@@ -154,7 +154,7 @@ class BahamutIRCdProto : public IRCDProto
 	}
 
 	/* JOIN - SJOIN */
-	void SendJoin(User *user, Channel *c, const ChannelStatus *status) anope_override
+	void SendJoin(const User *user, Channel *c, const ChannelStatus *status) anope_override
 	{
 		UplinkSocket::Message(user) << "SJOIN " << c->creation_time << " " << c->name;
 		if (status)
@@ -168,7 +168,7 @@ class BahamutIRCdProto : public IRCDProto
 			if (uc != NULL)
 				uc->Status->ClearFlags();
 
-			BotInfo *setter = findbot(user->nick);
+			const BotInfo *setter = findbot(user->nick);
 			for (unsigned i = 0; i < ModeManager::ChannelModes.size(); ++i)
 				if (cs.HasFlag(ModeManager::ChannelModes[i]->Name))
 					c->SetMode(setter, ModeManager::ChannelModes[i], user->nick, false);
@@ -188,7 +188,7 @@ class BahamutIRCdProto : public IRCDProto
 				return;
 			}
 
-			XLine *old = x;
+			const XLine *old = x;
 
 			if (old->manager->HasEntry("*@" + u->host))
 				return;
@@ -279,13 +279,13 @@ class BahamutIRCdProto : public IRCDProto
 
 	void SendLogin(User *u) anope_override
 	{
-		BotInfo *ns = findbot(Config->NickServ);
+		const BotInfo *ns = findbot(Config->NickServ);
 		ircdproto->SendMode(ns, u, "+d %d", u->timestamp);
 	}
 
 	void SendLogout(User *u) anope_override
 	{
-		BotInfo *ns = findbot(Config->NickServ);
+		const BotInfo *ns = findbot(Config->NickServ);
 		ircdproto->SendMode(ns, u, "+d 1");
 	}
 };
@@ -332,10 +332,11 @@ class BahamutIRCdMessage : public IRCdMessage
 			User *user = do_nick(source, params[0], params[4], params[5], params[6], params[9], Anope::string(params[2]).is_pos_number_only() ? convertTo<time_t>(params[2]) : 0, ip.addr(), "", "", params[3]);
 			if (user && nickserv)
 			{
-				NickAlias *na;
+				const NickAlias *na;
 				if (user->timestamp == convertTo<time_t>(params[7]) && (na = findnick(user->nick)))
 				{
-					user->Login(na->nc);
+					NickCore *nc = na->nc;
+					user->Login(nc);
 					if (!Config->NoNicknameOwnership && na->nc->HasFlag(NI_UNCONFIRMED) == false)
 						user->SetMode(findbot(Config->NickServ), UMODE_REGISTERED);
 				}

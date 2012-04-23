@@ -40,18 +40,18 @@ class CoreExport XLine : public Serializable
 	bool HasNickOrReal() const;
 	bool IsRegex() const;
 
-	Anope::string serialize_name() const;
-	serialized_data serialize();
-	static void unserialize(serialized_data &data);
+	const Anope::string serialize_name() const anope_override;
+	Serialize::Data serialize() const anope_override;
+	static Serializable* unserialize(Serializable *obj, Serialize::Data &data);
 };
 
 class CoreExport XLineManager : public Service
 {
 	char type;
 	/* List of XLines in this XLineManager */
-	std::vector<XLine *> XLines;
+	serialize_checker<std::vector<XLine *> > XLines;
 	/* Akills can have the same IDs, sometimes */
-	static std::multimap<Anope::string, XLine *, ci::less> XLinesByUID;
+	static serialize_checker<std::multimap<Anope::string, XLine *, ci::less> > XLinesByUID;
  public:
 	/* List of XLine managers we check users against in XLineManager::CheckAll */
 	static std::list<XLineManager *> XLineManagers;
@@ -118,7 +118,7 @@ class CoreExport XLineManager : public Service
 	 * @param index The index
 	 * @return The XLine, or NULL if the index is out of bounds
 	 */
-	XLine *GetEntry(unsigned index);
+	XLine* GetEntry(unsigned index);
 
 	/** Clear the XLine vector
 	 * Note: This does not remove the XLines from the IRCd
@@ -138,7 +138,7 @@ class CoreExport XLineManager : public Service
 	 * @param mask The mask
 	 * @return The XLine the user matches, or NULL
 	 */
-	XLine *HasEntry(const Anope::string &mask);
+	XLine* HasEntry(const Anope::string &mask);
 
 	/** Check a user against all of the xlines in this XLineManager
 	 * @param u The user
@@ -150,7 +150,7 @@ class CoreExport XLineManager : public Service
 	 * @param u The user
 	 * @param x The xline
 	 */
-	virtual bool Check(User *u, XLine *x) = 0;
+	virtual bool Check(User *u, const XLine *x) = 0;
 
 	/** Called when a user matches a xline in this XLineManager
 	 * @param u The user
@@ -161,7 +161,7 @@ class CoreExport XLineManager : public Service
 	/** Called when an XLine expires
 	 * @param x The xline
 	 */
-	virtual void OnExpire(XLine *x);
+	virtual void OnExpire(const XLine *x);
 
 	/** Called to send an XLine to the IRCd
 	 * @param u The user, if we know it

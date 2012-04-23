@@ -15,7 +15,7 @@
 #include "anope.h"
 #include "modules.h"
 
-class CoreExport Service : public Base
+class CoreExport Service : public virtual Base
 {
 	static Anope::map<Anope::map<Service *> > services;
  public:
@@ -89,7 +89,7 @@ class service_reference : public dynamic_reference<T>
 		this->name = n;
 	}
 
-	operator bool()
+	operator bool() anope_override
 	{
 		if (this->invalid)
 		{

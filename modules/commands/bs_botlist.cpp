@@ -30,7 +30,7 @@ class CommandBSBotList : public Command
 
 		list.addColumn("Nick").addColumn("Mask");
 
-		for (Anope::insensitive_map<BotInfo *>::const_iterator it = BotListByNick.begin(), it_end = BotListByNick.end(); it != it_end; ++it)
+		for (Anope::insensitive_map<BotInfo *>::const_iterator it = BotListByNick->begin(), it_end = BotListByNick->end(); it != it_end; ++it)
 		{
 			BotInfo *bi = it->second;
 

@@ -32,7 +32,7 @@ class CommandMSRSend : public Command
 
 		const Anope::string &nick = params[0];
 		const Anope::string &text = params[1];
-		NickAlias *na = NULL;
+		const NickAlias *na = NULL;
 
 		/* prevent user from rsend to themselves */
 		if ((na = findnick(nick)) && na->nc == u->Account())
@@ -65,7 +65,7 @@ class CommandMSRSend : public Command
 				MemoInfo *mi = memoserv->GetMemoInfo(nick, ischan);
 				if (mi == NULL)
 					throw CoreException("NULL mi in ms_rsend");
-				Memo *m = (mi->memos.size() ? mi->memos[mi->memos.size() - 1] : NULL);
+				Memo *m = (mi->memos->size() ? mi->GetMemo(mi->memos->size() - 1) : NULL);
 				if (m != NULL)
 					m->SetFlag(MF_RECEIPT);
 			}

@@ -14,19 +14,19 @@
 #include "module.h"
 #include "memoserv.h"
 
-void rsend_notify(CommandSource &source, MemoInfo *mi, Memo *m, const Anope::string &targ)
+static void rsend_notify(CommandSource &source, MemoInfo *mi, Memo *m, const Anope::string &targ)
 {
 	/* Only send receipt if memos are allowed */
 	if (memoserv && !readonly)
 	{
 		/* Get nick alias for sender */
-		NickAlias *na = findnick(m->sender);
+		const NickAlias *na = findnick(m->sender);
 
 		if (!na)
 			return;
 
 		/* Get nick core for sender */
-		NickCore *nc = na->nc;
+		const NickCore *nc = na->nc;
 
 		if (!nc)
 			return;
@@ -52,23 +52,23 @@ class MemoListCallback : public NumberList
 {
 	CommandSource &source;
 	MemoInfo *mi;
-	ChannelInfo *ci;
+	const ChannelInfo *ci;
  public:
-	MemoListCallback(CommandSource &_source, MemoInfo *_mi, ChannelInfo *_ci, const Anope::string &numlist) : NumberList(numlist, false), source(_source), mi(_mi), ci(_ci)
+	MemoListCallback(CommandSource &_source, MemoInfo *_mi, const ChannelInfo *_ci, const Anope::string &numlist) : NumberList(numlist, false), source(_source), mi(_mi), ci(_ci)
 	{
 	}
 
 	void HandleNumber(unsigned Number) anope_override
 	{
-		if (!Number || Number > mi->memos.size())
+		if (!Number || Number > mi->memos->size())
 			return;
 
 		MemoListCallback::DoRead(source, mi, ci, Number - 1);
 	}
 
-	static void DoRead(CommandSource &source, MemoInfo *mi, ChannelInfo *ci, unsigned index)
+	static void DoRead(CommandSource &source, MemoInfo *mi, const ChannelInfo *ci, unsigned index)
 	{
-		Memo *m = mi->memos[index];
+		Memo *m = mi->GetMemo(index);
 		if (ci)
 			source.Reply(_("Memo %d from %s (%s).  To delete, type: \002%s%s DEL %s %d\002"), index + 1, m->sender.c_str(), do_strftime(m->time).c_str(), Config->UseStrictPrivMsgString.c_str(), Config->MemoServ.c_str(), ci->name.c_str(), index + 1);
 		else
@@ -96,7 +96,7 @@ class CommandMSRead : public Command
 		User *u = source.u;
 
 		MemoInfo *mi;
-		ChannelInfo *ci = NULL;
+		ChannelInfo *ci;
 		Anope::string numstr = params[0], chan;
 
 		if (!numstr.empty() && numstr[0] == '#')
@@ -104,7 +104,8 @@ class CommandMSRead : public Command
 			chan = numstr;
 			numstr = params.size() > 1 ? params[1] : "";
 
-			if (!(ci = cs_findchan(chan)))
+			ci = cs_findchan(chan);
+			if (!ci)
 			{
 				source.Reply(CHAN_X_NOT_REGISTERED, chan.c_str());
 				return;
@@ -117,11 +118,11 @@ class CommandMSRead : public Command
 			mi = &ci->memos;
 		}
 		else
-			mi = &u->Account()->memos;
+			mi = const_cast<MemoInfo *>(&u->Account()->memos);
 
 		if (numstr.empty() || (!numstr.equals_ci("LAST") && !numstr.equals_ci("NEW") && !numstr.is_number_only()))
 			this->OnSyntaxError(source, numstr);
-		else if (mi->memos.empty())
+		else if (mi->memos->empty())
 		{
 			if (!chan.empty())
 				source.Reply(MEMO_X_HAS_NO_MEMOS, chan.c_str());
@@ -135,8 +136,8 @@ class CommandMSRead : public Command
 			if (numstr.equals_ci("NEW"))
 			{
 				int readcount = 0;
-				for (i = 0, end = mi->memos.size(); i < end; ++i)
-					if (mi->memos[i]->HasFlag(MF_UNREAD))
+				for (i = 0, end = mi->memos->size(); i < end; ++i)
+					if (mi->GetMemo(i)->HasFlag(MF_UNREAD))
 					{
 						MemoListCallback::DoRead(source, mi, ci, i);
 						++readcount;
@@ -151,7 +152,7 @@ class CommandMSRead : public Command
 			}
 			else if (numstr.equals_ci("LAST"))
 			{
-				for (i = 0, end = mi->memos.size() - 1; i < end; ++i);
+				for (i = 0, end = mi->memos->size() - 1; i < end; ++i);
 				MemoListCallback::DoRead(source, mi, ci, i);
 			}
 			else /* number[s] */

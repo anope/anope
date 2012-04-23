@@ -11,11 +11,11 @@
 class SQLiteResult : public SQLResult
 {
  public:
-	SQLiteResult(const SQLQuery &q, const Anope::string &fq) : SQLResult(q, fq)
+	SQLiteResult(unsigned int i, const SQLQuery &q, const Anope::string &fq) : SQLResult(i, q, fq)
 	{
 	}
 
-	SQLiteResult(const SQLQuery &q, const Anope::string &fq, const Anope::string &err) : SQLResult(q, fq, err)
+	SQLiteResult(const SQLQuery &q, const Anope::string &fq, const Anope::string &err) : SQLResult(0, q, fq, err)
 	{
 	}
 
@@ -29,6 +29,8 @@ class SQLiteResult : public SQLResult
  */
 class SQLiteService : public SQLProvider
 {
+	std::map<Anope::string, std::set<Anope::string> > active_schema;
+
 	Anope::string database;
 
 	sqlite3 *sql;
@@ -44,7 +46,7 @@ class SQLiteService : public SQLProvider
 
 	SQLResult RunQuery(const SQLQuery &query);
 
-	SQLQuery CreateTable(const Anope::string &table, const Serializable::serialized_data &data) anope_override;
+	std::vector<SQLQuery> CreateTable(const Anope::string &table, const Serialize::Data &data) anope_override;
 
 	SQLQuery GetTables();
 
@@ -156,7 +158,7 @@ SQLResult SQLiteService::RunQuery(const SQLQuery &query)
 	for (int i = 0; i < cols; ++i)
 		columns[i] = sqlite3_column_name(stmt, i);
 
-	SQLiteResult result(query, real_query);
+	SQLiteResult result(0, query, real_query);
 
 	while ((err = sqlite3_step(stmt)) == SQLITE_ROW)
 	{
@@ -170,6 +172,8 @@ SQLResult SQLiteService::RunQuery(const SQLQuery &query)
 		result.addRow(items);
 	}
 
+	result.id = sqlite3_last_insert_rowid(this->sql);
+
 	sqlite3_finalize(stmt);
 
 	if (err != SQLITE_DONE)
@@ -178,38 +182,58 @@ SQLResult SQLiteService::RunQuery(const SQLQuery &query)
 	return result;
 }
 
-SQLQuery SQLiteService::CreateTable(const Anope::string &table, const Serializable::serialized_data &data)
+std::vector<SQLQuery> SQLiteService::CreateTable(const Anope::string &table, const Serialize::Data &data)
 {
-	Anope::string query_text = "CREATE TABLE `" + table + "` (", key_buf;
-	for (Serializable::serialized_data::const_iterator it = data.begin(), it_end = data.end(); it != it_end; ++it)
-	{
-		query_text += "`" + it->first + "` ";
-		if (it->second.getType() == Serialize::DT_INT)
-			query_text += "int(11)";
-		else if (it->second.getMax() > 0)
-			query_text += "varchar(" + stringify(it->second.getMax()) + ")";
-		else
-			query_text += "text";
-		query_text += ",";
+	std::vector<SQLQuery> queries;
+	std::set<Anope::string> &known_cols = this->active_schema[table];
 
-		if (it->second.getKey())
-		{
-			if (key_buf.empty())
-				key_buf = "UNIQUE (";
-			key_buf += "`" + it->first + "`,";
-		}
-	}
-	if (!key_buf.empty())
+	if (active_schema.empty())
 	{
-		key_buf.erase(key_buf.end() - 1);
-		key_buf += ")";
-		query_text += " " + key_buf;
+		Anope::string query_text = "CREATE TABLE IF NOT EXISTS `" + table + "` (id INTEGER PRIMARY KEY, `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP, ";
+
+		for (Serialize::Data::const_iterator it = data.begin(), it_end = data.end(); it != it_end; ++it)
+		{
+			known_cols.insert(it->first);
+
+			query_text += ", `" + it->first + "` ";
+			if (it->second.getType() == Serialize::DT_INT)
+				query_text += "int(11)";
+			else
+				query_text += "text";
+		}
+
+		query_text.erase(query_text.end() - 1);
+		query_text += ")";
+
+		queries.push_back(query_text);
+
+		query_text = "CREATE UNIQUE INDEX IF NOT EXISTS `id_idx` ON `" + table + "` (`id`)";
+		queries.push_back(query_text);
+
+		query_text = "CREATE INDEX IF NOT EXISTS `timestamp_idx` ON `" + table + "` (`timestamp`)";
+		queries.push_back(query_text);
+
+		query_text = "CREATE TRIGGER `" + table + "_trigger` AFTER UPDATE ON `" + table + "` FOR EACH ROW BEGIN UPDATE `" + table + "` SET `timestamp` = CURRENT_TIMESTAMP WHERE `id` = `old.id`; end;";
+		queries.push_back(query_text);
 	}
 	else
-		query_text.erase(query_text.end() - 1);
-	query_text += ")";
+		for (Serialize::Data::const_iterator it = data.begin(), it_end = data.end(); it != it_end; ++it)
+		{
+			if (known_cols.count(it->first) > 0)
+				continue;
 
-	return SQLQuery(query_text);
+			known_cols.insert(it->first);
+
+			Anope::string query_text = "ALTER TABLE `" + table + "` ADD `" + it->first + "` ";
+			if (it->second.getType() == Serialize::DT_INT)
+				query_text += "int(11)";
+			else
+				query_text += "text";
+
+			queries.push_back(query_text);
+		}
+
+	return queries;
 }
 
 SQLQuery SQLiteService::GetTables()

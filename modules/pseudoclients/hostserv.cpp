@@ -23,7 +23,7 @@ class HostServCore : public Module
 		if (!ircd || !ircd->vhost)
 			throw ModuleException("Your IRCd does not suppor vhosts");
 	
-		BotInfo *HostServ = findbot(Config->HostServ);
+		const BotInfo *HostServ = findbot(Config->HostServ);
 		if (HostServ == NULL)
 			throw ModuleException("No bot named " + Config->HostServ);
 
@@ -33,7 +33,7 @@ class HostServCore : public Module
 
 	void OnNickIdentify(User *u) anope_override
 	{
-		NickAlias *na = findnick(u->nick);
+		const NickAlias *na = findnick(u->nick);
 		if (!na || !na->HasVhost())
 			na = findnick(u->Account()->display);
 		if (!na || !na->HasVhost())
@@ -50,7 +50,7 @@ class HostServCore : public Module
 			if (ircd->vident && !na->GetVhostIdent().empty())
 				u->SetVIdent(na->GetVhostIdent());
 
-			BotInfo *bi = findbot(Config->HostServ);
+			const BotInfo *bi = findbot(Config->HostServ);
 			if (bi)
 			{
 				if (!na->GetVhostIdent().empty())

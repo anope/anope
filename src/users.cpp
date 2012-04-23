@@ -41,7 +41,6 @@ User::User(const Anope::string &snick, const Anope::string &sident, const Anope:
 
 	/* we used to do this by calloc, no more. */
 	server = NULL;
-	nc = NULL;
 	invalid_pw_count = invalid_pw_time = lastmemosend = lastnickreg = lastmail = 0;
 	OnAccess = false;
 	timestamp = my_signon = Anope::CurTime;
@@ -81,7 +80,7 @@ void User::SetNewNick(const Anope::string &newnick)
 	UserListByNick[this->nick] = this;
 
 	OnAccess = false;
-	NickAlias *na = findnick(this->nick);
+	const NickAlias *na = findnick(this->nick);
 	if (na)
 		OnAccess = is_on_access(this, na->nc);
 }
@@ -225,7 +224,7 @@ User::~User()
 	Log(LOG_DEBUG_2) << "User::~User() done";
 }
 
-void User::SendMessage(BotInfo *source, const char *fmt, ...)
+void User::SendMessage(const BotInfo *source, const char *fmt, ...)
 {
 	va_list args;
 	char buf[BUFSIZE] = "";
@@ -240,7 +239,7 @@ void User::SendMessage(BotInfo *source, const char *fmt, ...)
 	va_end(args);
 }
 
-void User::SendMessage(BotInfo *source, Anope::string msg)
+void User::SendMessage(const BotInfo *source, Anope::string msg)
 {
 	const char *translated_message = translate(this, msg.c_str());
 
@@ -318,7 +317,7 @@ void User::SendMessage(BotInfo *source, Anope::string msg)
  */
 void User::Collide(NickAlias *na)
 {
-	BotInfo *bi = findbot(Config->NickServ);
+	const BotInfo *bi = findbot(Config->NickServ);
 	if (!bi)
 		return;
 	if (na)
@@ -372,15 +371,15 @@ void User::Identify(NickAlias *na)
 	this->Login(na->nc);
 	ircdproto->SendLogin(this);
 
-	NickAlias *this_na = findnick(this->nick);
-	if (!Config->NoNicknameOwnership && this_na && this_na->nc == na->nc && na->nc->HasFlag(NI_UNCONFIRMED) == false)
+	const NickAlias *this_na = findnick(this->nick);
+	if (!Config->NoNicknameOwnership && this_na && this_na->nc == *na->nc && na->nc->HasFlag(NI_UNCONFIRMED) == false)
 		this->SetMode(findbot(Config->NickServ), UMODE_REGISTERED);
 
 	FOREACH_MOD(I_OnNickIdentify, OnNickIdentify(this));
 
 	if (this->IsServicesOper())
 	{
-		BotInfo *bi = findbot(Config->OperServ);
+		const BotInfo *bi = findbot(Config->OperServ);
 		if (!this->nc->o->ot->modes.empty())
 		{
 			this->SetModes(bi, "%s", this->nc->o->ot->modes.c_str());
@@ -427,7 +426,7 @@ void User::Logout()
 /** Get the account the user is logged in using
  * @reurn The account or NULL
  */
-NickCore *User::Account()
+NickCore *User::Account() const
 {
 	return this->nc;
 }
@@ -436,13 +435,13 @@ NickCore *User::Account()
  * @param CheckNick True to check if the user is identified to the nickname they are on too
  * @return true or false
  */
-bool User::IsIdentified(bool CheckNick)
+bool User::IsIdentified(bool CheckNick) const
 {
 	if (CheckNick && this->nc)
 	{
 		NickAlias *na = findnick(this->nc->display);
 
-		if (na && na->nc == this->nc)
+		if (na && *na->nc == *this->nc)
 			return true;
 
 		return false;
@@ -455,11 +454,11 @@ bool User::IsIdentified(bool CheckNick)
  * @param CheckSecure Only returns true if the user has secure off
  * @return true or false
  */
-bool User::IsRecognized(bool CheckSecure)
+bool User::IsRecognized(bool CheckSecure) const
 {
 	if (CheckSecure && OnAccess)
 	{
-		NickAlias *na = findnick(this->nick);
+		const NickAlias *na = findnick(this->nick);
 
 		if (!na || na->nc->HasFlag(NI_SECURE))
 			return false;
@@ -589,7 +588,7 @@ void User::RemoveModeInternal(UserMode *um)
  * @param um The user mode
  * @param Param Optional param for the mode
  */
-void User::SetMode(BotInfo *bi, UserMode *um, const Anope::string &Param)
+void User::SetMode(const BotInfo *bi, UserMode *um, const Anope::string &Param)
 {
 	if (!um || HasMode(um->Name))
 		return;
@@ -603,7 +602,7 @@ void User::SetMode(BotInfo *bi, UserMode *um, const Anope::string &Param)
  * @param Name The mode name
  * @param param Optional param for the mode
  */
-void User::SetMode(BotInfo *bi, UserModeName Name, const Anope::string &Param)
+void User::SetMode(const BotInfo *bi, UserModeName Name, const Anope::string &Param)
 {
 	SetMode(bi, ModeManager::FindUserModeByName(Name), Param);
 }
@@ -612,7 +611,7 @@ void User::SetMode(BotInfo *bi, UserModeName Name, const Anope::string &Param)
  * @param bi The client setting the mode
  * @param um The user mode
  */
-void User::RemoveMode(BotInfo *bi, UserMode *um)
+void User::RemoveMode(const BotInfo *bi, UserMode *um)
 {
 	if (!um || !HasMode(um->Name))
 		return;
@@ -625,7 +624,7 @@ void User::RemoveMode(BotInfo *bi, UserMode *um)
  * @param bi The client setting the mode
  * @param Name The mode name
  */
-void User::RemoveMode(BotInfo *bi, UserModeName Name)
+void User::RemoveMode(const BotInfo *bi, UserModeName Name)
 {
 	RemoveMode(bi, ModeManager::FindUserModeByName(Name));
 }
@@ -634,7 +633,7 @@ void User::RemoveMode(BotInfo *bi, UserModeName Name)
  * @param bi The client setting the mode
  * @param umodes The modes
  */
-void User::SetModes(BotInfo *bi, const char *umodes, ...)
+void User::SetModes(const BotInfo *bi, const char *umodes, ...)
 {
 	char buf[BUFSIZE] = "";
 	va_list args;
@@ -761,7 +760,7 @@ Anope::string User::GetModes() const
  * @param c The channel
  * @return The channel container, or NULL
  */
-ChannelContainer *User::FindChannel(const Channel *c)
+ChannelContainer *User::FindChannel(const Channel *c) const
 {
 	for (UChannelList::const_iterator it = this->chans.begin(), it_end = this->chans.end(); it != it_end; ++it)
 		if ((*it)->chan == c)

@@ -27,7 +27,7 @@ class CommandNSGetPass : public Command
 		User *u = source.u;
 		const Anope::string &nick = params[0];
 		Anope::string tmp_pass;
-		NickAlias *na;
+		const NickAlias *na;
 
 		if (!(na = findnick(nick)))
 			source.Reply(NICK_X_NOT_REGISTERED, nick.c_str());

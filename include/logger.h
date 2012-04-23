@@ -48,11 +48,11 @@ struct LogFile
 class CoreExport Log
 {
  public:
-	BotInfo *bi;
-	User *u;
+	const BotInfo *bi;
+	const User *u;
 	Command *c;
 	Channel *chan;
-	ChannelInfo *ci;
+	const ChannelInfo *ci;
 	Server *s;
 	LogType Type;
 	Anope::string Category;
@@ -60,21 +60,21 @@ class CoreExport Log
 
 	std::stringstream buf;
 
-	Log(LogType type = LOG_NORMAL, const Anope::string &category = "", BotInfo *bi = NULL);
+	Log(LogType type = LOG_NORMAL, const Anope::string &category = "", const BotInfo *bi = NULL);
 
 	/* LOG_COMMAND/OVERRIDE/ADMIN */
-	Log(LogType type, User *u, Command *c, ChannelInfo *ci = NULL);
+	Log(LogType type, const User *u, Command *c, const ChannelInfo *ci = NULL);
 
 	/* LOG_CHANNEL */
-	Log(User *u, Channel *c, const Anope::string &category = "");
+	Log(const User *u, Channel *c, const Anope::string &category = "");
 
 	/* LOG_USER */
-	explicit Log(User *u, const Anope::string &category = "", BotInfo *bi = NULL);
+	explicit Log(const User *u, const Anope::string &category = "", const BotInfo *bi = NULL);
 
 	/* LOG_SERVER */
-	explicit Log(Server *s, const Anope::string &category = "", BotInfo *bi = NULL);
+	explicit Log(Server *s, const Anope::string &category = "", const BotInfo *bi = NULL);
 
-	explicit Log(BotInfo *b, const Anope::string &category = "");
+	explicit Log(const BotInfo *b, const Anope::string &category = "");
 
 	~Log();
 

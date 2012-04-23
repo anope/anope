@@ -75,9 +75,9 @@ class CommandNSList : public Command
 
 		list.addColumn("Nick").addColumn("Last usermask");
 
-		for (nickalias_map::const_iterator it = NickAliasList.begin(), it_end = NickAliasList.end(); it != it_end; ++it)
+		for (nickalias_map::const_iterator it = NickAliasList->begin(), it_end = NickAliasList->end(); it != it_end; ++it)
 		{
-			NickAlias *na = it->second;
+			const NickAlias *na = it->second;
 
 			/* Don't show private nicks to non-services admins. */
 			if (na->nc->HasFlag(NI_PRIVATE) && !is_servadmin && na->nc != mync)

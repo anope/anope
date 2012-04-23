@@ -21,7 +21,7 @@
 /**** actions.c ****/
 
 E bool bad_password(User *u);
-E void common_unban(ChannelInfo *ci, User *u, bool full = false);
+E void common_unban(const ChannelInfo *ci, User *u, bool full = false);
 
 /**** channels.c ****/
 
@@ -34,7 +34,7 @@ E void do_join(const Anope::string &source, const Anope::string &channels, const
 E void do_kick(const Anope::string &source, const Anope::string &channel, const Anope::string &users, const Anope::string &reason);
 E void do_part(const Anope::string &source, const Anope::string &channels, const Anope::string &reason);
 
-E void chan_set_correct_modes(User *user, Channel *c, int give_modes);
+E void chan_set_correct_modes(const User *user, Channel *c, int give_modes);
 
 /**** encrypt.c ****/
 
@@ -57,7 +57,7 @@ E std::vector<Anope::string> domains;
 E void InitLanguages();
 E const char *translate(const char *string);
 E const char *translate(User *u, const char *string);
-E const char *translate(NickCore *nc, const char *string);
+E const char *translate(const NickCore *nc, const char *string);
 E const char *anope_gettext(const char *lang, const char *string);
 
 /**** main.c ****/
@@ -115,9 +115,9 @@ E bool OnError(const Anope::string &, const std::vector<Anope::string> &);
 E bool IsFile(const Anope::string &filename);
 
 E time_t dotime(const Anope::string &s);
-E Anope::string duration(const time_t &seconds, NickCore *nc = NULL);
-E Anope::string expire_left(NickCore *nc, time_t expires);
-E Anope::string do_strftime(const time_t &t, NickCore *nc = NULL, bool short_output = false);
+E Anope::string duration(const time_t &seconds, const NickCore *nc = NULL);
+E Anope::string expire_left(const NickCore *nc, time_t expires);
+E Anope::string do_strftime(const time_t &t, const NickCore *nc = NULL, bool short_output = false);
 E bool IsValidIdent(const Anope::string &ident);
 E bool IsValidHost(const Anope::string &host);
 
@@ -137,7 +137,7 @@ E Anope::string normalizeBuffer(const Anope::string &);
 
 /* Number of generic modes we support */
 E unsigned GenericChannelModes, GenericUserModes;
-E std::multimap<ChannelModeName, ModeLock> def_mode_locks;
+E std::multimap<ChannelModeName, ModeLock *> def_mode_locks;
 E void SetDefaultMLock(ServerConfig *config);
 
 /**** process.c ****/

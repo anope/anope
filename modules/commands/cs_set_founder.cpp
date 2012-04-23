@@ -22,7 +22,7 @@ class CommandCSSetFounder : public Command
 		this->SetSyntax(_("\037channel\037 \037nick\037"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params)anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		User *u = source.u;
 		ChannelInfo *ci = cs_findchan(params[0]);
@@ -44,8 +44,7 @@ class CommandCSSetFounder : public Command
 			return;
 		}
 
-		NickAlias *na = findnick(params[1]);
-
+		const NickAlias *na = findnick(params[1]);
 		if (!na)
 		{
 			source.Reply(NICK_X_NOT_REGISTERED, params[1].c_str());

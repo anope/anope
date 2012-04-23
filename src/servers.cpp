@@ -49,7 +49,7 @@ Server::Server(Server *uplink, const Anope::string &name, unsigned hops, const A
 		if (Me == this->UplinkServer && !this->HasFlag(SERVER_JUPED))
 		{
 			/* Now do mode related stuff as we know what modes exist .. */
-			for (botinfo_map::iterator it = BotListByNick.begin(), it_end = BotListByNick.end(); it != it_end; ++it)
+			for (botinfo_map::iterator it = BotListByNick->begin(), it_end = BotListByNick->end(); it != it_end; ++it)
 			{
 				BotInfo *bi = it->second;
 				Anope::string modes = !bi->botmodes.empty() ? ("+" + bi->botmodes) : ircd->pseudoclient_mode;
@@ -276,7 +276,7 @@ void Server::Sync(bool SyncLinks)
 
 	if (this->GetUplink() && this->GetUplink() == Me)
 	{
-		for (registered_channel_map::iterator it = RegisteredChannelList.begin(), it_end = RegisteredChannelList.end(); it != it_end; ++it)
+		for (registered_channel_map::iterator it = RegisteredChannelList->begin(), it_end = RegisteredChannelList->end(); it != it_end; ++it)
 		{
 			ChannelInfo *ci = it->second;
 			if (ci->HasFlag(CI_PERSIST))
@@ -353,7 +353,7 @@ bool Server::IsULined() const
  * @param source The source of the message
  * @param message The message
  */
-void Server::Notice(BotInfo *source, const Anope::string &message)
+void Server::Notice(const BotInfo *source, const Anope::string &message)
 {
 	if (Config->NSDefFlags.HasFlag(NI_MSG))
 		ircdproto->SendGlobalPrivmsg(source, this, message);

@@ -17,12 +17,6 @@ class CoreExport ExtensibleItem
 	virtual void OnDelete();
 };
 
-class ExtensibleString : public Anope::string, public ExtensibleItem
-{
- public:
-	ExtensibleString(const Anope::string &s) : Anope::string(s), ExtensibleItem() { }
-};
-
 class CoreExport Extensible
 {
  private:
@@ -92,9 +86,9 @@ class CoreExport Extensible
 	 * @param key The key parameter is an arbitary string which identifies the extension data
 	 * @return The item found
 	 */
-	template<typename T> T GetExt(const Anope::string &key)
+	template<typename T> T GetExt(const Anope::string &key) const
 	{
-		extensible_map::iterator it = this->extension_items.find(key);
+		extensible_map::const_iterator it = this->extension_items.find(key);
 		if (it != this->extension_items.end())
 			return debug_cast<T>(it->second);
 
@@ -106,7 +100,7 @@ class CoreExport Extensible
 	 * @param key The key parameter is an arbitary string which identifies the extension data
 	 * @return True if the item was found.
 	 */
-	bool HasExt(const Anope::string &key)
+	bool HasExt(const Anope::string &key) const
 	{
 		return this->extension_items.count(key) > 0;
 	}
@@ -116,9 +110,9 @@ class CoreExport Extensible
 	 * @return This function writes a list of all extension items stored
 	 *	 in this object by name into the given deque and returns void.
 	 */
-	void GetExtList(std::deque<Anope::string> &list)
+	void GetExtList(std::deque<Anope::string> &list) const
 	{
-		for (extensible_map::iterator it = extension_items.begin(), it_end = extension_items.end(); it != it_end; ++it)
+		for (extensible_map::const_iterator it = extension_items.begin(), it_end = extension_items.end(); it != it_end; ++it)
 			list.push_back(it->first);
 	}
 };

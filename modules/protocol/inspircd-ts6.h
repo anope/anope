@@ -51,7 +51,7 @@ class InspIRCdTS6Proto : public IRCDProto
 
 	void SendAkillDel(const XLine *x) anope_override
 	{
-		BotInfo *bi = findbot(Config->OperServ);
+		const BotInfo *bi = findbot(Config->OperServ);
 
 		/* InspIRCd may support regex bans */
 		if (x->IsRegex() && has_rlinemod)
@@ -92,7 +92,7 @@ class InspIRCdTS6Proto : public IRCDProto
 		if (timeleft > 172800 || !x->Expires)
 			timeleft = 172800;
 
-		BotInfo *bi = findbot(Config->OperServ);
+		const BotInfo *bi = findbot(Config->OperServ);
 		/* InspIRCd may support regex bans, if they do we can send this and forget about it */
 		if (x->IsRegex() && has_rlinemod)
 		{
@@ -114,7 +114,7 @@ class InspIRCdTS6Proto : public IRCDProto
 				return;
 			}
 
-			XLine *old = x;
+			const XLine *old = x;
 
 			if (old->manager->HasEntry("*@" + u->host))
 				return;
@@ -169,7 +169,7 @@ class InspIRCdTS6Proto : public IRCDProto
 	}
 
 	/* JOIN */
-	void SendJoin(User *user, Channel *c, const ChannelStatus *status) anope_override
+	void SendJoin(const User *user, Channel *c, const ChannelStatus *status) anope_override
 	{
 		UplinkSocket::Message(Me) << "FJOIN " << c->name << " " << c->creation_time << " +" << c->GetModes(true, true) << " :," << user->GetUID();
 		/* Note that we can send this with the FJOIN but choose not to
@@ -187,7 +187,7 @@ class InspIRCdTS6Proto : public IRCDProto
 			if (uc != NULL)
 				uc->Status->ClearFlags();
 
-			BotInfo *setter = findbot(user->nick);
+			const BotInfo *setter = findbot(user->nick);
 			for (unsigned i = 0; i < ModeManager::ChannelModes.size(); ++i)
 				if (cs.HasFlag(ModeManager::ChannelModes[i]->Name))
 					c->SetMode(setter, ModeManager::ChannelModes[i], user->nick, false);
@@ -231,7 +231,7 @@ class InspIRCdTS6Proto : public IRCDProto
 	/* SVSHOLD - set */
 	void SendSVSHold(const Anope::string &nick) anope_override
 	{
-		BotInfo *bi = findbot(Config->NickServ);
+		const BotInfo *bi = findbot(Config->NickServ);
 		if (bi)
 			UplinkSocket::Message(bi) << "SVSHOLD " << nick << " " << Config->NSReleaseTimeout << " :Being held for registered user";
 	}
@@ -239,7 +239,7 @@ class InspIRCdTS6Proto : public IRCDProto
 	/* SVSHOLD - release */
 	void SendSVSHoldDel(const Anope::string &nick) anope_override
 	{
-		BotInfo *bi = findbot(Config->NickServ);
+		const BotInfo *bi = findbot(Config->NickServ);
 		if (bi)
 			UplinkSocket::Message(bi) << "SVSHOLD " << nick;
 	}
@@ -497,7 +497,7 @@ class InspircdIRCdMessage : public IRCdMessage
 
 bool event_idle(const Anope::string &source, const std::vector<Anope::string> &params)
 {
-	BotInfo *bi = findbot(params[0]);
+	const BotInfo *bi = findbot(params[0]);
 	if (bi)
 		UplinkSocket::Message(bi) << "IDLE " << source << " " << start_time << " " << (Anope::CurTime - bi->lastmsg);
 	return true;

@@ -19,16 +19,17 @@
 #include "servers.h"
 #include "config.h"
 
-class NickServHeld;
+serialize_checker<nickalias_map> NickAliasList("NickAlias");
 
+class NickServHeld;
 typedef std::map<Anope::string, NickServHeld *> nickservheld_map;
 static nickservheld_map NickServHelds;
 
 /** Default constructor
  * @param nick The nick
- * @param nickcore The nickcofe for this nick
+ * @param nickcore The nickcore for this nick
  */
-NickAlias::NickAlias(const Anope::string &nickname, NickCore *nickcore) : Flags<NickNameFlag, NS_END>(NickNameFlagStrings)
+NickAlias::NickAlias(const Anope::string &nickname, NickCore* nickcore) : Flags<NickNameFlag, NS_END>(NickNameFlagStrings)
 {
 	if (nickname.empty())
 		throw CoreException("Empty nick passed to NickAlias constructor");
@@ -38,16 +39,16 @@ NickAlias::NickAlias(const Anope::string &nickname, NickCore *nickcore) : Flags<
 	this->time_registered = this->last_seen = Anope::CurTime;
 	this->nick = nickname;
 	this->nc = nickcore;
-	this->nc->aliases.push_back(this);
+	nickcore->aliases.push_back(this);
 
-	NickAliasList[this->nick] = this;
+	(*NickAliasList)[this->nick] = this;
 
 	if (this->nc->o == NULL)
 	{
 		Oper *o = Oper::Find(this->nick);
 		if (o == NULL)
 			o = Oper::Find(this->nc->display);
-		this->nc->o = o;
+		nickcore->o = o;
 		if (this->nc->o != NULL)
 			Log() << "Tied oper " << this->nc->display << " to type " << this->nc->o->ot->GetName();
 	}
@@ -63,7 +64,7 @@ NickAlias::~NickAlias()
 	if (this->nc)
 	{
 		/* Next: see if our core is still useful. */
-		std::list<NickAlias *>::iterator it = std::find(this->nc->aliases.begin(), this->nc->aliases.end(), this);
+		std::list<serialize_obj<NickAlias> >::iterator it = std::find(this->nc->aliases.begin(), this->nc->aliases.end(), this);
 		if (it != this->nc->aliases.end())
 			this->nc->aliases.erase(it);
 		if (this->nc->aliases.empty())
@@ -80,7 +81,7 @@ NickAlias::~NickAlias()
 	}
 
 	/* Remove us from the aliases list */
-	NickAliasList.erase(this->nick);
+	NickAliasList->erase(this->nick);
 }
 
 /** Release a nick from being held. This can be called from the core (ns_release)
@@ -242,16 +243,16 @@ time_t NickAlias::GetVhostCreated() const
 	return this->vhost_created;
 }
 
-Anope::string NickAlias::serialize_name() const
+const Anope::string NickAlias::serialize_name() const
 {
 	return "NickAlias";
 }
 
-Serializable::serialized_data NickAlias::serialize()
+Serialize::Data NickAlias::serialize() const
 {
-	serialized_data data;	
+	Serialize::Data data;	
 
-	data["nick"].setKey().setMax(Config->NickLen) << this->nick;
+	data["nick"].setMax(Config->NickLen) << this->nick;
 	data["last_quit"] << this->last_quit;
 	data["last_realname"] << this->last_realname;
 	data["last_usermask"] << this->last_usermask;
@@ -272,18 +273,21 @@ Serializable::serialized_data NickAlias::serialize()
 	return data;
 }
 
-void NickAlias::unserialize(serialized_data &data)
+Serializable* NickAlias::unserialize(Serializable *obj, Serialize::Data &data)
 {
 	NickCore *core = findcore(data["nc"].astr());
 	if (core == NULL)
-		return;
+		return NULL;
 
-	NickAlias *na = findnick(data["nick"].astr());
-	if (na == NULL)
+	NickAlias *na;
+	if (obj)
+		na = debug_cast<NickAlias *>(obj);
+	else
 		na = new NickAlias(data["nick"].astr(), core);
-	else if (na->nc != core)
+
+	if (na->nc != core)
 	{
-		std::list<NickAlias *>::iterator it = std::find(na->nc->aliases.begin(), na->nc->aliases.end(), na);
+		std::list<serialize_obj<NickAlias> >::iterator it = std::find(na->nc->aliases.begin(), na->nc->aliases.end(), na);
 		if (it != na->nc->aliases.end())
 			na->nc->aliases.erase(it);
 
@@ -293,7 +297,7 @@ void NickAlias::unserialize(serialized_data &data)
 			change_core_display(na->nc);
 
 		na->nc = core;
-		na->nc->aliases.push_back(na);
+		core->aliases.push_back(na);
 	}
 
 	data["last_quit"] >> na->last_quit;
@@ -307,5 +311,6 @@ void NickAlias::unserialize(serialized_data &data)
 	time_t vhost_time;
 	data["vhost_time"] >> vhost_time;
 	na->SetVhost(data["vhost_ident"].astr(), data["vhost_host"].astr(), data["vhost_creator"].astr(), vhost_time);
+	return na;
 }
 

@@ -13,7 +13,7 @@
 
 #include "module.h"
 
-static bool SendResetEmail(User *u, NickAlias *na, BotInfo *bi);
+static bool SendResetEmail(User *u, const NickAlias *na, const BotInfo *bi);
 
 class CommandNSResetPass : public Command
 {
@@ -28,7 +28,7 @@ class CommandNSResetPass : public Command
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		User *u = source.u;
-		NickAlias *na;
+		const NickAlias *na;
 
 		if (Config->RestrictMail && (!u->Account() || !u->HasCommand("nickserv/resetpass")))
 			source.Reply(ACCESS_DENIED);
@@ -89,19 +89,20 @@ class NSResetPass : public Module
 			ResetInfo *ri = na ? na->nc->GetExt<ResetInfo *>("ns_resetpass") : NULL;
 			if (na && ri)
 			{
+				NickCore *nc = na->nc;
 				const Anope::string &passcode = params[1];
 				if (ri->time < Anope::CurTime - 3600)
 				{
-					na->nc->Shrink("ns_resetpass");
+					nc->Shrink("ns_resetpass");
 					source.Reply(_("Your password reset request has expired."));
 				}
 				else if (passcode.equals_cs(ri->code))
 				{
-					na->nc->Shrink("ns_resetpass");
+					nc->Shrink("ns_resetpass");
 
 					Log(LOG_COMMAND, u, &commandnsresetpass) << "confirmed RESETPASS to forcefully identify to " << na->nick;
 
-					na->nc->UnsetFlag(NI_UNCONFIRMED);
+					nc->UnsetFlag(NI_UNCONFIRMED);
 					u->Identify(na);
 
 					source.Reply(_("You are now identified for your nick. Change your password now."));
@@ -118,7 +119,7 @@ class NSResetPass : public Module
 	}
 };
 
-static bool SendResetEmail(User *u, NickAlias *na, BotInfo *bi)
+static bool SendResetEmail(User *u, const NickAlias *na, const BotInfo *bi)
 {
 	int min = 1, max = 62;
 	int chars[] = {
@@ -148,9 +149,10 @@ static bool SendResetEmail(User *u, NickAlias *na, BotInfo *bi)
 	ResetInfo *ri = new ResetInfo;
 	ri->code = passcode;
 	ri->time = Anope::CurTime;
-	na->nc->Extend("ns_resetpass", ri);
+	NickCore *nc = na->nc;
+	nc->Extend("ns_resetpass", ri);
 
-	return Mail(u, na->nc, bi, subject, message);
+	return Mail(u, nc, bi, subject, message);
 }
 
 MODULE_INIT(NSResetPass)

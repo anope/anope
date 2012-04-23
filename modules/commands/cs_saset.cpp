@@ -37,10 +37,10 @@ class CommandCSSASet : public Command
 				" \n"
 				"Available options:"));
 		Anope::string this_name = source.command;
-		for (BotInfo::command_map::iterator it = source.owner->commands.begin(), it_end = source.owner->commands.end(); it != it_end; ++it)
+		for (BotInfo::command_map::const_iterator it = source.owner->commands.begin(), it_end = source.owner->commands.end(); it != it_end; ++it)
 		{
 			const Anope::string &c_name = it->first;
-			CommandInfo &info = it->second;
+			const CommandInfo &info = it->second;
 			if (c_name.find_ci(this_name + " ") == 0)
 			{
 				service_reference<Command> command("Command", info.name);

@@ -15,18 +15,18 @@
 
 struct AJoinList : std::vector<std::pair<Anope::string, Anope::string> >, ExtensibleItem, Serializable
 {
-	NickCore *nc;
+	serialize_obj<NickCore> nc;
 
 	AJoinList(NickCore *n) : nc(n) { }
 
-	Anope::string serialize_name() const anope_override
+	const Anope::string serialize_name() const anope_override
 	{
 		return "AJoinList";
 	}
 
-	serialized_data serialize() anope_override
+	Serialize::Data serialize() const anope_override
 	{
-		serialized_data sd;
+		Serialize::Data sd;
 
 		sd["nc"] << this->nc->display;
 		Anope::string channels;
@@ -43,14 +43,20 @@ struct AJoinList : std::vector<std::pair<Anope::string, Anope::string> >, Extens
 		return sd;
 	}
 
-	static void unserialize(serialized_data &sd)
+	static Serializable* unserialize(Serializable *obj, Serialize::Data &sd)
 	{
 		NickCore *nc = findcore(sd["nc"].astr());
 		if (nc == NULL)
-			return;
+			return NULL;
 
-		AJoinList *aj = new AJoinList(nc);
-		nc->Extend("ns_ajoin_channels", aj);
+		AJoinList *aj;
+		if (obj)
+			aj = debug_cast<AJoinList *>(obj);
+		else
+		{
+			aj = new AJoinList(nc);
+			nc->Extend("ns_ajoin_channels", aj);
+		}
 
 		Anope::string token;
 		spacesepstream ssep(sd["channels"].astr());
@@ -68,6 +74,8 @@ struct AJoinList : std::vector<std::pair<Anope::string, Anope::string> >, Extens
 
 			aj->push_back(std::make_pair(chan, key));
 		}
+
+		return aj;
 	}
 };
 
@@ -200,7 +208,7 @@ class NSAJoin : public Module
 	void OnNickIdentify(User *u) anope_override
 	{
 		AJoinList *channels = u->Account()->GetExt<AJoinList *>("ns_ajoin_channels");
-		BotInfo *bi = findbot(Config->NickServ);
+		const BotInfo *bi = findbot(Config->NickServ);
 
 		if (channels == NULL || bi == NULL)
 			return;
@@ -208,9 +216,12 @@ class NSAJoin : public Module
 		for (unsigned i = 0; i < channels->size(); ++i)
 		{
 			Channel *c = findchan(channels->at(i).first);
-			ChannelInfo *ci = c != NULL ? c->ci : cs_findchan(channels->at(i).first);
-			if (c == NULL && ci != NULL)
-				c = ci->c;
+			ChannelInfo *ci;
+
+			if (c)
+				ci = c->ci;
+			else
+				ci = cs_findchan(channels->at(i).first);
 
 			bool need_invite = false;
 			Anope::string key = channels->at(i).second;

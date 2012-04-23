@@ -17,14 +17,14 @@ struct MyOper : Oper, Serializable
 {
 	MyOper(const Anope::string &n, OperType *o) : Oper(n, o) { }
 
-	Anope::string serialize_name() const anope_override
+	const Anope::string serialize_name() const anope_override
 	{
 		return "Oper";
 	}
 
-	serialized_data serialize() anope_override
+	Serialize::Data serialize() const anope_override
 	{
-		serialized_data data;
+		Serialize::Data data;
 
 		data["name"] << this->name;
 		data["type"] << this->ot->GetName();
@@ -32,17 +32,23 @@ struct MyOper : Oper, Serializable
 		return data;
 	}
 
-	static void unserialize(serialized_data &data)
+	static Serializable* unserialize(Serializable *obj, Serialize::Data &data)
 	{
 		OperType *ot = OperType::Find(data["type"].astr());
 		if (ot == NULL)
-			return;
+			return NULL;
 		NickCore *nc = findcore(data["name"].astr());
 		if (nc == NULL)
-			return;
+			return NULL;
 
-		nc->o = new MyOper(nc->display, ot);
+		MyOper *myo;
+		if (obj)
+			myo = debug_cast<MyOper *>(obj);
+		else
+			myo = new MyOper(nc->display, ot);
+		nc->o = myo;
 		Log(LOG_NORMAL, "operserv/oper") << "Tied oper " << nc->display << " to type " << ot->GetName();
+		return myo;
 	}
 };
 
@@ -67,7 +73,7 @@ class CommandOSOper : public Command
 			const Anope::string &oper = params[1];
 			const Anope::string &otype = params[2];
 
-			NickAlias *na = findnick(oper);
+			const NickAlias *na = findnick(oper);
 			if (na == NULL)
 				source.Reply(NICK_X_NOT_REGISTERED, oper.c_str());
 			else if (na->nc->o)
@@ -90,7 +96,7 @@ class CommandOSOper : public Command
 		{
 			const Anope::string &oper = params[1];
 
-			NickAlias *na = findnick(oper);
+			const NickAlias *na = findnick(oper);
 			if (na == NULL)
 				source.Reply(NICK_X_NOT_REGISTERED, oper.c_str());
 			else if (!na->nc || !na->nc->o)
@@ -107,9 +113,9 @@ class CommandOSOper : public Command
 		else if (subcommand.equals_ci("LIST"))
 		{
 			source.Reply(_("Name     Type"));
-			for (nickcore_map::const_iterator it = NickCoreList.begin(), it_end = NickCoreList.end(); it != it_end; ++it)
+			for (nickcore_map::const_iterator it = NickCoreList->begin(), it_end = NickCoreList->end(); it != it_end; ++it)
 			{
-				NickCore *nc = it->second;
+				const NickCore *nc = it->second;
 
 				if (!nc->o)
 					continue;
@@ -117,7 +123,7 @@ class CommandOSOper : public Command
 				source.Reply(_("%-8s %s"), nc->o->name.c_str(), nc->o->ot->GetName().c_str());
 				if (nc->o->config)
 					source.Reply(_("   This oper is configured in the configuration file."));
-				for (std::list<User *>::iterator uit = nc->Users.begin(); uit != nc->Users.end(); ++uit)
+				for (std::list<User *>::const_iterator uit = nc->Users.begin(); uit != nc->Users.end(); ++uit)
 				{
 					User *u = *uit;
 					source.Reply(_("   %s is online using this oper block."), u->nick.c_str());
@@ -213,9 +219,9 @@ class OSOper : public Module
 
 	~OSOper()
 	{
-		for (nickcore_map::const_iterator it = NickCoreList.begin(), it_end = NickCoreList.end(); it != it_end; ++it)
+		for (nickcore_map::const_iterator it = NickCoreList->begin(), it_end = NickCoreList->end(); it != it_end; ++it)
 		{
-			NickCore *nc = it->second;
+			const NickCore *nc = it->second;
 
 			if (nc->o && !nc->o->config)
 				delete nc->o;

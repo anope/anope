@@ -52,13 +52,13 @@ class PlexusProto : public IRCDProto
 
 	void SendSGLineDel(const XLine *x) anope_override
 	{
-		BotInfo *bi = findbot(Config->OperServ);
+		const BotInfo *bi = findbot(Config->OperServ);
 		UplinkSocket::Message(bi) << "UNXLINE * " << x->Mask;
 	}
 
 	void SendSGLine(User *, const XLine *x) anope_override
 	{
-		BotInfo *bi = findbot(Config->OperServ);
+		const BotInfo *bi = findbot(Config->OperServ);
 		UplinkSocket::Message(bi) << "XLINE * " << x->Mask << " 0 :" << x->GetReason();
 	}
 
@@ -67,7 +67,7 @@ class PlexusProto : public IRCDProto
 		if (x->IsRegex() || x->HasNickOrReal())
 			return;
 
-		BotInfo *bi = findbot(Config->OperServ);
+		const BotInfo *bi = findbot(Config->OperServ);
 		UplinkSocket::Message(bi) << "UNKLINE * " << x->GetUser() << " " << x->GetHost();
 	}
 
@@ -76,7 +76,7 @@ class PlexusProto : public IRCDProto
 		UplinkSocket::Message(Me) <<  "UNRESV * " << x->Mask;
 	}
 
-	void SendJoin(User *user, Channel *c, const ChannelStatus *status) anope_override
+	void SendJoin(const User *user, Channel *c, const ChannelStatus *status) anope_override
 	{
 		UplinkSocket::Message(Me) << "SJOIN " << c->creation_time << " " << c->name << " +" << c->GetModes(true, true) << " :" << user->GetUID();
 		if (status)
@@ -90,7 +90,7 @@ class PlexusProto : public IRCDProto
 			if (uc != NULL)
 				uc->Status->ClearFlags();
 
-			BotInfo *setter = findbot(user->nick);
+			const BotInfo *setter = findbot(user->nick);
 			for (unsigned i = 0; i < ModeManager::ChannelModes.size(); ++i)
 				if (cs.HasFlag(ModeManager::ChannelModes[i]->Name))
 					c->SetMode(setter, ModeManager::ChannelModes[i], user->nick, false);
@@ -99,7 +99,7 @@ class PlexusProto : public IRCDProto
 
 	void SendAkill(User *u, XLine *x) anope_override
 	{
-		BotInfo *bi = findbot(Config->OperServ);
+		const BotInfo *bi = findbot(Config->OperServ);
 
 		if (x->IsRegex() || x->HasNickOrReal())
 		{
@@ -112,14 +112,15 @@ class PlexusProto : public IRCDProto
 				return;
 			}
 
-			XLine *old = x;
+			const XLine *old = x;
 
 			if (old->manager->HasEntry("*@" + u->host))
 				return;
 
 			/* We can't akill x as it has a nick and/or realname included, so create a new akill for *@host */
-			x = new XLine("*@" + u->host, old->By, old->Expires, old->Reason, old->UID);
-			old->manager->AddXLine(x);
+			XLine *xline = new XLine("*@" + u->host, old->By, old->Expires, old->Reason, old->UID);
+			old->manager->AddXLine(xline);
+			x = xline;
 
 			Log(bi, "akill") << "AKILL: Added an akill for " << x->Mask << " because " << u->GetMask() << "#" << u->realname << " matches " << old->Mask;
 		}
@@ -146,7 +147,7 @@ class PlexusProto : public IRCDProto
 
 	void SendVhostDel(User *u) anope_override
 	{
-		BotInfo *bi = findbot(Config->HostServ);
+		const BotInfo *bi = findbot(Config->HostServ);
 		if (u->HasMode(UMODE_CLOAK))
 			u->RemoveMode(bi, UMODE_CLOAK);
 		else
@@ -538,7 +539,7 @@ bool event_encap(const Anope::string &source, const std::vector<Anope::string> &
 	else if (params[1].equals_cs("SU"))
 	{
 		User *u = finduser(params[2]);
-		NickAlias *user_na = findnick(params[2]);
+		const NickAlias *user_na = findnick(params[2]);
 		NickCore *nc = findcore(params[3]);
 		if (u && nc)
 		{
@@ -665,7 +666,7 @@ class ProtoPlexus : public Module
 			Config->Numeric = numeric;
 		}
 
-		for (botinfo_map::iterator it = BotListByNick.begin(), it_end = BotListByNick.end(); it != it_end; ++it)
+		for (botinfo_map::iterator it = BotListByNick->begin(), it_end = BotListByNick->end(); it != it_end; ++it)
 			it->second->GenerateUID();
 	}
 

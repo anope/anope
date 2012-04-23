@@ -76,9 +76,9 @@ class CommandCSList : public Command
 		ListFormatter list;
 		list.addColumn("Name").addColumn("Description");
 
-		for (registered_channel_map::const_iterator it = RegisteredChannelList.begin(), it_end = RegisteredChannelList.end(); it != it_end; ++it)
+		for (registered_channel_map::const_iterator it = RegisteredChannelList->begin(), it_end = RegisteredChannelList->end(); it != it_end; ++it)
 		{
-			ChannelInfo *ci = it->second;
+			const ChannelInfo *ci = it->second;
 
 			if (!is_servadmin && (ci->HasFlag(CI_PRIVATE) || ci->HasFlag(CI_SUSPENDED)))
 				continue;

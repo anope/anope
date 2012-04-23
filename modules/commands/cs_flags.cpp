@@ -32,7 +32,7 @@ class FlagsChanAccess : public ChanAccess
 		return false;
 	}
 
-	Anope::string Serialize()
+	Anope::string Serialize() const
 	{
 		return Anope::string(this->flags.begin(), this->flags.end());
 	}
@@ -43,7 +43,7 @@ class FlagsChanAccess : public ChanAccess
 			this->flags.insert(data[i - 1]);
 	}
 
-	static Anope::string DetermineFlags(ChanAccess *access)
+	static Anope::string DetermineFlags(const ChanAccess *access)
 	{
 		if (access->provider->name == "access/flags")
 			return access->Serialize();
@@ -88,7 +88,7 @@ class CommandCSFlags : public Command
 
 		AccessGroup u_access = ci->AccessFor(u);
 
-		if (mask.find_first_of("!*@") == Anope::string::npos && findnick(mask) == NULL)
+		if (mask.find_first_of("!*@") == Anope::string::npos && !findnick(mask))
 		{
 			User *targ = finduser(mask);
 			if (targ != NULL)
@@ -234,7 +234,7 @@ class CommandCSFlags : public Command
 		unsigned count = 0;
 		for (unsigned i = 0, end = ci->GetAccessCount(); i < end; ++i)
 		{
-			ChanAccess *access = ci->GetAccess(i);
+			const ChanAccess *access = ci->GetAccess(i);
 			const Anope::string &flags = FlagsChanAccess::DetermineFlags(access);
 
 			if (!arg.empty())

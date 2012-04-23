@@ -21,52 +21,64 @@
 #include "language.h"
 #include "servers.h"
 
-Anope::string BadWord::serialize_name() const
+serialize_checker<registered_channel_map> RegisteredChannelList("ChannelInfo");
+
+const Anope::string BadWord::serialize_name() const
 {
 	return "BadWord";
 }
 
-Serializable::serialized_data BadWord::serialize()
+Serialize::Data BadWord::serialize() const
 {
-	serialized_data data;
+	Serialize::Data data;
 
-	data["ci"] << this->ci->name;
-	data["word"] << this->word;
+	data["ci"].setMax(64)/*XXX*/ << this->ci->name;
+	data["word"].setMax(512) << this->word;
 	data["type"].setType(Serialize::DT_INT) << this->type;
 
 	return data;
 }
 
-void BadWord::unserialize(serialized_data &data)
+Serializable* BadWord::unserialize(Serializable *obj, Serialize::Data &data)
 {
 	ChannelInfo *ci = cs_findchan(data["ci"].astr());
 	if (!ci)
-		return;
-	
+		return NULL;
+
 	unsigned int n;
 	data["type"] >> n;
-
-	ci->AddBadWord(data["word"].astr(), static_cast<BadWordType>(n));
+	
+	BadWord *bw;
+	if (obj)
+	{
+		bw = debug_cast<BadWord *>(obj);
+		data["word"] >> bw->word;
+		bw->type = static_cast<BadWordType>(n);
+	}
+	else
+		bw = ci->AddBadWord(data["word"].astr(), static_cast<BadWordType>(n));
+	
+	return bw;
 }
 
 AutoKick::AutoKick() : Flags<AutoKickFlag>(AutoKickFlagString)
 {
 }
 
-Anope::string AutoKick::serialize_name() const
+const Anope::string AutoKick::serialize_name() const
 {
 	return "AutoKick";
 }
 
-Serializable::serialized_data AutoKick::serialize()
+Serialize::Data AutoKick::serialize() const
 {
-	serialized_data data;
+	Serialize::Data data;
 
-	data["ci"] << this->ci->name;
+	data["ci"].setMax(64)/*XXX*/ << this->ci->name;
 	if (this->HasFlag(AK_ISNICK) && this->nc)
-		data["nc"] << this->nc->display;
+		data["nc"].setMax(Config->NickLen) << this->nc->display;
 	else
-		data["mask"] << this->mask;
+		data["mask"].setMax(Config->NickLen) << this->mask;
 	data["reason"] << this->reason;
 	data["creator"] << this->creator;
 	data["addtime"].setType(Serialize::DT_INT) << this->addtime;
@@ -76,54 +88,70 @@ Serializable::serialized_data AutoKick::serialize()
 	return data;
 }
 
-void AutoKick::unserialize(serialized_data &data)
+Serializable* AutoKick::unserialize(Serializable *obj, Serialize::Data &data)
 {
 	ChannelInfo *ci = cs_findchan(data["ci"].astr());
-	if (ci == NULL)
-		return;
+	if (!ci)
+		return NULL;
 	
-	time_t addtime, lastused;
-	data["addtime"] >> addtime;
-	data["last_used"] >> lastused;
-	
+	AutoKick *ak;
 	NickCore *nc = findcore(data["nc"].astr());
-	if (nc)	
-		ci->AddAkick(data["creator"].astr(), nc, data["reason"].astr(), addtime, lastused);
+	if (obj)
+	{
+		ak = debug_cast<AutoKick *>(obj);
+		data["creator"] >> ak->creator;
+		data["reason"] >> ak->reason;
+		ak->nc = findcore(data["nc"].astr());
+		data["mask"] >> ak->mask;
+		data["addtime"] >> ak->addtime;
+		data["last_used"] >> ak->last_used;
+	}
 	else
-		ci->AddAkick(data["creator"].astr(), data["mask"].astr(), data["reason"].astr(), addtime, lastused);
+	{
+		time_t addtime, lastused;
+		data["addtime"] >> addtime;
+		data["last_used"] >> lastused;
+
+		if (nc)	
+			ak = ci->AddAkick(data["creator"].astr(), nc, data["reason"].astr(), addtime, lastused);
+		else
+			ak = ci->AddAkick(data["creator"].astr(), data["mask"].astr(), data["reason"].astr(), addtime, lastused);
+	}
+
+	return ak;
 }
 
 ModeLock::ModeLock(ChannelInfo *ch, bool s, ChannelModeName n, const Anope::string &p, const Anope::string &se, time_t c) : ci(ch), set(s), name(n), param(p), setter(se), created(c)
 {
 }
 
-Anope::string ModeLock::serialize_name() const
+const Anope::string ModeLock::serialize_name() const
 {
 	return "ModeLock";
 }
 
-Serializable::serialized_data ModeLock::serialize()
+Serialize::Data ModeLock::serialize() const
 {
-	serialized_data data;
+	Serialize::Data data;
 
-	if (this->ci == NULL)
+	if (!this->ci)
 		return data;
 
-	data["ci"] << this->ci->name;
-	data["set"] << this->set;
-	data["name"] << ChannelModeNameStrings[this->name];
-	data["param"] << this->param;
+	data["ci"].setMax(64)/*XXX*/ << this->ci->name;
+	data["set"].setMax(5) << this->set;
+	data["name"].setMax(64) << ChannelModeNameStrings[this->name];
+	data["param"].setMax(512) << this->param;
 	data["setter"] << this->setter;
 	data["created"].setType(Serialize::DT_INT) << this->created;
 
 	return data;
 }
 
-void ModeLock::unserialize(serialized_data &data)
+Serializable* ModeLock::unserialize(Serializable *obj, Serialize::Data &data)
 {
 	ChannelInfo *ci = cs_findchan(data["ci"].astr());
-	if (ci == NULL)
-		return;
+	if (!ci)
+		return NULL;
 
 	ChannelModeName name = CMODE_END;
 
@@ -134,28 +162,47 @@ void ModeLock::unserialize(serialized_data &data)
 			break;
 		}
 	if (name == CMODE_END)
-		return;
+		return NULL;
+	
+	ModeLock *ml;
+	if (obj)
+	{
+		ml = debug_cast<ModeLock *>(obj);
 
-	bool set;
-	data["set"] >> set;
+		data["set"] >> ml->set;
+		ml->name = name;
+		data["param"] >> ml->param;
+		data["setter"] >> ml->setter;
+		data["created"] >> ml->created;
+		return ml;
+	}
+	else
+	{
+		bool set;
+		data["set"] >> set;
 
-	time_t created;
-	data["created"] >> created;
+		time_t created;
+		data["created"] >> created;
 
-	ModeLock ml(ci, set, name, "", data["setter"].astr(), created);
-	data["param"] >> ml.param;
+		ml = new ModeLock(ci, set, name, "", data["setter"].astr(), created);
+		data["param"] >> ml->param;
 
-	ci->mode_locks.insert(std::make_pair(ml.name, ml));
+		ci->mode_locks->insert(std::make_pair(ml->name, ml));
+		return ml;
+	}
 }
 
-Anope::string LogSetting::serialize_name() const
+const Anope::string LogSetting::serialize_name() const
 {
 	return "LogSetting";
 }
 
-Serializable::serialized_data LogSetting::serialize()
+Serialize::Data LogSetting::serialize() const
 {
-	serialized_data data;
+	Serialize::Data data;
+
+	if (!ci)
+		return data;
 
 	data["ci"] << ci->name;
 	data["service_name"] << service_name;
@@ -169,35 +216,44 @@ Serializable::serialized_data LogSetting::serialize()
 	return data;
 }
 
-void LogSetting::unserialize(serialized_data &data)
+Serializable* LogSetting::unserialize(Serializable *obj, Serialize::Data &data)
 {
-	LogSetting ls;
-
 	ChannelInfo *ci = cs_findchan(data["ci"].astr());
 	if (ci == NULL)
-		return;
+		return NULL;
+	
+	LogSetting *ls;
+	if (obj)
+		ls = debug_cast<LogSetting *>(obj);
+	else
+	{
+		ls = new LogSetting();
+		ci->log_settings->push_back(ls);
+	}
 
-	ls.ci = ci;
-	data["service_name"] >> ls.service_name;
-	data["command_service"] >> ls.command_service;
-	data["command_name"] >> ls.command_name;
-	data["method"] >> ls.method;
-	data["extra"] >> ls.extra;
-	data["creator"] >> ls.creator;
-	data["created"] >> ls.created;
+	ls->ci = ci;
+	data["service_name"] >> ls->service_name;
+	data["command_service"] >> ls->command_service;
+	data["command_name"] >> ls->command_name;
+	data["method"] >> ls->method;
+	data["extra"] >> ls->extra;
+	data["creator"] >> ls->creator;
+	data["created"] >> ls->created;
 
-	ci->log_settings.push_back(ls);
+	return ls;
 }
 
 /** Default constructor
  * @param chname The channel name
  */
-ChannelInfo::ChannelInfo(const Anope::string &chname) : Flags<ChannelInfoFlag, CI_END>(ChannelInfoFlagStrings), botflags(BotServFlagStrings)
+ChannelInfo::ChannelInfo(const Anope::string &chname) : Flags<ChannelInfoFlag, CI_END>(ChannelInfoFlagStrings), access("ChanAccess"), akick("AutoKick"),
+	badwords("BadWord"), mode_locks("ModeLock"), log_settings("LogSetting"), botflags(BotServFlagStrings)
 {
 	if (chname.empty())
 		throw CoreException("Empty channel passed to ChannelInfo constructor");
 
-	this->founder = this->successor = NULL;
+	this->founder = NULL;
+	this->successor = NULL;
 	this->last_topic_time = 0;
 	this->c = findchan(chname);
 	if (this->c)
@@ -227,7 +283,7 @@ ChannelInfo::ChannelInfo(const Anope::string &chname) : Flags<ChannelInfoFlag, C
 	for (int i = 0; i < TTB_SIZE; ++i)
 		this->ttb[i] = 0;
 
-	RegisteredChannelList[this->name] = this;
+	(*RegisteredChannelList)[this->name] = this;
 
 	FOREACH_MOD(I_OnCreateChan, OnCreateChan(this));
 }
@@ -235,23 +291,24 @@ ChannelInfo::ChannelInfo(const Anope::string &chname) : Flags<ChannelInfoFlag, C
 /** Copy constructor
  * @param ci The ChannelInfo to copy settings to
  */
-ChannelInfo::ChannelInfo(ChannelInfo &ci) : Flags<ChannelInfoFlag, CI_END>(ChannelInfoFlagStrings), botflags(BotServFlagStrings)
+ChannelInfo::ChannelInfo(const ChannelInfo &ci) : Flags<ChannelInfoFlag, CI_END>(ChannelInfoFlagStrings), access("ChanAccess"), akick("AutoKick"),
+	badwords("BadWord"), mode_locks("ModeLock"), log_settings("LogSetting"), botflags(BotServFlagStrings)
 {
 	*this = ci;
 
 	if (this->founder)
-		++this->founder->channelcount;
+		--this->founder->channelcount;
 
-	this->access.clear();
-	this->akick.clear();
-	this->badwords.clear();
+	this->access->clear();
+	this->akick->clear();
+	this->badwords->clear();
 
 	for (int i = 0; i < TTB_SIZE; ++i)
 		this->ttb[i] = ci.ttb[i];
 
 	for (unsigned i = 0; i < ci.GetAccessCount(); ++i)
 	{
-		ChanAccess *taccess = ci.GetAccess(i);
+		const ChanAccess *taccess = ci.GetAccess(i);
 		AccessProvider *provider = taccess->provider;
 
 		ChanAccess *newaccess = provider->Create();
@@ -267,7 +324,7 @@ ChannelInfo::ChannelInfo(ChannelInfo &ci) : Flags<ChannelInfoFlag, CI_END>(Chann
 
 	for (unsigned i = 0; i < ci.GetAkickCount(); ++i)
 	{
-		AutoKick *takick = ci.GetAkick(i);
+		const AutoKick *takick = ci.GetAkick(i);
 		if (takick->HasFlag(AK_ISNICK))
 			this->AddAkick(takick->creator, takick->nc, takick->reason, takick->addtime, takick->last_used);
 		else
@@ -275,8 +332,15 @@ ChannelInfo::ChannelInfo(ChannelInfo &ci) : Flags<ChannelInfoFlag, CI_END>(Chann
 	}
 	for (unsigned i = 0; i < ci.GetBadWordCount(); ++i)
 	{
-		BadWord *bw = ci.GetBadWord(i);
+		const BadWord *bw = ci.GetBadWord(i);
 		this->AddBadWord(bw->word, bw->type);
+	}
+
+	for (unsigned i = 0; i < ci.log_settings->size(); ++i)
+	{
+		LogSetting *l = new LogSetting(*ci.log_settings->at(i));
+		l->ci = this;
+		this->log_settings->push_back(l);
 	}
 }
 
@@ -284,8 +348,6 @@ ChannelInfo::ChannelInfo(ChannelInfo &ci) : Flags<ChannelInfoFlag, CI_END>(Chann
  */
 ChannelInfo::~ChannelInfo()
 {
-	unsigned i, end;
-
 	FOREACH_MOD(I_OnDelChan, OnDelChan(this));
 
 	Log(LOG_DEBUG) << "Deleting channel " << this->name;
@@ -297,33 +359,41 @@ ChannelInfo::~ChannelInfo()
 		this->c->ci = NULL;
 	}
 
-	RegisteredChannelList.erase(this->name);
+	RegisteredChannelList->erase(this->name);
 
 	this->ClearAccess();
 	this->ClearAkick();
 	this->ClearBadWords();
 
-	if (!this->memos.memos.empty())
+	for (unsigned i = 0; i < this->log_settings->size(); ++i)
+		this->log_settings->at(i)->destroy();
+	this->log_settings->clear();
+
+	for (ChannelInfo::ModeList::iterator it = this->mode_locks->begin(), it_end = this->mode_locks->end(); it != it_end; ++it)
+		it->second->destroy();
+	this->mode_locks->clear();
+
+	if (!this->memos.memos->empty())
 	{
-		for (i = 0, end = this->memos.memos.size(); i < end; ++i)
-			delete this->memos.memos[i];
-		this->memos.memos.clear();
+		for (unsigned i = 0, end = this->memos.memos->size(); i < end; ++i)
+			this->memos.GetMemo(i)->destroy();
+		this->memos.memos->clear();
 	}
 
 	if (this->founder)
 		--this->founder->channelcount;
 }
 
-Anope::string ChannelInfo::serialize_name() const
+const Anope::string ChannelInfo::serialize_name() const
 {
 	return "ChannelInfo";
 }
 
-Serializable::serialized_data ChannelInfo::serialize()
+Serialize::Data ChannelInfo::serialize() const
 {
-	serialized_data data;
+	Serialize::Data data;
 
-	data["name"].setKey().setMax(255) << this->name;
+	data["name"].setMax(255) << this->name;
 	if (this->founder)
 		data["founder"] << this->founder->display;
 	if (this->successor)
@@ -339,7 +409,7 @@ Serializable::serialized_data ChannelInfo::serialize()
 	data["botflags"] << this->botflags.ToString();
 	{
 		Anope::string levels_buffer;
-		for (std::map<Anope::string, int16_t>::iterator it = this->levels.begin(), it_end = this->levels.end(); it != it_end; ++it)
+		for (std::map<Anope::string, int16_t>::const_iterator it = this->levels.begin(), it_end = this->levels.end(); it != it_end; ++it)
 			levels_buffer += it->first + " " + stringify(it->second) + " ";
 		data["levels"] << levels_buffer;
 	}
@@ -359,24 +429,26 @@ Serializable::serialized_data ChannelInfo::serialize()
 	return data;
 }
 
-void ChannelInfo::unserialize(serialized_data &data)
+Serializable* ChannelInfo::unserialize(Serializable *obj, Serialize::Data &data)
 {
-	ChannelInfo *ci = cs_findchan(data["name"].astr());
-	if (ci == NULL)
+	ChannelInfo *ci;
+	if (obj)
+		ci = debug_cast<ChannelInfo *>(obj);
+	else
 		ci = new ChannelInfo(data["name"].astr());
 
 	if (data.count("founder") > 0)
 	{
 		if (ci->founder)
-			ci->founder->channelcount--;
+			--ci->founder->channelcount;
 		ci->founder = findcore(data["founder"].astr());
 		if (ci->founder)
-			ci->founder->channelcount++;
+			--ci->founder->channelcount;
 	}
 	if (data.count("successor") > 0)
 	{
 		ci->successor = findcore(data["successor"].astr());
-		if (ci->founder && ci->founder == ci->successor)
+		if (ci->founder && *ci->founder == *ci->successor)
 			ci->successor = NULL;
 	}
 	data["description"] >> ci->desc;
@@ -393,8 +465,15 @@ void ChannelInfo::unserialize(serialized_data &data)
 		for (unsigned i = 0; i + 1 < v.size(); i += 2)
 			ci->levels[v[i]] = convertTo<int16_t>(v[i + 1]);
 	}
-	if (data.count("bi") > 0)
-		ci->bi = findbot(data["bi"].astr());
+	BotInfo *bi = findbot(data["bi"].astr());
+	if (*ci->bi != bi)
+	{
+		if (ci->bi)
+			ci->bi->UnAssign(NULL, ci);
+		ci->bi = bi;
+		if (ci->bi)
+			ci->bi->Assign(NULL, ci);
+	}
 	data["capsmin"] >> ci->capsmin;
 	data["capspercent"] >> ci->capspercent;
 	data["floodlines"] >> ci->floodlines;
@@ -409,6 +488,8 @@ void ChannelInfo::unserialize(serialized_data &data)
 		while (sep.GetToken(buf))
 			ci->memos.ignores.push_back(buf);
 	}
+
+	return ci;
 }
 
 
@@ -422,7 +503,7 @@ void ChannelInfo::SetFounder(NickCore *nc)
 	this->founder = nc;
 	if (this->founder)
 		++this->founder->channelcount;
-	if (this->founder == this->successor)
+	if (*this->founder == *this->successor)
 		this->successor = NULL;
 }
 
@@ -437,15 +518,15 @@ NickCore *ChannelInfo::GetFounder() const
 /** Find which bot should send mode/topic/etc changes for this channel
  * @return The bot
  */
-BotInfo *ChannelInfo::WhoSends()
+BotInfo *ChannelInfo::WhoSends() const
 {
 	if (this && this->bi)
 		return this->bi;
 	BotInfo *tbi = findbot(Config->ChanServ);
 	if (tbi)
 		return tbi;
-	else if (!BotListByNick.empty())
-		return BotListByNick.begin()->second;
+	else if (!BotListByNick->empty())
+		return BotListByNick->begin()->second;
 	return NULL;
 }
 
@@ -454,7 +535,7 @@ BotInfo *ChannelInfo::WhoSends()
  */
 void ChannelInfo::AddAccess(ChanAccess *taccess)
 {
-	this->access.push_back(taccess);
+	this->access->push_back(taccess);
 }
 
 /** Get an entry from the channel access list by index
@@ -464,25 +545,27 @@ void ChannelInfo::AddAccess(ChanAccess *taccess)
  *
  * Retrieves an entry from the access list that matches the given index.
  */
-ChanAccess *ChannelInfo::GetAccess(unsigned index)
+ChanAccess *ChannelInfo::GetAccess(unsigned index) const
 {
-	if (this->access.empty() || index >= this->access.size())
+	if (this->access->empty() || index >= this->access->size())
 		return NULL;
 
-	return this->access[index];
+	ChanAccess *acc = (*this->access)[index];
+	acc->QueueUpdate();
+	return acc;
 }
 
-AccessGroup ChannelInfo::AccessFor(User *u)
+AccessGroup ChannelInfo::AccessFor(const User *u)
 {
 	AccessGroup group;
 
 	if (u == NULL)
 		return group;
 
-	NickCore *nc = u->Account();
+	const NickCore *nc = u->Account();
 	if (nc == NULL && u->IsRecognized())
 	{
-		NickAlias *na = findnick(u->nick);
+		const NickAlias *na = findnick(u->nick);
 		if (na != NULL)
 			nc = na->nc;
 	}
@@ -492,9 +575,9 @@ AccessGroup ChannelInfo::AccessFor(User *u)
 	group.ci = this;
 	group.nc = nc;
 
-	for (unsigned i = 0, end = this->access.size(); i < end; ++i)
-		if (this->access[i]->Matches(u, nc))
-			group.push_back(this->access[i]);
+	for (unsigned i = 0, end = this->GetAccessCount(); i < end; ++i)
+		if (this->GetAccess(i)->Matches(u, nc))
+			group.push_back(this->GetAccess(i));
 
 	if (group.Founder || !group.empty())
 		this->last_used = Anope::CurTime;
@@ -502,7 +585,7 @@ AccessGroup ChannelInfo::AccessFor(User *u)
 	return group;
 }
 
-AccessGroup ChannelInfo::AccessFor(NickCore *nc)
+AccessGroup ChannelInfo::AccessFor(const NickCore *nc)
 {
 	AccessGroup group;
 
@@ -510,9 +593,9 @@ AccessGroup ChannelInfo::AccessFor(NickCore *nc)
 	group.ci = this;
 	group.nc = nc;
 
-	for (unsigned i = 0, end = this->access.size(); i < end; ++i)
-		if (this->access[i]->Matches(NULL, nc))
-			group.push_back(this->access[i]);
+	for (unsigned i = 0, end = this->GetAccessCount(); i < end; ++i)
+		if (this->GetAccess(i)->Matches(NULL, nc))
+			group.push_back(this->GetAccess(i));
 	
 	if (group.Founder || !group.empty())
 		this->last_used = Anope::CurTime;
@@ -525,7 +608,7 @@ AccessGroup ChannelInfo::AccessFor(NickCore *nc)
  */
 unsigned ChannelInfo::GetAccessCount() const
 {
-	return this->access.size();
+	return this->access->size();
 }
 
 /** Erase an entry from the channel access list
@@ -536,11 +619,11 @@ unsigned ChannelInfo::GetAccessCount() const
  */
 void ChannelInfo::EraseAccess(unsigned index)
 {
-	if (this->access.empty() || index >= this->access.size())
+	if (this->access->empty() || index >= this->access->size())
 		return;
 
-	delete this->access[index];
-	this->access.erase(this->access.begin() + index);
+	this->access->at(index)->destroy();
+	this->access->erase(this->access->begin() + index);
 }
 
 /** Erase an entry from the channel access list
@@ -549,14 +632,14 @@ void ChannelInfo::EraseAccess(unsigned index)
  *
  * Clears the memory used by the given access entry and removes it from the vector.
  */
-void ChannelInfo::EraseAccess(ChanAccess *taccess)
+void ChannelInfo::EraseAccess(const ChanAccess *taccess)
 {
-	for (unsigned i = 0, end = this->access.size(); i < end; ++i)
+	for (unsigned i = 0, end = this->access->size(); i < end; ++i)
 	{
-		if (this->access[i] == taccess)
+		if (this->GetAccess(i) == taccess)
 		{
-			delete this->access[i];
-			this->access.erase(this->access.begin() + i);
+			this->GetAccess(i)->destroy();
+			this->EraseAccess(i);
 			break;
 		}
 	}
@@ -568,9 +651,9 @@ void ChannelInfo::EraseAccess(ChanAccess *taccess)
  */
 void ChannelInfo::ClearAccess()
 {
-	for (unsigned i = this->access.size(); i > 0; --i)
-		delete this->access[i - 1];
-	this->access.clear();
+	for (unsigned i = this->access->size(); i > 0; --i)
+		this->GetAccess(i - 1)->destroy();
+	this->access->clear();
 }
 
 /** Add an akick entry to the channel by NickCore
@@ -583,9 +666,6 @@ void ChannelInfo::ClearAccess()
  */
 AutoKick *ChannelInfo::AddAkick(const Anope::string &user, NickCore *akicknc, const Anope::string &reason, time_t t, time_t lu)
 {
-	if (!akicknc)
-		return NULL;
-
 	AutoKick *autokick = new AutoKick();
 	autokick->ci = this;
 	autokick->SetFlag(AK_ISNICK);
@@ -595,7 +675,7 @@ AutoKick *ChannelInfo::AddAkick(const Anope::string &user, NickCore *akicknc, co
 	autokick->addtime = t;
 	autokick->last_used = lu;
 
-	this->akick.push_back(autokick);
+	this->akick->push_back(autokick);
 
 	return autokick;
 }
@@ -619,7 +699,7 @@ AutoKick *ChannelInfo::AddAkick(const Anope::string &user, const Anope::string &
 	autokick->addtime = t;
 	autokick->last_used = lu;
 
-	this->akick.push_back(autokick);
+	this->akick->push_back(autokick);
 
 	return autokick;
 }
@@ -628,12 +708,14 @@ AutoKick *ChannelInfo::AddAkick(const Anope::string &user, const Anope::string &
  * @param index The index in the akick vector
  * @return The akick structure, or NULL if not found
  */
-AutoKick *ChannelInfo::GetAkick(unsigned index)
+AutoKick *ChannelInfo::GetAkick(unsigned index) const
 {
-	if (this->akick.empty() || index >= this->akick.size())
+	if (this->akick->empty() || index >= this->akick->size())
 		return NULL;
 
-	return this->akick[index];
+	AutoKick *ak = (*this->akick)[index];
+	ak->QueueUpdate();
+	return ak;
 }
 
 /** Get the size of the akick vector for this channel
@@ -641,7 +723,7 @@ AutoKick *ChannelInfo::GetAkick(unsigned index)
  */
 unsigned ChannelInfo::GetAkickCount() const
 {
-	return this->akick.empty() ? 0 : this->akick.size();
+	return this->akick->size();
 }
 
 /** Erase an entry from the channel akick list
@@ -649,18 +731,18 @@ unsigned ChannelInfo::GetAkickCount() const
  */
 void ChannelInfo::EraseAkick(unsigned index)
 {
-	if (this->akick.empty() || index >= this->akick.size())
+	if (this->akick->empty() || index >= this->akick->size())
 		return;
 	
-	delete this->akick[index];
-	this->akick.erase(this->akick.begin() + index);
+	this->GetAkick(index)->destroy();
+	this->akick->erase(this->akick->begin() + index);
 }
 
 /** Clear the whole akick list
  */
 void ChannelInfo::ClearAkick()
 {
-	while (!this->akick.empty())
+	while (!this->akick->empty())
 		EraseAkick(0);
 }
 
@@ -669,14 +751,14 @@ void ChannelInfo::ClearAkick()
  * @param type The type (SINGLE START END)
  * @return The badword
  */
-BadWord *ChannelInfo::AddBadWord(const Anope::string &word, BadWordType type)
+BadWord* ChannelInfo::AddBadWord(const Anope::string &word, BadWordType type)
 {
-	BadWord *bw = new BadWord;
+	BadWord *bw = new BadWord();
 	bw->ci = this;
 	bw->word = word;
 	bw->type = type;
 
-	this->badwords.push_back(bw);
+	this->badwords->push_back(bw);
 
 	FOREACH_MOD(I_OnBadWordAdd, OnBadWordAdd(this, bw));
 
@@ -687,12 +769,14 @@ BadWord *ChannelInfo::AddBadWord(const Anope::string &word, BadWordType type)
  * @param index The index
  * @return The badword
  */
-BadWord *ChannelInfo::GetBadWord(unsigned index)
+BadWord* ChannelInfo::GetBadWord(unsigned index) const
 {
-	if (this->badwords.empty() || index >= this->badwords.size())
+	if (this->badwords->empty() || index >= this->badwords->size())
 		return NULL;
 
-	return this->badwords[index];
+	BadWord *bw = (*this->badwords)[index];
+	bw->QueueUpdate();
+	return bw;
 }
 
 /** Get how many badwords are on this channel
@@ -700,7 +784,7 @@ BadWord *ChannelInfo::GetBadWord(unsigned index)
  */
 unsigned ChannelInfo::GetBadWordCount() const
 {
-	return this->badwords.empty() ? 0 : this->badwords.size();
+	return this->badwords->size();
 }
 
 /** Remove a badword
@@ -708,20 +792,20 @@ unsigned ChannelInfo::GetBadWordCount() const
  */
 void ChannelInfo::EraseBadWord(unsigned index)
 {
-	if (this->badwords.empty() || index >= this->badwords.size())
+	if (this->badwords->empty() || index >= this->badwords->size())
 		return;
 	
-	FOREACH_MOD(I_OnBadWordDel, OnBadWordDel(this, this->badwords[index]));
+	FOREACH_MOD(I_OnBadWordDel, OnBadWordDel(this, (*this->badwords)[index]));
 
-	delete this->badwords[index];
-	this->badwords.erase(this->badwords.begin() + index);
+	delete (*this->badwords)[index];
+	this->badwords->erase(this->badwords->begin() + index);
 }
 
 /** Clear all badwords from the channel
  */
 void ChannelInfo::ClearBadWords()
 {
-	while (!this->badwords.empty())
+	while (!this->badwords->empty())
 		EraseBadWord(0);
 }
 
@@ -732,23 +816,23 @@ void ChannelInfo::ClearBadWords()
  */
 bool ChannelInfo::HasMLock(ChannelMode *mode, const Anope::string &param, bool status) const
 {
-	std::multimap<ChannelModeName, ModeLock>::const_iterator it = this->mode_locks.find(mode->Name);
+	std::multimap<ChannelModeName, ModeLock *>::const_iterator it = this->mode_locks->find(mode->Name);
 
-	if (it != this->mode_locks.end())
+	if (it != this->mode_locks->end())
 	{
 		if (mode->Type != MODE_REGULAR)
 		{
-			std::multimap<ChannelModeName, ModeLock>::const_iterator it_end = this->mode_locks.upper_bound(mode->Name);
+			std::multimap<ChannelModeName, ModeLock *>::const_iterator it_end = this->mode_locks->upper_bound(mode->Name);
 
 			for (; it != it_end; ++it)
 			{
-				const ModeLock &ml = it->second;
-				if (ml.param == param)
+				const ModeLock *ml = it->second;
+				if (ml->param == param)
 					return true;
 			}
 		}
 		else
-			return it->second.set == status;
+			return it->second->set == status;
 	}
 	return false;
 }
@@ -763,36 +847,46 @@ bool ChannelInfo::SetMLock(ChannelMode *mode, bool status, const Anope::string &
 {
 	if (setter.empty())
 		setter = this->founder ? this->founder->display : "Unknown";
-	std::pair<ChannelModeName, ModeLock> ml = std::make_pair(mode->Name, ModeLock(this, status, mode->Name, param, setter, created));
+	std::pair<ChannelModeName, ModeLock *> ml = std::make_pair(mode->Name, new ModeLock(this, status, mode->Name, param, setter, created));
 
 	EventReturn MOD_RESULT;
-	FOREACH_RESULT(I_OnMLock, OnMLock(this, &ml.second));
+	FOREACH_RESULT(I_OnMLock, OnMLock(this, ml.second));
 	if (MOD_RESULT == EVENT_STOP)
 		return false;
 
 	/* First, remove this */
 	if (mode->Type == MODE_REGULAR || mode->Type == MODE_PARAM)
-		this->mode_locks.erase(mode->Name);
+	{
+		ChannelInfo::ModeList::const_iterator it = this->mode_locks->find(mode->Name);
+		if (it != this->mode_locks->end())
+		{
+			ChannelInfo::ModeList::const_iterator it_end = this->mode_locks->upper_bound(mode->Name);
+			for (; it != it_end; ++it)
+				it->second->destroy();
+		}
+		this->mode_locks->erase(mode->Name);
+	}
 	else
 	{
 		// For list or status modes, we must check the parameter
-		std::multimap<ChannelModeName, ModeLock>::iterator it = this->mode_locks.find(mode->Name);
-		if (it != this->mode_locks.end())
+		ChannelInfo::ModeList::iterator it = this->mode_locks->find(mode->Name);
+		if (it != this->mode_locks->end())
 		{
-			std::multimap<ChannelModeName, ModeLock>::iterator it_end = this->mode_locks.upper_bound(mode->Name);
+			ChannelInfo::ModeList::iterator it_end = this->mode_locks->upper_bound(mode->Name);
 			for (; it != it_end; ++it)
 			{
-				const ModeLock &modelock = it->second;
-				if (modelock.param == param)
+				const ModeLock *modelock = it->second;
+				if (modelock->param == param)
 				{
-					this->mode_locks.erase(it);
+					it->second->destroy();
+					this->mode_locks->erase(it);
 					break;
 				}
 			}
 		}
 	}
 
-	this->mode_locks.insert(ml);
+	this->mode_locks->insert(ml);
 
 	return true;
 }
@@ -807,21 +901,22 @@ bool ChannelInfo::RemoveMLock(ChannelMode *mode, bool status, const Anope::strin
 {
 	if (mode->Type == MODE_REGULAR || mode->Type == MODE_PARAM)
 	{
-		std::multimap<ChannelModeName, ModeLock>::iterator it = this->mode_locks.find(mode->Name), it_end = this->mode_locks.upper_bound(mode->Name), it_next = it;
-		if (it != this->mode_locks.end())
+		ChannelInfo::ModeList::iterator it = this->mode_locks->find(mode->Name), it_end = this->mode_locks->upper_bound(mode->Name), it_next = it;
+		if (it != this->mode_locks->end())
 			for (; it != it_end; it = it_next)
 			{
-				const ModeLock &ml = it->second;
+				const ModeLock *ml = it->second;
 				++it_next;
 
-				if (status != ml.set)
+				if (status != ml->set)
 					continue;
 
 				EventReturn MOD_RESULT;
-				FOREACH_RESULT(I_OnUnMLock, OnUnMLock(this, &it->second));
+				FOREACH_RESULT(I_OnUnMLock, OnUnMLock(this, it->second));
 				if (MOD_RESULT != EVENT_STOP)
 				{
-					this->mode_locks.erase(it);
+					it->second->destroy();
+					this->mode_locks->erase(it);
 					return true;
 				}
 			}
@@ -830,20 +925,21 @@ bool ChannelInfo::RemoveMLock(ChannelMode *mode, bool status, const Anope::strin
 	else
 	{
 		// For list or status modes, we must check the parameter
-		std::multimap<ChannelModeName, ModeLock>::iterator it = this->mode_locks.find(mode->Name);
-		if (it != this->mode_locks.end())
+		ChannelInfo::ModeList::iterator it = this->mode_locks->find(mode->Name);
+		if (it != this->mode_locks->end())
 		{
-			std::multimap<ChannelModeName, ModeLock>::iterator it_end = this->mode_locks.upper_bound(mode->Name);
+			ChannelInfo::ModeList::iterator it_end = this->mode_locks->upper_bound(mode->Name);
 			for (; it != it_end; ++it)
 			{
-				const ModeLock &ml = it->second;
-				if (ml.set == status && ml.param == param)
+				const ModeLock *ml = it->second;
+				if (ml->set == status && ml->param == param)
 				{
 					EventReturn MOD_RESULT;
-					FOREACH_RESULT(I_OnUnMLock, OnUnMLock(this, &it->second));
+					FOREACH_RESULT(I_OnUnMLock, OnUnMLock(this, it->second));
 					if (MOD_RESULT == EVENT_STOP)
 						return false;
-					this->mode_locks.erase(it);
+					it->second->destroy();
+					this->mode_locks->erase(it);
 					return true;
 				}
 			}
@@ -857,13 +953,13 @@ bool ChannelInfo::RemoveMLock(ChannelMode *mode, bool status, const Anope::strin
  */
 void ChannelInfo::ClearMLock()
 {
-	this->mode_locks.clear();
+	this->mode_locks->clear();
 }
 
 /** Get all of the mlocks for this channel
  * @return The mlocks
  */
-const std::multimap<ChannelModeName, ModeLock> &ChannelInfo::GetMLock() const
+const ChannelInfo::ModeList &ChannelInfo::GetMLock() const
 {
 	return this->mode_locks;
 }
@@ -874,9 +970,9 @@ const std::multimap<ChannelModeName, ModeLock> &ChannelInfo::GetMLock() const
  */
 std::pair<ChannelInfo::ModeList::iterator, ChannelInfo::ModeList::iterator> ChannelInfo::GetModeList(ChannelModeName Name)
 {
-	std::multimap<ChannelModeName, ModeLock>::iterator it = this->mode_locks.find(Name), it_end = it;
-	if (it != this->mode_locks.end())
-		it_end = this->mode_locks.upper_bound(Name);
+	ChannelInfo::ModeList::iterator it = this->mode_locks->find(Name), it_end = it;
+	if (it != this->mode_locks->end())
+		it_end = this->mode_locks->upper_bound(Name);
 	return std::make_pair(it, it_end);
 }
 
@@ -885,20 +981,20 @@ std::pair<ChannelInfo::ModeList::iterator, ChannelInfo::ModeList::iterator> Chan
  * @param param An optional param to match with
  * @return The MLock, if any
  */
-ModeLock *ChannelInfo::GetMLock(ChannelModeName mname, const Anope::string &param)
+const ModeLock *ChannelInfo::GetMLock(ChannelModeName mname, const Anope::string &param)
 {
-	std::multimap<ChannelModeName, ModeLock>::iterator it = this->mode_locks.find(mname);
-	if (it != this->mode_locks.end())
+	ChannelInfo::ModeList::iterator it = this->mode_locks->find(mname);
+	if (it != this->mode_locks->end())
 	{
 		if (param.empty())
-			return &it->second;
+			return it->second;
 		else
 		{
-			std::multimap<ChannelModeName, ModeLock>::iterator it_end = this->mode_locks.upper_bound(mname);
+			ChannelInfo::ModeList::iterator it_end = this->mode_locks->upper_bound(mname);
 			for (; it != it_end; ++it)
 			{
-				if (Anope::Match(param, it->second.param))
-					return &it->second;
+				if (Anope::Match(param, it->second->param))
+					return it->second;
 			}
 		}
 	}
@@ -910,20 +1006,20 @@ Anope::string ChannelInfo::GetMLockAsString(bool complete) const
 {
 	Anope::string pos = "+", neg = "-", params;
 
-	for (std::multimap<ChannelModeName, ModeLock>::const_iterator it = this->GetMLock().begin(), it_end = this->GetMLock().end(); it != it_end; ++it)
+	for (ChannelInfo::ModeList::const_iterator it = this->GetMLock().begin(), it_end = this->GetMLock().end(); it != it_end; ++it)
 	{
-		const ModeLock &ml = it->second;
-		ChannelMode *cm = ModeManager::FindChannelModeByName(ml.name);
+		const ModeLock *ml = it->second;
+		ChannelMode *cm = ModeManager::FindChannelModeByName(ml->name);
 		if (!cm || cm->Type == MODE_LIST || cm->Type == MODE_STATUS)
 			continue;
 
-		if (ml.set)
+		if (ml->set)
 			pos += cm->ModeChar;
 		else
 			neg += cm->ModeChar;
 
-		if (complete && !ml.param.empty() && cm->Type == MODE_PARAM)
-			params += " " + ml.param;
+		if (complete && !ml->param.empty() && cm->Type == MODE_PARAM)
+			params += " " + ml->param;
 	}
 
 	if (pos.length() == 1)
@@ -1077,7 +1173,7 @@ void ChannelInfo::RestoreTopic()
 	}
 }
 
-int16_t ChannelInfo::GetLevel(const Anope::string &priv)
+int16_t ChannelInfo::GetLevel(const Anope::string &priv) const
 {
 	if (PrivilegeManager::FindPrivilege(priv) == NULL)
 	{
@@ -1085,9 +1181,10 @@ int16_t ChannelInfo::GetLevel(const Anope::string &priv)
 		return ACCESS_INVALID;
 	}
 
-	if (this->levels.count(priv) == 0)
-		this->levels[priv] = 0;
-	return this->levels[priv];
+	std::map<Anope::string, int16_t>::const_iterator it = this->levels.find(priv);
+	if (it == this->levels.end())
+		return 0;
+	return it->second;
 }
 
 void ChannelInfo::SetLevel(const Anope::string &priv, int16_t level)

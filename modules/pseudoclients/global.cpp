@@ -16,18 +16,18 @@
 
 class MyGlobalService : public GlobalService
 {
-	void ServerGlobal(Server *s, const Anope::string &message)
+	void ServerGlobal(const BotInfo *sender, Server *s, const Anope::string &message)
 	{
 		if (s != Me && !s->HasFlag(SERVER_JUPED))
-			s->Notice(findbot(Config->Global), message);
+			s->Notice(sender, message);
 		for (unsigned i = 0, j = s->GetLinks().size(); i < j; ++i)
-			this->ServerGlobal(s->GetLinks()[i], message);
+			this->ServerGlobal(sender, s->GetLinks()[i], message);
 	}
 
  public:
 	MyGlobalService(Module *m) : GlobalService(m) { }
 
-	void SendGlobal(BotInfo *sender, const Anope::string &source, const Anope::string &message) anope_override
+	void SendGlobal(const BotInfo *sender, const Anope::string &source, const Anope::string &message) anope_override
 	{
 		if (Me->GetLinks().empty())
 			return;
@@ -39,7 +39,7 @@ class MyGlobalService : public GlobalService
 		else
 			rmessage = message;
 
-		this->ServerGlobal(Me->GetLinks().front(), rmessage);
+		this->ServerGlobal(sender, Me->GetLinks().front(), rmessage);
 	}
 };
 
@@ -53,7 +53,7 @@ class GlobalCore : public Module
 	{
 		this->SetAuthor("Anope");
 
-		BotInfo *Global = findbot(Config->Global);
+		const BotInfo *Global = findbot(Config->Global);
 		if (Global == NULL)
 			throw ModuleException("No bot named " + Config->Global);
 

@@ -137,7 +137,7 @@ class CoreExport Server : public Flags<ServerFlag>
 	 * @param source The source of the message
 	 * @param message The message
 	 */
-	void Notice(BotInfo *source, const Anope::string &message);
+	void Notice(const BotInfo *source, const Anope::string &message);
 
 	/** Find a server
 	 * @param name The name or SID/numeric

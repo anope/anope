@@ -9,14 +9,16 @@
  * Based on the original code of Services by Andy Church.
  */
 
+#include "serialize.h"
+
 #ifndef MODULES_H
 #define MODULES_H
 
-#include "extensible.h"
 #include "base.h"
 #include "modes.h"
 #include "timers.h"
 #include "logger.h"
+#include "extensible.h"
 
 /** This definition is used as shorthand for the various classes
  * and functions needed to make a module loadable by the OS.
@@ -381,18 +383,13 @@ class CoreExport Module : public Extensible
 	 * @param ci The channel
 	 * @param bw The badword
 	 */
-	virtual void OnBadWordAdd(ChannelInfo *ci, BadWord *bw) { }
+	virtual void OnBadWordAdd(ChannelInfo *ci, const BadWord *bw) { }
 
 	/** Called before a badword is deleted from a channel
 	 * @param ci The channel
 	 * @param bw The badword
 	 */
-	virtual void OnBadWordDel(ChannelInfo *ci, BadWord *bw) { }
-
-	/** Called in findbot()
-	 * @param nick The nick being looked up
-	 */
-	virtual void OnFindBot(const Anope::string &nick) { }
+	virtual void OnBadWordDel(ChannelInfo *ci, const BadWord *bw) { }
 
 	/** Called before a bot kicks a user
 	 * @param bi The bot sending the kick
@@ -513,14 +510,14 @@ class CoreExport Module : public Extensible
 	 * @param xlm The xline manager it was added to
 	 * @return EVENT_CONTINUE to let other modules decide, EVENT_STOP to halt the command and not process it
 	 */
-	virtual EventReturn OnAddXLine(User *u, XLine *x, XLineManager *xlm) { return EVENT_CONTINUE; }
+	virtual EventReturn OnAddXLine(User *u, const XLine *x, XLineManager *xlm) { return EVENT_CONTINUE; }
 
 	/** Called before a XLine is deleted
 	 * @param u The user deleting the XLine
 	 * @param x The XLine
 	 * @param xlm The xline manager it was deleted from
 	 */
-	virtual void OnDelXLine(User *u, XLine *x, XLineManager *xlm) { }
+	virtual void OnDelXLine(User *u, const XLine *x, XLineManager *xlm) { }
 
 	/** Called when a user is checked for whether they are a services oper
 	 * @param u The user
@@ -632,14 +629,14 @@ class CoreExport Module : public Extensible
 	 * @param ci The channel
 	 * @param ak The akick
 	 */
-	virtual void OnAkickAdd(User *u, ChannelInfo *ci, AutoKick *ak) { }
+	virtual void OnAkickAdd(User *u, ChannelInfo *ci, const AutoKick *ak) { }
 
 	/** Called before removing an akick from a channel
 	 * @param u The user removing the akick
 	 * @param ci The channel
 	 * @param ak The akick
 	 */
-	virtual void OnAkickDel(User *u, ChannelInfo *ci, AutoKick *ak) { }
+	virtual void OnAkickDel(User *u, ChannelInfo *ci, const AutoKick *ak) { }
 
 	/** Called after a user join a channel when we decide whether to kick them or not
 	 * @param u The user
@@ -656,11 +653,6 @@ class CoreExport Module : public Extensible
 	 * @param ShowHidden true if we should show the user everything
 	 */
 	virtual void OnChanInfo(CommandSource &source, ChannelInfo *ci, InfoFormatter &info, bool ShowHidden) { }
-
-	/** Called on cs_findchan()
-	 * @param chname The name being looked up
-	 */
-	virtual void OnFindChan(const Anope::string &chname) { }
 
 	/** Checks if access has the channel privilege 'priv'.
 	 * @param access THe access struct
@@ -776,18 +768,6 @@ class CoreExport Module : public Extensible
 	 */
 	virtual void OnNickInfo(CommandSource &source, NickAlias *na, InfoFormatter &info, bool ShowHidden) { }
 
-	/** Called in findnick()
-	 * Useful to modify the na returned by findnick()
-	 * @param nick The nick being looked up
-	 */
-	virtual void OnFindNick(const Anope::string &nick) { }
-
-	/** Called in findcore()
-	 * Useful to modify the nc returned by findcore()
-	 * @param nick The nick being looked up
-	 */
-	virtual void OnFindCore(const Anope::string &nick) { }
-
 	/** Check whether a users password is correct.
 	 * @param u The user
 	 * @param command The command the user is doing
@@ -837,14 +817,14 @@ class CoreExport Module : public Extensible
 	 * @param mi The memo info
 	 * @param m The memo
 	 */
-	virtual void OnMemoDel(const NickCore *nc, MemoInfo *mi, Memo *m) { }
+	virtual void OnMemoDel(NickCore *nc, MemoInfo *mi, const Memo *m) { }
 
 	/** Called when a memo is deleted
 	 * @param ci The channel of the memo being deleted
 	 * @param mi The memo info
 	 * @param m The memo
 	 */
-	virtual void OnMemoDel(ChannelInfo *ci, MemoInfo *mi, Memo *m) { }
+	virtual void OnMemoDel(ChannelInfo *ci, MemoInfo *mi, const Memo *m) { }
 
 	/** Called when a mode is set on a channel
 	 * @param c The channel
@@ -948,6 +928,12 @@ class CoreExport Module : public Extensible
 	 * @return EVENT_STOP to stop checking modes
 	 */
 	virtual EventReturn OnCheckModes(Channel *c) { return EVENT_CONTINUE; }
+
+	virtual void OnSerializeCheck(SerializeType *) { }
+	virtual void OnSerializableConstruct(Serializable *) { }
+	virtual void OnSerializableDestruct(Serializable *) { }
+	virtual void OnSerializePtrAssign(Serializable *) { }
+	virtual void OnSerializableUpdate(Serializable *) { }
 };
 
 /** Implementation-specific flags which may be set in ModuleManager::Attach()
@@ -961,18 +947,18 @@ enum Implementation
 		I_OnDelNick, I_OnDelCore, I_OnChangeCoreDisplay,
 		I_OnNickClearAccess, I_OnNickAddAccess, I_OnNickEraseAccess,
 		I_OnNickClearCert, I_OnNickAddCert, I_OnNickEraseCert,
-		I_OnNickInfo, I_OnFindNick, I_OnFindCore, I_OnCheckAuthentication,
+		I_OnNickInfo, I_OnCheckAuthentication,
 		I_OnNickUpdate,
 
 		/* ChanServ */
 		I_OnChanSuspend, I_OnChanDrop, I_OnPreChanExpire, I_OnChanExpire, I_OnAccessAdd,
 		I_OnAccessDel, I_OnAccessClear, I_OnLevelChange, I_OnChanRegistered, I_OnChanUnsuspend, I_OnCreateChan, I_OnDelChan, I_OnChannelCreate,
 		I_OnChannelDelete, I_OnAkickAdd, I_OnAkickDel, I_OnCheckKick, I_OnCheckModes,
-		I_OnChanInfo, I_OnFindChan, I_OnCheckPriv, I_OnGroupCheckPriv,
+		I_OnChanInfo, I_OnCheckPriv, I_OnGroupCheckPriv,
 
 		/* BotServ */
 		I_OnBotJoin, I_OnBotKick, I_OnBotCreate, I_OnBotChange, I_OnBotDelete, I_OnBotAssign, I_OnBotUnAssign,
-		I_OnUserKicked, I_OnBotFantasy, I_OnBotNoFantasyAccess, I_OnBotBan, I_OnBadWordAdd, I_OnBadWordDel, I_OnFindBot,
+		I_OnUserKicked, I_OnBotFantasy, I_OnBotNoFantasyAccess, I_OnBotBan, I_OnBadWordAdd, I_OnBadWordDel,
 
 		/* HostServ */
 		I_OnSetVhost, I_OnDeleteVhost,
@@ -1001,6 +987,8 @@ enum Implementation
 		I_OnEncrypt, I_OnDecrypt,
 		I_OnChannelModeSet, I_OnChannelModeUnset, I_OnUserModeSet, I_OnUserModeUnset, I_OnChannelModeAdd, I_OnUserModeAdd,
 		I_OnMLock, I_OnUnMLock, I_OnServerSync, I_OnUplinkSync, I_OnBotPrivmsg, I_OnPrivmsg, I_OnLog,
+
+		I_OnSerializeCheck, I_OnSerializableConstruct, I_OnSerializableDestruct, I_OnSerializePtrAssign, I_OnSerializableUpdate,
 	I_END
 };
 

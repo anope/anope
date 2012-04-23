@@ -30,6 +30,7 @@ class dynamic_reference_base
 	bool invalid;
  public:
 	dynamic_reference_base() : invalid(false) { }
+	dynamic_reference_base(const dynamic_reference_base &other) : invalid(other.invalid) { }
 	virtual ~dynamic_reference_base() { }
 	inline void Invalidate() { this->invalid = true; }
 };
@@ -40,65 +41,66 @@ class dynamic_reference : public dynamic_reference_base
  protected:
 	T *ref;
  public:
+ 	dynamic_reference() : ref(NULL)
+	{
+	}
+
 	dynamic_reference(T *obj) : ref(obj)
 	{
 		if (ref)
 			ref->AddReference(this);
 	}
 
-	dynamic_reference(const dynamic_reference<T> &obj) : ref(obj.ref)
+	dynamic_reference(const dynamic_reference<T> &other) : dynamic_reference_base(other), ref(other.ref)
 	{
-		if (ref)
+		if (*this)
 			ref->AddReference(this);
 	}
 
 	virtual ~dynamic_reference()
 	{
-		if (this->invalid)
+		if (*this)
 		{
-			this->invalid = false;
-			this->ref = NULL;
-		}
-		else if (this->operator bool())
 			ref->DelReference(this);
+		}
 	}
 
 	virtual operator bool()
 	{
-		if (this->invalid)
-		{
-			this->invalid = false;
-			this->ref = NULL;
-		}
-		return this->ref != NULL;
+		if (!this->invalid)
+			return this->ref != NULL;
+		return false;
 	}
 
-	virtual inline operator T*()
+	virtual inline operator T*() const
 	{
-		if (this->operator bool())
+		if (!this->invalid)
 			return this->ref;
 		return NULL;
 	}
 
-	virtual inline T *operator->()
+	virtual inline T* operator->()
 	{
-		if (this->operator bool())
+		if (!this->invalid)
 			return this->ref;
 		return NULL;
 	}
 
 	virtual inline void operator=(T *newref)
 	{
-		if (this->invalid)
-		{
-			this->invalid = false;
-			this->ref = NULL;
-		}
-		else if (this->operator bool())
+		if (*this)
 			this->ref->DelReference(this);
 		this->ref = newref;
-		if (this->operator bool())
+		this->invalid = false;
+		if (*this)
 			this->ref->AddReference(this);
+	}
+
+	virtual inline bool operator==(const dynamic_reference<T> &other) const
+	{
+		if (!this->invalid)
+			return this->ref == other;
+		return false;
 	}
 };
 

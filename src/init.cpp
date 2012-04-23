@@ -453,7 +453,7 @@ void Init(int ac, char **av)
 
 	/* Create me */
 	Me = new Server(NULL, Config->ServerName, 0, Config->ServerDesc, Config->Numeric);
-	for (botinfo_map::iterator it = BotListByNick.begin(), it_end = BotListByNick.end(); it != it_end; ++it)
+	for (botinfo_map::const_iterator it = BotListByNick->begin(), it_end = BotListByNick->end(); it != it_end; ++it)
 		it->second->server = Me;
 
 	/* Announce ourselves to the logfile. */

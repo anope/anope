@@ -351,10 +351,10 @@ class EOld : public Module
 
 	EventReturn OnCheckAuthentication(Command *c, CommandSource *source, const std::vector<Anope::string> &params, const Anope::string &account, const Anope::string &password) anope_override
 	{
-		NickAlias *na = findnick(account);
-		NickCore *nc = na ? na->nc : NULL;
+		const NickAlias *na = findnick(account);
 		if (na == NULL)
 			return EVENT_CONTINUE;
+		NickCore *nc = na->nc;
 
 		size_t pos = nc->pass.find(':');
 		if (pos == Anope::string::npos)

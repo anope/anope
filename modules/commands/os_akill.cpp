@@ -173,7 +173,7 @@ class CommandOSAKill : public Command
 		{
 			source.Reply(USERHOST_MASK_TOO_WIDE, mask.c_str());
 			Log(LOG_ADMIN, u, this) << "tried to akill " << percent << "% of the network (" << affected << " users)";
-			delete x;
+			x->destroy();
 			return;
 		}
 
@@ -181,7 +181,7 @@ class CommandOSAKill : public Command
 		FOREACH_RESULT(I_OnAddXLine, OnAddXLine(u, x, akills));
 		if (MOD_RESULT == EVENT_STOP)
 		{
-			delete x;
+			x->destroy();
 			return;
 		}
 
@@ -264,7 +264,7 @@ class CommandOSAKill : public Command
 					if (!number)
 						return;
 
-					XLine *x = akills->GetEntry(number - 1);
+					const XLine *x = akills->GetEntry(number - 1);
 
 					if (!x)
 						return;
@@ -286,7 +286,7 @@ class CommandOSAKill : public Command
 		{
 			for (unsigned i = 0, end = akills->GetCount(); i < end; ++i)
 			{
-				XLine *x = akills->GetEntry(i);
+				const XLine *x = akills->GetEntry(i);
 
 				if (mask.empty() || mask.equals_ci(x->Mask) || mask == x->UID || Anope::Match(x->Mask, mask, false, true))
 				{

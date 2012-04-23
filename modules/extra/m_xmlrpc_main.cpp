@@ -5,7 +5,7 @@
 class XMLRPCUser : public User
 {
 	Anope::string out;
-	dynamic_reference<NickAlias> na;
+	NickAlias *na;
 
  public:
 	XMLRPCUser(const Anope::string &nnick) : User(nnick, Config->NSEnforcerUser, Config->NSEnforcerHost, ""), na(findnick(nick))
@@ -14,22 +14,22 @@ class XMLRPCUser : public User
 		this->server = Me;
 	}
 
-	void SendMessage(BotInfo *, Anope::string msg) anope_override
+	void SendMessage(const BotInfo *, Anope::string msg) anope_override
 	{
 		this->out += msg + "\n";
 	}
 
-	NickCore *Account() anope_override
+	NickCore *Account() const anope_override
 	{
-		return (na ? na->nc : NULL);
+		return (na ? *na->nc : NULL);
 	}
 
-	bool IsIdentified(bool CheckNick = false) anope_override
+	bool IsIdentified(bool CheckNick = false) const anope_override
 	{
 		return na;
 	}
 
-	bool IsRecognized(bool CheckSecure = true) anope_override
+	bool IsRecognized(bool CheckSecure = true) const anope_override
 	{
 		return na;
 	}
@@ -111,7 +111,7 @@ class MyXMLRPCEvent : public XMLRPCEvent
 			request->reply("error", "Invalid parameters");
 		else
 		{
-			NickAlias *na = findnick(username);
+			const NickAlias *na = findnick(username);
 
 			if (!na)
 				request->reply("error", "Invalid account");

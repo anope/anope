@@ -75,15 +75,15 @@ Anope::string LogFile::GetName() const
 	return this->filename;
 }
 
-Log::Log(LogType type, const Anope::string &category, BotInfo *b) : bi(b), u(NULL), c(NULL), chan(NULL), ci(NULL), s(NULL), Type(type), Category(category)
+Log::Log(LogType type, const Anope::string &category, const BotInfo *b) : bi(b), u(NULL), c(NULL), chan(NULL), ci(NULL), s(NULL), Type(type), Category(category)
 {
-	if (!bi)
-		bi = Config ? findbot(Config->Global) : NULL;
+	if (!bi && Config)
+		bi = findbot(Config->Global);
 	if (bi)
 		this->Sources.push_back(bi->nick);
 }
 
-Log::Log(LogType type, User *_u, Command *_c, ChannelInfo *_ci) : u(_u), c(_c), chan(NULL), ci(_ci), s(NULL), Type(type)
+Log::Log(LogType type, const User *_u, Command *_c, const ChannelInfo *_ci) : u(_u), c(_c), chan(NULL), ci(_ci), s(NULL), Type(type)
 {
 	if (!u || !c)
 		throw CoreException("Invalid pointers passed to Log::Log");
@@ -95,8 +95,8 @@ Log::Log(LogType type, User *_u, Command *_c, ChannelInfo *_ci) : u(_u), c(_c), 
 	this->bi = NULL;
 	if (sl != Anope::string::npos)
 		this->bi = findbot(c->name.substr(0, sl));
-	if (this->bi == NULL)
-		this->bi = Config ? findbot(Config->Global) : NULL;
+	if (this->bi == NULL && Config)
+		this->bi = findbot(Config->Global);
 	this->Category = c->name;
 	if (this->bi)
 		this->Sources.push_back(this->bi->nick);
@@ -106,12 +106,13 @@ Log::Log(LogType type, User *_u, Command *_c, ChannelInfo *_ci) : u(_u), c(_c), 
 		this->Sources.push_back(ci->name);
 }
 
-Log::Log(User *_u, Channel *ch, const Anope::string &category) : u(_u), c(NULL), chan(ch), ci(chan ? chan->ci : NULL), s(NULL), Type(LOG_CHANNEL)
+Log::Log(const User *_u, Channel *ch, const Anope::string &category) : bi(NULL), u(_u), c(NULL), chan(ch), ci(chan ? *chan->ci : NULL), s(NULL), Type(LOG_CHANNEL)
 {
 	if (!chan)
 		throw CoreException("Invalid pointers passed to Log::Log");
 	
-	this->bi = Config ? findbot(Config->ChanServ) : NULL;
+	if (Config)
+		this->bi = findbot(Config->ChanServ);
 	this->Category = category;
 	if (this->bi)
 		this->Sources.push_back(this->bi->nick);
@@ -120,36 +121,36 @@ Log::Log(User *_u, Channel *ch, const Anope::string &category) : u(_u), c(NULL),
 	this->Sources.push_back(chan->name);
 }
 
-Log::Log(User *_u, const Anope::string &category, BotInfo *_bi) : bi(_bi), u(_u), c(NULL), chan(NULL), ci(NULL), s(NULL), Type(LOG_USER), Category(category)
+Log::Log(const User *_u, const Anope::string &category, const BotInfo *_bi) : bi(_bi), u(_u), c(NULL), chan(NULL), ci(NULL), s(NULL), Type(LOG_USER), Category(category)
 {
 	if (!u)
 		throw CoreException("Invalid pointers passed to Log::Log");
 	
-	if (!this->bi)
-		this->bi = Config ? findbot(Config->Global) : NULL;
+	if (!this->bi && Config)
+		this->bi = findbot(Config->Global);
 	if (this->bi)
 		this->Sources.push_back(this->bi->nick);
 	this->Sources.push_back(u->nick);
 }
 
-Log::Log(Server *serv, const Anope::string &category, BotInfo *_bi) : bi(_bi), u(NULL), c(NULL), chan(NULL), ci(NULL), s(serv), Type(LOG_SERVER), Category(category)
+Log::Log(Server *serv, const Anope::string &category, const BotInfo *_bi) : bi(_bi), u(NULL), c(NULL), chan(NULL), ci(NULL), s(serv), Type(LOG_SERVER), Category(category)
 {
 	if (!s)
 		throw CoreException("Invalid pointer passed to Log::Log");
 	
-	if (!this->bi)
-		this->bi = Config ? findbot(Config->OperServ) : NULL;
-	if (!this->bi)
-		this->bi = Config ? findbot(Config->Global) : NULL;
+	if (!this->bi && Config)
+		this->bi = findbot(Config->OperServ);
+	if (!this->bi && Config)
+		this->bi = findbot(Config->Global);
 	if (this->bi)
 		this->Sources.push_back(this->bi->nick);
 	this->Sources.push_back(s->GetName());
 }
 
-Log::Log(BotInfo *b, const Anope::string &category) : bi(b), u(NULL), c(NULL), chan(NULL), ci(NULL), s(NULL), Type(LOG_NORMAL), Category(category)
+Log::Log(const BotInfo *b, const Anope::string &category) : bi(b), u(NULL), c(NULL), chan(NULL), ci(NULL), s(NULL), Type(LOG_NORMAL), Category(category)
 {
-	if (!this->bi)
-		this->bi = Config ? findbot(Config->Global) : NULL;
+	if (!this->bi && Config)
+		this->bi = findbot(Config->Global);
 	if (this->bi)
 		this->Sources.push_back(bi->nick);
 }

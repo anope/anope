@@ -49,7 +49,7 @@ class MySQLResult : public SQLResult
 	MYSQL_RES *res;
 
  public:
-	MySQLResult(const SQLQuery &q, const Anope::string &fq, MYSQL_RES *r) : SQLResult(q, fq), res(r)
+	MySQLResult(unsigned int i, const SQLQuery &q, const Anope::string &fq, MYSQL_RES *r) : SQLResult(i, q, fq), res(r)
 	{
 		unsigned num_fields = res ? mysql_num_fields(res) : 0;
 
@@ -80,7 +80,7 @@ class MySQLResult : public SQLResult
 		}
 	}
 
-	MySQLResult(const SQLQuery &q, const Anope::string &fq, const Anope::string &err) : SQLResult(q, fq, err), res(NULL)
+	MySQLResult(const SQLQuery &q, const Anope::string &fq, const Anope::string &err) : SQLResult(0, q, fq, err), res(NULL)
 	{
 	}
 
@@ -95,6 +95,8 @@ class MySQLResult : public SQLResult
  */
 class MySQLService : public SQLProvider
 {
+	std::map<Anope::string, std::set<Anope::string> > active_schema;
+
 	Anope::string database;
 	Anope::string server;
 	Anope::string user;
@@ -123,7 +125,7 @@ class MySQLService : public SQLProvider
 
 	SQLResult RunQuery(const SQLQuery &query) anope_override;
 
-	SQLQuery CreateTable(const Anope::string &table, const Serializable::serialized_data &data) anope_override;
+	std::vector<SQLQuery> CreateTable(const Anope::string &table, const Serialize::Data &data) anope_override;
 
 	SQLQuery GetTables() anope_override;
 
@@ -305,7 +307,7 @@ MySQLService::~MySQLService()
 		if (r.service == this)
 		{
 			if (r.sqlinterface)
-				r.sqlinterface->OnError(SQLResult(r.query, "SQL Interface is going away"));
+				r.sqlinterface->OnError(SQLResult(0, r.query, "SQL Interface is going away"));
 			me->QueryRequests.erase(me->QueryRequests.begin() + i - 1);
 		}
 	}
@@ -329,10 +331,11 @@ SQLResult MySQLService::RunQuery(const SQLQuery &query)
 
 	if (this->CheckConnection() && !mysql_real_query(this->sql, real_query.c_str(), real_query.length()))
 	{
-		MYSQL_RES *res = mysql_use_result(this->sql);
+		MYSQL_RES *res = mysql_store_result(this->sql);
+		unsigned int id = mysql_insert_id(this->sql);
 
 		this->Lock.Unlock();
-		return MySQLResult(query, real_query, res);
+		return MySQLResult(id, query, real_query, res);
 	}
 	else
 	{
@@ -342,38 +345,50 @@ SQLResult MySQLService::RunQuery(const SQLQuery &query)
 	}
 }
 
-SQLQuery MySQLService::CreateTable(const Anope::string &table, const Serializable::serialized_data &data)
+std::vector<SQLQuery> MySQLService::CreateTable(const Anope::string &table, const Serialize::Data &data)
 {
-	Anope::string query_text = "CREATE TABLE `" + table + "` (", key_buf;
-	for (Serializable::serialized_data::const_iterator it = data.begin(), it_end = data.end(); it != it_end; ++it)
-	{
-		query_text += "`" + it->first + "` ";
-		if (it->second.getType() == Serialize::DT_INT)
-			query_text += "int(11)";
-		else if (it->second.getMax() > 0)
-			query_text += "varchar(" + stringify(it->second.getMax()) + ")";
-		else
-			query_text += "text";
-		query_text += ",";
+	std::vector<SQLQuery> queries;
+	std::set<Anope::string> &known_cols = this->active_schema[table];
 
-		if (it->second.getKey())
-		{
-			if (key_buf.empty())
-				key_buf = "UNIQUE KEY `ukey` (";
-			key_buf += "`" + it->first + "`,";
-		}
-	}
-	if (!key_buf.empty())
+	if (known_cols.empty())
 	{
-		key_buf.erase(key_buf.end() - 1);
-		key_buf += ")";
-		query_text += " " + key_buf;
+		Anope::string query_text = "CREATE TABLE IF NOT EXISTS `" + table + "` (`id` int(10) unsigned NOT NULL AUTO_INCREMENT,"
+			" `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP";
+		for (Serialize::Data::const_iterator it = data.begin(), it_end = data.end(); it != it_end; ++it)
+		{
+			known_cols.insert(it->first);
+
+			query_text += ", `" + it->first + "` ";
+			if (it->second.getType() == Serialize::DT_INT)
+				query_text += "int(11)";
+			else if (it->second.getMax() > 0)
+				query_text += "varchar(" + stringify(it->second.getMax()) + ")";
+			else
+				query_text += "text";
+		}
+		query_text += ", PRIMARY KEY (`id`), KEY `timestamp_idx` (`timestamp`))";
+		queries.push_back(query_text);
 	}
 	else
-		query_text.erase(query_text.end() - 1);
-	query_text += ")";
+		for (Serialize::Data::const_iterator it = data.begin(), it_end = data.end(); it != it_end; ++it)
+		{
+			if (known_cols.count(it->first) > 0)
+				continue;
 
-	return SQLQuery(query_text);
+			known_cols.insert(it->first);
+
+			Anope::string query_text = "ALTER TABLE `" + table + "` ADD `" + it->first + "` ";
+			if (it->second.getType() == Serialize::DT_INT)
+				query_text += "int(11)";
+			else if (it->second.getMax() > 0)
+				query_text += "varchar(" + stringify(it->second.getMax()) + ")";
+			else
+				query_text += "text";
+
+			queries.push_back(query_text);
+		}
+
+	return queries;
 }
 
 SQLQuery MySQLService::GetTables()
@@ -391,7 +406,9 @@ void MySQLService::Connect()
 	bool connect = mysql_real_connect(this->sql, this->server.c_str(), this->user.c_str(), this->password.c_str(), this->database.c_str(), this->port, NULL, 0);
 
 	if (!connect)
-		throw SQLException("Unable to connect to SQL service " + this->name + ": " + mysql_error(this->sql));
+		throw SQLException("Unable to connect to MySQL service " + this->name + ": " + mysql_error(this->sql));
+	
+	Log(LOG_DEBUG) << "Successfully connected to MySQL service " << this->name << " at " << this->server << ":" << this->port;
 }
 
 

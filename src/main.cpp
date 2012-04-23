@@ -124,7 +124,7 @@ UplinkSocket::~UplinkSocket()
 			{
 				/* Don't use quitmsg here, it may contain information you don't want people to see */
 				ircdproto->SendQuit(u, "Shutting down");
-				BotInfo *bi = findbot(u->nick);
+				BotInfo* bi = findbot(u->nick);
 				if (bi != NULL)
 					bi->introduced = false;
 			}
@@ -224,7 +224,7 @@ UplinkSocket::Message::~Message()
 			return;
 		}
 
-		BotInfo *bi = findbot(this->user->nick);
+		const BotInfo *bi = findbot(this->user->nick);
 		if (bi != NULL && bi->introduced == false)
 		{
 			Log(LOG_DEBUG) << "Attempted to send \"" << this->buffer.str() << "\" from " << bi->nick << " when not introduced";

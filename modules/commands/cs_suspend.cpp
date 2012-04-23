@@ -13,6 +13,11 @@
 
 #include "module.h"
 
+struct ExtensibleString : Anope::string, ExtensibleItem
+{
+	ExtensibleString(const Anope::string &s) : Anope::string(s) { }
+};
+
 struct ChanSuspend : ExtensibleItem, Serializable
 {
 	Anope::string chan;
@@ -22,14 +27,14 @@ struct ChanSuspend : ExtensibleItem, Serializable
 	{
 	}
 
-	Anope::string serialize_name() const
+	const Anope::string serialize_name() const
 	{
 		return "ChanSuspend";
 	}
 
-	serialized_data serialize() anope_override
+	Serialize::Data serialize() const anope_override
 	{
-		serialized_data sd;
+		Serialize::Data sd;
 
 		sd["chan"] << this->chan;
 		sd["when"] << this->when;
@@ -37,18 +42,24 @@ struct ChanSuspend : ExtensibleItem, Serializable
 		return sd;
 	}
 
-	static void unserialize(serialized_data &sd)
+	static Serializable* unserialize(Serializable *obj, Serialize::Data &sd)
 	{
 		ChannelInfo *ci = cs_findchan(sd["chan"].astr());
 		if (ci == NULL)
-			return;
+			return NULL;
 
-		ChanSuspend *cs = new ChanSuspend();
+		ChanSuspend *cs;
+		if (obj)
+			cs = debug_cast<ChanSuspend *>(obj);
+		else
+			cs = new ChanSuspend();
 		
 		sd["chan"] >> cs->chan;
 		sd["when"] >> cs->when;
 
-		ci->Extend("ci_suspend_expire", cs);
+		if (!obj)
+			ci->Extend("ci_suspend_expire", cs);
+		return cs;
 	}
 };
 
@@ -220,11 +231,12 @@ class CSSuspend : public Module
 
 	~CSSuspend()
 	{
-		for (registered_channel_map::const_iterator it = RegisteredChannelList.begin(), it_end = RegisteredChannelList.end(); it != it_end; ++it)
+		for (registered_channel_map::const_iterator it = RegisteredChannelList->begin(), it_end = RegisteredChannelList->end(); it != it_end; ++it)
 		{
-			it->second->Shrink("cs_suspend_expire");
-			it->second->Shrink("suspend_by");
-			it->second->Shrink("suspend_reason");
+			ChannelInfo *ci = it->second;
+			ci->Shrink("cs_suspend_expire");
+			ci->Shrink("suspend_by");
+			ci->Shrink("suspend_reason");
 		}
 	}
 

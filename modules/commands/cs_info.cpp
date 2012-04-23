@@ -13,9 +13,11 @@
 
 #include "module.h"
 
+struct ExtensibleString : Anope::string, ExtensibleItem { };
+
 class CommandCSInfo : public Command
 {
-	void CheckOptStr(Anope::string &buf, ChannelInfoFlag opt, const char *str, ChannelInfo *ci, NickCore *nc)
+	void CheckOptStr(Anope::string &buf, ChannelInfoFlag opt, const char *str, const ChannelInfo *ci, const NickCore *nc)
 	{
 		if (ci->HasFlag(opt))
 		{
@@ -68,7 +70,7 @@ class CommandCSInfo : public Command
 		info["Registered"] = do_strftime(ci->time_registered);
 		info["Last used"] = do_strftime(ci->last_used);
 
-		ModeLock *secret = ci->GetMLock(CMODE_SECRET);
+		const ModeLock *secret = ci->GetMLock(CMODE_SECRET);
 		if (!ci->last_topic.empty() && (show_all || ((!secret || secret->set == false) && (!ci->c || !ci->c->HasMode(CMODE_SECRET)))))
 		{
 			info["Last topic"] = ci->last_topic;

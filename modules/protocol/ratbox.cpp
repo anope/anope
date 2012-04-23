@@ -52,13 +52,13 @@ class RatboxProto : public IRCDProto
 
 	void SendSGLineDel(const XLine *x) anope_override
 	{
-		BotInfo *bi = findbot(Config->OperServ);
+		const BotInfo *bi = findbot(Config->OperServ);
 		UplinkSocket::Message(bi) << "UNXLINE * " << x->Mask;
 	}
 
 	void SendSGLine(User *, const XLine *x) anope_override
 	{
-		BotInfo *bi = findbot(Config->OperServ);
+		const BotInfo *bi = findbot(Config->OperServ);
 		UplinkSocket::Message(bi) << "XLINE * " << x->Mask << " 0 :" << x->GetReason();
 	}
 
@@ -67,7 +67,7 @@ class RatboxProto : public IRCDProto
 		if (x->IsRegex() || x->HasNickOrReal())
 			return;
 
-		BotInfo *bi = findbot(Config->OperServ);
+		const BotInfo *bi = findbot(Config->OperServ);
 		UplinkSocket::Message(bi) << "UNKLINE * " << x->GetUser() << " " << x->GetHost();
 	}
 
@@ -76,7 +76,7 @@ class RatboxProto : public IRCDProto
 		UplinkSocket::Message(Me) << "UNRESV * " << x->Mask;
 	}
 
-	void SendJoin(User *user, Channel *c, const ChannelStatus *status) anope_override
+	void SendJoin(const User *user, Channel *c, const ChannelStatus *status) anope_override
 	{
 		/* Note that we must send our modes with the SJOIN and
 		 * can not add them to the mode stacker because ratbox
@@ -94,7 +94,7 @@ class RatboxProto : public IRCDProto
 
 	void SendAkill(User *u, XLine *x) anope_override
 	{
-		BotInfo *bi = findbot(Config->OperServ);
+		const BotInfo *bi = findbot(Config->OperServ);
 
 		if (x->IsRegex() || x->HasNickOrReal())
 		{
@@ -107,14 +107,15 @@ class RatboxProto : public IRCDProto
 				return;
 			}
 
-			XLine *old = x;
+			const XLine *old = x;
 
 			if (old->manager->HasEntry("*@" + u->host))
 				return;
 
 			/* We can't akill x as it has a nick and/or realname included, so create a new akill for *@host */
-			x = new XLine("*@" + u->host, old->By, old->Expires, old->Reason, old->UID);
-			old->manager->AddXLine(x);
+			XLine *xline = new XLine("*@" + u->host, old->By, old->Expires, old->Reason, old->UID);
+			old->manager->AddXLine(xline);
+			x = xline;
 
 			Log(bi, "akill") << "AKILL: Added an akill for " << x->Mask << " because " << u->GetMask() << "#" << u->realname << " matches " << old->Mask;
 		}
@@ -454,7 +455,7 @@ bool event_encap(const Anope::string &source, const std::vector<Anope::string> &
 			return true;
 		u->Login(nc);
 
-		NickAlias *user_na = findnick(u->nick);
+		const NickAlias *user_na = findnick(u->nick);
 		if (!Config->NoNicknameOwnership && user_na && user_na->nc == nc && user_na->nc->HasFlag(NI_UNCONFIRMED) == false)
 			u->SetMode(findbot(Config->NickServ), UMODE_REGISTERED);
 	}
@@ -577,7 +578,7 @@ class ProtoRatbox : public Module
 			Config->Numeric = numeric;
 		}
 
-		for (botinfo_map::iterator it = BotListByNick.begin(), it_end = BotListByNick.end(); it != it_end; ++it)
+		for (botinfo_map::iterator it = BotListByNick->begin(), it_end = BotListByNick->end(); it != it_end; ++it)
 			it->second->GenerateUID();
 	}
 

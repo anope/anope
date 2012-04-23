@@ -39,7 +39,7 @@ class CommandCSUp : public Command
 			
 			if (c == NULL)
 				source.Reply(CHAN_X_NOT_IN_USE, channel.c_str());
-			else if (c->ci == NULL)
+			else if (!c->ci)
 				source.Reply(CHAN_X_NOT_REGISTERED, channel.c_str());
 			else
 				chan_set_correct_modes(u, c, 1);
@@ -94,7 +94,7 @@ class CommandCSDown : public Command
 			
 			if (c == NULL)
 				source.Reply(CHAN_X_NOT_IN_USE, channel.c_str());
-			else if (c->ci == NULL)
+			else if (!c->ci)
 				source.Reply(CHAN_X_NOT_REGISTERED, channel.c_str());
 			else
 				RemoveAll(u, c);

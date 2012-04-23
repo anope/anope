@@ -14,9 +14,11 @@
 #include "commands.h"
 
 
-extern CoreExport Anope::insensitive_map<BotInfo *> BotListByNick;
-extern CoreExport Anope::map<BotInfo *> BotListByUID;
 typedef Anope::insensitive_map<BotInfo *> botinfo_map;
+typedef Anope::map<BotInfo *> botinfouid_map;
+
+extern serialize_checker<botinfo_map> BotListByNick;
+extern serialize_checker<botinfouid_map> BotListByUID;
 
 /** Flags settable on a bot
  */
@@ -60,9 +62,9 @@ class CoreExport BotInfo : public User, public Flags<BotFlag, BI_END>, public Se
 	 */
 	virtual ~BotInfo();
 
-	Anope::string serialize_name() const;
-	serialized_data serialize();
-	static void unserialize(serialized_data &);
+	const Anope::string serialize_name() const;
+	Serialize::Data serialize() const;
+	static Serializable* unserialize(Serializable *obj, Serialize::Data &);
 
 	void GenerateUID();
 
@@ -90,7 +92,7 @@ class CoreExport BotInfo : public User, public Flags<BotFlag, BI_END>, public Se
 
 	/** Get the number of channels this bot is assigned to
 	 */
-	unsigned GetChannelCount();
+	unsigned GetChannelCount() const;
 
 	/** Join this bot to a channel
 	 * @param c The channel

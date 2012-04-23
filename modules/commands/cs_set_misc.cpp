@@ -12,9 +12,9 @@
 
 #include "module.h"
 
-struct CSMiscData : Anope::string, ExtensibleItem, Serializable
+struct CSMiscData : ExtensibleItem, Serializable
 {
-	ChannelInfo *ci;
+	serialize_obj<ChannelInfo> ci;
 	Anope::string name;
 	Anope::string data;
 
@@ -22,14 +22,14 @@ struct CSMiscData : Anope::string, ExtensibleItem, Serializable
 	{
 	}
 
-	Anope::string serialize_name() const anope_override
+	const Anope::string serialize_name() const anope_override
 	{
 		return "CSMiscData";
 	}
 
-	serialized_data serialize() anope_override
+	Serialize::Data serialize() const anope_override
 	{
-		serialized_data sdata;
+		Serialize::Data sdata;
 
 		sdata["ci"] << this->ci->name;
 		sdata["name"] << this->name;
@@ -38,13 +38,27 @@ struct CSMiscData : Anope::string, ExtensibleItem, Serializable
 		return sdata;
 	}
 
-	static void unserialize(serialized_data &data)
+	static Serializable* unserialize(Serializable *obj, Serialize::Data &data)
 	{
 		ChannelInfo *ci = cs_findchan(data["ci"].astr());
 		if (ci == NULL)
-			return;
+			return NULL;
 
-		ci->Extend(data["name"].astr(), new CSMiscData(ci, data["name"].astr(), data["data"].astr()));
+		CSMiscData *d;
+		if (obj)
+		{
+			d = debug_cast<CSMiscData *>(obj);
+			d->ci = ci;
+			data["name"] >> d->name;
+			data["data"] >> d->data;
+		}
+		else
+		{
+			d = new CSMiscData(ci, data["name"].astr(), data["data"].astr());
+			ci->Extend(data["name"].astr(), d);
+		}
+
+		return d;
 	}
 };
 

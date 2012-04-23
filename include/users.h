@@ -11,6 +11,7 @@
 #include "anope.h"
 #include "modes.h"
 #include "extensible.h"
+#include "serialize.h"
 
 extern CoreExport Anope::insensitive_map<User *> UserListByNick;
 extern CoreExport Anope::map<User *> UserListByUID;
@@ -36,7 +37,7 @@ typedef std::list<ChannelContainer *> UChannelList;
 
 
 /* Online user and channel data. */
-class CoreExport User : public Base, public Extensible
+class CoreExport User : public virtual Base, public Extensible
 {
  protected:
 	Anope::string vident;
@@ -45,7 +46,7 @@ class CoreExport User : public Base, public Extensible
 	bool OnAccess; /* If the user is on the access list of the nick theyre on */
 	Flags<UserModeName, UMODE_END * 2> modes; /* Bitset of mode names the user has set on them */
 	std::map<UserModeName, Anope::string> Params; /* Map of user modes and the params this user has */
-	NickCore *nc; /* NickCore account the user is currently loggged in as */
+	serialize_obj<NickCore> nc; /* NickCore account the user is currently loggged in as */
 
  public: // XXX: exposing a tiny bit too much
 	Anope::string nick;		/* User's current nick */
@@ -159,8 +160,8 @@ class CoreExport User : public Base, public Extensible
 	 * @param fmt Format of the Message
 	 * @param ... any number of parameters
 	 */
-	void SendMessage(BotInfo *source, const char *fmt, ...);
-	virtual void SendMessage(BotInfo *source, Anope::string msg);
+	void SendMessage(const BotInfo *source, const char *fmt, ...);
+	virtual void SendMessage(const BotInfo *source, Anope::string msg);
 
 	/** Collide a nick
 	 * See the comment in users.cpp
@@ -187,19 +188,19 @@ class CoreExport User : public Base, public Extensible
 	/** Get the account the user is logged in using
 	 * @return The account or NULL
 	 */
-	virtual NickCore *Account();
+	virtual NickCore *Account() const;
 
 	/** Check if the user is identified for their nick
 	 * @param CheckNick True to check if the user is identified to the nickname they are on too
 	 * @return true or false
 	 */
-	virtual bool IsIdentified(bool CheckNick = false);
+	virtual bool IsIdentified(bool CheckNick = false) const;
 
 	/** Check if the user is recognized for their nick (on the nicks access list)
 	 * @param CheckSecure Only returns true if the user has secure off
 	 * @return true or false
 	 */
-	virtual bool IsRecognized(bool CheckSecure = true);
+	virtual bool IsRecognized(bool CheckSecure = true) const;
 
 	/** Check if the user is a services oper
 	 * @return true if they are an oper
@@ -244,32 +245,32 @@ class CoreExport User : public Base, public Extensible
 	 * @param um The user mode
 	 * @param Param Optional param for the mode
 	 */
-	void SetMode(BotInfo *bi, UserMode *um, const Anope::string &Param = "");
+	void SetMode(const BotInfo *bi, UserMode *um, const Anope::string &Param = "");
 
 	/** Set a mode on the user
 	 * @param bi The client setting the mode
 	 * @param Name The mode name
 	 * @param Param Optional param for the mode
 	 */
-	void SetMode(BotInfo *bi, UserModeName Name, const Anope::string &Param = "");
+	void SetMode(const BotInfo *bi, UserModeName Name, const Anope::string &Param = "");
 
 	/** Remove a mode on the user
 	 * @param bi The client setting the mode
 	 * @param um The user mode
 	 */
-	void RemoveMode(BotInfo *bi, UserMode *um);
+	void RemoveMode(const BotInfo *bi, UserMode *um);
 
 	/** Remove a mode from the user
 	 * @param bi The client setting the mode
 	 * @param Name The mode name
 	 */
-	void RemoveMode(BotInfo *bi, UserModeName Name);
+	void RemoveMode(const BotInfo *bi, UserModeName Name);
 
 	/** Set a string of modes on a user
 	 * @param bi The client setting the modes
 	 * @param umodes The modes
 	 */
-	void SetModes(BotInfo *bi, const char *umodes, ...);
+	void SetModes(const BotInfo *bi, const char *umodes, ...);
 
 	/** Set a string of modes on a user internally
 	 * @param umodes The modes
@@ -287,7 +288,7 @@ class CoreExport User : public Base, public Extensible
 	 * @param c The channel
 	 * @return The channel container, or NULL
 	 */
-	ChannelContainer *FindChannel(const Channel *c);
+	ChannelContainer *FindChannel(const Channel *c) const;
 
 	/** Check if the user is protected from kicks and negative mode changes
 	 * @return true or false

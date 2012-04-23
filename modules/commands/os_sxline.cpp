@@ -132,7 +132,7 @@ class CommandOSSXLineBase : public Command
 					if (!Number)
 						return;
 
-					XLine *x = this->xlm->GetEntry(Number - 1);
+					const XLine *x = this->xlm->GetEntry(Number - 1);
 
 					if (!x)
 						return;
@@ -154,7 +154,7 @@ class CommandOSSXLineBase : public Command
 		{
 			for (unsigned i = 0, end = this->xlm()->GetCount(); i < end; ++i)
 			{
-				XLine *x = this->xlm()->GetEntry(i);
+				const XLine *x = this->xlm()->GetEntry(i);
 
 				if (mask.empty() || mask.equals_ci(x->Mask) || mask == x->UID || Anope::Match(x->Mask, mask, false, true))
 				{
@@ -369,7 +369,7 @@ class CommandOSSNLine : public CommandOSSXLineBase
 		{
 			source.Reply(USERHOST_MASK_TOO_WIDE, mask.c_str());
 			Log(LOG_ADMIN, u, this) << "tried to " << source.command << " " << percent << "% of the network (" << affected << " users)";
-			delete x;
+			x->destroy();
 			return;
 		}
 
@@ -377,7 +377,7 @@ class CommandOSSNLine : public CommandOSSXLineBase
 		FOREACH_RESULT(I_OnAddXLine, OnAddXLine(u, x, this->xlm()));
 		if (MOD_RESULT == EVENT_STOP)
 		{
-			delete x;
+			x->destroy();
 			return;
 		}
 
@@ -576,7 +576,7 @@ class CommandOSSQLine : public CommandOSSXLineBase
 		{
 			source.Reply(USERHOST_MASK_TOO_WIDE, mask.c_str());
 			Log(LOG_ADMIN, u, this) << "tried to SQLine " << percent << "% of the network (" << affected << " users)";
-			delete x;
+			x->destroy();
 			return;
 		}
 
@@ -584,7 +584,7 @@ class CommandOSSQLine : public CommandOSSXLineBase
 		FOREACH_RESULT(I_OnAddXLine, OnAddXLine(u, x, this->xlm()));
 		if (MOD_RESULT == EVENT_STOP)
 		{
-			delete x;
+			x->destroy();
 			return;
 		}
 

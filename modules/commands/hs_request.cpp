@@ -30,14 +30,14 @@ struct HostRequest : ExtensibleItem, Serializable
 	Anope::string host;
 	time_t time;
 
-	Anope::string serialize_name() const anope_override
+	const Anope::string serialize_name() const anope_override
 	{
 		return "HostRequest";
 	}
 
-	serialized_data serialize() anope_override
+	Serialize::Data serialize() const anope_override
 	{
-		serialized_data data;
+		Serialize::Data data;
 
 		data["nick"] << this->nick;
 		data["ident"] << this->ident;
@@ -47,19 +47,25 @@ struct HostRequest : ExtensibleItem, Serializable
 		return data;
 	}
 
-	static void unserialize(serialized_data &data)
+	static Serializable* unserialize(Serializable *obj, Serialize::Data &data)
 	{
 		NickAlias *na = findnick(data["nick"].astr());
 		if (na == NULL)
-			return;
+			return NULL;
 
-		HostRequest *req = new HostRequest;
+		HostRequest *req;
+		if (obj)
+			req = debug_cast<HostRequest *>(obj);
+		else
+			req = new HostRequest;
 		req->nick = na->nick;
 		data["ident"] >> req->ident;
 		data["host"] >> req->host;
 		data["time"] >> req->time;
 
-		na->Extend("hs_request", req);
+		if (!obj)
+			na->Extend("hs_request", req);
+		return req;
 	}
 };
 
@@ -282,9 +288,9 @@ class CommandHSWaiting : public Command
 
 		list.addColumn("Number").addColumn("Nick").addColumn("Vhost").addColumn("Created");
 
-		for (nickalias_map::const_iterator it = NickAliasList.begin(), it_end = NickAliasList.end(); it != it_end; ++it)
+		for (nickalias_map::const_iterator it = NickAliasList->begin(), it_end = NickAliasList->end(); it != it_end; ++it)
 		{
-			NickAlias *na = it->second;
+			const NickAlias *na = it->second;
 			HostRequest *hr = na->GetExt<HostRequest *>("hs_request");
 			if (!hr)
 				continue;
@@ -358,8 +364,11 @@ class HSRequest : public Module
 
 	~HSRequest()
 	{
-		for (nickalias_map::const_iterator it = NickAliasList.begin(), it_end = NickAliasList.end(); it != it_end; ++it)
-			it->second->Shrink("hs_request");
+		for (nickalias_map::const_iterator it = NickAliasList->begin(), it_end = NickAliasList->end(); it != it_end; ++it)
+		{
+			NickAlias *na = it->second;
+			na->Shrink("hs_request");
+		}
 	}
 
 	void OnReload() anope_override
@@ -387,7 +396,7 @@ void req_send_memos(CommandSource &source, const Anope::string &vIdent, const An
 		{
 			Oper *o = Config->Opers[i];
 			
-			NickAlias *na = findnick(o->name);
+			const NickAlias *na = findnick(o->name);
 			if (!na)
 				continue;
 

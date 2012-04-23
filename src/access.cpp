@@ -46,8 +46,11 @@ void PrivilegeManager::RemovePrivilege(Privilege &p)
 	if (it != privs.end())
 		privs.erase(it);
 
-	for (registered_channel_map::const_iterator cit = RegisteredChannelList.begin(), cit_end = RegisteredChannelList.end(); cit != cit_end; ++cit)
+	for (registered_channel_map::const_iterator cit = RegisteredChannelList->begin(), cit_end = RegisteredChannelList->end(); cit != cit_end; ++cit)
+	{
+		cit->second->QueueUpdate();
 		cit->second->RemoveLevel(p.name);
+	}
 }
 
 Privilege *PrivilegeManager::FindPrivilege(const Anope::string &name)
@@ -84,14 +87,14 @@ ChanAccess::~ChanAccess()
 {
 }
 
-Anope::string ChanAccess::serialize_name() const
+const Anope::string ChanAccess::serialize_name() const
 {
 	return "ChanAccess";
 }
 
-Serializable::serialized_data ChanAccess::serialize()
+Serialize::Data ChanAccess::serialize() const
 {
-	serialized_data data;
+	Serialize::Data data;
 
 	data["provider"] << this->provider->name;
 	data["ci"] << this->ci->name;
@@ -104,14 +107,18 @@ Serializable::serialized_data ChanAccess::serialize()
 	return data;
 }
 
-void ChanAccess::unserialize(serialized_data &data)
+Serializable* ChanAccess::unserialize(Serializable *obj, Serialize::Data &data)
 {
 	service_reference<AccessProvider> aprovider("AccessProvider", data["provider"].astr());
 	ChannelInfo *ci = cs_findchan(data["ci"].astr());
 	if (!aprovider || !ci)
-		return;
+		return NULL;
 
-	ChanAccess *access = aprovider->Create();
+	ChanAccess *access;
+	if (obj)
+		access = debug_cast<ChanAccess *>(obj);
+	else
+		access = const_cast<ChanAccess *>(aprovider->Create());
 	access->provider = aprovider;
 	access->ci = ci;
 	data["mask"] >> access->mask;
@@ -120,10 +127,12 @@ void ChanAccess::unserialize(serialized_data &data)
 	data["created"] >> access->created;
 	access->Unserialize(data["data"].astr());
 
-	ci->AddAccess(access);
+	if (!obj)
+		ci->AddAccess(access);
+	return access;
 }
 
-bool ChanAccess::Matches(User *u, NickCore *nc)
+bool ChanAccess::Matches(const User *u, const NickCore *nc) const
 {
 	bool is_mask = this->mask.find_first_of("!@?*") != Anope::string::npos;
 	if (u && is_mask && Anope::Match(u->nick, this->mask))
@@ -131,10 +140,10 @@ bool ChanAccess::Matches(User *u, NickCore *nc)
 	else if (u && Anope::Match(u->GetDisplayedMask(), this->mask))
 		return true;
 	else if (nc)
-		for (std::list<NickAlias *>::iterator it = nc->aliases.begin(); it != nc->aliases.end(); ++it)
+		for (std::list<serialize_obj<NickAlias> >::const_iterator it = nc->aliases.begin(); it != nc->aliases.end();)
 		{
-			NickAlias *na = *it;
-			if (Anope::Match(na->nick, this->mask))
+			const NickAlias *na = *it++;
+			if (na && Anope::Match(na->nick, this->mask))
 				return true;
 		}
 	return false;
@@ -245,7 +254,7 @@ bool AccessGroup::HasPriv(const Anope::string &name) const
 	return false;
 }
 
-ChanAccess *AccessGroup::Highest() const
+const ChanAccess *AccessGroup::Highest() const
 {
 	const std::vector<Privilege> &privs = PrivilegeManager::GetPrivileges();
 	for (unsigned i = privs.size(); i > 0; --i)

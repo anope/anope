@@ -413,7 +413,7 @@ bool IRCdMessage::OnPrivmsg(const Anope::string &source, const std::vector<Anope
 	{
 		Log() << message << ": user record for " << source << " not found";
 
-		BotInfo *bi = findbot(receiver);
+		const BotInfo *bi = findbot(receiver);
 		if (bi)
 			ircdproto->SendMessage(bi, source, "%s", "Internal error - unable to process request.");
 
@@ -443,7 +443,7 @@ bool IRCdMessage::OnPrivmsg(const Anope::string &source, const std::vector<Anope
 		}
 		else if (Config->UseStrictPrivMsg)
 		{
-			BotInfo *bi = findbot(receiver);
+			const BotInfo *bi = findbot(receiver);
 			if (!bi)
 				return true;
 			Log(LOG_DEBUG) << "Ignored PRIVMSG without @ from " << source;
@@ -543,7 +543,7 @@ bool IRCdMessage::OnWhois(const Anope::string &source, const std::vector<Anope::
 		User *u = finduser(params[0]);
 		if (u && u->server == Me)
 		{
-			BotInfo *bi = findbot(u->nick);
+			const BotInfo *bi = findbot(u->nick);
 			ircdproto->SendNumeric(311, source, "%s %s %s * :%s", u->nick.c_str(), u->GetIdent().c_str(), u->host.c_str(), u->realname.c_str());
 			if (bi)
 				ircdproto->SendNumeric(307, source, "%s :is a registered nick", bi->nick.c_str());

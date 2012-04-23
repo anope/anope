@@ -36,6 +36,7 @@ class NickAlias;
 class NickCore;
 class OperType;
 class Regex;
+class Serializable;
 class Server;
 class ServerConfig;
 class Socket;

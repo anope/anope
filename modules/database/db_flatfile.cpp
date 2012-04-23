@@ -91,8 +91,8 @@ class DBFlatFile : public Module
 		}
 
 		SerializeType *st = NULL;
-		Serializable::serialized_data data;
-		std::multimap<SerializeType *, Serializable::serialized_data> objects;
+		Serialize::Data data;
+		std::multimap<SerializeType *, Serialize::Data> objects;
 		for (Anope::string buf, token; std::getline(db, buf.str());)
 		{
 			spacesepstream sep(buf);
@@ -121,11 +121,11 @@ class DBFlatFile : public Module
 		{
 			SerializeType *stype = SerializeType::Find(type_order[i]);
 
-			std::multimap<SerializeType *, Serializable::serialized_data>::iterator it = objects.find(stype), it_end = objects.upper_bound(stype);
+			std::multimap<SerializeType *, Serialize::Data>::iterator it = objects.find(stype), it_end = objects.upper_bound(stype);
 			if (it == objects.end())
 				continue;
 			for (; it != it_end; ++it)
-				it->first->Create(it->second);
+				it->first->Unserialize(NULL, it->second);
 		}
 
 		db.close();
@@ -155,10 +155,10 @@ class DBFlatFile : public Module
 		for (std::list<Serializable *>::const_iterator it = items.begin(), it_end = items.end(); it != it_end; ++it)
 		{
 			Serializable *base = *it;
-			Serializable::serialized_data data = base->serialize();
+			Serialize::Data data = base->serialize();
 	
 			db << "OBJECT " << base->serialize_name() << "\n";
-			for (Serializable::serialized_data::iterator dit = data.begin(), dit_end = data.end(); dit != dit_end; ++dit)
+			for (Serialize::Data::iterator dit = data.begin(), dit_end = data.end(); dit != dit_end; ++dit)
 				db << "DATA " << dit->first << " " << dit->second.astr() << "\n";
 			db << "END\n";
 		}

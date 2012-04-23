@@ -13,8 +13,6 @@
 
 #include "module.h"
 
-static BotInfo *OperServ;
-
 class SGLineManager : public XLineManager
 {
  public:
@@ -25,9 +23,9 @@ class SGLineManager : public XLineManager
 		this->Send(u, x);
 	}
 
-	void OnExpire(XLine *x) anope_override
+	void OnExpire(const XLine *x) anope_override
 	{
-		Log(OperServ, "expire/akill") << "AKILL on \2" << x->Mask << "\2 has expired";
+		Log(findbot(Config->OperServ), "expire/akill") << "AKILL on \2" << x->Mask << "\2 has expired";
 	}
 	
 	void Send(User *u, XLine *x) anope_override
@@ -52,7 +50,7 @@ class SGLineManager : public XLineManager
 		}
 	}
 
-	bool Check(User *u, XLine *x) anope_override
+	bool Check(User *u, const XLine *x) anope_override
 	{
 		if (x->regex)
 		{
@@ -101,9 +99,9 @@ class SQLineManager : public XLineManager
 		this->Send(u, x);
 	}
 
-	void OnExpire(XLine *x) anope_override
+	void OnExpire(const XLine *x) anope_override
 	{
-		Log(OperServ, "expire/sqline") << "SQLINE on \2" << x->Mask << "\2 has expired";
+		Log(findbot(Config->OperServ), "expire/sqline") << "SQLINE on \2" << x->Mask << "\2 has expired";
 	}
 
 	void Send(User *u, XLine *x) anope_override
@@ -116,7 +114,7 @@ class SQLineManager : public XLineManager
 		ircdproto->SendSQLineDel(x);
 	}
 
-	bool Check(User *u, XLine *x) anope_override
+	bool Check(User *u, const XLine *x) anope_override
 	{
 		if (x->regex)
 			return x->regex->Matches(u->nick);
@@ -142,9 +140,9 @@ class SNLineManager : public XLineManager
 		this->Send(u, x);
 	}
 
-	void OnExpire(XLine *x) anope_override
+	void OnExpire(const XLine *x) anope_override
 	{
-		Log(OperServ, "expire/snline") << "SNLINE on \2" << x->Mask << "\2 has expired";
+		Log(findbot(Config->OperServ), "expire/snline") << "SNLINE on \2" << x->Mask << "\2 has expired";
 	}
 
 	void Send(User *u, XLine *x) anope_override
@@ -157,7 +155,7 @@ class SNLineManager : public XLineManager
 		ircdproto->SendSGLineDel(x);
 	}
 
-	bool Check(User *u, XLine *x) anope_override
+	bool Check(User *u, const XLine *x) anope_override
 	{
 		if (x->regex)
 			return x->regex->Matches(u->realname);
@@ -177,8 +175,7 @@ class OperServCore : public Module
 	{
 		this->SetAuthor("Anope");
 
-		OperServ = findbot(Config->OperServ);
-		if (OperServ == NULL)
+		if (!findbot(Config->OperServ))
 			throw ModuleException("No bot named " + Config->OperServ);
 
 		Implementation i[] = { I_OnBotPrivmsg, I_OnServerQuit, I_OnUserModeSet, I_OnUserModeUnset, I_OnUserConnect, I_OnUserNickChange, I_OnPreHelp };
@@ -206,7 +203,7 @@ class OperServCore : public Module
 		if (Config->OSOpersOnly && !u->HasMode(UMODE_OPER) && bi->nick == Config->OperServ)
 		{
 			u->SendMessage(bi, ACCESS_DENIED);
-			Log(OperServ, "bados") << "Denied access to " << Config->OperServ << " from " << u->GetMask() << " (non-oper)";
+			Log(findbot(Config->OperServ), "bados") << "Denied access to " << Config->OperServ << " from " << u->GetMask() << " (non-oper)";
 			return EVENT_STOP;
 		}
 
@@ -216,19 +213,19 @@ class OperServCore : public Module
 	void OnServerQuit(Server *server) anope_override
 	{
 		if (server->HasFlag(SERVER_JUPED))
-			Log(server, "squit", OperServ) << "Received SQUIT for juped server " << server->GetName();
+			Log(server, "squit", findbot(Config->OperServ)) << "Received SQUIT for juped server " << server->GetName();
 	}
 
 	void OnUserModeSet(User *u, UserModeName Name) anope_override
 	{
 		if (Name == UMODE_OPER)
-			Log(u, "oper", OperServ) << "is now an IRC operator.";
+			Log(u, "oper", findbot(Config->OperServ)) << "is now an IRC operator.";
 	}
 
 	void OnUserModeUnset(User *u, UserModeName Name) anope_override
 	{
 		if (Name == UMODE_OPER)
-			Log(u, "oper", OperServ) << "is no longer an IRC operator";
+			Log(u, "oper", findbot(Config->OperServ)) << "is no longer an IRC operator";
 	}
 
 	void OnUserConnect(dynamic_reference<User> &u, bool &exempt) anope_override

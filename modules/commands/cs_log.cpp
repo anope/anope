@@ -36,23 +36,23 @@ public:
 			source.Reply(ACCESS_DENIED);
 		else if (params.size() == 1)
 		{
-			if (ci->log_settings.empty())
+			if (ci->log_settings->empty())
 				source.Reply(_("There currently are no logging configurations for %s."), ci->name.c_str());
 			else
 			{
 				ListFormatter list;
 				list.addColumn("Number").addColumn("Service").addColumn("Command").addColumn("Method").addColumn("");
 
-				for (unsigned i = 0; i < ci->log_settings.size(); ++i)
+				for (unsigned i = 0; i < ci->log_settings->size(); ++i)
 				{
-					LogSetting &log = ci->log_settings[i];
+					const LogSetting *log = ci->log_settings->at(i);
 
 					ListFormatter::ListEntry entry;
 					entry["Number"] = stringify(i + 1);
-					entry["Service"] = log.command_service;
-					entry["Command"] = log.command_name;
-					entry["Method"] = log.method;
-					entry[""] = log.extra;
+					entry["Service"] = log->command_service;
+					entry["Command"] = log->command_name;
+					entry["Method"] = log->method;
+					entry[""] = log->extra;
 					list.addEntry(entry);
 				}
 
@@ -110,21 +110,22 @@ public:
 
 			bool override = !ci->AccessFor(u).HasPriv("SET");
 
-			for (unsigned i = ci->log_settings.size(); i > 0; --i)
+			for (unsigned i = ci->log_settings->size(); i > 0; --i)
 			{
-				LogSetting &log = ci->log_settings[i - 1];
+				LogSetting *log = ci->log_settings->at(i - 1);
 
-				if (log.service_name == bi->commands[command_name].name && log.method.equals_ci(method))
+				if (log->service_name == bi->commands[command_name].name && log->method.equals_ci(method))
 				{
-					if (log.extra == extra)
+					if (log->extra == extra)
 					{
-						ci->log_settings.erase(ci->log_settings.begin() + i - 1);
+						log->destroy();
+						ci->log_settings->erase(ci->log_settings->begin() + i - 1);
 						Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "to remove logging for " << command << " with method " << method << (extra == "" ? "" : " ") << extra;
 						source.Reply(_("Logging for command %s on %s with log method %s%s%s has been removed."), command_name.c_str(), bi->nick.c_str(), method.c_str(), extra.empty() ? "" : " ", extra.empty() ? "" : extra.c_str());
 					}
 					else
 					{
-						log.extra = extra;
+						log->extra = extra;
 						Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "to change logging for " << command << " to method " << method << (extra == "" ? "" : " ") << extra;
 						source.Reply(_("Logging changed for command %s on %s, now using log method %s%s%s."), command_name.c_str(), bi->nick.c_str(), method.c_str(), extra.empty() ? "" : " ", extra.empty() ? "" : extra.c_str());
 					}
@@ -132,17 +133,17 @@ public:
 				}
 			}
 
-			LogSetting log;
-			log.ci = ci;
-			log.service_name = bi->commands[command_name].name;
-			log.command_service = bi->nick;
-			log.command_name = command_name;
-			log.method = method;
-			log.extra = extra;
-			log.created = Anope::CurTime;
-			log.creator = u->nick;
+			LogSetting *log = new LogSetting();
+			log->ci = ci;
+			log->service_name = bi->commands[command_name].name;
+			log->command_service = bi->nick;
+			log->command_name = command_name;
+			log->method = method;
+			log->extra = extra;
+			log->created = Anope::CurTime;
+			log->creator = u->nick;
 
-			ci->log_settings.push_back(log);
+			ci->log_settings->push_back(log);
 			Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "to log " << command << " with method " << method << (extra == "" ? "" : " ") << extra;
 
 			source.Reply(_("Logging is now active for command %s on %s, using log method %s%s%s."), command_name.c_str(), bi->nick.c_str(), method.c_str(), extra.empty() ? "" : " ", extra.empty() ? "" : extra.c_str());
@@ -197,19 +198,19 @@ class CSLog : public Module
 		if (l->Type != LOG_COMMAND || l->u == NULL || l->c == NULL || l->ci == NULL || !Me || !Me->IsSynced())
 			return;
 
-		for (unsigned i = l->ci->log_settings.size(); i > 0; --i)
+		for (unsigned i = l->ci->log_settings->size(); i > 0; --i)
 		{
-			LogSetting &log = l->ci->log_settings[i - 1];
+			const LogSetting *log = l->ci->log_settings->at(i - 1);
 
-			if (log.service_name == l->c->name)
+			if (log->service_name == l->c->name)
 			{
-				Anope::string buffer = l->u->nick + " used " + log.command_name + " " + l->buf.str();
+				Anope::string buffer = l->u->nick + " used " + log->command_name + " " + l->buf.str();
 
-				if (log.method.equals_ci("MESSAGE") && l->ci->c && l->ci->bi && l->ci->c->FindUser(l->ci->bi) != NULL)
-					ircdproto->SendPrivmsg(l->ci->bi, log.extra + l->ci->c->name, "%s", buffer.c_str());
-				else if (log.method.equals_ci("NOTICE") && l->ci->c && l->ci->bi && l->ci->c->FindUser(l->ci->bi) != NULL)
-					ircdproto->SendNotice(l->ci->bi, log.extra + l->ci->c->name, "%s", buffer.c_str());
-				else if (log.method.equals_ci("MEMO") && memoserv && l->ci->WhoSends() != NULL)
+				if (log->method.equals_ci("MESSAGE") && l->ci->c && l->ci->bi && l->ci->c->FindUser(l->ci->bi) != NULL)
+					ircdproto->SendPrivmsg(l->ci->bi, log->extra + l->ci->c->name, "%s", buffer.c_str());
+				else if (log->method.equals_ci("NOTICE") && l->ci->c && l->ci->bi && l->ci->c->FindUser(l->ci->bi) != NULL)
+					ircdproto->SendNotice(l->ci->bi, log->extra + l->ci->c->name, "%s", buffer.c_str());
+				else if (log->method.equals_ci("MEMO") && memoserv && l->ci->WhoSends() != NULL)
 					memoserv->Send(l->ci->WhoSends()->nick, l->ci->name, buffer, true);
 			}
 		}

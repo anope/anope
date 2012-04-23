@@ -25,13 +25,13 @@ class MemoDelCallback : public NumberList
 
 	void HandleNumber(unsigned Number) anope_override
 	{
-		if (!Number || Number > mi->memos.size())
+		if (!Number || Number > mi->memos->size())
 			return;
 
 		if (ci)
-			FOREACH_MOD(I_OnMemoDel, OnMemoDel(ci, mi, mi->memos[Number - 1]));
+			FOREACH_MOD(I_OnMemoDel, OnMemoDel(ci, mi, mi->GetMemo(Number - 1)));
 		else
-			FOREACH_MOD(I_OnMemoDel, OnMemoDel(source.u->Account(), mi, mi->memos[Number - 1]));
+			FOREACH_MOD(I_OnMemoDel, OnMemoDel(source.u->Account(), mi, mi->GetMemo(Number - 1)));
 
 		mi->Del(Number - 1);
 		source.Reply(_("Memo %d has been deleted."), Number);
@@ -52,7 +52,7 @@ class CommandMSDel : public Command
 		User *u = source.u;
 
 		MemoInfo *mi;
-		ChannelInfo *ci = NULL;
+		ChannelInfo *ci;
 		Anope::string numstr = !params.empty() ? params[0] : "", chan;
 
 		if (!numstr.empty() && numstr[0] == '#')
@@ -60,7 +60,8 @@ class CommandMSDel : public Command
 			chan = numstr;
 			numstr = params.size() > 1 ? params[1] : "";
 
-			if (!(ci = cs_findchan(chan)))
+			ci = cs_findchan(chan);
+			if (!ci)
 			{
 				source.Reply(CHAN_X_NOT_REGISTERED, chan.c_str());
 				return;
@@ -78,10 +79,10 @@ class CommandMSDel : public Command
 			mi = &ci->memos;
 		}
 		else
-			mi = &u->Account()->memos;
+			mi = const_cast<MemoInfo *>(&u->Account()->memos);
 		if (numstr.empty() || (!isdigit(numstr[0]) && !numstr.equals_ci("ALL") && !numstr.equals_ci("LAST")))
 			this->OnSyntaxError(source, numstr);
-		else if (mi->memos.empty())
+		else if (mi->memos->empty())
 		{
 			if (!chan.empty())
 				source.Reply(MEMO_X_HAS_NO_MEMOS, chan.c_str());
@@ -99,24 +100,24 @@ class CommandMSDel : public Command
 			{
 				/* Delete last memo. */
 				if (ci)
-					FOREACH_MOD(I_OnMemoDel, OnMemoDel(ci, mi, mi->memos[mi->memos.size() - 1]));
+					FOREACH_MOD(I_OnMemoDel, OnMemoDel(ci, mi, mi->GetMemo(mi->memos->size() - 1)));
 				else
-					FOREACH_MOD(I_OnMemoDel, OnMemoDel(u->Account(), mi, mi->memos[mi->memos.size() - 1]));
-				mi->Del(mi->memos[mi->memos.size() - 1]);
-				source.Reply(_("Memo %d has been deleted."), mi->memos.size() + 1);
+					FOREACH_MOD(I_OnMemoDel, OnMemoDel(u->Account(), mi, mi->GetMemo(mi->memos->size() - 1)));
+				mi->Del(mi->memos->size() - 1);
+				source.Reply(_("Memo %d has been deleted."), mi->memos->size() + 1);
 			}
 			else
 			{
 				/* Delete all memos. */
-				for (unsigned i = 0, end = mi->memos.size(); i < end; ++i)
+				for (unsigned i = 0, end = mi->memos->size(); i < end; ++i)
 				{
 					if (ci)
-						FOREACH_MOD(I_OnMemoDel, OnMemoDel(ci, mi, mi->memos[i]));
+						FOREACH_MOD(I_OnMemoDel, OnMemoDel(ci, mi, mi->GetMemo(i)));
 					else
-						FOREACH_MOD(I_OnMemoDel, OnMemoDel(u->Account(), mi, mi->memos[i]));
-					delete mi->memos[i];
+						FOREACH_MOD(I_OnMemoDel, OnMemoDel(u->Account(), mi, mi->GetMemo(i)));
+					mi->GetMemo(i)->destroy();
 				}
-				mi->memos.clear();
+				mi->memos->clear();
 				if (!chan.empty())
 					source.Reply(_("All memos for channel %s have been deleted."), chan.c_str());
 				else

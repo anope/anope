@@ -15,29 +15,28 @@
 #include "users.h"
 #include "protocol.h"
 
-nickalias_map NickAliasList;
-nickcore_map NickCoreList;
-
-NickAlias *findnick(const Anope::string &nick)
+NickAlias* findnick(const Anope::string &nick)
 {
-	FOREACH_MOD(I_OnFindNick, OnFindNick(nick));
-
-	nickalias_map::const_iterator it = NickAliasList.find(nick);
-	if (it != NickAliasList.end())
+	nickalias_map::const_iterator it = NickAliasList->find(nick);
+	if (it != NickAliasList->end())
+	{
+		it->second->QueueUpdate();
 		return it->second;
+	}
 
 	return NULL;
 }
 
 /*************************************************************************/
 
-NickCore *findcore(const Anope::string &nick)
+NickCore* findcore(const Anope::string &nick)
 {
-	FOREACH_MOD(I_OnFindCore, OnFindCore(nick));
-
-	nickcore_map::const_iterator it = NickCoreList.find(nick);
-	if (it != NickCoreList.end())
+	nickcore_map::const_iterator it = NickCoreList->find(nick);
+	if (it != NickCoreList->end())
+	{
+		it->second->QueueUpdate();
 		return it->second;
+	}
 
 	return NULL;
 }
@@ -81,16 +80,16 @@ void change_core_display(NickCore *nc, const Anope::string &newdisplay)
 	FOREACH_MOD(I_OnChangeCoreDisplay, OnChangeCoreDisplay(nc, newdisplay));
 
 	/* Remove the core from the list */
-	NickCoreList.erase(nc->display);
+	NickCoreList->erase(nc->display);
 
 	nc->display = newdisplay;
 
-	NickCoreList[nc->display] = nc;
+	(*NickCoreList)[nc->display] = nc;
 }
 
 void change_core_display(NickCore *nc)
 {
-	NickAlias *na;
+	const NickAlias *na;
 	if (nc->aliases.empty())
 		return;
 	na = nc->aliases.front();

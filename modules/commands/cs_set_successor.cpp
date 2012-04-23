@@ -48,7 +48,7 @@ class CommandCSSetSuccessor : public Command
 
 		if (params.size() > 1)
 		{
-			NickAlias *na = findnick(params[1]);
+			const NickAlias *na = findnick(params[1]);
 
 			if (!na)
 			{

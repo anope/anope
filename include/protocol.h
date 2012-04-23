@@ -84,7 +84,7 @@ class CoreExport IRCDProto
 	virtual void SendQuit(const User *u, const char *fmt, ...);
 	virtual void SendPing(const Anope::string &servname, const Anope::string &who);
 	virtual void SendPong(const Anope::string &servname, const Anope::string &who);
-	virtual void SendJoin(User *, Channel *, const ChannelStatus *) = 0;
+	virtual void SendJoin(const User *, Channel *, const ChannelStatus *) = 0;
 	virtual void SendSQLineDel(const XLine *x) { }
 	virtual void SendInvite(const BotInfo *bi, const Channel *c, const User *u);
 	virtual void SendPart(const BotInfo *bi, const Channel *chan, const char *fmt, ...);

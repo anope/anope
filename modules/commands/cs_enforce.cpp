@@ -20,9 +20,9 @@ class CommandCSEnforce : public Command
  private:
 	void DoSet(Channel *c)
 	{
-		ChannelInfo *ci;
+		const ChannelInfo *ci = c->ci;
 
-		if (!(ci = c->ci))
+		if (!ci)
 			return;
 
 		if (ci->HasFlag(CI_SECUREOPS))
@@ -39,10 +39,9 @@ class CommandCSEnforce : public Command
 
 	void DoSecureOps(Channel *c)
 	{
-		ChannelInfo *ci;
-		bool hadsecureops = false;
+		ChannelInfo *ci = c->ci;
 
-		if (!(ci = c->ci))
+		if (!ci)
 			return;
 
 		/* Dirty hack to allow chan_set_correct_modes to work ok.
@@ -50,6 +49,7 @@ class CommandCSEnforce : public Command
 		 * part of the code. This way we can enforce SECUREOPS even
 		 * if it's off.
 		 */
+		bool hadsecureops = false;
 		if (!ci->HasFlag(CI_SECUREOPS))
 		{
 			ci->SetFlag(CI_SECUREOPS);
@@ -91,10 +91,10 @@ class CommandCSEnforce : public Command
 
 	void DoCModeR(Channel *c)
 	{
-		ChannelInfo *ci;
+		ChannelInfo *ci = c->ci;
 		Anope::string mask;
 
-		if (!(ci = c->ci))
+		if (!ci)
 			return;
 
 		for (CUserList::iterator it = c->users.begin(), it_end = c->users.end(); it != it_end; )

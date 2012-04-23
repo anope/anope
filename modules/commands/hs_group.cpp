@@ -15,15 +15,16 @@
 
 class CommandHSGroup : public Command
 {
-	void Sync(NickAlias *na)
+	void Sync(const NickAlias *na)
 	{
 		if (!na || !na->HasVhost())
 			return;
 	
-		for (std::list<NickAlias *>::iterator it = na->nc->aliases.begin(), it_end = na->nc->aliases.end(); it != it_end; ++it)
+		for (std::list<serialize_obj<NickAlias> >::const_iterator it = na->nc->aliases.begin(), it_end = na->nc->aliases.end(); it != it_end;)
 		{
-			NickAlias *nick = *it;
-			nick->SetVhost(na->GetVhostIdent(), na->GetVhostHost(), na->GetVhostCreator());
+			NickAlias *nick = *it++;
+			if (nick)
+				nick->SetVhost(na->GetVhostIdent(), na->GetVhostHost(), na->GetVhostCreator());
 		}
 	}
 

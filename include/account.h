@@ -23,8 +23,8 @@
 typedef Anope::insensitive_map<NickAlias *> nickalias_map;
 typedef Anope::insensitive_map<NickCore *> nickcore_map;
 
-extern CoreExport nickalias_map NickAliasList;
-extern CoreExport nickcore_map NickCoreList;
+extern serialize_checker<nickalias_map> NickAliasList;
+extern serialize_checker<nickcore_map> NickCoreList;
 
 /* NickServ nickname structures. */
 
@@ -109,7 +109,7 @@ const Anope::string NickCoreFlagStrings[] = {
 	"MEMO_MAIL", "HIDE_STATUS", "SUSPENDED", "AUTOOP", "FORBIDDEN", "UNCONFIRMED", "STATS", ""
 };
 
-class CoreExport NickAlias : public Base, public Extensible, public Flags<NickNameFlag, NS_END>, public Serializable
+class CoreExport NickAlias : public Extensible, public Flags<NickNameFlag, NS_END>, public Serializable
 {
 	Anope::string vhost_ident, vhost_host, vhost_creator;
 	time_t vhost_created;
@@ -117,7 +117,7 @@ class CoreExport NickAlias : public Base, public Extensible, public Flags<NickNa
  public:
  	/** Default constructor
 	 * @param nickname The nick
-	 * @param nickcore The nickcofe for this nick
+	 * @param nickcore The nickcore for this nick
 	 */
 	NickAlias(const Anope::string &nickname, NickCore *nickcore);
 
@@ -132,11 +132,11 @@ class CoreExport NickAlias : public Base, public Extensible, public Flags<NickNa
 	Anope::string last_realhost;	/* Last uncloaked usermask, requires nickserv/auspex to see */
 	time_t time_registered;			/* When the nick was registered */
 	time_t last_seen;				/* When it was seen online for the last time */
-	NickCore *nc;					/* I'm an alias of this */
+	serialize_obj<NickCore> nc;					/* I'm an alias of this */
 
-	Anope::string serialize_name() const anope_override;
-	serialized_data serialize() anope_override;
-	static void unserialize(serialized_data &);
+	const Anope::string serialize_name() const anope_override;
+	Serialize::Data serialize() const anope_override;
+	static Serializable* unserialize(Serializable *obj, Serialize::Data &);
 
 	/** Release a nick
 	 * See the comment in users.cpp
@@ -188,7 +188,7 @@ class CoreExport NickAlias : public Base, public Extensible, public Flags<NickNa
 	time_t GetVhostCreated() const;
 };
 
-class CoreExport NickCore : public Base, public Extensible, public Flags<NickCoreFlag, NI_END>, public Serializable
+class CoreExport NickCore : public Extensible, public Flags<NickCoreFlag, NI_END>, public Serializable
 {
  public:
 	/** Default constructor
@@ -216,11 +216,11 @@ class CoreExport NickCore : public Base, public Extensible, public Flags<NickCor
 	/* Unsaved data */
 	uint16_t channelcount; /* Number of channels currently registered */
 	time_t lastmail;				/* Last time this nick record got a mail */
-	std::list<NickAlias *> aliases;	/* List of aliases */
+	std::list<serialize_obj<NickAlias> > aliases;	/* List of aliases */
 
-	Anope::string serialize_name() const anope_override;
-	serialized_data serialize() anope_override;
-	static void unserialize(serialized_data &);
+	const Anope::string serialize_name() const anope_override;
+	Serialize::Data serialize() const anope_override;
+	static Serializable* unserialize(Serializable *obj, Serialize::Data &);
 
 	/** Checks whether this account is a services oper or not.
 	 * @return True if this account is a services oper, false otherwise.
@@ -291,7 +291,7 @@ class CoreExport NickCore : public Base, public Extensible, public Flags<NickCor
 	 *
 	 * Search for an fingerprint within the cert list.
 	 */
-	bool FindCert(const Anope::string &entry);
+	bool FindCert(const Anope::string &entry) const;
 
 	/** Erase a fingerprint from the nick's certificate list
 	 *

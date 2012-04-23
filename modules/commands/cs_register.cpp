@@ -46,7 +46,7 @@ class CommandCSRegister : public Command
 		else if (c && !c->HasUserStatus(u, CMODE_OP))
 			source.Reply(_("You must be a channel operator to register the channel."));
 		else if (Config->CSMaxReg && u->Account()->channelcount >= Config->CSMaxReg && !u->HasPriv("chanserv/no-register-limit"))
-			source.Reply(u->Account()->channelcount > Config->CSMaxReg ? CHAN_EXCEEDED_CHANNEL_LIMIT : _(CHAN_REACHED_CHANNEL_LIMIT), Config->CSMaxReg);
+			source.Reply(u->Account()->channelcount > Config->CSMaxReg ? CHAN_EXCEEDED_CHANNEL_LIMIT : CHAN_REACHED_CHANNEL_LIMIT, Config->CSMaxReg);
 		else
 		{
 			ci = new ChannelInfo(chan);
@@ -54,11 +54,12 @@ class CommandCSRegister : public Command
 			if (!chdesc.empty())
 				ci->desc = chdesc;
 
-			ci->mode_locks = def_mode_locks;
-			for (ChannelInfo::ModeList::iterator it = ci->mode_locks.begin(), it_end = ci->mode_locks.end(); it != it_end; ++it)
+			for (ChannelInfo::ModeList::iterator it = def_mode_locks.begin(), it_end = def_mode_locks.end(); it != it_end; ++it)
 			{
-				it->second.setter = u->nick;
-				it->second.ci = ci;
+				ModeLock *ml = new ModeLock(*it->second);
+				ml->setter = u->nick;
+				ml->ci = ci;
+				ci->mode_locks->insert(std::make_pair(it->first, ml));
 			}
 
 			if (c && !c->topic.empty())

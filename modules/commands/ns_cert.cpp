@@ -16,7 +16,7 @@
 class CommandNSCert : public Command
 {
  private:
-	void DoServAdminList(CommandSource &source, NickCore *nc)
+	void DoServAdminList(CommandSource &source, const NickCore *nc)
 	{
 		if (nc->cert.empty())
 		{
@@ -112,7 +112,7 @@ class CommandNSCert : public Command
 		return;
 	}
 
-	void DoList(CommandSource &source, NickCore *nc)
+	void DoList(CommandSource &source, const NickCore *nc)
 	{
 		User *u = source.u;
 
@@ -154,18 +154,20 @@ class CommandNSCert : public Command
 		const Anope::string &cmd = params[0];
 		const Anope::string &mask = params.size() > 1 ? params[1] : "";
 
-		NickAlias *na;
+		const NickAlias *na;
 		if (cmd.equals_ci("LIST") && u->IsServicesOper() && !mask.empty() && (na = findnick(mask)))
 			return this->DoServAdminList(source, na->nc);
+
+		NickCore *nc = u->Account();
 
 		if (u->Account()->HasFlag(NI_SUSPENDED))
 			source.Reply(NICK_X_SUSPENDED, u->Account()->display.c_str());
 		else if (cmd.equals_ci("ADD"))
-			return this->DoAdd(source, u->Account(), mask);
+			return this->DoAdd(source, nc, mask);
 		else if (cmd.equals_ci("DEL"))
-			return this->DoDel(source, u->Account(), mask);
+			return this->DoDel(source, nc, mask);
 		else if (cmd.equals_ci("LIST"))
-			return this->DoList(source, u->Account());
+			return this->DoList(source, nc);
 		else
 			this->OnSyntaxError(source, cmd);
 
@@ -203,7 +205,7 @@ class NSCert : public Module
 
 	void DoAutoIdentify(User *u)
 	{
-		BotInfo *bi = findbot(Config->NickServ);
+		const BotInfo *bi = findbot(Config->NickServ);
 		NickAlias *na = findnick(u->nick);
 		if (!bi || !na)
 			return;

@@ -900,7 +900,7 @@ class BSKick : public Module
 
 			for (unsigned i = 0, end = ci->GetBadWordCount(); i < end; ++i)
 			{
-				BadWord *bw = ci->GetBadWord(i);
+				const BadWord *bw = ci->GetBadWord(i);
 
 				if (bw->type == BW_ANY && ((Config->BSCaseSensitive && nbuf.find(bw->word) != Anope::string::npos) || (!Config->BSCaseSensitive && nbuf.find_ci(bw->word) != Anope::string::npos)))
 					mustkick = true;
@@ -1012,7 +1012,7 @@ class BSKick : public Module
 					Channel *chan = (*it)->chan;
 					++it;
 
-					if (chan->ci != NULL && chan->ci->botflags.HasFlag(BS_KICK_AMSGS) && !chan->ci->AccessFor(u).HasPriv("NOKICK"))
+					if (chan->ci && chan->ci->botflags.HasFlag(BS_KICK_AMSGS) && !chan->ci->AccessFor(u).HasPriv("NOKICK"))
 					{
 						check_ban(chan->ci, u, TTB_AMSGS);
 						bot_kick(chan->ci, u, _("Don't use AMSGs!"));

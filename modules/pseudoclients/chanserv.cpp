@@ -23,7 +23,7 @@ class ExpireCallback : public CallBack
 		if (!Config->CSExpire || noexpire || readonly)
 			return;
 
-		for (registered_channel_map::const_iterator it = RegisteredChannelList.begin(), it_end = RegisteredChannelList.end(); it != it_end; )
+		for (registered_channel_map::const_iterator it = RegisteredChannelList->begin(), it_end = RegisteredChannelList->end(); it != it_end; )
 		{
 			ChannelInfo *ci = it->second;
 			++it;
@@ -46,7 +46,7 @@ class ExpireCallback : public CallBack
 
 				Log(LOG_NORMAL, "chanserv/expire") << "Expiring " << extra  << "channel " << ci->name << " (founder: " << (ci->GetFounder() ? ci->GetFounder()->display : "(none)") << ")";
 				FOREACH_MOD(I_OnChanExpire, OnChanExpire(ci));
-				delete ci;
+				ci->destroy();
 			}
 		}
 	}
@@ -61,7 +61,7 @@ class ChanServCore : public Module
 	{
 		this->SetAuthor("Anope");
 
-		BotInfo *ChanServ = findbot(Config->ChanServ);
+		const BotInfo *ChanServ = findbot(Config->ChanServ);
 		if (ChanServ == NULL)
 			throw ModuleException("No bot named " + Config->ChanServ);
 
@@ -83,7 +83,7 @@ class ChanServCore : public Module
 	void OnDelCore(NickCore *nc) anope_override
 	{
 		// XXX this is slightly inefficient
-		for (registered_channel_map::const_iterator it = RegisteredChannelList.begin(), it_end = RegisteredChannelList.end(); it != it_end;)
+		for (registered_channel_map::const_iterator it = RegisteredChannelList->begin(), it_end = RegisteredChannelList->end(); it != it_end;)
 		{
 			ChannelInfo *ci = it->second;
 			++it;
@@ -95,11 +95,11 @@ class ChanServCore : public Module
 					newowner = ci->successor;
 				else
 				{
-					ChanAccess *highest = NULL;
+					const ChanAccess *highest = NULL;
 					for (unsigned j = 0; j < ci->GetAccessCount(); ++j)
 					{
-						ChanAccess *ca = ci->GetAccess(j);
-						NickCore *anc = findcore(ca->mask);
+						const ChanAccess *ca = ci->GetAccess(j);
+						const NickCore *anc = findcore(ca->mask);
 
 						if (!anc || (!anc->IsServicesOper() && Config->CSMaxReg && anc->channelcount >= Config->CSMaxReg) || (anc == nc))
 							continue;
@@ -120,7 +120,7 @@ class ChanServCore : public Module
 				{
 					Log(LOG_NORMAL, "chanserv/expire") << "Deleting channel " << ci->name << " owned by deleted nick " << nc->display;
 
-					delete ci;
+					ci->destroy();
 					continue;
 				}
 			}
@@ -130,8 +130,8 @@ class ChanServCore : public Module
 
 			for (unsigned j = 0; j < ci->GetAccessCount(); ++j)
 			{
-				ChanAccess *ca = ci->GetAccess(j);
-				NickCore *anc = findcore(ca->mask);
+				const ChanAccess *ca = ci->GetAccess(j);
+				const NickCore *anc = findcore(ca->mask);
 
 				if (anc && anc == nc)
 				{
@@ -142,7 +142,7 @@ class ChanServCore : public Module
 
 			for (unsigned j = ci->GetAkickCount(); j > 0; --j)
 			{
-				AutoKick *akick = ci->GetAkick(j - 1);
+				const AutoKick *akick = ci->GetAkick(j - 1);
 				if (akick->HasFlag(AK_ISNICK) && akick->nc == nc)
 					ci->EraseAkick(j - 1);
 			}
@@ -183,10 +183,12 @@ class ChanServCore : public Module
 	EventReturn OnCheckModes(Channel *c) anope_override
 	{
 		if (!Config->CSRequire.empty())
+		{
 			if (c->ci)
 				c->SetModes(NULL, false, "+%s", Config->CSRequire.c_str());
 			else
 				c->SetModes(NULL, false, "-%s", Config->CSRequire.c_str());
+		}
 
 		return EVENT_CONTINUE;
 	}

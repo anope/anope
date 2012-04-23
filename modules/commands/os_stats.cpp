@@ -15,14 +15,14 @@
 
 struct Stats : Serializable
 {
-	Anope::string serialize_name() const
+	const Anope::string serialize_name() const
 	{
 		return "Stats";
 	}
 
-	serialized_data serialize() anope_override
+	Serialize::Data serialize() const anope_override
 	{
-		serialized_data data;
+		Serialize::Data data;
 
 		data["maxusercnt"] << maxusercnt;
 		data["maxusertime"] << maxusertime;
@@ -30,10 +30,11 @@ struct Stats : Serializable
 		return data;
 	}
 
-	static void unserialize(serialized_data &data)
+	static Serializable* unserialize(Serializable *obj, Serialize::Data &data)
 	{
 		data["maxusercnt"] >> maxusercnt;
 		data["maxusertime"] >> maxusertime;
+		return NULL;
 	}
 };
 

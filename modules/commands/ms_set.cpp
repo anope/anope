@@ -20,30 +20,31 @@ class CommandMSSet : public Command
 	{
 		User *u = source.u;
 		const Anope::string &param = params[1];
+		NickCore *nc = u->Account();
 
 		if (param.equals_ci("ON"))
 		{
-			u->Account()->SetFlag(NI_MEMO_SIGNON);
-			u->Account()->SetFlag(NI_MEMO_RECEIVE);
+			nc->SetFlag(NI_MEMO_SIGNON);
+			nc->SetFlag(NI_MEMO_RECEIVE);
 			source.Reply(_("%s will now notify you of memos when you log on and when they are sent to you."), Config->MemoServ.c_str());
 		}
 		else if (param.equals_ci("LOGON"))
 		{
-			u->Account()->SetFlag(NI_MEMO_SIGNON);
-			u->Account()->UnsetFlag(NI_MEMO_RECEIVE);
+			nc->SetFlag(NI_MEMO_SIGNON);
+			nc->UnsetFlag(NI_MEMO_RECEIVE);
 			source.Reply(_("%s will now notify you of memos when you log on or unset /AWAY."), Config->MemoServ.c_str());
 		}
 		else if (param.equals_ci("NEW"))
 		{
-			u->Account()->UnsetFlag(NI_MEMO_SIGNON);
-			u->Account()->SetFlag(NI_MEMO_RECEIVE);
+			nc->UnsetFlag(NI_MEMO_SIGNON);
+			nc->SetFlag(NI_MEMO_RECEIVE);
 			source.Reply(_("%s will now notify you of memos when they are sent to you."), Config->MemoServ.c_str());
 		}
 		else if (param.equals_ci("MAIL"))
 		{
-			if (!u->Account()->email.empty())
+			if (!nc->email.empty())
 			{
-				u->Account()->SetFlag(NI_MEMO_MAIL);
+				nc->SetFlag(NI_MEMO_MAIL);
 				source.Reply(_("You will now be informed about new memos via email."));
 			}
 			else
@@ -51,14 +52,14 @@ class CommandMSSet : public Command
 		}
 		else if (param.equals_ci("NOMAIL"))
 		{
-			u->Account()->UnsetFlag(NI_MEMO_MAIL);
+			nc->UnsetFlag(NI_MEMO_MAIL);
 			source.Reply(_("You will no longer be informed via email."));
 		}
 		else if (param.equals_ci("OFF"))
 		{
-			u->Account()->UnsetFlag(NI_MEMO_SIGNON);
-			u->Account()->UnsetFlag(NI_MEMO_RECEIVE);
-			u->Account()->UnsetFlag(NI_MEMO_MAIL);
+			nc->UnsetFlag(NI_MEMO_SIGNON);
+			nc->UnsetFlag(NI_MEMO_RECEIVE);
+			nc->UnsetFlag(NI_MEMO_MAIL);
 			source.Reply(_("%s will not send you any notification of memos."), Config->MemoServ.c_str());
 		}
 		else
@@ -86,7 +87,9 @@ class CommandMSSet : public Command
 			p1 = p2;
 			p2 = p3;
 			p3 = params.size() > 4 ? params[4] : "";
-			if (!(ci = cs_findchan(chan)))
+
+			ci = cs_findchan(chan);
+			if (!ci)
 			{
 				source.Reply(CHAN_X_NOT_REGISTERED, chan.c_str());
 				return;
@@ -102,14 +105,14 @@ class CommandMSSet : public Command
 		{
 			if (!p2.empty() && !p2.equals_ci("HARD") && chan.empty())
 			{
-				NickAlias *na;
+				const NickAlias *na;
 				if (!(na = findnick(p1)))
 				{
 					source.Reply(NICK_X_NOT_REGISTERED, p1.c_str());
 					return;
 				}
 				user = p1;
-				mi = &na->nc->memos;
+				mi = const_cast<MemoInfo *>(&na->nc->memos);
 				nc = na->nc;
 				p1 = p2;
 				p2 = p3;
@@ -209,7 +212,7 @@ class CommandMSSet : public Command
 	{
 		User *u = source.u;
 		const Anope::string &cmd = params[0];
-		MemoInfo *mi = &u->Account()->memos;
+		MemoInfo *mi = const_cast<MemoInfo *>(&u->Account()->memos);
 
 		if (readonly)
 			source.Reply(_("Sorry, memo option setting is temporarily disabled."));

@@ -38,9 +38,9 @@ class CoreExport Memo : public Flags<MemoFlag>, public Serializable
  public:
  	Memo();
 
-	Anope::string serialize_name() const anope_override;
-	serialized_data serialize() anope_override;
-	static void unserialize(serialized_data &);
+	const Anope::string serialize_name() const anope_override;
+	Serialize::Data serialize() const anope_override;
+	static Serializable* unserialize(Serializable *obj, Serialize::Data &);
 
 	Anope::string owner;
 	time_t time;	/* When it was sent */
@@ -51,9 +51,11 @@ class CoreExport Memo : public Flags<MemoFlag>, public Serializable
 struct CoreExport MemoInfo
 {
 	int16_t memomax;
-	std::vector<Memo *> memos;
+	serialize_checker<std::vector<Memo *> > memos;
 	std::vector<Anope::string> ignores;
 
+	MemoInfo();
+	Memo *GetMemo(unsigned index) const;
 	unsigned GetIndex(Memo *m) const;
 	void Del(unsigned index);
 	void Del(Memo *m);

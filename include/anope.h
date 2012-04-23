@@ -670,7 +670,7 @@ template<typename T, size_t Size = 32> class Flags
 		Flag_Values.reset();
 	}
 
-	Anope::string ToString()
+	Anope::string ToString() const
 	{
 		std::vector<Anope::string> v = ToVector();
 		Anope::string flag_buf;
@@ -692,7 +692,7 @@ template<typename T, size_t Size = 32> class Flags
 		FromVector(v);
 	}
 
-	std::vector<Anope::string> ToVector()
+	std::vector<Anope::string> ToVector() const
 	{
 		std::vector<Anope::string> ret;
 		for (unsigned i = 0; this->Flag_Strings && !this->Flag_Strings[i].empty(); ++i)

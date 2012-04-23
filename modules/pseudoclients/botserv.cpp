@@ -21,7 +21,7 @@ class BotServCore : public Module
 	{
 		this->SetAuthor("Anope");
 
-		BotInfo *BotServ = findbot(Config->BotServ);
+		const BotInfo *BotServ = findbot(Config->BotServ);
 		if (BotServ == NULL)
 			throw ModuleException("No bot named " + Config->BotServ);
 
@@ -160,7 +160,7 @@ class BotServCore : public Module
 		if (c->HasFlag(CH_INHABIT))
 			return;
 
-		if (c->ci && c->ci->bi && u != c->ci->bi && c->users.size() - 1 <= Config->BSMinUsers && c->FindUser(c->ci->bi))
+		if (c->ci && c->ci->bi && u != *c->ci->bi && c->users.size() - 1 <= Config->BSMinUsers && c->FindUser(c->ci->bi))
 		{
 			bool persist = c->HasFlag(CH_PERSIST);
 			c->SetFlag(CH_PERSIST);
@@ -203,7 +203,7 @@ class BotServCore : public Module
 	{
 		if (Config->BSSmartJoin && Name == CMODE_BAN && c->ci && c->ci->bi && c->FindUser(c->ci->bi))
 		{
-			BotInfo *bi = c->ci->bi;
+			const BotInfo *bi = c->ci->bi;
 
 			Entry ban(CMODE_BAN, param);
 			if (ban.Matches(bi))

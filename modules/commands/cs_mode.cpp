@@ -151,7 +151,7 @@ class CommandCSMode : public Command
 		}
 		else if (subcommand.equals_ci("LIST"))
 		{
-			const std::multimap<ChannelModeName, ModeLock> &mlocks = ci->GetMLock();
+			const ChannelInfo::ModeList &mlocks = ci->GetMLock();
 			if (mlocks.empty())
 			{
 				source.Reply(_("Channel %s has no mode locks."), ci->name.c_str());
@@ -161,18 +161,18 @@ class CommandCSMode : public Command
 				ListFormatter list;
 				list.addColumn("Mode").addColumn("Param").addColumn("Creator").addColumn("Created");
 
-				for (std::multimap<ChannelModeName, ModeLock>::const_iterator it = mlocks.begin(), it_end = mlocks.end(); it != it_end; ++it)
+				for (ChannelInfo::ModeList::const_iterator it = mlocks.begin(), it_end = mlocks.end(); it != it_end; ++it)
 				{
-					const ModeLock &ml = it->second;
-					ChannelMode *cm = ModeManager::FindChannelModeByName(ml.name);
+					const ModeLock *ml = it->second;
+					ChannelMode *cm = ModeManager::FindChannelModeByName(ml->name);
 					if (!cm)
 						continue;
 
 					ListFormatter::ListEntry entry;
-					entry["Mode"] = Anope::printf("%c%c", ml.set ? '+' : '-', cm->ModeChar);
-					entry["Param"] = ml.param;
-					entry["Creator"] = ml.setter;
-					entry["Created"] = do_strftime(ml.created, source.u->Account(), false);
+					entry["Mode"] = Anope::printf("%c%c", ml->set ? '+' : '-', cm->ModeChar);
+					entry["Param"] = ml->param;
+					entry["Creator"] = ml->setter;
+					entry["Created"] = do_strftime(ml->created, source.u->Account(), false);
 					list.addEntry(entry);
 				}
 

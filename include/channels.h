@@ -12,7 +12,7 @@
 #include "anope.h"
 #include "extensible.h"
 #include "modes.h"
-
+#include "serialize.h"
 
 typedef Anope::insensitive_map<Channel *> channel_map;
 extern CoreExport channel_map ChannelList;
@@ -40,7 +40,7 @@ enum ChannelFlag
 
 const Anope::string ChannelFlagString[] = { "CH_INABIT", "CH_PERSIST", "CH_SYNCING", "" };
 
-class CoreExport Channel : public Base, public Extensible, public Flags<ChannelFlag, 3>
+class CoreExport Channel : public virtual Base, public Extensible, public Flags<ChannelFlag, 3>
 {
  public:
 	typedef std::multimap<ChannelModeName, Anope::string> ModeList;
@@ -61,7 +61,7 @@ class CoreExport Channel : public Base, public Extensible, public Flags<ChannelF
 	~Channel();
 
 	Anope::string name;		/* Channel name */
-	ChannelInfo *ci;		/* Corresponding ChannelInfo */
+	serialize_obj<ChannelInfo> ci;	/* Corresponding ChannelInfo */
 	time_t creation_time;	/* When channel was created */
 
 	/* List of users in the channel */
@@ -104,14 +104,14 @@ class CoreExport Channel : public Base, public Extensible, public Flags<ChannelF
 	 * @param u The user
 	 * @return A user container if found, else NULL
 	 */
-	UserContainer *FindUser(User *u);
+	UserContainer *FindUser(const User *u) const;
 
 	/** Check if a user has a status on a channel
 	 * @param u The user
 	 * @param cms The status mode, or NULL to represent no status
 	 * @return true or false
 	 */
-	bool HasUserStatus(User *u, ChannelModeStatus *cms) const;
+	bool HasUserStatus(const User *u, ChannelModeStatus *cms) const;
 
 	/** Check if a user has a status on a channel
 	 * Use the overloaded function for ChannelModeStatus* to check for no status
@@ -119,7 +119,7 @@ class CoreExport Channel : public Base, public Extensible, public Flags<ChannelF
 	 * @param Name The Mode name, eg CMODE_OP, CMODE_VOICE
 	 * @return true or false
 	 */
-	bool HasUserStatus(User *u, ChannelModeName Name) const;
+	bool HasUserStatus(const User *u, ChannelModeName Name) const;
 
 	/** See if a channel has a mode
 	 * @param Name The mode name
@@ -156,7 +156,7 @@ class CoreExport Channel : public Base, public Extensible, public Flags<ChannelF
 	 * @param param Optional param arg for the mode
 	 * @param EnforceMLock true if mlocks should be enforced, false to override mlock
 	 */
-	void SetMode(BotInfo *bi, ChannelMode *cm, const Anope::string &param = "", bool EnforceMLock = true);
+	void SetMode(const BotInfo *bi, ChannelMode *cm, const Anope::string &param = "", bool EnforceMLock = true);
 
 	/**
 	 * Set a mode on a channel
@@ -165,7 +165,7 @@ class CoreExport Channel : public Base, public Extensible, public Flags<ChannelF
 	 * @param param Optional param arg for the mode
 	 * @param EnforceMLock true if mlocks should be enforced, false to override mlock
 	 */
-	void SetMode(BotInfo *bi, ChannelModeName Name, const Anope::string &param = "", bool EnforceMLock = true);
+	void SetMode(const BotInfo *bi, ChannelModeName Name, const Anope::string &param = "", bool EnforceMLock = true);
 
 	/** Remove a mode from a channel
 	 * @param bi The client setting the modes
@@ -173,7 +173,7 @@ class CoreExport Channel : public Base, public Extensible, public Flags<ChannelF
 	 * @param param Optional param arg for the mode
 	 * @param EnforceMLock true if mlocks should be enforced, false to override mlock
 	 */
-	void RemoveMode(BotInfo *bi, ChannelMode *cm, const Anope::string &param = "", bool EnforceMLock = true);
+	void RemoveMode(const BotInfo *bi, ChannelMode *cm, const Anope::string &param = "", bool EnforceMLock = true);
 
 	/**
 	 * Remove a mode from a channel
@@ -182,7 +182,7 @@ class CoreExport Channel : public Base, public Extensible, public Flags<ChannelF
 	 * @param param Optional param arg for the mode
 	 * @param EnforceMLock true if mlocks should be enforced, false to override mlock
 	 */
-	void RemoveMode(BotInfo *bi, ChannelModeName Name, const Anope::string &param = "", bool EnforceMLock = true);
+	void RemoveMode(const BotInfo *bi, ChannelModeName Name, const Anope::string &param = "", bool EnforceMLock = true);
 
 	/** Get a param from the channel
 	 * @param Name The mode
@@ -196,7 +196,7 @@ class CoreExport Channel : public Base, public Extensible, public Flags<ChannelF
 	 * @param EnforceMLock Should mlock be enforced on this mode change
 	 * @param cmodes The modes to set
 	 */
-	void SetModes(BotInfo *bi, bool EnforceMLock, const char *cmodes, ...);
+	void SetModes(const BotInfo *bi, bool EnforceMLock, const char *cmodes, ...);
 
 	/** Set a string of modes internally on a channel
 	 * @param setter the setter (if it is a user)
@@ -255,6 +255,6 @@ extern void do_join(const Anope::string &source, const Anope::string &channels, 
 extern void do_kick(const Anope::string &source, const Anope::string &channel, const Anope::string &users, const Anope::string &reason);
 extern void do_part(const Anope::string &source, const Anope::string &channels, const Anope::string &reason);
 
-extern void chan_set_correct_modes(User *user, Channel *c, int give_modes);
+extern void chan_set_correct_modes(const User *user, Channel *c, int give_modes);
 
 #endif // CHANNELS_H

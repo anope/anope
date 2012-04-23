@@ -65,12 +65,15 @@ class SQLResult
 	SQLQuery query;
 	Anope::string error;
  public:
+	unsigned int id;
  	Anope::string finished_query;
 
-	SQLResult(const SQLQuery &q, const Anope::string &fq, const Anope::string &err = "") : query(q), error(err), finished_query(fq) { }
+	SQLResult() : id(0) { }
+	SQLResult(unsigned int i, const SQLQuery &q, const Anope::string &fq, const Anope::string &err = "") : query(q), error(err), id(i), finished_query(fq) { }
 
 	inline operator bool() const { return this->error.empty(); }
 
+	inline const unsigned int GetID() const { return this->id; }
 	inline const SQLQuery &GetQuery() const { return this->query; }
 	inline const Anope::string &GetError() const { return this->error; }
 
@@ -124,7 +127,7 @@ class SQLProvider : public Service
 
 	virtual SQLResult RunQuery(const SQLQuery &query) = 0;
 
-	virtual SQLQuery CreateTable(const Anope::string &table, const Serializable::serialized_data &data) = 0;
+	virtual std::vector<SQLQuery> CreateTable(const Anope::string &table, const Serialize::Data &data) = 0;
 
 	virtual SQLQuery GetTables() = 0;
 };

@@ -27,8 +27,8 @@ class CommandMSInfo : public Command
 		User *u = source.u;
 
 		const MemoInfo *mi;
-		NickAlias *na = NULL;
-		ChannelInfo *ci = NULL;
+		const NickAlias *na = NULL;
+		ChannelInfo *ci;
 		const Anope::string &nname = !params.empty() ? params[0] : "";
 		int hardmax = 0;
 
@@ -45,7 +45,8 @@ class CommandMSInfo : public Command
 		}
 		else if (!nname.empty() && nname[0] == '#')
 		{
-			if (!(ci = cs_findchan(nname)))
+			ci = cs_findchan(nname);
+			if (!ci)
 			{
 				source.Reply(CHAN_X_NOT_REGISTERED, nname.c_str());
 				return;
@@ -71,11 +72,11 @@ class CommandMSInfo : public Command
 
 		if (!nname.empty() && (ci || na->nc != u->Account()))
 		{
-			if (mi->memos.empty())
+			if (mi->memos->empty())
 				source.Reply(_("%s currently has no memos."), nname.c_str());
-			else if (mi->memos.size() == 1)
+			else if (mi->memos->size() == 1)
 			{
-				if (mi->memos[0]->HasFlag(MF_UNREAD))
+				if (mi->GetMemo(0)->HasFlag(MF_UNREAD))
 					source.Reply(_("%s currently has \0021\002 memo, and it has not yet been read."), nname.c_str());
 				else
 					source.Reply(_("%s currently has \0021\002 memo."), nname.c_str());
@@ -83,17 +84,17 @@ class CommandMSInfo : public Command
 			else
 			{
 				unsigned count = 0, i, end;
-				for (i = 0, end = mi->memos.size(); i < end; ++i)
-					if (mi->memos[i]->HasFlag(MF_UNREAD))
+				for (i = 0, end = mi->memos->size(); i < end; ++i)
+					if (mi->GetMemo(i)->HasFlag(MF_UNREAD))
 						++count;
-				if (count == mi->memos.size())
+				if (count == mi->memos->size())
 					source.Reply(_("%s currently has \002%d\002 memos; all of them are unread."), nname.c_str(), count);
 				else if (!count)
-					source.Reply(_("%s currently has \002%d\002 memos."), nname.c_str(), mi->memos.size());
+					source.Reply(_("%s currently has \002%d\002 memos."), nname.c_str(), mi->memos->size());
 				else if (count == 1)
-					source.Reply(_("%s currently has \002%d\002 memos, of which \0021\002 is unread."), nname.c_str(), mi->memos.size());
+					source.Reply(_("%s currently has \002%d\002 memos, of which \0021\002 is unread."), nname.c_str(), mi->memos->size());
 				else
-					source.Reply(_("%s currently has \002%d\002 memos, of which \002%d\002 are unread."), nname.c_str(), mi->memos.size(), count);
+					source.Reply(_("%s currently has \002%d\002 memos, of which \002%d\002 are unread."), nname.c_str(), mi->memos->size(), count);
 			}
 			if (!mi->memomax)
 			{
@@ -128,11 +129,11 @@ class CommandMSInfo : public Command
 		}
 		else /* !nname || (!ci || na->nc == u->Account()) */
 		{
-			if (mi->memos.empty())
+			if (mi->memos->empty())
 				source.Reply(_("You currently have no memos."));
-			else if (mi->memos.size() == 1)
+			else if (mi->memos->size() == 1)
 			{
-				if (mi->memos[0]->HasFlag(MF_UNREAD))
+				if (mi->GetMemo(0)->HasFlag(MF_UNREAD))
 					source.Reply(_("You currently have \0021\002 memo, and it has not yet been read."));
 				else
 					source.Reply(_("You currently have \0021\002 memo."));
@@ -140,17 +141,17 @@ class CommandMSInfo : public Command
 			else
 			{
 				unsigned count = 0, i, end;
-				for (i = 0, end = mi->memos.size(); i < end; ++i)
-					if (mi->memos[i]->HasFlag(MF_UNREAD))
+				for (i = 0, end = mi->memos->size(); i < end; ++i)
+					if (mi->GetMemo(i)->HasFlag(MF_UNREAD))
 						++count;
-				if (count == mi->memos.size())
+				if (count == mi->memos->size())
 					source.Reply(_("You currently have \002%d\002 memos; all of them are unread."), count);
 				else if (!count)
-					source.Reply(_("You currently have \002%d\002 memos."), mi->memos.size());
+					source.Reply(_("You currently have \002%d\002 memos."), mi->memos->size());
 				else if (count == 1)
-					source.Reply(_("You currently have \002%d\002 memos, of which \0021\002 is unread."), mi->memos.size());
+					source.Reply(_("You currently have \002%d\002 memos, of which \0021\002 is unread."), mi->memos->size());
 				else
-					source.Reply(_("You currently have \002%d\002 memos, of which \002%d\002 are unread."), mi->memos.size(), count);
+					source.Reply(_("You currently have \002%d\002 memos, of which \002%d\002 are unread."), mi->memos->size(), count);
 			}
 
 			if (!mi->memomax)

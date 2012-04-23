@@ -58,7 +58,7 @@ class CommandNSGroup : public Command
 			Log(LOG_COMMAND, u, this) << "tried to use GROUP for SUSPENDED nick " << target->nick;
 			source.Reply(NICK_X_SUSPENDED, target->nick.c_str());
 		}
-		else if (na && target->nc == na->nc)
+		else if (na && *target->nc == *na->nc)
 			source.Reply(_("You are already a member of the group of \002%s\002."), target->nick.c_str());
 		else if (na && na->nc != u->Account())
 			source.Reply(NICK_IDENTIFY_REQUIRED, Config->UseStrictPrivMsgString.c_str(), Config->NickServ.c_str());
@@ -88,7 +88,7 @@ class CommandNSGroup : public Command
 				 * If not, check that it is valid.
 				 */
 				if (na)
-					delete na;
+					na->destroy();
 				else
 				{
 					size_t prefixlen = Config->NSGuestNickPrefix.length();
@@ -108,7 +108,7 @@ class CommandNSGroup : public Command
 				na->last_realname = u->realname;
 				na->time_registered = na->last_seen = Anope::CurTime;
 
-				u->Login(na->nc);
+				u->Login(target->nc);
 				ircdproto->SendLogin(u);
 				if (!Config->NoNicknameOwnership && na->nc == u->Account() && na->nc->HasFlag(NI_UNCONFIRMED) == false)
 					u->SetMode(findbot(Config->NickServ), UMODE_REGISTERED);
@@ -188,22 +188,23 @@ class CommandNSUngroup : public Command
 		{
 			NickCore *oldcore = na->nc;
 
-			std::list<NickAlias *>::iterator it = std::find(oldcore->aliases.begin(), oldcore->aliases.end(), na);
+			std::list<serialize_obj<NickAlias> >::iterator it = std::find(oldcore->aliases.begin(), oldcore->aliases.end(), na);
 			if (it != oldcore->aliases.end())
 				oldcore->aliases.erase(it);
 
 			if (na->nick.equals_ci(oldcore->display))
 				change_core_display(oldcore);
 
-			na->nc = new NickCore(na->nick);
-			na->nc->aliases.push_back(na);
+			NickCore *nc = new NickCore(na->nick);
+			na->nc = nc;
+			nc->aliases.push_back(na);
 
-			na->nc->pass = oldcore->pass;
+			nc->pass = oldcore->pass;
 			if (!oldcore->email.empty())
-				na->nc->email = oldcore->email;
+				nc->email = oldcore->email;
 			if (!oldcore->greet.empty())
-				na->nc->greet = oldcore->greet;
-			na->nc->language = oldcore->language;
+				nc->greet = oldcore->greet;
+			nc->language = oldcore->language;
 
 			source.Reply(_("Nick %s has been ungrouped from %s."), na->nick.c_str(), oldcore->display.c_str());
 
@@ -240,37 +241,50 @@ class CommandNSGList : public Command
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		User *u = source.u;
-		Anope::string nick = !params.empty() ? params[0] : "";
+		const Anope::string &nick = !params.empty() ? params[0] : "";
+		const NickCore *nc;
 
-		const NickCore *nc = u->Account();
-
-		if (!nick.empty() && (!nick.equals_ci(u->nick) && !u->IsServicesOper()))
-			source.Reply(ACCESS_DENIED, Config->NickServ.c_str());
-		else if (!nick.empty() && (!findnick(nick) || !(nc = findnick(nick)->nc)))
-			source.Reply(nick.empty() ? NICK_NOT_REGISTERED : _(NICK_X_NOT_REGISTERED), nick.c_str());
-		else
+		if (!nick.empty())
 		{
-			ListFormatter list;
-			list.addColumn("Nick").addColumn("Expires");
-			for (std::list<NickAlias *>::const_iterator it = nc->aliases.begin(), it_end = nc->aliases.end(); it != it_end; ++it)
+			const NickAlias *na = findnick(nick);
+			if (!na)
 			{
-				NickAlias *na2 = *it;
-
-				ListFormatter::ListEntry entry;
-				entry["Nick"] = na2->nick;
-				entry["Expires"] = (na2->HasFlag(NS_NO_EXPIRE) || !Config->NSExpire) ? "Does not expire" : ("expires in " + do_strftime(na2->last_seen + Config->NSExpire));
-				list.addEntry(entry);
+				source.Reply(NICK_X_NOT_REGISTERED, nick.c_str());
+				return;
+			}
+			else if (!u->IsServicesOper())
+			{
+				source.Reply(ACCESS_DENIED, Config->NickServ.c_str());
+				return;
 			}
 
-			source.Reply(!nick.empty() ? _("List of nicknames in the group of \002%s\002:") : _("List of nicknames in your group:"), nc->display.c_str());
-			std::vector<Anope::string> replies;
-			list.Process(replies);
-	
-			for (unsigned i = 0; i < replies.size(); ++i)
-				source.Reply(replies[i]);
-
-			source.Reply(_("%d nicknames in the group."), nc->aliases.size());
+			nc = na->nc;
 		}
+		else
+			nc = u->Account();
+
+		ListFormatter list;
+		list.addColumn("Nick").addColumn("Expires");
+		for (std::list<serialize_obj<NickAlias> >::const_iterator it = nc->aliases.begin(), it_end = nc->aliases.end(); it != it_end;)
+		{
+			const NickAlias *na2 = *it++;
+			if (!na2)
+				continue;
+
+			ListFormatter::ListEntry entry;
+			entry["Nick"] = na2->nick;
+			entry["Expires"] = (na2->HasFlag(NS_NO_EXPIRE) || !Config->NSExpire) ? "Does not expire" : ("expires in " + do_strftime(na2->last_seen + Config->NSExpire));
+			list.addEntry(entry);
+		}
+
+		source.Reply(!nick.empty() ? _("List of nicknames in the group of \002%s\002:") : _("List of nicknames in your group:"), nc->display.c_str());
+		std::vector<Anope::string> replies;
+		list.Process(replies);
+	
+		for (unsigned i = 0; i < replies.size(); ++i)
+			source.Reply(replies[i]);
+
+		source.Reply(_("%d nicknames in the group."), nc->aliases.size());
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override

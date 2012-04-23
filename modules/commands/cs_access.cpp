@@ -15,7 +15,7 @@
 
 static std::map<Anope::string, int16_t, ci::less> defaultLevels;
 
-static void reset_levels(ChannelInfo *ci)
+static inline void reset_levels(ChannelInfo *ci)
 {
 	ci->ClearLevels();
 	for (std::map<Anope::string, int16_t, ci::less>::iterator it = defaultLevels.begin(), it_end = defaultLevels.end(); it != it_end; ++it)
@@ -36,7 +36,7 @@ class AccessChanAccess : public ChanAccess
 		return this->ci->GetLevel(name) != ACCESS_INVALID && this->level >= this->ci->GetLevel(name);
 	}
 
-	Anope::string Serialize()
+	Anope::string Serialize() const
 	{
 		return stringify(this->level);
 	}
@@ -46,11 +46,11 @@ class AccessChanAccess : public ChanAccess
 		this->level = convertTo<int>(data);
 	}
 
-	static int DetermineLevel(ChanAccess *access)
+	static int DetermineLevel(const ChanAccess *access)
 	{
 		if (access->provider->name == "access/access")
 		{
-			AccessChanAccess *aaccess = debug_cast<AccessChanAccess *>(access);
+			const AccessChanAccess *aaccess = debug_cast<const AccessChanAccess *>(access);
 			return aaccess->level;
 		}
 		else
@@ -108,7 +108,7 @@ class CommandCSAccess : public Command
 		}
 
 		AccessGroup u_access = ci->AccessFor(u);
-		ChanAccess *highest = u_access.Highest();
+		const ChanAccess *highest = u_access.Highest();
 		int u_level = (highest ? AccessChanAccess::DetermineLevel(highest) : 0);
 		if (level >= u_level && !u_access.Founder && !u->HasPriv("chanserv/access/modify"))
 		{
@@ -123,7 +123,7 @@ class CommandCSAccess : public Command
 
 		bool override = !ci->AccessFor(u).HasPriv("ACCESS_CHANGE") || (level >= u_level && !u_access.Founder);
 
-		if (mask.find_first_of("!*@") == Anope::string::npos && findnick(mask) == NULL)
+		if (mask.find_first_of("!*@") == Anope::string::npos && !findnick(mask))
 		{
 			User *targ = finduser(mask);
 			if (targ != NULL)
@@ -137,7 +137,7 @@ class CommandCSAccess : public Command
 
 		for (unsigned i = ci->GetAccessCount(); i > 0; --i)
 		{
-			ChanAccess *access = ci->GetAccess(i - 1);
+			const ChanAccess *access = ci->GetAccess(i - 1);
 			if (mask.equals_ci(access->mask))
 			{
 				/* Don't allow lowering from a level >= u_level */
@@ -230,7 +230,7 @@ class CommandCSAccess : public Command
 					ChanAccess *access = ci->GetAccess(Number - 1);
 
 					AccessGroup u_access = ci->AccessFor(user);
-					ChanAccess *u_highest = u_access.Highest();
+					const ChanAccess *u_highest = u_access.Highest();
 
 					if ((u_highest ? AccessChanAccess::DetermineLevel(u_highest) : 0) <= AccessChanAccess::DetermineLevel(access) && !u_access.Founder && !this->override && !access->mask.equals_ci(user->Account()->display))
 					{
@@ -255,7 +255,7 @@ class CommandCSAccess : public Command
 		else
 		{
 			AccessGroup u_access = ci->AccessFor(u);
-			ChanAccess *highest = u_access.Highest();
+			const ChanAccess *highest = u_access.Highest();
 			int u_level = (highest ? AccessChanAccess::DetermineLevel(highest) : 0);
 
 			for (unsigned i = ci->GetAccessCount(); i > 0; --i)
@@ -308,7 +308,7 @@ class CommandCSAccess : public Command
 					if (!number || number > ci->GetAccessCount())
 						return;
 
-					ChanAccess *access = ci->GetAccess(number - 1);
+					const ChanAccess *access = ci->GetAccess(number - 1);
 
 					Anope::string timebuf;
 					if (ci->c)
@@ -339,7 +339,7 @@ class CommandCSAccess : public Command
 		{
 			for (unsigned i = 0, end = ci->GetAccessCount(); i < end; ++i)
 			{
-				ChanAccess *access = ci->GetAccess(i);
+				const ChanAccess *access = ci->GetAccess(i);
 
 				if (!nick.empty() && !Anope::Match(access->mask, nick))
 					continue;
@@ -470,7 +470,7 @@ class CommandCSAccess : public Command
 			has_access = true;
 		else if (is_del)
 		{
-			NickAlias *na = findnick(nick);
+			const NickAlias *na = findnick(nick);
 			if (na && na->nc == u->Account())
 				has_access = true;
 		}

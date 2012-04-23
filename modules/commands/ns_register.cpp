@@ -13,7 +13,12 @@
 
 #include "module.h"
 
-static bool SendRegmail(User *u, NickAlias *na, BotInfo *bi);
+static bool SendRegmail(User *u, const NickAlias *na, const BotInfo *bi);
+
+struct ExtensibleString : Anope::string, ExtensibleItem
+{
+	ExtensibleString(const Anope::string &s) : Anope::string(s) { }
+};
 
 class CommandNSConfirm : public Command
 {
@@ -49,13 +54,14 @@ class CommandNSConfirm : public Command
 			Anope::string *code = u->Account()->GetExt<ExtensibleString *>("ns_register_passcode");
 			if (code != NULL && *code == passcode)
 			{
-				u->Account()->Shrink("ns_register_passcode");
+				NickCore *nc = u->Account();
+				nc->Shrink("ns_register_passcode");
 				Log(LOG_COMMAND, u, this) << "to confirm their email";
 				source.Reply(_("Your email address of \002%s\002 has been confirmed."), u->Account()->email.c_str());
-				u->Account()->UnsetFlag(NI_UNCONFIRMED);
+				nc->UnsetFlag(NI_UNCONFIRMED);
 
 				ircdproto->SendLogin(u);
-				NickAlias *na = findnick(u->nick);
+				const NickAlias *na = findnick(u->nick);
 				if (!Config->NoNicknameOwnership && na != NULL && na->nc == u->Account() && na->nc->HasFlag(NI_UNCONFIRMED) == false)
 					u->SetMode(findbot(Config->NickServ), UMODE_REGISTERED);
 			}
@@ -170,18 +176,19 @@ class CommandNSRegister : public Command
 			source.Reply(MAIL_X_INVALID, email.c_str());
 		else
 		{
-			na = new NickAlias(u->nick, new NickCore(u->nick));
-			enc_encrypt(pass, na->nc->pass);
+			NickCore *nc = new NickCore(u->nick);
+			na = new NickAlias(u->nick, nc);
+			enc_encrypt(pass, nc->pass);
 			if (!email.empty())
-				na->nc->email = email;
+				nc->email = email;
 
 			Anope::string last_usermask = u->GetIdent() + "@" + u->GetDisplayedHost();
 			na->last_usermask = last_usermask;
 			na->last_realname = u->realname;
 			if (Config->NSAddAccessOnReg)
-				na->nc->AddAccess(create_mask(u));
+				nc->AddAccess(create_mask(u));
 
-			u->Login(na->nc);
+			u->Login(nc);
 
 			Log(LOG_COMMAND, u, this) << "to register " << na->nick << " (email: " << (!na->nc->email.empty() ? na->nc->email : "none") << ")";
 
@@ -198,12 +205,12 @@ class CommandNSRegister : public Command
 
 			if (Config->NSRegistration.equals_ci("admin"))
 			{
-				na->nc->SetFlag(NI_UNCONFIRMED);
+				nc->SetFlag(NI_UNCONFIRMED);
 				source.Reply(_("All new accounts must be validated by an administrator. Please wait for your registration to be confirmed."));
 			}
 			else if (Config->NSRegistration.equals_ci("mail"))
 			{
-				na->nc->SetFlag(NI_UNCONFIRMED);
+				nc->SetFlag(NI_UNCONFIRMED);
 				if (SendRegmail(u, na, source.owner))
 				{
 					source.Reply(_("A passcode has been sent to %s, please type %s%s confirm <passcode> to confirm your email address."), email.c_str(), Config->UseStrictPrivMsgString.c_str(), Config->NickServ.c_str());
@@ -276,7 +283,7 @@ class CommandNSResend : public Command
 			return;
 
 		User *u = source.u;
-		NickAlias *na = findnick(u->nick);
+		const NickAlias *na = findnick(u->nick);
 
 		if (na == NULL)
 			source.Reply(NICK_NOT_REGISTERED);
@@ -335,8 +342,10 @@ class NSRegister : public Module
 	}
 };
 
-static bool SendRegmail(User *u, NickAlias *na, BotInfo *bi)
+static bool SendRegmail(User *u, const NickAlias *na, const BotInfo *bi)
 {
+	NickCore *nc = na->nc;
+
 	Anope::string *code = na->nc->GetExt<ExtensibleString *>("ns_register_passcode");
 	Anope::string codebuf;
 	if (code == NULL)
@@ -351,7 +360,7 @@ static bool SendRegmail(User *u, NickAlias *na, BotInfo *bi)
 		int idx, min = 1, max = 62;
 		for (idx = 0; idx < 9; ++idx)
 			codebuf += chars[1 + static_cast<int>((static_cast<float>(max - min)) * static_cast<uint16_t>(rand()) / 65536.0) + min];
-		na->nc->Extend("ns_register_passcode", new ExtensibleString(codebuf));
+		nc->Extend("ns_register_passcode", new ExtensibleString(codebuf));
 	}
 	else
 		codebuf = *code;
@@ -367,7 +376,7 @@ static bool SendRegmail(User *u, NickAlias *na, BotInfo *bi)
 	message = message.replace_all_cs("%N", Config->NetworkName);
 	message = message.replace_all_cs("%c", codebuf);
 
-	return Mail(u, na->nc, bi, subject, message);
+	return Mail(u, nc, bi, subject, message);
 }
 
 MODULE_INIT(NSRegister)

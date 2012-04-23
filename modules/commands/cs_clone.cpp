@@ -41,6 +41,7 @@ public:
 			source.Reply(ACCESS_DENIED);
 			return;
 		}
+
 		ChannelInfo *target_ci = cs_findchan(target);
 		if (!target_ci)
 		{
@@ -58,10 +59,10 @@ public:
 
 		if (what.empty())
 		{
-			delete target_ci;
+			target_ci->destroy();
 			target_ci = new ChannelInfo(*ci);
 			target_ci->name = target;
-			RegisteredChannelList[target_ci->name] = target_ci;
+			(*RegisteredChannelList)[target_ci->name] = target_ci;
 			target_ci->c = findchan(target_ci->name);
 			if (target_ci->c)
 			{
@@ -107,7 +108,7 @@ public:
 		{
 			for (unsigned i = 0; i < ci->GetAccessCount(); ++i)
 			{
-				ChanAccess *taccess = ci->GetAccess(i);
+				const ChanAccess *taccess = ci->GetAccess(i);
 				AccessProvider *provider = taccess->provider;
 
 				ChanAccess *newaccess = provider->Create();
@@ -128,7 +129,7 @@ public:
 			target_ci->ClearAkick();
 			for (unsigned i = 0; i < ci->GetAkickCount(); ++i)
 			{
-				AutoKick *akick = ci->GetAkick(i);
+				const AutoKick *akick = ci->GetAkick(i);
 				if (akick->HasFlag(AK_ISNICK))
 					target_ci->AddAkick(akick->creator, akick->nc, akick->reason, akick->addtime, akick->last_used);
 				else
@@ -142,7 +143,7 @@ public:
 			target_ci->ClearBadWords();
 			for (unsigned i = 0; i < ci->GetBadWordCount(); ++i)
 			{
-				BadWord *bw = ci->GetBadWord(i);
+				const BadWord *bw = ci->GetBadWord(i);
 				target_ci->AddBadWord(bw->word, bw->type);
 			}
 

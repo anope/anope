@@ -13,9 +13,9 @@
 
 #include "module.h"
 
-struct NSMiscData : Anope::string, ExtensibleItem, Serializable
+struct NSMiscData : ExtensibleItem, Serializable
 {
-	NickCore *nc;
+	serialize_obj<NickCore> nc;
 	Anope::string name;
 	Anope::string data;
 
@@ -23,14 +23,14 @@ struct NSMiscData : Anope::string, ExtensibleItem, Serializable
 	{
 	}
 
-	Anope::string serialize_name() const anope_override
+	const Anope::string serialize_name() const anope_override
 	{
 		return "NSMiscData";
 	}
 
-	serialized_data serialize() anope_override
+	Serialize::Data serialize() const anope_override
 	{
-		serialized_data sdata;
+		Serialize::Data sdata;
 
 		sdata["nc"] << this->nc->display;
 		sdata["name"] << this->name;
@@ -39,13 +39,27 @@ struct NSMiscData : Anope::string, ExtensibleItem, Serializable
 		return sdata;
 	}
 
-	static void unserialize(serialized_data &data)
+	static Serializable* unserialize(Serializable *obj, Serialize::Data &data)
 	{
 		NickCore *nc = findcore(data["nc"].astr());
 		if (nc == NULL)
-			return;
+			return NULL;
 
-		nc->Extend(data["name"].astr(), new NSMiscData(nc, data["name"].astr(), data["data"].astr()));
+		NSMiscData *d;
+		if (obj)
+		{
+			d = debug_cast<NSMiscData *>(obj);
+			d->nc = nc;
+			data["name"] >> d->name;
+			data["data"] >> d->data;
+		}
+		else
+		{
+			d = new NSMiscData(nc, data["name"].astr(), data["data"].astr());
+			nc->Extend(data["name"].astr(), d);
+		}
+
+		return d;
 	}
 };
 
@@ -67,7 +81,7 @@ class CommandNSSetMisc : public Command
 
 	void Run(CommandSource &source, const Anope::string &user, const Anope::string &param)
 	{
-		NickAlias *na = findnick(user);
+		const NickAlias *na = findnick(user);
 		if (!na)
 		{
 			source.Reply(NICK_X_NOT_REGISTERED, user.c_str());

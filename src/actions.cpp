@@ -51,7 +51,7 @@ bool bad_password(User *u)
  * @param full True to match against the users real host and IP
  * @return void
  */
-void common_unban(ChannelInfo *ci, User *u, bool full)
+void common_unban(const ChannelInfo *ci, User *u, bool full)
 {
 	if (!u || !ci || !ci->c || !ci->c->HasMode(CMODE_BAN))
 		return;

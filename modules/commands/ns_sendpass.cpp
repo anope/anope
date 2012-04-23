@@ -13,7 +13,7 @@
 
 #include "module.h"
 
-static bool SendPassMail(User *u, NickAlias *na, BotInfo *bi, const Anope::string &pass);
+static bool SendPassMail(User *u, const NickAlias *na, const BotInfo *bi, const Anope::string &pass);
 
 class CommandNSSendPass : public Command
 {
@@ -29,7 +29,7 @@ class CommandNSSendPass : public Command
 	{
 		User *u = source.u;
 		const Anope::string &nick = params[0];
-		NickAlias *na;
+		const NickAlias *na;
 
 		if (Config->RestrictMail && (!u->Account() || !u->HasCommand("nickserv/sendpass")))
 			source.Reply(ACCESS_DENIED);
@@ -86,7 +86,7 @@ class NSSendPass : public Module
 	}
 };
 
-static bool SendPassMail(User *u, NickAlias *na, BotInfo *bi, const Anope::string &pass)
+static bool SendPassMail(User *u, const NickAlias *na, const BotInfo *bi, const Anope::string &pass)
 {
 	Anope::string subject = translate(na->nc, Config->MailSendpassSubject.c_str());
 	Anope::string message = translate(na->nc, Config->MailSendpassMessage.c_str());

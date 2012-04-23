@@ -13,7 +13,12 @@
 
 #include "module.h"
 
-static bool SendConfirmMail(User *u, BotInfo *bi)
+struct ExtensibleString : Anope::string, ExtensibleItem
+{
+	ExtensibleString(const Anope::string &s) : Anope::string(s) { }
+};
+
+static bool SendConfirmMail(User *u, const BotInfo *bi)
 {
 	int chars[] = {
 		' ', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l',
@@ -26,6 +31,7 @@ static bool SendConfirmMail(User *u, BotInfo *bi)
 	Anope::string code;
 	for (idx = 0; idx < 9; ++idx)
 		code += chars[1 + static_cast<int>((static_cast<float>(max - min)) * static_cast<uint16_t>(rand()) / 65536.0) + min];
+	
 	u->Account()->Extend("ns_set_email_passcode", new ExtensibleString(code));
 
 	Anope::string subject = Config->MailEmailchangeSubject;
@@ -54,7 +60,7 @@ class CommandNSSetEmail : public Command
 	void Run(CommandSource &source, const Anope::string &user, const Anope::string &param)
 	{
 		User *u = source.u;
-		NickAlias *na = findnick(user);
+		const NickAlias *na = findnick(user);
 		if (!na)
 		{
 			source.Reply(NICK_X_NOT_REGISTERED, user.c_str());
@@ -168,11 +174,12 @@ class NSSetEmail : public Module
 			{
 				if (params[0] == *passcode)
 				{
-					u->Account()->email = *new_email;
+					NickCore *uac = u->Account();
+					uac->email = *new_email;
 					Log(LOG_COMMAND, u, command) << "to confirm their email address change to " << u->Account()->email;
 					source.Reply(_("Your email address has been changed to \002%s\002."), u->Account()->email.c_str());
-					u->Account()->Shrink("ns_set_email");
-					u->Account()->Shrink("ns_set_email_passcode");
+					uac->Shrink("ns_set_email");
+					uac->Shrink("ns_set_email_passcode");
 					return EVENT_STOP;
 				}
 			}

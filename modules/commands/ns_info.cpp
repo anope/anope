@@ -16,7 +16,7 @@
 class CommandNSInfo : public Command
 {
  private:
-	template<typename T, unsigned END> void CheckOptStr(User *u, Anope::string &buf, T opt, const char *str, Flags<T, END> *nc, bool reverse_logic = false)
+	template<typename T, unsigned END> void CheckOptStr(User *u, Anope::string &buf, T opt, const char *str, const Flags<T, END> *nc, bool reverse_logic = false)
 	{
 		if (reverse_logic ? !nc->HasFlag(opt) : nc->HasFlag(opt))
 		{

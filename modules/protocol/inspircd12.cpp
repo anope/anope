@@ -220,7 +220,7 @@ bool event_metadata(const Anope::string &source, const std::vector<Anope::string
 		{
 			u->Login(nc);
 		
-			NickAlias *user_na = findnick(u->nick);
+			const NickAlias *user_na = findnick(u->nick);
 			if (!Config->NoNicknameOwnership && nickserv && user_na && user_na->nc == nc && user_na->nc->HasFlag(NI_UNCONFIRMED) == false)
 				u->SetMode(findbot(Config->NickServ), UMODE_REGISTERED);
 		}
@@ -266,7 +266,7 @@ class InspIRCdExtBan : public ChannelModeList
  public:
 	InspIRCdExtBan(ChannelModeName mName, char modeChar) : ChannelModeList(mName, modeChar) { }
 
-	bool Matches(User *u, const Entry *e) anope_override
+	bool Matches(const User *u, const Entry *e) anope_override
 	{
 		const Anope::string &mask = e->mask;
 
@@ -721,7 +721,7 @@ class ProtoInspIRCd : public Module
 			Config->Numeric = numeric;
 		}
 
-		for (botinfo_map::iterator it = BotListByNick.begin(), it_end = BotListByNick.end(); it != it_end; ++it)
+		for (botinfo_map::iterator it = BotListByNick->begin(), it_end = BotListByNick->end(); it != it_end; ++it)
 			it->second->GenerateUID();
 	}
 

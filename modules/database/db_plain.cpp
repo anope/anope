@@ -17,6 +17,11 @@
 Anope::string DatabaseFile;
 std::stringstream db_buffer;
 
+struct ExtensibleString : Anope::string, ExtensibleItem
+{
+	ExtensibleString(const Anope::string &s) : Anope::string(s) { }
+};
+
 class DatabaseException : public CoreException
 {
  public:
@@ -60,7 +65,7 @@ EventReturn OnDatabaseRead(const std::vector<Anope::string> &params)
 		LoadOperInfo(otherparams);
 
 		return EVENT_CONTINUE;
-	}
+}
 
 EventReturn OnDatabaseReadMetadata(NickCore *nc, const Anope::string &key, const std::vector<Anope::string> &params)
 {
@@ -93,7 +98,7 @@ EventReturn OnDatabaseReadMetadata(NickCore *nc, const Anope::string &key, const
 					m->SetFlag(MF_RECEIPT);
 			}
 			m->text = params[params.size() - 1];
-			nc->memos.memos.push_back(m);
+			nc->memos.memos->push_back(m);
 		}
 		else if (key.equals_ci("MIG"))
 			nc->memos.ignores.push_back(params[0].ci_str());
@@ -173,7 +178,7 @@ EventReturn OnDatabaseReadMetadata(ChannelInfo *ci, const Anope::string &key, co
 			if (!provider)
 				throw DatabaseException("Old access entry for nonexistant provider");
 
-			ChanAccess *access = provider->Create();
+			ChanAccess *access = const_cast<ChanAccess *>(provider->Create());
 			access->ci = ci;
 			access->mask = params[0];
 			access->Unserialize(params[1]);
@@ -189,7 +194,7 @@ EventReturn OnDatabaseReadMetadata(ChannelInfo *ci, const Anope::string &key, co
 			if (!provider)
 				throw DatabaseException("Access entry for nonexistant provider " + params[0]);
 
-			ChanAccess *access = provider->Create();
+			ChanAccess *access = const_cast<ChanAccess *>(provider->Create());
 			access->ci = ci;
 			access->mask = params[1];
 			access->Unserialize(params[2]);
@@ -222,18 +227,18 @@ EventReturn OnDatabaseReadMetadata(ChannelInfo *ci, const Anope::string &key, co
 		}
 		else if (key.equals_ci("LOG"))
 		{
-			LogSetting l;
+			LogSetting *l = new LogSetting();
 
-			l.ci = ci;
-			l.service_name = params[0];
-			l.command_service = params[1];
-			l.command_name = params[2];
-			l.method = params[3];
-			l.creator = params[4];
-			l.created = params[5].is_pos_number_only() ? convertTo<time_t>(params[5]) : Anope::CurTime;
-			l.extra = params.size() > 6 ? params[6] : "";
+			l->ci = ci;
+			l->service_name = params[0];
+			l->command_service = params[1];
+			l->command_name = params[2];
+			l->method = params[3];
+			l->creator = params[4];
+			l->created = params[5].is_pos_number_only() ? convertTo<time_t>(params[5]) : Anope::CurTime;
+			l->extra = params.size() > 6 ? params[6] : "";
 
-			ci->log_settings.push_back(l);
+			ci->log_settings->push_back(l);
 		}
 		else if (key.equals_ci("MLOCK"))
 		{
@@ -241,12 +246,12 @@ EventReturn OnDatabaseReadMetadata(ChannelInfo *ci, const Anope::string &key, co
 			Anope::string mode_name = params[1];
 			Anope::string setter = params[2];
 			time_t mcreated = params[3].is_pos_number_only() ? convertTo<time_t>(params[3]) : Anope::CurTime;
-				Anope::string param = params.size() > 4 ? params[4] : "";
-				for (size_t i = CMODE_BEGIN + 1; i < CMODE_END; ++i)
+			Anope::string param = params.size() > 4 ? params[4] : "";
+			for (size_t i = CMODE_BEGIN + 1; i < CMODE_END; ++i)
 				if (ChannelModeNameStrings[i] == mode_name)
 				{
 					ChannelModeName n = static_cast<ChannelModeName>(i);
-					ci->mode_locks.insert(std::make_pair(n, ModeLock(ci, set, n, param, setter, mcreated)));
+					ci->mode_locks->insert(std::make_pair(n, new ModeLock(ci, set, n, param, setter, mcreated)));
 					break;
 				}
 		}
@@ -263,7 +268,7 @@ EventReturn OnDatabaseReadMetadata(ChannelInfo *ci, const Anope::string &key, co
 					m->SetFlag(MF_RECEIPT);
 			}
 			m->text = params[params.size() - 1];
-			ci->memos.memos.push_back(m);
+			ci->memos.memos->push_back(m);
 		}
 		else if (key.equals_ci("MIG"))
 			ci->memos.ignores.push_back(params[0].ci_str());
@@ -666,9 +671,9 @@ class DBPlain : public Module
 
 		db_buffer << "VER 2" << endl;
 
-		for (nickcore_map::const_iterator nit = NickCoreList.begin(), nit_end = NickCoreList.end(); nit != nit_end; ++nit)
+		for (nickcore_map::const_iterator nit = NickCoreList->begin(), nit_end = NickCoreList->end(); nit != nit_end; ++nit)
 		{
-			NickCore *nc = nit->second;
+			const NickCore *nc = nit->second;
 
 			db_buffer << "NC " << nc->display << " " << nc->pass << endl;
 
@@ -683,34 +688,35 @@ class DBPlain : public Module
 
 			if (!nc->access.empty())
 			{
-				for (std::vector<Anope::string>::iterator it = nc->access.begin(), it_end = nc->access.end(); it != it_end; ++it)
+				for (std::vector<Anope::string>::const_iterator it = nc->access.begin(), it_end = nc->access.end(); it != it_end; ++it)
 					db_buffer << "MD ACCESS " << *it << endl;
 			}
 			if (!nc->cert.empty())
 			{
-				for (std::vector<Anope::string>::iterator it = nc->cert.begin(), it_end = nc->cert.end(); it != it_end; ++it)
+				for (std::vector<Anope::string>::const_iterator it = nc->cert.begin(), it_end = nc->cert.end(); it != it_end; ++it)
 					db_buffer << "MD CERT " << *it << endl;
 			}
 			if (nc->FlagCount())
 				db_buffer << "MD FLAGS " << nc->ToString() << endl;
-			MemoInfo *mi = &nc->memos;
-			for (unsigned k = 0, end = mi->memos.size(); k < end; ++k)
+			const MemoInfo *mi = &nc->memos;
+			for (unsigned k = 0, end = mi->memos->size(); k < end; ++k)
 			{
-				db_buffer << "MD MI " << mi->memos[k]->time << " " << mi->memos[k]->sender;
-				if (mi->memos[k]->HasFlag(MF_UNREAD))
+				const Memo *m = mi->GetMemo(k);
+				db_buffer << "MD MI " << m->time << " " << m->sender;
+				if (m->HasFlag(MF_UNREAD))
 					db_buffer << " UNREAD";
-				if (mi->memos[k]->HasFlag(MF_RECEIPT))
+				if (m->HasFlag(MF_RECEIPT))
 					db_buffer << " RECEIPT";
-				db_buffer << " :" << mi->memos[k]->text << endl;
+				db_buffer << " :" << m->text << endl;
 			}
 			for (unsigned k = 0, end = mi->ignores.size(); k < end; ++k)
 				db_buffer << "MD MIG " << Anope::string(mi->ignores[k]) << endl;
 			//FOREACH_MOD(I_OnDatabaseWriteMetadata, OnDatabaseWriteMetadata(WriteMetadata, nc));
 		}
 
-		for (nickalias_map::const_iterator it = NickAliasList.begin(), it_end = NickAliasList.end(); it != it_end; ++it)
+		for (nickalias_map::const_iterator it = NickAliasList->begin(), it_end = NickAliasList->end(); it != it_end; ++it)
 		{
-			NickAlias *na = it->second;
+			const NickAlias *na = it->second;
 
 			db_buffer << "NA " << na->nc->display << " " << na->nick << " " << na->time_registered << " " << na->last_seen << endl;
 			if (!na->last_usermask.empty())
@@ -729,7 +735,7 @@ class DBPlain : public Module
 			//FOREACH_MOD(I_OnDatabaseWriteMetadata, OnDatabaseWriteMetadata(WriteMetadata, na));
 		}
 
-		for (Anope::insensitive_map<BotInfo *>::const_iterator it = BotListByNick.begin(), it_end = BotListByNick.end(); it != it_end; ++it)
+		for (Anope::insensitive_map<BotInfo *>::const_iterator it = BotListByNick->begin(), it_end = BotListByNick->end(); it != it_end; ++it)
 		{
 			BotInfo *bi = it->second;
 
@@ -741,9 +747,9 @@ class DBPlain : public Module
 				db_buffer << "MD FLAGS " << bi->ToString() << endl;
 		}
 
-		for (registered_channel_map::const_iterator cit = RegisteredChannelList.begin(), cit_end = RegisteredChannelList.end(); cit != cit_end; ++cit)
+		for (registered_channel_map::const_iterator cit = RegisteredChannelList->begin(), cit_end = RegisteredChannelList->end(); cit != cit_end; ++cit)
 		{
-			ChannelInfo *ci = cit->second;
+			const ChannelInfo *ci = cit->second;
 
 			db_buffer << "CH " << ci->name << " " << ci->time_registered << " " << ci->last_used << endl;
 			db_buffer << "MD BANTYPE " << ci->bantype << endl;
@@ -774,7 +780,7 @@ class DBPlain : public Module
 			}
 			for (unsigned k = 0, end = ci->GetAccessCount(); k < end; ++k)
 			{
-				ChanAccess *access = ci->GetAccess(k);
+				const ChanAccess *access = ci->GetAccess(k);
 				db_buffer << "MD ACCESS2 " << access->provider->name << " " << access->mask << " " << access->Serialize() << " " << access->last_seen << " " << access->creator << " " << access->created << endl;
 			}
 			for (unsigned k = 0, end = ci->GetAkickCount(); k < end; ++k)
@@ -785,28 +791,29 @@ class DBPlain : public Module
 					db_buffer << ci->GetAkick(k)->reason;
 				db_buffer << endl;
 			}
-			for (unsigned k = 0, end = ci->log_settings.size(); k < end; ++k)
+			for (unsigned k = 0, end = ci->log_settings->size(); k < end; ++k)
 			{
-				LogSetting &l = ci->log_settings[k];
+				const LogSetting &l = *ci->log_settings->at(k);
 
 				db_buffer << "MD LOG " << l.service_name << " " << l.command_service << " " << l.command_name << " " << l.method << " " << l.creator << " " << l.created << " " << l.extra << endl;
 			}
-			for (std::multimap<ChannelModeName, ModeLock>::const_iterator it = ci->GetMLock().begin(), it_end = ci->GetMLock().end(); it != it_end; ++it)
+			for (ChannelInfo::ModeList::const_iterator it = ci->GetMLock().begin(), it_end = ci->GetMLock().end(); it != it_end; ++it)
 			{
-				const ModeLock &ml = it->second;
+				const ModeLock &ml = *it->second;
 				ChannelMode *cm = ModeManager::FindChannelModeByName(ml.name);
 				if (cm != NULL)
 					db_buffer << "MD MLOCK " << (ml.set ? 1 : 0) << " " << cm->NameAsString() << " " << ml.setter << " " << ml.created << " " << ml.param << endl;
 			}
-			MemoInfo *memos = &ci->memos;
-			for (unsigned k = 0, end = memos->memos.size(); k < end; ++k)
+			const MemoInfo *memos = &ci->memos;
+			for (unsigned k = 0, end = memos->memos->size(); k < end; ++k)
 			{
-				db_buffer << "MD MI " << memos->memos[k]->time << " " << memos->memos[k]->sender;
-				if (memos->memos[k]->HasFlag(MF_UNREAD))
+				const Memo *m = memos->GetMemo(k);
+				db_buffer << "MD MI " << m->time << " " << m->sender;
+				if (m->HasFlag(MF_UNREAD))
 					db_buffer << " UNREAD";
-				if (memos->memos[k]->HasFlag(MF_RECEIPT))
+				if (m->HasFlag(MF_RECEIPT))
 					db_buffer << " RECEIPT";
-				db_buffer << " :" << memos->memos[k]->text << endl;
+				db_buffer << " :" << m->text << endl;
 			}
 			for (unsigned k = 0, end = memos->ignores.size(); k < end; ++k)
 				db_buffer << "MD MIG " << Anope::string(memos->ignores[k]) << endl;
@@ -839,7 +846,7 @@ class DBPlain : public Module
 			XLineManager *xl = *it;
 			for (unsigned i = 0, end = xl->GetCount(); i < end; ++i)
 			{
-				XLine *x = xl->GetEntry(i);
+				const XLine *x = xl->GetEntry(i);
 				db_buffer << "OS SXLINE " << xl->Type() << " " << x->GetUser() << " " << x->GetHost() << " " << x->By << " " << x->Created << " " << x->Expires << " :" << x->Reason << endl;
 			}
 		}

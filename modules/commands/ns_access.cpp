@@ -18,7 +18,6 @@ class CommandNSAccess : public Command
  private:
 	void DoAdd(CommandSource &source, NickCore *nc, const Anope::string &mask)
 	{
-
 		if (mask.empty())
 		{
 			this->OnSyntaxError(source, "ADD");
@@ -110,7 +109,7 @@ class CommandNSAccess : public Command
 		NickCore *nc;
 		if (!nick.empty())
 		{
-			NickAlias *na = findnick(nick);
+			const NickAlias *na = findnick(nick);
 			if (na == NULL)
 			{
 				source.Reply(NICK_X_NOT_REGISTERED, nick.c_str());

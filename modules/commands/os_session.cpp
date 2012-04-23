@@ -102,7 +102,7 @@ class ExpireTimer : public Timer
 				continue;
 			Log(findbot(Config->OperServ), "expire/exception") << "Session exception for " << e->mask << "has expired.";
 			session_service->DelException(e);
-			delete e;
+			e->destroy();
 		}
 	}
 };
@@ -143,7 +143,7 @@ class ExceptionDelCallback : public NumberList
 		FOREACH_MOD(I_OnExceptionDel, OnExceptionDel(source.u, e));
 
 		session_service->DelException(e);
-		delete e;
+		e->destroy();
 	}
 };
 
@@ -346,7 +346,7 @@ class CommandOSException : public Command
 			EventReturn MOD_RESULT;
 			FOREACH_RESULT(I_OnExceptionAdd, OnExceptionAdd(exception));
 			if (MOD_RESULT == EVENT_STOP)
-				delete exception;
+				exception->destroy();
 			else
 			{
 				session_service->AddException(exception);
@@ -635,7 +635,7 @@ class OSSession : public Module
 	
 			if (kill && !exempt)
 			{
-				BotInfo *bi = findbot(Config->OperServ);
+				const BotInfo *bi = findbot(Config->OperServ);
 				if (bi)
 				{
 					if (!Config->SessionLimitExceeded.empty())

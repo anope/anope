@@ -113,7 +113,7 @@ enum ModeClass
 
 /** This class is the basis of all modes in Anope
  */
-class CoreExport Mode : public Base
+class CoreExport Mode : public virtual Base
 {
  public:
 	/* Class of mode this is */
@@ -231,7 +231,7 @@ class CoreExport ChannelModeList : public ChannelMode
 	 * @param e The entry to match against
 	 * @return true on match
 	 */
-	virtual bool Matches(User *u, const Entry *e) { return false; }
+	virtual bool Matches(const User *u, const Entry *e) { return false; }
 
 	/** Called when a mask is added to a channel
 	 * @param chan The channel
@@ -359,7 +359,7 @@ class StackerInfo
 	/* The type of object this stacker info is for */
 	StackerType Type;
 	/* Bot this is sent from */
-	BotInfo *bi;
+	const BotInfo *bi;
 
 	/** Add a mode to this object
 	 * @param mode The mode
@@ -401,7 +401,7 @@ class CoreExport ModeManager
 	 * @param Param A param, if there is one
 	 * @param Type The type this is, user or channel
 	 */
-	static void StackerAddInternal(BotInfo *bi, Base *Object, Mode *mode, bool Set, const Anope::string &Param, StackerType Type);
+	static void StackerAddInternal(const BotInfo *bi, Base *Object, Mode *mode, bool Set, const Anope::string &Param, StackerType Type);
 
  public:
  	/* List of all modes Anope knows about */
@@ -469,7 +469,7 @@ class CoreExport ModeManager
 	 * @param Set true for setting, false for removing
 	 * @param Param The param, if there is one
 	 */
-	static void StackerAdd(BotInfo *bi, Channel *c, ChannelMode *cm, bool Set, const Anope::string &Param = "");
+	static void StackerAdd(const BotInfo *bi, Channel *c, ChannelMode *cm, bool Set, const Anope::string &Param = "");
 
 	/** Add a mode to the stacker to be set on a user
 	 * @param bi The client to set the modes from
@@ -478,7 +478,7 @@ class CoreExport ModeManager
 	 * @param Set true for setting, false for removing
 	 * @param param The param, if there is one
 	 */
-	static void StackerAdd(BotInfo *bi, User *u, UserMode *um, bool Set, const Anope::string &Param = "");
+	static void StackerAdd(const BotInfo *bi, User *u, UserMode *um, bool Set, const Anope::string &Param = "");
 
 	/** Process all of the modes in the stacker and send them to the IRCd to be set on channels/users
 	 */
@@ -531,7 +531,7 @@ class CoreExport Entry : public Flags<EntryType>
 	 * @param full True to match against a users real host and IP
 	 * @return true on match
 	 */
-	bool Matches(User *u, bool full = false) const;
+	bool Matches(const User *u, bool full = false) const;
 };
 
 #endif // MODES_H

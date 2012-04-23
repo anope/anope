@@ -30,28 +30,28 @@ class CommandMSCheck : public Command
 
 		bool found = false;
 
-		NickAlias *na = findnick(recipient);
+		const NickAlias *na = findnick(recipient);
 		if (!na)
 		{
 			source.Reply(NICK_X_NOT_REGISTERED, recipient.c_str());
 			return;
 		}
 
-		MemoInfo *mi = &na->nc->memos;
+		MemoInfo *mi = const_cast<MemoInfo *>(&na->nc->memos);
 
 		/* Okay, I know this looks strange but we wanna get the LAST memo, so we
 			have to loop backwards */
 
-		for (int i = mi->memos.size() - 1; i >= 0; --i)
+		for (int i = mi->memos->size() - 1; i >= 0; --i)
 		{
-			if (u->Account()->display.equals_ci(mi->memos[i]->sender))
+			if (u->Account()->display.equals_ci(mi->GetMemo(i)->sender))
 			{
 				found = true; /* Yes, we've found the memo */
 
-				if (mi->memos[i]->HasFlag(MF_UNREAD))
-					source.Reply(_("The last memo you sent to %s (sent on %s) has not yet been read."), na->nick.c_str(), do_strftime(mi->memos[i]->time).c_str());
+				if (mi->GetMemo(i)->HasFlag(MF_UNREAD))
+					source.Reply(_("The last memo you sent to %s (sent on %s) has not yet been read."), na->nick.c_str(), do_strftime(mi->GetMemo(i)->time).c_str());
 				else
-					source.Reply(_("The last memo you sent to %s (sent on %s) has been read."), na->nick.c_str(), do_strftime(mi->memos[i]->time).c_str());
+					source.Reply(_("The last memo you sent to %s (sent on %s) has been read."), na->nick.c_str(), do_strftime(mi->GetMemo(i)->time).c_str());
 				break;
 			}
 		}

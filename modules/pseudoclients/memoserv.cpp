@@ -14,8 +14,6 @@
 #include "module.h"
 #include "memoserv.h"
 
-static BotInfo *MemoServ;
-
 static bool SendMemoMail(NickCore *nc, MemoInfo *mi, Memo *m)
 {
 	Anope::string subject = translate(nc, Config->MailMemoSubject.c_str());
@@ -74,7 +72,7 @@ class MyMemoServService : public MemoServService
 				return MEMO_TOO_FAST;
 			else if (!mi->memomax)
 				return MEMO_TARGET_FULL;
-			else if (mi->memomax > 0 && mi->memos.size() >= mi->memomax)
+			else if (mi->memomax > 0 && mi->memos->size() >= mi->memomax)
 				return MEMO_TARGET_FULL;
 			else if (mi->HasIgnore(sender))
 				return MEMO_SUCCESS;
@@ -84,7 +82,7 @@ class MyMemoServService : public MemoServService
 			sender->lastmemosend = Anope::CurTime;
 
 		Memo *m = new Memo();
-		mi->memos.push_back(m);
+		mi->memos->push_back(m);
 		m->owner = target;
 		m->sender = source;
 		m->time = Anope::CurTime;
@@ -106,7 +104,7 @@ class MyMemoServService : public MemoServService
 					if (ci->AccessFor(cu->user).HasPriv("MEMO"))
 					{
 						if (cu->user->Account() && cu->user->Account()->HasFlag(NI_MEMO_RECEIVE))
-							cu->user->SendMessage(MemoServ, MEMO_NEW_X_MEMO_ARRIVED, ci->name.c_str(), Config->UseStrictPrivMsgString.c_str(), Config->MemoServ.c_str(), ci->name.c_str(), mi->memos.size());
+							cu->user->SendMessage(findbot(Config->MemoServ), MEMO_NEW_X_MEMO_ARRIVED, ci->name.c_str(), Config->UseStrictPrivMsgString.c_str(), Config->MemoServ.c_str(), ci->name.c_str(), mi->memos->size());
 					}
 				}
 			}
@@ -117,12 +115,14 @@ class MyMemoServService : public MemoServService
 
 			if (nc->HasFlag(NI_MEMO_RECEIVE))
 			{
-				for (std::list<NickAlias *>::iterator it = nc->aliases.begin(), it_end = nc->aliases.end(); it != it_end; ++it)
+				for (std::list<serialize_obj<NickAlias> >::const_iterator it = nc->aliases.begin(), it_end = nc->aliases.end(); it != it_end;)
 				{
-					NickAlias *na = *it;
+					const NickAlias *na = *it++;
+					if (!na)
+						continue;
 					User *user = finduser(na->nick);
 					if (user && user->IsIdentified())
-						user->SendMessage(MemoServ, MEMO_NEW_MEMO_ARRIVED, source.c_str(), Config->UseStrictPrivMsgString.c_str(), Config->MemoServ.c_str(), mi->memos.size());
+						user->SendMessage(findbot(Config->MemoServ), MEMO_NEW_MEMO_ARRIVED, source.c_str(), Config->UseStrictPrivMsgString.c_str(), Config->MemoServ.c_str(), mi->memos->size());
 				}
 			}
 
@@ -136,24 +136,23 @@ class MyMemoServService : public MemoServService
 
 	void Check(User *u)
 	{
-		NickCore *nc = u->Account();
+		const NickCore *nc = u->Account();
 		if (!nc)
 			return;
+		const BotInfo *ms = findbot(Config->MemoServ);
 
-		unsigned i = 0, end = nc->memos.memos.size(), newcnt = 0;
+		unsigned i = 0, end = nc->memos.memos->size(), newcnt = 0;
 		for (; i < end; ++i)
-		{
-			if (nc->memos.memos[i]->HasFlag(MF_UNREAD))
+			if (nc->memos.GetMemo(i)->HasFlag(MF_UNREAD))
 				++newcnt;
-		}
 		if (newcnt > 0)
-			u->SendMessage(MemoServ, newcnt == 1 ? _("You have 1 new memo.") : _("You have %d new memos."), newcnt);
-		if (nc->memos.memomax > 0 && nc->memos.memos.size() >= nc->memos.memomax)
+			u->SendMessage(ms, newcnt == 1 ? _("You have 1 new memo.") : _("You have %d new memos."), newcnt);
+		if (nc->memos.memomax > 0 && nc->memos.memos->size() >= nc->memos.memomax)
 		{
-			if (nc->memos.memos.size() > nc->memos.memomax)
-				u->SendMessage(MemoServ, _("You are over your maximum number of memos (%d). You will be unable to receive any new memos until you delete some of your current ones."), nc->memos.memomax);
+			if (nc->memos.memos->size() > nc->memos.memomax)
+				u->SendMessage(ms, _("You are over your maximum number of memos (%d). You will be unable to receive any new memos until you delete some of your current ones."), nc->memos.memomax);
 			else
-				u->SendMessage(MemoServ, _("You have reached your maximum number of memos (%d). You will be unable to receive any new memos until you delete some of your current ones."), nc->memos.memomax);
+				u->SendMessage(ms, _("You have reached your maximum number of memos (%d). You will be unable to receive any new memos until you delete some of your current ones."), nc->memos.memomax);
 		}
 	}
 };
@@ -167,8 +166,7 @@ class MemoServCore : public Module
 	{
 		this->SetAuthor("Anope");
 
-		MemoServ = findbot(Config->MemoServ);
-		if (MemoServ == NULL)
+		if (!findbot(Config->MemoServ))
 			throw ModuleException("No bot named " + Config->MemoServ);
 
 		Implementation i[] = { I_OnNickIdentify, I_OnJoinChannel, I_OnUserAway, I_OnNickUpdate, I_OnPreHelp, I_OnPostHelp };
@@ -182,12 +180,12 @@ class MemoServCore : public Module
 
 	void OnJoinChannel(User *u, Channel *c) anope_override
 	{
-		if (c->ci && c->ci->AccessFor(u).HasPriv("MEMO") && c->ci->memos.memos.size() > 0)
+		if (c->ci && c->ci->AccessFor(u).HasPriv("MEMO") && c->ci->memos.memos->size() > 0)
 		{
-			if (c->ci->memos.memos.size() == 1)
-				u->SendMessage(MemoServ, _("There is \002%d\002 memo on channel %s."), c->ci->memos.memos.size(), c->ci->name.c_str());
+			if (c->ci->memos.memos->size() == 1)
+				u->SendMessage(findbot(Config->MemoServ), _("There is \002%d\002 memo on channel %s."), c->ci->memos.memos->size(), c->ci->name.c_str());
 			else
-				u->SendMessage(MemoServ, _("There are \002%d\002 memos on channel %s."), c->ci->memos.memos.size(), c->ci->name.c_str());
+				u->SendMessage(findbot(Config->MemoServ), _("There are \002%d\002 memos on channel %s."), c->ci->memos.memos->size(), c->ci->name.c_str());
 		}
 	}
 

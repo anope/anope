@@ -20,19 +20,31 @@ class CommandModeBase : public Command
 		User *u = source.u;
 		User *u2 = finduser(nick);
 		Channel *c = findchan(chan);
-		ChannelInfo *ci = c ? c->ci : NULL;
-
-		bool is_same = u == u2;
-
-		AccessGroup u_access = ci ? ci->AccessFor(u) : AccessGroup(), u2_access = ci && u2 ? ci->AccessFor(u2) : AccessGroup();
 
 		if (!c)
+		{
 			source.Reply(CHAN_X_NOT_IN_USE, chan.c_str());
-		else if (!ci)
-			source.Reply(CHAN_X_NOT_REGISTERED, chan.c_str());
-		else if (!u2)
+			return;
+
+		}
+
+		if (!u2)
+		{
 			source.Reply(NICK_X_NOT_IN_USE, nick.c_str());
-		else if (is_same ? !ci->AccessFor(u).HasPriv(levelself) : !ci->AccessFor(u).HasPriv(level))
+			return;
+		}
+
+		ChannelInfo *ci = c->ci;
+		if (!ci)
+		{
+			source.Reply(CHAN_X_NOT_REGISTERED, c->name.c_str());
+			return;
+		}
+
+		bool is_same = u == u2;
+		AccessGroup u_access = ci->AccessFor(u), u2_access = ci->AccessFor(u2);
+
+		if (is_same ? !ci->AccessFor(u).HasPriv(levelself) : !ci->AccessFor(u).HasPriv(level))
 			source.Reply(ACCESS_DENIED);
 		else if (!set && !is_same && ci->HasFlag(CI_PEACE) && u2_access >= u_access)
 			source.Reply(ACCESS_DENIED);

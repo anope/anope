@@ -24,14 +24,14 @@ class CommandNSSetDisplay : public Command
 
 	void Run(CommandSource &source, const Anope::string &user, const Anope::string &param)
 	{
-		NickAlias *user_na = findnick(user), *na = findnick(param);
+		const NickAlias *user_na = findnick(user), *na = findnick(param);
 
 		if (user_na == NULL)
 		{
 			source.Reply(NICK_X_NOT_REGISTERED, user.c_str());
 			return;
 		}
-		else if (!na || na->nc != user_na->nc)
+		else if (!na || *na->nc != *user_na->nc)
 		{
 			source.Reply(_("The new display MUST be a nickname of the nickname group %s"), user_na->nc->display.c_str());
 			return;

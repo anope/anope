@@ -15,9 +15,11 @@
 #include "extensible.h"
 #include "logger.h"
 #include "modules.h"
+#include "serialize.h"
 
 typedef Anope::insensitive_map<ChannelInfo *> registered_channel_map;
-extern CoreExport registered_channel_map RegisteredChannelList;
+
+extern serialize_checker<registered_channel_map> RegisteredChannelList;
 
 /** Flags used for the ChannelInfo class
  */
@@ -90,9 +92,9 @@ struct CoreExport BadWord : Serializable
 	Anope::string word;
 	BadWordType type;
 
-	Anope::string serialize_name() const anope_override;
-	serialized_data serialize() anope_override;
-	static void unserialize(serialized_data &);
+	const Anope::string serialize_name() const anope_override;
+	Serialize::Data serialize() const anope_override;
+	static Serializable* unserialize(Serializable *obj, Serialize::Data &);
 };
 
 /** Flags for auto kick
@@ -110,25 +112,25 @@ class CoreExport AutoKick : public Flags<AutoKickFlag>, public Serializable
 {
  public:
  	AutoKick();
-	ChannelInfo *ci;
+	serialize_obj<ChannelInfo> ci;
 	/* Only one of these can be in use */
 	Anope::string mask;
-	NickCore *nc;
+	serialize_obj<NickCore> nc;
 
 	Anope::string reason;
 	Anope::string creator;
 	time_t addtime;
 	time_t last_used;
 
-	Anope::string serialize_name() const anope_override;
-	serialized_data serialize() anope_override;
-	static void unserialize(serialized_data &);
+	const Anope::string serialize_name() const anope_override;
+	Serialize::Data serialize() const anope_override;
+	static Serializable* unserialize(Serializable *obj, Serialize::Data &);
 };
 
 struct CoreExport ModeLock : Serializable
 {
  public:
-	ChannelInfo *ci;
+	serialize_obj<ChannelInfo> ci;
 	bool set;
 	ChannelModeName name;
 	Anope::string param;
@@ -137,14 +139,14 @@ struct CoreExport ModeLock : Serializable
 
 	ModeLock(ChannelInfo *ch, bool s, ChannelModeName n, const Anope::string &p, const Anope::string &se = "", time_t c = Anope::CurTime);
 
-	Anope::string serialize_name() const anope_override;
-	serialized_data serialize() anope_override;
-	static void unserialize(serialized_data &);
+	const Anope::string serialize_name() const anope_override;
+	Serialize::Data serialize() const anope_override;
+	static Serializable* unserialize(Serializable *obj, Serialize::Data &);
 };
 
 struct CoreExport LogSetting : Serializable
 {
-	ChannelInfo *ci;
+	serialize_obj<ChannelInfo> ci;
 	/* Our service name of the command */
 	Anope::string service_name;
 	/* The name of the client the command is on */
@@ -155,24 +157,24 @@ struct CoreExport LogSetting : Serializable
 	Anope::string creator;
 	time_t created;
 
-	Anope::string serialize_name() const anope_override;
-	serialized_data serialize() anope_override;
-	static void unserialize(serialized_data &);
+	const Anope::string serialize_name() const anope_override;
+	Serialize::Data serialize() const anope_override;
+	static Serializable* unserialize(Serializable *obj, Serialize::Data &);
 };
 
 class CoreExport ChannelInfo : public Extensible, public Flags<ChannelInfoFlag, CI_END>, public Serializable
 {
  private:
-	NickCore *founder;							/* Channel founder */
-	std::vector<ChanAccess *> access;                                       /* List of authorized users */
-	std::vector<AutoKick *> akick;						/* List of users to kickban */
-	std::vector<BadWord *> badwords;					/* List of badwords */
+	serialize_obj<NickCore> founder;					/* Channel founder */
+	serialize_checker<std::vector<ChanAccess *> > access;			/* List of authorized users */
+	serialize_checker<std::vector<AutoKick *> > akick;			/* List of users to kickban */
+	serialize_checker<std::vector<BadWord *> > badwords;			/* List of badwords */
 	std::map<Anope::string, int16_t> levels;
 
  public:
-	typedef std::multimap<ChannelModeName, ModeLock> ModeList;
-	ModeList mode_locks;
-	std::vector<LogSetting> log_settings;
+	typedef std::multimap<ChannelModeName, ModeLock *> ModeList;
+	serialize_checker<ModeList> mode_locks;
+	serialize_checker<std::vector<LogSetting *> > log_settings;
 
  	/** Default constructor
 	 * @param chname The channel name
@@ -182,14 +184,14 @@ class CoreExport ChannelInfo : public Extensible, public Flags<ChannelInfoFlag, 
 	/** Copy constructor
 	 * @param ci The ChannelInfo to copy settings to
 	 */
-	ChannelInfo(ChannelInfo &ci);
+	ChannelInfo(const ChannelInfo &ci);
 
 	/** Default destructor
 	 */
 	~ChannelInfo();
 
 	Anope::string name; /* Channel name */
-	NickCore *successor; /* Who gets the channel if the founder nick is dropped or expires */
+	serialize_obj<NickCore> successor; /* Who gets the channel if the founder nick is dropped or expires */
 	Anope::string desc;
 
 	time_t time_registered;
@@ -206,7 +208,7 @@ class CoreExport ChannelInfo : public Extensible, public Flags<ChannelInfoFlag, 
 	Channel *c; /* Pointer to channel record (if channel is currently in use) */
 
 	/* For BotServ */
-	BotInfo *bi;					/* Bot used on this channel */
+	serialize_obj<BotInfo> bi;					/* Bot used on this channel */
 	Flags<BotServFlag> botflags;
 	int16_t ttb[TTB_SIZE];			/* Times to ban for each kicker */
 
@@ -214,9 +216,9 @@ class CoreExport ChannelInfo : public Extensible, public Flags<ChannelInfoFlag, 
 	int16_t floodlines, floodsecs;	/* For FLOOD kicker */
 	int16_t repeattimes;			/* For REPEAT kicker */
 
-	Anope::string serialize_name() const anope_override;
-	serialized_data serialize() anope_override;
-	static void unserialize(serialized_data &);
+	const Anope::string serialize_name() const anope_override;
+	Serialize::Data serialize() const anope_override;
+	static Serializable* unserialize(Serializable *obj, Serialize::Data &);
 
 	/** Change the founder of the channek
 	 * @params nc The new founder
@@ -231,7 +233,7 @@ class CoreExport ChannelInfo : public Extensible, public Flags<ChannelInfoFlag, 
 	/** Find which bot should send mode/topic/etc changes for this channel
 	 * @return The bot
 	 */
-	BotInfo *WhoSends();
+	BotInfo *WhoSends() const;
 
 	/** Add an entry to the channel access list
 	 * @param access The entry
@@ -245,13 +247,13 @@ class CoreExport ChannelInfo : public Extensible, public Flags<ChannelInfoFlag, 
 	 *
 	 * Retrieves an entry from the access list that matches the given index.
 	 */
-	ChanAccess *GetAccess(unsigned index);
+	ChanAccess *GetAccess(unsigned index) const;
 
 	/** Retrieve the access for a user or group in the form of a vector of access entries
 	 * (as multiple entries can affect a single user).
 	 */
-	AccessGroup AccessFor(User *u);
-	AccessGroup AccessFor(NickCore *nc);
+	AccessGroup AccessFor(const User *u);
+	AccessGroup AccessFor(const NickCore *nc);
 
 	/** Get the size of the accss vector for this channel
 	 * @return The access vector size
@@ -272,7 +274,7 @@ class CoreExport ChannelInfo : public Extensible, public Flags<ChannelInfoFlag, 
 	 *
 	 * Clears the memory used by the given access entry and removes it from the vector.
 	 */
-	void EraseAccess(ChanAccess *taccess);
+	void EraseAccess(const ChanAccess *taccess);
 
 	/** Clear the entire channel access list
 	 *
@@ -287,7 +289,7 @@ class CoreExport ChannelInfo : public Extensible, public Flags<ChannelInfoFlag, 
 	 * @param t The time the akick was added, defaults to now
 	 * @param lu The time the akick was last used, defaults to never
 	 */
-	AutoKick *AddAkick(const Anope::string &user, NickCore *akicknc, const Anope::string &reason, time_t t = Anope::CurTime, time_t lu = 0);
+	AutoKick* AddAkick(const Anope::string &user, NickCore *akicknc, const Anope::string &reason, time_t t = Anope::CurTime, time_t lu = 0);
 
 	/** Add an akick entry to the channel by reason
 	 * @param user The user who added the akick
@@ -296,13 +298,13 @@ class CoreExport ChannelInfo : public Extensible, public Flags<ChannelInfoFlag, 
 	 * @param t The time the akick was added, defaults to now
 	 * @param lu The time the akick was last used, defaults to never
 	 */
-	AutoKick *AddAkick(const Anope::string &user, const Anope::string &mask, const Anope::string &reason, time_t t = Anope::CurTime, time_t lu = 0);
+	AutoKick* AddAkick(const Anope::string &user, const Anope::string &mask, const Anope::string &reason, time_t t = Anope::CurTime, time_t lu = 0);
 
 	/** Get an entry from the channel akick list
 	 * @param index The index in the akick vector
 	 * @return The akick structure, or NULL if not found
 	 */
-	AutoKick *GetAkick(unsigned index);
+	AutoKick* GetAkick(unsigned index) const;
 
 	/** Get the size of the akick vector for this channel
 	 * @return The akick vector size
@@ -323,13 +325,13 @@ class CoreExport ChannelInfo : public Extensible, public Flags<ChannelInfoFlag, 
 	 * @param type The type (SINGLE START END)
 	 * @return The badword
 	 */
-	BadWord *AddBadWord(const Anope::string &word, BadWordType type);
+	BadWord* AddBadWord(const Anope::string &word, BadWordType type);
 
 	/** Get a badword structure by index
 	 * @param index The index
 	 * @return The badword
 	 */
-	BadWord *GetBadWord(unsigned index);
+	BadWord* GetBadWord(unsigned index) const;
 
 	/** Get how many badwords are on this channel
 	 * @return The number of badwords in the vector
@@ -378,7 +380,7 @@ class CoreExport ChannelInfo : public Extensible, public Flags<ChannelInfoFlag, 
 	/** Get all of the mlocks for this channel
 	 * @return The mlocks
 	 */
-	const std::multimap<ChannelModeName, ModeLock> &GetMLock() const;
+	const ModeList &GetMLock() const;
 
 	/** Get a list of modes on a channel
 	 * @param Name The mode name to get a list of
@@ -391,7 +393,7 @@ class CoreExport ChannelInfo : public Extensible, public Flags<ChannelInfoFlag, 
  	 * @param An optional param to match with
 	 * @return The MLock, if any
 	 */
-	ModeLock *GetMLock(ChannelModeName mname, const Anope::string &param = "");
+	const ModeLock *GetMLock(ChannelModeName mname, const Anope::string &param = "");
 
 	/** Get the current mode locks as a string
 	 * @param complete True to show mlock parameters aswell
@@ -421,7 +423,7 @@ class CoreExport ChannelInfo : public Extensible, public Flags<ChannelInfoFlag, 
 	 * @return the level
 	 * @throws CoreException if priv is not a valid privilege
 	 */
-	int16_t GetLevel(const Anope::string &priv);
+	int16_t GetLevel(const Anope::string &priv) const;
 
 	/** Set the level for a privilege
 	 * @param priv The privilege priv
@@ -440,8 +442,8 @@ class CoreExport ChannelInfo : public Extensible, public Flags<ChannelInfoFlag, 
 };
 
 extern ChannelInfo *cs_findchan(const Anope::string &chan);
-extern bool IsFounder(User *user, ChannelInfo *ci);
+extern bool IsFounder(const User *user, const ChannelInfo *ci);
 extern void update_cs_lastseen(User *user, ChannelInfo *ci);
-extern int get_idealban(ChannelInfo *ci, User *u, Anope::string &ret);
+extern int get_idealban(const ChannelInfo *ci, User *u, Anope::string &ret);
 
 #endif // REGCHANNEL_H

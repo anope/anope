@@ -31,7 +31,7 @@ class MyForbidService : public ForbidService
 		std::vector<ForbidData *>::iterator it = std::find(this->forbidData.begin(), this->forbidData.end(), d);
 		if (it != this->forbidData.end())
 			this->forbidData.erase(it);
-		delete d;
+		d->destroy();
 	}
 
 	ForbidData *FindForbid(const Anope::string &mask, ForbidType ftype) anope_override
@@ -42,7 +42,7 @@ class MyForbidService : public ForbidService
 			ForbidData *d = this->forbidData[i - 1];
 
 			if ((ftype == FT_NONE || ftype == d->type) && Anope::Match(mask, d->mask, false, true))
-				return d;
+				d->destroy();
 		}
 		return NULL;
 	}
@@ -65,7 +65,7 @@ class MyForbidService : public ForbidService
 
 				Log(LOG_NORMAL, "expire/forbid") << "Expiring forbid for " << d->mask << " type " << ftype;
 				this->forbidData.erase(this->forbidData.begin() + i - 1);
-				delete d;
+				d->destroy();
 			}
 		}
 
@@ -257,7 +257,7 @@ class OSForbid : public Module
 		ForbidData *d = this->forbidService.FindForbid(u->nick, FT_NICK);
 		if (d != NULL)
 		{
-			BotInfo *bi = findbot(Config->OperServ);
+			const BotInfo *bi = findbot(Config->OperServ);
 			if (bi)
 			{
 				if (d->reason.empty())

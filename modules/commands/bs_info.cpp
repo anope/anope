@@ -17,12 +17,12 @@
 class CommandBSInfo : public Command
 {
  private:
-	void send_bot_channels(std::vector<Anope::string> &buffers, BotInfo *bi)
+	void send_bot_channels(std::vector<Anope::string> &buffers, const BotInfo *bi)
 	{
 		Anope::string buf;
-		for (registered_channel_map::const_iterator it = RegisteredChannelList.begin(), it_end = RegisteredChannelList.end(); it != it_end; ++it)
+		for (registered_channel_map::const_iterator it = RegisteredChannelList->begin(), it_end = RegisteredChannelList->end(); it != it_end; ++it)
 		{
-			ChannelInfo *ci = it->second;
+			const ChannelInfo *ci = it->second;
 
 			if (ci->bi == bi)
 			{
@@ -38,7 +38,7 @@ class CommandBSInfo : public Command
 			buffers.push_back(buf);
 	}
 
-	void CheckOptStr(Anope::string &buf, BotServFlag flag, const char *option, Flags<BotServFlag> &flags, NickCore *nc)
+	void CheckOptStr(Anope::string &buf, BotServFlag flag, const char *option, Flags<BotServFlag> &flags, const NickCore *nc)
 	{
 		if (flags.HasFlag(flag))
 		{
@@ -60,7 +60,7 @@ class CommandBSInfo : public Command
 		const Anope::string &query = params[0];
 
 		User *u = source.u;
-		BotInfo *bi = findbot(query);
+		const BotInfo *bi = findbot(query);
 		ChannelInfo *ci;
 		InfoFormatter info(u);
 

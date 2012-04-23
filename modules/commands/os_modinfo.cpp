@@ -40,9 +40,9 @@ class CommandOSModInfo : public Command
 
 				source.Reply(_("   Providing service: \002%s\002"), c->name.c_str());
 
-				for (botinfo_map::const_iterator it = BotListByNick.begin(), it_end = BotListByNick.end(); it != it_end; ++it)
+				for (botinfo_map::const_iterator it = BotListByNick->begin(), it_end = BotListByNick->end(); it != it_end; ++it)
 				{
-					BotInfo *bi = it->second;
+					const BotInfo *bi = it->second;
 
 					for (BotInfo::command_map::const_iterator cit = bi->commands.begin(), cit_end = bi->commands.end(); cit != cit_end; ++cit)
 					{

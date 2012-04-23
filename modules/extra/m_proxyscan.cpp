@@ -98,7 +98,7 @@ class ProxyConnect : public ConnectionSocket
 				ircdproto->SendSZLine(NULL, x);
 			else
 				ircdproto->SendAkill(NULL, x);
-			delete x;
+			x->destroy();
 		}
 	}
 };
@@ -360,7 +360,7 @@ class ModuleProxyScan : public Module
 
 		if (!this->con_notice.empty() && !this->con_source.empty())
 		{
-			BotInfo *bi = findbot(this->con_source);
+			const BotInfo *bi = findbot(this->con_source);
 			if (bi)
 				user->SendMessage(bi, this->con_notice);
 		}

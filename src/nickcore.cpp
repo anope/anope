@@ -14,6 +14,8 @@
 #include "account.h"
 #include "config.h"
 
+serialize_checker<nickcore_map> NickCoreList("NickCore");
+
 /** Default constructor
  * @param display The display nick
  */
@@ -35,7 +37,7 @@ NickCore::NickCore(const Anope::string &coredisplay) : Flags<NickCoreFlag, NI_EN
 		if (Config->NSDefFlags.HasFlag(static_cast<NickCoreFlag>(t)))
 			this->SetFlag(static_cast<NickCoreFlag>(t));
 
-	NickCoreList[this->display] = this;
+	(*NickCoreList)[this->display] = this;
 }
 
 /** Default destructor
@@ -45,29 +47,29 @@ NickCore::~NickCore()
 	FOREACH_MOD(I_OnDelCore, OnDelCore(this));
 
 	/* Remove the core from the list */
-	NickCoreList.erase(this->display);
+	NickCoreList->erase(this->display);
 
 	/* Clear access before deleting display name, we want to be able to use the display name in the clear access event */
 	this->ClearAccess();
 
-	if (!this->memos.memos.empty())
+	if (!this->memos.memos->empty())
 	{
-		for (unsigned i = 0, end = this->memos.memos.size(); i < end; ++i)
-			delete this->memos.memos[i];
-		this->memos.memos.clear();
+		for (unsigned i = 0, end = this->memos.memos->size(); i < end; ++i)
+			this->memos.GetMemo(i)->destroy();
+		this->memos.memos->clear();
 	}
 }
 
-Anope::string NickCore::serialize_name() const
+const Anope::string NickCore::serialize_name() const
 {
 	return "NickCore";
 }
 
-Serializable::serialized_data NickCore::serialize()
+Serialize::Data NickCore::serialize() const
 {
-	serialized_data data;	
+	Serialize::Data data;	
 
-	data["display"].setKey().setMax(Config->NickLen) << this->display;
+	data["display"].setMax(Config->NickLen) << this->display;
 	data["pass"] << this->pass;
 	data["email"] << this->email;
 	data["greet"] << this->greet;
@@ -84,11 +86,15 @@ Serializable::serialized_data NickCore::serialize()
 	return data;
 }
 
-void NickCore::unserialize(serialized_data &data)
+Serializable* NickCore::unserialize(Serializable *obj, Serialize::Data &data)
 {
-	NickCore *nc = findcore(data["display"].astr());
-	if (nc == NULL)
+	NickCore *nc;
+
+	if (obj)
+		nc = debug_cast<NickCore *>(obj);
+	else
 		nc = new NickCore(data["display"].astr());
+
 	data["pass"] >> nc->pass;
 	data["email"] >> nc->email;
 	data["greet"] >> nc->greet;
@@ -119,6 +125,8 @@ void NickCore::unserialize(serialized_data &data)
 		while (sep.GetToken(buf))
 			nc->memos.ignores.push_back(buf);
 	}
+
+	return nc;
 }
 
 bool NickCore::IsServicesOper() const
@@ -178,7 +186,7 @@ Anope::string NickCore::GetCert(unsigned entry) const
 	return this->cert[entry];
 }
 
-bool NickCore::FindCert(const Anope::string &entry)
+bool NickCore::FindCert(const Anope::string &entry) const
 {
 	for (unsigned i = 0, end = this->cert.size(); i < end; ++i)
 		if (this->cert[i] == entry)

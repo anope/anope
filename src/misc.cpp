@@ -305,7 +305,7 @@ time_t dotime(const Anope::string &s)
  * @param seconds time in seconds
  * @return buffer
  */
-Anope::string duration(const time_t &t, NickCore *nc)
+Anope::string duration(const time_t &t, const NickCore *nc)
 {
 	/* We first calculate everything */
 	time_t days = (t / 86400);
@@ -339,7 +339,7 @@ Anope::string duration(const time_t &t, NickCore *nc)
 	}
 }
 
-Anope::string do_strftime(const time_t &t, NickCore *nc, bool short_output)
+Anope::string do_strftime(const time_t &t, const NickCore *nc, bool short_output)
 {
 	tm tm = *localtime(&t);
 	char buf[BUFSIZE];
@@ -514,7 +514,7 @@ bool nickIsServices(const Anope::string &tempnick, bool bot)
 		nick = nick.substr(0, at);
 	}
 
-	BotInfo *bi = findbot(nick);
+	const BotInfo *bi = findbot(nick);
 	if (bi)
 		return bot ? true : bi->HasFlag(BI_CORE);
 	return false;

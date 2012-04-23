@@ -31,14 +31,14 @@ class CommandHelp : public Command
 			return;
 	
 		User *u = source.u;
-		BotInfo *bi = source.owner;
+		const BotInfo *bi = source.owner;
 
 		if (params.empty())
 		{
-			for (BotInfo::command_map::iterator it = bi->commands.begin(), it_end = bi->commands.end(); it != it_end; ++it)
+			for (BotInfo::command_map::const_iterator it = bi->commands.begin(), it_end = bi->commands.end(); it != it_end; ++it)
 			{
 				const Anope::string &c_name = it->first;
-				CommandInfo &info = it->second;
+				const CommandInfo &info = it->second;
 
 				// Smaller command exists
 				Anope::string cmd = myStrGetToken(c_name, ' ', 0);
@@ -65,11 +65,11 @@ class CommandHelp : public Command
 					full_command += " " + params[i];
 				full_command.erase(full_command.begin());
 
-				BotInfo::command_map::iterator it = bi->commands.find(full_command);
+				BotInfo::command_map::const_iterator it = bi->commands.find(full_command);
 				if (it == bi->commands.end())
 					continue;
 
-				CommandInfo &info = it->second;
+				const CommandInfo &info = it->second;
 
 				service_reference<Command> c("Command", info.name);
 				if (!c)

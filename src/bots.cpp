@@ -16,9 +16,10 @@
 #include "config.h"
 #include "language.h"
 #include "extern.h"
+#include "serialize.h"
 
-Anope::insensitive_map<BotInfo *> BotListByNick;
-Anope::map<BotInfo *> BotListByUID;
+serialize_checker<botinfo_map> BotListByNick("BotInfo");
+serialize_checker<botinfouid_map> BotListByUID("BotInfo");
 
 BotInfo::BotInfo(const Anope::string &nnick, const Anope::string &nuser, const Anope::string &nhost, const Anope::string &nreal, const Anope::string &bmodes) : User(nnick, nuser, nhost, ts6_uid_retrieve()), Flags<BotFlag, BI_END>(BotFlagString), botmodes(bmodes)
 {
@@ -28,9 +29,9 @@ BotInfo::BotInfo(const Anope::string &nnick, const Anope::string &nuser, const A
 	this->lastmsg = this->created = Anope::CurTime;
 	this->introduced = false;
 
-	BotListByNick[this->nick] = this;
+	(*BotListByNick)[this->nick] = this;
 	if (!this->uid.empty())
-		BotListByUID[this->uid] = this;
+		(*BotListByUID)[this->uid] = this;
 
 	// If we're synchronised with the uplink already, send the bot.
 	if (Me && Me->IsSynced())
@@ -57,29 +58,32 @@ BotInfo::~BotInfo()
 		ircdproto->SendSQLineDel(&x);
 	}
 
-	for (registered_channel_map::const_iterator it = RegisteredChannelList.begin(), it_end = RegisteredChannelList.end(); it != it_end; ++it)
+	for (registered_channel_map::const_iterator it = RegisteredChannelList->begin(), it_end = RegisteredChannelList->end(); it != it_end; ++it)
 	{
 		ChannelInfo *ci = it->second;
 
 		if (ci->bi == this)
+		{
+			ci->QueueUpdate();
 			ci->bi = NULL;
+		}
 	}
 
-	BotListByNick.erase(this->nick);
+	BotListByNick->erase(this->nick);
 	if (!this->uid.empty())
-		BotListByUID.erase(this->uid);
+		BotListByUID->erase(this->uid);
 }
 
-Anope::string BotInfo::serialize_name() const
+const Anope::string BotInfo::serialize_name() const
 {
 	return "BotInfo";
 }
 
-Serializable::serialized_data BotInfo::serialize()
+Serialize::Data BotInfo::serialize() const
 {
-	serialized_data data;
+	Serialize::Data data;
 
-	data["nick"] << this->nick;
+	data["nick"].setMax(64) << this->nick;
 	data["user"] << this->ident;
 	data["host"] << this->host;
 	data["realname"] << this->realname;
@@ -89,13 +93,16 @@ Serializable::serialized_data BotInfo::serialize()
 	return data;
 }
 
-void BotInfo::unserialize(serialized_data &data)
+Serializable* BotInfo::unserialize(Serializable *obj, Serialize::Data &data)
 {
-	BotInfo *bi = findbot(data["nick"].astr());
-	if (bi == NULL)
+	BotInfo *bi;
+	if (obj)
+		bi = debug_cast<BotInfo *>(obj);
+	else if (!(bi = findbot(data["nick"].astr())))
 		bi = new BotInfo(data["nick"].astr(), data["user"].astr(), data["host"].astr(), data["realname"].astr());
 	data["created"] >> bi->created;
 	bi->FromString(data["flags"].astr());
+	return bi;
 }
 
 void BotInfo::GenerateUID()
@@ -103,26 +110,26 @@ void BotInfo::GenerateUID()
 	if (!this->uid.empty())
 		throw CoreException("Bot already has a uid?");
 	this->uid = ts6_uid_retrieve();
-	BotListByUID[this->uid] = this;
+	(*BotListByUID)[this->uid] = this;
 	UserListByUID[this->uid] = this;
 }
 
 void BotInfo::SetNewNick(const Anope::string &newnick)
 {
 	UserListByNick.erase(this->nick);
-	BotListByNick.erase(this->nick);
+	BotListByNick->erase(this->nick);
 
 	this->nick = newnick;
 
 	UserListByNick[this->nick] = this;
-	BotListByNick[this->nick] = this;
+	(*BotListByNick)[this->nick] = this;
 }
 
 void BotInfo::RejoinAll()
 {
-	for (registered_channel_map::const_iterator it = RegisteredChannelList.begin(), it_end = RegisteredChannelList.end(); it != it_end; ++it)
+	for (registered_channel_map::const_iterator it = RegisteredChannelList->begin(), it_end = RegisteredChannelList->end(); it != it_end; ++it)
 	{
-		ChannelInfo *ci = it->second;
+		const ChannelInfo *ci = it->second;
 
 		if (ci->bi == this && ci->c && ci->c->users.size() >= Config->BSMinUsers)
 			this->Join(ci->c);
@@ -162,12 +169,12 @@ void BotInfo::UnAssign(User *u, ChannelInfo *ci)
 	ci->bi = NULL;
 }
 
-unsigned BotInfo::GetChannelCount()
+unsigned BotInfo::GetChannelCount() const
 {
 	unsigned count = 0;
-	for (registered_channel_map::const_iterator it = RegisteredChannelList.begin(), it_end = RegisteredChannelList.end(); it != it_end; ++it)
+	for (registered_channel_map::const_iterator it = RegisteredChannelList->begin(), it_end = RegisteredChannelList->end(); it != it_end; ++it)
 	{
-		ChannelInfo *ci = it->second;
+		const ChannelInfo *ci = it->second;
 
 		if (ci->bi == this)
 			++count;
@@ -234,7 +241,7 @@ void BotInfo::OnMessage(User *u, const Anope::string &message)
 	std::vector<Anope::string> params = BuildStringVector(message);
 	bool has_help = this->commands.find("HELP") != this->commands.end();
 
-	BotInfo::command_map::iterator it = this->commands.end();
+	BotInfo::command_map::const_iterator it = this->commands.end();
 	unsigned count = 0;
 	for (unsigned max = params.size(); it == this->commands.end() && max > 0; --max)
 	{
@@ -256,7 +263,7 @@ void BotInfo::OnMessage(User *u, const Anope::string &message)
 		return;
 	}
 
-	CommandInfo &info = it->second;
+	const CommandInfo &info = it->second;
 	service_reference<Command> c("Command", info.name);
 	if (!c)
 	{

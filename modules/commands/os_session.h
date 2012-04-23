@@ -17,9 +17,9 @@ struct Exception : Serializable
 	time_t time;			/* When this exception was added */
 	time_t expires;			/* Time when it expires. 0 == no expiry */
 
-	Anope::string serialize_name() const anope_override { return "Exception"; }
-	serialized_data serialize() anope_override;
-	static void unserialize(serialized_data &data);
+	const Anope::string serialize_name() const anope_override { return "Exception"; }
+	Serialize::Data serialize() const anope_override;
+	static Serializable* unserialize(Serializable *obj, Serialize::Data &data);
 };
 
 class SessionService : public Service
@@ -51,9 +51,9 @@ class SessionService : public Service
 
 static service_reference<SessionService> session_service("SessionService", "session");
 
-Serializable::serialized_data Exception::serialize()
+Serialize::Data Exception::serialize() const
 {
-	serialized_data data;	
+	Serialize::Data data;	
 
 	data["mask"] << this->mask;
 	data["limit"] << this->limit;
@@ -65,12 +65,16 @@ Serializable::serialized_data Exception::serialize()
 	return data;
 }
 
-void Exception::unserialize(Serializable::serialized_data &data)
+Serializable* Exception::unserialize(Serializable *obj, Serialize::Data &data)
 {
 	if (!session_service)
-		return;
+		return NULL;
 
-	Exception *ex = new Exception;
+	Exception *ex;
+	if (obj)
+		ex = debug_cast<Exception *>(obj);
+	else
+		ex = new Exception;
 	data["mask"] >> ex->mask;
 	data["limit"] >> ex->limit;
 	data["who"] >> ex->who;
@@ -78,7 +82,9 @@ void Exception::unserialize(Serializable::serialized_data &data)
 	data["time"] >> ex->time;
 	data["expires"] >> ex->expires;
 
-	session_service->AddException(ex);
+	if (!obj)
+		session_service->AddException(ex);
+	return ex;
 }
 
 #endif

@@ -21,24 +21,24 @@
 #include "access.h"
 #include "channels.h"
 
-BotInfo *findbot(const Anope::string &nick)
+BotInfo* findbot(const Anope::string &nick)
 {
 	BotInfo *bi = NULL;
 	if (isdigit(nick[0]) && ircd->ts6)
 	{
-		Anope::map<BotInfo *>::iterator it = BotListByUID.find(nick);
-		if (it != BotListByUID.end())
+		botinfouid_map::iterator it = BotListByUID->find(nick);
+		if (it != BotListByUID->end())
 			bi = it->second;
 	}
 	else
 	{
-		Anope::insensitive_map<BotInfo *>::iterator it = BotListByNick.find(nick);
-		if (it != BotListByNick.end())
+		botinfo_map::iterator it = BotListByNick->find(nick);
+		if (it != BotListByNick->end())
 			bi = it->second;
 	}
-	
-	FOREACH_MOD(I_OnFindBot, OnFindBot(nick));
-	
+
+	if (bi)
+		bi->QueueUpdate();
 	return bi;
 }
 

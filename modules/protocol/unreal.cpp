@@ -73,7 +73,7 @@ class UnrealIRCdProto : public IRCDProto
 
 	void SendVhostDel(User *u) anope_override
 	{
-		BotInfo *bi = findbot(Config->HostServ);
+		const BotInfo *bi = findbot(Config->HostServ);
 		u->RemoveMode(bi, UMODE_CLOAK);
 		u->RemoveMode(bi, UMODE_VHOST);
 		ModeManager::ProcessModes();
@@ -93,14 +93,15 @@ class UnrealIRCdProto : public IRCDProto
 				return;
 			}
 
-			XLine *old = x;
+			const XLine *old = x;
 
 			if (old->manager->HasEntry("*@" + u->host))
 				return;
 
 			/* We can't akill x as it has a nick and/or realname included, so create a new akill for *@host */
-			x = new XLine("*@" + u->host, old->By, old->Expires, old->Reason, old->UID);
-			old->manager->AddXLine(x);
+			XLine *xline = new XLine("*@" + u->host, old->By, old->Expires, old->Reason, old->UID);
+			old->manager->AddXLine(xline);
+			x = xline;
 
 			Log(findbot(Config->OperServ), "akill") << "AKILL: Added an akill for " << x->Mask << " because " << u->GetMask() << "#" << u->realname << " matches " << old->Mask;
 		}
@@ -164,7 +165,7 @@ class UnrealIRCdProto : public IRCDProto
 	}
 
 	/* JOIN */
-	void SendJoin(User *user, Channel *c, const ChannelStatus *status) anope_override
+	void SendJoin(const User *user, Channel *c, const ChannelStatus *status) anope_override
 	{
 		UplinkSocket::Message(Me) << "~ " << c->creation_time << " " << c->name << " :" << user->nick;
 		if (status)
@@ -178,7 +179,7 @@ class UnrealIRCdProto : public IRCDProto
 			if (uc != NULL)
 				uc->Status->ClearFlags();
 
-			BotInfo *setter = findbot(user->nick);
+			const BotInfo *setter = findbot(user->nick);
 			for (unsigned i = 0; i < ModeManager::ChannelModes.size(); ++i)
 				if (cs.HasFlag(ModeManager::ChannelModes[i]->Name))
 					c->SetMode(setter, ModeManager::ChannelModes[i], user->nick, false);
@@ -349,7 +350,7 @@ class UnrealIRCdProto : public IRCDProto
 		if (!u->Account())
 			return;
 
-		BotInfo *ns = findbot(Config->NickServ);
+		const BotInfo *ns = findbot(Config->NickServ);
 		if (Capab.count("ESVID") > 0)
 			ircdproto->SendMode(ns, u, "+d %s", u->Account()->display.c_str());
 		else
@@ -358,7 +359,7 @@ class UnrealIRCdProto : public IRCDProto
 
 	void SendLogout(User *u) anope_override
 	{
-		BotInfo *ns = findbot(Config->NickServ);
+		const BotInfo *ns = findbot(Config->NickServ);
 		ircdproto->SendMode(ns, u, "+d 1");
 	}
 
@@ -368,7 +369,7 @@ class UnrealIRCdProto : public IRCDProto
 		 * so we will join and part us now
 		 */
 		BotInfo *bi = c->ci->WhoSends();
-		if (bi == NULL)
+		if (!bi)
 			;
 		else if (c->FindUser(bi) == NULL)
 		{
@@ -388,7 +389,7 @@ class UnrealExtBan : public ChannelModeList
  public:
 	UnrealExtBan(ChannelModeName mName, char modeChar) : ChannelModeList(mName, modeChar) { }
 
-	bool Matches(User *u, const Entry *e) anope_override
+	bool Matches(const User *u, const Entry *e) anope_override
 	{
 		const Anope::string &mask = e->mask;
 
@@ -578,7 +579,7 @@ class Unreal32IRCdMessage : public IRCdMessage
 			User *user = do_nick(source, params[0], params[3], params[4], params[5], params[10], Anope::string(params[2]).is_pos_number_only() ? convertTo<time_t>(params[2]) : 0, ip.addr(), vhost, "", params[7]);
 			if (user)
 			{
-				NickAlias *na = NULL;
+				const NickAlias *na = NULL;
 
 				if (params[6] == "0")
 					;
@@ -612,7 +613,7 @@ class Unreal32IRCdMessage : public IRCdMessage
 			User *user = do_nick(source, params[0], params[3], params[4], params[5], params[9], Anope::string(params[2]).is_pos_number_only() ? convertTo<time_t>(params[2]) : 0, "", vhost, "", params[7]);
 			if (user)
 			{
-				NickAlias *na = NULL;
+				const NickAlias *na = NULL;
 
 				if (params[6] == "0")
 					;

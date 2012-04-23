@@ -18,9 +18,9 @@ struct ForbidData : Serializable
 	time_t expires;
 	ForbidType type;
 
-	Anope::string serialize_name() const anope_override { return "ForbidData"; }
-	serialized_data serialize() anope_override;
-	static void unserialize(serialized_data &data);
+	const Anope::string serialize_name() const anope_override { return "ForbidData"; }
+	Serialize::Data serialize() const anope_override;
+	static Serializable* unserialize(Serializable *obj, Serialize::Data &data);
 };
 
 class ForbidService : public Service
@@ -39,9 +39,9 @@ class ForbidService : public Service
 
 static service_reference<ForbidService> forbid_service("ForbidService", "forbid");
 
-Serializable::serialized_data ForbidData::serialize()
+Serialize::Data ForbidData::serialize() const
 {
-	serialized_data data;
+	Serialize::Data data;
 	
 	data["mask"] << this->mask;
 	data["creator"] << this->creator;
@@ -53,12 +53,16 @@ Serializable::serialized_data ForbidData::serialize()
 	return data;
 }
 
-void ForbidData::unserialize(serialized_data &data)
+Serializable* ForbidData::unserialize(Serializable *obj, Serialize::Data &data)
 {
 	if (!forbid_service)
-		return;
+		return NULL;
 
-	ForbidData *fb = new ForbidData;
+	ForbidData *fb;
+	if (obj)
+		fb = debug_cast<ForbidData *>(obj);
+	else
+		fb = new ForbidData;
 
 	data["mask"] >> fb->mask;
 	data["creator"] >> fb->creator;
@@ -69,7 +73,9 @@ void ForbidData::unserialize(serialized_data &data)
 	data["type"] >> t;
 	fb->type = static_cast<ForbidType>(t);
 
-	forbid_service->AddForbid(fb);
+	if (!obj)
+		forbid_service->AddForbid(fb);
+	return fb;
 }
 
 #endif

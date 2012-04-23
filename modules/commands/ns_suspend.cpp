@@ -22,14 +22,14 @@ struct NickSuspend : ExtensibleItem, Serializable
 	{
 	}
 
-	Anope::string serialize_name() const
+	const Anope::string serialize_name() const
 	{
 		return "NickSuspend";
 	}
 
-	serialized_data serialize() anope_override
+	Serialize::Data serialize() const anope_override
 	{
-		serialized_data sd;
+		Serialize::Data sd;
 
 		sd["nick"] << this->nick;
 		sd["when"] << this->when;
@@ -37,18 +37,25 @@ struct NickSuspend : ExtensibleItem, Serializable
 		return sd;
 	}
 
-	static void unserialize(serialized_data &sd)
+	static Serializable* unserialize(Serializable *obj, Serialize::Data &sd)
 	{
-		NickAlias *na = findnick(sd["nick"].astr());
+		const NickAlias *na = findnick(sd["nick"].astr());
 		if (na == NULL)
-			return;
+			return NULL;
 
-		NickSuspend *ns = new NickSuspend();
+		NickSuspend *ns;
+		if (obj)
+			ns = debug_cast<NickSuspend *>(obj);
+		else
+			ns = new NickSuspend();
 		
 		sd["nick"] >> ns->nick;
 		sd["when"] >> ns->when;
 
-		na->nc->Extend("ns_suspend_expire", ns);
+		if (!obj)
+			na->nc->Extend("ns_suspend_expire", ns);
+
+		return ns;
 	}
 };
 
@@ -98,17 +105,19 @@ class CommandNSSuspend : public Command
 			return;
 		}
 
-		na->nc->SetFlag(NI_SUSPENDED);
-		na->nc->SetFlag(NI_SECURE);
-		na->nc->UnsetFlag(NI_KILLPROTECT);
-		na->nc->UnsetFlag(NI_KILL_QUICK);
-		na->nc->UnsetFlag(NI_KILL_IMMED);
+		NickCore *nc = na->nc;
 
-		for (std::list<NickAlias *>::iterator it = na->nc->aliases.begin(), it_end = na->nc->aliases.end(); it != it_end; ++it)
+		nc->SetFlag(NI_SUSPENDED);
+		nc->SetFlag(NI_SECURE);
+		nc->UnsetFlag(NI_KILLPROTECT);
+		nc->UnsetFlag(NI_KILL_QUICK);
+		nc->UnsetFlag(NI_KILL_IMMED);
+
+		for (std::list<serialize_obj<NickAlias> >::iterator it = nc->aliases.begin(), it_end = nc->aliases.end(); it != it_end;)
 		{
-			NickAlias *na2 = *it;
+			NickAlias *na2 = *it++;
 
-			if (na2->nc == na->nc)
+			if (na2 && *na2->nc == *na->nc)
 			{
 				na2->last_quit = reason;
 
@@ -127,7 +136,7 @@ class CommandNSSuspend : public Command
 			ns->nick = na->nick;
 			ns->when = Anope::CurTime + expiry_secs;
 
-			na->nc->Extend("ns_suspend_expire", ns);
+			nc->Extend("ns_suspend_expire", ns);
 		}
 
 		Log(LOG_ADMIN, u, this) << "for " << nick << " (" << (!reason.empty() ? reason : "No reason") << "), expires in " << (expiry_secs ? do_strftime(Anope::CurTime + expiry_secs) : "never");
@@ -221,7 +230,7 @@ class NSSuspend : public Module
 
 	~NSSuspend()
 	{
-		for (nickcore_map::const_iterator it = NickCoreList.begin(), it_end = NickCoreList.end(); it != it_end; ++it)
+		for (nickcore_map::const_iterator it = NickCoreList->begin(), it_end = NickCoreList->end(); it != it_end; ++it)
 			it->second->Shrink("ns_suspend_expire");
 	}
 

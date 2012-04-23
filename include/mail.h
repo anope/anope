@@ -16,9 +16,9 @@
 
 #include "anope.h"
 #include "threadengine.h"
+#include "serialize.h"
 
-
-extern CoreExport bool Mail(User *u, NickCore *nc, BotInfo *service, const Anope::string &subject, const Anope::string &message);
+extern CoreExport bool Mail(User *u, NickCore *nc, const BotInfo *service, const Anope::string &subject, const Anope::string &message);
 extern CoreExport bool Mail(NickCore *nc, const Anope::string &subject, const Anope::string &message);
 extern CoreExport bool MailValidate(const Anope::string &email);
 

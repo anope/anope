@@ -51,7 +51,7 @@ void MailThread::Run()
 	SetExitState();
 }
 
-bool Mail(User *u, NickCore *nc, BotInfo *service, const Anope::string &subject, const Anope::string &message)
+bool Mail(User *u, NickCore *nc, const BotInfo *service, const Anope::string &subject, const Anope::string &message)
 {
 	if (!u || !nc || !service || subject.empty() || message.empty())
 		return false;

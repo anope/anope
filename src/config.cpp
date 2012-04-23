@@ -620,9 +620,13 @@ static bool DoneOperTypes(ServerConfig *, const Anope::string &)
 
 static bool InitOpers(ServerConfig *config, const Anope::string &)
 {
-	for (nickcore_map::const_iterator it = NickCoreList.begin(), it_end = NickCoreList.end(); it != it_end; ++it)
-		if (it->second->o && it->second->o->config)
-			it->second->o = NULL;
+	for (nickcore_map::const_iterator it = NickCoreList->begin(), it_end = NickCoreList->end(); it != it_end; ++it)
+	{
+		NickCore *nc = it->second;
+		nc->QueueUpdate();
+		if (nc->o && nc->o->config)
+			nc->o = NULL;
+	}
 
 	for (unsigned i = 0; i < config->Opers.size(); ++i)
 		delete config->Opers[i];
@@ -674,7 +678,7 @@ static bool DoneOpers(ServerConfig *config, const Anope::string &)
 	{
 		Oper *o = config->Opers[i];
 
-		NickAlias *na = findnick(o->name);
+		const NickAlias *na = findnick(o->name);
 		if (!na)
 			// Nonexistant nick
 			continue;
@@ -817,8 +821,15 @@ static bool DoneLogs(ServerConfig *config, const Anope::string &)
 
 static bool InitCommands(ServerConfig *config, const Anope::string &)
 {
-	for (botinfo_map::iterator it = BotListByNick.begin(), it_end = BotListByNick.end(); it != it_end; ++it)
-		it->second->commands.clear();
+	for (botinfo_map::const_iterator it = BotListByNick->begin(), it_end = BotListByNick->end(); it != it_end; ++it)
+	{
+		BotInfo *bi = it->second;
+		if (bi)
+		{
+			bi->QueueUpdate();
+			bi->commands.clear();
+		}
+	}
 	return true;
 }
 
@@ -929,8 +940,8 @@ static bool DoServices(ServerConfig *config, const Anope::string &, const Anope:
 		throw ConfigException("One or more values in your configuration file failed to validate. Please see your log for more information.");
 
 	services.insert(nick);
-	BotInfo *bi = findbot(nick);
-	if (bi == NULL)
+	BotInfo* bi = findbot(nick);
+	if (!bi)
 		bi = new BotInfo(nick, user, host, gecos, modes);
 	bi->SetFlag(BI_CONF);
 
@@ -1000,13 +1011,13 @@ static bool DoServices(ServerConfig *config, const Anope::string &, const Anope:
 
 static bool DoneServices(ServerConfig *config, const Anope::string &)
 {
-	for (botinfo_map::iterator it = BotListByNick.begin(), it_end = BotListByNick.end(); it != it_end;)
+	for (botinfo_map::const_iterator it = BotListByNick->begin(), it_end = BotListByNick->end(); it != it_end;)
 	{
 		BotInfo *bi = it->second;
 		++it;
 
 		if (bi->HasFlag(BI_CONF) && services.count(bi->nick) == 0)
-			delete bi;
+			bi->destroy();
 	}
 	services.clear();
 	return true;

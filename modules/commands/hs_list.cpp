@@ -59,9 +59,9 @@ class CommandHSList : public Command
 		ListFormatter list;
 		list.addColumn("Number").addColumn("Nick").addColumn("Vhost").addColumn("Creator").addColumn("Created");
 
-		for (nickalias_map::const_iterator it = NickAliasList.begin(), it_end = NickAliasList.end(); it != it_end; ++it)
+		for (nickalias_map::const_iterator it = NickAliasList->begin(), it_end = NickAliasList->end(); it != it_end; ++it)
 		{
-			NickAlias *na = it->second;
+			const NickAlias *na = it->second;
 
 			if (!na->HasVhost())
 				continue;

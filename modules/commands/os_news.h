@@ -22,9 +22,9 @@ struct NewsItem : Serializable
 	Anope::string who;
 	time_t time;
 
-	Anope::string serialize_name() const anope_override { return "NewsItem"; }
-	serialized_data serialize() anope_override;
-	static void unserialize(serialized_data &data);
+	const Anope::string serialize_name() const anope_override { return "NewsItem"; }
+	Serialize::Data serialize() const anope_override;
+	static Serializable* unserialize(Serializable *obj, Serialize::Data &data);
 };
 
 class NewsService : public Service
@@ -41,9 +41,9 @@ class NewsService : public Service
 
 static service_reference<NewsService> news_service("NewsService", "news");
 
-Serializable::serialized_data NewsItem::serialize()
+Serialize::Data NewsItem::serialize() const
 {
-	serialized_data data;
+	Serialize::Data data;
 		
 	data["type"] << this->type;
 	data["text"] << this->text;
@@ -53,12 +53,16 @@ Serializable::serialized_data NewsItem::serialize()
 	return data;
 }
 
-void NewsItem::unserialize(serialized_data &data)
+Serializable* NewsItem::unserialize(Serializable *obj, Serialize::Data &data)
 {
 	if (!news_service)
-		return;
+		return NULL;
 
-	NewsItem *ni = new NewsItem();
+	NewsItem *ni;
+	if (obj)
+		ni = debug_cast<NewsItem *>(obj);
+	else
+		ni = new NewsItem();
 
 	unsigned int t;
 	data["type"] >> t;
@@ -67,7 +71,9 @@ void NewsItem::unserialize(serialized_data &data)
 	data["who"] >> ni->who;
 	data["time"] >> ni->time;
 
-	news_service->AddNewsItem(ni);
+	if (!obj)
+		news_service->AddNewsItem(ni);
+	return ni;
 }
 
 #endif // OS_NEWS

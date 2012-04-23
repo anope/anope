@@ -18,17 +18,14 @@
 #include "channels.h"
 #include "access.h"
 
-registered_channel_map RegisteredChannelList;
-
-/*************************************************************************/
-
-ChannelInfo *cs_findchan(const Anope::string &chan)
+ChannelInfo* cs_findchan(const Anope::string &chan)
 {
-	FOREACH_MOD(I_OnFindChan, OnFindChan(chan));
-
-	registered_channel_map::const_iterator it = RegisteredChannelList.find(chan);
-	if (it != RegisteredChannelList.end())
+	registered_channel_map::const_iterator it = RegisteredChannelList->find(chan);
+	if (it != RegisteredChannelList->end())
+	{
+		it->second->QueueUpdate();
 		return it->second;
+	}
 
 	return NULL;
 }
@@ -40,7 +37,7 @@ ChannelInfo *cs_findchan(const Anope::string &chan)
  * @param ci The channel
  * @return true or false
  */
-bool IsFounder(User *user, ChannelInfo *ci)
+bool IsFounder(const User *user, const ChannelInfo *ci)
 {
 	if (!user || !ci)
 		return false;
@@ -71,7 +68,7 @@ void update_cs_lastseen(User *user, ChannelInfo *ci)
 /* Returns the best ban possible for a user depending of the bantype
    value. */
 
-int get_idealban(ChannelInfo *ci, User *u, Anope::string &ret)
+int get_idealban(const ChannelInfo *ci, User *u, Anope::string &ret)
 {
 	Anope::string mask;
 

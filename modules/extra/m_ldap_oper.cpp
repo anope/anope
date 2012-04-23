@@ -31,6 +31,8 @@ class IdentifyInterface : public LDAPInterface
 		if (!u || !u->Account())
 			return;
 
+		NickCore *nc = u->Account();
+
 		try
 		{
 			const LDAPAttributes &attr = r.get(0);
@@ -38,9 +40,9 @@ class IdentifyInterface : public LDAPInterface
 			const Anope::string &opertype = attr.get(opertype_attribute);
 
 			OperType *ot = OperType::Find(opertype);
-			if (ot != NULL && (u->Account()->o == NULL || ot != u->Account()->o->ot))
+			if (ot != NULL && (nc->o == NULL || ot != nc->o->ot))
 			{
-				Oper *o = u->Account()->o;
+				Oper *o = nc->o;
 				if (o != NULL && my_opers.count(o) > 0)
 				{
 					my_opers.erase(o);
@@ -48,22 +50,22 @@ class IdentifyInterface : public LDAPInterface
 				}
 				o = new Oper(u->nick, ot);
 				my_opers.insert(o);
-				u->Account()->o = o;
-				Log() << "m_ldap_oper: Tied " << u->nick << " (" << u->Account()->display << ") to opertype " << ot->GetName();
+				nc->o = o;
+				Log() << "m_ldap_oper: Tied " << u->nick << " (" << nc->display << ") to opertype " << ot->GetName();
 			}
 		}
 		catch (const LDAPException &ex)
 		{
-			if (u->Account()->o != NULL)
+			if (nc->o != NULL)
 			{
-				if (my_opers.count(u->Account()->o) > 0)
+				if (my_opers.count(nc->o) > 0)
 				{
-					my_opers.erase(u->Account()->o);
-					delete u->Account()->o;
+					my_opers.erase(nc->o);
+					delete nc->o;
 				}
-				u->Account()->o = NULL;
+				nc->o = NULL;
 
-				Log() << "m_ldap_oper: Removed services operator from " << u->nick << " (" << u->Account()->display << ")";
+				Log() << "m_ldap_oper: Removed services operator from " << u->nick << " (" << nc->display << ")";
 			}
 		}
 	}

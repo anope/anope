@@ -17,9 +17,9 @@ struct IgnoreData : Serializable
 	Anope::string reason;
 	time_t time; /* When do we stop ignoring them? */
 
-	Anope::string serialize_name() const anope_override { return "IgnoreData"; }
-	serialized_data serialize() anope_override;
-	static void unserialize(serialized_data &data);
+	const Anope::string serialize_name() const anope_override { return "IgnoreData"; }
+	Serialize::Data serialize() const anope_override;
+	static Serializable* unserialize(Serializable *obj, Serialize::Data &data);
 };
 
 class IgnoreService : public Service
@@ -30,7 +30,7 @@ class IgnoreService : public Service
 	IgnoreService(Module *c) : Service(c, "IgnoreService", "ignore") { }
 	
  public:
-	virtual void AddIgnore(const Anope::string &mask, const Anope::string &creator, const Anope::string &reason, time_t delta = Anope::CurTime) = 0;
+	virtual IgnoreData* AddIgnore(const Anope::string &mask, const Anope::string &creator, const Anope::string &reason, time_t delta = Anope::CurTime) = 0;
 
 	virtual bool DelIgnore(const Anope::string &mask) = 0;
 
@@ -43,9 +43,9 @@ class IgnoreService : public Service
 
 static service_reference<IgnoreService> ignore_service("IgnoreService", "ignore");
 
-Serializable::serialized_data IgnoreData::serialize()
+Serialize::Data IgnoreData::serialize() const
 {
-	serialized_data data;
+	Serialize::Data data;
 
 	data["mask"] << this->mask;
 	data["creator"] << this->creator;
@@ -55,14 +55,24 @@ Serializable::serialized_data IgnoreData::serialize()
 	return data;
 }
 
-void IgnoreData::unserialize(serialized_data &data)
+Serializable* IgnoreData::unserialize(Serializable *obj, Serialize::Data &data)
 {
 	if (!ignore_service)
-		return;
+		return NULL;
+	
+	if (obj)
+	{
+		IgnoreData *ign = debug_cast<IgnoreData *>(obj);
+		data["mask"] >> ign->mask;
+		data["creator"] >> ign->creator;
+		data["reason"] >> ign->reason;
+		data["time"] >> ign->time;
+		return ign;
+	}
 
 	time_t t;
 	data["time"] >> t;
 
-	ignore_service->AddIgnore(data["mask"].astr(), data["creator"].astr(), data["reason"].astr(), t);
+	return ignore_service->AddIgnore(data["mask"].astr(), data["creator"].astr(), data["reason"].astr(), t);
 }
 

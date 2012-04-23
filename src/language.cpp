@@ -63,7 +63,7 @@ const char *translate(User *u, const char *string)
 	return translate(u ? u->Account() : NULL, string);
 }
 
-const char *translate(NickCore *nc, const char *string)
+const char *translate(const NickCore *nc, const char *string)
 {
 	return anope_gettext(nc ? nc->language.c_str() : Config->NSDefLanguage.c_str(), string);
 }

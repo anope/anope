@@ -15,7 +15,7 @@
 
 struct EntryMsg : Serializable
 {
-	ChannelInfo *ci;
+	serialize_obj<ChannelInfo> ci;
 	Anope::string creator;
 	Anope::string message;
 	time_t when;
@@ -29,14 +29,14 @@ struct EntryMsg : Serializable
 		this->when = ct;
 	}
 
-	Anope::string serialize_name() const anope_override
+	const Anope::string serialize_name() const anope_override
 	{
 		return "EntryMsg";
 	}
 
-	serialized_data serialize() anope_override
+	Serialize::Data serialize() const anope_override
 	{
-		serialized_data data;
+		Serialize::Data data;
 
 		data["ci"] << this->ci->name;
 		data["creator"] << this->creator;
@@ -46,7 +46,7 @@ struct EntryMsg : Serializable
 		return data;
 	}
 
-	static void unserialize(serialized_data &data);
+	static Serializable* unserialize(Serializable *obj, Serialize::Data &data);
 };
 
 static unsigned MaxEntries = 0;
@@ -55,11 +55,21 @@ struct EntryMessageList : std::vector<EntryMsg>, ExtensibleItem
 {
 };
 
-void EntryMsg::unserialize(serialized_data &data)
+Serializable* EntryMsg::unserialize(Serializable *obj, Serialize::Data &data)
 {
 	ChannelInfo *ci = cs_findchan(data["ci"].astr());
 	if (!ci)
-		return;
+		return NULL;
+
+	if (obj)
+	{
+		EntryMsg *msg = debug_cast<EntryMsg *>(obj);
+		msg->ci = ci;
+		data["creator"] >> msg->creator;
+		data["message"] >> msg->message;
+		data["when"] >> msg->when;
+		return msg;
+	}
 
 	EntryMessageList *messages = ci->GetExt<EntryMessageList *>("cs_entrymsg");
 	if (messages == NULL)
@@ -69,6 +79,7 @@ void EntryMsg::unserialize(serialized_data &data)
 	}
 
 	messages->push_back(EntryMsg(ci, data["creator"].astr(), data["message"].astr()));
+	return &messages->back();
 }
 
 class CommandEntryMessage : public Command

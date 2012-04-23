@@ -37,14 +37,14 @@ struct SeenInfo : Serializable
 	{
 	}
 
-	Anope::string serialize_name() const anope_override
+	const Anope::string serialize_name() const anope_override
 	{
 		return "SeenInfo";
 	}
 
-	serialized_data serialize() anope_override
+	Serialize::Data serialize() const anope_override
 	{
-		serialized_data data;
+		Serialize::Data data;
 
 		data["nick"] << nick;
 		data["vhost"] << vhost;
@@ -57,9 +57,13 @@ struct SeenInfo : Serializable
 		return data;
 	}
 
-	static void unserialize(serialized_data &data)
+	static Serializable* unserialize(Serializable *obj, Serialize::Data &data)
 	{
-		SeenInfo *s = new SeenInfo();
+		SeenInfo *s;
+		if (obj)
+			s = debug_cast<SeenInfo *>(obj);
+		else
+			s = new SeenInfo();
 
 		data["nick"] >> s->nick;
 		data["vhost"] >> s->vhost;
@@ -71,7 +75,9 @@ struct SeenInfo : Serializable
 		data["message"] >> s->message;
 		data["last"] >> s->last;
 
-		database[s->nick] = s;
+		if (!s)
+			database[s->nick] = s;
+		return s;
 	}
 };
 
@@ -89,7 +95,7 @@ static SeenInfo *FindInfo(const Anope::string &nick)
 static bool ShouldHide(const Anope::string &channel, User *u)
 {
 	Channel *targetchan = findchan(channel);
-	ChannelInfo *targetchan_ci = targetchan ? targetchan->ci : cs_findchan(channel);
+	const ChannelInfo *targetchan_ci = targetchan ? *targetchan->ci : cs_findchan(channel);
 
 	if (targetchan && targetchan->HasMode(CMODE_SECRET))
 		return true;
@@ -303,7 +309,7 @@ class DataBasePurger : public CallBack
 			if ((Anope::CurTime - cur->second->last) > purgetime)
 			{
 				Log(LOG_DEBUG) << cur->first << " was last seen " << do_strftime(cur->second->last) << ", purging entry";
-				delete cur->second;
+				cur->second->destroy();
 				database.erase(cur);
 			}
 		}

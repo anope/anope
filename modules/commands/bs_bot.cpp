@@ -22,7 +22,6 @@ class CommandBSBot : public Command
 		const Anope::string &user = params[2];
 		const Anope::string &host = params[3];
 		const Anope::string &real = params[4];
-		BotInfo *bi;
 
 		if (findbot(nick))
 		{
@@ -93,7 +92,7 @@ class CommandBSBot : public Command
 			return;
 		}
 
-		bi = new BotInfo(nick, user, host, real);
+		BotInfo *bi = new BotInfo(nick, user, host, real);
 
 		Log(LOG_ADMIN, source.u, this) << "ADD " << bi->GetMask() << " " << bi->realname;
 
@@ -110,7 +109,6 @@ class CommandBSBot : public Command
 		const Anope::string &user = params.size() > 3 ? params[3] : "";
 		const Anope::string &host = params.size() > 4 ? params[4] : "";
 		const Anope::string &real = params.size() > 5 ? params[5] : "";
-		BotInfo *bi;
 
 		if (oldnick.empty() || nick.empty())
 		{
@@ -118,7 +116,8 @@ class CommandBSBot : public Command
 			return;
 		}
 
-		if (!(bi = findbot(oldnick)))
+		BotInfo *bi = findbot(oldnick);
+		if (!bi)
 		{
 			source.Reply(BOT_DOES_NOT_EXIST, oldnick.c_str());
 			return;
@@ -263,7 +262,6 @@ class CommandBSBot : public Command
 	void DoDel(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		const Anope::string &nick = params[1];
-		BotInfo *bi;
 
 		if (nick.empty())
 		{
@@ -271,7 +269,8 @@ class CommandBSBot : public Command
 			return;
 		}
 
-		if (!(bi = findbot(nick)))
+		BotInfo *bi = findbot(nick);
+		if (!bi)
 		{
 			source.Reply(BOT_DOES_NOT_EXIST, nick.c_str());
 			return;
@@ -288,7 +287,7 @@ class CommandBSBot : public Command
 		Log(LOG_ADMIN, source.u, this) << "DEL " << bi->nick;
 
 		source.Reply(_("Bot \002%s\002 has been deleted."), nick.c_str());
-		delete bi;
+		bi->destroy();
 		return;
 	}
  public:

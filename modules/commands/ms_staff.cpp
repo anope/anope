@@ -36,9 +36,9 @@ class CommandMSStaff : public Command
 			return;
 		}
 
-		for (nickcore_map::const_iterator it = NickCoreList.begin(), it_end = NickCoreList.end(); it != it_end; ++it)
+		for (nickcore_map::const_iterator it = NickCoreList->begin(), it_end = NickCoreList->end(); it != it_end; ++it)
 		{
-			NickCore *nc = it->second;
+			const NickCore *nc = it->second;
 
 			if (nc->IsServicesOper())
 				memoserv->Send(source.u->nick, nc->display, text, true);

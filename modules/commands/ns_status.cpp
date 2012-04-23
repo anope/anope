@@ -27,7 +27,7 @@ class CommandNSStatus : public Command
 	{
 		User *u = source.u;
 		const Anope::string &nick = !params.empty() ? params[0] : u->nick;
-		NickAlias *na = findnick(nick);
+		const NickAlias *na = findnick(nick);
 		spacesepstream sep(nick);
 		Anope::string nickbuf;
 

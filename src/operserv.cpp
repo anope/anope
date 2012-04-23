@@ -22,7 +22,7 @@
 
 /* List of XLine managers we check users against in XLineManager::CheckAll */
 std::list<XLineManager *> XLineManager::XLineManagers;
-std::multimap<Anope::string, XLine *, ci::less> XLineManager::XLinesByUID;
+serialize_checker<std::multimap<Anope::string, XLine *, ci::less> > XLineManager::XLinesByUID("XLine");
 
 void XLine::InitRegex()
 {
@@ -138,14 +138,14 @@ bool XLine::IsRegex() const
 	return !this->Mask.empty() && this->Mask[0] == '/' && this->Mask[this->Mask.length() - 1] == '/';
 }
 
-Anope::string XLine::serialize_name() const
+const Anope::string XLine::serialize_name() const
 {
 	return "XLine";
 }
 
-Serializable::serialized_data XLine::serialize()
+Serialize::Data XLine::serialize() const
 {
-	serialized_data data;	
+	Serialize::Data data;	
 
 	data["mask"] << this->Mask;
 	data["by"] << this->By;
@@ -159,19 +159,39 @@ Serializable::serialized_data XLine::serialize()
 	return data;
 }
 
-void XLine::unserialize(serialized_data &data)
+Serializable* XLine::unserialize(Serializable *obj, Serialize::Data &data)
 {
 	service_reference<XLineManager> xlm("XLineManager", data["manager"].astr());
 	if (!xlm)
-		return;
+		return NULL;
 
-	time_t expires;
-	data["expires"] >> expires;
-	XLine *xl = new XLine(data["mask"].astr(), data["by"].astr(), expires, data["reason"].astr(), data["uid"].astr());
+	XLine *xl;
+	if (obj)
+	{
+		xl = debug_cast<XLine *>(obj);
+		data["mask"] >> xl->Mask;
+		data["by"] >> xl->By;
+		data["reason"] >> xl->Reason;
+		data["uid"] >> xl->UID;
+
+		if (xlm != xl->manager)
+		{
+			xl->manager->DelXLine(xl);
+			xlm->AddXLine(xl);
+		}
+	}
+	else
+	{
+		time_t expires;
+		data["expires"] >> expires;
+		xl = new XLine(data["mask"].astr(), data["by"].astr(), expires, data["reason"].astr(), data["uid"].astr());
+		xlm->AddXLine(xl);
+	}
+
 	data["created"] >> xl->Created;
 	xl->manager = xlm;
 
-	xlm->AddXLine(xl);
+	return xl;
 }
 
 /** Register a XLineManager, places it in XLineManagers for use in XLineManager::CheckAll
@@ -220,7 +240,7 @@ Anope::string XLineManager::GenerateUID()
 {
 	Anope::string id;
 	int count = 0;
-	while (id.empty() || XLinesByUID.count(id) > 0)
+	while (id.empty() || XLinesByUID->count(id) > 0)
 	{
 		if (++count > 10)
 		{
@@ -244,7 +264,7 @@ Anope::string XLineManager::GenerateUID()
 
 /** Constructor
  */
-XLineManager::XLineManager(Module *creator, const Anope::string &xname, char t) : Service(creator, "XLineManager", xname), type(t)
+XLineManager::XLineManager(Module *creator, const Anope::string &xname, char t) : Service(creator, "XLineManager", xname), type(t), XLines("XLine")
 {
 }
 
@@ -269,7 +289,7 @@ const char &XLineManager::Type()
  */
 size_t XLineManager::GetCount() const
 {
-	return this->XLines.size();
+	return this->XLines->size();
 }
 
 /** Get the XLine vector
@@ -285,10 +305,9 @@ const std::vector<XLine *> &XLineManager::GetList() const
  */
 void XLineManager::AddXLine(XLine *x)
 {
-	x->manager = this;
 	if (!x->UID.empty())
-		XLinesByUID.insert(std::make_pair(x->UID, x));
-	this->XLines.push_back(x);
+		XLinesByUID->insert(std::make_pair(x->UID, x));
+	this->XLines->push_back(x);
 }
 
 /** Delete an entry from this XLineManager
@@ -297,25 +316,25 @@ void XLineManager::AddXLine(XLine *x)
  */
 bool XLineManager::DelXLine(XLine *x)
 {
-	std::vector<XLine *>::iterator it = std::find(this->XLines.begin(), this->XLines.end(), x);
+	std::vector<XLine *>::iterator it = std::find(this->XLines->begin(), this->XLines->end(), x);
 
 	if (!x->UID.empty())
 	{
-		std::multimap<Anope::string, XLine *, ci::less>::iterator it2 = XLinesByUID.find(x->UID), it3 = XLinesByUID.upper_bound(x->UID);
-		for (; it2 != XLinesByUID.end() && it2 != it3; ++it2)
+		std::multimap<Anope::string, XLine *, ci::less>::iterator it2 = XLinesByUID->find(x->UID), it3 = XLinesByUID->upper_bound(x->UID);
+		for (; it2 != XLinesByUID->end() && it2 != it3; ++it2)
 			if (it2->second == x)
 			{
-				XLinesByUID.erase(it2);
+				XLinesByUID->erase(it2);
 				break;
 			}
 	}
 
-	if (it != this->XLines.end())
+	if (it != this->XLines->end())
 	{
 		this->SendDel(x);
 
-		delete x;
-		this->XLines.erase(it);
+		x->destroy();
+		this->XLines->erase(it);
 
 		return true;
 	}
@@ -327,25 +346,28 @@ bool XLineManager::DelXLine(XLine *x)
   * @param index The index
   * @return The XLine, or NULL if the index is out of bounds
   */
-XLine *XLineManager::GetEntry(unsigned index)
+XLine* XLineManager::GetEntry(unsigned index)
 {
-	if (index >= this->XLines.size())
+	if (index >= this->XLines->size())
 		return NULL;
 
-	return this->XLines[index];
+	XLine *x = this->XLines->at(index);
+	x->QueueUpdate();
+	return x;
 }
 
 /** Clear the XLine vector
  */
 void XLineManager::Clear()
 {
-	for (unsigned i = 0; i < this->XLines.size(); ++i)
+	for (unsigned i = 0; i < this->XLines->size(); ++i)
 	{
-		if (!this->XLines[i]->UID.empty())
-			XLinesByUID.erase(this->XLines[i]->UID);
-		delete this->XLines[i];
+		XLine *x = this->XLines->at(i);
+		if (!x->UID.empty())
+			XLinesByUID->erase(x->UID);
+		x->destroy();
 	}
-	this->XLines.clear();
+	this->XLines->clear();
 }
 
 /** Checks if a mask can/should be added to the XLineManager
@@ -406,19 +428,25 @@ bool XLineManager::CanAdd(CommandSource &source, const Anope::string &mask, time
  * @param mask The mask
  * @return The XLine the user matches, or NULL
  */
-XLine *XLineManager::HasEntry(const Anope::string &mask)
+XLine* XLineManager::HasEntry(const Anope::string &mask)
 {
-	std::map<Anope::string, XLine *, ci::less>::iterator it = XLinesByUID.find(mask);
-	if (it != XLinesByUID.end())
-		for (std::map<Anope::string, XLine *, ci::less>::iterator it2 = XLinesByUID.upper_bound(mask); it != it2; ++it)
+	std::map<Anope::string, XLine *, ci::less>::iterator it = XLinesByUID->find(mask);
+	if (it != XLinesByUID->end())
+		for (std::map<Anope::string, XLine *, ci::less>::iterator it2 = XLinesByUID->upper_bound(mask); it != it2; ++it)
 			if (it->second->manager == NULL || it->second->manager == this)
+			{
+				it->second->QueueUpdate();
 				return it->second;
-	for (unsigned i = 0, end = this->XLines.size(); i < end; ++i)
+			}
+	for (unsigned i = 0, end = this->XLines->size(); i < end; ++i)
 	{
-		XLine *x = this->XLines[i];
+		XLine *x = this->XLines->at(i);
 
 		if (x->Mask.equals_ci(mask))
+		{
+			x->QueueUpdate();
 			return x;
+		}
 	}
 
 	return NULL;
@@ -430,9 +458,9 @@ XLine *XLineManager::HasEntry(const Anope::string &mask)
  */
 XLine *XLineManager::CheckAllXLines(User *u)
 {
-	for (unsigned i = this->XLines.size(); i > 0; --i)
+	for (unsigned i = this->XLines->size(); i > 0; --i)
 	{
-		XLine *x = this->XLines[i - 1];
+		XLine *x = this->XLines->at(i - 1);
 
 		if (x->Expires && x->Expires < Anope::CurTime)
 		{
@@ -454,7 +482,7 @@ XLine *XLineManager::CheckAllXLines(User *u)
 /** Called when an XLine expires
  * @param x The xline
  */
-void XLineManager::OnExpire(XLine *x)
+void XLineManager::OnExpire(const XLine *x)
 {
 }
 

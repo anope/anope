@@ -37,11 +37,11 @@ class CommandMSSendAll : public Command
 			return;
 		}
 
-		NickAlias *na = findnick(u->nick);
+		const NickAlias *na = findnick(u->nick);
 
-		for (nickcore_map::const_iterator it = NickCoreList.begin(), it_end = NickCoreList.end(); it != it_end; ++it)
+		for (nickcore_map::const_iterator it = NickCoreList->begin(), it_end = NickCoreList->end(); it != it_end; ++it)
 		{
-			NickCore *nc = it->second;
+			const NickCore *nc = it->second;
 
 			if ((na && na->nc == nc) || !nc->display.equals_ci(u->nick))
 				memoserv->Send(u->nick, nc->display, text);

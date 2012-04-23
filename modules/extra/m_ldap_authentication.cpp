@@ -58,7 +58,7 @@ class IdentifyInterface : public LDAPInterface
 			if (Config->NSAddAccessOnReg)
 				na->nc->AddAccess(create_mask(u));
 
-			BotInfo *bi = findbot(Config->NickServ);
+			const BotInfo *bi = findbot(Config->NickServ);
 			if (bi)
 				u->SendMessage(bi, _("Your account \002%s\002 has been successfully created."), na->nick.c_str());
 		}
@@ -123,10 +123,11 @@ class OnIdentifyInterface : public LDAPInterface
 			const LDAPAttributes &attr = r.get(0);
 			Anope::string email = attr.get(email_attribute);
 
-			if (!email.equals_ci(u->Account()->email))
+			NickCore *nc = u->Account();
+			if (!email.equals_ci(nc->email))
 			{
-				u->Account()->email = email;
-				BotInfo *bi = findbot(Config->NickServ);
+				nc->email = email;
+				const BotInfo *bi = findbot(Config->NickServ);
 				if (bi)
 					u->SendMessage(bi, _("Your email has been updated to \002%s\002"), email.c_str());
 				Log() << "m_ldap_authentication: Updated email address for " << u->nick << " (" << u->Account()->display << ") to " << email;

@@ -27,7 +27,7 @@ class CommandMSList : public Command
 		User *u = source.u;
 
 		Anope::string param = !params.empty() ? params[0] : "", chan;
-		ChannelInfo *ci = NULL;
+		ChannelInfo *ci;
 		const MemoInfo *mi;
 
 		if (!param.empty() && param[0] == '#')
@@ -35,7 +35,8 @@ class CommandMSList : public Command
 			chan = param;
 			param = params.size() > 1 ? params[1] : "";
 
-			if (!(ci = cs_findchan(chan)))
+			ci = cs_findchan(chan);
+			if (!ci)
 			{
 				source.Reply(CHAN_X_NOT_REGISTERED, chan.c_str());
 				return;
@@ -52,7 +53,7 @@ class CommandMSList : public Command
 
 		if (!param.empty() && !isdigit(param[0]) && !param.equals_ci("NEW"))
 			this->OnSyntaxError(source, param);
-		else if (!mi->memos.size())
+		else if (!mi->memos->size())
 		{
 			if (!chan.empty())
 				source.Reply(MEMO_X_HAS_NO_MEMOS, chan.c_str());
@@ -79,10 +80,10 @@ class CommandMSList : public Command
 
 					void HandleNumber(unsigned Number) anope_override
 					{
-						if (!Number || Number > mi->memos.size())
+						if (!Number || Number > mi->memos->size())
 							return;
 
-						Memo *m = mi->memos[Number];
+						const Memo *m = mi->GetMemo(Number);
 
 						ListFormatter::ListEntry entry;
 						entry["Number"] = (m->HasFlag(MF_UNREAD) ? "* " : "  ") + stringify(Number + 1);
@@ -99,8 +100,8 @@ class CommandMSList : public Command
 				if (!param.empty())
 				{
 					unsigned i, end;
-					for (i = 0, end = mi->memos.size(); i < end; ++i)
-						if (mi->memos[i]->HasFlag(MF_UNREAD))
+					for (i = 0, end = mi->memos->size(); i < end; ++i)
+						if (mi->GetMemo(i)->HasFlag(MF_UNREAD))
 							break;
 					if (i == end)
 					{
@@ -112,12 +113,12 @@ class CommandMSList : public Command
 					}
 				}
 
-				for (unsigned i = 0, end = mi->memos.size(); i < end; ++i)
+				for (unsigned i = 0, end = mi->memos->size(); i < end; ++i)
 				{
-					if (!param.empty() && !mi->memos[i]->HasFlag(MF_UNREAD))
+					if (!param.empty() && !mi->GetMemo(i)->HasFlag(MF_UNREAD))
 						continue;
 
-					Memo *m = mi->memos[i];
+					const Memo *m = mi->GetMemo(i);
 
 					ListFormatter::ListEntry entry;
 					entry["Number"] = (m->HasFlag(MF_UNREAD) ? "* " : "  ") + stringify(i + 1);

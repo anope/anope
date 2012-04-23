@@ -81,7 +81,7 @@ class CommandBSBadwords : public Command
 					if (!Number || Number > ci->GetBadWordCount())
 						return;
 
-					BadWord *bw = ci->GetBadWord(Number - 1);
+					const BadWord *bw = ci->GetBadWord(Number - 1);
 					ListFormatter::ListEntry entry;
 					entry["Number"] = stringify(Number);
 					entry["Word"] = bw->word;
@@ -96,7 +96,7 @@ class CommandBSBadwords : public Command
 		{
 			for (unsigned i = 0, end = ci->GetBadWordCount(); i < end; ++i)
 			{
-				BadWord *bw = ci->GetBadWord(i);
+				const BadWord *bw = ci->GetBadWord(i);
 
 				if (!word.empty() && !Anope::Match(bw->word, word))
 					continue;
@@ -154,7 +154,7 @@ class CommandBSBadwords : public Command
 
 		for (unsigned i = 0, end = ci->GetBadWordCount(); i < end; ++i)
 		{
-			BadWord *bw = ci->GetBadWord(i);
+			const BadWord *bw = ci->GetBadWord(i);
 
 			if (!bw->word.empty() && ((Config->BSCaseSensitive && realword.equals_cs(bw->word)) || (!Config->BSCaseSensitive && realword.equals_ci(bw->word))))
 			{
@@ -183,7 +183,7 @@ class CommandBSBadwords : public Command
 		else
 		{
 			unsigned i, end;
-			BadWord *badword;
+			const BadWord *badword;
 
 			for (i = 0, end = ci->GetBadWordCount(); i < end; ++i)
 			{

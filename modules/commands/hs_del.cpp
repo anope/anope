@@ -65,8 +65,8 @@ class CommandHSDelAll : public Command
 		if (na)
 		{
 			FOREACH_MOD(I_OnDeleteVhost, OnDeleteVhost(na));
-			NickCore *nc = na->nc;
-			for (std::list<NickAlias *>::iterator it = nc->aliases.begin(), it_end = nc->aliases.end(); it != it_end; ++it)
+			const NickCore *nc = na->nc;
+			for (std::list<serialize_obj<NickAlias> >::const_iterator it = nc->aliases.begin(), it_end = nc->aliases.end(); it != it_end; ++it)
 			{
 				na = *it;
 				na->RemoveVhost();

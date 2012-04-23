@@ -33,10 +33,10 @@ class CommandNSSASet : public Command
 		this->SendSyntax(source);
 		source.Reply(_("Sets various nickname options. \037option\037 can be one of:"));
 		Anope::string this_name = source.command;
-		for (BotInfo::command_map::iterator it = source.owner->commands.begin(), it_end = source.owner->commands.end(); it != it_end; ++it)
+		for (BotInfo::command_map::const_iterator it = source.owner->commands.begin(), it_end = source.owner->commands.end(); it != it_end; ++it)
 		{
 			const Anope::string &c_name = it->first;
-			CommandInfo &info = it->second;
+			const CommandInfo &info = it->second;
 
 			if (c_name.find_ci(this_name + " ") == 0)
 			{
@@ -67,7 +67,7 @@ class CommandNSSASetPassword : public Command
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		User *u = source.u;
-		NickAlias *setter_na = findnick(params[0]);
+		const NickAlias *setter_na = findnick(params[0]);
 		if (setter_na == NULL)
 		{
 			source.Reply(NICK_X_NOT_REGISTERED, params[0].c_str());

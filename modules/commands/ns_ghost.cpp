@@ -30,7 +30,7 @@ class CommandNSGhost : public Command
 
 		User *u = source.u;
 		User *user = finduser(nick);
-		NickAlias *na = findnick(nick);
+		const NickAlias *na = findnick(nick);
 
 		if (!user)
 			source.Reply(NICK_X_NOT_IN_USE, nick.c_str());

@@ -34,9 +34,9 @@ class CommandNSGetEMail : public Command
 
 		Log(LOG_ADMIN, u, this) << "on " << email;
 
-		for (nickcore_map::const_iterator it = NickCoreList.begin(), it_end = NickCoreList.end(); it != it_end; ++it)
+		for (nickcore_map::const_iterator it = NickCoreList->begin(), it_end = NickCoreList->end(); it != it_end; ++it)
 		{
-			NickCore *nc = it->second;
+			const NickCore *nc = it->second;
 
 			if (!nc->email.empty() && nc->email.equals_ci(email))
 			{

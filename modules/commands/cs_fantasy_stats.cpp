@@ -106,7 +106,7 @@ class CSStats : public Module
 		Anope::string display;
 		if (params.empty())
 			display = source.u->Account()->display;
-		else if (NickAlias *na = findnick(params[0]))
+		else if (const NickAlias *na = findnick(params[0]))
 			display = na->nc->display;
 		else
 		{
@@ -166,3 +166,4 @@ void CommandCSGStats::Execute(CommandSource &source, const std::vector<Anope::st
 }
 
 MODULE_INIT(CSStats)
+

@@ -19,7 +19,7 @@ class OSIgnoreService : public IgnoreService
  public:
 	OSIgnoreService(Module *o) : IgnoreService(o) { }
 
-	void AddIgnore(const Anope::string &mask, const Anope::string &creator, const Anope::string &reason, time_t delta = Anope::CurTime) anope_override
+	IgnoreData* AddIgnore(const Anope::string &mask, const Anope::string &creator, const Anope::string &reason, time_t delta = Anope::CurTime) anope_override
 	{
 		/* If it s an existing user, we ignore the hostmask. */
 		Anope::string realmask = mask;
@@ -36,7 +36,7 @@ class OSIgnoreService : public IgnoreService
 			{
 				/* this should never happen */
 				if (user > host)
-					return;
+					return NULL;
 			}
 			else
 				/* We have user@host. Add nick wildcard. */
@@ -54,6 +54,7 @@ class OSIgnoreService : public IgnoreService
 				ign->time = 0;
 			else
 				ign->time = Anope::CurTime + delta;
+			return ign;
 		}
 		/* Create new entry.. */
 		else
@@ -64,6 +65,7 @@ class OSIgnoreService : public IgnoreService
 			newign.reason = reason;
 			newign.time = delta ? Anope::CurTime + delta : 0;
 			this->ignores.push_back(newign);
+			return &this->ignores.back();
 		}
 	}
 

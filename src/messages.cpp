@@ -47,7 +47,7 @@ bool OnStats(const Anope::string &source, const std::vector<Anope::string> &para
 				{
 					Oper *o = Config->Opers[i];
 
-					NickAlias *na = findnick(o->name);
+					const NickAlias *na = findnick(o->name);
 					if (na)
 						ircdproto->SendNumeric(243, source, "O * * %s %s 0", o->name.c_str(), o->ot->GetName().c_str());
 				}

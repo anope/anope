@@ -42,9 +42,9 @@ class NSMaxEmail : public Module
 		if (email.empty())
 			return 0;
 
-		for (nickcore_map::const_iterator it = NickCoreList.begin(), it_end = NickCoreList.end(); it != it_end; ++it)
+		for (nickcore_map::const_iterator it = NickCoreList->begin(), it_end = NickCoreList->end(); it != it_end; ++it)
 		{
-			NickCore *nc = it->second;
+			const NickCore *nc = it->second;
 
 			if (!(u->Account() && u->Account() == nc) && !nc->email.empty() && nc->email.equals_ci(email))
 				++count;

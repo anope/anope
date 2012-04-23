@@ -24,12 +24,14 @@ std::vector<UserMode *> ModeManager::UserModes;
 /* Number of generic modes we support */
 unsigned GenericChannelModes = 0, GenericUserModes = 0;
 /* Default mlocked modes */
-std::multimap<ChannelModeName, ModeLock> def_mode_locks;
+ChannelInfo::ModeList def_mode_locks;
 
 /** Parse the mode string from the config file and set the default mlocked modes
  */
 void SetDefaultMLock(ServerConfig *config)
 {
+	for (ChannelInfo::ModeList::iterator it = def_mode_locks.begin(), it_end = def_mode_locks.end(); it != it_end; ++it)
+		delete it->second;
 	def_mode_locks.clear();
 
 	Anope::string modes;
@@ -57,8 +59,15 @@ void SetDefaultMLock(ServerConfig *config)
 				}
 
 				if (cm->Type != MODE_LIST) // Only MODE_LIST can have duplicates
-					def_mode_locks.erase(cm->Name);
-				def_mode_locks.insert(std::make_pair(cm->Name, ModeLock(NULL, adding == 1, cm->Name, param)));
+				{
+					ChannelInfo::ModeList::iterator it = def_mode_locks.find(cm->Name);
+					if (it != def_mode_locks.end())
+					{
+						delete it->second;
+						def_mode_locks.erase(it);
+					}
+				}
+				def_mode_locks.insert(std::make_pair(cm->Name, new ModeLock(NULL, adding == 1, cm->Name, param)));
 			}
 		}
 	}
@@ -461,7 +470,7 @@ std::list<Anope::string> ModeManager::BuildModeStrings(StackerInfo *info)
  * @param Param A param, if there is one
  * @param Type The type this is, user or channel
  */
-void ModeManager::StackerAddInternal(BotInfo *bi, Base *Object, Mode *mode, bool Set, const Anope::string &Param, StackerType Type)
+void ModeManager::StackerAddInternal(const BotInfo *bi, Base *Object, Mode *mode, bool Set, const Anope::string &Param, StackerType Type)
 {
 	StackerInfo *s = GetInfo(Object);
 	s->Type = Type;
@@ -646,7 +655,7 @@ char ModeManager::GetStatusChar(char Value)
  * @param Set true for setting, false for removing
  * @param Param The param, if there is one
  */
-void ModeManager::StackerAdd(BotInfo *bi, Channel *c, ChannelMode *cm, bool Set, const Anope::string &Param)
+void ModeManager::StackerAdd(const BotInfo *bi, Channel *c, ChannelMode *cm, bool Set, const Anope::string &Param)
 {
 	StackerAddInternal(bi, c, cm, Set, Param, ST_CHANNEL);
 }
@@ -658,7 +667,7 @@ void ModeManager::StackerAdd(BotInfo *bi, Channel *c, ChannelMode *cm, bool Set,
  * @param Set true for setting, false for removing
  * @param param The param, if there is one
  */
-void ModeManager::StackerAdd(BotInfo *bi, User *u, UserMode *um, bool Set, const Anope::string &Param)
+void ModeManager::StackerAdd(const BotInfo *bi, User *u, UserMode *um, bool Set, const Anope::string &Param)
 {
 	StackerAddInternal(bi, u, um, Set, Param, ST_USER);
 }

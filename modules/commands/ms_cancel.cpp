@@ -39,11 +39,20 @@ class CommandMSCancel : public Command
 			source.Reply(ischan ? CHAN_X_NOT_REGISTERED : _(NICK_X_NOT_REGISTERED), nname.c_str());
 		else
 		{
-			for (int i = mi->memos.size() - 1; i >= 0; --i)
-				if (mi->memos[i]->HasFlag(MF_UNREAD) && u->Account()->display.equals_ci(mi->memos[i]->sender))
+			ChannelInfo *ci;
+			NickAlias *na;
+			if (ischan)
+				ci = cs_findchan(nname);
+			else
+				na = findnick(nname);
+			for (int i = mi->memos->size() - 1; i >= 0; --i)
+				if (mi->GetMemo(i)->HasFlag(MF_UNREAD) && u->Account()->display.equals_ci(mi->GetMemo(i)->sender))
 				{
-					FOREACH_MOD(I_OnMemoDel, OnMemoDel(findnick(nname)->nc, mi, mi->memos[i]));
-					mi->Del(mi->memos[i]);
+					if (ischan)
+						FOREACH_MOD(I_OnMemoDel, OnMemoDel(ci, mi, mi->GetMemo(i)));
+					else
+						FOREACH_MOD(I_OnMemoDel, OnMemoDel(na->nc, mi, mi->GetMemo(i)));
+					mi->Del(i);
 					source.Reply(_("Last memo to \002%s\002 has been cancelled."), nname.c_str());
 					return;
 				}

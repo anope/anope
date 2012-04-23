@@ -20,14 +20,14 @@
 
 Memo::Memo() : Flags<MemoFlag>(MemoFlagStrings) { }
 
-Anope::string Memo::serialize_name() const
+const Anope::string Memo::serialize_name() const
 {
 	return "Memo";
 }
 
-Serializable::serialized_data Memo::serialize()
+Serialize::Data Memo::serialize() const
 {
-	serialized_data data;	
+	Serialize::Data data;	
 
 	data["owner"] << this->owner;
 	data["time"].setType(Serialize::DT_INT) << this->time;
@@ -38,50 +38,69 @@ Serializable::serialized_data Memo::serialize()
 	return data;
 }
 
-void Memo::unserialize(serialized_data &data)
+Serializable* Memo::unserialize(Serializable *obj, Serialize::Data &data)
 {
 	if (!memoserv)
-		return;
+		return NULL;
 	
 	bool ischan;
 	MemoInfo *mi = memoserv->GetMemoInfo(data["owner"].astr(), ischan);
 	if (!mi)
-		return;
+		return NULL;
 
-	Memo *m = new Memo();
+	Memo *m;
+	if (obj)
+		m = debug_cast<Memo *>(obj);
+	else
+		m = new Memo();
 	data["owner"] >> m->owner;
 	data["time"] >> m->time;
 	data["sender"] >> m->sender;
 	data["text"] >> m->text;
 	m->FromString(data["flags"].astr());
 
-	mi->memos.push_back(m);
+	if (obj == NULL)
+		mi->memos->push_back(m);
+	return m;
+}
+
+MemoInfo::MemoInfo() : memos("Memo")
+{
+}
+
+Memo *MemoInfo::GetMemo(unsigned index) const
+{
+	if (index >= this->memos->size())
+		return NULL;
+	Memo *m = (*memos)[index];
+	m->QueueUpdate();
+	return m;
 }
 
 unsigned MemoInfo::GetIndex(Memo *m) const
 {
-	for (unsigned i = 0; i < this->memos.size(); ++i)
-		if (this->memos[i] == m)
+	for (unsigned i = 0; i < this->memos->size(); ++i)
+		if (this->GetMemo(i) == m)
 			return i;
 	return -1;
 }
 
 void MemoInfo::Del(unsigned index)
 {
-	if (index >= this->memos.size())
+	if (index >= this->memos->size())
 		return;
-	delete this->memos[index];
-	this->memos.erase(this->memos.begin() + index);
+	this->GetMemo(index)->destroy();
+	this->memos->erase(this->memos->begin() + index);
 }
 
 void MemoInfo::Del(Memo *memo)
 {
-	std::vector<Memo *>::iterator it = std::find(this->memos.begin(), this->memos.end(), memo);
+	std::vector<Memo *>::iterator it = std::find(this->memos->begin(), this->memos->end(), memo);
 
-	if (it != this->memos.end())
+	if (it != this->memos->end())
 	{
-		delete memo;
-		this->memos.erase(it);
+		memo->destroy();
+		this->memos->erase(it);
 	}
 }
 

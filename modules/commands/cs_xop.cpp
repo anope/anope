@@ -116,7 +116,7 @@ class XOPChanAccess : public ChanAccess
 		return false;
 	}
 
-	Anope::string Serialize()
+	Anope::string Serialize() const
 	{
 		for (int i = 0; xopAccess[i].type != XOP_UNKNOWN; ++i)
 		{
@@ -145,11 +145,11 @@ class XOPChanAccess : public ChanAccess
 		this->type = XOP_UNKNOWN;
 	}
 
-	static XOPType DetermineLevel(ChanAccess *access)
+	static XOPType DetermineLevel(const ChanAccess *access)
 	{
 		if (access->provider->name == "access/xop")
 		{
-			XOPChanAccess *xaccess = debug_cast<XOPChanAccess *>(access);
+			const XOPChanAccess *xaccess = debug_cast<const XOPChanAccess *>(access);
 			return xaccess->type;
 		}
 		else
@@ -216,7 +216,7 @@ class XOPBase : public Command
 		}
 
 		AccessGroup access = ci->AccessFor(u);
-		ChanAccess *highest = access.Highest();
+		const ChanAccess *highest = access.Highest();
 		int u_level = (highest ? XOPChanAccess::DetermineLevel(highest) : 0);
 
 		if ((!access.Founder && !access.HasPriv("ACCESS_CHANGE") && !u->HasPriv("chanserv/access/modify")) || (level <= u_level && !access.Founder))
@@ -225,7 +225,7 @@ class XOPBase : public Command
 			return;
 		}
 
-		if (mask.find_first_of("!*@") == Anope::string::npos && findnick(mask) == NULL)
+		if (mask.find_first_of("!*@") == Anope::string::npos && !findnick(mask))
 		{
 			User *targ = finduser(mask);
 			if (targ != NULL)
@@ -239,7 +239,7 @@ class XOPBase : public Command
 
 		for (unsigned i = 0; i < ci->GetAccessCount(); ++i)
 		{
-			ChanAccess *a = ci->GetAccess(i);
+			const ChanAccess *a = ci->GetAccess(i);
 
 			if (a->mask.equals_ci(mask))
 			{
@@ -304,7 +304,7 @@ class XOPBase : public Command
 		}
 
 		AccessGroup access = ci->AccessFor(u);
-		ChanAccess *highest = access.Highest();
+		const ChanAccess *highest = access.Highest();
 		bool override = false;
 		if ((!mask.equals_ci(u->Account()->display) && !access.HasPriv("ACCESS_CHANGE") && !access.Founder) || ((!highest || level <= XOPChanAccess::DetermineLevel(highest)) && !access.Founder))
 		{
@@ -436,7 +436,7 @@ class XOPBase : public Command
 					if (!Number || Number > ci->GetAccessCount())
 						return;
 
-					ChanAccess *a = ci->GetAccess(Number - 1);
+					const ChanAccess *a = ci->GetAccess(Number - 1);
 
 					if (this->type != XOPChanAccess::DetermineLevel(a))
 						return;
@@ -453,7 +453,7 @@ class XOPBase : public Command
 		{
 			for (unsigned i = 0, end = ci->GetAccessCount(); i < end; ++i)
 			{
-				ChanAccess *a = ci->GetAccess(i);
+				const ChanAccess *a = ci->GetAccess(i);
 
 				if (XOPChanAccess::DetermineLevel(a) != level)
 					continue;
@@ -507,7 +507,7 @@ class XOPBase : public Command
 
 		for (unsigned i = ci->GetAccessCount(); i > 0; --i)
 		{
-			ChanAccess *access = ci->GetAccess(i - 1);
+			const ChanAccess *access = ci->GetAccess(i - 1);
 			if (XOPChanAccess::DetermineLevel(access) == level)
 				ci->EraseAccess(i - 1);
 		}

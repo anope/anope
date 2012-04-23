@@ -59,7 +59,7 @@ class CoreExport ChanAccess : public Serializable
 {
  public:
 	AccessProvider *provider;
-	ChannelInfo *ci;
+	serialize_obj<ChannelInfo> ci;
 	Anope::string mask;
 	Anope::string creator;
 	time_t last_seen;
@@ -68,13 +68,13 @@ class CoreExport ChanAccess : public Serializable
 	ChanAccess(AccessProvider *p);
 	virtual ~ChanAccess();
 
-	Anope::string serialize_name() const;
-	serialized_data serialize();
-	static void unserialize(serialized_data &);
+	const Anope::string serialize_name() const anope_override;
+	Serialize::Data serialize() const anope_override;
+	static Serializable* unserialize(Serializable *obj, Serialize::Data &);
 
-	virtual bool Matches(User *u, NickCore *nc);
+	virtual bool Matches(const User *u, const NickCore *nc) const;
 	virtual bool HasPriv(const Anope::string &name) const = 0;
-	virtual Anope::string Serialize() = 0;
+	virtual Anope::string Serialize() const = 0;
 	virtual void Unserialize(const Anope::string &data) = 0;
 
 	bool operator>(const ChanAccess &other) const;
@@ -86,12 +86,12 @@ class CoreExport ChanAccess : public Serializable
 class CoreExport AccessGroup : public std::vector<ChanAccess *>
 {
  public:
- 	ChannelInfo *ci;
-	NickCore *nc;
+ 	const ChannelInfo *ci;
+	const NickCore *nc;
 	bool SuperAdmin, Founder;
 	AccessGroup();
 	bool HasPriv(const Anope::string &priv) const;
-	ChanAccess *Highest() const;
+	const ChanAccess *Highest() const;
 	bool operator>(const AccessGroup &other) const;
 	bool operator<(const AccessGroup &other) const;
 	bool operator>=(const AccessGroup &other) const;

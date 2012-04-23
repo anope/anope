@@ -72,7 +72,7 @@ class MyNewsService : public NewsService
 	{
 		for (unsigned i = 0; i < 3; ++i)
 			for (unsigned j = 0; j < newsItems[i].size(); ++j)
-				delete newsItems[i][j];
+				newsItems[i][j]->destroy();
 	}
 
 	void AddNewsItem(NewsItem *n)
@@ -86,7 +86,7 @@ class MyNewsService : public NewsService
 		std::vector<NewsItem *>::iterator it = std::find(list.begin(), list.end(), n);
 		if (it != list.end())
 			list.erase(it);
-		delete n;
+		n->destroy();
 	}
 
 	std::vector<NewsItem *> &GetNewsList(NewsType t)
@@ -364,10 +364,10 @@ class OSNews : public Module
 			if (Type == NEWS_RANDOM && i != cur_rand_news)
 				continue;
 
-			BotInfo *gl = findbot(Config->Global);
-			if (!gl && !BotListByNick.empty())
-				gl = BotListByNick.begin()->second;
-			BotInfo *os = findbot(Config->OperServ);
+			const BotInfo *gl = findbot(Config->Global);
+			if (!gl && !BotListByNick->empty())
+				gl = BotListByNick->begin()->second;
+			const BotInfo *os = findbot(Config->OperServ);
 			if (!os)
 				os = gl;
 			if (gl)

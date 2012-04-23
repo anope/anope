@@ -13,6 +13,11 @@
 
 #include "module.h"
 
+struct ExtensibleString : Anope::string, ExtensibleItem
+{
+	ExtensibleString(const Anope::string &s) : Anope::string(s) { }
+};
+
 IRCDVar myIrcd = {
 	"InspIRCd 1.1",	/* ircd name */
 	 "+I",				/* Modes used by pseudoclients */
@@ -48,7 +53,7 @@ static bool has_hidechansmod = false;
 /* CHGHOST */
 void inspircd_cmd_chghost(const Anope::string &nick, const Anope::string &vhost)
 {
-	BotInfo *bi = findbot(Config->OperServ);
+	const BotInfo *bi = findbot(Config->OperServ);
 	if (has_chghostmod)
 	{
 		if (nick.empty() || vhost.empty())
@@ -64,7 +69,7 @@ void inspircd_cmd_chghost(const Anope::string &nick, const Anope::string &vhost)
 
 bool event_idle(const Anope::string &source, const std::vector<Anope::string> &params)
 {
-	BotInfo *bi = findbot(params[0]);
+	const BotInfo *bi = findbot(params[0]);
 	UplinkSocket::Message(bi) << "IDLE " << source << " " << start_time << " " << (bi ? Anope::CurTime - bi->lastmsg : 0);
 	return true;
 }
@@ -128,7 +133,7 @@ class InspIRCdProto : public IRCDProto
 				return;
 			}
 
-			XLine *old = x;
+			const XLine *old = x;
 
 			if (old->manager->HasEntry("*@" + u->host))
 				return;
@@ -210,7 +215,7 @@ class InspIRCdProto : public IRCDProto
 	}
 
 	/* JOIN */
-	void SendJoin(User *user, Channel *c, const ChannelStatus *status) anope_override
+	void SendJoin(const User *user, Channel *c, const ChannelStatus *status) anope_override
 	{
 		UplinkSocket::Message(user) << "JOIN " << c->name << " " << c->creation_time;
 		if (status)
@@ -224,7 +229,7 @@ class InspIRCdProto : public IRCDProto
 			if (uc != NULL)
 				uc->Status->ClearFlags();
 
-			BotInfo *setter = findbot(user->nick);
+			const BotInfo *setter = findbot(user->nick);
 			for (unsigned i = 0; i < ModeManager::ChannelModes.size(); ++i)
 				if (cs.HasFlag(ModeManager::ChannelModes[i]->Name))
 					c->SetMode(setter, ModeManager::ChannelModes[i], user->nick, false);
@@ -386,7 +391,8 @@ class InspircdIRCdMessage : public IRCdMessage
 				Anope::string *svidbuf = na ? na->nc->GetExt<ExtensibleString *>("authenticationtoken") : NULL;
 				if (na && svidbuf && *svidbuf == params[0])
 				{
-					user->Login(na->nc);
+					NickCore *nc = na->nc;
+					user->Login(nc);
 					if (!Config->NoNicknameOwnership && na->nc->HasFlag(NI_UNCONFIRMED) == false)
 						user->SetMode(findbot(Config->NickServ), UMODE_REGISTERED);
 				}

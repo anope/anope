@@ -54,9 +54,9 @@ class CommandCSAKick : public Command
 
 		Anope::string mask = params[2];
 		Anope::string reason = params.size() > 3 ? params[3] : "";
-		NickAlias *na = findnick(mask);
+		const NickAlias *na = findnick(mask);
 		NickCore *nc = NULL;
-		AutoKick *akick;
+		const AutoKick *akick;
 
 		if (!na)
 		{
@@ -113,7 +113,7 @@ class CommandCSAKick : public Command
 
 			/* Match against the lastusermask of all nickalias's with equal
 			 * or higher access. - Viper */
-			for (nickalias_map::const_iterator it = NickAliasList.begin(), it_end = NickAliasList.end(); it != it_end; ++it)
+			for (nickalias_map::const_iterator it = NickAliasList->begin(), it_end = NickAliasList->end(); it != it_end; ++it)
 			{
 				na = it->second;
 
@@ -166,7 +166,6 @@ class CommandCSAKick : public Command
 		User *u = source.u;
 
 		const Anope::string &mask = params[2];
-		AutoKick *akick;
 		unsigned i, end;
 
 		if (!ci->GetAkickCount())
@@ -218,12 +217,12 @@ class CommandCSAKick : public Command
 		}
 		else
 		{
-			NickAlias *na = findnick(mask);
-			NickCore *nc = na ? na->nc : NULL;
+			const NickAlias *na = findnick(mask);
+			const NickCore *nc = na ? *na->nc : NULL;
 
 			for (i = 0, end = ci->GetAkickCount(); i < end; ++i)
 			{
-				akick = ci->GetAkick(i);
+				const AutoKick *akick = ci->GetAkick(i);
 
 				if ((akick->HasFlag(AK_ISNICK) && akick->nc == nc) || (!akick->HasFlag(AK_ISNICK) && mask.equals_ci(akick->mask)))
 					break;
@@ -267,7 +266,7 @@ class CommandCSAKick : public Command
 					if (!number || number > ci->GetAkickCount())
 						return;
 	
-					AutoKick *akick = ci->GetAkick(number - 1);
+					const AutoKick *akick = ci->GetAkick(number - 1);
 
 					Anope::string timebuf, lastused;
 					if (akick->addtime)
@@ -296,7 +295,7 @@ class CommandCSAKick : public Command
 		{
 			for (unsigned i = 0, end = ci->GetAkickCount(); i < end; ++i)
 			{
-				AutoKick *akick = ci->GetAkick(i);
+				const AutoKick *akick = ci->GetAkick(i);
 
 				if (!mask.empty())
 				{

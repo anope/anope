@@ -620,7 +620,9 @@ static void LoadBots()
 		READ(read_int32(&created, f));
 		READ(read_int16(&chancount, f));
 
-		BotInfo *bi = new BotInfo(nick, user, host, real);
+		BotInfo *bi = findbot(nick);
+		if (!bi)
+			bi = new BotInfo(nick, user, host, real);
 		bi->created = created;
 
 		if (flags & OLD_BI_PRIVATE)
@@ -1005,7 +1007,7 @@ class DBOld : public Module
 		ConfigReader conf;
 		hashm = conf.ReadValue("db_old", "hash", "", 0);
 
-		if (hashm != "md5" && hashm != "oldmd5" && hashm == "sha1" && hashm == "plain")
+		if (hashm != "md5" && hashm != "oldmd5" && hashm != "sha1" && hashm != "plain" && hashm != "sha256")
 			throw ModuleException("Invalid hash method");
 	}
 

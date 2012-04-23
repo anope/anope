@@ -537,7 +537,7 @@ void Channel::SetMode(const BotInfo *bi, ChannelMode *cm, const Anope::string &p
 	}
 
 	ModeManager::StackerAdd(bi, this, cm, true, param);
-	SetModeInternal(bi ? finduser(bi->nick) : NULL, cm, param, EnforceMLock);
+	SetModeInternal(bi, cm, param, EnforceMLock);
 }
 
 /**
@@ -589,7 +589,7 @@ void Channel::RemoveMode(const BotInfo *bi, ChannelMode *cm, const Anope::string
 	}
 
 	ModeManager::StackerAdd(bi, this, cm, false, realparam);
-	RemoveModeInternal(bi ? finduser(bi->nick) : NULL, cm, realparam, EnforceMLock);
+	RemoveModeInternal(bi, cm, realparam, EnforceMLock);
 }
 
 /**

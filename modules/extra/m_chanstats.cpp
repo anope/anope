@@ -63,6 +63,9 @@ class MChanstats : public Module
 	void GetTables()
 	{
 		TableList.clear();
+		if (!sql)
+			return;
+
 		SQLResult r = this->sql->RunQuery(this->sql->GetTables());
 		for (int i = 0; i < r.Rows(); ++i)
 		{
@@ -160,8 +163,10 @@ class MChanstats : public Module
 
 		Anope::string engine = config.ReadValue("chanstats", "engine", "", 0);
 		this->sql = service_reference<SQLProvider>("SQLProvider", engine);
-		this->CheckTables();
-
+		if (sql)
+			this->CheckTables();
+		else
+			Log() << "Chanstats: no database connection to " << engine;
 	}
 	void OnTopicUpdated(Channel *c, User *u, const Anope::string &topic) anope_override
 	{

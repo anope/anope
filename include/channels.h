@@ -156,7 +156,7 @@ class CoreExport Channel : public virtual Base, public Extensible, public Flags<
 	 * @param param Optional param arg for the mode
 	 * @param EnforceMLock true if mlocks should be enforced, false to override mlock
 	 */
-	void SetMode(const BotInfo *bi, ChannelMode *cm, const Anope::string &param = "", bool EnforceMLock = true);
+	void SetMode(BotInfo *bi, ChannelMode *cm, const Anope::string &param = "", bool EnforceMLock = true);
 
 	/**
 	 * Set a mode on a channel
@@ -165,7 +165,7 @@ class CoreExport Channel : public virtual Base, public Extensible, public Flags<
 	 * @param param Optional param arg for the mode
 	 * @param EnforceMLock true if mlocks should be enforced, false to override mlock
 	 */
-	void SetMode(const BotInfo *bi, ChannelModeName Name, const Anope::string &param = "", bool EnforceMLock = true);
+	void SetMode(BotInfo *bi, ChannelModeName Name, const Anope::string &param = "", bool EnforceMLock = true);
 
 	/** Remove a mode from a channel
 	 * @param bi The client setting the modes
@@ -173,7 +173,7 @@ class CoreExport Channel : public virtual Base, public Extensible, public Flags<
 	 * @param param Optional param arg for the mode
 	 * @param EnforceMLock true if mlocks should be enforced, false to override mlock
 	 */
-	void RemoveMode(const BotInfo *bi, ChannelMode *cm, const Anope::string &param = "", bool EnforceMLock = true);
+	void RemoveMode(BotInfo *bi, ChannelMode *cm, const Anope::string &param = "", bool EnforceMLock = true);
 
 	/**
 	 * Remove a mode from a channel
@@ -182,7 +182,7 @@ class CoreExport Channel : public virtual Base, public Extensible, public Flags<
 	 * @param param Optional param arg for the mode
 	 * @param EnforceMLock true if mlocks should be enforced, false to override mlock
 	 */
-	void RemoveMode(const BotInfo *bi, ChannelModeName Name, const Anope::string &param = "", bool EnforceMLock = true);
+	void RemoveMode(BotInfo *bi, ChannelModeName Name, const Anope::string &param = "", bool EnforceMLock = true);
 
 	/** Get a param from the channel
 	 * @param Name The mode
@@ -196,7 +196,7 @@ class CoreExport Channel : public virtual Base, public Extensible, public Flags<
 	 * @param EnforceMLock Should mlock be enforced on this mode change
 	 * @param cmodes The modes to set
 	 */
-	void SetModes(const BotInfo *bi, bool EnforceMLock, const char *cmodes, ...);
+	void SetModes(BotInfo *bi, bool EnforceMLock, const char *cmodes, ...);
 
 	/** Set a string of modes internally on a channel
 	 * @param setter the setter (if it is a user)

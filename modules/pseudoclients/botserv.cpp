@@ -203,7 +203,7 @@ class BotServCore : public Module
 	{
 		if (Config->BSSmartJoin && Name == CMODE_BAN && c->ci && c->ci->bi && c->FindUser(c->ci->bi))
 		{
-			const BotInfo *bi = c->ci->bi;
+			BotInfo *bi = c->ci->bi;
 
 			Entry ban(CMODE_BAN, param);
 			if (ban.Matches(bi))

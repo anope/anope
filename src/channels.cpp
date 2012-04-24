@@ -429,8 +429,8 @@ void Channel::RemoveModeInternal(User *setter, ChannelMode *cm, const Anope::str
 			return;
 		}
 
-		const BotInfo *bi = findbot(param);
-		const User *u = bi ? bi : finduser(param);
+		BotInfo *bi = findbot(param);
+		User *u = bi ? bi : finduser(param);
 
 		if (!u)
 		{
@@ -506,7 +506,7 @@ void Channel::RemoveModeInternal(User *setter, ChannelMode *cm, const Anope::str
  * @param param Optional param arg for the mode
  * @param EnforceMLock true if mlocks should be enforced, false to override mlock
  */
-void Channel::SetMode(const BotInfo *bi, ChannelMode *cm, const Anope::string &param, bool EnforceMLock)
+void Channel::SetMode(BotInfo *bi, ChannelMode *cm, const Anope::string &param, bool EnforceMLock)
 {
 	if (!cm)
 		return;
@@ -547,7 +547,7 @@ void Channel::SetMode(const BotInfo *bi, ChannelMode *cm, const Anope::string &p
  * @param param Optional param arg for the mode
  * @param EnforceMLock true if mlocks should be enforced, false to override mlock
  */
-void Channel::SetMode(const BotInfo *bi, ChannelModeName Name, const Anope::string &param, bool EnforceMLock)
+void Channel::SetMode(BotInfo *bi, ChannelModeName Name, const Anope::string &param, bool EnforceMLock)
 {
 	SetMode(bi, ModeManager::FindChannelModeByName(Name), param, EnforceMLock);
 }
@@ -558,7 +558,7 @@ void Channel::SetMode(const BotInfo *bi, ChannelModeName Name, const Anope::stri
  * @param param Optional param arg for the mode
  * @param EnforceMLock true if mlocks should be enforced, false to override mlock
  */
-void Channel::RemoveMode(const BotInfo *bi, ChannelMode *cm, const Anope::string &param, bool EnforceMLock)
+void Channel::RemoveMode(BotInfo *bi, ChannelMode *cm, const Anope::string &param, bool EnforceMLock)
 {
 	if (!cm)
 		return;
@@ -599,7 +599,7 @@ void Channel::RemoveMode(const BotInfo *bi, ChannelMode *cm, const Anope::string
  * @param param Optional param arg for the mode
  * @param EnforceMLock true if mlocks should be enforced, false to override mlock
  */
-void Channel::RemoveMode(const BotInfo *bi, ChannelModeName Name, const Anope::string &param, bool EnforceMLock)
+void Channel::RemoveMode(BotInfo *bi, ChannelModeName Name, const Anope::string &param, bool EnforceMLock)
 {
 	RemoveMode(bi, ModeManager::FindChannelModeByName(Name), param, EnforceMLock);
 }
@@ -631,7 +631,7 @@ bool Channel::GetParam(ChannelModeName Name, Anope::string &Target) const
  * @param EnforceMLock Should mlock be enforced on this mode change
  * @param cmodes The modes to set
  */
-void Channel::SetModes(const BotInfo *bi, bool EnforceMLock, const char *cmodes, ...)
+void Channel::SetModes(BotInfo *bi, bool EnforceMLock, const char *cmodes, ...)
 {
 	char buf[BUFSIZE] = "";
 	va_list args;

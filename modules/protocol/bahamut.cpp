@@ -168,7 +168,7 @@ class BahamutIRCdProto : public IRCDProto
 			if (uc != NULL)
 				uc->Status->ClearFlags();
 
-			const BotInfo *setter = findbot(user->nick);
+			BotInfo *setter = findbot(user->nick);
 			for (unsigned i = 0; i < ModeManager::ChannelModes.size(); ++i)
 				if (cs.HasFlag(ModeManager::ChannelModes[i]->Name))
 					c->SetMode(setter, ModeManager::ChannelModes[i], user->nick, false);

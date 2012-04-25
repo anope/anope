@@ -101,7 +101,7 @@ class CommandNSSuspend : public Command
 
 		if (Config->NSSecureAdmins && na->nc->IsServicesOper())
 		{
-			source.Reply(ACCESS_DENIED);
+			source.Reply(_("You may not suspend other services operators nicknames."));
 			return;
 		}
 
@@ -186,9 +186,9 @@ class CommandNSUnSuspend : public Command
 			return;
 		}
 
-		if (Config->NSSecureAdmins && na->nc->IsServicesOper())
+		if (!na->nc->HasFlag(NI_SUSPENDED))
 		{
-			source.Reply(ACCESS_DENIED);
+			source.Reply(_("Nick %s is not suspended."), na->nick.c_str());
 			return;
 		}
 

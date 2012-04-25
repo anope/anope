@@ -32,7 +32,7 @@ class CommandNSGetPass : public Command
 		if (!(na = findnick(nick)))
 			source.Reply(NICK_X_NOT_REGISTERED, nick.c_str());
 		else if (Config->NSSecureAdmins && na->nc->IsServicesOper())
-			source.Reply(ACCESS_DENIED);
+			source.Reply(_("You may not get the password of other services operators."));
 		else
 		{
 			if (enc_decrypt(na->nc->pass, tmp_pass) == 1)

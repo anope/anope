@@ -54,7 +54,7 @@ class CommandNSDrop : public Command
 		if (!is_mine && !u->HasPriv("nickserv/drop"))
 			source.Reply(ACCESS_DENIED);
 		else if (Config->NSSecureAdmins && !is_mine && na->nc->IsServicesOper())
-			source.Reply(ACCESS_DENIED);
+			source.Reply(_("You may not drop other services operators nicknames."));
 		else
 		{
 			if (readonly)

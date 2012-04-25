@@ -75,7 +75,7 @@ class CommandNSSetEmail : public Command
 		}
 		else if (Config->NSSecureAdmins && u->Account() != nc && nc->IsServicesOper())
 		{
-			source.Reply(ACCESS_DENIED);
+			source.Reply(_("You may not change the email of other services operators."));
 			return;
 		}
 		else if (!param.empty() && !MailValidate(param))

@@ -79,7 +79,7 @@ class CommandNSSASetPassword : public Command
 
 		if (Config->NSSecureAdmins && u->Account() != nc && nc->IsServicesOper())
 		{
-			source.Reply(ACCESS_DENIED);
+			source.Reply(_("You may not change the password of other services operators."));
 			return;
 		}
 		else if (nc->display.equals_ci(params[1]) || (Config->StrictPasswords && len < 5))

@@ -122,7 +122,7 @@ class CommandNSAccess : public Command
 			}
 			else if (Config->NSSecureAdmins && u->Account() != na->nc && na->nc->IsServicesOper())
 			{
-				source.Reply(ACCESS_DENIED);
+				source.Reply(_("You may view or modify the access list of other services operators."));
 				return;
 			}
 

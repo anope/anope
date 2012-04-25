@@ -196,7 +196,7 @@ class CommandCSFlags : public Command
 		service_reference<AccessProvider> provider("AccessProvider", "access/flags");
 		if (!provider)
 			return;
-		FlagsChanAccess *access = debug_cast<FlagsChanAccess *>(provider->Create());
+		FlagsChanAccess *access = anope_dynamic_static_cast<FlagsChanAccess *>(provider->Create());
 		access->ci = ci;
 		access->mask = mask;
 		access->creator = u->nick;

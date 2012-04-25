@@ -63,7 +63,7 @@ Serializable* EntryMsg::unserialize(Serializable *obj, Serialize::Data &data)
 
 	if (obj)
 	{
-		EntryMsg *msg = debug_cast<EntryMsg *>(obj);
+		EntryMsg *msg = anope_dynamic_static_cast<EntryMsg *>(obj);
 		msg->ci = ci;
 		data["creator"] >> msg->creator;
 		data["message"] >> msg->message;

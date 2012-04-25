@@ -55,7 +55,7 @@ struct HostRequest : ExtensibleItem, Serializable
 
 		HostRequest *req;
 		if (obj)
-			req = debug_cast<HostRequest *>(obj);
+			req = anope_dynamic_static_cast<HostRequest *>(obj);
 		else
 			req = new HostRequest;
 		req->nick = na->nick;

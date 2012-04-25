@@ -45,7 +45,7 @@ struct NickSuspend : ExtensibleItem, Serializable
 
 		NickSuspend *ns;
 		if (obj)
-			ns = debug_cast<NickSuspend *>(obj);
+			ns = anope_dynamic_static_cast<NickSuspend *>(obj);
 		else
 			ns = new NickSuspend();
 		

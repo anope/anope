@@ -43,7 +43,7 @@ struct MyOper : Oper, Serializable
 
 		MyOper *myo;
 		if (obj)
-			myo = debug_cast<MyOper *>(obj);
+			myo = anope_dynamic_static_cast<MyOper *>(obj);
 		else
 			myo = new MyOper(nc->display, ot);
 		nc->o = myo;

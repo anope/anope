@@ -168,7 +168,7 @@ Serializable* XLine::unserialize(Serializable *obj, Serialize::Data &data)
 	XLine *xl;
 	if (obj)
 	{
-		xl = debug_cast<XLine *>(obj);
+		xl = anope_dynamic_static_cast<XLine *>(obj);
 		data["mask"] >> xl->Mask;
 		data["by"] >> xl->By;
 		data["reason"] >> xl->Reason;

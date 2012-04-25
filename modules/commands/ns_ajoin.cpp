@@ -51,7 +51,7 @@ struct AJoinList : std::vector<std::pair<Anope::string, Anope::string> >, Extens
 
 		AJoinList *aj;
 		if (obj)
-			aj = debug_cast<AJoinList *>(obj);
+			aj = anope_dynamic_static_cast<AJoinList *>(obj);
 		else
 		{
 			aj = new AJoinList(nc);

@@ -52,7 +52,7 @@ class CommandMSDel : public Command
 		User *u = source.u;
 
 		MemoInfo *mi;
-		ChannelInfo *ci;
+		ChannelInfo *ci = NULL;
 		Anope::string numstr = !params.empty() ? params[0] : "", chan;
 
 		if (!numstr.empty() && numstr[0] == '#')

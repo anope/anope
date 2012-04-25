@@ -93,7 +93,7 @@ class MyXMLRPCEvent : public XMLRPCEvent
 				if (created && u)
 				{
 					User *useru = u;
-					XMLRPCUser *myu = debug_cast<XMLRPCUser *>(useru);
+					XMLRPCUser *myu = anope_dynamic_static_cast<XMLRPCUser *>(useru);
 					if (!myu->GetOut().empty())
 						request->reply("return", iface->Sanitize(myu->GetOut()));
 					delete u;

@@ -61,7 +61,7 @@ struct SeenInfo : Serializable
 	{
 		SeenInfo *s;
 		if (obj)
-			s = debug_cast<SeenInfo *>(obj);
+			s = anope_dynamic_static_cast<SeenInfo *>(obj);
 		else
 			s = new SeenInfo();
 

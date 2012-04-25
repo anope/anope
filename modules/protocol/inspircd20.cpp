@@ -664,7 +664,7 @@ class Inspircd20IRCdMessage : public InspircdIRCdMessage
 							continue;
 						}
 
-						ChannelModeStatus *cms = debug_cast<ChannelModeStatus *>(cm);
+						ChannelModeStatus *cms = anope_dynamic_static_cast<ChannelModeStatus *>(cm);
 						cms->Level = level--;
 					}
 				}

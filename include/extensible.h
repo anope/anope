@@ -90,7 +90,7 @@ class CoreExport Extensible
 	{
 		extensible_map::const_iterator it = this->extension_items.find(key);
 		if (it != this->extension_items.end())
-			return debug_cast<T>(it->second);
+			return anope_dynamic_static_cast<T>(it->second);
 
 		return NULL;
 	}

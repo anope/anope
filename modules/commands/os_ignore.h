@@ -62,7 +62,7 @@ Serializable* IgnoreData::unserialize(Serializable *obj, Serialize::Data &data)
 	
 	if (obj)
 	{
-		IgnoreData *ign = debug_cast<IgnoreData *>(obj);
+		IgnoreData *ign = anope_dynamic_static_cast<IgnoreData *>(obj);
 		data["mask"] >> ign->mask;
 		data["creator"] >> ign->creator;
 		data["reason"] >> ign->reason;

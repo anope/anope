@@ -27,7 +27,7 @@ class CommandMSList : public Command
 		User *u = source.u;
 
 		Anope::string param = !params.empty() ? params[0] : "", chan;
-		ChannelInfo *ci;
+		ChannelInfo *ci = NULL;
 		const MemoInfo *mi;
 
 		if (!param.empty() && param[0] == '#')

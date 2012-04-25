@@ -60,7 +60,7 @@ Serializable* NewsItem::unserialize(Serializable *obj, Serialize::Data &data)
 
 	NewsItem *ni;
 	if (obj)
-		ni = debug_cast<NewsItem *>(obj);
+		ni = anope_dynamic_static_cast<NewsItem *>(obj);
 	else
 		ni = new NewsItem();
 

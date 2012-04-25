@@ -51,7 +51,7 @@ Serializable* BadWord::unserialize(Serializable *obj, Serialize::Data &data)
 	BadWord *bw;
 	if (obj)
 	{
-		bw = debug_cast<BadWord *>(obj);
+		bw = anope_dynamic_static_cast<BadWord *>(obj);
 		data["word"] >> bw->word;
 		bw->type = static_cast<BadWordType>(n);
 	}
@@ -98,7 +98,7 @@ Serializable* AutoKick::unserialize(Serializable *obj, Serialize::Data &data)
 	NickCore *nc = findcore(data["nc"].astr());
 	if (obj)
 	{
-		ak = debug_cast<AutoKick *>(obj);
+		ak = anope_dynamic_static_cast<AutoKick *>(obj);
 		data["creator"] >> ak->creator;
 		data["reason"] >> ak->reason;
 		ak->nc = findcore(data["nc"].astr());
@@ -167,7 +167,7 @@ Serializable* ModeLock::unserialize(Serializable *obj, Serialize::Data &data)
 	ModeLock *ml;
 	if (obj)
 	{
-		ml = debug_cast<ModeLock *>(obj);
+		ml = anope_dynamic_static_cast<ModeLock *>(obj);
 
 		data["set"] >> ml->set;
 		ml->name = name;
@@ -224,7 +224,7 @@ Serializable* LogSetting::unserialize(Serializable *obj, Serialize::Data &data)
 	
 	LogSetting *ls;
 	if (obj)
-		ls = debug_cast<LogSetting *>(obj);
+		ls = anope_dynamic_static_cast<LogSetting *>(obj);
 	else
 	{
 		ls = new LogSetting();
@@ -433,7 +433,7 @@ Serializable* ChannelInfo::unserialize(Serializable *obj, Serialize::Data &data)
 {
 	ChannelInfo *ci;
 	if (obj)
-		ci = debug_cast<ChannelInfo *>(obj);
+		ci = anope_dynamic_static_cast<ChannelInfo *>(obj);
 	else
 		ci = new ChannelInfo(data["name"].astr());
 

@@ -72,7 +72,7 @@ Serializable* Exception::unserialize(Serializable *obj, Serialize::Data &data)
 
 	Exception *ex;
 	if (obj)
-		ex = debug_cast<Exception *>(obj);
+		ex = anope_dynamic_static_cast<Exception *>(obj);
 	else
 		ex = new Exception;
 	data["mask"] >> ex->mask;

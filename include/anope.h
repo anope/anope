@@ -596,22 +596,34 @@ template<typename T> inline T convertTo(const Anope::string &s, bool failIfLefto
 	return x;
 }
 
-/** Debug cast to be used instead of dynamic_cast, this uses dynamic_cast
- * for debug builds and static_cast on releass builds to speed up the program
- * because dynamic_cast relies on RTTI.
+/** Casts to be used instead of dynamic_cast, this uses dynamic_cast
+ * for debug builds and static_cast/reinterpret_cast on releass builds
+ * to speed up the program because dynamic_cast relies on RTTI.
  */
 #ifdef DEBUG_BUILD
 # include <typeinfo>
 #endif
-template<typename T, typename O> inline T debug_cast(O ptr)
+template<typename T, typename O> inline T anope_dynamic_static_cast(O ptr)
 {
 #ifdef DEBUG_BUILD
 	T ret = dynamic_cast<T>(ptr);
 	if (ptr != NULL && ret == NULL)
-		throw CoreException(Anope::string("debug_cast<") + typeid(T).name() + ">(" + typeid(O).name() + ") fail");
+		throw CoreException(Anope::string("anope_dynamic_static_cast<") + typeid(T).name() + ">(" + typeid(O).name() + ") fail");
 	return ret;
 #else
 	return static_cast<T>(ptr);
+#endif
+}
+
+template<typename T, typename O> inline T anope_dynamic_reinterpret_cast(O ptr)
+{
+#ifdef DEBUG_BUILD
+	T ret = dynamic_cast<T>(ptr);
+	if (ptr != NULL && ret == NULL)
+		throw CoreException(Anope::string("anope_dynamic_reinterpret_cast<") + typeid(T).name() + ">(" + typeid(O).name() + ") fail");
+	return ret;
+#else
+	return reinterpret_cast<T>(ptr);
 #endif
 }
 

@@ -39,8 +39,8 @@ class CommandMSCancel : public Command
 			source.Reply(ischan ? CHAN_X_NOT_REGISTERED : _(NICK_X_NOT_REGISTERED), nname.c_str());
 		else
 		{
-			ChannelInfo *ci;
-			NickAlias *na;
+			ChannelInfo *ci = NULL;
+			NickAlias *na = NULL;
 			if (ischan)
 				ci = cs_findchan(nname);
 			else

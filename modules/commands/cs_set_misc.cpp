@@ -47,7 +47,7 @@ struct CSMiscData : ExtensibleItem, Serializable
 		CSMiscData *d;
 		if (obj)
 		{
-			d = debug_cast<CSMiscData *>(obj);
+			d = anope_dynamic_static_cast<CSMiscData *>(obj);
 			d->ci = ci;
 			data["name"] >> d->name;
 			data["data"] >> d->data;

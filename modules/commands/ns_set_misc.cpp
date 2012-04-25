@@ -48,7 +48,7 @@ struct NSMiscData : ExtensibleItem, Serializable
 		NSMiscData *d;
 		if (obj)
 		{
-			d = debug_cast<NSMiscData *>(obj);
+			d = anope_dynamic_static_cast<NSMiscData *>(obj);
 			d->nc = nc;
 			data["name"] >> d->name;
 			data["data"] >> d->data;

@@ -50,7 +50,7 @@ class AccessChanAccess : public ChanAccess
 	{
 		if (access->provider->name == "access/access")
 		{
-			const AccessChanAccess *aaccess = debug_cast<const AccessChanAccess *>(access);
+			const AccessChanAccess *aaccess = anope_dynamic_static_cast<const AccessChanAccess *>(access);
 			return aaccess->level;
 		}
 		else
@@ -160,7 +160,7 @@ class CommandCSAccess : public Command
 		service_reference<AccessProvider> provider("AccessProvider", "access/access");
 		if (!provider)
 			return;
-		AccessChanAccess *access = debug_cast<AccessChanAccess *>(provider->Create());
+		AccessChanAccess *access = anope_dynamic_static_cast<AccessChanAccess *>(provider->Create());
 		access->ci = ci;
 		access->mask = mask;
 		access->creator = u->nick;

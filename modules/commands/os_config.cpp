@@ -69,63 +69,63 @@ class CommandOSConfig : public Command
 						{
 							case DT_NOSPACES:
 							{
-								ValueContainerString *vcs = debug_cast<ValueContainerString *>(v->val);
+								ValueContainerString *vcs = anope_dynamic_static_cast<ValueContainerString *>(v->val);
 								Config->ValidateNoSpaces(vi.GetValue(), v->tag, v->value);
 								vcs->Set(vi.GetValue());
 								break;
 							}
 							case DT_HOSTNAME:
 							{
-								ValueContainerString *vcs = debug_cast<ValueContainerString *>(v->val);
+								ValueContainerString *vcs = anope_dynamic_static_cast<ValueContainerString *>(v->val);
 								Config->ValidateHostname(vi.GetValue(), v->tag, v->value);
 								vcs->Set(vi.GetValue());
 								break;
 							}
 							case DT_IPADDRESS:
 							{
-								ValueContainerString *vcs = debug_cast<ValueContainerString *>(v->val);
+								ValueContainerString *vcs = anope_dynamic_static_cast<ValueContainerString *>(v->val);
 								Config->ValidateIP(vi.GetValue(), v->tag, v->value, allow_wild);
 								vcs->Set(vi.GetValue());
 								break;
 							}
 							case DT_STRING:
 							{
-								ValueContainerString *vcs = debug_cast<ValueContainerString *>(v->val);
+								ValueContainerString *vcs = anope_dynamic_static_cast<ValueContainerString *>(v->val);
 								vcs->Set(vi.GetValue());
 								break;
 							}
 							case DT_INTEGER:
 							{
 								int val = vi.GetInteger();
-								ValueContainerInt *vci = debug_cast<ValueContainerInt *>(v->val);
+								ValueContainerInt *vci = anope_dynamic_static_cast<ValueContainerInt *>(v->val);
 								vci->Set(&val, sizeof(int));
 								break;
 							}
 							case DT_UINTEGER:
 							{
 								unsigned val = vi.GetInteger();
-								ValueContainerUInt *vci = debug_cast<ValueContainerUInt *>(v->val);
+								ValueContainerUInt *vci = anope_dynamic_static_cast<ValueContainerUInt *>(v->val);
 								vci->Set(&val, sizeof(unsigned));
 								break;
 							}
 							case DT_LUINTEGER:
 							{
 								unsigned long val = vi.GetInteger();
-								ValueContainerLUInt *vci = debug_cast<ValueContainerLUInt *>(v->val);
+								ValueContainerLUInt *vci = anope_dynamic_static_cast<ValueContainerLUInt *>(v->val);
 								vci->Set(&val, sizeof(unsigned long));
 								break;
 							}
 							case DT_TIME:
 							{
 								time_t time = dotime(vi.GetValue());
-								ValueContainerTime *vci = debug_cast<ValueContainerTime *>(v->val);
+								ValueContainerTime *vci = anope_dynamic_static_cast<ValueContainerTime *>(v->val);
 								vci->Set(&time, sizeof(time_t));
 								break;
 							}
 							case DT_BOOLEAN:
 							{
 								bool val = vi.GetBool();
-								ValueContainerBool *vcb = debug_cast<ValueContainerBool *>(v->val);
+								ValueContainerBool *vcb = anope_dynamic_static_cast<ValueContainerBool *>(v->val);
 								vcb->Set(&val, sizeof(bool));
 								break;
 							}

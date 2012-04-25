@@ -22,7 +22,7 @@ class CommandCSMode : public Command
 
 		const Anope::string accesses[] = { "VOICE", "HALFOP", "OPDEOP", "PROTECT", "OWNER", "" };
 		const ChannelModeName modes[] = { CMODE_VOICE, CMODE_HALFOP, CMODE_OP, CMODE_PROTECT, CMODE_OWNER };
-		ChannelModeStatus *cms = debug_cast<ChannelModeStatus *>(cm);
+		ChannelModeStatus *cms = anope_dynamic_static_cast<ChannelModeStatus *>(cm);
 		AccessGroup access = ci->AccessFor(u);
 		unsigned short u_level = 0;
 
@@ -32,7 +32,7 @@ class CommandCSMode : public Command
 				ChannelMode *cm2 = ModeManager::FindChannelModeByName(modes[i]);
 				if (cm2 == NULL || cm2->Type != MODE_STATUS)
 					continue;
-				ChannelModeStatus *cms2 = debug_cast<ChannelModeStatus *>(cm2);
+				ChannelModeStatus *cms2 = anope_dynamic_static_cast<ChannelModeStatus *>(cm2);
 				if (cms2->Level > u_level)
 					u_level = cms2->Level;
 			}

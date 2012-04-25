@@ -149,7 +149,7 @@ class XOPChanAccess : public ChanAccess
 	{
 		if (access->provider->name == "access/xop")
 		{
-			const XOPChanAccess *xaccess = debug_cast<const XOPChanAccess *>(access);
+			const XOPChanAccess *xaccess = anope_dynamic_static_cast<const XOPChanAccess *>(access);
 			return xaccess->type;
 		}
 		else
@@ -263,7 +263,7 @@ class XOPBase : public Command
 		service_reference<AccessProvider> provider("AccessProvider", "access/xop");
 		if (!provider)
 			return;
-		XOPChanAccess *acc = debug_cast<XOPChanAccess *>(provider->Create());
+		XOPChanAccess *acc = anope_dynamic_static_cast<XOPChanAccess *>(provider->Create());
 		acc->ci = ci;
 		acc->mask = mask;
 		acc->creator = u->nick;

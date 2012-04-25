@@ -116,7 +116,7 @@ Serializable* ChanAccess::unserialize(Serializable *obj, Serialize::Data &data)
 
 	ChanAccess *access;
 	if (obj)
-		access = debug_cast<ChanAccess *>(obj);
+		access = anope_dynamic_static_cast<ChanAccess *>(obj);
 	else
 		access = const_cast<ChanAccess *>(aprovider->Create());
 	access->provider = aprovider;

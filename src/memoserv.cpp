@@ -50,7 +50,7 @@ Serializable* Memo::unserialize(Serializable *obj, Serialize::Data &data)
 
 	Memo *m;
 	if (obj)
-		m = debug_cast<Memo *>(obj);
+		m = anope_dynamic_static_cast<Memo *>(obj);
 	else
 		m = new Memo();
 	data["owner"] >> m->owner;

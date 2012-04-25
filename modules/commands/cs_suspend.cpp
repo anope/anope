@@ -50,7 +50,7 @@ struct ChanSuspend : ExtensibleItem, Serializable
 
 		ChanSuspend *cs;
 		if (obj)
-			cs = debug_cast<ChanSuspend *>(obj);
+			cs = anope_dynamic_static_cast<ChanSuspend *>(obj);
 		else
 			cs = new ChanSuspend();
 		

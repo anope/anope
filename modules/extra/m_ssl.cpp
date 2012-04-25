@@ -228,7 +228,7 @@ ClientSocket *SSLSocketIO::Accept(ListenSocket *s)
 
 	ClientSocket *newsocket = s->OnAccept(newsock, conaddr);
 	me->service.Init(newsocket);
-	SSLSocketIO *IO = debug_cast<SSLSocketIO *>(newsocket->IO);
+	SSLSocketIO *IO = anope_dynamic_static_cast<SSLSocketIO *>(newsocket->IO);
 
 	IO->sslsock = SSL_new(server_ctx);
 	if (!IO->sslsock)
@@ -254,7 +254,7 @@ SocketFlag SSLSocketIO::FinishAccept(ClientSocket *cs)
 	else if (!cs->HasFlag(SF_ACCEPTING))
 		throw SocketException("SSLSocketIO::FinishAccept called for a socket not accepted nor accepting?");
 
-	SSLSocketIO *IO = debug_cast<SSLSocketIO *>(cs->IO);
+	SSLSocketIO *IO = anope_dynamic_static_cast<SSLSocketIO *>(cs->IO);
 	
 	int ret = SSL_accept(IO->sslsock);
 	if (ret <= 0)
@@ -323,7 +323,7 @@ SocketFlag SSLSocketIO::FinishConnect(ConnectionSocket *s)
 	else if (!s->HasFlag(SF_CONNECTING))
 		throw SocketException("SSLSocketIO::FinishConnect called for a socket not connected nor connecting?");
 
-	SSLSocketIO *IO = debug_cast<SSLSocketIO *>(s->IO);
+	SSLSocketIO *IO = anope_dynamic_static_cast<SSLSocketIO *>(s->IO);
 
 	if (IO->sslsock == NULL)
 	{

@@ -293,7 +293,7 @@ class OSDefcon : public Module
 
 					if (cm->Type == MODE_PARAM)
 					{
-						cmp = debug_cast<ChannelModeParam *>(cm);
+						cmp = anope_dynamic_static_cast<ChannelModeParam *>(cm);
 
 						if (!ss.GetToken(param))
 						{

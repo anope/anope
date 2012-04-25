@@ -60,7 +60,7 @@ Serializable* ForbidData::unserialize(Serializable *obj, Serialize::Data &data)
 
 	ForbidData *fb;
 	if (obj)
-		fb = debug_cast<ForbidData *>(obj);
+		fb = anope_dynamic_static_cast<ForbidData *>(obj);
 	else
 		fb = new ForbidData;
 

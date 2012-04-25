@@ -112,7 +112,7 @@ Anope::string ChannelStatus::BuildModePrefixList() const
 
 		if (this->HasFlag(cm->Name))
 		{
-			ChannelModeStatus *cms = debug_cast<ChannelModeStatus *>(cm);
+			ChannelModeStatus *cms = anope_dynamic_static_cast<ChannelModeStatus *>(cm);
 			ret += cms->Symbol;
 		}
 	}
@@ -302,13 +302,13 @@ void StackerInfo::AddMode(Mode *mode, bool Set, const Anope::string &Param)
 
 	if (Type == ST_CHANNEL)
 	{
-		cm = debug_cast<ChannelMode *>(mode);
+		cm = anope_dynamic_static_cast<ChannelMode *>(mode);
 		if (cm->Type == MODE_PARAM)
 			IsParam = true;
 	}
 	else if (Type == ST_USER)
 	{
-		um = debug_cast<UserMode *>(mode);
+		um = anope_dynamic_static_cast<UserMode *>(mode);
 		if (um->Type == MODE_PARAM)
 			IsParam = true;
 	}
@@ -411,12 +411,12 @@ std::list<Anope::string> ModeManager::BuildModeStrings(StackerInfo *info)
 
 		if (info->Type == ST_CHANNEL)
 		{
-			cm = debug_cast<ChannelMode *>(it->first);
+			cm = anope_dynamic_static_cast<ChannelMode *>(it->first);
 			buf += cm->ModeChar;
 		}
 		else if (info->Type == ST_USER)
 		{
-			um = debug_cast<UserMode *>(it->first);
+			um = anope_dynamic_static_cast<UserMode *>(it->first);
 			buf += um->ModeChar;
 		}
 
@@ -440,12 +440,12 @@ std::list<Anope::string> ModeManager::BuildModeStrings(StackerInfo *info)
 
 		if (info->Type == ST_CHANNEL)
 		{
-			cm = debug_cast<ChannelMode *>(it->first);
+			cm = anope_dynamic_static_cast<ChannelMode *>(it->first);
 			buf += cm->ModeChar;
 		}
 		else if (info->Type == ST_USER)
 		{
-			um = debug_cast<UserMode *>(it->first);
+			um = anope_dynamic_static_cast<UserMode *>(it->first);
 			buf += um->ModeChar;
 		}
 
@@ -478,7 +478,7 @@ void ModeManager::StackerAddInternal(const BotInfo *bi, Base *Object, Mode *mode
 	if (bi)
 		s->bi = bi;
 	else if (Type == ST_CHANNEL)
-		s->bi = debug_cast<Channel *>(Object)->ci->WhoSends();
+		s->bi = anope_dynamic_reinterpret_cast<Channel *>(Object)->ci->WhoSends();
 	else if (Type == ST_USER)
 		s->bi = NULL;
 
@@ -638,7 +638,7 @@ char ModeManager::GetStatusChar(char Value)
 		ChannelMode *cm = ModeManager::ChannelModes[i];
 		if (cm->Type == MODE_STATUS)
 		{
-			ChannelModeStatus *cms = debug_cast<ChannelModeStatus *>(cm);
+			ChannelModeStatus *cms = anope_dynamic_static_cast<ChannelModeStatus *>(cm);
 
 			if (Value == cms->Symbol)
 				return cms->ModeChar;
@@ -685,9 +685,9 @@ void ModeManager::ProcessModes()
 			Channel *c = NULL;
 
 			if (s->Type == ST_USER)
-				u = debug_cast<User *>(it->first);
+				u = anope_dynamic_reinterpret_cast<User *>(it->first);
 			else if (s->Type == ST_CHANNEL)
-				c = debug_cast<Channel *>(it->first);
+				c = anope_dynamic_reinterpret_cast<Channel *>(it->first);
 			else
 				throw CoreException("ModeManager::ProcessModes got invalid Stacker Info type");
 

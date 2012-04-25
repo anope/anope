@@ -91,7 +91,7 @@ Serializable* NickCore::unserialize(Serializable *obj, Serialize::Data &data)
 	NickCore *nc;
 
 	if (obj)
-		nc = debug_cast<NickCore *>(obj);
+		nc = anope_dynamic_static_cast<NickCore *>(obj);
 	else
 		nc = new NickCore(data["display"].astr());
 

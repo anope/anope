@@ -28,7 +28,7 @@ class CommandMSInfo : public Command
 
 		const MemoInfo *mi;
 		const NickAlias *na = NULL;
-		ChannelInfo *ci;
+		ChannelInfo *ci = NULL;
 		const Anope::string &nname = !params.empty() ? params[0] : "";
 		int hardmax = 0;
 

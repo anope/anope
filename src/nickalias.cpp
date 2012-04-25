@@ -281,7 +281,7 @@ Serializable* NickAlias::unserialize(Serializable *obj, Serialize::Data &data)
 
 	NickAlias *na;
 	if (obj)
-		na = debug_cast<NickAlias *>(obj);
+		na = anope_dynamic_static_cast<NickAlias *>(obj);
 	else
 		na = new NickAlias(data["nick"].astr(), core);
 

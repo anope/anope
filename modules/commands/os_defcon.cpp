@@ -534,7 +534,7 @@ class OSDefcon : public Module
 			return;
 		}
 
-		if (!DConfig.sessionlimit)
+		if (!DConfig.sessionlimit || !session_service)
 			return;
 
 		Session *session = session_service->FindSession(u->host);

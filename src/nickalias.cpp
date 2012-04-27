@@ -69,7 +69,7 @@ NickAlias::~NickAlias()
 			this->nc->aliases.erase(it);
 		if (this->nc->aliases.empty())
 		{
-			delete this->nc;
+			this->nc->destroy();
 			this->nc = NULL;
 		}
 		else

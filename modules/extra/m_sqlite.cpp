@@ -48,7 +48,7 @@ class SQLiteService : public SQLProvider
 
 	std::vector<SQLQuery> CreateTable(const Anope::string &table, const Serialize::Data &data) anope_override;
 
-	SQLQuery GetTables();
+	SQLQuery GetTables(const Anope::string &prefix);
 
 	Anope::string BuildQuery(const SQLQuery &q);
 };
@@ -236,9 +236,9 @@ std::vector<SQLQuery> SQLiteService::CreateTable(const Anope::string &table, con
 	return queries;
 }
 
-SQLQuery SQLiteService::GetTables()
+SQLQuery SQLiteService::GetTables(const Anope::string &prefix)
 {
-	return SQLQuery("SELECT name FROM sqlite_master WHERE type='table'");
+	return SQLQuery("SELECT name FROM sqlite_master WHERE type='table' AND name LIKE '" + prefix + "%';");
 }
 
 Anope::string SQLiteService::Escape(const Anope::string &query)

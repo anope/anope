@@ -129,6 +129,6 @@ class SQLProvider : public Service
 
 	virtual std::vector<SQLQuery> CreateTable(const Anope::string &table, const Serialize::Data &data) = 0;
 
-	virtual SQLQuery GetTables() = 0;
+	virtual SQLQuery GetTables(const Anope::string &prefix) = 0;
 };
 

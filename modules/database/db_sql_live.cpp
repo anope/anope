@@ -2,30 +2,11 @@
 #include "../extra/sql.h"
 #include "../commands/os_session.h"
 
-class MySQLInterface : public SQLInterface
-{
- public:
-	MySQLInterface(Module *o) : SQLInterface(o) { }
-
-	void OnResult(const SQLResult &r) anope_override
-	{
-		Log(LOG_DEBUG) << "SQLive successfully executed query: " << r.finished_query;
-	}
-
-	void OnError(const SQLResult &r) anope_override
-	{
-		if (!r.GetQuery().query.empty())
-			Log(LOG_DEBUG) << "Error executing query " << r.finished_query << ": " << r.GetError();
-		else
-			Log(LOG_DEBUG) << "Error executing query: " << r.GetError();
-	}
-};
-
 class DBMySQL : public Module, public Pipe
 {
  private:
-	MySQLInterface sqlinterface;
 	Anope::string engine;
+	Anope::string prefix;
 	service_reference<SQLProvider> SQL;
 	time_t lastwarn;
 	bool ro;
@@ -114,7 +95,7 @@ class DBMySQL : public Module, public Pipe
 	}
 
  public:
-	DBMySQL(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, DATABASE), sqlinterface(this), SQL("", "")
+	DBMySQL(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, DATABASE), SQL("", "")
 	{
 		this->lastwarn = 0;
 		this->ro = false;
@@ -146,12 +127,12 @@ class DBMySQL : public Module, public Pipe
 					continue;
 				working_objects.insert(obj);
 
-				SQLResult res = this->RunQueryResult(BuildInsert(obj->serialize_name(), obj->id, obj->serialize()));
+				SQLResult res = this->RunQueryResult(BuildInsert(this->prefix + obj->serialize_name(), obj->id, obj->serialize()));
 				if (res.GetID() > 0)
 					obj->id = res.GetID();
-				SerializeType *type = SerializeType::Find(obj->serialize_name());
-				if (type)
-					type->objects.erase(obj->id);
+				SerializeType *stype = SerializeType::Find(obj->serialize_name());
+				if (stype)
+					stype->objects.erase(obj->id);
 
 				working_objects.erase(obj);
 			}
@@ -176,6 +157,7 @@ class DBMySQL : public Module, public Pipe
 		ConfigReader config;
 		this->engine = config.ReadValue("db_sql", "engine", "", 0);
 		this->SQL = service_reference<SQLProvider>("SQLProvider", this->engine);
+		this->prefix = config.ReadValue("db_sql", "prefix", "anope_db_", 0);
 	}
 
 	void OnSerializableConstruct(Serializable *obj) anope_override
@@ -190,10 +172,10 @@ class DBMySQL : public Module, public Pipe
 	{
 		if (!this->CheckInit())	
 			return;
-		this->RunQuery("DELETE FROM `" + obj->serialize_name() + "` WHERE `id` = " + stringify(obj->id));
-		SerializeType *type = SerializeType::Find(obj->serialize_name());
-		if (type)
-			type->objects.erase(obj->id);
+		this->RunQuery("DELETE FROM `" + this->prefix + obj->serialize_name() + "` WHERE `id` = " + stringify(obj->id));
+		SerializeType *stype = SerializeType::Find(obj->serialize_name());
+		if (stype)
+			stype->objects.erase(obj->id);
 	}
 
 	void OnSerializePtrAssign(Serializable *obj) anope_override
@@ -206,7 +188,7 @@ class DBMySQL : public Module, public Pipe
 			return;
 		obj->UpdateCache();
 
-		SQLResult res = this->RunQueryResult("SELECT * FROM `" + obj->serialize_name() + "` WHERE `id` = " + stringify(obj->id));
+		SQLResult res = this->RunQueryResult("SELECT * FROM `" + this->prefix + obj->serialize_name() + "` WHERE `id` = " + stringify(obj->id));
 
 		if (res.Rows() == 0)
 			obj->destroy();
@@ -232,12 +214,12 @@ class DBMySQL : public Module, public Pipe
 		}
 	}
 
-	void OnSerializeCheck(SerializeType *obj)
+	void OnSerializeCheck(SerializeType *obj) anope_override
 	{
 		if (!this->CheckInit() || obj->GetTimestamp() == Anope::CurTime)
 			return;
 
-		SQLQuery query("SELECT * FROM `" + obj->GetName() + "` WHERE (`timestamp` > FROM_UNIXTIME(@ts@) OR `timestamp` IS NULL)");
+		SQLQuery query("SELECT * FROM `" + this->prefix + obj->GetName() + "` WHERE (`timestamp` > FROM_UNIXTIME(@ts@) OR `timestamp` IS NULL)");
 		query.setValue("ts", obj->GetTimestamp());
 
 		obj->UpdateTimestamp();
@@ -295,12 +277,12 @@ class DBMySQL : public Module, public Pipe
 
 		if (clear_null)
 		{
-			query = "DELETE FROM `" + obj->GetName() + "` WHERE `timestamp` IS NULL";
+			query = "DELETE FROM `" + this->prefix + obj->GetName() + "` WHERE `timestamp` IS NULL";
 			this->RunQuery(query);
 		}
 	}
 
-	void OnSerializableUpdate(Serializable *obj)
+	void OnSerializableUpdate(Serializable *obj) anope_override
 	{
 		this->updated_items.insert(obj);
 		this->Notify();

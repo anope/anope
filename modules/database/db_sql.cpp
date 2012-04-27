@@ -30,38 +30,66 @@ class SQLSQLInterface : public SQLInterface
 	}
 };
 
-class DBSQL : public Module
+class ResultSQLSQLInterface : public SQLSQLInterface
+{
+	dynamic_reference<Serializable> obj;
+
+public:
+	ResultSQLSQLInterface(Module *o, Serializable *ob) : SQLSQLInterface(o), obj(ob) { }
+
+	void OnResult(const SQLResult &r) anope_override
+	{
+		SQLSQLInterface::OnResult(r);
+		if (r.GetID() > 0 && this->obj)
+			this->obj->id = r.GetID();
+		delete this;
+	}
+
+	void OnError(const SQLResult &r) anope_override
+	{
+		SQLSQLInterface::OnError(r);
+		delete this;
+	}
+};
+
+class DBSQL : public Module, public Pipe
 {
 	service_reference<SQLProvider> sql;
 	SQLSQLInterface sqlinterface;
+	Anope::string prefix;
+	std::set<dynamic_reference<Serializable> > updated_items;
+	bool quitting;
 
-	void RunBackground(const SQLQuery &q)
+	void RunBackground(const SQLQuery &q, SQLInterface *iface = NULL)
 	{
-		if (!quitting)
-			this->sql->Run(&sqlinterface, q);
+		if (!this->sql)
+		{
+			static time_t last_warn = 0;
+			if (last_warn + 300 < Anope::CurTime)
+			{
+				last_warn = Anope::CurTime;
+				Log() << "db_sql: Unable to execute query, is SQL configured correctly?";
+			}
+		}
+		else if (!this->quitting)
+		{
+			if (iface == NULL)
+				iface = &this->sqlinterface;
+			this->sql->Run(iface, q);
+		}
 		else
 			this->sql->RunQuery(q);
 	}
 
-	void DropTable(const Anope::string &table)
+	SQLQuery BuildInsert(const Anope::string &table, const Serialize::Data &data)
 	{
-		SQLQuery query("DROP TABLE `" + table + "`");
-		this->RunBackground(query);
-	}
-
-	void DropAll()
-	{
-		SQLResult r = this->sql->RunQuery(this->sql->GetTables());
-		for (int i = 0; i < r.Rows(); ++i)
+		if (this->sql)
 		{
-			const std::map<Anope::string, Anope::string> &map = r.Row(i);
-			for (std::map<Anope::string, Anope::string>::const_iterator it = map.begin(); it != map.end(); ++it)
-				this->DropTable(it->second);
+			std::vector<SQLQuery> create_queries = this->sql->CreateTable(table, data);
+			for (unsigned i = 0; i < create_queries.size(); ++i)
+				this->RunBackground(create_queries[i]);
 		}
-	}
 
-	void Insert(const Anope::string &table, const Serialize::Data &data)
-	{
 		Anope::string query_text = "INSERT INTO `" + table + "` (";
 		for (Serialize::Data::const_iterator it = data.begin(), it_end = data.end(); it != it_end; ++it)
 			query_text += "`" + it->first + "`,";
@@ -76,18 +104,44 @@ class DBSQL : public Module
 		for (Serialize::Data::const_iterator it = data.begin(), it_end = data.end(); it != it_end; ++it)
 			query.setValue(it->first, it->second.astr());
 
-		this->RunBackground(query);
+		return query;
 	}
 	
  public:
-	DBSQL(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, DATABASE), sql("", ""), sqlinterface(this)
+	DBSQL(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, DATABASE), sql("", ""), sqlinterface(this), quitting(false)
 	{
 		this->SetAuthor("Anope");
 
-		Implementation i[] = { I_OnReload, I_OnSaveDatabase, I_OnLoadDatabase };
+		Implementation i[] = { I_OnReload, I_OnLoadDatabase, I_OnSerializableConstruct, I_OnSerializableDestruct, I_OnSerializableUpdate };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 
 		this->OnReload();
+	}
+	
+	~DBSQL()
+	{
+		this->quitting = true;
+		this->OnNotify();
+	}
+
+	void OnNotify() anope_override
+	{
+		for (std::set<dynamic_reference<Serializable> >::iterator it = this->updated_items.begin(), it_end = this->updated_items.end(); it != it_end; ++it)
+		{
+			dynamic_reference<Serializable> obj = *it;
+
+			if (obj)
+			{
+				if (obj->IsCached())
+					continue;
+				obj->UpdateCache();
+
+				SQLQuery insert = this->BuildInsert(this->prefix + obj->serialize_name(), obj->serialize());
+				this->RunBackground(insert, new ResultSQLSQLInterface(this, obj));
+			}
+		}
+
+		this->updated_items.clear();
 	}
 
 	void OnReload() anope_override
@@ -95,38 +149,7 @@ class DBSQL : public Module
 		ConfigReader config;
 		Anope::string engine = config.ReadValue("db_sql", "engine", "", 0);
 		this->sql = service_reference<SQLProvider>("SQLProvider", engine);
-	}
-
-	EventReturn OnSaveDatabase() anope_override
-	{
-		if (!this->sql)
-		{
-			Log() << "db_sql: Unable to save databases, is SQL configured correctly?";
-			return EVENT_CONTINUE;
-		}
-
-		const std::list<Serializable *> &items = Serializable::GetItems();
-		if (items.empty())
-			return EVENT_CONTINUE;
-
-		this->DropAll();
-
-		for (std::list<Serializable *>::const_iterator it = items.begin(), it_end = items.end(); it != it_end; ++it)
-		{
-			Serializable *base = *it;
-			Serialize::Data data = base->serialize();
-
-			if (data.empty())
-				continue;
-
-			std::vector<SQLQuery> create_queries = this->sql->CreateTable(base->serialize_name(), data);
-			for (unsigned i = 0; i < create_queries.size(); ++i)
-				this->RunBackground(create_queries[i]);
-
-			this->Insert(base->serialize_name(), data);
-		}
-
-		return EVENT_CONTINUE;
+		this->prefix = config.ReadValue("db_sql", "prefix", "anope_db_", 0);
 	}
 
 	EventReturn OnLoadDatabase() anope_override
@@ -142,11 +165,13 @@ class DBSQL : public Module
 		{
 			SerializeType *sb = SerializeType::Find(type_order[i]);
 
-			SQLQuery query("SELECT * FROM `" + sb->GetName() + "`");
+			SQLQuery query("SELECT * FROM `" + this->prefix + sb->GetName() + "`");
 			SQLResult res = this->sql->RunQuery(query);
+
 			for (int j = 0; j < res.Rows(); ++j)
 			{
 				Serialize::Data data;
+
 				const std::map<Anope::string, Anope::string> &row = res.Row(j);
 				for (std::map<Anope::string, Anope::string>::const_iterator rit = row.begin(), rit_end = row.end(); rit != rit_end; ++rit)
 					data[rit->first] << rit->second;
@@ -156,6 +181,23 @@ class DBSQL : public Module
 		}
 
 		return EVENT_STOP;
+	}
+
+	void OnSerializableConstruct(Serializable *obj) anope_override
+	{
+		this->updated_items.insert(obj);
+		this->Notify();
+	}
+
+	void OnSerializableDestruct(Serializable *obj) anope_override
+	{
+		this->RunBackground("DELETE FROM `" + this->prefix + obj->serialize_name() + "` WHERE `id` = " + stringify(obj->id));
+	}
+
+	void OnSerializableUpdate(Serializable *obj) anope_override
+	{
+		this->updated_items.insert(obj);
+		this->Notify();
 	}
 };
 

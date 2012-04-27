@@ -66,7 +66,7 @@ class MChanstats : public Module
 		if (!sql)
 			return;
 
-		SQLResult r = this->sql->RunQuery(this->sql->GetTables());
+		SQLResult r = this->sql->RunQuery(this->sql->GetTables("anope_bs_"));
 		for (int i = 0; i < r.Rows(); ++i)
 		{
 			const std::map<Anope::string, Anope::string> &map = r.Row(i);

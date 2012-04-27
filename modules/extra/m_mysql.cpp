@@ -127,7 +127,7 @@ class MySQLService : public SQLProvider
 
 	std::vector<SQLQuery> CreateTable(const Anope::string &table, const Serialize::Data &data) anope_override;
 
-	SQLQuery GetTables() anope_override;
+	SQLQuery GetTables(const Anope::string &prefix) anope_override;
 
 	void Connect();
 
@@ -391,9 +391,9 @@ std::vector<SQLQuery> MySQLService::CreateTable(const Anope::string &table, cons
 	return queries;
 }
 
-SQLQuery MySQLService::GetTables()
+SQLQuery MySQLService::GetTables(const Anope::string &prefix)
 {
-	return SQLQuery("SHOW TABLES");
+	return SQLQuery("SHOW TABLES LIKE '" + prefix + "%';");
 }
 
 void MySQLService::Connect()

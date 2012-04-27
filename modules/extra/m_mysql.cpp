@@ -53,7 +53,7 @@ class MySQLResult : public SQLResult
 	{
 		unsigned num_fields = res ? mysql_num_fields(res) : 0;
 
-		Log(LOG_DEBUG) << "SQL query " << this->finished_query << " returned " << num_fields << " fields";
+		/* It is not thread safe to log anything here using Log() now :( */
 
 		if (!num_fields)
 			return;
@@ -68,7 +68,6 @@ class MySQLResult : public SQLResult
 
 				for (unsigned field_count = 0; field_count < num_fields; ++field_count)
 				{
-					Log(LOG_DEBUG) << "Field count " << field_count << " name is: " << (fields[field_count].name ? fields[field_count].name : "") << ", data is: " << (row[field_count] ? row[field_count] : "");
 					Anope::string column = (fields[field_count].name ? fields[field_count].name : "");
 					Anope::string data = (row[field_count] ? row[field_count] : "");
 

@@ -58,7 +58,6 @@ class DBSQL : public Module, public Pipe
 	SQLSQLInterface sqlinterface;
 	Anope::string prefix;
 	std::set<dynamic_reference<Serializable> > updated_items;
-	bool quitting;
 
 	void RunBackground(const SQLQuery &q, SQLInterface *iface = NULL)
 	{
@@ -71,7 +70,7 @@ class DBSQL : public Module, public Pipe
 				Log() << "db_sql: Unable to execute query, is SQL configured correctly?";
 			}
 		}
-		else if (!this->quitting)
+		else if (!quitting)
 		{
 			if (iface == NULL)
 				iface = &this->sqlinterface;
@@ -81,7 +80,7 @@ class DBSQL : public Module, public Pipe
 			this->sql->RunQuery(q);
 	}
 
-	SQLQuery BuildInsert(const Anope::string &table, const Serialize::Data &data)
+	SQLQuery BuildInsert(const Anope::string &table, unsigned int id, const Serialize::Data &data)
 	{
 		if (this->sql)
 		{
@@ -90,15 +89,16 @@ class DBSQL : public Module, public Pipe
 				this->RunBackground(create_queries[i]);
 		}
 
-		Anope::string query_text = "INSERT INTO `" + table + "` (";
+		Anope::string query_text = "INSERT INTO `" + table + "` (`id`";
 		for (Serialize::Data::const_iterator it = data.begin(), it_end = data.end(); it != it_end; ++it)
-			query_text += "`" + it->first + "`,";
-		query_text.erase(query_text.end() - 1);
-		query_text += ") VALUES (";
+			query_text += ",`" + it->first + "`";
+		query_text += ") VALUES (" + stringify(id);
 		for (Serialize::Data::const_iterator it = data.begin(), it_end = data.end(); it != it_end; ++it)
-			query_text += "@" + it->first + "@,";
+			query_text += ",@" + it->first + "@";
+		query_text += ") ON DUPLICATE KEY UPDATE ";
+		for (Serialize::Data::const_iterator it = data.begin(), it_end = data.end(); it != it_end; ++it)
+			query_text += "`" + it->first + "`=VALUES(`" + it->first + "`),";
 		query_text.erase(query_text.end() - 1);
-		query_text += ")";
 
 		SQLQuery query(query_text);
 		for (Serialize::Data::const_iterator it = data.begin(), it_end = data.end(); it != it_end; ++it)
@@ -108,7 +108,7 @@ class DBSQL : public Module, public Pipe
 	}
 	
  public:
-	DBSQL(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, DATABASE), sql("", ""), sqlinterface(this), quitting(false)
+	DBSQL(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, DATABASE), sql("", ""), sqlinterface(this)
 	{
 		this->SetAuthor("Anope");
 
@@ -118,12 +118,6 @@ class DBSQL : public Module, public Pipe
 		this->OnReload();
 	}
 	
-	~DBSQL()
-	{
-		this->quitting = true;
-		this->OnNotify();
-	}
-
 	void OnNotify() anope_override
 	{
 		for (std::set<dynamic_reference<Serializable> >::iterator it = this->updated_items.begin(), it_end = this->updated_items.end(); it != it_end; ++it)
@@ -136,7 +130,7 @@ class DBSQL : public Module, public Pipe
 					continue;
 				obj->UpdateCache();
 
-				SQLQuery insert = this->BuildInsert(this->prefix + obj->serialize_name(), obj->serialize());
+				SQLQuery insert = this->BuildInsert(this->prefix + obj->serialize_name(), obj->id, obj->serialize());
 				this->RunBackground(insert, new ResultSQLSQLInterface(this, obj));
 			}
 		}
@@ -176,7 +170,16 @@ class DBSQL : public Module, public Pipe
 				for (std::map<Anope::string, Anope::string>::const_iterator rit = row.begin(), rit_end = row.end(); rit != rit_end; ++rit)
 					data[rit->first] << rit->second;
 
-				sb->Unserialize(NULL, data);
+				Serializable *obj = sb->Unserialize(NULL, data);
+				try
+				{
+					if (obj)
+						obj->id = convertTo<unsigned int>(res.Get(j, "id"));
+				}
+				catch (const ConvertException &)
+				{
+					Log() << "db_sql: Unable to convert id for object #" << j << " of type " << sb->GetName();
+				}
 			}
 		}
 

@@ -1284,11 +1284,6 @@ ConfigItems::ConfigItems(ServerConfig *conf)
 	/* These tags can occur multiple times, and therefore they have special code to read them
 	 * which is different to the code for reading the singular tags listed above. */
 	MultiItem MultiItems[] = {
-		{"define",
-			{"name", "value", ""},
-			{"", "", ""},
-			{DT_STRING, DT_STRING},
-			InitDefine, DoDefine, DoneDefine},
 		/* Include must be first so we can pull in the extra files before processing
 		 * anything else! */
 		{"include",
@@ -1296,6 +1291,11 @@ ConfigItems::ConfigItems(ServerConfig *conf)
 			{"", "", ""},
 			{DT_STRING, DT_STRING},
 			InitInclude, DoInclude, DoneInclude},
+		{"define",
+			{"name", "value", ""},
+			{"", "", ""},
+			{DT_STRING, DT_STRING},
+			InitDefine, DoDefine, DoneDefine},
 		{"uplink",
 			{"host", "ipv6", "port", "password", ""},
 			{"", "no", "0", "", ""},

@@ -392,6 +392,9 @@ class CoreExport ServerConfig
 	/* Max lenght of hostnames */
 	unsigned HostLen;
 
+	/* Casemapping to use */
+	Anope::string CaseMap;
+
 	/* Max length of passwords */
 	unsigned PassLen;
 

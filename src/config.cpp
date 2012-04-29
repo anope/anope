@@ -16,6 +16,7 @@
 #include "access.h"
 #include "opertype.h"
 #include "channels.h"
+#include "hashcomp.h"
 
 /*************************************************************************/
 
@@ -195,6 +196,22 @@ ServerConfig::ServerConfig() : config_data(), NSDefFlags(NickCoreFlagStrings), C
 		{
 			Log() << "Unable to find nameserver, defaulting to 127.0.0.1";
 			this->NameServer = "127.0.0.1";
+		}
+	}
+
+	if (this->CaseMap == "ascii")
+		Anope::casemap = std::locale(std::locale(), new Anope::ascii_ctype<char>());
+	else if (this->CaseMap == "rfc1459")
+		Anope::casemap = std::locale(std::locale(), new Anope::rfc1459_ctype<char>());
+	else
+	{
+		try
+		{
+			Anope::casemap = std::locale(this->CaseMap.c_str());
+		}
+		catch (const std::runtime_error &)
+		{
+			Log() << "Unknown casemap " << this->CaseMap << " - casemap not changed";
 		}
 	}
 }
@@ -1149,6 +1166,7 @@ ConfigItems::ConfigItems(ServerConfig *conf)
 		{"networkinfo", "nicklen", "31", new ValueContainerUInt(&conf->NickLen), DT_UINTEGER | DT_NORELOAD, ValidateNickLen},
 		{"networkinfo", "userlen", "10", new ValueContainerUInt(&conf->UserLen), DT_UINTEGER | DT_NORELOAD, NoValidation},
 		{"networkinfo", "hostlen", "64", new ValueContainerUInt(&conf->HostLen), DT_UINTEGER | DT_NORELOAD, NoValidation},
+		{"options", "casemap", "ascii", new ValueContainerString(&conf->CaseMap), DT_STRING, NoValidation},
 		{"options", "passlen", "32", new ValueContainerUInt(&conf->PassLen), DT_UINTEGER | DT_NORELOAD, NoValidation},
 		{"options", "seed", "0", new ValueContainerLUInt(&conf->Seed), DT_LUINTEGER, NoValidation},
 		{"options", "nobackupokay", "no", new ValueContainerBool(&conf->NoBackupOkay), DT_BOOLEAN, NoValidation},

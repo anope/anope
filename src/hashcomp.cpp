@@ -12,89 +12,47 @@
 #include "hashcomp.h"
 #include "anope.h"
 
+/* Case map in use by Anope */
+std::locale Anope::casemap = std::locale(std::locale(), new Anope::ascii_ctype<char>());
+
 /*
  *
- * This is an implementation of two special string classes:
- *
- * irc::string which is a case-insensitive equivalent to
- * std::string which is not only case-insensitive but
- * can also do scandanavian comparisons, e.g. { = [, etc.
- *
- * ci::string which is a case-insensitive equivalent to
- * std::string.
- *
- * These classes depend on rfc_case_insensitive_map and
- * ascii_case_insensitive_map
+ * This is an implementation of a special string class, ci::string,
+ * which is a case-insensitive equivalent to std::string.
  *
  */
  
-bool irc::irc_char_traits::eq(char c1st, char c2nd)
-{
-	return rfc_case_insensitive_map[static_cast<unsigned char>(c1st)] == rfc_case_insensitive_map[static_cast<unsigned char>(c2nd)];
-}
-
-bool irc::irc_char_traits::ne(char c1st, char c2nd)
-{
-	return rfc_case_insensitive_map[static_cast<unsigned char>(c1st)] != rfc_case_insensitive_map[static_cast<unsigned char>(c2nd)];
-}
-
-bool irc::irc_char_traits::lt(char c1st, char c2nd)
-{
-	return rfc_case_insensitive_map[static_cast<unsigned char>(c1st)] < rfc_case_insensitive_map[static_cast<unsigned char>(c2nd)];
-}
-
-int irc::irc_char_traits::compare(const char *str1, const char *str2, size_t n)
-{
-	for (unsigned i = 0; i < n; ++i)
-	{
-		if (rfc_case_insensitive_map[static_cast<unsigned char>(*str1)] > rfc_case_insensitive_map[static_cast<unsigned char>(*str2)])
-			return 1;
-
-		if (rfc_case_insensitive_map[static_cast<unsigned char>(*str1)] < rfc_case_insensitive_map[static_cast<unsigned char>(*str2)])
-			return -1;
-
-		if (!*str1 || !*str2)
-			return 0;
-
-		++str1;
-		++str2;
-	}
-	return 0;
-}
-
-const char *irc::irc_char_traits::find(const char *s1, int n, char c)
-{
-	while (n-- > 0 && rfc_case_insensitive_map[static_cast<unsigned char>(*s1)] != rfc_case_insensitive_map[static_cast<unsigned char>(c)])
-		++s1;
-	return n >= 0 ? s1 : NULL;
-}
-
 bool ci::ci_char_traits::eq(char c1st, char c2nd)
 {
-	return ascii_case_insensitive_map[static_cast<unsigned char>(c1st)] == ascii_case_insensitive_map[static_cast<unsigned char>(c2nd)];
+	const std::ctype<char> &ct = std::use_facet<std::ctype<char> >(Anope::casemap);
+	return ct.toupper(c1st) == ct.toupper(c2nd);
 }
 
 bool ci::ci_char_traits::ne(char c1st, char c2nd)
 {
-	return ascii_case_insensitive_map[static_cast<unsigned char>(c1st)] != ascii_case_insensitive_map[static_cast<unsigned char>(c2nd)];
+	const std::ctype<char> &ct = std::use_facet<std::ctype<char> >(Anope::casemap);
+	return ct.toupper(c1st) != ct.toupper(c2nd);
 }
 
 bool ci::ci_char_traits::lt(char c1st, char c2nd)
 {
-	return ascii_case_insensitive_map[static_cast<unsigned char>(c1st)] < ascii_case_insensitive_map[static_cast<unsigned char>(c2nd)];
+	const std::ctype<char> &ct = std::use_facet<std::ctype<char> >(Anope::casemap);
+	return ct.toupper(c1st) < ct.toupper(c2nd);
 }
 
 int ci::ci_char_traits::compare(const char *str1, const char *str2, size_t n)
 {
+	const std::ctype<char> &ct = std::use_facet<std::ctype<char> >(Anope::casemap);
+
 	for (unsigned i = 0; i < n; ++i)
 	{
-		if (ascii_case_insensitive_map[static_cast<unsigned char>(*str1)] > ascii_case_insensitive_map[static_cast<unsigned char>(*str2)])
+		register char c1 = ct.toupper(*str1), c2 = ct.toupper(*str2);
+
+		if (c1 > c2)
 			return 1;
-
-		if (ascii_case_insensitive_map[static_cast<unsigned char>(*str1)] < ascii_case_insensitive_map[static_cast<unsigned char>(*str2)])
+		else if (c1 < c2)
 			return -1;
-
-		if (!*str1 || !*str2)
+		else if (!c1 || !c2)
 			return 0;
 
 		++str1;
@@ -105,7 +63,9 @@ int ci::ci_char_traits::compare(const char *str1, const char *str2, size_t n)
 
 const char *ci::ci_char_traits::find(const char *s1, int n, char c)
 {
-	while (n-- > 0 && ascii_case_insensitive_map[static_cast<unsigned char>(*s1)] != ascii_case_insensitive_map[static_cast<unsigned char>(c)])
+	const std::ctype<char> &ct = std::use_facet<std::ctype<char> >(Anope::casemap);
+	register char c_u = ct.toupper(c);
+	while (n-- > 0 && ct.toupper(*s1) != c_u)
 		++s1;
 	return n >= 0 ? s1 : NULL;
 }
@@ -118,16 +78,6 @@ const char *ci::ci_char_traits::find(const char *s1, int n, char c)
 bool ci::less::operator()(const Anope::string &s1, const Anope::string &s2) const
 {
 	return s1.ci_str().compare(s2.ci_str()) < 0;
-}
-
-/** Compare two Anope::strings as irc::strings and find which one is les
- * @param s1 The first string
- * @param s2 The second string
- * @return true if s1 < s2, else false
- */
-bool irc::less::operator()(const Anope::string &s1, const Anope::string &s2) const
-{
-	return s1.irc_str().compare(s2.irc_str()) < 0;
 }
 
 sepstream::sepstream(const Anope::string &source, char seperator) : tokens(source), sep(seperator)

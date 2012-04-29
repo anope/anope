@@ -28,7 +28,7 @@ namespace Anope
 	 private:
 		/**
 		 * The actual string is stored in an std::string as it can be converted to
-		 * ci::string, irc::string, or a C-style string at any time.
+		 * ci::string, or a C-style string at any time.
 		 */
 		std::string _string;
 	 public:
@@ -51,7 +51,6 @@ namespace Anope
 		string(const char *_str) : _string(_str) { }
 		string(const std::string &_str) : _string(_str) { }
 		string(const ci::string &_str) : _string(_str.c_str()) { }
-		string(const irc::string &_str) : _string(_str.c_str()) { }
 		string(const string &_str, size_type pos = 0, size_type n = npos) : _string(_str._string, pos, n) { }
 		template <class InputIterator> string(InputIterator first, InputIterator last) : _string(first, last) { }
 
@@ -61,8 +60,6 @@ namespace Anope
 		inline string &operator=(char chr) { this->_string = chr; return *this; }
 		inline string &operator=(const char *_str) { this->_string = _str; return *this; }
 		inline string &operator=(const std::string &_str) { this->_string = _str; return *this; }
-		inline string &operator=(const ci::string &_str) { this->_string = _str.c_str(); return *this; }
-		inline string &operator=(const irc::string &_str) { this->_string = _str.c_str(); return *this; }
 		inline string &operator=(const string &_str) { if (this != &_str) this->_string = _str._string; return *this; }
 
 		/**
@@ -70,35 +67,21 @@ namespace Anope
 		 */
 		inline bool operator==(const char *_str) const { return this->_string == _str; }
 		inline bool operator==(const std::string &_str) const { return this->_string == _str; }
-		inline bool operator==(const ci::string &_str) const { return ci::string(this->_string.c_str()) == _str; }
-		inline bool operator==(const irc::string &_str) const { return irc::string(this->_string.c_str()) == _str; }
 		inline bool operator==(const string &_str) const { return this->_string == _str._string; }
 
 		inline bool equals_cs(const char *_str) const { return this->_string == _str; }
 		inline bool equals_cs(const std::string &_str) const { return this->_string == _str; }
-		inline bool equals_cs(const ci::string &_str) const { return this->_string == _str.c_str(); }
-		inline bool equals_cs(const irc::string &_str) const { return this->_string == _str.c_str(); }
 		inline bool equals_cs(const string &_str) const { return this->_string == _str._string; }
 
 		inline bool equals_ci(const char *_str) const { return ci::string(this->_string.c_str()) == _str; }
 		inline bool equals_ci(const std::string &_str) const { return ci::string(this->_string.c_str()) == _str.c_str(); }
-		inline bool equals_ci(const ci::string &_str) const { return _str == this->_string.c_str(); }
-		inline bool equals_ci(const irc::string &_str) const { return ci::string(this->_string.c_str()) == _str.c_str(); }
 		inline bool equals_ci(const string &_str) const { return ci::string(this->_string.c_str()) == _str._string.c_str(); }
-
-		inline bool equals_irc(const char *_str) const { return irc::string(this->_string.c_str()) == _str; }
-		inline bool equals_irc(const std::string &_str) const { return irc::string(this->_string.c_str()) == _str.c_str(); }
-		inline bool equals_irc(const ci::string &_str) const { return irc::string(this->_string.c_str()) == _str.c_str(); }
-		inline bool equals_irc(const irc::string &_str) const { return _str == this->_string.c_str(); }
-		inline bool equals_irc(const string &_str) const { return irc::string(this->_string.c_str()) == _str._string.c_str(); }
 
 		/**
 		 * Inequality operators, exact opposites of the above.
 		 */
 		inline bool operator!=(const char *_str) const { return !operator==(_str); }
 		inline bool operator!=(const std::string &_str) const { return !operator==(_str); }
-		inline bool operator!=(const ci::string &_str) const { return !operator==(_str); }
-		inline bool operator!=(const irc::string &_str) const { return !operator==(_str); }
 		inline bool operator!=(const string &_str) const { return !operator==(_str); }
 
 		/**
@@ -107,8 +90,6 @@ namespace Anope
 		inline string &operator+=(char chr) { this->_string += chr; return *this; }
 		inline string &operator+=(const char *_str) { this->_string += _str; return *this; }
 		inline string &operator+=(const std::string &_str) { this->_string += _str; return *this; }
-		inline string &operator+=(const ci::string &_str) { this->_string += _str.c_str(); return *this; }
-		inline string &operator+=(const irc::string &_str) { this->_string += _str.c_str(); return *this; }
 		inline string &operator+=(const string &_str) { if (this != &_str) this->_string += _str._string; return *this; }
 
 		/**
@@ -117,15 +98,11 @@ namespace Anope
 		inline const string operator+(char chr) const { return string(*this) += chr; }
 		inline const string operator+(const char *_str) const { return string(*this) += _str; }
 		inline const string operator+(const std::string &_str) const { return string(*this) += _str; }
-		inline const string operator+(const ci::string &_str) const { return string(*this) += _str; }
-		inline const string operator+(const irc::string &_str) const { return string(*this) += _str; }
 		inline const string operator+(const string &_str) const { return string(*this) += _str; }
 
 		friend const string operator+(char chr, const string &str);
 		friend const string operator+(const char *_str, const string &str);
 		friend const string operator+(const std::string &_str, const string &str);
-		friend const string operator+(const ci::string &_str, const string &str);
-		friend const string operator+(const irc::string &_str, const string &str);
 
 		/**
 		 * Less-than operator.
@@ -139,7 +116,6 @@ namespace Anope
 		inline std::string &str() { return this->_string; }
 		inline const std::string &str() const { return this->_string; }
 		inline ci::string ci_str() const { return ci::string(this->_string.c_str()); }
-		inline irc::string irc_str() const { return irc::string(this->_string.c_str()); }
 
 		/**
 		 * Returns if the string is empty or not.
@@ -260,7 +236,7 @@ namespace Anope
 		{
 			Anope::string new_string = *this;
 			for (size_type i = 0; i < new_string.length(); ++i)
-				new_string[i] = static_cast<char>(tolower(new_string[i]));
+				new_string[i] = std::tolower(new_string[i], Anope::casemap);
 			return new_string;
 		}
 
@@ -271,7 +247,7 @@ namespace Anope
 		{
 			Anope::string new_string = *this;
 			for (size_type i = 0; i < new_string.length(); ++i)
-				new_string[i] = static_cast<char>(toupper(new_string[i]));
+				new_string[i] = std::toupper(new_string[i], Anope::casemap);
 			return new_string;
 		}
 
@@ -325,8 +301,6 @@ namespace Anope
 	inline const string operator+(char chr, const string &str) { string tmp(chr); tmp += str; return tmp; }
 	inline const string operator+(const char *_str, const string &str) { string tmp(_str); tmp += str; return tmp; }
 	inline const string operator+(const std::string &_str, const string &str) { string tmp(_str); tmp += str; return tmp; }
-	inline const string operator+(const ci::string &_str, const string &str) { string tmp(_str); tmp += str; return tmp; }
-	inline const string operator+(const irc::string &_str, const string &str) { string tmp(_str); tmp += str; return tmp; }
 
 	static const char *const compiled = __TIME__ " " __DATE__;
 

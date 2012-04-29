@@ -48,6 +48,8 @@ class SQLiteService : public SQLProvider
 
 	std::vector<SQLQuery> CreateTable(const Anope::string &table, const Serialize::Data &data) anope_override;
 
+	SQLQuery BuildInsert(const Anope::string &table, unsigned int id, const Serialize::Data &data);
+
 	SQLQuery GetTables(const Anope::string &prefix);
 
 	Anope::string BuildQuery(const SQLQuery &q);
@@ -187,9 +189,23 @@ std::vector<SQLQuery> SQLiteService::CreateTable(const Anope::string &table, con
 	std::vector<SQLQuery> queries;
 	std::set<Anope::string> &known_cols = this->active_schema[table];
 
-	if (active_schema.empty())
+	if (known_cols.empty())
 	{
-		Anope::string query_text = "CREATE TABLE IF NOT EXISTS `" + table + "` (id INTEGER PRIMARY KEY, `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP, ";
+		Log(LOG_DEBUG) << "m_sqlite: Fetching columns for " << table;
+
+		SQLResult columns = this->RunQuery("PRAGMA table_info(" + table + ")");
+		for (int i = 0; i < columns.Rows(); ++i)
+		{
+			const Anope::string &column = columns.Get(i, "name");
+
+			Log(LOG_DEBUG) << "m_sqlite: Column #" << i << " for " << table << ": " << column;
+			known_cols.insert(column);
+		}
+	}
+
+	if (known_cols.empty())
+	{
+		Anope::string query_text = "CREATE TABLE `" + table + "` (`id` INTEGER PRIMARY KEY, `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP";
 
 		for (Serialize::Data::const_iterator it = data.begin(), it_end = data.end(); it != it_end; ++it)
 		{
@@ -202,15 +218,14 @@ std::vector<SQLQuery> SQLiteService::CreateTable(const Anope::string &table, con
 				query_text += "text";
 		}
 
-		query_text.erase(query_text.end() - 1);
 		query_text += ")";
 
 		queries.push_back(query_text);
 
-		query_text = "CREATE UNIQUE INDEX IF NOT EXISTS `id_idx` ON `" + table + "` (`id`)";
+		query_text = "CREATE UNIQUE INDEX `" + table + "_id_idx` ON `" + table + "` (`id`)";
 		queries.push_back(query_text);
 
-		query_text = "CREATE INDEX IF NOT EXISTS `timestamp_idx` ON `" + table + "` (`timestamp`)";
+		query_text = "CREATE INDEX `" + table + "_timestamp_idx` ON `" + table + "` (`timestamp`)";
 		queries.push_back(query_text);
 
 		query_text = "CREATE TRIGGER `" + table + "_trigger` AFTER UPDATE ON `" + table + "` FOR EACH ROW BEGIN UPDATE `" + table + "` SET `timestamp` = CURRENT_TIMESTAMP WHERE `id` = `old.id`; end;";
@@ -234,6 +249,29 @@ std::vector<SQLQuery> SQLiteService::CreateTable(const Anope::string &table, con
 		}
 
 	return queries;
+}
+
+SQLQuery SQLiteService::BuildInsert(const Anope::string &table, unsigned int id, const Serialize::Data &data)
+{
+	Anope::string query_text = "REPLACE INTO `" + table + "` (";
+	if (id > 0)
+		query_text += "`id`,";
+	for (Serialize::Data::const_iterator it = data.begin(), it_end = data.end(); it != it_end; ++it)
+		query_text += "`" + it->first + "`,";
+	query_text.erase(query_text.length() - 1);
+	query_text += ") VALUES (";
+	if (id > 0)
+		query_text += stringify(id) + ",";
+	for (Serialize::Data::const_iterator it = data.begin(), it_end = data.end(); it != it_end; ++it)
+		query_text += "@" + it->first + "@,";
+	query_text.erase(query_text.length() - 1);
+	query_text += ")";
+
+	SQLQuery query(query_text);
+	for (Serialize::Data::const_iterator it = data.begin(), it_end = data.end(); it != it_end; ++it)
+		query.setValue(it->first, it->second.astr());
+	
+	return query;
 }
 
 SQLQuery SQLiteService::GetTables(const Anope::string &prefix)

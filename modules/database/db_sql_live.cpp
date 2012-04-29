@@ -67,33 +67,6 @@ class DBMySQL : public Module, public Pipe
 		throw SQLException("No SQL!");
 	}
 
-	SQLQuery BuildInsert(const Anope::string &table, unsigned int id, const Serialize::Data &data)
-	{
-		if (this->SQL)
-		{
-			std::vector<SQLQuery> create_queries = this->SQL->CreateTable(table, data);
-			for (unsigned i = 0; i < create_queries.size(); ++i)
-				this->RunQuery(create_queries[i]);
-		}
-
-		Anope::string query_text = "INSERT INTO `" + table + "` (`id`";
-		for (Serialize::Data::const_iterator it = data.begin(), it_end = data.end(); it != it_end; ++it)
-			query_text += ",`" + it->first + "`";
-		query_text += ") VALUES (" + stringify(id);
-		for (Serialize::Data::const_iterator it = data.begin(), it_end = data.end(); it != it_end; ++it)
-			query_text += ",@" + it->first + "@";
-		query_text += ") ON DUPLICATE KEY UPDATE ";
-		for (Serialize::Data::const_iterator it = data.begin(), it_end = data.end(); it != it_end; ++it)
-			query_text += "`" + it->first + "`=VALUES(`" + it->first + "`),";
-		query_text.erase(query_text.end() - 1);
-
-		SQLQuery query(query_text);
-		for (Serialize::Data::const_iterator it = data.begin(), it_end = data.end(); it != it_end; ++it)
-			query.setValue(it->first, it->second.astr());
-
-		return query;
-	}
-
  public:
 	DBMySQL(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, DATABASE), SQL("", "")
 	{
@@ -116,7 +89,7 @@ class DBMySQL : public Module, public Pipe
 		{
 			dynamic_reference<Serializable> obj = *it;
 
-			if (obj)
+			if (obj && this->SQL)
 			{
 				if (obj->IsCached())
 					continue;
@@ -127,7 +100,13 @@ class DBMySQL : public Module, public Pipe
 					continue;
 				working_objects.insert(obj);
 
-				SQLResult res = this->RunQueryResult(BuildInsert(this->prefix + obj->serialize_name(), obj->id, obj->serialize()));
+				const Serialize::Data &data = obj->serialize();
+
+				std::vector<SQLQuery> create = this->SQL->CreateTable(this->prefix + obj->serialize_name(), data);
+				for (unsigned i = 0; i < create.size(); ++i)
+					this->RunQueryResult(create[i]);
+
+				SQLResult res = this->RunQueryResult(this->SQL->BuildInsert(this->prefix + obj->serialize_name(), obj->id, data));
 				if (res.GetID() > 0)
 					obj->id = res.GetID();
 				SerializeType *stype = SerializeType::Find(obj->serialize_name());

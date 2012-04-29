@@ -126,6 +126,8 @@ class MySQLService : public SQLProvider
 
 	std::vector<SQLQuery> CreateTable(const Anope::string &table, const Serialize::Data &data) anope_override;
 
+	SQLQuery BuildInsert(const Anope::string &table, unsigned int id, const Serialize::Data &data);
+
 	SQLQuery GetTables(const Anope::string &prefix) anope_override;
 
 	void Connect();
@@ -351,7 +353,21 @@ std::vector<SQLQuery> MySQLService::CreateTable(const Anope::string &table, cons
 
 	if (known_cols.empty())
 	{
-		Anope::string query_text = "CREATE TABLE IF NOT EXISTS `" + table + "` (`id` int(10) unsigned NOT NULL AUTO_INCREMENT,"
+		Log(LOG_DEBUG) << "m_mysql: Fetching columns for " << table;
+
+		SQLResult columns = this->RunQuery("SHOW COLUMNS FROM `" + table + "`");
+		for (int i = 0; i < columns.Rows(); ++i)
+		{
+			const Anope::string &column = columns.Get(i, "Field");
+
+			Log(LOG_DEBUG) << "m_mysql: Column #" << i << " for " << table << ": " << column;
+			known_cols.insert(column);
+		}
+	}
+
+	if (known_cols.empty())
+	{
+		Anope::string query_text = "CREATE TABLE `" + table + "` (`id` int(10) unsigned NOT NULL AUTO_INCREMENT,"
 			" `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP";
 		for (Serialize::Data::const_iterator it = data.begin(), it_end = data.end(); it != it_end; ++it)
 		{
@@ -388,6 +404,26 @@ std::vector<SQLQuery> MySQLService::CreateTable(const Anope::string &table, cons
 		}
 
 	return queries;
+}
+
+SQLQuery MySQLService::BuildInsert(const Anope::string &table, unsigned int id, const Serialize::Data &data)
+{
+	Anope::string query_text = "INSERT INTO `" + table + "` (`id`";
+	for (Serialize::Data::const_iterator it = data.begin(), it_end = data.end(); it != it_end; ++it)
+		query_text += ",`" + it->first + "`";
+	query_text += ") VALUES (" + stringify(id);
+	for (Serialize::Data::const_iterator it = data.begin(), it_end = data.end(); it != it_end; ++it)
+		query_text += ",@" + it->first + "@";
+	query_text += ") ON DUPLICATE KEY UPDATE ";
+	for (Serialize::Data::const_iterator it = data.begin(), it_end = data.end(); it != it_end; ++it)
+		query_text += "`" + it->first + "`=VALUES(`" + it->first + "`),";
+	query_text.erase(query_text.end() - 1);
+
+	SQLQuery query(query_text);
+	for (Serialize::Data::const_iterator it = data.begin(), it_end = data.end(); it != it_end; ++it)
+		query.setValue(it->first, it->second.astr());
+	
+	return query;
 }
 
 SQLQuery MySQLService::GetTables(const Anope::string &prefix)

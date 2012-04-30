@@ -569,7 +569,10 @@ bool IRCdMessage::OnCapab(const Anope::string &, const std::vector<Anope::string
 bool IRCdMessage::OnError(const Anope::string &, const std::vector<Anope::string> &params)
 {
 	if (!params.empty())
-		Log(LOG_TERMINAL) << "Error: " << params[0];
+	{
+		Log() << "ERROR: " << params[0];
+		quitmsg = "Received ERROR from uplink: " + params[0];
+	}
 	
 	return true;
 }

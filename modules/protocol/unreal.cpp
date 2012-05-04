@@ -243,13 +243,14 @@ class UnrealIRCdProto : public IRCDProto
 		   TKLEXT = Extended TKL we don't use it but best to have it
 		   SJB64  = Base64 encoded time stamps
 		   ESVID  = Allows storing account names as services stamp
+		   MLOCK  = Supports the MLOCK server command
 		   VL     = Version Info
 		   NS     = Config->Numeric Server
 		*/
 		if (!Config->Numeric.empty())
-			UplinkSocket::Message() << "PROTOCTL NICKv2 VHP UMODE2 NICKIP TOKEN SJOIN SJOIN2 SJ3 NOQUIT TKLEXT ESVID VL";
+			UplinkSocket::Message() << "PROTOCTL NICKv2 VHP UMODE2 NICKIP TOKEN SJOIN SJOIN2 SJ3 NOQUIT TKLEXT ESVID MLOCK VL";
 		else
-			UplinkSocket::Message() << "PROTOCTL NICKv2 VHP UMODE2 NICKIP TOKEN SJOIN SJOIN2 SJ3 NOQUIT TKLEXT ESVID";
+			UplinkSocket::Message() << "PROTOCTL NICKv2 VHP UMODE2 NICKIP TOKEN SJOIN SJOIN2 SJ3 NOQUIT TKLEXT ESVID MLOCK";
 		UplinkSocket::Message() << "PASS :" << Config->Uplinks[CurrentUplink]->password;
 		SendServer(Me);
 	}
@@ -1211,7 +1212,9 @@ class ProtoUnreal : public Module
 		
 		this->AddModes();
 
-		ModuleManager::Attach(I_OnUserNickChange, this);
+		Implementation i[] = { I_OnUserNickChange, I_OnChannelCreate, I_OnMLock, I_OnUnMLock };
+		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
+		ModuleManager::SetPriority(this, PRIORITY_FIRST);
 	}
 
 	~ProtoUnreal()
@@ -1225,6 +1228,39 @@ class ProtoUnreal : public Module
 	void OnUserNickChange(User *u, const Anope::string &) anope_override
 	{
 		u->RemoveModeInternal(ModeManager::FindUserModeByName(UMODE_REGISTERED));
+	}
+
+	void OnChannelCreate(Channel *c) anope_override
+	{
+		if (Capab.count("MLOCK") > 0 && c->ci)
+		{
+			Anope::string modes = c->ci->GetMLockAsString(false).replace_all_cs("+", "").replace_all_cs("-", "");
+			UplinkSocket::Message(Me) << "MLOCK " << static_cast<long>(c->creation_time) << " " << c->ci->name << " " << modes;
+		}
+	}
+
+	EventReturn OnMLock(ChannelInfo *ci, ModeLock *lock) anope_override
+	{
+		ChannelMode *cm = ModeManager::FindChannelModeByName(lock->name);
+		if (cm && ci->c && (cm->Type == MODE_REGULAR || cm->Type == MODE_PARAM) && Capab.count("MLOCK") > 0)
+		{
+			Anope::string modes = ci->GetMLockAsString(false).replace_all_cs("+", "").replace_all_cs("-", "") + cm->ModeChar;
+			UplinkSocket::Message(Me) << "MLOCK " << static_cast<long>(ci->c->creation_time) << " " << ci->name << " " << modes;
+		}
+
+		return EVENT_CONTINUE;
+	}
+
+	EventReturn OnUnMLock(ChannelInfo *ci, ModeLock *lock) anope_override
+	{
+		ChannelMode *cm = ModeManager::FindChannelModeByName(lock->name);
+		if (cm && ci->c && (cm->Type == MODE_REGULAR || cm->Type == MODE_PARAM) && Capab.count("MLOCK") > 0)
+		{
+			Anope::string modes = ci->GetMLockAsString(false).replace_all_cs("+", "").replace_all_cs("-", "").replace_all_cs(cm->ModeChar, "");
+			UplinkSocket::Message(Me) << "MLOCK " << static_cast<long>(ci->c->creation_time) << " " << ci->name << " " << modes;
+		}
+
+		return EVENT_CONTINUE;
 	}
 };
 

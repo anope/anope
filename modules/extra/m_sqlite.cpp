@@ -105,7 +105,7 @@ class ModuleSQLite : public Module
 
 			if (this->SQLiteServices.find(connname) == this->SQLiteServices.end())
 			{
-				Anope::string database = config.ReadValue("sqlite", "database", "anope", i);
+				Anope::string database = db_dir + "/" + config.ReadValue("sqlite", "database", "anope", i);
 
 				try
 				{

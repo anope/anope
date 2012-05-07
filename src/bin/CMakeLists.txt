@@ -2,7 +2,7 @@
 if(NOT WIN32)
   configure_file(${Anope_SOURCE_DIR}/src/bin/anoperc.in ${Anope_BINARY_DIR}/src/bin/anoperc)
   install (PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/anoperc
-    DESTINATION bin
+    DESTINATION ${BIN_DIR}
   )
 
 endif(NOT WIN32)

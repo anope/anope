@@ -43,14 +43,13 @@
 /* Command-line options: (note that configuration variables are in config.c) */
 Anope::string services_dir;	/* -dir dirname */
 Anope::string services_bin;	/* Binary as specified by the user */
-Anope::string orig_cwd;		/* Original current working directory */
+Anope::string binary_dir; /* Used to store base path for Anope */
 int debug = 0;				/* -debug */
 bool readonly = false;		/* -readonly */
 bool nofork = false;		/* -nofork */
 bool nothird = false;		/* -nothrid */
 bool noexpire = false;		/* -noexpire */
 bool protocoldebug = false;	/* -protocoldebug */
-Anope::string binary_dir; /* Used to store base path for Anope */
 
 /* Set to 1 if we are to quit */
 bool quitting = false;
@@ -366,10 +365,6 @@ Anope::string GetFullProgDir(const Anope::string &argv0)
 
 int main(int ac, char **av, char **envp)
 {
-	char cwd[PATH_MAX] = "";
-	getcwd(cwd, PATH_MAX);
-	orig_cwd = cwd;
-
 #ifndef _WIN32
 	/* If we're root, issue a warning now */
 	if (!getuid() && !getgid())
@@ -387,11 +382,10 @@ int main(int ac, char **av, char **envp)
 
 #ifdef _WIN32
 	Anope::string::size_type n = binary_dir.rfind('\\');
-	services_dir = binary_dir.substr(0, n) + "\\data";
 #else
 	Anope::string::size_type n = binary_dir.rfind('/');
-	services_dir = binary_dir.substr(0, n) + "/data";
 #endif
+	services_dir = binary_dir.substr(0, n);
 
 	/* Clean out the module runtime directory prior to running, just in case files were left behind during a previous run */
 	ModuleManager::CleanupRuntimeDirectory();

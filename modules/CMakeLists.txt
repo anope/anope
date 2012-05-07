@@ -90,7 +90,7 @@ foreach(MODULE_FOLDER ${MODULES_FOLDERS})
           endif(WIN32)
           # Set the module to be installed to the module directory under the data directory
           install(TARGETS ${SO}
-            DESTINATION data/modules
+            DESTINATION ${LIB_DIR}/modules
           )
         endif(HAS_FUNCTION)
       else(NOT SKIP_DEPENDS AND NOT SKIP_LIBRARIES)
@@ -190,7 +190,7 @@ foreach(MODULE_FOLDER ${MODULES_FOLDERS})
           endif(WIN32)
           # Set the module to be installed to the module directory under the data directory
           install(TARGETS ${SO}
-            DESTINATION data/modules
+            DESTINATION ${LIB_DIR}/modules
           )
          else(NOT SKIP_DEPENDS AND NOT SKIP_LIBRARIES AND HAS_FUNCTION)
           message("  This is not a fatal error - ${SUBDIR} will not be built.")

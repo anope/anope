@@ -43,6 +43,8 @@ E bool enc_decrypt(const Anope::string &src, Anope::string &dest);
 
 /**** init.c ****/
 
+E Anope::string conf_dir, db_dir, modules_dir, locale_dir, log_dir;
+
 E void introduce_user(const Anope::string &user);
 E bool GetCommandLineArgument(const Anope::string &name, char shortname = 0);
 E bool GetCommandLineArgument(const Anope::string &name, char shortname, Anope::string &param);

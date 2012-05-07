@@ -26,6 +26,8 @@
 #include <unistd.h>
 #include <grp.h>
 
+Anope::string conf_dir = "conf", db_dir = "data", modules_dir = "lib", locale_dir = "locale", log_dir = "logs";
+
 ServerConfig::Uplink *uplink_server;
 
 void introduce_user(const Anope::string &user)
@@ -308,9 +310,13 @@ void Init(int ac, char **av)
 		Log(LOG_TERMINAL) << "Anope IRC Services (http://www.anope.org)";
 		Log(LOG_TERMINAL) << "Usage ./" << services_bin << " [options] ...";
 		Log(LOG_TERMINAL) << "-c, --config=filename.conf";
+		Log(LOG_TERMINAL) << "    --confdir=conf file direcory";
+		Log(LOG_TERMINAL) << "    --dbdir=database directory";
 		Log(LOG_TERMINAL) << "-d, --debug[=level]";
-		Log(LOG_TERMINAL) << "    --dir=services_directory";
 		Log(LOG_TERMINAL) << "-h, --help";
+		Log(LOG_TERMINAL) << "    --localedir=locale directory";
+		Log(LOG_TERMINAL) << "    --logdir=logs directory";
+		Log(LOG_TERMINAL) << "    --modulesdir=modules directory";
 		Log(LOG_TERMINAL) << "-e, --noexpire";
 		Log(LOG_TERMINAL) << "-n, --nofork";
 		Log(LOG_TERMINAL) << "    --nothird";
@@ -367,11 +373,39 @@ void Init(int ac, char **av)
 		services_conf = ConfigurationFile(Arg, false);
 	}
 
-	if (GetCommandLineArgument("dir", 0, Arg))
+	if (GetCommandLineArgument("confdir", 0, Arg))
 	{
 		if (Arg.empty())
-			throw FatalException("The --dir option requires a directory name");
-		services_dir = Arg;
+			throw FatalException("The --confdir option requires a path");
+		conf_dir = Arg;
+	}
+
+	if (GetCommandLineArgument("dbdir", 0, Arg))
+	{
+		if (Arg.empty())
+			throw FatalException("The --confdir option requires a path");
+		db_dir = Arg;
+	}
+
+	if (GetCommandLineArgument("localedir", 0, Arg))
+	{
+		if (Arg.empty())
+			throw FatalException("The --localedir option requires a path");
+		locale_dir = Arg;
+	}
+
+	if (GetCommandLineArgument("modulesdir", 0, Arg))
+	{
+		if (Arg.empty())
+			throw FatalException("The --modulesdir option requires a path");
+		modules_dir = Arg;
+	}
+
+	if (GetCommandLineArgument("logdir", 0, Arg))
+	{
+		if (Arg.empty())
+			throw FatalException("The --logdir option requires a path");
+		log_dir = Arg;
 	}
 
 	/* Chdir to Services data directory. */
@@ -382,9 +416,9 @@ void Init(int ac, char **av)
 
 	Log(LOG_TERMINAL) << "Anope " << Anope::Version() << ", " << Anope::VersionBuildString();
 #ifdef _WIN32
-	Log(LOG_TERMINAL) << "Using configuration file " << services_dir << "\\" << services_conf.GetName();
+	Log(LOG_TERMINAL) << "Using configuration file " << conf_dir << "\\" << services_conf.GetName();
 #else
-	Log(LOG_TERMINAL) << "Using configuration file " << services_dir << "/" << services_conf.GetName();
+	Log(LOG_TERMINAL) << "Using configuration file " << conf_dir << "/" << services_conf.GetName();
 #endif
 
 	/* Read configuration file; exit if there are problems. */

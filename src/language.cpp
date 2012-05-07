@@ -31,7 +31,7 @@ void InitLanguages()
 
 	while (sep.GetToken(language))
 	{
-		if (!IsFile("languages/" + language + "/LC_MESSAGES/anope.mo"))
+		if (!IsFile(locale_dir + "/" + language + "/LC_MESSAGES/anope.mo"))
 		{
 			Log() << "Error loading language " << language << ", file does not exist!";
 		}
@@ -42,10 +42,10 @@ void InitLanguages()
 		}
 	}
 
-	if (!bindtextdomain("anope", (services_dir + "/languages/").c_str()))
+	if (!bindtextdomain("anope", locale_dir.c_str()))
 		Log() << "Error calling bindtextdomain, " << Anope::LastError();
 	else
-		Log(LOG_DEBUG) << "Successfully bound anope to " << services_dir << "/languages/";
+		Log(LOG_DEBUG) << "Successfully bound anope to " << locale_dir;
 	
 	setlocale(LC_ALL, "");
 #else

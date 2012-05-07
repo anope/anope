@@ -29,8 +29,8 @@ if(GETTEXT_FOUND)
     endif(NOT WIN32)
 
     # Install the new language file
-    install(CODE "FILE(MAKE_DIRECTORY \${CMAKE_INSTALL_PREFIX}/data/languages/${LANG_LANG}/LC_MESSAGES/)")
-    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${LANG_MO} DESTINATION data/languages/${LANG_LANG}/LC_MESSAGES RENAME ${LANG_DOMAIN}.mo PERMISSIONS ${PERMS})
+    install(CODE "FILE(MAKE_DIRECTORY ${LOCALE_DIR}/${LANG_LANG}/LC_MESSAGES/)")
+    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${LANG_MO} DESTINATION ${LOCALE_DIR}/${LANG_LANG}/LC_MESSAGES RENAME ${LANG_DOMAIN}.mo PERMISSIONS ${PERMS})
   endforeach(LANG_PO)
 
   # Generate languages, depends on the mo files

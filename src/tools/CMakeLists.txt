@@ -25,7 +25,7 @@ foreach(SRC ${TOOLS_SRCS})
     endif(WIN32 AND ${EXE} STREQUAL anopesmtp)
     # Set the executable to be installed to the bin directory under the main directory
     install(TARGETS ${EXE}
-      DESTINATION bin
+      DESTINATION ${BIN_DIR}
     )
     # Add the executable to the list of files for CPack to ignore
     get_target_property(EXE_BINARY ${EXE} LOCATION)

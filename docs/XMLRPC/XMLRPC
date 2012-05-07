@@ -17,9 +17,9 @@ channel - Takes one parameter, a channel name, and returns real time information
 
 user - Takes one parameter, a user name, and returns real time information regarding that user.
 
-XMLRPC was designed to be used with db_mysql, and will not return any information that can be pulled from the SQL
+XMLRPC was designed to be used with db_sql, and will not return any information that can be pulled from the SQL
 database, such as accounts and registered channel information. It is instead used for pulling realtime data such
-as users and channels currently onlive. For examples on how to use these calls in PHP, see xmlrpc.php in docs/XMLRPC.
+as users and channels currently online. For examples on how to use these calls in PHP, see xmlrpc.php in docs/XMLRPC.
           
 Also note that the parameter named "id" is reserved for query ID. If you pass a query to Anope containing a value for id. it will
 be stored by Anope and the same id will be passed back in the result.

@@ -264,7 +264,7 @@ static dbFILE *open_db_read(const char *service, const char *filename, int versi
 	int myversion;
 
 	f = new dbFILE;
-	strscpy(f->filename, filename, sizeof(f->filename));
+	strscpy(f->filename, (db_dir + "/" + filename).c_str(), sizeof(f->filename));
 	f->mode = 'r';
 	fp = fopen(f->filename, "rb");
 	if (!fp)

@@ -22,7 +22,7 @@ std::vector<Module *> ModuleManager::EventHandlers[I_END];
 
 void ModuleManager::CleanupRuntimeDirectory()
 {
-	Anope::string dirbuf = services_dir + "/modules/runtime";
+	Anope::string dirbuf = modules_dir + "/modules/runtime";
 
 	Log(LOG_DEBUG) << "Cleaning out Module run time directory (" << dirbuf << ") - this may take a moment please wait";
 
@@ -57,7 +57,7 @@ void ModuleManager::CleanupRuntimeDirectory()
  */
 static ModuleReturn moduleCopyFile(const Anope::string &name, Anope::string &output)
 {
-	Anope::string input = services_dir + "/modules/" + name + ".so";
+	Anope::string input = modules_dir + "/modules/" + name + ".so";
 	
 	struct stat s;
 	if (stat(input.c_str(), &s) == -1)
@@ -134,14 +134,14 @@ ModuleReturn ModuleManager::LoadModule(const Anope::string &modname, User *u)
 	Log(LOG_DEBUG) << "trying to load [" << modname <<  "]";
 
 	/* Generate the filename for the temporary copy of the module */
-	Anope::string pbuf = services_dir + "/modules/runtime/" + modname + ".so.XXXXXX";
+	Anope::string pbuf = modules_dir + "/modules/runtime/" + modname + ".so.XXXXXX";
 
 	/* Don't skip return value checking! -GD */
 	ModuleReturn ret = moduleCopyFile(modname, pbuf);
 	if (ret != MOD_ERR_OK)
 	{
 		if (ret == MOD_ERR_NOEXIST)
-			Log(LOG_TERMINAL) << "Error while loading " << modname << " (file not exists)";
+			Log(LOG_TERMINAL) << "Error while loading " << modname << " (file does not exist)";
 		else if (ret == MOD_ERR_FILE_IO)
 			Log(LOG_TERMINAL) << "Error while loading " << modname << " (file IO error, check file permissions and diskspace)";
 		return ret;

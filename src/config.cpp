@@ -1064,7 +1064,7 @@ bool ConfigurationFile::IsOpen() const
 bool ConfigurationFile::Open()
 {
 	this->Close();
-	this->fp = (this->executable ? popen(this->name.c_str(), "r") : fopen(this->name.c_str(), "r"));
+	this->fp = (this->executable ? popen(this->name.c_str(), "r") : fopen((conf_dir + "/" + this->name).c_str(), "r"));
 	return this->fp != NULL;
 }
 

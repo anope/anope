@@ -150,6 +150,12 @@ class CommandNSRegister : public Command
 			return;
 		}
 
+		if (!ircdproto->IsNickValid(u->nick))
+		{
+			source.Reply(NICK_CANNOT_BE_REGISTERED, u->nick.c_str());
+			return;
+		}
+
 		if (Config->RestrictOperNicks)
 			for (unsigned i = 0; i < Config->Opers.size(); ++i)
 			{

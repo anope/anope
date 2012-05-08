@@ -45,9 +45,9 @@ class CommandNSRelease : public Command
 
 			if (MOD_RESULT == EVENT_ALLOW)
 			{
-				Log(LOG_COMMAND, u, this) << "released " << na->nick;
+				Log(LOG_COMMAND, u, this) << "for nickname " << na->nick;
 				na->Release();
-				source.Reply(_("Services' hold on your nick has been released."));
+				source.Reply(_("Services' hold on \002%s\002 has been released."), nick.c_str());
 			}
 			else
 			{
@@ -58,11 +58,15 @@ class CommandNSRelease : public Command
 		}
 		else
 		{
-			if (u->Account() == na->nc || (!na->nc->HasFlag(NI_SECURE) && is_on_access(u, na->nc)) ||
+			bool override = u->Account() != na->nc && u->HasPriv("nickserv/release");
+
+			if (override || u->Account() == na->nc ||
+					(!na->nc->HasFlag(NI_SECURE) && is_on_access(u, na->nc)) ||
 					(!u->fingerprint.empty() && na->nc->FindCert(u->fingerprint)))
 			{
+				Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this) << "for nickname " << na->nick;
 				na->Release();
-				source.Reply(_("Services' hold on your nick has been released."));
+				source.Reply(_("Services' hold on \002%s\002 has been released."), nick.c_str());
 			}
 			else
 				source.Reply(ACCESS_DENIED);

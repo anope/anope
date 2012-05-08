@@ -132,5 +132,7 @@ class SQLProvider : public Service
 	virtual SQLQuery BuildInsert(const Anope::string &table, unsigned int id, const Serialize::Data &data) = 0;
 
 	virtual SQLQuery GetTables(const Anope::string &prefix) = 0;
+
+	virtual Anope::string FromUnixtime(time_t) = 0;
 };
 

@@ -53,6 +53,8 @@ class SQLiteService : public SQLProvider
 	SQLQuery GetTables(const Anope::string &prefix);
 
 	Anope::string BuildQuery(const SQLQuery &q);
+
+	Anope::string FromUnixtime(time_t);
 };
 
 class ModuleSQLite : public Module
@@ -295,6 +297,11 @@ Anope::string SQLiteService::BuildQuery(const SQLQuery &q)
 		real_query = real_query.replace_all_cs("@" + it->first + "@", (it->second.escape ? ("'" + this->Escape(it->second.data) + "'") : it->second.data));
 
 	return real_query;
+}
+
+Anope::string SQLiteService::FromUnixtime(time_t t)
+{
+	return "datetime('" + stringify(t) + "', 'unixepoch')";
 }
 
 MODULE_INIT(ModuleSQLite)

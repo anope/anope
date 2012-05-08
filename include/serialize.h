@@ -70,6 +70,7 @@ class CoreExport Serializable : public virtual Base
  private:
 	std::list<Serializable *>::iterator s_iter;
 	Serialize::Data last_commit;
+	time_t last_commit_time;
 
  protected:
 	Serializable();
@@ -88,6 +89,9 @@ class CoreExport Serializable : public virtual Base
 
 	bool IsCached();
 	void UpdateCache();
+
+	bool IsTSCached();
+	void UpdateTS();
 
 	virtual const Anope::string serialize_name() const = 0;
 	virtual Serialize::Data serialize() const = 0;

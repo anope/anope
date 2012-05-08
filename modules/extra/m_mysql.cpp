@@ -135,6 +135,8 @@ class MySQLService : public SQLProvider
 	bool CheckConnection();
 
 	Anope::string BuildQuery(const SQLQuery &q);
+
+	Anope::string FromUnixtime(time_t);
 };
 
 /** The SQL thread used to execute queries
@@ -479,6 +481,11 @@ Anope::string MySQLService::BuildQuery(const SQLQuery &q)
 		real_query = real_query.replace_all_cs("@" + it->first + "@", (it->second.escape ? ("'" + this->Escape(it->second.data) + "'") : it->second.data));
 
 	return real_query;
+}
+
+Anope::string MySQLService::FromUnixtime(time_t t)
+{
+	return "FROM_UNIXTIME(" + stringify(t) + ")";
 }
 
 void DispatcherThread::Run()

@@ -109,7 +109,6 @@ class DBSQL : public Module, public Pipe
 				for (unsigned i = 0; i < create.size(); ++i)
 					this->RunBackground(create[i]);
 
-
 				SQLQuery insert = this->sql->BuildInsert(this->prefix + obj->serialize_name(), obj->id, data);
 				this->RunBackground(insert, new ResultSQLSQLInterface(this, obj));
 			}
@@ -179,6 +178,9 @@ class DBSQL : public Module, public Pipe
 
 	void OnSerializableUpdate(Serializable *obj) anope_override
 	{
+		if (obj->IsTSCached())
+			return;
+		obj->UpdateTS();
 		this->updated_items.insert(obj);
 		this->Notify();
 	}

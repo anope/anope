@@ -59,9 +59,9 @@ class DBMySQL : public Module, public Pipe
 		{
 			SQLResult res = SQL->RunQuery(query);
 			if (!res.GetError().empty())
-				Log(LOG_DEBUG) << "SQlive got error " << res.GetError() << " for " + res.finished_query;
+				Log(LOG_DEBUG) << "SQL-live got error " << res.GetError() << " for " + res.finished_query;
 			else
-				Log(LOG_DEBUG) << "SQLive got " << res.Rows() << " rows for " << res.finished_query;
+				Log(LOG_DEBUG) << "SQL-live got " << res.Rows() << " rows for " << res.finished_query;
 			return res;
 		}
 		throw SQLException("No SQL!");
@@ -95,11 +95,6 @@ class DBMySQL : public Module, public Pipe
 					continue;
 				obj->UpdateCache();
 
-				static std::set<Serializable *> working_objects; // XXX
-				if (working_objects.count(obj))
-					continue;
-				working_objects.insert(obj);
-
 				const Serialize::Data &data = obj->serialize();
 
 				std::vector<SQLQuery> create = this->SQL->CreateTable(this->prefix + obj->serialize_name(), data);
@@ -112,8 +107,6 @@ class DBMySQL : public Module, public Pipe
 				SerializeType *stype = SerializeType::Find(obj->serialize_name());
 				if (stype)
 					stype->objects.erase(obj->id);
-
-				working_objects.erase(obj);
 			}
 		}
 
@@ -198,8 +191,7 @@ class DBMySQL : public Module, public Pipe
 		if (!this->CheckInit() || obj->GetTimestamp() == Anope::CurTime)
 			return;
 
-		SQLQuery query("SELECT * FROM `" + this->prefix + obj->GetName() + "` WHERE (`timestamp` > FROM_UNIXTIME(@ts@) OR `timestamp` IS NULL)");
-		query.setValue("ts", obj->GetTimestamp());
+		SQLQuery query("SELECT * FROM `" + this->prefix + obj->GetName() + "` WHERE (`timestamp` > " + this->SQL->FromUnixtime(obj->GetTimestamp()) + " OR `timestamp` IS NULL)");
 
 		obj->UpdateTimestamp();
 
@@ -263,6 +255,9 @@ class DBMySQL : public Module, public Pipe
 
 	void OnSerializableUpdate(Serializable *obj) anope_override
 	{
+		if (obj->IsTSCached())
+			return;
+		obj->UpdateTS();
 		this->updated_items.insert(obj);
 		this->Notify();
 	}

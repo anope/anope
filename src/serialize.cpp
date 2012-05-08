@@ -70,7 +70,7 @@ unsigned stringstream::getMax() const
 	return this->_max;
 }
 
-Serializable::Serializable() : id(0)
+Serializable::Serializable() : last_commit_time(0), id(0)
 {
 	if (serializable_items == NULL)
 		serializable_items = new std::list<Serializable *>();
@@ -82,7 +82,7 @@ Serializable::Serializable() : id(0)
 	FOREACH_MOD(I_OnSerializableConstruct, OnSerializableConstruct(this));
 }
 
-Serializable::Serializable(const Serializable &) : id(0)
+Serializable::Serializable(const Serializable &) : last_commit_time(0), id(0)
 {
 	serializable_items->push_back(this);
 	this->s_iter = serializable_items->end();
@@ -124,6 +124,16 @@ bool Serializable::IsCached()
 void Serializable::UpdateCache()
 {
 	this->last_commit = this->serialize();
+}
+
+bool Serializable::IsTSCached()
+{
+	return this->last_commit_time == Anope::CurTime;
+}
+
+void Serializable::UpdateTS()
+{
+	this->last_commit_time = Anope::CurTime;
 }
 
 const std::list<Serializable *> &Serializable::GetItems()

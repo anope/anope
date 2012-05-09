@@ -653,7 +653,7 @@ class DBPlain : public Module
 	{
 		ConfigReader config;
 		DatabaseFile = db_dir + "/" + config.ReadValue("db_plain", "database", "anope.db", 0);
-		DatabaseFile = db_dir + "/backups/" + config.ReadValue("db_plain", "database", "anope.db", 0);
+		BackupFile = db_dir + "/backups/" + config.ReadValue("db_plain", "database", "anope.db", 0);
 	}
 
 	EventReturn OnLoadDatabase() anope_override

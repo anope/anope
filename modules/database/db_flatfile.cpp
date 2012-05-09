@@ -16,6 +16,7 @@
 class DBFlatFile : public Module
 {
 	Anope::string DatabaseFile;
+	Anope::string BackupFile;
 	/* Day the last backup was on */
 	int LastDay;
 	/* Backup file names */
@@ -46,7 +47,7 @@ class DBFlatFile : public Module
 		if (tm->tm_mday != LastDay)
 		{
 			LastDay = tm->tm_mday;
-			Anope::string newname = "backups/" + DatabaseFile + "." + stringify(tm->tm_year) + "." + stringify(tm->tm_mon) + "." + stringify(tm->tm_mday);
+			Anope::string newname = BackupFile + "." + stringify(tm->tm_year) + "." + stringify(tm->tm_mon) + "." + stringify(tm->tm_mday);
 
 			/* Backup already exists */
 			if (IsFile(newname))
@@ -77,6 +78,7 @@ class DBFlatFile : public Module
 	{
 		ConfigReader config;
 		DatabaseFile = db_dir + "/" + config.ReadValue("db_flatfile", "database", "anope.db", 0);
+		BackupFile = db_dir + "/backups/" + config.ReadValue("db_flatfile", "database", "anope.db", 0);
 	}
 
 	EventReturn OnLoadDatabase() anope_override

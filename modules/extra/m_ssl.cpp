@@ -10,9 +10,6 @@
 #include <openssl/crypto.h>
 #include <openssl/evp.h>
 
-#define CERTFILE "anope.cert"
-#define KEYFILE "anope.key"
-
 static SSL_CTX *server_ctx, *client_ctx;
 
 class MySSLService : public SSLService
@@ -90,6 +87,8 @@ class SSLModule : public Module
 		return 1;
 	}
 
+	Anope::string certfile, keyfile;
+
  public:
 	MySSLService service;
 
@@ -109,37 +108,43 @@ class SSLModule : public Module
 		if (!client_ctx || !server_ctx)
 			throw ModuleException("Error initializing SSL CTX");
 
-		if (IsFile(CERTFILE))
+		this->OnReload();
+
+		if (IsFile(this->certfile.c_str()))
 		{
-			if (!SSL_CTX_use_certificate_file(client_ctx, CERTFILE, SSL_FILETYPE_PEM) || !SSL_CTX_use_certificate_file(server_ctx, CERTFILE, SSL_FILETYPE_PEM))
+			if (!SSL_CTX_use_certificate_file(client_ctx, this->certfile.c_str(), SSL_FILETYPE_PEM) || !SSL_CTX_use_certificate_file(server_ctx, this->certfile.c_str(), SSL_FILETYPE_PEM))
 			{
 				SSL_CTX_free(client_ctx);
 				SSL_CTX_free(server_ctx);
 				throw ModuleException("Error loading certificate");
 			}
+			else
+				Log(LOG_DEBUG) << "m_ssl: Successfully loaded certificate " << this->certfile;
 		}
 		else
-			Log() << "m_ssl: No certificate file found";
+			Log() << "m_ssl: Unable to open certificate " << this->certfile;
 
-		if (IsFile(KEYFILE))
+		if (IsFile(this->keyfile.c_str()))
 		{
-			if (!SSL_CTX_use_PrivateKey_file(client_ctx, KEYFILE, SSL_FILETYPE_PEM) || !SSL_CTX_use_PrivateKey_file(server_ctx, KEYFILE, SSL_FILETYPE_PEM))
+			if (!SSL_CTX_use_PrivateKey_file(client_ctx, this->keyfile.c_str(), SSL_FILETYPE_PEM) || !SSL_CTX_use_PrivateKey_file(server_ctx, this->keyfile.c_str(), SSL_FILETYPE_PEM))
 			{
 				SSL_CTX_free(client_ctx);
 				SSL_CTX_free(server_ctx);
 				throw ModuleException("Error loading private key");
 			}
+			else
+				Log(LOG_DEBUG) << "m_ssl: Successfully loaded private key " << this->keyfile;
 		}
 		else
 		{
-			if (IsFile(CERTFILE))
+			if (IsFile(this->certfile.c_str()))
 			{
 				SSL_CTX_free(client_ctx);
 				SSL_CTX_free(server_ctx);
-				throw ModuleException("Error loading private key - file not found");
+				throw ModuleException("Error loading private key " + this->keyfile + " - file not found");
 			}
 			else
-				Log() << "m_ssl: No private key found";
+				Log() << "m_ssl: Unable to open private key " << this->keyfile;
 		}
 
 		SSL_CTX_set_mode(client_ctx, SSL_MODE_ENABLE_PARTIAL_WRITE | SSL_MODE_ACCEPT_MOVING_WRITE_BUFFER);
@@ -148,7 +153,7 @@ class SSLModule : public Module
 		SSL_CTX_set_verify(client_ctx, SSL_VERIFY_PEER | SSL_VERIFY_CLIENT_ONCE, SSLModule::AlwaysAccept);
 		SSL_CTX_set_verify(server_ctx, SSL_VERIFY_PEER | SSL_VERIFY_CLIENT_ONCE, SSLModule::AlwaysAccept);
 
-
+		ModuleManager::Attach(I_OnReload, this);
 		ModuleManager::Attach(I_OnPreServerConnect, this);
 	}
 
@@ -165,6 +170,14 @@ class SSLModule : public Module
 
 		SSL_CTX_free(client_ctx);
 		SSL_CTX_free(server_ctx);
+	}
+
+	void OnReload() anope_override
+	{
+		ConfigReader config;
+
+		this->certfile = config.ReadValue("ssl", "cert", "data/anope.crt", 0);
+		this->keyfile = config.ReadValue("ssl", "key", "data/anope.key", 0);
 	}
 
 	void OnPreServerConnect() anope_override

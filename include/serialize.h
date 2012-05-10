@@ -216,7 +216,7 @@ class serialize_obj : public dynamic_reference_base
 			this->ref->DelReference(this);
 	}
 
-	virtual operator bool() const
+	inline operator bool() const
 	{
 		if (!this->invalid)
 			return this->ref != NULL;
@@ -235,7 +235,7 @@ class serialize_obj : public dynamic_reference_base
 			this->ref->AddReference(this);
 	}
 
-	virtual inline operator T*() const
+	inline operator T*() const
 	{
 		if (!this->invalid)
 		{
@@ -248,7 +248,7 @@ class serialize_obj : public dynamic_reference_base
 		return NULL;
 	}
 
-	virtual inline T* operator*() const
+	inline T* operator*() const
 	{
 		if (!this->invalid)
 		{
@@ -261,7 +261,7 @@ class serialize_obj : public dynamic_reference_base
 		return NULL;
 	}
 
-	virtual inline T* operator->() const
+	inline T* operator->() const
 	{
 		if (!this->invalid)
 		{

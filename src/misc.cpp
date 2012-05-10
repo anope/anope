@@ -669,7 +669,7 @@ bool Anope::Match(const Anope::string &str, const Anope::string &mask, bool case
 		}
 	}
 
-	if (mask[m] == '*')
+	if (m < mask_len && mask[m] == '*')
 		++m;
 
 	return m == mask_len;

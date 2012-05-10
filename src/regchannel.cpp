@@ -638,7 +638,6 @@ void ChannelInfo::EraseAccess(const ChanAccess *taccess)
 	{
 		if (this->GetAccess(i) == taccess)
 		{
-			this->GetAccess(i)->destroy();
 			this->EraseAccess(i);
 			break;
 		}

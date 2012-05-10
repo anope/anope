@@ -118,8 +118,7 @@ Serializable* ChanAccess::unserialize(Serializable *obj, Serialize::Data &data)
 	if (obj)
 		access = anope_dynamic_static_cast<ChanAccess *>(obj);
 	else
-		access = const_cast<ChanAccess *>(aprovider->Create());
-	access->provider = aprovider;
+		access = aprovider->Create();
 	access->ci = ci;
 	data["mask"] >> access->mask;
 	data["creator"] >> access->creator;

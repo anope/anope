@@ -34,7 +34,7 @@ class CommandNSSetMessage : public Command
 
 		if (!Config->UsePrivmsg)
 		{
-			source.Reply(_("Option \002%s\02 cannot be set on this network."), "MSG");
+			source.Reply(_("You cannot %s on this network."), source.command.c_str());
 			return;
 		}
 
@@ -67,6 +67,12 @@ class CommandNSSetMessage : public Command
 				"you. With \002MSG\002 set, Services will use messages, else they'll \n"
 				"use notices."));
 		return true;
+	}
+
+	void OnServHelp(CommandSource &source) anope_override
+	{
+		if (Config->UsePrivmsg)
+			Command::OnServHelp(source);
 	}
 };
 

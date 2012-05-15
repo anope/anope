@@ -811,15 +811,14 @@ bool event_fmode(const Anope::string &source, const std::vector<Anope::string> &
 		return true;
 
 	/* TS's are equal now, so we can proceed with parsing */
-	std::vector<Anope::string> newparams;
-	for (unsigned n = 0; n < params.size(); ++n)
-	{
-		if (n != 1)
-		{
-			newparams.push_back(params[n]);
-			Log(LOG_DEBUG) << "Param: " << params[n];
-		}
-	}
+	std::vector<Anope::string> newparams; // channel, modes, ts
+	newparams.push_back(params[0]);
+	// For fun, modes sometimes get sent without a mode prefix
+	Anope::string modes = "+" + params[2];
+	for (unsigned n = 3; n < params.size(); ++n)
+		modes += " " + params[n];
+	newparams.push_back(modes);
+	newparams.push_back(params[1]);
 
 	return ircdmessage->OnMode(source, newparams);
 }

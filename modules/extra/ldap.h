@@ -66,6 +66,7 @@ struct LDAPResult
 
 	enum QueryType
 	{
+		QUERY_UNKNOWN,
 		QUERY_BIND,
 		QUERY_SEARCH,
 		QUERY_ADD,
@@ -75,6 +76,12 @@ struct LDAPResult
 
 	QueryType type;
 	LDAPQuery id;
+
+	LDAPResult()
+	{
+		this->type = QUERY_UNKNOWN;
+		this->id = -1;
+	}
 
 	size_t size() const
 	{

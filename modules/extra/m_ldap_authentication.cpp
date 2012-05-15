@@ -2,7 +2,11 @@
 #include "nickserv.h"
 #include "ldap.h"
 
+static Anope::string basedn;
+static Anope::string search_filter;
+static Anope::string object_class;
 static Anope::string email_attribute;
+static Anope::string username_attribute;
 
 struct IdentifyInfo
 {
@@ -12,10 +16,18 @@ struct IdentifyInfo
 	std::vector<Anope::string> params;
 	Anope::string account;
 	Anope::string pass;
+	Anope::string dn;
+	service_reference<LDAPProvider> lprov;
+	bool admin_bind;
 
-	IdentifyInfo(User *u, Command *c, CommandSource &s, const std::vector<Anope::string> &pa, const Anope::string &a, const Anope::string &p) : user(u), command(c), source(s), params(pa), account(a), pass(p) { }
+	IdentifyInfo(User *u, Command *c, CommandSource &s, const std::vector<Anope::string> &pa, const Anope::string &a, const Anope::string &p, service_reference<LDAPProvider> &lp) :
+		user(u), command(c), source(s), params(pa), account(a), pass(p), lprov(lp), admin_bind(true) { }
 };
 
+struct ExtensibleString : Anope::string, ExtensibleItem
+{
+	ExtensibleString(const Anope::string &s) : Anope::string(s) { }
+};
 
 class IdentifyInterface : public LDAPInterface
 {
@@ -40,34 +52,71 @@ class IdentifyInterface : public LDAPInterface
 		IdentifyInfo *ii = it->second;
 		this->requests.erase(it);
 
-		if (!ii->user || !ii->command)
+		if (!ii->user || !ii->command || !ii->lprov)
 		{
 			delete this;
 			return;
 		}
 
-		User *u = ii->user;
-		Command *c = ii->command;
-
-		u->Extend("m_ldap_authentication_authenticated", NULL);
-
-		NickAlias *na = findnick(ii->account);
-		if (na == NULL)
+		switch (r.type)
 		{
-			na = new NickAlias(ii->account, new NickCore(ii->account));
-			if (Config->NSAddAccessOnReg)
-				na->nc->AddAccess(create_mask(u));
+			case LDAPResult::QUERY_SEARCH:
+			{
+				try
+				{
+					const LDAPAttributes &attr = r.get(0);
+					ii->dn = attr.get("dn");
+					Log(LOG_DEBUG) << "m_ldap_authenticationn: binding as " << ii->dn;
+					LDAPQuery id = ii->lprov->Bind(this, ii->dn, ii->pass);
+					this->Add(id, ii);
+				}
+				catch (const LDAPException &ex)
+				{
+		                        Log() << "m_ldap_authentication: Error binding after search: " << ex.GetReason();
+				}
+				break;
+			}
+			case LDAPResult::QUERY_BIND:
+			{
+				if (ii->admin_bind)
+				{
+					Anope::string sf = search_filter.replace_all_cs("%account", ii->account).replace_all_cs("%object_class", object_class);
+					Log(LOG_DEBUG) << "m_ldap_authentication: searching for " << sf;
+					LDAPQuery id = ii->lprov->Search(this, basedn, sf);
+					this->Add(id, ii);
+					ii->admin_bind = false;
+				}
+				else
+				{
+					User *u = ii->user;
+					Command *c = ii->command;
 
-			const BotInfo *bi = findbot(Config->NickServ);
-			if (bi)
-				u->SendMessage(bi, _("Your account \002%s\002 has been successfully created."), na->nick.c_str());
-		}
+					u->Extend("m_ldap_authentication_authenticated", NULL);
+
+					NickAlias *na = findnick(ii->account);
+					if (na == NULL)
+					{
+						na = new NickAlias(ii->account, new NickCore(ii->account));
+						if (Config->NSAddAccessOnReg)
+							na->nc->AddAccess(create_mask(u));
 		
-		enc_encrypt(ii->pass, na->nc->pass);
+						BotInfo *bi = findbot(Config->NickServ);
+						if (bi)
+							u->SendMessage(bi, _("Your account \002%s\002 has been successfully created."), na->nick.c_str());
+					}
 
-		c->Execute(ii->source, ii->params);
-
-		delete ii;
+					na->nc->Extend("m_ldap_authentication_dn", new ExtensibleString(ii->dn));
+				
+					enc_encrypt(ii->pass, na->nc->pass);
+		
+					c->Execute(ii->source, ii->params);
+					delete ii;
+				}
+				break;
+			}
+			default:
+				delete ii;
+		}
 	}
 
 	void OnError(const LDAPResult &r) anope_override
@@ -123,11 +172,10 @@ class OnIdentifyInterface : public LDAPInterface
 			const LDAPAttributes &attr = r.get(0);
 			Anope::string email = attr.get(email_attribute);
 
-			NickCore *nc = u->Account();
-			if (!email.equals_ci(nc->email))
+			if (!email.equals_ci(u->Account()->email))
 			{
-				nc->email = email;
-				const BotInfo *bi = findbot(Config->NickServ);
+				u->Account()->email = email;
+				BotInfo *bi = findbot(Config->NickServ);
 				if (bi)
 					u->SendMessage(bi, _("Your email has been updated to \002%s\002"), email.c_str());
 				Log() << "m_ldap_authentication: Updated email address for " << u->nick << " (" << u->Account()->display << ") to " << email;
@@ -169,9 +217,6 @@ class NSIdentifyLDAP : public Module
 	OnIdentifyInterface oninterface;
 	OnRegisterInterface orinterface;
 
-	Anope::string binddn;
-	Anope::string object_class;
-	Anope::string username_attribute;
 	Anope::string password_attribute;
 	bool disable_register;
 	Anope::string disable_reason;
@@ -192,9 +237,10 @@ class NSIdentifyLDAP : public Module
 	{
 		ConfigReader config;
 
-		this->binddn = config.ReadValue("m_ldap_authentication", "binddn", "", 0);
-		this->object_class = config.ReadValue("m_ldap_authentication", "object_class", "", 0);
-		this->username_attribute = config.ReadValue("m_ldap_authentication", "username_attribute", "", 0);
+		basedn = config.ReadValue("m_ldap_authentication", "basedn", "", 0);
+		search_filter = config.ReadValue("m_ldap_authentication", "search_filter", "", 0);
+		object_class = config.ReadValue("m_ldap_authentication", "object_class", "", 0);
+		username_attribute = config.ReadValue("m_ldap_authentication", "username_attribute", "", 0);
 		this->password_attribute = config.ReadValue("m_ldap_authentication", "password_attribute", "", 0);
 		email_attribute = config.ReadValue("m_ldap_authentication", "email_attribute", "", 0);
 		this->disable_register = config.ReadFlag("m_ldap_authentication", "disable_ns_register", "false", 0);
@@ -230,11 +276,10 @@ class NSIdentifyLDAP : public Module
 			return EVENT_CONTINUE;
 		}
 
-		IdentifyInfo *ii = new IdentifyInfo(u, c, *source,  params, account, password);
+		IdentifyInfo *ii = new IdentifyInfo(u, c, *source,  params, account, password, this->ldap);
 		try
 		{
-			Anope::string full_binddn = this->username_attribute + "=" + account + "," + this->binddn;
-			LDAPQuery id = this->ldap->Bind(&this->iinterface, full_binddn, password);
+			LDAPQuery id = this->ldap->BindAsAdmin(&this->iinterface);
 			this->iinterface.Add(id, ii);
 		}
 		catch (const LDAPException &ex)
@@ -249,12 +294,16 @@ class NSIdentifyLDAP : public Module
 
 	void OnNickIdentify(User *u) anope_override
 	{
-		if (email_attribute.empty() || !this->ldap)
+		if (email_attribute.empty() || !this->ldap || !u->Account()->HasExt("m_ldap_authentication_dn"))
+			return;
+
+		Anope::string *dn = u->Account()->GetExt<ExtensibleString *>("m_ldap_authentication_dn");
+		if (!dn || dn->empty())
 			return;
 
 		try
 		{
-			LDAPQuery id = this->ldap->Search(&this->oninterface, this->binddn, "(" + this->username_attribute + "=" + u->Account()->display + ")");
+			LDAPQuery id = this->ldap->Search(&this->oninterface, *dn, "(" + email_attribute + "=*)");
 			this->oninterface.Add(id, u->nick);
 		}
 		catch (const LDAPException &ex)
@@ -277,9 +326,9 @@ class NSIdentifyLDAP : public Module
 
 			attributes[0].name = "objectClass";
 			attributes[0].values.push_back("top");
-			attributes[0].values.push_back(this->object_class);
+			attributes[0].values.push_back(object_class);
 
-			attributes[1].name = this->username_attribute;
+			attributes[1].name = username_attribute;
 			attributes[1].values.push_back(na->nick);
 
 			if (!na->nc->email.empty())
@@ -291,7 +340,7 @@ class NSIdentifyLDAP : public Module
 			attributes[3].name = this->password_attribute;
 			attributes[3].values.push_back(na->nc->pass);
 
-			Anope::string new_dn = this->username_attribute + "=" + na->nick + "," + this->binddn;
+			Anope::string new_dn = username_attribute + "=" + na->nick + "," + basedn;
 			this->ldap->Add(&this->orinterface, new_dn, attributes);
 		}
 		catch (const LDAPException &ex)

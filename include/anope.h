@@ -589,18 +589,6 @@ template<typename T, typename O> inline T anope_dynamic_static_cast(O ptr)
 #endif
 }
 
-template<typename T, typename O> inline T anope_dynamic_reinterpret_cast(O ptr)
-{
-#ifdef DEBUG_BUILD
-	T ret = dynamic_cast<T>(ptr);
-	if (ptr != NULL && ret == NULL)
-		throw CoreException(Anope::string("anope_dynamic_reinterpret_cast<") + typeid(T).name() + ">(" + typeid(O).name() + ") fail");
-	return ret;
-#else
-	return reinterpret_cast<T>(ptr);
-#endif
-}
-
 /*************************************************************************/
 
 /** Class with the ability to keep flags on items, they should extend from this

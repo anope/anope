@@ -343,21 +343,13 @@ class CoreExport ChannelModeRegistered : public ChannelMode
 	bool CanSet(User *u) const anope_override;
 };
 
-enum StackerType
-{
-	ST_CHANNEL,
-	ST_USER
-};
-
 class StackerInfo
 {
  public:
 	/* Modes to be added */
-	std::list<std::pair<Base *, Anope::string> > AddModes;
+	std::list<std::pair<Mode *, Anope::string> > AddModes;
 	/* Modes to be deleted */
-	std::list<std::pair<Base *, Anope::string> > DelModes;
-	/* The type of object this stacker info is for */
-	StackerType Type;
+	std::list<std::pair<Mode *, Anope::string> > DelModes;
 	/* Bot this is sent from */
 	const BotInfo *bi;
 
@@ -379,29 +371,14 @@ class CoreExport ModeManager
 {
  protected:
 	/* List of pairs of user/channels and their stacker info */
-	static std::list<std::pair<Base *, StackerInfo *> > StackerObjects;
-
-	/** Get the stacker info for an item, if one doesnt exist it is created
-	 * @param Item The user/channel etc
-	 * @return The stacker info
-	 */
-	static StackerInfo *GetInfo(Base *Item);
+	static std::map<User *, StackerInfo *> UserStackerObjects;
+	static std::map<Channel *, StackerInfo *> ChannelStackerObjects;
 
 	/** Build a list of mode strings to send to the IRCd from the mode stacker
 	 * @param info The stacker info for a channel or user
 	 * @return a list of strings
 	 */
 	static std::list<Anope::string> BuildModeStrings(StackerInfo *info);
-
-	/** Really add a mode to the stacker, internal use only
-	 * @param bi The client to set the modes from
-	 * @param Object The object, user/channel
-	 * @param mode The mode
-	 * @param Set Adding or removing?
-	 * @param Param A param, if there is one
-	 * @param Type The type this is, user or channel
-	 */
-	static void StackerAddInternal(const BotInfo *bi, Base *Object, Mode *mode, bool Set, const Anope::string &Param, StackerType Type);
 
  public:
  	/* List of all modes Anope knows about */
@@ -485,9 +462,9 @@ class CoreExport ModeManager
 	static void ProcessModes();
 
 	/** Delete a user or channel from the stacker
-	 * @param b The user/channel
 	 */
-	static void StackerDel(Base *b);
+	static void StackerDel(User *u);
+	static void StackerDel(Channel *c);
 };
 
 /** Entry flags

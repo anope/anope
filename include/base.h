@@ -53,18 +53,20 @@ class dynamic_reference : public dynamic_reference_base
 
 	dynamic_reference(const dynamic_reference<T> &other) : dynamic_reference_base(other), ref(other.ref)
 	{
-		if (*this)
+		if (operator bool())
 			ref->AddReference(this);
 	}
 
 	virtual ~dynamic_reference()
 	{
-		if (*this)
-		{
+		if (operator bool())
 			ref->DelReference(this);
-		}
 	}
 
+	/* We explicitly call operator bool here in several places to prevent other
+	 * operators, such operator T*, from being called instead, which will mess
+	 * with any class inheriting from this that overloads this operator.
+	 */
 	virtual operator bool()
 	{
 		if (!this->invalid)
@@ -72,31 +74,36 @@ class dynamic_reference : public dynamic_reference_base
 		return false;
 	}
 
-	virtual inline operator T*() const
+	inline operator T*()
 	{
-		if (!this->invalid)
+		if (operator bool())
 			return this->ref;
 		return NULL;
 	}
 
-	virtual inline T* operator->()
+	inline T* operator->()
 	{
-		if (!this->invalid)
+		if (operator bool())
 			return this->ref;
 		return NULL;
 	}
 
-	virtual inline void operator=(T *newref)
+	inline void operator=(T *newref)
 	{
-		if (*this)
+		if (operator bool())
 			this->ref->DelReference(this);
 		this->ref = newref;
 		this->invalid = false;
-		if (*this)
+		if (operator bool())
 			this->ref->AddReference(this);
 	}
 
-	virtual inline bool operator==(const dynamic_reference<T> &other) const
+	inline bool operator<(const dynamic_reference<T> &other) const
+	{
+		return this < &other;
+	}
+
+	inline bool operator==(const dynamic_reference<T> &other)
 	{
 		if (!this->invalid)
 			return this->ref == other;

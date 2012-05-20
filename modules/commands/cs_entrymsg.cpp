@@ -51,8 +51,9 @@ struct EntryMsg : Serializable
 
 static unsigned MaxEntries = 0;
 
-struct EntryMessageList : std::vector<EntryMsg>, ExtensibleItem
+struct EntryMessageList : serialize_checker<std::vector<EntryMsg> >, ExtensibleItem
 {
+	EntryMessageList() : serialize_checker<std::vector<EntryMsg> >("EntryMsg") { }
 };
 
 Serializable* EntryMsg::unserialize(Serializable *obj, Serialize::Data &data)
@@ -78,8 +79,8 @@ Serializable* EntryMsg::unserialize(Serializable *obj, Serialize::Data &data)
 		ci->Extend("cs_entrymsg", messages);
 	}
 
-	messages->push_back(EntryMsg(ci, data["creator"].astr(), data["message"].astr()));
-	return &messages->back();
+	(*messages)->push_back(EntryMsg(ci, data["creator"].astr(), data["message"].astr()));
+	return &(*messages)->back();
 }
 
 class CommandEntryMessage : public Command
@@ -90,6 +91,12 @@ class CommandEntryMessage : public Command
 		EntryMessageList *messages = ci->GetExt<EntryMessageList *>("cs_entrymsg");
 		if (messages == NULL)
 		{
+			messages = new EntryMessageList();
+			ci->Extend("cs_entrymsg", messages);
+		}
+
+		if ((*messages)->empty())
+		{
 			source.Reply(_("Entry message list for \002%s\002 is empty."), ci->name.c_str());
 			return;
 		}
@@ -98,9 +105,9 @@ class CommandEntryMessage : public Command
 
 		ListFormatter list;
 		list.addColumn("Number").addColumn("Creator").addColumn("Created").addColumn("Message");
-		for (unsigned i = 0; i < messages->size(); ++i)
+		for (unsigned i = 0; i < (*messages)->size(); ++i)
 		{
-			EntryMsg &msg = messages->at(i);
+			EntryMsg &msg = (*messages)->at(i);
 
 			ListFormatter::ListEntry entry;
 			entry["Number"] = stringify(i + 1);
@@ -127,11 +134,11 @@ class CommandEntryMessage : public Command
 			ci->Extend("cs_entrymsg", messages);
 		}
 
-		if (MaxEntries && messages->size() >= MaxEntries)
+		if (MaxEntries && (*messages)->size() >= MaxEntries)
 			source.Reply(_("The entry message list for \002%s\002 is full."), ci->name.c_str());
 		else
 		{
-			messages->push_back(EntryMsg(ci, source.u->nick, message));
+			(*messages)->push_back(EntryMsg(ci, source.u->nick, message));
 			source.Reply(_("Entry message added to \002%s\002"), ci->name.c_str());
 		}
 	}
@@ -139,17 +146,25 @@ class CommandEntryMessage : public Command
 	void DoDel(CommandSource &source, ChannelInfo *ci, const Anope::string &message)
 	{
 		EntryMessageList *messages = ci->GetExt<EntryMessageList *>("cs_entrymsg");
+		if (messages == NULL)
+		{
+			messages = new EntryMessageList();
+			ci->Extend("cs_entrymsg", messages);
+		}
+
 		if (!message.is_pos_number_only())
 			source.Reply(("Entry message \002%s\002 not found on channel \002%s\002."), message.c_str(), ci->name.c_str());
-		else if (messages != NULL)
+		else if ((*messages)->empty())
+			source.Reply(_("Entry message list for \002%s\002 is empty."), ci->name.c_str());
+		else
 		{
 			try
 			{
 				unsigned i = convertTo<unsigned>(message);
-				if (i > 0 && i <= messages->size())
+				if (i > 0 && i <= (*messages)->size())
 				{
-					messages->erase(messages->begin() + i - 1);
-					if (messages->empty())
+					(*messages)->erase((*messages)->begin() + i - 1);
+					if ((*messages)->empty())
 						ci->Shrink("cs_entrymsg");
 					source.Reply(_("Entry message \002%i\002 for \002%s\002 deleted."), i, ci->name.c_str());
 				}
@@ -161,8 +176,6 @@ class CommandEntryMessage : public Command
 				source.Reply(_("Entry message \002%s\002 not found on channel \002%s\002."), message.c_str(), ci->name.c_str());
 			}
 		}
-		else
-			source.Reply(_("Entry message list for \002%s\002 is empty."), ci->name.c_str());
 	}
 
 	void DoClear(CommandSource &source, ChannelInfo *ci)
@@ -251,8 +264,8 @@ class CSEntryMessage : public Module
 			EntryMessageList *messages = c->ci->GetExt<EntryMessageList *>("cs_entrymsg");
 
 			if (messages != NULL)
-				for (unsigned i = 0; i < messages->size(); ++i)
-					u->SendMessage(c->ci->WhoSends(), "[%s] %s", c->ci->name.c_str(), (*messages)[i].message.c_str());
+				for (unsigned i = 0; i < (*messages)->size(); ++i)
+					u->SendMessage(c->ci->WhoSends(), "[%s] %s", c->ci->name.c_str(), (*messages)->at(i).message.c_str());
 		}
 	}
 		

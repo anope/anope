@@ -20,7 +20,7 @@ class CommandCSList : public Command
 	{
 		this->SetFlag(CFLAG_STRIP_CHANNEL);
 		this->SetDesc(_("Lists all registered channels matching the given pattern"));
-		this->SetSyntax(_("\037pattern\037"));
+		this->SetSyntax(_("\037pattern\037 [SUSPENDED] [NOEXPIRE]"));
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
@@ -122,9 +122,31 @@ class CommandCSList : public Command
 		this->SendSyntax(source);
 		source.Reply(" ");
 		source.Reply(_("Lists all registered channels matching the given pattern.\n"
-				"(Channels with the \002PRIVATE\002 option set are not listed.)\n"
+				"Channels with the \002PRIVATE\002 option set will only be\n"
+				"displayed to Services Operators with the proper access.\n"
+				"Channels with the \002NOEXPIRE\002 option set will have\n"
+				"a \002!\002 prefixed to the channel for Services Operators to see.\n"
+				" \n"
 				"Note that a preceding '#' specifies a range, channel names\n"
-				"are to be written without '#'."));
+				"are to be written without '#'.\n"
+				" \n"
+				"If the SUSPENDED or NOEXPIRE options are given, only channels\n"
+				"which, respectively, are SUSPENDED or have the NOEXPIRE\n"
+				"flag set will be displayed. If multiple options are given,\n"
+				"all channels matching at least one option will be displayed.\n"
+				"Note that these options are limited to \037Services Operators\037.\n"
+				" \n"
+				"Examples:\n"
+				" \n"
+				"    \002LIST *anope*\002\n"
+				"        Lists all registered channels with \002anope\002 in their\n"
+				"        names (case insensitive).\n"
+				" \n"
+				"    \002LIST * NOEXPIRE\002\n"
+				"        Lists all registered channels which have been set to not expire.\n"
+				" \n"
+				"    \002LIST #51-100\002\n"
+				"        Lists all registered channels within the given range (51-100).\n"));
 		if (!Config->RegexEngine.empty())
 			source.Reply(" \n"
 					"Regex matches are also supported using the %s engine.\n"

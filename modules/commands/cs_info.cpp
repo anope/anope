@@ -127,10 +127,11 @@ class CommandCSInfo : public Command
 		this->SendSyntax(source);
 		source.Reply(" ");
 		source.Reply(_("Lists information about the named registered channel,\n"
-				"including its founder, time of registration, last time\n"
-				"used, description, and mode lock, if any. If \002ALL\002 is\n"
-				"specified, the entry message and successor will also\n"
-				"be displayed."));
+				"including its founder, time of registration, and last\n"
+				"time used. If the user issuing the command has the\n"
+				"appropriate access for it, then the description, successor,\n"
+				"last topic set, settings and expiration time will also\n"
+				"be displayed when applicable."));
 		return true;
 	}
 };

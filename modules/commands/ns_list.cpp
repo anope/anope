@@ -29,7 +29,7 @@ class CommandNSList : public Command
 		Anope::string pattern = params[0];
 		const NickCore *mync;
 		unsigned nnicks;
-		bool is_servadmin = u->IsServicesOper();
+		bool is_servadmin = u->HasCommand("nickserv/list");
 		int count = 0, from = 0, to = 0;
 		bool suspended, nsnoexpire, unconfirmed;
 
@@ -135,16 +135,18 @@ class CommandNSList : public Command
 		source.Reply(" ");
 		source.Reply(_("Lists all registered nicknames which match the given\n"
 				"pattern, in \037nick!user@host\037 format.  Nicks with the \002PRIVATE\002\n"
-				"option set will only be displayed to Services Operators.  Nicks\n"
-				"with the \002NOEXPIRE\002 option set will have a \002!\002 appended to\n"
-				"the nickname for Services Operators.\n"
+				"option set will only be displayed to Services Operators with the\n"
+				"proper access.  Nicks with the \002NOEXPIRE\002 option set will have\n"
+				"a \002!\002 prefixed to the nickname for Services Operators to see.\n"
 				" \n"
-				"If the SUSPENDED, NOEXPIRE or UNCONFIRMED options are given, only\n"
+				"Note that a preceding '#' specifies a range.\n"
+				" \n"
+				"If the SUSPENDED, UNCONFIRMED or NOEXPIRE options are given, only\n"
 				"nicks which, respectively, are SUSPENDED, UNCONFIRMED or have the\n"
 				"NOEXPIRE flag set will be displayed. If multiple options are\n"
 				"given, all nicks matching at least one option will be displayed.\n"
-				"These options are limited to \037Services Operators\037.  \n"
-				"\n"
+				"Note that these options are limited to \037Services Operators\037.\n"
+				" \n"
 				"Examples:\n"
 				" \n"
 				"    \002LIST *!joeuser@foo.com\002\n"
@@ -155,7 +157,10 @@ class CommandNSList : public Command
 				"        names (case insensitive).\n"
 				" \n"
 				"    \002LIST * NOEXPIRE\002\n"
-				"        Lists all registered nicks which have been set to not expire.\n"));
+				"        Lists all registered nicks which have been set to not expire.\n"
+				" \n"
+				"    \002LIST #51-100\002\n"
+				"        Lists all registered nicks within the given range (51-100).\n"));
 		if (!Config->RegexEngine.empty())
 			source.Reply(" \n"
 					"Regex matches are also supported using the %s engine.\n"

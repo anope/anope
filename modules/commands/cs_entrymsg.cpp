@@ -127,6 +127,8 @@ class CommandEntryMessage : public Command
 		
 	void DoAdd(CommandSource &source, ChannelInfo *ci, const Anope::string &message)
 	{
+		User *u = source.u;
+
 		EntryMessageList *messages = ci->GetExt<EntryMessageList *>("cs_entrymsg");
 		if (messages == NULL)
 		{
@@ -139,12 +141,15 @@ class CommandEntryMessage : public Command
 		else
 		{
 			(*messages)->push_back(EntryMsg(ci, source.u->nick, message));
+			Log(IsFounder(u, ci) ? LOG_COMMAND : LOG_OVERRIDE, u, this, ci) << "to add a message";
 			source.Reply(_("Entry message added to \002%s\002"), ci->name.c_str());
 		}
 	}
 
 	void DoDel(CommandSource &source, ChannelInfo *ci, const Anope::string &message)
 	{
+		User *u = source.u;
+
 		EntryMessageList *messages = ci->GetExt<EntryMessageList *>("cs_entrymsg");
 		if (messages == NULL)
 		{
@@ -166,6 +171,7 @@ class CommandEntryMessage : public Command
 					(*messages)->erase((*messages)->begin() + i - 1);
 					if ((*messages)->empty())
 						ci->Shrink("cs_entrymsg");
+					Log(IsFounder(u, ci) ? LOG_COMMAND : LOG_OVERRIDE, u, this, ci) << "to remove a message";
 					source.Reply(_("Entry message \002%i\002 for \002%s\002 deleted."), i, ci->name.c_str());
 				}
 				else
@@ -180,7 +186,10 @@ class CommandEntryMessage : public Command
 
 	void DoClear(CommandSource &source, ChannelInfo *ci)
 	{
+		User *u = source.u;
+
 		ci->Shrink("cs_entrymsg");
+		Log(IsFounder(u, ci) ? LOG_COMMAND : LOG_OVERRIDE, u, this, ci) << "to remove all messages";
 		source.Reply(_("Entry messages for \002%s\002 have been cleared."), ci->name.c_str());
 	}
 
@@ -188,7 +197,10 @@ class CommandEntryMessage : public Command
 	CommandEntryMessage(Module *creator) : Command(creator, "chanserv/entrymsg", 2, 3)
 	{
 		this->SetDesc(_("Manage the channel's entry messages"));
-		this->SetSyntax(_("\037channel\037 {ADD|DEL|LIST|CLEAR} [\037message\037|\037num\037]"));
+		this->SetSyntax(_("\037channel\037 ADD \037message\037"));
+		this->SetSyntax(_("\037channel\037 DEL \037num\037"));
+		this->SetSyntax(_("\037channel\037 LIST"));
+		this->SetSyntax(_("\037channel\037 CLEAR"));
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
@@ -204,27 +216,18 @@ class CommandEntryMessage : public Command
 
 		if (IsFounder(u, ci) || u->HasCommand("chanserv/set"))
 		{
-			bool success = true;
 			if (params[1].equals_ci("LIST"))
 				this->DoList(source, ci);
 			else if (params[1].equals_ci("CLEAR"))
 				this->DoClear(source, ci);
 			else if (params.size() < 3)
-			{
-				success = false;
 				this->OnSyntaxError(source, "");
-			}
 			else if (params[1].equals_ci("ADD"))
 				this->DoAdd(source, ci, params[2]);
 			else if (params[1].equals_ci("DEL"))
 				this->DoDel(source, ci, params[2]);
 			else
-			{
-				success = false;
 				this->OnSyntaxError(source, "");
-			}
-			if (success)
-				Log(IsFounder(u, ci) ? LOG_COMMAND : LOG_OVERRIDE, u, this, ci) << " to " << params[1] << " a message";
 		}
 		else
 			source.Reply(ACCESS_DENIED);
@@ -237,6 +240,22 @@ class CommandEntryMessage : public Command
 		this->SendSyntax(source);
 		source.Reply(" ");
 		source.Reply(_("Controls what messages will be sent to users when they join the channel."));
+		source.Reply(" ");
+		source.Reply(_("The \002ENTRYMSG ADD\002 command adds the given message to\n"
+				"the list of messages to be shown to users when they join\n"
+				"the channel."));
+		source.Reply(" ");
+		source.Reply(_("The \002ENTRYMSG DEL\002 command removes the given message from\n"
+				"the list of messages to be shown to users when they join\n"
+				"the channel. You can remove the message by specifying its number\n"
+				"which you can get by listing the messages as explained below."));
+		source.Reply(" ");
+		source.Reply(_("The \002ENTRYMSG LIST\002 command displays a listing of messages\n"
+				"to be shown to users when they join the channel."));
+		source.Reply(" ");
+		source.Reply(_("The \002ENTRYMSG CLEAR\002 command clears all entries from\n"
+				"the list of messages to be shown to users when they join\n"
+				"the channel, effectively disabling entry messages."));
 		return true;
 	}
 };

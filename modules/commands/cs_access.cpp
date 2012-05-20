@@ -440,7 +440,7 @@ class CommandCSAccess : public Command
 		this->SetSyntax(_("\037channel\037 DEL {\037mask\037 | \037entry-num\037 | \037list\037}"));
 		this->SetSyntax(_("\037channel\037 LIST [\037mask\037 | \037list\037]"));
 		this->SetSyntax(_("\037channel\037 VIEW [\037mask\037 | \037list\037]"));
-		this->SetSyntax(_("\037channel\037 CLEAR\002"));
+		this->SetSyntax(_("\037channel\037 CLEAR"));
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override

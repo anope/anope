@@ -1212,7 +1212,7 @@ class ProtoUnreal : public Module
 		
 		this->AddModes();
 
-		Implementation i[] = { I_OnUserNickChange, I_OnChannelCreate, I_OnMLock, I_OnUnMLock };
+		Implementation i[] = { I_OnUserNickChange, I_OnChannelCreate, I_OnChanRegistered, I_OnDelChan, I_OnMLock, I_OnUnMLock };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 		ModuleManager::SetPriority(this, PRIORITY_FIRST);
 	}
@@ -1232,17 +1232,32 @@ class ProtoUnreal : public Module
 
 	void OnChannelCreate(Channel *c) anope_override
 	{
-		if (Capab.count("MLOCK") > 0 && c->ci)
+		if (Config->UseServerSideMLock && Capab.count("MLOCK") > 0 && c->ci)
 		{
 			Anope::string modes = c->ci->GetMLockAsString(false).replace_all_cs("+", "").replace_all_cs("-", "");
 			UplinkSocket::Message(Me) << "MLOCK " << static_cast<long>(c->creation_time) << " " << c->ci->name << " " << modes;
 		}
 	}
 
+	void OnChanRegistered(ChannelInfo *ci) anope_override
+	{
+		if (!ci->c || !Config->UseServerSideMLock)
+			return;
+		Anope::string modes = ci->GetMLockAsString(false).replace_all_cs("+", "").replace_all_cs("-", "");
+		UplinkSocket::Message(Me) << "MLOCK " << static_cast<long>(ci->c->creation_time) << " " << ci->name << " " << modes;
+	}
+
+	void OnDelChan(ChannelInfo *ci) anope_override
+	{
+		if (!ci->c || !Config->UseServerSideMLock)
+			return;
+		UplinkSocket::Message(Me) << "MLOCK " << static_cast<long>(ci->c->creation_time) << " " << ci->name << " :";
+	}
+
 	EventReturn OnMLock(ChannelInfo *ci, ModeLock *lock) anope_override
 	{
 		ChannelMode *cm = ModeManager::FindChannelModeByName(lock->name);
-		if (cm && ci->c && (cm->Type == MODE_REGULAR || cm->Type == MODE_PARAM) && Capab.count("MLOCK") > 0)
+		if (cm && ci->c && (cm->Type == MODE_REGULAR || cm->Type == MODE_PARAM) && Capab.count("MLOCK") > 0 && Config->UseServerSideMLock)
 		{
 			Anope::string modes = ci->GetMLockAsString(false).replace_all_cs("+", "").replace_all_cs("-", "") + cm->ModeChar;
 			UplinkSocket::Message(Me) << "MLOCK " << static_cast<long>(ci->c->creation_time) << " " << ci->name << " " << modes;
@@ -1254,7 +1269,7 @@ class ProtoUnreal : public Module
 	EventReturn OnUnMLock(ChannelInfo *ci, ModeLock *lock) anope_override
 	{
 		ChannelMode *cm = ModeManager::FindChannelModeByName(lock->name);
-		if (cm && ci->c && (cm->Type == MODE_REGULAR || cm->Type == MODE_PARAM) && Capab.count("MLOCK") > 0)
+		if (cm && ci->c && (cm->Type == MODE_REGULAR || cm->Type == MODE_PARAM) && Capab.count("MLOCK") > 0 && Config->UseServerSideMLock)
 		{
 			Anope::string modes = ci->GetMLockAsString(false).replace_all_cs("+", "").replace_all_cs("-", "").replace_all_cs(cm->ModeChar, "");
 			UplinkSocket::Message(Me) << "MLOCK " << static_cast<long>(ci->c->creation_time) << " " << ci->name << " " << modes;

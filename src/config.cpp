@@ -1253,6 +1253,7 @@ ConfigItems::ConfigItems(ServerConfig *conf)
 		{"chanserv", "mlock", "+nrt", new ValueContainerString(&conf->MLock), DT_STRING | DT_ALLOW_EMPTY, NoValidation},
 		{"chanserv", "nomlock", "", new ValueContainerString(&conf->NoMLock), DT_STRING, NoValidation},
 		{"chanserv", "require", "", new ValueContainerString(&conf->CSRequire), DT_STRING, NoValidation},
+		{"chanserv", "use_server_side_mlock", "yes", new ValueContainerBool(&conf->UseServerSideMLock), DT_BOOLEAN, NoValidation},
 		{"memoserv", "name", "", new ValueContainerString(&conf->MemoServ), DT_STRING, NoValidation},
 		{"memoserv", "maxmemos", "0", new ValueContainerUInt(&conf->MSMaxMemos), DT_UINTEGER, NoValidation},
 		{"memoserv", "senddelay", "0", new ValueContainerTime(&conf->MSSendDelay), DT_TIME, NoValidation},

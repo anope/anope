@@ -730,7 +730,7 @@ class ProtoInspIRCd : public Module
 		
 		Capab.insert("NOQUIT");
 
-		Implementation i[] = { I_OnUserNickChange, I_OnServerSync };
+		Implementation i[] = { I_OnUserNickChange, I_OnServerSync, I_OnChannelCreate, I_OnChanRegistered, I_OnDelChan, I_OnMLock, I_OnUnMLock };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 
 		if (Config->Numeric.empty())
@@ -765,6 +765,51 @@ class ProtoInspIRCd : public Module
 				if (u->server == s && !u->IsIdentified())
 					nickserv->Validate(u);
 			}
+	}
+
+	void OnChannelCreate(Channel *c) anope_override
+	{
+		if (c->ci && Config->UseServerSideMLock)
+			this->OnChanRegistered(c->ci);
+	}
+
+	void OnChanRegistered(ChannelInfo *ci) anope_override
+	{
+		if (!Config->UseServerSideMLock)
+			return;
+		Anope::string modes = ci->GetMLockAsString(false).replace_all_cs("+", "").replace_all_cs("-", "");
+		UplinkSocket::Message(Me) << "METADATA " << ci->name << " mlock :" << modes;
+	}
+
+	void OnDelChan(ChannelInfo *ci) anope_override
+	{
+		if (!Config->UseServerSideMLock)
+			return;
+		UplinkSocket::Message(Me) << "METADATA " << ci->name << " mlock :";
+	}
+
+	EventReturn OnMLock(ChannelInfo *ci, ModeLock *lock) anope_override
+	{
+		ChannelMode *cm = ModeManager::FindChannelModeByName(lock->name);
+		if (cm && ci->c && (cm->Type == MODE_REGULAR || cm->Type == MODE_PARAM) && Config->UseServerSideMLock)
+		{
+			Anope::string modes = ci->GetMLockAsString(false).replace_all_cs("+", "").replace_all_cs("-", "") + cm->ModeChar;
+			UplinkSocket::Message(Me) << "METADATA " << ci->name << " mlock :" << modes;
+		}
+
+		return EVENT_CONTINUE;
+	}
+
+	EventReturn OnUnMLock(ChannelInfo *ci, ModeLock *lock) anope_override
+	{
+		ChannelMode *cm = ModeManager::FindChannelModeByName(lock->name);
+		if (cm && ci->c && (cm->Type == MODE_REGULAR || cm->Type == MODE_PARAM) && Config->UseServerSideMLock)
+		{
+			Anope::string modes = ci->GetMLockAsString(false).replace_all_cs("+", "").replace_all_cs("-", "").replace_all_cs(cm->ModeChar, "");
+			UplinkSocket::Message(Me) << "METADATA " << ci->name << " mlock :" << modes;
+		}
+
+		return EVENT_CONTINUE;
 	}
 };
 

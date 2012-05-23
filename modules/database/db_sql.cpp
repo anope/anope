@@ -58,6 +58,7 @@ class DBSQL : public Module, public Pipe
 	SQLSQLInterface sqlinterface;
 	Anope::string prefix;
 	std::set<dynamic_reference<Serializable> > updated_items;
+	bool shutting_down;
 
 	void RunBackground(const SQLQuery &q, SQLInterface *iface = NULL)
 	{
@@ -81,16 +82,16 @@ class DBSQL : public Module, public Pipe
 	}
 
  public:
-	DBSQL(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, DATABASE), sql("", ""), sqlinterface(this)
+	DBSQL(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, DATABASE), sql("", ""), sqlinterface(this), shutting_down(false)
 	{
 		this->SetAuthor("Anope");
 
-		Implementation i[] = { I_OnReload, I_OnLoadDatabase, I_OnSerializableConstruct, I_OnSerializableDestruct, I_OnSerializableUpdate };
+		Implementation i[] = { I_OnReload, I_OnShutdown, I_OnRestart, I_OnLoadDatabase, I_OnSerializableConstruct, I_OnSerializableDestruct, I_OnSerializableUpdate };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 
 		this->OnReload();
 	}
-	
+
 	void OnNotify() anope_override
 	{
 		for (std::set<dynamic_reference<Serializable> >::iterator it = this->updated_items.begin(), it_end = this->updated_items.end(); it != it_end; ++it)
@@ -123,6 +124,17 @@ class DBSQL : public Module, public Pipe
 		Anope::string engine = config.ReadValue("db_sql", "engine", "", 0);
 		this->sql = service_reference<SQLProvider>("SQLProvider", engine);
 		this->prefix = config.ReadValue("db_sql", "prefix", "anope_db_", 0);
+	}
+
+	void OnShutdown() anope_override
+	{
+		this->shutting_down = true;
+		this->OnNotify();
+	}
+
+	void OnRestart() anope_override
+	{
+		this->OnShutdown();
 	}
 
 	EventReturn OnLoadDatabase() anope_override
@@ -167,6 +179,8 @@ class DBSQL : public Module, public Pipe
 
 	void OnSerializableConstruct(Serializable *obj) anope_override
 	{
+		if (this->shutting_down)
+			return;
 		this->updated_items.insert(obj);
 		this->Notify();
 	}
@@ -178,7 +192,7 @@ class DBSQL : public Module, public Pipe
 
 	void OnSerializableUpdate(Serializable *obj) anope_override
 	{
-		if (obj->IsTSCached())
+		if (this->shutting_down || obj->IsTSCached())
 			return;
 		obj->UpdateTS();
 		this->updated_items.insert(obj);

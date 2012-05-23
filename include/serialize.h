@@ -242,6 +242,7 @@ class serialize_obj : public dynamic_reference_base
 			if (this->ref)
 			{
 				FOREACH_MOD(I_OnSerializePtrAssign, OnSerializePtrAssign(this->ref));
+				this->ref->QueueUpdate();
 			}
 			return this->ref;
 		}
@@ -255,6 +256,7 @@ class serialize_obj : public dynamic_reference_base
 			if (this->ref)
 			{
 				FOREACH_MOD(I_OnSerializePtrAssign, OnSerializePtrAssign(this->ref));
+				this->ref->QueueUpdate();
 			}
 			return this->ref;
 		}
@@ -268,6 +270,7 @@ class serialize_obj : public dynamic_reference_base
 			if (this->ref)
 			{
 				FOREACH_MOD(I_OnSerializePtrAssign, OnSerializePtrAssign(this->ref));
+				this->ref->QueueUpdate();
 			}
 			return this->ref;
 		}

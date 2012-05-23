@@ -51,9 +51,9 @@ struct EntryMsg : Serializable
 
 static unsigned MaxEntries = 0;
 
-struct EntryMessageList : serialize_checker<std::vector<EntryMsg> >, ExtensibleItem
+struct EntryMessageList : serialize_checker<std::vector<EntryMsg *> >, ExtensibleItem
 {
-	EntryMessageList() : serialize_checker<std::vector<EntryMsg> >("EntryMsg") { }
+	EntryMessageList() : serialize_checker<std::vector<EntryMsg *> >("EntryMsg") { }
 };
 
 Serializable* EntryMsg::unserialize(Serializable *obj, Serialize::Data &data)
@@ -79,8 +79,9 @@ Serializable* EntryMsg::unserialize(Serializable *obj, Serialize::Data &data)
 		ci->Extend("cs_entrymsg", messages);
 	}
 
-	(*messages)->push_back(EntryMsg(ci, data["creator"].astr(), data["message"].astr()));
-	return &(*messages)->back();
+	EntryMsg *m = new EntryMsg(ci, data["creator"].astr(), data["message"].astr());
+	(*messages)->push_back(m);
+	return m;
 }
 
 class CommandEntryMessage : public Command
@@ -107,13 +108,13 @@ class CommandEntryMessage : public Command
 		list.addColumn("Number").addColumn("Creator").addColumn("Created").addColumn("Message");
 		for (unsigned i = 0; i < (*messages)->size(); ++i)
 		{
-			EntryMsg &msg = (*messages)->at(i);
+			EntryMsg *msg = (*messages)->at(i);
 
 			ListFormatter::ListEntry entry;
 			entry["Number"] = stringify(i + 1);
-			entry["Creator"] = msg.creator;
-			entry["Created"] = do_strftime(msg.when);
-			entry["Message"] = msg.message;
+			entry["Creator"] = msg->creator;
+			entry["Created"] = do_strftime(msg->when);
+			entry["Message"] = msg->message;
 			list.addEntry(entry);
 		}
 
@@ -140,7 +141,7 @@ class CommandEntryMessage : public Command
 			source.Reply(_("The entry message list for \002%s\002 is full."), ci->name.c_str());
 		else
 		{
-			(*messages)->push_back(EntryMsg(ci, source.u->nick, message));
+			(*messages)->push_back(new EntryMsg(ci, source.u->nick, message));
 			Log(IsFounder(u, ci) ? LOG_COMMAND : LOG_OVERRIDE, u, this, ci) << "to add a message";
 			source.Reply(_("Entry message added to \002%s\002"), ci->name.c_str());
 		}
@@ -168,6 +169,7 @@ class CommandEntryMessage : public Command
 				unsigned i = convertTo<unsigned>(message);
 				if (i > 0 && i <= (*messages)->size())
 				{
+					(*messages)->at(i - 1)->destroy();
 					(*messages)->erase((*messages)->begin() + i - 1);
 					if ((*messages)->empty())
 						ci->Shrink("cs_entrymsg");
@@ -188,7 +190,15 @@ class CommandEntryMessage : public Command
 	{
 		User *u = source.u;
 
-		ci->Shrink("cs_entrymsg");
+		EntryMessageList *messages = ci->GetExt<EntryMessageList *>("cs_entrymsg");
+		if (messages != NULL)
+		{
+			for (unsigned i = 0; i < (*messages)->size(); ++i)
+				(*messages)->at(i)->destroy();
+			(*messages)->clear();
+			ci->Shrink("cs_entrymsg");
+		}
+
 		Log(IsFounder(u, ci) ? LOG_COMMAND : LOG_OVERRIDE, u, this, ci) << "to remove all messages";
 		source.Reply(_("Entry messages for \002%s\002 have been cleared."), ci->name.c_str());
 	}
@@ -284,7 +294,7 @@ class CSEntryMessage : public Module
 
 			if (messages != NULL)
 				for (unsigned i = 0; i < (*messages)->size(); ++i)
-					u->SendMessage(c->ci->WhoSends(), "[%s] %s", c->ci->name.c_str(), (*messages)->at(i).message.c_str());
+					u->SendMessage(c->ci->WhoSends(), "[%s] %s", c->ci->name.c_str(), (*messages)->at(i)->message.c_str());
 		}
 	}
 		

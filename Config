@@ -67,6 +67,12 @@ Run_Build_System () {
 		RUN_CC_PL="-DUSE_RUN_CC_PL:BOOLEAN=OFF"
 	fi
 
+	if [ "$USE_PCH" = "yes" ] ; then
+		PCH="-DUSE_PCH:BOOLEAN=ON"
+	else
+		PCH="-DUSE_PCH:BOOLEAN=OFF"
+	fi
+
 	case `uname -s` in
 		MINGW*)
 			GEN_TYPE="-G\"MSYS Makefiles\""
@@ -82,9 +88,9 @@ Run_Build_System () {
 		REAL_SOURCE_DIR="$SOURCE_DIR"
 	fi
 
-	echo "cmake $GEN_TYPE $WITH_INST $WITH_RUN $WITH_PERM $BUILD_TYPE $RUN_CC_PL $EXTRA_CONFIG_ARGS $REAL_SOURCE_DIR"
+	echo "cmake $GEN_TYPE $WITH_INST $WITH_RUN $WITH_PERM $BUILD_TYPE $RUN_CC_PL $PCH $EXTRA_CONFIG_ARGS $REAL_SOURCE_DIR"
 
-	cmake $GEN_TYPE $WITH_INST $WITH_RUN $WITH_PERM $BUILD_TYPE $RUN_CC_PL $EXTRA_CONFIG_ARGS $REAL_SOURCE_DIR
+	cmake $GEN_TYPE $WITH_INST $WITH_RUN $WITH_PERM $BUILD_TYPE $RUN_CC_PL $PCH $EXTRA_CONFIG_ARGS $REAL_SOURCE_DIR
 
 	echo ""
 	if [ "$SOURCE_DIR" = "." ] ; then
@@ -117,6 +123,7 @@ RUNGROUP=
 UMASK=
 DEBUG="yes"
 USE_RUN_CC_PL="no"
+USE_PCH="no"
 EXTRA_CONFIG_ARGS=
 CAN_QUICK="no"
 SOURCE_DIR=`dirname $0`
@@ -360,6 +367,25 @@ echo ""
 
 ####
 
+TEMP_YN="n"
+if [ "$USE_PCH" = "yes" ] ; then
+	TEMP_YN="y"
+fi
+echo "Do you want to build using precompiled headers? This can speed up"
+echo "the build, but uses more disk space."
+echo2 "[$TEMP_YN] "
+read YN
+if [ "$YN" ] ; then
+	if [ "$YN" = "y" ] ; then
+		USE_PCH="yes"
+	else
+		USE_PCH="no"
+	fi
+fi
+echo ""
+
+####
+
 echo "Are there any extra arguments you wish to pass to cmake?"
 echo "You may only need to do this if cmake is unable to locate"
 echo "missing dependencies without hints."
@@ -385,6 +411,7 @@ RUNGROUP="$RUNGROUP"
 UMASK=$UMASK
 DEBUG="$DEBUG"
 USE_RUN_CC_PL="$USE_RUN_CC_PL"
+USE_PCH="$USE_PCH"
 EXTRA_CONFIG_ARGS="$EXTRA_CONFIG_ARGS"
 EOT
 echo "done."

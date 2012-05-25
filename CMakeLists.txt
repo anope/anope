@@ -218,6 +218,7 @@ find_package(Gettext)
 
 # Add an optional variable for using run-cc.pl for building, Perl will be checked later regardless of this setting
 option(USE_RUN_CC_PL "Use run-cc.pl for building" OFF)
+option(USE_PCH "Use precompiled headers" OFF)
 
 # Use the following directories as includes
 # Note that it is important the binary include directory comes before the

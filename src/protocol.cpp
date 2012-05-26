@@ -570,7 +570,7 @@ bool IRCdMessage::OnError(const Anope::string &, const std::vector<Anope::string
 {
 	if (!params.empty())
 	{
-		Log() << "ERROR: " << params[0];
+		Log(LOG_TERMINAL) << "ERROR: " << params[0];
 		quitmsg = "Received ERROR from uplink: " + params[0];
 	}
 	

@@ -166,7 +166,7 @@ class CommandCSFlags : public Command
 							else
 							{
 								source.Reply(_("You can not set the \002%c\002 flag."), f);
-								continue;
+								break;
 							}
 						}
 						if (add == 1)
@@ -235,10 +235,11 @@ class CommandCSFlags : public Command
 		for (unsigned i = 0, end = ci->GetAccessCount(); i < end; ++i)
 		{
 			const ChanAccess *access = ci->GetAccess(i);
-			const Anope::string &flags = FlagsChanAccess::DetermineFlags(access);
 
 			if (!arg.empty())
 			{
+				const Anope::string &flags = FlagsChanAccess::DetermineFlags(access);
+
 				if (arg[0] == '+')
 				{
 					bool pass = true;

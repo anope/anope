@@ -33,12 +33,12 @@ static struct XOPAccess
 		{
 			"SIGNKICK",
 			"SET",
+			"MODE",
 			"AUTOOWNER",
 			"OWNERME",
 			"PROTECT",
 			"INFO",
 			"ASSIGN",
-			"TOPIC",
 			""
 		}
 	},
@@ -56,15 +56,14 @@ static struct XOPAccess
 	},
 	{ XOP_AOP, "AOP",
 		{
-			"MODE",
+			"TOPIC",
 			"GETKEY",
 			"INVITE",
-			"UNBAN",
 			"AUTOOP",
 			"OPDEOPME",
 			"HALFOP",
 			"SAY",
-			"NOKICK",
+			"GREET",
 			""
 		}
 	},
@@ -72,9 +71,10 @@ static struct XOPAccess
 		{
 			"AUTOHALFOP",
 			"HALFOPME",
+			"VOICE",
 			"KICK",
 			"BAN",
-			"FANTASIA",
+			"UNBAN",
 			""
 		}
 	},
@@ -83,6 +83,8 @@ static struct XOPAccess
 			"AUTOVOICE",
 			"VOICEME",
 			"ACCESS_LIST",
+			"FANTASIA",
+			"NOKICK",
 			""
 		}
 	},
@@ -215,14 +217,23 @@ class XOPBase : public Command
 			return;
 		}
 
+		XOPChanAccess tmp_access(NULL);
+		tmp_access.ci = ci;
+		tmp_access.type = level;
+
 		AccessGroup access = ci->AccessFor(u);
 		const ChanAccess *highest = access.Highest();
-		int u_level = (highest ? XOPChanAccess::DetermineLevel(highest) : 0);
+		bool override = false;
 
-		if ((!access.Founder && !access.HasPriv("ACCESS_CHANGE") && !u->HasPriv("chanserv/access/modify")) || (level <= u_level && !access.Founder))
+		if ((!access.Founder && !access.HasPriv("ACCESS_CHANGE")) || ((!highest || *highest <= tmp_access) && !access.Founder))
 		{
-			source.Reply(ACCESS_DENIED);
-			return;
+			if (u->HasPriv("chanserv/access/modify"))
+				override = true;
+			else
+			{
+				source.Reply(ACCESS_DENIED);
+				return;
+			}
 		}
 
 		if (mask.find_first_of("!*@") == Anope::string::npos && !findnick(mask))
@@ -243,7 +254,7 @@ class XOPBase : public Command
 
 			if (a->mask.equals_ci(mask))
 			{
-				if (XOPChanAccess::DetermineLevel(a) >= u_level && !access.Founder && !u->HasPriv("chanserv/access/modify"))
+				if ((!highest || *a >= *highest) && !access.Founder && !u->HasPriv("chanserv/access/modify"))
 				{
 					source.Reply(ACCESS_DENIED);
 					return;
@@ -272,7 +283,6 @@ class XOPBase : public Command
 		acc->created = Anope::CurTime;
 		ci->AddAccess(acc);
 
-		bool override = (level >= u_level && !access.Founder) || !access.HasPriv("ACCESS_CHANGE");
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "to add " << mask;
 
 		FOREACH_MOD(I_OnAccessAdd, OnAccessAdd(ci, u, acc));
@@ -303,10 +313,15 @@ class XOPBase : public Command
 			return;
 		}
 
+		XOPChanAccess tmp_access(NULL);
+		tmp_access.ci = ci;
+		tmp_access.type = level;
+
 		AccessGroup access = ci->AccessFor(u);
 		const ChanAccess *highest = access.Highest();
 		bool override = false;
-		if ((!mask.equals_ci(u->Account()->display) && !access.HasPriv("ACCESS_CHANGE") && !access.Founder) || ((!highest || level <= XOPChanAccess::DetermineLevel(highest)) && !access.Founder))
+
+		if ((!mask.equals_ci(u->Account()->display) && !access.HasPriv("ACCESS_CHANGE") && !access.Founder) || ((!highest || tmp_access >= *highest) && !access.Founder))
 		{
 			if (u->HasPriv("chanserv/access/modify"))
 				override = true;

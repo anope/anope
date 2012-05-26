@@ -106,22 +106,31 @@ class CommandCSAccess : public Command
 			source.Reply(_("Access level must be non-zero."));
 			return;
 		}
-
-		AccessGroup u_access = ci->AccessFor(u);
-		const ChanAccess *highest = u_access.Highest();
-		int u_level = (highest ? AccessChanAccess::DetermineLevel(highest) : 0);
-		if (level >= u_level && !u_access.Founder && !u->HasPriv("chanserv/access/modify"))
-		{
-			source.Reply(ACCESS_DENIED);
-			return;
-		}
 		else if (level <= ACCESS_INVALID || level >= ACCESS_FOUNDER)
 		{
 			source.Reply(CHAN_ACCESS_LEVEL_RANGE, ACCESS_INVALID + 1, ACCESS_FOUNDER - 1);
 			return;
 		}
 
-		bool override = !ci->AccessFor(u).HasPriv("ACCESS_CHANGE") || (level >= u_level && !u_access.Founder);
+		AccessGroup u_access = ci->AccessFor(u);
+		const ChanAccess *highest = u_access.Highest();
+
+		AccessChanAccess tmp_access(NULL);
+		tmp_access.ci = ci;
+		tmp_access.level = level;
+
+		bool override = false;
+
+		if ((!highest || *highest <= tmp_access) && !u_access.Founder)
+		{
+			if (u->HasPriv("chanserv/access/modify"))
+				override = true;
+			else
+			{
+				source.Reply(ACCESS_DENIED);
+				return;
+			}
+		}
 
 		if (mask.find_first_of("!*@") == Anope::string::npos && !findnick(mask))
 		{
@@ -141,7 +150,7 @@ class CommandCSAccess : public Command
 			if (mask.equals_ci(access->mask))
 			{
 				/* Don't allow lowering from a level >= u_level */
-				if (AccessChanAccess::DetermineLevel(access) >= u_level && !u_access.Founder && !u->HasPriv("chanserv/access/modify"))
+				if ((!highest || *access >= *highest) && !u_access.Founder && !u->HasPriv("chanserv/access/modify"))
 				{
 					source.Reply(ACCESS_DENIED);
 					return;
@@ -232,7 +241,7 @@ class CommandCSAccess : public Command
 					AccessGroup u_access = ci->AccessFor(user);
 					const ChanAccess *u_highest = u_access.Highest();
 
-					if ((u_highest ? AccessChanAccess::DetermineLevel(u_highest) : 0) <= AccessChanAccess::DetermineLevel(access) && !u_access.Founder && !this->override && !access->mask.equals_ci(user->Account()->display))
+					if ((!u_highest || *u_highest <= *access) && !u_access.Founder && !this->override && !access->mask.equals_ci(user->Account()->display))
 					{
 						Denied = true;
 						return;
@@ -256,15 +265,13 @@ class CommandCSAccess : public Command
 		{
 			AccessGroup u_access = ci->AccessFor(u);
 			const ChanAccess *highest = u_access.Highest();
-			int u_level = (highest ? AccessChanAccess::DetermineLevel(highest) : 0);
 
 			for (unsigned i = ci->GetAccessCount(); i > 0; --i)
 			{
 				ChanAccess *access = ci->GetAccess(i - 1);
 				if (mask.equals_ci(access->mask))
 				{
-					int access_level = AccessChanAccess::DetermineLevel(access);
-					if (!access->mask.equals_ci(u->Account()->display) && !u_access.Founder && u_level <= access_level && !u->HasPriv("chanserv/access/modify"))
+					if (!access->mask.equals_ci(u->Account()->display) && !u_access.Founder && (!highest || *highest <= *access) && !u->HasPriv("chanserv/access/modify"))
 						source.Reply(ACCESS_DENIED);
 					else
 					{

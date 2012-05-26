@@ -895,7 +895,7 @@ static bool DoPrivileges(ServerConfig *config, const Anope::string &, const Anop
 {
 	Anope::string name = values[0].GetValue();
 	Anope::string desc = values[1].GetValue();
-	Anope::string rank = values[2].GetValue();
+	int rank = values[2].GetInteger();
 
 	ValueItem vi(name);
 	if (!ValidateNotEmpty(config, "privilege", "name", vi))
@@ -905,14 +905,7 @@ static bool DoPrivileges(ServerConfig *config, const Anope::string &, const Anop
 	if (!ValidateNotEmpty(config, "privilege", "desc", vi))
 		throw ConfigException("One or more values in your configuration file failed to validate. Please see your log for more information.");
 	
-	int irank = 0;
-	try
-	{
-		irank = convertTo<int>(rank);
-	}
-	catch (const ConvertException &) { }
-
-	PrivilegeManager::AddPrivilege(Privilege(name, desc, irank));
+	PrivilegeManager::AddPrivilege(Privilege(name, desc, rank));
 	return true;
 }
 
@@ -1353,7 +1346,7 @@ ConfigItems::ConfigItems(ServerConfig *conf)
 		{"privilege",
 			{"name", "desc", "rank", ""},
 			{"", "", "", ""},
-			{DT_STRING, DT_STRING, DT_STRING, DT_STRING},
+			{DT_STRING, DT_STRING, DT_INTEGER, DT_STRING},
 			InitPrivileges, DoPrivileges, DonePrivileges},
 		{"",
 			{""},

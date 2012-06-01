@@ -95,6 +95,7 @@ class CSTop : public Module
 	CommandCSGTop10 commandcsgtop10;
 	service_reference<SQLProvider> sql;
 	MySQLInterface sqlinterface;
+	Anope::string prefix;
 
  public:
 	CSTop(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
@@ -112,6 +113,7 @@ class CSTop : public Module
 	void OnReload() anope_override
 	{
 		ConfigReader config;
+		prefix = config.ReadValue("chanstats", "prefix", "anope_", 0);
 		Anope::string engine = config.ReadValue("chanstats", "engine", "", 0);
 		this->sql = service_reference<SQLProvider>("SQLProvider", engine);
 	}
@@ -146,25 +148,17 @@ class CSTop : public Module
 		try
 		{
 			SQLQuery query;
-
+			query = "SELECT nick, letters, words, line, actions,"
+				"smileys_happy+smileys_sad+smileys_other as smileys "
+				"FROM `" + prefix + "chanstats` "
+				"WHERE `nick` != '' AND `chan` = @channel@ AND `type` = 'total' "
+				"ORDER BY `letters` DESC LIMIT @limit@;";
+			query.setValue("limit", limit, false);
 
 			if (is_global)
-			{
-				query = Anope::printf("SELECT nickserv_display, sum(letters) as letters, sum(words) as words,"
-							" sum(line) as line, sum(smileys) as smileys, sum(actions) as actions"
-							" FROM `anope_bs_chanstats_view_sum_all`"
-							" WHERE nickserv_display IS NOT NULL"
-							" GROUP BY nickserv_display ORDER BY letters DESC LIMIT %i;", limit);
-			}
+				query.setValue("channel", "");
 			else
-			{
-				query = Anope::printf("SELECT nickserv_display, sum(letters) as letters, sum(words) as words,"
-							" sum(line) as line, sum(smileys) as smileys, sum(actions) as actions"
-							" FROM `anope_bs_chanstats_view_sum_all`"
-							" WHERE nickserv_display IS NOT NULL AND `chanserv_name` = @channel@"
-							" GROUP BY nickserv_display ORDER BY letters DESC LIMIT %i;", limit);
 				query.setValue("channel", channel.c_str());
-			}
 
 			SQLResult res = this->RunQuery(query);
 
@@ -174,7 +168,7 @@ class CSTop : public Module
 				for (int i = 0; i < res.Rows(); ++i)
 				{
 					source.Reply(_("%2lu \002%-16s\002 letters: %s, words: %s, lines: %s, smileys %s, actions: %s"),
-						i+1, res.Get(i, "nickserv_display").c_str(), res.Get(i, "letters").c_str(),
+						i+1, res.Get(i, "nick").c_str(), res.Get(i, "letters").c_str(),
 						res.Get(i, "words").c_str(), res.Get(i, "line").c_str(), 
 						res.Get(0, "smileys").c_str(), res.Get(0, "actions").c_str());
 				}

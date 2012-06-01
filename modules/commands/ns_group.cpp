@@ -94,7 +94,10 @@ class CommandNSGroup : public Command
 				 * If not, check that it is valid.
 				 */
 				if (na)
+				{
+					FOREACH_MOD(I_OnChangeCoreDisplay, OnChangeCoreDisplay(na->nc, u->nick));
 					na->destroy();
+				}
 				else
 				{
 					size_t prefixlen = Config->NSGuestNickPrefix.length();

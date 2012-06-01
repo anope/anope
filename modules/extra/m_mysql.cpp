@@ -440,7 +440,7 @@ void MySQLService::Connect()
 	const unsigned int timeout = 1;
 	mysql_options(this->sql, MYSQL_OPT_CONNECT_TIMEOUT, reinterpret_cast<const char *>(&timeout));
 
-	bool connect = mysql_real_connect(this->sql, this->server.c_str(), this->user.c_str(), this->password.c_str(), this->database.c_str(), this->port, NULL, 0);
+	bool connect = mysql_real_connect(this->sql, this->server.c_str(), this->user.c_str(), this->password.c_str(), this->database.c_str(), this->port, NULL, CLIENT_MULTI_RESULTS);
 
 	if (!connect)
 		throw SQLException("Unable to connect to MySQL service " + this->name + ": " + mysql_error(this->sql));

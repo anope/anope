@@ -68,6 +68,7 @@ class CSStats : public Module
 	CommandCSGStats commandcsgstats;
 	service_reference<SQLProvider> sql;
 	MySQLInterface sqlinterface;
+	Anope::string prefix;
  public:
 	CSStats(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
 		commandcsstats(this), commandcsgstats(this), sql("", ""), sqlinterface(this)
@@ -83,6 +84,7 @@ class CSStats : public Module
 	void OnReload() anope_override
 	{
 		ConfigReader config;
+		prefix = config.ReadValue("chanstats", "prefix", "anope_", 0);
 		Anope::string engine = config.ReadValue("chanstats", "engine", "", 0);
 		this->sql = service_reference<SQLProvider>("SQLProvider", engine);
 	}
@@ -117,19 +119,14 @@ class CSStats : public Module
 		try
 		{
 			SQLQuery query;
+			query = "SELECT letters, words, line, smileys_happy+smileys_sad+smileys_other as smileys,"
+				"actions FROM `" + prefix + "chanstats` "
+				"WHERE `nick` = @nick@ AND `chan` = @channel@ AND `type` = 'total';";
 			if (is_global)
-				query = "SELECT sum(letters) as letters, sum(words) as words, sum(line) as line,"
-					" sum(smileys) as smileys, sum(actions) as actions"
-					" FROM `anope_bs_chanstats_view_sum_all`"
-					" WHERE `nickserv_display` = @display@";
+				query.setValue("channel", "");
 			else
-			{
-				query = "SELECT letters, words, line, smileys, actions "
-					" FROM `anope_bs_chanstats_view_sum_all` "
-					" WHERE `nickserv_display` = @display@ AND `chanserv_name` = @channel@;";
 				query.setValue("channel", source.c->ci->name);
-			}
-			query.setValue("display", display);
+			query.setValue("nick", display);
 			SQLResult res = this->RunQuery(query);
 
 			if (res.Rows() > 0)

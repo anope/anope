@@ -60,7 +60,7 @@ class CommandCSSetTopicLock : public Command
 		source.Reply(" ");
 		source.Reply(_("Enables or disables the \002topic lock\002 option for a channel.\n"
 				"When \002topic lock\002 is set, the channel topic will be unchangable\n"
-				" except via the \002TOPIC\002 command."));
+				"except via the \002TOPIC\002 command."));
 		return true;
 	}
 };

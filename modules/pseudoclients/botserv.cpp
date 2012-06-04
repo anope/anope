@@ -194,9 +194,9 @@ class BotServCore : public Module
 			"Bot will join a channel whenever there is at least\n"
 			"\002%d\002 user(s) on it."), Config->BSMinUsers);
 		if (!Config->BSFantasyCharacter.empty())
-			source.Reply(_("Additionally, all %s commands\n"
-				"can be used if fantasy is enabled by prefixing the command\n"
-				"name with one of the following characters: %s."), Config->ChanServ.c_str(), Config->BSFantasyCharacter.c_str());
+			source.Reply(_("Additionally, all %s commands can be used if fantasy\n"
+				"is enabled by prefixing the command name with one of\n"
+				"the following characters: %s"), Config->ChanServ.c_str(), Config->BSFantasyCharacter.c_str());
 	}
 
 	EventReturn OnChannelModeSet(Channel *c, User *setter, ChannelModeName Name, const Anope::string &param) anope_override

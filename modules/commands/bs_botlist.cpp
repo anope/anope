@@ -65,8 +65,8 @@ class CommandBSBotList : public Command
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Lists all available bots on this network. Bots prefixed"
-				"by a * are reserved for IRC operators."));
+		source.Reply(_("Lists all available bots on this network.\n"
+				"Bots prefixed by a * are reserved for IRC operators."));
 		return true;
 	}
 };

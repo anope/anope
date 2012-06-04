@@ -134,7 +134,7 @@ class CommandCSSetPersist : public Command
 				"When persistent is set, the service bot will remain\n"
 				"in the channel when it has emptied of users.\n"
 				" \n"
-				"If your IRCd does not a permanent (persistent) channel\n"
+				"If your IRCd does not have a permanent (persistent) channel\n"
 				"mode you must have a service bot in your channel to\n"
 				"set persist on, and it can not be unassigned while persist\n"
 				"is on.\n"
@@ -145,7 +145,7 @@ class CommandCSSetPersist : public Command
 				"it has been set off).\n"
 				" \n"
 				"If your IRCd has a permanent (persistent) channel mode\n"
-				"and is is set or unset (for any reason, including MLOCK),\n"
+				"and it is set or unset (for any reason, including MODE LOCK),\n"
 				"persist is automatically set and unset for the channel aswell.\n"
 				"Additionally, services will set or unset this mode when you\n"
 				"set persist on or off."));

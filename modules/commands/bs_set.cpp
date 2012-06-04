@@ -192,17 +192,15 @@ class CommandBSSet : public Command
 			source.Reply(_("Syntax: \002SET \037channel\037 FANTASY {\037ON|OFF\037}\n"
 					"Enables or disables \002fantasy\002 mode on a channel.\n"
 					"When it is enabled, users will be able to use\n"
-					"commands !op, !deop, !voice, !devoice,\n"
-					"!kick, !kb, !unban, !seen on a channel (find how \n"
-					"to use them; try with or without nick for each, \n"
-					"and with a reason for some?).\n"
+					"%s commands on a channel when prefixed\n"
+					"with one of the following fantasy characters: \002%s\002\n"
 					" \n"
 					"Note that users wanting to use fantaisist\n"
 					"commands MUST have enough level for both\n"
 					"the FANTASIA and another level depending\n"
 					"of the command if required (for example, to use \n"
 					"!op, user must have enough access for the OPDEOP\n"
-					"level)."));
+					"level)."), Config->ChanServ.c_str(), Config->BSFantasyCharacter.c_str());
 		else if (subcommand.equals_ci("GREET"))
 			source.Reply(_("Syntax: \002SET \037channel\037 GREET {\037ON|OFF\037}\n"
 					" \n"

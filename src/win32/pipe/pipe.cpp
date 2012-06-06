@@ -45,6 +45,7 @@ int pipe(int fds[2])
 	}
 
 	int afd = accept(lfd, NULL, NULL);
+	close(lfd);
 	if (afd == -1)
 	{
 		close(cfd);

@@ -22,16 +22,16 @@ Anope Modules
     1. If modules are supported by your system, they will be configured
        automatically when you run ./Config. The modules will be installed
        to the modules directory in your data path (by default this will
-       be ~/services/modules).
+       be ~/services/data/modules).
 
-       Note: you might need to run "make distclean" prior to running ./Config
+    2. Compile Anope as usual using ./Config. The "make" process will now
+       compile module support into Anope, and compile the default sample
+       modules, and any other module located in the modules folder or any
+       of its sub-directories, eg. modules/extra.
 
-    2. Compile Anope as usual. The (g)make process will now compile module
-       support into Anope, and compile the default sample modules, and/or
-       any other module located on the modules folder ("src/modules/").
-
-    3. Install Anope as usual. The install process will place the compiled
-       modules in their runtime location, making them available for loading.
+    3. Install Anope as usual. The "make install" process will place the
+       compiled modules in their runtime location, making them available
+       for loading.
 
     4. Start or restart services to make use of the new Anope executable.
        Note that you do not need to restart to load new or changed modules,
@@ -42,59 +42,64 @@ Anope Modules
     All module manipulation commands are done through OperServ. These are:
 
        MODLOAD     Load a module
+       MODRELOAD   Reload a module
        MODUNLOAD   Un-Load a module
        MODLIST     List loaded modules
        MODINFO     Info about a loaded module
 
-    These commands available to Service Roots only.
+    Access to the above commands require the operserv/modload and modlist
+    permissions. Refer to operserv.example.conf.
 
     You can also load (and pre-load) Modules automatically by loading them
-    on startup. To do so, edit your services.conf file and change the values
-    of "ModuleAutoload" and "ModuleDelayedAutoload" to include the modules
-    you want to load every time Anope starts.
+    on startup. To do so, edit any one of the configuration files (you may
+    want to use modules.conf for third-party/extra modules, or a config
+    file relevant to the *Serv your module operates on, eg. hostserv.conf),
+    and use the following method to load a module on startup or reload:
+        module { name="hs_modname" }
 
 4) Usage Example
 
-    /msg OperServ modload hs_moo
-    *** Global -- from OperServ: dengel loaded module hs_moo
-    -OperServ- Module hs_moo loaded
+    /msg OperServ modload ns_identify
+    -OperServ- Module ns_identify loaded
 
-    /msg OperServ modinfo hs_moo
-    -OperServ- Module: hs_moo Version: 1.1 Author: Anope loaded: Mar 21 10:54:37 2004 CLT
-    -OperServ- Providing command: /msg HostServ moo
+    /msg OperServ modinfo ns_identify
+    -OperServ- Module: ns_identify Version: 1.9.7 Author: Anope loaded: Jun 17 18:43:08 2012 BST (2 minutes ago)
+    -OperServ-    Providing service: nickserv/identify
+    -OperServ-    Command ID on NickServ is linked to nickserv/identify
+    -OperServ-    Command IDENTIFY on NickServ is linked to nickserv/identify
 
-    /msg HostServ moo
-    -HostServ- MOO! - This command was loaded via a module!
+    /msg OperServ modreload ns_identify
+    -OperServ- Module ns_identify reloaded
 
-    /msg OperServ modunload hs_moo
-    *** Global -- from OperServ: dengel unloaded module hs_moo
-    -OperServ- Module hs_moo unloaded
+    /msg OperServ modunload ns_identify
+    -OperServ- Module ns_identify unloaded
 
-    /msg HostServ moo
-    -HostServ- Unknown command moo. "/msg HostServ HELP" for help.
+    /msg NickServ IDENTIFY
+    -NickServ- Unknown command identify. "/msg NickServ HELP" for help.
+    NOTE: Doing the above, with the command still existing in a config file,
+          will result in a log message, similar to the following:
+          <@NickServ> Command IDENTIFY exists on me, but its service nickserv/identify was not found!
 
-    * Note that the name of the module file is "hs_moo.c", yet we load
-      and reference the module as "hs_moo" only. By naming convention
+    * Note that the name of the module source file is "ns_identify.cpp", yet we
+      load and reference the module as "ns_identify" only. By naming convention
       modules have an abbreviated service name they attach to (hs_ for
       HostServ, cs_ for ChanServ, etc) followed by a descriptive keyword.
 
 5) More Modules
 
-    Anope ships with three sample modules that only illustrates some of the
-    implemented module capabilities. They don't really do much or anything
-    useful.
-
     You can download more useful modules from http://modules.anope.org/. Just
-    grab the module file (usually with a .c extension). Place the module
-    file in your modules (src/modules) folder; the same folder that contains
-    both hs_moo.c and catserv.c module files.
+    grab the module file (usually with a .cpp extension). Place the module
+    file in your modules (anope-1.9.x/modules/third) folder; although any of
+    the other folders within the modules directory will work.
 
     The new modules need to be compiled and installed before you can make
     use of them:
-    
+
     1. Make sure you're in the main source directory. (usually anope-1.X.XX/)
-    2. Run `make modules` to compile any new or changed modules.
-    3. Run `make install` to install the modules.
+    2. Run ./Config to find and configure modules, then `cd build`.
+    3. Run `make` to compile Anope, and any modules.
+    4. Run `make install` to copy the compiled binaries to the ~/services/
+       directory.
 
     You can now use /msg OperServ MODLOAD to load the new modules.
 
@@ -114,7 +119,6 @@ Anope Modules
     can be reached at:
     
     * http://wiki.anope.org/
-
 
 8) Modules Repository
 

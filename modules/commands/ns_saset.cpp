@@ -66,7 +66,6 @@ class CommandNSSASetPassword : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		User *u = source.u;
 		const NickAlias *setter_na = findnick(params[0]);
 		if (setter_na == NULL)
 		{
@@ -77,7 +76,7 @@ class CommandNSSASetPassword : public Command
 
 		size_t len = params[1].length();
 
-		if (Config->NSSecureAdmins && u->Account() != nc && nc->IsServicesOper())
+		if (Config->NSSecureAdmins && source.nc != nc && nc->IsServicesOper())
 		{
 			source.Reply(_("You may not change the password of other services operators."));
 			return;

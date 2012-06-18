@@ -79,7 +79,6 @@ class CommandCSSuspend : public Command
 		Anope::string reason = params.size() > 2 ? params[2] : "";
 		time_t expiry_secs = Config->CSSuspendExpire;
 
-		User *u = source.u;
 
 		if (!expiry.empty() && expiry[0] != '+')
 		{
@@ -107,7 +106,7 @@ class CommandCSSuspend : public Command
 		}
 
 		ci->SetFlag(CI_SUSPENDED);
-		ci->Extend("suspend_by", new ExtensibleString(u->nick));
+		ci->Extend("suspend_by", new ExtensibleString(source.GetNick()));
 		if (!reason.empty())
 			ci->Extend("suspend_reason", new ExtensibleString(reason));
 
@@ -133,7 +132,7 @@ class CommandCSSuspend : public Command
 			ci->Extend("cs_suspend_expire", cs);
 		}
 
-		Log(LOG_ADMIN, u, this, ci) << (!reason.empty() ? reason : "No reason") << ", expires in " << (expiry_secs ? do_strftime(Anope::CurTime + expiry_secs) : "never");
+		Log(LOG_ADMIN, source, this, ci) << (!reason.empty() ? reason : "No reason") << ", expires in " << (expiry_secs ? do_strftime(Anope::CurTime + expiry_secs) : "never");
 		source.Reply(_("Channel \002%s\002 is now suspended."), ci->name.c_str());
 
 		FOREACH_MOD(I_OnChanSuspend, OnChanSuspend(ci));
@@ -168,7 +167,6 @@ class CommandCSUnSuspend : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		User *u = source.u;
 
 		if (readonly)
 			source.Reply(READ_ONLY_MODE);
@@ -189,7 +187,7 @@ class CommandCSUnSuspend : public Command
 
 		Anope::string *by = ci->GetExt<ExtensibleString *>("suspend_by"), *reason = ci->GetExt<ExtensibleString *>("suspend_reason");
 		if (by != NULL)
-			Log(LOG_ADMIN, u, this, ci) << " which was suspended by " << *by << " for: " << (reason && !reason->empty() ? *reason : "No reason");
+			Log(LOG_ADMIN, source, this, ci) << " which was suspended by " << *by << " for: " << (reason && !reason->empty() ? *reason : "No reason");
 
 		ci->UnsetFlag(CI_SUSPENDED);
 		ci->Shrink("suspend_by");

@@ -24,7 +24,6 @@ class CommandBSSetGreet : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		User *u = source.u;
 		ChannelInfo *ci = cs_findchan(params[0]);
 		const Anope::string &value = params[1];
 
@@ -34,7 +33,7 @@ class CommandBSSetGreet : public Command
 			return;
 		}
 
-		if (!u->HasPriv("botserv/administration") && !ci->AccessFor(u).HasPriv("SET"))
+		if (!source.HasPriv("botserv/administration") && !source.AccessFor(ci).HasPriv("SET"))
 		{
 			source.Reply(ACCESS_DENIED);
 			return;
@@ -48,16 +47,16 @@ class CommandBSSetGreet : public Command
 
 		if (value.equals_ci("ON"))
 		{
-			bool override = !ci->AccessFor(u).HasPriv("SET");
-			Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "to enable greets"; 
+			bool override = !source.AccessFor(ci).HasPriv("SET");
+			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to enable greets"; 
 
 			ci->botflags.SetFlag(BS_GREET);
 			source.Reply(_("Greet mode is now \002on\002 on channel %s."), ci->name.c_str());
 		}
 		else if (value.equals_ci("OFF"))
 		{
-			bool override = !ci->AccessFor(u).HasPriv("SET");
-			Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "to disable greets"; 
+			bool override = !source.AccessFor(ci).HasPriv("SET");
+			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to disable greets"; 
 
 			ci->botflags.UnsetFlag(BS_GREET);
 			source.Reply(_("Greet mode is now \002off\002 on channel %s."), ci->name.c_str());

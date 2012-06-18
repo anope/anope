@@ -18,7 +18,7 @@ class CommandOSSet : public Command
  private:
 	void DoList(CommandSource &source)
 	{
-		Log(LOG_ADMIN, source.u, this);
+		Log(LOG_ADMIN, source, this);
 
 		Anope::string index;
 
@@ -34,7 +34,6 @@ class CommandOSSet : public Command
 
 	void DoSetReadOnly(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		User *u = source.u;
 		const Anope::string &setting = params.size() > 1 ? params[1] : "";
 
 		if (setting.empty())
@@ -46,13 +45,13 @@ class CommandOSSet : public Command
 		if (setting.equals_ci("ON"))
 		{
 			readonly = true;
-			Log(LOG_ADMIN, u, this) << "READONLY ON";
+			Log(LOG_ADMIN, source, this) << "READONLY ON";
 			source.Reply(_("Services are now in \002read-only\002 mode."));
 		}
 		else if (setting.equals_ci("OFF"))
 		{
 			readonly = false;
-			Log(LOG_ADMIN, u, this) << "READONLY OFF";
+			Log(LOG_ADMIN, source, this) << "READONLY OFF";
 			source.Reply(_("Services are now in \002read-write\002 mode."));
 		}
 		else
@@ -63,8 +62,10 @@ class CommandOSSet : public Command
 
 	void DoSetSuperAdmin(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		User *u = source.u;
 		const Anope::string &setting = params.size() > 1 ? params[1] : "";
+
+		if (!source.GetUser())
+			return;
 
 		if (setting.empty())
 		{
@@ -81,15 +82,15 @@ class CommandOSSet : public Command
 			source.Reply(_("SuperAdmin setting not enabled in services.conf"));
 		else if (setting.equals_ci("ON"))
 		{
-			u->SuperAdmin = true;
+			source.GetUser()->SuperAdmin = true;
 			source.Reply(_("You are now a SuperAdmin"));
-			Log(LOG_ADMIN, u, this) << "SUPERADMIN ON";
+			Log(LOG_ADMIN, source, this) << "SUPERADMIN ON";
 		}
 		else if (setting.equals_ci("OFF"))
 		{
-			u->SuperAdmin = false;
+			source.GetUser()->SuperAdmin = false;
 			source.Reply(_("You are no longer a SuperAdmin"));
-			Log(LOG_ADMIN, u, this) << "SUPERADMIN OFF";
+			Log(LOG_ADMIN, source, this) << "SUPERADMIN OFF";
 		}
 		else
 			source.Reply(_("Setting for SuperAdmin must be \002on\002 or \002off\002 (must be enabled in services.conf)"));
@@ -99,7 +100,6 @@ class CommandOSSet : public Command
 
 	void DoSetDebug(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		User *u = source.u;
 		const Anope::string &setting = params.size() > 1 ? params[1] : "";
 
 		if (setting.empty())
@@ -111,12 +111,12 @@ class CommandOSSet : public Command
 		if (setting.equals_ci("ON"))
 		{
 			debug = 1;
-			Log(LOG_ADMIN, u, this) << "DEBUG ON";
+			Log(LOG_ADMIN, source, this) << "DEBUG ON";
 			source.Reply(_("Services are now in debug mode."));
 		}
 		else if (setting.equals_ci("OFF") || (setting[0] == '0' && setting.is_number_only() && !convertTo<int>(setting)))
 		{
-			Log(LOG_ADMIN, u, this) << "DEBUG OFF";
+			Log(LOG_ADMIN, source, this) << "DEBUG OFF";
 			debug = 0;
 			source.Reply(_("Services are now in non-debug mode."));
 		}
@@ -125,7 +125,7 @@ class CommandOSSet : public Command
 			try
 			{
 				debug = convertTo<int>(setting);
-				Log(LOG_ADMIN, u, this) << "DEBUG " << debug;
+				Log(LOG_ADMIN, source, this) << "DEBUG " << debug;
 				source.Reply(_("Services are now in debug mode (level %d)."), debug);
 				return;
 			}
@@ -139,7 +139,6 @@ class CommandOSSet : public Command
 
 	void DoSetNoExpire(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		User *u = source.u;
 		const Anope::string &setting = params.size() > 1 ? params[1] : "";
 
 		if (setting.empty())
@@ -151,13 +150,13 @@ class CommandOSSet : public Command
 		if (setting.equals_ci("ON"))
 		{
 			noexpire = true;
-			Log(LOG_ADMIN, u, this) << "NOEXPIRE ON";
+			Log(LOG_ADMIN, source, this) << "NOEXPIRE ON";
 			source.Reply(_("Services are now in \002no expire\002 mode."));
 		}
 		else if (setting.equals_ci("OFF"))
 		{
 			noexpire = false;
-			Log(LOG_ADMIN, u, this) << "NOEXPIRE OFF";
+			Log(LOG_ADMIN, source, this) << "NOEXPIRE OFF";
 			source.Reply(_("Services are now in \002expire\002 mode."));
 		}
 		else

@@ -27,8 +27,6 @@ class CommandBSAssign : public Command
 		const Anope::string &chan = params[0];
 		const Anope::string &nick = params[1];
 
-		User *u = source.u;
-
 		if (readonly)
 		{
 			source.Reply(BOT_ASSIGN_READONLY);
@@ -49,13 +47,14 @@ class CommandBSAssign : public Command
 			return;
 		}
 
- 		if (ci->botflags.HasFlag(BS_NOBOT) || (!ci->AccessFor(u).HasPriv("ASSIGN") && !u->HasPriv("botserv/administration")))
+		AccessGroup access = source.AccessFor(ci);
+ 		if (ci->botflags.HasFlag(BS_NOBOT) || (!access.HasPriv("ASSIGN") && !source.HasPriv("botserv/administration")))
 		{
 			source.Reply(ACCESS_DENIED);
 			return;
 		}
 
-		if (bi->HasFlag(BI_PRIVATE) && !u->HasCommand("botserv/assign/private"))
+		if (bi->HasFlag(BI_PRIVATE) && !source.HasCommand("botserv/assign/private"))
 		{
 			source.Reply(ACCESS_DENIED);
 			return;
@@ -67,10 +66,10 @@ class CommandBSAssign : public Command
 			return;
 		}
 
-		bool override = !ci->AccessFor(u).HasPriv("ASSIGN");
-		Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "for " << bi->nick;
+		bool override = !access.HasPriv("ASSIGN");
+		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "for " << bi->nick;
 
-		bi->Assign(u, ci);
+		bi->Assign(source.GetUser(), ci);
 		source.Reply(_("Bot \002%s\002 has been assigned to %s."), bi->nick.c_str(), ci->name.c_str());
 	}
 
@@ -96,8 +95,6 @@ class CommandBSUnassign : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		User *u = source.u;
-
 		if (readonly)
 		{
 			source.Reply(BOT_ASSIGN_READONLY);
@@ -111,7 +108,8 @@ class CommandBSUnassign : public Command
 			return;
 		}
 
-		if (!u->HasPriv("botserv/administration") && !ci->AccessFor(u).HasPriv("ASSIGN"))
+		AccessGroup access = source.AccessFor(ci);
+		if (!source.HasPriv("botserv/administration") && !access.HasPriv("ASSIGN"))
 		{
 			source.Reply(ACCESS_DENIED);
 			return;
@@ -129,10 +127,10 @@ class CommandBSUnassign : public Command
 			return;
 		}
 
-		bool override = !ci->AccessFor(u).HasPriv("ASSIGN");
-		Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "for " << ci->bi->nick;
+		bool override = !access.HasPriv("ASSIGN");
+		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "for " << ci->bi->nick;
 
-		ci->bi->UnAssign(u, ci);
+		ci->bi->UnAssign(source.GetUser(), ci);
 		source.Reply(_("There is no bot assigned to %s anymore."), ci->name.c_str());
 	}
 

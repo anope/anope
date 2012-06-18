@@ -24,7 +24,6 @@ class CommandMSList : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		User *u = source.u;
 
 		Anope::string param = !params.empty() ? params[0] : "", chan;
 		ChannelInfo *ci = NULL;
@@ -41,7 +40,7 @@ class CommandMSList : public Command
 				source.Reply(CHAN_X_NOT_REGISTERED, chan.c_str());
 				return;
 			}
-			else if (!ci->AccessFor(u).HasPriv("MEMO"))
+			else if (!source.AccessFor(ci).HasPriv("MEMO"))
 			{
 				source.Reply(ACCESS_DENIED);
 				return;
@@ -49,7 +48,7 @@ class CommandMSList : public Command
 			mi = &ci->memos;
 		}
 		else
-			mi = &u->Account()->memos;
+			mi = &source.nc->memos;
 
 		if (!param.empty() && !isdigit(param[0]) && !param.equals_ci("NEW"))
 			this->OnSyntaxError(source, param);
@@ -131,7 +130,7 @@ class CommandMSList : public Command
 			std::vector<Anope::string> replies;
 			list.Process(replies);
 
-			source.Reply(_("Memos for %s."), ci ? ci->name.c_str() : u->nick.c_str());
+			source.Reply(_("Memos for %s."), ci ? ci->name.c_str() : source.GetNick().c_str());
 			for (unsigned i = 0; i < replies.size(); ++i)
 				source.Reply(replies[i]);
 		}

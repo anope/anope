@@ -40,8 +40,8 @@ class CommandMSStaff : public Command
 		{
 			const NickCore *nc = it->second;
 
-			if (nc->IsServicesOper())
-				memoserv->Send(source.u->nick, nc->display, text, true);
+			if (source.nc != nc && nc->IsServicesOper())
+				memoserv->Send(source.GetNick(), nc->display, text, true);
 		}
 
 		return;

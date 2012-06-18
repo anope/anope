@@ -234,12 +234,13 @@ void User::SendMessage(const BotInfo *source, const char *fmt, ...)
 	va_start(args, fmt);
 	vsnprintf(buf, BUFSIZE - 1, translated_message, args);
 
-	this->SendMessage(source, Anope::string(buf));
+	Anope::string m = buf;
+	this->SendMessage(source, buf);
 
 	va_end(args);
 }
 
-void User::SendMessage(const BotInfo *source, Anope::string msg)
+void User::SendMessage(const BotInfo *source, const Anope::string &msg)
 {
 	const char *translated_message = translate(this, msg.c_str());
 
@@ -472,7 +473,7 @@ bool User::IsRecognized(bool CheckSecure) const
  */
 bool User::IsServicesOper()
 {
-	if (!this->nc || !this->nc->o)
+	if (!this->nc || !this->nc->IsServicesOper())
 		// No opertype.
 		return false;
 	else if (this->nc->o->require_oper && !this->HasMode(UMODE_OPER))

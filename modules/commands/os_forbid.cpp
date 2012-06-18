@@ -136,7 +136,7 @@ class CommandOSForbid : public Command
 			}
 
 			d->mask = entry;
-			d->creator = source.u->nick;
+			d->creator = source.GetNick();
 			d->reason = reason;
 			d->created = Anope::CurTime;
 			d->expires = expiryt;
@@ -144,7 +144,7 @@ class CommandOSForbid : public Command
 			if (created)
 				this->fs->AddForbid(d);
 
-			Log(LOG_ADMIN, source.u, this) << "to add a forbid on " << entry << " of type " << subcommand;
+			Log(LOG_ADMIN, source, this) << "to add a forbid on " << entry << " of type " << subcommand;
 			source.Reply(_("Added a%s forbid on %s to expire on %s"), ftype == FT_CHAN ? "n" : "", entry.c_str(), d->expires ? do_strftime(d->expires).c_str() : "never");
 		}
 		else if (command.equals_ci("DEL") && params.size() > 2 && ftype != FT_NONE)
@@ -154,7 +154,7 @@ class CommandOSForbid : public Command
 			ForbidData *d = this->fs->FindForbid(entry, ftype);
 			if (d != NULL)
 			{
-				Log(LOG_ADMIN, source.u, this) << "to remove forbid " << d->mask << " of type " << subcommand;
+				Log(LOG_ADMIN, source, this) << "to remove forbid " << d->mask << " of type " << subcommand;
 				source.Reply(_("%s deleted from the %s forbid list."), d->mask.c_str(), subcommand.c_str());
 				this->fs->RemoveForbid(d);
 			}
@@ -304,7 +304,7 @@ class OSForbid : public Module
 
 	EventReturn OnPreCommand(CommandSource &source, Command *command, std::vector<Anope::string> &params) anope_override
 	{
-		if (source.u->HasMode(UMODE_OPER))
+		if (source.IsOper())
 			return EVENT_CONTINUE;
 		else if (command->name == "nickserv/register" && params.size() > 1)
 		{

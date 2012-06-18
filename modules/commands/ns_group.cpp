@@ -25,7 +25,10 @@ class CommandNSGroup : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		User *u = source.u;
+		User *u = source.GetUser();
+
+		if (!u)
+			return;
 
 		const Anope::string &nick = params[0];
 		const Anope::string &pass = params.size() > 1 ? params[1] : "";
@@ -61,7 +64,7 @@ class CommandNSGroup : public Command
 			source.Reply(_("Please wait %d seconds before using the GROUP command again."), (Config->NSRegDelay + u->lastnickreg) - Anope::CurTime);
 		else if (target && target->nc->HasFlag(NI_SUSPENDED))
 		{
-			Log(LOG_COMMAND, u, this) << "tried to use GROUP for SUSPENDED nick " << target->nick;
+			Log(LOG_COMMAND, source, this) << "tried to use GROUP for SUSPENDED nick " << target->nick;
 			source.Reply(NICK_X_SUSPENDED, target->nick.c_str());
 		}
 		else if (na && *target->nc == *na->nc)
@@ -123,14 +126,14 @@ class CommandNSGroup : public Command
 					u->SetMode(findbot(Config->NickServ), UMODE_REGISTERED);
 				FOREACH_MOD(I_OnNickGroup, OnNickGroup(u, target));
 
-				Log(LOG_COMMAND, u, this) << "makes " << u->nick << " join group of " << target->nick << " (" << target->nc->display << ") (email: " << (!target->nc->email.empty() ? target->nc->email : "none") << ")";
+				Log(LOG_COMMAND, source, this) << "makes " << u->nick << " join group of " << target->nick << " (" << target->nc->display << ") (email: " << (!target->nc->email.empty() ? target->nc->email : "none") << ")";
 				source.Reply(_("You are now in the group of \002%s\002."), target->nick.c_str());
 
 				u->lastnickreg = Anope::CurTime;
 			}
 			else
 			{
-				Log(LOG_COMMAND, u, this) << "failed group for " << target->nick;
+				Log(LOG_COMMAND, source, this) << "failed group for " << target->nick;
 				source.Reply(PASSWORD_INCORRECT);
 				bad_password(u);
 			}
@@ -183,7 +186,10 @@ class CommandNSUngroup : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		User *u = source.u;
+		User *u = source.GetUser();
+		if (!u)
+			return;
+
 		Anope::string nick = !params.empty() ? params[0] : "";
 		NickAlias *na = findnick(!nick.empty() ? nick : u->nick);
 
@@ -249,7 +255,6 @@ class CommandNSGList : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		User *u = source.u;
 		const Anope::string &nick = !params.empty() ? params[0] : "";
 		const NickCore *nc;
 
@@ -261,7 +266,7 @@ class CommandNSGList : public Command
 				source.Reply(NICK_X_NOT_REGISTERED, nick.c_str());
 				return;
 			}
-			else if (!u->IsServicesOper())
+			else if (!source.IsServicesOper())
 			{
 				source.Reply(ACCESS_DENIED, Config->NickServ.c_str());
 				return;
@@ -270,7 +275,7 @@ class CommandNSGList : public Command
 			nc = na->nc;
 		}
 		else
-			nc = u->Account();
+			nc = source.nc;
 
 		ListFormatter list;
 		list.addColumn("Nick").addColumn("Expires");
@@ -298,8 +303,7 @@ class CommandNSGList : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
 	{
-		User *u = source.u;
-		if (u->IsServicesOper())
+		if (source.IsServicesOper())
 			source.Reply(_("Syntax: \002%s [\037nickname\037]\002\n"
 					" \n"
 					"Without a parameter, lists all nicknames that are in\n"

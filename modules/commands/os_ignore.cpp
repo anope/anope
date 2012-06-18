@@ -170,7 +170,7 @@ class CommandOSIgnore : public Command
 				return;
 			}
 
-			ignore_service->AddIgnore(nick, source.u->nick, reason, t);
+			ignore_service->AddIgnore(nick, source.GetNick(), reason, t);
 			if (!t)
 				source.Reply(_("\002%s\002 will now permanently be ignored."), nick.c_str());
 			else

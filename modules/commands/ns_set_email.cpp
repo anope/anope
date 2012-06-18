@@ -59,7 +59,6 @@ class CommandNSSetEmail : public Command
 
 	void Run(CommandSource &source, const Anope::string &user, const Anope::string &param)
 	{
-		User *u = source.u;
 		const NickAlias *na = findnick(user);
 		if (!na)
 		{
@@ -73,7 +72,7 @@ class CommandNSSetEmail : public Command
 			source.Reply(_("You cannot unset the e-mail on this network."));
 			return;
 		}
-		else if (Config->NSSecureAdmins && u->Account() != nc && nc->IsServicesOper())
+		else if (Config->NSSecureAdmins && source.nc != nc && nc->IsServicesOper())
 		{
 			source.Reply(_("You may not change the email of other services operators."));
 			return;
@@ -84,14 +83,14 @@ class CommandNSSetEmail : public Command
 			return;
 		}
 
-		if (!param.empty() && Config->NSConfirmEmailChanges && !u->IsServicesOper())
+		if (!param.empty() && Config->NSConfirmEmailChanges && !source.IsServicesOper())
 		{
-			u->Account()->Extend("ns_set_email", new ExtensibleString(param));
-			Anope::string old = u->Account()->email;
-			u->Account()->email = param;
-			if (SendConfirmMail(u, source.owner))
+			source.nc->Extend("ns_set_email", new ExtensibleString(param));
+			Anope::string old = source.nc->email;
+			source.nc->email = param;
+			if (SendConfirmMail(source.GetUser(), source.owner))
 				source.Reply(_("A confirmation email has been sent to \002%s\002. Follow the instructions in it to change your email address."), param.c_str());
-			u->Account()->email = old;
+			source.nc->email = old;
 		}
 		else
 		{
@@ -112,7 +111,7 @@ class CommandNSSetEmail : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		this->Run(source, source.u->Account()->display, params.size() ? params[0] : "");
+		this->Run(source, source.nc->display, params.size() ? params[0] : "");
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &) anope_override
@@ -166,18 +165,17 @@ class NSSetEmail : public Module
 
 	EventReturn OnPreCommand(CommandSource &source, Command *command, std::vector<Anope::string> &params) anope_override
 	{
-		User *u = source.u;
-		if (command->name == "nickserv/confirm" && !params.empty() && u->IsIdentified())
+		NickCore *uac = source.nc;
+		if (command->name == "nickserv/confirm" && !params.empty() && uac)
 		{
-			Anope::string *new_email = u->Account()->GetExt<ExtensibleString *>("ns_set_email"), *passcode = u->Account()->GetExt<ExtensibleString *>("ns_set_email_passcode");
+			Anope::string *new_email = uac->GetExt<ExtensibleString *>("ns_set_email"), *passcode = uac->GetExt<ExtensibleString *>("ns_set_email_passcode");
 			if (new_email && passcode)
 			{
 				if (params[0] == *passcode)
 				{
-					NickCore *uac = u->Account();
 					uac->email = *new_email;
-					Log(LOG_COMMAND, u, command) << "to confirm their email address change to " << u->Account()->email;
-					source.Reply(_("Your email address has been changed to \002%s\002."), u->Account()->email.c_str());
+					Log(LOG_COMMAND, source, command) << "to confirm their email address change to " << uac->email;
+					source.Reply(_("Your email address has been changed to \002%s\002."), uac->email.c_str());
 					uac->Shrink("ns_set_email");
 					uac->Shrink("ns_set_email_passcode");
 					return EVENT_STOP;

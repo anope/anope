@@ -15,15 +15,15 @@
 
 class CommandCSMode : public Command
 {
-	bool CanSet(User *u, ChannelInfo *ci, ChannelMode *cm)
+	bool CanSet(CommandSource &source, ChannelInfo *ci, ChannelMode *cm)
 	{
-		if (!u || !ci || !cm || cm->Type != MODE_STATUS)
+		if (!ci || !cm || cm->Type != MODE_STATUS)
 			return false;
 
 		const Anope::string accesses[] = { "VOICE", "HALFOP", "OPDEOP", "PROTECT", "OWNER", "" };
 		const ChannelModeName modes[] = { CMODE_VOICE, CMODE_HALFOP, CMODE_OP, CMODE_PROTECT, CMODE_OWNER };
 		ChannelModeStatus *cms = anope_dynamic_static_cast<ChannelModeStatus *>(cm);
-		AccessGroup access = ci->AccessFor(u);
+		AccessGroup access = source.AccessFor(ci);
 		unsigned short u_level = 0;
 
 		for (int i = 0; !accesses[i].empty(); ++i)
@@ -42,11 +42,11 @@ class CommandCSMode : public Command
 
 	void DoLock(CommandSource &source, ChannelInfo *ci, const std::vector<Anope::string> &params)
 	{
-		User *u = source.u;
+		User *u = source.GetUser();
 		const Anope::string &subcommand = params[2];
 		const Anope::string &param = params.size() > 3 ? params[3] : "";
 
-		bool override = !ci->AccessFor(u).HasPriv("MODE");
+		bool override = !source.AccessFor(ci).HasPriv("MODE");
 
 		if (subcommand.equals_ci("ADD") && !param.empty())
 		{
@@ -75,7 +75,7 @@ class CommandCSMode : public Command
 							source.Reply(_("Unknown mode character %c ignored."), modes[i]);
 							break;
 						}
-						else if (!cm->CanSet(u))
+						else if (u && !cm->CanSet(u))
 						{
 							source.Reply(_("You may not (un)lock mode %c."), modes[i]);
 							break;
@@ -86,11 +86,11 @@ class CommandCSMode : public Command
 							source.Reply(_("Missing parameter for mode %c."), cm->ModeChar);
 						else
 						{
-							ci->SetMLock(cm, adding, mode_param, u->nick); 
+							ci->SetMLock(cm, adding, mode_param, source.GetNick()); 
 							if (!mode_param.empty())
 								mode_param = " " + mode_param;
 							source.Reply(_("%c%c%s locked on %s"), adding ? '+' : '-', cm->ModeChar, mode_param.c_str(), ci->name.c_str());
-							Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "to lock " << (adding ? '+' : '-') << cm->ModeChar << mode_param;
+							Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to lock " << (adding ? '+' : '-') << cm->ModeChar << mode_param;
 						}
 				}
 			}
@@ -125,7 +125,7 @@ class CommandCSMode : public Command
 							source.Reply(_("Unknown mode character %c ignored."), modes[i]);
 							break;
 						}
-						else if (!cm->CanSet(u))
+						else if (u && !cm->CanSet(u))
 						{
 							source.Reply(_("You may not (un)lock mode %c."), modes[i]);
 							break;
@@ -141,7 +141,7 @@ class CommandCSMode : public Command
 								if (!mode_param.empty())
 									mode_param = " " + mode_param;
 								source.Reply(_("%c%c%s has been unlocked from %s."), adding == 1 ? '+' : '-', cm->ModeChar, mode_param.c_str(), ci->name.c_str());
-								Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "to unlock " << (adding ? '+' : '-') << cm->ModeChar << mode_param;
+								Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to unlock " << (adding ? '+' : '-') << cm->ModeChar << mode_param;
 							}
 							else
 								source.Reply(_("%c%c is not locked on %s."), adding == 1 ? '+' : '-', cm->ModeChar, ci->name.c_str());
@@ -172,7 +172,7 @@ class CommandCSMode : public Command
 					entry["Mode"] = Anope::printf("%c%c", ml->set ? '+' : '-', cm->ModeChar);
 					entry["Param"] = ml->param;
 					entry["Creator"] = ml->setter;
-					entry["Created"] = do_strftime(ml->created, source.u->Account(), false);
+					entry["Created"] = do_strftime(ml->created, source.nc, false);
 					list.addEntry(entry);
 				}
 
@@ -191,13 +191,13 @@ class CommandCSMode : public Command
 	
 	void DoSet(CommandSource &source, ChannelInfo *ci, const std::vector<Anope::string> &params)
 	{
-		User *u = source.u;
+		User *u = source.GetUser();
 
 		spacesepstream sep(params.size() > 3 ? params[3] : "");
 		Anope::string modes = params[2], param;
 
-		bool override = !ci->AccessFor(u).HasPriv("MODE");
-		Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "to set " << params[2];
+		bool override = !source.AccessFor(ci).HasPriv("MODE");
+		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to set " << params[2];
 
 		int adding = -1;
 		for (size_t i = 0; i < modes.length(); ++i)
@@ -216,7 +216,7 @@ class CommandCSMode : public Command
 					for (unsigned j = 0; j < ModeManager::ChannelModes.size(); ++j)
 					{
 						ChannelMode *cm = ModeManager::ChannelModes[j];
-						if (cm->CanSet(u))
+						if (!u || cm->CanSet(u))
 						{
 							if (cm->Type == MODE_REGULAR || (!adding && cm->Type == MODE_PARAM))
 							{
@@ -232,7 +232,7 @@ class CommandCSMode : public Command
 					if (adding == -1)
 						break;
 					ChannelMode *cm = ModeManager::FindChannelModeByChar(modes[i]);
-					if (!cm || !cm->CanSet(u))
+					if (!cm || (u && !cm->CanSet(u)))
 						continue;
 					switch (cm->Type)
 					{
@@ -255,13 +255,13 @@ class CommandCSMode : public Command
 							if (!sep.GetToken(param))
 								break;
 
-							if (!this->CanSet(u, ci, cm))
+							if (!this->CanSet(source, ci, cm))
 							{
 								source.Reply(_("You do not have access to set mode %c."), cm->ModeChar);
 								break;
 							}
 
-							AccessGroup u_access = ci->AccessFor(u);
+							AccessGroup u_access = source.AccessFor(ci);
 
 							if (str_is_wildcard(param))
 							{
@@ -343,12 +343,11 @@ class CommandCSMode : public Command
 	{
 		const Anope::string &subcommand = params[1];
 
-		User *u = source.u;
 		ChannelInfo *ci = cs_findchan(params[0]);
 
 		if (!ci || !ci->c)
 			source.Reply(CHAN_X_NOT_IN_USE, params[0].c_str());
-		else if (!ci->AccessFor(u).HasPriv("MODE") && !u->HasPriv("chanserv/set"))
+		else if (!source.AccessFor(ci).HasPriv("MODE") && !source.HasPriv("chanserv/set"))
 			source.Reply(ACCESS_DENIED);
 		else if (subcommand.equals_ci("LOCK"))
 			this->DoLock(source, ci, params);

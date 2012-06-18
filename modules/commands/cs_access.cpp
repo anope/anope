@@ -90,8 +90,6 @@ class CommandCSAccess : public Command
 {
 	void DoAdd(CommandSource &source, ChannelInfo *ci, const std::vector<Anope::string> &params)
 	{
-		User *u = source.u;
-
 		Anope::string mask = params[2];
 		int level = ACCESS_INVALID;
 
@@ -112,7 +110,7 @@ class CommandCSAccess : public Command
 			return;
 		}
 
-		AccessGroup u_access = ci->AccessFor(u);
+		AccessGroup u_access = source.AccessFor(ci);
 		const ChanAccess *highest = u_access.Highest();
 
 		AccessChanAccess tmp_access(NULL);
@@ -123,7 +121,7 @@ class CommandCSAccess : public Command
 
 		if ((!highest || *highest <= tmp_access) && !u_access.Founder)
 		{
-			if (u->HasPriv("chanserv/access/modify"))
+			if (source.HasPriv("chanserv/access/modify"))
 				override = true;
 			else
 			{
@@ -150,7 +148,7 @@ class CommandCSAccess : public Command
 			if (mask.equals_ci(access->mask))
 			{
 				/* Don't allow lowering from a level >= u_level */
-				if ((!highest || *access >= *highest) && !u_access.Founder && !u->HasPriv("chanserv/access/modify"))
+				if ((!highest || *access >= *highest) && !u_access.Founder && !source.HasPriv("chanserv/access/modify"))
 				{
 					source.Reply(ACCESS_DENIED);
 					return;
@@ -172,15 +170,15 @@ class CommandCSAccess : public Command
 		AccessChanAccess *access = anope_dynamic_static_cast<AccessChanAccess *>(provider->Create());
 		access->ci = ci;
 		access->mask = mask;
-		access->creator = u->nick;
+		access->creator = source.GetNick();
 		access->level = level;
 		access->last_seen = 0;
 		access->created = Anope::CurTime;
 		ci->AddAccess(access);
 
-		FOREACH_MOD(I_OnAccessAdd, OnAccessAdd(ci, u, access));
+		FOREACH_MOD(I_OnAccessAdd, OnAccessAdd(ci, source, access));
 
-		Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "to add " << mask << " with level " << level;
+		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to add " << mask << " with level " << level;
 		source.Reply(_("\002%s\002 added to %s access list at level \002%d\002."), access->mask.c_str(), ci->name.c_str(), level);
 
 		return;
@@ -188,8 +186,6 @@ class CommandCSAccess : public Command
 
 	void DoDel(CommandSource &source, ChannelInfo *ci, const std::vector<Anope::string> &params)
 	{
-		User *u = source.u;
-
 		const Anope::string &mask = params[2];
 
 		if (!ci->GetAccessCount())
@@ -208,7 +204,7 @@ class CommandCSAccess : public Command
 			 public:
 				AccessDelCallback(CommandSource &_source, ChannelInfo *_ci, Command *_c, const Anope::string &numlist) : NumberList(numlist, true), source(_source), ci(_ci), c(_c), Deleted(0), Denied(false), override(false)
 				{
-					if (!ci->AccessFor(source.u).HasPriv("ACCESS_CHANGE") && source.u->HasPriv("chanserv/access/modify"))
+					if (!source.AccessFor(ci).HasPriv("ACCESS_CHANGE") && source.HasPriv("chanserv/access/modify"))
 						this->override = true;
 				}
 
@@ -220,7 +216,7 @@ class CommandCSAccess : public Command
 						source.Reply(_("No matching entries on %s access list."), ci->name.c_str());
 					else
 					{
-						Log(override ? LOG_OVERRIDE : LOG_COMMAND, source.u, c, ci) << "to delete " << Nicks;
+						Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, c, ci) << "to delete " << Nicks;
 
 						if (Deleted == 1)
 							source.Reply(_("Deleted 1 entry from %s access list."), ci->name.c_str());
@@ -234,14 +230,12 @@ class CommandCSAccess : public Command
 					if (!Number || Number > ci->GetAccessCount())
 						return;
 
-					User *user = source.u;
-
 					ChanAccess *access = ci->GetAccess(Number - 1);
 
-					AccessGroup u_access = ci->AccessFor(user);
+					AccessGroup u_access = source.AccessFor(ci);
 					const ChanAccess *u_highest = u_access.Highest();
 
-					if ((!u_highest || *u_highest <= *access) && !u_access.Founder && !this->override && !access->mask.equals_ci(user->Account()->display))
+					if ((!u_highest || *u_highest <= *access) && !u_access.Founder && !this->override && !access->mask.equals_ci(source.nc->display))
 					{
 						Denied = true;
 						return;
@@ -253,7 +247,7 @@ class CommandCSAccess : public Command
 					else
 						Nicks = access->mask;
 
-					FOREACH_MOD(I_OnAccessDel, OnAccessDel(ci, user, access));
+					FOREACH_MOD(I_OnAccessDel, OnAccessDel(ci, source, access));
 
 					ci->EraseAccess(Number - 1);
 				}
@@ -263,7 +257,7 @@ class CommandCSAccess : public Command
 		}
 		else
 		{
-			AccessGroup u_access = ci->AccessFor(u);
+			AccessGroup u_access = source.AccessFor(ci);
 			const ChanAccess *highest = u_access.Highest();
 
 			for (unsigned i = ci->GetAccessCount(); i > 0; --i)
@@ -271,15 +265,15 @@ class CommandCSAccess : public Command
 				ChanAccess *access = ci->GetAccess(i - 1);
 				if (mask.equals_ci(access->mask))
 				{
-					if (!access->mask.equals_ci(u->Account()->display) && !u_access.Founder && (!highest || *highest <= *access) && !u->HasPriv("chanserv/access/modify"))
+					if (!access->mask.equals_ci(source.nc->display) && !u_access.Founder && (!highest || *highest <= *access) && !source.HasPriv("chanserv/access/modify"))
 						source.Reply(ACCESS_DENIED);
 					else
 					{
 						source.Reply(_("\002%s\002 deleted from %s access list."), access->mask.c_str(), ci->name.c_str());
-						bool override = !u_access.Founder && !u_access.HasPriv("ACCESS_CHANGE") && !access->mask.equals_ci(u->Account()->display);
-						Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "to delete " << access->mask;
+						bool override = !u_access.Founder && !u_access.HasPriv("ACCESS_CHANGE") && !access->mask.equals_ci(source.nc->display);
+						Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to delete " << access->mask;
 
-						FOREACH_MOD(I_OnAccessDel, OnAccessDel(ci, u, access));
+						FOREACH_MOD(I_OnAccessDel, OnAccessDel(ci, source, access));
 						ci->EraseAccess(access);
 					}
 					return;
@@ -420,20 +414,18 @@ class CommandCSAccess : public Command
 
 	void DoClear(CommandSource &source, ChannelInfo *ci)
 	{
-		User *u = source.u;
-
-		if (!IsFounder(u, ci) && !u->HasPriv("chanserv/access/modify"))
+		if (!source.IsFounder(ci) && !source.HasPriv("chanserv/access/modify"))
 			source.Reply(ACCESS_DENIED);
 		else
 		{
-			FOREACH_MOD(I_OnAccessClear, OnAccessClear(ci, u));
+			FOREACH_MOD(I_OnAccessClear, OnAccessClear(ci, source));
 
 			ci->ClearAccess();
 
 			source.Reply(_("Channel %s access list has been cleared."), ci->name.c_str());
 
-			bool override = !IsFounder(u, ci);
-			Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "to clear the access list";
+			bool override = !source.IsFounder(ci);
+			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to clear the access list";
 		}
 
 		return;
@@ -456,7 +448,6 @@ class CommandCSAccess : public Command
 		const Anope::string &nick = params.size() > 2 ? params[2] : "";
 		const Anope::string &s = params.size() > 3 ? params[3] : "";
 
-		User *u = source.u;
 		ChannelInfo *ci = cs_findchan(params[0]);
 		if (ci == NULL)
 		{
@@ -469,16 +460,16 @@ class CommandCSAccess : public Command
 		bool is_del = cmd.equals_ci("DEL");
 
 		bool has_access = false;
-		if (u->HasPriv("chanserv/access/modify"))
+		if (source.HasPriv("chanserv/access/modify"))
 			has_access = true;
-		else if (is_list && ci->AccessFor(u).HasPriv("ACCESS_LIST"))
+		else if (is_list && source.AccessFor(ci).HasPriv("ACCESS_LIST"))
 			has_access = true;
-		else if (ci->AccessFor(u).HasPriv("ACCESS_CHANGE"))
+		else if (source.AccessFor(ci).HasPriv("ACCESS_CHANGE"))
 			has_access = true;
 		else if (is_del)
 		{
 			const NickAlias *na = findnick(nick);
-			if (na && na->nc == u->Account())
+			if (na && na->nc == source.nc)
 				has_access = true;
 		}
 
@@ -575,8 +566,6 @@ class CommandCSLevels : public Command
 {
 	void DoSet(CommandSource &source, ChannelInfo *ci, const std::vector<Anope::string> &params)
 	{
-		User *u = source.u;
-
 		const Anope::string &what = params[2];
 		const Anope::string &lev = params[3];
 
@@ -607,10 +596,10 @@ class CommandCSLevels : public Command
 			else
 			{
 				ci->SetLevel(p->name, level);
-				FOREACH_MOD(I_OnLevelChange, OnLevelChange(u, ci, p->name, level));
+				FOREACH_MOD(I_OnLevelChange, OnLevelChange(source, ci, p->name, level));
 
-				bool override = !ci->AccessFor(u).HasPriv("FOUNDER");
-				Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "to set " << p->name << " to level " << level;
+				bool override = !source.AccessFor(ci).HasPriv("FOUNDER");
+				Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to set " << p->name << " to level " << level;
 
 				if (level == ACCESS_FOUNDER)
 					source.Reply(_("Level for %s on channel %s changed to founder only."), p->name.c_str(), ci->name.c_str());
@@ -622,8 +611,6 @@ class CommandCSLevels : public Command
 
 	void DoDisable(CommandSource &source, ChannelInfo *ci, const std::vector<Anope::string> &params)
 	{
-		User *u = source.u;
-
 		const Anope::string &what = params[2];
 
 		/* Don't allow disabling of the founder level. It would be hard to change it back if you dont have access to use this command */
@@ -633,10 +620,10 @@ class CommandCSLevels : public Command
 			if (p != NULL)
 			{
 				ci->SetLevel(p->name, ACCESS_INVALID);
-				FOREACH_MOD(I_OnLevelChange, OnLevelChange(u, ci, p->name, ACCESS_INVALID));
+				FOREACH_MOD(I_OnLevelChange, OnLevelChange(source, ci, p->name, ACCESS_INVALID));
 
-				bool override = !ci->AccessFor(u).HasPriv("FOUNDER");
-				Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "to disable " << p->name;
+				bool override = !source.AccessFor(ci).HasPriv("FOUNDER");
+				Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to disable " << p->name;
 
 				source.Reply(_("\002%s\002 disabled on channel %s."), p->name.c_str(), ci->name.c_str());
 				return;
@@ -684,13 +671,11 @@ class CommandCSLevels : public Command
 
 	void DoReset(CommandSource &source, ChannelInfo *ci)
 	{
-		User *u = source.u;
-
 		reset_levels(ci);
-		FOREACH_MOD(I_OnLevelChange, OnLevelChange(u, ci, "ALL", 0));
+		FOREACH_MOD(I_OnLevelChange, OnLevelChange(source, ci, "ALL", 0));
 
-		bool override = !ci->AccessFor(u).HasPriv("FOUNDER");
-		Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "to reset all levels";
+		bool override = !source.AccessFor(ci).HasPriv("FOUNDER");
+		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to reset all levels";
 
 		source.Reply(_("Access levels for \002%s\002 reset to defaults."), ci->name.c_str());
 		return;
@@ -712,8 +697,6 @@ class CommandCSLevels : public Command
 		const Anope::string &what = params.size() > 2 ? params[2] : "";
 		const Anope::string &s = params.size() > 3 ? params[3] : "";
 
-		User *u = source.u;
-
 		ChannelInfo *ci = cs_findchan(params[0]);
 		if (ci == NULL)
 		{
@@ -726,7 +709,7 @@ class CommandCSLevels : public Command
 		 */
 		if (cmd.equals_ci("SET") ? s.empty() : (cmd.substr(0, 3).equals_ci("DIS") ? (what.empty() || !s.empty()) : !what.empty()))
 			this->OnSyntaxError(source, cmd);
-		else if (!ci->AccessFor(u).HasPriv("FOUNDER") && !u->HasPriv("chanserv/access/modify"))
+		else if (!source.AccessFor(ci).HasPriv("FOUNDER") && !source.HasPriv("chanserv/access/modify"))
 			source.Reply(ACCESS_DENIED);
 		else if (cmd.equals_ci("SET"))
 			this->DoSet(source, ci, params);
@@ -757,7 +740,7 @@ class CommandCSLevels : public Command
 				const Privilege &p = privs[i];
 				ListFormatter::ListEntry entry;
 				entry["Name"] = p.name;
-				entry["Description"] = translate(source.u, p.desc.c_str());
+				entry["Description"] = translate(source.nc, p.desc.c_str());
 				list.addEntry(entry);
 			}
 

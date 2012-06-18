@@ -24,7 +24,7 @@ class BadwordsDelCallback : public NumberList
  public:
 	BadwordsDelCallback(CommandSource &_source, ChannelInfo *_ci, Command *_c, const Anope::string &list) : NumberList(list, true), source(_source), ci(_ci), c(_c), Deleted(0), override(false)
 	{
-		if (!ci->AccessFor(source.u).HasPriv("BADWORDS") && source.u->HasPriv("botserv/administration"))
+		if (!source.AccessFor(ci).HasPriv("BADWORDS") && source.HasPriv("botserv/administration"))
 			this->override = true;
 	}
 
@@ -43,7 +43,7 @@ class BadwordsDelCallback : public NumberList
 		if (!Number || Number > ci->GetBadWordCount())
 			return;
 
-		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source.u, c, ci) << "DEL " << ci->GetBadWord(Number - 1)->word;
+		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, c, ci) << "DEL " << ci->GetBadWord(Number - 1)->word;
 		++Deleted;
 		ci->EraseBadWord(Number - 1);
 	}
@@ -54,8 +54,8 @@ class CommandBSBadwords : public Command
  private:
 	void DoList(CommandSource &source, ChannelInfo *ci, const Anope::string &word)
 	{
-		bool override = !ci->AccessFor(source.u).HasPriv("BADWORDS");
-		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source.u, this, ci) << "LIST";
+		bool override = !source.AccessFor(ci).HasPriv("BADWORDS");
+		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "LIST";
 		ListFormatter list;
 
 		list.addColumn("Number").addColumn("Word").addColumn("Type");
@@ -163,8 +163,8 @@ class CommandBSBadwords : public Command
 			}
 		}
 
-		bool override = !ci->AccessFor(source.u).HasPriv("BADWORDS");
-		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source.u, this, ci) << "ADD " << realword;
+		bool override = !source.AccessFor(ci).HasPriv("BADWORDS");
+		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "ADD " << realword;
 		ci->AddBadWord(realword, bwtype);
 
 		source.Reply(_("\002%s\002 added to %s bad words list."), realword.c_str(), ci->name.c_str());
@@ -199,8 +199,8 @@ class CommandBSBadwords : public Command
 				return;
 			}
 
-			bool override = !ci->AccessFor(source.u).HasPriv("BADWORDS");
-			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source.u, this, ci) << "DEL " << badword->word;
+			bool override = !source.AccessFor(ci).HasPriv("BADWORDS");
+			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "DEL " << badword->word;
 
 			source.Reply(_("\002%s\002 deleted from %s bad words list."), badword->word.c_str(), ci->name.c_str());
 
@@ -212,8 +212,8 @@ class CommandBSBadwords : public Command
 
 	void DoClear(CommandSource &source, ChannelInfo *ci)
 	{
-		bool override = !ci->AccessFor(source.u).HasPriv("BADWORDS");
-		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source.u, this, ci) << "CLEAR";
+		bool override = !source.AccessFor(ci).HasPriv("BADWORDS");
+		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "CLEAR";
 
 		ci->ClearBadWords();
 		source.Reply(_("Bad words list is now empty."));
@@ -233,7 +233,6 @@ class CommandBSBadwords : public Command
 	{
 		const Anope::string &cmd = params[1];
 		const Anope::string &word = params.size() > 2 ? params[2] : "";
-		User *u = source.u;
 		bool need_args = cmd.equals_ci("LIST") || cmd.equals_ci("CLEAR");
 
 		if (!need_args && word.empty())
@@ -249,8 +248,7 @@ class CommandBSBadwords : public Command
 			return;
 		}
 
-
-		if (!ci->AccessFor(u).HasPriv("BADWORDS") && (!need_args || !u->HasPriv("botserv/administration")))
+		if (!source.AccessFor(ci).HasPriv("BADWORDS") && (!need_args || !source.HasPriv("botserv/administration")))
 		{
 			source.Reply(ACCESS_DENIED);
 			return;

@@ -29,7 +29,6 @@ class CommandMSIgnore : public Command
 		if (!memoserv)
 			return;
 
-		User *u = source.u;
 
 		Anope::string channel = params[0];
 		Anope::string command = (params.size() > 1 ? params[1] : "");
@@ -39,7 +38,7 @@ class CommandMSIgnore : public Command
 		{
 			param = command;
 			command = channel;
-			channel = u->nick;
+			channel = source.GetNick();
 		}
 
 		bool ischan;
@@ -47,7 +46,7 @@ class CommandMSIgnore : public Command
 		ChannelInfo *ci = cs_findchan(channel);
 		if (!mi)
 			source.Reply(ischan ? CHAN_X_NOT_REGISTERED : _(NICK_X_NOT_REGISTERED), channel.c_str());
-		else if (ischan && !ci->AccessFor(u).HasPriv("MEMO"))
+		else if (ischan && !source.AccessFor(ci).HasPriv("MEMO"))
 			source.Reply(ACCESS_DENIED);
 		else if (command.equals_ci("ADD") && !param.empty())
 		{

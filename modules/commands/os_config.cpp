@@ -141,7 +141,7 @@ class CommandOSConfig : public Command
 
 					ChangeHash(Config->config_data, params[1], params[2], params[3]);
 
-					Log(LOG_ADMIN, source.u, this) << "to change the configuration value of " << params[1] << ":" << params[2] << " to " << params[3];
+					Log(LOG_ADMIN, source, this) << "to change the configuration value of " << params[1] << ":" << params[2] << " to " << params[3];
 					source.Reply(_("Value of %s:%s changed to %s"), params[1].c_str(), params[2].c_str(), params[3].c_str());
 					return;
 				}
@@ -154,7 +154,7 @@ class CommandOSConfig : public Command
 			/* Blocks we should show */
 			const Anope::string show_blocks[] = { "botserv", "chanserv", "defcon", "global", "memoserv", "nickserv", "networkinfo", "operserv", "options", "" };
 
-			Log(LOG_ADMIN, source.u, this) << "VIEW";
+			Log(LOG_ADMIN, source, this) << "VIEW";
 
 			for (ConfigDataHash::const_iterator it = Config->config_data.begin(), it_end = Config->config_data.end(); it != it_end; ++it)
 			{

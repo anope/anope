@@ -24,7 +24,6 @@ class CommandOSSVSNick : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		User *u = source.u;
 		const Anope::string &nick = params[0];
 		Anope::string newnick = params[1];
 		User *u2;
@@ -57,7 +56,7 @@ class CommandOSSVSNick : public Command
 		else
 		{
 			source.Reply(_("The nick \002%s\002 is now being changed to \002%s\002."), nick.c_str(), newnick.c_str());
-			Log(LOG_ADMIN, u, this) << "to change " << nick << " to " << newnick;
+			Log(LOG_ADMIN, source, this) << "to change " << nick << " to " << newnick;
 			ircdproto->SendForceNickChange(u2, newnick, Anope::CurTime);
 		}
 		return;

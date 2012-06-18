@@ -27,22 +27,26 @@ class CommandOSLogin : public Command
 	{
 		const Anope::string &password = params[0];
 
-		Oper *o = source.u->Account()->o;
+		User *u = source.GetUser();
+		if (!u)
+			return;
+
+		Oper *o = source.nc->o;
 		if (o == NULL)
 			source.Reply(_("No oper block for your nick."));
 		else if (o->password.empty())
 			source.Reply(_("Your oper block doesn't require logging in."));
-		else if (source.u->HasExt("os_login_password_correct"))
+		else if (u->HasExt("os_login_password_correct"))
 			source.Reply(_("You are already identified."));
 		else if (o->password != password)
 		{
 			source.Reply(PASSWORD_INCORRECT);
-			bad_password(source.u);
+			bad_password(u);
 		}
 		else
 		{
-			Log(LOG_ADMIN, source.u, this) << "and successfully identified to " << source.owner->nick;
-			source.u->Extend("os_login_password_correct", NULL);
+			Log(LOG_ADMIN, source, this) << "and successfully identified to " << source.owner->nick;
+			u->Extend("os_login_password_correct", NULL);
 			source.Reply(_("Password accepted."));
 		}
 
@@ -71,17 +75,21 @@ class CommandOSLogout : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		Oper *o = source.u->Account()->o;
+		User *u = source.GetUser();
+		if (!u)
+			return;
+
+		Oper *o = source.nc->o;
 		if (o == NULL)
 			source.Reply(_("No oper block for your nick."));
 		else if (o->password.empty())
 			source.Reply(_("Your oper block doesn't require logging in."));
-		else if (!source.u->HasExt("os_login_password_correct"))
+		else if (!u->HasExt("os_login_password_correct"))
 			source.Reply(_("You are not identified."));
 		else
 		{
-			Log(LOG_ADMIN, source.u, this);
-			source.u->Shrink("os_login_password_correct");
+			Log(LOG_ADMIN, source, this);
+			u->Shrink("os_login_password_correct");
 			source.Reply(_("You have been logged out."));
 		}
 	}

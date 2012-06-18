@@ -82,11 +82,11 @@ class CommandNSAJoin : public Command
 {
 	void DoList(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		AJoinList *channels = source.u->Account()->GetExt<AJoinList *>("ns_ajoin_channels");
+		AJoinList *channels = source.nc->GetExt<AJoinList *>("ns_ajoin_channels");
 		if (channels == NULL)
 		{
 			channels = new AJoinList();
-			source.u->Account()->Extend("ns_ajoin_channels", channels);
+			source.nc->Extend("ns_ajoin_channels", channels);
 		}
 
 		if ((*channels)->empty())
@@ -117,11 +117,11 @@ class CommandNSAJoin : public Command
 
 	void DoAdd(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		AJoinList *channels = source.u->Account()->GetExt<AJoinList *>("ns_ajoin_channels");
+		AJoinList *channels = source.nc->GetExt<AJoinList *>("ns_ajoin_channels");
 		if (channels == NULL)
 		{
 			channels = new AJoinList();
-			source.u->Account()->Extend("ns_ajoin_channels", channels);
+			source.nc->Extend("ns_ajoin_channels", channels);
 		}
 
 		unsigned i = 0;
@@ -138,7 +138,7 @@ class CommandNSAJoin : public Command
 		else
 		{
 			AJoinEntry *entry = new AJoinEntry();
-			entry->owner = source.u->Account();
+			entry->owner = source.nc;
 			entry->channel = params[1];
 			entry->key = params.size() > 2 ? params[2] : "";
 			(*channels)->push_back(entry);
@@ -148,11 +148,11 @@ class CommandNSAJoin : public Command
 
 	void DoDel(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		AJoinList *channels = source.u->Account()->GetExt<AJoinList *>("ns_ajoin_channels");
+		AJoinList *channels = source.nc->GetExt<AJoinList *>("ns_ajoin_channels");
 		if (channels == NULL)
 		{
 			channels = new AJoinList();
-			source.u->Account()->Extend("ns_ajoin_channels", channels);
+			source.nc->Extend("ns_ajoin_channels", channels);
 		}
 
 		unsigned i = 0;

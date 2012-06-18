@@ -18,9 +18,8 @@ class CommandMSSet : public Command
  private:
 	void DoNotify(CommandSource &source, const std::vector<Anope::string> &params, MemoInfo *mi)
 	{
-		User *u = source.u;
 		const Anope::string &param = params[1];
-		NickCore *nc = u->Account();
+		NickCore *nc = source.nc;
 
 		if (param.equals_ci("ON"))
 		{
@@ -70,16 +69,15 @@ class CommandMSSet : public Command
 
 	void DoLimit(CommandSource &source, const std::vector<Anope::string> &params, MemoInfo *mi)
 	{
-		User *u = source.u;
 
 		Anope::string p1 = params[1];
 		Anope::string p2 = params.size() > 2 ? params[2] : "";
 		Anope::string p3 = params.size() > 3 ? params[3] : "";
 		Anope::string user, chan;
 		int16_t limit;
-		NickCore *nc = u->Account();
+		NickCore *nc = source.nc;
 		ChannelInfo *ci = NULL;
-		bool is_servadmin = u->HasPriv("memoserv/set-limit");
+		bool is_servadmin = source.HasPriv("memoserv/set-limit");
 
 		if (p1[0] == '#')
 		{
@@ -94,7 +92,7 @@ class CommandMSSet : public Command
 				source.Reply(CHAN_X_NOT_REGISTERED, chan.c_str());
 				return;
 			}
-			else if (!is_servadmin && !ci->AccessFor(u).HasPriv("MEMO"))
+			else if (!is_servadmin && !source.AccessFor(ci).HasPriv("MEMO"))
 			{
 				source.Reply(ACCESS_DENIED);
 				return;
@@ -180,21 +178,21 @@ class CommandMSSet : public Command
 		mi->memomax = limit;
 		if (limit > 0)
 		{
-			if (chan.empty() && nc == u->Account())
+			if (chan.empty() && nc == source.nc)
 				source.Reply(_("Your memo limit has been set to \002%d\002."), limit);
 			else
 				source.Reply(_("Memo limit for %s set to \002%d\002."), !chan.empty() ? chan.c_str() : user.c_str(), limit);
 		}
 		else if (!limit)
 		{
-			if (chan.empty() && nc == u->Account())
+			if (chan.empty() && nc == source.nc)
 				source.Reply(_("You will no longer be able to receive memos."));
 			else
 				source.Reply(_("Memo limit for %s set to \0020\002."), !chan.empty() ? chan.c_str() : user.c_str());
 		}
 		else
 		{
-			if (chan.empty() && nc == u->Account())
+			if (chan.empty() && nc == source.nc)
 				source.Reply(_("Your memo limit has been disabled."));
 			else
 				source.Reply(_("Memo limit \002disabled\002 for %s."), !chan.empty() ? chan.c_str() : user.c_str());
@@ -210,9 +208,8 @@ class CommandMSSet : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		User *u = source.u;
 		const Anope::string &cmd = params[0];
-		MemoInfo *mi = const_cast<MemoInfo *>(&u->Account()->memos);
+		MemoInfo *mi = const_cast<MemoInfo *>(&source.nc->memos);
 
 		if (readonly)
 			source.Reply(_("Sorry, memo option setting is temporarily disabled."));
@@ -263,8 +260,7 @@ class CommandMSSet : public Command
 					"\002ON\002 is essentially \002LOGON\002 and \002NEW\002 combined."));
 		else if (subcommand.equals_ci("LIMIT"))
 		{
-			User *u = source.u;
-			if (u->IsServicesOper())
+			if (source.IsServicesOper())
 				source.Reply(_("Syntax: \002LIMIT [\037user\037 | \037channel\037] {\037limit\037 | NONE} [HARD]\002\n"
 						" \n"
 						"Sets the maximum number of memos a user or channel is\n"

@@ -87,7 +87,7 @@ class CommandOSOper : public Command
 				{
 					na->nc->o = new MyOper(na->nc->display, ot);
 
-					Log(LOG_ADMIN, source.u, this) << "ADD " << na->nick << " as type " << ot->GetName();
+					Log(LOG_ADMIN, source, this) << "ADD " << na->nick << " as type " << ot->GetName();
 					source.Reply("%s (%s) added to the \2%s\2 list.", na->nick.c_str(), na->nc->display.c_str(), ot->GetName().c_str());
 				}
 			}
@@ -106,7 +106,7 @@ class CommandOSOper : public Command
 				delete na->nc->o;
 				na->nc->o = NULL;
 
-				Log(LOG_ADMIN, source.u, this) << "DEL " << na->nick;
+				Log(LOG_ADMIN, source, this) << "DEL " << na->nick;
 				source.Reply(_("Oper privileges removed from %s (%s)."), na->nick.c_str(), na->nc->display.c_str());
 			}
 		}

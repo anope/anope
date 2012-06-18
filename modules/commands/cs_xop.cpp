@@ -201,7 +201,6 @@ class XOPBase : public Command
  private:
 	void DoAdd(CommandSource &source, ChannelInfo *ci, const std::vector<Anope::string> &params, XOPType level)
 	{
-		User *u = source.u;
 
 		Anope::string mask = params.size() > 2 ? params[2] : "";
 
@@ -221,13 +220,13 @@ class XOPBase : public Command
 		tmp_access.ci = ci;
 		tmp_access.type = level;
 
-		AccessGroup access = ci->AccessFor(u);
+		AccessGroup access = source.AccessFor(ci);
 		const ChanAccess *highest = access.Highest();
 		bool override = false;
 
 		if ((!access.Founder && !access.HasPriv("ACCESS_CHANGE")) || ((!highest || *highest <= tmp_access) && !access.Founder))
 		{
-			if (u->HasPriv("chanserv/access/modify"))
+			if (source.HasPriv("chanserv/access/modify"))
 				override = true;
 			else
 			{
@@ -254,7 +253,7 @@ class XOPBase : public Command
 
 			if (a->mask.equals_ci(mask))
 			{
-				if ((!highest || *a >= *highest) && !access.Founder && !u->HasPriv("chanserv/access/modify"))
+				if ((!highest || *a >= *highest) && !access.Founder && !source.HasPriv("chanserv/access/modify"))
 				{
 					source.Reply(ACCESS_DENIED);
 					return;
@@ -277,22 +276,21 @@ class XOPBase : public Command
 		XOPChanAccess *acc = anope_dynamic_static_cast<XOPChanAccess *>(provider->Create());
 		acc->ci = ci;
 		acc->mask = mask;
-		acc->creator = u->nick;
+		acc->creator = source.GetNick();
 		acc->type = level;
 		acc->last_seen = 0;
 		acc->created = Anope::CurTime;
 		ci->AddAccess(acc);
 
-		Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "to add " << mask;
+		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to add " << mask;
 
-		FOREACH_MOD(I_OnAccessAdd, OnAccessAdd(ci, u, acc));
+		FOREACH_MOD(I_OnAccessAdd, OnAccessAdd(ci, source, acc));
 		source.Reply(_("\002%s\002 added to %s %s list."), acc->mask.c_str(), ci->name.c_str(), source.command.c_str());
 	}
 
 	void DoDel(CommandSource &source, ChannelInfo *ci, const std::vector<Anope::string> &params, XOPType level)
 	{
-		User *u = source.u;
-
+		NickCore *nc = source.nc;
 		const Anope::string &mask = params.size() > 2 ? params[2] : "";
 
 		if (mask.empty())
@@ -317,13 +315,13 @@ class XOPBase : public Command
 		tmp_access.ci = ci;
 		tmp_access.type = level;
 
-		AccessGroup access = ci->AccessFor(u);
+		AccessGroup access = source.AccessFor(ci);
 		const ChanAccess *highest = access.Highest();
 		bool override = false;
 
-		if ((!mask.equals_ci(u->Account()->display) && !access.HasPriv("ACCESS_CHANGE") && !access.Founder) || ((!highest || tmp_access >= *highest) && !access.Founder))
+		if ((!mask.equals_ci(nc->display) && !access.HasPriv("ACCESS_CHANGE") && !access.Founder) || ((!highest || tmp_access >= *highest) && !access.Founder))
 		{
-			if (u->HasPriv("chanserv/access/modify"))
+			if (source.HasPriv("chanserv/access/modify"))
 				override = true;
 			else
 			{
@@ -355,7 +353,7 @@ class XOPBase : public Command
 						 source.Reply(_("No matching entries on %s %s list."), ci->name.c_str(), source.command.c_str());
 					else
 					{
-						Log(override ? LOG_OVERRIDE : LOG_COMMAND, source.u, c, ci) << "to delete " << Nicks;
+						Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, c, ci) << "to delete " << Nicks;
 
 						if (Deleted == 1)
 							source.Reply(_("Deleted one entry from %s %s list."), ci->name.c_str(), source.command.c_str());
@@ -380,7 +378,7 @@ class XOPBase : public Command
 					else
 						Nicks = caccess->mask;
 
-					FOREACH_MOD(I_OnAccessDel, OnAccessDel(ci, source.u, caccess));
+					FOREACH_MOD(I_OnAccessDel, OnAccessDel(ci, source, caccess));
 
 					ci->EraseAccess(Number - 1);
 				}
@@ -396,11 +394,11 @@ class XOPBase : public Command
 
 				if (a->mask.equals_ci(mask) && XOPChanAccess::DetermineLevel(a) == level)
 				{
-					Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "to delete " << a->mask;
+					Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to delete " << a->mask;
 
 					source.Reply(_("\002%s\002 deleted from %s %s list."), a->mask.c_str(), ci->name.c_str(), source.command.c_str());
 
-					FOREACH_MOD(I_OnAccessDel, OnAccessDel(ci, u, a));
+					FOREACH_MOD(I_OnAccessDel, OnAccessDel(ci, source, a));
 					ci->EraseAccess(a);
 
 					return;
@@ -413,13 +411,12 @@ class XOPBase : public Command
 
 	void DoList(CommandSource &source, ChannelInfo *ci, const std::vector<Anope::string> &params, XOPType level)
 	{
-		User *u = source.u;
 
 		const Anope::string &nick = params.size() > 2 ? params[2] : "";
 
-		AccessGroup access = ci->AccessFor(u);
+		AccessGroup access = source.AccessFor(ci);
 
-		if (!access.HasPriv("ACCESS_LIST") && !u->HasCommand("chanserv/access/list"))
+		if (!access.HasPriv("ACCESS_LIST") && !source.HasCommand("chanserv/access/list"))
 		{
 			source.Reply(ACCESS_DENIED);
 			return;
@@ -497,7 +494,6 @@ class XOPBase : public Command
 
 	void DoClear(CommandSource &source, ChannelInfo *ci, XOPType level)
 	{
-		User *u = source.u;
 
 		if (readonly)
 		{
@@ -511,14 +507,14 @@ class XOPBase : public Command
 			return;
 		}
 
-		if (!ci->AccessFor(u).HasPriv("FOUNDER") && !u->HasPriv("chanserv/access/modify"))
+		if (!source.AccessFor(ci).HasPriv("FOUNDER") && !source.HasPriv("chanserv/access/modify"))
 		{
 			source.Reply(ACCESS_DENIED);
 			return;
 		}
 
-		bool override = !ci->AccessFor(u).HasPriv("FOUNDER");
-		Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "to clear the access list";
+		bool override = !source.AccessFor(ci).HasPriv("FOUNDER");
+		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to clear the access list";
 
 		for (unsigned i = ci->GetAccessCount(); i > 0; --i)
 		{
@@ -527,7 +523,7 @@ class XOPBase : public Command
 				ci->EraseAccess(i - 1);
 		}
 
-		FOREACH_MOD(I_OnAccessClear, OnAccessClear(ci, u));
+		FOREACH_MOD(I_OnAccessClear, OnAccessClear(ci, source));
 
 		source.Reply(_("Channel %s %s list has been cleared."), ci->name.c_str(), source.command.c_str());
 

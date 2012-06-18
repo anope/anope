@@ -105,7 +105,7 @@ class CommandNSSetMisc : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		this->Run(source, source.u->Account()->display, !params.empty() ? params[0] : "");
+		this->Run(source, source.nc->display, !params.empty() ? params[0] : "");
 	}
 };
 

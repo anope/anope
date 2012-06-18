@@ -24,13 +24,12 @@ class CommandOSModLoad : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		User *u = source.u;
 		const Anope::string &mname = params[0];
 
-		ModuleReturn status = ModuleManager::LoadModule(mname, u);
+		ModuleReturn status = ModuleManager::LoadModule(mname, source.GetUser());
 		if (status == MOD_ERR_OK)
 		{
-			Log(LOG_ADMIN, u, this) << "to load module " << mname;
+			Log(LOG_ADMIN, source, this) << "to load module " << mname;
 			source.Reply(_("Module \002%s\002 loaded"), mname.c_str());
 		}
 		else if (status == MOD_ERR_EXISTS)
@@ -62,7 +61,6 @@ class CommandOSModReLoad : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		User *u = source.u;
 		const Anope::string &mname = params[0];
 
 		Module *m = ModuleManager::FindModule(mname);
@@ -80,7 +78,7 @@ class CommandOSModReLoad : public Command
 
 		/* Unrecoverable */
 		bool fatal = m->type == PROTOCOL;
-		ModuleReturn status = ModuleManager::UnloadModule(m, u);
+		ModuleReturn status = ModuleManager::UnloadModule(m, source.GetUser());
 
 		if (status != MOD_ERR_OK)
 		{
@@ -88,10 +86,10 @@ class CommandOSModReLoad : public Command
 			return;
 		}
 
-		status = ModuleManager::LoadModule(mname, u);
+		status = ModuleManager::LoadModule(mname, source.GetUser());
 		if (status == MOD_ERR_OK)
 		{
-			Log(LOG_ADMIN, u, this) << "to reload module " << mname;
+			Log(LOG_ADMIN, source, this) << "to reload module " << mname;
 			source.Reply(_("Module \002%s\002 reloaded"), mname.c_str());
 		}
 		else
@@ -128,7 +126,6 @@ class CommandOSModUnLoad : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		User *u = source.u;
 		const Anope::string &mname = params[0];
 
 		Module *m = ModuleManager::FindModule(mname);
@@ -146,11 +143,11 @@ class CommandOSModUnLoad : public Command
 
 		Log() << "Trying to unload module [" << mname << "]";
 
-		ModuleReturn status = ModuleManager::UnloadModule(m, u);
+		ModuleReturn status = ModuleManager::UnloadModule(m, source.GetUser());
 
 		if (status == MOD_ERR_OK)
 		{
-			Log(LOG_ADMIN, u, this) << "to unload module " << mname;
+			Log(LOG_ADMIN, source, this) << "to unload module " << mname;
 			source.Reply(_("Module \002%s\002 unloaded"), mname.c_str());
 		}
 		else

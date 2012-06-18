@@ -27,18 +27,17 @@ class CommandNSResetPass : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		User *u = source.u;
 		const NickAlias *na;
 
-		if (Config->RestrictMail && (!u->Account() || !u->HasCommand("nickserv/resetpass")))
+		if (Config->RestrictMail && source.HasCommand("nickserv/resetpass"))
 			source.Reply(ACCESS_DENIED);
 		else if (!(na = findnick(params[0])))
 			source.Reply(NICK_X_NOT_REGISTERED, params[0].c_str());
 		else
 		{
-			if (SendResetEmail(u, na, source.owner))
+			if (SendResetEmail(source.GetUser(), na, source.owner))
 			{
-				Log(LOG_COMMAND, u, this) << "for " << na->nick << " (group: " << na->nc->display << ")";
+				Log(LOG_COMMAND, source, this) << "for " << na->nick << " (group: " << na->nc->display << ")";
 				source.Reply(_("Password reset email for \002%s\002 has been sent."), na->nick.c_str());
 			}
 		}
@@ -83,7 +82,6 @@ class NSResetPass : public Module
 	{
 		if (command->name == "nickserv/confirm" && params.size() > 1)
 		{
-			User *u = source.u;
 			NickAlias *na = findnick(params[0]);
 
 			ResetInfo *ri = na ? na->nc->GetExt<ResetInfo *>("ns_resetpass") : NULL;
@@ -100,13 +98,15 @@ class NSResetPass : public Module
 				{
 					nc->Shrink("ns_resetpass");
 
-					Log(LOG_COMMAND, u, &commandnsresetpass) << "confirmed RESETPASS to forcefully identify to " << na->nick;
+					Log(LOG_COMMAND, source, &commandnsresetpass) << "confirmed RESETPASS to forcefully identify to " << na->nick;
 
 					nc->UnsetFlag(NI_UNCONFIRMED);
-					u->Identify(na);
 
-					source.Reply(_("You are now identified for your nick. Change your password now."));
-
+					if (source.GetUser())
+					{
+						source.GetUser()->Identify(na);
+						source.Reply(_("You are now identified for your nick. Change your password now."));
+					}
 				}
 				else
 					return EVENT_CONTINUE;

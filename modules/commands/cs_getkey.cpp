@@ -26,7 +26,6 @@ class CommandCSGetKey : public Command
 	{
 		const Anope::string &chan = params[0];
 
-		User *u = source.u;
 		ChannelInfo *ci = cs_findchan(params[0]);
 		if (ci == NULL)
 		{
@@ -34,8 +33,7 @@ class CommandCSGetKey : public Command
 			return;
 		}
 
-
-		if (!ci->AccessFor(u).HasPriv("GETKEY") && !u->HasCommand("chanserv/getkey"))
+		if (!source.AccessFor(ci).HasPriv("GETKEY") && !source.HasCommand("chanserv/getkey"))
 		{
 			source.Reply(ACCESS_DENIED);
 			return;
@@ -48,8 +46,8 @@ class CommandCSGetKey : public Command
 			return;
 		}
 
-		bool override = !ci->AccessFor(u).HasPriv("GETKEY");
-		Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci);
+		bool override = !source.AccessFor(ci).HasPriv("GETKEY");
+		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci);
 
 		source.Reply(_("Key for channel \002%s\002 is \002%s\002."), chan.c_str(), key.c_str());
 		return;

@@ -29,7 +29,6 @@ class CommandOSChanKill : public Command
 		if (!akills)
 			return;
 
-		User *u = source.u;
 		Anope::string expiry, channel;
 		time_t expires;
 		unsigned last_param = 1;
@@ -67,7 +66,7 @@ class CommandOSChanKill : public Command
 		{
 			Anope::string realreason;
 			if (Config->AddAkiller)
-				realreason = "[" + u->nick + "] " + reason;
+				realreason = "[" + source.GetNick() + "] " + reason;
 			else
 				realreason = reason;
 
@@ -80,12 +79,12 @@ class CommandOSChanKill : public Command
 					if (uc->user->server == Me || uc->user->HasMode(UMODE_OPER))
 						continue;
 
-					XLine *x = new XLine("*@" + uc->user->host, u->nick, expires, realreason, XLineManager::GenerateUID());
+					XLine *x = new XLine("*@" + uc->user->host, source.GetNick(), expires, realreason, XLineManager::GenerateUID());
 					akills->AddXLine(x);
 					akills->OnMatch(uc->user, x);
 				}
 
-				Log(LOG_ADMIN, u, this) << "on " << c->name << " (" << realreason << ")";
+				Log(LOG_ADMIN, source, this) << "on " << c->name << " (" << realreason << ")";
 			}
 			else
 				source.Reply(CHAN_X_NOT_IN_USE, channel.c_str());

@@ -24,7 +24,6 @@ class CommandBSSetDontKickOps : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		User *u = source.u;
 		ChannelInfo *ci = cs_findchan(params[0]);
 		if (ci == NULL)
 		{
@@ -32,7 +31,8 @@ class CommandBSSetDontKickOps : public Command
 			return;
 		}
 
-		if (!u->HasPriv("botserv/administration") && !ci->AccessFor(u).HasPriv("SET"))
+		AccessGroup access = source.AccessFor(ci);
+		if (!source.HasPriv("botserv/administration") && !access.HasPriv("SET"))
 		{
 			source.Reply(ACCESS_DENIED);
 			return;
@@ -46,16 +46,16 @@ class CommandBSSetDontKickOps : public Command
 
 		if (params[1].equals_ci("ON"))
 		{
-			bool override = !ci->AccessFor(u).HasPriv("SET");
-			Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "to enable dontkickops"; 
+			bool override = !access.HasPriv("SET");
+			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to enable dontkickops"; 
 
 			ci->botflags.SetFlag(BS_DONTKICKOPS);
 			source.Reply(_("Bot \002won't kick ops\002 on channel %s."), ci->name.c_str());
 		}
 		else if (params[1].equals_ci("OFF"))
 		{
-			bool override = !ci->AccessFor(u).HasPriv("SET");
-			Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "to disable dontkickops"; 
+			bool override = !access.HasPriv("SET");
+			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to disable dontkickops"; 
 
 			ci->botflags.UnsetFlag(BS_DONTKICKOPS);
 			source.Reply(_("Bot \002will kick ops\002 on channel %s."), ci->name.c_str());

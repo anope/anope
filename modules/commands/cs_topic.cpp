@@ -26,7 +26,6 @@ class CommandCSTopic : public Command
 	{
 		const Anope::string &topic = params.size() > 1 ? params[1] : "";
 
-		User *u = source.u;
 
 		ChannelInfo *ci = cs_findchan(params[0]);
 		if (ci == NULL)
@@ -37,18 +36,18 @@ class CommandCSTopic : public Command
 
 		if (!ci->c)
 			source.Reply(CHAN_X_NOT_IN_USE, ci->name.c_str());
-		else if (!ci->AccessFor(u).HasPriv("TOPIC") && !u->HasCommand("chanserv/topic"))
+		else if (!source.AccessFor(ci).HasPriv("TOPIC") && !source.HasCommand("chanserv/topic"))
 			source.Reply(ACCESS_DENIED);
 		else
 		{
 			bool has_topiclock = ci->HasFlag(CI_TOPICLOCK);
 			ci->UnsetFlag(CI_TOPICLOCK);
-			ci->c->ChangeTopic(u->nick, topic, Anope::CurTime);
+			ci->c->ChangeTopic(source.GetNick(), topic, Anope::CurTime);
 			if (has_topiclock)
 				ci->SetFlag(CI_TOPICLOCK);
 	
-			bool override = !ci->AccessFor(u).HasPriv("TOPIC");
-			Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << (!topic.empty() ? "to change the topic to: " : "to unset the topic") << (!topic.empty() ? topic : "");
+			bool override = !source.AccessFor(ci).HasPriv("TOPIC");
+			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << (!topic.empty() ? "to change the topic to: " : "to unset the topic") << (!topic.empty() ? topic : "");
 		}
 		return;
 	}

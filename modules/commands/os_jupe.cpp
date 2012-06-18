@@ -24,7 +24,6 @@ class CommandOSJupe : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		User *u = source.u;
 		const Anope::string &jserver = params[0];
 		const Anope::string &reason = params.size() > 1 ? params[1] : "";
 		Server *server = Server::Find(jserver);
@@ -35,13 +34,13 @@ class CommandOSJupe : public Command
 			source.Reply(_("You can not jupe your services server or your uplink server."));
 		else
 		{
-			Anope::string rbuf = "Juped by " + u->nick + (!reason.empty() ? ": " + reason : "");
+			Anope::string rbuf = "Juped by " + source.GetNick() + (!reason.empty() ? ": " + reason : "");
 			if (server)
 				ircdproto->SendSquit(server, rbuf);
 			Server *juped_server = new Server(Me, jserver, 1, rbuf, ircd->ts6 ? ts6_sid_retrieve() : "", SERVER_JUPED);
 			ircdproto->SendServer(juped_server);
 
-			Log(LOG_ADMIN, u, this) << "on " << jserver << " (" << rbuf << ")";
+			Log(LOG_ADMIN, source, this) << "on " << jserver << " (" << rbuf << ")";
 		}
 		return;
 	}

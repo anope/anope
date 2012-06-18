@@ -22,7 +22,6 @@ struct EntryMsg : Serializable
 
 	EntryMsg(ChannelInfo *c, const Anope::string &cname, const Anope::string &cmessage, time_t ct = Anope::CurTime)
 	{
-	
 		this->ci = c;
 		this->creator = cname;
 		this->message = cmessage;
@@ -128,8 +127,6 @@ class CommandEntryMessage : public Command
 		
 	void DoAdd(CommandSource &source, ChannelInfo *ci, const Anope::string &message)
 	{
-		User *u = source.u;
-
 		EntryMessageList *messages = ci->GetExt<EntryMessageList *>("cs_entrymsg");
 		if (messages == NULL)
 		{
@@ -141,16 +138,14 @@ class CommandEntryMessage : public Command
 			source.Reply(_("The entry message list for \002%s\002 is full."), ci->name.c_str());
 		else
 		{
-			(*messages)->push_back(new EntryMsg(ci, source.u->nick, message));
-			Log(IsFounder(u, ci) ? LOG_COMMAND : LOG_OVERRIDE, u, this, ci) << "to add a message";
+			(*messages)->push_back(new EntryMsg(ci, source.GetNick(), message));
+			Log(source.IsFounder(ci) ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to add a message";
 			source.Reply(_("Entry message added to \002%s\002"), ci->name.c_str());
 		}
 	}
 
 	void DoDel(CommandSource &source, ChannelInfo *ci, const Anope::string &message)
 	{
-		User *u = source.u;
-
 		EntryMessageList *messages = ci->GetExt<EntryMessageList *>("cs_entrymsg");
 		if (messages == NULL)
 		{
@@ -173,7 +168,7 @@ class CommandEntryMessage : public Command
 					(*messages)->erase((*messages)->begin() + i - 1);
 					if ((*messages)->empty())
 						ci->Shrink("cs_entrymsg");
-					Log(IsFounder(u, ci) ? LOG_COMMAND : LOG_OVERRIDE, u, this, ci) << "to remove a message";
+					Log(source.IsFounder(ci) ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to remove a message";
 					source.Reply(_("Entry message \002%i\002 for \002%s\002 deleted."), i, ci->name.c_str());
 				}
 				else
@@ -188,8 +183,6 @@ class CommandEntryMessage : public Command
 
 	void DoClear(CommandSource &source, ChannelInfo *ci)
 	{
-		User *u = source.u;
-
 		EntryMessageList *messages = ci->GetExt<EntryMessageList *>("cs_entrymsg");
 		if (messages != NULL)
 		{
@@ -199,7 +192,7 @@ class CommandEntryMessage : public Command
 			ci->Shrink("cs_entrymsg");
 		}
 
-		Log(IsFounder(u, ci) ? LOG_COMMAND : LOG_OVERRIDE, u, this, ci) << "to remove all messages";
+		Log(source.IsFounder(ci) ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to remove all messages";
 		source.Reply(_("Entry messages for \002%s\002 have been cleared."), ci->name.c_str());
 	}
 
@@ -215,8 +208,6 @@ class CommandEntryMessage : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		User *u = source.u;
-
 		ChannelInfo *ci = cs_findchan(params[0]);
 		if (ci == NULL)
 		{
@@ -224,7 +215,7 @@ class CommandEntryMessage : public Command
 			return;
 		}
 
-		if (IsFounder(u, ci) || u->HasCommand("chanserv/set"))
+		if (source.IsFounder(ci) || source.HasCommand("chanserv/set"))
 		{
 			if (params[1].equals_ci("LIST"))
 				this->DoList(source, ci);

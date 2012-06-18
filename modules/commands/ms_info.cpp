@@ -24,15 +24,14 @@ class CommandMSInfo : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		User *u = source.u;
-
+		NickCore *nc = source.nc;
 		const MemoInfo *mi;
 		const NickAlias *na = NULL;
 		ChannelInfo *ci = NULL;
 		const Anope::string &nname = !params.empty() ? params[0] : "";
 		int hardmax = 0;
 
-		if (!nname.empty() && nname[0] != '#' && u->HasPriv("memoserv/info"))
+		if (!nname.empty() && nname[0] != '#' && source.HasPriv("memoserv/info"))
 		{
 			na = findnick(nname);
 			if (!na)
@@ -51,7 +50,7 @@ class CommandMSInfo : public Command
 				source.Reply(CHAN_X_NOT_REGISTERED, nname.c_str());
 				return;
 			}
-			else if (!ci->AccessFor(u).HasPriv("MEMO"))
+			else if (!source.AccessFor(ci).HasPriv("MEMO"))
 			{
 				source.Reply(ACCESS_DENIED);
 				return;
@@ -66,11 +65,11 @@ class CommandMSInfo : public Command
 		}
 		else
 		{
-			mi = &u->Account()->memos;
-			hardmax = u->Account()->HasFlag(NI_MEMO_HARDMAX) ? 1 : 0;
+			mi = &nc->memos;
+			hardmax = nc->HasFlag(NI_MEMO_HARDMAX) ? 1 : 0;
 		}
 
-		if (!nname.empty() && (ci || na->nc != u->Account()))
+		if (!nname.empty() && (ci || na->nc != nc))
 		{
 			if (mi->memos->empty())
 				source.Reply(_("%s currently has no memos."), nname.c_str());
@@ -127,7 +126,7 @@ class CommandMSInfo : public Command
 					source.Reply(_("%s is not notified of new memos."), nname.c_str());
 			}
 		}
-		else /* !nname || (!ci || na->nc == u->Account()) */
+		else /* !nname || (!ci || na->nc == nc) */
 		{
 			if (mi->memos->empty())
 				source.Reply(_("You currently have no memos."));
@@ -156,14 +155,14 @@ class CommandMSInfo : public Command
 
 			if (!mi->memomax)
 			{
-				if (!u->IsServicesOper() && hardmax)
+				if (!source.IsServicesOper() && hardmax)
 					source.Reply(_("Your memo limit is \0020\002; you will not receive any new memos. You cannot change this limit."));
 				else
 					source.Reply(_("Your memo limit is \0020\002; you will not receive any new memos."));
 			}
 			else if (mi->memomax > 0)
 			{
-				if (!u->IsServicesOper() && hardmax)
+				if (!source.IsServicesOper() && hardmax)
 					source.Reply(_("Your memo limit is \002%d\002, and may not be changed."), mi->memomax);
 				else
 					source.Reply(_("Your memo limit is \002%d\002."), mi->memomax);
@@ -172,11 +171,11 @@ class CommandMSInfo : public Command
 				source.Reply(_("You have no limit on the number of memos you may keep."));
 
 			/* Ripped too. But differently because of a seg fault (loughs) */
-			if (u->Account()->HasFlag(NI_MEMO_RECEIVE) && u->Account()->HasFlag(NI_MEMO_SIGNON))
+			if (nc->HasFlag(NI_MEMO_RECEIVE) && nc->HasFlag(NI_MEMO_SIGNON))
 				source.Reply(_("You will be notified of new memos at logon and when they arrive."));
-			else if (u->Account()->HasFlag(NI_MEMO_RECEIVE))
+			else if (nc->HasFlag(NI_MEMO_RECEIVE))
 				source.Reply(_("You will be notified when new memos arrive."));
-			else if (u->Account()->HasFlag(NI_MEMO_SIGNON))
+			else if (nc->HasFlag(NI_MEMO_SIGNON))
 				source.Reply(_("You will be notified of new memos at logon."));
 			else
 				source.Reply(_("You will not be notified of new memos."));

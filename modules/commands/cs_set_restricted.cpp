@@ -23,7 +23,6 @@ class CommandCSSetRestricted : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		User *u = source.u;
 		ChannelInfo *ci = cs_findchan(params[0]);
 		if (ci == NULL)
 		{
@@ -31,7 +30,7 @@ class CommandCSSetRestricted : public Command
 			return;
 		}
 
-		if (source.permission.empty() && !ci->AccessFor(u).HasPriv("SET"))
+		if (source.permission.empty() && !source.AccessFor(ci).HasPriv("SET"))
 		{
 			source.Reply(ACCESS_DENIED);
 			return;

@@ -26,7 +26,7 @@ class CommandCSInvite : public Command
 	{
 		const Anope::string &chan = params[0];
 
-		User *u = source.u;
+		User *u = source.GetUser();
 		Channel *c = findchan(chan);
 
 		if (!c)
@@ -42,7 +42,7 @@ class CommandCSInvite : public Command
 			return;
 		}
 
-		if (!ci->AccessFor(u).HasPriv("INVITE") && !u->HasCommand("chanserv/invite"))
+		if (!source.AccessFor(ci).HasPriv("INVITE") && !source.HasCommand("chanserv/invite"))
 		{
 			source.Reply(ACCESS_DENIED);
 			return;
@@ -52,12 +52,12 @@ class CommandCSInvite : public Command
 		if (params.size() == 1)
 			u2 = u;
 		else
+			u2 = finduser(params[1]);
+
+		if (!u2)
 		{
-			if (!(u2 = finduser(params[1])))
-			{
-				source.Reply(NICK_X_NOT_IN_USE, params[1].c_str());
-				return;
-			}
+			source.Reply(NICK_X_NOT_IN_USE, params.size() > 1 ? params[1].c_str() : source.GetNick().c_str());
+			return;
 		}
 
 		if (c->FindUser(u2))
@@ -69,17 +69,17 @@ class CommandCSInvite : public Command
 		}
 		else
 		{
-			bool override = !ci->AccessFor(u).HasPriv("INVITE");
+			bool override = !source.AccessFor(ci).HasPriv("INVITE");
 
 			ircdproto->SendInvite(ci->WhoSends(), c, u2);
 			if (u2 != u)
 			{
 				source.Reply(_("\002%s\002 has been invited to \002%s\002."), u2->nick.c_str(), c->name.c_str());
-				Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "for " << u2->nick;
+				Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "for " << u2->nick;
 			}
 			else
 			{
-				Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci);
+				Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci);
 			}
 			u2->SendMessage(ci->WhoSends(), _("You have been invited to \002%s\002."), c->name.c_str());
 		}

@@ -48,7 +48,7 @@ class CommandNSSetGreet : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		this->Run(source, source.u->Account()->display, params.size() > 0 ? params[0] : "");
+		this->Run(source, source.nc->display, params.size() > 0 ? params[0] : "");
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &) anope_override

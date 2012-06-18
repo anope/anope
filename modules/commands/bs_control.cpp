@@ -26,8 +26,6 @@ class CommandBSSay : public Command
 	{
 		const Anope::string &text = params[1];
 
-		User *u = source.u;
-
 		ChannelInfo *ci = cs_findchan(params[0]);
 		if (ci == NULL)
 		{
@@ -35,7 +33,7 @@ class CommandBSSay : public Command
 			return;
 		}
 
-		if (!ci->AccessFor(u).HasPriv("SAY"))
+		if (!source.AccessFor(ci).HasPriv("SAY"))
 		{
 			source.Reply(ACCESS_DENIED);
 			return;
@@ -63,7 +61,7 @@ class CommandBSSay : public Command
 		ci->bi->lastmsg = Anope::CurTime;
 
 		// XXX need a way to find if someone is overriding this
-		Log(LOG_COMMAND, u, this, ci) << text;
+		Log(LOG_COMMAND, source, this, ci) << text;
 
 		return;
 	}
@@ -88,7 +86,6 @@ class CommandBSAct : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		User *u = source.u;
 		Anope::string message = params[1];
 
 		ChannelInfo *ci = cs_findchan(params[0]);
@@ -98,7 +95,7 @@ class CommandBSAct : public Command
 			return;
 		}
 
-		if (!ci->AccessFor(u).HasPriv("SAY"))
+		if (!source.AccessFor(ci).HasPriv("SAY"))
 		{
 			source.Reply(ACCESS_DENIED);
 			return;
@@ -124,7 +121,7 @@ class CommandBSAct : public Command
 		ci->bi->lastmsg = Anope::CurTime;
 
 		// XXX Need to be able to find if someone is overriding this.
-		Log(LOG_COMMAND, u, this, ci) << message;
+		Log(LOG_COMMAND, source, this, ci) << message;
 
 		return;
 	}

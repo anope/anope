@@ -59,7 +59,6 @@ class CommandOSAKill : public Command
  private:
 	void DoAdd(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		User *u = source.u;
 		Anope::string expiry, mask;
 
 		if (params.size() < 2)
@@ -159,7 +158,7 @@ class CommandOSAKill : public Command
 			return;
 		}
 
-		XLine *x = new XLine(mask, u->nick, expires, reason);
+		XLine *x = new XLine(mask, source.GetNick(), expires, reason);
 		if (Config->AkillIds)
 			x->UID = XLineManager::GenerateUID();
 
@@ -172,13 +171,13 @@ class CommandOSAKill : public Command
 		if (percent > 95)
 		{
 			source.Reply(USERHOST_MASK_TOO_WIDE, mask.c_str());
-			Log(LOG_ADMIN, u, this) << "tried to akill " << percent << "% of the network (" << affected << " users)";
+			Log(LOG_ADMIN, source, this) << "tried to akill " << percent << "% of the network (" << affected << " users)";
 			x->destroy();
 			return;
 		}
 
 		EventReturn MOD_RESULT;
-		FOREACH_RESULT(I_OnAddXLine, OnAddXLine(u, x, akills));
+		FOREACH_RESULT(I_OnAddXLine, OnAddXLine(source, x, akills));
 		if (MOD_RESULT == EVENT_STOP)
 		{
 			x->destroy();
@@ -191,14 +190,13 @@ class CommandOSAKill : public Command
 
 		source.Reply(_("\002%s\002 added to the AKILL list."), mask.c_str());
 
-		Log(LOG_ADMIN, u, this) << "on " << mask << " (" << x->Reason << ") expires in " << (expires ? duration(expires - Anope::CurTime) : "never") << " [affects " << affected << " user(s) (" << percent << "%)]";
+		Log(LOG_ADMIN, source, this) << "on " << mask << " (" << x->Reason << ") expires in " << (expires ? duration(expires - Anope::CurTime) : "never") << " [affects " << affected << " user(s) (" << percent << "%)]";
 		if (readonly)
 			source.Reply(READ_ONLY_MODE);
 	}
 
 	void DoDel(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		User *u = source.u;
 		const Anope::string &mask = params.size() > 1 ? params[1] : "";
 
 		if (mask.empty())
@@ -230,7 +228,7 @@ class CommandOSAKill : public Command
 
 			do
 			{
-				FOREACH_MOD(I_OnDelXLine, OnDelXLine(u, x, akills));
+				FOREACH_MOD(I_OnDelXLine, OnDelXLine(source, x, akills));
 
 				source.Reply(_("\002%s\002 deleted from the AKILL list."), x->Mask.c_str());
 				AkillDelCallback::DoDel(source, x);
@@ -295,7 +293,7 @@ class CommandOSAKill : public Command
 					entry["Mask"] = x->Mask;
 					entry["Creator"] = x->By;
 					entry["Created"] = do_strftime(x->Created, NULL, true);
-					entry["Expires"] = expire_left(source.u->Account(), x->Expires);
+					entry["Expires"] = expire_left(source.nc, x->Expires);
 					entry["Reason"] = x->Reason;
 					list.addEntry(entry);
 				}
@@ -348,12 +346,11 @@ class CommandOSAKill : public Command
 
 	void DoClear(CommandSource &source)
 	{
-		User *u = source.u;
 
 		for (unsigned i = akills->GetCount(); i > 0; --i)
 		{
 			XLine *x = akills->GetEntry(i - 1);
-			FOREACH_MOD(I_OnDelXLine, OnDelXLine(u, x, akills));
+			FOREACH_MOD(I_OnDelXLine, OnDelXLine(source, x, akills));
 			akills->DelXLine(x);
 		}
 

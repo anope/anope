@@ -24,12 +24,11 @@ class CommandNSList : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		User *u = source.u;
 
 		Anope::string pattern = params[0];
 		const NickCore *mync;
 		unsigned nnicks;
-		bool is_servadmin = u->HasCommand("nickserv/list");
+		bool is_servadmin = source.HasCommand("nickserv/list");
 		int count = 0, from = 0, to = 0;
 		bool suspended, nsnoexpire, unconfirmed;
 
@@ -70,7 +69,7 @@ class CommandNSList : public Command
 			}
 		}
 
-		mync = u->Account();
+		mync = source.nc;
 		ListFormatter list;
 
 		list.addColumn("Nick").addColumn("Last usermask");

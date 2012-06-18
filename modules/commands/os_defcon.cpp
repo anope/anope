@@ -171,7 +171,6 @@ class CommandOSDefcon : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		User *u = source.u;
 		const Anope::string &lvl = params[0];
 
 		if (lvl.empty())
@@ -209,7 +208,7 @@ class CommandOSDefcon : public Command
 
 		source.Reply(_("Services are now at DEFCON \002%d\002"), DConfig.defaultlevel);
 		this->SendLevels(source);
-		Log(LOG_ADMIN, u, this) << "to change defcon level to " << newLevel;
+		Log(LOG_ADMIN, source, this) << "to change defcon level to " << newLevel;
 
 		/* Global notice the user what is happening. Also any Message that
 		   the Admin would like to add. Set in config file. */

@@ -1,45 +1,6 @@
 #include "module.h"
 #include "xmlrpc.h"
 
-// XXX We no longer need this, we need to modify CommandSource to allow commands to go back here
-class XMLRPCUser : public User
-{
-	Anope::string out;
-	NickAlias *na;
-
- public:
-	XMLRPCUser(const Anope::string &nnick) : User(nnick, Config->NSEnforcerUser, Config->NSEnforcerHost, ""), na(findnick(nick))
-	{
-		this->realname = "XMLRPC User";
-		this->server = Me;
-	}
-
-	void SendMessage(const BotInfo *, Anope::string msg) anope_override
-	{
-		this->out += msg + "\n";
-	}
-
-	NickCore *Account() const anope_override
-	{
-		return (na ? *na->nc : NULL);
-	}
-
-	bool IsIdentified(bool CheckNick = false) const anope_override
-	{
-		return na;
-	}
-
-	bool IsRecognized(bool CheckSecure = true) const anope_override
-	{
-		return na;
-	}
-
-	const Anope::string &GetOut()
-	{
-		return this->out;
-	}
-};
-
 class MyXMLRPCEvent : public XMLRPCEvent
 {
  public:
@@ -60,7 +21,7 @@ class MyXMLRPCEvent : public XMLRPCEvent
 	}
 
  private:
-	void DoCommand(XMLRPCServiceInterface *iface, XMLRPCClientSocket *source, XMLRPCRequest *request)
+	void DoCommand(XMLRPCServiceInterface *iface, XMLRPCClientSocket *, XMLRPCRequest *request)
 	{
 		Anope::string service = request->data.size() > 0 ? request->data[0] : "";
 		Anope::string user = request->data.size() > 1 ? request->data[1] : "";
@@ -77,27 +38,32 @@ class MyXMLRPCEvent : public XMLRPCEvent
 			{
 				request->reply("result", "Success");
 
-				dynamic_reference<User> u = finduser(user);
-				bool created = false;
-				if (!u)
-				{
-					u = new XMLRPCUser(user);
-					created = true;
-					request->reply("online", "no");
-				}
-				else
-					request->reply("online", "yes");
+				NickAlias *na = findnick(user);
 
-				bi->OnMessage(u, command);
+				Anope::string out;
 
-				if (created && u)
+				struct XMLRPCommandReply : CommandReply
 				{
-					User *useru = u;
-					XMLRPCUser *myu = anope_dynamic_static_cast<XMLRPCUser *>(useru);
-					if (!myu->GetOut().empty())
-						request->reply("return", iface->Sanitize(myu->GetOut()));
-					delete u;
+					Anope::string &str;
+
+					XMLRPCommandReply(Anope::string &s) : str(s) { }
+
+					void SendMessage(const BotInfo *source, const Anope::string &msg) anope_override
+					{
+						str += msg + "\n";
+					};
 				}
+				reply(out);
+
+				CommandSource source(user, NULL, na ? *na->nc : NULL, &reply);
+				source.c = NULL;
+				source.owner = bi;
+				source.service = bi;
+
+				RunCommand(source, command);
+
+				if (!out.empty())
+					request->reply("return", iface->Sanitize(out));
 			}
 		}
 	}

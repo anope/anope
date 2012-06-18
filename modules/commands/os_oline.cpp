@@ -24,7 +24,6 @@ class CommandOSOLine : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		User *u = source.u;
 		const Anope::string &nick = params[0];
 		const Anope::string &flag = params[1];
 		User *u2 = NULL;
@@ -38,13 +37,13 @@ class CommandOSOLine : public Command
 			u2->SetMode(source.owner, UMODE_OPER);
 			u2->SendMessage(source.owner, _("You are now an IRC Operator."));
 			source.Reply(_("Operflags \002%s\002 have been added for \002%s\002."), flag.c_str(), nick.c_str());
-			Log(LOG_ADMIN, u, this) << "for " << nick;
+			Log(LOG_ADMIN, source, this) << "for " << nick;
 		}
 		else if (u2 && flag[0] == '-')
 		{
 			ircdproto->SendSVSO(source.owner, nick, flag);
 			source.Reply(_("Operflags \002%s\002 have been added for \002%s\002."), flag.c_str(), nick.c_str());
-			Log(LOG_ADMIN, u, this) << "for " << nick;
+			Log(LOG_ADMIN, source, this) << "for " << nick;
 		}
 		else
 			this->OnSyntaxError(source, "");

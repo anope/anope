@@ -24,7 +24,6 @@ class CommandOSKill : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		User *u = source.u;
 		const Anope::string &nick = params[0];
 		Anope::string reason = params.size() > 1 ? params[1] : "";
 
@@ -38,8 +37,8 @@ class CommandOSKill : public Command
 			if (reason.empty())
 				reason = "No reason specified";
 			if (Config->AddAkiller)
-				reason = "(" + u->nick + ") " + reason;
-			Log(LOG_ADMIN, u, this) << "on " << u2->nick << " for " << reason;
+				reason = "(" + source.GetNick() + ") " + reason;
+			Log(LOG_ADMIN, source, this) << "on " << u2->nick << " for " << reason;
 			u2->Kill(Config->OperServ, reason);
 		}
 	}

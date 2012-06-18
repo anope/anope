@@ -56,7 +56,7 @@ class CommandCSTBan : public Command
 			source.Reply(CHAN_X_NOT_IN_USE, params[0].c_str());
 		else if (!c->ci)
 			source.Reply(CHAN_X_NOT_REGISTERED, c->name.c_str());
-		else if (!c->ci->AccessFor(source.u).HasPriv("BAN"))
+		else if (!source.AccessFor(c->ci).HasPriv("BAN"))
 			source.Reply(ACCESS_DENIED);
 		else if (!(u2 = finduser(nick)))
 			source.Reply(NICK_X_NOT_IN_USE, nick.c_str());

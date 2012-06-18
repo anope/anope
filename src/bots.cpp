@@ -238,94 +238,12 @@ void BotInfo::OnMessage(User *u, const Anope::string &message)
 	if (this->commands.empty())
 		return;
 
-	std::vector<Anope::string> params = BuildStringVector(message);
-	bool has_help = this->commands.find("HELP") != this->commands.end();
-
-	BotInfo::command_map::const_iterator it = this->commands.end();
-	unsigned count = 0;
-	for (unsigned max = params.size(); it == this->commands.end() && max > 0; --max)
-	{
-		Anope::string full_command;
-		for (unsigned i = 0; i < max; ++i)
-			full_command += " " + params[i];
-		full_command.erase(full_command.begin());
-
-		++count;
-		it = this->commands.find(full_command);
-	}
-
-	if (it == this->commands.end())
-	{
-		if (has_help)
-			u->SendMessage(this, _("Unknown command \002%s\002. \"%s%s HELP\" for help."), message.c_str(), Config->UseStrictPrivMsgString.c_str(), this->nick.c_str());
-		else
-			u->SendMessage(this, _("Unknown command \002%s\002."), message.c_str());
-		return;
-	}
-
-	const CommandInfo &info = it->second;
-	service_reference<Command> c("Command", info.name);
-	if (!c)
-	{
-		if (has_help)
-			u->SendMessage(this, _("Unknown command \002%s\002. \"%s%s HELP\" for help."), message.c_str(), Config->UseStrictPrivMsgString.c_str(), this->nick.c_str());
-		else
-			u->SendMessage(this, _("Unknown command \002%s\002."), message.c_str());
-		Log(this) << "Command " << it->first << " exists on me, but its service " << info.name << " was not found!";
-		return;
-	}
-
-	// Command requires registered users only
-	if (!c->HasFlag(CFLAG_ALLOW_UNREGISTERED) && !u->IsIdentified())
-	{
-		u->SendMessage(this, NICK_IDENTIFY_REQUIRED);
-		Log(LOG_NORMAL, "access_denied", this) << "Access denied for unregistered user " << u->GetMask() << " with command " << c->name;
-		return;
-	}
-
-	for (unsigned i = 0, j = params.size() - (count - 1); i < j; ++i)
-		params.erase(params.begin());
-
-	while (c->MaxParams > 0 && params.size() > c->MaxParams)
-	{
-		params[c->MaxParams - 1] += " " + params[c->MaxParams];
-		params.erase(params.begin() + c->MaxParams);
-	}
-
-	CommandSource source;
-	source.u = u;
+	CommandSource source(u->nick, u, u->Account(), u);
 	source.c = NULL;
 	source.owner = this;
 	source.service = this;
-	source.command = it->first;
-	source.permission = info.permission;
 
-	EventReturn MOD_RESULT;
-	FOREACH_RESULT(I_OnPreCommand, OnPreCommand(source, c, params));
-	if (MOD_RESULT == EVENT_STOP)
-		return;
-
-
-	if (params.size() < c->MinParams)
-	{
-		c->OnSyntaxError(source, !params.empty() ? params[params.size() - 1] : "");
-		return;
-	}
-
-	// If the command requires a permission, and they aren't registered or don't have the required perm, DENIED
-	if (!info.permission.empty() && !u->HasCommand(info.permission))
-	{
-		u->SendMessage(this, ACCESS_DENIED);
-		Log(LOG_NORMAL, "access_denied", this) << "Access denied for user " << u->GetMask() << " with command " << c->name;
-		return;
-	}
-
-	dynamic_reference<User> user_reference(u);
-	c->Execute(source, params);
-	if (user_reference)
-	{
-		FOREACH_MOD(I_OnPostCommand, OnPostCommand(source, c, params));
-	}
+	RunCommand(source, message);
 }
 
 /** Link a command name to a command in services

@@ -24,7 +24,7 @@ class NSMaxEmail : public Module
 		if (this->NSEmailMax < 1 || email.empty())
 			return false;
 
-		if (this->CountEmail(email, source.u) < this->NSEmailMax)
+		if (this->CountEmail(email, source.nc) < this->NSEmailMax)
 			return false;
 
 		if (this->NSEmailMax == 1)
@@ -35,7 +35,7 @@ class NSMaxEmail : public Module
 		return true;
 	}
 
-	int CountEmail(const Anope::string &email, User *u)
+	int CountEmail(const Anope::string &email, NickCore *unc)
 	{
 		int count = 0;
 
@@ -46,7 +46,7 @@ class NSMaxEmail : public Module
 		{
 			const NickCore *nc = it->second;
 
-			if (!(u->Account() && u->Account() == nc) && !nc->email.empty() && nc->email.equals_ci(email))
+			if (unc != nc && !nc->email.empty() && nc->email.equals_ci(email))
 				++count;
 		}
 

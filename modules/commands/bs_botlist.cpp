@@ -24,7 +24,6 @@ class CommandBSBotList : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		User *u = source.u;
 		unsigned count = 0;
 		ListFormatter list;
 
@@ -34,7 +33,7 @@ class CommandBSBotList : public Command
 		{
 			BotInfo *bi = it->second;
 
-			if (u->HasCommand("botserv/botlist") || !bi->HasFlag(BI_PRIVATE))
+			if (source.HasCommand("botserv/botlist") || !bi->HasFlag(BI_PRIVATE))
 			{
 				++count;
 				ListFormatter::ListEntry entry;

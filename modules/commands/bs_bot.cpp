@@ -94,7 +94,7 @@ class CommandBSBot : public Command
 
 		BotInfo *bi = new BotInfo(nick, user, host, real);
 
-		Log(LOG_ADMIN, source.u, this) << "ADD " << bi->GetMask() << " " << bi->realname;
+		Log(LOG_ADMIN, source, this) << "ADD " << bi->GetMask() << " " << bi->realname;
 
 		source.Reply(_("%s!%s@%s (%s) added to the bot list."), bi->nick.c_str(), bi->GetIdent().c_str(), bi->host.c_str(), bi->realname.c_str());
 
@@ -253,7 +253,7 @@ class CommandBSBot : public Command
 		}
 
 		source.Reply(_("Bot \002%s\002 has been changed to %s!%s@%s (%s)"), oldnick.c_str(), bi->nick.c_str(), bi->GetIdent().c_str(), bi->host.c_str(), bi->realname.c_str());
-		Log(LOG_ADMIN, source.u, this) << "CHANGE " << oldnick << " to " << bi->GetMask() << " " << bi->realname;
+		Log(LOG_ADMIN, source, this) << "CHANGE " << oldnick << " to " << bi->GetMask() << " " << bi->realname;
 
 		FOREACH_MOD(I_OnBotChange, OnBotChange(bi));
 		return;
@@ -284,7 +284,7 @@ class CommandBSBot : public Command
 
 		FOREACH_MOD(I_OnBotDelete, OnBotDelete(bi));
 
-		Log(LOG_ADMIN, source.u, this) << "DEL " << bi->nick;
+		Log(LOG_ADMIN, source, this) << "DEL " << bi->nick;
 
 		source.Reply(_("Bot \002%s\002 has been deleted."), nick.c_str());
 		bi->destroy();
@@ -302,7 +302,6 @@ class CommandBSBot : public Command
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		const Anope::string &cmd = params[0];
-		User *u = source.u;
 
 		if (readonly)
 		{
@@ -313,7 +312,7 @@ class CommandBSBot : public Command
 		if (cmd.equals_ci("ADD"))
 		{
 			// ADD nick user host real - 5
-			if (!u->HasCommand("botserv/bot/add"))
+			if (!source.HasCommand("botserv/bot/add"))
 			{
 				source.Reply(ACCESS_DENIED);
 				return;
@@ -336,7 +335,7 @@ class CommandBSBot : public Command
 		{
 			// CHANGE oldn newn user host real - 6
 			// but only oldn and newn are required
-			if (!u->HasCommand("botserv/bot/change"))
+			if (!source.HasCommand("botserv/bot/change"))
 			{
 				source.Reply(ACCESS_DENIED);
 				return;
@@ -353,7 +352,7 @@ class CommandBSBot : public Command
 		else if (cmd.equals_ci("DEL"))
 		{
 			// DEL nick
-			if (!u->HasCommand("botserv/bot/del"))
+			if (!source.HasCommand("botserv/bot/del"))
 			{
 				source.Reply(ACCESS_DENIED);
 				return;

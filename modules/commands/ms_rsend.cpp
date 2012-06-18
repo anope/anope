@@ -28,20 +28,19 @@ class CommandMSRSend : public Command
 		if (!memoserv)
 			return;
 
-		User *u = source.u;
 
 		const Anope::string &nick = params[0];
 		const Anope::string &text = params[1];
 		const NickAlias *na = NULL;
 
 		/* prevent user from rsend to themselves */
-		if ((na = findnick(nick)) && na->nc == u->Account())
+		if ((na = findnick(nick)) && na->nc == source.nc)
 		{
 			source.Reply(_("You can not request a receipt when sending a memo to yourself."));
 			return;
 		}
 
-		if (Config->MSMemoReceipt == 1 && !u->IsServicesOper())
+		if (Config->MSMemoReceipt == 1 && !source.IsServicesOper())
 			source.Reply(ACCESS_DENIED);
 		else if (Config->MSMemoReceipt > 2 || Config->MSMemoReceipt == 0)
 		{
@@ -50,7 +49,7 @@ class CommandMSRSend : public Command
 		}
 		else
 		{
-			MemoServService::MemoResult result = memoserv->Send(u->nick, nick, text);
+			MemoServService::MemoResult result = memoserv->Send(source.GetNick(), nick, text);
 			if (result == MemoServService::MEMO_INVALID_TARGET)
 				source.Reply(_("\002%s\002 is not a registered unforbidden nick or channel."), nick.c_str());
 			else if (result == MemoServService::MEMO_TOO_FAST)

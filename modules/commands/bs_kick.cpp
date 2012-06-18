@@ -30,7 +30,6 @@ class CommandBSKick : public Command
 		const Anope::string &value = params[2];
 		const Anope::string &ttb = params.size() > 3 ? params[3] : "";
 
-		User *u = source.u;
 		ChannelInfo *ci = cs_findchan(params[0]);
 
 		if (readonly)
@@ -41,14 +40,14 @@ class CommandBSKick : public Command
 			this->OnSyntaxError(source, "");
 		else if (!value.equals_ci("ON") && !value.equals_ci("OFF"))
 			this->OnSyntaxError(source, "");
-		else if (!ci->AccessFor(u).HasPriv("SET") && !u->HasPriv("botserv/administration"))
+		else if (!source.AccessFor(ci).HasPriv("SET") && !source.HasPriv("botserv/administration"))
 			source.Reply(ACCESS_DENIED);
 		else if (!ci->bi)
 			source.Reply(BOT_NOT_ASSIGNED);
 		else
 		{
-			bool override = !ci->AccessFor(u).HasPriv("SET");
-			Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << option << " " << value;
+			bool override = !source.AccessFor(ci).HasPriv("SET");
+			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << option << " " << value;
 
 			if (option.equals_ci("BADWORDS"))
 			{

@@ -24,7 +24,10 @@ class CommandHSOff : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		User *u = source.u;
+		User *u = source.GetUser();
+		if (!u)
+			return;
+
 		const NickAlias *na = findnick(u->nick);
 
 		if (!na || !na->HasVhost())
@@ -32,7 +35,7 @@ class CommandHSOff : public Command
 		else
 		{
 			ircdproto->SendVhostDel(u);
-			Log(LOG_COMMAND, u, this) << "to disable their vhost";
+			Log(LOG_COMMAND, source, this) << "to disable their vhost";
 			source.Reply(_("Your vhost was removed and the normal cloaking restored."));
 		}
 

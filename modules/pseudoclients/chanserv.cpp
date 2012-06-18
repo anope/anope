@@ -173,7 +173,7 @@ class ChanServCore : public Module
 				"Note that any channel which is not used for %d days\n"
 				"(i.e. which no user on the channel's access list enters\n"
 				"for that period of time) will be automatically dropped."), Config->CSExpire / 86400);
-		if (source.u->IsServicesOper())
+		if (source.IsServicesOper())
 			source.Reply(_(" \n"
 				"Services Operators can also, depending on their access drop\n"
 				"any channel, view (and modify) the access, levels and akick\n"

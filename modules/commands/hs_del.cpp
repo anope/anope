@@ -24,12 +24,11 @@ class CommandHSDel : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		User *u = source.u;
 		const Anope::string &nick = params[0];
 		NickAlias *na = findnick(nick);
 		if (na)
 		{
-			Log(LOG_ADMIN, u, this) << "for user " << na->nick;
+			Log(LOG_ADMIN, source, this) << "for user " << na->nick;
 			FOREACH_MOD(I_OnDeleteVhost, OnDeleteVhost(na));
 			na->RemoveVhost();
 			source.Reply(_("Vhost for \002%s\002 removed."), nick.c_str());
@@ -60,7 +59,6 @@ class CommandHSDelAll : public Command
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		const Anope::string &nick = params[0];
-		User *u = source.u;
 		NickAlias *na = findnick(nick);
 		if (na)
 		{
@@ -71,7 +69,7 @@ class CommandHSDelAll : public Command
 				na = *it;
 				na->RemoveVhost();
 			}
-			Log(LOG_ADMIN, u, this) << "for all nicks in group " << nc->display;
+			Log(LOG_ADMIN, source, this) << "for all nicks in group " << nc->display;
 			source.Reply(_("vhosts for group \002%s\002 have been removed."), nc->display.c_str());
 		}
 		else

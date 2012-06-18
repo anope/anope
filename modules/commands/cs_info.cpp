@@ -40,7 +40,7 @@ class CommandCSInfo : public Command
 	{
 		const Anope::string &chan = params[0];
 
-		User *u = source.u;
+		NickCore *nc = source.nc;
 		ChannelInfo *ci = cs_findchan(params[0]);
 		if (ci == NULL)
 		{
@@ -48,14 +48,14 @@ class CommandCSInfo : public Command
 			return;
 		}
 
-		bool has_auspex = u->IsIdentified() && u->HasPriv("chanserv/auspex");
+		bool has_auspex = source.HasPriv("chanserv/auspex");
 		bool show_all = false;
 
 		/* Should we show all fields? Only for sadmins and identified users */
-		if (has_auspex || ci->AccessFor(u).HasPriv("INFO"))
+		if (has_auspex || source.AccessFor(ci).HasPriv("INFO"))
 			show_all = true;
 
-		InfoFormatter info(u);
+		InfoFormatter info(nc);
 
 		source.Reply(CHAN_INFO_HEADER, chan.c_str());
 		if (ci->GetFounder())
@@ -82,21 +82,21 @@ class CommandCSInfo : public Command
 			info["Ban type"] = stringify(ci->bantype);
 
 			Anope::string optbuf;
-			CheckOptStr(optbuf, CI_KEEPTOPIC, _("Topic Retention"), ci, u->Account());
-			CheckOptStr(optbuf, CI_PEACE, _("Peace"), ci, u->Account());
-			CheckOptStr(optbuf, CI_PRIVATE, _("Private"), ci, u->Account());
-			CheckOptStr(optbuf, CI_RESTRICTED, _("Restricted Access"), ci, u->Account());
-			CheckOptStr(optbuf, CI_SECURE, _("Secure"), ci, u->Account());
-			CheckOptStr(optbuf, CI_SECUREFOUNDER, _("Secure Founder"), ci, u->Account());
-			CheckOptStr(optbuf, CI_SECUREOPS, _("Secure Ops"), ci, u->Account());
+			CheckOptStr(optbuf, CI_KEEPTOPIC, _("Topic Retention"), ci, nc);
+			CheckOptStr(optbuf, CI_PEACE, _("Peace"), ci, nc);
+			CheckOptStr(optbuf, CI_PRIVATE, _("Private"), ci, nc);
+			CheckOptStr(optbuf, CI_RESTRICTED, _("Restricted Access"), ci, nc);
+			CheckOptStr(optbuf, CI_SECURE, _("Secure"), ci, nc);
+			CheckOptStr(optbuf, CI_SECUREFOUNDER, _("Secure Founder"), ci, nc);
+			CheckOptStr(optbuf, CI_SECUREOPS, _("Secure Ops"), ci, nc);
 			if (ci->HasFlag(CI_SIGNKICK))
-				CheckOptStr(optbuf, CI_SIGNKICK, _("Signed kicks"), ci, u->Account());
+				CheckOptStr(optbuf, CI_SIGNKICK, _("Signed kicks"), ci, nc);
 			else
-				CheckOptStr(optbuf, CI_SIGNKICK_LEVEL, _("Signed kicks"), ci, u->Account());
-			CheckOptStr(optbuf, CI_TOPICLOCK, _("Topic Lock"), ci, u->Account());
-			CheckOptStr(optbuf, CI_PERSIST, _("Persistant"), ci, u->Account());
-			CheckOptStr(optbuf, CI_NO_EXPIRE, _("No expire"), ci, u->Account());
-			CheckOptStr(optbuf, CI_STATS, _("Chanstats"), ci, u->Account());
+				CheckOptStr(optbuf, CI_SIGNKICK_LEVEL, _("Signed kicks"), ci, nc);
+			CheckOptStr(optbuf, CI_TOPICLOCK, _("Topic Lock"), ci, nc);
+			CheckOptStr(optbuf, CI_PERSIST, _("Persistant"), ci, nc);
+			CheckOptStr(optbuf, CI_NO_EXPIRE, _("No expire"), ci, nc);
+			CheckOptStr(optbuf, CI_STATS, _("Chanstats"), ci, nc);
 
 			info["Options"] = optbuf.empty() ? _("None") : optbuf;
 			info["Mode lock"] = ci->GetMLockAsString(true);

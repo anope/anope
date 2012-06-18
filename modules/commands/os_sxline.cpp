@@ -63,7 +63,6 @@ class CommandOSSXLineBase : public Command
 
 	void OnDel(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		User *u = source.u;
 
 		if (!this->xlm() || this->xlm()->GetList().empty())
 		{
@@ -94,7 +93,7 @@ class CommandOSSXLineBase : public Command
 				return;
 			}
 
-			FOREACH_MOD(I_OnDelXLine, OnDelXLine(u, x, this->xlm()));
+			FOREACH_MOD(I_OnDelXLine, OnDelXLine(source, x, this->xlm()));
 
 			SXLineDelCallback::DoDel(this->xlm(), source, x);
 			source.Reply(_("\002%s\002 deleted from the %s list."), mask.c_str(), source.command.c_str());
@@ -163,7 +162,7 @@ class CommandOSSXLineBase : public Command
 					entry["Mask"] = x->Mask;
 					entry["By"] = x->By;
 					entry["Created"] = do_strftime(x->Created, NULL, true);
-					entry["Expires"] = expire_left(source.u->Account(), x->Expires);
+					entry["Expires"] = expire_left(source.nc, x->Expires);
 					entry["Reason"] = x->Reason;
 					list.addEntry(entry);
 				}
@@ -201,8 +200,7 @@ class CommandOSSXLineBase : public Command
 
 	void OnClear(CommandSource &source)
 	{
-		User *u = source.u;
-		FOREACH_MOD(I_OnDelXLine, OnDelXLine(u, NULL, this->xlm()));
+		FOREACH_MOD(I_OnDelXLine, OnDelXLine(source, NULL, this->xlm()));
 
 		for (unsigned i = this->xlm()->GetCount(); i > 0; --i)
 		{
@@ -258,7 +256,6 @@ class CommandOSSNLine : public CommandOSSXLineBase
 			return;
 		}
 
-		User *u = source.u;
 		unsigned last_param = 2;
 		Anope::string param, expiry;
 		time_t expires;
@@ -355,7 +352,7 @@ class CommandOSSNLine : public CommandOSSXLineBase
 		if (mask[masklen - 1] == ' ')
 			mask.erase(masklen - 1);
 
-		XLine *x = new XLine(mask, u->nick, expires, reason);
+		XLine *x = new XLine(mask, source.GetNick(), expires, reason);
 		if (Config->AkillIds)
 			x->UID = XLineManager::GenerateUID();
 
@@ -368,13 +365,13 @@ class CommandOSSNLine : public CommandOSSXLineBase
 		if (percent > 95)
 		{
 			source.Reply(USERHOST_MASK_TOO_WIDE, mask.c_str());
-			Log(LOG_ADMIN, u, this) << "tried to " << source.command << " " << percent << "% of the network (" << affected << " users)";
+			Log(LOG_ADMIN, source, this) << "tried to " << source.command << " " << percent << "% of the network (" << affected << " users)";
 			x->destroy();
 			return;
 		}
 
 		EventReturn MOD_RESULT;
-		FOREACH_RESULT(I_OnAddXLine, OnAddXLine(u, x, this->xlm()));
+		FOREACH_RESULT(I_OnAddXLine, OnAddXLine(source, x, this->xlm()));
 		if (MOD_RESULT == EVENT_STOP)
 		{
 			x->destroy();
@@ -385,7 +382,7 @@ class CommandOSSNLine : public CommandOSSXLineBase
 
 		if (Config->KillonSNline)
 		{
-			this->xlm()->Send(u, x);
+			this->xlm()->Send(source.GetUser(), x);
 
 			if (!ircd->sglineenforce)
 			{
@@ -403,7 +400,7 @@ class CommandOSSNLine : public CommandOSSXLineBase
 		}
 
 		source.Reply(_("\002%s\002 added to the %s list."), mask.c_str(), source.command.c_str());
-		Log(LOG_ADMIN, u, this) << "on " << mask << " (" << reason << ") expires in " << (expires ? duration(expires - Anope::CurTime) : "never") << " [affects " << affected << " user(s) (" << percent << "%)]";
+		Log(LOG_ADMIN, source, this) << "on " << mask << " (" << reason << ") expires in " << (expires ? duration(expires - Anope::CurTime) : "never") << " [affects " << affected << " user(s) (" << percent << "%)]";
 		if (readonly)
 			source.Reply(READ_ONLY_MODE);
 	}
@@ -483,7 +480,6 @@ class CommandOSSQLine : public CommandOSSXLineBase
 			return;
 		}
 
-		User *u = source.u;
 		unsigned last_param = 2;
 		Anope::string expiry, mask;
 		time_t expires;
@@ -562,7 +558,7 @@ class CommandOSSQLine : public CommandOSSXLineBase
 			return;
 		}
 
-		XLine *x = new XLine(mask, u->nick, expires, reason);
+		XLine *x = new XLine(mask, source.GetNick(), expires, reason);
 		if (Config->AkillIds)
 			x->UID = XLineManager::GenerateUID();
 
@@ -575,13 +571,13 @@ class CommandOSSQLine : public CommandOSSXLineBase
 		if (percent > 95)
 		{
 			source.Reply(USERHOST_MASK_TOO_WIDE, mask.c_str());
-			Log(LOG_ADMIN, u, this) << "tried to SQLine " << percent << "% of the network (" << affected << " users)";
+			Log(LOG_ADMIN, source, this) << "tried to SQLine " << percent << "% of the network (" << affected << " users)";
 			x->destroy();
 			return;
 		}
 
 		EventReturn MOD_RESULT;
-		FOREACH_RESULT(I_OnAddXLine, OnAddXLine(u, x, this->xlm()));
+		FOREACH_RESULT(I_OnAddXLine, OnAddXLine(source, x, this->xlm()));
 		if (MOD_RESULT == EVENT_STOP)
 		{
 			x->destroy();
@@ -624,11 +620,11 @@ class CommandOSSQLine : public CommandOSSXLineBase
 				}
 			}
 
-			this->xlm()->Send(u, x);
+			this->xlm()->Send(source.GetUser(), x);
 		}
 
 		source.Reply(_("\002%s\002 added to the SQLINE list."), mask.c_str());
-		Log(LOG_ADMIN, u, this) << "on " << mask << " (" << reason << ") expires in " << (expires ? duration(expires - Anope::CurTime) : "never") << " [affects " << affected << " user(s) (" << percent << "%)]";
+		Log(LOG_ADMIN, source, this) << "on " << mask << " (" << reason << ") expires in " << (expires ? duration(expires - Anope::CurTime) : "never") << " [affects " << affected << " user(s) (" << percent << "%)]";
 
 		if (readonly)
 			source.Reply(READ_ONLY_MODE);

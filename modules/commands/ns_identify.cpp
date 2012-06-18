@@ -25,7 +25,10 @@ class CommandNSIdentify : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		User *u = source.u;
+		User *u = source.GetUser();
+
+		if (!u)
+			return;
 
 		const Anope::string &nick = params.size() == 2 ? params[0] : u->nick;
 		Anope::string pass = params[params.size() - 1];
@@ -46,16 +49,16 @@ class CommandNSIdentify : public Command
 				source.Reply(NICK_X_NOT_REGISTERED, nick.c_str());
 			else if (MOD_RESULT != EVENT_ALLOW)
 			{
-				Log(LOG_COMMAND, u, this) << "and failed to identify";
+				Log(LOG_COMMAND, source, this) << "and failed to identify";
 				source.Reply(PASSWORD_INCORRECT);
 				bad_password(u);
 			}
 			else
 			{
 				if (u->IsIdentified())
-					Log(LOG_COMMAND, u, this) << "to log out of account " << u->Account()->display;
+					Log(LOG_COMMAND, source, this) << "to log out of account " << u->Account()->display;
 
-				Log(LOG_COMMAND, u, this) << "and identified for account " << na->nc->display;
+				Log(LOG_COMMAND, source, this) << "and identified for account " << na->nc->display;
 				source.Reply(_("Password accepted - you are now recognized."));
 				u->Identify(na);
 			}

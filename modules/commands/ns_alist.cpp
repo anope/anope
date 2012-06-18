@@ -24,10 +24,9 @@ class CommandNSAList : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		User *u = source.u;
-		Anope::string nick = u->Account()->display;
+		Anope::string nick = source.GetNick();
 
-		if (params.size() && u->IsServicesOper())
+		if (params.size() && source.IsServicesOper())
 			nick = params[0];
 
 		const NickAlias *na = findnick(nick);

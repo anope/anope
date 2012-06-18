@@ -94,7 +94,6 @@ class CommandNSAccess : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		User *u = source.u;
 		const Anope::string &cmd = params[0];
 		Anope::string nick, mask;
 
@@ -115,12 +114,12 @@ class CommandNSAccess : public Command
 				source.Reply(NICK_X_NOT_REGISTERED, nick.c_str());
 				return;
 			}
-			else if (na->nc != u->Account() && !u->HasPriv("nickserv/access"))
+			else if (na->nc != source.nc && !source.HasPriv("nickserv/access"))
 			{
 				source.Reply(ACCESS_DENIED);
 				return;
 			}
-			else if (Config->NSSecureAdmins && u->Account() != na->nc && na->nc->IsServicesOper() && !cmd.equals_ci("LIST"))
+			else if (Config->NSSecureAdmins && source.nc != na->nc && na->nc->IsServicesOper() && !cmd.equals_ci("LIST"))
 			{
 				source.Reply(_("You may view but not modify the access list of other services operators."));
 				return;
@@ -129,7 +128,7 @@ class CommandNSAccess : public Command
 			nc = na->nc;
 		}
 		else
-			nc = u->Account();
+			nc = source.nc;
 
 		if (!mask.empty() && (mask.find('@') == Anope::string::npos || mask.find('!') != Anope::string::npos))
 		{
@@ -137,7 +136,7 @@ class CommandNSAccess : public Command
 			source.Reply(MORE_INFO, Config->UseStrictPrivMsgString.c_str(), Config->NickServ.c_str(), this->name.c_str());
 		}
 		else if (nc->HasFlag(NI_SUSPENDED))
-			source.Reply(NICK_X_SUSPENDED, u->Account()->display.c_str());
+			source.Reply(NICK_X_SUSPENDED, nc->display.c_str());
 		else if (cmd.equals_ci("ADD"))
 			return this->DoAdd(source, nc, mask);
 		else if (cmd.equals_ci("DEL"))

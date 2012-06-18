@@ -24,7 +24,6 @@ class CommandHSSet : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		User *u = source.u;
 
 		const Anope::string &nick = params[0];
 
@@ -80,9 +79,9 @@ class CommandHSSet : public Command
 			return;
 		}
 
-		Log(LOG_ADMIN, u, this) << "to set the vhost of " << na->nick << " to " << (!user.empty() ? user + "@" : "") << host;
+		Log(LOG_ADMIN, source, this) << "to set the vhost of " << na->nick << " to " << (!user.empty() ? user + "@" : "") << host;
 
-		na->SetVhost(user, host, u->nick);
+		na->SetVhost(user, host, source.GetNick());
 		FOREACH_MOD(I_OnSetVhost, OnSetVhost(na));
 		if (!user.empty())
 			source.Reply(_("VHost for \002%s\002 set to \002%s\002@\002%s\002."), nick.c_str(), user.c_str(), host.c_str());
@@ -126,7 +125,6 @@ class CommandHSSetAll : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		User *u = source.u;
 
 		Anope::string nick = params[0];
 
@@ -182,9 +180,9 @@ class CommandHSSetAll : public Command
 			return;
 		}
 
-		Log(LOG_ADMIN, u, this) << "to set the vhost of " << na->nick << " to " << (!user.empty() ? user + "@" : "") << host;
+		Log(LOG_ADMIN, source, this) << "to set the vhost of " << na->nick << " to " << (!user.empty() ? user + "@" : "") << host;
 
-		na->SetVhost(user, host, u->nick);
+		na->SetVhost(user, host, source.GetNick());
 		this->Sync(na);
 		FOREACH_MOD(I_OnSetVhost, OnSetVhost(na));
 		if (!user.empty())

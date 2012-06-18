@@ -83,7 +83,7 @@ class CommandNSSetHide : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		this->Run(source, source.u->Account()->display, params[0], params[1]);
+		this->Run(source, source.nc->display, params[0], params[1]);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &) anope_override

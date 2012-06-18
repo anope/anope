@@ -36,11 +36,11 @@ class CommandCSBan : public Command
 			return;
 		}
 
-		User *u = source.u;
 		Channel *c = ci->c;
+		User *u = source.GetUser();
 		User *u2 = finduser(target);
 
-		AccessGroup u_access = ci->AccessFor(u);
+		AccessGroup u_access = source.AccessFor(ci);
 
 		if (!c)
 			source.Reply(CHAN_X_NOT_IN_USE, chan.c_str());
@@ -66,7 +66,7 @@ class CommandCSBan : public Command
 				get_idealban(ci, u2, mask);
 
 				// XXX need a way to detect if someone is overriding
-				Log(LOG_COMMAND, u, this, ci) << "for " << mask;
+				Log(LOG_COMMAND, source, this, ci) << "for " << mask;
 
 				c->SetMode(NULL, CMODE_BAN, mask);
 
@@ -74,15 +74,15 @@ class CommandCSBan : public Command
 				if (!c->FindUser(u2))
 					return;
 
-				if (ci->HasFlag(CI_SIGNKICK) || (ci->HasFlag(CI_SIGNKICK_LEVEL) && !ci->AccessFor(u).HasPriv("SIGNKICK")))
-					c->Kick(ci->WhoSends(), u2, "%s (%s)", reason.c_str(), u->nick.c_str());
+				if (ci->HasFlag(CI_SIGNKICK) || (ci->HasFlag(CI_SIGNKICK_LEVEL) && !source.AccessFor(ci).HasPriv("SIGNKICK")))
+					c->Kick(ci->WhoSends(), u2, "%s (%s)", reason.c_str(), source.GetNick().c_str());
 				else
 					c->Kick(ci->WhoSends(), u2, "%s", reason.c_str());
 			}
 		}
 		else if (u_access.HasPriv("FOUNDER"))
 		{
-			Log(LOG_COMMAND, u, this, ci) << "for " << target;
+			Log(LOG_COMMAND, source, this, ci) << "for " << target;
 
 			c->SetMode(NULL, CMODE_BAN, target);
 
@@ -106,7 +106,7 @@ class CommandCSBan : public Command
 
 					++kicked;
 					if (ci->HasFlag(CI_SIGNKICK) || (ci->HasFlag(CI_SIGNKICK_LEVEL) && !u_access.HasPriv("SIGNKICK")))
-						c->Kick(ci->WhoSends(), uc->user, "%s (Matches %s) (%s)", reason.c_str(), target.c_str(), u->nick.c_str());
+						c->Kick(ci->WhoSends(), uc->user, "%s (Matches %s) (%s)", reason.c_str(), target.c_str(), source.GetNick().c_str());
 					else
 						c->Kick(ci->WhoSends(), uc->user, "%s (Matches %s)", reason.c_str(), target.c_str());
 				}

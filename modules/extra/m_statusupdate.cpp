@@ -31,7 +31,7 @@ class StatusUpdate : public Module
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 	}
 
-	void OnAccessAdd(ChannelInfo *ci, User *u, ChanAccess *access) anope_override
+	void OnAccessAdd(ChannelInfo *ci, CommandSource &, ChanAccess *access) anope_override
 	{
 		if (ci->c)
 			for (CUserList::iterator it = ci->c->users.begin(), it_end = ci->c->users.end(); it != it_end; ++it)
@@ -48,7 +48,7 @@ class StatusUpdate : public Module
 			}
 	}
 
-	void OnAccessDel(ChannelInfo *ci, User *u, ChanAccess *access) anope_override
+	void OnAccessDel(ChannelInfo *ci, CommandSource &, ChanAccess *access) anope_override
 	{
 		if (ci->c)
 			for (CUserList::iterator it = ci->c->users.begin(), it_end = ci->c->users.end(); it != it_end; ++it)

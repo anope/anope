@@ -31,7 +31,7 @@ class MemoDelCallback : public NumberList
 		if (ci)
 			FOREACH_MOD(I_OnMemoDel, OnMemoDel(ci, mi, mi->GetMemo(Number - 1)));
 		else
-			FOREACH_MOD(I_OnMemoDel, OnMemoDel(source.u->Account(), mi, mi->GetMemo(Number - 1)));
+			FOREACH_MOD(I_OnMemoDel, OnMemoDel(source.nc, mi, mi->GetMemo(Number - 1)));
 
 		mi->Del(Number - 1);
 		source.Reply(_("Memo %d has been deleted."), Number);
@@ -49,7 +49,6 @@ class CommandMSDel : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		User *u = source.u;
 
 		MemoInfo *mi;
 		ChannelInfo *ci = NULL;
@@ -71,7 +70,7 @@ class CommandMSDel : public Command
 				source.Reply(READ_ONLY_MODE);
 				return;
 			}
-			else if (!ci->AccessFor(u).HasPriv("MEMO"))
+			else if (!source.AccessFor(ci).HasPriv("MEMO"))
 			{
 				source.Reply(ACCESS_DENIED);
 				return;
@@ -79,7 +78,7 @@ class CommandMSDel : public Command
 			mi = &ci->memos;
 		}
 		else
-			mi = const_cast<MemoInfo *>(&u->Account()->memos);
+			mi = const_cast<MemoInfo *>(&source.nc->memos);
 		if (numstr.empty() || (!isdigit(numstr[0]) && !numstr.equals_ci("ALL") && !numstr.equals_ci("LAST")))
 			this->OnSyntaxError(source, numstr);
 		else if (mi->memos->empty())
@@ -102,7 +101,7 @@ class CommandMSDel : public Command
 				if (ci)
 					FOREACH_MOD(I_OnMemoDel, OnMemoDel(ci, mi, mi->GetMemo(mi->memos->size() - 1)));
 				else
-					FOREACH_MOD(I_OnMemoDel, OnMemoDel(u->Account(), mi, mi->GetMemo(mi->memos->size() - 1)));
+					FOREACH_MOD(I_OnMemoDel, OnMemoDel(source.nc, mi, mi->GetMemo(mi->memos->size() - 1)));
 				mi->Del(mi->memos->size() - 1);
 				source.Reply(_("Memo %d has been deleted."), mi->memos->size() + 1);
 			}
@@ -114,7 +113,7 @@ class CommandMSDel : public Command
 					if (ci)
 						FOREACH_MOD(I_OnMemoDel, OnMemoDel(ci, mi, mi->GetMemo(i)));
 					else
-						FOREACH_MOD(I_OnMemoDel, OnMemoDel(u->Account(), mi, mi->GetMemo(i)));
+						FOREACH_MOD(I_OnMemoDel, OnMemoDel(source.nc, mi, mi->GetMemo(i)));
 					mi->GetMemo(i)->destroy();
 				}
 				mi->memos->clear();

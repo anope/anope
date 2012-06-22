@@ -24,22 +24,21 @@ class CommandNSUpdate : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		User *u = source.u;
+		User *u = source.GetUser();
+		if (!u)
+			return;
+
 		NickAlias *na = findnick(u->nick);
 
-		if (!na)
+		if (na && na->nc == source.nc)
 		{
-			source.Reply(NICK_NOT_REGISTERED);
-			return;
+			na->last_realname = u->realname;
+			na->last_seen = Anope::CurTime;
 		}
-
-		na->last_realname = u->realname;
-		na->last_seen = Anope::CurTime;
 
 		FOREACH_MOD(I_OnNickUpdate, OnNickUpdate(u));
 
 		source.Reply(_("Status updated (memos, vhost, chmodes, flags)."), Config->NickServ.c_str());
-		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &) anope_override

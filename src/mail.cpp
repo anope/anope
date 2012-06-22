@@ -53,24 +53,39 @@ void MailThread::Run()
 
 bool Mail(User *u, NickCore *nc, const BotInfo *service, const Anope::string &subject, const Anope::string &message)
 {
-	if (!u || !nc || !service || subject.empty() || message.empty())
+	if (!nc || !service || subject.empty() || message.empty())
 		return false;
-
-	if (!Config->UseMail)
-		u->SendMessage(service, _("Services have been configured to not send mail."));
-	else if (Anope::CurTime - u->lastmail < Config->MailDelay)
-		u->SendMessage(service, _("Please wait \002%d\002 seconds and retry."), Config->MailDelay - (Anope::CurTime - u->lastmail));
-	else if (nc->email.empty())
-		u->SendMessage(service, _("E-mail for \002%s\002 is invalid."), nc->display.c_str());
-	else
+	
+	if (!u)
 	{
-		u->lastmail = nc->lastmail = Anope::CurTime;
+		if (!Config->UseMail)
+			return false;
+		else if (nc->email.empty())
+			return false;
+
+		nc->lastmail = Anope::CurTime;
 		Thread *t = new MailThread(nc->display, nc->email, subject, message);
 		t->Start();
 		return true;
 	}
+	else
+	{
+		if (!Config->UseMail)
+			u->SendMessage(service, _("Services have been configured to not send mail."));
+		else if (Anope::CurTime - u->lastmail < Config->MailDelay)
+			u->SendMessage(service, _("Please wait \002%d\002 seconds and retry."), Config->MailDelay - (Anope::CurTime - u->lastmail));
+		else if (nc->email.empty())
+			u->SendMessage(service, _("E-mail for \002%s\002 is invalid."), nc->display.c_str());
+		else
+		{
+			u->lastmail = nc->lastmail = Anope::CurTime;
+			Thread *t = new MailThread(nc->display, nc->email, subject, message);
+			t->Start();
+			return true;
+		}
 
-	return false;
+		return false;
+	}
 }
 
 bool Mail(NickCore *nc, const Anope::string &subject, const Anope::string &message)

@@ -24,7 +24,6 @@ class CommandNSGetPass : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		User *u = source.u;
 		const Anope::string &nick = params[0];
 		Anope::string tmp_pass;
 		const NickAlias *na;
@@ -37,7 +36,7 @@ class CommandNSGetPass : public Command
 		{
 			if (enc_decrypt(na->nc->pass, tmp_pass) == 1)
 			{
-				Log(LOG_ADMIN, u, this) << "for " << nick;
+				Log(LOG_ADMIN, source, this) << "for " << nick;
 				source.Reply(_("Password for %s is \002%s\002."), nick.c_str(), tmp_pass.c_str());
 			}
 			else

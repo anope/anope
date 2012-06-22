@@ -24,8 +24,7 @@ class CommandOSQuit : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		User *u = source.u;
-		quitmsg = "QUIT command received from " + u->nick;
+		quitmsg = source.command + " command received from " + source.GetNick();
 		quitting = true;
 		return;
 	}
@@ -53,8 +52,7 @@ class CommandOSRestart : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		User *u = source.u;
-		quitmsg = "RESTART command received from " + u->nick;
+		quitmsg = source.command + " command received from " + source.GetNick();
 		quitting = restarting = true;
 		save_databases();
 		return;
@@ -80,8 +78,7 @@ class CommandOSShutdown : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		User *u = source.u;
-		quitmsg = source.command + " command received from " + u->nick;
+		quitmsg = source.command + " command received from " + source.GetNick();
 		quitting = true;
 		save_databases();
 		return;

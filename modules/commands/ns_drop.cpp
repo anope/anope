@@ -18,13 +18,11 @@ class CommandNSDrop : public Command
  public:
 	CommandNSDrop(Module *creator) : Command(creator, "nickserv/drop", 0, 1)
 	{
-		this->SetFlag(CFLAG_ALLOW_UNREGISTERED);
 		this->SetDesc(_("Cancel the registration of a nickname"));
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		User *u = source.u;
 		Anope::string nick = !params.empty() ? params[0] : "";
 
 		if (readonly)
@@ -33,25 +31,19 @@ class CommandNSDrop : public Command
 			return;
 		}
 
-		NickAlias *na = findnick((u->Account() && !nick.empty() ? nick : u->nick));
+		NickAlias *na = findnick(!nick.empty() ? nick : source.GetNick());
 		if (!na)
 		{
 			source.Reply(NICK_NOT_REGISTERED);
 			return;
 		}
 
-		if (!u->Account())
-		{
-			source.Reply(NICK_IDENTIFY_REQUIRED, Config->UseStrictPrivMsgString.c_str(), Config->NickServ.c_str());
-			return;
-		}
-
-		bool is_mine = u->Account() == na->nc;
+		bool is_mine = source.nc == na->nc;
 		Anope::string my_nick;
 		if (is_mine && nick.empty())
 			my_nick = na->nick;
 
-		if (!is_mine && !u->HasPriv("nickserv/drop"))
+		if (!is_mine && !source.HasPriv("nickserv/drop"))
 			source.Reply(ACCESS_DENIED);
 		else if (Config->NSSecureAdmins && !is_mine && na->nc->IsServicesOper())
 			source.Reply(_("You may not drop other services operators nicknames."));
@@ -60,9 +52,9 @@ class CommandNSDrop : public Command
 			if (readonly)
 				source.Reply(READ_ONLY_MODE);
 
-			FOREACH_MOD(I_OnNickDrop, OnNickDrop(u, na));
+			FOREACH_MOD(I_OnNickDrop, OnNickDrop(source, na));
 
-			Log(!is_mine ? LOG_OVERRIDE : LOG_COMMAND, u, this) << "to drop nickname " << na->nick << " (group: " << na->nc->display << ") (email: " << (!na->nc->email.empty() ? na->nc->email : "none") << ")";
+			Log(!is_mine ? LOG_OVERRIDE : LOG_COMMAND, source, this) << "to drop nickname " << na->nick << " (group: " << na->nc->display << ") (email: " << (!na->nc->email.empty() ? na->nc->email : "none") << ")";
 			na->destroy();
 
 			if (!is_mine)
@@ -83,8 +75,7 @@ class CommandNSDrop : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
 	{
-		User *u = source.u;
-		if (u->Account() && u->HasPriv("nickserv/drop"))
+		if (source.HasPriv("nickserv/drop"))
 			source.Reply(_("Syntax: \002%s [\037nickname\037]\002\n"
 					" \n"
 					"Without a parameter, deletes your nickname.\n"

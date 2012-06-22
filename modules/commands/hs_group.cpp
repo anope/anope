@@ -37,15 +37,14 @@ class CommandHSGroup : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		User *u = source.u;
-		NickAlias *na = findnick(u->nick);
-		if (na && u->Account() == na->nc && na->HasVhost())
+		NickAlias *na = findnick(source.GetNick());
+		if (na && source.nc == na->nc && na->HasVhost())
 		{
 			this->Sync(na);
 			if (!na->GetVhostIdent().empty())
-				source.Reply(_("All vhost's in the group \002%s\002 have been set to \002%s\002@\002%s\002"), u->Account()->display.c_str(), na->GetVhostIdent().c_str(), na->GetVhostHost().c_str());
+				source.Reply(_("All vhost's in the group \002%s\002 have been set to \002%s\002@\002%s\002"), source.nc->display.c_str(), na->GetVhostIdent().c_str(), na->GetVhostHost().c_str());
 			else
-				source.Reply(_("All vhost's in the group \002%s\002 have been set to \002%s\002"), u->Account()->display.c_str(), na->GetVhostHost().c_str());
+				source.Reply(_("All vhost's in the group \002%s\002 have been set to \002%s\002"), source.nc->display.c_str(), na->GetVhostHost().c_str());
 		}
 		else
 			source.Reply(HOST_NOT_ASSIGNED);

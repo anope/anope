@@ -24,7 +24,6 @@ class CommandCSSetSecureFounder : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		User *u = source.u;
 		ChannelInfo *ci = cs_findchan(params[0]);
 		if (ci == NULL)
 		{
@@ -33,7 +32,7 @@ class CommandCSSetSecureFounder : public Command
 		}
 
 
-		if (source.permission.empty() && ci->HasFlag(CI_SECUREFOUNDER) ? !IsFounder(u, ci) : !ci->AccessFor(u).HasPriv("FOUNDER"))
+		if (source.permission.empty() && ci->HasFlag(CI_SECUREFOUNDER) ? !source.IsFounder(ci) : !source.AccessFor(ci).HasPriv("FOUNDER"))
 		{
 			source.Reply(ACCESS_DENIED);
 			return;

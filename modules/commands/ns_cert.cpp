@@ -60,10 +60,10 @@ class CommandNSCert : public Command
 			return;
 		}
 
-		if (!source.u->fingerprint.empty() && !nc->FindCert(source.u->fingerprint))
+		if (source.GetUser() && !source.GetUser()->fingerprint.empty() && !nc->FindCert(source.GetUser()->fingerprint))
 		{
-			nc->AddCert(source.u->fingerprint);
-			source.Reply(_("\002%s\002 added to your certificate list."), source.u->fingerprint.c_str());
+			nc->AddCert(source.GetUser()->fingerprint);
+			source.Reply(_("\002%s\002 added to your certificate list."), source.GetUser()->fingerprint.c_str());
 			return;
 		}
 
@@ -86,11 +86,10 @@ class CommandNSCert : public Command
 
 	void DoDel(CommandSource &source, NickCore *nc, const Anope::string &mask)
 	{
-
-		if (!source.u->fingerprint.empty() && nc->FindCert(source.u->fingerprint))
+		if (source.GetUser() && !source.GetUser()->fingerprint.empty() && nc->FindCert(source.GetUser()->fingerprint))
 		{
-			nc->EraseCert(source.u->fingerprint);
-			source.Reply(_("\002%s\002 deleted from your certificate list."), source.u->fingerprint.c_str());
+			nc->EraseCert(source.GetUser()->fingerprint);
+			source.Reply(_("\002%s\002 deleted from your certificate list."), source.GetUser()->fingerprint.c_str());
 			return;
 		}
 
@@ -114,11 +113,10 @@ class CommandNSCert : public Command
 
 	void DoList(CommandSource &source, const NickCore *nc)
 	{
-		User *u = source.u;
 
 		if (nc->cert.empty())
 		{
-			source.Reply(_("Your certificate list is empty."), u->nick.c_str());
+			source.Reply(_("Your certificate list is empty."));
 			return;
 		}
 
@@ -150,18 +148,17 @@ class CommandNSCert : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		User *u = source.u;
 		const Anope::string &cmd = params[0];
 		const Anope::string &mask = params.size() > 1 ? params[1] : "";
 
 		const NickAlias *na;
-		if (cmd.equals_ci("LIST") && u->IsServicesOper() && !mask.empty() && (na = findnick(mask)))
+		if (cmd.equals_ci("LIST") && source.IsServicesOper() && !mask.empty() && (na = findnick(mask)))
 			return this->DoServAdminList(source, na->nc);
 
-		NickCore *nc = u->Account();
+		NickCore *nc = source.nc;
 
-		if (u->Account()->HasFlag(NI_SUSPENDED))
-			source.Reply(NICK_X_SUSPENDED, u->Account()->display.c_str());
+		if (source.nc->HasFlag(NI_SUSPENDED))
+			source.Reply(NICK_X_SUSPENDED, source.nc->display.c_str());
 		else if (cmd.equals_ci("ADD"))
 			return this->DoAdd(source, nc, mask);
 		else if (cmd.equals_ci("DEL"))

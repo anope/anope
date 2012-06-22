@@ -25,15 +25,14 @@ class CommandGLGlobal : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		User *u = source.u;
 		const Anope::string &msg = params[0];
 
 		if (!global)
 			source.Reply("No global reference, is gl_main loaded?");
 		else
 		{
-			Log(LOG_ADMIN, u, this);
-			global->SendGlobal(findbot(Config->Global), u->nick, msg);
+			Log(LOG_ADMIN, source, this);
+			global->SendGlobal(findbot(Config->Global), source.GetNick(), msg);
 		}
 	}
 

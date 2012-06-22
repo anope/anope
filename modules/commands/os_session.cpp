@@ -140,7 +140,7 @@ class ExceptionDelCallback : public NumberList
 	static void DoDel(CommandSource &source, unsigned index)
 	{
 		Exception *e = session_service->GetExceptions()[index];
-		FOREACH_MOD(I_OnExceptionDel, OnExceptionDel(source.u, e));
+		FOREACH_MOD(I_OnExceptionDel, OnExceptionDel(source, e));
 
 		session_service->DelException(e);
 		e->destroy();
@@ -261,7 +261,6 @@ class CommandOSException : public Command
  private:
 	void DoAdd(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		User *u = source.u;
 		Anope::string mask, expiry, limitstr;
 		unsigned last_param = 3;
 
@@ -340,7 +339,7 @@ class CommandOSException : public Command
 			exception->limit = limit;
 			exception->reason = reason;
 			exception->time = Anope::CurTime;
-			exception->who = u->nick;
+			exception->who = source.GetNick();
 			exception->expires = expires;
 
 			EventReturn MOD_RESULT;

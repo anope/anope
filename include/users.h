@@ -12,6 +12,7 @@
 #include "modes.h"
 #include "extensible.h"
 #include "serialize.h"
+#include "commands.h"
 
 extern CoreExport Anope::insensitive_map<User *> UserListByNick;
 extern CoreExport Anope::map<User *> UserListByUID;
@@ -37,7 +38,7 @@ typedef std::list<ChannelContainer *> UChannelList;
 
 
 /* Online user and channel data. */
-class CoreExport User : public virtual Base, public Extensible
+class CoreExport User : public virtual Base, public Extensible, public CommandReply
 {
  protected:
 	Anope::string vident;
@@ -161,7 +162,7 @@ class CoreExport User : public virtual Base, public Extensible
 	 * @param ... any number of parameters
 	 */
 	void SendMessage(const BotInfo *source, const char *fmt, ...);
-	virtual void SendMessage(const BotInfo *source, Anope::string msg);
+	void SendMessage(const BotInfo *source, const Anope::string &msg) anope_override;
 
 	/** Collide a nick
 	 * See the comment in users.cpp
@@ -194,13 +195,13 @@ class CoreExport User : public virtual Base, public Extensible
 	 * @param CheckNick True to check if the user is identified to the nickname they are on too
 	 * @return true or false
 	 */
-	virtual bool IsIdentified(bool CheckNick = false) const;
+	bool IsIdentified(bool CheckNick = false) const;
 
 	/** Check if the user is recognized for their nick (on the nicks access list)
 	 * @param CheckSecure Only returns true if the user has secure off
 	 * @return true or false
 	 */
-	virtual bool IsRecognized(bool CheckSecure = true) const;
+	bool IsRecognized(bool CheckSecure = true) const;
 
 	/** Check if the user is a services oper
 	 * @return true if they are an oper

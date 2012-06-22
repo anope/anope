@@ -444,10 +444,10 @@ class MChanstats : public Module
 		query.setValue("smileys_other", smileys_other);
 		this->RunQuery(query);
 	}
-	void OnDelCore(User *u) anope_override
+	void OnDelCore(NickCore *nc) anope_override
 	{
 		query = "DELETE FROM `" + prefix + "chanstats` WHERE `nick` = @nick@;";
-		query.setValue("nick", GetDisplay(u));
+		query.setValue("nick", nc->display);
 		this->RunQuery(query);
 	}
 	void OnChangeCoreDisplay(NickCore *nc, const Anope::string &newdisplay) anope_override

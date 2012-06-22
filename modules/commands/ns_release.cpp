@@ -25,7 +25,6 @@ class CommandNSRelease : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		User *u = source.u;
 		const Anope::string &nick = params[0];
 		Anope::string pass = params.size() > 1 ? params[1] : "";
 		NickAlias *na;
@@ -45,26 +44,32 @@ class CommandNSRelease : public Command
 
 			if (MOD_RESULT == EVENT_ALLOW)
 			{
-				Log(LOG_COMMAND, u, this) << "for nickname " << na->nick;
+				Log(LOG_COMMAND, source, this) << "for nickname " << na->nick;
 				na->Release();
 				source.Reply(_("Services' hold on \002%s\002 has been released."), nick.c_str());
 			}
 			else
 			{
 				source.Reply(ACCESS_DENIED);
-				Log(LOG_COMMAND, u, this) << "invalid password for " << nick;
-				bad_password(u);
+				Log(LOG_COMMAND, source, this) << "invalid password for " << nick;
+				if (source.GetUser())
+					bad_password(source.GetUser());
 			}
 		}
 		else
 		{
-			bool override = u->Account() != na->nc && u->HasPriv("nickserv/release");
+			bool override = source.nc != na->nc && source.HasPriv("nickserv/release");
 
-			if (override || u->Account() == na->nc ||
-					(!na->nc->HasFlag(NI_SECURE) && is_on_access(u, na->nc)) ||
-					(!u->fingerprint.empty() && na->nc->FindCert(u->fingerprint)))
+			bool ok = override;
+			if (source.nc == na->nc)
+				ok = true;
+			else if (source.GetUser() && !na->nc->HasFlag(NI_SECURE) && is_on_access(source.GetUser(), na->nc))
+				ok = true;
+			else if (source.GetUser() && !source.GetUser()->fingerprint.empty() && na->nc->FindCert(source.GetUser()->fingerprint))
+				ok = true;
+			if (ok)
 			{
-				Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this) << "for nickname " << na->nick;
+				Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this) << "for nickname " << na->nick;
 				na->Release();
 				source.Reply(_("Services' hold on \002%s\002 has been released."), nick.c_str());
 			}

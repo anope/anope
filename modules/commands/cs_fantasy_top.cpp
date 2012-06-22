@@ -131,7 +131,7 @@ class CSTop : public Module
 
 	void DoTop(CommandSource &source, const std::vector<Anope::string> &params, bool is_global, int limit = 1)
 	{
-		if (!source.u || !source.c || !source.c->ci)
+		if (!source.c || !source.c->ci)
 			return;
 
 		Anope::string channel;

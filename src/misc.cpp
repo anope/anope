@@ -222,7 +222,7 @@ void ListFormatter::Process(std::vector<Anope::string> &buffer)
 	}
 }
 
-InfoFormatter::InfoFormatter(User *u) : user(u), longest(0)
+InfoFormatter::InfoFormatter(NickCore *acc) : nc(acc), longest(0)
 {
 }
 
@@ -235,7 +235,7 @@ void InfoFormatter::Process(std::vector<Anope::string> &buffer)
 		Anope::string s;
 		for (unsigned i = it->first.length(); i < this->longest; ++i)
 			s += " ";
-		s += Anope::string(translate(this->user, it->first.c_str())) + ": " + it->second;
+		s += Anope::string(translate(this->nc, it->first.c_str())) + ": " + it->second;
 
 		buffer.push_back(s);
 	}
@@ -360,7 +360,7 @@ Anope::string do_strftime(const time_t &t, const NickCore *nc, bool short_output
  * @param seconds time in seconds
  * @return buffer
  */
-Anope::string expire_left(NickCore *nc, time_t expires)
+Anope::string expire_left(const NickCore *nc, time_t expires)
 {
 	if (!expires)
 		return translate(nc, NO_EXPIRE);

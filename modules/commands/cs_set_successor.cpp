@@ -24,7 +24,6 @@ class CommandCSSetSuccessor : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		User *u = source.u;
 		ChannelInfo *ci = cs_findchan(params[0]);
 		if (ci == NULL)
 		{
@@ -32,13 +31,13 @@ class CommandCSSetSuccessor : public Command
 			return;
 		}
 
-		if (source.permission.empty() && !ci->AccessFor(u).HasPriv("SET"))
+		if (source.permission.empty() && !source.AccessFor(ci).HasPriv("SET"))
 		{
 			source.Reply(ACCESS_DENIED);
 			return;
 		}
 
-		if (source.permission.empty() && ci->HasFlag(CI_SECUREFOUNDER) ? !IsFounder(u, ci) : !ci->AccessFor(u).HasPriv("FOUNDER"))
+		if (source.permission.empty() && ci->HasFlag(CI_SECUREFOUNDER) ? !source.IsFounder(ci) : !source.AccessFor(ci).HasPriv("FOUNDER"))
 		{
 			source.Reply(ACCESS_DENIED);
 			return;
@@ -65,7 +64,7 @@ class CommandCSSetSuccessor : public Command
 		else
 			nc = NULL;
 
-		Log(!source.permission.empty() ? LOG_ADMIN : LOG_COMMAND, u, this, ci) << "to change the successor from " << (ci->successor ? ci->successor->display : "(none)") << " to " << (nc ? nc->display : "(none)");
+		Log(!source.permission.empty() ? LOG_ADMIN : LOG_COMMAND, source, this, ci) << "to change the successor from " << (ci->successor ? ci->successor->display : "(none)") << " to " << (nc ? nc->display : "(none)");
 
 		ci->successor = nc;
 

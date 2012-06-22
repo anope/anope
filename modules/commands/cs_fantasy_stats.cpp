@@ -102,12 +102,12 @@ class CSStats : public Module
 
 	void DoStats(CommandSource &source, const bool is_global, const std::vector<Anope::string> &params)
 	{
-		if (!source.u || !source.c)
+		if (!source.c)
 			return;
 
 		Anope::string display;
 		if (params.empty())
-			display = source.u->Account()->display;
+			display = source.nc->display;
 		else if (const NickAlias *na = findnick(params[0]))
 			display = na->nc->display;
 		else

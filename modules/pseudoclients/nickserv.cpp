@@ -334,7 +334,7 @@ class NickServCore : public Module
 	{
 		if (!params.empty() || source.owner->nick != Config->NickServ)
 			return;
-		if (source.u->IsServicesOper())
+		if (source.IsServicesOper())
 			source.Reply(_(" \n"
 				"Services Operators can also drop any nickname without needing\n"
 				"to identify for the nick, and may view the access list for\n"

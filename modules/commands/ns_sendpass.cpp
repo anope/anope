@@ -27,11 +27,10 @@ class CommandNSSendPass : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		User *u = source.u;
 		const Anope::string &nick = params[0];
 		const NickAlias *na;
 
-		if (Config->RestrictMail && (!u->Account() || !u->HasCommand("nickserv/sendpass")))
+		if (Config->RestrictMail && !source.HasCommand("nickserv/sendpass"))
 			source.Reply(ACCESS_DENIED);
 		else if (!(na = findnick(nick)))
 			source.Reply(NICK_X_NOT_REGISTERED, nick.c_str());
@@ -40,9 +39,9 @@ class CommandNSSendPass : public Command
 			Anope::string tmp_pass;
 			if (enc_decrypt(na->nc->pass, tmp_pass) == 1)
 			{
-				if (SendPassMail(u, na, source.owner, tmp_pass))
+				if (SendPassMail(source.GetUser(), na, source.owner, tmp_pass))
 				{
-					Log(Config->RestrictMail ? LOG_ADMIN : LOG_COMMAND, u, this) << "for " << na->nick;
+					Log(Config->RestrictMail ? LOG_ADMIN : LOG_COMMAND, source, this) << "for " << na->nick;
 					source.Reply(_("Password of \002%s\002 has been sent."), nick.c_str());
 				}
 			}

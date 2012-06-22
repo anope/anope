@@ -16,14 +16,14 @@
 class CommandNSInfo : public Command
 {
  private:
-	template<typename T, unsigned END> void CheckOptStr(User *u, Anope::string &buf, T opt, const char *str, const Flags<T, END> *nc, bool reverse_logic = false)
+	template<typename T, unsigned END> void CheckOptStr(NickCore *core, Anope::string &buf, T opt, const char *str, const Flags<T, END> *nc, bool reverse_logic = false)
 	{
 		if (reverse_logic ? !nc->HasFlag(opt) : nc->HasFlag(opt))
 		{
 			if (!buf.empty())
 				buf += ", ";
 
-			buf += translate(u, str);
+			buf += translate(core, str);
 		}
 	}
  public:
@@ -36,11 +36,10 @@ class CommandNSInfo : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		User *u = source.u;
 
-		const Anope::string &nick = params.size() ? params[0] : (u->Account() ? u->Account()->display : u->nick);
+		const Anope::string &nick = params.size() ? params[0] : (source.nc ? source.nc->display : source.GetNick());
 		NickAlias *na = findnick(nick);
-		bool has_auspex = u->IsIdentified() && u->HasPriv("nickserv/auspex");
+		bool has_auspex = source.HasPriv("nickserv/auspex");
 
 		if (!na)
 		{
@@ -58,7 +57,7 @@ class CommandNSInfo : public Command
 			if (u2 && u2->Account() == na->nc)
 				nick_online = true;
 
-			if (has_auspex || (u->Account() && na->nc == u->Account()))
+			if (has_auspex || na->nc == source.nc)
 				show_hidden = true;
 
 			source.Reply(_("%s is %s"), na->nick.c_str(), na->last_realname.c_str());
@@ -69,7 +68,7 @@ class CommandNSInfo : public Command
 			if (na->nc->IsServicesOper() && (show_hidden || !na->nc->HasFlag(NI_HIDE_STATUS)))
 				source.Reply(_("%s is a services operator of type %s."), na->nick.c_str(), na->nc->o->ot->GetName().c_str());
 
-			InfoFormatter info(u);
+			InfoFormatter info(source.nc);
 
 			if (nick_online)
 			{
@@ -114,14 +113,14 @@ class CommandNSInfo : public Command
 
 				Anope::string optbuf;
 
-				CheckOptStr<NickCoreFlag, NI_END>(u, optbuf, NI_KILLPROTECT, _("Protection"), na->nc);
-				CheckOptStr<NickCoreFlag, NI_END>(u, optbuf, NI_SECURE, _("Security"), na->nc);
-				CheckOptStr<NickCoreFlag, NI_END>(u, optbuf, NI_PRIVATE, _("Private"), na->nc);
-				CheckOptStr<NickCoreFlag, NI_END>(u, optbuf, NI_MSG, _("Message mode"), na->nc);
-				CheckOptStr<NickCoreFlag, NI_END>(u, optbuf, NI_AUTOOP, _("Auto-op"), na->nc);
-				CheckOptStr<NickCoreFlag, NI_END>(u, optbuf, NI_SUSPENDED, _("Suspended"), na->nc);
-				CheckOptStr<NickCoreFlag, NI_END>(u, optbuf, NI_STATS, _("Chanstats"), na->nc);
-				CheckOptStr<NickNameFlag, NS_END>(u, optbuf, NS_NO_EXPIRE, _("No expire"), na);
+				CheckOptStr<NickCoreFlag, NI_END>(source.nc, optbuf, NI_KILLPROTECT, _("Protection"), na->nc);
+				CheckOptStr<NickCoreFlag, NI_END>(source.nc, optbuf, NI_SECURE, _("Security"), na->nc);
+				CheckOptStr<NickCoreFlag, NI_END>(source.nc, optbuf, NI_PRIVATE, _("Private"), na->nc);
+				CheckOptStr<NickCoreFlag, NI_END>(source.nc, optbuf, NI_MSG, _("Message mode"), na->nc);
+				CheckOptStr<NickCoreFlag, NI_END>(source.nc, optbuf, NI_AUTOOP, _("Auto-op"), na->nc);
+				CheckOptStr<NickCoreFlag, NI_END>(source.nc, optbuf, NI_SUSPENDED, _("Suspended"), na->nc);
+				CheckOptStr<NickCoreFlag, NI_END>(source.nc, optbuf, NI_STATS, _("Chanstats"), na->nc);
+				CheckOptStr<NickNameFlag, NS_END>(source.nc, optbuf, NS_NO_EXPIRE, _("No expire"), na);
 
 				info[_("Options")] = optbuf.empty() ? _("None") : optbuf;
 

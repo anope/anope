@@ -26,8 +26,6 @@ class CommandCSDrop : public Command
 	{
 		const Anope::string &chan = params[0];
 
-		User *u = source.u;
-
 		if (readonly)
 		{
 			source.Reply(_("Sorry, channel de-registration is temporarily disabled.")); // XXX: READ_ONLY_MODE?
@@ -41,20 +39,20 @@ class CommandCSDrop : public Command
 			return;
 		}
 
-		if (ci->HasFlag(CI_SUSPENDED) && !u->HasCommand("chanserv/drop"))
+		if (ci->HasFlag(CI_SUSPENDED) && !source.HasCommand("chanserv/drop"))
 		{
 			source.Reply(CHAN_X_SUSPENDED, chan.c_str());
 			return;
 		}
 
-		if ((ci->HasFlag(CI_SECUREFOUNDER) ? !IsFounder(u, ci) : !ci->AccessFor(u).HasPriv("FOUNDER")) && !u->HasCommand("chanserv/drop"))
+		if ((ci->HasFlag(CI_SECUREFOUNDER) ? !source.IsFounder(ci) : !source.AccessFor(ci).HasPriv("FOUNDER")) && !source.HasCommand("chanserv/drop"))
 		{
 			source.Reply(ACCESS_DENIED);
 			return;
 		}
 
-		bool override = (ci->HasFlag(CI_SECUREFOUNDER) ? !IsFounder(u, ci) : !ci->AccessFor(u).HasPriv("FOUNDER"));
-		Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "(founder was: " << (ci->GetFounder() ? ci->GetFounder()->display : "none") << ")";
+		bool override = (ci->HasFlag(CI_SECUREFOUNDER) ? !source.IsFounder(ci) : !source.AccessFor(ci).HasPriv("FOUNDER"));
+		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "(founder was: " << (ci->GetFounder() ? ci->GetFounder()->display : "none") << ")";
 
 		FOREACH_MOD(I_OnChanDrop, OnChanDrop(ci));
 
@@ -71,10 +69,9 @@ class CommandCSDrop : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
 	{
-		User *u = source.u;
 		this->SendSyntax(source);
 		source.Reply(" ");
-		if (u->IsServicesOper())
+		if (source.IsServicesOper())
 			source.Reply(_("Unregisters the named channel.  Only \002Services Operators\002\n"
 					"can drop a channel for which they have not identified."));
 		else

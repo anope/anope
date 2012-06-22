@@ -155,8 +155,8 @@ class CommandOSSeen : public Command
 					counter++;
 				}
 			}
-			Log(LOG_ADMIN, source.u, this) << "CLEAR and removed " << counter << " nicks that were added after " << do_strftime(time, NULL, true);
-			source.Reply(_("Database cleared, removed %lu nicks that were added after %s"), counter, do_strftime(time, source.u->Account(), true).c_str());
+			Log(LOG_ADMIN, source, this) << "CLEAR and removed " << counter << " nicks that were added after " << do_strftime(time, NULL, true);
+			source.Reply(_("Database cleared, removed %lu nicks that were added after %s"), counter, do_strftime(time, source.nc, true).c_str());
 		}
 		else
 			this->SendSyntax(source);
@@ -190,7 +190,6 @@ class CommandSeen : public Command
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		const Anope::string &target = params[0];
-		User *u = source.u;
 
 		if (target.length() > Config->NickLen)
 		{
@@ -204,9 +203,9 @@ class CommandSeen : public Command
 			return;
 		}
 
-		if (target.equals_ci(u->nick))
+		if (target.equals_ci(source.GetNick()))
 		{
-			source.Reply(_("You might see yourself in the mirror, %s."), u->nick.c_str());
+			source.Reply(_("You might see yourself in the mirror, %s."), source.GetNick().c_str());
 			return;
 		}
 
@@ -224,8 +223,8 @@ class CommandSeen : public Command
 		else
 			onlinestatus = Anope::printf(_(" but %s mysteriously dematerialized."), target.c_str());
 
-		Anope::string timebuf = duration(Anope::CurTime - info->last, u->Account());
-		Anope::string timebuf2 = do_strftime(info->last, u->Account(), true);
+		Anope::string timebuf = duration(Anope::CurTime - info->last, source.nc);
+		Anope::string timebuf2 = do_strftime(info->last, source.nc, true);
 
 		if (info->type == NEW)
 		{

@@ -81,11 +81,11 @@ class CoreExport ListFormatter
  */
 class CoreExport InfoFormatter
 {
-	User *user;
+	NickCore *nc;
 	std::vector<std::pair<Anope::string, Anope::string> > replies;
 	unsigned longest;
  public:
-	InfoFormatter(User *u);
+	InfoFormatter(NickCore *nc);
 	void Process(std::vector<Anope::string> &);
 	Anope::string &operator[](const Anope::string &key);
 };

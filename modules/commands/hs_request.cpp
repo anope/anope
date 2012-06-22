@@ -87,13 +87,13 @@ class CommandHSRequest : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		User *u = source.u;
-
-		NickAlias *na = findnick(u->nick);
-		if (na == NULL)
-			na = findnick(u->Account()->display);
-		if (!na)
+		User *u = source.GetUser();
+		NickAlias *na = findnick(source.GetNick());
+		if (!na || na->nc != source.nc)
+		{
+			source.Reply(ACCESS_DENIED);
 			return;
+		}
 
 		Anope::string rawhostmask = params[0];
 		
@@ -163,7 +163,7 @@ class CommandHSRequest : public Command
 
 		source.Reply(_("Your vHost has been requested"));
 		req_send_memos(source, user, host);
-		Log(LOG_COMMAND, u, this, NULL) << "to request new vhost " << (!user.empty() ? user + "@" : "") << host;
+		Log(LOG_COMMAND, source, this) << "to request new vhost " << (!user.empty() ? user + "@" : "") << host;
 
 		return;
 	}
@@ -190,7 +190,6 @@ class CommandHSActivate : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		User *u = source.u;
 
 		const Anope::string &nick = params[0];
 
@@ -198,14 +197,14 @@ class CommandHSActivate : public Command
 		HostRequest *req = na ? na->GetExt<HostRequest *>("hs_request") : NULL;
 		if (req)
 		{
-			na->SetVhost(req->ident, req->host, u->nick, req->time);
+			na->SetVhost(req->ident, req->host, source.GetNick(), req->time);
 			FOREACH_MOD(I_OnSetVhost, OnSetVhost(na));
 
 			if (HSRequestMemoUser && memoserv)
 				memoserv->Send(Config->HostServ, na->nick, _("[auto memo] Your requested vHost has been approved."), true);
 
 			source.Reply(_("vHost for %s has been activated"), na->nick.c_str());
-			Log(LOG_COMMAND, u, this, NULL) << "for " << na->nick << " for vhost " << (!req->ident.empty() ? req->ident + "@" : "") << req->host;
+			Log(LOG_COMMAND, source, this) << "for " << na->nick << " for vhost " << (!req->ident.empty() ? req->ident + "@" : "") << req->host;
 			na->Shrink("hs_request");
 		}
 		else
@@ -234,7 +233,6 @@ class CommandHSReject : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		User *u = source.u;
 
 		const Anope::string &nick = params[0];
 		const Anope::string &reason = params.size() > 1 ? params[1] : "";
@@ -257,7 +255,7 @@ class CommandHSReject : public Command
 			}
 
 			source.Reply(_("vHost for %s has been rejected"), nick.c_str());
-			Log(LOG_COMMAND, u, this, NULL) << "to reject vhost for " << nick << " (" << (!reason.empty() ? reason : "") << ")";
+			Log(LOG_COMMAND, source, this, NULL) << "to reject vhost for " << nick << " (" << (!reason.empty() ? reason : "") << ")";
 		}
 		else
 			source.Reply(_("No request for nick %s found."), nick.c_str());
@@ -400,7 +398,7 @@ void req_send_memos(CommandSource &source, const Anope::string &vIdent, const An
 			if (!na)
 				continue;
 
-			Anope::string message = Anope::printf(_("[auto memo] vHost \002%s\002 has been requested by %s."), host.c_str(), source.u->GetMask().c_str());
+			Anope::string message = Anope::printf(_("[auto memo] vHost \002%s\002 has been requested by %s."), host.c_str(), source.GetNick().c_str());
 
 			memoserv->Send(Config->HostServ, na->nick, message, true);
 		}

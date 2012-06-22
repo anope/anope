@@ -28,7 +28,7 @@ public:
 		const Anope::string &target = params[1];
 		Anope::string what = params.size() > 2 ? params[2] : "";
 
-		User *u = source.u;
+		User *u = source.GetUser();
 		ChannelInfo *ci = cs_findchan(params[0]);
 		if (ci == NULL)
 		{
@@ -36,7 +36,7 @@ public:
 			return;
 		}
 
-		if (!ci->AccessFor(u).HasPriv("SET"))
+		if (!source.AccessFor(ci).HasPriv("SET"))
 		{
 			source.Reply(ACCESS_DENIED);
 			return;
@@ -48,7 +48,7 @@ public:
 			source.Reply(CHAN_X_NOT_REGISTERED, target.c_str());
 			return;
 		}
-		if (!IsFounder(u, ci) || !IsFounder(u, target_ci))
+		if (!source.IsFounder(ci) || !source.IsFounder(target_ci))
 		{
 			source.Reply(ACCESS_DENIED);
 			return;
@@ -71,7 +71,7 @@ public:
 				target_ci->c->CheckModes();
 
 				ChannelMode *cm;
-				if (u->FindChannel(target_ci->c) != NULL)
+				if (u && u->FindChannel(target_ci->c) != NULL)
 				{
 					/* On most ircds you do not receive the admin/owner mode till its registered */
 					if ((cm = ModeManager::FindChannelModeByName(CMODE_OWNER)))
@@ -155,7 +155,7 @@ public:
 			return;
 		}
 
-		Log(LOG_COMMAND, u, this, ci) << "to clone " << (what.empty() ? "everything from it" : what) << " to " << target_ci->name;
+		Log(LOG_COMMAND, source, this, ci) << "to clone " << (what.empty() ? "everything from it" : what) << " to " << target_ci->name;
 
 		return;
 	}

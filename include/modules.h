@@ -499,25 +499,25 @@ class CoreExport Module : public Extensible
 	virtual EventReturn OnExceptionAdd(Exception *ex) { return EVENT_CONTINUE; }
 
 	/** Called before an exception is deleted
-	 * @param u The user who is deleting it
+	 * @param source The source deleting it
 	 * @param ex The exceotion
 	 */
-	virtual void OnExceptionDel(User *u, Exception *ex) { }
+	virtual void OnExceptionDel(CommandSource &source, Exception *ex) { }
 
 	/** Called before a XLine is added
-	 * @param u The user adding the XLine
+	 * @param source The source of the XLine
 	 * @param x The XLine
 	 * @param xlm The xline manager it was added to
 	 * @return EVENT_CONTINUE to let other modules decide, EVENT_STOP to halt the command and not process it
 	 */
-	virtual EventReturn OnAddXLine(User *u, const XLine *x, XLineManager *xlm) { return EVENT_CONTINUE; }
+	virtual EventReturn OnAddXLine(CommandSource &source, const XLine *x, XLineManager *xlm) { return EVENT_CONTINUE; }
 
 	/** Called before a XLine is deleted
-	 * @param u The user deleting the XLine
+	 * @param source The source of the XLine
 	 * @param x The XLine
 	 * @param xlm The xline manager it was deleted from
 	 */
-	virtual void OnDelXLine(User *u, const XLine *x, XLineManager *xlm) { }
+	virtual void OnDelXLine(CommandSource &source, const XLine *x, XLineManager *xlm) { }
 
 	/** Called when a user is checked for whether they are a services oper
 	 * @param u The user
@@ -558,31 +558,31 @@ class CoreExport Module : public Extensible
 
 	/** Called when access is deleted from a channel
 	 * @param ci The channel
-	 * @param u The user who removed the access
+	 * @param source The source of the command
 	 * @param access The access entry being removed
 	 */
-	virtual void OnAccessDel(ChannelInfo *ci, User *u, ChanAccess *access) { }
+	virtual void OnAccessDel(ChannelInfo *ci, CommandSource &source, ChanAccess *access) { }
 
 	/** Called when access is added
 	 * @param ci The channel
-	 * @param u The user who added the access
+	 * @param source The source of the command
 	 * @param access The access changed
 	 */
-	virtual void OnAccessAdd(ChannelInfo *ci, User *u, ChanAccess *access) { }
+	virtual void OnAccessAdd(ChannelInfo *ci, CommandSource &source, ChanAccess *access) { }
 
 	/** Called when the access list is cleared
 	 * @param ci The channel
 	 * @param u The user who cleared the access
 	 */
-	virtual void OnAccessClear(ChannelInfo *ci, User *u) { }
+	virtual void OnAccessClear(ChannelInfo *ci, CommandSource &source) { }
 
 	/** Called when a level for a channel is changed
-	 * @param u The user changing the level
+	 * @param source The source of the command
 	 * @param ci The channel the level was changed on
 	 * @param priv The privilege changed
 	 * @param what The new level
 	 */
-	virtual void OnLevelChange(User *u, ChannelInfo *ci, const Anope::string &priv, int16_t what) { }
+	virtual void OnLevelChange(CommandSource &source, ChannelInfo *ci, const Anope::string &priv, int16_t what) { }
 
 	/** Called right before a channel is dropped
 	 * @param ci The channel
@@ -625,18 +625,18 @@ class CoreExport Module : public Extensible
 	virtual void OnChannelDelete(Channel *c) { }
 
 	/** Called after adding an akick to a channel
-	 * @param u The user adding the akick
+	 * @param source The source of the command
 	 * @param ci The channel
 	 * @param ak The akick
 	 */
-	virtual void OnAkickAdd(User *u, ChannelInfo *ci, const AutoKick *ak) { }
+	virtual void OnAkickAdd(CommandSource &source, ChannelInfo *ci, const AutoKick *ak) { }
 
 	/** Called before removing an akick from a channel
-	 * @param u The user removing the akick
+	 * @param source The source of the command
 	 * @param ci The channel
 	 * @param ak The akick
 	 */
-	virtual void OnAkickDel(User *u, ChannelInfo *ci, const AutoKick *ak) { }
+	virtual void OnAkickDel(CommandSource &source, ChannelInfo *ci, const AutoKick *ak) { }
 
 	/** Called after a user join a channel when we decide whether to kick them or not
 	 * @param u The user
@@ -669,10 +669,10 @@ class CoreExport Module : public Extensible
 	virtual EventReturn OnGroupCheckPriv(const AccessGroup *group, const Anope::string &priv) { return EVENT_CONTINUE; }
 
 	/** Called when a nick is dropped
-	 * @param u The user dropping the nick
+	 * @param source The source of the command
 	 * @param na The nick
 	 */
-	virtual void OnNickDrop(User *u, NickAlias *na) { }
+	virtual void OnNickDrop(CommandSource &source, NickAlias *na) { }
 
 	/** Called when a nick is forbidden
 	 * @param na The nick alias of the forbidden nick

@@ -25,16 +25,15 @@ class CommandNSLogout : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		User *u = source.u;
 
 		const Anope::string &nick = !params.empty() ? params[0] : "";
 		const Anope::string &param = params.size() > 1 ? params[1] : "";
 
 		User *u2;
-		if (!u->IsServicesOper() && !nick.empty())
+		if (!source.IsServicesOper() && !nick.empty())
 			this->OnSyntaxError(source, "");
-		else if (!(u2 = (!nick.empty() ? finduser(nick) : u)))
-			source.Reply(NICK_X_NOT_IN_USE, nick.c_str());
+		else if (!(u2 = (!nick.empty() ? finduser(nick) : source.GetUser())))
+			source.Reply(NICK_X_NOT_IN_USE, !nick.empty() ? nick.c_str() : source.GetNick().c_str());
 		else if (!nick.empty() && u2->IsServicesOper())
 			source.Reply(_("You can't logout %s because they are a Services Operator."), nick.c_str());
 		else
@@ -43,7 +42,7 @@ class CommandNSLogout : public Command
 				nickserv->Validate(u2);
 
 			u2->SuperAdmin = 0; /* Dont let people logout and remain a SuperAdmin */
-			Log(LOG_COMMAND, u, this) << "to logout " << u2->nick;
+			Log(LOG_COMMAND, source, this) << "to logout " << u2->nick;
 
 			/* Remove founder status from this user in all channels */
 			if (!nick.empty())

@@ -30,7 +30,6 @@ class CommandHelp : public Command
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 	
-		User *u = source.u;
 		const BotInfo *bi = source.owner;
 
 		if (params.empty())
@@ -48,7 +47,7 @@ class CommandHelp : public Command
 				service_reference<Command> c("Command", info.name);
 				if (!c)
 					continue;
-				if (!Config->HidePrivilegedCommands || info.permission.empty() || u->HasCommand(info.permission))
+				if (!Config->HidePrivilegedCommands || info.permission.empty() || source.HasCommand(info.permission))
 				{
 					source.command = c_name;
 					c->OnServHelp(source);
@@ -75,7 +74,7 @@ class CommandHelp : public Command
 				if (!c)
 					continue;
 
-				if (Config->HidePrivilegedCommands && !info.permission.empty() && !u->HasCommand(info.permission))
+				if (Config->HidePrivilegedCommands && !info.permission.empty() && !source.HasCommand(info.permission))
 					continue;
 
 				const Anope::string &subcommand = params.size() > max ? params[max] : "";
@@ -91,14 +90,14 @@ class CommandHelp : public Command
 					source.Reply(" ");
 					source.Reply(_("Access to this command requires the permission \002%s\002 to be present in your opertype."), info.permission.c_str());
 				}
-				if (!c->HasFlag(CFLAG_ALLOW_UNREGISTERED) && !u->IsIdentified())
+				if (!c->HasFlag(CFLAG_ALLOW_UNREGISTERED) && !source.nc)
 				{
 					if (info.permission.empty())
 						source.Reply(" ");
 					source.Reply( _("You need to be identified to use this command."));
 				}
 				/* User doesn't have the proper permission to use this command */
-				else if (!info.permission.empty() && !u->HasCommand(info.permission))
+				else if (!info.permission.empty() && !source.HasCommand(info.permission))
 				{
 					source.Reply(_("You cannot use this command."));
 				}

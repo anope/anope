@@ -28,7 +28,6 @@ class CommandMSSendAll : public Command
 		if (!memoserv)
 			return;
 
-		User *u = source.u;
 		const Anope::string &text = params[0];
 
 		if (readonly)
@@ -37,14 +36,12 @@ class CommandMSSendAll : public Command
 			return;
 		}
 
-		const NickAlias *na = findnick(u->nick);
-
 		for (nickcore_map::const_iterator it = NickCoreList->begin(), it_end = NickCoreList->end(); it != it_end; ++it)
 		{
 			const NickCore *nc = it->second;
 
-			if ((na && na->nc == nc) || !nc->display.equals_ci(u->nick))
-				memoserv->Send(u->nick, nc->display, text);
+			if (nc != source.nc)
+				memoserv->Send(source.GetNick(), nc->display, text);
 		}
 
 		source.Reply(_("A massmemo has been sent to all registered users."));

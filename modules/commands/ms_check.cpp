@@ -24,7 +24,6 @@ class CommandMSCheck : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		User *u = source.u;
 
 		const Anope::string &recipient = params[0];
 
@@ -44,7 +43,7 @@ class CommandMSCheck : public Command
 
 		for (int i = mi->memos->size() - 1; i >= 0; --i)
 		{
-			if (u->Account()->display.equals_ci(mi->GetMemo(i)->sender))
+			if (source.nc->display.equals_ci(mi->GetMemo(i)->sender))
 			{
 				found = true; /* Yes, we've found the memo */
 

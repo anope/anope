@@ -44,7 +44,6 @@ class CommandNSRecover : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		User *u = source.u;
 
 		const Anope::string &nick = params[0];
 		const Anope::string &pass = params.size() > 1 ? params[1] : "";
@@ -59,7 +58,7 @@ class CommandNSRecover : public Command
 			source.Reply(NICK_X_NOT_REGISTERED, nick.c_str());
 		else if (na->nc->HasFlag(NI_SUSPENDED))
 			source.Reply(NICK_X_SUSPENDED, na->nick.c_str());
-		else if (nick.equals_ci(u->nick))
+		else if (nick.equals_ci(source.GetNick()))
 			source.Reply(_("You can't recover yourself!"));
 		else if (!pass.empty())
 		{
@@ -75,17 +74,22 @@ class CommandNSRecover : public Command
 			else
 			{
 				source.Reply(ACCESS_DENIED);
-				Log(LOG_COMMAND, u, this) << "with invalid password for " << nick;
-				bad_password(u);
+				Log(LOG_COMMAND, source, this) << "with invalid password for " << nick;
+				if (source.GetUser())
+					bad_password(source.GetUser());
 			}
 		}
 		else
 		{
-			if (u->Account() == na->nc || (!na->nc->HasFlag(NI_SECURE) && is_on_access(u, na->nc)) ||
-					(!u->fingerprint.empty() && na->nc->FindCert(u->fingerprint)))
-			{
+			bool ok = false;
+			if (source.nc == na->nc)
+				ok = true;
+			else if (!na->nc->HasFlag(NI_SECURE) && source.GetUser() && is_on_access(source.GetUser(), na->nc))
+				ok = true;
+			else if (source.GetUser() && !source.GetUser()->fingerprint.empty() && na->nc->FindCert(source.GetUser()->fingerprint))
+				ok = true;
+			if (ok)
 				this->DoRecover(source, u2, na, nick);
-			}
 			else
 				source.Reply(ACCESS_DENIED);
 		}

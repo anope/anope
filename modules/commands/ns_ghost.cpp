@@ -28,7 +28,6 @@ class CommandNSGhost : public Command
 		const Anope::string &nick = params[0];
 		const Anope::string &pass = params.size() > 1 ? params[1] : "";
 
-		User *u = source.u;
 		User *user = finduser(nick);
 		const NickAlias *na = findnick(nick);
 
@@ -40,16 +39,16 @@ class CommandNSGhost : public Command
 			source.Reply(NICK_X_NOT_REGISTERED, nick.c_str());
 		else if (na->nc->HasFlag(NI_SUSPENDED))
 			source.Reply(NICK_X_SUSPENDED, na->nick.c_str());
-		else if (nick.equals_ci(u->nick))
+		else if (nick.equals_ci(source.GetNick()))
 			source.Reply(_("You can't ghost yourself!"));
 		else
 		{
 			bool ok = false;
-			if (u->Account() == na->nc)
+			if (source.nc == na->nc)
 				ok = true;
-			else if (!na->nc->HasFlag(NI_SECURE) && is_on_access(u, na->nc))
+			else if (!na->nc->HasFlag(NI_SECURE) && source.GetUser() && is_on_access(source.GetUser(), na->nc))
 				ok = true;
-			else if (!u->fingerprint.empty() && na->nc->FindCert(u->fingerprint))
+			else if (source.GetUser() && !source.GetUser()->fingerprint.empty() && na->nc->FindCert(source.GetUser()->fingerprint))
 				ok = true;
 			else if (!pass.empty())
 			{
@@ -67,8 +66,8 @@ class CommandNSGhost : public Command
 					source.Reply(_("You may not ghost an unidentified user, use RECOVER instead."));
 				else
 				{
-					Log(LOG_COMMAND, u, this) << "for " << nick;
-					Anope::string buf = "GHOST command used by " + u->nick;
+					Log(LOG_COMMAND, source, this) << "for " << nick;
+					Anope::string buf = "GHOST command used by " + source.GetNick();
 					user->Kill(Config->NickServ, buf);
 					source.Reply(_("Ghost with your nick has been killed."), nick.c_str());
 				}
@@ -78,8 +77,9 @@ class CommandNSGhost : public Command
 				source.Reply(ACCESS_DENIED);
 				if (!pass.empty())
 				{
-					Log(LOG_COMMAND, u, this) << "with an invalid password for " << nick;
-					bad_password(u);
+					Log(LOG_COMMAND, source, this) << "with an invalid password for " << nick;
+					if (source.GetUser())
+						bad_password(source.GetUser());
 				}
 			}
 		}

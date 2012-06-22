@@ -25,7 +25,6 @@ class CommandOSNOOP : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		User *u = source.u;
 		const Anope::string &cmd = params[0];
 		const Anope::string &server = params[1];
 
@@ -37,10 +36,10 @@ class CommandOSNOOP : public Command
 			/* Remove the O:lines */
 			ircdproto->SendSVSNOOP(s, true);
 
-			Log(LOG_ADMIN, u, this) << "SET on " << s->GetName();
+			Log(LOG_ADMIN, source, this) << "SET on " << s->GetName();
 			source.Reply(_("All O:lines of \002%s\002 have been removed."), s->GetName().c_str());
 
-			Anope::string reason = "NOOP command used by " + u->nick;
+			Anope::string reason = "NOOP command used by " + source.GetNick();
 			/* Kill all the IRCops of the server */
 			for (Anope::insensitive_map<User *>::iterator it = UserListByNick.begin(); it != UserListByNick.end();)
 			{
@@ -53,7 +52,7 @@ class CommandOSNOOP : public Command
 		}
 		else if (cmd.equals_ci("REVOKE"))
 		{
-			Log(LOG_ADMIN, u, this) << "REVOKE on " << s->GetName();
+			Log(LOG_ADMIN, source, this) << "REVOKE on " << s->GetName();
 			ircdproto->SendSVSNOOP(s, false);
 			source.Reply(_("All O:lines of \002%s\002 have been reset."), s->GetName().c_str());
 		}

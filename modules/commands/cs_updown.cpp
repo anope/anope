@@ -24,7 +24,9 @@ class CommandCSUp : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		User *u = source.u;
+		User *u = source.GetUser();
+		if (!u)
+			return;
 
 		if (params.empty())
 			for (UChannelList::iterator it = u->chans.begin(); it != u->chans.end(); ++it)
@@ -79,7 +81,9 @@ class CommandCSDown : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		User *u = source.u;
+		User *u = source.GetUser();
+		if (!u)
+			return;
 
 		if (params.empty())
 			for (UChannelList::iterator it = u->chans.begin(); it != u->chans.end(); ++it)

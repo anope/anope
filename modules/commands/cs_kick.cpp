@@ -29,7 +29,7 @@ class CommandCSKick : public Command
 		const Anope::string &target = params[1];
 		const Anope::string &reason = params.size() > 2 ? params[2] : "Requested";
 
-		User *u = source.u;
+		User *u = source.GetUser();
 		ChannelInfo *ci = cs_findchan(params[0]);
 		Channel *c = findchan(params[0]);
 		User *u2 = finduser(target);
@@ -45,7 +45,7 @@ class CommandCSKick : public Command
 			return;
 		}
 
-		AccessGroup u_access = ci->AccessFor(u);
+		AccessGroup u_access = source.AccessFor(ci);
 
 		if (!u_access.HasPriv("KICK"))
 			source.Reply(ACCESS_DENIED);
@@ -61,17 +61,17 @@ class CommandCSKick : public Command
 			else
 			{
 				 // XXX
-				Log(LOG_COMMAND, u, this, ci) << "for " << u2->nick;
+				Log(LOG_COMMAND, source, this, ci) << "for " << u2->nick;
 
 				if (ci->HasFlag(CI_SIGNKICK) || (ci->HasFlag(CI_SIGNKICK_LEVEL) && !u_access.HasPriv("SIGNKICK")))
-					c->Kick(ci->WhoSends(), u2, "%s (%s)", reason.c_str(), u->nick.c_str());
+					c->Kick(ci->WhoSends(), u2, "%s (%s)", reason.c_str(), source.GetNick().c_str());
 				else
 					c->Kick(ci->WhoSends(), u2, "%s", reason.c_str());
 			}
 		}
 		else if (u_access.HasPriv("FOUNDER"))
 		{
-			Log(LOG_COMMAND, u, this, ci) << "for " << target;
+			Log(LOG_COMMAND, source, this, ci) << "for " << target;
 
 			int matched = 0, kicked = 0;
 			for (CUserList::iterator it = c->users.begin(), it_end = c->users.end(); it != it_end;)
@@ -90,7 +90,7 @@ class CommandCSKick : public Command
 
 					++kicked;
 					if (ci->HasFlag(CI_SIGNKICK) || (ci->HasFlag(CI_SIGNKICK_LEVEL) && !u_access.HasPriv("SIGNKICK")))
-						c->Kick(ci->WhoSends(), uc->user, "%s (Matches %s) (%s)", reason.c_str(), target.c_str(), u->nick.c_str());
+						c->Kick(ci->WhoSends(), uc->user, "%s (Matches %s) (%s)", reason.c_str(), target.c_str(), source.GetNick().c_str());
 					else
 						c->Kick(ci->WhoSends(), uc->user, "%s (Matches %s)", reason.c_str(), target.c_str());
 				}

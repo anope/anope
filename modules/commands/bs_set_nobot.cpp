@@ -24,7 +24,6 @@ class CommandBSSetNoBot : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		User *u = source.u;
 		ChannelInfo *ci = cs_findchan(params[0]);
 		const Anope::string &value = params[1];
 
@@ -34,7 +33,7 @@ class CommandBSSetNoBot : public Command
 			return;
 		}
 
-		if (!u->HasCommand("botserv/set/nobot"))
+		if (!source.HasCommand("botserv/set/nobot"))
 		{
 			source.Reply(ACCESS_DENIED);
 			return;
@@ -42,18 +41,18 @@ class CommandBSSetNoBot : public Command
 
 		if (value.equals_ci("ON"))
 		{
-			bool override = !ci->AccessFor(u).HasPriv("SET");
-			Log(override ? LOG_ADMIN : LOG_COMMAND, u, this, ci) << "to enable nobot"; 
+			bool override = !source.AccessFor(ci).HasPriv("SET");
+			Log(override ? LOG_ADMIN : LOG_COMMAND, source, this, ci) << "to enable nobot"; 
 
 			ci->botflags.SetFlag(BS_NOBOT);
 			if (ci->bi)
-				ci->bi->UnAssign(u, ci);
+				ci->bi->UnAssign(source.GetUser(), ci);
 			source.Reply(_("No Bot mode is now \002on\002 on channel %s."), ci->name.c_str());
 		}
 		else if (value.equals_ci("OFF"))
 		{
-			bool override = !ci->AccessFor(u).HasPriv("SET");
-			Log(override ? LOG_ADMIN : LOG_COMMAND, u, this, ci) << "to disable nobot"; 
+			bool override = !source.AccessFor(ci).HasPriv("SET");
+			Log(override ? LOG_ADMIN : LOG_COMMAND, source, this, ci) << "to disable nobot"; 
 
 			ci->botflags.UnsetFlag(BS_NOBOT);
 			source.Reply(_("No Bot mode is now \002off\002 on channel %s."), ci->name.c_str());

@@ -264,7 +264,10 @@ class NSIdentifyLDAP : public Module
 		if (c == NULL || source == NULL || !this->ldap)
 			return EVENT_CONTINUE;
 
-		User *u = source->u;
+		User *u = source->GetUser();
+		if (!u)
+			return EVENT_CONTINUE;
+
 		if (u->HasExt("m_ldap_authentication_authenticated"))
 		{
 			u->Shrink("m_ldap_authentication_authenticated");

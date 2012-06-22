@@ -59,10 +59,9 @@ class CommandBSInfo : public Command
 	{
 		const Anope::string &query = params[0];
 
-		User *u = source.u;
 		const BotInfo *bi = findbot(query);
 		ChannelInfo *ci;
-		InfoFormatter info(u);
+		InfoFormatter info(source.nc);
 
 		if (bi)
 		{
@@ -79,7 +78,7 @@ class CommandBSInfo : public Command
 			for (unsigned i = 0; i < replies.size(); ++i)
 				source.Reply(replies[i]);
 
-			if (u->HasPriv("botserv/administration"))
+			if (source.HasPriv("botserv/administration"))
 			{
 				std::vector<Anope::string> buf;
 				this->send_bot_channels(buf, bi);
@@ -90,7 +89,7 @@ class CommandBSInfo : public Command
 		}
 		else if ((ci = cs_findchan(query)))
 		{
-			if (!ci->AccessFor(u).HasPriv("FOUNDER") && !u->HasPriv("botserv/administration"))
+			if (!source.AccessFor(ci).HasPriv("FOUNDER") && !source.HasPriv("botserv/administration"))
 			{
 				source.Reply(ACCESS_DENIED);
 				return;
@@ -99,8 +98,8 @@ class CommandBSInfo : public Command
 			source.Reply(CHAN_INFO_HEADER, ci->name.c_str());
 			info[_("Bot nick")] = ci->bi ? ci->bi->nick : "not assigned yet";
 
-			Anope::string enabled = translate(u, _("Enabled"));
-			Anope::string disabled = translate(u, _("Disabled"));
+			Anope::string enabled = translate(source.nc, _("Enabled"));
+			Anope::string disabled = translate(source.nc, _("Disabled"));
 
 			if (ci->botflags.HasFlag(BS_KICK_BADWORDS))
 			{
@@ -203,11 +202,11 @@ class CommandBSInfo : public Command
 				info[_("AMSG kicker")] = disabled;
 
 			Anope::string flags;
-			CheckOptStr(flags, BS_DONTKICKOPS, _("Ops protection"), ci->botflags, u->Account());
-			CheckOptStr(flags, BS_DONTKICKVOICES, _("Voices protection"), ci->botflags, u->Account());
-			CheckOptStr(flags, BS_FANTASY, _("Fantasy"), ci->botflags, u->Account());
-			CheckOptStr(flags, BS_GREET, _("Greet"), ci->botflags, u->Account());
-			CheckOptStr(flags, BS_NOBOT, _("No bot"), ci->botflags, u->Account());
+			CheckOptStr(flags, BS_DONTKICKOPS, _("Ops protection"), ci->botflags, source.nc);
+			CheckOptStr(flags, BS_DONTKICKVOICES, _("Voices protection"), ci->botflags, source.nc);
+			CheckOptStr(flags, BS_FANTASY, _("Fantasy"), ci->botflags, source.nc);
+			CheckOptStr(flags, BS_GREET, _("Greet"), ci->botflags, source.nc);
+			CheckOptStr(flags, BS_NOBOT, _("No bot"), ci->botflags, source.nc);
 
 			info[_("Options")] = flags.empty() ? _("None") : flags;
 

@@ -66,12 +66,11 @@ class CommandNSSetPassword : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		User *u = source.u;
 
 		const Anope::string &param = params[1];
 		unsigned len = param.length();
 
-		if (u->Account()->display.equals_ci(param) || (Config->StrictPasswords && len < 5))
+		if (source.GetNick().equals_ci(param) || (Config->StrictPasswords && len < 5))
 		{
 			source.Reply(MORE_OBSCURE_PASSWORD);
 			return;
@@ -82,12 +81,12 @@ class CommandNSSetPassword : public Command
 			return;
 		}
 
-		enc_encrypt(param, u->Account()->pass);
+		enc_encrypt(param, source.nc->pass);
 		Anope::string tmp_pass;
-		if (enc_decrypt(u->Account()->pass, tmp_pass) == 1)
-			source.Reply(_("Password for \002%s\002 changed to \002%s\002."), u->Account()->display.c_str(), tmp_pass.c_str());
+		if (enc_decrypt(source.nc->pass, tmp_pass) == 1)
+			source.Reply(_("Password for \002%s\002 changed to \002%s\002."), source.nc->display.c_str(), tmp_pass.c_str());
 		else
-			source.Reply(_("Password for \002%s\002 changed."), u->Account()->display.c_str());
+			source.Reply(_("Password for \002%s\002 changed."), source.nc->display.c_str());
 
 		return;
 	}

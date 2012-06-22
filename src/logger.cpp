@@ -75,7 +75,7 @@ Anope::string LogFile::GetName() const
 	return this->filename;
 }
 
-Log::Log(LogType type, const Anope::string &category, const BotInfo *b) : bi(b), u(NULL), c(NULL), chan(NULL), ci(NULL), s(NULL), Type(type), Category(category)
+Log::Log(LogType type, const Anope::string &category, const BotInfo *b) : bi(b), u(NULL), nc(NULL), c(NULL), chan(NULL), ci(NULL), s(NULL), Type(type), Category(category)
 {
 	if (!bi && Config)
 		bi = findbot(Config->Global);
@@ -83,9 +83,9 @@ Log::Log(LogType type, const Anope::string &category, const BotInfo *b) : bi(b),
 		this->Sources.push_back(bi->nick);
 }
 
-Log::Log(LogType type, const User *_u, Command *_c, const ChannelInfo *_ci) : u(_u), c(_c), chan(NULL), ci(_ci), s(NULL), Type(type)
+Log::Log(LogType type, const CommandSource &source, Command *_c, const ChannelInfo *_ci) : u(source.GetUser()), nc(source.nc), c(_c), chan(NULL), ci(_ci), s(NULL), Type(type)
 {
-	if (!u || !c)
+	if (!c)
 		throw CoreException("Invalid pointers passed to Log::Log");
 	
 	if (type != LOG_COMMAND && type != LOG_OVERRIDE && type != LOG_ADMIN)
@@ -100,13 +100,14 @@ Log::Log(LogType type, const User *_u, Command *_c, const ChannelInfo *_ci) : u(
 	this->Category = c->name;
 	if (this->bi)
 		this->Sources.push_back(this->bi->nick);
-	this->Sources.push_back(u->nick);
+	if (u)
+		this->Sources.push_back(u->nick);
 	this->Sources.push_back(c->name);
 	if (ci)
 		this->Sources.push_back(ci->name);
 }
 
-Log::Log(const User *_u, Channel *ch, const Anope::string &category) : bi(NULL), u(_u), c(NULL), chan(ch), ci(chan ? *chan->ci : NULL), s(NULL), Type(LOG_CHANNEL)
+Log::Log(const User *_u, Channel *ch, const Anope::string &category) : bi(NULL), u(_u), nc(NULL), c(NULL), chan(ch), ci(chan ? *chan->ci : NULL), s(NULL), Type(LOG_CHANNEL)
 {
 	if (!chan)
 		throw CoreException("Invalid pointers passed to Log::Log");
@@ -121,7 +122,7 @@ Log::Log(const User *_u, Channel *ch, const Anope::string &category) : bi(NULL),
 	this->Sources.push_back(chan->name);
 }
 
-Log::Log(const User *_u, const Anope::string &category, const BotInfo *_bi) : bi(_bi), u(_u), c(NULL), chan(NULL), ci(NULL), s(NULL), Type(LOG_USER), Category(category)
+Log::Log(const User *_u, const Anope::string &category, const BotInfo *_bi) : bi(_bi), u(_u), nc(NULL), c(NULL), chan(NULL), ci(NULL), s(NULL), Type(LOG_USER), Category(category)
 {
 	if (!u)
 		throw CoreException("Invalid pointers passed to Log::Log");
@@ -133,7 +134,7 @@ Log::Log(const User *_u, const Anope::string &category, const BotInfo *_bi) : bi
 	this->Sources.push_back(u->nick);
 }
 
-Log::Log(Server *serv, const Anope::string &category, const BotInfo *_bi) : bi(_bi), u(NULL), c(NULL), chan(NULL), ci(NULL), s(serv), Type(LOG_SERVER), Category(category)
+Log::Log(Server *serv, const Anope::string &category, const BotInfo *_bi) : bi(_bi), u(NULL), nc(NULL), c(NULL), chan(NULL), ci(NULL), s(serv), Type(LOG_SERVER), Category(category)
 {
 	if (!s)
 		throw CoreException("Invalid pointer passed to Log::Log");
@@ -147,7 +148,7 @@ Log::Log(Server *serv, const Anope::string &category, const BotInfo *_bi) : bi(_
 	this->Sources.push_back(s->GetName());
 }
 
-Log::Log(const BotInfo *b, const Anope::string &category) : bi(b), u(NULL), c(NULL), chan(NULL), ci(NULL), s(NULL), Type(LOG_NORMAL), Category(category)
+Log::Log(const BotInfo *b, const Anope::string &category) : bi(b), u(NULL), nc(NULL), c(NULL), chan(NULL), ci(NULL), s(NULL), Type(LOG_NORMAL), Category(category)
 {
 	if (!this->bi && Config)
 		this->bi = findbot(Config->Global);
@@ -179,36 +180,45 @@ Anope::string Log::BuildPrefix() const
 	{
 		case LOG_ADMIN:
 		{
-			if (!this->c || !this->u)
+			if (!this->c && !(this->u || this->nc))
 				break;
 			buffer += "ADMIN: ";
 			size_t sl = this->c->name.find('/');
 			Anope::string cname = sl != Anope::string::npos ? this->c->name.substr(sl + 1) : this->c->name;
-			buffer += this->u->GetMask() + " used " + cname + " ";
+			if (this->u)
+				buffer += this->u->GetMask() + " used " + cname + " ";
+			else if (this->nc)
+				buffer += this->nc->display + " used " + cname + " ";
 			if (this->ci)
 				buffer += "on " + this->ci->name + " ";
 			break;
 		}
 		case LOG_OVERRIDE:
 		{
-			if (!this->c || !this->u)
+			if (!this->c && !(this->u || this->nc))
 				break;
 			buffer += "OVERRIDE: ";
 			size_t sl = this->c->name.find('/');
 			Anope::string cname = sl != Anope::string::npos ? this->c->name.substr(sl + 1) : this->c->name;
-			buffer += this->u->GetMask() + " used " + cname + " ";
+			if (this->u)
+				buffer += this->u->GetMask() + " used " + cname + " ";
+			else if (this->nc)
+				buffer += this->nc->display + " used " + cname + " ";
 			if (this->ci)
 				buffer += "on " + this->ci->name + " ";
 			break;
 		}
 		case LOG_COMMAND:
 		{
-			if (!this->c || !this->u)
+			if (!this->c || !(this->u || this->nc))
 				break;
 			buffer += "COMMAND: ";
 			size_t sl = this->c->name.find('/');
 			Anope::string cname = sl != Anope::string::npos ? this->c->name.substr(sl + 1) : this->c->name;
-			buffer += this->u->GetMask() + " used " + cname + " ";
+			if (this->u)
+				buffer += this->u->GetMask() + " used " + cname + " ";
+			else if (this->nc)
+				buffer += this->nc->display + " used " + cname + " ";
 			if (this->ci)
 				buffer += "on " + this->ci->name + " ";
 			break;

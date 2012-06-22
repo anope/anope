@@ -158,7 +158,7 @@ class NewsBase : public Command
 			news->type = ntype;
 			news->text = text;
 			news->time = Anope::CurTime;
-			news->who = source.u->nick;
+			news->who = source.GetNick();
 
 			this->ns->AddNewsItem(news);
 

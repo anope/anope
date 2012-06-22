@@ -24,7 +24,6 @@ class CommandOSMode : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		User *u = source.u;
 		const Anope::string &target = params[0];
 		const Anope::string &modes = params[1];
 
@@ -37,7 +36,7 @@ class CommandOSMode : public Command
 		{
 			c->SetModes(source.owner, false, modes.c_str());
 
-			Log(LOG_ADMIN, u, this) << modes << " on " << target;
+			Log(LOG_ADMIN, source, this) << modes << " on " << target;
 		}
 	}
 
@@ -62,7 +61,6 @@ class CommandOSUMode : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		User *u = source.u;
 		const Anope::string &target = params[0];
 		const Anope::string &modes = params[1];
 
@@ -74,9 +72,9 @@ class CommandOSUMode : public Command
 			u2->SetModes(source.owner, "%s", modes.c_str());
 			source.Reply(_("Changed usermodes of \002%s\002 to %s."), u2->nick.c_str(), modes.c_str());
 
-			u2->SendMessage(source.owner, _("\002%s\002 changed your usermodes to %s."), u->nick.c_str(), modes.c_str());
+			u2->SendMessage(source.owner, _("\002%s\002 changed your usermodes to %s."), source.GetNick().c_str(), modes.c_str());
 
-			Log(LOG_ADMIN, u, this) << modes << " on " << target;
+			Log(LOG_ADMIN, source, this) << modes << " on " << target;
 		}
 	}
 

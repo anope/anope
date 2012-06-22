@@ -17,7 +17,7 @@ class CommandModeBase : public Command
 {
 	void do_mode(CommandSource &source, Command *com, ChannelMode *cm, const Anope::string &chan, const Anope::string &nick, bool set, const Anope::string &level, const Anope::string &levelself)
 	{
-		User *u = source.u;
+		User *u = source.GetUser();
 		User *u2 = finduser(nick);
 		Channel *c = findchan(chan);
 
@@ -42,9 +42,9 @@ class CommandModeBase : public Command
 		}
 
 		bool is_same = u == u2;
-		AccessGroup u_access = ci->AccessFor(u), u2_access = ci->AccessFor(u2);
+		AccessGroup u_access = source.AccessFor(ci), u2_access = ci->AccessFor(u2);
 
-		if (is_same ? !ci->AccessFor(u).HasPriv(levelself) : !ci->AccessFor(u).HasPriv(level))
+		if (is_same ? !source.AccessFor(ci).HasPriv(levelself) : !source.AccessFor(ci).HasPriv(level))
 			source.Reply(ACCESS_DENIED);
 		else if (!set && !is_same && ci->HasFlag(CI_PEACE) && u2_access >= u_access)
 			source.Reply(ACCESS_DENIED);
@@ -59,7 +59,7 @@ class CommandModeBase : public Command
 			else
 				c->RemoveMode(NULL, cm, u2->nick);
 
-			Log(LOG_COMMAND, u, com, ci) << "for " << u2->nick;
+			Log(LOG_COMMAND, source, com, ci) << "for " << u2->nick;
 		}
 	}
 
@@ -76,15 +76,13 @@ class CommandModeBase : public Command
 	 */
 	void do_util(CommandSource &source, Command *com, ChannelMode *cm, const Anope::string &chan, const Anope::string &nick, bool set, const Anope::string &level, const Anope::string &levelself)
 	{
-		User *u = source.u;
+		User *u = source.GetUser();
 
-		if (chan.empty())
+		if (chan.empty() && u)
 			for (UChannelList::iterator it = u->chans.begin(); it != u->chans.end(); ++it)
 				do_mode(source, com, cm, (*it)->chan->name, u->nick, set, level, levelself);
-		else
+		else if (!chan.empty())
 			do_mode(source, com, cm, chan, !nick.empty() ? nick : u->nick, set, level, levelself);
-
-		return;
 	}
 
  public:

@@ -24,7 +24,6 @@ class CommandBSSetFantasy : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		User *u = source.u;
 		ChannelInfo *ci = cs_findchan(params[0]);
 		const Anope::string &value = params[1];
 
@@ -34,7 +33,7 @@ class CommandBSSetFantasy : public Command
 			return;
 		}
 
-		if (!u->HasPriv("botserv/administration") && !ci->AccessFor(u).HasPriv("SET"))
+		if (!source.HasPriv("botserv/administration") && !source.AccessFor(ci).HasPriv("SET"))
 		{
 			source.Reply(ACCESS_DENIED);
 			return;
@@ -48,16 +47,16 @@ class CommandBSSetFantasy : public Command
 
 		if (value.equals_ci("ON"))
 		{
-			bool override = !ci->AccessFor(u).HasPriv("SET");
-			Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "to enable fantasy"; 
+			bool override = !source.AccessFor(ci).HasPriv("SET");
+			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to enable fantasy"; 
 
 			ci->botflags.SetFlag(BS_FANTASY);
 			source.Reply(_("Fantasy mode is now \002on\002 on channel %s."), ci->name.c_str());
 		}
 		else if (value.equals_ci("OFF"))
 		{
-			bool override = !ci->AccessFor(u).HasPriv("SET");
-			Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "to disable fantasy"; 
+			bool override = !source.AccessFor(ci).HasPriv("SET");
+			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to disable fantasy"; 
 
 			ci->botflags.UnsetFlag(BS_FANTASY);
 			source.Reply(_("Fantasy mode is now \002off\002 on channel %s."), ci->name.c_str());

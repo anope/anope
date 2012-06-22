@@ -24,7 +24,6 @@ class CommandOSKick : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		User *u = source.u;
 		const Anope::string &chan = params[0];
 		const Anope::string &nick = params[1];
 		const Anope::string &s = params[2];
@@ -47,8 +46,8 @@ class CommandOSKick : public Command
 			return;
 		}
 
-		c->Kick(source.owner, u2, "%s (%s)", u->nick.c_str(), s.c_str());
-		Log(LOG_ADMIN, u, this) << "on " << u2->nick << " in " << c->name << " (" << s << ")";
+		c->Kick(source.owner, u2, "%s (%s)", source.GetNick().c_str(), s.c_str());
+		Log(LOG_ADMIN, source, this) << "on " << u2->nick << " in " << c->name << " (" << s << ")";
 		return;
 	}
 

@@ -26,7 +26,6 @@ class CommandCSClearUsers : public Command
 	{
 		const Anope::string &chan = params[0];
 
-		User *u = source.u;
 		Channel *c = findchan(chan);
 		Anope::string modebuf;
 
@@ -40,13 +39,13 @@ class CommandCSClearUsers : public Command
 			source.Reply(CHAN_X_NOT_REGISTERED, c->name.c_str());
 			return;
 		}
-		else if (!c->ci->AccessFor(u).HasPriv("FOUNDER") && !u->HasCommand("chanserv/clearusers"))
+		else if (!source.AccessFor(c->ci).HasPriv("FOUNDER") && !source.HasCommand("chanserv/clearusers"))
 		{
 			source.Reply(ACCESS_DENIED);
 			return;
 		}
 		
-		Anope::string buf = "CLEARUSERS command from " + u->nick + " (" + u->Account()->display + ")";
+		Anope::string buf = "CLEARUSERS command from " + source.GetNick() + " (" + source.nc->display + ")";
 
 		for (CUserList::iterator it = c->users.begin(), it_end = c->users.end(); it != it_end; )
 		{
@@ -55,8 +54,8 @@ class CommandCSClearUsers : public Command
 			c->Kick(NULL, uc->user, "%s", buf.c_str());
 		}
 
-		bool override = !c->ci->AccessFor(u).HasPriv("FOUNDER");
-		Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, c->ci);
+		bool override = !source.AccessFor(c->ci).HasPriv("FOUNDER");
+		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, c->ci);
 
 		source.Reply(_("All users have been kicked from \002%s\002."), chan.c_str());
 

@@ -22,14 +22,13 @@ class CommandCSSync : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		User *u = source.u;
 		ChannelInfo *ci = cs_findchan(params[0]);
 
 		if (ci == NULL)
 			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
 		else if (ci->c == NULL)
 			source.Reply(CHAN_X_NOT_IN_USE, params[0].c_str());
-		else if (!ci->AccessFor(u).HasPriv("ACCESS_CHANGE"))
+		else if (!source.AccessFor(ci).HasPriv("ACCESS_CHANGE"))
 			source.Reply(ACCESS_DENIED);
 		else
 		{

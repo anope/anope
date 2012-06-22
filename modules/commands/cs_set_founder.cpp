@@ -24,7 +24,6 @@ class CommandCSSetFounder : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		User *u = source.u;
 		ChannelInfo *ci = cs_findchan(params[0]);
 		if (ci == NULL)
 		{
@@ -32,13 +31,13 @@ class CommandCSSetFounder : public Command
 			return;
 		}
 
-		if (source.permission.empty() && !ci->AccessFor(u).HasPriv("SET"))
+		if (source.permission.empty() && !source.AccessFor(ci).HasPriv("SET"))
 		{
 			source.Reply(ACCESS_DENIED);
 			return;
 		}
 
-		if (source.permission.empty() && (ci->HasFlag(CI_SECUREFOUNDER) ? !IsFounder(u, ci) : !ci->AccessFor(u).HasPriv("FOUNDER")))
+		if (source.permission.empty() && (ci->HasFlag(CI_SECUREFOUNDER) ? !source.IsFounder(ci) : !source.AccessFor(ci).HasPriv("FOUNDER")))
 		{
 			source.Reply(ACCESS_DENIED);
 			return;
@@ -52,13 +51,13 @@ class CommandCSSetFounder : public Command
 		}
 
 		NickCore *nc = na->nc;
-		if (Config->CSMaxReg && nc->channelcount >= Config->CSMaxReg && !u->HasPriv("chanserv/no-register-limit"))
+		if (Config->CSMaxReg && nc->channelcount >= Config->CSMaxReg && !source.HasPriv("chanserv/no-register-limit"))
 		{
 			source.Reply(_("\002%s\002 has too many channels registered."), na->nick.c_str());
 			return;
 		}
 
-		Log(!source.permission.empty() ? LOG_ADMIN : LOG_COMMAND, u, this, ci) << "to change the founder from " << (ci->GetFounder() ? ci->GetFounder()->display : "(none)") << " to " << nc->display;
+		Log(!source.permission.empty() ? LOG_ADMIN : LOG_COMMAND, source, this, ci) << "to change the founder from " << (ci->GetFounder() ? ci->GetFounder()->display : "(none)") << " to " << nc->display;
 
 		ci->SetFounder(nc);
 

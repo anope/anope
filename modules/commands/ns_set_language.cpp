@@ -51,7 +51,7 @@ class CommandNSSetLanguage : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &param) anope_override
 	{
-		this->Run(source, source.u->Account()->display, param[0]);
+		this->Run(source, source.nc->display, param[0]);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &) anope_override

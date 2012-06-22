@@ -28,11 +28,10 @@ class CommandNSGetEMail : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		User *u = source.u;
 		const Anope::string &email = params[0];
 		int j = 0;
 
-		Log(LOG_ADMIN, u, this) << "on " << email;
+		Log(LOG_ADMIN, source, this) << "on " << email;
 
 		for (nickcore_map::const_iterator it = NickCoreList->begin(), it_end = NickCoreList->end(); it != it_end; ++it)
 		{

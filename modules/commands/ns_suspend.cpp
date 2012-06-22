@@ -70,7 +70,6 @@ class CommandNSSuspend : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		User *u = source.u;
 
 		const Anope::string &nick = params[0];
 		Anope::string expiry = params[1];
@@ -139,7 +138,7 @@ class CommandNSSuspend : public Command
 			nc->Extend("ns_suspend_expire", ns);
 		}
 
-		Log(LOG_ADMIN, u, this) << "for " << nick << " (" << (!reason.empty() ? reason : "No reason") << "), expires in " << (expiry_secs ? do_strftime(Anope::CurTime + expiry_secs) : "never");
+		Log(LOG_ADMIN, source, this) << "for " << nick << " (" << (!reason.empty() ? reason : "No reason") << "), expires in " << (expiry_secs ? do_strftime(Anope::CurTime + expiry_secs) : "never");
 		source.Reply(_("Nick %s is now suspended."), nick.c_str());
 
 		FOREACH_MOD(I_OnNickSuspended, OnNickSuspend(na));
@@ -170,7 +169,6 @@ class CommandNSUnSuspend : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		User *u = source.u;
 		const Anope::string &nick = params[0];
 
 		if (readonly)
@@ -195,7 +193,7 @@ class CommandNSUnSuspend : public Command
 		na->nc->UnsetFlag(NI_SUSPENDED);
 		na->nc->Shrink("ns_suspend_expire");
 
-		Log(LOG_ADMIN, u, this) << "for " << na->nick;
+		Log(LOG_ADMIN, source, this) << "for " << na->nick;
 		source.Reply(_("Nick %s is now released."), nick.c_str());
 
 		FOREACH_MOD(I_OnNickUnsuspended, OnNickUnsuspended(na));

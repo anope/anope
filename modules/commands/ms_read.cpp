@@ -36,7 +36,7 @@ static void rsend_notify(CommandSource &source, MemoInfo *mi, Memo *m, const Ano
 		Anope::string text = Anope::printf(translate(na->nc, _("\002[auto-memo]\002 The memo you sent to %s has been viewed.")), targ.c_str());
 
 		/* Send notification */
-		memoserv->Send(source.u->nick, m->sender, text, true);
+		memoserv->Send(source.GetNick(), m->sender, text, true);
 
 		/* Notify recepient of the memo that a notification has
 		   been sent to the sender */
@@ -78,7 +78,7 @@ class MemoListCallback : public NumberList
 
 		/* Check if a receipt notification was requested */
 		if (m->HasFlag(MF_RECEIPT))
-			rsend_notify(source, mi, m, ci ? ci->name : source.u->nick);
+			rsend_notify(source, mi, m, ci ? ci->name : source.GetNick());
 	}
 };
 
@@ -93,7 +93,6 @@ class CommandMSRead : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		User *u = source.u;
 
 		MemoInfo *mi;
 		ChannelInfo *ci = NULL;
@@ -110,7 +109,7 @@ class CommandMSRead : public Command
 				source.Reply(CHAN_X_NOT_REGISTERED, chan.c_str());
 				return;
 			}
-			else if (!ci->AccessFor(u).HasPriv("MEMO"))
+			else if (!source.AccessFor(ci).HasPriv("MEMO"))
 			{
 				source.Reply(ACCESS_DENIED);
 				return;
@@ -118,7 +117,7 @@ class CommandMSRead : public Command
 			mi = &ci->memos;
 		}
 		else
-			mi = const_cast<MemoInfo *>(&u->Account()->memos);
+			mi = const_cast<MemoInfo *>(&source.nc->memos);
 
 		if (numstr.empty() || (!numstr.equals_ci("LAST") && !numstr.equals_ci("NEW") && !numstr.is_number_only()))
 			this->OnSyntaxError(source, numstr);

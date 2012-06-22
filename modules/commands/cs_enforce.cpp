@@ -122,14 +122,13 @@ class CommandCSEnforce : public Command
 	{
 		const Anope::string &what = params.size() > 1 ? params[1] : "";
 
-		User *u = source.u;
 		Channel *c = findchan(params[0]);
 
 		if (!c)
 			source.Reply(CHAN_X_NOT_IN_USE, params[0].c_str());
 		else if (!c->ci)
 			source.Reply(CHAN_X_NOT_REGISTERED, c->name.c_str());
-		else if (!c->ci->AccessFor(u).HasPriv("AKICK"))
+		else if (!source.AccessFor(c->ci).HasPriv("AKICK"))
 			source.Reply(ACCESS_DENIED);
 		else
 		{

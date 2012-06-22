@@ -25,8 +25,7 @@ class CommandNSStatus : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		User *u = source.u;
-		const Anope::string &nick = !params.empty() ? params[0] : u->nick;
+		const Anope::string &nick = !params.empty() ? params[0] : source.GetNick();
 		const NickAlias *na = findnick(nick);
 		spacesepstream sep(nick);
 		Anope::string nickbuf;

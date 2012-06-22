@@ -27,13 +27,14 @@ class CommandCSRegister : public Command
 		const Anope::string &chan = params[0];
 		const Anope::string &chdesc = params.size() > 1 ? params[1] : "";
 
-		User *u = source.u;
+		User *u = source.GetUser();
+		NickCore *nc = source.nc;
 		Channel *c = findchan(params[0]);
 		ChannelInfo *ci = cs_findchan(params[0]);
 
 		if (readonly)
 			source.Reply(_("Sorry, channel registration is temporarily disabled."));
-		else if (u->Account()->HasFlag(NI_UNCONFIRMED))
+		else if (nc->HasFlag(NI_UNCONFIRMED))
 			source.Reply(_("You must confirm your account before you can register a channel."));
 		else if (chan[0] == '&')
 			source.Reply(_("Local channels cannot be registered."));
@@ -45,19 +46,19 @@ class CommandCSRegister : public Command
 			source.Reply(_("Channel \002%s\002 is already registered!"), chan.c_str());
 		else if (c && !c->HasUserStatus(u, CMODE_OP))
 			source.Reply(_("You must be a channel operator to register the channel."));
-		else if (Config->CSMaxReg && u->Account()->channelcount >= Config->CSMaxReg && !u->HasPriv("chanserv/no-register-limit"))
-			source.Reply(u->Account()->channelcount > Config->CSMaxReg ? CHAN_EXCEEDED_CHANNEL_LIMIT : CHAN_REACHED_CHANNEL_LIMIT, Config->CSMaxReg);
+		else if (Config->CSMaxReg && nc->channelcount >= Config->CSMaxReg && !source.HasPriv("chanserv/no-register-limit"))
+			source.Reply(nc->channelcount > Config->CSMaxReg ? CHAN_EXCEEDED_CHANNEL_LIMIT : CHAN_REACHED_CHANNEL_LIMIT, Config->CSMaxReg);
 		else
 		{
 			ci = new ChannelInfo(chan);
-			ci->SetFounder(u->Account());
+			ci->SetFounder(nc);
 			if (!chdesc.empty())
 				ci->desc = chdesc;
 
 			for (ChannelInfo::ModeList::iterator it = def_mode_locks.begin(), it_end = def_mode_locks.end(); it != it_end; ++it)
 			{
 				ModeLock *ml = new ModeLock(*it->second);
-				ml->setter = u->nick;
+				ml->setter = source.GetNick();
 				ml->ci = ci;
 				ci->mode_locks->insert(std::make_pair(it->first, ml));
 			}
@@ -71,8 +72,8 @@ class CommandCSRegister : public Command
 			else
 				ci->last_topic_setter = source.owner->nick;
 
-			Log(LOG_COMMAND, u, this, ci);
-			source.Reply(_("Channel \002%s\002 registered under your nickname: %s"), chan.c_str(), u->nick.c_str());
+			Log(LOG_COMMAND, source, this, ci);
+			source.Reply(_("Channel \002%s\002 registered under your account: %s"), chan.c_str(), nc->display.c_str());
 
 			/* Implement new mode lock */
 			if (c)
@@ -80,7 +81,7 @@ class CommandCSRegister : public Command
 				c->CheckModes();
 
 				ChannelMode *cm;
-				if (u->FindChannel(c) != NULL)
+				if (u && u->FindChannel(c) != NULL)
 				{
 					/* On most ircds you do not receive the admin/owner mode till its registered */
 					if ((cm = ModeManager::FindChannelModeByName(CMODE_OWNER)))

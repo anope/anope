@@ -24,7 +24,6 @@ class CommandBSSetPrivate : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		User *u = source.u;
 		BotInfo *bi = findbot(params[0]);
 		const Anope::string &value = params[1];
 
@@ -34,7 +33,7 @@ class CommandBSSetPrivate : public Command
 			return;
 		}
 
-		if (!u->HasCommand("botserv/set/private"))
+		if (!source.HasCommand("botserv/set/private"))
 		{
 			source.Reply(ACCESS_DENIED);
 			return;

@@ -50,8 +50,6 @@ class CommandCSAKick : public Command
 {
 	void DoAdd(CommandSource &source, ChannelInfo *ci, const std::vector<Anope::string> &params)
 	{
-		User *u = source.u;
-
 		Anope::string mask = params[2];
 		Anope::string reason = params.size() > 3 ? params[3] : "";
 		const NickAlias *na = findnick(mask);
@@ -86,7 +84,7 @@ class CommandCSAKick : public Command
 		* or whether the mask matches a user with higher/equal access - Viper */
 		if (ci->HasFlag(CI_PEACE) && nc)
 		{
-			AccessGroup nc_access = ci->AccessFor(nc), u_access = ci->AccessFor(u);
+			AccessGroup nc_access = ci->AccessFor(nc), u_access = source.AccessFor(ci);
 			if (nc == ci->GetFounder() || nc_access >= u_access)
 			{
 				source.Reply(ACCESS_DENIED);
@@ -101,7 +99,7 @@ class CommandCSAKick : public Command
 			{
 				User *u2 = it->second;
 
-				AccessGroup nc_access = ci->AccessFor(nc), u_access = ci->AccessFor(u);
+				AccessGroup nc_access = ci->AccessFor(nc), u_access = source.AccessFor(ci);
 				Entry entry_mask(CMODE_BEGIN, mask);
 
 				if ((ci->AccessFor(u2).HasPriv("FOUNDER") || nc_access >= u_access) && entry_mask.Matches(u2))
@@ -117,7 +115,7 @@ class CommandCSAKick : public Command
 			{
 				na = it->second;
 
-				AccessGroup nc_access = ci->AccessFor(na->nc), u_access = ci->AccessFor(u);
+				AccessGroup nc_access = ci->AccessFor(na->nc), u_access = source.AccessFor(ci);
 				if (na->nc && (na->nc == ci->GetFounder() || nc_access >= u_access))
 				{
 					Anope::string buf = na->nick + "!" + na->last_usermask;
@@ -147,14 +145,14 @@ class CommandCSAKick : public Command
 		}
 
 		if (nc)
-			akick = ci->AddAkick(u->nick, nc, reason);
+			akick = ci->AddAkick(source.GetNick(), nc, reason);
 		else
-			akick = ci->AddAkick(u->nick, mask, reason);
+			akick = ci->AddAkick(source.GetNick(), mask, reason);
 
-		bool override = !ci->AccessFor(u).HasPriv("AKICK");
-		Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "to add " << mask << (reason == "" ? "" : ": ") << reason;
+		bool override = !source.AccessFor(ci).HasPriv("AKICK");
+		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to add " << mask << (reason == "" ? "" : ": ") << reason;
 
-		FOREACH_MOD(I_OnAkickAdd, OnAkickAdd(u, ci, akick));
+		FOREACH_MOD(I_OnAkickAdd, OnAkickAdd(source, ci, akick));
 
 		source.Reply(_("\002%s\002 added to %s autokick list."), mask.c_str(), ci->name.c_str());
 
@@ -163,8 +161,6 @@ class CommandCSAKick : public Command
 
 	void DoDel(CommandSource &source, ChannelInfo *ci, const std::vector<Anope::string> &params)
 	{
-		User *u = source.u;
-
 		const Anope::string &mask = params[2];
 		unsigned i, end;
 
@@ -190,8 +186,8 @@ class CommandCSAKick : public Command
 
 				~AkickDelCallback()
 				{
-					bool override = !ci->AccessFor(source.u).HasPriv("AKICK");
-					Log(override ? LOG_OVERRIDE : LOG_COMMAND, source.u, c, ci) << "to delete " << Deleted << (Deleted == 1 ? " entry" : " entries");
+					bool override = !source.AccessFor(ci).HasPriv("AKICK");
+					Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, c, ci) << "to delete " << Deleted << (Deleted == 1 ? " entry" : " entries");
 
 					if (!Deleted)
 						source.Reply(_("No matching entries on %s autokick list."), ci->name.c_str());
@@ -206,7 +202,7 @@ class CommandCSAKick : public Command
 					if (!Number || Number > ci->GetAkickCount())
 						return;
 
-					FOREACH_MOD(I_OnAkickDel, OnAkickDel(source.u, ci, ci->GetAkick(Number - 1)));
+					FOREACH_MOD(I_OnAkickDel, OnAkickDel(source, ci, ci->GetAkick(Number - 1)));
 
 					++Deleted;
 					ci->EraseAkick(Number - 1);
@@ -234,10 +230,10 @@ class CommandCSAKick : public Command
 				return;
 			}
 
-			bool override = !ci->AccessFor(u).HasPriv("AKICK");
-			Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "to delete " << mask;
+			bool override = !source.AccessFor(ci).HasPriv("AKICK");
+			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to delete " << mask;
 
-			FOREACH_MOD(I_OnAkickDel, OnAkickDel(u, ci, ci->GetAkick(i)));
+			FOREACH_MOD(I_OnAkickDel, OnAkickDel(source, ci, ci->GetAkick(i)));
 
 			ci->EraseAkick(i);
 
@@ -370,7 +366,6 @@ class CommandCSAKick : public Command
 
 	void DoEnforce(CommandSource &source, ChannelInfo *ci)
 	{
-		User *u = source.u;
 		Channel *c = ci->c;
 		int count = 0;
 
@@ -388,17 +383,16 @@ class CommandCSAKick : public Command
 				++count;
 		}
 
-		bool override = !ci->AccessFor(u).HasPriv("AKICK");
-		Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "ENFORCE, affects " << count << " users";
+		bool override = !source.AccessFor(ci).HasPriv("AKICK");
+		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "ENFORCE, affects " << count << " users";
 
 		source.Reply(_("AKICK ENFORCE for \002%s\002 complete; \002%d\002 users were affected."), ci->name.c_str(), count);
 	}
 
 	void DoClear(CommandSource &source, ChannelInfo *ci)
 	{
-		User *u = source.u;
-		bool override = !ci->AccessFor(u).HasPriv("AKICK");
-		Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "to clear the akick list";
+		bool override = !source.AccessFor(ci).HasPriv("AKICK");
+		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to clear the akick list";
 
 		ci->ClearAkick();
 		source.Reply(_("Channel %s akick list has been cleared."), ci->name.c_str());
@@ -422,8 +416,6 @@ class CommandCSAKick : public Command
 		Anope::string cmd = params[1];
 		Anope::string mask = params.size() > 2 ? params[2] : "";
 
-		User *u = source.u;
-
 		ChannelInfo *ci = cs_findchan(params[0]);
 		if (ci == NULL)
 		{
@@ -433,7 +425,7 @@ class CommandCSAKick : public Command
 
 		if (mask.empty() && (cmd.equals_ci("ADD") || cmd.equals_ci("DEL")))
 			this->OnSyntaxError(source, cmd);
-		else if (!ci->AccessFor(u).HasPriv("AKICK") && !u->HasPriv("chanserv/access/modify"))
+		else if (!source.AccessFor(ci).HasPriv("AKICK") && !source.HasPriv("chanserv/access/modify"))
 			source.Reply(ACCESS_DENIED);
 		else if (!cmd.equals_ci("LIST") && !cmd.equals_ci("VIEW") && !cmd.equals_ci("ENFORCE") && readonly)
 			source.Reply(_("Sorry, channel autokick list modification is temporarily disabled."));

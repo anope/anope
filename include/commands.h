@@ -33,11 +33,23 @@ struct CommandInfo
 	Anope::string permission;
 };
 
-/* The source for a command */
-struct CoreExport CommandSource
+struct CommandReply
 {
-	/* User executing the command */
+	virtual void SendMessage(const BotInfo *source, const Anope::string &msg) = 0;
+};
+
+/* The source for a command */
+class CoreExport CommandSource
+{
+	/* The nick executing the command */
+	Anope::string nick;
+	/* User executing the command, may be NULL */
 	User *u;
+ public:
+	/* The account executing the command */
+	NickCore *nc;
+	/* Where the reply should go */
+	CommandReply *reply;
 	/* Channel the command was executed on (fantasy) */
 	Channel *c;
 	/* The service this command is on */
@@ -49,8 +61,20 @@ struct CoreExport CommandSource
 	/* The permission of the command being executed */
 	Anope::string permission;
 
+	CommandSource(const Anope::string &n, User *user, NickCore *core, CommandReply *reply);
+
+	const Anope::string &GetNick() const;
+	User *GetUser() const;
+	AccessGroup AccessFor(ChannelInfo *ci) const;
+	bool IsFounder(ChannelInfo *ci) const;
+
 	void Reply(const char *message, ...);
 	void Reply(const Anope::string &message);
+
+	bool HasCommand(const Anope::string &cmd);
+	bool HasPriv(const Anope::string &cmd);
+	bool IsServicesOper() const;
+	bool IsOper() const;
 };
 
 /** Every services command is a class, inheriting from Command.
@@ -117,5 +141,7 @@ class CoreExport Command : public Service, public Flags<CommandFlag>
 	 */
 	virtual void OnSyntaxError(CommandSource &source, const Anope::string &subcommand);
 };
+
+extern void RunCommand(CommandSource &source, const Anope::string &message);
 
 #endif // COMMANDS_H

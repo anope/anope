@@ -75,8 +75,6 @@ class CommandCSFlags : public Command
 {
 	void DoModify(CommandSource &source, ChannelInfo *ci, const std::vector<Anope::string> &params)
 	{
-		User *u = source.u;
-
 		Anope::string mask = params.size() > 2 ? params[2] : "";
 		Anope::string flags = params.size() > 3 ? params[3] : "";
 
@@ -86,7 +84,7 @@ class CommandCSFlags : public Command
 			return;
 		}
 
-		AccessGroup u_access = ci->AccessFor(u);
+		AccessGroup u_access = source.AccessFor(ci);
 
 		if (mask.find_first_of("!*@") == Anope::string::npos && !findnick(mask))
 		{
@@ -141,7 +139,7 @@ class CommandCSFlags : public Command
 					{
 						if (!u_access.HasPriv(it->first))
 						{
-							if (u->HasPriv("chanserv/access/modify"))
+							if (source.HasPriv("chanserv/access/modify"))
 								override = true;
 							else
 								continue;
@@ -161,7 +159,7 @@ class CommandCSFlags : public Command
 							continue;
 						else if (!u_access.HasPriv(it->first))
 						{
-							if (u->HasPriv("chanserv/access/modify"))
+							if (source.HasPriv("chanserv/access/modify"))
 								override = true;
 							else
 							{
@@ -181,9 +179,9 @@ class CommandCSFlags : public Command
 		{
 			if (current != NULL)
 			{
-				FOREACH_MOD(I_OnAccessDel, OnAccessDel(ci, u, current));
+				FOREACH_MOD(I_OnAccessDel, OnAccessDel(ci, source, current));
 				ci->EraseAccess(current);
-				Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "to delete " << mask;
+				Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to delete " << mask;
 				source.Reply(_("\002%s\002 removed from the %s access list."), mask.c_str(), ci->name.c_str());
 			}
 			else
@@ -199,7 +197,7 @@ class CommandCSFlags : public Command
 		FlagsChanAccess *access = anope_dynamic_static_cast<FlagsChanAccess *>(provider->Create());
 		access->ci = ci;
 		access->mask = mask;
-		access->creator = u->nick;
+		access->creator = source.GetNick();
 		access->last_seen = current ? current->last_seen : 0;
 		access->created = Anope::CurTime;
 		access->flags = current_flags;
@@ -209,9 +207,9 @@ class CommandCSFlags : public Command
 
 		ci->AddAccess(access);
 
-		FOREACH_MOD(I_OnAccessAdd, OnAccessAdd(ci, u, access));
+		FOREACH_MOD(I_OnAccessAdd, OnAccessAdd(ci, source, access));
 
-		Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "to modify " << mask << "'s flags to " << access->Serialize();
+		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to modify " << mask << "'s flags to " << access->Serialize();
 		source.Reply(_("Access for \002%s\002 on %s set to +\002%s\002"), access->mask.c_str(), ci->name.c_str(), access->Serialize().c_str());
 
 		return;
@@ -259,7 +257,7 @@ class CommandCSFlags : public Command
 			entry["Mask"] = access->mask;
 			entry["Flags"] = FlagsChanAccess::DetermineFlags(access);
 			entry["Creator"] = access->creator;
-			entry["Created"] = do_strftime(access->created, source.u->Account(), true);
+			entry["Created"] = do_strftime(access->created, source.nc, true);
 			list.addEntry(entry);
 		}
 
@@ -282,20 +280,18 @@ class CommandCSFlags : public Command
 
 	void DoClear(CommandSource &source, ChannelInfo *ci)
 	{
-		User *u = source.u;
-
-		if (!IsFounder(u, ci) && !u->HasPriv("chanserv/access/modify"))
+		if (!source.IsFounder(ci) && !source.HasPriv("chanserv/access/modify"))
 			source.Reply(ACCESS_DENIED);
 		else
 		{
 			ci->ClearAccess();
 
-			FOREACH_MOD(I_OnAccessClear, OnAccessClear(ci, u));
+			FOREACH_MOD(I_OnAccessClear, OnAccessClear(ci, source));
 
 			source.Reply(_("Channel %s access list has been cleared."), ci->name.c_str());
 
-			bool override = !IsFounder(u, ci);
-			Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "to clear the access list";
+			bool override = !source.IsFounder(ci);
+			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to clear the access list";
 		}
 
 		return;
@@ -315,7 +311,6 @@ class CommandCSFlags : public Command
 		const Anope::string &chan = params[0];
 		const Anope::string &cmd = params[1];
 
-		User *u = source.u;
 		ChannelInfo *ci = cs_findchan(chan);
 		if (ci == NULL)
 		{
@@ -325,11 +320,11 @@ class CommandCSFlags : public Command
 
 		bool is_list = cmd.equals_ci("LIST");
 		bool has_access = false;
-		if (u->HasPriv("chanserv/access/modify"))
+		if (source.HasPriv("chanserv/access/modify"))
 			has_access = true;
-		else if (is_list && ci->AccessFor(u).HasPriv("ACCESS_LIST"))
+		else if (is_list && source.AccessFor(ci).HasPriv("ACCESS_LIST"))
 			has_access = true;
-		else if (ci->AccessFor(u).HasPriv("ACCESS_CHANGE"))
+		else if (source.AccessFor(ci).HasPriv("ACCESS_CHANGE"))
 			has_access = true;
 
 		if (!has_access)
@@ -379,7 +374,7 @@ class CommandCSFlags : public Command
 			Privilege *p = PrivilegeManager::FindPrivilege(it->second);
 			if (p == NULL)
 				continue;
-			source.Reply("  %c - %s", it->first, translate(source.u->Account(), p->desc.c_str()));
+			source.Reply("  %c - %s", it->first, translate(source.nc, p->desc.c_str()));
 		}
 
 		return true;

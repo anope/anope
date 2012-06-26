@@ -598,12 +598,12 @@ class CommandCSQOP : public XOPBase
 				"QOP list.\n"
 				" \n"
 				"The \002QOP DEL\002 command removes the given nick from the\n"
-				"QOP list.  If a list of entry numbers is given, those\n"
-				"entries are deleted.  (See the example for LIST below.)\n"
+				"QOP list. If a list of entry numbers is given, those\n"
+				"entries are deleted. (See the example for LIST below.)\n"
 				" \n"
-				"The \002QOP LIST\002 command displays the QOP list.  If\n"
+				"The \002QOP LIST\002 command displays the QOP list. If\n"
 				"a wildcard mask is given, only those entries matching the\n"
-				"mask are displayed.  If a list of entry numbers is given,\n"
+				"mask are displayed. If a list of entry numbers is given,\n"
 				"only those entries are shown; for example:\n"
 				"   \002QOP #channel LIST 2-5,7-9\002\n"
 				"      Lists QOP entries numbered 2 through 5 and\n"
@@ -612,15 +612,14 @@ class CommandCSQOP : public XOPBase
 				"The \002QOP CLEAR\002 command clears all entries of the\n"
 				"QOP list.\n"));
 		source.Reply(_(" \n"
-				"The \002QOP\002 commands are limited to\n"
-				"founders (unless SECUREOPS is off). However, any user on the\n"
-				"QOP list may use the \002QOP LIST\002 command.\n"
+				"The \002QOP\002 commands are limited to founders\n"
+				"(unless SECUREOPS is off). However, any user on the\n"
+				"VOP list may use the \002QOP LIST\002 command.\n"
 				" \n"));
-		source.Reply(_("This command may have been disabled for your channel, and\n"
-				"in that case you need to use the access list. See\n"
-				"\002%s%s HELP ACCESS\002 for information about the access list,\n"
-				"and \002%s%s HELP SET XOP\002 to know how to toggle between\n"
-				"the access list and xOP list systems."),
+		source.Reply(_("Alternative methods of modifying channel access lists are\n"
+				"available. See \002%s%s HELP ACCESS\002 for information\n"
+				"about the access list, and \002%s%s HELP FLAGS\002 for\n"
+				"information about the flags based system."),
 				Config->UseStrictPrivMsgString.c_str(), source.owner->nick.c_str(),
 				Config->UseStrictPrivMsgString.c_str(), source.owner->nick.c_str());
 		return true;
@@ -653,12 +652,12 @@ class CommandCSAOP : public XOPBase
 				"AOP list.\n"
 				" \n"
 				"The \002AOP DEL\002 command removes the given nick from the\n"
-				"AOP list.  If a list of entry numbers is given, those\n"
-				"entries are deleted.  (See the example for LIST below.)\n"
+				"AOP list. If a list of entry numbers is given, those\n"
+				"entries are deleted. (See the example for LIST below.)\n"
 				" \n"
-				"The \002AOP LIST\002 command displays the AOP list.  If\n"
+				"The \002AOP LIST\002 command displays the AOP list. If\n"
 				"a wildcard mask is given, only those entries matching the\n"
-				"mask are displayed.  If a list of entry numbers is given,\n"
+				"mask are displayed. If a list of entry numbers is given,\n"
 				"only those entries are shown; for example:\n"
 				"   \002AOP #channel LIST 2-5,7-9\002\n"
 				"      Lists AOP entries numbered 2 through 5 and\n"
@@ -670,13 +669,12 @@ class CommandCSAOP : public XOPBase
 				"The \002AOP ADD\002 and \002AOP DEL\002 commands are limited to\n"
 				"SOPs or above, while the \002AOP CLEAR\002 command can only\n"
 				"be used by the channel founder. However, any user on the\n"
-				"AOP list may use the \002AOP LIST\002 command.\n"
+				"VOP list may use the \002AOP LIST\002 command.\n"
 				" \n"));
-		source.Reply(_("This command may have been disabled for your channel, and\n"
-				"in that case you need to use the access list. See\n"
-				"\002%s%s HELP ACCESS\002 for information about the access list,\n"
-				"and \002%s%s HELP SET XOP\002 to know how to toggle between\n"
-				"the access list and xOP list systems."),
+		source.Reply(_("Alternative methods of modifying channel access lists are\n"
+				"available. See \002%s%s HELP ACCESS\002 for information\n"
+				"about the access list, and \002%s%s HELP FLAGS\002 for\n"
+				"information about the flags based system."),
 				Config->UseStrictPrivMsgString.c_str(), source.owner->nick.c_str(), 
 				Config->UseStrictPrivMsgString.c_str(), source.owner->nick.c_str());
 		return true;
@@ -708,12 +706,12 @@ class CommandCSHOP : public XOPBase
 				"HOP list.\n"
 				" \n"
 				"The \002HOP DEL\002 command removes the given nick from the\n"
-				"HOP list.  If a list of entry numbers is given, those\n"
-				"entries are deleted.  (See the example for LIST below.)\n"
+				"HOP list. If a list of entry numbers is given, those\n"
+				"entries are deleted. (See the example for LIST below.)\n"
 				" \n"
-				"The \002HOP LIST\002 command displays the HOP list.  If\n"
+				"The \002HOP LIST\002 command displays the HOP list. If\n"
 				"a wildcard mask is given, only those entries matching the\n"
-				"mask are displayed.  If a list of entry numbers is given,\n"
+				"mask are displayed. If a list of entry numbers is given,\n"
 				"only those entries are shown; for example:\n"
 				"   \002HOP #channel LIST 2-5,7-9\002\n"
 				"      Lists HOP entries numbered 2 through 5 and\n"
@@ -722,15 +720,15 @@ class CommandCSHOP : public XOPBase
 				"The \002HOP CLEAR\002 command clears all entries of the\n"
 				"HOP list.\n"));
 		source.Reply(_(" \n"
-				"The \002HOP ADD\002, \002HOP DEL\002 and \002HOP LIST\002 commands are\n"
-				"limited to AOPs or above, while the \002HOP CLEAR\002 command\n"
-				"can only be used by the channel founder.\n"
+				"The \002HOP ADD\002 and \002HOP DEL\002 commands are limited\n"
+				"to SOPs or above, while \002HOP LIST\002 is available to VOPs\n"
+				"and above. The \002HOP CLEAR\002 command can only be used by the\n"
+				"channel founder.\n"
 				" \n"));
-		source.Reply(_("This command may have been disabled for your channel, and\n"
-				"in that case you need to use the access list. See\n"
-				"\002%s%s HELP ACCESS\002 for information about the access list,\n"
-				"and \002%s%s HELP SET XOP\002 to know how to toggle between\n"
-				"the access list and xOP list systems."),
+		source.Reply(_("Alternative methods of modifying channel access lists are\n"
+				"available. See \002%s%s HELP ACCESS\002 for information\n"
+				"about the access list, and \002%s%s HELP FLAGS\002 for\n"
+				"information about the flags based system."),
 				Config->UseStrictPrivMsgString.c_str(), source.owner->nick.c_str(),
 				Config->UseStrictPrivMsgString.c_str(), source.owner->nick.c_str());
 		return true;
@@ -763,15 +761,15 @@ class CommandCSSOP : public XOPBase
 				"SOP list.\n"
 				" \n"
 				"The \002SOP DEL\002 command removes the given nick from the\n"
-				"SOP list.  If a list of entry numbers is given, those\n"
-				"entries are deleted.  (See the example for LIST below.)\n"
+				"SOP list. If a list of entry numbers is given, those\n"
+				"entries are deleted. (See the example for LIST below.)\n"
 				" \n"
-				"The \002SOP LIST\002 command displays the SOP list.  If\n"
+				"The \002SOP LIST\002 command displays the SOP list. If\n"
 				"a wildcard mask is given, only those entries matching the\n"
-				"mask are displayed.  If a list of entry numbers is given,\n"
+				"mask are displayed. If a list of entry numbers is given,\n"
 				"only those entries are shown; for example:\n"
 				"   \002SOP #channel LIST 2-5,7-9\002\n"
-				"      Lists AOP entries numbered 2 through 5 and\n"
+				"      Lists SOP entries numbered 2 through 5 and\n"
 				"      7 through 9.\n"
 				"      \n"
 				"The \002SOP CLEAR\002 command clears all entries of the\n"
@@ -779,13 +777,12 @@ class CommandCSSOP : public XOPBase
 		source.Reply(_(" \n"
 				"The \002SOP ADD\002, \002SOP DEL\002 and \002SOP CLEAR\002 commands are\n"
 				"limited to the channel founder. However, any user on the\n"
-				"AOP list may use the \002SOP LIST\002 command.\n"
+				"VOP list may use the \002SOP LIST\002 command.\n"
 				" \n"));
-		source.Reply(_("This command may have been disabled for your channel, and\n"
-				"in that case you need to use the access list. See\n"
-				"\002%s%s HELP ACCESS\002 for information about the access list,\n"
-				"and \002%s%s HELP SET XOP\002 to know how to toggle between\n"
-				"the access list and xOP list systems."),
+		source.Reply(_("Alternative methods of modifying channel access lists are\n"
+				"available. See \002%s%s HELP ACCESS\002 for information\n"
+				"about the access list, and \002%s%s HELP FLAGS\002 for\n"
+				"information about the flags based system."),
 				Config->UseStrictPrivMsgString.c_str(), source.owner->nick.c_str(),
 				Config->UseStrictPrivMsgString.c_str(), source.owner->nick.c_str());
 		return true;
@@ -817,12 +814,12 @@ class CommandCSVOP : public XOPBase
 				"VOP list.\n"
 				" \n"
 				"The \002VOP DEL\002 command removes the given nick from the\n"
-				"VOP list.  If a list of entry numbers is given, those\n"
-				"entries are deleted.  (See the example for LIST below.)\n"
+				"VOP list. If a list of entry numbers is given, those\n"
+				"entries are deleted. (See the example for LIST below.)\n"
 				" \n"
-				"The \002VOP LIST\002 command displays the VOP list.  If\n"
+				"The \002VOP LIST\002 command displays the VOP list. If\n"
 				"a wildcard mask is given, only those entries matching the\n"
-				"mask are displayed.  If a list of entry numbers is given,\n"
+				"mask are displayed. If a list of entry numbers is given,\n"
 				"only those entries are shown; for example:\n"
 				"   \002VOP #channel LIST 2-5,7-9\002\n"
 				"      Lists VOP entries numbered 2 through 5 and\n"
@@ -831,15 +828,15 @@ class CommandCSVOP : public XOPBase
 				"The \002VOP CLEAR\002 command clears all entries of the\n"
 				"VOP list.\n"));
 		source.Reply(_(" \n"
-				"The \002VOP ADD\002, \002VOP DEL\002 and \002VOP LIST\002 commands are\n"
-				"limited to AOPs or above, while the \002VOP CLEAR\002 command\n"
-				"can only be used by the channel founder.\n"
+				"The \002VOP ADD\002 and \002VOP DEL\002 commands are limited\n"
+				"to SOPs or above, while \002VOP LIST\002 is available to VOPs\n"
+				"and above. The \002VOP CLEAR\002 command can only be used by the\n"
+				"channel founder.\n"
 				" \n"));
-		source.Reply(_("This command may have been disabled for your channel, and\n"
-				"in that case you need to use the access list. See\n"
-				"\002%s%s HELP ACCESS\002 for information about the access list,\n"
-				"and \002%s%s HELP SET XOP\002 to know how to toggle between\n"
-				"the access list and xOP list systems."),
+		source.Reply(_("Alternative methods of modifying channel access lists are\n"
+				"available. See \002%s%s HELP ACCESS\002 for information\n"
+				"about the access list, and \002%s%s HELP FLAGS\002 for\n"
+				"information about the flags based system."),
 				Config->UseStrictPrivMsgString.c_str(), source.owner->nick.c_str(),
 				Config->UseStrictPrivMsgString.c_str(), source.owner->nick.c_str());
 		return true;

@@ -234,8 +234,7 @@ void User::SendMessage(const BotInfo *source, const char *fmt, ...)
 	va_start(args, fmt);
 	vsnprintf(buf, BUFSIZE - 1, translated_message, args);
 
-	Anope::string m = buf;
-	this->SendMessage(source, buf);
+	this->SendMessage(source, Anope::string(buf));
 
 	va_end(args);
 }

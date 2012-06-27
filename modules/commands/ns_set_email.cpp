@@ -13,11 +13,6 @@
 
 #include "module.h"
 
-struct ExtensibleString : Anope::string, ExtensibleItem
-{
-	ExtensibleString(const Anope::string &s) : Anope::string(s) { }
-};
-
 static bool SendConfirmMail(User *u, const BotInfo *bi)
 {
 	int chars[] = {
@@ -32,7 +27,7 @@ static bool SendConfirmMail(User *u, const BotInfo *bi)
 	for (idx = 0; idx < 9; ++idx)
 		code += chars[1 + static_cast<int>((static_cast<float>(max - min)) * static_cast<uint16_t>(rand()) / 65536.0) + min];
 	
-	u->Account()->Extend("ns_set_email_passcode", new ExtensibleString(code));
+	u->Account()->Extend("ns_set_email_passcode", new ExtensibleItemClass<Anope::string>(code));
 
 	Anope::string subject = Config->MailEmailchangeSubject;
 	Anope::string message = Config->MailEmailchangeMessage;
@@ -85,7 +80,7 @@ class CommandNSSetEmail : public Command
 
 		if (!param.empty() && Config->NSConfirmEmailChanges && !source.IsServicesOper())
 		{
-			source.nc->Extend("ns_set_email", new ExtensibleString(param));
+			source.nc->Extend("ns_set_email", new ExtensibleItemClass<Anope::string>(param));
 			Anope::string old = source.nc->email;
 			source.nc->email = param;
 			if (SendConfirmMail(source.GetUser(), source.owner))
@@ -168,7 +163,7 @@ class NSSetEmail : public Module
 		NickCore *uac = source.nc;
 		if (command->name == "nickserv/confirm" && !params.empty() && uac)
 		{
-			Anope::string *new_email = uac->GetExt<ExtensibleString *>("ns_set_email"), *passcode = uac->GetExt<ExtensibleString *>("ns_set_email_passcode");
+			Anope::string *new_email = uac->GetExt<ExtensibleItemClass<Anope::string> *>("ns_set_email"), *passcode = uac->GetExt<ExtensibleItemClass<Anope::string> *>("ns_set_email_passcode");
 			if (new_email && passcode)
 			{
 				if (params[0] == *passcode)

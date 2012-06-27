@@ -13,11 +13,6 @@
 
 #include "module.h"
 
-struct ExtensibleString : Anope::string, ExtensibleItem
-{
-	ExtensibleString(const Anope::string &s) : Anope::string(s) { }
-};
-
 struct ChanSuspend : ExtensibleItem, Serializable
 {
 	Anope::string chan;
@@ -106,9 +101,9 @@ class CommandCSSuspend : public Command
 		}
 
 		ci->SetFlag(CI_SUSPENDED);
-		ci->Extend("suspend_by", new ExtensibleString(source.GetNick()));
+		ci->Extend("suspend_by", new ExtensibleItemClass<Anope::string>(source.GetNick()));
 		if (!reason.empty())
-			ci->Extend("suspend_reason", new ExtensibleString(reason));
+			ci->Extend("suspend_reason", new ExtensibleItemClass<Anope::string>(reason));
 
 		if (ci->c)
 		{
@@ -185,7 +180,7 @@ class CommandCSUnSuspend : public Command
 			return;
 		}
 
-		Anope::string *by = ci->GetExt<ExtensibleString *>("suspend_by"), *reason = ci->GetExt<ExtensibleString *>("suspend_reason");
+		Anope::string *by = ci->GetExt<ExtensibleItemClass<Anope::string> *>("suspend_by"), *reason = ci->GetExt<ExtensibleItemClass<Anope::string> *>("suspend_reason");
 		if (by != NULL)
 			Log(LOG_ADMIN, source, this, ci) << " which was suspended by " << *by << " for: " << (reason && !reason->empty() ? *reason : "No reason");
 

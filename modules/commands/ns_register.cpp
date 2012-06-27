@@ -15,11 +15,6 @@
 
 static bool SendRegmail(User *u, const NickAlias *na, const BotInfo *bi);
 
-struct ExtensibleString : Anope::string, ExtensibleItem
-{
-	ExtensibleString(const Anope::string &s) : Anope::string(s) { }
-};
-
 class CommandNSConfirm : public Command
 {
  public:
@@ -50,7 +45,7 @@ class CommandNSConfirm : public Command
 		}
 		else if (source.nc)
 		{
-			Anope::string *code = source.nc->GetExt<ExtensibleString *>("ns_register_passcode");
+			Anope::string *code = source.nc->GetExt<ExtensibleItemClass<Anope::string> *>("ns_register_passcode");
 			if (code != NULL && *code == passcode)
 			{
 				NickCore *nc = source.nc;
@@ -354,7 +349,7 @@ static bool SendRegmail(User *u, const NickAlias *na, const BotInfo *bi)
 {
 	NickCore *nc = na->nc;
 
-	Anope::string *code = na->nc->GetExt<ExtensibleString *>("ns_register_passcode");
+	Anope::string *code = na->nc->GetExt<ExtensibleItemClass<Anope::string> *>("ns_register_passcode");
 	Anope::string codebuf;
 	if (code == NULL)
 	{
@@ -368,7 +363,7 @@ static bool SendRegmail(User *u, const NickAlias *na, const BotInfo *bi)
 		int idx, min = 1, max = 62;
 		for (idx = 0; idx < 9; ++idx)
 			codebuf += chars[1 + static_cast<int>((static_cast<float>(max - min)) * static_cast<uint16_t>(rand()) / 65536.0) + min];
-		nc->Extend("ns_register_passcode", new ExtensibleString(codebuf));
+		nc->Extend("ns_register_passcode", new ExtensibleItemClass<Anope::string>(codebuf));
 	}
 	else
 		codebuf = *code;

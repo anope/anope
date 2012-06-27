@@ -17,6 +17,11 @@ class CoreExport ExtensibleItem
 	virtual void OnDelete();
 };
 
+template<typename T> struct CoreExport ExtensibleItemClass : T, ExtensibleItem
+{
+	ExtensibleItemClass(const T& t) : T(t) { }
+};
+
 class CoreExport Extensible
 {
  private:

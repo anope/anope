@@ -13,8 +13,6 @@
 
 #include "module.h"
 
-struct ExtensibleString : Anope::string, ExtensibleItem { };
-
 class CommandCSInfo : public Command
 {
 	void CheckOptStr(Anope::string &buf, ChannelInfoFlag opt, const char *str, const ChannelInfo *ci, const NickCore *nc)
@@ -106,7 +104,7 @@ class CommandCSInfo : public Command
 		}
 		if (ci->HasFlag(CI_SUSPENDED))
 		{
-			Anope::string *by = ci->GetExt<ExtensibleString *>("suspend_by"), *reason = ci->GetExt<ExtensibleString *>("suspend_reason");
+			Anope::string *by = ci->GetExt<ExtensibleItemClass<Anope::string> *>("suspend_by"), *reason = ci->GetExt<ExtensibleItemClass<Anope::string> *>("suspend_reason");
 			if (by != NULL)
 				info["Suspended"] = Anope::printf("[%s] %s", by->c_str(), (reason && !reason->empty() ? reason->c_str() : NO_REASON));
 		}

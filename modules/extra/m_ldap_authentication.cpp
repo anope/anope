@@ -24,11 +24,6 @@ struct IdentifyInfo
 		user(u), command(c), source(s), params(pa), account(a), pass(p), lprov(lp), admin_bind(true) { }
 };
 
-struct ExtensibleString : Anope::string, ExtensibleItem
-{
-	ExtensibleString(const Anope::string &s) : Anope::string(s) { }
-};
-
 class IdentifyInterface : public LDAPInterface
 {
 	std::map<LDAPQuery, IdentifyInfo *> requests;
@@ -105,7 +100,7 @@ class IdentifyInterface : public LDAPInterface
 							u->SendMessage(bi, _("Your account \002%s\002 has been successfully created."), na->nick.c_str());
 					}
 
-					na->nc->Extend("m_ldap_authentication_dn", new ExtensibleString(ii->dn));
+					na->nc->Extend("m_ldap_authentication_dn", new ExtensibleItemClass<Anope::string>(ii->dn));
 				
 					enc_encrypt(ii->pass, na->nc->pass);
 		
@@ -300,7 +295,7 @@ class NSIdentifyLDAP : public Module
 		if (email_attribute.empty() || !this->ldap || !u->Account()->HasExt("m_ldap_authentication_dn"))
 			return;
 
-		Anope::string *dn = u->Account()->GetExt<ExtensibleString *>("m_ldap_authentication_dn");
+		Anope::string *dn = u->Account()->GetExt<ExtensibleItemClass<Anope::string> *>("m_ldap_authentication_dn");
 		if (!dn || dn->empty())
 			return;
 

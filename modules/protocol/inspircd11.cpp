@@ -13,11 +13,6 @@
 
 #include "module.h"
 
-struct ExtensibleString : Anope::string, ExtensibleItem
-{
-	ExtensibleString(const Anope::string &s) : Anope::string(s) { }
-};
-
 IRCDVar myIrcd = {
 	"InspIRCd 1.1",	/* ircd name */
 	 "+I",				/* Modes used by pseudoclients */
@@ -333,7 +328,7 @@ class InspIRCdProto : public IRCDProto
 			return;
 
 		Anope::string svidbuf = stringify(u->timestamp);
-		u->Account()->Extend("authenticationtoken", new ExtensibleString(svidbuf));
+		u->Account()->Extend("authenticationtoken", new ExtensibleItemClass<Anope::string>(svidbuf));
 	}
 
 	void SendLogout(User *u) anope_override
@@ -388,7 +383,7 @@ class InspircdIRCdMessage : public IRCdMessage
 				user->SetCloakedHost(params[3]);
 
 				NickAlias *na = findnick(user->nick);
-				Anope::string *svidbuf = na ? na->nc->GetExt<ExtensibleString *>("authenticationtoken") : NULL;
+				Anope::string *svidbuf = na ? na->nc->GetExt<ExtensibleItemClass<Anope::string> *>("authenticationtoken") : NULL;
 				if (na && svidbuf && *svidbuf == params[0])
 				{
 					NickCore *nc = na->nc;

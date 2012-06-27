@@ -18,11 +18,6 @@ Anope::string DatabaseFile;
 Anope::string BackupFile;
 std::stringstream db_buffer;
 
-struct ExtensibleString : Anope::string, ExtensibleItem
-{
-	ExtensibleString(const Anope::string &s) : Anope::string(s) { }
-};
-
 class DatabaseException : public CoreException
 {
  public:
@@ -170,8 +165,8 @@ EventReturn OnDatabaseReadMetadata(ChannelInfo *ci, const Anope::string &key, co
 		}
 		else if (key.equals_ci("SUSPEND"))
 		{
-			ci->Extend("suspend_by", new ExtensibleString(params[0]));
-			ci->Extend("suspend_reason", new ExtensibleString(params[1]));
+			ci->Extend("suspend_by", new ExtensibleItemClass<Anope::string>(params[0]));
+			ci->Extend("suspend_reason", new ExtensibleItemClass<Anope::string>(params[1]));
 		}
 		else if (key.equals_ci("ACCESS")) // Older access system, from Anope 1.9.4.
 		{
@@ -776,7 +771,7 @@ class DBPlain : public Module
 				db_buffer << "MD FLAGS " << ci->ToString() << endl;
 			if (ci->HasFlag(CI_SUSPENDED))
 			{
-				Anope::string *by = ci->GetExt<ExtensibleString *>("suspend_by"), *reason = ci->GetExt<ExtensibleString *>("suspend_reason");
+				Anope::string *by = ci->GetExt<ExtensibleItemClass<Anope::string> *>("suspend_by"), *reason = ci->GetExt<ExtensibleItemClass<Anope::string> *>("suspend_reason");
 				if (by && reason)
 					db_buffer << "MD SUSPEND " << *by << " :" << *reason << endl;
 			}

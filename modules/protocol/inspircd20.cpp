@@ -138,8 +138,10 @@ bool event_chgname(const Anope::string &source, const std::vector<Anope::string>
 		Log(LOG_DEBUG) << "FNAME for nonexistent user " << source;
 		return true;
 	}
+	else if (params.empty())
+		return true;
 
-	u->SetRealname(!params.empty() ? params[0] : "");
+	u->SetRealname(params[0]);
 	return true;
 }
 
@@ -241,15 +243,14 @@ bool event_encap(const Anope::string &source, const std::vector<Anope::string> &
 		u->SetDisplayedHost(params[3]);
 		UplinkSocket::Message(u) << "FHOST " << params[3];
 	}
-	else if (params[1] == "CHGNAME" && params.size() > 2)
+	else if (params[1] == "CHGNAME" && params.size() > 3)
 	{
 		User *u = finduser(params[2]);
 		if (!u || u->server != Me)
 			return true;
 
-		const Anope::string &name = params.size() > 3 ? params[3] : "";
-		u->SetRealname(name);
-		UplinkSocket::Message(u) << "FNAME " << name;
+		u->SetRealname(params[3]);
+		UplinkSocket::Message(u) << "FNAME " << params[3];
 	}
 
 	return true;

@@ -125,8 +125,10 @@ bool event_setname(const Anope::string &source, const std::vector<Anope::string>
 		Log(LOG_DEBUG) << "SETNAME for nonexistent user " << source;
 		return true;
 	}
+	else if (params.empty())
+		return true;
 
-	u->SetRealname(!params.empty() ? params[0] : "");
+	u->SetRealname(params[0]);
 	return true;
 }
 
@@ -139,8 +141,10 @@ bool event_chgname(const Anope::string &source, const std::vector<Anope::string>
 		Log(LOG_DEBUG) << "FNAME for nonexistent user " << source;
 		return true;
 	}
+	else if (params.empty())
+		return true;
 
-	u->SetRealname(!params.empty() ? params[0] : "");
+	u->SetRealname(params[0]);
 	return true;
 }
 

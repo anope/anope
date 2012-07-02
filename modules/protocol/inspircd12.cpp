@@ -126,7 +126,7 @@ bool event_setname(const Anope::string &source, const std::vector<Anope::string>
 		return true;
 	}
 
-	u->SetRealname(params[0]);
+	u->SetRealname(!params.empty() ? params[0] : "");
 	return true;
 }
 
@@ -140,7 +140,7 @@ bool event_chgname(const Anope::string &source, const std::vector<Anope::string>
 		return true;
 	}
 
-	u->SetRealname(params[0]);
+	u->SetRealname(!params.empty() ? params[0] : "");
 	return true;
 }
 

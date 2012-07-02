@@ -129,20 +129,6 @@ bool event_fmode(const Anope::string &source, const std::vector<Anope::string> &
 	return ircdmessage->OnMode(source, newparams);
 }
 
-bool event_setname(const Anope::string &source, const std::vector<Anope::string> &params)
-{
-	User *u = finduser(source);
-
-	if (!u)
-	{
-		Log(LOG_DEBUG) << "SETNAME for nonexistent user " << source;
-		return true;
-	}
-
-	u->SetRealname(params[0]);
-	return true;
-}
-
 bool event_chgname(const Anope::string &source, const std::vector<Anope::string> &params)
 {
 	User *u = finduser(source);
@@ -153,21 +139,7 @@ bool event_chgname(const Anope::string &source, const std::vector<Anope::string>
 		return true;
 	}
 
-	u->SetRealname(params[0]);
-	return true;
-}
-
-bool event_setident(const Anope::string &source, const std::vector<Anope::string> &params)
-{
-	User *u = finduser(source);
-
-	if (!u)
-	{
-		Log(LOG_DEBUG) << "SETIDENT for nonexistent user " << source;
-		return true;
-	}
-
-	u->SetIdent(params[0]);
+	u->SetRealname(!params.empty() ? params[0] : "");
 	return true;
 }
 
@@ -182,20 +154,6 @@ bool event_chgident(const Anope::string &source, const std::vector<Anope::string
 	}
 
 	u->SetIdent(params[0]);
-	return true;
-}
-
-bool event_sethost(const Anope::string &source, const std::vector<Anope::string> &params)
-{
-	User *u = finduser(source);
-
-	if (!u)
-	{
-		Log(LOG_DEBUG) << "SETHOST for nonexistent user " << source;
-		return true;
-	}
-
-	u->SetDisplayedHost(params[0]);
 	return true;
 }
 
@@ -257,6 +215,43 @@ bool event_metadata(const Anope::string &source, const std::vector<Anope::string
 			FOREACH_MOD(I_OnFingerprint, OnFingerprint(u));
 		}
 	}
+	return true;
+}
+
+bool event_encap(const Anope::string &source, const std::vector<Anope::string> &params)
+{
+	if (params.size() < 2 || Server::Find(params[0]) != Me)
+		return true;
+
+	if (params[1] == "CHGIDENT" && params.size() > 3)
+	{
+		User *u = finduser(params[2]);
+		if (!u || u->server != Me)
+			return true;
+
+		u->SetIdent(params[3]);
+		UplinkSocket::Message(u) << "FIDENT " << params[3];
+	}
+	else if (params[1] == "CHGHOST" && params.size() > 3)
+	{
+		User *u = finduser(params[2]);
+		if (!u || u->server != Me)
+			return true;
+
+		u->SetDisplayedHost(params[3]);
+		UplinkSocket::Message(u) << "FHOST " << params[3];
+	}
+	else if (params[1] == "CHGNAME" && params.size() > 2)
+	{
+		User *u = finduser(params[2]);
+		if (!u || u->server != Me)
+			return true;
+
+		const Anope::string &name = params.size() > 3 ? params[3] : "";
+		u->SetRealname(name);
+		UplinkSocket::Message(u) << "FNAME " << name;
+	}
+
 	return true;
 }
 
@@ -705,8 +700,9 @@ class ProtoInspIRCd : public Module
 {
 	Message message_endburst, message_time,
 		message_rsquit, message_svsmode, message_fhost,
-		message_chgident, message_fname, message_sethost, message_setident, message_setname, message_fjoin, message_fmode,
-		message_ftopic, message_opertype, message_idle, message_metadata;
+		message_chgident, message_fname, message_fjoin, message_fmode,
+		message_ftopic, message_opertype, message_idle, message_metadata,
+		message_encap;
 	
 	InspIRCdProto ircd_proto;
 	Inspircd20IRCdMessage ircd_message;
@@ -716,11 +712,10 @@ class ProtoInspIRCd : public Module
 		message_time("TIME", event_time), message_rsquit("RSQUIT", event_rsquit),
 		message_svsmode("SVSMODE", OnMode), message_fhost("FHOST", event_chghost),
 		message_chgident("FIDENT", event_chgident), message_fname("FNAME", event_chgname),
-		message_sethost("SETHOST", event_sethost), message_setident("SETIDENT", event_setident),
-		message_setname("SETNAME", event_setname), message_fjoin("FJOIN", OnSJoin),
+		message_fjoin("FJOIN", OnSJoin),
 		message_fmode("FMODE", event_fmode), message_ftopic("FTOPIC", event_ftopic),
 		message_opertype("OPERTYPE", event_opertype), message_idle("IDLE", event_idle),
-		message_metadata("METADATA", event_metadata)
+		message_metadata("METADATA", event_metadata), message_encap("ENCAP", event_encap)
 	{
 		this->SetAuthor("Anope");
 

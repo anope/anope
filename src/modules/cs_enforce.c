@@ -82,12 +82,10 @@ void do_enforce_secureops(Channel * c)
     flags = ci->flags;
     ci->flags |= CI_SECUREOPS;
 
-    user = c->users;
-    do {
+    for (user = c->users; user; user = next) {
         next = user->next;
         chan_set_correct_modes(user->user, c, 0);
-        user = next;
-    } while (user);
+    }
 
     ci->flags = flags;
 }
@@ -113,9 +111,9 @@ void do_enforce_restricted(Channel * c)
     if (ci->levels[CA_NOJOIN] < 0)
         ci->levels[CA_NOJOIN] = 0;
 
-    user = c->users;
-    do {
+    for (user = c->users; user; user = next) {
         next = user->next;
+
         u = user->user;
         if (check_access(u, c->ci, CA_NOJOIN)) {
             get_idealban(ci, u, mask, sizeof(mask));
@@ -128,8 +126,7 @@ void do_enforce_restricted(Channel * c)
             av[2] = reason;
             do_kick(s_ChanServ, 3, av);
         }
-        user = next;
-    } while (user);
+    }
 
     ci->levels[CA_NOJOIN] = old_nojoin_level;
 }
@@ -151,9 +148,9 @@ void do_enforce_cmode_R(Channel * c)
     if (debug)
         alog("debug: cs_enforce: Enforcing mode +R on %s", c->name);
 
-    user = c->users;
-    do {
+    for (user = c->users; user; user = next) {
         next = user->next;
+
         u = user->user;
         if (!nick_identified(u)) {
             get_idealban(ci, u, mask, sizeof(mask));
@@ -168,8 +165,7 @@ void do_enforce_cmode_R(Channel * c)
             av[2] = reason;
             do_kick(s_ChanServ, 3, av);
         }
-        user = next;
-    } while (user);
+    }
 }
 
 /* Enforcing Group Functions */

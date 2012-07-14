@@ -3,6 +3,7 @@ Anope Version 1.8 - GIT
 12/31  F Fixed os_svsnick to allow changing the case of a users' nick    [#1369]
 02/22  F Fixed several grammar errors in docs/ (patch provided by Simba) [  #00]
 02/25  F Do not allow akill masks to end in @                            [#1380]
+07/14  F Fixed crash with cs_enforce and empty permanent channels        [  #00]
 
 Anope Version 1.8.7
 -----------------------

@@ -1941,7 +1941,16 @@ int ValueItem::GetInteger() const
 {
 	if (v.empty() || !v.is_number_only())
 		return 0;
-	return convertTo<int>(v);
+	try
+	{
+		return convertTo<int>(v);
+	}
+	catch (const ConvertException &)
+	{
+		Log() << "Unable to convert configuration value " << this->v << " to an integer. Value too large?";
+	}
+
+	return 0;
 }
 
 const char *ValueItem::GetString() const

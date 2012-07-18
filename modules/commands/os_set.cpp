@@ -114,7 +114,7 @@ class CommandOSSet : public Command
 			Log(LOG_ADMIN, source, this) << "DEBUG ON";
 			source.Reply(_("Services are now in debug mode."));
 		}
-		else if (setting.equals_ci("OFF") || (setting[0] == '0' && setting.is_number_only() && !convertTo<int>(setting)))
+		else if (setting.equals_ci("OFF") || setting == "0")
 		{
 			Log(LOG_ADMIN, source, this) << "DEBUG OFF";
 			debug = 0;

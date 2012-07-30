@@ -8,9 +8,10 @@ VERSION_MAJOR="1"
 VERSION_MINOR="8"
 VERSION_PATCH="8"
 VERSION_EXTRA="-git"
-VERSION_BUILD="3095"
+VERSION_BUILD="3096"
 
 # Changes since 1.8.7 Release
+#Revision 3096 - Fixed crash when InspIRCd sends user MODE changes for users that don't exist
 #Revision 3095 - Fixed crash with cs_enforce and registered empty permanent channels
 #Revision 3094 - Bug #1380 - Do not allow akill masks to end in @
 #Revision 3093 - Fixed several grammar errors in docs/ (patch provided by Simba)

@@ -1520,7 +1520,7 @@ int anope_event_mode(char *source, int ac, char **av)
 		/* If it's still null, drop it like fire.
 		 * most likely situation was that server introduced a nick
 		 * which we subsequently akilled */
-		if (u == NULL)
+		if (u == NULL || u2 == NULL)
 			return MOD_CONT;
 
 		av[0] = u2->nick;

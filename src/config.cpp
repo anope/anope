@@ -1154,7 +1154,7 @@ ConfigItems::ConfigItems(ServerConfig *conf)
 		{"serverinfo", "localhost", "", new ValueContainerString(&conf->LocalHost), DT_HOSTNAME | DT_NORELOAD, NoValidation},
 		{"serverinfo", "id", "", new ValueContainerString(&conf->Numeric), DT_NOSPACES | DT_NORELOAD, NoValidation},
 		{"serverinfo", "pid", "data/services.pid", new ValueContainerString(&conf->PIDFilename), DT_STRING | DT_NORELOAD, ValidateNotEmpty},
-		{"serverinfo", "motd", "data/services.motd", new ValueContainerString(&conf->MOTDFilename), DT_STRING, ValidateNotEmpty},
+		{"serverinfo", "motd", "conf/services.motd", new ValueContainerString(&conf->MOTDFilename), DT_STRING, ValidateNotEmpty},
 		{"networkinfo", "networkname", "", new ValueContainerString(&conf->NetworkName), DT_STRING, ValidateNotEmpty},
 		{"networkinfo", "nicklen", "31", new ValueContainerUInt(&conf->NickLen), DT_UINTEGER | DT_NORELOAD, ValidateNickLen},
 		{"networkinfo", "userlen", "10", new ValueContainerUInt(&conf->UserLen), DT_UINTEGER | DT_NORELOAD, NoValidation},

@@ -849,6 +849,7 @@ int check_akill(char *nick, const char *username, const char *host,
 {
     int i;
     Akill *ak;
+    time_t now = time(NULL);
 
     /**
      * If DefCon is set to NO new users - kill the user ;).
@@ -867,17 +868,23 @@ int check_akill(char *nick, const char *username, const char *host,
             continue;
         if (match_wild_nocase(ak->user, username)
             && match_wild_nocase(ak->host, host)) {
-            anope_cmd_akill(ak->user, ak->host, ak->by, ak->seton,
+              if (!ak->expires || ak->expires > now) {
+                  anope_cmd_akill(ak->user, ak->host, ak->by, ak->seton,
                             ak->expires, ak->reason);
-            return 1;
+                  return 1;
+              }
         }
         if (ircd->vhost) {
             if (vhost) {
                 if (match_wild_nocase(ak->user, username)
                     && match_wild_nocase(ak->host, vhost)) {
-                    anope_cmd_akill(ak->user, ak->host, ak->by, ak->seton,
+
+                    if (!ak->expires || ak->expires > now) {
+                        anope_cmd_akill(ak->user, ak->host, ak->by, ak->seton,
                                     ak->expires, ak->reason);
-                    return 1;
+
+                        return 1;
+                    }
                 }
             }
         }
@@ -885,9 +892,12 @@ int check_akill(char *nick, const char *username, const char *host,
             if (ip) {
                 if (match_wild_nocase(ak->user, username)
                     && match_wild_nocase(ak->host, ip)) {
-                    anope_cmd_akill(ak->user, ak->host, ak->by, ak->seton,
+                    
+                    if (!ak->expires || ak->expires > now) {
+                        anope_cmd_akill(ak->user, ak->host, ak->by, ak->seton,
                                     ak->expires, ak->reason);
-                    return 1;
+                        return 1;
+                    }
                 }
             }
         }
@@ -1065,6 +1075,7 @@ int check_sgline(char *nick, const char *realname)
 {
     int i;
     SXLine *sx;
+    time_t now = time(NULL);
 
     if (sglines.count == 0)
         return 0;
@@ -1075,10 +1086,12 @@ int check_sgline(char *nick, const char *realname)
             continue;
 
         if (match_wild_nocase(sx->mask, realname)) {
-            anope_cmd_sgline(sx->mask, sx->reason);
-            /* We kill nick since s_sgline can't */
-            anope_cmd_svskill(ServerName, nick, "G-Lined: %s", sx->reason);
-            return 1;
+            if (!sx->expires || sx->expires > now) {
+                anope_cmd_sgline(sx->mask, sx->reason);
+                /* We kill nick since s_sgline can't */
+                anope_cmd_svskill(ServerName, nick, "G-Lined: %s", sx->reason);
+                return 1;
+            }
         }
     }
 
@@ -1449,6 +1462,7 @@ int check_szline(char *nick, char *ip)
 {
     int i;
     SXLine *sx;
+    time_t now = time(NULL);
 
     if (szlines.count == 0) {
         return 0;
@@ -1465,8 +1479,10 @@ int check_szline(char *nick, char *ip)
         }
 
         if (match_wild_nocase(sx->mask, ip)) {
-            anope_cmd_szline(sx->mask, sx->reason, sx->by);
-            return 1;
+            if (!sx->expires || sx->expires > now) {
+                anope_cmd_szline(sx->mask, sx->reason, sx->by);
+                return 1;
+            }
         }
     }
 

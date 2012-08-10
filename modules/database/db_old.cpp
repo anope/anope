@@ -143,11 +143,10 @@ static void my_b64_encode(const Anope::string &src, Anope::string &target)
 	}
 }
 
-static Anope::string Hex(const std::string &data)
+static Anope::string Hex(const char *data, size_t l)
 {
 	const char hextable[] = "0123456789abcdef";
 
-	size_t l = data.length();
 	std::string rv;
 	for (size_t i = 0; i < l; ++i)
 	{
@@ -393,8 +392,12 @@ static void LoadNicks()
 			READ(read_buffer(pwbuf, f));
 			if (hashm == "plain")
 				my_b64_encode(pwbuf, nc->pass);
+			else if (hashm == "md5" || hashm == "oldmd5")
+				nc->pass = Hex(pwbuf, 16);
+			else if (hashm == "sha1")
+				nc->pass = Hex(pwbuf, 20);
 			else
-				nc->pass = Hex(pwbuf);
+				nc->pass = Hex(pwbuf, strlen(pwbuf));
 			nc->pass = hashm + ":" + nc->pass;
 
 			READ(read_string(buffer, f));

@@ -308,6 +308,7 @@ void XLineManager::AddXLine(XLine *x)
 	if (!x->UID.empty())
 		XLinesByUID->insert(std::make_pair(x->UID, x));
 	this->XLines->push_back(x);
+	x->manager = this;
 }
 
 /** Delete an entry from this XLineManager

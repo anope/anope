@@ -1,0 +1,30 @@
+<!DOCTYPE html> 
+<html>
+<head>
+	<link href="/static/style.css" media="screen" rel="stylesheet" type="text/css" />
+	<title>{TITLE}</title>
+</head>
+<body>
+	<div class="master">
+		<div class="header">
+			<div class="loggedinas"><a href="/">Home</a></div>
+		</div>
+		<table width="100%" height="100%">
+			<tr>
+				<td>
+					<center>
+						<img src="static/logo.png"/>
+						<br/>
+						{FOR M IN MESSAGES}
+							{M}<br/>
+						{END FOR}
+					</center>
+				</td>
+			</tr>
+		</table>
+	</div>
+	<div class="footer">
+		Anope IRC Services - &copy; 2012 Anope Team - <a href="http://anope.org">http://anope.org</a>
+	</div>
+</body>
+</html>

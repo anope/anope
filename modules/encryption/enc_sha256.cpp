@@ -148,7 +148,7 @@ class ESHA256 : public Module
 		size_t pos = password.find(':');
 		Anope::string buf = password.substr(password.find(':', pos + 1) + 1, password.length());
 		char buf2[33];
-		Anope::Unhex(buf, buf2);
+		Anope::Unhex(buf, buf2, sizeof(buf2));
 		for (int i = 0 ; i < 8; ++i)
 			PACK32(reinterpret_cast<unsigned char *>(&buf2[i << 2]), iv[i]);
 	}

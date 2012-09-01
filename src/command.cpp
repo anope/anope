@@ -16,7 +16,8 @@
 #include "access.h"
 #include "regchannel.h"
 
-CommandSource::CommandSource(const Anope::string &n, User *user, NickCore *core, CommandReply *r) : nick(n), u(user), nc(core), reply(r)
+CommandSource::CommandSource(const Anope::string &n, User *user, NickCore *core, CommandReply *r) : nick(n), u(user), nc(core), reply(r),
+	c(NULL), owner(NULL), service(NULL)
 {
 }
 
@@ -90,7 +91,7 @@ void CommandSource::Reply(const char *message, ...)
 	va_list args;
 	char buf[4096]; // Messages can be really big.
 
-	const char *translated_message = translate(this->u, message);
+	const char *translated_message = translate(this->nc, message);
 
 	va_start(args, message);
 	vsnprintf(buf, sizeof(buf), translated_message, args);
@@ -102,7 +103,7 @@ void CommandSource::Reply(const char *message, ...)
 
 void CommandSource::Reply(const Anope::string &message)
 {
-	const char *translated_message = translate(this->u, message.c_str());
+	const char *translated_message = translate(this->nc, message.c_str());
 
 	sepstream sep(translated_message, '\n');
 	Anope::string tok;

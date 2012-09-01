@@ -758,9 +758,9 @@ void Anope::Unhex(const Anope::string &src, Anope::string &dest)
 {
 	size_t len = src.length();
 	Anope::string rv;
-	for (size_t i = 0; i < len; i += 2)
+	for (size_t i = 0; i + 1 < len; i += 2)
 	{
-		char h = src[i], l = src[i + 1];
+		char h = std::tolower(src[i]), l = std::tolower(src[i + 1]);
 		unsigned char byte = (h >= 'a' ? h - 'a' + 10 : h - '0') << 4;
 		byte += (l >= 'a' ? l - 'a' + 10 : l - '0');
 		rv += byte;
@@ -768,17 +768,12 @@ void Anope::Unhex(const Anope::string &src, Anope::string &dest)
 	dest = rv;
 }
 
-void Anope::Unhex(const Anope::string &src, char *dest)
+void Anope::Unhex(const Anope::string &src, char *dest, size_t sz)
 {
-	size_t len = src.length(), destpos = 0;
-	for (size_t i = 0; i < len; i += 2)
-	{
-		char h = src[i], l = src[i + 1];
-		unsigned char byte = (h >= 'a' ? h - 'a' + 10 : h - '0') << 4;
-		byte += (l >= 'a' ? l - 'a' + 10 : l - '0');
-		dest[destpos++] = byte;
-	}
-	dest[destpos] = 0;
+	Anope::string d;
+	Anope::Unhex(src, d);
+
+	strncpy(dest, d.c_str(), sz);
 }
 
 int Anope::LastErrorCode()

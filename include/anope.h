@@ -342,7 +342,7 @@ namespace Anope
 	 * @param dest The destination string
 	 */
 	extern CoreExport void Unhex(const string &src, string &dest);
-	extern CoreExport void Unhex(const string &src, char *dest);
+	extern CoreExport void Unhex(const string &src, char *dest, size_t sz);
 	
 	/** Base 64 encode a string
 	 * @param src The string to encode

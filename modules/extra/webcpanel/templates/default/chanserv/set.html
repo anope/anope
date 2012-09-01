@@ -1,0 +1,100 @@
+{INCLUDE header.html}
+		{FOR M IN MESSAGES}
+			{M}<br/>
+		{END FOR}
+		<form method="post" action="/chanserv/set?channel={CHANNEL_ESCAPED}">
+			<table width="100%" height="100%">
+				<tr>
+					<td>Channel Name</td>
+					<td>{CHANNEL}</td>
+				</tr>
+				{IF EXISTS FOUNDER}
+				<tr>
+					<td>Founder</td>
+					<td>{FOUNDER}</td>
+				</tr>
+				{END IF}
+				{IF EXISTS SUCCESSOR}
+				<tr>
+					<td>Succsesor</td>
+					<td>{SUCCESSOR}</td>
+				</tr>
+				{END IF}
+				<tr>
+					<td>Time registered</td>
+					<td>{TIME_REGISTERED</td>
+				</tr>
+				<tr>
+					<td>Last used</td>
+					<td>{LAST_USED}</td>
+				</tr>
+				{IF EXISTS LAST_TOPIC}
+				<tr>
+					<td>Last topic</td>
+					<td>{LAST_TOPIC}</td>
+				</tr>
+				<tr>
+					<td>Set by</td>
+					<td>{LAST_TOPIC_SETTER}</td>
+				</tr>
+				{END IF}
+				<tr>
+					<td>Keep topic</td>
+					{IF EXISTS KEEPTOPIC}
+					<td><input type="checkbox" name="keeptopic" value="on" checked></td>
+					{ELSE}
+					<td><input type="checkbox" name="keeptopic" value="on"></td>
+					{END IF}
+				</tr>
+				<tr>
+					<td>Peace</td>
+					{IF EXISTS PEACE}
+					<td><input type="checkbox" name="peace" value="on" checked></td>
+					{ELSE}
+					<td><input type="checkbox" name="peace" value="on"></td>
+					{END IF}
+				</tr>
+				<tr>
+					<td>Private</td>
+					{IF EXISTS PRIVATE}
+					<td><input type="checkbox" name="private" value="on" checked></td>
+					{ELSE}
+					<td><input type="checkbox" name="private" value="on"></td>
+					{END IF}
+				</tr>
+				<tr>
+					<td>Restricted</td>
+					{IF EXISTS RESTRICTED}
+					<td><input type="checkbox" name="restricted" value="on" checked></td>
+					{ELSE}
+					<td><input type="checkbox" name="restricted" value="on"></td>
+					{END IF}
+				</tr>
+				<tr>
+					<td>Secure</td>
+					{IF EXISTS SECURE}
+					<td><input type="checkbox" name="secure" value="on" checked></td>
+					{ELSE}
+					<td><input type="checkbox" name="secure" value="on"></td>
+					{END IF}
+				</tr>
+				<tr>
+					<td>Secure Ops</td>
+					{IF EXISTS SECUREOPS}
+					<td><input type="checkbox" name="secureops" value="on" checked></td>
+					{ELSE}
+					<td><input type="checkbox" name="secureops" value="on"></td>
+					{END IF}
+				</tr>
+				<tr>
+					<td>Topic Lock</td>
+					{IF EXISTS TOPICLOCK}
+					<td><input type="checkbox" name="topiclock" value="on" checked></td>
+					{ELSE}
+					<td><input type="checkbox" name="topiclock" value="on"></td>
+					{END IF}
+				</tr>
+		</table>
+	<input type="submit" value="Save">
+	</form>
+{INCLUDE footer.html}

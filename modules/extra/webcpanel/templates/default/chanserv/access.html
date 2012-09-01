@@ -1,0 +1,52 @@
+{INCLUDE header.html}
+		{FOR M IN MESSAGES}
+			{M}<br/>
+		{END FOR}
+		{IF EXISTS ACCESSES}
+			<b>Access List</b></br>
+			<table width="100%" height="100%">
+				<tr>
+					<th>Mask</th>
+					<th>Access</th>
+					<th>Creator</th>
+				</tr>
+				{FOR MASK,ACCESS,CREATOR,ACCESS_CHANGE IN MASKS,ACCESSES,CREATORS,ACCESS_CHANGES}
+					<tr>
+						<td>{MASK}</td>
+						<td>{ACCESS}</td>
+						<td>{CREATOR}</td>
+						{IF EQ ACCESS_CHANGE YES}
+							<td><a href="/chanserv/access?channel={ESCAPED_CHANNEL}&mask={MASK}&del=1">Delete</a></td>
+						{END IF}
+					</tr>
+				{END FOR}
+			</table>
+		{ELSE}
+			<b>Access list is empty.</b>
+		{END IF}
+
+		<br/><br/>
+
+		<b>Add an access entry</b><br/>
+		<form method="post" action="/chanserv/access?channel={ESCAPED_CHANNEL}">
+			<table width="100%" height="100%">
+				<tr>
+					<th>Mask</th>
+					<th>Access</th>
+					<th>Provider</th>
+				</tr>
+				<tr>
+					<td><input type="text" name="mask"></td>
+					<td><input type="text" name="access"></td>
+					<td>
+						<select name="provider">
+							{FOR PROVIDER IN PROVIDERS}
+								<option value="{PROVIDER}">{PROVIDER}</option>
+							{END FOR}
+						</select>
+					</td>
+				</tr>
+			</table>
+			<input type="submit" value="Add">
+		</form>
+{INCLUDE footer.html}

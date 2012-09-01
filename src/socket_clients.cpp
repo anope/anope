@@ -60,7 +60,7 @@ void ConnectionSocket::OnError(const Anope::string &)
 {
 }
 
-ClientSocket::ClientSocket(ListenSocket *ls, const sockaddrs &addr) : Socket(), LS(ls), clientaddr(addr)
+ClientSocket::ClientSocket(ListenSocket *ls, const sockaddrs &addr) : LS(ls), clientaddr(addr)
 {
 }
 

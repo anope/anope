@@ -1,0 +1,51 @@
+<!DOCTYPE html> 
+<html>
+<head>
+	<link href="/static/style.css" media="screen" rel="stylesheet" type="text/css" />
+	<title>{TITLE}</title>
+</head>
+<body>
+	<div class="master">
+		<div class="header">
+			<div class="loggedinas"><a href="/">Home</a></div>
+		</div>
+		<table width="100%" height="100%">
+			<tr>
+				<td>
+					<center>
+						<img src="static/logo.png"/>
+						{MESSAGES}
+						<br>
+						<h2>Register</h2>
+						<br>
+						Fill out the following form to register.
+						<form action="/confirm" method="post">
+							<table>
+								<tr>
+									<td><div align="right">Username:</div></td>
+									<td><div align="left"><input name="username"/></div></td>
+								</tr>
+								<tr>
+									<td><div align="right">Password:</div></td>
+									<td><div align="left"><input name="password" type="password"/></div></td>
+								</tr>
+								<tr>
+									<td><div align="right">Email</div></td>
+									<td><div align="left"><input type="{EMAIL_TYPE}" name="email"></div></td>
+								</tr>
+								<tr>
+									<td></td>
+									<td><div align="left"><input type="submit" value="Register"/></div></td>
+								</tr>
+							</table>
+						</form>
+					</center>
+				</td>
+			</tr>
+		</table>
+	</div>
+	<div class="footer">
+		Anope IRC Services - &copy; 2012 Anope Team - <a href="http://anope.org">http://anope.org</a>
+	</div>
+</body>
+</html>

@@ -105,7 +105,7 @@ foreach(MODULE_FOLDER ${MODULES_FOLDERS})
 
     foreach(SUBDIR ${SUBMODULE_DIRS})
       if(IS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/${SUBDIR}")
-        file(GLOB MODULES_SUBDIR_SRCS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "${SUBDIR}/*.cpp")
+        file(GLOB_RECURSE MODULES_SUBDIR_SRCS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "${SUBDIR}/*.cpp")
         sort_list(MODULES_SUBDIR_SRCS)
 
         # Set all the files to use C++ as well as set their compile flags (use the module-specific compile flags, though)
@@ -195,6 +195,11 @@ foreach(MODULE_FOLDER ${MODULES_FOLDERS})
          else(NOT SKIP_DEPENDS AND NOT SKIP_LIBRARIES AND HAS_FUNCTION)
           message("  This is not a fatal error - ${SUBDIR} will not be built.")
         endif(NOT SKIP_DEPENDS AND NOT SKIP_LIBRARIES AND HAS_FUNCTION)
+
+	# Run the directories CMakeLists.txt if there is one
+        if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${SUBDIR}/CMakeLists.txt")
+          add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/${SUBDIR}")
+        endif(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${SUBDIR}/CMakeLists.txt")
       endif(IS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/${SUBDIR}")
     endforeach(SUBDIR)
   endif(IS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/${MODULE_FOLDER}")

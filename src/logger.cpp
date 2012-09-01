@@ -83,7 +83,7 @@ Log::Log(LogType type, const Anope::string &category, const BotInfo *b) : bi(b),
 		this->Sources.push_back(bi->nick);
 }
 
-Log::Log(LogType type, const CommandSource &source, Command *_c, const ChannelInfo *_ci) : u(source.GetUser()), nc(source.nc), c(_c), chan(NULL), ci(_ci), s(NULL), Type(type)
+Log::Log(LogType type, const CommandSource &source, Command *_c, const ChannelInfo *_ci) : nick(source.GetNick()), u(source.GetUser()), nc(source.nc), c(_c), chan(NULL), ci(_ci), s(NULL), Type(type)
 {
 	if (!c)
 		throw CoreException("Invalid pointers passed to Log::Log");
@@ -210,7 +210,7 @@ Anope::string Log::BuildPrefix() const
 		}
 		case LOG_COMMAND:
 		{
-			if (!this->c || !(this->u || this->nc))
+			if (!this->c)
 				break;
 			buffer += "COMMAND: ";
 			size_t sl = this->c->name.find('/');
@@ -219,6 +219,8 @@ Anope::string Log::BuildPrefix() const
 				buffer += this->u->GetMask() + " used " + cname + " ";
 			else if (this->nc)
 				buffer += this->nc->display + " used " + cname + " ";
+			else
+				buffer += this->nick + " used " + cname + " ";
 			if (this->ci)
 				buffer += "on " + this->ci->name + " ";
 			break;

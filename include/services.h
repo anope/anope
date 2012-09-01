@@ -55,8 +55,10 @@
 
 #ifdef __GXX_EXPERIMENTAL_CXX0X__
 # define anope_override override
+# define anope_final final
 #else
 # define anope_override
+# define anope_final
 #endif
 
 /**

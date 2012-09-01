@@ -1,0 +1,50 @@
+{INCLUDE header.html}
+		<b>Channels you have access in:</b><br/>
+		{FOR CH,ECH IN CHANNEL_NAMES,ESCAPED_CHANNEL_NAMES}
+			<a href="/memoserv/memos?channel={ECH}">{CH}</a> 
+		{END FOR}
+		<br/><br/>
+		{FOR M IN MESSAGES}
+			{M}</br>
+		{END FOR}
+		<br/>
+		{IF EXISTS NUMBER}
+			<b>Memos List:</b>
+			<table width="100%" height="100%">
+				<tr>
+					<th>Number</th>
+					<th>Sender</th>
+					<th>Time/Message</th>
+				</tr>
+				{FOR I,S,T,TXT,U IN NUMBER,SENDER,TIME,TEXT,UNREAD}
+				<tr>
+					<td>{I}</td>
+					<td>{S}</td>
+					<td>{T}</td>
+				{IF EQ U YES}
+					<td><a href="/memoserv/memos?channel={ESCAPED_CHANNEL_NAME}&number={I}&read=1">Mark as Read</a></td>
+				{ELSE}
+					<td><a href="/memoserv/memos?channel={ESCAPED_CHANNEL_NAME}&number={I}&read=2">Mark as Unread</a></td>
+				{END IF}
+					<td><a href="/memoserv/memos?channel={ESCAPED_CHANNEL_NAME}&number={I}&del=1">Delete</a></td>
+
+				</tr>
+				<tr>
+					<td></td><td></td>
+					<td>{TXT}</td>
+				</tr>
+				{END FOR}
+			</table>
+		{ELSE}
+			<b>No memos to show.</b>
+		{END IF}
+
+		<br/><br/>
+
+		<b>Send a new Memo</b>
+		<form method="post" action="/memoserv/memos?channel={ESCAPED_CHANNEL}">
+		Receiver: <input type="text" name="receiver">
+		Message: <input type="text" name="message">
+		<input type="submit" value="Send">
+		</form>
+{INCLUDE footer.html}

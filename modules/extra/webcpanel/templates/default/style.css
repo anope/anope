@@ -1,0 +1,97 @@
+html {
+font-family: 'Cabin', Helvetica, Arial, sans-serif;
+}
+body {
+	overflow:hidden;
+}
+.master {
+	margin-left:0px;
+	margin-right:0px;
+	height:100%;
+	background: #FFF;
+	border-width: 1px;
+	border-style: solid;
+	overflow: hidden;
+}
+.header {
+	height: 33px;
+	padding-left: 5px;
+	width: auto;
+	background: #EEE;
+	border-width: 1px;
+	border-bottom-style: solid;	
+}
+.sidebar {
+	width: 185px;
+	background: #EEE;
+	height: 500px;
+	border-width: 1px;
+	border-right-style: solid;	
+	padding-top:15px;
+	padding-left:15px;
+}
+
+.loggedinas {
+	right:15px;
+	top:15px;
+	position:absolute;
+}
+
+#button {
+	padding: 0;
+	height:30px;
+	margin: 0px;
+	padding-bottom: 2px;
+}
+#button li {
+	display: inline;
+}
+
+#button li a {
+	font-family: Arial;
+	font-size:11px;
+	text-decoration: none;
+	float:left;
+	padding: 10px;
+	background-color: #EEE;
+	height:13px;
+	color: #000;
+}
+#button li a:hover {
+ background-color: #A8BEE3;
+ padding-bottom:10px;
+}
+#a.current {
+	color:navy;
+}
+
+.content {
+	left:220px;
+	top:50px;
+	position:absolute;
+}
+
+.footer {
+	margin-left:auto;
+	margin-right:auto;
+	text-align:center;
+	height: 30px;
+	width:100%;
+	background: #FFF;
+	overflow: hidden;
+}
+
+.sidenav {
+	list-style-type: none;
+	background: #EEE
+}
+
+.sidenav a {
+	color:black;
+	text-decoration:none;
+}
+.sidenav a:hover{
+	color:black;
+	background:#FFF;
+	text-decoration:underline;
+}

@@ -224,9 +224,12 @@ class CommandNSRegister : public Command
 			}
 			else if (Config->NSRegistration.equals_ci("none"))
 			{
-				ircdproto->SendLogin(u);
-				if (!Config->NoNicknameOwnership && u && na->nc == u->Account() && na->nc->HasFlag(NI_UNCONFIRMED) == false)
-					u->SetMode(findbot(Config->NickServ), UMODE_REGISTERED);
+				if (u)
+				{
+					ircdproto->SendLogin(u);
+					if (!Config->NoNicknameOwnership && na->nc == u->Account() && na->nc->HasFlag(NI_UNCONFIRMED) == false)
+						u->SetMode(findbot(Config->NickServ), UMODE_REGISTERED);
+				}
 			}
 
 			if (u)

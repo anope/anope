@@ -1,0 +1,16 @@
+{INCLUDE header.html}
+	<table>
+		<tr>
+			<th>Number</th>
+			<th>Channel</th>
+			<th>Access</th>
+		</tr>
+		{FOR N,C,A IN NUMBERS,CHANNELS,ACCESSES}
+			<tr>
+				<td>{N}</td>
+				<td>{C}</td>
+				<td>{A}</td>
+			</tr>
+		{END FOR}
+	</table>
+{INCLUDE footer.html}

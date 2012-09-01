@@ -49,6 +49,7 @@ class CoreExport Log
 {
  public:
 	const BotInfo *bi;
+	Anope::string nick;
 	const User *u;
 	const NickCore *nc;
 	Command *c;

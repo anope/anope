@@ -239,7 +239,6 @@ void BotInfo::OnMessage(User *u, const Anope::string &message)
 		return;
 
 	CommandSource source(u->nick, u, u->Account(), u);
-	source.c = NULL;
 	source.owner = this;
 	source.service = this;
 

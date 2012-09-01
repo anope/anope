@@ -1,0 +1,24 @@
+<!DOCTYPE html> 
+<html>
+<head>
+	<link href="/static/style.css" media="screen" rel="stylesheet" type="text/css" />
+	<title>{TITLE}</title>
+</head>
+<body>
+	<div class="master">
+		<div class="header">
+			<ul id="button">
+				{FOR CATEGORY_URL,CATEGORY_NAME IN CATEGORY_URLS,CATEGORY_NAMES}
+				<li><a href="{CATEGORY_URL}">{CATEGORY_NAME}</a></li>
+				{END FOR}
+			</ul>
+			<div class="loggedinas">Logged in as {ACCOUNT} <a href="/logout">(Logout)</a></div>
+		</div>
+		<div class="sidebar">
+			<ul class="sidenav">
+				{FOR SUBCATEGORY_URL,SUBCATEGORY_GET,SUBCATEGORY_NAME IN SUBCATEGORY_URLS,SUBCATEGORY_GETS,SUBCATEGORY_NAMES}
+				<li><a href="{SUBCATEGORY_URL}{SUBCATEGORY_GET}">{SUBCATEGORY_NAME}</a></li>
+				{END FOR}
+			</ul>
+		</div>
+		<div class="content">

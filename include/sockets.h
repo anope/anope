@@ -288,6 +288,9 @@ class CoreExport BufferedSocket : public virtual Socket
 	/** Write to the socket
 	* @param message The message
 	*/
+ protected:
+	virtual void Write(const char *buffer, size_t l);
+ public:
 	void Write(const char *message, ...);
 	void Write(const Anope::string &message);
 
@@ -304,8 +307,10 @@ class CoreExport BufferedSocket : public virtual Socket
 
 class CoreExport BinarySocket : public virtual Socket
 {
+ protected:
 	struct DataBlock
 	{
+		char *orig;
 		char *buf;
 		size_t len;
 
@@ -338,7 +343,9 @@ class CoreExport BinarySocket : public virtual Socket
 	 * @param buffer The data to write
 	 * @param l The length of the data
 	 */
-	void Write(const char *buffer, size_t l);
+	virtual void Write(const char *buffer, size_t l);
+	void Write(const char *message, ...);
+	void Write(const Anope::string &message);
 
 	/** Called with data from the socket
 	 * @param buffer The data

@@ -73,10 +73,21 @@ void PrivilegeManager::ClearPrivileges()
 
 AccessProvider::AccessProvider(Module *o, const Anope::string &n) : Service(o, "AccessProvider", n)
 {
+	providers.push_back(this);
 }
 
 AccessProvider::~AccessProvider()
 {
+	std::list<AccessProvider *>::iterator it = std::find(providers.begin(), providers.end(), this);
+	if (it != providers.end())
+		providers.erase(it);
+}
+
+std::list<AccessProvider *> AccessProvider::providers;
+
+const std::list<AccessProvider *>& AccessProvider::GetProviders()
+{
+	return providers;
 }
 
 ChanAccess::ChanAccess(AccessProvider *p) : provider(p)

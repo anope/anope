@@ -56,7 +56,7 @@ bool BufferedSocket::ProcessRead()
 	while (stream.GetToken(tbuf))
 	{
 		tbuf.trim();
-		if (!tbuf.empty() && !Read(tbuf))
+		if (!Read(tbuf))
 			return false;
 	}
 
@@ -80,6 +80,12 @@ bool BufferedSocket::Read(const Anope::string &buf)
 	return false;
 }
 
+void BufferedSocket::Write(const char *buffer, size_t l)
+{
+	this->WriteBuffer += buffer + Anope::string("\r\n");
+	SocketEngine::MarkWritable(this);
+}
+
 void BufferedSocket::Write(const char *message, ...)
 {
 	va_list vi;
@@ -89,17 +95,15 @@ void BufferedSocket::Write(const char *message, ...)
 		return;
 
 	va_start(vi, message);
-	vsnprintf(tbuffer, sizeof(tbuffer), message, vi);
+	int len = vsnprintf(tbuffer, sizeof(tbuffer), message, vi);
 	va_end(vi);
 
-	Anope::string sbuf = tbuffer;
-	Write(sbuf);
+	this->Write(tbuffer, std::min(len, static_cast<int>(sizeof(tbuffer))));
 }
 
 void BufferedSocket::Write(const Anope::string &message)
 {
-	this->WriteBuffer += message + "\r\n";
-	SocketEngine::MarkWritable(this);
+	this->Write(message.c_str(), message.length());
 }
 
 int BufferedSocket::ReadBufferLen() const
@@ -115,14 +119,14 @@ int BufferedSocket::WriteBufferLen() const
 
 BinarySocket::DataBlock::DataBlock(const char *b, size_t l)
 {
-	this->buf = new char[l];
+	this->orig = this->buf = new char[l];
 	memcpy(this->buf, b, l);
 	this->len = l;
 }
 
 BinarySocket::DataBlock::~DataBlock()
 {
-	delete [] this->buf;
+	delete [] this->orig;
 }
 
 BinarySocket::BinarySocket()
@@ -178,6 +182,26 @@ void BinarySocket::Write(const char *buffer, size_t l)
 {
 	this->WriteBuffer.push_back(new DataBlock(buffer, l));
 	SocketEngine::MarkWritable(this);
+}
+
+void BinarySocket::Write(const char *message, ...)
+{
+	va_list vi;
+	char tbuffer[BUFSIZE];
+
+	if (!message)
+		return;
+
+	va_start(vi, message);
+	int len = vsnprintf(tbuffer, sizeof(tbuffer), message, vi);
+	va_end(vi);
+
+	this->Write(tbuffer, std::min(len, static_cast<int>(sizeof(tbuffer))));
+}
+
+void BinarySocket::Write(const Anope::string &message)
+{
+	this->Write(message.c_str(), message.length());
 }
 
 bool BinarySocket::Read(const char *buffer, size_t l)

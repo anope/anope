@@ -53,6 +53,11 @@ class CoreExport AccessProvider : public Service
 	AccessProvider(Module *o, const Anope::string &n);
 	virtual ~AccessProvider();
 	virtual ChanAccess *Create() = 0;
+
+ private:
+	static std::list<AccessProvider *> providers;
+ public:
+	static const std::list<AccessProvider *>& GetProviders();
 };
 
 class CoreExport ChanAccess : public Serializable

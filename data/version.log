@@ -1,3 +1,126 @@
+Revision 271d723 - Sun, 2 Sep 2012 08:31:11 -0400 - Update Changes
+Revision a0c4575 - Sun, 2 Sep 2012 08:31:04 -0400 - Regenerate language files
+Revision 1af64a9 - Sun, 2 Sep 2012 08:30:54 -0400 - Fix Windows
+Revision e3d5140 - Sat, 1 Sep 2012 18:54:51 -0400 - Added a web panel module + a default template
+Revision f81d011 - Tue, 28 Aug 2012 00:39:50 -0400 - Actually set xline's manager...
+Revision fde4289 - Thu, 9 Aug 2012 23:28:02 -0400 - Fixed db_old loading encrypted passwords from 1.8
+Revision f7bf2fa - Wed, 8 Aug 2012 17:09:34 -0400 - Put motd in conf/ not data/ and fixed the default values in the config
+Revision b894a56 - Wed, 8 Aug 2012 04:28:33 -0400 - Update pid and motd file paths
+Revision 48022c3 - Wed, 18 Jul 2012 16:52:14 -0400 - Warn about really big integer values in the config
+Revision 28aa981 - Sun, 1 Jul 2012 23:50:38 -0400 - Actually the core can't handle empty realnames, just ignore them
+Revision 2b8a09b - Sun, 1 Jul 2012 22:26:05 -0400 - Remove some unused code in inspircd20 protocol module & allow /chghost/ident/naming services clients
+Revision a12788e - Sun, 1 Jul 2012 22:26:05 -0400 - Don't crash on empty setnames on inspircd1.2
+Revision 9b5f6d3 - Sun, 1 Jul 2012 22:26:05 -0400 - Remove ExtensibleString everywhere
+Revision af24dc6 - Tue, 26 Jun 2012 16:21:24 +0100 - Removed old set xop references and cleared up some other stuff.
+Revision f27560c - Tue, 26 Jun 2012 02:01:01 +0100 - Merge branch '1.9' of ssh://anope.git.sf.net/gitroot/anope/anope into 1.9
+Revision 4b309b5 - Mon, 25 Jun 2012 20:51:08 -0400 - Fixed accidentally recursion in User::SendMessage from last commit
+Revision d8a99d6 - Fri, 22 Jun 2012 21:26:33 +0100 - Merge branch '1.9' of ssh://anope.git.sf.net/gitroot/anope/anope into 1.9
+Revision 2dec8e7 - Mon, 18 Jun 2012 05:04:30 -0400 - Allow userless command sources
+Revision ba53c7e - Sun, 17 Jun 2012 22:23:22 +0100 - Updated MODULES somewhat
+Revision 873d428 - Mon, 11 Jun 2012 15:44:48 -0400 - Split up bs_set
+Revision 3626fb2 - Wed, 6 Jun 2012 15:16:46 -0400 - Fixed fd leak in win32/pipe.cpp
+Revision a661098 - Mon, 4 Jun 2012 05:45:13 +0100 - Some more fantasy character help output
+Revision a4bf5ce - Mon, 4 Jun 2012 04:50:35 +0100 - minor help output changes, including some confusion in fantasy chars
+Revision 437944d - Fri, 1 Jun 2012 04:43:26 -0400 - Merge branch '1.9' of anope.git.sf.net:/gitroot/anope/anope into 1.9
+Revision db37b1c - Fri, 1 Jun 2012 07:37:34 +0200 - updated chanstats
+Revision 1e49e9b - Sat, 26 May 2012 02:36:02 -0400 - This should actually be LOG_TERMINAL, quitmsg isn't logged to terminal on shutdown
+Revision 2cbfbc9 - Sat, 26 May 2012 02:15:48 -0400 - Some access level fixes from Robby to more closely match the historic levels, and some code cleanup
+Revision 38d5f20 - Thu, 24 May 2012 21:54:15 -0400 - Added a ./Config option for using precompiled headers
+Revision 70fb590 - Wed, 23 May 2012 19:35:56 -0400 - Add support for inspircd2.0+s mlock, improved on Unreal's, and made server side mlock usage configurable
+Revision bf7d1a5 - Wed, 23 May 2012 15:09:41 -0400 - Fixed some problems found by Robby
+Revision 1f73e27 - Sun, 20 May 2012 04:14:26 -0400 - Updated help messages for ns_list, cs_list, cs_entrymsg, and cs_info. Also fixed logging for cs_entrymsg.
+Revision 699087b - Sun, 20 May 2012 03:57:22 -0400 - Fixed cs_entrymsg loading entries from the database
+Revision ccd2908 - Thu, 17 May 2012 03:57:19 -0400 - reinterpret_cast off of a virtual base does Bad Things
+Revision a883362 - Thu, 17 May 2012 02:03:22 -0400 - Fixed not always calling operator bool() in dynamic_reference, which would mess up service references and do weird things
+Revision ef88385 - Tue, 15 May 2012 17:19:50 -0400 - m_ldap_authentication: Removed the dependency on a specific binddn in favour of searching the tree for matching criteria and using the returned DN
+Revision 90b0283 - Tue, 15 May 2012 04:27:36 -0400 - Grab the DN for every LDAP query and send it in the result
+Revision 0a8d46b - Mon, 14 May 2012 22:30:03 -0400 - Fixed parsing FMODE on inspircd 1.1
+Revision a84226e - Fri, 11 May 2012 00:50:58 -0400 - Do not show help for set message if useprivmsg is disabled
+Revision 9370b06 - Thu, 10 May 2012 17:53:53 -0400 - Fixed crash on access del + valgrind errors
+Revision d5ffae0 - Wed, 9 May 2012 03:37:37 -0400 - Made ssl cert and keyfiles configurable
+Revision f895997 - Wed, 9 May 2012 03:11:57 +0100 - fixed paste error (failed awesomeness) in last commit.
+Revision a81b3aa - Wed, 9 May 2012 01:23:34 +0100 - Fixed saving backups
+Revision 820e4ed - Tue, 8 May 2012 18:04:49 -0400 - Fixed some 100% cpu bugs with the new SQL stuff, and fixed sqlite+db_sql_live
+Revision 25586f3 - Tue, 8 May 2012 02:01:44 -0400 - Allow services operators to release other user's nicks, and allow services operators to view the access list of other operators
+Revision b7149fc - Sun, 6 May 2012 21:44:11 -0400 - Merge branch '1.9' of anope.git.sf.net:/gitroot/anope/anope into 1.9
+Revision 675b113 - Sun, 6 May 2012 21:43:50 -0400 - Split up db/conf/lib/locale install directories, and allow alternate ones to be specified at runtime
+Revision c797987 - Sat, 5 May 2012 09:35:18 +0200 - Readding missing valid nick check to ns register/group removed in os_forbid commit
+Revision eb0e07d - Fri, 4 May 2012 16:03:02 -0400 - Use Unreal's MLOCK command if supported
+Revision 1b5805e - Sun, 29 Apr 2012 20:39:33 -0400 - Set quitmsg on ERROR
+Revision 42e652c - Sun, 29 Apr 2012 19:24:37 -0400 - Pull table schemas from SQL on startup so we can alter the schemas if we need to, fixed sqlite to work again
+Revision 62818ab - Sun, 29 Apr 2012 15:43:51 -0400 - Added options:casemap to chose how case insensitive strings are compared, using ascii, rfc1459, or a locale installed on the system
+Revision 4d9a96e - Fri, 27 Apr 2012 17:06:16 -0400 - Fixes to db_sql
+Revision e490a54 - Fri, 27 Apr 2012 16:05:49 -0400 - Process defines even before includes, fixes defining{} pseudoclient names to something else in their respective configurations
+Revision 5068483 - Fri, 27 Apr 2012 15:38:50 -0400 - Add db_sql:prefix allow prefixing all anope tables similarly, and changed db_sql to update the databases incrementally instead of one big flush
+Revision 83ee20f - Wed, 25 Apr 2012 19:02:09 -0400 - Clarify access denied messages caused by NSSecureAdmins
+Revision b08aa4e - Wed, 25 Apr 2012 18:49:53 -0400 - Check for os_sesion to exist before having defcon try and place session bans
+Revision 1081ecd - Wed, 25 Apr 2012 14:29:50 -0400 - Fixed non-debug build
+Revision 2370c16 - Tue, 24 Apr 2012 16:02:07 -0400 - Fixed build from the previous merge
+Revision 3d84dc9 - Mon, 23 Apr 2012 05:17:02 -0400 - Merge branch '1.9' of anope.git.sf.net:/gitroot/anope/anope into 1.9
+Revision 573e49a - Mon, 23 Apr 2012 05:08:26 -0400 - Reworked live SQL support yet again
+Revision 63c639e - Mon, 23 Apr 2012 05:07:06 -0400 - Fixed hashm checking in db_old and loading 1.9.1 databases
+Revision fc00406 - Sun, 22 Apr 2012 02:57:17 -0400 - Fixed ./services --version etc not getting printed when stdout is a file/pipe/not a tty
+Revision b752c3a - Fri, 13 Apr 2012 18:33:22 +0200 - fixed a bug in chanstats
+Revision 7372b45 - Sun, 8 Apr 2012 19:29:56 +0200 - fixed a compile error in m_sqlite
+Revision deb5196 - Sun, 8 Apr 2012 12:43:34 +0200 - Added Chanstats. It uses a new, improved database format and is not compatible with current phpdenora or magirc installations.
+Revision 9e1fda2 - Sun, 8 Apr 2012 12:30:48 +0200 - Modified the SQL API to allow unescaped parameters (useful for passing row names and NULL values)
+Revision 9d249ef - Fri, 6 Apr 2012 14:41:28 -0400 - Fixed unpacking questions from dns packets
+Revision e03b73e - Fri, 6 Apr 2012 15:36:49 +0200 - Revert changes made to line endings.
+Revision 6b473f2 - Fri, 6 Apr 2012 15:12:22 +0200 - Revert last commit cause guess what, I screwed things up
+Revision 05bb80c - Fri, 6 Apr 2012 14:35:34 +0200 - Fixed mail function causing some MTAs to sent blank messages
+Revision e6edc65 - Sun, 1 Apr 2012 20:50:46 +0200 - updated the german language file
+Revision cf3124c - Sun, 1 Apr 2012 20:50:04 +0200 - fixed some typos
+Revision 12a6a27 - Tue, 27 Mar 2012 19:14:55 -0400 - Merge branch '1.9' of anope.git.sf.net:/gitroot/anope/anope into 1.9
+Revision 31a0e67 - Tue, 27 Mar 2012 19:01:29 -0400 - Fixed unpacking multiple names from dns packets when one has multiple compression pointers. Currently this will just fail at unpacking the later name due to offsets being invalid. Also cleaned up the existing code and made unpacking error messages more helpful.
+Revision 8d0b4a1 - Thu, 22 Mar 2012 07:30:38 +0100 - added a missing error message when a module file does not exist. this fixes bug #1401. also moved some debug messages to debug level 2
+Revision 1b0ebca - Wed, 21 Mar 2012 22:20:18 +0100 - fixed bug #1399
+Revision 0d100ff - Wed, 21 Mar 2012 20:25:25 +0100 - fixed ns_ajoin
+Revision 88fd1da - Tue, 13 Mar 2012 21:07:10 -0400 - Fixed typos
+Revision a069347 - Tue, 13 Mar 2012 19:26:11 -0400 - Actually check if the nicks arent registered, oops
+Revision a26f4b9 - Tue, 13 Mar 2012 17:45:07 -0400 - Bug #1389 - readd RNG seed in the config and start DNS query ids off on a random number
+Revision 053d6a2 - Tue, 13 Mar 2012 17:18:11 -0400 - Add a nickserv:unregistered_notice config option to send a message to unregistered users on connect. Suggested by Cronus.
+Revision beae477 - Tue, 13 Mar 2012 16:58:14 -0400 - Bug #1382 - Save maxusercount and maxusertime
+Revision cff91a5 - Sun, 11 Mar 2012 21:21:47 -0400 - Made gch files depend on the header they were generated from
+Revision 92ed5d7 - Sun, 11 Mar 2012 16:44:44 -0400 - Fixed having multiple uplink blocks work right if the first uplink fails on startup
+Revision 7800375 - Sun, 11 Mar 2012 05:20:28 -0400 - Bug #1384 - Fixed spacing of connection log message if users have no vhost - patch from cbiedl
+Revision ab25815 - Mon, 5 Mar 2012 20:15:56 -0500 - Fixed backup databases having their names collide due to not separating month and day, #1383
+Revision 8e01043 - Mon, 5 Mar 2012 14:29:48 -0500 - Fixed bs_kick syntax error
+Revision b7a6d51 - Sun, 4 Mar 2012 10:18:25 +0100 - fixed the --dir commandline parameter
+Revision 4ed844f - Fri, 2 Mar 2012 17:05:59 -0500 - Escape all column names when building sql queries
+Revision 020467d - Mon, 27 Feb 2012 00:16:15 -0500 - Fixed db_old loading noexpire
+Revision 141b87b - Sun, 26 Feb 2012 23:28:02 -0500 - Changed the OnChanDrop event to be called right before channels are dropped, not after
+Revision a5b9e23 - Sun, 26 Feb 2012 23:23:15 -0500 - Added chanserv:require config option to set which modes must be on all registered channels. Prevents the core from always enforcing +r on every channel, even if chanserv is not loaded.
+Revision a78790e - Sun, 26 Feb 2012 20:18:22 -0500 - Fixed vhost check on identify
+Revision 07226fe - Sun, 26 Feb 2012 19:49:02 -0500 - Track plexus umode and cmode +C and renamed UMODE_NO_CTCP to match up with the names of other modes.
+Revision e730138 - Sat, 25 Feb 2012 22:45:51 -0500 - Fixed missing #include in init.cpp
+Revision 2bc3bd3 - Sat, 25 Feb 2012 00:06:02 -0500 - Do not send kills after sending XLines because it causes us to internally remove the user and then recieve a quit from the user (who is now nonexistant) once the IRCd processes the XLine
+Revision 83456f6 - Fri, 24 Feb 2012 23:25:29 -0500 - Fixed akill setter and ids showing in akill reasons
+Revision 601dc41 - Fri, 24 Feb 2012 14:54:44 -0500 - Merge branch '1.9' of anope.git.sf.net:/gitroot/anope/anope into 1.9
+Revision 2337b77 - Fri, 24 Feb 2012 14:53:34 -0500 - Fixed calculating bots channel count of assigned channels and fixed the order of saving memos (among other things)
+Revision fde40de - Fri, 24 Feb 2012 01:50:21 +0000 - Tell users to use NickServ for registering nicks, not chanserv...
+Revision ba32aad - Thu, 23 Feb 2012 02:32:49 +0000 - Merge branch '1.9' of ssh://anope.git.sf.net/gitroot/anope/anope into 1.9
+Revision 24811e5 - Wed, 22 Feb 2012 20:55:59 -0500 - Added a configuration option to make all nick registrations require admin verification
+Revision f01aab5 - Thu, 23 Feb 2012 00:04:36 +0000 - Merge branch '1.9' of ssh://anope.git.sf.net/gitroot/anope/anope into 1.9
+Revision 3850b07 - Wed, 22 Feb 2012 18:12:02 -0500 - Added regex support for many commands, such as akill, sqline, snline, all of the */list commands, etc.
+Revision 81e50dd - Wed, 22 Feb 2012 16:25:20 -0500 - Fixed db_old loading memo owners
+Revision bd31fbb - Wed, 22 Feb 2012 14:41:36 -0500 - Also fixed m_proxyscan to handle users with invalid ips
+Revision 0006606 - Tue, 21 Feb 2012 20:50:14 -0500 - Fixed m_dnsbl handling users with spoofs/other non ips
+Revision 826de43 - Wed, 22 Feb 2012 00:28:58 +0000 - Fixed some trivial formatting
+Revision b84e080 - Sun, 19 Feb 2012 20:54:55 -0500 - Made our message sources actual clients/servers, and put in a few more default messages for very standard things (KICK etc)
+Revision 0ba58d7 - Sat, 18 Feb 2012 18:07:34 -0500 - Fixed some events
+Revision 1536c5c - Sat, 18 Feb 2012 17:21:55 -0500 - Add users hostmask to access lists not nick when access add is used on a non registered user
+Revision f2ce9cd - Sat, 18 Feb 2012 15:47:16 -0500 - Made mode lock del check status of the mode lock before removing it
+Revision ee5cd84 - Sat, 18 Feb 2012 15:04:26 -0500 - Use C++11's explicit override feature if available
+Revision 41e8d27 - Thu, 16 Feb 2012 16:02:17 -0500 - Fixed FreeBSD build
+Revision e1f5fc6 - Wed, 15 Feb 2012 00:06:25 -0500 - Remove revision numbers as they're only ever set by Config reading git since we've switched off of SVN. Instead just use the hash for the current head when building. Also recheck the hash on every make not just Config.
+Revision db59f1a - Tue, 14 Feb 2012 19:03:09 -0500 - Fixed detecting when to set +r and fixed crash on shutdown introduced by the last commit
+Revision a9772cd - Tue, 14 Feb 2012 15:13:27 -0500 - Clean up and reorganize our header files
+Revision 086790d - Mon, 13 Feb 2012 00:10:45 -0500 - Removed our RNG and just use the systems, it's not very widely used. Also made DNS query ids not random as they don't need to be.
+Revision 1bc8e2a - Wed, 8 Feb 2012 18:00:24 -0500 - Removed operserv:notifications in favor of log blocks, as well as some other notifiications
+Revision 089c85b - Sat, 4 Feb 2012 17:28:38 -0500 - Fixed WallBadOS
+Revision 01194e3 - Sat, 4 Feb 2012 13:12:11 -0500 - Bump for 1.9.7-git
+Revision f082530 - Fri, 3 Feb 2012 15:19:09 -0500 - Anope 1.9.6 Release
+Revision b906656 - Fri, 3 Feb 2012 15:18:27 -0500 - Update version.log
 Revision 378ae4c - Fri, 3 Feb 2012 15:18:06 -0500 - Regenerate language files
 Revision ce2a0f7 - Tue, 31 Jan 2012 16:19:47 -0500 - Fixed a memory leak in m_ldap
 Revision be5ba49 - Tue, 31 Jan 2012 15:44:04 -0500 - Not sure what I was thinking here

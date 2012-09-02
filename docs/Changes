@@ -2,6 +2,11 @@ Anope Version 1.9.7
 --------------------
 A Added ability for using regex as patterns for various commands
 A Extended ability of operserv/akill to also match against nick and realname
+A Added chanserv:require configuration option
+A Added nickserv:unregistered_notice and nickserv:registration configuration option
+A Added options:casemap configuration option
+A Added a web panel
+A db_sql_live now allows all tables to be "live", not just a select few
 
 Anope Version 1.9.6
 --------------------

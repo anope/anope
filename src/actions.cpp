@@ -14,6 +14,7 @@
 #include "config.h"
 #include "regchannel.h"
 #include "channels.h"
+#include "extern.h"
 
 /*************************************************************************/
 

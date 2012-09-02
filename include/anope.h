@@ -23,7 +23,7 @@ namespace Anope
 	 * allow us to only require one type of string everywhere that can be converted
 	 * at any time to a specific type of string.
 	 */
-	class string
+	class CoreExport string
 	{
 	 private:
 		/**
@@ -586,6 +586,18 @@ template<typename T, typename O> inline T anope_dynamic_static_cast(O ptr)
 	return ret;
 #else
 	return static_cast<T>(ptr);
+#endif
+}
+
+template<typename T, typename O> inline T anope_dynamic_reinterpret_cast(O ptr)
+{
+#ifdef DEBUG_BUILD
+	T ret = dynamic_cast<T>(ptr);
+	if (ptr != NULL && ret == NULL)
+		throw CoreException(Anope::string("anope_dynamic_reinterpret_cast<") + typeid(T).name() + ">(" + typeid(O).name() + ") fail");
+	return ret;
+#else
+	return reinterpret_cast<T>(ptr);
 #endif
 }
 

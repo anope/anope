@@ -25,7 +25,6 @@ extern CoreExport const char *windows_inet_ntop(int af, const void *src, char *d
 extern CoreExport int fcntl(int fd, int cmd, int arg);
 
 #ifndef WIN32_NO_OVERRIDE
-# define close windows_close
 # define accept windows_accept
 # define inet_pton windows_inet_pton
 # define inet_ntop windows_inet_ntop

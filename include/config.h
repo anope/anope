@@ -805,6 +805,6 @@ class CoreExport ConfigReader
 };
 
 extern ConfigurationFile services_conf;
-extern ServerConfig *Config;
+extern CoreExport ServerConfig *Config;
 
 #endif // CONFIG_H

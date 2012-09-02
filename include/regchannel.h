@@ -16,10 +16,11 @@
 #include "logger.h"
 #include "modules.h"
 #include "serialize.h"
+#include "bots.h"
 
 typedef Anope::insensitive_map<ChannelInfo *> registered_channel_map;
 
-extern serialize_checker<registered_channel_map> RegisteredChannelList;
+extern CoreExport serialize_checker<registered_channel_map> RegisteredChannelList;
 
 /** Flags used for the ChannelInfo class
  */
@@ -441,9 +442,9 @@ class CoreExport ChannelInfo : public Extensible, public Flags<ChannelInfoFlag, 
 	void ClearLevels();
 };
 
-extern ChannelInfo *cs_findchan(const Anope::string &chan);
-extern bool IsFounder(const User *user, const ChannelInfo *ci);
-extern void update_cs_lastseen(User *user, ChannelInfo *ci);
-extern int get_idealban(const ChannelInfo *ci, User *u, Anope::string &ret);
+extern CoreExport ChannelInfo *cs_findchan(const Anope::string &chan);
+extern CoreExport bool IsFounder(const User *user, const ChannelInfo *ci);
+extern CoreExport void update_cs_lastseen(User *user, ChannelInfo *ci);
+extern CoreExport int get_idealban(const ChannelInfo *ci, User *u, Anope::string &ret);
 
 #endif // REGCHANNEL_H

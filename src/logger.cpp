@@ -22,8 +22,10 @@
 #include "uplink.h"
 #include "protocol.h"
 
+#ifndef _WIN32
 #include <sys/time.h>
 #include <unistd.h>
+#endif
 
 static Anope::string GetTimeStamp()
 {

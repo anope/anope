@@ -11,6 +11,12 @@
 
 #ifdef _WIN32
 #include "services.h"
+#include "anope.h"
+
+#include <io.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <fcntl.h>
 
 static struct WindowsLanguage
 {

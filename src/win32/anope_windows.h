@@ -1,4 +1,4 @@
- /* POSIX emulation layer for Windows.
+/* POSIX emulation layer for Windows.
  *
  * Copyright (C) 2008-2011 Robin Burchell <w00t@inspircd.org>
  * Copyright (C) 2008-2012 Anope Team <info@anope.org>
@@ -9,9 +9,11 @@
  * Based on the original code of Services by Andy Church.
  */
  
- #ifndef WINDOWS_H
- #define WINDOWS_H
- #ifdef _WIN32
+#ifndef WINDOWS_H
+#define WINDOWS_H
+#ifdef _WIN32
+
+#define NOMINMAX
 
 #include <winsock2.h>
 #include <ws2tcpip.h>
@@ -40,6 +42,8 @@
 /* VS2008 hates having this define before its own */
 #define vsnprintf _vsnprintf
 
+#define anope_close windows_close
+
 #define stat _stat
 #define S_ISREG(x) ((x) & _S_IFREG)
 
@@ -47,6 +51,8 @@
 # undef EINPROGRESS
 #endif
 #define EINPROGRESS WSAEWOULDBLOCK
+
+#include "extensible.h"
 
 #include "socket.h"
 #include "dir/dir.h"
@@ -70,6 +76,8 @@ extern int setenv(const char *name, const char *value, int overwrite);
 extern int unsetenv(const char *name);
 extern int mkstemp(char *input);
 extern void getcwd(char *buf, size_t sz);
+
+template struct ExtensibleItemClass<Anope::string>;
 
 #endif // _WIN32
 #endif // WINDOWS_H

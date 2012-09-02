@@ -23,8 +23,8 @@
 typedef Anope::insensitive_map<NickAlias *> nickalias_map;
 typedef Anope::insensitive_map<NickCore *> nickcore_map;
 
-extern serialize_checker<nickalias_map> NickAliasList;
-extern serialize_checker<nickcore_map> NickCoreList;
+extern CoreExport serialize_checker<nickalias_map> NickAliasList;
+extern CoreExport serialize_checker<nickcore_map> NickCoreList;
 
 /* NickServ nickname structures. */
 
@@ -309,11 +309,11 @@ class CoreExport NickCore : public Extensible, public Flags<NickCoreFlag, NI_END
 
 };
 
-extern void change_core_display(NickCore *nc);
-extern void change_core_display(NickCore *nc, const Anope::string &newdisplay);
+extern CoreExport void change_core_display(NickCore *nc);
+extern CoreExport void change_core_display(NickCore *nc, const Anope::string &newdisplay);
 
-extern NickAlias *findnick(const Anope::string &nick);
-extern NickCore *findcore(const Anope::string &nick);
-extern bool is_on_access(const User *u, const NickCore *nc);
+extern CoreExport NickAlias *findnick(const Anope::string &nick);
+extern CoreExport NickCore *findcore(const Anope::string &nick);
+extern CoreExport bool is_on_access(const User *u, const NickCore *nc);
 
 #endif // ACCOUNT_H

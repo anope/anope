@@ -13,6 +13,7 @@
 #include "extensible.h"
 #include "serialize.h"
 #include "commands.h"
+#include "account.h"
 
 extern CoreExport Anope::insensitive_map<User *> UserListByNick;
 extern CoreExport Anope::map<User *> UserListByUID;
@@ -303,19 +304,19 @@ class CoreExport User : public virtual Base, public Extensible, public CommandRe
 	void Kill(const Anope::string &source, const Anope::string &reason);
 };
 
-extern int32_t opcnt;
-extern uint32_t maxusercnt, usercnt;
-extern time_t maxusertime;
+extern CoreExport int32_t opcnt;
+extern CoreExport uint32_t maxusercnt, usercnt;
+extern CoreExport time_t maxusertime;
 
-extern User *finduser(const Anope::string &nick);
+extern CoreExport User *finduser(const Anope::string &nick);
 
-extern User *do_nick(const Anope::string &source, const Anope::string &nick, const Anope::string &username, const Anope::string &host, const Anope::string &server, const Anope::string &realname, time_t ts, const Anope::string &ip, const Anope::string &vhost, const Anope::string &uid, const Anope::string &modes);
+extern CoreExport User *do_nick(const Anope::string &source, const Anope::string &nick, const Anope::string &username, const Anope::string &host, const Anope::string &server, const Anope::string &realname, time_t ts, const Anope::string &ip, const Anope::string &vhost, const Anope::string &uid, const Anope::string &modes);
 
-extern void do_umode(const Anope::string &user, const Anope::string &modes);
-extern void do_kill(User *user, const Anope::string &reason);
+extern CoreExport void do_umode(const Anope::string &user, const Anope::string &modes);
+extern CoreExport void do_kill(User *user, const Anope::string &reason);
 
-extern bool matches_list(Channel *c, User *user, ChannelModeName mode);
+extern CoreExport bool matches_list(Channel *c, User *user, ChannelModeName mode);
 
-extern Anope::string create_mask(User *u);
+extern CoreExport Anope::string create_mask(User *u);
 
 #endif // USERS_H

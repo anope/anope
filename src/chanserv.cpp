@@ -17,6 +17,7 @@
 #include "users.h"
 #include "channels.h"
 #include "access.h"
+#include "account.h"
 
 ChannelInfo* cs_findchan(const Anope::string &chan)
 {

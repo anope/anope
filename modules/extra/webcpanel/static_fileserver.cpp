@@ -12,7 +12,6 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-#include <unistd.h>
 
 StaticFileServer::StaticFileServer(const Anope::string &f_n, const Anope::string &u, const Anope::string &c_t) : HTTPPage(u, c_t), file_name(f_n)
 {

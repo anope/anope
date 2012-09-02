@@ -13,7 +13,9 @@
 #include "threadengine.h"
 #include "anope.h"
 
+#ifndef _WIN32
 #include <pthread.h>
+#endif
 
 static inline pthread_attr_t *get_engine_attr()
 {

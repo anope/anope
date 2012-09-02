@@ -17,8 +17,8 @@
 typedef Anope::insensitive_map<BotInfo *> botinfo_map;
 typedef Anope::map<BotInfo *> botinfouid_map;
 
-extern serialize_checker<botinfo_map> BotListByNick;
-extern serialize_checker<botinfouid_map> BotListByUID;
+extern CoreExport serialize_checker<botinfo_map> BotListByNick;
+extern CoreExport serialize_checker<botinfouid_map> BotListByUID;
 
 /** Flags settable on a bot
  */
@@ -132,9 +132,9 @@ class CoreExport BotInfo : public User, public Flags<BotFlag, BI_END>, public Se
 	CommandInfo *GetCommand(const Anope::string &cname);
 };
 
-extern BotInfo *findbot(const Anope::string &nick);
+extern CoreExport BotInfo *findbot(const Anope::string &nick);
 
-extern void bot_raw_ban(User *requester, ChannelInfo *ci, const Anope::string &nick, const Anope::string &reason);
-extern void bot_raw_kick(User *requester, ChannelInfo *ci, const Anope::string &nick, const Anope::string &reason);
+extern CoreExport void bot_raw_ban(User *requester, ChannelInfo *ci, const Anope::string &nick, const Anope::string &reason);
+extern CoreExport void bot_raw_kick(User *requester, ChannelInfo *ci, const Anope::string &nick, const Anope::string &reason);
 
 #endif // BOTS_H

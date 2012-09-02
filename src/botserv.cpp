@@ -20,6 +20,7 @@
 #include "extern.h"
 #include "access.h"
 #include "channels.h"
+#include "account.h"
 
 BotInfo* findbot(const Anope::string &nick)
 {

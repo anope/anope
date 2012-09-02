@@ -13,8 +13,9 @@
 #include "sockets.h"
 #include "socketengine.h"
 
-#include <unistd.h>
+#ifndef _WIN32
 #include <fcntl.h>
+#endif
 
 Pipe::Pipe() : Socket(-1), WritePipe(-1)
 {
@@ -37,7 +38,7 @@ Pipe::Pipe() : Socket(-1), WritePipe(-1)
 Pipe::~Pipe()
 {
 	if (this->WritePipe >= 0)
-		close(this->WritePipe);
+		anope_close(this->WritePipe);
 }
 
 bool Pipe::ProcessRead()

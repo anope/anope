@@ -25,7 +25,7 @@ static nickservreleases_map NickServReleases;
 
 /** Timer for colliding nicks to force people off of nicknames
  */
-class CoreExport NickServCollide : public Timer
+class NickServCollide : public Timer
 {
 	dynamic_reference<User> u;
 	Anope::string nick;

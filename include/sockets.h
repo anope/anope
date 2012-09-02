@@ -12,9 +12,11 @@
 #ifndef SOCKETS_H
 #define SOCKETS_H
 
+#ifndef _WIN32
 #include <netinet/in.h>
 #include <sys/types.h>
 #include <sys/socket.h>
+#endif
 
 #include "anope.h"
 
@@ -482,8 +484,8 @@ class CoreExport Pipe : public Socket
 	virtual void OnNotify() = 0;
 };
 
-extern uint32_t TotalRead;
-extern uint32_t TotalWritten;
-extern SocketIO normalSocketIO;
+extern CoreExport uint32_t TotalRead;
+extern CoreExport uint32_t TotalWritten;
+extern CoreExport SocketIO normalSocketIO;
 
 #endif // SOCKET_H

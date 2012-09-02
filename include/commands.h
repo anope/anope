@@ -142,6 +142,6 @@ class CoreExport Command : public Service, public Flags<CommandFlag>
 	virtual void OnSyntaxError(CommandSource &source, const Anope::string &subcommand);
 };
 
-extern void RunCommand(CommandSource &source, const Anope::string &message);
+extern CoreExport void RunCommand(CommandSource &source, const Anope::string &message);
 
 #endif // COMMANDS_H

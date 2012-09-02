@@ -11,7 +11,6 @@
 /*************************************************************************/
 
 #include "module.h"
-#include <unistd.h>
 
 class DBFlatFile : public Module
 {

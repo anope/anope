@@ -28,6 +28,10 @@
 # include <strings.h>
 #endif
 
+#ifndef _WIN32
+#include <unistd.h>
+#endif
+
 /* Pull in the various bits of STL */
 #include <iostream>
 #include <fstream>
@@ -45,20 +49,21 @@
 
 #define _(x) x
 
-#ifndef _WIN32
-# define DllExport
-# define CoreExport
-# define MARK_DEPRECATED __attribute((deprecated))
-#else
-# include "anope_windows.h"
-#endif
-
 #ifdef __GXX_EXPERIMENTAL_CXX0X__
 # define anope_override override
 # define anope_final final
 #else
 # define anope_override
 # define anope_final
+#endif
+
+#ifndef _WIN32
+# define DllExport
+# define CoreExport
+# define MARK_DEPRECATED __attribute((deprecated))
+# define anope_close close
+#else
+# include "anope_windows.h"
 #endif
 
 /**

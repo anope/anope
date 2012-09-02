@@ -253,7 +253,7 @@ Anope::string XLineManager::GenerateUID()
 		{
 			char c;
 			do
-				c = (random() % 75) + 48;
+				c = (rand() % 75) + 48;
 			while (!isupper(c) && !isdigit(c));
 			id += c;
 		}
@@ -431,9 +431,9 @@ bool XLineManager::CanAdd(CommandSource &source, const Anope::string &mask, time
  */
 XLine* XLineManager::HasEntry(const Anope::string &mask)
 {
-	std::map<Anope::string, XLine *, ci::less>::iterator it = XLinesByUID->find(mask);
+	std::multimap<Anope::string, XLine *, ci::less>::iterator it = XLinesByUID->find(mask);
 	if (it != XLinesByUID->end())
-		for (std::map<Anope::string, XLine *, ci::less>::iterator it2 = XLinesByUID->upper_bound(mask); it != it2; ++it)
+		for (std::multimap<Anope::string, XLine *, ci::less>::iterator it2 = XLinesByUID->upper_bound(mask); it != it2; ++it)
 			if (it->second->manager == NULL || it->second->manager == this)
 			{
 				it->second->QueueUpdate();

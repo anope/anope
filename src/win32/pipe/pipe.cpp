@@ -6,6 +6,7 @@
  */
 
 #include "services.h"
+#include "sockets.h"
 
 int pipe(int fds[2])
 {
@@ -14,22 +15,22 @@ int pipe(int fds[2])
 	int cfd = socket(AF_INET, SOCK_STREAM, 0), lfd = socket(AF_INET, SOCK_STREAM, 0);
 	if (cfd == -1 || lfd == -1)
 	{
-		close(cfd);
-		close(lfd);
+		anope_close(cfd);
+		anope_close(lfd);
 		return -1;
 	}
 
 	if (bind(lfd, &localhost.sa, localhost.size()) == -1)
 	{
-		close(cfd);
-		close(lfd);
+		anope_close(cfd);
+		anope_close(lfd);
 		return -1;
 	}
 
 	if (listen(lfd, 1) == -1)
 	{
-		close(cfd);
-		close(lfd);
+		anope_close(cfd);
+		anope_close(lfd);
 		return -1;
 	}
 
@@ -39,16 +40,16 @@ int pipe(int fds[2])
 
 	if (connect(cfd, &lfd_addr.sa, lfd_addr.size()))
 	{
-		close(cfd);
-		close(lfd);
+		anope_close(cfd);
+		anope_close(lfd);
 		return -1;
 	}
 
 	int afd = accept(lfd, NULL, NULL);
-	close(lfd);
+	anope_close(lfd);
 	if (afd == -1)
 	{
-		close(cfd);
+		anope_close(cfd);
 		return -1;
 	}
 

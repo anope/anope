@@ -23,19 +23,6 @@
 E bool bad_password(User *u);
 E void common_unban(const ChannelInfo *ci, User *u, bool full = false);
 
-/**** channels.c ****/
-
-E Channel *findchan(const Anope::string &chan);
-
-E User *nc_on_chan(Channel *c, const NickCore *nc);
-
-E void do_cmode(const Anope::string &source, const Anope::string &channel, const Anope::string &modes, const Anope::string &ts);
-E void do_join(const Anope::string &source, const Anope::string &channels, const Anope::string &ts);
-E void do_kick(const Anope::string &source, const Anope::string &channel, const Anope::string &users, const Anope::string &reason);
-E void do_part(const Anope::string &source, const Anope::string &channels, const Anope::string &reason);
-
-E void chan_set_correct_modes(const User *user, Channel *c, int give_modes);
-
 /**** encrypt.c ****/
 
 E void enc_encrypt(const Anope::string &src, Anope::string &dest);

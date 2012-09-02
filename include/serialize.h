@@ -27,7 +27,7 @@ namespace Serialize
 	};
 }
 
-class stringstream : public std::stringstream
+class CoreExport stringstream : public std::stringstream
 {
  private:
 	Serialize::DataType type;

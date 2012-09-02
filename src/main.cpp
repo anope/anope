@@ -35,8 +35,11 @@
 #include "signals.h"
 #include "socketengine.h"
 
-#include <unistd.h>
+#ifndef _WIN32
 #include <limits.h>
+#else
+#include <process.h>
+#endif
 
 /******** Global variables! ********/
 

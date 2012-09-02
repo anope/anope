@@ -14,10 +14,11 @@
 #include "socketengine.h"
 #include "logger.h"
 
+#ifndef _WIN32
 #include <arpa/inet.h>
 #include <errno.h>
-#include <unistd.h>
 #include <fcntl.h>
+#endif
 
 std::map<int, Socket *> SocketEngine::Sockets;
 
@@ -421,7 +422,7 @@ Socket::Socket(int sock, bool ipv6, int type) : Flags<SocketFlag>(SocketFlagStri
 Socket::~Socket()
 {
 	SocketEngine::DelSocket(this);
-	close(this->Sock);
+	anope_close(this->Sock);
 	this->IO->Destroy();
 }
 

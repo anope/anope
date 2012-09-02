@@ -12,7 +12,7 @@ static Anope::string BuildDate()
 {
 	char timebuf[64];
 	struct tm *tm = localtime(&Anope::CurTime);
-	strftime(timebuf, sizeof(timebuf), "%a, %d %b %Y %T %Z", tm);
+	strftime(timebuf, sizeof(timebuf), "%a, %d %b %Y %H:%M:%S %Z", tm);
 	return timebuf;
 }
 

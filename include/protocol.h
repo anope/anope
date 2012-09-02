@@ -144,12 +144,12 @@ class CoreExport IRCdMessage
 	virtual bool OnError(const Anope::string &, const std::vector<Anope::string> &);
 };
 
-extern IRCDVar *ircd;
-extern IRCDProto *ircdproto;
-extern IRCdMessage *ircdmessage;
+extern CoreExport IRCDVar *ircd;
+extern CoreExport IRCDProto *ircdproto;
+extern CoreExport IRCdMessage *ircdmessage;
 
-extern void pmodule_ircd_proto(IRCDProto *);
-extern void pmodule_ircd_var(IRCDVar *ircdvar);
-extern void pmodule_ircd_message(IRCdMessage *message);
+extern CoreExport void pmodule_ircd_proto(IRCDProto *);
+extern CoreExport void pmodule_ircd_var(IRCDVar *ircdvar);
+extern CoreExport void pmodule_ircd_message(IRCdMessage *message);
 
 #endif // PROTOCOL_H

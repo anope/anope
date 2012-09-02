@@ -6,6 +6,7 @@
  */
 
 #include "services.h"
+#include "anope.h"
 
 void *dlopen(const char *filename, int)
 {

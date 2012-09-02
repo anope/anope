@@ -191,9 +191,10 @@ class CommandNSRegister : public Command
 				na->last_realname = u->realname;
 
 				u->Login(nc);
+
+				if (Config->NSAddAccessOnReg)
+					nc->AddAccess(create_mask(u));
 			}
-			if (Config->NSAddAccessOnReg)
-				nc->AddAccess(create_mask(u));
 
 			Log(LOG_COMMAND, source, this) << "to register " << na->nick << " (email: " << (!na->nc->email.empty() ? na->nc->email : "none") << ")";
 

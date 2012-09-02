@@ -12,7 +12,6 @@
 
 #include "module.h"
 #include "../commands/os_session.h"
-#include <unistd.h>
 
 Anope::string DatabaseFile;
 Anope::string BackupFile;

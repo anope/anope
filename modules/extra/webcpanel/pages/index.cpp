@@ -34,7 +34,7 @@ void WebCPanel::Index::OnRequest(HTTPProvider *server, const Anope::string &page
 			{
 				char c;
 				do
-					c = 48 + (rand() % 123);
+					c = 48 + (rand() % 75);
 				while (!isalnum(c));
 				id += c;
 			}

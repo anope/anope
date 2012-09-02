@@ -20,11 +20,12 @@
 #include "socketengine.h"
 #include "servers.h"
 
+#ifndef _WIN32
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <sys/stat.h>
-#include <unistd.h>
 #include <grp.h>
+#endif
 
 Anope::string conf_dir = "conf", db_dir = "data", modules_dir = "lib", locale_dir = "locale", log_dir = "logs";
 

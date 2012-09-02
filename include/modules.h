@@ -1111,7 +1111,7 @@ class CoreExport ModuleManager
 
 /** Class used for callbacks within modules
  */
-class CallBack : public Timer
+class CoreExport CallBack : public Timer
 {
  private:
 	Module *m;

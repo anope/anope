@@ -246,15 +246,15 @@ class CoreExport Channel : public virtual Base, public Extensible, public Flags<
 	void Hold();
 };
 
-extern Channel *findchan(const Anope::string &chan);
+extern CoreExport Channel *findchan(const Anope::string &chan);
 
-extern User *nc_on_chan(Channel *c, const NickCore *nc);
+extern CoreExport User *nc_on_chan(Channel *c, const NickCore *nc);
 
-extern void do_cmode(const Anope::string &source, const Anope::string &channel, const Anope::string &modes, const Anope::string &ts);
-extern void do_join(const Anope::string &source, const Anope::string &channels, const Anope::string &ts);
-extern void do_kick(const Anope::string &source, const Anope::string &channel, const Anope::string &users, const Anope::string &reason);
-extern void do_part(const Anope::string &source, const Anope::string &channels, const Anope::string &reason);
+extern CoreExport void do_cmode(const Anope::string &source, const Anope::string &channel, const Anope::string &modes, const Anope::string &ts);
+extern CoreExport void do_join(const Anope::string &source, const Anope::string &channels, const Anope::string &ts);
+extern CoreExport void do_kick(const Anope::string &source, const Anope::string &channel, const Anope::string &users, const Anope::string &reason);
+extern CoreExport void do_part(const Anope::string &source, const Anope::string &channels, const Anope::string &reason);
 
-extern void chan_set_correct_modes(const User *user, Channel *c, int give_modes);
+extern CoreExport void chan_set_correct_modes(const User *user, Channel *c, int give_modes);
 
 #endif // CHANNELS_H

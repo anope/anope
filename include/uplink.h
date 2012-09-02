@@ -42,7 +42,7 @@ class UplinkSocket : public ConnectionSocket, public BufferedSocket
 		}
 	};
 };
-extern UplinkSocket *UplinkSock;
+extern CoreExport UplinkSocket *UplinkSock;
 
 #endif // UPLINK_H
 

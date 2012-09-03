@@ -481,9 +481,9 @@ get_target_property(SERVICES_BINARY ${PROGRAM_NAME} LOCATION)
 get_filename_component(SERVICES_BINARY ${SERVICES_BINARY} NAME)
 
 # At install time, create the following additional directories
-install(CODE "file(MAKE_DIRECTORY \"${DB_DIR}/backups\")")
-install(CODE "file(MAKE_DIRECTORY \"${LOGS_DIR}\")")
-install(CODE "file(MAKE_DIRECTORY \"${LIB_DIR}/modules/runtime\")")
+install(CODE "file(MAKE_DIRECTORY \"${CMAKE_INSTALL_PREFIX}/${DB_DIR}/backups\")")
+install(CODE "file(MAKE_DIRECTORY \"${CMAKE_INSTALL_PREFIX}/${LOGS_DIR}\")")
+install(CODE "file(MAKE_DIRECTORY \"${CMAKE_INSTALL_PREFIX}/${LIB_DIR}/modules/runtime\")")
 # On non-Windows platforms, if RUNGROUP is set, change the permissions of the below directories, as well as the group of the data directory
 if(NOT WIN32 AND RUNGROUP)
   install(CODE "execute_process(COMMAND ${CHMOD} 2775 \"\${DB_DIR}/backups\")")

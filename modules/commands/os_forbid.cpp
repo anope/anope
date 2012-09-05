@@ -39,10 +39,10 @@ class MyForbidService : public ForbidService
 		const std::vector<ForbidData *> &forbids = this->GetForbids();
 		for (unsigned i = forbids.size(); i > 0; --i)
 		{
-			ForbidData *d = this->forbidData[i - 1];
+			ForbidData *d = forbids[i - 1];
 
 			if ((ftype == FT_NONE || ftype == d->type) && Anope::Match(mask, d->mask, false, true))
-				d->destroy();
+				return d;
 		}
 		return NULL;
 	}

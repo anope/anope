@@ -548,6 +548,9 @@ class CoreExport ServerConfig
 	bool NSAddAccessOnReg;
 	/* Maximum number of channels on AJoin */
 	unsigned AJoinMax;
+	/* Kill & killquick delays before force changing off users */
+	time_t NSKillQuick;
+	time_t NSKill;
 
 	/* Core ChanServ modules */
 	Anope::string ChanCoreModules;

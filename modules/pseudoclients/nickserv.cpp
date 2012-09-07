@@ -124,13 +124,13 @@ class MyNickServService : public NickServService
 			}
 			else if (na->nc->HasFlag(NI_KILL_QUICK))
 			{
-				u->SendMessage(NickServ, _("If you do not change within 20 seconds, I will change your nick."));
-				new NickServCollide(u, 20);
+				u->SendMessage(NickServ, _("If you do not change within %s, I will change your nick."), duration(Config->NSKillQuick, u->Account()).c_str());
+				new NickServCollide(u, Config->NSKillQuick);
 			}
 			else
 			{
-				u->SendMessage(NickServ, _("If you do not change within one minute, I will change your nick."));
-				new NickServCollide(u, 60);
+				u->SendMessage(NickServ, _("If you do not change within %s, I will change your nick."), duration(Config->NSKill, u->Account()).c_str());
+				new NickServCollide(u, Config->NSKill);
 			}
 		}
 

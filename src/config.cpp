@@ -1212,6 +1212,8 @@ ConfigItems::ConfigItems(ServerConfig *conf)
 		{"nickserv", "modeonid", "no", new ValueContainerBool(&conf->NSModeOnID), DT_BOOLEAN, NoValidation},
 		{"nickserv", "addaccessonreg", "no", new ValueContainerBool(&conf->NSAddAccessOnReg), DT_BOOLEAN, NoValidation},
 		{"nickserv", "ajoinmax", "10", new ValueContainerUInt(&conf->AJoinMax), DT_UINTEGER, NoValidation},
+		{"nickserv", "killquick", "20", new ValueContainerTime(&conf->NSKillQuick), DT_TIME, NoValidation},
+		{"nickserv", "kill", "60", new ValueContainerTime(&conf->NSKill), DT_TIME, NoValidation},
 		{"mail", "usemail", "no", new ValueContainerBool(&conf->UseMail), DT_BOOLEAN, ValidateEmailReg},
 		{"mail", "sendmailpath", "", new ValueContainerString(&conf->SendMailPath), DT_STRING, ValidateMail},
 		{"mail", "sendfrom", "", new ValueContainerString(&conf->SendFrom), DT_STRING, ValidateMail},

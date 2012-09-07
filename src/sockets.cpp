@@ -227,7 +227,7 @@ cidr::cidr(const Anope::string &ip, unsigned char len)
 
 Anope::string cidr::mask() const
 {
-	return this->cidr_ip + "/" + this->cidr_len;
+	return Anope::printf("%s/%d", this->cidr_ip.c_str(), this->cidr_len);
 }
 
 bool cidr::match(sockaddrs &other)
@@ -263,6 +263,36 @@ bool cidr::match(sockaddrs &other)
 		return false;
 
 	return true;
+}
+
+bool cidr::operator<(const cidr &other) const
+{
+	if (this->addr.sa.sa_family != other.addr.sa.sa_family)
+		return this->addr.sa.sa_family < other.addr.sa.sa_family;
+	
+	switch (this->addr.sa.sa_family)
+	{
+		case AF_INET:
+		{
+			unsigned int m = 0xFFFFFFFFU >> (32 - this->cidr_len);
+
+			return (this->addr.sa4.sin_addr.s_addr & m) < (other.addr.sa4.sin_addr.s_addr & m);
+		}
+		case AF_INET6:
+		{
+			int i = memcmp(&this->addr.sa6.sin6_addr.s6_addr, &other.addr.sa6.sin6_addr.s6_addr, this->cidr_len / 8);
+			if (i || this->cidr_len >= 128)
+				return i < 0;
+
+			// Now all thats left is to compare 'remainig' bits at offset this->cidr_len / 8
+			int remaining = this->cidr_len % 8;
+			unsigned char m = 0xFF << (8 - remaining);
+
+			return (this->addr.sa6.sin6_addr.s6_addr[this->cidr_len / 8] & m) < (other.addr.sa6.sin6_addr.s6_addr[this->cidr_len / 8] & m);
+		}
+		default:
+			throw CoreException("Unknown AFTYPE for cidr");
+	}
 }
 
 /** Receive something from the buffer

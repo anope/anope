@@ -659,6 +659,9 @@ class CoreExport ServerConfig
 	unsigned MaxSessionLimit;
 	/* How long session akills should last */
 	time_t SessionAutoKillExpiry;
+	/* Number of bits to use when comparing session IPs */
+	unsigned SessionIPv4CIDR;
+	unsigned SessionIPv6CIDR;
 	/* Reason to use for session kills */
 	Anope::string SessionLimitExceeded;
 	/* Optional second reason */

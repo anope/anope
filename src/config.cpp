@@ -214,6 +214,9 @@ ServerConfig::ServerConfig() : config_data(), NSDefFlags(NickCoreFlagStrings), C
 			Log() << "Unknown casemap " << this->CaseMap << " - casemap not changed";
 		}
 	}
+
+	if (this->SessionIPv4CIDR > 32 || this->SessionIPv6CIDR > 128)
+		throw ConfigException("Session CIDR value out of range");
 }
 
 bool ServerConfig::CheckOnce(const Anope::string &tag)
@@ -1284,6 +1287,8 @@ ConfigItems::ConfigItems(ServerConfig *conf)
 		{"operserv", "sessionlimitdetailsloc", "", new ValueContainerString(&conf->SessionLimitDetailsLoc), DT_STRING, NoValidation},
 		{"operserv", "maxsessionkill", "0", new ValueContainerUInt(&conf->MaxSessionKill), DT_UINTEGER, NoValidation},
 		{"operserv", "sessionautokillexpiry", "0", new ValueContainerTime(&conf->SessionAutoKillExpiry), DT_TIME, NoValidation},
+		{"operserv", "session_ipv4_cidr", "32", new ValueContainerUInt(&conf->SessionIPv4CIDR), DT_UINTEGER | DT_NORELOAD, NoValidation},
+		{"operserv", "session_ipv6_cidr", "128", new ValueContainerUInt(&conf->SessionIPv6CIDR), DT_UINTEGER | DT_NORELOAD, NoValidation},
 		{"operserv", "addakiller", "no", new ValueContainerBool(&conf->AddAkiller), DT_BOOLEAN, NoValidation},
 		{"operserv", "akillids", "no", new ValueContainerBool(&conf->AkillIds), DT_BOOLEAN, NoValidation},
 		{"operserv", "opersonly", "no", new ValueContainerBool(&conf->OSOpersOnly), DT_BOOLEAN, NoValidation},

@@ -3,9 +3,11 @@
 
 struct Session
 {
-	Anope::string host;             /* Host of the session */
+	cidr addr;                      /* A cidr (sockaddrs + len) representing this session */
 	unsigned count;                 /* Number of clients with this host */
 	unsigned hits;                  /* Number of subsequent kills for a host */
+
+	Session(const Anope::string &ip, int len) : addr(ip, len), count(1), hits(0) { }
 };
 
 struct Exception : Serializable
@@ -25,7 +27,7 @@ struct Exception : Serializable
 class SessionService : public Service
 {
  public:
-	typedef Anope::map<Session *> SessionMap;
+ 	typedef std::map<cidr, Session *> SessionMap;
 	typedef std::vector<Exception *> ExceptionVector;
 
 	SessionService(Module *m) : Service(m, "SessionService", "session") { }

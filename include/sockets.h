@@ -90,6 +90,7 @@ class CoreExport cidr
 	cidr(const Anope::string &ip, unsigned char len);
 	Anope::string mask() const;
 	bool match(sockaddrs &other);
+	bool operator<(const cidr &other) const;
 };
 
 class SocketException : public CoreException

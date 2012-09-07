@@ -63,17 +63,18 @@ class MySessionService : public SessionService
 
 	void AddSession(Session *s) anope_override
 	{
-		this->Sessions[s->host] = s;
+		this->Sessions[s->addr] = s;
 	}
 
 	void DelSession(Session *s) anope_override
 	{
-		this->Sessions.erase(s->host);
+		this->Sessions.erase(s->addr);
 	}
 
-	Session *FindSession(const Anope::string &mask) anope_override
+	Session *FindSession(const Anope::string &ip) anope_override
 	{
-		SessionMap::iterator it = this->Sessions.find(mask);
+		cidr c(ip, ip.find(':') != Anope::string::npos ? Config->SessionIPv6CIDR : Config->SessionIPv4CIDR);
+		SessionMap::iterator it = this->Sessions.find(c);
 		if (it != this->Sessions.end())
 			return it->second;
 		return NULL;
@@ -176,7 +177,7 @@ class CommandOSSession : public Command
 				{
 					ListFormatter::ListEntry entry;
 					entry["Session"] = stringify(session->count);
-					entry["Host"] = session->host;
+					entry["Host"] = session->addr.mask();
 					list.addEntry(entry);
 				}
 			}
@@ -204,7 +205,7 @@ class CommandOSSession : public Command
 		else
 		{
 			Exception *exception = session_service->FindException(param);
-			source.Reply(_("The host \002%s\002 currently has \002%d\002 sessions with a limit of \002%d\002."), param.c_str(), session->count, exception && exception->limit > Config->DefSessionLimit ? exception->limit : Config->DefSessionLimit);
+			source.Reply(_("The host \002%s\002 currently has \002%d\002 sessions with a limit of \002%d\002."), session->addr.mask().c_str(), session->count, exception && exception->limit > Config->DefSessionLimit ? exception->limit : Config->DefSessionLimit);
 		}
 
 		return;
@@ -606,7 +607,7 @@ class OSSession : public Module
 
 	void AddSession(User *u, bool exempt)
 	{
-		Session *session = this->ss.FindSession(u->host);
+		Session *session = this->ss.FindSession(u->ip);
 
 		if (session)
 		{
@@ -661,11 +662,7 @@ class OSSession : public Module
 		}
 		else
 		{
-			session = new Session();
-			session->host = u->host;
-			session->count = 1;
-			session->hits = 0;
-
+			session = new Session(u->ip, u->ip.find(':') != Anope::string::npos ? Config->SessionIPv6CIDR : Config->SessionIPv4CIDR);
 			this->ss.AddSession(session);
 		}
 	}

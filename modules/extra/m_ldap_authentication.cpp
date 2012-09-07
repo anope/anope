@@ -57,17 +57,32 @@ class IdentifyInterface : public LDAPInterface
 		{
 			case LDAPResult::QUERY_SEARCH:
 			{
-				try
+				if (!r.empty())
 				{
-					const LDAPAttributes &attr = r.get(0);
-					ii->dn = attr.get("dn");
-					Log(LOG_DEBUG) << "m_ldap_authenticationn: binding as " << ii->dn;
-					LDAPQuery id = ii->lprov->Bind(this, ii->dn, ii->pass);
-					this->Add(id, ii);
+					try
+					{
+						const LDAPAttributes &attr = r.get(0);
+						ii->dn = attr.get("dn");
+						Log(LOG_DEBUG) << "m_ldap_authenticationn: binding as " << ii->dn;
+						LDAPQuery id = ii->lprov->Bind(this, ii->dn, ii->pass);
+						this->Add(id, ii);
+					}
+					catch (const LDAPException &ex)
+					{
+						Log() << "m_ldap_authentication: Error binding after search: " << ex.GetReason();
+						delete ii;
+					}
 				}
-				catch (const LDAPException &ex)
+				else
 				{
-		                        Log() << "m_ldap_authentication: Error binding after search: " << ex.GetReason();
+					User *u = ii->user;
+					Command *c = ii->command;
+
+					u->Extend("m_ldap_authentication_error", NULL);
+
+					c->Execute(ii->source, ii->params);
+
+					delete ii;
 				}
 				break;
 			}

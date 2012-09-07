@@ -240,12 +240,16 @@ class LDAPService : public LDAPProvider, public Thread, public Condition
 			for (LDAPMessage *cur = ldap_first_message(this->con, result); cur; cur = ldap_next_message(this->con, cur))
 			{
 				int cur_type = ldap_msgtype(cur);
-				char *dn = ldap_get_dn(this->con, cur);
 
 				LDAPAttributes attributes;
 
+				char *dn = ldap_get_dn(this->con, cur);
 				if (dn != NULL)
+				{
 					attributes["dn"].push_back(dn);
+					ldap_memfree(dn);
+					dn = NULL;
+				}
 
 				switch (cur_type)
 				{
@@ -265,7 +269,10 @@ class LDAPService : public LDAPProvider, public Thread, public Condition
 						ldap_result->type = LDAPResult::QUERY_MODIFY;
 						break;
 					case LDAP_RES_SEARCH_RESULT:
-						break; /* Ignore this */
+						// If we get here and ldap_result->type is LDAPResult::QUERY_UNKNOWN
+						// then the result set is empty
+						ldap_result->type = LDAPResult::QUERY_SEARCH;
+						break;
 					default:
 						Log(LOG_DEBUG) << "m_ldap: Unknown msg type " << cur_type;
 						continue;
@@ -321,9 +328,6 @@ class LDAPService : public LDAPProvider, public Thread, public Condition
 				}
 
 				ldap_result->messages.push_back(attributes);
-
-				if (dn != NULL)
-					ldap_memfree(dn);
 			}
 
 			ldap_msgfree(result);

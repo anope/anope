@@ -1694,9 +1694,7 @@ void ServerConfig::LoadConf(ConfigurationFile &file)
 				// Terminate word
 				in_word = false;
 			}
-			else if (!in_word && ch == ';')
-				;
-			else if (ch == '}')
+			else if (ch == ';' || ch == '}')
 				;
 			else
 			{
@@ -1711,6 +1709,12 @@ void ServerConfig::LoadConf(ConfigurationFile &file)
 
 			if (ch == ';' || ch == '}' || c + 1 == len)
 			{
+				bool eol = c + 1 == len;
+
+				if (!eol && in_quote)
+					// Allow ; and } in quoted strings
+					continue;
+
 				if (in_quote)
 				{
 					// Quotes can span multiple lines; all we need to do is go to the next line without clearing things

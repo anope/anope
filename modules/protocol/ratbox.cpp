@@ -385,7 +385,7 @@ class RatboxIRCdMessage : public IRCdMessage
 				c->SetModeInternal(NULL, *it, buf);
 
 			/* Now set whatever modes this user is allowed to have on the channel */
-			chan_set_correct_modes(u, c, 1);
+			chan_set_correct_modes(u, c, 1, true);
 
 			/* Check to see if modules want the user to join, if they do
 			 * check to see if they are allowed to join (CheckKick will kick/ban them)

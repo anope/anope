@@ -32,7 +32,7 @@ class CommandCSUp : public Command
 			for (UChannelList::iterator it = u->chans.begin(); it != u->chans.end(); ++it)
 			{
 				Channel *c = (*it)->chan;
-				chan_set_correct_modes(u, c, 1);
+				chan_set_correct_modes(u, c, 1, false);
 			}
 		else
 		{
@@ -44,7 +44,7 @@ class CommandCSUp : public Command
 			else if (!c->ci)
 				source.Reply(CHAN_X_NOT_REGISTERED, channel.c_str());
 			else
-				chan_set_correct_modes(u, c, 1);
+				chan_set_correct_modes(u, c, 1, false);
 		}
 
 	}

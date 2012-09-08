@@ -250,7 +250,7 @@ class NickServCore : public Module
 				ChannelContainer *cc = *it;
 				Channel *c = cc->chan;
 				if (c)
-					chan_set_correct_modes(u, c, 1);
+					chan_set_correct_modes(u, c, 1, true);
 			}
 
 		if (Config->NSForceEmail && u->Account()->email.empty())
@@ -286,7 +286,7 @@ class NickServCore : public Module
 			ChannelContainer *cc = *it;
 			Channel *c = cc->chan;
 			if (c)
-				chan_set_correct_modes(u, c, 1);
+				chan_set_correct_modes(u, c, 1, false);
 		}
 	}
 

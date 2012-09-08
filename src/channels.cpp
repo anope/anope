@@ -94,7 +94,7 @@ void Channel::Reset()
 	this->CheckModes();
 
 	for (CUserList::const_iterator it = this->users.begin(), it_end = this->users.end(); it != it_end; ++it)
-		chan_set_correct_modes((*it)->user, this, 1);
+		chan_set_correct_modes((*it)->user, this, 1, false);
 	
 	if (this->ci)
 		this->ci->RestoreTopic();
@@ -371,7 +371,7 @@ void Channel::SetModeInternal(User *setter, ChannelMode *cm, const Anope::string
 
 		/* Enforce secureops, etc */
 		if (EnforceMLock)
-			chan_set_correct_modes(u, this, 0);
+			chan_set_correct_modes(u, this, 0, false);
 		return;
 	}
 
@@ -454,7 +454,7 @@ void Channel::RemoveModeInternal(User *setter, ChannelMode *cm, const Anope::str
 					this->SetMode(bi, cm, bi->nick);
 			}
 
-			chan_set_correct_modes(u, this, 0);
+			chan_set_correct_modes(u, this, 0, false);
 		}
 		return;
 	}
@@ -1042,7 +1042,7 @@ void do_join(const Anope::string &source, const Anope::string &channels, const A
 		/* Join the user to the channel */
 		chan->JoinUser(user);
 		/* Set the propre modes on the user */
-		chan_set_correct_modes(user, chan, 1);
+		chan_set_correct_modes(user, chan, 1, true);
 
 		/* Modules may want to allow this user in the channel, check.
 		 * If not, CheckKick will kick/ban them, don't call OnJoinChannel after this as the user will have
@@ -1153,7 +1153,7 @@ void do_cmode(const Anope::string &source, const Anope::string &channel, const A
  * @param give_modes Set to 1 to give modes, 0 to not give modes
  * @return void
  **/
-void chan_set_correct_modes(const User *user, Channel *c, int give_modes)
+void chan_set_correct_modes(const User *user, Channel *c, int give_modes, bool check_noop)
 {
 	ChannelMode *owner = ModeManager::FindChannelModeByName(CMODE_OWNER),
 		*admin = ModeManager::FindChannelModeByName(CMODE_PROTECT),
@@ -1173,7 +1173,7 @@ void chan_set_correct_modes(const User *user, Channel *c, int give_modes)
 
 	AccessGroup u_access = ci->AccessFor(user);
 
-	if (give_modes && (!user->Account() || user->Account()->HasFlag(NI_AUTOOP)))
+	if (give_modes && (!user->Account() || user->Account()->HasFlag(NI_AUTOOP)) && (!check_noop || !ci->HasFlag(CI_NOAUTOOP)))
 	{
 		if (owner && u_access.HasPriv("AUTOOWNER"))
 			c->SetMode(NULL, CMODE_OWNER, user->nick);

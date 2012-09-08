@@ -62,6 +62,8 @@ enum ChannelInfoFlag
 	CI_PERSIST,
 	/* Chanstats are enabled */
 	CI_STATS,
+	/* If set users are not auto given any status on join */
+	CI_NOAUTOOP,
 
 	CI_END
 };
@@ -69,7 +71,7 @@ enum ChannelInfoFlag
 const Anope::string ChannelInfoFlagStrings[] = {
 	"BEGIN", "KEEPTOPIC", "SECUREOPS", "PRIVATE", "TOPICLOCK", "RESTRICTED",
 	"PEACE", "SECURE", "NO_EXPIRE", "MEMO_HARDMAX", "SECUREFOUNDER",
-	"SIGNKICK", "SIGNKICK_LEVEL", "SUSPENDED", "PERSIST", "STATS", ""
+	"SIGNKICK", "SIGNKICK_LEVEL", "SUSPENDED", "PERSIST", "STATS", "NOAUTOOP", ""
 };
 
 /** Flags for badwords

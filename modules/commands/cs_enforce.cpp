@@ -60,7 +60,7 @@ class CommandCSEnforce : public Command
 		{
 			UserContainer *uc = *it;
 
-			chan_set_correct_modes(uc->user, c, 0);
+			chan_set_correct_modes(uc->user, c, 0, false);
 		}
 
 		if (hadsecureops)

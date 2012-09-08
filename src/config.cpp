@@ -116,6 +116,8 @@ ServerConfig::ServerConfig() : config_data(), NSDefFlags(NickCoreFlagStrings), C
 				this->CSDefFlags.SetFlag(CI_PEACE);
 			else if (option.equals_ci("persist"))
 				this->CSDefFlags.SetFlag(CI_PERSIST);
+			else if (option.equals_ci("noautoop"))
+				this->CSDefFlags.SetFlag(CI_NOAUTOOP);
 		}
 	}
 

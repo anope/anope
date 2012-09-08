@@ -255,6 +255,6 @@ extern CoreExport void do_join(const Anope::string &source, const Anope::string 
 extern CoreExport void do_kick(const Anope::string &source, const Anope::string &channel, const Anope::string &users, const Anope::string &reason);
 extern CoreExport void do_part(const Anope::string &source, const Anope::string &channels, const Anope::string &reason);
 
-extern CoreExport void chan_set_correct_modes(const User *user, Channel *c, int give_modes);
+extern CoreExport void chan_set_correct_modes(const User *user, Channel *c, int give_modes, bool check_noop);
 
 #endif // CHANNELS_H

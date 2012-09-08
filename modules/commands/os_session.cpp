@@ -299,14 +299,14 @@ class CommandOSException : public Command
 		else if (expires > 0)
 			expires += Anope::CurTime;
 
-		int limit = -1;
+		unsigned limit = -1;
 		try
 		{
-			limit = convertTo<int>(limitstr);
+			limit = convertTo<unsigned>(limitstr);
 		}
 		catch (const ConvertException &) { }
 
-		if (limit < 0 || limit > static_cast<int>(Config->MaxSessionLimit))
+		if (limit > Config->MaxSessionLimit)
 		{
 			source.Reply(_("Invalid session limit. It must be a valid integer greater than or equal to zero and less than \002%d\002."), Config->MaxSessionLimit);
 			return;
@@ -414,7 +414,7 @@ class CommandOSException : public Command
 		}
 		catch (const ConvertException &) { }
 
-		if (n1 >= 0 && n1 < session_service->GetExceptions().size() && n2 >= 0 && n2 < session_service->GetExceptions().size() && n1 != n2)
+		if (n1 >= 0 && static_cast<unsigned>(n1) < session_service->GetExceptions().size() && n2 >= 0 && static_cast<unsigned>(n2) < session_service->GetExceptions().size() && n1 != n2)
 		{
 			Exception *temp = session_service->GetExceptions()[n1];
 			session_service->GetExceptions()[n1] = session_service->GetExceptions()[n2];
@@ -607,7 +607,15 @@ class OSSession : public Module
 
 	void AddSession(User *u, bool exempt)
 	{
-		Session *session = this->ss.FindSession(u->ip);
+		Session *session;
+		try
+		{
+			session = this->ss.FindSession(u->ip);
+		}
+		catch (const SocketException &)
+		{
+			return;
+		}
 
 		if (session)
 		{
@@ -669,7 +677,15 @@ class OSSession : public Module
 
 	void DelSession(User *u)
 	{
-		Session *session = this->ss.FindSession(u->host);
+		Session *session;
+		try
+		{
+			session = this->ss.FindSession(u->ip);
+		}
+		catch (const SocketException &)
+		{
+			return;
+		}
 		if (!session)
 		{
 			if (debug)

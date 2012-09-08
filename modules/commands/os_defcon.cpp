@@ -536,7 +536,15 @@ class OSDefcon : public Module
 		if (!DConfig.sessionlimit || !session_service)
 			return;
 
-		Session *session = session_service->FindSession(u->host);
+		Session *session;
+		try
+		{
+			session = session_service->FindSession(u->ip);
+		}
+		catch (const SocketException &)
+		{
+			return;
+		}
 		Exception *exception = session_service->FindException(u);
 
 		if (DConfig.Check(DEFCON_REDUCE_SESSION) && !exception)

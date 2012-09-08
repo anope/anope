@@ -76,22 +76,13 @@ class CommandCSSetSignKick : public Command
 	}
 };
 
-class CommandCSSASetSignKick : public CommandCSSetSignKick
-{
- public:
-	CommandCSSASetSignKick(Module *creator) : CommandCSSetSignKick(creator, "chanserv/saset/signkick")
-	{
-	}
-};
-
 class CSSetSignKick : public Module
 {
 	CommandCSSetSignKick commandcssetsignkick;
-	CommandCSSASetSignKick commandcssasetsignkick;
 
  public:
 	CSSetSignKick(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
-		commandcssetsignkick(this), commandcssasetsignkick(this)
+		commandcssetsignkick(this)
 	{
 		this->SetAuthor("Anope");
 

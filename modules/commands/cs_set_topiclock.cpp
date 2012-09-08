@@ -64,22 +64,13 @@ class CommandCSSetTopicLock : public Command
 	}
 };
 
-class CommandCSSASetTopicLock : public CommandCSSetTopicLock
-{
- public:
-	CommandCSSASetTopicLock(Module *creator) : CommandCSSetTopicLock(creator, "chanserv/saset/topiclock")
-	{
-	}
-};
-
 class CSSetTopicLock : public Module
 {
 	CommandCSSetTopicLock commandcssettopiclock;
-	CommandCSSASetTopicLock commandcssasettopiclock;
 
  public:
 	CSSetTopicLock(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
-		commandcssettopiclock(this), commandcssasettopiclock(this)
+		commandcssettopiclock(this)
 	{
 		this->SetAuthor("Anope");
 

@@ -105,23 +105,14 @@ class CommandCSSetMisc : public Command
 	}
 };
 
-class CommandCSSASetMisc : public CommandCSSetMisc
-{
- public:
-	CommandCSSASetMisc(Module *creator) : CommandCSSetMisc(creator, "chanserv/saset/misc")
-	{
-	}
-};
-
 class CSSetMisc : public Module
 {
 	SerializeType csmiscdata_type;
 	CommandCSSetMisc commandcssetmisc;
-	CommandCSSASetMisc commandcssasetmisc;
 
  public:
 	CSSetMisc(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
-		csmiscdata_type("CSMiscData", CSMiscData::unserialize), commandcssetmisc(this), commandcssasetmisc(this)
+		csmiscdata_type("CSMiscData", CSMiscData::unserialize), commandcssetmisc(this)
 	{
 		this->SetAuthor("Anope");
 

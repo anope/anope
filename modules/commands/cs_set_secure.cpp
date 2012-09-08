@@ -66,22 +66,13 @@ class CommandCSSetSecure : public Command
 	}
 };
 
-class CommandCSSASetSecure : public CommandCSSetSecure
-{
- public:
-	CommandCSSASetSecure(Module *creator) : CommandCSSetSecure(creator, "chanserv/saset/secure")
-	{
-	}
-};
-
 class CSSetSecure : public Module
 {
 	CommandCSSetSecure commandcssetsecure;
-	CommandCSSASetSecure commandcssasetsecure;
 
  public:
 	CSSetSecure(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
-		commandcssetsecure(this), commandcssasetsecure(this)
+		commandcssetsecure(this)
 	{
 		this->SetAuthor("Anope");
 

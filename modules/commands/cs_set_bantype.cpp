@@ -70,22 +70,13 @@ class CommandCSSetBanType : public Command
 	}
 };
 
-class CommandCSSASetBanType : public CommandCSSetBanType
-{
- public:
-	CommandCSSASetBanType(Module *creator) : CommandCSSetBanType(creator, "chanserv/saset/bantype")
-	{
-	}
-};
-
 class CSSetBanType : public Module
 {
 	CommandCSSetBanType commandcssetbantype;
-	CommandCSSASetBanType commandcssasetbantype;
 
  public:
 	CSSetBanType(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
-		commandcssetbantype(this), commandcssasetbantype(this)
+		commandcssetbantype(this)
 	{
 		this->SetAuthor("Anope");
 

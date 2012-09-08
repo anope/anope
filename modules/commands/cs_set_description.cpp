@@ -61,22 +61,13 @@ class CommandCSSetDescription : public Command
 	}
 };
 
-class CommandCSSASetDescription : public CommandCSSetDescription
-{
- public:
-	CommandCSSASetDescription(Module *creator) : CommandCSSetDescription(creator, "chanserv/saset/description")
-	{
-	}
-};
-
 class CSSetDescription : public Module
 {
 	CommandCSSetDescription commandcssetdescription;
-	CommandCSSASetDescription commandcssasetdescription;
 
  public:
 	CSSetDescription(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
-		commandcssetdescription(this), commandcssasetdescription(this)
+		commandcssetdescription(this)
 	{
 		this->SetAuthor("Anope");
 

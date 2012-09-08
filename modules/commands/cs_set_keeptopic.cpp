@@ -66,22 +66,13 @@ class CommandCSSetKeepTopic : public Command
 	}
 };
 
-class CommandCSSASetKeepTopic : public CommandCSSetKeepTopic
-{
- public:
-	CommandCSSASetKeepTopic(Module *creator) : CommandCSSetKeepTopic(creator, "chanserv/saset/keeptopic")
-	{
-	}
-};
-
 class CSSetKeepTopic : public Module
 {
 	CommandCSSetKeepTopic commandcssetkeeptopic;
-	CommandCSSASetKeepTopic commandcssasetkeeptopic;
 
  public:
 	CSSetKeepTopic(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
-		commandcssetkeeptopic(this), commandcssasetkeeptopic(this)
+		commandcssetkeeptopic(this)
 	{
 		this->SetAuthor("Anope");
 

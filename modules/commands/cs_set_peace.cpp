@@ -65,22 +65,13 @@ class CommandCSSetPeace : public Command
 	}
 };
 
-class CommandCSSASetPeace : public CommandCSSetPeace
-{
- public:
-	CommandCSSASetPeace(Module *creator) : CommandCSSetPeace(creator, "chanserv/saset/peace")
-	{
-	}
-};
-
 class CSSetPeace : public Module
 {
 	CommandCSSetPeace commandcssetpeace;
-	CommandCSSASetPeace commandcssasetpeace;
 
  public:
 	CSSetPeace(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
-		commandcssetpeace(this), commandcssasetpeace(this)
+		commandcssetpeace(this)
 	{
 		this->SetAuthor("Anope");
 

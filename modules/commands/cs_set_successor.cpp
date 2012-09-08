@@ -91,22 +91,13 @@ class CommandCSSetSuccessor : public Command
 	}
 };
 
-class CommandCSSASetSuccessor : public CommandCSSetSuccessor
-{
- public:
-	CommandCSSASetSuccessor(Module *creator) : CommandCSSetSuccessor(creator, "chanserv/saset/successor")
-	{
-	}
-};
-
 class CSSetSuccessor : public Module
 {
 	CommandCSSetSuccessor commandcssetsuccessor;
-	CommandCSSASetSuccessor commandcssasetsuccessor;
 
  public:
 	CSSetSuccessor(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
-		commandcssetsuccessor(this), commandcssasetsuccessor(this)
+		commandcssetsuccessor(this)
 	{
 		this->SetAuthor("Anope");
 

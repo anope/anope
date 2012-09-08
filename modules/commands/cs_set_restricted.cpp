@@ -63,22 +63,13 @@ class CommandCSSetRestricted : public Command
 	}
 };
 
-class CommandCSSASetRestricted : public CommandCSSetRestricted
-{
- public:
-	CommandCSSASetRestricted(Module *creator) : CommandCSSetRestricted(creator, "chanserv/saset/restricted")
-	{
-	}
-};
-
 class CSSetRestricted : public Module
 {
 	CommandCSSetRestricted commandcssetrestricted;
-	CommandCSSASetRestricted commandcssasetrestricted;
 
  public:
 	CSSetRestricted(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
-		commandcssetrestricted(this), commandcssasetrestricted(this)
+		commandcssetrestricted(this)
 	{
 		this->SetAuthor("Anope");
 

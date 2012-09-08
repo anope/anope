@@ -67,22 +67,13 @@ class CommandCSSetSecureFounder : public Command
 	}
 };
 
-class CommandCSSASetSecureFounder : public CommandCSSetSecureFounder
-{
- public:
-	CommandCSSASetSecureFounder(Module *creator) : CommandCSSetSecureFounder(creator, "chanserv/saset/securefounder")
-	{
-	}
-};
-
 class CSSetSecureFounder : public Module
 {
 	CommandCSSetSecureFounder commandcssetsecurefounder;
-	CommandCSSASetSecureFounder commandcssasetsecurefounder;
 
  public:
 	CSSetSecureFounder(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
-		commandcssetsecurefounder(this), commandcssasetsecurefounder(this)
+		commandcssetsecurefounder(this)
 	{
 		this->SetAuthor("Anope");
 

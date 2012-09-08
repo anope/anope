@@ -152,22 +152,13 @@ class CommandCSSetPersist : public Command
 	}
 };
 
-class CommandCSSASetPersist : public CommandCSSetPersist
-{
- public:
-	CommandCSSASetPersist(Module *creator) : CommandCSSetPersist(creator, "chanserv/saset/persist")
-	{
-	}
-};
-
 class CSSetPersist : public Module
 {
 	CommandCSSetPersist commandcssetpeace;
-	CommandCSSASetPersist commandcssasetpeace;
 
  public:
 	CSSetPersist(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
-		commandcssetpeace(this), commandcssasetpeace(this)
+		commandcssetpeace(this)
 	{
 		this->SetAuthor("Anope");
 

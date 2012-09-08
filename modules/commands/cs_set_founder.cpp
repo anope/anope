@@ -76,22 +76,13 @@ class CommandCSSetFounder : public Command
 	}
 };
 
-class CommandCSSASetFounder : public CommandCSSetFounder
-{
- public:
-	CommandCSSASetFounder(Module *creator) : CommandCSSetFounder(creator, "chanserv/saset/founder")
-	{
-	}
-};
-
 class CSSetFounder : public Module
 {
 	CommandCSSetFounder commandcssetfounder;
-	CommandCSSASetFounder commandcssasetfounder;
 
  public:
 	CSSetFounder(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
-		commandcssetfounder(this), commandcssasetfounder(this)
+		commandcssetfounder(this)
 	{
 		this->SetAuthor("Anope");
 

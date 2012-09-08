@@ -65,22 +65,13 @@ class CommandCSSetPrivate : public Command
 	}
 };
 
-class CommandCSSASetPrivate : public CommandCSSetPrivate
-{
- public:
-	CommandCSSASetPrivate(Module *creator) : CommandCSSetPrivate(creator, "chanserv/saset/private")
-	{
-	}
-};
-
 class CSSetPrivate : public Module
 {
 	CommandCSSetPrivate commandcssetprivate;
-	CommandCSSASetPrivate commandcssasetprivate;
 
  public:
 	CSSetPrivate(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
-		commandcssetprivate(this), commandcssasetprivate(this)
+		commandcssetprivate(this)
 	{
 		this->SetAuthor("Anope");
 

@@ -82,13 +82,14 @@ const char *anope_gettext(const char *lang, const char *string)
 #ifdef _WIN32
 	SetThreadLocale(MAKELCID(MAKELANGID(WindowsGetLanguage(lang), SUBLANG_DEFAULT), SORT_DEFAULT));
 #else
-	/* First, set LANGUAGE env variable.
+	/* First, set LANG and LANGUAGE env variables.
 	 * Some systems (Debian) don't care about this, so we must setlocale LC_ALL aswell.
 	 * BUT if this call fails because the LANGUAGE env variable is set, setlocale resets
 	 * the locale to "C", which short circuits gettext and causes it to fail on systems that
 	 * use the LANGUAGE env variable. We must reset the locale to en_US (or, anything not
 	 * C or POSIX) then.
 	 */
+	setenv("LANG", lang, 1);
 	setenv("LANGUAGE", lang, 1);
 	if (setlocale(LC_ALL, lang) == NULL)
 		setlocale(LC_ALL, "en_US");
@@ -100,6 +101,7 @@ const char *anope_gettext(const char *lang, const char *string)
 	SetThreadLocale(MAKELCID(MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), SORT_DEFAULT));
 #else
 	unsetenv("LANGUAGE");
+	unsetenv("LANG");
 	setlocale(LC_ALL, "");
 #endif
 

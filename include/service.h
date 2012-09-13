@@ -80,6 +80,8 @@ class service_reference : public dynamic_reference<T>
 	Anope::string name;
 
  public:
+ 	service_reference() : dynamic_reference<T>(NULL) { }
+
 	service_reference(const Anope::string &t, const Anope::string &n) : dynamic_reference<T>(NULL), type(t), name(n)
 	{
 	}

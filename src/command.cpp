@@ -15,6 +15,7 @@
 #include "opertype.h"
 #include "access.h"
 #include "regchannel.h"
+#include "channels.h"
 
 CommandSource::CommandSource(const Anope::string &n, User *user, NickCore *core, CommandReply *r) : nick(n), u(user), nc(core), reply(r),
 	c(NULL), owner(NULL), service(NULL)
@@ -26,12 +27,17 @@ const Anope::string &CommandSource::GetNick() const
 	return this->nick;
 }
 
-User *CommandSource::GetUser() const
+User *CommandSource::GetUser()
 {
 	return this->u;
 }
 
-AccessGroup CommandSource::AccessFor(ChannelInfo *ci) const
+NickCore *CommandSource::GetAccount()
+{
+	return this->nc;
+}
+
+AccessGroup CommandSource::AccessFor(ChannelInfo *ci)
 {
 	if (this->u)
 		return ci->AccessFor(this->u);
@@ -41,12 +47,12 @@ AccessGroup CommandSource::AccessFor(ChannelInfo *ci) const
 		return AccessGroup();
 }
 
-bool CommandSource::IsFounder(ChannelInfo *ci) const
+bool CommandSource::IsFounder(ChannelInfo *ci)
 {
 	if (this->u)
 		return ::IsFounder(this->u, ci);
 	else if (this->nc)
-		return this->nc == ci->GetFounder();
+		return *this->nc == ci->GetFounder();
 	return false;
 }
 
@@ -68,7 +74,7 @@ bool CommandSource::HasPriv(const Anope::string &cmd)
 	return false;
 }
 
-bool CommandSource::IsServicesOper() const
+bool CommandSource::IsServicesOper()
 {
 	if (this->u)
 		return this->u->IsServicesOper();
@@ -77,7 +83,7 @@ bool CommandSource::IsServicesOper() const
 	return false;
 }
 
-bool CommandSource::IsOper() const
+bool CommandSource::IsOper()
 {
 	if (this->u)
 		return this->u->HasMode(UMODE_OPER);

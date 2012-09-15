@@ -44,18 +44,18 @@ class CoreExport CommandSource
 	/* The nick executing the command */
 	Anope::string nick;
 	/* User executing the command, may be NULL */
-	User *u;
+	dynamic_reference<User> u;
  public:
 	/* The account executing the command */
-	NickCore *nc;
+	dynamic_reference<NickCore> nc;
 	/* Where the reply should go */
 	CommandReply *reply;
 	/* Channel the command was executed on (fantasy) */
-	Channel *c;
+	dynamic_reference<Channel> c;
 	/* The service this command is on */
-	BotInfo *owner;
+	dynamic_reference<BotInfo> owner;
 	/* The service the reply should come from, *not* necessarily the service the command is on */
-	BotInfo *service;
+	dynamic_reference<BotInfo> service;
 	/* The actual name of the command being executed */
 	Anope::string command;
 	/* The permission of the command being executed */
@@ -64,17 +64,18 @@ class CoreExport CommandSource
 	CommandSource(const Anope::string &n, User *user, NickCore *core, CommandReply *reply);
 
 	const Anope::string &GetNick() const;
-	User *GetUser() const;
-	AccessGroup AccessFor(ChannelInfo *ci) const;
-	bool IsFounder(ChannelInfo *ci) const;
+	User *GetUser();
+	NickCore *GetAccount();
+	AccessGroup AccessFor(ChannelInfo *ci);
+	bool IsFounder(ChannelInfo *ci);
 
 	void Reply(const char *message, ...);
 	void Reply(const Anope::string &message);
 
 	bool HasCommand(const Anope::string &cmd);
 	bool HasPriv(const Anope::string &cmd);
-	bool IsServicesOper() const;
-	bool IsOper() const;
+	bool IsServicesOper();
+	bool IsOper();
 };
 
 /** Every services command is a class, inheriting from Command.

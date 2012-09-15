@@ -30,7 +30,7 @@ class CommandNSUpdate : public Command
 
 		NickAlias *na = findnick(u->nick);
 
-		if (na && na->nc == source.nc)
+		if (na && na->nc == source.GetAccount())
 		{
 			na->last_realname = u->realname;
 			na->last_seen = Anope::CurTime;

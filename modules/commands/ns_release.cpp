@@ -58,10 +58,10 @@ class CommandNSRelease : public Command
 		}
 		else
 		{
-			bool override = source.nc != na->nc && source.HasPriv("nickserv/release");
+			bool override = source.GetAccount() != na->nc && source.HasPriv("nickserv/release");
 
 			bool ok = override;
-			if (source.nc == na->nc)
+			if (source.GetAccount() == na->nc)
 				ok = true;
 			else if (source.GetUser() && !na->nc->HasFlag(NI_SECURE) && is_on_access(source.GetUser(), na->nc))
 				ok = true;

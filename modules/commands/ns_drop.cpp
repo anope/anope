@@ -38,7 +38,7 @@ class CommandNSDrop : public Command
 			return;
 		}
 
-		bool is_mine = source.nc == na->nc;
+		bool is_mine = source.GetAccount() == na->nc;
 		Anope::string my_nick;
 		if (is_mine && nick.empty())
 			my_nick = na->nick;

@@ -88,6 +88,13 @@ class dynamic_reference : public dynamic_reference_base
 		return NULL;
 	}
 
+	inline T* operator*()
+	{
+		if (operator bool())
+			return this->ref;
+		return NULL;
+	}
+
 	inline void operator=(T *newref)
 	{
 		if (operator bool())

@@ -85,7 +85,7 @@ Log::Log(LogType type, const Anope::string &category, const BotInfo *b) : bi(b),
 		this->Sources.push_back(bi->nick);
 }
 
-Log::Log(LogType type, const CommandSource &source, Command *_c, const ChannelInfo *_ci) : nick(source.GetNick()), u(source.GetUser()), nc(source.nc), c(_c), chan(NULL), ci(_ci), s(NULL), Type(type)
+Log::Log(LogType type, CommandSource &source, Command *_c, const ChannelInfo *_ci) : nick(source.GetNick()), u(source.GetUser()), nc(source.nc), c(_c), chan(NULL), ci(_ci), s(NULL), Type(type)
 {
 	if (!c)
 		throw CoreException("Invalid pointers passed to Log::Log");

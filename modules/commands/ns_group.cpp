@@ -266,7 +266,7 @@ class CommandNSGList : public Command
 				source.Reply(NICK_X_NOT_REGISTERED, nick.c_str());
 				return;
 			}
-			else if (na->nc != source.nc && !source.IsServicesOper())
+			else if (na->nc != source.GetAccount() && !source.IsServicesOper())
 			{
 				source.Reply(ACCESS_DENIED, Config->NickServ.c_str());
 				return;
@@ -275,7 +275,7 @@ class CommandNSGList : public Command
 			nc = na->nc;
 		}
 		else
-			nc = source.nc;
+			nc = source.GetAccount();
 
 		ListFormatter list;
 		list.addColumn("Nick").addColumn("Expires");

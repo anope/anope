@@ -44,7 +44,7 @@ class CommandNSGhost : public Command
 		else
 		{
 			bool ok = false;
-			if (source.nc == na->nc)
+			if (source.GetAccount() == na->nc)
 				ok = true;
 			else if (!na->nc->HasFlag(NI_SECURE) && source.GetUser() && is_on_access(source.GetUser(), na->nc))
 				ok = true;

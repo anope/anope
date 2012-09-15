@@ -58,7 +58,7 @@ class CommandNSConfirm : public Command
 				{
 					ircdproto->SendLogin(source.GetUser());
 					const NickAlias *na = findnick(source.GetNick());
-					if (!Config->NoNicknameOwnership && na != NULL && na->nc == source.nc && na->nc->HasFlag(NI_UNCONFIRMED) == false)
+					if (!Config->NoNicknameOwnership && na != NULL && na->nc == source.GetAccount() && na->nc->HasFlag(NI_UNCONFIRMED) == false)
 						source.GetUser()->SetMode(findbot(Config->NickServ), UMODE_REGISTERED);
 				}
 			}
@@ -294,7 +294,7 @@ class CommandNSResend : public Command
 
 		if (na == NULL)
 			source.Reply(NICK_NOT_REGISTERED);
-		else if (na->nc != source.nc || source.nc->HasFlag(NI_UNCONFIRMED) == false)
+		else if (na->nc != source.GetAccount() || source.nc->HasFlag(NI_UNCONFIRMED) == false)
 			source.Reply(_("Your account is already confirmed."));
 		else
 		{

@@ -10,7 +10,6 @@ static Anope::string username_attribute;
 
 struct IdentifyInfo
 {
-	dynamic_reference<User> user;
 	dynamic_reference<Command> command;
 	CommandSource source;
 	std::vector<Anope::string> params;
@@ -20,8 +19,8 @@ struct IdentifyInfo
 	service_reference<LDAPProvider> lprov;
 	bool admin_bind;
 
-	IdentifyInfo(User *u, Command *c, CommandSource &s, const std::vector<Anope::string> &pa, const Anope::string &a, const Anope::string &p, service_reference<LDAPProvider> &lp) :
-		user(u), command(c), source(s), params(pa), account(a), pass(p), lprov(lp), admin_bind(true) { }
+	IdentifyInfo(Command *c, CommandSource &s, const std::vector<Anope::string> &pa, const Anope::string &a, const Anope::string &p, service_reference<LDAPProvider> &lp) :
+		command(c), source(s), params(pa), account(a), pass(p), lprov(lp), admin_bind(true) { }
 };
 
 class IdentifyInterface : public LDAPInterface
@@ -47,7 +46,7 @@ class IdentifyInterface : public LDAPInterface
 		IdentifyInfo *ii = it->second;
 		this->requests.erase(it);
 
-		if (!ii->user || !ii->command || !ii->lprov)
+		if (!ii->source.GetUser() || !ii->command || !ii->lprov)
 		{
 			delete this;
 			return;
@@ -75,7 +74,7 @@ class IdentifyInterface : public LDAPInterface
 				}
 				else
 				{
-					User *u = ii->user;
+					User *u = ii->source.GetUser();
 					Command *c = ii->command;
 
 					u->Extend("m_ldap_authentication_error", NULL);
@@ -98,7 +97,7 @@ class IdentifyInterface : public LDAPInterface
 				}
 				else
 				{
-					User *u = ii->user;
+					User *u = ii->source.GetUser();
 					Command *c = ii->command;
 
 					u->Extend("m_ldap_authentication_authenticated", NULL);
@@ -137,13 +136,13 @@ class IdentifyInterface : public LDAPInterface
 		IdentifyInfo *ii = it->second;
 		this->requests.erase(it);
 
-		if (!ii->user || !ii->command)
+		if (!ii->source.GetUser() || !ii->command)
 		{
 			delete ii;
 			return;
 		}
 
-		User *u = ii->user;
+		User *u = ii->source.GetUser();
 		Command *c = ii->command;
 
 		u->Extend("m_ldap_authentication_error", NULL);
@@ -289,7 +288,7 @@ class NSIdentifyLDAP : public Module
 			return EVENT_CONTINUE;
 		}
 
-		IdentifyInfo *ii = new IdentifyInfo(u, c, *source,  params, account, password, this->ldap);
+		IdentifyInfo *ii = new IdentifyInfo(c, *source,  params, account, password, this->ldap);
 		try
 		{
 			LDAPQuery id = this->ldap->BindAsAdmin(&this->iinterface);

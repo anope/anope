@@ -34,7 +34,7 @@ class CommandMSRSend : public Command
 		const NickAlias *na = NULL;
 
 		/* prevent user from rsend to themselves */
-		if ((na = findnick(nick)) && na->nc == source.nc)
+		if ((na = findnick(nick)) && na->nc == source.GetAccount())
 		{
 			source.Reply(_("You can not request a receipt when sending a memo to yourself."));
 			return;

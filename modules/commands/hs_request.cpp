@@ -89,7 +89,7 @@ class CommandHSRequest : public Command
 	{
 		User *u = source.GetUser();
 		NickAlias *na = findnick(source.GetNick());
-		if (!na || na->nc != source.nc)
+		if (!na || na->nc != source.GetAccount())
 		{
 			source.Reply(ACCESS_DENIED);
 			return;

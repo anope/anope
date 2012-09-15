@@ -65,7 +65,7 @@ class CoreExport Log
 	Log(LogType type = LOG_NORMAL, const Anope::string &category = "", const BotInfo *bi = NULL);
 
 	/* LOG_COMMAND/OVERRIDE/ADMIN */
-	Log(LogType type, const CommandSource &source, Command *c, const ChannelInfo *ci = NULL);
+	Log(LogType type, CommandSource &source, Command *c, const ChannelInfo *ci = NULL);
 
 	/* LOG_CHANNEL */
 	Log(const User *u, Channel *c, const Anope::string &category = "");

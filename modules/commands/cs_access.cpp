@@ -469,7 +469,7 @@ class CommandCSAccess : public Command
 		else if (is_del)
 		{
 			const NickAlias *na = findnick(nick);
-			if (na && na->nc == source.nc)
+			if (na && na->nc == source.GetAccount())
 				has_access = true;
 		}
 

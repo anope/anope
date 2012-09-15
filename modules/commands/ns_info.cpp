@@ -57,7 +57,7 @@ class CommandNSInfo : public Command
 			if (u2 && u2->Account() == na->nc)
 				nick_online = true;
 
-			if (has_auspex || na->nc == source.nc)
+			if (has_auspex || na->nc == source.GetAccount())
 				show_hidden = true;
 
 			source.Reply(_("%s is %s"), na->nick.c_str(), na->last_realname.c_str());

@@ -114,12 +114,12 @@ class CommandNSAccess : public Command
 				source.Reply(NICK_X_NOT_REGISTERED, nick.c_str());
 				return;
 			}
-			else if (na->nc != source.nc && !source.HasPriv("nickserv/access"))
+			else if (na->nc != source.GetAccount() && !source.HasPriv("nickserv/access"))
 			{
 				source.Reply(ACCESS_DENIED);
 				return;
 			}
-			else if (Config->NSSecureAdmins && source.nc != na->nc && na->nc->IsServicesOper() && !cmd.equals_ci("LIST"))
+			else if (Config->NSSecureAdmins && source.GetAccount() != na->nc && na->nc->IsServicesOper() && !cmd.equals_ci("LIST"))
 			{
 				source.Reply(_("You may view but not modify the access list of other services operators."));
 				return;

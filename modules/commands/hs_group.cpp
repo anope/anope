@@ -38,7 +38,7 @@ class CommandHSGroup : public Command
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		NickAlias *na = findnick(source.GetNick());
-		if (na && source.nc == na->nc && na->HasVhost())
+		if (na && source.GetAccount() == na->nc && na->HasVhost())
 		{
 			this->Sync(na);
 			if (!na->GetVhostIdent().empty())

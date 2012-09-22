@@ -15,7 +15,6 @@
 #include "module.h"
 
 static void myOperServHelp(User * u);
-static int load_config(void);
 static int reload_config(int argc, char **argv);
 
 /**

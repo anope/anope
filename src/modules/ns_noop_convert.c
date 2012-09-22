@@ -39,23 +39,11 @@
 /*************************************************************************/
 
 User *currentUser;
-static int m_isIRCop = 0;
 
 char *NSAutoOPDBName;
 
-static int myNickServAutoOpHelp(User * u);
-static void myNickServHelp(User * u);
-
-static int noop(User * u);
-static int mEventJoin(int argc, char **argv);
-static int setAutoOp(User * u);
-static int UnsetAutoOp(User * u);
-
 static int mLoadData(void);
-static int mSaveData(int argc, char **argv);
 static int mLoadConfig(int argc, char **argv);
-
-static void m_AddLanguages(void);
 
 /*************************************************************************/
 

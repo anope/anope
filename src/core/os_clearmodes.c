@@ -14,8 +14,8 @@
 
 #include "module.h"
 
-int do_clearmodes(User * u);
-void myOperServHelp(User * u);
+static int do_clearmodes(User * u);
+static void myOperServHelp(User * u);
 
 /**
  * Create the command, and tell anope about it.
@@ -54,7 +54,7 @@ void AnopeFini(void)
  * Add the help response to anopes /os help output.
  * @param u The user who is requesting help
  **/
-void myOperServHelp(User * u)
+static void myOperServHelp(User * u)
 {
     if (is_services_oper(u)) {
         notice_lang(s_OperServ, u, OPER_HELP_CMD_CLEARMODES);
@@ -66,7 +66,7 @@ void myOperServHelp(User * u)
  * @param u The user who issued the command
  * @param MOD_CONT to continue processing other modules, MOD_STOP to stop processing.
  **/
-int do_clearmodes(User * u)
+static int do_clearmodes(User * u)
 {
     char *s;
     char *argv[2];

@@ -14,18 +14,18 @@
 
 #include "module.h"
 
-void myChanServHelp(User * u);
-int do_util(User * u, CSModeUtil * util);
-int do_op(User * u);
-int do_deop(User * u);
-int do_voice(User * u);
-int do_devoice(User * u);
-int do_halfop(User * u);
-int do_dehalfop(User * u);
-int do_protect(User * u);
-int do_deprotect(User * u);
-int do_owner(User * u);
-int do_deowner(User * u);
+static void myChanServHelp(User * u);
+static int do_util(User * u, CSModeUtil * util);
+static int do_op(User * u);
+static int do_deop(User * u);
+static int do_voice(User * u);
+static int do_devoice(User * u);
+static int do_halfop(User * u);
+static int do_dehalfop(User * u);
+static int do_protect(User * u);
+static int do_deprotect(User * u);
+static int do_owner(User * u);
+static int do_deowner(User * u);
 
 /**
  * Create the command, and tell anope about it.
@@ -87,7 +87,7 @@ void AnopeFini(void)
  * Add the help response to anopes /cs help output.
  * @param u The user who is requesting help
  **/
-void myChanServHelp(User * u)
+static void myChanServHelp(User * u)
 {
     if (ircd->owner) {
         notice_lang(s_ChanServ, u, CHAN_HELP_CMD_OWNER);
@@ -117,35 +117,35 @@ void myChanServHelp(User * u)
  * @param MOD_CONT to continue processing other modules, MOD_STOP to stop processing.
  **/
 
-int do_op(User * u)
+static int do_op(User * u)
 {
     return do_util(u, &csmodeutils[MUT_OP]);
 }
 
 /*************************************************************************/
 
-int do_deop(User * u)
+static int do_deop(User * u)
 {
     return do_util(u, &csmodeutils[MUT_DEOP]);
 }
 
 /*************************************************************************/
 
-int do_voice(User * u)
+static int do_voice(User * u)
 {
     return do_util(u, &csmodeutils[MUT_VOICE]);
 }
 
 /*************************************************************************/
 
-int do_devoice(User * u)
+static int do_devoice(User * u)
 {
     return do_util(u, &csmodeutils[MUT_DEVOICE]);
 }
 
 /*************************************************************************/
 
-int do_halfop(User * u)
+static int do_halfop(User * u)
 {
     if (ircd->halfop) {
         return do_util(u, &csmodeutils[MUT_HALFOP]);
@@ -156,7 +156,7 @@ int do_halfop(User * u)
 
 /*************************************************************************/
 
-int do_dehalfop(User * u)
+static int do_dehalfop(User * u)
 {
     if (ircd->halfop) {
         return do_util(u, &csmodeutils[MUT_DEHALFOP]);
@@ -167,7 +167,7 @@ int do_dehalfop(User * u)
 
 /*************************************************************************/
 
-int do_protect(User * u)
+static int do_protect(User * u)
 {
     if (ircd->protect || ircd->admin) {
         return do_util(u, &csmodeutils[MUT_PROTECT]);
@@ -178,7 +178,7 @@ int do_protect(User * u)
 
 /*************************************************************************/
 
-int do_deprotect(User * u)
+static int do_deprotect(User * u)
 {
     if (ircd->protect || ircd->admin) {
         return do_util(u, &csmodeutils[MUT_DEPROTECT]);
@@ -189,7 +189,7 @@ int do_deprotect(User * u)
 
 /*************************************************************************/
 
-int do_owner(User * u)
+static int do_owner(User * u)
 {
     char *av[2];
     char *chan = strtok(NULL, " ");
@@ -245,7 +245,7 @@ int do_owner(User * u)
 
 /*************************************************************************/
 
-int do_deowner(User * u)
+static int do_deowner(User * u)
 {
     char *av[2];
     char *chan = strtok(NULL, " ");
@@ -301,7 +301,7 @@ int do_deowner(User * u)
 
 /* do_util: not a command, but does the job of other */
 
-int do_util(User * u, CSModeUtil * util)
+static int do_util(User * u, CSModeUtil * util)
 {
     char *av[2];
     char *chan = strtok(NULL, " ");

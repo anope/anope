@@ -14,10 +14,10 @@
 
 #include "module.h"
 
-int do_modinfo(User * u);
-void myOperServHelp(User * u);
-int showModuleMsgLoaded(MessageHash * msgList, char *mod_name, User * u);
-int showModuleCmdLoaded(CommandHash * cmdList, char *mod_name, User * u);
+static int do_modinfo(User * u);
+static void myOperServHelp(User * u);
+static int showModuleMsgLoaded(MessageHash * msgList, char *mod_name, User * u);
+static int showModuleCmdLoaded(CommandHash * cmdList, char *mod_name, User * u);
 
 /**
  * Create the command, and tell anope about it.
@@ -54,7 +54,7 @@ void AnopeFini(void)
  * Add the help response to anopes /os help output.
  * @param u The user who is requesting help
  **/
-void myOperServHelp(User * u)
+static void myOperServHelp(User * u)
 {
     notice_lang(s_OperServ, u, OPER_HELP_CMD_MODINFO);
 }
@@ -64,7 +64,7 @@ void myOperServHelp(User * u)
  * @param u The user who issued the command
  * @param MOD_CONT to continue processing other modules, MOD_STOP to stop processing.
  **/
-int do_modinfo(User * u)
+static int do_modinfo(User * u)
 {
     char *file;
     struct tm tm;
@@ -102,7 +102,7 @@ int do_modinfo(User * u)
     return MOD_CONT;
 }
 
-int showModuleCmdLoaded(CommandHash * cmdList, char *mod_name, User * u)
+static int showModuleCmdLoaded(CommandHash * cmdList, char *mod_name, User * u)
 {
     Command *c;
     CommandHash *current;
@@ -120,7 +120,7 @@ int showModuleCmdLoaded(CommandHash * cmdList, char *mod_name, User * u)
     return display;
 }
 
-int showModuleMsgLoaded(MessageHash * msgList, char *mod_name, User * u)
+static int showModuleMsgLoaded(MessageHash * msgList, char *mod_name, User * u)
 {
     Message *msg;
     MessageHash *mcurrent;

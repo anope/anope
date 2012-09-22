@@ -14,9 +14,9 @@
 
 #include "module.h"
 
-void myOperServHelp(User * u);
-int load_config(void);
-int reload_config(int argc, char **argv);
+static void myOperServHelp(User * u);
+static int load_config(void);
+static int reload_config(int argc, char **argv);
 
 /**
  * Create the command, and tell anope about it.
@@ -73,7 +73,7 @@ void AnopeFini(void)
  * Add the help response to anopes /os help output.
  * @param u The user who is requesting help
  **/
-void myOperServHelp(User * u)
+static void myOperServHelp(User * u)
 {
     if (is_services_admin(u)) {
         notice_lang(s_OperServ, u, OPER_HELP_CMD_LOGONNEWS);
@@ -84,7 +84,7 @@ void myOperServHelp(User * u)
 /**
  * Upon /os reload refresh the count
  **/
-int reload_config(int argc, char **argv) {
+static int reload_config(int argc, char **argv) {
     char buf[BUFSIZE];
     Command *c;
 

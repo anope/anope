@@ -14,15 +14,15 @@
 
 #include "module.h"
 
-int do_group(User * u);
-void myNickServHelp(User * u);
-int do_glist(User * u);
-int do_listlinks(User * u);
+static int do_group(User * u);
+static void myNickServHelp(User * u);
+static int do_glist(User * u);
+static int do_listlinks(User * u);
 
 NickAlias *makealias(const char *nick, NickCore * nc);
 
 /* Obsolete commands */
-int do_link(User * u);
+static int do_link(User * u);
 
 /**
  * Create the command, and tell anope about it.
@@ -72,7 +72,7 @@ void AnopeFini(void)
  * Add the help response to anopes /ns help output.
  * @param u The user who is requesting help
  **/
-void myNickServHelp(User * u)
+static void myNickServHelp(User * u)
 {
     notice_lang(s_NickServ, u, NICK_HELP_CMD_GROUP);
     notice_lang(s_NickServ, u, NICK_HELP_CMD_GLIST);
@@ -85,7 +85,7 @@ void myNickServHelp(User * u)
  **/
 /* Register a nick in a specified group. */
 
-int do_group(User * u)
+static int do_group(User * u)
 {
     NickAlias *na, *target;
     NickCore *nc;
@@ -281,13 +281,13 @@ NickAlias *makealias(const char *nick, NickCore * nc)
 }
 
 
-int do_link(User * u)
+static int do_link(User * u)
 {
     notice_lang(s_NickServ, u, OBSOLETE_COMMAND, "GROUP");
     return MOD_CONT;
 }
 
-int do_glist(User * u)
+static int do_glist(User * u)
 {
     char *nick = strtok(NULL, " ");
 
@@ -338,7 +338,7 @@ int do_glist(User * u)
 }
 
 
-int do_listlinks(User * u)
+static int do_listlinks(User * u)
 {
     notice_lang(s_NickServ, u, OBSOLETE_COMMAND, "GLIST");
     return MOD_CONT;

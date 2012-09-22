@@ -14,9 +14,9 @@
 
 #include "module.h"
 
-int do_info(User * u);
-void send_bot_channels(User * u, BotInfo * bi);
-void myBotServHelp(User * u);
+static int do_info(User * u);
+static void send_bot_channels(User * u, BotInfo * bi);
+static void myBotServHelp(User * u);
 
 /**
  * Create the info command, and tell anope about it.
@@ -54,7 +54,7 @@ void AnopeFini(void)
  * Add the help response to Anopes /bs help output.
  * @param u The user who is requesting help
  **/
-void myBotServHelp(User * u)
+static void myBotServHelp(User * u)
 {
     notice_lang(s_BotServ, u, BOT_HELP_CMD_INFO);
 }
@@ -64,7 +64,7 @@ void myBotServHelp(User * u)
  * @param u The user who issued the command
  * @param MOD_CONT to continue processing other modules, MOD_STOP to stop processing.
  **/
-int do_info(User * u)
+static int do_info(User * u)
 {
     BotInfo *bi;
     ChannelInfo *ci;
@@ -251,7 +251,7 @@ int do_info(User * u)
     return MOD_CONT;
 }
 
-void send_bot_channels(User * u, BotInfo * bi)
+static void send_bot_channels(User * u, BotInfo * bi)
 {
     int i;
     ChannelInfo *ci;

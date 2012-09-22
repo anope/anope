@@ -16,9 +16,9 @@
 
 Command *c;
 
-int do_release(User * u);
-void myNickServHelp(User * u);
-int myHelpResonse(User * u);
+static int do_release(User * u);
+static void myNickServHelp(User * u);
+static int myHelpResonse(User * u);
 
 /**
  * Create the command, and tell anope about it.
@@ -55,7 +55,7 @@ void AnopeFini(void)
  * Add the help response to anopes /ns help output.
  * @param u The user who is requesting help
  **/
-void myNickServHelp(User * u)
+static void myNickServHelp(User * u)
 {
     notice_lang(s_NickServ, u, NICK_HELP_CMD_RELEASE);
 }
@@ -64,7 +64,7 @@ void myNickServHelp(User * u)
  * Show the extended help on the RELEASE command.
  * @param u The user who is requesting help
  **/
-int myHelpResonse(User * u)
+static int myHelpResonse(User * u)
 {
     char relstr[192];
 
@@ -82,7 +82,7 @@ int myHelpResonse(User * u)
  * @param u The user who issued the command
  * @param MOD_CONT to continue processing other modules, MOD_STOP to stop processing.
  **/
-int do_release(User * u)
+static int do_release(User * u)
 {
     char *nick = strtok(NULL, " ");
     char *pass = strtok(NULL, " ");

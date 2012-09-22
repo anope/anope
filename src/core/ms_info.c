@@ -14,8 +14,8 @@
 
 #include "module.h"
 
-int do_info(User * u);
-void myMemoServHelp(User * u);
+static int do_info(User * u);
+static void myMemoServHelp(User * u);
 
 /**
  * Create the command, and tell anope about it.
@@ -52,7 +52,7 @@ void AnopeFini(void)
  * Add the help response to anopes /ms help output.
  * @param u The user who is requesting help
  **/
-void myMemoServHelp(User * u)
+static void myMemoServHelp(User * u)
 {
     notice_lang(s_MemoServ, u, MEMO_HELP_CMD_INFO);
 }
@@ -62,7 +62,7 @@ void myMemoServHelp(User * u)
  * @param u The user who issued the command
  * @param MOD_CONT to continue processing other modules, MOD_STOP to stop processing.
  **/
-int do_info(User * u)
+static int do_info(User * u)
 {
     MemoInfo *mi;
     NickAlias *na = NULL;

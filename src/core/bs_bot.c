@@ -14,10 +14,10 @@
 
 #include "module.h"
 
-int do_bot(User * u);
-int delbot(BotInfo * bi);
-void myBotServHelp(User * u);
-void change_bot_nick(BotInfo * bi, char *newnick);
+static int do_bot(User * u);
+static int delbot(BotInfo * bi);
+static void myBotServHelp(User * u);
+static void change_bot_nick(BotInfo * bi, char *newnick);
 
 /**
  * Create the command, and tell anope about it.
@@ -56,7 +56,7 @@ void AnopeFini(void)
  * Add the help response to Anopes /bs help output.
  * @param u The user who is requesting help
  **/
-void myBotServHelp(User * u)
+static void myBotServHelp(User * u)
 {
     if (is_services_admin(u)) {
         notice_lang(s_BotServ, u, BOT_HELP_CMD_BOT);
@@ -68,7 +68,7 @@ void myBotServHelp(User * u)
  * @param u The user who issued the command
  * @param MOD_CONT to continue processing other modules, MOD_STOP to stop processing.
  **/
-int do_bot(User * u)
+static int do_bot(User * u)
 {
     BotInfo *bi;
     char *cmd = strtok(NULL, " ");
@@ -349,7 +349,7 @@ int do_bot(User * u)
     return MOD_CONT;
 }
 
-int delbot(BotInfo * bi)
+static int delbot(BotInfo * bi)
 {
     cs_remove_bot(bi);
 
@@ -372,7 +372,7 @@ int delbot(BotInfo * bi)
     return 1;
 }
 
-void change_bot_nick(BotInfo * bi, char *newnick)
+static void change_bot_nick(BotInfo * bi, char *newnick)
 {
     if (bi->next)
         bi->next->prev = bi->prev;

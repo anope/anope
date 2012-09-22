@@ -14,15 +14,15 @@
 
 #include "module.h"
 
-int do_xop(User * u, char *xname, int xlev, int *xmsgs);
-int do_aop(User * u);
-int do_hop(User * u);
-int do_sop(User * u);
-int do_vop(User * u);
+static int do_xop(User * u, char *xname, int xlev, int *xmsgs);
+static int do_aop(User * u);
+static int do_hop(User * u);
+static int do_sop(User * u);
+static int do_vop(User * u);
 
-void myChanServHelp(User * u);
+static void myChanServHelp(User * u);
 
-int xop_msgs[4][14] = {
+static int xop_msgs[4][14] = {
     {CHAN_AOP_SYNTAX,
      CHAN_AOP_DISABLED,
      CHAN_AOP_NICKS_ONLY,
@@ -123,7 +123,7 @@ void AnopeFini(void)
  * Add the help response to anopes /cs help output.
  * @param u The user who is requesting help
  **/
-void myChanServHelp(User * u)
+static void myChanServHelp(User * u)
 {
     notice_lang(s_ChanServ, u, CHAN_HELP_CMD_SOP);
     notice_lang(s_ChanServ, u, CHAN_HELP_CMD_AOP);
@@ -138,14 +138,14 @@ void myChanServHelp(User * u)
  * @param u The user who issued the command
  * @param MOD_CONT to continue processing other modules, MOD_STOP to stop processing.
  **/
-int do_aop(User * u)
+static int do_aop(User * u)
 {
     return do_xop(u, "AOP", ACCESS_AOP, xop_msgs[0]);
 }
 
 /*************************************************************************/
 
-int do_hop(User * u)
+static int do_hop(User * u)
 {
     if (ircd->halfop)
         return do_xop(u, "HOP", ACCESS_HOP, xop_msgs[3]);
@@ -154,14 +154,14 @@ int do_hop(User * u)
 
 /*************************************************************************/
 
-int do_sop(User * u)
+static int do_sop(User * u)
 {
     return do_xop(u, "SOP", ACCESS_SOP, xop_msgs[1]);
 }
 
 /*************************************************************************/
 
-int do_vop(User * u)
+static int do_vop(User * u)
 {
     return do_xop(u, "VOP", ACCESS_VOP, xop_msgs[2]);
 }
@@ -170,7 +170,7 @@ int do_vop(User * u)
  * `perm' is incremented whenever a permission-denied error occurs
  */
 
-int xop_del(User * u, ChannelInfo * ci, ChanAccess * access, int *perm, int uacc, int xlev)
+static int xop_del(User * u, ChannelInfo * ci, ChanAccess * access, int *perm, int uacc, int xlev)
 {
     char *nick;
     if (!access->in_use || !access->nc || access->level != xlev)
@@ -186,7 +186,7 @@ int xop_del(User * u, ChannelInfo * ci, ChanAccess * access, int *perm, int uacc
     return 1;
 }
 
-int xop_del_callback(User * u, int num, va_list args)
+static int xop_del_callback(User * u, int num, va_list args)
 {
     ChannelInfo *ci = va_arg(args, ChannelInfo *);
     int *last = va_arg(args, int *);
@@ -202,7 +202,7 @@ int xop_del_callback(User * u, int num, va_list args)
 }
 
 
-int xop_list(User * u, int index, ChannelInfo * ci,
+static int xop_list(User * u, int index, ChannelInfo * ci,
              int *sent_header, int xlev, int xmsg)
 {
     ChanAccess *access = &ci->access[index];
@@ -220,7 +220,7 @@ int xop_list(User * u, int index, ChannelInfo * ci,
     return 1;
 }
 
-int xop_list_callback(User * u, int num, va_list args)
+static int xop_list_callback(User * u, int num, va_list args)
 {
     ChannelInfo *ci = va_arg(args, ChannelInfo *);
     int *sent_header = va_arg(args, int *);
@@ -234,7 +234,7 @@ int xop_list_callback(User * u, int num, va_list args)
 }
 
 
-int do_xop(User * u, char *xname, int xlev, int *xmsgs)
+static int do_xop(User * u, char *xname, int xlev, int *xmsgs)
 {
     char *chan = strtok(NULL, " ");
     char *cmd = strtok(NULL, " ");

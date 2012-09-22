@@ -14,11 +14,11 @@
 
 #include "module.h"
 
-int do_staff(User * u);
-void myOperServHelp(User * u);
-int opers_list_callback(SList * slist, int number, void *item,
+static int do_staff(User * u);
+static void myOperServHelp(User * u);
+static int opers_list_callback(SList * slist, int number, void *item,
                         va_list args);
-int opers_list(int number, NickCore * nc, User * u, char *level);
+static int opers_list(int number, NickCore * nc, User * u, char *level);
 
 /**
  * Create the command, and tell anope about it.
@@ -56,7 +56,7 @@ void AnopeFini(void)
  * Add the help response to anopes /os help output.
  * @param u The user who is requesting help
  **/
-void myOperServHelp(User * u)
+static void myOperServHelp(User * u)
 {
     notice_lang(s_OperServ, u, OPER_HELP_CMD_STAFF);
 }
@@ -66,7 +66,7 @@ void myOperServHelp(User * u)
  * @param u The user who issued the command
  * @param MOD_CONT to continue processing other modules, MOD_STOP to stop processing.
  **/
-int do_staff(User * u)
+static int do_staff(User * u)
 {
     int idx = 0;
     User *au = NULL;
@@ -108,7 +108,7 @@ int do_staff(User * u)
 /**
  * Function for the enumerator to call
  **/
-int opers_list_callback(SList * slist, int number, void *item,
+static int opers_list_callback(SList * slist, int number, void *item,
                         va_list args)
 {
     User *u = va_arg(args, User *);
@@ -121,7 +121,7 @@ int opers_list_callback(SList * slist, int number, void *item,
 /**
  * Display an Opers list Entry
  **/
-int opers_list(int number, NickCore * nc, User * u, char *level)
+static int opers_list(int number, NickCore * nc, User * u, char *level)
 {
     User *au = NULL;
     NickAlias *na;

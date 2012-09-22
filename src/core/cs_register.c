@@ -14,8 +14,8 @@
 
 #include "module.h"
 
-int do_register(User * u);
-void myChanServHelp(User * u);
+static int do_register(User * u);
+static void myChanServHelp(User * u);
 
 /**
  * Create the off command, and tell anope about it.
@@ -55,7 +55,7 @@ void AnopeFini(void)
  * Add the help response to anopes /cs help output.
  * @param u The user who is requesting help
  **/
-void myChanServHelp(User * u)
+static void myChanServHelp(User * u)
 {
     notice_lang(s_ChanServ, u, CHAN_HELP_CMD_REGISTER);
 }
@@ -65,7 +65,7 @@ void myChanServHelp(User * u)
  * @param u The user who issued the command
  * @param MOD_CONT to continue processing other modules, MOD_STOP to stop processing.
  **/
-int do_register(User * u)
+static int do_register(User * u)
 {
     char *chan = strtok(NULL, " ");
     char *pass = strtok(NULL, " ");

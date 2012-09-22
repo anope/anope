@@ -15,13 +15,13 @@
 #include "module.h"
 #include "encrypt.h"
 
-int do_confirm(User * u);
-int do_register(User * u);
-int do_resend(User * u);
-void myNickServHelp(User * u);
+static int do_confirm(User * u);
+static int do_register(User * u);
+static int do_resend(User * u);
+static void myNickServHelp(User * u);
 NickRequest *makerequest(const char *nick);
 NickAlias *makenick(const char *nick);
-int do_sendregmail(User * u, NickRequest * nr);
+static int do_sendregmail(User * u, NickRequest * nr);
 int ns_do_register(User * u);
 
 /**
@@ -68,7 +68,7 @@ void AnopeFini(void)
  * Add the help response to anopes /ns help output.
  * @param u The user who is requesting help
  **/
-void myNickServHelp(User * u)
+static void myNickServHelp(User * u)
 {
     notice_lang(s_NickServ, u, NICK_HELP_CMD_REGISTER);
     if (NSEmailReg) {
@@ -82,7 +82,7 @@ void myNickServHelp(User * u)
  * @param u The user who issued the command
  * @param MOD_CONT to continue processing other modules, MOD_STOP to stop processing.
  **/
-int do_register(User * u)
+static int do_register(User * u)
 {
     NickRequest *nr = NULL, *anr = NULL;
     NickCore *nc = NULL;
@@ -234,7 +234,7 @@ int ns_do_register(User * u)
 }
 
 
-int do_confirm(User * u)
+static int do_confirm(User * u)
 {
 
     NickRequest *nr = NULL;
@@ -436,7 +436,7 @@ NickAlias *makenick(const char *nick)
 
 /* Register a nick. */
 
-int do_resend(User * u)
+static int do_resend(User * u)
 {
     NickRequest *nr = NULL;
     if (NSEmailReg) {
@@ -458,7 +458,7 @@ int do_resend(User * u)
     return MOD_CONT;
 }
 
-int do_sendregmail(User * u, NickRequest * nr)
+static int do_sendregmail(User * u, NickRequest * nr)
 {
     MailInfo *mail = NULL;
     char buf[BUFSIZE];

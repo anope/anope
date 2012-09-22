@@ -14,15 +14,15 @@
 
 #include "module.h"
 
-int sgline_view_callback(SList * slist, int number, void *item,
+static int sgline_view_callback(SList * slist, int number, void *item,
                          va_list args);
-int sgline_view(int number, SXLine * sx, User * u, int *sent_header);
-int sgline_list_callback(SList * slist, int number, void *item,
+static int sgline_view(int number, SXLine * sx, User * u, int *sent_header);
+static int sgline_list_callback(SList * slist, int number, void *item,
                          va_list args);
-int sgline_list(int number, SXLine * sx, User * u, int *sent_header);
-int do_sgline(User * u);
+static int sgline_list(int number, SXLine * sx, User * u, int *sent_header);
+static int do_sgline(User * u);
 
-void myOperServHelp(User * u);
+static void myOperServHelp(User * u);
 
 /**
  * Create the command, and tell anope about it.
@@ -63,7 +63,7 @@ void AnopeFini(void)
  * Add the help response to anopes /os help output.
  * @param u The user who is requesting help
  **/
-void myOperServHelp(User * u)
+static void myOperServHelp(User * u)
 {
     if (is_services_oper(u)) {
         notice_lang(s_OperServ, u, OPER_HELP_CMD_SGLINE);
@@ -75,7 +75,7 @@ void myOperServHelp(User * u)
  * @param u The user who issued the command
  * @param MOD_CONT to continue processing other modules, MOD_STOP to stop processing.
  **/
-int do_sgline(User * u)
+static int do_sgline(User * u)
 {
     char *cmd = strtok(NULL, " ");
 
@@ -297,7 +297,7 @@ int do_sgline(User * u)
 
 /* Lists an SGLINE entry, prefixing it with the header if needed */
 
-int sgline_view(int number, SXLine * sx, User * u, int *sent_header)
+static int sgline_view(int number, SXLine * sx, User * u, int *sent_header)
 {
     char timebuf[32], expirebuf[256];
     struct tm tm;
@@ -322,7 +322,7 @@ int sgline_view(int number, SXLine * sx, User * u, int *sent_header)
 
 /* Callback for enumeration purposes */
 
-int sgline_view_callback(SList * slist, int number, void *item,
+static int sgline_view_callback(SList * slist, int number, void *item,
                          va_list args)
 {
     User *u = va_arg(args, User *);
@@ -333,7 +333,7 @@ int sgline_view_callback(SList * slist, int number, void *item,
 
 /* Lists an SGLINE entry, prefixing it with the header if needed */
 
-int sgline_list(int number, SXLine * sx, User * u, int *sent_header)
+static int sgline_list(int number, SXLine * sx, User * u, int *sent_header)
 {
     if (!sx)
         return 0;
@@ -351,7 +351,7 @@ int sgline_list(int number, SXLine * sx, User * u, int *sent_header)
 
 /* Callback for enumeration purposes */
 
-int sgline_list_callback(SList * slist, int number, void *item,
+static int sgline_list_callback(SList * slist, int number, void *item,
                          va_list args)
 {
     User *u = va_arg(args, User *);

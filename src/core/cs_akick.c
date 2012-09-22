@@ -15,9 +15,9 @@
 #include "module.h"
 
 
-int do_akick(User * u);
-void myChanServHelp(User * u);
-int get_access_nc(NickCore *nc, ChannelInfo *ci);
+static int do_akick(User * u);
+static void myChanServHelp(User * u);
+static int get_access_nc(NickCore *nc, ChannelInfo *ci);
 
 /**
  * Create the command, and tell anope about it.
@@ -56,7 +56,7 @@ void AnopeFini(void)
  * Add the help response to anopes /cs help output.
  * @param u The user who is requesting help
  **/
-void myChanServHelp(User * u)
+static void myChanServHelp(User * u)
 {
     notice_lang(s_ChanServ, u, CHAN_HELP_CMD_AKICK);
 }
@@ -67,7 +67,7 @@ void myChanServHelp(User * u)
  * @param MOD_CONT to continue processing other modules, MOD_STOP to stop processing.
  **/
  /* `last' is set to the last index this routine was called with */
-int akick_del(User * u, AutoKick * akick)
+static int akick_del(User * u, AutoKick * akick)
 {
     if (!(akick->flags & AK_USED))
         return 0;
@@ -90,7 +90,7 @@ int akick_del(User * u, AutoKick * akick)
     return 1;
 }
 
-int akick_del_callback(User * u, int num, va_list args)
+static int akick_del_callback(User * u, int num, va_list args)
 {
     ChannelInfo *ci = va_arg(args, ChannelInfo *);
     int *last = va_arg(args, int *);
@@ -104,7 +104,7 @@ int akick_del_callback(User * u, int num, va_list args)
 }
 
 
-int akick_list(User * u, int index, ChannelInfo * ci, int *sent_header)
+static int akick_list(User * u, int index, ChannelInfo * ci, int *sent_header)
 {
     AutoKick *akick = &ci->akick[index];
 
@@ -123,7 +123,7 @@ int akick_list(User * u, int index, ChannelInfo * ci, int *sent_header)
     return 1;
 }
 
-int akick_list_callback(User * u, int num, va_list args)
+static int akick_list_callback(User * u, int num, va_list args)
 {
     ChannelInfo *ci = va_arg(args, ChannelInfo *);
     int *sent_header = va_arg(args, int *);
@@ -132,7 +132,7 @@ int akick_list_callback(User * u, int num, va_list args)
     return akick_list(u, num - 1, ci, sent_header);
 }
 
-int akick_view(User * u, int index, ChannelInfo * ci, int *sent_header)
+static int akick_view(User * u, int index, ChannelInfo * ci, int *sent_header)
 {
     AutoKick *akick = &ci->akick[index];
     char timebuf[64];
@@ -167,7 +167,7 @@ int akick_view(User * u, int index, ChannelInfo * ci, int *sent_header)
     return 1;
 }
 
-int akick_view_callback(User * u, int num, va_list args)
+static int akick_view_callback(User * u, int num, va_list args)
 {
     ChannelInfo *ci = va_arg(args, ChannelInfo *);
     int *sent_header = va_arg(args, int *);
@@ -178,7 +178,7 @@ int akick_view_callback(User * u, int num, va_list args)
 
 
 
-int do_akick(User * u)
+static int do_akick(User * u)
 {
     char *chan = strtok(NULL, " ");
     char *cmd = strtok(NULL, " ");
@@ -668,7 +668,7 @@ int do_akick(User * u)
 }
 
 
-int get_access_nc(NickCore *nc, ChannelInfo *ci)
+static int get_access_nc(NickCore *nc, ChannelInfo *ci)
 {
     ChanAccess *access;
     if (!ci || !nc)

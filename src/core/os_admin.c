@@ -14,11 +14,11 @@
 
 #include "module.h"
 
-int do_admin(User * u);
-int admin_list_callback(SList * slist, int number, void *item,
+static int do_admin(User * u);
+static int admin_list_callback(SList * slist, int number, void *item,
                         va_list args);
-int admin_list(int number, NickCore * nc, User * u, int *sent_header);
-void myOperServHelp(User * u);
+static int admin_list(int number, NickCore * nc, User * u, int *sent_header);
+static void myOperServHelp(User * u);
 
 /**
  * Create the command, and tell anope about it.
@@ -58,7 +58,7 @@ void AnopeFini(void)
  * Add the help response to anopes /os help output.
  * @param u The user who is requesting help
  **/
-void myOperServHelp(User * u)
+static void myOperServHelp(User * u)
 {
     notice_lang(s_OperServ, u, OPER_HELP_CMD_ADMIN);
 }
@@ -68,7 +68,7 @@ void myOperServHelp(User * u)
  * @param u The user who issued the command
  * @param MOD_CONT to continue processing other modules, MOD_STOP to stop processing.
  **/
-int do_admin(User * u)
+static int do_admin(User * u)
 {
     char *cmd = strtok(NULL, " ");
     char *nick = strtok(NULL, " ");
@@ -223,7 +223,7 @@ int do_admin(User * u)
     return MOD_CONT;
 }
 
-int admin_list_callback(SList * slist, int number, void *item,
+static int admin_list_callback(SList * slist, int number, void *item,
                         va_list args)
 {
     User *u = va_arg(args, User *);
@@ -232,7 +232,7 @@ int admin_list_callback(SList * slist, int number, void *item,
     return admin_list(number, item, u, sent_header);
 }
 
-int admin_list(int number, NickCore * nc, User * u, int *sent_header)
+static int admin_list(int number, NickCore * nc, User * u, int *sent_header)
 {
     if (!nc)
         return 0;

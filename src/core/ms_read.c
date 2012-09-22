@@ -14,10 +14,10 @@
 
 #include "module.h"
 
-int do_read(User * u);
-int read_memo_callback(User * u, int num, va_list args);
-int read_memo(User * u, int index, MemoInfo * mi, const char *chan);
-void myMemoServHelp(User * u);
+static int do_read(User * u);
+static int read_memo_callback(User * u, int num, va_list args);
+static int read_memo(User * u, int index, MemoInfo * mi, const char *chan);
+static void myMemoServHelp(User * u);
 extern void rsend_notify(User * u, Memo * m, const char *chan);
 
 
@@ -56,7 +56,7 @@ void AnopeFini(void)
  * Add the help response to anopes /ms help output.
  * @param u The user who is requesting help
  **/
-void myMemoServHelp(User * u)
+static void myMemoServHelp(User * u)
 {
     notice_lang(s_MemoServ, u, MEMO_HELP_CMD_READ);
 }
@@ -66,7 +66,7 @@ void myMemoServHelp(User * u)
  * @param u The user who issued the command
  * @param MOD_CONT to continue processing other modules, MOD_STOP to stop processing.
  **/
-int do_read(User * u)
+static int do_read(User * u)
 {
     MemoInfo *mi;
     ChannelInfo *ci;
@@ -149,7 +149,7 @@ int do_read(User * u)
  * @param va_list variable arguements
  * @return result of read_memo()
  */
-int read_memo_callback(User * u, int num, va_list args)
+static int read_memo_callback(User * u, int num, va_list args)
 {
     MemoInfo *mi = va_arg(args, MemoInfo *);
     const char *chan = va_arg(args, const char *);
@@ -171,7 +171,7 @@ int read_memo_callback(User * u, int num, va_list args)
  * @param chan Channel Name
  * @return 1 on success, 0 if failed
  */
-int read_memo(User * u, int index, MemoInfo * mi, const char *chan)
+static int read_memo(User * u, int index, MemoInfo * mi, const char *chan)
 {
     Memo *m;
     char timebuf[64];

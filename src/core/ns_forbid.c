@@ -14,8 +14,8 @@
 
 #include "module.h"
 
-int do_forbid(User * u);
-void myNickServHelp(User * u);
+static int do_forbid(User * u);
+static void myNickServHelp(User * u);
 NickAlias *makenick(const char *nick);
 
 /**
@@ -56,7 +56,7 @@ void AnopeFini(void)
  * Add the help response to anopes /ns help output.
  * @param u The user who is requesting help
  **/
-void myNickServHelp(User * u)
+static void myNickServHelp(User * u)
 {
     if (is_services_admin(u)) {
         notice_lang(s_NickServ, u, NICK_HELP_CMD_FORBID);
@@ -68,7 +68,7 @@ void myNickServHelp(User * u)
  * @param u The user who issued the command
  * @param MOD_CONT to continue processing other modules, MOD_STOP to stop processing.
  **/
-int do_forbid(User * u)
+static int do_forbid(User * u)
 {
     NickAlias *na;
     char *nick = strtok(NULL, " ");

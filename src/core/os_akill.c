@@ -14,14 +14,14 @@
 
 #include "module.h"
 
-int do_akill(User * u);
-int akill_view_callback(SList * slist, int number, void *item,
+static int do_akill(User * u);
+static int akill_view_callback(SList * slist, int number, void *item,
                         va_list args);
-int akill_view(int number, Akill * ak, User * u, int *sent_header);
-int akill_list_callback(SList * slist, int number, void *item,
+static int akill_view(int number, Akill * ak, User * u, int *sent_header);
+static int akill_list_callback(SList * slist, int number, void *item,
                         va_list args);
-int akill_list(int number, Akill * ak, User * u, int *sent_header);
-void myOperServHelp(User * u);
+static int akill_list(int number, Akill * ak, User * u, int *sent_header);
+static void myOperServHelp(User * u);
 
 /**
  * Create the command, and tell anope about it.
@@ -60,7 +60,7 @@ void AnopeFini(void)
  * Add the help response to anopes /os help output.
  * @param u The user who is requesting help
  **/
-void myOperServHelp(User * u)
+static void myOperServHelp(User * u)
 {
     if (is_services_oper(u)) {
         notice_lang(s_OperServ, u, OPER_HELP_CMD_AKILL);
@@ -74,7 +74,7 @@ void myOperServHelp(User * u)
  **/
 /* Manage the AKILL list. */
 
-int do_akill(User * u)
+static int do_akill(User * u)
 {
     char *cmd = strtok(NULL, " ");
     char breason[BUFSIZE];
@@ -317,7 +317,7 @@ int do_akill(User * u)
     return MOD_CONT;
 }
 
-int akill_view(int number, Akill * ak, User * u, int *sent_header)
+static int akill_view(int number, Akill * ak, User * u, int *sent_header)
 {
     char mask[BUFSIZE];
     char timebuf[32], expirebuf[256];
@@ -344,7 +344,7 @@ int akill_view(int number, Akill * ak, User * u, int *sent_header)
 
 /* Lists an AKILL entry, prefixing it with the header if needed */
 
-int akill_list_callback(SList * slist, int number, void *item,
+static int akill_list_callback(SList * slist, int number, void *item,
                         va_list args)
 {
     User *u = va_arg(args, User *);
@@ -355,7 +355,7 @@ int akill_list_callback(SList * slist, int number, void *item,
 
 /* Callback for enumeration purposes */
 
-int akill_view_callback(SList * slist, int number, void *item,
+static int akill_view_callback(SList * slist, int number, void *item,
                         va_list args)
 {
     User *u = va_arg(args, User *);
@@ -365,7 +365,7 @@ int akill_view_callback(SList * slist, int number, void *item,
 }
 
 /* Lists an AKILL entry, prefixing it with the header if needed */
-int akill_list(int number, Akill * ak, User * u, int *sent_header)
+static int akill_list(int number, Akill * ak, User * u, int *sent_header)
 {
     char mask[BUFSIZE];
 

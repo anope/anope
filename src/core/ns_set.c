@@ -15,21 +15,21 @@
 #include "module.h"
 #include "encrypt.h"
 
-int do_set(User * u);
-int do_set_display(User * u, NickCore * nc, char *param);
-int do_set_password(User * u, NickCore * nc, char *param);
-int do_set_language(User * u, NickCore * nc, char *param);
-int do_set_url(User * u, NickCore * nc, char *param);
-int do_set_email(User * u, NickCore * nc, char *param);
-int do_set_greet(User * u, NickCore * nc, char *param);
-int do_set_icq(User * u, NickCore * nc, char *param);
-int do_set_kill(User * u, NickCore * nc, char *param);
-int do_set_secure(User * u, NickCore * nc, char *param);
-int do_set_private(User * u, NickCore * nc, char *param);
-int do_set_msg(User * u, NickCore * nc, char *param);
-int do_set_hide(User * u, NickCore * nc, char *param);
-int do_set_autoop(User *u, NickCore *nc, char *param);
-void myNickServHelp(User * u);
+static int do_set(User * u);
+static int do_set_display(User * u, NickCore * nc, char *param);
+static int do_set_password(User * u, NickCore * nc, char *param);
+static int do_set_language(User * u, NickCore * nc, char *param);
+static int do_set_url(User * u, NickCore * nc, char *param);
+static int do_set_email(User * u, NickCore * nc, char *param);
+static int do_set_greet(User * u, NickCore * nc, char *param);
+static int do_set_icq(User * u, NickCore * nc, char *param);
+static int do_set_kill(User * u, NickCore * nc, char *param);
+static int do_set_secure(User * u, NickCore * nc, char *param);
+static int do_set_private(User * u, NickCore * nc, char *param);
+static int do_set_msg(User * u, NickCore * nc, char *param);
+static int do_set_hide(User * u, NickCore * nc, char *param);
+static int do_set_autoop(User *u, NickCore *nc, char *param);
+static void myNickServHelp(User * u);
 
 /**
  * Create the command, and tell anope about it.
@@ -103,7 +103,7 @@ void AnopeFini(void)
  * Add the help response to anopes /ns help output.
  * @param u The user who is requesting help
  **/
-void myNickServHelp(User * u)
+static void myNickServHelp(User * u)
 {
     notice_lang(s_NickServ, u, NICK_HELP_CMD_SET);
 }
@@ -113,7 +113,7 @@ void myNickServHelp(User * u)
  * @param u The user who issued the command
  * @param MOD_CONT to continue processing other modules, MOD_STOP to stop processing.
  **/
-int do_set(User * u)
+static int do_set(User * u)
 {
     char *cmd = strtok(NULL, " ");
     char *param = strtok(NULL, " ");
@@ -170,7 +170,7 @@ int do_set(User * u)
     return MOD_CONT;
 }
 
-int do_set_display(User * u, NickCore * nc, char *param)
+static int do_set_display(User * u, NickCore * nc, char *param)
 {
     int i;
     NickAlias *na;
@@ -201,7 +201,7 @@ int do_set_display(User * u, NickCore * nc, char *param)
     return MOD_CONT;
 }
 
-int do_set_password(User * u, NickCore * nc, char *param)
+static int do_set_password(User * u, NickCore * nc, char *param)
 {
     int len = strlen(param);
     char tmp_pass[PASSMAX];
@@ -235,7 +235,7 @@ int do_set_password(User * u, NickCore * nc, char *param)
     return MOD_CONT;
 }
 
-int do_set_language(User * u, NickCore * nc, char *param)
+static int do_set_language(User * u, NickCore * nc, char *param)
 {
     int langnum;
 
@@ -257,7 +257,7 @@ int do_set_language(User * u, NickCore * nc, char *param)
     return MOD_CONT;
 }
 
-int do_set_url(User * u, NickCore * nc, char *param)
+static int do_set_url(User * u, NickCore * nc, char *param)
 {
     if (nc->url)
         free(nc->url);
@@ -276,7 +276,7 @@ int do_set_url(User * u, NickCore * nc, char *param)
     return MOD_CONT;
 }
 
-int do_set_email(User * u, NickCore * nc, char *param)
+static int do_set_email(User * u, NickCore * nc, char *param)
 {
     if (!param && NSForceEmail) {
         notice_lang(s_NickServ, u, NICK_SET_EMAIL_UNSET_IMPOSSIBLE);
@@ -303,7 +303,7 @@ int do_set_email(User * u, NickCore * nc, char *param)
     return MOD_CONT;
 }
 
-int do_set_icq(User * u, NickCore * nc, char *param)
+static int do_set_icq(User * u, NickCore * nc, char *param)
 {
     if (param) {
         int32 tmp = atol(param);
@@ -324,7 +324,7 @@ int do_set_icq(User * u, NickCore * nc, char *param)
     return MOD_CONT;
 }
 
-int do_set_greet(User * u, NickCore * nc, char *param)
+static int do_set_greet(User * u, NickCore * nc, char *param)
 {
     if (nc->greet)
         free(nc->greet);
@@ -347,7 +347,7 @@ int do_set_greet(User * u, NickCore * nc, char *param)
     return MOD_CONT;
 }
 
-int do_set_kill(User * u, NickCore * nc, char *param)
+static int do_set_kill(User * u, NickCore * nc, char *param)
 {
     if (stricmp(param, "ON") == 0) {
         nc->flags |= NI_KILLPROTECT;
@@ -384,7 +384,7 @@ int do_set_kill(User * u, NickCore * nc, char *param)
     return MOD_CONT;
 }
 
-int do_set_secure(User * u, NickCore * nc, char *param)
+static int do_set_secure(User * u, NickCore * nc, char *param)
 {
     if (stricmp(param, "ON") == 0) {
         nc->flags |= NI_SECURE;
@@ -402,7 +402,7 @@ int do_set_secure(User * u, NickCore * nc, char *param)
     return MOD_CONT;
 }
 
-int do_set_private(User * u, NickCore * nc, char *param)
+static int do_set_private(User * u, NickCore * nc, char *param)
 {
     if (stricmp(param, "ON") == 0) {
         nc->flags |= NI_PRIVATE;
@@ -421,7 +421,7 @@ int do_set_private(User * u, NickCore * nc, char *param)
     return MOD_CONT;
 }
 
-int do_set_msg(User * u, NickCore * nc, char *param)
+static int do_set_msg(User * u, NickCore * nc, char *param)
 {
     if (!UsePrivmsg) {
         notice_lang(s_NickServ, u, NICK_SET_OPTION_DISABLED, "MSG");
@@ -444,7 +444,7 @@ int do_set_msg(User * u, NickCore * nc, char *param)
     return MOD_CONT;
 }
 
-int do_set_hide(User * u, NickCore * nc, char *param)
+static int do_set_hide(User * u, NickCore * nc, char *param)
 {
     int flag, onmsg, offmsg;
     char *param2;
@@ -490,7 +490,7 @@ int do_set_hide(User * u, NickCore * nc, char *param)
     return MOD_CONT;
 }
 
-int do_set_autoop(User *u, NickCore *nc, char *param) {
+static int do_set_autoop(User *u, NickCore *nc, char *param) {
 
     /**
      * This works the other way around, the absence of this flag denotes ON

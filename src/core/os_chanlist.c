@@ -14,8 +14,8 @@
 
 #include "module.h"
 
-int do_chanlist(User * u);
-void myOperServHelp(User * u);
+static int do_chanlist(User * u);
+static void myOperServHelp(User * u);
 #ifdef _WIN32
 extern MDE int anope_get_private_mode();
 #endif
@@ -57,7 +57,7 @@ void AnopeFini(void)
  * Add the help response to anopes /os help output.
  * @param u The user who is requesting help
  **/
-void myOperServHelp(User * u)
+static void myOperServHelp(User * u)
 {
     notice_lang(s_OperServ, u, OPER_HELP_CMD_CHANLIST);
 }
@@ -67,7 +67,7 @@ void myOperServHelp(User * u)
  * @param u The user who issued the command
  * @param MOD_CONT to continue processing other modules, MOD_STOP to stop processing.
  **/
-int do_chanlist(User * u)
+static int do_chanlist(User * u)
 {
     char *pattern = strtok(NULL, " ");
     char *opt = strtok(NULL, " ");

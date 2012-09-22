@@ -18,10 +18,10 @@
 #define AUTHOR "Anope"
 #define VERSION VERSION_STRING
 
-int my_cs_enforce(User * u);
-void my_cs_help(User * u);
-int my_cs_help_enforce(User * u);
-void my_add_languages(void);
+static int my_cs_enforce(User * u);
+static void my_cs_help(User * u);
+static int my_cs_help_enforce(User * u);
+static void my_add_languages(void);
 
 #define LNG_NUM_STRINGS    6
 
@@ -61,7 +61,7 @@ void AnopeFini(void)
 }
 
 /* Enforcing functions */
-void do_enforce_secureops(Channel * c)
+static void do_enforce_secureops(Channel * c)
 {
     struct c_userlist *user;
     struct c_userlist *next;
@@ -90,7 +90,7 @@ void do_enforce_secureops(Channel * c)
     ci->flags = flags;
 }
 
-void do_enforce_restricted(Channel * c)
+static void do_enforce_restricted(Channel * c)
 {
     struct c_userlist *user;
     struct c_userlist *next;
@@ -131,7 +131,7 @@ void do_enforce_restricted(Channel * c)
     ci->levels[CA_NOJOIN] = old_nojoin_level;
 }
 
-void do_enforce_cmode_R(Channel * c)
+static void do_enforce_cmode_R(Channel * c)
 {
     struct c_userlist *user;
     struct c_userlist *next;
@@ -169,7 +169,7 @@ void do_enforce_cmode_R(Channel * c)
 }
 
 /* Enforcing Group Functions */
-void do_enforce_set(Channel * c)
+static void do_enforce_set(Channel * c)
 {
     ChannelInfo *ci;
 
@@ -182,7 +182,7 @@ void do_enforce_set(Channel * c)
         do_enforce_restricted(c);
 }
 
-void do_enforce_modes(Channel * c)
+static void do_enforce_modes(Channel * c)
 {
     CBMode *cbm;
 
@@ -192,7 +192,7 @@ void do_enforce_modes(Channel * c)
 
 /* End of enforcing functions */
 
-int my_cs_enforce(User * u)
+static int my_cs_enforce(User * u)
 {
     char *cur_buffer;
     char *chan=NULL;
@@ -242,12 +242,12 @@ int my_cs_enforce(User * u)
 }
 
 /* Language and response stuff */
-void my_cs_help(User * u)
+static void my_cs_help(User * u)
 {
     moduleNoticeLang(s_ChanServ, u, LNG_CHAN_HELP);
 }
 
-int my_cs_help_enforce(User * u)
+static int my_cs_help_enforce(User * u)
 {
     moduleNoticeLang(s_ChanServ, u, LNG_ENFORCE_SYNTAX);
     notice(s_ChanServ, u->nick, " ");
@@ -261,7 +261,7 @@ int my_cs_help_enforce(User * u)
     return MOD_STOP;
 }
 
-void my_add_languages(void)
+static void my_add_languages(void)
 {
     /* English (US) */
     char *langtable_en_us[] = {

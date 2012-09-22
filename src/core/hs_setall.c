@@ -14,8 +14,8 @@
 
 #include "module.h"
 
-int do_setall(User * u);
-void myHostServHelp(User * u);
+static int do_setall(User * u);
+static void myHostServHelp(User * u);
 extern int do_hs_sync(NickCore * nc, char *vIdent, char *hostmask,
                       char *creator, time_t time);
 
@@ -55,7 +55,7 @@ void AnopeFini(void)
  * Add the help response to anopes /hs help output.
  * @param u The user who is requesting help
  **/
-void myHostServHelp(User * u)
+static void myHostServHelp(User * u)
 {
     if (is_host_setter(u)) {
         notice_lang(s_HostServ, u, HOST_HELP_CMD_SETALL);
@@ -67,7 +67,7 @@ void myHostServHelp(User * u)
  * @param u The user who issued the command
  * @param MOD_CONT to continue processing other modules, MOD_STOP to stop processing.
  **/
-int do_setall(User * u)
+static int do_setall(User * u)
 {
 
     char *nick = strtok(NULL, " ");

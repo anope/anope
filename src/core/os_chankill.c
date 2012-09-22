@@ -14,8 +14,8 @@
 
 #include "module.h"
 
-int do_chankill(User * u);
-void myOperServHelp(User * u);
+static int do_chankill(User * u);
+static void myOperServHelp(User * u);
 
 /**
  * Create the command, and tell anope about it.
@@ -55,7 +55,7 @@ void AnopeFini(void)
  * Add the help response to anopes /os help output.
  * @param u The user who is requesting help
  **/
-void myOperServHelp(User * u)
+static void myOperServHelp(User * u)
 {
     if (is_services_admin(u)) {
         notice_lang(s_OperServ, u, OPER_HELP_CMD_CHANKILL);
@@ -70,7 +70,7 @@ void myOperServHelp(User * u)
  * @param MOD_CONT to continue processing other modules, MOD_STOP to stop processing. 
  *
  **/
-int do_chankill(User * u)
+static int do_chankill(User * u)
 {
     char *expiry, *channel, *reason;
     time_t expires;

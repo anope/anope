@@ -59,20 +59,20 @@ struct db_file_ {
 char *IgnoreDB;
 
 /* Functions */
-int new_open_db_read(DBFile *dbptr, char **key, char **value);
-int new_open_db_write(DBFile *dbptr);
-void new_close_db(FILE *fptr, char **key, char **value);
-int new_read_db_entry(char **key, char **value, FILE * fptr);
-int new_write_db_entry(const char *key, DBFile *dbptr, const char *fmt, ...);
-int new_write_db_endofblock(DBFile *dbptr);
-void fill_db_ptr(DBFile *dbptr, int version, int core_version, char service[256], char filename[256]);
+static int new_open_db_read(DBFile *dbptr, char **key, char **value);
+static int new_open_db_write(DBFile *dbptr);
+static void new_close_db(FILE *fptr, char **key, char **value);
+static int new_read_db_entry(char **key, char **value, FILE * fptr);
+static int new_write_db_entry(const char *key, DBFile *dbptr, const char *fmt, ...);
+static int new_write_db_endofblock(DBFile *dbptr);
+static void fill_db_ptr(DBFile *dbptr, int version, int core_version, char service[256], char filename[256]);
 
-int save_ignoredb(int argc, char **argv);
-int backup_ignoredb(int argc, char **argv);
-void load_ignore_db(void);
-void save_ignore_db(void);
-void load_config(void);
-int reload_config(int argc, char **argv);
+static int save_ignoredb(int argc, char **argv);
+static int backup_ignoredb(int argc, char **argv);
+static void load_ignore_db(void);
+static void save_ignore_db(void);
+static void load_config(void);
+static int reload_config(int argc, char **argv);
 
 /* ------------------------------------------------------------------------------- */
 
@@ -128,7 +128,7 @@ void AnopeFini(void) {
 
 /* ------------------------------------------------------------------------------- */
 
-void load_config(void) {
+static void load_config(void) {
 	int i;
 
 	Directive confvalues[][1] = {
@@ -152,7 +152,7 @@ void load_config(void) {
 /**
  * Upon /os reload call the routines for reloading the configuration directives
  **/
-int reload_config(int argc, char **argv) {
+static int reload_config(int argc, char **argv) {
 	if (argc >= 1) {
 		if (!stricmp(argv[0], EVENT_START)) {
 			load_config();
@@ -164,7 +164,7 @@ int reload_config(int argc, char **argv) {
 /**
  * When anope saves her databases, we do the same.
  **/
-int save_ignoredb(int argc, char **argv) {
+static int save_ignoredb(int argc, char **argv) {
 	if ((argc >= 1) && (!stricmp(argv[0], EVENT_STOP)))
 		save_ignore_db();
 
@@ -175,7 +175,7 @@ int save_ignoredb(int argc, char **argv) {
 /**
  * When anope backs her databases up, we do the same.
  **/
-int backup_ignoredb(int argc, char **argv) {
+static int backup_ignoredb(int argc, char **argv) {
 	if ((argc >= 1) && (!stricmp(argv[0], EVENT_STOP))) {
 		if (debug)
 			alog("[os_ignore_db] debug: Backing up %s database...", IgnoreDB);
@@ -190,7 +190,7 @@ int backup_ignoredb(int argc, char **argv) {
  *                DataBase Handling
  **************************************************************************/
 
-void load_ignore_db(void) {
+static void load_ignore_db(void) {
 	DBFile *dbptr = scalloc(1, sizeof(DBFile));
 	char *key, *value, *mask = NULL;
 	int retval = 0;
@@ -284,7 +284,7 @@ void load_ignore_db(void) {
 }
 
 
-void save_ignore_db(void) {
+static void save_ignore_db(void) {
 	DBFile *dbptr = scalloc(1, sizeof(DBFile));
 	time_t now;
 	IgnoreData *ign, *next;
@@ -345,7 +345,7 @@ void save_ignore_db(void) {
  **************************************************************************/
 
 
-int new_open_db_read(DBFile *dbptr, char **key, char **value) {
+static int new_open_db_read(DBFile *dbptr, char **key, char **value) {
 	*key = malloc(MAXKEYLEN);
 	*value = malloc(MAXVALLEN);
 
@@ -396,7 +396,7 @@ int new_open_db_read(DBFile *dbptr, char **key, char **value) {
 }
 
 
-int new_open_db_write(DBFile *dbptr) {
+static int new_open_db_write(DBFile *dbptr) {
 	if (!(dbptr->fptr = fopen(dbptr->filename, "wb"))) {
 		if (debug) {
 			alog("debug: %s Can't open %s database for writing", dbptr->service, dbptr->filename);
@@ -417,7 +417,7 @@ int new_open_db_write(DBFile *dbptr) {
 }
 
 
-void new_close_db(FILE *fptr, char **key, char **value) {
+static void new_close_db(FILE *fptr, char **key, char **value) {
 	if (key && *key) {
 		free(*key);
 		*key = NULL;
@@ -433,7 +433,7 @@ void new_close_db(FILE *fptr, char **key, char **value) {
 }
 
 
-int new_read_db_entry(char **key, char **value, FILE *fptr) {
+static int new_read_db_entry(char **key, char **value, FILE *fptr) {
 	char *string = *key;
 	int character;
 	int i = 0;
@@ -473,7 +473,7 @@ int new_read_db_entry(char **key, char **value, FILE *fptr) {
 }
 
 
-int new_write_db_entry(const char *key, DBFile *dbptr, const char *fmt, ...) {
+static int new_write_db_entry(const char *key, DBFile *dbptr, const char *fmt, ...) {
 	char string[MAXKEYLEN + MAXVALLEN + 2], value[MAXVALLEN];   /* safety byte :P */
 	va_list ap;
 	unsigned int length;
@@ -512,7 +512,7 @@ int new_write_db_entry(const char *key, DBFile *dbptr, const char *fmt, ...) {
 }
 
 
-int new_write_db_endofblock(DBFile *dbptr) {
+static int new_write_db_endofblock(DBFile *dbptr) {
 	if (!dbptr) {
 		return DB_WRITE_ERROR;
 	}
@@ -528,7 +528,7 @@ int new_write_db_endofblock(DBFile *dbptr) {
 
 
 
-void fill_db_ptr(DBFile *dbptr, int version, int core_version,
+static void fill_db_ptr(DBFile *dbptr, int version, int core_version,
 				char service[256], char filename[256]) {
 	dbptr->db_version = version;
 	dbptr->core_db_version = core_version;

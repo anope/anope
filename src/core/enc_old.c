@@ -13,7 +13,7 @@
 
 #include "module.h"
 
-void binary_to_hex(unsigned char *bin, char *hex, int length)
+static void my_binary_to_hex(unsigned char *bin, char *hex, int length)
 {
     static const char trans[] = "0123456789ABCDEF";
     int i;
@@ -358,7 +358,7 @@ unsigned int len;
  * resulting string would be longer than `size', return -1 and leave `dest'
  * unchanged; else return 0.
  */
-int old_encrypt(const char *src, int len, char *dest, int size)
+static int old_encrypt(const char *src, int len, char *dest, int size)
 {
 
     MD5_CTX context;
@@ -380,7 +380,7 @@ int old_encrypt(const char *src, int len, char *dest, int size)
 
     if(debug) {
         memset(tmp,0,33);
-        binary_to_hex(dest,tmp,16);
+        my_binary_to_hex(dest,tmp,16);
         alog("enc_old: Converted [%s] to [%s]",src,tmp); 
     }
 
@@ -388,7 +388,7 @@ int old_encrypt(const char *src, int len, char *dest, int size)
 
 }
 
-int old_encrypt_check_len(int passlen, int bufsize)
+static int old_encrypt_check_len(int passlen, int bufsize)
 {
     if (bufsize < 16)
         fatal("enc_old: old_check_len(): buffer too small (%d)", bufsize);
@@ -399,7 +399,7 @@ int old_encrypt_check_len(int passlen, int bufsize)
 /* Compare a plaintext string against an encrypted password.  Return 1 if
  * they match, 0 if not, and -1 if something went wrong. */
 
-int old_check_password(const char *plaintext, const char *password)
+static int old_check_password(const char *plaintext, const char *password)
 {
     char buf[BUFSIZE];
 
@@ -411,7 +411,7 @@ int old_check_password(const char *plaintext, const char *password)
         return 0;
 }
 
-int old_decrypt(const char *src, char *dest, int size)
+static int old_decrypt(const char *src, char *dest, int size)
 {
     return 0;
 }

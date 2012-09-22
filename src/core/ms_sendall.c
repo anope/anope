@@ -14,8 +14,8 @@
 
 #include "module.h"
 
-int do_sendall(User * u);
-void myMemoServHelp(User * u);
+static int do_sendall(User * u);
+static void myMemoServHelp(User * u);
 
 /**
  * Create the command, and tell anope about it.
@@ -53,7 +53,7 @@ void AnopeFini(void)
  * Add the help response to anopes /ms help output.
  * @param u The user who is requesting help
  **/
-void myMemoServHelp(User * u)
+static void myMemoServHelp(User * u)
 {
     if (is_services_admin(u)) {
         notice_lang(s_MemoServ, u, MEMO_HELP_CMD_SENDALL);
@@ -65,7 +65,7 @@ void myMemoServHelp(User * u)
  * @param u The user who issued the command
  * @param MOD_CONT to continue processing other modules, MOD_STOP to stop processing.
  **/
-int do_sendall(User * u)
+static int do_sendall(User * u)
 {
     int i, z = 1;
     NickCore *nc;

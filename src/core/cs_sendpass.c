@@ -14,8 +14,8 @@
 
 #include "module.h"
 
-int do_sendpass(User * u);
-void myChanServHelp(User * u);
+static int do_sendpass(User * u);
+static void myChanServHelp(User * u);
 
 /**
  * Create the command, and tell anope about it.
@@ -58,7 +58,7 @@ void AnopeFini(void)
  * Add the help response to anopes /cs help output.
  * @param u The user who is requesting help
  **/
-void myChanServHelp(User * u)
+static void myChanServHelp(User * u)
 {
     if (!RestrictMail || is_services_oper(u))
         notice_lang(s_ChanServ, u, CHAN_HELP_CMD_SENDPASS);
@@ -69,7 +69,7 @@ void myChanServHelp(User * u)
  * @param u The user who issued the command
  * @param MOD_CONT to continue processing other modules, MOD_STOP to stop processing.
  **/
-int do_sendpass(User * u)
+static int do_sendpass(User * u)
 {
 
     char *chan = strtok(NULL, " ");

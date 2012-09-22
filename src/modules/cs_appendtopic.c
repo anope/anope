@@ -48,10 +48,10 @@
 #define LNG_CHAN_HELP_APPENDTOPIC	1
 #define LNG_APPENDTOPIC_SYNTAX		2
 
-int my_cs_appendtopic(User * u);
-void my_cs_help(User * u);
-int my_cs_help_appendtopic(User * u);
-void my_add_languages(void);
+static int my_cs_appendtopic(User * u);
+static void my_cs_help(User * u);
+static int my_cs_help_appendtopic(User * u);
+static void my_add_languages(void);
 
 int AnopeInit(int argc, char **argv)
 {
@@ -84,12 +84,12 @@ void AnopeFini(void)
     alog("[cs_appendtopic] Unloaded successfully");
 }
 
-void my_cs_help(User * u)
+static void my_cs_help(User * u)
 {
     moduleNoticeLang(s_ChanServ, u, LNG_CHAN_HELP);
 }
 
-int my_cs_help_appendtopic(User * u)
+static int my_cs_help_appendtopic(User * u)
 {
     moduleNoticeLang(s_ChanServ, u, LNG_APPENDTOPIC_SYNTAX);
     notice(s_ChanServ, u->nick, " ");
@@ -97,7 +97,7 @@ int my_cs_help_appendtopic(User * u)
     return MOD_STOP;
 }
 
-int my_cs_appendtopic(User * u)
+static int my_cs_appendtopic(User * u)
 {
     char *cur_buffer;
     char *chan;
@@ -161,7 +161,7 @@ int my_cs_appendtopic(User * u)
     return MOD_CONT;
 }
 
-void my_add_languages(void)
+static void my_add_languages(void)
 {
     /* English (US) */
     char *langtable_en_us[] = {

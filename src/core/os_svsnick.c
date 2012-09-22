@@ -14,8 +14,8 @@
 
 #include "module.h"
 
-int do_svsnick(User * u);
-void myOperServHelp(User * u);
+static int do_svsnick(User * u);
+static void myOperServHelp(User * u);
 
 /**
  * Create the command, and tell anope about it.
@@ -55,7 +55,7 @@ void AnopeFini(void)
  * Add the help response to anopes /os help output.
  * @param u The user who is requesting help
  **/
-void myOperServHelp(User * u)
+static void myOperServHelp(User * u)
 {
     if (is_services_admin(u) && u->isSuperAdmin) {
         notice_lang(s_OperServ, u, OPER_HELP_CMD_SVSNICK);
@@ -69,7 +69,7 @@ void myOperServHelp(User * u)
  **/
 /* Forcefully change a user's nickname */
 
-int do_svsnick(User * u)
+static int do_svsnick(User * u)
 {
     char *nick = strtok(NULL, " ");
     char *newnick = strtok(NULL, " ");

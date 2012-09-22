@@ -15,10 +15,10 @@
 #include "module.h"
 
 
-int do_access(User * u);
-int do_levels(User * u);
+static int do_access(User * u);
+static int do_levels(User * u);
 
-void myChanServHelp(User * u);
+static void myChanServHelp(User * u);
 
 /**
  * Create the command, and tell anope about it.
@@ -63,7 +63,7 @@ void AnopeFini(void)
  * Add the help response to anopes /cs help output.
  * @param u The user who is requesting help
  **/
-void myChanServHelp(User * u)
+static void myChanServHelp(User * u)
 {
     notice_lang(s_ChanServ, u, CHAN_HELP_CMD_ACCESS);
     notice_lang(s_ChanServ, u, CHAN_HELP_CMD_LEVELS);
@@ -139,7 +139,7 @@ static int access_list_callback(User * u, int num, va_list args)
  * @param u The user who issued the command
  * @param MOD_CONT to continue processing other modules, MOD_STOP to stop processing.
  **/
-int do_access(User * u)
+static int do_access(User * u)
 {
     char *chan = strtok(NULL, " ");
     char *cmd = strtok(NULL, " ");
@@ -395,7 +395,7 @@ int do_access(User * u)
 }
 
 
-int do_levels(User * u)
+static int do_levels(User * u)
 {
     char *chan = strtok(NULL, " ");
     char *cmd = strtok(NULL, " ");

@@ -15,29 +15,29 @@
 #include "module.h"
 #include "encrypt.h"
 
-int do_set(User * u);
-int do_set_founder(User * u, ChannelInfo * ci, char *param);
-int do_set_successor(User * u, ChannelInfo * ci, char *param);
-int do_set_password(User * u, ChannelInfo * ci, char *param);
-int do_set_desc(User * u, ChannelInfo * ci, char *param);
-int do_set_url(User * u, ChannelInfo * ci, char *param);
-int do_set_email(User * u, ChannelInfo * ci, char *param);
-int do_set_entrymsg(User * u, ChannelInfo * ci, char *param);
-int do_set_bantype(User * u, ChannelInfo * ci, char *param);
-int do_set_mlock(User * u, ChannelInfo * ci, char *param);
-int do_set_keeptopic(User * u, ChannelInfo * ci, char *param);
-int do_set_topiclock(User * u, ChannelInfo * ci, char *param);
-int do_set_private(User * u, ChannelInfo * ci, char *param);
-int do_set_secureops(User * u, ChannelInfo * ci, char *param);
-int do_set_securefounder(User * u, ChannelInfo * ci, char *param);
-int do_set_restricted(User * u, ChannelInfo * ci, char *param);
-int do_set_secure(User * u, ChannelInfo * ci, char *param);
-int do_set_signkick(User * u, ChannelInfo * ci, char *param);
-int do_set_opnotice(User * u, ChannelInfo * ci, char *param);
-int do_set_xop(User * u, ChannelInfo * ci, char *param);
-int do_set_peace(User * u, ChannelInfo * ci, char *param);
-int do_set_noexpire(User * u, ChannelInfo * ci, char *param);
-void myChanServHelp(User * u);
+static int do_set(User * u);
+static int do_set_founder(User * u, ChannelInfo * ci, char *param);
+static int do_set_successor(User * u, ChannelInfo * ci, char *param);
+static int do_set_password(User * u, ChannelInfo * ci, char *param);
+static int do_set_desc(User * u, ChannelInfo * ci, char *param);
+static int do_set_url(User * u, ChannelInfo * ci, char *param);
+static int do_set_email(User * u, ChannelInfo * ci, char *param);
+static int do_set_entrymsg(User * u, ChannelInfo * ci, char *param);
+static int do_set_bantype(User * u, ChannelInfo * ci, char *param);
+static int do_set_mlock(User * u, ChannelInfo * ci, char *param);
+static int do_set_keeptopic(User * u, ChannelInfo * ci, char *param);
+static int do_set_topiclock(User * u, ChannelInfo * ci, char *param);
+static int do_set_private(User * u, ChannelInfo * ci, char *param);
+static int do_set_secureops(User * u, ChannelInfo * ci, char *param);
+static int do_set_securefounder(User * u, ChannelInfo * ci, char *param);
+static int do_set_restricted(User * u, ChannelInfo * ci, char *param);
+static int do_set_secure(User * u, ChannelInfo * ci, char *param);
+static int do_set_signkick(User * u, ChannelInfo * ci, char *param);
+static int do_set_opnotice(User * u, ChannelInfo * ci, char *param);
+static int do_set_xop(User * u, ChannelInfo * ci, char *param);
+static int do_set_peace(User * u, ChannelInfo * ci, char *param);
+static int do_set_noexpire(User * u, ChannelInfo * ci, char *param);
+static void myChanServHelp(User * u);
 
 /**
  * Create the command, and tell anope about it.
@@ -140,7 +140,7 @@ void AnopeFini(void)
  * Add the help response to anopes /cs help output.
  * @param u The user who is requesting help
  **/
-void myChanServHelp(User * u)
+static void myChanServHelp(User * u)
 {
     notice_lang(s_ChanServ, u, CHAN_HELP_CMD_SET);
 }
@@ -159,7 +159,7 @@ void myChanServHelp(User * u)
  * the first passed in the function call can be retrieved using
  * strtok(NULL, toks).
  */
-int do_set(User * u)
+static int do_set(User * u)
 {
     char *chan = strtok(NULL, " ");
     char *cmd = strtok(NULL, " ");
@@ -282,7 +282,7 @@ int do_set(User * u)
 
 /*************************************************************************/
 
-int do_set_founder(User * u, ChannelInfo * ci, char *param)
+static int do_set_founder(User * u, ChannelInfo * ci, char *param)
 {
     NickAlias *na = findnick(param);
     NickCore *nc, *nc0 = ci->founder;
@@ -320,7 +320,7 @@ int do_set_founder(User * u, ChannelInfo * ci, char *param)
 
 /*************************************************************************/
 
-int do_set_successor(User * u, ChannelInfo * ci, char *param)
+static int do_set_successor(User * u, ChannelInfo * ci, char *param)
 {
     NickAlias *na;
     NickCore *nc;
@@ -364,7 +364,7 @@ int do_set_successor(User * u, ChannelInfo * ci, char *param)
 
 /*************************************************************************/
 
-int do_set_password(User * u, ChannelInfo * ci, char *param)
+static int do_set_password(User * u, ChannelInfo * ci, char *param)
 {
     int len = strlen(param);
 
@@ -406,7 +406,7 @@ int do_set_password(User * u, ChannelInfo * ci, char *param)
 
 /*************************************************************************/
 
-int do_set_desc(User * u, ChannelInfo * ci, char *param)
+static int do_set_desc(User * u, ChannelInfo * ci, char *param)
 {
     if (ci->desc)
         free(ci->desc);
@@ -419,7 +419,7 @@ int do_set_desc(User * u, ChannelInfo * ci, char *param)
 
 /*************************************************************************/
 
-int do_set_url(User * u, ChannelInfo * ci, char *param)
+static int do_set_url(User * u, ChannelInfo * ci, char *param)
 {
     if (ci->url)
         free(ci->url);
@@ -439,7 +439,7 @@ int do_set_url(User * u, ChannelInfo * ci, char *param)
 
 /*************************************************************************/
 
-int do_set_email(User * u, ChannelInfo * ci, char *param)
+static int do_set_email(User * u, ChannelInfo * ci, char *param)
 {
     if (ci->email)
         free(ci->email);
@@ -459,7 +459,7 @@ int do_set_email(User * u, ChannelInfo * ci, char *param)
 
 /*************************************************************************/
 
-int do_set_entrymsg(User * u, ChannelInfo * ci, char *param)
+static int do_set_entrymsg(User * u, ChannelInfo * ci, char *param)
 {
     if (ci->entry_message)
         free(ci->entry_message);
@@ -480,7 +480,7 @@ int do_set_entrymsg(User * u, ChannelInfo * ci, char *param)
 
 /*************************************************************************/
 
-int do_set_mlock(User * u, ChannelInfo * ci, char *param)
+static int do_set_mlock(User * u, ChannelInfo * ci, char *param)
 {
     int add = -1;               /* 1 if adding, 0 if deleting, -1 if neither */
     unsigned char mode;
@@ -580,7 +580,7 @@ int do_set_mlock(User * u, ChannelInfo * ci, char *param)
 
 /*************************************************************************/
 
-int do_set_bantype(User * u, ChannelInfo * ci, char *param)
+static int do_set_bantype(User * u, ChannelInfo * ci, char *param)
 {
     char *endptr;
 
@@ -600,7 +600,7 @@ int do_set_bantype(User * u, ChannelInfo * ci, char *param)
 
 /*************************************************************************/
 
-int do_set_keeptopic(User * u, ChannelInfo * ci, char *param)
+static int do_set_keeptopic(User * u, ChannelInfo * ci, char *param)
 {
     if (stricmp(param, "ON") == 0) {
         ci->flags |= CI_KEEPTOPIC;
@@ -621,7 +621,7 @@ int do_set_keeptopic(User * u, ChannelInfo * ci, char *param)
 
 /*************************************************************************/
 
-int do_set_topiclock(User * u, ChannelInfo * ci, char *param)
+static int do_set_topiclock(User * u, ChannelInfo * ci, char *param)
 {
     if (stricmp(param, "ON") == 0) {
         ci->flags |= CI_TOPICLOCK;
@@ -642,7 +642,7 @@ int do_set_topiclock(User * u, ChannelInfo * ci, char *param)
 
 /*************************************************************************/
 
-int do_set_private(User * u, ChannelInfo * ci, char *param)
+static int do_set_private(User * u, ChannelInfo * ci, char *param)
 {
     if (stricmp(param, "ON") == 0) {
         ci->flags |= CI_PRIVATE;
@@ -663,7 +663,7 @@ int do_set_private(User * u, ChannelInfo * ci, char *param)
 
 /*************************************************************************/
 
-int do_set_secureops(User * u, ChannelInfo * ci, char *param)
+static int do_set_secureops(User * u, ChannelInfo * ci, char *param)
 {
     if (stricmp(param, "ON") == 0) {
         ci->flags |= CI_SECUREOPS;
@@ -684,7 +684,7 @@ int do_set_secureops(User * u, ChannelInfo * ci, char *param)
 
 /*************************************************************************/
 
-int do_set_securefounder(User * u, ChannelInfo * ci, char *param)
+static int do_set_securefounder(User * u, ChannelInfo * ci, char *param)
 {
     if (stricmp(param, "ON") == 0) {
         ci->flags |= CI_SECUREFOUNDER;
@@ -705,7 +705,7 @@ int do_set_securefounder(User * u, ChannelInfo * ci, char *param)
 
 /*************************************************************************/
 
-int do_set_restricted(User * u, ChannelInfo * ci, char *param)
+static int do_set_restricted(User * u, ChannelInfo * ci, char *param)
 {
     if (stricmp(param, "ON") == 0) {
         ci->flags |= CI_RESTRICTED;
@@ -730,7 +730,7 @@ int do_set_restricted(User * u, ChannelInfo * ci, char *param)
 
 /*************************************************************************/
 
-int do_set_secure(User * u, ChannelInfo * ci, char *param)
+static int do_set_secure(User * u, ChannelInfo * ci, char *param)
 {
     if (stricmp(param, "ON") == 0) {
         ci->flags |= CI_SECURE;
@@ -750,7 +750,7 @@ int do_set_secure(User * u, ChannelInfo * ci, char *param)
 
 /*************************************************************************/
 
-int do_set_signkick(User * u, ChannelInfo * ci, char *param)
+static int do_set_signkick(User * u, ChannelInfo * ci, char *param)
 {
     if (stricmp(param, "ON") == 0) {
         ci->flags |= CI_SIGNKICK;
@@ -778,7 +778,7 @@ int do_set_signkick(User * u, ChannelInfo * ci, char *param)
 
 /*************************************************************************/
 
-int do_set_opnotice(User * u, ChannelInfo * ci, char *param)
+static int do_set_opnotice(User * u, ChannelInfo * ci, char *param)
 {
     if (stricmp(param, "ON") == 0) {
         ci->flags |= CI_OPNOTICE;
@@ -801,7 +801,7 @@ int do_set_opnotice(User * u, ChannelInfo * ci, char *param)
 
 #define CHECKLEV(lev) ((ci->levels[(lev)] != ACCESS_INVALID) && (access->level >= ci->levels[(lev)]))
 
-int do_set_xop(User * u, ChannelInfo * ci, char *param)
+static int do_set_xop(User * u, ChannelInfo * ci, char *param)
 {
     if (stricmp(param, "ON") == 0) {
         if (!(ci->flags & CI_XOP)) {
@@ -856,7 +856,7 @@ int do_set_xop(User * u, ChannelInfo * ci, char *param)
 
 /*************************************************************************/
 
-int do_set_peace(User * u, ChannelInfo * ci, char *param)
+static int do_set_peace(User * u, ChannelInfo * ci, char *param)
 {
     if (stricmp(param, "ON") == 0) {
         ci->flags |= CI_PEACE;
@@ -876,7 +876,7 @@ int do_set_peace(User * u, ChannelInfo * ci, char *param)
 
 /*************************************************************************/
 
-int do_set_noexpire(User * u, ChannelInfo * ci, char *param)
+static int do_set_noexpire(User * u, ChannelInfo * ci, char *param)
 {
     if (!is_services_admin(u)) {
         notice_lang(s_ChanServ, u, PERMISSION_DENIED);

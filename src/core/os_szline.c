@@ -14,14 +14,14 @@
 
 #include "module.h"
 
-int do_szline(User * u);
-void myOperServHelp(User * u);
-int szline_view_callback(SList * slist, int number, void *item,
+static int do_szline(User * u);
+static void myOperServHelp(User * u);
+static int szline_view_callback(SList * slist, int number, void *item,
                          va_list args);
-int szline_list_callback(SList * slist, int number, void *item,
+static int szline_list_callback(SList * slist, int number, void *item,
                          va_list args);
-int szline_view(int number, SXLine * sx, User * u, int *sent_header);
-int szline_list(int number, SXLine * sx, User * u, int *sent_header);
+static int szline_view(int number, SXLine * sx, User * u, int *sent_header);
+static int szline_list(int number, SXLine * sx, User * u, int *sent_header);
 
 /**
  * Create the command, and tell anope about it.
@@ -61,7 +61,7 @@ void AnopeFini(void)
  * Add the help response to anopes /os help output.
  * @param u The user who is requesting help
  **/
-void myOperServHelp(User * u)
+static void myOperServHelp(User * u)
 {
     if (is_services_oper(u)) {
         notice_lang(s_OperServ, u, OPER_HELP_CMD_SZLINE);
@@ -73,7 +73,7 @@ void myOperServHelp(User * u)
  * @param u The user who issued the command
  * @param MOD_CONT to continue processing other modules, MOD_STOP to stop processing.
  **/
-int do_szline(User * u)
+static int do_szline(User * u)
 {
     char *cmd = strtok(NULL, " ");
 
@@ -285,7 +285,7 @@ int do_szline(User * u)
 }
 
 
-int szline_view(int number, SXLine * sx, User * u, int *sent_header)
+static int szline_view(int number, SXLine * sx, User * u, int *sent_header)
 {
     char timebuf[32], expirebuf[256];
     struct tm tm;
@@ -310,7 +310,7 @@ int szline_view(int number, SXLine * sx, User * u, int *sent_header)
 
 /* Callback for enumeration purposes */
 
-int szline_view_callback(SList * slist, int number, void *item,
+static int szline_view_callback(SList * slist, int number, void *item,
                          va_list args)
 {
     User *u = va_arg(args, User *);
@@ -321,7 +321,7 @@ int szline_view_callback(SList * slist, int number, void *item,
 
 /* Callback for enumeration purposes */
 
-int szline_list_callback(SList * slist, int number, void *item,
+static int szline_list_callback(SList * slist, int number, void *item,
                          va_list args)
 {
     User *u = va_arg(args, User *);
@@ -332,7 +332,7 @@ int szline_list_callback(SList * slist, int number, void *item,
 
 /* Lists an SZLINE entry, prefixing it with the header if needed */
 
-int szline_list(int number, SXLine * sx, User * u, int *sent_header)
+static int szline_list(int number, SXLine * sx, User * u, int *sent_header)
 {
     if (!sx)
         return 0;

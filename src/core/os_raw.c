@@ -14,7 +14,7 @@
 
 #include "module.h"
 
-int do_raw(User * u);
+static int do_raw(User * u);
 
 /**
  * Create the command, and tell anope about it.
@@ -55,7 +55,7 @@ void AnopeFini(void)
  * @param u The user who issued the command
  * @param MOD_CONT to continue processing other modules, MOD_STOP to stop processing.
  **/
-int do_raw(User * u)
+static int do_raw(User * u)
 {
     char *text = strtok(NULL, "");
     if (!text)

@@ -21,9 +21,9 @@
 #define VERSION VERSION_STRING
 
 /* Configuration variables */
-int HSRequestMemoUser = 0;
-int HSRequestMemoOper = 0;
-int HSRequestMemoSetters = 0;
+static int HSRequestMemoUser = 0;
+static int HSRequestMemoOper = 0;
+static int HSRequestMemoSetters = 0;
 char *HSRequestDBName = NULL;
 
 #define HSREQ_DEFAULT_DBNAME "hs_request.db"
@@ -53,33 +53,33 @@ char *HSRequestDBName = NULL;
 #define LNG_WAITING_SYNTAX		19
 #define LNG_HELP_WAITING		20
 
-int hs_do_request(User * u);
-int hs_do_activate(User * u);
-int hs_do_reject(User * u);
-int hs_do_list_out(User * u);
+static int hs_do_request(User * u);
+static int hs_do_activate(User * u);
+static int hs_do_reject(User * u);
+static int hs_do_list_out(User * u);
 
-int hs_help_request(User * u);
-int hs_help_activate(User * u);
-int hs_help_reject(User * u);
-int hs_help_waiting(User * u);
-void hs_help(User * u);
+static int hs_help_request(User * u);
+static int hs_help_activate(User * u);
+static int hs_help_reject(User * u);
+static int hs_help_waiting(User * u);
+static void hs_help(User * u);
 
-void my_add_host_request(char *nick, char *vIdent, char *vhost,
+static void my_add_host_request(char *nick, char *vIdent, char *vhost,
                          char *creator, int32 tmp_time);
-int my_isvalidchar(const char c);
-void my_memo_lang(User * u, char *name, int z, char *source, int number, ...);
-void req_send_memos(User * u, char *vHost);
-void show_list(User * u);
-int hs_do_waiting(User * u);
-int hsreqevt_nick_dropped(int argc, char **argv);
+static int my_isvalidchar(const char c);
+static void my_memo_lang(User * u, char *name, int z, char *source, int number, ...);
+static void req_send_memos(User * u, char *vHost);
+static void show_list(User * u);
+static int hs_do_waiting(User * u);
+static int hsreqevt_nick_dropped(int argc, char **argv);
 
-void hsreq_save_db(void);
-void hsreq_load_db(void);
-int hsreqevt_db_saving(int argc, char **argv);
-int hsreqevt_db_backup(int argc, char **argv);
+static void hsreq_save_db(void);
+static void hsreq_load_db(void);
+static int hsreqevt_db_saving(int argc, char **argv);
+static int hsreqevt_db_backup(int argc, char **argv);
 
-void my_load_config(void);
-void my_add_languages(void);
+static void my_load_config(void);
+static void my_add_languages(void);
 
 HostCore *hs_request_head;
 
@@ -154,7 +154,7 @@ void AnopeFini(void)
     alog("hs_request un-loaded");
 }
 
-int hs_do_request(User * u)
+static int hs_do_request(User * u)
 {
     char *cur_buffer;
     char *nick;
@@ -255,7 +255,7 @@ int hs_do_request(User * u)
     return MOD_CONT;
 }
 
-void my_memo_lang(User * u, char *name, int z, char *source, int number, ...)
+static void my_memo_lang(User * u, char *name, int z, char *source, int number, ...)
 {
     va_list va;
     char buffer[4096], outbuf[4096];
@@ -306,7 +306,7 @@ void my_memo_lang(User * u, char *name, int z, char *source, int number, ...)
 }
 
 
-void req_send_memos(User * u, char *vHost)
+static void req_send_memos(User * u, char *vHost)
 {
     int i;
     int z = 2;
@@ -334,7 +334,7 @@ void req_send_memos(User * u, char *vHost)
     }
 }
 
-int hsreqevt_nick_dropped(int argc, char **argv)
+static int hsreqevt_nick_dropped(int argc, char **argv)
 {
     HostCore *tmp;
     boolean found = false;
@@ -349,7 +349,7 @@ int hsreqevt_nick_dropped(int argc, char **argv)
     return MOD_CONT;
 }
 
-int hs_do_reject(User * u)
+static int hs_do_reject(User * u)
 {
     char *cur_buffer;
     char *nick;
@@ -398,7 +398,7 @@ int hs_do_reject(User * u)
     return MOD_CONT;
 }
 
-int hs_do_activate(User * u)
+static int hs_do_activate(User * u)
 {
     char *cur_buffer;
     char *nick;
@@ -443,7 +443,7 @@ int hs_do_activate(User * u)
 }
 
 
-void my_add_host_request(char *nick, char *vIdent, char *vhost,
+static void my_add_host_request(char *nick, char *vIdent, char *vhost,
                          char *creator, int32 tmp_time)
 {
     HostCore *tmp;
@@ -466,7 +466,7 @@ void my_add_host_request(char *nick, char *vIdent, char *vhost,
     }
 }
 
-int my_isvalidchar(const char c)
+static int my_isvalidchar(const char c)
 {
     if (((c >= 'A') && (c <= 'Z')) || ((c >= 'a') && (c <= 'z'))
         || ((c >= '0') && (c <= '9')) || (c == '.') || (c == '-'))
@@ -475,7 +475,7 @@ int my_isvalidchar(const char c)
         return 0;
 }
 
-int hs_do_list_out(User * u)
+static int hs_do_list_out(User * u)
 {
     char *key;
 
@@ -491,14 +491,14 @@ int hs_do_list_out(User * u)
     return MOD_CONT;
 }
 
-int hs_do_waiting(User * u)
+static int hs_do_waiting(User * u)
 {
     show_list(u);
 
     return MOD_CONT;
 }
 
-void show_list(User * u)
+static void show_list(User * u)
 {
     struct tm *tm;
     char buf[BUFSIZE];
@@ -531,7 +531,7 @@ void show_list(User * u)
     notice_lang(s_HostServ, u, HOST_LIST_FOOTER, display_counter);
 }
 
-int hs_help_request(User * u)
+static int hs_help_request(User * u)
 {
     moduleNoticeLang(s_HostServ, u, LNG_REQUEST_SYNTAX);
     notice(s_HostServ, u->nick, " ");
@@ -540,7 +540,7 @@ int hs_help_request(User * u)
     return MOD_CONT;
 }
 
-int hs_help_activate(User * u)
+static int hs_help_activate(User * u)
 {
     if (is_host_setter(u)) {
         moduleNoticeLang(s_HostServ, u, LNG_ACTIVATE_SYNTAX);
@@ -555,7 +555,7 @@ int hs_help_activate(User * u)
     return MOD_CONT;
 }
 
-int hs_help_reject(User * u)
+static int hs_help_reject(User * u)
 {
     if (is_host_setter(u)) {
         moduleNoticeLang(s_HostServ, u, LNG_REJECT_SYNTAX);
@@ -570,7 +570,7 @@ int hs_help_reject(User * u)
     return MOD_CONT;
 }
 
-int hs_help_waiting(User * u)
+static int hs_help_waiting(User * u)
 {
     if (is_host_setter(u)) {
         moduleNoticeLang(s_HostServ, u, LNG_WAITING_SYNTAX);
@@ -583,13 +583,13 @@ int hs_help_waiting(User * u)
     return MOD_CONT;
 }
 
-void hs_help(User * u)
+static void hs_help(User * u)
 {
     moduleNoticeLang(s_HostServ, u, LNG_HELP);
     if (is_host_setter(u))
         moduleNoticeLang(s_HostServ, u, LNG_HELP_SETTER);
 }
-void hsreq_load_db(void)
+static void hsreq_load_db(void)
 {
     FILE *fp;
     char *filename;
@@ -648,7 +648,7 @@ void hsreq_load_db(void)
         alog("[hs_request] Succesfully loaded database");
 }
 
-void hsreq_save_db(void)
+static void hsreq_save_db(void)
 {
     FILE *fp;
     char *filename;
@@ -681,7 +681,7 @@ void hsreq_save_db(void)
         alog("[hs_request] Succesfully saved database");
 }
 
-int hsreqevt_db_saving(int argc, char **argv)
+static int hsreqevt_db_saving(int argc, char **argv)
 {
     if ((argc >= 1) && (stricmp(argv[0], EVENT_START) == 0))
         hsreq_save_db();
@@ -689,7 +689,7 @@ int hsreqevt_db_saving(int argc, char **argv)
     return MOD_CONT;
 }
 
-int hsreqevt_db_backup(int argc, char **argv)
+static int hsreqevt_db_backup(int argc, char **argv)
 {
     if ((argc >= 1) && (stricmp(argv[0], EVENT_START) == 0)) {
 	    if (HSRequestDBName)
@@ -701,7 +701,7 @@ int hsreqevt_db_backup(int argc, char **argv)
     return MOD_CONT;
 }
 
-void my_load_config(void)
+static void my_load_config(void)
 {
     int i;
     char *tmp = NULL;
@@ -731,7 +731,7 @@ void my_load_config(void)
         alog("debug: [hs_request] Set config vars: MemoUser=%d MemoOper=%d MemoSetters=%d DBName='%s'", HSRequestMemoUser, HSRequestMemoOper, HSRequestMemoSetters, HSRequestDBName);
 }
 
-void my_add_languages(void)
+static void my_add_languages(void)
 {
     char *langtable_en_us[] = {
         /* LNG_REQUEST_SYNTAX */

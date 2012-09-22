@@ -14,7 +14,7 @@
 
 #include "module.h"
 
-int do_help(User * u);
+static int do_help(User * u);
 
 /**
  * Create the off command, and tell anope about it.
@@ -49,7 +49,7 @@ void AnopeFini(void)
  * @param u The user who issued the command
  * @param MOD_CONT to continue processing other modules, MOD_STOP to stop processing.
  **/
-int do_help(User * u)
+static int do_help(User * u)
 {
     char *cmd = strtok(NULL, "");
 

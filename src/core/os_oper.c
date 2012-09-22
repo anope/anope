@@ -14,11 +14,11 @@
 
 #include "module.h"
 
-int do_oper(User * u);
-int oper_list_callback(SList * slist, int number, void *item,
+static int do_oper(User * u);
+static int oper_list_callback(SList * slist, int number, void *item,
                        va_list args);
-int oper_list(int number, NickCore * nc, User * u, int *sent_header);
-void myOperServHelp(User * u);
+static int oper_list(int number, NickCore * nc, User * u, int *sent_header);
+static void myOperServHelp(User * u);
 
 /**
  * Create the command, and tell anope about it.
@@ -56,7 +56,7 @@ void AnopeFini(void)
  * Add the help response to anopes /os help output.
  * @param u The user who is requesting help
  **/
-void myOperServHelp(User * u)
+static void myOperServHelp(User * u)
 {
     notice_lang(s_OperServ, u, OPER_HELP_CMD_OPER);
 }
@@ -66,7 +66,7 @@ void myOperServHelp(User * u)
  * @param u The user who issued the command
  * @param MOD_CONT to continue processing other modules, MOD_STOP to stop processing.
  **/
-int do_oper(User * u)
+static int do_oper(User * u)
 {
     char *cmd = strtok(NULL, " ");
     char *nick = strtok(NULL, " ");
@@ -226,7 +226,7 @@ int do_oper(User * u)
 
 /* Lists an oper entry, prefixing it with the header if needed */
 
-int oper_list(int number, NickCore * nc, User * u, int *sent_header)
+static int oper_list(int number, NickCore * nc, User * u, int *sent_header)
 {
     if (!nc)
         return 0;
@@ -242,7 +242,7 @@ int oper_list(int number, NickCore * nc, User * u, int *sent_header)
 
 /* Callback for enumeration purposes */
 
-int oper_list_callback(SList * slist, int number, void *item, va_list args)
+static int oper_list_callback(SList * slist, int number, void *item, va_list args)
 {
     User *u = va_arg(args, User *);
     int *sent_header = va_arg(args, int *);

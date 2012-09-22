@@ -74,8 +74,8 @@ typedef void *POINTER;
 #define S44 21
 
 void Ano_MD5Transform (UINT4 [4], unsigned char [64]);
-void Encode (unsigned char *, UINT4 *, unsigned int);
-void Decode (UINT4 *, unsigned char *, unsigned int);
+static void Encode (unsigned char *, UINT4 *, unsigned int);
+static void Decode (UINT4 *, unsigned char *, unsigned int);
 
 static unsigned char PADDING[64] = {
   0x80, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -299,7 +299,7 @@ unsigned char block[64];
 /* Encodes input (UINT4) into output (unsigned char). Assumes len is
   a multiple of 4.
  */
-void Encode (output, input, len)
+static void Encode (output, input, len)
 unsigned char *output;
 UINT4 *input;
 unsigned int len;
@@ -317,7 +317,7 @@ unsigned int len;
 /* Decodes input (unsigned char) into output (UINT4). Assumes len is
   a multiple of 4.
  */
-void Decode (output, input, len)
+static void Decode (output, input, len)
 UINT4 *output;
 unsigned char *input;
 unsigned int len;
@@ -335,7 +335,7 @@ unsigned int len;
 
 #define XTOI(c) ((c)>9 ? (c)-'A'+10 : (c)-'0')
 
-int md5_encrypt(const char *src, int len, char *dest, int size)
+static int md5_encrypt(const char *src, int len, char *dest, int size)
 {
     MD5_CTX context;
     char tmp[33];
@@ -362,7 +362,7 @@ int md5_encrypt(const char *src, int len, char *dest, int size)
 }
 
 
-int md5_encrypt_check_len(int passlen, int bufsize)
+static int md5_encrypt_check_len(int passlen, int bufsize)
 {
     if (bufsize < 16)
 	fatal("enc_md5: md5_check_len(): buffer too small (%d)", bufsize);
@@ -370,13 +370,13 @@ int md5_encrypt_check_len(int passlen, int bufsize)
 }
 
 
-int md5_decrypt(const char *src, char *dest, int size)
+static int md5_decrypt(const char *src, char *dest, int size)
 {
     return 0;
 }
 
 
-int md5_check_password(const char *plaintext, const char *password)
+static int md5_check_password(const char *plaintext, const char *password)
 {
     char buf[BUFSIZE];
 

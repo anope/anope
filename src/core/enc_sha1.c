@@ -25,10 +25,10 @@ typedef struct {
     unsigned char buffer[64];
 } SHA1_CTX;
 
-void SHA1Transform(uint32 state[5], unsigned char const buffer[64]);
-void SHA1Init(SHA1_CTX* context);
-void SHA1Update(SHA1_CTX* context, unsigned char const * data, uint32 len);
-void SHA1Final(unsigned char digest[20], SHA1_CTX* context);
+static void SHA1Transform(uint32 state[5], unsigned char const buffer[64]);
+static void SHA1Init(SHA1_CTX* context);
+static void SHA1Update(SHA1_CTX* context, unsigned char const * data, uint32 len);
+static void SHA1Final(unsigned char digest[20], SHA1_CTX* context);
 
 #define rol(value, bits) (((value) << (bits)) | ((value) >> (32 - (bits))))
 
@@ -53,7 +53,7 @@ void SHA1Final(unsigned char digest[20], SHA1_CTX* context);
 
 /* Hash a single 512-bit block. This is the core of the algorithm. */
 
-void SHA1Transform(uint32 state[5], unsigned char const buffer[64])
+static void SHA1Transform(uint32 state[5], unsigned char const buffer[64])
 {
 uint32 a, b, c, d, e;
 typedef union {
@@ -108,7 +108,7 @@ static unsigned char workspace[64];
 
 /* SHA1Init - Initialize new context */
 
-void SHA1Init(SHA1_CTX* context)
+static void SHA1Init(SHA1_CTX* context)
 {
     /* SHA1 initialization constants */
     context->state[0] = 0x67452301;
@@ -122,7 +122,7 @@ void SHA1Init(SHA1_CTX* context)
 
 /* Run your data through this. */
 
-void SHA1Update(SHA1_CTX* context, unsigned char const * data, uint32 len)
+static void SHA1Update(SHA1_CTX* context, unsigned char const * data, uint32 len)
 {
     uint32 i, j;
 
@@ -144,7 +144,7 @@ void SHA1Update(SHA1_CTX* context, unsigned char const * data, uint32 len)
 
 /* Add padding and return the message digest. */
 
-void SHA1Final(unsigned char digest[20], SHA1_CTX* context)
+static void SHA1Final(unsigned char digest[20], SHA1_CTX* context)
 {
     uint32 i;
     unsigned char finalcount[8];
@@ -175,7 +175,7 @@ void SHA1Final(unsigned char digest[20], SHA1_CTX* context)
 
 /*****************************************************************************/
 
-int sha1_encrypt(const char *src, int len, char *dest, int size)
+static int sha1_encrypt(const char *src, int len, char *dest, int size)
 {
     SHA1_CTX context;
     unsigned char tmp[41];
@@ -204,7 +204,7 @@ int sha1_encrypt(const char *src, int len, char *dest, int size)
 }
 
 
-int sha1_encrypt_check_len(int passlen, int bufsize)
+static int sha1_encrypt_check_len(int passlen, int bufsize)
 {
     if (bufsize < 20)
         fatal("enc_sha1: sha1_check_len(): buffer too small (%d)", bufsize);
@@ -212,13 +212,13 @@ int sha1_encrypt_check_len(int passlen, int bufsize)
 }
 
 
-int sha1_decrypt(const char *src, char *dest, int size)
+static int sha1_decrypt(const char *src, char *dest, int size)
 {
     return 0;
 }
 
 
-int sha1_check_password(const char *plaintext, const char *password)
+static int sha1_check_password(const char *plaintext, const char *password)
 {
     char buf[BUFSIZE];
 

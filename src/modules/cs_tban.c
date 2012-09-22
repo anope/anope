@@ -21,17 +21,17 @@
 #define AUTHOR "Rob"
 #define VERSION VERSION_STRING
 
-void myHelp(User * u);
-void myFullHelpSyntax(User * u);
-int myFullHelp(User * u);
-void mySendResponse(User * u, char *channel, char *mask, char *time);
+static void myHelp(User * u);
+static void myFullHelpSyntax(User * u);
+static int myFullHelp(User * u);
+static void mySendResponse(User * u, char *channel, char *mask, char *time);
 
-int do_tban(User * u);
-void addBan(Channel * c, time_t timeout, char *banmask);
-int delBan(int argc, char **argv);
-int canBanUser(Channel * c, User * u, User * u2);
+static int do_tban(User * u);
+static void addBan(Channel * c, time_t timeout, char *banmask);
+static int delBan(int argc, char **argv);
+static int canBanUser(Channel * c, User * u, User * u2);
 
-void mAddLanguages(void);
+static void mAddLanguages(void);
 
 #define LANG_NUM_STRINGS    4
 #define TBAN_HELP           0
@@ -66,17 +66,17 @@ void AnopeFini(void)
     /* module is unloading */
 }
 
-void myHelp(User * u)
+static void myHelp(User * u)
 {
     moduleNoticeLang(s_ChanServ, u, TBAN_HELP);
 }
 
-void myFullHelpSyntax(User * u)
+static void myFullHelpSyntax(User * u)
 {
     moduleNoticeLang(s_ChanServ, u, TBAN_SYNTAX);
 }
 
-int myFullHelp(User * u)
+static int myFullHelp(User * u)
 {
     myFullHelpSyntax(u);
     notice(s_ChanServ, u->nick, "");
@@ -84,12 +84,12 @@ int myFullHelp(User * u)
     return MOD_CONT;
 }
 
-void mySendResponse(User * u, char *channel, char *mask, char *time)
+static void mySendResponse(User * u, char *channel, char *mask, char *time)
 {
     moduleNoticeLang(s_ChanServ, u, TBAN_RESPONSE, mask, channel, time);
 }
 
-int do_tban(User * u)
+static int do_tban(User * u)
 {
     char mask[BUFSIZE];
     Channel *c;
@@ -130,7 +130,7 @@ int do_tban(User * u)
     return MOD_CONT;
 }
 
-void addBan(Channel * c, time_t timeout, char *banmask)
+static void addBan(Channel * c, time_t timeout, char *banmask)
 {
     char *av[3];
     char *cb[2];
@@ -148,7 +148,7 @@ void addBan(Channel * c, time_t timeout, char *banmask)
     moduleAddCallback("tban", time(NULL) + timeout, delBan, 2, cb);
 }
 
-int delBan(int argc, char **argv)
+static int delBan(int argc, char **argv)
 {
     char *av[3];
     Channel *c;
@@ -166,7 +166,7 @@ int delBan(int argc, char **argv)
     return MOD_CONT;
 }
 
-int canBanUser(Channel * c, User * u, User * u2)
+static int canBanUser(Channel * c, User * u, User * u2)
 {
     ChannelInfo *ci;
     int ok = 0;
@@ -188,7 +188,7 @@ int canBanUser(Channel * c, User * u, User * u2)
 }
 
 
-void mAddLanguages(void)
+static void mAddLanguages(void)
 {
     char *langtable_en_us[] = {
         "    TBAN       Bans the user for a given length of time",

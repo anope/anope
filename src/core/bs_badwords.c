@@ -14,11 +14,11 @@
 
 #include "module.h"
 
-int do_badwords(User * u);
-void myBotServHelp(User * u);
-int badwords_del_callback(User * u, int num, va_list args);
-int badwords_list(User * u, int index, ChannelInfo * ci, int *sent_header);
-int badwords_list_callback(User * u, int num, va_list args);
+static int do_badwords(User * u);
+static void myBotServHelp(User * u);
+static int badwords_del_callback(User * u, int num, va_list args);
+static int badwords_list(User * u, int index, ChannelInfo * ci, int *sent_header);
+static int badwords_list_callback(User * u, int num, va_list args);
 
 /**
  * Create the command, and tell anope about it.
@@ -57,7 +57,7 @@ void AnopeFini(void)
  * Add the help response to Anopes /bs help output.
  * @param u The user who is requesting help
  **/
-void myBotServHelp(User * u)
+static void myBotServHelp(User * u)
 {
     notice_lang(s_BotServ, u, BOT_HELP_CMD_BADWORDS);
 }
@@ -67,7 +67,7 @@ void myBotServHelp(User * u)
  * @param u The user who issued the command
  * @param MOD_CONT to continue processing other modules, MOD_STOP to stop processing.
  **/
-int do_badwords(User * u)
+static int do_badwords(User * u)
 {
     char *chan = strtok(NULL, " ");
     char *cmd = strtok(NULL, " ");
@@ -283,7 +283,7 @@ int do_badwords(User * u)
     return MOD_CONT;
 }
 
-int badwords_del_callback(User * u, int num, va_list args)
+static int badwords_del_callback(User * u, int num, va_list args)
 {
     BadWord *bw;
     ChannelInfo *ci = va_arg(args, ChannelInfo *);
@@ -303,7 +303,7 @@ int badwords_del_callback(User * u, int num, va_list args)
     return 1;
 }
 
-int badwords_list(User * u, int index, ChannelInfo * ci, int *sent_header)
+static int badwords_list(User * u, int index, ChannelInfo * ci, int *sent_header)
 {
     BadWord *bw = &ci->badwords[index];
 
@@ -325,7 +325,7 @@ int badwords_list(User * u, int index, ChannelInfo * ci, int *sent_header)
     return 1;
 }
 
-int badwords_list_callback(User * u, int num, va_list args)
+static int badwords_list_callback(User * u, int num, va_list args)
 {
     ChannelInfo *ci = va_arg(args, ChannelInfo *);
     int *sent_header = va_arg(args, int *);

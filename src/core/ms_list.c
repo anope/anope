@@ -13,11 +13,11 @@
 /*************************************************************************/
 
 #include "module.h"
-int do_list(User * u);
-int list_memo_callback(User * u, int num, va_list args);
-int list_memo(User * u, int index, MemoInfo * mi, int *sent_header,
+static int do_list(User * u);
+static int list_memo_callback(User * u, int num, va_list args);
+static int list_memo(User * u, int index, MemoInfo * mi, int *sent_header,
               int new, const char *chan);
-void myMemoServHelp(User * u);
+static void myMemoServHelp(User * u);
 
 /**
  * Create the command, and tell anope about it.
@@ -54,7 +54,7 @@ void AnopeFini(void)
  * Add the help response to anopes /ms help output.
  * @param u The user who is requesting help
  **/
-void myMemoServHelp(User * u)
+static void myMemoServHelp(User * u)
 {
     notice_lang(s_MemoServ, u, MEMO_HELP_CMD_LIST);
 }
@@ -64,7 +64,7 @@ void myMemoServHelp(User * u)
  * @param u The user who issued the command
  * @param MOD_CONT to continue processing other modules, MOD_STOP to stop processing.
  **/
-int do_list(User * u)
+static int do_list(User * u)
 {
     char *param = strtok(NULL, " "), *chan = NULL;
     ChannelInfo *ci;
@@ -137,7 +137,7 @@ int do_list(User * u)
  * @param va_list List of arguements
  * @return result form list_memo()
  */
-int list_memo_callback(User * u, int num, va_list args)
+static int list_memo_callback(User * u, int num, va_list args)
 {
     MemoInfo *mi = va_arg(args, MemoInfo *);
     int *sent_header = va_arg(args, int *);
@@ -162,7 +162,7 @@ int list_memo_callback(User * u, int num, va_list args)
  * @param chan Channel name
  * @return MOD_CONT
  */
-int list_memo(User * u, int index, MemoInfo * mi, int *sent_header,
+static int list_memo(User * u, int index, MemoInfo * mi, int *sent_header,
               int new, const char *chan)
 {
     Memo *m;

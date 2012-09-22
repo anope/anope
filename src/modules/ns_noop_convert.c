@@ -39,23 +39,23 @@
 /*************************************************************************/
 
 User *currentUser;
-int m_isIRCop = 0;
+static int m_isIRCop = 0;
 
 char *NSAutoOPDBName;
 
-int myNickServAutoOpHelp(User * u);
-void myNickServHelp(User * u);
+static int myNickServAutoOpHelp(User * u);
+static void myNickServHelp(User * u);
 
-int noop(User * u);
-int mEventJoin(int argc, char **argv);
-int setAutoOp(User * u);
-int UnsetAutoOp(User * u);
+static int noop(User * u);
+static int mEventJoin(int argc, char **argv);
+static int setAutoOp(User * u);
+static int UnsetAutoOp(User * u);
 
-int mLoadData(void);
-int mSaveData(int argc, char **argv);
-int mLoadConfig(int argc, char **argv);
+static int mLoadData(void);
+static int mSaveData(int argc, char **argv);
+static int mLoadConfig(int argc, char **argv);
 
-void m_AddLanguages(void);
+static void m_AddLanguages(void);
 
 /*************************************************************************/
 
@@ -99,7 +99,7 @@ void AnopeFini(void)
  * Load data from the db file, and populate the autoop setting
  * @return 0 for success
  **/
-int mLoadData(void)
+static int mLoadData(void)
 {
     int ret = 0;
     int len = 0;
@@ -138,7 +138,7 @@ int mLoadData(void)
  * Load the configuration directives from Services configuration file.
  * @return 0 for success
  **/
-int mLoadConfig(int argc, char **argv)
+static int mLoadConfig(int argc, char **argv)
 {
     char *tmp = NULL;
 

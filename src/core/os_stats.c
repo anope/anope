@@ -16,9 +16,9 @@
 
 
 
-int do_stats(User * u);
-void get_operserv_stats(long *nrec, long *memuse);
-void myOperServHelp(User * u);
+static int do_stats(User * u);
+static void get_operserv_stats(long *nrec, long *memuse);
+static void myOperServHelp(User * u);
 
 /**
  * Create the command, and tell anope about it.
@@ -59,7 +59,7 @@ void AnopeFini(void)
  * Add the help response to anopes /os help output.
  * @param u The user who is requesting help
  **/
-void myOperServHelp(User * u)
+static void myOperServHelp(User * u)
 {
     notice_lang(s_OperServ, u, OPER_HELP_CMD_STATS);
 }
@@ -69,7 +69,7 @@ void myOperServHelp(User * u)
  * @param s The server to start counting from
  * @return Amount of servers connected to server s
  **/
-int stats_count_servers(Server * s)
+static int stats_count_servers(Server * s)
 {
     int count = 0;
 
@@ -88,7 +88,7 @@ int stats_count_servers(Server * s)
  * @param u The user who issued the command
  * @param MOD_CONT to continue processing other modules, MOD_STOP to stop processing.
  **/
-int do_stats(User * u)
+static int do_stats(User * u)
 {
     time_t uptime = time(NULL) - start_time;
     char *extra = strtok(NULL, "");
@@ -383,7 +383,7 @@ int do_stats(User * u)
     return MOD_CONT;
 }
 
-void get_operserv_stats(long *nrec, long *memuse)
+static void get_operserv_stats(long *nrec, long *memuse)
 {
     int i;
     long mem = 0, count = 0, mem2 = 0, count2 = 0;

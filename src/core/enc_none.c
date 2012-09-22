@@ -9,10 +9,10 @@
 
 #include "module.h"
 
-int plain_encrypt(const char *src,int len,char *dest,int size);
-int plain_encrypt_check_len(int passlen, int bufsize);
-int plain_decrypt(const char *src, char *dest, int size);
-int plain_check_password(const char *plaintext, const char *password);
+static int plain_encrypt(const char *src,int len,char *dest,int size);
+static int plain_encrypt_check_len(int passlen, int bufsize);
+static int plain_decrypt(const char *src, char *dest, int size);
+static int plain_check_password(const char *plaintext, const char *password);
 
 
 int AnopeInit(int argc, char **argv) {
@@ -36,7 +36,7 @@ void AnopeFini(void) {
     encmodule_check_password(NULL);
 }
 
-int plain_encrypt(const char *src,int len,char *dest,int size) {
+static int plain_encrypt(const char *src,int len,char *dest,int size) {
     if(size>=len) {
         memset(dest,0,size);
         strncpy(dest,src,len);
@@ -46,21 +46,21 @@ int plain_encrypt(const char *src,int len,char *dest,int size) {
     return -1;
 }
 
-int plain_encrypt_check_len(int passlen, int bufsize) {
+static int plain_encrypt_check_len(int passlen, int bufsize) {
     if(bufsize>=passlen) {
         return 0;
     }
     return bufsize;
 }
 
-int plain_decrypt(const char *src, char *dest, int size) {
+static int plain_decrypt(const char *src, char *dest, int size) {
     memset(dest,0,size);
     strncpy(dest,src,size);
     dest[size] = '\0';
     return 1;
 }
 
-int plain_check_password(const char *plaintext, const char *password) {
+static int plain_check_password(const char *plaintext, const char *password) {
     if(strcmp(plaintext,password)==0) {
         return 1;
     }

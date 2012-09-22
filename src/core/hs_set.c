@@ -14,8 +14,8 @@
 
 #include "module.h"
 
-int myDoSet(User * u);
-void myHostServHelp(User * u);
+static int myDoSet(User * u);
+static void myHostServHelp(User * u);
 
 /**
  * Create the off command, and tell anope about it.
@@ -54,7 +54,7 @@ void AnopeFini(void)
  * Add the help response to anopes /hs help output.
  * @param u The user who is requesting help
  **/
-void myHostServHelp(User * u)
+static void myHostServHelp(User * u)
 {
     if (is_host_setter(u)) {
         notice_lang(s_HostServ, u, HOST_HELP_CMD_SET);
@@ -66,7 +66,7 @@ void myHostServHelp(User * u)
  * @param u The user who issued the command
  * @param MOD_CONT to continue processing other modules, MOD_STOP to stop processing.
  **/
-int myDoSet(User * u)
+static int myDoSet(User * u)
 {
     char *nick = strtok(NULL, " ");
     char *rawhostmask = strtok(NULL, " ");

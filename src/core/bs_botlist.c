@@ -14,8 +14,8 @@
 
 #include "module.h"
 
-int do_botlist(User * u);
-void myBotServHelp(User * u);
+static int do_botlist(User * u);
+static void myBotServHelp(User * u);
 
 /**
  * Create the botlist command, and tell anope about it.
@@ -53,7 +53,7 @@ void AnopeFini(void)
  * Add the help response to Anopes /bs help output.
  * @param u The user who is requesting help
  **/
-void myBotServHelp(User * u)
+static void myBotServHelp(User * u)
 {
     notice_lang(s_BotServ, u, BOT_HELP_CMD_BOTLIST);
 }
@@ -63,7 +63,7 @@ void myBotServHelp(User * u)
  * @param u The user who issued the command
  * @param MOD_CONT to continue processing other modules, MOD_STOP to stop processing.
  **/
-int do_botlist(User * u)
+static int do_botlist(User * u)
 {
     int i, count = 0;
     BotInfo *bi;

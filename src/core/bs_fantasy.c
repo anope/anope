@@ -14,7 +14,7 @@
 
 #include "module.h"
 
-int do_fantasy(int argc, char **argv);
+static int do_fantasy(int argc, char **argv);
 
 /**
  * Create the hook, and tell anope about it.
@@ -49,7 +49,7 @@ void AnopeFini(void)
  * @param argv Argument list
  * @return MOD_CONT or MOD_STOP
  **/
-int do_fantasy(int argc, char **argv)
+static int do_fantasy(int argc, char **argv)
 {
     User *u;
     ChannelInfo *ci;

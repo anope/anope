@@ -19,8 +19,8 @@ extern MDE int anope_get_invite_mode();
 extern MDE int anope_get_invis_mode();
 #endif
 
-int do_userlist(User * u);
-void myOperServHelp(User * u);
+static int do_userlist(User * u);
+static void myOperServHelp(User * u);
 
 /**
  * Create the command, and tell anope about it.
@@ -58,7 +58,7 @@ void AnopeFini(void)
  * Add the help response to anopes /os help output.
  * @param u The user who is requesting help
  **/
-void myOperServHelp(User * u)
+static void myOperServHelp(User * u)
 {
     notice_lang(s_OperServ, u, OPER_HELP_CMD_USERLIST);
 }
@@ -69,7 +69,7 @@ void myOperServHelp(User * u)
  * @param MOD_CONT to continue processing other modules, MOD_STOP to stop processing.
  **/
 
-int do_userlist(User * u)
+static int do_userlist(User * u)
 {
     char *pattern = strtok(NULL, " ");
     char *opt = strtok(NULL, " ");

@@ -18,10 +18,10 @@
 extern MDE time_t DefContimer;
 extern MDE void runDefCon(void);
 #endif
-int do_defcon(User * u);
-void defcon_sendlvls(User * u);
+static int do_defcon(User * u);
+static void defcon_sendlvls(User * u);
 
-void myOperServHelp(User * u);
+static void myOperServHelp(User * u);
 
 /**
  * Create the command, and tell anope about it.
@@ -59,7 +59,7 @@ void AnopeFini(void)
  * Add the help response to anopes /os help output.
  * @param u The user who is requesting help
  **/
-void myOperServHelp(User * u)
+static void myOperServHelp(User * u)
 {
     if (is_services_admin(u)) {
         notice_lang(s_OperServ, u, OPER_HELP_CMD_DEFCON);
@@ -76,7 +76,7 @@ void myOperServHelp(User * u)
  * @param MOD_CONT to continue processing other modules, MOD_STOP to stop processing.
  *
  **/
-int do_defcon(User * u)
+static int do_defcon(User * u)
 {
     char *lvl = strtok(NULL, " ");
     int newLevel = 0;
@@ -131,7 +131,7 @@ int do_defcon(User * u)
 /**
  * Send a message to the oper about which precautions are "active" for this level
  **/
-void defcon_sendlvls(User * u)
+static void defcon_sendlvls(User * u)
 {
     if (checkDefCon(DEFCON_NO_NEW_CHANNELS)) {
         notice_lang(s_OperServ, u, OPER_HELP_DEFCON_NO_NEW_CHANNELS);

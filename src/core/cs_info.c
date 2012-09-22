@@ -14,8 +14,8 @@
 
 #include "module.h"
 
-int do_info(User * u);
-void myChanServHelp(User * u);
+static int do_info(User * u);
+static void myChanServHelp(User * u);
 
 /**
  * Create the command, and tell anope about it.
@@ -55,7 +55,7 @@ void AnopeFini(void)
  * Add the help response to anopes /cs help output.
  * @param u The user who is requesting help
  **/
-void myChanServHelp(User * u)
+static void myChanServHelp(User * u)
 {
     notice_lang(s_ChanServ, u, CHAN_HELP_CMD_INFO);
 }
@@ -65,7 +65,7 @@ void myChanServHelp(User * u)
  * @param u The user who issued the command
  * @param MOD_CONT to continue processing other modules, MOD_STOP to stop processing.
  **/
-int do_info(User * u)
+static int do_info(User * u)
 {
 /* SADMINS and users, who have identified for a channel, can now cause it's
  * Enstry Message and Successor to be displayed by supplying the ALL parameter.

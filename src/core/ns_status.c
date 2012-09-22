@@ -14,8 +14,8 @@
 
 #include "module.h"
 
-int do_status(User * u);
-void myNickServHelp(User * u);
+static int do_status(User * u);
+static void myNickServHelp(User * u);
 
 /**
  * Create the command, and tell anope about it.
@@ -52,7 +52,7 @@ void AnopeFini(void)
  * Add the help response to anopes /ns help output.
  * @param u The user who is requesting help
  **/
-void myNickServHelp(User * u)
+static void myNickServHelp(User * u)
 {
     notice_lang(s_NickServ, u, NICK_HELP_CMD_STATUS);
 }
@@ -62,7 +62,7 @@ void myNickServHelp(User * u)
  * @param u The user who issued the command
  * @param MOD_CONT to continue processing other modules, MOD_STOP to stop processing.
  **/
-int do_status(User * u)
+static int do_status(User * u)
 {
     User *u2;
     NickAlias *na = NULL;

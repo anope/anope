@@ -42,22 +42,22 @@
 
 char *OSInfoDBName = NULL;
 
-int myAddNickInfo(User * u);
-int myAddChanInfo(User * u);
-int myNickInfo(User * u);
-int myChanInfo(User * u);
+static int myAddNickInfo(User * u);
+static int myAddChanInfo(User * u);
+static int myNickInfo(User * u);
+static int myChanInfo(User * u);
 
-int mNickHelp(User * u);
-int mChanHelp(User * u);
-void mMainChanHelp(User * u);
-void mMainNickHelp(User * u);
-void m_AddLanguages(void);
+static int mNickHelp(User * u);
+static int mChanHelp(User * u);
+static void mMainChanHelp(User * u);
+static void mMainNickHelp(User * u);
+static void m_AddLanguages(void);
 
-int mLoadData(void);
-int mSaveData(int argc, char **argv);
-int mBackupData(int argc, char **argv);
-int mLoadConfig();
-int mEventReload(int argc, char **argv);
+static int mLoadData(void);
+static int mSaveData(int argc, char **argv);
+static int mBackupData(int argc, char **argv);
+static int mLoadConfig();
+static int mEventReload(int argc, char **argv);
 
 /*************************************************************************/
 
@@ -142,7 +142,7 @@ void AnopeFini(void)
  * @return MOD_CONT if we want to process other commands in this command
  * stack, MOD_STOP if we dont
  **/
-int myAddNickInfo(User * u)
+static int myAddNickInfo(User * u)
 {
     char *text = NULL;
     char *cmd = NULL;
@@ -214,7 +214,7 @@ int myAddNickInfo(User * u)
  * @return MOD_CONT if we want to process other commands in this command
  * stack, MOD_STOP if we dont
  **/
-int myAddChanInfo(User * u)
+static int myAddChanInfo(User * u)
 {
     char *text = NULL;
     char *cmd = NULL;
@@ -281,7 +281,7 @@ int myAddChanInfo(User * u)
  * @param u The user who requested info
  * @return MOD_CONT to continue processing commands or MOD_STOP to stop
  **/
-int myNickInfo(User * u)
+static int myNickInfo(User * u)
 {
     char *text = NULL;
     char *nick = NULL;
@@ -318,7 +318,7 @@ int myNickInfo(User * u)
  * @param u The user who requested info
  * @return MOD_CONT to continue processing commands or MOD_STOP to stop
  **/
-int myChanInfo(User * u)
+static int myChanInfo(User * u)
 {
     char *text = NULL;
     char *chan = NULL;
@@ -352,7 +352,7 @@ int myChanInfo(User * u)
  * Load data from the db file, and populate our OperInfo lines
  * @return 0 for success
  **/
-int mLoadData(void)
+static int mLoadData(void)
 {
     int ret = 0;
     FILE *in;
@@ -411,7 +411,7 @@ int mLoadData(void)
  * Next do the same again for ChannelInfos
  * @return 0 for success
  **/
-int mSaveData(int argc, char **argv)
+static int mSaveData(int argc, char **argv)
 {
     ChannelInfo *ci = NULL;
     NickCore *nc = NULL;
@@ -462,7 +462,7 @@ int mSaveData(int argc, char **argv)
  * Backup our databases using the commands provided by Anope
  * @return MOD_CONT
  **/
-int mBackupData(int argc, char **argv)
+static int mBackupData(int argc, char **argv)
 {
 	if (argc >= 1 && !stricmp(argv[0], EVENT_START))
 		ModuleDatabaseBackup(OSInfoDBName);
@@ -474,7 +474,7 @@ int mBackupData(int argc, char **argv)
  * Load the configuration directives from Services configuration file.
  * @return 0 for success
  **/
-int mLoadConfig(void)
+static int mLoadConfig(void)
 {
     char *tmp = NULL;
 
@@ -504,7 +504,7 @@ int mLoadConfig(void)
  * Manage the RELOAD EVENT
  * @return MOD_CONT
  **/
-int mEventReload(int argc, char **argv)
+static int mEventReload(int argc, char **argv)
 {
     int ret = 0;
     if (argc >= 1) {
@@ -527,7 +527,7 @@ int mEventReload(int argc, char **argv)
 /**
  * manages the multilanguage stuff
  **/
-void m_AddLanguages(void)
+static void m_AddLanguages(void)
 {
     char *langtable_en_us[] = {
         /* OINFO_SYNTAX */
@@ -745,7 +745,7 @@ void m_AddLanguages(void)
 
 /*************************************************************************/
 
-int mNickHelp(User * u)
+static int mNickHelp(User * u)
 {
     if (is_oper(u)) {
         moduleNoticeLang(s_NickServ, u, OINFO_HELP);
@@ -755,7 +755,7 @@ int mNickHelp(User * u)
     return MOD_CONT;
 }
 
-int mChanHelp(User * u)
+static int mChanHelp(User * u)
 {
     if (is_oper(u)) {
         moduleNoticeLang(s_ChanServ, u, OCINFO_HELP);
@@ -766,7 +766,7 @@ int mChanHelp(User * u)
 }
 
 /* This help will be added to the main NickServ list */
-void mMainNickHelp(User * u)
+static void mMainNickHelp(User * u)
 {
     if (is_oper(u)) {
         moduleNoticeLang(s_NickServ, u, OINFO_HELP_CMD);
@@ -774,7 +774,7 @@ void mMainNickHelp(User * u)
 }
 
 /* This help will be added to the main NickServ list */
-void mMainChanHelp(User * u)
+static void mMainChanHelp(User * u)
 {
     if (is_oper(u)) {
         moduleNoticeLang(s_ChanServ, u, OCINFO_HELP_CMD);

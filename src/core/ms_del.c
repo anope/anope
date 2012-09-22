@@ -14,9 +14,9 @@
 
 #include "module.h"
 
-int do_del(User * u);
-int del_memo_callback(User * u, int num, va_list args);
-void myMemoServHelp(User * u);
+static int do_del(User * u);
+static int del_memo_callback(User * u, int num, va_list args);
+static void myMemoServHelp(User * u);
 
 /**
  * Create the command, and tell anope about it.
@@ -52,7 +52,7 @@ void AnopeFini(void)
  * Add the help response to anopes /ms help output.
  * @param u The user who is requesting help
  **/
-void myMemoServHelp(User * u)
+static void myMemoServHelp(User * u)
 {
     notice_lang(s_MemoServ, u, MEMO_HELP_CMD_DEL);
 }
@@ -62,7 +62,7 @@ void myMemoServHelp(User * u)
  * @param u The user who issued the command
  * @param MOD_CONT to continue processing other modules, MOD_STOP to stop processing.
  **/
-int do_del(User * u)
+static int do_del(User * u)
 {
     MemoInfo *mi;
     ChannelInfo *ci;
@@ -172,7 +172,7 @@ int do_del(User * u)
  * @param va_list Variable Arguemtns
  * @return 1 if successful, 0 if it fails
  */
-int del_memo_callback(User * u, int num, va_list args)
+static int del_memo_callback(User * u, int num, va_list args)
 {
     MemoInfo *mi = va_arg(args, MemoInfo *);
     int *last = va_arg(args, int *);

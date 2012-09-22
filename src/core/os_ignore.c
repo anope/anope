@@ -14,9 +14,9 @@
 
 #include "module.h"
 
-int do_ignorelist(User * u);
-void myOperServHelp(User * u);
-int do_ignoreuser(User * u);
+static int do_ignorelist(User * u);
+static void myOperServHelp(User * u);
+static int do_ignoreuser(User * u);
 
 /**
  * Create the command, and tell anope about it.
@@ -53,7 +53,7 @@ void AnopeFini(void)
  * Add the help response to anopes /os help output.
  * @param u The user who is requesting help
  **/
-void myOperServHelp(User * u)
+static void myOperServHelp(User * u)
 {
     if (is_services_admin(u)) {
         notice_lang(s_OperServ, u, OPER_HELP_CMD_IGNORE);
@@ -65,7 +65,7 @@ void myOperServHelp(User * u)
  * @param u The user who issued the command
  * @param MOD_CONT to continue processing other modules, MOD_STOP to stop processing.
  **/
-int do_ignoreuser(User * u)
+static int do_ignoreuser(User * u)
 {
     char *cmd = strtok(NULL, " ");
     int t;
@@ -126,7 +126,7 @@ int do_ignoreuser(User * u)
 }
 
 /* shows the Services ignore list */
-int do_ignorelist(User * u)
+static int do_ignorelist(User * u)
 {
     IgnoreData *id;
 

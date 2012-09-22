@@ -18,16 +18,16 @@
 #define AUTHOR "Anope"
 #define VERSION VERSION_STRING
 
-void my_load_config(void);
-void my_add_languages(void);
-int my_ns_register(User * u);
-int my_ns_set(User * u);
-int my_event_reload(int argc, char **argv);
-int my_event_addcommand(int argc, char **argv);
-int my_event_delcommand(int argc, char **argv);
+static void my_load_config(void);
+static void my_add_languages(void);
+static int my_ns_register(User * u);
+static int my_ns_set(User * u);
+static int my_event_reload(int argc, char **argv);
+static int my_event_addcommand(int argc, char **argv);
+static int my_event_delcommand(int argc, char **argv);
 
-int NSEmailMax = 0;
-int added_register = 0;
+static int NSEmailMax = 0;
+static int added_register = 0;
 
 #define LNG_NUM_STRINGS		2
 #define LNG_NSEMAILMAX_REACHED		0
@@ -94,7 +94,7 @@ void AnopeFini(void)
     /* Nothing to do while unloading */
 }
 
-int count_email_in_use(char *email, User * u)
+static int count_email_in_use(char *email, User * u)
 {
     NickCore *nc;
     int i;
@@ -113,7 +113,7 @@ int count_email_in_use(char *email, User * u)
     return count;
 }
 
-int check_email_limit_reached(char *email, User * u)
+static int check_email_limit_reached(char *email, User * u)
 {
     if ((NSEmailMax < 1) || !email || is_services_admin(u))
         return MOD_CONT;
@@ -130,7 +130,7 @@ int check_email_limit_reached(char *email, User * u)
     return MOD_STOP;
 }
 
-int my_ns_register(User * u)
+static int my_ns_register(User * u)
 {
     char *cur_buffer;
     char *email;
@@ -147,7 +147,7 @@ int my_ns_register(User * u)
     return ret;
 }
 
-int my_ns_set(User * u)
+static int my_ns_set(User * u)
 {
     char *cur_buffer;
     char *set;
@@ -176,7 +176,7 @@ int my_ns_set(User * u)
     return ret;
 }
 
-int my_event_reload(int argc, char **argv)
+static int my_event_reload(int argc, char **argv)
 {
     if ((argc > 0) && (stricmp(argv[0], EVENT_START) == 0))
         my_load_config();
@@ -184,7 +184,7 @@ int my_event_reload(int argc, char **argv)
     return MOD_CONT;
 }
 
-int my_event_addcommand(int argc, char **argv)
+static int my_event_addcommand(int argc, char **argv)
 {
     Command *c;
     int status;
@@ -204,7 +204,7 @@ int my_event_addcommand(int argc, char **argv)
     return MOD_CONT;
 }
 
-int my_event_delcommand(int argc, char **argv)
+static int my_event_delcommand(int argc, char **argv)
 {
     if (argc == 2 && stricmp(argv[0], "ns_maxemail")
             && !stricmp(argv[1], "REGISTER") && added_register) {
@@ -215,7 +215,7 @@ int my_event_delcommand(int argc, char **argv)
     return MOD_CONT;
 }
 
-void my_load_config(void)
+static void my_load_config(void)
 {
     Directive confvalues[] = {
         {"NSEmailMax", {{PARAM_INT, PARAM_RELOAD, &NSEmailMax}}}
@@ -227,7 +227,7 @@ void my_load_config(void)
         alog("debug: [ns_maxemail] NSEmailMax set to %d", NSEmailMax);
 }
 
-void my_add_languages(void)
+static void my_add_languages(void)
 {
     char *langtable_en_us[] = {
         /* LNG_NSEMAILMAX_REACHED */

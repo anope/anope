@@ -15,22 +15,22 @@
 #include "module.h"
 #include "encrypt.h"
 
-int do_saset(User * u);
-int do_saset_display(User * u, NickCore * nc, char *param);
-int do_saset_password(User * u, NickCore * nc, char *param);
-int do_saset_url(User * u, NickCore * nc, char *param);
-int do_saset_email(User * u, NickCore * nc, char *param);
-int do_saset_greet(User * u, NickCore * nc, char *param);
-int do_saset_icq(User * u, NickCore * nc, char *param);
-int do_saset_kill(User * u, NickCore * nc, char *param);
-int do_saset_secure(User * u, NickCore * nc, char *param);
-int do_saset_private(User * u, NickCore * nc, char *param);
-int do_saset_msg(User * u, NickCore * nc, char *param);
-int do_saset_hide(User * u, NickCore * nc, char *param);
-int do_saset_noexpire(User * u, NickAlias * nc, char *param);
-int do_saset_autoop(User * u, NickCore * nc, char *param);
-int do_saset_language(User * u, NickCore * nc, char *param);
-void myNickServHelp(User * u);
+static int do_saset(User * u);
+static int do_saset_display(User * u, NickCore * nc, char *param);
+static int do_saset_password(User * u, NickCore * nc, char *param);
+static int do_saset_url(User * u, NickCore * nc, char *param);
+static int do_saset_email(User * u, NickCore * nc, char *param);
+static int do_saset_greet(User * u, NickCore * nc, char *param);
+static int do_saset_icq(User * u, NickCore * nc, char *param);
+static int do_saset_kill(User * u, NickCore * nc, char *param);
+static int do_saset_secure(User * u, NickCore * nc, char *param);
+static int do_saset_private(User * u, NickCore * nc, char *param);
+static int do_saset_msg(User * u, NickCore * nc, char *param);
+static int do_saset_hide(User * u, NickCore * nc, char *param);
+static int do_saset_noexpire(User * u, NickAlias * nc, char *param);
+static int do_saset_autoop(User * u, NickCore * nc, char *param);
+static int do_saset_language(User * u, NickCore * nc, char *param);
+static void myNickServHelp(User * u);
 
 /**
  * Create the command, and tell anope about it.
@@ -112,7 +112,7 @@ void AnopeFini(void)
  * Add the help response to anopes /ns help output.
  * @param u The user who is requesting help
  **/
-void myNickServHelp(User * u)
+static void myNickServHelp(User * u)
 {
     if (is_services_oper(u))
         notice_lang(s_NickServ, u, NICK_HELP_CMD_SASET);
@@ -123,7 +123,7 @@ void myNickServHelp(User * u)
  * @param u The user who issued the command
  * @param MOD_CONT to continue processing other modules, MOD_STOP to stop processing.
  **/
-int do_saset(User * u)
+static int do_saset(User * u)
 {
     char *nick = strtok(NULL, " ");
     char *cmd = strtok(NULL, " ");
@@ -190,7 +190,7 @@ int do_saset(User * u)
     return MOD_CONT;
 }
 
-int do_saset_display(User * u, NickCore * nc, char *param)
+static int do_saset_display(User * u, NickCore * nc, char *param)
 {
     int i;
     NickAlias *na;
@@ -226,7 +226,7 @@ int do_saset_display(User * u, NickCore * nc, char *param)
     return MOD_CONT;
 }
 
-int do_saset_password(User * u, NickCore * nc, char *param)
+static int do_saset_password(User * u, NickCore * nc, char *param)
 {
     int len = strlen(param);
     char tmp_pass[PASSMAX];
@@ -271,7 +271,7 @@ int do_saset_password(User * u, NickCore * nc, char *param)
     return MOD_CONT;
 }
 
-int do_saset_url(User * u, NickCore * nc, char *param)
+static int do_saset_url(User * u, NickCore * nc, char *param)
 {
     if (nc->url)
         free(nc->url);
@@ -291,7 +291,7 @@ int do_saset_url(User * u, NickCore * nc, char *param)
     return MOD_CONT;
 }
 
-int do_saset_email(User * u, NickCore * nc, char *param)
+static int do_saset_email(User * u, NickCore * nc, char *param)
 {
     if (!param && NSForceEmail) {
         notice_lang(s_NickServ, u, NICK_SASET_EMAIL_UNSET_IMPOSSIBLE);
@@ -324,7 +324,7 @@ int do_saset_email(User * u, NickCore * nc, char *param)
     return MOD_CONT;
 }
 
-int do_saset_icq(User * u, NickCore * nc, char *param)
+static int do_saset_icq(User * u, NickCore * nc, char *param)
 {
     if (param) {
         int32 tmp = atol(param);
@@ -346,7 +346,7 @@ int do_saset_icq(User * u, NickCore * nc, char *param)
     return MOD_CONT;
 }
 
-int do_saset_greet(User * u, NickCore * nc, char *param)
+static int do_saset_greet(User * u, NickCore * nc, char *param)
 {
     if (nc->greet)
         free(nc->greet);
@@ -372,7 +372,7 @@ int do_saset_greet(User * u, NickCore * nc, char *param)
     return MOD_CONT;
 }
 
-int do_saset_kill(User * u, NickCore * nc, char *param)
+static int do_saset_kill(User * u, NickCore * nc, char *param)
 {
     if (stricmp(param, "ON") == 0) {
         nc->flags |= NI_KILLPROTECT;
@@ -409,7 +409,7 @@ int do_saset_kill(User * u, NickCore * nc, char *param)
     return MOD_CONT;
 }
 
-int do_saset_secure(User * u, NickCore * nc, char *param)
+static int do_saset_secure(User * u, NickCore * nc, char *param)
 {
     if (stricmp(param, "ON") == 0) {
         nc->flags |= NI_SECURE;
@@ -428,7 +428,7 @@ int do_saset_secure(User * u, NickCore * nc, char *param)
     return MOD_CONT;
 }
 
-int do_saset_private(User * u, NickCore * nc, char *param)
+static int do_saset_private(User * u, NickCore * nc, char *param)
 {
     if (stricmp(param, "ON") == 0) {
         nc->flags |= NI_PRIVATE;
@@ -447,7 +447,7 @@ int do_saset_private(User * u, NickCore * nc, char *param)
     return MOD_CONT;
 }
 
-int do_saset_msg(User * u, NickCore * nc, char *param)
+static int do_saset_msg(User * u, NickCore * nc, char *param)
 {
     if (!UsePrivmsg) {
         notice_lang(s_NickServ, u, NICK_SASET_OPTION_DISABLED, "MSG");
@@ -470,7 +470,7 @@ int do_saset_msg(User * u, NickCore * nc, char *param)
     return MOD_CONT;
 }
 
-int do_saset_hide(User * u, NickCore * nc, char *param)
+static int do_saset_hide(User * u, NickCore * nc, char *param)
 {
     int flag, onmsg, offmsg;
     char *param2;
@@ -516,7 +516,7 @@ int do_saset_hide(User * u, NickCore * nc, char *param)
     return MOD_CONT;
 }
 
-int do_saset_noexpire(User * u, NickAlias * na, char *param)
+static int do_saset_noexpire(User * u, NickAlias * na, char *param)
 {
     if (!param) {
         syntax_error(s_NickServ, u, "SASET NOEXPIRE",
@@ -540,7 +540,7 @@ int do_saset_noexpire(User * u, NickAlias * na, char *param)
     return MOD_CONT;
 }
 
-int do_saset_autoop(User * u, NickCore * nc, char *param)
+static int do_saset_autoop(User * u, NickCore * nc, char *param)
 {
     if (stricmp(param, "ON") == 0) {
         nc->flags &= ~NI_AUTOOP;
@@ -559,7 +559,7 @@ int do_saset_autoop(User * u, NickCore * nc, char *param)
     return MOD_CONT;
 }
 
-int do_saset_language(User * u, NickCore * nc, char *param)
+static int do_saset_language(User * u, NickCore * nc, char *param)
 {
     int langnum;
 

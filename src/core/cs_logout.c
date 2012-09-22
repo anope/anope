@@ -14,9 +14,9 @@
 
 #include "module.h"
 
-int do_logout(User * u);
-void myChanServHelp(User * u);
-void make_unidentified(User * u, ChannelInfo * ci);
+static int do_logout(User * u);
+static void myChanServHelp(User * u);
+static void make_unidentified(User * u, ChannelInfo * ci);
 
 /**
  * Create the command, and tell anope about it.
@@ -56,7 +56,7 @@ void AnopeFini(void)
  * Add the help response to anopes /cs help output.
  * @param u The user who is requesting help
  **/
-void myChanServHelp(User * u)
+static void myChanServHelp(User * u)
 {
     notice_lang(s_ChanServ, u, CHAN_HELP_CMD_LOGOUT);
 }
@@ -66,7 +66,7 @@ void myChanServHelp(User * u)
  * @param u The user who issued the command
  * @param MOD_CONT to continue processing other modules, MOD_STOP to stop processing.
  **/
-int do_logout(User * u)
+static int do_logout(User * u)
 {
     char *chan = strtok(NULL, " ");
     char *nick = strtok(NULL, " ");
@@ -108,7 +108,7 @@ int do_logout(User * u)
     return MOD_CONT;
 }
 
-void make_unidentified(User * u, ChannelInfo * ci)
+static void make_unidentified(User * u, ChannelInfo * ci)
 {
     struct u_chaninfolist *uci;
 

@@ -132,6 +132,11 @@ if(CMAKE_COMPILER_IS_GNUCXX)
           string(LENGTH ${LINE} LINE_LENGTH)
           math(EXPR LINE_LENGTH "${LINE_LENGTH} - 1")
           string(SUBSTRING ${LINE} 1 ${LINE_LENGTH} INCLUDE)
+          # For systems like Mac OS X, look for include paths that say " (framework directory)" at the end of them and strip that off
+          string(FIND ${INCLUDE} " (framework directory)" FRAMEWORK)
+          if(NOT FRAMEWORK EQUAL -1)
+            string(SUBSTRING ${INCLUDE} 0 ${FRAMEWORK} INCLUDE)
+          endif(NOT FRAMEWORK EQUAL -1)
           # Convert the path to an absolute one, just in case it wasn't
           get_filename_component(INCLUDE ${INCLUDE} ABSOLUTE)
           # Add that directory to the list of default include directories

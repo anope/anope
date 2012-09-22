@@ -365,7 +365,7 @@ endmacro(find_includes)
 #   header file dependencies for the given source file.
 ###############################################################################
 macro(calculate_depends SRC SKIP)
-  # Temporarily set that we didn't get a 3nd argument before we actually check if we did get one or not
+  # Temporarily set that we didn't get a 3rd argument before we actually check if we did get one or not
   set(CHECK_ANGLE_INCLUDES FALSE)
   # Check for a third argument
   if(${ARGC} GREATER 2)
@@ -392,7 +392,14 @@ macro(calculate_depends SRC SKIP)
         endif(DEFAULT_INCLUDE_DIRS OR WSDK_PATH OR DEFINED $ENV{VCINSTALLDIR})
         # If the include file was found, add it's path to the list of include paths, but only if it doesn't already exist and isn't in the defaults for the compiler
         if(FOUND_${FILENAME}_INCLUDE)
-          find_in_list(DEFAULT_INCLUDE_DIRS "${FOUND_${FILENAME}_INCLUDE}" FOUND_IN_DEFAULTS)
+          # This used to be find_in_list, but it was changed to this loop to do a find on each default include directory, this fixes Mac OS X trying to get it's framework directories in here
+          set(FOUND_IN_DEFAULTS -1)
+          foreach(DEFAULT_INCLUDE_DIR ${DEFAULT_INCLUDE_DIRS})
+            string(FIND ${FOUND_${FILENAME}_INCLUDE} ${DEFAULT_INCLUDE_DIR} FOUND_DEFAULT)
+            if(NOT FOUND_DEFAULT EQUAL -1)
+              set(FOUND_IN_DEFAULTS 0)
+            endif(NOT FOUND_DEFAULT EQUAL -1)
+          endforeach(DEFAULT_INCLUDE_DIR)
           if(FOUND_IN_DEFAULTS EQUAL -1)
             find_in_list(${ARGV2} "${FOUND_${FILENAME}_INCLUDE}" FOUND_IN_INCLUDES)
             if(FOUND_IN_INCLUDES EQUAL -1)

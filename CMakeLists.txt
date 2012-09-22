@@ -133,10 +133,7 @@ if(CMAKE_COMPILER_IS_GNUCXX)
           math(EXPR LINE_LENGTH "${LINE_LENGTH} - 1")
           string(SUBSTRING ${LINE} 1 ${LINE_LENGTH} INCLUDE)
           # For systems like Mac OS X, look for include paths that say " (framework directory)" at the end of them and strip that off
-          string(FIND ${INCLUDE} " (framework directory)" FRAMEWORK)
-          if(NOT FRAMEWORK EQUAL -1)
-            string(SUBSTRING ${INCLUDE} 0 ${FRAMEWORK} INCLUDE)
-          endif(NOT FRAMEWORK EQUAL -1)
+          string(REGEX REPLACE " \\(framework directory\\)$" "" INCLUDE ${INCLUDE})
           # Convert the path to an absolute one, just in case it wasn't
           get_filename_component(INCLUDE ${INCLUDE} ABSOLUTE)
           # Add that directory to the list of default include directories
@@ -313,7 +310,9 @@ if(NOT MSVC)
     # Check if pthread_create is within the pthread library (if the library exists), and add it to the linker flags if needed
     check_library_exists(pthread pthread_create "" HAVE_PTHREAD)
     if(HAVE_PTHREAD)
-      set(LDFLAGS "${LDFLAGS} -pthread")
+      if(NOT APPLE)
+        set(LDFLAGS "${LDFLAGS} -pthread")
+      endif(NOT APPLE)
     else(HAVE_PTHREAD)
       message(FATAL_ERROR "The pthread library is required to build Anope")
     endif(HAVE_PTHREAD)

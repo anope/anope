@@ -266,7 +266,7 @@ class CommandNSGList : public Command
 				source.Reply(NICK_X_NOT_REGISTERED, nick.c_str());
 				return;
 			}
-			else if (!source.IsServicesOper())
+			else if (na->nc != source.nc && !source.IsServicesOper())
 			{
 				source.Reply(ACCESS_DENIED, Config->NickServ.c_str());
 				return;

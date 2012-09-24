@@ -283,7 +283,7 @@ class InspIRCdTS6Proto : public IRCDProto
 		UplinkSocket::Message(Me) << "ENDBURST";
 	}
 
-	void SendGlobopsInternal(BotInfo *source, const Anope::string &buf)
+	void SendGlobopsInternal(const BotInfo *source, const Anope::string &buf)
 	{
 		if (has_globopsmod)
 			UplinkSocket::Message(source) << "SNONOTICE g :" << buf;

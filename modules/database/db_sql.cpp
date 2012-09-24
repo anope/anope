@@ -15,6 +15,7 @@ class SQLSQLInterface : public SQLInterface
 {
  public:
 	SQLSQLInterface(Module *o) : SQLInterface(o) { }
+	virtual ~SQLSQLInterface() { }
 
 	void OnResult(const SQLResult &r) anope_override
 	{

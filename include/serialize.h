@@ -220,7 +220,7 @@ class serialize_obj : public dynamic_reference_base
 	{
 		if (!this->invalid)
 			return this->ref != NULL;
-		return NULL;
+		return false;
 	}
 
 	inline void operator=(T *newref)

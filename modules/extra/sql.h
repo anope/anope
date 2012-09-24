@@ -32,7 +32,7 @@ struct SQLQuery
 		this->parameters.clear();
 		return *this;
 	}
-	
+
 	bool operator==(const SQLQuery &other) const
 	{
 		return this->query == other.query;
@@ -98,7 +98,7 @@ class SQLResult
 		std::map<Anope::string, Anope::string>::const_iterator it = rows.find(col);
 		if (it == rows.end())
 			throw SQLException("Unknown column name in SQLResult: " + col);
-	
+
 		return it->second;
 	}
 };
@@ -111,6 +111,7 @@ class SQLInterface
 	Module *owner;
 
 	SQLInterface(Module *m) : owner(m) { }
+	virtual ~SQLInterface() { }
 
 	virtual void OnResult(const SQLResult &r) = 0;
 	virtual void OnError(const SQLResult &r) = 0;

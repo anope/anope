@@ -15,7 +15,6 @@ class IdentifyInterface : public LDAPInterface
 
 	void Add(LDAPQuery id, const Anope::string &nick)
 	{
-		std::map<LDAPQuery, Anope::string>::iterator it = this->requests.find(id);
 		this->requests[id] = nick;
 	}
 

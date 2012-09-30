@@ -23,7 +23,7 @@ std::vector<Module *> ModuleManager::EventHandlers[I_END];
 
 void ModuleManager::CleanupRuntimeDirectory()
 {
-	Anope::string dirbuf = modules_dir + "/modules/runtime";
+	Anope::string dirbuf = db_dir + "/runtime";
 
 	Log(LOG_DEBUG) << "Cleaning out Module run time directory (" << dirbuf << ") - this may take a moment please wait";
 
@@ -135,7 +135,7 @@ ModuleReturn ModuleManager::LoadModule(const Anope::string &modname, User *u)
 	Log(LOG_DEBUG) << "trying to load [" << modname <<  "]";
 
 	/* Generate the filename for the temporary copy of the module */
-	Anope::string pbuf = modules_dir + "/modules/runtime/" + modname + ".so.XXXXXX";
+	Anope::string pbuf = db_dir + "/runtime/" + modname + ".so.XXXXXX";
 
 	/* Don't skip return value checking! -GD */
 	ModuleReturn ret = moduleCopyFile(modname, pbuf);

@@ -5,7 +5,7 @@
  * Please read COPYING and README for further details.
  */
 
-#define RTLD_LAZY 0
+#define RTLD_NOW 0
 
 extern void *dlopen(const char *filename, int);
 extern char *dlerror(void);

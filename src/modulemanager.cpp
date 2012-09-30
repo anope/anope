@@ -149,7 +149,7 @@ ModuleReturn ModuleManager::LoadModule(const Anope::string &modname, User *u)
 	}
 
 	dlerror();
-	void *handle = dlopen(pbuf.c_str(), RTLD_LAZY);
+	void *handle = dlopen(pbuf.c_str(), RTLD_NOW);
 	const char *err = dlerror();
 	if (!handle && err && *err)
 	{

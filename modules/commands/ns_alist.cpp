@@ -25,31 +25,33 @@ class CommandNSAList : public Command
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		Anope::string nick = source.GetNick();
+		NickCore *nc = source.nc;
 
 		if (params.size() && source.IsServicesOper())
-			nick = params[0];
-
-		const NickAlias *na = findnick(nick);
-
-		if (!na)
 		{
-			source.Reply(NICK_X_NOT_REGISTERED, nick.c_str());
-			return;
+			nick = params[0];
+			const NickAlias *na = findnick(nick);
+			if (!na)
+			{
+				source.Reply(NICK_X_NOT_REGISTERED, nick.c_str());
+				return;
+			}
+			nc = na->nc;
 		}
-		
+
 		ListFormatter list;
 		int chan_count = 0;
 
 		list.addColumn("Number").addColumn("Channel").addColumn("Access");
 
-		source.Reply(_("Channels that \002%s\002 has access on:"), na->nick.c_str());
+		source.Reply(_("Channels that \002%s\002 has access on:"), nick.c_str());
 
 		for (registered_channel_map::const_iterator it = RegisteredChannelList->begin(), it_end = RegisteredChannelList->end(); it != it_end; ++it)
 		{
 			ChannelInfo *ci = it->second;
 			ListFormatter::ListEntry entry;
 
-			if (ci->GetFounder() && ci->GetFounder() == na->nc)
+			if (ci->GetFounder() && ci->GetFounder() == nc)
 			{
 				++chan_count;
 				entry["Number"] = stringify(chan_count);
@@ -59,7 +61,7 @@ class CommandNSAList : public Command
 				continue;
 			}
 
-			AccessGroup access = ci->AccessFor(na->nc);
+			AccessGroup access = ci->AccessFor(nc);
 			if (access.empty())
 				continue;
 				

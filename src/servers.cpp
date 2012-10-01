@@ -212,7 +212,7 @@ void Server::SetSID(const Anope::string &sid)
  */
 const Anope::string &Server::GetSID() const
 {
-	if (!this->SID.empty())
+	if (!this->SID.empty() && ircdproto->RequiresID)
 		return this->SID;
 	else
 		return this->Name;

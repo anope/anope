@@ -178,7 +178,7 @@ const Anope::string &User::GetCloakedHost() const
 
 const Anope::string &User::GetUID() const
 {
-	if (!this->uid.empty())
+	if (!this->uid.empty() && ircdproto->RequiresID)
 		return this->uid;
 	else
 		return this->nick;

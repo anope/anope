@@ -341,10 +341,10 @@ class UnrealIRCdProto : public IRCDProto
 
 	bool IsChannelValid(const Anope::string &chan) anope_override
 	{
-		if (chan.find(':') != Anope::string::npos || chan[0] != '#')
+		if (chan.find(':') != Anope::string::npos)
 			return false;
 
-		return true;
+		return IRCDProto::IsChannelValid(chan);
 	}
 
 	void SendLogin(User *u) anope_override

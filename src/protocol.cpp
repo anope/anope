@@ -310,7 +310,7 @@ void IRCDProto::SendNumeric(int numeric, const Anope::string &dest, const char *
 
 bool IRCDProto::IsChannelValid(const Anope::string &chan)
 {
-	if (chan[0] != '#')
+	if (chan.empty() || chan[0] != '#' || chan.length() > Config->ChanLen)
 		return false;
 
 	return true;

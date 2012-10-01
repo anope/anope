@@ -1164,6 +1164,7 @@ ConfigItems::ConfigItems(ServerConfig *conf)
 		{"networkinfo", "nicklen", "31", new ValueContainerUInt(&conf->NickLen), DT_UINTEGER | DT_NORELOAD, ValidateNickLen},
 		{"networkinfo", "userlen", "10", new ValueContainerUInt(&conf->UserLen), DT_UINTEGER | DT_NORELOAD, NoValidation},
 		{"networkinfo", "hostlen", "64", new ValueContainerUInt(&conf->HostLen), DT_UINTEGER | DT_NORELOAD, NoValidation},
+		{"networkinfo", "chanlen", "32", new ValueContainerUInt(&conf->ChanLen), DT_UINTEGER | DT_NORELOAD, NoValidation},
 		{"options", "casemap", "ascii", new ValueContainerString(&conf->CaseMap), DT_STRING, NoValidation},
 		{"options", "passlen", "32", new ValueContainerUInt(&conf->PassLen), DT_UINTEGER | DT_NORELOAD, NoValidation},
 		{"options", "seed", "0", new ValueContainerLUInt(&conf->Seed), DT_LUINTEGER, NoValidation},

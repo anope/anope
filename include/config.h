@@ -391,6 +391,8 @@ class CoreExport ServerConfig
 	unsigned UserLen;
 	/* Max lenght of hostnames */
 	unsigned HostLen;
+	/* Max length of channel names */
+	unsigned ChanLen;
 
 	/* Casemapping to use */
 	Anope::string CaseMap;

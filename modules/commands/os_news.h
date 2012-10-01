@@ -22,7 +22,7 @@ struct NewsItem : Serializable
 	Anope::string who;
 	time_t time;
 
-	const Anope::string serialize_name() const anope_override { return "NewsItem"; }
+	NewsItem() : Serializable("NewsItem") { }
 	Serialize::Data serialize() const anope_override;
 	static Serializable* unserialize(Serializable *obj, Serialize::Data &data);
 };

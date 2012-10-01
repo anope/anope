@@ -62,18 +62,22 @@ namespace Serialize
 
 extern void RegisterTypes();
 
+class SerializeType;
+
 class CoreExport Serializable : public virtual Base
 {
  private:
 	static std::list<Serializable *> *serializable_items;
-
+	SerializeType *s_type;
  private:
-	std::list<Serializable *>::iterator s_iter;
+	std::list<Serializable *>::iterator s_iter; // Iterator into serializable_items
+	
 	Serialize::Data last_commit;
 	time_t last_commit_time;
 
- protected:
 	Serializable();
+ protected:
+ 	Serializable(const Anope::string &serialize_type);
 	Serializable(const Serializable &);
 
 	virtual ~Serializable();
@@ -93,7 +97,8 @@ class CoreExport Serializable : public virtual Base
 	bool IsTSCached();
 	void UpdateTS();
 
-	virtual const Anope::string serialize_name() const = 0;
+	SerializeType* GetSerializableType() const;
+
 	virtual Serialize::Data serialize() const = 0;
 
 	static const std::list<Serializable *> &GetItems();
@@ -108,12 +113,19 @@ class CoreExport SerializeType
 
 	Anope::string name;
 	unserialize_func unserialize;
+	Module *owner;
+
 	time_t timestamp;
 
  public:
 	std::map<unsigned int, Serializable *> objects;
 
-	SerializeType(const Anope::string &n, unserialize_func f);
+	/** Creates a new serializable type
+	 * @param n Type name
+	 * @param f Func to unserialize objects
+	 * @param owner Owner of this type. Leave NULL for the core.
+	 */
+	SerializeType(const Anope::string &n, unserialize_func f, Module *owner = NULL);
 	~SerializeType();
 
 	const Anope::string &GetName();
@@ -124,6 +136,8 @@ class CoreExport SerializeType
 
 	time_t GetTimestamp() const;
 	void UpdateTimestamp();
+
+	Module* GetOwner() const;
 
 	static SerializeType *Find(const Anope::string &name);
 

@@ -23,11 +23,6 @@
 
 serialize_checker<registered_channel_map> RegisteredChannelList("ChannelInfo");
 
-const Anope::string BadWord::serialize_name() const
-{
-	return "BadWord";
-}
-
 Serialize::Data BadWord::serialize() const
 {
 	Serialize::Data data;
@@ -61,13 +56,8 @@ Serializable* BadWord::unserialize(Serializable *obj, Serialize::Data &data)
 	return bw;
 }
 
-AutoKick::AutoKick() : Flags<AutoKickFlag>(AutoKickFlagString)
+AutoKick::AutoKick() : Flags<AutoKickFlag>(AutoKickFlagString), Serializable("AutoKick")
 {
-}
-
-const Anope::string AutoKick::serialize_name() const
-{
-	return "AutoKick";
 }
 
 Serialize::Data AutoKick::serialize() const
@@ -121,13 +111,8 @@ Serializable* AutoKick::unserialize(Serializable *obj, Serialize::Data &data)
 	return ak;
 }
 
-ModeLock::ModeLock(ChannelInfo *ch, bool s, ChannelModeName n, const Anope::string &p, const Anope::string &se, time_t c) : ci(ch), set(s), name(n), param(p), setter(se), created(c)
+ModeLock::ModeLock(ChannelInfo *ch, bool s, ChannelModeName n, const Anope::string &p, const Anope::string &se, time_t c) : Serializable("ModeLock"), ci(ch), set(s), name(n), param(p), setter(se), created(c)
 {
-}
-
-const Anope::string ModeLock::serialize_name() const
-{
-	return "ModeLock";
 }
 
 Serialize::Data ModeLock::serialize() const
@@ -192,11 +177,6 @@ Serializable* ModeLock::unserialize(Serializable *obj, Serialize::Data &data)
 	}
 }
 
-const Anope::string LogSetting::serialize_name() const
-{
-	return "LogSetting";
-}
-
 Serialize::Data LogSetting::serialize() const
 {
 	Serialize::Data data;
@@ -246,7 +226,8 @@ Serializable* LogSetting::unserialize(Serializable *obj, Serialize::Data &data)
 /** Default constructor
  * @param chname The channel name
  */
-ChannelInfo::ChannelInfo(const Anope::string &chname) : Flags<ChannelInfoFlag, CI_END>(ChannelInfoFlagStrings), access("ChanAccess"), akick("AutoKick"),
+ChannelInfo::ChannelInfo(const Anope::string &chname) : Flags<ChannelInfoFlag, CI_END>(ChannelInfoFlagStrings), Serializable("ChannelInfo"),
+	access("ChanAccess"), akick("AutoKick"),
 	badwords("BadWord"), mode_locks("ModeLock"), log_settings("LogSetting"), botflags(BotServFlagStrings)
 {
 	if (chname.empty())
@@ -291,7 +272,8 @@ ChannelInfo::ChannelInfo(const Anope::string &chname) : Flags<ChannelInfoFlag, C
 /** Copy constructor
  * @param ci The ChannelInfo to copy settings to
  */
-ChannelInfo::ChannelInfo(const ChannelInfo &ci) : Flags<ChannelInfoFlag, CI_END>(ChannelInfoFlagStrings), access("ChanAccess"), akick("AutoKick"),
+ChannelInfo::ChannelInfo(const ChannelInfo &ci) : Flags<ChannelInfoFlag, CI_END>(ChannelInfoFlagStrings), Serializable("ChannelInfo"),
+	access("ChanAccess"), akick("AutoKick"),
 	badwords("BadWord"), mode_locks("ModeLock"), log_settings("LogSetting"), botflags(BotServFlagStrings)
 {
 	*this = ci;
@@ -382,11 +364,6 @@ ChannelInfo::~ChannelInfo()
 
 	if (this->founder)
 		--this->founder->channelcount;
-}
-
-const Anope::string ChannelInfo::serialize_name() const
-{
-	return "ChannelInfo";
 }
 
 Serialize::Data ChannelInfo::serialize() const

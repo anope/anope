@@ -72,9 +72,16 @@ unsigned stringstream::getMax() const
 
 Serializable::Serializable() : last_commit_time(0), id(0)
 {
+	throw CoreException("Default Serializable constructor?");
+}
+
+Serializable::Serializable(const Anope::string &serialize_type) : last_commit_time(0), id(0)
+{
 	if (serializable_items == NULL)
 		serializable_items = new std::list<Serializable *>();
 	serializable_items->push_back(this);
+
+	this->s_type = SerializeType::Find(serialize_type);
 
 	this->s_iter = serializable_items->end();
 	--this->s_iter;
@@ -82,11 +89,13 @@ Serializable::Serializable() : last_commit_time(0), id(0)
 	FOREACH_MOD(I_OnSerializableConstruct, OnSerializableConstruct(this));
 }
 
-Serializable::Serializable(const Serializable &) : last_commit_time(0), id(0)
+Serializable::Serializable(const Serializable &other) : last_commit_time(0), id(0)
 {
 	serializable_items->push_back(this);
 	this->s_iter = serializable_items->end();
 	--this->s_iter;
+
+	this->s_type = other.s_type;
 
 	FOREACH_MOD(I_OnSerializableConstruct, OnSerializableConstruct(this));
 }
@@ -136,12 +145,17 @@ void Serializable::UpdateTS()
 	this->last_commit_time = Anope::CurTime;
 }
 
+SerializeType* Serializable::GetSerializableType() const
+{
+	return this->s_type;
+}
+
 const std::list<Serializable *> &Serializable::GetItems()
 {
 	return *serializable_items;
 }
 
-SerializeType::SerializeType(const Anope::string &n, unserialize_func f)  : name(n), unserialize(f), timestamp(0)
+SerializeType::SerializeType(const Anope::string &n, unserialize_func f, Module *o)  : name(n), unserialize(f), owner(o), timestamp(0)
 {
 	type_order.push_back(this->name);
 	types[this->name] = this;
@@ -178,6 +192,11 @@ time_t SerializeType::GetTimestamp() const
 void SerializeType::UpdateTimestamp()
 {
 	this->timestamp = Anope::CurTime;
+}
+
+Module* SerializeType::GetOwner() const
+{
+	return this->owner;
 }
 
 SerializeType *SerializeType::Find(const Anope::string &name)

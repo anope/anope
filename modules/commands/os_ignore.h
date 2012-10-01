@@ -17,7 +17,7 @@ struct IgnoreData : Serializable
 	Anope::string reason;
 	time_t time; /* When do we stop ignoring them? */
 
-	const Anope::string serialize_name() const anope_override { return "IgnoreData"; }
+	IgnoreData() : Serializable("IgnoreData") { }
 	Serialize::Data serialize() const anope_override;
 	static Serializable* unserialize(Serializable *obj, Serialize::Data &data);
 };

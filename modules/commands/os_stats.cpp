@@ -15,10 +15,7 @@
 
 struct Stats : Serializable
 {
-	const Anope::string serialize_name() const
-	{
-		return "Stats";
-	}
+	Stats() : Serializable("Stats") { }
 
 	Serialize::Data serialize() const anope_override
 	{

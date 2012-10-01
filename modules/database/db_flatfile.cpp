@@ -82,42 +82,58 @@ class DBFlatFile : public Module
 
 	EventReturn OnLoadDatabase() anope_override
 	{
-		std::fstream db;
-		db.open(DatabaseFile.c_str(), std::ios_base::in);
+		std::map<Module *, std::fstream *> databases;
+		databases[NULL] = new std::fstream(DatabaseFile.c_str(), std::ios_base::in);
 
-		if (!db.is_open())
+		if (!databases[NULL]->is_open())
 		{
+			delete databases[NULL];
 			Log() << "Unable to open " << DatabaseFile << " for reading!";
 			return EVENT_CONTINUE;
 		}
 
-		SerializeType *st = NULL;
-		Serialize::Data data;
-		std::multimap<SerializeType *, Serialize::Data> objects;
-		for (Anope::string buf, token; std::getline(db, buf.str());)
+		const std::vector<Anope::string> type_order = SerializeType::GetTypeOrder();
+
+		for (unsigned i = 0; i < type_order.size(); ++i)
 		{
-			spacesepstream sep(buf);
-
-			if (!sep.GetToken(token))
-				continue;
-
-			if (token == "OBJECT" && sep.GetToken(token))
+			SerializeType *stype = SerializeType::Find(type_order[i]);
+			if (stype && !databases.count(stype->GetOwner()))
 			{
-				st = SerializeType::Find(token);
-				data.clear();
-			}
-			else if (token == "DATA" && st != NULL && sep.GetToken(token))
-				data[token] << sep.GetRemaining();
-			else if (token == "END" && st != NULL)
-			{
-				objects.insert(std::make_pair(st, data));
-
-				st = NULL;
-				data.clear();
+				Anope::string db_name = db_dir + "/module_" + stype->GetOwner()->name + ".db";
+				databases[stype->GetOwner()] = new std::fstream(db_name.c_str(), std::ios_base::in);
 			}
 		}
 
-		const std::vector<Anope::string> type_order = SerializeType::GetTypeOrder();
+		std::multimap<SerializeType *, Serialize::Data> objects;
+		for (std::map<Module *, std::fstream *>::iterator it = databases.begin(), it_end = databases.end(); it != it_end; ++it)
+		{
+			std::fstream *db = it->second;
+			SerializeType *st = NULL;
+			Serialize::Data data;
+			for (Anope::string buf, token; std::getline(*db, buf.str());)
+			{
+				spacesepstream sep(buf);
+
+				if (!sep.GetToken(token))
+					continue;
+
+				if (token == "OBJECT" && sep.GetToken(token))
+				{
+					st = SerializeType::Find(token);
+					data.clear();
+				}
+				else if (token == "DATA" && st != NULL && sep.GetToken(token))
+					data[token] << sep.GetRemaining();
+				else if (token == "END" && st != NULL)
+				{
+					objects.insert(std::make_pair(st, data));
+
+					st = NULL;
+					data.clear();
+				}
+			}
+		}
+
 		for (unsigned i = 0; i < type_order.size(); ++i)
 		{
 			SerializeType *stype = SerializeType::Find(type_order[i]);
@@ -129,7 +145,11 @@ class DBFlatFile : public Module
 				it->first->Unserialize(NULL, it->second);
 		}
 
-		db.close();
+		for (std::map<Module *, std::fstream *>::iterator it = databases.begin(), it_end = databases.end(); it != it_end; ++it)
+		{
+			it->second->close();
+			delete it->second;
+		}
 
 		return EVENT_STOP;
 	}
@@ -143,9 +163,11 @@ class DBFlatFile : public Module
 		if (IsFile(DatabaseFile))
 			rename(DatabaseFile.c_str(), tmp_db.c_str());
 
-		std::fstream db(DatabaseFile.c_str(), std::ios_base::out | std::ios_base::trunc);
-		if (!db.is_open())
+		std::map<Module *, std::fstream *> databases;
+		databases[NULL] = new std::fstream(DatabaseFile.c_str(), std::ios_base::out | std::ios_base::trunc);
+		if (!databases[NULL]->is_open())
 		{
+			delete databases[NULL];
 			Log() << "Unable to open " << DatabaseFile << " for writing";
 			if (IsFile(tmp_db))
 				rename(tmp_db.c_str(), DatabaseFile.c_str());
@@ -156,19 +178,30 @@ class DBFlatFile : public Module
 		for (std::list<Serializable *>::const_iterator it = items.begin(), it_end = items.end(); it != it_end; ++it)
 		{
 			Serializable *base = *it;
+			SerializeType *s_type = base->GetSerializableType();
+
+			if (!s_type)
+				continue;
+
 			Serialize::Data data = base->serialize();
+
+			if (!databases.count(s_type->GetOwner()))
+			{
+				Anope::string db_name = db_dir + "/module_" + s_type->GetOwner()->name + ".db";
+				databases[s_type->GetOwner()] = new std::fstream(db_name.c_str(), std::ios_base::out | std::ios_base::trunc);
+			}
+			std::fstream *fd = databases[s_type->GetOwner()];
 	
-			db << "OBJECT " << base->serialize_name() << "\n";
+			*fd << "OBJECT " << s_type->GetName() << "\n";
 			for (Serialize::Data::iterator dit = data.begin(), dit_end = data.end(); dit != dit_end; ++dit)
-				db << "DATA " << dit->first << " " << dit->second.astr() << "\n";
-			db << "END\n";
+				*fd << "DATA " << dit->first << " " << dit->second.astr() << "\n";
+			*fd << "END\n";
 		}
 
-		db.close();
-
-		if (db.good() == false)
+		if (databases[NULL]->good() == false)
 		{
 			Log() << "Unable to write database";
+			databases[NULL]->close();
 			if (!Config->NoBackupOkay)
 				quitting = true;
 			if (IsFile(tmp_db))
@@ -176,6 +209,12 @@ class DBFlatFile : public Module
 		}
 		else
 			unlink(tmp_db.c_str());
+
+		for (std::map<Module *, std::fstream *>::iterator it = databases.begin(), it_end = databases.end(); it != it_end; ++it)
+		{
+			it->second->close();
+			delete it->second;
+		}
 
 		return EVENT_CONTINUE;
 	}

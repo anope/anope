@@ -18,12 +18,7 @@
 #include "users.h"
 #include "account.h"
 
-Memo::Memo() : Flags<MemoFlag>(MemoFlagStrings) { }
-
-const Anope::string Memo::serialize_name() const
-{
-	return "Memo";
-}
+Memo::Memo() : Flags<MemoFlag>(MemoFlagStrings), Serializable("Memo") { }
 
 Serialize::Data Memo::serialize() const
 {

@@ -73,7 +73,6 @@ class CoreExport ChanAccess : public Serializable
 	ChanAccess(AccessProvider *p);
 	virtual ~ChanAccess();
 
-	const Anope::string serialize_name() const anope_override;
 	Serialize::Data serialize() const anope_override;
 	static Serializable* unserialize(Serializable *obj, Serialize::Data &);
 

@@ -18,13 +18,8 @@ struct CSMiscData : ExtensibleItem, Serializable
 	Anope::string name;
 	Anope::string data;
 
-	CSMiscData(ChannelInfo *c, const Anope::string &n, const Anope::string &d) : ci(c), name(n), data(d)
+	CSMiscData(ChannelInfo *c, const Anope::string &n, const Anope::string &d) : Serializable("CSMiscData"), ci(c), name(n), data(d)
 	{
-	}
-
-	const Anope::string serialize_name() const anope_override
-	{
-		return "CSMiscData";
 	}
 
 	Serialize::Data serialize() const anope_override

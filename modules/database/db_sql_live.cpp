@@ -95,18 +95,20 @@ class DBMySQL : public Module, public Pipe
 					continue;
 				obj->UpdateCache();
 
+				SerializeType *s_type = obj->GetSerializableType();
+				if (!s_type)
+					continue;
+
 				Serialize::Data data = obj->serialize();
 
-				std::vector<SQLQuery> create = this->SQL->CreateTable(this->prefix + obj->serialize_name(), data);
+				std::vector<SQLQuery> create = this->SQL->CreateTable(this->prefix + s_type->GetName(), data);
 				for (unsigned i = 0; i < create.size(); ++i)
 					this->RunQueryResult(create[i]);
 
-				SQLResult res = this->RunQueryResult(this->SQL->BuildInsert(this->prefix + obj->serialize_name(), obj->id, data));
+				SQLResult res = this->RunQueryResult(this->SQL->BuildInsert(this->prefix + s_type->GetName(), obj->id, data));
 				if (res.GetID() > 0)
 					obj->id = res.GetID();
-				SerializeType *stype = SerializeType::Find(obj->serialize_name());
-				if (stype)
-					stype->objects.erase(obj->id);
+				s_type->objects.erase(obj->id);
 			}
 		}
 
@@ -144,15 +146,16 @@ class DBMySQL : public Module, public Pipe
 	{
 		if (!this->CheckInit())	
 			return;
-		this->RunQuery("DELETE FROM `" + this->prefix + obj->serialize_name() + "` WHERE `id` = " + stringify(obj->id));
-		SerializeType *stype = SerializeType::Find(obj->serialize_name());
-		if (stype)
-			stype->objects.erase(obj->id);
+		SerializeType *s_type = obj->GetSerializableType();
+		if (!s_type)
+			return;
+		this->RunQuery("DELETE FROM `" + this->prefix + s_type->GetName() + "` WHERE `id` = " + stringify(obj->id));
+		s_type->objects.erase(obj->id);
 	}
 
 	void OnSerializePtrAssign(Serializable *obj) anope_override
 	{
-		SerializeType *stype = SerializeType::Find(obj->serialize_name());
+		SerializeType *stype = obj->GetSerializableType();
 		if (stype == NULL || !this->CheckInit() || stype->GetTimestamp() == Anope::CurTime)
 			return;
 
@@ -160,7 +163,7 @@ class DBMySQL : public Module, public Pipe
 			return;
 		obj->UpdateCache();
 
-		SQLResult res = this->RunQueryResult("SELECT * FROM `" + this->prefix + obj->serialize_name() + "` WHERE `id` = " + stringify(obj->id));
+		SQLResult res = this->RunQueryResult("SELECT * FROM `" + this->prefix + stype->GetName() + "` WHERE `id` = " + stringify(obj->id));
 
 		if (res.Rows() == 0)
 			obj->destroy();

@@ -19,7 +19,7 @@ struct Exception : Serializable
 	time_t time;			/* When this exception was added */
 	time_t expires;			/* Time when it expires. 0 == no expiry */
 
-	const Anope::string serialize_name() const anope_override { return "Exception"; }
+	Exception() : Serializable("Exception") { }
 	Serialize::Data serialize() const anope_override;
 	static Serializable* unserialize(Serializable *obj, Serialize::Data &data);
 };

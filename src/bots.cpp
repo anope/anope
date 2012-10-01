@@ -21,7 +21,7 @@
 serialize_checker<botinfo_map> BotListByNick("BotInfo");
 serialize_checker<botinfouid_map> BotListByUID("BotInfo");
 
-BotInfo::BotInfo(const Anope::string &nnick, const Anope::string &nuser, const Anope::string &nhost, const Anope::string &nreal, const Anope::string &bmodes) : User(nnick, nuser, nhost, "", "", Me, nreal, Anope::CurTime, "", ts6_uid_retrieve()), Flags<BotFlag, BI_END>(BotFlagString), botmodes(bmodes)
+BotInfo::BotInfo(const Anope::string &nnick, const Anope::string &nuser, const Anope::string &nhost, const Anope::string &nreal, const Anope::string &bmodes) : User(nnick, nuser, nhost, "", "", Me, nreal, Anope::CurTime, "", ts6_uid_retrieve()), Flags<BotFlag, BI_END>(BotFlagString), Serializable("BotInfo"), botmodes(bmodes)
 {
 	this->lastmsg = this->created = Anope::CurTime;
 	this->introduced = false;
@@ -69,11 +69,6 @@ BotInfo::~BotInfo()
 	BotListByNick->erase(this->nick);
 	if (!this->uid.empty())
 		BotListByUID->erase(this->uid);
-}
-
-const Anope::string BotInfo::serialize_name() const
-{
-	return "BotInfo";
 }
 
 Serialize::Data BotInfo::serialize() const

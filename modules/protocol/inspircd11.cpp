@@ -875,7 +875,7 @@ struct IRCDMessageRSQuit : IRCDMessage
 		else
 			s = Server::Find(params[0]);
 
-		source.GetServer()->Delete(source.GetServer()->GetName() + " " + source.GetServer()->GetUplink()->GetName());
+		source.GetServer()->Delete(source.GetServer()->GetName() + " " + (s ? s->GetName() : "<unknown>"));
 
 		return true;
 	}

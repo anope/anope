@@ -30,10 +30,7 @@ struct HostRequest : ExtensibleItem, Serializable
 	Anope::string host;
 	time_t time;
 
-	const Anope::string serialize_name() const anope_override
-	{
-		return "HostRequest";
-	}
+	HostRequest() : Serializable("HostRequest") { }
 
 	Serialize::Data serialize() const anope_override
 	{

@@ -18,7 +18,7 @@ struct ForbidData : Serializable
 	time_t expires;
 	ForbidType type;
 
-	const Anope::string serialize_name() const anope_override { return "ForbidData"; }
+	ForbidData() : Serializable("ForbidData") { }
 	Serialize::Data serialize() const anope_override;
 	static Serializable* unserialize(Serializable *obj, Serialize::Data &data);
 };

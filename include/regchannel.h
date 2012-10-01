@@ -95,7 +95,7 @@ struct CoreExport BadWord : Serializable
 	Anope::string word;
 	BadWordType type;
 
-	const Anope::string serialize_name() const anope_override;
+	BadWord() : Serializable("BadWord") { }
 	Serialize::Data serialize() const anope_override;
 	static Serializable* unserialize(Serializable *obj, Serialize::Data &);
 };
@@ -125,7 +125,6 @@ class CoreExport AutoKick : public Flags<AutoKickFlag>, public Serializable
 	time_t addtime;
 	time_t last_used;
 
-	const Anope::string serialize_name() const anope_override;
 	Serialize::Data serialize() const anope_override;
 	static Serializable* unserialize(Serializable *obj, Serialize::Data &);
 };
@@ -142,7 +141,6 @@ struct CoreExport ModeLock : Serializable
 
 	ModeLock(ChannelInfo *ch, bool s, ChannelModeName n, const Anope::string &p, const Anope::string &se = "", time_t c = Anope::CurTime);
 
-	const Anope::string serialize_name() const anope_override;
 	Serialize::Data serialize() const anope_override;
 	static Serializable* unserialize(Serializable *obj, Serialize::Data &);
 };
@@ -160,7 +158,7 @@ struct CoreExport LogSetting : Serializable
 	Anope::string creator;
 	time_t created;
 
-	const Anope::string serialize_name() const anope_override;
+	LogSetting() : Serializable("LogSetting") { }
 	Serialize::Data serialize() const anope_override;
 	static Serializable* unserialize(Serializable *obj, Serialize::Data &);
 };
@@ -219,7 +217,6 @@ class CoreExport ChannelInfo : public Extensible, public Flags<ChannelInfoFlag, 
 	int16_t floodlines, floodsecs;	/* For FLOOD kicker */
 	int16_t repeattimes;			/* For REPEAT kicker */
 
-	const Anope::string serialize_name() const anope_override;
 	Serialize::Data serialize() const anope_override;
 	static Serializable* unserialize(Serializable *obj, Serialize::Data &);
 

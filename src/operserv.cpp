@@ -45,7 +45,7 @@ void XLine::InitRegex()
 	}
 }
 
-XLine::XLine(const Anope::string &mask, const Anope::string &reason, const Anope::string &uid) : Mask(mask), Created(0), Expires(0), Reason(reason), UID(uid)
+XLine::XLine(const Anope::string &mask, const Anope::string &reason, const Anope::string &uid) : Serializable("XLine"), Mask(mask), Created(0), Expires(0), Reason(reason), UID(uid)
 {
 	regex = NULL;
 	manager = NULL;
@@ -53,7 +53,7 @@ XLine::XLine(const Anope::string &mask, const Anope::string &reason, const Anope
 	this->InitRegex();
 }
 
-XLine::XLine(const Anope::string &mask, const Anope::string &by, const time_t expires, const Anope::string &reason, const Anope::string &uid) : Mask(mask), By(by), Created(Anope::CurTime), Expires(expires), Reason(reason), UID(uid)
+XLine::XLine(const Anope::string &mask, const Anope::string &by, const time_t expires, const Anope::string &reason, const Anope::string &uid) : Serializable("XLine"), Mask(mask), By(by), Created(Anope::CurTime), Expires(expires), Reason(reason), UID(uid)
 {
 	regex = NULL;
 	manager = NULL;
@@ -136,11 +136,6 @@ bool XLine::HasNickOrReal() const
 bool XLine::IsRegex() const
 {
 	return !this->Mask.empty() && this->Mask[0] == '/' && this->Mask[this->Mask.length() - 1] == '/';
-}
-
-const Anope::string XLine::serialize_name() const
-{
-	return "XLine";
 }
 
 Serialize::Data XLine::serialize() const

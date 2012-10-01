@@ -105,13 +105,17 @@ class DBSQL : public Module, public Pipe
 					continue;
 				obj->UpdateCache();
 
+				SerializeType *s_type = obj->GetSerializableType();
+				if (!s_type)
+					continue;
+
 				Serialize::Data data = obj->serialize();
 
-				std::vector<SQLQuery> create = this->sql->CreateTable(this->prefix + obj->serialize_name(), data);
+				std::vector<SQLQuery> create = this->sql->CreateTable(this->prefix + s_type->GetName(), data);
 				for (unsigned i = 0; i < create.size(); ++i)
 					this->RunBackground(create[i]);
 
-				SQLQuery insert = this->sql->BuildInsert(this->prefix + obj->serialize_name(), obj->id, data);
+				SQLQuery insert = this->sql->BuildInsert(this->prefix + s_type->GetName(), obj->id, data);
 				this->RunBackground(insert, new ResultSQLSQLInterface(this, obj));
 			}
 		}
@@ -188,7 +192,9 @@ class DBSQL : public Module, public Pipe
 
 	void OnSerializableDestruct(Serializable *obj) anope_override
 	{
-		this->RunBackground("DELETE FROM `" + this->prefix + obj->serialize_name() + "` WHERE `id` = " + stringify(obj->id));
+		SerializeType *s_type = obj->GetSerializableType();
+		if (s_type)
+			this->RunBackground("DELETE FROM `" + this->prefix + s_type->GetName() + "` WHERE `id` = " + stringify(obj->id));
 	}
 
 	void OnSerializableUpdate(Serializable *obj) anope_override

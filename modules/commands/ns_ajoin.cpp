@@ -26,10 +26,7 @@ struct AJoinEntry : Serializable
 	Anope::string channel;
 	Anope::string key;
 
-	const Anope::string serialize_name() const anope_override
-	{
-		return "AJoinEntry";
-	}
+	AJoinEntry() : Serializable("AJoinEntry") { }
 
 	Serialize::Data serialize() const anope_override
 	{

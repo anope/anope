@@ -90,17 +90,12 @@ const std::list<AccessProvider *>& AccessProvider::GetProviders()
 	return providers;
 }
 
-ChanAccess::ChanAccess(AccessProvider *p) : provider(p)
+ChanAccess::ChanAccess(AccessProvider *p) : Serializable("ChanAccess"), provider(p)
 {
 }
 
 ChanAccess::~ChanAccess()
 {
-}
-
-const Anope::string ChanAccess::serialize_name() const
-{
-	return "ChanAccess";
 }
 
 Serialize::Data ChanAccess::serialize() const

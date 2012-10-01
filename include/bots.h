@@ -62,7 +62,6 @@ class CoreExport BotInfo : public User, public Flags<BotFlag, BI_END>, public Se
 	 */
 	virtual ~BotInfo();
 
-	const Anope::string serialize_name() const;
 	Serialize::Data serialize() const;
 	static Serializable* unserialize(Serializable *obj, Serialize::Data &);
 

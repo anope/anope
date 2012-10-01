@@ -95,7 +95,7 @@ class DBMySQL : public Module, public Pipe
 					continue;
 				obj->UpdateCache();
 
-				const Serialize::Data &data = obj->serialize();
+				Serialize::Data data = obj->serialize();
 
 				std::vector<SQLQuery> create = this->SQL->CreateTable(this->prefix + obj->serialize_name(), data);
 				for (unsigned i = 0; i < create.size(); ++i)

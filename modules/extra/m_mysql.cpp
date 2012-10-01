@@ -126,7 +126,7 @@ class MySQLService : public SQLProvider
 
 	std::vector<SQLQuery> CreateTable(const Anope::string &table, const Serialize::Data &data) anope_override;
 
-	SQLQuery BuildInsert(const Anope::string &table, unsigned int id, const Serialize::Data &data);
+	SQLQuery BuildInsert(const Anope::string &table, unsigned int id, Serialize::Data &data);
 
 	SQLQuery GetTables(const Anope::string &prefix) anope_override;
 
@@ -408,8 +408,14 @@ std::vector<SQLQuery> MySQLService::CreateTable(const Anope::string &table, cons
 	return queries;
 }
 
-SQLQuery MySQLService::BuildInsert(const Anope::string &table, unsigned int id, const Serialize::Data &data)
+SQLQuery MySQLService::BuildInsert(const Anope::string &table, unsigned int id, Serialize::Data &data)
 {
+	/* Empty columns not present in the data set */
+	const std::set<Anope::string> &known_cols = this->active_schema[table];
+	for (std::set<Anope::string>::iterator it = known_cols.begin(), it_end = known_cols.end(); it != it_end; ++it)
+		if (*it != "id" && data.count(*it) == 0)
+			data[*it] << "";
+
 	Anope::string query_text = "INSERT INTO `" + table + "` (`id`";
 	for (Serialize::Data::const_iterator it = data.begin(), it_end = data.end(); it != it_end; ++it)
 		query_text += ",`" + it->first + "`";

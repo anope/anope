@@ -258,7 +258,7 @@ SQLQuery SQLiteService::BuildInsert(const Anope::string &table, unsigned int id,
 	/* Empty columns not present in the data set */
 	const std::set<Anope::string> &known_cols = this->active_schema[table];
 	for (std::set<Anope::string>::iterator it = known_cols.begin(), it_end = known_cols.end(); it != it_end; ++it)
-		if (*it != "id" && data.count(*it) == 0)
+		if (*it != "id" && *it != "timestamp" && data.count(*it) == 0)
 			data[*it] << "";
 
 	Anope::string query_text = "REPLACE INTO `" + table + "` (";

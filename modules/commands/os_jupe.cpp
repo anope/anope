@@ -37,7 +37,7 @@ class CommandOSJupe : public Command
 			Anope::string rbuf = "Juped by " + source.GetNick() + (!reason.empty() ? ": " + reason : "");
 			if (server)
 				ircdproto->SendSquit(server, rbuf);
-			Server *juped_server = new Server(Me, jserver, 1, rbuf, ircd->ts6 ? ts6_sid_retrieve() : "", SERVER_JUPED);
+			Server *juped_server = new Server(Me, jserver, 1, rbuf, ts6_sid_retrieve(), SERVER_JUPED);
 			ircdproto->SendServer(juped_server);
 
 			Log(LOG_ADMIN, source, this) << "on " << jserver << " (" << rbuf << ")";

@@ -7,8 +7,6 @@
 /* Anope */
 extern CoreExport Server *Me;
 
-extern CoreExport void do_server(const Anope::string &source, const Anope::string &servername, unsigned int hops, const Anope::string &descript, const Anope::string &numeric);
-
 extern CoreExport const Anope::string ts6_uid_retrieve();
 extern CoreExport const Anope::string ts6_sid_retrieve();
 
@@ -57,12 +55,14 @@ class CoreExport Server : public Flags<ServerFlag>
 	 * @param sid Server sid/numeric
 	 * @param flag An optional server flag
 	 */
-	Server(Server *uplink, const Anope::string &name, unsigned hops, const Anope::string &description, const Anope::string &sid, ServerFlag flag = SERVER_NONE);
+	Server(Server *uplink, const Anope::string &name, unsigned hops, const Anope::string &description, const Anope::string &sid = "", ServerFlag flag = SERVER_NONE);
 
+ private:
 	/** Destructor
 	 */
 	~Server();
 
+ public:
 	/** Delete this server with a reason
 	 * @param reason The reason
 	 */
@@ -93,7 +93,7 @@ class CoreExport Server : public Flags<ServerFlag>
 	 */
 	void SetSID(const Anope::string &sid);
 
-	/** Get the server numeric/SID
+	/** Get the server numeric/SID, else the server name
 	 * @return The numeric/SID
 	 */
 	const Anope::string &GetSID() const;

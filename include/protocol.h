@@ -17,39 +17,15 @@
 #include "services.h"
 #include "anope.h"
 
-/* Protocol tweaks */
-
-struct IRCDVar
-{
-	const char *name;				/* Name of the IRCd command */
-	const char *pseudoclient_mode;	/* Mode used by BotServ Bots */
-	int svsnick;					/* Supports SVSNICK */
-	int vhost;						/* Supports vhost */
-	int snline;						/* Supports SNline */
-	int sqline;						/* Supports SQline */
-	int szline;						/* Supports SZline */
-	int join2msg;					/* Join 2 Message */
-	int chansqline;					/* Supports Channel Sqlines */
-	int quitonkill;					/* IRCD sends QUIT when kill */
-	int vident;						/* Supports vidents */
-	int svshold;					/* Supports svshold */
-	int tsonmode;					/* Timestamp on mode changes */
-	int omode;						/* On the fly o:lines */
-	int umode;						/* change user modes */
-	int knock_needs_i;				/* Check if we needed +i when setting NOKNOCK */
-	int svsmode_ucmode;				/* Can remove User Channel Modes with SVSMODE */
-	int sglineenforce;
-	int ts6;						/* ircd is TS6 */
-	const char *globaltldprefix;	/* TLD prefix used for Global */
-	unsigned maxmodes;				/* Max modes to send per line */
-	int certfp;					/* IRCd sends a SSL users certificate fingerprint */
-};
-
-
 class CoreExport IRCDProto
 {
+	Anope::string proto_name;
+
+	IRCDProto() { }
  protected:
-	virtual void SendSVSKillInternal(const BotInfo *, const User *, const Anope::string &);
+ 	IRCDProto(const Anope::string &proto_name);
+
+	virtual void SendSVSKillInternal(const BotInfo *, User *, const Anope::string &);
 	virtual void SendModeInternal(const BotInfo *, const Channel *, const Anope::string &);
 	virtual void SendModeInternal(const BotInfo *, const User *, const Anope::string &) = 0;
 	virtual void SendKickInternal(const BotInfo *, const Channel *, const User *, const Anope::string &);
@@ -62,14 +38,40 @@ class CoreExport IRCDProto
 	virtual void SendCTCPInternal(const BotInfo *bi, const Anope::string &dest, const Anope::string &buf);
 	virtual void SendNumericInternal(int numeric, const Anope::string &dest, const Anope::string &buf);
  public:
-	virtual ~IRCDProto() { }
+	virtual ~IRCDProto();
+
+	const Anope::string &GetProtocolName();
+	/* Modes used by default by our clients */
+	Anope::string DefaultPseudoclientModes;
+	/* Can we force change a users's nick */
+	bool CanSVSNick;
+	/* Can we set vhosts/vidents on users? */
+	bool CanSetVHost, CanSetVIdent;
+	/* Can we ban specific gecos from being used? */
+	bool CanSNLine;
+	/* Can we ban specific nicknames from being used? */
+	bool CanSQLine;
+	/* Can we ban sepcific channel names from being used? */
+	bool CanSQLineChannel;
+	/* Can we ban by IP? */
+	bool CanSZLine;
+	/* Can we place temporary holds on specific nicknames? */
+	bool CanSVSHold;
+	/* See os_oline */
+	bool CanSVSO;
+	/* See ns_cert */
+	bool CanCertFP;
+	/* Whether this IRCd requires unique IDs for each user or server. See TS6/P10. */
+	bool RequiresID;
+	/* The maximum number of modes we are allowed to set with one MODE command */
+	unsigned MaxModes;
 
 	virtual void SendSVSNOOP(const Server *, bool) { }
 	virtual void SendTopic(BotInfo *, Channel *);
 	virtual void SendVhostDel(User *) { }
 	virtual void SendAkill(User *, XLine *) = 0;
 	virtual void SendAkillDel(const XLine *) = 0;
-	virtual void SendSVSKill(const BotInfo *source, const User *user, const char *fmt, ...);
+	virtual void SendSVSKill(const BotInfo *source, User *user, const char *fmt, ...);
 	virtual void SendMode(const BotInfo *bi, const Channel *dest, const char *fmt, ...);
 	virtual void SendMode(const BotInfo *bi, const User *u, const char *fmt, ...);
 	virtual void SendClientIntroduction(const User *u) = 0;
@@ -78,8 +80,8 @@ class CoreExport IRCDProto
 	virtual void SendNotice(const BotInfo *bi, const Anope::string &dest, const char *fmt, ...);
 	virtual void SendAction(const BotInfo *bi, const Anope::string &dest, const char *fmt, ...);
 	virtual void SendPrivmsg(const BotInfo *bi, const Anope::string &dest, const char *fmt, ...);
-	virtual void SendGlobalNotice(const BotInfo *bi, const Server *dest, const Anope::string &msg);
-	virtual void SendGlobalPrivmsg(const BotInfo *bi, const Server *desc, const Anope::string &msg);
+	virtual void SendGlobalNotice(const BotInfo *bi, const Server *dest, const Anope::string &msg) = 0;
+	virtual void SendGlobalPrivmsg(const BotInfo *bi, const Server *desc, const Anope::string &msg) = 0;
 
 	virtual void SendQuit(const User *u, const char *fmt, ...);
 	virtual void SendPing(const Anope::string &servname, const Anope::string &who);
@@ -120,36 +122,44 @@ class CoreExport IRCDProto
 	virtual void SendChannel(Channel *c) { }
 };
 
-class CoreExport IRCdMessage
+enum IRCDMessageFlag
 {
- public:
-	virtual bool On436(const Anope::string &, const std::vector<Anope::string> &);
-	virtual bool OnAway(const Anope::string &, const std::vector<Anope::string> &);
-	virtual bool OnJoin(const Anope::string &, const std::vector<Anope::string> &);
-	virtual bool OnKick(const Anope::string &, const std::vector<Anope::string> &);
-	virtual bool OnKill(const Anope::string &, const std::vector<Anope::string> &);
-	virtual bool OnMode(const Anope::string &, const std::vector<Anope::string> &) = 0;
-	virtual bool OnUID(const Anope::string &, const std::vector<Anope::string> &);
-	virtual bool OnNick(const Anope::string &, const std::vector<Anope::string> &) = 0;
-	virtual bool OnPart(const Anope::string &, const std::vector<Anope::string> &);
-	virtual bool OnPing(const Anope::string &, const std::vector<Anope::string> &);
-	virtual bool OnPrivmsg(const Anope::string &, const std::vector<Anope::string> &);
-	virtual bool OnQuit(const Anope::string &, const std::vector<Anope::string> &);
-	virtual bool OnServer(const Anope::string &, const std::vector<Anope::string> &) = 0;
-	virtual bool OnSQuit(const Anope::string &, const std::vector<Anope::string> &);
-	virtual bool OnTopic(const Anope::string &, const std::vector<Anope::string> &) = 0;
-	virtual bool OnWhois(const Anope::string &, const std::vector<Anope::string> &);
-	virtual bool OnCapab(const Anope::string &, const std::vector<Anope::string> &);
-	virtual bool OnSJoin(const Anope::string &, const std::vector<Anope::string> &) = 0;
-	virtual bool OnError(const Anope::string &, const std::vector<Anope::string> &);
+	IRCDMESSAGE_SOFT_LIMIT,
+	IRCDMESSAGE_REQUIRE_SERVER,
+	IRCDMESSAGE_REQUIRE_USER
 };
 
-extern CoreExport IRCDVar *ircd;
-extern CoreExport IRCDProto *ircdproto;
-extern CoreExport IRCdMessage *ircdmessage;
+class CoreExport MessageSource
+{
+	Anope::string source;
+	User *u;
+	Server *s;
 
-extern CoreExport void pmodule_ircd_proto(IRCDProto *);
-extern CoreExport void pmodule_ircd_var(IRCDVar *ircdvar);
-extern CoreExport void pmodule_ircd_message(IRCdMessage *message);
+ public:
+	MessageSource(const Anope::string &);
+	MessageSource(User *u);
+	MessageSource(Server *s);
+	const Anope::string GetName();
+	const Anope::string &GetSource();
+	User *GetUser();
+	Server *GetServer();
+};
+
+class CoreExport IRCDMessage : public Flags<IRCDMessageFlag, 3>
+{
+	static std::map<Anope::string, std::vector<IRCDMessage *> > messages;
+
+	Anope::string name;
+	unsigned param_count;
+ public:
+ 	static const std::vector<IRCDMessage *> *Find(const Anope::string &name);
+
+	IRCDMessage(const Anope::string &n, unsigned p = 0);
+	~IRCDMessage();
+	unsigned GetParamCount() const;
+	virtual bool Run(MessageSource &, const std::vector<Anope::string> &params) = 0;
+};
+
+extern CoreExport IRCDProto *ircdproto;
 
 #endif // PROTOCOL_H

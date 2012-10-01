@@ -52,7 +52,8 @@ Server::Server(Server *uplink, const Anope::string &name, unsigned hops, const A
 			for (botinfo_map::iterator it = BotListByNick->begin(), it_end = BotListByNick->end(); it != it_end; ++it)
 			{
 				BotInfo *bi = it->second;
-				Anope::string modes = !bi->botmodes.empty() ? ("+" + bi->botmodes) : ircd->pseudoclient_mode;
+				Anope::string modes = !bi->botmodes.empty() ? ("+" + bi->botmodes) : ircdproto->DefaultPseudoclientModes;
+
 				bi->SetModesInternal(modes.c_str());
 				for (unsigned i = 0; i < bi->botchannels.size(); ++i)
 				{
@@ -70,7 +71,10 @@ Server::Server(Server *uplink, const Anope::string &name, unsigned hops, const A
 							if (cm == NULL)
 								cm = ModeManager::FindChannelModeByChar(ModeManager::GetStatusChar(want_modes[j]));
 							if (cm && cm->Type == MODE_STATUS)
-								c->SetModeInternal(bi, cm, bi->nick);
+							{
+								MessageSource ms = bi;
+								c->SetModeInternal(ms, cm, bi->nick);
+							}
 						}
 					}
 				}
@@ -113,6 +117,8 @@ Server::Server(Server *uplink, const Anope::string &name, unsigned hops, const A
 			}
 		}
 	}
+
+	FOREACH_MOD(I_OnNewServer, OnNewServer(this));
 }
 
 /** Destructor
@@ -157,6 +163,7 @@ Server::~Server()
 void Server::Delete(const Anope::string &reason)
 {
 	this->QReason = reason;
+	FOREACH_MOD(I_OnServerQuit, OnServerQuit(this));
 	delete this;
 }
 
@@ -205,7 +212,10 @@ void Server::SetSID(const Anope::string &sid)
  */
 const Anope::string &Server::GetSID() const
 {
-	return this->SID;
+	if (!this->SID.empty())
+		return this->SID;
+	else
+		return this->Name;
 }
 
 /** Get the list of links this server has, or NULL if it has none
@@ -395,42 +405,7 @@ Server *Server::Find(const Anope::string &name, Server *s)
 
 /*************************************************************************/
 
-/**
- * Handle adding the server to the Server struct
- * @param source Name of the uplink if any
- * @param servername Name of the server being linked
- * @param hops Number of hops to reach this server
- * @param descript Description of the server
- * @param numeric Server Numberic/SUID
- * @return void
- */
-void do_server(const Anope::string &source, const Anope::string &servername, unsigned int hops, const Anope::string &descript, const Anope::string &numeric)
-{
-	if (source.empty())
-		Log(LOG_DEBUG) << "Server " << servername << " introduced";
-	else
-		Log(LOG_DEBUG) << "Server introduced (" << servername << ")" << " from " << source;
-
-	Server *s = NULL;
-
-	if (!source.empty())
-	{
-		s = Server::Find(source);
-
-		if (!s)
-			throw CoreException("Recieved a server from a nonexistant uplink?");
-	}
-	else
-		s = Me;
-
-	/* Create a server structure. */
-	Server *newserver = new Server(s, servername, hops, descript, numeric);
-
-	/* Let modules know about the connection */
-	FOREACH_MOD(I_OnNewServer, OnNewServer(newserver));
-}
-
-static inline char nextID(char &c)
+static inline char& nextID(char &c)
 {
 	if (c == 'Z')
 		c = '0';
@@ -446,7 +421,7 @@ static inline char nextID(char &c)
  */
 const Anope::string ts6_uid_retrieve()
 {
-	if (!ircd || !ircd->ts6)
+	if (!ircdproto || !ircdproto->RequiresID)
 		return "";
 
 	static Anope::string current_uid = "AAAAAA";
@@ -465,7 +440,7 @@ const Anope::string ts6_uid_retrieve()
  */
 const Anope::string ts6_sid_retrieve()
 {
-	if (!ircd || !ircd->ts6)
+	if (!ircdproto || !ircdproto->RequiresID)
 		return "";
 
 	static Anope::string current_sid;

@@ -32,12 +32,10 @@ time_t maxusertime;
 /*************************************************************************/
 /*************************************************************************/
 
-User::User(const Anope::string &snick, const Anope::string &sident, const Anope::string &shost, const Anope::string &suid) : modes(UserModeNameStrings)
+User::User(const Anope::string &snick, const Anope::string &sident, const Anope::string &shost, const Anope::string &svhost, const Anope::string &sip, Server *sserver, const Anope::string &srealname, time_t ssignon, const Anope::string &smodes, const Anope::string &suid)
 {
 	if (snick.empty() || sident.empty() || shost.empty())
 		throw CoreException("Bad args passed to User::User");
-
-	// XXX: we should also duplicate-check here.
 
 	/* we used to do this by calloc, no more. */
 	server = NULL;
@@ -48,41 +46,86 @@ User::User(const Anope::string &snick, const Anope::string &sident, const Anope:
 	this->nick = snick;
 	this->ident = sident;
 	this->host = shost;
+	this->vhost = svhost;
+	if (!svhost.empty())
+		this->SetCloakedHost(svhost);
+	this->ip = sip;
+	this->server = sserver;
+	this->realname = srealname;
+	this->timestamp = ssignon;
+	this->SetModesInternal("%s", smodes.c_str());
 	this->uid = suid;
 	this->SuperAdmin = false;
 
+	size_t old = UserListByNick.size();
 	UserListByNick[snick] = this;
 	if (!suid.empty())
 		UserListByUID[suid] = this;
+	if (old == UserListByNick.size())
+		Log(LOG_DEBUG) << "Duplicate user " << snick << " in user table?";
 
 	this->nc = NULL;
 
-	++usercnt;
+	if (sserver) // Our bots are introduced on startup with no server
+		Log(this, "connect") << (!svhost.empty() ? Anope::string("(") + svhost + ") " : "") << "(" << srealname << ") " << sip << " connected to the network (" << sserver->GetName() << ")";
 
+	++usercnt;
 	if (usercnt > maxusercnt)
 	{
 		maxusercnt = usercnt;
 		maxusertime = Anope::CurTime;
 		Log(this, "maxusers") << "connected - new maximum user count: " << maxusercnt;
 	}
+
+	bool exempt = false;
+	if (server && server->IsULined())
+		exempt = true;
+	dynamic_reference<User> user = this;
+	FOREACH_MOD(I_OnUserConnect, OnUserConnect(user, exempt));
 }
 
-void User::SetNewNick(const Anope::string &newnick)
+void User::ChangeNick(const Anope::string &newnick)
 {
 	/* Sanity check to make sure we don't segfault */
 	if (newnick.empty())
-		throw CoreException("User::SetNewNick() got a bad argument");
+		throw CoreException("User::ChangeNick() got a bad argument");
+	
+	this->SuperAdmin = false;
+	Log(this, "nick") << "(" << this->realname << ") changed nick to " << newnick;
 
-	UserListByNick.erase(this->nick);
+	Anope::string old = this->nick;
 
-	this->nick = newnick;
+	if (this->nick.equals_ci(newnick))
+		this->nick = newnick;
+	else
+	{
+		/* Update this only if nicks aren't the same */
+		this->my_signon = Anope::CurTime;
 
-	UserListByNick[this->nick] = this;
+		NickAlias *old_na = findnick(this->nick);
+		if (old_na && (this->IsIdentified(true) || this->IsRecognized()))
+			old_na->last_seen = Anope::CurTime;
+		
+		UserListByNick.erase(this->nick);
+		this->nick = newnick;
+		UserListByNick[this->nick] = this;
 
-	OnAccess = false;
-	const NickAlias *na = findnick(this->nick);
-	if (na)
-		OnAccess = is_on_access(this, na->nc);
+		OnAccess = false;
+		NickAlias *na = findnick(this->nick);
+		if (na)
+			OnAccess = is_on_access(this, na->nc);
+
+		if (old_na)
+			old_na->OnCancel(this);
+
+		if (na && na->nc == this->Account())
+		{
+			na->last_seen = Anope::CurTime;
+			this->UpdateHost();
+		}
+	}
+
+	FOREACH_MOD(I_OnUserNickChange, OnUserNickChange(this, old));
 }
 
 void User::SetDisplayedHost(const Anope::string &shost)
@@ -102,7 +145,7 @@ void User::SetDisplayedHost(const Anope::string &shost)
  */
 const Anope::string &User::GetDisplayedHost() const
 {
-	if (ircd->vhost && !this->vhost.empty())
+	if (!this->vhost.empty())
 		return this->vhost;
 	else if (this->HasMode(UMODE_CLOAK) && !this->GetCloakedHost().empty())
 		return this->GetCloakedHost();
@@ -135,7 +178,10 @@ const Anope::string &User::GetCloakedHost() const
 
 const Anope::string &User::GetUID() const
 {
-	return this->uid;
+	if (!this->uid.empty())
+		return this->uid;
+	else
+		return this->nick;
 }
 
 void User::SetVIdent(const Anope::string &sident)
@@ -149,7 +195,7 @@ void User::SetVIdent(const Anope::string &sident)
 
 const Anope::string &User::GetVIdent() const
 {
-	if (this->HasMode(UMODE_CLOAK) || (ircd->vident && !this->vident.empty()))
+	if (!this->vident.empty())
 		return this->vident;
 	else
 		return this->ident;
@@ -323,7 +369,7 @@ void User::Collide(NickAlias *na)
 	if (na)
 		na->SetFlag(NS_COLLIDED);
 
-	if (ircd->svsnick)
+	if (ircdproto->CanSVSNick)
 	{
 		Anope::string guestnick;
 
@@ -386,7 +432,7 @@ void User::Identify(NickAlias *na)
 			if (bi != NULL)
 				this->SendMessage(bi, "Changing your usermodes to \002%s\002", this->nc->o->ot->modes.c_str());
 		}
-		if (ircd->vhost && !this->nc->o->vhost.empty())
+		if (ircdproto->CanSetVHost && !this->nc->o->vhost.empty())
 		{
 			if (bi != NULL)
 				this->SendMessage(bi, "Changing your vhost to \002%s\002", this->nc->o->vhost.c_str());
@@ -687,6 +733,8 @@ void User::SetModesInternal(const char *umodes, ...)
 	vsnprintf(buf, BUFSIZE - 1, umodes, args);
 	va_end(args);
 
+	Log(this, "mode") << "changes modes to " << buf;
+
 	spacesepstream sep(buf);
 	sep.GetToken(modebuf);
 	for (unsigned i = 0, end = modebuf.length(); i < end; ++i)
@@ -785,14 +833,25 @@ void User::Kill(const Anope::string &source, const Anope::string &reason)
 	Anope::string real_reason = real_source + " (" + reason + ")";
 
 	ircdproto->SendSVSKill(findbot(source), this, "%s", real_reason.c_str());
+}
 
-	if (!ircd->quitonkill)
-		do_kill(this, real_reason);
+void User::KillInternal(const Anope::string &source, const Anope::string &reason)
+{
+	Log(this, "killed") << "was killed by " << source << " (Reason: " << reason << ")";
+
+	NickAlias *na = findnick(this->nick);
+	if (na && !na->nc->HasFlag(NI_SUSPENDED) && (this->IsRecognized() || this->IsIdentified(true)))
+	{
+		na->last_seen = Anope::CurTime;
+		na->last_quit = reason;
+	}
+
+	delete this;
 }
 
 User *finduser(const Anope::string &nick)
 {
-	if (isdigit(nick[0]) && ircd->ts6)
+	if (isdigit(nick[0]) && ircdproto->RequiresID)
 	{
 		Anope::map<User *>::iterator it = UserListByUID.find(nick);
 		if (it != UserListByUID.end())
@@ -807,127 +866,6 @@ User *finduser(const Anope::string &nick)
 
 	return NULL;
 }
-
-/*************************************************************************/
-
-/* Handle a server NICK command. */
-
-User *do_nick(const Anope::string &source, const Anope::string &nick, const Anope::string &username, const Anope::string &host, const Anope::string &server, const Anope::string &realname, time_t ts, const Anope::string &ip, const Anope::string &vhost, const Anope::string &uid, const Anope::string &modes)
-{
-	if (source.empty())
-	{
-		Server *serv = Server::Find(server);
-		if (serv == NULL)
-		{
-			Log() << "User " << nick << " introduced with nonexistant server " << server << "!";
-			return NULL;
-		}
-
-		/* Allocate User structure and fill it in. */
-		dynamic_reference<User> user = new User(nick, username, host, uid);
-		user->ip = ip;
-		user->server = serv;
-		user->realname = realname;
-		user->timestamp = ts;
-		if (!vhost.empty())
-			user->SetCloakedHost(vhost);
-		user->SetVIdent(username);
-		user->SetModesInternal(modes.c_str());
-
-		Log(user, "connect") << (!vhost.empty() ? Anope::string("(") + vhost + ") " : "") << "(" << user->realname << ") " << user->ip << " connected to the network (" << serv->GetName() << ")";
-
-		bool exempt = false;
-		if (user->server && user->server->IsULined())
-			exempt = true;
-		FOREACH_MOD(I_OnUserConnect, OnUserConnect(user, exempt));
-
-		return user;
-	}
-	else
-	{
-		/* An old user changing nicks. */
-		User *user = finduser(source);
-
-		if (!user)
-		{
-			Log() << "user: NICK from nonexistent nick " << source;
-			return NULL;
-		}
-		user->SuperAdmin = false;
-
-		Log(user, "nick") << "(" << user->realname << ") changed nick to " << nick;
-
-		user->timestamp = ts;
-
-		if (user->nick.equals_ci(nick))
-			/* No need to redo things */
-			user->SetNewNick(nick);
-		else
-		{
-			/* Update this only if nicks aren't the same */
-			user->my_signon = Anope::CurTime;
-
-			NickAlias *old_na = findnick(user->nick);
-			if (old_na && (old_na->nc == user->Account() || user->IsRecognized()))
-				old_na->last_seen = Anope::CurTime;
-
-			Anope::string oldnick = user->nick;
-			user->SetNewNick(nick);
-			FOREACH_MOD(I_OnUserNickChange, OnUserNickChange(user, oldnick));
-
-			if (old_na)
-				old_na->OnCancel(user);
-
-			NickAlias *na = findnick(user->nick);
-			if (na && na->nc == user->Account())
-			{
-				na->last_seen = Anope::CurTime;
-				user->UpdateHost();
-			}
-		}
-
-		return user;
-	}
-}
-
-/*************************************************************************/
-
-void do_umode(const Anope::string &user, const Anope::string &modes)
-{
-	User *u = finduser(user);
-	if (!u)
-	{
-		Log() << "user: MODE "<< modes << " for nonexistent nick "<< user;
-		return;
-	}
-
-	Log(u, "mode") << "changes modes to " << modes;
-
-	u->SetModesInternal(modes.c_str());
-}
-
-/*************************************************************************/
-
-
-/* Handle a KILL command.
- * @param user the user being killed
- * @param msg why
- */
-void do_kill(User *user, const Anope::string &msg)
-{
-	Log(user, "killed") << "was killed (Reason: " << msg << ")";
-
-	NickAlias *na = findnick(user->nick);
-	if (na && !na->nc->HasFlag(NI_SUSPENDED) && (user->IsRecognized() || user->IsIdentified(true)))
-	{
-		na->last_seen = Anope::CurTime;
-		na->last_quit = msg;
-	}
-	delete user;
-}
-
-/*************************************************************************/
-/*************************************************************************/
 
 bool matches_list(Channel *c, User *user, ChannelModeName mode)
 {

@@ -225,7 +225,7 @@ class NSCert : public Module
 	{
 		this->SetAuthor("Anope");
 
-		if (!ircd || !ircd->certfp)
+		if (!ircdproto || !ircdproto->CanCertFP)
 			throw ModuleException("Your IRCd does not support ssl client certificates");
 
 		Implementation i[] = { I_OnFingerprint };

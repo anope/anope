@@ -250,7 +250,7 @@ class CommandOSSNLine : public CommandOSSXLineBase
 
 	void OnAdd(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		if (!this->xlm() ||! ircd->snline)
+		if (!this->xlm() || !ircdproto->CanSNLine)
 		{
 			source.Reply(_("Your IRCd does not support SNLINE"));
 			return;
@@ -384,18 +384,15 @@ class CommandOSSNLine : public CommandOSSXLineBase
 		{
 			this->xlm()->Send(source.GetUser(), x);
 
-			if (!ircd->sglineenforce)
+			Anope::string rreason = "G-Lined: " + reason;
+
+			for (Anope::insensitive_map<User *>::const_iterator it = UserListByNick.begin(); it != UserListByNick.end();)
 			{
-				Anope::string rreason = "G-Lined: " + reason;
+				User *user = it->second;
+				++it;
 
-				for (Anope::insensitive_map<User *>::const_iterator it = UserListByNick.begin(); it != UserListByNick.end();)
-				{
-					User *user = it->second;
-					++it;
-
-					if (!user->HasMode(UMODE_OPER) && user->server != Me && Anope::Match(user->realname, x->Mask, false, true))
-						user->Kill(Config->ServerName, rreason);
-				}
+				if (!user->HasMode(UMODE_OPER) && user->server != Me && Anope::Match(user->realname, x->Mask, false, true))
+					user->Kill(Config->ServerName, rreason);
 			}
 		}
 
@@ -474,7 +471,7 @@ class CommandOSSQLine : public CommandOSSXLineBase
 
 	void OnAdd(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		if (!this->xlm() || !ircd->sqline)
+		if (!this->xlm() || !ircdproto->CanSQLine)
 		{
 			source.Reply(_("Your IRCd does not support SQLINE"));
 			return;

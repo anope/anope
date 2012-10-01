@@ -13,7 +13,6 @@
 #include "services.h"
 #include "modules.h"
 
-message_map MessageMap;
 std::list<Module *> Modules;
 
 CallBack::CallBack(Module *mod, long time_from_now, time_t now, bool repeating) : Timer(time_from_now, now, repeating),  m(mod)
@@ -25,56 +24,5 @@ CallBack::~CallBack()
 	std::list<CallBack *>::iterator it = std::find(m->CallBacks.begin(), m->CallBacks.end(), this);
 	if (it != m->CallBacks.end())
 		m->CallBacks.erase(it);
-}
-
-/** Message constructor, adds the message to Anope
- * @param n The message name
- * @param f A callback function
- */
-Message::Message(const Anope::string &n, bool (*f)(const Anope::string &, const std::vector<Anope::string> &)) : name(n), func(f)
-{
-	MessageMap.insert(std::make_pair(this->name, this));
-}
-
-/** Message destructor
- */
-Message::~Message()
-{
-	message_map::iterator it = MessageMap.find(this->name);
-
-	if (it == MessageMap.end())
-		return;
-
-	message_map::iterator upper = MessageMap.upper_bound(this->name);
-
-	for (; it != upper; ++it)
-	{
-		if (it->second == this)
-		{
-			MessageMap.erase(it);
-			break;
-		}
-	}
-}
-
-/** Find a message in the message table
- * @param name The name of the message were looking for
- * @return NULL if we cant find it, or a pointer to the Message if we can
- */
-std::vector<Message *> Anope::FindMessage(const Anope::string &name)
-{
-	std::vector<Message *> messages;
-
-	message_map::iterator it = MessageMap.find(name);
-
-	if (it == MessageMap.end())
-		return messages;
-
-	message_map::iterator upper = MessageMap.upper_bound(name);
-
-	for (; it != upper; ++it)
-		messages.push_back(it->second);
-
-	return messages;
 }
 

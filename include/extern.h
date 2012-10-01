@@ -71,34 +71,6 @@ E int CurrentUplink;
 E void save_databases();
 E void sighandler(int signum);
 
-/**** messages.cpp ****/
-
-E void init_core_messages();
-
-E bool OnStats(const Anope::string &source, const std::vector<Anope::string> &);
-E bool OnTime(const Anope::string &source, const std::vector<Anope::string> &);
-E bool OnVersion(const Anope::string &source, const std::vector<Anope::string> &);
-
-E bool On436(const Anope::string &, const std::vector<Anope::string> &);
-E bool OnAway(const Anope::string &, const std::vector<Anope::string> &);
-E bool OnJoin(const Anope::string &, const std::vector<Anope::string> &);
-E bool OnKick(const Anope::string &, const std::vector<Anope::string> &);
-E bool OnKill(const Anope::string &, const std::vector<Anope::string> &);
-E bool OnMode(const Anope::string &, const std::vector<Anope::string> &);
-E bool OnNick(const Anope::string &, const std::vector<Anope::string> &);
-E bool OnUID(const Anope::string &, const std::vector<Anope::string> &);
-E bool OnPart(const Anope::string &, const std::vector<Anope::string> &);
-E bool OnPing(const Anope::string &, const std::vector<Anope::string> &);
-E bool OnPrivmsg(const Anope::string &, const std::vector<Anope::string> &);
-E bool OnQuit(const Anope::string &, const std::vector<Anope::string> &);
-E bool OnServer(const Anope::string &, const std::vector<Anope::string> &);
-E bool OnSQuit(const Anope::string &, const std::vector<Anope::string> &);
-E bool OnTopic(const Anope::string &, const std::vector<Anope::string> &);
-E bool OnWhois(const Anope::string &, const std::vector<Anope::string> &);
-E bool OnCapab(const Anope::string &, const std::vector<Anope::string> &);
-E bool OnSJoin(const Anope::string &, const std::vector<Anope::string> &);
-E bool OnError(const Anope::string &, const std::vector<Anope::string> &);
-
 /**** misc.c ****/
 
 E bool IsFile(const Anope::string &filename);

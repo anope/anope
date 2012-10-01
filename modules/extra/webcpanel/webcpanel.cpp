@@ -73,7 +73,7 @@ class ModuleWebCPanel : public Module
 			s.subsections.push_back(ss);
 			provider->RegisterPage(&this->nickserv_info);
 
-			if (ircd && ircd->certfp)
+			if (ircdproto && ircdproto->CanCertFP)
 			{
 				ss.name = "SSL Certificates";
 				ss.url = "/nickserv/cert";

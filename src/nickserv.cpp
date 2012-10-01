@@ -52,13 +52,10 @@ bool is_on_access(const User *u, const NickCore *nc)
 		return false;
 
 	Anope::string buf = u->GetIdent() + "@" + u->host, buf2, buf3;
-	if (ircd->vhost)
-	{
-		if (!u->vhost.empty())
-			buf2 = u->GetIdent() + "@" + u->vhost;
-		if (!u->GetCloakedHost().empty())
-			buf3 = u->GetIdent() + "@" + u->GetCloakedHost();
-	}
+	if (!u->vhost.empty())
+		buf2 = u->GetIdent() + "@" + u->vhost;
+	if (!u->GetCloakedHost().empty())
+		buf3 = u->GetIdent() + "@" + u->GetCloakedHost();
 
 	for (unsigned i = 0, end = nc->access.size(); i < end; ++i)
 	{

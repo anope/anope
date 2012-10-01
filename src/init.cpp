@@ -481,8 +481,6 @@ void Init(int ac, char **av)
 	/* Initialize the socket engine */
 	SocketEngine::Init();
 
-	init_core_messages();
-
 	/* Write our PID to the PID file. */
 	write_pidfile();
 

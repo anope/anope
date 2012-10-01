@@ -102,7 +102,7 @@ class CommandNSInfo : public Command
 			{
 				if (na->HasVhost())
 				{
-					if (ircd->vident && !na->GetVhostIdent().empty())
+					if (ircdproto->CanSetVIdent && !na->GetVhostIdent().empty())
 						info[_("VHost")] = na->GetVhostIdent() + "@" + na->GetVhostHost();
 					else
 						info[_("VHost")] = na->GetVhostHost();

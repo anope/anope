@@ -49,6 +49,7 @@ struct BadWord;
 struct DNSQuery;
 struct Exception;
 struct MemoInfo;
+struct MessageSource;
 struct ModeLock;
 struct Oper;
 

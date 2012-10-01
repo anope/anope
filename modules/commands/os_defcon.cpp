@@ -323,14 +323,6 @@ class OSDefcon : public Module
 	
 			Log() << "DefConChanModes must lock mode +l as well to lock mode +L";
 		}
-
-		/* Some ircd we can't set NOKNOCK without INVITE */
-		/* So check if we need there is a NOKNOCK MODE and that we need INVITEONLY */
-		if (ircd->knock_needs_i && (cm = ModeManager::FindChannelModeByName(CMODE_NOKNOCK)) && DConfig.DefConModesOn.HasFlag(cm->Name) && !DConfig.DefConModesOn.HasFlag(CMODE_INVITE))
-		{
-			DConfig.DefConModesOn.UnsetFlag(CMODE_NOKNOCK);
-			Log() << "DefConChanModes must lock mode +i as well to lock mode +K";
-		}
 	}
 
  public:
@@ -437,7 +429,7 @@ class OSDefcon : public Module
 		return EVENT_CONTINUE;
 	}
 
-	EventReturn OnChannelModeSet(Channel *c, User *setter, ChannelModeName Name, const Anope::string &param) anope_override
+	EventReturn OnChannelModeSet(Channel *c, MessageSource &, ChannelModeName Name, const Anope::string &param) anope_override
 	{
 		ChannelMode *cm = ModeManager::FindChannelModeByName(Name);
 
@@ -451,7 +443,7 @@ class OSDefcon : public Module
 		return EVENT_CONTINUE;
 	}
 
-	EventReturn OnChannelModeUnset(Channel *c, User *setter, ChannelModeName Name, const Anope::string &) anope_override
+	EventReturn OnChannelModeUnset(Channel *c, MessageSource &, ChannelModeName Name, const Anope::string &) anope_override
 	{
 		ChannelMode *cm = ModeManager::FindChannelModeByName(Name);
 

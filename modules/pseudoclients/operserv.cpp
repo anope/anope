@@ -37,7 +37,7 @@ class SGLineManager : public XLineManager
 	{
 		try
 		{
-			if (!ircd->szline)
+			if (!ircdproto->CanSZLine)
 				throw SocketException("SZLine is not supported");
 			else if (x->GetUser() != "*")
 				throw SocketException("Can not ZLine a username");
@@ -236,7 +236,7 @@ class OperServCore : public Module
 
 	void OnUserNickChange(User *u, const Anope::string &oldnick) anope_override
 	{
-		if (ircd->sqline && !u->HasMode(UMODE_OPER))
+		if (ircdproto->CanSQLine && !u->HasMode(UMODE_OPER))
 			this->sqlines.CheckAllXLines(u);
 	}
 

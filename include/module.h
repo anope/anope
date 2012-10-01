@@ -31,6 +31,7 @@
 #include "logger.h"
 #include "mail.h"
 #include "memo.h"
+#include "messages.h"
 #include "modes.h"
 #include "modules.h"
 #include "oper.h"

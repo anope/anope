@@ -121,7 +121,7 @@ class CommandHSRequest : public Command
 				source.Reply(HOST_SET_IDENTTOOLONG, Config->UserLen);
 				return;
 			}
-			else if (!ircd->vident)
+			else if (!ircdproto->CanSetVIdent)
 			{
 				source.Reply(HOST_NO_VIDENT);
 				return;
@@ -353,6 +353,9 @@ class HSRequest : public Module
 		request_type("HostRequest", HostRequest::unserialize), commandhsrequest(this), commandhsactive(this), commandhsreject(this), commandhswaiting(this)
 	{
 		this->SetAuthor("Anope");
+
+		if (!ircdproto || !ircdproto->CanSetVHost)
+			throw ModuleException("Your IRCd does not support vhosts");
 
 		Implementation i[] = { I_OnReload };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));

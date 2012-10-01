@@ -81,7 +81,7 @@ class OSSVSNick : public Module
 	{
 		this->SetAuthor("Anope");
 
-		if (!ircd || !ircd->svsnick)
+		if (!ircdproto || !ircdproto->CanSVSNick)
 			throw ModuleException("Your IRCd does not support SVSNICK");
 
 	}

@@ -12,6 +12,9 @@
 #include "services.h"
 #include "modules.h"
 #include "extern.h"
+#include "protocol.h"
+#include "servers.h"
+#include "users.h"
 
 /** Main process routine
  * @param buffer A raw line from the uplink to do things with
@@ -23,7 +26,8 @@ void process(const Anope::string &buffer)
 
 	/* Strip all extra spaces */
 	Anope::string buf = buffer;
-	buf = buf.replace_all_cs("  ", " ");
+	while (buf.find("  ") != Anope::string::npos)
+		buf = buf.replace_all_cs("  ", " ");
 
 	if (buf.empty())
 		return;
@@ -74,18 +78,26 @@ void process(const Anope::string &buffer)
 				Log() << "params " << i << ": " << params[i];
 	}
 
-	std::vector<Message *> messages = Anope::FindMessage(command);
+	const std::vector<IRCDMessage *> *messages = IRCDMessage::Find(command);
 
-	if (!messages.empty())
+	if (messages && !messages->empty())
 	{
+		MessageSource src(source);
+
 		bool retVal = true;
-
-		for (std::vector<Message *>::iterator it = messages.begin(), it_end = messages.end(); retVal == true && it != it_end; ++it)
+		/* Newer messages take priority */
+		for (unsigned i = messages->size(); retVal && i > 0; --i)
 		{
-			Message *m = *it;
+			IRCDMessage *m = messages->at(i - 1);
 
-			if (m->func)
-				retVal = m->func(source, params);
+			if (m->HasFlag(IRCDMESSAGE_SOFT_LIMIT) ? (params.size() < m->GetParamCount()) : (params.size() != m->GetParamCount()))
+				Log(LOG_DEBUG) << "invalid parameters for " << command << ": " << params.size() << " != " << m->GetParamCount();
+			else if (m->HasFlag(IRCDMESSAGE_REQUIRE_USER) && !src.GetUser())
+				Log(LOG_DEBUG) << "unexpected non-user source " << source << " for " << command;
+			else if (m->HasFlag(IRCDMESSAGE_REQUIRE_SERVER) && !source.empty() && !src.GetServer())
+				Log(LOG_DEBUG) << "unexpected non-server soruce " << source << " for " << command;
+			else
+				retVal = m->Run(src, params);
 		}
 	}
 	else

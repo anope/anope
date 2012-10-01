@@ -82,9 +82,15 @@ class CoreExport User : public virtual Base, public Extensible, public CommandRe
 	 * @param snick The nickname of the user.
 	 * @param sident The username of the user
 	 * @param shost The hostname of the user
+	 * @param svhost The vhost of the user
+	 * @param sip The ip of the user
+	 * @param sserver The server of the user
+	 * @param srealname The realname/gecos of teh user
+	 * @param ssignon User's timestamp
+	 * @param smodes User's modes
 	 * @param suid The unique identifier of the user.
 	 */
-	User(const Anope::string &snick, const Anope::string &sident, const Anope::string &shost, const Anope::string &suid = "");
+	User(const Anope::string &snick, const Anope::string &sident, const Anope::string &shost, const Anope::string &svhost, const Anope::string &sip, Server *sserver, const Anope::string &srealname, time_t ssignon, const Anope::string &smodes, const Anope::string &suid = "");
 
 	/** Destroy a user.
 	 */
@@ -93,7 +99,7 @@ class CoreExport User : public virtual Base, public Extensible, public CommandRe
 	/** Update the nickname of a user record accordingly, should be
 	 * called from ircd protocol.
 	 */
-	void SetNewNick(const Anope::string &newnick);
+	void ChangeNick(const Anope::string &newnick);
 
 	/** Update the displayed (vhost) of a user record.
 	 * This is used (if set) instead of real host.
@@ -116,8 +122,7 @@ class CoreExport User : public virtual Base, public Extensible, public CommandRe
 	 */
 	const Anope::string &GetCloakedHost() const;
 
-	/** Retrieves the UID of the user, where applicable, if set.
-	 * This is not used on some IRCds, but is for a lot e.g. P10, TS6 protocols.
+	/** Retrieves the UID of the user, if set, else the nick.
 	 * @return The UID of the user.
 	 */
 	const Anope::string &GetUID() const;
@@ -302,6 +307,12 @@ class CoreExport User : public virtual Base, public Extensible, public CommandRe
 	 * @param reason The reason for the kill
 	 */
 	void Kill(const Anope::string &source, const Anope::string &reason);
+
+	/** Process a kill for a user
+	 * @param source The user/server doing the kill
+	 * @param reason The reason for the kill
+	 */
+	void KillInternal(const Anope::string &source, const Anope::string &reason);
 };
 
 extern CoreExport int32_t opcnt;
@@ -309,11 +320,6 @@ extern CoreExport uint32_t maxusercnt, usercnt;
 extern CoreExport time_t maxusertime;
 
 extern CoreExport User *finduser(const Anope::string &nick);
-
-extern CoreExport User *do_nick(const Anope::string &source, const Anope::string &nick, const Anope::string &username, const Anope::string &host, const Anope::string &server, const Anope::string &realname, time_t ts, const Anope::string &ip, const Anope::string &vhost, const Anope::string &uid, const Anope::string &modes);
-
-extern CoreExport void do_umode(const Anope::string &user, const Anope::string &modes);
-extern CoreExport void do_kill(User *user, const Anope::string &reason);
 
 extern CoreExport bool matches_list(Channel *c, User *user, ChannelModeName mode);
 

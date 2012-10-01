@@ -72,7 +72,7 @@ class OSOLine : public Module
 	{
 		this->SetAuthor("Anope");
 
-		if (!ircd || !ircd->omode)
+		if (!ircdproto || !ircdproto->CanSVSO)
 			throw ModuleException("Your IRCd does not support OMODE.");
 
 	}

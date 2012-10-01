@@ -92,7 +92,7 @@ void NickAlias::Release()
 {
 	if (this->HasFlag(NS_HELD))
 	{
-		if (ircd->svshold)
+		if (ircdproto->CanSVSHold)
 			ircdproto->SendSVSHoldDel(this->nick);
 		else
 		{
@@ -147,11 +147,8 @@ class CoreExport NickServRelease : public User, public Timer
 	 * @param na The nick
 	 * @param delay The delay before the nick is released
 	 */
-	NickServRelease(NickAlias *na, time_t delay) : User(na->nick, Config->NSEnforcerUser, Config->NSEnforcerHost, ts6_uid_retrieve()), Timer(delay), nick(na->nick)
+	NickServRelease(NickAlias *na, time_t delay) : User(na->nick, Config->NSEnforcerUser, Config->NSEnforcerHost, "", "", Me, "Services Enforcer", Anope::CurTime, "", ts6_uid_retrieve()), Timer(delay), nick(na->nick)
 	{
-		this->realname = "Services Enforcer";
-		this->server = Me;
-
 		/* Erase the current release timer and use the new one */
 		std::map<Anope::string, NickServRelease *>::iterator nit = NickServReleases.find(this->nick);
 		if (nit != NickServReleases.end())
@@ -195,7 +192,7 @@ void NickAlias::OnCancel(User *)
 
 		new NickServHeld(this, Config->NSReleaseTimeout);
 
-		if (ircd->svshold)
+		if (ircdproto->CanSVSHold)
 			ircdproto->SendSVSHold(this->nick);
 		else
 			new NickServRelease(this, Config->NSReleaseTimeout);

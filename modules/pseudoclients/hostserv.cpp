@@ -20,8 +20,8 @@ class HostServCore : public Module
 	{
 		this->SetAuthor("Anope");
 
-		if (!ircd || !ircd->vhost)
-			throw ModuleException("Your IRCd does not suppor vhosts");
+		if (!ircdproto || !ircdproto->CanSetVHost)
+			throw ModuleException("Your IRCd does not support vhosts");
 	
 		const BotInfo *HostServ = findbot(Config->HostServ);
 		if (HostServ == NULL)
@@ -36,18 +36,17 @@ class HostServCore : public Module
 		const NickAlias *na = findnick(u->nick);
 		if (!na || !na->HasVhost())
 			na = findnick(u->Account()->display);
-		if (!na || !na->HasVhost())
+		if (!ircdproto->CanSetVHost || !na || !na->HasVhost())
 			return;
 
 		if (u->vhost.empty() || !u->vhost.equals_cs(na->GetVhostHost()) || (!na->GetVhostIdent().empty() && !u->GetVIdent().equals_cs(na->GetVhostIdent())))
 		{
 			ircdproto->SendVhost(u, na->GetVhostIdent(), na->GetVhostHost());
-			if (ircd->vhost)
-			{
-				u->vhost = na->GetVhostHost();
-				u->UpdateHost();
-			}
-			if (ircd->vident && !na->GetVhostIdent().empty())
+
+			u->vhost = na->GetVhostHost();
+			u->UpdateHost();
+
+			if (ircdproto->CanSetVIdent && !na->GetVhostIdent().empty())
 				u->SetVIdent(na->GetVhostIdent());
 
 			const BotInfo *bi = findbot(Config->HostServ);

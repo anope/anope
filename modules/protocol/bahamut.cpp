@@ -13,34 +13,40 @@
 
 #include "module.h"
 
-IRCDVar myIrcd = {
-	"Bahamut 1.8.x",	/* ircd name */
-	"+",					/* Modes used by pseudoclients */
-	 1,					/* SVSNICK */
-	 0,					/* Vhost */
-	 1,					/* Supports SNlines */
-	 1,					/* Supports SQlines */
-	 1,					/* Supports SZlines */
-	 0,					/* Join 2 Message */
-	 1,					/* Chan SQlines */
-	 1,					/* Quit on Kill */
-	 0,					/* vidents */
-	 1,					/* svshold */
-	 1,					/* time stamp on mode */
-	 0,					/* O:LINE */
-	 1,					/* UMODE */
-	 1,					/* No Knock requires +i */
-	 0,					/* Can remove User Channel Modes with SVSMODE */
-	 0,					/* Sglines are not enforced until user reconnects */
-	 0,					/* ts6 */
-	 "$",				/* TLD Prefix for Global */
-	 6,					/* Max number of modes we can send per line */
-	 0					/* IRCd sends a SSL users certificate fingerprint */
-};
+class ChannelModeFlood : public ChannelModeParam
+{
+ public:
+	ChannelModeFlood(char modeChar, bool minusNoArg) : ChannelModeParam(CMODE_FLOOD, modeChar, minusNoArg) { }
 
+	bool IsValid(const Anope::string &value) const anope_override
+	{
+		try
+		{
+			Anope::string rest;
+			if (!value.empty() && value[0] != ':' && convertTo<int>(value[0] == '*' ? value.substr(1) : value, rest, false) > 0 && rest[0] == ':' && rest.length() > 1 && convertTo<int>(rest.substr(1), rest, false) > 0 && rest.empty())
+				return true;
+		}
+		catch (const ConvertException &) { }
+
+		return false;
+	}
+};
 
 class BahamutIRCdProto : public IRCDProto
 {
+ public:
+	BahamutIRCdProto() : IRCDProto("Bahamut 1.8.x")
+	{
+		DefaultPseudoclientModes = "+";
+		CanSVSNick = true;
+		CanSNLine = true;
+		CanSQLine = true;
+		CanSQLineChannel = true;
+		CanSZLine = true;
+		CanSVSHold = true;
+		MaxModes = 60;
+	}
+
 	void SendModeInternal(const BotInfo *source, const Channel *dest, const Anope::string &buf) anope_override
 	{
 		if (Capab.count("TSMODE") > 0)
@@ -60,6 +66,16 @@ class BahamutIRCdProto : public IRCDProto
 			UplinkSocket::Message(bi) << "SVSMODE " << u->nick << " " << u->timestamp << " " << buf;
 		else
 			UplinkSocket::Message(Me) << "SVSMODE " << u->nick << " " << u->timestamp << " " << buf;
+	}
+
+	void SendGlobalNotice(const BotInfo *bi, const Server *dest, const Anope::string &msg) anope_override
+	{
+		UplinkSocket::Message(bi) << "NOTICE $" << dest->GetName() << " :" << msg;
+	}
+
+	void SendGlobalPrivmsg(const BotInfo *bi, const Server *dest, const Anope::string &msg) anope_override
+	{
+		UplinkSocket::Message(bi) << "PRIVMSG $" << dest->GetName() << " :" << msg;
 	}
 
 	/* SVSHOLD - set */
@@ -290,46 +306,82 @@ class BahamutIRCdProto : public IRCDProto
 	}
 };
 
-class BahamutIRCdMessage : public IRCdMessage
+struct IRCDMessageBurst : IRCDMessage
 {
- public:
-	bool OnMode(const Anope::string &source, const std::vector<Anope::string> &params) anope_override
+	IRCDMessageBurst() : IRCDMessage("BURST", 0) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
+
+	bool Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		if (params.size() > 2 && (params[0][0] == '#' || params[0][0] == '&'))
-			do_cmode(source, params[0], params[2], params[1]);
-		else if (params.size() > 1)
-			do_umode(params[0], params[1]);
+		/* If we found a server with the given source, that one just
+		 * finished bursting. If there was no source, then our uplink
+		 * server finished bursting. -GD
+		 */
+		Server *s = source.GetServer();
+		if (!s)
+			s = Me->GetLinks().front();
+		if (s)
+			s->Sync(true);
+		return true;
+	}
+};
+
+struct IRCDMessageMode : IRCDMessage
+{
+	IRCDMessageMode(const Anope::string &n) : IRCDMessage(n, 2) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
+
+	bool Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
+	{
+		if (params.size() > 2 && ircdproto->IsChannelValid(params[0]))
+		{
+			Channel *c = findchan(params[0]);
+			time_t ts = Anope::CurTime;
+			try
+			{
+				ts = convertTo<time_t>(params[1]);
+			}
+			catch (const ConvertException &) { }
+
+			if (c)
+				c->SetModesInternal(source, params[2], ts);
+		}
+		else
+		{
+			User *u = finduser(params[0]);
+			if (u)
+				u->SetModesInternal("%s", params[1].c_str());
+		}
 
 		return true;
 	}
+};
 
-	/*
-	 ** NICK - new
-	 **	  source  = NULL
-	 **	  parv[0] = nickname
-	 **	  parv[1] = hopcount
-	 **	  parv[2] = timestamp
-	 **	  parv[3] = modes
-	 **	  parv[4] = username
-	 **	  parv[5] = hostname
-	 **	  parv[6] = server
-	 **	  parv[7] = servicestamp
-	 **	  parv[8] = IP
-	 **	  parv[9] = info
-	 ** NICK - change
-	 **	  source  = oldnick
-	 **	  parv[0] = new nickname
-	 **	  parv[1] = hopcount
-	 */
-	bool OnNick(const Anope::string &source, const std::vector<Anope::string> &params) anope_override
+/*
+ ** NICK - new
+ **	  source  = NULL
+ **	  parv[0] = nickname
+ **	  parv[1] = hopcount
+ **	  parv[2] = timestamp
+ **	  parv[3] = modes
+ **	  parv[4] = username
+ **	  parv[5] = hostname
+ **	  parv[6] = server
+ **	  parv[7] = servicestamp
+ **	  parv[8] = IP
+ **	  parv[9] = info
+ ** NICK - change
+ **	  source  = oldnick
+ **	  parv[0] = new nickname
+ **	  parv[1] = hopcount
+ */
+struct IRCDMessageNick : IRCDMessage
+{
+	IRCDMessageNick() : IRCDMessage("NICK", 2) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
+
+	bool Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		if (params.size() != 2)
+		if (params.size() == 10)
 		{
-			/* Currently bahamut has no ipv6 support */
-			sockaddrs ip;
-			ip.ntop(AF_INET, params[8].c_str());
-
-			User *user = do_nick(source, params[0], params[4], params[5], params[6], params[9], Anope::string(params[2]).is_pos_number_only() ? convertTo<time_t>(params[2]) : 0, ip.addr(), "", "", params[3]);
+			User *user = new User(params[0], params[4], params[5], "", params[8], source.GetServer(), params[9], params[2].is_pos_number_only() ? convertTo<time_t>(params[2]) : 0, params[3]);
 			if (user && nickserv)
 			{
 				const NickAlias *na;
@@ -345,35 +397,29 @@ class BahamutIRCdMessage : public IRCdMessage
 			}
 		}
 		else
-			do_nick(source, params[0], "", "", "", "", Anope::string(params[1]).is_pos_number_only() ? convertTo<time_t>(params[1]) : 0, "", "", "", "");
+			source.GetUser()->ChangeNick(params[0]);
 
 		return true;
 	}
+};
 
-	bool OnServer(const Anope::string &source, const std::vector<Anope::string> &params) anope_override
+struct IRCDMessageServer : IRCDMessage
+{
+	IRCDMessageServer() : IRCDMessage("SERVER", 3) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
+
+	bool Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		do_server(source, params[0], Anope::string(params[1]).is_pos_number_only() ? convertTo<unsigned>(params[1]) : 0, params[2], "");
+		unsigned int hops = Anope::string(params[1]).is_pos_number_only() ? convertTo<unsigned>(params[1]) : 0;
+		new Server(source.GetServer() == NULL ? Me : source.GetServer(), params[0], hops, params[2]);
 		return true;
 	}
+};
 
-	bool OnTopic(const Anope::string &, const std::vector<Anope::string> &params) anope_override
-	{
-		if (params.size() < 4)
-			return true;
+struct IRCDMessageSJoin : IRCDMessage
+{
+	IRCDMessageSJoin() : IRCDMessage("SJOIN", 2) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
 
-		Channel *c = findchan(params[0]);
-		if (!c)
-		{
-			Log() << "TOPIC for nonexistant channel " << params[0];
-			return true;
-		}
-
-		c->ChangeTopicInternal(params[1], params[3], Anope::string(params[2]).is_pos_number_only() ? convertTo<time_t>(params[2]) : Anope::CurTime);
-
-		return true;
-	}
-
-	bool OnSJoin(const Anope::string &source, const std::vector<Anope::string> &params) anope_override
+	bool Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		Channel *c = findchan(params[1]);
 		time_t ts = Anope::string(params[0]).is_pos_number_only() ? convertTo<time_t>(params[0]) : 0;
@@ -403,7 +449,7 @@ class BahamutIRCdMessage : public IRCdMessage
 				modes += " " + params[i];
 			if (!modes.empty())
 				modes.erase(modes.begin());
-			c->SetModesInternal(NULL, modes);
+			c->SetModesInternal(source, modes);
 		}
 
 		/* For some reason, bahamut will send a SJOIN from the user joining a channel
@@ -411,28 +457,24 @@ class BahamutIRCdMessage : public IRCdMessage
 		 */
 		if (!c->HasFlag(CH_SYNCING) && params.size() == 2)
 		{
-			User *u = finduser(source);
-			if (!u)
-				Log(LOG_DEBUG) << "SJOIN for nonexistant user " << source << " on " << c->name;
-			else
+			User *u = source.GetUser();
+
+			EventReturn MOD_RESULT;
+			FOREACH_RESULT(I_OnPreJoinChannel, OnPreJoinChannel(u, c));
+
+			/* Add the user to the channel */
+			c->JoinUser(u);
+
+			/* Now set whatever modes this user is allowed to have on the channel */
+			chan_set_correct_modes(u, c, 1, true);
+
+			/* Check to see if modules want the user to join, if they do
+			 * check to see if they are allowed to join (CheckKick will kick/ban them)
+			 * Don't trigger OnJoinChannel event then as the user will be destroyed
+			 */
+			if (MOD_RESULT == EVENT_STOP && (!c->ci || !c->ci->CheckKick(u)))
 			{
-				EventReturn MOD_RESULT;
-				FOREACH_RESULT(I_OnPreJoinChannel, OnPreJoinChannel(u, c));
-
-				/* Add the user to the channel */
-				c->JoinUser(u);
-
-				/* Now set whatever modes this user is allowed to have on the channel */
-				chan_set_correct_modes(u, c, 1, true);
-
-				/* Check to see if modules want the user to join, if they do
-				 * check to see if they are allowed to join (CheckKick will kick/ban them)
-				 * Don't trigger OnJoinChannel event then as the user will be destroyed
-				 */
-				if (MOD_RESULT == EVENT_STOP && (!c->ci || !c->ci->CheckKick(u)))
-				{
-					FOREACH_MOD(I_OnJoinChannel, OnJoinChannel(u, c));
-				}
+				FOREACH_MOD(I_OnJoinChannel, OnJoinChannel(u, c));
 			}
 		}
 		else
@@ -476,7 +518,7 @@ class BahamutIRCdMessage : public IRCdMessage
 				 * This will enforce secureops etc on the user
 				 */
 				for (std::list<ChannelMode *>::iterator it = Status.begin(), it_end = Status.end(); it != it_end; ++it)
-					c->SetModeInternal(NULL, *it, buf);
+					c->SetModeInternal(source, *it, buf);
 
 				/* Now set whatever modes this user is allowed to have on the channel */
 				chan_set_correct_modes(u, c, 1, true);
@@ -504,53 +546,48 @@ class BahamutIRCdMessage : public IRCdMessage
 	}
 };
 
-bool event_burst(const Anope::string &source, const std::vector<Anope::string> &params)
+struct IRCDMessageTopic : IRCDMessage
 {
-	Server *s = Server::Find(source);
+	IRCDMessageTopic() : IRCDMessage("TOPIC", 4) { }
 
-	if (params.empty())
+	bool Run(MessageSource &, const std::vector<Anope::string> &params) anope_override
 	{
-		/* for future use  - start burst */
-	}
-	else
-	{
-		/* If we found a server with the given source, that one just
-		 * finished bursting. If there was no source, then our uplink
-		 * server finished bursting. -GD
-		 */
-		if (!s)
-			s = Me->GetLinks().front();
-		if (s)
-			s->Sync(true);
-	}
-	return true;
-}
-
-class ChannelModeFlood : public ChannelModeParam
-{
- public:
-	ChannelModeFlood(char modeChar, bool minusNoArg) : ChannelModeParam(CMODE_FLOOD, modeChar, minusNoArg) { }
-
-	bool IsValid(const Anope::string &value) const anope_override
-	{
-		try
-		{
-			Anope::string rest;
-			if (!value.empty() && value[0] != ':' && convertTo<int>(value[0] == '*' ? value.substr(1) : value, rest, false) > 0 && rest[0] == ':' && rest.length() > 1 && convertTo<int>(rest.substr(1), rest, false) > 0 && rest.empty())
-				return true;
-		}
-		catch (const ConvertException &) { }
-
-		return false;
+		Channel *c = findchan(params[0]);
+		if (c)
+			c->ChangeTopicInternal(params[1], params[3], Anope::string(params[2]).is_pos_number_only() ? convertTo<time_t>(params[2]) : Anope::CurTime);
+		return true;
 	}
 };
 
 class ProtoBahamut : public Module
 {
-	Message message_svsmode, message_burst;
-	
 	BahamutIRCdProto ircd_proto;
-	BahamutIRCdMessage ircd_message;
+
+	/* Core message handlers */
+	CoreIRCDMessageAway core_message_away;
+	CoreIRCDMessageCapab core_message_capab;
+	CoreIRCDMessageError core_message_error;
+	CoreIRCDMessageJoin core_message_join;
+	CoreIRCDMessageKill core_message_kill;
+	CoreIRCDMessageMOTD core_message_motd;
+	CoreIRCDMessagePart core_message_part;
+	CoreIRCDMessagePing core_message_ping;
+	CoreIRCDMessagePrivmsg core_message_privmsg;
+	CoreIRCDMessageQuit core_message_quit;
+	CoreIRCDMessageSQuit core_message_squit;
+	CoreIRCDMessageStats core_message_stats;
+	CoreIRCDMessageTime core_message_time;
+	CoreIRCDMessageTopic core_message_topic;
+	CoreIRCDMessageVersion core_message_version;
+	CoreIRCDMessageWhois core_message_whois;
+
+	/* Our message handlers */
+	IRCDMessageBurst message_burst;
+	IRCDMessageMode message_mode, message_svsmode;
+	IRCDMessageNick message_nick;
+	IRCDMessageServer message_server;
+	IRCDMessageSJoin message_sjoin;
+	IRCDMessageTopic message_topic;
 
 	void AddModes()
 	{
@@ -591,24 +628,13 @@ class ProtoBahamut : public Module
 
  public:
 	ProtoBahamut(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PROTOCOL),
-		message_svsmode("SVSMODE", OnMode), message_burst("BURST", event_burst)
+		message_mode("MODE"), message_svsmode("SVSMODE")
 	{
 		this->SetAuthor("Anope");
-
-		pmodule_ircd_var(&myIrcd);
-		pmodule_ircd_proto(&this->ircd_proto);
-		pmodule_ircd_message(&this->ircd_message);
 
 		this->AddModes();
 
 		ModuleManager::Attach(I_OnUserNickChange, this);
-	}
-
-	~ProtoBahamut()
-	{
-		pmodule_ircd_var(NULL);
-		pmodule_ircd_proto(NULL);
-		pmodule_ircd_message(NULL);
 	}
 
 	void OnUserNickChange(User *u, const Anope::string &) anope_override

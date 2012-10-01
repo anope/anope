@@ -21,27 +21,31 @@
 #include "channels.h"
 
 IRCDProto *ircdproto;
-IRCDVar *ircd;
-IRCdMessage *ircdmessage;
 
-void pmodule_ircd_proto(IRCDProto *proto)
+IRCDProto::IRCDProto(const Anope::string &p) : proto_name(p)
 {
-	ircdproto = proto;
+	DefaultPseudoclientModes = "+io";
+	CanSVSNick = CanSetVHost = CanSetVIdent = CanSNLine = CanSQLine = CanSQLineChannel = CanSZLine = CanSVSHold =
+		CanSVSO = CanCertFP = RequiresID = false;
+	MaxModes = 3;
+
+	ircdproto = this;
 }
 
-void pmodule_ircd_var(IRCDVar *ircdvar)
+IRCDProto::~IRCDProto()
 {
-	ircd = ircdvar;
+	if (ircdproto == this)
+		ircdproto = NULL;
 }
 
-void pmodule_ircd_message(IRCdMessage *message)
+const Anope::string &IRCDProto::GetProtocolName()
 {
-	ircdmessage = message;
+	return this->proto_name;
 }
 
-void IRCDProto::SendSVSKillInternal(const BotInfo *source, const User *user, const Anope::string &buf)
+void IRCDProto::SendSVSKillInternal(const BotInfo *source, User *user, const Anope::string &buf)
 {
-	UplinkSocket::Message(source) << "KILL " << (ircd->ts6 ? user->GetUID() : user->nick) << " :" << buf;
+	UplinkSocket::Message(source) << "KILL " << user->GetUID() << " :" << buf;
 }
 
 void IRCDProto::SendModeInternal(const BotInfo *bi, const Channel *dest, const Anope::string &buf)
@@ -52,9 +56,9 @@ void IRCDProto::SendModeInternal(const BotInfo *bi, const Channel *dest, const A
 void IRCDProto::SendKickInternal(const BotInfo *bi, const Channel *c, const User *u, const Anope::string &r)
 {
 	if (!r.empty())
-		UplinkSocket::Message(bi) << "KICK " << c->name << " " << (ircd->ts6 ? u->GetUID() : u->nick) << " :" << r;
+		UplinkSocket::Message(bi) << "KICK " << c->name << " " << u->GetUID() << " :" << r;
 	else
-		UplinkSocket::Message(bi) << "KICK " << c->name << " " << (ircd->ts6 ? u->GetUID() : u->nick);
+		UplinkSocket::Message(bi) << "KICK " << c->name << " " << u->GetUID();
 }
 
 void IRCDProto::SendMessageInternal(const BotInfo *bi, const Anope::string &dest, const Anope::string &buf)
@@ -120,7 +124,7 @@ void IRCDProto::SendTopic(BotInfo *bi, Channel *c)
 	UplinkSocket::Message(bi) << "TOPIC " << c->name << " :" << c->topic;
 }
 
-void IRCDProto::SendSVSKill(const BotInfo *source, const User *user, const char *fmt, ...)
+void IRCDProto::SendSVSKill(const BotInfo *source, User *user, const char *fmt, ...)
 {
 	if (!user || !fmt)
 		return;
@@ -207,16 +211,6 @@ void IRCDProto::SendPrivmsg(const BotInfo *bi, const Anope::string &dest, const 
 	SendPrivmsgInternal(bi, dest, buf);
 }
 
-void IRCDProto::SendGlobalNotice(const BotInfo *bi, const Server *dest, const Anope::string &msg)
-{
-	UplinkSocket::Message(bi) << "NOTICE " << ircd->globaltldprefix << dest->GetName() << " :" << msg;
-}
-
-void IRCDProto::SendGlobalPrivmsg(const BotInfo *bi, const Server *dest, const Anope::string &msg)
-{
-	UplinkSocket::Message(bi) << "PRIVMSG " << ircd->globaltldprefix << dest->GetName() << " :" << msg;
-}
-
 void IRCDProto::SendQuit(const User *u, const char *fmt, ...)
 {
 	va_list args;
@@ -251,7 +245,7 @@ void IRCDProto::SendPong(const Anope::string &servname, const Anope::string &who
 
 void IRCDProto::SendInvite(const BotInfo *bi, const Channel *c, const User *u)
 {
-	UplinkSocket::Message(bi) << "INVITE " << (ircd->ts6 ? u->GetUID() : u->nick) << " " << c->name;
+	UplinkSocket::Message(bi) << "INVITE " << u->GetUID() << " " << c->name;
 }
 
 void IRCDProto::SendPart(const BotInfo *bi, const Channel *chan, const char *fmt, ...)
@@ -322,258 +316,73 @@ bool IRCDProto::IsChannelValid(const Anope::string &chan)
 	return true;
 }
 
-bool IRCdMessage::On436(const Anope::string &, const std::vector<Anope::string> &params)
+MessageSource::MessageSource(const Anope::string &src) : source(src), u(NULL), s(NULL)
 {
-	if (!params.empty())
-		introduce_user(params[0]);
-	return true;
+	if (src.empty())
+		this->s = !Me->GetLinks().empty() ? Me->GetLinks().front() : NULL;
+	else if (ircdproto->RequiresID || src.find('.') != Anope::string::npos)
+		this->s = Server::Find(src);
+	if (this->s == NULL)
+		this->u = finduser(src);
 }
 
-bool IRCdMessage::OnAway(const Anope::string &source, const std::vector<Anope::string> &params)
+MessageSource::MessageSource(User *_u) : source(_u->nick), u(_u), s(NULL)
 {
-	User *u = finduser(source);
-	if (u)
-	{
-		FOREACH_MOD(I_OnUserAway, OnUserAway(u, params.empty() ? "" : params[0]));
-	}
-	return true;
 }
 
-bool IRCdMessage::OnJoin(const Anope::string &source, const std::vector<Anope::string> &params)
+MessageSource::MessageSource(Server *_s) : source(_s->GetName()), u(NULL), s(_s)
 {
-	if (!params.empty())
-		do_join(source, params[0], params.size() > 1 ? params[1] : "");
-	return true;
 }
 
-bool IRCdMessage::OnKick(const Anope::string &source, const std::vector<Anope::string> &params)
+const Anope::string MessageSource::GetName()
 {
-	if (params.size() > 2)
-		do_kick(source, params[0], params[1], params[2]);
-	return true;
-}
-
-/** Called on KILL
- * @params[0] The nick
- * @params[1] The reason
- */
-bool IRCdMessage::OnKill(const Anope::string &source, const std::vector<Anope::string> &params)
-{
-	User *u = finduser(params[0]);
-	BotInfo *bi;
-
-	if (!u)
-		return true;
-
-	/* Recover if someone kills us. */
-	if (u->server == Me && (bi = dynamic_cast<BotInfo *>(u)))
-	{
-		bi->introduced = false;
-		introduce_user(bi->nick);
-		bi->RejoinAll();
-	}
+	if (this->s)
+		return this->s->GetName();
+	else if (this->u)
+		return this->u->nick;
 	else
-		do_kill(u, params[1]);
-	
-	
-	return true;
+		return this->source;
 }
 
-bool IRCdMessage::OnUID(const Anope::string &source, const std::vector<Anope::string> &params)
+const Anope::string &MessageSource::GetSource()
 {
-	return true;
+	return this->source;
 }
 
-bool IRCdMessage::OnPart(const Anope::string &source, const std::vector<Anope::string> &params)
+User *MessageSource::GetUser()
 {
-	if (!params.empty())
-		do_part(source, params[0], params.size() > 1 ? params[1] : "");
-	return true;
+	return this->u;
 }
 
-bool IRCdMessage::OnPing(const Anope::string &, const std::vector<Anope::string> &params)
+Server *MessageSource::GetServer()
 {
-	if (!params.empty())
-		ircdproto->SendPong(params.size() > 1 ? params[1] : Config->ServerName, params[0]);
-	return true;
+	return this->s;
 }
 
-bool IRCdMessage::OnPrivmsg(const Anope::string &source, const std::vector<Anope::string> &params)
+std::map<Anope::string, std::vector<IRCDMessage *> > IRCDMessage::messages;
+
+const std::vector<IRCDMessage *> *IRCDMessage::Find(const Anope::string &name)
 {
-	const Anope::string &receiver = params.size() > 0 ? params[0] : "";
-	Anope::string message = params.size() > 1 ? params[1] : "";
-
-	/* Messages from servers can happen on some IRCds, check for . */
-	if (source.empty() || receiver.empty() || message.empty() || source.find('.') != Anope::string::npos)
-		return true;
-
-	User *u = finduser(source);
-
-	if (!u)
-	{
-		Log() << message << ": user record for " << source << " not found";
-
-		const BotInfo *bi = findbot(receiver);
-		if (bi)
-			ircdproto->SendMessage(bi, source, "%s", "Internal error - unable to process request.");
-
-		return true;
-	}
-
-	if (receiver[0] == '#')
-	{
-		Channel *c = findchan(receiver);
-		if (c)
-		{
-			FOREACH_MOD(I_OnPrivmsg, OnPrivmsg(u, c, message));
-		}
-	}
-	else
-	{
-		/* If a server is specified (nick@server format), make sure it matches
-		 * us, and strip it off. */
-		Anope::string botname = receiver;
-		size_t s = receiver.find('@');
-		if (s != Anope::string::npos)
-		{
-			Anope::string servername(receiver.begin() + s + 1, receiver.end());
-			botname = botname.substr(0, s);
-			if (!servername.equals_ci(Config->ServerName))
-				return true;
-		}
-		else if (Config->UseStrictPrivMsg)
-		{
-			const BotInfo *bi = findbot(receiver);
-			if (!bi)
-				return true;
-			Log(LOG_DEBUG) << "Ignored PRIVMSG without @ from " << source;
-			u->SendMessage(bi, _("\"/msg %s\" is no longer supported.  Use \"/msg %s@%s\" or \"/%s\" instead."), receiver.c_str(), receiver.c_str(), Config->ServerName.c_str(), receiver.c_str());
-			return true;
-		}
-
-		BotInfo *bi = findbot(botname);
-
-		if (bi)
-		{
-			EventReturn MOD_RESULT;
-			FOREACH_RESULT(I_OnBotPrivmsg, OnBotPrivmsg(u, bi, message));
-			if (MOD_RESULT == EVENT_STOP)
-				return true;
-
-			if (message[0] == '\1' && message[message.length() - 1] == '\1')
-			{
-				if (message.substr(0, 6).equals_ci("\1PING "))
-				{
-					Anope::string buf = message;
-					buf.erase(buf.begin());
-					buf.erase(buf.end() - 1);
-					ircdproto->SendCTCP(bi, u->nick, "%s", buf.c_str());
-				}
-				else if (message.substr(0, 9).equals_ci("\1VERSION\1"))
-				{
-					Module *enc = ModuleManager::FindFirstOf(ENCRYPTION);
-					ircdproto->SendCTCP(bi, u->nick, "VERSION Anope-%s %s :%s - (%s) -- %s", Anope::Version().c_str(), Config->ServerName.c_str(), ircd->name, enc ? enc->name.c_str() : "unknown", Anope::VersionBuildString().c_str());
-				}
-				return true;
-			}
-			
-			bi->OnMessage(u, message);
-		}
-	}
-
-	return true;
+	std::map<Anope::string, std::vector<IRCDMessage *> >::iterator it = messages.find(name);
+	if (it != messages.end())
+		return &it->second;
+	return NULL;
 }
 
-bool IRCdMessage::OnQuit(const Anope::string &source, const std::vector<Anope::string> &params)
+IRCDMessage::IRCDMessage(const Anope::string &n, unsigned p) : name(n), param_count(p)
 {
-	const Anope::string &reason = !params.empty() ? params[0] : "";
-	User *user = finduser(source);
-	if (!user)
-	{
-		Log() << "user: QUIT from nonexistent user " << source << " (" << reason << ")";
-		return true;
-	}
-
-	Log(user, "quit") << "quit (Reason: " << (!reason.empty() ? reason : "no reason") << ")";
-
-	NickAlias *na = findnick(user->nick);
-	if (na && !na->nc->HasFlag(NI_SUSPENDED) && (user->IsRecognized() || user->IsIdentified(true)))
-	{
-		na->last_seen = Anope::CurTime;
-		na->last_quit = reason;
-	}
-	FOREACH_MOD(I_OnUserQuit, OnUserQuit(user, reason));
-	delete user;
-
-	return true;
+	messages[n].insert(messages[n].begin(), this);
 }
 
-bool IRCdMessage::OnSQuit(const Anope::string &source, const std::vector<Anope::string> &params)
+IRCDMessage::~IRCDMessage()
 {
-	const Anope::string &server = params[0];
-
-	Server *s = Server::Find(server);
-
-	if (!s)
-	{
-		Log() << "SQUIT for nonexistent server " << server;
-		return true;
-	}
-
-	FOREACH_MOD(I_OnServerQuit, OnServerQuit(s));
-
-	Anope::string buf = s->GetName() + " " + s->GetUplink()->GetName();
-
-	if (s->GetUplink() == Me && Capab.count("UNCONNECT") > 0)
-	{
-		Log(LOG_DEBUG) << "Sending UNCONNECT SQUIT for " << s->GetName();
-		/* need to fix */
-		ircdproto->SendSquit(s, buf);
-	}
-
-	s->Delete(buf);
-
-	return true;
+	std::vector<IRCDMessage *>::iterator it = std::find(messages[this->name].begin(), messages[this->name].end(), this);
+	if (it != messages[this->name].end())
+		messages[this->name].erase(it);
 }
 
-bool IRCdMessage::OnWhois(const Anope::string &source, const std::vector<Anope::string> &params)
+unsigned IRCDMessage::GetParamCount() const
 {
-	if (!source.empty() && !params.empty())
-	{
-		User *u = finduser(params[0]);
-		if (u && u->server == Me)
-		{
-			const BotInfo *bi = findbot(u->nick);
-			ircdproto->SendNumeric(311, source, "%s %s %s * :%s", u->nick.c_str(), u->GetIdent().c_str(), u->host.c_str(), u->realname.c_str());
-			if (bi)
-				ircdproto->SendNumeric(307, source, "%s :is a registered nick", bi->nick.c_str());
-			ircdproto->SendNumeric(312, source, "%s %s :%s", u->nick.c_str(), Config->ServerName.c_str(), Config->ServerDesc.c_str());
-			if (bi)
-				ircdproto->SendNumeric(317, source, "%s %ld %ld :seconds idle, signon time", bi->nick.c_str(), static_cast<long>(Anope::CurTime - bi->lastmsg), static_cast<long>(start_time));
-			ircdproto->SendNumeric(318, source, "%s :End of /WHOIS list.", params[0].c_str());
-		}
-		else
-			ircdproto->SendNumeric(401, source, "%s :No such user.", params[0].c_str());
-	}
-
-	return true;
-}
-
-bool IRCdMessage::OnCapab(const Anope::string &, const std::vector<Anope::string> &params)
-{
-	for (unsigned i = 0; i < params.size(); ++i)
-		Capab.insert(params[i]);
-	return true;
-}
-
-bool IRCdMessage::OnError(const Anope::string &, const std::vector<Anope::string> &params)
-{
-	if (!params.empty())
-	{
-		Log(LOG_TERMINAL) << "ERROR: " << params[0];
-		quitmsg = "Received ERROR from uplink: " + params[0];
-	}
-	
-	return true;
+	return this->param_count;
 }
 

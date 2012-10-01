@@ -278,7 +278,7 @@ class OSForbid : public Module
 		ForbidData *d = this->forbidService.FindForbid(c->name, FT_CHAN);
 		if (bi != NULL && d != NULL)
 		{
-			if (ircd->chansqline)
+			if (ircdproto->CanSQLineChannel)
 			{
 				XLine x(c->name, bi->nick, Anope::CurTime + Config->CSInhabit, d->reason);
 				ircdproto->SendSQLine(NULL, &x);

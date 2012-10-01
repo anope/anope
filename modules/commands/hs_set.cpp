@@ -55,7 +55,7 @@ class CommandHSSet : public Command
 
 		if (!user.empty())
 		{
-			if (!ircd->vident)
+			if (!ircdproto->CanSetVIdent)
 			{
 				source.Reply(HOST_NO_VIDENT);
 				return;
@@ -156,7 +156,7 @@ class CommandHSSetAll : public Command
 
 		if (!user.empty())
 		{
-			if (!ircd->vident)
+			if (!ircdproto->CanSetVIdent)
 			{
 				source.Reply(HOST_NO_VIDENT);
 				return;

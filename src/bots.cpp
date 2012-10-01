@@ -21,11 +21,8 @@
 serialize_checker<botinfo_map> BotListByNick("BotInfo");
 serialize_checker<botinfouid_map> BotListByUID("BotInfo");
 
-BotInfo::BotInfo(const Anope::string &nnick, const Anope::string &nuser, const Anope::string &nhost, const Anope::string &nreal, const Anope::string &bmodes) : User(nnick, nuser, nhost, ts6_uid_retrieve()), Flags<BotFlag, BI_END>(BotFlagString), botmodes(bmodes)
+BotInfo::BotInfo(const Anope::string &nnick, const Anope::string &nuser, const Anope::string &nhost, const Anope::string &nreal, const Anope::string &bmodes) : User(nnick, nuser, nhost, "", "", Me, nreal, Anope::CurTime, "", ts6_uid_retrieve()), Flags<BotFlag, BI_END>(BotFlagString), botmodes(bmodes)
 {
-	this->realname = nreal;
-	this->server = Me;
-
 	this->lastmsg = this->created = Anope::CurTime;
 	this->introduced = false;
 
@@ -36,7 +33,7 @@ BotInfo::BotInfo(const Anope::string &nnick, const Anope::string &nuser, const A
 	// If we're synchronised with the uplink already, send the bot.
 	if (Me && Me->IsSynced())
 	{
-		Anope::string tmodes = !this->botmodes.empty() ? ("+" + this->botmodes) : (ircd ? ircd->pseudoclient_mode : "");
+		Anope::string tmodes = !this->botmodes.empty() ? ("+" + this->botmodes) : (ircdproto ? ircdproto->DefaultPseudoclientModes : "");
 		if (!tmodes.empty())
 			this->SetModesInternal(tmodes.c_str());
 

@@ -384,7 +384,7 @@ std::list<Anope::string> ModeManager::BuildModeStrings(StackerInfo *info)
 
 	for (it = info->AddModes.begin(), it_end = info->AddModes.end(); it != it_end; ++it)
 	{
-		if (++NModes > ircd->maxmodes)
+		if (++NModes > ircdproto->MaxModes)
 		{
 			ret.push_back(buf + parambuf);
 			buf = "+";
@@ -404,7 +404,7 @@ std::list<Anope::string> ModeManager::BuildModeStrings(StackerInfo *info)
 	buf += "-";
 	for (it = info->DelModes.begin(), it_end = info->DelModes.end(); it != it_end; ++it)
 	{
-		if (++NModes > ircd->maxmodes)
+		if (++NModes > ircdproto->MaxModes)
 		{
 			ret.push_back(buf + parambuf);
 			buf = "-";

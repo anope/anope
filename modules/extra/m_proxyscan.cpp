@@ -94,7 +94,7 @@ class ProxyConnect : public ConnectionSocket
 		}
 		else
 		{
-			if (ircd->szline)
+			if (ircdproto->CanSZLine)
 				ircdproto->SendSZLine(NULL, x);
 			else
 				ircdproto->SendAkill(NULL, x);

@@ -365,8 +365,9 @@ class MChanstats : public Module
 		else
 			Log() << "Chanstats: no database connection to " << engine;
 	}
-	void OnTopicUpdated(Channel *c, User *u, const Anope::string &topic) anope_override
+	void OnTopicUpdated(Channel *c, const Anope::string &user, const Anope::string &topic) anope_override
 	{
+		User *u = finduser(user);
 		if (!u || !u->Account() || !c->ci || !c->ci->HasFlag(CI_STATS))
 			return;
 		query = "CALL " + prefix + "chanstats_proc_update(@channel@, @nick@, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1);";
@@ -374,16 +375,17 @@ class MChanstats : public Module
 		query.setValue("nick", GetDisplay(u));
 		this->RunQuery(query);
 	}
-	EventReturn OnChannelModeSet(Channel *c, User *setter, ChannelModeName Name, const Anope::string &param) anope_override
+	EventReturn OnChannelModeSet(Channel *c, MessageSource &setter, ChannelModeName Name, const Anope::string &param) anope_override
 	{
-		this->OnModeChange(c, setter);
+		this->OnModeChange(c, setter.GetUser());
 		return EVENT_CONTINUE;
 	}
-	EventReturn OnChannelModeUnset(Channel *c, User *setter, ChannelModeName Name, const Anope::string &param) anope_override
+	EventReturn OnChannelModeUnset(Channel *c, MessageSource &setter, ChannelModeName Name, const Anope::string &param) anope_override
 	{
-		this->OnModeChange(c, setter);
+		this->OnModeChange(c, setter.GetUser());
 		return EVENT_CONTINUE;
 	}
+ private:
 	void OnModeChange(Channel *c, User *u)
 	{
 		if (!u || !u->Account() || !c->ci || !c->ci->HasFlag(CI_STATS))
@@ -394,7 +396,8 @@ class MChanstats : public Module
 		query.setValue("nick", GetDisplay(u));
 		this->RunQuery(query);
 	}
-	void OnUserKicked(Channel *c, User *target, const Anope::string &source, const Anope::string &kickmsg) anope_override
+ public:
+	void OnUserKicked(Channel *c, User *target, MessageSource &source, const Anope::string &kickmsg) anope_override
 	{
 		if (!c->ci || !c->ci->HasFlag(CI_STATS))
 			return;
@@ -406,7 +409,7 @@ class MChanstats : public Module
 
 		query = "CALL " + prefix + "chanstats_proc_update(@channel@, @nick@, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0);";
 		query.setValue("channel", c->name);
-		query.setValue("nick", GetDisplay(finduser(source)));
+		query.setValue("nick", GetDisplay(source.GetUser()));
 		this->RunQuery(query);
 	}
 	void OnPrivmsg(User *u, Channel *c, Anope::string &msg) anope_override

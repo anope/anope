@@ -141,9 +141,6 @@ enum Priority { PRIORITY_FIRST, PRIORITY_DONTCARE, PRIORITY_LAST, PRIORITY_BEFOR
 /* Module types, in the order in which they are unloaded. The order these are in is IMPORTANT */
 enum ModType { MT_BEGIN, THIRD, SUPPORTED, CORE, DATABASE, ENCRYPTION, PROTOCOL, MT_END };
 
-typedef std::multimap<Anope::string, Message *> message_map;
-extern CoreExport message_map MessageMap;
-
 extern CoreExport std::list<Module *> Modules;
 
 class ModuleVersion
@@ -268,7 +265,7 @@ class CoreExport Module : public Extensible
 	 * @param source The nick of the sender.
 	 * @param kickmsg The reason for the kick.
 	 */
-	virtual void OnUserKicked(Channel *c, User *target, const Anope::string &source, const Anope::string &kickmsg) { }
+	virtual void OnUserKicked(Channel *c, User *target, MessageSource &source, const Anope::string &kickmsg) { }
 
 	/** Called when Services' configuration has been loaded.
 	 */
@@ -439,7 +436,7 @@ class CoreExport Module : public Extensible
 	 * @param setter The user who set the new topic
 	 * @param topic The new topic
 	 */
-	virtual void OnTopicUpdated(Channel *c, User *setter, const Anope::string &topic) { }
+	virtual void OnTopicUpdated(Channel *c, const Anope::string &user, const Anope::string &topic) { }
 
 	/** Called before a channel expires
 	 * @param ci The channel
@@ -828,21 +825,21 @@ class CoreExport Module : public Extensible
 
 	/** Called when a mode is set on a channel
 	 * @param c The channel
-	 * @param setter The user who is setting the mode
+	 * @param setter The user or server that is setting the mode
 	 * @param Name The mode name
 	 * @param param The mode param, if there is one
 	 * @return EVENT_STOP to make mlock/secureops etc checks not happen
 	 */
-	virtual EventReturn OnChannelModeSet(Channel *c, User *setter, ChannelModeName Name, const Anope::string &param) { return EVENT_CONTINUE; }
+	virtual EventReturn OnChannelModeSet(Channel *c, MessageSource &setter, ChannelModeName Name, const Anope::string &param) { return EVENT_CONTINUE; }
 
 	/** Called when a mode is unset on a channel
 	 * @param c The channel
-	 * @param setter the user who is unsetting the mode
+	 * @param setter The user or server that is unsetting the mode
 	 * @param Name The mode name
 	 * @param param The mode param, if there is one
 	 * @return EVENT_STOP to make mlock/secureops etc checks not happen
 	 */
-	virtual EventReturn OnChannelModeUnset(Channel *c, User *setter, ChannelModeName Name, const Anope::string &param) { return EVENT_CONTINUE; }
+	virtual EventReturn OnChannelModeUnset(Channel *c, MessageSource &setter, ChannelModeName Name, const Anope::string &param) { return EVENT_CONTINUE; }
 
 	/** Called when a mode is set on a user
 	 * @param u The user
@@ -1119,16 +1116,6 @@ class CoreExport CallBack : public Timer
 	CallBack(Module *mod, long time_from_now, time_t now = Anope::CurTime, bool repeating = false);
 
 	virtual ~CallBack();
-};
-
-class CoreExport Message
-{
-public:
-	Anope::string name;
-	bool (*func)(const Anope::string &source, const std::vector<Anope::string> &params);
-
-	Message(const Anope::string &n, bool (*f)(const Anope::string &, const std::vector<Anope::string> &));
-	~Message();
 };
 
 #endif // MODULES_H

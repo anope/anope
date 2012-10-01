@@ -218,11 +218,8 @@ class CommandBSBot : public Command
 			}
 
 			/* The new nick is really different, so we remove the Q line for the old nick. */
-			if (ircd->sqline)
-			{
-				XLine x(bi->nick);
-				ircdproto->SendSQLineDel(&x);
-			}
+			XLine x_del(bi->nick);
+			ircdproto->SendSQLineDel(&x_del);
 
 			/* Add a Q line for the new nick */
 			XLine x(nick, "Reserved for services");

@@ -337,7 +337,7 @@ std::pair<Channel::ModeList::iterator, Channel::ModeList::iterator> Channel::Get
  * @param param The param
  * @param EnforeMLock true if mlocks should be enforced, false to override mlock
  */
-void Channel::SetModeInternal(User *setter, ChannelMode *cm, const Anope::string &param, bool EnforceMLock)
+void Channel::SetModeInternal(MessageSource &setter, ChannelMode *cm, const Anope::string &param, bool EnforceMLock)
 {
 	if (!cm)
 		return;
@@ -412,7 +412,7 @@ void Channel::SetModeInternal(User *setter, ChannelMode *cm, const Anope::string
  * @param param The param
  * @param EnforceMLock true if mlocks should be enforced, false to override mlock
  */
-void Channel::RemoveModeInternal(User *setter, ChannelMode *cm, const Anope::string &param, bool EnforceMLock)
+void Channel::RemoveModeInternal(MessageSource &setter, ChannelMode *cm, const Anope::string &param, bool EnforceMLock)
 {
 	if (!cm)
 		return;
@@ -537,7 +537,8 @@ void Channel::SetMode(BotInfo *bi, ChannelMode *cm, const Anope::string &param, 
 	}
 
 	ModeManager::StackerAdd(bi, this, cm, true, param);
-	SetModeInternal(bi, cm, param, EnforceMLock);
+	MessageSource ms(bi);
+	SetModeInternal(ms, cm, param, EnforceMLock);
 }
 
 /**
@@ -589,7 +590,8 @@ void Channel::RemoveMode(BotInfo *bi, ChannelMode *cm, const Anope::string &para
 	}
 
 	ModeManager::StackerAdd(bi, this, cm, false, realparam);
-	RemoveModeInternal(bi, cm, realparam, EnforceMLock);
+	MessageSource ms(bi);
+	RemoveModeInternal(ms, cm, realparam, EnforceMLock);
 }
 
 /**
@@ -680,13 +682,29 @@ void Channel::SetModes(BotInfo *bi, bool EnforceMLock, const char *cmodes, ...)
 	}
 }
 
-/** Set a string of modes internally on a channel
- * @param setter The setter, if it is a user
- * @param mode the modes
- * @param EnforceMLock true to enforce mlock
- */
-void Channel::SetModesInternal(User *setter, const Anope::string &mode, bool EnforceMLock)
+void Channel::SetModesInternal(MessageSource &source, const Anope::string &mode, time_t ts, bool EnforceMLock)
 {
+	if (source.GetServer())
+	{
+		if (Anope::CurTime != this->server_modetime)
+		{
+			this->server_modecount = 0;
+			this->server_modetime = Anope::CurTime;
+		}
+
+		++this->server_modecount;
+	}
+
+	if (ts > 0 && ts < this->creation_time)
+		return;
+	else if (ts > this->creation_time)
+	{
+		Log(LOG_DEBUG) << "Changing TS of " << this->name << " from " << this->creation_time << " to " << ts;
+		this->creation_time = ts;
+		this->Reset();
+	}
+
+	User *setter = source.GetUser();
 	/* Removing channel modes *may* delete this channel */
 	dynamic_reference<Channel> this_reference(this);
 
@@ -727,9 +745,9 @@ void Channel::SetModesInternal(User *setter, const Anope::string &mode, bool Enf
 		if (cm->Type == MODE_REGULAR)
 		{
 			if (add)
-				this->SetModeInternal(setter, cm, "", EnforceMLock);
+				this->SetModeInternal(source, cm, "", EnforceMLock);
 			else
-				this->RemoveModeInternal(setter, cm, "", EnforceMLock);
+				this->RemoveModeInternal(source, cm, "", EnforceMLock);
 			continue;
 		}
 		else if (cm->Type == MODE_PARAM)
@@ -738,7 +756,7 @@ void Channel::SetModesInternal(User *setter, const Anope::string &mode, bool Enf
 
 			if (!add && cmp->MinusNoArg)
 			{
-				this->RemoveModeInternal(setter, cm, "", EnforceMLock);
+				this->RemoveModeInternal(source, cm, "", EnforceMLock);
 				continue;
 			}
 		}
@@ -752,9 +770,9 @@ void Channel::SetModesInternal(User *setter, const Anope::string &mode, bool Enf
 				paramstring += " " + token;
 
 			if (add)
-				this->SetModeInternal(setter, cm, token, EnforceMLock);
+				this->SetModeInternal(source, cm, token, EnforceMLock);
 			else
-				this->RemoveModeInternal(setter, cm, token, EnforceMLock);
+				this->RemoveModeInternal(source, cm, token, EnforceMLock);
 		}
 		else
 			Log() << "warning: Channel::SetModesInternal() recieved more modes requiring params than params, modes: " << mode;
@@ -766,7 +784,7 @@ void Channel::SetModesInternal(User *setter, const Anope::string &mode, bool Enf
 	if (setter)
 		Log(setter, this, "mode") << modestring << paramstring;
 	else
-		Log(LOG_DEBUG) << "Setting " << this->name << " to " << modestring << paramstring;
+		Log(LOG_DEBUG) << source.GetName() << " is setting " << this->name << " to " << modestring << paramstring;
 }
 
 /** Kick a user from a channel internally
@@ -774,23 +792,24 @@ void Channel::SetModesInternal(User *setter, const Anope::string &mode, bool Enf
  * @param nick The nick being kicked
  * @param reason The reason for the kick
  */
-void Channel::KickInternal(const Anope::string &source, const Anope::string &nick, const Anope::string &reason)
+void Channel::KickInternal(MessageSource &source, const Anope::string &nick, const Anope::string &reason)
 {
-	User *sender = finduser(source);
-	BotInfo *bi = NULL;
-	if (this->ci && this->ci->bi)
-		bi = findbot(nick);
-	User *target = bi ? bi : finduser(nick);
+	User *sender = source.GetUser();
+	User *target = finduser(nick);
 	if (!target)
 	{
 		Log() << "Channel::KickInternal got a nonexistent user " << nick << " on " << this->name << ": " << reason;
 		return;
 	}
 
+	BotInfo *bi = NULL;
+	if (target->server == Me)
+		bi = findbot(nick);
+
 	if (sender)
 		Log(sender, this, "kick") << "kicked " << target->nick << " (" << reason << ")";
 	else
-		Log(target, this, "kick") << "was kicked by " << source << " (" << reason << ")";
+		Log(target, this, "kick") << "was kicked by " << source.GetSource() << " (" << reason << ")";
 
 	Anope::string chname = this->name;
 
@@ -802,7 +821,7 @@ void Channel::KickInternal(const Anope::string &source, const Anope::string &nic
 		this->DeleteUser(target);
 	}
 	else
-		Log() << "Channel::KickInternal got kick for user " << target->nick << " from " << (sender ? sender->nick : source) << " who isn't on channel " << this->name;
+		Log() << "Channel::KickInternal got kick for user " << target->nick << " from " << source.GetSource() << " who isn't on channel " << this->name;
 
 	/* Bots get rejoined */
 	if (bi)
@@ -833,13 +852,17 @@ bool Channel::Kick(BotInfo *bi, User *u, const char *reason, ...)
 	/* Do not kick protected clients */
 	if (u->IsProtected())
 		return false;
+	
+	if (bi == NULL)
+		bi = this->ci->WhoSends();
 
 	EventReturn MOD_RESULT;
 	FOREACH_RESULT(I_OnBotKick, OnBotKick(bi, this, u, buf));
 	if (MOD_RESULT == EVENT_STOP)
 		return false;
-	ircdproto->SendKick(bi ? bi : this->ci->WhoSends(), this, u, "%s", buf);
-	this->KickInternal(bi ? bi->nick : this->ci->WhoSends()->nick, u->nick, buf);
+	ircdproto->SendKick(bi, this, u, "%s", buf);
+	MessageSource ms(bi);
+	this->KickInternal(ms, u->nick, buf);
 	return true;
 }
 
@@ -870,13 +893,14 @@ Anope::string Channel::GetModes(bool complete, bool plus)
 void Channel::ChangeTopicInternal(const Anope::string &user, const Anope::string &newtopic, time_t ts)
 {
 	User *u = finduser(user);
+
 	this->topic = newtopic;
 	this->topic_setter = u ? u->nick : user;
 	this->topic_time = ts;
 
-	Log(LOG_DEBUG) << "Topic of " << this->name << " changed by " << user << " to " << newtopic;
+	Log(LOG_DEBUG) << "Topic of " << this->name << " changed by " << (u ? u->nick : user) << " to " << newtopic;
 
-	FOREACH_MOD(I_OnTopicUpdated, OnTopicUpdated(this, u, this->topic));
+	FOREACH_MOD(I_OnTopicUpdated, OnTopicUpdated(this, user, this->topic));
 
 	if (this->ci)
 		this->ci->CheckTopic();
@@ -885,13 +909,14 @@ void Channel::ChangeTopicInternal(const Anope::string &user, const Anope::string
 void Channel::ChangeTopic(const Anope::string &user, const Anope::string &newtopic, time_t ts)
 {
 	User *u = finduser(user);
+
 	this->topic = newtopic;
 	this->topic_setter = u ? u->nick : user;
 	this->topic_time = ts;
 
 	ircdproto->SendTopic(this->ci->WhoSends(), this);
 
-	FOREACH_MOD(I_OnTopicUpdated, OnTopicUpdated(this, u, this->topic));
+	FOREACH_MOD(I_OnTopicUpdated, OnTopicUpdated(this, user, this->topic));
 
 	if (this->ci)
 		this->ci->CheckTopic();
@@ -977,172 +1002,6 @@ User *nc_on_chan(Channel *c, const NickCore *nc)
 	}
 	return NULL;
 }
-
-/*************************************************************************/
-/*************************** Message Handling ****************************/
-/*************************************************************************/
-
-/** Handle a JOIN command
- * @param source user joining
- * @param channels being joined
- * @param ts TS for the join
- */
-void do_join(const Anope::string &source, const Anope::string &channels, const Anope::string &ts)
-{
-	User *user = finduser(source);
-	if (!user)
-	{
-		Log() << "JOIN from nonexistent user " << source << ": " << channels;
-		return;
-	}
-
-	commasepstream sep(channels);
-	Anope::string buf;
-	while (sep.GetToken(buf))
-	{
-		if (buf[0] == '0')
-		{
-			for (UChannelList::iterator it = user->chans.begin(), it_end = user->chans.end(); it != it_end; )
-			{
-				ChannelContainer *cc = *it++;
-
-				Anope::string channame = cc->chan->name;
-				FOREACH_MOD(I_OnPrePartChannel, OnPrePartChannel(user, cc->chan));
-				cc->chan->DeleteUser(user);
-				FOREACH_MOD(I_OnPartChannel, OnPartChannel(user, findchan(channame), channame, ""));
-			}
-			user->chans.clear();
-			continue;
-		}
-
-		Channel *chan = findchan(buf);
-
-		/* Channel doesn't exist, create it */
-		if (!chan)
-			chan = new Channel(buf, Anope::CurTime);
-
-		/* Join came with a TS */
-		if (!ts.empty())
-		{
-			time_t t = Anope::string(ts).is_pos_number_only() ? convertTo<time_t>(ts) : 0;
-
-			/* Their time is older, we lose */
-			if (t && chan->creation_time > t)
-			{
-				Log(LOG_DEBUG) << "Recieved an older TS " << chan->name << " in JOIN, changing from " << chan->creation_time << " to " << ts;
-				chan->creation_time = t;
-
-				chan->Reset();
-			}
-		}
-
-		EventReturn MOD_RESULT;
-		FOREACH_RESULT(I_OnPreJoinChannel, OnPreJoinChannel(user, chan));
-
-		/* Join the user to the channel */
-		chan->JoinUser(user);
-		/* Set the propre modes on the user */
-		chan_set_correct_modes(user, chan, 1, true);
-
-		/* Modules may want to allow this user in the channel, check.
-		 * If not, CheckKick will kick/ban them, don't call OnJoinChannel after this as the user will have
-		 * been destroyed
-		 */
-		if (MOD_RESULT != EVENT_STOP && chan && chan->ci && chan->ci->CheckKick(user))
-			continue;
-
-		FOREACH_MOD(I_OnJoinChannel, OnJoinChannel(user, chan));
-	}
-}
-
-/*************************************************************************/
-
-/** Handle a KICK command.
- * @param source The source of the kick
- * @param users the user(s) being kicked
- * @param reason The reason for the kick
- */
-void do_kick(const Anope::string &source, const Anope::string &channel, const Anope::string &users, const Anope::string &reason)
-{
-	Channel *c = findchan(channel);
-	if (!c)
-	{
-		Log() << "Recieved kick for nonexistant channel " << channel;
-		return;
-	}
-
-	Anope::string buf;
-	commasepstream sep(users);
-	while (sep.GetToken(buf))
-		c->KickInternal(source, buf, reason);
-}
-
-/*************************************************************************/
-
-void do_part(const Anope::string &source, const Anope::string &channels, const Anope::string &reason)
-{
-	User *user = finduser(source);
-	if (!user)
-	{
-		Log() << "PART from nonexistent user " << source << ": " << reason;
-		return;
-	}
-
-	commasepstream sep(channels);
-	Anope::string buf;
-	while (sep.GetToken(buf))
-	{
-		Channel *c = findchan(buf);
-
-		if (!c)
-			Log() << "Recieved PART from " << user->nick << " for nonexistant channel " << buf;
-		else if (user->FindChannel(c))
-		{
-			Log(user, c, "part") << "Reason: " << (!reason.empty() ? reason : "No reason");
-			FOREACH_MOD(I_OnPrePartChannel, OnPrePartChannel(user, c));
-			Anope::string ChannelName = c->name;
-			c->DeleteUser(user);
-			FOREACH_MOD(I_OnPartChannel, OnPartChannel(user, findchan(ChannelName), ChannelName, !reason.empty() ? reason : ""));
-		}
-		else
-			Log() << "Recieved PART from " << user->nick << " for " << c->name << ", but " << user->nick << " isn't in " << c->name << "?";
-	}
-}
-
-/*************************************************************************/
-
-/** Process a MODE command from the server, and set the modes on the user/channel
- * it was sent for
- * @param source The source of the command
- * @param channel the channel to change modes on
- * @param modes the mode changes
- * @param ts the timestamp for the modes
- */
-void do_cmode(const Anope::string &source, const Anope::string &channel, const Anope::string &modes, const Anope::string &ts)
-{
-	Channel *c = findchan(channel);
-	if (!c)
-	{
-		Log(LOG_DEBUG) << "MODE " << modes << " for nonexistant channel " << channel;
-		return;
-	}
-
-	Log(LOG_DEBUG) << "MODE " << channel << " " << modes << " ts: " << ts;
-
-	if (source.find('.') != Anope::string::npos)
-	{
-		if (Anope::CurTime != c->server_modetime)
-		{
-			c->server_modecount = 0;
-			c->server_modetime = Anope::CurTime;
-		}
-		++c->server_modecount;
-	}
-
-	c->SetModesInternal(finduser(source), modes);
-}
-
-/*************************************************************************/
 
 /**
  * Set the correct modes, or remove the ones granted without permission,

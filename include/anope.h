@@ -324,12 +324,6 @@ namespace Anope
 	 */
 	extern CoreExport bool Match(const string &str, const string &mask, bool case_sensitive = false, bool use_regex = false);
 
-	/** Find a message in the message table
-	 * @param name The name of the message were looking for
-	 * @return NULL if we cant find it, or a pointer to the Message if we can
-	 */
-	extern CoreExport std::vector<Message *> FindMessage(const string &name);
-
 	/** Converts a string to hex
 	 * @param the data to be converted
 	 * @return a anope::string containing the hex value

@@ -376,9 +376,9 @@ class CSSeen : public Module
 		UpdateUser(u, PART, u->nick, "", channel, msg);
 	}
 
-	void OnUserKicked(Channel *c, User *target, const Anope::string &source, const Anope::string &msg) anope_override
+	void OnUserKicked(Channel *c, User *target, MessageSource &source, const Anope::string &msg) anope_override
 	{
-		UpdateUser(target, KICK, target->nick, source, c->name, msg);
+		UpdateUser(target, KICK, target->nick, source.GetSource(), c->name, msg);
 	}
 
  private:

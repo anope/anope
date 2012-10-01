@@ -140,7 +140,7 @@ class CoreExport Channel : public virtual Base, public Extensible, public Flags<
 	 * @param param The param
 	 * @param EnforceMLock true if mlocks should be enforced, false to override mlock
 	 */
-	void SetModeInternal(User *setter, ChannelMode *cm, const Anope::string &param = "", bool EnforceMLock = true);
+	void SetModeInternal(MessageSource &source, ChannelMode *cm, const Anope::string &param = "", bool EnforceMLock = true);
 
 	/** Remove a mode internally on a channel, this is not sent out to the IRCd
 	 * @param setter The Setter
@@ -148,7 +148,7 @@ class CoreExport Channel : public virtual Base, public Extensible, public Flags<
 	 * @param param The param
 	 * @param EnforceMLock true if mlocks should be enforced, false to override mlock
 	 */
-	void RemoveModeInternal(User *setter, ChannelMode *cm, const Anope::string &param = "", bool EnforceMLock = true);
+	void RemoveModeInternal(MessageSource &source, ChannelMode *cm, const Anope::string &param = "", bool EnforceMLock = true);
 
 	/** Set a mode on a channel
 	 * @param bi The client setting the modes
@@ -199,18 +199,18 @@ class CoreExport Channel : public virtual Base, public Extensible, public Flags<
 	void SetModes(BotInfo *bi, bool EnforceMLock, const char *cmodes, ...);
 
 	/** Set a string of modes internally on a channel
-	 * @param setter the setter (if it is a user)
+	 * @param source The setter
 	 * @param mode the modes
 	 * @param EnforceMLock true to enforce mlock
 	 */
-	void SetModesInternal(User *setter, const Anope::string &mode, bool EnforceMLock = true);
+	void SetModesInternal(MessageSource &source, const Anope::string &mode, time_t ts = Anope::CurTime, bool EnforceMLock = true);
 
 	/** Kick a user from a channel internally
 	 * @param source The sender of the kick
 	 * @param nick The nick being kicked
 	 * @param reason The reason for the kick
 	 */
-	void KickInternal(const Anope::string &source, const Anope::string &nick, const Anope::string &reason);
+	void KickInternal(MessageSource &source, const Anope::string &nick, const Anope::string &reason);
 
 	/** Kick a user from the channel
 	 * @param bi The sender, can be NULL for the service bot for this channel
@@ -228,7 +228,7 @@ class CoreExport Channel : public virtual Base, public Extensible, public Flags<
 	Anope::string GetModes(bool complete, bool plus);
 
 	/** Update the topic of the channel internally, and reset it if topiclock etc says to
-	 * @param user THe user setting the new topic
+	 * @param user The user setting the new topic
 	 * @param newtopic The new topic
 	 * @param ts The time the new topic is being set
 	 */
@@ -249,11 +249,6 @@ class CoreExport Channel : public virtual Base, public Extensible, public Flags<
 extern CoreExport Channel *findchan(const Anope::string &chan);
 
 extern CoreExport User *nc_on_chan(Channel *c, const NickCore *nc);
-
-extern CoreExport void do_cmode(const Anope::string &source, const Anope::string &channel, const Anope::string &modes, const Anope::string &ts);
-extern CoreExport void do_join(const Anope::string &source, const Anope::string &channels, const Anope::string &ts);
-extern CoreExport void do_kick(const Anope::string &source, const Anope::string &channel, const Anope::string &users, const Anope::string &reason);
-extern CoreExport void do_part(const Anope::string &source, const Anope::string &channels, const Anope::string &reason);
 
 extern CoreExport void chan_set_correct_modes(const User *user, Channel *c, int give_modes, bool check_noop);
 

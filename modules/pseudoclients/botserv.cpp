@@ -199,7 +199,7 @@ class BotServCore : public Module
 				"the following characters: %s"), Config->ChanServ.c_str(), Config->BSFantasyCharacter.c_str());
 	}
 
-	EventReturn OnChannelModeSet(Channel *c, User *setter, ChannelModeName Name, const Anope::string &param) anope_override
+	EventReturn OnChannelModeSet(Channel *c, MessageSource &, ChannelModeName Name, const Anope::string &param) anope_override
 	{
 		if (Config->BSSmartJoin && Name == CMODE_BAN && c->ci && c->ci->bi && c->FindUser(c->ci->bi))
 		{

@@ -213,10 +213,7 @@ UplinkSocket::Message::~Message()
 			return;
 		}
 
-		if (ircd->ts6)
-			message_source = this->server->GetSID();
-		else
-			message_source = this->server->GetName();
+		message_source = this->server->GetSID();
 	}
 	else if (this->user != NULL)
 	{
@@ -233,10 +230,7 @@ UplinkSocket::Message::~Message()
 			return;
 		}
 
-		if (ircd->ts6)
-			message_source = this->user->GetUID();
-		else
-			message_source = this->user->nick;
+		message_source = this->user->GetUID();
 	}
 
 	if (!UplinkSock)

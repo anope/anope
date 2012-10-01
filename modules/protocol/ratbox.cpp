@@ -11,35 +11,31 @@
 
 #include "module.h"
 
-static Anope::string TS6UPLINK;
-
-IRCDVar myIrcd = {
-	"Ratbox 2.0+",	/* ircd name */
-	 "+oiS",			/* Modes used by pseudoclients */
-	 0,				/* SVSNICK */
-	 0,				/* Vhost */
-	 1,				/* Supports SNlines */
-	 1,				/* Supports SQlines */
-	 0,				/* Supports SZlines */
-	 1,				/* Join 2 Message */
-	 1,				/* Chan SQlines */
-	 0,				/* Quit on Kill */
-	 0,				/* vidents */
-	 0,				/* svshold */
-	 0,				/* time stamp on mode */
-	 0,				/* UMODE */
-	 0,				/* O:LINE */
-	 0,				/* No Knock requires +i */
-	 0,				/* Can remove User Channel Modes with SVSMODE */
-	 0,				/* Sglines are not enforced until user reconnects */
-	 1,				/* ts6 */
-	 "$$",			/* TLD Prefix for Global */
-	 4,				/* Max number of modes we can send per line */
-	 0,				/* IRCd sends a SSL users certificate fingerprint */
-};
+static Anope::string UplinkSID;
 
 class RatboxProto : public IRCDProto
 {
+ public:
+	RatboxProto() : IRCDProto("Ratbox 3.0+")
+	{
+		DefaultPseudoclientModes = "+oiS";
+		CanSNLine = true;
+		CanSQLine = true;
+		CanSZLine = true;
+		RequiresID = true;
+		MaxModes = 4;
+	}
+
+	void SendGlobalNotice(const BotInfo *bi, const Server *dest, const Anope::string &msg) anope_override
+	{
+		UplinkSocket::Message(bi) << "NOTICE $$" << dest->GetName() << " :" << msg;
+	}
+
+	void SendGlobalPrivmsg(const BotInfo *bi, const Server *dest, const Anope::string &msg) anope_override
+	{
+		UplinkSocket::Message(bi) << "PRIVMSG $$" << dest->GetName() << " :" << msg;
+	}
+
 	void SendGlobopsInternal(const BotInfo *source, const Anope::string &buf) anope_override
 	{
 		UplinkSocket::Message(source) << "OPERWALL :" << buf;
@@ -140,21 +136,13 @@ class RatboxProto : public IRCDProto
 		  QS     - Can handle quit storm removal
 		  EX     - Can do channel +e exemptions
 		  CHW    - Can do channel wall @#
-		  LL     - Can do lazy links
 		  IE     - Can do invite exceptions
-		  EOB    - Can do EOB message
-		  KLN    - Can do KLINE message
 		  GLN    - Can do GLINE message
-		  HUB    - This server is a HUB
-		  UID    - Can do UIDs
-		  ZIP    - Can do ZIPlinks
-		  ENC    - Can do ENCrypted links
-		  KNOCK  -  supports KNOCK
-		  TBURST - supports TBURST
-		  PARA   - supports invite broadcasting for +p
-		  ENCAP  - ?
+		  KNOCK  - supports KNOCK
+		  TB     - supports topic burst
+		  ENCAP  - supports ENCAP
 		*/
-		UplinkSocket::Message() << "CAPAB :QS EX CHW IE KLN GLN KNOCK TB UNKLN CLUSTER ENCAP TS6";
+		UplinkSocket::Message() << "CAPAB :QS EX CHW IE GLN TB ENCAP";
 		/* Make myself known to myself in the serverlist */
 		SendServer(Me);
 		/*
@@ -224,93 +212,185 @@ class RatboxProto : public IRCDProto
 	}
 };
 
-class RatboxIRCdMessage : public IRCdMessage
+struct IRCDMessageBMask : IRCDMessage
 {
- public:
+	IRCDMessageBMask() : IRCDMessage("BMASK", 4) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
+
+	bool Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
+	{
+		/* :42X BMASK 1106409026 #ircops b :*!*@*.aol.com */
+		/*            0          1       2  3             */
+		Channel *c = findchan(params[1]);
+
+		if (c)
+		{
+			ChannelMode *ban = ModeManager::FindChannelModeByName(CMODE_BAN),
+				*except = ModeManager::FindChannelModeByName(CMODE_EXCEPT),
+				*invex = ModeManager::FindChannelModeByName(CMODE_INVITEOVERRIDE);
+
+			Anope::string bans = params[3];
+			int count = myNumToken(bans, ' '), i;
+			for (i = 0; i < count; ++i)
+			{
+				Anope::string b = myStrGetToken(bans, ' ', i);
+				if (ban && params[2].equals_cs("b"))
+					c->SetModeInternal(source, ban, b);
+				else if (except && params[2].equals_cs("e"))
+					c->SetModeInternal(source, except, b);
+				if (invex && params[2].equals_cs("I"))
+					c->SetModeInternal(source, invex, b);
+			}
+		}
+
+		return true;
+	}
+};
+
+struct IRCDMessageEncap : IRCDMessage
+{
+	IRCDMessageEncap() : IRCDMessage("ENCAP", 3) { SetFlag(IRCDMESSAGE_REQUIRE_USER); }
+
+	// Debug: Received: :00BAAAAAB ENCAP * LOGIN Adam
+	bool Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
+	{
+		if (params[1] == "LOGIN")
+		{
+			User *u = source.GetUser();
+
+			NickCore *nc = findcore(params[2]);
+			if (!nc)
+				return true;
+			u->Login(nc);
+
+			const NickAlias *user_na = findnick(u->nick);
+			if (!Config->NoNicknameOwnership && user_na && user_na->nc == nc && user_na->nc->HasFlag(NI_UNCONFIRMED) == false)
+				u->SetMode(findbot(Config->NickServ), UMODE_REGISTERED);
+		}
+
+		return true;
+	}
+};
+
+struct IRCDMessageJoin : CoreIRCDMessageJoin
+{
+	IRCDMessageJoin() : CoreIRCDMessageJoin("JOIN") { }
+
  	/*
 	 * params[0] = ts
 	 * params[1] = channel
+	 * params[2] = modes
 	 */
-	bool OnJoin(const Anope::string &source, const std::vector<Anope::string> &params) anope_override
-	{
-		if (params.size() < 2)
-			return IRCdMessage::OnJoin(source, params);
-		do_join(source, params[1], params[0]);
-		return true;
-	}
-
-	bool OnMode(const Anope::string &source, const std::vector<Anope::string> &params) anope_override
+	bool Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		if (params.size() < 2)
 			return true;
 
-		if (params[0][0] == '#' || params[0][0] == '&')
-			do_cmode(source, params[0], params[2], params[1]);
+		std::vector<Anope::string> p = params;
+		p.erase(p.begin());
+
+		return CoreIRCDMessageJoin::Run(source, p);
+	}
+};
+
+struct IRCDMessageMode : IRCDMessage
+{
+	IRCDMessageMode() : IRCDMessage("MODE", 3) { }
+
+	bool Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
+	{
+		if (ircdproto->IsChannelValid(params[0]))
+		{
+			// 0 = channel, 1 = ts, 2 = modes
+			Channel *c = findchan(params[0]);
+			time_t ts = Anope::CurTime;
+			try
+			{
+				ts = convertTo<time_t>(params[1]);
+			}
+			catch (const ConvertException &) { }
+
+			if (c)
+				c->SetModesInternal(source, params[2], ts);
+		}
 		else
-			do_umode(params[0], params[1]);
+		{
+			User *u = finduser(params[0]);
+			if (u)
+				u->SetModesInternal("%s", params[1].c_str());
+		}
 
 		return true;
 	}
+};
 
-	bool OnUID(const Anope::string &source, const std::vector<Anope::string> &params) anope_override
+struct IRCDMessageNick : IRCDMessage
+{
+	IRCDMessageNick() : IRCDMessage("NICK", 1) { SetFlag(IRCDMESSAGE_REQUIRE_USER); }
+
+	bool Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		/* Source is always the server */
-		User *user = do_nick("", params[0], params[4], params[5], source, params[8], Anope::string(params[2]).is_pos_number_only() ? convertTo<time_t>(params[2]) : 0, params[6], "*", params[7], params[3]);
-		if (user && user->server->IsSynced() && nickserv)
-			nickserv->Validate(user);
-
+		source.GetUser()->ChangeNick(params[0]);
 		return true;
 	}
+};
 
-	/*
-	  params[0] = nick
-	  params[1] = hop
-	  params[2] = ts
-	  params[3] = modes
-	  params[4] = user
-	  params[5] = host
-	  params[6] = IP
-	  params[7] = UID
-	  params[8] = info
-	*/
-	bool OnNick(const Anope::string &source, const std::vector<Anope::string> &params) anope_override
+struct IRCDMessagePass : IRCDMessage
+{
+	IRCDMessagePass() : IRCDMessage("PASS", 4) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
+
+	bool Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		do_nick(source, params[0], "", "", "", "", Anope::string(params[1]).is_pos_number_only() ? convertTo<time_t>(params[1]) : 0, "", "", "", "");
-
+		UplinkSID = params[3];
 		return true;
 	}
+};
 
-	bool OnServer(const Anope::string &source, const std::vector<Anope::string> &params) anope_override
+struct IRCDMessagePong : IRCDMessage
+{
+	IRCDMessagePong() : IRCDMessage("PONG", 0) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
+
+	bool Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		if (params[1].equals_cs("1"))
-			do_server(source, params[0], Anope::string(params[1]).is_pos_number_only() ? convertTo<unsigned>(params[1]) : 0, params[2], TS6UPLINK);
-		else
-			do_server(source, params[0], Anope::string(params[1]).is_pos_number_only() ? convertTo<unsigned>(params[1]) : 0, params[2], "");
+		source.GetServer()->Sync(false);
+		return true;
+	}
+};
+
+struct IRCDMessageServer : IRCDMessage
+{
+	IRCDMessageServer() : IRCDMessage("SERVER", 3) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
+
+	// SERVER hades.arpa 1 :ircd-ratbox test server
+	bool Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
+	{
+		// Servers other then our immediate uplink are introduced via SID
+		if (params[1] != "1")
+			return true;
+		new Server(source.GetServer() == NULL ? Me : source.GetServer(), params[0], 1, params[2], UplinkSID);
 		ircdproto->SendPing(Config->ServerName, params[0]);
 		return true;
 	}
+};
 
-	bool OnTopic(const Anope::string &source, const std::vector<Anope::string> &params) anope_override
+struct IRCDMessageSID : IRCDMessage
+{
+	IRCDMessageSID() : IRCDMessage("SID", 4) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
+
+	bool Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		Channel *c = findchan(params[0]);
-		if (!c)
-		{
-			Log() << "TOPIC for nonexistant channel " << params[0];
-			return true;
-		}
-
-		if (params.size() == 4)
-		{
-			c->ChangeTopicInternal(params[1], params[3], Anope::string(params[2]).is_pos_number_only() ? convertTo<time_t>(params[2]) : Anope::CurTime);
-		}
-		else
-		{
-			c->ChangeTopicInternal(source, (params.size() > 1 ? params[1] : ""));
-		}
+		/* :42X SID trystan.nomadirc.net 2 43X :ircd-ratbox test server */
+		unsigned int hops = params[1].is_pos_number_only() ? convertTo<unsigned>(params[1]) : 0;
+		new Server(source.GetServer() == NULL ? Me : source.GetServer(), params[0], hops, params[3], params[2]);
+		ircdproto->SendPing(Config->ServerName, params[0]);
 		return true;
 	}
+};
 
-	bool OnSJoin(const Anope::string &source, const std::vector<Anope::string> &params) anope_override
+struct IRCDMessageSjoin : IRCDMessage
+{
+	IRCDMessageSjoin() : IRCDMessage("SJOIN", 2) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
+
+	bool Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		Channel *c = findchan(params[1]);
 		time_t ts = Anope::string(params[0]).is_pos_number_only() ? convertTo<time_t>(params[0]) : 0;
@@ -340,7 +420,7 @@ class RatboxIRCdMessage : public IRCdMessage
 			if (!modes.empty())
 				modes.erase(modes.begin());
 			/* Set the modes internally */
-			c->SetModesInternal(NULL, modes);
+			c->SetModesInternal(source, modes);
 		}
 
 		spacesepstream sep(params[params.size() - 1]);
@@ -382,7 +462,7 @@ class RatboxIRCdMessage : public IRCdMessage
 			 * This will enforce secureops etc on the user
 			 */
 			for (std::list<ChannelMode *>::iterator it = Status.begin(), it_end = Status.end(); it != it_end; ++it)
-				c->SetModeInternal(NULL, *it, buf);
+				c->SetModeInternal(source, *it, buf);
 
 			/* Now set whatever modes this user is allowed to have on the channel */
 			chan_set_correct_modes(u, c, 1, true);
@@ -409,120 +489,99 @@ class RatboxIRCdMessage : public IRCdMessage
 	}
 };
 
-bool event_tburst(const Anope::string &source, const std::vector<Anope::string> &params)
+struct IRCDMessageTBurst : IRCDMessage
 {
-	if (params.size() != 4)
-		return true;
+	IRCDMessageTBurst() : IRCDMessage("TBURST", 4) { }
 
-	Anope::string setter = myStrGetToken(params[2], '!', 0);
-	time_t topic_time = Anope::string(params[1]).is_pos_number_only() ? convertTo<time_t>(params[1]) : Anope::CurTime;
-	Channel *c = findchan(params[0]);
-
-	if (!c)
+	bool Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		Log() << "TOPIC " << params[3] << " for nonexistent channel " << params[0];
-		return true;
-	}
+		Anope::string setter = myStrGetToken(params[2], '!', 0);
+		time_t topic_time = Anope::string(params[1]).is_pos_number_only() ? convertTo<time_t>(params[1]) : Anope::CurTime;
+		Channel *c = findchan(params[0]);
 
-	c->ChangeTopicInternal(setter, params.size() > 3 ? params[3] : "", topic_time);
-
-	return true;
-}
-
-bool event_kick(const Anope::string &source, const std::vector<Anope::string> &params)
-{
-	if (params.size() > 2)
-		do_kick(source, params[0], params[1], params[2]);
-	return true;
-}
-
-bool event_sid(const Anope::string &source, const std::vector<Anope::string> &params)
-{
-	/* :42X SID trystan.nomadirc.net 2 43X :ircd-ratbox test server */
-	do_server(source, params[0], Anope::string(params[1]).is_pos_number_only() ? convertTo<unsigned>(params[1]) : 0, params[3], params[2]);
-	ircdproto->SendPing(Config->ServerName, params[0]);
-	return true;
-}
-
-// Debug: Received: :00BAAAAAB ENCAP * LOGIN Adam
-bool event_encap(const Anope::string &source, const std::vector<Anope::string> &params)
-{
-	if (params.size() > 2 && params[1] == "LOGIN")
-	{
-		User *u = finduser(source);
-		NickCore *nc = findcore(params[2]);
-		if (!u || !nc)
+		if (!c)
 			return true;
-		u->Login(nc);
 
-		const NickAlias *user_na = findnick(u->nick);
-		if (!Config->NoNicknameOwnership && user_na && user_na->nc == nc && user_na->nc->HasFlag(NI_UNCONFIRMED) == false)
-			u->SetMode(findbot(Config->NickServ), UMODE_REGISTERED);
+		c->ChangeTopicInternal(setter, params[3], topic_time);
+
+		return true;
 	}
+};
 
-	return true;
-}
-
-bool event_pong(const Anope::string &source, const std::vector<Anope::string> &params)
+struct IRCDMessageTMode : IRCDMessage
 {
-	Server *s = Server::Find(source);
-	if (s)
-		s->Sync(false);
-	return true;
-}
+	IRCDMessageTMode() : IRCDMessage("TMODE", 3) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
 
-bool event_tmode(const Anope::string &source, const std::vector<Anope::string> &params)
-{
-	if (params[1][0] == '#')
+	bool Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
 	{
+		time_t ts = Anope::CurTime;
+		try
+		{
+			ts = convertTo<time_t>(params[0]);
+		}
+		catch (const ConvertException &) { }
+		Channel *c = findchan(params[1]);
 		Anope::string modes = params[2];
 		for (unsigned i = 3; i < params.size(); ++i)
 			modes += " " + params[i];
-		do_cmode(source, params[1], modes, params[0]);
+
+		if (c)
+			c->SetModesInternal(source, modes, ts);
+
+		return true;
 	}
-	return true;
-}
+};
 
-bool event_pass(const Anope::string &source, const std::vector<Anope::string> &params)
+struct IRCDMessageUID : IRCDMessage
 {
-	TS6UPLINK = params[3];
-	return true;
-}
+	IRCDMessageUID() : IRCDMessage("UID", 9) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
 
-bool event_bmask(const Anope::string &source, const std::vector<Anope::string> &params)
-{
-	/* :42X BMASK 1106409026 #ircops b :*!*@*.aol.com */
-	/*            0          1       2  3             */
-	Channel *c = findchan(params[1]);
-
-	if (c)
+	// :42X UID Adam 1 1348535644 +aow Adam 192.168.0.5 192.168.0.5 42XAAAAAB :Adam
+	bool Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		ChannelMode *ban = ModeManager::FindChannelModeByName(CMODE_BAN),
-			*except = ModeManager::FindChannelModeByName(CMODE_EXCEPT),
-			*invex = ModeManager::FindChannelModeByName(CMODE_INVITEOVERRIDE);
-		Anope::string bans = params[3];
-		int count = myNumToken(bans, ' '), i;
-		for (i = 0; i <= count - 1; ++i)
-		{
-			Anope::string b = myStrGetToken(bans, ' ', i);
-			if (ban && params[2].equals_cs("b"))
-				c->SetModeInternal(NULL, ban, b);
-			else if (except && params[2].equals_cs("e"))
-				c->SetModeInternal(NULL, except, b);
-			if (invex && params[2].equals_cs("I"))
-				c->SetModeInternal(NULL, invex, b);
-		}
+		/* Source is always the server */
+		User *user = new User(params[0], params[4], params[5], "", params[6], source.GetServer(), params[8], params[2].is_pos_number_only() ? convertTo<time_t>(params[2]) : 0, params[3], params[7]);
+		if (user && user->server->IsSynced() && nickserv)
+			nickserv->Validate(user);
+
+		return true;
 	}
-	return true;
-}
+};
 
 class ProtoRatbox : public Module
 {
-	Message message_kick, message_tmode, message_bmask, message_pass, message_tb, message_sid, message_encap,
-		message_pong;
-	
 	RatboxProto ircd_proto;
-	RatboxIRCdMessage ircd_message;
+
+	/* Core message handlers */
+	CoreIRCDMessageAway core_message_away;
+	CoreIRCDMessageCapab core_message_capab;
+	CoreIRCDMessageError core_message_error;
+	CoreIRCDMessageKill core_message_kill;
+	CoreIRCDMessageMOTD core_message_motd;
+	CoreIRCDMessagePart core_message_part;
+	CoreIRCDMessagePing core_message_ping;
+	CoreIRCDMessagePrivmsg core_message_privmsg;
+	CoreIRCDMessageQuit core_message_quit;
+	CoreIRCDMessageSQuit core_message_squit;
+	CoreIRCDMessageStats core_message_stats;
+	CoreIRCDMessageTime core_message_time;
+	CoreIRCDMessageTopic core_message_topic;
+	CoreIRCDMessageVersion core_message_version;
+
+	/* Our message handlers */
+	IRCDMessageBMask message_bmask;
+	IRCDMessageEncap message_encap;
+	IRCDMessageJoin message_join;
+	IRCDMessageMode message_mode;
+	IRCDMessageNick message_nick;
+	IRCDMessagePass message_pass;
+	IRCDMessagePong message_pong;
+	IRCDMessageServer message_server;
+	IRCDMessageSID message_sid;
+	IRCDMessageSjoin message_sjoin;
+	IRCDMessageTBurst message_tburst;
+	IRCDMessageTMode message_tmode;
+	IRCDMessageUID message_uid;
 
 	void AddModes()
 	{
@@ -554,17 +613,9 @@ class ProtoRatbox : public Module
 	}
 
  public:
-	ProtoRatbox(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PROTOCOL),
-		message_kick("KICK", event_kick), message_tmode("TMODE", event_tmode),
-		message_bmask("BMASK", event_bmask), message_pass("PASS", event_pass),
-		message_tb("TB", event_tburst), message_sid("SID", event_sid), message_encap("ENCAP", event_encap),
-		message_pong("PONG", event_pong)
+	ProtoRatbox(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PROTOCOL)
 	{
 		this->SetAuthor("Anope");
-
-		pmodule_ircd_var(&myIrcd);
-		pmodule_ircd_proto(&this->ircd_proto);
-		pmodule_ircd_message(&this->ircd_message);
 
 		this->AddModes();
 
@@ -581,14 +632,6 @@ class ProtoRatbox : public Module
 		for (botinfo_map::iterator it = BotListByNick->begin(), it_end = BotListByNick->end(); it != it_end; ++it)
 			it->second->GenerateUID();
 	}
-
-	~ProtoRatbox()
-	{
-		pmodule_ircd_var(NULL);
-		pmodule_ircd_proto(NULL);
-		pmodule_ircd_message(NULL);
-	}
-
 
 	void OnServerSync(Server *s) anope_override
 	{

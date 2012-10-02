@@ -96,7 +96,7 @@ void Channel::Reset()
 	for (CUserList::const_iterator it = this->users.begin(), it_end = this->users.end(); it != it_end; ++it)
 		chan_set_correct_modes((*it)->user, this, 1, false);
 	
-	if (this->ci)
+	if (this->ci && Me && Me->IsSynced())
 		this->ci->RestoreTopic();
 }
 
@@ -695,9 +695,9 @@ void Channel::SetModesInternal(MessageSource &source, const Anope::string &mode,
 		++this->server_modecount;
 	}
 
-	if (ts > 0 && ts < this->creation_time)
+	if (ts > this->creation_time)
 		return;
-	else if (ts > this->creation_time)
+	else if (ts < this->creation_time)
 	{
 		Log(LOG_DEBUG) << "Changing TS of " << this->name << " from " << this->creation_time << " to " << ts;
 		this->creation_time = ts;

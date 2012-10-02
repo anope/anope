@@ -1062,7 +1062,7 @@ struct IRCDMessageSJoin : IRCDMessage
 
 struct IRCDMessageTopic : IRCDMessage
 {
-	IRCDMessageTopic() : IRCDMessage("TOPIC", 4) { SetFlag(IRCDMESSAGE_REQUIRE_USER); }
+	IRCDMessageTopic() : IRCDMessage("TOPIC", 4) { }
 
 	/*
 	**	source = sender prefix

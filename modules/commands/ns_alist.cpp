@@ -44,7 +44,7 @@ class CommandNSAList : public Command
 
 		list.addColumn("Number").addColumn("Channel").addColumn("Access");
 
-		source.Reply(_("Channels that \002%s\002 has access on:"), nick.c_str());
+		source.Reply(_("Channels that \002%s\002 has access on:"), nc->display.c_str());
 
 		for (registered_channel_map::const_iterator it = RegisteredChannelList->begin(), it_end = RegisteredChannelList->end(); it != it_end; ++it)
 		{

@@ -361,8 +361,11 @@ class UnrealIRCdProto : public IRCDProto
 
 	void SendLogout(User *u) anope_override
 	{
-		const BotInfo *ns = findbot(Config->NickServ);
-		ircdproto->SendMode(ns, u, "+d 1");
+		if (!Capab.count("ESVID"))
+		{
+			const BotInfo *ns = findbot(Config->NickServ);
+			ircdproto->SendMode(ns, u, "+d 1");
+		}
 	}
 
 	void SendChannel(Channel *c) anope_override
@@ -1187,6 +1190,7 @@ class ProtoUnreal : public Module
 	void OnUserNickChange(User *u, const Anope::string &) anope_override
 	{
 		u->RemoveModeInternal(ModeManager::FindUserModeByName(UMODE_REGISTERED));
+		ircdproto->SendLogout(u);
 	}
 
 	void OnChannelCreate(Channel *c) anope_override

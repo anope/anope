@@ -297,13 +297,14 @@ class NickServCore : public Module
 		/* If the new nick isnt registerd or its registerd and not yours */
 		if (!na || na->nc != u->Account())
 		{
-			ircdproto->SendLogout(u);
+			/* Remove +r, but keep an account associated with the user */
 			u->RemoveMode(NickServ, UMODE_REGISTERED);
 
 			this->mynickserv.Validate(u);
 		}
 		else
 		{
+			/* Reset +r and re-send account (even though it really should be set at this point) */
 			ircdproto->SendLogin(u);
 			if (!Config->NoNicknameOwnership && na->nc == u->Account() && na->nc->HasFlag(NI_UNCONFIRMED) == false)
 				u->SetMode(NickServ, UMODE_REGISTERED);

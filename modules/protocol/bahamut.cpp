@@ -640,6 +640,7 @@ class ProtoBahamut : public Module
 	void OnUserNickChange(User *u, const Anope::string &) anope_override
 	{
 		u->RemoveModeInternal(ModeManager::FindUserModeByName(UMODE_REGISTERED));
+		ircdproto->SendLogout(u);
 	}
 };
 

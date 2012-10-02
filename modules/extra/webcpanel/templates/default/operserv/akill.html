@@ -1,0 +1,49 @@
+{INCLUDE header.html}
+	{IF EXISTS NOACCESS}
+		<b>Access denied.</b>
+	{ELSE}
+		{FOR M IN MESSAGES}
+			{M}</br>
+		{END FOR}
+		</br><b>AKILL List:</b>
+		<table width="100%" height="100%">
+			<tr>
+				<th align="left">Number</th>
+				<th align="left">Hostmask/Reason</th>
+				<th align="left">Expires</th>
+				<th align="left">Setter</th>
+			</tr>
+			{FOR N,H,S,T,E,R IN NUMBER,HOST,SETTER,TIME,EXPIRE,REASON}
+			<tr>
+				<td>{N}</td>
+				<td>{H}</td>
+				<td>{E}</td>
+				<td>{S}</td>
+				<td></td>
+				<td><a href="/operserv/akill?&number={N}&del=1">Delete</a></td>
+			</tr>
+			<tr>
+				<td></td>
+				<td colspan="2">{R}</td>
+			</tr>
+			{END FOR}
+		</table></br>
+		<b>Add a new AKILL</b>
+		<form method="post" action="/operserv/akill">
+			<table width="100%" height="100%" align="left">
+				<tr>
+					<th align="left">HostMask</th>
+					<th align="left">Expiry</th>
+					<th align="left">Reason</th>
+				</tr>
+				<tr>
+					<td><input type="text" name="mask"></td>
+					<td><input type="text" name="expiry"></td>
+					<td><input type="text" name="reason"></td>
+				</tr>
+			</table>
+			<input type="submit" value="send">
+		</form>
+	{END IF}
+
+{INCLUDE footer.html}

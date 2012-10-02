@@ -32,6 +32,8 @@ class ModuleWebCPanel : public Module
 
 	WebCPanel::MemoServ::Memos memoserv_memos;
 
+	WebCPanel::OperServ::Akill operserv_akill;
+
  public:
 	ModuleWebCPanel(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, SUPPORTED),
 		panel(this, "webcpanel"),
@@ -39,7 +41,7 @@ class ModuleWebCPanel : public Module
 		index("/"), logout("/logout"), _register("/register"), confirm("/confirm"),
 		nickserv_info(Config->NickServ, "/nickserv/info"), nickserv_cert(Config->NickServ, "/nickserv/cert"), nickserv_access(Config->NickServ, "/nickserv/access"), nickserv_alist(Config->NickServ, "/nickserv/alist"),
 		chanserv_info(Config->ChanServ, "/chanserv/info"), chanserv_set(Config->ChanServ, "/chanserv/set"), chanserv_access(Config->ChanServ, "/chanserv/access"), chanserv_akick(Config->ChanServ, "/chanserv/akick"),
-		memoserv_memos(Config->MemoServ, "/memoserv/memos")
+		memoserv_memos(Config->MemoServ, "/memoserv/memos"), operserv_akill(Config->OperServ, "/operserv/akill")
 	{
 		this->SetAuthor("Anope");
 
@@ -132,6 +134,20 @@ class ModuleWebCPanel : public Module
 			ss.url = "/memoserv/memos";
 			s.subsections.push_back(ss);
 			provider->RegisterPage(&this->memoserv_memos);
+
+			panel.sections.push_back(s);
+		}
+
+		if (Config->OperServ.empty() == false)
+		{
+			Section s;
+			s.name = Config->OperServ;
+
+			SubSection ss;
+			ss.name = "Akill";
+			ss.url = "/operserv/akill";
+			s.subsections.push_back(ss);
+			provider->RegisterPage(&this->operserv_akill);
 
 			panel.sections.push_back(s);
 		}

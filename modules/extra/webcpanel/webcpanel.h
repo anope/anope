@@ -161,3 +161,5 @@ namespace WebPanel
 #include "pages/chanserv/akick.h"
 
 #include "pages/memoserv/memos.h"
+
+#include "pages/operserv/akill.h"

@@ -158,9 +158,9 @@ class BahamutIRCdProto : public IRCDProto
 	}
 
 	/* TOPIC */
-	void SendTopic(BotInfo *whosets, Channel *c) anope_override
+	void SendTopic(BotInfo *bi, Channel *c, const Anope::string &topic, const Anope::string &setter, time_t &ts) anope_override
 	{
-		UplinkSocket::Message(whosets) << "TOPIC " << c->name << " " << c->topic_setter << " " << c->topic_time << " :" << c->topic;
+		UplinkSocket::Message(bi) << "TOPIC " << c->name << " " << setter << " " << ts << " :" << topic;
 	}
 
 	/* UNSQLINE */

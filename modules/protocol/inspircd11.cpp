@@ -94,9 +94,9 @@ class InspIRCdProto : public IRCDProto
 		UplinkSocket::Message(findbot(Config->OperServ)) << "GLINE " << x->Mask;
 	}
 
-	void SendTopic(BotInfo *whosets, Channel *c) anope_override
+	void SendTopic(BotInfo *bi, Channel *c, const Anope::string &topic, const Anope::string &setter, time_t &ts) anope_override
 	{
-		UplinkSocket::Message(whosets) << "FTOPIC " << c->name << " " << c->topic_time << " " << c->topic_setter <<" :" << c->topic;
+		UplinkSocket::Message(bi) << "FTOPIC " << c->name << " " << ts << " " << setter << " :" << topic;
 	}
 
 	void SendVhostDel(User *u) anope_override

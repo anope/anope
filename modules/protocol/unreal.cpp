@@ -57,9 +57,9 @@ class UnrealIRCdProto : public IRCDProto
 		UplinkSocket::Message() << "BD - G " << x->GetUser() << " " << x->GetHost() << " " << Config->OperServ;
 	}
 
-	void SendTopic(BotInfo *whosets, Channel *c) anope_override
+	void SendTopic(BotInfo *bi, Channel *c, const Anope::string &topic, const Anope::string &setter, time_t &ts) anope_override
 	{
-		UplinkSocket::Message(whosets) << ") " << c->name << " " << c->topic_setter << " " << c->topic_time + 1 << " :" << c->topic;
+		UplinkSocket::Message(bi) << "TOPIC " << c->name << " " << setter << " " << ts << " :" << topic;
 	}
 
 	void SendGlobalNotice(const BotInfo *bi, const Server *dest, const Anope::string &msg) anope_override

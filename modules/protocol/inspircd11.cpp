@@ -196,14 +196,6 @@ class InspIRCdProto : public IRCDProto
 		UplinkSocket::Message(u) << "OPERTYPE Service";
 	}
 
-	void SendKickInternal(const BotInfo *source, const Channel *chan, const User *user, const Anope::string &buf) anope_override
-	{
-		if (!buf.empty())
-			UplinkSocket::Message(source) << "KICK " << chan->name << " " << user->nick << " :" << buf;
-		else
-			UplinkSocket::Message(source) << "KICK " << chan->name << " " << user->nick << " :" << user->nick;
-	}
-
 	/* SERVER services-dev.chatspike.net password 0 :Description here */
 	void SendServer(const Server *server) anope_override
 	{
@@ -902,6 +894,7 @@ class ProtoInspIRCd : public Module
 	CoreIRCDMessageCapab core_message_capab;
 	CoreIRCDMessageError core_message_error;
 	CoreIRCDMessageJoin core_message_join;
+	CoreIRCDMessageKick core_message_kick;
 	CoreIRCDMessageKill core_message_kill;
 	CoreIRCDMessageMOTD core_message_motd;
 	CoreIRCDMessagePart core_message_part;

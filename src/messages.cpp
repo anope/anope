@@ -94,6 +94,25 @@ bool CoreIRCDMessageJoin::Run(MessageSource &source, const std::vector<Anope::st
 	return true;
 }
 
+
+bool CoreIRCDMessageKick::Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
+{
+	const Anope::string &channel = params[0];
+	const Anope::string &users = params[1];
+	const Anope::string &reason = params.size() > 2 ? params[2] : "";
+
+	Channel *c = findchan(channel);
+	if (!c)
+		return true;
+
+	Anope::string user;
+	commasepstream sep(users);
+
+	while (sep.GetToken(user))
+		c->KickInternal(source, user, reason);
+	return true;
+}
+
 bool CoreIRCDMessageKill::Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
 {
 	User *u = finduser(params[0]);

@@ -641,6 +641,7 @@ class ProtoPlexus : public Module
 	CoreIRCDMessageAway core_message_away;
 	CoreIRCDMessageCapab core_message_capab;
 	CoreIRCDMessageError core_message_error;
+	CoreIRCDMessageKick core_message_kick;
 	CoreIRCDMessageKill core_message_kill;
 	CoreIRCDMessageMOTD core_message_motd;
 	CoreIRCDMessagePart core_message_part;

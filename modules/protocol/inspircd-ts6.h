@@ -94,7 +94,7 @@ class InspIRCdTS6Proto : public IRCDProto
 
 	void SendTopic(BotInfo *whosets, Channel *c) anope_override
 	{
-		UplinkSocket::Message(whosets) << "FTOPIC " << c->name << " " << Anope::CurTime << " " << c->topic_setter << " :" << c->topic;
+		UplinkSocket::Message(whosets) << "FTOPIC " << c->name << " " << c->topic_time << " " << c->topic_setter << " :" << c->topic;
 	}
 
 	void SendVhostDel(User *u) anope_override

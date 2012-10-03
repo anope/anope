@@ -487,6 +487,7 @@ class ProtoInspIRCd : public Module
 	CoreIRCDMessageCapab core_message_capab;
 	CoreIRCDMessageError core_message_error;
 	CoreIRCDMessageJoin core_message_join;
+	CoreIRCDMessageKick core_message_kick;
 	CoreIRCDMessageKill core_message_kill;
 	CoreIRCDMessageMOTD core_message_motd;
 	CoreIRCDMessagePart core_message_part;

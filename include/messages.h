@@ -33,6 +33,13 @@ struct CoreIRCDMessageJoin : IRCDMessage
 	bool Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override;
 };
 
+struct CoreIRCDMessageKick : IRCDMessage
+{
+	CoreIRCDMessageKick(const Anope::string &mname = "KICK") : IRCDMessage(mname, 2) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
+
+	bool Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override;
+};
+
 struct CoreIRCDMessageKill : IRCDMessage
 {
 	CoreIRCDMessageKill(const Anope::string &mname = "KILL") : IRCDMessage(mname, 2) { }

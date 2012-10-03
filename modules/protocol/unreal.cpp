@@ -131,11 +131,6 @@ class UnrealIRCdProto : public IRCDProto
 		UplinkSocket::Message(source) << "h " << user->nick << " :" << buf;
 	}
 
-	void SendModeInternal(const BotInfo *source, const Channel *dest, const Anope::string &buf) anope_override
-	{
-		UplinkSocket::Message(source) << "G " << dest->name << " " << buf;
-	}
-
 	void SendModeInternal(const BotInfo *bi, const User *u, const Anope::string &buf) anope_override
 	{
 		UplinkSocket::Message(bi) << "v " << u->nick <<" " << buf;
@@ -145,14 +140,6 @@ class UnrealIRCdProto : public IRCDProto
 	{
 		Anope::string modes = "+" + u->GetModes();
 		UplinkSocket::Message() << "& " << u->nick << " 1 " << u->timestamp << " " << u->GetIdent() << " " << u->host << " " << u->server->GetName() << " 0 " << modes << " " << u->host << " * :" << u->realname;
-	}
-
-	void SendKickInternal(const BotInfo *source, const Channel *chan, const User *user, const Anope::string &buf) anope_override
-	{
-		if (!buf.empty())
-			UplinkSocket::Message(source) << "H " << chan->name << " " << user->nick << " :" << buf;
-		else
-			UplinkSocket::Message(source) << "H " << chan->name << " " << user->nick;
 	}
 
 	/* SERVER name hop descript */
@@ -1105,6 +1092,7 @@ class ProtoUnreal : public Module
 	CoreIRCDMessageCapab core_message_capab;
 	CoreIRCDMessageError core_message_error;
 	CoreIRCDMessageJoin core_message_join;
+	CoreIRCDMessageKick core_message_kick;
 	CoreIRCDMessageKill core_message_kill;
 	CoreIRCDMessageMOTD core_message_motd;
 	CoreIRCDMessagePart core_message_part;

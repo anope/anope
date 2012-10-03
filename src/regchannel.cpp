@@ -1134,7 +1134,7 @@ void ChannelInfo::CheckTopic()
 	{
 		this->last_topic = this->c->topic;
 		this->last_topic_setter = this->c->topic_setter;
-		this->last_topic_time = this->c->topic_time;
+		this->last_topic_time = this->c->topic_ts;
 	}
 }
 

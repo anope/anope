@@ -69,7 +69,8 @@ class CoreExport Channel : public virtual Base, public Extensible, public Flags<
 
 	Anope::string topic;		/* Current topic of the channel */
 	Anope::string topic_setter;	/* Who set the topic */
-	time_t topic_time;		/* When the topic was set*/
+	time_t topic_ts;                /* The timestamp associated with the topic. Not necessarually anywhere close to Anope::CurTime */
+	time_t topic_time;              /* The actual time the topic was set, probably close to Anope::CurTime */
 
 	time_t server_modetime;		/* Time of last server MODE */
 	time_t chanserv_modetime;	/* Time of last check_modes() */

@@ -94,7 +94,12 @@ class InspIRCdTS6Proto : public IRCDProto
 
 	void SendTopic(BotInfo *whosets, Channel *c) anope_override
 	{
-		UplinkSocket::Message(whosets) << "FTOPIC " << c->name << " " << c->topic_time << " " << c->topic_setter << " :" << c->topic;
+		/* If the last time a topic was set is after the TS we want for this topic we must bump this topic's timestamp to now */
+		time_t ts = c->topic_ts;
+		if (c->topic_time > ts)
+			ts = Anope::CurTime;
+		/* But don't modify c->topic_ts, it should remain set to the real TS we want as ci->last_topic_time pulls from it */
+		UplinkSocket::Message(whosets) << "FTOPIC " << c->name << " " << ts << " " << c->topic_setter << " :" << c->topic;
 	}
 
 	void SendVhostDel(User *u) anope_override

@@ -161,6 +161,7 @@ class MyXMLRPCEvent : public XMLRPCEvent
 				request->reply("topicsetter", iface->Sanitize(c->topic_setter));
 
 			request->reply("topictime", stringify(c->topic_time));
+			request->reply("topicts", stringify(c->topic_ts));
 		}
 	}
 

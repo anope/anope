@@ -59,7 +59,7 @@ class UnrealIRCdProto : public IRCDProto
 
 	void SendTopic(BotInfo *whosets, Channel *c) anope_override
 	{
-		UplinkSocket::Message(whosets) << ") " << c->name << " " << c->topic_setter << " " << c->topic_time + 1 << " :" << c->topic;
+		UplinkSocket::Message(whosets) << ") " << c->name << " " << c->topic_setter << " " << c->topic_ts << " :" << c->topic;
 	}
 
 	void SendGlobalNotice(const BotInfo *bi, const Server *dest, const Anope::string &msg) anope_override

@@ -41,7 +41,7 @@ Channel::Channel(const Anope::string &nname, time_t ts) : Flags<ChannelFlag, 3>(
 
 	this->creation_time = ts;
 	this->server_modetime = this->chanserv_modetime = 0;
-	this->server_modecount = this->chanserv_modecount = this->bouncy_modes = this->topic_time = 0;
+	this->server_modecount = this->chanserv_modecount = this->bouncy_modes = this->topic_ts = this->topic_time = 0;
 
 	this->ci = cs_findchan(this->name);
 	if (this->ci)
@@ -896,7 +896,8 @@ void Channel::ChangeTopicInternal(const Anope::string &user, const Anope::string
 
 	this->topic = newtopic;
 	this->topic_setter = u ? u->nick : user;
-	this->topic_time = ts;
+	this->topic_ts = ts;
+	this->topic_time = Anope::CurTime;
 
 	Log(LOG_DEBUG) << "Topic of " << this->name << " changed by " << (u ? u->nick : user) << " to " << newtopic;
 
@@ -912,9 +913,12 @@ void Channel::ChangeTopic(const Anope::string &user, const Anope::string &newtop
 
 	this->topic = newtopic;
 	this->topic_setter = u ? u->nick : user;
-	this->topic_time = ts;
+	this->topic_ts = ts;
 
 	ircdproto->SendTopic(this->ci->WhoSends(), this);
+
+	/* Now that the topic is set update the time set. This is *after* we set it so the protocol modules are able to tell the old last set time */
+	this->topic_time = Anope::CurTime;
 
 	FOREACH_MOD(I_OnTopicUpdated, OnTopicUpdated(this, user, this->topic));
 

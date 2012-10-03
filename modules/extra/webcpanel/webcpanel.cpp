@@ -189,7 +189,7 @@ namespace WebPanel
 		service_reference<Command> cmd("Command", c);
 		if (!cmd)
 		{
-			r["MESSAGSE"] = "Unable to find command " + c;
+			r["MESSAGES"] = "Unable to find command " + c;
 			return;
 		}
 

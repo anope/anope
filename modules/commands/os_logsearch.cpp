@@ -121,7 +121,7 @@ class CommandOSLogSearch : public Command
 		unsigned count = 0;
 		for (std::list<Anope::string>::iterator it = matches.begin(), it_end = matches.end(); it != it_end; ++it)
 			source.Reply("#%d: %s", ++count, it->c_str());
-		source.Reply(_("Showed %d/%d matches for \2%s\2"), replies, found, search_string.c_str());
+		source.Reply(_("Showed %d/%d matches for \2%s\2"), found, replies, search_string.c_str());
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
@@ -130,7 +130,7 @@ class CommandOSLogSearch : public Command
 		source.Reply(" ");
 		source.Reply(_("This command searches the Services logfiles for messages\n"
 				"that match the given pattern. The day and limit argument\n"
-				"may be used to specifcy how many days of logs to search\n"
+				"may be used to specify how many days of logs to search\n"
 				"and the number of replies to limit to. By default this\n"
 				"command searches one week of logs, and limits replies\n"
 				"to 50.\n"

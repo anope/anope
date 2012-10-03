@@ -455,6 +455,8 @@ class CoreExport ServerConfig
 	Anope::string CSRequire;
 	/* Use server side mlock */
 	bool UseServerSideMLock;
+	/* Use server side topic lock */
+	bool UseServerSideTopicLock;
 	/* Default botmodes on channels, defaults to ao */
 	Anope::string BotModes;
 	/* THe actual modes */

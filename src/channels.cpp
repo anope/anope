@@ -910,11 +910,11 @@ void Channel::ChangeTopic(const Anope::string &user, const Anope::string &newtop
 {
 	User *u = finduser(user);
 
-	ircdproto->SendTopic(this->ci->WhoSends(), this, newtopic, u ? u->nick : user, ts);
-
 	this->topic = newtopic;
 	this->topic_setter = u ? u->nick : user;
 	this->topic_time = ts;
+
+	ircdproto->SendTopic(this->ci->WhoSends(), this);
 
 	FOREACH_MOD(I_OnTopicUpdated, OnTopicUpdated(this, user, this->topic));
 

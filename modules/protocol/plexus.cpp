@@ -223,9 +223,9 @@ class PlexusProto : public IRCDProto
 		UplinkSocket::Message(Me) << "ENCAP * SU " << u->GetUID();
 	}
 
-	void SendTopic(BotInfo *bi, Channel *c, const Anope::string &topic, const Anope::string &setter, time_t &ts) anope_override
+	void SendTopic(BotInfo *bi, Channel *c) anope_override
 	{
-		UplinkSocket::Message(bi) << "ENCAP * TOPIC " << c->name << " " << setter << " " << ts << " :" << topic;
+		UplinkSocket::Message(bi) << "ENCAP * TOPIC " << c->name << " " << c->topic_setter << " " << c->topic_time + 1 << " :" << c->topic;
 	}
 
 	void SendChannel(Channel *c) anope_override

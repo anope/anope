@@ -67,7 +67,7 @@ class CoreExport IRCDProto
 	unsigned MaxModes;
 
 	virtual void SendSVSNOOP(const Server *, bool) { }
-	virtual void SendTopic(BotInfo *, Channel *, const Anope::string &, const Anope::string &, time_t &);
+	virtual void SendTopic(BotInfo *, Channel *);
 	virtual void SendVhostDel(User *) { }
 	virtual void SendAkill(User *, XLine *) = 0;
 	virtual void SendAkillDel(const XLine *) = 0;

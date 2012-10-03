@@ -92,14 +92,9 @@ class InspIRCdTS6Proto : public IRCDProto
 		UplinkSocket::Message(bi) << "GLINE " << x->Mask;
 	}
 
-	void SendTopic(BotInfo *bi, Channel *c, const Anope::string &topic, const Anope::string &setter, time_t &ts) anope_override
+	void SendTopic(BotInfo *whosets, Channel *c) anope_override
 	{
-		/* Preferably we want to set the topic with a TS in the past (when re-setting the topic on channel creation etc)
-		 * But if we have a previous topic and it is newer than the older TS we must bump the TS to now
-		 */
-		if (c->topic_time > ts)
-			ts = Anope::CurTime;
-		UplinkSocket::Message(bi) << "FTOPIC " << c->name << " " << ts << " " << setter << " :" << topic;
+		UplinkSocket::Message(whosets) << "FTOPIC " << c->name << " " << c->topic_time << " " << c->topic_setter << " :" << c->topic;
 	}
 
 	void SendVhostDel(User *u) anope_override

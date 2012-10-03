@@ -197,7 +197,7 @@ class RatboxProto : public IRCDProto
 		return true;
 	}
 
-	void SendTopic(BotInfo *bi, Channel *c, const Anope::string &topic, const Anope::string &setter, time_t &ts) anope_override
+	void SendTopic(BotInfo *bi, Channel *c) anope_override
 	{
 		bool needjoin = c->FindUser(bi) == NULL;
 		if (needjoin)
@@ -206,7 +206,7 @@ class RatboxProto : public IRCDProto
 			status.SetFlag(CMODE_OP);
 			bi->Join(c, &status);
 		}
-		IRCDProto::SendTopic(bi, c, topic, setter, ts);
+		IRCDProto::SendTopic(bi, c);
 		if (needjoin)
 			bi->Part(c);
 	}

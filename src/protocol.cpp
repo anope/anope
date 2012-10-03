@@ -119,9 +119,9 @@ void IRCDProto::SendNumericInternal(int numeric, const Anope::string &dest, cons
 	UplinkSocket::Message(Me) << n << " " << dest << " " << buf;
 }
 
-void IRCDProto::SendTopic(BotInfo *bi, Channel *c, const Anope::string &topic, const Anope::string &, time_t &)
+void IRCDProto::SendTopic(BotInfo *bi, Channel *c)
 {
-	UplinkSocket::Message(bi) << "TOPIC " << c->name << " :" << topic;
+	UplinkSocket::Message(bi) << "TOPIC " << c->name << " :" << c->topic;
 }
 
 void IRCDProto::SendSVSKill(const BotInfo *source, User *user, const char *fmt, ...)

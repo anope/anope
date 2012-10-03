@@ -84,7 +84,7 @@ struct CoreIRCDMessageQuit : IRCDMessage
 
 struct CoreIRCDMessageSQuit : IRCDMessage
 {
-	CoreIRCDMessageSQuit(const Anope::string &mname = "SQUIT") : IRCDMessage(mname, 1) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
+	CoreIRCDMessageSQuit(const Anope::string &mname = "SQUIT") : IRCDMessage(mname, 2) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
 
 	bool Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override;
 };

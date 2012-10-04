@@ -18,6 +18,7 @@ static bool has_chghostmod = false;
 static bool has_chgidentmod = false;
 static bool has_globopsmod = true; // Not a typo
 static bool has_rlinemod = false;
+static unsigned int spanningtree_proto_ver = 0;
 #include "inspircd-ts6.h"
 
 static bool has_servicesmod = false;
@@ -117,7 +118,10 @@ struct IRCDMessageCapab : IRCDMessage
 	{
 		if (params[0].equals_cs("START"))
 		{
-			if (params.size() < 2 || (Anope::string(params[1]).is_pos_number_only() ? convertTo<unsigned>(params[1]) : 0) < 1202)
+			if (params.size() >= 2)
+				spanningtree_proto_ver = (Anope::string(params[1]).is_pos_number_only() ? convertTo<unsigned>(params[1]) : 0);
+
+			if (spanningtree_proto_ver < 1202)
 			{
 				UplinkSocket::Message() << "ERROR :Protocol mismatch, no or invalid protocol version given in CAPAB START";
 				quitmsg = "Protocol mismatch, no or invalid protocol version given in CAPAB START";

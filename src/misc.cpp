@@ -773,7 +773,7 @@ void Anope::Unhex(const Anope::string &src, char *dest, size_t sz)
 	Anope::string d;
 	Anope::Unhex(src, d);
 
-	strncpy(dest, d.c_str(), sz);
+	memcpy(dest, d.c_str(), std::min(d.length() + 1, sz));
 }
 
 int Anope::LastErrorCode()

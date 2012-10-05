@@ -549,39 +549,49 @@ struct IRCDMessageMetadata : IRCDMessage
 
 	bool Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		if (params[1].equals_cs("accountname"))
+		if (isdigit(params[0][0]))
 		{
-			User *u = finduser(params[0]);
-			NickCore *nc = findcore(params[2]);
-			if (u && nc)
+			if (params[1].equals_cs("accountname"))
 			{
-				u->Login(nc);
+				User *u = finduser(params[0]);
+				NickCore *nc = findcore(params[2]);
+				if (u && nc)
+				{
+					u->Login(nc);
 
-				const NickAlias *user_na = findnick(u->nick);
-				if (!Config->NoNicknameOwnership && nickserv && user_na && user_na->nc == nc && user_na->nc->HasFlag(NI_UNCONFIRMED) == false)
-					u->SetMode(findbot(Config->NickServ), UMODE_REGISTERED);
+					const NickAlias *user_na = findnick(u->nick);
+					if (!Config->NoNicknameOwnership && nickserv && user_na && user_na->nc == nc && user_na->nc->HasFlag(NI_UNCONFIRMED) == false)
+						u->SetMode(findbot(Config->NickServ), UMODE_REGISTERED);
+				}
+			}
+
+			/*
+			 *   possible incoming ssl_cert messages:
+			 *   Received: :409 METADATA 409AAAAAA ssl_cert :vTrSe c38070ce96e41cc144ed6590a68d45a6 <...> <...>
+			 *   Received: :409 METADATA 409AAAAAC ssl_cert :vTrSE Could not get peer certificate: error:00000000:lib(0):func(0):reason(0)
+			 */
+			else if (params[1].equals_cs("ssl_cert"))
+			{
+				User *u = finduser(params[0]);
+				if (!u)
+					return true;
+				std::string data = params[2].c_str();
+				size_t pos1 = data.find(' ') + 1;
+				size_t pos2 = data.find(' ', pos1);
+				if ((pos2 - pos1) >= 32) // inspircd supports md5 and sha1 fingerprint hashes -> size 32 or 40 bytes.
+				{
+					u->fingerprint = data.substr(pos1, pos2 - pos1);
+					FOREACH_MOD(I_OnFingerprint, OnFingerprint(u));
+				}
 			}
 		}
-
-		/*
-		 *   possible incoming ssl_cert messages:
-		 *   Received: :409 METADATA 409AAAAAA ssl_cert :vTrSe c38070ce96e41cc144ed6590a68d45a6 <...> <...>
-		 *   Received: :409 METADATA 409AAAAAC ssl_cert :vTrSE Could not get peer certificate: error:00000000:lib(0):func(0):reason(0)
-		 */
-		else if (params[1].equals_cs("ssl_cert"))
+		else if (params[0][0] == '#')
 		{
-			User *u = finduser(params[0]);
-			if (!u)
-				return true;
-		 	std::string data = params[2].c_str();
-			size_t pos1 = data.find(' ') + 1;
-			size_t pos2 = data.find(' ', pos1);
-			if ((pos2 - pos1) >= 32) // inspircd supports md5 and sha1 fingerprint hashes -> size 32 or 40 bytes.
-			{
-				u->fingerprint = data.substr(pos1, pos2 - pos1);
-				FOREACH_MOD(I_OnFingerprint, OnFingerprint(u));
-			}
 		}
+		else if (params[0] == "*")
+		{
+		}
+
 		return true;
 	}
 };

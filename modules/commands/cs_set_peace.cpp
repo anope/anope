@@ -30,8 +30,12 @@ class CommandCSSetPeace : public Command
 			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
 			return;
 		}
+		EventReturn MOD_RESULT;
+		FOREACH_RESULT(I_OnSetChannelOption, OnSetChannelOption(source, this, ci, params[1]));
+		if (MOD_RESULT == EVENT_STOP)
+			return;
 
-		if (source.permission.empty() && !source.AccessFor(ci).HasPriv("SET"))
+		if (MOD_RESULT != EVENT_ALLOW && source.permission.empty() && !source.AccessFor(ci).HasPriv("SET"))
 		{
 			source.Reply(ACCESS_DENIED);
 			return;

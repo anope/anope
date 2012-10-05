@@ -32,6 +32,11 @@ class CommandNSSetLanguage : public Command
 		}
 		NickCore *nc = na->nc;
 
+		EventReturn MOD_RESULT;
+		FOREACH_RESULT(I_OnSetNickOption, OnSetNickOption(source, this, nc, param));
+		if (MOD_RESULT == EVENT_STOP)
+			return;
+
 		for (unsigned j = 0; j < languages.size(); ++j)
 		{
 			if (param == "en" || languages[j] == param)

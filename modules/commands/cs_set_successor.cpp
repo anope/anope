@@ -31,16 +31,24 @@ class CommandCSSetSuccessor : public Command
 			return;
 		}
 
-		if (source.permission.empty() && !source.AccessFor(ci).HasPriv("SET"))
-		{
-			source.Reply(ACCESS_DENIED);
+		EventReturn MOD_RESULT;
+		FOREACH_RESULT(I_OnSetChannelOption, OnSetChannelOption(source, this, ci, params[1]));
+		if (MOD_RESULT == EVENT_STOP)
 			return;
-		}
 
-		if (source.permission.empty() && ci->HasFlag(CI_SECUREFOUNDER) ? !source.IsFounder(ci) : !source.AccessFor(ci).HasPriv("FOUNDER"))
+		if (MOD_RESULT != EVENT_ALLOW && source.permission.empty())
 		{
-			source.Reply(ACCESS_DENIED);
-			return;
+			if (!source.AccessFor(ci).HasPriv("SET"))
+			{
+				source.Reply(ACCESS_DENIED);
+				return;
+			}
+
+			if (ci->HasFlag(CI_SECUREFOUNDER) ? !source.IsFounder(ci) : !source.AccessFor(ci).HasPriv("FOUNDER"))
+			{
+				source.Reply(ACCESS_DENIED);
+				return;
+			}
 		}
 
 		NickCore *nc;

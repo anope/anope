@@ -37,6 +37,11 @@ class CommandNSSetDisplay : public Command
 			return;
 		}
 
+		EventReturn MOD_RESULT;
+		FOREACH_RESULT(I_OnSetNickOption, OnSetNickOption(source, this, user_na->nc, param));
+		if (MOD_RESULT == EVENT_STOP)
+			return;
+
 		change_core_display(user_na->nc, na->nick);
 		source.Reply(NICK_SET_DISPLAY_CHANGED, user_na->nc->display.c_str());
 	}

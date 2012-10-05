@@ -38,6 +38,11 @@ class CommandNSSetMessage : public Command
 			return;
 		}
 
+		EventReturn MOD_RESULT;
+		FOREACH_RESULT(I_OnSetNickOption, OnSetNickOption(source, this, nc, param));
+		if (MOD_RESULT == EVENT_STOP)
+			return;
+
 		if (param.equals_ci("ON"))
 		{
 			nc->SetFlag(NI_MSG);

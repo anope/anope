@@ -931,6 +931,24 @@ class CoreExport Module : public Extensible
 	virtual void OnSerializableDestruct(Serializable *) { }
 	virtual void OnSerializePtrAssign(Serializable *) { }
 	virtual void OnSerializableUpdate(Serializable *) { }
+
+	/** Called when a chanserv/set command is used
+	 * @param source The source of the command
+	 * @param cmd The command
+	 * @param ci The channel the command was used on
+	 * @param setting The setting passed to the command. Probably ON/OFF.
+	 * @return EVENT_ALLOW to bypass access checks, EVENT_STOP to halt immediately.
+	 */
+	virtual EventReturn OnSetChannelOption(CommandSource &source, Command *cmd, ChannelInfo *ci, const Anope::string &setting) { return EVENT_CONTINUE; }
+
+	/** Called when a nickserv/set command is used.
+	 * @param source The source of the command
+	 * @param cmd The command
+	 * @param nc The nickcore being modifed
+	 * @param setting The setting passed to the command. Probably ON/OFF.
+	 * @return EVENT_STOP to halt immediately
+	 */
+	virtual EventReturn OnSetNickOption(CommandSource &source, Command *cmd, NickCore *nc, const Anope::string &setting) { return EVENT_CONTINUE; }
 };
 
 /** Implementation-specific flags which may be set in ModuleManager::Attach()
@@ -940,18 +958,15 @@ enum Implementation
 	I_BEGIN,
 		/* NickServ */
 		I_OnPreNickExpire, I_OnNickExpire, I_OnNickForbidden, I_OnNickGroup, I_OnNickLogout, I_OnNickIdentify, I_OnNickDrop,
-		I_OnNickRegister, I_OnNickSuspended, I_OnNickUnsuspended,
-		I_OnDelNick, I_OnDelCore, I_OnChangeCoreDisplay,
-		I_OnNickClearAccess, I_OnNickAddAccess, I_OnNickEraseAccess,
-		I_OnNickClearCert, I_OnNickAddCert, I_OnNickEraseCert,
-		I_OnNickInfo, I_OnCheckAuthentication,
-		I_OnNickUpdate,
+		I_OnNickRegister, I_OnNickSuspended, I_OnNickUnsuspended, I_OnDelNick, I_OnDelCore, I_OnChangeCoreDisplay,
+		I_OnNickClearAccess, I_OnNickAddAccess, I_OnNickEraseAccess, I_OnNickClearCert, I_OnNickAddCert, I_OnNickEraseCert,
+		I_OnNickInfo, I_OnCheckAuthentication, I_OnNickUpdate, I_OnSetNickOption,
 
 		/* ChanServ */
 		I_OnChanSuspend, I_OnChanDrop, I_OnPreChanExpire, I_OnChanExpire, I_OnAccessAdd,
 		I_OnAccessDel, I_OnAccessClear, I_OnLevelChange, I_OnChanRegistered, I_OnChanUnsuspend, I_OnCreateChan, I_OnDelChan, I_OnChannelCreate,
 		I_OnChannelDelete, I_OnAkickAdd, I_OnAkickDel, I_OnCheckKick, I_OnCheckModes,
-		I_OnChanInfo, I_OnCheckPriv, I_OnGroupCheckPriv,
+		I_OnChanInfo, I_OnCheckPriv, I_OnGroupCheckPriv, I_OnSetChannelOption,
 
 		/* BotServ */
 		I_OnBotJoin, I_OnBotKick, I_OnBotCreate, I_OnBotChange, I_OnBotDelete, I_OnBotAssign, I_OnBotUnAssign,

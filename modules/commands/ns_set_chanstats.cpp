@@ -30,6 +30,11 @@ class CommandNSSetChanstats : public Command
 			return;
 		}
 
+		EventReturn MOD_RESULT;
+		FOREACH_RESULT(I_OnSetNickOption, OnSetNickOption(source, this, na->nc, param));
+		if (MOD_RESULT == EVENT_STOP)
+			return;
+
 		if (param.equals_ci("ON"))
 		{
 			na->nc->SetFlag(NI_STATS);

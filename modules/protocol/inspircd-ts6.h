@@ -590,6 +590,48 @@ struct IRCDMessageMetadata : IRCDMessage
 		}
 		else if (params[0] == "*")
 		{
+			// Wed Oct  3 15:40:27 2012: S[14] O :20D METADATA * modules :-m_svstopic.so
+
+			if (params[1].equals_cs("modules") && !params[2].empty())
+			{
+				// only interested when it comes from our uplink
+				Server* server = source.GetServer();
+				if (!server || server->GetUplink() != Me)
+					return true;
+
+				bool plus = (params[2][0] == '+');
+				if (!plus && params[2][0] != '-')
+					return true;
+
+				bool required = false;
+				Anope::string module = params[2].substr(1);
+
+				if (module.equals_cs("m_services_account.so"))
+					required = true;
+				else if (module.equals_cs("m_hidechans.so"))
+					required = true;
+				else if (module.equals_cs("m_chghost.so"))
+					has_chghostmod = plus;
+				else if (module.equals_cs("m_chgident.so"))
+					has_chgidentmod = plus;
+				else if (module.equals_cs("m_svshold.so"))
+					ircdproto->CanSVSHold = plus;
+				else if (module.equals_cs("m_rline.so"))
+					has_rlinemod = plus;
+				else
+					return true;
+
+				if (required)
+				{
+					if (!plus)
+						Log() << "Warning: InspIRCd unloaded module " << module << ", Anope won't function correctly without it";
+				}
+				else
+				{
+					Log() << "InspIRCd " << (plus ? "loaded" : "unloaded") << " module " << module << ", adjusted functionality";
+				}
+
+			}
 		}
 
 		return true;

@@ -588,7 +588,7 @@ struct IRCDMessageMetadata : IRCDMessage
 
 struct IRCDMessageMode : IRCDMessage
 {
-	IRCDMessageMode() : IRCDMessage("MODE", 2) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); } 
+	IRCDMessageMode() : IRCDMessage("MODE", 2) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
 
 	bool Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
 	{
@@ -712,7 +712,7 @@ struct IRCDMessageTime : IRCDMessage
 struct IRCDMessageUID : IRCDMessage
 {
 	IRCDMessageUID() : IRCDMessage("UID", 8) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
-	
+
 	/*
 	 * [Nov 03 22:09:58.176252 2009] debug: Received: :964 UID 964AAAAAC 1225746297 w00t2 localhost testnet.user w00t 127.0.0.1 1225746302 +iosw +ACGJKLNOQcdfgjklnoqtx :Robin Burchell <w00t@inspircd.org>
 	 * 0: uid

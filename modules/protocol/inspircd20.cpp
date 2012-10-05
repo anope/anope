@@ -21,7 +21,6 @@ static bool has_rlinemod = false;
 #include "inspircd-ts6.h"
 
 static bool has_servicesmod = false;
-static bool has_svsholdmod = false;
 
 class InspIRCd20Proto : public InspIRCdTS6Proto
 {
@@ -128,9 +127,9 @@ struct IRCDMessageCapab : IRCDMessage
 
 			/* reset CAPAB */
 			has_servicesmod = false;
-			has_svsholdmod = false;
 			has_chghostmod = false;
 			has_chgidentmod = false;
+			ircdproto->CanSVSHold = false;
 		}
 		else if (params[0].equals_cs("CHANMODES") && params.size() > 1)
 		{
@@ -297,7 +296,7 @@ struct IRCDMessageCapab : IRCDMessage
 			while (ssep.GetToken(module))
 			{
 				if (module.equals_cs("m_svshold.so"))
-					has_svsholdmod = true;
+					ircdproto->CanSVSHold = true;
 				else if (module.find("m_rline.so") == 0)
 				{
 					has_rlinemod = true;
@@ -424,13 +423,12 @@ struct IRCDMessageCapab : IRCDMessage
 				quitting = true;
 				return false;
 			}
-			if (!has_svsholdmod)
+			if (!ircdproto->CanSVSHold)
 				Log() << "SVSHOLD missing, Usage disabled until module is loaded.";
 			if (!has_chghostmod)
 				Log() << "CHGHOST missing, Usage disabled until module is loaded.";
 			if (!has_chgidentmod)
 				Log() << "CHGIDENT missing, Usage disabled until module is loaded.";
-			ircdproto->CanSVSHold = has_svsholdmod;
 		}
 
 		return true;

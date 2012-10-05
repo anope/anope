@@ -15,7 +15,6 @@
 
 static bool has_servicesmod = false;
 static bool has_globopsmod = false;
-static bool has_svsholdmod = false;
 static bool has_chghostmod = false;
 static bool has_chgidentmod = false;
 static bool has_hidechansmod = false;
@@ -346,10 +345,10 @@ struct IRCDMessageCapab : IRCDMessage
 			/* reset CAPAB */
 			has_servicesmod = false;
 			has_globopsmod = false;
-			has_svsholdmod = false;
 			has_chghostmod = false;
 			has_chgidentmod = false;
 			has_hidechansmod = false;
+			ircdproto->CanSVSHold = false;
 		}
 		else if (params[0].equals_cs("MODULES") && params.size() > 1)
 		{
@@ -358,7 +357,7 @@ struct IRCDMessageCapab : IRCDMessage
 			if (params[1].find("m_services.so") != Anope::string::npos)
 			has_servicesmod = true;
 			if (params[1].find("m_svshold.so") != Anope::string::npos)
-				has_svsholdmod = true;
+				ircdproto->CanSVSHold = true;
 			if (params[1].find("m_chghost.so") != Anope::string::npos)
 				has_chghostmod = true;
 			if (params[1].find("m_chgident.so") != Anope::string::npos)
@@ -559,13 +558,12 @@ struct IRCDMessageCapab : IRCDMessage
 				quitting = true;
 				return false;
 			}
-			if (!has_svsholdmod)
+			if (!ircdproto->CanSVSHold)
 				Log() << "SVSHOLD missing, Usage disabled until module is loaded.";
 			if (!has_chghostmod)
 				Log() << "CHGHOST missing, Usage disabled until module is loaded.";
 			if (!has_chgidentmod)
 				Log() << "CHGIDENT missing, Usage disabled until module is loaded.";
-			ircdproto->CanSVSHold = has_svsholdmod;
 		}
 
 		return true;

@@ -121,7 +121,7 @@ class CommandOSLogSearch : public Command
 		unsigned count = 0;
 		for (std::list<Anope::string>::iterator it = matches.begin(), it_end = matches.end(); it != it_end; ++it)
 			source.Reply("#%d: %s", ++count, it->c_str());
-		source.Reply(_("Showed %d/%d matches for \2%s\2"), found, replies, search_string.c_str());
+		source.Reply(_("Showed %d/%d matches for \2%s\2"), replies, found, search_string.c_str());
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override

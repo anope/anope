@@ -538,7 +538,7 @@ class ProtoInspIRCd : public Module
 
 		Capab.insert("NOQUIT");
 
-		Implementation i[] = { I_OnUserNickChange, I_OnServerSync, I_OnChannelCreate, I_OnChanRegistered, I_OnDelChan, I_OnMLock, I_OnUnMLock };
+		Implementation i[] = { I_OnUserNickChange, I_OnServerSync, I_OnChannelCreate, I_OnChanRegistered, I_OnDelChan, I_OnMLock, I_OnUnMLock, I_OnSetChannelOption };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 
 		if (Config->Numeric.empty())
@@ -576,13 +576,13 @@ class ProtoInspIRCd : public Module
 
 	void OnChanRegistered(ChannelInfo *ci) anope_override
 	{
-		if (Config->UseServerSideMLock)
+		if (Config->UseServerSideMLock && ci->c)
 		{
 			Anope::string modes = ci->GetMLockAsString(false).replace_all_cs("+", "").replace_all_cs("-", "");
 			SendChannelMetadata(ci->c, "mlock", modes);
 		}
 
-		if (Config->UseServerSideTopicLock && has_svstopic_topiclock)
+		if (Config->UseServerSideTopicLock && has_svstopic_topiclock && ci->c)
 		{
 			Anope::string on = ci->HasFlag(CI_TOPICLOCK) ? "1" : "";
 			SendChannelMetadata(ci->c, "topiclock", on);
@@ -591,10 +591,10 @@ class ProtoInspIRCd : public Module
 
 	void OnDelChan(ChannelInfo *ci) anope_override
 	{
-		if (Config->UseServerSideMLock)
+		if (Config->UseServerSideMLock && ci->c)
 			SendChannelMetadata(ci->c, "mlock", "");
 
-		if (Config->UseServerSideTopicLock && has_svstopic_topiclock)
+		if (Config->UseServerSideTopicLock && has_svstopic_topiclock && ci->c)
 			SendChannelMetadata(ci->c, "topiclock", "");
 	}
 
@@ -618,6 +618,14 @@ class ProtoInspIRCd : public Module
 			Anope::string modes = ci->GetMLockAsString(false).replace_all_cs("+", "").replace_all_cs("-", "").replace_all_cs(cm->ModeChar, "");
 			SendChannelMetadata(ci->c, "mlock", modes);
 		}
+
+		return EVENT_CONTINUE;
+	}
+
+	EventReturn OnSetChannelOption(CommandSource &source, Command *cmd, ChannelInfo *ci, const Anope::string &setting) anope_override
+	{
+		if (cmd->name == "chanserv/set/topiclock" && ci->c)
+			SendChannelMetadata(ci->c, "topiclock", setting.equals_ci("ON") ? "1" : "");
 
 		return EVENT_CONTINUE;
 	}

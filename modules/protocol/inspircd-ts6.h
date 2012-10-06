@@ -96,7 +96,7 @@ class InspIRCdTS6Proto : public IRCDProto
 	{
 		if (has_svstopic_topiclock)
 		{
-			UplinkSocket::Message(Me) << "SVSTOPIC " << c->name << " " << c->topic_ts << " " << c->topic_setter << " :" << c->topic;
+			UplinkSocket::Message(c->ci->WhoSends()) << "SVSTOPIC " << c->name << " " << c->topic_ts << " " << c->topic_setter << " :" << c->topic;
 		}
 		else
 		{
@@ -521,7 +521,7 @@ struct IRCDMessageFTopic : IRCDMessage
 
 	bool Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		/* :source FTOPIC channel ts setby :topic */
+		/* :source FTOPIC channel topicts setby :topic */
 
 		Channel *c = findchan(params[0]);
 		if (c)

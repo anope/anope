@@ -18,6 +18,7 @@ static bool has_chghostmod = false;
 static bool has_chgidentmod = false;
 static bool has_globopsmod = true; // Not a typo
 static bool has_rlinemod = false;
+static bool has_svstopic_topiclock = false;
 static unsigned int spanningtree_proto_ver = 0;
 #include "inspircd-ts6.h"
 
@@ -521,6 +522,11 @@ class ProtoInspIRCd : public Module
 	IRCDMessageCapab message_capab;
 	IRCDMessageEncap message_encap;
 
+	void SendChannelMetadata(Channel *c, const Anope::string &metadataname, const Anope::string &value)
+	{
+		UplinkSocket::Message(Me) << "METADATA " << c->name << " " << metadataname << " :" << value;
+	}
+
  public:
 	ProtoInspIRCd(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PROTOCOL),
 		message_fhost("FHOST")
@@ -570,14 +576,14 @@ class ProtoInspIRCd : public Module
 		if (!Config->UseServerSideMLock)
 			return;
 		Anope::string modes = ci->GetMLockAsString(false).replace_all_cs("+", "").replace_all_cs("-", "");
-		UplinkSocket::Message(Me) << "METADATA " << ci->name << " mlock :" << modes;
+		SendChannelMetadata(ci->c, "mlock", modes);
 	}
 
 	void OnDelChan(ChannelInfo *ci) anope_override
 	{
 		if (!Config->UseServerSideMLock)
 			return;
-		UplinkSocket::Message(Me) << "METADATA " << ci->name << " mlock :";
+		SendChannelMetadata(ci->c, "mlock", "");
 	}
 
 	EventReturn OnMLock(ChannelInfo *ci, ModeLock *lock) anope_override
@@ -586,7 +592,7 @@ class ProtoInspIRCd : public Module
 		if (cm && ci->c && (cm->Type == MODE_REGULAR || cm->Type == MODE_PARAM) && Config->UseServerSideMLock)
 		{
 			Anope::string modes = ci->GetMLockAsString(false).replace_all_cs("+", "").replace_all_cs("-", "") + cm->ModeChar;
-			UplinkSocket::Message(Me) << "METADATA " << ci->name << " mlock :" << modes;
+			SendChannelMetadata(ci->c, "mlock", modes);
 		}
 
 		return EVENT_CONTINUE;
@@ -598,7 +604,7 @@ class ProtoInspIRCd : public Module
 		if (cm && ci->c && (cm->Type == MODE_REGULAR || cm->Type == MODE_PARAM) && Config->UseServerSideMLock)
 		{
 			Anope::string modes = ci->GetMLockAsString(false).replace_all_cs("+", "").replace_all_cs("-", "").replace_all_cs(cm->ModeChar, "");
-			UplinkSocket::Message(Me) << "METADATA " << ci->name << " mlock :" << modes;
+			SendChannelMetadata(ci->c, "mlock", modes);
 		}
 
 		return EVENT_CONTINUE;

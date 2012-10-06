@@ -225,7 +225,7 @@ bool CoreIRCDMessagePrivmsg::Run(MessageSource &source, const std::vector<Anope:
 			if (!bi)
 				return true;
 			Log(LOG_DEBUG) << "Ignored PRIVMSG without @ from " << u->nick;
-			u->SendMessage(bi, _("\"/msg %s\" is no longer supported.  Use \"/msg %s@%s\" or \"/%s\" instead."), receiver.c_str(), receiver.c_str(), Config->ServerName.c_str(), receiver.c_str());
+			u->SendMessage(bi, _("\"/msg %s\" is no longer supported.  Use \"/msg %s@%s\" or \"/%s\" instead."), bi->nick.c_str(), bi->nick.c_str(), Config->ServerName.c_str(), bi->nick.c_str());
 			return true;
 		}
 

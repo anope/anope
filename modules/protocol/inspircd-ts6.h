@@ -94,12 +94,19 @@ class InspIRCdTS6Proto : public IRCDProto
 
 	void SendTopic(BotInfo *whosets, Channel *c) anope_override
 	{
-		/* If the last time a topic was set is after the TS we want for this topic we must bump this topic's timestamp to now */
-		time_t ts = c->topic_ts;
-		if (c->topic_time > ts)
-			ts = Anope::CurTime;
-		/* But don't modify c->topic_ts, it should remain set to the real TS we want as ci->last_topic_time pulls from it */
-		UplinkSocket::Message(whosets) << "FTOPIC " << c->name << " " << ts << " " << c->topic_setter << " :" << c->topic;
+		if (has_svstopic_topiclock)
+		{
+			UplinkSocket::Message(Me) << "SVSTOPIC " << c->name << " " << c->topic_ts << " " << c->topic_setter << " :" << c->topic;
+		}
+		else
+		{
+			/* If the last time a topic was set is after the TS we want for this topic we must bump this topic's timestamp to now */
+			time_t ts = c->topic_ts;
+			if (c->topic_time > ts)
+				ts = Anope::CurTime;
+			/* But don't modify c->topic_ts, it should remain set to the real TS we want as ci->last_topic_time pulls from it */
+			UplinkSocket::Message(whosets) << "FTOPIC " << c->name << " " << ts << " " << c->topic_setter << " :" << c->topic;
+		}
 	}
 
 	void SendVhostDel(User *u) anope_override
@@ -618,6 +625,8 @@ struct IRCDMessageMetadata : IRCDMessage
 					ircdproto->CanSVSHold = plus;
 				else if (module.equals_cs("m_rline.so"))
 					has_rlinemod = plus;
+				else if (module.equals_cs("m_topiclock.so"))
+					has_svstopic_topiclock = plus;
 				else
 					return true;
 

@@ -18,6 +18,7 @@ static bool has_globopsmod = false;
 static bool has_chghostmod = false;
 static bool has_chgidentmod = false;
 static bool has_rlinemod = false;
+static bool has_svstopic_topiclock = false;
 static unsigned int spanningtree_proto_ver = 1201;
 #include "inspircd-ts6.h"
 

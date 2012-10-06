@@ -134,6 +134,7 @@ struct IRCDMessageCapab : IRCDMessage
 			has_servicesmod = false;
 			has_chghostmod = false;
 			has_chgidentmod = false;
+			has_svstopic_topiclock = false;
 			ircdproto->CanSVSHold = false;
 		}
 		else if (params[0].equals_cs("CHANMODES") && params.size() > 1)
@@ -308,6 +309,8 @@ struct IRCDMessageCapab : IRCDMessage
 					if (!Config->RegexEngine.empty() && module.length() > 11 && Config->RegexEngine != module.substr(11))
 						Log() << "Warning: InspIRCd is using regex engine " << module.substr(11) << ", but we have " << Config->RegexEngine << ". This may cause inconsistencies.";
 				}
+				else if (module.equals_cs("m_topiclock.so"))
+					has_svstopic_topiclock = true;
 			}
 		}
 		else if (params[0].equals_cs("MODSUPPORT") && params.size() > 1)

@@ -570,23 +570,32 @@ class ProtoInspIRCd : public Module
 
 	void OnChannelCreate(Channel *c) anope_override
 	{
-		if (c->ci && Config->UseServerSideMLock)
+		if (c->ci && (Config->UseServerSideMLock || Config->UseServerSideTopicLock))
 			this->OnChanRegistered(c->ci);
 	}
 
 	void OnChanRegistered(ChannelInfo *ci) anope_override
 	{
-		if (!Config->UseServerSideMLock)
-			return;
-		Anope::string modes = ci->GetMLockAsString(false).replace_all_cs("+", "").replace_all_cs("-", "");
-		SendChannelMetadata(ci->c, "mlock", modes);
+		if (Config->UseServerSideMLock)
+		{
+			Anope::string modes = ci->GetMLockAsString(false).replace_all_cs("+", "").replace_all_cs("-", "");
+			SendChannelMetadata(ci->c, "mlock", modes);
+		}
+
+		if (Config->UseServerSideTopicLock && has_svstopic_topiclock)
+		{
+			Anope::string on = ci->HasFlag(CI_TOPICLOCK) ? "1" : "";
+			SendChannelMetadata(ci->c, "topiclock", on);
+		}
 	}
 
 	void OnDelChan(ChannelInfo *ci) anope_override
 	{
-		if (!Config->UseServerSideMLock)
-			return;
-		SendChannelMetadata(ci->c, "mlock", "");
+		if (Config->UseServerSideMLock)
+			SendChannelMetadata(ci->c, "mlock", "");
+
+		if (Config->UseServerSideTopicLock && has_svstopic_topiclock)
+			SendChannelMetadata(ci->c, "topiclock", "");
 	}
 
 	EventReturn OnMLock(ChannelInfo *ci, ModeLock *lock) anope_override

@@ -47,6 +47,18 @@ class InspIRCdTS6Proto : public IRCDProto
 			UplinkSocket::Message(Me) << "CHGHOST " << nick << " " << vhost;
 	}
 
+	void SendAddLine(const Anope::string &type, const Anope::string &mask, time_t duration, const Anope::string &addedby, const Anope::string &reason)
+	{
+		const BotInfo *bi = findbot(Config->OperServ);
+		UplinkSocket::Message(bi) << "ADDLINE " << type << " " << mask << " " << addedby << " " << Anope::CurTime << " " << duration << " :" << reason;
+	}
+
+	void SendDelLine(const Anope::string &type, const Anope::string &mask)
+	{
+		const BotInfo *bi = findbot(Config->OperServ);
+		UplinkSocket::Message(bi) << "DELLINE " << type << " " << mask;
+	}
+
  protected:
 	InspIRCdTS6Proto(const Anope::string &name) : IRCDProto(name)
 	{
@@ -83,13 +95,13 @@ class InspIRCdTS6Proto : public IRCDProto
 			size_t h = x->Mask.find('#');
 			if (h != Anope::string::npos)
 				mask = mask.replace(h, 1, ' ');
-			UplinkSocket::Message(bi) << "RLINE " << mask;
+			SendDelLine("R", mask);
 			return;
 		}
 		else if (x->IsRegex() || x->HasNickOrReal())
 			return;
 
-		UplinkSocket::Message(bi) << "GLINE " << x->Mask;
+		SendDelLine("G", x->mask);
 	}
 
 	void SendTopic(BotInfo *whosets, Channel *c) anope_override
@@ -135,7 +147,7 @@ class InspIRCdTS6Proto : public IRCDProto
 			size_t h = x->Mask.find('#');
 			if (h != Anope::string::npos)
 				mask = mask.replace(h, 1, ' ');
-			UplinkSocket::Message(bi) << "RLINE " << mask << " " << timeleft << " :" << x->GetReason();
+			SendAddLineOperserv("R", mask, timeleft, x->By, x->GetReason());
 			return;
 		}
 		else if (x->IsRegex() || x->HasNickOrReal())
@@ -172,8 +184,7 @@ class InspIRCdTS6Proto : public IRCDProto
 			}
 		}
 		catch (const SocketException &) { }
-
-		UplinkSocket::Message(bi) << "ADDLINE G " << x->GetUser() << "@" << x->GetHost() << " " << x->By << " " << Anope::CurTime << " " << timeleft << " :" << x->GetReason();
+		SendAddLine("G", x->GetUser() + "@" + x->GetHost(), timeleft, x->By, x->GetReason());
 	}
 
 	void SendNumericInternal(int numeric, const Anope::string &dest, const Anope::string &buf) anope_override
@@ -232,7 +243,7 @@ class InspIRCdTS6Proto : public IRCDProto
 	/* UNSQLINE */
 	void SendSQLineDel(const XLine *x) anope_override
 	{
-		UplinkSocket::Message(Me) << "DELLINE Q " << x->Mask;
+		SendDelLine("Q", x->Mask);
 	}
 
 	/* SQLINE */
@@ -242,7 +253,7 @@ class InspIRCdTS6Proto : public IRCDProto
 		time_t timeleft = x->Expires - Anope::CurTime;
 		if (timeleft > 172800 || !x->Expires)
 			timeleft = 172800;
-		UplinkSocket::Message(Me) << "ADDLINE Q " << x->Mask << " " << Config->OperServ << " " << Anope::CurTime << " " << timeleft << " :" << x->GetReason();
+		SendAddLine("Q", x->Mask, timeleft, x->By, x->GetReason());
 	}
 
 	/* Functions that use serval cmd functions */
@@ -282,7 +293,7 @@ class InspIRCdTS6Proto : public IRCDProto
 	/* UNSZLINE */
 	void SendSZLineDel(const XLine *x) anope_override
 	{
-		UplinkSocket::Message(Me) << "DELLINE Z " << x->GetHost();
+		SendDelLine("Z", x->GetHost());
 	}
 
 	/* SZLINE */
@@ -292,7 +303,7 @@ class InspIRCdTS6Proto : public IRCDProto
 		time_t timeleft = x->Expires - Anope::CurTime;
 		if (timeleft > 172800 || !x->Expires)
 			timeleft = 172800;
-		UplinkSocket::Message(Me) << "ADDLINE Z " << x->GetHost() << " " << x->By << " " << Anope::CurTime << " " << timeleft <<" :" << x->GetReason();
+		SendAddLine("Z", x->GetHost(), timeleft, x->By, x->GetReason());
 	}
 
 	void SendSVSJoin(const BotInfo *source, const Anope::string &nick, const Anope::string &chan, const Anope::string &) anope_override

@@ -35,12 +35,12 @@ Anope Mutli Language Support
     want translated (messages to the user, etc).
 
     If you want to translate a module someone has made, first generate a .pot file if there isn't one already using
-    `xgettext -s -d modulename -o modulename.pot --from-code=utf-8 modulename.cpp`.
+    `xgettext -s -d modulename -o modulename.pot --from-code=utf-8 --keyword --keyword=_ modulename.cpp`.
     The .pot file is a template of all of the language strings extracted from the source file.
 
     Next, run msginit on the .pot file with
     `msginit -l language -o modulename.language.po -i modulename.pot`.
     Translate the new .po file and rerun ./Config; make && make install.
 
-    All .po and .pot files should be placed in modules/language/third. Additionally an update script is provided there
+    All .po and .pot files should be placed in modules/third/language. Additionally an update script is provided there
     that will create .pot files and merge any changes to it with existing .po files.

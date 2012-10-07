@@ -61,6 +61,7 @@ class CommandNSIdentify : public Command
 				Log(LOG_COMMAND, source, this) << "and identified for account " << na->nc->display;
 				source.Reply(_("Password accepted - you are now recognized."));
 				u->Identify(na);
+				na->Release();
 			}
 		}
 		return;

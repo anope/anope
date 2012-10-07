@@ -437,6 +437,8 @@ struct IRCDMessageCapab : IRCDMessage
 				Log() << "CHGHOST missing, Usage disabled until module is loaded.";
 			if (!has_chgidentmod)
 				Log() << "CHGIDENT missing, Usage disabled until module is loaded.";
+			if ((!has_svstopic_topiclock) && (Config->UseServerSideTopicLock))
+				Log() << "m_topiclock missing, server side topic locking disabled until module is loaded.";
 		}
 
 		return true;

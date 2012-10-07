@@ -86,8 +86,6 @@ class InspIRCdTS6Proto : public IRCDProto
 
 	void SendAkillDel(const XLine *x) anope_override
 	{
-		const BotInfo *bi = findbot(Config->OperServ);
-
 		/* InspIRCd may support regex bans */
 		if (x->IsRegex() && has_rlinemod)
 		{
@@ -101,7 +99,7 @@ class InspIRCdTS6Proto : public IRCDProto
 		else if (x->IsRegex() || x->HasNickOrReal())
 			return;
 
-		SendDelLine("G", x->mask);
+		SendDelLine("G", x->Mask);
 	}
 
 	void SendTopic(BotInfo *whosets, Channel *c) anope_override
@@ -147,7 +145,7 @@ class InspIRCdTS6Proto : public IRCDProto
 			size_t h = x->Mask.find('#');
 			if (h != Anope::string::npos)
 				mask = mask.replace(h, 1, ' ');
-			SendAddLineOperserv("R", mask, timeleft, x->By, x->GetReason());
+			SendAddLine("R", mask, timeleft, x->By, x->GetReason());
 			return;
 		}
 		else if (x->IsRegex() || x->HasNickOrReal())

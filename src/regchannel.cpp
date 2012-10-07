@@ -235,7 +235,6 @@ ChannelInfo::ChannelInfo(const Anope::string &chname) : Flags<ChannelInfoFlag, C
 
 	this->founder = NULL;
 	this->successor = NULL;
-	this->last_topic_time = 0;
 	this->c = findchan(chname);
 	if (this->c)
 		this->c->ci = this;
@@ -243,6 +242,9 @@ ChannelInfo::ChannelInfo(const Anope::string &chname) : Flags<ChannelInfoFlag, C
 	this->floodlines = this->floodsecs = 0;
 	this->repeattimes = 0;
 	this->bi = NULL;
+
+	this->last_topic_setter = Config->ChanServ;
+	this->last_topic_time = Anope::CurTime;
 
 	this->name = chname;
 

@@ -33,7 +33,7 @@ Module::Module(const Anope::string &modname, const Anope::string &, ModType modt
 
 #if GETTEXT_FOUND
 	for (unsigned i = 0; i < languages.size(); ++i)
-		if (IsFile("languages/" + languages[i] + "/LC_MESSAGES/" + modname + ".mo"))
+		if (IsFile(locale_dir + "/" + languages[i] + "/LC_MESSAGES/" + modname + ".mo"))
 		{
 			if (!bindtextdomain(this->name.c_str(), locale_dir.c_str()))
 				Log() << "Error calling bindtextdomain, " << Anope::LastError();

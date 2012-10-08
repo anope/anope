@@ -15,9 +15,8 @@
 
 class BotServCore : public Module
 {
-	Channel *fantasy_channel;
  public:
-	BotServCore(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE), fantasy_channel(NULL)
+	BotServCore(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
 	{
 		this->SetAuthor("Anope");
 
@@ -25,7 +24,7 @@ class BotServCore : public Module
 		if (BotServ == NULL)
 			throw ModuleException("No bot named " + Config->BotServ);
 
-		Implementation i[] = { I_OnPrivmsg, I_OnPreCommand, I_OnJoinChannel, I_OnLeaveChannel,
+		Implementation i[] = { I_OnPrivmsg, I_OnJoinChannel, I_OnLeaveChannel,
 					I_OnPreHelp, I_OnPostHelp, I_OnChannelModeSet };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 
@@ -44,7 +43,6 @@ class BotServCore : public Module
 			ctcp.erase(ctcp.length() - 1);
 			ircdproto->SendCTCP(c->ci->bi, u->nick, "%s", ctcp.c_str());
 		}
-
 
 		Anope::string realbuf = msg;
 
@@ -66,58 +64,88 @@ class BotServCore : public Module
 			if (!Config->BSFantasyCharacter.empty())
 				realbuf.erase(realbuf.begin());
 
-			size_t space = realbuf.find(' ');
-			Anope::string command, rest;
-			if (space == Anope::string::npos)
-				command = realbuf;
-			else
+			std::vector<Anope::string> params = BuildStringVector(realbuf);
+
+			ServerConfig::fantasy_map::const_iterator it = Config->Fantasy.end();
+			unsigned count = 0;
+			for (unsigned max = params.size(); it == Config->Fantasy.end() && max > 0; --max)
 			{
-				command = realbuf.substr(0, space);
-				rest = realbuf.substr(space + 1);
+				Anope::string full_command;
+				for (unsigned i = 0; i < max; ++i)
+					full_command += " " + params[i];
+				full_command.erase(full_command.begin());
+
+				++count;
+				it = Config->Fantasy.find(full_command);
 			}
 
-			if (c->ci->AccessFor(u).HasPriv("FANTASIA"))
-			{
-				FOREACH_MOD(I_OnBotFantasy, OnBotFantasy(command, u, c->ci, rest));
-			}
-			else
-			{
-				FOREACH_MOD(I_OnBotNoFantasyAccess, OnBotNoFantasyAccess(command, u, c->ci, rest));
-			}
-
-			BotInfo *bi = findbot(Config->ChanServ);
-			if (bi == NULL)
-				bi = findbot(Config->BotServ);
-			if (bi == NULL || !bi->commands.count(command))
+			if (it == Config->Fantasy.end())
 				return;
 
+			const CommandInfo &info = it->second;
+			service_reference<Command> cmd("Command", info.name);
+			if (!cmd)
+			{
+				Log(LOG_DEBUG) << "Fantasy command " << it->first << " exists for nonexistant service " << info.name << "!";
+				return;
+			}
+
+			for (unsigned i = 0, j = params.size() - (count - 1); i < j; ++i)
+				params.erase(params.begin());
+
+			while (cmd->MaxParams > 0 && params.size() > cmd->MaxParams)
+			{
+				params[cmd->MaxParams - 1] += " " + params[cmd->MaxParams];
+				params.erase(params.begin() + cmd->MaxParams);
+			}
+
+			/* All ChanServ commands take the channel as a first parameter */
+			if (cmd->name.find("chanserv/") == 0)
+				params.insert(params.begin(), c->ci->name);
+
+			// Command requires registered users only
+			if (!cmd->HasFlag(CFLAG_ALLOW_UNREGISTERED) && !u->Account())
+				return;
+
+			if (params.size() < cmd->MinParams)
+				return;
+
+			CommandSource source(u->nick, u, u->Account(), u);
+			source.c = c;
+			source.owner = c->ci->bi;
+			source.service = c->ci->bi;
+			source.command = it->first;
+			source.permission = info.permission;
+
+			EventReturn MOD_RESULT;
 			if (c->ci->AccessFor(u).HasPriv("FANTASIA"))
 			{
-				this->fantasy_channel = c;
-				bi->OnMessage(u, realbuf);
-				this->fantasy_channel = NULL;
+				FOREACH_RESULT(I_OnBotFantasy, OnBotFantasy(source, cmd, c->ci, params));
 			}
-		}
-	}
-
-	EventReturn OnPreCommand(CommandSource &source, Command *command, std::vector<Anope::string> &params) anope_override
-	{
-		if (this->fantasy_channel != NULL)
-		{
-			if (!command->HasFlag(CFLAG_STRIP_CHANNEL))
+			else
 			{
-				params.insert(params.begin(), this->fantasy_channel->name);
-				if (command->MaxParams && params.size() > command->MaxParams)
-				{
-					params[params.size() - 2] += " " + params[params.size() - 1];
-					params.erase(params.end() - 1);
-				}
+				FOREACH_RESULT(I_OnBotNoFantasyAccess, OnBotNoFantasyAccess(source, cmd, c->ci, params));
 			}
-			source.c = this->fantasy_channel;
-			source.service = this->fantasy_channel->ci->WhoSends();
-		}
 
-		return EVENT_CONTINUE;
+			if (MOD_RESULT == EVENT_STOP || !c->ci->AccessFor(u).HasPriv("FANTASIA"))
+				return;
+
+			if (MOD_RESULT != EVENT_ALLOW && !info.permission.empty() && !source.HasCommand(info.permission))
+				return;
+
+			FOREACH_RESULT(I_OnPreCommand, OnPreCommand(source, cmd, params));
+			if (MOD_RESULT == EVENT_STOP)
+				return;
+
+			dynamic_reference<User> user_reference(u);
+			dynamic_reference<NickCore> nc_reference(u->Account());
+			cmd->Execute(source, params);
+
+			if (user_reference && nc_reference)
+			{
+				FOREACH_MOD(I_OnPostCommand, OnPostCommand(source, cmd, params));
+			}
+		}
 	}
 
 	void OnJoinChannel(User *user, Channel *c) anope_override

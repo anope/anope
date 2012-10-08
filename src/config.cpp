@@ -890,6 +890,8 @@ static bool DoneCommands(ServerConfig *config, const Anope::string &)
 	return true;
 }
 
+/*************************************************************************/
+
 static bool InitPrivileges(ServerConfig *config, const Anope::string &)
 {
 	PrivilegeManager::ClearPrivileges();
@@ -1035,6 +1037,30 @@ static bool DoneServices(ServerConfig *config, const Anope::string &)
 			bi->destroy();
 	}
 	services.clear();
+	return true;
+}
+
+/*************************************************************************/
+
+static bool InitFantasy(ServerConfig *config, const Anope::string &)
+{
+	config->Fantasy.clear();
+	return true;
+}
+
+static bool DoFantasy(ServerConfig *config, const Anope::string &, const Anope::string *, ValueList &values, int *)
+{
+	Anope::string name = values[0].GetValue();
+	Anope::string service = values[1].GetValue();
+	Anope::string permission = values[2].GetValue();
+
+	config->Fantasy[name].name = service;
+	config->Fantasy[name].permission = permission;
+	return true;
+}
+
+static bool DoneFantasy(ServerConfig *config, const Anope::string &)
+{
 	return true;
 }
 
@@ -1359,6 +1385,11 @@ ConfigItems::ConfigItems(ServerConfig *conf)
 			{"", "", "", ""},
 			{DT_STRING, DT_STRING, DT_INTEGER, DT_STRING},
 			InitPrivileges, DoPrivileges, DonePrivileges},
+		{"fantasy",
+			{"name", "command", "permission", ""},
+			{"", "", "", ""},
+			{DT_STRING, DT_STRING, DT_STRING},
+			InitFantasy, DoFantasy, DoneFantasy},
 		{"",
 			{""},
 			{""},

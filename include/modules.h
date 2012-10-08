@@ -348,20 +348,22 @@ class CoreExport Module : public Extensible
 	virtual EventReturn OnDecrypt(const Anope::string &hashm, const Anope::string &src, Anope::string &dest) { return EVENT_CONTINUE; }
 
 	/** Called on fantasy command
-	 * @param command The command
-	 * @param u The user using the command
+	 * @param source The source of the command
+	 * @param c The command
 	 * @param ci The channel it's being used in
 	 * @param params The params
+	 * @return EVENT_STOP to halt processing and not run the command, EVENT_ALLOW to allow the command to be executed
 	 */
-	virtual void OnBotFantasy(const Anope::string &command, User *u, ChannelInfo *ci, const Anope::string &params) { }
+	virtual EventReturn OnBotFantasy(CommandSource &source, Command *c, ChannelInfo *ci, const std::vector<Anope::string> &params) { return EVENT_CONTINUE; }
 
 	/** Called on fantasy command without access
-	 * @param command The command
-	 * @param u The user using the command
+	 * @param source The source of the command
+	 * @param c The command
 	 * @param ci The channel it's being used in
 	 * @param params The params
+	 * @return EVENT_STOP to halt processing and not run the command, EVENT_ALLOW to allow the command to be executed
 	 */
-	virtual void OnBotNoFantasyAccess(const Anope::string &command, User *u, ChannelInfo *ci, const Anope::string &params) { }
+	virtual EventReturn OnBotNoFantasyAccess(CommandSource &source, Command *c, ChannelInfo *ci, const std::vector<Anope::string> &params) { return EVENT_CONTINUE; }
 
 	/** Called after a bot joins a channel
 	 * @param c The channel

@@ -239,7 +239,6 @@ void RunCommand(CommandSource &source, const Anope::string &message)
 	if (MOD_RESULT == EVENT_STOP)
 		return;
 
-
 	if (params.size() < c->MinParams)
 	{
 		c->OnSyntaxError(source, !params.empty() ? params[params.size() - 1] : "");

@@ -688,6 +688,10 @@ class CoreExport ServerConfig
 	std::list<OperType *> MyOperTypes;
 	/* List of pairs of opers and their opertype from the config */
 	std::vector<Oper *> Opers;
+
+	/* Map of fantasy commands */
+	typedef Anope::insensitive_map<CommandInfo> fantasy_map;
+	fantasy_map Fantasy;
 };
 
 /** This class can be used on its own to represent an exception, or derived to represent a module-specific exception.

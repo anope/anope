@@ -239,5 +239,6 @@ void TemplateFileServer::Serve(HTTPProvider *server, const Anope::string &page_n
 	}
 
 	reply.Write(finished);
+	return;
 }
 

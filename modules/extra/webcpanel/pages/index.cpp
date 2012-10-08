@@ -7,7 +7,75 @@
 
 #include "../webcpanel.h"
 
-void WebCPanel::Index::OnRequest(HTTPProvider *server, const Anope::string &page_name, HTTPClient *client, HTTPMessage &message, HTTPReply &reply)
+class WebpanelRequest : public IdentifyRequest
+{
+	HTTPReply reply;
+	HTTPMessage message;
+	dynamic_reference<HTTPProvider> server;
+	Anope::string page_name;
+	dynamic_reference<HTTPClient> client;
+	TemplateFileServer::Replacements replacements;
+
+ public:
+	WebpanelRequest(HTTPReply &r, HTTPMessage &m, HTTPProvider *s, const Anope::string &p_n, HTTPClient *c, TemplateFileServer::Replacements &re, const Anope::string &user, const Anope::string &pass) : IdentifyRequest(user, pass), reply(r), message(m), server(s), page_name(p_n), client(c), replacements(re) { }
+
+	void OnSuccess() anope_override
+	{
+		if (!client)
+			return;
+		NickAlias *na = findnick(this->GetAccount());
+		if (!na)
+		{
+			this->OnFail();
+			return;
+		}
+
+		Anope::string id;
+		for (int i = 0; i < 64; ++i)
+		{
+			char c;
+			do
+				c = 48 + (rand() % 75);
+			while (!isalnum(c));
+			id += c;
+		}
+
+		na->Extend("webcpanel_id", new ExtensibleItemClass<Anope::string>(id));
+		na->Extend("webcpanel_ip", new ExtensibleItemClass<Anope::string>(client->GetIP()));
+
+		{
+			HTTPReply::cookie c;
+			c.push_back(std::make_pair("account", na->nick));
+			c.push_back(std::make_pair("Path", "/"));
+			reply.cookies.push_back(c);
+		}
+
+		{			
+			HTTPReply::cookie c;
+			c.push_back(std::make_pair("id", id));
+			c.push_back(std::make_pair("Path", "/"));
+			reply.cookies.push_back(c);
+		}
+
+		reply.error = HTTP_FOUND;
+		reply.headers["Location"] = "http://" + message.headers["Host"] + "/nickserv/info";
+
+		client->SendReply(&reply);
+	}
+
+	void OnFail() anope_override
+	{
+		if (!client)
+			return;
+		replacements["INVALID_LOGIN"] = "Invalid username or password";
+		TemplateFileServer page("login.html");
+		page.Serve(server, page_name, client, message, reply, replacements);
+
+		client->SendReply(&reply);
+	}
+};
+
+bool WebCPanel::Index::OnRequest(HTTPProvider *server, const Anope::string &page_name, HTTPClient *client, HTTPMessage &message, HTTPReply &reply)
 {
 	TemplateFileServer::Replacements replacements;
 	const Anope::string &user = message.post_data["username"], &pass = message.post_data["password"];
@@ -18,56 +86,14 @@ void WebCPanel::Index::OnRequest(HTTPProvider *server, const Anope::string &page
 	{
 		// Rate limit check.
 
-		NickAlias *na = findnick(user);
-
-		EventReturn MOD_RESULT = EVENT_CONTINUE;
-
-		if (na)
-		{
-			FOREACH_RESULT(I_OnCheckAuthentication, OnCheckAuthentication(NULL, NULL, std::vector<Anope::string>(), na->nc->display, pass));
-		}
-
-		if (MOD_RESULT == EVENT_ALLOW)
-		{
-			Anope::string id;
-			for (int i = 0; i < 64; ++i)
-			{
-				char c;
-				do
-					c = 48 + (rand() % 75);
-				while (!isalnum(c));
-				id += c;
-			}
-
-			na->Extend("webcpanel_id", new ExtensibleItemClass<Anope::string>(id));
-			na->Extend("webcpanel_ip", new ExtensibleItemClass<Anope::string>(client->GetIP()));
-
-			{
-				HTTPReply::cookie c;
-				c.push_back(std::make_pair("account", na->nick));
-				c.push_back(std::make_pair("Path", "/"));
-				reply.cookies.push_back(c);
-			}
-
-			{
-				HTTPReply::cookie c;
-				c.push_back(std::make_pair("id", id));
-				c.push_back(std::make_pair("Path", "/"));
-				reply.cookies.push_back(c);
-			}
-
-			reply.error = HTTP_FOUND;
-			reply.headers["Location"] = "http://" + message.headers["Host"] + "/nickserv/info";
-			return;
-		}
-		else
-		{
-			replacements["INVALID_LOGIN"] = "Invalid username or password";
-		}
+		WebpanelRequest *req = new WebpanelRequest(reply, message, server, page_name, client, replacements, user, pass);
+		FOREACH_MOD(I_OnCheckAuthentication, OnCheckAuthentication(NULL, req));
+		req->Dispatch();
+		return false;
 	}
 
 	TemplateFileServer page("login.html");
-
 	page.Serve(server, page_name, client, message, reply, replacements);
+	return true;
 }
 

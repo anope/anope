@@ -304,7 +304,39 @@ class CoreExport NickCore : public Extensible, public Flags<NickCoreFlag, NI_END
 	 * Deletes all the memory allocated in the certificate list vector and then clears the vector.
 	 */
 	void ClearCert();
+};
 
+class IdentifyRequest
+{
+	Anope::string account;
+	Anope::string password;
+
+	std::set<Module *> holds;
+	bool dispatched;
+	bool success;
+	
+	static std::set<IdentifyRequest *> requests;
+
+ protected:
+	IdentifyRequest(const Anope::string &acc, const Anope::string &pass);
+	virtual ~IdentifyRequest();
+
+ public:
+	virtual void OnSuccess() = 0;
+	virtual void OnFail() = 0;
+
+	const Anope::string &GetAccount() const { return account; }
+	const Anope::string &GetPassword() const { return password; }
+
+	/* Hold this request. Once held it must be Release()d later on */
+	void Hold(Module *m);
+	void Release(Module *m);
+
+	void Success(Module *m);
+
+	void Dispatch();
+
+	static void ModuleUnload(Module *m);
 };
 
 extern CoreExport void change_core_display(NickCore *nc);

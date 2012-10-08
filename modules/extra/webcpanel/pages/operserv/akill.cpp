@@ -11,7 +11,7 @@ WebCPanel::OperServ::Akill::Akill(const Anope::string &cat, const Anope::string 
 {
 }
 
-void WebCPanel::OperServ::Akill::OnRequest(HTTPProvider *server, const Anope::string &page_name, HTTPClient *client, HTTPMessage &message, HTTPReply &reply, NickAlias *na, TemplateFileServer::Replacements &replacements)
+bool WebCPanel::OperServ::Akill::OnRequest(HTTPProvider *server, const Anope::string &page_name, HTTPClient *client, HTTPMessage &message, HTTPReply &reply, NickAlias *na, TemplateFileServer::Replacements &replacements)
 {
 
 	static service_reference<XLineManager> akills("XLineManager","xlinemanager/sgline");
@@ -59,5 +59,6 @@ void WebCPanel::OperServ::Akill::OnRequest(HTTPProvider *server, const Anope::st
 
 	TemplateFileServer page("operserv/akill.html");
 	page.Serve(server, page_name, client, message, reply, replacements);
+	return true;
 }
 

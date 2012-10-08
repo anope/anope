@@ -26,6 +26,7 @@ class ConnectionSocket;
 class DNSPacket;
 class dynamic_reference_base;
 class Entry;
+class IdentifyRequest;
 class InfoFormatter;
 class ListenSocket;
 class Log;

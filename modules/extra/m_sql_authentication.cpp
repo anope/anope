@@ -1,71 +1,71 @@
 #include "module.h"
 #include "sql.h"
 
+static Module *me;
+
 class SQLAuthenticationResult : public SQLInterface
 {
-	dynamic_reference<Command> cmd;
-	CommandSource source;
-	std::vector<Anope::string> params;
 	dynamic_reference<User> user;
-	Anope::string account;
+	IdentifyRequest *req;
 
  public:
-	SQLAuthenticationResult(Module *m, Command *c, CommandSource &s, const std::vector<Anope::string> &p, User *u, const Anope::string &a) : SQLInterface(m), cmd(c), source(s), params(p), user(u), account(a) { }
+	SQLAuthenticationResult(User *u, IdentifyRequest *r) : SQLInterface(me), user(u), req(r)
+	{
+		req->Hold(me);
+	}
+
+	~SQLAuthenticationResult()
+	{
+		req->Release(me);
+	}
 
 	void OnResult(const SQLResult &r) anope_override
 	{
-		if (user && cmd)
+		if (r.Rows() == 0)
 		{
-			Anope::string email;
+			Log(LOG_DEBUG) << "m_sql_authentication: Unsuccessful authentication for " << req->GetAccount();
+			delete this;
+			return;
+		}
 
-			if (r.Rows() > 0)
+		Log(LOG_DEBUG) << "m_sql_authentication: Successful authentication for " << req->GetAccount();
+
+		Anope::string email;
+		try
+		{
+			email = r.Get(0, "email");
+		}
+		catch (const SQLException &) { }
+
+		const BotInfo *bi = findbot(Config->NickServ);
+		NickAlias *na = findnick(req->GetAccount());
+		if (na == NULL)
+		{
+			na = new NickAlias(req->GetAccount(), new NickCore(req->GetAccount()));
+			if (user)
 			{
-				user->Extend("m_sql_authentication_success", NULL);
-
-				try
-				{
-					email = r.Get(0, "email");
-				}
-				catch (const SQLException &) { }
-			}
-			else
-				user->Extend("m_sql_authentication_failed", NULL);
-
-			BotInfo *bi = findbot(Config->NickServ);
-			NickAlias *na = findnick(account);
-			if (na == NULL)
-			{
-				na = new NickAlias(account, new NickCore(account));
 				if (Config->NSAddAccessOnReg)
 					na->nc->AddAccess(create_mask(user));
 		
 				if (bi)
 					user->SendMessage(bi, _("Your account \002%s\002 has been successfully created."), na->nick.c_str());
 			}
-
-			if (!email.empty() && email != na->nc->email)
-			{
-				na->nc->email = email;
-				if (bi)
-					user->SendMessage(bi, _("Your email has been updated to \002%s\002."), email.c_str());
-			}
-
-			cmd->Execute(source, params);
 		}
 
+		if (!email.empty() && email != na->nc->email)
+		{
+			na->nc->email = email;
+			if (user && bi)
+				user->SendMessage(bi, _("Your email has been updated to \002%s\002."), email.c_str());
+		}
+
+		req->Success(me);
 		delete this;
 	}
 
 	void OnError(const SQLResult &r) anope_override
 	{
 		Log() << "m_sql_authentication: Error executing query " << r.GetQuery().query << ": " << r.GetError();
-
-		if (user && cmd)
-		{
-			user->Extend("m_sql_authentication_failed", NULL);
-			cmd->Execute(source, params);
-		}
-
 		delete this;
 	}
 };
@@ -83,6 +83,8 @@ class ModuleSQLAuthentication : public Module
 	ModuleSQLAuthentication(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, SUPPORTED)
 	{
 		this->SetAuthor("Anope");
+
+		me = this;
 
 		Implementation i[] = { I_OnReload, I_OnPreCommand, I_OnCheckAuthentication };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
@@ -113,37 +115,32 @@ class ModuleSQLAuthentication : public Module
 		return EVENT_CONTINUE;
 	}
 
-	EventReturn OnCheckAuthentication(Command *c, CommandSource *source, const std::vector<Anope::string> &params, const Anope::string &account, const Anope::string &password) anope_override
+	void OnCheckAuthentication(User *u, IdentifyRequest *req) anope_override
 	{
-		if (!source || !source->GetUser())
-			return EVENT_CONTINUE;
-		else if (!this->SQL)
+		if (!this->SQL)
 		{
 			Log() << "m_sql_authentication: Unable to find SQL engine";
-			return EVENT_CONTINUE;
-		}
-		else if (source->GetUser()->HasExt("m_sql_authentication_success"))
-		{
-			source->GetUser()->Shrink("m_sql_authentication_success");
-			return EVENT_ALLOW;
-		}
-		else if (source->GetUser()->HasExt("m_sql_authentication_failed"))
-		{
-			source->GetUser()->Shrink("m_sql_authentication_failed");
-			return EVENT_CONTINUE;
+			return;
 		}
 
 		SQLQuery q(this->query);
-		q.setValue("a", account);
-		q.setValue("p", password);
-		q.setValue("n", source->GetNick());
-		q.setValue("i", source->GetUser()->ip);
+		q.setValue("a", req->GetAccount());
+		q.setValue("p", req->GetPassword());
+		if (u)
+		{
+			q.setValue("n", u->nick);
+			q.setValue("i", u->ip);
+		}
+		else
+		{
+			q.setValue("n", "");
+			q.setValue("i", "");
+		}
 
-		this->SQL->Run(new SQLAuthenticationResult(this, c, *source, params, source->GetUser(), account), q);
 
-		Log(LOG_DEBUG) << "m_sql_authentication: Checking authentication for " << account;
+		this->SQL->Run(new SQLAuthenticationResult(u, req), q);
 
-		return EVENT_STOP;
+		Log(LOG_DEBUG) << "m_sql_authentication: Checking authentication for " << req->GetAccount();
 	}
 };
 

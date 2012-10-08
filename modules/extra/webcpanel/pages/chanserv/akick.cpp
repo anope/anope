@@ -11,7 +11,7 @@ WebCPanel::ChanServ::Akick::Akick(const Anope::string &cat, const Anope::string 
 {
 }
 
-void WebCPanel::ChanServ::Akick::OnRequest(HTTPProvider *server, const Anope::string &page_name, HTTPClient *client, HTTPMessage &message, HTTPReply &reply, NickAlias *na, TemplateFileServer::Replacements &replacements)
+bool WebCPanel::ChanServ::Akick::OnRequest(HTTPProvider *server, const Anope::string &page_name, HTTPClient *client, HTTPMessage &message, HTTPReply &reply, NickAlias *na, TemplateFileServer::Replacements &replacements)
 {
 	const Anope::string &chname = message.get_data["channel"];
 
@@ -19,19 +19,19 @@ void WebCPanel::ChanServ::Akick::OnRequest(HTTPProvider *server, const Anope::st
 	{
 		reply.error = HTTP_FOUND;
 		reply.headers["Location"] = "http://" + message.headers["Host"] + "/chanserv/info";
-		return;
+		return true;
 	}
 
 	ChannelInfo *ci = cs_findchan(chname);
 
 	if (!ci)
-		return;
+		return true;
 
 	AccessGroup u_access = ci->AccessFor(na->nc);
 	bool has_priv = na->nc->IsServicesOper() && na->nc->o->ot->HasPriv("chanserv/access/modify");
 
 	if (!u_access.HasPriv("akick") && !has_priv)
-		return;
+		return true;
 
 	if (message.get_data["del"].empty() == false && message.get_data["mask"].empty() == false)
 	{
@@ -70,6 +70,7 @@ void WebCPanel::ChanServ::Akick::OnRequest(HTTPProvider *server, const Anope::st
 
 	TemplateFileServer page("chanserv/akick.html");
 	page.Serve(server, page_name, client, message, reply, replacements);
+	return true;
 }
 
 std::set<Anope::string> WebCPanel::ChanServ::Akick::GetData() anope_override

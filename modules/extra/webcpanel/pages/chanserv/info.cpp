@@ -11,7 +11,7 @@ WebCPanel::ChanServ::Info::Info(const Anope::string &cat, const Anope::string &u
 {
 }
 
-void WebCPanel::ChanServ::Info::OnRequest(HTTPProvider *server, const Anope::string &page_name, HTTPClient *client, HTTPMessage &message, HTTPReply &reply, NickAlias *na, TemplateFileServer::Replacements &replacements)
+bool WebCPanel::ChanServ::Info::OnRequest(HTTPProvider *server, const Anope::string &page_name, HTTPClient *client, HTTPMessage &message, HTTPReply &reply, NickAlias *na, TemplateFileServer::Replacements &replacements)
 {
 	// XXX this is slightly inefficient
 	for (registered_channel_map::const_iterator it = RegisteredChannelList->begin(), it_end = RegisteredChannelList->end(); it != it_end; ++it)
@@ -25,8 +25,8 @@ void WebCPanel::ChanServ::Info::OnRequest(HTTPProvider *server, const Anope::str
 		}
 	}
 
-
 	TemplateFileServer page("chanserv/main.html");
 	page.Serve(server, page_name, client, message, reply, replacements);
+	return true;
 }
 

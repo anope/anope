@@ -7,7 +7,7 @@
 
 #include "../webcpanel.h"
 
-void WebCPanel::Register::OnRequest(HTTPProvider *server, const Anope::string &page_name, HTTPClient *client, HTTPMessage &message, HTTPReply &reply)
+bool WebCPanel::Register::OnRequest(HTTPProvider *server, const Anope::string &page_name, HTTPClient *client, HTTPMessage &message, HTTPReply &reply)
 {
 	TemplateFileServer::Replacements replacements;
 
@@ -19,5 +19,6 @@ void WebCPanel::Register::OnRequest(HTTPProvider *server, const Anope::string &p
 	TemplateFileServer page("register.html");
 
 	page.Serve(server, page_name, client, message, reply, replacements);
+	return true;
 }
 

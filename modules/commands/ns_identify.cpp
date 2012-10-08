@@ -13,6 +13,47 @@
 
 #include "module.h"
 
+class NSIdentifyRequest : public IdentifyRequest
+{
+	CommandSource source;
+	Command *cmd;
+
+ public:
+	NSIdentifyRequest(CommandSource &s, Command *c, const Anope::string &acc, const Anope::string &pass) : IdentifyRequest(acc, pass), source(s), cmd(c) { }
+
+	void OnSuccess() anope_override
+	{
+		if (!source.GetUser())
+			return;
+
+		User *u = source.GetUser();
+		NickAlias *na = findnick(GetAccount());
+
+		if (!na)
+			source.Reply(NICK_X_NOT_REGISTERED, GetAccount().c_str());
+		else
+		{
+			if (u->IsIdentified())
+				Log(LOG_COMMAND, source, cmd) << "to log out of account " << u->Account()->display;
+
+			Log(LOG_COMMAND, source, cmd) << "and identified for account " << na->nc->display;
+			source.Reply(_("Password accepted - you are now recognized."));
+			u->Identify(na);
+			na->Release();
+		}
+	}
+
+	void OnFail() anope_override
+	{
+		if (source.GetUser())
+		{
+			Log(LOG_COMMAND, source, cmd) << "and failed to identify";
+			source.Reply(PASSWORD_INCORRECT);
+			bad_password(source.GetUser());
+		}
+	}
+};
+
 class CommandNSIdentify : public Command
 {
  public:
@@ -40,29 +81,9 @@ class CommandNSIdentify : public Command
 			source.Reply(_("You are already identified."));
 		else
 		{
-			EventReturn MOD_RESULT;
-			FOREACH_RESULT(I_OnCheckAuthentication, OnCheckAuthentication(this, &source, params, na ? na->nc->display : nick, pass));
-			if (MOD_RESULT == EVENT_STOP)
-				return;
-
-			if (!na)
-				source.Reply(NICK_X_NOT_REGISTERED, nick.c_str());
-			else if (MOD_RESULT != EVENT_ALLOW)
-			{
-				Log(LOG_COMMAND, source, this) << "and failed to identify";
-				source.Reply(PASSWORD_INCORRECT);
-				bad_password(u);
-			}
-			else
-			{
-				if (u->IsIdentified())
-					Log(LOG_COMMAND, source, this) << "to log out of account " << u->Account()->display;
-
-				Log(LOG_COMMAND, source, this) << "and identified for account " << na->nc->display;
-				source.Reply(_("Password accepted - you are now recognized."));
-				u->Identify(na);
-				na->Release();
-			}
+			NSIdentifyRequest *req = new NSIdentifyRequest(source, this, na ? na->nc->display : nick, pass);
+			FOREACH_MOD(I_OnCheckAuthentication, OnCheckAuthentication(source.GetUser(), req));
+			req->Dispatch();
 		}
 		return;
 	}

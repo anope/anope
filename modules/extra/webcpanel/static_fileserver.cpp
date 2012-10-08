@@ -17,7 +17,7 @@ StaticFileServer::StaticFileServer(const Anope::string &f_n, const Anope::string
 {
 }
 
-void StaticFileServer::OnRequest(HTTPProvider *server, const Anope::string &page_name, HTTPClient *client, HTTPMessage &message, HTTPReply &reply)
+bool StaticFileServer::OnRequest(HTTPProvider *server, const Anope::string &page_name, HTTPClient *client, HTTPMessage &message, HTTPReply &reply)
 {
 	int fd = open((template_base + "/" + this->file_name).c_str(), O_RDONLY);
 	if (fd < 0)
@@ -25,7 +25,7 @@ void StaticFileServer::OnRequest(HTTPProvider *server, const Anope::string &page
 		Log(LOG_NORMAL, "httpd") << "Error serving file " << page_name << " (" << (template_base + "/" + this->file_name) << "): " << strerror(errno);
 
 		client->SendError(HTTP_PAGE_NOT_FOUND, "Page not found");
-		return;
+		return true;
 	}
 
 	reply.content_type = this->GetContentType();
@@ -37,5 +37,6 @@ void StaticFileServer::OnRequest(HTTPProvider *server, const Anope::string &page
 		reply.Write(buffer, i);
 	
 	close(fd);
+	return true;
 }
 

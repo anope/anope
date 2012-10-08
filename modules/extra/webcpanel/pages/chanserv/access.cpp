@@ -11,7 +11,7 @@ WebCPanel::ChanServ::Access::Access(const Anope::string &cat, const Anope::strin
 {
 }
 
-void WebCPanel::ChanServ::Access::OnRequest(HTTPProvider *server, const Anope::string &page_name, HTTPClient *client, HTTPMessage &message, HTTPReply &reply, NickAlias *na, TemplateFileServer::Replacements &replacements)
+bool WebCPanel::ChanServ::Access::OnRequest(HTTPProvider *server, const Anope::string &page_name, HTTPClient *client, HTTPMessage &message, HTTPReply &reply, NickAlias *na, TemplateFileServer::Replacements &replacements)
 {
 	const Anope::string &chname = message.get_data["channel"];
 
@@ -19,19 +19,19 @@ void WebCPanel::ChanServ::Access::OnRequest(HTTPProvider *server, const Anope::s
 	{
 		reply.error = HTTP_FOUND;
 		reply.headers["Location"] = "http://" + message.headers["Host"] + "/chanserv/info";
-		return;
+		return true;
 	}
 
 	ChannelInfo *ci = cs_findchan(chname);
 
 	if (!ci)
-		return;
+		return true;
 
 	AccessGroup u_access = ci->AccessFor(na->nc);
 	bool has_priv = na->nc->IsServicesOper() && na->nc->o->ot->HasPriv("chanserv/access/modify");
 
 	if (!u_access.HasPriv("ACCESS_LIST") && !has_priv)
-		return;
+		return true;
 
 	const ChanAccess *highest = u_access.Highest();
 	
@@ -136,6 +136,7 @@ void WebCPanel::ChanServ::Access::OnRequest(HTTPProvider *server, const Anope::s
 
 	TemplateFileServer page("chanserv/access.html");
 	page.Serve(server, page_name, client, message, reply, replacements);
+	return true;
 }
 
 std::set<Anope::string> WebCPanel::ChanServ::Access::GetData() anope_override

@@ -11,7 +11,7 @@ WebCPanel::NickServ::Access::Access(const Anope::string &cat, const Anope::strin
 {
 }
 
-void WebCPanel::NickServ::Access::OnRequest(HTTPProvider *server, const Anope::string &page_name, HTTPClient *client, HTTPMessage &message, HTTPReply &reply, NickAlias *na, TemplateFileServer::Replacements &replacements)
+bool WebCPanel::NickServ::Access::OnRequest(HTTPProvider *server, const Anope::string &page_name, HTTPClient *client, HTTPMessage &message, HTTPReply &reply, NickAlias *na, TemplateFileServer::Replacements &replacements)
 {
 	if (message.post_data.count("access") > 0)
 	{
@@ -35,5 +35,6 @@ void WebCPanel::NickServ::Access::OnRequest(HTTPProvider *server, const Anope::s
 
 	TemplateFileServer page("nickserv/access.html");
 	page.Serve(server, page_name, client, message, reply, replacements);
+	return true;
 }
 

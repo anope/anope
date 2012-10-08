@@ -16,7 +16,7 @@ class Akick : public WebPanelProtectedPage
  public:
  	Akick(const Anope::string &cat, const Anope::string &u);
 
-	void OnRequest(HTTPProvider *, const Anope::string &, HTTPClient *, HTTPMessage &, HTTPReply &, NickAlias *, TemplateFileServer::Replacements &) anope_override;
+	bool OnRequest(HTTPProvider *, const Anope::string &, HTTPClient *, HTTPMessage &, HTTPReply &, NickAlias *, TemplateFileServer::Replacements &) anope_override;
 
 	std::set<Anope::string> GetData() anope_override;
 };

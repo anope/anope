@@ -13,6 +13,61 @@
 
 #include "module.h"
 
+class NSGroupRequest : public IdentifyRequest
+{
+	CommandSource source;
+	Command *cmd;
+	Anope::string nick;
+	dynamic_reference<NickAlias> target;
+ 
+ public:
+	NSGroupRequest(CommandSource &src, Command *c, const Anope::string &n, NickAlias *targ, const Anope::string &pass) : IdentifyRequest(targ->nc->display, pass), source(src), cmd(c), nick(n), target(targ) { }
+
+	void OnSuccess() anope_override
+	{
+		if (!source.GetUser() || source.GetUser()->nick != nick || !target || !target->nc)
+			return;
+
+		User *u = source.GetUser();
+		NickAlias *na = findnick(nick);
+		/* If the nick is already registered, drop it. */
+		if (na)
+		{
+			FOREACH_MOD(I_OnChangeCoreDisplay, OnChangeCoreDisplay(na->nc, u->nick));
+			na->destroy();
+		}
+
+		na = new NickAlias(nick, target->nc);
+
+		Anope::string last_usermask = u->GetIdent() + "@" + u->GetDisplayedHost();
+		na->last_usermask = last_usermask;
+		na->last_realname = u->realname;
+		na->time_registered = na->last_seen = Anope::CurTime;
+
+		u->Login(target->nc);
+		ircdproto->SendLogin(u);
+		if (!Config->NoNicknameOwnership && na->nc == u->Account() && na->nc->HasFlag(NI_UNCONFIRMED) == false)
+			u->SetMode(findbot(Config->NickServ), UMODE_REGISTERED);
+		FOREACH_MOD(I_OnNickGroup, OnNickGroup(u, target));
+
+		Log(LOG_COMMAND, source, cmd) << "makes " << nick << " join group of " << target->nick << " (" << target->nc->display << ") (email: " << (!target->nc->email.empty() ? target->nc->email : "none") << ")";
+		source.Reply(_("You are now in the group of \002%s\002."), target->nick.c_str());
+
+		u->lastnickreg = Anope::CurTime;
+
+	}
+
+	void OnFail() anope_override
+	{
+		if (!source.GetUser())
+			return;
+
+		Log(LOG_COMMAND, source, cmd) << "failed group for " << target->nick;
+		source.Reply(PASSWORD_INCORRECT);
+		bad_password(source.GetUser());
+	}
+};
+
 class CommandNSGroup : public Command
 {
  public:
@@ -62,7 +117,7 @@ class CommandNSGroup : public Command
 			source.Reply(NICK_X_NOT_REGISTERED, nick.c_str());
 		else if (Anope::CurTime < u->lastnickreg + Config->NSRegDelay)
 			source.Reply(_("Please wait %d seconds before using the GROUP command again."), (Config->NSRegDelay + u->lastnickreg) - Anope::CurTime);
-		else if (target && target->nc->HasFlag(NI_SUSPENDED))
+		else if (target->nc->HasFlag(NI_SUSPENDED))
 		{
 			Log(LOG_COMMAND, source, this) << "tried to use GROUP for SUSPENDED nick " << target->nick;
 			source.Reply(NICK_X_SUSPENDED, target->nick.c_str());
@@ -75,6 +130,12 @@ class CommandNSGroup : public Command
 			source.Reply(_("Your nick is already registered."));
 		else if (Config->NSMaxAliases && (target->nc->aliases.size() >= Config->NSMaxAliases) && !target->nc->IsServicesOper())
 			source.Reply(_("There are too many nicks in %s's group."));
+		else if (u->nick.length() <= Config->NSGuestNickPrefix.length() + 7 &&
+			u->nick.length() >= Config->NSGuestNickPrefix.length() + 1 &&
+			!u->nick.find_ci(Config->NSGuestNickPrefix) && !u->nick.substr(Config->NSGuestNickPrefix.length()).find_first_not_of("1234567890"))
+		{
+			source.Reply(NICK_CANNOT_BE_REGISTERED, u->nick.c_str());
+		}
 		else
 		{
 			bool ok = false;
@@ -82,63 +143,23 @@ class CommandNSGroup : public Command
 				ok = true;
 			else if (!u->fingerprint.empty() && target->nc->FindCert(u->fingerprint))
 				ok = true;
-			else if (!pass.empty())
+
+			if (ok == false && !pass.empty())
 			{
-				EventReturn MOD_RESULT;
-				FOREACH_RESULT(I_OnCheckAuthentication, OnCheckAuthentication(this, &source, params, target->nc->display, pass));
-				if (MOD_RESULT == EVENT_STOP)
-					return;
-				else if (MOD_RESULT == EVENT_ALLOW)
-					ok = true;
-			}
-			if (ok)
-			{
-				/* If the nick is already registered, drop it.
-				 * If not, check that it is valid.
-				 */
-				if (na)
-				{
-					FOREACH_MOD(I_OnChangeCoreDisplay, OnChangeCoreDisplay(na->nc, u->nick));
-					na->destroy();
-				}
-				else
-				{
-					size_t prefixlen = Config->NSGuestNickPrefix.length();
-					size_t nicklen = u->nick.length();
-
-					if (nicklen <= prefixlen + 7 && nicklen >= prefixlen + 1 && !u->nick.find_ci(Config->NSGuestNickPrefix) && !u->nick.substr(prefixlen).find_first_not_of("1234567890"))
-					{
-						source.Reply(NICK_CANNOT_BE_REGISTERED, u->nick.c_str());
-						return;
-					}
-				}
-
-				na = new NickAlias(u->nick, target->nc);
-
-				Anope::string last_usermask = u->GetIdent() + "@" + u->GetDisplayedHost();
-				na->last_usermask = last_usermask;
-				na->last_realname = u->realname;
-				na->time_registered = na->last_seen = Anope::CurTime;
-
-				u->Login(target->nc);
-				ircdproto->SendLogin(u);
-				if (!Config->NoNicknameOwnership && na->nc == u->Account() && na->nc->HasFlag(NI_UNCONFIRMED) == false)
-					u->SetMode(findbot(Config->NickServ), UMODE_REGISTERED);
-				FOREACH_MOD(I_OnNickGroup, OnNickGroup(u, target));
-
-				Log(LOG_COMMAND, source, this) << "makes " << u->nick << " join group of " << target->nick << " (" << target->nc->display << ") (email: " << (!target->nc->email.empty() ? target->nc->email : "none") << ")";
-				source.Reply(_("You are now in the group of \002%s\002."), target->nick.c_str());
-
-				u->lastnickreg = Anope::CurTime;
+				NSGroupRequest *req = new NSGroupRequest(source, this, u->nick, target, pass);
+				FOREACH_MOD(I_OnCheckAuthentication, OnCheckAuthentication(source.GetUser(), req));
+				req->Dispatch();
 			}
 			else
 			{
-				Log(LOG_COMMAND, source, this) << "failed group for " << target->nick;
-				source.Reply(PASSWORD_INCORRECT);
-				bad_password(u);
+				NSGroupRequest req(source, this, u->nick, target, pass);
+
+				if (ok)
+					req.OnSuccess();
+				else
+					req.OnFail();
 			}
 		}
-		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override

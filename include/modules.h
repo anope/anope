@@ -765,15 +765,11 @@ class CoreExport Module : public Extensible
 	 */
 	virtual void OnNickInfo(CommandSource &source, NickAlias *na, InfoFormatter &info, bool ShowHidden) { }
 
-	/** Check whether a users password is correct.
-	 * @param u The user
-	 * @param command The command the user is doing
-	 * @param params Command params
-	 * @param account The account the password should be checked against
-	 * @param password The password
-	 * @return EVENT_ALLOW to allow the password, EVENT_STOP to stop processing completely
+	/** Check whether a username and password is correct
+	 * @param u The user trying to identify, if applicable.
+	 * @param req The login request
 	 */
-	virtual EventReturn OnCheckAuthentication(Command *c, CommandSource *source, const std::vector<Anope::string> &params, const Anope::string &account, const Anope::string &password) { return EVENT_CONTINUE; }
+	virtual void OnCheckAuthentication(User *u, IdentifyRequest *req) { }
 
 	/** Called when a user does /ns update
 	 * @param u The user

@@ -52,6 +52,7 @@ Module::~Module()
 	ModuleManager::DetachAll(this);
 	/* Clear any active callbacks this module has */
 	ModuleManager::ClearCallBacks(this);
+	IdentifyRequest::ModuleUnload(this);
 
 	std::list<Module *>::iterator it = std::find(Modules.begin(), Modules.end(), this);
 	if (it != Modules.end())

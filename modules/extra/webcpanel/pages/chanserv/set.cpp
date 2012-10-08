@@ -11,7 +11,7 @@ WebCPanel::ChanServ::Set::Set(const Anope::string &cat, const Anope::string &u) 
 {
 }
 
-void WebCPanel::ChanServ::Set::OnRequest(HTTPProvider *server, const Anope::string &page_name, HTTPClient *client, HTTPMessage &message, HTTPReply &reply, NickAlias *na, TemplateFileServer::Replacements &replacements)
+bool WebCPanel::ChanServ::Set::OnRequest(HTTPProvider *server, const Anope::string &page_name, HTTPClient *client, HTTPMessage &message, HTTPReply &reply, NickAlias *na, TemplateFileServer::Replacements &replacements)
 {
 	const Anope::string &chname = message.get_data["channel"];
 
@@ -19,13 +19,13 @@ void WebCPanel::ChanServ::Set::OnRequest(HTTPProvider *server, const Anope::stri
 	{
 		reply.error = HTTP_FOUND;
 		reply.headers["Location"] = "http://" + message.headers["Host"] + "/chanserv/info";
-		return;
+		return true;
 	}
 
 	ChannelInfo *ci = cs_findchan(chname);
 
 	if (!ci || !ci->AccessFor(na->nc).HasPriv("SET"))
-		return;
+		return true;
 
 	if (message.post_data.empty() == false)
 	{
@@ -125,6 +125,7 @@ void WebCPanel::ChanServ::Set::OnRequest(HTTPProvider *server, const Anope::stri
 
 	TemplateFileServer page("chanserv/set.html");
 	page.Serve(server, page_name, client, message, reply, replacements);
+	return true;
 }
 
 std::set<Anope::string> WebCPanel::ChanServ::Set::GetData() anope_override

@@ -2,6 +2,8 @@
 #include "nickserv.h"
 #include "ldap.h"
 
+static Module *me;
+
 static Anope::string basedn;
 static Anope::string search_filter;
 static Anope::string object_class;
@@ -10,17 +12,21 @@ static Anope::string username_attribute;
 
 struct IdentifyInfo
 {
-	dynamic_reference<Command> command;
-	CommandSource source;
-	std::vector<Anope::string> params;
-	Anope::string account;
-	Anope::string pass;
-	Anope::string dn;
+	dynamic_reference<User> user;
+	IdentifyRequest *req;
 	service_reference<LDAPProvider> lprov;
 	bool admin_bind;
+	Anope::string dn;
 
-	IdentifyInfo(Command *c, CommandSource &s, const std::vector<Anope::string> &pa, const Anope::string &a, const Anope::string &p, service_reference<LDAPProvider> &lp) :
-		command(c), source(s), params(pa), account(a), pass(p), lprov(lp), admin_bind(true) { }
+	IdentifyInfo(User *u, IdentifyRequest *r, service_reference<LDAPProvider> &lp) : user(u), req(r), lprov(lp), admin_bind(true)
+	{
+		req->Hold(me);
+	}
+	
+	~IdentifyInfo()
+	{
+		req->Release(me);
+	}
 };
 
 class IdentifyInterface : public LDAPInterface
@@ -46,9 +52,9 @@ class IdentifyInterface : public LDAPInterface
 		IdentifyInfo *ii = it->second;
 		this->requests.erase(it);
 
-		if (!ii->source.GetUser() || !ii->command || !ii->lprov)
+		if (!ii->lprov)
 		{
-			delete this;
+			delete ii;
 			return;
 		}
 
@@ -63,25 +69,14 @@ class IdentifyInterface : public LDAPInterface
 						const LDAPAttributes &attr = r.get(0);
 						ii->dn = attr.get("dn");
 						Log(LOG_DEBUG) << "m_ldap_authenticationn: binding as " << ii->dn;
-						LDAPQuery id = ii->lprov->Bind(this, ii->dn, ii->pass);
+						LDAPQuery id = ii->lprov->Bind(this, ii->dn, ii->req->GetPassword());
 						this->Add(id, ii);
+						return;
 					}
 					catch (const LDAPException &ex)
 					{
 						Log() << "m_ldap_authentication: Error binding after search: " << ex.GetReason();
-						delete ii;
 					}
-				}
-				else
-				{
-					User *u = ii->source.GetUser();
-					Command *c = ii->command;
-
-					u->Extend("m_ldap_authentication_error", NULL);
-
-					c->Execute(ii->source, ii->params);
-
-					delete ii;
 				}
 				break;
 			}
@@ -89,43 +84,40 @@ class IdentifyInterface : public LDAPInterface
 			{
 				if (ii->admin_bind)
 				{
-					Anope::string sf = search_filter.replace_all_cs("%account", ii->account).replace_all_cs("%object_class", object_class);
+					Anope::string sf = search_filter.replace_all_cs("%account", ii->req->GetAccount()).replace_all_cs("%object_class", object_class);
 					Log(LOG_DEBUG) << "m_ldap_authentication: searching for " << sf;
 					LDAPQuery id = ii->lprov->Search(this, basedn, sf);
 					this->Add(id, ii);
 					ii->admin_bind = false;
+					return;
 				}
 				else
 				{
-					User *u = ii->source.GetUser();
-					Command *c = ii->command;
-
-					u->Extend("m_ldap_authentication_authenticated", NULL);
-
-					NickAlias *na = findnick(ii->account);
+					NickAlias *na = findnick(ii->req->GetAccount());
 					if (na == NULL)
 					{
-						na = new NickAlias(ii->account, new NickCore(ii->account));
-						if (Config->NSAddAccessOnReg)
-							na->nc->AddAccess(create_mask(u));
-		
-						BotInfo *bi = findbot(Config->NickServ);
-						if (bi)
-							u->SendMessage(bi, _("Your account \002%s\002 has been successfully created."), na->nick.c_str());
-					}
+						na = new NickAlias(ii->req->GetAccount(), new NickCore(ii->req->GetAccount()));
+						if (ii->user)
+						{
+							if (Config->NSAddAccessOnReg)
+								na->nc->AddAccess(create_mask(ii->user));
 
+							const BotInfo *bi = findbot(Config->NickServ);
+							if (bi)
+								ii->user->SendMessage(bi, _("Your account \002%s\002 has been successfully created."), na->nick.c_str());
+						}
+					}
 					na->nc->Extend("m_ldap_authentication_dn", new ExtensibleItemClass<Anope::string>(ii->dn));
-				
-					enc_encrypt(ii->pass, na->nc->pass);
-		
-					c->Execute(ii->source, ii->params);
-					delete ii;
+
+					ii->req->Success(me);
 				}
 				break;
 			}
 			default:
-				delete ii;
+				break;
 		}
+
+		delete ii;
 	}
 
 	void OnError(const LDAPResult &r) anope_override
@@ -135,20 +127,6 @@ class IdentifyInterface : public LDAPInterface
 			return;
 		IdentifyInfo *ii = it->second;
 		this->requests.erase(it);
-
-		if (!ii->source.GetUser() || !ii->command)
-		{
-			delete ii;
-			return;
-		}
-
-		User *u = ii->source.GetUser();
-		Command *c = ii->command;
-
-		u->Extend("m_ldap_authentication_error", NULL);
-
-		c->Execute(ii->source, ii->params);
-
 		delete ii;
 	}
 };
@@ -235,6 +213,8 @@ class NSIdentifyLDAP : public Module
 	{
 		this->SetAuthor("Anope");
 
+		me = this;
+
 		Implementation i[] = { I_OnReload, I_OnPreCommand, I_OnCheckAuthentication, I_OnNickIdentify, I_OnNickRegister };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 		ModuleManager::SetPriority(this, PRIORITY_FIRST);
@@ -267,28 +247,12 @@ class NSIdentifyLDAP : public Module
 		return EVENT_CONTINUE;
 	}
 
-	EventReturn OnCheckAuthentication(Command *c, CommandSource *source, const std::vector<Anope::string> &params, const Anope::string &account, const Anope::string &password) anope_override
+	void OnCheckAuthentication(User *u, IdentifyRequest *req) anope_override
 	{
+		if (!this->ldap)
+			return;
 
-		if (c == NULL || source == NULL || !this->ldap)
-			return EVENT_CONTINUE;
-
-		User *u = source->GetUser();
-		if (!u)
-			return EVENT_CONTINUE;
-
-		if (u->HasExt("m_ldap_authentication_authenticated"))
-		{
-			u->Shrink("m_ldap_authentication_authenticated");
-			return EVENT_ALLOW;
-		}
-		else if (u->HasExt("m_ldap_authentication_error"))
-		{
-			u->Shrink("m_ldap_authentication_error");
-			return EVENT_CONTINUE;
-		}
-
-		IdentifyInfo *ii = new IdentifyInfo(c, *source,  params, account, password, this->ldap);
+		IdentifyInfo *ii = new IdentifyInfo(u, req, this->ldap);
 		try
 		{
 			LDAPQuery id = this->ldap->BindAsAdmin(&this->iinterface);
@@ -298,10 +262,7 @@ class NSIdentifyLDAP : public Module
 		{
 			delete ii;
 			Log() << "ns_identify_ldap: " << ex.GetReason();
-			return EVENT_CONTINUE;
 		}
-
-		return EVENT_STOP;
 	}
 
 	void OnNickIdentify(User *u) anope_override

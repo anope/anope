@@ -35,7 +35,7 @@ static Anope::string GetStatusFromCode(HTTPError err)
 	return "501 Not Implemented";
 }
 
-class MyHTTPClient : public HTTPClient, public Base
+class MyHTTPClient : public HTTPClient
 {
 	HTTPProvider *provider;
 	HTTPMessage header;
@@ -78,9 +78,8 @@ class MyHTTPClient : public HTTPClient, public Base
 
 		HTTPReply reply;
 
-		this->page->OnRequest(this->provider, this->page_name, this, this->header, reply);
-
-		this->SendReply(&reply);
+		if (this->page->OnRequest(this->provider, this->page_name, this, this->header, reply))
+			this->SendReply(&reply);
 	}
 
  public:

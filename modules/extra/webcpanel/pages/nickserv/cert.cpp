@@ -11,7 +11,7 @@ WebCPanel::NickServ::Cert::Cert(const Anope::string &cat, const Anope::string &u
 {
 }
 
-void WebCPanel::NickServ::Cert::OnRequest(HTTPProvider *server, const Anope::string &page_name, HTTPClient *client, HTTPMessage &message, HTTPReply &reply, NickAlias *na, TemplateFileServer::Replacements &replacements)
+bool WebCPanel::NickServ::Cert::OnRequest(HTTPProvider *server, const Anope::string &page_name, HTTPClient *client, HTTPMessage &message, HTTPReply &reply, NickAlias *na, TemplateFileServer::Replacements &replacements)
 {
 	if (message.post_data.count("certfp") > 0)
 	{
@@ -35,5 +35,6 @@ void WebCPanel::NickServ::Cert::OnRequest(HTTPProvider *server, const Anope::str
 
 	TemplateFileServer page("nickserv/cert.html");
 	page.Serve(server, page_name, client, message, reply, replacements);
+	return true;
 }
 

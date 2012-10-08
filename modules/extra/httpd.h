@@ -21,6 +21,23 @@ struct HTTPReply
 
 	HTTPReply() : error(HTTP_ERROR_OK), length(0) { }
 
+	HTTPReply(const HTTPReply& other) : error(other.error), length(other.length)
+	{
+		content_type = other.content_type;
+		headers = other.headers;
+		cookies = other.cookies;
+
+		for (unsigned i = 0; i < other.out.size(); ++i)
+			out.push_back(new Data(other.out[i]->buf, other.out[i]->len));
+	}
+
+	~HTTPReply()
+	{
+		for (unsigned i = 0; i < out.size(); ++i)
+			delete out[i];
+		out.clear();
+	}
+
 	struct Data
 	{
 		char *buf;
@@ -87,10 +104,10 @@ class HTTPPage : public Base
 	 * @param The HTTP header sent from the client to request the page
 	 * @param The HTTP header that will be sent back to the client
 	 */
-	virtual void OnRequest(HTTPProvider *, const Anope::string &, HTTPClient *, HTTPMessage &, HTTPReply &) = 0;
+	virtual bool OnRequest(HTTPProvider *, const Anope::string &, HTTPClient *, HTTPMessage &, HTTPReply &) = 0;
 };
 
-class HTTPClient : public ClientSocket, public BufferedSocket, public BinarySocket
+class HTTPClient : public ClientSocket, public BufferedSocket, public BinarySocket, public Base
 {
  protected:
 	void WriteClient(const Anope::string &message)

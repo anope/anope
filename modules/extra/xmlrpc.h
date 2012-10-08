@@ -3,7 +3,7 @@ class XMLRPCClientSocket;
 class XMLRPCListenSocket;
 class XMLRPCServiceInterface;
 
-class XMLRPCClientSocket : public ClientSocket, public BufferedSocket
+class XMLRPCClientSocket : public ClientSocket, public BufferedSocket, public Base
 {
  protected:
 	Anope::string query;

@@ -13,6 +13,43 @@
 
 #include "module.h"
 
+class NSGhostRequest : public IdentifyRequest
+{
+	CommandSource source;
+	Command *cmd;
+ 
+ public:
+	NSGhostRequest(CommandSource &src, Command *c, const Anope::string &user, const Anope::string &pass) : IdentifyRequest(user, pass), source(src), cmd(c) { }
+
+	void OnSuccess() anope_override
+	{
+		if (!source.GetUser() || !source.service)
+			return;
+
+		User *user = source.GetUser();
+		if (!user->IsIdentified())
+			source.Reply(_("You may not ghost an unidentified user, use RECOVER instead."));
+		else
+		{
+			Log(LOG_COMMAND, source, cmd) << "for " << GetAccount();
+			Anope::string buf = "GHOST command used by " + source.GetNick();
+			user->Kill(source.service->nick, buf);
+			source.Reply(_("Ghost with your nick has been killed."));
+		}
+	}
+
+	void OnFail() anope_override
+	{
+		source.Reply(ACCESS_DENIED);
+		if (!GetPassword().empty())
+		{
+			Log(LOG_COMMAND, source, cmd) << "with an invalid password for " << GetAccount();
+			if (source.GetUser())
+				bad_password(source.GetUser());
+		}
+	}
+};
+
 class CommandNSGhost : public Command
 {
  public:
@@ -50,37 +87,21 @@ class CommandNSGhost : public Command
 				ok = true;
 			else if (source.GetUser() && !source.GetUser()->fingerprint.empty() && na->nc->FindCert(source.GetUser()->fingerprint))
 				ok = true;
-			else if (!pass.empty())
-			{
-				EventReturn MOD_RESULT;
-				FOREACH_RESULT(I_OnCheckAuthentication, OnCheckAuthentication(this, &source, params, na->nc->display, pass));
-				if (MOD_RESULT == EVENT_STOP)
-					return;
-				else if (MOD_RESULT == EVENT_ALLOW)
-					ok = true;
-			}
 
-			if (ok)
+			if (ok == false && !pass.empty())
 			{
-				if (!user->IsIdentified())
-					source.Reply(_("You may not ghost an unidentified user, use RECOVER instead."));
-				else
-				{
-					Log(LOG_COMMAND, source, this) << "for " << nick;
-					Anope::string buf = "GHOST command used by " + source.GetNick();
-					user->Kill(Config->NickServ, buf);
-					source.Reply(_("Ghost with your nick has been killed."), nick.c_str());
-				}
+				NSGhostRequest *req = new NSGhostRequest(source, this, na->nc->display, pass);
+				FOREACH_MOD(I_OnCheckAuthentication, OnCheckAuthentication(source.GetUser(), req));
+				req->Dispatch();
 			}
 			else
 			{
-				source.Reply(ACCESS_DENIED);
-				if (!pass.empty())
-				{
-					Log(LOG_COMMAND, source, this) << "with an invalid password for " << nick;
-					if (source.GetUser())
-						bad_password(source.GetUser());
-				}
+				NSGhostRequest req(source, this, na->nc->display, pass);
+
+				if (ok)
+					req.OnSuccess();
+				else
+					req.OnFail();
 			}
 		}
 

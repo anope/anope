@@ -11,7 +11,7 @@ WebCPanel::NickServ::Alist::Alist(const Anope::string &cat, const Anope::string 
 {
 }
 
-void WebCPanel::NickServ::Alist::OnRequest(HTTPProvider *server, const Anope::string &page_name, HTTPClient *client, HTTPMessage &message, HTTPReply &reply, NickAlias *na, TemplateFileServer::Replacements &replacements)
+bool WebCPanel::NickServ::Alist::OnRequest(HTTPProvider *server, const Anope::string &page_name, HTTPClient *client, HTTPMessage &message, HTTPReply &reply, NickAlias *na, TemplateFileServer::Replacements &replacements)
 {
 	int chan_count = 0;
 
@@ -45,5 +45,6 @@ void WebCPanel::NickServ::Alist::OnRequest(HTTPProvider *server, const Anope::st
 
 	TemplateFileServer page("nickserv/alist.html");
 	page.Serve(server, page_name, client, message, reply, replacements);
+	return true;
 }
 

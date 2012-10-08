@@ -11,12 +11,13 @@ WebCPanel::Logout::Logout(const Anope::string &u) : WebPanelProtectedPage("", u)
 {
 }
 
-void WebCPanel::Logout::OnRequest(HTTPProvider *server, const Anope::string &page_name, HTTPClient *client, HTTPMessage &message, HTTPReply &reply, NickAlias *na, TemplateFileServer::Replacements &replacements)
+bool WebCPanel::Logout::OnRequest(HTTPProvider *server, const Anope::string &page_name, HTTPClient *client, HTTPMessage &message, HTTPReply &reply, NickAlias *na, TemplateFileServer::Replacements &replacements)
 {
 	na->Shrink("webcpanel_id");
 	na->Shrink("webcpanel_ip");
 
 	reply.error = HTTP_FOUND;
 	reply.headers["Location"] = "http://" + message.headers["Host"];
+	return true;
 }
 

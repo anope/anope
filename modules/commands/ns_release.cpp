@@ -13,6 +13,38 @@
 
 #include "module.h"
 
+class NSReleaseRequest : public IdentifyRequest
+{
+	CommandSource source;
+	Command *cmd;
+	dynamic_reference<NickAlias> na;
+ 
+ public:
+	NSReleaseRequest(CommandSource &src, Command *c, NickAlias *n, const Anope::string &pass) : IdentifyRequest(n->nc->display, pass), source(src), cmd(c), na(n) { }
+
+	void OnSuccess() anope_override
+	{
+		if (!source.GetUser() || !na)
+			return;
+
+		bool override = source.GetAccount() != na->nc && source.HasPriv("nickserv/release");
+		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, cmd) << "for nickname " << na->nick;
+		na->Release();
+		source.Reply(_("Services' hold on \002%s\002 has been released."), na->nick.c_str());
+	}
+
+	void OnFail() anope_override
+	{
+		source.Reply(ACCESS_DENIED);
+		if (!GetPassword().empty())
+		{
+			Log(LOG_COMMAND, source, cmd) << "with invalid password for " << na->nick;
+			if (!source.GetUser())
+				bad_password(source.GetUser());
+		}
+	}
+};
+
 class CommandNSRelease : public Command
 {
  public:
@@ -35,27 +67,6 @@ class CommandNSRelease : public Command
 			source.Reply(NICK_X_SUSPENDED, na->nick.c_str());
 		else if (!na->HasFlag(NS_HELD))
 			source.Reply(_("Nick \002%s\002 isn't being held."), nick.c_str());
-		else if (!pass.empty())
-		{
-			EventReturn MOD_RESULT;
-			FOREACH_RESULT(I_OnCheckAuthentication, OnCheckAuthentication(this, &source, params, na->nc->display, pass));
-			if (MOD_RESULT == EVENT_STOP)
-				return;
-
-			if (MOD_RESULT == EVENT_ALLOW)
-			{
-				Log(LOG_COMMAND, source, this) << "for nickname " << na->nick;
-				na->Release();
-				source.Reply(_("Services' hold on \002%s\002 has been released."), nick.c_str());
-			}
-			else
-			{
-				source.Reply(ACCESS_DENIED);
-				Log(LOG_COMMAND, source, this) << "invalid password for " << nick;
-				if (source.GetUser())
-					bad_password(source.GetUser());
-			}
-		}
 		else
 		{
 			bool override = source.GetAccount() != na->nc && source.HasPriv("nickserv/release");
@@ -67,14 +78,22 @@ class CommandNSRelease : public Command
 				ok = true;
 			else if (source.GetUser() && !source.GetUser()->fingerprint.empty() && na->nc->FindCert(source.GetUser()->fingerprint))
 				ok = true;
-			if (ok)
+
+			if (ok == false && !pass.empty())
 			{
-				Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this) << "for nickname " << na->nick;
-				na->Release();
-				source.Reply(_("Services' hold on \002%s\002 has been released."), nick.c_str());
+				NSReleaseRequest *req = new NSReleaseRequest(source, this, na, pass);
+				FOREACH_MOD(I_OnCheckAuthentication, OnCheckAuthentication(source.GetUser(), req));
+				req->Dispatch();
 			}
 			else
-				source.Reply(ACCESS_DENIED);
+			{
+				NSReleaseRequest req(source, this, na, pass);
+
+				if (ok)
+					req.OnSuccess();
+				else
+					req.OnFail();
+			}
 		}
 		return;
 	}

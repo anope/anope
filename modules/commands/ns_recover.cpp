@@ -14,11 +14,22 @@
 
 #include "module.h"
 
-class CommandNSRecover : public Command
+class NSRecoverRequest : public IdentifyRequest
 {
- private:
-	void DoRecover(CommandSource &source, User *u, NickAlias *na, const Anope::string &nick)
+	CommandSource source;
+	Command *cmd;
+	dynamic_reference<NickAlias> na;
+ 
+ public:
+	NSRecoverRequest(CommandSource &src, Command *c, NickAlias *n, const Anope::string &pass) : IdentifyRequest(n->nc->display, pass), source(src), cmd(c), na(n) { }
+
+	void OnSuccess() anope_override
 	{
+		if (!source.GetUser() || !na)
+			return;
+
+		User *u = source.GetUser();
+
 		u->SendMessage(source.owner, FORCENICKCHANGE_NOW);
 
 		if (u->Account() == na->nc)
@@ -31,9 +42,27 @@ class CommandNSRecover : public Command
 
 		/* Convert Config->NSReleaseTimeout seconds to string format */
 		Anope::string relstr = duration(Config->NSReleaseTimeout);
-		source.Reply(NICK_RECOVERED, Config->UseStrictPrivMsgString.c_str(), Config->NickServ.c_str(), nick.c_str(), relstr.c_str());
+		source.Reply(NICK_RECOVERED, Config->UseStrictPrivMsgString.c_str(), Config->NickServ.c_str(), na->nick.c_str(), relstr.c_str());
 	}
 
+	void OnFail() anope_override
+	{
+		if (!source.GetUser())
+			return;
+
+		User *u = source.GetUser();
+
+		source.Reply(ACCESS_DENIED);
+		if (!GetPassword().empty())
+		{
+			Log(LOG_COMMAND, source, cmd) << "with invalid password for " << na->nick;
+			bad_password(u);
+		}
+	}
+};
+
+class CommandNSRecover : public Command
+{
  public:
 	CommandNSRecover(Module *creator) : Command(creator, "nickserv/recover", 1, 2)
 	{
@@ -60,25 +89,6 @@ class CommandNSRecover : public Command
 			source.Reply(NICK_X_SUSPENDED, na->nick.c_str());
 		else if (nick.equals_ci(source.GetNick()))
 			source.Reply(_("You can't recover yourself!"));
-		else if (!pass.empty())
-		{
-			EventReturn MOD_RESULT;
-			FOREACH_RESULT(I_OnCheckAuthentication, OnCheckAuthentication(this, &source, params, na->nc->display, pass));
-			if (MOD_RESULT == EVENT_STOP)
-				return;
-
-			if (MOD_RESULT == EVENT_ALLOW)
-			{
-				this->DoRecover(source, u2, na, nick);
-			}
-			else
-			{
-				source.Reply(ACCESS_DENIED);
-				Log(LOG_COMMAND, source, this) << "with invalid password for " << nick;
-				if (source.GetUser())
-					bad_password(source.GetUser());
-			}
-		}
 		else
 		{
 			bool ok = false;
@@ -88,12 +98,23 @@ class CommandNSRecover : public Command
 				ok = true;
 			else if (source.GetUser() && !source.GetUser()->fingerprint.empty() && na->nc->FindCert(source.GetUser()->fingerprint))
 				ok = true;
-			if (ok)
-				this->DoRecover(source, u2, na, nick);
+
+			if (ok == false && !pass.empty())
+			{
+				NSRecoverRequest *req = new NSRecoverRequest(source, this, na, pass);
+				FOREACH_MOD(I_OnCheckAuthentication, OnCheckAuthentication(source.GetUser(), req));
+				req->Dispatch();
+			}
 			else
-				source.Reply(ACCESS_DENIED);
+			{
+				NSRecoverRequest req(source, this, na, pass);
+
+				if (ok)
+					req.OnSuccess();
+				else
+					req.OnFail();
+			}
 		}
-		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override

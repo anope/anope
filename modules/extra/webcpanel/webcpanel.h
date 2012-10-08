@@ -66,7 +66,7 @@ class WebPanelPage : public HTTPPage
 	{
 	}
 
-	virtual void OnRequest(HTTPProvider *, const Anope::string &, HTTPClient *, HTTPMessage &, HTTPReply &) = 0;
+	virtual bool OnRequest(HTTPProvider *, const Anope::string &, HTTPClient *, HTTPMessage &, HTTPReply &) = 0;
 };
 
 class WebPanelProtectedPage : public WebPanelPage
@@ -78,14 +78,14 @@ class WebPanelProtectedPage : public WebPanelPage
 	{
 	}
 
-	void OnRequest(HTTPProvider *provider, const Anope::string &page_name, HTTPClient *client, HTTPMessage &message, HTTPReply &reply) anope_override anope_final
+	bool OnRequest(HTTPProvider *provider, const Anope::string &page_name, HTTPClient *client, HTTPMessage &message, HTTPReply &reply) anope_override anope_final
 	{
 		service_reference<Panel> panel("Panel", "webcpanel");
 		NickAlias *na;
 
 		if (!panel || !(na = panel->GetNickFromSession(client, message)))
 		{
-			return; // Access denied
+			return true; // Access denied
 		}
 
 		TemplateFileServer::Replacements replacements;
@@ -123,10 +123,10 @@ class WebPanelProtectedPage : public WebPanelPage
 			}
 		}
 
-		this->OnRequest(provider, page_name, client, message, reply, na, replacements);
+		return this->OnRequest(provider, page_name, client, message, reply, na, replacements);
 	}
 
-	virtual void OnRequest(HTTPProvider *, const Anope::string &, HTTPClient *, HTTPMessage &, HTTPReply &, NickAlias *, TemplateFileServer::Replacements &) = 0;
+	virtual bool OnRequest(HTTPProvider *, const Anope::string &, HTTPClient *, HTTPMessage &, HTTPReply &, NickAlias *, TemplateFileServer::Replacements &) = 0;
 
 	/* What get data should be appended to links in the navbar */
 	virtual std::set<Anope::string> GetData() { return std::set<Anope::string>(); }

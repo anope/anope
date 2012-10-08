@@ -192,30 +192,28 @@ class ESHA1 : public Module
 		return EVENT_ALLOW;
 	}
 
-	EventReturn OnCheckAuthentication(Command *c, CommandSource *source, const std::vector<Anope::string> &params, const Anope::string &account, const Anope::string &password) anope_override
+	void OnCheckAuthentication(User *, IdentifyRequest *req) anope_override
 	{
-		const NickAlias *na = findnick(account);
+		const NickAlias *na = findnick(req->GetAccount());
 		if (na == NULL)
-			return EVENT_CONTINUE;
+			return;
 		NickCore *nc = na->nc;
 
 		size_t pos = nc->pass.find(':');
 		if (pos == Anope::string::npos)
-			return EVENT_CONTINUE;
+			return;
 		Anope::string hash_method(nc->pass.begin(), nc->pass.begin() + pos);
 		if (!hash_method.equals_cs("sha1"))
-			return EVENT_CONTINUE;
+			return;
 
 		Anope::string buf;
-		this->OnEncrypt(password, buf);
+		this->OnEncrypt(req->GetPassword(), buf);
 		if (nc->pass.equals_cs(buf))
 		{
 			if (ModuleManager::FindFirstOf(ENCRYPTION) != this)
-				enc_encrypt(password, nc->pass);
-			return EVENT_ALLOW;
+				enc_encrypt(req->GetPassword(), nc->pass);
+			req->Success(this);
 		}
-
-		return EVENT_CONTINUE;
 	}
 };
 

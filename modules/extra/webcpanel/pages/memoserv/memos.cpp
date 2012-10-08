@@ -11,7 +11,7 @@ WebCPanel::MemoServ::Memos::Memos(const Anope::string &cat, const Anope::string 
 {
 }
 
-void WebCPanel::MemoServ::Memos::OnRequest(HTTPProvider *server, const Anope::string &page_name, HTTPClient *client, HTTPMessage &message, HTTPReply &reply, NickAlias *na, TemplateFileServer::Replacements &replacements)
+bool WebCPanel::MemoServ::Memos::OnRequest(HTTPProvider *server, const Anope::string &page_name, HTTPClient *client, HTTPMessage &message, HTTPReply &reply, NickAlias *na, TemplateFileServer::Replacements &replacements)
 {
 	const Anope::string &chname = message.get_data["channel"];
 	ChannelInfo *ci;
@@ -117,5 +117,6 @@ void WebCPanel::MemoServ::Memos::OnRequest(HTTPProvider *server, const Anope::st
 
 	TemplateFileServer page("memoserv/memos.html");
 	page.Serve(server, page_name, client, message, reply, replacements);
+	return true;
 }
 

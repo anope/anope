@@ -11,7 +11,7 @@ WebCPanel::NickServ::Info::Info(const Anope::string &cat, const Anope::string &u
 {
 }
 
-void WebCPanel::NickServ::Info::OnRequest(HTTPProvider *server, const Anope::string &page_name, HTTPClient *client, HTTPMessage &message, HTTPReply &reply, NickAlias *na, TemplateFileServer::Replacements &replacements)
+bool WebCPanel::NickServ::Info::OnRequest(HTTPProvider *server, const Anope::string &page_name, HTTPClient *client, HTTPMessage &message, HTTPReply &reply, NickAlias *na, TemplateFileServer::Replacements &replacements)
 {
 	if (message.post_data.empty() == false)
 	{
@@ -107,5 +107,6 @@ void WebCPanel::NickServ::Info::OnRequest(HTTPProvider *server, const Anope::str
 	
 	TemplateFileServer page("nickserv/info.html");
 	page.Serve(server, page_name, client, message, reply, replacements);
+	return true;
 }
 

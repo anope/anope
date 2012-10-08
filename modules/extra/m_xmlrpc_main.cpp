@@ -1,6 +1,37 @@
 #include "module.h"
 #include "xmlrpc.h"
 
+class XMLRPCIdentifyRequest : public IdentifyRequest
+{
+	XMLRPCRequest request;
+	dynamic_reference<XMLRPCServiceInterface> xinterface;
+	dynamic_reference<XMLRPCClientSocket> source;
+
+ public:
+	XMLRPCIdentifyRequest(XMLRPCRequest& req, XMLRPCServiceInterface* iface, XMLRPCClientSocket* s, const Anope::string &acc, const Anope::string &pass) : IdentifyRequest(acc, pass), request(req), xinterface(iface), source(s) { }
+
+	void OnSuccess() anope_override
+	{
+		if (!xinterface || !source)
+			return;
+
+		request.reply("result", "Success");
+		request.reply("account", GetAccount());
+
+		xinterface->Reply(source, &request);
+	}
+
+	void OnFail() anope_override
+	{
+		if (!xinterface || !source)
+			return;
+
+		request.reply("error", "Invalid password");
+
+		xinterface->Reply(source, &request);
+	}
+};
+
 class MyXMLRPCEvent : public XMLRPCEvent
 {
  public:
@@ -77,22 +108,9 @@ class MyXMLRPCEvent : public XMLRPCEvent
 			request->reply("error", "Invalid parameters");
 		else
 		{
-			const NickAlias *na = findnick(username);
-
-			if (!na)
-				request->reply("error", "Invalid account");
-			else
-			{
-				EventReturn MOD_RESULT;
-				FOREACH_RESULT(I_OnCheckAuthentication, OnCheckAuthentication(NULL, NULL, std::vector<Anope::string>(), na->nc->display, password));
-				if (MOD_RESULT == EVENT_ALLOW)
-				{
-					request->reply("result", "Success");
-					request->reply("account", na->nc->display);
-				}
-				else
-					request->reply("error", "Invalid password");
-			}
+			XMLRPCIdentifyRequest *req = new XMLRPCIdentifyRequest(*request, iface, source, username, password);
+			FOREACH_MOD(I_OnCheckAuthentication, OnCheckAuthentication(NULL, req));
+			req->Dispatch();
 		}
 	}
 

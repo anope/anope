@@ -93,3 +93,62 @@ void change_core_display(NickCore *nc)
 	change_core_display(nc, na->nick);
 }
 
+std::set<IdentifyRequest *> IdentifyRequest::requests;
+
+IdentifyRequest::IdentifyRequest(const Anope::string &acc, const Anope::string &pass) : account(acc), password(pass), dispatched(false), success(false)
+{
+	requests.insert(this);
+}
+
+IdentifyRequest::~IdentifyRequest()
+{
+	requests.erase(this);
+}
+
+void IdentifyRequest::Hold(Module *m)
+{
+	holds.insert(m);
+}
+
+void IdentifyRequest::Release(Module *m)
+{
+	holds.erase(m);
+	if (holds.empty() && dispatched)
+	{
+		if (!success)
+			this->OnFail();
+		delete this;
+	}
+}
+
+void IdentifyRequest::Success(Module *m)
+{
+	if (!success)
+	{
+		this->OnSuccess();
+		success = true;
+	}
+}
+
+void IdentifyRequest::Dispatch()
+{
+	if (holds.empty())
+	{
+		if (!success)
+			this->OnFail();
+		delete this;
+	}
+	else
+		dispatched = true;
+}
+
+void IdentifyRequest::ModuleUnload(Module *m)
+{
+	for (std::set<IdentifyRequest *>::iterator it = requests.begin(), it_end = requests.end(); it != it_end;)
+	{
+		IdentifyRequest *ir = *it;
+		++it;
+
+		ir->Release(m);
+	}
+}

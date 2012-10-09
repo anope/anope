@@ -11,6 +11,8 @@
 #include "static_fileserver.h"
 #include "template_fileserver.h"
 
+extern Module *me;
+
 extern Anope::string provider_name, template_name, template_base, page_title;
 
 struct SubSection

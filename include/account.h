@@ -308,6 +308,7 @@ class CoreExport NickCore : public Extensible, public Flags<NickCoreFlag, NI_END
 
 class IdentifyRequest
 {
+	Module *owner;
 	Anope::string account;
 	Anope::string password;
 
@@ -318,7 +319,7 @@ class IdentifyRequest
 	static std::set<IdentifyRequest *> requests;
 
  protected:
-	IdentifyRequest(const Anope::string &acc, const Anope::string &pass);
+	IdentifyRequest(Module *o, const Anope::string &acc, const Anope::string &pass);
 	virtual ~IdentifyRequest();
 
  public:

@@ -20,7 +20,7 @@ class NSReleaseRequest : public IdentifyRequest
 	dynamic_reference<NickAlias> na;
  
  public:
-	NSReleaseRequest(CommandSource &src, Command *c, NickAlias *n, const Anope::string &pass) : IdentifyRequest(n->nc->display, pass), source(src), cmd(c), na(n) { }
+	NSReleaseRequest(Module *m, CommandSource &src, Command *c, NickAlias *n, const Anope::string &pass) : IdentifyRequest(m, n->nc->display, pass), source(src), cmd(c), na(n) { }
 
 	void OnSuccess() anope_override
 	{
@@ -81,13 +81,13 @@ class CommandNSRelease : public Command
 
 			if (ok == false && !pass.empty())
 			{
-				NSReleaseRequest *req = new NSReleaseRequest(source, this, na, pass);
+				NSReleaseRequest *req = new NSReleaseRequest(owner, source, this, na, pass);
 				FOREACH_MOD(I_OnCheckAuthentication, OnCheckAuthentication(source.GetUser(), req));
 				req->Dispatch();
 			}
 			else
 			{
-				NSReleaseRequest req(source, this, na, pass);
+				NSReleaseRequest req(owner, source, this, na, pass);
 
 				if (ok)
 					req.OnSuccess();

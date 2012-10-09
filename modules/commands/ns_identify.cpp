@@ -19,7 +19,7 @@ class NSIdentifyRequest : public IdentifyRequest
 	Command *cmd;
 
  public:
-	NSIdentifyRequest(CommandSource &s, Command *c, const Anope::string &acc, const Anope::string &pass) : IdentifyRequest(acc, pass), source(s), cmd(c) { }
+	NSIdentifyRequest(Module *o, CommandSource &s, Command *c, const Anope::string &acc, const Anope::string &pass) : IdentifyRequest(o, acc, pass), source(s), cmd(c) { }
 
 	void OnSuccess() anope_override
 	{
@@ -81,7 +81,7 @@ class CommandNSIdentify : public Command
 			source.Reply(_("You are already identified."));
 		else
 		{
-			NSIdentifyRequest *req = new NSIdentifyRequest(source, this, na ? na->nc->display : nick, pass);
+			NSIdentifyRequest *req = new NSIdentifyRequest(owner, source, this, na ? na->nc->display : nick, pass);
 			FOREACH_MOD(I_OnCheckAuthentication, OnCheckAuthentication(source.GetUser(), req));
 			req->Dispatch();
 		}

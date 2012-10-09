@@ -21,7 +21,7 @@ class NSGroupRequest : public IdentifyRequest
 	dynamic_reference<NickAlias> target;
  
  public:
-	NSGroupRequest(CommandSource &src, Command *c, const Anope::string &n, NickAlias *targ, const Anope::string &pass) : IdentifyRequest(targ->nc->display, pass), source(src), cmd(c), nick(n), target(targ) { }
+	NSGroupRequest(Module *o, CommandSource &src, Command *c, const Anope::string &n, NickAlias *targ, const Anope::string &pass) : IdentifyRequest(o, targ->nc->display, pass), source(src), cmd(c), nick(n), target(targ) { }
 
 	void OnSuccess() anope_override
 	{
@@ -146,13 +146,13 @@ class CommandNSGroup : public Command
 
 			if (ok == false && !pass.empty())
 			{
-				NSGroupRequest *req = new NSGroupRequest(source, this, u->nick, target, pass);
+				NSGroupRequest *req = new NSGroupRequest(owner, source, this, u->nick, target, pass);
 				FOREACH_MOD(I_OnCheckAuthentication, OnCheckAuthentication(source.GetUser(), req));
 				req->Dispatch();
 			}
 			else
 			{
-				NSGroupRequest req(source, this, u->nick, target, pass);
+				NSGroupRequest req(owner, source, this, u->nick, target, pass);
 
 				if (ok)
 					req.OnSuccess();

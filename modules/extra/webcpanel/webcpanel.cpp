@@ -7,6 +7,7 @@
 
 #include "webcpanel.h"
 
+Module *me;
 Anope::string provider_name, template_name, template_base, page_title;
 
 class ModuleWebCPanel : public Module
@@ -44,6 +45,8 @@ class ModuleWebCPanel : public Module
 		memoserv_memos(Config->MemoServ, "/memoserv/memos"), operserv_akill(Config->OperServ, "/operserv/akill")
 	{
 		this->SetAuthor("Anope");
+
+		me = this;
 
 		ConfigReader reader;
 		provider_name = reader.ReadValue("webcpanel", "server", "httpd/main", 0);

@@ -95,7 +95,7 @@ void change_core_display(NickCore *nc)
 
 std::set<IdentifyRequest *> IdentifyRequest::requests;
 
-IdentifyRequest::IdentifyRequest(const Anope::string &acc, const Anope::string &pass) : account(acc), password(pass), dispatched(false), success(false)
+IdentifyRequest::IdentifyRequest(Module *o, const Anope::string &acc, const Anope::string &pass) : owner(o), account(acc), password(pass), dispatched(false), success(false)
 {
 	requests.insert(this);
 }
@@ -150,5 +150,7 @@ void IdentifyRequest::ModuleUnload(Module *m)
 		++it;
 
 		ir->Release(m);
+		if (ir->owner == m)
+			delete ir;
 	}
 }

@@ -21,7 +21,7 @@ class NSRecoverRequest : public IdentifyRequest
 	dynamic_reference<NickAlias> na;
  
  public:
-	NSRecoverRequest(CommandSource &src, Command *c, NickAlias *n, const Anope::string &pass) : IdentifyRequest(n->nc->display, pass), source(src), cmd(c), na(n) { }
+	NSRecoverRequest(Module *m, CommandSource &src, Command *c, NickAlias *n, const Anope::string &pass) : IdentifyRequest(m, n->nc->display, pass), source(src), cmd(c), na(n) { }
 
 	void OnSuccess() anope_override
 	{
@@ -101,13 +101,13 @@ class CommandNSRecover : public Command
 
 			if (ok == false && !pass.empty())
 			{
-				NSRecoverRequest *req = new NSRecoverRequest(source, this, na, pass);
+				NSRecoverRequest *req = new NSRecoverRequest(owner, source, this, na, pass);
 				FOREACH_MOD(I_OnCheckAuthentication, OnCheckAuthentication(source.GetUser(), req));
 				req->Dispatch();
 			}
 			else
 			{
-				NSRecoverRequest req(source, this, na, pass);
+				NSRecoverRequest req(owner, source, this, na, pass);
 
 				if (ok)
 					req.OnSuccess();

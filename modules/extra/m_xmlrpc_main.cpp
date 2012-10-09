@@ -1,6 +1,8 @@
 #include "module.h"
 #include "xmlrpc.h"
 
+static Module *me;
+
 class XMLRPCIdentifyRequest : public IdentifyRequest
 {
 	XMLRPCRequest request;
@@ -8,7 +10,7 @@ class XMLRPCIdentifyRequest : public IdentifyRequest
 	dynamic_reference<XMLRPCClientSocket> source;
 
  public:
-	XMLRPCIdentifyRequest(XMLRPCRequest& req, XMLRPCServiceInterface* iface, XMLRPCClientSocket* s, const Anope::string &acc, const Anope::string &pass) : IdentifyRequest(acc, pass), request(req), xinterface(iface), source(s) { }
+	XMLRPCIdentifyRequest(Module *m, XMLRPCRequest& req, XMLRPCServiceInterface* iface, XMLRPCClientSocket* s, const Anope::string &acc, const Anope::string &pass) : IdentifyRequest(m, acc, pass), request(req), xinterface(iface), source(s) { }
 
 	void OnSuccess() anope_override
 	{
@@ -104,7 +106,7 @@ class MyXMLRPCEvent : public XMLRPCEvent
 			request->reply("error", "Invalid parameters");
 		else
 		{
-			XMLRPCIdentifyRequest *req = new XMLRPCIdentifyRequest(*request, iface, source, username, password);
+			XMLRPCIdentifyRequest *req = new XMLRPCIdentifyRequest(me, *request, iface, source, username, password);
 			FOREACH_MOD(I_OnCheckAuthentication, OnCheckAuthentication(NULL, req));
 			req->Dispatch();
 		}
@@ -247,6 +249,8 @@ class ModuleXMLRPCMain : public Module
 	{
 		if (!xmlrpc)
 			throw ModuleException("Unable to find xmlrpc reference, is m_xmlrpc loaded?");
+
+		me = this;
 
 		xmlrpc->Register(&stats);
 	}

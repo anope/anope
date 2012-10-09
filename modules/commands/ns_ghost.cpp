@@ -19,7 +19,7 @@ class NSGhostRequest : public IdentifyRequest
 	Command *cmd;
  
  public:
-	NSGhostRequest(CommandSource &src, Command *c, const Anope::string &user, const Anope::string &pass) : IdentifyRequest(user, pass), source(src), cmd(c) { }
+	NSGhostRequest(Module *o, CommandSource &src, Command *c, const Anope::string &user, const Anope::string &pass) : IdentifyRequest(o, user, pass), source(src), cmd(c) { }
 
 	void OnSuccess() anope_override
 	{
@@ -90,13 +90,13 @@ class CommandNSGhost : public Command
 
 			if (ok == false && !pass.empty())
 			{
-				NSGhostRequest *req = new NSGhostRequest(source, this, na->nc->display, pass);
+				NSGhostRequest *req = new NSGhostRequest(owner, source, this, na->nc->display, pass);
 				FOREACH_MOD(I_OnCheckAuthentication, OnCheckAuthentication(source.GetUser(), req));
 				req->Dispatch();
 			}
 			else
 			{
-				NSGhostRequest req(source, this, na->nc->display, pass);
+				NSGhostRequest req(owner, source, this, na->nc->display, pass);
 
 				if (ok)
 					req.OnSuccess();

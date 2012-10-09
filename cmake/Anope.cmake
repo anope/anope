@@ -359,12 +359,12 @@ macro(find_includes SRC INCLUDES)
 endmacro(find_includes)
 
 ###############################################################################
-# calculate_depends(<source filename> <output variable set to TRUE on fail> [<optional output variable for includes>])
+# calculate_depends(<source filename> <output variable set to TRUE on fail> <TRUE to output error messages> [<optional output variable for includes>])
 #
 # This macro is used in most of the src (sub)directories to calculate the
 #   header file dependencies for the given source file.
 ###############################################################################
-macro(calculate_depends SRC SKIP)
+macro(calculate_depends SRC SKIP VERBOSE)
   # Temporarily set that we didn't get a 3rd argument before we actually check if we did get one or not
   set(CHECK_ANGLE_INCLUDES FALSE)
   # Check for a third argument
@@ -402,14 +402,16 @@ macro(calculate_depends SRC SKIP)
             endif(FOUND_DEFAULT)
           endforeach(DEFAULT_INCLUDE_DIR)
           if(FOUND_IN_DEFAULTS EQUAL -1)
-            find_in_list(${ARGV2} "${FOUND_${FILENAME}_INCLUDE}" FOUND_IN_INCLUDES)
+            find_in_list(${ARGV3} "${FOUND_${FILENAME}_INCLUDE}" FOUND_IN_INCLUDES)
             if(FOUND_IN_INCLUDES EQUAL -1)
-              append_to_list(${ARGV2} "${FOUND_${FILENAME}_INCLUDE}")
+              append_to_list(${ARGV3} "${FOUND_${FILENAME}_INCLUDE}")
             endif(FOUND_IN_INCLUDES EQUAL -1)
           endif(FOUND_IN_DEFAULTS EQUAL -1)
         else(FOUND_${FILENAME}_INCLUDE)
           set(${SKIP} TRUE)
-          message("${SRC} needs header file ${FILENAME} but we were unable to locate that header file! Check that the header file is within the search path of your OS.")
+          if(VERBOSE)
+            message("${SRC} needs header file ${FILENAME} but we were unable to locate that header file! Check that the header file is within the search path of your OS.")
+          endif(VERBOSE)
         endif(FOUND_${FILENAME}_INCLUDE)
       endif(CHECK_ANGLE_INCLUDES)
     endif(QUOTE_TYPE STREQUAL "angle brackets")
@@ -417,12 +419,12 @@ macro(calculate_depends SRC SKIP)
 endmacro(calculate_depends)
 
 ###############################################################################
-# calculate_libraries(<source filename> <output variable set to TRUE on fail> <output variable for linker flags> <output variable for extra depends>)
+# calculate_libraries(<source filename> <output variable set to TRUE on fail> <TRUE to output error messages> <output variable for linker flags> <output variable for extra depends>)
 #
 # This macro is used in most of the module (sub)directories to calculate the
 #   library dependencies for the given source file.
 ###############################################################################
-macro(calculate_libraries SRC SKIP SRC_LDFLAGS EXTRA_DEPENDS)
+macro(calculate_libraries SRC SKIP VERBOSE SRC_LDFLAGS EXTRA_DEPENDS)
   # Set up a temporary LDFLAGS for this file
   set(THIS_LDFLAGS "${LDFLAGS}")
   # Reset extra dependencies
@@ -464,8 +466,10 @@ macro(calculate_libraries SRC SKIP SRC_LDFLAGS EXTRA_DEPENDS)
       else(FOUND_${LIBRARY}_LIBRARY)
         # Skip this file
         set(${SKIP} TRUE)
-        # In the case of the library not being found, we fatally error so CMake stops trying to generate
-        message("${SRC} needs library ${LIBRARY} but we were unable to locate that library! Check that the library is within the search path of your OS.")
+        if(VERBOSE)
+          # In the case of the library not being found, we fatally error so CMake stops trying to generate
+          message(FATAL_ERROR "${SRC} needs library ${LIBRARY} but we were unable to locate that library! Check that the library is within the search path of your OS.")
+        endif(VERBOSE)
       endif(FOUND_${LIBRARY}_LIBRARY)
     endforeach(LIBRARY)
   endforeach(REQUIRED_LIBRARY)

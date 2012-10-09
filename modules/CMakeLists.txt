@@ -42,7 +42,7 @@ foreach(MODULE_FOLDER ${MODULES_FOLDERS})
       # Temporary variable for the current source's include directories
       set(TEMP_INCLUDES)
       # Calculate the header file dependencies for the given source file
-      calculate_depends(${SRC} SKIP_DEPENDS TEMP_INCLUDES)
+      calculate_depends(${SRC} SKIP_DEPENDS FALSE TEMP_INCLUDES)
       # If there were some extra include directories, add them to the list
       if(TEMP_INCLUDES)
         append_to_list(EXTRA_INCLUDES ${TEMP_INCLUDES})
@@ -54,7 +54,7 @@ foreach(MODULE_FOLDER ${MODULES_FOLDERS})
       # Reset skip_libraries
       set(SKIP_LIBRARIES)
       # Calculate the library dependencies for the given source file
-      calculate_libraries(${SRC} SKIP_LIBRARIES TEMP_LDFLAGS TEMP_DEPENDENCIES)
+      calculate_libraries(${SRC} SKIP_LIBRARIES FALSE TEMP_LDFLAGS TEMP_DEPENDENCIES)
       if(NOT SKIP_DEPENDS AND NOT SKIP_LIBRARIES)
         # Reset has_function
         set(HAS_FUNCTION)
@@ -95,7 +95,7 @@ foreach(MODULE_FOLDER ${MODULES_FOLDERS})
           )
         endif(HAS_FUNCTION)
       else(NOT SKIP_DEPENDS AND NOT SKIP_LIBRARIES)
-        message("  This is not a fatal error - ${SRC} will not be built.")
+        message("  ${SRC} can not be built due to missing dependencies.")
       endif(NOT SKIP_DEPENDS AND NOT SKIP_LIBRARIES)
     endforeach(SRC)
 
@@ -138,7 +138,7 @@ foreach(MODULE_FOLDER ${MODULES_FOLDERS})
             # Temporary variable for the current source's include directories
             set(TEMP_INCLUDES)
             # Calculate the header file dependencies for the given source file
-            calculate_depends(${SRC} SKIP_DEPENDS TEMP_INCLUDES)
+            calculate_depends(${SRC} SKIP_DEPENDS FALSE TEMP_INCLUDES)
             # If there were some extra include directories, add them to the list
             if(TEMP_INCLUDES)
               append_to_list(EXTRA_INCLUDES ${TEMP_INCLUDES})
@@ -148,7 +148,7 @@ foreach(MODULE_FOLDER ${MODULES_FOLDERS})
             # Reset extra dependencies
             set(TEMP_DEPENDENCIES)
             # Calculate the library dependencies for the given source file
-            calculate_libraries(${SRC} SKIP_LIBRARIES TEMP_LDFLAGS TEMP_DEPENDENCIES)
+            calculate_libraries(${SRC} SKIP_LIBRARIES FALSE TEMP_LDFLAGS TEMP_DEPENDENCIES)
             # Check the function dependencies for the given source file
             check_functions(${SRC} HAS_FUNCTION)
 
@@ -195,7 +195,7 @@ foreach(MODULE_FOLDER ${MODULES_FOLDERS})
             DESTINATION ${LIB_DIR}/modules
           )
          else(NOT SKIP_DEPENDS AND NOT SKIP_LIBRARIES AND HAS_FUNCTION)
-          message("  This is not a fatal error - ${SUBDIR} will not be built.")
+          message("  ${SRC} can not be built due to missing dependencies.")
         endif(NOT SKIP_DEPENDS AND NOT SKIP_LIBRARIES AND HAS_FUNCTION)
 
 	# Run the directories CMakeLists.txt if there is one

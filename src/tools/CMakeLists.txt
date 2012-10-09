@@ -12,7 +12,7 @@ foreach(SRC ${TOOLS_SRCS})
   # Create skip variable
   set(SKIP)
   # Calculate the header file dependencies for the given source file
-  calculate_depends(${SRC} SKIP)
+  calculate_depends(${SRC} SKIP TRUE)
   # Only continue if this file isn't skipped
   if(NOT SKIP)
     # Generate the executable and set its linker flags, also set it to depend on the main Anope executable to be built beforehand

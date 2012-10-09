@@ -384,7 +384,7 @@ void Init(int ac, char **av)
 	if (GetCommandLineArgument("dbdir", 0, Arg))
 	{
 		if (Arg.empty())
-			throw FatalException("The --confdir option requires a path");
+			throw FatalException("The --dbdir option requires a path");
 		db_dir = Arg;
 	}
 

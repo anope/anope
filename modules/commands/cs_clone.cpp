@@ -98,7 +98,7 @@ public:
 				target_ci->last_topic_time = target_ci->c->topic_time;
 			}
 			else
-				target_ci->last_topic_setter = source.owner->nick;
+				target_ci->last_topic_setter = source.service->nick;
 
 			FOREACH_MOD(I_OnChanRegistered, OnChanRegistered(target_ci));
 

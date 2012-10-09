@@ -249,7 +249,7 @@ class OperServCore : public Module
 
 	EventReturn OnPreHelp(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		if (!params.empty() || source.owner->nick != Config->OperServ)
+		if (!params.empty() || source.c || source.service->nick != Config->OperServ)
 			return EVENT_CONTINUE;
 		source.Reply(_("%s commands:"), Config->OperServ.c_str());
 		return EVENT_CONTINUE;

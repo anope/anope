@@ -66,7 +66,7 @@ class CommandCSSetKeepTopic : public Command
 				"channel. When \002%s\002 is set, the topic for the\n"
 				"channel will be remembered by %s even after the\n"
 				"last user leaves the channel, and will be restored the\n"
-				"next time the channel is created."), this->name.c_str(), source.owner->nick.c_str());
+				"next time the channel is created."), this->name.c_str(), source.service->nick.c_str());
 		return true;
 	}
 };

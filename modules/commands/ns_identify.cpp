@@ -96,7 +96,7 @@ class CommandNSIdentify : public Command
 				"nick.  Many commands require you to authenticate yourself\n"
 				"with this command before you use them.  The password\n"
 				"should be the same one you sent with the \002REGISTER\002\n"
-				"command."), source.owner->nick.c_str());
+				"command."), source.service->nick.c_str());
 		return true;
 	}
 };

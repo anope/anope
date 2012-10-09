@@ -30,18 +30,19 @@ class CommandHelp : public Command
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 	
-		const BotInfo *bi = source.owner;
+		const BotInfo *bi = source.service;
+		const CommandInfo::map &map = source.c ? Config->Fantasy : bi->commands;
 
 		if (params.empty())
 		{
-			for (BotInfo::command_map::const_iterator it = bi->commands.begin(), it_end = bi->commands.end(); it != it_end; ++it)
+			for (CommandInfo::map::const_iterator it = map.begin(), it_end = map.end(); it != it_end; ++it)
 			{
 				const Anope::string &c_name = it->first;
 				const CommandInfo &info = it->second;
 
 				// Smaller command exists
 				Anope::string cmd = myStrGetToken(c_name, ' ', 0);
-				if (cmd != it->first && bi->commands.count(cmd))
+				if (cmd != it->first && map.count(cmd))
 					continue;
 
 				service_reference<Command> c("Command", info.name);
@@ -64,8 +65,8 @@ class CommandHelp : public Command
 					full_command += " " + params[i];
 				full_command.erase(full_command.begin());
 
-				BotInfo::command_map::const_iterator it = bi->commands.find(full_command);
-				if (it == bi->commands.end())
+				CommandInfo::map::const_iterator it = map.find(full_command);
+				if (it == map.end())
 					continue;
 
 				const CommandInfo &info = it->second;

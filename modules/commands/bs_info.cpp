@@ -228,7 +228,7 @@ class CommandBSInfo : public Command
 				"If the parameter is a channel, then you'll get information\n"
 				"such as enabled kickers. If the parameter is a nick,\n"
 				"you'll get information about a bot, such as creation\n"
-				"time or number of channels it is on."), source.owner->nick.c_str());
+				"time or number of channels it is on."), source.service->nick.c_str());
 		return true;
 	}
 };

@@ -29,6 +29,8 @@ const Anope::string CommandFlagStrings[] = {
 
 struct CommandInfo
 {
+	typedef Anope::insensitive_map<CommandInfo> map;
+
 	Anope::string name;
 	Anope::string permission;
 };
@@ -53,15 +55,13 @@ class CoreExport CommandSource
 	/* Channel the command was executed on (fantasy) */
 	dynamic_reference<Channel> c;
 	/* The service this command is on */
-	dynamic_reference<BotInfo> owner;
-	/* The service the reply should come from, *not* necessarily the service the command is on */
 	dynamic_reference<BotInfo> service;
 	/* The actual name of the command being executed */
 	Anope::string command;
 	/* The permission of the command being executed */
 	Anope::string permission;
 
-	CommandSource(const Anope::string &n, User *user, NickCore *core, CommandReply *reply);
+	CommandSource(const Anope::string &n, User *user, NickCore *core, CommandReply *reply, BotInfo *bi);
 
 	const Anope::string &GetNick() const;
 	User *GetUser();

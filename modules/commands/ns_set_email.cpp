@@ -88,7 +88,7 @@ class CommandNSSetEmail : public Command
 			source.nc->Extend("ns_set_email", new ExtensibleItemClass<Anope::string>(param));
 			Anope::string old = source.nc->email;
 			source.nc->email = param;
-			if (SendConfirmMail(source.GetUser(), source.owner))
+			if (SendConfirmMail(source.GetUser(), source.service))
 				source.Reply(_("A confirmation email has been sent to \002%s\002. Follow the instructions in it to change your email address."), param.c_str());
 			source.nc->email = old;
 		}

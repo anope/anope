@@ -61,7 +61,7 @@ class CommandCSTopic : public Command
 				"is set. This command is most useful in conjunction\n"
 				"with topic lock.\n"
 				"By default, limited to those with founder access on the\n"
-				"channel."), source.owner->nick.c_str());
+				"channel."), source.service->nick.c_str());
 		return true;
 	}
 };

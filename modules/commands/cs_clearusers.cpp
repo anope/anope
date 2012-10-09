@@ -69,7 +69,7 @@ class CommandCSClearUsers : public Command
 		source.Reply(_("Tells %s to clear (kick) all users on a channel."
 				" \n"
 				"By default, limited to those with founder access on the\n"
-				"channel."), source.owner->nick.c_str());
+				"channel."), source.service->nick.c_str());
 		return true;
 	}
 };

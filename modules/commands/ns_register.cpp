@@ -217,7 +217,7 @@ class CommandNSRegister : public Command
 			else if (Config->NSRegistration.equals_ci("mail"))
 			{
 				nc->SetFlag(NI_UNCONFIRMED);
-				if (SendRegmail(u, na, source.owner))
+				if (SendRegmail(u, na, source.service))
 				{
 					source.Reply(_("A passcode has been sent to %s, please type %s%s confirm <passcode> to confirm your email address."), email.c_str(), Config->UseStrictPrivMsgString.c_str(), Config->NickServ.c_str());
 					source.Reply(_("If you do not confirm your email address within %s your account will expire."), duration(Config->NSUnconfirmedExpire).c_str());
@@ -300,7 +300,7 @@ class CommandNSResend : public Command
 		{
 			if (Anope::CurTime < source.nc->lastmail + Config->NSResendDelay)
 				source.Reply(_("Cannot send mail now; please retry a little later."));
-			else if (SendRegmail(source.GetUser(), na, source.owner))
+			else if (SendRegmail(source.GetUser(), na, source.service))
 			{
 				na->nc->lastmail = Anope::CurTime;
 				source.Reply(_("Your passcode has been re-sent to %s."), na->nc->email.c_str());

@@ -34,7 +34,7 @@ class CommandNSSet : public Command
 		source.Reply(" ");
 		source.Reply(_("Sets various nickname options.  \037option\037 can be one of:"));
 		Anope::string this_name = source.command;
-		for (BotInfo::command_map::const_iterator it = source.owner->commands.begin(), it_end = source.owner->commands.end(); it != it_end; ++it)
+		for (CommandInfo::map::const_iterator it = source.service->commands.begin(), it_end = source.service->commands.end(); it != it_end; ++it)
 		{
 			const Anope::string &c_name = it->first;
 			const CommandInfo &info = it->second;
@@ -50,7 +50,7 @@ class CommandNSSet : public Command
 			}
 		}
 		source.Reply(_("Type \002%s%s HELP %s \037option\037\002 for more information\n"
-				"on a specific option."), Config->UseStrictPrivMsgString.c_str(), source.owner->nick.c_str(), source.command.c_str());
+				"on a specific option."), Config->UseStrictPrivMsgString.c_str(), source.service->nick.c_str(), source.command.c_str());
 		return true;
 	}
 };

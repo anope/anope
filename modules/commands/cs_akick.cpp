@@ -464,7 +464,7 @@ class CommandCSAKick : public Command
 				"When akicking a \037registered nick\037 the nickserv account\n"
 				"will be added to the akick list instead of the mask.\n"
 				"All users within that nickgroup will then be akicked.\n"),
-				source.owner->nick.c_str());
+				source.service->nick.c_str());
 		source.Reply(_(
 				" \n"
 				"The \002AKICK DEL\002 command removes the given nick or mask\n"
@@ -484,7 +484,7 @@ class CommandCSAKick : public Command
 				"AKICK mask.\n"
 				" \n"
 				"The \002AKICK CLEAR\002 command clears all entries of the\n"
-				"akick list."), source.owner->nick.c_str());
+				"akick list."), source.service->nick.c_str());
 		return true;
 	}
 };

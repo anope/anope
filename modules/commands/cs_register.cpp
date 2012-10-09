@@ -70,7 +70,7 @@ class CommandCSRegister : public Command
 				ci->last_topic_time = c->topic_time;
 			}
 			else
-				ci->last_topic_setter = source.owner->nick;
+				ci->last_topic_setter = source.service->nick;
 
 			Log(LOG_COMMAND, source, this, ci);
 			source.Reply(_("Channel \002%s\002 registered under your account: %s"), chan.c_str(), nc->display.c_str());
@@ -125,7 +125,7 @@ class CommandCSRegister : public Command
 			"NOTICE: In order to register a channel, you must have\n"
 			"first registered your nickname.  If you haven't,\n"
 			"\002%s%s HELP\002 for information on how to do so."),
-			source.owner->nick.c_str(), source.owner->nick.c_str(), Config->UseStrictPrivMsgString.c_str(), source.owner->nick.c_str(), Config->UseStrictPrivMsgString.c_str(), Config->NickServ.c_str());
+			source.service->nick.c_str(), source.service->nick.c_str(), Config->UseStrictPrivMsgString.c_str(), source.service->nick.c_str(), Config->UseStrictPrivMsgString.c_str(), Config->NickServ.c_str());
 		return true;
 	}
 };

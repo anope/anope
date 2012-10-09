@@ -151,7 +151,7 @@ class ChanServCore : public Module
 
 	EventReturn OnPreHelp(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		if (!params.empty() || source.owner->nick != Config->ChanServ)
+		if (!params.empty() || source.c || source.service->nick != Config->ChanServ)
 			return EVENT_CONTINUE;
 		source.Reply(_("\002%s\002 allows you to register and control various\n"
 			"aspects of channels. %s can often prevent\n"
@@ -166,7 +166,7 @@ class ChanServCore : public Module
 
 	void OnPostHelp(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		if (!params.empty() || source.owner->nick != Config->ChanServ)
+		if (!params.empty() || source.c || source.service->nick != Config->ChanServ)
 			return;
 		if (Config->CSExpire >= 86400)
 			source.Reply(_(" \n"

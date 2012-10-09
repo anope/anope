@@ -46,105 +46,106 @@ class BotServCore : public Module
 
 		Anope::string realbuf = msg;
 
-		bool was_action = false;
 		if (realbuf.substr(0, 8).equals_ci("\1ACTION ") && realbuf[realbuf.length() - 1] == '\1')
 		{
 			realbuf.erase(0, 8);
 			realbuf.erase(realbuf.length() - 1);
-			was_action = true;
+			return;
 		}
 	
-		if (realbuf.empty())
+		if (realbuf.empty() || !c->ci->botflags.HasFlag(BS_FANTASY))
 			return;
 
-		/* Fantaisist commands */
-		if (c->ci->botflags.HasFlag(BS_FANTASY) && (Config->BSFantasyCharacter.empty() || realbuf.find_first_of(Config->BSFantasyCharacter) == 0) && !was_action)
+		std::vector<Anope::string> params = BuildStringVector(realbuf);
+
+		if (!realbuf.find_first_of(c->ci->bi->nick))
+			params.erase(params.begin());
+		else if (Config->BSFantasyCharacter.empty())
+			;
+		else if (!realbuf.find_first_of(Config->BSFantasyCharacter))
+			params[0].erase(params[0].begin());
+		else
+			return;
+		
+		if (params.empty())
+			return;
+
+		CommandInfo::map::const_iterator it = Config->Fantasy.end();
+		unsigned count = 0;
+		for (unsigned max = params.size(); it == Config->Fantasy.end() && max > 0; --max)
 		{
-			/* Strip off the fantasy character */
-			if (!Config->BSFantasyCharacter.empty())
-				realbuf.erase(realbuf.begin());
+			Anope::string full_command;
+			for (unsigned i = 0; i < max; ++i)
+				full_command += " " + params[i];
+			full_command.erase(full_command.begin());
 
-			std::vector<Anope::string> params = BuildStringVector(realbuf);
+			++count;
+			it = Config->Fantasy.find(full_command);
+		}
 
-			ServerConfig::fantasy_map::const_iterator it = Config->Fantasy.end();
-			unsigned count = 0;
-			for (unsigned max = params.size(); it == Config->Fantasy.end() && max > 0; --max)
-			{
-				Anope::string full_command;
-				for (unsigned i = 0; i < max; ++i)
-					full_command += " " + params[i];
-				full_command.erase(full_command.begin());
+		if (it == Config->Fantasy.end())
+			return;
 
-				++count;
-				it = Config->Fantasy.find(full_command);
-			}
+		const CommandInfo &info = it->second;
+		service_reference<Command> cmd("Command", info.name);
+		if (!cmd)
+		{
+			Log(LOG_DEBUG) << "Fantasy command " << it->first << " exists for nonexistant service " << info.name << "!";
+			return;
+		}
 
-			if (it == Config->Fantasy.end())
-				return;
+		for (unsigned i = 0, j = params.size() - (count - 1); i < j; ++i)
+			params.erase(params.begin());
 
-			const CommandInfo &info = it->second;
-			service_reference<Command> cmd("Command", info.name);
-			if (!cmd)
-			{
-				Log(LOG_DEBUG) << "Fantasy command " << it->first << " exists for nonexistant service " << info.name << "!";
-				return;
-			}
+		while (cmd->MaxParams > 0 && params.size() > cmd->MaxParams)
+		{
+			params[cmd->MaxParams - 1] += " " + params[cmd->MaxParams];
+			params.erase(params.begin() + cmd->MaxParams);
+		}
 
-			for (unsigned i = 0, j = params.size() - (count - 1); i < j; ++i)
-				params.erase(params.begin());
+		/* All ChanServ commands take the channel as a first parameter */
+		if (cmd->name.find("chanserv/") == 0 && !cmd->HasFlag(CFLAG_STRIP_CHANNEL))
+			params.insert(params.begin(), c->ci->name);
 
-			while (cmd->MaxParams > 0 && params.size() > cmd->MaxParams)
-			{
-				params[cmd->MaxParams - 1] += " " + params[cmd->MaxParams];
-				params.erase(params.begin() + cmd->MaxParams);
-			}
+		// Command requires registered users only
+		if (!cmd->HasFlag(CFLAG_ALLOW_UNREGISTERED) && !u->Account())
+			return;
 
-			/* All ChanServ commands take the channel as a first parameter */
-			if (cmd->name.find("chanserv/") == 0)
-				params.insert(params.begin(), c->ci->name);
+		if (params.size() < cmd->MinParams)
+			return;
 
-			// Command requires registered users only
-			if (!cmd->HasFlag(CFLAG_ALLOW_UNREGISTERED) && !u->Account())
-				return;
+		CommandSource source(u->nick, u, u->Account(), u, c->ci->bi);
+		source.c = c;
+		source.command = it->first;
+		source.permission = info.permission;
 
-			if (params.size() < cmd->MinParams)
-				return;
+		EventReturn MOD_RESULT;
+		if (c->ci->AccessFor(u).HasPriv("FANTASIA"))
+		{
+			FOREACH_RESULT(I_OnBotFantasy, OnBotFantasy(source, cmd, c->ci, params));
+		}
+		else
+		{
+			FOREACH_RESULT(I_OnBotNoFantasyAccess, OnBotNoFantasyAccess(source, cmd, c->ci, params));
+		}
 
-			CommandSource source(u->nick, u, u->Account(), u);
-			source.c = c;
-			source.owner = c->ci->bi;
-			source.service = c->ci->bi;
-			source.command = it->first;
-			source.permission = info.permission;
+		if (MOD_RESULT == EVENT_STOP || !c->ci->AccessFor(u).HasPriv("FANTASIA"))
+			return;
 
-			EventReturn MOD_RESULT;
-			if (c->ci->AccessFor(u).HasPriv("FANTASIA"))
-			{
-				FOREACH_RESULT(I_OnBotFantasy, OnBotFantasy(source, cmd, c->ci, params));
-			}
-			else
-			{
-				FOREACH_RESULT(I_OnBotNoFantasyAccess, OnBotNoFantasyAccess(source, cmd, c->ci, params));
-			}
+		if (MOD_RESULT != EVENT_ALLOW && !info.permission.empty() && !source.HasCommand(info.permission))
+			return;
 
-			if (MOD_RESULT == EVENT_STOP || !c->ci->AccessFor(u).HasPriv("FANTASIA"))
-				return;
+		FOREACH_RESULT(I_OnPreCommand, OnPreCommand(source, cmd, params));
+		if (MOD_RESULT == EVENT_STOP)
+			return;
 
-			if (MOD_RESULT != EVENT_ALLOW && !info.permission.empty() && !source.HasCommand(info.permission))
-				return;
+		dynamic_reference<User> user_reference(u);
+		dynamic_reference<NickCore> nc_reference(u->Account());
+		cmd->Execute(source, params);
 
-			FOREACH_RESULT(I_OnPreCommand, OnPreCommand(source, cmd, params));
-			if (MOD_RESULT == EVENT_STOP)
-				return;
-
-			dynamic_reference<User> user_reference(u);
-			dynamic_reference<NickCore> nc_reference(u->Account());
-			cmd->Execute(source, params);
-
-			if (user_reference && nc_reference)
-			{
-				FOREACH_MOD(I_OnPostCommand, OnPostCommand(source, cmd, params));
-			}
+		if (user_reference && nc_reference)
+		{
+			FOREACH_MOD(I_OnPostCommand, OnPostCommand(source, cmd, params));
 		}
 	}
 
@@ -200,24 +201,43 @@ class BotServCore : public Module
 
 	EventReturn OnPreHelp(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		if (!params.empty() || source.owner->nick != Config->BotServ)
+		if (!params.empty())
 			return EVENT_CONTINUE;
-		source.Reply(_("\002%s\002 allows you to have a bot on your own channel.\n"
-			"It has been created for users that can't host or\n"
-			"configure a bot, or for use on networks that don't\n"
-			"allow user bots. Available commands are listed \n"
-			"below; to use them, type \002%s%s \037command\037\002. For\n"
-			"more information on a specific command, type\n"
-			"\002%s%s %s \037command\037\002.\n "),
-			Config->BotServ.c_str(), Config->UseStrictPrivMsgString.c_str(), Config->BotServ.c_str(),
-			Config->UseStrictPrivMsgString.c_str(), Config->BotServ.c_str(), source.command.c_str());
+
+		if (source.c)
+		{
+			source.Reply(_("\2%s\2 allows you to execute \"fantasy\" commands in the channel.\n"
+					"Fantasy commands are tied to existing commands, usually on \2%s\2,\n"
+					"and provide a more convenient way to execute commands. Commands that\n"
+					"require a channel as a parameter will automatically have that parameter\n"
+					"given.\n"), source.service->nick.c_str(), Config->ChanServ.c_str());
+			if (!Config->BSFantasyCharacter.empty())
+				source.Reply(_(" \n"
+						"Fantasy commands may be prefixed with one of the following characters: %s\n"), Config->BSFantasyCharacter.c_str());
+			source.Reply(_(" \n"
+					"Available commands are:"));
+		}
+		else if (source.service->nick == Config->BotServ)
+		{
+			source.Reply(_("\002%s\002 allows you to have a bot on your own channel.\n"
+				"It has been created for users that can't host or\n"
+				"configure a bot, or for use on networks that don't\n"
+				"allow user bots. Available commands are listed \n"
+				"below; to use them, type \002%s%s \037command\037\002. For\n"
+				"more information on a specific command, type\n"
+				"\002%s%s %s \037command\037\002.\n "),
+				Config->BotServ.c_str(), Config->UseStrictPrivMsgString.c_str(), Config->BotServ.c_str(),
+				Config->UseStrictPrivMsgString.c_str(), Config->BotServ.c_str(), source.command.c_str());
+		}
+
 		return EVENT_CONTINUE;
 	}
 
 	void OnPostHelp(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		if (!params.empty() || source.owner->nick != Config->BotServ)
+		if (!params.empty() || source.c || source.service->nick != Config->BotServ)
 			return;
+
 		source.Reply(_(" \n"
 			"Bot will join a channel whenever there is at least\n"
 			"\002%d\002 user(s) on it."), Config->BSMinUsers);

@@ -33,15 +33,15 @@ class CommandOSOLine : public Command
 			source.Reply(NICK_X_NOT_IN_USE, nick.c_str());
 		else if (u2 && flag[0] == '+')
 		{
-			ircdproto->SendSVSO(source.owner, nick, flag);
-			u2->SetMode(source.owner, UMODE_OPER);
-			u2->SendMessage(source.owner, _("You are now an IRC Operator."));
+			ircdproto->SendSVSO(source.service, nick, flag);
+			u2->SetMode(source.service, UMODE_OPER);
+			u2->SendMessage(source.service, _("You are now an IRC Operator."));
 			source.Reply(_("Operflags \002%s\002 have been added for \002%s\002."), flag.c_str(), nick.c_str());
 			Log(LOG_ADMIN, source, this) << "for " << nick;
 		}
 		else if (u2 && flag[0] == '-')
 		{
-			ircdproto->SendSVSO(source.owner, nick, flag);
+			ircdproto->SendSVSO(source.service, nick, flag);
 			source.Reply(_("Operflags \002%s\002 have been added for \002%s\002."), flag.c_str(), nick.c_str());
 			Log(LOG_ADMIN, source, this) << "for " << nick;
 		}

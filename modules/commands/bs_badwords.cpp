@@ -289,7 +289,7 @@ class CommandBSBadwords : public Command
 				"will be done if a user says a word that ends with\n"
 				"\037word\037. If you don't specify anything, a kick will\n"
 				"be issued every time \037word\037 is said by a user.\n"
-				" \n"), Config->UseStrictPrivMsgString.c_str(), source.owner->nick.c_str(), source.command.c_str());
+				" \n"), Config->UseStrictPrivMsgString.c_str(), source.service->nick.c_str(), source.command.c_str());
 		source.Reply(_("The \002DEL\002 command removes the given word from the\n"
 				"bad words list.  If a list of entry numbers is given, those\n"
 				"entries are deleted.  (See the example for LIST below.)\n"

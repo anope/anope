@@ -45,7 +45,7 @@ class CommandOSLogin : public Command
 		}
 		else
 		{
-			Log(LOG_ADMIN, source, this) << "and successfully identified to " << source.owner->nick;
+			Log(LOG_ADMIN, source, this) << "and successfully identified to " << source.service->nick;
 			u->Extend("os_login_password_correct", NULL);
 			source.Reply(_("Password accepted."));
 		}
@@ -59,7 +59,7 @@ class CommandOSLogin : public Command
 		source.Reply(" ");
 		source.Reply(_("Logs you in to %s so you gain Services Operator privileges.\n"
 				"This command may be unnecessary if your oper block is\n"
-				"configured without a password."), source.owner->nick.c_str());
+				"configured without a password."), source.service->nick.c_str());
 		return true;
 	}
 };
@@ -100,7 +100,7 @@ class CommandOSLogout : public Command
 		source.Reply(" ");
 		source.Reply(_("Logs you out from %s so you lose Services Operator privileges.\n"
 				"This command is only useful if your oper block is configured\n"
-				"with a password."), source.owner->nick.c_str());
+				"with a password."), source.service->nick.c_str());
 		return true;
 	}
 };

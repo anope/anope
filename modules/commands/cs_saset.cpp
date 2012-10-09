@@ -37,7 +37,7 @@ class CommandCSSASet : public Command
 				" \n"
 				"Available options:"));
 		Anope::string this_name = source.command;
-		for (BotInfo::command_map::const_iterator it = source.owner->commands.begin(), it_end = source.owner->commands.end(); it != it_end; ++it)
+		for (CommandInfo::map::const_iterator it = source.service->commands.begin(), it_end = source.service->commands.end(); it != it_end; ++it)
 		{
 			const Anope::string &c_name = it->first;
 			const CommandInfo &info = it->second;
@@ -52,7 +52,7 @@ class CommandCSSASet : public Command
 			}
 		}
 		source.Reply(_("Type \002%s%s HELP SASET \037option\037\002 for more information on a\n"
-			"particular option."), Config->UseStrictPrivMsgString.c_str(), source.owner->nick.c_str());
+			"particular option."), Config->UseStrictPrivMsgString.c_str(), source.service->nick.c_str());
 		return true;
 	}
 };

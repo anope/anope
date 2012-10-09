@@ -30,7 +30,7 @@ class NSRecoverRequest : public IdentifyRequest
 
 		User *u = source.GetUser();
 
-		u->SendMessage(source.owner, FORCENICKCHANGE_NOW);
+		u->SendMessage(source.service, FORCENICKCHANGE_NOW);
 
 		if (u->Account() == na->nc)
 		{

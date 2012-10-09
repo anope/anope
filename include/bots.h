@@ -43,8 +43,7 @@ class CoreExport BotInfo : public User, public Flags<BotFlag, BI_END>, public Se
  public:
 	time_t created;			/* Birth date ;) */
 	time_t lastmsg;			/* Last time we said something */
-	typedef Anope::insensitive_map<CommandInfo> command_map;
-	command_map commands; /* Commands, actual name to service name */
+	CommandInfo::map commands; /* Commands, actual name to service name */
 	Anope::string botmodes;		/* Modes the bot should have as configured in service:modes */
 	std::vector<Anope::string> botchannels;	/* Channels the bot should be in as configured in service:channels */
 	bool introduced;		/* Whether or not this bot is introduced */

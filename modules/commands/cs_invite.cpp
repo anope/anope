@@ -94,7 +94,7 @@ class CommandCSInvite : public Command
 				"nick into the given channel.\n"
 				" \n"
 				"By default, limited to AOPs or those with level 5 and above\n"
-				"on the channel."), source.owner->nick.c_str());
+				"on the channel."), source.service->nick.c_str());
 		return true;
 	}
 };

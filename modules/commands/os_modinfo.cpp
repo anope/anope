@@ -44,7 +44,7 @@ class CommandOSModInfo : public Command
 				{
 					const BotInfo *bi = it->second;
 
-					for (BotInfo::command_map::const_iterator cit = bi->commands.begin(), cit_end = bi->commands.end(); cit != cit_end; ++cit)
+					for (CommandInfo::map::const_iterator cit = bi->commands.begin(), cit_end = bi->commands.end(); cit != cit_end; ++cit)
 					{
 						const Anope::string &c_name = cit->first;
 						const CommandInfo &info = cit->second;

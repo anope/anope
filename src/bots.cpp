@@ -230,10 +230,7 @@ void BotInfo::OnMessage(User *u, const Anope::string &message)
 	if (this->commands.empty())
 		return;
 
-	CommandSource source(u->nick, u, u->Account(), u);
-	source.owner = this;
-	source.service = this;
-
+	CommandSource source(u->nick, u, u->Account(), u, this);
 	RunCommand(source, message);
 }
 
@@ -256,7 +253,7 @@ void BotInfo::SetCommand(const Anope::string &cname, const Anope::string &sname,
  */
 CommandInfo *BotInfo::GetCommand(const Anope::string &cname)
 {
-	command_map::iterator it = this->commands.find(cname);
+	CommandInfo::map::iterator it = this->commands.find(cname);
 	if (it != this->commands.end())
 		return &it->second;
 	return NULL;

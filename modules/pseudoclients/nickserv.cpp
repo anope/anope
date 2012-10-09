@@ -320,7 +320,7 @@ class NickServCore : public Module
 
 	EventReturn OnPreHelp(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		if (!params.empty() || source.owner->nick != Config->NickServ)
+		if (!params.empty() || source.c || source.service->nick != Config->NickServ)
 			return EVENT_CONTINUE;
 		source.Reply(_("\002%s\002 allows you to \"register\" a nickname and\n"
 			"prevent others from using it. The following\n"
@@ -333,7 +333,7 @@ class NickServCore : public Module
 
 	void OnPostHelp(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		if (!params.empty() || source.owner->nick != Config->NickServ)
+		if (!params.empty() || source.c || source.service->nick != Config->NickServ)
 			return;
 		if (source.IsServicesOper())
 			source.Reply(_(" \n"

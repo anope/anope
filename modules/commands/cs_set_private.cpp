@@ -65,7 +65,7 @@ class CommandCSSetPrivate : public Command
 		source.Reply(_("Enables or disables the \002private\002 option for a channel.\n"
 				"When \002private\002 is set, a \002%s%s LIST\002 will not\n"
 				"include the channel in any lists."),
-				Config->UseStrictPrivMsgString.c_str(), source.owner->nick.c_str());
+				Config->UseStrictPrivMsgString.c_str(), source.service->nick.c_str());
 		return true;
 	}
 };

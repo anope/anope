@@ -620,8 +620,8 @@ class CommandCSQOP : public XOPBase
 				"available. See \002%s%s HELP ACCESS\002 for information\n"
 				"about the access list, and \002%s%s HELP FLAGS\002 for\n"
 				"information about the flags based system."),
-				Config->UseStrictPrivMsgString.c_str(), source.owner->nick.c_str(),
-				Config->UseStrictPrivMsgString.c_str(), source.owner->nick.c_str());
+				Config->UseStrictPrivMsgString.c_str(), source.service->nick.c_str(),
+				Config->UseStrictPrivMsgString.c_str(), source.service->nick.c_str());
 		return true;
 	}
 };
@@ -675,8 +675,8 @@ class CommandCSAOP : public XOPBase
 				"available. See \002%s%s HELP ACCESS\002 for information\n"
 				"about the access list, and \002%s%s HELP FLAGS\002 for\n"
 				"information about the flags based system."),
-				Config->UseStrictPrivMsgString.c_str(), source.owner->nick.c_str(), 
-				Config->UseStrictPrivMsgString.c_str(), source.owner->nick.c_str());
+				Config->UseStrictPrivMsgString.c_str(), source.service->nick.c_str(), 
+				Config->UseStrictPrivMsgString.c_str(), source.service->nick.c_str());
 		return true;
 	}
 };
@@ -729,8 +729,8 @@ class CommandCSHOP : public XOPBase
 				"available. See \002%s%s HELP ACCESS\002 for information\n"
 				"about the access list, and \002%s%s HELP FLAGS\002 for\n"
 				"information about the flags based system."),
-				Config->UseStrictPrivMsgString.c_str(), source.owner->nick.c_str(),
-				Config->UseStrictPrivMsgString.c_str(), source.owner->nick.c_str());
+				Config->UseStrictPrivMsgString.c_str(), source.service->nick.c_str(),
+				Config->UseStrictPrivMsgString.c_str(), source.service->nick.c_str());
 		return true;
 	}
 };
@@ -783,8 +783,8 @@ class CommandCSSOP : public XOPBase
 				"available. See \002%s%s HELP ACCESS\002 for information\n"
 				"about the access list, and \002%s%s HELP FLAGS\002 for\n"
 				"information about the flags based system."),
-				Config->UseStrictPrivMsgString.c_str(), source.owner->nick.c_str(),
-				Config->UseStrictPrivMsgString.c_str(), source.owner->nick.c_str());
+				Config->UseStrictPrivMsgString.c_str(), source.service->nick.c_str(),
+				Config->UseStrictPrivMsgString.c_str(), source.service->nick.c_str());
 		return true;
 	}
 };
@@ -837,8 +837,8 @@ class CommandCSVOP : public XOPBase
 				"available. See \002%s%s HELP ACCESS\002 for information\n"
 				"about the access list, and \002%s%s HELP FLAGS\002 for\n"
 				"information about the flags based system."),
-				Config->UseStrictPrivMsgString.c_str(), source.owner->nick.c_str(),
-				Config->UseStrictPrivMsgString.c_str(), source.owner->nick.c_str());
+				Config->UseStrictPrivMsgString.c_str(), source.service->nick.c_str(),
+				Config->UseStrictPrivMsgString.c_str(), source.service->nick.c_str());
 		return true;
 	}
 };

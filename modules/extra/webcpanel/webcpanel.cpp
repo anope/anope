@@ -214,10 +214,7 @@ namespace WebPanel
 		}
 		my_reply(r);
 
-		CommandSource source(user, NULL, nc, &my_reply);
-		source.owner = bi;
-		source.service = bi;
-
+		CommandSource source(user, NULL, nc, &my_reply, bi);
 		cmd->Execute(source, params);
 	}
 }

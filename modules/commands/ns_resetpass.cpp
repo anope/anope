@@ -35,7 +35,7 @@ class CommandNSResetPass : public Command
 			source.Reply(NICK_X_NOT_REGISTERED, params[0].c_str());
 		else
 		{
-			if (SendResetEmail(source.GetUser(), na, source.owner))
+			if (SendResetEmail(source.GetUser(), na, source.service))
 			{
 				Log(LOG_COMMAND, source, this) << "for " << na->nick << " (group: " << na->nc->display << ")";
 				source.Reply(_("Password reset email for \002%s\002 has been sent."), na->nick.c_str());

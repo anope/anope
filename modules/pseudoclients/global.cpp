@@ -81,7 +81,7 @@ class GlobalCore : public Module
 
 	EventReturn OnPreHelp(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		if (!params.empty() || source.owner->nick != Config->Global)
+		if (!params.empty() || source.c || source.service->nick != Config->Global)
 			return EVENT_CONTINUE;
 		source.Reply(_("%s commands:"), Config->Global.c_str());
 		return EVENT_CONTINUE;

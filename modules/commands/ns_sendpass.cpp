@@ -39,7 +39,7 @@ class CommandNSSendPass : public Command
 			Anope::string tmp_pass;
 			if (enc_decrypt(na->nc->pass, tmp_pass) == 1)
 			{
-				if (SendPassMail(source.GetUser(), na, source.owner, tmp_pass))
+				if (SendPassMail(source.GetUser(), na, source.service, tmp_pass))
 				{
 					Log(Config->RestrictMail ? LOG_ADMIN : LOG_COMMAND, source, this) << "for " << na->nick;
 					source.Reply(_("Password of \002%s\002 has been sent."), nick.c_str());

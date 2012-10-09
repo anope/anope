@@ -86,11 +86,7 @@ class MyXMLRPCEvent : public XMLRPCEvent
 				}
 				reply(out);
 
-				CommandSource source(user, NULL, na ? *na->nc : NULL, &reply);
-				source.c = NULL;
-				source.owner = bi;
-				source.service = bi;
-
+				CommandSource source(user, NULL, na ? *na->nc : NULL, &reply, bi);
 				RunCommand(source, command);
 
 				if (!out.empty())

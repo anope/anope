@@ -17,8 +17,8 @@
 #include "regchannel.h"
 #include "channels.h"
 
-CommandSource::CommandSource(const Anope::string &n, User *user, NickCore *core, CommandReply *r) : nick(n), u(user), nc(core), reply(r),
-	c(NULL), owner(NULL), service(NULL)
+CommandSource::CommandSource(const Anope::string &n, User *user, NickCore *core, CommandReply *r, BotInfo *bi) : nick(n), u(user), nc(core), reply(r),
+	c(NULL), service(bi)
 {
 }
 
@@ -153,7 +153,7 @@ void Command::SendSyntax(CommandSource &source)
 void Command::SendSyntax(CommandSource &source, const Anope::string &syn)
 {
 	source.Reply(_("Syntax: \002%s %s\002"), source.command.c_str(), syn.c_str());
-	source.Reply(MORE_INFO, Config->UseStrictPrivMsgString.c_str(), source.owner->nick.c_str(), source.command.c_str());
+	source.Reply(MORE_INFO, Config->UseStrictPrivMsgString.c_str(), source.service->nick.c_str(), source.command.c_str());
 }
 
 const Anope::string &Command::GetDesc() const
@@ -171,7 +171,7 @@ bool Command::OnHelp(CommandSource &source, const Anope::string &subcommand) { r
 void Command::OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 {
 	this->SendSyntax(source);
-	source.Reply(MORE_INFO, Config->UseStrictPrivMsgString.c_str(), source.owner->nick.c_str(), source.command.c_str());
+	source.Reply(MORE_INFO, Config->UseStrictPrivMsgString.c_str(), source.service->nick.c_str(), source.command.c_str());
 }
 
 void RunCommand(CommandSource &source, const Anope::string &message)
@@ -179,7 +179,7 @@ void RunCommand(CommandSource &source, const Anope::string &message)
 	std::vector<Anope::string> params = BuildStringVector(message);
 	bool has_help = source.service->commands.find("HELP") != source.service->commands.end();
 
-	BotInfo::command_map::const_iterator it = source.service->commands.end();
+	CommandInfo::map::const_iterator it = source.service->commands.end();
 	unsigned count = 0;
 	for (unsigned max = params.size(); it == source.service->commands.end() && max > 0; --max)
 	{

@@ -239,7 +239,7 @@ class CommandMSSet : public Command
 					"                   receive\n"
 					" \n"
 					"Type \002%s%s HELP %s \037option\037\002 for more information\n"
-					"on a specific option."), Config->UseStrictPrivMsgString.c_str(), source.owner->nick.c_str(), source.command.c_str());
+					"on a specific option."), Config->UseStrictPrivMsgString.c_str(), source.service->nick.c_str(), source.command.c_str());
 		}
 		else if (subcommand.equals_ci("NOTIFY"))
 			source.Reply(_("Syntax: \002NOTIFY {ON | LOGON | NEW | MAIL | NOMAIL | OFF}\002\n"

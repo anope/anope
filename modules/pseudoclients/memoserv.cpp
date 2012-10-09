@@ -202,7 +202,7 @@ class MemoServCore : public Module
 
 	EventReturn OnPreHelp(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		if (!params.empty() || source.owner->nick != Config->MemoServ)
+		if (!params.empty() || source.c || source.service->nick != Config->MemoServ)
 			return EVENT_CONTINUE;
 		source.Reply(_("\002%s\002 is a utility allowing IRC users to send short\n"
 			"messages to other IRC users, whether they are online at\n"
@@ -215,7 +215,7 @@ class MemoServCore : public Module
 
 	void OnPostHelp(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		if (!params.empty() || source.owner->nick != Config->MemoServ)
+		if (!params.empty() || source.c || source.service->nick != Config->MemoServ)
 			return;
 		source.Reply(_(" \n"
 			"Type \002%s%s HELP \037command\037\002 for help on any of the\n"

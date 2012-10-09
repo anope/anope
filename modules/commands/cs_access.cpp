@@ -508,7 +508,7 @@ class CommandCSAccess : public Command
 				"user levels allow for access to different subsets of\n"
 				"privileges. Any registered user not on the access list has\n"
 				"a user level of 0, and any unregistered user has a user level\n"
-				"of -1."), source.owner->nick.c_str());
+				"of -1."), source.service->nick.c_str());
 		source.Reply(" ");
 		source.Reply(_("The \002ACCESS ADD\002 command adds the given mask to the\n"
 				"access list with the given user level; if the mask is\n"
@@ -557,7 +557,7 @@ class CommandCSAccess : public Command
 				" \n"
 				"These levels may be changed, or new ones added, using the\n"
 				"\002LEVELS\002 command; type \002%s%s HELP LEVELS\002 for\n"
-				"information."), source.owner->nick.c_str(), Config->UseStrictPrivMsgString.c_str(), source.owner->nick.c_str());
+				"information."), source.service->nick.c_str(), Config->UseStrictPrivMsgString.c_str(), source.service->nick.c_str());
 		return true;
 	}
 };
@@ -592,7 +592,7 @@ class CommandCSLevels : public Command
 		{
 			Privilege *p = PrivilegeManager::FindPrivilege(what);
 			if (p == NULL)
-				source.Reply(_("Setting \002%s\002 not known.  Type \002%s%s HELP LEVELS \002 for a list of valid settings."), what.c_str(), Config->UseStrictPrivMsgString.c_str(), source.owner->nick.c_str());
+				source.Reply(_("Setting \002%s\002 not known.  Type \002%s%s HELP LEVELS \002 for a list of valid settings."), what.c_str(), Config->UseStrictPrivMsgString.c_str(), source.service->nick.c_str());
 			else
 			{
 				ci->SetLevel(p->name, level);
@@ -630,7 +630,7 @@ class CommandCSLevels : public Command
 			}
 		}
 
-		source.Reply(_("Setting \002%s\002 not known.  Type \002%s%s HELP LEVELS \002 for a list of valid settings."), what.c_str(), Config->UseStrictPrivMsgString.c_str(), source.owner->nick.c_str());
+		source.Reply(_("Setting \002%s\002 not known.  Type \002%s%s HELP LEVELS \002 for a list of valid settings."), what.c_str(), Config->UseStrictPrivMsgString.c_str(), source.service->nick.c_str());
 
 		return;
 	}
@@ -772,7 +772,7 @@ class CommandCSLevels : public Command
 					"\002HELP ACCESS LEVELS\002).\n"
 					" \n"
 					"For a list of the features and functions whose levels can be\n"
-					"set, see \002HELP LEVELS DESC\002."), source.owner->nick.c_str());
+					"set, see \002HELP LEVELS DESC\002."), source.service->nick.c_str());
 		}
 		return true;
 	}

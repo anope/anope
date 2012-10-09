@@ -67,7 +67,7 @@ class HostServCore : public Module
 
 	EventReturn OnPreHelp(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		if (!params.empty() || source.owner->nick != Config->HostServ)
+		if (!params.empty() || source.c || source.service->nick != Config->HostServ)
 			return EVENT_CONTINUE;
 		source.Reply(_("%s commands:"), Config->HostServ.c_str());
 		return EVENT_CONTINUE;

@@ -299,9 +299,9 @@ void User::SendMessage(const BotInfo *source, const Anope::string &msg)
 	while (sep.GetToken(tok))
 	{
 		if (Config->UsePrivmsg && ((!this->nc && Config->NSDefFlags.HasFlag(NI_MSG)) || (this->nc && this->nc->HasFlag(NI_MSG))))
-			ircdproto->SendPrivmsg(source, this->nick, "%s", tok.c_str());
+			ircdproto->SendPrivmsg(source, this->GetUID(), "%s", tok.c_str());
 		else
-			ircdproto->SendNotice(source, this->nick, "%s", tok.c_str());
+			ircdproto->SendNotice(source, this->GetUID(), "%s", tok.c_str());
 	}
 }
 

@@ -116,6 +116,7 @@ class LDAPInterface
 
 	virtual void OnResult(const LDAPResult &r) = 0;
 	virtual void OnError(const LDAPResult &err) = 0;
+	virtual void OnDelete() { }
 };
 
 class LDAPProvider : public Service

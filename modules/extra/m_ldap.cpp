@@ -15,6 +15,8 @@ class LDAPService : public LDAPProvider, public Thread, public Condition
 
 	LDAP *con;
 
+	time_t last_connect;
+
 	LDAPMod **BuildMods(const LDAPMods &attributes)
 	{
 		LDAPMod **mods = new LDAPMod*[attributes.size() + 1];
@@ -54,19 +56,34 @@ class LDAPService : public LDAPProvider, public Thread, public Condition
 		delete [] mods;
 	}
 
+	void Reconnect()
+	{
+		/* Only try one connect a minute. It is an expensive blocking operation */
+		if (last_connect > Anope::CurTime - 60)
+			throw LDAPException("Unable to connect to LDAP service " + this->name + ": reconnecting too fast");
+		last_connect = Anope::CurTime;
+
+		ldap_unbind_ext(this->con, NULL, NULL);
+		int i = ldap_initialize(&this->con, this->server.c_str());
+		if (i != LDAP_SUCCESS)
+			throw LDAPException("Unable to connect to LDAP service " + this->name + ": " + ldap_err2string(i));
+	}
+
  public:
 	typedef std::map<int, LDAPInterface *> query_queue;
 	typedef std::vector<std::pair<LDAPInterface *, LDAPResult *> > result_queue;
 	query_queue queries;
 	result_queue results;
 
-	LDAPService(Module *o, const Anope::string &n, const Anope::string &s, int po, const Anope::string &b, const Anope::string &p) : LDAPProvider(o, "ldap/" + n), server(s), port(po), admin_binddn(b), admin_pass(p)
+	LDAPService(Module *o, const Anope::string &n, const Anope::string &s, int po, const Anope::string &b, const Anope::string &p) : LDAPProvider(o, "ldap/" + n), server(s), port(po), admin_binddn(b), admin_pass(p), last_connect(0)
 	{
-		if (ldap_initialize(&this->con, this->server.c_str()) != LDAP_SUCCESS)
-			throw LDAPException("Unable to connect to LDAP service " + this->name + ": " + Anope::LastError());
+		int i = ldap_initialize(&this->con, this->server.c_str());
+		if (i != LDAP_SUCCESS)
+			throw LDAPException("Unable to connect to LDAP service " + this->name + ": " + ldap_err2string(i));
 		static const int version = LDAP_VERSION3;
-		if (ldap_set_option(this->con, LDAP_OPT_PROTOCOL_VERSION, &version) != LDAP_OPT_SUCCESS)
-			throw LDAPException("Unable to set protocol version for " + this->name + ": " + Anope::LastError());
+		i = ldap_set_option(this->con, LDAP_OPT_PROTOCOL_VERSION, &version);
+		if (i != LDAP_OPT_SUCCESS)
+			throw LDAPException("Unable to set protocol version for " + this->name + ": " + ldap_err2string(i));
 	}
 
 	~LDAPService()
@@ -76,7 +93,7 @@ class LDAPService : public LDAPProvider, public Thread, public Condition
 		for (query_queue::iterator it = this->queries.begin(), it_end = this->queries.end(); it != it_end; ++it)
 		{
 			ldap_abandon_ext(this->con, it->first, NULL, NULL);
-			delete it->second;
+			it->second->OnDelete();
 		}
 		this->queries.clear();
 
@@ -107,7 +124,15 @@ class LDAPService : public LDAPProvider, public Thread, public Condition
 		int ret = ldap_sasl_bind(con, who.c_str(), LDAP_SASL_SIMPLE, &cred, NULL, NULL, &msgid);
 		free(cred.bv_val);
 		if (ret != LDAP_SUCCESS)
-			throw LDAPException(ldap_err2string(ret));
+		{
+			if (ret == LDAP_SERVER_DOWN || ret == LDAP_TIMEOUT)
+			{
+				this->Reconnect();
+				return this->Bind(i, who, pass);
+			}
+			else
+				throw LDAPException(ldap_err2string(ret));
+		}
 
 		if (i != NULL)
 		{
@@ -128,7 +153,15 @@ class LDAPService : public LDAPProvider, public Thread, public Condition
 		LDAPQuery msgid;
 		int ret = ldap_search_ext(this->con, base.c_str(), LDAP_SCOPE_SUBTREE, filter.c_str(), NULL, 0, NULL, NULL, NULL, 0, &msgid);
 		if (ret != LDAP_SUCCESS)
-			throw LDAPException(ldap_err2string(ret));
+		{
+			if (ret == LDAP_SERVER_DOWN || ret == LDAP_TIMEOUT)
+			{
+				this->Reconnect();
+				return this->Search(i, base, filter);
+			}
+			else
+				throw LDAPException(ldap_err2string(ret));
+		}
 
 		this->Lock();
 		this->queries[msgid] = i;
@@ -146,7 +179,15 @@ class LDAPService : public LDAPProvider, public Thread, public Condition
 		this->FreeMods(mods);
 
 		if (ret != LDAP_SUCCESS)
-			throw LDAPException(ldap_err2string(ret));
+		{
+			if (ret == LDAP_SERVER_DOWN || ret == LDAP_TIMEOUT)
+			{
+				this->Reconnect();
+				return this->Add(i, dn, attributes);
+			}
+			else
+				throw LDAPException(ldap_err2string(ret));
+		}
 
 		if (i != NULL)
 		{
@@ -165,7 +206,15 @@ class LDAPService : public LDAPProvider, public Thread, public Condition
 		int ret = ldap_delete_ext(this->con, dn.c_str(), NULL, NULL, &msgid);
 
 		if (ret != LDAP_SUCCESS)
-			throw LDAPException(ldap_err2string(ret));
+		{
+			if (ret == LDAP_SERVER_DOWN || ret == LDAP_TIMEOUT)
+			{
+				this->Reconnect();
+				return this->Del(i, dn);
+			}
+			else
+				throw LDAPException(ldap_err2string(ret));
+		}
 
 		if (i != NULL)
 		{
@@ -186,7 +235,15 @@ class LDAPService : public LDAPProvider, public Thread, public Condition
 		this->FreeMods(mods);
 
 		if (ret != LDAP_SUCCESS)
-			throw LDAPException(ldap_err2string(ret));
+		{
+			if (ret == LDAP_SERVER_DOWN || ret == LDAP_TIMEOUT)
+			{
+				this->Reconnect();
+				return this->Modify(i, base, attributes);
+			}
+			else
+				throw LDAPException(ldap_err2string(ret));
+		}
 
 		if (i != NULL)
 		{
@@ -435,8 +492,12 @@ class ModuleLDAP : public Module, public Pipe
 				int msgid = it2->first;
 				LDAPInterface *i = it2->second;
 				++it2;
+
 				if (i->owner == m)
+				{
+					i->OnDelete();
 					s->queries.erase(msgid);
+				}
 			}
 			for (unsigned i = s->results.size(); i > 0; --i)
 			{

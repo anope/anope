@@ -85,11 +85,18 @@ class IdentifyInterface : public LDAPInterface
 				if (ii->admin_bind)
 				{
 					Anope::string sf = search_filter.replace_all_cs("%account", ii->req->GetAccount()).replace_all_cs("%object_class", object_class);
-					Log(LOG_DEBUG) << "m_ldap_authentication: searching for " << sf;
-					LDAPQuery id = ii->lprov->Search(this, basedn, sf);
-					this->Add(id, ii);
-					ii->admin_bind = false;
-					return;
+					try
+					{
+						Log(LOG_DEBUG) << "m_ldap_authentication: searching for " << sf;
+						LDAPQuery id = ii->lprov->Search(this, basedn, sf);
+						this->Add(id, ii);
+						ii->admin_bind = false;
+						return;
+					}
+					catch (const LDAPException &ex)
+					{
+						Log() << "m_ldap_authentication: Unable to search for " << sf << ": " << ex.GetReason();
+					}
 				}
 				else
 				{
@@ -261,7 +268,7 @@ class NSIdentifyLDAP : public Module
 		catch (const LDAPException &ex)
 		{
 			delete ii;
-			Log() << "ns_identify_ldap: " << ex.GetReason();
+			Log() << "m_ldap_authentication: " << ex.GetReason();
 		}
 	}
 

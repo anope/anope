@@ -122,6 +122,9 @@ void Serializable::destroy()
 
 void Serializable::QueueUpdate()
 {
+	/* Check for modifications now */
+	FOREACH_MOD(I_OnSerializeCheck, OnSerializeCheck(this->GetSerializableType()));
+	/* Schedule updater */
 	FOREACH_MOD(I_OnSerializableUpdate, OnSerializableUpdate(this));
 }
 

@@ -927,7 +927,6 @@ class CoreExport Module : public Extensible
 	virtual void OnSerializeCheck(SerializeType *) { }
 	virtual void OnSerializableConstruct(Serializable *) { }
 	virtual void OnSerializableDestruct(Serializable *) { }
-	virtual void OnSerializePtrAssign(Serializable *) { }
 	virtual void OnSerializableUpdate(Serializable *) { }
 
 	/** Called when a chanserv/set command is used
@@ -998,7 +997,7 @@ enum Implementation
 		I_OnChannelModeSet, I_OnChannelModeUnset, I_OnUserModeSet, I_OnUserModeUnset, I_OnChannelModeAdd, I_OnUserModeAdd,
 		I_OnMLock, I_OnUnMLock, I_OnServerSync, I_OnUplinkSync, I_OnBotPrivmsg, I_OnPrivmsg, I_OnLog,
 
-		I_OnSerializeCheck, I_OnSerializableConstruct, I_OnSerializableDestruct, I_OnSerializePtrAssign, I_OnSerializableUpdate,
+		I_OnSerializeCheck, I_OnSerializableConstruct, I_OnSerializableDestruct, I_OnSerializableUpdate,
 	I_END
 };
 

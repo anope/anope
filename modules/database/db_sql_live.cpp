@@ -74,7 +74,7 @@ class DBMySQL : public Module, public Pipe
 		this->ro = false;
 		this->init = false;
 
-		Implementation i[] = { I_OnReload, I_OnShutdown, I_OnLoadDatabase, I_OnSerializableConstruct, I_OnSerializableDestruct, I_OnSerializePtrAssign, I_OnSerializeCheck, I_OnSerializableUpdate };
+		Implementation i[] = { I_OnReload, I_OnShutdown, I_OnLoadDatabase, I_OnSerializableConstruct, I_OnSerializableDestruct, I_OnSerializeCheck, I_OnSerializableUpdate };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 
 		OnReload();
@@ -153,42 +153,6 @@ class DBMySQL : public Module, public Pipe
 		s_type->objects.erase(obj->id);
 	}
 
-	void OnSerializePtrAssign(Serializable *obj) anope_override
-	{
-		SerializeType *stype = obj->GetSerializableType();
-		if (stype == NULL || !this->CheckInit() || stype->GetTimestamp() == Anope::CurTime)
-			return;
-
-		if (obj->IsCached())
-			return;
-		obj->UpdateCache();
-
-		SQLResult res = this->RunQueryResult("SELECT * FROM `" + this->prefix + stype->GetName() + "` WHERE `id` = " + stringify(obj->id));
-
-		if (res.Rows() == 0)
-			obj->destroy();
-		else
-		{
-			const std::map<Anope::string, Anope::string> &row = res.Row(0);
-
-			if (res.Get(0, "timestamp").empty())
-			{
-				obj->destroy();
-				stype->objects.erase(obj->id);
-			}
-			else
-			{
-				Serialize::Data data;
-
-				for (std::map<Anope::string, Anope::string>::const_iterator it = row.begin(), it_end = row.end(); it != it_end; ++it)
-					data[it->first] << it->second;
-
-				if (stype->Unserialize(obj, data) == NULL)
-					obj->destroy();
-			}
-		}
-	}
-
 	void OnSerializeCheck(SerializeType *obj) anope_override
 	{
 		if (!this->CheckInit() || obj->GetTimestamp() == Anope::CurTime)
@@ -241,8 +205,12 @@ class DBMySQL : public Module, public Pipe
 				Serializable *new_s = obj->Unserialize(s, data);
 				if (new_s)
 				{
-					new_s->id = id;
-					obj->objects[id] = new_s;
+					// If s == new_s then s->id == new_s->id
+					if (s != new_s)
+					{
+						new_s->id = id;
+						obj->objects[id] = new_s;
+					}
 				}
 				else
 					s->destroy();

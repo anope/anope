@@ -294,23 +294,16 @@ struct IRCDMessageJoin : CoreIRCDMessageJoin
 
 struct IRCDMessageMode : IRCDMessage
 {
-	IRCDMessageMode() : IRCDMessage("MODE", 3) { }
+	IRCDMessageMode() : IRCDMessage("MODE", 2) { }
 
+	// Received: :42CAAAIHS MODE 42CAAAIHS :+ao
 	bool Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		if (ircdproto->IsChannelValid(params[0]))
 		{
-			// 0 = channel, 1 = ts, 2 = modes
 			Channel *c = findchan(params[0]);
-			time_t ts = Anope::CurTime;
-			try
-			{
-				ts = convertTo<time_t>(params[1]);
-			}
-			catch (const ConvertException &) { }
-
 			if (c)
-				c->SetModesInternal(source, params[2], ts);
+				c->SetModesInternal(source, params[1], Anope::CurTime);
 		}
 		else
 		{

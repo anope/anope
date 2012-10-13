@@ -77,17 +77,17 @@ struct AJoinEntry : Serializable
 
 class CommandNSAJoin : public Command
 {
-	void DoList(CommandSource &source, const std::vector<Anope::string> &params)
+	void DoList(CommandSource &source, NickCore *nc)
 	{
-		AJoinList *channels = source.nc->GetExt<AJoinList *>("ns_ajoin_channels");
+		AJoinList *channels = nc->GetExt<AJoinList *>("ns_ajoin_channels");
 		if (channels == NULL)
 		{
 			channels = new AJoinList();
-			source.nc->Extend("ns_ajoin_channels", channels);
+			nc->Extend("ns_ajoin_channels", channels);
 		}
 
 		if ((*channels)->empty())
-			source.Reply(_("Your auto join list is empty."));
+			source.Reply(_("%s's auto join list is empty."), nc->display.c_str());
 		else
 		{
 			ListFormatter list;
@@ -102,7 +102,7 @@ class CommandNSAJoin : public Command
 				list.addEntry(entry);
 			}
 
-			source.Reply(_("Your auto join list:"));
+			source.Reply(_("%s's auto join list:"), nc->display.c_str());
 
 			std::vector<Anope::string> replies;
 			list.Process(replies);
@@ -112,58 +112,58 @@ class CommandNSAJoin : public Command
 		}
 	}
 
-	void DoAdd(CommandSource &source, const std::vector<Anope::string> &params)
+	void DoAdd(CommandSource &source, NickCore *nc, const Anope::string &chan, const Anope::string &key)
 	{
-		AJoinList *channels = source.nc->GetExt<AJoinList *>("ns_ajoin_channels");
+		AJoinList *channels = nc->GetExt<AJoinList *>("ns_ajoin_channels");
 		if (channels == NULL)
 		{
 			channels = new AJoinList();
-			source.nc->Extend("ns_ajoin_channels", channels);
+			nc->Extend("ns_ajoin_channels", channels);
 		}
 
 		unsigned i = 0;
 		for (; i < (*channels)->size(); ++i)
-			if ((*channels)->at(i)->channel.equals_ci(params[1]))
+			if ((*channels)->at(i)->channel.equals_ci(chan))
 				break;
 
-		if ((*channels)->size() >= Config->AJoinMax)
+		if (*source.nc == nc && (*channels)->size() >= Config->AJoinMax)
 			source.Reply(_("Your auto join list is full."));
 		else if (i != (*channels)->size())
-			source.Reply(_("%s is already on your auto join list."), params[1].c_str());
-		else if (ircdproto->IsChannelValid(params[1]) == false)
- 			source.Reply(CHAN_X_INVALID, params[1].c_str());
+			source.Reply(_("%s is already on %s's auto join list."), chan.c_str(), nc->display.c_str());
+		else if (ircdproto->IsChannelValid(chan) == false)
+ 			source.Reply(CHAN_X_INVALID, chan.c_str());
 		else
 		{
 			AJoinEntry *entry = new AJoinEntry();
-			entry->owner = source.nc;
-			entry->channel = params[1];
-			entry->key = params.size() > 2 ? params[2] : "";
+			entry->owner = nc;
+			entry->channel = chan;
+			entry->key = key;
 			(*channels)->push_back(entry);
-			source.Reply(_("Added %s to your auto join list."), params[1].c_str());
+			source.Reply(_("Added %s to %s's auto join list."), chan.c_str(), nc->display.c_str());
 		}
 	}
 
-	void DoDel(CommandSource &source, const std::vector<Anope::string> &params)
+	void DoDel(CommandSource &source, NickCore *nc, const Anope::string &chan)
 	{
-		AJoinList *channels = source.nc->GetExt<AJoinList *>("ns_ajoin_channels");
+		AJoinList *channels = nc->GetExt<AJoinList *>("ns_ajoin_channels");
 		if (channels == NULL)
 		{
 			channels = new AJoinList();
-			source.nc->Extend("ns_ajoin_channels", channels);
+			nc->Extend("ns_ajoin_channels", channels);
 		}
 
 		unsigned i = 0;
 		for (; i < (*channels)->size(); ++i)
-			if ((*channels)->at(i)->channel.equals_ci(params[1]))
+			if ((*channels)->at(i)->channel.equals_ci(chan))
 				break;
 		
 		if (i == (*channels)->size())
-			source.Reply(_("%s was not found on your auto join list."), params[1].c_str());
+			source.Reply(_("%s was not found on %s's auto join list."), chan.c_str(), nc->display.c_str());
 		else
 		{
 			(*channels)->at(i)->destroy();
 			(*channels)->erase((*channels)->begin() + i);
-			source.Reply(_("%s was removed from your auto join list."), params[1].c_str());
+			source.Reply(_("%s was removed from %s's auto join list."), chan.c_str(), nc->display.c_str());
 		}
 	}
 
@@ -171,23 +171,43 @@ class CommandNSAJoin : public Command
 	CommandNSAJoin(Module *creator) : Command(creator, "nickserv/ajoin", 1, 3)
 	{
 		this->SetDesc(_("Manage your auto join list"));
-		this->SetSyntax(_("{ADD | DEL | LIST} [\037channel\037] [\037key\037]"));
+		this->SetSyntax(_("{ADD | DEL | LIST} \037[user]\037 [\037channel\037] [\037key\037]"));
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
+		NickCore *nc = source.GetAccount();
+		Anope::string param, param2;
+
+		if (params.size() > 1 && source.IsServicesOper() && ircdproto->IsNickValid(params[1]))
+		{
+			NickAlias *na = findnick(params[1]);
+			if (!na)
+			{
+				source.Reply(NICK_X_NOT_REGISTERED, params[1].c_str());
+				return;
+			}
+
+			nc = na->nc;
+			param = params.size() > 2 ? params[2] : "";
+			param2 = params.size() > 3 ? params[3] : "";
+		}
+		else
+		{
+			param = params.size() > 1 ? params[1] : "";
+			param2 = params.size() > 2 ? params[2] : "";
+		}
+
 		if (params[0].equals_ci("LIST"))
-			this->DoList(source, params);
-		else if (params.size() < 2)
+			this->DoList(source, nc);
+		else if (param.empty())
 			this->OnSyntaxError(source, "");
 		else if (params[0].equals_ci("ADD"))
-			this->DoAdd(source, params);
+			this->DoAdd(source, nc, param, param2);
 		else if (params[0].equals_ci("DEL"))
-			this->DoDel(source, params);
+			this->DoDel(source, nc, param);
 		else
 			this->OnSyntaxError(source, "");
-
-		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
@@ -195,7 +215,9 @@ class CommandNSAJoin : public Command
 		this->SendSyntax(source);
 		source.Reply(" ");
 		source.Reply(_("This command manages your auto join list. When you identify\n"
-				"you will automatically join the channels on your auto join list"));
+				"you will automatically join the channels on your auto join list.\n"
+				"Services operators may provide a nick to modify other users'\n"
+				"auto join lists."));
 		return true;
 	}
 };

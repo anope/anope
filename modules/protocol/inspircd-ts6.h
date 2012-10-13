@@ -361,6 +361,10 @@ class InspIRCdTS6Proto : public IRCDProto
 
 		return true;
 	}
+
+	void SendOper(User *u) anope_override
+	{
+	}
 };
 
 struct IRCDMessageEndburst : IRCDMessage

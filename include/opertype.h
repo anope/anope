@@ -23,7 +23,7 @@ struct CoreExport Oper
 	std::vector<Anope::string> hosts;
 	Anope::string vhost;
 
-	Oper(const Anope::string &n, OperType *o) : name(n), ot(o) { this->config = false; }
+	Oper(const Anope::string &n, OperType *o) : name(n), ot(o), require_oper(false), config(false) { }
 
 	virtual ~Oper() { }
 	

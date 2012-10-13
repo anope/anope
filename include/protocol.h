@@ -120,6 +120,11 @@ class CoreExport IRCDProto
 	 * On most TS6 IRCds this is a SJOIN with no nick
 	 */
 	virtual void SendChannel(Channel *c) { }
+
+	/** Make the user an IRC operator
+	 * Normally this is a simple +o, though some IRCds require us to send the oper type
+	 */
+	virtual void SendOper(User *u);
 };
 
 enum IRCDMessageFlag

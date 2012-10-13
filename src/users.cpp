@@ -431,6 +431,9 @@ void User::Identify(NickAlias *na)
 			this->SetModes(bi, "%s", this->nc->o->ot->modes.c_str());
 			if (bi != NULL)
 				this->SendMessage(bi, "Changing your usermodes to \002%s\002", this->nc->o->ot->modes.c_str());
+			UserMode *um = ModeManager::FindUserModeByName(UMODE_OPER);
+			if (um && !this->HasMode(UMODE_OPER) && this->nc->o->ot->modes.find(um->ModeChar) != Anope::string::npos)
+				ircdproto->SendOper(this);
 		}
 		if (ircdproto->CanSetVHost && !this->nc->o->vhost.empty())
 		{

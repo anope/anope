@@ -316,6 +316,12 @@ bool IRCDProto::IsChannelValid(const Anope::string &chan)
 	return true;
 }
 
+void IRCDProto::SendOper(User *u)
+{
+	SendNumericInternal(381, u->GetUID(), ":You are now an IRC operator (set by services)");
+	u->SetMode(findbot(Config->OperServ), UMODE_OPER);
+}
+
 MessageSource::MessageSource(const Anope::string &src) : source(src), u(NULL), s(NULL)
 {
 	if (src.empty())

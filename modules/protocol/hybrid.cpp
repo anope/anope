@@ -37,11 +37,6 @@ class HybridProto : public IRCDProto
 		UplinkSocket::Message(bi) << "PRIVMSG $$" << dest->GetName() << " :" << msg;
 	}
 
-	void SendGlobopsInternal(const BotInfo *bi, const Anope::string &buf) anope_override
-	{
-		UplinkSocket::Message(bi) << "GLOBOPS :" << buf;
-	}
-
 	void SendSQLine(User *, const XLine *x) anope_override
 	{
 		const BotInfo *bi = findbot(Config->OperServ);
@@ -211,9 +206,9 @@ class HybridProto : public IRCDProto
 	void SendModeInternal(const BotInfo *bi, const User *u, const Anope::string &buf) anope_override
 	{
 		if (bi)
-			UplinkSocket::Message(bi) << "SVSMODE " << u->nick << " " << u->timestamp << " " << buf;
+			UplinkSocket::Message(bi) << "SVSMODE " << u->GetUID() << " " << u->timestamp << " " << buf;
 		else
-			UplinkSocket::Message(Me) << "SVSMODE " << u->nick << " " << u->timestamp << " " << buf;
+			UplinkSocket::Message(Me) << "SVSMODE " << u->GetUID() << " " << u->timestamp << " " << buf;
 	}
 
 	void SendLogin(User *u) anope_override
@@ -227,7 +222,7 @@ class HybridProto : public IRCDProto
 	{
 		const BotInfo *ns = findbot(Config->NickServ);
 
-		ircdproto->SendMode(ns, u, "+d 1");
+		ircdproto->SendMode(ns, u, "+d 0");
 	}
 
 	void SendChannel(Channel *c) anope_override
@@ -580,9 +575,14 @@ struct IRCDMessageUID : IRCDMessage
 	/* :0MC UID Steve 1 1350157102 +oi ~steve resolved.host 10.0.0.1 0MCAAAAAB 1350157108 :Mining all the time */
 	bool Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
 	{
+		Anope::string ip = params[6];
+
+		if (ip == "0") /* Can be 0 for spoofed clients */
+			ip.clear();
+
 		/* Source is always the server */
 		User *user = new User(params[0], params[4], params[5], "",
-					params[6], source.GetServer(),
+					ip, source.GetServer(),
 					params[9], params[2].is_pos_number_only() ? convertTo<time_t>(params[2]) : 0,
 					params[3], params[7]);
 

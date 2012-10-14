@@ -170,10 +170,11 @@ Table of Contents
     Anope currently works with:
 
         * Bahamut 1.4.27 or later (including 1.8)
+        * Hybrid 8.0 or later
         * InspIRCd 1.1, 1.2, or 2.0
+        * Plexus 3 or later
         * Ratbox 2.0.6 or later
         * UnrealIRCd 3.2 or later
-        * Plexus 3 or later
 
     Anope could also work with some of the daemons derived by the ones listed
     above, but there's no support for them if they work or don't work.

@@ -220,7 +220,7 @@ class HybridProto : public IRCDProto
 	{
 		const BotInfo *ns = findbot(Config->NickServ);
 
-		ircdproto->SendMode(ns, u, "+d %d", u->timestamp);
+		ircdproto->SendMode(ns, u, "+d %s", u->Account()->display.c_str());
 	}
 
 	void SendLogout(User *u) anope_override
@@ -588,13 +588,14 @@ struct IRCDMessageUID : IRCDMessage
 
 		if (user && nickserv)
 		{
-			const NickAlias *na;
+			const NickAlias *na = NULL;
 
-			if (user->timestamp == convertTo<time_t>(params[8]) && (na = findnick(user->nick)))
+			if (params[8] != "0")
+				na = findnick(params[8]);
+
+			if (na)
 			{
-				NickCore *nc = na->nc;
-
-				user->Login(nc);
+				user->Login(na->nc);
 
 				if (!Config->NoNicknameOwnership && na->nc->HasFlag(NI_UNCONFIRMED) == false)
 					user->SetMode(findbot(Config->NickServ), UMODE_REGISTERED);

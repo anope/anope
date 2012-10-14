@@ -60,8 +60,8 @@ class CoreExport User : public virtual Base, public Extensible, public CommandRe
 	Anope::string fingerprint;	/* SSL Fingerprint */
 	Anope::string ip;               /* User's IP */
 	Server *server;			/* Server user is connected to */
-	time_t timestamp;		/* Timestamp of the nick */
-	time_t my_signon;		/* When did _we_ see the user? */
+	time_t signon;                  /* When the user signed on. Set on connect and never modified. */
+	time_t timestamp;		/* Timestamp of the nick. Updated when the nick changes. */
 	bool SuperAdmin;		/* is SuperAdmin on or off? */
 
 	/* Channels the user is in */
@@ -98,8 +98,10 @@ class CoreExport User : public virtual Base, public Extensible, public CommandRe
 
 	/** Update the nickname of a user record accordingly, should be
 	 * called from ircd protocol.
+	 * @param newnick The new username
+	 * @param ts The time the nick was changed, User::timestamp will be updated to this.
 	 */
-	void ChangeNick(const Anope::string &newnick);
+	void ChangeNick(const Anope::string &newnick, time_t ts = Anope::CurTime);
 
 	/** Update the displayed (vhost) of a user record.
 	 * This is used (if set) instead of real host.

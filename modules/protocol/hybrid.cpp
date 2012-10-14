@@ -352,7 +352,7 @@ struct IRCDMessageNick : IRCDMessage
 	/* :0MCAAAAAB NICK newnick 1350157102 */
 	bool Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		source.GetUser()->ChangeNick(params[0]);
+		source.GetUser()->ChangeNick(params[0], convertTo<time_t>(params[1]));
 		return true;
 	}
 };
@@ -511,7 +511,7 @@ struct IRCDMessageSjoin : IRCDMessage
 			 * Don't trigger OnJoinChannel event then as the user will be destroyed
 			 */
 			if (MOD_RESULT != EVENT_STOP && c->ci && c->ci->CheckKick(u))
-			continue;
+				continue;
 
 			FOREACH_MOD(I_OnJoinChannel, OnJoinChannel(u, c));
 		}
@@ -627,6 +627,7 @@ class ProtoHybrid : public Module
 	CoreIRCDMessageTime core_message_time;
 	CoreIRCDMessageTopic core_message_topic;
 	CoreIRCDMessageVersion core_message_version;
+	CoreIRCDMessageWhois core_message_whois;
 
 	/* Our message handlers */
 	IRCDMessageBMask message_bmask;

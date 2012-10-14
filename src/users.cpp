@@ -41,7 +41,6 @@ User::User(const Anope::string &snick, const Anope::string &sident, const Anope:
 	server = NULL;
 	invalid_pw_count = invalid_pw_time = lastmemosend = lastnickreg = lastmail = 0;
 	OnAccess = false;
-	timestamp = my_signon = Anope::CurTime;
 
 	this->nick = snick;
 	this->ident = sident;
@@ -52,7 +51,7 @@ User::User(const Anope::string &snick, const Anope::string &sident, const Anope:
 	this->ip = sip;
 	this->server = sserver;
 	this->realname = srealname;
-	this->timestamp = ssignon;
+	this->timestamp = this->signon = ssignon;
 	this->SetModesInternal("%s", smodes.c_str());
 	this->uid = suid;
 	this->SuperAdmin = false;
@@ -84,7 +83,7 @@ User::User(const Anope::string &snick, const Anope::string &sident, const Anope:
 	FOREACH_MOD(I_OnUserConnect, OnUserConnect(user, exempt));
 }
 
-void User::ChangeNick(const Anope::string &newnick)
+void User::ChangeNick(const Anope::string &newnick, time_t ts)
 {
 	/* Sanity check to make sure we don't segfault */
 	if (newnick.empty())
@@ -94,14 +93,12 @@ void User::ChangeNick(const Anope::string &newnick)
 	Log(this, "nick") << "(" << this->realname << ") changed nick to " << newnick;
 
 	Anope::string old = this->nick;
+	this->timestamp = ts;
 
 	if (this->nick.equals_ci(newnick))
 		this->nick = newnick;
 	else
 	{
-		/* Update this only if nicks aren't the same */
-		this->my_signon = Anope::CurTime;
-
 		NickAlias *old_na = findnick(this->nick);
 		if (old_na && (this->IsIdentified(true) || this->IsRecognized()))
 			old_na->last_seen = Anope::CurTime;

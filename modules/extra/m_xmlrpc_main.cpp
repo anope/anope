@@ -202,7 +202,7 @@ class MyXMLRPCEvent : public XMLRPCEvent
 			if (!u->ip.empty())
 				request->reply("ip", u->ip);
 			request->reply("timestamp", stringify(u->timestamp));
-			request->reply("signon", stringify(u->my_signon));
+			request->reply("signon", stringify(u->signon));
 			if (u->Account())
 			{
 				request->reply("account", iface->Sanitize(u->Account()->display));

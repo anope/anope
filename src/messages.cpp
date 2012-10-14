@@ -388,7 +388,7 @@ bool CoreIRCDMessageWhois::Run(MessageSource &source, const std::vector<Anope::s
 			ircdproto->SendNumeric(307, source.GetSource(), "%s :is a registered nick", bi->nick.c_str());
 		ircdproto->SendNumeric(312, source.GetSource(), "%s %s :%s", u->nick.c_str(), Config->ServerName.c_str(), Config->ServerDesc.c_str());
 		if (bi)
-			ircdproto->SendNumeric(317, source.GetSource(), "%s %ld %ld :seconds idle, signon time", bi->nick.c_str(), static_cast<long>(Anope::CurTime - bi->lastmsg), static_cast<long>(start_time));
+			ircdproto->SendNumeric(317, source.GetSource(), "%s %ld %ld :seconds idle, signon time", bi->nick.c_str(), static_cast<long>(Anope::CurTime - bi->lastmsg), static_cast<long>(bi->signon));
 		ircdproto->SendNumeric(318, source.GetSource(), "%s :End of /WHOIS list.", params[0].c_str());
 	}
 	else

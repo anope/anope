@@ -61,7 +61,7 @@ class NickServCollide : public Timer
 			return;
 		/* If they identified or don't exist anymore, don't kill them. */
 		NickAlias *na = findnick(u->nick);
-		if (!na || u->Account() == na->nc || u->my_signon > this->GetSetTime())
+		if (!na || u->Account() == na->nc || u->timestamp > this->GetSetTime())
 			return;
 
 		u->Collide(na);

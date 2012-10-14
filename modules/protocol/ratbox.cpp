@@ -561,6 +561,7 @@ class ProtoRatbox : public Module
 	CoreIRCDMessageTime core_message_time;
 	CoreIRCDMessageTopic core_message_topic;
 	CoreIRCDMessageVersion core_message_version;
+	CoreIRCDMessageWhois core_message_whois;
 
 	/* Our message handlers */
 	IRCDMessageBMask message_bmask;

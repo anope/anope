@@ -130,7 +130,7 @@ class CommandNSRegister : public Command
 			return;
 		}
 
-		if (u && !u->HasMode(UMODE_OPER) && Config->NickRegDelay && Anope::CurTime - u->my_signon < Config->NickRegDelay)
+		if (u && !u->HasMode(UMODE_OPER) && Config->NickRegDelay && Anope::CurTime - u->timestamp < Config->NickRegDelay)
 		{
 			source.Reply(_("You must have been using this nick for at least %d seconds to register."), Config->NickRegDelay);
 			return;

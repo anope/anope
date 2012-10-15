@@ -664,7 +664,7 @@ NICK_SASET_HIDE_STATUS_OFF
 	
 # SASET MSG responses
 NICK_SASET_MSG_SYNTAX
-	SASAET nickname MSG {ON | OFF}
+	SASET nickname MSG {ON | OFF}
 NICK_SASET_MSG_ON
 	Services will now reply to %s with messages.
 NICK_SASET_MSG_OFF

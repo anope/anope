@@ -8,9 +8,10 @@ VERSION_MAJOR="1"
 VERSION_MINOR="8"
 VERSION_PATCH="8"
 VERSION_EXTRA="-git"
-VERSION_BUILD="3099"
+VERSION_BUILD="3100"
 
 # Changes since 1.8.7 Release
+#Revision 3100 - Fix typo in NICK_SASET_MSG_SYNTAX
 #Revision 3098 - Made all module functions static to fix OSX's linker from linking modules with similar function names to each other
 #Revision 3097 - Do not apply akills or sxlines that are pending expiration
 #Revision 3096 - Fixed crash when InspIRCd sends user MODE changes for users that don't exist

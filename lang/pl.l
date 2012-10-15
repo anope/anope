@@ -845,7 +845,7 @@ NICK_SASET_HIDE_STATUS_OFF
 
 # SASET MSG responses
 NICK_SASET_MSG_SYNTAX
-	SASAET nick MSG {ON | OFF}
+	SASET nick MSG {ON | OFF}
 
 NICK_SASET_MSG_ON
 	Serwisy bêd± teraz wysy³aæ do %s wiadomo¶ci.

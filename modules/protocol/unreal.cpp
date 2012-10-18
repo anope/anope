@@ -348,11 +348,8 @@ class UnrealIRCdProto : public IRCDProto
 
 	void SendLogout(User *u) anope_override
 	{
-		if (!Capab.count("ESVID"))
-		{
-			const BotInfo *ns = findbot(Config->NickServ);
-			ircdproto->SendMode(ns, u, "+d 1");
-		}
+		const BotInfo *ns = findbot(Config->NickServ);
+		ircdproto->SendMode(ns, u, "+d 0");
 	}
 
 	void SendChannel(Channel *c) anope_override
@@ -497,9 +494,9 @@ class ChannelModeUnrealSSL : public ChannelMode
 	}
 };
 
-struct IRCDMessageCapab : IRCDMessage
+struct IRCDMessageCapab : CoreIRCDMessageCapab
 {
-	IRCDMessageCapab() : IRCDMessage("PROTOCTL", 0) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
+	IRCDMessageCapab() : CoreIRCDMessageCapab("PROTOCTL") { }
 
 	bool Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
 	{
@@ -648,7 +645,7 @@ struct IRCDMessageCapab : IRCDMessage
 			}
 		}
 
-		return true;
+		return CoreIRCDMessageCapab::Run(source, params);
 	}
 };
 
@@ -1089,7 +1086,6 @@ class ProtoUnreal : public Module
 
 	/* Core message handlers */
 	CoreIRCDMessageAway core_message_away;
-	CoreIRCDMessageCapab core_message_capab;
 	CoreIRCDMessageError core_message_error;
 	CoreIRCDMessageJoin core_message_join;
 	CoreIRCDMessageKick core_message_kick;

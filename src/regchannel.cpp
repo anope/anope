@@ -226,7 +226,7 @@ Serializable* LogSetting::unserialize(Serializable *obj, Serialize::Data &data)
 /** Default constructor
  * @param chname The channel name
  */
-ChannelInfo::ChannelInfo(const Anope::string &chname) : Flags<ChannelInfoFlag, CI_END>(ChannelInfoFlagStrings), Serializable("ChannelInfo"),
+ChannelInfo::ChannelInfo(const Anope::string &chname) : Serializable("ChannelInfo"), Flags<ChannelInfoFlag, CI_END>(ChannelInfoFlagStrings),
 	access("ChanAccess"), akick("AutoKick"),
 	badwords("BadWord"), mode_locks("ModeLock"), log_settings("LogSetting"), botflags(BotServFlagStrings)
 {

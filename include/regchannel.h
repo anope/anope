@@ -163,7 +163,8 @@ struct CoreExport LogSetting : Serializable
 	static Serializable* unserialize(Serializable *obj, Serialize::Data &);
 };
 
-class CoreExport ChannelInfo : public Extensible, public Flags<ChannelInfoFlag, CI_END>, public Serializable
+/* It matters that Base is here before Extensible (it is inherited by Serializable) */
+class CoreExport ChannelInfo : public Serializable, public Extensible, public Flags<ChannelInfoFlag, CI_END>
 {
  private:
 	serialize_obj<NickCore> founder;					/* Channel founder */

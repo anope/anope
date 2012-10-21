@@ -19,7 +19,7 @@ serialize_checker<nickcore_map> NickCoreList("NickCore");
 /** Default constructor
  * @param display The display nick
  */
-NickCore::NickCore(const Anope::string &coredisplay) : Flags<NickCoreFlag, NI_END>(NickCoreFlagStrings), Serializable("NickCore")
+NickCore::NickCore(const Anope::string &coredisplay) :  Serializable("NickCore"), Flags<NickCoreFlag, NI_END>(NickCoreFlagStrings)
 {
 	if (coredisplay.empty())
 		throw CoreException("Empty display passed to NickCore constructor");

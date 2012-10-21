@@ -29,7 +29,7 @@ static nickservheld_map NickServHelds;
  * @param nick The nick
  * @param nickcore The nickcore for this nick
  */
-NickAlias::NickAlias(const Anope::string &nickname, NickCore* nickcore) : Flags<NickNameFlag, NS_END>(NickNameFlagStrings), Serializable("NickAlias")
+NickAlias::NickAlias(const Anope::string &nickname, NickCore* nickcore) : Serializable("NickAlias"), Flags<NickNameFlag, NS_END>(NickNameFlagStrings)
 {
 	if (nickname.empty())
 		throw CoreException("Empty nick passed to NickAlias constructor");

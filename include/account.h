@@ -109,7 +109,8 @@ const Anope::string NickCoreFlagStrings[] = {
 	"MEMO_MAIL", "HIDE_STATUS", "SUSPENDED", "AUTOOP", "FORBIDDEN", "UNCONFIRMED", "STATS", ""
 };
 
-class CoreExport NickAlias : public Extensible, public Flags<NickNameFlag, NS_END>, public Serializable
+/* It matters that Base is here before Extensible (it is inherited by Serializable) */
+class CoreExport NickAlias : public Serializable, public Extensible, public Flags<NickNameFlag, NS_END>
 {
 	Anope::string vhost_ident, vhost_host, vhost_creator;
 	time_t vhost_created;
@@ -187,7 +188,8 @@ class CoreExport NickAlias : public Extensible, public Flags<NickNameFlag, NS_EN
 	time_t GetVhostCreated() const;
 };
 
-class CoreExport NickCore : public Extensible, public Flags<NickCoreFlag, NI_END>, public Serializable
+/* It matters that Base is here before Extensible (it is inherited by Serializable) */
+class CoreExport NickCore : public Serializable, public Extensible, public Flags<NickCoreFlag, NI_END>
 {
  public:
 	/** Default constructor

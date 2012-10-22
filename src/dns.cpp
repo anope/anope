@@ -462,12 +462,12 @@ unsigned short DNSPacket::Pack(unsigned char *output, unsigned short output_size
 	return pos;
 }
 
-DNSManager::DNSManager(const Anope::string &nameserver, int port) : Timer(300, Anope::CurTime, true), Socket(-1, nameserver.find(':') != Anope::string::npos, SOCK_DGRAM)
+DNSManager::DNSManager(const Anope::string &nameserver, const Anope::string &ip, int port) : Timer(300, Anope::CurTime, true), Socket(-1, nameserver.find(':') != Anope::string::npos, SOCK_DGRAM)
 {
 	this->addrs.pton(this->IPv6 ? AF_INET6 : AF_INET, nameserver, port);
 	try
 	{
-		this->Bind("0.0.0.0", port);
+		this->Bind(ip, port);
 	}
 	catch (const SocketException &ex)
 	{
@@ -525,7 +525,12 @@ bool DNSManager::ProcessRead()
 
 	if (!(recv_packet.flags & DNS_QUERYFLAGS_QR))
 	{
-		FOREACH_MOD(I_OnDnsRequest, OnDnsRequest(recv_packet));
+		DNSPacket *packet = new DNSPacket(recv_packet);
+		packet->flags |= DNS_QUERYFLAGS_QR; /* This is a reponse */
+
+		FOREACH_MOD(I_OnDnsRequest, OnDnsRequest(recv_packet, packet));
+
+		DNSEngine->SendPacket(packet);
 		return true;
 	}
 

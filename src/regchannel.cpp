@@ -274,7 +274,7 @@ ChannelInfo::ChannelInfo(const Anope::string &chname) : Serializable("ChannelInf
 /** Copy constructor
  * @param ci The ChannelInfo to copy settings to
  */
-ChannelInfo::ChannelInfo(const ChannelInfo &ci) : Flags<ChannelInfoFlag, CI_END>(ChannelInfoFlagStrings), Serializable("ChannelInfo"),
+ChannelInfo::ChannelInfo(const ChannelInfo &ci) : Serializable("ChannelInfo"), Flags<ChannelInfoFlag, CI_END>(ChannelInfoFlagStrings),
 	access("ChanAccess"), akick("AutoKick"),
 	badwords("BadWord"), mode_locks("ModeLock"), log_settings("LogSetting"), botflags(BotServFlagStrings)
 {

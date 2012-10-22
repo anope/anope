@@ -210,7 +210,7 @@ ServerConfig::ServerConfig() : config_data(), NSDefFlags(NickCoreFlagStrings), C
 	}
 	if (DNSEngine)
 		DNSEngine->SetFlag(SF_DEAD);
-	DNSEngine = new DNSManager(this->NameServer, this->DNSPort);
+	DNSEngine = new DNSManager(this->NameServer, this->DNSIP, this->DNSPort);
 
 	if (this->CaseMap == "ascii")
 		Anope::casemap = std::locale(std::locale(), new Anope::ascii_ctype<char>());
@@ -1302,6 +1302,7 @@ ConfigItems::ConfigItems(ServerConfig *conf)
 		{"mail", "memo_message", "", new ValueContainerString(&conf->MailMemoMessage), DT_STRING | DT_ALLOW_NEWLINE, ValidateMail},
 		{"dns", "nameserver", "127.0.0.1", new ValueContainerString(&conf->NameServer), DT_STRING, NoValidation},
 		{"dns", "timeout", "5", new ValueContainerTime(&conf->DNSTimeout), DT_TIME, NoValidation},
+		{"dns", "ip", "0.0.0.0", new ValueContainerString(&conf->DNSIP), DT_STRING, NoValidation},
 		{"dns", "port", "53", new ValueContainerInt(&conf->DNSPort), DT_INTEGER, NoValidation},
 		{"chanserv", "name", "", new ValueContainerString(&conf->ChanServ), DT_STRING, NoValidation},
 		{"chanserv", "defaults", "keeptopic secure securefounder signkick", new ValueContainerString(&CSDefaults), DT_STRING, ValidateChanServ},

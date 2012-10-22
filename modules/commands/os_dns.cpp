@@ -490,15 +490,14 @@ class ModuleDNS : public Module
 		}
 	}
 
-	void OnDnsRequest(DNSPacket &req) anope_override
+	void OnDnsRequest(DNSPacket &req, DNSPacket *packet) anope_override
 	{
 		if (req.questions.empty())
 			return;
-		/* Currently we reply to any QR */
+		/* Currently we reply to any QR for A/AAAA */
 		const Question& q = req.questions[0];
-
-		DNSPacket *packet = new DNSPacket(req);
-		packet->flags |= DNS_QUERYFLAGS_QR; /* This is a reponse */
+		if (q.type != DNS_QUERY_A && q.type != DNS_QUERY_AAAA)
+			return;
 
 		for (unsigned i = 0; i < dns_servers.size(); ++i)
 		{
@@ -508,10 +507,15 @@ class ModuleDNS : public Module
 
 			for (unsigned j = 0; j < s->GetIPs().size(); ++j)
 			{
-				ResourceRecord rr(q.name, s->GetIPs()[j].find(':') != Anope::string::npos ? DNS_QUERY_AAAA : DNS_QUERY_A);
-				rr.ttl = this->ttl;
-				rr.rdata = s->GetIPs()[j];
-				packet->answers.push_back(rr);
+				QueryType q_type = s->GetIPs()[j].find(':') != Anope::string::npos ? DNS_QUERY_AAAA : DNS_QUERY_A;
+
+				if (q_type == q.type)
+				{
+					ResourceRecord rr(q.name, q_type);
+					rr.ttl = this->ttl;
+					rr.rdata = s->GetIPs()[j];
+					packet->answers.push_back(rr);
+				}
 			}
 		}
 
@@ -531,10 +535,15 @@ class ModuleDNS : public Module
 
 				for (unsigned j = 0; j < s->GetIPs().size(); ++j)
 				{
-					ResourceRecord rr(q.name, s->GetIPs()[j].find(':') != Anope::string::npos ? DNS_QUERY_AAAA : DNS_QUERY_A);
-					rr.ttl = this->ttl;
-					rr.rdata = s->GetIPs()[j];
-					packet->answers.push_back(rr);
+					QueryType q_type = s->GetIPs()[j].find(':') != Anope::string::npos ? DNS_QUERY_AAAA : DNS_QUERY_A;
+
+					if (q_type == q.type)
+					{
+						ResourceRecord rr(q.name, q_type);
+						rr.ttl = this->ttl;
+						rr.rdata = s->GetIPs()[j];
+						packet->answers.push_back(rr);
+					}
 				}
 			}
 
@@ -544,8 +553,6 @@ class ModuleDNS : public Module
 				/* Send back an empty answer anyway */
 			}
 		}
-
-		DNSEngine->SendPacket(packet);
 	}
 };
 

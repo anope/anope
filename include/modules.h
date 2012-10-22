@@ -917,6 +917,11 @@ class CoreExport Module : public Extensible
 	 */
 	virtual void OnLog(Log *l) { }
 
+	/** Called when a DNS request (question) is recieved.
+	 * @param req The dns request
+	 */
+	virtual void OnDnsRequest(DNSPacket &req) { }
+
 	/** Called when a channels modes are being checked to see if they are allowed,
 	 * mostly to ensure mlock/+r are set.
 	 * @param c The channel
@@ -995,7 +1000,7 @@ enum Implementation
 		I_OnServerQuit, I_OnTopicUpdated,
 		I_OnEncrypt, I_OnDecrypt,
 		I_OnChannelModeSet, I_OnChannelModeUnset, I_OnUserModeSet, I_OnUserModeUnset, I_OnChannelModeAdd, I_OnUserModeAdd,
-		I_OnMLock, I_OnUnMLock, I_OnServerSync, I_OnUplinkSync, I_OnBotPrivmsg, I_OnPrivmsg, I_OnLog,
+		I_OnMLock, I_OnUnMLock, I_OnServerSync, I_OnUplinkSync, I_OnBotPrivmsg, I_OnPrivmsg, I_OnLog, I_OnDnsRequest,
 
 		I_OnSerializeCheck, I_OnSerializableConstruct, I_OnSerializableDestruct, I_OnSerializableUpdate,
 	I_END

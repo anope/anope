@@ -362,17 +362,6 @@ Anope::string GetFullProgDir(const Anope::string &argv0)
 
 int main(int ac, char **av, char **envp)
 {
-#ifndef _WIN32
-	/* If we're root, issue a warning now */
-	if (!getuid() && !getgid())
-	{
-		std::cerr << "WARNING: You are currently running Anope as the root superuser. Anope does not" << std::endl;
-		std::cerr << "         require root privileges to run, and it is discouraged that you run Anope" << std::endl;
-		std::cerr << "         as the root superuser." << std::endl;
-		sleep(3);
-	}
-#endif
-
 	binary_dir = GetFullProgDir(av[0]);
 	if (binary_dir[binary_dir.length() - 1] == '.')
 		binary_dir = binary_dir.substr(0, binary_dir.length() - 2);

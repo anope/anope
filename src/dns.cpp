@@ -56,20 +56,11 @@ DNSQuery::DNSQuery(const Question &q)
 	this->error = DNS_ERROR_NONE;
 }
 
-DNSQuery::DNSQuery(const DNSPacket &p)
-{
-	this->questions = p.questions;
-	this->answers = p.answers;
-	this->authorities = p.authorities;
-	this->additional = p.additional;
-	this->error = DNS_ERROR_NONE;
-}
-
 DNSRequest::DNSRequest(const Anope::string &addr, QueryType qt, bool cache, Module *c) : Timer(Config->DNSTimeout), Question(addr, qt), use_cache(cache), id(0), creator(c)
 {
 	if (!DNSEngine)
-		DNSEngine = new DNSManager(Config->NameServer, DNSManager::DNSPort);
-	if (DNSEngine->packets.size() == 65535)
+		throw SocketException("No DNSEngine");
+	if (DNSEngine->GetPackets().size() == 65535)
 		throw SocketException("DNS queue full");
 
 	do
@@ -101,14 +92,12 @@ void DNSRequest::Process()
 		return;
 	}
 	
-	DNSPacket *p = new DNSPacket();	
+	DNSPacket *p = new DNSPacket(DNSEngine->addrs);
 	p->flags = DNS_QUERYFLAGS_RD;
 
 	p->id = this->id;
 	p->questions.push_back(*this);
-	DNSEngine->packets.push_back(p);
-
-	SocketEngine::MarkWritable(DNSEngine);
+	DNSEngine->SendPacket(p);
 }
 
 void DNSRequest::OnError(const DNSQuery *r)
@@ -239,12 +228,12 @@ ResourceRecord DNSPacket::UnpackResourceRecord(const unsigned char *input, unsig
 			if (pos + 4 > input_size)
 				throw SocketException("Unable to unpack resource record");
 
-			in_addr addr;
-			addr.s_addr = input[pos] | (input[pos + 1] << 8) | (input[pos + 2] << 16)  | (input[pos + 3] << 24);
+			in_addr a;
+			a.s_addr = input[pos] | (input[pos + 1] << 8) | (input[pos + 2] << 16)  | (input[pos + 3] << 24);
 			pos += 4;
 
 			sockaddrs addrs;
-			addrs.ntop(AF_INET, &addr);
+			addrs.ntop(AF_INET, &a);
 
 			record.rdata = addrs.addr();
 			break;
@@ -254,13 +243,13 @@ ResourceRecord DNSPacket::UnpackResourceRecord(const unsigned char *input, unsig
 			if (pos + 16 > input_size)
 				throw SocketException("Unable to unpack resource record");
 
-			in6_addr addr;
+			in6_addr a;
 			for (int j = 0; j < 16; ++j)
-				addr.s6_addr[j] = input[pos + j];
+				a.s6_addr[j] = input[pos + j];
 			pos += 16;
 
 			sockaddrs addrs;
-			addrs.ntop(AF_INET6, &addr);
+			addrs.ntop(AF_INET6, &a);
 
 			record.rdata = addrs.addr();
 			break;
@@ -280,9 +269,8 @@ ResourceRecord DNSPacket::UnpackResourceRecord(const unsigned char *input, unsig
 	return record;
 }
 
-DNSPacket::DNSPacket() : DNSQuery()
+DNSPacket::DNSPacket(const sockaddrs &a) : DNSQuery(), addr(a), id(0), flags(0)
 {
-	this->id = this->flags = 0;
 }
 
 void DNSPacket::Fill(const unsigned char *input, const unsigned short len)
@@ -426,13 +414,13 @@ unsigned short DNSPacket::Pack(unsigned char *output, unsigned short output_size
 					if (pos + 6 > output_size)
 						throw SocketException("Unable to pack packet");
 
-					sockaddrs addr(rr.rdata);
+					sockaddrs a(rr.rdata);
 
 					s = htons(4);
 					memcpy(&output[pos], &s, 2);
 					pos += 2;
 
-					memcpy(&output[pos], &addr.sa4.sin_addr, 4);
+					memcpy(&output[pos], &a.sa4.sin_addr, 4);
 					pos += 4;
 					break;
 				}
@@ -441,13 +429,13 @@ unsigned short DNSPacket::Pack(unsigned char *output, unsigned short output_size
 					if (pos + 18 > output_size)
 						throw SocketException("Unable to pack packet");
 
-					sockaddrs addr(rr.rdata);
+					sockaddrs a(rr.rdata);
 
 					s = htons(16);
 					memcpy(&output[pos], &s, 2);
 					pos += 2;
 
-					memcpy(&output[pos], &addr.sa6.sin6_addr, 16);
+					memcpy(&output[pos], &a.sa6.sin6_addr, 16);
 					pos += 16;
 					break;
 				}
@@ -477,6 +465,15 @@ unsigned short DNSPacket::Pack(unsigned char *output, unsigned short output_size
 DNSManager::DNSManager(const Anope::string &nameserver, int port) : Timer(300, Anope::CurTime, true), Socket(-1, nameserver.find(':') != Anope::string::npos, SOCK_DGRAM)
 {
 	this->addrs.pton(this->IPv6 ? AF_INET6 : AF_INET, nameserver, port);
+	try
+	{
+		this->Bind("0.0.0.0", port);
+	}
+	catch (const SocketException &ex)
+	{
+		/* This error can be from normal operation as most people don't use services to handle DNS queries, so put it in debug log */
+		Log(LOG_DEBUG) << "Unable to bind DNSManager to port " << port << ": " << ex.GetReason();
+	}
 }
 
 DNSManager::~DNSManager()
@@ -514,13 +511,7 @@ bool DNSManager::ProcessRead()
 	if (length < DNSPacket::HEADER_LENGTH)
 		return true;
 
-	if (this->addrs != from_server)
-	{
-		Log(LOG_DEBUG_2) << "Resolver: Received an answer from the wrong nameserver, Bad NAT or DNS forging attempt? '" << this->addrs.addr() << "' != '" << from_server.addr() << "'";
-		return true;
-	}
-
-	DNSPacket recv_packet;
+	DNSPacket recv_packet(from_server);
 
 	try
 	{
@@ -532,6 +523,18 @@ bool DNSManager::ProcessRead()
 		return true;
 	}
 
+	if (!(recv_packet.flags & DNS_QUERYFLAGS_QR))
+	{
+		FOREACH_MOD(I_OnDnsRequest, OnDnsRequest(recv_packet));
+		return true;
+	}
+
+	if (this->addrs != from_server)
+	{
+		Log(LOG_DEBUG_2) << "Resolver: Received an answer from the wrong nameserver, Bad NAT or DNS forging attempt? '" << this->addrs.addr() << "' != '" << from_server.addr() << "'";
+		return true;
+	}
+
 	std::map<unsigned short, DNSRequest *>::iterator it = DNSEngine->requests.find(recv_packet.id);
 	if (it == DNSEngine->requests.end())
 	{
@@ -540,13 +543,7 @@ bool DNSManager::ProcessRead()
 	}
 	DNSRequest *request = it->second;
 
-	if (!(recv_packet.flags & DNS_QUERYFLAGS_QR))
-	{
-		Log(LOG_DEBUG_2) << "Resolver: Received a non-answer";
-		recv_packet.error = DNS_ERROR_NOT_AN_ANSWER;
-		request->OnError(&recv_packet);
-	}
-	else if (recv_packet.flags & DNS_QUERYFLAGS_OPCODE)
+	if (recv_packet.flags & DNS_QUERYFLAGS_OPCODE)
 	{
 		Log(LOG_DEBUG_2) << "Resolver: Received a nonstandard query";
 		recv_packet.error = DNS_ERROR_NONSTANDARD_QUERY;
@@ -614,7 +611,7 @@ bool DNSManager::ProcessWrite()
 			unsigned char buffer[524];
 			unsigned short len = r->Pack(buffer, sizeof(buffer));
 
-			sendto(this->GetFD(), reinterpret_cast<char *>(buffer), len, 0, &this->addrs.sa, this->addrs.size());
+			sendto(this->GetFD(), reinterpret_cast<char *>(buffer), len, 0, &r->addr.sa, r->addr.size());
 		}
 		catch (const SocketException &) { }
 
@@ -696,6 +693,19 @@ void DNSManager::Cleanup(Module *mod)
 			this->requests.erase(id);
 		}
 	}
+}
+
+std::deque<DNSPacket *>& DNSManager::GetPackets()
+{
+	return this->packets;
+}
+
+void DNSManager::SendPacket(DNSPacket *p)
+{
+	Log(LOG_DEBUG_2) << "Resolver: Queueing packet " << p->id;
+	this->packets.push_back(p);
+
+	SocketEngine::MarkWritable(this);
 }
 
 DNSQuery DNSManager::BlockingQuery(const Anope::string &mask, QueryType qt)

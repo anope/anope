@@ -66,7 +66,10 @@ User::User(const Anope::string &snick, const Anope::string &sident, const Anope:
 	this->nc = NULL;
 
 	if (sserver) // Our bots are introduced on startup with no server
+	{
+		++sserver->Users;
 		Log(this, "connect") << (!svhost.empty() ? Anope::string("(") + svhost + ") " : "") << "(" << srealname << ") " << sip << " connected to the network (" << sserver->GetName() << ")";
+	}
 
 	++usercnt;
 	if (usercnt > maxusercnt)
@@ -241,7 +244,7 @@ User::~User()
 	Log(LOG_DEBUG_2) << "User::~User() called";
 
 	Log(this, "disconnect") << "(" << this->realname << ") " << "disconnected from the network (" << this->server->GetName() << ")";
-
+	--this->server->Users;
 
 	FOREACH_MOD(I_OnUserLogoff, OnUserLogoff(this));
 

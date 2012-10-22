@@ -394,6 +394,10 @@ class CoreExport ServerConfig
 	/* Max length of channel names */
 	unsigned ChanLen;
 
+	/* User and group to run as */
+	Anope::string User;
+	Anope::string Group;
+
 	/* Casemapping to use */
 	Anope::string CaseMap;
 
@@ -494,8 +498,10 @@ class CoreExport ServerConfig
 
 	/* Nameserver to use for resolving hostnames */
 	Anope::string NameServer;
-	/* TIme before a DNS query is considered dead */
+	/* Time before a DNS query is considered dead */
 	time_t DNSTimeout;
+	/* The port DNS queries come in on */
+	int DNSPort;
 
 	/* Prefix of guest nicks when a user gets forced off of a nick */
 	Anope::string NSGuestNickPrefix;

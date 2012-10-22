@@ -422,6 +422,9 @@ void Init(int ac, char **av)
 	Log(LOG_TERMINAL) << "Using configuration file " << conf_dir << "/" << services_conf.GetName();
 #endif
 
+	/* Initialize the socket engine */
+	SocketEngine::Init();
+
 	/* Read configuration file; exit if there are problems. */
 	try
 	{
@@ -441,6 +444,15 @@ void Init(int ac, char **av)
 	if (!SupportedWindowsVersion())
 		throw FatalException(GetWindowsVersion() + " is not a supported version of Windows");
 #else
+	/* If we're root, issue a warning now */
+	if (!getuid() && !getgid())
+	{
+		std::cerr << "WARNING: You are currently running Anope as the root superuser. Anope does not" << std::endl;
+		std::cerr << "         require root privileges to run, and it is discouraged that you run Anope" << std::endl;
+		std::cerr << "         as the root superuser." << std::endl;
+		sleep(3);
+	}
+
 	if (!nofork && AtTerm())
 	{
 		/* Install these before fork() - it is possible for the child to
@@ -478,16 +490,16 @@ void Init(int ac, char **av)
 	}
 #endif
 
-	/* Initialize the socket engine */
-	SocketEngine::Init();
-
 	/* Write our PID to the PID file. */
 	write_pidfile();
 
 	/* Create me */
 	Me = new Server(NULL, Config->ServerName, 0, Config->ServerDesc, Config->Numeric);
 	for (botinfo_map::const_iterator it = BotListByNick->begin(), it_end = BotListByNick->end(); it != it_end; ++it)
+	{
 		it->second->server = Me;
+		++Me->Users;
+	}
 
 	/* Announce ourselves to the logfile. */
 	Log() << "Anope " << Anope::Version() << " starting up" << (debug || readonly ? " (options:" : "") << (debug ? " debug" : "") << (readonly ? " readonly" : "") << (debug || readonly ? ")" : "");

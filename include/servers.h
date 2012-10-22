@@ -63,6 +63,9 @@ class CoreExport Server : public Flags<ServerFlag>
 	~Server();
 
  public:
+ 	/* Number of users on the server */
+ 	unsigned Users;
+
 	/** Delete this server with a reason
 	 * @param reason The reason
 	 */

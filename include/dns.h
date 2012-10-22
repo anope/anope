@@ -95,7 +95,6 @@ struct CoreExport DNSQuery
 
 	DNSQuery();
 	DNSQuery(const Question &q);
-	DNSQuery(const DNSPacket &p);
 };
 
 /** The request
@@ -124,7 +123,7 @@ class CoreExport DNSRequest : public Timer, public Question
 	void Tick(time_t) anope_override;
 };
 
-/** A full packet sent or recieved to/from the nameserver, may contain multiple queries
+/** A full packet sent or recieved to/from the nameserver
  */
 class DNSPacket : public DNSQuery
 {
@@ -139,12 +138,14 @@ class DNSPacket : public DNSQuery
  public:
 	static const int HEADER_LENGTH = 12;
 
-	/* Our 16-bit id for this header */
+	/* Source or destination of the packet */
+	sockaddrs addr;
+	/* ID for this packet */
 	unsigned short id;
-	/* Flags on the query */
+	/* Flags on the packet */
 	unsigned short flags;
 
-	DNSPacket();
+	DNSPacket(const sockaddrs &a);
 	void Fill(const unsigned char *input, const unsigned short len);
 	unsigned short Pack(unsigned char *output, unsigned short output_size);
 };
@@ -155,20 +156,19 @@ class CoreExport DNSManager : public Timer, public Socket
 {
 	typedef std::multimap<Anope::string, ResourceRecord, ci::less> cache_map;
 	cache_map cache;
-	sockaddrs addrs;
- public:
-	std::deque<DNSPacket *> packets;
-	std::map<unsigned short, DNSRequest *> requests;
 
-	static const int DNSPort = 53;
+	std::deque<DNSPacket *> packets;
+ public:
+	sockaddrs addrs;
+	std::map<unsigned short, DNSRequest *> requests;
 
 	DNSManager(const Anope::string &nameserver, int port);
 
 	~DNSManager();
 
-	bool ProcessRead();
+	bool ProcessRead() anope_override;
 
-	bool ProcessWrite();
+	bool ProcessWrite() anope_override;
 
 	/** Add a record to the dns cache
 	 * @param r The record
@@ -188,6 +188,15 @@ class CoreExport DNSManager : public Timer, public Socket
 	 * @param mod The module
 	 */
 	void Cleanup(Module *mod);
+
+	/** Get the list of packets pending to be sent
+	 */
+	std::deque<DNSPacket *>& GetPackets();
+
+	/** Queues a packet for sending
+	 * @param p The packet
+	 */
+	void SendPacket(DNSPacket *p);
 
 	/** Does a BLOCKING DNS query and returns the first IP.
 	 * Only use this if you know what you are doing. Unless you specifically

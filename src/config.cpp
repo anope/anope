@@ -17,6 +17,14 @@
 #include "opertype.h"
 #include "channels.h"
 #include "hashcomp.h"
+#include "dns.h"
+
+#ifndef _WIN32
+#include <errno.h>
+#include <sys/types.h>
+#include <pwd.h>
+#include <grp.h>
+#endif
 
 /*************************************************************************/
 
@@ -200,6 +208,9 @@ ServerConfig::ServerConfig() : config_data(), NSDefFlags(NickCoreFlagStrings), C
 			this->NameServer = "127.0.0.1";
 		}
 	}
+	if (DNSEngine)
+		DNSEngine->SetFlag(SF_DEAD);
+	DNSEngine = new DNSManager(this->NameServer, this->DNSPort);
 
 	if (this->CaseMap == "ascii")
 		Anope::casemap = std::locale(std::locale(), new Anope::ascii_ctype<char>());
@@ -219,6 +230,31 @@ ServerConfig::ServerConfig() : config_data(), NSDefFlags(NickCoreFlagStrings), C
 
 	if (this->SessionIPv4CIDR > 32 || this->SessionIPv6CIDR > 128)
 		throw ConfigException("Session CIDR value out of range");
+
+#ifndef _WIN32
+	if (!this->User.empty())
+	{
+		errno = 0;
+		struct passwd *u = getpwnam(this->User.c_str());
+		if (u == NULL)
+			Log() << "Unable to setuid to " << this->User << ": " << Anope::LastError();
+		else if (setuid(u->pw_uid) == -1)
+			Log() << "Unable to setuid to " << this->User << ": " << Anope::LastError();
+		else
+			Log() << "Successfully set user to " << this->User;
+	}
+	if (!this->Group.empty())
+	{
+		errno = 0;
+		struct group *g = getgrnam(this->Group.c_str());
+		if (g == NULL)
+			Log() << "Unable to setgid to " << this->Group << ": " << Anope::LastError();
+		else if (setuid(g->gr_gid) == -1)
+			Log() << "Unable to setgid to " << this->Group << ": " << Anope::LastError();
+		else
+			Log() << "Successfully set group to " << this->Group;
+	}
+#endif
 }
 
 bool ServerConfig::CheckOnce(const Anope::string &tag)
@@ -1191,6 +1227,8 @@ ConfigItems::ConfigItems(ServerConfig *conf)
 		{"networkinfo", "userlen", "10", new ValueContainerUInt(&conf->UserLen), DT_UINTEGER | DT_NORELOAD, NoValidation},
 		{"networkinfo", "hostlen", "64", new ValueContainerUInt(&conf->HostLen), DT_UINTEGER | DT_NORELOAD, NoValidation},
 		{"networkinfo", "chanlen", "32", new ValueContainerUInt(&conf->ChanLen), DT_UINTEGER | DT_NORELOAD, NoValidation},
+		{"options", "user", "", new ValueContainerString(&conf->User), DT_STRING, NoValidation},
+		{"options", "group", "", new ValueContainerString(&conf->Group), DT_STRING, NoValidation},
 		{"options", "casemap", "ascii", new ValueContainerString(&conf->CaseMap), DT_STRING, NoValidation},
 		{"options", "passlen", "32", new ValueContainerUInt(&conf->PassLen), DT_UINTEGER | DT_NORELOAD, NoValidation},
 		{"options", "seed", "0", new ValueContainerLUInt(&conf->Seed), DT_LUINTEGER, NoValidation},
@@ -1264,6 +1302,7 @@ ConfigItems::ConfigItems(ServerConfig *conf)
 		{"mail", "memo_message", "", new ValueContainerString(&conf->MailMemoMessage), DT_STRING | DT_ALLOW_NEWLINE, ValidateMail},
 		{"dns", "nameserver", "127.0.0.1", new ValueContainerString(&conf->NameServer), DT_STRING, NoValidation},
 		{"dns", "timeout", "5", new ValueContainerTime(&conf->DNSTimeout), DT_TIME, NoValidation},
+		{"dns", "port", "53", new ValueContainerInt(&conf->DNSPort), DT_INTEGER, NoValidation},
 		{"chanserv", "name", "", new ValueContainerString(&conf->ChanServ), DT_STRING, NoValidation},
 		{"chanserv", "defaults", "keeptopic secure securefounder signkick", new ValueContainerString(&CSDefaults), DT_STRING, ValidateChanServ},
 		{"chanserv", "maxregistered", "0", new ValueContainerUInt(&conf->CSMaxReg), DT_UINTEGER, ValidateChanServ},

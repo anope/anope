@@ -486,6 +486,17 @@ struct IRCDMessageEncap : IRCDMessage
 	}
 };
 
+struct IRCDMessageFIdent : IRCDMessage
+{
+	IRCDMessageFIdent() : IRCDMessage("FIDENT", 1) { SetFlag(IRCDMESSAGE_REQUIRE_USER); }
+
+	bool Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
+	{
+		source.GetUser()->SetIdent(params[0]);
+		return true;
+	}
+};
+
 class ProtoInspIRCd : public Module
 {
 	InspIRCd20Proto ircd_proto;
@@ -526,6 +537,7 @@ class ProtoInspIRCd : public Module
 	/* Our message handlers */
 	IRCDMessageCapab message_capab;
 	IRCDMessageEncap message_encap;
+	IRCDMessageFIdent message_fident;
 
 	void SendChannelMetadata(Channel *c, const Anope::string &metadataname, const Anope::string &value)
 	{

@@ -500,7 +500,8 @@ class CoreExport ServerConfig
 	Anope::string NameServer;
 	/* Time before a DNS query is considered dead */
 	time_t DNSTimeout;
-	/* The port DNS queries come in on */
+	/* The IP/port DNS queries come in on */
+	Anope::string DNSIP;
 	int DNSPort;
 
 	/* Prefix of guest nicks when a user gets forced off of a nick */

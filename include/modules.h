@@ -919,8 +919,9 @@ class CoreExport Module : public Extensible
 
 	/** Called when a DNS request (question) is recieved.
 	 * @param req The dns request
+	 * @param reply The reply that will be sent
 	 */
-	virtual void OnDnsRequest(DNSPacket &req) { }
+	virtual void OnDnsRequest(DNSPacket &req, DNSPacket *reply) { }
 
 	/** Called when a channels modes are being checked to see if they are allowed,
 	 * mostly to ensure mlock/+r are set.

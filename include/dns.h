@@ -162,7 +162,7 @@ class CoreExport DNSManager : public Timer, public Socket
 	sockaddrs addrs;
 	std::map<unsigned short, DNSRequest *> requests;
 
-	DNSManager(const Anope::string &nameserver, int port);
+	DNSManager(const Anope::string &nameserver, const Anope::string &ip, int port);
 
 	~DNSManager();
 

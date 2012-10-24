@@ -257,7 +257,7 @@ class MyHTTPProvider : public HTTPProvider, public CallBack
 	std::list<dynamic_reference<MyHTTPClient> > clients;
 
  public:
-	MyHTTPProvider(Module *c, const Anope::string &n, const Anope::string &i, const unsigned short p, const int t) : HTTPProvider(c, n, i, p), CallBack(c, 10, Anope::CurTime, true), timeout(t) { }
+	MyHTTPProvider(Module *c, const Anope::string &n, const Anope::string &i, const unsigned short p, const int t) : Socket(-1, i.find(':') != Anope::string::npos), HTTPProvider(c, n, i, p), CallBack(c, 10, Anope::CurTime, true), timeout(t) { }
 
 	void Tick(time_t) anope_override
 	{

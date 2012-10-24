@@ -142,7 +142,7 @@ class HTTPClient : public ClientSocket, public BufferedSocket, public BinarySock
 	virtual void SendReply(HTTPReply *) = 0;
 };
 
-class HTTPProvider : public Service, public ListenSocket
+class HTTPProvider : public ListenSocket, public Service
 {
  	Anope::string ip;
 	unsigned short port;
@@ -150,7 +150,7 @@ class HTTPProvider : public Service, public ListenSocket
 	Anope::string ext_ip;
 	std::vector<Anope::string> ext_headers;
 
-	HTTPProvider(Module *c, const Anope::string &n, const Anope::string &i, const unsigned short p) : Service(c, "HTTPProvider", n), ListenSocket(i, p, i.find(':') != Anope::string::npos), ip(i), port(p) { }
+	HTTPProvider(Module *c, const Anope::string &n, const Anope::string &i, const unsigned short p) : ListenSocket(i, p, i.find(':') != Anope::string::npos), Service(c, "HTTPProvider", n) { }
 
 	const Anope::string &GetIP() const
 	{

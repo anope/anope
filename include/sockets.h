@@ -358,7 +358,7 @@ class CoreExport BinarySocket : public virtual Socket
 	virtual bool Read(const char *buffer, size_t l);
 };
 
-class CoreExport ListenSocket : public Socket
+class CoreExport ListenSocket : public virtual Socket
 {
  public:
 	/** Constructor

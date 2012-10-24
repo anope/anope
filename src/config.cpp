@@ -208,8 +208,7 @@ ServerConfig::ServerConfig() : config_data(), NSDefFlags(NickCoreFlagStrings), C
 			this->NameServer = "127.0.0.1";
 		}
 	}
-	if (DNSEngine)
-		DNSEngine->SetFlag(SF_DEAD);
+	delete DNSEngine;
 	DNSEngine = new DNSManager(this->NameServer, this->DNSIP, this->DNSPort);
 
 	if (this->CaseMap == "ascii")
@@ -1304,6 +1303,9 @@ ConfigItems::ConfigItems(ServerConfig *conf)
 		{"dns", "timeout", "5", new ValueContainerTime(&conf->DNSTimeout), DT_TIME, NoValidation},
 		{"dns", "ip", "0.0.0.0", new ValueContainerString(&conf->DNSIP), DT_STRING, NoValidation},
 		{"dns", "port", "53", new ValueContainerInt(&conf->DNSPort), DT_INTEGER, NoValidation},
+		{"dns", "admin", "admin@example.com", new ValueContainerString(&conf->DNSSOAAdmin), DT_STRING, NoValidation},
+		{"dns", "primary_nameserver", "ns1.example.com", new ValueContainerString(&conf->DNSSOANS), DT_STRING, NoValidation},
+		{"dns", "refresh", "3600", new ValueContainerUInt(&conf->DNSSOARefresh), DT_UINTEGER, NoValidation},
 		{"chanserv", "name", "", new ValueContainerString(&conf->ChanServ), DT_STRING, NoValidation},
 		{"chanserv", "defaults", "keeptopic secure securefounder signkick", new ValueContainerString(&CSDefaults), DT_STRING, ValidateChanServ},
 		{"chanserv", "maxregistered", "0", new ValueContainerUInt(&conf->CSMaxReg), DT_UINTEGER, ValidateChanServ},

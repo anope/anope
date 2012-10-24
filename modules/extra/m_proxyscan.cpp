@@ -41,7 +41,7 @@ class ProxyCallbackListener : public ListenSocket
 	};
 
  public:
-	ProxyCallbackListener(const Anope::string &b, int p) : ListenSocket(b, p, false)
+	ProxyCallbackListener(const Anope::string &b, int p) : Socket(-1, b.find(':') != Anope::string::npos), ListenSocket(b, p, false)
 	{
 	}
 

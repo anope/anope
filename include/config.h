@@ -503,6 +503,12 @@ class CoreExport ServerConfig
 	/* The IP/port DNS queries come in on */
 	Anope::string DNSIP;
 	int DNSPort;
+	/* DNS SOA admin */
+	Anope::string DNSSOAAdmin;
+	/* DNS SOA primary NS */
+	Anope::string DNSSOANS;
+	/* SOA Refresh time */
+	unsigned DNSSOARefresh;
 
 	/* Prefix of guest nicks when a user gets forced off of a nick */
 	Anope::string NSGuestNickPrefix;

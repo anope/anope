@@ -58,9 +58,9 @@ DNSQuery::DNSQuery(const Question &q)
 
 DNSRequest::DNSRequest(const Anope::string &addr, QueryType qt, bool cache, Module *c) : Timer(Config->DNSTimeout), Question(addr, qt), use_cache(cache), id(0), creator(c)
 {
-	if (!DNSEngine)
+	if (!DNSEngine || !DNSEngine->udpsock)
 		throw SocketException("No DNSEngine");
-	if (DNSEngine->GetPackets().size() == 65535)
+	if (DNSEngine->udpsock->GetPackets().size() == 65535)
 		throw SocketException("DNS queue full");
 
 	do
@@ -82,7 +82,7 @@ void DNSRequest::Process()
 {
 	Log(LOG_DEBUG_2) << "Resolver: Processing request to lookup " << this->name << ", of type " << this->type;
 
-	if (!DNSEngine)
+	if (!DNSEngine || !DNSEngine->udpsock)
 		throw SocketException("DNSEngine has not been initialized");
 
 	if (this->use_cache && DNSEngine->CheckCache(this))
@@ -92,12 +92,12 @@ void DNSRequest::Process()
 		return;
 	}
 	
-	DNSPacket *p = new DNSPacket(DNSEngine->addrs);
+	DNSPacket *p = new DNSPacket(&DNSEngine->addrs);
 	p->flags = DNS_QUERYFLAGS_RD;
 
 	p->id = this->id;
 	p->questions.push_back(*this);
-	DNSEngine->SendPacket(p);
+	DNSEngine->udpsock->Reply(p);
 }
 
 void DNSRequest::OnError(const DNSQuery *r)
@@ -269,8 +269,10 @@ ResourceRecord DNSPacket::UnpackResourceRecord(const unsigned char *input, unsig
 	return record;
 }
 
-DNSPacket::DNSPacket(const sockaddrs &a) : DNSQuery(), addr(a), id(0), flags(0)
+DNSPacket::DNSPacket(sockaddrs *a) : DNSQuery(), id(0), flags(0)
 {
+	if (a)
+		addr = *a;
 }
 
 void DNSPacket::Fill(const unsigned char *input, const unsigned short len)
@@ -439,6 +441,7 @@ unsigned short DNSPacket::Pack(unsigned char *output, unsigned short output_size
 					pos += 16;
 					break;
 				}
+				case DNS_QUERY_NS:
 				case DNS_QUERY_CNAME:
 				case DNS_QUERY_PTR:
 				{
@@ -450,8 +453,47 @@ unsigned short DNSPacket::Pack(unsigned char *output, unsigned short output_size
 
 					this->PackName(output, output_size, pos, rr.rdata);
 
-					i = htons(pos - packet_pos_save - 2);
-					memcpy(&output[packet_pos_save], &i, 2);
+					s = htons(pos - packet_pos_save - 2);
+					memcpy(&output[packet_pos_save], &s, 2);
+					break;
+				}
+				case DNS_QUERY_SOA:
+				{
+					if (pos + 2 >= output_size)
+						throw SocketException("Unable to pack packet");
+
+					unsigned short packet_pos_save = pos;
+					pos += 2;
+
+					this->PackName(output, output_size, pos, Config->DNSSOANS);
+					this->PackName(output, output_size, pos, Config->DNSSOAAdmin.replace_all_cs('@', '.'));
+
+					if (pos + 20 >= output_size)
+						throw SocketException("Unable to pack SOA");
+
+					l = htonl(DNSEngine->GetSerial());
+					memcpy(&output[pos], &l, 4);
+					pos += 4;
+					
+					l = htonl(Config->DNSSOARefresh); // Refresh
+					memcpy(&output[pos], &l, 4);
+					pos += 4;
+
+					l = htonl(Config->DNSSOARefresh); // Retry
+					memcpy(&output[pos], &l, 4);
+					pos += 4;
+
+					l = htonl(604800); // Expire
+					memcpy(&output[pos], &l, 4);
+					pos += 4;
+
+					l = htonl(0); // Minimum
+					memcpy(&output[pos], &l, 4);
+					pos += 4;
+
+					s = htons(pos - packet_pos_save - 2);
+					memcpy(&output[packet_pos_save], &s, 2);
+
 					break;
 				}
 				default:
@@ -462,25 +504,164 @@ unsigned short DNSPacket::Pack(unsigned char *output, unsigned short output_size
 	return pos;
 }
 
-DNSManager::DNSManager(const Anope::string &nameserver, const Anope::string &ip, int port) : Timer(300, Anope::CurTime, true), Socket(-1, nameserver.find(':') != Anope::string::npos, SOCK_DGRAM)
+DNSManager::TCPSocket::Client::Client(TCPSocket *ls, int fd, const sockaddrs &addr) : Socket(fd, ls->IsIPv6()), ClientSocket(ls, addr), Timer(5), tcpsock(ls), packet(NULL), length(0)
 {
-	this->addrs.pton(this->IPv6 ? AF_INET6 : AF_INET, nameserver, port);
+	Log(LOG_DEBUG_2) << "Resolver: New client from " << addr.addr();
+}
+
+DNSManager::TCPSocket::Client::~Client()
+{
+	Log(LOG_DEBUG_2) << "Resolver: Exiting client from " << clientaddr.addr();
+	delete packet;
+}
+
+void DNSManager::TCPSocket::Client::Reply(DNSPacket *p) anope_override
+{
+	delete packet;
+	packet = p;
+	SocketEngine::MarkWritable(this);
+}
+
+bool DNSManager::TCPSocket::Client::ProcessRead()
+{
+	Log(LOG_DEBUG_2) << "Resolver: Reading from DNS TCP socket";
+
+	int i = recv(this->GetFD(), reinterpret_cast<char *>(packet_buffer) + length, sizeof(packet_buffer) - length, 0);
+	if (i <= 0)
+		return false;
+
+	length += i;
+
+	short want_len = packet_buffer[0] << 8 | packet_buffer[1];
+	if (length >= want_len - 2)
+	{
+		int len = length - 2;
+		length = 0;
+		return DNSEngine->HandlePacket(this, packet_buffer + 2, len, NULL);
+	}
+	return true;
+}
+
+bool DNSManager::TCPSocket::Client::ProcessWrite()
+{
+	Log(LOG_DEBUG_2) << "Resolver: Writing to DNS TCP socket";
+
+	if (packet != NULL)
+	{
+		try
+		{
+			unsigned char buffer[524];
+			unsigned short len = packet->Pack(buffer + 2, sizeof(buffer) - 2);
+
+			short s = htons(len);
+			memcpy(buffer, &s, 2);
+			len += 2;
+
+			send(this->GetFD(), reinterpret_cast<char *>(buffer), len, 0);
+		}
+		catch (const SocketException &) { }
+
+		delete packet;
+		packet = NULL;
+	}
+
+	SocketEngine::ClearWritable(this);
+	return true; /* Do not return false here, bind is unhappy we close the connection so soon after sending */
+}
+
+DNSManager::TCPSocket::TCPSocket(const Anope::string &ip, int port) : Socket(-1, ip.find(':') != Anope::string::npos), ListenSocket(ip, port, ip.find(':') != Anope::string::npos)
+{
+}
+
+ClientSocket *DNSManager::TCPSocket::OnAccept(int fd, const sockaddrs &addr) anope_override
+{
+	return new Client(this, fd, addr);
+}
+
+DNSManager::UDPSocket::UDPSocket(const Anope::string &ip, int port) : Socket(-1, ip.find(':') != Anope::string::npos, SOCK_DGRAM)
+{
+}
+
+DNSManager::UDPSocket::~UDPSocket()
+{
+	for (unsigned i = 0; i < packets.size(); ++i)
+		delete packets[i];
+}
+
+void DNSManager::UDPSocket::Reply(DNSPacket *p)
+{
+	packets.push_back(p);
+	SocketEngine::MarkWritable(this);
+}
+
+bool DNSManager::UDPSocket::ProcessRead()
+{
+	Log(LOG_DEBUG_2) << "Resolver: Reading from DNS UDP socket";
+
+	unsigned char packet_buffer[524];
+	sockaddrs from_server;
+	socklen_t x = sizeof(from_server);
+	int length = recvfrom(this->GetFD(), reinterpret_cast<char *>(&packet_buffer), sizeof(packet_buffer), 0, &from_server.sa, &x);
+	return DNSEngine->HandlePacket(this, packet_buffer, length, &from_server);
+}
+
+bool DNSManager::UDPSocket::ProcessWrite()
+{
+	Log(LOG_DEBUG_2) << "Resolver: Writing to DNS UDP socket";
+
+	DNSPacket *r = !packets.empty() ? packets.front() : NULL;
+	if (r != NULL)
+	{
+		try
+		{
+			unsigned char buffer[524];
+			unsigned short len = r->Pack(buffer, sizeof(buffer));
+
+			sendto(this->GetFD(), reinterpret_cast<char *>(buffer), len, 0, &r->addr.sa, r->addr.size());
+		}
+		catch (const SocketException &) { }
+
+		delete r;
+		packets.pop_front();
+	}
+
+	if (packets.empty())
+		SocketEngine::ClearWritable(this);
+	
+	return true;
+}
+
+DNSManager::DNSManager(const Anope::string &nameserver, const Anope::string &ip, int port) : Timer(300, Anope::CurTime, true), serial(0), last_year(0), last_day(0), last_num(0), tcpsock(NULL), udpsock(NULL)
+{
+	this->addrs.pton(nameserver.find(':') != Anope::string::npos ? AF_INET6 : AF_INET, nameserver, port);
+
 	try
 	{
-		this->Bind(ip, port);
+		udpsock = new UDPSocket(ip, port);
+	}
+	catch (const SocketException &ex)
+	{
+		Log() << "Unable to create socket for DNSManager: " << ex.GetReason();
+	}
+
+	try
+	{
+		udpsock->Bind(ip, port);
+		tcpsock = new TCPSocket(ip, port);
 	}
 	catch (const SocketException &ex)
 	{
 		/* This error can be from normal operation as most people don't use services to handle DNS queries, so put it in debug log */
 		Log(LOG_DEBUG) << "Unable to bind DNSManager to port " << port << ": " << ex.GetReason();
 	}
+
+	this->UpdateSerial();
 }
 
 DNSManager::~DNSManager()
 {
-	for (unsigned i = this->packets.size(); i > 0; --i)
-		delete this->packets[i - 1];
-	this->packets.clear();
+	delete udpsock;
+	delete tcpsock;
 
 	for (std::map<unsigned short, DNSRequest *>::iterator it = this->requests.begin(), it_end = this->requests.end(); it != it_end; ++it)
 	{	
@@ -499,19 +680,12 @@ DNSManager::~DNSManager()
 	DNSEngine = NULL;
 }
 
-bool DNSManager::ProcessRead()
+bool DNSManager::HandlePacket(ReplySocket *s, const unsigned char *const packet_buffer, int length, sockaddrs *from)
 {
-	Log(LOG_DEBUG_2) << "Resolver: Reading from DNS socket";
-
-	unsigned char packet_buffer[524];
-	sockaddrs from_server;
-	socklen_t x = sizeof(from_server);
-	int length = recvfrom(this->GetFD(), reinterpret_cast<char *>(&packet_buffer), sizeof(packet_buffer), 0, &from_server.sa, &x);
-
 	if (length < DNSPacket::HEADER_LENGTH)
 		return true;
 
-	DNSPacket recv_packet(from_server);
+	DNSPacket recv_packet(from);
 
 	try
 	{
@@ -525,18 +699,65 @@ bool DNSManager::ProcessRead()
 
 	if (!(recv_packet.flags & DNS_QUERYFLAGS_QR))
 	{
+		if (recv_packet.questions.empty())
+		{
+			Log(LOG_DEBUG_2) << "Resolver: Received a question with no questions?";
+			return true;
+		}
+
 		DNSPacket *packet = new DNSPacket(recv_packet);
 		packet->flags |= DNS_QUERYFLAGS_QR; /* This is a reponse */
+		packet->flags |= DNS_QUERYFLAGS_AA; /* And we are authoritative */
+
+		packet->answers.clear();
+		packet->authorities.clear();
+		packet->additional.clear();
+
+		for (unsigned i = 0; i < recv_packet.questions.size(); ++i)
+		{
+			const Question& q = recv_packet.questions[i];
+
+			if (q.type == DNS_QUERY_AXFR || q.type == DNS_QUERY_SOA)
+			{
+				ResourceRecord rr(q.name, DNS_QUERY_SOA);
+				packet->answers.push_back(rr);
+
+				if (q.type == DNS_QUERY_AXFR)
+				{
+					ResourceRecord rr2(q.name, DNS_QUERY_NS);
+					rr2.rdata = Config->DNSSOANS;
+					packet->answers.push_back(rr2);
+				}
+				break;
+			}
+		}
 
 		FOREACH_MOD(I_OnDnsRequest, OnDnsRequest(recv_packet, packet));
 
-		DNSEngine->SendPacket(packet);
+		for (unsigned i = 0; i < recv_packet.questions.size(); ++i)
+		{
+			const Question& q = recv_packet.questions[i];
+
+			if (q.type == DNS_QUERY_AXFR)
+			{
+				ResourceRecord rr(q.name, DNS_QUERY_SOA);
+				packet->answers.push_back(rr);
+				break;
+			}
+		}
+
+		s->Reply(packet);
 		return true;
 	}
 
-	if (this->addrs != from_server)
+	if (from == NULL)
 	{
-		Log(LOG_DEBUG_2) << "Resolver: Received an answer from the wrong nameserver, Bad NAT or DNS forging attempt? '" << this->addrs.addr() << "' != '" << from_server.addr() << "'";
+		Log(LOG_DEBUG_2) << "Resolver: Received an answer over TCP. This is not supported.";
+		return true;
+	}
+	else if (this->addrs != *from)
+	{
+		Log(LOG_DEBUG_2) << "Resolver: Received an answer from the wrong nameserver, Bad NAT or DNS forging attempt? '" << this->addrs.addr() << "' != '" << from->addr() << "'";
 		return true;
 	}
 
@@ -601,32 +822,6 @@ bool DNSManager::ProcessRead()
 	}
 	
 	delete request;
-	return true;
-}
-
-bool DNSManager::ProcessWrite()
-{
-	Log(LOG_DEBUG_2) << "Resolver: Writing to DNS socket";
-
-	DNSPacket *r = !DNSEngine->packets.empty() ? DNSEngine->packets.front() : NULL;
-	if (r != NULL)
-	{
-		try
-		{
-			unsigned char buffer[524];
-			unsigned short len = r->Pack(buffer, sizeof(buffer));
-
-			sendto(this->GetFD(), reinterpret_cast<char *>(buffer), len, 0, &r->addr.sa, r->addr.size());
-		}
-		catch (const SocketException &) { }
-
-		delete r;
-		DNSEngine->packets.pop_front();
-	}
-
-	if (DNSEngine->packets.empty())
-		SocketEngine::ClearWritable(this);
-
 	return true;
 }
 
@@ -700,17 +895,42 @@ void DNSManager::Cleanup(Module *mod)
 	}
 }
 
-std::deque<DNSPacket *>& DNSManager::GetPackets()
+void DNSManager::UpdateSerial()
 {
-	return this->packets;
+	char timebuf[20];
+	tm *tm = localtime(&Anope::CurTime);
+
+	if (!tm)
+	{
+		Log(LOG_DEBUG) << "Resolver: Unable to update serial";
+		return;
+	}
+
+	if (tm->tm_yday != last_day || tm->tm_year != last_year)
+	{
+		last_day = tm->tm_yday;
+		last_year = tm->tm_year;
+		last_num = 0;
+	}
+
+	++last_num;
+
+	int i = strftime(timebuf, sizeof(timebuf), "%Y%m%d", tm);
+	snprintf(timebuf + i, sizeof(timebuf) - i, "%d", last_num);
+
+	try
+	{
+		serial = convertTo<uint32_t>(timebuf);
+	}
+	catch (const ConvertException &)
+	{
+		Log(LOG_DEBUG) << "Resolver: Unable to update serial";
+	}
 }
 
-void DNSManager::SendPacket(DNSPacket *p)
+uint32_t DNSManager::GetSerial() const
 {
-	Log(LOG_DEBUG_2) << "Resolver: Queueing packet " << p->id;
-	this->packets.push_back(p);
-
-	SocketEngine::MarkWritable(this);
+	return serial;
 }
 
 DNSQuery DNSManager::BlockingQuery(const Anope::string &mask, QueryType qt)

@@ -27,12 +27,18 @@ enum QueryType
 	DNS_QUERY_NONE,
 	/* A simple A lookup */
 	DNS_QUERY_A = 1,
+	/* An authoritative name server */
+	DNS_QUERY_NS = 2,
 	/* A CNAME lookup */
 	DNS_QUERY_CNAME = 5,
+	/* Start of a zone of authority */
+	DNS_QUERY_SOA = 6,
 	/* Reverse DNS lookup */
 	DNS_QUERY_PTR = 12,
 	/* IPv6 AAAA lookup */
-	DNS_QUERY_AAAA = 28
+	DNS_QUERY_AAAA = 28,
+	/* Zone transfer */
+	DNS_QUERY_AXFR = 252
 };
 
 /** Flags that can be AND'd into DNSPacket::flags to receive certain values
@@ -145,30 +151,85 @@ class DNSPacket : public DNSQuery
 	/* Flags on the packet */
 	unsigned short flags;
 
-	DNSPacket(const sockaddrs &a);
+	DNSPacket(sockaddrs *a);
 	void Fill(const unsigned char *input, const unsigned short len);
 	unsigned short Pack(unsigned char *output, unsigned short output_size);
 };
 
-/** DNS manager, manages all requests
+/** DNS manager
  */
-class CoreExport DNSManager : public Timer, public Socket
+class CoreExport DNSManager : public Timer
 {
+	class ReplySocket : public virtual Socket
+	{
+	 public:
+		virtual ~ReplySocket() { }
+		virtual void Reply(DNSPacket *p) = 0;
+	};
+
+	/* Listens for TCP requests */
+	class TCPSocket : public ListenSocket
+	{
+		/* A TCP client */
+		class Client : public ClientSocket, public Timer, public ReplySocket
+		{
+			TCPSocket *tcpsock;
+	 		DNSPacket *packet;
+			unsigned char packet_buffer[524];
+			int length;
+
+		 public:
+		 	Client(TCPSocket *ls, int fd, const sockaddrs &addr);
+			~Client();
+
+			/* Times out after a few seconds */
+			void Tick(time_t) anope_override { }
+			void Reply(DNSPacket *p) anope_override;
+		 	bool ProcessRead() anope_override;
+			bool ProcessWrite() anope_override;
+		};
+
+	 public:
+		TCPSocket(const Anope::string &ip, int port);
+
+		ClientSocket *OnAccept(int fd, const sockaddrs &addr) anope_override;
+	};
+
+	/* Listens for UDP requests */
+	class UDPSocket : public ReplySocket
+	{
+		std::deque<DNSPacket *> packets;
+	 public:
+
+		UDPSocket(const Anope::string &ip, int port);
+		~UDPSocket();
+
+		void Reply(DNSPacket *p) anope_override;
+
+		std::deque<DNSPacket *>& GetPackets() { return packets; }
+
+	 	bool ProcessRead() anope_override;
+
+		bool ProcessWrite() anope_override;
+	};
+
 	typedef std::multimap<Anope::string, ResourceRecord, ci::less> cache_map;
 	cache_map cache;
 
-	std::deque<DNSPacket *> packets;
+	uint32_t serial;
+	int last_year, last_day, last_num;
+
  public:
+	TCPSocket *tcpsock;
+	UDPSocket *udpsock;
+
 	sockaddrs addrs;
 	std::map<unsigned short, DNSRequest *> requests;
 
 	DNSManager(const Anope::string &nameserver, const Anope::string &ip, int port);
-
 	~DNSManager();
 
-	bool ProcessRead() anope_override;
-
-	bool ProcessWrite() anope_override;
+	bool HandlePacket(ReplySocket *s, const unsigned char *const data, int len, sockaddrs *from);
 
 	/** Add a record to the dns cache
 	 * @param r The record
@@ -189,14 +250,8 @@ class CoreExport DNSManager : public Timer, public Socket
 	 */
 	void Cleanup(Module *mod);
 
-	/** Get the list of packets pending to be sent
-	 */
-	std::deque<DNSPacket *>& GetPackets();
-
-	/** Queues a packet for sending
-	 * @param p The packet
-	 */
-	void SendPacket(DNSPacket *p);
+	void UpdateSerial();
+	uint32_t GetSerial() const;
 
 	/** Does a BLOCKING DNS query and returns the first IP.
 	 * Only use this if you know what you are doing. Unless you specifically

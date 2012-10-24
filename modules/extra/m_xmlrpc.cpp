@@ -88,7 +88,7 @@ class MyXMLRPCClientSocket : public XMLRPCClientSocket
 class MyXMLRPCListenSocket : public XMLRPCListenSocket
 {
  public:
-	MyXMLRPCListenSocket(const Anope::string &bindip, int port, bool ipv6, const Anope::string &u, const Anope::string &p, const std::vector<Anope::string> &a) : XMLRPCListenSocket(bindip, port, ipv6, u, p, a)
+	MyXMLRPCListenSocket(const Anope::string &bindip, int port, bool ipv6, const Anope::string &u, const Anope::string &p, const std::vector<Anope::string> &a) : Socket(-1, ipv6), XMLRPCListenSocket(bindip, port, ipv6, u, p, a)
 	{
 		listen_sockets.push_back(this);
 	}

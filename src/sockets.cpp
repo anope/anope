@@ -535,7 +535,7 @@ void Socket::ProcessError()
  * @param port The port to listen on
  * @param ipv6 true for ipv6
  */
-ListenSocket::ListenSocket(const Anope::string &bindip, int port, bool ipv6) : Socket(-1, ipv6)
+ListenSocket::ListenSocket(const Anope::string &bindip, int port, bool ipv6)
 {
 	this->SetNonBlocking();
 

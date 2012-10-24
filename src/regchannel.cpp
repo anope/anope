@@ -422,7 +422,7 @@ Serializable* ChannelInfo::unserialize(Serializable *obj, Serialize::Data &data)
 			--ci->founder->channelcount;
 		ci->founder = findcore(data["founder"].astr());
 		if (ci->founder)
-			--ci->founder->channelcount;
+			++ci->founder->channelcount;
 	}
 	if (data.count("successor") > 0)
 	{

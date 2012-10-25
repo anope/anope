@@ -381,7 +381,14 @@ struct IRCDMessageNick : IRCDMessage
 	{
 		if (params.size() == 10)
 		{
-			User *user = new User(params[0], params[4], params[5], "", params[8], source.GetServer(), params[9], params[2].is_pos_number_only() ? convertTo<time_t>(params[2]) : 0, params[3]);
+			Server *s = Server::Find(params[6]);
+			if (s == NULL)
+			{
+				Log(LOG_DEBUG) << "User " << params[0] << " introduced from nonexistant server " << params[6] << "?";
+				return true;
+			}
+
+			User *user = new User(params[0], params[4], params[5], "", params[8], s, params[9], params[2].is_pos_number_only() ? convertTo<time_t>(params[2]) : 0, params[3]);
 			if (user && nickserv)
 			{
 				const NickAlias *na;

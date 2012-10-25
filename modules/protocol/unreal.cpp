@@ -790,8 +790,15 @@ struct IRCDMessageNick : IRCDMessage
 				vhost.clear();
 
 			time_t user_ts = params[2].is_pos_number_only() ? convertTo<time_t>(params[2]) : Anope::CurTime;
+
+			Server *s = Server::Find(params[5]);
+			if (s == NULL)
+			{
+				Log(LOG_DEBUG) << "User " << params[0] << " introduced from nonexistant server " << params[5] << "?";
+				return true;
+			}
 		
-			User *user = new User(params[0], params[3], params[4], vhost, ip, source.GetServer(), params[10], user_ts, params[7]);
+			User *user = new User(params[0], params[3], params[4], vhost, ip, s, params[10], user_ts, params[7]);
 
 			const NickAlias *na = NULL;
 

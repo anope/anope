@@ -210,6 +210,7 @@ class DBMySQL : public Module, public Pipe
 					{
 						new_s->id = id;
 						obj->objects[id] = new_s;
+						new_s->UpdateCache(); /* We know this is the most up to date copy */
 					}
 				}
 				else

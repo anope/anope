@@ -776,8 +776,14 @@ struct IRCDMessageNick : IRCDMessage
 			Anope::string decoded_ip;
 			Anope::B64Decode(params[9], decoded_ip);
 
-			sockaddrs ip;
-			ip.ntop(params[9].length() == 8 ? AF_INET : AF_INET6, decoded_ip.c_str());
+			Anope::string ip;
+			try
+			{
+				sockaddrs ip_addr;
+				ip_addr.ntop(params[9].length() == 8 ? AF_INET : AF_INET6, decoded_ip.c_str());
+				ip = ip_addr.addr();
+			}
+			catch (const SocketException &ex) { }
 
 			Anope::string vhost = params[8];
 			if (vhost.equals_cs("*"))
@@ -785,7 +791,7 @@ struct IRCDMessageNick : IRCDMessage
 
 			time_t user_ts = params[2].is_pos_number_only() ? convertTo<time_t>(params[2]) : Anope::CurTime;
 		
-			User *user = new User(params[0], params[3], params[4], vhost, ip.addr(), source.GetServer(), params[10], user_ts, params[7]);
+			User *user = new User(params[0], params[3], params[4], vhost, ip, source.GetServer(), params[10], user_ts, params[7]);
 
 			const NickAlias *na = NULL;
 

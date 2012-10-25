@@ -391,7 +391,7 @@ class CSFlags : public Module
 		accessprovider(this), commandcsflags(this)
 	{
 		this->SetAuthor("Anope");
-
+		this->SetPermanent(true);
 
 		Implementation i[] = { I_OnReload };
 		ModuleManager::Attach(i, this, 1);

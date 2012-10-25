@@ -857,6 +857,7 @@ class CSXOP : public Module
 		accessprovider(this), commandcsqop(this), commandcssop(this), commandcsaop(this), commandcshop(this), commandcsvop(this)
 	{
 		this->SetAuthor("Anope");
+		this->SetPermanent(true);
 	}
 };
 

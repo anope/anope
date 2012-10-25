@@ -789,6 +789,7 @@ class CSAccess : public Module
 		accessprovider(this), commandcsaccess(this), commandcslevels(this)
 	{
 		this->SetAuthor("Anope");
+		this->SetPermanent(true);
 
 		Implementation i[] = { I_OnReload, I_OnCreateChan, I_OnGroupCheckPriv };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));

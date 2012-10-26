@@ -70,7 +70,7 @@ struct SeenInfo : Serializable
 		data["message"] >> s->message;
 		data["last"] >> s->last;
 
-		if (!s)
+		if (!obj)
 			database[s->nick] = s;
 		return s;
 	}
@@ -146,6 +146,7 @@ class CommandOSSeen : public Command
 				if (time < buf->second->last)
 				{
 					Log(LOG_DEBUG) << buf->first << " was last seen " << do_strftime(buf->second->last) << ", deleting entry";
+					buf->second->destroy();
 					database.erase(buf);
 					counter++;
 				}

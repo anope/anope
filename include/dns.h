@@ -216,6 +216,7 @@ class CoreExport DNSManager : public Timer
 	typedef std::multimap<Anope::string, ResourceRecord, ci::less> cache_map;
 	cache_map cache;
 
+	bool listen;
 	uint32_t serial;
 	int last_year, last_day, last_num;
 

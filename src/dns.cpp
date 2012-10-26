@@ -631,7 +631,7 @@ bool DNSManager::UDPSocket::ProcessWrite()
 	return true;
 }
 
-DNSManager::DNSManager(const Anope::string &nameserver, const Anope::string &ip, int port) : Timer(300, Anope::CurTime, true), serial(0), last_year(0), last_day(0), last_num(0), tcpsock(NULL), udpsock(NULL)
+DNSManager::DNSManager(const Anope::string &nameserver, const Anope::string &ip, int port) : Timer(300, Anope::CurTime, true), listen(false), serial(0), last_year(0), last_day(0), last_num(0), tcpsock(NULL), udpsock(NULL)
 {
 	this->addrs.pton(nameserver.find(':') != Anope::string::npos ? AF_INET6 : AF_INET, nameserver, port);
 
@@ -648,6 +648,7 @@ DNSManager::DNSManager(const Anope::string &nameserver, const Anope::string &ip,
 	{
 		udpsock->Bind(ip, port);
 		tcpsock = new TCPSocket(ip, port);
+		listen = true;
 	}
 	catch (const SocketException &ex)
 	{
@@ -699,7 +700,9 @@ bool DNSManager::HandlePacket(ReplySocket *s, const unsigned char *const packet_
 
 	if (!(recv_packet.flags & DNS_QUERYFLAGS_QR))
 	{
-		if (recv_packet.questions.empty())
+		if (!listen)
+			return true;
+		else if (recv_packet.questions.empty())
 		{
 			Log(LOG_DEBUG_2) << "Resolver: Received a question with no questions?";
 			return true;

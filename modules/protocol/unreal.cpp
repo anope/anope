@@ -851,6 +851,83 @@ struct IRCDMessagePong : IRCDMessage
 	}
 };
 
+struct IRCDMessageSASL : IRCDMessage
+{
+	class UnrealSASLIdentifyRequest : public IdentifyRequest
+	{
+		Anope::string uid;
+
+	 public:
+		UnrealSASLIdentifyRequest(Module *m, const Anope::string &id, const Anope::string &acc, const Anope::string &pass) : IdentifyRequest(m, acc, pass), uid(id) { }
+
+		void OnSuccess() anope_override
+		{
+			size_t p = this->uid.find('!');
+			if (p == Anope::string::npos)
+				return;
+
+			UplinkSocket::Message(Me) << "SVSLOGIN " << this->uid.substr(0, p) << " " << this->uid << " " << this->GetAccount();
+			UplinkSocket::Message(findbot(Config->NickServ)) << "SASL " << this->uid.substr(0, p) << " " << this->uid << " D S";
+		}
+
+		void OnFail() anope_override
+		{
+			size_t p = this->uid.find('!');
+			if (p == Anope::string::npos)
+				return;
+
+			UplinkSocket::Message(findbot(Config->NickServ)) << "SASL " << this->uid.substr(0, p) << " " << this->uid << " D F";
+		}
+	};
+	
+	Module *me;
+
+	IRCDMessageSASL(Module *m) : IRCDMessage("SASL", 4), me(m) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
+
+	/* Received: :irc.foonet.com SASL services.localhost.net irc.foonet.com!1.57290 S PLAIN
+	 *                                                       uid
+	 *
+	 * Received: :irc.foonet.com SASL services.localhost.net irc.foonet.com!3.56270 C QWRhbQBBZGFtAHF3ZXJ0eQ==
+	 *                                                       uid                      base64(account\0account\0pass)
+	 */
+	bool Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
+	{
+		size_t p = params[1].find('!');
+		if (p == Anope::string::npos)	
+			return true;
+
+		/* Unreal segfaults if we send from Me */
+		if (params[2] == "S")
+			UplinkSocket::Message(findbot(Config->NickServ)) << "SASL " << params[1].substr(0, p) << " " << params[1] << " C +";
+		else if (params[2] == "C")
+		{
+			Anope::string decoded;
+			Anope::B64Decode(params[3], decoded);
+
+			p = decoded.find('\0');
+			if (p == Anope::string::npos)
+				return true;
+			decoded = decoded.substr(p + 1);
+
+			p = decoded.find('\0');
+			if (p == Anope::string::npos)
+				return true;
+
+			Anope::string acc = decoded.substr(0, p),
+				pass = decoded.substr(p + 1);
+
+			if (acc.empty() || pass.empty())
+				return true;
+
+			IdentifyRequest *req = new UnrealSASLIdentifyRequest(me, params[1], acc, pass);
+			FOREACH_MOD(I_OnCheckAuthentication, OnCheckAuthentication(NULL, req));
+			req->Dispatch();
+		}
+
+		return true;
+	}
+};
+
 struct IRCDMessageSDesc : IRCDMessage
 {
 	IRCDMessageSDesc() : IRCDMessage("SDESC", 1) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
@@ -1124,6 +1201,7 @@ class ProtoUnreal : public Module
 	IRCDMessageNetInfo message_netinfo;
 	IRCDMessageNick message_nick;
 	IRCDMessagePong message_pong;
+	IRCDMessageSASL message_sasl;
 	IRCDMessageSDesc message_sdesc;
 	IRCDMessageSetHost message_sethost;
 	IRCDMessageSetIdent message_setident;
@@ -1173,7 +1251,7 @@ class ProtoUnreal : public Module
 
  public:
 	ProtoUnreal(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PROTOCOL),
-		message_mode("MODE"), message_svsmode("SVSMODE"), message_svs2mode("SVS2MODE")
+		message_mode("MODE"), message_svsmode("SVSMODE"), message_svs2mode("SVS2MODE"), message_sasl(this)
 	{
 		this->SetAuthor("Anope");
 

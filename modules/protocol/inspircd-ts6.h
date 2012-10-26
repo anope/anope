@@ -579,9 +579,16 @@ struct IRCDMessageMetadata : IRCDMessage
 				{
 					u->Login(nc);
 
+					const BotInfo *bi = findbot(Config->NickServ);
 					const NickAlias *user_na = findnick(u->nick);
 					if (!Config->NoNicknameOwnership && nickserv && user_na && user_na->nc == nc && user_na->nc->HasFlag(NI_UNCONFIRMED) == false)
-						u->SetMode(findbot(Config->NickServ), UMODE_REGISTERED);
+						u->SetMode(bi, UMODE_REGISTERED);
+
+					/* Sometimes a user connects, we send them the usual "this nickname is registered" mess (if
+					 * their server isn't syncing) and then we receive this.. so tell them about it.
+					 */
+					if (bi)
+						u->SendMessage(bi, _("You have been logged in as \2%s\2."), nc->display.c_str());
 				}
 			}
 

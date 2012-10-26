@@ -447,7 +447,9 @@ struct IRCDMessageCapab : IRCDMessage
 
 struct IRCDMessageEncap : IRCDMessage
 {
-	IRCDMessageEncap() : IRCDMessage("ENCAP", 4) { }
+	Module *me;
+
+	IRCDMessageEncap(Module *m) : IRCDMessage("ENCAP", 4), me(m) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
 
 	bool Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
 	{
@@ -480,6 +482,60 @@ struct IRCDMessageEncap : IRCDMessage
 
 			u->SetRealname(params[3]);
 			UplinkSocket::Message(u) << "FNAME " << params[3];
+		}
+		else if (params[1] == "SASL" && params.size() == 6)
+		{
+			class InspIRCDSASLIdentifyRequest : public IdentifyRequest
+			{
+				Anope::string uid;
+
+			 public:
+				InspIRCDSASLIdentifyRequest(Module *m, const Anope::string &id, const Anope::string &acc, const Anope::string &pass) : IdentifyRequest(m, acc, pass), uid(id) { }
+
+				void OnSuccess() anope_override
+				{
+					UplinkSocket::Message(Me) << "METADATA " << this->uid << " accountname :" << this->GetAccount();
+					UplinkSocket::Message(Me) << "ENCAP " << this->uid.substr(0, 3) << " SASL " << Me->GetSID() << " " << this->uid << " D S";
+				}
+
+				void OnFail() anope_override
+				{
+					UplinkSocket::Message(Me) << "ENCAP " << this->uid.substr(0, 3) << " SASL " << Me->GetSID() << " " << this->uid << " " << " D F";
+				}
+			};
+
+			/*
+			Received: :869 ENCAP * SASL 869AAAAAH * S PLAIN
+			Sent: :00B ENCAP 869 SASL 00B 869AAAAAH C +
+			Received: :869 ENCAP * SASL 869AAAAAH 00B C QWRhbQBBZGFtAG1vbw==
+			                                            base64(account\0account\0pass)
+			*/
+			if (params[4] == "S")
+				UplinkSocket::Message(Me) << "ENCAP " << params[2].substr(0, 3) << " SASL " << Me->GetSID() << " " << params[2] << " C +";
+			else if (params[4] == "C")
+			{
+				Anope::string decoded;
+				Anope::B64Decode(params[5], decoded);
+
+				size_t p = decoded.find('\0');
+				if (p == Anope::string::npos)
+					return true;
+				decoded = decoded.substr(p + 1);
+
+				p = decoded.find('\0');
+				if (p == Anope::string::npos)
+					return true;
+
+				Anope::string acc = decoded.substr(0, p),
+					pass = decoded.substr(p + 1);
+
+				if (acc.empty() || pass.empty())
+					return true;
+
+				IdentifyRequest *req = new InspIRCDSASLIdentifyRequest(me, params[2], acc, pass);
+				FOREACH_MOD(I_OnCheckAuthentication, OnCheckAuthentication(NULL, req));
+				req->Dispatch();
+			}
 		}
 
 		return true;
@@ -546,7 +602,7 @@ class ProtoInspIRCd : public Module
 
  public:
 	ProtoInspIRCd(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PROTOCOL),
-		message_fhost("FHOST")
+		message_fhost("FHOST"), message_encap(this)
 	{
 		this->SetAuthor("Anope");
 

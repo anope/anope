@@ -253,6 +253,9 @@ class NickServCore : public Module
 					chan_set_correct_modes(u, c, 1, true);
 			}
 
+		if (!Config->NSModesOnID.empty())
+			u->SetModes(NickServ, "%s", Config->NSModesOnID.c_str());
+
 		if (Config->NSForceEmail && u->Account()->email.empty())
 		{
 			u->SendMessage(NickServ, _("You must now supply an e-mail for your nick.\n"

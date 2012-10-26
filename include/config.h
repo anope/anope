@@ -568,6 +568,8 @@ class CoreExport ServerConfig
 	/* Kill & killquick delays before force changing off users */
 	time_t NSKillQuick;
 	time_t NSKill;
+	/* Modes set on a user when they identify */
+	Anope::string NSModesOnID;
 
 	/* Core ChanServ modules */
 	Anope::string ChanCoreModules;

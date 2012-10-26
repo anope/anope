@@ -45,7 +45,7 @@ void XLine::InitRegex()
 	}
 }
 
-XLine::XLine(const Anope::string &mask, const Anope::string &reason, const Anope::string &uid) : Serializable("XLine"), Mask(mask), Created(0), Expires(0), Reason(reason), UID(uid)
+XLine::XLine(const Anope::string &mask, const Anope::string &reason, const Anope::string &uid) : Serializable("XLine"), Mask(mask), By(Config->OperServ), Created(0), Expires(0), Reason(reason), UID(uid)
 {
 	regex = NULL;
 	manager = NULL;

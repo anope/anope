@@ -550,7 +550,7 @@ bool DNSManager::TCPSocket::Client::ProcessWrite()
 	{
 		try
 		{
-			unsigned char buffer[524];
+			unsigned char buffer[65535];
 			unsigned short len = packet->Pack(buffer + 2, sizeof(buffer) - 2);
 
 			short s = htons(len);

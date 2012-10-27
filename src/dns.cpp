@@ -919,7 +919,7 @@ void DNSManager::UpdateSerial()
 	++last_num;
 
 	int i = strftime(timebuf, sizeof(timebuf), "%Y%m%d", tm);
-	snprintf(timebuf + i, sizeof(timebuf) - i, "%d", last_num);
+	snprintf(timebuf + i, sizeof(timebuf) - i, "%02d", last_num);
 
 	try
 	{

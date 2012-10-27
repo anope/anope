@@ -71,13 +71,34 @@ var installerQuestions = [
 
 var buildPackages = [
                                         {
+                                                         'name' : 'Microsoft Visual Studio 2012',
+                                                                    'libpaths' : [
+                                                                    'Program Files\\Microsoft Visual Studio 11.0\\VC\\lib',
+                                                                    'Program Files (x86)\\Microsoft Visual Studio 11.0\\VC\\lib',
+                                                                    'Program Files\\Microsoft SDKs\\Windows\\v7.0\\Lib',
+                                                                    'Program Files (x86)\\Microsoft SDKs\\Windows\\v7.0\\Lib',
+                                                                    ],
+                                                         'incpaths': [
+                                                                    'Program Files\\Microsoft Visual Studio 11.0\\VC\\include',
+                                                                    'Program Files (x86)\\Microsoft Visual Studio 11.0\\VC\\include',
+                                                                    'Program Files\\Microsoft SDKs\\Windows\\v7.0\\Include',
+                                                                    'Program Files (x86)\\Microsoft SDKs\\Windows\\v7.0\\Include',
+                                                                    ],
+                                                         'nmake' : [
+                                                                    'Program Files\\Microsoft Visual Studio 11.0\\VC\\bin',
+                                                                    'Program Files (x86)\\Microsoft Visual Studio 11.0\\VC\\bin',
+                                                                   ],
+                                                        'additional_switches' : [ '/w' ],
+                                                        'installedDrive' : 'C'
+                                        },
+                                        {
                                                         'name' : 'Microsoft Visual Studio 2010 (64bit)',
                                                         'libpaths' : [
                                                                      'Program Files (x86)\\Microsoft Visual Studio 10.0\\VC\\lib',
                                                                      'Program Files\\Microsoft SDKs\\Windows\\v7.1\\Lib',
                                                                      'Program Files\\Microsoft SDKs\\Windows\\v7.0\\Lib',
                                                                      'Program Files (x86)\\Microsoft SDKs\\Windows\\v7.0A\\Lib'
-								     ],
+                                       ],
                                                         'incpaths': [
                                                                      'Program Files (x86)\\Microsoft Visual Studio 10.0\\VC\\include',
                                                                      'Program Files\\Microsoft SDKs\\Windows\\v7.1\\Include',
@@ -87,8 +108,8 @@ var buildPackages = [
                                                          'nmake' : [
                                                                    'Program Files (x86)\\Microsoft Visual Studio 10.0\\VC\\bin',
                                                                    ],
-							 'additional_switches' : [ '/w' ],
-							 'installedDrive' : 'C'
+                                                         'additional_switches' : [ '/w' ],
+                                                         'installedDrive' : 'C'
                                         },
                                         {
                                                         'name' : 'Microsoft Visual Studio 2010',
@@ -159,8 +180,8 @@ var buildPackages = [
                                                                         ],
                                                         'additional_switches' : [
                                                                                                 '/w'
-                                                                      	],
-							'installedDrive' : 'C'
+                                                                                ],
+                                                        'installedDrive' : 'C'
                                         },
                                         {                                        
                                                         'name' : 'Microsoft Visual Studio 2005 (Old PSDK)',
@@ -178,26 +199,8 @@ var buildPackages = [
                                                                         ],
                                                         'additional_switches' : [
                                                                                                 '/w'
-                                                               		],
-							'installedDrive' : 'C'
-                                        },
-                                        
-                                        {
-                                                        'name' : 'Microsoft Visual Studio .NET 2003',
-                                                        'libpaths' : [
-                                                                                'Program Files\\Microsoft Visual Studio .NET 2003\\VC7\\Lib',
-                                                                                'Program Files\\Microsoft Visual Studio .NET 2003\\PlatformSDK\\Lib'
-                                                                         ],
-                                                        'incpaths' : [
-                                                                                'Program Files\\Microsoft Visual Studio .NET 2003\\VC7\\Include',
-                                                                                'Program Files\\Microsoft Visual Studio .NET 2003\\PlatformSDK\\Include'
-                                                                         ],
-                                                        'nmake' : [
-                                                                                'Program Files\\Microsoft Visual Studio .NET 2003\\VC7\\Bin',
-                                                                                ''
-                                                                        ],                                                                    
-                                                        'additional_switches' : false,
-							'installedDrive' : 'C'
+                                                               	                ],
+                                                         'installedDrive' : 'C'
                                         }
                                 ];                  
                                                               

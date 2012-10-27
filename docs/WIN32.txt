@@ -20,36 +20,20 @@ Anope for Windows
         * Current Anope source:
             http://sourceforge.net/project/showfiles.php?group_id=94081
 
-        If you have Visual C++ 6, 7 (.NET 2002/2003), 8 (2005) or 10 (2010) skip ahead to step 2, else you
+        If you have Visual C++ 2008, 2010, or 2012 skip ahead to step 2, else you
         need to download the following free components from Microsoft. Once
         downloaded, install one of the following, for best results use MS VC 2010.
 
 		* Microsoft Visual C++ 2010 Express
-			http://www.microsoft.com/express/vc/
+			http://www.microsoft.com/visualstudio/eng/products/visual-studio-2010-express
 
 		or
 
 		* Microsoft Visual C++ 2008 Express Edition:
-			http://www.microsoft.com/visualstudio/en-us/products/2008-editions/express
+			http://www.microsoft.com/en-us/download/details.aspx?id=14597
 
-		or
-
-		* Microsoft Visual C++ 2005 Express Edition:
-			http://msdn.microsoft.com/vstudio/express/visualc/download/
-            
-	if you installed Visual C++ 2010, it comes included with an SDK, so skip ahead to step 2, otherwise
-	install the following PlatformSDK:
-
-		* Microsoft Windows PlatformSDK: (Requires WGA validation)
-			http://www.microsoft.com/downloads/details.aspx?FamilyId=0BAF2B35-C656-4969-ACE8-E4C0C0716ADB&displaylang=en
-
-			(NOTE: Although this says for Windows Server 2003, it does infact work on all supported
-			versions of Windows.)
-	    
-			When installing, you should select the Custom option, and ensure that the top option relating to
-			the registering of environment variables, is enabled in addition to the default selections.
-
-			If you do not do this, you may run into problems with the PSDK not being found properly during install.
+		* Microsoft Windows Platform SDK: (Requires WGA validation)
+			http://www.microsoft.com/en-us/download/details.aspx?id=3138
 
 		* MySQL for Windows (only needed if building with MySQL enabled):
 			http://dev.mysql.com/

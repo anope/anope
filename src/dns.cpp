@@ -631,7 +631,7 @@ bool DNSManager::UDPSocket::ProcessWrite()
 	return true;
 }
 
-DNSManager::DNSManager(const Anope::string &nameserver, const Anope::string &ip, int port) : Timer(300, Anope::CurTime, true), listen(false), serial(0), last_year(0), last_day(0), last_num(0), tcpsock(NULL), udpsock(NULL)
+DNSManager::DNSManager(const Anope::string &nameserver, const Anope::string &ip, int port) : Timer(300, Anope::CurTime, true), listen(false), serial(0), tcpsock(NULL), udpsock(NULL)
 {
 	this->addrs.pton(nameserver.find(':') != Anope::string::npos ? AF_INET6 : AF_INET, nameserver, port);
 
@@ -900,35 +900,7 @@ void DNSManager::Cleanup(Module *mod)
 
 void DNSManager::UpdateSerial()
 {
-	char timebuf[20];
-	tm *tm = localtime(&Anope::CurTime);
-
-	if (!tm)
-	{
-		Log(LOG_DEBUG) << "Resolver: Unable to update serial";
-		return;
-	}
-
-	if (tm->tm_yday != last_day || tm->tm_year != last_year)
-	{
-		last_day = tm->tm_yday;
-		last_year = tm->tm_year;
-		last_num = 0;
-	}
-
-	++last_num;
-
-	int i = strftime(timebuf, sizeof(timebuf), "%Y%m%d", tm);
-	snprintf(timebuf + i, sizeof(timebuf) - i, "%02d", last_num);
-
-	try
-	{
-		serial = convertTo<uint32_t>(timebuf);
-	}
-	catch (const ConvertException &)
-	{
-		Log(LOG_DEBUG) << "Resolver: Unable to update serial";
-	}
+	serial = Anope::CurTime;
 }
 
 uint32_t DNSManager::GetSerial() const

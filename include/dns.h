@@ -218,7 +218,6 @@ class CoreExport DNSManager : public Timer
 
 	bool listen;
 	uint32_t serial;
-	int last_year, last_day, last_num;
 
  public:
 	TCPSocket *tcpsock;

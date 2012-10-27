@@ -368,9 +368,9 @@ macro(calculate_depends SRC SKIP VERBOSE)
   # Temporarily set that we didn't get a 3rd argument before we actually check if we did get one or not
   set(CHECK_ANGLE_INCLUDES FALSE)
   # Check for a third argument
-  if(${ARGC} GREATER 2)
+  if(${ARGC} GREATER 3)
     set(CHECK_ANGLE_INCLUDES TRUE)
-  endif(${ARGC} GREATER 2)
+  endif(${ARGC} GREATER 3)
   # Find all the lines in the given source file that have any form of #include on them, regardless of whitespace, but only if they are valid for the platform we are on
   find_includes(${SRC} INCLUDES)
   # Reset the list of headers to empty

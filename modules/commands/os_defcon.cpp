@@ -282,7 +282,7 @@ class OSDefcon : public Module
 			{
 				if (cm->Type == MODE_STATUS || cm->Type == MODE_LIST || !cm->CanSet(NULL))
 				{
-					Log() << "DefConChanModes mode character '" << mode << "' cannot be locked";
+					Log(this) << "DefConChanModes mode character '" << mode << "' cannot be locked";
 					continue;
 				}
 				else if (add)
@@ -296,7 +296,7 @@ class OSDefcon : public Module
 
 						if (!ss.GetToken(param))
 						{
-							Log() << "DefConChanModes mode character '" << mode << "' has no parameter while one is expected";
+							Log(this) << "DefConChanModes mode character '" << mode << "' has no parameter while one is expected";
 							continue;
 						}
 
@@ -321,7 +321,7 @@ class OSDefcon : public Module
 		{
 			DConfig.DefConModesOn.UnsetFlag(CMODE_REDIRECT);
 	
-			Log() << "DefConChanModes must lock mode +l as well to lock mode +L";
+			Log(this) << "DefConChanModes must lock mode +l as well to lock mode +L";
 		}
 	}
 

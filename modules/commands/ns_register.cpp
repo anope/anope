@@ -307,7 +307,7 @@ class CommandNSResend : public Command
 				Log(LOG_COMMAND, source, this) << "to resend registration verification code";
 			}
 			else
-				Log() << "Unable to resend registration verification code for " << source.GetNick();
+				Log(this->owner) << "Unable to resend registration verification code for " << source.GetNick();
 		}
 
 		return;

@@ -55,7 +55,7 @@ class DBFlatFile : public Module
 			Log(LOG_DEBUG) << "db_flatfile: Attemping to rename " << DatabaseFile << " to " << newname;
 			if (rename(DatabaseFile.c_str(), newname.c_str()))
 			{
-				Log() << "Unable to back up database!";
+				Log(this) << "Unable to back up database!";
 
 				if (!Config->NoBackupOkay)
 					quitting = true;
@@ -88,7 +88,7 @@ class DBFlatFile : public Module
 		if (!databases[NULL]->is_open())
 		{
 			delete databases[NULL];
-			Log() << "Unable to open " << DatabaseFile << " for reading!";
+			Log(this) << "Unable to open " << DatabaseFile << " for reading!";
 			return EVENT_CONTINUE;
 		}
 
@@ -168,7 +168,7 @@ class DBFlatFile : public Module
 		if (!databases[NULL]->is_open())
 		{
 			delete databases[NULL];
-			Log() << "Unable to open " << DatabaseFile << " for writing";
+			Log(this) << "Unable to open " << DatabaseFile << " for writing";
 			if (IsFile(tmp_db))
 				rename(tmp_db.c_str(), DatabaseFile.c_str());
 			return EVENT_CONTINUE;
@@ -200,7 +200,7 @@ class DBFlatFile : public Module
 
 		if (databases[NULL]->good() == false)
 		{
-			Log() << "Unable to write database";
+			Log(this) << "Unable to write database";
 			databases[NULL]->close();
 			if (!Config->NoBackupOkay)
 				quitting = true;

@@ -122,7 +122,7 @@ class SSLModule : public Module
 				Log(LOG_DEBUG) << "m_ssl: Successfully loaded certificate " << this->certfile;
 		}
 		else
-			Log() << "m_ssl: Unable to open certificate " << this->certfile;
+			Log() << "Unable to open certificate " << this->certfile;
 
 		if (IsFile(this->keyfile.c_str()))
 		{
@@ -144,7 +144,7 @@ class SSLModule : public Module
 				throw ModuleException("Error loading private key " + this->keyfile + " - file not found");
 			}
 			else
-				Log() << "m_ssl: Unable to open private key " << this->keyfile;
+				Log() << "Unable to open private key " << this->keyfile;
 		}
 
 		SSL_CTX_set_mode(client_ctx, SSL_MODE_ENABLE_PARTIAL_WRITE | SSL_MODE_ACCEPT_MOVING_WRITE_BUFFER);

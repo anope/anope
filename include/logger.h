@@ -24,6 +24,7 @@ enum LogType
 	LOG_SERVER,
 	LOG_CHANNEL,
 	LOG_USER,
+	LOG_MODULE,
 	LOG_NORMAL,
 	LOG_TERMINAL,
 	LOG_RAWIO,
@@ -56,6 +57,7 @@ class CoreExport Log
 	Channel *chan;
 	const ChannelInfo *ci;
 	Server *s;
+	Module *m;
 	LogType Type;
 	Anope::string Category;
 	std::list<Anope::string> Sources;
@@ -77,6 +79,8 @@ class CoreExport Log
 	explicit Log(Server *s, const Anope::string &category = "", const BotInfo *bi = NULL);
 
 	explicit Log(const BotInfo *b, const Anope::string &category = "");
+
+	Log(Module *m, const Anope::string &category = "");
 
 	~Log();
 

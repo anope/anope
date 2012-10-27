@@ -53,7 +53,7 @@ class MySQLResult : public SQLResult
 	{
 		unsigned num_fields = res ? mysql_num_fields(res) : 0;
 
-		/* It is not thread safe to log anything here using Log() now :( */
+		/* It is not thread safe to log anything here using Log(this->owner) now :( */
 
 		if (!num_fields)
 			return;

@@ -50,7 +50,7 @@ class SQLOperResult : public SQLInterface
 					Config->Opers.erase(it);
 				delete user->Account()->o;
 				user->Account()->o = NULL;
-				Log() << "m_sql_oper: Removed services operator from " << user->nick << " (" << user->Account()->display << ")";
+				Log(this->owner) << "m_sql_oper: Removed services operator from " << user->nick << " (" << user->Account()->display << ")";
 				user->RemoveMode(findbot(Config->OperServ), UMODE_OPER); // Probably not set, just incase
 			}
 			return;
@@ -59,13 +59,13 @@ class SQLOperResult : public SQLInterface
 		OperType *ot = OperType::Find(opertype);
 		if (ot == NULL)
 		{
-			Log() << "m_sql_oper: Oper " << user->nick << " has type " << opertype << ", but this opertype does not exist?";
+			Log(this->owner) << "m_sql_oper: Oper " << user->nick << " has type " << opertype << ", but this opertype does not exist?";
 			return;
 		}
 
 		if (!user->Account()->o || user->Account()->o->ot != ot)
 		{
-			Log() << "m_sql_oper: Tieing oper " << user->nick << " to type " << opertype;
+			Log(this->owner) << "m_sql_oper: Tieing oper " << user->nick << " to type " << opertype;
 			user->Account()->o = new Oper(user->Account()->display, ot);
 			Config->Opers.push_back(user->Account()->o);
 		}
@@ -82,7 +82,7 @@ class SQLOperResult : public SQLInterface
 	void OnError(const SQLResult &r) anope_override
 	{
 		SQLOperResultDeleter d(this);
-		Log() << "m_sql_oper: Error executing query " << r.GetQuery().query << ": " << r.GetError();
+		Log(this->owner) << "m_sql_oper: Error executing query " << r.GetQuery().query << ": " << r.GetError();
 	}
 };
 
@@ -118,7 +118,7 @@ class ModuleSQLOper : public Module
 	{
 		if (!this->SQL)
 		{
-			Log() << "m_sql_oper: Unable to find SQL engine";
+			Log() << "Unable to find SQL engine";
 			return;
 		}
 

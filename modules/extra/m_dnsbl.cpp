@@ -163,7 +163,7 @@ class ModuleDNSBL : public Module
 			}
 			catch (const SocketException &ex)
 			{
-				Log() << "m_dnsbl: " << ex.GetReason();
+				Log(this) << ex.GetReason();
 			}
 		}
 	}

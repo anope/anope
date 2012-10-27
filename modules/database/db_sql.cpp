@@ -69,7 +69,7 @@ class DBSQL : public Module, public Pipe
 			if (last_warn + 300 < Anope::CurTime)
 			{
 				last_warn = Anope::CurTime;
-				Log() << "db_sql: Unable to execute query, is SQL configured correctly?";
+				Log(this) << "db_sql: Unable to execute query, is SQL configured correctly?";
 			}
 		}
 		else if (!quitting)
@@ -146,7 +146,7 @@ class DBSQL : public Module, public Pipe
 	{
 		if (!this->sql)
 		{
-			Log() << "db_sql: Unable to load databases, is SQL configured correctly?";
+			Log(this) << "Unable to load databases, is SQL configured correctly?";
 			return EVENT_CONTINUE;
 		}
 
@@ -174,7 +174,7 @@ class DBSQL : public Module, public Pipe
 				}
 				catch (const ConvertException &)
 				{
-					Log() << "db_sql: Unable to convert id for object #" << j << " of type " << sb->GetName();
+					Log(this) << "Unable to convert id for object #" << j << " of type " << sb->GetName();
 				}
 			}
 		}

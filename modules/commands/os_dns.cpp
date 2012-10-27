@@ -430,7 +430,7 @@ class ModuleDNS : public Module
 			if (dns && !dns->Pooled() && !dns->GetIPs().empty() && dns->GetLimit() < s->Users)
 			{
 				dns->Pool(true);
-				Log() << "Pooling server " << s->GetName();
+				Log(this) << "Pooling server " << s->GetName();
 			}
 		}
 	}
@@ -442,7 +442,7 @@ class ModuleDNS : public Module
 		if (dns && dns->Pooled())
 		{
 			dns->Pool(false);
-			Log() << "Depooling delinked server " << s->GetName();
+			Log(this) << "Depooling delinked server " << s->GetName();
 		}
 	}
 
@@ -454,7 +454,7 @@ class ModuleDNS : public Module
 			/* Check for user limit reached */
 			if (s && s->GetLimit() && s->Pooled() && u->server->Users >= s->GetLimit())
 			{
-				Log() << "Depooling full server " << s->GetName() << ": " << u->server->Users << " users";
+				Log(this) << "Depooling full server " << s->GetName() << ": " << u->server->Users << " users";
 				s->Pool(false);
 			}
 		}
@@ -471,7 +471,7 @@ class ModuleDNS : public Module
 			/* Check for dropping under userlimit */
 			if (s->GetLimit() && !s->Pooled() && s->GetLimit() > u->server->Users)
 			{
-				Log() << "Pooling server " << s->GetName();
+				Log(this) << "Pooling server " << s->GetName();
 				s->Pool(true);
 			}
 
@@ -489,7 +489,7 @@ class ModuleDNS : public Module
 					/* Check for very fast user drops */
 					if (diff <= this->user_drop_time)
 					{
-						Log() << "Depooling server " << s->GetName() << ": dropped " << this->user_drop_mark << " users in " << diff << " seconds";
+						Log(this) << "Depooling server " << s->GetName() << ": dropped " << this->user_drop_mark << " users in " << diff << " seconds";
 						s->repool = Anope::CurTime + this->user_drop_readd_time;
 						s->Pool(false);
 					}
@@ -498,7 +498,7 @@ class ModuleDNS : public Module
 					{
 						s->Pool(true);
 						s->repool = 0;
-						Log() << "Pooling server " << s->GetName();
+						Log(this) << "Pooling server " << s->GetName();
 					}
 				}
 			}
@@ -540,7 +540,7 @@ class ModuleDNS : public Module
 			if (last_warn + 60 < Anope::CurTime)
 			{
 				last_warn = Anope::CurTime;
-				Log() << "os_dns: Warning! There are no pooled servers!";
+				Log(this) << "os_dns: Warning! There are no pooled servers!";
 			}
 
 			/* Something messed up, just return them all and hope one is available */
@@ -564,7 +564,7 @@ class ModuleDNS : public Module
 
 			if (packet->answers.empty())
 			{
-				Log() << "os_dns: Error! There are no servers with any IPs. At all.";
+				Log(this) << "os_dns: Error! There are no servers with any IPs. At all.";
 				/* Send back an empty answer anyway */
 			}
 		}

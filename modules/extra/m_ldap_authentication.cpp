@@ -75,7 +75,7 @@ class IdentifyInterface : public LDAPInterface
 					}
 					catch (const LDAPException &ex)
 					{
-						Log() << "m_ldap_authentication: Error binding after search: " << ex.GetReason();
+						Log(this->owner) << "m_ldap_authentication: Error binding after search: " << ex.GetReason();
 					}
 				}
 				break;
@@ -95,7 +95,7 @@ class IdentifyInterface : public LDAPInterface
 					}
 					catch (const LDAPException &ex)
 					{
-						Log() << "m_ldap_authentication: Unable to search for " << sf << ": " << ex.GetReason();
+						Log(this->owner) << "m_ldap_authentication: Unable to search for " << sf << ": " << ex.GetReason();
 					}
 				}
 				else
@@ -172,19 +172,19 @@ class OnIdentifyInterface : public LDAPInterface
 				BotInfo *bi = findbot(Config->NickServ);
 				if (bi)
 					u->SendMessage(bi, _("Your email has been updated to \002%s\002"), email.c_str());
-				Log() << "m_ldap_authentication: Updated email address for " << u->nick << " (" << u->Account()->display << ") to " << email;
+				Log(this->owner) << "m_ldap_authentication: Updated email address for " << u->nick << " (" << u->Account()->display << ") to " << email;
 			}
 		}
 		catch (const LDAPException &ex)
 		{
-			Log() << "m_ldap_authentication: " << ex.GetReason();
+			Log(this->owner) << "m_ldap_authentication: " << ex.GetReason();
 		}
 	}
 
 	void OnError(const LDAPResult &r) anope_override
 	{
 		this->requests.erase(r.id);
-		Log() << "m_ldap_authentication: " << r.error;
+		Log(this->owner) << "m_ldap_authentication: " << r.error;
 	}
 };
 
@@ -195,12 +195,12 @@ class OnRegisterInterface : public LDAPInterface
 
 	void OnResult(const LDAPResult &r) anope_override
 	{
-		Log() << "m_ldap_authentication: Successfully added newly created account to LDAP";
+		Log(this->owner) << "m_ldap_authentication: Successfully added newly created account to LDAP";
 	}
 
 	void OnError(const LDAPResult &r) anope_override
 	{
-		Log() << "m_ldap_authentication: Error adding newly created account to LDAP: " << r.getError();
+		Log(this->owner) << "m_ldap_authentication: Error adding newly created account to LDAP: " << r.getError();
 	}
 };
 
@@ -268,7 +268,7 @@ class NSIdentifyLDAP : public Module
 		catch (const LDAPException &ex)
 		{
 			delete ii;
-			Log() << "m_ldap_authentication: " << ex.GetReason();
+			Log(this) << ex.GetReason();
 		}
 	}
 
@@ -288,7 +288,7 @@ class NSIdentifyLDAP : public Module
 		}
 		catch (const LDAPException &ex)
 		{
-			Log() << "m_ldap_authentication: " << ex.GetReason();
+			Log(this) << ex.GetReason();
 		}
 	}
 
@@ -325,7 +325,7 @@ class NSIdentifyLDAP : public Module
 		}
 		catch (const LDAPException &ex)
 		{
-			Log() << "m_ldap_authentication: " << ex.GetReason();
+			Log(this) << ex.GetReason();
 		}
 	}
 };

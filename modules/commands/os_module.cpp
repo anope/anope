@@ -141,7 +141,7 @@ class CommandOSModUnLoad : public Command
 			return;
 		}
 
-		Log() << "Trying to unload module [" << mname << "]";
+		Log(this->owner) << "Trying to unload module [" << mname << "]";
 
 		ModuleReturn status = ModuleManager::UnloadModule(m, source.GetUser());
 

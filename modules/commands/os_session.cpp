@@ -689,7 +689,7 @@ class OSSession : public Module
 		if (!session)
 		{
 			if (debug)
-				Log() << "session: Tried to delete non-existant session: " << u->host;
+				Log(this) << "Tried to delete non-existant session: " << u->host;
 			return;
 		}
 

@@ -50,7 +50,7 @@ class IdentifyInterface : public LDAPInterface
 				o = new Oper(u->nick, ot);
 				my_opers.insert(o);
 				nc->o = o;
-				Log() << "m_ldap_oper: Tied " << u->nick << " (" << nc->display << ") to opertype " << ot->GetName();
+				Log(this->owner) << "m_ldap_oper: Tied " << u->nick << " (" << nc->display << ") to opertype " << ot->GetName();
 			}
 		}
 		catch (const LDAPException &ex)
@@ -64,7 +64,7 @@ class IdentifyInterface : public LDAPInterface
 				}
 				nc->o = NULL;
 
-				Log() << "m_ldap_oper: Removed services operator from " << u->nick << " (" << nc->display << ")";
+				Log() << "Removed services operator from " << u->nick << " (" << nc->display << ")";
 			}
 		}
 	}
@@ -127,7 +127,7 @@ class LDAPOper : public Module
 		}
 		catch (const LDAPException &ex)
 		{
-			Log() << "m_ldapoper: " << ex.GetReason();
+			Log() << ex.GetReason();
 		}
 	}
 

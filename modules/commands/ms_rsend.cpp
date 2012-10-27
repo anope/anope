@@ -44,7 +44,7 @@ class CommandMSRSend : public Command
 			source.Reply(ACCESS_DENIED);
 		else if (Config->MSMemoReceipt > 2 || Config->MSMemoReceipt == 0)
 		{
-			Log() << "MSMemoReceipt is set misconfigured to " << Config->MSMemoReceipt;
+			Log(this->owner) << "MSMemoReceipt is set misconfigured to " << Config->MSMemoReceipt;
 			source.Reply(_("Sorry, RSEND has been disabled on this network."));
 		}
 		else

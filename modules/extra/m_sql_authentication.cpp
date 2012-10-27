@@ -65,7 +65,7 @@ class SQLAuthenticationResult : public SQLInterface
 
 	void OnError(const SQLResult &r) anope_override
 	{
-		Log() << "m_sql_authentication: Error executing query " << r.GetQuery().query << ": " << r.GetError();
+		Log(this->owner) << "m_sql_authentication: Error executing query " << r.GetQuery().query << ": " << r.GetError();
 		delete this;
 	}
 };
@@ -119,7 +119,7 @@ class ModuleSQLAuthentication : public Module
 	{
 		if (!this->SQL)
 		{
-			Log() << "m_sql_authentication: Unable to find SQL engine";
+			Log(this) << "Unable to find SQL engine";
 			return;
 		}
 

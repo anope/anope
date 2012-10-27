@@ -79,7 +79,7 @@ Log::Log(LogType type, const Anope::string &category, const BotInfo *b) : bi(b),
 		this->Sources.push_back(bi->nick);
 }
 
-Log::Log(LogType type, CommandSource &source, Command *_c, const ChannelInfo *_ci) : nick(source.GetNick()), u(source.GetUser()), nc(source.nc), c(_c), chan(NULL), ci(_ci), s(NULL), Type(type)
+Log::Log(LogType type, CommandSource &source, Command *_c, const ChannelInfo *_ci) : nick(source.GetNick()), u(source.GetUser()), nc(source.nc), c(_c), chan(NULL), ci(_ci), s(NULL), m(NULL), Type(type)
 {
 	if (!c)
 		throw CoreException("Invalid pointers passed to Log::Log");
@@ -103,7 +103,7 @@ Log::Log(LogType type, CommandSource &source, Command *_c, const ChannelInfo *_c
 		this->Sources.push_back(ci->name);
 }
 
-Log::Log(const User *_u, Channel *ch, const Anope::string &category) : bi(NULL), u(_u), nc(NULL), c(NULL), chan(ch), ci(chan ? *chan->ci : NULL), s(NULL), Type(LOG_CHANNEL)
+Log::Log(const User *_u, Channel *ch, const Anope::string &category) : bi(NULL), u(_u), nc(NULL), c(NULL), chan(ch), ci(chan ? *chan->ci : NULL), s(NULL), m(NULL), Type(LOG_CHANNEL)
 {
 	if (!chan)
 		throw CoreException("Invalid pointers passed to Log::Log");
@@ -118,7 +118,7 @@ Log::Log(const User *_u, Channel *ch, const Anope::string &category) : bi(NULL),
 	this->Sources.push_back(chan->name);
 }
 
-Log::Log(const User *_u, const Anope::string &category, const BotInfo *_bi) : bi(_bi), u(_u), nc(NULL), c(NULL), chan(NULL), ci(NULL), s(NULL), Type(LOG_USER), Category(category)
+Log::Log(const User *_u, const Anope::string &category, const BotInfo *_bi) : bi(_bi), u(_u), nc(NULL), c(NULL), chan(NULL), ci(NULL), s(NULL), m(NULL), Type(LOG_USER), Category(category)
 {
 	if (!u)
 		throw CoreException("Invalid pointers passed to Log::Log");
@@ -130,7 +130,7 @@ Log::Log(const User *_u, const Anope::string &category, const BotInfo *_bi) : bi
 	this->Sources.push_back(u->nick);
 }
 
-Log::Log(Server *serv, const Anope::string &category, const BotInfo *_bi) : bi(_bi), u(NULL), nc(NULL), c(NULL), chan(NULL), ci(NULL), s(serv), Type(LOG_SERVER), Category(category)
+Log::Log(Server *serv, const Anope::string &category, const BotInfo *_bi) : bi(_bi), u(NULL), nc(NULL), c(NULL), chan(NULL), ci(NULL), s(serv), m(NULL), Type(LOG_SERVER), Category(category)
 {
 	if (!s)
 		throw CoreException("Invalid pointer passed to Log::Log");
@@ -144,12 +144,18 @@ Log::Log(Server *serv, const Anope::string &category, const BotInfo *_bi) : bi(_
 	this->Sources.push_back(s->GetName());
 }
 
-Log::Log(const BotInfo *b, const Anope::string &category) : bi(b), u(NULL), nc(NULL), c(NULL), chan(NULL), ci(NULL), s(NULL), Type(LOG_NORMAL), Category(category)
+Log::Log(const BotInfo *b, const Anope::string &category) : bi(b), u(NULL), nc(NULL), c(NULL), chan(NULL), ci(NULL), s(NULL), m(NULL), Type(LOG_NORMAL), Category(category)
 {
 	if (!this->bi && Config)
 		this->bi = findbot(Config->Global);
 	if (this->bi)
 		this->Sources.push_back(bi->nick);
+}
+
+Log::Log(Module *mod, const Anope::string &category) : bi(NULL), u(NULL), nc(NULL), c(NULL), chan(NULL), ci(NULL), s(NULL), m(mod), Type(LOG_MODULE), Category(category)
+{
+	if (m)
+		this->Sources.push_back(m->name);
 }
 
 Log::~Log()
@@ -244,6 +250,12 @@ Anope::string Log::BuildPrefix() const
 				buffer += "SERVER: " + this->s->GetName() + " (" + this->s->GetDescription() + ") ";
 			break;
 		}
+		case LOG_MODULE:
+		{
+			if (this->m)
+				buffer += this->m->name.upper() + ": ";
+			break;
+		}
 		default:
 			break;
 	}
@@ -305,16 +317,16 @@ bool LogInfo::HasType(LogType ltype, const Anope::string &type) const
 		case LOG_USER:
 			list = &this->Users;
 			break;
-		case LOG_NORMAL:
-			list = &this->Normal;
-			break;
 		case LOG_TERMINAL:
 			return true;
 		case LOG_RAWIO:
 			return debug ? true : this->RawIO;
 		case LOG_DEBUG:
 			return debug ? true : this->Debug;
+		case LOG_MODULE:
+		case LOG_NORMAL:
 		default:
+			list = &this->Normal;
 			break;
 	}
 

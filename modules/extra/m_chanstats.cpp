@@ -363,7 +363,7 @@ class MChanstats : public Module
 		if (sql)
 			this->CheckTables();
 		else
-			Log() << "Chanstats: no database connection to " << engine;
+			Log(this) << "no database connection to " << engine;
 	}
 	void OnTopicUpdated(Channel *c, const Anope::string &user, const Anope::string &topic) anope_override
 	{

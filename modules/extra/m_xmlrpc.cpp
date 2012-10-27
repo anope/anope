@@ -286,7 +286,7 @@ class ModuleXMLRPC : public Module
 
 			if (ssl && !sslref)
 			{
-				Log() << "m_xmlrpc: Could not enable SSL, is m_ssl loaded?";
+				Log(this) << "Could not enable SSL, is m_ssl loaded?";
 				ssl = false;
 			}
 
@@ -298,7 +298,7 @@ class ModuleXMLRPC : public Module
 			}
 			catch (const SocketException &ex)
 			{
-				Log() << "m_xmlrpc " << ex.GetReason();
+				Log(this) << ex.GetReason();
 			}
 		}
 	}

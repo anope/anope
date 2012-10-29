@@ -204,7 +204,7 @@ namespace Config
 			Dictionary<int, string> InstallerQuestions = new Dictionary<int, string>();
 			InstallerQuestions.Add(0, "Where do you want Anope to be installed?");
 			InstallerQuestions.Add(1, "Would you like to build using NMake instead of using Visual Studio?\r\nNOTE: If you decide to use NMake, you must be in an environment where\r\nNMake can function, such as the Visual Studio command line. If you say\r\nyes to this while not in an environment that can run NMake, it can\r\ncause the CMake configuration to enter an endless loop. [y/n]");
-			InstallerQuestions.Add(2, "Are you using Visual Studio 2008 or 2010? You can leave this blank\nand have CMake try and auto detect it, but this usually doesn't\nwork correctly. [2008/2010]");
+			InstallerQuestions.Add(2, "Are you using Visual Studio 2008, 2010, or 2012? You can leave this blank\nand have CMake try and auto detect it, but this usually doesn't\nwork correctly. [2008/2010/2012]");
 			InstallerQuestions.Add(3, "Would you like to build a debug version of Anope? [y/n]");
 			InstallerQuestions.Add(4, "Are there any extra arguments you wish to pass to cmake?\nYou may only need to do this if cmake is unable to locate missing dependencies without hints.\nTo do this, set the variable EXTRA_INCLUDE like this: -DEXTRA_INCLUDE:STRING=c:/some/path/include;c:/some/path/bin;c:/some/path/lib");
 
@@ -260,7 +260,12 @@ namespace Config
 							++i;
 						break;
 					case 2:
-						if (InstallerResponse == "2010")
+						if (InstallerResponse == "2012")
+						{
+							VSVersion = "-G\"Visual Studio 11\" ";
+							VSShortVer = "2012";
+						}
+						else if (InstallerResponse == "2010")
 						{
 							VSVersion = "-G\"Visual Studio 10\" ";
 							VSShortVer = "2010";
@@ -304,7 +309,7 @@ namespace Config
 			InstallDirectory = "-DINSTDIR:STRING=\"" + InstallDirectory.Replace('\\', '/') + "\" ";
 			string NMake = UseNMake ? "-G\"NMake Makefiles\" " : "";
 			string Debug = BuildDebug ? "-DCMAKE_BUILD_TYPE:STRING=DEBUG " : "-DCMAKE_BUILD_TYPE:STRING=RELEASE ";
-			string cMake = InstallDirectory + NMake + Debug + VSVersion + ExtraArguments + Environment.CurrentDirectory.Replace('\\','/');
+			string cMake = InstallDirectory + NMake + Debug + VSVersion + ExtraArguments + "\"" + Environment.CurrentDirectory.Replace('\\','/') + "\"";
 			RunCMake(cMake);
 
 			return 0;

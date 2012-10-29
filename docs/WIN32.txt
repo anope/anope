@@ -25,12 +25,11 @@ Anope for Windows
 
         (NOTE: When installing, tell CMake to add itself to the PATH.)
 
-        If you have Visual C++ 10 (2010) skip ahead to step 2, else you
-        need to download the following free component from Microsoft. Once
-        downloaded, install these packages.
+        If you have Visual C++ 10 or 11 (2010/2012) skip ahead to step 2, else you
+        need to download and install the following free component from Microsoft.
 
         * Microsoft Visual C++ 2010 Express Edition:
-            http://www.microsoft.com/express/vc/
+            http://www.microsoft.com/visualstudio/eng/downloads#d-2010-express
 
     2) Unpack the Anope tarball with your favorite uncompression program
        (WinZip or WinRAR, etc).

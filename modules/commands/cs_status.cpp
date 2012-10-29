@@ -57,7 +57,7 @@ public:
 				source.Reply(_("\2%s\2 has no access on \2%s\2."), nick.c_str(), ci->name.c_str());
 			else
 			{
-				source.Reply(_("Access for \2%s\2 on \2%s\2"), nick.c_str());
+				source.Reply(_("Access for \2%s\2 on \2%s\2"), nick.c_str(), ci->name.c_str());
 
 				for (unsigned i = 0; i < ag.size(); ++i)
 				{
@@ -74,7 +74,7 @@ public:
 				if (autokick->HasFlag(AK_ISNICK))
 				{
 					if (na && *autokick->nc == na->nc)
-						source.Reply(_("\2%s\2 is on the auto kick list (%s)."), autokick->reason.c_str());
+						source.Reply(_("\2%s\2 is on the auto kick list (%s)."), na->nc->display.c_str(), autokick->reason.c_str());
 				}
 				else if (u != NULL)
 				{

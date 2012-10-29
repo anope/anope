@@ -16,9 +16,8 @@ Anope Bundled Tools
         sendmailpath = "/home/anope/services/bin/anopesmtp 127.0.0.1"
 
     If the SMTP client doesn't send mail, or if there's an other problem with
-    it, you can compile it in debug mode. To do this, open anopesmtp.cpp, and look
-    for "smtp_debug" near the top. Change this from 0 to 1 and recompile
-    the code. This should generate a log file of what happened when it tried
+    it, you can enable debug mode by passing the --debug flag after the server
+    address. This should generate a log file of what happened when it tried
     to connect to the SMTP server.
 
         Credits:

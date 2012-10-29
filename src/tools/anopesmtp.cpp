@@ -90,8 +90,6 @@ struct smtp_message
 	ano_socket_t sock;
 };
 
-
-/* set this to 1 if you want to get a log otherwise it runs silent */
 int smtp_debug = 0;
 
 struct smtp_message smail;
@@ -107,7 +105,7 @@ static std::string get_logname(struct tm *tm = NULL)
 	}
 
 	strftime(timestamp, sizeof(timestamp), "%Y%m%d", tm);
-	std::string name = std::string("logs/anopesmtp.") + timestamp;
+	std::string name = std::string("anopesmtp.") + timestamp;
 	return name;
 }
 
@@ -445,6 +443,9 @@ int main(int argc, char *argv[])
 
 	if (argc == 1)
 		return 0;
+	
+	if (argc == 3 && !strcmp(argv[2], "--debug"))
+		smtp_debug = 1;
 
 	char *server = strtok(argv[1], ":"), *aport;
 	short port;

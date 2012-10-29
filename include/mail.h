@@ -25,6 +25,8 @@ extern CoreExport bool MailValidate(const Anope::string &email);
 class MailThread : public Thread
 {
  private:
+ 	Anope::string SendMailPath;
+	Anope::string SendFrom;
 	Anope::string MailTo;
 	Anope::string Addr;
 	Anope::string Subject;
@@ -33,7 +35,7 @@ class MailThread : public Thread
 
 	bool Success;
  public:
-	MailThread(const Anope::string &mailto, const Anope::string &addr, const Anope::string &subject, const Anope::string &message);
+	MailThread(const Anope::string &smpath, const Anope::string &sf, const Anope::string &mailto, const Anope::string &addr, const Anope::string &subject, const Anope::string &message);
 
 	~MailThread();
 

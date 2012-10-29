@@ -199,8 +199,6 @@ class serialize_checker
 	}
 };
 
-#include "modules.h"
-
 template<typename T>
 class serialize_obj : public dynamic_reference_base
 {

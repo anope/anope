@@ -516,6 +516,10 @@ if(EXISTS "${CMAKE_ROOT}/Modules/CPack.cmake")
   #set(CPACK_RESOURCE_FILE_README "${Anope_SOURCE_DIR}/docs/README")
   # The following is primarily for NSIS
   if(WIN32)
+    # By default, do not warn when built on machines using only VS Express:
+    IF(NOT DEFINED CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS_NO_WARNINGS)
+      SET(CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS_NO_WARNINGS ON)
+    ENDIF(NOT DEFINED CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS_NO_WARNINGS)
     # Also for Windows, include installing the MSVCRT library
     include(InstallRequiredSystemLibraries)
     set(CPACK_GENERATOR "NSIS")

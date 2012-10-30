@@ -676,19 +676,13 @@ struct IRCDMessageMode : IRCDMessage
 		if (ircdproto->IsChannelValid(params[0]))
 		{
 			Channel *c = findchan(params[0]);
-			time_t ts;
 
-			try
-			{
-				ts = convertTo<time_t>(params[1]);
-			}
-			catch (const ConvertException &)
-			{
-				ts = Anope::CurTime;
-			}
+			Anope::string modes = params[1];
+			for (unsigned n = 2; n < params.size(); ++n)
+				modes += " " + params[n];
 
 			if (c)
-				c->SetModesInternal(source, params[2], ts);
+				c->SetModesInternal(source, modes, Anope::CurTime);
 		}
 		else
 		{

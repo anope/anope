@@ -45,8 +45,6 @@ class ngIRCdProto : public IRCDProto
 	void SendClientIntroduction(const User *u) anope_override
 	{
 		Anope::string modes = "+" + u->GetModes();
-		XLine x(u->nick, "Reserved for services");
-		ircdproto->SendSQLine(NULL, &x);
 		UplinkSocket::Message(Me) << "NICK " << u->nick << " 1 " << u->GetIdent() << " " << u->host << " 1 " << modes << " :" << u->realname;
 	}
 
@@ -106,9 +104,9 @@ class ngIRCdProto : public IRCDProto
 			UplinkSocket::Message(bi) << "KICK " << chan->name << " " << user->nick;
 	}
 
-	void SendLogin(User *u) { } anope_override
+	void SendLogin(User *u) anope_override { }
 
-	void SendLogout(User *u) { } anope_override
+	void SendLogout(User *u) anope_override { } 
 
 	void SendModeInternal(const BotInfo *bi, const Channel *dest, const Anope::string &buf) anope_override
 	{
@@ -180,7 +178,7 @@ struct IRCDMessage005 : IRCDMessage
 					unsigned newlen = convertTo<unsigned>(data);
 					if (Config->NickLen != newlen)
 					{
-						Log() << "Config->NickLen changed from " << Config->NickLen << " to " << newlen;
+						Log() << "NickLen changed from " << Config->NickLen << " to " << newlen;
 						Config->NickLen = newlen;
 					}
 				}
@@ -189,7 +187,6 @@ struct IRCDMessage005 : IRCDMessage
 		return true;
 	}
 };
-
 
 struct IRCDMessage376 : IRCDMessage
 {
@@ -208,8 +205,6 @@ struct IRCDMessage376 : IRCDMessage
 		return true;
 	}
 };
-
-
 
 struct IRCDMessageChaninfo : IRCDMessage
 {

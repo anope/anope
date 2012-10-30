@@ -95,15 +95,16 @@ Server::Server(Server *uplink, const Anope::string &name, unsigned hops, const A
 			{
 				User *u = it->second;
 
-				ircdproto->SendClientIntroduction(u);
-
 				BotInfo *bi = findbot(u->nick);
 				if (bi)
 				{
-					bi->introduced = true;
 					XLine x(bi->nick, "Reserved for services");
 					ircdproto->SendSQLine(NULL, &x);
 				}
+
+				ircdproto->SendClientIntroduction(u);
+				if (bi)
+					bi->introduced = true;
 			}
 
 			for (channel_map::const_iterator it = ChannelList.begin(), it_end = ChannelList.end(); it != it_end; ++it)

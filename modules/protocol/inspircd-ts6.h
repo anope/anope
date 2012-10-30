@@ -49,14 +49,12 @@ class InspIRCdTS6Proto : public IRCDProto
 
 	void SendAddLine(const Anope::string &type, const Anope::string &mask, time_t duration, const Anope::string &addedby, const Anope::string &reason)
 	{
-		const BotInfo *bi = findbot(Config->OperServ);
-		UplinkSocket::Message(bi) << "ADDLINE " << type << " " << mask << " " << addedby << " " << Anope::CurTime << " " << duration << " :" << reason;
+		UplinkSocket::Message(Me) << "ADDLINE " << type << " " << mask << " " << addedby << " " << Anope::CurTime << " " << duration << " :" << reason;
 	}
 
 	void SendDelLine(const Anope::string &type, const Anope::string &mask)
 	{
-		const BotInfo *bi = findbot(Config->OperServ);
-		UplinkSocket::Message(bi) << "DELLINE " << type << " " << mask;
+		UplinkSocket::Message(Me) << "DELLINE " << type << " " << mask;
 	}
 
  protected:

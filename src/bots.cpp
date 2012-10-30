@@ -37,10 +37,10 @@ BotInfo::BotInfo(const Anope::string &nnick, const Anope::string &nuser, const A
 		if (!tmodes.empty())
 			this->SetModesInternal(tmodes.c_str());
 
-		ircdproto->SendClientIntroduction(this);
-		this->introduced = true;
 		XLine x(this->nick, "Reserved for services");
 		ircdproto->SendSQLine(NULL, &x);
+		ircdproto->SendClientIntroduction(this);
+		this->introduced = true;
 	}
 }
 

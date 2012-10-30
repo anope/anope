@@ -47,15 +47,18 @@ void introduce_user(const Anope::string &user)
 	User *u = finduser(user);
 	if (u)
 	{
-		ircdproto->SendClientIntroduction(u);
-
 		BotInfo *bi = findbot(u->nick);
 		if (bi)
 		{
-			bi->introduced = true;
-
 			XLine x(bi->nick, "Reserved for services");
 			ircdproto->SendSQLine(NULL, &x);
+		}
+
+		ircdproto->SendClientIntroduction(u);
+
+		if (bi)
+		{
+			bi->introduced = true;
 
 			for (UChannelList::const_iterator cit = bi->chans.begin(), cit_end = bi->chans.end(); cit != cit_end; ++cit)
 				ircdproto->SendJoin(bi, (*cit)->chan, &Config->BotModeList);

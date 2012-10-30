@@ -82,6 +82,33 @@ else \
 #define OLD_BS_KICK_FLOOD		0x02000000
 #define OLD_BS_KICK_REPEAT		0x01000000
 
+static struct mlock_info
+{
+	char c;
+	uint32_t m;
+} mlock_infos[] = {
+	{'i', 0x00000001},
+	{'m', 0x00000002},
+	{'n', 0x00000004},
+	{'p', 0x00000008},
+	{'s', 0x00000010},
+	{'t', 0x00000020},
+	{'R', 0x00000100},
+	{'r', 0x00000200},
+	{'c', 0x00000400},
+	{'A', 0x00000800},
+	{'K', 0x00002000},
+	{'O', 0x00008000},
+	{'Q', 0x00010000},
+	{'S', 0x00020000},
+	{'G', 0x00100000},
+	{'C', 0x00200000},
+	{'u', 0x00400000},
+	{'z', 0x00800000},
+	{'N', 0x01000000},
+	{'M', 0x04000000}
+};
+
 static Anope::string hashm;
 
 enum
@@ -103,6 +130,17 @@ enum
 	LANG_HUN, /* Hungarian */
 	LANG_PL /* Polish */
 };
+
+static void process_mlock(ChannelInfo *ci, uint32_t lock, bool status)
+{
+	for (unsigned i = 0; i < (sizeof(mlock_infos) / sizeof(mlock_info)); ++i)
+		if (lock & mlock_infos[i].m)
+		{
+			ChannelMode *cm = ModeManager::FindChannelModeByChar(mlock_infos[i].c);
+			if (cm)
+				ci->SetMLock(cm, status);
+		}
+}
 
 static const char Base64[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 static const char Pad64 = '=';
@@ -781,7 +819,9 @@ static void LoadChannels()
 			}
 
 			READ(read_uint32(&tmpu32, f)); // mlock on
+			process_mlock(ci, tmpu32, true);
 			READ(read_uint32(&tmpu32, f)); // mlock off
+			process_mlock(ci, tmpu32, false);
 			READ(read_uint32(&tmpu32, f)); // mlock limit
 			READ(read_string(buffer, f));
 			READ(read_string(buffer, f));

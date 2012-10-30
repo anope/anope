@@ -126,7 +126,7 @@ class UnrealIRCdProto : public IRCDProto
 		UplinkSocket::Message() << "BD + G " << x->GetUser() << " " << x->GetHost() << " " << x->By << " " << Anope::CurTime + timeleft << " " << x->Created << " :" << x->GetReason();
 	}
 
-	void SendSVSKillInternal(const BotInfo *source, const User *user, const Anope::string &buf) anope_override
+	void SendSVSKillInternal(const BotInfo *source, User *user, const Anope::string &buf) anope_override
 	{
 		UplinkSocket::Message(source) << "h " << user->nick << " :" << buf;
 	}

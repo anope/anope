@@ -72,7 +72,7 @@ class MyMemoServService : public MemoServService
 				return MEMO_TOO_FAST;
 			else if (!mi->memomax)
 				return MEMO_TARGET_FULL;
-			else if (mi->memomax > 0 && mi->memos->size() >= mi->memomax)
+			else if (mi->memomax > 0 && mi->memos->size() >= static_cast<unsigned>(mi->memomax))
 				return MEMO_TARGET_FULL;
 			else if (mi->HasIgnore(sender))
 				return MEMO_SUCCESS;
@@ -147,9 +147,9 @@ class MyMemoServService : public MemoServService
 				++newcnt;
 		if (newcnt > 0)
 			u->SendMessage(ms, newcnt == 1 ? _("You have 1 new memo.") : _("You have %d new memos."), newcnt);
-		if (nc->memos.memomax > 0 && nc->memos.memos->size() >= nc->memos.memomax)
+		if (nc->memos.memomax > 0 && nc->memos.memos->size() >= static_cast<unsigned>(nc->memos.memomax))
 		{
-			if (nc->memos.memos->size() > nc->memos.memomax)
+			if (nc->memos.memos->size() > static_cast<unsigned>(nc->memos.memomax))
 				u->SendMessage(ms, _("You are over your maximum number of memos (%d). You will be unable to receive any new memos until you delete some of your current ones."), nc->memos.memomax);
 			else
 				u->SendMessage(ms, _("You have reached your maximum number of memos (%d). You will be unable to receive any new memos until you delete some of your current ones."), nc->memos.memomax);

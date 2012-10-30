@@ -128,7 +128,7 @@ bool WebCPanel::ChanServ::Set::OnRequest(HTTPProvider *server, const Anope::stri
 	return true;
 }
 
-std::set<Anope::string> WebCPanel::ChanServ::Set::GetData() anope_override
+std::set<Anope::string> WebCPanel::ChanServ::Set::GetData()
 {
 	std::set<Anope::string> v;
 	v.insert("channel");

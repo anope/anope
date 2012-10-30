@@ -238,7 +238,7 @@ class BahamutIRCdProto : public IRCDProto
 	/*
 	  Note: if the stamp is null 0, the below usage is correct of Bahamut
 	*/
-	void SendSVSKillInternal(const BotInfo *source, const User *user, const Anope::string &buf) anope_override
+	void SendSVSKillInternal(const BotInfo *source, User *user, const Anope::string &buf) anope_override
 	{
 		if (source)
 			UplinkSocket::Message(source) << "SVSKILL " << user->nick << " :" << buf;

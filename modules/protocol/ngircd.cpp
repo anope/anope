@@ -138,14 +138,6 @@ class ngIRCdProto : public IRCDProto
 		UplinkSocket::Message() << "SERVER " << server->GetName() << " " << server->GetHops() << " :" << server->GetDescription();
 	}
 
-	void SendSVSKillInternal(const BotInfo *source, const User *user, const Anope::string &buf) anope_override
-	{
-		if (source)
-			UplinkSocket::Message(source) << "KILL " << user->nick << " :" << buf;
-		else
-			UplinkSocket::Message(Me) << "KILL " << user->nick << " :" << buf;
-	}
-
 	void SendTopic(BotInfo *bi, Channel *c) anope_override
 	{
 		UplinkSocket::Message(bi) << "TOPIC " << c->name << " :" << c->topic;

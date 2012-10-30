@@ -515,7 +515,7 @@ DNSManager::TCPSocket::Client::~Client()
 	delete packet;
 }
 
-void DNSManager::TCPSocket::Client::Reply(DNSPacket *p) anope_override
+void DNSManager::TCPSocket::Client::Reply(DNSPacket *p)
 {
 	delete packet;
 	packet = p;
@@ -573,7 +573,7 @@ DNSManager::TCPSocket::TCPSocket(const Anope::string &ip, int port) : Socket(-1,
 {
 }
 
-ClientSocket *DNSManager::TCPSocket::OnAccept(int fd, const sockaddrs &addr) anope_override
+ClientSocket *DNSManager::TCPSocket::OnAccept(int fd, const sockaddrs &addr)
 {
 	return new Client(this, fd, addr);
 }

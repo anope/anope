@@ -21,20 +21,20 @@
 #include "servers.h"
 #include "channels.h"
 
-bool CoreIRCDMessageAway::Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
+bool CoreIRCDMessageAway::Run(MessageSource &source, const std::vector<Anope::string> &params)
 {
 	FOREACH_MOD(I_OnUserAway, OnUserAway(source.GetUser(), params.empty() ? "" : params[0]));
 	return true;
 }
 
-bool CoreIRCDMessageCapab::Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
+bool CoreIRCDMessageCapab::Run(MessageSource &source, const std::vector<Anope::string> &params)
 {
 	for (unsigned i = 0; i < params.size(); ++i)
 		Capab.insert(params[i]);
 	return true;
 }
 
-bool CoreIRCDMessageError::Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
+bool CoreIRCDMessageError::Run(MessageSource &source, const std::vector<Anope::string> &params)
 {
 	Log(LOG_TERMINAL) << "ERROR: " << params[0];
 	quitmsg = "Received ERROR from uplink: " + params[0];
@@ -42,7 +42,7 @@ bool CoreIRCDMessageError::Run(MessageSource &source, const std::vector<Anope::s
 	return true;
 }
 
-bool CoreIRCDMessageJoin::Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
+bool CoreIRCDMessageJoin::Run(MessageSource &source, const std::vector<Anope::string> &params)
 {
 	User *user = source.GetUser();
 	const Anope::string &channels = params[0];
@@ -95,7 +95,7 @@ bool CoreIRCDMessageJoin::Run(MessageSource &source, const std::vector<Anope::st
 }
 
 
-bool CoreIRCDMessageKick::Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
+bool CoreIRCDMessageKick::Run(MessageSource &source, const std::vector<Anope::string> &params)
 {
 	const Anope::string &channel = params[0];
 	const Anope::string &users = params[1];
@@ -113,7 +113,7 @@ bool CoreIRCDMessageKick::Run(MessageSource &source, const std::vector<Anope::st
 	return true;
 }
 
-bool CoreIRCDMessageKill::Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
+bool CoreIRCDMessageKill::Run(MessageSource &source, const std::vector<Anope::string> &params)
 {
 	User *u = finduser(params[0]);
 	BotInfo *bi;
@@ -135,7 +135,7 @@ bool CoreIRCDMessageKill::Run(MessageSource &source, const std::vector<Anope::st
 }
 
 /* XXX We should cache the file somewhere not open/read/close it on every request */
-bool CoreIRCDMessageMOTD::Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
+bool CoreIRCDMessageMOTD::Run(MessageSource &source, const std::vector<Anope::string> &params)
 {
 	Server *s = Server::Find(params[0]);
 	if (s != Me)
@@ -160,7 +160,7 @@ bool CoreIRCDMessageMOTD::Run(MessageSource &source, const std::vector<Anope::st
 	return true;
 }
 
-bool CoreIRCDMessagePart::Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
+bool CoreIRCDMessagePart::Run(MessageSource &source, const std::vector<Anope::string> &params)
 {
 	User *u = source.GetUser();
 	const Anope::string &reason = params.size() > 1 ? params[1] : "";
@@ -185,13 +185,13 @@ bool CoreIRCDMessagePart::Run(MessageSource &source, const std::vector<Anope::st
 	return true;
 }
 
-bool CoreIRCDMessagePing::Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
+bool CoreIRCDMessagePing::Run(MessageSource &source, const std::vector<Anope::string> &params)
 {
 	ircdproto->SendPong(params.size() > 1 ? params[1] : Me->GetSID(), params[0]);
 	return true;
 }
 
-bool CoreIRCDMessagePrivmsg::Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
+bool CoreIRCDMessagePrivmsg::Run(MessageSource &source, const std::vector<Anope::string> &params)
 {
 	const Anope::string &receiver = params[0];
 	Anope::string message = params[1];
@@ -262,7 +262,7 @@ bool CoreIRCDMessagePrivmsg::Run(MessageSource &source, const std::vector<Anope:
 	return true;
 }
 
-bool CoreIRCDMessageQuit::Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
+bool CoreIRCDMessageQuit::Run(MessageSource &source, const std::vector<Anope::string> &params)
 {
 	const Anope::string &reason = params[0];
 	User *user = source.GetUser();
@@ -281,7 +281,7 @@ bool CoreIRCDMessageQuit::Run(MessageSource &source, const std::vector<Anope::st
 	return true;
 }
 
-bool CoreIRCDMessageSQuit::Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
+bool CoreIRCDMessageSQuit::Run(MessageSource &source, const std::vector<Anope::string> &params)
 {
 	Server *s = Server::Find(params[0]);
 
@@ -298,7 +298,7 @@ bool CoreIRCDMessageSQuit::Run(MessageSource &source, const std::vector<Anope::s
 	return true;
 }
 
-bool CoreIRCDMessageStats::Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
+bool CoreIRCDMessageStats::Run(MessageSource &source, const std::vector<Anope::string> &params)
 {
 	User *u = source.GetUser();
 
@@ -349,7 +349,7 @@ bool CoreIRCDMessageStats::Run(MessageSource &source, const std::vector<Anope::s
 	return true;
 }
 
-bool CoreIRCDMessageTime::Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
+bool CoreIRCDMessageTime::Run(MessageSource &source, const std::vector<Anope::string> &params)
 {
 	time_t t;
 	time(&t);
@@ -360,7 +360,7 @@ bool CoreIRCDMessageTime::Run(MessageSource &source, const std::vector<Anope::st
 	return true;
 }
 
-bool CoreIRCDMessageTopic::Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
+bool CoreIRCDMessageTopic::Run(MessageSource &source, const std::vector<Anope::string> &params)
 {
 	Channel *c = findchan(params[0]);
 	if (c)
@@ -369,14 +369,14 @@ bool CoreIRCDMessageTopic::Run(MessageSource &source, const std::vector<Anope::s
 	return true;
 }
 
-bool CoreIRCDMessageVersion::Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
+bool CoreIRCDMessageVersion::Run(MessageSource &source, const std::vector<Anope::string> &params)
 {
 	Module *enc = ModuleManager::FindFirstOf(ENCRYPTION);
 	ircdproto->SendNumeric(351, source.GetSource(), "Anope-%s %s :%s -(%s) -- %s", Anope::Version().c_str(), Config->ServerName.c_str(), ircdproto->GetProtocolName().c_str(), enc ? enc->name.c_str() : "unknown", Anope::VersionBuildString().c_str());
 	return true;
 }
 
-bool CoreIRCDMessageWhois::Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
+bool CoreIRCDMessageWhois::Run(MessageSource &source, const std::vector<Anope::string> &params)
 {
 	User *u = finduser(params[0]);
 

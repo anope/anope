@@ -73,7 +73,7 @@ bool WebCPanel::ChanServ::Akick::OnRequest(HTTPProvider *server, const Anope::st
 	return true;
 }
 
-std::set<Anope::string> WebCPanel::ChanServ::Akick::GetData() anope_override
+std::set<Anope::string> WebCPanel::ChanServ::Akick::GetData()
 {
 	std::set<Anope::string> v;
 	v.insert("channel");

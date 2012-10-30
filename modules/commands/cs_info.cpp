@@ -97,7 +97,10 @@ class CommandCSInfo : public Command
 			CheckOptStr(optbuf, CI_STATS, _("Chanstats"), ci, nc);
 
 			info["Options"] = optbuf.empty() ? _("None") : optbuf;
-			info["Mode lock"] = ci->GetMLockAsString(true);
+
+			const Anope::string &ml = ci->GetMLockAsString(true);
+			if (!ml.empty())
+				info["Mode lock"] = ml;
 
 			if (!ci->HasFlag(CI_NO_EXPIRE))
 				info["Expires on"] = do_strftime(ci->last_used + Config->CSExpire);

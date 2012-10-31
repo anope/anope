@@ -13,6 +13,8 @@
 
 #include "module.h"
 
+struct NSGhostExtensibleInfo : ExtensibleItem, std::map<Anope::string, ChannelStatus> { };
+
 class NSGhostRequest : public IdentifyRequest
 {
 	CommandSource source;
@@ -27,11 +29,20 @@ class NSGhostRequest : public IdentifyRequest
 		if (!source.GetUser() || !source.service || !u)
 			return;
 
-		Anope::string nick = u->nick;
-		NickCore *acc = u->Account();
-		std::vector<std::pair<Anope::string, ChannelStatus> > channels;
-		for (UChannelList::iterator it = u->chans.begin(), it_end = u->chans.end(); it != it_end; ++it)
-			channels.push_back(std::make_pair((*it)->chan->name, *(*it)->Status));
+		if (Config->NSRestoreOnGhost)
+		{
+			if (u->Account() != NULL)
+				source.GetUser()->Login(u->Account());
+
+			if (!u->chans.empty())
+			{
+				NSGhostExtensibleInfo *ei = new NSGhostExtensibleInfo;
+				for (UChannelList::iterator it = u->chans.begin(), it_end = u->chans.end(); it != it_end; ++it)
+					(*ei)[(*it)->chan->name] = *(*it)->Status;
+
+				source.GetUser()->Extend("ns_ghost_info", ei);
+			}
+		}
 
 		Log(LOG_COMMAND, source, cmd) << "for " << GetAccount();
 		Anope::string buf = "GHOST command used by " + source.GetNick();
@@ -39,25 +50,7 @@ class NSGhostRequest : public IdentifyRequest
 		source.Reply(_("Ghost with your nick has been killed."));
 
 		if (Config->NSRestoreOnGhost)
-		{
-			if (acc != NULL)
-				source.GetUser()->Login(acc);
-
-			ircdproto->SendForceNickChange(source.GetUser(), nick, Anope::CurTime);
-
-			for (unsigned i = 0; i < channels.size(); ++i)
-			{
-				ircdproto->SendSVSJoin(source.service, source.GetUser()->GetUID(), channels[i].first, "");
-
-				Channel *c = findchan(channels[i].first);
-				if (c)
-				{
-					for (size_t j = CMODE_BEGIN + 1; j < CMODE_END; ++j)
-						if (channels[i].second.HasFlag(static_cast<ChannelModeName>(j)))
-							c->SetMode(c->ci->WhoSends(), ModeManager::FindChannelModeByName(static_cast<ChannelModeName>(j)), source.GetUser()->GetUID());
-				}
-			}
-		}
+			ircdproto->SendForceNickChange(source.GetUser(), GetAccount(), Anope::CurTime);
 	}
 
 	void OnFail() anope_override
@@ -171,6 +164,51 @@ class NSGhost : public Module
 
 		if (Config->NoNicknameOwnership)
 			throw ModuleException(modname + " can not be used with options:nonicknameownership enabled");
+
+		Implementation i[] = { I_OnUserNickChange, I_OnJoinChannel };
+		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
+	}
+
+	~NSGhost()
+	{
+		for (Anope::insensitive_map<User *>::iterator it = UserListByNick.begin(), it_end = UserListByNick.end(); it != it_end; ++it)
+			it->second->Shrink("ns_ghost_info");
+	}
+
+	void OnUserNickChange(User *u, const Anope::string &oldnick) anope_override
+	{
+		if (Config->NSRestoreOnGhost)
+		{
+			NSGhostExtensibleInfo *ei = u->GetExt<NSGhostExtensibleInfo *>("ns_ghost_info");
+
+			if (ei != NULL)
+				for (std::map<Anope::string, ChannelStatus>::iterator it = ei->begin(), it_end = ei->end(); it != it_end; ++it)
+					ircdproto->SendSVSJoin(findbot(Config->NickServ), u->GetUID(), it->first, "");
+		}
+	}
+
+	void OnJoinChannel(User *u, Channel *c) anope_override
+	{
+		if (Config->NSRestoreOnGhost)
+		{
+			NSGhostExtensibleInfo *ei = u->GetExt<NSGhostExtensibleInfo *>("ns_ghost_info");
+
+			if (ei != NULL)
+			{
+				std::map<Anope::string, ChannelStatus>::iterator it = ei->find(c->name);
+				if (it != ei->end())
+				{
+					ei->erase(it);
+
+					for (size_t j = CMODE_BEGIN + 1; j < CMODE_END; ++j)
+						if (it->second.HasFlag(static_cast<ChannelModeName>(j)))
+							c->SetMode(c->ci->WhoSends(), ModeManager::FindChannelModeByName(static_cast<ChannelModeName>(j)), u->GetUID());
+
+					if (ei->empty())
+						u->Shrink("ns_ghost_info");
+				}
+			}
+		}
 	}
 };
 

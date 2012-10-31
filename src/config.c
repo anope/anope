@@ -723,7 +723,7 @@ int parse_directive(Directive * d, char *dir, int ac, char *av[MAXPARAMS],
         }
         switch (d->params[i].type) {
         case PARAM_INT:
-            val = strtol(av[optind++], &s, 0);
+            val = strtol(av[optind++], &s, 10);
             if (*s) {
                 error(linenum,
                       "%s: Expected an integer for parameter %d",
@@ -734,7 +734,7 @@ int parse_directive(Directive * d, char *dir, int ac, char *av[MAXPARAMS],
             *(int *) d->params[i].ptr = val;
             break;
         case PARAM_POSINT:
-            val = strtol(av[optind++], &s, 0);
+            val = strtol(av[optind++], &s, 10);
             if (*s || val <= 0) {
                 error(linenum,
                       "%s: Expected a positive integer for parameter %d",
@@ -751,7 +751,7 @@ int parse_directive(Directive * d, char *dir, int ac, char *av[MAXPARAMS],
             *(int *) d->params[i].ptr = val;
             break;
         case PARAM_PORT:
-            val = strtol(av[optind++], &s, 0);
+            val = strtol(av[optind++], &s, 10);
             if (*s) {
                 error(linenum,
                       "%s: Expected a port number for parameter %d",

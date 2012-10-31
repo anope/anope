@@ -170,7 +170,7 @@ class UnrealIRCdProto : public IRCDProto
 			BotInfo *setter = findbot(user->nick);
 			for (unsigned i = 0; i < ModeManager::ChannelModes.size(); ++i)
 				if (cs.HasFlag(ModeManager::ChannelModes[i]->Name))
-					c->SetMode(setter, ModeManager::ChannelModes[i], user->nick, false);
+					c->SetMode(setter, ModeManager::ChannelModes[i], user->GetUID(), false);
 		}
 	}
 

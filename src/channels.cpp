@@ -86,7 +86,7 @@ void Channel::Reset()
 				ChannelMode *cm = ModeManager::ChannelModes[i];
 
 				if (flags.HasFlag(cm->Name))
-					this->SetMode(NULL, cm, uc->user->nick, false);
+					 this->SetMode(NULL, cm, uc->user->GetUID(), false);
 			}
 		}
 	}
@@ -451,7 +451,7 @@ void Channel::RemoveModeInternal(MessageSource &setter, ChannelMode *cm, const A
 			if (this->ci && this->ci->bi && this->ci->bi == bi)
 			{
 				if (Config->BotModeList.HasFlag(cm->Name))
-					this->SetMode(bi, cm, bi->nick);
+					this->SetMode(bi, cm, bi->GetUID());
 			}
 
 			chan_set_correct_modes(u, this, 0, false);
@@ -668,14 +668,30 @@ void Channel::SetModes(BotInfo *bi, bool EnforceMLock, const char *cmodes, ...)
 		if (add)
 		{
 			if (cm->Type != MODE_REGULAR && sep.GetToken(sbuf))
+			{
+				if (cm->Type == MODE_STATUS)
+				{
+					User *targ = finduser(sbuf);
+					if (targ != NULL)
+						sbuf = targ->GetUID();
+				}
 				this->SetMode(bi, cm, sbuf, EnforceMLock);
+			}
 			else
 				this->SetMode(bi, cm, "", EnforceMLock);
 		}
 		else if (!add)
 		{
 			if (cm->Type != MODE_REGULAR && sep.GetToken(sbuf))
+			{
+				if (cm->Type == MODE_STATUS)
+				{
+					User *targ = finduser(sbuf);
+					if (targ != NULL)
+						sbuf = targ->GetUID();
+				}
 				this->RemoveMode(bi, cm, sbuf, EnforceMLock);
+			}
 			else
 				this->RemoveMode(bi, cm, "", EnforceMLock);
 		}
@@ -1039,31 +1055,31 @@ void chan_set_correct_modes(const User *user, Channel *c, int give_modes, bool c
 	if (give_modes && (!user->Account() || user->Account()->HasFlag(NI_AUTOOP)) && (!check_noop || !ci->HasFlag(CI_NOAUTOOP)))
 	{
 		if (owner && u_access.HasPriv("AUTOOWNER"))
-			c->SetMode(NULL, CMODE_OWNER, user->nick);
+			c->SetMode(NULL, CMODE_OWNER, user->GetUID());
 		else if (admin && u_access.HasPriv("AUTOPROTECT"))
-			c->SetMode(NULL, CMODE_PROTECT, user->nick);
+			c->SetMode(NULL, CMODE_PROTECT, user->GetUID());
 
 		if (op && u_access.HasPriv("AUTOOP"))
-			c->SetMode(NULL, CMODE_OP, user->nick);
+			c->SetMode(NULL, CMODE_OP, user->GetUID());
 		else if (halfop && u_access.HasPriv("AUTOHALFOP"))
-			c->SetMode(NULL, CMODE_HALFOP, user->nick);
+			c->SetMode(NULL, CMODE_HALFOP, user->GetUID());
 		else if (voice && u_access.HasPriv("AUTOVOICE"))
-			c->SetMode(NULL, CMODE_VOICE, user->nick);
+			c->SetMode(NULL, CMODE_VOICE, user->GetUID());
 	}
 	/* If this channel has secureops or the channel is syncing and they are not ulined, check to remove modes */
 	if ((ci->HasFlag(CI_SECUREOPS) || (c->HasFlag(CH_SYNCING) && user->server->IsSynced())) && !user->server->IsULined())
 	{
 		if (owner && !u_access.HasPriv("AUTOOWNER") && !u_access.HasPriv("OWNERME"))
-			c->RemoveMode(NULL, CMODE_OWNER, user->nick);
+			c->RemoveMode(NULL, CMODE_OWNER, user->GetUID());
 
 		if (admin && !u_access.HasPriv("AUTOPROTECT") && !u_access.HasPriv("PROTECTME"))
-			c->RemoveMode(NULL, CMODE_PROTECT, user->nick);
+			c->RemoveMode(NULL, CMODE_PROTECT, user->GetUID());
 
 		if (op && c->HasUserStatus(user, CMODE_OP) && !u_access.HasPriv("AUTOOP") && !u_access.HasPriv("OPDEOPME"))
-			c->RemoveMode(NULL, CMODE_OP, user->nick);
+			c->RemoveMode(NULL, CMODE_OP, user->GetUID());
 
 		if (halfop && !u_access.HasPriv("AUTOHALFOP") && !u_access.HasPriv("HALFOPME"))
-			c->RemoveMode(NULL, CMODE_HALFOP, user->nick);
+			c->RemoveMode(NULL, CMODE_HALFOP, user->GetUID());
 	}
 
 	// Check mlock
@@ -1079,9 +1095,9 @@ void chan_set_correct_modes(const User *user, Channel *c, int give_modes, bool c
 			if ((ml->set && !c->HasUserStatus(user, ml->name)) || (!ml->set && c->HasUserStatus(user, ml->name)))
 			{
 				if (ml->set)
-					c->SetMode(NULL, cm, user->nick, false);
+					c->SetMode(NULL, cm, user->GetUID(), false);
 				else if (!ml->set)
-					c->RemoveMode(NULL, cm, user->nick, false);
+					c->RemoveMode(NULL, cm, user->GetUID(), false);
 			}
 		}
 	}

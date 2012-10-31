@@ -85,9 +85,9 @@ class CommandCSRegister : public Command
 				{
 					/* On most ircds you do not receive the admin/owner mode till its registered */
 					if ((cm = ModeManager::FindChannelModeByName(CMODE_OWNER)))
-						c->SetMode(NULL, cm, u->nick);
+						c->SetMode(NULL, cm, u->GetUID());
 					else if ((cm = ModeManager::FindChannelModeByName(CMODE_PROTECT)))
-						c->RemoveMode(NULL, cm, u->nick);
+						c->RemoveMode(NULL, cm, u->GetUID());
 				}
 
 				/* Mark the channel as persistent */

@@ -75,9 +75,9 @@ public:
 				{
 					/* On most ircds you do not receive the admin/owner mode till its registered */
 					if ((cm = ModeManager::FindChannelModeByName(CMODE_OWNER)))
-						target_ci->c->SetMode(NULL, cm, u->nick);
+						target_ci->c->SetMode(NULL, cm, u->GetUID());
 					else if ((cm = ModeManager::FindChannelModeByName(CMODE_PROTECT)))
-						target_ci->c->RemoveMode(NULL, cm, u->nick);
+						target_ci->c->RemoveMode(NULL, cm, u->GetUID());
 				}
 
 				/* Mark the channel as persistent */

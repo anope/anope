@@ -55,9 +55,9 @@ class CommandModeBase : public Command
 		else
 		{
 			if (set)
-				c->SetMode(NULL, cm, u2->nick);
+				c->SetMode(NULL, cm, u2->GetUID());
 			else
-				c->RemoveMode(NULL, cm, u2->nick);
+				c->RemoveMode(NULL, cm, u2->GetUID());
 
 			Log(LOG_COMMAND, source, com, ci) << "for " << u2->nick;
 		}

@@ -280,9 +280,9 @@ class CommandCSMode : public Command
 									if (Anope::Match(uc->user->GetMask(), param))
 									{
 										if (adding)
-											ci->c->SetMode(NULL, cm, uc->user->nick);
+											ci->c->SetMode(NULL, cm, uc->user->GetUID());
 										else
-											ci->c->RemoveMode(NULL, cm, uc->user->nick);
+											ci->c->RemoveMode(NULL, cm, uc->user->GetUID());
 									}
 								}
 							}
@@ -303,9 +303,9 @@ class CommandCSMode : public Command
 								}
 
 								if (adding)
-									ci->c->SetMode(NULL, cm, param);
+									ci->c->SetMode(NULL, cm, target->GetUID());
 								else
-									ci->c->RemoveMode(NULL, cm, param);
+									ci->c->RemoveMode(NULL, cm, target->GetUID());
 							}
 							break;
 						}

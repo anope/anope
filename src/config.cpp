@@ -1032,7 +1032,7 @@ static bool DoServices(ServerConfig *config, const Anope::string &, const Anope:
 			if (cm == NULL)
 				cm = ModeManager::FindChannelModeByChar(ModeManager::GetStatusChar(want_modes[j]));
 			if (cm && cm->Type == MODE_STATUS)
-				c->SetMode(bi, cm, bi->nick);
+				c->SetMode(bi, cm, bi->GetUID());
 		}
 	}
 	for (unsigned i = 0; i < oldchannels.size(); ++i)

@@ -61,23 +61,26 @@ class CommandOSMode : public Command
 				if (!cm)
 					continue;
 
-				Anope::string param;
+				Anope::string param, param_log;
 				if (cm->Type != MODE_REGULAR)
 				{
 					if (!sep.GetToken(param))
 						continue;
+
+					param_log = param;
 
 					if (cm->Type == MODE_STATUS)
 					{
 						User *targ = finduser(param);
 						if (targ == NULL || c->FindUser(targ) == NULL)
 							continue;
+						param = targ->GetUID();
 					}
 				}
 
 				log_modes += cm->ModeChar;
 				if (!param.empty())
-					log_params += " " + param;
+					log_params += " " + param_log;
 
 				if (add)
 					c->SetMode(source.service, cm, param, false);

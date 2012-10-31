@@ -17,35 +17,64 @@ class NSGhostRequest : public IdentifyRequest
 {
 	CommandSource source;
 	Command *cmd;
+	dynamic_reference<User> u;
  
  public:
-	NSGhostRequest(Module *o, CommandSource &src, Command *c, const Anope::string &user, const Anope::string &pass) : IdentifyRequest(o, user, pass), source(src), cmd(c) { }
+	NSGhostRequest(Module *o, CommandSource &src, Command *c, User *user, const Anope::string &pass) : IdentifyRequest(o, user->nick, pass), source(src), cmd(c), u(user) { }
 
 	void OnSuccess() anope_override
 	{
-		if (!source.GetUser() || !source.service)
+		if (!source.GetUser() || !source.service || !u)
 			return;
 
-		User *user = source.GetUser();
-		if (!user->IsIdentified())
-			source.Reply(_("You may not ghost an unidentified user, use RECOVER instead."));
-		else
+		Anope::string nick = u->nick;
+		NickCore *acc = u->Account();
+		std::vector<std::pair<Anope::string, ChannelStatus> > channels;
+		for (UChannelList::iterator it = u->chans.begin(), it_end = u->chans.end(); it != it_end; ++it)
+			channels.push_back(std::make_pair((*it)->chan->name, *(*it)->Status));
+
+		Log(LOG_COMMAND, source, cmd) << "for " << GetAccount();
+		Anope::string buf = "GHOST command used by " + source.GetNick();
+		u->Kill(source.service->nick, buf);
+		source.Reply(_("Ghost with your nick has been killed."));
+
+		if (Config->NSRestoreOnGhost)
 		{
-			Log(LOG_COMMAND, source, cmd) << "for " << GetAccount();
-			Anope::string buf = "GHOST command used by " + source.GetNick();
-			user->Kill(source.service->nick, buf);
-			source.Reply(_("Ghost with your nick has been killed."));
+			if (acc != NULL)
+				source.GetUser()->Login(acc);
+
+			ircdproto->SendForceNickChange(source.GetUser(), nick, Anope::CurTime);
+
+			for (unsigned i = 0; i < channels.size(); ++i)
+			{
+				ircdproto->SendSVSJoin(source.service, source.GetUser()->GetUID(), channels[i].first, "");
+
+				Channel *c = findchan(channels[i].first);
+				if (c)
+				{
+					for (size_t j = CMODE_BEGIN + 1; j < CMODE_END; ++j)
+						if (channels[i].second.HasFlag(static_cast<ChannelModeName>(j)))
+							c->SetMode(c->ci->WhoSends(), ModeManager::FindChannelModeByName(static_cast<ChannelModeName>(j)), source.GetUser()->GetUID());
+				}
+			}
 		}
 	}
 
 	void OnFail() anope_override
 	{
-		source.Reply(ACCESS_DENIED);
-		if (!GetPassword().empty())
+		if (!u)
+			;
+		else if (!findnick(GetAccount()))
+			source.Reply(NICK_X_NOT_REGISTERED, GetAccount().c_str());
+		else
 		{
-			Log(LOG_COMMAND, source, cmd) << "with an invalid password for " << GetAccount();
-			if (source.GetUser())
-				bad_password(source.GetUser());
+			source.Reply(ACCESS_DENIED);
+			if (!GetPassword().empty())
+			{
+				Log(LOG_COMMAND, source, cmd) << "with an invalid password for " << GetAccount();
+				if (source.GetUser())
+					bad_password(source.GetUser());
+			}
 		}
 	}
 };
@@ -72,6 +101,8 @@ class CommandNSGhost : public Command
 			source.Reply(NICK_X_NOT_IN_USE, nick.c_str());
 		else if (user->server == Me)
 			source.Reply(_("\2%s\2 is a services enforcer."), user->nick.c_str());
+		else if (!user->IsIdentified())
+			source.Reply(_("You may not ghost an unidentified user, use RECOVER instead."));
 		else if (!na)
 			source.Reply(NICK_X_NOT_REGISTERED, nick.c_str());
 		else if (na->nc->HasFlag(NI_SUSPENDED))
@@ -90,13 +121,13 @@ class CommandNSGhost : public Command
 
 			if (ok == false && !pass.empty())
 			{
-				NSGhostRequest *req = new NSGhostRequest(owner, source, this, na->nc->display, pass);
+				NSGhostRequest *req = new NSGhostRequest(owner, source, this, user, pass);
 				FOREACH_MOD(I_OnCheckAuthentication, OnCheckAuthentication(source.GetUser(), req));
 				req->Dispatch();
 			}
 			else
 			{
-				NSGhostRequest req(owner, source, this, na->nc->display, pass);
+				NSGhostRequest req(owner, source, this, user, pass);
 
 				if (ok)
 					req.OnSuccess();

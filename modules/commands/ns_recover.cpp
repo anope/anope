@@ -19,16 +19,15 @@ class NSRecoverRequest : public IdentifyRequest
 	CommandSource source;
 	Command *cmd;
 	dynamic_reference<NickAlias> na;
+	dynamic_reference<User> u;
  
  public:
-	NSRecoverRequest(Module *m, CommandSource &src, Command *c, NickAlias *n, const Anope::string &pass) : IdentifyRequest(m, n->nc->display, pass), source(src), cmd(c), na(n) { }
+	NSRecoverRequest(Module *m, CommandSource &src, Command *c, User *user, NickAlias *n, const Anope::string &pass) : IdentifyRequest(m, n->nc->display, pass), source(src), cmd(c), na(n), u(user) { }
 
 	void OnSuccess() anope_override
 	{
-		if (!source.GetUser() || !na)
+		if (!na || !u)
 			return;
-
-		User *u = source.GetUser();
 
 		u->SendMessage(source.service, FORCENICKCHANGE_NOW);
 
@@ -47,10 +46,8 @@ class NSRecoverRequest : public IdentifyRequest
 
 	void OnFail() anope_override
 	{
-		if (!source.GetUser())
+		if (!na || !u)
 			return;
-
-		User *u = source.GetUser();
 
 		source.Reply(ACCESS_DENIED);
 		if (!GetPassword().empty())
@@ -101,13 +98,13 @@ class CommandNSRecover : public Command
 
 			if (ok == false && !pass.empty())
 			{
-				NSRecoverRequest *req = new NSRecoverRequest(owner, source, this, na, pass);
+				NSRecoverRequest *req = new NSRecoverRequest(owner, source, this, u2, na, pass);
 				FOREACH_MOD(I_OnCheckAuthentication, OnCheckAuthentication(source.GetUser(), req));
 				req->Dispatch();
 			}
 			else
 			{
-				NSRecoverRequest req(owner, source, this, na, pass);
+				NSRecoverRequest req(owner, source, this, u2, na, pass);
 
 				if (ok)
 					req.OnSuccess();

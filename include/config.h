@@ -570,6 +570,8 @@ class CoreExport ServerConfig
 	time_t NSKill;
 	/* Modes set on a user when they identify */
 	Anope::string NSModesOnID;
+	/* Restore nick/channels on ghost */
+	bool NSRestoreOnGhost;
 
 	/* Core ChanServ modules */
 	Anope::string ChanCoreModules;

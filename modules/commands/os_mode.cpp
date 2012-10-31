@@ -34,9 +34,59 @@ class CommandOSMode : public Command
 			source.Reply(_("Services is unable to change modes. Are your servers' U:lines configured correctly?"));
 		else
 		{
-			c->SetModes(source.service, false, modes.c_str());
+			spacesepstream sep(modes);
+			Anope::string mode;
+			int add = 1;
+			Anope::string log_modes, log_params;
 
-			Log(LOG_ADMIN, source, this) << modes << " on " << target;
+			sep.GetToken(mode);
+			for (unsigned i = 0; i < mode.length(); ++i)
+			{
+				char ch = mode[i];
+
+				if (ch == '+')
+				{
+					add = 1;
+					log_modes += "+";
+					continue;
+				}
+				else if (ch == '-')
+				{
+					add = 0;
+					log_modes += "-";
+					continue;
+				}
+
+				ChannelMode *cm = ModeManager::FindChannelModeByChar(ch);
+				if (!cm)
+					continue;
+
+				Anope::string param;
+				if (cm->Type != MODE_REGULAR)
+				{
+					if (!sep.GetToken(param))
+						continue;
+
+					if (cm->Type == MODE_STATUS)
+					{
+						User *targ = finduser(param);
+						if (targ == NULL || c->FindUser(targ) == NULL)
+							continue;
+					}
+				}
+
+				log_modes += cm->ModeChar;
+				if (!param.empty())
+					log_params += " " + param;
+
+				if (add)
+					c->SetMode(source.service, cm, param, false);
+				else
+					c->RemoveMode(source.service, cm, param, false);
+			}
+
+			if (!log_modes.replace_all_cs("+", "").replace_all_cs("-", "").empty())
+				Log(LOG_ADMIN, source, this) << log_modes << log_params << " on " << c->name;
 		}
 	}
 

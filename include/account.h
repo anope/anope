@@ -92,8 +92,6 @@ enum NickCoreFlag
 	NI_SUSPENDED,
 	/* Autoop nickname in channels */
 	NI_AUTOOP,
-	/* This nickcore is forbidden, which means the nickalias for it is aswell */
-	NI_FORBIDDEN,
 	/* If set means the nick core does not have their email addrses confirmed.
 	 */
 	NI_UNCONFIRMED,
@@ -106,7 +104,7 @@ enum NickCoreFlag
 const Anope::string NickCoreFlagStrings[] = {
 	"BEGIN", "KILLPROTECT", "SECURE", "MSG", "MEMO_HARDMAX", "MEMO_SIGNON", "MEMO_RECEIVE",
 	"PRIVATE", "HIDE_EMAIL", "HIDE_MASK", "HIDE_QUIT", "KILL_QUICK", "KILL_IMMED",
-	"MEMO_MAIL", "HIDE_STATUS", "SUSPENDED", "AUTOOP", "FORBIDDEN", "UNCONFIRMED", "STATS", ""
+	"MEMO_MAIL", "HIDE_STATUS", "SUSPENDED", "AUTOOP", "UNCONFIRMED", "STATS", ""
 };
 
 /* It matters that Base is here before Extensible (it is inherited by Serializable) */

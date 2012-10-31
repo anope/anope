@@ -127,6 +127,13 @@ class CommandOSForbid : public Command
 					expiryt += Anope::CurTime;
 			}
 
+			NickAlias *target = findnick(entry);
+			if (target != NULL && Config->NSSecureAdmins && target->nc->IsServicesOper())
+			{
+				source.Reply(ACCESS_DENIED);
+				return;
+			}
+
 			ForbidData *d = this->fs->FindForbid(entry, ftype);
 			bool created = false;
 			if (d == NULL)
@@ -304,7 +311,31 @@ class OSForbid : public Module
 
 	EventReturn OnPreCommand(CommandSource &source, Command *command, std::vector<Anope::string> &params) anope_override
 	{
-		if (source.IsOper())
+		if (command->name == "nickserv/info" && params.size() > 0)
+		{
+			ForbidData *d = this->forbidService.FindForbid(params[0], FT_NICK);
+			if (d != NULL)
+			{
+				if (source.IsOper())
+					source.Reply(_("Nick \2%s\2 is forbidden by %s: %s"), params[0].c_str(), d->creator.c_str(), d->reason.c_str());
+				else
+					source.Reply(_("Nick \2%s\2 is forbidden."), params[0].c_str());
+				return EVENT_STOP;
+			}
+		}
+		else if (command->name == "chanserv/info" && params.size() > 0)
+		{
+			ForbidData *d = this->forbidService.FindForbid(params[0], FT_CHAN);
+			if (d != NULL)
+			{
+				if (source.IsOper())
+					source.Reply(_("Channel \2%s\2 is forbidden by %s: %s"), params[0].c_str(), d->creator.c_str(), d->reason.c_str());
+				else
+					source.Reply(_("Channel \2%s\2 is forbidden."), params[0].c_str());
+				return EVENT_STOP;
+			}
+		}
+		else if (source.IsOper())
 			return EVENT_CONTINUE;
 		else if (command->name == "nickserv/register" && params.size() > 1)
 		{

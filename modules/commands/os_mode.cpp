@@ -108,7 +108,7 @@ class CommandOSUMode : public Command
  public:
 	CommandOSUMode(Module *creator) : Command(creator, "operserv/umode", 2, 2)
 	{
-		this->SetDesc(_("Change channel or user modes"));
+		this->SetDesc(_("Change user modes"));
 		this->SetSyntax(_("\037user\037 \037modes\037"));
 	}
 

@@ -11,10 +11,9 @@
 
 #include "services.h"
 #include "anope.h"
-#include "socketengine.h"
 #include "sockets.h"
+#include "socketengine.h"
 #include "config.h"
-#include "logger.h"
 
 #include <errno.h>
 
@@ -32,121 +31,96 @@
 # define POLLRDHUP POLLHUP
 #endif
 
-static long max;
-static pollfd *events;
-static int SocketCount;
-static std::map<int, int> socket_positions;
+static std::vector<pollfd> events;
+static unsigned SocketCount;
+static std::map<int, unsigned> socket_positions;
 
 void SocketEngine::Init()
 {
-	SocketCount = 0;
-
-	rlimit fd_limit;
-	if (getrlimit(RLIMIT_NOFILE, &fd_limit) == -1)
-		throw CoreException(Anope::LastError());
-	
-	max = fd_limit.rlim_cur;
-
-	events = new pollfd[max];
+	events.resize(DefaultSize);
 }
 
 void SocketEngine::Shutdown()
 {
-	for (std::map<int, Socket *>::const_iterator it = Sockets.begin(), it_end = Sockets.end(); it != it_end;)
-	{
-		Socket *s = it->second;
-		++it;
-		delete s;
-	}
-	Sockets.clear();
-
-	delete [] events;
+	while (!Sockets.empty())
+		delete Sockets.begin()->second;
 }
 
-void SocketEngine::AddSocket(Socket *s)
+void SocketEngine::Change(Socket *s, bool set, SocketFlag flag)
 {
-	if (SocketCount == max)
-		throw SocketException("Unable to add fd " + stringify(s->GetFD()) + " to poll: " + Anope::LastError());
-
-	pollfd *ev = &events[SocketCount];
-	ev->fd = s->GetFD();
-	ev->events = POLLIN;
-	ev->revents = 0;
-
-	Sockets[ev->fd] = s;
-	socket_positions[ev->fd] = SocketCount;
-
-	++SocketCount;
-}
-
-void SocketEngine::DelSocket(Socket *s)
-{
-	std::map<int, int>::iterator pos = socket_positions.find(s->GetFD());
-	if (pos == socket_positions.end())
-		throw SocketException("Unable to remove fd " + stringify(s->GetFD()) + " from poll");
-
-	if (pos->second != SocketCount - 1)
-	{
-		pollfd *ev = &events[pos->second],
-			*last_ev = &events[SocketCount - 1];
-
-		ev->fd = last_ev->fd;
-		ev->events = last_ev->events;
-		ev->revents = last_ev->revents;
-
-		socket_positions[ev->fd] = pos->second;
-	}
-
-	Sockets.erase(s->GetFD());
-	socket_positions.erase(pos);
-
-	--SocketCount;
-}
-
-void SocketEngine::MarkWritable(Socket *s)
-{
-	if (s->HasFlag(SF_WRITABLE))
+	if (set == s->HasFlag(flag))
 		return;
 
-	std::map<int, int>::iterator pos = socket_positions.find(s->GetFD());
-	if (pos == socket_positions.end())
-		throw SocketException("Unable to mark fd " + stringify(s->GetFD()) + " as writable in poll");
+	bool before_registered = s->HasFlag(SF_READABLE) || s->HasFlag(SF_WRITABLE);
 
-	pollfd *ev = &events[pos->second];
-	ev->events |= POLLOUT;
+	if (set)
+		s->SetFlag(flag);
+	else
+		s->UnsetFlag(flag);
 	
-	s->SetFlag(SF_WRITABLE);
-}
+	bool now_registered = s->HasFlag(SF_READABLE) || s->HasFlag(SF_WRITABLE);
 
-void SocketEngine::ClearWritable(Socket *s)
-{
-	if (!s->HasFlag(SF_WRITABLE))
-		return;
+	if (!before_registered && now_registered)
+	{
+		if (SocketCount >= events.size())
+			events.resize(events.size() * 2);
 
-	std::map<int, int>::iterator pos = socket_positions.find(s->GetFD());
-	if (pos == socket_positions.end())
-		throw SocketException("Unable clear mark fd " + stringify(s->GetFD()) + " as writable in poll");
+		pollfd &ev = events[SocketCount];
+		memset(&ev, 0, sizeof(ev));
 
-	pollfd *ev = &events[pos->second];
-	ev->events &= ~POLLOUT;
+		ev.fd = s->GetFD();
+		ev.events = (s->HasFlag(SF_READABLE) ? POLLIN : 0) | (s->HasFlag(SF_WRITABLE) ? POLLOUT : 0);
 
-	s->UnsetFlag(SF_WRITABLE);
+		socket_positions[ev.fd] = SocketCount;
+		++SocketCount;
+	}
+	else if (before_registered && !now_registered)
+	{
+		std::map<int, unsigned>::iterator pos = socket_positions.find(s->GetFD());
+		if (pos == socket_positions.end())
+			throw SocketException("Unable to remove fd " + stringify(s->GetFD()) + " from poll, it does not exist?");
+
+		if (pos->second != SocketCount - 1)
+		{
+			pollfd &ev = events[pos->second],
+				&last_ev = events[SocketCount - 1];
+
+			ev = last_ev;
+
+			socket_positions[ev.fd] = pos->second;
+		}
+
+		socket_positions.erase(pos);
+		--SocketCount;
+	}
+	else if (before_registered && now_registered)
+	{
+		std::map<int, unsigned>::iterator pos = socket_positions.find(s->GetFD());
+		if (pos == socket_positions.end())
+			throw SocketException("Unable to modify fd " + stringify(s->GetFD()) + " in poll, it does not exist?");
+
+		pollfd &ev = events[pos->second];
+		ev.events = (s->HasFlag(SF_READABLE) ? POLLIN : 0) | (s->HasFlag(SF_WRITABLE) ? POLLOUT : 0);
+	}
 }
 
 void SocketEngine::Process()
 {
-	int total = poll(events, SocketCount, Config->ReadTimeout * 1000);
+	if (Sockets.size() > events.size())
+		events.resize(events.size() * 2);
+
+	int total = poll(&events.front(), events.size(), Config->ReadTimeout * 1000);
 	Anope::CurTime = time(NULL);
 
 	/* EINTR can be given if the read timeout expires */
-	if (total == -1)
+	if (total < 0)
 	{
 		if (errno != EINTR)
 			Log() << "SockEngine::Process(): error: " << Anope::LastError();
 		return;
 	}
 
-	for (int i = 0, processed = 0; i < SocketCount && processed != total; ++i)
+	for (unsigned i = 0, processed = 0; i < SocketCount && processed != static_cast<unsigned>(total); ++i)
 	{
 		pollfd *ev = &events[i];
 		
@@ -161,13 +135,16 @@ void SocketEngine::Process()
 		if (ev->revents & (POLLERR | POLLRDHUP))
 		{
 			s->ProcessError();
-			s->SetFlag(SF_DEAD);
 			delete s;
 			continue;
 		}
 
 		if (!s->Process())
+		{
+			if (s->HasFlag(SF_DEAD))
+				delete s;
 			continue;
+		}
 
 		if ((ev->revents & POLLIN) && !s->ProcessRead())
 			s->SetFlag(SF_DEAD);

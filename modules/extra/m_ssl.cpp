@@ -153,6 +153,10 @@ class SSLModule : public Module
 		SSL_CTX_set_verify(client_ctx, SSL_VERIFY_PEER | SSL_VERIFY_CLIENT_ONCE, SSLModule::AlwaysAccept);
 		SSL_CTX_set_verify(server_ctx, SSL_VERIFY_PEER | SSL_VERIFY_CLIENT_ONCE, SSLModule::AlwaysAccept);
 
+		Anope::string context_name = "Anope";
+		SSL_CTX_set_session_id_context(client_ctx, reinterpret_cast<const unsigned char *>(context_name.c_str()), context_name.length());
+		SSL_CTX_set_session_id_context(server_ctx, reinterpret_cast<const unsigned char *>(context_name.c_str()), context_name.length());
+
 		ModuleManager::Attach(I_OnReload, this);
 		ModuleManager::Attach(I_OnPreServerConnect, this);
 	}
@@ -275,7 +279,8 @@ SocketFlag SSLSocketIO::FinishAccept(ClientSocket *cs)
 		int error = SSL_get_error(IO->sslsock, ret);
 		if (ret == -1 && (error == SSL_ERROR_WANT_READ || error == SSL_ERROR_WANT_WRITE))
 		{
-			SocketEngine::MarkWritable(cs);
+			SocketEngine::Change(cs, error == SSL_ERROR_WANT_WRITE, SF_WRITABLE);
+			SocketEngine::Change(cs, error == SSL_ERROR_WANT_READ, SF_READABLE);
 			return SF_ACCEPTING;
 		}
 		else
@@ -290,6 +295,8 @@ SocketFlag SSLSocketIO::FinishAccept(ClientSocket *cs)
 	{
 		cs->SetFlag(SF_ACCEPTED);
 		cs->UnsetFlag(SF_ACCEPTING);
+		SocketEngine::Change(cs, false, SF_WRITABLE);
+		SocketEngine::Change(cs, true, SF_READABLE);
 		cs->OnAccept();
 		return SF_ACCEPTED;
 	}
@@ -315,7 +322,7 @@ void SSLSocketIO::Connect(ConnectionSocket *s, const Anope::string &target, int 
 		}
 		else
 		{
-			SocketEngine::MarkWritable(s);
+			SocketEngine::Change(s, true, SF_WRITABLE);
 			s->SetFlag(SF_CONNECTING);
 			return;
 		}
@@ -354,7 +361,8 @@ SocketFlag SSLSocketIO::FinishConnect(ConnectionSocket *s)
 		int error = SSL_get_error(IO->sslsock, ret);
 		if (ret == -1 && (error == SSL_ERROR_WANT_READ || error == SSL_ERROR_WANT_WRITE))
 		{
-			SocketEngine::MarkWritable(s);
+			SocketEngine::Change(s, error == SSL_ERROR_WANT_WRITE, SF_WRITABLE);
+			SocketEngine::Change(s, error == SSL_ERROR_WANT_READ, SF_READABLE);
 			return SF_CONNECTING;
 		}
 		else
@@ -369,6 +377,8 @@ SocketFlag SSLSocketIO::FinishConnect(ConnectionSocket *s)
 	{
 		s->UnsetFlag(SF_CONNECTING);
 		s->SetFlag(SF_CONNECTED);
+		SocketEngine::Change(s, false, SF_WRITABLE);
+		SocketEngine::Change(s, true, SF_READABLE);
 		s->OnConnect();
 		return SF_CONNECTED;
 	}
@@ -381,6 +391,8 @@ void SSLSocketIO::Destroy()
 		SSL_shutdown(this->sslsock);
 		SSL_free(this->sslsock);
 	}
+
+	delete this;
 }
 
 MODULE_INIT(SSLModule)

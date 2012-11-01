@@ -70,7 +70,7 @@ bool BufferedSocket::ProcessWrite()
 		return false;
 	this->WriteBuffer = this->WriteBuffer.substr(count);
 	if (this->WriteBuffer.empty())
-		SocketEngine::ClearWritable(this);
+		SocketEngine::Change(this, false, SF_WRITABLE);
 
 	return true;
 }
@@ -83,7 +83,7 @@ bool BufferedSocket::Read(const Anope::string &buf)
 void BufferedSocket::Write(const char *buffer, size_t l)
 {
 	this->WriteBuffer += buffer + Anope::string("\r\n");
-	SocketEngine::MarkWritable(this);
+	SocketEngine::Change(this, true, SF_WRITABLE);
 }
 
 void BufferedSocket::Write(const char *message, ...)
@@ -152,7 +152,7 @@ bool BinarySocket::ProcessWrite()
 {
 	if (this->WriteBuffer.empty())
 	{
-		SocketEngine::ClearWritable(this);
+		SocketEngine::Change(this, false, SF_WRITABLE);
 		return true;
 	}
 
@@ -173,7 +173,7 @@ bool BinarySocket::ProcessWrite()
 	}
 
 	if (this->WriteBuffer.empty())
-		SocketEngine::ClearWritable(this);
+		SocketEngine::Change(this, false, SF_WRITABLE);
 
 	return true;
 }
@@ -181,7 +181,7 @@ bool BinarySocket::ProcessWrite()
 void BinarySocket::Write(const char *buffer, size_t l)
 {
 	this->WriteBuffer.push_back(new DataBlock(buffer, l));
-	SocketEngine::MarkWritable(this);
+	SocketEngine::Change(this, true, SF_WRITABLE);
 }
 
 void BinarySocket::Write(const char *message, ...)

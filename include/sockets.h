@@ -110,6 +110,7 @@ class SocketException : public CoreException
 enum SocketFlag
 {
 	SF_DEAD,
+	SF_READABLE,
 	SF_WRITABLE,
 	SF_CONNECTING,
 	SF_CONNECTED,

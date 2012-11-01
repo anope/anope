@@ -7,6 +7,7 @@
 
 #include "module.h"
 #include "httpd.h"
+#include "ssl.h"
 
 static Anope::string BuildDate()
 {
@@ -299,9 +300,10 @@ class MyHTTPProvider : public HTTPProvider, public CallBack
 
 class HTTPD : public Module
 {
+	service_reference<SSLService> sslref;
 	std::map<Anope::string, HTTPProvider *> providers;
  public:
-	HTTPD(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, SUPPORTED)
+	HTTPD(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, SUPPORTED), sslref("SSLService", "ssl")
 	{
 		this->SetAuthor("Anope");
 
@@ -338,6 +340,7 @@ class HTTPD : public Module
 			Anope::string ip = config.ReadValue("httpd", "ip", "", i);
 			int port = config.ReadInteger("httpd", "port", "8080", i, true);
 			int timeout = config.ReadInteger("httpd", "timeout", "30", i, true);
+			bool ssl = config.ReadFlag("httpd", "ssl", "no", i);
 			Anope::string ext_ip = config.ReadValue("httpd", "extforward_ip", "", i);
 			Anope::string ext_header = config.ReadValue("httpd", "extforward_header", "", i);
 
@@ -352,12 +355,20 @@ class HTTPD : public Module
 				continue;
 			}
 
+			if (ssl && !sslref)
+			{
+				Log(this) << "Could not enable SSL, is m_ssl loaded?";
+				ssl = false;
+			}
+
 			HTTPProvider *p;
 			if (this->providers.count(hname) == 0)
 			{
 				try
 				{
 					p = new MyHTTPProvider(this, hname, ip, port, timeout);
+					if (ssl)
+						sslref->Init(p);
 				}
 				catch (const SocketException &ex)
 				{
@@ -380,6 +391,8 @@ class HTTPD : public Module
 					try
 					{
 						p = new MyHTTPProvider(this, hname, ip, port, timeout);
+						if (ssl)
+							sslref->Init(p);
 					}
 					catch (const SocketException &ex)
 					{

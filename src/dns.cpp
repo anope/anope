@@ -519,7 +519,7 @@ void DNSManager::TCPSocket::Client::Reply(DNSPacket *p)
 {
 	delete packet;
 	packet = p;
-	SocketEngine::MarkWritable(this);
+	SocketEngine::Change(this, true, SF_WRITABLE);
 }
 
 bool DNSManager::TCPSocket::Client::ProcessRead()
@@ -535,9 +535,8 @@ bool DNSManager::TCPSocket::Client::ProcessRead()
 	short want_len = packet_buffer[0] << 8 | packet_buffer[1];
 	if (length >= want_len - 2)
 	{
-		int len = length - 2;
-		length = 0;
-		return DNSEngine->HandlePacket(this, packet_buffer + 2, len, NULL);
+		SocketEngine::Change(this, false, SF_READABLE);
+		return DNSEngine->HandlePacket(this, packet_buffer + 2, length - 2, NULL);
 	}
 	return true;
 }
@@ -565,7 +564,7 @@ bool DNSManager::TCPSocket::Client::ProcessWrite()
 		packet = NULL;
 	}
 
-	SocketEngine::ClearWritable(this);
+	SocketEngine::Change(this, false, SF_WRITABLE);
 	return true; /* Do not return false here, bind is unhappy we close the connection so soon after sending */
 }
 
@@ -591,7 +590,7 @@ DNSManager::UDPSocket::~UDPSocket()
 void DNSManager::UDPSocket::Reply(DNSPacket *p)
 {
 	packets.push_back(p);
-	SocketEngine::MarkWritable(this);
+	SocketEngine::Change(this, true, SF_WRITABLE);
 }
 
 bool DNSManager::UDPSocket::ProcessRead()
@@ -626,7 +625,7 @@ bool DNSManager::UDPSocket::ProcessWrite()
 	}
 
 	if (packets.empty())
-		SocketEngine::ClearWritable(this);
+		SocketEngine::Change(this, false, SF_WRITABLE);
 	
 	return true;
 }
@@ -848,7 +847,7 @@ bool DNSManager::CheckCache(DNSRequest *request)
 		for (cache_map::iterator it_end = this->cache.upper_bound(request->name); it != it_end; ++it)
 		{
 			ResourceRecord &rec = it->second;
-			if (rec.created + rec.ttl >= Anope::CurTime)
+			if (rec.created + static_cast<time_t>(rec.ttl) >= Anope::CurTime)
 				record.answers.push_back(rec);
 		}
 
@@ -873,7 +872,7 @@ void DNSManager::Tick(time_t now)
 		it_next = it;
 		++it_next;
 
-		if (req.created + req.ttl < now)
+		if (req.created + static_cast<time_t>(req.ttl) < now)
 			this->cache.erase(it);
 	}
 }

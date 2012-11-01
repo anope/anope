@@ -56,8 +56,9 @@ void ConnectionSocket::OnConnect()
 {
 }
 
-void ConnectionSocket::OnError(const Anope::string &)
+void ConnectionSocket::OnError(const Anope::string &error)
 {
+	Log(LOG_DEBUG) << "Socket error: " << error;
 }
 
 ClientSocket::ClientSocket(ListenSocket *ls, const sockaddrs &addr) : LS(ls), clientaddr(addr)
@@ -97,5 +98,6 @@ void ClientSocket::OnAccept()
 
 void ClientSocket::OnError(const Anope::string &error)
 {
+	Log(LOG_DEBUG) << "Socket error: " << error;
 }
 

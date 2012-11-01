@@ -384,7 +384,7 @@ void SocketIO::Connect(ConnectionSocket *s, const Anope::string &target, int por
 			s->OnError(Anope::LastError());
 		else
 		{
-			SocketEngine::MarkWritable(s);
+			SocketEngine::Change(s, true, SF_WRITABLE);
 			s->SetFlag(SF_CONNECTING);
 		}
 	}
@@ -444,16 +444,19 @@ Socket::Socket(int sock, bool ipv6, int type) : Flags<SocketFlag>(SocketFlagStri
 	else
 		this->Sock = sock;
 	this->SetNonBlocking();
-	SocketEngine::AddSocket(this);
+	SocketEngine::Sockets[this->Sock] = this;
+	SocketEngine::Change(this, true, SF_READABLE);
 }
 
 /** Default destructor
 */
 Socket::~Socket()
 {
-	SocketEngine::DelSocket(this);
+	SocketEngine::Change(this, false, SF_READABLE);
+	SocketEngine::Change(this, false, SF_WRITABLE);
 	anope_close(this->Sock);
 	this->IO->Destroy();
+	SocketEngine::Sockets.erase(this->Sock);
 }
 
 /** Get the socket FD for this socket

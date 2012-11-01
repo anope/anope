@@ -14,6 +14,7 @@
 extern Module *me;
 
 extern Anope::string provider_name, template_name, template_base, page_title;
+extern bool use_ssl;
 
 struct SubSection
 {

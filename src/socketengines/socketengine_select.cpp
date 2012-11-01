@@ -11,8 +11,8 @@
 
 #include "services.h"
 #include "anope.h"
-#include "socketengine.h"
 #include "sockets.h"
+#include "socketengine.h"
 #include "logger.h"
 #include "config.h"
 
@@ -28,56 +28,60 @@ static fd_set WriteFDs;
 
 void SocketEngine::Init()
 {
-	MaxFD = 0;
-	FDCount = 0;
 	FD_ZERO(&ReadFDs);
 	FD_ZERO(&WriteFDs);
 }
 
 void SocketEngine::Shutdown()
 {
-	for (std::map<int, Socket *>::const_iterator it = Sockets.begin(), it_end = Sockets.end(); it != it_end;)
+	while (!Sockets.empty())
+		delete Sockets.begin()->second;
+}
+
+void SocketEngine::Change(Socket *s, bool set, SocketFlag flag)
+{
+	if (set == s->HasFlag(flag))
+		return;
+
+	bool before_registered = s->HasFlag(SF_READABLE) || s->HasFlag(SF_WRITABLE);
+
+	if (set)
+		s->SetFlag(flag);
+	else
+		s->UnsetFlag(flag);
+	
+	bool now_registered = s->HasFlag(SF_READABLE) || s->HasFlag(SF_WRITABLE);
+
+	if (!before_registered && now_registered)
 	{
-		Socket *s = it->second;
-		++it;
-		delete s;
+		if (s->GetFD() > MaxFD)
+			MaxFD = s->GetFD();
+		if (s->HasFlag(SF_READABLE))
+			FD_SET(s->GetFD(), &ReadFDs);
+		if (s->HasFlag(SF_WRITABLE))
+			FD_SET(s->GetFD(), &WriteFDs);
+		++FDCount;
 	}
-	Sockets.clear();
-}
+	else if (before_registered && !now_registered)
+	{
+		if (s->GetFD() == MaxFD)
+			--MaxFD;
+		FD_CLR(s->GetFD(), &ReadFDs);
+		FD_CLR(s->GetFD(), &WriteFDs);
+		--FDCount;
+	}
+	else if (before_registered && now_registered)
+	{
+		if (s->HasFlag(SF_READABLE))
+			FD_SET(s->GetFD(), &ReadFDs);
+		else
+			FD_CLR(s->GetFD(), &ReadFDs);
 
-void SocketEngine::AddSocket(Socket *s)
-{
-	if (s->GetFD() > MaxFD)
-		MaxFD = s->GetFD();
-	FD_SET(s->GetFD(), &ReadFDs);
-	Sockets[s->GetFD()] = s;
-	++FDCount;
-}
-
-void SocketEngine::DelSocket(Socket *s)
-{
-	if (s->GetFD() == MaxFD)
-		--MaxFD;
-	FD_CLR(s->GetFD(), &ReadFDs);
-	FD_CLR(s->GetFD(), &WriteFDs);
-	Sockets.erase(s->GetFD());
-	--FDCount;
-}
-
-void SocketEngine::MarkWritable(Socket *s)
-{
-	if (s->HasFlag(SF_WRITABLE))
-		return;
-	FD_SET(s->GetFD(), &WriteFDs);
-	s->SetFlag(SF_WRITABLE);
-}
-
-void SocketEngine::ClearWritable(Socket *s)
-{
-	if (!s->HasFlag(SF_WRITABLE))
-		return;
-	FD_CLR(s->GetFD(), &WriteFDs);
-	s->UnsetFlag(SF_WRITABLE);
+		if (s->HasFlag(SF_WRITABLE))
+			FD_SET(s->GetFD(), &WriteFDs);
+		else
+			FD_CLR(s->GetFD(), &WriteFDs);
+	}
 }
 
 void SocketEngine::Process()
@@ -123,13 +127,16 @@ void SocketEngine::Process()
 			if (has_error)
 			{
 				s->ProcessError();
-				s->SetFlag(SF_DEAD);
 				delete s;
 				continue;
 			}
 
 			if (!s->Process())
+			{
+				if (s->HasFlag(SF_DEAD))
+					delete s;
 				continue;
+			}
 
 			if (has_read && !s->ProcessRead())
 				s->SetFlag(SF_DEAD);

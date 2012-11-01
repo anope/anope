@@ -9,6 +9,7 @@
 
 Module *me;
 Anope::string provider_name, template_name, template_base, page_title;
+bool use_ssl = false;
 
 class ModuleWebCPanel : public Module
 {
@@ -53,6 +54,7 @@ class ModuleWebCPanel : public Module
 		template_name = reader.ReadValue("webcpanel", "template", "template", 0);
 		template_base = db_dir + "/modules/webcpanel/templates/" + template_name;
 		page_title = reader.ReadValue("webcpanel", "title", "Anope IRC Services", 0);
+		use_ssl = reader.ReadFlag("webcpanel", "ssl", "no", 0); // This is dumb, is there a better way to do this?
 
 		service_reference<HTTPProvider> provider("HTTPProvider", provider_name);
 		if (!provider)

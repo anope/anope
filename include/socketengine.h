@@ -16,6 +16,7 @@
 
 class CoreExport SocketEngine
 {
+	static const int DefaultSize = 4; // Uplink, DNS, Signal handler, Mode stacker
  public:
 	/* Map of sockets */
 	static std::map<int, Socket *> Sockets;
@@ -28,25 +29,12 @@ class CoreExport SocketEngine
 	 */
 	static void Shutdown();
 
-	/** Add a socket to the internal list
+	/** Set a flag on a socket
 	 * @param s The socket
+	 * @param set Whether setting or unsetting
+	 * @param flag The flag to set or unset
 	 */
-	static void AddSocket(Socket *s);
-
-	/** Delete a socket from the internal list
-	 * @param s The socket
-	 */
-	static void DelSocket(Socket *s);
-
-	/** Mark a socket as writeable
-	 * @param s The socket
-	 */
-	static void MarkWritable(Socket *s);
-
-	/** Unmark a socket as writeable
-	 * @param s The socket
-	 */
-	static void ClearWritable(Socket *s);
+	static void Change(Socket *s, bool set, SocketFlag flag);
 
 	/** Read from sockets and do things
 	 */

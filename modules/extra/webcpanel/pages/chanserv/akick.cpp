@@ -18,7 +18,7 @@ bool WebCPanel::ChanServ::Akick::OnRequest(HTTPProvider *server, const Anope::st
 	if (chname.empty())
 	{
 		reply.error = HTTP_FOUND;
-		reply.headers["Location"] = "http://" + message.headers["Host"] + "/chanserv/info";
+		reply.headers["Location"] = Anope::string("http") + (use_ssl ? "s" : "") + "://" + message.headers["Host"] + "/chanserv/info";
 		return true;
 	}
 

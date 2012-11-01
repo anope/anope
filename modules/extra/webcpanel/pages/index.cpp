@@ -58,7 +58,7 @@ class WebpanelRequest : public IdentifyRequest
 		}
 
 		reply.error = HTTP_FOUND;
-		reply.headers["Location"] = "http://" + message.headers["Host"] + "/nickserv/info";
+		reply.headers["Location"] = Anope::string("http") + (use_ssl ? "s" : "") + "://" + message.headers["Host"] + "/nickserv/info";
 
 		client->SendReply(&reply);
 	}

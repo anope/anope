@@ -240,7 +240,7 @@ export ok INPUT
 ####
 
 ok=0
-echo "In what directory do you want the binaries to be installed?"
+echo "In what directory should Anope be installed?"
 while [ $ok -eq 0 ] ; do
 	echo2 "[$INSTDIR] "
 	if read INPUT ; then : ; else echo "" ; exit 1 ; fi

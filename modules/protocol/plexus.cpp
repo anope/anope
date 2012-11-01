@@ -626,7 +626,13 @@ struct IRCDMessageUID : IRCDMessage
 			ip.clear();
 
 		User *user = new User(params[0], params[4], params[9], params[5], ip, source.GetServer(), params[10], params[2].is_pos_number_only() ? convertTo<time_t>(params[2]) : 0, params[3], params[7]);
-		if (user && user->server->IsSynced() && nickserv)
+		if (params[8] != "0" && params[8].is_pos_number_only() && convertTo<time_t>(params[8]) == user->timestamp)
+		{
+			NickAlias *na = findnick(user->nick);
+			if (na)
+				user->Login(na->nc);
+		}
+		else if (user && user->server->IsSynced() && nickserv)
 			nickserv->Validate(user);
 
 		return true;

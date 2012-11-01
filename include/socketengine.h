@@ -13,6 +13,7 @@
 #define SOCKETENGINE_H
 
 #include "services.h"
+#include "sockets.h"
 
 class CoreExport SocketEngine
 {

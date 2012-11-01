@@ -976,7 +976,6 @@ static void arc4_addrandom(void *dat, int datlen)
  */
 void rand_init(void)
 {
-    int n;
 #ifndef _WIN32
     int fd;
 #endif
@@ -1007,7 +1006,7 @@ void rand_init(void)
     /* unix/bsd: /dev/urandom */
     fd = open("/dev/urandom", O_RDONLY);
     if (fd) {
-        n = read(fd, &rdat.rnd, sizeof(rdat.rnd));
+        read(fd, &rdat.rnd, sizeof(rdat.rnd));
         close(fd);
     }
 #else
@@ -1112,14 +1111,13 @@ char *send_token(char *token1, char *token2)
  */
 int myNumToken(const char *str, const char dilim)
 {
-    int len, idx, counter = 0, start_pos = 0;
+    int len, idx, counter = 0;
     if (!str) {
         return 0;
     }
     len = strlen(str);
     for (idx = 0; idx <= len; idx++) {
         if ((str[idx] == dilim) || (idx == len)) {
-            start_pos = idx + 1;
             counter++;
         }
     }

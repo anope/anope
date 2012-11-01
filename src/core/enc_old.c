@@ -380,7 +380,7 @@ static int old_encrypt(const char *src, int len, char *dest, int size)
 
     if(debug) {
         memset(tmp,0,33);
-        my_binary_to_hex(dest,tmp,16);
+        my_binary_to_hex((unsigned char *) dest,tmp,16);
         alog("enc_old: Converted [%s] to [%s]",src,tmp); 
     }
 

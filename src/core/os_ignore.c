@@ -78,7 +78,6 @@ static int do_ignoreuser(User * u)
     if (!stricmp(cmd, "ADD")) {
         char *time = strtok(NULL, " ");
         char *nick = strtok(NULL, " ");
-        char *rest = strtok(NULL, "");
 
         if (!nick) {
 	    syntax_error(s_OperServ, u, "IGNORE", OPER_IGNORE_SYNTAX);
@@ -88,7 +87,6 @@ static int do_ignoreuser(User * u)
             return MOD_CONT;
         } else {
             t = dotime(time);
-            rest = NULL;
 
             if (t <= -1) {
                 notice_lang(s_OperServ, u, OPER_IGNORE_VALID_TIME);

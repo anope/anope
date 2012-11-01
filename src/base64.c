@@ -295,7 +295,7 @@ char *encode_ip(unsigned char *ip)
     } else {
         s_ip = str_signed(ip);
         ia.s_addr = inet_addr(s_ip);
-        cp = (unsigned char *) ia.s_addr;
+        cp = (unsigned char *) &ia.s_addr;
         b64_encode((char *) &cp, sizeof(struct in_addr), buf, 25);
     }
     return buf;
@@ -305,14 +305,14 @@ int decode_ip(char *buf)
 {
     int len = strlen(buf);
     char targ[25];
-    struct in_addr ia;
+    struct in_addr *ia;
 
     b64_decode(buf, targ, 25);
-    ia = *(struct in_addr *) targ;
+    ia = (struct in_addr *) targ;
     if (len == 24) {            /* IPv6 */
         return 0;
     } else if (len == 8)        /* IPv4 */
-        return ia.s_addr;
+        return ia->s_addr;
     else                        /* Error?? */
         return 0;
 }

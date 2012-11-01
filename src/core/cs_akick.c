@@ -368,8 +368,6 @@ static int do_akick(User * u)
             free(mask);
 
     } else if (stricmp(cmd, "STICK") == 0) {
-        NickAlias *na;
-        NickCore *nc;
 
         if (readonly) {
             notice_lang(s_ChanServ, u, CHAN_AKICK_DISABLED);
@@ -380,9 +378,6 @@ static int do_akick(User * u)
             notice_lang(s_ChanServ, u, CHAN_AKICK_LIST_EMPTY, ci->name);
             return MOD_CONT;
         }
-
-        na = findnick(mask);
-        nc = (na ? na->nc : NULL);
 
         for (akick = ci->akick, i = 0; i < ci->akickcount; akick++, i++) {
             if (!(akick->flags & AK_USED) || (akick->flags & AK_ISNICK))
@@ -406,9 +401,6 @@ static int do_akick(User * u)
         if (ci->c)
             stick_mask(ci, akick);
     } else if (stricmp(cmd, "UNSTICK") == 0) {
-        NickAlias *na;
-        NickCore *nc;
-
         if (readonly) {
             notice_lang(s_ChanServ, u, CHAN_AKICK_DISABLED);
             return MOD_CONT;
@@ -418,9 +410,6 @@ static int do_akick(User * u)
             notice_lang(s_ChanServ, u, CHAN_AKICK_LIST_EMPTY, ci->name);
             return MOD_CONT;
         }
-
-        na = findnick(mask);
-        nc = (na ? na->nc : NULL);
 
         for (akick = ci->akick, i = 0; i < ci->akickcount; akick++, i++) {
             if (!(akick->flags & AK_USED) || (akick->flags & AK_ISNICK))

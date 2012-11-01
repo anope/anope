@@ -278,7 +278,6 @@ void modules_unload_all(boolean fini, boolean unload_proto)
 #ifdef USE_MODULES
 	int idx;
 	ModuleHash *mh, *next;
-        void (*func) (void);
        	
 	for (idx = 0; idx < MAX_CMD_HASH; idx++) {
 		mh = MODULE_HASH[idx];
@@ -288,10 +287,14 @@ void modules_unload_all(boolean fini, boolean unload_proto)
 				mod_current_module = mh->m;
 				mod_current_module_name = mh->m->name;
 			    if(fini) {
-			        func = (void (*)(void))ano_modsym(mh->m->handle, "AnopeFini");
-		    	    if (func) {
-		            	func();                 /* exec AnopeFini */
-			        }
+				union fini_union
+				{
+					void *ptr;
+					void (*func)(void);
+				} u;
+				u.ptr = ano_modsym(mh->m->handle, "AnopeFini");
+				if (u.ptr)
+					u.func(); /* exec AnopeFini */
 				
 		    	    if (prepForUnload(mh->m) != MOD_ERR_OK) {
 			    		mh = next;
@@ -599,11 +602,21 @@ int loadModule(Module * m, User * u)
     char buf[4096];
     int len;
     const char *err;
-    int (*func) (int, char **);
-    int (*version)();
     int ret = 0;
     char *argv[1];
     int argc = 0;
+
+    union init_func_union
+    {
+    	void *ptr;
+	int (*func)(int, char **);
+    } init_union;
+
+    union version_func_union
+    {
+        void *ptr;
+        int (*func)();
+    } version_union;
 
     Module *m2;
     if (!m || !m->name) {
@@ -647,20 +660,22 @@ int loadModule(Module * m, User * u)
         return MOD_ERR_NOLOAD;
     }
     ano_modclearerr();
-    func = (int (*)(int, char **))ano_modsym(m->handle, "AnopeInit");
-    if ( func == NULL && (err = ano_moderr()) != NULL) {
+
+    init_union.ptr = ano_modsym(m->handle, "AnopeInit");
+
+    if ( init_union.ptr == NULL && (err = ano_moderr()) != NULL) {
         ano_modclose(m->handle);        /* If no AnopeInit - it isnt an Anope Module, close it */
         return MOD_ERR_NOLOAD;
     }
-    if (func) {
-	version = (int (*)())ano_modsym(m->handle,"getAnopeBuildVersion");
-	if (version) {
-        if (version() >= VERSION_BUILD ) {
+    if (init_union.ptr) {
+	version_union.ptr = ano_modsym(m->handle,"getAnopeBuildVersion");
+	if (version_union.ptr) {
+        if (version_union.func() >= VERSION_BUILD ) {
             if(debug) {
-                alog("Module %s compiled against current or newer anope revision %d, this is %d",m->name,version(),VERSION_BUILD);
+                alog("Module %s compiled against current or newer anope revision %d, this is %d",m->name,version_union.func(),VERSION_BUILD);
             }
         } else {
-            alog("Module %s is compiled against an old version of anope (%d) current is %d", m->name, version(), VERSION_BUILD);
+            alog("Module %s is compiled against an old version of anope (%d) current is %d", m->name, version_union.func(), VERSION_BUILD);
             alog("Rebuild module %s against the current version to resolve this error", m->name);
             ano_modclose(m->handle);
             ano_modclearerr();
@@ -684,7 +699,7 @@ int loadModule(Module * m, User * u)
         }
         argc++;
 
-        ret = func(argc, argv); /* exec AnopeInit */
+        init_union.func(argc, argv); /* exec AnopeInit */
         if (u) {
             free(argv[0]);
         }
@@ -733,7 +748,11 @@ int loadModule(Module * m, User * u)
 int unloadModule(Module * m, User * u)
 {
 #ifdef USE_MODULES
-    void (*func) (void);
+    union fini_union
+    {
+        void *ptr;
+        void (*func)(void);
+    } un;
 
     if (!m || !m->handle) {
         if (u) {
@@ -754,11 +773,11 @@ int unloadModule(Module * m, User * u)
         return MOD_ERR_NOUNLOAD;
     }
 
-    func = (void (*)(void))ano_modsym(m->handle, "AnopeFini");
-    if (func) {
+    un.ptr = ano_modsym(m->handle, "AnopeFini");
+    if (un.ptr) {
         mod_current_module = m;
         mod_current_module_name = m->name;
-        func();                 /* exec AnopeFini */
+        un.func();                 /* exec AnopeFini */
     }
 
     if (prepForUnload(m) != MOD_ERR_OK) {
@@ -821,7 +840,6 @@ int prepForUnload(Module * m)
     Message *msg;
     EvtMessage *eMsg;
     EvtHook *eHook;
-    int status = 0;
 
     if (!m) {
         return MOD_ERR_PARAMS;
@@ -906,7 +924,7 @@ int prepForUnload(Module * m)
             for (eMsg = ecurrent->evm; eMsg; eMsg = eMsg->next) {
                 if ((eMsg->mod_name)
                     && (stricmp(eMsg->mod_name, m->name) == 0)) {
-                    status = delEventHandler(EVENT, eMsg, m->name);
+                    delEventHandler(EVENT, eMsg, m->name);
                 }
             }
         }
@@ -915,7 +933,7 @@ int prepForUnload(Module * m)
             for (eHook = ehcurrent->evh; eHook; eHook = eHook->next) {
                 if ((eHook->mod_name)
                     && (stricmp(eHook->mod_name, m->name) == 0)) {
-                    status = delEventHook(EVENTHOOKS, eHook, m->name);
+                    delEventHook(EVENTHOOKS, eHook, m->name);
                 }
             }
         }

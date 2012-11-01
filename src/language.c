@@ -152,13 +152,11 @@ static void load_lang(int index, const char *filename)
 void lang_sanitize()
 {
     int i = 0, j = 0;
-    int len = 0;
     char tmp[2000];
     char *newstr = NULL;
     for (i = 0; i < NUM_LANGS; i++) {
         for (j = 0; j < NUM_STRINGS; j++) {
             if (strstr(langtexts[i][j], "%R")) {
-                len = strlen(langtexts[i][j]);
                 strscpy(tmp, langtexts[i][j], sizeof(tmp));
                 if (UseStrictPrivMsg) {
                     strnrepl(tmp, sizeof(tmp), "%R", "/");

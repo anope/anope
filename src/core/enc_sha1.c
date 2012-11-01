@@ -178,7 +178,7 @@ static void SHA1Final(unsigned char digest[20], SHA1_CTX* context)
 static int sha1_encrypt(const char *src, int len, char *dest, int size)
 {
     SHA1_CTX context;
-    unsigned char tmp[41];
+    char tmp[41];
 
     if (size < 20)
         return -1;
@@ -186,12 +186,12 @@ static int sha1_encrypt(const char *src, int len, char *dest, int size)
     memset(dest,0,size);
 
     SHA1Init(&context);
-    SHA1Update(&context, src, len);
-    SHA1Final(dest, &context);
+    SHA1Update(&context, (const unsigned char *) src, len);
+    SHA1Final((unsigned char *) dest, &context);
 
     if(debug) {
         memset(tmp,0,41);
-        binary_to_hex(dest,tmp,20);
+        binary_to_hex((unsigned char *) dest,tmp,20);
        /* Dont log source if we were encrypting in place :) */
         if (memcmp(src, dest, 20) != 0) {
             alog("enc_sha1: hashed from [%s] to [%s]",src,tmp); 

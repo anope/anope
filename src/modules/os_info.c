@@ -72,8 +72,6 @@ int AnopeInit(int argc, char **argv)
     Command *c;
     EvtHook *hook = NULL;
 
-    int status;
-
     moduleAddAuthor(AUTHOR);
     moduleAddVersion(VERSION);
     moduleSetType(SUPPORTED);
@@ -85,26 +83,26 @@ int AnopeInit(int argc, char **argv)
 
     c = createCommand("oInfo", myAddNickInfo, is_oper, -1, -1, -1, -1, -1);
     moduleAddHelp(c, mNickHelp);
-    status = moduleAddCommand(NICKSERV, c, MOD_HEAD);
+    moduleAddCommand(NICKSERV, c, MOD_HEAD);
 
     c = createCommand("Info", myNickInfo, NULL, -1, -1, -1, -1, -1);
-    status = moduleAddCommand(NICKSERV, c, MOD_TAIL);
+    moduleAddCommand(NICKSERV, c, MOD_TAIL);
 
     c = createCommand("oInfo", myAddChanInfo, is_oper, -1, -1, -1, -1, -1);
     moduleAddHelp(c, mChanHelp);
-    status = moduleAddCommand(CHANSERV, c, MOD_HEAD);
+    moduleAddCommand(CHANSERV, c, MOD_HEAD);
 
     c = createCommand("Info", myChanInfo, NULL, -1, -1, -1, -1, -1);
-    status = moduleAddCommand(CHANSERV, c, MOD_TAIL);
+    moduleAddCommand(CHANSERV, c, MOD_TAIL);
 
     hook = createEventHook(EVENT_DB_SAVING, mSaveData);
-    status = moduleAddEventHook(hook);
+    moduleAddEventHook(hook);
 
     hook = createEventHook(EVENT_DB_BACKUP, mBackupData);
-    status = moduleAddEventHook(hook);
+    moduleAddEventHook(hook);
 
     hook = createEventHook(EVENT_RELOAD, mEventReload);
-    status = moduleAddEventHook(hook);
+    moduleAddEventHook(hook);
 
     moduleSetNickHelp(mMainNickHelp);
     moduleSetChanHelp(mMainChanHelp);

@@ -48,11 +48,16 @@ class CommandHelp : public Command
 				service_reference<Command> c("Command", info.name);
 				if (!c)
 					continue;
-				if (!Config->HidePrivilegedCommands || info.permission.empty() || source.HasCommand(info.permission))
-				{
-					source.command = c_name;
-					c->OnServHelp(source);
-				}
+				else if (!Config->HidePrivilegedCommands)
+					; // Always show with HidePrivilegedCommands disabled
+				else if (!c->HasFlag(CFLAG_ALLOW_UNREGISTERED) && !source.GetAccount())
+					continue;
+				else if (!info.permission.empty() && !source.HasCommand(info.permission))
+					continue;
+
+				source.command = c_name;
+				c->OnServHelp(source);
+
 			}
 		}
 		else
@@ -74,9 +79,12 @@ class CommandHelp : public Command
 				service_reference<Command> c("Command", info.name);
 				if (!c)
 					continue;
-
-				if (Config->HidePrivilegedCommands && !info.permission.empty() && !source.HasCommand(info.permission))
+				else if (!Config->HidePrivilegedCommands)
+					; // Always show with HidePrivilegedCommands disabled
+				else if (!info.permission.empty() && !source.HasCommand(info.permission))
 					continue;
+				
+				// Allow unregistered users to see help for commands that they explicitly request help for
 
 				const Anope::string &subcommand = params.size() > max ? params[max] : "";
 				source.command = full_command;

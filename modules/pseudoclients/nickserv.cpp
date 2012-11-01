@@ -344,7 +344,8 @@ class NickServCore : public Module
 				"to identify for the nick, and may view the access list for\n"
 				"any nickname."));
 		if (Config->NSExpire >= 86400)
-			source.Reply(_("Nicknames that are not used anymore are subject to \n"
+			source.Reply(_(" \n"
+				"Nicknames that are not used anymore are subject to \n"
 				"the automatic expiration, i.e. they will be deleted\n"
 				"after %d days if not used."), Config->NSExpire / 86400);
 		source.Reply(_(" \n"

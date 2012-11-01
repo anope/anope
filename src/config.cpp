@@ -1251,7 +1251,7 @@ ConfigItems::ConfigItems(ServerConfig *conf)
 		{"options", "ulineservers", "", new ValueContainerString(&UlineServers), DT_STRING, NoValidation},
 		{"options", "botmodes", "", new ValueContainerString(&conf->BotModes), DT_STRING, NoValidation},
 		{"options", "retrywait", "60", new ValueContainerInt(&conf->RetryWait), DT_INTEGER, ValidateNotZero},
-		{"options", "hideprivilegedcommands", "no", new ValueContainerBool(&conf->HidePrivilegedCommands), DT_BOOLEAN, NoValidation},
+		{"options", "hideprivilegedcommands", "yes", new ValueContainerBool(&conf->HidePrivilegedCommands), DT_BOOLEAN, NoValidation},
 		{"options", "nonicknameownership", "no", new ValueContainerBool(&conf->NoNicknameOwnership), DT_BOOLEAN | DT_NORELOAD, NoValidation},
 		{"options", "regexengine", "", new ValueContainerString(&conf->RegexEngine), DT_STRING, NoValidation},
 		{"nickserv", "name", "", new ValueContainerString(&conf->NickServ), DT_STRING, NoValidation},

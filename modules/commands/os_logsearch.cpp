@@ -92,7 +92,7 @@ class CommandOSLogSearch : public Command
 		Log(LOG_ADMIN, source, this) << "for " << search_string;
 
 		std::list<Anope::string> matches;
-		for (int d = 0; d < days; ++d)
+		for (int d = days - 1; d >= 0; --d)
 		{
 			Anope::string lf_name = CreateLogName(logfile_name, Anope::CurTime - (d * 86400));
 			Log(LOG_DEBUG) << "Searching " << lf_name;
@@ -136,7 +136,7 @@ class CommandOSLogSearch : public Command
 				"to 50.\n"
 				"\n"
 				"For example:\n"
-				"    \2LOGSEARCH 21d 500l Anope\2\n"
+				"    \2LOGSEARCH +21d +500l Anope\2\n"
 				"      Searches the last 21 days worth of logs for messages\n"
 				"      containing Anope and lists the most recent 500 of them.\n"));
 		return true;

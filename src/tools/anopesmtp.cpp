@@ -119,7 +119,7 @@ void alog(const char *fmt, ...)
 		return;
 
 	std::fstream file;
-	file.open(get_logname().c_str(), std::ios_base::out);
+	file.open(get_logname().c_str(), std::ios_base::out | std::ios_base::app);
 
 	if (!file.is_open())
 		return;

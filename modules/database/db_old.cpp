@@ -82,6 +82,13 @@ else \
 #define OLD_BS_KICK_FLOOD		0x02000000
 #define OLD_BS_KICK_REPEAT		0x01000000
 
+struct ExtensibleItemUint32 : ExtensibleItem
+{
+	uint32_t u;
+	ExtensibleItemUint32(uint32_t i) : u(i) { }
+};
+
+
 static struct mlock_info
 {
 	char c;
@@ -819,9 +826,9 @@ static void LoadChannels()
 			}
 
 			READ(read_uint32(&tmpu32, f)); // mlock on
-			process_mlock(ci, tmpu32, true);
+			ci->Extend("mlock_on", new ExtensibleItemUint32(tmpu32));
 			READ(read_uint32(&tmpu32, f)); // mlock off
-			process_mlock(ci, tmpu32, false);
+			ci->Extend("mlock_off", new ExtensibleItemUint32(tmpu32));
 			READ(read_uint32(&tmpu32, f)); // mlock limit
 			READ(read_string(buffer, f));
 			READ(read_string(buffer, f));
@@ -1044,7 +1051,7 @@ class DBOld : public Module
 	{
 		this->SetAuthor("Anope");
 
-		Implementation i[] = { I_OnLoadDatabase };
+		Implementation i[] = { I_OnLoadDatabase, I_OnUplinkSync };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 
 		ConfigReader conf;
@@ -1063,6 +1070,28 @@ class DBOld : public Module
 		LoadOper();
 
 		return EVENT_STOP;
+	}
+
+	void OnUplinkSync(Server *s) anope_override
+	{
+		ExtensibleItemUint32 *mlock;
+		for (registered_channel_map::iterator it = RegisteredChannelList->begin(), it_end = RegisteredChannelList->end(); it != it_end; ++it)
+		{
+			ChannelInfo *ci = it->second;
+			if (ci->HasExt("mlock_on"))
+			{
+				mlock = ci->GetExt<ExtensibleItemUint32 *>("mlock_on");
+				process_mlock(ci, mlock->u, true);
+				ci->Shrink("mlock_on");
+			}
+
+			if (ci->HasExt("mlock_off"))
+			{
+				mlock = ci->GetExt<ExtensibleItemUint32 *>("mlock_off");
+				process_mlock(ci, mlock->u, false);
+				ci->Shrink("mlock_off");
+			}
+		}
 	}
 };
 

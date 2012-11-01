@@ -11,6 +11,7 @@
 /*************************************************************************/
 
 #include "module.h"
+#include "../commands/os_session.h"
 
 #define READ(x) \
 if (true) \
@@ -1044,6 +1045,44 @@ static void LoadOper()
 	close_db(f);
 }
 
+static void LoadExceptions()
+{
+	dbFILE *f = open_db_read("OperServ", "exception.db", 9);
+	if (f == NULL)
+		return;
+	
+	int16_t num;
+	READ(read_int16(&num, f));
+	for (int i = 0; i < num; ++i)
+	{
+		Anope::string mask, reason;
+		int16_t limit;
+		char who[32];
+		int32_t time, expires;
+
+		READ(read_string(mask, f));
+		READ(read_int16(&limit, f));
+		READ(read_buffer(who, f));
+		READ(read_string(reason, f));
+		READ(read_int32(&time, f));
+		READ(read_int32(&expires, f));
+
+		Exception *exception = new Exception();
+		exception->mask = mask;
+		exception->limit = limit;
+		exception->who = who;
+		exception->time = time;
+		exception->expires = expires;
+		exception->reason = reason;
+		if (session_service)
+			session_service->AddException(exception);
+		else
+			delete exception;
+	}
+
+	close_db(f);
+}
+
 class DBOld : public Module
 {
  public:
@@ -1068,6 +1107,7 @@ class DBOld : public Module
 		LoadBots();
 		LoadChannels();
 		LoadOper();
+		LoadExceptions();
 
 		return EVENT_STOP;
 	}

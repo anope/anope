@@ -20,6 +20,7 @@ enum TypeInfo
 };
 
 struct SeenInfo;
+static SeenInfo *FindInfo(const Anope::string &nick);
 typedef Anope::insensitive_map<SeenInfo *> database_map;
 database_map database;
 
@@ -58,7 +59,12 @@ struct SeenInfo : Serializable
 		if (obj)
 			s = anope_dynamic_static_cast<SeenInfo *>(obj);
 		else
-			s = new SeenInfo();
+		{
+			/* ignore duplicate entries in the db, created by an old bug */
+			s = FindInfo(data["nick"].str());
+			if (!s)
+				s = new SeenInfo();
+		}
 
 		data["nick"] >> s->nick;
 		data["vhost"] >> s->vhost;

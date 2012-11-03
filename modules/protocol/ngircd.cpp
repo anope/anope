@@ -19,6 +19,7 @@ class ngIRCdProto : public IRCDProto
 	ngIRCdProto() : IRCDProto("ngIRCd")
 	{
 		DefaultPseudoclientModes = "+oi";
+		CanSVSNick = true;
 		MaxModes = 5;
 	}
 
@@ -55,6 +56,11 @@ class ngIRCdProto : public IRCDProto
 		SendServer(Me);
 		/* finish the enhanced server handshake and register the connection */
 		this->SendNumeric(376, "*", ":End of MOTD command");
+	}
+
+	void SendForceNickChange(const User *u, const Anope::string &newnick, time_t when) anope_override
+	{
+		UplinkSocket::Message(Me) << "SVSNICK " << u->nick << " " << newnick;
 	}
 
 	void SendGlobalNotice(const BotInfo *bi, const Server *dest, const Anope::string &msg) anope_override

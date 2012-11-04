@@ -8,26 +8,11 @@
 
 class AnopeXMLRPC
 {
-	private $Host, $Bind, $Port;
+	private $Host;
 
-	private $Socket;
-
-	function __construct($Host, $Port, $Bind = NULL)
+	function __construct($Host)
 	{
 		$this->Host = $Host;
-		$this->Port = $Port;
-		$this->Bind = $Bind;
-
-		$this->Socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
-		if ($Bind && socket_bind($this->Socket, $this->Bind) == false)
-			$his->Socket = false;
-		if (socket_connect($this->Socket, $this->Host, $this->Port) == false)
-			$this->Socket = false;
-	}
-
-	function __destruct()
-	{
-		@socket_close($this->Socket);
 	}
 
 	/** Run an XMLRPC command. Name should be a query name and params an array of parameters, eg:
@@ -40,10 +25,12 @@ class AnopeXMLRPC
 	function RunXMLRPC($name, $params)
 	{
 		$xmlquery = xmlrpc_encode_request($name, $params);
-		socket_write($this->Socket, $xmlquery);
+		$context = stream_context_create(array("http" => array(
+			"method" => "POST",
+			"header" => "Content-Type: text/xml",
+			"content" => $xmlquery)));
 
-		$inbuf = socket_read($this->Socket, 4096);
-		$inbuf = substr($inbuf, strpos($inbuf, "\r\n\r\n") + 4);
+		$inbuf = file_get_contents($this->Host, false, $context);
 		$response = xmlrpc_decode($inbuf);
 
 		if (isset($response[0]))
@@ -97,5 +84,7 @@ class AnopeXMLRPC
 		return $this->RunXMLRPC("user", array($User));
 	}
 }
+
+$anopexmlrpc = new AnopeXMLRPC("http://127.0.0.1:8080/xmlrpc");
 
 ?>

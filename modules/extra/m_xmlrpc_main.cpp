@@ -6,70 +6,80 @@ static Module *me;
 class XMLRPCIdentifyRequest : public IdentifyRequest
 {
 	XMLRPCRequest request;
+	HTTPReply repl; /* Request holds a reference to the HTTPReply, because we might exist long enough to invalidate it
+	                   we'll copy it here then reset the reference before we use it */
+	dynamic_reference<HTTPClient> client;
 	dynamic_reference<XMLRPCServiceInterface> xinterface;
-	dynamic_reference<XMLRPCClientSocket> source;
 
  public:
-	XMLRPCIdentifyRequest(Module *m, XMLRPCRequest& req, XMLRPCServiceInterface* iface, XMLRPCClientSocket* s, const Anope::string &acc, const Anope::string &pass) : IdentifyRequest(m, acc, pass), request(req), xinterface(iface), source(s) { }
+	XMLRPCIdentifyRequest(Module *m, XMLRPCRequest& req, HTTPClient *c, XMLRPCServiceInterface* iface, const Anope::string &acc, const Anope::string &pass) : IdentifyRequest(m, acc, pass), request(req), repl(request.r), client(c), xinterface(iface) { }
 
 	void OnSuccess() anope_override
 	{
-		if (!xinterface || !source)
+		if (!xinterface || !client)
 			return;
+
+		request.r = this->repl;
 
 		request.reply("result", "Success");
 		request.reply("account", GetAccount());
 
-		xinterface->Reply(source, &request);
+		xinterface->Reply(request);
+		client->SendReply(&request.r);
 	}
 
 	void OnFail() anope_override
 	{
-		if (!xinterface || !source)
+		if (!xinterface || !client)
 			return;
+
+		request.r = this->repl;
 
 		request.reply("error", "Invalid password");
 
-		xinterface->Reply(source, &request);
+		xinterface->Reply(request);
+		client->SendReply(&request.r);
 	}
 };
 
 class MyXMLRPCEvent : public XMLRPCEvent
 {
  public:
-	void Run(XMLRPCServiceInterface *iface, XMLRPCClientSocket *source, XMLRPCRequest *request) anope_override
+	bool Run(XMLRPCServiceInterface *iface, HTTPClient *client, XMLRPCRequest &request) anope_override
 	{
-		if (request->name == "command")
-			this->DoCommand(iface, source, request);
-		else if (request->name == "checkAuthentication")
-			this->DoCheckAuthentication(iface, source, request);
-		else if (request->name == "stats")
-			this->DoStats(iface, source, request);
-		else if (request->name == "channel")
-			this->DoChannel(iface, source, request);
-		else if (request->name == "user")
-			this->DoUser(iface, source, request);
-		else if (request->name == "opers")
-			this->DoOperType(iface, source, request);
+		if (request.name == "command")
+			this->DoCommand(iface, client, request);
+		else if (request.name == "checkAuthentication")
+			return this->DoCheckAuthentication(iface, client, request);
+		else if (request.name == "stats")
+			this->DoStats(iface, client, request);
+		else if (request.name == "channel")
+			this->DoChannel(iface, client, request);
+		else if (request.name == "user")
+			this->DoUser(iface, client, request);
+		else if (request.name == "opers")
+			this->DoOperType(iface, client, request);
+
+		return true;
 	}
 
  private:
-	void DoCommand(XMLRPCServiceInterface *iface, XMLRPCClientSocket *, XMLRPCRequest *request)
+	void DoCommand(XMLRPCServiceInterface *iface, HTTPClient *client, XMLRPCRequest &request)
 	{
-		Anope::string service = request->data.size() > 0 ? request->data[0] : "";
-		Anope::string user = request->data.size() > 1 ? request->data[1] : "";
-		Anope::string command = request->data.size() > 2 ? request->data[2] : "";
+		Anope::string service = request.data.size() > 0 ? request.data[0] : "";
+		Anope::string user = request.data.size() > 1 ? request.data[1] : "";
+		Anope::string command = request.data.size() > 2 ? request.data[2] : "";
 
 		if (service.empty() || user.empty() || command.empty())
-			request->reply("error", "Invalid parameters");
+			request.reply("error", "Invalid parameters");
 		else
 		{
 			BotInfo *bi = findbot(service);
 			if (!bi)
-				request->reply("error", "Invalid service");
+				request.reply("error", "Invalid service");
 			else
 			{
-				request->reply("result", "Success");
+				request.reply("result", "Success");
 
 				NickAlias *na = findnick(user);
 
@@ -92,71 +102,74 @@ class MyXMLRPCEvent : public XMLRPCEvent
 				RunCommand(source, command);
 
 				if (!out.empty())
-					request->reply("return", iface->Sanitize(out));
+					request.reply("return", iface->Sanitize(out));
 			}
 		}
 	}
 
-	void DoCheckAuthentication(XMLRPCServiceInterface *iface, XMLRPCClientSocket *source, XMLRPCRequest *request)
+	bool DoCheckAuthentication(XMLRPCServiceInterface *iface, HTTPClient *client, XMLRPCRequest &request)
 	{
-		Anope::string username = request->data.size() > 0 ? request->data[0] : "";
-		Anope::string password = request->data.size() > 1 ? request->data[1] : "";
+		Anope::string username = request.data.size() > 0 ? request.data[0] : "";
+		Anope::string password = request.data.size() > 1 ? request.data[1] : "";
 
 		if (username.empty() || password.empty())
-			request->reply("error", "Invalid parameters");
+			request.reply("error", "Invalid parameters");
 		else
 		{
-			XMLRPCIdentifyRequest *req = new XMLRPCIdentifyRequest(me, *request, iface, source, username, password);
+			XMLRPCIdentifyRequest *req = new XMLRPCIdentifyRequest(me, request, client, iface, username, password);
 			FOREACH_MOD(I_OnCheckAuthentication, OnCheckAuthentication(NULL, req));
 			req->Dispatch();
+			return false;
 		}
+		
+		return true;
 	}
 
-	void DoStats(XMLRPCServiceInterface *iface, XMLRPCClientSocket *source, XMLRPCRequest *request)
+	void DoStats(XMLRPCServiceInterface *iface, HTTPClient *client, XMLRPCRequest &request)
 	{
-		request->reply("uptime", stringify(Anope::CurTime - start_time));
-		request->reply("uplinkname", Me->GetLinks().front()->GetName());
+		request.reply("uptime", stringify(Anope::CurTime - start_time));
+		request.reply("uplinkname", Me->GetLinks().front()->GetName());
 		{
 			Anope::string buf;
 			for (std::set<Anope::string>::iterator it = Capab.begin(); it != Capab.end(); ++it)
 				buf += " " + *it;
 			if (!buf.empty())
 				buf.erase(buf.begin());
-			request->reply("uplinkcapab", buf);
+			request.reply("uplinkcapab", buf);
 		}
-		request->reply("usercount", stringify(usercnt));
-		request->reply("maxusercount", stringify(maxusercnt));
-		request->reply("channelcount", stringify(ChannelList.size()));
+		request.reply("usercount", stringify(usercnt));
+		request.reply("maxusercount", stringify(maxusercnt));
+		request.reply("channelcount", stringify(ChannelList.size()));
 	}
 
-	void DoChannel(XMLRPCServiceInterface *iface, XMLRPCClientSocket *source, XMLRPCRequest *request)
+	void DoChannel(XMLRPCServiceInterface *iface, HTTPClient *client, XMLRPCRequest &request)
 	{
-		if (request->data.empty())
+		if (request.data.empty())
 			return;
 
-		Channel *c = findchan(request->data[0]);
+		Channel *c = findchan(request.data[0]);
 
-		request->reply("name", iface->Sanitize(c ? c->name : request->data[0]));
+		request.reply("name", iface->Sanitize(c ? c->name : request.data[0]));
 
 		if (c)
 		{
-			request->reply("bancount", stringify(c->HasMode(CMODE_BAN)));
+			request.reply("bancount", stringify(c->HasMode(CMODE_BAN)));
 			int count = 0;
 			std::pair<Channel::ModeList::iterator, Channel::ModeList::iterator> its = c->GetModeList(CMODE_BAN);
 			for (; its.first != its.second; ++its.first)
-				request->reply("ban" + stringify(++count), iface->Sanitize(its.first->second));
+				request.reply("ban" + stringify(++count), iface->Sanitize(its.first->second));
 
-			request->reply("exceptcount", stringify(c->HasMode(CMODE_EXCEPT)));
+			request.reply("exceptcount", stringify(c->HasMode(CMODE_EXCEPT)));
 			count = 0;
 			its = c->GetModeList(CMODE_EXCEPT);
 			for (; its.first != its.second; ++its.first)
-				request->reply("except" + stringify(++count), iface->Sanitize(its.first->second));
+				request.reply("except" + stringify(++count), iface->Sanitize(its.first->second));
 
-			request->reply("invitecount", stringify(c->HasMode(CMODE_INVITEOVERRIDE)));
+			request.reply("invitecount", stringify(c->HasMode(CMODE_INVITEOVERRIDE)));
 			count = 0;
 			its = c->GetModeList(CMODE_INVITEOVERRIDE);
 			for (; its.first != its.second; ++its.first)
-				request->reply("invite" + stringify(++count), iface->Sanitize(its.first->second));
+				request.reply("invite" + stringify(++count), iface->Sanitize(its.first->second));
 
 			Anope::string users;
 			for (CUserList::const_iterator it = c->users.begin(); it != c->users.end(); ++it)
@@ -167,47 +180,47 @@ class MyXMLRPCEvent : public XMLRPCEvent
 			if (!users.empty())
 			{
 				users.erase(users.length() - 1);
-				request->reply("users", iface->Sanitize(users));
+				request.reply("users", iface->Sanitize(users));
 			}
 
 			if (!c->topic.empty())
-				request->reply("topic", iface->Sanitize(c->topic));
+				request.reply("topic", iface->Sanitize(c->topic));
 
 			if (!c->topic_setter.empty())
-				request->reply("topicsetter", iface->Sanitize(c->topic_setter));
+				request.reply("topicsetter", iface->Sanitize(c->topic_setter));
 
-			request->reply("topictime", stringify(c->topic_time));
-			request->reply("topicts", stringify(c->topic_ts));
+			request.reply("topictime", stringify(c->topic_time));
+			request.reply("topicts", stringify(c->topic_ts));
 		}
 	}
 
-	void DoUser(XMLRPCServiceInterface *iface, XMLRPCClientSocket *source, XMLRPCRequest *request)
+	void DoUser(XMLRPCServiceInterface *iface, HTTPClient *client, XMLRPCRequest &request)
 	{
-		if (request->data.empty())
+		if (request.data.empty())
 			return;
 
-		User *u = finduser(request->data[0]);
+		User *u = finduser(request.data[0]);
 
-		request->reply("nick", iface->Sanitize(u ? u->nick : request->data[0]));
+		request.reply("nick", iface->Sanitize(u ? u->nick : request.data[0]));
 
 		if (u)
 		{
-			request->reply("ident", iface->Sanitize(u->GetIdent()));
-			request->reply("vident", iface->Sanitize(u->GetVIdent()));
-			request->reply("host", iface->Sanitize(u->host));
+			request.reply("ident", iface->Sanitize(u->GetIdent()));
+			request.reply("vident", iface->Sanitize(u->GetVIdent()));
+			request.reply("host", iface->Sanitize(u->host));
 			if (!u->vhost.empty())
-				request->reply("vhost", iface->Sanitize(u->vhost));
+				request.reply("vhost", iface->Sanitize(u->vhost));
 			if (!u->chost.empty())
-				request->reply("chost", iface->Sanitize(u->chost));
+				request.reply("chost", iface->Sanitize(u->chost));
 			if (!u->ip.empty())
-				request->reply("ip", u->ip);
-			request->reply("timestamp", stringify(u->timestamp));
-			request->reply("signon", stringify(u->signon));
+				request.reply("ip", u->ip);
+			request.reply("timestamp", stringify(u->timestamp));
+			request.reply("signon", stringify(u->signon));
 			if (u->Account())
 			{
-				request->reply("account", iface->Sanitize(u->Account()->display));
+				request.reply("account", iface->Sanitize(u->Account()->display));
 				if (u->Account()->o)
-					request->reply("opertype", iface->Sanitize(u->Account()->o->ot->GetName()));
+					request.reply("opertype", iface->Sanitize(u->Account()->o->ot->GetName()));
 			}
 
 			Anope::string channels;
@@ -219,12 +232,12 @@ class MyXMLRPCEvent : public XMLRPCEvent
 			if (!channels.empty())
 			{
 				channels.erase(channels.length() - 1);
-				request->reply("channels", channels);
+				request.reply("channels", channels);
 			}
 		}
 	}
 
-	void DoOperType(XMLRPCServiceInterface *iface, XMLRPCClientSocket *source, XMLRPCRequest *request)
+	void DoOperType(XMLRPCServiceInterface *iface, HTTPClient *client, XMLRPCRequest &request)
 	{
 		for (std::list<OperType *>::const_iterator it = Config->MyOperTypes.begin(), it_end = Config->MyOperTypes.end(); it != it_end; ++it)
 		{
@@ -233,7 +246,7 @@ class MyXMLRPCEvent : public XMLRPCEvent
 				perms += " " + *it2;
 			for (std::list<Anope::string>::const_iterator it2 = (*it)->GetCommands().begin(), it2_end = (*it)->GetCommands().end(); it2 != it2_end; ++it2)
 				perms += " " + *it2;
-			request->reply((*it)->GetName(), perms);
+			request.reply((*it)->GetName(), perms);
 		}
 	}
 };
@@ -247,10 +260,10 @@ class ModuleXMLRPCMain : public Module
  public:
 	ModuleXMLRPCMain(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, SUPPORTED), xmlrpc("XMLRPCServiceInterface", "xmlrpc")
 	{
+		me = this;
+
 		if (!xmlrpc)
 			throw ModuleException("Unable to find xmlrpc reference, is m_xmlrpc loaded?");
-
-		me = this;
 
 		xmlrpc->Register(&stats);
 	}

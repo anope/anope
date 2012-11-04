@@ -40,7 +40,7 @@ class MyHTTPClient : public HTTPClient
 {
 	HTTPProvider *provider;
 	HTTPMessage header;
-	bool header_done;
+	bool header_done, served;
 	Anope::string page_name;
 	dynamic_reference<HTTPPage> page;
 	Anope::string ip;
@@ -54,6 +54,10 @@ class MyHTTPClient : public HTTPClient
 
 	void Serve()
 	{
+		if (this->served)
+			return;
+		this->served = true;
+
 		if (!this->page)
 		{
 			this->SendError(HTTP_PAGE_NOT_FOUND, "Page not found");
@@ -78,6 +82,7 @@ class MyHTTPClient : public HTTPClient
 		Log(LOG_DEBUG, "httpd") << "m_httpd: Serving page " << this->page_name << " to " << this->ip;
 
 		HTTPReply reply;
+		reply.content_type = this->page->GetContentType();
 
 		if (this->page->OnRequest(this->provider, this->page_name, this, this->header, reply))
 			this->SendReply(&reply);
@@ -86,7 +91,7 @@ class MyHTTPClient : public HTTPClient
  public:
 	time_t created;
 
-	MyHTTPClient(HTTPProvider *l, int f, const sockaddrs &a) : Socket(f, l->IsIPv6()), HTTPClient(l, f, a), provider(l), header_done(false), ip(a.addr()), action(ACTION_NONE), created(Anope::CurTime)
+	MyHTTPClient(HTTPProvider *l, int f, const sockaddrs &a) : Socket(f, l->IsIPv6()), HTTPClient(l, f, a), provider(l), header_done(false), served(false), ip(a.addr()), action(ACTION_NONE), created(Anope::CurTime)
 	{
 		Log(LOG_DEBUG, "httpd") << "Accepted connection " << f << " from " << a.addr();
 	}
@@ -176,22 +181,43 @@ class MyHTTPClient : public HTTPClient
 
 				if (this->action == ACTION_POST)
 				{
-					Log(LOG_DEBUG_2) << "HTTP POST from " << this->clientaddr.addr() << ": " << this->extrabuf;
-					
-					sepstream sep(this->extrabuf, '&');
-					Anope::string token;
+					unsigned content_length = 0;
+					if (this->header.headers.count("Content-Length"))
+						try
+						{
+							content_length = convertTo<unsigned>(this->header.headers["Content-Length"]);
+						}
+						catch (const ConvertException &) { }
 
-					while (sep.GetToken(token))
+					if (this->extrabuf.length() == content_length)
 					{
-						size_t sz = token.find('=');
-						if (sz == Anope::string::npos || !sz || sz + 1 >= token.length())
-							continue;
-						this->header.post_data[token.substr(0, sz)] = HTTPUtils::URLDecode(token.substr(sz + 1));
+						Log(LOG_DEBUG_2) << "HTTP POST from " << this->clientaddr.addr() << ": " << this->extrabuf;
+					
+						sepstream sep(this->extrabuf, '&');
+						Anope::string token;
+
+						while (sep.GetToken(token))
+						{
+							size_t sz = token.find('=');
+							if (sz == Anope::string::npos || !sz || sz + 1 >= token.length())
+								continue;
+							this->header.post_data[token.substr(0, sz)] = HTTPUtils::URLDecode(token.substr(sz + 1));
+						}
+
+						this->header.content = this->extrabuf;
+						this->Serve();
 					}
 				}
-
-				this->Serve();
+				else
+					this->Serve();
 			}
+		}
+		else if (this->action == ACTION_POST)
+		{
+			if (buf.empty())
+				this->Serve();
+			else
+				this->header.content += buf;
 		}
 
 		return true;

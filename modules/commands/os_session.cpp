@@ -198,7 +198,13 @@ class CommandOSSession : public Command
 	void DoView(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		Anope::string param = params[1];
-		Session *session = session_service->FindSession(param);
+		Session *session = NULL;
+		
+		try
+		{
+			session = session_service->FindSession(param);
+		}
+		catch (const SocketException &) { }
 
 		if (!session)
 			source.Reply(_("\002%s\002 not found on session list."), param.c_str());

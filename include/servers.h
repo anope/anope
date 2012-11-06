@@ -27,7 +27,7 @@ const Anope::string ServerFlagStrings[] = { "SERVER_NONE", "SERVER_SYNCING", "SE
 
 /** Class representing a server
  */
-class CoreExport Server : public Flags<ServerFlag>
+class CoreExport Server : public Flags<ServerFlag>, public Extensible
 {
  private:
 	/* Server name */

@@ -18,31 +18,37 @@
 class CommandCSEnforce : public Command
 {
  private:
-	void DoSet(Channel *c)
+	void DoSet(CommandSource &source, Channel *c)
 	{
 		const ChannelInfo *ci = c->ci;
 
 		if (!ci)
 			return;
 
+		Log(LOG_COMMAND, source, this) << "to enforce set";
+
 		if (ci->HasFlag(CI_SECUREOPS))
-			this->DoSecureOps(c);
+			this->DoSecureOps(source, c);
 		if (ci->HasFlag(CI_RESTRICTED))
-			this->DoRestricted(c);
+			this->DoRestricted(source, c);
 	}
 
-	void DoModes(Channel *c)
+	void DoModes(CommandSource &source, Channel *c)
 	{
+		Log(LOG_COMMAND, source, this) << "to enforce modes";
+
 		if (c->HasMode(CMODE_REGISTEREDONLY))
-			this->DoCModeR(c);
+			this->DoCModeR(source, c);
 	}
 
-	void DoSecureOps(Channel *c)
+	void DoSecureOps(CommandSource &source, Channel *c)
 	{
 		ChannelInfo *ci = c->ci;
 
 		if (!ci)
 			return;
+
+		Log(LOG_COMMAND, source, this) << "to enforce secureops";
 
 		/* Dirty hack to allow chan_set_correct_modes to work ok.
 		 * We pretend like SECUREOPS is on so it doesn't ignore that
@@ -67,11 +73,13 @@ class CommandCSEnforce : public Command
 			ci->UnsetFlag(CI_SECUREOPS);
 	}
 
-	void DoRestricted(Channel *c)
+	void DoRestricted(CommandSource &source, Channel *c)
 	{
 		ChannelInfo *ci = c->ci;
 		if (ci == NULL)
 			return;
+
+		Log(LOG_COMMAND, source, this) << "to enforce restricted";
 
 		for (CUserList::iterator it = c->users.begin(), it_end = c->users.end(); it != it_end; )
 		{
@@ -89,13 +97,15 @@ class CommandCSEnforce : public Command
 		}
 	}
 
-	void DoCModeR(Channel *c)
+	void DoCModeR(CommandSource &source, Channel *c)
 	{
 		ChannelInfo *ci = c->ci;
 		Anope::string mask;
 
 		if (!ci)
 			return;
+
+		Log(LOG_COMMAND, source, this) << "to enforce registered only";
 
 		for (CUserList::iterator it = c->users.begin(), it_end = c->users.end(); it != it_end; )
 		{
@@ -134,27 +144,27 @@ class CommandCSEnforce : public Command
 		{
 			if (what.empty() || what.equals_ci("SET"))
 			{
-				this->DoSet(c);
+				this->DoSet(source, c);
 				source.Reply(_("Enforced %s"), !what.empty() ? what.c_str() : "SET");
 			}
 			else if (what.equals_ci("MODES"))
 			{
-				this->DoModes(c);
+				this->DoModes(source, c);
 				source.Reply(_("Enforced %s"), what.c_str());
 			}
 			else if (what.equals_ci("SECUREOPS"))
 			{
-				this->DoSecureOps(c);
+				this->DoSecureOps(source, c);
 				source.Reply(_("Enforced %s"), what.c_str());
 			}
 			else if (what.equals_ci("RESTRICTED"))
 			{
-				this->DoRestricted(c);
+				this->DoRestricted(source, c);
 				source.Reply(_("Enforced %s"), what.c_str());
 			}
 			else if (what.equals_ci("+R"))
 			{
-				this->DoCModeR(c);
+				this->DoCModeR(source, c);
 				source.Reply(_("Enforced %s"), what.c_str());
 			}
 			else

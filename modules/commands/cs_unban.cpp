@@ -53,6 +53,8 @@ class CommandCSUnban : public Command
 			return;
 		}
 
+		Log(LOG_COMMAND, source, this, ci) << "to unban " << u2->nick;
+
 		common_unban(ci, u2, source.GetUser() == u2);
 		if (u2 == source.GetUser())
 			source.Reply(_("You have been unbanned from \002%s\002."), ci->c->name.c_str());

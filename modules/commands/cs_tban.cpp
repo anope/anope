@@ -72,6 +72,8 @@ class CommandCSTBan : public Command
 			c->SetMode(NULL, CMODE_BAN, mask);
 			new TempBan(t, c, mask);
 
+			Log(LOG_COMMAND, source, this, c->ci) << "for " << mask << " to expire in " << duration(t);
+
 			source.Reply(_("%s banned from %s, will auto-expire in %s."), mask.c_str(), c->name.c_str(), duration(t).c_str());
 		}
 

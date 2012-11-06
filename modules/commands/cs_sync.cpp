@@ -32,6 +32,8 @@ class CommandCSSync : public Command
 			source.Reply(ACCESS_DENIED);
 		else
 		{
+			Log(LOG_COMMAND, source, this, ci);
+
 			for (CUserList::iterator it = ci->c->users.begin(), it_end = ci->c->users.end(); it != it_end; ++it)
 				chan_set_correct_modes((*it)->user, ci->c, 1, false);
 

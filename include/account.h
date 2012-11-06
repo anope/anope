@@ -306,7 +306,7 @@ class CoreExport NickCore : public Serializable, public Extensible, public Flags
 	void ClearCert();
 };
 
-class IdentifyRequest
+class CoreExport IdentifyRequest
 {
 	Module *owner;
 	Anope::string account;

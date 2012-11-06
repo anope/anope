@@ -10,6 +10,7 @@
 #include "modules.h"
 #include "extern.h"
 #include "users.h"
+#include "regchannel.h"
 
 #include <sys/types.h>
 #include <sys/stat.h>

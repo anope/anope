@@ -17,6 +17,7 @@
 #include "memo.h"
 #include "users.h"
 #include "account.h"
+#include "regchannel.h"
 
 Memo::Memo() : Flags<MemoFlag>(MemoFlagStrings), Serializable("Memo") { }
 

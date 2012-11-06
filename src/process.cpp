@@ -15,6 +15,7 @@
 #include "protocol.h"
 #include "servers.h"
 #include "users.h"
+#include "regchannel.h"
 
 /** Main process routine
  * @param buffer A raw line from the uplink to do things with

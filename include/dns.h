@@ -260,7 +260,7 @@ class CoreExport DNSManager : public Timer
 	static DNSQuery BlockingQuery(const Anope::string &mask, QueryType qt);
 };
 
-extern DNSManager *DNSEngine;
+extern CoreExport DNSManager *DNSEngine;
 
 #endif // DNS_H
 

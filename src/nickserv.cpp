@@ -14,6 +14,7 @@
 #include "modules.h"
 #include "users.h"
 #include "protocol.h"
+#include "regchannel.h"
 
 NickAlias* findnick(const Anope::string &nick)
 {

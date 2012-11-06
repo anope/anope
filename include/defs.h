@@ -33,6 +33,7 @@ class Log;
 class LogInfo;
 class Memo;
 class Message;
+class MessageSource;
 class Module;
 class NickAlias;
 class NickCore;
@@ -50,7 +51,6 @@ struct BadWord;
 struct DNSQuery;
 struct Exception;
 struct MemoInfo;
-struct MessageSource;
 struct ModeLock;
 struct Oper;
 

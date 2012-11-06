@@ -27,7 +27,7 @@ Pipe::Pipe() : Socket(-1), WritePipe(-1)
 	flags = fcntl(fds[1], F_GETFL, 0);
 	fcntl(fds[1], F_SETFL, flags | O_NONBLOCK);
 
-	this->~Socket();
+	this->~Pipe();
 
 	this->Sock = fds[0];
 	this->WritePipe = fds[1];

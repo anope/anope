@@ -14,6 +14,7 @@
 
 #include "service.h"
 #include "anope.h"
+#include "channels.h"
 
 enum CommandFlag
 {

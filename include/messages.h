@@ -5,119 +5,119 @@
  * as they see fit.
  */
 
-struct CoreIRCDMessageAway : IRCDMessage
+struct CoreExport CoreIRCDMessageAway : IRCDMessage
 {
 	CoreIRCDMessageAway(const Anope::string &mname = "AWAY") : IRCDMessage(mname, 0) { SetFlag(IRCDMESSAGE_REQUIRE_USER); SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
 
 	bool Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override;
 };
 
-struct CoreIRCDMessageCapab : IRCDMessage
+struct CoreExport CoreIRCDMessageCapab : IRCDMessage
 {
 	CoreIRCDMessageCapab(const Anope::string &mname = "CAPAB") : IRCDMessage(mname, 1) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
 
 	bool Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override;
 };
 
-struct CoreIRCDMessageError : IRCDMessage
+struct CoreExport CoreIRCDMessageError : IRCDMessage
 {
 	CoreIRCDMessageError(const Anope::string &mname = "ERROR") : IRCDMessage(mname, 1) { }
 
 	bool Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override;
 };
 
-struct CoreIRCDMessageJoin : IRCDMessage
+struct CoreExport CoreIRCDMessageJoin : IRCDMessage
 {
 	CoreIRCDMessageJoin(const Anope::string &mname = "JOIN") : IRCDMessage(mname, 1) { SetFlag(IRCDMESSAGE_REQUIRE_USER); SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
 
 	bool Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override;
 };
 
-struct CoreIRCDMessageKick : IRCDMessage
+struct CoreExport CoreIRCDMessageKick : IRCDMessage
 {
 	CoreIRCDMessageKick(const Anope::string &mname = "KICK") : IRCDMessage(mname, 2) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
 
 	bool Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override;
 };
 
-struct CoreIRCDMessageKill : IRCDMessage
+struct CoreExport CoreIRCDMessageKill : IRCDMessage
 {
 	CoreIRCDMessageKill(const Anope::string &mname = "KILL") : IRCDMessage(mname, 2) { }
 
 	bool Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override;
 };
 
-struct CoreIRCDMessageMOTD : IRCDMessage
+struct CoreExport CoreIRCDMessageMOTD : IRCDMessage
 {
 	CoreIRCDMessageMOTD(const Anope::string &mname = "MOTD") : IRCDMessage(mname, 1) { }
 
 	bool Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override;
 };
 
-struct CoreIRCDMessagePart : IRCDMessage
+struct CoreExport CoreIRCDMessagePart : IRCDMessage
 {
 	CoreIRCDMessagePart(const Anope::string &mname = "PART") : IRCDMessage(mname, 1) { SetFlag(IRCDMESSAGE_REQUIRE_USER); SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
 
 	bool Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override;
 };
 
-struct CoreIRCDMessagePing : IRCDMessage
+struct CoreExport CoreIRCDMessagePing : IRCDMessage
 {
 	CoreIRCDMessagePing(const Anope::string &mname = "PING") : IRCDMessage(mname, 1) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
 
 	bool Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override;
 };
 
-struct CoreIRCDMessagePrivmsg : IRCDMessage
+struct CoreExport CoreIRCDMessagePrivmsg : IRCDMessage
 {
 	CoreIRCDMessagePrivmsg(const Anope::string &mname = "PRIVMSG") : IRCDMessage(mname, 2) { SetFlag(IRCDMESSAGE_REQUIRE_USER); }
 
 	bool Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override;
 };
 
-struct CoreIRCDMessageQuit : IRCDMessage
+struct CoreExport CoreIRCDMessageQuit : IRCDMessage
 {
 	CoreIRCDMessageQuit(const Anope::string &mname = "QUIT") : IRCDMessage(mname, 1) { SetFlag(IRCDMESSAGE_REQUIRE_USER); }
 
 	bool Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override;
 };
 
-struct CoreIRCDMessageSQuit : IRCDMessage
+struct CoreExport CoreIRCDMessageSQuit : IRCDMessage
 {
 	CoreIRCDMessageSQuit(const Anope::string &mname = "SQUIT") : IRCDMessage(mname, 2) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
 
 	bool Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override;
 };
 
-struct CoreIRCDMessageStats : IRCDMessage
+struct CoreExport CoreIRCDMessageStats : IRCDMessage
 {
 	CoreIRCDMessageStats(const Anope::string &mname = "STATS") : IRCDMessage(mname, 1) { SetFlag(IRCDMESSAGE_REQUIRE_USER); SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
 
 	bool Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override;
 };
 
-struct CoreIRCDMessageTime : IRCDMessage
+struct CoreExport CoreIRCDMessageTime : IRCDMessage
 {
 	CoreIRCDMessageTime(const Anope::string &mname = "TIME") : IRCDMessage(mname, 0) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
 
 	bool Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override;
 };
 
-struct CoreIRCDMessageTopic : IRCDMessage
+struct CoreExport CoreIRCDMessageTopic : IRCDMessage
 {
 	CoreIRCDMessageTopic(const Anope::string &mname = "TOPIC") : IRCDMessage(mname, 2) { SetFlag(IRCDMESSAGE_REQUIRE_USER); }
 
 	bool Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override;
 };
 
-struct CoreIRCDMessageVersion : IRCDMessage
+struct CoreExport CoreIRCDMessageVersion : IRCDMessage
 {
 	CoreIRCDMessageVersion(const Anope::string &mname = "VERSION") : IRCDMessage(mname, 0) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
 
 	bool Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override;
 };
 
-struct CoreIRCDMessageWhois : IRCDMessage
+struct CoreExport CoreIRCDMessageWhois : IRCDMessage
 {
 	CoreIRCDMessageWhois(const Anope::string &mname = "WHOIS") : IRCDMessage(mname, 1) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
 

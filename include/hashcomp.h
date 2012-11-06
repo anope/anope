@@ -16,6 +16,12 @@
 #include <string>
 #include <locale>
 
+#ifndef _WIN32
+#include <tr1/unordered_map>
+#else
+#include <unordered_map>
+#endif
+
 #include "services.h"
 
 namespace Anope

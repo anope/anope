@@ -153,9 +153,14 @@ class CommandOSUserList : public Command
 		}
 		else
 		{
+			/* Historically this has been ordered, so... */
+			Anope::map<User *> ordered_map;
+			for (user_map::const_iterator it = UserListByNick.begin(); it != UserListByNick.end(); ++it)
+				ordered_map[it->first] = it->second;
+
 			source.Reply(_("Users list:"));
 
-			for (Anope::insensitive_map<User *>::iterator it = UserListByNick.begin(); it != UserListByNick.end(); ++it)
+			for (Anope::map<User *>::const_iterator it = ordered_map.begin(); it != ordered_map.end(); ++it)
 			{
 				User *u2 = it->second;
 

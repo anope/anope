@@ -18,8 +18,7 @@
 #include "extern.h"
 #include "serialize.h"
 
-serialize_checker<botinfo_map> BotListByNick("BotInfo");
-serialize_checker<botinfouid_map> BotListByUID("BotInfo");
+serialize_checker<botinfo_map> BotListByNick("BotInfo"), BotListByUID("BotInfo");
 
 BotInfo::BotInfo(const Anope::string &nnick, const Anope::string &nuser, const Anope::string &nhost, const Anope::string &nreal, const Anope::string &bmodes) : User(nnick, nuser, nhost, "", "", Me, nreal, Anope::CurTime, "", ts6_uid_retrieve()), Flags<BotFlag, BI_END>(BotFlagString), Serializable("BotInfo"), botmodes(bmodes)
 {

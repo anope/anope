@@ -12,6 +12,7 @@
 /*************************************************************************/
 
 #include "module.h"
+#include "os_session.h"
 
 struct Stats : Serializable
 {
@@ -155,12 +156,52 @@ class CommandOSStats : public Command
 		return;
 	}
 
+	template<typename T> void GetHashStats(const T& map, size_t& entries, size_t& buckets, size_t& max_chain)
+	{
+		entries = map.size(), buckets = map.bucket_count(), max_chain = 0;
+		for (size_t i = 0; i < buckets; ++i)
+			if (map.bucket_size(i) > max_chain)
+				max_chain = map.bucket_size(i);
+	}
+
+	void DoStatsHash(CommandSource &source)
+	{
+		size_t entries, buckets, max_chain;
+
+		GetHashStats(UserListByNick, entries, buckets, max_chain);
+		source.Reply(_("Users (nick): %lu entries, %lu buckets, longest chain is %d"), entries, buckets, max_chain);
+
+		if (!UserListByUID.empty())
+		{
+			GetHashStats(UserListByUID, entries, buckets, max_chain);
+			source.Reply(_("Users (uid): %lu entries, %lu buckets, longest chain is %d"), entries, buckets, max_chain);
+		}
+
+		GetHashStats(ChannelList, entries, buckets, max_chain);
+		source.Reply(_("Channels: %lu entries, %lu buckets, longest chain is %d"), entries, buckets, max_chain);
+
+		GetHashStats(*RegisteredChannelList, entries, buckets, max_chain);
+		source.Reply(_("Registered channels: %lu entries, %lu buckets, longest chain is %d"), entries, buckets, max_chain);
+
+		GetHashStats(*NickAliasList, entries, buckets, max_chain);
+		source.Reply(_("Registered nicknames: %lu entries, %lu buckets, longest chain is %d"), entries, buckets, max_chain);
+
+		GetHashStats(*NickCoreList, entries, buckets, max_chain);
+		source.Reply(_("Registered nick groups: %lu entries, %lu buckets, longest chain is %d"), entries, buckets, max_chain);
+
+		if (session_service)
+		{
+			GetHashStats(session_service->GetSessions(), entries, buckets, max_chain);
+			source.Reply(_("Sessions: %lu entries, %lu buckets, longest chain is %d"), entries, buckets, max_chain);
+		}
+	}
+
  public:
 	CommandOSStats(Module *creator) : Command(creator, "operserv/stats", 0, 1),
 		akills("XLineManager", "xlinemanager/sgline"), snlines("XLineManager", "xlinemanager/snline"), sqlines("XLineManager", "xlinemanager/sqline")
 	{
 		this->SetDesc(_("Show status of Services and network"));
-		this->SetSyntax(_("[AKILL | ALL | RESET | UPLINK]"));
+		this->SetSyntax(_("[AKILL | ALL | HASH | RESET | UPLINK]"));
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
@@ -179,7 +220,10 @@ class CommandOSStats : public Command
 		if (extra.equals_ci("ALL") || extra.equals_ci("UPLINK"))
 			this->DoStatsUplink(source);
 
-		if (!extra.empty() && !extra.equals_ci("ALL") && !extra.equals_ci("AKILL") && !extra.equals_ci("UPLINK"))
+		if (extra.equals_ci("ALL") || extra.equals_ci("HASH"))
+			this->DoStatsHash(source);
+
+		if (!extra.empty() && !extra.equals_ci("ALL") && !extra.equals_ci("AKILL") && !extra.equals_ci("UPLINK") && !extra.equals_ci("HASH"))
 			source.Reply(_("Unknown STATS option \002%s\002."), extra.c_str());
 	}
 
@@ -199,6 +243,8 @@ class CommandOSStats : public Command
 				" \n"
 				"The \002UPLINK\002 option displays information about the current\n"
 				"server Anope uses as an uplink to the network.\n"
+				" \n"
+				"The \002HASH\002 option displays information about the hash maps.\n"
 				" \n"
 				"The \002ALL\002 displays the user and uptime statistics, and\n"
 				"everything you'd see with the \002UPLINK\002 option."));

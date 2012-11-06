@@ -20,8 +20,8 @@
 #include "memo.h"
 #include "base.h"
 
-typedef Anope::insensitive_map<NickAlias *> nickalias_map;
-typedef Anope::insensitive_map<NickCore *> nickcore_map;
+typedef Anope::hash_map<NickAlias *> nickalias_map;
+typedef Anope::hash_map<NickCore *> nickcore_map;
 
 extern CoreExport serialize_checker<nickalias_map> NickAliasList;
 extern CoreExport serialize_checker<nickcore_map> NickCoreList;

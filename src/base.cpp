@@ -6,7 +6,7 @@
 #include "access.h"
 #include "bots.h"
 
-Anope::map<Anope::map<Service *> > Service::services;
+std::map<Anope::string, std::map<Anope::string, Service *> > Service::services;
 
 void RegisterTypes()
 {

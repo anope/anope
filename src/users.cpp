@@ -22,8 +22,7 @@
 #include "opertype.h"
 #include "extern.h"
 
-Anope::insensitive_map<User *> UserListByNick;
-Anope::map<User *> UserListByUID;
+user_map UserListByNick, UserListByUID;
 
 int32_t opcnt = 0;
 uint32_t usercnt = 0, maxusercnt = 0;
@@ -856,13 +855,13 @@ User *finduser(const Anope::string &nick)
 {
 	if (isdigit(nick[0]) && ircdproto->RequiresID)
 	{
-		Anope::map<User *>::iterator it = UserListByUID.find(nick);
+		user_map::iterator it = UserListByUID.find(nick);
 		if (it != UserListByUID.end())
 			return it->second;
 	}
 	else
 	{
-		Anope::insensitive_map<User *>::iterator it = UserListByNick.find(nick);
+		user_map::iterator it = UserListByNick.find(nick);
 		if (it != UserListByNick.end())
 			return it->second;
 	}

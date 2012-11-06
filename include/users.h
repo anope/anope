@@ -15,8 +15,9 @@
 #include "commands.h"
 #include "account.h"
 
-extern CoreExport Anope::insensitive_map<User *> UserListByNick;
-extern CoreExport Anope::map<User *> UserListByUID;
+typedef Anope::hash_map<User *> user_map;
+
+extern CoreExport user_map UserListByNick, UserListByUID;
 
 class CoreExport ChannelStatus : public Flags<ChannelModeName, CMODE_END * 2>
 {

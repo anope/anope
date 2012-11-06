@@ -14,11 +14,9 @@
 #include "commands.h"
 
 
-typedef Anope::insensitive_map<BotInfo *> botinfo_map;
-typedef Anope::map<BotInfo *> botinfouid_map;
+typedef Anope::map<BotInfo *> botinfo_map;
 
-extern CoreExport serialize_checker<botinfo_map> BotListByNick;
-extern CoreExport serialize_checker<botinfouid_map> BotListByUID;
+extern CoreExport serialize_checker<botinfo_map> BotListByNick, BotListByUID;
 
 /** Flags settable on a bot
  */

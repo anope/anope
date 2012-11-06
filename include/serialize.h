@@ -109,7 +109,7 @@ class CoreExport SerializeType
 	typedef Serializable* (*unserialize_func)(Serializable *obj, Serialize::Data &);
 
 	static std::vector<Anope::string> type_order;
-	static Anope::map<SerializeType *> types;
+	static std::map<Anope::string, SerializeType *> types;
 
 	Anope::string name;
 	unserialize_func unserialize;

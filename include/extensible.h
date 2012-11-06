@@ -25,7 +25,7 @@ template<typename T> struct CoreExport ExtensibleItemClass : T, ExtensibleItem
 class CoreExport Extensible
 {
  private:
- 	typedef Anope::map<ExtensibleItem *> extensible_map;
+ 	typedef std::map<Anope::string, ExtensibleItem *> extensible_map;
 	extensible_map extension_items;
 
  public:

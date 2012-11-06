@@ -121,7 +121,7 @@ class OSLogin : public Module
 
 	~OSLogin()
 	{
-		for (Anope::insensitive_map<User *>::const_iterator it = UserListByNick.begin(); it != UserListByNick.end(); ++it)
+		for (user_map::const_iterator it = UserListByNick.begin(); it != UserListByNick.end(); ++it)
 			it->second->Shrink("os_login_password_correct");
 	}
 

@@ -30,7 +30,7 @@ const Anope::string CommandFlagStrings[] = {
 
 struct CommandInfo
 {
-	typedef Anope::insensitive_map<CommandInfo> map;
+	typedef Anope::map<CommandInfo> map;
 
 	Anope::string name;
 	Anope::string permission;

@@ -14,7 +14,8 @@
 #include "modes.h"
 #include "serialize.h"
 
-typedef Anope::insensitive_map<Channel *> channel_map;
+typedef Anope::hash_map<Channel *> channel_map;
+
 extern CoreExport channel_map ChannelList;
 
 struct UserContainer : public Extensible

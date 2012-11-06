@@ -95,7 +95,7 @@ class CommandCSAKick : public Command
 		{
 			/* Match against all currently online users with equal or
 			 * higher access. - Viper */
-			for (Anope::insensitive_map<User *>::iterator it = UserListByNick.begin(), it_end = UserListByNick.end(); it != it_end; ++it)
+			for (user_map::const_iterator it = UserListByNick.begin(); it != UserListByNick.end(); ++it)
 			{
 				User *u2 = it->second;
 

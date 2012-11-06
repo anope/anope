@@ -17,14 +17,14 @@
 
 class CoreExport Service : public virtual Base
 {
-	static Anope::map<Anope::map<Service *> > services;
+	static std::map<Anope::string, std::map<Anope::string, Service *> > services;
  public:
  	static Service *FindService(const Anope::string &t, const Anope::string &n)
 	{
-		Anope::map<Anope::map<Service *> >::iterator it = services.find(t);
+		std::map<Anope::string, std::map<Anope::string, Service *> >::iterator it = services.find(t);
 		if (it != services.end())
 		{
-			Anope::map<Service *>::iterator it2 = it->second.find(n);
+			std::map<Anope::string, Service *>::iterator it2 = it->second.find(n);
 			if (it2 != it->second.end())
 				return it2->second;
 		}
@@ -35,9 +35,9 @@ class CoreExport Service : public virtual Base
 	static std::vector<Anope::string> GetServiceKeys(const Anope::string &t)
 	{
 		std::vector<Anope::string> keys;
-		Anope::map<Anope::map<Service *> >::iterator it = services.find(t);
+		std::map<Anope::string, std::map<Anope::string, Service *> >::iterator it = services.find(t);
 		if (it != services.end())
-			for (Anope::map<Service *>::iterator it2 = it->second.begin(); it2 != it->second.end(); ++it2)
+			for (std::map<Anope::string, Service *>::iterator it2 = it->second.begin(); it2 != it->second.end(); ++it2)
 				keys.push_back(it2->first);
 		return keys;
 	}
@@ -58,7 +58,7 @@ class CoreExport Service : public virtual Base
 
 	void Register()
 	{
-		Anope::map<Service *> &smap = services[this->type];
+		std::map<Anope::string, Service *> &smap = services[this->type];
 		if (smap.find(this->name) != smap.end())
 			throw ModuleException("Service " + this->type + " with name " + this->name + " already exists");
 		smap[this->name] = this;
@@ -66,7 +66,7 @@ class CoreExport Service : public virtual Base
 
 	void Unregister()
 	{
-		Anope::map<Service *> &smap = services[this->type];
+		std::map<Anope::string, Service *> &smap = services[this->type];
 		smap.erase(this->name);
 		if (smap.empty())
 			services.erase(this->type);

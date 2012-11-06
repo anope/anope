@@ -107,7 +107,7 @@ class PlexusProto : public IRCDProto
 			if (!u)
 			{
 				/* No user (this akill was just added), and contains nick and/or realname. Find users that match and ban them */
-				for (Anope::insensitive_map<User *>::const_iterator it = UserListByNick.begin(); it != UserListByNick.end(); ++it)
+				for (user_map::const_iterator it = UserListByNick.begin(); it != UserListByNick.end(); ++it)
 					if (x->manager->Check(it->second, x))
 						this->SendAkill(it->second, x);
 				return;
@@ -757,7 +757,7 @@ class ProtoPlexus : public Module
 	void OnServerSync(Server *s) anope_override
 	{
 		if (nickserv)
-			for (Anope::insensitive_map<User *>::iterator it = UserListByNick.begin(); it != UserListByNick.end(); ++it)
+			for (user_map::const_iterator it = UserListByNick.begin(); it != UserListByNick.end(); ++it)
 			{
 				User *u = it->second;
 				if (u->server == s && !u->IsIdentified())

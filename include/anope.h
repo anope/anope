@@ -15,9 +15,6 @@
 
 namespace Anope
 {
-	template<typename T> class map : public std::map<string, T> { };
-	template<typename T> class insensitive_map : public std::map<string, T, ci::less> { };
-
 	/**
 	 * A wrapper string class around all the other string classes, this class will
 	 * allow us to only require one type of string everywhere that can be converted
@@ -232,7 +229,7 @@ namespace Anope
 		/**
 		 * Get the string in lowercase.
 		 */
-		inline string lower()
+		inline string lower() const
 		{
 			Anope::string new_string = *this;
 			for (size_type i = 0; i < new_string.length(); ++i)
@@ -243,7 +240,7 @@ namespace Anope
 		/**
 		 * Get the string in uppercase.
 		 */
-		inline string upper()
+		inline string upper() const
 		{
 			Anope::string new_string = *this;
 			for (size_type i = 0; i < new_string.length(); ++i)
@@ -285,6 +282,25 @@ namespace Anope
 	inline const string operator+(char chr, const string &str) { string tmp(chr); tmp += str; return tmp; }
 	inline const string operator+(const char *_str, const string &str) { string tmp(_str); tmp += str; return tmp; }
 	inline const string operator+(const std::string &_str, const string &str) { string tmp(_str); tmp += str; return tmp; }
+
+	struct hash
+	{
+		inline size_t operator()(const string &s) const
+		{
+			return std::tr1::hash<std::string>()(s.lower().str());
+		}
+	};
+
+	struct compare
+	{
+		inline bool operator()(const string &s1, const string &s2) const
+		{
+			return s1.equals_ci(s2);
+		}
+	};
+
+	template<typename T> class map : public std::map<string, T, ci::less> { };
+	template<typename T> class hash_map : public std::tr1::unordered_map<string, T, hash, compare> { };
 
 	static const char *const compiled = __TIME__ " " __DATE__;
 

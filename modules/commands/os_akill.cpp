@@ -163,7 +163,7 @@ class CommandOSAKill : public Command
 			x->UID = XLineManager::GenerateUID();
 
 		unsigned int affected = 0;
-		for (Anope::insensitive_map<User *>::iterator it = UserListByNick.begin(); it != UserListByNick.end(); ++it)
+		for (user_map::const_iterator it = UserListByNick.begin(); it != UserListByNick.end(); ++it)
 			if (akills->Check(it->second, x))
 				++affected;
 		float percent = static_cast<float>(affected) / static_cast<float>(UserListByNick.size()) * 100.0;

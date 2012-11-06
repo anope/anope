@@ -171,7 +171,7 @@ class NSGhost : public Module
 
 	~NSGhost()
 	{
-		for (Anope::insensitive_map<User *>::iterator it = UserListByNick.begin(), it_end = UserListByNick.end(); it != it_end; ++it)
+		for (user_map::const_iterator it = UserListByNick.begin(); it != UserListByNick.end(); ++it)
 			it->second->Shrink("ns_ghost_info");
 	}
 

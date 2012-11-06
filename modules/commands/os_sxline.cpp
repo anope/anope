@@ -357,7 +357,7 @@ class CommandOSSNLine : public CommandOSSXLineBase
 			x->UID = XLineManager::GenerateUID();
 
 		unsigned int affected = 0;
-		for (Anope::insensitive_map<User *>::iterator it = UserListByNick.begin(); it != UserListByNick.end(); ++it)
+		for (user_map::const_iterator it = UserListByNick.begin(); it != UserListByNick.end(); ++it)
 			if (this->xlm()->Check(it->second, x))
 				++affected;
 		float percent = static_cast<float>(affected) / static_cast<float>(UserListByNick.size()) * 100.0;
@@ -386,7 +386,7 @@ class CommandOSSNLine : public CommandOSSXLineBase
 
 			Anope::string rreason = "G-Lined: " + reason;
 
-			for (Anope::insensitive_map<User *>::const_iterator it = UserListByNick.begin(); it != UserListByNick.end();)
+			for (user_map::const_iterator it = UserListByNick.begin(); it != UserListByNick.end(); ++it)
 			{
 				User *user = it->second;
 				++it;
@@ -560,7 +560,7 @@ class CommandOSSQLine : public CommandOSSXLineBase
 			x->UID = XLineManager::GenerateUID();
 
 		unsigned int affected = 0;
-		for (Anope::insensitive_map<User *>::iterator it = UserListByNick.begin(); it != UserListByNick.end(); ++it)
+		for (user_map::const_iterator it = UserListByNick.begin(); it != UserListByNick.end(); ++it)
 			if (this->xlm()->Check(it->second, x))
 				++affected;
 		float percent = static_cast<float>(affected) / static_cast<float>(UserListByNick.size()) * 100.0;
@@ -607,7 +607,7 @@ class CommandOSSQLine : public CommandOSSXLineBase
 			}
 			else
 			{
-				for (Anope::insensitive_map<User *>::const_iterator it = UserListByNick.begin(); it != UserListByNick.end();)
+				for (user_map::const_iterator it = UserListByNick.begin(); it != UserListByNick.end(); ++it)
 				{
 					User *user = it->second;
 					++it;

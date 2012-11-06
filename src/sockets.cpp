@@ -295,6 +295,44 @@ bool cidr::operator<(const cidr &other) const
 	}
 }
 
+bool cidr::operator==(const cidr &other) const
+{
+	return !(*this < other) && !(other < *this);
+}
+
+bool cidr::operator!=(const cidr &other) const
+{
+	return !(*this == other);
+}
+
+size_t cidr::hash::operator()(const cidr &s) const
+{
+	switch (s.addr.sa.sa_family)
+	{
+		case AF_INET:
+		{
+			unsigned int m = 0xFFFFFFFFU >> (32 - s.cidr_len);
+			return s.addr.sa4.sin_addr.s_addr & m;
+		}
+		case AF_INET6:
+		{
+			size_t h = 0;
+
+			for (int i = 0; i < s.cidr_len / 8; ++i)
+				h ^= (s.addr.sa6.sin6_addr.s6_addr[i] << ((i * 8) % sizeof(size_t)));
+
+			int remaining = s.cidr_len % 8;
+			unsigned char m = 0xFF << (8 - remaining);
+
+			h ^= s.addr.sa6.sin6_addr.s6_addr[s.cidr_len / 8] & m;
+
+			return h;
+		}
+		default:
+			throw CoreException("Unknown AFTYPE for cidr");
+	}
+}
+
 /** Receive something from the buffer
  * @param s The socket
  * @param buf The buf to read to

@@ -91,7 +91,7 @@ Server::Server(Server *uplink, const Anope::string &name, unsigned hops, const A
 			}
 
 			/* We make the bots go online */
-			for (Anope::insensitive_map<User *>::iterator it = UserListByNick.begin(), it_end = UserListByNick.end(); it != it_end; ++it)
+			for (user_map::const_iterator it = UserListByNick.begin(); it != UserListByNick.end(); ++it)
 			{
 				User *u = it->second;
 
@@ -130,7 +130,7 @@ Server::~Server()
 
 	if (Capab.count("NOQUIT") > 0 || Capab.count("QS") > 0)
 	{
-		for (Anope::insensitive_map<User *>::const_iterator it = UserListByNick.begin(); it != UserListByNick.end();)
+		for (user_map::const_iterator it = UserListByNick.begin(); it != UserListByNick.end();)
 		{
 			User *u = it->second;
 			++it;

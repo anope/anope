@@ -118,7 +118,7 @@ UplinkSocket::~UplinkSocket()
 	{
 		FOREACH_MOD(I_OnServerDisconnect, OnServerDisconnect());
 
-		for (Anope::insensitive_map<User *>::const_iterator it = UserListByNick.begin(); it != UserListByNick.end(); ++it)
+		for (user_map::const_iterator it = UserListByNick.begin(); it != UserListByNick.end(); ++it)
 		{
 			User *u = it->second;
 

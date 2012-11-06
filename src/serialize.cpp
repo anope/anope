@@ -16,7 +16,7 @@
 #include "modules.h"
 
 std::vector<Anope::string> SerializeType::type_order;
-Anope::map<SerializeType *> SerializeType::types;
+std::map<Anope::string, SerializeType *> SerializeType::types;
 std::list<Serializable *> *Serializable::serializable_items;
 
 stringstream::stringstream() : std::stringstream(), type(Serialize::DT_TEXT), _max(0)
@@ -204,7 +204,7 @@ Module* SerializeType::GetOwner() const
 
 SerializeType *SerializeType::Find(const Anope::string &name)
 {
-	Anope::map<SerializeType *>::iterator it = types.find(name);
+	std::map<Anope::string, SerializeType *>::iterator it = types.find(name);
 	if (it != types.end())
 		return it->second;
 	return NULL;

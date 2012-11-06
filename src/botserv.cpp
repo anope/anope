@@ -27,7 +27,7 @@ BotInfo* findbot(const Anope::string &nick)
 	BotInfo *bi = NULL;
 	if (isdigit(nick[0]) && ircdproto->RequiresID)
 	{
-		botinfouid_map::iterator it = BotListByUID->find(nick);
+		botinfo_map::iterator it = BotListByUID->find(nick);
 		if (it != BotListByUID->end())
 			bi = it->second;
 	}

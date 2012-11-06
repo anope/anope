@@ -21,7 +21,7 @@ enum TypeInfo
 
 struct SeenInfo;
 static SeenInfo *FindInfo(const Anope::string &nick);
-typedef Anope::insensitive_map<SeenInfo *> database_map;
+typedef Anope::hash_map<SeenInfo *> database_map;
 database_map database;
 
 struct SeenInfo : Serializable

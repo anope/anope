@@ -29,8 +29,16 @@ bool CoreIRCDMessageAway::Run(MessageSource &source, const std::vector<Anope::st
 
 bool CoreIRCDMessageCapab::Run(MessageSource &source, const std::vector<Anope::string> &params)
 {
-	for (unsigned i = 0; i < params.size(); ++i)
-		Capab.insert(params[i]);
+	if (params.size() == 1)
+	{
+		spacesepstream sep(params[0]);
+		Anope::string token;
+		while (sep.GetToken(token))
+			Capab.insert(token);
+	}
+	else
+		for (unsigned i = 0; i < params.size(); ++i)
+			Capab.insert(params[i]);
 	return true;
 }
 

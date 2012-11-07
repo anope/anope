@@ -81,19 +81,25 @@ class CommandCSEnforce : public Command
 
 		Log(LOG_COMMAND, source, this) << "to enforce restricted";
 
-		for (CUserList::iterator it = c->users.begin(), it_end = c->users.end(); it != it_end; )
+		std::vector<User *> users;
+		for (CUserList::iterator it = c->users.begin(), it_end = c->users.end(); it != it_end; ++it)
 		{
-			UserContainer *uc = *it++;
+			UserContainer *uc = *it;
 			User *user = uc->user;
 
 			if (ci->AccessFor(user).empty())
-			{
-				Anope::string mask;
-				get_idealban(ci, user, mask);
-				Anope::string reason = translate(user, CHAN_NOT_ALLOWED_TO_JOIN);
-				c->SetMode(NULL, CMODE_BAN, mask);
-				c->Kick(NULL, user, "%s", reason.c_str());
-			}
+				users.push_back(user);
+		}
+
+		for (unsigned i = 0; i < users.size(); ++i)
+		{	
+			User *user = users[i];
+
+			Anope::string mask;
+			get_idealban(ci, user, mask);
+			Anope::string reason = translate(user, CHAN_NOT_ALLOWED_TO_JOIN);
+			c->SetMode(NULL, CMODE_BAN, mask);
+			c->Kick(NULL, user, "%s", reason.c_str());
 		}
 	}
 
@@ -107,18 +113,25 @@ class CommandCSEnforce : public Command
 
 		Log(LOG_COMMAND, source, this) << "to enforce registered only";
 
+		std::vector<User *> users;
 		for (CUserList::iterator it = c->users.begin(), it_end = c->users.end(); it != it_end; )
 		{
-			UserContainer *uc = *it++;
+			UserContainer *uc = *it;
+			User *user = uc->user;
 
-			if (!uc->user->IsIdentified())
-			{
-				get_idealban(ci, uc->user, mask);
-				Anope::string reason = translate(uc->user, CHAN_NOT_ALLOWED_TO_JOIN);
-				if (!c->HasMode(CMODE_REGISTEREDONLY))
-					c->SetMode(NULL, CMODE_BAN, mask);
-				c->Kick(NULL, uc->user, "%s", reason.c_str());
-			}
+			if (!user->IsIdentified())
+				users.push_back(user);
+		}
+
+		for (unsigned i = 0; i < users.size(); ++i)
+		{
+			User *user = users[i];
+
+			get_idealban(ci, user, mask);
+			Anope::string reason = translate(user, CHAN_NOT_ALLOWED_TO_JOIN);
+			if (!c->HasMode(CMODE_REGISTEREDONLY))
+				c->SetMode(NULL, CMODE_BAN, mask);
+			c->Kick(NULL, user, "%s", reason.c_str());
 		}
 	}
  public:

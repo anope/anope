@@ -102,15 +102,18 @@ class CommandCSSuspend : public Command
 
 		if (ci->c)
 		{
-			for (CUserList::iterator it = ci->c->users.begin(), it_end = ci->c->users.end(); it != it_end; )
+			std::vector<User *> users;
+
+			for (CUserList::iterator it = ci->c->users.begin(), it_end = ci->c->users.end(); it != it_end; ++it)
 			{
-				UserContainer *uc = *it++;
-
-				if (uc->user->HasMode(UMODE_OPER))
-					continue;
-
-				ci->c->Kick(NULL, uc->user, "%s", !reason.empty() ? reason.c_str() : translate(uc->user, _("This channel has been suspended.")));
+				UserContainer *uc = *it;
+				User *user = uc->user;
+				if (!user->HasMode(UMODE_OPER) && user->server != Me)
+					users.push_back(user);
 			}
+
+			for (unsigned i = 0; i < users.size(); ++i)
+				ci->c->Kick(NULL, users[i], "%s", !reason.empty() ? reason.c_str() : translate(users[i], _("This channel has been suspended.")));
 		}
 
 		if (expiry_secs > 0)

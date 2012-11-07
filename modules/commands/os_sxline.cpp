@@ -594,15 +594,19 @@ class CommandOSSQLine : public CommandOSSXLineBase
 
 					if (!Anope::Match(c->name, mask, false, true))
 						continue;
-					for (CUserList::iterator it = c->users.begin(), it_end = c->users.end(); it != it_end; )
+
+					std::vector<User *> users;
+					for (CUserList::iterator it = c->users.begin(), it_end = c->users.end(); it != it_end; ++it)
 					{
 						UserContainer *uc = *it;
-						++it;
+						User *user = uc->user;
 
-						if (uc->user->HasMode(UMODE_OPER) || uc->user->server == Me)
-							continue;
-						c->Kick(NULL, uc->user, "%s", reason.c_str());
+						if (!user->HasMode(UMODE_OPER) && user->server != Me)
+							users.push_back(user);
 					}
+
+					for (unsigned i = 0; i < users.size(); ++i)
+						c->Kick(NULL, users[i], "%s", reason.c_str());
 				}
 			}
 			else

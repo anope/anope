@@ -47,12 +47,16 @@ class CommandCSClearUsers : public Command
 		
 		Anope::string buf = "CLEARUSERS command from " + source.GetNick() + " (" + source.nc->display + ")";
 
-		for (CUserList::iterator it = c->users.begin(), it_end = c->users.end(); it != it_end; )
+		std::vector<User *> users;
+		for (CUserList::iterator it = c->users.begin(), it_end = c->users.end(); it != it_end; ++it)
 		{
-			UserContainer *uc = *it++;
-
-			c->Kick(NULL, uc->user, "%s", buf.c_str());
+			User *user = (*it)->user;
+			if (!user->HasMode(UMODE_OPER) && user->server != Me)
+				users.push_back(user);
 		}
+
+		for (unsigned i = 0; i < users.size(); ++i)
+			c->Kick(NULL, users[i], "%s", buf.c_str());
 
 		bool override = !source.AccessFor(c->ci).HasPriv("FOUNDER");
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, c->ci);

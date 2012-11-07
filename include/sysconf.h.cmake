@@ -7,7 +7,6 @@
 #cmakedefine HAVE_CSTDINT 1
 #cmakedefine HAVE_STDINT_H 1
 #cmakedefine HAVE_STDDEF_H 1
-#cmakedefine HAVE_SETGRENT 1
 #cmakedefine HAVE_STRCASECMP 1
 #cmakedefine HAVE_STRICMP 1
 #cmakedefine HAVE_STRINGS_H 1
@@ -16,7 +15,6 @@
 #cmakedefine HAVE_EPOLL 1
 #cmakedefine HAVE_POLL 1
 #cmakedefine GETTEXT_FOUND 1
-#cmakedefine RUNGROUP "@RUNGROUP@"
 
 #ifdef HAVE_CSTDINT
 # include <cstdint>

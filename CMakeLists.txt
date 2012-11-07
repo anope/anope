@@ -339,7 +339,6 @@ check_include_file(stdint.h HAVE_STDINT_H)
 check_include_file(strings.h HAVE_STRINGS_H)
 
 # Check for the existance of the following functions
-check_function_exists(setgrent HAVE_SETGRENT)
 check_function_exists(strcasecmp HAVE_STRCASECMP)
 check_function_exists(stricmp HAVE_STRICMP)
 check_function_exists(umask HAVE_UMASK)

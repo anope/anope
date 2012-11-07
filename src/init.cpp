@@ -21,10 +21,8 @@
 #include "servers.h"
 
 #ifndef _WIN32
-#include <sys/types.h>
 #include <sys/wait.h>
 #include <sys/stat.h>
-#include <grp.h>
 #endif
 
 Anope::string conf_dir = "conf", db_dir = "data", modules_dir = "lib", locale_dir = "locale", log_dir = "logs";
@@ -64,37 +62,6 @@ void introduce_user(const Anope::string &user)
 				ircdproto->SendJoin(bi, (*cit)->chan, &Config->BotModeList);
 		}
 	}
-}
-
-/*************************************************************************/
-
-/* Set GID if necessary.  Return 0 if successful (or if RUNGROUP not
- * defined), else print an error message to logfile and return -1.
- */
-
-static int set_group()
-{
-#if defined(RUNGROUP) && defined(HAVE_SETGRENT)
-	struct group *gr;
-
-	setgrent();
-	while ((gr = getgrent()))
-	{
-		if (!strcmp(gr->gr_name, RUNGROUP))
-			break;
-	}
-	endgrent();
-	if (gr)
-	{
-		setgid(gr->gr_gid);
-	}
-	else
-	{
-		Log() << "Unknown run group '" << RUNGROUP << "'";
-		return -1;
-	}
-#endif
-	return 0;
 }
 
 /*************************************************************************/
@@ -294,9 +261,7 @@ void Init(int ac, char **av)
 #if defined(DEFUMASK) && HAVE_UMASK
 	umask(DEFUMASK);
 #endif
-	if (set_group() < 0)
-		throw FatalException("set_group() fail");
-	
+
 	RegisterTypes();
 
 	/* Parse command line arguments */

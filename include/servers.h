@@ -3,6 +3,7 @@
 
 #include "services.h"
 #include "anope.h"
+#include "extensible.h"
 
 /* Anope */
 extern CoreExport Server *Me;

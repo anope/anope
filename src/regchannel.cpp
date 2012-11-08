@@ -266,7 +266,10 @@ ChannelInfo::ChannelInfo(const Anope::string &chname) : Serializable("ChannelInf
 	for (int i = 0; i < TTB_SIZE; ++i)
 		this->ttb[i] = 0;
 
+	size_t old = RegisteredChannelList->size();
 	(*RegisteredChannelList)[this->name] = this;
+	if (old == RegisteredChannelList->size())
+		Log(LOG_DEBUG) << "Duplicate channel " << this->name << " in registered channel table?";
 
 	FOREACH_MOD(I_OnCreateChan, OnCreateChan(this));
 }

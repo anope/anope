@@ -41,7 +41,10 @@ NickAlias::NickAlias(const Anope::string &nickname, NickCore* nickcore) : Serial
 	this->nc = nickcore;
 	nickcore->aliases.push_back(this);
 
+	size_t old = NickAliasList->size();
 	(*NickAliasList)[this->nick] = this;
+	if (old == NickAliasList->size())
+		Log(LOG_DEBUG) << "Duplicate nick " << nickname << " in nickalias table";
 
 	if (this->nc->o == NULL)
 	{

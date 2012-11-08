@@ -37,7 +37,10 @@ Channel::Channel(const Anope::string &nname, time_t ts) : Flags<ChannelFlag, 3>(
 
 	this->name = nname;
 
+	size_t old = ChannelList.size();
 	ChannelList[this->name] = this;
+	if (old == ChannelList.size())
+		Log(LOG_DEBUG) << "Duplicate channel " << this->name << " in table?";
 
 	this->creation_time = ts;
 	this->server_modetime = this->chanserv_modetime = 0;

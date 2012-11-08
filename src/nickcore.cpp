@@ -37,7 +37,10 @@ NickCore::NickCore(const Anope::string &coredisplay) : Serializable("NickCore"),
 		if (Config->NSDefFlags.HasFlag(static_cast<NickCoreFlag>(t)))
 			this->SetFlag(static_cast<NickCoreFlag>(t));
 
+	size_t old = NickCoreList->size();
 	(*NickCoreList)[this->display] = this;
+	if (old == NickCoreList->size())
+		Log(LOG_DEBUG) << "Duplicate account " << coredisplay << " in nickcore table?";
 }
 
 /** Default destructor

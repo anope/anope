@@ -206,7 +206,10 @@ class CSLog : public Module
 				Anope::string buffer = l->u->nick + " used " + log->command_name + " " + l->buf.str();
 
 				if (log->method.equals_ci("MESSAGE") && l->ci->c && l->ci->bi && l->ci->c->FindUser(l->ci->bi) != NULL)
+				{
 					ircdproto->SendPrivmsg(l->ci->bi, log->extra + l->ci->c->name, "%s", buffer.c_str());
+					l->ci->bi->lastmsg = Anope::CurTime;
+				}
 				else if (log->method.equals_ci("NOTICE") && l->ci->c && l->ci->bi && l->ci->c->FindUser(l->ci->bi) != NULL)
 					ircdproto->SendNotice(l->ci->bi, log->extra + l->ci->c->name, "%s", buffer.c_str());
 				else if (log->method.equals_ci("MEMO") && memoserv && l->ci->WhoSends() != NULL)

@@ -455,6 +455,9 @@ void User::Login(NickCore *core)
 	core->Users.push_back(this);
 
 	this->UpdateHost();
+
+	if (this->server->IsSynced())
+		Log(this, "account") << "is now identified as " << this->nc->display;
 }
 
 /** Logout the user
@@ -463,6 +466,8 @@ void User::Logout()
 {
 	if (!this->nc)
 		return;
+	
+	Log(this, "account") << "is not longer identified as " << this->nc->display;
 
 	std::list<User *>::iterator it = std::find(this->nc->Users.begin(), this->nc->Users.end(), this);
 	if (it != this->nc->Users.end())

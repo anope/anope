@@ -572,6 +572,8 @@ class CoreExport ServerConfig
 	Anope::string NSModesOnID;
 	/* Restore nick/channels on ghost */
 	bool NSRestoreOnGhost;
+	/* Whether or not to use SASL */
+	bool NSSASL;
 
 	/* Core ChanServ modules */
 	Anope::string ChanCoreModules;

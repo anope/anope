@@ -867,7 +867,7 @@ struct IRCDMessageSASL : IRCDMessage
 				return;
 
 			UplinkSocket::Message(Me) << "SVSLOGIN " << this->uid.substr(0, p) << " " << this->uid << " " << this->GetAccount();
-			UplinkSocket::Message(findbot(Config->NickServ)) << "SASL " << this->uid.substr(0, p) << " " << this->uid << " D S";
+			UplinkSocket::Message() << "SASL " << this->uid.substr(0, p) << " " << this->uid << " D S";
 		}
 
 		void OnFail() anope_override
@@ -876,7 +876,9 @@ struct IRCDMessageSASL : IRCDMessage
 			if (p == Anope::string::npos)
 				return;
 
-			UplinkSocket::Message(findbot(Config->NickServ)) << "SASL " << this->uid.substr(0, p) << " " << this->uid << " D F";
+			UplinkSocket::Message() << "SASL " << this->uid.substr(0, p) << " " << this->uid << " D F";
+
+			Log(findbot(Config->NickServ)) << "A user failed to identify for account " << this->GetAccount() << " using SASL";
 		}
 	};
 	
@@ -893,12 +895,11 @@ struct IRCDMessageSASL : IRCDMessage
 	bool Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		size_t p = params[1].find('!');
-		if (p == Anope::string::npos)	
+		if (!Config->NSSASL || p == Anope::string::npos)	
 			return true;
 
-		/* Unreal segfaults if we send from Me */
 		if (params[2] == "S")
-			UplinkSocket::Message(findbot(Config->NickServ)) << "SASL " << params[1].substr(0, p) << " " << params[1] << " C +";
+			UplinkSocket::Message() << "SASL " << params[1].substr(0, p) << " " << params[1] << " C +";
 		else if (params[2] == "C")
 		{
 			Anope::string decoded;

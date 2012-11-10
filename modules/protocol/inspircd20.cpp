@@ -483,7 +483,7 @@ struct IRCDMessageEncap : IRCDMessage
 			u->SetRealname(params[3]);
 			UplinkSocket::Message(u) << "FNAME " << params[3];
 		}
-		else if (params[1] == "SASL" && params.size() == 6)
+		else if (Config->NSSASL && params[1] == "SASL" && params.size() == 6)
 		{
 			class InspIRCDSASLIdentifyRequest : public IdentifyRequest
 			{
@@ -501,6 +501,8 @@ struct IRCDMessageEncap : IRCDMessage
 				void OnFail() anope_override
 				{
 					UplinkSocket::Message(Me) << "ENCAP " << this->uid.substr(0, 3) << " SASL " << Me->GetSID() << " " << this->uid << " " << " D F";
+
+					Log(findbot(Config->NickServ)) << "A user failed to identify for account " << this->GetAccount() << " using SASL";
 				}
 			};
 

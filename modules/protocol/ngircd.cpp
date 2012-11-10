@@ -597,7 +597,7 @@ class ProtongIRCd : public Module
 	CoreIRCDMessageMOTD core_message_motd;
 	CoreIRCDMessagePart core_message_part;
 	CoreIRCDMessagePing core_message_ping;
-	CoreIRCDMessagePrivmsg core_message_privmsg;
+	CoreIRCDMessagePrivmsg core_message_privmsg, core_message_squery;
 	CoreIRCDMessageQuit core_message_quit;
 	CoreIRCDMessageSQuit core_message_squit;
 	CoreIRCDMessageStats core_message_stats;
@@ -662,7 +662,8 @@ class ProtongIRCd : public Module
 	}
 
  public:
-	ProtongIRCd(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PROTOCOL)
+	ProtongIRCd(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PROTOCOL),
+		core_message_squery("SQUERY")
 	{
 		this->SetAuthor("Anope");
 

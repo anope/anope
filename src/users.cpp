@@ -467,7 +467,7 @@ void User::Logout()
 	if (!this->nc)
 		return;
 	
-	Log(this, "account") << "is not longer identified as " << this->nc->display;
+	Log(this, "account") << "is no longer identified as " << this->nc->display;
 
 	std::list<User *>::iterator it = std::find(this->nc->Users.begin(), this->nc->Users.end(), this);
 	if (it != this->nc->Users.end())

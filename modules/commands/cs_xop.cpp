@@ -291,7 +291,7 @@ class XOPBase : public Command
 	void DoDel(CommandSource &source, ChannelInfo *ci, const std::vector<Anope::string> &params, XOPType level)
 	{
 		NickCore *nc = source.nc;
-		const Anope::string &mask = params.size() > 2 ? params[2] : "";
+		Anope::string mask = params.size() > 2 ? params[2] : "";
 
 		if (mask.empty())
 		{
@@ -318,6 +318,18 @@ class XOPBase : public Command
 		AccessGroup access = source.AccessFor(ci);
 		const ChanAccess *highest = access.Highest();
 		bool override = false;
+
+		if (mask.find_first_of("!*@") == Anope::string::npos && !findnick(mask))
+		{
+			User *targ = finduser(mask);
+			if (targ != NULL)
+				mask = "*!*@" + targ->GetDisplayedHost();
+			else
+			{
+				source.Reply(NICK_X_NOT_REGISTERED, mask.c_str());
+				return;
+			}
+		}
 
 		if ((!mask.equals_ci(nc->display) && !access.HasPriv("ACCESS_CHANGE") && !access.Founder) || ((!highest || tmp_access >= *highest) && !access.Founder))
 		{

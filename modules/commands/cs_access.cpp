@@ -186,7 +186,19 @@ class CommandCSAccess : public Command
 
 	void DoDel(CommandSource &source, ChannelInfo *ci, const std::vector<Anope::string> &params)
 	{
-		const Anope::string &mask = params[2];
+		Anope::string mask = params[2];
+
+		if (mask.find_first_of("!*@") == Anope::string::npos && !findnick(mask))
+		{
+			User *targ = finduser(mask);
+			if (targ != NULL)
+				mask = "*!*@" + targ->GetDisplayedHost();
+			else
+			{
+				source.Reply(NICK_X_NOT_REGISTERED, mask.c_str());
+				return;
+			}
+		}
 
 		if (!ci->GetAccessCount())
 			source.Reply(_("%s access list is empty."), ci->name.c_str());

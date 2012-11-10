@@ -323,6 +323,10 @@ bool LogInfo::HasType(LogType ltype, const Anope::string &type) const
 			return debug ? true : this->RawIO;
 		case LOG_DEBUG:
 			return debug ? true : this->Debug;
+		case LOG_DEBUG_2:
+		case LOG_DEBUG_3:
+		case LOG_DEBUG_4:
+			break;
 		case LOG_MODULE:
 		case LOG_NORMAL:
 		default:

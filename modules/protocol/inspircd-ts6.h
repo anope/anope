@@ -516,7 +516,7 @@ struct IRCDMessageFMode : IRCDMessage
 		}
 		catch (const ConvertException &)
 		{
-			ts = Anope::CurTime;
+			ts = 0;
 		}
 
 		if (c)
@@ -680,7 +680,7 @@ struct IRCDMessageMode : IRCDMessage
 				modes += " " + params[n];
 
 			if (c)
-				c->SetModesInternal(source, modes, Anope::CurTime);
+				c->SetModesInternal(source, modes);
 		}
 		else
 		{

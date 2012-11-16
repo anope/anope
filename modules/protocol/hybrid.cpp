@@ -316,7 +316,7 @@ struct IRCDMessageMode : IRCDMessage
 		if (params.size() > 2 && ircdproto->IsChannelValid(params[0]))
 		{
 			Channel *c = findchan(params[0]);
-			time_t ts = Anope::CurTime;
+			time_t ts = 0;
 
 			try
 			{
@@ -546,7 +546,7 @@ struct IRCDMessageTMode : IRCDMessage
 
 	bool Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		time_t ts = Anope::CurTime;
+		time_t ts = 0;
 
 		try
 		{

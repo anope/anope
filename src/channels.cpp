@@ -714,7 +714,9 @@ void Channel::SetModesInternal(MessageSource &source, const Anope::string &mode,
 		++this->server_modecount;
 	}
 
-	if (ts > this->creation_time)
+	if (!ts)
+		;
+	else if (ts > this->creation_time)
 		return;
 	else if (ts < this->creation_time)
 	{

@@ -783,7 +783,7 @@ struct IRCDMessageMode : IRCDMessage
 			}
 			catch (const ConvertException &)
 			{
-				ts = Anope::CurTime;
+				ts = 0;
 			}
 
 			if (c)

@@ -334,7 +334,7 @@ struct IRCDMessageMode : IRCDMessage
 		if (params.size() > 2 && ircdproto->IsChannelValid(params[0]))
 		{
 			Channel *c = findchan(params[0]);
-			time_t ts = Anope::CurTime;
+			time_t ts = 0;
 			try
 			{
 				ts = convertTo<time_t>(params[1]);

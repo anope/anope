@@ -303,7 +303,7 @@ struct IRCDMessageMode : IRCDMessage
 		{
 			Channel *c = findchan(params[0]);
 			if (c)
-				c->SetModesInternal(source, params[1], Anope::CurTime);
+				c->SetModesInternal(source, params[1]);
 		}
 		else
 		{
@@ -507,7 +507,7 @@ struct IRCDMessageTMode : IRCDMessage
 
 	bool Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		time_t ts = Anope::CurTime;
+		time_t ts = 0;
 		try
 		{
 			ts = convertTo<time_t>(params[0]);

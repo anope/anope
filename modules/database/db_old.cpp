@@ -771,6 +771,9 @@ static void LoadChannels()
 				int16_t level;
 				READ(read_int16(&level, f));
 
+				if (level == ACCESS_INVALID)
+					level = ACCESS_FOUNDER;
+
 				ci->SetLevel(GetLevelName(j), level);
 			}
 

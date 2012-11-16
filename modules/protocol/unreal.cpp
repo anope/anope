@@ -702,7 +702,7 @@ struct IRCDMessageMode : IRCDMessage
 		if (ircdproto->IsChannelValid(params[0]))
 		{
 			Channel *c = findchan(params[0]);
-			time_t ts = Anope::CurTime;
+			time_t ts = 0;
 			try
 			{
 				if (server_source)

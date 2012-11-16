@@ -358,7 +358,7 @@ struct IRCDMessageMode : IRCDMessage
 		{
 			// 0 = channel, 1 = ts, 2 = modes
 			Channel *c = findchan(params[0]);
-			time_t ts = Anope::CurTime;
+			time_t ts = 0;
 			try
 			{
 				ts = convertTo<time_t>(params[1]);
@@ -567,7 +567,7 @@ struct IRCDMessageTMode : IRCDMessage
 
 	bool Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		time_t ts = Anope::CurTime;
+		time_t ts = 0;
 		try
 		{
 			ts = convertTo<time_t>(params[0]);

@@ -114,7 +114,7 @@ class CommandCSEnforce : public Command
 		Log(LOG_COMMAND, source, this) << "to enforce registered only";
 
 		std::vector<User *> users;
-		for (CUserList::iterator it = c->users.begin(), it_end = c->users.end(); it != it_end; )
+		for (CUserList::iterator it = c->users.begin(), it_end = c->users.end(); it != it_end; ++it)
 		{
 			UserContainer *uc = *it;
 			User *user = uc->user;

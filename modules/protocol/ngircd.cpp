@@ -255,7 +255,7 @@ struct IRCDMessageChaninfo : IRCDMessage
 			c->ChangeTopicInternal(source.GetName(), params[4], Anope::CurTime);
 		}
 
-		c->SetModesInternal(source, modes, c->creation_time, true);
+		c->SetModesInternal(source, modes);
 		return true;
 	}
 };
@@ -302,7 +302,7 @@ struct IRCDMessageJoin : IRCDMessage
 		chan->JoinUser(user);
 
 		if (!modes.empty())
-			chan->SetModesInternal(source, modes, chan->creation_time);
+			chan->SetModesInternal(source, modes);
 
 		/* Set the proper modes on the user */
 		chan_set_correct_modes(user, chan, 1, true);
@@ -353,7 +353,7 @@ struct IRCDMessageMode : IRCDMessage
 			Channel *c = findchan(params[0]);
 
 			if (c)
-				c->SetModesInternal(source, modes, c->creation_time);
+				c->SetModesInternal(source, modes);
 		}
 		else
 		{

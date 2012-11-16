@@ -58,7 +58,7 @@ class BotServCore : public Module
 
 		std::vector<Anope::string> params = BuildStringVector(realbuf);
 
-		if (!realbuf.find_first_of(c->ci->bi->nick))
+		if (!realbuf.find(c->ci->bi->nick))
 			params.erase(params.begin());
 		else if (Config->BSFantasyCharacter.empty())
 			;

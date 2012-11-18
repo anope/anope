@@ -20,6 +20,8 @@ class ngIRCdProto : public IRCDProto
 	{
 		DefaultPseudoclientModes = "+oi";
 		CanSVSNick = true;
+		CanSetVHost = true;
+		CanSetVIdent = true;
 		MaxModes = 5;
 	}
 
@@ -51,7 +53,7 @@ class ngIRCdProto : public IRCDProto
 
 	void SendConnect() anope_override
 	{
-		UplinkSocket::Message() << "PASS " << Config->Uplinks[CurrentUplink]->password << " 0210-IRC+ Anope|" << Anope::VersionShort() << ":CLHSo P";
+		UplinkSocket::Message() << "PASS " << Config->Uplinks[CurrentUplink]->password << " 0210-IRC+ Anope|" << Anope::VersionShort() << ":CLHMSo P";
 		/* Make myself known to myself in the serverlist */
 		SendServer(Me);
 		/* finish the enhanced server handshake and register the connection */
@@ -147,6 +149,28 @@ class ngIRCdProto : public IRCDProto
 	void SendTopic(BotInfo *bi, Channel *c) anope_override
 	{
 		UplinkSocket::Message(bi) << "TOPIC " << c->name << " :" << c->topic;
+	}
+
+	void SendVhost(User *u, const Anope::string &vIdent, const Anope::string &vhost) anope_override
+	{
+		if (!vIdent.empty())
+			UplinkSocket::Message(Me) << "METADATA " << u->nick << " user :" << vIdent;
+		if (!vhost.empty())
+		{
+			if (!u->HasMode(UMODE_CLOAK))
+			{
+				const BotInfo *bi = findbot(Config->HostServ);
+				u->SetMode(bi, UMODE_CLOAK);
+				// send the modechange before we send the vhost
+				ModeManager::ProcessModes();
+			}
+			UplinkSocket::Message(Me) << "METADATA " << u->nick << " host :" << vhost;
+		}
+	}
+
+	void SendVhostDel(User *u) anope_override
+	{
+		this->SendVhost(u, u->GetIdent(), u->GetCloakedHost());
 	}
 };
 
@@ -328,6 +352,46 @@ struct IRCDMessageJoin : IRCDMessage
 	}
 };
 
+struct IRCDMessageMetadata : IRCDMessage
+{
+	IRCDMessageMetadata() : IRCDMessage("METADATA", 3) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
+
+	/*
+	 * Received: :ngircd.dev.anope.de METADATA DukePyrolator host :anope-e2ee5c7d
+	 *
+	 * params[0] = nick of the user
+	 * params[1] = command
+	 * params[3] = data
+	 *
+	 * following commands are supported:
+	 *  - "host": the hostname of a client (can't be empty)
+	 *  - "info": info text ("real name") of a client
+	 *  - "user": the user name (ident) of a client (can't be empty)
+	 */
+
+	bool Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
+	{
+		User *u = finduser(params[0]);
+		if (!u)
+		{
+			Log() << "received METADATA for non-existent user " << params[0];
+			return true;
+		}
+		if (params[1].equals_cs("host"))
+		{
+			u->SetCloakedHost(params[2]);
+		}
+		else if (params[1].equals_cs("info"))
+		{
+			u->SetRealname(params[2]);
+		}
+		else if (params[1].equals_cs("user"))
+		{
+			u->SetVIdent(params[2]);
+		}
+		return true;
+	}
+};
 
 struct IRCDMessageMode : IRCDMessage
 {
@@ -609,6 +673,7 @@ class ProtongIRCd : public Module
 	IRCDMessage376 message_376;
 	IRCDMessageChaninfo message_chaninfo;
 	IRCDMessageJoin message_join;
+	IRCDMessageMetadata message_metadata;
 	IRCDMessageMode message_mode;
 	IRCDMessageNick message_nick;
 	IRCDMessageNJoin message_njoin;

@@ -972,7 +972,7 @@ struct IRCDMessageSetIdent : IRCDMessage
 
 struct IRCDMessageSetName : IRCDMessage
 {
-	IRCDMessageSetName() : IRCDMessage("STENAME", 1) { }
+	IRCDMessageSetName() : IRCDMessage("SETNAME", 1) { }
 
 	bool Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
 	{

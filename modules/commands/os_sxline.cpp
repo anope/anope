@@ -18,33 +18,33 @@ class SXLineDelCallback : public NumberList
 	XLineManager *xlm;
 	Command *command;
 	CommandSource &source;
-	unsigned Deleted;
+	unsigned deleted;
  public:
-	SXLineDelCallback(XLineManager *x, Command *c, CommandSource &_source, const Anope::string &numlist) : NumberList(numlist, true), xlm(x), command(c), source(_source), Deleted(0)
+	SXLineDelCallback(XLineManager *x, Command *c, CommandSource &_source, const Anope::string &numlist) : NumberList(numlist, true), xlm(x), command(c), source(_source), deleted(0)
 	{
 	}
 
 	~SXLineDelCallback()
 	{
-		if (!Deleted)
+		if (!deleted)
 			source.Reply(_("No matching entries on the %s list."), this->command->name.c_str());
-		else if (Deleted == 1)
+		else if (deleted == 1)
 			source.Reply(_("Deleted 1 entry from the %s list."), this->command->name.c_str());
 		else
-			source.Reply(_("Deleted %d entries from the %s list."), Deleted, this->command->name.c_str());
+			source.Reply(_("Deleted %d entries from the %s list."), deleted, this->command->name.c_str());
 	}
 
-	void HandleNumber(unsigned Number) anope_override
+	void HandleNumber(unsigned number) anope_override
 	{
-		if (!Number)
+		if (!number)
 			return;
 
-		XLine *x = this->xlm->GetEntry(Number - 1);
+		XLine *x = this->xlm->GetEntry(number - 1);
 
 		if (!x)
 			return;
 
-		++Deleted;
+		++deleted;
 		DoDel(this->xlm, source, x);
 	}
 
@@ -99,7 +99,7 @@ class CommandOSSXLineBase : public Command
 			source.Reply(_("\002%s\002 deleted from the %s list."), mask.c_str(), source.command.c_str());
 		}
 
-		if (readonly)
+		if (Anope::ReadOnly)
 			source.Reply(READ_ONLY_MODE);
 
 		return;
@@ -126,24 +126,24 @@ class CommandOSSXLineBase : public Command
 				{
 				}
 
-				void HandleNumber(unsigned Number) anope_override
+				void HandleNumber(unsigned number) anope_override
 				{
-					if (!Number)
+					if (!number)
 						return;
 
-					const XLine *x = this->xlm->GetEntry(Number - 1);
+					const XLine *x = this->xlm->GetEntry(number - 1);
 
 					if (!x)
 						return;
 
 					ListFormatter::ListEntry entry;
-					entry["Number"] = stringify(Number);
-					entry["Mask"] = x->Mask;
-					entry["By"] = x->By;
-					entry["Created"] = do_strftime(x->Created, NULL, true);
-					entry["Expires"] = expire_left(NULL, x->Expires);
-					entry["Reason"] = x->Reason;
-					list.addEntry(entry);
+					entry["Number"] = stringify(number);
+					entry["Mask"] = x->mask;
+					entry["By"] = x->by;
+					entry["Created"] = Anope::strftime(x->created, NULL, true);
+					entry["Expires"] = Anope::Expires(x->expires);
+					entry["Reason"] = x->reason;
+					list.AddEntry(entry);
 				}
 			}
 			sl_list(this->xlm(), list, mask);
@@ -155,21 +155,21 @@ class CommandOSSXLineBase : public Command
 			{
 				const XLine *x = this->xlm()->GetEntry(i);
 
-				if (mask.empty() || mask.equals_ci(x->Mask) || mask == x->UID || Anope::Match(x->Mask, mask, false, true))
+				if (mask.empty() || mask.equals_ci(x->mask) || mask == x->id || Anope::Match(x->mask, mask, false, true))
 				{
 					ListFormatter::ListEntry entry;
 					entry["Number"] = stringify(i + 1);
-					entry["Mask"] = x->Mask;
-					entry["By"] = x->By;
-					entry["Created"] = do_strftime(x->Created, NULL, true);
-					entry["Expires"] = expire_left(source.nc, x->Expires);
-					entry["Reason"] = x->Reason;
-					list.addEntry(entry);
+					entry["Mask"] = x->mask;
+					entry["By"] = x->by;
+					entry["Created"] = Anope::strftime(x->created, NULL, true);
+					entry["Expires"] = Anope::Expires(x->expires, source.nc);
+					entry["Reason"] = x->reason;
+					list.AddEntry(entry);
 				}
 			}
 		}
 
-		if (list.isEmpty())
+		if (list.IsEmpty())
 			source.Reply(_("No matching entries on the %s list."), source.command.c_str());
 		else
 		{
@@ -186,7 +186,7 @@ class CommandOSSXLineBase : public Command
 	void OnList(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		ListFormatter list;
-		list.addColumn("Number").addColumn("Mask").addColumn("Reason");
+		list.AddColumn("Number").AddColumn("Mask").AddColumn("Reason");
 
 		this->ProcessList(source, params, list);
 	}
@@ -194,7 +194,7 @@ class CommandOSSXLineBase : public Command
 	void OnView(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		ListFormatter list;
-		list.addColumn("Number").addColumn("Mask").addColumn("By").addColumn("Created").addColumn("Expires").addColumn("Reason");
+		list.AddColumn("Number").AddColumn("Mask").AddColumn("By").AddColumn("Created").AddColumn("Expires").AddColumn("Reason");
 		this->ProcessList(source, params, list);
 	}
 
@@ -250,7 +250,7 @@ class CommandOSSNLine : public CommandOSSXLineBase
 
 	void OnAdd(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		if (!this->xlm() || !ircdproto->CanSNLine)
+		if (!this->xlm() || !IRCD->CanSNLine)
 		{
 			source.Reply(_("Your IRCd does not support SNLINE"));
 			return;
@@ -268,7 +268,7 @@ class CommandOSSNLine : public CommandOSSXLineBase
 			last_param = 3;
 		}
 
-		expires = !expiry.empty() ? dotime(expiry) : Config->SNLineExpiry;
+		expires = !expiry.empty() ? Anope::DoTime(expiry) : Config->SNLineExpiry;
 		/* If the expiry given does not contain a final letter, it's in days,
 		 * said the doc. Ah well.
 		 */
@@ -318,7 +318,7 @@ class CommandOSSNLine : public CommandOSSXLineBase
 				return;
 			}
 
-			service_reference<RegexProvider> provider("Regex", Config->RegexEngine);
+			ServiceReference<RegexProvider> provider("Regex", Config->RegexEngine);
 			if (!provider)
 			{
 				source.Reply(_("Unable to find regex engine %s"), Config->RegexEngine.c_str());
@@ -354,7 +354,7 @@ class CommandOSSNLine : public CommandOSSXLineBase
 
 		XLine *x = new XLine(mask, source.GetNick(), expires, reason);
 		if (Config->AkillIds)
-			x->UID = XLineManager::GenerateUID();
+			x->id = XLineManager::GenerateUID();
 
 		unsigned int affected = 0;
 		for (user_map::const_iterator it = UserListByNick.begin(); it != UserListByNick.end(); ++it)
@@ -366,7 +366,7 @@ class CommandOSSNLine : public CommandOSSXLineBase
 		{
 			source.Reply(USERHOST_MASK_TOO_WIDE, mask.c_str());
 			Log(LOG_ADMIN, source, this) << "tried to " << source.command << " " << percent << "% of the network (" << affected << " users)";
-			x->destroy();
+			x->Destroy();
 			return;
 		}
 
@@ -374,7 +374,7 @@ class CommandOSSNLine : public CommandOSSXLineBase
 		FOREACH_RESULT(I_OnAddXLine, OnAddXLine(source, x, this->xlm()));
 		if (MOD_RESULT == EVENT_STOP)
 		{
-			x->destroy();
+			x->Destroy();
 			return;
 		}
 
@@ -391,18 +391,18 @@ class CommandOSSNLine : public CommandOSSXLineBase
 				User *user = it->second;
 				++it;
 
-				if (!user->HasMode(UMODE_OPER) && user->server != Me && Anope::Match(user->realname, x->Mask, false, true))
+				if (!user->HasMode(UMODE_OPER) && user->server != Me && Anope::Match(user->realname, x->mask, false, true))
 					user->Kill(Config->ServerName, rreason);
 			}
 		}
 
 		source.Reply(_("\002%s\002 added to the %s list."), mask.c_str(), source.command.c_str());
-		Log(LOG_ADMIN, source, this) << "on " << mask << " (" << reason << ") expires in " << (expires ? duration(expires - Anope::CurTime) : "never") << " [affects " << affected << " user(s) (" << percent << "%)]";
-		if (readonly)
+		Log(LOG_ADMIN, source, this) << "on " << mask << " (" << reason << ") expires in " << (expires ? Anope::Duration(expires - Anope::CurTime) : "never") << " [affects " << affected << " user(s) (" << percent << "%)]";
+		if (Anope::ReadOnly)
 			source.Reply(READ_ONLY_MODE);
 	}
 
-	service_reference<XLineManager> snlines;
+	ServiceReference<XLineManager> snlines;
  public:
  	CommandOSSNLine(Module *creator) : CommandOSSXLineBase(creator, "operserv/snline"), snlines("XLineManager", "xlinemanager/snline")
 	{
@@ -471,7 +471,7 @@ class CommandOSSQLine : public CommandOSSXLineBase
 
 	void OnAdd(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		if (!this->xlm() || !ircdproto->CanSQLine)
+		if (!this->xlm() || !IRCD->CanSQLine)
 		{
 			source.Reply(_("Your IRCd does not support SQLINE"));
 			return;
@@ -489,7 +489,7 @@ class CommandOSSQLine : public CommandOSSXLineBase
 			last_param = 3;
 		}
 
-		expires = !expiry.empty() ? dotime(expiry) : Config->SQLineExpiry;
+		expires = !expiry.empty() ? Anope::DoTime(expiry) : Config->SQLineExpiry;
 		/* If the expiry given does not contain a final letter, it's in days,
 		 * said the doc. Ah well.
 		 */
@@ -528,7 +528,7 @@ class CommandOSSQLine : public CommandOSSXLineBase
 				return;
 			}
 
-			service_reference<RegexProvider> provider("Regex", Config->RegexEngine);
+			ServiceReference<RegexProvider> provider("Regex", Config->RegexEngine);
 			if (!provider)
 			{
 				source.Reply(_("Unable to find regex engine %s"), Config->RegexEngine.c_str());
@@ -557,7 +557,7 @@ class CommandOSSQLine : public CommandOSSXLineBase
 
 		XLine *x = new XLine(mask, source.GetNick(), expires, reason);
 		if (Config->AkillIds)
-			x->UID = XLineManager::GenerateUID();
+			x->id = XLineManager::GenerateUID();
 
 		unsigned int affected = 0;
 		for (user_map::const_iterator it = UserListByNick.begin(); it != UserListByNick.end(); ++it)
@@ -569,7 +569,7 @@ class CommandOSSQLine : public CommandOSSXLineBase
 		{
 			source.Reply(USERHOST_MASK_TOO_WIDE, mask.c_str());
 			Log(LOG_ADMIN, source, this) << "tried to SQLine " << percent << "% of the network (" << affected << " users)";
-			x->destroy();
+			x->Destroy();
 			return;
 		}
 
@@ -577,7 +577,7 @@ class CommandOSSQLine : public CommandOSSXLineBase
 		FOREACH_RESULT(I_OnAddXLine, OnAddXLine(source, x, this->xlm()));
 		if (MOD_RESULT == EVENT_STOP)
 		{
-			x->destroy();
+			x->Destroy();
 			return;
 		}
 
@@ -616,7 +616,7 @@ class CommandOSSQLine : public CommandOSSXLineBase
 					User *user = it->second;
 					++it;
 
-					if (!user->HasMode(UMODE_OPER) && user->server != Me && Anope::Match(user->nick, x->Mask, false, true))
+					if (!user->HasMode(UMODE_OPER) && user->server != Me && Anope::Match(user->nick, x->mask, false, true))
 						user->Kill(Config->ServerName, rreason);
 				}
 			}
@@ -625,13 +625,13 @@ class CommandOSSQLine : public CommandOSSXLineBase
 		}
 
 		source.Reply(_("\002%s\002 added to the SQLINE list."), mask.c_str());
-		Log(LOG_ADMIN, source, this) << "on " << mask << " (" << reason << ") expires in " << (expires ? duration(expires - Anope::CurTime) : "never") << " [affects " << affected << " user(s) (" << percent << "%)]";
+		Log(LOG_ADMIN, source, this) << "on " << mask << " (" << reason << ") expires in " << (expires ? Anope::Duration(expires - Anope::CurTime) : "never") << " [affects " << affected << " user(s) (" << percent << "%)]";
 
-		if (readonly)
+		if (Anope::ReadOnly)
 			source.Reply(READ_ONLY_MODE);
 	}
 
- 	service_reference<XLineManager> sqlines;
+ 	ServiceReference<XLineManager> sqlines;
  public:
 	CommandOSSQLine(Module *creator) : CommandOSSXLineBase(creator, "operserv/sqline"), sqlines("XLineManager", "xlinemanager/sqline")
 	{

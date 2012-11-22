@@ -27,7 +27,7 @@ class NSIdentifyRequest : public IdentifyRequest
 			return;
 
 		User *u = source.GetUser();
-		NickAlias *na = findnick(GetAccount());
+		NickAlias *na = NickAlias::Find(GetAccount());
 
 		if (!na)
 			source.Reply(NICK_X_NOT_REGISTERED, GetAccount().c_str());
@@ -49,7 +49,7 @@ class NSIdentifyRequest : public IdentifyRequest
 		{
 			Log(LOG_COMMAND, source, cmd) << "and failed to identify";
 			source.Reply(PASSWORD_INCORRECT);
-			bad_password(source.GetUser());
+			source.GetUser()->BadPassword();
 		}
 	}
 };
@@ -74,7 +74,7 @@ class CommandNSIdentify : public Command
 		const Anope::string &nick = params.size() == 2 ? params[0] : u->nick;
 		Anope::string pass = params[params.size() - 1];
 
-		NickAlias *na = findnick(nick);
+		NickAlias *na = NickAlias::Find(nick);
 		if (na && na->nc->HasFlag(NI_SUSPENDED))
 			source.Reply(NICK_X_SUSPENDED, na->nick.c_str());
 		else if (u->Account() && na && u->Account() == na->nc)

@@ -7,6 +7,7 @@
  *
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
+ *
  */
 
 #include "serialize.h"
@@ -31,7 +32,7 @@
 	{ \
 		return new x(modname, creator); \
 	} \
-	BOOLEAN WINAPI DllMain(HINSTANCE, DWORD nReason, LPVOID) \
+	BOOLEAN WINAPI DllMain(HINSTANCE, DWORD, LPVOID) \
 	{ \
 		return TRUE; \
 	} \
@@ -120,7 +121,6 @@ enum EventReturn
 	EVENT_ALLOW
 };
 
-
 enum ModuleReturn
 {
 	MOD_ERR_OK,
@@ -141,26 +141,23 @@ enum Priority { PRIORITY_FIRST, PRIORITY_DONTCARE, PRIORITY_LAST, PRIORITY_BEFOR
 /* Module types, in the order in which they are unloaded. The order these are in is IMPORTANT */
 enum ModType { MT_BEGIN, THIRD, SUPPORTED, CORE, DATABASE, ENCRYPTION, PROTOCOL, MT_END };
 
-extern CoreExport std::list<Module *> Modules;
-
+/** Returned by Module::GetVersion, used to see what version of Anope
+ * a module is compiled against.
+ */
 class ModuleVersion
 {
  private:
-	int Major;
-	int Minor;
-	int Patch;
+	int version_major;
+	int version_minor;
+	int version_patch;
 
  public:
 	/** Constructor
-	 * @param vMajor The major version numbber
-	 * @param vMinor The minor version numbber
-	 * @param vPatch The patch version numbber
+	 * @param major The major version numbber
+	 * @param minor The minor version numbber
+	 * @param patch The patch version numbber
 	 */
-	ModuleVersion(int vMajor, int vMinor, int vPatch);
-
-	/** Destructor
-	 */
-	virtual ~ModuleVersion();
+	ModuleVersion(int major, int minor, int patch);
 
 	/** Get the major version of Anope this was built against
 	 * @return The major version
@@ -200,7 +197,7 @@ class CoreExport Module : public Extensible
 
 	/** Callbacks used in this module
 	 */
-	std::list<CallBack *> CallBacks;
+	std::list<CallBack *> callbacks;
 
 	/** Handle for this module, obtained from dlopen()
 	 */
@@ -259,6 +256,14 @@ class CoreExport Module : public Extensible
 	 */
 	ModuleVersion GetVersion() const;
 
+	/** Gets the IRCd protocol published by this module
+	 */
+	virtual IRCDProto *GetIRCDProto();
+
+	/* Everything below here are events. Modules must ModuleManager::Attach to these events
+	 * before they will be called.
+	 */
+
 	/** Called when the ircd notifies that a user has been kicked from a channel.
 	 * @param c The channel the user has been kicked from.
 	 * @param target The user that has been kicked.
@@ -290,7 +295,7 @@ class CoreExport Module : public Extensible
 	 * @param u The connecting user.
 	 * @param exempt set to true/is true if the user should be excepted from bans etc
 	 */
-	virtual void OnUserConnect(dynamic_reference<User> &u, bool &exempt) { }
+	virtual void OnUserConnect(Reference<User> &u, bool &exempt) { }
 
 	/** Called when a new server connects to the network.
 	 * @param s The server that has connected to the network
@@ -649,9 +654,9 @@ class CoreExport Module : public Extensible
 	 * @param source The user requesting info
 	 * @param ci The channel the user is requesting info for
 	 * @param info Data to show the user requesting information
-	 * @param ShowHidden true if we should show the user everything
+	 * @param show_hidden true if we should show the user everything
 	 */
-	virtual void OnChanInfo(CommandSource &source, ChannelInfo *ci, InfoFormatter &info, bool ShowHidden) { }
+	virtual void OnChanInfo(CommandSource &source, ChannelInfo *ci, InfoFormatter &info, bool show_hidden) { }
 
 	/** Checks if access has the channel privilege 'priv'.
 	 * @param access THe access struct
@@ -763,9 +768,9 @@ class CoreExport Module : public Extensible
 	 * @param source The user requesting info
 	 * @param na The nick the user is requesting info from
 	 * @param info Data to show the user requesting information
-	 * @param ShowHidden true if we should show the user everything
+	 * @param show_hidden true if we should show the user everything
 	 */
-	virtual void OnNickInfo(CommandSource &source, NickAlias *na, InfoFormatter &info, bool ShowHidden) { }
+	virtual void OnNickInfo(CommandSource &source, NickAlias *na, InfoFormatter &info, bool show_hidden) { }
 
 	/** Check whether a username and password is correct
 	 * @param u The user trying to identify, if applicable.
@@ -824,32 +829,32 @@ class CoreExport Module : public Extensible
 	/** Called when a mode is set on a channel
 	 * @param c The channel
 	 * @param setter The user or server that is setting the mode
-	 * @param Name The mode name
+	 * @param mname The mode name
 	 * @param param The mode param, if there is one
 	 * @return EVENT_STOP to make mlock/secureops etc checks not happen
 	 */
-	virtual EventReturn OnChannelModeSet(Channel *c, MessageSource &setter, ChannelModeName Name, const Anope::string &param) { return EVENT_CONTINUE; }
+	virtual EventReturn OnChannelModeSet(Channel *c, MessageSource &setter, ChannelModeName mname, const Anope::string &param) { return EVENT_CONTINUE; }
 
 	/** Called when a mode is unset on a channel
 	 * @param c The channel
 	 * @param setter The user or server that is unsetting the mode
-	 * @param Name The mode name
+	 * @param mname The mode name
 	 * @param param The mode param, if there is one
 	 * @return EVENT_STOP to make mlock/secureops etc checks not happen
 	 */
-	virtual EventReturn OnChannelModeUnset(Channel *c, MessageSource &setter, ChannelModeName Name, const Anope::string &param) { return EVENT_CONTINUE; }
+	virtual EventReturn OnChannelModeUnset(Channel *c, MessageSource &setter, ChannelModeName mname, const Anope::string &param) { return EVENT_CONTINUE; }
 
 	/** Called when a mode is set on a user
 	 * @param u The user
-	 * @param Name The mode name
+	 * @param mname The mode name
 	 */
-	virtual void OnUserModeSet(User *u, UserModeName Name) { }
+	virtual void OnUserModeSet(User *u, UserModeName mname) { }
 
 	/** Called when a mode is unset from a user
 	 * @param u The user
-	 * @param Name The mode name
+	 * @param mname The mode name
 	 */
-	virtual void OnUserModeUnset(User *u, UserModeName Name) { }
+	virtual void OnUserModeUnset(User *u, UserModeName mname) { }
 
 	/** Called when a channel mode is introducted into Anope
 	 * @param cm The mode
@@ -921,7 +926,7 @@ class CoreExport Module : public Extensible
 	 * @param req The dns request
 	 * @param reply The reply that will be sent
 	 */
-	virtual void OnDnsRequest(DNSPacket &req, DNSPacket *reply) { }
+	virtual void OnDnsRequest(DNS::Packet &req, DNS::Packet *reply) { }
 
 	/** Called when a channels modes are being checked to see if they are allowed,
 	 * mostly to ensure mlock/+r are set.
@@ -930,7 +935,7 @@ class CoreExport Module : public Extensible
 	 */
 	virtual EventReturn OnCheckModes(Channel *c) { return EVENT_CONTINUE; }
 
-	virtual void OnSerializeCheck(SerializeType *) { }
+	virtual void OnSerializeCheck(Serialize::Type *) { }
 	virtual void OnSerializableConstruct(Serializable *) { }
 	virtual void OnSerializableDestruct(Serializable *) { }
 	virtual void OnSerializableUpdate(Serializable *) { }
@@ -1012,6 +1017,10 @@ enum Implementation
 class CoreExport ModuleManager
 {
  public:
+ 	/** List of all modules loaded in Anope
+	 */
+	static CoreExport std::list<Module *> Modules;
+
 	/** Event handler hooks.
 	 * This needs to be public to be used by FOREACH_MOD and friends.
 	 */
@@ -1124,7 +1133,8 @@ class CoreExport ModuleManager
 	static ModuleReturn DeleteModule(Module *m);
 };
 
-/** Class used for callbacks within modules
+/** Class used for callbacks within modules. These are identical to Timers hwoever
+ * they will be cleaned up automatically when a module is unloaded, and Timers will not.
  */
 class CoreExport CallBack : public Timer
 {

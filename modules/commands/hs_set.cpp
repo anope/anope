@@ -27,7 +27,7 @@ class CommandHSSet : public Command
 
 		const Anope::string &nick = params[0];
 
-		NickAlias *na = findnick(nick);
+		NickAlias *na = NickAlias::Find(nick);
 		if (na == NULL)
 		{
 			source.Reply(NICK_X_NOT_REGISTERED, nick.c_str());
@@ -55,12 +55,12 @@ class CommandHSSet : public Command
 
 		if (!user.empty())
 		{
-			if (!ircdproto->CanSetVIdent)
+			if (!IRCD->CanSetVIdent)
 			{
 				source.Reply(HOST_NO_VIDENT);
 				return;
 			}
-			else if (!IsValidIdent(user))
+			else if (!IRCD->IsIdentValid(user))
 			{
 				source.Reply(HOST_SET_IDENT_ERROR);
 				return;
@@ -73,7 +73,7 @@ class CommandHSSet : public Command
 			return;
 		}
 
-		if (!IsValidHost(host))
+		if (!IRCD->IsHostValid(host))
 		{
 			source.Reply(HOST_SET_ERROR);
 			return;
@@ -108,7 +108,7 @@ class CommandHSSetAll : public Command
 		if (!na || !na->HasVhost())
 			return;
 	
-		for (std::list<serialize_obj<NickAlias> >::const_iterator it = na->nc->aliases.begin(), it_end = na->nc->aliases.end(); it != it_end;)
+		for (std::list<Serialize::Reference<NickAlias> >::const_iterator it = na->nc->aliases.begin(), it_end = na->nc->aliases.end(); it != it_end;)
 		{
 			NickAlias *nick = *it++;
 			if (nick)
@@ -128,7 +128,7 @@ class CommandHSSetAll : public Command
 
 		Anope::string nick = params[0];
 
-		NickAlias *na = findnick(nick);
+		NickAlias *na = NickAlias::Find(nick);
 		if (na == NULL)
 		{
 			source.Reply(NICK_X_NOT_REGISTERED, nick.c_str());
@@ -156,12 +156,12 @@ class CommandHSSetAll : public Command
 
 		if (!user.empty())
 		{
-			if (!ircdproto->CanSetVIdent)
+			if (!IRCD->CanSetVIdent)
 			{
 				source.Reply(HOST_NO_VIDENT);
 				return;
 			}
-			else if (!IsValidIdent(user))
+			else if (!IRCD->IsIdentValid(user))
 			{
 				source.Reply(HOST_SET_IDENT_ERROR);
 				return;
@@ -174,7 +174,7 @@ class CommandHSSetAll : public Command
 			return;
 		}
 
-		if (!IsValidHost(host))
+		if (!IRCD->IsHostValid(host))
 		{
 			source.Reply(HOST_SET_ERROR);
 			return;

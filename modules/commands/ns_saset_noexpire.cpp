@@ -24,7 +24,7 @@ class CommandNSSASetNoexpire : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		NickAlias *na = findnick(params[0]);
+		NickAlias *na = NickAlias::Find(params[0]);
 		if (na == NULL)
 		{
 			source.Reply(NICK_X_NOT_REGISTERED, params[0].c_str());

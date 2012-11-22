@@ -118,7 +118,7 @@ class XOPChanAccess : public ChanAccess
 		return false;
 	}
 
-	Anope::string Serialize() const
+	Anope::string AccessSerialize() const
 	{
 		for (int i = 0; xopAccess[i].type != XOP_UNKNOWN; ++i)
 		{
@@ -131,7 +131,7 @@ class XOPChanAccess : public ChanAccess
 		return "";
 	}
 
-	void Unserialize(const Anope::string &data) anope_override
+	void AccessUnserialize(const Anope::string &data) anope_override
 	{
 		for (int i = 0; xopAccess[i].type != XOP_UNKNOWN; ++i)
 		{
@@ -210,7 +210,7 @@ class XOPBase : public Command
 			return;
 		}
 
-		if (readonly)
+		if (Anope::ReadOnly)
 		{
 			source.Reply(_("Sorry, channel %s list modification is temporarily disabled."), source.command.c_str());
 			return;
@@ -224,7 +224,7 @@ class XOPBase : public Command
 		const ChanAccess *highest = access.Highest();
 		bool override = false;
 
-		if ((!access.Founder && !access.HasPriv("ACCESS_CHANGE")) || ((!highest || *highest <= tmp_access) && !access.Founder))
+		if ((!access.founder && !access.HasPriv("ACCESS_CHANGE")) || ((!highest || *highest <= tmp_access) && !access.founder))
 		{
 			if (source.HasPriv("chanserv/access/modify"))
 				override = true;
@@ -235,9 +235,9 @@ class XOPBase : public Command
 			}
 		}
 
-		if (mask.find_first_of("!*@") == Anope::string::npos && !findnick(mask))
+		if (mask.find_first_of("!*@") == Anope::string::npos && !NickAlias::Find(mask))
 		{
-			User *targ = finduser(mask);
+			User *targ = User::Find(mask, true);
 			if (targ != NULL)
 				mask = "*!*@" + targ->GetDisplayedHost();
 			else
@@ -253,7 +253,7 @@ class XOPBase : public Command
 
 			if (a->mask.equals_ci(mask))
 			{
-				if ((!highest || *a >= *highest) && !access.Founder && !source.HasPriv("chanserv/access/modify"))
+				if ((!highest || *a >= *highest) && !access.founder && !source.HasPriv("chanserv/access/modify"))
 				{
 					source.Reply(ACCESS_DENIED);
 					return;
@@ -270,7 +270,7 @@ class XOPBase : public Command
 			return;
 		}
 
-		service_reference<AccessProvider> provider("AccessProvider", "access/xop");
+		ServiceReference<AccessProvider> provider("AccessProvider", "access/xop");
 		if (!provider)
 			return;
 		XOPChanAccess *acc = anope_dynamic_static_cast<XOPChanAccess *>(provider->Create());
@@ -299,7 +299,7 @@ class XOPBase : public Command
 			return;
 		}
 
-		if (readonly)
+		if (Anope::ReadOnly)
 		{
 			source.Reply(_("Sorry, channel %s list modification is temporarily disabled."), source.command.c_str());
 			return;
@@ -319,9 +319,9 @@ class XOPBase : public Command
 		const ChanAccess *highest = access.Highest();
 		bool override = false;
 
-		if (mask.find_first_of("!*@") == Anope::string::npos && !findnick(mask))
+		if (mask.find_first_of("!*@") == Anope::string::npos && !NickAlias::Find(mask))
 		{
-			User *targ = finduser(mask);
+			User *targ = User::Find(mask, true);
 			if (targ != NULL)
 				mask = "*!*@" + targ->GetDisplayedHost();
 			else
@@ -331,7 +331,7 @@ class XOPBase : public Command
 			}
 		}
 
-		if ((!mask.equals_ci(nc->display) && !access.HasPriv("ACCESS_CHANGE") && !access.Founder) || ((!highest || tmp_access >= *highest) && !access.Founder))
+		if ((!mask.equals_ci(nc->display) && !access.HasPriv("ACCESS_CHANGE") && !access.founder) || ((!highest || tmp_access >= *highest) && !access.founder))
 		{
 			if (source.HasPriv("chanserv/access/modify"))
 				override = true;
@@ -350,49 +350,49 @@ class XOPBase : public Command
 				CommandSource &source;
 				ChannelInfo *ci;
 				Command *c;
-				unsigned Deleted;
-				Anope::string Nicks;
+				unsigned deleted;
+				Anope::string nicks;
 				bool override;
 				XOPType type;
 			 public:
-				XOPDelCallback(CommandSource &_source, ChannelInfo *_ci, Command *_c, bool _override, XOPType _type, const Anope::string &numlist) : NumberList(numlist, true), source(_source), ci(_ci), c(_c), Deleted(0), override(_override), type(_type)
+				XOPDelCallback(CommandSource &_source, ChannelInfo *_ci, Command *_c, bool _override, XOPType _type, const Anope::string &numlist) : NumberList(numlist, true), source(_source), ci(_ci), c(_c), deleted(0), override(_override), type(_type)
 				{
 				}
 
 				~XOPDelCallback()
 				{
-					if (!Deleted)
+					if (!deleted)
 						 source.Reply(_("No matching entries on %s %s list."), ci->name.c_str(), source.command.c_str());
 					else
 					{
-						Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, c, ci) << "to delete " << Nicks;
+						Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, c, ci) << "to delete " << nicks;
 
-						if (Deleted == 1)
+						if (deleted == 1)
 							source.Reply(_("Deleted one entry from %s %s list."), ci->name.c_str(), source.command.c_str());
 						else
-							source.Reply(_("Deleted %d entries from %s %s list."), Deleted, ci->name.c_str(), source.command.c_str());
+							source.Reply(_("Deleted %d entries from %s %s list."), deleted, ci->name.c_str(), source.command.c_str());
 					}
 				}
 
-				void HandleNumber(unsigned Number) anope_override
+				void HandleNumber(unsigned number) anope_override
 				{
-					if (!Number || Number > ci->GetAccessCount())
+					if (!number || number > ci->GetAccessCount())
 						return;
 
-					ChanAccess *caccess = ci->GetAccess(Number - 1);
+					ChanAccess *caccess = ci->GetAccess(number - 1);
 
 					if (this->type != XOPChanAccess::DetermineLevel(caccess))
 						return;
 
-					++Deleted;
-					if (!Nicks.empty())
-						Nicks += ", " + caccess->mask;
+					++deleted;
+					if (!nicks.empty())
+						nicks += ", " + caccess->mask;
 					else
-						Nicks = caccess->mask;
+						nicks = caccess->mask;
 
 					FOREACH_MOD(I_OnAccessDel, OnAccessDel(ci, source, caccess));
 
-					ci->EraseAccess(Number - 1);
+					ci->EraseAccess(number - 1);
 				}
 			}
 			delcallback(source, ci, this, override, level, mask);
@@ -441,7 +441,7 @@ class XOPBase : public Command
 		}
 
 		ListFormatter list;
-		list.addColumn("Number").addColumn("Mask");
+		list.AddColumn("Number").AddColumn("Mask");
 
 		if (!nick.empty() && nick.find_first_not_of("1234567890,-") == Anope::string::npos)
 		{
@@ -468,7 +468,7 @@ class XOPBase : public Command
 					ListFormatter::ListEntry entry;
 					entry["Number"] = stringify(Number);
 					entry["Mask"] = a->mask;
-					this->list.addEntry(entry);
+					this->list.AddEntry(entry);
 				}
 			} nl_list(list, ci, nick, level);
 			nl_list.Process();
@@ -487,11 +487,11 @@ class XOPBase : public Command
 				ListFormatter::ListEntry entry;
 				entry["Number"] = stringify(i + 1);
 				entry["Mask"] = a->mask;
-				list.addEntry(entry);
+				list.AddEntry(entry);
 			}
 		}
 
-		if (list.isEmpty())
+		if (list.IsEmpty())
 			source.Reply(_("No matching entries on %s access list."), ci->name.c_str());
 		else
 		{
@@ -507,7 +507,7 @@ class XOPBase : public Command
 	void DoClear(CommandSource &source, ChannelInfo *ci, XOPType level)
 	{
 
-		if (readonly)
+		if (Anope::ReadOnly)
 		{
 			source.Reply(_("Sorry, channel %s list modification is temporarily disabled."), source.command.c_str());
 			return;
@@ -545,7 +545,7 @@ class XOPBase : public Command
  protected:
 	void DoXop(CommandSource &source, const std::vector<Anope::string> &params, XOPType level)
 	{
-		ChannelInfo *ci = cs_findchan(params[0]);
+		ChannelInfo *ci = ChannelInfo::Find(params[0]);
 		if (ci == NULL)
 		{
 			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());

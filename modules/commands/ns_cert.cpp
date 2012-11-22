@@ -31,14 +31,14 @@ class CommandNSCert : public Command
 		}
 
 		ListFormatter list;
-		list.addColumn("Certificate");
+		list.AddColumn("Certificate");
 
 		for (unsigned i = 0, end = nc->cert.size(); i < end; ++i)
 		{
 			Anope::string fingerprint = nc->GetCert(i);
 			ListFormatter::ListEntry entry;
 			entry["Certificate"] = fingerprint;
-			list.addEntry(entry);
+			list.AddEntry(entry);
 		}
 
 		source.Reply(_("Certificate list for \002%s\002:"), nc->display.c_str());
@@ -121,13 +121,13 @@ class CommandNSCert : public Command
 		}
 
 		ListFormatter list;
-		list.addColumn("Certificate");
+		list.AddColumn("Certificate");
 
 		for (unsigned i = 0, end = nc->cert.size(); i < end; ++i)
 		{
 			ListFormatter::ListEntry entry;
 			entry["Certificate"] = nc->GetCert(i);
-			list.addEntry(entry);
+			list.AddEntry(entry);
 		}
 
 		source.Reply(_("Certificate list:"));
@@ -152,7 +152,7 @@ class CommandNSCert : public Command
 		const Anope::string &mask = params.size() > 1 ? params[1] : "";
 
 		const NickAlias *na;
-		if (cmd.equals_ci("LIST") && source.IsServicesOper() && !mask.empty() && (na = findnick(mask)))
+		if (cmd.equals_ci("LIST") && source.IsServicesOper() && !mask.empty() && (na = NickAlias::Find(mask)))
 			return this->DoServAdminList(source, na->nc);
 
 		NickCore *nc = source.nc;
@@ -202,9 +202,8 @@ class NSCert : public Module
 
 	void DoAutoIdentify(User *u)
 	{
-		const BotInfo *bi = findbot(Config->NickServ);
-		NickAlias *na = findnick(u->nick);
-		if (!bi || !na)
+		NickAlias *na = NickAlias::Find(u->nick);
+		if (!NickServ || !na)
 			return;
 		if (u->IsIdentified() && u->Account() == na->nc)
 			return;
@@ -214,7 +213,7 @@ class NSCert : public Module
 			return;
 
 		u->Identify(na);
-		u->SendMessage(bi, _("SSL Fingerprint accepted. You are now identified."));
+		u->SendMessage(NickServ, _("SSL Fingerprint accepted. You are now identified."));
 		Log(u) << "automatically identified for account " << na->nc->display << " using a valid SSL fingerprint";
 		return;
 	}
@@ -225,7 +224,7 @@ class NSCert : public Module
 	{
 		this->SetAuthor("Anope");
 
-		if (!ircdproto || !ircdproto->CanCertFP)
+		if (!IRCD || !IRCD->CanCertFP)
 			throw ModuleException("Your IRCd does not support ssl client certificates");
 
 		Implementation i[] = { I_OnFingerprint };

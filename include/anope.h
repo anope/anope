@@ -1,4 +1,5 @@
 /*
+ *
  * (C) 2003-2012 Anope Team
  * Contact us at team@anope.org
  *
@@ -6,6 +7,7 @@
  *
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
+ *
  */
 
 #ifndef ANOPE_H
@@ -304,17 +306,81 @@ namespace Anope
 
 	static const char *const compiled = __TIME__ " " __DATE__;
 
+	/** The time Anope started.
+	 */
+	extern time_t StartTime;
+
+	/** The value to return from main()
+	 */
+	extern int ReturnValue;
+	extern bool Quitting;
+	extern bool Restarting;
+	extern Anope::string QuitReason;
+
 	/** The current system time, which is pretty close to being accurate.
 	 * Use this unless you need very specific time checks
 	 */
 	extern CoreExport time_t CurTime;
 
+	/** The debug level we are running at.
+	 */
+	extern int Debug;
+
+	/** Other comand line options.
+	 */
+	extern bool ReadOnly, NoFork, NoThird, NoExpire, ProtocolDebug;
+
+	/** The root of the services installation. Usually ~/services
+	 */
+	extern Anope::string ServicesDir;
+
+	/** Services binary name (eg services)
+	 */
+	extern Anope::string ServicesBin;
+
+	/** Various directory paths. These can be set at runtime by command line args
+	 */
+	extern Anope::string ConfigDir;
+	extern Anope::string DataDir;
+	extern Anope::string ModuleDir;
+	extern Anope::string LocaleDir;
+	extern Anope::string LogDir;
+
+	/** The uplink we are currently connected to
+	 */
+	extern int CurrentUplink;
+
+	/** Various methods to determine the Anope version running
+	 */
 	extern CoreExport string Version();
 	extern CoreExport string VersionShort();
 	extern CoreExport string VersionBuildString();
 	extern CoreExport int VersionMajor();
 	extern CoreExport int VersionMinor();
 	extern CoreExport int VersionPatch();
+
+	/** Determines if we are still attached to the terminal, and can print
+	 * messages to the user via stderr/stdout.
+	 * @return true if still attached
+	 */
+	extern bool AtTerm();
+
+	/** Used to "fork" the process and go into the background during initial startup
+	 * while we are AtTerm(). The actual fork is not done here, but earlier, and this
+	 * simply notifys the parent via kill() to exit().
+	 */
+	extern void Fork();
+
+	/** One of the first functions called, does general initialization such as reading
+	 * command line args, loading the configuration, doing the initial fork() if necessary,
+	 * initializating language support, loading modules, and loading databases.
+	 * @throws CoreException if something bad went wrong
+	 */
+	extern void Init(int ac, char **av);
+
+	/** Calls the save database event
+	 */
+	extern void SaveDatabases();
 
 	/** Check whether two strings match.
 	 * @param str The string to check against the pattern (e.g. foobar)
@@ -350,6 +416,20 @@ namespace Anope
 	 */
 	extern CoreExport void B64Decode(const string &src, string &target);
 
+	/** Encrypts what is in 'src' to 'dest'
+	 * @param src The source string to encrypt
+	 * @param dest The destination where the encrypted string is placed
+	 */
+	extern void Encrypt(const Anope::string &src, Anope::string &dest);
+
+	/** Decrypts what is in 'src' to 'dest'.
+	 * @param src The source string to decrypt
+	 * @param dest The destination where the decrypted string is placed
+	 * @return true if decryption was successful. This is usually not the case
+	 * as most encryption methods we use are one way.
+	 */
+	extern bool Decrypt(const Anope::string &src, Anope::string &dest);
+
 	/** Returns a sequence of data formatted as the format argument specifies.
 	 ** After the format parameter, the function expects at least as many
 	 ** additional arguments as specified in format.
@@ -368,6 +448,48 @@ namespace Anope
 	 * @return An error message
 	 */
 	extern CoreExport const string LastError();
+
+	/** Determines if a path is a file
+	 */
+	extern bool IsFile(const Anope::string &file);
+
+	/** Converts a string into seconds
+	 * @param s The string, eg 3d
+	 * @return The time represented by the string, eg 259,200
+	 */
+	extern time_t DoTime(const Anope::string &s);
+
+	/** Retrieves a human readable string representing the time in seconds
+	 * @param seconds The time on seconds, eg 60
+	 * @param nc The account to use langauge settings for to translate this string, if applicable
+	 * @return A human readable string, eg "1 minute"
+	 */
+	extern Anope::string Duration(time_t seconds, const NickCore *nc = NULL);
+
+	/** Generates a human readable string of type "expires in ..."
+	 * @param expires time in seconds
+	 * @param nc The account to use langauge settings for to translate this string, if applicable
+	 * @return A human readable string, eg "expires in 5 days"
+	 */
+	extern Anope::string Expires(time_t seconds, const NickCore *nc = NULL);
+
+	/** Converts a time in seconds (epoch) to a human readable format.
+	 * @param t The time
+	 * @param nc The account to use langauge settings for to translate this string, if applicable
+	 * @param short_output If true, the output is just a date (eg, "Apr 12 20:18:22 2009 MSD"), else it includes the date and how long ago/from now that date is, (eg "Apr 12 20:18:22 2009 MSD (1313 days, 9 hours, 32 minutes ago)"
+	 */
+	extern Anope::string strftime(time_t t, const NickCore *nc = NULL, bool short_output = false);
+
+	/** Normalize buffer, stripping control characters and colors
+	 * @param A string to be parsed for control and color codes
+	 * @return A string stripped of control and color codes
+	 */
+	extern Anope::string NormalizeBuffer(const Anope::string &);
+
+	/** Main processing routine. Parses the message and takes the appropriate action.
+	 * @param Raw message from the uplink
+	 */
+	extern void Process(const Anope::string &);
 }
 
 /** sepstream allows for splitting token seperated lists.
@@ -394,23 +516,52 @@ class CoreExport sepstream
 	/** Create a sepstream and fill it with the provided data
 	 */
 	sepstream(const Anope::string &source, char seperator);
-	virtual ~sepstream() { }
 
 	/** Fetch the next token from the stream
 	 * @param token The next token from the stream is placed here
 	 * @return True if tokens still remain, false if there are none left
 	 */
-	virtual bool GetToken(Anope::string &token);
+	bool GetToken(Anope::string &token);
+
+	/** Gets token number 'num' from the stream
+	 * @param token The token is placed here
+	 * @param num The token number to featch
+	 * @return True if the token was able to be detched
+	 */
+	bool GetToken(Anope::string &token, int num);
+
+	/** Gets every token from this stream
+	 * @param token Tokens are pushed back here
+	 */
+	template<typename T> void GetTokens(T& token)
+	{
+		token.clear();
+		Anope::string t;
+		while (this->GetToken(t))
+			token.push_back(t);
+	}
+
+	/** Gets token number 'num' from the stream and all remaining tokens.
+	 * @param token The token is placed here
+	 * @param num The token number to featch
+	 * @return True if the token was able to be detched
+	 */
+	bool GetTokenRemainder(Anope::string &token, int num);
+
+	/** Determines the number of tokens in this stream.
+	 * @return The number of tokens in this stream
+	 */
+	int NumTokens();
 
 	/** Fetch the entire remaining stream, without tokenizing
 	 * @return The remaining part of the stream
 	 */
-	virtual const Anope::string GetRemaining();
+	const Anope::string GetRemaining();
 
 	/** Returns true if the end of the stream has been reached
 	 * @return True if the end of the stream has been reached, otherwise false
 	 */
-	virtual bool StreamEnd();
+	bool StreamEnd();
 };
 
 /** A derived form of sepstream, which seperates on commas
@@ -476,14 +627,6 @@ class CoreException : public std::exception
 	{
 		return source;
 	}
-};
-
-class FatalException : public CoreException
-{
- public:
-	FatalException(const Anope::string &reason = "") : CoreException(reason) { }
-
-	virtual ~FatalException() throw() { }
 };
 
 class ModuleException : public CoreException
@@ -600,39 +743,43 @@ template<typename T, typename O> inline T anope_dynamic_reinterpret_cast(O ptr)
 /** Class with the ability to keep flags on items, they should extend from this
  * where T is an enum.
  */
-template<typename T, size_t Size = 32> class Flags
+template<typename T> class Flags
 {
- protected:
-	std::bitset<Size> Flag_Values;
-	const Anope::string *Flag_Strings;
+	std::vector<bool> flags_values;
+	static const Anope::string *flags_strings;
 
  public:
-	Flags() : Flag_Strings(NULL) { }
- 	Flags(const Anope::string *flag_strings) : Flag_Strings(flag_strings) { }
-
 	/** Add a flag to this item
-	 * @param Value The flag
+	 * @param value The flag
 	 */
-	void SetFlag(T Value)
+	void SetFlag(T value)
 	{
-		Flag_Values[Value] = true;
+		if (value < 0)
+			return;
+
+		if (static_cast<unsigned>(value) >= flags_values.size())
+			flags_values.resize(value + 1);
+		flags_values[value] = true;
 	}
 
 	/** Remove a flag from this item
-	 * @param Value The flag
+	 * @param value The flag
 	 */
-	void UnsetFlag(T Value)
+	void UnsetFlag(T value)
 	{
-		Flag_Values[Value] = false;
+		if (value >= 0 && static_cast<unsigned>(value) < flags_values.size())
+			flags_values[value] = false;
 	}
 
 	/** Check if this item has a flag
-	 * @param Value The flag
+	 * @param value The flag
 	 * @return true or false
 	 */
-	bool HasFlag(T Value) const
+	bool HasFlag(T value) const
 	{
-		return Flag_Values.test(Value);
+		if (value >= 0 && static_cast<unsigned>(value) < flags_values.size())
+			return flags_values[value];
+		return false;
 	}
 
 	/** Check how many flags are set
@@ -640,14 +787,23 @@ template<typename T, size_t Size = 32> class Flags
 	 */
 	size_t FlagCount() const
 	{
-		return Flag_Values.count();
+		size_t c = 0;
+		for (unsigned i = 0; i < flags_values.size(); ++i)
+			if (flags_values[i])
+				++c;
+		return c;
 	}
 
 	/** Unset all of the flags
 	 */
 	void ClearFlags()
 	{
-		Flag_Values.reset();
+		flags_values.clear();
+	}
+
+	static const Anope::string* GetFlagStrings()
+	{
+		return flags_strings;
 	}
 
 	Anope::string ToString() const
@@ -675,9 +831,9 @@ template<typename T, size_t Size = 32> class Flags
 	std::vector<Anope::string> ToVector() const
 	{
 		std::vector<Anope::string> ret;
-		for (unsigned i = 0; this->Flag_Strings && !this->Flag_Strings[i].empty(); ++i)
+		for (unsigned i = 0; this->flags_strings && !this->flags_strings[i].empty(); ++i)
 			if (this->HasFlag(static_cast<T>(i)))
-				ret.push_back(this->Flag_Strings[i]);
+				ret.push_back(this->flags_strings[i]);
 		return ret;
 	}
 
@@ -685,9 +841,9 @@ template<typename T, size_t Size = 32> class Flags
 	{
 		this->ClearFlags();
 
-		for (unsigned i = 0; this->Flag_Strings && !this->Flag_Strings[i].empty(); ++i)
+		for (unsigned i = 0; this->flags_strings && !this->flags_strings[i].empty(); ++i)
 			for (unsigned j = 0; j < strings.size(); ++j)
-				if (this->Flag_Strings[i] == strings[j])
+				if (this->flags_strings[i] == strings[j])
 					this->SetFlag(static_cast<T>(i));
 	}
 };

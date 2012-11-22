@@ -119,7 +119,6 @@ add_to_cpack_ignored_files("${SERVICES_BINARY}$" TRUE)
 configure_file(${Anope_SOURCE_DIR}/include/sysconf.h.cmake ${Anope_BINARY_DIR}/include/sysconf.h)
 
 # Go into the following directories and run their CMakeLists.txt as well
-add_subdirectory(bin)
 add_subdirectory(tools)
 
 # Set Anope to be installed to the bin directory

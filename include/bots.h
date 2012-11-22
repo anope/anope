@@ -1,8 +1,10 @@
 /*
+ *
  * Copyright (C) 2008-2011 Robin Burchell <w00t@inspircd.org>
  * Copyright (C) 2008-2012 Anope Team <team@anope.org>
  *
  * Please read COPYING and README for further details.
+ *
  */
 
 #ifndef BOTS_H
@@ -16,7 +18,7 @@
 
 typedef Anope::map<BotInfo *> botinfo_map;
 
-extern CoreExport serialize_checker<botinfo_map> BotListByNick, BotListByUID;
+extern CoreExport Serialize::Checker<botinfo_map> BotListByNick, BotListByUID;
 
 /** Flags settable on a bot
  */
@@ -24,8 +26,6 @@ enum BotFlag
 {
 	BI_BEGIN,
 
-	/* This bot is a core bot. NickServ, ChanServ, etc */
-	BI_CORE,
 	/* This bot can only be assigned by IRCops */
 	BI_PRIVATE,
 	/* This bot is defined in the config */
@@ -34,17 +34,21 @@ enum BotFlag
 	BI_END
 };
 
-static const Anope::string BotFlagString[] = { "BEGIN", "CORE", "PRIVATE", "CONF", "" };
-
-class CoreExport BotInfo : public User, public Flags<BotFlag, BI_END>, public Serializable
+/* A service bot (NickServ, ChanServ, a BotServ bot, etc). */
+class CoreExport BotInfo : public User, public Flags<BotFlag>, public Serializable
 {
  public:
-	time_t created;			/* Birth date ;) */
-	time_t lastmsg;			/* Last time we said something */
-	CommandInfo::map commands; /* Commands, actual name to service name */
-	Anope::string botmodes;		/* Modes the bot should have as configured in service:modes */
-	std::vector<Anope::string> botchannels;	/* Channels the bot should be in as configured in service:channels */
-	bool introduced;		/* Whether or not this bot is introduced */
+	time_t created;
+	/* Last time this bot said something (via privmsg) */
+	time_t lastmsg;
+	/* Map of actual command names -> service name/permission required */
+	CommandInfo::map commands;
+	/* Modes the bot should have as configured in service:modes */
+	Anope::string botmodes;
+	/* Channels the bot should be in as configured in service:channels */
+	std::vector<Anope::string> botchannels;
+	/* Whether or not this bot is introduced to the network */
+	bool introduced;
 
 	/** Create a new bot.
 	 * @param nick The nickname to assign to the bot.
@@ -59,8 +63,8 @@ class CoreExport BotInfo : public User, public Flags<BotFlag, BI_END>, public Se
 	 */
 	virtual ~BotInfo();
 
-	Serialize::Data serialize() const;
-	static Serializable* unserialize(Serializable *obj, Serialize::Data &);
+	Serialize::Data Serialize() const;
+	static Serializable* Unserialize(Serializable *obj, Serialize::Data &);
 
 	void GenerateUID();
 
@@ -126,11 +130,13 @@ class CoreExport BotInfo : public User, public Flags<BotFlag, BI_END>, public Se
 	 * @return A struct containing service name and permission
 	 */
 	CommandInfo *GetCommand(const Anope::string &cname);
+
+	/** Find a bot by nick
+	 * @param nick The nick
+	 * @param nick_only True to only look by nick, and not by UID
+	 * @return The bot, if it exists
+	 */
+	static BotInfo* Find(const Anope::string &nick, bool nick_only = false);
 };
-
-extern CoreExport BotInfo *findbot(const Anope::string &nick);
-
-extern CoreExport void bot_raw_ban(User *requester, ChannelInfo *ci, const Anope::string &nick, const Anope::string &reason);
-extern CoreExport void bot_raw_kick(User *requester, ChannelInfo *ci, const Anope::string &nick, const Anope::string &reason);
 
 #endif // BOTS_H

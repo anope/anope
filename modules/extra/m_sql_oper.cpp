@@ -3,7 +3,7 @@
 
 class SQLOperResult : public SQLInterface
 {
-	dynamic_reference<User> user;
+	Reference<User> user;
 
 	struct SQLOperResultDeleter
 	{
@@ -51,7 +51,7 @@ class SQLOperResult : public SQLInterface
 				delete user->Account()->o;
 				user->Account()->o = NULL;
 				Log(this->owner) << "m_sql_oper: Removed services operator from " << user->nick << " (" << user->Account()->display << ")";
-				user->RemoveMode(findbot(Config->OperServ), UMODE_OPER); // Probably not set, just incase
+				user->RemoveMode(OperServ, UMODE_OPER); // Probably not set, just incase
 			}
 			return;
 		}
@@ -72,10 +72,10 @@ class SQLOperResult : public SQLInterface
 
 		if (!user->HasMode(UMODE_OPER))
 		{
-			ircdproto->SendOper(user);
+			IRCD->SendOper(user);
 
 			if (!modes.empty())
-				user->SetModes(findbot(Config->OperServ), "%s", modes.c_str());
+				user->SetModes(OperServ, "%s", modes.c_str());
 		}
 	}
 
@@ -91,7 +91,7 @@ class ModuleSQLOper : public Module
 	Anope::string engine;
 	Anope::string query;
 
-	service_reference<SQLProvider> SQL;
+	ServiceReference<SQLProvider> SQL;
 
  public:
 	ModuleSQLOper(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, SUPPORTED)
@@ -111,7 +111,7 @@ class ModuleSQLOper : public Module
 		this->engine = config.ReadValue("m_sql_oper", "engine", "", 0);
 		this->query = config.ReadValue("m_sql_oper", "query", "", 0);
 
-		this->SQL = service_reference<SQLProvider>("SQLProvider", this->engine);
+		this->SQL = ServiceReference<SQLProvider>("SQLProvider", this->engine);
 	}
 
 	void OnNickIdentify(User *u) anope_override

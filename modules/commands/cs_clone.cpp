@@ -29,7 +29,7 @@ public:
 		Anope::string what = params.size() > 2 ? params[2] : "";
 
 		User *u = source.GetUser();
-		ChannelInfo *ci = cs_findchan(params[0]);
+		ChannelInfo *ci = ChannelInfo::Find(params[0]);
 		if (ci == NULL)
 		{
 			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
@@ -42,7 +42,7 @@ public:
 			return;
 		}
 
-		ChannelInfo *target_ci = cs_findchan(target);
+		ChannelInfo *target_ci = ChannelInfo::Find(target);
 		if (!target_ci)
 		{
 			source.Reply(CHAN_X_NOT_REGISTERED, target.c_str());
@@ -59,11 +59,11 @@ public:
 
 		if (what.empty())
 		{
-			target_ci->destroy();
+			target_ci->Destroy();
 			target_ci = new ChannelInfo(*ci);
 			target_ci->name = target;
 			(*RegisteredChannelList)[target_ci->name] = target_ci;
-			target_ci->c = findchan(target_ci->name);
+			target_ci->c = Channel::Find(target_ci->name);
 			if (target_ci->c)
 			{
 				target_ci->c->ci = target_ci;
@@ -88,7 +88,7 @@ public:
 					target_ci->c->SetMode(NULL, CMODE_PERM);
 	
 				if (target_ci->bi && target_ci->c->FindUser(target_ci->bi) == NULL)
-					target_ci->bi->Join(target_ci->c, &Config->BotModeList);
+					target_ci->bi->Join(target_ci->c, &ModeManager::DefaultBotModes);
 			}
 
 			if (target_ci->c && !target_ci->c->topic.empty())
@@ -117,7 +117,7 @@ public:
 				newaccess->creator = taccess->creator;
 				newaccess->last_seen = taccess->last_seen;
 				newaccess->created = taccess->created;
-				newaccess->Unserialize(taccess->Serialize());
+				newaccess->AccessUnserialize(taccess->AccessSerialize());
 
 				target_ci->AddAccess(newaccess);
 			}

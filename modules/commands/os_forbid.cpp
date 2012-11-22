@@ -31,7 +31,7 @@ class MyForbidService : public ForbidService
 		std::vector<ForbidData *>::iterator it = std::find(this->forbidData.begin(), this->forbidData.end(), d);
 		if (it != this->forbidData.end())
 			this->forbidData.erase(it);
-		d->destroy();
+		d->Destroy();
 	}
 
 	ForbidData *FindForbid(const Anope::string &mask, ForbidType ftype) anope_override
@@ -65,7 +65,7 @@ class MyForbidService : public ForbidService
 
 				Log(LOG_NORMAL, "expire/forbid") << "Expiring forbid for " << d->mask << " type " << ftype;
 				this->forbidData.erase(this->forbidData.begin() + i - 1);
-				d->destroy();
+				d->Destroy();
 			}
 		}
 
@@ -75,7 +75,7 @@ class MyForbidService : public ForbidService
 
 class CommandOSForbid : public Command
 {
-	service_reference<ForbidService> fs;
+	ServiceReference<ForbidService> fs;
  public:
 	CommandOSForbid(Module *creator) : Command(creator, "operserv/forbid", 1, 5), fs("ForbidService", "forbid")
 	{
@@ -122,12 +122,12 @@ class CommandOSForbid : public Command
 
 			if (!expiry.empty())
 			{
-				expiryt = dotime(expiry);
+				expiryt = Anope::DoTime(expiry);
 				if (expiryt)
 					expiryt += Anope::CurTime;
 			}
 
-			NickAlias *target = findnick(entry);
+			NickAlias *target = NickAlias::Find(entry);
 			if (target != NULL && Config->NSSecureAdmins && target->nc->IsServicesOper())
 			{
 				source.Reply(ACCESS_DENIED);
@@ -152,7 +152,7 @@ class CommandOSForbid : public Command
 				this->fs->AddForbid(d);
 
 			Log(LOG_ADMIN, source, this) << "to add a forbid on " << entry << " of type " << subcommand;
-			source.Reply(_("Added a%s forbid on %s to expire on %s"), ftype == FT_CHAN ? "n" : "", entry.c_str(), d->expires ? do_strftime(d->expires).c_str() : "never");
+			source.Reply(_("Added a%s forbid on %s to expire on %s"), ftype == FT_CHAN ? "n" : "", entry.c_str(), d->expires ? Anope::strftime(d->expires).c_str() : "never");
 		}
 		else if (command.equals_ci("DEL") && params.size() > 2 && ftype != FT_NONE)
 		{
@@ -176,7 +176,7 @@ class CommandOSForbid : public Command
 			else
 			{
 				ListFormatter list;
-				list.addColumn("Mask").addColumn("Type").addColumn("Reason");
+				list.AddColumn("Mask").AddColumn("Type").AddColumn("Reason");
 
 				for (unsigned i = 0; i < forbids.size(); ++i)
 				{
@@ -196,9 +196,9 @@ class CommandOSForbid : public Command
 					entry["Mask"] = d->mask;
 					entry["Type"] = stype;
 					entry["Creator"] = d->creator;
-					entry["Expires"] = d->expires ? do_strftime(d->expires).c_str() : "never";
+					entry["Expires"] = d->expires ? Anope::strftime(d->expires).c_str() : "never";
 					entry["Reason"] = d->reason;
-					list.addEntry(entry);
+					list.AddEntry(entry);
 				}
 
 				source.Reply(_("Forbid list:"));
@@ -234,13 +234,13 @@ class CommandOSForbid : public Command
 
 class OSForbid : public Module
 {
-	SerializeType forbiddata_type;
+	Serialize::Type forbiddata_type;
 	MyForbidService forbidService;
 	CommandOSForbid commandosforbid;
 
  public:
 	OSForbid(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
-		forbiddata_type("ForbidData", ForbidData::unserialize), forbidService(this), commandosforbid(this)
+		forbiddata_type("ForbidData", ForbidData::Unserialize), forbidService(this), commandosforbid(this)
 	{
 		this->SetAuthor("Anope");
 
@@ -248,7 +248,7 @@ class OSForbid : public Module
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 	}
 
-	void OnUserConnect(dynamic_reference<User> &u, bool &exempt) anope_override
+	void OnUserConnect(Reference<User> &u, bool &exempt) anope_override
 	{
 		if (!u || exempt)
 			return;
@@ -264,13 +264,12 @@ class OSForbid : public Module
 		ForbidData *d = this->forbidService.FindForbid(u->nick, FT_NICK);
 		if (d != NULL)
 		{
-			const BotInfo *bi = findbot(Config->OperServ);
-			if (bi)
+			if (OperServ)
 			{
 				if (d->reason.empty())
-					u->SendMessage(bi, _("This nickname has been forbidden."));
+					u->SendMessage(OperServ, _("This nickname has been forbidden."));
 				else
-					u->SendMessage(bi, _("This nickname has been forbidden: %s"), d->reason.c_str());
+					u->SendMessage(OperServ, _("This nickname has been forbidden: %s"), d->reason.c_str());
 			}
 			u->Collide(NULL);
 		}
@@ -278,17 +277,16 @@ class OSForbid : public Module
 
 	void OnJoinChannel(User *u, Channel *c) anope_override
 	{
-		if (u->HasMode(UMODE_OPER))
+		if (u->HasMode(UMODE_OPER) || !OperServ)
 			return;
 
-		BotInfo *bi = findbot(Config->OperServ);
 		ForbidData *d = this->forbidService.FindForbid(c->name, FT_CHAN);
-		if (bi != NULL && d != NULL)
+		if (d != NULL)
 		{
-			if (ircdproto->CanSQLineChannel)
+			if (IRCD->CanSQLineChannel)
 			{
-				XLine x(c->name, bi->nick, Anope::CurTime + Config->CSInhabit, d->reason);
-				ircdproto->SendSQLine(NULL, &x);
+				XLine x(c->name, OperServ->nick, Anope::CurTime + Config->CSInhabit, d->reason);
+				IRCD->SendSQLine(NULL, &x);
 			}
 			else if (!c->HasFlag(CH_INHABIT))
 			{
@@ -303,9 +301,9 @@ class OSForbid : public Module
 			}
 
 			if (d->reason.empty())
-				c->Kick(bi, u, _("This channel has been forbidden."));
+				c->Kick(OperServ, u, _("This channel has been forbidden."));
 			else
-				c->Kick(bi, u, _("This channel has been forbidden: %s"), d->reason.c_str());
+				c->Kick(OperServ, u, _("This channel has been forbidden: %s"), d->reason.c_str());
 		}
 	}
 

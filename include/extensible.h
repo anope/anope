@@ -1,7 +1,10 @@
 /*
- * Copyright (C) 2008-2012 Anope Team <team@anope.org>
+ *
+ * (C) 2003-2012 Anope Team
+ * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
+ *
  */
 
 #ifndef EXTENSIBLE_H
@@ -9,19 +12,28 @@
 
 #include "anope.h"
 
+/* All items added to Extensible must inherit from this.
+ */
 class CoreExport ExtensibleItem
 {
  public:
- 	ExtensibleItem();
-	virtual ~ExtensibleItem();
-	virtual void OnDelete();
+	virtual ~ExtensibleItem() { }
+
+	/* Called when this ExtensibleItem is being deleted. This should
+	 * clean up things (eg, delete this;) if necessary.
+	 */
+	virtual void OnDelete() { delete this; }
 };
 
+/** Common class used to Extensible::Extend non-pointers from, as it doesn't delete
+ * itself when removed. Eg, obj->Extend(key, new ExtensibleItemClass<Anope::string>(value));
+ */
 template<typename T> struct CoreExport ExtensibleItemClass : T, ExtensibleItem
 {
 	ExtensibleItemClass(const T& t) : T(t) { }
 };
 
+/* Used to attach arbitrary objects to this object using unique keys */
 class CoreExport Extensible
 {
  private:
@@ -33,7 +45,7 @@ class CoreExport Extensible
 	 */
 	Extensible() { }
 
-	/** Default destructor, deletes all of the extensible items in this object
+	/** Destructor, deletes all of the extensible items in this object
 	 * then clears the map
 	 */
 	virtual ~Extensible()

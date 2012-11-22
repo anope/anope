@@ -27,7 +27,7 @@ class CommandOSKill : public Command
 		const Anope::string &nick = params[0];
 		Anope::string reason = params.size() > 1 ? params[1] : "";
 
-		User *u2 = finduser(nick);
+		User *u2 = User::Find(nick, true);
 		if (u2 == NULL)
 			source.Reply(NICK_X_NOT_IN_USE, nick.c_str());
 		else if (u2->IsProtected() || u2->server == Me)

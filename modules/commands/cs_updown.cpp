@@ -32,19 +32,19 @@ class CommandCSUp : public Command
 			for (UChannelList::iterator it = u->chans.begin(); it != u->chans.end(); ++it)
 			{
 				Channel *c = (*it)->chan;
-				chan_set_correct_modes(u, c, 1, false);
+				c->SetCorrectModes(u, true, false);
 			}
 		else
 		{
 			const Anope::string &channel = params[0];
-			Channel *c = findchan(params[0]);
+			Channel *c = Channel::Find(params[0]);
 			
 			if (c == NULL)
 				source.Reply(CHAN_X_NOT_IN_USE, channel.c_str());
 			else if (!c->ci)
 				source.Reply(CHAN_X_NOT_REGISTERED, channel.c_str());
 			else
-				chan_set_correct_modes(u, c, 1, false);
+				c->SetCorrectModes(u, true, false);
 		}
 
 	}
@@ -67,7 +67,7 @@ class CommandCSDown : public Command
 		{
 			ChannelMode *cm = ModeManager::ChannelModes[i];
 
-			if (cm != NULL && cm->Type == MODE_STATUS)
+			if (cm != NULL && cm->type == MODE_STATUS)
 				c->RemoveMode(NULL, cm, u->nick);
 		}
 	}
@@ -94,7 +94,7 @@ class CommandCSDown : public Command
 		else
 		{
 			const Anope::string &channel = params[0];
-			Channel *c = findchan(params[0]);
+			Channel *c = Channel::Find(params[0]);
 			
 			if (c == NULL)
 				source.Reply(CHAN_X_NOT_IN_USE, channel.c_str());

@@ -7,8 +7,7 @@
  *
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
- *
- *
+ * 
  */
 
 #ifndef ACCOUNT_H
@@ -23,10 +22,8 @@
 typedef Anope::hash_map<NickAlias *> nickalias_map;
 typedef Anope::hash_map<NickCore *> nickcore_map;
 
-extern CoreExport serialize_checker<nickalias_map> NickAliasList;
-extern CoreExport serialize_checker<nickcore_map> NickCoreList;
-
-/* NickServ nickname structures. */
+extern CoreExport Serialize::Checker<nickalias_map> NickAliasList;
+extern CoreExport Serialize::Checker<nickcore_map> NickCoreList;
 
 /** Flags set on NickAliases
  */
@@ -48,10 +45,6 @@ enum NickNameFlag
 	NS_COLLIDED,
 
 	NS_END
-};
-
-const Anope::string NickNameFlagStrings[] = {
-	"BEGIN", "NO_EXPIRE", "HELD", "COLLIDED", ""
 };
 
 /** Flags set on NickCores
@@ -101,40 +94,36 @@ enum NickCoreFlag
 	NI_END
 };
 
-const Anope::string NickCoreFlagStrings[] = {
-	"BEGIN", "KILLPROTECT", "SECURE", "MSG", "MEMO_HARDMAX", "MEMO_SIGNON", "MEMO_RECEIVE",
-	"PRIVATE", "HIDE_EMAIL", "HIDE_MASK", "HIDE_QUIT", "KILL_QUICK", "KILL_IMMED",
-	"MEMO_MAIL", "HIDE_STATUS", "SUSPENDED", "AUTOOP", "UNCONFIRMED", "STATS", ""
-};
-
-/* It matters that Base is here before Extensible (it is inherited by Serializable) */
-class CoreExport NickAlias : public Serializable, public Extensible, public Flags<NickNameFlag, NS_END>
+/* A registered nickname.
+ * It matters that Base is here before Extensible (it is inherited by Serializable) 
+ */
+class CoreExport NickAlias : public Serializable, public Extensible, public Flags<NickNameFlag>
 {
 	Anope::string vhost_ident, vhost_host, vhost_creator;
 	time_t vhost_created;
 
  public:
- 	/** Default constructor
+	Anope::string nick;
+	Anope::string last_quit;
+	Anope::string last_realname;
+	/* Last usermask this nick was seen on, eg user@host */
+	Anope::string last_usermask;
+	/* Last uncloaked usermask, requires nickserv/auspex to see */
+	Anope::string last_realhost;
+	time_t time_registered;
+	time_t last_seen;
+	/* Account this nick is tied to. Multiple nicks can be tied to a single account. */
+	Serialize::Reference<NickCore> nc;
+
+ 	/** Constructor
 	 * @param nickname The nick
 	 * @param nickcore The nickcore for this nick
 	 */
 	NickAlias(const Anope::string &nickname, NickCore *nickcore);
-
-	/** Default destructor
-	 */
 	~NickAlias();
 
-	Anope::string nick;				/* Nickname */
-	Anope::string last_quit;		/* Last quit message */
-	Anope::string last_realname;	/* Last realname */
-	Anope::string last_usermask;	/* Last usermask */
-	Anope::string last_realhost;	/* Last uncloaked usermask, requires nickserv/auspex to see */
-	time_t time_registered;			/* When the nick was registered */
-	time_t last_seen;				/* When it was seen online for the last time */
-	serialize_obj<NickCore> nc;					/* I'm an alias of this */
-
-	Serialize::Data serialize() const anope_override;
-	static Serializable* unserialize(Serializable *obj, Serialize::Data &);
+	Serialize::Data Serialize() const anope_override;
+	static Serializable* Unserialize(Serializable *obj, Serialize::Data &);
 
 	/** Release a nick
 	 * See the comment in users.cpp
@@ -184,41 +173,67 @@ class CoreExport NickAlias : public Serializable, public Extensible, public Flag
 	 * @return the time it was created
 	 */
 	time_t GetVhostCreated() const;
+
+	/** Finds a registered nick
+	 * @param nick The nick to lookup
+	 * @return the nick, if found
+	 */
+	static NickAlias *Find(const Anope::string &nick);
 };
 
-/* It matters that Base is here before Extensible (it is inherited by Serializable) */
-class CoreExport NickCore : public Serializable, public Extensible, public Flags<NickCoreFlag, NI_END>
+/* A registered account. Each account must have a NickAlias with the same nick as the
+ * account's display.
+ * It matters that Base is here before Extensible (it is inherited by Serializable)
+ */
+class CoreExport NickCore : public Serializable, public Extensible, public Flags<NickCoreFlag>
 {
  public:
-	/** Default constructor
-	 * @param display The display nick
-	 */
-	NickCore(const Anope::string &nickdisplay);
-
-	/** Default destructor
-	 */
-	~NickCore();
-
-	std::list<User *> Users;
-
-	Anope::string display;	/* How the nick is displayed */
-	Anope::string pass;		/* Password of the nicks */
-	Anope::string email;	/* E-mail associated to the nick */
-	Anope::string greet;	/* Greet associated to the nick */
-	Anope::string language;	/* Language name */
-	std::vector<Anope::string> access; /* Access list, vector of strings */
-	std::vector<Anope::string> cert; /* ssl certificate list, vector of strings */
+ 	/* Name of the account. Find(display)->nc == this. */
+	Anope::string display;
+	/* User password in form of hashm:data */
+	Anope::string pass;
+	Anope::string email;
+	/* Greet associated with the account, sometimes sent when the user joins a channel */
+	Anope::string greet;
+	/* Locale name of the language of the user. Empty means default language */
+	Anope::string language;
+	/* Access list, contains user@host masks of users who get certain privileges based
+	 * on if NI_SECURE is set and what (if any) kill protection is enabled. */
+	std::vector<Anope::string> access;
+	/* SSL certificate list. Users who have a matching certificate may be automatically logged in */
+	std::vector<Anope::string> cert;
 	MemoInfo memos;
 
+	/* Nicknames registered that are grouped to this account.
+	 * for n in aliases, n->nc == this.
+	 */
+	std::list<Serialize::Reference<NickAlias> > aliases;
+
+	/* Set if this user is a services operattor. o->ot must exist. */
 	Oper *o;
 
 	/* Unsaved data */
-	uint16_t channelcount; /* Number of channels currently registered */
-	time_t lastmail;				/* Last time this nick record got a mail */
-	std::list<serialize_obj<NickAlias> > aliases;	/* List of aliases */
 
-	Serialize::Data serialize() const anope_override;
-	static Serializable* unserialize(Serializable *obj, Serialize::Data &);
+	/* Number of channels registered by this account */
+	uint16_t channelcount;
+	/* Last time an email was sent to this user */
+	time_t lastmail;
+	/* Users online now logged into this account */
+	std::list<User *> users;
+
+	/** Constructor
+	 * @param display The display nick
+	 */
+	NickCore(const Anope::string &nickdisplay);
+	~NickCore();
+
+	Serialize::Data Serialize() const anope_override;
+	static Serializable* Unserialize(Serializable *obj, Serialize::Data &);
+
+	/** Changes the display for this account
+	 * @param na The new display, must be grouped to this account.
+	 */
+	void SetDisplay(const NickAlias *na);
 
 	/** Checks whether this account is a services oper or not.
 	 * @return True if this account is a services oper, false otherwise.
@@ -265,6 +280,14 @@ class CoreExport NickCore : public Serializable, public Extensible, public Flags
 	 */
 	void ClearAccess();
 
+	/** Is the given user on this accounts access list?
+	 *
+	 * @param u The user
+	 *
+	 * @return true if the user is on the access list
+	 */
+	bool IsOnAccess(const User *u) const;
+
 	/** Add an entry to the nick's certificate list
 	 *
 	 * @param entry The fingerprint to add to the cert list
@@ -304,10 +327,21 @@ class CoreExport NickCore : public Serializable, public Extensible, public Flags
 	 * Deletes all the memory allocated in the certificate list vector and then clears the vector.
 	 */
 	void ClearCert();
+
+	/** Finds an account
+	 * @param nick The account name to find
+	 * @return The account, if it exists
+	 */
+	static NickCore* Find(const Anope::string &nick);
 };
 
+/* A request to check if an account/password is valid. These can exist for
+ * extended periods of time due to some authentication modules take.
+ */
 class CoreExport IdentifyRequest
 {
+	/* Owner of this request, used to cleanup requests if a module is unloaded
+	 * while a reqyest us pending */
 	Module *owner;
 	Anope::string account;
 	Anope::string password;
@@ -316,35 +350,47 @@ class CoreExport IdentifyRequest
 	bool dispatched;
 	bool success;
 	
-	static std::set<IdentifyRequest *> requests;
+	static std::set<IdentifyRequest *> Requests;
 
  protected:
 	IdentifyRequest(Module *o, const Anope::string &acc, const Anope::string &pass);
 	virtual ~IdentifyRequest();
 
  public:
+ 	/* One of these is called when the request goes through */
 	virtual void OnSuccess() = 0;
 	virtual void OnFail() = 0;
 
 	const Anope::string &GetAccount() const { return account; }
 	const Anope::string &GetPassword() const { return password; }
 
-	/* Hold this request. Once held it must be Release()d later on */
+	/* Holds this request. When a request is held it must be Released later
+	 * for the request to complete. Multiple modules may hold a request at any time,
+	 * but the request is not complete until every module has released it. If you do not
+	 * require holding this (eg, your password check is done in this thread and immediately)
+	 * then you don't need to hold the request before Successing it.
+	 * @param m The module holding this request
+	 */
 	void Hold(Module *m);
+
+	/** Releases a held request
+	 * @param m The module releaseing the hold
+	 */
 	void Release(Module *m);
 
+	/** Called by modules when this IdentifyRequest has successeded successfully.
+	 * If this request is behind held it must still be Released after calling this.
+	 * @param m The module confirming authentication
+	 */
 	void Success(Module *m);
 
+	/** Used to either finalize this request or marks
+	 * it as dispatched and begins waiting for the module(s)
+	 * that have holds to finish.
+	 */
 	void Dispatch();
 
 	static void ModuleUnload(Module *m);
 };
-
-extern CoreExport void change_core_display(NickCore *nc);
-extern CoreExport void change_core_display(NickCore *nc, const Anope::string &newdisplay);
-
-extern CoreExport NickAlias *findnick(const Anope::string &nick);
-extern CoreExport NickCore *findcore(const Anope::string &nick);
-extern CoreExport bool is_on_access(const User *u, const NickCore *nc);
 
 #endif // ACCOUNT_H

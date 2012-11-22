@@ -30,7 +30,7 @@ class CommandNSAList : public Command
 		if (params.size() && source.IsServicesOper())
 		{
 			nick = params[0];
-			const NickAlias *na = findnick(nick);
+			const NickAlias *na = NickAlias::Find(nick);
 			if (!na)
 			{
 				source.Reply(NICK_X_NOT_REGISTERED, nick.c_str());
@@ -42,7 +42,7 @@ class CommandNSAList : public Command
 		ListFormatter list;
 		int chan_count = 0;
 
-		list.addColumn("Number").addColumn("Channel").addColumn("Access");
+		list.AddColumn("Number").AddColumn("Channel").AddColumn("Access");
 
 		source.Reply(_("Channels that \002%s\002 has access on:"), nc->display.c_str());
 
@@ -57,7 +57,7 @@ class CommandNSAList : public Command
 				entry["Number"] = stringify(chan_count);
 				entry["Channel"] = (ci->HasFlag(CI_NO_EXPIRE) ? "!" : "") + ci->name;
 				entry["Access"] = "Founder";
-				list.addEntry(entry);
+				list.AddEntry(entry);
 				continue;
 			}
 
@@ -70,9 +70,9 @@ class CommandNSAList : public Command
 			entry["Number"] = stringify(chan_count);
 			entry["Channel"] = (ci->HasFlag(CI_NO_EXPIRE) ? "!" : "") + ci->name;
 			for (unsigned i = 0; i < access.size(); ++i)
-				entry["Access"] = entry["Access"] + ", " + access[i]->Serialize();
+				entry["Access"] = entry["Access"] + ", " + access[i]->AccessSerialize();
 			entry["Access"] = entry["Access"].substr(2);
-			list.addEntry(entry);
+			list.AddEntry(entry);
 		}
 
 		std::vector<Anope::string> replies;

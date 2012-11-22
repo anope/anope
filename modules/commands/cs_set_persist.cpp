@@ -24,7 +24,7 @@ class CommandCSSetPersist : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		ChannelInfo *ci = cs_findchan(params[0]);
+		ChannelInfo *ci = ChannelInfo::Find(params[0]);
 		if (ci == NULL)
 		{
 			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
@@ -60,21 +60,19 @@ class CommandCSSetPersist : public Command
 						ci->bi->Join(c);
 				}
 
-				/* No botserv bot, no channel mode */
-				/* Give them ChanServ
-				 * Yes, this works fine with no Config->s_BotServ
+				/* No botserv bot, no channel mode, give them ChanServ.
+				 * Yes, this works fine with no Config->BotServ.
 				 */
 				if (!ci->bi && !cm)
 				{
-					BotInfo *bi = findbot(Config->ChanServ);
-					if (!bi)
+					if (!ChanServ)
 					{
 						source.Reply(_("ChanServ is required to enable persist on this network."));
 						return;
 					}
-					bi->Assign(NULL, ci);
-					if (!ci->c->FindUser(bi))
-						bi->Join(ci->c);
+					ChanServ->Assign(NULL, ci);
+					if (!ci->c->FindUser(ChanServ))
+						ChanServ->Join(ci->c);
 				}
 
 				/* Set the perm mode */
@@ -111,14 +109,13 @@ class CommandCSSetPersist : public Command
 				 */
 				if (!cm && Config->BotServ.empty() && ci->bi)
 				{
-					BotInfo *bi = findbot(Config->ChanServ);
-					if (!bi)
+					if (!ChanServ)
 					{
 						source.Reply(_("ChanServ is required to enable persist on this network."));
 						return;
 					}
 					/* Unassign bot */
-					bi->UnAssign(NULL, ci);
+					ChanServ->UnAssign(NULL, ci);
 				}
 			}
 

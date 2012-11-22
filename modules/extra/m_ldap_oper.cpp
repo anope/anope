@@ -23,7 +23,7 @@ class IdentifyInterface : public LDAPInterface
 		std::map<LDAPQuery, Anope::string>::iterator it = this->requests.find(r.id);
 		if (it == this->requests.end())
 			return;
-		User *u = finduser(it->second);
+		User *u = User::Find(it->second);
 		this->requests.erase(it);
 
 
@@ -77,7 +77,7 @@ class IdentifyInterface : public LDAPInterface
 
 class LDAPOper : public Module
 {
-	service_reference<LDAPProvider> ldap;
+	ServiceReference<LDAPProvider> ldap;
 	IdentifyInterface iinterface;
 
 	Anope::string binddn;

@@ -1,4 +1,4 @@
-/* Include file for high-level encryption routines.
+/*
  *
  * (C) 2003-2012 Anope Team
  * Contact us at team@anope.org
@@ -7,11 +7,11 @@
  *
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
+ *
  */
 
 #include "services.h"
 #include "modules.h"
-#include "extern.h"
 
 /******************************************************************************/
 
@@ -19,7 +19,7 @@
  * @param src The source string
  * @param dest The destination strnig
  */
-void enc_encrypt(const Anope::string &src, Anope::string &dest)
+void Anope::Encrypt(const Anope::string &src, Anope::string &dest)
 {
 	EventReturn MOD_RESULT;
 	FOREACH_RESULT(I_OnEncrypt, OnEncrypt(src, dest));
@@ -30,12 +30,12 @@ void enc_encrypt(const Anope::string &src, Anope::string &dest)
  * @param desc The destination string
  * @return true on success
  */
-bool enc_decrypt(const Anope::string &src, Anope::string &dest)
+bool Anope::Decrypt(const Anope::string &src, Anope::string &dest)
 {
 	size_t pos = src.find(':');
 	if (pos == Anope::string::npos)
 	{
-		Log() << "Error: enc_decrypt() called with invalid password string (" << src << ")";
+		Log() << "Error: Anope::Decrypt() called with invalid password string (" << src << ")";
 		return false;
 	}
 	Anope::string hashm(src.begin(), src.begin() + pos);

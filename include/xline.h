@@ -1,29 +1,31 @@
-/* OperServ support
+/*
  *
  * (C) 2008-2012 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
+ *
  */
 
-#ifndef OPER_H
-#define OPER_H
+#ifndef XLINE_H
+#define XLINE_H
 
 #include "serialize.h"
 #include "service.h"
 
+/* An Xline, eg, anything added with operserv/akill, or any of the operserv/sxline commands */
 class CoreExport XLine : public Serializable
 {
 	void InitRegex();
  public:
-	Anope::string Mask;
+	Anope::string mask;
 	Regex *regex;
-	Anope::string By;
-	time_t Created;
-	time_t Expires;
-	Anope::string Reason;
+	Anope::string by;
+	time_t created;
+	time_t expires;
+	Anope::string reason;
 	XLineManager *manager;
-	Anope::string UID;
+	Anope::string id;
 
 	XLine(const Anope::string &mask, const Anope::string &reason = "", const Anope::string &uid = "");
 
@@ -40,17 +42,18 @@ class CoreExport XLine : public Serializable
 	bool HasNickOrReal() const;
 	bool IsRegex() const;
 
-	Serialize::Data serialize() const anope_override;
-	static Serializable* unserialize(Serializable *obj, Serialize::Data &data);
+	Serialize::Data Serialize() const anope_override;
+	static Serializable* Unserialize(Serializable *obj, Serialize::Data &data);
 };
 
+/* Managers XLines. There is one XLineManager per type of XLine. */
 class CoreExport XLineManager : public Service
 {
 	char type;
 	/* List of XLines in this XLineManager */
-	serialize_checker<std::vector<XLine *> > XLines;
+	Serialize::Checker<std::vector<XLine *> > xlines;
 	/* Akills can have the same IDs, sometimes */
-	static serialize_checker<std::multimap<Anope::string, XLine *, ci::less> > XLinesByUID;
+	static Serialize::Checker<std::multimap<Anope::string, XLine *, ci::less> > XLinesByUID;
  public:
 	/* List of XLine managers we check users against in XLineManager::CheckAll */
 	static std::list<XLineManager *> XLineManagers;
@@ -174,4 +177,4 @@ class CoreExport XLineManager : public Service
 	virtual void SendDel(XLine *x) = 0;
 };
 
-#endif // OPER_H
+#endif // XLINE_H

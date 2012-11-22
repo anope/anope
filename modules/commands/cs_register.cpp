@@ -29,10 +29,10 @@ class CommandCSRegister : public Command
 
 		User *u = source.GetUser();
 		NickCore *nc = source.nc;
-		Channel *c = findchan(params[0]);
-		ChannelInfo *ci = cs_findchan(params[0]);
+		Channel *c = Channel::Find(params[0]);
+		ChannelInfo *ci = ChannelInfo::Find(params[0]);
 
-		if (readonly)
+		if (Anope::ReadOnly)
 			source.Reply(_("Sorry, channel registration is temporarily disabled."));
 		else if (nc->HasFlag(NI_UNCONFIRMED))
 			source.Reply(_("You must confirm your account before you can register a channel."));
@@ -40,7 +40,7 @@ class CommandCSRegister : public Command
 			source.Reply(_("Local channels cannot be registered."));
 		else if (chan[0] != '#')
 			source.Reply(CHAN_SYMBOL_REQUIRED);
-		else if (!ircdproto->IsChannelValid(chan))
+		else if (!IRCD->IsChannelValid(chan))
 			source.Reply(CHAN_X_INVALID, chan.c_str());
 		else if (ci)
 			source.Reply(_("Channel \002%s\002 is already registered!"), chan.c_str());
@@ -55,7 +55,7 @@ class CommandCSRegister : public Command
 			if (!chdesc.empty())
 				ci->desc = chdesc;
 
-			for (ChannelInfo::ModeList::iterator it = def_mode_locks.begin(), it_end = def_mode_locks.end(); it != it_end; ++it)
+			for (ChannelInfo::ModeList::iterator it = ModeManager::DefaultModeLocks.begin(), it_end = ModeManager::DefaultModeLocks.end(); it != it_end; ++it)
 			{
 				ModeLock *ml = new ModeLock(*it->second);
 				ml->setter = source.GetNick();

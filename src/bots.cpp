@@ -1,8 +1,10 @@
 /*
+ *
  * Copyright (C) 2008-2011 Robin Burchell <w00t@inspircd.org>
  * Copyright (C) 2008-2012 Anope Team <team@anope.org>
  *
  * Please read COPYING and README for further details.
+ *
  */
 
 #include "services.h"
@@ -10,17 +12,27 @@
 #include "bots.h"
 #include "servers.h"
 #include "protocol.h"
-#include "oper.h"
+#include "xline.h"
 #include "regchannel.h"
 #include "channels.h"
 #include "config.h"
 #include "language.h"
-#include "extern.h"
 #include "serialize.h"
 
-serialize_checker<botinfo_map> BotListByNick("BotInfo"), BotListByUID("BotInfo");
+Serialize::Checker<botinfo_map> BotListByNick("BotInfo"), BotListByUID("BotInfo");
 
-BotInfo::BotInfo(const Anope::string &nnick, const Anope::string &nuser, const Anope::string &nhost, const Anope::string &nreal, const Anope::string &bmodes) : User(nnick, nuser, nhost, "", "", Me, nreal, Anope::CurTime, "", ts6_uid_retrieve()), Flags<BotFlag, BI_END>(BotFlagString), Serializable("BotInfo"), botmodes(bmodes)
+static const Anope::string BotFlagString[] = { "BEGIN", "CORE", "PRIVATE", "CONF", "" };
+template<> const Anope::string* Flags<BotFlag>::flags_strings = BotFlagString;
+
+static const Anope::string BotServFlagStrings[] = {
+	"BEGIN", "DONTKICKOPS", "DONTKICKVOICES", "FANTASY", "GREET", "NOBOT",
+	"KICK_BOLDs", "KICK_COLORS", "KICK_REVERSES", "KICK_UNDERLINES", "KICK_BADWORDS", "KICK_CAPS",
+	"KICK_FLOOD", "KICK_REPEAT", "KICK_ITALICS", "KICK_AMSGS", "MSG_PRIVMSG", "MSG_NOTICE",
+	"MSG_NOTICEOPS", ""
+};
+template<> const Anope::string* Flags<BotServFlag>::flags_strings = BotServFlagStrings;
+
+BotInfo::BotInfo(const Anope::string &nnick, const Anope::string &nuser, const Anope::string &nhost, const Anope::string &nreal, const Anope::string &bmodes) : User(nnick, nuser, nhost, "", "", Me, nreal, Anope::CurTime, "", Servers::TS6_UID_Retrieve()), Serializable("BotInfo"), botmodes(bmodes)
 {
 	this->lastmsg = this->created = Anope::CurTime;
 	this->introduced = false;
@@ -32,13 +44,13 @@ BotInfo::BotInfo(const Anope::string &nnick, const Anope::string &nuser, const A
 	// If we're synchronised with the uplink already, send the bot.
 	if (Me && Me->IsSynced())
 	{
-		Anope::string tmodes = !this->botmodes.empty() ? ("+" + this->botmodes) : (ircdproto ? ircdproto->DefaultPseudoclientModes : "");
+		Anope::string tmodes = !this->botmodes.empty() ? ("+" + this->botmodes) : (IRCD ? IRCD->DefaultPseudoclientModes : "");
 		if (!tmodes.empty())
 			this->SetModesInternal(tmodes.c_str());
 
 		XLine x(this->nick, "Reserved for services");
-		ircdproto->SendSQLine(NULL, &x);
-		ircdproto->SendClientIntroduction(this);
+		IRCD->SendSQLine(NULL, &x);
+		IRCD->SendClientIntroduction(this);
 		this->introduced = true;
 	}
 }
@@ -48,10 +60,10 @@ BotInfo::~BotInfo()
 	// If we're synchronised with the uplink already, send the bot.
 	if (Me && Me->IsSynced())
 	{
-		ircdproto->SendQuit(this, "");
+		IRCD->SendQuit(this, "");
 		this->introduced = false;
 		XLine x(this->nick);
-		ircdproto->SendSQLineDel(&x);
+		IRCD->SendSQLineDel(&x);
 	}
 
 	for (registered_channel_map::const_iterator it = RegisteredChannelList->begin(), it_end = RegisteredChannelList->end(); it != it_end; ++it)
@@ -70,11 +82,11 @@ BotInfo::~BotInfo()
 		BotListByUID->erase(this->uid);
 }
 
-Serialize::Data BotInfo::serialize() const
+Serialize::Data BotInfo::Serialize() const
 {
 	Serialize::Data data;
 
-	data["nick"].setMax(64) << this->nick;
+	data["nick"].SetMax(64)/*XXX*/ << this->nick;
 	data["user"] << this->ident;
 	data["host"] << this->host;
 	data["realname"] << this->realname;
@@ -84,12 +96,12 @@ Serialize::Data BotInfo::serialize() const
 	return data;
 }
 
-Serializable* BotInfo::unserialize(Serializable *obj, Serialize::Data &data)
+Serializable* BotInfo::Unserialize(Serializable *obj, Serialize::Data &data)
 {
 	BotInfo *bi;
 	if (obj)
 		bi = anope_dynamic_static_cast<BotInfo *>(obj);
-	else if (!(bi = findbot(data["nick"].astr())))
+	else if (!(bi = BotInfo::Find(data["nick"].astr())))
 		bi = new BotInfo(data["nick"].astr(), data["user"].astr(), data["host"].astr(), data["realname"].astr());
 	data["created"] >> bi->created;
 	bi->FromString(data["flags"].astr());
@@ -100,7 +112,7 @@ void BotInfo::GenerateUID()
 {
 	if (!this->uid.empty())
 		throw CoreException("Bot already has a uid?");
-	this->uid = ts6_uid_retrieve();
+	this->uid = Servers::TS6_UID_Retrieve();
 	(*BotListByUID)[this->uid] = this;
 	UserListByUID[this->uid] = this;
 }
@@ -139,7 +151,7 @@ void BotInfo::Assign(User *u, ChannelInfo *ci)
 	
 	ci->bi = this;
 	if (ci->c && ci->c->users.size() >= Config->BSMinUsers)
-		this->Join(ci->c, &Config->BotModeList);
+		this->Join(ci->c, &ModeManager::DefaultBotModes);
 }
 
 void BotInfo::UnAssign(User *u, ChannelInfo *ci)
@@ -178,7 +190,7 @@ void BotInfo::Join(Channel *c, ChannelStatus *status)
 	if (c->FindUser(this) != NULL)
 		return;
 
-	if (Config && ircdproto && Config->BSSmartJoin)
+	if (Config && IRCD && Config->BSSmartJoin)
 	{
 		std::pair<Channel::ModeList::iterator, Channel::ModeList::iterator> bans = c->GetModeList(CMODE_BAN);
 
@@ -197,21 +209,21 @@ void BotInfo::Join(Channel *c, ChannelStatus *status)
 
 		/* Should we be invited? */
 		if (c->HasMode(CMODE_INVITE) || (limit && c->users.size() >= limit))
-			ircdproto->SendNotice(this, "@" + c->name, "%s invited %s into the channel.", this->nick.c_str(), this->nick.c_str());
+			IRCD->SendNotice(this, "@" + c->name, "%s invited %s into the channel.", this->nick.c_str(), this->nick.c_str());
 
 		ModeManager::ProcessModes();
 	}
 
 	c->JoinUser(this);
-	if (ircdproto)
-		ircdproto->SendJoin(this, c, status);
+	if (IRCD)
+		IRCD->SendJoin(this, c, status);
 
 	FOREACH_MOD(I_OnBotJoin, OnBotJoin(c, this));
 }
 
 void BotInfo::Join(const Anope::string &chname, ChannelStatus *status)
 {
-	Channel *c = findchan(chname);
+	Channel *c = Channel::Find(chname);
 	return this->Join(c ? c : new Channel(chname), status);
 }
 
@@ -220,7 +232,7 @@ void BotInfo::Part(Channel *c, const Anope::string &reason)
 	if (c->FindUser(this) == NULL)
 		return;
 
-	ircdproto->SendPart(this, c, "%s", !reason.empty() ? reason.c_str() : "");
+	IRCD->SendPart(this, c, "%s", !reason.empty() ? reason.c_str() : "");
 	c->DeleteUser(this);
 }
 
@@ -233,11 +245,6 @@ void BotInfo::OnMessage(User *u, const Anope::string &message)
 	RunCommand(source, message);
 }
 
-/** Link a command name to a command in services
- * @param cname The command name
- * @param sname The service name
- * @param permission Permission required to execute the command, if any
- */
 void BotInfo::SetCommand(const Anope::string &cname, const Anope::string &sname, const Anope::string &permission)
 {
 	CommandInfo ci;
@@ -246,15 +253,32 @@ void BotInfo::SetCommand(const Anope::string &cname, const Anope::string &sname,
 	this->commands[cname] = ci;
 }
 
-/** Get command info for a command
- * @param cname The command name
- * @return A struct containing service name and permission
- */
 CommandInfo *BotInfo::GetCommand(const Anope::string &cname)
 {
 	CommandInfo::map::iterator it = this->commands.find(cname);
 	if (it != this->commands.end())
 		return &it->second;
 	return NULL;
+}
+
+BotInfo* BotInfo::Find(const Anope::string &nick, bool nick_only)
+{
+	BotInfo *bi = NULL;
+	if (!nick_only && isdigit(nick[0]) && IRCD->RequiresID)
+	{
+		botinfo_map::iterator it = BotListByUID->find(nick);
+		if (it != BotListByUID->end())
+			bi = it->second;
+	}
+	else
+	{
+		botinfo_map::iterator it = BotListByNick->find(nick);
+		if (it != BotListByNick->end())
+			bi = it->second;
+	}
+
+	if (bi)
+		bi->QueueUpdate();
+	return bi;
 }
 

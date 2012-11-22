@@ -7,6 +7,7 @@
  *
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
+ *
  */
 
 #include "service.h"
@@ -24,27 +25,27 @@ bool Privilege::operator==(const Privilege &other) const
 	return this->name == other.name;
 }
 
-std::vector<Privilege> PrivilegeManager::privs;
+std::vector<Privilege> PrivilegeManager::Privileges;
 
 void PrivilegeManager::AddPrivilege(Privilege p)
 {
 	unsigned i;
-	for (i = 0; i < privs.size(); ++i)
+	for (i = 0; i < Privileges.size(); ++i)
 	{
-		Privilege &priv = privs[i];
+		Privilege &priv = Privileges[i];
 
 		if (priv.rank > p.rank)
 			break;
 	}
 	
-	privs.insert(privs.begin() + i, p);
+	Privileges.insert(Privileges.begin() + i, p);
 }
 
 void PrivilegeManager::RemovePrivilege(Privilege &p)
 {
-	std::vector<Privilege>::iterator it = std::find(privs.begin(), privs.end(), p);
-	if (it != privs.end())
-		privs.erase(it);
+	std::vector<Privilege>::iterator it = std::find(Privileges.begin(), Privileges.end(), p);
+	if (it != Privileges.end())
+		Privileges.erase(it);
 
 	for (registered_channel_map::const_iterator cit = RegisteredChannelList->begin(), cit_end = RegisteredChannelList->end(); cit != cit_end; ++cit)
 	{
@@ -55,39 +56,39 @@ void PrivilegeManager::RemovePrivilege(Privilege &p)
 
 Privilege *PrivilegeManager::FindPrivilege(const Anope::string &name)
 {
-	for (unsigned i = privs.size(); i > 0; --i)
-		if (privs[i - 1].name.equals_ci(name))
-			return &privs[i - 1];
+	for (unsigned i = Privileges.size(); i > 0; --i)
+		if (Privileges[i - 1].name.equals_ci(name))
+			return &Privileges[i - 1];
 	return NULL;
 }
 
 std::vector<Privilege> &PrivilegeManager::GetPrivileges()
 {
-	return privs;
+	return Privileges;
 }
 
 void PrivilegeManager::ClearPrivileges()
 {
-	privs.clear();
+	Privileges.clear();
 }
 
 AccessProvider::AccessProvider(Module *o, const Anope::string &n) : Service(o, "AccessProvider", n)
 {
-	providers.push_back(this);
+	Providers.push_back(this);
 }
 
 AccessProvider::~AccessProvider()
 {
-	std::list<AccessProvider *>::iterator it = std::find(providers.begin(), providers.end(), this);
-	if (it != providers.end())
-		providers.erase(it);
+	std::list<AccessProvider *>::iterator it = std::find(Providers.begin(), Providers.end(), this);
+	if (it != Providers.end())
+		Providers.erase(it);
 }
 
-std::list<AccessProvider *> AccessProvider::providers;
+std::list<AccessProvider *> AccessProvider::Providers;
 
 const std::list<AccessProvider *>& AccessProvider::GetProviders()
 {
-	return providers;
+	return Providers;
 }
 
 ChanAccess::ChanAccess(AccessProvider *p) : Serializable("ChanAccess"), provider(p)
@@ -98,7 +99,7 @@ ChanAccess::~ChanAccess()
 {
 }
 
-Serialize::Data ChanAccess::serialize() const
+Serialize::Data ChanAccess::Serialize() const
 {
 	Serialize::Data data;
 
@@ -106,17 +107,17 @@ Serialize::Data ChanAccess::serialize() const
 	data["ci"] << this->ci->name;
 	data["mask"] << this->mask;
 	data["creator"] << this->creator;
-	data["last_seen"].setType(Serialize::DT_INT) << this->last_seen;
-	data["created"].setType(Serialize::DT_INT) << this->created;
-	data["data"] << this->Serialize();
+	data["last_seen"].SetType(Serialize::DT_INT) << this->last_seen;
+	data["created"].SetType(Serialize::DT_INT) << this->created;
+	data["data"] << this->AccessSerialize();
 
 	return data;
 }
 
-Serializable* ChanAccess::unserialize(Serializable *obj, Serialize::Data &data)
+Serializable* ChanAccess::Unserialize(Serializable *obj, Serialize::Data &data)
 {
-	service_reference<AccessProvider> aprovider("AccessProvider", data["provider"].astr());
-	ChannelInfo *ci = cs_findchan(data["ci"].astr());
+	ServiceReference<AccessProvider> aprovider("AccessProvider", data["provider"].astr());
+	ChannelInfo *ci = ChannelInfo::Find(data["ci"].astr());
 	if (!aprovider || !ci)
 		return NULL;
 
@@ -130,7 +131,7 @@ Serializable* ChanAccess::unserialize(Serializable *obj, Serialize::Data &data)
 	data["creator"] >> access->creator;
 	data["last_seen"] >> access->last_seen;
 	data["created"] >> access->created;
-	access->Unserialize(data["data"].astr());
+	access->AccessUnserialize(data["data"].astr());
 
 	if (!obj)
 		ci->AddAccess(access);
@@ -145,7 +146,7 @@ bool ChanAccess::Matches(const User *u, const NickCore *nc) const
 	else if (u && Anope::Match(u->GetDisplayedMask(), this->mask))
 		return true;
 	else if (nc)
-		for (std::list<serialize_obj<NickAlias> >::const_iterator it = nc->aliases.begin(); it != nc->aliases.end();)
+		for (std::list<Serialize::Reference<NickAlias> >::const_iterator it = nc->aliases.begin(); it != nc->aliases.end();)
 		{
 			const NickAlias *na = *it++;
 			if (na && Anope::Match(na->nick, this->mask))
@@ -234,16 +235,16 @@ AccessGroup::AccessGroup() : std::vector<ChanAccess *>()
 {
 	this->ci = NULL;
 	this->nc = NULL;
-	this->SuperAdmin = this->Founder = false;
+	this->super_admin = this->founder = false;
 }
 
 bool AccessGroup::HasPriv(const Anope::string &name) const
 {
-	if (this->SuperAdmin)
+	if (this->super_admin)
 		return true;
 	else if (ci->GetLevel(name) == ACCESS_INVALID)
 		return false;
-	else if (this->Founder)
+	else if (this->founder)
 		return true;
 	EventReturn MOD_RESULT;
 	FOREACH_RESULT(I_OnGroupCheckPriv, OnGroupCheckPriv(this, name));
@@ -271,13 +272,13 @@ const ChanAccess *AccessGroup::Highest() const
 
 bool AccessGroup::operator>(const AccessGroup &other) const
 {
-	if (this->SuperAdmin)
+	if (this->super_admin)
 		return true;
-	else if (other.SuperAdmin)
+	else if (other.super_admin)
 		return false;
-	else if (this->Founder && !other.Founder)
+	else if (this->founder && !other.founder)
 		return true;
-	else if (!this->Founder && other.Founder)
+	else if (!this->founder && other.founder)
 		return false;
 	const std::vector<Privilege> &privs = PrivilegeManager::GetPrivileges();
 	for (unsigned i = privs.size(); i > 0; --i)
@@ -298,13 +299,13 @@ bool AccessGroup::operator>(const AccessGroup &other) const
 
 bool AccessGroup::operator<(const AccessGroup &other) const
 {
-	if (other.SuperAdmin)
+	if (other.super_admin)
 		return true;
-	else if (this->SuperAdmin)
+	else if (this->super_admin)
 		return false;
-	else if (other.Founder && !this->Founder)
+	else if (other.founder && !this->founder)
 		return true;
-	else if (this->Founder && !other.Founder)
+	else if (this->founder && !other.founder)
 		return false;
 	const std::vector<Privilege> &privs = PrivilegeManager::GetPrivileges();
 	for (unsigned i = privs.size(); i > 0; --i)
@@ -325,13 +326,13 @@ bool AccessGroup::operator<(const AccessGroup &other) const
 
 bool AccessGroup::operator>=(const AccessGroup &other) const
 {
-	if (this->SuperAdmin)
+	if (this->super_admin)
 		return true;
-	else if (other.SuperAdmin)
+	else if (other.super_admin)
 		return false;
-	else if (this->Founder)
+	else if (this->founder)
 		return true;
-	else if (other.Founder)
+	else if (other.founder)
 		return false;
 	const std::vector<Privilege> &privs = PrivilegeManager::GetPrivileges();
 	for (unsigned i = privs.size(); i > 0; --i)
@@ -352,13 +353,13 @@ bool AccessGroup::operator>=(const AccessGroup &other) const
 
 bool AccessGroup::operator<=(const AccessGroup &other) const
 {
-	if (other.SuperAdmin)
+	if (other.super_admin)
 		return true;
-	else if (this->SuperAdmin)
+	else if (this->super_admin)
 		return false;
-	else if (other.Founder)
+	else if (other.founder)
 		return true;
-	else if (this->Founder)
+	else if (this->founder)
 		return false;
 	const std::vector<Privilege> &privs = PrivilegeManager::GetPrivileges();
 	for (unsigned i = privs.size(); i > 0; --i)

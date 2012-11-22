@@ -11,9 +11,9 @@ class WebpanelRequest : public IdentifyRequest
 {
 	HTTPReply reply;
 	HTTPMessage message;
-	dynamic_reference<HTTPProvider> server;
+	Reference<HTTPProvider> server;
 	Anope::string page_name;
-	dynamic_reference<HTTPClient> client;
+	Reference<HTTPClient> client;
 	TemplateFileServer::Replacements replacements;
 
  public:
@@ -23,7 +23,7 @@ class WebpanelRequest : public IdentifyRequest
 	{
 		if (!client)
 			return;
-		NickAlias *na = findnick(this->GetAccount());
+		NickAlias *na = NickAlias::Find(this->GetAccount());
 		if (!na)
 		{
 			this->OnFail();

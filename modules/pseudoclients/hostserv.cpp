@@ -20,11 +20,11 @@ class HostServCore : public Module
 	{
 		this->SetAuthor("Anope");
 
-		if (!ircdproto || !ircdproto->CanSetVHost)
+		if (!IRCD || !IRCD->CanSetVHost)
 			throw ModuleException("Your IRCd does not support vhosts");
 	
-		const BotInfo *HostServ = findbot(Config->HostServ);
-		if (HostServ == NULL)
+		HostServ = BotInfo::Find(Config->HostServ);
+		if (!HostServ)
 			throw ModuleException("No bot named " + Config->HostServ);
 
 		Implementation i[] = { I_OnNickIdentify, I_OnNickUpdate, I_OnPreHelp };
@@ -33,29 +33,28 @@ class HostServCore : public Module
 
 	void OnNickIdentify(User *u) anope_override
 	{
-		const NickAlias *na = findnick(u->nick);
+		const NickAlias *na = NickAlias::Find(u->nick);
 		if (!na || !na->HasVhost())
-			na = findnick(u->Account()->display);
-		if (!ircdproto->CanSetVHost || !na || !na->HasVhost())
+			na = NickAlias::Find(u->Account()->display);
+		if (!IRCD->CanSetVHost || !na || !na->HasVhost())
 			return;
 
 		if (u->vhost.empty() || !u->vhost.equals_cs(na->GetVhostHost()) || (!na->GetVhostIdent().empty() && !u->GetVIdent().equals_cs(na->GetVhostIdent())))
 		{
-			ircdproto->SendVhost(u, na->GetVhostIdent(), na->GetVhostHost());
+			IRCD->SendVhost(u, na->GetVhostIdent(), na->GetVhostHost());
 
 			u->vhost = na->GetVhostHost();
 			u->UpdateHost();
 
-			if (ircdproto->CanSetVIdent && !na->GetVhostIdent().empty())
+			if (IRCD->CanSetVIdent && !na->GetVhostIdent().empty())
 				u->SetVIdent(na->GetVhostIdent());
 
-			const BotInfo *bi = findbot(Config->HostServ);
-			if (bi)
+			if (HostServ)
 			{
 				if (!na->GetVhostIdent().empty())
-					u->SendMessage(bi, _("Your vhost of \002%s\002@\002%s\002 is now activated."), na->GetVhostIdent().c_str(), na->GetVhostHost().c_str());
+					u->SendMessage(HostServ, _("Your vhost of \002%s\002@\002%s\002 is now activated."), na->GetVhostIdent().c_str(), na->GetVhostHost().c_str());
 				else
-					u->SendMessage(bi, _("Your vhost of \002%s\002 is now activated."), na->GetVhostHost().c_str());
+					u->SendMessage(HostServ, _("Your vhost of \002%s\002 is now activated."), na->GetVhostHost().c_str());
 			}
 		}
 	}

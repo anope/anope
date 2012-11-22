@@ -29,11 +29,11 @@ class CommandOSOLine : public Command
 		User *u2 = NULL;
 
 		/* let's check whether the user is online */
-		if (!(u2 = finduser(nick)))
+		if (!(u2 = User::Find(nick, true)))
 			source.Reply(NICK_X_NOT_IN_USE, nick.c_str());
 		else if (u2 && flag[0] == '+')
 		{
-			ircdproto->SendSVSO(source.service, nick, flag);
+			IRCD->SendSVSO(source.service, nick, flag);
 			u2->SetMode(source.service, UMODE_OPER);
 			u2->SendMessage(source.service, _("You are now an IRC Operator."));
 			source.Reply(_("Operflags \002%s\002 have been added for \002%s\002."), flag.c_str(), nick.c_str());
@@ -41,7 +41,7 @@ class CommandOSOLine : public Command
 		}
 		else if (u2 && flag[0] == '-')
 		{
-			ircdproto->SendSVSO(source.service, nick, flag);
+			IRCD->SendSVSO(source.service, nick, flag);
 			source.Reply(_("Operflags \002%s\002 have been added for \002%s\002."), flag.c_str(), nick.c_str());
 			Log(LOG_ADMIN, source, this) << "for " << nick;
 		}
@@ -72,7 +72,7 @@ class OSOLine : public Module
 	{
 		this->SetAuthor("Anope");
 
-		if (!ircdproto || !ircdproto->CanSVSO)
+		if (!IRCD || !IRCD->CanSVSO)
 			throw ModuleException("Your IRCd does not support OMODE.");
 
 	}

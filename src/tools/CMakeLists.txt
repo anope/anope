@@ -34,6 +34,14 @@ foreach(SRC ${TOOLS_SRCS})
   endif(NOT SKIP)
 endforeach(SRC)
 
+# If not on Windows, generate anoperc and install it along with mydbgen
+if(NOT WIN32)
+  configure_file(${Anope_SOURCE_DIR}/src/tools/anoperc.in ${Anope_BINARY_DIR}/src/tools/anoperc)
+  install (PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/anoperc
+    DESTINATION ${BIN_DIR}
+  )
+endif(NOT WIN32)
+
 # On non-Windows platforms, if RUNGROUP is set, change the permissions of the tools directory
 if(NOT WIN32 AND RUNGROUP)
   install(CODE "execute_process(COMMAND ${CHMOD} 2770 \"\${CMAKE_INSTALL_PREFIX}/bin\")")

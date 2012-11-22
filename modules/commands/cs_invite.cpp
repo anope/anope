@@ -27,7 +27,7 @@ class CommandCSInvite : public Command
 		const Anope::string &chan = params[0];
 
 		User *u = source.GetUser();
-		Channel *c = findchan(chan);
+		Channel *c = Channel::Find(chan);
 
 		if (!c)
 		{
@@ -52,7 +52,7 @@ class CommandCSInvite : public Command
 		if (params.size() == 1)
 			u2 = u;
 		else
-			u2 = finduser(params[1]);
+			u2 = User::Find(params[1], true);
 
 		if (!u2)
 		{
@@ -71,7 +71,7 @@ class CommandCSInvite : public Command
 		{
 			bool override = !source.AccessFor(ci).HasPriv("INVITE");
 
-			ircdproto->SendInvite(ci->WhoSends(), c, u2);
+			IRCD->SendInvite(ci->WhoSends(), c, u2);
 			if (u2 != u)
 			{
 				source.Reply(_("\002%s\002 has been invited to \002%s\002."), u2->nick.c_str(), c->name.c_str());

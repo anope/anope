@@ -24,7 +24,7 @@ class CommandCSSetFounder : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		ChannelInfo *ci = cs_findchan(params[0]);
+		ChannelInfo *ci = ChannelInfo::Find(params[0]);
 		if (ci == NULL)
 		{
 			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
@@ -48,7 +48,7 @@ class CommandCSSetFounder : public Command
 			return;
 		}
 
-		const NickAlias *na = findnick(params[1]);
+		const NickAlias *na = NickAlias::Find(params[1]);
 		if (!na)
 		{
 			source.Reply(NICK_X_NOT_REGISTERED, params[1].c_str());

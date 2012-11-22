@@ -7,6 +7,7 @@
  *
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
+ *
  */
 
 #include "services.h"
@@ -25,28 +26,28 @@ bool BufferedSocket::ProcessRead()
 {
 	char tbuffer[NET_BUFSIZE];
 
-	this->RecvLen = 0;
+	this->recv_len = 0;
 
-	int len = this->IO->Recv(this, tbuffer, sizeof(tbuffer) - 1);
+	int len = this->io->Recv(this, tbuffer, sizeof(tbuffer) - 1);
 	if (len <= 0)
 		return false;
 	
 	tbuffer[len] = 0;
-	this->RecvLen = len;
+	this->recv_len = len;
 
-	Anope::string sbuffer = this->extrabuf;
+	Anope::string sbuffer = this->extra_buf;
 	sbuffer += tbuffer;
-	this->extrabuf.clear();
+	this->extra_buf.clear();
 	size_t lastnewline = sbuffer.rfind('\n');
 	if (lastnewline == Anope::string::npos)
 	{
-		this->extrabuf = sbuffer;
+		this->extra_buf = sbuffer;
 		return true;
 	}
 	if (lastnewline < sbuffer.length() - 1)
 	{
-		this->extrabuf = sbuffer.substr(lastnewline);
-		this->extrabuf.trim();
+		this->extra_buf = sbuffer.substr(lastnewline);
+		this->extra_buf.trim();
 		sbuffer = sbuffer.substr(0, lastnewline);
 	}
 
@@ -65,11 +66,11 @@ bool BufferedSocket::ProcessRead()
 
 bool BufferedSocket::ProcessWrite()
 {
-	int count = this->IO->Send(this, this->WriteBuffer);
+	int count = this->io->Send(this, this->write_buffer);
 	if (count <= -1)
 		return false;
-	this->WriteBuffer = this->WriteBuffer.substr(count);
-	if (this->WriteBuffer.empty())
+	this->write_buffer = this->write_buffer.substr(count);
+	if (this->write_buffer.empty())
 		SocketEngine::Change(this, false, SF_WRITABLE);
 
 	return true;
@@ -82,7 +83,7 @@ bool BufferedSocket::Read(const Anope::string &buf)
 
 void BufferedSocket::Write(const char *buffer, size_t l)
 {
-	this->WriteBuffer += buffer + Anope::string("\r\n");
+	this->write_buffer += buffer + Anope::string("\r\n");
 	SocketEngine::Change(this, true, SF_WRITABLE);
 }
 
@@ -108,12 +109,12 @@ void BufferedSocket::Write(const Anope::string &message)
 
 int BufferedSocket::ReadBufferLen() const
 {
-	return RecvLen;
+	return recv_len;
 }
 
 int BufferedSocket::WriteBufferLen() const
 {
-	return this->WriteBuffer.length();
+	return this->write_buffer.length();
 }
 
 
@@ -141,7 +142,7 @@ bool BinarySocket::ProcessRead()
 {
 	char tbuffer[NET_BUFSIZE];
 
-	int len = this->IO->Recv(this, tbuffer, sizeof(tbuffer));
+	int len = this->io->Recv(this, tbuffer, sizeof(tbuffer));
 	if (len <= 0)
 		return false;
 	
@@ -150,21 +151,21 @@ bool BinarySocket::ProcessRead()
 
 bool BinarySocket::ProcessWrite()
 {
-	if (this->WriteBuffer.empty())
+	if (this->write_buffer.empty())
 	{
 		SocketEngine::Change(this, false, SF_WRITABLE);
 		return true;
 	}
 
-	DataBlock *d = this->WriteBuffer.front();
+	DataBlock *d = this->write_buffer.front();
 
-	int len = this->IO->Send(this, d->buf, d->len);
+	int len = this->io->Send(this, d->buf, d->len);
 	if (len <= -1)
 		return false;
 	else if (static_cast<size_t>(len) == d->len)
 	{
 		delete d;
-		this->WriteBuffer.pop_front();
+		this->write_buffer.pop_front();
 	}
 	else
 	{
@@ -172,7 +173,7 @@ bool BinarySocket::ProcessWrite()
 		d->len -= len;
 	}
 
-	if (this->WriteBuffer.empty())
+	if (this->write_buffer.empty())
 		SocketEngine::Change(this, false, SF_WRITABLE);
 
 	return true;
@@ -180,7 +181,7 @@ bool BinarySocket::ProcessWrite()
 
 void BinarySocket::Write(const char *buffer, size_t l)
 {
-	this->WriteBuffer.push_back(new DataBlock(buffer, l));
+	this->write_buffer.push_back(new DataBlock(buffer, l));
 	SocketEngine::Change(this, true, SF_WRITABLE);
 }
 

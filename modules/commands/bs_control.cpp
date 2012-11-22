@@ -26,7 +26,7 @@ class CommandBSSay : public Command
 	{
 		const Anope::string &text = params[1];
 
-		ChannelInfo *ci = cs_findchan(params[0]);
+		ChannelInfo *ci = ChannelInfo::Find(params[0]);
 		if (ci == NULL)
 		{
 			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
@@ -57,7 +57,7 @@ class CommandBSSay : public Command
 			return;
 		}
 
-		ircdproto->SendPrivmsg(ci->bi, ci->name, "%s", text.c_str());
+		IRCD->SendPrivmsg(ci->bi, ci->name, "%s", text.c_str());
 		ci->bi->lastmsg = Anope::CurTime;
 
 		// XXX need a way to find if someone is overriding this
@@ -88,7 +88,7 @@ class CommandBSAct : public Command
 	{
 		Anope::string message = params[1];
 
-		ChannelInfo *ci = cs_findchan(params[0]);
+		ChannelInfo *ci = ChannelInfo::Find(params[0]);
 		if (ci == NULL)
 		{
 			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
@@ -117,7 +117,7 @@ class CommandBSAct : public Command
 		while ((i = message.find(1)) && i != Anope::string::npos)
 			message.erase(i, 1);
 
-		ircdproto->SendAction(ci->bi, ci->name, "%s", message.c_str());
+		IRCD->SendAction(ci->bi, ci->name, "%s", message.c_str());
 		ci->bi->lastmsg = Anope::CurTime;
 
 		// XXX Need to be able to find if someone is overriding this.

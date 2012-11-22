@@ -31,7 +31,7 @@ class CommandNSResetPass : public Command
 
 		if (Config->RestrictMail && source.HasCommand("nickserv/resetpass"))
 			source.Reply(ACCESS_DENIED);
-		else if (!(na = findnick(params[0])))
+		else if (!(na = NickAlias::Find(params[0])))
 			source.Reply(NICK_X_NOT_REGISTERED, params[0].c_str());
 		else
 		{
@@ -82,7 +82,7 @@ class NSResetPass : public Module
 	{
 		if (command->name == "nickserv/confirm" && params.size() > 1)
 		{
-			NickAlias *na = findnick(params[0]);
+			NickAlias *na = NickAlias::Find(params[0]);
 
 			ResetInfo *ri = na ? na->nc->GetExt<ResetInfo *>("ns_resetpass") : NULL;
 			if (na && ri)
@@ -135,8 +135,8 @@ static bool SendResetEmail(User *u, const NickAlias *na, const BotInfo *bi)
 	for (idx = 0; idx < 20; ++idx)
 		passcode += chars[1 + static_cast<int>((static_cast<float>(max - min)) * static_cast<uint16_t>(rand()) / 65536.0) + min];
 
-	Anope::string subject = translate(na->nc, Config->MailResetSubject.c_str());
-	Anope::string message = translate(na->nc, Config->MailResetMessage.c_str());
+	Anope::string subject = Language::Translate(na->nc, Config->MailResetSubject.c_str());
+	Anope::string message = Language::Translate(na->nc, Config->MailResetMessage.c_str());
 
 	subject = subject.replace_all_cs("%n", na->nick);
 	subject = subject.replace_all_cs("%N", Config->NetworkName);
@@ -152,7 +152,7 @@ static bool SendResetEmail(User *u, const NickAlias *na, const BotInfo *bi)
 	NickCore *nc = na->nc;
 	nc->Extend("ns_resetpass", ri);
 
-	return Mail(u, nc, bi, subject, message);
+	return Mail::Send(u, nc, bi, subject, message);
 }
 
 MODULE_INIT(NSResetPass)

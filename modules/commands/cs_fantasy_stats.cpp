@@ -66,7 +66,7 @@ class CSStats : public Module
 {
 	CommandCSStats commandcsstats;
 	CommandCSGStats commandcsgstats;
-	service_reference<SQLProvider> sql;
+	ServiceReference<SQLProvider> sql;
 	MySQLInterface sqlinterface;
 	Anope::string prefix;
  public:
@@ -86,7 +86,7 @@ class CSStats : public Module
 		ConfigReader config;
 		prefix = config.ReadValue("chanstats", "prefix", "anope_", 0);
 		Anope::string engine = config.ReadValue("chanstats", "engine", "", 0);
-		this->sql = service_reference<SQLProvider>("SQLProvider", engine);
+		this->sql = ServiceReference<SQLProvider>("SQLProvider", engine);
 	}
 
 	SQLResult RunQuery(const SQLQuery &query)
@@ -108,7 +108,7 @@ class CSStats : public Module
 		Anope::string display;
 		if (params.empty())
 			display = source.nc->display;
-		else if (const NickAlias *na = findnick(params[0]))
+		else if (const NickAlias *na = NickAlias::Find(params[0]))
 			display = na->nc->display;
 		else
 		{

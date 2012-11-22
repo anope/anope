@@ -26,7 +26,7 @@ public:
 	{
 		const Anope::string &channel = params[0];
 
-		ChannelInfo *ci = cs_findchan(channel);
+		ChannelInfo *ci = ChannelInfo::Find(channel);
 		if (ci == NULL)
 			source.Reply(CHAN_X_NOT_REGISTERED, channel.c_str());
 		else if (!source.AccessFor(ci).HasPriv("ACCESS_CHANGE") && !source.HasPriv("chanserv/access/modify"))
@@ -38,20 +38,20 @@ public:
 				nick = params[1];
 
 			AccessGroup ag;
-			User *u = finduser(nick);
+			User *u = User::Find(nick, true);
 			NickAlias *na = NULL;
 			if (u != NULL)
 				ag = ci->AccessFor(u);
 			else
 			{
-				na = findnick(nick);
+				na = NickAlias::Find(nick);
 				if (na != NULL)
 					ag = ci->AccessFor(na->nc);
 			}
 
-			if (ag.SuperAdmin)
+			if (ag.super_admin)
 				source.Reply(_("\2%s\2 is a super administrator."), nick.c_str());
-			else if (ag.Founder)
+			else if (ag.founder)
 				source.Reply(_("\2%s\2 is the channel founder."), nick.c_str());
 			else  if (ag.empty())
 				source.Reply(_("\2%s\2 has no access on \2%s\2."), nick.c_str(), ci->name.c_str());
@@ -63,7 +63,7 @@ public:
 				{
 					ChanAccess *acc = ag[i];
 
-					source.Reply(_("\2%s\2 matches access entry %s, which has privilege %s."), nick.c_str(), acc->mask.c_str(), acc->Serialize().c_str());
+					source.Reply(_("\2%s\2 matches access entry %s, which has privilege %s."), nick.c_str(), acc->mask.c_str(), acc->AccessSerialize().c_str());
 				}
 			}
 

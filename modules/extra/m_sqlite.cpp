@@ -107,7 +107,7 @@ class ModuleSQLite : public Module
 
 			if (this->SQLiteServices.find(connname) == this->SQLiteServices.end())
 			{
-				Anope::string database = db_dir + "/" + config.ReadValue("sqlite", "database", "anope", i);
+				Anope::string database = Anope::DataDir + "/" + config.ReadValue("sqlite", "database", "anope", i);
 
 				try
 				{
@@ -214,7 +214,7 @@ std::vector<SQLQuery> SQLiteService::CreateTable(const Anope::string &table, con
 			known_cols.insert(it->first);
 
 			query_text += ", `" + it->first + "` ";
-			if (it->second.getType() == Serialize::DT_INT)
+			if (it->second.GetType() == Serialize::DT_INT)
 				query_text += "int(11)";
 			else
 				query_text += "text";
@@ -242,7 +242,7 @@ std::vector<SQLQuery> SQLiteService::CreateTable(const Anope::string &table, con
 			known_cols.insert(it->first);
 
 			Anope::string query_text = "ALTER TABLE `" + table + "` ADD `" + it->first + "` ";
-			if (it->second.getType() == Serialize::DT_INT)
+			if (it->second.GetType() == Serialize::DT_INT)
 				query_text += "int(11)";
 			else
 				query_text += "text";

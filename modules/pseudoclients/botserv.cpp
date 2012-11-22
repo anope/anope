@@ -20,8 +20,8 @@ class BotServCore : public Module
 	{
 		this->SetAuthor("Anope");
 
-		const BotInfo *BotServ = findbot(Config->BotServ);
-		if (BotServ == NULL)
+		BotServ = BotInfo::Find(Config->BotServ);
+		if (!BotServ)
 			throw ModuleException("No bot named " + Config->BotServ);
 
 		Implementation i[] = { I_OnPrivmsg, I_OnJoinChannel, I_OnLeaveChannel,
@@ -41,7 +41,7 @@ class BotServCore : public Module
 			Anope::string ctcp = msg;
 			ctcp.erase(ctcp.begin());
 			ctcp.erase(ctcp.length() - 1);
-			ircdproto->SendCTCP(c->ci->bi, u->nick, "%s", ctcp.c_str());
+			IRCD->SendCTCP(c->ci->bi, u->nick, "%s", ctcp.c_str());
 		}
 
 		Anope::string realbuf = msg;
@@ -56,7 +56,8 @@ class BotServCore : public Module
 		if (realbuf.empty() || !c->ci->botflags.HasFlag(BS_FANTASY))
 			return;
 
-		std::vector<Anope::string> params = BuildStringVector(realbuf);
+		std::vector<Anope::string> params;
+		spacesepstream(realbuf).GetTokens(params);
 
 		if (!realbuf.find(c->ci->bi->nick))
 			params.erase(params.begin());
@@ -87,7 +88,7 @@ class BotServCore : public Module
 			return;
 
 		const CommandInfo &info = it->second;
-		service_reference<Command> cmd("Command", info.name);
+		ServiceReference<Command> cmd("Command", info.name);
 		if (!cmd)
 		{
 			Log(LOG_DEBUG) << "Fantasy command " << it->first << " exists for nonexistant service " << info.name << "!";
@@ -97,10 +98,10 @@ class BotServCore : public Module
 		for (unsigned i = 0, j = params.size() - (count - 1); i < j; ++i)
 			params.erase(params.begin());
 
-		while (cmd->MaxParams > 0 && params.size() > cmd->MaxParams)
+		while (cmd->max_params > 0 && params.size() > cmd->max_params)
 		{
-			params[cmd->MaxParams - 1] += " " + params[cmd->MaxParams];
-			params.erase(params.begin() + cmd->MaxParams);
+			params[cmd->max_params - 1] += " " + params[cmd->max_params];
+			params.erase(params.begin() + cmd->max_params);
 		}
 
 		/* All ChanServ commands take the channel as a first parameter */
@@ -111,7 +112,7 @@ class BotServCore : public Module
 		if (!cmd->HasFlag(CFLAG_ALLOW_UNREGISTERED) && !u->Account())
 			return;
 
-		if (params.size() < cmd->MinParams)
+		if (params.size() < cmd->min_params)
 			return;
 
 		CommandSource source(u->nick, u, u->Account(), u, c->ci->bi);
@@ -139,8 +140,8 @@ class BotServCore : public Module
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
-		dynamic_reference<User> user_reference(u);
-		dynamic_reference<NickCore> nc_reference(u->Account());
+		Reference<User> user_reference(u);
+		Reference<NickCore> nc_reference(u->Account());
 		cmd->Execute(source, params);
 
 		if (user_reference && nc_reference)
@@ -160,14 +161,14 @@ class BotServCore : public Module
 			 * legit users - Rob
 			 **/
 			if (c->users.size() >= Config->BSMinUsers && !c->FindUser(c->ci->bi))
-				c->ci->bi->Join(c, &Config->BotModeList);
+				c->ci->bi->Join(c, &ModeManager::DefaultBotModes);
 			/* Only display the greet if the main uplink we're connected
 			 * to has synced, or we'll get greet-floods when the net
 			 * recovers from a netsplit. -GD
 			 */
 			if (c->FindUser(c->ci->bi) && c->ci->botflags.HasFlag(BS_GREET) && user->Account() && !user->Account()->greet.empty() && c->ci->AccessFor(user).HasPriv("GREET") && user->server->IsSynced())
 			{
-				ircdproto->SendPrivmsg(c->ci->bi, c->name, "[%s] %s", user->Account()->display.c_str(), user->Account()->greet.c_str());
+				IRCD->SendPrivmsg(c->ci->bi, c->name, "[%s] %s", user->Account()->display.c_str(), user->Account()->greet.c_str());
 				c->ci->bi->lastmsg = Anope::CurTime;
 			}
 		}

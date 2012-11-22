@@ -16,8 +16,8 @@
 
 static bool SendMemoMail(NickCore *nc, MemoInfo *mi, Memo *m)
 {
-	Anope::string subject = translate(nc, Config->MailMemoSubject.c_str());
-	Anope::string message = translate(nc, Config->MailMemoMessage.c_str());
+	Anope::string subject = Language::Translate(nc, Config->MailMemoSubject.c_str());
+	Anope::string message = Language::Translate(nc, Config->MailMemoMessage.c_str());
 
 	subject = subject.replace_all_cs("%n", nc->display);
 	subject = subject.replace_all_cs("%s", m->sender);
@@ -29,7 +29,7 @@ static bool SendMemoMail(NickCore *nc, MemoInfo *mi, Memo *m)
 	message = message.replace_all_cs("%d", mi->GetIndex(m));
 	message = message.replace_all_cs("%t", m->text);
 
-	return Mail(nc, subject, message);
+	return Mail::Send(nc, subject, message);
 }
 
 class MyMemoServService : public MemoServService
@@ -42,14 +42,14 @@ class MyMemoServService : public MemoServService
 		if (!target.empty() && target[0] == '#')
 		{
 			ischan = true;
-			ChannelInfo *ci = cs_findchan(target);
+			ChannelInfo *ci = ChannelInfo::Find(target);
 			if (ci != NULL)
 				return &ci->memos;
 		}
 		else
 		{
 			ischan = false;
-			NickAlias *na = findnick(target);
+			NickAlias *na = NickAlias::Find(target);
 			if (na != NULL)
 				return &na->nc->memos;
 		}
@@ -65,7 +65,7 @@ class MyMemoServService : public MemoServService
 		if (mi == NULL)
 			return MEMO_INVALID_TARGET;
 
-		User *sender = finduser(source);
+		User *sender = User::Find(source);
 		if (sender != NULL && !sender->HasPriv("memoserv/no-limit") && !force)
 		{
 			if (Config->MSSendDelay > 0 && sender->lastmemosend + Config->MSSendDelay > Anope::CurTime)
@@ -93,7 +93,7 @@ class MyMemoServService : public MemoServService
 
 		if (ischan)
 		{
-			ChannelInfo *ci = cs_findchan(target);
+			ChannelInfo *ci = ChannelInfo::Find(target);
 
 			if (ci->c)
 			{
@@ -104,25 +104,25 @@ class MyMemoServService : public MemoServService
 					if (ci->AccessFor(cu->user).HasPriv("MEMO"))
 					{
 						if (cu->user->Account() && cu->user->Account()->HasFlag(NI_MEMO_RECEIVE))
-							cu->user->SendMessage(findbot(Config->MemoServ), MEMO_NEW_X_MEMO_ARRIVED, ci->name.c_str(), Config->UseStrictPrivMsgString.c_str(), Config->MemoServ.c_str(), ci->name.c_str(), mi->memos->size());
+							cu->user->SendMessage(MemoServ, MEMO_NEW_X_MEMO_ARRIVED, ci->name.c_str(), Config->UseStrictPrivMsgString.c_str(), Config->MemoServ.c_str(), ci->name.c_str(), mi->memos->size());
 					}
 				}
 			}
 		}
 		else
 		{
-			NickCore *nc = findnick(target)->nc;
+			NickCore *nc = NickAlias::Find(target)->nc;
 
 			if (nc->HasFlag(NI_MEMO_RECEIVE))
 			{
-				for (std::list<serialize_obj<NickAlias> >::const_iterator it = nc->aliases.begin(), it_end = nc->aliases.end(); it != it_end;)
+				for (std::list<Serialize::Reference<NickAlias> >::const_iterator it = nc->aliases.begin(), it_end = nc->aliases.end(); it != it_end;)
 				{
 					const NickAlias *na = *it++;
 					if (!na)
 						continue;
-					User *user = finduser(na->nick);
+					User *user = User::Find(na->nick);
 					if (user && user->IsIdentified())
-						user->SendMessage(findbot(Config->MemoServ), MEMO_NEW_MEMO_ARRIVED, source.c_str(), Config->UseStrictPrivMsgString.c_str(), Config->MemoServ.c_str(), mi->memos->size());
+						user->SendMessage(MemoServ, MEMO_NEW_MEMO_ARRIVED, source.c_str(), Config->UseStrictPrivMsgString.c_str(), Config->MemoServ.c_str(), mi->memos->size());
 				}
 			}
 
@@ -139,20 +139,19 @@ class MyMemoServService : public MemoServService
 		const NickCore *nc = u->Account();
 		if (!nc)
 			return;
-		const BotInfo *ms = findbot(Config->MemoServ);
 
 		unsigned i = 0, end = nc->memos.memos->size(), newcnt = 0;
 		for (; i < end; ++i)
 			if (nc->memos.GetMemo(i)->HasFlag(MF_UNREAD))
 				++newcnt;
 		if (newcnt > 0)
-			u->SendMessage(ms, newcnt == 1 ? _("You have 1 new memo.") : _("You have %d new memos."), newcnt);
+			u->SendMessage(MemoServ, newcnt == 1 ? _("You have 1 new memo.") : _("You have %d new memos."), newcnt);
 		if (nc->memos.memomax > 0 && nc->memos.memos->size() >= static_cast<unsigned>(nc->memos.memomax))
 		{
 			if (nc->memos.memos->size() > static_cast<unsigned>(nc->memos.memomax))
-				u->SendMessage(ms, _("You are over your maximum number of memos (%d). You will be unable to receive any new memos until you delete some of your current ones."), nc->memos.memomax);
+				u->SendMessage(MemoServ, _("You are over your maximum number of memos (%d). You will be unable to receive any new memos until you delete some of your current ones."), nc->memos.memomax);
 			else
-				u->SendMessage(ms, _("You have reached your maximum number of memos (%d). You will be unable to receive any new memos until you delete some of your current ones."), nc->memos.memomax);
+				u->SendMessage(MemoServ, _("You have reached your maximum number of memos (%d). You will be unable to receive any new memos until you delete some of your current ones."), nc->memos.memomax);
 		}
 	}
 };
@@ -166,7 +165,8 @@ class MemoServCore : public Module
 	{
 		this->SetAuthor("Anope");
 
-		if (!findbot(Config->MemoServ))
+		MemoServ = BotInfo::Find(Config->MemoServ);
+		if (!MemoServ)
 			throw ModuleException("No bot named " + Config->MemoServ);
 
 		Implementation i[] = { I_OnNickIdentify, I_OnJoinChannel, I_OnUserAway, I_OnNickUpdate, I_OnPreHelp, I_OnPostHelp };
@@ -183,9 +183,9 @@ class MemoServCore : public Module
 		if (c->ci && c->ci->AccessFor(u).HasPriv("MEMO") && c->ci->memos.memos->size() > 0)
 		{
 			if (c->ci->memos.memos->size() == 1)
-				u->SendMessage(findbot(Config->MemoServ), _("There is \002%d\002 memo on channel %s."), c->ci->memos.memos->size(), c->ci->name.c_str());
+				u->SendMessage(MemoServ, _("There is \002%d\002 memo on channel %s."), c->ci->memos.memos->size(), c->ci->name.c_str());
 			else
-				u->SendMessage(findbot(Config->MemoServ), _("There are \002%d\002 memos on channel %s."), c->ci->memos.memos->size(), c->ci->name.c_str());
+				u->SendMessage(MemoServ, _("There are \002%d\002 memos on channel %s."), c->ci->memos.memos->size(), c->ci->name.c_str());
 		}
 	}
 

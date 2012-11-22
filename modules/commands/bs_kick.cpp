@@ -30,9 +30,9 @@ class CommandBSKick : public Command
 		const Anope::string &value = params[2];
 		const Anope::string &ttb = params.size() > 3 ? params[3] : "";
 
-		ChannelInfo *ci = cs_findchan(params[0]);
+		ChannelInfo *ci = ChannelInfo::Find(params[0]);
 
-		if (readonly)
+		if (Anope::ReadOnly)
 			source.Reply(_("Sorry, kicker configuration is temporarily disabled."));
 		else if (ci == NULL)
 			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
@@ -736,14 +736,12 @@ class BSKick : public Module
 			/* Should not use == here because bd.ttb[ttbtype] could possibly be > ci->ttb[ttbtype]
 			 * if the TTB was changed after it was not set (0) before and the user had already been
 			 * kicked a few times. Bug #1056 - Adam */
-			Anope::string mask;
 
 			bd.ttb[ttbtype] = 0;
 
-			get_idealban(ci, u, mask);
+			Anope::string mask = ci->GetIdealBan(u);
 
-			if (ci->c)
-				ci->c->SetMode(NULL, CMODE_BAN, mask);
+			ci->c->SetMode(NULL, CMODE_BAN, mask);
 			FOREACH_MOD(I_OnBotBan, OnBotBan(u, ci, mask));
 		}
 	}
@@ -756,7 +754,7 @@ class BSKick : public Module
 		if (!ci || !ci->bi || !ci->c || !u || u->server->IsULined() || !ci->c->FindUser(u))
 			return;
 
-		Anope::string fmt = translate(u, message);
+		Anope::string fmt = Language::Translate(u, message);
 		va_start(args, message);
 		vsnprintf(buf, sizeof(buf), fmt.c_str(), args);
 		va_end(args);
@@ -895,7 +893,7 @@ class BSKick : public Module
 			bool mustkick = false;
 
 			/* Normalize the buffer */
-			Anope::string nbuf = normalizeBuffer(realbuf);
+			Anope::string nbuf = Anope::NormalizeBuffer(realbuf);
 
 			for (unsigned i = 0, end = ci->GetBadWordCount(); i < end; ++i)
 			{

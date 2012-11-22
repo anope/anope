@@ -43,7 +43,7 @@ class StatusUpdate : public Module
 					for (int i = 0; !modeInfo[i].priv.empty(); ++i)
 						if (!access->HasPriv(modeInfo[i].priv))
 							ci->c->RemoveMode(NULL, modeInfo[i].name, user->nick);
-					chan_set_correct_modes(user, ci->c, 1, false);
+					ci->c->SetCorrectModes(user, true, false);
 				}
 			}
 	}

@@ -18,7 +18,7 @@ class NSGroupRequest : public IdentifyRequest
 	CommandSource source;
 	Command *cmd;
 	Anope::string nick;
-	dynamic_reference<NickAlias> target;
+	Reference<NickAlias> target;
  
  public:
 	NSGroupRequest(Module *o, CommandSource &src, Command *c, const Anope::string &n, NickAlias *targ, const Anope::string &pass) : IdentifyRequest(o, targ->nc->display, pass), source(src), cmd(c), nick(n), target(targ) { }
@@ -29,12 +29,12 @@ class NSGroupRequest : public IdentifyRequest
 			return;
 
 		User *u = source.GetUser();
-		NickAlias *na = findnick(nick);
+		NickAlias *na = NickAlias::Find(nick);
 		/* If the nick is already registered, drop it. */
 		if (na)
 		{
 			FOREACH_MOD(I_OnChangeCoreDisplay, OnChangeCoreDisplay(na->nc, u->nick));
-			na->destroy();
+			na->Destroy();
 		}
 
 		na = new NickAlias(nick, target->nc);
@@ -45,9 +45,9 @@ class NSGroupRequest : public IdentifyRequest
 		na->time_registered = na->last_seen = Anope::CurTime;
 
 		u->Login(target->nc);
-		ircdproto->SendLogin(u);
+		IRCD->SendLogin(u);
 		if (!Config->NoNicknameOwnership && na->nc == u->Account() && na->nc->HasFlag(NI_UNCONFIRMED) == false)
-			u->SetMode(findbot(Config->NickServ), UMODE_REGISTERED);
+			u->SetMode(NickServ, UMODE_REGISTERED);
 		FOREACH_MOD(I_OnNickGroup, OnNickGroup(u, target));
 
 		Log(LOG_COMMAND, source, cmd) << "makes " << nick << " join group of " << target->nick << " (" << target->nc->display << ") (email: " << (!target->nc->email.empty() ? target->nc->email : "none") << ")";
@@ -64,7 +64,7 @@ class NSGroupRequest : public IdentifyRequest
 
 		Log(LOG_COMMAND, source, cmd) << "failed group for " << target->nick;
 		source.Reply(PASSWORD_INCORRECT);
-		bad_password(source.GetUser());
+		source.GetUser()->BadPassword();
 	}
 };
 
@@ -88,13 +88,13 @@ class CommandNSGroup : public Command
 		const Anope::string &nick = params[0];
 		const Anope::string &pass = params.size() > 1 ? params[1] : "";
 
-		if (readonly)
+		if (Anope::ReadOnly)
 		{
 			source.Reply(_("Sorry, nickname grouping is temporarily disabled."));
 			return;
 		}
 
-		if (!ircdproto->IsNickValid(u->nick))
+		if (!IRCD->IsNickValid(u->nick))
 		{
 			source.Reply(NICK_CANNOT_BE_REGISTERED, u->nick.c_str());
 			return;
@@ -112,8 +112,8 @@ class CommandNSGroup : public Command
 				}
 			}
 
-		NickAlias *target, *na = findnick(u->nick);
-		if (!(target = findnick(nick)))
+		NickAlias *target, *na = NickAlias::Find(u->nick);
+		if (!(target = NickAlias::Find(nick)))
 			source.Reply(NICK_X_NOT_REGISTERED, nick.c_str());
 		else if (Anope::CurTime < u->lastnickreg + Config->NSRegDelay)
 			source.Reply(_("Please wait %d seconds before using the GROUP command again."), (Config->NSRegDelay + u->lastnickreg) - Anope::CurTime);
@@ -212,7 +212,7 @@ class CommandNSUngroup : public Command
 			return;
 
 		Anope::string nick = !params.empty() ? params[0] : "";
-		NickAlias *na = findnick(!nick.empty() ? nick : u->nick);
+		NickAlias *na = NickAlias::Find(!nick.empty() ? nick : u->nick);
 
 		if (u->Account()->aliases.size() == 1)
 			source.Reply(_("Your nick is not grouped to anything, you can't ungroup it."));
@@ -224,12 +224,12 @@ class CommandNSUngroup : public Command
 		{
 			NickCore *oldcore = na->nc;
 
-			std::list<serialize_obj<NickAlias> >::iterator it = std::find(oldcore->aliases.begin(), oldcore->aliases.end(), na);
+			std::list<Serialize::Reference<NickAlias> >::iterator it = std::find(oldcore->aliases.begin(), oldcore->aliases.end(), na);
 			if (it != oldcore->aliases.end())
 				oldcore->aliases.erase(it);
 
 			if (na->nick.equals_ci(oldcore->display))
-				change_core_display(oldcore);
+				oldcore->SetDisplay(oldcore->aliases.front());
 
 			NickCore *nc = new NickCore(na->nick);
 			na->nc = nc;
@@ -244,10 +244,10 @@ class CommandNSUngroup : public Command
 
 			source.Reply(_("Nick %s has been ungrouped from %s."), na->nick.c_str(), oldcore->display.c_str());
 
-			User *user = finduser(na->nick);
+			User *user = User::Find(na->nick);
 			if (user)
 				/* The user on the nick who was ungrouped may be identified to the old group, set -r */
-				user->RemoveMode(findbot(Config->NickServ), UMODE_REGISTERED);
+				user->RemoveMode(NickServ, UMODE_REGISTERED);
 		}
 
 		return;
@@ -281,7 +281,7 @@ class CommandNSGList : public Command
 
 		if (!nick.empty())
 		{
-			const NickAlias *na = findnick(nick);
+			const NickAlias *na = NickAlias::Find(nick);
 			if (!na)
 			{
 				source.Reply(NICK_X_NOT_REGISTERED, nick.c_str());
@@ -299,8 +299,8 @@ class CommandNSGList : public Command
 			nc = source.GetAccount();
 
 		ListFormatter list;
-		list.addColumn("Nick").addColumn("Expires");
-		for (std::list<serialize_obj<NickAlias> >::const_iterator it = nc->aliases.begin(), it_end = nc->aliases.end(); it != it_end;)
+		list.AddColumn("Nick").AddColumn("Expires");
+		for (std::list<Serialize::Reference<NickAlias> >::const_iterator it = nc->aliases.begin(), it_end = nc->aliases.end(); it != it_end;)
 		{
 			const NickAlias *na2 = *it++;
 			if (!na2)
@@ -308,8 +308,8 @@ class CommandNSGList : public Command
 
 			ListFormatter::ListEntry entry;
 			entry["Nick"] = na2->nick;
-			entry["Expires"] = (na2->HasFlag(NS_NO_EXPIRE) || !Config->NSExpire) ? "Does not expire" : ("expires in " + do_strftime(na2->last_seen + Config->NSExpire));
-			list.addEntry(entry);
+			entry["Expires"] = (na2->HasFlag(NS_NO_EXPIRE) || !Config->NSExpire) ? "Does not expire" : ("expires in " + Anope::strftime(na2->last_seen + Config->NSExpire));
+			list.AddEntry(entry);
 		}
 
 		source.Reply(!nick.empty() ? _("List of nicknames in the group of \002%s\002:") : _("List of nicknames in your group:"), nc->display.c_str());

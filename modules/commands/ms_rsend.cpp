@@ -25,7 +25,7 @@ class CommandMSRSend : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		if (!memoserv)
+		if (!MemoServService)
 			return;
 
 
@@ -34,7 +34,7 @@ class CommandMSRSend : public Command
 		const NickAlias *na = NULL;
 
 		/* prevent user from rsend to themselves */
-		if ((na = findnick(nick)) && na->nc == source.GetAccount())
+		if ((na = NickAlias::Find(nick)) && na->nc == source.GetAccount())
 		{
 			source.Reply(_("You can not request a receipt when sending a memo to yourself."));
 			return;
@@ -49,7 +49,7 @@ class CommandMSRSend : public Command
 		}
 		else
 		{
-			MemoServService::MemoResult result = memoserv->Send(source.GetNick(), nick, text);
+			MemoServService::MemoResult result = MemoServService->Send(source.GetNick(), nick, text);
 			if (result == MemoServService::MEMO_INVALID_TARGET)
 				source.Reply(_("\002%s\002 is not a registered unforbidden nick or channel."), nick.c_str());
 			else if (result == MemoServService::MEMO_TOO_FAST)
@@ -61,7 +61,7 @@ class CommandMSRSend : public Command
 				source.Reply(_("Memo sent to \002%s\002."), name.c_str());
 
 				bool ischan;
-				MemoInfo *mi = memoserv->GetMemoInfo(nick, ischan);
+				MemoInfo *mi = MemoServService->GetMemoInfo(nick, ischan);
 				if (mi == NULL)
 					throw CoreException("NULL mi in ms_rsend");
 				Memo *m = (mi->memos->size() ? mi->GetMemo(mi->memos->size() - 1) : NULL);
@@ -98,7 +98,7 @@ class MSRSend : public Module
 	{
 		this->SetAuthor("Anope");
 
-		if (!memoserv)
+		if (!MemoServService)
 			throw ModuleException("No MemoServ!");
 		else if (!Config->MSMemoReceipt)
 			throw ModuleException("Invalid value for memoreceipt");

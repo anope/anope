@@ -15,20 +15,20 @@
 
 struct AJoinEntry;
 
-struct AJoinList : serialize_checker<std::vector<AJoinEntry *> >, ExtensibleItem
+struct AJoinList : Serialize::Checker<std::vector<AJoinEntry *> >, ExtensibleItem
 {
-	AJoinList() : serialize_checker<std::vector<AJoinEntry *> >("AJoinEntry") { }
+	AJoinList() : Serialize::Checker<std::vector<AJoinEntry *> >("AJoinEntry") { }
 };
 
 struct AJoinEntry : Serializable
 {
-	serialize_obj<NickCore> owner;
+	Serialize::Reference<NickCore> owner;
 	Anope::string channel;
 	Anope::string key;
 
 	AJoinEntry() : Serializable("AJoinEntry") { }
 
-	Serialize::Data serialize() const anope_override
+	Serialize::Data Serialize() const anope_override
 	{
 		Serialize::Data sd;
 
@@ -42,9 +42,9 @@ struct AJoinEntry : Serializable
 		return sd;
 	}
 
-	static Serializable* unserialize(Serializable *obj, Serialize::Data &sd)
+	static Serializable* Unserialize(Serializable *obj, Serialize::Data &sd)
 	{
-		NickCore *nc = findcore(sd["owner"].astr());
+		NickCore *nc = NickCore::Find(sd["owner"].astr());
 		if (nc == NULL)
 			return NULL;
 
@@ -91,7 +91,7 @@ class CommandNSAJoin : public Command
 		else
 		{
 			ListFormatter list;
-			list.addColumn("Number").addColumn("Channel").addColumn("Key");
+			list.AddColumn("Number").AddColumn("Channel").AddColumn("Key");
 			for (unsigned i = 0; i < (*channels)->size(); ++i)
 			{
 				AJoinEntry *aj = (*channels)->at(i);
@@ -99,7 +99,7 @@ class CommandNSAJoin : public Command
 				entry["Number"] = stringify(i + 1);
 				entry["Channel"] = aj->channel;
 				entry["Key"] = aj->key;
-				list.addEntry(entry);
+				list.AddEntry(entry);
 			}
 
 			source.Reply(_("%s's auto join list:"), nc->display.c_str());
@@ -130,7 +130,7 @@ class CommandNSAJoin : public Command
 			source.Reply(_("Your auto join list is full."));
 		else if (i != (*channels)->size())
 			source.Reply(_("%s is already on %s's auto join list."), chan.c_str(), nc->display.c_str());
-		else if (ircdproto->IsChannelValid(chan) == false)
+		else if (IRCD->IsChannelValid(chan) == false)
  			source.Reply(CHAN_X_INVALID, chan.c_str());
 		else
 		{
@@ -161,7 +161,7 @@ class CommandNSAJoin : public Command
 			source.Reply(_("%s was not found on %s's auto join list."), chan.c_str(), nc->display.c_str());
 		else
 		{
-			(*channels)->at(i)->destroy();
+			(*channels)->at(i)->Destroy();
 			(*channels)->erase((*channels)->begin() + i);
 			source.Reply(_("%s was removed from %s's auto join list."), chan.c_str(), nc->display.c_str());
 		}
@@ -179,9 +179,9 @@ class CommandNSAJoin : public Command
 		NickCore *nc = source.GetAccount();
 		Anope::string param, param2;
 
-		if (params.size() > 1 && source.IsServicesOper() && ircdproto->IsNickValid(params[1]))
+		if (params.size() > 1 && source.IsServicesOper() && IRCD->IsNickValid(params[1]))
 		{
-			NickAlias *na = findnick(params[1]);
+			NickAlias *na = NickAlias::Find(params[1]);
 			if (!na)
 			{
 				source.Reply(NICK_X_NOT_REGISTERED, params[1].c_str());
@@ -224,12 +224,12 @@ class CommandNSAJoin : public Command
 
 class NSAJoin : public Module
 {
-	SerializeType ajoinentry_type;
+	Serialize::Type ajoinentry_type;
 	CommandNSAJoin commandnsajoin;
 
  public:
 	NSAJoin(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
-		ajoinentry_type("AJoinEntry", AJoinEntry::unserialize), commandnsajoin(this)
+		ajoinentry_type("AJoinEntry", AJoinEntry::Unserialize), commandnsajoin(this)
 	{
 		this->SetAuthor("Anope");
 
@@ -239,6 +239,9 @@ class NSAJoin : public Module
 
 	void OnNickIdentify(User *u) anope_override
 	{
+		if (!NickServ)
+			return;
+
 		AJoinList *channels = u->Account()->GetExt<AJoinList *>("ns_ajoin_channels");
 		if (channels == NULL)
 		{
@@ -246,20 +249,16 @@ class NSAJoin : public Module
 			u->Account()->Extend("ns_ajoin_channels", channels);
 		}
 
-		const BotInfo *bi = findbot(Config->NickServ);
-		if (bi == NULL)
-			return;
-
 		for (unsigned i = 0; i < (*channels)->size(); ++i)
 		{
 			AJoinEntry *entry = (*channels)->at(i);
-			Channel *c = findchan(entry->channel);
+			Channel *c = Channel::Find(entry->channel);
 			ChannelInfo *ci;
 
 			if (c)
 				ci = c->ci;
 			else
-				ci = cs_findchan(entry->channel);
+				ci = ChannelInfo::Find(entry->channel);
 
 			bool need_invite = false;
 			Anope::string key = entry->key;
@@ -279,9 +278,9 @@ class NSAJoin : public Module
 					continue;
 				else if (c->HasMode(CMODE_SSL) && !u->HasMode(UMODE_SSL))
 					continue;
-				else if (matches_list(c, u, CMODE_BAN) == true && matches_list(c, u, CMODE_EXCEPT) == false)
+				else if (c->MatchesList(u, CMODE_BAN) == true && c->MatchesList(u, CMODE_EXCEPT) == false)
 					need_invite = true;
-				else if (c->HasMode(CMODE_INVITE) && matches_list(c, u, CMODE_INVITEOVERRIDE) == false)
+				else if (c->HasMode(CMODE_INVITE) && c->MatchesList(u, CMODE_INVITEOVERRIDE) == false)
 					need_invite = true;
 					
 				if (c->HasMode(CMODE_KEY))
@@ -315,10 +314,10 @@ class NSAJoin : public Module
 			{
 				if (!ci->AccessFor(u).HasPriv("INVITE"))
 					continue;
-				ircdproto->SendInvite(bi, c, u);
+				IRCD->SendInvite(NickServ, c, u);
 			}
 
-			ircdproto->SendSVSJoin(bi, u->nick, entry->channel, key);
+			IRCD->SendSVSJoin(NickServ, u->nick, entry->channel, key);
 		}
 	}
 };

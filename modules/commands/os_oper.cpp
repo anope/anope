@@ -17,7 +17,7 @@ struct MyOper : Oper, Serializable
 {
 	MyOper(const Anope::string &n, OperType *o) : Oper(n, o), Serializable("Oper") { }
 
-	Serialize::Data serialize() const anope_override
+	Serialize::Data Serialize() const anope_override
 	{
 		Serialize::Data data;
 
@@ -27,12 +27,12 @@ struct MyOper : Oper, Serializable
 		return data;
 	}
 
-	static Serializable* unserialize(Serializable *obj, Serialize::Data &data)
+	static Serializable* Unserialize(Serializable *obj, Serialize::Data &data)
 	{
 		OperType *ot = OperType::Find(data["type"].astr());
 		if (ot == NULL)
 			return NULL;
-		NickCore *nc = findcore(data["name"].astr());
+		NickCore *nc = NickCore::Find(data["name"].astr());
 		if (nc == NULL)
 			return NULL;
 
@@ -68,7 +68,7 @@ class CommandOSOper : public Command
 			const Anope::string &oper = params[1];
 			const Anope::string &otype = params[2];
 
-			const NickAlias *na = findnick(oper);
+			const NickAlias *na = NickAlias::Find(oper);
 			if (na == NULL)
 				source.Reply(NICK_X_NOT_REGISTERED, oper.c_str());
 			else if (na->nc->o)
@@ -91,7 +91,7 @@ class CommandOSOper : public Command
 		{
 			const Anope::string &oper = params[1];
 
-			const NickAlias *na = findnick(oper);
+			const NickAlias *na = NickAlias::Find(oper);
 			if (na == NULL)
 				source.Reply(NICK_X_NOT_REGISTERED, oper.c_str());
 			else if (!na->nc || !na->nc->o)
@@ -118,7 +118,7 @@ class CommandOSOper : public Command
 				source.Reply(_("%-8s %s"), nc->o->name.c_str(), nc->o->ot->GetName().c_str());
 				if (nc->o->config)
 					source.Reply(_("   This oper is configured in the configuration file."));
-				for (std::list<User *>::const_iterator uit = nc->Users.begin(); uit != nc->Users.end(); ++uit)
+				for (std::list<User *>::const_iterator uit = nc->users.begin(); uit != nc->users.end(); ++uit)
 				{
 					User *u = *uit;
 					source.Reply(_("   %s is online using this oper block."), u->nick.c_str());
@@ -202,12 +202,12 @@ class CommandOSOper : public Command
 
 class OSOper : public Module
 {
-	SerializeType myoper_type;
+	Serialize::Type myoper_type;
 	CommandOSOper commandosoper;
 
  public:
 	OSOper(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
-		myoper_type("Oper", MyOper::unserialize), commandosoper(this)
+		myoper_type("Oper", MyOper::Unserialize), commandosoper(this)
 	{
 		this->SetAuthor("Anope");
 	}

@@ -26,13 +26,13 @@ class CommandNSStatus : public Command
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		const Anope::string &nick = !params.empty() ? params[0] : source.GetNick();
-		const NickAlias *na = findnick(nick);
+		const NickAlias *na = NickAlias::Find(nick);
 		spacesepstream sep(nick);
 		Anope::string nickbuf;
 
 		while (sep.GetToken(nickbuf))
 		{
-			User *u2 = finduser(nickbuf);
+			User *u2 = User::Find(nickbuf, true);
 			if (!u2) /* Nick is not online */
 				source.Reply(_("STATUS %s %d %s"), nickbuf.c_str(), 0, "");
 			else if (u2->IsIdentified() && na && na->nc == u2->Account()) /* Nick is identified */

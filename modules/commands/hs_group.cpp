@@ -20,7 +20,7 @@ class CommandHSGroup : public Command
 		if (!na || !na->HasVhost())
 			return;
 	
-		for (std::list<serialize_obj<NickAlias> >::const_iterator it = na->nc->aliases.begin(), it_end = na->nc->aliases.end(); it != it_end;)
+		for (std::list<Serialize::Reference<NickAlias> >::const_iterator it = na->nc->aliases.begin(), it_end = na->nc->aliases.end(); it != it_end;)
 		{
 			NickAlias *nick = *it++;
 			if (nick)
@@ -37,7 +37,7 @@ class CommandHSGroup : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		NickAlias *na = findnick(source.GetNick());
+		NickAlias *na = NickAlias::Find(source.GetNick());
 		if (na && source.GetAccount() == na->nc && na->HasVhost())
 		{
 			this->Sync(na);

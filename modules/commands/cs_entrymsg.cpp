@@ -15,7 +15,7 @@
 
 struct EntryMsg : Serializable
 {
-	serialize_obj<ChannelInfo> ci;
+	Serialize::Reference<ChannelInfo> ci;
 	Anope::string creator;
 	Anope::string message;
 	time_t when;
@@ -28,31 +28,31 @@ struct EntryMsg : Serializable
 		this->when = ct;
 	}
 
-	Serialize::Data serialize() const anope_override
+	Serialize::Data Serialize() const anope_override
 	{
 		Serialize::Data data;
 
 		data["ci"] << this->ci->name;
 		data["creator"] << this->creator;
 		data["message"] << this->message;
-		data["when"].setType(Serialize::DT_INT) << this->when;
+		data["when"].SetType(Serialize::DT_INT) << this->when;
 
 		return data;
 	}
 
-	static Serializable* unserialize(Serializable *obj, Serialize::Data &data);
+	static Serializable* Unserialize(Serializable *obj, Serialize::Data &data);
 };
 
 static unsigned MaxEntries = 0;
 
-struct EntryMessageList : serialize_checker<std::vector<EntryMsg *> >, ExtensibleItem
+struct EntryMessageList : Serialize::Checker<std::vector<EntryMsg *> >, ExtensibleItem
 {
-	EntryMessageList() : serialize_checker<std::vector<EntryMsg *> >("EntryMsg") { }
+	EntryMessageList() : Serialize::Checker<std::vector<EntryMsg *> >("EntryMsg") { }
 };
 
-Serializable* EntryMsg::unserialize(Serializable *obj, Serialize::Data &data)
+Serializable* EntryMsg::Unserialize(Serializable *obj, Serialize::Data &data)
 {
-	ChannelInfo *ci = cs_findchan(data["ci"].astr());
+	ChannelInfo *ci = ChannelInfo::Find(data["ci"].astr());
 	if (!ci)
 		return NULL;
 
@@ -99,7 +99,7 @@ class CommandEntryMessage : public Command
 		source.Reply(_("Entry message list for \002%s\002:"), ci->name.c_str());
 
 		ListFormatter list;
-		list.addColumn("Number").addColumn("Creator").addColumn("Created").addColumn("Message");
+		list.AddColumn("Number").AddColumn("Creator").AddColumn("Created").AddColumn("Message");
 		for (unsigned i = 0; i < (*messages)->size(); ++i)
 		{
 			EntryMsg *msg = (*messages)->at(i);
@@ -107,9 +107,9 @@ class CommandEntryMessage : public Command
 			ListFormatter::ListEntry entry;
 			entry["Number"] = stringify(i + 1);
 			entry["Creator"] = msg->creator;
-			entry["Created"] = do_strftime(msg->when);
+			entry["Created"] = Anope::strftime(msg->when);
 			entry["Message"] = msg->message;
-			list.addEntry(entry);
+			list.AddEntry(entry);
 		}
 
 		std::vector<Anope::string> replies;
@@ -159,7 +159,7 @@ class CommandEntryMessage : public Command
 				unsigned i = convertTo<unsigned>(message);
 				if (i > 0 && i <= (*messages)->size())
 				{
-					(*messages)->at(i - 1)->destroy();
+					(*messages)->at(i - 1)->Destroy();
 					(*messages)->erase((*messages)->begin() + i - 1);
 					if ((*messages)->empty())
 						ci->Shrink("cs_entrymsg");
@@ -182,7 +182,7 @@ class CommandEntryMessage : public Command
 		if (messages != NULL)
 		{
 			for (unsigned i = 0; i < (*messages)->size(); ++i)
-				(*messages)->at(i)->destroy();
+				(*messages)->at(i)->Destroy();
 			(*messages)->clear();
 			ci->Shrink("cs_entrymsg");
 		}
@@ -203,7 +203,7 @@ class CommandEntryMessage : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		ChannelInfo *ci = cs_findchan(params[0]);
+		ChannelInfo *ci = ChannelInfo::Find(params[0]);
 		if (ci == NULL)
 		{
 			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
@@ -258,11 +258,11 @@ class CommandEntryMessage : public Command
 
 class CSEntryMessage : public Module
 {
-	SerializeType entrymsg_type;
+	Serialize::Type entrymsg_type;
 	CommandEntryMessage commandentrymsg;
 
  public:
-	CSEntryMessage(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE), entrymsg_type("EntryMsg", EntryMsg::unserialize), commandentrymsg(this)
+	CSEntryMessage(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE), entrymsg_type("EntryMsg", EntryMsg::Unserialize), commandentrymsg(this)
 	{
 		this->SetAuthor("Anope");
 

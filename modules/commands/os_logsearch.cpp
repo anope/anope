@@ -23,7 +23,7 @@ class CommandOSLogSearch : public Command
 	
 		strftime(timestamp, sizeof(timestamp), "%Y%m%d", tm);
 
-		return log_dir + "/" + file + "." + timestamp;
+		return Anope::LogDir + "/" + file + "." + timestamp;
 	}
 
  public:

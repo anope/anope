@@ -27,7 +27,7 @@ class CommandOSMode : public Command
 		const Anope::string &target = params[0];
 		const Anope::string &modes = params[1];
 
-		Channel *c = findchan(target);
+		Channel *c = Channel::Find(target);
 		if (!c)
 			source.Reply(CHAN_X_NOT_IN_USE, target.c_str());
 		else if (c->bouncy_modes)
@@ -62,23 +62,23 @@ class CommandOSMode : public Command
 					continue;
 
 				Anope::string param, param_log;
-				if (cm->Type != MODE_REGULAR)
+				if (cm->type != MODE_REGULAR)
 				{
 					if (!sep.GetToken(param))
 						continue;
 
 					param_log = param;
 
-					if (cm->Type == MODE_STATUS)
+					if (cm->type == MODE_STATUS)
 					{
-						User *targ = finduser(param);
+						User *targ = User::Find(param, true);
 						if (targ == NULL || c->FindUser(targ) == NULL)
 							continue;
 						param = targ->GetUID();
 					}
 				}
 
-				log_modes += cm->ModeChar;
+				log_modes += cm->mchar;
 				if (!param.empty())
 					log_params += " " + param_log;
 
@@ -117,7 +117,7 @@ class CommandOSUMode : public Command
 		const Anope::string &target = params[0];
 		const Anope::string &modes = params[1];
 
-		User *u2 = finduser(target);
+		User *u2 = User::Find(target, true);
 		if (!u2)
 			source.Reply(NICK_X_NOT_IN_USE, target.c_str());
 		else

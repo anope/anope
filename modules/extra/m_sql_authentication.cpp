@@ -5,7 +5,7 @@ static Module *me;
 
 class SQLAuthenticationResult : public SQLInterface
 {
-	dynamic_reference<User> user;
+	Reference<User> user;
 	IdentifyRequest *req;
 
  public:
@@ -37,26 +37,25 @@ class SQLAuthenticationResult : public SQLInterface
 		}
 		catch (const SQLException &) { }
 
-		const BotInfo *bi = findbot(Config->NickServ);
-		NickAlias *na = findnick(req->GetAccount());
+		NickAlias *na = NickAlias::Find(req->GetAccount());
 		if (na == NULL)
 		{
 			na = new NickAlias(req->GetAccount(), new NickCore(req->GetAccount()));
 			if (user)
 			{
 				if (Config->NSAddAccessOnReg)
-					na->nc->AddAccess(create_mask(user));
+					na->nc->AddAccess(user->Mask());
 		
-				if (bi)
-					user->SendMessage(bi, _("Your account \002%s\002 has been successfully created."), na->nick.c_str());
+				if (NickServ)
+					user->SendMessage(NickServ, _("Your account \002%s\002 has been successfully created."), na->nick.c_str());
 			}
 		}
 
 		if (!email.empty() && email != na->nc->email)
 		{
 			na->nc->email = email;
-			if (user && bi)
-				user->SendMessage(bi, _("Your email has been updated to \002%s\002."), email.c_str());
+			if (user && NickServ)
+				user->SendMessage(NickServ, _("Your email has been updated to \002%s\002."), email.c_str());
 		}
 
 		req->Success(me);
@@ -77,7 +76,7 @@ class ModuleSQLAuthentication : public Module
 	bool disable_register;
 	Anope::string disable_reason;
 
-	service_reference<SQLProvider> SQL;
+	ServiceReference<SQLProvider> SQL;
 
  public:
 	ModuleSQLAuthentication(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, SUPPORTED)
@@ -101,7 +100,7 @@ class ModuleSQLAuthentication : public Module
 		this->disable_register = config.ReadFlag("m_sql_authentication", "disable_ns_register", "false", 0);
 		this->disable_reason = config.ReadValue("m_sql_authentication", "disable_reason", "", 0);
 
-		this->SQL = service_reference<SQLProvider>("SQLProvider", this->engine);
+		this->SQL = ServiceReference<SQLProvider>("SQLProvider", this->engine);
 	}
 
 	EventReturn OnPreCommand(CommandSource &source, Command *command, std::vector<Anope::string> &params) anope_override

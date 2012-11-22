@@ -7,6 +7,7 @@
  *
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
+ *
  */
 
 #include "services.h"
@@ -17,10 +18,10 @@
 #include "config.h"
 #include "uplink.h"
 #include "bots.h"
-#include "extern.h"
 #include "channels.h"
+#include "operserv.h"
 
-IRCDProto *ircdproto;
+IRCDProto *IRCD = NULL;
 
 IRCDProto::IRCDProto(const Anope::string &p) : proto_name(p)
 {
@@ -29,13 +30,14 @@ IRCDProto::IRCDProto(const Anope::string &p) : proto_name(p)
 		CanSVSO = CanCertFP = RequiresID = false;
 	MaxModes = 3;
 
-	ircdproto = this;
+	if (IRCD == NULL)
+		IRCD = this;
 }
 
 IRCDProto::~IRCDProto()
 {
-	if (ircdproto == this)
-		ircdproto = NULL;
+	if (IRCD == this)
+		IRCD = NULL;
 }
 
 const Anope::string &IRCDProto::GetProtocolName()
@@ -105,7 +107,7 @@ void IRCDProto::SendGlobopsInternal(const BotInfo *source, const Anope::string &
 
 void IRCDProto::SendCTCPInternal(const BotInfo *bi, const Anope::string &dest, const Anope::string &buf)
 {
-	Anope::string s = normalizeBuffer(buf);
+	Anope::string s = Anope::NormalizeBuffer(buf);
 	this->SendNoticeInternal(bi, dest, "\1" + s + "\1");
 }
 
@@ -278,9 +280,9 @@ void IRCDProto::SendSquit(Server *s, const Anope::string &message)
 	UplinkSocket::Message() << "SQUIT " << s->GetName() << " :" << message;
 }
 
-void IRCDProto::SendChangeBotNick(const BotInfo *bi, const Anope::string &newnick)
+void IRCDProto::SendNickChange(const User *u, const Anope::string &newnick)
 {
-	UplinkSocket::Message(bi) << "NICK " << newnick << " " << Anope::CurTime;
+	UplinkSocket::Message(u) << "NICK " << newnick << " " << Anope::CurTime;
 }
 
 void IRCDProto::SendForceNickChange(const User *u, const Anope::string &newnick, time_t when)
@@ -308,6 +310,29 @@ void IRCDProto::SendNumeric(int numeric, const Anope::string &dest, const char *
 	SendNumericInternal(numeric, dest, buf);
 }
 
+bool IRCDProto::IsNickValid(const Anope::string &nick)
+{
+	/**
+	 * RFC: defination of a valid nick
+	 * nickname =  ( letter / special ) ( letter / digit / special / "-" )
+	 * letter   =  A-Z / a-z
+	 * digit    =  0-9
+	 * special  =  [, ], \, `, _, ^, {, |, }
+	 **/
+
+	 if (nick.empty())
+	 	return false;
+	
+	Anope::string special = "{}\\`_^{|}";
+	
+	for (unsigned i = 0; i < nick.length(); ++i)
+		if (!(nick[i] >= 'A' && nick[i] <= 'Z') && !(nick[i] >= 'a' && nick[i] <= 'z') && special.find(nick[i]) == Anope::string::npos
+		&& (!i || (!(nick[i] >= '0' && nick[i] <= '9') && nick[i] != '-')))
+			return false;
+	
+	return true;
+}
+
 bool IRCDProto::IsChannelValid(const Anope::string &chan)
 {
 	if (chan.empty() || chan[0] != '#' || chan.length() > Config->ChanLen)
@@ -316,20 +341,59 @@ bool IRCDProto::IsChannelValid(const Anope::string &chan)
 	return true;
 }
 
+bool IRCDProto::IsIdentValid(const Anope::string &ident)
+{
+	if (ident.empty() || ident.length() > Config->UserLen)
+		return false;
+
+	for (unsigned i = 0; i < ident.length(); ++i)
+	{
+		const char &c = ident[i];
+		if ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || (c >= '0' && c <= '9') || c == '.' || c == '-')
+			;
+		else
+			return false;
+	}
+
+	return true;
+}
+
+bool IRCDProto::IsHostValid(const Anope::string &host)
+{
+	if (host.empty() || host.length() > Config->HostLen)
+		return false;
+
+	if (Config->VhostDisallowBE.find_first_of(host[0]) != Anope::string::npos)
+		return false;
+	else if (Config->VhostDisallowBE.find_first_of(host[host.length() - 1]) != Anope::string::npos)
+		return false;
+
+	int dots = 0;
+	for (unsigned i = 0; i < host.length(); ++i)
+	{
+		if (host[i] == '.')
+			++dots;
+		if (Config->VhostChars.find_first_of(host[i]) == Anope::string::npos)
+			return false;
+	}
+
+	return Config->VhostUndotted || dots > 0;
+}
+
 void IRCDProto::SendOper(User *u)
 {
 	SendNumericInternal(381, u->GetUID(), ":You are now an IRC operator (set by services)");
-	u->SetMode(findbot(Config->OperServ), UMODE_OPER);
+	u->SetMode(OperServ, UMODE_OPER);
 }
 
 MessageSource::MessageSource(const Anope::string &src) : source(src), u(NULL), s(NULL)
 {
 	if (src.empty())
 		this->s = !Me->GetLinks().empty() ? Me->GetLinks().front() : NULL;
-	else if (ircdproto->RequiresID || src.find('.') != Anope::string::npos)
+	else if (IRCD->RequiresID || src.find('.') != Anope::string::npos)
 		this->s = Server::Find(src);
 	if (this->s == NULL)
-		this->u = finduser(src);
+		this->u = User::Find(src);
 }
 
 MessageSource::MessageSource(User *_u) : source(_u ? _u->nick : ""), u(_u), s(NULL)
@@ -365,26 +429,8 @@ Server *MessageSource::GetServer()
 	return this->s;
 }
 
-std::map<Anope::string, std::vector<IRCDMessage *> > IRCDMessage::messages;
-
-const std::vector<IRCDMessage *> *IRCDMessage::Find(const Anope::string &name)
+IRCDMessage::IRCDMessage(Module *o, const Anope::string &n, unsigned p) : Service(o, "IRCDMessage", o->name + "/" + n.lower()), name(n), param_count(p)
 {
-	std::map<Anope::string, std::vector<IRCDMessage *> >::iterator it = messages.find(name);
-	if (it != messages.end())
-		return &it->second;
-	return NULL;
-}
-
-IRCDMessage::IRCDMessage(const Anope::string &n, unsigned p) : name(n), param_count(p)
-{
-	messages[n].insert(messages[n].begin(), this);
-}
-
-IRCDMessage::~IRCDMessage()
-{
-	std::vector<IRCDMessage *>::iterator it = std::find(messages[this->name].begin(), messages[this->name].end(), this);
-	if (it != messages[this->name].end())
-		messages[this->name].erase(it);
 }
 
 unsigned IRCDMessage::GetParamCount() const

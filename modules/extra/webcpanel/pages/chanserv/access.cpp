@@ -22,7 +22,7 @@ bool WebCPanel::ChanServ::Access::OnRequest(HTTPProvider *server, const Anope::s
 		return true;
 	}
 
-	ChannelInfo *ci = cs_findchan(chname);
+	ChannelInfo *ci = ChannelInfo::Find(chname);
 
 	if (!ci)
 		return true;
@@ -64,7 +64,7 @@ bool WebCPanel::ChanServ::Access::OnRequest(HTTPProvider *server, const Anope::s
 
 					if (acc->mask == message.post_data["mask"])
 					{
-						if ((!highest || *acc >= *highest) && !u_access.Founder && !has_priv)
+						if ((!highest || *acc >= *highest) && !u_access.founder && !has_priv)
 						{
 							replacements["MESSAGES"] = "Access denied";
 							denied = true;
@@ -85,7 +85,7 @@ bool WebCPanel::ChanServ::Access::OnRequest(HTTPProvider *server, const Anope::s
 					new_acc->creator = na->nc->display;
 					try
 					{
-						new_acc->Unserialize(message.post_data["access"]);
+						new_acc->AccessUnserialize(message.post_data["access"]);
 					}
 					catch (...)
 					{
@@ -98,7 +98,7 @@ bool WebCPanel::ChanServ::Access::OnRequest(HTTPProvider *server, const Anope::s
 						new_acc->last_seen = 0;
 						new_acc->created = Anope::CurTime;
 
-						if ((!highest || *highest <= *new_acc) && !u_access.Founder && !has_priv)
+						if ((!highest || *highest <= *new_acc) && !u_access.founder && !has_priv)
 							delete new_acc;
 						else if (new_acc->Serialize().empty())
 						{
@@ -108,7 +108,7 @@ bool WebCPanel::ChanServ::Access::OnRequest(HTTPProvider *server, const Anope::s
 						else
 						{
 							ci->AddAccess(new_acc);
-							replacements["MESSAGES"] = "Access for " + new_acc->mask + " set to " + new_acc->Serialize();
+							replacements["MESSAGES"] = "Access for " + new_acc->mask + " set to " + new_acc->AccessSerialize();
 						}
 					}
 				}
@@ -123,7 +123,7 @@ bool WebCPanel::ChanServ::Access::OnRequest(HTTPProvider *server, const Anope::s
 		ChanAccess *access = ci->GetAccess(i);
 
 		replacements["MASKS"] = HTTPUtils::Escape(access->mask);
-		replacements["ACCESSES"] = HTTPUtils::Escape(access->Serialize());
+		replacements["ACCESSES"] = HTTPUtils::Escape(access->AccessSerialize());
 		replacements["CREATORS"] = HTTPUtils::Escape(access->creator);
 		replacements["ACCESS_CHANGES"] = ci->AccessFor(na->nc).HasPriv("ACCESS_CHANGE") ? "YES" : "NO";
 	}

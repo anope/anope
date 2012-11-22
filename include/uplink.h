@@ -7,6 +7,7 @@
  *
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
+ *
  */
 
 #ifndef UPLINK_H
@@ -14,6 +15,12 @@
 
 #include "sockets.h"
 
+namespace Uplink
+{
+	extern void Connect();
+}
+
+/* This is the socket to our uplink */
 class UplinkSocket : public ConnectionSocket, public BufferedSocket
 {
  public:
@@ -22,10 +29,12 @@ class UplinkSocket : public ConnectionSocket, public BufferedSocket
 	bool Read(const Anope::string &);
 	void OnConnect();
 	void OnError(const Anope::string &);
-	
+
+	/* A message sent over the uplink socket */
 	class CoreExport Message
 	{
 	 private:
+	 	/* The source of the message, can be a server (Me), or any user (one of our bots) */
 		const Server *server;
 		const User *user;
 		std::stringstream buffer;

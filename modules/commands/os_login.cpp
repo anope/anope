@@ -41,7 +41,7 @@ class CommandOSLogin : public Command
 		else if (o->password != password)
 		{
 			source.Reply(PASSWORD_INCORRECT);
-			bad_password(u);
+			u->BadPassword();
 		}
 		else
 		{

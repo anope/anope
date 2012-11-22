@@ -39,7 +39,7 @@ bool WebCPanel::NickServ::Alist::OnRequest(HTTPProvider *server, const Anope::st
 		replacements["CHANNELS"] = (ci->HasFlag(CI_NO_EXPIRE) ? "!" : "") + ci->name;
 		Anope::string access_str;
 		for (unsigned i = 0; i < access.size(); ++i)
-			access_str += ", " + access[i]->Serialize();
+			access_str += ", " + access[i]->AccessSerialize();
 		replacements["ACCESSES"] = access_str.substr(2);
 	}
 

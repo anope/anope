@@ -41,11 +41,12 @@ class CommandHelp : public Command
 				const CommandInfo &info = it->second;
 
 				// Smaller command exists
-				Anope::string cmd = myStrGetToken(c_name, ' ', 0);
+				Anope::string cmd;
+				spacesepstream(c_name).GetToken(cmd, 0);
 				if (cmd != it->first && map.count(cmd))
 					continue;
 
-				service_reference<Command> c("Command", info.name);
+				ServiceReference<Command> c("Command", info.name);
 				if (!c)
 					continue;
 				else if (!Config->HidePrivilegedCommands)
@@ -76,7 +77,7 @@ class CommandHelp : public Command
 
 				const CommandInfo &info = it->second;
 
-				service_reference<Command> c("Command", info.name);
+				ServiceReference<Command> c("Command", info.name);
 				if (!c)
 					continue;
 				else if (!Config->HidePrivilegedCommands)

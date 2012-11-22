@@ -32,12 +32,12 @@ class CommandNSSendPass : public Command
 
 		if (Config->RestrictMail && !source.HasCommand("nickserv/sendpass"))
 			source.Reply(ACCESS_DENIED);
-		else if (!(na = findnick(nick)))
+		else if (!(na = NickAlias::Find(nick)))
 			source.Reply(NICK_X_NOT_REGISTERED, nick.c_str());
 		else
 		{
 			Anope::string tmp_pass;
-			if (enc_decrypt(na->nc->pass, tmp_pass) == 1)
+			if (Anope::Decrypt(na->nc->pass, tmp_pass) == 1)
 			{
 				if (SendPassMail(source.GetUser(), na, source.service, tmp_pass))
 				{
@@ -79,7 +79,7 @@ class NSSendPass : public Module
 			throw ModuleException("Not using mail.");
 
 		Anope::string tmp_pass = "plain:tmp";
-		if (enc_decrypt(tmp_pass, tmp_pass) == -1)
+		if (Anope::Decrypt(tmp_pass, tmp_pass) == -1)
 			throw ModuleException("Incompatible with the encryption module being used");
 
 	}
@@ -87,8 +87,8 @@ class NSSendPass : public Module
 
 static bool SendPassMail(User *u, const NickAlias *na, const BotInfo *bi, const Anope::string &pass)
 {
-	Anope::string subject = translate(na->nc, Config->MailSendpassSubject.c_str());
-	Anope::string message = translate(na->nc, Config->MailSendpassMessage.c_str());
+	Anope::string subject = Language::Translate(na->nc, Config->MailSendpassSubject.c_str());
+	Anope::string message = Language::Translate(na->nc, Config->MailSendpassMessage.c_str());
 
 	subject = subject.replace_all_cs("%n", na->nick);
 	subject = subject.replace_all_cs("%N", Config->NetworkName);
@@ -98,7 +98,7 @@ static bool SendPassMail(User *u, const NickAlias *na, const BotInfo *bi, const 
 	message = message.replace_all_cs("%N", Config->NetworkName);
 	message = message.replace_all_cs("%p", pass);
 
-	return Mail(u, na->nc, bi, subject, message);
+	return Mail::Send(u, na->nc, bi, subject, message);
 }
 
 MODULE_INIT(NSSendPass)

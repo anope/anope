@@ -7,8 +7,8 @@
  *
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
+ *
  */
-
 
 #include "services.h"
 #include "account.h"
@@ -19,17 +19,9 @@
 #include "servers.h"
 #include "config.h"
 
-serialize_checker<nickalias_map> NickAliasList("NickAlias");
+Serialize::Checker<nickalias_map> NickAliasList("NickAlias");
 
-class NickServHeld;
-typedef std::map<Anope::string, NickServHeld *> nickservheld_map;
-static nickservheld_map NickServHelds;
-
-/** Default constructor
- * @param nick The nick
- * @param nickcore The nickcore for this nick
- */
-NickAlias::NickAlias(const Anope::string &nickname, NickCore* nickcore) : Serializable("NickAlias"), Flags<NickNameFlag, NS_END>(NickNameFlagStrings)
+NickAlias::NickAlias(const Anope::string &nickname, NickCore* nickcore) : Serializable("NickAlias")
 {
 	if (nickname.empty())
 		throw CoreException("Empty nick passed to NickAlias constructor");
@@ -57,8 +49,6 @@ NickAlias::NickAlias(const Anope::string &nickname, NickCore* nickcore) : Serial
 	}
 }
 
-/** Default destructor
- */
 NickAlias::~NickAlias()
 {
 	FOREACH_MOD(I_OnDelNick, OnDelNick(this));
@@ -67,19 +57,19 @@ NickAlias::~NickAlias()
 	if (this->nc)
 	{
 		/* Next: see if our core is still useful. */
-		std::list<serialize_obj<NickAlias> >::iterator it = std::find(this->nc->aliases.begin(), this->nc->aliases.end(), this);
+		std::list<Serialize::Reference<NickAlias> >::iterator it = std::find(this->nc->aliases.begin(), this->nc->aliases.end(), this);
 		if (it != this->nc->aliases.end())
 			this->nc->aliases.erase(it);
 		if (this->nc->aliases.empty())
 		{
-			this->nc->destroy();
+			this->nc->Destroy();
 			this->nc = NULL;
 		}
 		else
 		{
 			/* Display updating stuff */
 			if (this->nick.equals_ci(this->nc->display))
-				change_core_display(this->nc);
+				this->nc->SetDisplay(this->nc->aliases.front());
 		}
 	}
 
@@ -87,19 +77,15 @@ NickAlias::~NickAlias()
 	NickAliasList->erase(this->nick);
 }
 
-/** Release a nick from being held. This can be called from the core (ns_release)
- * or from a timer used when forcing clients off of nicks. Note that if this is called
- * from a timer, ircd->svshold is NEVER true
- */
 void NickAlias::Release()
 {
 	if (this->HasFlag(NS_HELD))
 	{
-		if (ircdproto->CanSVSHold)
-			ircdproto->SendSVSHoldDel(this->nick);
+		if (IRCD->CanSVSHold)
+			IRCD->SendSVSHoldDel(this->nick);
 		else
 		{
-			User *u = finduser(this->nick);
+			User *u = User::Find(this->nick);
 			if (u && u->server == Me)
 			{
 				delete u;
@@ -114,12 +100,14 @@ void NickAlias::Release()
  */
 class NickServHeld : public Timer
 {
-	dynamic_reference<NickAlias> na;
+	static std::map<Anope::string, NickServHeld *> NickServHelds;
+
+	Reference<NickAlias> na;
 	Anope::string nick;
  public:
 	NickServHeld(NickAlias *n, long l) : Timer(l), na(n), nick(na->nick)
 	{
-		nickservheld_map::iterator nit = NickServHelds.find(na->nick);
+		std::map<Anope::string, NickServHeld *>::iterator nit = NickServHelds.find(na->nick);
 		if (nit != NickServHelds.end())
 			delete nit->second;
 
@@ -137,6 +125,7 @@ class NickServHeld : public Timer
 			na->UnsetFlag(NS_HELD);
 	}
 };
+std::map<Anope::string, NickServHeld *> NickServHeld::NickServHelds;
 
 /** Timers for releasing nicks to be available for use
  */
@@ -146,27 +135,25 @@ class CoreExport NickServRelease : public User, public Timer
 	Anope::string nick;
 
  public:
-	/** Default constructor
+	/** Constructor
 	 * @param na The nick
 	 * @param delay The delay before the nick is released
 	 */
-	NickServRelease(NickAlias *na, time_t delay) : User(na->nick, Config->NSEnforcerUser, Config->NSEnforcerHost, "", "", Me, "Services Enforcer", Anope::CurTime, "", ts6_uid_retrieve()), Timer(delay), nick(na->nick)
+	NickServRelease(NickAlias *na, time_t delay) : User(na->nick, Config->NSEnforcerUser, Config->NSEnforcerHost, "", "", Me, "Services Enforcer", Anope::CurTime, "", Servers::TS6_UID_Retrieve()), Timer(delay), nick(na->nick)
 	{
 		/* Erase the current release timer and use the new one */
 		std::map<Anope::string, NickServRelease *>::iterator nit = NickServReleases.find(this->nick);
 		if (nit != NickServReleases.end())
 		{
-			ircdproto->SendQuit(nit->second, "");
+			IRCD->SendQuit(nit->second, "");
 			delete nit->second;
 		}
 
 		NickServReleases.insert(std::make_pair(this->nick, this));
 
-		ircdproto->SendClientIntroduction(this);
+		IRCD->SendClientIntroduction(this);
 	}
 
-	/** Default destructor
-	 */
 	virtual ~NickServRelease()
 	{
 		NickServReleases.erase(this->nick);
@@ -177,15 +164,11 @@ class CoreExport NickServRelease : public User, public Timer
 	 */
 	void Tick(time_t t)
 	{
-		ircdproto->SendQuit(this, "");
+		IRCD->SendQuit(this, "");
 	}
 };
 std::map<Anope::string, NickServRelease *> NickServRelease::NickServReleases;
 
-/** Called when a user gets off this nick
- * See the comment in users.cpp for User::Collide()
- * @param u The user
- */
 void NickAlias::OnCancel(User *)
 {
 	if (this->HasFlag(NS_COLLIDED))
@@ -195,8 +178,8 @@ void NickAlias::OnCancel(User *)
 
 		new NickServHeld(this, Config->NSReleaseTimeout);
 
-		if (ircdproto->CanSVSHold)
-			ircdproto->SendSVSHold(this->nick);
+		if (IRCD->CanSVSHold)
+			IRCD->SendSVSHold(this->nick);
 		else
 			new NickServRelease(this, Config->NSReleaseTimeout);
 	}
@@ -243,17 +226,29 @@ time_t NickAlias::GetVhostCreated() const
 	return this->vhost_created;
 }
 
-Serialize::Data NickAlias::serialize() const
+NickAlias *NickAlias::Find(const Anope::string &nick)
+{
+	nickalias_map::const_iterator it = NickAliasList->find(nick);
+	if (it != NickAliasList->end())
+	{
+		it->second->QueueUpdate();
+		return it->second;
+	}
+
+	return NULL;
+}
+
+Serialize::Data NickAlias::Serialize() const
 {
 	Serialize::Data data;	
 
-	data["nick"].setMax(Config->NickLen) << this->nick;
+	data["nick"].SetMax(Config->NickLen) << this->nick;
 	data["last_quit"] << this->last_quit;
 	data["last_realname"] << this->last_realname;
 	data["last_usermask"] << this->last_usermask;
 	data["last_realhost"] << this->last_realhost;
-	data["time_registered"].setType(Serialize::DT_INT) << this->time_registered;
-	data["last_seen"].setType(Serialize::DT_INT) << this->last_seen;
+	data["time_registered"].SetType(Serialize::DT_INT) << this->time_registered;
+	data["last_seen"].SetType(Serialize::DT_INT) << this->last_seen;
 	data["nc"] << this->nc->display;
 	data["flags"] << this->ToString();
 
@@ -268,9 +263,9 @@ Serialize::Data NickAlias::serialize() const
 	return data;
 }
 
-Serializable* NickAlias::unserialize(Serializable *obj, Serialize::Data &data)
+Serializable* NickAlias::Unserialize(Serializable *obj, Serialize::Data &data)
 {
-	NickCore *core = findcore(data["nc"].astr());
+	NickCore *core = NickCore::Find(data["nc"].astr());
 	if (core == NULL)
 		return NULL;
 
@@ -282,14 +277,14 @@ Serializable* NickAlias::unserialize(Serializable *obj, Serialize::Data &data)
 
 	if (na->nc != core)
 	{
-		std::list<serialize_obj<NickAlias> >::iterator it = std::find(na->nc->aliases.begin(), na->nc->aliases.end(), na);
+		std::list<Serialize::Reference<NickAlias> >::iterator it = std::find(na->nc->aliases.begin(), na->nc->aliases.end(), na);
 		if (it != na->nc->aliases.end())
 			na->nc->aliases.erase(it);
 
 		if (na->nc->aliases.empty())
 			delete na->nc;
 		else if (na->nick.equals_ci(na->nc->display))
-			change_core_display(na->nc);
+			na->nc->SetDisplay(na->nc->aliases.front());
 
 		na->nc = core;
 		core->aliases.push_back(na);

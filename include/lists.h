@@ -8,7 +8,6 @@
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
  *
- *
  */
 
 #ifndef LISTS_H
@@ -48,9 +47,9 @@ class CoreExport NumberList
 	void Process();
 
 	/** Called with a number from the list
-	 * @param Number The number
+	 * @param number The number
 	 */
-	virtual void HandleNumber(unsigned Number);
+	virtual void HandleNumber(unsigned number);
 
 	/** Called when there is an error with the numbered list
 	 * Return false to immediatly stop processing the list and return
@@ -71,9 +70,9 @@ class CoreExport ListFormatter
 	std::vector<Anope::string> columns;
 	std::vector<ListEntry> entries;
  public:
-	ListFormatter &addColumn(const Anope::string &name);
-	void addEntry(const ListEntry &entry);
-	bool isEmpty() const;
+	ListFormatter &AddColumn(const Anope::string &name);
+	void AddEntry(const ListEntry &entry);
+	bool IsEmpty() const;
 	void Process(std::vector<Anope::string> &);
 };
 

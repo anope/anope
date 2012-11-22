@@ -29,7 +29,7 @@ class CommandCSBan : public Command
 		const Anope::string &target = params[1];
 		const Anope::string &reason = params.size() > 2 ? params[2] : "Requested";
 
-		ChannelInfo *ci = cs_findchan(params[0]);
+		ChannelInfo *ci = ChannelInfo::Find(params[0]);
 		if (ci == NULL)
 		{
 			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
@@ -38,7 +38,7 @@ class CommandCSBan : public Command
 
 		Channel *c = ci->c;
 		User *u = source.GetUser();
-		User *u2 = finduser(target);
+		User *u2 = User::Find(target, true);
 
 		AccessGroup u_access = source.AccessFor(ci);
 
@@ -56,14 +56,13 @@ class CommandCSBan : public Command
 
 			if (u != u2 && ci->HasFlag(CI_PEACE) && u2_access >= u_access)
 				source.Reply(ACCESS_DENIED);
-			else if (matches_list(ci->c, u2, CMODE_EXCEPT))
+			else if (ci->c->MatchesList(u2, CMODE_EXCEPT))
 				source.Reply(CHAN_EXCEPTED, u2->nick.c_str(), ci->name.c_str());
 			else if (u2->IsProtected())
 				source.Reply(ACCESS_DENIED);
 			else
 			{
-				Anope::string mask;
-				get_idealban(ci, u2, mask);
+				Anope::string mask = ci->GetIdealBan(u2);
 
 				// XXX need a way to detect if someone is overriding
 				Log(LOG_COMMAND, source, this, ci) << "for " << mask;
@@ -99,7 +98,7 @@ class CommandCSBan : public Command
 
 					if (u != uc->user && ci->HasFlag(CI_PEACE) && u2_access >= u_access)
 						continue;
-					else if (matches_list(ci->c, uc->user, CMODE_EXCEPT))
+					else if (ci->c->MatchesList(uc->user, CMODE_EXCEPT))
 						continue;
 					else if (uc->user->IsProtected())
 						continue;

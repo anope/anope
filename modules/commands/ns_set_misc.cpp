@@ -15,7 +15,7 @@
 
 struct NSMiscData : ExtensibleItem, Serializable
 {
-	serialize_obj<NickCore> nc;
+	Serialize::Reference<NickCore> nc;
 	Anope::string name;
 	Anope::string data;
 
@@ -23,7 +23,7 @@ struct NSMiscData : ExtensibleItem, Serializable
 	{
 	}
 
-	Serialize::Data serialize() const anope_override
+	Serialize::Data Serialize() const anope_override
 	{
 		Serialize::Data sdata;
 
@@ -34,9 +34,9 @@ struct NSMiscData : ExtensibleItem, Serializable
 		return sdata;
 	}
 
-	static Serializable* unserialize(Serializable *obj, Serialize::Data &data)
+	static Serializable* Unserialize(Serializable *obj, Serialize::Data &data)
 	{
-		NickCore *nc = findcore(data["nc"].astr());
+		NickCore *nc = NickCore::Find(data["nc"].astr());
 		if (nc == NULL)
 			return NULL;
 
@@ -76,7 +76,7 @@ class CommandNSSetMisc : public Command
 
 	void Run(CommandSource &source, const Anope::string &user, const Anope::string &param)
 	{
-		const NickAlias *na = findnick(user);
+		const NickAlias *na = NickAlias::Find(user);
 		if (!na)
 		{
 			source.Reply(NICK_X_NOT_REGISTERED, user.c_str());
@@ -126,13 +126,13 @@ class CommandNSSASetMisc : public CommandNSSetMisc
 
 class NSSetMisc : public Module
 {
-	SerializeType nsmiscdata_type;
+	Serialize::Type nsmiscdata_type;
 	CommandNSSetMisc commandnssetmisc;
 	CommandNSSASetMisc commandnssasetmisc;
 
  public:
 	NSSetMisc(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
-		nsmiscdata_type("NSMiscData", NSMiscData::unserialize), commandnssetmisc(this), commandnssasetmisc(this)
+		nsmiscdata_type("NSMiscData", NSMiscData::Unserialize), commandnssetmisc(this), commandnssasetmisc(this)
 	{
 		this->SetAuthor("Anope");
 

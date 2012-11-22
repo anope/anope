@@ -13,7 +13,7 @@
 
 #include "module.h"
 
-static service_reference<XLineManager> akills("XLineManager", "xlinemanager/sgline");
+static ServiceReference<XLineManager> akills("XLineManager", "xlinemanager/sgline");
 
 class CommandOSChanKill : public Command
 {
@@ -42,7 +42,7 @@ class CommandOSChanKill : public Command
 			last_param = 2;
 		}
 
-		expires = !expiry.empty() ? dotime(expiry) : Config->ChankillExpiry;
+		expires = !expiry.empty() ? Anope::DoTime(expiry) : Config->ChankillExpiry;
 		if (!expiry.empty() && isdigit(expiry[expiry.length() - 1]))
 			expires *= 86400;
 		if (expires && expires < 60)
@@ -70,7 +70,7 @@ class CommandOSChanKill : public Command
 			else
 				realreason = reason;
 
-			if ((c = findchan(channel)))
+			if ((c = Channel::Find(channel)))
 			{
 				for (CUserList::iterator it = c->users.begin(), it_end = c->users.end(); it != it_end; )
 				{

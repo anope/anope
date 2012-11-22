@@ -7,64 +7,26 @@
  *
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
+ *
  */
 
 #include "services.h"
 #include "config.h"
-#include "extern.h"
 #include "users.h"
 #include "protocol.h"
 #include "bots.h"
-#include "oper.h"
+#include "xline.h"
 #include "signals.h"
 #include "socketengine.h"
 #include "servers.h"
+#include "language.h"
 
 #ifndef _WIN32
 #include <sys/wait.h>
 #include <sys/stat.h>
 #endif
 
-Anope::string conf_dir = "conf", db_dir = "data", modules_dir = "lib", locale_dir = "locale", log_dir = "logs";
-
-ServerConfig::Uplink *uplink_server;
-
-void introduce_user(const Anope::string &user)
-{
-	/* Watch out for infinite loops... */
-	time_t now = Anope::CurTime;
-	static time_t lasttime = now - 4;
-	if (lasttime >= now - 3)
-	{
-		quitmsg = "introduce_user loop detected";
-		quitting = true;
-		return;
-	}
-	lasttime = now;
-
-	User *u = finduser(user);
-	if (u)
-	{
-		BotInfo *bi = findbot(u->nick);
-		if (bi)
-		{
-			XLine x(bi->nick, "Reserved for services");
-			ircdproto->SendSQLine(NULL, &x);
-		}
-
-		ircdproto->SendClientIntroduction(u);
-
-		if (bi)
-		{
-			bi->introduced = true;
-
-			for (UChannelList::const_iterator cit = bi->chans.begin(), cit_end = bi->chans.end(); cit != cit_end; ++cit)
-				ircdproto->SendJoin(bi, (*cit)->chan, &Config->BotModeList);
-		}
-	}
-}
-
-/*************************************************************************/
+Anope::string Anope::ConfigDir = "conf", Anope::DataDir = "data", Anope::ModuleDir = "lib", Anope::LocaleDir = "locale", Anope::LogDir = "logs";
 
 /* Vector of pairs of command line arguments and their params */
 static std::vector<std::pair<Anope::string, Anope::string> > CommandLineArguments;
@@ -96,24 +58,13 @@ static void ParseCommandLineArguments(int ac, char **av)
 	}
 }
 
-/** Check if an argument was given on startup
- * @param name The argument name
- * @param shortname A shorter name, eg --debug and -d
- * @return true if name/shortname was found, false if not
- */
-bool GetCommandLineArgument(const Anope::string &name, char shortname)
-{
-	Anope::string Unused;
-	return GetCommandLineArgument(name, shortname, Unused);
-}
-
 /** Check if an argument was given on startup and its parameter
  * @param name The argument name
  * @param shortname A shorter name, eg --debug and -d
  * @param param A string to put the param, if any, of the argument
  * @return true if name/shortname was found, false if not
  */
-bool GetCommandLineArgument(const Anope::string &name, char shortname, Anope::string &param)
+static bool GetCommandLineArgument(const Anope::string &name, char shortname, Anope::string &param)
 {
 	param.clear();
 
@@ -127,6 +78,17 @@ bool GetCommandLineArgument(const Anope::string &name, char shortname, Anope::st
 	}
 
 	return false;
+}
+
+/** Check if an argument was given on startup
+ * @param name The argument name
+ * @param shortname A shorter name, eg --debug and -d
+ * @return true if name/shortname was found, false if not
+ */
+static bool GetCommandLineArgument(const Anope::string &name, char shortname = 0)
+{
+	Anope::string Unused;
+	return GetCommandLineArgument(name, shortname, Unused);
 }
 
 /*************************************************************************/
@@ -156,7 +118,7 @@ static void write_pidfile()
 		atexit(remove_pidfile);
 	}
 	else
-		throw FatalException("Can not write to PID file " + Config->PIDFilename);
+		throw CoreException("Can not write to PID file " + Config->PIDFilename);
 }
 
 /*************************************************************************/
@@ -170,7 +132,7 @@ class SignalReload : public Signal
 	{
 		Log() << "Received SIGHUP: Saving databases & rehashing configuration";
 
-		save_databases();
+		Anope::SaveDatabases();
 
 		ServerConfig *old_config = Config;
 		try
@@ -196,14 +158,13 @@ class SignalExit : public Signal
 	{
 #ifndef _WIN32
 		Log() << "Received " << strsignal(this->signal) << " signal (" << this->signal << "), exiting.";
-		quitmsg = Anope::string("Services terminating via signal ") + strsignal(this->signal) + " (" + stringify(this->signal) + ")";
+		Anope::QuitReason = Anope::string("Services terminating via signal ") + strsignal(this->signal) + " (" + stringify(this->signal) + ")";
 #else
 		Log() << "Received signal " << this->signal << ", exiting.";
-		quitmsg = Anope::string("Services terminating via signal ") + stringify(this->signal);
+		Anope::QuitReason = Anope::string("Services terminating via signal ") + stringify(this->signal);
 #endif
-
-		quitting = true;
-		save_databases();
+		Anope::SaveDatabases();
+		Anope::Quitting = true;
 	}
 };
 
@@ -215,12 +176,12 @@ class SignalNothing : public Signal
 	void OnNotify() { }
 };
 
-bool AtTerm()
+bool Anope::AtTerm()
 {
 	return isatty(fileno(stdout)) && isatty(fileno(stdin)) && isatty(fileno(stderr));
 }
 
-void Fork()
+void Anope::Fork()
 {
 #ifndef _WIN32
 	kill(getppid(), SIGUSR2);
@@ -240,29 +201,28 @@ static void parent_signal_handler(int signal)
 {
 	if (signal == SIGUSR2)
 	{
-		quitting = true;
-		return_code = 0;
+		Anope::Quitting = true;
 	}
 	else if (signal == SIGCHLD)
 	{
-		quitting = true;
-		return_code = -1;
+		Anope::ReturnValue = -1;
+		Anope::Quitting = true;
 		int status = 0;
 		wait(&status);
 		if (WIFEXITED(status))
-			return_code = WEXITSTATUS(status);
+			Anope::ReturnValue = WEXITSTATUS(status);
 	}
 }
 #endif
 
-void Init(int ac, char **av)
+void Anope::Init(int ac, char **av)
 {
 	/* Set file creation mask and group ID. */
 #if defined(DEFUMASK) && HAVE_UMASK
 	umask(DEFUMASK);
 #endif
 
-	RegisterTypes();
+	Serialize::RegisterTypes();
 
 	/* Parse command line arguments */
 	ParseCommandLineArguments(ac, av);
@@ -270,14 +230,14 @@ void Init(int ac, char **av)
 	if (GetCommandLineArgument("version", 'v'))
 	{
 		Log(LOG_TERMINAL) << "Anope-" << Anope::Version() << " -- " << Anope::VersionBuildString();
-		throw FatalException();
+		throw CoreException();
 	}
 
 	if (GetCommandLineArgument("help", 'h'))
 	{
 		Log(LOG_TERMINAL) << "Anope-" << Anope::Version() << " -- " << Anope::VersionBuildString();
 		Log(LOG_TERMINAL) << "Anope IRC Services (http://www.anope.org)";
-		Log(LOG_TERMINAL) << "Usage ./" << services_bin << " [options] ...";
+		Log(LOG_TERMINAL) << "Usage ./" << Anope::ServicesBin << " [options] ...";
 		Log(LOG_TERMINAL) << "-c, --config=filename.conf";
 		Log(LOG_TERMINAL) << "    --confdir=conf file direcory";
 		Log(LOG_TERMINAL) << "    --dbdir=database directory";
@@ -296,98 +256,98 @@ void Init(int ac, char **av)
 		Log(LOG_TERMINAL) << "";
 		Log(LOG_TERMINAL) << "Further support is available from http://www.anope.org";
 		Log(LOG_TERMINAL) << "Or visit us on IRC at irc.anope.org #anope";
-		throw FatalException();
+		throw CoreException();
 	}
 
 	if (GetCommandLineArgument("nofork", 'n'))
-		nofork = true;
+		Anope::NoFork = true;
 
 	if (GetCommandLineArgument("support", 's'))
 	{
-		nofork = nothird = true;
-		++debug;
+		Anope::NoFork = Anope::NoThird = true;
+		++Anope::Debug;
 	}
 
 	if (GetCommandLineArgument("readonly", 'r'))
-		readonly = true;
+		Anope::ReadOnly = true;
 
 	if (GetCommandLineArgument("nothird"))
-		nothird = true;
+		Anope::NoThird = true;
 
 	if (GetCommandLineArgument("noexpire", 'e'))
-		noexpire = true;
+		Anope::NoExpire = true;
 
 	if (GetCommandLineArgument("protocoldebug"))
-		protocoldebug = true;
+		Anope::ProtocolDebug = true;
 
-	Anope::string Arg;
-	if (GetCommandLineArgument("debug", 'd', Arg))
+	Anope::string arg;
+	if (GetCommandLineArgument("debug", 'd', arg))
 	{
-		if (!Arg.empty())
+		if (!arg.empty())
 		{
-			int level = Arg.is_number_only() ? convertTo<int>(Arg) : -1;
+			int level = arg.is_number_only() ? convertTo<int>(arg) : -1;
 			if (level > 0)
-				debug = level;
+				Anope::Debug = level;
 			else
-				throw FatalException("Invalid option given to --debug");
+				throw CoreException("Invalid option given to --debug");
 		}
 		else
-			++debug;
+			++Anope::Debug;
 	}
 
-	if (GetCommandLineArgument("config", 'c', Arg))
+	if (GetCommandLineArgument("config", 'c', arg))
 	{
-		if (Arg.empty())
-			throw FatalException("The --config option requires a file name");
-		services_conf = ConfigurationFile(Arg, false);
+		if (arg.empty())
+			throw CoreException("The --config option requires a file name");
+		ServicesConf = ConfigurationFile(arg, false);
 	}
 
-	if (GetCommandLineArgument("confdir", 0, Arg))
+	if (GetCommandLineArgument("confdir", 0, arg))
 	{
-		if (Arg.empty())
-			throw FatalException("The --confdir option requires a path");
-		conf_dir = Arg;
+		if (arg.empty())
+			throw CoreException("The --confdir option requires a path");
+		Anope::ConfigDir = arg;
 	}
 
-	if (GetCommandLineArgument("dbdir", 0, Arg))
+	if (GetCommandLineArgument("dbdir", 0, arg))
 	{
-		if (Arg.empty())
-			throw FatalException("The --dbdir option requires a path");
-		db_dir = Arg;
+		if (arg.empty())
+			throw CoreException("The --dbdir option requires a path");
+		Anope::DataDir = arg;
 	}
 
-	if (GetCommandLineArgument("localedir", 0, Arg))
+	if (GetCommandLineArgument("localedir", 0, arg))
 	{
-		if (Arg.empty())
-			throw FatalException("The --localedir option requires a path");
-		locale_dir = Arg;
+		if (arg.empty())
+			throw CoreException("The --localedir option requires a path");
+		Anope::LocaleDir = arg;
 	}
 
-	if (GetCommandLineArgument("modulesdir", 0, Arg))
+	if (GetCommandLineArgument("modulesdir", 0, arg))
 	{
-		if (Arg.empty())
-			throw FatalException("The --modulesdir option requires a path");
-		modules_dir = Arg;
+		if (arg.empty())
+			throw CoreException("The --modulesdir option requires a path");
+		Anope::ModuleDir = arg;
 	}
 
-	if (GetCommandLineArgument("logdir", 0, Arg))
+	if (GetCommandLineArgument("logdir", 0, arg))
 	{
-		if (Arg.empty())
-			throw FatalException("The --logdir option requires a path");
-		log_dir = Arg;
+		if (arg.empty())
+			throw CoreException("The --logdir option requires a path");
+		Anope::LogDir = arg;
 	}
 
 	/* Chdir to Services data directory. */
-	if (chdir(services_dir.c_str()) < 0)
+	if (chdir(Anope::ServicesDir.c_str()) < 0)
 	{
-		throw FatalException("Unable to chdir to " + services_dir + ": " + Anope::LastError());
+		throw CoreException("Unable to chdir to " + Anope::ServicesDir + ": " + Anope::LastError());
 	}
 
 	Log(LOG_TERMINAL) << "Anope " << Anope::Version() << ", " << Anope::VersionBuildString();
 #ifdef _WIN32
-	Log(LOG_TERMINAL) << "Using configuration file " << conf_dir << "\\" << services_conf.GetName();
+	Log(LOG_TERMINAL) << "Using configuration file " << Anope::ConfigDir << "\\" << ServicesConf.GetName();
 #else
-	Log(LOG_TERMINAL) << "Using configuration file " << conf_dir << "/" << services_conf.GetName();
+	Log(LOG_TERMINAL) << "Using configuration file " << Anope::ConfigDir << "/" << ServicesConf.GetName();
 #endif
 
 	/* Initialize the socket engine */
@@ -405,12 +365,12 @@ void Init(int ac, char **av)
 		Log(LOG_TERMINAL) << "*** documentation. Read the documentation files found in the 'docs'";
 		Log(LOG_TERMINAL) << "*** folder. Visit our portal located at http://www.anope.org/. Join";
 		Log(LOG_TERMINAL) << "*** our support channel on /server irc.anope.org channel #anope.";
-		throw FatalException("Configuration file failed to validate");
+		throw CoreException("Configuration file failed to validate");
 	}
 
 #ifdef _WIN32
 	if (!SupportedWindowsVersion())
-		throw FatalException(GetWindowsVersion() + " is not a supported version of Windows");
+		throw CoreException(GetWindowsVersion() + " is not a supported version of Windows");
 #else
 	/* If we're root, issue a warning now */
 	if (!getuid() && !getgid())
@@ -421,7 +381,7 @@ void Init(int ac, char **av)
 		sleep(3);
 	}
 
-	if (!nofork && AtTerm())
+	if (!Anope::NoFork && Anope::AtTerm())
 	{
 		/* Install these before fork() - it is possible for the child to
 		 * connect and kill() the parent before it is able to install the
@@ -444,12 +404,12 @@ void Init(int ac, char **av)
 			sigemptyset(&mask);
 			sigsuspend(&mask);
 
-			exit(return_code);
+			exit(Anope::ReturnValue);
 		}
 		else if (i == -1)
 		{
 			Log() << "Error, unable to fork: " << Anope::LastError();
-			nofork = true;
+			Anope::NoFork = true;
 		}
 
 		/* Child doesn't need these */
@@ -466,11 +426,11 @@ void Init(int ac, char **av)
 	for (botinfo_map::const_iterator it = BotListByNick->begin(), it_end = BotListByNick->end(); it != it_end; ++it)
 	{
 		it->second->server = Me;
-		++Me->Users;
+		++Me->users;
 	}
 
 	/* Announce ourselves to the logfile. */
-	Log() << "Anope " << Anope::Version() << " starting up" << (debug || readonly ? " (options:" : "") << (debug ? " debug" : "") << (readonly ? " readonly" : "") << (debug || readonly ? ")" : "");
+	Log() << "Anope " << Anope::Version() << " starting up" << (Anope::Debug || Anope::ReadOnly ? " (options:" : "") << (Anope::Debug ? " debug" : "") << (Anope::ReadOnly ? " readonly" : "") << (Anope::Debug || Anope::ReadOnly ? ")" : "");
 
 	new SignalReload(SIGHUP);
 	new SignalExit(SIGTERM);
@@ -478,8 +438,7 @@ void Init(int ac, char **av)
 	new SignalNothing(SIGPIPE);
 
 	/* Initialize multi-language support */
-	Log(LOG_DEBUG) << "Loading Languages...";
-	InitLanguages();
+	Language::InitLanguages();
 
 	/* Initialize random number generator */
 	srand(Config->Seed);
@@ -491,9 +450,9 @@ void Init(int ac, char **av)
 
 	Module *protocol = ModuleManager::FindFirstOf(PROTOCOL);
 	if (protocol == NULL)
-		throw FatalException("You must load a protocol module!");
+		throw CoreException("You must load a protocol module!");
 	else if (ModuleManager::FindFirstOf(ENCRYPTION) == NULL)
-		throw FatalException("You must load at least one encryption module");
+		throw CoreException("You must load at least one encryption module");
 
 	Log() << "Using IRCd protocol " << protocol->name;
 

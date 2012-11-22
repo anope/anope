@@ -22,7 +22,7 @@ bool WebCPanel::ChanServ::Akick::OnRequest(HTTPProvider *server, const Anope::st
 		return true;
 	}
 
-	ChannelInfo *ci = cs_findchan(chname);
+	ChannelInfo *ci = ChannelInfo::Find(chname);
 
 	if (!ci)
 		return true;

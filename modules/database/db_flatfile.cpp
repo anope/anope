@@ -37,7 +37,7 @@ class DBFlatFile : public Module
 	void BackupDatabase()
 	{
 		/* Do not backup a database that doesn't exist */
-		if (!IsFile(DatabaseFile))
+		if (!Anope::IsFile(DatabaseFile))
 			return;
 
 		time_t now = Anope::CurTime;
@@ -58,7 +58,7 @@ class DBFlatFile : public Module
 				Log(this) << "Unable to back up database!";
 
 				if (!Config->NoBackupOkay)
-					quitting = true;
+					Anope::Quitting = true;
 
 				return;
 			}
@@ -76,8 +76,8 @@ class DBFlatFile : public Module
 	void OnReload() anope_override
 	{
 		ConfigReader config;
-		DatabaseFile = db_dir + "/" + config.ReadValue("db_flatfile", "database", "anope.db", 0);
-		BackupFile = db_dir + "/backups/" + config.ReadValue("db_flatfile", "database", "anope.db", 0);
+		DatabaseFile = Anope::DataDir + "/" + config.ReadValue("db_flatfile", "database", "anope.db", 0);
+		BackupFile = Anope::DataDir + "/backups/" + config.ReadValue("db_flatfile", "database", "anope.db", 0);
 	}
 
 	EventReturn OnLoadDatabase() anope_override
@@ -92,23 +92,23 @@ class DBFlatFile : public Module
 			return EVENT_CONTINUE;
 		}
 
-		const std::vector<Anope::string> type_order = SerializeType::GetTypeOrder();
+		const std::vector<Anope::string> type_order = Serialize::Type::GetTypeOrder();
 
 		for (unsigned i = 0; i < type_order.size(); ++i)
 		{
-			SerializeType *stype = SerializeType::Find(type_order[i]);
+			Serialize::Type *stype = Serialize::Type::Find(type_order[i]);
 			if (stype && !databases.count(stype->GetOwner()))
 			{
-				Anope::string db_name = db_dir + "/module_" + stype->GetOwner()->name + ".db";
+				Anope::string db_name = Anope::DataDir + "/module_" + stype->GetOwner()->name + ".db";
 				databases[stype->GetOwner()] = new std::fstream(db_name.c_str(), std::ios_base::in);
 			}
 		}
 
-		std::multimap<SerializeType *, Serialize::Data> objects;
+		std::multimap<Serialize::Type *, Serialize::Data> objects;
 		for (std::map<Module *, std::fstream *>::iterator it = databases.begin(), it_end = databases.end(); it != it_end; ++it)
 		{
 			std::fstream *db = it->second;
-			SerializeType *st = NULL;
+			Serialize::Type *st = NULL;
 			Serialize::Data data;
 			for (Anope::string buf, token; std::getline(*db, buf.str());)
 			{
@@ -119,7 +119,7 @@ class DBFlatFile : public Module
 
 				if (token == "OBJECT" && sep.GetToken(token))
 				{
-					st = SerializeType::Find(token);
+					st = Serialize::Type::Find(token);
 					data.clear();
 				}
 				else if (token == "DATA" && st != NULL && sep.GetToken(token))
@@ -136,9 +136,9 @@ class DBFlatFile : public Module
 
 		for (unsigned i = 0; i < type_order.size(); ++i)
 		{
-			SerializeType *stype = SerializeType::Find(type_order[i]);
+			Serialize::Type *stype = Serialize::Type::Find(type_order[i]);
 
-			std::multimap<SerializeType *, Serialize::Data>::iterator it = objects.find(stype), it_end = objects.upper_bound(stype);
+			std::multimap<Serialize::Type *, Serialize::Data>::iterator it = objects.find(stype), it_end = objects.upper_bound(stype);
 			if (it == objects.end())
 				continue;
 			for (; it != it_end; ++it)
@@ -178,16 +178,16 @@ class DBFlatFile : public Module
 		for (std::list<Serializable *>::const_iterator it = items.begin(), it_end = items.end(); it != it_end; ++it)
 		{
 			Serializable *base = *it;
-			SerializeType *s_type = base->GetSerializableType();
+			Serialize::Type *s_type = base->GetSerializableType();
 
 			if (!s_type)
 				continue;
 
-			Serialize::Data data = base->serialize();
+			Serialize::Data data = base->Serialize();
 
 			if (!databases.count(s_type->GetOwner()))
 			{
-				Anope::string db_name = db_dir + "/module_" + s_type->GetOwner()->name + ".db";
+				Anope::string db_name = Anope::DataDir + "/module_" + s_type->GetOwner()->name + ".db";
 				databases[s_type->GetOwner()] = new std::fstream(db_name.c_str(), std::ios_base::out | std::ios_base::trunc);
 			}
 			std::fstream *fd = databases[s_type->GetOwner()];
@@ -203,7 +203,7 @@ class DBFlatFile : public Module
 			Log(this) << "Unable to write database";
 			databases[NULL]->close();
 			if (!Config->NoBackupOkay)
-				quitting = true;
+				Anope::Quitting = true;
 			if (IsFile(tmp_db))
 				rename(tmp_db.c_str(), DatabaseFile.c_str());
 		}

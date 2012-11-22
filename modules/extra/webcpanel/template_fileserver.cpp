@@ -126,7 +126,8 @@ void TemplateFileServer::Serve(HTTPProvider *server, const Anope::string &page_n
 
 			if (content.find("IF ") == 0)
 			{
-				std::vector<Anope::string> tokens = BuildStringVector(content);
+				std::vector<Anope::string> tokens;
+				spacesepstream(content).GetTokens(tokens);
 
 				if (tokens.size() == 4 && tokens[1] == "EQ")
 				{
@@ -163,13 +164,17 @@ void TemplateFileServer::Serve(HTTPProvider *server, const Anope::string &page_n
 			}
 			else if (content.find("FOR ") == 0)
 			{
-				std::vector<Anope::string> tokens = BuildStringVector(content);
+				std::vector<Anope::string> tokens;
+				spacesepstream(content).GetTokens(tokens);
+
 				if (tokens.size() != 4 || tokens[2] != "IN")
 					Log() << "Invalid FOR in web template " << this->file_name;
 				else
 				{
-					std::vector<Anope::string> temp_variables = BuildStringVector(tokens[1], ','),
-						real_variables = BuildStringVector(tokens[3], ',');
+					std::vector<Anope::string> temp_variables, real_variables;
+					commasepstream(tokens[1]).GetTokens(temp_variables);
+					commasepstream(tokens[3]).GetTokens(real_variables);
+
 					if (temp_variables.size() != real_variables.size())
 						Log() << "Invalid FOR in web template " << this->file_name << " variable mismatch";
 					else
@@ -200,7 +205,9 @@ void TemplateFileServer::Serve(HTTPProvider *server, const Anope::string &page_n
 			}
 			else if (content.find("INCLUDE ") == 0)
 			{
-				std::vector<Anope::string> tokens = BuildStringVector(content);
+				std::vector<Anope::string> tokens;
+				spacesepstream(content).GetTokens(tokens);
+
 				if (tokens.size() != 2)
 					Log() << "Invalid INCLUDE in web template " << this->file_name;
 				else

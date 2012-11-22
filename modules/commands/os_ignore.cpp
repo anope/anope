@@ -25,7 +25,7 @@ class OSIgnoreService : public IgnoreService
 		Anope::string realmask = mask;
 		size_t user, host;
 
-		User *u = finduser(mask);
+		User *u = User::Find(mask, true);
 		if (u)
 			realmask = "*!*@" + u->host;
 		/* Determine whether we get a nick or a mask. */
@@ -86,7 +86,7 @@ class OSIgnoreService : public IgnoreService
 
 	IgnoreData *Find(const Anope::string &mask) anope_override
 	{
-		User *u = finduser(mask);
+		User *u = User::Find(mask, true);
 		std::list<IgnoreData>::iterator ign = this->ignores.begin(), ign_end = this->ignores.end();
 		
 		if (u)
@@ -162,7 +162,7 @@ class CommandOSIgnore : public Command
 		}
 		else
 		{
-			time_t t = dotime(time);
+			time_t t = Anope::DoTime(time);
 
 			if (t <= -1)
 			{
@@ -205,7 +205,7 @@ class CommandOSIgnore : public Command
 		else
 		{
 			ListFormatter list;
-			list.addColumn("Mask").addColumn("Creator").addColumn("Reason").addColumn("Expires");
+			list.AddColumn("Mask").AddColumn("Creator").AddColumn("Reason").AddColumn("Expires");
 			for (std::list<IgnoreData>::const_iterator ign = ignores.begin(), ign_end = ignores.end(); ign != ign_end; ++ign)
 			{
 				const IgnoreData &ignore = *ign;
@@ -214,8 +214,8 @@ class CommandOSIgnore : public Command
 				entry["Mask"] = ignore.mask;
 				entry["Creator"] = ignore.creator;
 				entry["Reason"] = ignore.reason;
-				entry["Expires"] = do_strftime(ignore.time);
-				list.addEntry(entry);
+				entry["Expires"] = Anope::strftime(ignore.time);
+				list.AddEntry(entry);
 			}
 
 			source.Reply(_("Services ignore list:"));
@@ -309,16 +309,15 @@ class CommandOSIgnore : public Command
 
 class OSIgnore : public Module
 {
-	SerializeType ignoredata_type;
+	Serialize::Type ignoredata_type;
 	OSIgnoreService osignoreservice;
 	CommandOSIgnore commandosignore;
 
  public:
 	OSIgnore(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
-		ignoredata_type("IgnoreData", IgnoreData::unserialize), osignoreservice(this), commandosignore(this)
+		ignoredata_type("IgnoreData", IgnoreData::Unserialize), osignoreservice(this), commandosignore(this)
 	{
 		this->SetAuthor("Anope");
-
 
 		Implementation i[] = { I_OnBotPrivmsg };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));

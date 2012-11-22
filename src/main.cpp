@@ -8,32 +8,15 @@
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
  *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program (see the file COPYING); if not, write to the
- * Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
 #include "services.h"
 #include "timers.h"
-#include "extern.h"
-#include "uplink.h"
 #include "config.h"
-#include "protocol.h"
-#include "servers.h"
 #include "bots.h"
-#include "dns.h"
 #include "signals.h"
 #include "socketengine.h"
+#include "uplink.h"
 
 #ifndef _WIN32
 #include <limits.h>
@@ -41,37 +24,23 @@
 #include <process.h>
 #endif
 
-/******** Global variables! ********/
+/* Command-line options: */
+int Anope::Debug = 0;
+bool Anope::ReadOnly = false, Anope::NoFork = false, Anope::NoThird = false, Anope::NoExpire = false, Anope::ProtocolDebug = false;
+Anope::string Anope::ServicesDir;
+Anope::string Anope::ServicesBin;
 
-/* Command-line options: (note that configuration variables are in config.c) */
-Anope::string services_dir;	/* -dir dirname */
-Anope::string services_bin;	/* Binary as specified by the user */
-Anope::string binary_dir; /* Used to store base path for Anope */
-int debug = 0;				/* -debug */
-bool readonly = false;		/* -readonly */
-bool nofork = false;		/* -nofork */
-bool nothird = false;		/* -nothrid */
-bool noexpire = false;		/* -noexpire */
-bool protocoldebug = false;	/* -protocoldebug */
+int Anope::ReturnValue = 0;
+bool Anope::Quitting = false;
+bool Anope::Restarting = false;
+Anope::string Anope::QuitReason;
 
-/* Set to 1 if we are to quit */
-bool quitting = false;
-int return_code = 0;
+static Anope::string BinaryDir;       /* Full path to services bin directory */
 
-/* Set to true if we are restarting */
-bool restarting = false;
-
-/* Contains a message as to why services is terminating */
-Anope::string quitmsg;
-
-/* At what time were we started? */
-time_t start_time = time(NULL);
-
+time_t Anope::StartTime = time(NULL);
 time_t Anope::CurTime = time(NULL);
 
-/******** Local variables! ********/
-
-/*************************************************************************/
+int Anope::CurrentUplink = -1;
 
 class UpdateTimer : public Timer
 {
@@ -80,210 +49,19 @@ class UpdateTimer : public Timer
 
 	void Tick(time_t)
 	{
-		save_databases();
+		Anope::SaveDatabases();
 	}
 };
 
-UplinkSocket *UplinkSock = NULL;
-int CurrentUplink = -1;
-
-static void Connect();
-
-class ReconnectTimer : public Timer
+void Anope::SaveDatabases()
 {
- public:
-	ReconnectTimer(int wait) : Timer(wait) { }
-
-	void Tick(time_t)
-	{
-		try
-		{
-			Connect();
-		}
-		catch (const SocketException &ex)
-		{
-			Log(LOG_TERMINAL) << "Unable to connect to uplink #" << (CurrentUplink + 1) << " (" << Config->Uplinks[CurrentUplink]->host << ":" << Config->Uplinks[CurrentUplink]->port << "): " << ex.GetReason();
-		}
-	}
-};
-
-UplinkSocket::UplinkSocket() : Socket(-1, Config->Uplinks[CurrentUplink]->ipv6), ConnectionSocket(), BufferedSocket()
-{
-	UplinkSock = this;
-}
-
-UplinkSocket::~UplinkSocket()
-{
-	if (ircdproto && Me && !Me->GetLinks().empty() && Me->GetLinks()[0]->IsSynced())
-	{
-		FOREACH_MOD(I_OnServerDisconnect, OnServerDisconnect());
-
-		for (user_map::const_iterator it = UserListByNick.begin(); it != UserListByNick.end(); ++it)
-		{
-			User *u = it->second;
-
-			if (u->server == Me)
-			{
-				/* Don't use quitmsg here, it may contain information you don't want people to see */
-				ircdproto->SendQuit(u, "Shutting down");
-				BotInfo* bi = findbot(u->nick);
-				if (bi != NULL)
-					bi->introduced = false;
-			}
-		}
-
-		ircdproto->SendSquit(Me, quitmsg);
-
-		this->ProcessWrite(); // Write out the last bit
-	}
-
-	for (unsigned i = Me->GetLinks().size(); i > 0; --i)
-		if (!Me->GetLinks()[i - 1]->HasFlag(SERVER_JUPED))
-			Me->GetLinks()[i - 1]->Delete(Me->GetName() + " " + Me->GetLinks()[i - 1]->GetName());
-
-	UplinkSock = NULL;
-
-	Me->SetFlag(SERVER_SYNCING);
-
-	if (AtTerm())
-	{
-		if (static_cast<unsigned>(CurrentUplink + 1) == Config->Uplinks.size())
-		{
-			quitting = true;
-			quitmsg = "Unable to connect to any uplink";
-			return_code = -1;
-		}
-		else
-		{
-			new ReconnectTimer(1);
-		}
-	}
-	else if (!quitting)
-	{
-		int Retry = Config->RetryWait;
-		if (Retry <= 0)
-			Retry = 60;
-
-		Log() << "Disconnected, retrying in " << Retry << " seconds";
-		new ReconnectTimer(Retry);
-	}
-}
-
-bool UplinkSocket::Read(const Anope::string &buf)
-{
-	process(buf);
-	return true;
-}
-
-void UplinkSocket::OnConnect()
-{
-	Log(LOG_TERMINAL) << "Successfully connected to uplink #" << (CurrentUplink + 1) << " " << Config->Uplinks[CurrentUplink]->host << ":" << Config->Uplinks[CurrentUplink]->port;
-	ircdproto->SendConnect();
-	FOREACH_MOD(I_OnServerConnect, OnServerConnect());
-}
-
-void UplinkSocket::OnError(const Anope::string &error)
-{
-	Log(LOG_TERMINAL) << "Unable to connect to uplink #" << (CurrentUplink + 1) << " (" << Config->Uplinks[CurrentUplink]->host << ":" << Config->Uplinks[CurrentUplink]->port << ")" << (!error.empty() ? (": " + error) : "");
-}
-
-UplinkSocket::Message::Message() : server(NULL), user(NULL)
-{
-}
-
-UplinkSocket::Message::Message(const Server *s) : server(s), user(NULL)
-{
-}
-
-UplinkSocket::Message::Message(const User *u) : server(NULL), user(u)
-{
-	if (!u)
-		server = Me;
-}
-
-UplinkSocket::Message::~Message()
-{
-	Anope::string message_source = "";
-
-	if (this->server != NULL)
-	{
-		if (this->server != Me && !this->server->HasFlag(SERVER_JUPED))
-		{
-			Log(LOG_DEBUG) << "Attempted to send \"" << this->buffer.str() << "\" from " << this->server->GetName() << " who is not from me?";
-			return;
-		}
-
-		message_source = this->server->GetSID();
-	}
-	else if (this->user != NULL)
-	{
-		if (this->user->server != Me && !this->user->server->HasFlag(SERVER_JUPED))
-		{
-			Log(LOG_DEBUG) << "Attempted to send \"" << this->buffer.str() << "\" from " << this->user->nick << " who is not from me?";
-			return;
-		}
-
-		const BotInfo *bi = findbot(this->user->nick);
-		if (bi != NULL && bi->introduced == false)
-		{
-			Log(LOG_DEBUG) << "Attempted to send \"" << this->buffer.str() << "\" from " << bi->nick << " when not introduced";
-			return;
-		}
-
-		message_source = this->user->GetUID();
-	}
-
-	if (!UplinkSock)
-	{
-		if (!message_source.empty())
-			Log(LOG_DEBUG) << "Attempted to send \"" << message_source << " " << this->buffer.str() << "\" with UplinkSock NULL";
-		else
-			Log(LOG_DEBUG) << "Attempted to send \"" << this->buffer.str() << "\" with UplinkSock NULL";
-		return;
-	}
-
-	if (!message_source.empty())
-	{
-		UplinkSock->Write(":" + message_source + " " + this->buffer.str());
-		Log(LOG_RAWIO) << "Sent: :" << message_source << " " << this->buffer.str();
-	}
-	else
-	{
-		UplinkSock->Write(this->buffer.str());
-		Log(LOG_RAWIO) << "Sent: " << this->buffer.str();
-	}
-}
-
-static void Connect()
-{
-	if (static_cast<unsigned>(++CurrentUplink) >= Config->Uplinks.size())
-		CurrentUplink = 0;
-
-	ServerConfig::Uplink *u = Config->Uplinks[CurrentUplink];
-
-	new UplinkSocket();
-	if (!Config->LocalHost.empty())
-		UplinkSock->Bind(Config->LocalHost);
-	FOREACH_MOD(I_OnPreServerConnect, OnPreServerConnect());
-	DNSQuery rep = DNSManager::BlockingQuery(u->host, u->ipv6 ? DNS_QUERY_AAAA : DNS_QUERY_A);
-	Anope::string reply_ip = !rep.answers.empty() ? rep.answers.front().rdata : u->host;
-	Log(LOG_TERMINAL) << "Attempting to connect to uplink #" << (CurrentUplink + 1) << " " << u->host << " (" << reply_ip << "), port " << u->port;
-	UplinkSock->Connect(reply_ip, u->port);
-}
-
-/*************************************************************************/
-
-void save_databases()
-{
-	if (readonly)
+	if (Anope::ReadOnly)
 		return;
 
 	EventReturn MOD_RESULT;
 	FOREACH_RESULT(I_OnSaveDatabase, OnSaveDatabase());
 	Log(LOG_DEBUG) << "Saving databases";
 }
-
-/*************************************************************************/
 
 std::vector<Signal *> Signal::SignalHandlers;
 
@@ -321,7 +99,7 @@ Signal::~Signal()
 
 /** The following comes from InspIRCd to get the full path of the Anope executable
  */
-Anope::string GetFullProgDir(const Anope::string &argv0)
+static Anope::string GetFullProgDir(const Anope::string &argv0)
 {
 	char buffer[PATH_MAX];
 #ifdef _WIN32
@@ -333,7 +111,7 @@ Anope::string GetFullProgDir(const Anope::string &argv0)
 	{
 		Anope::string fullpath = buffer;
 		Anope::string::size_type n = fullpath.rfind("\\");
-		services_bin = fullpath.substr(n + 1, fullpath.length());
+		Anope::ServicesBin = fullpath.substr(n + 1, fullpath.length());
 		return fullpath.substr(0, n);
 	}
 #else
@@ -342,14 +120,14 @@ Anope::string GetFullProgDir(const Anope::string &argv0)
 	{
 		Anope::string remainder = argv0;
 
-		services_bin = remainder;
-		Anope::string::size_type n = services_bin.rfind("/");
+		Anope::ServicesBin = remainder;
+		Anope::string::size_type n = Anope::ServicesBin.rfind("/");
 		Anope::string fullpath;
-		if (services_bin[0] == '/')
-			fullpath = services_bin.substr(0, n);
+		if (Anope::ServicesBin[0] == '/')
+			fullpath = Anope::ServicesBin.substr(0, n);
 		else
-			fullpath = Anope::string(buffer) + "/" + services_bin.substr(0, n);
-		services_bin = services_bin.substr(n + 1, remainder.length());
+			fullpath = Anope::string(buffer) + "/" + Anope::ServicesBin.substr(0, n);
+		Anope::ServicesBin = Anope::ServicesBin.substr(n + 1, remainder.length());
 		return fullpath;
 	}
 #endif
@@ -362,16 +140,16 @@ Anope::string GetFullProgDir(const Anope::string &argv0)
 
 int main(int ac, char **av, char **envp)
 {
-	binary_dir = GetFullProgDir(av[0]);
-	if (binary_dir[binary_dir.length() - 1] == '.')
-		binary_dir = binary_dir.substr(0, binary_dir.length() - 2);
+	BinaryDir = GetFullProgDir(av[0]);
+	if (BinaryDir[BinaryDir.length() - 1] == '.')
+		BinaryDir = BinaryDir.substr(0, BinaryDir.length() - 2);
 
 #ifdef _WIN32
-	Anope::string::size_type n = binary_dir.rfind('\\');
+	Anope::string::size_type n = BinaryDir.rfind('\\');
 #else
-	Anope::string::size_type n = binary_dir.rfind('/');
+	Anope::string::size_type n = BinaryDir.rfind('/');
 #endif
-	services_dir = binary_dir.substr(0, n);
+	Anope::ServicesDir = BinaryDir.substr(0, n);
 
 	/* Clean out the module runtime directory prior to running, just in case files were left behind during a previous run */
 	ModuleManager::CleanupRuntimeDirectory();
@@ -383,9 +161,9 @@ int main(int ac, char **av, char **envp)
 	try
 	{
 		/* General initialization first */
-		Init(ac, av);
+		Anope::Init(ac, av);
 	}
-	catch (const FatalException &ex)
+	catch (const CoreException &ex)
 	{
 		Log() << ex.GetReason();
 		return -1;
@@ -393,11 +171,11 @@ int main(int ac, char **av, char **envp)
 
 	try
 	{
-		Connect();
+		Uplink::Connect();
 	}
 	catch (const SocketException &ex)
 	{
-		Log(LOG_TERMINAL) << "Unable to connect to uplink #" << CurrentUplink << " (" << Config->Uplinks[CurrentUplink]->host << ":" << Config->Uplinks[CurrentUplink]->port << "): " << ex.GetReason();
+		Log(LOG_TERMINAL) << "Unable to connect to uplink #" << Anope::CurrentUplink << " (" << Config->Uplinks[Anope::CurrentUplink]->host << ":" << Config->Uplinks[Anope::CurrentUplink]->port << "): " << ex.GetReason();
 	}
 
 	/* Set up timers */
@@ -405,7 +183,7 @@ int main(int ac, char **av, char **envp)
 	UpdateTimer updateTimer(Config->UpdateTimeout);
 
 	/*** Main loop. ***/
-	while (!quitting)
+	while (!Anope::Quitting)
 	{
 		Log(LOG_DEBUG_2) << "Top of main loop";
 
@@ -420,7 +198,7 @@ int main(int ac, char **av, char **envp)
 		SocketEngine::Process();
 	}
 
-	if (restarting)
+	if (Anope::Restarting)
 	{
 		FOREACH_MOD(I_OnRestart, OnRestart());
 	}
@@ -429,9 +207,9 @@ int main(int ac, char **av, char **envp)
 		FOREACH_MOD(I_OnShutdown, OnShutdown());
 	}
 
-	if (quitmsg.empty())
-		quitmsg = "Terminating, reason unknown";
-	Log() << quitmsg;
+	if (Anope::QuitReason.empty())
+		Anope::QuitReason = "Terminating, reason unknown";
+	Log() << Anope::QuitReason;
 
 	delete UplinkSock;
 
@@ -446,14 +224,15 @@ int main(int ac, char **av, char **envp)
 	OnShutdown();
 #endif
 
-	if (restarting)
+	if (Anope::Restarting)
 	{
-		chdir(binary_dir.c_str());
-		av[0] = const_cast<char *>(("./" + services_bin).c_str());
-		execve(services_bin.c_str(), av, envp);
+		chdir(BinaryDir.c_str());
+		Anope::string sbin = "./" + Anope::ServicesBin;
+		av[0] = const_cast<char *>(sbin.c_str());
+		execve(Anope::ServicesBin.c_str(), av, envp);
 		Log() << "Restart failed";
-		return_code = -1;
+		Anope::ReturnValue = -1;
 	}
 
-	return return_code;
+	return Anope::ReturnValue;
 }

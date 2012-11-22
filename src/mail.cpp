@@ -7,28 +7,28 @@
  *
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
+ *
  */
-
 
 #include "services.h"
 #include "mail.h"
 #include "config.h"
 
-MailThread::MailThread(const Anope::string &smpath, const Anope::string &sf, const Anope::string &mailto, const Anope::string &addr, const Anope::string &subject, const Anope::string &message) : Thread(), SendMailPath(smpath), SendFrom(sf), MailTo(mailto), Addr(addr), Subject(subject), Message(message), DontQuoteAddresses(Config->DontQuoteAddresses), Success(false)
+Mail::Message::Message(const Anope::string &sf, const Anope::string &mailto, const Anope::string &a, const Anope::string &s, const Anope::string &m) : Thread(), sendmail_path(Config->SendMailPath), send_from(sf), mail_to(mailto), addr(a), subject(s), message(m), dont_quote_addresses(Config->DontQuoteAddresses), success(false)
 {
 }
 
-MailThread::~MailThread()
+Mail::Message::~Message()
 {
-	if (Success)
-		Log(LOG_NORMAL, "mail") << "Successfully delivered mail for " << MailTo << " (" << Addr << ")";
+	if (success)
+		Log(LOG_NORMAL, "mail") << "Successfully delivered mail for " << mail_to << " (" << addr << ")";
 	else
-		Log(LOG_NORMAL, "mail") << "Error delivering mail for " << MailTo << " (" << Addr << ")";
+		Log(LOG_NORMAL, "mail") << "Error delivering mail for " << mail_to << " (" << addr << ")";
 }
 
-void MailThread::Run()
+void Mail::Message::Run()
 {
-	FILE *pipe = popen(SendMailPath.c_str(), "w");
+	FILE *pipe = popen(sendmail_path.c_str(), "w");
 
 	if (!pipe)
 	{
@@ -36,22 +36,22 @@ void MailThread::Run()
 		return;
 	}
 
-	fprintf(pipe, "From: %s\n", SendFrom.c_str());
-	if (this->DontQuoteAddresses)
-		fprintf(pipe, "To: %s <%s>\n", MailTo.c_str(), Addr.c_str());
+	fprintf(pipe, "From: %s\n", send_from.c_str());
+	if (this->dont_quote_addresses)
+		fprintf(pipe, "To: %s <%s>\n", mail_to.c_str(), addr.c_str());
 	else
-		fprintf(pipe, "To: \"%s\" <%s>\n", MailTo.c_str(), Addr.c_str());
-	fprintf(pipe, "Subject: %s\n", Subject.c_str());
-	fprintf(pipe, "%s", Message.c_str());
+		fprintf(pipe, "To: \"%s\" <%s>\n", mail_to.c_str(), addr.c_str());
+	fprintf(pipe, "Subject: %s\n", subject.c_str());
+	fprintf(pipe, "%s", message.c_str());
 	fprintf(pipe, "\n.\n");
 
 	pclose(pipe);
 
-	Success = true;
+	success = true;
 	SetExitState();
 }
 
-bool Mail(User *u, NickCore *nc, const BotInfo *service, const Anope::string &subject, const Anope::string &message)
+bool Mail::Send(User *u, NickCore *nc, const BotInfo *service, const Anope::string &subject, const Anope::string &message)
 {
 	if (!nc || !service || subject.empty() || message.empty())
 		return false;
@@ -64,7 +64,7 @@ bool Mail(User *u, NickCore *nc, const BotInfo *service, const Anope::string &su
 			return false;
 
 		nc->lastmail = Anope::CurTime;
-		Thread *t = new MailThread(Config->SendMailPath, Config->SendFrom, nc->display, nc->email, subject, message);
+		Thread *t = new Mail::Message(Config->SendFrom, nc->display, nc->email, subject, message);
 		t->Start();
 		return true;
 	}
@@ -79,7 +79,7 @@ bool Mail(User *u, NickCore *nc, const BotInfo *service, const Anope::string &su
 		else
 		{
 			u->lastmail = nc->lastmail = Anope::CurTime;
-			Thread *t = new MailThread(Config->SendMailPath, Config->SendFrom, nc->display, nc->email, subject, message);
+			Thread *t = new Mail::Message(Config->SendFrom, nc->display, nc->email, subject, message);
 			t->Start();
 			return true;
 		}
@@ -88,13 +88,13 @@ bool Mail(User *u, NickCore *nc, const BotInfo *service, const Anope::string &su
 	}
 }
 
-bool Mail(NickCore *nc, const Anope::string &subject, const Anope::string &message)
+bool Mail::Send(NickCore *nc, const Anope::string &subject, const Anope::string &message)
 {
 	if (!Config->UseMail || !nc || nc->email.empty() || subject.empty() || message.empty())
 		return false;
 
 	nc->lastmail = Anope::CurTime;
-	Thread *t = new MailThread(Config->SendMailPath, Config->SendFrom, nc->display, nc->email, subject, message);
+	Thread *t = new Mail::Message(Config->SendFrom, nc->display, nc->email, subject, message);
 	t->Start();
 
 	return true;
@@ -109,7 +109,7 @@ bool Mail(NickCore *nc, const Anope::string &subject, const Anope::string &messa
  * @param email Email to Validate
  * @return bool
  */
-bool MailValidate(const Anope::string &email)
+bool Mail::Validate(const Anope::string &email)
 {
 	bool has_period = false;
 

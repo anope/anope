@@ -25,12 +25,12 @@ class CommandMSStaff : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		if (!memoserv)
+		if (!MemoServService)
 			return;
 
 		const Anope::string &text = params[0];
 
-		if (readonly)
+		if (Anope::ReadOnly)
 		{
 			source.Reply(MEMO_SEND_DISABLED);
 			return;
@@ -41,7 +41,7 @@ class CommandMSStaff : public Command
 			const NickCore *nc = it->second;
 
 			if (source.nc != nc && nc->IsServicesOper())
-				memoserv->Send(source.GetNick(), nc->display, text, true);
+				MemoServService->Send(source.GetNick(), nc->display, text, true);
 		}
 
 		return;
@@ -67,7 +67,7 @@ class MSStaff : public Module
 	{
 		this->SetAuthor("Anope");
 
-		if (!memoserv)
+		if (!MemoServService)
 			throw ModuleException("No MemoServ!");
 	}
 };

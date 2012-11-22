@@ -42,7 +42,7 @@ class MyHTTPClient : public HTTPClient
 	HTTPMessage header;
 	bool header_done, served;
 	Anope::string page_name;
-	dynamic_reference<HTTPPage> page;
+	Reference<HTTPPage> page;
 	Anope::string ip;
 
 	enum
@@ -114,7 +114,8 @@ class MyHTTPClient : public HTTPClient
 		{
 			if (this->action == ACTION_NONE)
 			{
-				std::vector<Anope::string> params = BuildStringVector(buf);
+				std::vector<Anope::string> params;
+				spacesepstream(buf).GetTokens(params);
 
 				if (params.empty() || (params[0] != "GET" && params[0] != "POST"))
 				{
@@ -189,11 +190,11 @@ class MyHTTPClient : public HTTPClient
 						}
 						catch (const ConvertException &) { }
 
-					if (this->extrabuf.length() == content_length)
+					if (this->extra_buf.length() == content_length)
 					{
-						Log(LOG_DEBUG_2) << "HTTP POST from " << this->clientaddr.addr() << ": " << this->extrabuf;
+						Log(LOG_DEBUG_2) << "HTTP POST from " << this->clientaddr.addr() << ": " << this->extra_buf;
 					
-						sepstream sep(this->extrabuf, '&');
+						sepstream sep(this->extra_buf, '&');
 						Anope::string token;
 
 						while (sep.GetToken(token))
@@ -204,7 +205,7 @@ class MyHTTPClient : public HTTPClient
 							this->header.post_data[token.substr(0, sz)] = HTTPUtils::URLDecode(token.substr(sz + 1));
 						}
 
-						this->header.content = this->extrabuf;
+						this->header.content = this->extra_buf;
 						this->Serve();
 					}
 				}
@@ -281,7 +282,7 @@ class MyHTTPProvider : public HTTPProvider, public CallBack
 {
 	int timeout;
 	std::map<Anope::string, HTTPPage *> pages;
-	std::list<dynamic_reference<MyHTTPClient> > clients;
+	std::list<Reference<MyHTTPClient> > clients;
 
  public:
 	MyHTTPProvider(Module *c, const Anope::string &n, const Anope::string &i, const unsigned short p, const int t) : Socket(-1, i.find(':') != Anope::string::npos), HTTPProvider(c, n, i, p), CallBack(c, 10, Anope::CurTime, true), timeout(t) { }
@@ -290,7 +291,7 @@ class MyHTTPProvider : public HTTPProvider, public CallBack
 	{
 		while (!this->clients.empty())
 		{
-			dynamic_reference<MyHTTPClient>& c = this->clients.front();
+			Reference<MyHTTPClient>& c = this->clients.front();
 			if (c && c->created + this->timeout >= Anope::CurTime)
 				break;
 
@@ -326,7 +327,7 @@ class MyHTTPProvider : public HTTPProvider, public CallBack
 
 class HTTPD : public Module
 {
-	service_reference<SSLService> sslref;
+	ServiceReference<SSLService> sslref;
 	std::map<Anope::string, HTTPProvider *> providers;
  public:
 	HTTPD(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, SUPPORTED), sslref("SSLService", "ssl")
@@ -432,7 +433,7 @@ class HTTPD : public Module
 
 
 			p->ext_ip = ext_ip;
-			p->ext_headers = BuildStringVector(ext_header);
+			spacesepstream(ext_header).GetTokens(p->ext_headers);
 		}
 
 		for (std::map<Anope::string, HTTPProvider *>::iterator it = this->providers.begin(), it_end = this->providers.end(); it != it_end;)

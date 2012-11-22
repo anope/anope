@@ -72,7 +72,7 @@ class MyNewsService : public NewsService
 	{
 		for (unsigned i = 0; i < 3; ++i)
 			for (unsigned j = 0; j < newsItems[i].size(); ++j)
-				newsItems[i][j]->destroy();
+				newsItems[i][j]->Destroy();
 	}
 
 	void AddNewsItem(NewsItem *n)
@@ -86,7 +86,7 @@ class MyNewsService : public NewsService
 		std::vector<NewsItem *>::iterator it = std::find(list.begin(), list.end(), n);
 		if (it != list.end())
 			list.erase(it);
-		n->destroy();
+		n->Destroy();
 	}
 
 	std::vector<NewsItem *> &GetNewsList(NewsType t)
@@ -106,7 +106,7 @@ static const char **findmsgs(NewsType type)
 
 class NewsBase : public Command
 {
-	service_reference<NewsService> ns;
+	ServiceReference<NewsService> ns;
 
  protected:
 	void DoList(CommandSource &source, NewsType ntype, const char **msgs)
@@ -117,16 +117,16 @@ class NewsBase : public Command
 		else
 		{
 			ListFormatter lflist;
-			lflist.addColumn("Number").addColumn("Creator").addColumn("Created").addColumn("Text");
+			lflist.AddColumn("Number").AddColumn("Creator").AddColumn("Created").AddColumn("Text");
 
 			for (unsigned i = 0, end = list.size(); i < end; ++i)
 			{
 				ListFormatter::ListEntry entry;
 				entry["Number"] = stringify(i + 1);
 				entry["Creator"] = list[i]->who;
-				entry["Created"] = do_strftime(list[i]->time);
+				entry["Created"] = Anope::strftime(list[i]->time);
 				entry["Text"] = list[i]->text;
-				lflist.addEntry(entry);
+				lflist.AddEntry(entry);
 			}
 
 			source.Reply(msgs[MSG_LIST_HEADER]);
@@ -151,7 +151,7 @@ class NewsBase : public Command
 			this->OnSyntaxError(source, "ADD");
 		else
 		{
-			if (readonly)
+			if (Anope::ReadOnly)
 				source.Reply(READ_ONLY_MODE);
 
 			NewsItem *news = new NewsItem();
@@ -181,7 +181,7 @@ class NewsBase : public Command
 				source.Reply(msgs[MSG_LIST_NONE]);
 			else
 			{
-				if (readonly)
+				if (Anope::ReadOnly)
 					source.Reply(READ_ONLY_MODE);
 				if (!text.equals_ci("ALL"))
 				{
@@ -336,7 +336,7 @@ class CommandOSRandomNews : public NewsBase
 
 class OSNews : public Module
 {
-	SerializeType newsitem_type;
+	Serialize::Type newsitem_type;
 	MyNewsService newsservice;
 
 	CommandOSLogonNews commandoslogonnews;
@@ -364,14 +364,14 @@ class OSNews : public Module
 			if (Type == NEWS_RANDOM && i != cur_rand_news)
 				continue;
 
-			const BotInfo *gl = findbot(Config->Global);
+			const BotInfo *gl = Global;
 			if (!gl && !BotListByNick->empty())
 				gl = BotListByNick->begin()->second;
-			const BotInfo *os = findbot(Config->OperServ);
+			const BotInfo *os = OperServ;
 			if (!os)
 				os = gl;
 			if (gl)
-				u->SendMessage(Type != NEWS_OPER ? gl : os, msg.c_str(), do_strftime(newsList[i]->time).c_str(), newsList[i]->text.c_str());
+				u->SendMessage(Type != NEWS_OPER ? gl : os, msg.c_str(), Anope::strftime(newsList[i]->time).c_str(), newsList[i]->text.c_str());
 
 			++displayed;
 
@@ -391,7 +391,7 @@ class OSNews : public Module
 
  public:
 	OSNews(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
-		newsitem_type("NewsItem", NewsItem::unserialize), newsservice(this), commandoslogonnews(this), commandosopernews(this), commandosrandomnews(this)
+		newsitem_type("NewsItem", NewsItem::Unserialize), newsservice(this), commandoslogonnews(this), commandosopernews(this), commandosrandomnews(this)
 	{
 		this->SetAuthor("Anope");
 
@@ -405,7 +405,7 @@ class OSNews : public Module
 			DisplayNews(u, NEWS_OPER);
 	}
 
-	void OnUserConnect(dynamic_reference<User> &user, bool &) anope_override
+	void OnUserConnect(Reference<User> &user, bool &) anope_override
 	{
 		if (!user || !user->server->IsSynced())
 			return;

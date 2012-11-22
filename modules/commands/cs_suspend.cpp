@@ -22,7 +22,7 @@ struct ChanSuspend : ExtensibleItem, Serializable
 	{
 	}
 
-	Serialize::Data serialize() const anope_override
+	Serialize::Data Serialize() const anope_override
 	{
 		Serialize::Data sd;
 
@@ -32,9 +32,9 @@ struct ChanSuspend : ExtensibleItem, Serializable
 		return sd;
 	}
 
-	static Serializable* unserialize(Serializable *obj, Serialize::Data &sd)
+	static Serializable* Unserialize(Serializable *obj, Serialize::Data &sd)
 	{
-		ChannelInfo *ci = cs_findchan(sd["chan"].astr());
+		ChannelInfo *ci = ChannelInfo::Find(sd["chan"].astr());
 		if (ci == NULL)
 			return NULL;
 
@@ -77,7 +77,7 @@ class CommandCSSuspend : public Command
 			expiry.clear();
 		}
 		else
-			expiry_secs = dotime(expiry);
+			expiry_secs = Anope::DoTime(expiry);
 
 		if (Config->ForceForbidReason && reason.empty())
 		{
@@ -85,10 +85,10 @@ class CommandCSSuspend : public Command
 			return;
 		}
 
-		if (readonly)
+		if (Anope::ReadOnly)
 			source.Reply(READ_ONLY_MODE);
 
-		ChannelInfo *ci = cs_findchan(chan);
+		ChannelInfo *ci = ChannelInfo::Find(chan);
 		if (ci == NULL)
 		{
 			source.Reply(CHAN_X_NOT_REGISTERED, chan.c_str());
@@ -113,7 +113,7 @@ class CommandCSSuspend : public Command
 			}
 
 			for (unsigned i = 0; i < users.size(); ++i)
-				ci->c->Kick(NULL, users[i], "%s", !reason.empty() ? reason.c_str() : translate(users[i], _("This channel has been suspended.")));
+				ci->c->Kick(NULL, users[i], "%s", !reason.empty() ? reason.c_str() : Language::Translate(users[i], _("This channel has been suspended.")));
 		}
 
 		if (expiry_secs > 0)
@@ -125,7 +125,7 @@ class CommandCSSuspend : public Command
 			ci->Extend("cs_suspend_expire", cs);
 		}
 
-		Log(LOG_ADMIN, source, this, ci) << (!reason.empty() ? reason : "No reason") << ", expires in " << (expiry_secs ? do_strftime(Anope::CurTime + expiry_secs) : "never");
+		Log(LOG_ADMIN, source, this, ci) << (!reason.empty() ? reason : "No reason") << ", expires in " << (expiry_secs ? Anope::strftime(Anope::CurTime + expiry_secs) : "never");
 		source.Reply(_("Channel \002%s\002 is now suspended."), ci->name.c_str());
 
 		FOREACH_MOD(I_OnChanSuspend, OnChanSuspend(ci));
@@ -161,10 +161,10 @@ class CommandCSUnSuspend : public Command
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 
-		if (readonly)
+		if (Anope::ReadOnly)
 			source.Reply(READ_ONLY_MODE);
 
-		ChannelInfo *ci = cs_findchan(params[0]);
+		ChannelInfo *ci = ChannelInfo::Find(params[0]);
 		if (ci == NULL)
 		{
 			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
@@ -206,13 +206,13 @@ class CommandCSUnSuspend : public Command
 
 class CSSuspend : public Module
 {
-	SerializeType chansuspend_type;
+	Serialize::Type chansuspend_type;
 	CommandCSSuspend commandcssuspend;
 	CommandCSUnSuspend commandcsunsuspend;
 
  public:
 	CSSuspend(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
-		chansuspend_type("ChanSuspend", ChanSuspend::unserialize), commandcssuspend(this), commandcsunsuspend(this)
+		chansuspend_type("ChanSuspend", ChanSuspend::Unserialize), commandcssuspend(this), commandcsunsuspend(this)
 	{
 		this->SetAuthor("Anope");
 
@@ -247,7 +247,7 @@ class CSSuspend : public Module
 			ci->Shrink("suspend_by");
 			ci->Shrink("suspend_reason");
 
-			Log(LOG_NORMAL, "expire", findbot(Config->ChanServ)) << "Expiring suspend for " << ci->name;
+			Log(LOG_NORMAL, "expire", ChanServ) << "Expiring suspend for " << ci->name;
 		}
 	}
 };

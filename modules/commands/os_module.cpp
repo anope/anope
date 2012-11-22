@@ -76,6 +76,13 @@ class CommandOSModReLoad : public Command
 			return;
 		}
 
+		Module *protocol = ModuleManager::FindFirstOf(PROTOCOL);
+		if (m->type == PROTOCOL && m != protocol)
+		{
+			source.Reply(_("You may not reload this module directly, instead reload %s."), protocol ? protocol->name.c_str() : "(unknown)");
+			return;
+		}
+
 		/* Unrecoverable */
 		bool fatal = m->type == PROTOCOL;
 		ModuleReturn status = ModuleManager::UnloadModule(m, source.GetUser());
@@ -96,8 +103,8 @@ class CommandOSModReLoad : public Command
 		{
 			if (fatal)
 			{
-				quitmsg = "Unable to reload module " + mname;
-				quitting = true;
+				Anope::QuitReason = "Unable to reload module " + mname;
+				Anope::Quitting = true;
 			}
 			else
 				source.Reply(_("Unable to load module \002%s\002"), mname.c_str());

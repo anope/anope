@@ -4,6 +4,7 @@
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
+ *
  */
 
 #ifndef CHANNELS_H
@@ -18,10 +19,12 @@ typedef Anope::hash_map<Channel *> channel_map;
 
 extern CoreExport channel_map ChannelList;
 
+/* A user container, there is one of these per user per channel. */
 struct UserContainer : public Extensible
 {
 	User *user;
-	ChannelStatus *Status;
+	/* Status the user has in the channel */
+	ChannelStatus *status;
 
 	UserContainer(User *u) : user(u) { }
 	virtual ~UserContainer() { }
@@ -39,9 +42,7 @@ enum ChannelFlag
 	CH_SYNCING
 };
 
-const Anope::string ChannelFlagString[] = { "CH_INABIT", "CH_PERSIST", "CH_SYNCING", "" };
-
-class CoreExport Channel : public virtual Base, public Extensible, public Flags<ChannelFlag, 3>
+class CoreExport Channel : public Base, public Extensible, public Flags<ChannelFlag>
 {
  public:
 	typedef std::multimap<ChannelModeName, Anope::string> ModeList;
@@ -51,33 +52,43 @@ class CoreExport Channel : public virtual Base, public Extensible, public Flags<
 	ModeList modes;
 
  public:
-	/** Default constructor
-	 * @param name The channel name
-	 * @param ts The time the channel was created
-	 */
-	Channel(const Anope::string &nname, time_t ts = Anope::CurTime);
+ 	/* Channel name */
+	Anope::string name;
+	/* Set if this channel is registered. ci->c == this. Contains information relevant to the registered channel */
+	Serialize::Reference<ChannelInfo> ci;
+	/* When the channel was created */
+	time_t creation_time;
 
-	/** Default destructor
-	 */
-	~Channel();
-
-	Anope::string name;		/* Channel name */
-	serialize_obj<ChannelInfo> ci;	/* Corresponding ChannelInfo */
-	time_t creation_time;	/* When channel was created */
-
-	/* List of users in the channel */
+	/* Users in the channel */
 	CUserList users;
 
-	Anope::string topic;		/* Current topic of the channel */
-	Anope::string topic_setter;	/* Who set the topic */
-	time_t topic_ts;                /* The timestamp associated with the topic. Not necessarually anywhere close to Anope::CurTime */
-	time_t topic_time;              /* The actual time the topic was set, probably close to Anope::CurTime */
+	/* Current topic of the channel */
+	Anope::string topic;
+	/* Who set the topic */
+	Anope::string topic_setter;
+	/* The timestamp associated with the topic. Not necessarually anywhere close to Anope::CurTime.
+	 * This is the time the topic was *originally set*. When we restore the topic we want to change the TS back
+	 * to this, but we can only do this on certain IRCds.
+	 */
+	time_t topic_ts;
+	/* The actual time the topic was set, probably close to Anope::CurTime */
+	time_t topic_time;
 
 	time_t server_modetime;		/* Time of last server MODE */
 	time_t chanserv_modetime;	/* Time of last check_modes() */
 	int16_t server_modecount;	/* Number of server MODEs this second */
 	int16_t chanserv_modecount;	/* Number of check_mode()'s this sec */
 	int16_t bouncy_modes;		/* Did we fail to set modes here? */
+
+	/** Constructor
+	 * @param name The channel name
+	 * @param ts The time the channel was created
+	 */
+	Channel(const Anope::string &nname, time_t ts = Anope::CurTime);
+
+	/** Destructor
+	 */
+	~Channel();
 
 	/** Call if we need to unset all modes and clear all user status (internally).
 	 * Only useful if we get a SJOIN with a TS older than what we have here
@@ -94,8 +105,9 @@ class CoreExport Channel : public virtual Base, public Extensible, public Flags<
 
 	/** Join a user internally to the channel
 	 * @param u The user
+	 * @return The UserContainer for the user
 	 */
-	void JoinUser(User *u);
+	UserContainer* JoinUser(User *u);
 
 	/** Remove a user internally from the channel
 	 * @param u The user
@@ -118,94 +130,101 @@ class CoreExport Channel : public virtual Base, public Extensible, public Flags<
 	/** Check if a user has a status on a channel
 	 * Use the overloaded function for ChannelModeStatus* to check for no status
 	 * @param u The user
-	 * @param Name The Mode name, eg CMODE_OP, CMODE_VOICE
+	 * @param name The mode name, eg CMODE_OP, CMODE_VOICE
 	 * @return true or false
 	 */
-	bool HasUserStatus(const User *u, ChannelModeName Name) const;
+	bool HasUserStatus(const User *u, ChannelModeName name) const;
 
 	/** See if a channel has a mode
-	 * @param Name The mode name
+	 * @param name The mode name
 	 * @return The number of modes set
  	 * @param param The optional mode param
 	 */
-	size_t HasMode(ChannelModeName Name, const Anope::string &param = "");
+	size_t HasMode(ChannelModeName name, const Anope::string &param = "");
 
 	/** Get a list of modes on a channel
-	 * @param Name A mode name to get the list of
+	 * @param name A mode name to get the list of
 	 * @return a pair of iterators for the beginning and end of the list
 	 */
-	std::pair<ModeList::iterator, ModeList::iterator> GetModeList(ChannelModeName Name);
+	std::pair<ModeList::iterator, ModeList::iterator> GetModeList(ChannelModeName name);
 
 	/** Set a mode internally on a channel, this is not sent out to the IRCd
 	 * @param setter The setter
 	 * @param cm The mode
 	 * @param param The param
-	 * @param EnforceMLock true if mlocks should be enforced, false to override mlock
+	 * @param enforce_mlock true if mlocks should be enforced, false to override mlock
 	 */
-	void SetModeInternal(MessageSource &source, ChannelMode *cm, const Anope::string &param = "", bool EnforceMLock = true);
+	void SetModeInternal(MessageSource &source, ChannelMode *cm, const Anope::string &param = "", bool enforce_mlock = true);
 
 	/** Remove a mode internally on a channel, this is not sent out to the IRCd
 	 * @param setter The Setter
 	 * @param cm The mode
 	 * @param param The param
-	 * @param EnforceMLock true if mlocks should be enforced, false to override mlock
+	 * @param enforce_mlock true if mlocks should be enforced, false to override mlock
 	 */
-	void RemoveModeInternal(MessageSource &source, ChannelMode *cm, const Anope::string &param = "", bool EnforceMLock = true);
+	void RemoveModeInternal(MessageSource &source, ChannelMode *cm, const Anope::string &param = "", bool enforce_mlock = true);
 
 	/** Set a mode on a channel
 	 * @param bi The client setting the modes
 	 * @param cm The mode
 	 * @param param Optional param arg for the mode
-	 * @param EnforceMLock true if mlocks should be enforced, false to override mlock
+	 * @param enforce_mlock true if mlocks should be enforced, false to override mlock
 	 */
-	void SetMode(BotInfo *bi, ChannelMode *cm, const Anope::string &param = "", bool EnforceMLock = true);
+	void SetMode(BotInfo *bi, ChannelMode *cm, const Anope::string &param = "", bool enforce_mlock = true);
 
 	/**
 	 * Set a mode on a channel
 	 * @param bi The client setting the modes
-	 * @param Name The mode name
+	 * @param name The mode name
 	 * @param param Optional param arg for the mode
-	 * @param EnforceMLock true if mlocks should be enforced, false to override mlock
+	 * @param enforce_mlock true if mlocks should be enforced, false to override mlock
 	 */
-	void SetMode(BotInfo *bi, ChannelModeName Name, const Anope::string &param = "", bool EnforceMLock = true);
+	void SetMode(BotInfo *bi, ChannelModeName name, const Anope::string &param = "", bool enforce_mlock = true);
 
 	/** Remove a mode from a channel
 	 * @param bi The client setting the modes
 	 * @param cm The mode
 	 * @param param Optional param arg for the mode
-	 * @param EnforceMLock true if mlocks should be enforced, false to override mlock
+	 * @param enforce_mlock true if mlocks should be enforced, false to override mlock
 	 */
-	void RemoveMode(BotInfo *bi, ChannelMode *cm, const Anope::string &param = "", bool EnforceMLock = true);
+	void RemoveMode(BotInfo *bi, ChannelMode *cm, const Anope::string &param = "", bool enforce_mlock = true);
 
 	/**
 	 * Remove a mode from a channel
 	 * @param bi The client setting the modes
-	 * @param Name The mode name
+	 * @param name The mode name
 	 * @param param Optional param arg for the mode
-	 * @param EnforceMLock true if mlocks should be enforced, false to override mlock
+	 * @param enforce_mlock true if mlocks should be enforced, false to override mlock
 	 */
-	void RemoveMode(BotInfo *bi, ChannelModeName Name, const Anope::string &param = "", bool EnforceMLock = true);
+	void RemoveMode(BotInfo *bi, ChannelModeName name, const Anope::string &param = "", bool enforce_mlock = true);
 
-	/** Get a param from the channel
-	 * @param Name The mode
-	 * @param Target a string to put the param into
-	 * @return true on success
+	/** Get a modes parameter for the channel
+	 * @param name The mode
+	 * @param target a string to put the param into
+	 * @return true if the parameter was fetched, false if on error (mode not set) etc.
 	 */
-	bool GetParam(ChannelModeName Name, Anope::string &Target) const;
+	bool GetParam(ChannelModeName name, Anope::string &target) const;
 
 	/** Set a string of modes on the channel
 	 * @param bi The client setting the modes
-	 * @param EnforceMLock Should mlock be enforced on this mode change
+	 * @param enforce_mlock Should mlock be enforced on this mode change
 	 * @param cmodes The modes to set
 	 */
-	void SetModes(BotInfo *bi, bool EnforceMLock, const char *cmodes, ...);
+	void SetModes(BotInfo *bi, bool enforce_mlock, const char *cmodes, ...);
 
 	/** Set a string of modes internally on a channel
 	 * @param source The setter
 	 * @param mode the modes
-	 * @param EnforceMLock true to enforce mlock
+	 * @param enforce_mlock true to enforce mlock
 	 */
-	void SetModesInternal(MessageSource &source, const Anope::string &mode, time_t ts = 0, bool EnforceMLock = true);
+	void SetModesInternal(MessageSource &source, const Anope::string &mode, time_t ts = 0, bool enforce_mlock = true);
+
+	/** Does the given user match the given list? (CMODE_BAN, CMODE_EXCEPT, etc, a list mode)
+	 * @param u The user
+	 * @param list The mode of the list to check (eg CMODE_BAN)
+	 * @return true if the user matches the list
+	 */
+	bool MatchesList(User *u, ChannelModeName list);
 
 	/** Kick a user from a channel internally
 	 * @param source The sender of the kick
@@ -246,12 +265,26 @@ class CoreExport Channel : public virtual Base, public Extensible, public Flags<
 	/** Hold the channel open using ChanServ
 	 */
 	void Hold();
+
+	/** Set the correct modes, or remove the ones granted without permission,
+	 * for the specified user.
+	 * @param user The user to give/remove modes to/from
+	 * @param give_modes if true modes may be given to the user
+	 * @param check_noop if true, CI_NOAUTOOP is checked before giving modes
+	 */
+	void SetCorrectModes(User *u, bool give_mode, bool check_noop);
+
+	/** Unbans a user from this channel.
+	 * @param u The user to unban
+	 * @param full Whether or not to match using the user's real host and IP
+	 */
+	void Unban(const User *u, bool full = false);
+
+	/** Finds a channel
+	 * @param name The channel to find
+	 * @return The channel, if found
+	 */
+	static Channel* Find(const Anope::string &name);
 };
-
-extern CoreExport Channel *findchan(const Anope::string &chan);
-
-extern CoreExport User *nc_on_chan(Channel *c, const NickCore *nc);
-
-extern CoreExport void chan_set_correct_modes(const User *user, Channel *c, int give_modes, bool check_noop);
 
 #endif // CHANNELS_H

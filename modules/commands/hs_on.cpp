@@ -27,10 +27,10 @@ class CommandHSOn : public Command
 		User *u = source.GetUser();
 		if (!u)
 			return;
-		else if (!ircdproto->CanSetVHost)
+		else if (!IRCD->CanSetVHost)
 			return; // HostServ wouldn't even be loaded at this point
 
-		const NickAlias *na = findnick(u->nick);
+		const NickAlias *na = NickAlias::Find(u->nick);
 		if (na && u->Account() == na->nc && na->HasVhost())
 		{
 			if (!na->GetVhostIdent().empty())
@@ -38,9 +38,9 @@ class CommandHSOn : public Command
 			else
 				source.Reply(_("Your vhost of \002%s\002 is now activated."), na->GetVhostHost().c_str());
 			Log(LOG_COMMAND, source, this) << "to enable their vhost of " << (!na->GetVhostIdent().empty() ? na->GetVhostIdent() + "@" : "") << na->GetVhostHost();
-			ircdproto->SendVhost(u, na->GetVhostIdent(), na->GetVhostHost());
+			IRCD->SendVhost(u, na->GetVhostIdent(), na->GetVhostHost());
 			u->vhost = na->GetVhostHost();
-			if (ircdproto->CanSetVIdent && !na->GetVhostIdent().empty())
+			if (IRCD->CanSetVIdent && !na->GetVhostIdent().empty())
 				u->SetVIdent(na->GetVhostIdent());
 			u->UpdateHost();
 		}

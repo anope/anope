@@ -36,12 +36,12 @@ class AccessChanAccess : public ChanAccess
 		return this->ci->GetLevel(name) != ACCESS_INVALID && this->level >= this->ci->GetLevel(name);
 	}
 
-	Anope::string Serialize() const
+	Anope::string AccessSerialize() const
 	{
 		return stringify(this->level);
 	}
 
-	void Unserialize(const Anope::string &data) anope_override
+	void AccessUnserialize(const Anope::string &data) anope_override
 	{
 		this->level = convertTo<int>(data);
 	}
@@ -119,7 +119,7 @@ class CommandCSAccess : public Command
 
 		bool override = false;
 
-		if ((!highest || *highest <= tmp_access) && !u_access.Founder)
+		if ((!highest || *highest <= tmp_access) && !u_access.founder)
 		{
 			if (source.HasPriv("chanserv/access/modify"))
 				override = true;
@@ -130,9 +130,9 @@ class CommandCSAccess : public Command
 			}
 		}
 
-		if (mask.find_first_of("!*@") == Anope::string::npos && !findnick(mask))
+		if (mask.find_first_of("!*@") == Anope::string::npos && !NickAlias::Find(mask))
 		{
-			User *targ = finduser(mask);
+			User *targ = User::Find(mask, true);
 			if (targ != NULL)
 				mask = "*!*@" + targ->GetDisplayedHost();
 			else
@@ -148,7 +148,7 @@ class CommandCSAccess : public Command
 			if (mask.equals_ci(access->mask))
 			{
 				/* Don't allow lowering from a level >= u_level */
-				if ((!highest || *access >= *highest) && !u_access.Founder && !source.HasPriv("chanserv/access/modify"))
+				if ((!highest || *access >= *highest) && !u_access.founder && !source.HasPriv("chanserv/access/modify"))
 				{
 					source.Reply(ACCESS_DENIED);
 					return;
@@ -164,7 +164,7 @@ class CommandCSAccess : public Command
 			return;
 		}
 
-		service_reference<AccessProvider> provider("AccessProvider", "access/access");
+		ServiceReference<AccessProvider> provider("AccessProvider", "access/access");
 		if (!provider)
 			return;
 		AccessChanAccess *access = anope_dynamic_static_cast<AccessChanAccess *>(provider->Create());
@@ -188,9 +188,9 @@ class CommandCSAccess : public Command
 	{
 		Anope::string mask = params[2];
 
-		if (mask.find_first_of("!*@") == Anope::string::npos && !findnick(mask))
+		if (mask.find_first_of("!*@") == Anope::string::npos && !NickAlias::Find(mask))
 		{
-			User *targ = finduser(mask);
+			User *targ = User::Find(mask, true);
 			if (targ != NULL)
 				mask = "*!*@" + targ->GetDisplayedHost();
 			else
@@ -209,12 +209,12 @@ class CommandCSAccess : public Command
 				CommandSource &source;
 				ChannelInfo *ci;
 				Command *c;
-				unsigned Deleted;
+				unsigned deleted;
 				Anope::string Nicks;
 				bool Denied;
 				bool override;
 			 public:
-				AccessDelCallback(CommandSource &_source, ChannelInfo *_ci, Command *_c, const Anope::string &numlist) : NumberList(numlist, true), source(_source), ci(_ci), c(_c), Deleted(0), Denied(false), override(false)
+				AccessDelCallback(CommandSource &_source, ChannelInfo *_ci, Command *_c, const Anope::string &numlist) : NumberList(numlist, true), source(_source), ci(_ci), c(_c), deleted(0), Denied(false), override(false)
 				{
 					if (!source.AccessFor(ci).HasPriv("ACCESS_CHANGE") && source.HasPriv("chanserv/access/modify"))
 						this->override = true;
@@ -222,18 +222,18 @@ class CommandCSAccess : public Command
 
 				~AccessDelCallback()
 				{
-					if (Denied && !Deleted)
+					if (Denied && !deleted)
 						source.Reply(ACCESS_DENIED);
-					else if (!Deleted)
+					else if (!deleted)
 						source.Reply(_("No matching entries on %s access list."), ci->name.c_str());
 					else
 					{
 						Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, c, ci) << "to delete " << Nicks;
 
-						if (Deleted == 1)
+						if (deleted == 1)
 							source.Reply(_("Deleted 1 entry from %s access list."), ci->name.c_str());
 						else
-							source.Reply(_("Deleted %d entries from %s access list."), Deleted, ci->name.c_str());
+							source.Reply(_("Deleted %d entries from %s access list."), deleted, ci->name.c_str());
 					}
 				}
 
@@ -247,13 +247,13 @@ class CommandCSAccess : public Command
 					AccessGroup u_access = source.AccessFor(ci);
 					const ChanAccess *u_highest = u_access.Highest();
 
-					if ((!u_highest || *u_highest <= *access) && !u_access.Founder && !this->override && !access->mask.equals_ci(source.nc->display))
+					if ((!u_highest || *u_highest <= *access) && !u_access.founder && !this->override && !access->mask.equals_ci(source.nc->display))
 					{
 						Denied = true;
 						return;
 					}
 
-					++Deleted;
+					++deleted;
 					if (!Nicks.empty())
 						Nicks += ", " + access->mask;
 					else
@@ -277,12 +277,12 @@ class CommandCSAccess : public Command
 				ChanAccess *access = ci->GetAccess(i - 1);
 				if (mask.equals_ci(access->mask))
 				{
-					if (!access->mask.equals_ci(source.nc->display) && !u_access.Founder && (!highest || *highest <= *access) && !source.HasPriv("chanserv/access/modify"))
+					if (!access->mask.equals_ci(source.nc->display) && !u_access.founder && (!highest || *highest <= *access) && !source.HasPriv("chanserv/access/modify"))
 						source.Reply(ACCESS_DENIED);
 					else
 					{
 						source.Reply(_("\002%s\002 deleted from %s access list."), access->mask.c_str(), ci->name.c_str());
-						bool override = !u_access.Founder && !u_access.HasPriv("ACCESS_CHANGE") && !access->mask.equals_ci(source.nc->display);
+						bool override = !u_access.founder && !u_access.HasPriv("ACCESS_CHANGE") && !access->mask.equals_ci(source.nc->display);
 						Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to delete " << access->mask;
 
 						FOREACH_MOD(I_OnAccessDel, OnAccessDel(ci, source, access));
@@ -333,7 +333,7 @@ class CommandCSAccess : public Command
 						if (access->last_seen == 0)
 							timebuf = "Never";
 						else
-							timebuf = do_strftime(access->last_seen, NULL, true);
+							timebuf = Anope::strftime(access->last_seen, NULL, true);
 					}
 
 					ListFormatter::ListEntry entry;
@@ -342,7 +342,7 @@ class CommandCSAccess : public Command
 					entry["Mask"] = access->mask;
 					entry["By"] = access->creator;
 					entry["Last seen"] = timebuf;
-					this->list.addEntry(entry);
+					this->list.AddEntry(entry);
 				}
 			}
 			nl_list(list, ci, nick);
@@ -367,7 +367,7 @@ class CommandCSAccess : public Command
 					if (access->last_seen == 0)
 						timebuf = "Never";
 					else
-						timebuf = do_strftime(access->last_seen, NULL, true);
+						timebuf = Anope::strftime(access->last_seen, NULL, true);
 				}
 
 				ListFormatter::ListEntry entry;
@@ -376,11 +376,11 @@ class CommandCSAccess : public Command
 				entry["Mask"] = access->mask;
 				entry["By"] = access->creator;
 				entry["Last seen"] = timebuf;
-				list.addEntry(entry);
+				list.AddEntry(entry);
 			}
 		}
 
-		if (list.isEmpty())
+		if (list.IsEmpty())
 			source.Reply(_("No matching entries on %s access list."), ci->name.c_str());
 		else
 		{
@@ -407,7 +407,7 @@ class CommandCSAccess : public Command
 		}
 
 		ListFormatter list;
-		list.addColumn("Number").addColumn("Level").addColumn("Mask");
+		list.AddColumn("Number").AddColumn("Level").AddColumn("Mask");
 		this->ProcessList(source, ci, params, list);
 	}
 
@@ -420,7 +420,7 @@ class CommandCSAccess : public Command
 		}
 
 		ListFormatter list;
-		list.addColumn("Number").addColumn("Level").addColumn("Mask").addColumn("By").addColumn("Last seen");
+		list.AddColumn("Number").AddColumn("Level").AddColumn("Mask").AddColumn("By").AddColumn("Last seen");
 		this->ProcessList(source, ci, params, list);
 	}
 
@@ -460,7 +460,7 @@ class CommandCSAccess : public Command
 		const Anope::string &nick = params.size() > 2 ? params[2] : "";
 		const Anope::string &s = params.size() > 3 ? params[3] : "";
 
-		ChannelInfo *ci = cs_findchan(params[0]);
+		ChannelInfo *ci = ChannelInfo::Find(params[0]);
 		if (ci == NULL)
 		{
 			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
@@ -480,7 +480,7 @@ class CommandCSAccess : public Command
 			has_access = true;
 		else if (is_del)
 		{
-			const NickAlias *na = findnick(nick);
+			const NickAlias *na = NickAlias::Find(nick);
 			if (na && na->nc == source.GetAccount())
 				has_access = true;
 		}
@@ -492,7 +492,7 @@ class CommandCSAccess : public Command
 			this->OnSyntaxError(source, cmd);
 		else if (!has_access)
 			source.Reply(ACCESS_DENIED);
-		else if (readonly && !is_list)
+		else if (Anope::ReadOnly && !is_list)
 			source.Reply(_("Sorry, channel access list modification is temporarily disabled."));
 		else if (cmd.equals_ci("ADD"))
 			this->DoAdd(source, ci, params);
@@ -652,7 +652,7 @@ class CommandCSLevels : public Command
 		source.Reply(_("Access level settings for channel %s:"), ci->name.c_str());
 
 		ListFormatter list;
-		list.addColumn("Name").addColumn("Level");
+		list.AddColumn("Name").AddColumn("Level");
 
 		const std::vector<Privilege> &privs = PrivilegeManager::GetPrivileges();
 
@@ -671,7 +671,7 @@ class CommandCSLevels : public Command
 			else
 				entry["Level"] = stringify(j);
 
-			list.addEntry(entry);
+			list.AddEntry(entry);
 		}
 
 		std::vector<Anope::string> replies;
@@ -709,7 +709,7 @@ class CommandCSLevels : public Command
 		const Anope::string &what = params.size() > 2 ? params[2] : "";
 		const Anope::string &s = params.size() > 3 ? params[3] : "";
 
-		ChannelInfo *ci = cs_findchan(params[0]);
+		ChannelInfo *ci = ChannelInfo::Find(params[0]);
 		if (ci == NULL)
 		{
 			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
@@ -744,7 +744,7 @@ class CommandCSLevels : public Command
 			source.Reply(_("The following feature/function names are understood."));
 
 			ListFormatter list;
-			list.addColumn("Name").addColumn("Description");
+			list.AddColumn("Name").AddColumn("Description");
 
 			const std::vector<Privilege> &privs = PrivilegeManager::GetPrivileges();
 			for (unsigned i = 0; i < privs.size(); ++i)
@@ -752,8 +752,8 @@ class CommandCSLevels : public Command
 				const Privilege &p = privs[i];
 				ListFormatter::ListEntry entry;
 				entry["Name"] = p.name;
-				entry["Description"] = translate(source.nc, p.desc.c_str());
-				list.addEntry(entry);
+				entry["Description"] = Language::Translate(source.nc, p.desc.c_str());
+				list.AddEntry(entry);
 			}
 
 			std::vector<Anope::string> replies;

@@ -18,28 +18,41 @@
 #include "threadengine.h"
 #include "serialize.h"
 
-extern CoreExport bool Mail(User *u, NickCore *nc, const BotInfo *service, const Anope::string &subject, const Anope::string &message);
-extern CoreExport bool Mail(NickCore *nc, const Anope::string &subject, const Anope::string &message);
-extern CoreExport bool MailValidate(const Anope::string &email);
-
-class MailThread : public Thread
+namespace Mail
 {
- private:
- 	Anope::string SendMailPath;
-	Anope::string SendFrom;
-	Anope::string MailTo;
-	Anope::string Addr;
-	Anope::string Subject;
-	Anope::string Message;
-	bool DontQuoteAddresses;
+	extern CoreExport bool Send(User *from, NickCore *to, const BotInfo *service, const Anope::string &subject, const Anope::string &message);
+	extern CoreExport bool Send(NickCore *to, const Anope::string &subject, const Anope::string &message);
+	extern CoreExport bool Validate(const Anope::string &email);
 
-	bool Success;
- public:
-	MailThread(const Anope::string &smpath, const Anope::string &sf, const Anope::string &mailto, const Anope::string &addr, const Anope::string &subject, const Anope::string &message);
+	/* A email message being sent */
+	class Message : public Thread
+	{
+	 private:
+	 	Anope::string sendmail_path;
+		Anope::string send_from;
+		Anope::string mail_to;
+		Anope::string addr;
+		Anope::string subject;
+		Anope::string message;
+		bool dont_quote_addresses;
 
-	~MailThread();
+		bool success;
+	 public:
+	 	/** Construct this message. Once constructed call Thread::Start to launch the mail sending.
+		 * @param sf Config->SendFrom
+		 * @param mailto Name of person being mailed (u->nick, nc->display, etc)
+		 * @param addr Destination address to mail
+		 * @param subject Message subject
+		 * @param message The actual message
+		 */
+		Message(const Anope::string &sf, const Anope::string &mailto, const Anope::string &addr, const Anope::string &subject, const Anope::string &message);
 
-	void Run();
-};
+		~Message();
+
+		/* Called from within the thread to actually send the mail */
+		void Run() anope_override;
+	};
+
+} // namespace Mail
 
 #endif // MAIL_H

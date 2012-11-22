@@ -38,7 +38,7 @@ struct SeenInfo : Serializable
 	{
 	}
 
-	Serialize::Data serialize() const anope_override
+	Serialize::Data Serialize() const anope_override
 	{
 		Serialize::Data data;
 
@@ -48,12 +48,12 @@ struct SeenInfo : Serializable
 		data["nick2"] << nick2;
 		data["channel"] << channel;
 		data["message"] << message;
-		data["last"].setType(Serialize::DT_INT) << last;
+		data["last"].SetType(Serialize::DT_INT) << last;
 
 		return data;
 	}
 
-	static Serializable* unserialize(Serializable *obj, Serialize::Data &data)
+	static Serializable* Unserialize(Serializable *obj, Serialize::Data &data)
 	{
 		SeenInfo *s;
 		if (obj)
@@ -95,8 +95,8 @@ static SeenInfo *FindInfo(const Anope::string &nick)
 
 static bool ShouldHide(const Anope::string &channel, User *u)
 {
-	Channel *targetchan = findchan(channel);
-	const ChannelInfo *targetchan_ci = targetchan ? *targetchan->ci : cs_findchan(channel);
+	Channel *targetchan = Channel::Find(channel);
+	const ChannelInfo *targetchan_ci = targetchan ? *targetchan->ci : ChannelInfo::Find(channel);
 
 	if (targetchan && targetchan->HasMode(CMODE_SECRET))
 		return true;
@@ -137,7 +137,7 @@ class CommandOSSeen : public Command
 		else if (params[0].equals_ci("CLEAR"))
 		{
 			time_t time = 0;
-			if ((params.size() < 2) || (0 >= (time = dotime(params[1]))))
+			if ((params.size() < 2) || (0 >= (time = Anope::DoTime(params[1]))))
 			{
 				this->OnSyntaxError(source, params[0]);
 				return;
@@ -151,14 +151,14 @@ class CommandOSSeen : public Command
 				++it;
 				if (time < buf->second->last)
 				{
-					Log(LOG_DEBUG) << buf->first << " was last seen " << do_strftime(buf->second->last) << ", deleting entry";
-					buf->second->destroy();
+					Log(LOG_DEBUG) << buf->first << " was last seen " << Anope::strftime(buf->second->last) << ", deleting entry";
+					buf->second->Destroy();
 					database.erase(buf);
 					counter++;
 				}
 			}
-			Log(LOG_ADMIN, source, this) << "CLEAR and removed " << counter << " nicks that were added after " << do_strftime(time, NULL, true);
-			source.Reply(_("Database cleared, removed %lu nicks that were added after %s"), counter, do_strftime(time, source.nc, true).c_str());
+			Log(LOG_ADMIN, source, this) << "CLEAR and removed " << counter << " nicks that were added after " << Anope::strftime(time, NULL, true);
+			source.Reply(_("Database cleared, removed %lu nicks that were added after %s"), counter, Anope::strftime(time, source.nc, true).c_str());
 		}
 		else
 			this->SendSyntax(source);
@@ -199,7 +199,7 @@ class CommandSeen : public Command
 			return;
 		}
 
-		if (findbot(target) != NULL)
+		if (BotInfo::Find(target, true) != NULL)
 		{
 			source.Reply(_("%s is a client on services."), target.c_str());
 			return;
@@ -218,15 +218,15 @@ class CommandSeen : public Command
 			return;
 		}
 
-		User *u2 = finduser(target);
+		User *u2 = User::Find(target, true);
 		Anope::string onlinestatus;
 		if (u2)
 			onlinestatus = ".";
 		else
 			onlinestatus = Anope::printf(_(" but %s mysteriously dematerialized."), target.c_str());
 
-		Anope::string timebuf = duration(Anope::CurTime - info->last, source.nc);
-		Anope::string timebuf2 = do_strftime(info->last, source.nc, true);
+		Anope::string timebuf = Anope::Duration(Anope::CurTime - info->last, source.nc);
+		Anope::string timebuf2 = Anope::strftime(info->last, source.nc, true);
 
 		if (info->type == NEW)
 		{
@@ -235,7 +235,7 @@ class CommandSeen : public Command
 		}
 		else if (info->type == NICK_TO)
 		{
-			u2 = finduser(info->nick2);
+			u2 = User::Find(info->nick2, true);
 			if (u2)
 				onlinestatus = Anope::printf( _(". %s is still online."), u2->nick.c_str());
 			else
@@ -309,8 +309,8 @@ class DataBasePurger : public CallBack
 
 			if ((Anope::CurTime - cur->second->last) > purgetime)
 			{
-				Log(LOG_DEBUG) << cur->first << " was last seen " << do_strftime(cur->second->last) << ", purging entry";
-				cur->second->destroy();
+				Log(LOG_DEBUG) << cur->first << " was last seen " << Anope::strftime(cur->second->last) << ", purging entry";
+				cur->second->Destroy();
 				database.erase(cur);
 			}
 		}
@@ -320,12 +320,12 @@ class DataBasePurger : public CallBack
 
 class CSSeen : public Module
 {
-	SerializeType seeninfo_type;
+	Serialize::Type seeninfo_type;
 	CommandSeen commandseen;
 	CommandOSSeen commandosseen;
 	DataBasePurger purger;
  public:
-	CSSeen(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE), seeninfo_type("SeenInfo", SeenInfo::unserialize), commandseen(this), commandosseen(this), purger(this)
+	CSSeen(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE), seeninfo_type("SeenInfo", SeenInfo::Unserialize), commandseen(this), commandosseen(this), purger(this)
 	{
 		this->SetAuthor("Anope");
 
@@ -344,14 +344,14 @@ class CSSeen : public Module
 	void OnReload() anope_override
 	{
 		ConfigReader config;
-		purgetime = dotime(config.ReadValue("cs_seen", "purgetime", "30d", 0));
-		expiretimeout = dotime(config.ReadValue("cs_seen", "expiretimeout", "1d", 0));
+		purgetime = Anope::DoTime(config.ReadValue("cs_seen", "purgetime", "30d", 0));
+		expiretimeout = Anope::DoTime(config.ReadValue("cs_seen", "expiretimeout", "1d", 0));
 
 		if (purger.GetSecs() != expiretimeout)
 			purger.SetSecs(expiretimeout);
 	}
 
-	void OnUserConnect(dynamic_reference<User> &u, bool &exempt) anope_override
+	void OnUserConnect(Reference<User> &u, bool &exempt) anope_override
 	{
 		if (u)
 			UpdateUser(u, NEW, u->nick, "", "", "");

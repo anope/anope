@@ -108,7 +108,7 @@ class CommandNSAccess : public Command
 		NickCore *nc;
 		if (!nick.empty())
 		{
-			const NickAlias *na = findnick(nick);
+			const NickAlias *na = NickAlias::Find(nick);
 			if (na == NULL)
 			{
 				source.Reply(NICK_X_NOT_REGISTERED, nick.c_str());

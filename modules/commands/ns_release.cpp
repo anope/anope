@@ -17,7 +17,7 @@ class NSReleaseRequest : public IdentifyRequest
 {
 	CommandSource source;
 	Command *cmd;
-	dynamic_reference<NickAlias> na;
+	Reference<NickAlias> na;
  
  public:
 	NSReleaseRequest(Module *m, CommandSource &src, Command *c, NickAlias *n, const Anope::string &pass) : IdentifyRequest(m, n->nc->display, pass), source(src), cmd(c), na(n) { }
@@ -40,7 +40,7 @@ class NSReleaseRequest : public IdentifyRequest
 		{
 			Log(LOG_COMMAND, source, cmd) << "with invalid password for " << na->nick;
 			if (!source.GetUser())
-				bad_password(source.GetUser());
+				source.GetUser()->BadPassword();
 		}
 	}
 };
@@ -61,7 +61,7 @@ class CommandNSRelease : public Command
 		Anope::string pass = params.size() > 1 ? params[1] : "";
 		NickAlias *na;
 
-		if (!(na = findnick(nick)))
+		if (!(na = NickAlias::Find(nick)))
 			source.Reply(NICK_X_NOT_REGISTERED, nick.c_str());
 		else if (na->nc->HasFlag(NI_SUSPENDED))
 			source.Reply(NICK_X_SUSPENDED, na->nick.c_str());
@@ -74,7 +74,7 @@ class CommandNSRelease : public Command
 			bool ok = override;
 			if (source.GetAccount() == na->nc)
 				ok = true;
-			else if (source.GetUser() && !na->nc->HasFlag(NI_SECURE) && is_on_access(source.GetUser(), na->nc))
+			else if (source.GetUser() && !na->nc->HasFlag(NI_SECURE) && na->nc->IsOnAccess(source.GetUser()))
 				ok = true;
 			else if (source.GetUser() && !source.GetUser()->fingerprint.empty() && na->nc->FindCert(source.GetUser()->fingerprint))
 				ok = true;
@@ -101,7 +101,7 @@ class CommandNSRelease : public Command
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
 	{
 		/* Convert Config->NSReleaseTimeout seconds to string format */
-		Anope::string relstr = duration(Config->NSReleaseTimeout);
+		Anope::string relstr = Anope::Duration(Config->NSReleaseTimeout);
 
 		this->SendSyntax(source);
 		source.Reply(" ");

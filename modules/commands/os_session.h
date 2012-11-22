@@ -20,8 +20,8 @@ struct Exception : Serializable
 	time_t expires;			/* Time when it expires. 0 == no expiry */
 
 	Exception() : Serializable("Exception") { }
-	Serialize::Data serialize() const anope_override;
-	static Serializable* unserialize(Serializable *obj, Serialize::Data &data);
+	Serialize::Data Serialize() const anope_override;
+	static Serializable* Unserialize(Serializable *obj, Serialize::Data &data);
 };
 
 class SessionService : public Service
@@ -51,9 +51,9 @@ class SessionService : public Service
 	virtual SessionMap &GetSessions() = 0;
 };
 
-static service_reference<SessionService> session_service("SessionService", "session");
+static ServiceReference<SessionService> session_service("SessionService", "session");
 
-Serialize::Data Exception::serialize() const
+Serialize::Data Exception::Serialize() const
 {
 	Serialize::Data data;	
 
@@ -67,7 +67,7 @@ Serialize::Data Exception::serialize() const
 	return data;
 }
 
-Serializable* Exception::unserialize(Serializable *obj, Serialize::Data &data)
+Serializable* Exception::Unserialize(Serializable *obj, Serialize::Data &data)
 {
 	if (!session_service)
 		return NULL;

@@ -44,7 +44,7 @@ class CommandBSInfo : public Command
 		{
 			if (!buf.empty())
 				buf += ", ";
-			buf += translate(nc, option);
+			buf += Language::Translate(nc, option);
 		}
 	}
 
@@ -59,7 +59,7 @@ class CommandBSInfo : public Command
 	{
 		const Anope::string &query = params[0];
 
-		const BotInfo *bi = findbot(query);
+		const BotInfo *bi = BotInfo::Find(query, true);
 		ChannelInfo *ci;
 		InfoFormatter info(source.nc);
 
@@ -68,7 +68,7 @@ class CommandBSInfo : public Command
 			source.Reply(_("Information for bot \002%s\002:"), bi->nick.c_str());
 			info[_("Mask")] = bi->GetIdent() + "@" + bi->host;
 			info[_("Real name")] = bi->realname;
-			info[_("Created")] = do_strftime(bi->created);
+			info[_("Created")] = Anope::strftime(bi->created);
 			info[_("Options")] = bi->HasFlag(BI_PRIVATE) ? _("Private") : _("None");
 			info[_("Used on")] = stringify(bi->GetChannelCount()) + " channel(s)";
 
@@ -87,7 +87,7 @@ class CommandBSInfo : public Command
 			}
 
 		}
-		else if ((ci = cs_findchan(query)))
+		else if ((ci = ChannelInfo::Find(query)))
 		{
 			if (!source.AccessFor(ci).HasPriv("FOUNDER") && !source.HasPriv("botserv/administration"))
 			{
@@ -98,8 +98,8 @@ class CommandBSInfo : public Command
 			source.Reply(CHAN_INFO_HEADER, ci->name.c_str());
 			info[_("Bot nick")] = ci->bi ? ci->bi->nick : "not assigned yet";
 
-			Anope::string enabled = translate(source.nc, _("Enabled"));
-			Anope::string disabled = translate(source.nc, _("Disabled"));
+			Anope::string enabled = Language::Translate(source.nc, _("Enabled"));
+			Anope::string disabled = Language::Translate(source.nc, _("Disabled"));
 
 			if (ci->botflags.HasFlag(BS_KICK_BADWORDS))
 			{

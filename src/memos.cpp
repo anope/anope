@@ -7,8 +7,8 @@
  *
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
+ *
  */
-
 
 #include "services.h"
 #include "modules.h"
@@ -19,14 +19,17 @@
 #include "account.h"
 #include "regchannel.h"
 
-Memo::Memo() : Flags<MemoFlag>(MemoFlagStrings), Serializable("Memo") { }
+static const Anope::string MemoFlagString[] = { "MF_UNREAD", "MF_RECEIPT", "" };
+template<> const Anope::string* Flags<MemoFlag>::flags_strings = MemoFlagString;
 
-Serialize::Data Memo::serialize() const
+Memo::Memo() : Serializable("Memo") { }
+
+Serialize::Data Memo::Serialize() const
 {
 	Serialize::Data data;	
 
 	data["owner"] << this->owner;
-	data["time"].setType(Serialize::DT_INT) << this->time;
+	data["time"].SetType(Serialize::DT_INT) << this->time;
 	data["sender"] << this->sender;
 	data["text"] << this->text;
 	data["flags"] << this->ToString();
@@ -34,13 +37,13 @@ Serialize::Data Memo::serialize() const
 	return data;
 }
 
-Serializable* Memo::unserialize(Serializable *obj, Serialize::Data &data)
+Serializable* Memo::Unserialize(Serializable *obj, Serialize::Data &data)
 {
-	if (!memoserv)
+	if (!MemoServService)
 		return NULL;
 	
 	bool ischan;
-	MemoInfo *mi = memoserv->GetMemoInfo(data["owner"].astr(), ischan);
+	MemoInfo *mi = MemoServService->GetMemoInfo(data["owner"].astr(), ischan);
 	if (!mi)
 		return NULL;
 
@@ -85,7 +88,7 @@ void MemoInfo::Del(unsigned index)
 {
 	if (index >= this->memos->size())
 		return;
-	this->GetMemo(index)->destroy();
+	this->GetMemo(index)->Destroy();
 	this->memos->erase(this->memos->begin() + index);
 }
 
@@ -95,7 +98,7 @@ void MemoInfo::Del(Memo *memo)
 
 	if (it != this->memos->end())
 	{
-		memo->destroy();
+		memo->Destroy();
 		this->memos->erase(it);
 	}
 }

@@ -1,11 +1,10 @@
 /*
+ *
  * Copyright (C) 2002-2011 InspIRCd Development Team
  * Copyright (C) 2008-2012 Anope Team <team@anope.org>
  *
  * Please read COPYING and README for further details.
  *
- * These classes have been copied from InspIRCd and modified
- * for use in Anope.
  */
 
 #include "services.h"
@@ -70,11 +69,6 @@ const char *ci::ci_char_traits::find(const char *s1, int n, char c)
 	return n >= 0 ? s1 : NULL;
 }
 
-/** Compare two Anope::strings as ci::strings and find which one is less
- * @param s1 The first string
- * @param s2 The second string
- * @return true if s1 < s2, else false
- */
 bool ci::less::operator()(const Anope::string &s1, const Anope::string &s2) const
 {
 	return s1.ci_str().compare(s2.ci_str()) < 0;
@@ -108,6 +102,34 @@ bool sepstream::GetToken(Anope::string &token)
 	}
 
 	token.clear();
+	return false;
+}
+
+bool sepstream::GetToken(Anope::string &token, int num)
+{
+	int i;
+	for (i = 0; i < num + 1 && !this->GetToken(token); ++i);
+	return i == num + 1;
+}
+
+int sepstream::NumTokens()
+{
+	int i;
+	Anope::string token;
+	for (i = 0; this->GetToken(token); ++i);
+	return i;
+}
+
+bool sepstream::GetTokenRemainder(Anope::string &token, int num)
+{
+	if (this->GetToken(token, num))
+	{
+		if (!this->StreamEnd())
+			token += sep + this->GetRemaining();
+
+		return true;
+	}
+
 	return false;
 }
 

@@ -4,11 +4,11 @@
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
+ *
  */
 
 #include "services.h"
 #include "modules.h"
-#include "extern.h"
 #include "users.h"
 #include "regchannel.h"
 
@@ -20,11 +20,12 @@
 #include <dlfcn.h>
 #endif
 
+std::list<Module *> ModuleManager::Modules;
 std::vector<Module *> ModuleManager::EventHandlers[I_END];
 
 void ModuleManager::CleanupRuntimeDirectory()
 {
-	Anope::string dirbuf = db_dir + "/runtime";
+	Anope::string dirbuf = Anope::DataDir + "/runtime";
 
 	Log(LOG_DEBUG) << "Cleaning out Module run time directory (" << dirbuf << ") - this may take a moment please wait";
 
@@ -59,7 +60,7 @@ void ModuleManager::CleanupRuntimeDirectory()
  */
 static ModuleReturn moduleCopyFile(const Anope::string &name, Anope::string &output)
 {
-	Anope::string input = modules_dir + "/modules/" + name + ".so";
+	Anope::string input = Anope::ModuleDir + "/modules/" + name + ".so";
 	
 	struct stat s;
 	if (stat(input.c_str(), &s) == -1)
@@ -114,7 +115,7 @@ static ModuleReturn moduleCopyFile(const Anope::string &name, Anope::string &out
  * This function will take a pointer from either dlsym or GetProcAddress and cast it in
  * a way that won't cause C++ warnings/errors to come up.
  */
-template <class TYPE> TYPE function_cast(void *symbol)
+template <class TYPE> static TYPE function_cast(void *symbol)
 {
 	union
 	{
@@ -136,7 +137,7 @@ ModuleReturn ModuleManager::LoadModule(const Anope::string &modname, User *u)
 	Log(LOG_DEBUG) << "trying to load [" << modname <<  "]";
 
 	/* Generate the filename for the temporary copy of the module */
-	Anope::string pbuf = db_dir + "/runtime/" + modname + ".so.XXXXXX";
+	Anope::string pbuf = Anope::DataDir + "/runtime/" + modname + ".so.XXXXXX";
 
 	/* Don't skip return value checking! -GD */
 	ModuleReturn ret = moduleCopyFile(modname, pbuf);
@@ -219,12 +220,6 @@ ModuleReturn ModuleManager::LoadModule(const Anope::string &modname, User *u)
 	else
 		Log(LOG_DEBUG_2) << "Module " << modname << " is compiled against current version of Anope " << Anope::VersionShort();
 
-	if (m->type == PROTOCOL && ModuleManager::FindFirstOf(PROTOCOL) != m)
-	{
-		DeleteModule(m);
-		Log() << "You cannot load two protocol modules";
-		return MOD_ERR_UNKNOWN;
-	}
 	Log(LOG_DEBUG) << "Module loaded.";
 	FOREACH_MOD(I_OnModuleLoad, OnModuleLoad(u, m));
 
@@ -455,17 +450,12 @@ bool ModuleManager::SetPriority(Module *mod, Implementation i, Priority s, Modul
 	return true;
 }
 
-/** Delete all callbacks attached to a module
- * @param m The module
- */
 void ModuleManager::ClearCallBacks(Module *m)
 {
-	while (!m->CallBacks.empty())
-		delete m->CallBacks.front();
+	while (!m->callbacks.empty())
+		delete m->callbacks.front();
 }
 
-/** Unloading all modules except the protocol module.
- */
 void ModuleManager::UnloadAll()
 {
 	std::vector<Anope::string> modules[MT_END];

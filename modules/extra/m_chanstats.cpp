@@ -21,7 +21,7 @@ class MySQLInterface : public SQLInterface
 
 class MChanstats : public Module
 {
-	service_reference<SQLProvider> sql;
+	ServiceReference<SQLProvider> sql;
 	MySQLInterface sqlinterface;
 	SQLQuery query;
 	Anope::string SmileysHappy, SmileysSad, SmileysOther, prefix;
@@ -359,7 +359,7 @@ class MChanstats : public Module
 		SmileysOther = config.ReadValue("chanstats", "SmileysOther", ":/", 0);
 
 		Anope::string engine = config.ReadValue("chanstats", "engine", "", 0);
-		this->sql = service_reference<SQLProvider>("SQLProvider", engine);
+		this->sql = ServiceReference<SQLProvider>("SQLProvider", engine);
 		if (sql)
 			this->CheckTables();
 		else
@@ -367,7 +367,7 @@ class MChanstats : public Module
 	}
 	void OnTopicUpdated(Channel *c, const Anope::string &user, const Anope::string &topic) anope_override
 	{
-		User *u = finduser(user);
+		User *u = User::Find(user);
 		if (!u || !u->Account() || !c->ci || !c->ci->HasFlag(CI_STATS))
 			return;
 		query = "CALL " + prefix + "chanstats_proc_update(@channel@, @nick@, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1);";

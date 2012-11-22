@@ -30,9 +30,9 @@ class CommandCSKick : public Command
 		const Anope::string &reason = params.size() > 2 ? params[2] : "Requested";
 
 		User *u = source.GetUser();
-		ChannelInfo *ci = cs_findchan(params[0]);
-		Channel *c = findchan(params[0]);
-		User *u2 = finduser(target);
+		ChannelInfo *ci = ChannelInfo::Find(params[0]);
+		Channel *c = Channel::Find(params[0]);
+		User *u2 = User::Find(target, true);
 
 		if (!c)
 		{

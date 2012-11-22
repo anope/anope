@@ -13,7 +13,8 @@ struct Rewrite
 
 	bool Matches(const std::vector<Anope::string> &message)
 	{
-		std::vector<Anope::string> sm = BuildStringVector(this->source_message);
+		std::vector<Anope::string> sm;
+		spacesepstream(this->source_message).GetTokens(sm);
 
 		for (unsigned i = 0; i < sm.size(); ++i)
 			if (sm[i] != "$" && !sm[i].equals_ci(message[i]))
@@ -106,7 +107,8 @@ class ModuleRewrite : public Module
 
 	EventReturn OnBotPrivmsg(User *u, BotInfo *bi, Anope::string &message) anope_override
 	{
-		std::vector<Anope::string> tokens = BuildStringVector(message);
+		std::vector<Anope::string> tokens;
+		spacesepstream(message).GetTokens(tokens);
 		for (unsigned i = 0; i < this->rewrites.size(); ++i)
 		{
 			Rewrite &rw = this->rewrites[i];

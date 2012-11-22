@@ -32,16 +32,16 @@ class CommandNSLogout : public Command
 		User *u2;
 		if (!source.IsServicesOper() && !nick.empty())
 			this->OnSyntaxError(source, "");
-		else if (!(u2 = (!nick.empty() ? finduser(nick) : source.GetUser())))
+		else if (!(u2 = (!nick.empty() ? User::Find(nick, true) : source.GetUser())))
 			source.Reply(NICK_X_NOT_IN_USE, !nick.empty() ? nick.c_str() : source.GetNick().c_str());
 		else if (!nick.empty() && u2->IsServicesOper())
 			source.Reply(_("You can't logout %s because they are a Services Operator."), nick.c_str());
 		else
 		{
-			if (!nick.empty() && !param.empty() && param.equals_ci("REVALIDATE") && nickserv)
-				nickserv->Validate(u2);
+			if (!nick.empty() && !param.empty() && param.equals_ci("REVALIDATE") && NickServService)
+				NickServService->Validate(u2);
 
-			u2->SuperAdmin = 0; /* Dont let people logout and remain a SuperAdmin */
+			u2->super_admin = false; /* Dont let people logout and remain a SuperAdmin */
 			Log(LOG_COMMAND, source, this) << "to logout " << u2->nick;
 
 			/* Remove founder status from this user in all channels */
@@ -50,8 +50,8 @@ class CommandNSLogout : public Command
 			else
 				source.Reply(_("Your nick has been logged out."));
 
-			ircdproto->SendLogout(u2);
-			u2->RemoveMode(findbot(Config->NickServ), UMODE_REGISTERED);
+			IRCD->SendLogout(u2);
+			u2->RemoveMode(NickServ, UMODE_REGISTERED);
 			u2->Logout();
 
 			/* Send out an event */

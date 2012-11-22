@@ -52,7 +52,7 @@ class CommandCSAKick : public Command
 	{
 		Anope::string mask = params[2];
 		Anope::string reason = params.size() > 3 ? params[3] : "";
-		const NickAlias *na = findnick(mask);
+		const NickAlias *na = NickAlias::Find(mask);
 		NickCore *nc = NULL;
 		const AutoKick *akick;
 
@@ -178,34 +178,34 @@ class CommandCSAKick : public Command
 				CommandSource &source;
 				ChannelInfo *ci;
 				Command *c;
-				unsigned Deleted;
+				unsigned deleted;
 			 public:
-				AkickDelCallback(CommandSource &_source, ChannelInfo *_ci, Command *_c, const Anope::string &list) : NumberList(list, true), source(_source), ci(_ci), c(_c), Deleted(0)
+				AkickDelCallback(CommandSource &_source, ChannelInfo *_ci, Command *_c, const Anope::string &list) : NumberList(list, true), source(_source), ci(_ci), c(_c), deleted(0)
 				{
 				}
 
 				~AkickDelCallback()
 				{
 					bool override = !source.AccessFor(ci).HasPriv("AKICK");
-					Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, c, ci) << "to delete " << Deleted << (Deleted == 1 ? " entry" : " entries");
+					Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, c, ci) << "to delete " << deleted << (deleted == 1 ? " entry" : " entries");
 
-					if (!Deleted)
+					if (!deleted)
 						source.Reply(_("No matching entries on %s autokick list."), ci->name.c_str());
-					else if (Deleted == 1)
+					else if (deleted == 1)
 						source.Reply(_("Deleted 1 entry from %s autokick list."), ci->name.c_str());
 					else
-						source.Reply(_("Deleted %d entries from %s autokick list."), Deleted, ci->name.c_str());
+						source.Reply(_("Deleted %d entries from %s autokick list."), deleted, ci->name.c_str());
 				}
 
-				void HandleNumber(unsigned Number) anope_override
+				void HandleNumber(unsigned number) anope_override
 				{
-					if (!Number || Number > ci->GetAkickCount())
+					if (!number || number > ci->GetAkickCount())
 						return;
 
-					FOREACH_MOD(I_OnAkickDel, OnAkickDel(source, ci, ci->GetAkick(Number - 1)));
+					FOREACH_MOD(I_OnAkickDel, OnAkickDel(source, ci, ci->GetAkick(number - 1)));
 
-					++Deleted;
-					ci->EraseAkick(Number - 1);
+					++deleted;
+					ci->EraseAkick(number - 1);
 				}
 			}
 			delcallback(source, ci, this, mask);
@@ -213,7 +213,7 @@ class CommandCSAKick : public Command
 		}
 		else
 		{
-			const NickAlias *na = findnick(mask);
+			const NickAlias *na = NickAlias::Find(mask);
 			const NickCore *nc = na ? *na->nc : NULL;
 
 			for (i = 0, end = ci->GetAkickCount(); i < end; ++i)
@@ -266,11 +266,11 @@ class CommandCSAKick : public Command
 
 					Anope::string timebuf, lastused;
 					if (akick->addtime)
-						timebuf = do_strftime(akick->addtime, NULL, false);
+						timebuf = Anope::strftime(akick->addtime, NULL, false);
 					else
 						timebuf = UNKNOWN;
 					if (akick->last_used)
-						lastused = do_strftime(akick->last_used, NULL, false);
+						lastused = Anope::strftime(akick->last_used, NULL, false);
 					else
 						lastused = UNKNOWN;
 
@@ -281,7 +281,7 @@ class CommandCSAKick : public Command
 					entry["Created"] = timebuf;
 					entry["Last used"] = lastused;
 					entry["Reason"] = akick->reason;
-					this->list.addEntry(entry);
+					this->list.AddEntry(entry);
 				}
 			}
 			nl_list(list, ci, mask);
@@ -303,11 +303,11 @@ class CommandCSAKick : public Command
 
 				Anope::string timebuf, lastused;
 				if (akick->addtime)
-					timebuf = do_strftime(akick->addtime);
+					timebuf = Anope::strftime(akick->addtime);
 				else
 					timebuf = UNKNOWN;
 				if (akick->last_used)
-					lastused = do_strftime(akick->last_used);
+					lastused = Anope::strftime(akick->last_used);
 				else
 					lastused = UNKNOWN;
 
@@ -318,11 +318,11 @@ class CommandCSAKick : public Command
 				entry["Created"] = timebuf;
 				entry["Last used"] = lastused;
 				entry["Reason"] = akick->reason;
-				list.addEntry(entry);
+				list.AddEntry(entry);
 			}
 		}
 
-		if (list.isEmpty())
+		if (list.IsEmpty())
 			source.Reply(_("No matching entries on %s autokick list."), ci->name.c_str());
 		else
 		{
@@ -347,7 +347,7 @@ class CommandCSAKick : public Command
 		}
 
 		ListFormatter list;
-		list.addColumn("Number").addColumn("Mask").addColumn("Reason");
+		list.AddColumn("Number").AddColumn("Mask").AddColumn("Reason");
 		this->ProcessList(source, ci, params, list);
 	}
 
@@ -360,7 +360,7 @@ class CommandCSAKick : public Command
 		}
 
 		ListFormatter list;
-		list.addColumn("Number").addColumn("Mask").addColumn("Creator").addColumn("Created").addColumn("Last used").addColumn("Reason");
+		list.AddColumn("Number").AddColumn("Mask").AddColumn("Creator").AddColumn("Created").AddColumn("Last used").AddColumn("Reason");
 		this->ProcessList(source, ci, params, list);
 	}
 
@@ -416,7 +416,7 @@ class CommandCSAKick : public Command
 		Anope::string cmd = params[1];
 		Anope::string mask = params.size() > 2 ? params[2] : "";
 
-		ChannelInfo *ci = cs_findchan(params[0]);
+		ChannelInfo *ci = ChannelInfo::Find(params[0]);
 		if (ci == NULL)
 		{
 			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
@@ -427,7 +427,7 @@ class CommandCSAKick : public Command
 			this->OnSyntaxError(source, cmd);
 		else if (!source.AccessFor(ci).HasPriv("AKICK") && !source.HasPriv("chanserv/access/modify"))
 			source.Reply(ACCESS_DENIED);
-		else if (!cmd.equals_ci("LIST") && !cmd.equals_ci("VIEW") && !cmd.equals_ci("ENFORCE") && readonly)
+		else if (!cmd.equals_ci("LIST") && !cmd.equals_ci("VIEW") && !cmd.equals_ci("ENFORCE") && Anope::ReadOnly)
 			source.Reply(_("Sorry, channel autokick list modification is temporarily disabled."));
 		else if (cmd.equals_ci("ADD"))
 			this->DoAdd(source, ci, params);

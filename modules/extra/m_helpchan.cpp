@@ -26,10 +26,10 @@ class HelpChannel : public Module
 	{
 		if (Name == CMODE_OP && c && c->ci && c->name.equals_ci(this->HelpChan))
 		{
-			User *u = finduser(param);
+			User *u = User::Find(param);
 
 			if (u && c->ci->AccessFor(u).HasPriv("OPDEOPME"))
-				u->SetMode(findbot(Config->OperServ), UMODE_HELPOP);
+				u->SetMode(OperServ, UMODE_HELPOP);
 		}
 
 		return EVENT_CONTINUE;

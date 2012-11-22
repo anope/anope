@@ -43,7 +43,7 @@ static WSADATA wsa;
 void OnStartup()
 {
 	if (WSAStartup(MAKEWORD(2, 0), &wsa))
-		throw FatalException("Failed to initialize WinSock library");
+		throw CoreException("Failed to initialize WinSock library");
 }
 
 void OnShutdown()

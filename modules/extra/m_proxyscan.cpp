@@ -36,7 +36,7 @@ class ProxyCallbackListener : public ListenSocket
 
 		bool ProcessWrite() anope_override
 		{
-			return !BufferedSocket::ProcessWrite() || this->WriteBuffer.empty() ? false : true;
+			return !BufferedSocket::ProcessWrite() || this->write_buffer.empty() ? false : true;
 		}
 	};
 
@@ -53,7 +53,7 @@ class ProxyCallbackListener : public ListenSocket
 
 class ProxyConnect : public ConnectionSocket
 {
-	static service_reference<XLineManager> akills;
+	static ServiceReference<XLineManager> akills;
 
  public:
  	static std::set<ProxyConnect *> proxies;
@@ -85,7 +85,7 @@ class ProxyConnect : public ConnectionSocket
 		reason = reason.replace_all_cs("%i", this->conaddr.addr());
 		reason = reason.replace_all_cs("%p", stringify(this->conaddr.port()));
 
-		Log(findbot(Config->OperServ)) << "PROXYSCAN: Open " << this->GetType() << " proxy found on " << this->conaddr.addr() << ":" << this->conaddr.port() << " (" << reason << ")";
+		Log(OperServ) << "PROXYSCAN: Open " << this->GetType() << " proxy found on " << this->conaddr.addr() << ":" << this->conaddr.port() << " (" << reason << ")";
 		XLine *x = new XLine("*@" + this->conaddr.addr(), Config->OperServ, Anope::CurTime + this->proxy.duration, reason, XLineManager::GenerateUID());
 		if (add_to_akill && akills)
 		{
@@ -94,15 +94,15 @@ class ProxyConnect : public ConnectionSocket
 		}
 		else
 		{
-			if (ircdproto->CanSZLine)
-				ircdproto->SendSZLine(NULL, x);
+			if (IRCD->CanSZLine)
+				IRCD->SendSZLine(NULL, x);
 			else
-				ircdproto->SendAkill(NULL, x);
-			x->destroy();
+				IRCD->SendAkill(NULL, x);
+			x->Destroy();
 		}
 	}
 };
-service_reference<XLineManager> ProxyConnect::akills("XLineManager", "xlinemanager/sgline");
+ServiceReference<XLineManager> ProxyConnect::akills("XLineManager", "xlinemanager/sgline");
 std::set<ProxyConnect *> ProxyConnect::proxies;
 
 class HTTPProxyConnect : public ProxyConnect, public BufferedSocket
@@ -255,7 +255,7 @@ class ModuleProxyScan : public Module
 			++it;
 
 			ClientSocket *cs = dynamic_cast<ClientSocket *>(s);
-			if (cs != NULL && cs->LS == this->listener)
+			if (cs != NULL && cs->ls == this->listener)
 				delete s;
 		}
 
@@ -332,7 +332,7 @@ class ModuleProxyScan : public Module
 			if (p.ports.empty())
 				continue;
 
-			p.duration = dotime(config.ReadValue("proxyscan", "time", "4h", i));
+			p.duration = Anope::DoTime(config.ReadValue("proxyscan", "time", "4h", i));
 			p.reason = config.ReadValue("proxyscan", "reason", "", i);
 			if (p.reason.empty())
 				continue;
@@ -341,7 +341,7 @@ class ModuleProxyScan : public Module
 		}
 	}
 
-	void OnUserConnect(dynamic_reference<User> &user, bool &exempt) anope_override
+	void OnUserConnect(Reference<User> &user, bool &exempt) anope_override
 	{
 		if (exempt || !user || !Me->IsSynced() || !user->server->IsSynced())
 			return;
@@ -360,7 +360,7 @@ class ModuleProxyScan : public Module
 
 		if (!this->con_notice.empty() && !this->con_source.empty())
 		{
-			const BotInfo *bi = findbot(this->con_source);
+			const BotInfo *bi = BotInfo::Find(this->con_source);
 			if (bi)
 				user->SendMessage(bi, this->con_notice);
 		}

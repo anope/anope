@@ -14,7 +14,7 @@
 
 struct CSMiscData : ExtensibleItem, Serializable
 {
-	serialize_obj<ChannelInfo> ci;
+	Serialize::Reference<ChannelInfo> ci;
 	Anope::string name;
 	Anope::string data;
 
@@ -22,7 +22,7 @@ struct CSMiscData : ExtensibleItem, Serializable
 	{
 	}
 
-	Serialize::Data serialize() const anope_override
+	Serialize::Data Serialize() const anope_override
 	{
 		Serialize::Data sdata;
 
@@ -33,9 +33,9 @@ struct CSMiscData : ExtensibleItem, Serializable
 		return sdata;
 	}
 
-	static Serializable* unserialize(Serializable *obj, Serialize::Data &data)
+	static Serializable* Unserialize(Serializable *obj, Serialize::Data &data)
 	{
-		ChannelInfo *ci = cs_findchan(data["ci"].astr());
+		ChannelInfo *ci = ChannelInfo::Find(data["ci"].astr());
 		if (ci == NULL)
 			return NULL;
 
@@ -75,7 +75,7 @@ class CommandCSSetMisc : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		ChannelInfo *ci = cs_findchan(params[0]);
+		ChannelInfo *ci = ChannelInfo::Find(params[0]);
 		if (ci == NULL)
 		{
 			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
@@ -108,12 +108,12 @@ class CommandCSSetMisc : public Command
 
 class CSSetMisc : public Module
 {
-	SerializeType csmiscdata_type;
+	Serialize::Type csmiscdata_type;
 	CommandCSSetMisc commandcssetmisc;
 
  public:
 	CSSetMisc(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
-		csmiscdata_type("CSMiscData", CSMiscData::unserialize), commandcssetmisc(this)
+		csmiscdata_type("CSMiscData", CSMiscData::Unserialize), commandcssetmisc(this)
 	{
 		this->SetAuthor("Anope");
 

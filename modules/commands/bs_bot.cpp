@@ -23,7 +23,7 @@ class CommandBSBot : public Command
 		const Anope::string &host = params[3];
 		const Anope::string &real = params[4];
 
-		if (findbot(nick))
+		if (BotInfo::Find(nick, true))
 		{
 			source.Reply(_("Bot \002%s\002 already exists."), nick.c_str());
 			return;
@@ -47,46 +47,30 @@ class CommandBSBot : public Command
 			return;
 		}
 
-		/* Check the nick is valid re RFC 2812 */
-		if (isdigit(nick[0]) || nick[0] == '-')
-		{
-			source.Reply(_("Bot Nicks may only contain valid nick characters."));
-			return;
-		}
-
-		for (unsigned i = 0, end = nick.length(); i < end && i < Config->NickLen; ++i)
-			if (!isvalidnick(nick[i]))
-			{
-				source.Reply(_("Bot Nicks may only contain valid nick characters."));
-				return;
-			}
-
-		/* check for hardcored ircd forbidden nicks */
-		if (!ircdproto->IsNickValid(nick))
+		if (!IRCD->IsNickValid(nick))
 		{
 			source.Reply(_("Bot Nicks may only contain valid nick characters."));
 			return;
 		}
 
 		/* Check the host is valid */
-		if (!IsValidHost(host))
+		if (!IRCD->IsHostValid(host))
 		{
 			source.Reply(_("Bot Hosts may only contain valid host characters."));
 			return;
 		}
 
-		for (unsigned i = 0, end = user.length(); i < end && i < Config->UserLen; ++i)
-			if (!isalnum(user[i]))
-			{
-				source.Reply(_("Bot Idents may only contain valid characters."), Config->UserLen);
-				return;
-			}
+		if (!IRCD->IsIdentValid(user))
+		{
+			source.Reply(_("Bot Idents may only contain valid characters."));
+			return;
+		}
 
 		/* We check whether the nick is registered, and inform the user
 		* if so. You need to drop the nick manually before you can use
 		* it as a bot nick from now on -GD
 		*/
-		if (findnick(nick))
+		if (NickAlias::Find(nick))
 		{
 			source.Reply(NICK_ALREADY_REGISTERED, nick.c_str());
 			return;
@@ -116,16 +100,16 @@ class CommandBSBot : public Command
 			return;
 		}
 
-		BotInfo *bi = findbot(oldnick);
+		BotInfo *bi = BotInfo::Find(oldnick, true);
 		if (!bi)
 		{
 			source.Reply(BOT_DOES_NOT_EXIST, oldnick.c_str());
 			return;
 		}
 
-		if (!oldnick.equals_ci(nick) && nickIsServices(oldnick, false))
+		if (bi->HasFlag(BI_CONF))
 		{
-			source.Reply(BOT_DOES_NOT_EXIST, oldnick.c_str());
+			source.Reply(_("Bot %s is not changable."), bi->nick.c_str());
 			return;
 		}
 
@@ -147,12 +131,6 @@ class CommandBSBot : public Command
 			return;
 		}
 
-		if (!oldnick.equals_ci(nick) && nickIsServices(nick, false))
-		{
-			source.Reply(BOT_DOES_NOT_EXIST, oldnick.c_str());
-			return;
-		}
-
 		/* Checks whether there *are* changes.
 		* Case sensitive because we may want to change just the case.
 		* And we must finally check that the nick is not already
@@ -164,42 +142,25 @@ class CommandBSBot : public Command
 			return;
 		}
 
-		/* Check the nick is valid re RFC 2812 */
-		if (isdigit(nick[0]) || nick[0] == '-')
+		if (!IRCD->IsNickValid(nick))
 		{
 			source.Reply(_("Bot Nicks may only contain valid nick characters."));
 			return;
 		}
 
-		for (unsigned i = 0, end = nick.length(); i < end && i < Config->NickLen; ++i)
-			if (!isvalidnick(nick[i]))
-			{
-				source.Reply(_("Bot Nicks may only contain valid nick characters."));
-				return;
-			}
-
-		/* check for hardcored ircd forbidden nicks */
-		if (!ircdproto->IsNickValid(nick))
-		{
-			source.Reply(_("Bot Nicks may only contain valid nick characters."));
-			return;
-		}
-
-		if (!host.empty() && !IsValidHost(host))
+		if (!host.empty() && !IRCD->IsHostValid(host))
 		{
 			source.Reply(_("Bot Hosts may only contain valid host characters."));
 			return;
 		}
 
-		if (!user.empty())
-			for (unsigned i = 0, end = user.length(); i < end && i < Config->UserLen; ++i)
-				if (!isalnum(user[i]))
-				{
-					source.Reply(_("Bot Idents may only contain valid characters."), Config->UserLen);
-					return;
-				}
+		if (!user.empty() && !IRCD->IsIdentValid(user))
+		{
+			source.Reply(_("Bot Idents may only contain valid characters."), Config->UserLen);
+			return;
+		}
 
-		if (!nick.equals_ci(bi->nick) && findbot(nick))
+		if (!nick.equals_ci(bi->nick) && BotInfo::Find(nick, true))
 		{
 			source.Reply(_("Bot \002%s\002 already exists."), nick.c_str());
 			return;
@@ -211,7 +172,7 @@ class CommandBSBot : public Command
 			* if so. You need to drop the nick manually before you can use
 			* it as a bot nick from now on -GD
 			*/
-			if (findnick(nick))
+			if (NickAlias::Find(nick))
 			{
 				source.Reply(NICK_ALREADY_REGISTERED, nick.c_str());
 				return;
@@ -219,19 +180,17 @@ class CommandBSBot : public Command
 
 			/* The new nick is really different, so we remove the Q line for the old nick. */
 			XLine x_del(bi->nick);
-			ircdproto->SendSQLineDel(&x_del);
+			IRCD->SendSQLineDel(&x_del);
 
 			/* Add a Q line for the new nick */
 			XLine x(nick, "Reserved for services");
-			ircdproto->SendSQLine(NULL, &x);
+			IRCD->SendSQLine(NULL, &x);
 		}
 
 		if (!user.empty())
-			ircdproto->SendQuit(bi, "Quit: Be right back");
+			IRCD->SendQuit(bi, "Quit: Be right back");
 		else
-		{
-			ircdproto->SendChangeBotNick(bi, nick);
-		}
+			IRCD->SendNickChange(bi, nick);
 
 		if (!nick.equals_cs(bi->nick))
 			bi->SetNewNick(nick);
@@ -245,7 +204,7 @@ class CommandBSBot : public Command
 
 		if (!user.empty())
 		{
-			ircdproto->SendClientIntroduction(bi);
+			IRCD->SendClientIntroduction(bi);
 			bi->RejoinAll();
 		}
 
@@ -266,16 +225,16 @@ class CommandBSBot : public Command
 			return;
 		}
 
-		BotInfo *bi = findbot(nick);
+		BotInfo *bi = BotInfo::Find(nick, true);
 		if (!bi)
 		{
 			source.Reply(BOT_DOES_NOT_EXIST, nick.c_str());
 			return;
 		}
 
-		if (nickIsServices(nick, false))
+		if (bi->HasFlag(BI_CONF))
 		{
-			source.Reply(BOT_DOES_NOT_EXIST, nick.c_str());
+			source.Reply(_("Bot %s is not deletable."), bi->nick.c_str());
 			return;
 		}
 
@@ -284,7 +243,7 @@ class CommandBSBot : public Command
 		Log(LOG_ADMIN, source, this) << "DEL " << bi->nick;
 
 		source.Reply(_("Bot \002%s\002 has been deleted."), nick.c_str());
-		bi->destroy();
+		bi->Destroy();
 		return;
 	}
  public:
@@ -300,7 +259,7 @@ class CommandBSBot : public Command
 	{
 		const Anope::string &cmd = params[0];
 
-		if (readonly)
+		if (Anope::ReadOnly)
 		{
 			source.Reply(_("Sorry, bot modification is temporarily disabled."));
 			return;

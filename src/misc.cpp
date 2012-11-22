@@ -1,4 +1,3 @@
-
 /* Miscellaneous routines.
  *
  * (C) 2003-2012 Anope Team
@@ -8,12 +7,12 @@
  *
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
+ *
  */
 
 #include "services.h"
 #include "version.h"
 #include "modules.h"
-#include "extern.h"
 #include "lists.h"
 #include "config.h"
 #include "bots.h"
@@ -23,37 +22,6 @@
 #include <errno.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-
-ExtensibleItem::ExtensibleItem()
-{
-}
-
-ExtensibleItem::~ExtensibleItem()
-{
-}
-
-void ExtensibleItem::OnDelete()
-{
-	delete this;
-}
-
-/*************************************************************************/
-
-/** Check if a file exists
- * @param filename The file
- * @return true if the file exists, false if it doens't
- */
-bool IsFile(const Anope::string &filename)
-{
-	struct stat fileinfo;
-	if (!stat(filename.c_str(), &fileinfo))
-		return true;
-
-	return false;
-}
-
-
-/*************************************************************************/
 
 NumberList::NumberList(const Anope::string &list, bool descending) : is_valid(true), desc(descending)
 {
@@ -134,18 +102,18 @@ bool NumberList::InvalidRange(const Anope::string &)
 	return true;
 }
 
-ListFormatter &ListFormatter::addColumn(const Anope::string &name)
+ListFormatter &ListFormatter::AddColumn(const Anope::string &name)
 {
 	this->columns.push_back(name);
 	return *this;
 }
 
-void ListFormatter::addEntry(const ListEntry &entry)
+void ListFormatter::AddEntry(const ListEntry &entry)
 {
 	this->entries.push_back(entry);
 }
 
-bool ListFormatter::isEmpty() const
+bool ListFormatter::IsEmpty() const
 {
 	return this->entries.empty();
 }
@@ -235,7 +203,7 @@ void InfoFormatter::Process(std::vector<Anope::string> &buffer)
 		Anope::string s;
 		for (unsigned i = it->first.length(); i < this->longest; ++i)
 			s += " ";
-		s += Anope::string(translate(this->nc, it->first.c_str())) + ": " + it->second;
+		s += Anope::string(Language::Translate(this->nc, it->first.c_str())) + ": " + it->second;
 
 		buffer.push_back(s);
 	}
@@ -249,18 +217,16 @@ Anope::string& InfoFormatter::operator[](const Anope::string &key)
 	return this->replies.back().second;
 }
 
-/**
- * dotime:  Return the number of seconds corresponding to the given time
- *          string.  If the given string does not represent a valid time,
- *          return -1.
- *
- *          A time string is either a plain integer (representing a number
- *          of seconds), or an integer followed by one of these characters:
- *          "s" (seconds), "m" (minutes), "h" (hours), or "d" (days).
- * @param s String to convert
- * @return time_t
- */
-time_t dotime(const Anope::string &s)
+bool Anope::IsFile(const Anope::string &filename)
+{
+	struct stat fileinfo;
+	if (!stat(filename.c_str(), &fileinfo))
+		return true;
+
+	return false;
+}
+
+time_t Anope::DoTime(const Anope::string &s)
 {
 	if (s.empty())
 		return -1;
@@ -297,15 +263,7 @@ time_t dotime(const Anope::string &s)
 	return 0;
 }
 
-/*************************************************************************/
-
-/**
- * Expresses in a string the period of time represented by a given amount
- * of seconds (with days/hours/minutes).
- * @param seconds time in seconds
- * @return buffer
- */
-Anope::string duration(const time_t &t, const NickCore *nc)
+Anope::string Anope::Duration(time_t t, const NickCore *nc)
 {
 	/* We first calculate everything */
 	time_t days = (t / 86400);
@@ -314,58 +272,50 @@ Anope::string duration(const time_t &t, const NickCore *nc)
 	time_t seconds = (t) % 60;
 
 	if (!days && !hours && !minutes)
-		return stringify(seconds) + " " + (seconds != 1 ? translate(nc, _("seconds")) : translate(nc, _("second")));
+		return stringify(seconds) + " " + (seconds != 1 ? Language::Translate(nc, _("seconds")) : Language::Translate(nc, _("second")));
 	else
 	{
 		bool need_comma = false;
 		Anope::string buffer;
 		if (days)
 		{
-			buffer = stringify(days) + " " + (days != 1 ? translate(nc, _("days")) : translate(nc, _("day")));
+			buffer = stringify(days) + " " + (days != 1 ? Language::Translate(nc, _("days")) : Language::Translate(nc, _("day")));
 			need_comma = true;
 		}
 		if (hours)
 		{
 			buffer += need_comma ? ", " : "";
-			buffer += stringify(hours) + " " + (hours != 1 ? translate(nc, _("hours")) : translate(nc, _("hour")));
+			buffer += stringify(hours) + " " + (hours != 1 ? Language::Translate(nc, _("hours")) : Language::Translate(nc, _("hour")));
 			need_comma = true;
 		}
 		if (minutes)
 		{
 			buffer += need_comma ? ", " : "";
-			buffer += stringify(minutes) + " " + (minutes != 1 ? translate(nc, _("minutes")) : translate(nc, _("minute")));
+			buffer += stringify(minutes) + " " + (minutes != 1 ? Language::Translate(nc, _("minutes")) : Language::Translate(nc, _("minute")));
 		}
 		return buffer;
 	}
 }
 
-Anope::string do_strftime(const time_t &t, const NickCore *nc, bool short_output)
+Anope::string Anope::strftime(time_t t, const NickCore *nc, bool short_output)
 {
 	tm tm = *localtime(&t);
 	char buf[BUFSIZE];
-	strftime(buf, sizeof(buf), translate(nc, _("%b %d %H:%M:%S %Y %Z")), &tm);
+	strftime(buf, sizeof(buf), Language::Translate(nc, _("%b %d %H:%M:%S %Y %Z")), &tm);
 	if (short_output)
 		return buf;
 	if (t < Anope::CurTime)
-		return Anope::string(buf) + " " + Anope::printf(translate(nc, _("(%s ago)")), duration(Anope::CurTime - t).c_str(), nc);
+		return Anope::string(buf) + " " + Anope::printf(Language::Translate(nc, _("(%s ago)")), Duration(Anope::CurTime - t).c_str(), nc);
 	else
-		return Anope::string(buf) + " " + Anope::printf(translate(nc, _("(%s from now)")), duration(t - Anope::CurTime).c_str(), nc);
+		return Anope::string(buf) + " " + Anope::printf(Language::Translate(nc, _("(%s from now)")), Duration(t - Anope::CurTime).c_str(), nc);
 }
 
-/*************************************************************************/
-
-/**
- * Generates a human readable string of type "expires in ..."
- * @param na Nick Alias
- * @param seconds time in seconds
- * @return buffer
- */
-Anope::string expire_left(const NickCore *nc, time_t expires)
+Anope::string Anope::Expires(time_t expires, const NickCore *nc)
 {
 	if (!expires)
-		return translate(nc, NO_EXPIRE);
+		return Language::Translate(nc, NO_EXPIRE);
 	else if (expires <= Anope::CurTime)
-		return translate(nc, _("expires momentarily"));
+		return Language::Translate(nc, _("expires momentarily"));
 	else
 	{
 		char buf[256];
@@ -374,202 +324,27 @@ Anope::string expire_left(const NickCore *nc, time_t expires)
 		if (diff >= 86400)
 		{
 			int days = diff / 86400;
-			snprintf(buf, sizeof(buf), translate(nc, days == 1 ? _("expires in %d day") : _("expires in %d days")), days);
+			snprintf(buf, sizeof(buf), Language::Translate(nc, days == 1 ? _("expires in %d day") : _("expires in %d days")), days);
 		}
 		else
 		{
 			if (diff <= 3600)
 			{
 				int minutes = diff / 60;
-				snprintf(buf, sizeof(buf), translate(nc, minutes == 1 ? _("expires in %d minute") : _("expires in %d minutes")), minutes);
+				snprintf(buf, sizeof(buf), Language::Translate(nc, minutes == 1 ? _("expires in %d minute") : _("expires in %d minutes")), minutes);
 			}
 			else
 			{
 				int hours = diff / 3600, minutes;
 				diff -= hours * 3600;
 				minutes = diff / 60;
-				snprintf(buf, sizeof(buf), translate(nc, hours == 1 && minutes == 1 ? _("expires in %d hour, %d minute") : (hours == 1 && minutes != 1 ? _("expires in %d hour, %d minutes") : (hours != 1 && minutes == 1 ? _("expires in %d hours, %d minute") : _("expires in %d hours, %d minutes")))), hours, minutes);
+				snprintf(buf, sizeof(buf), Language::Translate(nc, hours == 1 && minutes == 1 ? _("expires in %d hour, %d minute") : (hours == 1 && minutes != 1 ? _("expires in %d hour, %d minutes") : (hours != 1 && minutes == 1 ? _("expires in %d hours, %d minute") : _("expires in %d hours, %d minutes")))), hours, minutes);
 			}
 		}
 
 		return buf;
 	}
 }
-
-/*************************************************************************/
-
-/** Checks if a username is valid
- * @param ident The username
- * @return true if the ident is valid
- */
-bool IsValidIdent(const Anope::string &ident)
-{
-	if (ident.empty() || ident.length() > Config->UserLen)
-		return false;
-	for (unsigned i = 0; i < ident.length(); ++i)
-	{
-		const char &c = ident[i];
-		if ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || (c >= '0' && c <= '9') || c == '.' || c == '-')
-			;
-		else
-			return false;
-	}
-
-	return true;
-}
-
-/** Checks if a host is valid
- * @param host The host
- * @param true if the host is valid
- */
-bool IsValidHost(const Anope::string &host)
-{
-	if (host.empty() || host.length() > Config->HostLen)
-		return false;
-
-	if (Config->VhostDisallowBE.find_first_of(host[0]) != Anope::string::npos)
-		return false;
-	else if (Config->VhostDisallowBE.find_first_of(host[host.length() - 1]) != Anope::string::npos)
-		return false;
-
-	int dots = 0;
-	for (unsigned i = 0; i < host.length(); ++i)
-	{
-		if (host[i] == '.')
-			++dots;
-		if (Config->VhostChars.find_first_of(host[i]) == Anope::string::npos)
-			return false;
-	}
-
-	return Config->VhostUndotted || dots > 0;
-}
-
-/*************************************************************************/
-
-/**
- * Get the token
- * @param str String to search in
- * @param dilim Character to search for
- * @param token_number the token number
- * @return token
- */
-Anope::string myStrGetToken(const Anope::string &str, char dilim, int token_number)
-{
-	if (str.empty() || str.find(dilim) == Anope::string::npos)
-		return token_number ? "" : str;
-
-	Anope::string substring;
-	sepstream sep(str, dilim);
-
-	for (int i = 0; i < token_number + 1 && !sep.StreamEnd() && sep.GetToken(substring); ++i);
-
-	return substring;
-}
-
-/*************************************************************************/
-
-/**
- * Get the Remaining tokens
- * @param str String to search in
- * @param dilim Character to search for
- * @param token_number the token number
- * @return token
- */
-Anope::string myStrGetTokenRemainder(const Anope::string &str, const char dilim, int token_number)
-{
-	if (str.empty() || str.find(dilim) == Anope::string::npos)
-		return token_number ? "" : str;
-
-	Anope::string substring;
-	sepstream sep(str, dilim);
-
-	for (int i = 0; i < token_number + 1 && !sep.StreamEnd() && sep.GetToken(substring); ++i);
-
-	if (!sep.StreamEnd())
-		substring += dilim + sep.GetRemaining();
-	return substring;
-}
-
-/*************************************************************************/
-
-/**
- * Is the given nick a network service
- * @param nick to check
- * @param int Check if botserv bots
- * @return int
- */
-bool nickIsServices(const Anope::string &tempnick, bool bot)
-{
-	if (tempnick.empty())
-		return false;
-
-	Anope::string nick = tempnick;
-
-	size_t at = nick.find('@');
-	if (at != Anope::string::npos)
-	{
-		Anope::string servername = nick.substr(at + 1);
-		if (!servername.equals_ci(Config->ServerName))
-			return false;
-		nick = nick.substr(0, at);
-	}
-
-	const BotInfo *bi = findbot(nick);
-	if (bi)
-		return bot ? true : bi->HasFlag(BI_CORE);
-	return false;
-}
-
-/*************************************************************************/
-
-/**
- * Number of tokens in a string
- * @param str String
- * @param dilim Dilimiter
- * @return number of tokens
- */
-int myNumToken(const Anope::string &str, char dilim)
-{
-	if (str.empty())
-		return 0;
-	int counter = 0;
-	for (size_t idx = 0, len = str.length(); idx <= len; ++idx)
-		if (str[idx] == dilim || idx == len)
-			++counter;
-	return counter;
-}
-
-/*************************************************************************/
-
-/** Build a string list from a source string
- * @param src The source string
- * @return a list of strings
- */
-std::list<Anope::string> BuildStringList(const Anope::string &src, char delim)
-{
-	sepstream tokens(src, delim);
-	Anope::string token;
-	std::list<Anope::string> Ret;
-
-	while (tokens.GetToken(token))
-		Ret.push_back(token);
-
-	return Ret;
-}
-
-std::vector<Anope::string> BuildStringVector(const Anope::string &src, char delim)
-{
-	sepstream tokens(src, delim);
-	Anope::string token;
-	std::vector<Anope::string> Ret;
-
-	while (tokens.GetToken(token))
-		Ret.push_back(token);
-
-	return Ret;
-}
-
-/*************************************************************************/
 
 bool Anope::Match(const Anope::string &str, const Anope::string &mask, bool case_sensitive, bool use_regex)
 {
@@ -583,7 +358,7 @@ bool Anope::Match(const Anope::string &str, const Anope::string &mask, bool case
 
 		if (r == NULL || r->GetExpression() != stripped_mask)
 		{
-			service_reference<RegexProvider> provider("Regex", Config->RegexEngine);
+			ServiceReference<RegexProvider> provider("Regex", Config->RegexEngine);
 			if (provider)
 			{
 				try
@@ -675,13 +450,6 @@ bool Anope::Match(const Anope::string &str, const Anope::string &mask, bool case
 	return m == mask_len;
 }
 
-/** Returns a sequence of data formatted as the format argument specifies.
- ** After the format parameter, the function expects at least as many
- ** additional arguments as specified in format.
- * @param fmt Format of the Message
- * @param ... any number of parameters
- * @return a Anope::string
- */
 Anope::string Anope::printf(const char *fmt, ...)
 {
 	va_list args;
@@ -692,35 +460,6 @@ Anope::string Anope::printf(const char *fmt, ...)
 	return buf;
 }
 
-
-/*************************************************************************/
-
-/**
- * Check if the given string is some sort of wildcard
- * @param str String to check
- * @return 1 for wildcard, 0 for anything else
- */
-bool str_is_wildcard(const Anope::string &str)
-{
-	return str.find_first_of("*?") != Anope::string::npos;
-}
-
-/**
- * Check if the given string is a pure wildcard
- * @param str String to check
- * @return 1 for pure wildcard, 0 for anything else
- */
-bool str_is_pure_wildcard(const Anope::string &str)
-{
-	return str.find_first_not_of('*') == Anope::string::npos;
-}
-
-/*************************************************************************/
-
-/** Converts a string to hex
- * @param the data to be converted
- * @return a anope::string containing the hex value
- */
 Anope::string Anope::Hex(const Anope::string &data)
 {
 	const char hextable[] = "0123456789abcdef";
@@ -750,10 +489,6 @@ Anope::string Anope::Hex(const char *data, unsigned len)
 	return rv;
 }
 
-/** Converts a string from hex
- * @param src The data to be converted
- * @param dest The destination string
- */
 void Anope::Unhex(const Anope::string &src, Anope::string &dest)
 {
 	size_t len = src.length();
@@ -827,12 +562,7 @@ int Anope::VersionMajor() { return VERSION_MAJOR; }
 int Anope::VersionMinor() { return VERSION_MINOR; }
 int Anope::VersionPatch() { return VERSION_PATCH; }
 
-/**
- * Normalize buffer stripping control characters and colors
- * @param A string to be parsed for control and color codes
- * @return A string stripped of control and color codes
- */
-Anope::string normalizeBuffer(const Anope::string &buf)
+Anope::string Anope::NormalizeBuffer(const Anope::string &buf)
 {
 	Anope::string newbuf;
 

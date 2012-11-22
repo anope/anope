@@ -4,8 +4,10 @@
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
+ *
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
+ *
  */
 
 #ifndef TIMERS_H
@@ -33,14 +35,14 @@ class CoreExport Timer
 	bool repeat;
 
  public:
-	/** Default constructor, initializes the triggering time
+	/** Constructor, initializes the triggering time
 	 * @param time_from_now The number of seconds from now to trigger the timer
 	 * @param now The time now
 	 * @param repeating Repeat this timer every time_from_now if this is true
 	 */
 	Timer(long time_from_now, time_t now = Anope::CurTime, bool repeating = false);
 
-	/** Default destructor, removes the timer from the list
+	/** Destructor, removes the timer from the list
 	 */
 	virtual ~Timer();
 
@@ -91,14 +93,14 @@ class CoreExport TimerManager
 	static std::vector<Timer *> Timers;
  public:
 	/** Add a timer to the list
-	 * @param T A Timer derived class to add
+	 * @param t A Timer derived class to add
 	 */
-	static void AddTimer(Timer *T);
+	static void AddTimer(Timer *t);
 
 	/** Deletes a timer
-	 * @param T A Timer derived class to delete
+	 * @param t A Timer derived class to delete
 	 */
-	static void DelTimer(Timer *T);
+	static void DelTimer(Timer *t);
 
 	/** Tick all pending timers
 	 * @param ctime The current time

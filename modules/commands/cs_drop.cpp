@@ -26,13 +26,13 @@ class CommandCSDrop : public Command
 	{
 		const Anope::string &chan = params[0];
 
-		if (readonly)
+		if (Anope::ReadOnly)
 		{
 			source.Reply(_("Sorry, channel de-registration is temporarily disabled.")); // XXX: READ_ONLY_MODE?
 			return;
 		}
 
-		ChannelInfo *ci = cs_findchan(chan);
+		ChannelInfo *ci = ChannelInfo::Find(chan);
 		if (ci == NULL)
 		{
 			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
@@ -57,7 +57,7 @@ class CommandCSDrop : public Command
 		FOREACH_MOD(I_OnChanDrop, OnChanDrop(ci));
 
 		Channel *c = ci->c;
-		ci->destroy();
+		ci->Destroy();
 
 		source.Reply(_("Channel \002%s\002 has been dropped."), chan.c_str());
 

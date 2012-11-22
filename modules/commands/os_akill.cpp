@@ -13,38 +13,38 @@
 
 #include "module.h"
 
-static service_reference<XLineManager> akills("XLineManager", "xlinemanager/sgline");
+static ServiceReference<XLineManager> akills("XLineManager", "xlinemanager/sgline");
 
 class AkillDelCallback : public NumberList
 {
 	CommandSource &source;
-	unsigned Deleted;
+	unsigned deleted;
  public:
-	AkillDelCallback(CommandSource &_source, const Anope::string &numlist) : NumberList(numlist, true), source(_source), Deleted(0)
+	AkillDelCallback(CommandSource &_source, const Anope::string &numlist) : NumberList(numlist, true), source(_source), deleted(0)
 	{
 	}
 
 	~AkillDelCallback()
 	{
-		if (!Deleted)
+		if (!deleted)
 			source.Reply(_("No matching entries on the AKILL list."));
-		else if (Deleted == 1)
+		else if (deleted == 1)
 			source.Reply(_("Deleted 1 entry from the AKILL list."));
 		else
-			source.Reply(_("Deleted %d entries from the AKILL list."), Deleted);
+			source.Reply(_("Deleted %d entries from the AKILL list."), deleted);
 	}
 
-	void HandleNumber(unsigned Number) anope_override
+	void HandleNumber(unsigned number) anope_override
 	{
-		if (!Number)
+		if (!number)
 			return;
 
-		XLine *x = akills->GetEntry(Number - 1);
+		XLine *x = akills->GetEntry(number - 1);
 
 		if (!x)
 			return;
 
-		++Deleted;
+		++deleted;
 		DoDel(source, x);
 	}
 
@@ -76,7 +76,7 @@ class CommandOSAKill : public Command
 			sep.GetToken(mask);
 		}
 
-		time_t expires = !expiry.empty() ? dotime(expiry) : Config->AutokillExpiry;
+		time_t expires = !expiry.empty() ? Anope::DoTime(expiry) : Config->AutokillExpiry;
 		/* If the expiry given does not contain a final letter, it's in days,
 		 * said the doc. Ah well.
 		 */
@@ -127,7 +127,7 @@ class CommandOSAKill : public Command
 				return;
 			}
 
-			service_reference<RegexProvider> provider("Regex", Config->RegexEngine);
+			ServiceReference<RegexProvider> provider("Regex", Config->RegexEngine);
 			if (!provider)
 			{
 				source.Reply(_("Unable to find regex engine %s"), Config->RegexEngine.c_str());
@@ -146,7 +146,7 @@ class CommandOSAKill : public Command
 			}
 		}
 
-		User *targ = finduser(mask);
+		User *targ = User::Find(mask, true);
 		if (targ)
 			mask = "*@" + targ->host;
 
@@ -160,7 +160,7 @@ class CommandOSAKill : public Command
 
 		XLine *x = new XLine(mask, source.GetNick(), expires, reason);
 		if (Config->AkillIds)
-			x->UID = XLineManager::GenerateUID();
+			x->id = XLineManager::GenerateUID();
 
 		unsigned int affected = 0;
 		for (user_map::const_iterator it = UserListByNick.begin(); it != UserListByNick.end(); ++it)
@@ -172,7 +172,7 @@ class CommandOSAKill : public Command
 		{
 			source.Reply(USERHOST_MASK_TOO_WIDE, mask.c_str());
 			Log(LOG_ADMIN, source, this) << "tried to akill " << percent << "% of the network (" << affected << " users)";
-			x->destroy();
+			x->Destroy();
 			return;
 		}
 
@@ -180,7 +180,7 @@ class CommandOSAKill : public Command
 		FOREACH_RESULT(I_OnAddXLine, OnAddXLine(source, x, akills));
 		if (MOD_RESULT == EVENT_STOP)
 		{
-			x->destroy();
+			x->Destroy();
 			return;
 		}
 
@@ -190,8 +190,8 @@ class CommandOSAKill : public Command
 
 		source.Reply(_("\002%s\002 added to the AKILL list."), mask.c_str());
 
-		Log(LOG_ADMIN, source, this) << "on " << mask << " (" << x->Reason << ") expires in " << (expires ? duration(expires - Anope::CurTime) : "never") << " [affects " << affected << " user(s) (" << percent << "%)]";
-		if (readonly)
+		Log(LOG_ADMIN, source, this) << "on " << mask << " (" << x->reason << ") expires in " << (expires ? Anope::Duration(expires - Anope::CurTime) : "never") << " [affects " << affected << " user(s) (" << percent << "%)]";
+		if (Anope::ReadOnly)
 			source.Reply(READ_ONLY_MODE);
 	}
 
@@ -230,14 +230,14 @@ class CommandOSAKill : public Command
 			{
 				FOREACH_MOD(I_OnDelXLine, OnDelXLine(source, x, akills));
 
-				source.Reply(_("\002%s\002 deleted from the AKILL list."), x->Mask.c_str());
+				source.Reply(_("\002%s\002 deleted from the AKILL list."), x->mask.c_str());
 				AkillDelCallback::DoDel(source, x);
 			}
 			while ((x = akills->HasEntry(mask)));
 
 		}
 
-		if (readonly)
+		if (Anope::ReadOnly)
 			source.Reply(READ_ONLY_MODE);
 
 		return;
@@ -269,12 +269,12 @@ class CommandOSAKill : public Command
 
 					ListFormatter::ListEntry entry;
 					entry["Number"] = stringify(number);
-					entry["Mask"] = x->Mask;
-					entry["Creator"] = x->By;
-					entry["Created"] = do_strftime(x->Created, NULL, true);
-					entry["Expires"] = expire_left(NULL, x->Expires);
-					entry["Reason"] = x->Reason;
-					this->list.addEntry(entry);
+					entry["Mask"] = x->mask;
+					entry["Creator"] = x->by;
+					entry["Created"] = Anope::strftime(x->created, NULL, true);
+					entry["Expires"] = Anope::Expires(x->expires);
+					entry["Reason"] = x->reason;
+					this->list.AddEntry(entry);
 				}
 			}
 			nl_list(list, mask);
@@ -286,21 +286,21 @@ class CommandOSAKill : public Command
 			{
 				const XLine *x = akills->GetEntry(i);
 
-				if (mask.empty() || mask.equals_ci(x->Mask) || mask == x->UID || Anope::Match(x->Mask, mask, false, true))
+				if (mask.empty() || mask.equals_ci(x->mask) || mask == x->id || Anope::Match(x->mask, mask, false, true))
 				{
 					ListFormatter::ListEntry entry;
 					entry["Number"] = stringify(i + 1);
-					entry["Mask"] = x->Mask;
-					entry["Creator"] = x->By;
-					entry["Created"] = do_strftime(x->Created, NULL, true);
-					entry["Expires"] = expire_left(source.nc, x->Expires);
-					entry["Reason"] = x->Reason;
-					list.addEntry(entry);
+					entry["Mask"] = x->mask;
+					entry["Creator"] = x->by;
+					entry["Created"] = Anope::strftime(x->created, NULL, true);
+					entry["Expires"] = Anope::Expires(x->expires, source.nc);
+					entry["Reason"] = x->reason;
+					list.AddEntry(entry);
 				}
 			}
 		}
 
-		if (list.isEmpty())
+		if (list.IsEmpty())
 			source.Reply(_("No matching entries on the AKILL list."));
 		else
 		{
@@ -325,7 +325,7 @@ class CommandOSAKill : public Command
 		}
 
 		ListFormatter list;
-		list.addColumn("Number").addColumn("Mask").addColumn("Reason");
+		list.AddColumn("Number").AddColumn("Mask").AddColumn("Reason");
 
 		this->ProcessList(source, params, list);
 	}
@@ -339,7 +339,7 @@ class CommandOSAKill : public Command
 		}
 
 		ListFormatter list;
-		list.addColumn("Number").addColumn("Mask").addColumn("Creator").addColumn("Created").addColumn("Expires").addColumn("Reason");
+		list.AddColumn("Number").AddColumn("Mask").AddColumn("Creator").AddColumn("Created").AddColumn("Expires").AddColumn("Reason");
 
 		this->ProcessList(source, params, list);
 	}

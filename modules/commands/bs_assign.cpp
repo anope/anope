@@ -27,20 +27,20 @@ class CommandBSAssign : public Command
 		const Anope::string &chan = params[0];
 		const Anope::string &nick = params[1];
 
-		if (readonly)
+		if (Anope::ReadOnly)
 		{
 			source.Reply(BOT_ASSIGN_READONLY);
 			return;
 		}
 
-		ChannelInfo *ci = cs_findchan(params[0]);
+		ChannelInfo *ci = ChannelInfo::Find(params[0]);
 		if (ci == NULL)
 		{
 			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
 			return;
 		}
 
-		BotInfo *bi = findbot(nick);
+		BotInfo *bi = BotInfo::Find(nick, true);
 		if (!bi)
 		{
 			source.Reply(BOT_DOES_NOT_EXIST, nick.c_str());
@@ -95,13 +95,13 @@ class CommandBSUnassign : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		if (readonly)
+		if (Anope::ReadOnly)
 		{
 			source.Reply(BOT_ASSIGN_READONLY);
 			return;
 		}
 
-		ChannelInfo *ci = cs_findchan(params[0]);
+		ChannelInfo *ci = ChannelInfo::Find(params[0]);
 		if (ci == NULL)
 		{
 			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());

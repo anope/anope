@@ -4,6 +4,7 @@
  * Copyright (C) 2008-2012 Anope Team <team@anope.org>
  *
  * Please read COPYING and README for further details.
+ *
  */
 
 #ifndef BASE_H
@@ -16,48 +17,57 @@
 class CoreExport Base
 {
 	/* References to this base class */
-	std::set<dynamic_reference_base *> References;
+	std::set<ReferenceBase *> references;
  public:
 	Base();
 	virtual ~Base();
-	void AddReference(dynamic_reference_base *r);
-	void DelReference(dynamic_reference_base *r);
+
+	/** Adds a reference to this object. Eg, when a Reference
+	 * is created referring to this object this is called. It is used to
+	 * cleanup references when this object is destructed.
+	 */
+	void AddReference(ReferenceBase *r);
+
+	void DelReference(ReferenceBase *r);
 };
 
-class dynamic_reference_base
+class ReferenceBase
 {
  protected:
 	bool invalid;
  public:
-	dynamic_reference_base() : invalid(false) { }
-	dynamic_reference_base(const dynamic_reference_base &other) : invalid(other.invalid) { }
-	virtual ~dynamic_reference_base() { }
+	ReferenceBase() : invalid(false) { }
+	ReferenceBase(const ReferenceBase &other) : invalid(other.invalid) { }
+	virtual ~ReferenceBase() { }
 	inline void Invalidate() { this->invalid = true; }
 };
 
+/** Used to hold pointers to objects that may be deleted. A Reference will
+ * no longer be valid once the object it refers is destructed.
+ */
 template<typename T>
-class dynamic_reference : public dynamic_reference_base
+class Reference : public ReferenceBase
 {
  protected:
 	T *ref;
  public:
- 	dynamic_reference() : ref(NULL)
+ 	Reference() : ref(NULL)
 	{
 	}
 
-	dynamic_reference(T *obj) : ref(obj)
+	Reference(T *obj) : ref(obj)
 	{
 		if (ref)
 			ref->AddReference(this);
 	}
 
-	dynamic_reference(const dynamic_reference<T> &other) : dynamic_reference_base(other), ref(other.ref)
+	Reference(const Reference<T> &other) : ReferenceBase(other), ref(other.ref)
 	{
 		if (operator bool())
 			ref->AddReference(this);
 	}
 
-	virtual ~dynamic_reference()
+	virtual ~Reference()
 	{
 		if (operator bool())
 			ref->DelReference(this);
@@ -105,12 +115,12 @@ class dynamic_reference : public dynamic_reference_base
 			this->ref->AddReference(this);
 	}
 
-	inline bool operator<(const dynamic_reference<T> &other) const
+	inline bool operator<(const Reference<T> &other) const
 	{
 		return this < &other;
 	}
 
-	inline bool operator==(const dynamic_reference<T> &other)
+	inline bool operator==(const Reference<T> &other)
 	{
 		if (!this->invalid)
 			return this->ref == other;

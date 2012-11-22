@@ -7,22 +7,20 @@ class DBMySQL : public Module, public Pipe
  private:
 	Anope::string engine;
 	Anope::string prefix;
-	service_reference<SQLProvider> SQL;
+	ServiceReference<SQLProvider> SQL;
 	time_t lastwarn;
 	bool ro;
 	bool init;
-	std::set<dynamic_reference<Serializable> > updated_items;
+	std::set<Reference<Serializable> > updated_items;
 
 	bool CheckSQL()
 	{
 		if (SQL)
 		{
-			if (readonly && this->ro)
+			if (Anope::ReadOnly && this->ro)
 			{
-				readonly = this->ro = false;
-				const BotInfo *bi = findbot(Config->OperServ);
-				if (bi)
-					ircdproto->SendGlobops(bi, "Found SQL again, going out of readonly mode...");
+				Anope::ReadOnly = this->ro = false;
+				Log() << "Found SQL again, going out of readonly mode...";
 			}
 
 			return true;
@@ -31,10 +29,8 @@ class DBMySQL : public Module, public Pipe
 		{
 			if (Anope::CurTime - Config->UpdateTimeout > lastwarn)
 			{
-				const BotInfo *bi = findbot(Config->OperServ);
-				if (bi)
-					ircdproto->SendGlobops(bi, "Unable to locate SQL reference, going to readonly...");
-				readonly = this->ro = true;
+				Log() << "Unable to locate SQL reference, going to readonly...";
+				Anope::ReadOnly = this->ro = true;
 				this->lastwarn = Anope::CurTime;
 			}
 
@@ -85,9 +81,9 @@ class DBMySQL : public Module, public Pipe
 		if (!this->CheckInit())
 			return;
 
-		for (std::set<dynamic_reference<Serializable> >::iterator it = this->updated_items.begin(), it_end = this->updated_items.end(); it != it_end; ++it)
+		for (std::set<Reference<Serializable> >::iterator it = this->updated_items.begin(), it_end = this->updated_items.end(); it != it_end; ++it)
 		{
-			dynamic_reference<Serializable> obj = *it;
+			Reference<Serializable> obj = *it;
 
 			if (obj && this->SQL)
 			{
@@ -95,11 +91,11 @@ class DBMySQL : public Module, public Pipe
 					continue;
 				obj->UpdateCache();
 
-				SerializeType *s_type = obj->GetSerializableType();
+				Serialize::Type *s_type = obj->GetSerializableType();
 				if (!s_type)
 					continue;
 
-				Serialize::Data data = obj->serialize();
+				Serialize::Data data = obj->Serialize();
 
 				std::vector<SQLQuery> create = this->SQL->CreateTable(this->prefix + s_type->GetName(), data);
 				for (unsigned i = 0; i < create.size(); ++i)
@@ -133,7 +129,7 @@ class DBMySQL : public Module, public Pipe
 	{
 		ConfigReader config;
 		this->engine = config.ReadValue("db_sql", "engine", "", 0);
-		this->SQL = service_reference<SQLProvider>("SQLProvider", this->engine);
+		this->SQL = ServiceReference<SQLProvider>("SQLProvider", this->engine);
 		this->prefix = config.ReadValue("db_sql", "prefix", "anope_db_", 0);
 	}
 
@@ -149,14 +145,14 @@ class DBMySQL : public Module, public Pipe
 	{
 		if (!this->CheckInit())	
 			return;
-		SerializeType *s_type = obj->GetSerializableType();
+		Serialize::Type *s_type = obj->GetSerializableType();
 		if (!s_type)
 			return;
 		this->RunQuery("DELETE FROM `" + this->prefix + s_type->GetName() + "` WHERE `id` = " + stringify(obj->id));
 		s_type->objects.erase(obj->id);
 	}
 
-	void OnSerializeCheck(SerializeType *obj) anope_override
+	void OnSerializeCheck(Serialize::Type *obj) anope_override
 	{
 		if (!this->CheckInit() || obj->GetTimestamp() == Anope::CurTime)
 			return;
@@ -189,7 +185,7 @@ class DBMySQL : public Module, public Pipe
 				std::map<unsigned int, Serializable *>::iterator it = obj->objects.find(id);
 				if (it != obj->objects.end())
 				{
-					it->second->destroy();
+					it->second->Destroy();
 					obj->objects.erase(it);
 				}
 			}
@@ -217,7 +213,7 @@ class DBMySQL : public Module, public Pipe
 					}
 				}
 				else
-					s->destroy();
+					s->Destroy();
 			}
 		}
 

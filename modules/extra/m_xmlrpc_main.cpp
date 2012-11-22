@@ -8,8 +8,8 @@ class XMLRPCIdentifyRequest : public IdentifyRequest
 	XMLRPCRequest request;
 	HTTPReply repl; /* Request holds a reference to the HTTPReply, because we might exist long enough to invalidate it
 	                   we'll copy it here then reset the reference before we use it */
-	dynamic_reference<HTTPClient> client;
-	dynamic_reference<XMLRPCServiceInterface> xinterface;
+	Reference<HTTPClient> client;
+	Reference<XMLRPCServiceInterface> xinterface;
 
  public:
 	XMLRPCIdentifyRequest(Module *m, XMLRPCRequest& req, HTTPClient *c, XMLRPCServiceInterface* iface, const Anope::string &acc, const Anope::string &pass) : IdentifyRequest(m, acc, pass), request(req), repl(request.r), client(c), xinterface(iface) { }
@@ -74,14 +74,14 @@ class MyXMLRPCEvent : public XMLRPCEvent
 			request.reply("error", "Invalid parameters");
 		else
 		{
-			BotInfo *bi = findbot(service);
+			BotInfo *bi = BotInfo::Find(service);
 			if (!bi)
 				request.reply("error", "Invalid service");
 			else
 			{
 				request.reply("result", "Success");
 
-				NickAlias *na = findnick(user);
+				NickAlias *na = NickAlias::Find(user);
 
 				Anope::string out;
 
@@ -127,18 +127,18 @@ class MyXMLRPCEvent : public XMLRPCEvent
 
 	void DoStats(XMLRPCServiceInterface *iface, HTTPClient *client, XMLRPCRequest &request)
 	{
-		request.reply("uptime", stringify(Anope::CurTime - start_time));
+		request.reply("uptime", stringify(Anope::CurTime - Anope::StartTime));
 		request.reply("uplinkname", Me->GetLinks().front()->GetName());
 		{
 			Anope::string buf;
-			for (std::set<Anope::string>::iterator it = Capab.begin(); it != Capab.end(); ++it)
+			for (std::set<Anope::string>::iterator it = Servers::Capab.begin(); it != Servers::Capab.end(); ++it)
 				buf += " " + *it;
 			if (!buf.empty())
 				buf.erase(buf.begin());
 			request.reply("uplinkcapab", buf);
 		}
-		request.reply("usercount", stringify(usercnt));
-		request.reply("maxusercount", stringify(maxusercnt));
+		request.reply("usercount", stringify(UserListByNick.size()));
+		request.reply("maxusercount", stringify(MaxUserCount));
 		request.reply("channelcount", stringify(ChannelList.size()));
 	}
 
@@ -147,7 +147,7 @@ class MyXMLRPCEvent : public XMLRPCEvent
 		if (request.data.empty())
 			return;
 
-		Channel *c = findchan(request.data[0]);
+		Channel *c = Channel::Find(request.data[0]);
 
 		request.reply("name", iface->Sanitize(c ? c->name : request.data[0]));
 
@@ -175,7 +175,7 @@ class MyXMLRPCEvent : public XMLRPCEvent
 			for (CUserList::const_iterator it = c->users.begin(); it != c->users.end(); ++it)
 			{
 				UserContainer *uc = *it;
-				users += uc->Status->BuildModePrefixList() + uc->user->nick + " ";
+				users += uc->status->BuildModePrefixList() + uc->user->nick + " ";
 			}
 			if (!users.empty())
 			{
@@ -199,7 +199,7 @@ class MyXMLRPCEvent : public XMLRPCEvent
 		if (request.data.empty())
 			return;
 
-		User *u = finduser(request.data[0]);
+		User *u = User::Find(request.data[0]);
 
 		request.reply("nick", iface->Sanitize(u ? u->nick : request.data[0]));
 
@@ -227,7 +227,7 @@ class MyXMLRPCEvent : public XMLRPCEvent
 			for (UChannelList::const_iterator it = u->chans.begin(); it != u->chans.end(); ++it)
 			{
 				ChannelContainer *cc = *it;
-				channels += cc->Status->BuildModePrefixList() + cc->chan->name + " ";
+				channels += cc->status->BuildModePrefixList() + cc->chan->name + " ";
 			}
 			if (!channels.empty())
 			{
@@ -253,7 +253,7 @@ class MyXMLRPCEvent : public XMLRPCEvent
 
 class ModuleXMLRPCMain : public Module
 {
-	service_reference<XMLRPCServiceInterface> xmlrpc;
+	ServiceReference<XMLRPCServiceInterface> xmlrpc;
 
 	MyXMLRPCEvent stats;
 

@@ -22,7 +22,7 @@ class CommandCSSync : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		ChannelInfo *ci = cs_findchan(params[0]);
+		ChannelInfo *ci = ChannelInfo::Find(params[0]);
 
 		if (ci == NULL)
 			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
@@ -35,7 +35,7 @@ class CommandCSSync : public Command
 			Log(LOG_COMMAND, source, this, ci);
 
 			for (CUserList::iterator it = ci->c->users.begin(), it_end = ci->c->users.end(); it != it_end; ++it)
-				chan_set_correct_modes((*it)->user, ci->c, 1, false);
+				ci->c->SetCorrectModes((*it)->user, true, false);
 
 			source.Reply(_("All user modes on \002%s\002 have been synced."), ci->name.c_str());
 		}

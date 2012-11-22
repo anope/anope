@@ -28,13 +28,13 @@ class CommandNSGetPass : public Command
 		Anope::string tmp_pass;
 		const NickAlias *na;
 
-		if (!(na = findnick(nick)))
+		if (!(na = NickAlias::Find(nick)))
 			source.Reply(NICK_X_NOT_REGISTERED, nick.c_str());
 		else if (Config->NSSecureAdmins && na->nc->IsServicesOper())
 			source.Reply(_("You may not get the password of other services operators."));
 		else
 		{
-			if (enc_decrypt(na->nc->pass, tmp_pass) == 1)
+			if (Anope::Decrypt(na->nc->pass, tmp_pass) == 1)
 			{
 				Log(LOG_ADMIN, source, this) << "for " << nick;
 				source.Reply(_("Password for %s is \002%s\002."), nick.c_str(), tmp_pass.c_str());
@@ -68,7 +68,7 @@ class NSGetPass : public Module
 		this->SetAuthor("Anope");
 
 		Anope::string tmp_pass = "plain:tmp";
-		if (enc_decrypt(tmp_pass, tmp_pass) == -1)
+		if (Anope::Decrypt(tmp_pass, tmp_pass) == -1)
 			throw ModuleException("Incompatible with the encryption module being used");
 
 	}

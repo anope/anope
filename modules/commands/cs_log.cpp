@@ -28,7 +28,7 @@ public:
 	{
 		const Anope::string &channel = params[0];
 
-		ChannelInfo *ci = cs_findchan(channel);
+		ChannelInfo *ci = ChannelInfo::Find(channel);
 		if (ci == NULL)
 			source.Reply(CHAN_X_NOT_REGISTERED, channel.c_str());
 		else if (!source.AccessFor(ci).HasPriv("SET") && !source.HasPriv("chanserv/set"))
@@ -40,7 +40,7 @@ public:
 			else
 			{
 				ListFormatter list;
-				list.addColumn("Number").addColumn("Service").addColumn("Command").addColumn("Method").addColumn("");
+				list.AddColumn("Number").AddColumn("Service").AddColumn("Command").AddColumn("Method").AddColumn("");
 
 				for (unsigned i = 0; i < ci->log_settings->size(); ++i)
 				{
@@ -52,7 +52,7 @@ public:
 					entry["Command"] = log->command_name;
 					entry["Method"] = log->method;
 					entry[""] = log->extra;
-					list.addEntry(entry);
+					list.AddEntry(entry);
 				}
 
 				source.Reply(_("Log list for %s:"), ci->name.c_str());
@@ -79,7 +79,7 @@ public:
 
 			Anope::string service = command.substr(0, sl),
 				command_name = command.substr(sl + 1);
-			BotInfo *bi = findbot(service);
+			BotInfo *bi = BotInfo::Find(service, true);
 
 			if (bi == NULL || bi->commands.count(command_name) == 0)
 			{
@@ -87,7 +87,7 @@ public:
 				return;
 			}
 
-			service_reference<Command> c_service("Command", bi->commands[command_name].name);
+			ServiceReference<Command> c_service("Command", bi->commands[command_name].name);
 			if (!c_service)
 			{
 				source.Reply(_("%s is not a valid command."), command.c_str());
@@ -117,7 +117,7 @@ public:
 				{
 					if (log->extra == extra)
 					{
-						log->destroy();
+						log->Destroy();
 						ci->log_settings->erase(ci->log_settings->begin() + i - 1);
 						Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to remove logging for " << command << " with method " << method << (extra == "" ? "" : " ") << extra;
 						source.Reply(_("Logging for command %s on %s with log method %s%s%s has been removed."), command_name.c_str(), bi->nick.c_str(), method.c_str(), extra.empty() ? "" : " ", extra.empty() ? "" : extra.c_str());
@@ -194,7 +194,7 @@ class CSLog : public Module
 
 	void OnLog(Log *l) anope_override
 	{
-		if (l->Type != LOG_COMMAND || l->u == NULL || l->c == NULL || l->ci == NULL || !Me || !Me->IsSynced())
+		if (l->type != LOG_COMMAND || l->u == NULL || l->c == NULL || l->ci == NULL || !Me || !Me->IsSynced())
 			return;
 
 		for (unsigned i = l->ci->log_settings->size(); i > 0; --i)
@@ -207,13 +207,13 @@ class CSLog : public Module
 
 				if (log->method.equals_ci("MESSAGE") && l->ci->c && l->ci->bi && l->ci->c->FindUser(l->ci->bi) != NULL)
 				{
-					ircdproto->SendPrivmsg(l->ci->bi, log->extra + l->ci->c->name, "%s", buffer.c_str());
+					IRCD->SendPrivmsg(l->ci->bi, log->extra + l->ci->c->name, "%s", buffer.c_str());
 					l->ci->bi->lastmsg = Anope::CurTime;
 				}
 				else if (log->method.equals_ci("NOTICE") && l->ci->c && l->ci->bi && l->ci->c->FindUser(l->ci->bi) != NULL)
-					ircdproto->SendNotice(l->ci->bi, log->extra + l->ci->c->name, "%s", buffer.c_str());
-				else if (log->method.equals_ci("MEMO") && memoserv && l->ci->WhoSends() != NULL)
-					memoserv->Send(l->ci->WhoSends()->nick, l->ci->name, buffer, true);
+					IRCD->SendNotice(l->ci->bi, log->extra + l->ci->c->name, "%s", buffer.c_str());
+				else if (log->method.equals_ci("MEMO") && MemoServService && l->ci->WhoSends() != NULL)
+					MemoServService->Send(l->ci->WhoSends()->nick, l->ci->name, buffer, true);
 			}
 		}
 	}

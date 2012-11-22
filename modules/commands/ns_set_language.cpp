@@ -24,7 +24,7 @@ class CommandNSSetLanguage : public Command
 
 	void Run(CommandSource &source, const Anope::string &user, const Anope::string &param)
 	{
-		const NickAlias *na = findnick(user);
+		const NickAlias *na = NickAlias::Find(user);
 		if (!na)
 		{
 			source.Reply(NICK_X_NOT_REGISTERED, user.c_str());
@@ -37,11 +37,11 @@ class CommandNSSetLanguage : public Command
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
-		for (unsigned j = 0; j < languages.size(); ++j)
+		for (unsigned j = 0; j < Language::Languages.size(); ++j)
 		{
-			if (param == "en" || languages[j] == param)
+			if (param == "en" || Language::Languages[j] == param)
 				break;
-			else if (j + 1 == languages.size())
+			else if (j + 1 == Language::Languages.size())
 			{
 				this->OnSyntaxError(source, "");
 				return;
@@ -69,12 +69,12 @@ class CommandNSSetLanguage : public Command
 				"supported languages:"));
 
 		source.Reply("         en (English)");
-		for (unsigned j = 0; j < languages.size(); ++j)
+		for (unsigned j = 0; j < Language::Languages.size(); ++j)
 		{
-			const Anope::string &langname = anope_gettext(languages[j].c_str(), _("English"));
+			const Anope::string &langname = Language::Translate(Language::Languages[j].c_str(), _("English"));
 			if (langname == "English")
 				continue;
-			source.Reply("         %s (%s)", languages[j].c_str(), langname.c_str());
+			source.Reply("         %s (%s)", Language::Languages[j].c_str(), langname.c_str());
 		}
 
 		return true;
@@ -104,12 +104,12 @@ class CommandNSSASetLanguage : public CommandNSSetLanguage
 				"\037language\037 should be chosen from the following list of\n"
 				"supported languages:"));
 		source.Reply("         en (English)");
-		for (unsigned j = 0; j < languages.size(); ++j)
+		for (unsigned j = 0; j < Language::Languages.size(); ++j)
 		{
-			const Anope::string &langname = anope_gettext(languages[j].c_str(), _("English"));
+			const Anope::string &langname = Language::Translate(Language::Languages[j].c_str(), _("English"));
 			if (langname == "English")
 				continue;
-			source.Reply("         %s (%s)", languages[j].c_str(), langname.c_str());
+			source.Reply("         %s (%s)", Language::Languages[j].c_str(), langname.c_str());
 		}
 		return true;
 	}

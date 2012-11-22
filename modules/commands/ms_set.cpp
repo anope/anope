@@ -86,7 +86,7 @@ class CommandMSSet : public Command
 			p2 = p3;
 			p3 = params.size() > 4 ? params[4] : "";
 
-			ci = cs_findchan(chan);
+			ci = ChannelInfo::Find(chan);
 			if (!ci)
 			{
 				source.Reply(CHAN_X_NOT_REGISTERED, chan.c_str());
@@ -104,7 +104,7 @@ class CommandMSSet : public Command
 			if (!p2.empty() && !p2.equals_ci("HARD") && chan.empty())
 			{
 				const NickAlias *na;
-				if (!(na = findnick(p1)))
+				if (!(na = NickAlias::Find(p1)))
 				{
 					source.Reply(NICK_X_NOT_REGISTERED, p1.c_str());
 					return;
@@ -211,7 +211,7 @@ class CommandMSSet : public Command
 		const Anope::string &cmd = params[0];
 		MemoInfo *mi = const_cast<MemoInfo *>(&source.nc->memos);
 
-		if (readonly)
+		if (Anope::ReadOnly)
 			source.Reply(_("Sorry, memo option setting is temporarily disabled."));
 		else if (cmd.equals_ci("NOTIFY"))
 			return this->DoNotify(source, params, mi);

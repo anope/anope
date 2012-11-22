@@ -7,6 +7,7 @@
  *
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
+ *
  */
 
 #ifndef SOCKETS_H
@@ -104,12 +105,12 @@ class CoreExport cidr
 class SocketException : public CoreException
 {
  public:
-	/** Default constructor for socket exceptions
+	/** Constructor for socket exceptions
 	 * @param message Error message
 	 */
 	SocketException(const Anope::string &message) : CoreException(message) { }
 
-	/** Default destructor
+	/** Destructor
 	 * @throws Nothing
 	 */
 	virtual ~SocketException() throw() { }
@@ -125,9 +126,6 @@ enum SocketFlag
 	SF_ACCEPTING,
 	SF_ACCEPTED
 };
-
-static const Anope::string SocketFlagStrings[] = { "SF_DEAD", "SF_WRITABLE", "SF_CONNECTING", "SF_CONNECTED", "SF_ACCEPTING", "SF_ACCEPTED", "" };
-
 
 class CoreExport SocketIO
 {
@@ -189,29 +187,29 @@ class CoreExport Socket : public Flags<SocketFlag>
 {
  protected:
 	/* Socket FD */
-	int Sock;
+	int sock;
 	/* Is this an IPv6 socket? */
-	bool IPv6;
+	bool ipv6;
 
  public:
 	/* Sockaddrs for bind() (if it's bound) */
 	sockaddrs bindaddr;
 
 	/* I/O functions used for this socket */
- 	SocketIO *IO;
+ 	SocketIO *io;
 
 	/** Empty constructor, should not be called.
 	 */
 	Socket();
 
-	/** Default constructor
+	/** Constructor, possibly creates the socket and adds it to the engine
 	 * @param sock The socket to use, -1 if we need to create our own
 	 * @param ipv6 true if using ipv6
 	 * @param type The socket type, defaults to SOCK_STREAM
 	 */
  	Socket(int sock, bool ipv6 = false, int type = SOCK_STREAM);
 
-	/** Default destructor
+	/** Destructor, closes the socket and removes it from the engine
 	 */
 	virtual ~Socket();
 
@@ -225,7 +223,7 @@ class CoreExport Socket : public Flags<SocketFlag>
 	 */
 	bool IsIPv6() const;
 
-	/** Mark a socket as blockig
+	/** Mark a socket as blocking
 	 * @return true if the socket is now blocking
 	 */
 	bool SetBlocking();
@@ -266,19 +264,14 @@ class CoreExport BufferedSocket : public virtual Socket
 {
  protected:
 	/* Things to be written to the socket */
-	Anope::string WriteBuffer;
+	Anope::string write_buffer;
 	/* Part of a message sent from the server, but not totally received */
-	Anope::string extrabuf;
-	/* How much data was received from this socket */
-	int RecvLen;
+	Anope::string extra_buf;
+	/* How much data was received from this socket on this recv() */
+	int recv_len;
 
  public:
-	/** Constructor
-	 */
 	BufferedSocket();
-
-	/** Default destructor
-	 */
 	virtual ~BufferedSocket();
 
 	/** Called when there is something to be received for this socket
@@ -330,15 +323,11 @@ class CoreExport BinarySocket : public virtual Socket
 		~DataBlock();
 	};
 
-	std::deque<DataBlock *> WriteBuffer;
+	/* Data to be written out */
+	std::deque<DataBlock *> write_buffer;
 
  public:
-	/** Constructor
-	 */
 	BinarySocket();
-
-	/** Default destructor
-	 */
 	virtual ~BinarySocket();
 
 	/** Called when there is something to be received for this socket
@@ -376,9 +365,6 @@ class CoreExport ListenSocket : public virtual Socket
 	 * @param ipv6 true for ipv6
 	 */
 	ListenSocket(const Anope::string &bindip, int port, bool ipv6);
-
-	/** Destructor
-	 */
 	virtual ~ListenSocket();
 
 	/** Process what has come in from the connection
@@ -435,7 +421,7 @@ class CoreExport ClientSocket : public virtual Socket
 {
  public:
 	/* Listen socket this connection came from */
-	ListenSocket *LS;
+	ListenSocket *ls;
 	/* Clients address */
 	sockaddrs clientaddr;
 
@@ -469,19 +455,14 @@ class CoreExport Pipe : public Socket
 {
  public:
  	/** The FD of the write pipe (if this isn't evenfd)
-	 * this->Sock is the readfd
+	 * this->sock is the readfd
 	 */
- 	int WritePipe;
+ 	int write_pipe;
 
- 	/** Constructor
-	 */
 	Pipe();
-
-	/** Destructor
-	 */
 	~Pipe();
 
-	/** Called when data is to be read
+	/** Called when data is to be read, reads the data then calls OnNotify
 	 */
 	bool ProcessRead() anope_override;
 
@@ -489,13 +470,13 @@ class CoreExport Pipe : public Socket
 	 */
 	void Notify();
 
-	/** Overload to do something useful
+	/** Called after ProcessRead comes back from Notify(), overload to do something useful
 	 */
 	virtual void OnNotify() = 0;
 };
 
 extern CoreExport uint32_t TotalRead;
 extern CoreExport uint32_t TotalWritten;
-extern CoreExport SocketIO normalSocketIO;
+extern CoreExport SocketIO NormalSocketIO;
 
 #endif // SOCKET_H

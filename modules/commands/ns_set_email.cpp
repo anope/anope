@@ -40,7 +40,7 @@ static bool SendConfirmMail(User *u, const BotInfo *bi)
 	message = message.replace_all_cs("%N", Config->NetworkName);
 	message = message.replace_all_cs("%c", code);
 
-	return Mail(u, u->Account(), bi, subject, message);
+	return Mail::Send(u, u->Account(), bi, subject, message);
 }
 
 class CommandNSSetEmail : public Command
@@ -54,7 +54,7 @@ class CommandNSSetEmail : public Command
 
 	void Run(CommandSource &source, const Anope::string &user, const Anope::string &param)
 	{
-		const NickAlias *na = findnick(user);
+		const NickAlias *na = NickAlias::Find(user);
 		if (!na)
 		{
 			source.Reply(NICK_X_NOT_REGISTERED, user.c_str());
@@ -72,7 +72,7 @@ class CommandNSSetEmail : public Command
 			source.Reply(_("You may not change the email of other services operators."));
 			return;
 		}
-		else if (!param.empty() && !MailValidate(param))
+		else if (!param.empty() && !Mail::Validate(param))
 		{
 			source.Reply(MAIL_X_INVALID, param.c_str());
 			return;

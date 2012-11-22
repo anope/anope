@@ -28,13 +28,13 @@ class CommandHSOff : public Command
 		if (!u)
 			return;
 
-		const NickAlias *na = findnick(u->nick);
+		const NickAlias *na = NickAlias::Find(u->nick);
 
 		if (!na || !na->HasVhost())
 			source.Reply(HOST_NOT_ASSIGNED);
 		else
 		{
-			ircdproto->SendVhostDel(u);
+			IRCD->SendVhostDel(u);
 			Log(LOG_COMMAND, source, this) << "to disable their vhost";
 			source.Reply(_("Your vhost was removed and the normal cloaking restored."));
 		}

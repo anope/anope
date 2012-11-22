@@ -44,12 +44,12 @@ class DNSServer : public Serializable
 	void Pool(bool p)
 	{
 		pooled = p;
-		if (DNSEngine)
-			DNSEngine->UpdateSerial();
+		if (DNS::Engine)
+			DNS::Engine->UpdateSerial();
 	}
 
 
-	Serialize::Data serialize() const anope_override
+	Serialize::Data Serialize() const anope_override
 	{
 		Serialize::Data data;
 
@@ -62,7 +62,7 @@ class DNSServer : public Serializable
 		return data;
 	}
 
-	static Serializable* unserialize(Serializable *obj, Serialize::Data &data)
+	static Serializable* Unserialize(Serializable *obj, Serialize::Data &data)
 	{
 		DNSServer *req;
 
@@ -104,7 +104,7 @@ class CommandOSDNS : public Command
 		}
 
 		ListFormatter lf;
-		lf.addColumn("Server").addColumn("IP").addColumn("Limit").addColumn("State");
+		lf.AddColumn("Server").AddColumn("IP").AddColumn("Limit").AddColumn("State");
 		for (unsigned i = 0; i < dns_servers.size(); ++i)
 		{
 			DNSServer *s = dns_servers[i];
@@ -129,7 +129,7 @@ class CommandOSDNS : public Command
 			else
 				entry["State"] = "Unpooled";
 
-			lf.addEntry(entry);
+			lf.AddEntry(entry);
 		}
 
 		std::vector<Anope::string> replies;
@@ -221,7 +221,7 @@ class CommandOSDNS : public Command
 		Log(LOG_ADMIN, source, this) << "to add IP " << params[2] << " to " << s->GetName();
 
 		if (s->Pooled())
-			DNSEngine->UpdateSerial();
+			DNS::Engine->UpdateSerial();
 	}
 	
 	void DelIP(CommandSource &source, const std::vector<Anope::string> &params)
@@ -248,7 +248,7 @@ class CommandOSDNS : public Command
 				}
 
 				if (s->Pooled())
-					DNSEngine->UpdateSerial();
+					DNS::Engine->UpdateSerial();
 
 				return;
 			}
@@ -388,7 +388,7 @@ class CommandOSDNS : public Command
 
 class ModuleDNS : public Module
 {
-	SerializeType dns_type;
+	Serialize::Type dns_type;
 	CommandOSDNS commandosdns;
 
 	time_t ttl;
@@ -400,7 +400,7 @@ class ModuleDNS : public Module
 
  public:
 	ModuleDNS(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, SUPPORTED),
-		dns_type("DNSServer", DNSServer::unserialize), commandosdns(this)
+		dns_type("DNSServer", DNSServer::Unserialize), commandosdns(this)
 	{
 		this->SetAuthor("Anope");
 
@@ -414,10 +414,10 @@ class ModuleDNS : public Module
 	{
 		ConfigReader config;
 
-		this->ttl = dotime(config.ReadValue("os_dns", "ttl", 0));
+		this->ttl = Anope::DoTime(config.ReadValue("os_dns", "ttl", 0));
 		this->user_drop_mark = config.ReadInteger("os_dns", "user_drop_mark", 0, false);
-		this->user_drop_time = dotime(config.ReadValue("os_dns", "user_drop_time", 0, false));
-		this->user_drop_readd_time = dotime(config.ReadValue("os_dns", "user_drop_readd_time", 0, false));
+		this->user_drop_time = Anope::DoTime(config.ReadValue("os_dns", "user_drop_time", 0, false));
+		this->user_drop_readd_time = Anope::DoTime(config.ReadValue("os_dns", "user_drop_readd_time", 0, false));
 		this->remove_split_servers = config.ReadFlag("os_dns", "remove_split_servers", 0);
 		this->readd_connected_servers = config.ReadFlag("os_dns", "readd_connected_servers", 0);
 	}
@@ -427,7 +427,7 @@ class ModuleDNS : public Module
 		if (this->readd_connected_servers)
 		{
 			DNSServer *dns = DNSServer::Find(s->GetName());
-			if (dns && !dns->Pooled() && !dns->GetIPs().empty() && dns->GetLimit() < s->Users)
+			if (dns && !dns->Pooled() && !dns->GetIPs().empty() && dns->GetLimit() < s->users)
 			{
 				dns->Pool(true);
 				Log(this) << "Pooling server " << s->GetName();
@@ -446,15 +446,15 @@ class ModuleDNS : public Module
 		}
 	}
 
-	void OnUserConnect(dynamic_reference<User> &u, bool &exempt) anope_override
+	void OnUserConnect(Reference<User> &u, bool &exempt) anope_override
 	{
 		if (u && u->server)
 		{
 			DNSServer *s = DNSServer::Find(u->server->GetName());
 			/* Check for user limit reached */
-			if (s && s->GetLimit() && s->Pooled() && u->server->Users >= s->GetLimit())
+			if (s && s->GetLimit() && s->Pooled() && u->server->users >= s->GetLimit())
 			{
-				Log(this) << "Depooling full server " << s->GetName() << ": " << u->server->Users << " users";
+				Log(this) << "Depooling full server " << s->GetName() << ": " << u->server->users << " users";
 				s->Pool(false);
 			}
 		}
@@ -469,7 +469,7 @@ class ModuleDNS : public Module
 				return;
 
 			/* Check for dropping under userlimit */
-			if (s->GetLimit() && !s->Pooled() && s->GetLimit() > u->server->Users)
+			if (s->GetLimit() && !s->Pooled() && s->GetLimit() > u->server->users)
 			{
 				Log(this) << "Pooling server " << s->GetName();
 				s->Pool(true);
@@ -505,13 +505,13 @@ class ModuleDNS : public Module
 		}
 	}
 
-	void OnDnsRequest(DNSPacket &req, DNSPacket *packet) anope_override
+	void OnDnsRequest(DNS::Packet &req, DNS::Packet *packet) anope_override
 	{
 		if (req.questions.empty())
 			return;
 		/* Currently we reply to any QR for A/AAAA */
-		const Question& q = req.questions[0];
-		if (q.type != DNS_QUERY_A && q.type != DNS_QUERY_AAAA && q.type != DNS_QUERY_AXFR)
+		const DNS::Question& q = req.questions[0];
+		if (q.type != DNS::QUERY_A && q.type != DNS::QUERY_AAAA && q.type != DNS::QUERY_AXFR)
 			return;
 
 		for (unsigned i = 0; i < dns_servers.size(); ++i)
@@ -522,11 +522,11 @@ class ModuleDNS : public Module
 
 			for (unsigned j = 0; j < s->GetIPs().size(); ++j)
 			{
-				QueryType q_type = s->GetIPs()[j].find(':') != Anope::string::npos ? DNS_QUERY_AAAA : DNS_QUERY_A;
+				DNS::QueryType q_type = s->GetIPs()[j].find(':') != Anope::string::npos ? DNS::QUERY_AAAA : DNS::QUERY_A;
 
-				if (q.type == DNS_QUERY_AXFR || q_type == q.type)
+				if (q.type == DNS::QUERY_AXFR || q_type == q.type)
 				{
-					ResourceRecord rr(q.name, q_type);
+					DNS::ResourceRecord rr(q.name, q_type);
 					rr.ttl = this->ttl;
 					rr.rdata = s->GetIPs()[j];
 					packet->answers.push_back(rr);
@@ -550,11 +550,11 @@ class ModuleDNS : public Module
 
 				for (unsigned j = 0; j < s->GetIPs().size(); ++j)
 				{
-					QueryType q_type = s->GetIPs()[j].find(':') != Anope::string::npos ? DNS_QUERY_AAAA : DNS_QUERY_A;
+					DNS::QueryType q_type = s->GetIPs()[j].find(':') != Anope::string::npos ? DNS::QUERY_AAAA : DNS::QUERY_A;
 
-					if (q.type == DNS_QUERY_AXFR || q_type == q.type)
+					if (q.type == DNS::QUERY_AXFR || q_type == q.type)
 					{
-						ResourceRecord rr(q.name, q_type);
+						DNS::ResourceRecord rr(q.name, q_type);
 						rr.ttl = this->ttl;
 						rr.rdata = s->GetIPs()[j];
 						packet->answers.push_back(rr);

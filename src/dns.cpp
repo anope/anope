@@ -7,6 +7,7 @@
  *
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
+ *
  */
 
 #include "services.h"
@@ -21,11 +22,13 @@
 #include <netdb.h>
 #endif
 
-DNSManager *DNSEngine = NULL;
+using namespace DNS;
+
+Manager *DNS::Engine = NULL;
 
 Question::Question()
 {
-	this->type = DNS_QUERY_NONE;
+	this->type = QUERY_NONE;
 	this->qclass = 0;
 }
 
@@ -45,22 +48,22 @@ ResourceRecord::ResourceRecord(const Question &q) : Question(q)
 	this->created = Anope::CurTime;
 }
 
-DNSQuery::DNSQuery()
+Query::Query()
 {
-	this->error = DNS_ERROR_NONE;
+	this->error = ERROR_NONE;
 }
 
-DNSQuery::DNSQuery(const Question &q)
+Query::Query(const Question &q)
 {
 	this->questions.push_back(q);
-	this->error = DNS_ERROR_NONE;
+	this->error = ERROR_NONE;
 }
 
-DNSRequest::DNSRequest(const Anope::string &addr, QueryType qt, bool cache, Module *c) : Timer(Config->DNSTimeout), Question(addr, qt), use_cache(cache), id(0), creator(c)
+Request::Request(const Anope::string &addr, QueryType qt, bool cache, Module *c) : Timer(Config->DNSTimeout), Question(addr, qt), use_cache(cache), id(0), creator(c)
 {
-	if (!DNSEngine || !DNSEngine->udpsock)
-		throw SocketException("No DNSEngine");
-	if (DNSEngine->udpsock->GetPackets().size() == 65535)
+	if (!DNS::Engine || !DNS::Engine->udpsock)
+		throw SocketException("No DNS::Engine");
+	if (DNS::Engine->udpsock->GetPackets().size() == 65535)
 		throw SocketException("DNS queue full");
 
 	do
@@ -68,51 +71,51 @@ DNSRequest::DNSRequest(const Anope::string &addr, QueryType qt, bool cache, Modu
 		static unsigned short cur_id = rand();
 		this->id = cur_id++;
 	}
-	while (DNSEngine->requests.count(this->id));
+	while (DNS::Engine->requests.count(this->id));
 
-	DNSEngine->requests[this->id] = this;
+	DNS::Engine->requests[this->id] = this;
 }
 
-DNSRequest::~DNSRequest()
+Request::~Request()
 {
-	DNSEngine->requests.erase(this->id);
+	DNS::Engine->requests.erase(this->id);
 }
 
-void DNSRequest::Process()
+void Request::Process()
 {
 	Log(LOG_DEBUG_2) << "Resolver: Processing request to lookup " << this->name << ", of type " << this->type;
 
-	if (!DNSEngine || !DNSEngine->udpsock)
-		throw SocketException("DNSEngine has not been initialized");
+	if (!DNS::Engine || !DNS::Engine->udpsock)
+		throw SocketException("DNS::Engine has not been initialized");
 
-	if (this->use_cache && DNSEngine->CheckCache(this))
+	if (this->use_cache && DNS::Engine->CheckCache(this))
 	{
 		Log(LOG_DEBUG_2) << "Resolver: Using cached result";
 		delete this;
 		return;
 	}
 	
-	DNSPacket *p = new DNSPacket(&DNSEngine->addrs);
-	p->flags = DNS_QUERYFLAGS_RD;
+	Packet *p = new Packet(&DNS::Engine->addrs);
+	p->flags = QUERYFLAGS_RD;
 
 	p->id = this->id;
 	p->questions.push_back(*this);
-	DNSEngine->udpsock->Reply(p);
+	DNS::Engine->udpsock->Reply(p);
 }
 
-void DNSRequest::OnError(const DNSQuery *r)
+void Request::OnError(const Query *r)
 {
 }
 
-void DNSRequest::Tick(time_t)
+void Request::Tick(time_t)
 {
 	Log(LOG_DEBUG_2) << "Resolver: timeout for query " << this->name;
-	DNSQuery rr(*this);
-	rr.error = DNS_ERROR_TIMEOUT;
+	Query rr(*this);
+	rr.error = ERROR_TIMEOUT;
 	this->OnError(&rr);
 } 
 
-void DNSPacket::PackName(unsigned char *output, unsigned short output_size, unsigned short &pos, const Anope::string &name)
+void Packet::PackName(unsigned char *output, unsigned short output_size, unsigned short &pos, const Anope::string &name)
 {
 	if (name.length() + 2 > output_size)
 		throw SocketException("Unable to pack name");
@@ -132,7 +135,7 @@ void DNSPacket::PackName(unsigned char *output, unsigned short output_size, unsi
 	output[pos++] = 0;
 }
 
-Anope::string DNSPacket::UnpackName(const unsigned char *input, unsigned short input_size, unsigned short &pos)
+Anope::string Packet::UnpackName(const unsigned char *input, unsigned short input_size, unsigned short &pos)
 {
 	Anope::string name;
 	unsigned short pos_ptr = pos, lowest_ptr = input_size;
@@ -145,9 +148,9 @@ Anope::string DNSPacket::UnpackName(const unsigned char *input, unsigned short i
 	{
 		unsigned short offset = input[pos_ptr];
 
-		if (offset & DNS_POINTER)
+		if (offset & POINTER)
 		{
-			if ((offset & DNS_POINTER) != DNS_POINTER)
+			if ((offset & POINTER) != POINTER)
 				throw SocketException("Unable to unpack name - bogus compression header");
 			if (pos_ptr + 1 >= input_size)
 				throw SocketException("Unable to unpack name - bogus compression header");
@@ -159,7 +162,7 @@ Anope::string DNSPacket::UnpackName(const unsigned char *input, unsigned short i
 				compressed = true;
 			}
 
-			pos_ptr = (offset & DNS_LABEL) << 8 | input[pos_ptr + 1];
+			pos_ptr = (offset & LABEL) << 8 | input[pos_ptr + 1];
 
 			/* Pointers can only go back */
 			if (pos_ptr >= lowest_ptr)
@@ -190,7 +193,7 @@ Anope::string DNSPacket::UnpackName(const unsigned char *input, unsigned short i
 	return name;
 }
 
-Question DNSPacket::UnpackQuestion(const unsigned char *input, unsigned short input_size, unsigned short &pos)
+Question Packet::UnpackQuestion(const unsigned char *input, unsigned short input_size, unsigned short &pos)
 {
 	Question question;
 
@@ -208,7 +211,7 @@ Question DNSPacket::UnpackQuestion(const unsigned char *input, unsigned short in
 	return question;
 }
 
-ResourceRecord DNSPacket::UnpackResourceRecord(const unsigned char *input, unsigned short input_size, unsigned short &pos)
+ResourceRecord Packet::UnpackResourceRecord(const unsigned char *input, unsigned short input_size, unsigned short &pos)
 {
 	ResourceRecord record = static_cast<ResourceRecord>(this->UnpackQuestion(input, input_size, pos));
 
@@ -223,7 +226,7 @@ ResourceRecord DNSPacket::UnpackResourceRecord(const unsigned char *input, unsig
 
 	switch (record.type)
 	{
-		case DNS_QUERY_A:
+		case QUERY_A:
 		{
 			if (pos + 4 > input_size)
 				throw SocketException("Unable to unpack resource record");
@@ -238,7 +241,7 @@ ResourceRecord DNSPacket::UnpackResourceRecord(const unsigned char *input, unsig
 			record.rdata = addrs.addr();
 			break;
 		}
-		case DNS_QUERY_AAAA:
+		case QUERY_AAAA:
 		{
 			if (pos + 16 > input_size)
 				throw SocketException("Unable to unpack resource record");
@@ -254,8 +257,8 @@ ResourceRecord DNSPacket::UnpackResourceRecord(const unsigned char *input, unsig
 			record.rdata = addrs.addr();
 			break;
 		}
-		case DNS_QUERY_CNAME:
-		case DNS_QUERY_PTR:
+		case QUERY_CNAME:
+		case QUERY_PTR:
 		{
 			record.rdata = this->UnpackName(input, input_size, pos);
 			break;
@@ -269,15 +272,15 @@ ResourceRecord DNSPacket::UnpackResourceRecord(const unsigned char *input, unsig
 	return record;
 }
 
-DNSPacket::DNSPacket(sockaddrs *a) : DNSQuery(), id(0), flags(0)
+Packet::Packet(sockaddrs *a) : Query(), id(0), flags(0)
 {
 	if (a)
 		addr = *a;
 }
 
-void DNSPacket::Fill(const unsigned char *input, const unsigned short len)
+void Packet::Fill(const unsigned char *input, const unsigned short len)
 {
-	if (len < DNSPacket::HEADER_LENGTH)
+	if (len < Packet::HEADER_LENGTH)
 		throw SocketException("Unable to fill packet");
 
 	unsigned short packet_pos = 0;
@@ -315,9 +318,9 @@ void DNSPacket::Fill(const unsigned char *input, const unsigned short len)
 		this->additional.push_back(this->UnpackResourceRecord(input, len, packet_pos));
 }
 
-unsigned short DNSPacket::Pack(unsigned char *output, unsigned short output_size)
+unsigned short Packet::Pack(unsigned char *output, unsigned short output_size)
 {
-	if (output_size < DNSPacket::HEADER_LENGTH)
+	if (output_size < Packet::HEADER_LENGTH)
 		throw SocketException("Unable to pack packet");
 	
 	unsigned short pos = 0;
@@ -339,7 +342,7 @@ unsigned short DNSPacket::Pack(unsigned char *output, unsigned short output_size
 	{
 		Question &q = this->questions[i];
 
-		if (q.type == DNS_QUERY_PTR)
+		if (q.type == QUERY_PTR)
 		{
 			sockaddrs ip(q.name);
 
@@ -411,7 +414,7 @@ unsigned short DNSPacket::Pack(unsigned char *output, unsigned short output_size
 
 			switch (rr.type)
 			{
-				case DNS_QUERY_A:
+				case QUERY_A:
 				{
 					if (pos + 6 > output_size)
 						throw SocketException("Unable to pack packet");
@@ -426,7 +429,7 @@ unsigned short DNSPacket::Pack(unsigned char *output, unsigned short output_size
 					pos += 4;
 					break;
 				}
-				case DNS_QUERY_AAAA:
+				case QUERY_AAAA:
 				{
 					if (pos + 18 > output_size)
 						throw SocketException("Unable to pack packet");
@@ -441,9 +444,9 @@ unsigned short DNSPacket::Pack(unsigned char *output, unsigned short output_size
 					pos += 16;
 					break;
 				}
-				case DNS_QUERY_NS:
-				case DNS_QUERY_CNAME:
-				case DNS_QUERY_PTR:
+				case QUERY_NS:
+				case QUERY_CNAME:
+				case QUERY_PTR:
 				{
 					if (pos + 2 >= output_size)
 						throw SocketException("Unable to pack packet");
@@ -457,7 +460,7 @@ unsigned short DNSPacket::Pack(unsigned char *output, unsigned short output_size
 					memcpy(&output[packet_pos_save], &s, 2);
 					break;
 				}
-				case DNS_QUERY_SOA:
+				case QUERY_SOA:
 				{
 					if (pos + 2 >= output_size)
 						throw SocketException("Unable to pack packet");
@@ -471,7 +474,7 @@ unsigned short DNSPacket::Pack(unsigned char *output, unsigned short output_size
 					if (pos + 20 >= output_size)
 						throw SocketException("Unable to pack SOA");
 
-					l = htonl(DNSEngine->GetSerial());
+					l = htonl(DNS::Engine->GetSerial());
 					memcpy(&output[pos], &l, 4);
 					pos += 4;
 					
@@ -504,25 +507,25 @@ unsigned short DNSPacket::Pack(unsigned char *output, unsigned short output_size
 	return pos;
 }
 
-DNSManager::TCPSocket::Client::Client(TCPSocket *ls, int fd, const sockaddrs &addr) : Socket(fd, ls->IsIPv6()), ClientSocket(ls, addr), Timer(5), tcpsock(ls), packet(NULL), length(0)
+Manager::TCPSocket::Client::Client(TCPSocket *l, int fd, const sockaddrs &addr) : Socket(fd, l->IsIPv6()), ClientSocket(l, addr), Timer(5), tcpsock(l), packet(NULL), length(0)
 {
 	Log(LOG_DEBUG_2) << "Resolver: New client from " << addr.addr();
 }
 
-DNSManager::TCPSocket::Client::~Client()
+Manager::TCPSocket::Client::~Client()
 {
 	Log(LOG_DEBUG_2) << "Resolver: Exiting client from " << clientaddr.addr();
 	delete packet;
 }
 
-void DNSManager::TCPSocket::Client::Reply(DNSPacket *p)
+void Manager::TCPSocket::Client::Reply(Packet *p)
 {
 	delete packet;
 	packet = p;
 	SocketEngine::Change(this, true, SF_WRITABLE);
 }
 
-bool DNSManager::TCPSocket::Client::ProcessRead()
+bool Manager::TCPSocket::Client::ProcessRead()
 {
 	Log(LOG_DEBUG_2) << "Resolver: Reading from DNS TCP socket";
 
@@ -536,12 +539,12 @@ bool DNSManager::TCPSocket::Client::ProcessRead()
 	if (length >= want_len - 2)
 	{
 		SocketEngine::Change(this, false, SF_READABLE);
-		return DNSEngine->HandlePacket(this, packet_buffer + 2, length - 2, NULL);
+		return DNS::Engine->HandlePacket(this, packet_buffer + 2, length - 2, NULL);
 	}
 	return true;
 }
 
-bool DNSManager::TCPSocket::Client::ProcessWrite()
+bool Manager::TCPSocket::Client::ProcessWrite()
 {
 	Log(LOG_DEBUG_2) << "Resolver: Writing to DNS TCP socket";
 
@@ -568,32 +571,32 @@ bool DNSManager::TCPSocket::Client::ProcessWrite()
 	return true; /* Do not return false here, bind is unhappy we close the connection so soon after sending */
 }
 
-DNSManager::TCPSocket::TCPSocket(const Anope::string &ip, int port) : Socket(-1, ip.find(':') != Anope::string::npos), ListenSocket(ip, port, ip.find(':') != Anope::string::npos)
+Manager::TCPSocket::TCPSocket(const Anope::string &ip, int port) : Socket(-1, ip.find(':') != Anope::string::npos), ListenSocket(ip, port, ip.find(':') != Anope::string::npos)
 {
 }
 
-ClientSocket *DNSManager::TCPSocket::OnAccept(int fd, const sockaddrs &addr)
+ClientSocket *Manager::TCPSocket::OnAccept(int fd, const sockaddrs &addr)
 {
 	return new Client(this, fd, addr);
 }
 
-DNSManager::UDPSocket::UDPSocket(const Anope::string &ip, int port) : Socket(-1, ip.find(':') != Anope::string::npos, SOCK_DGRAM)
+Manager::UDPSocket::UDPSocket(const Anope::string &ip, int port) : Socket(-1, ip.find(':') != Anope::string::npos, SOCK_DGRAM)
 {
 }
 
-DNSManager::UDPSocket::~UDPSocket()
+Manager::UDPSocket::~UDPSocket()
 {
 	for (unsigned i = 0; i < packets.size(); ++i)
 		delete packets[i];
 }
 
-void DNSManager::UDPSocket::Reply(DNSPacket *p)
+void Manager::UDPSocket::Reply(Packet *p)
 {
 	packets.push_back(p);
 	SocketEngine::Change(this, true, SF_WRITABLE);
 }
 
-bool DNSManager::UDPSocket::ProcessRead()
+bool Manager::UDPSocket::ProcessRead()
 {
 	Log(LOG_DEBUG_2) << "Resolver: Reading from DNS UDP socket";
 
@@ -601,14 +604,14 @@ bool DNSManager::UDPSocket::ProcessRead()
 	sockaddrs from_server;
 	socklen_t x = sizeof(from_server);
 	int length = recvfrom(this->GetFD(), reinterpret_cast<char *>(&packet_buffer), sizeof(packet_buffer), 0, &from_server.sa, &x);
-	return DNSEngine->HandlePacket(this, packet_buffer, length, &from_server);
+	return DNS::Engine->HandlePacket(this, packet_buffer, length, &from_server);
 }
 
-bool DNSManager::UDPSocket::ProcessWrite()
+bool Manager::UDPSocket::ProcessWrite()
 {
 	Log(LOG_DEBUG_2) << "Resolver: Writing to DNS UDP socket";
 
-	DNSPacket *r = !packets.empty() ? packets.front() : NULL;
+	Packet *r = !packets.empty() ? packets.front() : NULL;
 	if (r != NULL)
 	{
 		try
@@ -630,7 +633,7 @@ bool DNSManager::UDPSocket::ProcessWrite()
 	return true;
 }
 
-DNSManager::DNSManager(const Anope::string &nameserver, const Anope::string &ip, int port) : Timer(300, Anope::CurTime, true), listen(false), serial(0), tcpsock(NULL), udpsock(NULL)
+Manager::Manager(const Anope::string &nameserver, const Anope::string &ip, int port) : Timer(300, Anope::CurTime, true), listen(false), serial(0), tcpsock(NULL), udpsock(NULL)
 {
 	this->addrs.pton(nameserver.find(':') != Anope::string::npos ? AF_INET6 : AF_INET, nameserver, port);
 
@@ -640,7 +643,7 @@ DNSManager::DNSManager(const Anope::string &nameserver, const Anope::string &ip,
 	}
 	catch (const SocketException &ex)
 	{
-		Log() << "Unable to create socket for DNSManager: " << ex.GetReason();
+		Log() << "Unable to create socket for Manager: " << ex.GetReason();
 	}
 
 	try
@@ -652,23 +655,23 @@ DNSManager::DNSManager(const Anope::string &nameserver, const Anope::string &ip,
 	catch (const SocketException &ex)
 	{
 		/* This error can be from normal operation as most people don't use services to handle DNS queries, so put it in debug log */
-		Log(LOG_DEBUG) << "Unable to bind DNSManager to port " << port << ": " << ex.GetReason();
+		Log(LOG_DEBUG) << "Unable to bind Manager to port " << port << ": " << ex.GetReason();
 	}
 
 	this->UpdateSerial();
 }
 
-DNSManager::~DNSManager()
+Manager::~Manager()
 {
 	delete udpsock;
 	delete tcpsock;
 
-	for (std::map<unsigned short, DNSRequest *>::iterator it = this->requests.begin(), it_end = this->requests.end(); it != it_end; ++it)
+	for (std::map<unsigned short, Request *>::iterator it = this->requests.begin(), it_end = this->requests.end(); it != it_end; ++it)
 	{	
-		DNSRequest *request = it->second;
+		Request *request = it->second;
 
-		DNSQuery rr(*request);
-		rr.error = DNS_ERROR_UNKNOWN;
+		Query rr(*request);
+		rr.error = ERROR_UNKNOWN;
 		request->OnError(&rr);
 
 		delete request;
@@ -677,15 +680,15 @@ DNSManager::~DNSManager()
 
 	this->cache.clear();
 
-	DNSEngine = NULL;
+	DNS::Engine = NULL;
 }
 
-bool DNSManager::HandlePacket(ReplySocket *s, const unsigned char *const packet_buffer, int length, sockaddrs *from)
+bool Manager::HandlePacket(ReplySocket *s, const unsigned char *const packet_buffer, int length, sockaddrs *from)
 {
-	if (length < DNSPacket::HEADER_LENGTH)
+	if (length < Packet::HEADER_LENGTH)
 		return true;
 
-	DNSPacket recv_packet(from);
+	Packet recv_packet(from);
 
 	try
 	{
@@ -697,7 +700,7 @@ bool DNSManager::HandlePacket(ReplySocket *s, const unsigned char *const packet_
 		return true;
 	}
 
-	if (!(recv_packet.flags & DNS_QUERYFLAGS_QR))
+	if (!(recv_packet.flags & QUERYFLAGS_QR))
 	{
 		if (!listen)
 			return true;
@@ -707,9 +710,9 @@ bool DNSManager::HandlePacket(ReplySocket *s, const unsigned char *const packet_
 			return true;
 		}
 
-		DNSPacket *packet = new DNSPacket(recv_packet);
-		packet->flags |= DNS_QUERYFLAGS_QR; /* This is a reponse */
-		packet->flags |= DNS_QUERYFLAGS_AA; /* And we are authoritative */
+		Packet *packet = new Packet(recv_packet);
+		packet->flags |= QUERYFLAGS_QR; /* This is a reponse */
+		packet->flags |= QUERYFLAGS_AA; /* And we are authoritative */
 
 		packet->answers.clear();
 		packet->authorities.clear();
@@ -719,14 +722,14 @@ bool DNSManager::HandlePacket(ReplySocket *s, const unsigned char *const packet_
 		{
 			const Question& q = recv_packet.questions[i];
 
-			if (q.type == DNS_QUERY_AXFR || q.type == DNS_QUERY_SOA)
+			if (q.type == QUERY_AXFR || q.type == QUERY_SOA)
 			{
-				ResourceRecord rr(q.name, DNS_QUERY_SOA);
+				ResourceRecord rr(q.name, QUERY_SOA);
 				packet->answers.push_back(rr);
 
-				if (q.type == DNS_QUERY_AXFR)
+				if (q.type == QUERY_AXFR)
 				{
-					ResourceRecord rr2(q.name, DNS_QUERY_NS);
+					ResourceRecord rr2(q.name, QUERY_NS);
 					rr2.rdata = Config->DNSSOANS;
 					packet->answers.push_back(rr2);
 				}
@@ -740,9 +743,9 @@ bool DNSManager::HandlePacket(ReplySocket *s, const unsigned char *const packet_
 		{
 			const Question& q = recv_packet.questions[i];
 
-			if (q.type == DNS_QUERY_AXFR)
+			if (q.type == QUERY_AXFR)
 			{
-				ResourceRecord rr(q.name, DNS_QUERY_SOA);
+				ResourceRecord rr(q.name, QUERY_SOA);
 				packet->answers.push_back(rr);
 				break;
 			}
@@ -763,45 +766,45 @@ bool DNSManager::HandlePacket(ReplySocket *s, const unsigned char *const packet_
 		return true;
 	}
 
-	std::map<unsigned short, DNSRequest *>::iterator it = DNSEngine->requests.find(recv_packet.id);
-	if (it == DNSEngine->requests.end())
+	std::map<unsigned short, Request *>::iterator it = DNS::Engine->requests.find(recv_packet.id);
+	if (it == DNS::Engine->requests.end())
 	{
 		Log(LOG_DEBUG_2) << "Resolver: Received an answer for something we didn't request";
 		return true;
 	}
-	DNSRequest *request = it->second;
+	Request *request = it->second;
 
-	if (recv_packet.flags & DNS_QUERYFLAGS_OPCODE)
+	if (recv_packet.flags & QUERYFLAGS_OPCODE)
 	{
 		Log(LOG_DEBUG_2) << "Resolver: Received a nonstandard query";
-		recv_packet.error = DNS_ERROR_NONSTANDARD_QUERY;
+		recv_packet.error = ERROR_NONSTANDARD_QUERY;
 		request->OnError(&recv_packet);
 	}
-	else if (recv_packet.flags & DNS_QUERYFLAGS_RCODE)
+	else if (recv_packet.flags & QUERYFLAGS_RCODE)
 	{
-		DNSError error = DNS_ERROR_UNKNOWN;
+		Error error = ERROR_UNKNOWN;
 
-		switch (recv_packet.flags & DNS_QUERYFLAGS_RCODE)
+		switch (recv_packet.flags & QUERYFLAGS_RCODE)
 		{
 			case 1:
 				Log(LOG_DEBUG_2) << "Resolver: format error";
-				error = DNS_ERROR_FORMAT_ERROR;
+				error = ERROR_FORMAT_ERROR;
 				break;
 			case 2:
 				Log(LOG_DEBUG_2) << "Resolver: server error";
-				error = DNS_ERROR_SERVER_FAILURE;
+				error = ERROR_SERVER_FAILURE;
 				break;
 			case 3:
 				Log(LOG_DEBUG_2) << "Resolver: domain not found";
-				error = DNS_ERROR_DOMAIN_NOT_FOUND;
+				error = ERROR_DOMAIN_NOT_FOUND;
 				break;
 			case 4:
 				Log(LOG_DEBUG_2) << "Resolver: not implemented";
-				error = DNS_ERROR_NOT_IMPLEMENTED;
+				error = ERROR_NOT_IMPLEMENTED;
 				break;
 			case 5:
 				Log(LOG_DEBUG_2) << "Resolver: refused";
-				error = DNS_ERROR_REFUSED;
+				error = ERROR_REFUSED;
 				break;
 			default:
 				break;
@@ -813,21 +816,21 @@ bool DNSManager::HandlePacket(ReplySocket *s, const unsigned char *const packet_
 	else if (recv_packet.answers.empty())
 	{
 		Log(LOG_DEBUG_2) << "Resolver: No resource records returned";
-		recv_packet.error = DNS_ERROR_NO_RECORDS;
+		recv_packet.error = ERROR_NO_RECORDS;
 		request->OnError(&recv_packet);
 	}
 	else
 	{
 		Log(LOG_DEBUG_2) << "Resolver: Lookup complete for " << request->name;
 		request->OnLookupComplete(&recv_packet);
-		DNSEngine->AddCache(recv_packet);
+		DNS::Engine->AddCache(recv_packet);
 	}
 	
 	delete request;
 	return true;
 }
 
-void DNSManager::AddCache(DNSQuery &r)
+void Manager::AddCache(Query &r)
 {
 	for (unsigned i = 0; i < r.answers.size(); ++i)
 	{
@@ -837,12 +840,12 @@ void DNSManager::AddCache(DNSQuery &r)
 	}
 }
 
-bool DNSManager::CheckCache(DNSRequest *request)
+bool Manager::CheckCache(Request *request)
 {
 	cache_map::iterator it = this->cache.find(request->name);
 	if (it != this->cache.end())
 	{
-		DNSQuery record(*request);
+		Query record(*request);
 		
 		for (cache_map::iterator it_end = this->cache.upper_bound(request->name); it != it_end; ++it)
 		{
@@ -862,7 +865,7 @@ bool DNSManager::CheckCache(DNSRequest *request)
 	return false;
 }
 
-void DNSManager::Tick(time_t now)
+void Manager::Tick(time_t now)
 {
 	Log(LOG_DEBUG_2) << "Resolver: Purging DNS cache";
 
@@ -877,18 +880,18 @@ void DNSManager::Tick(time_t now)
 	}
 }
 
-void DNSManager::Cleanup(Module *mod)
+void Manager::Cleanup(Module *mod)
 {
-	for (std::map<unsigned short, DNSRequest *>::iterator it = this->requests.begin(), it_end = this->requests.end(); it != it_end;)
+	for (std::map<unsigned short, Request *>::iterator it = this->requests.begin(), it_end = this->requests.end(); it != it_end;)
 	{
 		unsigned short id = it->first;
-		DNSRequest *req = it->second;
+		Request *req = it->second;
 		++it;
 
 		if (req->creator && req->creator == mod)
 		{
-			DNSQuery rr(*req);
-			rr.error = DNS_ERROR_UNLOADED;
+			Query rr(*req);
+			rr.error = ERROR_UNLOADED;
 			req->OnError(&rr);
 
 			delete req;
@@ -897,25 +900,25 @@ void DNSManager::Cleanup(Module *mod)
 	}
 }
 
-void DNSManager::UpdateSerial()
+void Manager::UpdateSerial()
 {
 	serial = Anope::CurTime;
 }
 
-uint32_t DNSManager::GetSerial() const
+uint32_t Manager::GetSerial() const
 {
 	return serial;
 }
 
-DNSQuery DNSManager::BlockingQuery(const Anope::string &mask, QueryType qt)
+Query Manager::BlockingQuery(const Anope::string &mask, QueryType qt)
 {
 	Question question(mask, qt);
-	DNSQuery result(question);
+	Query result(question);
 
 	int type = AF_UNSPEC;
-	if (qt == DNS_QUERY_A)
+	if (qt == QUERY_A)
 		type = AF_INET;
-	else if (qt == DNS_QUERY_AAAA)
+	else if (qt == QUERY_AAAA)
 		type = AF_INET6;
 
 	addrinfo hints;

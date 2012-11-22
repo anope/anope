@@ -25,13 +25,13 @@ class CommandNSDrop : public Command
 	{
 		Anope::string nick = !params.empty() ? params[0] : "";
 
-		if (readonly)
+		if (Anope::ReadOnly)
 		{
 			source.Reply(_("Sorry, nickname de-registration is temporarily disabled."));
 			return;
 		}
 
-		NickAlias *na = findnick(!nick.empty() ? nick : source.GetNick());
+		NickAlias *na = NickAlias::Find(!nick.empty() ? nick : source.GetNick());
 		if (!na)
 		{
 			source.Reply(NICK_NOT_REGISTERED);
@@ -49,13 +49,13 @@ class CommandNSDrop : public Command
 			source.Reply(_("You may not drop other services operators nicknames."));
 		else
 		{
-			if (readonly)
+			if (Anope::ReadOnly)
 				source.Reply(READ_ONLY_MODE);
 
 			FOREACH_MOD(I_OnNickDrop, OnNickDrop(source, na));
 
 			Log(!is_mine ? LOG_OVERRIDE : LOG_COMMAND, source, this) << "to drop nickname " << na->nick << " (group: " << na->nc->display << ") (email: " << (!na->nc->email.empty() ? na->nc->email : "none") << ")";
-			na->destroy();
+			na->Destroy();
 
 			if (!is_mine)
 			{

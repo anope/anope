@@ -8,7 +8,6 @@
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
  *
- *
  */
 
 #ifndef SERVICES_H
@@ -65,14 +64,5 @@
 #else
 # include "anope_windows.h"
 #endif
-
-/**
- * RFC: defination of a valid nick
- * nickname =  ( letter / special ) *8( letter / digit / special / "-" )
- * letter   =  %x41-5A / %x61-7A ; A-Z / a-z
- * digit    =  %x30-39 ; 0-9
- * special  =  %x5B-60 / %x7B-7D ; "[", "]", "\", "`", "_", "^", "{", "|", "}"
- **/
-#define isvalidnick(c) (isalnum(c) || ((c) >= '\x5B' && (c) <= '\x60') || ((c) >= '\x7B' && (c) <= '\x7D') || (c) == '-')
 
 #endif // SERVICES_H

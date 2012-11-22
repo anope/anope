@@ -309,7 +309,7 @@ static dbFILE *open_db_read(const char *service, const char *filename, int versi
 	int myversion;
 
 	f = new dbFILE;
-	strscpy(f->filename, (db_dir + "/" + filename).c_str(), sizeof(f->filename));
+	strscpy(f->filename, (Anope::DataDir + "/" + filename).c_str(), sizeof(f->filename));
 	f->mode = 'r';
 	fp = fopen(f->filename, "rb");
 	if (!fp)
@@ -595,7 +595,7 @@ static void LoadNicks()
 
 			Anope::string core;
 			READ(read_string(core, f));
-			NickCore *nc = findcore(core);
+			NickCore *nc = NickCore::Find(core);
 			if (nc == NULL)
 			{
 				Log() << "Skipping coreless nick " << nick << " with core " << core;
@@ -634,7 +634,7 @@ static void LoadVHosts()
 		READ(read_string(creator, f));
 		READ(read_int32(&vtime, f));
 
-		NickAlias *na = findnick(nick);
+		NickAlias *na = NickAlias::Find(nick);
 		if (na == NULL)
 		{
 			Log() << "Removing vhost for nonexistant nick " << nick;
@@ -669,7 +669,7 @@ static void LoadBots()
 		READ(read_int32(&created, f));
 		READ(read_int16(&chancount, f));
 
-		BotInfo *bi = findbot(nick);
+		BotInfo *bi = BotInfo::Find(nick);
 		if (!bi)
 			bi = new BotInfo(nick, user, host, real);
 		bi->created = created;
@@ -698,10 +698,10 @@ static void LoadChannels()
 			ChannelInfo *ci = new ChannelInfo(namebuf);
 
 			READ(read_string(buffer, f));
-			ci->SetFounder(findcore(buffer));
+			ci->SetFounder(NickCore::Find(buffer));
 
 			READ(read_string(buffer, f));
-			ci->successor = findcore(buffer);
+			ci->successor = NickCore::Find(buffer);
 
 			char pwbuf[32];
 			READ(read_buffer(pwbuf, f));
@@ -777,7 +777,7 @@ static void LoadChannels()
 				ci->SetLevel(GetLevelName(j), level);
 			}
 
-			service_reference<AccessProvider> provider("AccessProvider", "access/access");
+			ServiceReference<AccessProvider> provider("AccessProvider", "access/access");
 			uint16_t tmpu16;
 			READ(read_uint16(&tmpu16, f));
 			for (uint16_t j = 0; j < tmpu16; ++j)
@@ -793,7 +793,7 @@ static void LoadChannels()
 					int16_t level;
 					READ(read_int16(&level, f));
 					if (access)
-						access->Unserialize(stringify(level));
+						access->AccessUnserialize(stringify(level));
 
 					Anope::string mask;
 					READ(read_string(mask, f));
@@ -858,7 +858,7 @@ static void LoadChannels()
 			READ(read_string(buffer, f));
 
 			READ(read_string(buffer, f));
-			ci->bi = findbot(buffer);
+			ci->bi = BotInfo::Find(buffer);
 
 			READ(read_int32(&tmp32, f));
 			if (tmp32 & OLD_BS_DONTKICKOPS)
@@ -981,7 +981,7 @@ static void LoadOper()
 			continue;
 
 		XLine *x = new XLine(user + "@" + host, by, expires, reason, XLineManager::GenerateUID());
-		x->Created = seton;
+		x->created = seton;
 		akill->AddXLine(x);
 	}
 
@@ -1001,7 +1001,7 @@ static void LoadOper()
 			continue;
 
 		XLine *x = new XLine(mask, by, expires, reason, XLineManager::GenerateUID());
-		x->Created = seton;
+		x->created = seton;
 		snline->AddXLine(x);
 	}
 
@@ -1021,7 +1021,7 @@ static void LoadOper()
 			continue;
 
 		XLine *x = new XLine(mask, by, expires, reason, XLineManager::GenerateUID());
-		x->Created = seton;
+		x->created = seton;
 		sqline->AddXLine(x);
 	}
 
@@ -1041,7 +1041,7 @@ static void LoadOper()
 			continue;
 
 		XLine *x = new XLine(mask, by, expires, reason, XLineManager::GenerateUID());
-		x->Created = seton;
+		x->created = seton;
 		szline->AddXLine(x);
 	}
 

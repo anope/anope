@@ -49,7 +49,7 @@ class BahamutIRCdProto : public IRCDProto
 
 	void SendModeInternal(const BotInfo *source, const Channel *dest, const Anope::string &buf) anope_override
 	{
-		if (Capab.count("TSMODE") > 0)
+		if (Servers::Capab.count("TSMODE") > 0)
 		{
 			if (source)
 				UplinkSocket::Message(source) << "MODE " << dest->name << " " << dest->creation_time << " " << buf;
@@ -93,13 +93,13 @@ class BahamutIRCdProto : public IRCDProto
 	/* SQLINE */
 	void SendSQLine(User *, const XLine *x) anope_override
 	{
-		UplinkSocket::Message() << "SQLINE " << x->Mask << " :" << x->GetReason();
+		UplinkSocket::Message() << "SQLINE " << x->mask << " :" << x->GetReason();
 	}
 
 	/* UNSLINE */
 	void SendSGLineDel(const XLine *x) anope_override
 	{
-		UplinkSocket::Message() << "UNSGLINE 0 :" << x->Mask;
+		UplinkSocket::Message() << "UNSGLINE 0 :" << x->mask;
 	}
 
 	/* UNSZLINE */
@@ -115,13 +115,13 @@ class BahamutIRCdProto : public IRCDProto
 	void SendSZLine(User *, const XLine *x) anope_override
 	{
 		// Calculate the time left before this would expire, capping it at 2 days
-		time_t timeleft = x->Expires - Anope::CurTime;
-		if (timeleft > 172800 || !x->Expires)
+		time_t timeleft = x->expires - Anope::CurTime;
+		if (timeleft > 172800 || !x->expires)
 			timeleft = 172800;
 		/* this will likely fail so its only here for legacy */
 		UplinkSocket::Message() << "SZLINE " << x->GetHost() << " :" << x->GetReason();
 		/* this is how we are supposed to deal with it */
-		UplinkSocket::Message() << "AKILL " << x->GetHost() << " * " << timeleft << " " << x->By << " " << Anope::CurTime << " :" << x->GetReason();
+		UplinkSocket::Message() << "AKILL " << x->GetHost() << " * " << timeleft << " " << x->by << " " << Anope::CurTime << " :" << x->GetReason();
 	}
 
 	/* SVSNOOP */
@@ -133,7 +133,7 @@ class BahamutIRCdProto : public IRCDProto
 	/* SGLINE */
 	void SendSGLine(User *, const XLine *x) anope_override
 	{
-		UplinkSocket::Message() << "SGLINE " << x->Mask.length() << " :" << x->Mask << ":" << x->GetReason();
+		UplinkSocket::Message() << "SGLINE " << x->mask.length() << " :" << x->mask << ":" << x->GetReason();
 	}
 
 	/* RAKILL */
@@ -148,7 +148,7 @@ class BahamutIRCdProto : public IRCDProto
 			if (x->GetUser() == "*")
 			{
 				sockaddrs(x->GetHost());
-				ircdproto->SendSZLineDel(x);
+				IRCD->SendSZLineDel(x);
 				return;
 			}
 		}
@@ -166,7 +166,7 @@ class BahamutIRCdProto : public IRCDProto
 	/* UNSQLINE */
 	void SendSQLineDel(const XLine *x) anope_override
 	{
-		UplinkSocket::Message() << "UNSQLINE " << x->Mask;
+		UplinkSocket::Message() << "UNSQLINE " << x->mask;
 	}
 
 	/* JOIN - SJOIN */
@@ -182,11 +182,11 @@ class BahamutIRCdProto : public IRCDProto
 			 */
 			UserContainer *uc = c->FindUser(user);
 			if (uc != NULL)
-				uc->Status->ClearFlags();
+				uc->status->ClearFlags();
 
-			BotInfo *setter = findbot(user->nick);
+			BotInfo *setter = BotInfo::Find(user->nick);
 			for (unsigned i = 0; i < ModeManager::ChannelModes.size(); ++i)
-				if (cs.HasFlag(ModeManager::ChannelModes[i]->Name))
+				if (cs.HasFlag(ModeManager::ChannelModes[i]->name))
 					c->SetMode(setter, ModeManager::ChannelModes[i], user->GetUID(), false);
 		}
 	}
@@ -210,10 +210,10 @@ class BahamutIRCdProto : public IRCDProto
 				return;
 
 			/* We can't akill x as it has a nick and/or realname included, so create a new akill for *@host */
-			x = new XLine("*@" + u->host, old->By, old->Expires, old->Reason, old->UID);
+			x = new XLine("*@" + u->host, old->by, old->expires, old->reason, old->id);
 			old->manager->AddXLine(x);
 
-			Log(findbot(Config->OperServ), "akill") << "AKILL: Added an akill for " << x->Mask << " because " << u->GetMask() << "#" << u->realname << " matches " << old->Mask;
+			Log(OperServ, "akill") << "AKILL: Added an akill for " << x->mask << " because " << u->GetMask() << "#" << u->realname << " matches " << old->mask;
 		}
 
 		/* ZLine if we can instead */
@@ -222,17 +222,17 @@ class BahamutIRCdProto : public IRCDProto
 			if (x->GetUser() == "*")
 			{
 				sockaddrs(x->GetHost());
-				ircdproto->SendSZLine(u, x);
+				IRCD->SendSZLine(u, x);
 				return;
 			}
 		}
 		catch (const SocketException &) { }
 
 		// Calculate the time left before this would expire, capping it at 2 days
-		time_t timeleft = x->Expires - Anope::CurTime;
+		time_t timeleft = x->expires - Anope::CurTime;
 		if (timeleft > 172800)
 			timeleft = 172800;
-		UplinkSocket::Message() << "AKILL " << x->GetHost() << " " << x->GetUser() << " " << timeleft << " " << x->By << " " << Anope::CurTime << " :" << x->GetReason();
+		UplinkSocket::Message() << "AKILL " << x->GetHost() << " " << x->GetUser() << " " << timeleft << " " << x->by << " " << Anope::CurTime << " :" << x->GetReason();
 	}
 
 	/*
@@ -270,7 +270,7 @@ class BahamutIRCdProto : public IRCDProto
 
 	void SendConnect() anope_override
 	{
-		UplinkSocket::Message() << "PASS " << Config->Uplinks[CurrentUplink]->password << " :TS";
+		UplinkSocket::Message() << "PASS " << Config->Uplinks[Anope::CurrentUplink]->password << " :TS";
 		UplinkSocket::Message() << "CAPAB SSJOIN NOQUIT BURST UNCONNECT NICKIP TSMODE TS3";
 		SendServer(Me);
 		/*
@@ -295,20 +295,18 @@ class BahamutIRCdProto : public IRCDProto
 
 	void SendLogin(User *u) anope_override
 	{
-		const BotInfo *ns = findbot(Config->NickServ);
-		ircdproto->SendMode(ns, u, "+d %d", u->timestamp);
+		IRCD->SendMode(NickServ, u, "+d %d", u->timestamp);
 	}
 
 	void SendLogout(User *u) anope_override
 	{
-		const BotInfo *ns = findbot(Config->NickServ);
-		ircdproto->SendMode(ns, u, "+d 1");
+		IRCD->SendMode(NickServ, u, "+d 1");
 	}
 };
 
 struct IRCDMessageBurst : IRCDMessage
 {
-	IRCDMessageBurst() : IRCDMessage("BURST", 0) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
+	IRCDMessageBurst(Module *creator) : IRCDMessage(creator, "BURST", 0) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
 
 	bool Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
 	{
@@ -327,14 +325,15 @@ struct IRCDMessageBurst : IRCDMessage
 
 struct IRCDMessageMode : IRCDMessage
 {
-	IRCDMessageMode(const Anope::string &n) : IRCDMessage(n, 2) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
+	IRCDMessageMode(Module *creator, const Anope::string &sname) : IRCDMessage(creator, sname, 2) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
 
 	bool Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		if (params.size() > 2 && ircdproto->IsChannelValid(params[0]))
+		if (params.size() > 2 && IRCD->IsChannelValid(params[0]))
 		{
-			Channel *c = findchan(params[0]);
+			Channel *c = Channel::Find(params[0]);
 			time_t ts = 0;
+
 			try
 			{
 				ts = convertTo<time_t>(params[1]);
@@ -346,7 +345,7 @@ struct IRCDMessageMode : IRCDMessage
 		}
 		else
 		{
-			User *u = finduser(params[0]);
+			User *u = User::Find(params[0]);
 			if (u)
 				u->SetModesInternal("%s", params[1].c_str());
 		}
@@ -375,7 +374,7 @@ struct IRCDMessageMode : IRCDMessage
  */
 struct IRCDMessageNick : IRCDMessage
 {
-	IRCDMessageNick() : IRCDMessage("NICK", 2) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
+	IRCDMessageNick(Module *creator) : IRCDMessage(creator, "NICK", 2) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
 
 	bool Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
 	{
@@ -389,18 +388,18 @@ struct IRCDMessageNick : IRCDMessage
 			}
 
 			User *user = new User(params[0], params[4], params[5], "", params[8], s, params[9], params[2].is_pos_number_only() ? convertTo<time_t>(params[2]) : 0, params[3]);
-			if (user && nickserv)
+			if (user && NickServService)
 			{
 				const NickAlias *na;
-				if (user->timestamp == convertTo<time_t>(params[7]) && (na = findnick(user->nick)))
+				if (user->timestamp == convertTo<time_t>(params[7]) && (na = NickAlias::Find(user->nick)))
 				{
 					NickCore *nc = na->nc;
 					user->Login(nc);
 					if (!Config->NoNicknameOwnership && na->nc->HasFlag(NI_UNCONFIRMED) == false)
-						user->SetMode(findbot(Config->NickServ), UMODE_REGISTERED);
+						user->SetMode(NickServ, UMODE_REGISTERED);
 				}
 				else
-					nickserv->Validate(user);
+					NickServService->Validate(user);
 			}
 		}
 		else
@@ -412,7 +411,7 @@ struct IRCDMessageNick : IRCDMessage
 
 struct IRCDMessageServer : IRCDMessage
 {
-	IRCDMessageServer() : IRCDMessage("SERVER", 3) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
+	IRCDMessageServer(Module *creator) : IRCDMessage(creator, "SERVER", 3) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
 
 	bool Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
 	{
@@ -424,77 +423,39 @@ struct IRCDMessageServer : IRCDMessage
 
 struct IRCDMessageSJoin : IRCDMessage
 {
-	IRCDMessageSJoin() : IRCDMessage("SJOIN", 2) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
+	IRCDMessageSJoin(Module *creator) : IRCDMessage(creator, "SJOIN", 2) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
 
 	bool Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		Channel *c = findchan(params[1]);
-		time_t ts = Anope::string(params[0]).is_pos_number_only() ? convertTo<time_t>(params[0]) : 0;
-		bool keep_their_modes = true;
-
-		if (!c)
-		{
-			c = new Channel(params[1], ts);
-			c->SetFlag(CH_SYNCING);
-		}
-		/* Our creation time is newer than what the server gave us */
-		else if (c->creation_time > ts)
-		{
-			c->creation_time = ts;
-			c->Reset();
-		}
-		/* Their TS is newer than ours, our modes > theirs, unset their modes if need be */
-		else if (ts > c->creation_time)
-			keep_their_modes = false;
-
-		/* If we need to keep their modes, and this SJOIN string contains modes */
-		if (keep_their_modes && params.size() >= 4)
-		{
-			/* Set the modes internally */
-			Anope::string modes;
+		Anope::string modes;
+		if (params.size() >= 4)
 			for (unsigned i = 2; i < params.size(); ++i)
 				modes += " " + params[i];
-			if (!modes.empty())
-				modes.erase(modes.begin());
-			c->SetModesInternal(source, modes);
-		}
+		if (!modes.empty())
+			modes.erase(modes.begin());
+
+		std::list<Message::Join::SJoinUser> users;
 
 		/* For some reason, bahamut will send a SJOIN from the user joining a channel
 		 * if the channel already existed
 		 */
-		if (!c->HasFlag(CH_SYNCING) && params.size() == 2)
+		if (source.GetUser())
 		{
-			User *u = source.GetUser();
-
-			EventReturn MOD_RESULT;
-			FOREACH_RESULT(I_OnPreJoinChannel, OnPreJoinChannel(u, c));
-
-			/* Add the user to the channel */
-			c->JoinUser(u);
-
-			/* Now set whatever modes this user is allowed to have on the channel */
-			chan_set_correct_modes(u, c, 1, true);
-
-			/* Check to see if modules want the user to join, if they do
-			 * check to see if they are allowed to join (CheckKick will kick/ban them)
-			 * Don't trigger OnJoinChannel event then as the user will be destroyed
-			 */
-			if (MOD_RESULT == EVENT_STOP && (!c->ci || !c->ci->CheckKick(u)))
-			{
-				FOREACH_MOD(I_OnJoinChannel, OnJoinChannel(u, c));
-			}
+			Message::Join::SJoinUser sju;
+			sju.second = source.GetUser();
+			users.push_back(sju);
 		}
 		else
 		{
 			spacesepstream sep(params[params.size() - 1]);
 			Anope::string buf;
+
 			while (sep.GetToken(buf))
 			{
-				std::list<ChannelMode *> Status;
-				char ch;
+				Message::Join::SJoinUser sju;
 
 				/* Get prefixes from the nick */
-				while ((ch = ModeManager::GetStatusChar(buf[0])))
+				for (char ch; (ch = ModeManager::GetStatusChar(buf[0]));)
 				{
 					buf.erase(buf.begin());
 					ChannelMode *cm = ModeManager::FindChannelModeByChar(ch);
@@ -504,50 +465,22 @@ struct IRCDMessageSJoin : IRCDMessage
 						continue;
 					}
 
-					if (keep_their_modes)
-						Status.push_back(cm);
+					sju.first.SetFlag(cm->name);
 				}
 
-				User *u = finduser(buf);
-				if (!u)
+				sju.second = User::Find(buf);
+				if (!sju.second)
 				{
-					Log(LOG_DEBUG) << "SJOIN for nonexistant user " << buf << " on " << c->name;
+					Log(LOG_DEBUG) << "SJOIN for nonexistant user " << buf << " on " << params[1];
 					continue;
 				}
 
-				EventReturn MOD_RESULT;
-				FOREACH_RESULT(I_OnPreJoinChannel, OnPreJoinChannel(u, c));
-
-				/* Add the user to the channel */
-				c->JoinUser(u);
-
-				/* Update their status internally on the channel
-				 * This will enforce secureops etc on the user
-				 */
-				for (std::list<ChannelMode *>::iterator it = Status.begin(), it_end = Status.end(); it != it_end; ++it)
-					c->SetModeInternal(source, *it, buf);
-
-				/* Now set whatever modes this user is allowed to have on the channel */
-				chan_set_correct_modes(u, c, 1, true);
-
-				/* Check to see if modules want the user to join, if they do
-				 * check to see if they are allowed to join (CheckKick will kick/ban them)
-				 * Don't trigger OnJoinChannel event then as the user will be destroyed
-				 */
-				if (MOD_RESULT != EVENT_STOP && c->ci && c->ci->CheckKick(u))
-					continue;
-
-				FOREACH_MOD(I_OnJoinChannel, OnJoinChannel(u, c));
+				users.push_back(sju);
 			}
 		}
 
-		/* Channel is done syncing */
-		if (c->HasFlag(CH_SYNCING))
-		{
-			/* Unset the syncing flag */
-			c->UnsetFlag(CH_SYNCING);
-			c->Sync();
-		}
+		time_t ts = Anope::string(params[0]).is_pos_number_only() ? convertTo<time_t>(params[0]) : Anope::CurTime;
+		Message::Join::SJoin(source, params[1], ts, modes, users);
 
 		return true;
 	}
@@ -555,11 +488,11 @@ struct IRCDMessageSJoin : IRCDMessage
 
 struct IRCDMessageTopic : IRCDMessage
 {
-	IRCDMessageTopic() : IRCDMessage("TOPIC", 4) { }
+	IRCDMessageTopic(Module *creator) : IRCDMessage(creator, "TOPIC", 4) { }
 
 	bool Run(MessageSource &, const std::vector<Anope::string> &params) anope_override
 	{
-		Channel *c = findchan(params[0]);
+		Channel *c = Channel::Find(params[0]);
 		if (c)
 			c->ChangeTopicInternal(params[1], params[3], Anope::string(params[2]).is_pos_number_only() ? convertTo<time_t>(params[2]) : Anope::CurTime);
 		return true;
@@ -571,23 +504,22 @@ class ProtoBahamut : public Module
 	BahamutIRCdProto ircd_proto;
 
 	/* Core message handlers */
-	CoreIRCDMessageAway core_message_away;
-	CoreIRCDMessageCapab core_message_capab;
-	CoreIRCDMessageError core_message_error;
-	CoreIRCDMessageJoin core_message_join;
-	CoreIRCDMessageKick core_message_kick;
-	CoreIRCDMessageKill core_message_kill;
-	CoreIRCDMessageMOTD core_message_motd;
-	CoreIRCDMessagePart core_message_part;
-	CoreIRCDMessagePing core_message_ping;
-	CoreIRCDMessagePrivmsg core_message_privmsg;
-	CoreIRCDMessageQuit core_message_quit;
-	CoreIRCDMessageSQuit core_message_squit;
-	CoreIRCDMessageStats core_message_stats;
-	CoreIRCDMessageTime core_message_time;
-	CoreIRCDMessageTopic core_message_topic;
-	CoreIRCDMessageVersion core_message_version;
-	CoreIRCDMessageWhois core_message_whois;
+	Message::Away message_away;
+	Message::Capab message_capab;
+	Message::Error message_error;
+	Message::Join message_join;
+	Message::Kick message_kick;
+	Message::Kill message_kill;
+	Message::MOTD message_motd;
+	Message::Part message_part;
+	Message::Ping message_ping;
+	Message::Privmsg message_privmsg;
+	Message::Quit message_quit;
+	Message::SQuit message_squit;
+	Message::Stats message_stats;
+	Message::Time message_time;
+	Message::Version message_version;
+	Message::Whois message_whois;
 
 	/* Our message handlers */
 	IRCDMessageBurst message_burst;
@@ -636,7 +568,13 @@ class ProtoBahamut : public Module
 
  public:
 	ProtoBahamut(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PROTOCOL),
-		message_mode("MODE"), message_svsmode("SVSMODE")
+		message_away(this), message_capab(this), message_error(this), message_join(this),
+		message_kick(this), message_kill(this), message_motd(this), message_part(this),
+		message_ping(this), message_privmsg(this), message_quit(this), message_squit(this),
+		message_stats(this), message_time(this), message_version(this), message_whois(this),
+
+		message_burst(this), message_mode(this, "MODE"), message_svsmode(this, "SVSMODE"),
+		message_nick(this), message_server(this), message_sjoin(this), message_topic(this)
 	{
 		this->SetAuthor("Anope");
 
@@ -645,10 +583,15 @@ class ProtoBahamut : public Module
 		ModuleManager::Attach(I_OnUserNickChange, this);
 	}
 
+	IRCDProto *GetIRCDProto() anope_override
+	{
+		return &ircd_proto;
+	}
+
 	void OnUserNickChange(User *u, const Anope::string &) anope_override
 	{
 		u->RemoveModeInternal(ModeManager::FindUserModeByName(UMODE_REGISTERED));
-		ircdproto->SendLogout(u);
+		IRCD->SendLogout(u);
 	}
 };
 

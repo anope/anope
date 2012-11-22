@@ -41,7 +41,7 @@ class CommandNSSet : public Command
 
 			if (c_name.find_ci(this_name + " ") == 0)
 			{
-				service_reference<Command> command("Command", info.name);
+				ServiceReference<Command> command("Command", info.name);
 				if (command)
 				{
 					source.command = c_name;
@@ -81,9 +81,9 @@ class CommandNSSetPassword : public Command
 			return;
 		}
 
-		enc_encrypt(param, source.nc->pass);
+		Anope::Encrypt(param, source.nc->pass);
 		Anope::string tmp_pass;
-		if (enc_decrypt(source.nc->pass, tmp_pass) == 1)
+		if (Anope::Decrypt(source.nc->pass, tmp_pass) == 1)
 			source.Reply(_("Password for \002%s\002 changed to \002%s\002."), source.nc->display.c_str(), tmp_pass.c_str());
 		else
 			source.Reply(_("Password for \002%s\002 changed."), source.nc->display.c_str());

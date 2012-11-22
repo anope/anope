@@ -1,15 +1,15 @@
-/* Modular support
+/*
  *
  * (C) 2008-2012 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
+ *
  */
 
 #ifndef REGCHANNEL_H
 #define REGCHANNEL_H
 
-#include "botserv.h"
 #include "memo.h"
 #include "modes.h"
 #include "extensible.h"
@@ -20,7 +20,7 @@
 
 typedef Anope::hash_map<ChannelInfo *> registered_channel_map;
 
-extern CoreExport serialize_checker<registered_channel_map> RegisteredChannelList;
+extern CoreExport Serialize::Checker<registered_channel_map> RegisteredChannelList;
 
 /** Flags used for the ChannelInfo class
  */
@@ -68,10 +68,57 @@ enum ChannelInfoFlag
 	CI_END
 };
 
-const Anope::string ChannelInfoFlagStrings[] = {
-	"BEGIN", "KEEPTOPIC", "SECUREOPS", "PRIVATE", "TOPICLOCK", "RESTRICTED",
-	"PEACE", "SECURE", "NO_EXPIRE", "MEMO_HARDMAX", "SECUREFOUNDER",
-	"SIGNKICK", "SIGNKICK_LEVEL", "SUSPENDED", "PERSIST", "STATS", "NOAUTOOP", ""
+/* BotServ SET flags (ChannelInfo::botflags) */
+enum BotServFlag
+{
+	BS_BEGIN,
+	/* BotServ won't kick ops */
+	BS_DONTKICKOPS,
+	/* BotServ won't kick voices */
+	BS_DONTKICKVOICES,
+	/* BotServ bot accepts fantasy commands */
+	BS_FANTASY,
+	/* BotServ should show greets */
+	BS_GREET,
+	/* BotServ bots are not allowed to be in this channel */
+	BS_NOBOT,
+	/* BotServ kicks for bolds */
+	BS_KICK_BOLDS,
+	/* BotServ kicks for colors */
+	BS_KICK_COLORS,
+	/* BOtServ kicks for reverses */
+	BS_KICK_REVERSES,
+	/* BotServ kicks for underlines */
+	BS_KICK_UNDERLINES,
+	/* BotServ kicks for badwords */
+	BS_KICK_BADWORDS,
+	/* BotServ kicks for caps */
+	BS_KICK_CAPS,
+	/* BotServ kicks for flood */
+	BS_KICK_FLOOD,
+	/* BotServ kicks for repeating */
+	BS_KICK_REPEAT,
+	/* BotServ kicks for italics */
+	BS_KICK_ITALICS,
+	/* BotServ kicks for amsgs */
+	BS_KICK_AMSGS,
+	BS_END
+};
+
+/* Indices for TTB (Times To Ban) */
+enum
+{
+	TTB_BOLDS,
+	TTB_COLORS,
+	TTB_REVERSES,
+	TTB_UNDERLINES,
+	TTB_BADWORDS,
+	TTB_CAPS,
+	TTB_FLOOD,
+	TTB_REPEAT,
+	TTB_ITALICS,
+	TTB_AMSGS,
+	TTB_SIZE
 };
 
 /** Flags for badwords
@@ -96,8 +143,8 @@ struct CoreExport BadWord : Serializable
 	BadWordType type;
 
 	BadWord() : Serializable("BadWord") { }
-	Serialize::Data serialize() const anope_override;
-	static Serializable* unserialize(Serializable *obj, Serialize::Data &);
+	Serialize::Data Serialize() const anope_override;
+	static Serializable* Unserialize(Serializable *obj, Serialize::Data &);
 };
 
 /** Flags for auto kick
@@ -108,31 +155,31 @@ enum AutoKickFlag
 	AK_ISNICK
 };
 
-const Anope::string AutoKickFlagString[] = { "AK_ISNICK", "" };
-
 /* AutoKick data. */
 class CoreExport AutoKick : public Flags<AutoKickFlag>, public Serializable
 {
  public:
- 	AutoKick();
-	serialize_obj<ChannelInfo> ci;
-	/* Only one of these can be in use */
+	/* Channel this autokick is on */
+	Serialize::Reference<ChannelInfo> ci;
+
+	/* Only one of these can be in use. if HasFlag(AK_ISNICK) then nc is in use */
 	Anope::string mask;
-	serialize_obj<NickCore> nc;
+	Serialize::Reference<NickCore> nc;
 
 	Anope::string reason;
 	Anope::string creator;
 	time_t addtime;
 	time_t last_used;
 
-	Serialize::Data serialize() const anope_override;
-	static Serializable* unserialize(Serializable *obj, Serialize::Data &);
+ 	AutoKick();
+	Serialize::Data Serialize() const anope_override;
+	static Serializable* Unserialize(Serializable *obj, Serialize::Data &);
 };
 
 struct CoreExport ModeLock : Serializable
 {
  public:
-	serialize_obj<ChannelInfo> ci;
+	Serialize::Reference<ChannelInfo> ci;
 	bool set;
 	ChannelModeName name;
 	Anope::string param;
@@ -141,13 +188,13 @@ struct CoreExport ModeLock : Serializable
 
 	ModeLock(ChannelInfo *ch, bool s, ChannelModeName n, const Anope::string &p, const Anope::string &se = "", time_t c = Anope::CurTime);
 
-	Serialize::Data serialize() const anope_override;
-	static Serializable* unserialize(Serializable *obj, Serialize::Data &);
+	Serialize::Data Serialize() const anope_override;
+	static Serializable* Unserialize(Serializable *obj, Serialize::Data &);
 };
 
 struct CoreExport LogSetting : Serializable
 {
-	serialize_obj<ChannelInfo> ci;
+	Serialize::Reference<ChannelInfo> ci;
 	/* Our service name of the command */
 	Anope::string service_name;
 	/* The name of the client the command is on */
@@ -159,26 +206,52 @@ struct CoreExport LogSetting : Serializable
 	time_t created;
 
 	LogSetting() : Serializable("LogSetting") { }
-	Serialize::Data serialize() const anope_override;
-	static Serializable* unserialize(Serializable *obj, Serialize::Data &);
+	Serialize::Data Serialize() const anope_override;
+	static Serializable* Unserialize(Serializable *obj, Serialize::Data &);
 };
 
 /* It matters that Base is here before Extensible (it is inherited by Serializable) */
-class CoreExport ChannelInfo : public Serializable, public Extensible, public Flags<ChannelInfoFlag, CI_END>
+class CoreExport ChannelInfo : public Serializable, public Extensible, public Flags<ChannelInfoFlag>
 {
  private:
-	serialize_obj<NickCore> founder;					/* Channel founder */
-	serialize_checker<std::vector<ChanAccess *> > access;			/* List of authorized users */
-	serialize_checker<std::vector<AutoKick *> > akick;			/* List of users to kickban */
-	serialize_checker<std::vector<BadWord *> > badwords;			/* List of badwords */
+	Serialize::Reference<NickCore> founder;					/* Channel founder */
+	Serialize::Checker<std::vector<ChanAccess *> > access;			/* List of authorized users */
+	Serialize::Checker<std::vector<AutoKick *> > akick;			/* List of users to kickban */
+	Serialize::Checker<std::vector<BadWord *> > badwords;			/* List of badwords */
 	std::map<Anope::string, int16_t> levels;
 
  public:
 	typedef std::multimap<ChannelModeName, ModeLock *> ModeList;
-	serialize_checker<ModeList> mode_locks;
-	serialize_checker<std::vector<LogSetting *> > log_settings;
+	Serialize::Checker<ModeList> mode_locks;
+	Serialize::Checker<std::vector<LogSetting *> > log_settings;
 
- 	/** Default constructor
+	Anope::string name;                       /* Channel name */
+	Serialize::Reference<NickCore> successor; /* Who gets the channel if the founder nick is dropped or expires */
+	Anope::string desc;
+
+	time_t time_registered;
+	time_t last_used;
+
+	Anope::string last_topic;                 /* The last topic that was set on this channel */
+	Anope::string last_topic_setter;          /* Setter */
+	time_t last_topic_time;	                  /* Time */
+
+	int16_t bantype;
+
+	MemoInfo memos;
+
+	Channel *c;                               /* Pointer to channel, if the channel exists */
+
+	/* For BotServ */
+	Serialize::Reference<BotInfo> bi;         /* Bot used on this channel */
+	Flags<BotServFlag> botflags;
+	int16_t ttb[TTB_SIZE];                    /* Times to ban for each kicker */
+
+	int16_t capsmin, capspercent;	          /* For CAPS kicker */
+	int16_t floodlines, floodsecs;            /* For FLOOD kicker */
+	int16_t repeattimes;                      /* For REPEAT kicker */
+
+ 	/** Constructor
 	 * @param chname The channel name
 	 */
 	ChannelInfo(const Anope::string &chname);
@@ -188,38 +261,10 @@ class CoreExport ChannelInfo : public Serializable, public Extensible, public Fl
 	 */
 	ChannelInfo(const ChannelInfo &ci);
 
-	/** Default destructor
-	 */
 	~ChannelInfo();
 
-	Anope::string name; /* Channel name */
-	serialize_obj<NickCore> successor; /* Who gets the channel if the founder nick is dropped or expires */
-	Anope::string desc;
-
-	time_t time_registered;
-	time_t last_used;
-
-	Anope::string last_topic;		/* The last topic that was set on this channel */
-	Anope::string last_topic_setter;	/* Setter */
-	time_t last_topic_time;			/* Time */
-
-	int16_t bantype;
-
-	MemoInfo memos;
-
-	Channel *c; /* Pointer to channel record (if channel is currently in use) */
-
-	/* For BotServ */
-	serialize_obj<BotInfo> bi;					/* Bot used on this channel */
-	Flags<BotServFlag> botflags;
-	int16_t ttb[TTB_SIZE];			/* Times to ban for each kicker */
-
-	int16_t capsmin, capspercent;	/* For CAPS kicker */
-	int16_t floodlines, floodsecs;	/* For FLOOD kicker */
-	int16_t repeattimes;			/* For REPEAT kicker */
-
-	Serialize::Data serialize() const anope_override;
-	static Serializable* unserialize(Serializable *obj, Serialize::Data &);
+	Serialize::Data Serialize() const anope_override;
+	static Serializable* Unserialize(Serializable *obj, Serialize::Data &);
 
 	/** Change the founder of the channek
 	 * @params nc The new founder
@@ -440,11 +485,26 @@ class CoreExport ChannelInfo : public Serializable, public Extensible, public Fl
 	/** Clear all privileges from the channel
 	 */
 	void ClearLevels();
+
+	/** Gets a ban mask for the given user based on the bantype
+	 * of the channel.
+	 * @param u The user
+	 * @return A ban mask that affects the user
+	 */
+	Anope::string GetIdealBan(User *u) const;
+
+	/** Finds a ChannelInfo 
+	 * @param name channel name to lookup
+	 * @return the ChannelInfo associated with the channel
+	 */
+	static ChannelInfo* Find(const Anope::string &name);
 };
 
-extern CoreExport ChannelInfo *cs_findchan(const Anope::string &chan);
+/** Is the user the real founder?
+ * @param user The user
+ * @param ci The channel
+ * @return true or false
+ */
 extern CoreExport bool IsFounder(const User *user, const ChannelInfo *ci);
-extern CoreExport void update_cs_lastseen(User *user, ChannelInfo *ci);
-extern CoreExport int get_idealban(const ChannelInfo *ci, User *u, Anope::string &ret);
 
 #endif // REGCHANNEL_H

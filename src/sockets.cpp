@@ -7,6 +7,7 @@
  *
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
+ *
  */
 
 #include "services.h"
@@ -20,15 +21,18 @@
 #include <fcntl.h>
 #endif
 
+static const Anope::string SocketFlagStrings[] = {
+	"SF_DEAD", "SF_WRITABLE", "SF_CONNECTING", "SF_CONNECTED", "SF_ACCEPTING", "SF_ACCEPTED", ""
+};
+template<> const Anope::string* Flags<SocketFlag>::flags_strings = SocketFlagStrings;
+
 std::map<int, Socket *> SocketEngine::Sockets;
 
 uint32_t TotalRead = 0;
 uint32_t TotalWritten = 0;
 
-SocketIO normalSocketIO;
+SocketIO NormalSocketIO;
 
-/** Construct the object, sets everything to 0
- */
 sockaddrs::sockaddrs(const Anope::string &address)
 {
 	this->clear();
@@ -36,16 +40,11 @@ sockaddrs::sockaddrs(const Anope::string &address)
 		this->pton(address.find(':') != Anope::string::npos ? AF_INET6 : AF_INET, address);
 }
 
-/** Memset the object to 0
- */
 void sockaddrs::clear()
 {
 	memset(this, 0, sizeof(*this));
 }
 
-/** Get the size of the sockaddr we represent
- * @return The size
- */
 size_t sockaddrs::size() const
 {
 	switch (sa.sa_family)
@@ -61,9 +60,6 @@ size_t sockaddrs::size() const
 	return 0;
 }
 
-/** Get the port represented by this addr
- * @return The port, or -1 on fail
- */
 int sockaddrs::port() const
 {
 	switch (sa.sa_family)
@@ -79,9 +75,6 @@ int sockaddrs::port() const
 	return -1;
 }
 
-/** Get the address represented by this addr
- * @return The address
- */
 Anope::string sockaddrs::addr() const
 {
 	char address[INET6_ADDRSTRLEN + 1] = "";
@@ -103,16 +96,11 @@ Anope::string sockaddrs::addr() const
 	return address;
 }
 
-/** Check if this sockaddr has data in it
- */
 bool sockaddrs::operator()() const
 {
 	return this->sa.sa_family != 0;
 }
 
-/** Compares with sockaddr with another. Compares address type, port, and address
- * @return true if they are the same
- */
 bool sockaddrs::operator==(const sockaddrs &other) const
 {
 	if (sa.sa_family != other.sa.sa_family)
@@ -130,12 +118,6 @@ bool sockaddrs::operator==(const sockaddrs &other) const
 	return false;
 }
 
-/** The equivalent of inet_pton
- * @param type AF_INET or AF_INET6
- * @param address The address to place in the sockaddr structures
- * @param pport An option port to include in the  sockaddr structures
- * @throws A socket exception if given invalid IPs
- */
 void sockaddrs::pton(int type, const Anope::string &address, int pport)
 {
 	switch (type)
@@ -169,11 +151,6 @@ void sockaddrs::pton(int type, const Anope::string &address, int pport)
 	throw CoreException("Invalid socket type");
 }
 
-/** The equivalent of inet_ntop
- * @param type AF_INET or AF_INET6
- * @param address The in_addr or in_addr6 structure
- * @throws A socket exception if given an invalid structure
- */
 void sockaddrs::ntop(int type, const void *src)
 {
 	switch (type)
@@ -333,12 +310,6 @@ size_t cidr::hash::operator()(const cidr &s) const
 	}
 }
 
-/** Receive something from the buffer
- * @param s The socket
- * @param buf The buf to read to
- * @param sz How much to read
- * @return Number of bytes received
- */
 int SocketIO::Recv(Socket *s, char *buf, size_t sz)
 {
 	size_t i = recv(s->GetFD(), buf, sz, 0);
@@ -346,26 +317,18 @@ int SocketIO::Recv(Socket *s, char *buf, size_t sz)
 	return i;
 }
 
-/** Write something to the socket
- * @param s The socket
- * @param buf The data to write
- * @param size The length of the data
- */
 int SocketIO::Send(Socket *s, const char *buf, size_t sz)
 {
 	size_t i = send(s->GetFD(), buf, sz, 0);
 	TotalWritten += i;
 	return i;
 }
+
 int SocketIO::Send(Socket *s, const Anope::string &buf)
 {
 	return this->Send(s, buf.c_str(), buf.length());
 }
 
-/** Accept a connection from a socket
- * @param s The socket
- * @return The new client socket
- */
 ClientSocket *SocketIO::Accept(ListenSocket *s)
 {
 	sockaddrs conaddr;
@@ -384,20 +347,11 @@ ClientSocket *SocketIO::Accept(ListenSocket *s)
 		throw SocketException("Unable to accept connection: " + Anope::LastError());
 }
 
-/** Finished accepting a connection from a socket
- * @param s The socket
- * @return SF_ACCEPTED if accepted, SF_ACCEPTING if still in process, SF_DEAD on error
- */
 SocketFlag SocketIO::FinishAccept(ClientSocket *cs)
 {
 	return SF_ACCEPTED;
 }
 
-/** Bind a socket
- * @param s The socket
- * @param ip The IP to bind to
- * @param port The optional port to bind to
- */
 void SocketIO::Bind(Socket *s, const Anope::string &ip, int port)
 {
 	s->bindaddr.pton(s->IsIPv6() ? AF_INET6 : AF_INET, ip, port);
@@ -405,11 +359,6 @@ void SocketIO::Bind(Socket *s, const Anope::string &ip, int port)
 		throw SocketException("Unable to bind to address: " + Anope::LastError());
 }
 
-/** Connect the socket
-  * @param s THe socket
-  * @param target IP to connect to
-  * @param port to connect to
-  */
 void SocketIO::Connect(ConnectionSocket *s, const Anope::string &target, int port)
 {
 	s->UnsetFlag(SF_CONNECTING);
@@ -433,10 +382,6 @@ void SocketIO::Connect(ConnectionSocket *s, const Anope::string &target, int por
 	}
 }
 
-/** Called to potentially finish a pending connection
- * @param s The socket
- * @return SF_CONNECTED on success, SF_CONNECTING if still pending, and SF_DEAD on error.
- */
 SocketFlag SocketIO::FinishConnect(ConnectionSocket *s)
 {
 	if (s->HasFlag(SF_CONNECTED))
@@ -461,148 +406,102 @@ SocketFlag SocketIO::FinishConnect(ConnectionSocket *s)
 	}
 }
 
-/** Empty constructor, should not be called.
- */
-Socket::Socket() : Flags<SocketFlag>(SocketFlagStrings)
+Socket::Socket()
 {
 	throw CoreException("Socket::Socket() ?");
 }
 
-/** Constructor
- * @param sock The socket
- * @param ipv6 IPv6?
- * @param type The socket type, defaults to SOCK_STREAM
- */
-Socket::Socket(int sock, bool ipv6, int type) : Flags<SocketFlag>(SocketFlagStrings)
+Socket::Socket(int s, bool i, int type)
 {
-	this->IO = &normalSocketIO;
-	this->IPv6 = ipv6;
-	if (sock == -1)
-		this->Sock = socket(this->IPv6 ? AF_INET6 : AF_INET, type, 0);
+	this->io = &NormalSocketIO;
+	this->ipv6 = i;
+	if (s == -1)
+		this->sock = socket(this->ipv6 ? AF_INET6 : AF_INET, type, 0);
 	else
-		this->Sock = sock;
+		this->sock = s;
 	this->SetNonBlocking();
-	SocketEngine::Sockets[this->Sock] = this;
+	SocketEngine::Sockets[this->sock] = this;
 	SocketEngine::Change(this, true, SF_READABLE);
 }
 
-/** Default destructor
-*/
 Socket::~Socket()
 {
 	SocketEngine::Change(this, false, SF_READABLE);
 	SocketEngine::Change(this, false, SF_WRITABLE);
-	anope_close(this->Sock);
-	this->IO->Destroy();
-	SocketEngine::Sockets.erase(this->Sock);
+	anope_close(this->sock);
+	this->io->Destroy();
+	SocketEngine::Sockets.erase(this->sock);
 }
 
-/** Get the socket FD for this socket
- * @return the fd
- */
 int Socket::GetFD() const
 {
-	return Sock;
+	return sock;
 }
 
-/** Check if this socket is IPv6
- * @return true or false
- */
 bool Socket::IsIPv6() const
 {
-	return IPv6;
+	return ipv6;
 }
 
-/** Mark a socket as blockig
- * @return true if the socket is now blocking
- */
 bool Socket::SetBlocking()
 {
 	int flags = fcntl(this->GetFD(), F_GETFL, 0);
 	return !fcntl(this->GetFD(), F_SETFL, flags & ~O_NONBLOCK);
 }
 
-/** Mark a socket as non-blocking
- * @return true if the socket is now non-blocking
- */
 bool Socket::SetNonBlocking()
 {
 	int flags = fcntl(this->GetFD(), F_GETFL, 0);
 	return !fcntl(this->GetFD(), F_SETFL, flags | O_NONBLOCK);
 }
 
-/** Bind the socket to an ip and port
- * @param ip The ip
- * @param port The port
- */
 void Socket::Bind(const Anope::string &ip, int port)
 {
-	this->IO->Bind(this, ip, port);
+	this->io->Bind(this, ip, port);
 }
 
-/** Called when there either is a read or write event.
- * @return true to continue to call ProcessRead/ProcessWrite, false to not continue
- */
 bool Socket::Process()
 {
 	return true;
 }
 
-/** Called when there is something to be received for this socket
- * @return true on success, false to drop this socket
- */
 bool Socket::ProcessRead()
 {
 	return true;
 }
 
-/** Called when the socket is ready to be written to
- * @return true on success, false to drop this socket
- */
 bool Socket::ProcessWrite()
 {
 	return true;
 }
 
-/** Called when there is an error for this socket
- * @return true on success, false to drop this socket
- */
 void Socket::ProcessError()
 {
 }
 
-/** Constructor
- * @param bindip The IP to bind to
- * @param port The port to listen on
- * @param ipv6 true for ipv6
- */
-ListenSocket::ListenSocket(const Anope::string &bindip, int port, bool ipv6)
+ListenSocket::ListenSocket(const Anope::string &bindip, int port, bool i)
 {
 	this->SetNonBlocking();
 
 	const char op = 1;
 	setsockopt(this->GetFD(), SOL_SOCKET, SO_REUSEADDR, &op, sizeof(op));
 
-	this->bindaddr.pton(IPv6 ? AF_INET6 : AF_INET, bindip, port);
-	this->IO->Bind(this, bindip, port);
+	this->bindaddr.pton(i ? AF_INET6 : AF_INET, bindip, port);
+	this->io->Bind(this, bindip, port);
 
-	if (listen(Sock, SOMAXCONN) == -1)
+	if (listen(sock, SOMAXCONN) == -1)
 		throw SocketException("Unable to listen: " + Anope::LastError());
 }
 
-/** Destructor
- */
 ListenSocket::~ListenSocket()
 {
 }
 
-/** Accept a connection in this sockets queue
- */
 bool ListenSocket::ProcessRead()
 {
 	try
 	{
-		this->IO->Accept(this);
+		this->io->Accept(this);
 	}
 	catch (const SocketException &ex)
 	{

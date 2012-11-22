@@ -7,6 +7,7 @@
  *
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
+ *
  */
 
 
@@ -14,10 +15,25 @@
 #include "anope.h"
 #include "serialize.h"
 #include "modules.h"
+#include "account.h"
+#include "bots.h"
+#include "regchannel.h"
+#include "xline.h"
+#include "access.h"
 
-std::vector<Anope::string> SerializeType::type_order;
-std::map<Anope::string, SerializeType *> SerializeType::types;
-std::list<Serializable *> *Serializable::serializable_items;
+using namespace Serialize;
+
+std::vector<Anope::string> Type::TypeOrder;
+std::map<Anope::string, Type *> Serialize::Type::Types;
+std::list<Serializable *> *Serializable::SerializableItems;
+
+void Serialize::RegisterTypes()
+{
+	static Type nc("NickCore", NickCore::Unserialize), na("NickAlias", NickAlias::Unserialize), bi("BotInfo", BotInfo::Unserialize),
+		ci("ChannelInfo", ChannelInfo::Unserialize), access("ChanAccess", ChanAccess::Unserialize), logsetting("LogSetting", LogSetting::Unserialize),
+		modelock("ModeLock", ModeLock::Unserialize), akick("AutoKick", AutoKick::Unserialize), badword("BadWord", BadWord::Unserialize),
+		memo("Memo", Memo::Unserialize), xline("XLine", XLine::Unserialize);
+}
 
 stringstream::stringstream() : std::stringstream(), type(Serialize::DT_TEXT), _max(0)
 {
@@ -48,24 +64,24 @@ bool stringstream::operator!=(const stringstream &other) const
 	return !(*this == other);
 }
 
-stringstream &stringstream::setType(Serialize::DataType t)
+stringstream &stringstream::SetType(Serialize::DataType t)
 {
 	this->type = t;
 	return *this;
 }
 
-Serialize::DataType stringstream::getType() const
+DataType Serialize::stringstream::GetType() const
 {
 	return this->type;
 }
 
-stringstream &stringstream::setMax(unsigned m)
+stringstream &stringstream::SetMax(unsigned m)
 {
 	this->_max = m;
 	return *this;
 }
 
-unsigned stringstream::getMax() const
+unsigned stringstream::GetMax() const
 {
 	return this->_max;
 }
@@ -77,13 +93,13 @@ Serializable::Serializable() : last_commit_time(0), id(0)
 
 Serializable::Serializable(const Anope::string &serialize_type) : last_commit_time(0), id(0)
 {
-	if (serializable_items == NULL)
-		serializable_items = new std::list<Serializable *>();
-	serializable_items->push_back(this);
+	if (SerializableItems == NULL)
+		SerializableItems = new std::list<Serializable *>();
+	SerializableItems->push_back(this);
 
-	this->s_type = SerializeType::Find(serialize_type);
+	this->s_type = Type::Find(serialize_type);
 
-	this->s_iter = serializable_items->end();
+	this->s_iter = SerializableItems->end();
 	--this->s_iter;
 
 	FOREACH_MOD(I_OnSerializableConstruct, OnSerializableConstruct(this));
@@ -91,8 +107,8 @@ Serializable::Serializable(const Anope::string &serialize_type) : last_commit_ti
 
 Serializable::Serializable(const Serializable &other) : last_commit_time(0), id(0)
 {
-	serializable_items->push_back(this);
-	this->s_iter = serializable_items->end();
+	SerializableItems->push_back(this);
+	this->s_iter = SerializableItems->end();
 	--this->s_iter;
 
 	this->s_type = other.s_type;
@@ -102,7 +118,7 @@ Serializable::Serializable(const Serializable &other) : last_commit_time(0), id(
 
 Serializable::~Serializable()
 {
-	serializable_items->erase(this->s_iter);
+	SerializableItems->erase(this->s_iter);
 }
 
 Serializable &Serializable::operator=(const Serializable &)
@@ -110,7 +126,7 @@ Serializable &Serializable::operator=(const Serializable &)
 	return *this;
 }
 
-void Serializable::destroy()
+void Serializable::Destroy()
 {
 	if (!this)
 		return;
@@ -130,12 +146,12 @@ void Serializable::QueueUpdate()
 
 bool Serializable::IsCached()
 {
-	return this->last_commit == this->serialize();
+	return this->last_commit == this->Serialize();
 }
 
 void Serializable::UpdateCache()
 {
-	this->last_commit = this->serialize();
+	this->last_commit = this->Serialize();
 }
 
 bool Serializable::IsTSCached()
@@ -148,70 +164,70 @@ void Serializable::UpdateTS()
 	this->last_commit_time = Anope::CurTime;
 }
 
-SerializeType* Serializable::GetSerializableType() const
+Type* Serializable::GetSerializableType() const
 {
 	return this->s_type;
 }
 
 const std::list<Serializable *> &Serializable::GetItems()
 {
-	return *serializable_items;
+	return *SerializableItems;
 }
 
-SerializeType::SerializeType(const Anope::string &n, unserialize_func f, Module *o)  : name(n), unserialize(f), owner(o), timestamp(0)
+Type::Type(const Anope::string &n, unserialize_func f, Module *o)  : name(n), unserialize(f), owner(o), timestamp(0)
 {
-	type_order.push_back(this->name);
-	types[this->name] = this;
+	TypeOrder.push_back(this->name);
+	Types[this->name] = this;
 }
 
-SerializeType::~SerializeType()
+Type::~Type()
 {
-	std::vector<Anope::string>::iterator it = std::find(type_order.begin(), type_order.end(), this->name);
-	if (it != type_order.end())
-		type_order.erase(it);
-	types.erase(this->name);
+	std::vector<Anope::string>::iterator it = std::find(TypeOrder.begin(), TypeOrder.end(), this->name);
+	if (it != TypeOrder.end())
+		TypeOrder.erase(it);
+	Types.erase(this->name);
 }
 
-const Anope::string &SerializeType::GetName()
+const Anope::string &Type::GetName()
 {
 	return this->name;
 }
 
-Serializable *SerializeType::Unserialize(Serializable *obj, Serialize::Data &data)
+Serializable *Type::Unserialize(Serializable *obj, Serialize::Data &data)
 {
 	return this->unserialize(obj, data);
 }
 
-void SerializeType::Check()
+void Type::Check()
 {
 	FOREACH_MOD(I_OnSerializeCheck, OnSerializeCheck(this));
 }
 
-time_t SerializeType::GetTimestamp() const
+time_t Type::GetTimestamp() const
 {
 	return this->timestamp;
 }
 
-void SerializeType::UpdateTimestamp()
+void Type::UpdateTimestamp()
 {
 	this->timestamp = Anope::CurTime;
 }
 
-Module* SerializeType::GetOwner() const
+Module* Type::GetOwner() const
 {
 	return this->owner;
 }
 
-SerializeType *SerializeType::Find(const Anope::string &name)
+Type *Serialize::Type::Find(const Anope::string &name)
 {
-	std::map<Anope::string, SerializeType *>::iterator it = types.find(name);
-	if (it != types.end())
+	std::map<Anope::string, Type *>::iterator it = Types.find(name);
+	if (it != Types.end())
 		return it->second;
 	return NULL;
 }
 
-const std::vector<Anope::string> &SerializeType::GetTypeOrder()
+const std::vector<Anope::string> &Type::GetTypeOrder()
 {
-	return type_order;
+	return TypeOrder;
 }
 

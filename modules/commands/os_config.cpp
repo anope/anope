@@ -117,7 +117,7 @@ class CommandOSConfig : public Command
 							}
 							case DT_TIME:
 							{
-								time_t time = dotime(vi.GetValue());
+								time_t time = Anope::DoTime(vi.GetValue());
 								ValueContainerTime *vci = anope_dynamic_static_cast<ValueContainerTime *>(v->val);
 								vci->Set(&time, sizeof(time_t));
 								break;
@@ -169,7 +169,7 @@ class CommandOSConfig : public Command
 					continue;
 
 				ListFormatter lflist;
-				lflist.addColumn("Name").addColumn("Value");
+				lflist.AddColumn("Name").AddColumn("Value");
 				for (unsigned i = 0; i < list.size(); ++i)
 				{
 					const Anope::string &first = list[i].first, second = list[i].second;
@@ -177,7 +177,7 @@ class CommandOSConfig : public Command
 					ListFormatter::ListEntry entry;
 					entry["Name"] = first;
 					entry["Value"] = second;
-					lflist.addEntry(entry);
+					lflist.AddEntry(entry);
 				}
 
 				std::vector<Anope::string> replies;

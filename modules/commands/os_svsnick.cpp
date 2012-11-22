@@ -36,28 +36,22 @@ class CommandOSSVSNick : public Command
 		}
 
 		/* Check for valid characters */
-		if (newnick[0] == '-' || isdigit(newnick[0]))
+		if (!IRCD->IsNickValid(newnick))
 		{
 			source.Reply(_("Nick \002%s\002 is an illegal nickname and cannot be used."), newnick.c_str());
 			return;
 		}
-		for (unsigned i = 0, end = newnick.length(); i < end; ++i)
-			if (!isvalidnick(newnick[i]))
-			{
-				source.Reply(_("Nick \002%s\002 is an illegal nickname and cannot be used."), newnick.c_str());
-				return;
-			}
 
 		/* Check for a nick in use or a forbidden/suspended nick */
-		if (!(u2 = finduser(nick)))
+		if (!(u2 = User::Find(nick, true)))
 			source.Reply(NICK_X_NOT_IN_USE, nick.c_str());
-		else if (!nick.equals_ci(newnick) && finduser(newnick))
+		else if (!nick.equals_ci(newnick) && User::Find(newnick))
 			source.Reply(_("Nick \002%s\002 is currently in use."), newnick.c_str());
 		else
 		{
 			source.Reply(_("The nick \002%s\002 is now being changed to \002%s\002."), nick.c_str(), newnick.c_str());
 			Log(LOG_ADMIN, source, this) << "to change " << nick << " to " << newnick;
-			ircdproto->SendForceNickChange(u2, newnick, Anope::CurTime);
+			IRCD->SendForceNickChange(u2, newnick, Anope::CurTime);
 		}
 		return;
 	}
@@ -81,7 +75,7 @@ class OSSVSNick : public Module
 	{
 		this->SetAuthor("Anope");
 
-		if (!ircdproto || !ircdproto->CanSVSNick)
+		if (!IRCD || !IRCD->CanSVSNick)
 			throw ModuleException("Your IRCd does not support SVSNICK");
 
 	}

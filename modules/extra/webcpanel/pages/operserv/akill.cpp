@@ -14,7 +14,7 @@ WebCPanel::OperServ::Akill::Akill(const Anope::string &cat, const Anope::string 
 bool WebCPanel::OperServ::Akill::OnRequest(HTTPProvider *server, const Anope::string &page_name, HTTPClient *client, HTTPMessage &message, HTTPReply &reply, NickAlias *na, TemplateFileServer::Replacements &replacements)
 {
 
-	static service_reference<XLineManager> akills("XLineManager","xlinemanager/sgline");
+	static ServiceReference<XLineManager> akills("XLineManager","xlinemanager/sgline");
 
 	if (!na->nc->IsServicesOper() && !(na->nc->o && na->nc->o->ot && na->nc->o->ot->HasPriv("operserv/akill")))
 	{
@@ -28,7 +28,7 @@ bool WebCPanel::OperServ::Akill::OnRequest(HTTPProvider *server, const Anope::st
 		if (message.post_data.count("mask") > 0 && message.post_data.count("expiry") > 0 && message.post_data.count("reason") > 0)
 		{
 			std::vector<Anope::string> params;
-			stringstream cmdstr;
+			std::stringstream cmdstr;
 			params.push_back("ADD");
 			cmdstr << "+" << HTTPUtils::URLDecode(message.post_data["expiry"]);
 			cmdstr << " " << HTTPUtils::URLDecode(message.post_data["mask"]);
@@ -49,11 +49,11 @@ bool WebCPanel::OperServ::Akill::OnRequest(HTTPProvider *server, const Anope::st
 		{
 			const XLine *x = akills->GetEntry(i);
 			replacements["NUMBER"] = stringify(i + 1);
-			replacements["HOST"] = x->Mask;
-			replacements["SETTER"] = x->By;
-			replacements["TIME"] = do_strftime(x->Created, NULL, true);
-			replacements["EXPIRE"] = expire_left(na->nc, x->Expires);
-			replacements["REASON"] = x->Reason;
+			replacements["HOST"] = x->mask;
+			replacements["SETTER"] = x->by;
+			replacements["TIME"] = Anope::strftime(x->created, NULL, true);
+			replacements["EXPIRE"] = Anope::Expires(x->expires, na->nc);
+			replacements["REASON"] = x->reason;
 		}
 	}
 

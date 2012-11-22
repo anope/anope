@@ -36,7 +36,7 @@ bool WebCPanel::MemoServ::Memos::OnRequest(HTTPProvider *server, const Anope::st
 	}
 	else
 	{
-		ci = cs_findchan(chname);
+		ci = ChannelInfo::Find(chname);
 		if (ci)
 		{
 			replacements["MESSAGES"] = "Displaying the memos for " + chname + ".";
@@ -107,7 +107,7 @@ bool WebCPanel::MemoServ::Memos::OnRequest(HTTPProvider *server, const Anope::st
 		m = mi->GetMemo(i);
 		replacements["NUMBER"] = stringify(i+1);
 		replacements["SENDER"] = m->sender;
-		replacements["TIME"] = do_strftime(m->time);
+		replacements["TIME"] = Anope::strftime(m->time);
 		replacements["TEXT"] = m->text;
 		if (m->HasFlag(MF_UNREAD))
 			replacements["UNREAD"] = "YES";

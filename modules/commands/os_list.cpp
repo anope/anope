@@ -36,9 +36,9 @@ class CommandOSChanList : public Command
 		}
 
 		ListFormatter list;
-		list.addColumn("Name").addColumn("Users").addColumn("Modes").addColumn("Topic");
+		list.AddColumn("Name").AddColumn("Users").AddColumn("Modes").AddColumn("Topic");
 
-		if (!pattern.empty() && (u2 = finduser(pattern)))
+		if (!pattern.empty() && (u2 = User::Find(pattern, true)))
 		{
 			source.Reply(_("\002%s\002 channel list:"), u2->nick.c_str());
 
@@ -56,7 +56,7 @@ class CommandOSChanList : public Command
 				entry["Users"] = stringify(cc->chan->users.size());
 				entry["Modes"] = cc->chan->GetModes(true, true);
 				entry["Topic"] = cc->chan->topic;
-				list.addEntry(entry);
+				list.AddEntry(entry);
 			}
 		}
 		else
@@ -79,7 +79,7 @@ class CommandOSChanList : public Command
 				entry["Users"] = stringify(c->users.size());
 				entry["Modes"] = c->GetModes(true, true);
 				entry["Topic"] = c->topic;
-				list.addEntry(entry);
+				list.AddEntry(entry);
 			}
 		}
 
@@ -130,9 +130,9 @@ class CommandOSUserList : public Command
 			Modes.push_back(UMODE_INVIS);
 
 		ListFormatter list;
-		list.addColumn("Name").addColumn("Mask");
+		list.AddColumn("Name").AddColumn("Mask");
 
-		if (!pattern.empty() && (c = findchan(pattern)))
+		if (!pattern.empty() && (c = Channel::Find(pattern)))
 		{
 			source.Reply(_("\002%s\002 users list:"), pattern.c_str());
 
@@ -148,7 +148,7 @@ class CommandOSUserList : public Command
 				ListFormatter::ListEntry entry;
 				entry["Name"] = uc->user->nick;
 				entry["Mask"] = uc->user->GetIdent() + "@" + uc->user->GetDisplayedHost();
-				list.addEntry(entry);
+				list.AddEntry(entry);
 			}
 		}
 		else
@@ -178,7 +178,7 @@ class CommandOSUserList : public Command
 				ListFormatter::ListEntry entry;
 				entry["Name"] = u2->nick;
 				entry["Mask"] = u2->GetIdent() + "@" + u2->GetDisplayedHost();
-				list.addEntry(entry);
+				list.AddEntry(entry);
 			}
 		}
 

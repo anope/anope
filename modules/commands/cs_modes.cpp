@@ -18,8 +18,8 @@ class CommandModeBase : public Command
 	void do_mode(CommandSource &source, Command *com, ChannelMode *cm, const Anope::string &chan, const Anope::string &nick, bool set, const Anope::string &level, const Anope::string &levelself)
 	{
 		User *u = source.GetUser();
-		User *u2 = finduser(nick);
-		Channel *c = findchan(chan);
+		User *u2 = User::Find(nick, true);
+		Channel *c = Channel::Find(chan);
 
 		if (!c)
 		{

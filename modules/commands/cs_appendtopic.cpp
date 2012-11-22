@@ -52,7 +52,7 @@ class CommandCSAppendTopic : public Command
 	{
 		const Anope::string &newtopic = params[1];
 
-		Channel *c = findchan(params[0]);;
+		Channel *c = Channel::Find(params[0]);;
 
 		if (!c)
 			source.Reply(CHAN_X_NOT_IN_USE, params[0].c_str());

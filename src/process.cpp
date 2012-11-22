@@ -11,16 +11,12 @@
 
 #include "services.h"
 #include "modules.h"
-#include "extern.h"
 #include "protocol.h"
 #include "servers.h"
 #include "users.h"
 #include "regchannel.h"
 
-/** Main process routine
- * @param buffer A raw line from the uplink to do things with
- */
-void process(const Anope::string &buffer)
+void Anope::Process(const Anope::string &buffer)
 {
 	/* If debugging, log the buffer */
 	Log(LOG_RAWIO) << "Received: " << buffer;
@@ -46,12 +42,11 @@ void process(const Anope::string &buffer)
 	}
 
 	spacesepstream buf_sep(buf);
-	Anope::string buf_token;
 
 	Anope::string command = buf;
-	if (buf_sep.GetToken(buf_token))
-		command = buf_token;
+	buf_sep.GetToken(command);
 	
+	Anope::string buf_token;
 	std::vector<Anope::string> params;
 	while (buf_sep.GetToken(buf_token))
 	{
@@ -67,7 +62,7 @@ void process(const Anope::string &buffer)
 			params.push_back(buf_token);
 	}
 
-	if (protocoldebug)
+	if (Anope::ProtocolDebug)
 	{
 		Log() << "Source : " << (source.empty() ? "No source" : source);
 		Log() << "Command: " << command;
@@ -79,29 +74,26 @@ void process(const Anope::string &buffer)
 				Log() << "params " << i << ": " << params[i];
 	}
 
-	const std::vector<IRCDMessage *> *messages = IRCDMessage::Find(command);
+	static const Anope::string proto_name = ModuleManager::FindFirstOf(PROTOCOL) ? ModuleManager::FindFirstOf(PROTOCOL)->name : "";
+	
+	// event
 
-	if (messages && !messages->empty())
+	ServiceReference<IRCDMessage> m("IRCDMessage", proto_name + "/" + command.lower());
+	if (!m)
 	{
-		MessageSource src(source);
-
-		bool retVal = true;
-		/* Newer messages take priority */
-		for (unsigned i = messages->size(); retVal && i > 0; --i)
-		{
-			IRCDMessage *m = messages->at(i - 1);
-
-			if (m->HasFlag(IRCDMESSAGE_SOFT_LIMIT) ? (params.size() < m->GetParamCount()) : (params.size() != m->GetParamCount()))
-				Log(LOG_DEBUG) << "invalid parameters for " << command << ": " << params.size() << " != " << m->GetParamCount();
-			else if (m->HasFlag(IRCDMESSAGE_REQUIRE_USER) && !src.GetUser())
-				Log(LOG_DEBUG) << "unexpected non-user source " << source << " for " << command;
-			else if (m->HasFlag(IRCDMESSAGE_REQUIRE_SERVER) && !source.empty() && !src.GetServer())
-				Log(LOG_DEBUG) << "unexpected non-server soruce " << source << " for " << command;
-			else
-				retVal = m->Run(src, params);
-		}
-	}
-	else
 		Log(LOG_DEBUG) << "unknown message from server (" << buffer << ")";
+		return;
+	}
+
+	MessageSource src(source);
+
+	if (m->HasFlag(IRCDMESSAGE_SOFT_LIMIT) ? (params.size() < m->GetParamCount()) : (params.size() != m->GetParamCount()))
+		Log(LOG_DEBUG) << "invalid parameters for " << command << ": " << params.size() << " != " << m->GetParamCount();
+	else if (m->HasFlag(IRCDMESSAGE_REQUIRE_USER) && !src.GetUser())
+		Log(LOG_DEBUG) << "unexpected non-user source " << source << " for " << command;
+	else if (m->HasFlag(IRCDMESSAGE_REQUIRE_SERVER) && !source.empty() && !src.GetServer())
+		Log(LOG_DEBUG) << "unexpected non-server soruce " << source << " for " << command;
+	else
+		m->Run(src, params);
 }
 

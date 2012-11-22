@@ -26,7 +26,7 @@ class CommandCSClearUsers : public Command
 	{
 		const Anope::string &chan = params[0];
 
-		Channel *c = findchan(chan);
+		Channel *c = Channel::Find(chan);
 		Anope::string modebuf;
 
 		if (!c)

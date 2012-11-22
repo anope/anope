@@ -23,18 +23,18 @@ class MemoDelCallback : public NumberList
 	{
 	}
 
-	void HandleNumber(unsigned Number) anope_override
+	void HandleNumber(unsigned number) anope_override
 	{
-		if (!Number || Number > mi->memos->size())
+		if (!number || number > mi->memos->size())
 			return;
 
 		if (ci)
-			FOREACH_MOD(I_OnMemoDel, OnMemoDel(ci, mi, mi->GetMemo(Number - 1)));
+			FOREACH_MOD(I_OnMemoDel, OnMemoDel(ci, mi, mi->GetMemo(number - 1)));
 		else
-			FOREACH_MOD(I_OnMemoDel, OnMemoDel(source.nc, mi, mi->GetMemo(Number - 1)));
+			FOREACH_MOD(I_OnMemoDel, OnMemoDel(source.nc, mi, mi->GetMemo(number - 1)));
 
-		mi->Del(Number - 1);
-		source.Reply(_("Memo %d has been deleted."), Number);
+		mi->Del(number - 1);
+		source.Reply(_("Memo %d has been deleted."), number);
 	}
 };
 
@@ -59,13 +59,13 @@ class CommandMSDel : public Command
 			chan = numstr;
 			numstr = params.size() > 1 ? params[1] : "";
 
-			ci = cs_findchan(chan);
+			ci = ChannelInfo::Find(chan);
 			if (!ci)
 			{
 				source.Reply(CHAN_X_NOT_REGISTERED, chan.c_str());
 				return;
 			}
-			else if (readonly)
+			else if (Anope::ReadOnly)
 			{
 				source.Reply(READ_ONLY_MODE);
 				return;
@@ -114,7 +114,7 @@ class CommandMSDel : public Command
 						FOREACH_MOD(I_OnMemoDel, OnMemoDel(ci, mi, mi->GetMemo(i)));
 					else
 						FOREACH_MOD(I_OnMemoDel, OnMemoDel(source.nc, mi, mi->GetMemo(i)));
-					mi->GetMemo(i)->destroy();
+					mi->GetMemo(i)->Destroy();
 				}
 				mi->memos->clear();
 				if (!chan.empty())

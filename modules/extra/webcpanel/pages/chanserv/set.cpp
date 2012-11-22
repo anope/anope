@@ -22,7 +22,7 @@ bool WebCPanel::ChanServ::Set::OnRequest(HTTPProvider *server, const Anope::stri
 		return true;
 	}
 
-	ChannelInfo *ci = cs_findchan(chname);
+	ChannelInfo *ci = ChannelInfo::Find(chname);
 
 	if (!ci || !ci->AccessFor(na->nc).HasPriv("SET"))
 		return true;
@@ -93,8 +93,8 @@ bool WebCPanel::ChanServ::Set::OnRequest(HTTPProvider *server, const Anope::stri
 		replacements["FOUNDER"] = ci->GetFounder()->display;
 	if (ci->successor)
 		replacements["SUCCESSOR"] = ci->successor->display;
-	replacements["TIME_REGISTERED"] = do_strftime(ci->time_registered, na->nc);
-	replacements["LAST_USED"] = do_strftime(ci->last_used, na->nc);
+	replacements["TIME_REGISTERED"] = Anope::strftime(ci->time_registered, na->nc);
+	replacements["LAST_USED"] = Anope::strftime(ci->last_used, na->nc);
 
 	if (!ci->last_topic.empty())
 	{

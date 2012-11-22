@@ -1,3 +1,15 @@
+/*
+ *
+ * (C) 2003-2012 Anope Team
+ * Contact us at team@anope.org
+ *
+ * Please read COPYING and README for further details.
+ *
+ * Based on the original code of Epona by Lara.
+ * Based on the original code of Services by Andy Church.
+ *
+ */
+
 #ifndef THREADENGINE_H
 #define THREADENGINE_H
 
@@ -12,7 +24,7 @@ class CoreExport Thread : public Pipe, public Extensible
 
  public:
 	/* Handle for this thread */
-	pthread_t Handle;
+	pthread_t handle;
 
 	/** Threads constructor
 	 */

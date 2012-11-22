@@ -24,7 +24,7 @@ class CommandBSSetPrivate : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		BotInfo *bi = findbot(params[0]);
+		BotInfo *bi = BotInfo::Find(params[0], true);
 		const Anope::string &value = params[1];
 
 		if (bi == NULL)

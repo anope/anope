@@ -12,13 +12,13 @@ static Anope::string username_attribute;
 
 struct IdentifyInfo
 {
-	dynamic_reference<User> user;
+	Reference<User> user;
 	IdentifyRequest *req;
-	service_reference<LDAPProvider> lprov;
+	ServiceReference<LDAPProvider> lprov;
 	bool admin_bind;
 	Anope::string dn;
 
-	IdentifyInfo(User *u, IdentifyRequest *r, service_reference<LDAPProvider> &lp) : user(u), req(r), lprov(lp), admin_bind(true)
+	IdentifyInfo(User *u, IdentifyRequest *r, ServiceReference<LDAPProvider> &lp) : user(u), req(r), lprov(lp), admin_bind(true)
 	{
 		req->Hold(me);
 	}
@@ -100,18 +100,17 @@ class IdentifyInterface : public LDAPInterface
 				}
 				else
 				{
-					NickAlias *na = findnick(ii->req->GetAccount());
+					NickAlias *na = NickAlias::Find(ii->req->GetAccount());
 					if (na == NULL)
 					{
 						na = new NickAlias(ii->req->GetAccount(), new NickCore(ii->req->GetAccount()));
 						if (ii->user)
 						{
 							if (Config->NSAddAccessOnReg)
-								na->nc->AddAccess(create_mask(ii->user));
+								na->nc->AddAccess(ii->user->Mask());
 
-							const BotInfo *bi = findbot(Config->NickServ);
-							if (bi)
-								ii->user->SendMessage(bi, _("Your account \002%s\002 has been successfully created."), na->nick.c_str());
+							if (NickServ)
+								ii->user->SendMessage(NickServ, _("Your account \002%s\002 has been successfully created."), na->nick.c_str());
 						}
 					}
 					na->nc->Extend("m_ldap_authentication_dn", new ExtensibleItemClass<Anope::string>(ii->dn));
@@ -155,7 +154,7 @@ class OnIdentifyInterface : public LDAPInterface
 		std::map<LDAPQuery, Anope::string>::iterator it = this->requests.find(r.id);
 		if (it == this->requests.end())
 			return;
-		User *u = finduser(it->second);
+		User *u = User::Find(it->second);
 		this->requests.erase(it);
 
 		if (!u || !u->Account() || r.empty())
@@ -169,9 +168,8 @@ class OnIdentifyInterface : public LDAPInterface
 			if (!email.equals_ci(u->Account()->email))
 			{
 				u->Account()->email = email;
-				BotInfo *bi = findbot(Config->NickServ);
-				if (bi)
-					u->SendMessage(bi, _("Your email has been updated to \002%s\002"), email.c_str());
+				if (NickServ)
+					u->SendMessage(NickServ, _("Your email has been updated to \002%s\002"), email.c_str());
 				Log(this->owner) << "m_ldap_authentication: Updated email address for " << u->nick << " (" << u->Account()->display << ") to " << email;
 			}
 		}
@@ -206,7 +204,7 @@ class OnRegisterInterface : public LDAPInterface
 
 class NSIdentifyLDAP : public Module
 {
-	service_reference<LDAPProvider> ldap;
+	ServiceReference<LDAPProvider> ldap;
 	IdentifyInterface iinterface;
 	OnIdentifyInterface oninterface;
 	OnRegisterInterface orinterface;

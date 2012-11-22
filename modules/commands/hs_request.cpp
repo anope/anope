@@ -32,21 +32,21 @@ struct HostRequest : ExtensibleItem, Serializable
 
 	HostRequest() : Serializable("HostRequest") { }
 
-	Serialize::Data serialize() const anope_override
+	Serialize::Data Serialize() const anope_override
 	{
 		Serialize::Data data;
 
 		data["nick"] << this->nick;
 		data["ident"] << this->ident;
 		data["host"] << this->host;
-		data["time"].setType(Serialize::DT_INT) << this->time;
+		data["time"].SetType(Serialize::DT_INT) << this->time;
 
 		return data;
 	}
 
-	static Serializable* unserialize(Serializable *obj, Serialize::Data &data)
+	static Serializable* Unserialize(Serializable *obj, Serialize::Data &data)
 	{
-		NickAlias *na = findnick(data["nick"].astr());
+		NickAlias *na = NickAlias::Find(data["nick"].astr());
 		if (na == NULL)
 			return NULL;
 
@@ -85,7 +85,7 @@ class CommandHSRequest : public Command
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		User *u = source.GetUser();
-		NickAlias *na = findnick(source.GetNick());
+		NickAlias *na = NickAlias::Find(source.GetNick());
 		if (!na || na->nc != source.GetAccount())
 		{
 			source.Reply(ACCESS_DENIED);
@@ -118,7 +118,7 @@ class CommandHSRequest : public Command
 				source.Reply(HOST_SET_IDENTTOOLONG, Config->UserLen);
 				return;
 			}
-			else if (!ircdproto->CanSetVIdent)
+			else if (!IRCD->CanSetVIdent)
 			{
 				source.Reply(HOST_NO_VIDENT);
 				return;
@@ -137,7 +137,7 @@ class CommandHSRequest : public Command
 			return;
 		}
 
-		if (!IsValidHost(host))
+		if (!IRCD->IsHostValid(host))
 		{
 			source.Reply(HOST_SET_ERROR);
 			return;
@@ -190,15 +190,15 @@ class CommandHSActivate : public Command
 
 		const Anope::string &nick = params[0];
 
-		NickAlias *na = findnick(nick);
+		NickAlias *na = NickAlias::Find(nick);
 		HostRequest *req = na ? na->GetExt<HostRequest *>("hs_request") : NULL;
 		if (req)
 		{
 			na->SetVhost(req->ident, req->host, source.GetNick(), req->time);
 			FOREACH_MOD(I_OnSetVhost, OnSetVhost(na));
 
-			if (HSRequestMemoUser && memoserv)
-				memoserv->Send(Config->HostServ, na->nick, _("[auto memo] Your requested vHost has been approved."), true);
+			if (HSRequestMemoUser && MemoServService)
+				MemoServService->Send(Config->HostServ, na->nick, _("[auto memo] Your requested vHost has been approved."), true);
 
 			source.Reply(_("vHost for %s has been activated"), na->nick.c_str());
 			Log(LOG_COMMAND, source, this) << "for " << na->nick << " for vhost " << (!req->ident.empty() ? req->ident + "@" : "") << req->host;
@@ -234,13 +234,13 @@ class CommandHSReject : public Command
 		const Anope::string &nick = params[0];
 		const Anope::string &reason = params.size() > 1 ? params[1] : "";
 
-		NickAlias *na = findnick(nick);
+		NickAlias *na = NickAlias::Find(nick);
 		HostRequest *req = na ? na->GetExt<HostRequest *>("hs_request") : NULL;
 		if (req)
 		{
 			na->Shrink("hs_request");
 
-			if (HSRequestMemoUser && memoserv)
+			if (HSRequestMemoUser && MemoServService)
 			{
 				Anope::string message;
 				if (!reason.empty())
@@ -248,7 +248,7 @@ class CommandHSReject : public Command
 				else
 					message = _("[auto memo] Your requested vHost has been rejected.");
 
-				memoserv->Send(Config->HostServ, nick, message, true);
+				MemoServService->Send(Config->HostServ, nick, message, true);
 			}
 
 			source.Reply(_("vHost for %s has been rejected"), nick.c_str());
@@ -281,7 +281,7 @@ class CommandHSWaiting : public Command
 		unsigned display_counter = 0;
 		ListFormatter list;
 
-		list.addColumn("Number").addColumn("Nick").addColumn("Vhost").addColumn("Created");
+		list.AddColumn("Number").AddColumn("Nick").AddColumn("Vhost").AddColumn("Created");
 
 		for (nickalias_map::const_iterator it = NickAliasList->begin(), it_end = NickAliasList->end(); it != it_end; ++it)
 		{
@@ -301,8 +301,8 @@ class CommandHSWaiting : public Command
 					entry["Vhost"] = hr->ident + "@" + hr->host;
 				else
 					entry["Vhost"] = hr->host;
-				entry["Created"] = do_strftime(hr->time);
-				list.addEntry(entry);
+				entry["Created"] = Anope::strftime(hr->time);
+				list.AddEntry(entry);
 			}
 			++counter;
 		}
@@ -339,7 +339,7 @@ class CommandHSWaiting : public Command
 
 class HSRequest : public Module
 {
-	SerializeType request_type;
+	Serialize::Type request_type;
 	CommandHSRequest commandhsrequest;
 	CommandHSActivate commandhsactive;
 	CommandHSReject commandhsreject;
@@ -347,11 +347,11 @@ class HSRequest : public Module
 
  public:
 	HSRequest(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
-		request_type("HostRequest", HostRequest::unserialize), commandhsrequest(this), commandhsactive(this), commandhsreject(this), commandhswaiting(this)
+		request_type("HostRequest", HostRequest::Unserialize), commandhsrequest(this), commandhsactive(this), commandhsreject(this), commandhswaiting(this)
 	{
 		this->SetAuthor("Anope");
 
-		if (!ircdproto || !ircdproto->CanSetVHost)
+		if (!IRCD || !IRCD->CanSetVHost)
 			throw ModuleException("Your IRCd does not support vhosts");
 
 		Implementation i[] = { I_OnReload };
@@ -389,18 +389,18 @@ void req_send_memos(CommandSource &source, const Anope::string &vIdent, const An
 	else
 		host = vHost;
 
-	if (HSRequestMemoOper == 1 && memoserv)
+	if (HSRequestMemoOper == 1 && MemoServService)
 		for (unsigned i = 0; i < Config->Opers.size(); ++i)
 		{
 			Oper *o = Config->Opers[i];
 			
-			const NickAlias *na = findnick(o->name);
+			const NickAlias *na = NickAlias::Find(o->name);
 			if (!na)
 				continue;
 
 			Anope::string message = Anope::printf(_("[auto memo] vHost \002%s\002 has been requested by %s."), host.c_str(), source.GetNick().c_str());
 
-			memoserv->Send(Config->HostServ, na->nick, message, true);
+			MemoServService->Send(Config->HostServ, na->nick, message, true);
 		}
 }
 

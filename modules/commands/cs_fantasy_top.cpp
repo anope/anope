@@ -93,7 +93,7 @@ class CSTop : public Module
 	CommandCSGTop commandcsgtop;
 	CommandCSTop10 commandcstop10;
 	CommandCSGTop10 commandcsgtop10;
-	service_reference<SQLProvider> sql;
+	ServiceReference<SQLProvider> sql;
 	MySQLInterface sqlinterface;
 	Anope::string prefix;
 
@@ -115,7 +115,7 @@ class CSTop : public Module
 		ConfigReader config;
 		prefix = config.ReadValue("chanstats", "prefix", "anope_", 0);
 		Anope::string engine = config.ReadValue("chanstats", "engine", "", 0);
-		this->sql = service_reference<SQLProvider>("SQLProvider", engine);
+		this->sql = ServiceReference<SQLProvider>("SQLProvider", engine);
 	}
 
 	SQLResult RunQuery(const SQLQuery &query)

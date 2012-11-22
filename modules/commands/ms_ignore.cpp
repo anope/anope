@@ -26,7 +26,7 @@ class CommandMSIgnore : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		if (!memoserv)
+		if (!MemoServService)
 			return;
 
 
@@ -42,8 +42,8 @@ class CommandMSIgnore : public Command
 		}
 
 		bool ischan;
-		MemoInfo *mi = memoserv->GetMemoInfo(channel, ischan);
-		ChannelInfo *ci = cs_findchan(channel);
+		MemoInfo *mi = MemoServService->GetMemoInfo(channel, ischan);
+		ChannelInfo *ci = ChannelInfo::Find(channel);
 		if (!mi)
 			source.Reply(ischan ? CHAN_X_NOT_REGISTERED : _(NICK_X_NOT_REGISTERED), channel.c_str());
 		else if (ischan && !source.AccessFor(ci).HasPriv("MEMO"))
@@ -77,12 +77,12 @@ class CommandMSIgnore : public Command
 			else
 			{
 				ListFormatter list;
-				list.addColumn("Mask");
+				list.AddColumn("Mask");
 				for (unsigned i = 0; i < mi->ignores.size(); ++i)
 				{
 					ListFormatter::ListEntry entry;
 					entry["Mask"] = mi->ignores[i];
-					list.addEntry(entry);
+					list.AddEntry(entry);
 				}
 
 				source.Reply(_("Ignore list:"));
@@ -120,7 +120,7 @@ class MSIgnore : public Module
 	{
 		this->SetAuthor("Anope");
 
-		if (!memoserv)
+		if (!MemoServService)
 			throw ModuleException("No MemoServ!");
 	}
 };

@@ -1,8 +1,14 @@
 /*
- * Copyright (C) 2008-2011 Robin Burchell <w00t@inspircd.org>
- * Copyright (C) 2008-2012 Anope Team <team@anope.org>
+ *
+ * (C) 2008-2011 Robin Burchell <w00t@inspircd.org>
+ * (C) 2003-2012 Anope Team
+ * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
+ *
+ * Based on the original code of Epona by Lara.
+ * Based on the original code of Services by Andy Church.
+ *
  */
 
 #ifndef USERS_H
@@ -19,25 +25,21 @@ typedef Anope::hash_map<User *> user_map;
 
 extern CoreExport user_map UserListByNick, UserListByUID;
 
-class CoreExport ChannelStatus : public Flags<ChannelModeName, CMODE_END * 2>
-{
- public:
-	ChannelStatus();
-	Anope::string BuildCharPrefixList() const;
-	Anope::string BuildModePrefixList() const;
-};
+extern CoreExport int OperCount;
+extern CoreExport unsigned MaxUserCount;
+extern CoreExport time_t MaxUserTime;
 
+/* One per channel per user. Channel and status */
 struct ChannelContainer
 {
 	Channel *chan;
-	ChannelStatus *Status;
+	ChannelStatus *status;
 
 	ChannelContainer(Channel *c) : chan(c) { }
 	virtual ~ChannelContainer() { }
 };
 
 typedef std::list<ChannelContainer *> UChannelList;
-
 
 /* Online user and channel data. */
 class CoreExport User : public virtual Base, public Extensible, public CommandReply
@@ -46,36 +48,55 @@ class CoreExport User : public virtual Base, public Extensible, public CommandRe
 	Anope::string vident;
 	Anope::string ident;
 	Anope::string uid;
-	bool OnAccess; /* If the user is on the access list of the nick theyre on */
-	Flags<UserModeName, UMODE_END * 2> modes; /* Bitset of mode names the user has set on them */
-	std::map<UserModeName, Anope::string> Params; /* Map of user modes and the params this user has */
-	serialize_obj<NickCore> nc; /* NickCore account the user is currently loggged in as */
+	/* If the user is on the access list of the nick theyre on */
+	bool on_access;
+	/* Bitset of mode names the user has set on them */
+	Flags<UserModeName> modes;
+	/* Map of user modes and the params this user has */
+	std::map<UserModeName, Anope::string> mode_params;
+	/* NickCore account the user is currently loggged in as, if they are logged in */
+	Serialize::Reference<NickCore> nc;
+
+	/* # of invalid password attempts */
+	unsigned short invalid_pw_count;
+	/* Time of last invalid password */
+	time_t invalid_pw_time;
+
 
  public: // XXX: exposing a tiny bit too much
-	Anope::string nick;		/* User's current nick */
+ 	/* User's current nick */
+	Anope::string nick;
 
-	Anope::string host;		/* User's real hostname */
-	Anope::string vhost;		/* User's virtual hostname */
-	Anope::string chost;		/* User's cloaked hostname */
-	Anope::string realname;		/* Realname */
-	Anope::string fingerprint;	/* SSL Fingerprint */
-	Anope::string ip;               /* User's IP */
-	Server *server;			/* Server user is connected to */
-	time_t signon;                  /* When the user signed on. Set on connect and never modified. */
-	time_t timestamp;		/* Timestamp of the nick. Updated when the nick changes. */
-	bool SuperAdmin;		/* is SuperAdmin on or off? */
+	/* User's real hostname */
+	Anope::string host;
+	/* User's virtual hostname */
+	Anope::string vhost;
+	/* User's cloaked hostname */
+	Anope::string chost;
+	/* Realname */
+	Anope::string realname;
+	/* SSL Fingerprint */
+	Anope::string fingerprint;
+	/* User's IP */
+	Anope::string ip;
+	/* Server user is connected to */
+	Server *server;
+	/* When the user signed on. Set on connect and never modified. */
+	time_t signon;
+	/* Timestamp of the nick. Updated when the nick changes. */
+	time_t timestamp;
+	/* Is the user as super admin? */
+	bool super_admin;
 
 	/* Channels the user is in */
 	UChannelList chans;
 
-	unsigned short invalid_pw_count;	/* # of invalid password attempts */
-	time_t invalid_pw_time;				/* Time of last invalid password */
-
-	time_t lastmemosend;	/* Last time MS SEND command used */
-	time_t lastnickreg;		/* Last time NS REGISTER cmd used */
-	time_t lastmail;		/* Last time this user sent a mail */
-
-	/****************************************************************/
+	/* Last time this user sent a memo command used */
+	time_t lastmemosend;
+	/* Last time this user registered */
+	time_t lastnickreg;
+	/* Last time this user sent an email */
+	time_t lastmail;
 
 	/** Create a new user object, initialising necessary fields and
 	 * adds it to the hash
@@ -152,7 +173,7 @@ class CoreExport User : public virtual Base, public Extensible, public CommandRe
 	 */
 	const Anope::string &GetIdent() const;
 
-	/** Get the full mask ( nick!ident@realhost ) of a user
+	/** Get the full mask (nick!ident@realhost) of a user
 	 */
 	Anope::string GetMask() const;
 
@@ -201,16 +222,16 @@ class CoreExport User : public virtual Base, public Extensible, public CommandRe
 	virtual NickCore *Account() const;
 
 	/** Check if the user is identified for their nick
-	 * @param CheckNick True to check if the user is identified to the nickname they are on too
+	 * @param check_nick True to check if the user is identified to the nickname they are on too
 	 * @return true or false
 	 */
-	bool IsIdentified(bool CheckNick = false) const;
+	bool IsIdentified(bool check_nick = false) const;
 
 	/** Check if the user is recognized for their nick (on the nicks access list)
-	 * @param CheckSecure Only returns true if the user has secure off
+	 * @param check_nick Only returns true if the user has secure off
 	 * @return true or false
 	 */
-	bool IsRecognized(bool CheckSecure = true) const;
+	bool IsRecognized(bool check_nick = true) const;
 
 	/** Check if the user is a services oper
 	 * @return true if they are an oper
@@ -243,7 +264,7 @@ class CoreExport User : public virtual Base, public Extensible, public CommandRe
 	 * @param um The user mode
 	 * @param Param The param, if there is one
 	 */
-	void SetModeInternal(UserMode *um, const Anope::string &Param = "");
+	void SetModeInternal(UserMode *um, const Anope::string &param = "");
 
 	/** Remove a mode internally on the user, the IRCd is not informed
 	 * @param um The user mode
@@ -255,14 +276,14 @@ class CoreExport User : public virtual Base, public Extensible, public CommandRe
 	 * @param um The user mode
 	 * @param Param Optional param for the mode
 	 */
-	void SetMode(const BotInfo *bi, UserMode *um, const Anope::string &Param = "");
+	void SetMode(const BotInfo *bi, UserMode *um, const Anope::string &param = "");
 
 	/** Set a mode on the user
 	 * @param bi The client setting the mode
-	 * @param Name The mode name
+	 * @param name The mode name
 	 * @param Param Optional param for the mode
 	 */
-	void SetMode(const BotInfo *bi, UserModeName Name, const Anope::string &Param = "");
+	void SetMode(const BotInfo *bi, UserModeName name, const Anope::string &param = "");
 
 	/** Remove a mode on the user
 	 * @param bi The client setting the mode
@@ -272,9 +293,9 @@ class CoreExport User : public virtual Base, public Extensible, public CommandRe
 
 	/** Remove a mode from the user
 	 * @param bi The client setting the mode
-	 * @param Name The mode name
+	 * @param name The mode name
 	 */
-	void RemoveMode(const BotInfo *bi, UserModeName Name);
+	void RemoveMode(const BotInfo *bi, UserModeName name);
 
 	/** Set a string of modes on a user
 	 * @param bi The client setting the modes
@@ -316,16 +337,28 @@ class CoreExport User : public virtual Base, public Extensible, public CommandRe
 	 * @param reason The reason for the kill
 	 */
 	void KillInternal(const Anope::string &source, const Anope::string &reason);
+
+	/* Returns a mask that will most likely match any address the
+	 * user will have from that location.  For IP addresses, wildcards the
+	 * appropriate subnet mask (e.g. 35.1.1.1 -> 35.*; 128.2.1.1 -> 128.2.*);
+	 * for named addresses, wildcards the leftmost part of the name unless the
+	 * name only contains two parts.  If the username begins with a ~, delete
+	 * it.
+	 */
+	Anope::string Mask() const;
+
+	/** Notes the usage of an incorrect password. If too many
+	 * incorrect passwords are used the user might be killed.
+	 * @return true if the user was killed
+	 */
+	bool BadPassword();
+
+	/** Finds a user by nick, or possibly UID
+	 * @param name The nick, or possibly UID, to lookup
+	 * @param nick_only set to true to only look up by nick, not UID
+	 * @return the user, if they exist
+	 */
+	static User* Find(const Anope::string &name, bool nick_only = false);
 };
-
-extern CoreExport int32_t opcnt;
-extern CoreExport uint32_t maxusercnt, usercnt;
-extern CoreExport time_t maxusertime;
-
-extern CoreExport User *finduser(const Anope::string &nick);
-
-extern CoreExport bool matches_list(Channel *c, User *user, ChannelModeName mode);
-
-extern CoreExport Anope::string create_mask(User *u);
 
 #endif // USERS_H

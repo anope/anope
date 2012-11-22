@@ -9,7 +9,8 @@ class NickServService : public Service
 	virtual void Validate(User *u) = 0;
 };
 
-static service_reference<NickServService> nickserv("NickServService", "NickServ");
+static ServiceReference<NickServService> NickServService("NickServService", "NickServ");
+static Reference<BotInfo> NickServ;
 
 #endif // NICKSERV_H
 

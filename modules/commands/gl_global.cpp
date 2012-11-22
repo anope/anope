@@ -27,12 +27,12 @@ class CommandGLGlobal : public Command
 	{
 		const Anope::string &msg = params[0];
 
-		if (!global)
+		if (!GlobalService)
 			source.Reply("No global reference, is gl_main loaded?");
 		else
 		{
 			Log(LOG_ADMIN, source, this);
-			global->SendGlobal(findbot(Config->Global), source.GetNick(), msg);
+			GlobalService->SendGlobal(Global, source.GetNick(), msg);
 		}
 	}
 

@@ -130,7 +130,7 @@ class HTTPClient : public ClientSocket, public BufferedSocket, public BinarySock
 
 	bool ProcessWrite() anope_override
 	{
-		return !BinarySocket::ProcessWrite() || BinarySocket::WriteBuffer.empty() ? false : true;
+		return !BinarySocket::ProcessWrite() || BinarySocket::write_buffer.empty() ? false : true;
 	}
 
 	void Write(const char *buffer, size_t l) anope_override

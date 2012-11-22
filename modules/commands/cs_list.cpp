@@ -33,8 +33,9 @@ class CommandCSList : public Command
 
 		if (pattern[0] == '#')
 		{
-			Anope::string n1 = myStrGetToken(pattern.substr(1), '-', 0), /* Read FROM out */
-					n2 = myStrGetTokenRemainder(pattern, '-', 1);
+			Anope::string n1, n2;
+			sepstream(pattern.substr(1), '-').GetToken(n1, 0);
+			sepstream(pattern, '-').GetToken(n2, 1);
 
 			try
 			{
@@ -72,7 +73,7 @@ class CommandCSList : public Command
 		source.Reply(_("List of entries matching \002%s\002:"), pattern.c_str());
 
 		ListFormatter list;
-		list.addColumn("Name").addColumn("Description");
+		list.AddColumn("Name").AddColumn("Description");
 
 		for (registered_channel_map::const_iterator it = RegisteredChannelList->begin(), it_end = RegisteredChannelList->end(); it != it_end; ++it)
 		{
@@ -99,7 +100,7 @@ class CommandCSList : public Command
 						entry["Description"] = "[Suspended]";
 					else
 						entry["Description"] = ci->desc;
-					list.addEntry(entry);
+					list.AddEntry(entry);
 				}
 				++count;
 			}

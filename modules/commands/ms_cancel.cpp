@@ -25,14 +25,14 @@ class CommandMSCancel : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		if (!memoserv)
+		if (!MemoServService)
 			return;
 
 
 		const Anope::string &nname = params[0];
 
 		bool ischan;
-		MemoInfo *mi = memoserv->GetMemoInfo(nname, ischan);
+		MemoInfo *mi = MemoServService->GetMemoInfo(nname, ischan);
 
 		if (mi == NULL)
 			source.Reply(ischan ? CHAN_X_NOT_REGISTERED : _(NICK_X_NOT_REGISTERED), nname.c_str());
@@ -41,9 +41,9 @@ class CommandMSCancel : public Command
 			ChannelInfo *ci = NULL;
 			NickAlias *na = NULL;
 			if (ischan)
-				ci = cs_findchan(nname);
+				ci = ChannelInfo::Find(nname);
 			else
-				na = findnick(nname);
+				na = NickAlias::Find(nname);
 			for (int i = mi->memos->size() - 1; i >= 0; --i)
 				if (mi->GetMemo(i)->HasFlag(MF_UNREAD) && source.nc->display.equals_ci(mi->GetMemo(i)->sender))
 				{
@@ -81,7 +81,7 @@ class MSCancel : public Module
 	{
 		this->SetAuthor("Anope");
 
-		if (!memoserv)
+		if (!MemoServService)
 			throw ModuleException("No MemoServ!");
 	}
 };

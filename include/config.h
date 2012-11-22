@@ -8,7 +8,6 @@
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
  *
- *
  */
 
 #ifndef CONFIG_H
@@ -206,23 +205,6 @@ typedef bool (*MultiValidator)(ServerConfig *, const Anope::string &, const Anop
 /** A callback indicating the end of a group of entries
  */
 typedef bool (*MultiNotify)(ServerConfig *, const Anope::string &);
-
-bool ValidateNotEmpty(ServerConfig *, const Anope::string &tag, const Anope::string &value, ValueItem &data);
-bool ValidateNotZero(ServerConfig *, const Anope::string &tag, const Anope::string &value, ValueItem &data);
-bool ValidateEmailReg(ServerConfig *config, const Anope::string &tag, const Anope::string &value, ValueItem &data);
-bool ValidatePort(ServerConfig *, const Anope::string &tag, const Anope::string &value, ValueItem &data);
-bool ValidateGuestPrefix(ServerConfig *conf, const Anope::string &tag, const Anope::string &value, ValueItem &data);
-bool ValidateBantype(ServerConfig *, const Anope::string &, const Anope::string &, ValueItem &data);
-bool ValidateChanServ(ServerConfig *config, const Anope::string &tag, const Anope::string &value, ValueItem &data);
-bool ValidateMemoServ(ServerConfig *config, const Anope::string &tag, const Anope::string &value, ValueItem &data);
-bool ValidateBotServ(ServerConfig *config, const Anope::string &tag, const Anope::string &value, ValueItem &data);
-bool ValidateHostServ(ServerConfig *config, const Anope::string &tag, const Anope::string &value, ValueItem &data);
-bool ValidateLimitSessions(ServerConfig *config, const Anope::string &tag, const Anope::string &value, ValueItem &data);
-bool ValidateOperServ(ServerConfig *config, const Anope::string &tag, const Anope::string &value, ValueItem &data);
-bool ValidateGlobal(ServerConfig *config, const Anope::string &tag, const Anope::string &value, ValueItem &data);
-bool ValidateNickLen(ServerConfig *, const Anope::string &, const Anope::string &, ValueItem &data);
-bool ValidateMail(ServerConfig *config, const Anope::string &tag, const Anope::string &value, ValueItem &data);
-bool ValidateGlobalOnCycle(ServerConfig *config, const Anope::string &tag, const Anope::string &value, ValueItem &data);
 
 /** Represents a configuration file
  */
@@ -463,8 +445,6 @@ class CoreExport ServerConfig
 	bool UseServerSideTopicLock;
 	/* Default botmodes on channels, defaults to ao */
 	Anope::string BotModes;
-	/* THe actual modes */
-	ChannelStatus BotModeList;
 	/* How long to wait between connection attempts */
 	int RetryWait;
 	/* If services should hide unprivileged commands */
@@ -517,7 +497,7 @@ class CoreExport ServerConfig
 	/* Don't allow nicks to use /ns group to regroup nicks */
 	bool NSNoGroupChange;
 	/* Default flags for newly registered nicks */
-	Flags<NickCoreFlag, NI_END> NSDefFlags;
+	Flags<NickCoreFlag> NSDefFlags;
 	/* All languages Anope is aware about */
 	Anope::string Languages;
 	/* Default language used by services */
@@ -578,7 +558,7 @@ class CoreExport ServerConfig
 	/* Core ChanServ modules */
 	Anope::string ChanCoreModules;
 	/* Default flags for newly registered channels */
-	Flags<ChannelInfoFlag, CI_END> CSDefFlags;
+	Flags<ChannelInfoFlag> CSDefFlags;
 	/* Max number of channels a user can own */
 	unsigned CSMaxReg;
 	/* Time before a channel expires */
@@ -741,7 +721,7 @@ class ConfigException : public CoreException
 #define CONF_FILE_NOT_FOUND 0x000200
 
 /** Allows reading of values from configuration files
- * This class allows a module to read from either the main configuration file (inspircd.conf) or from
+ * This class allows a module to read from either the main configuration file (services.conf) or from
  * a module-specified configuration file. It may either be instantiated with one parameter or none.
  * Constructing the class using one parameter allows you to specify a path to your own configuration
  * file, otherwise, inspircd.conf is read.
@@ -836,7 +816,7 @@ class CoreExport ConfigReader
 	int EnumerateValues(const Anope::string &, int);
 };
 
-extern ConfigurationFile services_conf;
+extern ConfigurationFile ServicesConf;
 extern CoreExport ServerConfig *Config;
 
 #endif // CONFIG_H

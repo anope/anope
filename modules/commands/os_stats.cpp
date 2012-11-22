@@ -18,20 +18,20 @@ struct Stats : Serializable
 {
 	Stats() : Serializable("Stats") { }
 
-	Serialize::Data serialize() const anope_override
+	Serialize::Data Serialize() const anope_override
 	{
 		Serialize::Data data;
 
-		data["maxusercnt"] << maxusercnt;
-		data["maxusertime"] << maxusertime;
+		data["maxusercnt"] << MaxUserCount;
+		data["maxusertime"] << MaxUserTime;
 
 		return data;
 	}
 
-	static Serializable* unserialize(Serializable *obj, Serialize::Data &data)
+	static Serializable* Unserialize(Serializable *obj, Serialize::Data &data)
 	{
-		data["maxusercnt"] >> maxusercnt;
-		data["maxusertime"] >> maxusertime;
+		data["maxusercnt"] >> MaxUserCount;
+		data["maxusertime"] >> MaxUserTime;
 		return NULL;
 	}
 };
@@ -57,7 +57,7 @@ static int stats_count_servers(Server *s)
 
 class CommandOSStats : public Command
 {
-	service_reference<XLineManager> akills, snlines, sqlines;
+	ServiceReference<XLineManager> akills, snlines, sqlines;
  private:
 	void DoStatsAkill(CommandSource &source)
 	{
@@ -82,7 +82,7 @@ class CommandOSStats : public Command
 			else
 				source.Reply(_("Default AKILL expiry time: \002No expiration\002"));
 		}
-		if (ircdproto->CanSNLine && snlines)
+		if (IRCD->CanSNLine && snlines)
 		{
 			/* SNLINEs */
 			source.Reply(_("Current number of SNLINEs: \002%d\002"), snlines->GetCount());
@@ -102,7 +102,7 @@ class CommandOSStats : public Command
 			else
 				source.Reply(_("Default SNLINE expiry time: \002No expiration\002"));
 		}
-		if (ircdproto->CanSQLine && sqlines)
+		if (IRCD->CanSQLine && sqlines)
 		{
 			/* SQLINEs */
 			source.Reply(_("Current number of SQLINEs: \002%d\002"), sqlines->GetCount());
@@ -127,17 +127,17 @@ class CommandOSStats : public Command
 
 	void DoStatsReset(CommandSource &source)
 	{
-		maxusercnt = usercnt;
+		MaxUserCount = UserListByNick.size();
 		source.Reply(_("Statistics reset."));
 		return;
 	}
 
 	void DoStatsUptime(CommandSource &source)
 	{
-		time_t uptime = Anope::CurTime - start_time;
-		source.Reply(_("Current users: \002%d\002 (\002%d\002 ops)"), usercnt, opcnt);
-		source.Reply(_("Maximum users: \002%d\002 (%s)"), maxusercnt, do_strftime(maxusertime).c_str());
-		source.Reply(_("Services up %s"), duration(uptime).c_str());
+		time_t uptime = Anope::CurTime - Anope::StartTime;
+		source.Reply(_("Current users: \002%d\002 (\002%d\002 ops)"), UserListByNick.size(), OperCount);
+		source.Reply(_("Maximum users: \002%d\002 (%s)"), MaxUserCount, Anope::strftime(MaxUserTime).c_str());
+		source.Reply(_("Services up %s"), Anope::Duration(uptime).c_str());
 
 		return;
 	}
@@ -145,7 +145,7 @@ class CommandOSStats : public Command
 	void DoStatsUplink(CommandSource &source)
 	{
 		Anope::string buf;
-		for (std::set<Anope::string>::iterator it = Capab.begin(); it != Capab.end(); ++it)
+		for (std::set<Anope::string>::iterator it = Servers::Capab.begin(); it != Servers::Capab.end(); ++it)
 			buf += " " + *it;
 		if (!buf.empty())
 			buf.erase(buf.begin());
@@ -255,12 +255,12 @@ class CommandOSStats : public Command
 class OSStats : public Module
 {
 	CommandOSStats commandosstats;
-	SerializeType stats_type;
+	Serialize::Type stats_type;
 	Stats stats_saver;
 
  public:
 	OSStats(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
-		commandosstats(this), stats_type("Stats", Stats::unserialize)
+		commandosstats(this), stats_type("Stats", Stats::Unserialize)
 	{
 		this->SetAuthor("Anope");
 

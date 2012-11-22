@@ -29,12 +29,12 @@ class CommandOSModInfo : public Command
 		Module *m = ModuleManager::FindModule(file);
 		if (m)
 		{
-			source.Reply(_("Module: \002%s\002 Version: \002%s\002 Author: \002%s\002 loaded: \002%s\002"), m->name.c_str(), !m->version.empty() ? m->version.c_str() : "?", !m->author.empty() ? m->author.c_str() : "?", do_strftime(m->created).c_str());
+			source.Reply(_("Module: \002%s\002 Version: \002%s\002 Author: \002%s\002 loaded: \002%s\002"), m->name.c_str(), !m->version.empty() ? m->version.c_str() : "?", !m->author.empty() ? m->author.c_str() : "?", Anope::strftime(m->created).c_str());
 
 			std::vector<Anope::string> servicekeys = Service::GetServiceKeys("Command");
 			for (unsigned i = 0; i < servicekeys.size(); ++i)
 			{
-				service_reference<Command> c("Command", servicekeys[i]);
+				ServiceReference<Command> c("Command", servicekeys[i]);
 				if (!c || c->owner != m)
 					continue;
 
@@ -156,9 +156,11 @@ class CommandOSModList : public Command
 			}
 		}
 
+		Module *protocol = ModuleManager::FindFirstOf(PROTOCOL);
+
 		source.Reply(_("Current Module list:"));
 
-		for (std::list<Module *>::iterator it = Modules.begin(), it_end = Modules.end(); it != it_end; ++it)
+		for (std::list<Module *>::iterator it = ModuleManager::Modules.begin(), it_end = ModuleManager::Modules.end(); it != it_end; ++it)
 		{
 			Module *m = *it;
 
@@ -179,6 +181,8 @@ class CommandOSModList : public Command
 					}
 					break;
 				case PROTOCOL:
+					if (m != protocol)
+						break;
 					if (showProto)
 					{
 						source.Reply(_("Module: \002%s\002 [%s] [%s]"), m->name.c_str(), m->version.c_str(), proto);

@@ -20,7 +20,7 @@ class ExpireCallback : public CallBack
 
 	void Tick(time_t) anope_override
 	{
-		if (!Config->CSExpire || noexpire || readonly)
+		if (!Config->CSExpire || Anope::NoExpire || Anope::ReadOnly)
 			return;
 
 		for (registered_channel_map::const_iterator it = RegisteredChannelList->begin(), it_end = RegisteredChannelList->end(); it != it_end; )
@@ -30,7 +30,7 @@ class ExpireCallback : public CallBack
 
 			bool expire = false;
 
-			if (!ci->c && Config->CSExpire && Anope::CurTime - ci->last_used >= Config->CSExpire)
+			if (!ci->c && Anope::CurTime - ci->last_used >= Config->CSExpire)
 				expire = true;
 
 			if (ci->HasFlag(CI_NO_EXPIRE))
@@ -46,7 +46,7 @@ class ExpireCallback : public CallBack
 
 				Log(LOG_NORMAL, "chanserv/expire") << "Expiring " << extra  << "channel " << ci->name << " (founder: " << (ci->GetFounder() ? ci->GetFounder()->display : "(none)") << ")";
 				FOREACH_MOD(I_OnChanExpire, OnChanExpire(ci));
-				ci->destroy();
+				ci->Destroy();
 			}
 		}
 	}
@@ -61,8 +61,8 @@ class ChanServCore : public Module
 	{
 		this->SetAuthor("Anope");
 
-		const BotInfo *ChanServ = findbot(Config->ChanServ);
-		if (ChanServ == NULL)
+		ChanServ = BotInfo::Find(Config->ChanServ);
+		if (!ChanServ)
 			throw ModuleException("No bot named " + Config->ChanServ);
 
 		Implementation i[] = { I_OnBotPrivmsg, I_OnDelCore, I_OnPreHelp, I_OnPostHelp, I_OnCheckModes };
@@ -99,7 +99,7 @@ class ChanServCore : public Module
 					for (unsigned j = 0; j < ci->GetAccessCount(); ++j)
 					{
 						const ChanAccess *ca = ci->GetAccess(j);
-						const NickCore *anc = findcore(ca->mask);
+						const NickCore *anc = NickCore::Find(ca->mask);
 
 						if (!anc || (!anc->IsServicesOper() && Config->CSMaxReg && anc->channelcount >= Config->CSMaxReg) || (anc == nc))
 							continue;
@@ -107,7 +107,7 @@ class ChanServCore : public Module
 							highest = ca;
 					}
 					if (highest)
-						newowner = findcore(highest->mask);
+						newowner = NickCore::Find(highest->mask);
 				}
 
 				if (newowner)
@@ -120,7 +120,7 @@ class ChanServCore : public Module
 				{
 					Log(LOG_NORMAL, "chanserv/expire") << "Deleting channel " << ci->name << " owned by deleted nick " << nc->display;
 
-					ci->destroy();
+					ci->Destroy();
 					continue;
 				}
 			}
@@ -131,7 +131,7 @@ class ChanServCore : public Module
 			for (unsigned j = 0; j < ci->GetAccessCount(); ++j)
 			{
 				const ChanAccess *ca = ci->GetAccess(j);
-				const NickCore *anc = findcore(ca->mask);
+				const NickCore *anc = NickCore::Find(ca->mask);
 
 				if (anc && anc == nc)
 				{

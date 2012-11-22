@@ -157,7 +157,7 @@ class MyXMLRPCServiceInterface : public XMLRPCServiceInterface, public HTTPPage
 
 class ModuleXMLRPC : public Module
 {
-	service_reference<HTTPProvider> httpref;
+	ServiceReference<HTTPProvider> httpref;
  public:
 	MyXMLRPCServiceInterface xmlrpcinterface;
 
@@ -183,7 +183,7 @@ class ModuleXMLRPC : public Module
 	void OnReload() anope_override
 	{
 		ConfigReader config;
-		httpref = service_reference<HTTPProvider>("HTTPProvider", "httpd/main");
+		httpref = ServiceReference<HTTPProvider>("HTTPProvider", "httpd/main");
 	}
 };
 

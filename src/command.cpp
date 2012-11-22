@@ -1,13 +1,14 @@
 /*
+ *
  * Copyright (C) 2008-2011 Robin Burchell <w00t@inspircd.org>
  * Copyright (C) 2008-2012 Anope Team <team@anope.org>
  *
  * Please read COPYING and README for further details.
+ *
  */
 
 #include "services.h"
 #include "commands.h"
-#include "extern.h"
 #include "users.h"
 #include "language.h"
 #include "config.h"
@@ -16,6 +17,9 @@
 #include "access.h"
 #include "regchannel.h"
 #include "channels.h"
+
+static const Anope::string CommandFlagString[] = { "CFLAG_ALLOW_UNREGISTERED", "CFLAG_STRIP_CHANNEL", "" };
+template<> const Anope::string* Flags<CommandFlag>::flags_strings = CommandFlagString;
 
 CommandSource::CommandSource(const Anope::string &n, User *user, NickCore *core, CommandReply *r, BotInfo *bi) : nick(n), u(user), nc(core), reply(r),
 	c(NULL), service(bi)
@@ -97,7 +101,7 @@ void CommandSource::Reply(const char *message, ...)
 	va_list args;
 	char buf[4096]; // Messages can be really big.
 
-	const char *translated_message = translate(this->nc, message);
+	const char *translated_message = Language::Translate(this->nc, message);
 
 	va_start(args, message);
 	vsnprintf(buf, sizeof(buf), translated_message, args);
@@ -109,7 +113,7 @@ void CommandSource::Reply(const char *message, ...)
 
 void CommandSource::Reply(const Anope::string &message)
 {
-	const char *translated_message = translate(this->nc, message.c_str());
+	const char *translated_message = Language::Translate(this->nc, message.c_str());
 
 	sepstream sep(translated_message, '\n');
 	Anope::string tok;
@@ -117,7 +121,7 @@ void CommandSource::Reply(const Anope::string &message)
 		this->reply->SendMessage(this->service, tok);
 }
 
-Command::Command(Module *o, const Anope::string &sname, size_t min_params, size_t max_params) : Service(o, "Command", sname), Flags<CommandFlag>(CommandFlagStrings), MaxParams(max_params), MinParams(min_params), module(owner)
+Command::Command(Module *o, const Anope::string &sname, size_t minparams, size_t maxparams) : Service(o, "Command", sname), max_params(maxparams), min_params(minparams), module(owner)
 {
 }
 
@@ -163,7 +167,7 @@ const Anope::string &Command::GetDesc() const
 
 void Command::OnServHelp(CommandSource &source)
 {
-	source.Reply("    %-14s %s", source.command.c_str(), translate(source.nc, (this->GetDesc().c_str())));
+	source.Reply("    %-14s %s", source.command.c_str(), Language::Translate(source.nc, this->GetDesc().c_str()));
 }
 
 bool Command::OnHelp(CommandSource &source, const Anope::string &subcommand) { return false; }
@@ -176,7 +180,8 @@ void Command::OnSyntaxError(CommandSource &source, const Anope::string &subcomma
 
 void RunCommand(CommandSource &source, const Anope::string &message)
 {
-	std::vector<Anope::string> params = BuildStringVector(message);
+	std::vector<Anope::string> params;
+	spacesepstream(message).GetTokens(params);
 	bool has_help = source.service->commands.find("HELP") != source.service->commands.end();
 
 	CommandInfo::map::const_iterator it = source.service->commands.end();
@@ -202,7 +207,7 @@ void RunCommand(CommandSource &source, const Anope::string &message)
 	}
 
 	const CommandInfo &info = it->second;
-	service_reference<Command> c("Command", info.name);
+	ServiceReference<Command> c("Command", info.name);
 	if (!c)
 	{
 		if (has_help)
@@ -225,10 +230,10 @@ void RunCommand(CommandSource &source, const Anope::string &message)
 	for (unsigned i = 0, j = params.size() - (count - 1); i < j; ++i)
 		params.erase(params.begin());
 
-	while (c->MaxParams > 0 && params.size() > c->MaxParams)
+	while (c->max_params > 0 && params.size() > c->max_params)
 	{
-		params[c->MaxParams - 1] += " " + params[c->MaxParams];
-		params.erase(params.begin() + c->MaxParams);
+		params[c->max_params - 1] += " " + params[c->max_params];
+		params.erase(params.begin() + c->max_params);
 	}
 
 	source.command = it->first;
@@ -239,7 +244,7 @@ void RunCommand(CommandSource &source, const Anope::string &message)
 	if (MOD_RESULT == EVENT_STOP)
 		return;
 
-	if (params.size() < c->MinParams)
+	if (params.size() < c->min_params)
 	{
 		c->OnSyntaxError(source, !params.empty() ? params[params.size() - 1] : "");
 		return;
@@ -255,8 +260,8 @@ void RunCommand(CommandSource &source, const Anope::string &message)
 	}
 
 	bool had_u = source.GetUser(), had_nc = source.nc;
-	dynamic_reference<User> user_reference(source.GetUser());
-	dynamic_reference<NickCore> nc_reference(source.nc);
+	Reference<User> user_reference(source.GetUser());
+	Reference<NickCore> nc_reference(source.nc);
 	c->Execute(source, params);
 	if (had_u == user_reference && had_nc == nc_reference)
 	{

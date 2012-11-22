@@ -22,7 +22,7 @@ struct NickSuspend : ExtensibleItem, Serializable
 	{
 	}
 
-	Serialize::Data serialize() const anope_override
+	Serialize::Data Serialize() const anope_override
 	{
 		Serialize::Data sd;
 
@@ -32,9 +32,9 @@ struct NickSuspend : ExtensibleItem, Serializable
 		return sd;
 	}
 
-	static Serializable* unserialize(Serializable *obj, Serialize::Data &sd)
+	static Serializable* Unserialize(Serializable *obj, Serialize::Data &sd)
 	{
-		const NickAlias *na = findnick(sd["nick"].astr());
+		const NickAlias *na = NickAlias::Find(sd["nick"].astr());
 		if (na == NULL)
 			return NULL;
 
@@ -71,7 +71,7 @@ class CommandNSSuspend : public Command
 		Anope::string reason = params.size() > 2 ? params[2] : "";
 		time_t expiry_secs = Config->NSSuspendExpire;
 
-		if (readonly)
+		if (Anope::ReadOnly)
 		{
 			source.Reply(READ_ONLY_MODE);
 			return;
@@ -84,9 +84,9 @@ class CommandNSSuspend : public Command
 			expiry.clear();
 		}
 		else
-			expiry_secs = dotime(expiry);
+			expiry_secs = Anope::DoTime(expiry);
 
-		NickAlias *na = findnick(nick);
+		NickAlias *na = NickAlias::Find(nick);
 		if (!na)
 		{
 			source.Reply(NICK_X_NOT_REGISTERED, nick.c_str());
@@ -107,7 +107,7 @@ class CommandNSSuspend : public Command
 		nc->UnsetFlag(NI_KILL_QUICK);
 		nc->UnsetFlag(NI_KILL_IMMED);
 
-		for (std::list<serialize_obj<NickAlias> >::iterator it = nc->aliases.begin(), it_end = nc->aliases.end(); it != it_end;)
+		for (std::list<Serialize::Reference<NickAlias> >::iterator it = nc->aliases.begin(), it_end = nc->aliases.end(); it != it_end;)
 		{
 			NickAlias *na2 = *it++;
 
@@ -115,7 +115,7 @@ class CommandNSSuspend : public Command
 			{
 				na2->last_quit = reason;
 
-				User *u2 = finduser(na2->nick);
+				User *u2 = User::Find(na2->nick);
 				if (u2)
 				{
 					u2->Logout();
@@ -133,7 +133,7 @@ class CommandNSSuspend : public Command
 			nc->Extend("ns_suspend_expire", ns);
 		}
 
-		Log(LOG_ADMIN, source, this) << "for " << nick << " (" << (!reason.empty() ? reason : "No reason") << "), expires in " << (expiry_secs ? do_strftime(Anope::CurTime + expiry_secs) : "never");
+		Log(LOG_ADMIN, source, this) << "for " << nick << " (" << (!reason.empty() ? reason : "No reason") << "), expires in " << (expiry_secs ? Anope::strftime(Anope::CurTime + expiry_secs) : "never");
 		source.Reply(_("Nick %s is now suspended."), nick.c_str());
 
 		FOREACH_MOD(I_OnNickSuspended, OnNickSuspend(na));
@@ -166,13 +166,13 @@ class CommandNSUnSuspend : public Command
 	{
 		const Anope::string &nick = params[0];
 
-		if (readonly)
+		if (Anope::ReadOnly)
 		{
 			source.Reply(READ_ONLY_MODE);
 			return;
 		}
 
-		NickAlias *na = findnick(nick);
+		NickAlias *na = NickAlias::Find(nick);
 		if (!na)
 		{
 			source.Reply(NICK_X_NOT_REGISTERED, nick.c_str());
@@ -207,13 +207,13 @@ class CommandNSUnSuspend : public Command
 
 class NSSuspend : public Module
 {
-	SerializeType nicksuspend_type;
+	Serialize::Type nicksuspend_type;
 	CommandNSSuspend commandnssuspend;
 	CommandNSUnSuspend commandnsunsuspend;
 
  public:
 	NSSuspend(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
-		nicksuspend_type("NickSuspend", NickSuspend::unserialize), commandnssuspend(this), commandnsunsuspend(this)
+		nicksuspend_type("NickSuspend", NickSuspend::Unserialize), commandnssuspend(this), commandnsunsuspend(this)
 	{
 		this->SetAuthor("Anope");
 
@@ -241,7 +241,7 @@ class NSSuspend : public Module
 			na->nc->UnsetFlag(NI_SUSPENDED);
 			na->nc->Shrink("ns_suspend_expire");
 
-			Log(LOG_NORMAL, "expire", findbot(Config->NickServ)) << "Expiring suspend for " << na->nick;
+			Log(LOG_NORMAL, "expire", NickServ) << "Expiring suspend for " << na->nick;
 		}
 	}
 };

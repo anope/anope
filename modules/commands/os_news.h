@@ -23,8 +23,8 @@ struct NewsItem : Serializable
 	time_t time;
 
 	NewsItem() : Serializable("NewsItem") { }
-	Serialize::Data serialize() const anope_override;
-	static Serializable* unserialize(Serializable *obj, Serialize::Data &data);
+	Serialize::Data Serialize() const anope_override;
+	static Serializable* Unserialize(Serializable *obj, Serialize::Data &data);
 };
 
 class NewsService : public Service
@@ -39,9 +39,9 @@ class NewsService : public Service
 	virtual std::vector<NewsItem *> &GetNewsList(NewsType t) = 0;
 };
 
-static service_reference<NewsService> news_service("NewsService", "news");
+static ServiceReference<NewsService> news_service("NewsService", "news");
 
-Serialize::Data NewsItem::serialize() const
+Serialize::Data NewsItem::Serialize() const
 {
 	Serialize::Data data;
 		
@@ -53,7 +53,7 @@ Serialize::Data NewsItem::serialize() const
 	return data;
 }
 
-Serializable* NewsItem::unserialize(Serializable *obj, Serialize::Data &data)
+Serializable* NewsItem::Unserialize(Serializable *obj, Serialize::Data &data)
 {
 	if (!news_service)
 		return NULL;

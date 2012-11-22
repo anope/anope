@@ -22,20 +22,20 @@ enum CommandFlag
 	CFLAG_STRIP_CHANNEL
 };
 
-const Anope::string CommandFlagStrings[] = {
-	"CFLAG_ALLOW_UNREGISTERED",
-	"CFLAG_STRIP_CHANNEL",
-	""
-};
-
+/* Used in BotInfo::commands */
 struct CommandInfo
 {
 	typedef Anope::map<CommandInfo> map;
 
+	/* Service name of the command */
 	Anope::string name;
+	/* Permission required to execute the command */
 	Anope::string permission;
 };
 
+/* Where the replies from commands go to. User inheits from this and is the normal
+ * source of a CommandReply
+ */
 struct CommandReply
 {
 	virtual void SendMessage(const BotInfo *source, const Anope::string &msg) = 0;
@@ -47,16 +47,16 @@ class CoreExport CommandSource
 	/* The nick executing the command */
 	Anope::string nick;
 	/* User executing the command, may be NULL */
-	dynamic_reference<User> u;
+	Reference<User> u;
  public:
 	/* The account executing the command */
-	dynamic_reference<NickCore> nc;
+	Reference<NickCore> nc;
 	/* Where the reply should go */
 	CommandReply *reply;
 	/* Channel the command was executed on (fantasy) */
-	dynamic_reference<Channel> c;
+	Reference<Channel> c;
 	/* The service this command is on */
-	dynamic_reference<BotInfo> service;
+	Reference<BotInfo> service;
 	/* The actual name of the command being executed */
 	Anope::string command;
 	/* The permission of the command being executed */
@@ -88,9 +88,9 @@ class CoreExport Command : public Service, public Flags<CommandFlag>
 
  public:
  	/* Maximum paramaters accepted by this command */
-	size_t MaxParams;
+	size_t max_params;
 	/* Minimum parameters required to use this command */
-	size_t MinParams;
+	size_t min_params;
 
 	/* Module which owns us */
 	Module *module;

@@ -7,6 +7,7 @@
  *
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
+ *
  */
 
 
@@ -20,16 +21,15 @@
 #include "bots.h"
 #include "config.h"
 #include "opertype.h"
-#include "extern.h"
+#include "nickserv.h"
+#include "operserv.h"
+#include "language.h"
 
 user_map UserListByNick, UserListByUID;
 
-int32_t opcnt = 0;
-uint32_t usercnt = 0, maxusercnt = 0;
-time_t maxusertime;
-
-/*************************************************************************/
-/*************************************************************************/
+int OperCount = 0;
+unsigned MaxUserCount = 0;
+time_t MaxUserTime = 0;
 
 User::User(const Anope::string &snick, const Anope::string &sident, const Anope::string &shost, const Anope::string &svhost, const Anope::string &sip, Server *sserver, const Anope::string &srealname, time_t ssignon, const Anope::string &smodes, const Anope::string &suid)
 {
@@ -39,7 +39,7 @@ User::User(const Anope::string &snick, const Anope::string &sident, const Anope:
 	/* we used to do this by calloc, no more. */
 	server = NULL;
 	invalid_pw_count = invalid_pw_time = lastmemosend = lastnickreg = lastmail = 0;
-	OnAccess = false;
+	on_access = false;
 
 	this->nick = snick;
 	this->ident = sident;
@@ -53,7 +53,7 @@ User::User(const Anope::string &snick, const Anope::string &sident, const Anope:
 	this->timestamp = this->signon = ssignon;
 	this->SetModesInternal("%s", smodes.c_str());
 	this->uid = suid;
-	this->SuperAdmin = false;
+	this->super_admin = false;
 
 	size_t old = UserListByNick.size();
 	UserListByNick[snick] = this;
@@ -66,22 +66,21 @@ User::User(const Anope::string &snick, const Anope::string &sident, const Anope:
 
 	if (sserver) // Our bots are introduced on startup with no server
 	{
-		++sserver->Users;
+		++sserver->users;
 		Log(this, "connect") << (!svhost.empty() ? Anope::string("(") + svhost + ") " : "") << "(" << srealname << ") " << sip << " connected to the network (" << sserver->GetName() << ")";
 	}
 
-	++usercnt;
-	if (usercnt > maxusercnt)
+	if (UserListByNick.size() > MaxUserCount)
 	{
-		maxusercnt = usercnt;
-		maxusertime = Anope::CurTime;
-		Log(this, "maxusers") << "connected - new maximum user count: " << maxusercnt;
+		MaxUserCount = UserListByNick.size();
+		MaxUserTime = Anope::CurTime;
+		Log(this, "maxusers") << "connected - new maximum user count: " << UserListByNick.size();
 	}
 
 	bool exempt = false;
 	if (server && server->IsULined())
 		exempt = true;
-	dynamic_reference<User> user = this;
+	Reference<User> user = this;
 	FOREACH_MOD(I_OnUserConnect, OnUserConnect(user, exempt));
 }
 
@@ -91,7 +90,7 @@ void User::ChangeNick(const Anope::string &newnick, time_t ts)
 	if (newnick.empty())
 		throw CoreException("User::ChangeNick() got a bad argument");
 	
-	this->SuperAdmin = false;
+	this->super_admin = false;
 	Log(this, "nick") << "(" << this->realname << ") changed nick to " << newnick;
 
 	Anope::string old = this->nick;
@@ -101,7 +100,7 @@ void User::ChangeNick(const Anope::string &newnick, time_t ts)
 		this->nick = newnick;
 	else
 	{
-		NickAlias *old_na = findnick(this->nick);
+		NickAlias *old_na = NickAlias::Find(this->nick);
 		if (old_na && (this->IsIdentified(true) || this->IsRecognized()))
 			old_na->last_seen = Anope::CurTime;
 		
@@ -109,10 +108,10 @@ void User::ChangeNick(const Anope::string &newnick, time_t ts)
 		this->nick = newnick;
 		UserListByNick[this->nick] = this;
 
-		OnAccess = false;
-		NickAlias *na = findnick(this->nick);
+		on_access = false;
+		NickAlias *na = NickAlias::Find(this->nick);
 		if (na)
-			OnAccess = is_on_access(this, na->nc);
+			on_access = na->nc->IsOnAccess(this);
 
 		if (old_na)
 			old_na->OnCancel(this);
@@ -139,9 +138,6 @@ void User::SetDisplayedHost(const Anope::string &shost)
 	this->UpdateHost();
 }
 
-/** Get the displayed vhost of a user record.
- * @return The displayed vhost of the user, where ircd-supported, or the user's real host.
- */
 const Anope::string &User::GetDisplayedHost() const
 {
 	if (!this->vhost.empty())
@@ -152,9 +148,6 @@ const Anope::string &User::GetDisplayedHost() const
 		return this->host;
 }
 
-/** Update the cloaked host of a user
- * @param host The cloaked host
- */
 void User::SetCloakedHost(const Anope::string &newhost)
 {
 	if (newhost.empty())
@@ -167,9 +160,6 @@ void User::SetCloakedHost(const Anope::string &newhost)
 	this->UpdateHost();
 }
 
-/** Get the cloaked host of a user
- * @return The cloaked host
- */
 const Anope::string &User::GetCloakedHost() const
 {
 	return chost;
@@ -177,7 +167,7 @@ const Anope::string &User::GetCloakedHost() const
 
 const Anope::string &User::GetUID() const
 {
-	if (!this->uid.empty() && ircdproto->RequiresID)
+	if (!this->uid.empty() && IRCD->RequiresID)
 		return this->uid;
 	else
 		return this->nick;
@@ -230,7 +220,7 @@ void User::SetRealname(const Anope::string &srealname)
 		throw CoreException("realname empty in SetRealname");
 
 	this->realname = srealname;
-	NickAlias *na = findnick(this->nick);
+	NickAlias *na = NickAlias::Find(this->nick);
 
 	if (na && (this->IsIdentified(true) || this->IsRecognized()))
 		na->last_realname = srealname;
@@ -243,17 +233,15 @@ User::~User()
 	Log(LOG_DEBUG_2) << "User::~User() called";
 
 	Log(this, "disconnect") << "(" << this->realname << ") " << "disconnected from the network (" << this->server->GetName() << ")";
-	--this->server->Users;
+	--this->server->users;
 
 	FOREACH_MOD(I_OnUserLogoff, OnUserLogoff(this));
 
 	ModeManager::StackerDel(this);
 	this->Logout();
 
-	--usercnt;
-
 	if (this->HasMode(UMODE_OPER))
-		--opcnt;
+		--OperCount;
 
 	while (!this->chans.empty())
 		this->chans.front()->chan->DeleteUser(this);
@@ -262,7 +250,7 @@ User::~User()
 	if (!this->uid.empty())
 		UserListByUID.erase(this->uid);
 
-	NickAlias *na = findnick(this->nick);
+	NickAlias *na = NickAlias::Find(this->nick);
 	if (na)
 		na->OnCancel(this);
 
@@ -274,7 +262,7 @@ void User::SendMessage(const BotInfo *source, const char *fmt, ...)
 	va_list args;
 	char buf[BUFSIZE] = "";
 
-	const char *translated_message = translate(this, fmt);
+	const char *translated_message = Language::Translate(this, fmt);
 
 	va_start(args, fmt);
 	vsnprintf(buf, BUFSIZE - 1, translated_message, args);
@@ -286,7 +274,7 @@ void User::SendMessage(const BotInfo *source, const char *fmt, ...)
 
 void User::SendMessage(const BotInfo *source, const Anope::string &msg)
 {
-	const char *translated_message = translate(this, msg.c_str());
+	const char *translated_message = Language::Translate(this, msg.c_str());
 
 	/* Send privmsg instead of notice if:
 	* - UsePrivmsg is enabled
@@ -298,9 +286,9 @@ void User::SendMessage(const BotInfo *source, const Anope::string &msg)
 	while (sep.GetToken(tok))
 	{
 		if (Config->UsePrivmsg && ((!this->nc && Config->NSDefFlags.HasFlag(NI_MSG)) || (this->nc && this->nc->HasFlag(NI_MSG))))
-			ircdproto->SendPrivmsg(source, this->GetUID(), "%s", tok.c_str());
+			IRCD->SendPrivmsg(source, this->GetUID(), "%s", tok.c_str());
 		else
-			ircdproto->SendNotice(source, this->GetUID(), "%s", tok.c_str());
+			IRCD->SendNotice(source, this->GetUID(), "%s", tok.c_str());
 	}
 }
 
@@ -362,13 +350,10 @@ void User::SendMessage(const BotInfo *source, const Anope::string &msg)
  */
 void User::Collide(NickAlias *na)
 {
-	const BotInfo *bi = findbot(Config->NickServ);
-	if (!bi)
-		return;
 	if (na)
 		na->SetFlag(NS_COLLIDED);
 
-	if (ircdproto->CanSVSNick)
+	if (IRCD->CanSVSNick)
 	{
 		Anope::string guestnick;
 
@@ -376,25 +361,21 @@ void User::Collide(NickAlias *na)
 		do
 		{
 			guestnick = Config->NSGuestNickPrefix + stringify(static_cast<uint16_t>(rand()));
-		} while (finduser(guestnick) && i++ < 10);
+		} while (User::Find(guestnick) && i++ < 10);
 
 		if (i == 11)
 			this->Kill(Config->NickServ, "Services nickname-enforcer kill");
 		else
 		{
-			this->SendMessage(bi, _("Your nickname is now being changed to \002%s\002"), guestnick.c_str());
-			ircdproto->SendForceNickChange(this, guestnick, Anope::CurTime);
+			if (NickServ)
+				this->SendMessage(NickServ, _("Your nickname is now being changed to \002%s\002"), guestnick.c_str());
+			IRCD->SendForceNickChange(this, guestnick, Anope::CurTime);
 		}
 	}
 	else
 		this->Kill(Config->NickServ, "Services nickname-enforcer kill");
 }
 
-/** Identify the user to the Nick
- * updates last_seen, logs the user in,
- * send messages, checks for mails, set vhost and more
- * @param the NickAlias
- */
 void User::Identify(NickAlias *na)
 {
 	if (!na)
@@ -414,45 +395,41 @@ void User::Identify(NickAlias *na)
 	}
 
 	this->Login(na->nc);
-	ircdproto->SendLogin(this);
+	IRCD->SendLogin(this);
 
-	const NickAlias *this_na = findnick(this->nick);
+	const NickAlias *this_na = NickAlias::Find(this->nick);
 	if (!Config->NoNicknameOwnership && this_na && this_na->nc == *na->nc && na->nc->HasFlag(NI_UNCONFIRMED) == false)
-		this->SetMode(findbot(Config->NickServ), UMODE_REGISTERED);
+		this->SetMode(NickServ, UMODE_REGISTERED);
 
 	FOREACH_MOD(I_OnNickIdentify, OnNickIdentify(this));
 
 	if (this->IsServicesOper())
 	{
-		const BotInfo *bi = findbot(Config->OperServ);
 		if (!this->nc->o->ot->modes.empty())
 		{
-			this->SetModes(bi, "%s", this->nc->o->ot->modes.c_str());
-			if (bi != NULL)
-				this->SendMessage(bi, "Changing your usermodes to \002%s\002", this->nc->o->ot->modes.c_str());
+			this->SetModes(OperServ, "%s", this->nc->o->ot->modes.c_str());
+			if (OperServ)
+				this->SendMessage(OperServ, "Changing your usermodes to \002%s\002", this->nc->o->ot->modes.c_str());
 			UserMode *um = ModeManager::FindUserModeByName(UMODE_OPER);
-			if (um && !this->HasMode(UMODE_OPER) && this->nc->o->ot->modes.find(um->ModeChar) != Anope::string::npos)
-				ircdproto->SendOper(this);
+			if (um && !this->HasMode(UMODE_OPER) && this->nc->o->ot->modes.find(um->mchar) != Anope::string::npos)
+				IRCD->SendOper(this);
 		}
-		if (ircdproto->CanSetVHost && !this->nc->o->vhost.empty())
+		if (IRCD->CanSetVHost && !this->nc->o->vhost.empty())
 		{
-			if (bi != NULL)
-				this->SendMessage(bi, "Changing your vhost to \002%s\002", this->nc->o->vhost.c_str());
+			if (OperServ)
+				this->SendMessage(OperServ, "Changing your vhost to \002%s\002", this->nc->o->vhost.c_str());
  			this->SetDisplayedHost(this->nc->o->vhost);
-			ircdproto->SendVhost(this, "", this->nc->o->vhost);
+			IRCD->SendVhost(this, "", this->nc->o->vhost);
 		}
 	}
 }
 
 
-/** Login the user to a NickCore
- * @param core The account the user is useing
- */
 void User::Login(NickCore *core)
 {
 	this->Logout();
 	this->nc = core;
-	core->Users.push_back(this);
+	core->users.push_back(this);
 
 	this->UpdateHost();
 
@@ -460,8 +437,6 @@ void User::Login(NickCore *core)
 		Log(this, "account") << "is now identified as " << this->nc->display;
 }
 
-/** Logout the user
- */
 void User::Logout()
 {
 	if (!this->nc)
@@ -469,30 +444,23 @@ void User::Logout()
 	
 	Log(this, "account") << "is no longer identified as " << this->nc->display;
 
-	std::list<User *>::iterator it = std::find(this->nc->Users.begin(), this->nc->Users.end(), this);
-	if (it != this->nc->Users.end())
-		this->nc->Users.erase(it);
+	std::list<User *>::iterator it = std::find(this->nc->users.begin(), this->nc->users.end(), this);
+	if (it != this->nc->users.end())
+		this->nc->users.erase(it);
 
 	this->nc = NULL;
 }
 
-/** Get the account the user is logged in using
- * @reurn The account or NULL
- */
 NickCore *User::Account() const
 {
 	return this->nc;
 }
 
-/** Check if the user is identified for their nick
- * @param CheckNick True to check if the user is identified to the nickname they are on too
- * @return true or false
- */
 bool User::IsIdentified(bool CheckNick) const
 {
 	if (CheckNick && this->nc)
 	{
-		NickAlias *na = findnick(this->nc->display);
+		NickAlias *na = NickAlias::Find(this->nc->display);
 
 		if (na && *na->nc == *this->nc)
 			return true;
@@ -503,26 +471,19 @@ bool User::IsIdentified(bool CheckNick) const
 	return this->nc ? true : false;
 }
 
-/** Check if the user is recognized for their nick (on the nicks access list)
- * @param CheckSecure Only returns true if the user has secure off
- * @return true or false
- */
 bool User::IsRecognized(bool CheckSecure) const
 {
-	if (CheckSecure && OnAccess)
+	if (CheckSecure && on_access)
 	{
-		const NickAlias *na = findnick(this->nick);
+		const NickAlias *na = NickAlias::Find(this->nick);
 
 		if (!na || na->nc->HasFlag(NI_SECURE))
 			return false;
 	}
 
-	return OnAccess;
+	return on_access;
 }
 
-/** Check if the user is a services oper
- * @return true if they are an oper
- */
 bool User::IsServicesOper()
 {
 	if (!this->nc || !this->nc->IsServicesOper())
@@ -552,10 +513,6 @@ bool User::IsServicesOper()
 	return true;
 }
 
-/** Check whether this user has access to run the given command string.
-  * @param cmdstr The string to check, e.g. botserv/set/private.
-  * @return True if this user may run the specified command, false otherwise.
-  */
 bool User::HasCommand(const Anope::string &command)
 {
 	if (this->IsServicesOper())
@@ -563,10 +520,6 @@ bool User::HasCommand(const Anope::string &command)
 	return false;
 }
 
-/** Check whether this user has access to the given special permission.
-  * @param privstr The priv to check for, e.g. users/auspex.
-  * @return True if this user has the specified priv, false otherwise.
-  */
 bool User::HasPriv(const Anope::string &priv)
 {
 	if (this->IsServicesOper())
@@ -574,17 +527,15 @@ bool User::HasPriv(const Anope::string &priv)
 	return false;
 }
 
-/** Update the last usermask stored for a user, and check to see if they are recognized
- */
 void User::UpdateHost()
 {
 	if (this->host.empty())
 		return;
 
-	NickAlias *na = findnick(this->nick);
-	OnAccess = false;
+	NickAlias *na = NickAlias::Find(this->nick);
+	on_access = false;
 	if (na)
-		OnAccess = is_on_access(this, na->nc);
+		on_access = na->nc->IsOnAccess(this);
 
 	if (na && (this->IsIdentified(true) || this->IsRecognized()))
 	{
@@ -595,97 +546,64 @@ void User::UpdateHost()
 	}
 }
 
-/** Check if the user has a mode
- * @param Name Mode name
- * @return true or false
- */
 bool User::HasMode(UserModeName Name) const
 {
 	return this->modes.HasFlag(Name);
 }
 
-/** Set a mode internally on the user, the IRCd is not informed
- * @param um The user mode
- * @param Param The param, if there is one
- */
-void User::SetModeInternal(UserMode *um, const Anope::string &Param)
+void User::SetModeInternal(UserMode *um, const Anope::string &param)
 {
 	if (!um)
 		return;
 
-	this->modes.SetFlag(um->Name);
-	if (!Param.empty())
-		Params.insert(std::make_pair(um->Name, Param));
+	this->modes.SetFlag(um->name);
+	if (!param.empty())
+		this->mode_params.insert(std::make_pair(um->name, param));
 
-	FOREACH_MOD(I_OnUserModeSet, OnUserModeSet(this, um->Name));
+	FOREACH_MOD(I_OnUserModeSet, OnUserModeSet(this, um->name));
 }
 
-/** Remove a mode internally on the user, the IRCd is not informed
- * @param um The user mode
- */
 void User::RemoveModeInternal(UserMode *um)
 {
 	if (!um)
 		return;
 
-	this->modes.UnsetFlag(um->Name);
-	std::map<UserModeName, Anope::string>::iterator it = Params.find(um->Name);
-	if (it != Params.end())
-		Params.erase(it);
+	this->modes.UnsetFlag(um->name);
+	std::map<UserModeName, Anope::string>::iterator it = this->mode_params.find(um->name);
+	if (it != this->mode_params.end())
+		this->mode_params.erase(it);
 
-	FOREACH_MOD(I_OnUserModeUnset, OnUserModeUnset(this, um->Name));
+	FOREACH_MOD(I_OnUserModeUnset, OnUserModeUnset(this, um->name));
 }
 
-/** Set a mode on the user
- * @param bi The client setting the mode
- * @param um The user mode
- * @param Param Optional param for the mode
- */
 void User::SetMode(const BotInfo *bi, UserMode *um, const Anope::string &Param)
 {
-	if (!um || HasMode(um->Name))
+	if (!um || HasMode(um->name))
 		return;
 
 	ModeManager::StackerAdd(bi, this, um, true, Param);
 	SetModeInternal(um, Param);
 }
 
-/** Set a mode on the user
- * @param bi The client setting the mode
- * @param Name The mode name
- * @param param Optional param for the mode
- */
 void User::SetMode(const BotInfo *bi, UserModeName Name, const Anope::string &Param)
 {
 	SetMode(bi, ModeManager::FindUserModeByName(Name), Param);
 }
 
-/** Remove a mode on the user
- * @param bi The client setting the mode
- * @param um The user mode
- */
 void User::RemoveMode(const BotInfo *bi, UserMode *um)
 {
-	if (!um || !HasMode(um->Name))
+	if (!um || !HasMode(um->name))
 		return;
 
 	ModeManager::StackerAdd(bi, this, um, false);
 	RemoveModeInternal(um);
 }
 
-/** Remove a mode from the user
- * @param bi The client setting the mode
- * @param Name The mode name
- */
 void User::RemoveMode(const BotInfo *bi, UserModeName Name)
 {
 	RemoveMode(bi, ModeManager::FindUserModeByName(Name));
 }
 
-/** Set a string of modes on a user
- * @param bi The client setting the mode
- * @param umodes The modes
- */
 void User::SetModes(const BotInfo *bi, const char *umodes, ...)
 {
 	char buf[BUFSIZE] = "";
@@ -720,7 +638,7 @@ void User::SetModes(const BotInfo *bi, const char *umodes, ...)
 
 		if (add)
 		{
-			if (um->Type == MODE_PARAM && sep.GetToken(sbuf))
+			if (um->type == MODE_PARAM && sep.GetToken(sbuf))
 				this->SetMode(bi, um, sbuf);
 			else
 				this->SetMode(bi, um);
@@ -766,7 +684,7 @@ void User::SetModesInternal(const char *umodes, ...)
 
 		if (add)
 		{
-			if (um->Type == MODE_PARAM && sep.GetToken(sbuf))
+			if (um->type == MODE_PARAM && sep.GetToken(sbuf))
 				this->SetModeInternal(um, sbuf);
 			else
 				this->SetModeInternal(um);
@@ -774,13 +692,13 @@ void User::SetModesInternal(const char *umodes, ...)
 		else
 			this->RemoveModeInternal(um);
 
-		switch (um->Name)
+		switch (um->name)
 		{
 			case UMODE_OPER:
 				if (add)
-					++opcnt;
+					++OperCount;
 				else
-					--opcnt;
+					--OperCount;
 				break;
 			case UMODE_CLOAK:
 			case UMODE_VHOST:
@@ -803,18 +721,12 @@ Anope::string User::GetModes() const
 			UserMode *um = ModeManager::FindUserModeByName(static_cast<UserModeName>(i));
 			if (um == NULL)
 				continue;
-			ret += um->ModeChar;
+			ret += um->mchar;
 		}
 
 	return ret;
 }
 
-/** Find the channel container for Channel c that the user is on
- * This is preferred over using FindUser in Channel, as there are usually more users in a channel
- * than channels a user is in
- * @param c The channel
- * @return The channel container, or NULL
- */
 ChannelContainer *User::FindChannel(const Channel *c) const
 {
 	for (UChannelList::const_iterator it = this->chans.begin(), it_end = this->chans.end(); it != it_end; ++it)
@@ -823,9 +735,6 @@ ChannelContainer *User::FindChannel(const Channel *c) const
 	return NULL;
 }
 
-/** Check if the user is protected from kicks and negative mode changes
- * @return true or false
- */
 bool User::IsProtected() const
 {
 	if (this->HasMode(UMODE_PROTECTED) || this->HasMode(UMODE_GOD))
@@ -839,14 +748,14 @@ void User::Kill(const Anope::string &source, const Anope::string &reason)
 	Anope::string real_source = source.empty() ? Config->ServerName : source;
 	Anope::string real_reason = real_source + " (" + reason + ")";
 
-	ircdproto->SendSVSKill(findbot(source), this, "%s", real_reason.c_str());
+	IRCD->SendSVSKill(BotInfo::Find(source), this, "%s", real_reason.c_str());
 }
 
 void User::KillInternal(const Anope::string &source, const Anope::string &reason)
 {
 	Log(this, "killed") << "was killed by " << source << " (Reason: " << reason << ")";
 
-	NickAlias *na = findnick(this->nick);
+	NickAlias *na = NickAlias::Find(this->nick);
 	if (na && !na->nc->HasFlag(NI_SUSPENDED) && (this->IsRecognized() || this->IsIdentified(true)))
 	{
 		na->last_seen = Anope::CurTime;
@@ -856,61 +765,12 @@ void User::KillInternal(const Anope::string &source, const Anope::string &reason
 	delete this;
 }
 
-User *finduser(const Anope::string &nick)
-{
-	if (isdigit(nick[0]) && ircdproto->RequiresID)
-	{
-		user_map::iterator it = UserListByUID.find(nick);
-		if (it != UserListByUID.end())
-			return it->second;
-	}
-	else
-	{
-		user_map::iterator it = UserListByNick.find(nick);
-		if (it != UserListByNick.end())
-			return it->second;
-	}
-
-	return NULL;
-}
-
-bool matches_list(Channel *c, User *user, ChannelModeName mode)
-{
-	if (!c || !c->HasMode(mode))
-		return false;
-
-
-	std::pair<Channel::ModeList::iterator, Channel::ModeList::iterator> modes = c->GetModeList(mode);
-	for (; modes.first != modes.second; ++modes.first)
-	{
-		Entry e(mode, modes.first->second);
-		if (e.Matches(user))
-			return true;
-	}
-
-	return false;
-}
-
-/*************************************************************************/
-
-/* Given a user, return a mask that will most likely match any address the
- * user will have from that location.  For IP addresses, wildcards the
- * appropriate subnet mask (e.g. 35.1.1.1 -> 35.*; 128.2.1.1 -> 128.2.*);
- * for named addresses, wildcards the leftmost part of the name unless the
- * name only contains two parts.  If the username begins with a ~, delete
- * it.
- */
-
-Anope::string create_mask(User *u)
+Anope::string User::Mask() const
 {
 	Anope::string mask;
-	Anope::string mident = u->GetIdent();
-	Anope::string mhost = u->GetDisplayedHost();
+	Anope::string mident = this->GetIdent();
+	Anope::string mhost = this->GetDisplayedHost();
 
-	/* Get us a buffer the size of the username plus hostname.  The result
-	 * will never be longer than this (and will often be shorter), thus we
-	 * can use strcpy() and sprintf() safely.
-	 */
 	if (mident[0] == '~')
 		mask = "*" + mident + "@";
 	else
@@ -930,6 +790,43 @@ Anope::string create_mask(User *u)
 		else
 			mask += mhost;
 	}
+
 	return mask;
+}
+
+bool User::BadPassword()
+{
+	if (!Config->BadPassLimit)
+		return false;
+
+	if (Config->BadPassTimeout > 0 && this->invalid_pw_time > 0 && this->invalid_pw_time < Anope::CurTime - Config->BadPassTimeout)
+		this->invalid_pw_count = 0;
+	++this->invalid_pw_count;
+	this->invalid_pw_time = Anope::CurTime;
+	if (this->invalid_pw_count >= Config->BadPassLimit)
+	{
+		this->Kill(Config->ServerName, "Too many invalid passwords");
+		return true;
+	}
+
+	return false;
+}
+
+User* User::Find(const Anope::string &name, bool nick_only)
+{
+	if (!nick_only && isdigit(name[0]) && IRCD->RequiresID)
+	{
+		user_map::iterator it = UserListByUID.find(name);
+		if (it != UserListByUID.end())
+			return it->second;
+	}
+	else
+	{
+		user_map::iterator it = UserListByNick.find(name);
+		if (it != UserListByNick.end())
+			return it->second;
+	}
+
+	return NULL;
 }
 

@@ -1,3 +1,15 @@
+/*
+ *
+ * (C) 2003-2012 Anope Team
+ * Contact us at team@anope.org
+ *
+ * Please read COPYING and README for further details.
+ *
+ * Based on the original code of Epona by Lara.
+ * Based on the original code of Services by Andy Church.
+ *
+ */
+
 #ifndef SERVERS_H
 #define SERVERS_H
 
@@ -5,13 +17,25 @@
 #include "anope.h"
 #include "extensible.h"
 
-/* Anope */
+/* Anope. We are at the top of the server tree, our uplink is
+ * almost always me->GetLinks()[0]. We never have an uplink. */
 extern CoreExport Server *Me;
 
-extern CoreExport const Anope::string ts6_uid_retrieve();
-extern CoreExport const Anope::string ts6_sid_retrieve();
+namespace Servers
+{
+	/* Retrieves the next free TS6 UID or SID */
+	extern CoreExport const Anope::string TS6_UID_Retrieve();
+	extern CoreExport const Anope::string TS6_SID_Retrieve();
 
-extern CoreExport std::set<Anope::string> Capab;
+	/* Gets our uplink. Note we don't actually have an "uplink", this is just
+	 * the only server whose uplink *is* Me that is not a juped server.
+	 * @return Our uplink, or NULL if not uplinked to anything
+	 */
+	extern CoreExport Server* GetUplink();
+
+	/* CAPAB/PROTOCTL given by the uplink */
+	extern CoreExport std::set<Anope::string> Capab;
+}
 
 /** Flags set on servers
  */
@@ -24,28 +48,26 @@ enum ServerFlag
 	SERVER_JUPED
 };
 
-const Anope::string ServerFlagStrings[] = { "SERVER_NONE", "SERVER_SYNCING", "SERVER_JUPED", "" };
-
 /** Class representing a server
  */
 class CoreExport Server : public Flags<ServerFlag>, public Extensible
 {
  private:
 	/* Server name */
-	Anope::string Name;
+	Anope::string name;
 	/* Hops between services and server */
-	unsigned int Hops;
+	unsigned int hops;
 	/* Server description */
-	Anope::string Description;
+	Anope::string description;
 	/* Server ID */
-	Anope::string SID;
+	Anope::string sid;
 	/* Links for this server */
-	std::vector<Server *> Links;
+	std::vector<Server *> links;
 	/* Uplink for this server */
-	Server *UplinkServer;
+	Server *uplink;
 
 	/* Reason this server was quit */
-	Anope::string QReason;
+	Anope::string quit_reason;
 
  public:
 	/** Constructor
@@ -65,7 +87,7 @@ class CoreExport Server : public Flags<ServerFlag>, public Extensible
 
  public:
  	/* Number of users on the server */
- 	unsigned Users;
+ 	unsigned users;
 
 	/** Delete this server with a reason
 	 * @param reason The reason
@@ -125,7 +147,7 @@ class CoreExport Server : public Flags<ServerFlag>, public Extensible
 	/** Finish syncing this server and optionally all links to it
 	 * @param SyncLinks True to sync the links for this server too (if any)
 	 */
-	void Sync(bool SyncLinks);
+	void Sync(bool sync_links);
 
 	/** Check if this server is synced
 	 * @return true or false

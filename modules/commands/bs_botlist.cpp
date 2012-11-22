@@ -27,7 +27,7 @@ class CommandBSBotList : public Command
 		unsigned count = 0;
 		ListFormatter list;
 
-		list.addColumn("Nick").addColumn("Mask");
+		list.AddColumn("Nick").AddColumn("Mask");
 
 		for (botinfo_map::const_iterator it = BotListByNick->begin(), it_end = BotListByNick->end(); it != it_end; ++it)
 		{
@@ -39,7 +39,7 @@ class CommandBSBotList : public Command
 				ListFormatter::ListEntry entry;
 				entry["Nick"] = (bi->HasFlag(BI_PRIVATE) ? "* " : "") + bi->nick;
 				entry["Mask"] = bi->GetIdent() + "@" + bi->host;
-				list.addEntry(entry);
+				list.AddEntry(entry);
 			}
 		}
 

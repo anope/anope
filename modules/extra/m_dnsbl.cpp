@@ -7,7 +7,7 @@
 
 #include "module.h"
 
-static service_reference<XLineManager> akills("XLineManager", "xlinemanager/sgline");
+static ServiceReference<XLineManager> akills("XLineManager", "xlinemanager/sgline");
 
 struct Blacklist
 {
@@ -19,21 +19,21 @@ struct Blacklist
 	Blacklist(const Anope::string &n, time_t b, const Anope::string &r, const std::map<int, Anope::string> &re) : name(n), bantime(b), reason(r), replies(re) { }
 };
 
-class DNSBLResolver : public DNSRequest
+class DNSBLResolver : public DNS::Request
 {
-	dynamic_reference<User> user;
+	Reference<User> user;
 	Blacklist blacklist;
 	bool add_to_akill;
 
  public:
-	DNSBLResolver(Module *c, User *u, const Blacklist &b, const Anope::string &host, bool add_akill) : DNSRequest(host, DNS_QUERY_A, true, c), user(u), blacklist(b), add_to_akill(add_akill) { }
+	DNSBLResolver(Module *c, User *u, const Blacklist &b, const Anope::string &host, bool add_akill) : DNS::Request(host, DNS::QUERY_A, true, c), user(u), blacklist(b), add_to_akill(add_akill) { }
 
-	void OnLookupComplete(const DNSQuery *record) anope_override
+	void OnLookupComplete(const DNS::Query *record) anope_override
 	{
 		if (!user || user->HasExt("m_dnsbl_akilled"))
 			return;
 
-		const ResourceRecord &ans_record = record->answers[0];
+		const DNS::ResourceRecord &ans_record = record->answers[0];
 		// Replies should be in 127.0.0.0/24
 		if (ans_record.rdata.find("127.0.0.") != 0)
 			return;
@@ -61,8 +61,7 @@ class DNSBLResolver : public DNSRequest
 		reason = reason.replace_all_cs("%r", record_reason);
 		reason = reason.replace_all_cs("%N", Config->NetworkName);
 
-		const BotInfo *operserv = findbot(Config->OperServ);
-		Log(operserv) << "DNSBL: " << user->GetMask() << " (" << user->ip << ") appears in " << this->blacklist.name;
+		Log(OperServ) << "DNSBL: " << user->GetMask() << " (" << user->ip << ") appears in " << this->blacklist.name;
 		XLine *x = new XLine("*@" + user->ip, Config->OperServ, Anope::CurTime + this->blacklist.bantime, reason, XLineManager::GenerateUID());
 		if (this->add_to_akill && akills)
 		{
@@ -71,8 +70,8 @@ class DNSBLResolver : public DNSRequest
 		}
 		else
 		{
-			ircdproto->SendAkill(NULL, x);
-			x->destroy();
+			IRCD->SendAkill(NULL, x);
+			x->Destroy();
 		}
 	}
 };
@@ -110,7 +109,7 @@ class ModuleDNSBL : public Module
 			if (bname.empty())
 				continue;
 			Anope::string sbantime = config.ReadValue("blacklist", "time", "4h", i);
-			time_t bantime = dotime(sbantime);
+			time_t bantime = Anope::DoTime(sbantime);
 			if (bantime < 0)
 				bantime = 9000;
 			Anope::string reason = config.ReadValue("blacklist", "reason", "", i);
@@ -126,7 +125,7 @@ class ModuleDNSBL : public Module
 		}
 	}
 
-	void OnUserConnect(dynamic_reference<User> &user, bool &exempt) anope_override
+	void OnUserConnect(Reference<User> &user, bool &exempt) anope_override
 	{
 		if (exempt || !user || (!this->check_on_connect && !Me->IsSynced()))
 			return;

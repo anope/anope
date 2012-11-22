@@ -7,52 +7,47 @@
  *
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
+ *
  */
 
 #include "services.h"
 #include "modules.h"
-#include "oper.h"
+#include "xline.h"
 #include "servers.h"
 #include "bots.h"
 #include "regchannel.h"
 #include "protocol.h"
 #include "config.h"
 #include "channels.h"
-#include "extern.h"
+
+const Anope::string ServerFlagStrings[] = { "SERVER_NONE", "SERVER_SYNCING", "SERVER_JUPED", "" };
+template<> const Anope::string* Flags<ServerFlag>::flags_strings = ServerFlagStrings;
 
 /* Anope */
 Server *Me = NULL;
 
-std::set<Anope::string> Capab;
+std::set<Anope::string> Servers::Capab;
 
-/** Constructor
- * @param uplink The uplink this server is from, is only NULL when creating Me
- * @param name The server name
- * @param hops Hops from services server
- * @param description Server rdescription
- * @param sid Server sid/numeric
- * @param flag An optional server flag
- */
-Server::Server(Server *uplink, const Anope::string &name, unsigned hops, const Anope::string &description, const Anope::string &sid, ServerFlag flag) : Flags<ServerFlag>(ServerFlagStrings), Name(name), Hops(hops), Description(description), SID(sid), UplinkServer(uplink)
+Server::Server(Server *up, const Anope::string &sname, unsigned shops, const Anope::string &desc, const Anope::string &ssid, ServerFlag flag) : name(sname), hops(shops), description(desc), sid(ssid), uplink(up)
 {
 	this->SetFlag(SERVER_SYNCING);
 	this->SetFlag(flag);
 
-	Log(this, "connect") << "uplinked to " << (this->UplinkServer ? this->UplinkServer->GetName() : "no uplink") << " connected to the network";
+	Log(this, "connect") << "uplinked to " << (this->uplink ? this->uplink->GetName() : "no uplink") << " connected to the network";
 
 	/* Add this server to our uplinks leaf list */
-	if (this->UplinkServer)
+	if (this->uplink)
 	{
-		this->UplinkServer->AddLink(this);
+		this->uplink->AddLink(this);
 
 		/* Check to be sure this isn't a juped server */
-		if (Me == this->UplinkServer && !this->HasFlag(SERVER_JUPED))
+		if (Me == this->uplink && !this->HasFlag(SERVER_JUPED))
 		{
 			/* Now do mode related stuff as we know what modes exist .. */
 			for (botinfo_map::iterator it = BotListByNick->begin(), it_end = BotListByNick->end(); it != it_end; ++it)
 			{
 				BotInfo *bi = it->second;
-				Anope::string modes = !bi->botmodes.empty() ? ("+" + bi->botmodes) : ircdproto->DefaultPseudoclientModes;
+				Anope::string modes = !bi->botmodes.empty() ? ("+" + bi->botmodes) : IRCD->DefaultPseudoclientModes;
 
 				bi->SetModesInternal(modes.c_str());
 				for (unsigned i = 0; i < bi->botchannels.size(); ++i)
@@ -61,7 +56,7 @@ Server::Server(Server *uplink, const Anope::string &name, unsigned hops, const A
 					if (h == Anope::string::npos)
 						continue;
 					Anope::string chname = bi->botchannels[i].substr(h);
-					Channel *c = findchan(chname);
+					Channel *c = Channel::Find(chname);
 					if (c && c->FindUser(bi))
 					{
 						Anope::string want_modes = bi->botchannels[i].substr(0, h);
@@ -70,7 +65,7 @@ Server::Server(Server *uplink, const Anope::string &name, unsigned hops, const A
 							ChannelMode *cm = ModeManager::FindChannelModeByChar(want_modes[j]);
 							if (cm == NULL)
 								cm = ModeManager::FindChannelModeByChar(ModeManager::GetStatusChar(want_modes[j]));
-							if (cm && cm->Type == MODE_STATUS)
+							if (cm && cm->type == MODE_STATUS)
 							{
 								MessageSource ms = bi;
 								c->SetModeInternal(ms, cm, bi->nick);
@@ -80,14 +75,14 @@ Server::Server(Server *uplink, const Anope::string &name, unsigned hops, const A
 				}
 			}
 
-			ircdproto->SendBOB();
+			IRCD->SendBOB();
 	
 			for (unsigned i = 0; i < Me->GetLinks().size(); ++i)
 			{
 				Server *s = Me->GetLinks()[i];
 
 				if (s->HasFlag(SERVER_JUPED))
-					ircdproto->SendServer(s);
+					IRCD->SendServer(s);
 			}
 
 			/* We make the bots go online */
@@ -95,14 +90,14 @@ Server::Server(Server *uplink, const Anope::string &name, unsigned hops, const A
 			{
 				User *u = it->second;
 
-				BotInfo *bi = findbot(u->nick);
+				BotInfo *bi = BotInfo::Find(u->nick);
 				if (bi)
 				{
 					XLine x(bi->nick, "Reserved for services");
-					ircdproto->SendSQLine(NULL, &x);
+					IRCD->SendSQLine(NULL, &x);
 				}
 
-				ircdproto->SendClientIntroduction(u);
+				IRCD->SendClientIntroduction(u);
 				if (bi)
 					bi->introduced = true;
 			}
@@ -111,10 +106,10 @@ Server::Server(Server *uplink, const Anope::string &name, unsigned hops, const A
 			{
 				Channel *c = it->second;
 				if (c->users.empty())
-					ircdproto->SendChannel(c);
+					IRCD->SendChannel(c);
 				else
 					for (CUserList::const_iterator cit = c->users.begin(), cit_end = c->users.end(); cit != cit_end; ++cit)
-						ircdproto->SendJoin((*cit)->user, c, (*cit)->Status);
+						IRCD->SendJoin((*cit)->user, c, (*cit)->status);
 			}
 		}
 	}
@@ -122,13 +117,11 @@ Server::Server(Server *uplink, const Anope::string &name, unsigned hops, const A
 	FOREACH_MOD(I_OnNewServer, OnNewServer(this));
 }
 
-/** Destructor
- */
 Server::~Server()
 {
-	Log(this, "quit") << "quit from " << (this->UplinkServer ? this->UplinkServer->GetName() : "no uplink") << " for " << this->QReason;
+	Log(this, "quit") << "quit from " << (this->uplink ? this->uplink->GetName() : "no uplink") << " for " << this->quit_reason;
 
-	if (Capab.count("NOQUIT") > 0 || Capab.count("QS") > 0)
+	if (Servers::Capab.count("NOQUIT") > 0 || Servers::Capab.count("QS") > 0)
 	{
 		for (user_map::const_iterator it = UserListByNick.begin(); it != UserListByNick.end();)
 		{
@@ -137,11 +130,11 @@ Server::~Server()
 
 			if (u->server == this)
 			{
-				NickAlias *na = findnick(u->nick);
+				NickAlias *na = NickAlias::Find(u->nick);
 				if (na && !na->nc->HasFlag(NI_SUSPENDED) && (u->IsRecognized() || u->IsIdentified()))
 				{
 					na->last_seen = Anope::CurTime;
-					na->last_quit = this->QReason;
+					na->last_quit = this->quit_reason;
 				}
 
 				delete u;
@@ -151,113 +144,80 @@ Server::~Server()
 		Log(LOG_DEBUG) << "Finished removing all users for " << this->GetName();
 	}
 
-	if (this->UplinkServer)
-		this->UplinkServer->DelLink(this);
+	if (this->uplink)
+		this->uplink->DelLink(this);
 
-	for (unsigned i = this->Links.size(); i > 0; --i)
-		this->Links[i - 1]->Delete(this->QReason);
+	for (unsigned i = this->links.size(); i > 0; --i)
+		this->links[i - 1]->Delete(this->quit_reason);
 }
 
-/** Delete this server with a reason
- * @param reason The reason
- */
 void Server::Delete(const Anope::string &reason)
 {
-	this->QReason = reason;
+	this->quit_reason = reason;
 	FOREACH_MOD(I_OnServerQuit, OnServerQuit(this));
 	delete this;
 }
 
-/** Get the name for this server
- * @return The name
- */
 const Anope::string &Server::GetName() const
 {
-	return this->Name;
+	return this->name;
 }
 
-/** Get the number of hops this server is from services
- * @return Number of hops
- */
 unsigned Server::GetHops() const
 {
-	return this->Hops;
+	return this->hops;
 }
 
-/** Set the server description
- * @param desc The new description
- */
 void Server::SetDescription(const Anope::string &desc)
 {
-	this->Description = desc;
+	this->description = desc;
 }
 
-/** Get the server description
- * @return The server description
- */
 const Anope::string &Server::GetDescription() const
 {
-	return this->Description;
+	return this->description;
 }
 
-/** Change this servers SID
- * @param sid The new SID
- */
-void Server::SetSID(const Anope::string &sid)
+void Server::SetSID(const Anope::string &nsid)
 {
-	this->SID = sid;
+	this->sid = nsid;
 }
 
-/** Get the server numeric/SID
- * @return The numeric/SID
- */
 const Anope::string &Server::GetSID() const
 {
-	if (!this->SID.empty() && ircdproto->RequiresID)
-		return this->SID;
+	if (!this->sid.empty() && IRCD->RequiresID)
+		return this->sid;
 	else
-		return this->Name;
+		return this->name;
 }
 
-/** Get the list of links this server has, or NULL if it has none
- * @return A list of servers
- */
 const std::vector<Server *> &Server::GetLinks() const
 {
-	return this->Links;
+	return this->links;
 }
 
-/** Get the uplink server for this server, if this is our uplink will be Me
- * @return The servers uplink
- */
 Server *Server::GetUplink()
 {
-	return this->UplinkServer;
+	return this->uplink;
 }
 
-/** Adds a link to this server
- * @param s The linking server
- */
 void Server::AddLink(Server *s)
 {
-	this->Links.push_back(s);
+	this->links.push_back(s);
 
 	Log(this, "connect") << "introduced " << s->GetName();
 }
 
-/** Delinks a server from this server
- * @param s The server
- */
 void Server::DelLink(Server *s)
 {
-	if (this->Links.empty())
+	if (this->links.empty())
 		throw CoreException("Server::DelLink called on " + this->GetName() + " for " + s->GetName() + " but we have no links?");
 
-	for (unsigned i = 0, j = this->Links.size(); i < j; ++i)
+	for (unsigned i = 0, j = this->links.size(); i < j; ++i)
 	{
-		if (this->Links[i] == s)
+		if (this->links[i] == s)
 		{
-			this->Links.erase(this->Links.begin() + i);
+			this->links.erase(this->links.begin() + i);
 			break;
 		}
 	}
@@ -265,10 +225,7 @@ void Server::DelLink(Server *s)
 	Log(this, "quit") << "quit " << s->GetName();
 }
 
-/** Finish syncing this server and optionally all links to it
- * @param SyncLinks True to sync the links for this server too (if any)
- */
-void Server::Sync(bool SyncLinks)
+void Server::Sync(bool sync_links)
 {
 	if (this->IsSynced())
 		return;
@@ -279,10 +236,10 @@ void Server::Sync(bool SyncLinks)
 
 	FOREACH_MOD(I_OnServerSync, OnServerSync(this));
 
-	if (SyncLinks && !this->Links.empty())
+	if (sync_links && !this->links.empty())
 	{
-		for (unsigned i = 0, j = this->Links.size(); i < j; ++i)
-			this->Links[i]->Sync(true);
+		for (unsigned i = 0, j = this->links.size(); i < j; ++i)
+			this->links[i]->Sync(true);
 	}
 
 	if (this->GetUplink() && this->GetUplink() == Me)
@@ -302,7 +259,7 @@ void Server::Sync(bool SyncLinks)
 				{
 					ci->c->SetMode(NULL, CMODE_PERM);
 					if (created)
-						ircdproto->SendChannel(ci->c);
+						IRCD->SendChannel(ci->c);
 				}
 				else
 				{
@@ -316,7 +273,7 @@ void Server::Sync(bool SyncLinks)
 
 		FOREACH_MOD(I_OnPreUplinkSync, OnPreUplinkSync(this));
 
-		ircdproto->SendEOB();
+		IRCD->SendEOB();
 		Me->Sync(false);
 
 		FOREACH_MOD(I_OnUplinkSync, OnUplinkSync(this));
@@ -329,25 +286,19 @@ void Server::Sync(bool SyncLinks)
 				c->ci->RestoreTopic();
 		}
 
-		if (!nofork && AtTerm())
+		if (!Anope::NoFork && Anope::AtTerm())
 		{
 			Log(LOG_TERMINAL) << "Successfully linked, launching into background...";
-			Fork();
+			Anope::Fork();
 		}
 	}
 }
 
-/** Check if this server is synced
- * @return true or false
- */
 bool Server::IsSynced() const
 {
 	return !this->HasFlag(SERVER_SYNCING);
 }
 
-/** Check if this server is ULined
- * @return true or false
- */
 bool Server::IsULined() const
 {
 	if (this == Me)
@@ -359,24 +310,14 @@ bool Server::IsULined() const
 	return false;
 }
 
-
-/** Send a message to alll users on this server
- * @param source The source of the message
- * @param message The message
- */
 void Server::Notice(const BotInfo *source, const Anope::string &message)
 {
 	if (Config->NSDefFlags.HasFlag(NI_MSG))
-		ircdproto->SendGlobalPrivmsg(source, this, message);
+		IRCD->SendGlobalPrivmsg(source, this, message);
 	else
-		ircdproto->SendGlobalNotice(source, this, message);
+		IRCD->SendGlobalNotice(source, this, message);
 }
 
-/** Find a server
- * @param name The name or SID/numeric
- * @param s The server list to search for this server on, defaults to our Uplink
- * @return The server
- */
 Server *Server::Find(const Anope::string &name, Server *s)
 {
 	Log(LOG_DEBUG_2) << "Server::Find called for " << name;
@@ -417,17 +358,14 @@ static inline char& nextID(char &c)
 	return c;
 }
 
-/** Recieve the next UID in our list
- * @return The UID
- */
-const Anope::string ts6_uid_retrieve()
+const Anope::string Servers::TS6_UID_Retrieve()
 {
-	if (!ircdproto || !ircdproto->RequiresID)
+	if (!IRCD || !IRCD->RequiresID)
 		return "";
 
 	static Anope::string current_uid = "AAAAAA";
 
-	while (finduser(Config->Numeric + current_uid) != NULL)
+	while (User::Find(Config->Numeric + current_uid) != NULL)
 	{
 		int current_len = current_uid.length() - 1;
 		while (current_len >= 0 && nextID(current_uid[current_len--]) == 'A');
@@ -436,12 +374,9 @@ const Anope::string ts6_uid_retrieve()
 	return Config->Numeric + current_uid;
 }
 
-/** Return the next SID in our list
- * @return The SID
- */
-const Anope::string ts6_sid_retrieve()
+const Anope::string Servers::TS6_SID_Retrieve()
 {
-	if (!ircdproto || !ircdproto->RequiresID)
+	if (!IRCD || !IRCD->RequiresID)
 		return "";
 
 	static Anope::string current_sid;
@@ -459,5 +394,13 @@ const Anope::string ts6_sid_retrieve()
 	}
 
 	return current_sid;
+}
+
+Server* Servers::GetUplink()
+{
+	for (unsigned i = 0; Me && i < Me->GetLinks().size(); ++i)
+		if (!Me->GetLinks()[i]->HasFlag(SERVER_JUPED))
+			return Me->GetLinks()[i];
+	return NULL;
 }
 

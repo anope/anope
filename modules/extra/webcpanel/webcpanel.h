@@ -46,7 +46,7 @@ class Panel : public Section, public Service
 		if (acc.empty() || id.empty())
 			return NULL;
 
-		NickAlias *na = findnick(acc);
+		NickAlias *na = NickAlias::Find(acc);
 		if (na == NULL)
 			return NULL;
 
@@ -83,7 +83,7 @@ class WebPanelProtectedPage : public WebPanelPage
 
 	bool OnRequest(HTTPProvider *provider, const Anope::string &page_name, HTTPClient *client, HTTPMessage &message, HTTPReply &reply) anope_override anope_final
 	{
-		service_reference<Panel> panel("Panel", "webcpanel");
+		ServiceReference<Panel> panel("Panel", "webcpanel");
 		NickAlias *na;
 
 		if (!panel || !(na = panel->GetNickFromSession(client, message)))

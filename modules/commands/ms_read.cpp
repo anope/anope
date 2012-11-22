@@ -17,10 +17,10 @@
 static void rsend_notify(CommandSource &source, MemoInfo *mi, Memo *m, const Anope::string &targ)
 {
 	/* Only send receipt if memos are allowed */
-	if (memoserv && !readonly)
+	if (MemoServService && !Anope::ReadOnly)
 	{
 		/* Get nick alias for sender */
-		const NickAlias *na = findnick(m->sender);
+		const NickAlias *na = NickAlias::Find(m->sender);
 
 		if (!na)
 			return;
@@ -33,10 +33,10 @@ static void rsend_notify(CommandSource &source, MemoInfo *mi, Memo *m, const Ano
 
 		/* Text of the memo varies if the recepient was a
 		   nick or channel */
-		Anope::string text = Anope::printf(translate(na->nc, _("\002[auto-memo]\002 The memo you sent to %s has been viewed.")), targ.c_str());
+		Anope::string text = Anope::printf(Language::Translate(na->nc, _("\002[auto-memo]\002 The memo you sent to %s has been viewed.")), targ.c_str());
 
 		/* Send notification */
-		memoserv->Send(source.GetNick(), m->sender, text, true);
+		MemoServService->Send(source.GetNick(), m->sender, text, true);
 
 		/* Notify recepient of the memo that a notification has
 		   been sent to the sender */
@@ -58,21 +58,21 @@ class MemoListCallback : public NumberList
 	{
 	}
 
-	void HandleNumber(unsigned Number) anope_override
+	void HandleNumber(unsigned number) anope_override
 	{
-		if (!Number || Number > mi->memos->size())
+		if (!number || number > mi->memos->size())
 			return;
 
-		MemoListCallback::DoRead(source, mi, ci, Number - 1);
+		MemoListCallback::DoRead(source, mi, ci, number - 1);
 	}
 
 	static void DoRead(CommandSource &source, MemoInfo *mi, const ChannelInfo *ci, unsigned index)
 	{
 		Memo *m = mi->GetMemo(index);
 		if (ci)
-			source.Reply(_("Memo %d from %s (%s).  To delete, type: \002%s%s DEL %s %d\002"), index + 1, m->sender.c_str(), do_strftime(m->time).c_str(), Config->UseStrictPrivMsgString.c_str(), Config->MemoServ.c_str(), ci->name.c_str(), index + 1);
+			source.Reply(_("Memo %d from %s (%s).  To delete, type: \002%s%s DEL %s %d\002"), index + 1, m->sender.c_str(), Anope::strftime(m->time).c_str(), Config->UseStrictPrivMsgString.c_str(), Config->MemoServ.c_str(), ci->name.c_str(), index + 1);
 		else
-			source.Reply(_("Memo %d from %s (%s).  To delete, type: \002%s%s DEL %d\002"), index + 1, m->sender.c_str(), do_strftime(m->time).c_str(), Config->UseStrictPrivMsgString.c_str(), Config->MemoServ.c_str(), index + 1);
+			source.Reply(_("Memo %d from %s (%s).  To delete, type: \002%s%s DEL %d\002"), index + 1, m->sender.c_str(), Anope::strftime(m->time).c_str(), Config->UseStrictPrivMsgString.c_str(), Config->MemoServ.c_str(), index + 1);
 		source.Reply("%s", m->text.c_str());
 		m->UnsetFlag(MF_UNREAD);
 
@@ -103,7 +103,7 @@ class CommandMSRead : public Command
 			chan = numstr;
 			numstr = params.size() > 1 ? params[1] : "";
 
-			ci = cs_findchan(chan);
+			ci = ChannelInfo::Find(chan);
 			if (!ci)
 			{
 				source.Reply(CHAN_X_NOT_REGISTERED, chan.c_str());

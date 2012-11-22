@@ -53,8 +53,8 @@ class GlobalCore : public Module
 	{
 		this->SetAuthor("Anope");
 
-		const BotInfo *Global = findbot(Config->Global);
-		if (Global == NULL)
+		Global = BotInfo::Find(Config->Global);
+		if (!Global)
 			throw ModuleException("No bot named " + Config->Global);
 
 		Implementation i[] = { I_OnRestart, I_OnShutdown, I_OnNewServer, I_OnPreHelp };
@@ -64,19 +64,19 @@ class GlobalCore : public Module
 	void OnRestart() anope_override
 	{
 		if (Config->GlobalOnCycle)
-			global->SendGlobal(findbot(Config->Global), "", Config->GlobalOnCycleMessage);
+			GlobalService->SendGlobal(Global, "", Config->GlobalOnCycleMessage);
 	}
 	
 	void OnShutdown() anope_override
 	{
 		if (Config->GlobalOnCycle)
-			global->SendGlobal(findbot(Config->Global), "", Config->GlobalOnCycleMessage);
+			GlobalService->SendGlobal(Global, "", Config->GlobalOnCycleMessage);
 	}
 
 	void OnNewServer(Server *s) anope_override
 	{
 		if (Config->GlobalOnCycle && !Config->GlobalOnCycleUP.empty())
-			s->Notice(findbot(Config->Global), Config->GlobalOnCycleUP);
+			s->Notice(Global, Config->GlobalOnCycleUP);
 	}
 
 	EventReturn OnPreHelp(CommandSource &source, const std::vector<Anope::string> &params) anope_override

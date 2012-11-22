@@ -7,11 +7,11 @@
  *
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
+ *
  */
 
 #include "services.h"
 #include "config.h"
-#include "extern.h"
 #include "bots.h"
 #include "access.h"
 #include "opertype.h"
@@ -28,7 +28,7 @@
 
 /*************************************************************************/
 
-ConfigurationFile services_conf("services.conf", false); // Services configuration file name
+ConfigurationFile ServicesConf("services.conf", false); // Services configuration file name
 ServerConfig *Config = NULL;
 
 static Anope::string UlineServers;
@@ -38,7 +38,7 @@ static Anope::string NSDefaults;
 
 /*************************************************************************/
 
-ServerConfig::ServerConfig() : config_data(), NSDefFlags(NickCoreFlagStrings), CSDefFlags(ChannelInfoFlagStrings), BSDefFlags(BotServFlagStrings)
+ServerConfig::ServerConfig()
 {
 	this->Read();
 
@@ -173,7 +173,7 @@ ServerConfig::ServerConfig() : config_data(), NSDefFlags(NickCoreFlagStrings), C
 	if (this->Seed == 0)
 		Log() << "Configuration option options:seed should be set. It's for YOUR safety! Remember that!";
 
-	SetDefaultMLock(this);
+	ModeManager::UpdateDefaultMLock(this);
 
 	if (IsFile(this->NameServer))
 	{
@@ -208,8 +208,8 @@ ServerConfig::ServerConfig() : config_data(), NSDefFlags(NickCoreFlagStrings), C
 			this->NameServer = "127.0.0.1";
 		}
 	}
-	delete DNSEngine;
-	DNSEngine = new DNSManager(this->NameServer, this->DNSIP, this->DNSPort);
+	delete DNS::Engine;
+	DNS::Engine = new DNS::Manager(this->NameServer, this->DNSIP, this->DNSPort);
 
 	if (this->CaseMap == "ascii")
 		Anope::casemap = std::locale(std::locale(), new Anope::ascii_ctype<char>());
@@ -363,27 +363,27 @@ void ServerConfig::ValidateHostname(const Anope::string &p, const Anope::string 
 	}
 }
 
-bool ValidateNotEmpty(ServerConfig *, const Anope::string &tag, const Anope::string &value, ValueItem &data)
+static bool ValidateNotEmpty(ServerConfig *, const Anope::string &tag, const Anope::string &value, ValueItem &data)
 {
 	if (data.GetValue().empty())
 		throw ConfigException("The value for <" + tag + ":" + value + "> cannot be empty!");
 	return true;
 }
 
-bool ValidateNotZero(ServerConfig *, const Anope::string &tag, const Anope::string &value, ValueItem &data)
+static bool ValidateNotZero(ServerConfig *, const Anope::string &tag, const Anope::string &value, ValueItem &data)
 {
-	if (!data.GetInteger() && dotime(data.GetValue()) <= 0)
+	if (!data.GetInteger() && Anope::DoTime(data.GetValue()) <= 0)
 		throw ConfigException("The value for <" + tag + ":" + value + "> must be non-zero!");
 	return true;
 }
 
-bool ValidateEmailReg(ServerConfig *config, const Anope::string &tag, const Anope::string &value, ValueItem &data)
+static bool ValidateEmailReg(ServerConfig *config, const Anope::string &tag, const Anope::string &value, ValueItem &data)
 {
 	if (!config->NSRegistration.equals_ci("none") && !config->NSRegistration.equals_ci("disable"))
 	{
 		if (value.equals_ci("unconfirmedexpire"))
 		{
-			if (!data.GetInteger() && dotime(data.GetValue()) <= 0)
+			if (!data.GetInteger() && Anope::DoTime(data.GetValue()) <= 0)
 				throw ConfigException("The value for <" + tag + ":" + value + "> must be non-zero when e-mail or admin registration is enabled!");
 		}
 		else
@@ -395,7 +395,7 @@ bool ValidateEmailReg(ServerConfig *config, const Anope::string &tag, const Anop
 	return true;
 }
 
-bool ValidatePort(ServerConfig *, const Anope::string &tag, const Anope::string &value, ValueItem &data)
+static bool ValidatePort(ServerConfig *, const Anope::string &tag, const Anope::string &value, ValueItem &data)
 {
 	int port = data.GetInteger();
 	if (!port)
@@ -405,7 +405,7 @@ bool ValidatePort(ServerConfig *, const Anope::string &tag, const Anope::string 
 	return true;
 }
 
-bool ValidateBantype(ServerConfig *, const Anope::string &, const Anope::string &, ValueItem &data)
+static bool ValidateBantype(ServerConfig *, const Anope::string &, const Anope::string &, ValueItem &data)
 {
 	int bantype = data.GetInteger();
 	if (bantype < 0 || bantype > 3)
@@ -413,7 +413,7 @@ bool ValidateBantype(ServerConfig *, const Anope::string &, const Anope::string 
 	return true;
 }
 
-bool ValidateNickServ(ServerConfig *config, const Anope::string &tag, const Anope::string &value, ValueItem &data)
+static bool ValidateNickServ(ServerConfig *config, const Anope::string &tag, const Anope::string &value, ValueItem &data)
 {
 	if (!config->NickServ.empty())
 	{
@@ -434,7 +434,7 @@ bool ValidateNickServ(ServerConfig *config, const Anope::string &tag, const Anop
 	return true;
 }
 
-bool ValidateChanServ(ServerConfig *config, const Anope::string &tag, const Anope::string &value, ValueItem &data)
+static bool ValidateChanServ(ServerConfig *config, const Anope::string &tag, const Anope::string &value, ValueItem &data)
 {
 	if (!config->ChanServ.empty())
 	{
@@ -448,31 +448,13 @@ bool ValidateChanServ(ServerConfig *config, const Anope::string &tag, const Anop
 	return true;
 }
 
-bool ValidateMemoServ(ServerConfig *config, const Anope::string &tag, const Anope::string &value, ValueItem &data)
-{
-	if (!config->MemoServ.empty())
-	{
-		if (value.equals_ci("description"))
-		{
-			if (data.GetValue().empty())
-				throw ConfigException("The value for <" + tag + ":" + value + "> cannot be empty when MemoServ is enabled!");
-		}
-	}
-	return true;
-}
-
-bool ValidateBotServ(ServerConfig *config, const Anope::string &tag, const Anope::string &value, ValueItem &data)
+static bool ValidateBotServ(ServerConfig *config, const Anope::string &tag, const Anope::string &value, ValueItem &data)
 {
 	if (!config->BotServ.empty())
 	{
-		if (value.equals_ci("description"))
+		if (value.equals_ci("badwordsmax") || value.equals_ci("keepdata"))
 		{
-			if (data.GetValue().empty())
-				throw ConfigException("The value for <" + tag + ":" + value + "> cannot be empty when BotServ is enabled!");
-		}
-		else if (value.equals_ci("badwordsmax") || value.equals_ci("keepdata"))
-		{
-			if (!data.GetInteger() && dotime(data.GetValue()) <= 0)
+			if (!data.GetInteger() && Anope::DoTime(data.GetValue()) <= 0)
 				throw ConfigException("The value for <" + tag + ":" + value + "> must be non-zero when BotServ is enabled!");
 		}
 		else if (value.equals_ci("minusers"))
@@ -484,36 +466,24 @@ bool ValidateBotServ(ServerConfig *config, const Anope::string &tag, const Anope
 	return true;
 }
 
-bool ValidateHostServ(ServerConfig *config, const Anope::string &tag, const Anope::string &value, ValueItem &data)
-{
-	if (!config->HostServ.empty())
-	{
-		if (value.equals_ci("description") && data.GetValue().empty())
-			throw ConfigException("The value for <" + tag + ":" + value + "> cannot be empty when HostServ is enabled!");
-	}
-	return true;
-}
-
-bool ValidateLimitSessions(ServerConfig *config, const Anope::string &tag, const Anope::string &value, ValueItem &data)
+static bool ValidateLimitSessions(ServerConfig *config, const Anope::string &tag, const Anope::string &value, ValueItem &data)
 {
 	if (config->LimitSessions)
 	{
 		if (value.equals_ci("maxsessionlimit") || value.equals_ci("exceptionexpiry"))
 		{
-			if (!data.GetInteger() && dotime(data.GetValue()) <= 0)
+			if (!data.GetInteger() && Anope::DoTime(data.GetValue()) <= 0)
 				throw ConfigException("The value for <" + tag + ":" + value + "> must be non-zero when session limiting is enabled!");
 		}
 	}
 	return true;
 }
 
-bool ValidateOperServ(ServerConfig *config, const Anope::string &tag, const Anope::string &value, ValueItem &data)
+static bool ValidateOperServ(ServerConfig *config, const Anope::string &tag, const Anope::string &value, ValueItem &data)
 {
 	if (!config->OperServ.empty())
 	{
-		if (value.equals_ci("description") && data.GetValue().empty())
-			throw ConfigException("The value for <" + tag + ":" + value + "> cannot be empty when OperServ is enabled!");
-		else if (value.equals_ci("autokillexpiry") || value.equals_ci("chankillexpiry") || value.equals_ci("snlineexpiry") || value.equals_ci("sqlineexpiry"))
+		if (value.equals_ci("autokillexpiry") || value.equals_ci("chankillexpiry") || value.equals_ci("snlineexpiry") || value.equals_ci("sqlineexpiry"))
 			return ValidateNotZero(config, tag, value, data);
 		else if (value.equals_ci("maxsessionlimit") || value.equals_ci("exceptionexpiry"))
 			return ValidateLimitSessions(config, tag, value, data);
@@ -521,17 +491,7 @@ bool ValidateOperServ(ServerConfig *config, const Anope::string &tag, const Anop
 	return true;
 }
 
-bool ValidateGlobal(ServerConfig *config, const Anope::string &tag, const Anope::string &value, ValueItem &data)
-{
-	if (!config->Global.empty())
-	{
-		if (value.equals_ci("description") && data.GetValue().empty())
-			throw ConfigException("The value for <" + tag + ":" + value + "> cannot be empty when Global is enabled!");
-	}
-	return true;
-}
-
-bool ValidateNickLen(ServerConfig *, const Anope::string &, const Anope::string &, ValueItem &data)
+static bool ValidateNickLen(ServerConfig *, const Anope::string &, const Anope::string &, ValueItem &data)
 {
 	int nicklen = data.GetInteger();
 	if (!nicklen)
@@ -548,7 +508,7 @@ bool ValidateNickLen(ServerConfig *, const Anope::string &, const Anope::string 
 	return true;
 }
 
-bool ValidateMail(ServerConfig *config, const Anope::string &tag, const Anope::string &value, ValueItem &data)
+static bool ValidateMail(ServerConfig *config, const Anope::string &tag, const Anope::string &value, ValueItem &data)
 {
 	if (config->UseMail)
 	{
@@ -561,7 +521,7 @@ bool ValidateMail(ServerConfig *config, const Anope::string &tag, const Anope::s
 	return true;
 }
 
-bool ValidateGlobalOnCycle(ServerConfig *config, const Anope::string &tag, const Anope::string &value, ValueItem &data)
+static bool ValidateGlobalOnCycle(ServerConfig *config, const Anope::string &tag, const Anope::string &value, ValueItem &data)
 {
 	if (config->GlobalOnCycle)
 	{
@@ -574,7 +534,7 @@ bool ValidateGlobalOnCycle(ServerConfig *config, const Anope::string &tag, const
 	return true;
 }
 
-bool InitUplinks(ServerConfig *config, const Anope::string &)
+static bool InitUplinks(ServerConfig *config, const Anope::string &)
 {
 	if (!config->Uplinks.empty())
 	{
@@ -722,7 +682,7 @@ static bool DoOper(ServerConfig *config, const Anope::string &, const Anope::str
 	o->config = true;
 	o->password = password;
 	o->certfp = certfp;
-	o->hosts = BuildStringVector(host);
+	spacesepstream(host).GetTokens(o->hosts);
 	o->vhost = vhost;
 	config->Opers.push_back(o);
 
@@ -735,7 +695,7 @@ static bool DoneOpers(ServerConfig *config, const Anope::string &)
 	{
 		Oper *o = config->Opers[i];
 
-		const NickAlias *na = findnick(o->name);
+		const NickAlias *na = NickAlias::Find(o->name);
 		if (!na)
 			// Nonexistant nick
 			continue;
@@ -796,7 +756,7 @@ static bool DoneInclude(ServerConfig *config, const Anope::string &)
 
 /*************************************************************************/
 
-bool InitModules(ServerConfig *, const Anope::string &)
+static bool InitModules(ServerConfig *, const Anope::string &)
 {
 	return true;
 }
@@ -826,7 +786,7 @@ static bool DoneModules(ServerConfig *config, const Anope::string &)
 	return true;
 }
 
-bool InitLogs(ServerConfig *config, const Anope::string &)
+static bool InitLogs(ServerConfig *config, const Anope::string &)
 {
 	config->LogInfos.clear();
 	return true;
@@ -853,15 +813,15 @@ static bool DoLogs(ServerConfig *config, const Anope::string &, const Anope::str
 	bool ldebug = values[11].GetBool();
 
 	LogInfo *l = new LogInfo(logage, rawio, ldebug);
-	l->Targets = BuildStringList(targets);
-	l->Sources = BuildStringList(source);
-	l->Admin = BuildStringList(admin);
-	l->Override = BuildStringList(override);
-	l->Commands = BuildStringList(commands);
-	l->Servers = BuildStringList(servers);
-	l->Channels = BuildStringList(channels);
-	l->Users = BuildStringList(users);
-	l->Normal = BuildStringList(normal);
+	spacesepstream(targets).GetTokens(l->targets);
+	spacesepstream(source).GetTokens(l->sources);
+	spacesepstream(admin).GetTokens(l->admin);
+	spacesepstream(override).GetTokens(l->override);
+	spacesepstream(commands).GetTokens(l->commands);
+	spacesepstream(servers).GetTokens(l->servers);
+	spacesepstream(channels).GetTokens(l->channels);
+	spacesepstream(users).GetTokens(l->users);
+	spacesepstream(normal).GetTokens(l->normal);
 
 	config->LogInfos.push_back(l);
 
@@ -909,7 +869,7 @@ static bool DoCommands(ServerConfig *config, const Anope::string &, const Anope:
 	if (!ValidateNotEmpty(config, "command", "command", vi))
 		throw ConfigException("One or more values in your configuration file failed to validate. Please see your log for more information.");
 	
-	BotInfo *bi = findbot(service);
+	BotInfo *bi = BotInfo::Find(service);
 	if (bi == NULL)
 		throw ConfigException("Command " + name + " exists for nonexistant service " + service);
 
@@ -992,7 +952,7 @@ static bool DoServices(ServerConfig *config, const Anope::string &, const Anope:
 		throw ConfigException("One or more values in your configuration file failed to validate. Please see your log for more information.");
 
 	services.insert(nick);
-	BotInfo* bi = findbot(nick);
+	BotInfo* bi = BotInfo::Find(nick);
 	if (!bi)
 		bi = new BotInfo(nick, user, host, gecos, modes);
 	bi->SetFlag(BI_CONF);
@@ -1014,7 +974,7 @@ static bool DoServices(ServerConfig *config, const Anope::string &, const Anope:
 			chname = token.substr(ch);
 		}
 		bi->Join(chname);
-		Channel *c = findchan(chname);
+		Channel *c = Channel::Find(chname);
 		if (!c)
 			continue; // Can't happen
 
@@ -1022,7 +982,7 @@ static bool DoServices(ServerConfig *config, const Anope::string &, const Anope:
 		for (unsigned i = 0; i < ModeManager::ChannelModes.size(); ++i)
 		{
 			ChannelMode *cm = ModeManager::ChannelModes[i];
-			if (cm && cm->Type == MODE_STATUS)
+			if (cm && cm->type == MODE_STATUS)
 				c->RemoveMode(bi, cm, bi->nick);
 		}
 		/* Set the new modes */
@@ -1031,7 +991,7 @@ static bool DoServices(ServerConfig *config, const Anope::string &, const Anope:
 			ChannelMode *cm = ModeManager::FindChannelModeByChar(want_modes[j]);
 			if (cm == NULL)
 				cm = ModeManager::FindChannelModeByChar(ModeManager::GetStatusChar(want_modes[j]));
-			if (cm && cm->Type == MODE_STATUS)
+			if (cm && cm->type == MODE_STATUS)
 				c->SetMode(bi, cm, bi->GetUID());
 		}
 	}
@@ -1053,7 +1013,7 @@ static bool DoServices(ServerConfig *config, const Anope::string &, const Anope:
 		if (found)
 			continue;
 
-		Channel *c = findchan(chname);
+		Channel *c = Channel::Find(chname);
 		if (c)
 			bi->Part(c);
 	}
@@ -1069,7 +1029,7 @@ static bool DoneServices(ServerConfig *config, const Anope::string &)
 		++it;
 
 		if (bi->HasFlag(BI_CONF) && services.count(bi->nick) == 0)
-			bi->destroy();
+			bi->Destroy();
 	}
 	services.clear();
 	return true;
@@ -1123,7 +1083,7 @@ bool ConfigurationFile::IsOpen() const
 bool ConfigurationFile::Open()
 {
 	this->Close();
-	this->fp = (this->executable ? popen(this->name.c_str(), "r") : fopen((conf_dir + "/" + this->name).c_str(), "r"));
+	this->fp = (this->executable ? popen(this->name.c_str(), "r") : fopen((Anope::ConfigDir + "/" + this->name).c_str(), "r"));
 	return this->fp != NULL;
 }
 
@@ -1464,7 +1424,7 @@ void ServerConfig::Read()
 	// These tags MUST occur and must ONLY occur once in the config file
 	static const Anope::string Once[] = {"serverinfo", "networkinfo", "options", ""};
 
-	this->LoadConf(services_conf);
+	this->LoadConf(ServicesConf);
 
 	ConfigItems configitems(this);
 
@@ -1550,9 +1510,9 @@ void ServerConfig::Read()
 						if (has_value)
 						{
 #ifdef _WIN32
-							long time = static_cast<long>(dotime(item));
+							long time = static_cast<long>(Anope::DoTime(item));
 #else
-							time_t time = dotime(item);
+							time_t time = Anope::DoTime(item);
 #endif
 							vl.push_back(ValueItem(time));
 						}
@@ -1648,7 +1608,7 @@ void ServerConfig::Read()
 			}
 			case DT_TIME:
 			{
-				time_t time = dotime(vi.GetValue());
+				time_t time = Anope::DoTime(vi.GetValue());
 				ValueContainerTime *vci = anope_dynamic_static_cast<ValueContainerTime *>(configitems.Values[Index].val);
 				vci->Set(&time, sizeof(time_t));
 				break;
@@ -1665,10 +1625,10 @@ void ServerConfig::Read()
 		}
 	}
 
-	Log(LOG_DEBUG) << "End config " << services_conf.GetName();
+	Log(LOG_DEBUG) << "End config " << ServicesConf.GetName();
 	for (int Index = 0; !Once[Index].empty(); ++Index)
 		CheckOnce(Once[Index]);
-	Log() << "Done reading configuration file " << services_conf.GetName();
+	Log() << "Done reading configuration file " << ServicesConf.GetName();
 }
 
 void ServerConfig::LoadConf(ConfigurationFile &file)

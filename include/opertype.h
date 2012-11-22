@@ -3,6 +3,7 @@
  * Copyright (C) 2008-2012 Anope Team <team@anope.org>
  *
  * Please read COPYING and README for further details.
+ *
  */
 
 #ifndef OPERTYPE_H
@@ -11,15 +12,22 @@
 #include "services.h"
 #include "account.h"
 
+/* A services operator. Usually made by the configuration file, but not always.
+ * NickAlias::Find(name)->nc->o == this
+ */
 struct CoreExport Oper
 {
+	/* The oper's nick */
 	Anope::string name;
+	/* The type of operator this operator is */
 	OperType *ot;
+	/* Whether the user must be an IRC operator (umode +o) to be considered a services operator */
 	bool require_oper;
 	Anope::string password;
 	Anope::string certfp;
+	/* True if this operator is set in the config */
 	bool config;
-
+	/* Hosts allowed to use this operator block */
 	std::vector<Anope::string> hosts;
 	Anope::string vhost;
 

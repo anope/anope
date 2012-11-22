@@ -50,7 +50,7 @@ class CommandCSEnforce : public Command
 
 		Log(LOG_COMMAND, source, this) << "to enforce secureops";
 
-		/* Dirty hack to allow chan_set_correct_modes to work ok.
+		/* Dirty hack to allow Channel::SetCorrectModes to work ok.
 		 * We pretend like SECUREOPS is on so it doesn't ignore that
 		 * part of the code. This way we can enforce SECUREOPS even
 		 * if it's off.
@@ -66,7 +66,7 @@ class CommandCSEnforce : public Command
 		{
 			UserContainer *uc = *it;
 
-			chan_set_correct_modes(uc->user, c, 0, false);
+			c->SetCorrectModes(uc->user, false, false);
 		}
 
 		if (hadsecureops)
@@ -95,9 +95,8 @@ class CommandCSEnforce : public Command
 		{	
 			User *user = users[i];
 
-			Anope::string mask;
-			get_idealban(ci, user, mask);
-			Anope::string reason = translate(user, CHAN_NOT_ALLOWED_TO_JOIN);
+			Anope::string mask = ci->GetIdealBan(user);
+			Anope::string reason = Language::Translate(user, CHAN_NOT_ALLOWED_TO_JOIN);
 			c->SetMode(NULL, CMODE_BAN, mask);
 			c->Kick(NULL, user, "%s", reason.c_str());
 		}
@@ -106,7 +105,6 @@ class CommandCSEnforce : public Command
 	void DoCModeR(CommandSource &source, Channel *c)
 	{
 		ChannelInfo *ci = c->ci;
-		Anope::string mask;
 
 		if (!ci)
 			return;
@@ -127,8 +125,8 @@ class CommandCSEnforce : public Command
 		{
 			User *user = users[i];
 
-			get_idealban(ci, user, mask);
-			Anope::string reason = translate(user, CHAN_NOT_ALLOWED_TO_JOIN);
+			Anope::string mask = ci->GetIdealBan(user);
+			Anope::string reason = Language::Translate(user, CHAN_NOT_ALLOWED_TO_JOIN);
 			if (!c->HasMode(CMODE_REGISTEREDONLY))
 				c->SetMode(NULL, CMODE_BAN, mask);
 			c->Kick(NULL, user, "%s", reason.c_str());
@@ -145,7 +143,7 @@ class CommandCSEnforce : public Command
 	{
 		const Anope::string &what = params.size() > 1 ? params[1] : "";
 
-		Channel *c = findchan(params[0]);
+		Channel *c = Channel::Find(params[0]);
 
 		if (!c)
 			source.Reply(CHAN_X_NOT_IN_USE, params[0].c_str());

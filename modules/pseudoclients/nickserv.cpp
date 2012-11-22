@@ -15,23 +15,20 @@
 #include "nickserv.h"
 
 class NickServCollide;
-class NickServRelease;
 
 typedef std::map<Anope::string, NickServCollide *> nickservcollides_map;
-typedef std::map<Anope::string, NickServRelease *> nickservreleases_map;
 
 static nickservcollides_map NickServCollides;
-static nickservreleases_map NickServReleases;
 
 /** Timer for colliding nicks to force people off of nicknames
  */
 class NickServCollide : public Timer
 {
-	dynamic_reference<User> u;
+	Reference<User> u;
 	Anope::string nick;
 
  public:
-	/** Default constructor
+	/** Constructor
 	 * @param nick The nick we're colliding
 	 * @param delay How long to delay before kicking the user off the nick
 	 */
@@ -45,8 +42,6 @@ class NickServCollide : public Timer
 		NickServCollides.insert(std::make_pair(nick, this));
 	}
 
-	/** Default destructor
-	 */
 	virtual ~NickServCollide()
 	{
 		NickServCollides.erase(this->nick);
@@ -60,7 +55,7 @@ class NickServCollide : public Timer
 		if (!u)
 			return;
 		/* If they identified or don't exist anymore, don't kill them. */
-		NickAlias *na = findnick(u->nick);
+		NickAlias *na = NickAlias::Find(u->nick);
 		if (!na || u->Account() == na->nc || u->timestamp > this->GetSetTime())
 			return;
 
@@ -75,10 +70,9 @@ class MyNickServService : public NickServService
 
 	void Validate(User *u) anope_override
 	{
-		NickAlias *na = findnick(u->nick);
+		NickAlias *na = NickAlias::Find(u->nick);
 		if (!na)
 			return;
-		const BotInfo *NickServ = findbot(Config->NickServ);
 
 		if (na->nc->HasFlag(NI_SUSPENDED))
 		{
@@ -124,12 +118,12 @@ class MyNickServService : public NickServService
 			}
 			else if (na->nc->HasFlag(NI_KILL_QUICK))
 			{
-				u->SendMessage(NickServ, _("If you do not change within %s, I will change your nick."), duration(Config->NSKillQuick, u->Account()).c_str());
+				u->SendMessage(NickServ, _("If you do not change within %s, I will change your nick."), Anope::Duration(Config->NSKillQuick, u->Account()).c_str());
 				new NickServCollide(u, Config->NSKillQuick);
 			}
 			else
 			{
-				u->SendMessage(NickServ, _("If you do not change within %s, I will change your nick."), duration(Config->NSKill, u->Account()).c_str());
+				u->SendMessage(NickServ, _("If you do not change within %s, I will change your nick."), Anope::Duration(Config->NSKill, u->Account()).c_str());
 				new NickServCollide(u, Config->NSKill);
 			}
 		}
@@ -144,7 +138,7 @@ class ExpireCallback : public CallBack
 
 	void Tick(time_t) anope_override
 	{
-		if (noexpire || readonly)
+		if (Anope::NoExpire || Anope::ReadOnly)
 			return;
 
 		for (nickalias_map::const_iterator it = NickAliasList->begin(), it_end = NickAliasList->end(); it != it_end; )
@@ -152,7 +146,7 @@ class ExpireCallback : public CallBack
 			NickAlias *na = it->second;
 			++it;
 
-			User *u = finduser(na->nick);
+			User *u = User::Find(na->nick);
 			if (u && (na->nc->HasFlag(NI_SECURE) ? u->IsIdentified(true) : u->IsRecognized()))
 				na->last_seen = Anope::CurTime;
 
@@ -175,7 +169,7 @@ class ExpireCallback : public CallBack
 					extra = "suspended ";
 				Log(LOG_NORMAL, "expire") << "Expiring " << extra << "nickname " << na->nick << " (group: " << na->nc->display << ") (e-mail: " << (na->nc->email.empty() ? "none" : na->nc->email) << ")";
 				FOREACH_MOD(I_OnNickExpire, OnNickExpire(na));
-				na->destroy();
+				na->Destroy();
 			}
 		}
 	}
@@ -191,7 +185,8 @@ class NickServCore : public Module
 	{
 		this->SetAuthor("Anope");
 
-		if (!findbot(Config->NickServ))
+		NickServ = BotInfo::Find(Config->NickServ);
+		if (!NickServ)
 			throw ModuleException("No bot named " + Config->NickServ);
 
 		Implementation i[] = { I_OnDelNick, I_OnDelCore, I_OnChangeCoreDisplay, I_OnNickIdentify, I_OnNickGroup,
@@ -201,45 +196,41 @@ class NickServCore : public Module
 
 	void OnDelNick(NickAlias *na) anope_override
 	{
-		User *u = finduser(na->nick);
+		User *u = User::Find(na->nick);
 		if (u && u->Account() == na->nc)
 		{
-			ircdproto->SendLogout(u);
-			u->RemoveMode(findbot(Config->NickServ), UMODE_REGISTERED);
+			IRCD->SendLogout(u);
+			u->RemoveMode(NickServ, UMODE_REGISTERED);
 			u->Logout();
 		}
 	}
 
 	void OnDelCore(NickCore *nc) anope_override
 	{
-		Log(findbot(Config->NickServ), "nick") << "deleting nickname group " << nc->display;
+		Log(NickServ, "nick") << "deleting nickname group " << nc->display;
 
-		/* Clean up this nick core from any users online using it
-		 * (ones that /nick but remain unidentified)
-		 */
-		for (std::list<User *>::iterator it = nc->Users.begin(); it != nc->Users.end();)
+		/* Clean up this nick core from any users online */
+		for (std::list<User *>::iterator it = nc->users.begin(); it != nc->users.end();)
 		{
 			User *user = *it++;
-			ircdproto->SendLogout(user);
-			user->RemoveMode(findbot(Config->NickServ), UMODE_REGISTERED);
+			IRCD->SendLogout(user);
+			user->RemoveMode(NickServ, UMODE_REGISTERED);
 			user->Logout();
 			FOREACH_MOD(I_OnNickLogout, OnNickLogout(user));
 		}
-		nc->Users.clear();
+		nc->users.clear();
 	}
 
 	void OnChangeCoreDisplay(NickCore *nc, const Anope::string &newdisplay) anope_override
 	{
-		Log(LOG_NORMAL, "nick", findbot(Config->NickServ)) << "Changing " << nc->display << " nickname group display to " << newdisplay;
+		Log(LOG_NORMAL, "nick", NickServ) << "Changing " << nc->display << " nickname group display to " << newdisplay;
 	}
 
 	void OnNickIdentify(User *u) anope_override
 	{
-		const BotInfo *NickServ = findbot(Config->NickServ);
-
 		if (!Config->NoNicknameOwnership)
 		{
-			const NickAlias *this_na = findnick(u->nick);
+			const NickAlias *this_na = NickAlias::Find(u->nick);
 			if (this_na && this_na->nc == u->Account() && u->Account()->HasFlag(NI_UNCONFIRMED) == false)
 				u->SetMode(NickServ, UMODE_REGISTERED);
 		}
@@ -250,7 +241,7 @@ class NickServCore : public Module
 				ChannelContainer *cc = *it;
 				Channel *c = cc->chan;
 				if (c)
-					chan_set_correct_modes(u, c, 1, true);
+					c->SetCorrectModes(u, true, true);
 			}
 
 		if (!Config->NSModesOnID.empty())
@@ -269,17 +260,17 @@ class NickServCore : public Module
 		if (u->Account()->HasFlag(NI_UNCONFIRMED))
 		{
 			u->SendMessage(NickServ, _("Your email address is not confirmed. To confirm it, follow the instructions that were emailed to you when you registered."));
-			const NickAlias *this_na = findnick(u->Account()->display);
+			const NickAlias *this_na = NickAlias::Find(u->Account()->display);
 			time_t time_registered = Anope::CurTime - this_na->time_registered;
 			if (Config->NSUnconfirmedExpire > time_registered)
-				u->SendMessage(NickServ, _("Your account will expire, if not confirmed, in %s"), duration(Config->NSUnconfirmedExpire - time_registered).c_str());
+				u->SendMessage(NickServ, _("Your account will expire, if not confirmed, in %s"), Anope::Duration(Config->NSUnconfirmedExpire - time_registered).c_str());
 		}
 	}
 
 	void OnNickGroup(User *u, NickAlias *target) anope_override
 	{
 		if (target->nc->HasFlag(NI_UNCONFIRMED) == false)
-			u->SetMode(findbot(Config->NickServ), UMODE_REGISTERED);
+			u->SetMode(NickServ, UMODE_REGISTERED);
 	}
 
 	void OnNickUpdate(User *u) anope_override
@@ -289,14 +280,13 @@ class NickServCore : public Module
 			ChannelContainer *cc = *it;
 			Channel *c = cc->chan;
 			if (c)
-				chan_set_correct_modes(u, c, 1, false);
+				c->SetCorrectModes(u, true, true);
 		}
 	}
 
 	void OnUserNickChange(User *u, const Anope::string &oldnick) anope_override
 	{
-		const NickAlias *na = findnick(u->nick);
-		const BotInfo *NickServ = findbot(Config->NickServ);
+		const NickAlias *na = NickAlias::Find(u->nick);
 		/* If the new nick isnt registerd or its registerd and not yours */
 		if (!na || na->nc != u->Account())
 		{
@@ -308,7 +298,7 @@ class NickServCore : public Module
 		else
 		{
 			/* Reset +r and re-send account (even though it really should be set at this point) */
-			ircdproto->SendLogin(u);
+			IRCD->SendLogin(u);
 			if (!Config->NoNicknameOwnership && na->nc == u->Account() && na->nc->HasFlag(NI_UNCONFIRMED) == false)
 				u->SetMode(NickServ, UMODE_REGISTERED);
 			Log(NickServ) << u->GetMask() << " automatically identified for group " << u->Account()->display;
@@ -318,7 +308,7 @@ class NickServCore : public Module
 	void OnUserModeSet(User *u, UserModeName Name) anope_override
 	{
 		if (Name == UMODE_REGISTERED && !u->IsIdentified())
-			u->RemoveMode(findbot(Config->NickServ), Name);
+			u->RemoveMode(NickServ, Name);
 	}
 
 	EventReturn OnPreHelp(CommandSource &source, const std::vector<Anope::string> &params) anope_override
@@ -357,10 +347,10 @@ class NickServCore : public Module
 			"nickname(s)."), Config->NickServ.c_str());
 	}
 
-	void OnUserConnect(dynamic_reference<User> &u, bool &exempt) anope_override
+	void OnUserConnect(Reference<User> &u, bool &exempt) anope_override
 	{
-		if (!Config->NoNicknameOwnership && !Config->NSUnregisteredNotice.empty() && u && !findnick(u->nick))
-			u->SendMessage(findbot(Config->NickServ), Config->NSUnregisteredNotice);
+		if (!Config->NoNicknameOwnership && !Config->NSUnregisteredNotice.empty() && u && !NickAlias::Find(u->nick))
+			u->SendMessage(NickServ, Config->NSUnregisteredNotice);
 	}
 };
 

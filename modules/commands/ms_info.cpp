@@ -33,7 +33,7 @@ class CommandMSInfo : public Command
 
 		if (!nname.empty() && nname[0] != '#' && source.HasPriv("memoserv/info"))
 		{
-			na = findnick(nname);
+			na = NickAlias::Find(nname);
 			if (!na)
 			{
 				source.Reply(NICK_X_NOT_REGISTERED, nname.c_str());
@@ -44,7 +44,7 @@ class CommandMSInfo : public Command
 		}
 		else if (!nname.empty() && nname[0] == '#')
 		{
-			ci = cs_findchan(nname);
+			ci = ChannelInfo::Find(nname);
 			if (!ci)
 			{
 				source.Reply(CHAN_X_NOT_REGISTERED, nname.c_str());

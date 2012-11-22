@@ -36,8 +36,9 @@ class CommandNSList : public Command
 
 		if (pattern[0] == '#')
 		{
-			Anope::string n1 = myStrGetToken(pattern.substr(1), '-', 0), /* Read FROM out */
-					n2 = myStrGetToken(pattern, '-', 1);
+			Anope::string n1, n2;
+			sepstream(pattern.substr(1), '-').GetToken(n1, 0);
+			sepstream(pattern, '-').GetToken(n2, 1);
 			try
 			{
 				from = convertTo<int>(n1);
@@ -72,7 +73,7 @@ class CommandNSList : public Command
 		mync = source.nc;
 		ListFormatter list;
 
-		list.addColumn("Nick").addColumn("Last usermask");
+		list.AddColumn("Nick").AddColumn("Last usermask");
 
 		for (nickalias_map::const_iterator it = NickAliasList->begin(), it_end = NickAliasList->end(); it != it_end; ++it)
 		{
@@ -110,7 +111,7 @@ class CommandNSList : public Command
 						entry["Last usermask"] = "[Unconfirmed]";
 					else
 						entry["Last usermask"] = na->last_usermask;
-					list.addEntry(entry);
+					list.AddEntry(entry);
 				}
 				++count;
 			}

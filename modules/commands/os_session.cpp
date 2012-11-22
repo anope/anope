@@ -101,9 +101,9 @@ class ExpireTimer : public Timer
 
 			if (!e->expires || e->expires > Anope::CurTime)
 				continue;
-			Log(findbot(Config->OperServ), "expire/exception") << "Session exception for " << e->mask << "has expired.";
+			Log(OperServ, "expire/exception") << "Session exception for " << e->mask << "has expired.";
 			session_service->DelException(e);
-			e->destroy();
+			e->Destroy();
 		}
 	}
 };
@@ -112,30 +112,30 @@ class ExceptionDelCallback : public NumberList
 {
  protected:
 	CommandSource &source;
-	unsigned Deleted;
+	unsigned deleted;
  public:
-	ExceptionDelCallback(CommandSource &_source, const Anope::string &numlist) : NumberList(numlist, true), source(_source), Deleted(0)
+	ExceptionDelCallback(CommandSource &_source, const Anope::string &numlist) : NumberList(numlist, true), source(_source), deleted(0)
 	{
 	}
 
 	~ExceptionDelCallback()
 	{
-		if (!Deleted)
+		if (!deleted)
 			source.Reply(_("No matching entries on session-limit exception list."));
-		else if (Deleted == 1)
+		else if (deleted == 1)
 			source.Reply(_("Deleted 1 entry from session-limit exception list."));
 		else
-			source.Reply(_("Deleted %d entries from session-limit exception list."), Deleted);
+			source.Reply(_("Deleted %d entries from session-limit exception list."), deleted);
 	}
 
-	virtual void HandleNumber(unsigned Number) anope_override
+	virtual void HandleNumber(unsigned number) anope_override
 	{
-		if (!Number || Number > session_service->GetExceptions().size())
+		if (!number || number > session_service->GetExceptions().size())
 			return;
 
-		++Deleted;
+		++deleted;
 
-		DoDel(source, Number - 1);
+		DoDel(source, number - 1);
 	}
 
 	static void DoDel(CommandSource &source, unsigned index)
@@ -144,7 +144,7 @@ class ExceptionDelCallback : public NumberList
 		FOREACH_MOD(I_OnExceptionDel, OnExceptionDel(source, e));
 
 		session_service->DelException(e);
-		e->destroy();
+		e->Destroy();
 	}
 };
 
@@ -167,7 +167,7 @@ class CommandOSSession : public Command
 		else
 		{
 			ListFormatter list;
-			list.addColumn("Session").addColumn("Host");
+			list.AddColumn("Session").AddColumn("Host");
 
 			for (SessionService::SessionMap::iterator it = session_service->GetSessions().begin(), it_end = session_service->GetSessions().end(); it != it_end; ++it)
 			{
@@ -178,7 +178,7 @@ class CommandOSSession : public Command
 					ListFormatter::ListEntry entry;
 					entry["Session"] = stringify(session->count);
 					entry["Host"] = session->addr.mask();
-					list.addEntry(entry);
+					list.AddEntry(entry);
 				}
 			}
 
@@ -296,7 +296,7 @@ class CommandOSException : public Command
 			return;
 		}
 
-		time_t expires = !expiry.empty() ? dotime(expiry) : Config->ExceptionExpiry;
+		time_t expires = !expiry.empty() ? Anope::DoTime(expiry) : Config->ExceptionExpiry;
 		if (expires < 0)
 		{
 			source.Reply(BAD_EXPIRY_TIME);
@@ -352,12 +352,12 @@ class CommandOSException : public Command
 			EventReturn MOD_RESULT;
 			FOREACH_RESULT(I_OnExceptionAdd, OnExceptionAdd(exception));
 			if (MOD_RESULT == EVENT_STOP)
-				exception->destroy();
+				exception->Destroy();
 			else
 			{
 				session_service->AddException(exception);
 				source.Reply(_("Session limit for \002%s\002 set to \002%d\002."), mask.c_str(), limit);
-				if (readonly)
+				if (Anope::ReadOnly)
 					source.Reply(READ_ONLY_MODE);
 			}
 		}
@@ -394,7 +394,7 @@ class CommandOSException : public Command
 				source.Reply(_("\002%s\002 not found on session-limit exception list."), mask.c_str());
 		}
 
-		if (readonly)
+		if (Anope::ReadOnly)
 			source.Reply(READ_ONLY_MODE);
 
 		return;
@@ -428,7 +428,7 @@ class CommandOSException : public Command
 
 			source.Reply(_("Exception for \002%s\002 (#%d) moved to position \002%d\002."), session_service->GetExceptions()[n1]->mask.c_str(), n1 + 1, n2 + 1);
 
-			if (readonly)
+			if (Anope::ReadOnly)
 				source.Reply(READ_ONLY_MODE);
 		}
 		else
@@ -468,10 +468,10 @@ class CommandOSException : public Command
 					entry["Number"] = stringify(Number);
 					entry["Mask"] = e->mask;
 					entry["By"] = e->who;
-					entry["Created"] = do_strftime(e->time);
+					entry["Created"] = Anope::strftime(e->time);
 					entry["Limit"] = stringify(e->limit);
 					entry["Reason"] = e->reason;
-					this->list.addEntry(entry);
+					this->list.AddEntry(entry);
 				}
 			}
 			nl_list(list, mask);
@@ -488,15 +488,15 @@ class CommandOSException : public Command
 					entry["Number"] = stringify(i + 1);
 					entry["Mask"] = e->mask;
 					entry["By"] = e->who;
-					entry["Created"] = do_strftime(e->time);
+					entry["Created"] = Anope::strftime(e->time);
 					entry["Limit"] = stringify(e->limit);
 					entry["Reason"] = e->reason;
-					list.addEntry(entry);
+					list.AddEntry(entry);
 				}
 			}
 		}
 
-		if (list.isEmpty())
+		if (list.IsEmpty())
 			source.Reply(_("No matching entries on session-limit exception list."));
 		else
 		{
@@ -513,7 +513,7 @@ class CommandOSException : public Command
 	void DoList(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		ListFormatter list;
-		list.addColumn("Number").addColumn("Limit").addColumn("Mask");
+		list.AddColumn("Number").AddColumn("Limit").AddColumn("Mask");
 
 		this->ProcessList(source, params, list);
 	}
@@ -521,7 +521,7 @@ class CommandOSException : public Command
 	void DoView(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		ListFormatter list;
-		list.addColumn("Number").addColumn("Mask").addColumn("By").addColumn("Created").addColumn("Limit").addColumn("Reason");
+		list.AddColumn("Number").AddColumn("Mask").AddColumn("By").AddColumn("Created").AddColumn("Limit").AddColumn("Reason");
 
 		this->ProcessList(source, params, list);
 	}
@@ -604,12 +604,12 @@ class CommandOSException : public Command
 
 class OSSession : public Module
 {
-	SerializeType exception_type;
+	Serialize::Type exception_type;
 	MySessionService ss;
 	ExpireTimer expiretimer;
 	CommandOSSession commandossession;
 	CommandOSException commandosexception;
-	service_reference<XLineManager> akills;
+	ServiceReference<XLineManager> akills;
 
 	void AddSession(User *u, bool exempt)
 	{
@@ -649,13 +649,12 @@ class OSSession : public Module
 	
 			if (kill && !exempt)
 			{
-				const BotInfo *bi = findbot(Config->OperServ);
-				if (bi)
+				if (OperServ)
 				{
 					if (!Config->SessionLimitExceeded.empty())
-						u->SendMessage(bi, Config->SessionLimitExceeded.c_str(), u->host.c_str());
+						u->SendMessage(OperServ, Config->SessionLimitExceeded.c_str(), u->host.c_str());
 					if (!Config->SessionLimitDetailsLoc.empty())
-						u->SendMessage(bi, "%s", Config->SessionLimitDetailsLoc.c_str());
+						u->SendMessage(OperServ, "%s", Config->SessionLimitDetailsLoc.c_str());
 				}
 
 				++session->hits;
@@ -665,7 +664,7 @@ class OSSession : public Module
 					XLine *x = new XLine(akillmask, Config->OperServ, Anope::CurTime + Config->SessionAutoKillExpiry, "Session limit exceeded", XLineManager::GenerateUID());
 					akills->AddXLine(x);
 					akills->Send(NULL, x);
-					Log(bi, "akill/session") << "Added a temporary AKILL for \2" << akillmask << "\2 due to excessive connections";
+					Log(OperServ, "akill/session") << "Added a temporary AKILL for \2" << akillmask << "\2 due to excessive connections";
 				}
 				else
 				{
@@ -694,8 +693,7 @@ class OSSession : public Module
 		}
 		if (!session)
 		{
-			if (debug)
-				Log(this) << "Tried to delete non-existant session: " << u->host;
+			Log(LOG_DEBUG) << "Tried to delete non-existant session: " << u->host;
 			return;
 		}
 
@@ -711,7 +709,7 @@ class OSSession : public Module
 
  public:
 	OSSession(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
-		exception_type("Exception", Exception::unserialize), ss(this), commandossession(this), commandosexception(this), akills("XLineManager", "xlinemanager/sgline")
+		exception_type("Exception", Exception::Unserialize), ss(this), commandossession(this), commandosexception(this), akills("XLineManager", "xlinemanager/sgline")
 	{
 		this->SetAuthor("Anope");
 
@@ -720,7 +718,7 @@ class OSSession : public Module
 		ModuleManager::SetPriority(this, PRIORITY_FIRST);
 	}
 
-	void OnUserConnect(dynamic_reference<User> &user, bool &exempt) anope_override
+	void OnUserConnect(Reference<User> &user, bool &exempt) anope_override
 	{
 		if (user && Config->LimitSessions)
 			this->AddSession(user, exempt);

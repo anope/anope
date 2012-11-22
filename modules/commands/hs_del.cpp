@@ -25,7 +25,7 @@ class CommandHSDel : public Command
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		const Anope::string &nick = params[0];
-		NickAlias *na = findnick(nick);
+		NickAlias *na = NickAlias::Find(nick);
 		if (na)
 		{
 			Log(LOG_ADMIN, source, this) << "for user " << na->nick;
@@ -59,12 +59,12 @@ class CommandHSDelAll : public Command
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		const Anope::string &nick = params[0];
-		NickAlias *na = findnick(nick);
+		NickAlias *na = NickAlias::Find(nick);
 		if (na)
 		{
 			FOREACH_MOD(I_OnDeleteVhost, OnDeleteVhost(na));
 			const NickCore *nc = na->nc;
-			for (std::list<serialize_obj<NickAlias> >::const_iterator it = nc->aliases.begin(), it_end = nc->aliases.end(); it != it_end; ++it)
+			for (std::list<Serialize::Reference<NickAlias> >::const_iterator it = nc->aliases.begin(), it_end = nc->aliases.end(); it != it_end; ++it)
 			{
 				na = *it;
 				na->RemoveVhost();

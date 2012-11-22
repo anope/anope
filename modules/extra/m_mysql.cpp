@@ -376,10 +376,10 @@ std::vector<SQLQuery> MySQLService::CreateTable(const Anope::string &table, cons
 			known_cols.insert(it->first);
 
 			query_text += ", `" + it->first + "` ";
-			if (it->second.getType() == Serialize::DT_INT)
+			if (it->second.GetType() == Serialize::DT_INT)
 				query_text += "int(11)";
-			else if (it->second.getMax() > 0)
-				query_text += "varchar(" + stringify(it->second.getMax()) + ")";
+			else if (it->second.GetMax() > 0)
+				query_text += "varchar(" + stringify(it->second.GetMax()) + ")";
 			else
 				query_text += "text";
 		}
@@ -395,10 +395,10 @@ std::vector<SQLQuery> MySQLService::CreateTable(const Anope::string &table, cons
 			known_cols.insert(it->first);
 
 			Anope::string query_text = "ALTER TABLE `" + table + "` ADD `" + it->first + "` ";
-			if (it->second.getType() == Serialize::DT_INT)
+			if (it->second.GetType() == Serialize::DT_INT)
 				query_text += "int(11)";
-			else if (it->second.getMax() > 0)
-				query_text += "varchar(" + stringify(it->second.getMax()) + ")";
+			else if (it->second.GetMax() > 0)
+				query_text += "varchar(" + stringify(it->second.GetMax()) + ")";
 			else
 				query_text += "text";
 

@@ -35,7 +35,8 @@ class MemoServService : public Service
 	virtual void Check(User *u) = 0;
 };
 
-static service_reference<MemoServService> memoserv("MemoServService", "MemoServ");
+static ServiceReference<MemoServService> MemoServService("MemoServService", "MemoServ");
+static Reference<BotInfo> MemoServ;
 
 #endif // MEMOSERV_H
 

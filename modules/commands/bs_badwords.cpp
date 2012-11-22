@@ -19,10 +19,10 @@ class BadwordsDelCallback : public NumberList
 	CommandSource &source;
 	ChannelInfo *ci;
 	Command *c;
-	unsigned Deleted;
+	unsigned deleted;
 	bool override;
  public:
-	BadwordsDelCallback(CommandSource &_source, ChannelInfo *_ci, Command *_c, const Anope::string &list) : NumberList(list, true), source(_source), ci(_ci), c(_c), Deleted(0), override(false)
+	BadwordsDelCallback(CommandSource &_source, ChannelInfo *_ci, Command *_c, const Anope::string &list) : NumberList(list, true), source(_source), ci(_ci), c(_c), deleted(0), override(false)
 	{
 		if (!source.AccessFor(ci).HasPriv("BADWORDS") && source.HasPriv("botserv/administration"))
 			this->override = true;
@@ -30,12 +30,12 @@ class BadwordsDelCallback : public NumberList
 
 	~BadwordsDelCallback()
 	{
-		if (!Deleted)
+		if (!deleted)
 			source.Reply(_("No matching entries on %s bad words list."), ci->name.c_str());
-		else if (Deleted == 1)
+		else if (deleted == 1)
 			source.Reply(_("Deleted 1 entry from %s bad words list."), ci->name.c_str());
 		else
-			source.Reply(_("Deleted %d entries from %s bad words list."), Deleted, ci->name.c_str());
+			source.Reply(_("Deleted %d entries from %s bad words list."), deleted, ci->name.c_str());
 	}
 
 	void HandleNumber(unsigned Number) anope_override
@@ -44,7 +44,7 @@ class BadwordsDelCallback : public NumberList
 			return;
 
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, c, ci) << "DEL " << ci->GetBadWord(Number - 1)->word;
-		++Deleted;
+		++deleted;
 		ci->EraseBadWord(Number - 1);
 	}
 };
@@ -58,7 +58,7 @@ class CommandBSBadwords : public Command
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "LIST";
 		ListFormatter list;
 
-		list.addColumn("Number").addColumn("Word").addColumn("Type");
+		list.AddColumn("Number").AddColumn("Word").AddColumn("Type");
 
 		if (!ci->GetBadWordCount())
 		{
@@ -86,7 +86,7 @@ class CommandBSBadwords : public Command
 					entry["Number"] = stringify(Number);
 					entry["Word"] = bw->word;
 					entry["Type"] = bw->type == BW_SINGLE ? "(SINGLE)" : (bw->type == BW_START ? "(START)" : (bw->type == BW_END ? "(END)" : ""));
-					this->list.addEntry(entry);
+					this->list.AddEntry(entry);
 				}
 			}
 			nl_list(list, ci, word);
@@ -105,11 +105,11 @@ class CommandBSBadwords : public Command
 				entry["Number"] = stringify(i + 1);
 				entry["Word"] = bw->word;
 				entry["Type"] = bw->type == BW_SINGLE ? "(SINGLE)" : (bw->type == BW_START ? "(START)" : (bw->type == BW_END ? "(END)" : ""));
-				list.addEntry(entry);
+				list.AddEntry(entry);
 			}
 		}
 
-		if (list.isEmpty())
+		if (list.IsEmpty())
 			source.Reply(_("No matching entries on %s badword list."), ci->name.c_str());
 		else
 		{
@@ -241,7 +241,7 @@ class CommandBSBadwords : public Command
 			return;
 		}
 
-		ChannelInfo *ci = cs_findchan(params[0]);
+		ChannelInfo *ci = ChannelInfo::Find(params[0]);
 		if (ci == NULL)
 		{
 			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
@@ -254,7 +254,7 @@ class CommandBSBadwords : public Command
 			return;
 		}
 
-		if (readonly)
+		if (Anope::ReadOnly)
 		{
 			source.Reply(_("Sorry, channel bad words list modification is temporarily disabled."));
 			return;

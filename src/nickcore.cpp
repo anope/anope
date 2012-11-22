@@ -7,6 +7,7 @@
  *
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
+ *
  */
 
 #include "services.h"
@@ -14,12 +15,21 @@
 #include "account.h"
 #include "config.h"
 
-serialize_checker<nickcore_map> NickCoreList("NickCore");
+Serialize::Checker<nickcore_map> NickCoreList("NickCore");
 
-/** Default constructor
- * @param display The display nick
- */
-NickCore::NickCore(const Anope::string &coredisplay) : Serializable("NickCore"), Flags<NickCoreFlag, NI_END>(NickCoreFlagStrings)
+static const Anope::string NickNameFlagStrings[] = {
+	"BEGIN", "NO_EXPIRE", "HELD", "COLLIDED", ""
+};
+template<> const Anope::string* Flags<NickNameFlag>::flags_strings = NickNameFlagStrings;
+
+static const Anope::string NickCoreFlagStrings[] = {
+	"BEGIN", "KILLPROTECT", "SECURE", "MSG", "MEMO_HARDMAX", "MEMO_SIGNON", "MEMO_RECEIVE",
+	"PRIVATE", "HIDE_EMAIL", "HIDE_MASK", "HIDE_QUIT", "KILL_QUICK", "KILL_IMMED",
+	"MEMO_MAIL", "HIDE_STATUS", "SUSPENDED", "AUTOOP", "UNCONFIRMED", "STATS", ""
+};
+template<> const Anope::string* Flags<NickCoreFlag>::flags_strings = NickCoreFlagStrings;
+
+NickCore::NickCore(const Anope::string &coredisplay) : Serializable("NickCore")
 {
 	if (coredisplay.empty())
 		throw CoreException("Empty display passed to NickCore constructor");
@@ -43,11 +53,16 @@ NickCore::NickCore(const Anope::string &coredisplay) : Serializable("NickCore"),
 		Log(LOG_DEBUG) << "Duplicate account " << coredisplay << " in nickcore table?";
 }
 
-/** Default destructor
- */
 NickCore::~NickCore()
 {
 	FOREACH_MOD(I_OnDelCore, OnDelCore(this));
+
+	for (std::list<User *>::iterator it = this->users.begin(); it != this->users.end();)
+	{
+		User *user = *it++;
+		user->Logout();
+	}
+	this->users.clear();
 
 	/* Remove the core from the list */
 	NickCoreList->erase(this->display);
@@ -58,16 +73,16 @@ NickCore::~NickCore()
 	if (!this->memos.memos->empty())
 	{
 		for (unsigned i = 0, end = this->memos.memos->size(); i < end; ++i)
-			this->memos.GetMemo(i)->destroy();
+			this->memos.GetMemo(i)->Destroy();
 		this->memos.memos->clear();
 	}
 }
 
-Serialize::Data NickCore::serialize() const
+Serialize::Data NickCore::Serialize() const
 {
 	Serialize::Data data;	
 
-	data["display"].setMax(Config->NickLen) << this->display;
+	data["display"].SetMax(Config->NickLen) << this->display;
 	data["pass"] << this->pass;
 	data["email"] << this->email;
 	data["greet"] << this->greet;
@@ -84,7 +99,7 @@ Serialize::Data NickCore::serialize() const
 	return data;
 }
 
-Serializable* NickCore::unserialize(Serializable *obj, Serialize::Data &data)
+Serializable* NickCore::Unserialize(Serializable *obj, Serialize::Data &data)
 {
 	NickCore *nc;
 
@@ -125,6 +140,21 @@ Serializable* NickCore::unserialize(Serializable *obj, Serialize::Data &data)
 	}
 
 	return nc;
+}
+
+void NickCore::SetDisplay(const NickAlias *na)
+{
+	if (na->nc != this || na->nick == this->display)
+		return;
+
+	FOREACH_MOD(I_OnChangeCoreDisplay, OnChangeCoreDisplay(this, na->nick));
+
+	/* Remove the core from the list */
+	NickCoreList->erase(this->display);
+
+	this->display = na->nick;
+
+	(*NickCoreList)[this->display] = this;
 }
 
 bool NickCore::IsServicesOper() const
@@ -171,6 +201,23 @@ void NickCore::ClearAccess()
 	this->access.clear();
 }
 
+bool NickCore::IsOnAccess(const User *u) const
+{
+	Anope::string buf = u->GetIdent() + "@" + u->host, buf2, buf3;
+	if (!u->vhost.empty())
+		buf2 = u->GetIdent() + "@" + u->vhost;
+	if (!u->GetCloakedHost().empty())
+		buf3 = u->GetIdent() + "@" + u->GetCloakedHost();
+
+	for (unsigned i = 0, end = this->access.size(); i < end; ++i)
+	{
+		Anope::string a = this->GetAccess(i);
+		if (Anope::Match(buf, a) || (!buf2.empty() && Anope::Match(buf2, a)) || (!buf3.empty() && Anope::Match(buf3, a)))
+			return true;
+	}
+	return false;
+}
+
 void NickCore::AddCert(const Anope::string &entry)
 {
 	this->cert.push_back(entry);
@@ -209,3 +256,16 @@ void NickCore::ClearCert()
 	FOREACH_MOD(I_OnNickClearCert, OnNickClearCert(this));
 	this->cert.clear();
 }
+
+NickCore* NickCore::Find(const Anope::string &nick)
+{
+	nickcore_map::const_iterator it = NickCoreList->find(nick);
+	if (it != NickCoreList->end())
+	{
+		it->second->QueueUpdate();
+		return it->second;
+	}
+
+	return NULL;
+}
+

@@ -1,12 +1,9 @@
 /*
+ *
  * Copyright (C) 2002-2011 InspIRCd Development Team
  * Copyright (C) 2009-2012 Anope Team <team@anope.org>
  *
  * Please read COPYING and README for further details.
- *
- * These classes have been copied from InspIRCd and modified
- * for use in Anope.
- *
  *
  */
 
@@ -28,13 +25,15 @@ namespace Anope
 {
 	class string;
 
+	/* Casemap in use by Anope. ci::string's comparation functions use this (and thus Anope::string) */
 	extern std::locale casemap;
 
-	template<typename charT>
-	class ascii_ctype : public std::ctype<charT>
+	/* ASCII case insensitive ctype. */
+	template<typename char_type>
+	class ascii_ctype : public std::ctype<char_type>
 	{
 	 public:
-		charT do_toupper(charT c) const anope_override
+		char_type do_toupper(char_type c) const anope_override
 		{
 			if (c >= 'a' && c <= 'z')
 				return c - 32;
@@ -42,7 +41,7 @@ namespace Anope
 				return c;
 		}
 
-		charT do_tolower(charT c) const anope_override
+		char_type do_tolower(char_type c) const anope_override
 		{
 			if (c >= 'A' && c <= 'Z')
 				return c + 32;
@@ -51,29 +50,30 @@ namespace Anope
 		}
 	};
 
-	template<typename charT>
-	class rfc1459_ctype : public ascii_ctype<charT>
+	/* rfc1459 case insensitive ctype, { = [, } = ], and | = \ */
+	template<typename char_type>
+	class rfc1459_ctype : public ascii_ctype<char_type>
 	{
 	 public:
-		charT do_toupper(charT c) const anope_override
+		char_type do_toupper(char_type c) const anope_override
 		{
 			if (c == '{' || c == '}' || c == '|')
 				return c - 32;
 			else
-				return ascii_ctype<charT>::do_toupper(c);
+				return ascii_ctype<char_type>::do_toupper(c);
 		}
 
-		charT do_tolower(charT c) const anope_override
+		char_type do_tolower(char_type c) const anope_override
 		{
 			if (c == '[' || c == ']' || c == '\\')
 				return c + 32;
 			else
-				return ascii_ctype<charT>::do_tolower(c);
+				return ascii_ctype<char_type>::do_tolower(c);
 		}
 	};
 }
 
-/** The ci namespace contains a number of helper classes.
+/** The ci namespace contains a number of helper classes relevant to case insensitive strings.
  */
 namespace ci
 {

@@ -7,6 +7,7 @@
  *
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
+ *
  */
 
 #ifndef SOCKETENGINE_H
@@ -17,7 +18,7 @@
 
 class CoreExport SocketEngine
 {
-	static const int DefaultSize = 4; // Uplink, DNS, Signal handler, Mode stacker
+	static const int DefaultSize = 8; // Uplink, DNS, Signal handlers, Mode stacker
  public:
 	/* Map of sockets */
 	static std::map<int, Socket *> Sockets;

@@ -19,8 +19,8 @@ struct ForbidData : Serializable
 	ForbidType type;
 
 	ForbidData() : Serializable("ForbidData") { }
-	Serialize::Data serialize() const anope_override;
-	static Serializable* unserialize(Serializable *obj, Serialize::Data &data);
+	Serialize::Data Serialize() const anope_override;
+	static Serializable* Unserialize(Serializable *obj, Serialize::Data &data);
 };
 
 class ForbidService : public Service
@@ -37,9 +37,9 @@ class ForbidService : public Service
 	virtual const std::vector<ForbidData *> &GetForbids() = 0;
 };
 
-static service_reference<ForbidService> forbid_service("ForbidService", "forbid");
+static ServiceReference<ForbidService> forbid_service("ForbidService", "forbid");
 
-Serialize::Data ForbidData::serialize() const
+Serialize::Data ForbidData::Serialize() const
 {
 	Serialize::Data data;
 	
@@ -53,7 +53,7 @@ Serialize::Data ForbidData::serialize() const
 	return data;
 }
 
-Serializable* ForbidData::unserialize(Serializable *obj, Serialize::Data &data)
+Serializable* ForbidData::Unserialize(Serializable *obj, Serialize::Data &data)
 {
 	if (!forbid_service)
 		return NULL;

@@ -52,11 +52,11 @@ class ModuleWebCPanel : public Module
 		ConfigReader reader;
 		provider_name = reader.ReadValue("webcpanel", "server", "httpd/main", 0);
 		template_name = reader.ReadValue("webcpanel", "template", "template", 0);
-		template_base = db_dir + "/modules/webcpanel/templates/" + template_name;
+		template_base = Anope::DataDir + "/modules/webcpanel/templates/" + template_name;
 		page_title = reader.ReadValue("webcpanel", "title", "Anope IRC Services", 0);
 		use_ssl = reader.ReadFlag("webcpanel", "ssl", "no", 0); // This is dumb, is there a better way to do this?
 
-		service_reference<HTTPProvider> provider("HTTPProvider", provider_name);
+		ServiceReference<HTTPProvider> provider("HTTPProvider", provider_name);
 		if (!provider)
 			throw ModuleException("Unable to find HTTPD provider. Is m_httpd loaded?");
 
@@ -80,7 +80,7 @@ class ModuleWebCPanel : public Module
 			s.subsections.push_back(ss);
 			provider->RegisterPage(&this->nickserv_info);
 
-			if (ircdproto && ircdproto->CanCertFP)
+			if (IRCD && IRCD->CanCertFP)
 			{
 				ss.name = "SSL Certificates";
 				ss.url = "/nickserv/cert";
@@ -160,7 +160,7 @@ class ModuleWebCPanel : public Module
 
 	~ModuleWebCPanel()
 	{
-		service_reference<HTTPProvider> provider("HTTPProvider", provider_name);
+		ServiceReference<HTTPProvider> provider("HTTPProvider", provider_name);
 		if (provider)
 		{
 			provider->UnregisterPage(&this->style_css);
@@ -191,14 +191,14 @@ namespace WebPanel
 {
 	void RunCommand(const Anope::string &user, NickCore *nc, const Anope::string &service, const Anope::string &c, const std::vector<Anope::string> &params, TemplateFileServer::Replacements &r)
 	{
-		service_reference<Command> cmd("Command", c);
+		ServiceReference<Command> cmd("Command", c);
 		if (!cmd)
 		{
 			r["MESSAGES"] = "Unable to find command " + c;
 			return;
 		}
 
-		BotInfo *bi = findbot(service);
+		BotInfo *bi = BotInfo::Find(service);
 		if (!bi)
 		{
 			if (BotListByNick->empty())

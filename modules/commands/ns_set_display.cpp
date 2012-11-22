@@ -24,7 +24,7 @@ class CommandNSSetDisplay : public Command
 
 	void Run(CommandSource &source, const Anope::string &user, const Anope::string &param)
 	{
-		const NickAlias *user_na = findnick(user), *na = findnick(param);
+		const NickAlias *user_na = NickAlias::Find(user), *na = NickAlias::Find(param);
 
 		if (user_na == NULL)
 		{
@@ -42,7 +42,7 @@ class CommandNSSetDisplay : public Command
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
-		change_core_display(user_na->nc, na->nick);
+		user_na->nc->SetDisplay(na);
 		source.Reply(NICK_SET_DISPLAY_CHANGED, user_na->nc->display.c_str());
 	}
 

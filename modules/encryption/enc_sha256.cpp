@@ -280,7 +280,7 @@ class ESHA256 : public Module
 
 	void OnCheckAuthentication(User *, IdentifyRequest *req) anope_override
 	{
-		const NickAlias *na = findnick(req->GetAccount());
+		const NickAlias *na = NickAlias::Find(req->GetAccount());
 		if (na == NULL)
 			return;
 		NickCore *nc = na->nc;
@@ -303,7 +303,7 @@ class ESHA256 : public Module
 			 * we want to re-encrypt the pass with the new encryption
 			 */
 			if (ModuleManager::FindFirstOf(ENCRYPTION) != this)
-				enc_encrypt(req->GetPassword(), nc->pass);
+				Anope::Encrypt(req->GetPassword(), nc->pass);
 			req->Success(this);
 		}
 	}

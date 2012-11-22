@@ -32,12 +32,12 @@ class FlagsChanAccess : public ChanAccess
 		return false;
 	}
 
-	Anope::string Serialize() const
+	Anope::string AccessSerialize() const
 	{
 		return Anope::string(this->flags.begin(), this->flags.end());
 	}
 
-	void Unserialize(const Anope::string &data) anope_override
+	void AccessUnserialize(const Anope::string &data) anope_override
 	{
 		for (unsigned i = data.length(); i > 0; --i)
 			this->flags.insert(data[i - 1]);
@@ -46,7 +46,7 @@ class FlagsChanAccess : public ChanAccess
 	static Anope::string DetermineFlags(const ChanAccess *access)
 	{
 		if (access->provider->name == "access/flags")
-			return access->Serialize();
+			return access->AccessSerialize();
 		
 		std::set<char> buffer;
 
@@ -86,9 +86,9 @@ class CommandCSFlags : public Command
 
 		AccessGroup u_access = source.AccessFor(ci);
 
-		if (mask.find_first_of("!*@") == Anope::string::npos && !findnick(mask))
+		if (mask.find_first_of("!*@") == Anope::string::npos && !NickAlias::Find(mask))
 		{
-			User *targ = finduser(mask);
+			User *targ = User::Find(mask, true);
 			if (targ != NULL)
 				mask = "*!*@" + targ->GetDisplayedHost();
 			else
@@ -191,7 +191,7 @@ class CommandCSFlags : public Command
 			return;
 		}
 
-		service_reference<AccessProvider> provider("AccessProvider", "access/flags");
+		ServiceReference<AccessProvider> provider("AccessProvider", "access/flags");
 		if (!provider)
 			return;
 		FlagsChanAccess *access = anope_dynamic_static_cast<FlagsChanAccess *>(provider->Create());
@@ -209,8 +209,8 @@ class CommandCSFlags : public Command
 
 		FOREACH_MOD(I_OnAccessAdd, OnAccessAdd(ci, source, access));
 
-		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to modify " << mask << "'s flags to " << access->Serialize();
-		source.Reply(_("Access for \002%s\002 on %s set to +\002%s\002"), access->mask.c_str(), ci->name.c_str(), access->Serialize().c_str());
+		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to modify " << mask << "'s flags to " << access->AccessSerialize();
+		source.Reply(_("Access for \002%s\002 on %s set to +\002%s\002"), access->mask.c_str(), ci->name.c_str(), access->AccessSerialize().c_str());
 
 		return;
 	}
@@ -227,7 +227,7 @@ class CommandCSFlags : public Command
 
 		ListFormatter list;
 
-		list.addColumn("Number").addColumn("Mask").addColumn("Flags").addColumn("Creator").addColumn("Created");
+		list.AddColumn("Number").AddColumn("Mask").AddColumn("Flags").AddColumn("Creator").AddColumn("Created");
 
 		unsigned count = 0;
 		for (unsigned i = 0, end = ci->GetAccessCount(); i < end; ++i)
@@ -257,11 +257,11 @@ class CommandCSFlags : public Command
 			entry["Mask"] = access->mask;
 			entry["Flags"] = FlagsChanAccess::DetermineFlags(access);
 			entry["Creator"] = access->creator;
-			entry["Created"] = do_strftime(access->created, source.nc, true);
-			list.addEntry(entry);
+			entry["Created"] = Anope::strftime(access->created, source.nc, true);
+			list.AddEntry(entry);
 		}
 
-		if (list.isEmpty())
+		if (list.IsEmpty())
 			source.Reply(_("No matching entries on %s access list."), ci->name.c_str());
 		else
 		{
@@ -311,7 +311,7 @@ class CommandCSFlags : public Command
 		const Anope::string &chan = params[0];
 		const Anope::string &cmd = params[1];
 
-		ChannelInfo *ci = cs_findchan(chan);
+		ChannelInfo *ci = ChannelInfo::Find(chan);
 		if (ci == NULL)
 		{
 			source.Reply(CHAN_X_NOT_REGISTERED, chan.c_str());
@@ -329,7 +329,7 @@ class CommandCSFlags : public Command
 
 		if (!has_access)
 			source.Reply(ACCESS_DENIED);
-		else if (readonly && !is_list)
+		else if (Anope::ReadOnly && !is_list)
 			source.Reply(_("Sorry, channel access list modification is temporarily disabled."));
 		else if (cmd.equals_ci("MODIFY"))
 			this->DoModify(source, ci, params);
@@ -374,7 +374,7 @@ class CommandCSFlags : public Command
 			Privilege *p = PrivilegeManager::FindPrivilege(it->second);
 			if (p == NULL)
 				continue;
-			source.Reply("  %c - %s", it->first, translate(source.nc, p->desc.c_str()));
+			source.Reply("  %c - %s", it->first, Language::Translate(source.nc, p->desc.c_str()));
 		}
 
 		return true;

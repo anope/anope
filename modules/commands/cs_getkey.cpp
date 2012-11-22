@@ -26,7 +26,7 @@ class CommandCSGetKey : public Command
 	{
 		const Anope::string &chan = params[0];
 
-		ChannelInfo *ci = cs_findchan(params[0]);
+		ChannelInfo *ci = ChannelInfo::Find(params[0]);
 		if (ci == NULL)
 		{
 			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());

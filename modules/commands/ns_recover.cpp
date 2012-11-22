@@ -18,8 +18,8 @@ class NSRecoverRequest : public IdentifyRequest
 {
 	CommandSource source;
 	Command *cmd;
-	dynamic_reference<NickAlias> na;
-	dynamic_reference<User> u;
+	Reference<NickAlias> na;
+	Reference<User> u;
  
  public:
 	NSRecoverRequest(Module *m, CommandSource &src, Command *c, User *user, NickAlias *n, const Anope::string &pass) : IdentifyRequest(m, n->nc->display, pass), source(src), cmd(c), na(n), u(user) { }
@@ -33,14 +33,14 @@ class NSRecoverRequest : public IdentifyRequest
 
 		if (u->Account() == na->nc)
 		{
-			ircdproto->SendLogout(u);
-			u->RemoveMode(findbot(Config->NickServ), UMODE_REGISTERED);
+			IRCD->SendLogout(u);
+			u->RemoveMode(NickServ, UMODE_REGISTERED);
 		}
 
 		u->Collide(na);
 
 		/* Convert Config->NSReleaseTimeout seconds to string format */
-		Anope::string relstr = duration(Config->NSReleaseTimeout);
+		Anope::string relstr = Anope::Duration(Config->NSReleaseTimeout);
 		source.Reply(NICK_RECOVERED, Config->UseStrictPrivMsgString.c_str(), Config->NickServ.c_str(), na->nick.c_str(), relstr.c_str());
 	}
 
@@ -53,7 +53,7 @@ class NSRecoverRequest : public IdentifyRequest
 		if (!GetPassword().empty())
 		{
 			Log(LOG_COMMAND, source, cmd) << "with invalid password for " << na->nick;
-			bad_password(u);
+			u->BadPassword();
 		}
 	}
 };
@@ -76,11 +76,11 @@ class CommandNSRecover : public Command
 
 		NickAlias *na;
 		User *u2;
-		if (!(u2 = finduser(nick)))
+		if (!(u2 = User::Find(nick, true)))
 			source.Reply(NICK_X_NOT_IN_USE, nick.c_str());
 		else if (u2->server == Me)
 			source.Reply(_("\2%s\2 has already been recovered."), u2->nick.c_str());
-		else if (!(na = findnick(u2->nick)))
+		else if (!(na = NickAlias::Find(u2->nick)))
 			source.Reply(NICK_X_NOT_REGISTERED, nick.c_str());
 		else if (na->nc->HasFlag(NI_SUSPENDED))
 			source.Reply(NICK_X_SUSPENDED, na->nick.c_str());
@@ -91,7 +91,7 @@ class CommandNSRecover : public Command
 			bool ok = false;
 			if (source.GetAccount() == na->nc)
 				ok = true;
-			else if (!na->nc->HasFlag(NI_SECURE) && source.GetUser() && is_on_access(source.GetUser(), na->nc))
+			else if (!na->nc->HasFlag(NI_SECURE) && source.GetUser() && na->nc->IsOnAccess(source.GetUser()))
 				ok = true;
 			else if (source.GetUser() && !source.GetUser()->fingerprint.empty() && na->nc->FindCert(source.GetUser()->fingerprint))
 				ok = true;
@@ -117,7 +117,7 @@ class CommandNSRecover : public Command
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
 	{
 		/* Convert Config->NSReleaseTimeout seconds to string format */
-		Anope::string relstr = duration(Config->NSReleaseTimeout);
+		Anope::string relstr = Anope::Duration(Config->NSReleaseTimeout);
 
 		this->SendSyntax(source);
 		source.Reply(" ");

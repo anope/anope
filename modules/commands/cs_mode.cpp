@@ -17,7 +17,7 @@ class CommandCSMode : public Command
 {
 	bool CanSet(CommandSource &source, ChannelInfo *ci, ChannelMode *cm)
 	{
-		if (!ci || !cm || cm->Type != MODE_STATUS)
+		if (!ci || !cm || cm->type != MODE_STATUS)
 			return false;
 
 		const Anope::string accesses[] = { "VOICE", "HALFOP", "OPDEOP", "PROTECT", "OWNER", "" };
@@ -30,7 +30,7 @@ class CommandCSMode : public Command
 			if (access.HasPriv(accesses[i]))
 			{
 				ChannelMode *cm2 = ModeManager::FindChannelModeByName(modes[i]);
-				if (cm2 == NULL || cm2->Type != MODE_STATUS)
+				if (cm2 == NULL || cm2->type != MODE_STATUS)
 					continue;
 				ChannelModeStatus *cms2 = anope_dynamic_static_cast<ChannelModeStatus *>(cm2);
 				if (cms2->Level > u_level)
@@ -82,15 +82,15 @@ class CommandCSMode : public Command
 						}
 
 						Anope::string mode_param;
-						if (((cm->Type == MODE_STATUS || cm->Type == MODE_LIST) && !sep.GetToken(mode_param)) || (cm->Type == MODE_PARAM && adding && !sep.GetToken(mode_param)))
-							source.Reply(_("Missing parameter for mode %c."), cm->ModeChar);
+						if (((cm->type == MODE_STATUS || cm->type == MODE_LIST) && !sep.GetToken(mode_param)) || (cm->type == MODE_PARAM && adding && !sep.GetToken(mode_param)))
+							source.Reply(_("Missing parameter for mode %c."), cm->mchar);
 						else
 						{
 							ci->SetMLock(cm, adding, mode_param, source.GetNick()); 
 							if (!mode_param.empty())
 								mode_param = " " + mode_param;
-							source.Reply(_("%c%c%s locked on %s"), adding ? '+' : '-', cm->ModeChar, mode_param.c_str(), ci->name.c_str());
-							Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to lock " << (adding ? '+' : '-') << cm->ModeChar << mode_param;
+							source.Reply(_("%c%c%s locked on %s"), adding ? '+' : '-', cm->mchar, mode_param.c_str(), ci->name.c_str());
+							Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to lock " << (adding ? '+' : '-') << cm->mchar << mode_param;
 						}
 				}
 			}
@@ -132,19 +132,19 @@ class CommandCSMode : public Command
 						}
 
 						Anope::string mode_param;
-						if (!cm->Type == MODE_REGULAR && !sep.GetToken(mode_param))
-							source.Reply(_("Missing parameter for mode %c."), cm->ModeChar);
+						if (!cm->type == MODE_REGULAR && !sep.GetToken(mode_param))
+							source.Reply(_("Missing parameter for mode %c."), cm->mchar);
 						else
 						{
 							if (ci->RemoveMLock(cm, adding, mode_param))
 							{
 								if (!mode_param.empty())
 									mode_param = " " + mode_param;
-								source.Reply(_("%c%c%s has been unlocked from %s."), adding == 1 ? '+' : '-', cm->ModeChar, mode_param.c_str(), ci->name.c_str());
-								Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to unlock " << (adding ? '+' : '-') << cm->ModeChar << mode_param;
+								source.Reply(_("%c%c%s has been unlocked from %s."), adding == 1 ? '+' : '-', cm->mchar, mode_param.c_str(), ci->name.c_str());
+								Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to unlock " << (adding ? '+' : '-') << cm->mchar << mode_param;
 							}
 							else
-								source.Reply(_("%c%c is not locked on %s."), adding == 1 ? '+' : '-', cm->ModeChar, ci->name.c_str());
+								source.Reply(_("%c%c is not locked on %s."), adding == 1 ? '+' : '-', cm->mchar, ci->name.c_str());
 						}
 				}
 			}
@@ -159,7 +159,7 @@ class CommandCSMode : public Command
 			else
 			{
 				ListFormatter list;
-				list.addColumn("Mode").addColumn("Param").addColumn("Creator").addColumn("Created");
+				list.AddColumn("Mode").AddColumn("Param").AddColumn("Creator").AddColumn("Created");
 
 				for (ChannelInfo::ModeList::const_iterator it = mlocks.begin(), it_end = mlocks.end(); it != it_end; ++it)
 				{
@@ -169,11 +169,11 @@ class CommandCSMode : public Command
 						continue;
 
 					ListFormatter::ListEntry entry;
-					entry["Mode"] = Anope::printf("%c%c", ml->set ? '+' : '-', cm->ModeChar);
+					entry["Mode"] = Anope::printf("%c%c", ml->set ? '+' : '-', cm->mchar);
 					entry["Param"] = ml->param;
 					entry["Creator"] = ml->setter;
-					entry["Created"] = do_strftime(ml->created, source.nc, false);
-					list.addEntry(entry);
+					entry["Created"] = Anope::strftime(ml->created, source.nc, false);
+					list.AddEntry(entry);
 				}
 
 				source.Reply(_("Mode locks for %s:"), ci->name.c_str());
@@ -218,7 +218,7 @@ class CommandCSMode : public Command
 						ChannelMode *cm = ModeManager::ChannelModes[j];
 						if (!u || cm->CanSet(u))
 						{
-							if (cm->Type == MODE_REGULAR || (!adding && cm->Type == MODE_PARAM))
+							if (cm->type == MODE_REGULAR || (!adding && cm->type == MODE_PARAM))
 							{
 								if (adding)
 									ci->c->SetMode(NULL, cm);
@@ -234,7 +234,7 @@ class CommandCSMode : public Command
 					ChannelMode *cm = ModeManager::FindChannelModeByChar(modes[i]);
 					if (!cm || (u && !cm->CanSet(u)))
 						continue;
-					switch (cm->Type)
+					switch (cm->type)
 					{
 						case MODE_REGULAR:
 							if (adding)
@@ -257,13 +257,13 @@ class CommandCSMode : public Command
 
 							if (!this->CanSet(source, ci, cm))
 							{
-								source.Reply(_("You do not have access to set mode %c."), cm->ModeChar);
+								source.Reply(_("You do not have access to set mode %c."), cm->mchar);
 								break;
 							}
 
 							AccessGroup u_access = source.AccessFor(ci);
 
-							if (str_is_wildcard(param))
+							if (param.find_first_of("*?") != Anope::string::npos)
 							{
 								for (CUserList::const_iterator it = ci->c->users.begin(), it_end = ci->c->users.end(); it != it_end; ++it)
 								{
@@ -288,7 +288,7 @@ class CommandCSMode : public Command
 							}
 							else
 							{
-								User *target = finduser(param);
+								User *target = User::Find(param, true);
 								if (target == NULL)
 								{
 									source.Reply(NICK_X_NOT_IN_USE, param.c_str());
@@ -316,7 +316,7 @@ class CommandCSMode : public Command
 								ci->c->SetMode(NULL, cm, param);
 							else
 							{
-								std::pair<Channel::ModeList::iterator, Channel::ModeList::iterator> its = ci->c->GetModeList(cm->Name);
+								std::pair<Channel::ModeList::iterator, Channel::ModeList::iterator> its = ci->c->GetModeList(cm->name);
 								for (; its.first != its.second;)
 								{
 									const Anope::string &mask = its.first->second;
@@ -343,7 +343,7 @@ class CommandCSMode : public Command
 	{
 		const Anope::string &subcommand = params[1];
 
-		ChannelInfo *ci = cs_findchan(params[0]);
+		ChannelInfo *ci = ChannelInfo::Find(params[0]);
 
 		if (!ci || !ci->c)
 			source.Reply(CHAN_X_NOT_IN_USE, params[0].c_str());

@@ -19,7 +19,7 @@ bool WebCPanel::NickServ::Info::OnRequest(HTTPProvider *server, const Anope::str
 		{
 			if (message.post_data["email"] != na->nc->email)
 			{
-				if (!message.post_data["email"].empty() && !MailValidate(message.post_data["email"]))
+				if (!message.post_data["email"].empty() && !Mail::Validate(message.post_data["email"]))
 					replacements["ERRORS"] = "Invalid email";
 				else
 				{
@@ -83,7 +83,7 @@ bool WebCPanel::NickServ::Info::OnRequest(HTTPProvider *server, const Anope::str
 	replacements["DISPLAY"] = HTTPUtils::Escape(na->nc->display);
 	if (na->nc->email.empty() == false)
 		replacements["EMAIL"] = HTTPUtils::Escape(na->nc->email);
-	replacements["TIME_REGISTERED"] = do_strftime(na->time_registered, na->nc);
+	replacements["TIME_REGISTERED"] = Anope::strftime(na->time_registered, na->nc);
 	if (na->HasVhost())
 	{
 		if (na->GetVhostIdent().empty() == false)

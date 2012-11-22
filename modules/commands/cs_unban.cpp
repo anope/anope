@@ -24,7 +24,7 @@ class CommandCSUnban : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		ChannelInfo *ci = cs_findchan(params[0]);
+		ChannelInfo *ci = ChannelInfo::Find(params[0]);
 		if (ci == NULL)
 		{
 			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
@@ -45,7 +45,7 @@ class CommandCSUnban : public Command
 
 		User *u2 = source.GetUser();
 		if (params.size() > 1)
-			u2 = finduser(params[1]);
+			u2 = User::Find(params[1], true);
 
 		if (!u2)
 		{
@@ -55,7 +55,7 @@ class CommandCSUnban : public Command
 
 		Log(LOG_COMMAND, source, this, ci) << "to unban " << u2->nick;
 
-		common_unban(ci, u2, source.GetUser() == u2);
+		ci->c->Unban(u2, source.GetUser() == u2);
 		if (u2 == source.GetUser())
 			source.Reply(_("You have been unbanned from \002%s\002."), ci->c->name.c_str());
 		else

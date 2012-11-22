@@ -30,7 +30,7 @@ class CommandOSKick : public Command
 		Channel *c;
 		User *u2;
 
-		if (!(c = findchan(chan)))
+		if (!(c = Channel::Find(chan)))
 		{
 			source.Reply(CHAN_X_NOT_IN_USE, chan.c_str());
 			return;
@@ -40,7 +40,7 @@ class CommandOSKick : public Command
 			source.Reply(_("Services is unable to change modes. Are your servers' U:lines configured correctly?"));
 			return;
 		}
-		else if (!(u2 = finduser(nick)))
+		else if (!(u2 = User::Find(nick, true)))
 		{
 			source.Reply(NICK_X_NOT_IN_USE, nick.c_str());
 			return;

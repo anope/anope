@@ -29,7 +29,7 @@ class CommandMSCheck : public Command
 
 		bool found = false;
 
-		const NickAlias *na = findnick(recipient);
+		const NickAlias *na = NickAlias::Find(recipient);
 		if (!na)
 		{
 			source.Reply(NICK_X_NOT_REGISTERED, recipient.c_str());
@@ -48,9 +48,9 @@ class CommandMSCheck : public Command
 				found = true; /* Yes, we've found the memo */
 
 				if (mi->GetMemo(i)->HasFlag(MF_UNREAD))
-					source.Reply(_("The last memo you sent to %s (sent on %s) has not yet been read."), na->nick.c_str(), do_strftime(mi->GetMemo(i)->time).c_str());
+					source.Reply(_("The last memo you sent to %s (sent on %s) has not yet been read."), na->nick.c_str(), Anope::strftime(mi->GetMemo(i)->time).c_str());
 				else
-					source.Reply(_("The last memo you sent to %s (sent on %s) has been read."), na->nick.c_str(), do_strftime(mi->GetMemo(i)->time).c_str());
+					source.Reply(_("The last memo you sent to %s (sent on %s) has been read."), na->nick.c_str(), Anope::strftime(mi->GetMemo(i)->time).c_str());
 				break;
 			}
 		}

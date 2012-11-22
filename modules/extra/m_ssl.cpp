@@ -110,7 +110,7 @@ class SSLModule : public Module
 
 		this->OnReload();
 
-		if (IsFile(this->certfile.c_str()))
+		if (Anope::IsFile(this->certfile.c_str()))
 		{
 			if (!SSL_CTX_use_certificate_file(client_ctx, this->certfile.c_str(), SSL_FILETYPE_PEM) || !SSL_CTX_use_certificate_file(server_ctx, this->certfile.c_str(), SSL_FILETYPE_PEM))
 			{
@@ -124,7 +124,7 @@ class SSLModule : public Module
 		else
 			Log() << "Unable to open certificate " << this->certfile;
 
-		if (IsFile(this->keyfile.c_str()))
+		if (Anope::IsFile(this->keyfile.c_str()))
 		{
 			if (!SSL_CTX_use_PrivateKey_file(client_ctx, this->keyfile.c_str(), SSL_FILETYPE_PEM) || !SSL_CTX_use_PrivateKey_file(server_ctx, this->keyfile.c_str(), SSL_FILETYPE_PEM))
 			{
@@ -137,7 +137,7 @@ class SSLModule : public Module
 		}
 		else
 		{
-			if (IsFile(this->certfile.c_str()))
+			if (Anope::IsFile(this->certfile.c_str()))
 			{
 				SSL_CTX_free(client_ctx);
 				SSL_CTX_free(server_ctx);
@@ -168,7 +168,7 @@ class SSLModule : public Module
 			Socket *s = it->second;
 			++it;
 
-			if (dynamic_cast<SSLSocketIO *>(s->IO))
+			if (dynamic_cast<SSLSocketIO *>(s->io))
 				delete s;
 		}
 
@@ -188,7 +188,7 @@ class SSLModule : public Module
 	{
 		ConfigReader config;
 
-		if (config.ReadFlag("uplink", "ssl", "no", CurrentUplink))
+		if (config.ReadFlag("uplink", "ssl", "no", Anope::CurrentUplink))
 		{
 			this->service.Init(UplinkSock);
 		}
@@ -201,10 +201,10 @@ MySSLService::MySSLService(Module *o, const Anope::string &n) : SSLService(o, n)
 
 void MySSLService::Init(Socket *s)
 {
-	if (s->IO != &normalSocketIO)
+	if (s->io != &NormalSocketIO)
 		throw CoreException("Socket initializing SSL twice");
 	
-	s->IO = new SSLSocketIO();
+	s->io = new SSLSocketIO();
 }
 
 SSLSocketIO::SSLSocketIO()
@@ -228,7 +228,7 @@ int SSLSocketIO::Send(Socket *s, const char *buf, size_t sz)
 
 ClientSocket *SSLSocketIO::Accept(ListenSocket *s)
 {
-	if (s->IO == &normalSocketIO)
+	if (s->io == &NormalSocketIO)
 		throw SocketException("Attempting to accept on uninitialized socket with SSL");
 
 	sockaddrs conaddr;
@@ -245,15 +245,15 @@ ClientSocket *SSLSocketIO::Accept(ListenSocket *s)
 
 	ClientSocket *newsocket = s->OnAccept(newsock, conaddr);
 	me->service.Init(newsocket);
-	SSLSocketIO *IO = anope_dynamic_static_cast<SSLSocketIO *>(newsocket->IO);
+	SSLSocketIO *io = anope_dynamic_static_cast<SSLSocketIO *>(newsocket->io);
 
-	IO->sslsock = SSL_new(server_ctx);
-	if (!IO->sslsock)
+	io->sslsock = SSL_new(server_ctx);
+	if (!io->sslsock)
 		throw SocketException("Unable to initialize SSL socket");
 
-	SSL_set_accept_state(IO->sslsock);
+	SSL_set_accept_state(io->sslsock);
 
-	if (!SSL_set_fd(IO->sslsock, newsocket->GetFD()))
+	if (!SSL_set_fd(io->sslsock, newsocket->GetFD()))
 		throw SocketException("Unable to set SSL fd");
 
 	newsocket->SetFlag(SF_ACCEPTING);
@@ -264,19 +264,19 @@ ClientSocket *SSLSocketIO::Accept(ListenSocket *s)
 
 SocketFlag SSLSocketIO::FinishAccept(ClientSocket *cs)
 {
-	if (cs->IO == &normalSocketIO)
+	if (cs->io == &NormalSocketIO)
 		throw SocketException("Attempting to finish connect uninitialized socket with SSL");
 	else if (cs->HasFlag(SF_ACCEPTED))
 		return SF_ACCEPTED;
 	else if (!cs->HasFlag(SF_ACCEPTING))
 		throw SocketException("SSLSocketIO::FinishAccept called for a socket not accepted nor accepting?");
 
-	SSLSocketIO *IO = anope_dynamic_static_cast<SSLSocketIO *>(cs->IO);
+	SSLSocketIO *io = anope_dynamic_static_cast<SSLSocketIO *>(cs->io);
 	
-	int ret = SSL_accept(IO->sslsock);
+	int ret = SSL_accept(io->sslsock);
 	if (ret <= 0)
 	{
-		int error = SSL_get_error(IO->sslsock, ret);
+		int error = SSL_get_error(io->sslsock, ret);
 		if (ret == -1 && (error == SSL_ERROR_WANT_READ || error == SSL_ERROR_WANT_WRITE))
 		{
 			SocketEngine::Change(cs, error == SSL_ERROR_WANT_WRITE, SF_WRITABLE);
@@ -304,7 +304,7 @@ SocketFlag SSLSocketIO::FinishAccept(ClientSocket *cs)
 
 void SSLSocketIO::Connect(ConnectionSocket *s, const Anope::string &target, int port)
 {
-	if (s->IO == &normalSocketIO)
+	if (s->io == &NormalSocketIO)
 		throw SocketException("Attempting to connect uninitialized socket with SSL");
 
 	s->UnsetFlag(SF_CONNECTING);
@@ -336,29 +336,29 @@ void SSLSocketIO::Connect(ConnectionSocket *s, const Anope::string &target, int 
 
 SocketFlag SSLSocketIO::FinishConnect(ConnectionSocket *s)
 {
-	if (s->IO == &normalSocketIO)
+	if (s->io == &NormalSocketIO)
 		throw SocketException("Attempting to finish connect uninitialized socket with SSL");
 	else if (s->HasFlag(SF_CONNECTED))
 		return SF_CONNECTED;
 	else if (!s->HasFlag(SF_CONNECTING))
 		throw SocketException("SSLSocketIO::FinishConnect called for a socket not connected nor connecting?");
 
-	SSLSocketIO *IO = anope_dynamic_static_cast<SSLSocketIO *>(s->IO);
+	SSLSocketIO *io = anope_dynamic_static_cast<SSLSocketIO *>(s->io);
 
-	if (IO->sslsock == NULL)
+	if (io->sslsock == NULL)
 	{
-		IO->sslsock = SSL_new(client_ctx);
-		if (!IO->sslsock)
+		io->sslsock = SSL_new(client_ctx);
+		if (!io->sslsock)
 			throw SocketException("Unable to initialize SSL socket");
 
-		if (!SSL_set_fd(IO->sslsock, s->GetFD()))
+		if (!SSL_set_fd(io->sslsock, s->GetFD()))
 			throw SocketException("Unable to set SSL fd");
 	}
 	
-	int ret = SSL_connect(IO->sslsock);
+	int ret = SSL_connect(io->sslsock);
 	if (ret <= 0)
 	{
-		int error = SSL_get_error(IO->sslsock, ret);
+		int error = SSL_get_error(io->sslsock, ret);
 		if (ret == -1 && (error == SSL_ERROR_WANT_READ || error == SSL_ERROR_WANT_WRITE))
 		{
 			SocketEngine::Change(s, error == SSL_ERROR_WANT_WRITE, SF_WRITABLE);

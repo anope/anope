@@ -18,8 +18,13 @@
 
 enum LogType
 {
+	/* Used whenever an administrator uses an administrative comand */
 	LOG_ADMIN,
+	/* Used whenever an administrator overides something, such as adding
+	 * access to a channel where they don't have permission to.
+	 */
 	LOG_OVERRIDE,
+	/* Any other command usage */
 	LOG_COMMAND,
 	LOG_SERVER,
 	LOG_CHANNEL,
@@ -37,30 +42,37 @@ enum LogType
 struct LogFile
 {
 	Anope::string filename;
-
- public:
 	std::ofstream stream;
 
 	LogFile(const Anope::string &name);
 	Anope::string GetName() const;
 };
 
-
+/* Represents a single log message */
 class CoreExport Log
 {
  public:
+ 	/* Bot that should log this message */
 	const BotInfo *bi;
+	/* For commands, the user executing the command */
 	Anope::string nick;
+	/* For commands, the user executing the command, but might not always exist */
 	const User *u;
+	/* For commands, the account executing teh command, but will not always exist */
 	const NickCore *nc;
+	/* For commands, the command being executed */
 	Command *c;
+	/* Used for LOG_CHANNEL */
 	Channel *chan;
+	/* For commands, the channel the command was executed on, will not always exist */
 	const ChannelInfo *ci;
+	/* For LOG_SERVER */
 	Server *s;
+	/* For LOG_MODULE */
 	Module *m;
-	LogType Type;
-	Anope::string Category;
-	std::list<Anope::string> Sources;
+	LogType type;
+	Anope::string category;
+	std::list<Anope::string> sources;
 
 	std::stringstream buf;
 
@@ -93,22 +105,23 @@ class CoreExport Log
 	}
 };
 
+/* Configured in the configuration file, actually does the message logging */
 class CoreExport LogInfo
 {
  public:
-	std::list<Anope::string> Targets;
-	std::map<Anope::string, LogFile *> Logfiles;
-	std::list<Anope::string> Sources;
-	int LogAge;
-	std::list<Anope::string> Admin;
-	std::list<Anope::string> Override;
-	std::list<Anope::string> Commands;
-	std::list<Anope::string> Servers;
-	std::list<Anope::string> Users;
-	std::list<Anope::string> Channels;
-	std::list<Anope::string> Normal;
-	bool RawIO;
-	bool Debug;
+	std::list<Anope::string> targets;
+	std::map<Anope::string, LogFile *> logfiles;
+	std::list<Anope::string> sources;
+	int log_age;
+	std::list<Anope::string> admin;
+	std::list<Anope::string> override;
+	std::list<Anope::string> commands;
+	std::list<Anope::string> servers;
+	std::list<Anope::string> users;
+	std::list<Anope::string> channels;
+	std::list<Anope::string> normal;
+	bool raw_io;
+	bool debug;
 
 	LogInfo(int logage, bool rawio, bool debug);
 
@@ -118,6 +131,7 @@ class CoreExport LogInfo
 
 	bool HasType(LogType ltype, const Anope::string &type) const;
 
+	/* Logs the message l if configured to */
 	void ProcessMessage(const Log *l);
 };
 

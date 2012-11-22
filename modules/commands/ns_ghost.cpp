@@ -19,7 +19,7 @@ class NSGhostRequest : public IdentifyRequest
 {
 	CommandSource source;
 	Command *cmd;
-	dynamic_reference<User> u;
+	Reference<User> u;
  
  public:
 	NSGhostRequest(Module *o, CommandSource &src, Command *c, User *user, const Anope::string &pass) : IdentifyRequest(o, user->nick, pass), source(src), cmd(c), u(user) { }
@@ -38,7 +38,7 @@ class NSGhostRequest : public IdentifyRequest
 			{
 				NSGhostExtensibleInfo *ei = new NSGhostExtensibleInfo;
 				for (UChannelList::iterator it = u->chans.begin(), it_end = u->chans.end(); it != it_end; ++it)
-					(*ei)[(*it)->chan->name] = *(*it)->Status;
+					(*ei)[(*it)->chan->name] = *(*it)->status;
 
 				source.GetUser()->Extend("ns_ghost_info", ei);
 			}
@@ -50,14 +50,14 @@ class NSGhostRequest : public IdentifyRequest
 		source.Reply(_("Ghost with your nick has been killed."));
 
 		if (Config->NSRestoreOnGhost)
-			ircdproto->SendForceNickChange(source.GetUser(), GetAccount(), Anope::CurTime);
+			IRCD->SendForceNickChange(source.GetUser(), GetAccount(), Anope::CurTime);
 	}
 
 	void OnFail() anope_override
 	{
 		if (!u)
 			;
-		else if (!findnick(GetAccount()))
+		else if (!NickAlias::Find(GetAccount()))
 			source.Reply(NICK_X_NOT_REGISTERED, GetAccount().c_str());
 		else
 		{
@@ -66,7 +66,7 @@ class NSGhostRequest : public IdentifyRequest
 			{
 				Log(LOG_COMMAND, source, cmd) << "with an invalid password for " << GetAccount();
 				if (source.GetUser())
-					bad_password(source.GetUser());
+					source.GetUser()->BadPassword();
 			}
 		}
 	}
@@ -87,8 +87,8 @@ class CommandNSGhost : public Command
 		const Anope::string &nick = params[0];
 		const Anope::string &pass = params.size() > 1 ? params[1] : "";
 
-		User *user = finduser(nick);
-		const NickAlias *na = findnick(nick);
+		User *user = User::Find(nick, true);
+		const NickAlias *na = NickAlias::Find(nick);
 
 		if (!user)
 			source.Reply(NICK_X_NOT_IN_USE, nick.c_str());
@@ -107,7 +107,7 @@ class CommandNSGhost : public Command
 			bool ok = false;
 			if (source.GetAccount() == na->nc)
 				ok = true;
-			else if (!na->nc->HasFlag(NI_SECURE) && source.GetUser() && is_on_access(source.GetUser(), na->nc))
+			else if (!na->nc->HasFlag(NI_SECURE) && source.GetUser() && na->nc->IsOnAccess(source.GetUser()))
 				ok = true;
 			else if (source.GetUser() && !source.GetUser()->fingerprint.empty() && na->nc->FindCert(source.GetUser()->fingerprint))
 				ok = true;
@@ -183,7 +183,7 @@ class NSGhost : public Module
 
 			if (ei != NULL)
 				for (std::map<Anope::string, ChannelStatus>::iterator it = ei->begin(), it_end = ei->end(); it != it_end; ++it)
-					ircdproto->SendSVSJoin(findbot(Config->NickServ), u->GetUID(), it->first, "");
+					IRCD->SendSVSJoin(NickServ, u->GetUID(), it->first, "");
 		}
 	}
 

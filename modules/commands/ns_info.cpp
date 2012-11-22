@@ -16,14 +16,14 @@
 class CommandNSInfo : public Command
 {
  private:
-	template<typename T, unsigned END> void CheckOptStr(NickCore *core, Anope::string &buf, T opt, const char *str, const Flags<T, END> *nc, bool reverse_logic = false)
+	template<typename T> void CheckOptStr(NickCore *core, Anope::string &buf, T opt, const char *str, const Flags<T> *nc, bool reverse_logic = false)
 	{
 		if (reverse_logic ? !nc->HasFlag(opt) : nc->HasFlag(opt))
 		{
 			if (!buf.empty())
 				buf += ", ";
 
-			buf += translate(core, str);
+			buf += Language::Translate(core, str);
 		}
 	}
  public:
@@ -38,12 +38,12 @@ class CommandNSInfo : public Command
 	{
 
 		const Anope::string &nick = params.size() ? params[0] : (source.nc ? source.nc->display : source.GetNick());
-		NickAlias *na = findnick(nick);
+		NickAlias *na = NickAlias::Find(nick);
 		bool has_auspex = source.HasPriv("nickserv/auspex");
 
 		if (!na)
 		{
-			if (nickIsServices(nick, true))
+			if (BotInfo::Find(nick, true))
 				source.Reply(_("Nick \002%s\002 is part of this Network's Services."), nick.c_str());
 			else
 				source.Reply(NICK_X_NOT_REGISTERED, nick.c_str());
@@ -53,7 +53,7 @@ class CommandNSInfo : public Command
 			bool nick_online = false, show_hidden = false;
 
 			/* Is the real owner of the nick we're looking up online? -TheShadow */
-			User *u2 = finduser(na->nick);
+			User *u2 = User::Find(na->nick);
 			if (u2 && u2->Account() == na->nc)
 				nick_online = true;
 
@@ -87,10 +87,10 @@ class CommandNSInfo : public Command
 					info[_("Last seen address")] = na->last_realhost;
 			}
 
-			info[_("Time registered")] = do_strftime(na->time_registered);
+			info[_("Time registered")] = Anope::strftime(na->time_registered);
 
 			if (!nick_online)
-				info[_("Last seen")] = do_strftime(na->last_seen);
+				info[_("Last seen")] = Anope::strftime(na->last_seen);
 
 			if (!na->last_quit.empty() && (show_hidden || !na->nc->HasFlag(NI_HIDE_QUIT)))
 				info[_("Last quit message")] = na->last_quit;
@@ -102,7 +102,7 @@ class CommandNSInfo : public Command
 			{
 				if (na->HasVhost())
 				{
-					if (ircdproto->CanSetVIdent && !na->GetVhostIdent().empty())
+					if (IRCD->CanSetVIdent && !na->GetVhostIdent().empty())
 						info[_("VHost")] = na->GetVhostIdent() + "@" + na->GetVhostHost();
 					else
 						info[_("VHost")] = na->GetVhostHost();
@@ -113,14 +113,14 @@ class CommandNSInfo : public Command
 
 				Anope::string optbuf;
 
-				CheckOptStr<NickCoreFlag, NI_END>(source.nc, optbuf, NI_KILLPROTECT, _("Protection"), na->nc);
-				CheckOptStr<NickCoreFlag, NI_END>(source.nc, optbuf, NI_SECURE, _("Security"), na->nc);
-				CheckOptStr<NickCoreFlag, NI_END>(source.nc, optbuf, NI_PRIVATE, _("Private"), na->nc);
-				CheckOptStr<NickCoreFlag, NI_END>(source.nc, optbuf, NI_MSG, _("Message mode"), na->nc);
-				CheckOptStr<NickCoreFlag, NI_END>(source.nc, optbuf, NI_AUTOOP, _("Auto-op"), na->nc);
-				CheckOptStr<NickCoreFlag, NI_END>(source.nc, optbuf, NI_SUSPENDED, _("Suspended"), na->nc);
-				CheckOptStr<NickCoreFlag, NI_END>(source.nc, optbuf, NI_STATS, _("Chanstats"), na->nc);
-				CheckOptStr<NickNameFlag, NS_END>(source.nc, optbuf, NS_NO_EXPIRE, _("No expire"), na);
+				CheckOptStr<NickCoreFlag>(source.nc, optbuf, NI_KILLPROTECT, _("Protection"), na->nc);
+				CheckOptStr<NickCoreFlag>(source.nc, optbuf, NI_SECURE, _("Security"), na->nc);
+				CheckOptStr<NickCoreFlag>(source.nc, optbuf, NI_PRIVATE, _("Private"), na->nc);
+				CheckOptStr<NickCoreFlag>(source.nc, optbuf, NI_MSG, _("Message mode"), na->nc);
+				CheckOptStr<NickCoreFlag>(source.nc, optbuf, NI_AUTOOP, _("Auto-op"), na->nc);
+				CheckOptStr<NickCoreFlag>(source.nc, optbuf, NI_SUSPENDED, _("Suspended"), na->nc);
+				CheckOptStr<NickCoreFlag>(source.nc, optbuf, NI_STATS, _("Chanstats"), na->nc);
+				CheckOptStr<NickNameFlag>(source.nc, optbuf, NS_NO_EXPIRE, _("No expire"), na);
 
 				info[_("Options")] = optbuf.empty() ? _("None") : optbuf;
 
@@ -129,10 +129,10 @@ class CommandNSInfo : public Command
 					if (na->HasFlag(NS_NO_EXPIRE) || !Config->NSExpire)
 						;
 					else
-						info[_("Expires")] = do_strftime(na->last_seen + Config->NSExpire);
+						info[_("Expires")] = Anope::strftime(na->last_seen + Config->NSExpire);
 				}
 				else
-					info[_("Expires")] = do_strftime(na->time_registered + Config->NSUnconfirmedExpire);
+					info[_("Expires")] = Anope::strftime(na->time_registered + Config->NSUnconfirmedExpire);
 			}
 
 			FOREACH_MOD(I_OnNickInfo, OnNickInfo(source, na, info, show_hidden));

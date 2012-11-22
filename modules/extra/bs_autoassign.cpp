@@ -31,7 +31,7 @@ class BSAutoAssign : public Module
 		if (this->bot.empty())
 			return;
 
-		BotInfo *bi = findbot(this->bot);
+		BotInfo *bi = BotInfo::Find(this->bot);
 		if (bi == NULL)
 		{
 			Log(this) << "bs_autoassign is configured to assign bot " << this->bot << ", but it does not exist?";

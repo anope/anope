@@ -139,9 +139,9 @@ EventReturn OnDatabaseReadMetadata(ChannelInfo *ci, const Anope::string &key, co
 		else if (key.equals_ci("MEMOMAX"))
 			ci->memos.memomax = params[0].is_pos_number_only() ? convertTo<int16_t>(params[0]) : -1;
 		else if (key.equals_ci("FOUNDER"))
-			ci->SetFounder(findcore(params[0]));
+			ci->SetFounder(NickCore::Find(params[0]));
 		else if (key.equals_ci("SUCCESSOR"))
-			ci->successor = findcore(params[0]);
+			ci->successor = NickCore::Find(params[0]);
 		else if (key.equals_ci("LEVELS"))
 		{
 			for (unsigned j = 0, end = params.size(); j < end; j += 2)
@@ -169,14 +169,14 @@ EventReturn OnDatabaseReadMetadata(ChannelInfo *ci, const Anope::string &key, co
 		}
 		else if (key.equals_ci("ACCESS")) // Older access system, from Anope 1.9.4.
 		{
-			service_reference<AccessProvider> provider("AccessProvider", "access/access");
+			ServiceReference<AccessProvider> provider("AccessProvider", "access/access");
 			if (!provider)
 				throw DatabaseException("Old access entry for nonexistant provider");
 
 			ChanAccess *access = const_cast<ChanAccess *>(provider->Create());
 			access->ci = ci;
 			access->mask = params[0];
-			access->Unserialize(params[1]);
+			access->AccessUnserialize(params[1]);
 			access->last_seen = params[2].is_pos_number_only() ? convertTo<time_t>(params[2]) : 0;
 			access->creator = params[3];
 			access->created = Anope::CurTime;
@@ -185,14 +185,14 @@ EventReturn OnDatabaseReadMetadata(ChannelInfo *ci, const Anope::string &key, co
 		}
 		else if (key.equals_ci("ACCESS2"))
 		{
-			service_reference<AccessProvider> provider("AccessProvider", params[0]);
+			ServiceReference<AccessProvider> provider("AccessProvider", params[0]);
 			if (!provider)
 				throw DatabaseException("Access entry for nonexistant provider " + params[0]);
 
 			ChanAccess *access = const_cast<ChanAccess *>(provider->Create());
 			access->ci = ci;
 			access->mask = params[1];
-			access->Unserialize(params[2]);
+			access->AccessUnserialize(params[2]);
 			access->last_seen = params[3].is_pos_number_only() ? convertTo<time_t>(params[3]) : 0;
 			access->creator = params[4];
 			access->created = params.size() > 5 && params[5].is_pos_number_only() ? convertTo<time_t>(params[5]) : Anope::CurTime;
@@ -206,7 +206,7 @@ EventReturn OnDatabaseReadMetadata(ChannelInfo *ci, const Anope::string &key, co
 			NickCore *nc = NULL;
 			if (Nick)
 			{
-				nc = findcore(params[2]);
+				nc = NickCore::Find(params[2]);
 				if (!nc)
 					throw DatabaseException("Akick for nonexistant core " + params[2] + " on " + ci->name);
 			}
@@ -242,6 +242,7 @@ EventReturn OnDatabaseReadMetadata(ChannelInfo *ci, const Anope::string &key, co
 			Anope::string setter = params[2];
 			time_t mcreated = params[3].is_pos_number_only() ? convertTo<time_t>(params[3]) : Anope::CurTime;
 			Anope::string param = params.size() > 4 ? params[4] : "";
+			const Anope::string* ChannelModeNameStrings = Flags<ChannelModeName>::GetFlagStrings();
 			for (size_t i = CMODE_BEGIN + 1; i < CMODE_END; ++i)
 				if (ChannelModeNameStrings[i] == mode_name)
 				{
@@ -270,7 +271,7 @@ EventReturn OnDatabaseReadMetadata(ChannelInfo *ci, const Anope::string &key, co
 		else if (key.equals_ci("BI"))
 		{
 			if (params[0].equals_ci("NAME"))
-				ci->bi = findbot(params[1]);
+				ci->bi = BotInfo::Find(params[1]);
 			else if (params[0].equals_ci("FLAGS"))
 				ci->botflags.FromVector(params);
 			else if (params[0].equals_ci("TTB"))
@@ -396,22 +397,22 @@ static void ReadDatabase(Module *m = NULL)
 		{
 			if (params[0].equals_ci("NC"))
 			{
-				nc = findcore(params[1]);
+				nc = NickCore::Find(params[1]);
 				Type = MD_NC;
 			}
 			else if (params[0].equals_ci("NA"))
 			{
-				na = findnick(params[2]);
+				na = NickAlias::Find(params[2]);
 				Type = MD_NA;
 			}
 			else if (params[0].equals_ci("BI"))
 			{
-				bi = findbot(params[1]);
+				bi = BotInfo::Find(params[1]);
 				Type = MD_BI;
 			}
 			else if (params[0].equals_ci("CH"))
 			{
-				ci = cs_findchan(params[1]);
+				ci = ChannelInfo::Find(params[1]);
 				Type = MD_CH;
 			}
 			else if (params[0].equals_ci("MD"))
@@ -484,7 +485,7 @@ static void LoadNickCore(const std::vector<Anope::string> &params)
 
 static void LoadNickAlias(const std::vector<Anope::string> &params)
 {
-	NickCore *nc = findcore(params[0]);
+	NickCore *nc = NickCore::Find(params[0]);
 	if (!nc)
 	{
 		Log() << "[db_plain]: Unable to find core " << params[0];
@@ -502,7 +503,7 @@ static void LoadNickAlias(const std::vector<Anope::string> &params)
 
 static void LoadBotInfo(const std::vector<Anope::string> &params)
 {
-	BotInfo *bi = findbot(params[0]);
+	BotInfo *bi = BotInfo::Find(params[0]);
 	if (!bi)
 		bi = new BotInfo(params[0], params[1], params[2]);
 
@@ -533,8 +534,8 @@ static void LoadOperInfo(const std::vector<Anope::string> &params)
 {
 	if (params[0].equals_ci("STATS"))
 	{
-		maxusercnt = params[1].is_pos_number_only() ? convertTo<uint32_t>(params[1]) : 0;
-		maxusertime = params[2].is_pos_number_only() ? convertTo<time_t>(params[2]) : 0;
+		MaxUserCount = params[1].is_pos_number_only() ? convertTo<uint32_t>(params[1]) : 0;
+		MaxUserTime = params[2].is_pos_number_only() ? convertTo<time_t>(params[2]) : 0;
 	}
 	else if (params[0].equals_ci("SXLINE"))
 	{
@@ -551,7 +552,7 @@ static void LoadOperInfo(const std::vector<Anope::string> &params)
 				Anope::string reason = params[7];
 
 				XLine *x = new XLine(mask, by, expires, reason, XLineManager::GenerateUID());
-				x->Created = seton;
+				x->created = seton;
 				xl->AddXLine(x);
 				break;
 			}
@@ -627,7 +628,7 @@ class DBPlain : public Module
 				Log() << "Unable to back up database!";
 
 				if (!Config->NoBackupOkay)
-					quitting = true;
+					Anope::Quitting = true;
 
 				return;
 			}
@@ -646,8 +647,8 @@ class DBPlain : public Module
 	void OnReload() anope_override
 	{
 		ConfigReader config;
-		DatabaseFile = db_dir + "/" + config.ReadValue("db_plain", "database", "anope.db", 0);
-		BackupFile = db_dir + "/backups/" + config.ReadValue("db_plain", "database", "anope.db", 0);
+		DatabaseFile = Anope::DataDir + "/" + config.ReadValue("db_plain", "database", "anope.db", 0);
+		BackupFile = Anope::DataDir + "/backups/" + config.ReadValue("db_plain", "database", "anope.db", 0);
 	}
 
 	EventReturn OnLoadDatabase() anope_override
@@ -777,7 +778,7 @@ class DBPlain : public Module
 			for (unsigned k = 0, end = ci->GetAccessCount(); k < end; ++k)
 			{
 				const ChanAccess *access = ci->GetAccess(k);
-				db_buffer << "MD ACCESS2 " << access->provider->name << " " << access->mask << " " << access->Serialize() << " " << access->last_seen << " " << access->creator << " " << access->created << endl;
+				db_buffer << "MD ACCESS2 " << access->provider->name << " " << access->mask << " " << access->AccessSerialize() << " " << access->last_seen << " " << access->creator << " " << access->created << endl;
 			}
 			for (unsigned k = 0, end = ci->GetAkickCount(); k < end; ++k)
 			{
@@ -835,7 +836,7 @@ class DBPlain : public Module
 			//FOREACH_MOD(I_OnDatabaseWriteMetadata, OnDatabaseWriteMetadata(WriteMetadata, ci));
 		}
 
-		db_buffer << "OS STATS " << maxusercnt << " " << maxusertime << endl;
+		db_buffer << "OS STATS " << MaxUserCount << " " << MaxUserTime << endl;
 
 		for (std::list<XLineManager *>::iterator it = XLineManager::XLineManagers.begin(), it_end = XLineManager::XLineManagers.end(); it != it_end; ++it)
 		{
@@ -843,7 +844,7 @@ class DBPlain : public Module
 			for (unsigned i = 0, end = xl->GetCount(); i < end; ++i)
 			{
 				const XLine *x = xl->GetEntry(i);
-				db_buffer << "OS SXLINE " << xl->Type() << " " << x->GetUser() << " " << x->GetHost() << " " << x->By << " " << x->Created << " " << x->Expires << " :" << x->Reason << endl;
+				db_buffer << "OS SXLINE " << xl->Type() << " " << x->GetUser() << " " << x->GetHost() << " " << x->by << " " << x->created << " " << x->expires << " :" << x->reason << endl;
 			}
 		}
 
@@ -861,7 +862,7 @@ class DBPlain : public Module
 
 		if (!db.is_open())
 		{
-			ircdproto->SendGlobops(NULL, "Unable to open %s for writing!", DatabaseFile.c_str());
+			IRCD->SendGlobops(NULL, "Unable to open %s for writing!", DatabaseFile.c_str());
 			return EVENT_CONTINUE;
 		}
 

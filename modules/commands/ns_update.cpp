@@ -28,7 +28,7 @@ class CommandNSUpdate : public Command
 		if (!u)
 			return;
 
-		NickAlias *na = findnick(u->nick);
+		NickAlias *na = NickAlias::Find(u->nick);
 
 		if (na && na->nc == source.GetAccount())
 		{

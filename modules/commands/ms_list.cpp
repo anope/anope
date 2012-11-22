@@ -34,7 +34,7 @@ class CommandMSList : public Command
 			chan = param;
 			param = params.size() > 1 ? params[1] : "";
 
-			ci = cs_findchan(chan);
+			ci = ChannelInfo::Find(chan);
 			if (!ci)
 			{
 				source.Reply(CHAN_X_NOT_REGISTERED, chan.c_str());
@@ -63,7 +63,7 @@ class CommandMSList : public Command
 		{
 			ListFormatter list;
 
-			list.addColumn("Number").addColumn("Sender").addColumn("Date/Time");
+			list.AddColumn("Number").AddColumn("Sender").AddColumn("Date/Time");
 
 			if (!param.empty() && isdigit(param[0]))
 			{
@@ -77,18 +77,18 @@ class CommandMSList : public Command
 					{
 					}
 
-					void HandleNumber(unsigned Number) anope_override
+					void HandleNumber(unsigned number) anope_override
 					{
-						if (!Number || Number > mi->memos->size())
+						if (!number || number > mi->memos->size())
 							return;
 
-						const Memo *m = mi->GetMemo(Number);
+						const Memo *m = mi->GetMemo(number);
 
 						ListFormatter::ListEntry entry;
-						entry["Number"] = (m->HasFlag(MF_UNREAD) ? "* " : "  ") + stringify(Number + 1);
+						entry["Number"] = (m->HasFlag(MF_UNREAD) ? "* " : "  ") + stringify(number + 1);
 						entry["Sender"] = m->sender;
-						entry["Date/Time"] = do_strftime(m->time);
-						this->list.addEntry(entry);
+						entry["Date/Time"] = Anope::strftime(m->time);
+						this->list.AddEntry(entry);
 					}
 				}
 				mlc(list, source, mi, param);
@@ -122,8 +122,8 @@ class CommandMSList : public Command
 					ListFormatter::ListEntry entry;
 					entry["Number"] = (m->HasFlag(MF_UNREAD) ? "* " : "  ") + stringify(i + 1);
 					entry["Sender"] = m->sender;
-					entry["Date/Time"] = do_strftime(m->time);
-					list.addEntry(entry);
+					entry["Date/Time"] = Anope::strftime(m->time);
+					list.AddEntry(entry);
 				}
 			}
 

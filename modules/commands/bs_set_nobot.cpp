@@ -24,7 +24,7 @@ class CommandBSSetNoBot : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		ChannelInfo *ci = cs_findchan(params[0]);
+		ChannelInfo *ci = ChannelInfo::Find(params[0]);
 		const Anope::string &value = params[1];
 
 		if (ci == NULL)

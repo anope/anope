@@ -7,6 +7,7 @@
  *
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
+ *
  */
 
 #include "services.h"
@@ -22,7 +23,7 @@ ConnectionSocket::ConnectionSocket() : Socket()
 
 void ConnectionSocket::Connect(const Anope::string &TargetHost, int Port)
 {
-	this->IO->Connect(this, TargetHost, Port);
+	this->io->Connect(this, TargetHost, Port);
 }
 
 bool ConnectionSocket::Process()
@@ -32,7 +33,7 @@ bool ConnectionSocket::Process()
 		if (this->HasFlag(SF_CONNECTED))
 			return true;
 		else if (this->HasFlag(SF_CONNECTING))
-			this->SetFlag(this->IO->FinishConnect(this));
+			this->SetFlag(this->io->FinishConnect(this));
 		else
 			this->SetFlag(SF_DEAD);
 	}
@@ -61,7 +62,7 @@ void ConnectionSocket::OnError(const Anope::string &error)
 	Log(LOG_DEBUG) << "Socket error: " << error;
 }
 
-ClientSocket::ClientSocket(ListenSocket *ls, const sockaddrs &addr) : LS(ls), clientaddr(addr)
+ClientSocket::ClientSocket(ListenSocket *l, const sockaddrs &addr) : ls(l), clientaddr(addr)
 {
 }
 
@@ -72,7 +73,7 @@ bool ClientSocket::Process()
 		if (this->HasFlag(SF_ACCEPTED))
 			return true;
 		else if (this->HasFlag(SF_ACCEPTING))
-			this->SetFlag(this->IO->FinishAccept(this));
+			this->SetFlag(this->io->FinishAccept(this));
 		else
 			this->SetFlag(SF_DEAD);
 	}

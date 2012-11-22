@@ -22,7 +22,7 @@ static Module *me;
 class TempBan : public CallBack
 {
  private:
-	dynamic_reference<Channel> chan;
+	Reference<Channel> chan;
 	Anope::string mask;
 
  public:
@@ -46,7 +46,7 @@ class CommandCSTBan : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		Channel *c = findchan(params[0]);
+		Channel *c = Channel::Find(params[0]);
 
 		const Anope::string &nick = params[1];
 		const Anope::string &time = params[2];
@@ -58,23 +58,22 @@ class CommandCSTBan : public Command
 			source.Reply(CHAN_X_NOT_REGISTERED, c->name.c_str());
 		else if (!source.AccessFor(c->ci).HasPriv("BAN"))
 			source.Reply(ACCESS_DENIED);
-		else if (!(u2 = finduser(nick)))
+		else if (!(u2 = User::Find(nick, true)))
 			source.Reply(NICK_X_NOT_IN_USE, nick.c_str());
-		else if (matches_list(c, u2, CMODE_EXCEPT))
+		else if (c->MatchesList(u2, CMODE_EXCEPT))
 			source.Reply(CHAN_EXCEPTED, u2->nick.c_str(), c->ci->name.c_str());
 		else if (u2->IsProtected())
 			source.Reply(ACCESS_DENIED);
 		else
 		{
-			time_t t = dotime(time);
-			Anope::string mask;
-			get_idealban(c->ci, u2, mask);
+			time_t t = Anope::DoTime(time);
+			Anope::string mask = c->ci->GetIdealBan(u2);
 			c->SetMode(NULL, CMODE_BAN, mask);
 			new TempBan(t, c, mask);
 
-			Log(LOG_COMMAND, source, this, c->ci) << "for " << mask << " to expire in " << duration(t);
+			Log(LOG_COMMAND, source, this, c->ci) << "for " << mask << " to expire in " << Anope::Duration(t);
 
-			source.Reply(_("%s banned from %s, will auto-expire in %s."), mask.c_str(), c->name.c_str(), duration(t).c_str());
+			source.Reply(_("%s banned from %s, will auto-expire in %s."), mask.c_str(), c->name.c_str(), Anope::Duration(t).c_str());
 		}
 
 		return;

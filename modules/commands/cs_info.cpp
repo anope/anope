@@ -22,7 +22,7 @@ class CommandCSInfo : public Command
 			if (!buf.empty())
 				buf += ", ";
 
-			buf += translate(nc, str);
+			buf += Language::Translate(nc, str);
 		}
 	}
 
@@ -39,7 +39,7 @@ class CommandCSInfo : public Command
 		const Anope::string &chan = params[0];
 
 		NickCore *nc = source.nc;
-		ChannelInfo *ci = cs_findchan(params[0]);
+		ChannelInfo *ci = ChannelInfo::Find(params[0]);
 		if (ci == NULL)
 		{
 			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
@@ -65,8 +65,8 @@ class CommandCSInfo : public Command
 		if (!ci->desc.empty())
 			info["Description"] = ci->desc;
 
-		info["Registered"] = do_strftime(ci->time_registered);
-		info["Last used"] = do_strftime(ci->last_used);
+		info["Registered"] = Anope::strftime(ci->time_registered);
+		info["Last used"] = Anope::strftime(ci->last_used);
 
 		const ModeLock *secret = ci->GetMLock(CMODE_SECRET);
 		if (!ci->last_topic.empty() && (show_all || ((!secret || secret->set == false) && (!ci->c || !ci->c->HasMode(CMODE_SECRET)))))
@@ -103,7 +103,7 @@ class CommandCSInfo : public Command
 				info["Mode lock"] = ml;
 
 			if (!ci->HasFlag(CI_NO_EXPIRE))
-				info["Expires on"] = do_strftime(ci->last_used + Config->CSExpire);
+				info["Expires on"] = Anope::strftime(ci->last_used + Config->CSExpire);
 		}
 		if (ci->HasFlag(CI_SUSPENDED))
 		{

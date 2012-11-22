@@ -40,7 +40,7 @@ class CommandNSSASet : public Command
 
 			if (c_name.find_ci(this_name + " ") == 0)
 			{
-				service_reference<Command> command("Command", info.name);
+				ServiceReference<Command> command("Command", info.name);
 				if (command)
 				{
 					source.command = c_name;
@@ -66,7 +66,7 @@ class CommandNSSASetPassword : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		const NickAlias *setter_na = findnick(params[0]);
+		const NickAlias *setter_na = NickAlias::Find(params[0]);
 		if (setter_na == NULL)
 		{
 			source.Reply(NICK_X_NOT_REGISTERED, params[0].c_str());
@@ -92,9 +92,9 @@ class CommandNSSASetPassword : public Command
 			return;
 		}
 
-		enc_encrypt(params[1], nc->pass);
+		Anope::Encrypt(params[1], nc->pass);
 		Anope::string tmp_pass;
-		if (enc_decrypt(nc->pass, tmp_pass) == 1)
+		if (Anope::Decrypt(nc->pass, tmp_pass) == 1)
 			source.Reply(_("Password for \002%s\002 changed to \002%s\002."), nc->display.c_str(), tmp_pass.c_str());
 		else
 			source.Reply(_("Password for \002%s\002 changed."), nc->display.c_str());

@@ -36,7 +36,7 @@ class CommandOSNOOP : public Command
 		else if (cmd.equals_ci("SET"))
 		{
 			/* Remove the O:lines */
-			ircdproto->SendSVSNOOP(s, true);
+			IRCD->SendSVSNOOP(s, true);
 			s->Extend("noop", new ExtensibleItemClass<Anope::string>(source.GetNick()));
 
 			Log(LOG_ADMIN, source, this) << "SET on " << s->GetName();
@@ -56,7 +56,7 @@ class CommandOSNOOP : public Command
 		else if (cmd.equals_ci("REVOKE"))
 		{
 			s->Shrink("noop");
-			ircdproto->SendSVSNOOP(s, false);
+			IRCD->SendSVSNOOP(s, false);
 			Log(LOG_ADMIN, source, this) << "REVOKE on " << s->GetName();
 			source.Reply(_("All O:lines of \002%s\002 have been reset."), s->GetName().c_str());
 		}

@@ -159,7 +159,7 @@ class ngIRCdProto : public IRCDProto
 		{
 			if (!u->HasMode(UMODE_CLOAK))
 			{
-				const BotInfo *bi = findbot(Config->HostServ);
+				const BotInfo *bi = BotInfo::Find(Config->HostServ);
 				u->SetMode(bi, UMODE_CLOAK);
 				// send the modechange before we send the vhost
 				ModeManager::ProcessModes();
@@ -328,7 +328,7 @@ struct IRCDMessageJoin : Message::Join
 
 struct IRCDMessageMetadata : IRCDMessage
 {
-	IRCDMessageMetadata() : IRCDMessage("METADATA", 3) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
+	IRCDMessageMetadata(Module *creator) : IRCDMessage(creator, "METADATA", 3) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
 
 	/*
 	 * Received: :ngircd.dev.anope.de METADATA DukePyrolator host :anope-e2ee5c7d
@@ -345,7 +345,7 @@ struct IRCDMessageMetadata : IRCDMessage
 
 	bool Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		User *u = finduser(params[0]);
+		User *u = User::Find(params[0]);
 		if (!u)
 		{
 			Log() << "received METADATA for non-existent user " << params[0];
@@ -676,9 +676,9 @@ class ProtongIRCd : public Module
 		message_part(this), message_ping(this), message_privmsg(this), message_squery(this, "SQUERY"),
 		message_quit(this), message_squit(this), message_stats(this), message_time(this), message_version(this),
 
-		message_005(this), message_376(this), message_chaninfo(this), message_join(this), message_mode(this),
-		message_nick(this), message_njoin(this), message_pong(this), message_server(this), message_topic(this)
-		
+		message_005(this), message_376(this), message_chaninfo(this), message_join(this), message_metadata(this),
+		message_mode(this), message_nick(this), message_njoin(this), message_pong(this), message_server(this),
+		message_topic(this)
 	{
 		this->SetAuthor("Anope");
 

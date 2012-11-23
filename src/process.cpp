@@ -75,8 +75,13 @@ void Anope::Process(const Anope::string &buffer)
 	}
 
 	static const Anope::string proto_name = ModuleManager::FindFirstOf(PROTOCOL) ? ModuleManager::FindFirstOf(PROTOCOL)->name : "";
+
+	MessageSource src(source);
 	
-	// event
+	EventReturn MOD_RESULT;
+	FOREACH_RESULT(I_OnMessage, OnMessage(src, command, params));
+	if (MOD_RESULT == EVENT_STOP)
+		return;
 
 	ServiceReference<IRCDMessage> m("IRCDMessage", proto_name + "/" + command.lower());
 	if (!m)
@@ -84,8 +89,6 @@ void Anope::Process(const Anope::string &buffer)
 		Log(LOG_DEBUG) << "unknown message from server (" << buffer << ")";
 		return;
 	}
-
-	MessageSource src(source);
 
 	if (m->HasFlag(IRCDMESSAGE_SOFT_LIMIT) ? (params.size() < m->GetParamCount()) : (params.size() != m->GetParamCount()))
 		Log(LOG_DEBUG) << "invalid parameters for " << command << ": " << params.size() << " != " << m->GetParamCount();

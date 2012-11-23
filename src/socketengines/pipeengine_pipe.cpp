@@ -27,7 +27,11 @@ Pipe::Pipe() : Socket(-1), write_pipe(-1)
 	flags = fcntl(fds[1], F_GETFL, 0);
 	fcntl(fds[1], F_SETFL, flags | O_NONBLOCK);
 
-	this->~Pipe();
+	SocketEngine::Change(this, false, SF_READABLE);
+	SocketEngine::Change(this, false, SF_WRITABLE);
+	anope_close(this->sock);
+	this->io->Destroy();
+	SocketEngine::Sockets.erase(this->sock);
 
 	this->sock = fds[0];
 	this->write_pipe = fds[1];

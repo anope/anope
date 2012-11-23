@@ -198,12 +198,11 @@ class NSGhost : public Module
 				std::map<Anope::string, ChannelStatus>::iterator it = ei->find(c->name);
 				if (it != ei->end())
 				{
-					ei->erase(it);
-
 					for (size_t j = CMODE_BEGIN + 1; j < CMODE_END; ++j)
 						if (it->second.HasFlag(static_cast<ChannelModeName>(j)))
 							c->SetMode(c->ci->WhoSends(), ModeManager::FindChannelModeByName(static_cast<ChannelModeName>(j)), u->GetUID());
 
+					ei->erase(it);
 					if (ei->empty())
 						u->Shrink("ns_ghost_info");
 				}

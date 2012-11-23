@@ -957,6 +957,14 @@ class CoreExport Module : public Extensible
 	 * @return EVENT_STOP to halt immediately
 	 */
 	virtual EventReturn OnSetNickOption(CommandSource &source, Command *cmd, NickCore *nc, const Anope::string &setting) { return EVENT_CONTINUE; }
+
+	/** Called whenever a message is received from the uplink
+	 * @param source The source of the message
+	 * @param command The command being executed
+	 * @param params Parameters
+	 * @return EVENT_STOP to prevent the protocol module from processing this message
+	 */
+	virtual EventReturn OnMessage(MessageSource &source, Anope::string &command, std::vector<Anope::string> &param) { return EVENT_CONTINUE; }
 };
 
 /** Implementation-specific flags which may be set in ModuleManager::Attach()
@@ -1007,6 +1015,7 @@ enum Implementation
 		I_OnEncrypt, I_OnDecrypt,
 		I_OnChannelModeSet, I_OnChannelModeUnset, I_OnUserModeSet, I_OnUserModeUnset, I_OnChannelModeAdd, I_OnUserModeAdd,
 		I_OnMLock, I_OnUnMLock, I_OnServerSync, I_OnUplinkSync, I_OnBotPrivmsg, I_OnPrivmsg, I_OnLog, I_OnDnsRequest,
+		I_OnMessage,
 
 		I_OnSerializeCheck, I_OnSerializableConstruct, I_OnSerializableDestruct, I_OnSerializableUpdate,
 	I_END

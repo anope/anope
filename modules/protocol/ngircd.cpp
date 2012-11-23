@@ -178,7 +178,7 @@ struct IRCDMessage005 : IRCDMessage
 	IRCDMessage005(Module *creator) : IRCDMessage(creator, "005", 1) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
 
 	// Please see <http://www.irc.org/tech_docs/005.html> for details.
-	bool Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
+	void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		size_t pos;
 		Anope::string parameter, data;
@@ -205,7 +205,6 @@ struct IRCDMessage005 : IRCDMessage
 				}
 			}
 		}
-		return true;
 	}
 };
 
@@ -221,9 +220,8 @@ struct IRCDMessage376 : IRCDMessage
 	 *
 	 */
 
-	bool Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
+	void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		return true;
 	}
 };
 
@@ -248,7 +246,7 @@ struct IRCDMessageChaninfo : IRCDMessage
 	 * a channel has no user limit (the parameter <modes> doesn't list the "l"
 	 * channel mode). In this case <limit> should be "0".
 	 */
-	bool Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
+	void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 
 		Channel *c = Channel::Find(params[0]);
@@ -279,7 +277,6 @@ struct IRCDMessageChaninfo : IRCDMessage
 		}
 
 		c->SetModesInternal(source, modes);
-		return true;
 	}
 };
 
@@ -293,7 +290,7 @@ struct IRCDMessageJoin : Message::Join
 	 *
 	 * if a user joins a new channel, the ircd sends <channelname>\7<umode>
 	 */
-	bool Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
+	void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		User *user = source.GetUser();
 		size_t pos = params[0].find('\7');
@@ -320,8 +317,6 @@ struct IRCDMessageJoin : Message::Join
 			if (c)
 				c->SetModesInternal(source, modes);
 		}
-
-		return true;
 	}
 };
 
@@ -342,13 +337,13 @@ struct IRCDMessageMetadata : IRCDMessage
 	 *  - "user": the user name (ident) of a client (can't be empty)
 	 */
 
-	bool Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
+	void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		User *u = User::Find(params[0]);
 		if (!u)
 		{
 			Log() << "received METADATA for non-existent user " << params[0];
-			return true;
+			return;
 		}
 		if (params[1].equals_cs("host"))
 		{
@@ -362,7 +357,6 @@ struct IRCDMessageMetadata : IRCDMessage
 		{
 			u->SetVIdent(params[2]);
 		}
-		return true;
 	}
 };
 
@@ -378,7 +372,7 @@ struct IRCDMessageMode : IRCDMessage
 	 * params[n] = parameters
 	 */
 
-	bool Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
+	void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		Anope::string modes = params[1];
 
@@ -399,7 +393,6 @@ struct IRCDMessageMode : IRCDMessage
 			if (u)
 				u->SetModesInternal("%s", params[1].c_str());
 		}
-		return true;
 	}
 };
 
@@ -426,7 +419,7 @@ struct IRCDMessageNick : IRCDMessage
 	 * params[0] = newnick
 	 *
 	 */
-	bool Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
+	void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		if (params.size() == 1)
 		{
@@ -444,7 +437,6 @@ struct IRCDMessageNick : IRCDMessage
 		{
 			Log(LOG_DEBUG) << "Received NICK with invalid number of parameters. source = " << source.GetName() << "params[0] = " << params[0] << "params.size() = " << params.size();
 		}
-		return true;
 	}
 };
 
@@ -463,7 +455,7 @@ struct IRCDMessageNJoin : IRCDMessage
 	 *
 	 * Received: :dev.anope.de NJOIN #test :DukeP2,@DukeP,%test,+test2
 	 */
-	bool Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
+	void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		std::list<Message::Join::SJoinUser> users;
 
@@ -497,8 +489,6 @@ struct IRCDMessageNJoin : IRCDMessage
 		} 
 
 		Message::Join::SJoin(source, params[0], 0, "", users);
-
-		return true;
 	}
 };
 
@@ -511,11 +501,10 @@ struct IRCDMessagePong : IRCDMessage
 	 * when receiving a new server and then finish sync once we
 	 * get a pong back from that server.
 	 */
-	bool Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
+	void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		if (!source.GetServer()->IsSynced())
 			source.GetServer()->Sync(false);
-		return true;
 	}
 };
 
@@ -549,7 +538,7 @@ struct IRCDMessageServer : IRCDMessage
 	 * params[3] = server description
 	 */
 
-	bool Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
+	void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		if (params.size() == 3)
 		{
@@ -568,7 +557,6 @@ struct IRCDMessageServer : IRCDMessage
 		 * get a pong back from that server.
 		 */
 		IRCD->SendPing(Config->ServerName, params[0]);
-		return true;
 	}
 };
 
@@ -577,16 +565,15 @@ struct IRCDMessageTopic : IRCDMessage
 	IRCDMessageTopic(Module *creator) : IRCDMessage(creator, "TOPIC", 2) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
 
 	// Received: :DukeP TOPIC #anope :test
-	bool Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
+	void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		Channel *c = Channel::Find(params[0]);
 		if (!c)
 		{
 			Log(LOG_DEBUG) << "TOPIC for nonexistant channel " << params[0];
-			return true;
+			return;
 		}
 		c->ChangeTopicInternal(source.GetName(), params[1], Anope::CurTime);
-		return true;
 	}
 };
 

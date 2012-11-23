@@ -13,7 +13,7 @@ endif(WIN32)
 
 # If we have eventfd, use it
 if(HAVE_EVENTFD)
-  append_to_list(SRC_SRCS socketengines/pipeengine_eventfd.cpp)
+  append_to_list(SRC_SRCS socketengines/pipeengine_pipe.cpp)
 # Else fall back to pipe
 else(HAVE_EVENTFD)
   append_to_list(SRC_SRCS socketengines/pipeengine_pipe.cpp)

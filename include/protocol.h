@@ -244,7 +244,7 @@ class CoreExport IRCDMessage : public Flags<IRCDMessageFlag>, public Service
  public:
 	IRCDMessage(Module *owner, const Anope::string &n, unsigned p = 0);
 	unsigned GetParamCount() const;
-	virtual bool Run(MessageSource &, const std::vector<Anope::string> &params) = 0;
+	virtual void Run(MessageSource &, const std::vector<Anope::string> &params) = 0;
 };
 
 extern CoreExport IRCDProto *IRCD;

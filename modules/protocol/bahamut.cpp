@@ -308,7 +308,7 @@ struct IRCDMessageBurst : IRCDMessage
 {
 	IRCDMessageBurst(Module *creator) : IRCDMessage(creator, "BURST", 0) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
 
-	bool Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
+	void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		/* If we found a server with the given source, that one just
 		 * finished bursting. If there was no source, then our uplink
@@ -319,7 +319,6 @@ struct IRCDMessageBurst : IRCDMessage
 			s = Me->GetLinks().front();
 		if (s)
 			s->Sync(true);
-		return true;
 	}
 };
 
@@ -327,7 +326,7 @@ struct IRCDMessageMode : IRCDMessage
 {
 	IRCDMessageMode(Module *creator, const Anope::string &sname) : IRCDMessage(creator, sname, 2) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
 
-	bool Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
+	void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		if (params.size() > 2 && IRCD->IsChannelValid(params[0]))
 		{
@@ -349,8 +348,6 @@ struct IRCDMessageMode : IRCDMessage
 			if (u)
 				u->SetModesInternal("%s", params[1].c_str());
 		}
-
-		return true;
 	}
 };
 
@@ -376,7 +373,7 @@ struct IRCDMessageNick : IRCDMessage
 {
 	IRCDMessageNick(Module *creator) : IRCDMessage(creator, "NICK", 2) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
 
-	bool Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
+	void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		if (params.size() == 10)
 		{
@@ -384,7 +381,7 @@ struct IRCDMessageNick : IRCDMessage
 			if (s == NULL)
 			{
 				Log(LOG_DEBUG) << "User " << params[0] << " introduced from nonexistant server " << params[6] << "?";
-				return true;
+				return;
 			}
 
 			User *user = new User(params[0], params[4], params[5], "", params[8], s, params[9], params[2].is_pos_number_only() ? convertTo<time_t>(params[2]) : 0, params[3]);
@@ -404,8 +401,6 @@ struct IRCDMessageNick : IRCDMessage
 		}
 		else
 			source.GetUser()->ChangeNick(params[0]);
-
-		return true;
 	}
 };
 
@@ -413,11 +408,10 @@ struct IRCDMessageServer : IRCDMessage
 {
 	IRCDMessageServer(Module *creator) : IRCDMessage(creator, "SERVER", 3) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
 
-	bool Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
+	void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		unsigned int hops = Anope::string(params[1]).is_pos_number_only() ? convertTo<unsigned>(params[1]) : 0;
 		new Server(source.GetServer() == NULL ? Me : source.GetServer(), params[0], hops, params[2]);
-		return true;
 	}
 };
 
@@ -425,7 +419,7 @@ struct IRCDMessageSJoin : IRCDMessage
 {
 	IRCDMessageSJoin(Module *creator) : IRCDMessage(creator, "SJOIN", 2) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
 
-	bool Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
+	void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		Anope::string modes;
 		if (params.size() >= 4)
@@ -481,8 +475,6 @@ struct IRCDMessageSJoin : IRCDMessage
 
 		time_t ts = Anope::string(params[0]).is_pos_number_only() ? convertTo<time_t>(params[0]) : Anope::CurTime;
 		Message::Join::SJoin(source, params[1], ts, modes, users);
-
-		return true;
 	}
 };
 
@@ -490,12 +482,11 @@ struct IRCDMessageTopic : IRCDMessage
 {
 	IRCDMessageTopic(Module *creator) : IRCDMessage(creator, "TOPIC", 4) { }
 
-	bool Run(MessageSource &, const std::vector<Anope::string> &params) anope_override
+	void Run(MessageSource &, const std::vector<Anope::string> &params) anope_override
 	{
 		Channel *c = Channel::Find(params[0]);
 		if (c)
 			c->ChangeTopicInternal(params[1], params[3], Anope::string(params[2]).is_pos_number_only() ? convertTo<time_t>(params[2]) : Anope::CurTime);
-		return true;
 	}
 };
 

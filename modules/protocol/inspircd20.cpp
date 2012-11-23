@@ -172,7 +172,7 @@ struct IRCDMessageCapab : Message::Capab
 {
 	IRCDMessageCapab(Module *creator) : Message::Capab(creator, "CAPAB") { SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
 
-	bool Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
+	void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		if (params[0].equals_cs("START"))
 		{
@@ -184,7 +184,7 @@ struct IRCDMessageCapab : Message::Capab
 				UplinkSocket::Message() << "ERROR :Protocol mismatch, no or invalid protocol version given in CAPAB START";
 				Anope::QuitReason = "Protocol mismatch, no or invalid protocol version given in CAPAB START";
 				Anope::Quitting = true;
-				return false;
+				return;
 			}
 
 			/* reset CAPAB */
@@ -479,14 +479,14 @@ struct IRCDMessageCapab : Message::Capab
 				UplinkSocket::Message() << "ERROR :m_services_account.so is not loaded. This is required by Anope";
 				Anope::QuitReason = "ERROR: Remote server does not have the m_services_account module loaded, and this is required.";
 				Anope::Quitting = true;
-				return false;
+				return;
 			}
 			if (!ModeManager::FindUserModeByName(UMODE_PRIV))
 			{
 				UplinkSocket::Message() << "ERROR :m_hidechans.so is not loaded. This is required by Anope";
 				Anope::QuitReason = "ERROR: Remote server does not have the m_hidechans module loaded, and this is required.";
 				Anope::Quitting = true;
-				return false;
+				return;
 			}
 			if (!IRCD->CanSVSHold)
 				Log() << "SVSHOLD missing, Usage disabled until module is loaded.";
@@ -498,9 +498,7 @@ struct IRCDMessageCapab : Message::Capab
 				Log() << "m_topiclock missing, server side topic locking disabled until module is loaded.";
 		}
 
-		Servers::Capab.insert("NOQUIT");
-
-		return Message::Capab::Run(source, params);
+		Message::Capab::Run(source, params);
 	}
 };
 
@@ -508,16 +506,16 @@ struct IRCDMessageEncap : IRCDMessage
 {
 	IRCDMessageEncap(Module *creator) : IRCDMessage(creator, "ENCAP", 4) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
 
-	bool Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
+	void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		if (Anope::Match(Me->GetSID(), params[0]) == false)
-			return true;
+			return;
 
 		if (params[1] == "CHGIDENT")
 		{
 			User *u = User::Find(params[2]);
 			if (!u || u->server != Me)
-				return true;
+				return;
 
 			u->SetIdent(params[3]);
 			UplinkSocket::Message(u) << "FIDENT " << params[3];
@@ -526,7 +524,7 @@ struct IRCDMessageEncap : IRCDMessage
 		{
 			User *u = User::Find(params[2]);
 			if (!u || u->server != Me)
-				return true;
+				return;
 
 			u->SetDisplayedHost(params[3]);
 			UplinkSocket::Message(u) << "FHOST " << params[3];
@@ -535,7 +533,7 @@ struct IRCDMessageEncap : IRCDMessage
 		{
 			User *u = User::Find(params[2]);
 			if (!u || u->server != Me)
-				return true;
+				return;
 
 			u->SetRealname(params[3]);
 			UplinkSocket::Message(u) << "FNAME " << params[3];
@@ -578,26 +576,24 @@ struct IRCDMessageEncap : IRCDMessage
 
 				size_t p = decoded.find('\0');
 				if (p == Anope::string::npos)
-					return true;
+					return;
 				decoded = decoded.substr(p + 1);
 
 				p = decoded.find('\0');
 				if (p == Anope::string::npos)
-					return true;
+					return;
 
 				Anope::string acc = decoded.substr(0, p),
 					pass = decoded.substr(p + 1);
 
 				if (acc.empty() || pass.empty())
-					return true;
+					return;
 
 				IdentifyRequest *req = new InspIRCDSASLIdentifyRequest(this->owner, params[2], acc, pass);
 				FOREACH_MOD(I_OnCheckAuthentication, OnCheckAuthentication(NULL, req));
 				req->Dispatch();
 			}
 		}
-
-		return true;
 	}
 };
 
@@ -605,10 +601,9 @@ struct IRCDMessageFIdent : IRCDMessage
 {
 	IRCDMessageFIdent(Module *creator) : IRCDMessage(creator, "FIDENT", 1) { SetFlag(IRCDMESSAGE_REQUIRE_USER); }
 
-	bool Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
+	void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		source.GetUser()->SetIdent(params[0]);
-		return true;
 	}
 };
 

@@ -17,7 +17,7 @@
 #include <fcntl.h>
 #endif
 
-Pipe::Pipe() : Socket(-1), WritePipe(-1)
+Pipe::Pipe() : Socket(-1), write_pipe(-1)
 {
 	int fds[2];
 	if (pipe(fds))
@@ -29,17 +29,17 @@ Pipe::Pipe() : Socket(-1), WritePipe(-1)
 
 	this->~Pipe();
 
-	this->Sock = fds[0];
-	this->WritePipe = fds[1];
+	this->sock = fds[0];
+	this->write_pipe = fds[1];
 
-	SocketEngine::Sockets[this->Sock] = this;
+	SocketEngine::Sockets[this->sock] = this;
 	SocketEngine::Change(this, true, SF_READABLE);
 }
 
 Pipe::~Pipe()
 {
-	if (this->WritePipe >= 0)
-		anope_close(this->WritePipe);
+	if (this->write_pipe >= 0)
+		anope_close(this->write_pipe);
 }
 
 bool Pipe::ProcessRead()
@@ -53,6 +53,6 @@ bool Pipe::ProcessRead()
 void Pipe::Notify()
 {
 	const char dummy = '*';
-	write(this->WritePipe, &dummy, 1);
+	write(this->write_pipe, &dummy, 1);
 }
 

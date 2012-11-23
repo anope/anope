@@ -7,6 +7,8 @@
  *
  */
 
+#include "anope.h"
+
 namespace Language
 {
 

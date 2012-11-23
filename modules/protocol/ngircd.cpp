@@ -159,8 +159,7 @@ class ngIRCdProto : public IRCDProto
 		{
 			if (!u->HasMode(UMODE_CLOAK))
 			{
-				const BotInfo *bi = BotInfo::Find(Config->HostServ);
-				u->SetMode(bi, UMODE_CLOAK);
+				u->SetMode(HostServ, UMODE_CLOAK);
 				// send the modechange before we send the vhost
 				ModeManager::ProcessModes();
 			}

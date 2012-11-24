@@ -96,7 +96,7 @@ namespace Message
 	
 	struct CoreExport Ping : IRCDMessage
 	{
-		Ping(Module *creator, const Anope::string &mname = "PPING") : IRCDMessage(creator, mname, 1) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
+		Ping(Module *creator, const Anope::string &mname = "PING") : IRCDMessage(creator, mname, 1) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
 	
 		void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override;
 	};

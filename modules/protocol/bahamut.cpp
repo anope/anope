@@ -35,7 +35,7 @@ class ChannelModeFlood : public ChannelModeParam
 class BahamutIRCdProto : public IRCDProto
 {
  public:
-	BahamutIRCdProto() : IRCDProto("Bahamut 1.8.x")
+	BahamutIRCdProto(Module *creator) : IRCDProto(creator, "Bahamut 1.8.x")
 	{
 		DefaultPseudoclientModes = "+";
 		CanSVSNick = true;
@@ -559,6 +559,7 @@ class ProtoBahamut : public Module
 
  public:
 	ProtoBahamut(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PROTOCOL),
+		ircd_proto(this),
 		message_away(this), message_capab(this), message_error(this), message_join(this),
 		message_kick(this), message_kill(this), message_motd(this), message_part(this),
 		message_ping(this), message_privmsg(this), message_quit(this), message_squit(this),
@@ -572,11 +573,6 @@ class ProtoBahamut : public Module
 		this->AddModes();
 
 		ModuleManager::Attach(I_OnUserNickChange, this);
-	}
-
-	IRCDProto *GetIRCDProto() anope_override
-	{
-		return &ircd_proto;
 	}
 
 	void OnUserNickChange(User *u, const Anope::string &) anope_override

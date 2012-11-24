@@ -16,7 +16,7 @@
 class ngIRCdProto : public IRCDProto
 {
  public:
-	ngIRCdProto() : IRCDProto("ngIRCd")
+	ngIRCdProto(Module *creator) : IRCDProto(creator, "ngIRCd")
 	{
 		DefaultPseudoclientModes = "+oi";
 		CanSVSNick = true;
@@ -658,6 +658,7 @@ class ProtongIRCd : public Module
 
  public:
 	ProtongIRCd(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PROTOCOL),
+		ircd_proto(this),
 		message_capab(this), message_error(this), message_kick(this), message_kill(this), message_motd(this),
 		message_part(this), message_ping(this), message_privmsg(this), message_squery(this, "SQUERY"),
 		message_quit(this), message_squit(this), message_stats(this), message_time(this), message_version(this),
@@ -674,11 +675,6 @@ class ProtongIRCd : public Module
 
 		Implementation i[] = { I_OnUserNickChange };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
-	}
-
-	IRCDProto *GetIRCDProto() anope_override
-	{
-		return &ircd_proto;
 	}
 
 	void OnUserNickChange(User *u, const Anope::string &) anope_override

@@ -59,18 +59,18 @@ class InspIRCd12Proto : public IRCDProto
 			UplinkSocket::Message(Me) << "CHGHOST " << nick << " " << vhost;
 	}
 
-	void SendAddLine(const Anope::string &type, const Anope::string &mask, time_t duration, const Anope::string &addedby, const Anope::string &reason)
+	void SendAddLine(const Anope::string &xtype, const Anope::string &mask, time_t duration, const Anope::string &addedby, const Anope::string &reason)
 	{
-		UplinkSocket::Message(Me) << "ADDLINE " << type << " " << mask << " " << addedby << " " << Anope::CurTime << " " << duration << " :" << reason;
+		UplinkSocket::Message(Me) << "ADDLINE " << xtype << " " << mask << " " << addedby << " " << Anope::CurTime << " " << duration << " :" << reason;
 	}
 
-	void SendDelLine(const Anope::string &type, const Anope::string &mask)
+	void SendDelLine(const Anope::string &xtype, const Anope::string &mask)
 	{
-		UplinkSocket::Message(Me) << "DELLINE " << type << " " << mask;
+		UplinkSocket::Message(Me) << "DELLINE " << xtype << " " << mask;
 	}
 
  public:
-	InspIRCd12Proto() : IRCDProto("InspIRCd 1.2")
+	InspIRCd12Proto(Module *creator) : IRCDProto(creator, "InspIRCd 1.2")
 	{
 		DefaultPseudoclientModes = "+I";
 		CanSVSNick = true;
@@ -1206,6 +1206,7 @@ class ProtoInspIRCd : public Module
 
  public:
 	ProtoInspIRCd(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PROTOCOL),
+		ircd_proto(this),
 		message_away(this), message_error(this), message_join(this), message_kick(this), message_kill(this),
 		message_motd(this), message_part(this), message_ping(this), message_privmsg(this), message_quit(this),
 		message_squit(this), message_stats(this), message_topic(this), message_version(this),
@@ -1231,11 +1232,6 @@ class ProtoInspIRCd : public Module
 
 		for (botinfo_map::iterator it = BotListByNick->begin(), it_end = BotListByNick->end(); it != it_end; ++it)
 			it->second->GenerateUID();
-	}
-
-	IRCDProto *GetIRCDProto() anope_override
-	{
-		return &ircd_proto;
 	}
 
 	void OnUserNickChange(User *u, const Anope::string &) anope_override

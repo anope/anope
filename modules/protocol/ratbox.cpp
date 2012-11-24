@@ -12,12 +12,13 @@
 #include "module.h"
 
 static Anope::string UplinkSID;
-static IRCDProto *hybrid;
+
+static ServiceReference<IRCDProto> hybrid("IRCDProto", "hybrid");
 
 class RatboxProto : public IRCDProto
 {
  public:
-	RatboxProto() : IRCDProto("Ratbox 3.0+")
+	RatboxProto(Module *creator) : IRCDProto(creator, "Ratbox 3.0+")
 	{
 		DefaultPseudoclientModes = "+oiS";
 		CanSNLine = true;
@@ -230,6 +231,7 @@ class ProtoRatbox : public Module
 
  public:
 	ProtoRatbox(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PROTOCOL),
+		ircd_proto(this),
 		message_away(this), message_capab(this), message_error(this), message_kick(this), message_kill(this),
 		message_mode(this), message_motd(this), message_part(this), message_ping(this), message_privmsg(this),
 		message_quit(this), message_squit(this), message_stats(this), message_time(this), message_topic(this),
@@ -249,7 +251,6 @@ class ProtoRatbox : public Module
 		m_hybrid = ModuleManager::FindModule("hybrid");
 		if (!m_hybrid)
 			throw ModuleException("Unable to find hybrid");
-		hybrid = m_hybrid->GetIRCDProto();
 		if (!hybrid)
 			throw ModuleException("No protocol interface for hybrid");
 
@@ -262,11 +263,6 @@ class ProtoRatbox : public Module
 	~ProtoRatbox()
 	{
 		ModuleManager::UnloadModule(m_hybrid, NULL);
-	}
-
-	IRCDProto *GetIRCDProto() anope_override
-	{
-		return &ircd_proto;
 	}
 
 	void OnServerSync(Server *s) anope_override

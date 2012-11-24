@@ -23,7 +23,7 @@
 
 IRCDProto *IRCD = NULL;
 
-IRCDProto::IRCDProto(const Anope::string &p) : proto_name(p)
+IRCDProto::IRCDProto(Module *creator, const Anope::string &p) : Service(creator, "IRCDProto", creator->name), proto_name(p)
 {
 	DefaultPseudoclientModes = "+io";
 	CanSVSNick = CanSetVHost = CanSetVIdent = CanSNLine = CanSQLine = CanSQLineChannel = CanSZLine = CanSVSHold =

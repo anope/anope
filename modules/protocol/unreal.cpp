@@ -16,7 +16,7 @@
 class UnrealIRCdProto : public IRCDProto
 {
  public:
-	UnrealIRCdProto() : IRCDProto("UnrealIRCd 3.2.x")
+	UnrealIRCdProto(Module *creator) : IRCDProto(creator, "UnrealIRCd 3.2.x")
 	{
 		DefaultPseudoclientModes = "+Soiq";
 		CanSVSNick = true;
@@ -1196,6 +1196,7 @@ class ProtoUnreal : public Module
 
  public:
 	ProtoUnreal(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PROTOCOL),
+		ircd_proto(this),
 		message_away(this), message_error(this), message_join(this), message_kick(this), message_kill(this),
 		message_motd(this), message_part(this), message_ping(this), message_privmsg(this), message_quit(this),
 		message_squit(this), message_stats(this), message_time(this), message_version(this),
@@ -1213,11 +1214,6 @@ class ProtoUnreal : public Module
 		Implementation i[] = { I_OnUserNickChange, I_OnChannelCreate, I_OnChanRegistered, I_OnDelChan, I_OnMLock, I_OnUnMLock };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 		ModuleManager::SetPriority(this, PRIORITY_FIRST);
-	}
-
-	IRCDProto *GetIRCDProto() anope_override
-	{
-		return &ircd_proto;
 	}
 
 	void OnUserNickChange(User *u, const Anope::string &) anope_override

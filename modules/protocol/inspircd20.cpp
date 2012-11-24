@@ -20,12 +20,12 @@ static bool has_svstopic_topiclock = false;
 static unsigned int spanningtree_proto_ver = 0;
 static bool has_servicesmod = false;
 
-static IRCDProto *insp12;
+static ServiceReference<IRCDProto> insp12("IRCDProto", "inspircd12");
 
 class InspIRCd20Proto : public IRCDProto
 {
  public:
-	InspIRCd20Proto() : IRCDProto("InspIRCd 2.0")
+	InspIRCd20Proto(Module *creator) : IRCDProto(creator, "InspIRCd 2.0")
 	{
 		DefaultPseudoclientModes = "+I";
 		CanSVSNick = true;
@@ -647,6 +647,7 @@ class ProtoInspIRCd : public Module
 
  public:
 	ProtoInspIRCd(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PROTOCOL),
+		ircd_proto(this),
 		message_away(this), message_error(this), message_join(this), message_kick(this), message_kill(this),
 		message_motd(this), message_part(this), message_ping(this), message_privmsg(this), message_quit(this),
 		message_squit(this), message_stats(this), message_topic(this), message_version(this),
@@ -675,7 +676,6 @@ class ProtoInspIRCd : public Module
 		m_insp12 = ModuleManager::FindModule("inspircd12");
 		if (!m_insp12)
 			throw ModuleException("Unable to find inspircd12");
-		insp12 = m_insp12->GetIRCDProto();
 		if (!insp12)
 			throw ModuleException("No protocol interface for insp12");
 		ModuleManager::DetachAll(m_insp12);
@@ -687,11 +687,6 @@ class ProtoInspIRCd : public Module
 	~ProtoInspIRCd()
 	{
 		ModuleManager::UnloadModule(m_insp12, NULL);
-	}
-
-	IRCDProto *GetIRCDProto() anope_override
-	{
-		return &ircd_proto;
 	}
 
 	void OnUserNickChange(User *u, const Anope::string &) anope_override

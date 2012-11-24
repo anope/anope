@@ -17,7 +17,7 @@ static Anope::string UplinkSID;
 class HybridProto : public IRCDProto
 {
   public:
-	HybridProto() : IRCDProto("Hybrid 8.0.0")
+	HybridProto(Module *creator) : IRCDProto(creator, "Hybrid 8.0.0")
 	{
 		DefaultPseudoclientModes = "+oi";
 		CanSNLine = true;
@@ -601,6 +601,7 @@ class ProtoHybrid : public Module
 
 public:
 	ProtoHybrid(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PROTOCOL),
+		ircd_proto(this),
 		message_away(this), message_capab(this), message_error(this), message_kick(this), message_kill(this),
 		message_mode(this), message_motd(this), message_part(this), message_ping(this), message_privmsg(this),
 		message_quit(this), message_squit(this), message_stats(this), message_time(this), message_topic(this),
@@ -624,11 +625,6 @@ public:
 
 		for (botinfo_map::iterator it = BotListByNick->begin(), it_end = BotListByNick->end(); it != it_end; ++it)
 			it->second->GenerateUID();
-	}
-
-	IRCDProto *GetIRCDProto() anope_override
-	{
-		return &ircd_proto;
 	}
 
 	void OnUserNickChange(User *u, const Anope::string &) anope_override

@@ -256,10 +256,6 @@ class CoreExport Module : public Extensible
 	 */
 	ModuleVersion GetVersion() const;
 
-	/** Gets the IRCd protocol published by this module
-	 */
-	virtual IRCDProto *GetIRCDProto();
-
 	/* Everything below here are events. Modules must ModuleManager::Attach to these events
 	 * before they will be called.
 	 */

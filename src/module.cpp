@@ -85,11 +85,6 @@ void Module::SetAuthor(const Anope::string &nauthor)
 	this->author = nauthor;
 }
 
-IRCDProto *Module::GetIRCDProto()
-{
-	return NULL;
-}
-
 ModuleVersion::ModuleVersion(int maj, int min, int pa) : version_major(maj), version_minor(min), version_patch(pa)
 {
 }

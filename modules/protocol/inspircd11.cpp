@@ -22,7 +22,7 @@ static bool has_hidechansmod = false;
 class InspIRCdProto : public IRCDProto
 {
  public:
-	InspIRCdProto() : IRCDProto("InspIRCd 1.1")
+	InspIRCdProto(Module *creator) : IRCDProto(creator, "InspIRCd 1.1")
 	{
 		DefaultPseudoclientModes = "+I";
 		CanSVSNick = true;
@@ -867,6 +867,7 @@ class ProtoInspIRCd : public Module
 
  public:
 	ProtoInspIRCd(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PROTOCOL),
+		ircd_proto(this),
 		message_away(this), message_error(this), message_join(this), message_kick(this), message_kill(this),
 		message_motd(this), message_part(this), message_ping(this), message_privmsg(this), message_quit(this),
 		message_squit(this), message_stats(this), message_time(this), message_topic(this), message_version(this),
@@ -884,11 +885,6 @@ class ProtoInspIRCd : public Module
 		this->AddModes();
 
 		ModuleManager::Attach(I_OnUserNickChange, this);
-	}
-
-	IRCDProto *GetIRCDProto() anope_override
-	{
-		return &ircd_proto;
 	}
 
 	void OnUserNickChange(User *u, const Anope::string &) anope_override

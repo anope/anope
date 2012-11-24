@@ -12,12 +12,13 @@
 #include "module.h"
 
 static Anope::string UplinkSID;
-static IRCDProto *hybrid;
+
+static ServiceReference<IRCDProto> hybrid("IRCDProto", "hybrid");
 
 class PlexusProto : public IRCDProto
 {
  public:
-	PlexusProto() : IRCDProto("hybrid-7.2.3+plexus-3.0.1")
+	PlexusProto(Module *creator) : IRCDProto(creator, "hybrid-7.2.3+plexus-3.0.1")
 	{
 		DefaultPseudoclientModes = "+oiU";
 		CanSVSNick = true;
@@ -327,6 +328,7 @@ class ProtoPlexus : public Module
 
  public:
 	ProtoPlexus(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PROTOCOL),
+		ircd_proto(this),
 		message_away(this), message_capab(this), message_error(this), message_kick(this), message_kill(this),
 		message_mode(this), message_motd(this), message_part(this), message_ping(this), message_privmsg(this), message_quit(this),
 		message_squit(this), message_stats(this), message_time(this), message_topic(this), message_version(this), message_whois(this),
@@ -346,7 +348,6 @@ class ProtoPlexus : public Module
 		m_hybrid = ModuleManager::FindModule("hybrid");
 		if (!m_hybrid)
 			throw ModuleException("Unable to find hybrid");
-		hybrid = m_hybrid->GetIRCDProto();
 		if (!hybrid)
 			throw ModuleException("No protocol interface for hybrid");
 
@@ -359,11 +360,6 @@ class ProtoPlexus : public Module
 	~ProtoPlexus()
 	{
 		ModuleManager::UnloadModule(m_hybrid, NULL);
-	}
-
-	IRCDProto *GetIRCDProto() anope_override
-	{
-		return &ircd_proto;
 	}
 
 	void OnServerSync(Server *s) anope_override

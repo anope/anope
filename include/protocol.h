@@ -18,12 +18,12 @@
 #include "service.h"
 
 /* Encapsultes the IRCd protocol we are speaking. */
-class CoreExport IRCDProto
+class CoreExport IRCDProto : public Service
 {
 	Anope::string proto_name;
 
  protected:
- 	IRCDProto(const Anope::string &proto_name);
+ 	IRCDProto(Module *creator, const Anope::string &proto_name);
  public:
 	virtual ~IRCDProto();
 

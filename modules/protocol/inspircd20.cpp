@@ -630,7 +630,7 @@ class ProtoInspIRCd : public Module
 	Message::Version message_version;
 
 	/* InspIRCd 1.2 message handlers */
-	ServiceAlias message_endburst, message_fhost, message_sjoin, message_fmode,
+	ServiceAlias message_endburst, message_fhost, message_fjoin, message_fmode,
 				message_ftopic, message_idle, message_metadata, message_mode,
 				message_nick, message_opertype, message_rsquit, message_server,
 				message_time, message_uid;
@@ -654,7 +654,7 @@ class ProtoInspIRCd : public Module
 
 		message_endburst("IRCDMessage", "inspircd20/endburst", "inspircd12/endburst"),
 		message_fhost("IRCDMessage", "inspircd20/fhost", "inspircd12/fhost"),
-		message_sjoin("IRCDMessage", "inspircd20/sjoin", "inspircd12/sjoin"),
+		message_fjoin("IRCDMessage", "inspircd20/fjoin", "inspircd12/fjoin"),
 		message_fmode("IRCDMessage", "inspircd20/mode", "inspircd12/fmode"),
 		message_ftopic("IRCDMessage", "inspircd20/ftopic", "inspircd12/ftopic"),
 		message_idle("IRCDMessage", "inspircd20/idle", "inspircd12/idle"),

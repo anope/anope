@@ -826,6 +826,7 @@ struct IRCDMessageFJoin : IRCDMessage
 			/* Loop through prefixes and find modes for them */
 			for (char c;  (c = buf[0]) != ',';)
 			{
+				buf.erase(buf.begin());
 				ChannelMode *cm = ModeManager::FindChannelModeByChar(c);
 				if (!cm)
 				{
@@ -1190,7 +1191,7 @@ class ProtoInspIRCd : public Module
 	IRCDMessageCapab message_capab;
 	IRCDMessageEndburst message_endburst;
 	IRCDMessageFHost message_fhost, message_sethost;
-	IRCDMessageFJoin message_sjoin;
+	IRCDMessageFJoin message_fjoin;
 	IRCDMessageFMode message_fmode;
 	IRCDMessageFTopic message_ftopic;
 	IRCDMessageIdle message_idle;
@@ -1212,7 +1213,7 @@ class ProtoInspIRCd : public Module
 		message_squit(this), message_stats(this), message_topic(this), message_version(this),
 
 		message_chgident(this), message_setname(this, "SETNAME"), message_chgname(this, "FNAME"), message_capab(this), message_endburst(this),
-		message_fhost(this, "FHOST"), message_sethost(this, "SETHOST"), message_sjoin(this), message_fmode(this), message_ftopic(this),
+		message_fhost(this, "FHOST"), message_sethost(this, "SETHOST"), message_fjoin(this), message_fmode(this), message_ftopic(this),
 		message_idle(this), message_metadata(this), message_mode(this), message_nick(this), message_opertype(this), message_rsquit(this),
 		message_setident(this), message_server(this), message_time(this), message_uid(this)
 	{

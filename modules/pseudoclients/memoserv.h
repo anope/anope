@@ -36,7 +36,7 @@ class MemoServService : public Service
 };
 
 static ServiceReference<MemoServService> MemoServService("MemoServService", "MemoServ");
-static Reference<BotInfo> MemoServ;
+static ServiceReference<BotInfo> MemoServ("BotInfo", "MemoServ");
 
 #endif // MEMOSERV_H
 

@@ -35,7 +35,7 @@ enum BotFlag
 };
 
 /* A service bot (NickServ, ChanServ, a BotServ bot, etc). */
-class CoreExport BotInfo : public User, public Flags<BotFlag>, public Serializable
+class CoreExport BotInfo : public User, public Flags<BotFlag>, public Serializable, public Service
 {
  public:
 	time_t created;

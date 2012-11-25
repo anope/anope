@@ -1,6 +1,6 @@
 #ifndef OPERSERV_H
 #define OPERSERV_H
 
-static Reference<BotInfo> OperServ;
+static ServiceReference<BotInfo> OperServ("BotInfo", "OperServ");
 
 #endif // OPERSERV_H

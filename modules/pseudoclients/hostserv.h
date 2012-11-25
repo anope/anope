@@ -1,6 +1,6 @@
 #ifndef HOSTSERV_H
 #define HOSTSERV_H
 
-static Reference<BotInfo> HostServ;
+static ServiceReference<BotInfo> HostServ("BotInfo", "HostServ");
 
 #endif // HOSTSERV_H

@@ -15,7 +15,7 @@ class GlobalService : public Service
 };
 
 static ServiceReference<GlobalService> GlobalService("GlobalService", "Global");
-static Reference<BotInfo> Global;
+static ServiceReference<BotInfo> Global("BotInfo", "Global");
 
 #endif // GLOBAL_H
 

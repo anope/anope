@@ -23,12 +23,19 @@ class HostServCore : public Module
 		if (!IRCD || !IRCD->CanSetVHost)
 			throw ModuleException("Your IRCd does not support vhosts");
 	
-		HostServ = BotInfo::Find(Config->HostServ);
-		if (!HostServ)
+		BotInfo *bi = BotInfo::Find(Config->HostServ);
+		if (!bi)
 			throw ModuleException("No bot named " + Config->HostServ);
 
 		Implementation i[] = { I_OnNickIdentify, I_OnNickUpdate, I_OnPreHelp };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
+		
+		Service::AddAlias("BotInfo", "HostServ", bi->nick);
+	}
+
+	~HostServCore()
+	{
+		Service::DelAlias("BotInfo", "HostServ");
 	}
 
 	void OnNickIdentify(User *u) anope_override

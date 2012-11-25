@@ -175,8 +175,8 @@ class OperServCore : public Module
 	{
 		this->SetAuthor("Anope");
 
-		OperServ = BotInfo::Find(Config->OperServ);
-		if (!OperServ)
+		BotInfo *bi = BotInfo::Find(Config->OperServ);
+		if (!bi)
 			throw ModuleException("No bot named " + Config->OperServ);
 
 		Implementation i[] = { I_OnBotPrivmsg, I_OnServerQuit, I_OnUserModeSet, I_OnUserModeUnset, I_OnUserConnect, I_OnUserNickChange, I_OnPreHelp };
@@ -186,10 +186,14 @@ class OperServCore : public Module
 		XLineManager::RegisterXLineManager(&sglines);
 		XLineManager::RegisterXLineManager(&sqlines);
 		XLineManager::RegisterXLineManager(&snlines);
+
+		Service::AddAlias("BotInfo", "OperServ", bi->nick);
 	}
 
 	~OperServCore()
 	{
+		Service::DelAlias("BotInfo", "OperServ");
+
 		this->sglines.Clear();
 		this->sqlines.Clear();
 		this->snlines.Clear();

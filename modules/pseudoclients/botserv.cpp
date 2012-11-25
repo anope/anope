@@ -20,14 +20,20 @@ class BotServCore : public Module
 	{
 		this->SetAuthor("Anope");
 
-		BotServ = BotInfo::Find(Config->BotServ);
-		if (!BotServ)
+		BotInfo *bi = BotInfo::Find(Config->BotServ);
+		if (!bi)
 			throw ModuleException("No bot named " + Config->BotServ);
 
 		Implementation i[] = { I_OnPrivmsg, I_OnJoinChannel, I_OnLeaveChannel,
 					I_OnPreHelp, I_OnPostHelp, I_OnChannelModeSet };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 
+		Service::AddAlias("BotInfo", "BotServ", bi->nick);
+	}
+
+	~BotServCore()
+	{
+		Service::DelAlias("BotInfo", "BotServ");
 	}
 
 	void OnPrivmsg(User *u, Channel *c, Anope::string &msg) anope_override

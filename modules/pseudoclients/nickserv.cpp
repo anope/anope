@@ -185,13 +185,20 @@ class NickServCore : public Module
 	{
 		this->SetAuthor("Anope");
 
-		NickServ = BotInfo::Find(Config->NickServ);
-		if (!NickServ)
+		BotInfo *bi = BotInfo::Find(Config->NickServ);
+		if (!bi)
 			throw ModuleException("No bot named " + Config->NickServ);
 
 		Implementation i[] = { I_OnDelNick, I_OnDelCore, I_OnChangeCoreDisplay, I_OnNickIdentify, I_OnNickGroup,
 		I_OnNickUpdate, I_OnUserNickChange, I_OnPreHelp, I_OnPostHelp, I_OnUserConnect };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
+
+		Service::AddAlias("BotInfo", "NickServ", bi->nick);
+	}
+
+	~NickServCore()
+	{
+		Service::DelAlias("BotInfo", "NickServ");
 	}
 
 	void OnDelNick(NickAlias *na) anope_override

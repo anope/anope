@@ -53,12 +53,19 @@ class GlobalCore : public Module
 	{
 		this->SetAuthor("Anope");
 
-		Global = BotInfo::Find(Config->Global);
-		if (!Global)
+		BotInfo *bi = BotInfo::Find(Config->Global);
+		if (!bi)
 			throw ModuleException("No bot named " + Config->Global);
 
 		Implementation i[] = { I_OnRestart, I_OnShutdown, I_OnNewServer, I_OnPreHelp };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
+
+		Service::AddAlias("BotInfo", "Global", bi->nick);
+	}
+
+	~GlobalCore()
+	{
+		Service::DelAlias("BotInfo", "Global");
 	}
 
 	void OnRestart() anope_override

@@ -61,12 +61,19 @@ class ChanServCore : public Module
 	{
 		this->SetAuthor("Anope");
 
-		ChanServ = BotInfo::Find(Config->ChanServ);
-		if (!ChanServ)
+		BotInfo *bi = BotInfo::Find(Config->ChanServ);
+		if (!bi)
 			throw ModuleException("No bot named " + Config->ChanServ);
 
 		Implementation i[] = { I_OnBotPrivmsg, I_OnDelCore, I_OnPreHelp, I_OnPostHelp, I_OnCheckModes };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
+
+		Service::AddAlias("BotInfo", "ChanServ", bi->nick);
+	}
+
+	~ChanServCore()
+	{
+		Service::DelAlias("BotInfo", "ChanServ");
 	}
 
 	EventReturn OnBotPrivmsg(User *u, BotInfo *bi, Anope::string &message) anope_override

@@ -983,7 +983,7 @@ static bool DoServices(ServerConfig *config, const Anope::string &, const Anope:
 		{
 			ChannelMode *cm = ModeManager::ChannelModes[i];
 			if (cm && cm->type == MODE_STATUS)
-				c->RemoveMode(bi, cm, bi->nick);
+				c->RemoveMode(bi, cm, bi->GetUID());
 		}
 		/* Set the new modes */
 		for (unsigned j = 0; j < want_modes.length(); ++j)

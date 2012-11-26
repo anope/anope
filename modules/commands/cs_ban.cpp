@@ -27,7 +27,7 @@ class CommandCSBan : public Command
 	{
 		const Anope::string &chan = params[0];
 		const Anope::string &target = params[1];
-		const Anope::string &reason = params.size() > 2 ? params[2] : "Requested";
+		Anope::string reason = params.size() > 2 ? params[2] : "Requested";
 
 		ChannelInfo *ci = ChannelInfo::Find(params[0]);
 		if (ci == NULL)
@@ -41,6 +41,9 @@ class CommandCSBan : public Command
 		User *u2 = User::Find(target, true);
 
 		AccessGroup u_access = source.AccessFor(ci);
+
+		if (reason.length() > Config->CSReasonMax)
+			reason = reason.substr(0, Config->CSReasonMax);
 
 		if (!c)
 			source.Reply(CHAN_X_NOT_IN_USE, chan.c_str());

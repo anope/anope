@@ -27,7 +27,7 @@ class CommandCSKick : public Command
 	{
 		const Anope::string &chan = params[0];
 		const Anope::string &target = params[1];
-		const Anope::string &reason = params.size() > 2 ? params[2] : "Requested";
+		Anope::string reason = params.size() > 2 ? params[2] : "Requested";
 
 		User *u = source.GetUser();
 		ChannelInfo *ci = ChannelInfo::Find(params[0]);
@@ -44,6 +44,9 @@ class CommandCSKick : public Command
 			source.Reply(CHAN_X_NOT_REGISTERED, chan.c_str());
 			return;
 		}
+
+		if (reason.length() > Config->CSReasonMax)
+			reason = reason.substr(0, Config->CSReasonMax);
 
 		AccessGroup u_access = source.AccessFor(ci);
 

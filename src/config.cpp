@@ -1287,6 +1287,7 @@ ConfigItems::ConfigItems(ServerConfig *conf)
 		{"chanserv", "require", "", new ValueContainerString(&conf->CSRequire), DT_STRING, NoValidation},
 		{"chanserv", "use_server_side_mlock", "yes", new ValueContainerBool(&conf->UseServerSideMLock), DT_BOOLEAN, NoValidation},
 		{"chanserv", "use_server_side_topiclock", "yes", new ValueContainerBool(&conf->UseServerSideTopicLock), DT_BOOLEAN, NoValidation},
+		{"chanserv", "reasonmax", "200",  new ValueContainerUInt(&conf->CSReasonMax), DT_UINTEGER, NoValidation},
 		{"memoserv", "name", "", new ValueContainerString(&conf->MemoServ), DT_STRING, NoValidation},
 		{"memoserv", "maxmemos", "0", new ValueContainerUInt(&conf->MSMaxMemos), DT_UINTEGER, NoValidation},
 		{"memoserv", "senddelay", "0", new ValueContainerTime(&conf->MSSendDelay), DT_TIME, NoValidation},

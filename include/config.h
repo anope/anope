@@ -443,6 +443,8 @@ class CoreExport ServerConfig
 	bool UseServerSideMLock;
 	/* Use server side topic lock */
 	bool UseServerSideTopicLock;
+	/* The max length for reasons (cs_kick, cs_ban, etc) */
+	unsigned CSReasonMax;
 	/* Default botmodes on channels, defaults to ao */
 	Anope::string BotModes;
 	/* How long to wait between connection attempts */

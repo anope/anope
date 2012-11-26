@@ -56,6 +56,9 @@ class CommandCSAKick : public Command
 		NickCore *nc = NULL;
 		const AutoKick *akick;
 
+		if (reason.length() > Config->CSReasonMax)
+			reason = reason.substr(0, Config->CSReasonMax);
+
 		if (!na)
 		{
 			Anope::string nick, user, host;

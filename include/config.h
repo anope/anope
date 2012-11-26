@@ -550,8 +550,8 @@ class CoreExport ServerConfig
 	time_t NSKill;
 	/* Modes set on a user when they identify */
 	Anope::string NSModesOnID;
-	/* Restore nick/channels on ghost */
-	bool NSRestoreOnGhost;
+	/* Restore nick/channels on recover */
+	bool NSRestoreOnRecover;
 	/* Whether or not to use SASL */
 	bool NSSASL;
 

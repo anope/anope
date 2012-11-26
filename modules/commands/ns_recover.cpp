@@ -1,4 +1,3 @@
-
 /* NickServ core functions
  *
  * (C) 2003-2012 Anope Team
@@ -14,46 +13,105 @@
 
 #include "module.h"
 
+struct NSRecoverExtensibleInfo : ExtensibleItem, std::map<Anope::string, ChannelStatus> { };
+
 class NSRecoverRequest : public IdentifyRequest
 {
 	CommandSource source;
 	Command *cmd;
-	Reference<NickAlias> na;
-	Reference<User> u;
+	Anope::string user;
  
  public:
-	NSRecoverRequest(Module *m, CommandSource &src, Command *c, User *user, NickAlias *n, const Anope::string &pass) : IdentifyRequest(m, n->nc->display, pass), source(src), cmd(c), na(n), u(user) { }
+	NSRecoverRequest(Module *o, CommandSource &src, Command *c, const Anope::string &nick, const Anope::string &pass) : IdentifyRequest(o, nick, pass), source(src), cmd(c), user(nick) { }
 
 	void OnSuccess() anope_override
 	{
-		if (!na || !u)
+		User *u = User::Find(user, true);
+		if (!source.GetUser() || !source.service)
 			return;
 
-		u->SendMessage(source.service, FORCENICKCHANGE_NOW);
+		NickAlias *na = NickAlias::Find(user);
+		if (!na)
+			return;
 
-		if (u->Account() == na->nc)
+		Log(LOG_COMMAND, source, cmd) << "for " << na->nick;
+
+		/* Nick is being held by us, release it */
+		if (na->HasFlag(NS_HELD))
 		{
-			IRCD->SendLogout(u);
-			u->RemoveMode(NickServ, UMODE_REGISTERED);
+			na->Release();
+			source.Reply(_("Service's hold on \002%s\002 has been released."), na->nick.c_str());
 		}
+		else if (!u)
+		{
+			source.Reply(_("No one is using your nick, and services are not holding it."));
+		}
+		// If the user being recovered is identified for the account of the nick then the user is the
+		// same person that is executing the command, so kill them off (old GHOST command).
+		else if (u->Account() == na->nc)
+		{
+			if (!source.GetAccount() && na->nc->HasFlag(NI_SECURE))
+			{
+				source.GetUser()->Login(u->Account());
+				Log(LOG_COMMAND, source, cmd) << "and was automatically identified to " << u->Account()->display;
+			}
 
-		u->Collide(na);
+			if (Config->NSRestoreOnRecover)
+			{
+				if (!u->chans.empty())
+				{
+					NSRecoverExtensibleInfo *ei = new NSRecoverExtensibleInfo;
+					for (UChannelList::iterator it = u->chans.begin(), it_end = u->chans.end(); it != it_end; ++it)
+						(*ei)[(*it)->chan->name] = *(*it)->status;
 
-		/* Convert Config->NSReleaseTimeout seconds to string format */
-		Anope::string relstr = Anope::Duration(Config->NSReleaseTimeout);
-		source.Reply(NICK_RECOVERED, Config->UseStrictPrivMsgString.c_str(), Config->NickServ.c_str(), na->nick.c_str(), relstr.c_str());
+					source.GetUser()->Extend("ns_recover_info", ei);
+				}
+			}
+
+			u->SendMessage(NickServ, _("This nickname has been recovered by %s. If you did not do\n"
+							"this then %s may have your password, and you should change it.\n"),
+							source.GetNick().c_str(), source.GetNick().c_str());
+
+			Anope::string buf = source.command.upper() + " command used by " + source.GetNick();
+			u->Kill(source.service->nick, buf);
+
+			source.Reply(_("Ghost with your nick has been killed."));
+
+			if (IRCD->CanSVSNick)
+				IRCD->SendForceNickChange(source.GetUser(), GetAccount(), Anope::CurTime);
+		}
+		/* User is not identified or not identified to the same account as the person using this command */
+		else
+		{
+			if (!source.GetAccount() && na->nc->HasFlag(NI_SECURE))
+			{
+				source.GetUser()->Login(na->nc); // Identify the user using the command if they arent identified
+				Log(LOG_COMMAND, source, cmd) << "and was automatically identified to " << na->nick << " (" << na->nc->display << ")";
+			}
+
+			u->SendMessage(NickServ, _("This nickname has been recovered by %s."), source.GetNick().c_str());
+			u->Collide(na);
+
+			if (IRCD->CanSVSNick)
+			{
+				/* If we can svsnick then release our hold and svsnick the user using the command */
+				na->Release();
+				IRCD->SendForceNickChange(source.GetUser(), GetAccount(), Anope::CurTime);
+			}
+			else
+				source.Reply(_("The user with your nick has been removed. Use this command again\n"
+						"to release services's hold on your nick."));
+		}
 	}
 
 	void OnFail() anope_override
 	{
-		if (!na || !u)
-			return;
-
 		source.Reply(ACCESS_DENIED);
 		if (!GetPassword().empty())
 		{
-			Log(LOG_COMMAND, source, cmd) << "with invalid password for " << na->nick;
-			u->BadPassword();
+			Log(LOG_COMMAND, source, cmd) << "with an invalid password for " << GetAccount();
+			if (source.GetUser())
+				source.GetUser()->BadPassword();
 		}
 	}
 };
@@ -64,84 +122,71 @@ class CommandNSRecover : public Command
 	CommandNSRecover(Module *creator) : Command(creator, "nickserv/recover", 1, 2)
 	{
 		this->SetFlag(CFLAG_ALLOW_UNREGISTERED);
-		this->SetDesc(_("Kill another user who has taken your nick"));
-		this->SetSyntax(_("\037nickname\037 [\037password\037]"));
+		this->SetDesc(_("Regains control of your nick"));
+		this->SetSyntax("\037nickname\037 [\037password\037]");
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-
 		const Anope::string &nick = params[0];
 		const Anope::string &pass = params.size() > 1 ? params[1] : "";
 
-		NickAlias *na;
-		User *u2;
-		if (!(u2 = User::Find(nick, true)))
-			source.Reply(NICK_X_NOT_IN_USE, nick.c_str());
-		else if (u2->server == Me)
-			source.Reply(_("\2%s\2 has already been recovered."), u2->nick.c_str());
-		else if (!(na = NickAlias::Find(u2->nick)))
+		User *user = User::Find(nick, true);
+
+		if (user && source.GetUser() == user)
+		{
+			source.Reply(_("You can't %s yourself!"), source.command.lower().c_str());
+			return;
+		}
+
+		const NickAlias *na = NickAlias::Find(nick);
+
+		if (!na)
+		{
 			source.Reply(NICK_X_NOT_REGISTERED, nick.c_str());
+			return;
+		}
 		else if (na->nc->HasFlag(NI_SUSPENDED))
+		{
 			source.Reply(NICK_X_SUSPENDED, na->nick.c_str());
-		else if (nick.equals_ci(source.GetNick()))
-			source.Reply(_("You can't recover yourself!"));
+			return;
+		}
+
+		bool ok = false;
+		if (source.GetAccount() == na->nc)
+			ok = true;
+		else if (!na->nc->HasFlag(NI_SECURE) && source.GetUser() && na->nc->IsOnAccess(source.GetUser()))
+			ok = true;
+		else if (source.GetUser() && !source.GetUser()->fingerprint.empty() && na->nc->FindCert(source.GetUser()->fingerprint))
+			ok = true;
+
+		if (ok == false && !pass.empty())
+		{
+			NSRecoverRequest *req = new NSRecoverRequest(owner, source, this, na->nick, pass);
+			FOREACH_MOD(I_OnCheckAuthentication, OnCheckAuthentication(source.GetUser(), req));
+			req->Dispatch();
+		}
 		else
 		{
-			bool ok = false;
-			if (source.GetAccount() == na->nc)
-				ok = true;
-			else if (!na->nc->HasFlag(NI_SECURE) && source.GetUser() && na->nc->IsOnAccess(source.GetUser()))
-				ok = true;
-			else if (source.GetUser() && !source.GetUser()->fingerprint.empty() && na->nc->FindCert(source.GetUser()->fingerprint))
-				ok = true;
+			NSRecoverRequest req(owner, source, this, na->nick, pass);
 
-			if (ok == false && !pass.empty())
-			{
-				NSRecoverRequest *req = new NSRecoverRequest(owner, source, this, u2, na, pass);
-				FOREACH_MOD(I_OnCheckAuthentication, OnCheckAuthentication(source.GetUser(), req));
-				req->Dispatch();
-			}
+			if (ok)
+				req.OnSuccess();
 			else
-			{
-				NSRecoverRequest req(owner, source, this, u2, na, pass);
-
-				if (ok)
-					req.OnSuccess();
-				else
-					req.OnFail();
-			}
+				req.OnFail();
 		}
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
 	{
-		/* Convert Config->NSReleaseTimeout seconds to string format */
-		Anope::string relstr = Anope::Duration(Config->NSReleaseTimeout);
-
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Allows you to recover your nickname if someone else has\n"
-				"taken it; this does the same thing that %s does\n"
-				"automatically if someone tries to use a kill-protected\n"
-				"nick.\n"
-				" \n"
-				"When you give this command, %s will bring a fake\n"
-				"user online with the same nickname as the user you're\n"
-				"trying to recover your nick from.  This causes the IRC\n"
-				"servers to disconnect the other user.  This fake user will\n"
-				"remain online for %s to ensure that the other\n"
-				"user does not immediately reconnect; after that time, you\n"
-				"can reclaim your nick.  Alternatively, use the \002RELEASE\002\n"
-				"command (\002%s%s HELP RELEASE\002) to get the nick\n"
-				"back sooner.\n"
-				" \n"
-				"In order to use the \002RECOVER\002 command for a nick, your\n"
-				"current address as shown in /WHOIS must be on that nick's\n"
-				"access list, you must be identified and in the group of\n"
-				"that nick, or you must supply the correct password for\n"
-				"the nickname."), Config->NickServ.c_str(), Config->NickServ.c_str(), relstr.c_str(), Config->UseStrictPrivMsgString.c_str(), Config->NickServ.c_str());
-
+		source.Reply(_("Recovers your nick from another user or from services.\n"
+				"If services are currently holding your nick, the hold\n"
+				"will be released. If another user is holding your nick\n"
+				"and is identified they will be killed (similar to the old\n"
+				"GHOST command). If they are not identified they will be\n"
+				"forced off of the nick."));
 		return true;
 	}
 };
@@ -158,6 +203,73 @@ class NSRecover : public Module
 
 		if (Config->NoNicknameOwnership)
 			throw ModuleException(modname + " can not be used with options:nonicknameownership enabled");
+
+		Implementation i[] = { I_OnUserNickChange, I_OnJoinChannel, I_OnShutdown, I_OnRestart };
+		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
+	}
+
+	~NSRecover()
+	{
+		for (user_map::const_iterator it = UserListByNick.begin(); it != UserListByNick.end(); ++it)
+			it->second->Shrink("ns_recover_info");
+
+		OnShutdown();
+	}
+
+	void OnShutdown() anope_override
+	{
+		/* On shutdown, restart, or mod unload, remove all of our holds for nicks (svshold or qlines)
+		 * because some IRCds do not allow us to have these automatically expire
+		 */
+		for (nickalias_map::const_iterator it = NickAliasList->begin(); it != NickAliasList->end(); ++it)
+			it->second->Release();
+	}
+
+	void OnRestart() anope_override { OnShutdown(); }
+
+	void OnUserNickChange(User *u, const Anope::string &oldnick) anope_override
+	{
+		if (Config->NSRestoreOnRecover)
+		{
+			NSRecoverExtensibleInfo *ei = u->GetExt<NSRecoverExtensibleInfo *>("ns_recover_info");
+
+			if (ei != NULL)
+				for (std::map<Anope::string, ChannelStatus>::iterator it = ei->begin(), it_end = ei->end(); it != it_end;)
+				{
+					Channel *c = Channel::Find(it->first);
+					const Anope::string &cname = it->first;
+					++it;
+
+					/* User might already be on the channel */
+					if (u->FindChannel(c))
+						this->OnJoinChannel(u, c);
+					else
+						IRCD->SendSVSJoin(NickServ, u->GetUID(), cname, "");
+				}
+		}
+	}
+
+	void OnJoinChannel(User *u, Channel *c) anope_override
+	{
+		if (Config->NSRestoreOnRecover)
+		{
+			NSRecoverExtensibleInfo *ei = u->GetExt<NSRecoverExtensibleInfo *>("ns_recover_info");
+
+			if (ei != NULL)
+			{
+				std::map<Anope::string, ChannelStatus>::iterator it = ei->find(c->name);
+				if (it != ei->end())
+				{
+					for (size_t j = CMODE_BEGIN + 1; j < CMODE_END; ++j)
+						if (it->second.HasFlag(static_cast<ChannelModeName>(j)))
+							c->SetMode(c->ci->WhoSends(), ModeManager::FindChannelModeByName(static_cast<ChannelModeName>(j)), u->GetUID());
+
+					ei->erase(it);
+					if (ei->empty())
+						u->Shrink("ns_recover_info");
+				}
+			}
+		}
 	}
 };
 

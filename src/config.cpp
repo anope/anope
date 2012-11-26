@@ -1244,7 +1244,7 @@ ConfigItems::ConfigItems(ServerConfig *conf)
 		{"nickserv", "killquick", "20", new ValueContainerTime(&conf->NSKillQuick), DT_TIME, NoValidation},
 		{"nickserv", "kill", "60", new ValueContainerTime(&conf->NSKill), DT_TIME, NoValidation},
 		{"nickserv", "modesonid", "", new ValueContainerString(&conf->NSModesOnID), DT_STRING, NoValidation},
-		{"nickserv", "restoreonghost", "yes", new ValueContainerBool(&conf->NSRestoreOnGhost), DT_BOOLEAN, NoValidation},
+		{"nickserv", "restoreonrecover", "yes", new ValueContainerBool(&conf->NSRestoreOnRecover), DT_BOOLEAN, NoValidation},
 		{"nickserv", "sasl", "yes", new ValueContainerBool(&conf->NSSASL), DT_BOOLEAN, NoValidation},
 		{"mail", "usemail", "no", new ValueContainerBool(&conf->UseMail), DT_BOOLEAN, ValidateEmailReg},
 		{"mail", "sendmailpath", "", new ValueContainerString(&conf->SendMailPath), DT_STRING, ValidateMail},

@@ -74,6 +74,7 @@ class InspIRCd12Proto : public IRCDProto
 	{
 		DefaultPseudoclientModes = "+I";
 		CanSVSNick = true;
+		CanSVSJoin = true;
 		CanSetVHost = true;
 		CanSetVIdent = true;
 		CanSQLine = true;
@@ -309,10 +310,17 @@ class InspIRCd12Proto : public IRCDProto
 		SendAddLine("Z", x->GetHost(), timeleft, x->by, x->GetReason());
 	}
 
-	void SendSVSJoin(const BotInfo *source, const Anope::string &nick, const Anope::string &chan, const Anope::string &) anope_override
+	void SendSVSJoin(const BotInfo *source, const User *u, const Anope::string &chan, const Anope::string &) anope_override
 	{
-		User *u = User::Find(nick);
 		UplinkSocket::Message(source) << "SVSJOIN " << u->GetUID() << " " << chan;
+	}
+
+	void SendSVSPart(const BotInfo *source, const User *u, const Anope::string &chan, const Anope::string &param) anope_override
+	{
+		if (!param.empty())
+			UplinkSocket::Message(source) << "SVSPART " << u->GetUID() << " " << chan << " :" << param;
+		else
+			UplinkSocket::Message(source) << "SVSPART " << u->GetUID() << " " << chan;
 	}
 
 	void SendSWhois(const BotInfo *, const Anope::string &who, const Anope::string &mask) anope_override

@@ -43,8 +43,10 @@ class CoreExport IRCDProto : public Service
 	const Anope::string &GetProtocolName();
 	/* Modes used by default by our clients */
 	Anope::string DefaultPseudoclientModes;
-	/* Can we force change a users's nick */
+	/* Can we force change a users's nick? */
 	bool CanSVSNick;
+	/* Can we force join or part users? */
+	bool CanSVSJoin;
 	/* Can we set vhosts/vidents on users? */
 	bool CanSetVHost, CanSetVIdent;
 	/* Can we ban specific gecos from being used? */
@@ -151,11 +153,19 @@ class CoreExport IRCDProto : public Service
 
 	/** Force joins a user that isn't ours to a channel.
 	 * @param bi The source of the message
-	 * @param nick The user to join
+	 * @param u The user to join
 	 * @param chan The channel to join the user to
 	 * @param param Channel key?
 	 */
-	virtual void SendSVSJoin(const BotInfo *bi, const Anope::string &nick, const Anope::string &chan, const Anope::string &param) { }
+	virtual void SendSVSJoin(const BotInfo *bi, const User *u, const Anope::string &chan, const Anope::string &param) { }
+
+	/** Force parts a user that isn't ours from a channel.
+	 * @param bi The source of the message
+	 * @param u The user to part
+	 * @param chan The channel to part the user from
+	 * @param param part reason, some IRCds don't support this
+	 */
+	virtual void SendSVSPart(const BotInfo *bi, const User *u, const Anope::string &chan, const Anope::string &param) { }
 
 	virtual void SendInvite(const BotInfo *bi, const Channel *c, const User *u);
 	virtual void SendGlobops(const BotInfo *source, const char *fmt, ...);

@@ -20,6 +20,7 @@ class UnrealIRCdProto : public IRCDProto
 	{
 		DefaultPseudoclientModes = "+Soiq";
 		CanSVSNick = true;
+		CanSVSJoin = true;
 		CanSetVHost = true;
 		CanSetVIdent = true;
 		CanSNLine = true;
@@ -202,12 +203,6 @@ class UnrealIRCdProto : public IRCDProto
 		UplinkSocket::Message(source) << "SVSO " << nick << " " << flag;
 	}
 
-	/* NICK <newnick>  */
-	void SendChangeBotNick(const BotInfo *oldnick, const Anope::string &newnick) anope_override
-	{
-		UplinkSocket::Message(oldnick) << "NICK " << newnick << " " << Anope::CurTime;
-	}
-
 	/* Functions that use serval cmd functions */
 
 	void SendVhost(User *u, const Anope::string &vIdent, const Anope::string &vhost) anope_override
@@ -300,12 +295,20 @@ class UnrealIRCdProto : public IRCDProto
 	/* In older Unreal SVSJOIN and SVSNLINE tokens were mixed so SVSJOIN and SVSNLINE are broken
 	   when coming from a none TOKEN'd server
 	*/
-	void SendSVSJoin(const BotInfo *source, const Anope::string &nick, const Anope::string &chan, const Anope::string &param) anope_override
+	void SendSVSJoin(const BotInfo *source, const User *user, const Anope::string &chan, const Anope::string &param) anope_override
 	{
 		if (!param.empty())
-			UplinkSocket::Message(source) << "SVSJOIN " << nick << " " << chan << " :" << param;
+			UplinkSocket::Message(source) << "SVSJOIN " << user->GetUID() << " " << chan << " :" << param;
 		else
-			UplinkSocket::Message(source) << "SVSJOIN " << nick << " :" << chan;
+			UplinkSocket::Message(source) << "SVSJOIN " << user->GetUID() << " " << chan;
+	}
+
+	void SendSVSPart(const BotInfo *source, const User *user, const Anope::string &chan, const Anope::string &param) anope_override
+	{
+		if (!param.empty())
+			UplinkSocket::Message(source) << "SVSPART " << user->GetUID() << " " << chan << " :" << param;
+		else
+			UplinkSocket::Message(source) << "SVSPART " << user->GetUID() << " " << chan;
 	}
 
 	void SendSWhois(const BotInfo *source, const Anope::string &who, const Anope::string &mask) anope_override

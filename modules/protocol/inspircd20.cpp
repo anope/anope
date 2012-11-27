@@ -29,6 +29,7 @@ class InspIRCd20Proto : public IRCDProto
 	{
 		DefaultPseudoclientModes = "+I";
 		CanSVSNick = true;
+		CanSVSJoin = true;
 		CanSetVHost = true;
 		CanSetVIdent = true;
 		CanSQLine = true;
@@ -66,7 +67,8 @@ class InspIRCd20Proto : public IRCDProto
 	void SendSVSHoldDel(const Anope::string &nick) anope_override { insp12->SendSVSHoldDel(nick); }
 	void SendSZLineDel(const XLine *x) anope_override { insp12->SendSZLineDel(x); }
 	void SendSZLine(User *u, const XLine *x) anope_override { insp12->SendSZLine(u, x); }
-	void SendSVSJoin(const BotInfo *source, const Anope::string &nick, const Anope::string &chan, const Anope::string &other) anope_override { insp12->SendSVSJoin(source, nick, chan, other); }
+	void SendSVSJoin(const BotInfo *source, const User *u, const Anope::string &chan, const Anope::string &other) anope_override { insp12->SendSVSJoin(source, u, chan, other); }
+	void SendSVSPart(const BotInfo *source, const User *u, const Anope::string &chan, const Anope::string &param) anope_override { insp12->SendSVSPart(source, u, chan, param); }
 	void SendSWhois(const BotInfo *bi, const Anope::string &who, const Anope::string &mask) anope_override { insp12->SendSWhois(bi, who, mask); }
 	void SendBOB() anope_override { insp12->SendBOB(); }
 	void SendEOB() anope_override { insp12->SendEOB(); }

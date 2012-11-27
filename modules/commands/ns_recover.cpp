@@ -243,8 +243,8 @@ class NSRecover : public Module
 					/* User might already be on the channel */
 					if (u->FindChannel(c))
 						this->OnJoinChannel(u, c);
-					else
-						IRCD->SendSVSJoin(NickServ, u->GetUID(), cname, "");
+					else if (IRCD->CanSVSJoin)
+						IRCD->SendSVSJoin(NickServ, u, cname, "");
 				}
 		}
 	}

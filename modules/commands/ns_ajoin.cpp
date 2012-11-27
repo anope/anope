@@ -233,6 +233,9 @@ class NSAJoin : public Module
 	{
 		this->SetAuthor("Anope");
 
+		if (!IRCD->CanSVSJoin)
+			throw ModuleException("Your IRCd does not support SVSJOIN");
+
 		Implementation i[] = { I_OnNickIdentify };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 	}
@@ -317,7 +320,7 @@ class NSAJoin : public Module
 				IRCD->SendInvite(NickServ, c, u);
 			}
 
-			IRCD->SendSVSJoin(NickServ, u->nick, entry->channel, key);
+			IRCD->SendSVSJoin(NickServ, u, entry->channel, key);
 		}
 	}
 };

@@ -535,11 +535,12 @@ bool Manager::TCPSocket::Client::ProcessRead()
 
 	length += i;
 
-	short want_len = packet_buffer[0] << 8 | packet_buffer[1];
-	if (length >= want_len - 2)
+	unsigned short want_len = packet_buffer[0] << 8 | packet_buffer[1];
+	if (length >= want_len + 2)
 	{
-		SocketEngine::Change(this, false, SF_READABLE);
-		return DNS::Engine->HandlePacket(this, packet_buffer + 2, length - 2, NULL);
+		int len = length - 2;
+		length -= want_len + 2;
+		return DNS::Engine->HandlePacket(this, packet_buffer + 2, len, NULL);
 	}
 	return true;
 }

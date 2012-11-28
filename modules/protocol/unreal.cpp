@@ -345,7 +345,7 @@ class UnrealIRCdProto : public IRCDProto
 		if (Servers::Capab.count("ESVID") > 0)
 			IRCD->SendMode(NickServ, u, "+d %s", u->Account()->display.c_str());
 		else
-			IRCD->SendMode(NickServ, u, "+d %d", u->timestamp);
+			IRCD->SendMode(NickServ, u, "+d %d", u->signon);
 	}
 
 	void SendLogout(User *u) anope_override
@@ -809,7 +809,7 @@ struct IRCDMessageNick : IRCDMessage
 				;
 			else if (params[6].is_pos_number_only())
 			{
-				if (convertTo<time_t>(params[6]) == user->timestamp)
+				if (convertTo<time_t>(params[6]) == user->signon)
 					na = NickAlias::Find(user->nick);
 			}
 			else

@@ -295,7 +295,7 @@ class BahamutIRCdProto : public IRCDProto
 
 	void SendLogin(User *u) anope_override
 	{
-		IRCD->SendMode(NickServ, u, "+d %d", u->timestamp);
+		IRCD->SendMode(NickServ, u, "+d %d", u->signon);
 	}
 
 	void SendLogout(User *u) anope_override
@@ -388,7 +388,7 @@ struct IRCDMessageNick : IRCDMessage
 			if (user && NickServService)
 			{
 				const NickAlias *na;
-				if (user->timestamp == convertTo<time_t>(params[7]) && (na = NickAlias::Find(user->nick)))
+				if (user->signon == convertTo<time_t>(params[7]) && (na = NickAlias::Find(user->nick)))
 				{
 					NickCore *nc = na->nc;
 					user->Login(nc);

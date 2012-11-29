@@ -107,7 +107,7 @@ class HTTPPage : public Base
 	virtual bool OnRequest(HTTPProvider *, const Anope::string &, HTTPClient *, HTTPMessage &, HTTPReply &) = 0;
 };
 
-class HTTPClient : public ClientSocket, public BufferedSocket, public BinarySocket, public Base
+class HTTPClient : public ClientSocket, public BinarySocket, public Base
 {
  protected:
 	void WriteClient(const Anope::string &message)
@@ -116,26 +116,11 @@ class HTTPClient : public ClientSocket, public BufferedSocket, public BinarySock
 	}
 
  public:
-	HTTPClient(ListenSocket *l, int f, const sockaddrs &a) : ClientSocket(l, a), BufferedSocket(), BinarySocket() { }
+	HTTPClient(ListenSocket *l, int f, const sockaddrs &a) : ClientSocket(l, a), BinarySocket() { }
 
 	virtual const Anope::string GetIP()
 	{
 		return this->clientaddr.addr();
-	}
-
-	bool ProcessRead() anope_override
-	{
-		return BufferedSocket::ProcessRead();
-	}
-
-	bool ProcessWrite() anope_override
-	{
-		return !BinarySocket::ProcessWrite() || BinarySocket::write_buffer.empty() ? false : true;
-	}
-
-	void Write(const char *buffer, size_t l) anope_override
-	{
-		BinarySocket::Write(buffer, l);
 	}
 
 	virtual void SendError(HTTPError err, const Anope::string &msg) = 0;

@@ -48,9 +48,10 @@ namespace Anope
 		string(char chr) : _string() { _string = chr; }
 		string(size_type n, char chr) : _string(n, chr) { }
 		string(const char *_str) : _string(_str) { }
+		string(const char *_str, size_type n) : _string(_str, n) { }
 		string(const std::string &_str) : _string(_str) { }
 		string(const ci::string &_str) : _string(_str.c_str()) { }
-		string(const string &_str, size_type pos = 0, size_type n = npos) : _string(_str._string, pos, n) { }
+		string(const string &_str, size_type pos, size_type n = npos) : _string(_str._string, pos, n) { }
 		template <class InputIterator> string(InputIterator first, InputIterator last) : _string(first, last) { }
 
 		/**
@@ -152,12 +153,13 @@ namespace Anope
 		/**
 		 * Trim leading and trailing white spaces from the string.
 		 */
-		inline void trim()
+		inline string& trim()
 		{
 			while (!this->_string.empty() && isspace(this->_string[0]))
 				this->_string.erase(this->_string.begin());
 			while (!this->_string.empty() && isspace(this->_string[this->_string.length() - 1]))
 				this->_string.erase(this->_string.length() - 1);
+			return *this;
 		}
 
 		/**

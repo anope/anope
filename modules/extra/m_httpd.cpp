@@ -45,6 +45,9 @@ class MyHTTPClient : public HTTPClient
 	Reference<HTTPPage> page;
 	Anope::string ip;
 
+	unsigned content_length;
+	Anope::string post_data;
+
 	enum
 	{
 		ACTION_NONE,
@@ -91,7 +94,7 @@ class MyHTTPClient : public HTTPClient
  public:
 	time_t created;
 
-	MyHTTPClient(HTTPProvider *l, int f, const sockaddrs &a) : Socket(f, l->IsIPv6()), HTTPClient(l, f, a), provider(l), header_done(false), served(false), ip(a.addr()), action(ACTION_NONE), created(Anope::CurTime)
+	MyHTTPClient(HTTPProvider *l, int f, const sockaddrs &a) : Socket(f, l->IsIPv6()), HTTPClient(l, f, a), provider(l), header_done(false), served(false), ip(a.addr()), content_length(0), action(ACTION_NONE), created(Anope::CurTime)
 	{
 		Log(LOG_DEBUG, "httpd") << "Accepted connection " << f << " from " << a.addr();
 	}
@@ -106,119 +109,116 @@ class MyHTTPClient : public HTTPClient
 		return this->ip;
 	}
 
-	bool Read(const Anope::string &buf) anope_override
+	bool Read(const char *buffer, size_t l) anope_override
 	{
-		Log(LOG_DEBUG_2) << "HTTP from " << this->clientaddr.addr() << ": " << buf;
+		Anope::string buf(buffer, l);
 
 		if (!this->header_done)
 		{
-			if (this->action == ACTION_NONE)
+			Anope::string token;
+			sepstream sep(buf, '\n');
+			while (sep.GetToken(token) && !token.trim().empty())
+				this->Read(token);
+			this->header_done = true;
+			buf = sep.GetRemaining();
+		}
+
+		this->post_data += buf;
+
+		if (this->post_data.length() >= this->content_length)
+		{
+			sepstream sep(this->post_data, '&');
+			Anope::string token;
+
+			while (sep.GetToken(token))
 			{
-				std::vector<Anope::string> params;
-				spacesepstream(buf).GetTokens(params);
-
-				if (params.empty() || (params[0] != "GET" && params[0] != "POST"))
-				{
-					this->SendError(HTTP_BAD_REQUEST, "Unknown operation");
-					return true;
-				}
-
-				if (params.size() != 3)
-				{
-					this->SendError(HTTP_BAD_REQUEST, "Invalid parameters");
-					return true;
-				}
-
-				if (params[0] == "GET")
-					this->action = ACTION_GET;
-				else if (params[0] == "POST")
-					this->action = ACTION_POST;
-
-				Anope::string targ = params[1];
-				size_t q = targ.find('?');
-				if (q != Anope::string::npos)
-				{
-					sepstream sep(targ.substr(q + 1), '&');
-					targ = targ.substr(0, q);
-
-					Anope::string token;
-					while (sep.GetToken(token))
-					{
-						size_t sz = token.find('=');
-						if (sz == Anope::string::npos || !sz || sz + 1 >= token.length())
-							continue;
-						this->header.get_data[token.substr(0, sz)] = HTTPUtils::URLDecode(token.substr(sz + 1));
-					}
-				}
-
-				this->page = this->provider->FindPage(targ);
-				this->page_name = targ;
+				size_t sz = token.find('=');
+				if (sz == Anope::string::npos || !sz || sz + 1 >= token.length())
+					continue;
+				this->header.post_data[token.substr(0, sz)] = HTTPUtils::URLDecode(token.substr(sz + 1));
 			}
-			else if (buf.find("Cookie: ") == 0)
-			{
-				spacesepstream sep(buf.substr(8));
-				Anope::string token;
 
+			this->Serve();
+		}
+		
+		return true;
+	}
+
+	bool Read(const Anope::string &buf)
+	{
+		Log(LOG_DEBUG_2) << "HTTP from " << this->clientaddr.addr() << ": " << buf;
+
+		if (this->action == ACTION_NONE)
+		{
+			std::vector<Anope::string> params;
+			spacesepstream(buf).GetTokens(params);
+
+			if (params.empty() || (params[0] != "GET" && params[0] != "POST"))
+			{
+				this->SendError(HTTP_BAD_REQUEST, "Unknown operation");
+				return true;
+			}
+
+			if (params.size() != 3)
+			{
+				this->SendError(HTTP_BAD_REQUEST, "Invalid parameters");
+				return true;
+			}
+
+			if (params[0] == "GET")
+				this->action = ACTION_GET;
+			else if (params[0] == "POST")
+				this->action = ACTION_POST;
+
+			Anope::string targ = params[1];
+			size_t q = targ.find('?');
+			if (q != Anope::string::npos)
+			{
+				sepstream sep(targ.substr(q + 1), '&');
+				targ = targ.substr(0, q);
+
+				Anope::string token;
 				while (sep.GetToken(token))
 				{
 					size_t sz = token.find('=');
 					if (sz == Anope::string::npos || !sz || sz + 1 >= token.length())
 						continue;
-					size_t end = token.length() - (sz + 1);
-					if (!sep.StreamEnd())
-						--end; // Remove trailing ;
-					this->header.cookies[token.substr(0, sz)] = token.substr(sz + 1, end);
+					this->header.get_data[token.substr(0, sz)] = HTTPUtils::URLDecode(token.substr(sz + 1));
 				}
 			}
-			else if (buf.find(':') != Anope::string::npos)
+
+			this->page = this->provider->FindPage(targ);
+			this->page_name = targ;
+		}
+		else if (buf.find("Cookie: ") == 0)
+		{
+			spacesepstream sep(buf.substr(8));
+			Anope::string token;
+
+			while (sep.GetToken(token))
 			{
-				size_t sz = buf.find(':');
-				if (sz + 2 < buf.length())
-					this->header.headers[buf.substr(0, sz)] = buf.substr(sz + 2);
-			}
-			else if (buf.empty())
-			{
-				this->header_done = true;
-
-				if (this->action == ACTION_POST)
-				{
-					unsigned content_length = 0;
-					if (this->header.headers.count("Content-Length"))
-						try
-						{
-							content_length = convertTo<unsigned>(this->header.headers["Content-Length"]);
-						}
-						catch (const ConvertException &) { }
-
-					if (this->extra_buf.length() == content_length)
-					{
-						Log(LOG_DEBUG_2) << "HTTP POST from " << this->clientaddr.addr() << ": " << this->extra_buf;
-					
-						sepstream sep(this->extra_buf, '&');
-						Anope::string token;
-
-						while (sep.GetToken(token))
-						{
-							size_t sz = token.find('=');
-							if (sz == Anope::string::npos || !sz || sz + 1 >= token.length())
-								continue;
-							this->header.post_data[token.substr(0, sz)] = HTTPUtils::URLDecode(token.substr(sz + 1));
-						}
-
-						this->header.content = this->extra_buf;
-						this->Serve();
-					}
-				}
-				else
-					this->Serve();
+				size_t sz = token.find('=');
+				if (sz == Anope::string::npos || !sz || sz + 1 >= token.length())
+					continue;
+				size_t end = token.length() - (sz + 1);
+				if (!sep.StreamEnd())
+					--end; // Remove trailing ;
+				this->header.cookies[token.substr(0, sz)] = token.substr(sz + 1, end);
 			}
 		}
-		else if (this->action == ACTION_POST)
+		else if (buf.find("Content-Length: ") == 0)
 		{
-			if (buf.empty())
-				this->Serve();
-			else
-				this->header.content += buf;
+			try
+			{
+				this->content_length = convertTo<unsigned>(buf.substr(16));
+			}
+			catch (const ConvertException &ex) { }
+		}
+		else if (buf.find(':') != Anope::string::npos)
+		{
+			size_t sz = buf.find(':');
+			if (sz + 2 < buf.length())
+				this->header.headers[buf.substr(0, sz)] = buf.substr(sz + 2);
 		}
 
 		return true;

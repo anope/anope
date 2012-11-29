@@ -20,6 +20,7 @@ class XMLRPCServiceInterface;
 class XMLRPCEvent
 {
  public:
+ 	virtual ~XMLRPCEvent() { }
 	virtual bool Run(XMLRPCServiceInterface *iface, HTTPClient *client, XMLRPCRequest &request) = 0;
 };
 

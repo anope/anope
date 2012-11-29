@@ -130,6 +130,8 @@ enum SocketFlag
 class CoreExport SocketIO
 {
  public:
+	virtual ~SocketIO() { }
+
 	/** Receive something from the buffer
  	 * @param s The socket
 	 * @param buf The buf to read to

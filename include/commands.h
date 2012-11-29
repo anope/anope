@@ -38,6 +38,7 @@ struct CommandInfo
  */
 struct CommandReply
 {
+	virtual ~CommandReply() { }
 	virtual void SendMessage(const BotInfo *source, const Anope::string &msg) = 0;
 };
 

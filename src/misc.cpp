@@ -450,6 +450,30 @@ bool Anope::Match(const Anope::string &str, const Anope::string &mask, bool case
 	return m == mask_len;
 }
 
+void Anope::Encrypt(const Anope::string &src, Anope::string &dest)
+{
+	EventReturn MOD_RESULT;
+	FOREACH_RESULT(I_OnEncrypt, OnEncrypt(src, dest));
+}
+
+bool Anope::Decrypt(const Anope::string &src, Anope::string &dest)
+{
+	size_t pos = src.find(':');
+	if (pos == Anope::string::npos)
+	{
+		Log() << "Error: Anope::Decrypt() called with invalid password string (" << src << ")";
+		return false;
+	}
+	Anope::string hashm(src.begin(), src.begin() + pos);
+
+	EventReturn MOD_RESULT;
+	FOREACH_RESULT(I_OnDecrypt, OnDecrypt(hashm, src, dest));
+	if (MOD_RESULT == EVENT_ALLOW)
+		return true;
+
+	return false;
+}
+
 Anope::string Anope::printf(const char *fmt, ...)
 {
 	va_list args;

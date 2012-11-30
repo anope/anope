@@ -326,7 +326,7 @@ void Privmsg::Run(MessageSource &source, const std::vector<Anope::string> &param
 				else if (message.substr(0, 9).equals_ci("\1VERSION\1"))
 				{
 					Module *enc = ModuleManager::FindFirstOf(ENCRYPTION);
-					IRCD->SendCTCP(bi, u->nick, "VERSION Anope-%s %s :%s - (%s) -- %s", Anope::Version().c_str(), Config->ServerName.c_str(), IRCD->GetProtocolName().c_str(), enc ? enc->name.c_str() : "unknown", Anope::VersionBuildString().c_str());
+					IRCD->SendCTCP(bi, u->nick, "VERSION Anope-%s %s :%s - (%s) -- %s", Anope::Version().c_str(), Config->ServerName.c_str(), IRCD->GetProtocolName().c_str(), enc ? enc->name.c_str() : "(none)", Anope::VersionBuildString().c_str());
 				}
 				return;
 			}
@@ -448,7 +448,7 @@ void Topic::Run(MessageSource &source, const std::vector<Anope::string> &params)
 void Version::Run(MessageSource &source, const std::vector<Anope::string> &params)
 {
 	Module *enc = ModuleManager::FindFirstOf(ENCRYPTION);
-	IRCD->SendNumeric(351, source.GetSource(), "Anope-%s %s :%s -(%s) -- %s", Anope::Version().c_str(), Config->ServerName.c_str(), IRCD->GetProtocolName().c_str(), enc ? enc->name.c_str() : "unknown", Anope::VersionBuildString().c_str());
+	IRCD->SendNumeric(351, source.GetSource(), "Anope-%s %s :%s -(%s) -- %s", Anope::Version().c_str(), Config->ServerName.c_str(), IRCD->GetProtocolName().c_str(), enc ? enc->name.c_str() : "(none)", Anope::VersionBuildString().c_str());
 	return;
 }
 

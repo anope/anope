@@ -279,7 +279,7 @@ class InspIRCd12Proto : public IRCDProto
 		SendServer(Me);
 		UplinkSocket::Message(Me) << "BURST";
 		Module *enc = ModuleManager::FindFirstOf(ENCRYPTION);
-		UplinkSocket::Message(Me) << "VERSION :Anope-" << Anope::Version() << " " << Config->ServerName << " :" << IRCD->GetProtocolName() << " - (" << (enc ? enc->name : "unknown") << ") -- " << Anope::VersionBuildString();
+		UplinkSocket::Message(Me) << "VERSION :Anope-" << Anope::Version() << " " << Config->ServerName << " :" << IRCD->GetProtocolName() << " - (" << (enc ? enc->name : "none") << ") -- " << Anope::VersionBuildString();
 	}
 
 	/* SVSHOLD - set */

@@ -1,9 +1,4 @@
 /* This module generates and compares password hashes using SHA256 algorithms.
- * To help reduce the risk of dictionary attacks, the code appends random bytes
- * (so-called "salt") to the original plain text before generating hashes and
- * stores this salt appended to the result. To verify another plain text value
- * against the given hash, this module will retrieve the salt value from the
- * password string and use it when computing a new hash of the plain text.
  *
  * If an intruder gets access to your system or uses a brute force attack,
  * salt will not provide much value.
@@ -53,20 +48,10 @@
  */
 
 #include "module.h"
+#include "encryption.h"
 
 static const unsigned SHA256_DIGEST_SIZE = 256 / 8;
 static const unsigned SHA256_BLOCK_SIZE = 512 / 8;
-
-/** An sha256 context
- */
-class SHA256Context
-{
- public:
-	unsigned tot_len;
-	unsigned len;
-	unsigned char block[2 * SHA256_BLOCK_SIZE];
-	uint32_t h[8];
-};
 
 inline static uint32_t SHFR(uint32_t x, uint32_t n) { return x >> n; }
 inline static uint32_t ROTR(uint32_t x, uint32_t n) { return (x >> n) | (x << ((sizeof(x) << 3) - n)); }
@@ -99,7 +84,13 @@ inline static void SHA256_SCR(uint32_t w[64], int i)
 	w[i] = SHA256_F4(w[i - 2]) + w[i - 7] + SHA256_F3(w[i - 15]) + w[i - 16];
 }
 
-uint32_t sha256_k[64] =
+static const uint32_t sha256_h0[8] =
+{
+	0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a,
+	0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19
+};
+
+static const uint32_t sha256_k[64] =
 {
 	0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5,
 	0x3956c25b, 0x59f111f1, 0x923f82a4, 0xab1c5ed5,
@@ -119,8 +110,137 @@ uint32_t sha256_k[64] =
 	0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f2
 };
 
+/** An sha256 context
+ */
+class SHA256Context : public Encryption::Context
+{
+	void Transform(unsigned char *message, unsigned block_nb)
+	{
+		uint32_t w[64], wv[8];
+		unsigned char *sub_block;
+		for (unsigned i = 1; i <= block_nb; ++i)
+		{
+			int j;
+			sub_block = message + ((i - 1) << 6);
+
+			for (j = 0; j < 16; ++j)
+				PACK32(&sub_block[j << 2], w[j]);
+			for (j = 16; j < 64; ++j)
+				SHA256_SCR(w, j);
+			for (j = 0; j < 8; ++j)
+				wv[j] = this->h[j];
+			for (j = 0; j < 64; ++j)
+			{
+				uint32_t t1 = wv[7] + SHA256_F2(wv[4]) + CH(wv[4], wv[5], wv[6]) + sha256_k[j] + w[j];
+				uint32_t t2 = SHA256_F1(wv[0]) + MAJ(wv[0], wv[1], wv[2]);
+				wv[7] = wv[6];
+				wv[6] = wv[5];
+				wv[5] = wv[4];
+				wv[4] = wv[3] + t1;
+				wv[3] = wv[2];
+				wv[2] = wv[1];
+				wv[1] = wv[0];
+				wv[0] = t1 + t2;
+			}
+			for (j = 0; j < 8; ++j)
+				this->h[j] += wv[j];
+		}
+	}
+
+	unsigned tot_len;
+	unsigned len;
+	unsigned char block[2 * SHA256_BLOCK_SIZE];
+	uint32_t h[8];
+	unsigned char digest[SHA256_DIGEST_SIZE + 1];
+
+ public:
+	SHA256Context(Encryption::IV *iv)
+	{
+		if (iv != NULL)
+		{
+			if (iv->second != 8)
+				throw CoreException("Invalid IV size");
+			for (int i = 0; i < 8; ++i)
+				this->h[i] = iv->first[i];
+		}
+		else
+			for (int i = 0; i < 8; ++i)
+				this->h[i] = sha256_h0[i];
+
+		this->tot_len = 0;
+		this->len = 0;
+		memset(this->block, 0, sizeof(this->block));
+		memset(this->digest, 0, sizeof(this->digest));
+	}
+
+	void Update(const unsigned char *message, size_t mlen) anope_override
+	{
+		unsigned tmp_len = SHA256_BLOCK_SIZE - this->len, rem_len = mlen < tmp_len ? mlen : tmp_len;
+
+		memcpy(&this->block[this->len], message, rem_len);
+		if (this->len + mlen < SHA256_BLOCK_SIZE)
+		{
+			this->len += mlen;
+			return;
+		}
+		unsigned new_len = mlen - rem_len, block_nb = new_len / SHA256_BLOCK_SIZE;
+		unsigned char *shifted_message = new unsigned char[mlen - rem_len];
+		memcpy(shifted_message, message + rem_len, mlen - rem_len);
+		this->Transform(this->block, 1);
+		this->Transform(shifted_message, block_nb);
+		rem_len = new_len % SHA256_BLOCK_SIZE;
+		memcpy(this->block, &shifted_message[block_nb << 6], rem_len);
+		delete [] shifted_message;
+		this->len = rem_len;
+		this->tot_len += (block_nb + 1) << 6;
+	}
+
+	void Finalize() anope_override
+	{
+		unsigned block_nb = 1 + ((SHA256_BLOCK_SIZE - 9) < (this->len % SHA256_BLOCK_SIZE));
+		unsigned len_b = (this->tot_len + this->len) << 3;
+		unsigned pm_len = block_nb << 6;
+		memset(this->block + this->len, 0, pm_len - this->len);
+		this->block[this->len] = 0x80;
+		UNPACK32(len_b, this->block + pm_len - 4);
+		this->Transform(this->block, block_nb);
+		for (int i = 0 ; i < 8; ++i)
+			UNPACK32(this->h[i], &this->digest[i << 2]);
+		this->digest[SHA256_BLOCK_SIZE] = 0;
+	}
+
+	Encryption::Hash GetFinalizedHash() anope_override
+	{
+		Encryption::Hash hash;
+		hash.first = this->digest;
+		hash.second = SHA256_BLOCK_SIZE;
+		return hash;
+	}
+};
+
+class SHA256Provider : public Encryption::Provider
+{
+ public:
+ 	SHA256Provider(Module *creator) : Encryption::Provider(creator, "sha256") { }
+
+	Encryption::Context *CreateContext(Encryption::IV *iv) anope_override
+	{
+		return new SHA256Context(iv);
+	}
+
+	Encryption::IV GetDefaultIV() anope_override
+	{
+		Encryption::IV iv;
+		iv.first = sha256_h0;
+		iv.second = sizeof(sha256_h0) / sizeof(uint32_t);
+		return iv;
+	}
+};
+
 class ESHA256 : public Module
 {
+	SHA256Provider sha256provider;
+
 	unsigned iv[8];
 	bool use_iv;
 
@@ -153,101 +273,9 @@ class ESHA256 : public Module
 			PACK32(reinterpret_cast<unsigned char *>(&buf2[i << 2]), iv[i]);
 	}
 
-	void SHA256Init(SHA256Context *ctx)
-	{
-		for (int i = 0; i < 8; ++i)
-			ctx->h[i] = iv[i];
-		ctx->len = 0;
-		ctx->tot_len = 0;
-	}
-
-	void SHA256Transform(SHA256Context *ctx, unsigned char *message, unsigned block_nb)
-	{
-		uint32_t w[64], wv[8];
-		unsigned char *sub_block;
-		for (unsigned i = 1; i <= block_nb; ++i)
-		{
-			int j;
-			sub_block = message + ((i - 1) << 6);
-
-			for (j = 0; j < 16; ++j)
-				PACK32(&sub_block[j << 2], w[j]);
-			for (j = 16; j < 64; ++j)
-				SHA256_SCR(w, j);
-			for (j = 0; j < 8; ++j)
-				wv[j] = ctx->h[j];
-			for (j = 0; j < 64; ++j)
-			{
-				uint32_t t1 = wv[7] + SHA256_F2(wv[4]) + CH(wv[4], wv[5], wv[6]) + sha256_k[j] + w[j];
-				uint32_t t2 = SHA256_F1(wv[0]) + MAJ(wv[0], wv[1], wv[2]);
-				wv[7] = wv[6];
-				wv[6] = wv[5];
-				wv[5] = wv[4];
-				wv[4] = wv[3] + t1;
-				wv[3] = wv[2];
-				wv[2] = wv[1];
-				wv[1] = wv[0];
-				wv[0] = t1 + t2;
-			}
-			for (j = 0; j < 8; ++j)
-				ctx->h[j] += wv[j];
-		}
-	}
-
-	void SHA256Update(SHA256Context *ctx, const unsigned char *message, unsigned len)
-	{
-		/*
-		 * XXX here be dragons!
-		 * After many hours of pouring over this, I think I've found the problem.
-		 * When Special created our module from the reference one, he used:
-		 *
-		 *     unsigned rem_len = SHA256_BLOCK_SIZE - ctx->len;
-		 *
-		 * instead of the reference's version of:
-		 *
-		 *     unsigned tmp_len = SHA256_BLOCK_SIZE - ctx->len;
-		 *     unsigned rem_len = len < tmp_len ? len : tmp_len;
-		 *
-		 * I've changed back to the reference version of this code, and it seems to work with no errors.
-		 * So I'm inclined to believe this was the problem..
-		 *             -- w00t (January 06, 2008)
-		 */
-		unsigned tmp_len = SHA256_BLOCK_SIZE - ctx->len, rem_len = len < tmp_len ? len : tmp_len;
-
-		memcpy(&ctx->block[ctx->len], message, rem_len);
-		if (ctx->len + len < SHA256_BLOCK_SIZE)
-		{
-			ctx->len += len;
-			return;
-		}
-		unsigned new_len = len - rem_len, block_nb = new_len / SHA256_BLOCK_SIZE;
-		unsigned char *shifted_message = new unsigned char[len - rem_len];
-		memcpy(shifted_message, message + rem_len, len - rem_len);
-		SHA256Transform(ctx, ctx->block, 1);
-		SHA256Transform(ctx, shifted_message, block_nb);
-		rem_len = new_len % SHA256_BLOCK_SIZE;
-		memcpy(ctx->block, &shifted_message[block_nb << 6], rem_len);
-		delete [] shifted_message;
-		ctx->len = rem_len;
-		ctx->tot_len += (block_nb + 1) << 6;
-	}
-
-	void SHA256Final(SHA256Context *ctx, unsigned char *digest)
-	{
-		unsigned block_nb = 1 + ((SHA256_BLOCK_SIZE - 9) < (ctx->len % SHA256_BLOCK_SIZE));
-		unsigned len_b = (ctx->tot_len + ctx->len) << 3;
-		unsigned pm_len = block_nb << 6;
-		memset(ctx->block + ctx->len, 0, pm_len - ctx->len);
-		ctx->block[ctx->len] = 0x80;
-		UNPACK32(len_b, ctx->block + pm_len - 4);
-		SHA256Transform(ctx, ctx->block, block_nb);
-		for (int i = 0 ; i < 8; ++i)
-			UNPACK32(ctx->h[i], &digest[i << 2]);
-	}
-
-/**********   ANOPE ******/
  public:
-	ESHA256(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, ENCRYPTION)
+	ESHA256(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, ENCRYPTION),
+		sha256provider(this)
 	{
 		this->SetAuthor("Anope");
 
@@ -259,20 +287,20 @@ class ESHA256 : public Module
 
 	EventReturn OnEncrypt(const Anope::string &src, Anope::string &dest) anope_override
 	{
-		char digest[SHA256_DIGEST_SIZE + 1];
-		SHA256Context ctx;
-		std::stringstream buf;
-
 		if (!use_iv)
 			NewRandomIV();
 		else
 			use_iv = false;
 
-		SHA256Init(&ctx);
-		SHA256Update(&ctx, reinterpret_cast<const unsigned char *>(src.c_str()), src.length());
-		SHA256Final(&ctx, reinterpret_cast<unsigned char *>(digest));
-		digest[SHA256_DIGEST_SIZE] = '\0';
-		buf << "sha256:" << Anope::Hex(digest, SHA256_DIGEST_SIZE) << ":" << GetIVString();
+		Encryption::IV initilization(this->iv, 8);
+		SHA256Context ctx(&initilization);
+		ctx.Update(reinterpret_cast<const unsigned char *>(src.c_str()), src.length());
+		ctx.Finalize();
+
+		Encryption::Hash hash = ctx.GetFinalizedHash();
+
+		std::stringstream buf;
+		buf << "sha256:" << Anope::Hex(reinterpret_cast<const char *>(hash.first), hash.second) << ":" << GetIVString();
 		Log(LOG_DEBUG_2) << "(enc_sha256) hashed password from [" << src << "] to [" << buf.str() << " ]";
 		dest = buf.str();
 		return EVENT_ALLOW;

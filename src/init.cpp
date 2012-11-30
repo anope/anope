@@ -451,8 +451,6 @@ void Anope::Init(int ac, char **av)
 	Module *protocol = ModuleManager::FindFirstOf(PROTOCOL);
 	if (protocol == NULL)
 		throw CoreException("You must load a protocol module!");
-	else if (ModuleManager::FindFirstOf(ENCRYPTION) == NULL)
-		throw CoreException("You must load at least one encryption module");
 
 	Log() << "Using IRCd protocol " << protocol->name;
 

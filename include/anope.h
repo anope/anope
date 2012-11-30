@@ -138,6 +138,9 @@ namespace Anope
 		 */
 		inline void push_back(char c) { return this->_string.push_back(c); }
 
+		inline string& append(const string &s) { this->_string.append(s.str()); return *this; }
+		inline string& append(const char *s, size_t n) { this->_string.append(s, n); return *this; }
+
 		/**
 		 * Resizes the string content to n characters.
 		 */

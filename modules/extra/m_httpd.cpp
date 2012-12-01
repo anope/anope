@@ -136,6 +136,7 @@ class MyHTTPClient : public HTTPClient
 				if (sz == Anope::string::npos || !sz || sz + 1 >= token.length())
 					continue;
 				this->header.post_data[token.substr(0, sz)] = HTTPUtils::URLDecode(token.substr(sz + 1));
+				Log(LOG_DEBUG_2) << "HTTP POST from  " << this->clientaddr.addr() << ": " << token.substr(0, sz) << ": " << this->header.post_data[token.substr(0, sz)];
 			}
 
 			this->Serve();
@@ -373,12 +374,12 @@ class HTTPD : public Module
 
 			if (ip.empty())
 			{
-				Log(LOG_NORMAL, "httpd") << "You must configure a bind IP for HTTP server " << hname;
+				Log(this) << "You must configure a bind IP for HTTP server " << hname;
 				continue;
 			}
 			else if (port <= 0 || port > 65535)
 			{
-				Log(LOG_NORMAL, "httpd") << "You must configure a (valid) listen port for HTTP server " << hname;
+				Log(this) << "You must configure a (valid) listen port for HTTP server " << hname;
 				continue;
 			}
 
@@ -399,12 +400,12 @@ class HTTPD : public Module
 				}
 				catch (const SocketException &ex)
 				{
-					Log(LOG_NORMAL, "httpd") << "Unable to create HTTP server " << hname << ": " << ex.GetReason();
+					Log(this) << "Unable to create HTTP server " << hname << ": " << ex.GetReason();
 					continue;
 				}
 				this->providers[hname] = p;
 
-				Log(LOG_NORMAL, "httpd") << "Created HTTP server " << hname;
+				Log(this) << "Created HTTP server " << hname;
 			}
 			else
 			{
@@ -415,6 +416,8 @@ class HTTPD : public Module
 					delete p;
 					this->providers.erase(hname);
 
+					Log(this) << "Changing HTTP server " << hname << " to " << ip << ":" << port;
+
 					try
 					{
 						p = new MyHTTPProvider(this, hname, ip, port, timeout);
@@ -423,7 +426,7 @@ class HTTPD : public Module
 					}
 					catch (const SocketException &ex)
 					{
-						Log(LOG_NORMAL, "httpd") << "Unable to create HTTP server " << hname << ": " << ex.GetReason();
+						Log(this) << "Unable to create HTTP server " << hname << ": " << ex.GetReason();
 						continue;
 					}
 
@@ -443,7 +446,7 @@ class HTTPD : public Module
 
 			if (existing.count(p->name) == 0)
 			{
-				Log(LOG_NORMAL, "httpd") << "Removing HTTP server " << p->name;
+				Log(this) << "Removing HTTP server " << p->name;
 				this->providers.erase(p->name);
 				delete p;
 			}

@@ -135,7 +135,7 @@ class HTTPProvider : public ListenSocket, public Service
 	Anope::string ext_ip;
 	std::vector<Anope::string> ext_headers;
 
-	HTTPProvider(Module *c, const Anope::string &n, const Anope::string &i, const unsigned short p) : ListenSocket(i, p, i.find(':') != Anope::string::npos), Service(c, "HTTPProvider", n) { }
+	HTTPProvider(Module *c, const Anope::string &n, const Anope::string &i, const unsigned short p) : ListenSocket(i, p, i.find(':') != Anope::string::npos), Service(c, "HTTPProvider", n), ip(i), port(p) { }
 
 	const Anope::string &GetIP() const
 	{

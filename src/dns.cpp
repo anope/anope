@@ -468,7 +468,9 @@ unsigned short Packet::Pack(unsigned char *output, unsigned short output_size)
 					unsigned short packet_pos_save = pos;
 					pos += 2;
 
-					this->PackName(output, output_size, pos, Config->DNSSOANS);
+					std::vector<Anope::string> nameservers;
+					spacesepstream(Config->DNSSOANS).GetTokens(nameservers);
+					this->PackName(output, output_size, pos, !nameservers.empty() ? nameservers[0] : "");
 					this->PackName(output, output_size, pos, Config->DNSSOAAdmin.replace_all_cs('@', '.'));
 
 					if (pos + 20 >= output_size)
@@ -730,9 +732,14 @@ bool Manager::HandlePacket(ReplySocket *s, const unsigned char *const packet_buf
 
 				if (q.type == QUERY_AXFR)
 				{
-					ResourceRecord rr2(q.name, QUERY_NS);
-					rr2.rdata = Config->DNSSOANS;
-					packet->answers.push_back(rr2);
+					Anope::string token;
+					spacesepstream sep(Config->DNSSOANS);
+					while (sep.GetToken(token))
+					{
+						ResourceRecord rr2(q.name, QUERY_NS);
+						rr2.rdata = token;
+						packet->answers.push_back(rr2);
+					}
 				}
 				break;
 			}

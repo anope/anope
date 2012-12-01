@@ -1267,7 +1267,7 @@ ConfigItems::ConfigItems(ServerConfig *conf)
 		{"dns", "ip", "0.0.0.0", new ValueContainerString(&conf->DNSIP), DT_STRING, NoValidation},
 		{"dns", "port", "53", new ValueContainerInt(&conf->DNSPort), DT_INTEGER, NoValidation},
 		{"dns", "admin", "admin@example.com", new ValueContainerString(&conf->DNSSOAAdmin), DT_STRING, NoValidation},
-		{"dns", "primary_nameserver", "ns1.example.com", new ValueContainerString(&conf->DNSSOANS), DT_STRING, NoValidation},
+		{"dns", "nameservers", "ns1.example.com", new ValueContainerString(&conf->DNSSOANS), DT_STRING, NoValidation},
 		{"dns", "refresh", "3600", new ValueContainerUInt(&conf->DNSSOARefresh), DT_UINTEGER, NoValidation},
 		{"chanserv", "name", "", new ValueContainerString(&conf->ChanServ), DT_STRING, NoValidation},
 		{"chanserv", "defaults", "keeptopic secure securefounder signkick", new ValueContainerString(&CSDefaults), DT_STRING, ValidateChanServ},

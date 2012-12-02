@@ -48,8 +48,13 @@ class NSIdentifyRequest : public IdentifyRequest
 		if (source.GetUser())
 		{
 			Log(LOG_COMMAND, source, cmd) << "and failed to identify";
-			source.Reply(PASSWORD_INCORRECT);
-			source.GetUser()->BadPassword();
+			if (NickAlias::Find(GetAccount()) != NULL)
+			{
+				source.Reply(PASSWORD_INCORRECT);
+				source.GetUser()->BadPassword();
+			}
+			else
+				source.Reply(NICK_X_NOT_REGISTERED, GetAccount().c_str());
 		}
 	}
 };

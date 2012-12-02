@@ -106,13 +106,18 @@ class NSRecoverRequest : public IdentifyRequest
 
 	void OnFail() anope_override
 	{
-		source.Reply(ACCESS_DENIED);
-		if (!GetPassword().empty())
+		if (NickAlias::Find(GetAccount()) != NULL)
 		{
-			Log(LOG_COMMAND, source, cmd) << "with an invalid password for " << GetAccount();
-			if (source.GetUser())
-				source.GetUser()->BadPassword();
+			source.Reply(ACCESS_DENIED);
+			if (!GetPassword().empty())
+			{
+				Log(LOG_COMMAND, source, cmd) << "with an invalid password for " << GetAccount();
+				if (source.GetUser())
+					source.GetUser()->BadPassword();
+			}
 		}
+		else
+			source.Reply(NICK_X_NOT_REGISTERED, GetAccount().c_str());
 	}
 };
 

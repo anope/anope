@@ -62,9 +62,14 @@ class NSGroupRequest : public IdentifyRequest
 		if (!source.GetUser())
 			return;
 
-		Log(LOG_COMMAND, source, cmd) << "failed group for " << target->nick;
-		source.Reply(PASSWORD_INCORRECT);
-		source.GetUser()->BadPassword();
+		Log(LOG_COMMAND, source, cmd) << "and failed to group to " << target->nick;
+		if (NickAlias::Find(GetAccount()) != NULL)
+		{
+			source.Reply(PASSWORD_INCORRECT);
+			source.GetUser()->BadPassword();
+		}
+		else
+			source.Reply(NICK_X_NOT_REGISTERED, GetAccount().c_str());
 	}
 };
 

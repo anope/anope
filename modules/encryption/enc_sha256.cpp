@@ -151,7 +151,7 @@ class SHA256Context : public Encryption::Context
 	unsigned len;
 	unsigned char block[2 * SHA256_BLOCK_SIZE];
 	uint32_t h[8];
-	unsigned char digest[SHA256_DIGEST_SIZE + 1];
+	unsigned char digest[SHA256_DIGEST_SIZE];
 
  public:
 	SHA256Context(Encryption::IV *iv)
@@ -206,14 +206,13 @@ class SHA256Context : public Encryption::Context
 		this->Transform(this->block, block_nb);
 		for (int i = 0 ; i < 8; ++i)
 			UNPACK32(this->h[i], &this->digest[i << 2]);
-		this->digest[SHA256_BLOCK_SIZE] = 0;
 	}
 
 	Encryption::Hash GetFinalizedHash() anope_override
 	{
 		Encryption::Hash hash;
 		hash.first = this->digest;
-		hash.second = SHA256_BLOCK_SIZE;
+		hash.second = SHA256_DIGEST_SIZE;
 		return hash;
 	}
 };
@@ -324,7 +323,6 @@ class ESHA256 : public Module
 		use_iv = true;
 		Anope::string buf;
 		this->OnEncrypt(req->GetPassword(), buf);
-
 		if (nc->pass.equals_cs(buf))
 		{
 			/* if we are NOT the first module in the list,

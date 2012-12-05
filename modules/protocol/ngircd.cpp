@@ -155,21 +155,18 @@ class ngIRCdProto : public IRCDProto
 	{
 		if (!vIdent.empty())
 			UplinkSocket::Message(Me) << "METADATA " << u->nick << " user :" << vIdent;
-		if (!vhost.empty())
+
+		UplinkSocket::Message(Me) << "METADATA " << u->nick << " cloakhost :" << vhost;
+		if (!u->HasMode(UMODE_CLOAK))
 		{
-			if (!u->HasMode(UMODE_CLOAK))
-			{
-				u->SetMode(HostServ, UMODE_CLOAK);
-				// send the modechange before we send the vhost
-				ModeManager::ProcessModes();
-			}
-			UplinkSocket::Message(Me) << "METADATA " << u->nick << " host :" << vhost;
+			u->SetMode(HostServ, UMODE_CLOAK);
+			ModeManager::ProcessModes();
 		}
 	}
 
 	void SendVhostDel(User *u) anope_override
 	{
-		this->SendVhost(u, u->GetIdent(), u->GetCloakedHost());
+		this->SendVhost(u, u->GetIdent(), "");
 	}
 };
 
@@ -333,6 +330,7 @@ struct IRCDMessageMetadata : IRCDMessage
 	 *
 	 * following commands are supported:
 	 *  - "host": the hostname of a client (can't be empty)
+         *  - "cloakhost" : the cloaked hostname of a client
 	 *  - "info": info text ("real name") of a client
 	 *  - "user": the user name (ident) of a client (can't be empty)
 	 */
@@ -348,6 +346,11 @@ struct IRCDMessageMetadata : IRCDMessage
 		if (params[1].equals_cs("host"))
 		{
 			u->SetCloakedHost(params[2]);
+		}
+		else if (params[1].equals_cs("cloakhost"))
+		{
+			if (!params[2].empty())
+				u->SetDisplayedHost(params[2]);
 		}
 		else if (params[1].equals_cs("info"))
 		{

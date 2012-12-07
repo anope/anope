@@ -12,36 +12,36 @@
  *
  * Written by Scott <stealtharcher.scott@gmail.com>
  * Written by Adam <Adam@anope.org>
+ * Cleaned up by Naram Qashat <cyberbotx@anope.org>
  *
  * Compile with: csc /out:../../Config.exe /win32icon:anope-icon.ico Config.cs
- *
  */
-
 
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Reflection;
 
 namespace Config
 {
 	class Config
 	{
-		static string InstallDirectory, VSVersion, VSShortVer, ExtraArguments;
+		static string ExecutablePath, InstallDirectory, VSVersion, VSShortVer, ExtraIncludeDirs, ExtraLibDirs, ExtraArguments;
 		static bool UseNMake = true, BuildDebug = false;
 
 		static bool CheckResponse(string InstallerResponse)
 		{
-			if (System.String.Compare(InstallerResponse, "yes", true) == 0 || System.String.Compare(InstallerResponse, "y", true) == 0)
+			if (string.Compare(InstallerResponse, "yes", true) == 0 || string.Compare(InstallerResponse, "y", true) == 0)
 				return true;
 			return false;
 		}
-		
+
 		static bool LoadCache()
 		{
 			try
 			{
-				string[] cache = File.ReadAllLines("config.cache");
+				string[] cache = File.ReadAllLines(string.Format(@"{0}\config.cache", ExecutablePath));
 				if (cache.Length > 0)
 					Console.WriteLine("Using defaults from config.cache");
 				foreach (string line in cache)
@@ -49,13 +49,17 @@ namespace Config
 					int e = line.IndexOf('=');
 					string name = line.Substring(0, e);
 					string value = line.Substring(e + 1);
-					
+
 					if (name == "INSTDIR")
 						InstallDirectory = value;
 					else if (name == "DEBUG")
 						BuildDebug = CheckResponse(value);
 					else if (name == "USENMAKE")
 						UseNMake = CheckResponse(value);
+					else if (name == "EXTRAINCLUDE")
+						ExtraIncludeDirs = value;
+					else if (name == "EXTRALIBS")
+						ExtraLibDirs = value;
 					else if (name == "EXTRAARGS")
 						ExtraArguments = value;
 					else if (name == "VSVERSION")
@@ -66,67 +70,74 @@ namespace Config
 
 				return true;
 			}
-			catch (Exception) { }
-			
+			catch (Exception)
+			{
+			}
+
 			return false;
 		}
-		
+
 		static void SaveCache()
 		{
-			TextWriter tw = new StreamWriter("config.cache");
-			tw.WriteLine("INSTDIR=" + InstallDirectory);
-			tw.WriteLine("DEBUG=" + (BuildDebug ? "yes" : "no"));
-			tw.WriteLine("USENMAKE=" + (UseNMake ? "yes" : "no"));
-			tw.WriteLine("EXTRAARGS=" + ExtraArguments);
-			tw.WriteLine("VSVERSION=" + VSVersion);
-			tw.WriteLine("VSSHORTVER=" + VSShortVer);
-			tw.Close();
+			using (TextWriter tw = new StreamWriter(string.Format(@"{0}\config.cache", ExecutablePath)))
+			{
+				tw.WriteLine("INSTDIR={0}", InstallDirectory);
+				tw.WriteLine("DEBUG={0}", BuildDebug ? "yes" : "no");
+				tw.WriteLine("USENMAKE={0}", UseNMake ? "yes" : "no");
+				tw.WriteLine("EXTRAINCLUDE={0}", ExtraIncludeDirs);
+				tw.WriteLine("EXTRALIBS={0}", ExtraLibDirs);
+				tw.WriteLine("EXTRAARGS={0}", ExtraArguments);
+				tw.WriteLine("VSVERSION={0}", VSVersion);
+				tw.WriteLine("VSSHORTVER={0}", VSShortVer);
+			}
 		}
-		
+
 		static string HandleCache(int i)
 		{
 			switch (i)
 			{
 				case 0:
-					Console.Write("[" + InstallDirectory + "] ");
+					Console.Write("[{0}] ", InstallDirectory);
 					return InstallDirectory;
 				case 1:
-					Console.Write("[" + UseNMake + "] ");
-					return (UseNMake ? "yes" : "no");
+					Console.Write("[{0}] ", UseNMake ? "yes" : "no");
+					return UseNMake ? "yes" : "no";
 				case 2:
-					Console.Write("[" + VSShortVer + "] ");
+					Console.Write("[{0}] ", VSShortVer);
 					return VSShortVer;
 				case 3:
-					Console.Write("[" + BuildDebug + "] ");
-					return (BuildDebug ? "yes" : "no");
+					Console.Write("[{0}] ", BuildDebug ? "yes" : "no");
+					return BuildDebug ? "yes" : "no";
 				case 4:
-					Console.Write("[" + ExtraArguments + "] ");
+					Console.Write("[{0}] ", ExtraIncludeDirs);
+					return ExtraIncludeDirs;
+				case 5:
+					Console.Write("[{0}] ", ExtraLibDirs);
+					return ExtraLibDirs;
+				case 6:
+					Console.Write("[{0}] ", ExtraArguments);
 					return ExtraArguments;
 				default:
 					break;
 			}
-			
+
 			return null;
 		}
 
 		static string FindAnopeVersion()
 		{
-			if (!File.Exists(@"src\version.sh"))
+			if (!File.Exists(string.Format(@"{0}\src\version.sh", ExecutablePath)))
 				return "Unknown";
 
 			Dictionary<string, string> versions = new Dictionary<string, string>();
-			string[] versionfile = File.ReadAllLines(@"src\version.sh");
+			string[] versionfile = File.ReadAllLines(string.Format(@"{0}\src\version.sh", ExecutablePath));
 			foreach (string line in versionfile)
-			{
 				if (line.StartsWith("VERSION_"))
 				{
 					string key = line.Split('_')[1].Split('=')[0];
 					if (!versions.ContainsKey(key))
-					{
 						versions.Add(key, line.Split('=')[1].Replace("\"", "").Replace("\'", ""));
-					}
 				}
-			}
 
 			try
 			{
@@ -144,6 +155,7 @@ namespace Config
 
 		static void RunCMake(string cMake)
 		{
+			Console.WriteLine("cmake {0}", cMake);
 			try
 			{
 				ProcessStartInfo processStartInfo = new ProcessStartInfo("cmake")
@@ -154,8 +166,7 @@ namespace Config
 					Arguments = cMake
 				};
 				Process pCMake = Process.Start(processStartInfo);
-				StreamReader stdout = pCMake.StandardOutput;
-				StreamReader stderr = pCMake.StandardError;
+				StreamReader stdout = pCMake.StandardOutput, stderr = pCMake.StandardError;
 				string stdoutr, stderrr;
 				List<string> errors = new List<string>();
 				while (!pCMake.HasExited)
@@ -166,10 +177,8 @@ namespace Config
 						errors.Add(stderrr);
 				}
 				foreach (string error in errors)
-				{
 					Console.WriteLine(error);
-				}
-				Console.WriteLine("");
+				Console.WriteLine();
 				if (pCMake.ExitCode == 0)
 				{
 					if (UseNMake)
@@ -182,138 +191,204 @@ namespace Config
 			}
 			catch (Exception e)
 			{
-				Console.WriteLine("");
+				Console.WriteLine();
 				Console.WriteLine(DateTime.UtcNow + " UTC: " + e.Message);
 				Console.WriteLine("There was an error attempting to run CMake! Check the above error message, and contact the Anope team if you are unsure how to proceed.");
 			}
 		}
 
-		static int Main()
+		static int Main(string[] args)
 		{
+			bool IgnoreCache = false, NoIntro = false, DoQuick = false;
+
+			if (args.Length > 0)
+			{
+				if (args[0] == "--help")
+				{
+					Console.WriteLine("Config utility for Anope");
+					Console.WriteLine("------------------------");
+					Console.WriteLine("Syntax: .\\Config.exe [options]");
+					Console.WriteLine("-nocache     Ignore settings saved in config.cache");
+					Console.WriteLine("-nointro     Skip intro (disclaimer, etc)");
+					Console.WriteLine("-quick or -q Skip questions, go straight to cmake");
+					return 0;
+				}
+				else if (args[0] == "-nocache")
+					IgnoreCache = true;
+				else if (args[0] == "-nointro")
+					NoIntro = true;
+				else if (args[0] == "-quick" || args[0] == "-q")
+					DoQuick = true;
+			}
+
+			ExecutablePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+
 			string AnopeVersion = FindAnopeVersion();
 
-			if (File.Exists(".BANNER"))
-				Console.WriteLine(File.ReadAllText(".BANNER").Replace("CURVER", AnopeVersion).Replace("For more options type SOURCE_DIR/Config --help", ""));
+			if (!NoIntro && File.Exists(string.Format(@"{0}\.BANNER", ExecutablePath)))
+				Console.WriteLine(File.ReadAllText(string.Format(@"{0}\.BANNER", ExecutablePath)).Replace("CURVER", AnopeVersion).Replace("For more options type SOURCE_DIR/Config --help", ""));
 
 			Console.WriteLine("Press Enter to begin");
-			Console.WriteLine("");
+			Console.WriteLine();
 			Console.ReadKey();
-			
-			bool UseCache = LoadCache();
 
-			Dictionary<int, string> InstallerQuestions = new Dictionary<int, string>();
-			InstallerQuestions.Add(0, "Where do you want Anope to be installed?");
-			InstallerQuestions.Add(1, "Would you like to build using NMake instead of using Visual Studio?\r\nNOTE: If you decide to use NMake, you must be in an environment where\r\nNMake can function, such as the Visual Studio command line. If you say\r\nyes to this while not in an environment that can run NMake, it can\r\ncause the CMake configuration to enter an endless loop. [y/n]");
-			InstallerQuestions.Add(2, "Are you using Visual Studio 2008, 2010, or 2012? You can leave this blank\nand have CMake try and auto detect it, but this usually doesn't\nwork correctly. [2008/2010/2012]");
-			InstallerQuestions.Add(3, "Would you like to build a debug version of Anope? [y/n]");
-			InstallerQuestions.Add(4, "Are there any extra arguments you wish to pass to cmake?\nYou may only need to do this if cmake is unable to locate missing dependencies without hints.\nTo do this, set the variable EXTRA_INCLUDE like this: -DEXTRA_INCLUDE:STRING=c:/some/path/include;c:/some/path/bin;c:/some/path/lib");
+			bool UseCache = false;
 
-			for (int i = 0; i < InstallerQuestions.Count; ++i)
+			if (DoQuick || !IgnoreCache)
 			{
-				Console.WriteLine(InstallerQuestions[i]);
-				string CacheResponse = null;
-				if (UseCache)
-					CacheResponse = HandleCache(i);
-				string InstallerResponse = Console.ReadLine();
-				Console.WriteLine("");
-				
-				if (CacheResponse != null && (InstallerResponse == null || InstallerResponse.Length < 1))
-					InstallerResponse = CacheResponse;
-
-				// Question 4 is optional
-				if (i != 4 && (InstallerResponse == null || InstallerResponse.Length < 1))
+				UseCache = LoadCache();
+				if (DoQuick && !UseCache)
 				{
-					Console.WriteLine("Invlaid option");
-					--i;
-					continue;
+					Console.WriteLine("Can't find cache file (config.cache), aborting...");
+					return 1;
 				}
+			}
 
-				switch (i)
+			if (!DoQuick)
+			{
+				List<string> InstallerQuestions = new List<string>()
+			{
+				"Where do you want Anope to be installed?",
+				"Would you like to build using NMake instead of using Visual Studio?\r\nNOTE: If you decide to use NMake, you must be in an environment where\r\nNMake can function, such as the Visual Studio command line. If you say\r\nyes to this while not in an environment that can run NMake, it can\r\ncause the CMake configuration to enter an endless loop. [y/n]",
+				"Are you using Visual Studio 2008, 2010, or 2012? You can leave this blank\nand have CMake try and auto detect it, but this usually doesn't\nwork correctly. [2008/2010/2012]",
+				"Would you like to build a debug version of Anope? [y/n]",
+				"Are there any extra include directories you wish to use?\nYou may only need to do this if CMake is unable to locate missing dependencies without hints.\nSeparate directories with semicolons and use slashes (aka /) instead of backslashes (aka \\).\nIf you need no extra include directories, enter NONE in all caps.",
+				"Are there any extra library directories you wish to use?\nYou may only need to do this if CMake is unable to locate missing dependencies without hints.\nSeparate directories with semicolons and use slashes (aka /) instead of backslashes (aka \\).\nIf you need no extra library directories, enter NONE in all caps.",
+				"Are there any extra arguments you wish to pass to CMake?\nIf you need no extra arguments to CMake, enter NONE in all caps."
+			};
+
+				for (int i = 0; i < InstallerQuestions.Count; ++i)
 				{
-					case 0:
-						if (!Directory.Exists(InstallerResponse))
-						{
-							Console.WriteLine("Directory does not exist! Creating directory.");
-							Console.WriteLine("");
-							try
+					Console.WriteLine(InstallerQuestions[i]);
+					string CacheResponse = null;
+					if (UseCache)
+						CacheResponse = HandleCache(i);
+					string InstallerResponse = Console.ReadLine();
+					Console.WriteLine();
+
+					if (!string.IsNullOrWhiteSpace(CacheResponse) && string.IsNullOrWhiteSpace(InstallerResponse))
+						InstallerResponse = CacheResponse;
+
+					// Question 5-7 are optional
+					if (i < 4 && string.IsNullOrWhiteSpace(InstallerResponse))
+					{
+						Console.WriteLine("Invalid option");
+						--i;
+						continue;
+					}
+
+					switch (i)
+					{
+						case 0:
+							if (!Directory.Exists(InstallerResponse))
 							{
-								Directory.CreateDirectory(InstallerResponse);
-								InstallDirectory = InstallerResponse;
+								Console.WriteLine("Directory does not exist! Creating directory.");
+								Console.WriteLine();
+								try
+								{
+									Directory.CreateDirectory(InstallerResponse);
+									InstallDirectory = InstallerResponse;
+								}
+								catch (Exception e)
+								{
+									Console.WriteLine("Unable to create directory: " + e.Message);
+									--i;
+								}
 							}
-							catch (Exception e)
+							else if (File.Exists(InstallerResponse + @"\include\services.h"))
 							{
-								Console.WriteLine("Unable to create directory: " + e.Message);
+								Console.WriteLine("You cannot use the Anope source directory as the target directory!");
 								--i;
 							}
-						}
-						else if (File.Exists(InstallerResponse + @"\include\services.h"))
-						{
-							Console.WriteLine("You cannot use the Anope source directory as the target directory!");
-							--i;
-						}
-						else
-							InstallDirectory = InstallerResponse;
-						break;
-					case 1:
-						UseNMake = CheckResponse(InstallerResponse);
-						if (UseNMake)
-							++i;
-						break;
-					case 2:
-						if (InstallerResponse == "2012")
-						{
-							VSVersion = "-G\"Visual Studio 11\" ";
-							VSShortVer = "2012";
-						}
-						else if (InstallerResponse == "2010")
-						{
-							VSVersion = "-G\"Visual Studio 10\" ";
-							VSShortVer = "2010";
-						}
-						else if (InstallerResponse == "2008")
-						{
-							VSVersion = "-G\"Visual Studio 9 2008\" ";
-							VSShortVer = "2008";
-						}
-						break;
-					case 3:
-						BuildDebug = CheckResponse(InstallerResponse);
-						break;
-					case 4:
-						ExtraArguments = InstallerResponse;
-						break;
-					default:
-						break;
+							else
+								InstallDirectory = InstallerResponse;
+							break;
+						case 1:
+							UseNMake = CheckResponse(InstallerResponse);
+							if (UseNMake)
+								++i;
+							break;
+						case 2:
+							if (InstallerResponse == "2012")
+							{
+								VSVersion = "-G\"Visual Studio 11\" ";
+								VSShortVer = "2012";
+							}
+							else if (InstallerResponse == "2010")
+							{
+								VSVersion = "-G\"Visual Studio 10\" ";
+								VSShortVer = "2010";
+							}
+							else if (InstallerResponse == "2008")
+							{
+								VSVersion = "-G\"Visual Studio 9 2008\" ";
+								VSShortVer = "2008";
+							}
+							break;
+						case 3:
+							BuildDebug = CheckResponse(InstallerResponse);
+							break;
+						case 4:
+							if (InstallerResponse == "NONE")
+								ExtraIncludeDirs = null;
+							else
+								ExtraIncludeDirs = InstallerResponse;
+							break;
+						case 5:
+							if (InstallerResponse == "NONE")
+								ExtraLibDirs = null;
+							else
+								ExtraLibDirs = InstallerResponse;
+							break;
+						case 6:
+							if (InstallerResponse == "NONE")
+								ExtraArguments = null;
+							else
+								ExtraArguments = InstallerResponse;
+							break;
+						default:
+							break;
+					}
 				}
 			}
 
 			Console.WriteLine("Anope will be compiled with the following options:");
 			Console.WriteLine("Install directory: {0}", InstallDirectory);
 			Console.WriteLine("Use NMake: {0}", UseNMake ? "Yes" : "No");
-			if (VSShortVer != null)
+			if (!string.IsNullOrWhiteSpace(VSShortVer))
 				Console.WriteLine("Using Visual Studio: {0}", VSShortVer);
 			else
 				Console.WriteLine("Using Visual Studio: No");
 			Console.WriteLine("Build debug: {0}", BuildDebug ? "Yes" : "No");
-			Console.WriteLine("Anope Version: {0}", AnopeVersion); ;
-			if (ExtraArguments != null)
-				Console.WriteLine("Extra Arguments: {0}", ExtraArguments);
+			Console.WriteLine("Anope Version: {0}", AnopeVersion);
+			Console.WriteLine("Extra Include Directories: {0}", ExtraIncludeDirs);
+			Console.WriteLine("Extra Library Directories: {0}", ExtraLibDirs);
+			Console.WriteLine("Extra Arguments: {0}", ExtraArguments);
 			Console.WriteLine("Press Enter to continue...");
 			Console.ReadKey();
-			
+
 			SaveCache();
-			
-			if (ExtraArguments != null)
+
+			if (!string.IsNullOrWhiteSpace(ExtraIncludeDirs))
+				ExtraIncludeDirs = string.Format("-DEXTRA_INCLUDE:STRING={0} ", ExtraIncludeDirs);
+			else
+				ExtraIncludeDirs = "";
+			if (!string.IsNullOrWhiteSpace(ExtraLibDirs))
+				ExtraLibDirs = string.Format("-DEXTRA_LIBS:STRING={0} ", ExtraLibDirs);
+			else
+				ExtraLibDirs = "";
+			if (!string.IsNullOrWhiteSpace(ExtraArguments))
 				ExtraArguments += " ";
-			
+			else
+				ExtraArguments = "";
+
 			InstallDirectory = "-DINSTDIR:STRING=\"" + InstallDirectory.Replace('\\', '/') + "\" ";
 			string NMake = UseNMake ? "-G\"NMake Makefiles\" " : "";
 			string Debug = BuildDebug ? "-DCMAKE_BUILD_TYPE:STRING=DEBUG " : "-DCMAKE_BUILD_TYPE:STRING=RELEASE ";
-			string cMake = InstallDirectory + NMake + Debug + VSVersion + ExtraArguments + "\"" + Environment.CurrentDirectory.Replace('\\','/') + "\"";
+			string cMake = InstallDirectory + NMake + Debug + VSVersion + ExtraIncludeDirs + ExtraLibDirs + ExtraArguments + "\"" + ExecutablePath.Replace('\\', '/') + "\"";
 			RunCMake(cMake);
 
 			return 0;
 		}
 	}
 }
-

@@ -40,7 +40,8 @@ Run_Build_System () {
 	WITH_INST=""
 	WITH_RUN=""
 	WITH_PERM=""
-	RUN_CC_PL=""
+	EXTRA_INCLUDE=""
+	EXTRA_LIBS=""
 	GEN_TYPE=""
 
 	if [ "$INSTDIR" != "" ] ; then
@@ -73,6 +74,14 @@ Run_Build_System () {
 		PCH="-DUSE_PCH:BOOLEAN=OFF"
 	fi
 
+	if [ "$EXTRA_INCLUDE_DIRS" != "" ] ; then
+		EXTRA_INCLUDE="-DEXTRA_INCLUDE:STRING=$EXTRA_INCLUDE_DIRS"
+	fi
+
+	if [ "$EXTRA_LIB_DIRS" != "" ] ; then
+		EXTRA_LIBS="-DEXTRA_LIBS:STRING=$EXTRA_LIB_DIRS"
+	fi
+
 	case `uname -s` in
 		MINGW*)
 			GEN_TYPE="-G\"MSYS Makefiles\""
@@ -88,9 +97,9 @@ Run_Build_System () {
 		REAL_SOURCE_DIR="$SOURCE_DIR"
 	fi
 
-	echo "cmake $GEN_TYPE $WITH_INST $WITH_RUN $WITH_PERM $BUILD_TYPE $RUN_CC_PL $PCH $EXTRA_CONFIG_ARGS $REAL_SOURCE_DIR"
+	echo "cmake $GEN_TYPE $WITH_INST $WITH_RUN $WITH_PERM $BUILD_TYPE $RUN_CC_PL $PCH $EXTRA_INCLUDE $EXTRA_LIBS $EXTRA_CONFIG_ARGS $REAL_SOURCE_DIR"
 
-	cmake $GEN_TYPE $WITH_INST $WITH_RUN $WITH_PERM $BUILD_TYPE $RUN_CC_PL $PCH $EXTRA_CONFIG_ARGS $REAL_SOURCE_DIR
+	cmake $GEN_TYPE $WITH_INST $WITH_RUN $WITH_PERM $BUILD_TYPE $RUN_CC_PL $PCH $EXTRA_INCLUDE $EXTRA_LIBS $EXTRA_CONFIG_ARGS $REAL_SOURCE_DIR
 
 	echo ""
 	if [ "$SOURCE_DIR" = "." ] ; then
@@ -124,6 +133,8 @@ UMASK=
 DEBUG="yes"
 USE_RUN_CC_PL="no"
 USE_PCH="no"
+EXTRA_INCLUDE_DIRS=
+EXTRA_LIB_DIRS=
 EXTRA_CONFIG_ARGS=
 CAN_QUICK="no"
 SOURCE_DIR=`dirname $0`
@@ -386,14 +397,52 @@ echo ""
 
 ####
 
-echo "Are there any extra arguments you wish to pass to cmake?"
-echo "You may only need to do this if cmake is unable to locate"
+echo "Are there any extra include directories you wish to use?"
+echo "You may only need to do this if CMake is unable to locate"
 echo "missing dependencies without hints."
-echo "You can do this by: -DEXTRA_INCLUDE:STRING=/path/to/files;/path/to/more/files"
+echo "Separate directories with semicolons."
+echo "If you need no extra include directories, enter NONE in all caps."
+echo2 "[$EXTRA_INCLUDE_DIRS] "
+if read INPUT ; then : ; else echo "" ; exit 1 ; fi
+if [ "$INPUT" ] ; then
+	if [ "$INPUT" = "NONE" ] ; then
+		EXTRA_INCLUDE_DIRS=""
+	else
+		EXTRA_INCLUDE_DIRS=$INPUT
+	fi
+fi
+echo ""
+
+####
+
+echo "Are there any extra library directories you wish to use?"
+echo "You may only need to do this if CMake is unable to locate"
+echo "missing dependencies without hints."
+echo "Separate directories with semicolons."
+echo "If you need no extra library directories, enter NONE in all caps."
+echo2 "[$EXTRA_LIB_DIRS] "
+if read INPUT ; then : ; else echo "" ; exit 1 ; fi
+if [ "$INPUT" ] ; then
+	if [ "$INPUT" = "NONE" ] ; then
+		EXTRA_LIB_DIRS=""
+	else
+		EXTRA_LIB_DIRS=$INPUT
+	fi
+fi
+echo ""
+
+####
+
+echo "Are there any extra arguments you wish to pass to CMake?"
+echo "If you need no extra arugments to CMake, enter NONE in all caps."
 echo2 "[$EXTRA_CONFIG_ARGS] "
 if read INPUT ; then : ; else echo "" ; exit 1 ; fi
 if [ "$INPUT" ] ; then
-  EXTRA_CONFIG_ARGS=$INPUT
+	if [ "$INPUT" = "NONE" ] ; then
+		EXTRA_CONFIG_ARGS=""
+	else
+		EXTRA_CONFIG_ARGS=$INPUT
+	fi
 fi
 echo ""
 
@@ -412,6 +461,8 @@ UMASK=$UMASK
 DEBUG="$DEBUG"
 USE_RUN_CC_PL="$USE_RUN_CC_PL"
 USE_PCH="$USE_PCH"
+EXTRA_INCLUDE_DIRS="$EXTRA_INCLUDE_DIRS"
+EXTRA_LIB_DIRS="$EXTRA_LIB_DIRS"
 EXTRA_CONFIG_ARGS="$EXTRA_CONFIG_ARGS"
 EOT
 echo "done."

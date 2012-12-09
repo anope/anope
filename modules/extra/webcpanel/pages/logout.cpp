@@ -17,7 +17,7 @@ bool WebCPanel::Logout::OnRequest(HTTPProvider *server, const Anope::string &pag
 	na->Shrink("webcpanel_ip");
 
 	reply.error = HTTP_FOUND;
-	reply.headers["Location"] = Anope::string("http") + (use_ssl ? "s" : "") + "://" + message.headers["Host"];
+	reply.headers["Location"] = Anope::string("http") + (use_ssl ? "s" : "") + "://" + message.headers["Host"] + "/";
 	return true;
 }
 

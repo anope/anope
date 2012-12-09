@@ -75,8 +75,8 @@ class MyHTTPClient : public HTTPClient
 
 				if (this->header.headers.count(token))
 				{
-					Log(LOG_DEBUG, "httpd") << "m_httpd: IP for connection " << this->GetFD() << " changed to " << this->ip;
 					this->ip = this->header.headers[token];
+					Log(LOG_DEBUG, "httpd") << "m_httpd: IP for connection " << this->GetFD() << " changed to " << this->ip;
 					break;
 				}
 			}

@@ -145,19 +145,17 @@ class ModuleWebCPanel : public Module
 
 			panel.sections.push_back(s);
 		}
-		if (IRCD || IRCD->CanSetVHost)
-		{
-			if (Config->HostServ.empty() == false)
-			{
-				Section s;
-				s.name = Config->HostServ;
 
-				SubSection ss;
-				ss.name = "Request";
-				ss.url = "/hostserv/request";
-				s.subsections.push_back(ss);
-				provider->RegisterPage(&this->hostserv_request);
-			}
+		if (Config->HostServ.empty() == false)
+		{
+			Section s;
+			s.name = Config->HostServ;
+
+			SubSection ss;
+			ss.name = "vHost Request";
+			ss.url = "/hostserv/request";
+			s.subsections.push_back(ss);
+			provider->RegisterPage(&this->hostserv_request);
 		}
 
 		if (Config->OperServ.empty() == false)

@@ -1,0 +1,23 @@
+{INCLUDE header.html}
+	{FOR M IN MESSAGES}
+		{M}<br/>
+	{END FOR}
+	<table width="100%" height="100%">
+		<tr>
+			<td>Your <b>current</b> vHost</td>
+		{IF EXISTS VHOST}
+			<td>{VHOST}</td>
+		{ELSE}
+			<td><b>None</td>
+		{END IF}
+	</table>
+	{IF EXISTS VHOST}		
+		<b>Request a new vHost</b>
+	{ELSE}
+		<b>Request a vHost</b>
+	{END IF}
+	<form method="post" action="/hostserv/request">
+		<input name="req">
+		<input type="submit" value="Request">
+	</form>
+{INCLUDE footer.html}

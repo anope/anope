@@ -156,6 +156,8 @@ class ModuleWebCPanel : public Module
 			ss.url = "/hostserv/request";
 			s.subsections.push_back(ss);
 			provider->RegisterPage(&this->hostserv_request);
+
+			panel.sections.push_back(s);
 		}
 
 		if (Config->OperServ.empty() == false)

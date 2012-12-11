@@ -323,7 +323,7 @@ bool IRCDProto::IsNickValid(const Anope::string &nick)
 	 if (nick.empty())
 	 	return false;
 	
-	Anope::string special = "{}\\`_^{|}";
+	Anope::string special = "[]\\`_^{|}";
 	
 	for (unsigned i = 0; i < nick.length(); ++i)
 		if (!(nick[i] >= 'A' && nick[i] <= 'Z') && !(nick[i] >= 'a' && nick[i] <= 'z') && special.find(nick[i]) == Anope::string::npos

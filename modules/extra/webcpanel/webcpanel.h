@@ -50,7 +50,7 @@ class Panel : public Section, public Service
 		if (na == NULL)
 			return NULL;
 
-		Anope::string *n_id = na->GetExt<Anope::string *>("webcpanel_id"), *n_ip = na->GetExt<Anope::string *>("webcpanel_ip");
+		Anope::string *n_id = na->GetExt<ExtensibleItemClass<Anope::string> *>("webcpanel_id"), *n_ip = na->GetExt<ExtensibleItemClass<Anope::string> *>("webcpanel_ip");
 		if (n_id == NULL || n_ip == NULL)
 			return NULL;
 		else if (id != *n_id)

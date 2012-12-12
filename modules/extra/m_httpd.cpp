@@ -136,7 +136,7 @@ class MyHTTPClient : public HTTPClient
 				if (sz == Anope::string::npos || !sz || sz + 1 >= token.length())
 					continue;
 				this->header.post_data[token.substr(0, sz)] = HTTPUtils::URLDecode(token.substr(sz + 1));
-				Log(LOG_DEBUG_2) << "HTTP POST from  " << this->clientaddr.addr() << ": " << token.substr(0, sz) << ": " << this->header.post_data[token.substr(0, sz)];
+				Log(LOG_DEBUG_2) << "HTTP POST from " << this->clientaddr.addr() << ": " << token.substr(0, sz) << ": " << this->header.post_data[token.substr(0, sz)];
 			}
 
 			this->Serve();

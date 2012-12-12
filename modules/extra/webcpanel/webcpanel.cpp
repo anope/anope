@@ -34,7 +34,10 @@ class ModuleWebCPanel : public Module
 
 	WebCPanel::MemoServ::Memos memoserv_memos;
 
+	WebCPanel::HostServ::Request hostserv_request;
+
 	WebCPanel::OperServ::Akill operserv_akill;
+
 
  public:
 	ModuleWebCPanel(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, SUPPORTED),
@@ -43,7 +46,7 @@ class ModuleWebCPanel : public Module
 		index("/"), logout("/logout"), _register("/register"), confirm("/confirm"),
 		nickserv_info(Config->NickServ, "/nickserv/info"), nickserv_cert(Config->NickServ, "/nickserv/cert"), nickserv_access(Config->NickServ, "/nickserv/access"), nickserv_alist(Config->NickServ, "/nickserv/alist"),
 		chanserv_info(Config->ChanServ, "/chanserv/info"), chanserv_set(Config->ChanServ, "/chanserv/set"), chanserv_access(Config->ChanServ, "/chanserv/access"), chanserv_akick(Config->ChanServ, "/chanserv/akick"),
-		memoserv_memos(Config->MemoServ, "/memoserv/memos"), operserv_akill(Config->OperServ, "/operserv/akill")
+		memoserv_memos(Config->MemoServ, "/memoserv/memos"), hostserv_request(Config->HostServ, "/hostserv/request"), operserv_akill(Config->OperServ, "/operserv/akill")
 	{
 		this->SetAuthor("Anope");
 
@@ -143,6 +146,20 @@ class ModuleWebCPanel : public Module
 			panel.sections.push_back(s);
 		}
 
+		if (Config->HostServ.empty() == false)
+		{
+			Section s;
+			s.name = Config->HostServ;
+
+			SubSection ss;
+			ss.name = "vHost Request";
+			ss.url = "/hostserv/request";
+			s.subsections.push_back(ss);
+			provider->RegisterPage(&this->hostserv_request);
+
+			panel.sections.push_back(s);
+		}
+
 		if (Config->OperServ.empty() == false)
 		{
 			Section s;
@@ -183,6 +200,8 @@ class ModuleWebCPanel : public Module
 			provider->UnregisterPage(&this->chanserv_akick);
 
 			provider->UnregisterPage(&this->memoserv_memos);
+			
+			provider->UnregisterPage(&this->hostserv_request);
 		}
 	}
 };

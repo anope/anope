@@ -152,7 +152,7 @@ class CommandHSRequest : public Command
 
 
 		HostRequest *req = new HostRequest;
-		req->nick = u->nick;
+		req->nick = source.GetNick();
 		req->ident = user;
 		req->host = host;
 		req->time = Anope::CurTime;

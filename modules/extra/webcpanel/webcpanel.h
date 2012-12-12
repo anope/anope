@@ -165,4 +165,6 @@ namespace WebPanel
 
 #include "pages/memoserv/memos.h"
 
+#include "pages/hostserv/request.h"
+
 #include "pages/operserv/akill.h"

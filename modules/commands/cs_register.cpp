@@ -42,6 +42,8 @@ class CommandCSRegister : public Command
 			source.Reply(CHAN_SYMBOL_REQUIRED);
 		else if (!IRCD->IsChannelValid(chan))
 			source.Reply(CHAN_X_INVALID, chan.c_str());
+		else if (!c && u)
+			source.Reply(CHAN_X_NOT_IN_USE, chan.c_str());
 		else if (ci)
 			source.Reply(_("Channel \002%s\002 is already registered!"), chan.c_str());
 		else if (c && !c->HasUserStatus(u, CMODE_OP))

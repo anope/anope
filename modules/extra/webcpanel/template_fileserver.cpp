@@ -137,10 +137,14 @@ void TemplateFileServer::Serve(HTTPProvider *server, const Anope::string &page_n
 					if (second.empty())
 						second = tokens[3];
 
-					IfStack.push(first == second);
+					bool stackok = IfStack.empty() || IfStack.top();
+					IfStack.push(stackok && first == second);
 				}
 				else if (tokens.size() == 3 && tokens[1] == "EXISTS")
-					IfStack.push(r.count(tokens[2]) > 0);
+				{
+					bool stackok = IfStack.empty() || IfStack.top();
+					IfStack.push(stackok && r.count(tokens[2]) > 0);
+				}
 				else
 					Log() << "Invalid IF in web template " << this->file_name;
 			}
@@ -152,7 +156,8 @@ void TemplateFileServer::Serve(HTTPProvider *server, const Anope::string &page_n
 				{
 					bool old = IfStack.top();
 					IfStack.pop(); // Pop off previous if()
-					IfStack.push(!old); // Push back the opposite of what was popped
+					bool stackok = IfStack.empty() || IfStack.top();
+					IfStack.push(stackok && !old); // Push back the opposite of what was popped
 				}
 			}
 			else if (content == "END IF")

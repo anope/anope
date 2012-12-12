@@ -16,10 +16,8 @@ bool WebCPanel::HostServ::Request::OnRequest(HTTPProvider *server, const Anope::
 	if (message.post_data.count("req") > 0)
 	{
 		std::vector<Anope::string> params;
-		std::stringstream cmdstr;
+		params.push_back(HTTPUtils::URLDecode(message.post_data["req"]));
 
-		cmdstr << HTTPUtils::URLDecode(message.post_data["req"]);
-		params.push_back(cmdstr.str());
 		WebPanel::RunCommand(na->nc->display, na->nc, Config->HostServ, "hostserv/request", params, replacements);
 	}
 
@@ -30,6 +28,8 @@ bool WebCPanel::HostServ::Request::OnRequest(HTTPProvider *server, const Anope::
 		else
 			replacements["VHOST"] = na->GetVhostHost();
 	}
+	if (ServiceReference<Command>("Command", "hostserv/request"))
+		replacements["CAN_REQUEST"] = "YES";
 	TemplateFileServer page("hostserv/request.html");
 	page.Serve(server, page_name, client, message, reply, replacements);
 	return true;

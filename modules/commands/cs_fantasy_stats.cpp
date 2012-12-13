@@ -14,16 +14,16 @@
 #include "module.h"
 #include "../extra/sql.h"
 
-class MySQLInterface : public SQLInterface
+class MySQLInterface : public SQL::Interface
 {
  public:
-	MySQLInterface(Module *o) : SQLInterface(o) { }
+	MySQLInterface(Module *o) : SQL::Interface(o) { }
 
-	void OnResult(const SQLResult &r) anope_override
+	void OnResult(const SQL::Result &r) anope_override
 	{
 	}
 
-	void OnError(const SQLResult &r) anope_override
+	void OnError(const SQL::Result &r) anope_override
 	{
 		if (!r.GetQuery().query.empty())
 			Log(LOG_DEBUG) << "Chanstats: Error executing query " << r.finished_query << ": " << r.GetError();
@@ -66,7 +66,7 @@ class CSStats : public Module
 {
 	CommandCSStats commandcsstats;
 	CommandCSGStats commandcsgstats;
-	ServiceReference<SQLProvider> sql;
+	ServiceReference<SQL::Provider> sql;
 	MySQLInterface sqlinterface;
 	Anope::string prefix;
  public:
@@ -86,17 +86,17 @@ class CSStats : public Module
 		ConfigReader config;
 		prefix = config.ReadValue("chanstats", "prefix", "anope_", 0);
 		Anope::string engine = config.ReadValue("chanstats", "engine", "", 0);
-		this->sql = ServiceReference<SQLProvider>("SQLProvider", engine);
+		this->sql = ServiceReference<SQL::Provider>("SQL::Provider", engine);
 	}
 
-	SQLResult RunQuery(const SQLQuery &query)
+	SQL::Result RunQuery(const SQL::Query &query)
 	{
 		if (!this->sql)
-			throw SQLException("Unable to locate SQL reference, is m_mysql loaded and configured correctly?");
+			throw SQL::Exception("Unable to locate SQL reference, is m_mysql loaded and configured correctly?");
 
-		SQLResult res = this->sql->RunQuery(query);
+		SQL::Result res = this->sql->RunQuery(query);
 		if (!res.GetError().empty())
-			throw SQLException(res.GetError());
+			throw SQL::Exception(res.GetError());
 		return res;
 	}
 
@@ -118,16 +118,16 @@ class CSStats : public Module
 
 		try
 		{
-			SQLQuery query;
+			SQL::Query query;
 			query = "SELECT letters, words, line, smileys_happy+smileys_sad+smileys_other as smileys,"
 				"actions FROM `" + prefix + "chanstats` "
 				"WHERE `nick` = @nick@ AND `chan` = @channel@ AND `type` = 'total';";
 			if (is_global)
-				query.setValue("channel", "");
+				query.SetValue("channel", "");
 			else
-				query.setValue("channel", source.c->ci->name);
-			query.setValue("nick", display);
-			SQLResult res = this->RunQuery(query);
+				query.SetValue("channel", source.c->ci->name);
+			query.SetValue("nick", display);
+			SQL::Result res = this->RunQuery(query);
 
 			if (res.Rows() > 0)
 			{
@@ -144,7 +144,7 @@ class CSStats : public Module
 			else
 				source.Reply(_("No stats for %s"), display.c_str());
 		}
-		catch (const SQLException &ex)
+		catch (const SQL::Exception &ex)
 		{
 			Log(LOG_DEBUG) << ex.GetReason();
 		}

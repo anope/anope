@@ -137,10 +137,8 @@ bool XLine::IsRegex() const
 	return !this->mask.empty() && this->mask[0] == '/' && this->mask[this->mask.length() - 1] == '/';
 }
 
-Serialize::Data XLine::Serialize() const
+void XLine::Serialize(Serialize::Data &data) const
 {
-	Serialize::Data data;	
-
 	data["mask"] << this->mask;
 	data["by"] << this->by;
 	data["created"] << this->created;
@@ -149,13 +147,15 @@ Serialize::Data XLine::Serialize() const
 	data["uid"] << this->id;
 	if (this->manager)
 		data["manager"] << this->manager->name;
-
-	return data;
 }
 
 Serializable* XLine::Unserialize(Serializable *obj, Serialize::Data &data)
 {
-	ServiceReference<XLineManager> xlm("XLineManager", data["manager"].astr());
+	Anope::string smanager;
+
+	data["manager"] >> smanager;
+
+	ServiceReference<XLineManager> xlm("XLineManager", smanager);
 	if (!xlm)
 		return NULL;
 
@@ -176,9 +176,16 @@ Serializable* XLine::Unserialize(Serializable *obj, Serialize::Data &data)
 	}
 	else
 	{
+		Anope::string smask, sby, sreason, suid;
 		time_t expires;
+
+		data["mask"] >> smask;
+		data["by"] >> sby;
+		data["reason"] >> sreason;
+		data["uid"] >> suid;
 		data["expires"] >> expires;
-		xl = new XLine(data["mask"].astr(), data["by"].astr(), expires, data["reason"].astr(), data["uid"].astr());
+
+		xl = new XLine(smask, sby, expires, sreason, suid);
 		xlm->AddXLine(xl);
 	}
 

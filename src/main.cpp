@@ -14,7 +14,6 @@
 #include "timers.h"
 #include "config.h"
 #include "bots.h"
-#include "signals.h"
 #include "socketengine.h"
 #include "uplink.h"
 
@@ -31,6 +30,7 @@ Anope::string Anope::ServicesDir;
 Anope::string Anope::ServicesBin;
 
 int Anope::ReturnValue = 0;
+sig_atomic_t Anope::Signal = 0;
 bool Anope::Quitting = false;
 bool Anope::Restarting = false;
 Anope::string Anope::QuitReason;
@@ -62,40 +62,6 @@ void Anope::SaveDatabases()
 	FOREACH_RESULT(I_OnSaveDatabase, OnSaveDatabase());
 	Log(LOG_DEBUG) << "Saving databases";
 }
-
-std::vector<Signal *> Signal::SignalHandlers;
-
-void Signal::SignalHandler(int signal)
-{
-	for (unsigned i = 0, j = SignalHandlers.size(); i < j; ++i)
-		if (SignalHandlers[i]->signal == signal)
-			SignalHandlers[i]->Notify();
-}
-
-Signal::Signal(int s) : Pipe(), signal(s)
-{
-	memset(&this->old, 0, sizeof(this->old));
-
-	this->action.sa_flags = 0;
-	sigemptyset(&this->action.sa_mask);
-	this->action.sa_handler = SignalHandler;
-	
-	if (sigaction(s, &this->action, &this->old) == -1)
-		throw CoreException("Unable to install signal " + stringify(s) + ": " + Anope::LastError());
-
-	SignalHandlers.push_back(this);
-}
-
-Signal::~Signal()
-{
-	std::vector<Signal *>::iterator it = std::find(SignalHandlers.begin(), SignalHandlers.end(), this);
-	if (it != SignalHandlers.end())
-		SignalHandlers.erase(it);
-	
-	sigaction(this->signal, &this->old, NULL);
-}
-
-/*************************************************************************/
 
 /** The following comes from InspIRCd to get the full path of the Anope executable
  */
@@ -196,6 +162,9 @@ int main(int ac, char **av, char **envp)
 
 		/* Process the socket engine */
 		SocketEngine::Process();
+
+		if (Anope::Signal)
+			Anope::HandleSignal();
 	}
 
 	if (Anope::Restarting)

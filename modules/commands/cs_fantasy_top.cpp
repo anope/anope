@@ -14,16 +14,16 @@
 #include "module.h"
 #include "../extra/sql.h"
 
-class MySQLInterface : public SQLInterface
+class MySQLInterface : public SQL::Interface
 {
  public:
-	MySQLInterface(Module *o) : SQLInterface(o) { }
+	MySQLInterface(Module *o) : SQL::Interface(o) { }
 
-	void OnResult(const SQLResult &r) anope_override
+	void OnResult(const SQL::Result &r) anope_override
 	{
 	}
 
-	void OnError(const SQLResult &r) anope_override
+	void OnError(const SQL::Result &r) anope_override
 	{
 		if (!r.GetQuery().query.empty())
 			Log(LOG_DEBUG) << "Chanstats: Error executing query " << r.finished_query << ": " << r.GetError();
@@ -93,7 +93,7 @@ class CSTop : public Module
 	CommandCSGTop commandcsgtop;
 	CommandCSTop10 commandcstop10;
 	CommandCSGTop10 commandcsgtop10;
-	ServiceReference<SQLProvider> sql;
+	ServiceReference<SQL::Provider> sql;
 	MySQLInterface sqlinterface;
 	Anope::string prefix;
 
@@ -115,17 +115,17 @@ class CSTop : public Module
 		ConfigReader config;
 		prefix = config.ReadValue("chanstats", "prefix", "anope_", 0);
 		Anope::string engine = config.ReadValue("chanstats", "engine", "", 0);
-		this->sql = ServiceReference<SQLProvider>("SQLProvider", engine);
+		this->sql = ServiceReference<SQL::Provider>("SQL::Provider", engine);
 	}
 
-	SQLResult RunQuery(const SQLQuery &query)
+	SQL::Result RunQuery(const SQL::Query &query)
 	{
 		if (!this->sql)
-			throw SQLException("Unable to locate SQL reference, is m_mysql loaded and configured correctly?");
+			throw SQL::Exception("Unable to locate SQL reference, is m_mysql loaded and configured correctly?");
 
-		SQLResult res = sql->RunQuery(query);
+		SQL::Result res = sql->RunQuery(query);
 		if (!res.GetError().empty())
-			throw SQLException(res.GetError());
+			throw SQL::Exception(res.GetError());
 		return res;
 	}
 
@@ -147,20 +147,20 @@ class CSTop : public Module
 
 		try
 		{
-			SQLQuery query;
+			SQL::Query query;
 			query = "SELECT nick, letters, words, line, actions,"
 				"smileys_happy+smileys_sad+smileys_other as smileys "
 				"FROM `" + prefix + "chanstats` "
 				"WHERE `nick` != '' AND `chan` = @channel@ AND `type` = 'total' "
 				"ORDER BY `letters` DESC LIMIT @limit@;";
-			query.setValue("limit", limit, false);
+			query.SetValue("limit", limit, false);
 
 			if (is_global)
-				query.setValue("channel", "");
+				query.SetValue("channel", "");
 			else
-				query.setValue("channel", channel.c_str());
+				query.SetValue("channel", channel.c_str());
 
-			SQLResult res = this->RunQuery(query);
+			SQL::Result res = this->RunQuery(query);
 
 			if (res.Rows() > 0)
 			{
@@ -176,7 +176,7 @@ class CSTop : public Module
 			else
 				source.Reply(_("No stats for %s"), is_global ? "Network" : channel.c_str());
 		}
-		catch (const SQLException &ex)
+		catch (const SQL::Exception &ex)
 		{
 			Log(LOG_DEBUG) << ex.GetReason();
 		}

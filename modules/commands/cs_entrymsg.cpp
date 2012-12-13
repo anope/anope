@@ -28,16 +28,12 @@ struct EntryMsg : Serializable
 		this->when = ct;
 	}
 
-	Serialize::Data Serialize() const anope_override
+	void Serialize(Serialize::Data &data) const anope_override
 	{
-		Serialize::Data data;
-
 		data["ci"] << this->ci->name;
 		data["creator"] << this->creator;
 		data["message"] << this->message;
-		data["when"].SetType(Serialize::DT_INT) << this->when;
-
-		return data;
+		data.SetType("when", Serialize::Data::DT_INT); data["when"] << this->when;
 	}
 
 	static Serializable* Unserialize(Serializable *obj, Serialize::Data &data);
@@ -52,7 +48,13 @@ struct EntryMessageList : Serialize::Checker<std::vector<EntryMsg *> >, Extensib
 
 Serializable* EntryMsg::Unserialize(Serializable *obj, Serialize::Data &data)
 {
-	ChannelInfo *ci = ChannelInfo::Find(data["ci"].astr());
+	Anope::string sci, screator, smessage;
+
+	data["ci"] >> sci;
+	data["creator"] >> screator;
+	data["message"] >> smessage;
+
+	ChannelInfo *ci = ChannelInfo::Find(sci);
 	if (!ci)
 		return NULL;
 
@@ -73,7 +75,7 @@ Serializable* EntryMsg::Unserialize(Serializable *obj, Serialize::Data &data)
 		ci->Extend("cs_entrymsg", messages);
 	}
 
-	EntryMsg *m = new EntryMsg(ci, data["creator"].astr(), data["message"].astr());
+	EntryMsg *m = new EntryMsg(ci, screator, smessage);
 	(*messages)->push_back(m);
 	return m;
 }

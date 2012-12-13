@@ -78,11 +78,9 @@ NickCore::~NickCore()
 	}
 }
 
-Serialize::Data NickCore::Serialize() const
+void NickCore::Serialize(Serialize::Data &data) const
 {
-	Serialize::Data data;	
-
-	data["display"].SetMax(Config->NickLen) << this->display;
+	data["display"] << this->display;
 	data["pass"] << this->pass;
 	data["email"] << this->email;
 	data["greet"] << this->greet;
@@ -95,24 +93,27 @@ Serialize::Data NickCore::Serialize() const
 	data["memomax"] << this->memos.memomax;
 	for (unsigned i = 0; i < this->memos.ignores.size(); ++i)
 		data["memoignores"] << this->memos.ignores[i] << " ";
-	
-	return data;
 }
 
 Serializable* NickCore::Unserialize(Serializable *obj, Serialize::Data &data)
 {
 	NickCore *nc;
 
+	Anope::string sdisplay, sflags;
+
+	data["display"] >> sdisplay;
+	data["flags"] >> sflags;
+
 	if (obj)
 		nc = anope_dynamic_static_cast<NickCore *>(obj);
 	else
-		nc = new NickCore(data["display"].astr());
+		nc = new NickCore(sdisplay);
 
 	data["pass"] >> nc->pass;
 	data["email"] >> nc->email;
 	data["greet"] >> nc->greet;
 	data["language"] >> nc->language;
-	nc->FromString(data["flags"].astr());
+	nc->FromString(sflags);
 	{
 		Anope::string buf;
 		data["access"] >> buf;

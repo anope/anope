@@ -1,7 +1,7 @@
 #include "module.h"
 #include "sql.h"
 
-class SQLOperResult : public SQLInterface
+class SQLOperResult : public SQL::Interface
 {
 	Reference<User> user;
 
@@ -13,9 +13,9 @@ class SQLOperResult : public SQLInterface
 	};
 
  public:
-	SQLOperResult(Module *m, User *u) : SQLInterface(m), user(u) { }
+	SQLOperResult(Module *m, User *u) : SQL::Interface(m), user(u) { }
 
-	void OnResult(const SQLResult &r) anope_override
+	void OnResult(const SQL::Result &r) anope_override
 	{
 		SQLOperResultDeleter d(this);
 
@@ -27,7 +27,7 @@ class SQLOperResult : public SQLInterface
 		{
 			opertype = r.Get(0, "opertype");
 		}
-		catch (const SQLException &)
+		catch (const SQL::Exception &)
 		{
 			return;
 		}
@@ -39,7 +39,7 @@ class SQLOperResult : public SQLInterface
 		{
 			modes = r.Get(0, "modes");
 		}
-		catch (const SQLException &) { }
+		catch (const SQL::Exception &) { }
 
 		if (opertype.empty())
 		{
@@ -79,7 +79,7 @@ class SQLOperResult : public SQLInterface
 		}
 	}
 
-	void OnError(const SQLResult &r) anope_override
+	void OnError(const SQL::Result &r) anope_override
 	{
 		SQLOperResultDeleter d(this);
 		Log(this->owner) << "m_sql_oper: Error executing query " << r.GetQuery().query << ": " << r.GetError();
@@ -91,7 +91,7 @@ class ModuleSQLOper : public Module
 	Anope::string engine;
 	Anope::string query;
 
-	ServiceReference<SQLProvider> SQL;
+	ServiceReference<SQL::Provider> SQL;
 
  public:
 	ModuleSQLOper(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, SUPPORTED)
@@ -111,7 +111,7 @@ class ModuleSQLOper : public Module
 		this->engine = config.ReadValue("m_sql_oper", "engine", "", 0);
 		this->query = config.ReadValue("m_sql_oper", "query", "", 0);
 
-		this->SQL = ServiceReference<SQLProvider>("SQLProvider", this->engine);
+		this->SQL = ServiceReference<SQL::Provider>("SQL::Provider", this->engine);
 	}
 
 	void OnNickIdentify(User *u) anope_override
@@ -122,9 +122,9 @@ class ModuleSQLOper : public Module
 			return;
 		}
 
-		SQLQuery q(this->query);
-		q.setValue("a", u->Account()->display);
-		q.setValue("i", u->ip);
+		SQL::Query q(this->query);
+		q.SetValue("a", u->Account()->display);
+		q.SetValue("i", u->ip);
 
 		this->SQL->Run(new SQLOperResult(this, u), q);
 

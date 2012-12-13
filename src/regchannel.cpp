@@ -34,20 +34,21 @@ template<> const Anope::string* Flags<ChannelInfoFlag>::flags_strings = ChannelI
 static const Anope::string AutoKickFlagString[] = { "AK_ISNICK", "" };
 template<> const Anope::string* Flags<AutoKickFlag>::flags_strings = AutoKickFlagString;
 
-Serialize::Data BadWord::Serialize() const
+void BadWord::Serialize(Serialize::Data &data) const
 {
-	Serialize::Data data;
-
-	data["ci"].SetMax(64)/*XXX*/ << this->ci->name;
-	data["word"].SetMax(512) << this->word;
-	data["type"].SetType(Serialize::DT_INT) << this->type;
-
-	return data;
+	data["ci"] << this->ci->name;
+	data["word"] << this->word;
+	data.SetType("type", Serialize::Data::DT_INT); data["type"] << this->type;
 }
 
 Serializable* BadWord::Unserialize(Serializable *obj, Serialize::Data &data)
 {
-	ChannelInfo *ci = ChannelInfo::Find(data["ci"].astr());
+	Anope::string sci, sword;
+
+	data["ci"] >> sci;
+	data["word"] >> sword;
+
+	ChannelInfo *ci = ChannelInfo::Find(sci);
 	if (!ci)
 		return NULL;
 
@@ -62,7 +63,7 @@ Serializable* BadWord::Unserialize(Serializable *obj, Serialize::Data &data)
 		bw->type = static_cast<BadWordType>(n);
 	}
 	else
-		bw = ci->AddBadWord(data["word"].astr(), static_cast<BadWordType>(n));
+		bw = ci->AddBadWord(sword, static_cast<BadWordType>(n));
 	
 	return bw;
 }
@@ -71,38 +72,39 @@ AutoKick::AutoKick() : Serializable("AutoKick")
 {
 }
 
-Serialize::Data AutoKick::Serialize() const
+void AutoKick::Serialize(Serialize::Data &data) const
 {
-	Serialize::Data data;
-
-	data["ci"].SetMax(64)/*XXX*/ << this->ci->name;
+	data["ci"] << this->ci->name;
 	if (this->HasFlag(AK_ISNICK) && this->nc)
-		data["nc"].SetMax(Config->NickLen) << this->nc->display;
+		data["nc"] << this->nc->display;
 	else
-		data["mask"].SetMax(Config->NickLen) << this->mask;
+		data["mask"] << this->mask;
 	data["reason"] << this->reason;
 	data["creator"] << this->creator;
-	data["addtime"].SetType(Serialize::DT_INT) << this->addtime;
-	data["last_used"].SetType(Serialize::DT_INT) << this->last_used;
+	data.SetType("addtime", Serialize::Data::DT_INT); data["addtime"] << this->addtime;
+	data.SetType("last_used", Serialize::Data::DT_INT); data["last_used"] << this->last_used;
 	data["flags"] << this->ToString();
-
-	return data;
 }
 
 Serializable* AutoKick::Unserialize(Serializable *obj, Serialize::Data &data)
 {
-	ChannelInfo *ci = ChannelInfo::Find(data["ci"].astr());
+	Anope::string sci, snc;
+
+	data["ci"] >> sci;
+	data["nc"] >> snc;
+
+	ChannelInfo *ci = ChannelInfo::Find(sci);
 	if (!ci)
 		return NULL;
 	
 	AutoKick *ak;
-	NickCore *nc = NickCore::Find(data["nc"].astr());
+	NickCore *nc = NickCore::Find(snc);
 	if (obj)
 	{
 		ak = anope_dynamic_static_cast<AutoKick *>(obj);
 		data["creator"] >> ak->creator;
 		data["reason"] >> ak->reason;
-		ak->nc = NickCore::Find(data["nc"].astr());
+		ak->nc = NickCore::Find(snc);
 		data["mask"] >> ak->mask;
 		data["addtime"] >> ak->addtime;
 		data["last_used"] >> ak->last_used;
@@ -113,11 +115,21 @@ Serializable* AutoKick::Unserialize(Serializable *obj, Serialize::Data &data)
 		data["addtime"] >> addtime;
 		data["last_used"] >> lastused;
 
+		Anope::string screator, sreason, smask;
+
+		data["creator"] >> screator;
+		data["reason"] >> sreason;
+		data["mask"] >> smask;
+
 		if (nc)	
-			ak = ci->AddAkick(data["creator"].astr(), nc, data["reason"].astr(), addtime, lastused);
+			ak = ci->AddAkick(screator, nc, sreason, addtime, lastused);
 		else
-			ak = ci->AddAkick(data["creator"].astr(), data["mask"].astr(), data["reason"].astr(), addtime, lastused);
+			ak = ci->AddAkick(screator, smask, sreason, addtime, lastused);
 	}
+
+	Anope::string sflags;
+	data["flags"] >> sflags;
+	ak->FromString(sflags);
 
 	return ak;
 }
@@ -126,27 +138,28 @@ ModeLock::ModeLock(ChannelInfo *ch, bool s, ChannelModeName n, const Anope::stri
 {
 }
 
-Serialize::Data ModeLock::Serialize() const
+void ModeLock::Serialize(Serialize::Data &data) const
 {
-	Serialize::Data data;
-
 	if (!this->ci)
-		return data;
+		return;
 
 	const Anope::string* ChannelModeNameStrings = Flags<ChannelModeName>::GetFlagStrings();
-	data["ci"].SetMax(64)/*XXX*/ << this->ci->name;
-	data["set"].SetMax(5) << this->set;
-	data["name"].SetMax(64) << ChannelModeNameStrings[this->name];
-	data["param"].SetMax(512) << this->param;
+	data["ci"] << this->ci->name;
+	data["set"] << this->set;
+	data["name"] << ChannelModeNameStrings[this->name];
+	data["param"] << this->param;
 	data["setter"] << this->setter;
-	data["created"].SetType(Serialize::DT_INT) << this->created;
-
-	return data;
+	data.SetType("created", Serialize::Data::DT_INT); data["created"] << this->created;
 }
 
 Serializable* ModeLock::Unserialize(Serializable *obj, Serialize::Data &data)
 {
-	ChannelInfo *ci = ChannelInfo::Find(data["ci"].astr());
+	Anope::string sci, sname;
+	
+	data["ci"] >> sci;
+	data["name"] >> sname;
+
+	ChannelInfo *ci = ChannelInfo::Find(sci);
 	if (!ci)
 		return NULL;
 
@@ -154,7 +167,7 @@ Serializable* ModeLock::Unserialize(Serializable *obj, Serialize::Data &data)
 
 	const Anope::string* ChannelModeNameStrings = Flags<ChannelModeName>::GetFlagStrings();
 	for (unsigned i = 0; !ChannelModeNameStrings[i].empty(); ++i)
-		if (ChannelModeNameStrings[i] == data["name"].astr())
+		if (ChannelModeNameStrings[i] == sname)
 		{
 			name = static_cast<ChannelModeName>(i);
 			break;
@@ -182,7 +195,10 @@ Serializable* ModeLock::Unserialize(Serializable *obj, Serialize::Data &data)
 		time_t created;
 		data["created"] >> created;
 
-		ml = new ModeLock(ci, set, name, "", data["setter"].astr(), created);
+		Anope::string setter;
+		data["setter"] >> setter;
+
+		ml = new ModeLock(ci, set, name, "", setter, created);
 		data["param"] >> ml->param;
 
 		ci->mode_locks->insert(std::make_pair(ml->name, ml));
@@ -190,12 +206,10 @@ Serializable* ModeLock::Unserialize(Serializable *obj, Serialize::Data &data)
 	}
 }
 
-Serialize::Data LogSetting::Serialize() const
+void LogSetting::Serialize(Serialize::Data &data) const
 {
-	Serialize::Data data;
-
 	if (!ci)
-		return data;
+		return;
 
 	data["ci"] << ci->name;
 	data["service_name"] << service_name;
@@ -204,14 +218,16 @@ Serialize::Data LogSetting::Serialize() const
 	data["method"] << method;
 	data["extra"] << extra;
 	data["creator"] << creator;
-	data["created"].SetType(Serialize::DT_INT) << created;
-
-	return data;
+	data.SetType("created", Serialize::Data::DT_INT); data["created"] << created;
 }
 
 Serializable* LogSetting::Unserialize(Serializable *obj, Serialize::Data &data)
 {
-	ChannelInfo *ci = ChannelInfo::Find(data["ci"].astr());
+	Anope::string sci;
+	
+	data["ci"] >> sci;
+
+	ChannelInfo *ci = ChannelInfo::Find(sci);
 	if (ci == NULL)
 		return NULL;
 	
@@ -376,22 +392,20 @@ ChannelInfo::~ChannelInfo()
 		--this->founder->channelcount;
 }
 
-Serialize::Data ChannelInfo::Serialize() const
+void ChannelInfo::Serialize(Serialize::Data &data) const
 {
-	Serialize::Data data;
-
-	data["name"].SetMax(255) << this->name;
+	data["name"] << this->name;
 	if (this->founder)
 		data["founder"] << this->founder->display;
 	if (this->successor)
 		data["successor"] << this->successor->display;
 	data["description"] << this->desc;
-	data["time_registered"].SetType(Serialize::DT_INT) << this->time_registered;
-	data["last_used"].SetType(Serialize::DT_INT) << this->last_used;
+	data.SetType("time_registered", Serialize::Data::DT_INT); data["time_registered"] << this->time_registered;
+	data.SetType("last_used", Serialize::Data::DT_INT); data["last_used"] << this->last_used;
 	data["last_topic"] << this->last_topic;
 	data["last_topic_setter"] << this->last_topic_setter;
-	data["last_topic_time"].SetType(Serialize::DT_INT) << this->last_topic_time;
-	data["bantype"].SetType(Serialize::DT_INT) << this->bantype;
+	data.SetType("last_topic_time", Serialize::Data::DT_INT); data["last_topic_time"] << this->last_topic_time;
+	data.SetType("bantype", Serialize::Data::DT_INT); data["bantype"] << this->bantype;
 	data["flags"] << this->ToString();
 	data["botflags"] << this->botflags.ToString();
 	{
@@ -404,40 +418,44 @@ Serialize::Data ChannelInfo::Serialize() const
 		data["bi"] << this->bi->nick;
 	for (int i = 0; i < TTB_SIZE; ++i)
 		data["ttb"] << this->ttb[i] << " ";
-	data["capsmin"].SetType(Serialize::DT_INT) << this->capsmin;
-	data["capspercent"].SetType(Serialize::DT_INT) << this->capspercent;
-	data["floodlines"].SetType(Serialize::DT_INT) << this->floodlines;
-	data["floodsecs"].SetType(Serialize::DT_INT) << this->floodsecs;
-	data["repeattimes"].SetType(Serialize::DT_INT) << this->repeattimes;
+	data.SetType("capsmin", Serialize::Data::DT_INT); data["capsmin"] << this->capsmin;
+	data.SetType("capspercent", Serialize::Data::DT_INT); data["capspercent"] << this->capspercent;
+	data.SetType("floodlines", Serialize::Data::DT_INT); data["floodlines"] << this->floodlines;
+	data.SetType("floodsecs", Serialize::Data::DT_INT); data["floodsecs"] << this->floodsecs;
+	data.SetType("repeattimes", Serialize::Data::DT_INT); data["repeattimes"] << this->repeattimes;
 	data["memomax"] << this->memos.memomax;
 	for (unsigned i = 0; i < this->memos.ignores.size(); ++i)
 		data["memoignores"] << this->memos.ignores[i] << " ";
-
-	return data;
 }
 
 Serializable* ChannelInfo::Unserialize(Serializable *obj, Serialize::Data &data)
 {
+	Anope::string sname, sfounder, ssuccessor, sflags, sbotflags, slevels, sbi;
+
+	data["name"] >> sname;
+	data["founder"] >> sfounder;
+	data["successor"] >> ssuccessor;
+	data["flags"] >> sflags;
+	data["botflags"] >> sbotflags;
+	data["levels"] >> slevels;
+	data["bi"] >> sbi;
+
 	ChannelInfo *ci;
 	if (obj)
 		ci = anope_dynamic_static_cast<ChannelInfo *>(obj);
 	else
-		ci = new ChannelInfo(data["name"].astr());
+		ci = new ChannelInfo(sname);
 
-	if (data.count("founder") > 0)
-	{
-		if (ci->founder)
-			--ci->founder->channelcount;
-		ci->founder = NickCore::Find(data["founder"].astr());
-		if (ci->founder)
-			++ci->founder->channelcount;
-	}
-	if (data.count("successor") > 0)
-	{
-		ci->successor = NickCore::Find(data["successor"].astr());
-		if (ci->founder && *ci->founder == *ci->successor)
-			ci->successor = NULL;
-	}
+	if (ci->founder)
+		--ci->founder->channelcount;
+	ci->founder = NickCore::Find(sfounder);
+	if (ci->founder)
+		++ci->founder->channelcount;
+
+	ci->successor = NickCore::Find(ssuccessor);
+	if (ci->founder && *ci->founder == *ci->successor)
+		ci->successor = NULL;
+	
 	data["description"] >> ci->desc;
 	data["time_registered"] >> ci->time_registered;
 	data["last_used"] >> ci->last_used;
@@ -445,15 +463,15 @@ Serializable* ChannelInfo::Unserialize(Serializable *obj, Serialize::Data &data)
 	data["last_topic_setter"] >> ci->last_topic_setter;
 	data["last_topic_time"] >> ci->last_topic_time;
 	data["bantype"] >> ci->bantype;
-	ci->FromString(data["flags"].astr());
-	ci->botflags.FromString(data["botflags"].astr());
+	ci->FromString(sflags);
+	ci->botflags.FromString(sbotflags);
 	{
 		std::vector<Anope::string> v;
-		spacesepstream(data["levels"].astr()).GetTokens(v);
+		spacesepstream(slevels).GetTokens(v);
 		for (unsigned i = 0; i + 1 < v.size(); i += 2)
 			ci->levels[v[i]] = convertTo<int16_t>(v[i + 1]);
 	}
-	BotInfo *bi = BotInfo::Find(data["bi"].astr());
+	BotInfo *bi = BotInfo::Find(sbi);
 	if (*ci->bi != bi)
 	{
 		if (ci->bi)

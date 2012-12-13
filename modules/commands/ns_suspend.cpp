@@ -22,19 +22,19 @@ struct NickSuspend : ExtensibleItem, Serializable
 	{
 	}
 
-	Serialize::Data Serialize() const anope_override
+	void Serialize(Serialize::Data &sd) const anope_override
 	{
-		Serialize::Data sd;
-
 		sd["nick"] << this->nick;
 		sd["when"] << this->when;
-
-		return sd;
 	}
 
 	static Serializable* Unserialize(Serializable *obj, Serialize::Data &sd)
 	{
-		const NickAlias *na = NickAlias::Find(sd["nick"].astr());
+		Anope::string snick;
+
+		sd["nick"] >> snick;
+
+		const NickAlias *na = NickAlias::Find(snick);
 		if (na == NULL)
 			return NULL;
 

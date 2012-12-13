@@ -99,25 +99,26 @@ ChanAccess::~ChanAccess()
 {
 }
 
-Serialize::Data ChanAccess::Serialize() const
+void ChanAccess::Serialize(Serialize::Data &data) const
 {
-	Serialize::Data data;
-
 	data["provider"] << this->provider->name;
 	data["ci"] << this->ci->name;
 	data["mask"] << this->mask;
 	data["creator"] << this->creator;
-	data["last_seen"].SetType(Serialize::DT_INT) << this->last_seen;
-	data["created"].SetType(Serialize::DT_INT) << this->created;
+	data.SetType("last_seen", Serialize::Data::DT_INT); data["last_seen"] << this->last_seen;
+	data.SetType("created", Serialize::Data::DT_INT); data["created"] << this->created;
 	data["data"] << this->AccessSerialize();
-
-	return data;
 }
 
 Serializable* ChanAccess::Unserialize(Serializable *obj, Serialize::Data &data)
 {
-	ServiceReference<AccessProvider> aprovider("AccessProvider", data["provider"].astr());
-	ChannelInfo *ci = ChannelInfo::Find(data["ci"].astr());
+	Anope::string provider, chan;
+
+	data["provider"] >> provider;
+	data["ci"] >>chan;
+
+	ServiceReference<AccessProvider> aprovider("AccessProvider", provider);
+	ChannelInfo *ci = ChannelInfo::Find(chan);
 	if (!aprovider || !ci)
 		return NULL;
 
@@ -131,7 +132,10 @@ Serializable* ChanAccess::Unserialize(Serializable *obj, Serialize::Data &data)
 	data["creator"] >> access->creator;
 	data["last_seen"] >> access->last_seen;
 	data["created"] >> access->created;
-	access->AccessUnserialize(data["data"].astr());
+
+	Anope::string adata;
+	data["data"] >> adata;
+	access->AccessUnserialize(adata);
 
 	if (!obj)
 		ci->AddAccess(access);

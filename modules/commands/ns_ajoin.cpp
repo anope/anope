@@ -28,23 +28,23 @@ struct AJoinEntry : Serializable
 
 	AJoinEntry() : Serializable("AJoinEntry") { }
 
-	Serialize::Data Serialize() const anope_override
+	void Serialize(Serialize::Data &sd) const anope_override
 	{
-		Serialize::Data sd;
-
 		if (!this->owner)
-			return sd;
+			return;
 
 		sd["owner"] << this->owner->display;
 		sd["channel"] << this->channel;
 		sd["key"] << this->key;
-
-		return sd;
 	}
 
 	static Serializable* Unserialize(Serializable *obj, Serialize::Data &sd)
 	{
-		NickCore *nc = NickCore::Find(sd["owner"].astr());
+		Anope::string sowner;
+
+		sd["owner"] >> sowner;
+
+		NickCore *nc = NickCore::Find(sowner);
 		if (nc == NULL)
 			return NULL;
 

@@ -14,25 +14,37 @@
 std::map<Anope::string, std::map<Anope::string, Service *> > Service::Services;
 std::map<Anope::string, std::map<Anope::string, Anope::string> > Service::Aliases;
 
-Base::Base()
+Base::Base() : references(NULL)
 {
 }
 
 Base::~Base()
 {
-	for (std::set<ReferenceBase *>::iterator it = this->references.begin(), it_end = this->references.end(); it != it_end; ++it)
+	if (this->references != NULL)
 	{
-		(*it)->Invalidate();
+		for (std::set<ReferenceBase *>::iterator it = this->references->begin(), it_end = this->references->end(); it != it_end; ++it)
+			(*it)->Invalidate();
+		delete this->references;
 	}
 }
 
 void Base::AddReference(ReferenceBase *r)
 {
-	this->references.insert(r);
+	if (this->references == NULL)
+		this->references = new std::set<ReferenceBase *>();
+	this->references->insert(r);
 }
 
 void Base::DelReference(ReferenceBase *r)
 {
-	this->references.erase(r);
+	if (this->references != NULL)
+	{
+		this->references->erase(r);
+		if (this->references->empty())
+		{
+			delete this->references;
+			this->references = NULL;
+		}
+	}
 }
 

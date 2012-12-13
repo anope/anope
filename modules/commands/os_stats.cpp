@@ -18,14 +18,10 @@ struct Stats : Serializable
 {
 	Stats() : Serializable("Stats") { }
 
-	Serialize::Data Serialize() const anope_override
+	void Serialize(Serialize::Data &data) const anope_override
 	{
-		Serialize::Data data;
-
 		data["maxusercnt"] << MaxUserCount;
 		data["maxusertime"] << MaxUserTime;
-
-		return data;
 	}
 
 	static Serializable* Unserialize(Serializable *obj, Serialize::Data &data)

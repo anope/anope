@@ -24,17 +24,13 @@ template<> const Anope::string* Flags<MemoFlag>::flags_strings = MemoFlagString;
 
 Memo::Memo() : Serializable("Memo") { }
 
-Serialize::Data Memo::Serialize() const
+void Memo::Serialize(Serialize::Data &data) const
 {
-	Serialize::Data data;	
-
 	data["owner"] << this->owner;
-	data["time"].SetType(Serialize::DT_INT) << this->time;
+	data.SetType("time", Serialize::Data::DT_INT); data["time"] << this->time;
 	data["sender"] << this->sender;
 	data["text"] << this->text;
 	data["flags"] << this->ToString();
-
-	return data;
 }
 
 Serializable* Memo::Unserialize(Serializable *obj, Serialize::Data &data)
@@ -42,8 +38,13 @@ Serializable* Memo::Unserialize(Serializable *obj, Serialize::Data &data)
 	if (!MemoServService)
 		return NULL;
 	
+	Anope::string owner, flags;
+
+	data["owner"] >> owner;
+	data["flags"] >> flags;
+	
 	bool ischan;
-	MemoInfo *mi = MemoServService->GetMemoInfo(data["owner"].astr(), ischan);
+	MemoInfo *mi = MemoServService->GetMemoInfo(owner, ischan);
 	if (!mi)
 		return NULL;
 
@@ -56,7 +57,7 @@ Serializable* Memo::Unserialize(Serializable *obj, Serialize::Data &data)
 	data["time"] >> m->time;
 	data["sender"] >> m->sender;
 	data["text"] >> m->text;
-	m->FromString(data["flags"].astr());
+	m->FromString(flags);
 
 	if (obj == NULL)
 		mi->memos->push_back(m);

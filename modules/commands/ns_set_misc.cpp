@@ -23,20 +23,22 @@ struct NSMiscData : ExtensibleItem, Serializable
 	{
 	}
 
-	Serialize::Data Serialize() const anope_override
+	void Serialize(Serialize::Data &sdata) const anope_override
 	{
-		Serialize::Data sdata;
-
 		sdata["nc"] << this->nc->display;
 		sdata["name"] << this->name;
 		sdata["data"] << this->data;
-
-		return sdata;
 	}
 
 	static Serializable* Unserialize(Serializable *obj, Serialize::Data &data)
 	{
-		NickCore *nc = NickCore::Find(data["nc"].astr());
+		Anope::string snc, sname, sdata;
+
+		data["nc"] >> snc;
+		data["name"] >> sname;
+		data["data"] >> sdata;
+
+		NickCore *nc = NickCore::Find(snc);
 		if (nc == NULL)
 			return NULL;
 
@@ -50,8 +52,8 @@ struct NSMiscData : ExtensibleItem, Serializable
 		}
 		else
 		{
-			d = new NSMiscData(nc, data["name"].astr(), data["data"].astr());
-			nc->Extend(data["name"].astr(), d);
+			d = new NSMiscData(nc, sname, sdata);
+			nc->Extend(sname, d);
 		}
 
 		return d;

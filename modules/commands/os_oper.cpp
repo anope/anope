@@ -17,22 +17,23 @@ struct MyOper : Oper, Serializable
 {
 	MyOper(const Anope::string &n, OperType *o) : Oper(n, o), Serializable("Oper") { }
 
-	Serialize::Data Serialize() const anope_override
+	void Serialize(Serialize::Data &data) const anope_override
 	{
-		Serialize::Data data;
-
 		data["name"] << this->name;
 		data["type"] << this->ot->GetName();
-
-		return data;
 	}
 
 	static Serializable* Unserialize(Serializable *obj, Serialize::Data &data)
 	{
-		OperType *ot = OperType::Find(data["type"].astr());
+		Anope::string stype, sname;
+
+		data["type"] >> stype;
+		data["name"] >> sname;
+
+		OperType *ot = OperType::Find(stype);
 		if (ot == NULL)
 			return NULL;
-		NickCore *nc = NickCore::Find(data["name"].astr());
+		NickCore *nc = NickCore::Find(sname);
 		if (nc == NULL)
 			return NULL;
 

@@ -100,7 +100,7 @@ bool WebCPanel::ChanServ::Access::OnRequest(HTTPProvider *server, const Anope::s
 
 						if ((!highest || *highest <= *new_acc) && !u_access.founder && !has_priv)
 							delete new_acc;
-						else if (new_acc->Serialize().empty())
+						else if (new_acc->AccessSerialize().empty())
 						{
 							replacements["MESSAGES"] = "Invalid access expression for the given type";
 							delete new_acc;

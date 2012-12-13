@@ -87,7 +87,7 @@ class CoreExport ChanAccess : public Serializable
 	ChanAccess(AccessProvider *p);
 	virtual ~ChanAccess();
 
-	Serialize::Data Serialize() const anope_override;
+	void Serialize(Serialize::Data &data) const anope_override;
 	static Serializable* Unserialize(Serializable *obj, Serialize::Data &);
 
 	/** Check if this access entry matches the given user or account

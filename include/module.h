@@ -40,7 +40,6 @@
 #include "servers.h"
 #include "service.h"
 #include "services.h"
-#include "signals.h"
 #include "socketengine.h"
 #include "sockets.h"
 #include "threadengine.h"

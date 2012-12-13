@@ -22,19 +22,19 @@ struct ChanSuspend : ExtensibleItem, Serializable
 	{
 	}
 
-	Serialize::Data Serialize() const anope_override
+	void Serialize(Serialize::Data &sd) const anope_override
 	{
-		Serialize::Data sd;
-
 		sd["chan"] << this->chan;
 		sd["when"] << this->when;
-
-		return sd;
 	}
 
 	static Serializable* Unserialize(Serializable *obj, Serialize::Data &sd)
 	{
-		ChannelInfo *ci = ChannelInfo::Find(sd["chan"].astr());
+		Anope::string schan;
+
+		sd["chan"] >> schan;
+
+		ChannelInfo *ci = ChannelInfo::Find(schan);
 		if (ci == NULL)
 			return NULL;
 

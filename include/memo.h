@@ -31,7 +31,7 @@ class CoreExport Memo : public Flags<MemoFlag>, public Serializable
  public:
  	Memo();
 
-	Serialize::Data Serialize() const anope_override;
+	void Serialize(Serialize::Data &data) const anope_override;
 	static Serializable* Unserialize(Serializable *obj, Serialize::Data &);
 
 	Anope::string owner;

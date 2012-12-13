@@ -18,7 +18,7 @@ struct IgnoreData : Serializable
 	time_t time; /* When do we stop ignoring them? */
 
 	IgnoreData() : Serializable("IgnoreData") { }
-	Serialize::Data Serialize() const anope_override;
+	void Serialize(Serialize::Data &data) const anope_override;
 	static Serializable* Unserialize(Serializable *obj, Serialize::Data &data);
 };
 
@@ -43,16 +43,12 @@ class IgnoreService : public Service
 
 static ServiceReference<IgnoreService> ignore_service("IgnoreService", "ignore");
 
-Serialize::Data IgnoreData::Serialize() const
+void IgnoreData::Serialize(Serialize::Data &data) const
 {
-	Serialize::Data data;
-
 	data["mask"] << this->mask;
 	data["creator"] << this->creator;
 	data["reason"] << this->reason;
 	data["time"] << this->time;
-		
-	return data;
 }
 
 Serializable* IgnoreData::Unserialize(Serializable *obj, Serialize::Data &data)
@@ -70,9 +66,14 @@ Serializable* IgnoreData::Unserialize(Serializable *obj, Serialize::Data &data)
 		return ign;
 	}
 
+	Anope::string smask, screator, sreason;
 	time_t t;
+
+	data["mask"] >> smask;
+	data["creator"] >> screator;
+	data["reason"] >> sreason;
 	data["time"] >> t;
 
-	return ignore_service->AddIgnore(data["mask"].astr(), data["creator"].astr(), data["reason"].astr(), t);
+	return ignore_service->AddIgnore(smask, screator, sreason, t);
 }
 

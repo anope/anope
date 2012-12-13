@@ -238,17 +238,15 @@ NickAlias *NickAlias::Find(const Anope::string &nick)
 	return NULL;
 }
 
-Serialize::Data NickAlias::Serialize() const
+void NickAlias::Serialize(Serialize::Data &data) const
 {
-	Serialize::Data data;	
-
-	data["nick"].SetMax(Config->NickLen) << this->nick;
+	data["nick"] << this->nick;
 	data["last_quit"] << this->last_quit;
 	data["last_realname"] << this->last_realname;
 	data["last_usermask"] << this->last_usermask;
 	data["last_realhost"] << this->last_realhost;
-	data["time_registered"].SetType(Serialize::DT_INT) << this->time_registered;
-	data["last_seen"].SetType(Serialize::DT_INT) << this->last_seen;
+	data.SetType("time_registered", Serialize::Data::DT_INT); data["time_registered"] << this->time_registered;
+	data.SetType("time_registered", Serialize::Data::DT_INT); data["last_seen"] << this->last_seen;
 	data["nc"] << this->nc->display;
 	data["flags"] << this->ToString();
 
@@ -259,13 +257,16 @@ Serialize::Data NickAlias::Serialize() const
 		data["vhost_creator"] << this->GetVhostCreator();
 		data["vhost_time"] << this->GetVhostCreated();
 	}
-
-	return data;
 }
 
 Serializable* NickAlias::Unserialize(Serializable *obj, Serialize::Data &data)
 {
-	NickCore *core = NickCore::Find(data["nc"].astr());
+	Anope::string snc, snick;
+
+	data["nc"] >> snc;
+	data["nick"] >> snick;
+
+	NickCore *core = NickCore::Find(snc);
 	if (core == NULL)
 		return NULL;
 
@@ -273,7 +274,7 @@ Serializable* NickAlias::Unserialize(Serializable *obj, Serialize::Data &data)
 	if (obj)
 		na = anope_dynamic_static_cast<NickAlias *>(obj);
 	else
-		na = new NickAlias(data["nick"].astr(), core);
+		na = new NickAlias(snick, core);
 
 	if (na->nc != core)
 	{
@@ -296,11 +297,20 @@ Serializable* NickAlias::Unserialize(Serializable *obj, Serialize::Data &data)
 	data["last_realhost"] >> na->last_realhost;
 	data["time_registered"] >> na->time_registered;
 	data["last_seen"] >> na->last_seen;
-	na->FromString(data["flags"].astr());
 
+	Anope::string flags;
+	data["flags"] >> flags;
+	na->FromString(flags);
+
+	Anope::string vhost_ident, vhost_host, vhost_creator;
 	time_t vhost_time;
+
+	data["vhost_ident"] >> vhost_ident;
+	data["vhost_host"] >> vhost_host;
+	data["vhost_creator"] >> vhost_creator;
 	data["vhost_time"] >> vhost_time;
-	na->SetVhost(data["vhost_ident"].astr(), data["vhost_host"].astr(), data["vhost_creator"].astr(), vhost_time);
+
+	na->SetVhost(vhost_ident, vhost_host, vhost_creator, vhost_time);
 	return na;
 }
 

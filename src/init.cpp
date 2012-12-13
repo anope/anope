@@ -16,7 +16,6 @@
 #include "protocol.h"
 #include "bots.h"
 #include "xline.h"
-#include "signals.h"
 #include "socketengine.h"
 #include "servers.h"
 #include "language.h"
@@ -91,91 +90,6 @@ static bool GetCommandLineArgument(const Anope::string &name, char shortname = 0
 	return GetCommandLineArgument(name, shortname, Unused);
 }
 
-/*************************************************************************/
-
-/* Remove our PID file.  Done at exit. */
-
-static void remove_pidfile()
-{
-	remove(Config->PIDFilename.c_str());
-}
-
-/*************************************************************************/
-
-/* Create our PID file and write the PID to it. */
-
-static void write_pidfile()
-{
-	FILE *pidfile = fopen(Config->PIDFilename.c_str(), "w");
-	if (pidfile)
-	{
-#ifdef _WIN32
-		fprintf(pidfile, "%d\n", static_cast<int>(GetCurrentProcessId()));
-#else
-		fprintf(pidfile, "%d\n", static_cast<int>(getpid()));
-#endif
-		fclose(pidfile);
-		atexit(remove_pidfile);
-	}
-	else
-		throw CoreException("Can not write to PID file " + Config->PIDFilename);
-}
-
-/*************************************************************************/
-
-class SignalReload : public Signal
-{
- public:
-	SignalReload(int sig) : Signal(sig) { }
-
-	void OnNotify()
-	{
-		Log() << "Received SIGHUP: Saving databases & rehashing configuration";
-
-		Anope::SaveDatabases();
-
-		ServerConfig *old_config = Config;
-		try
-		{
-			Config = new ServerConfig();
-			FOREACH_MOD(I_OnReload, OnReload());
-			delete old_config;
-		}
-		catch (const ConfigException &ex)
-		{
-			Config = old_config;
-			Log() << "Error reloading configuration file: " << ex.GetReason();
-		}
-	}
-};
-
-class SignalExit : public Signal
-{
- public:
-	SignalExit(int sig) : Signal(sig) { }
-
-	void OnNotify()
-	{
-#ifndef _WIN32
-		Log() << "Received " << strsignal(this->signal) << " signal (" << this->signal << "), exiting.";
-		Anope::QuitReason = Anope::string("Services terminating via signal ") + strsignal(this->signal) + " (" + stringify(this->signal) + ")";
-#else
-		Log() << "Received signal " << this->signal << ", exiting.";
-		Anope::QuitReason = Anope::string("Services terminating via signal ") + stringify(this->signal);
-#endif
-		Anope::SaveDatabases();
-		Anope::Quitting = true;
-	}
-};
-
-class SignalNothing : public Signal
-{
- public:
-	SignalNothing(int sig) : Signal(sig) { }
-
-	void OnNotify() { }
-};
-
 bool Anope::AtTerm()
 {
 	return isatty(fileno(stdout)) && isatty(fileno(stdin)) && isatty(fileno(stderr));
@@ -196,6 +110,45 @@ void Anope::Fork()
 #endif
 }
 
+void Anope::HandleSignal()
+{
+	switch (Signal)
+	{
+		case SIGHUP:
+		{
+			Anope::SaveDatabases();
+
+			ServerConfig *old_config = Config;
+			try
+			{
+				Config = new ServerConfig();
+				FOREACH_MOD(I_OnReload, OnReload());
+				delete old_config;
+			}
+			catch (const ConfigException &ex)
+			{
+				Config = old_config;
+				Log() << "Error reloading configuration file: " << ex.GetReason();
+			}
+			break;
+		}
+		case SIGTERM:
+		case SIGINT:
+#ifndef _WIN32
+			Log() << "Received " << strsignal(Signal) << " signal (" << Signal << "), exiting.";
+			Anope::QuitReason = Anope::string("Services terminating via signal ") + strsignal(Signal) + " (" + stringify(Signal) + ")";
+#else
+			Log() << "Received signal " << Signal << ", exiting.";
+			Anope::QuitReason = Anope::string("Services terminating via signal ") + stringify(Signal);
+#endif
+			Anope::SaveDatabases();
+			Anope::Quitting = true;
+			break;
+	}
+
+	Signal = 0;
+}
+
 #ifndef _WIN32
 static void parent_signal_handler(int signal)
 {
@@ -214,6 +167,57 @@ static void parent_signal_handler(int signal)
 	}
 }
 #endif
+
+static void SignalHandler(int sig)
+{
+	Anope::Signal = sig;
+}
+
+static void InitSignals()
+{
+	struct sigaction sa;
+
+	sa.sa_flags = 0;
+	sigemptyset(&sa.sa_mask);
+
+	sa.sa_handler = SignalHandler;
+
+	sigaction(SIGHUP, &sa, NULL);
+
+	sigaction(SIGTERM, &sa, NULL);
+	sigaction(SIGINT, &sa, NULL);
+
+	sa.sa_handler = SIG_IGN;
+
+	sigaction(SIGCHLD, &sa, NULL);
+	sigaction(SIGPIPE, &sa, NULL);
+}
+
+/* Remove our PID file.  Done at exit. */
+
+static void remove_pidfile()
+{
+	remove(Config->PIDFilename.c_str());
+}
+
+/* Create our PID file and write the PID to it. */
+
+static void write_pidfile()
+{
+	FILE *pidfile = fopen(Config->PIDFilename.c_str(), "w");
+	if (pidfile)
+	{
+#ifdef _WIN32
+		fprintf(pidfile, "%d\n", static_cast<int>(GetCurrentProcessId()));
+#else
+		fprintf(pidfile, "%d\n", static_cast<int>(getpid()));
+#endif
+		fclose(pidfile);
+		atexit(remove_pidfile);
+	}
+	else
+		throw CoreException("Can not write to PID file " + Config->PIDFilename);
+}
 
 void Anope::Init(int ac, char **av)
 {
@@ -432,10 +436,7 @@ void Anope::Init(int ac, char **av)
 	/* Announce ourselves to the logfile. */
 	Log() << "Anope " << Anope::Version() << " starting up" << (Anope::Debug || Anope::ReadOnly ? " (options:" : "") << (Anope::Debug ? " debug" : "") << (Anope::ReadOnly ? " readonly" : "") << (Anope::Debug || Anope::ReadOnly ? ")" : "");
 
-	new SignalReload(SIGHUP);
-	new SignalExit(SIGTERM);
-	new SignalExit(SIGINT);
-	new SignalNothing(SIGPIPE);
+	InitSignals();
 
 	/* Initialize multi-language support */
 	Language::InitLanguages();

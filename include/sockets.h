@@ -225,15 +225,11 @@ class CoreExport Socket : public Flags<SocketFlag>
 	 */
 	bool IsIPv6() const;
 
-	/** Mark a socket as blocking
+	/** Mark a socket as (non)blocking
+	 * @param state true to enable blocking, false to disable blocking
 	 * @return true if the socket is now blocking
 	 */
-	bool SetBlocking();
-
-	/** Mark a socket as non-blocking
-	 * @return true if the socket is now non-blocking
-	 */
-	bool SetNonBlocking();
+	bool SetBlocking(bool state);
 
 	/** Bind the socket to an ip and port
 	 * @param ip The ip
@@ -456,7 +452,7 @@ class CoreExport ClientSocket : public virtual Socket
 class CoreExport Pipe : public Socket
 {
  public:
- 	/** The FD of the write pipe (if this isn't evenfd)
+ 	/** The FD of the write pipe
 	 * this->sock is the readfd
 	 */
  	int write_pipe;
@@ -468,7 +464,28 @@ class CoreExport Pipe : public Socket
 	 */
 	bool ProcessRead() anope_override;
 
+	/** Write data to this pipe
+	 * @param data The data to write
+	 * @param sz The amount of data to wirite
+	 */
+	void Write(const char *data, size_t sz);
+	inline void Write(const Anope::string &data) { this->Write(data.c_str(), data.length() + 1); }
+
+	/** Read data from this pipe
+	 * @param data A buffer to read data into
+	 * @param sz The size of the buffer
+	 * @return The amount of data read
+	 */
+	int Read(char *data, size_t sz);
+
+	/** Mark the write end of this pipe (non)blocking
+	 * @param state true to enable blocking, false to disable blocking
+	 * @return true if the socket is now blocking
+	 */
+	bool SetWriteBlocking(bool state);
+
 	/** Called when this pipe needs to be woken up
+	 * Is the same as Write("\0", 1)
 	 */
 	void Notify();
 

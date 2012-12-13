@@ -1,16 +1,16 @@
 #include "module.h"
 #include "../extra/sql.h"
 
-class MySQLInterface : public SQLInterface
+class MySQLInterface : public SQL::Interface
 {
  public:
-	MySQLInterface(Module *o) : SQLInterface(o) { }
+	MySQLInterface(Module *o) : SQL::Interface(o) { }
 
-	void OnResult(const SQLResult &r) anope_override
+	void OnResult(const SQL::Result &r) anope_override
 	{
 	}
 
-	void OnError(const SQLResult &r) anope_override
+	void OnError(const SQL::Result &r) anope_override
 	{
 		if (!r.GetQuery().query.empty())
 			Log(LOG_DEBUG) << "Chanstats: Error executing query " << r.finished_query << ": " << r.GetError();
@@ -21,13 +21,13 @@ class MySQLInterface : public SQLInterface
 
 class MChanstats : public Module
 {
-	ServiceReference<SQLProvider> sql;
+	ServiceReference<SQL::Provider> sql;
 	MySQLInterface sqlinterface;
-	SQLQuery query;
+	SQL::Query query;
 	Anope::string SmileysHappy, SmileysSad, SmileysOther, prefix;
 	std::vector<Anope::string> TableList, ProcedureList, EventList;
 
-	void RunQuery(const SQLQuery &q)
+	void RunQuery(const SQL::Query &q)
 	{
 		if (sql)
 			sql->Run(&sqlinterface, q);
@@ -70,7 +70,7 @@ class MChanstats : public Module
 		if (!sql)
 			return;
 
-		SQLResult r = this->sql->RunQuery(this->sql->GetTables(prefix));
+		SQL::Result r = this->sql->RunQuery(this->sql->GetTables(prefix));
 		for (int i = 0; i < r.Rows(); ++i)
 		{
 			const std::map<Anope::string, Anope::string> &map = r.Row(i);
@@ -359,7 +359,7 @@ class MChanstats : public Module
 		SmileysOther = config.ReadValue("chanstats", "SmileysOther", ":/", 0);
 
 		Anope::string engine = config.ReadValue("chanstats", "engine", "", 0);
-		this->sql = ServiceReference<SQLProvider>("SQLProvider", engine);
+		this->sql = ServiceReference<SQL::Provider>("SQL::Provider", engine);
 		if (sql)
 			this->CheckTables();
 		else
@@ -371,8 +371,8 @@ class MChanstats : public Module
 		if (!u || !u->Account() || !c->ci || !c->ci->HasFlag(CI_STATS))
 			return;
 		query = "CALL " + prefix + "chanstats_proc_update(@channel@, @nick@, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1);";
-		query.setValue("channel", c->name);
-		query.setValue("nick", GetDisplay(u));
+		query.SetValue("channel", c->name);
+		query.SetValue("nick", GetDisplay(u));
 		this->RunQuery(query);
 	}
 	EventReturn OnChannelModeSet(Channel *c, MessageSource &setter, ChannelModeName Name, const Anope::string &param) anope_override
@@ -392,8 +392,8 @@ class MChanstats : public Module
 			return;
 
 		query = "CALL " + prefix + "chanstats_proc_update(@channel@, @nick@, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0);";
-		query.setValue("channel", c->name);
-		query.setValue("nick", GetDisplay(u));
+		query.SetValue("channel", c->name);
+		query.SetValue("nick", GetDisplay(u));
 		this->RunQuery(query);
 	}
  public:
@@ -403,13 +403,13 @@ class MChanstats : public Module
 			return;
 
 		query = "CALL " + prefix + "chanstats_proc_update(@channel@, @nick@, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0);";
-		query.setValue("channel", c->name);
-		query.setValue("nick", GetDisplay(target));
+		query.SetValue("channel", c->name);
+		query.SetValue("nick", GetDisplay(target));
 		this->RunQuery(query);
 
 		query = "CALL " + prefix + "chanstats_proc_update(@channel@, @nick@, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0);";
-		query.setValue("channel", c->name);
-		query.setValue("nick", GetDisplay(source.GetUser()));
+		query.SetValue("channel", c->name);
+		query.SetValue("nick", GetDisplay(source.GetUser()));
 		this->RunQuery(query);
 	}
 	void OnPrivmsg(User *u, Channel *c, Anope::string &msg) anope_override
@@ -437,33 +437,33 @@ class MChanstats : public Module
 		words = words - smileys_happy - smileys_sad - smileys_other;
 		query = "CALL " + prefix + "chanstats_proc_update(@channel@, @nick@, 1, @letters@, @words@, @action@, "
 		"@smileys_happy@, @smileys_sad@, @smileys_other@, '0', '0', '0', '0');";
-		query.setValue("channel", c->name);
-		query.setValue("nick", GetDisplay(u));
-		query.setValue("letters", letters);
-		query.setValue("words", words);
-		query.setValue("action", action);
-		query.setValue("smileys_happy", smileys_happy);
-		query.setValue("smileys_sad", smileys_sad);
-		query.setValue("smileys_other", smileys_other);
+		query.SetValue("channel", c->name);
+		query.SetValue("nick", GetDisplay(u));
+		query.SetValue("letters", letters);
+		query.SetValue("words", words);
+		query.SetValue("action", action);
+		query.SetValue("smileys_happy", smileys_happy);
+		query.SetValue("smileys_sad", smileys_sad);
+		query.SetValue("smileys_other", smileys_other);
 		this->RunQuery(query);
 	}
 	void OnDelCore(NickCore *nc) anope_override
 	{
 		query = "DELETE FROM `" + prefix + "chanstats` WHERE `nick` = @nick@;";
-		query.setValue("nick", nc->display);
+		query.SetValue("nick", nc->display);
 		this->RunQuery(query);
 	}
 	void OnChangeCoreDisplay(NickCore *nc, const Anope::string &newdisplay) anope_override
 	{
 		query = "CALL " + prefix + "chanstats_proc_chgdisplay(@old_display@, @new_display@);";
-		query.setValue("old_display", nc->display);
-		query.setValue("new_display", newdisplay);
+		query.SetValue("old_display", nc->display);
+		query.SetValue("new_display", newdisplay);
 		this->RunQuery(query);
 	}
 	void OnChanDrop(ChannelInfo *ci) anope_override
 	{
 		query = "DELETE FROM `" + prefix + "chanstats` WHERE `chan` = @channel@;";
-		query.setValue("channel", ci->name);
+		query.SetValue("channel", ci->name);
 		this->RunQuery(query);
 	}
 };

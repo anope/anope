@@ -49,17 +49,13 @@ class DNSServer : public Serializable
 	}
 
 
-	Serialize::Data Serialize() const anope_override
+	void Serialize(Serialize::Data &data) const anope_override
 	{
-		Serialize::Data data;
-
 		data["server_name"] << server_name;
 		for (unsigned i = 0; i < ips.size(); ++i)
 			data["ip" + stringify(i)] << ips[i];
 		data["limit"] << limit;
 		data["pooled"] << pooled;
-
-		return data;
 	}
 
 	static Serializable* Unserialize(Serializable *obj, Serialize::Data &data)
@@ -72,12 +68,16 @@ class DNSServer : public Serializable
 			req = new DNSServer();
 
 		data["server_name"] >> req->server_name;
-		for (unsigned i = 0; data.count("ip" + stringify(i)); ++i)
+
+		for (unsigned i = 0; true; ++i)
 		{
 			Anope::string ip_str;
 			data["ip" + stringify(i)] >> ip_str;
+			if (ip_str.empty())
+				break;
 			req->ips.push_back(ip_str);
 		}
+
 		data["limit"] >> req->limit;
 		data["pooled"] >> req->pooled;
 

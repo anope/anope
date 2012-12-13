@@ -2,12 +2,14 @@
 #include "../extra/sql.h"
 #include "../commands/os_session.h"
 
+using namespace SQL;
+
 class DBMySQL : public Module, public Pipe
 {
  private:
 	Anope::string engine;
 	Anope::string prefix;
-	ServiceReference<SQLProvider> SQL;
+	ServiceReference<Provider> SQL;
 	time_t lastwarn;
 	bool ro;
 	bool init;
@@ -43,24 +45,24 @@ class DBMySQL : public Module, public Pipe
 		return init && SQL;
 	}
 
-	void RunQuery(const SQLQuery &query)
+	void RunQuery(const Query &query)
 	{
 		/* Can this be threaded? */
 		this->RunQueryResult(query);
 	}
 
-	SQLResult RunQueryResult(const SQLQuery &query)
+	Result RunQueryResult(const Query &query)
 	{
 		if (this->CheckSQL())
 		{
-			SQLResult res = SQL->RunQuery(query);
+			Result res = SQL->RunQuery(query);
 			if (!res.GetError().empty())
 				Log(LOG_DEBUG) << "SQL-live got error " << res.GetError() << " for " + res.finished_query;
 			else
 				Log(LOG_DEBUG) << "SQL-live got " << res.Rows() << " rows for " << res.finished_query;
 			return res;
 		}
-		throw SQLException("No SQL!");
+		throw SQL::Exception("No SQL!");
 	}
 
  public:
@@ -87,21 +89,26 @@ class DBMySQL : public Module, public Pipe
 
 			if (obj && this->SQL)
 			{
-				if (obj->IsCached())
+				Data *data = new Data();
+				obj->Serialize(*data);
+
+				if (obj->IsCached(data))
+				{
+					delete data;
 					continue;
-				obj->UpdateCache();
+				}
+
+				obj->UpdateCache(data);
 
 				Serialize::Type *s_type = obj->GetSerializableType();
 				if (!s_type)
 					continue;
 
-				Serialize::Data data = obj->Serialize();
-
-				std::vector<SQLQuery> create = this->SQL->CreateTable(this->prefix + s_type->GetName(), data);
+				std::vector<Query> create = this->SQL->CreateTable(this->prefix + s_type->GetName(), *data);
 				for (unsigned i = 0; i < create.size(); ++i)
 					this->RunQueryResult(create[i]);
 
-				SQLResult res = this->RunQueryResult(this->SQL->BuildInsert(this->prefix + s_type->GetName(), obj->id, data));
+				Result res = this->RunQueryResult(this->SQL->BuildInsert(this->prefix + s_type->GetName(), obj->id, *data));
 				if (obj->id != res.GetID())
 				{
 					/* In this case obj is new, so place it into the object map */
@@ -129,7 +136,7 @@ class DBMySQL : public Module, public Pipe
 	{
 		ConfigReader config;
 		this->engine = config.ReadValue("db_sql", "engine", "", 0);
-		this->SQL = ServiceReference<SQLProvider>("SQLProvider", this->engine);
+		this->SQL = ServiceReference<Provider>("SQL::Provider", this->engine);
 		this->prefix = config.ReadValue("db_sql", "prefix", "anope_db_", 0);
 	}
 
@@ -157,11 +164,11 @@ class DBMySQL : public Module, public Pipe
 		if (!this->CheckInit() || obj->GetTimestamp() == Anope::CurTime)
 			return;
 
-		SQLQuery query("SELECT * FROM `" + this->prefix + obj->GetName() + "` WHERE (`timestamp` > " + this->SQL->FromUnixtime(obj->GetTimestamp()) + " OR `timestamp` IS NULL)");
+		Query query("SELECT * FROM `" + this->prefix + obj->GetName() + "` WHERE (`timestamp` > " + this->SQL->FromUnixtime(obj->GetTimestamp()) + " OR `timestamp` IS NULL)");
 
 		obj->UpdateTimestamp();
 
-		SQLResult res = this->RunQueryResult(query);
+		Result res = this->RunQueryResult(query);
 
 		bool clear_null = false;
 		for (int i = 0; i < res.Rows(); ++i)
@@ -191,17 +198,17 @@ class DBMySQL : public Module, public Pipe
 			}
 			else
 			{
-				Serialize::Data data;
+				Data *data = new Data();
 
 				for (std::map<Anope::string, Anope::string>::const_iterator it = row.begin(), it_end = row.end(); it != it_end; ++it)
-					data[it->first] << it->second;
+					(*data)[it->first] << it->second;
 
 				Serializable *s = NULL;
 				std::map<unsigned int, Serializable *>::iterator it = obj->objects.find(id);
 				if (it != obj->objects.end())
 					s = it->second;
 
-				Serializable *new_s = obj->Unserialize(s, data);
+				Serializable *new_s = obj->Unserialize(s, *data);
 				if (new_s)
 				{
 					// If s == new_s then s->id == new_s->id
@@ -209,11 +216,16 @@ class DBMySQL : public Module, public Pipe
 					{
 						new_s->id = id;
 						obj->objects[id] = new_s;
-						new_s->UpdateCache(); /* We know this is the most up to date copy */
+						new_s->UpdateCache(data); /* We know this is the most up to date copy */
 					}
+					else
+						delete data;
 				}
 				else
+				{
+					delete data;
 					s->Destroy();
+				}
 			}
 		}
 

@@ -22,20 +22,22 @@ struct CSMiscData : ExtensibleItem, Serializable
 	{
 	}
 
-	Serialize::Data Serialize() const anope_override
+	void Serialize(Serialize::Data &sdata) const anope_override
 	{
-		Serialize::Data sdata;
-
 		sdata["ci"] << this->ci->name;
 		sdata["name"] << this->name;
 		sdata["data"] << this->data;
-
-		return sdata;
 	}
 
 	static Serializable* Unserialize(Serializable *obj, Serialize::Data &data)
 	{
-		ChannelInfo *ci = ChannelInfo::Find(data["ci"].astr());
+		Anope::string sci, sname, sdata;
+
+		data["ci"] >> sci;
+		data["name"] >> sname;
+		data["data"] >> sdata;
+
+		ChannelInfo *ci = ChannelInfo::Find(sci);
 		if (ci == NULL)
 			return NULL;
 
@@ -49,8 +51,8 @@ struct CSMiscData : ExtensibleItem, Serializable
 		}
 		else
 		{
-			d = new CSMiscData(ci, data["name"].astr(), data["data"].astr());
-			ci->Extend(data["name"].astr(), d);
+			d = new CSMiscData(ci, sname, sdata);
+			ci->Extend(sname, d);
 		}
 
 		return d;

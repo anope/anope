@@ -3,13 +3,13 @@
 
 static Module *me;
 
-class SQLAuthenticationResult : public SQLInterface
+class SQLAuthenticationResult : public SQL::Interface
 {
 	Reference<User> user;
 	IdentifyRequest *req;
 
  public:
-	SQLAuthenticationResult(User *u, IdentifyRequest *r) : SQLInterface(me), user(u), req(r)
+	SQLAuthenticationResult(User *u, IdentifyRequest *r) : SQL::Interface(me), user(u), req(r)
 	{
 		req->Hold(me);
 	}
@@ -19,7 +19,7 @@ class SQLAuthenticationResult : public SQLInterface
 		req->Release(me);
 	}
 
-	void OnResult(const SQLResult &r) anope_override
+	void OnResult(const SQL::Result &r) anope_override
 	{
 		if (r.Rows() == 0)
 		{
@@ -35,7 +35,7 @@ class SQLAuthenticationResult : public SQLInterface
 		{
 			email = r.Get(0, "email");
 		}
-		catch (const SQLException &) { }
+		catch (const SQL::Exception &) { }
 
 		NickAlias *na = NickAlias::Find(req->GetAccount());
 		if (na == NULL)
@@ -62,7 +62,7 @@ class SQLAuthenticationResult : public SQLInterface
 		delete this;
 	}
 
-	void OnError(const SQLResult &r) anope_override
+	void OnError(const SQL::Result &r) anope_override
 	{
 		Log(this->owner) << "m_sql_authentication: Error executing query " << r.GetQuery().query << ": " << r.GetError();
 		delete this;
@@ -76,7 +76,7 @@ class ModuleSQLAuthentication : public Module
 	bool disable_register;
 	Anope::string disable_reason;
 
-	ServiceReference<SQLProvider> SQL;
+	ServiceReference<SQL::Provider> SQL;
 
  public:
 	ModuleSQLAuthentication(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, SUPPORTED)
@@ -100,7 +100,7 @@ class ModuleSQLAuthentication : public Module
 		this->disable_register = config.ReadFlag("m_sql_authentication", "disable_ns_register", "false", 0);
 		this->disable_reason = config.ReadValue("m_sql_authentication", "disable_reason", "", 0);
 
-		this->SQL = ServiceReference<SQLProvider>("SQLProvider", this->engine);
+		this->SQL = ServiceReference<SQL::Provider>("SQL::Provider", this->engine);
 	}
 
 	EventReturn OnPreCommand(CommandSource &source, Command *command, std::vector<Anope::string> &params) anope_override
@@ -122,18 +122,18 @@ class ModuleSQLAuthentication : public Module
 			return;
 		}
 
-		SQLQuery q(this->query);
-		q.setValue("a", req->GetAccount());
-		q.setValue("p", req->GetPassword());
+		SQL::Query q(this->query);
+		q.SetValue("a", req->GetAccount());
+		q.SetValue("p", req->GetPassword());
 		if (u)
 		{
-			q.setValue("n", u->nick);
-			q.setValue("i", u->ip);
+			q.SetValue("n", u->nick);
+			q.SetValue("i", u->ip);
 		}
 		else
 		{
-			q.setValue("n", "");
-			q.setValue("i", "");
+			q.SetValue("n", "");
+			q.SetValue("i", "");
 		}
 
 

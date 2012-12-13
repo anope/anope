@@ -11,14 +11,6 @@ if(WIN32)
   append_to_list(SRC_SRCS win32/sigaction/sigaction.cpp)
 endif(WIN32)
 
-# If we have eventfd, use it
-if(HAVE_EVENTFD)
-  append_to_list(SRC_SRCS socketengines/pipeengine_pipe.cpp)
-# Else fall back to pipe
-else(HAVE_EVENTFD)
-  append_to_list(SRC_SRCS socketengines/pipeengine_pipe.cpp)
-endif(HAVE_EVENTFD)
-
 if(HAVE_EPOLL)
   append_to_list(SRC_SRCS socketengines/socketengine_epoll.cpp)
 else(HAVE_EPOLL)

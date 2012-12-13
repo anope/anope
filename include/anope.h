@@ -13,6 +13,8 @@
 #ifndef ANOPE_H
 #define ANOPE_H
 
+#include <signal.h>
+
 #include "hashcomp.h"
 
 namespace Anope
@@ -282,9 +284,12 @@ namespace Anope
 		 * Stream insertion operator, must be friend because they cannot be inside the class.
 		 */
 		friend std::ostream &operator<<(std::ostream &os, const string &_str);
+		friend std::istream &operator>>(std::istream &is, string &_str);
 	};
 
 	inline std::ostream &operator<<(std::ostream &os, const string &_str) { return os << _str._string; }
+	/* This is not standard to make operator>> behave like operator<< in that it will allow extracting a whole line, not just one word */
+	inline std::istream &operator>>(std::istream &is, string &_str) { return std::getline(is,  _str._string); }
 
 	inline const string operator+(char chr, const string &str) { string tmp(chr); tmp += str; return tmp; }
 	inline const string operator+(const char *_str, const string &str) { string tmp(_str); tmp += str; return tmp; }
@@ -318,6 +323,8 @@ namespace Anope
 	/** The value to return from main()
 	 */
 	extern int ReturnValue;
+
+	extern sig_atomic_t Signal;
 	extern bool Quitting;
 	extern bool Restarting;
 	extern Anope::string QuitReason;
@@ -375,6 +382,10 @@ namespace Anope
 	 * simply notifys the parent via kill() to exit().
 	 */
 	extern void Fork();
+
+	/** Does something with the signal in Anope::Signal
+	 */
+	extern void HandleSignal();
 
 	/** One of the first functions called, does general initialization such as reading
 	 * command line args, loading the configuration, doing the initial fork() if necessary,

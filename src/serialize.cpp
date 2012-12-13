@@ -35,7 +35,7 @@ void Serialize::RegisterTypes()
 		memo("Memo", Memo::Unserialize), xline("XLine", XLine::Unserialize);
 }
 
-stringstream::stringstream() : std::stringstream(), type(Serialize::DT_TEXT), _max(0)
+/*stringstream::stringstream() : std::stringstream(), type(Serialize::DT_TEXT), _max(0)
 {
 }
 
@@ -84,14 +84,14 @@ stringstream &stringstream::SetMax(unsigned m)
 unsigned stringstream::GetMax() const
 {
 	return this->_max;
-}
+}*/
 
-Serializable::Serializable() : last_commit_time(0), id(0)
+Serializable::Serializable() : last_commit(NULL), last_commit_time(0), id(0)
 {
 	throw CoreException("Default Serializable constructor?");
 }
 
-Serializable::Serializable(const Anope::string &serialize_type) : last_commit_time(0), id(0)
+Serializable::Serializable(const Anope::string &serialize_type) : last_commit(NULL), last_commit_time(0), id(0)
 {
 	if (SerializableItems == NULL)
 		SerializableItems = new std::list<Serializable *>();
@@ -105,7 +105,7 @@ Serializable::Serializable(const Anope::string &serialize_type) : last_commit_ti
 	FOREACH_MOD(I_OnSerializableConstruct, OnSerializableConstruct(this));
 }
 
-Serializable::Serializable(const Serializable &other) : last_commit_time(0), id(0)
+Serializable::Serializable(const Serializable &other) : last_commit(NULL), last_commit_time(0), id(0)
 {
 	SerializableItems->push_back(this);
 	this->s_iter = SerializableItems->end();
@@ -119,6 +119,7 @@ Serializable::Serializable(const Serializable &other) : last_commit_time(0), id(
 Serializable::~Serializable()
 {
 	SerializableItems->erase(this->s_iter);
+	delete last_commit;
 }
 
 Serializable &Serializable::operator=(const Serializable &)
@@ -144,14 +145,15 @@ void Serializable::QueueUpdate()
 	FOREACH_MOD(I_OnSerializableUpdate, OnSerializableUpdate(this));
 }
 
-bool Serializable::IsCached()
+bool Serializable::IsCached(Serialize::Data *data)
 {
-	return this->last_commit == this->Serialize();
+	return this->last_commit && this->last_commit->IsEqual(data);
 }
 
-void Serializable::UpdateCache()
+void Serializable::UpdateCache(Serialize::Data *data)
 {
-	this->last_commit = this->Serialize();
+	delete this->last_commit;
+	this->last_commit = data;
 }
 
 bool Serializable::IsTSCached()
@@ -162,11 +164,6 @@ bool Serializable::IsTSCached()
 void Serializable::UpdateTS()
 {
 	this->last_commit_time = Anope::CurTime;
-}
-
-Type* Serializable::GetSerializableType() const
-{
-	return this->s_type;
 }
 
 const std::list<Serializable *> &Serializable::GetItems()
@@ -188,11 +185,6 @@ Type::~Type()
 	Types.erase(this->name);
 }
 
-const Anope::string &Type::GetName()
-{
-	return this->name;
-}
-
 Serializable *Type::Unserialize(Serializable *obj, Serialize::Data &data)
 {
 	return this->unserialize(obj, data);
@@ -211,11 +203,6 @@ time_t Type::GetTimestamp() const
 void Type::UpdateTimestamp()
 {
 	this->timestamp = Anope::CurTime;
-}
-
-Module* Type::GetOwner() const
-{
-	return this->owner;
 }
 
 Type *Serialize::Type::Find(const Anope::string &name)

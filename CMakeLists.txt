@@ -353,13 +353,6 @@ check_function_exists(epoll_wait HAVE_EPOLL)
 check_function_exists(poll HAVE_POLL)
 check_function_exists(kqueue HAVE_KQUEUE)
 
-# Check if eventfd works
-try_run(EVENTFD_TEST_RUN_RESULT EVENTFD_TEST_COMPILE_RESULT ${CMAKE_CURRENT_BINARY_DIR} ${Anope_SOURCE_DIR}/cmake/eventfd_test.cpp)
-set(HAVE_EVENTFD FALSE)
-if (EVENTFD_TEST_COMPILE_RESULT AND EVENTFD_TEST_RUN_RESULT EQUAL 1)
-  set(HAVE_EVENTFD TRUE)
-endif(EVENTFD_TEST_COMPILE_RESULT AND EVENTFD_TEST_RUN_RESULT EQUAL 1)
-
 # Strip the leading and trailing spaces from the compile flags
 if(CXXFLAGS)
   strip_string(${CXXFLAGS} CXXFLAGS)

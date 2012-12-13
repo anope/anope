@@ -17,7 +17,7 @@
 class CoreExport Base
 {
 	/* References to this base class */
-	std::set<ReferenceBase *> references;
+	std::set<ReferenceBase *> *references;
  public:
 	Base();
 	virtual ~Base();

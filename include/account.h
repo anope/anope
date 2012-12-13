@@ -122,7 +122,7 @@ class CoreExport NickAlias : public Serializable, public Extensible, public Flag
 	NickAlias(const Anope::string &nickname, NickCore *nickcore);
 	~NickAlias();
 
-	Serialize::Data Serialize() const anope_override;
+	void Serialize(Serialize::Data &data) const anope_override;
 	static Serializable* Unserialize(Serializable *obj, Serialize::Data &);
 
 	/** Release a nick
@@ -227,7 +227,7 @@ class CoreExport NickCore : public Serializable, public Extensible, public Flags
 	NickCore(const Anope::string &nickdisplay);
 	~NickCore();
 
-	Serialize::Data Serialize() const anope_override;
+	void Serialize(Serialize::Data &data) const anope_override;
 	static Serializable* Unserialize(Serializable *obj, Serialize::Data &);
 
 	/** Changes the display for this account

@@ -93,16 +93,15 @@ static ModuleReturn moduleCopyFile(const Anope::string &name, Anope::string &out
 	}
 
 	int want = s.st_size;
-	char *buffer = new char[s.st_size];
+	char buffer[1024];
 	while (want > 0 && !source.fail() && !target.fail())
 	{
-		source.read(buffer, want);
+		source.read(buffer, std::min(want, static_cast<int>(sizeof(buffer))));
 		int read_len = source.gcount();
 
 		target.write(buffer, read_len);
 		want -= read_len;
 	}
-	delete [] buffer;
 	
 	source.close();
 	target.close();

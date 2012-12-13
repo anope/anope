@@ -23,7 +23,7 @@ struct NewsItem : Serializable
 	time_t time;
 
 	NewsItem() : Serializable("NewsItem") { }
-	Serialize::Data Serialize() const anope_override;
+	void Serialize(Serialize::Data &data) const anope_override;
 	static Serializable* Unserialize(Serializable *obj, Serialize::Data &data);
 };
 
@@ -41,16 +41,12 @@ class NewsService : public Service
 
 static ServiceReference<NewsService> news_service("NewsService", "news");
 
-Serialize::Data NewsItem::Serialize() const
+void NewsItem::Serialize(Serialize::Data &data) const
 {
-	Serialize::Data data;
-		
 	data["type"] << this->type;
 	data["text"] << this->text;
 	data["who"] << this->who;
 	data["time"] << this->time;
-
-	return data;
 }
 
 Serializable* NewsItem::Unserialize(Serializable *obj, Serialize::Data &data)

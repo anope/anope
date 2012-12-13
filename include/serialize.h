@@ -20,41 +20,24 @@
 
 namespace Serialize
 {
- 	enum DataType
+	class Data
 	{
-		DT_TEXT,
-		DT_INT
-	};
-
-	class CoreExport stringstream : public std::stringstream
-	{
-	 private:
-		Serialize::DataType type;
-		unsigned _max;
-
 	 public:
-		stringstream();
-		stringstream(const stringstream &ss);
-		Anope::string astr() const;
-
-		template<typename T> std::istream &operator>>(T &val)
+ 		enum Type
 		{
-			std::istringstream is(this->str());
-			is >> val;
-			return *this;
-		}
-		std::istream &operator>>(Anope::string &val);
+			DT_TEXT,
+			DT_INT
+		};
 
-		bool operator==(const stringstream &other) const;
-		bool operator!=(const stringstream &other) const;
+		virtual ~Data() { }
 
-		stringstream &SetType(Serialize::DataType t);
-		Serialize::DataType GetType() const;
-		stringstream &SetMax(unsigned m);
-		unsigned GetMax() const;
+		virtual std::iostream& operator[](const Anope::string &key) = 0;
+
+		virtual bool IsEqual(Data *other) { throw CoreException("Not supported"); }
+
+		virtual void SetType(const Anope::string &key, Type t) { }
+		virtual Type GetType(const Anope::string &key) const { return DT_TEXT; }
 	};
-
-	typedef std::map<Anope::string, stringstream> Data;
 
 	extern void RegisterTypes();
 
@@ -64,7 +47,7 @@ namespace Serialize
 }
 
 /** A serialziable object. Serializable objects can be serialized into
- * a map of stringstreams (Serialize::Data), and then reconstructed or
+ * abstract data types (Serialize::Data), and then reconstructed or
  * updated later at any time.
  */
 class CoreExport Serializable : public virtual Base
@@ -82,7 +65,7 @@ class CoreExport Serializable : public virtual Base
  	/* Iterator into serializable_items */
 	std::list<Serializable *>::iterator s_iter;
 	/* The last serialized form of this object commited to the database */
-	Serialize::Data last_commit;
+	Serialize::Data *last_commit;
 	/* The last time this object was commited to the database */
 	time_t last_commit_time;
 
@@ -108,8 +91,8 @@ class CoreExport Serializable : public virtual Base
 	 */
 	void QueueUpdate();
 
-	bool IsCached();
-	void UpdateCache();
+	bool IsCached(Serialize::Data *);
+	void UpdateCache(Serialize::Data *);
 
 	bool IsTSCached();
 	void UpdateTS();
@@ -117,9 +100,9 @@ class CoreExport Serializable : public virtual Base
 	/** Get the type of serializable object this is
 	 * @return The serializable object type
 	 */
-	Serialize::Type* GetSerializableType() const;
+	Serialize::Type* GetSerializableType() const { return this->s_type; }
 
-	virtual Serialize::Data Serialize() const = 0;
+	virtual void Serialize(Serialize::Data &data) const = 0;
 
 	static const std::list<Serializable *> &GetItems();
 };
@@ -164,7 +147,7 @@ class CoreExport Serialize::Type
 	/** Gets the name for this type
 	 * @return The name, eg "NickAlias"
 	 */
-	const Anope::string &GetName();
+	const Anope::string &GetName() { return this->name; }
 
 	/** Unserialized an object.
 	 * @param obj NULL if this object doesn't yet exist. If this isn't NULL, instead
@@ -187,7 +170,7 @@ class CoreExport Serialize::Type
 	 */
 	void UpdateTimestamp();
 
-	Module* GetOwner() const;
+	Module* GetOwner() const { return this->owner; }
 
 	static Serialize::Type *Find(const Anope::string &name);
 

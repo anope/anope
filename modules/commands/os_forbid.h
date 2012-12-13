@@ -19,7 +19,7 @@ struct ForbidData : Serializable
 	ForbidType type;
 
 	ForbidData() : Serializable("ForbidData") { }
-	Serialize::Data Serialize() const anope_override;
+	void Serialize(Serialize::Data &data) const anope_override;
 	static Serializable* Unserialize(Serializable *obj, Serialize::Data &data);
 };
 
@@ -39,18 +39,14 @@ class ForbidService : public Service
 
 static ServiceReference<ForbidService> forbid_service("ForbidService", "forbid");
 
-Serialize::Data ForbidData::Serialize() const
+void ForbidData::Serialize(Serialize::Data &data) const
 {
-	Serialize::Data data;
-	
 	data["mask"] << this->mask;
 	data["creator"] << this->creator;
 	data["reason"] << this->reason;
 	data["created"] << this->created;
 	data["expires"] << this->expires;
 	data["type"] << this->type;
-
-	return data;
 }
 
 Serializable* ForbidData::Unserialize(Serializable *obj, Serialize::Data &data)

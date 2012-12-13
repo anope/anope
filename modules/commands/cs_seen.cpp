@@ -38,30 +38,30 @@ struct SeenInfo : Serializable
 	{
 	}
 
-	Serialize::Data Serialize() const anope_override
+	void Serialize(Serialize::Data &data) const anope_override
 	{
-		Serialize::Data data;
-
 		data["nick"] << nick;
 		data["vhost"] << vhost;
 		data["type"] << type;
 		data["nick2"] << nick2;
 		data["channel"] << channel;
 		data["message"] << message;
-		data["last"].SetType(Serialize::DT_INT) << last;
-
-		return data;
+		data.SetType("last", Serialize::Data::DT_INT); data["last"] << last;
 	}
 
 	static Serializable* Unserialize(Serializable *obj, Serialize::Data &data)
 	{
+		Anope::string snick;
+		
+		data["nick"] >> snick;
+
 		SeenInfo *s;
 		if (obj)
 			s = anope_dynamic_static_cast<SeenInfo *>(obj);
 		else
 		{
 			/* ignore duplicate entries in the db, created by an old bug */
-			s = FindInfo(data["nick"].str());
+			s = FindInfo(snick);
 			if (!s)
 				s = new SeenInfo();
 		}

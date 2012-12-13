@@ -63,7 +63,7 @@ class CoreExport BotInfo : public User, public Flags<BotFlag>, public Serializab
 	 */
 	virtual ~BotInfo();
 
-	Serialize::Data Serialize() const;
+	void Serialize(Serialize::Data &data) const;
 	static Serializable* Unserialize(Serializable *obj, Serialize::Data &);
 
 	void GenerateUID();

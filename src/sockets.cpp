@@ -419,7 +419,7 @@ Socket::Socket(int s, bool i, int type)
 		this->sock = socket(this->ipv6 ? AF_INET6 : AF_INET, type, 0);
 	else
 		this->sock = s;
-	this->SetNonBlocking();
+	this->SetBlocking(false);
 	SocketEngine::Sockets[this->sock] = this;
 	SocketEngine::Change(this, true, SF_READABLE);
 }
@@ -443,16 +443,13 @@ bool Socket::IsIPv6() const
 	return ipv6;
 }
 
-bool Socket::SetBlocking()
+bool Socket::SetBlocking(bool state)
 {
 	int flags = fcntl(this->GetFD(), F_GETFL, 0);
-	return !fcntl(this->GetFD(), F_SETFL, flags & ~O_NONBLOCK);
-}
-
-bool Socket::SetNonBlocking()
-{
-	int flags = fcntl(this->GetFD(), F_GETFL, 0);
-	return !fcntl(this->GetFD(), F_SETFL, flags | O_NONBLOCK);
+	if (state)
+		return !fcntl(this->GetFD(), F_SETFL, flags & ~O_NONBLOCK);
+	else
+		return !fcntl(this->GetFD(), F_SETFL, flags | O_NONBLOCK);
 }
 
 void Socket::Bind(const Anope::string &ip, int port)
@@ -481,7 +478,7 @@ void Socket::ProcessError()
 
 ListenSocket::ListenSocket(const Anope::string &bindip, int port, bool i)
 {
-	this->SetNonBlocking();
+	this->SetBlocking(false);
 
 	const char op = 1;
 	setsockopt(this->GetFD(), SOL_SOCKET, SO_REUSEADDR, &op, sizeof(op));

@@ -4,22 +4,24 @@
 #include <sqlite3.h>
 #include "sql.h"
 
+using namespace SQL;
+
 /* SQLite3 API, based from InspiRCd */
 
 /** A SQLite result
  */
-class SQLiteResult : public SQLResult
+class SQLiteResult : public Result
 {
  public:
-	SQLiteResult(unsigned int i, const SQLQuery &q, const Anope::string &fq) : SQLResult(i, q, fq)
+	SQLiteResult(unsigned int i, const Query &q, const Anope::string &fq) : Result(i, q, fq)
 	{
 	}
 
-	SQLiteResult(const SQLQuery &q, const Anope::string &fq, const Anope::string &err) : SQLResult(0, q, fq, err)
+	SQLiteResult(const Query &q, const Anope::string &fq, const Anope::string &err) : Result(0, q, fq, err)
 	{
 	}
 
-	void addRow(const std::map<Anope::string, Anope::string> &data)
+	void AddRow(const std::map<Anope::string, Anope::string> &data)
 	{
 		this->entries.push_back(data);
 	}
@@ -27,7 +29,7 @@ class SQLiteResult : public SQLResult
 
 /** A SQLite database, there can be multiple
  */
-class SQLiteService : public SQLProvider
+class SQLiteService : public Provider
 {
 	std::map<Anope::string, std::set<Anope::string> > active_schema;
 
@@ -42,17 +44,17 @@ class SQLiteService : public SQLProvider
 
 	~SQLiteService();
 
-	void Run(SQLInterface *i, const SQLQuery &query) anope_override;
+	void Run(Interface *i, const Query &query) anope_override;
 
-	SQLResult RunQuery(const SQLQuery &query);
+	Result RunQuery(const Query &query);
 
-	std::vector<SQLQuery> CreateTable(const Anope::string &table, const Serialize::Data &data) anope_override;
+	std::vector<Query> CreateTable(const Anope::string &table, const Data &data) anope_override;
 
-	SQLQuery BuildInsert(const Anope::string &table, unsigned int id, Serialize::Data &data);
+	Query BuildInsert(const Anope::string &table, unsigned int id, Data &data);
 
-	SQLQuery GetTables(const Anope::string &prefix);
+	Query GetTables(const Anope::string &prefix);
 
-	Anope::string BuildQuery(const SQLQuery &q);
+	Anope::string BuildQuery(const Query &q);
 
 	Anope::string FromUnixtime(time_t);
 };
@@ -116,7 +118,7 @@ class ModuleSQLite : public Module
 
 					Log(LOG_NORMAL, "sqlite") << "SQLite: Successfully added database " << database;
 				}
-				catch (const SQLException &ex)
+				catch (const SQL::Exception &ex)
 				{
 					Log(LOG_NORMAL, "sqlite") << "SQLite: " << ex.GetReason();
 				}
@@ -126,11 +128,11 @@ class ModuleSQLite : public Module
 };
 
 SQLiteService::SQLiteService(Module *o, const Anope::string &n, const Anope::string &d)
-: SQLProvider(o, n), database(d), sql(NULL)
+: Provider(o, n), database(d), sql(NULL)
 {
 	int db = sqlite3_open_v2(database.c_str(), &this->sql, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE, 0);
 	if (db != SQLITE_OK)
-		throw SQLException("Unable to open SQLite database " + database + ": " + sqlite3_errmsg(this->sql));
+		throw SQL::Exception("Unable to open SQLite database " + database + ": " + sqlite3_errmsg(this->sql));
 }
 
 SQLiteService::~SQLiteService()
@@ -139,16 +141,16 @@ SQLiteService::~SQLiteService()
 	sqlite3_close(this->sql);
 }
 
-void SQLiteService::Run(SQLInterface *i, const SQLQuery &query)
+void SQLiteService::Run(Interface *i, const Query &query)
 {
-	SQLResult res = this->RunQuery(query);
+	Result res = this->RunQuery(query);
 	if (!res.GetError().empty())
 		i->OnError(res);
 	else
 		i->OnResult(res);
 }
 
-SQLResult SQLiteService::RunQuery(const SQLQuery &query)
+Result SQLiteService::RunQuery(const Query &query)
 {
 	Anope::string real_query = this->BuildQuery(query);
 	sqlite3_stmt *stmt;
@@ -173,7 +175,7 @@ SQLResult SQLiteService::RunQuery(const SQLQuery &query)
 			if (data && *data)
 				items[columns[i]] = data;
 		}
-		result.addRow(items);
+		result.AddRow(items);
 	}
 
 	result.id = sqlite3_last_insert_rowid(this->sql);
@@ -186,16 +188,16 @@ SQLResult SQLiteService::RunQuery(const SQLQuery &query)
 	return result;
 }
 
-std::vector<SQLQuery> SQLiteService::CreateTable(const Anope::string &table, const Serialize::Data &data)
+std::vector<Query> SQLiteService::CreateTable(const Anope::string &table, const Data &data)
 {
-	std::vector<SQLQuery> queries;
+	std::vector<Query> queries;
 	std::set<Anope::string> &known_cols = this->active_schema[table];
 
 	if (known_cols.empty())
 	{
 		Log(LOG_DEBUG) << "m_sqlite: Fetching columns for " << table;
 
-		SQLResult columns = this->RunQuery("PRAGMA table_info(" + table + ")");
+		Result columns = this->RunQuery("PRAGMA table_info(" + table + ")");
 		for (int i = 0; i < columns.Rows(); ++i)
 		{
 			const Anope::string &column = columns.Get(i, "name");
@@ -209,12 +211,12 @@ std::vector<SQLQuery> SQLiteService::CreateTable(const Anope::string &table, con
 	{
 		Anope::string query_text = "CREATE TABLE `" + table + "` (`id` INTEGER PRIMARY KEY, `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP";
 
-		for (Serialize::Data::const_iterator it = data.begin(), it_end = data.end(); it != it_end; ++it)
+		for (Data::Map::const_iterator it = data.data.begin(), it_end = data.data.end(); it != it_end; ++it)
 		{
 			known_cols.insert(it->first);
 
 			query_text += ", `" + it->first + "` ";
-			if (it->second.GetType() == Serialize::DT_INT)
+			if (data.GetType(it->first) == Serialize::Data::DT_INT)
 				query_text += "int(11)";
 			else
 				query_text += "text";
@@ -234,7 +236,7 @@ std::vector<SQLQuery> SQLiteService::CreateTable(const Anope::string &table, con
 		queries.push_back(query_text);
 	}
 	else
-		for (Serialize::Data::const_iterator it = data.begin(), it_end = data.end(); it != it_end; ++it)
+		for (Data::Map::const_iterator it = data.data.begin(), it_end = data.data.end(); it != it_end; ++it)
 		{
 			if (known_cols.count(it->first) > 0)
 				continue;
@@ -242,7 +244,7 @@ std::vector<SQLQuery> SQLiteService::CreateTable(const Anope::string &table, con
 			known_cols.insert(it->first);
 
 			Anope::string query_text = "ALTER TABLE `" + table + "` ADD `" + it->first + "` ";
-			if (it->second.GetType() == Serialize::DT_INT)
+			if (data.GetType(it->first) == Serialize::Data::DT_INT)
 				query_text += "int(11)";
 			else
 				query_text += "text";
@@ -253,38 +255,42 @@ std::vector<SQLQuery> SQLiteService::CreateTable(const Anope::string &table, con
 	return queries;
 }
 
-SQLQuery SQLiteService::BuildInsert(const Anope::string &table, unsigned int id, Serialize::Data &data)
+Query SQLiteService::BuildInsert(const Anope::string &table, unsigned int id, Data &data)
 {
 	/* Empty columns not present in the data set */
 	const std::set<Anope::string> &known_cols = this->active_schema[table];
 	for (std::set<Anope::string>::iterator it = known_cols.begin(), it_end = known_cols.end(); it != it_end; ++it)
-		if (*it != "id" && *it != "timestamp" && data.count(*it) == 0)
+		if (*it != "id" && *it != "timestamp" && data.data.count(*it) == 0)
 			data[*it] << "";
 
 	Anope::string query_text = "REPLACE INTO `" + table + "` (";
 	if (id > 0)
 		query_text += "`id`,";
-	for (Serialize::Data::const_iterator it = data.begin(), it_end = data.end(); it != it_end; ++it)
+	for (Data::Map::const_iterator it = data.data.begin(), it_end = data.data.end(); it != it_end; ++it)
 		query_text += "`" + it->first + "`,";
 	query_text.erase(query_text.length() - 1);
 	query_text += ") VALUES (";
 	if (id > 0)
 		query_text += stringify(id) + ",";
-	for (Serialize::Data::const_iterator it = data.begin(), it_end = data.end(); it != it_end; ++it)
+	for (Data::Map::const_iterator it = data.data.begin(), it_end = data.data.end(); it != it_end; ++it)
 		query_text += "@" + it->first + "@,";
 	query_text.erase(query_text.length() - 1);
 	query_text += ")";
 
-	SQLQuery query(query_text);
-	for (Serialize::Data::const_iterator it = data.begin(), it_end = data.end(); it != it_end; ++it)
-		query.setValue(it->first, it->second.astr());
+	Query query(query_text);
+	for (Data::Map::const_iterator it = data.data.begin(), it_end = data.data.end(); it != it_end; ++it)
+	{
+		Anope::string buf;
+		*it->second >> buf;
+		query.SetValue(it->first, buf);
+	}
 	
 	return query;
 }
 
-SQLQuery SQLiteService::GetTables(const Anope::string &prefix)
+Query SQLiteService::GetTables(const Anope::string &prefix)
 {
-	return SQLQuery("SELECT name FROM sqlite_master WHERE type='table' AND name LIKE '" + prefix + "%';");
+	return Query("SELECT name FROM sqlite_master WHERE type='table' AND name LIKE '" + prefix + "%';");
 }
 
 Anope::string SQLiteService::Escape(const Anope::string &query)
@@ -295,7 +301,7 @@ Anope::string SQLiteService::Escape(const Anope::string &query)
 	return buffer;
 }
 
-Anope::string SQLiteService::BuildQuery(const SQLQuery &q)
+Anope::string SQLiteService::BuildQuery(const Query &q)
 {
 	Anope::string real_query = q.query;
 

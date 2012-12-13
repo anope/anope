@@ -143,7 +143,7 @@ struct CoreExport BadWord : Serializable
 	BadWordType type;
 
 	BadWord() : Serializable("BadWord") { }
-	Serialize::Data Serialize() const anope_override;
+	void Serialize(Serialize::Data &data) const anope_override;
 	static Serializable* Unserialize(Serializable *obj, Serialize::Data &);
 };
 
@@ -172,7 +172,7 @@ class CoreExport AutoKick : public Flags<AutoKickFlag>, public Serializable
 	time_t last_used;
 
  	AutoKick();
-	Serialize::Data Serialize() const anope_override;
+	void Serialize(Serialize::Data &data) const anope_override;
 	static Serializable* Unserialize(Serializable *obj, Serialize::Data &);
 };
 
@@ -188,7 +188,7 @@ struct CoreExport ModeLock : Serializable
 
 	ModeLock(ChannelInfo *ch, bool s, ChannelModeName n, const Anope::string &p, const Anope::string &se = "", time_t c = Anope::CurTime);
 
-	Serialize::Data Serialize() const anope_override;
+	void Serialize(Serialize::Data &data) const anope_override;
 	static Serializable* Unserialize(Serializable *obj, Serialize::Data &);
 };
 
@@ -206,7 +206,7 @@ struct CoreExport LogSetting : Serializable
 	time_t created;
 
 	LogSetting() : Serializable("LogSetting") { }
-	Serialize::Data Serialize() const anope_override;
+	void Serialize(Serialize::Data &data) const anope_override;
 	static Serializable* Unserialize(Serializable *obj, Serialize::Data &);
 };
 
@@ -263,7 +263,7 @@ class CoreExport ChannelInfo : public Serializable, public Extensible, public Fl
 
 	~ChannelInfo();
 
-	Serialize::Data Serialize() const anope_override;
+	void Serialize(Serialize::Data &data) const anope_override;
 	static Serializable* Unserialize(Serializable *obj, Serialize::Data &);
 
 	/** Change the founder of the channek

@@ -82,29 +82,33 @@ BotInfo::~BotInfo()
 		BotListByUID->erase(this->uid);
 }
 
-Serialize::Data BotInfo::Serialize() const
+void BotInfo::Serialize(Serialize::Data &data) const
 {
-	Serialize::Data data;
-
-	data["nick"].SetMax(64)/*XXX*/ << this->nick;
+	data["nick"] << this->nick;
 	data["user"] << this->ident;
 	data["host"] << this->host;
 	data["realname"] << this->realname;
 	data["created"] << this->created;
 	data["flags"] << this->ToString();
-
-	return data;
 }
 
 Serializable* BotInfo::Unserialize(Serializable *obj, Serialize::Data &data)
 {
+	Anope::string nick, user, host, realname, flags;
+
+	data["nick"] >> nick;
+	data["user"] >> user;
+	data["host"] >> host;
+	data["realname"] >> realname;
+	data["flags"] >> flags;
+
 	BotInfo *bi;
 	if (obj)
 		bi = anope_dynamic_static_cast<BotInfo *>(obj);
-	else if (!(bi = BotInfo::Find(data["nick"].astr())))
-		bi = new BotInfo(data["nick"].astr(), data["user"].astr(), data["host"].astr(), data["realname"].astr());
+	else if (!(bi = BotInfo::Find(nick)))
+		bi = new BotInfo(nick, user, host, realname);
 	data["created"] >> bi->created;
-	bi->FromString(data["flags"].astr());
+	bi->FromString(flags);
 	return bi;
 }
 

@@ -38,22 +38,25 @@ class CoreExport Extensible
 {
  private:
  	typedef std::map<Anope::string, ExtensibleItem *> extensible_map;
-	extensible_map extension_items;
+	extensible_map *extension_items;
 
  public:
-	/** Default constructor, does nothing
+	/** Default constructor
 	 */
-	Extensible() { }
+	Extensible() : extension_items(NULL) { }
 
 	/** Destructor, deletes all of the extensible items in this object
 	 * then clears the map
 	 */
 	virtual ~Extensible()
 	{
-		for (extensible_map::iterator it = extension_items.begin(), it_end = extension_items.end(); it != it_end; ++it)
-			if (it->second)
-				it->second->OnDelete();
-		extension_items.clear();
+		if (extension_items)
+		{
+			for (extensible_map::iterator it = extension_items->begin(), it_end = extension_items->end(); it != it_end; ++it)
+				if (it->second)
+					it->second->OnDelete();
+			delete extension_items;
+		}
 	}
 
 	/** Extend an Extensible class.
@@ -70,7 +73,9 @@ class CoreExport Extensible
 	void Extend(const Anope::string &key, ExtensibleItem *p)
 	{
 		this->Shrink(key);
-		this->extension_items[key] = p;
+		if (!extension_items)
+			extension_items = new extensible_map();
+		(*this->extension_items)[key] = p;
 	}
 
 	/** Shrink an Extensible class.
@@ -83,8 +88,11 @@ class CoreExport Extensible
 	 */
 	bool Shrink(const Anope::string &key)
 	{
-		extensible_map::iterator it = this->extension_items.find(key);
-		if (it != this->extension_items.end())
+		if (!extension_items)
+			return false;
+
+		extensible_map::iterator it = this->extension_items->find(key);
+		if (it != this->extension_items->end())
 		{
 			if (it->second != NULL)
 				it->second->OnDelete();
@@ -92,7 +100,7 @@ class CoreExport Extensible
 			 * returns the number of elements removed, std::map
 			 * is single-associative so this should only be 0 or 1
 			 */
-			return this->extension_items.erase(key) > 0;
+			return this->extension_items->erase(key) > 0;
 		}
 
 		return false;
@@ -105,9 +113,12 @@ class CoreExport Extensible
 	 */
 	template<typename T> T GetExt(const Anope::string &key) const
 	{
-		extensible_map::const_iterator it = this->extension_items.find(key);
-		if (it != this->extension_items.end())
-			return anope_dynamic_static_cast<T>(it->second);
+		if (this->extension_items)
+		{
+			extensible_map::const_iterator it = this->extension_items->find(key);
+			if (it != this->extension_items->end())
+				return anope_dynamic_static_cast<T>(it->second);
+		}
 
 		return NULL;
 	}
@@ -119,7 +130,7 @@ class CoreExport Extensible
 	 */
 	bool HasExt(const Anope::string &key) const
 	{
-		return this->extension_items.count(key) > 0;
+		return this->extension_items != NULL && this->extension_items->count(key) > 0;
 	}
 
 	/** Get a list of all extension items names.
@@ -129,8 +140,9 @@ class CoreExport Extensible
 	 */
 	void GetExtList(std::deque<Anope::string> &list) const
 	{
-		for (extensible_map::const_iterator it = extension_items.begin(), it_end = extension_items.end(); it != it_end; ++it)
-			list.push_back(it->first);
+		if (extension_items)
+			for (extensible_map::const_iterator it = extension_items->begin(), it_end = extension_items->end(); it != it_end; ++it)
+				list.push_back(it->first);
 	}
 };
 

@@ -12,17 +12,123 @@
 
 #include "module.h"
 
-class DBFlatFile : public Module
+class SaveData : public Serialize::Data
 {
-	Anope::string DatabaseFile;
-	Anope::string BackupFile;
+ public:
+	std::fstream *fs;
+
+	SaveData() : fs(NULL) { }
+
+	std::iostream& operator[](const Anope::string &key) anope_override
+	{
+		*fs << "\nDATA " << key << " ";
+		return *fs;
+	}
+};
+
+class LoadData : public Serialize::Data
+{
+ public:
+ 	std::fstream *fs;
+	std::map<Anope::string, Anope::string> data;
+	std::stringstream ss;
+	bool read;
+
+	LoadData() : fs(NULL), read(false) { }
+
+	std::iostream& operator[](const Anope::string &key) anope_override
+	{
+		if (!read)
+		{
+			for (Anope::string token; std::getline(*this->fs, token.str());)
+			{
+				if (token.find("DATA ") != 0)
+					break;
+
+				size_t sp = token.find(' ', 5); // Skip DATA
+				if (sp != Anope::string::npos)
+					data[token.substr(5, sp - 5)] = token.substr(sp + 1);
+			}
+
+			read = true;
+		}
+
+		ss.clear();
+		this->ss << this->data[key];
+		return this->ss;
+	}
+	
+	void Reset()
+	{
+		read = false;
+		data.clear();
+	}
+};
+
+class DBFlatFile : public Module, public Pipe
+{
+	Anope::string database_file;
 	/* Day the last backup was on */
-	int LastDay;
+	int last_day;
 	/* Backup file names */
-	std::list<Anope::string> Backups;
+	std::map<Anope::string, std::list<Anope::string> > backups;
+	bool use_fork;
+
+	void BackupDatabase()
+	{
+		tm *tm = localtime(&Anope::CurTime);
+
+		if (tm->tm_mday != last_day)
+		{
+			last_day = tm->tm_mday;
+
+			const std::vector<Anope::string> &type_order = Serialize::Type::GetTypeOrder();
+
+			std::set<Anope::string> dbs;
+			dbs.insert(database_file);
+
+			for (unsigned i = 0; i < type_order.size(); ++i)
+			{
+				Serialize::Type *stype = Serialize::Type::Find(type_order[i]);
+
+				if (stype && stype->GetOwner())
+					dbs.insert("module_" + stype->GetOwner()->name + ".db");
+			}
+
+
+			for (std::set<Anope::string>::const_iterator it = dbs.begin(), it_end = dbs.end(); it != it_end; ++it)
+			{
+				const Anope::string &oldname = Anope::DataDir + "/" + *it;
+				Anope::string newname = Anope::DataDir + "/backups/" + *it + "." + stringify(tm->tm_year) + "." + stringify(tm->tm_mon) + "." + stringify(tm->tm_mday);
+
+				/* Backup already exists */
+				if (Anope::IsFile(newname))
+					continue;
+
+				Log(LOG_DEBUG) << "db_flatfile: Attemping to rename " << *it << " to " << newname;
+				if (rename(oldname.c_str(), newname.c_str()))
+				{
+					Log(this) << "Unable to back up database " << *it << "!";
+
+					if (!Config->NoBackupOkay)
+						Anope::Quitting = true;
+
+					continue;
+				}
+
+				backups[*it].push_back(newname);
+
+				if (Config->KeepBackups > 0 && backups[*it].size() > static_cast<unsigned>(Config->KeepBackups))
+				{
+					unlink(backups[*it].front().c_str());
+					backups[*it].pop_front();
+				}
+			}
+		}
+	}
 
  public:
-	DBFlatFile(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, DATABASE)
+	DBFlatFile(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, DATABASE), last_day(0), use_fork(false)
 	{
 		this->SetAuthor("Anope");
 
@@ -30,126 +136,77 @@ class DBFlatFile : public Module
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 
 		OnReload();
-
-		LastDay = 0;
 	}
 
-	void BackupDatabase()
+	void OnNotify() anope_override
 	{
-		/* Do not backup a database that doesn't exist */
-		if (!Anope::IsFile(DatabaseFile))
+		char buf[512];
+		int i = this->Read(buf, sizeof(buf) - 1);
+		if (i <= 0)
 			return;
+		buf[i] = 0;
 
-		time_t now = Anope::CurTime;
-		tm *tm = localtime(&now);
-
-		if (tm->tm_mday != LastDay)
+		if (!*buf)
 		{
-			LastDay = tm->tm_mday;
-			Anope::string newname = BackupFile + "." + stringify(tm->tm_year) + "." + stringify(tm->tm_mon) + "." + stringify(tm->tm_mday);
-
-			/* Backup already exists */
-			if (IsFile(newname))
-				return;
-
-			Log(LOG_DEBUG) << "db_flatfile: Attemping to rename " << DatabaseFile << " to " << newname;
-			if (rename(DatabaseFile.c_str(), newname.c_str()))
-			{
-				Log(this) << "Unable to back up database!";
-
-				if (!Config->NoBackupOkay)
-					Anope::Quitting = true;
-
-				return;
-			}
-
-			Backups.push_back(newname);
-
-			if (Config->KeepBackups > 0 && Backups.size() > static_cast<unsigned>(Config->KeepBackups))
-			{
-				unlink(Backups.front().c_str());
-				Backups.pop_front();
-			}
+			Log(this) << "Finished saving databases";
+			return;
 		}
+
+		Log(this) << "Error saving databases: " << buf;
+
+		if (!Config->NoBackupOkay)
+			Anope::Quitting = true;
 	}
 
 	void OnReload() anope_override
 	{
 		ConfigReader config;
-		DatabaseFile = Anope::DataDir + "/" + config.ReadValue("db_flatfile", "database", "anope.db", 0);
-		BackupFile = Anope::DataDir + "/backups/" + config.ReadValue("db_flatfile", "database", "anope.db", 0);
+		database_file = config.ReadValue("db_flatfile", "database", "anope.db", 0);
+		use_fork = config.ReadFlag("db_flatfile", "fork", "no", 0);
 	}
 
 	EventReturn OnLoadDatabase() anope_override
 	{
-		std::map<Module *, std::fstream *> databases;
-		databases[NULL] = new std::fstream(DatabaseFile.c_str(), std::ios_base::in);
+		const std::vector<Anope::string> &type_order = Serialize::Type::GetTypeOrder();
+		std::set<Anope::string> tried_dbs;
 
-		if (!databases[NULL]->is_open())
+		const Anope::string &db_name = Anope::DataDir + "/" + database_file;
+
+		std::fstream fd(db_name.c_str(), std::ios_base::in);
+		if (!fd.is_open())
 		{
-			delete databases[NULL];
-			Log(this) << "Unable to open " << DatabaseFile << " for reading!";
-			return EVENT_CONTINUE;
+			Log(this) << "Unable to open " << db_name << " for reading!";
+			return EVENT_STOP;
 		}
 
-		const std::vector<Anope::string> type_order = Serialize::Type::GetTypeOrder();
+		std::map<Anope::string, std::vector<std::streampos> > positions;
+
+		for (Anope::string buf; std::getline(fd, buf.str());)
+			if (buf.find("OBJECT ") == 0)
+				positions[buf.substr(7)].push_back(fd.tellg());
+
+		LoadData ld;
+		ld.fs = &fd;
 
 		for (unsigned i = 0; i < type_order.size(); ++i)
 		{
 			Serialize::Type *stype = Serialize::Type::Find(type_order[i]);
-			if (stype && !databases.count(stype->GetOwner()))
-			{
-				Anope::string db_name = Anope::DataDir + "/module_" + stype->GetOwner()->name + ".db";
-				databases[stype->GetOwner()] = new std::fstream(db_name.c_str(), std::ios_base::in);
-			}
-		}
-
-		std::multimap<Serialize::Type *, Serialize::Data> objects;
-		for (std::map<Module *, std::fstream *>::iterator it = databases.begin(), it_end = databases.end(); it != it_end; ++it)
-		{
-			std::fstream *db = it->second;
-			Serialize::Type *st = NULL;
-			Serialize::Data data;
-			for (Anope::string buf, token; std::getline(*db, buf.str());)
-			{
-				spacesepstream sep(buf);
-
-				if (!sep.GetToken(token))
-					continue;
-
-				if (token == "OBJECT" && sep.GetToken(token))
-				{
-					st = Serialize::Type::Find(token);
-					data.clear();
-				}
-				else if (token == "DATA" && st != NULL && sep.GetToken(token))
-					data[token] << sep.GetRemaining();
-				else if (token == "END" && st != NULL)
-				{
-					objects.insert(std::make_pair(st, data));
-
-					st = NULL;
-					data.clear();
-				}
-			}
-		}
-
-		for (unsigned i = 0; i < type_order.size(); ++i)
-		{
-			Serialize::Type *stype = Serialize::Type::Find(type_order[i]);
-
-			std::multimap<Serialize::Type *, Serialize::Data>::iterator it = objects.find(stype), it_end = objects.upper_bound(stype);
-			if (it == objects.end())
+			if (!stype || stype->GetOwner())
 				continue;
-			for (; it != it_end; ++it)
-				it->first->Unserialize(NULL, it->second);
+				
+			std::vector<std::streampos> &pos = positions[stype->GetName()];
+
+			for (unsigned j = 0; j < pos.size(); ++j)
+			{
+				fd.clear();
+				fd.seekg(pos[j]);
+
+				stype->Unserialize(NULL, ld);
+				ld.Reset();
+			}
 		}
 
-		for (std::map<Module *, std::fstream *>::iterator it = databases.begin(), it_end = databases.end(); it != it_end; ++it)
-		{
-			it->second->close();
-			delete it->second;
-		}
+		fd.close();
 
 		return EVENT_STOP;
 	}
@@ -159,61 +216,92 @@ class DBFlatFile : public Module
 	{
 		BackupDatabase();
 
-		Anope::string tmp_db = DatabaseFile + ".tmp";
-		if (IsFile(DatabaseFile))
-			rename(DatabaseFile.c_str(), tmp_db.c_str());
-
-		std::map<Module *, std::fstream *> databases;
-		databases[NULL] = new std::fstream(DatabaseFile.c_str(), std::ios_base::out | std::ios_base::trunc);
-		if (!databases[NULL]->is_open())
+		int i = -1;
+		if (use_fork)
 		{
-			delete databases[NULL];
-			Log(this) << "Unable to open " << DatabaseFile << " for writing";
-			if (IsFile(tmp_db))
-				rename(tmp_db.c_str(), DatabaseFile.c_str());
-			return EVENT_CONTINUE;
+			i = fork();
+			if (i > 0)
+				return EVENT_CONTINUE;
+			else if (i < 0)
+				Log(this) << "Unable to fork for database save";
 		}
 
-		const std::list<Serializable *> &items = Serializable::GetItems();
-		for (std::list<Serializable *>::const_iterator it = items.begin(), it_end = items.end(); it != it_end; ++it)
+		try
 		{
-			Serializable *base = *it;
-			Serialize::Type *s_type = base->GetSerializableType();
+			std::map<Module *, std::fstream *> databases;
 
-			if (!s_type)
-				continue;
-
-			Serialize::Data data = base->Serialize();
-
-			if (!databases.count(s_type->GetOwner()))
+			SaveData data;
+			const std::list<Serializable *> &items = Serializable::GetItems();
+			for (std::list<Serializable *>::const_iterator it = items.begin(), it_end = items.end(); it != it_end; ++it)
 			{
-				Anope::string db_name = Anope::DataDir + "/module_" + s_type->GetOwner()->name + ".db";
-				databases[s_type->GetOwner()] = new std::fstream(db_name.c_str(), std::ios_base::out | std::ios_base::trunc);
+				Serializable *base = *it;
+				Serialize::Type *s_type = base->GetSerializableType();
+
+				if (!s_type)
+					continue;
+
+				data.fs = databases[s_type->GetOwner()];
+
+				if (!data.fs)
+				{
+					Anope::string db_name;
+					if (s_type->GetOwner())
+						db_name = Anope::DataDir + "/module_" + s_type->GetOwner()->name + ".db";
+					else
+						db_name = Anope::DataDir + "/" + database_file;
+
+					if (Anope::IsFile(db_name))
+						rename(db_name.c_str(), (db_name + ".tmp").c_str());
+
+					data.fs = databases[s_type->GetOwner()] = new std::fstream(db_name.c_str(), std::ios_base::out | std::ios_base::trunc);
+
+					if (!data.fs->is_open())
+					{
+						Log(this) << "Unable to open " << db_name << " for writing";
+						continue;
+					}
+				}
+				else if (!data.fs->is_open())
+					continue;
+
+				*data.fs << "OBJECT " << s_type->GetName();
+				base->Serialize(data);
+				*data.fs << "\nEND\n";
 			}
-			std::fstream *fd = databases[s_type->GetOwner()];
-	
-			*fd << "OBJECT " << s_type->GetName() << "\n";
-			for (Serialize::Data::iterator dit = data.begin(), dit_end = data.end(); dit != dit_end; ++dit)
-				*fd << "DATA " << dit->first << " " << dit->second.astr() << "\n";
-			*fd << "END\n";
+
+			for (std::map<Module *, std::fstream *>::iterator it = databases.begin(), it_end = databases.end(); it != it_end; ++it)
+			{
+				std::fstream *f = it->second;
+				const Anope::string &db_name = Anope::DataDir + "/" + (it->first ? (it->first->name + ".db") : database_file);
+
+				if (!f->is_open() || !f->good())
+				{
+					this->Write("Unable to write database " + db_name);
+
+					f->close();
+
+					if (Anope::IsFile((db_name + ".tmp").c_str()))
+						rename((db_name + ".tmp").c_str(), db_name.c_str());
+				}
+				else
+				{
+					f->close();
+					unlink((db_name + ".tmp").c_str());
+				}
+
+				delete f;
+			}
+		}
+		catch (...)
+		{
+			if (i)
+				throw;
 		}
 
-		if (databases[NULL]->good() == false)
+		if (!i)
 		{
-			Log(this) << "Unable to write database";
-			databases[NULL]->close();
-			if (!Config->NoBackupOkay)
-				Anope::Quitting = true;
-			if (IsFile(tmp_db))
-				rename(tmp_db.c_str(), DatabaseFile.c_str());
-		}
-		else
-			unlink(tmp_db.c_str());
-
-		for (std::map<Module *, std::fstream *>::iterator it = databases.begin(), it_end = databases.end(); it != it_end; ++it)
-		{
-			it->second->close();
-			delete it->second;
+			this->Notify();
+			exit(0);
 		}
 
 		return EVENT_CONTINUE;

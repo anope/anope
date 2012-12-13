@@ -5,6 +5,8 @@
 #include <mysql/mysql.h>
 #include "sql.h"
 
+using namespace SQL;
+
 /** Non blocking threaded MySQL API, based loosely from InspIRCd's m_mysql.cpp
  *
  * This module spawns a single thread that is used to execute blocking MySQL queries.
@@ -24,32 +26,32 @@ struct QueryRequest
 	/* The connection to the database */
 	MySQLService *service;
 	/* The interface to use once we have the result to send the data back */
-	SQLInterface *sqlinterface;
+	Interface *sqlinterface;
 	/* The actual query */
-	SQLQuery query;
+	Query query;
 
-	QueryRequest(MySQLService *s, SQLInterface *i, const SQLQuery &q) : service(s), sqlinterface(i), query(q) { }
+	QueryRequest(MySQLService *s, Interface *i, const Query &q) : service(s), sqlinterface(i), query(q) { }
 };
 
 /** A query result */
 struct QueryResult
 {
 	/* The interface to send the data back on */
-	SQLInterface *sqlinterface;
+	Interface *sqlinterface;
 	/* The result */
-	SQLResult result;
+	Result result;
 
-	QueryResult(SQLInterface *i, SQLResult &r) : sqlinterface(i), result(r) { }
+	QueryResult(Interface *i, Result &r) : sqlinterface(i), result(r) { }
 };
 
 /** A MySQL result
  */
-class MySQLResult : public SQLResult
+class MySQLResult : public Result
 {
 	MYSQL_RES *res;
 
  public:
-	MySQLResult(unsigned int i, const SQLQuery &q, const Anope::string &fq, MYSQL_RES *r) : SQLResult(i, q, fq), res(r)
+	MySQLResult(unsigned int i, const Query &q, const Anope::string &fq, MYSQL_RES *r) : Result(i, q, fq), res(r)
 	{
 		unsigned num_fields = res ? mysql_num_fields(res) : 0;
 
@@ -79,7 +81,7 @@ class MySQLResult : public SQLResult
 		}
 	}
 
-	MySQLResult(const SQLQuery &q, const Anope::string &fq, const Anope::string &err) : SQLResult(0, q, fq, err), res(NULL)
+	MySQLResult(const Query &q, const Anope::string &fq, const Anope::string &err) : Result(0, q, fq, err), res(NULL)
 	{
 	}
 
@@ -92,7 +94,7 @@ class MySQLResult : public SQLResult
 
 /** A MySQL connection, there can be multiple
  */
-class MySQLService : public SQLProvider
+class MySQLService : public Provider
 {
 	std::map<Anope::string, std::set<Anope::string> > active_schema;
 
@@ -120,21 +122,21 @@ class MySQLService : public SQLProvider
 
 	~MySQLService();
 
-	void Run(SQLInterface *i, const SQLQuery &query) anope_override;
+	void Run(Interface *i, const Query &query) anope_override;
 
-	SQLResult RunQuery(const SQLQuery &query) anope_override;
+	Result RunQuery(const Query &query) anope_override;
 
-	std::vector<SQLQuery> CreateTable(const Anope::string &table, const Serialize::Data &data) anope_override;
+	std::vector<Query> CreateTable(const Anope::string &table, const Data &data) anope_override;
 
-	SQLQuery BuildInsert(const Anope::string &table, unsigned int id, Serialize::Data &data);
+	Query BuildInsert(const Anope::string &table, unsigned int id, Data &data) anope_override;
 
-	SQLQuery GetTables(const Anope::string &prefix) anope_override;
+	Query GetTables(const Anope::string &prefix) anope_override;
 
 	void Connect();
 
 	bool CheckConnection();
 
-	Anope::string BuildQuery(const SQLQuery &q);
+	Anope::string BuildQuery(const Query &q);
 
 	Anope::string FromUnixtime(time_t);
 };
@@ -235,7 +237,7 @@ class ModuleSQL : public Module, public Pipe
 
 					Log(LOG_NORMAL, "mysql") << "MySQL: Successfully connected to server " << connname << " (" << server << ")";
 				}
-				catch (const SQLException &ex)
+				catch (const SQL::Exception &ex)
 				{
 					Log(LOG_NORMAL, "mysql") << "MySQL: " << ex.GetReason();
 				}
@@ -280,7 +282,7 @@ class ModuleSQL : public Module, public Pipe
 			const QueryResult &qr = *it;
 
 			if (!qr.sqlinterface)
-				throw SQLException("NULL qr.sqlinterface in MySQLPipe::OnNotify() ?");
+				throw SQL::Exception("NULL qr.sqlinterface in MySQLPipe::OnNotify() ?");
 
 			if (qr.result.GetError().empty())
 				qr.sqlinterface->OnResult(qr.result);
@@ -291,7 +293,7 @@ class ModuleSQL : public Module, public Pipe
 };
 
 MySQLService::MySQLService(Module *o, const Anope::string &n, const Anope::string &d, const Anope::string &s, const Anope::string &u, const Anope::string &p, int po)
-: SQLProvider(o, n), database(d), server(s), user(u), password(p), port(po), sql(NULL)
+: Provider(o, n), database(d), server(s), user(u), password(p), port(po), sql(NULL)
 {
 	Connect();
 }
@@ -310,7 +312,7 @@ MySQLService::~MySQLService()
 		if (r.service == this)
 		{
 			if (r.sqlinterface)
-				r.sqlinterface->OnError(SQLResult(0, r.query, "SQL Interface is going away"));
+				r.sqlinterface->OnError(Result(0, r.query, "SQL Interface is going away"));
 			me->QueryRequests.erase(me->QueryRequests.begin() + i - 1);
 		}
 	}
@@ -318,7 +320,7 @@ MySQLService::~MySQLService()
 	me->DThread->Unlock();
 }
 
-void MySQLService::Run(SQLInterface *i, const SQLQuery &query)
+void MySQLService::Run(Interface *i, const Query &query)
 {
 	me->DThread->Lock();
 	me->QueryRequests.push_back(QueryRequest(this, i, query));
@@ -326,7 +328,7 @@ void MySQLService::Run(SQLInterface *i, const SQLQuery &query)
 	me->DThread->Wakeup();
 }
 
-SQLResult MySQLService::RunQuery(const SQLQuery &query)
+Result MySQLService::RunQuery(const Query &query)
 {
 	this->Lock.Lock();
 
@@ -348,16 +350,16 @@ SQLResult MySQLService::RunQuery(const SQLQuery &query)
 	}
 }
 
-std::vector<SQLQuery> MySQLService::CreateTable(const Anope::string &table, const Serialize::Data &data)
+std::vector<Query> MySQLService::CreateTable(const Anope::string &table, const Data &data)
 {
-	std::vector<SQLQuery> queries;
+	std::vector<Query> queries;
 	std::set<Anope::string> &known_cols = this->active_schema[table];
 
 	if (known_cols.empty())
 	{
 		Log(LOG_DEBUG) << "m_mysql: Fetching columns for " << table;
 
-		SQLResult columns = this->RunQuery("SHOW COLUMNS FROM `" + table + "`");
+		Result columns = this->RunQuery("SHOW COLUMNS FROM `" + table + "`");
 		for (int i = 0; i < columns.Rows(); ++i)
 		{
 			const Anope::string &column = columns.Get(i, "Field");
@@ -371,15 +373,13 @@ std::vector<SQLQuery> MySQLService::CreateTable(const Anope::string &table, cons
 	{
 		Anope::string query_text = "CREATE TABLE `" + table + "` (`id` int(10) unsigned NOT NULL AUTO_INCREMENT,"
 			" `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP";
-		for (Serialize::Data::const_iterator it = data.begin(), it_end = data.end(); it != it_end; ++it)
+		for (Data::Map::const_iterator it = data.data.begin(), it_end = data.data.end(); it != it_end; ++it)
 		{
 			known_cols.insert(it->first);
 
 			query_text += ", `" + it->first + "` ";
-			if (it->second.GetType() == Serialize::DT_INT)
+			if (data.GetType(it->first) == Serialize::Data::DT_INT)
 				query_text += "int(11)";
-			else if (it->second.GetMax() > 0)
-				query_text += "varchar(" + stringify(it->second.GetMax()) + ")";
 			else
 				query_text += "text";
 		}
@@ -387,7 +387,7 @@ std::vector<SQLQuery> MySQLService::CreateTable(const Anope::string &table, cons
 		queries.push_back(query_text);
 	}
 	else
-		for (Serialize::Data::const_iterator it = data.begin(), it_end = data.end(); it != it_end; ++it)
+		for (Data::Map::const_iterator it = data.data.begin(), it_end = data.data.end(); it != it_end; ++it)
 		{
 			if (known_cols.count(it->first) > 0)
 				continue;
@@ -395,10 +395,8 @@ std::vector<SQLQuery> MySQLService::CreateTable(const Anope::string &table, cons
 			known_cols.insert(it->first);
 
 			Anope::string query_text = "ALTER TABLE `" + table + "` ADD `" + it->first + "` ";
-			if (it->second.GetType() == Serialize::DT_INT)
+			if (data.GetType(it->first) == Serialize::Data::DT_INT)
 				query_text += "int(11)";
-			else if (it->second.GetMax() > 0)
-				query_text += "varchar(" + stringify(it->second.GetMax()) + ")";
 			else
 				query_text += "text";
 
@@ -408,35 +406,39 @@ std::vector<SQLQuery> MySQLService::CreateTable(const Anope::string &table, cons
 	return queries;
 }
 
-SQLQuery MySQLService::BuildInsert(const Anope::string &table, unsigned int id, Serialize::Data &data)
+Query MySQLService::BuildInsert(const Anope::string &table, unsigned int id, Data &data) anope_override
 {
 	/* Empty columns not present in the data set */
 	const std::set<Anope::string> &known_cols = this->active_schema[table];
 	for (std::set<Anope::string>::iterator it = known_cols.begin(), it_end = known_cols.end(); it != it_end; ++it)
-		if (*it != "id" && *it != "timestamp" && data.count(*it) == 0)
+		if (*it != "id" && *it != "timestamp" && data.data.count(*it) == 0)
 			data[*it] << "";
 
 	Anope::string query_text = "INSERT INTO `" + table + "` (`id`";
-	for (Serialize::Data::const_iterator it = data.begin(), it_end = data.end(); it != it_end; ++it)
+	for (Data::Map::const_iterator it = data.data.begin(), it_end = data.data.end(); it != it_end; ++it)
 		query_text += ",`" + it->first + "`";
 	query_text += ") VALUES (" + stringify(id);
-	for (Serialize::Data::const_iterator it = data.begin(), it_end = data.end(); it != it_end; ++it)
+	for (Data::Map::const_iterator it = data.data.begin(), it_end = data.data.end(); it != it_end; ++it)
 		query_text += ",@" + it->first + "@";
 	query_text += ") ON DUPLICATE KEY UPDATE ";
-	for (Serialize::Data::const_iterator it = data.begin(), it_end = data.end(); it != it_end; ++it)
+	for (Data::Map::const_iterator it = data.data.begin(), it_end = data.data.end(); it != it_end; ++it)
 		query_text += "`" + it->first + "`=VALUES(`" + it->first + "`),";
 	query_text.erase(query_text.end() - 1);
 
-	SQLQuery query(query_text);
-	for (Serialize::Data::const_iterator it = data.begin(), it_end = data.end(); it != it_end; ++it)
-		query.setValue(it->first, it->second.astr());
+	Query query(query_text);
+	for (Data::Map::const_iterator it = data.data.begin(), it_end = data.data.end(); it != it_end; ++it)
+	{
+		Anope::string buf;
+		*it->second >> buf;
+		query.SetValue(it->first, buf);
+	}
 	
 	return query;
 }
 
-SQLQuery MySQLService::GetTables(const Anope::string &prefix)
+Query MySQLService::GetTables(const Anope::string &prefix)
 {
-	return SQLQuery("SHOW TABLES LIKE '" + prefix + "%';");
+	return Query("SHOW TABLES LIKE '" + prefix + "%';");
 }
 
 void MySQLService::Connect()
@@ -449,7 +451,7 @@ void MySQLService::Connect()
 	bool connect = mysql_real_connect(this->sql, this->server.c_str(), this->user.c_str(), this->password.c_str(), this->database.c_str(), this->port, NULL, CLIENT_MULTI_RESULTS);
 
 	if (!connect)
-		throw SQLException("Unable to connect to MySQL service " + this->name + ": " + mysql_error(this->sql));
+		throw SQL::Exception("Unable to connect to MySQL service " + this->name + ": " + mysql_error(this->sql));
 	
 	Log(LOG_DEBUG) << "Successfully connected to MySQL service " << this->name << " at " << this->server << ":" << this->port;
 }
@@ -463,7 +465,7 @@ bool MySQLService::CheckConnection()
 		{
 			this->Connect();
 		}
-		catch (const SQLException &)
+		catch (const SQL::Exception &)
 		{
 			return false;
 		}
@@ -479,7 +481,7 @@ Anope::string MySQLService::Escape(const Anope::string &query)
 	return buffer;
 }
 
-Anope::string MySQLService::BuildQuery(const SQLQuery &q)
+Anope::string MySQLService::BuildQuery(const Query &q)
 {
 	Anope::string real_query = q.query;
 
@@ -505,7 +507,7 @@ void DispatcherThread::Run()
 			QueryRequest &r = me->QueryRequests.front();
 			this->Unlock();
 
-			SQLResult sresult = r.service->RunQuery(r.query);
+			Result sresult = r.service->RunQuery(r.query);
 
 			this->Lock();
 			if (!me->QueryRequests.empty() && me->QueryRequests.front().query == r.query)

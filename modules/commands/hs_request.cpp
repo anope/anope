@@ -32,21 +32,20 @@ struct HostRequest : ExtensibleItem, Serializable
 
 	HostRequest() : Serializable("HostRequest") { }
 
-	Serialize::Data Serialize() const anope_override
+	void Serialize(Serialize::Data &data) const anope_override
 	{
-		Serialize::Data data;
-
 		data["nick"] << this->nick;
 		data["ident"] << this->ident;
 		data["host"] << this->host;
-		data["time"].SetType(Serialize::DT_INT) << this->time;
-
-		return data;
+		data.SetType("time", Serialize::Data::DT_INT); data["time"] << this->time;
 	}
 
 	static Serializable* Unserialize(Serializable *obj, Serialize::Data &data)
 	{
-		NickAlias *na = NickAlias::Find(data["nick"].astr());
+		Anope::string snick;
+		data["nick"] >> snick;
+
+		NickAlias *na = NickAlias::Find(snick);
 		if (na == NULL)
 			return NULL;
 

@@ -48,15 +48,34 @@ Pipe::~Pipe()
 
 bool Pipe::ProcessRead()
 {
+	this->OnNotify();
+
 	char dummy[512];
 	while (read(this->GetFD(), dummy, 512) == 512);
-	this->OnNotify();
 	return true;
+}
+
+void Pipe::Write(const char *data, size_t sz)
+{
+	write(this->write_pipe, data, sz);
+}
+
+int Pipe::Read(char *data, size_t sz)
+{
+	return read(this->GetFD(), data, sz);
+}
+
+bool Pipe::SetWriteBlocking(bool state)
+{
+	int flags = fcntl(this->write_pipe, F_GETFL, 0);
+	if (state)
+		return !fcntl(this->write_pipe, F_SETFL, flags & ~O_NONBLOCK);
+	else
+		return !fcntl(this->write_pipe, F_SETFL, flags | O_NONBLOCK);
 }
 
 void Pipe::Notify()
 {
-	const char dummy = '*';
-	write(this->write_pipe, &dummy, 1);
+	this->Write("\0", 1);
 }
 

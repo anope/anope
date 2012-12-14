@@ -1,0 +1,22 @@
+{INCLUDE header.html}
+	{IF EXISTS MESSAGES}
+		{FOR M IN MESSAGES}
+			{M}<br/>
+		{END FOR}
+	{END IF}
+	<h3>Channels you can drop:</h3>
+	<div class="scroll">
+	{FOR CH,ECH IN CHANNEL_NAMES,ESCAPED_CHANNEL_NAMES}
+		<a href="/chanserv/drop?channel={ECH}">{CH}</a></br>
+	{END FOR}
+	</div>
+	{IF EXISTS CHANNEL_DROP} 
+		<h3>Drop Channel {CHANNEL_DROP}?</h3>
+		<form method="post" name="dropForm" action="/chanserv/drop">
+			<input type="hidden" value="{CHANNEL_DROP}" name="channel">
+			Enter Channel For Confirmation: <input type="text" name="confChan">
+			<input type="hidden" value="yes" name="drop">
+			<input type="submit" value="Drop">
+		</form>
+	{END IF}
+{INCLUDE footer.html}

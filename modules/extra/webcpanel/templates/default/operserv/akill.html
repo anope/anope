@@ -8,33 +8,33 @@
 		</br><b>AKILL List:</b>
 		<table width="100%" height="100%">
 			<tr>
-				<th align="left">Number</th>
-				<th align="left">Hostmask/Reason</th>
-				<th align="left">Expires</th>
-				<th align="left">Setter</th>
+				<td class="akillR1">Number</td>
+				<td class="akillR2">Hostmask</td>
+				<td class="akillR2">Expires</td>
+				<td class="akillR2">Setter</td>
+				<td>
 			</tr>
-			{FOR N,H,S,T,E,R IN NUMBER,HOST,SETTER,TIME,EXPIRE,REASON}
-			<tr>
-				<td>{N}</td>
-				<td>{H}</td>
-				<td>{E}</td>
-				<td>{S}</td>
-				<td></td>
-				<td><a href="/operserv/akill?&number={N}&del=1">Delete</a></td>
-			</tr>
-			<tr>
-				<td></td>
-				<td colspan="2">{R}</td>
-			</tr>
-			{END FOR}
-		</table></br>
+		</table>
+		<div class="scroll">
+			<table>
+				{FOR N,H,S,T,E,R IN NUMBER,HOST,SETTER,TIME,EXPIRE,REASON}
+				<tr>
+					<td class="akillR1">{N}</td>
+					<td class="akillR2"><abbr class="akillR2" title="{R}">{H}</abbr></td>
+					<td class="akillR2"><abbr class="akillR2" title="{T}">{E}</abbr></td>
+					<td class="akillR2">{S}</td>
+					<td class="akillR3"><a href="/operserv/akill?&number={N}&del=1">Delete</a></td>
+				</tr>
+				{END FOR}
+			</table></br>
+		</div>
 		<b>Add a new AKILL</b>
 		<form method="post" action="/operserv/akill">
 			<table width="100%" height="100%" align="left">
 				<tr>
-					<th align="left">HostMask</th>
-					<th align="left">Expiry</th>
-					<th align="left">Reason</th>
+					<th align="left">HostMask</td>
+					<th align="left">Expiry</td>
+					<th align="left">Reason</td>
 				</tr>
 				<tr>
 					<td><input type="text" name="mask"></td>

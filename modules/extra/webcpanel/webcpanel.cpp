@@ -31,6 +31,7 @@ class ModuleWebCPanel : public Module
 	WebCPanel::ChanServ::Set chanserv_set;
 	WebCPanel::ChanServ::Access chanserv_access;
 	WebCPanel::ChanServ::Akick chanserv_akick;
+	WebCPanel::ChanServ::Drop chanserv_drop;
 
 	WebCPanel::MemoServ::Memos memoserv_memos;
 
@@ -46,7 +47,7 @@ class ModuleWebCPanel : public Module
 		index("/"), logout("/logout"), _register("/register"), confirm("/confirm"),
 		nickserv_info(Config->NickServ, "/nickserv/info"), nickserv_cert(Config->NickServ, "/nickserv/cert"), nickserv_access(Config->NickServ, "/nickserv/access"), nickserv_alist(Config->NickServ, "/nickserv/alist"),
 		chanserv_info(Config->ChanServ, "/chanserv/info"), chanserv_set(Config->ChanServ, "/chanserv/set"), chanserv_access(Config->ChanServ, "/chanserv/access"), chanserv_akick(Config->ChanServ, "/chanserv/akick"),
-		memoserv_memos(Config->MemoServ, "/memoserv/memos"), hostserv_request(Config->HostServ, "/hostserv/request"), operserv_akill(Config->OperServ, "/operserv/akill")
+		chanserv_drop(Config->ChanServ, "/chanserv/drop"), memoserv_memos(Config->MemoServ, "/memoserv/memos"), hostserv_request(Config->HostServ, "/hostserv/request"), operserv_akill(Config->OperServ, "/operserv/akill")
 	{
 		this->SetAuthor("Anope");
 
@@ -129,6 +130,11 @@ class ModuleWebCPanel : public Module
 			s.subsections.push_back(ss);
 			provider->RegisterPage(&this->chanserv_akick);
 
+			ss.name = "Drop";
+			ss.url = "/chanserv/drop";
+			s.subsections.push_back(ss);
+			provider->RegisterPage(&this->chanserv_drop);
+
 			panel.sections.push_back(s);
 		}
 
@@ -198,6 +204,7 @@ class ModuleWebCPanel : public Module
 			provider->UnregisterPage(&this->chanserv_set);
 			provider->UnregisterPage(&this->chanserv_access);
 			provider->UnregisterPage(&this->chanserv_akick);
+			provider->UnregisterPage(&this->chanserv_drop);
 
 			provider->UnregisterPage(&this->memoserv_memos);
 			

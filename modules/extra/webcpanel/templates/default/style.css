@@ -95,3 +95,26 @@ body {
 	background:#FFF;
 	text-decoration:underline;
 }
+
+.scroll {
+	overflow-x: scroll;
+	height: 125px;
+}
+
+.akillR1 { 
+	width: 80px;
+	text-align: left;
+}
+.akillR2 {
+	width: 250px;
+	text-align: left;
+}
+.akillR3 {
+	width: 100px;
+	text-align: left;
+}
+
+.danger { 
+	color: red;
+	weight: bolder; 
+}

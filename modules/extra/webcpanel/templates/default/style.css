@@ -101,6 +101,11 @@ body {
 	height: 125px;
 }
 
+.cinfo {
+	overflow-x: scroll;
+	height: 450px;
+}
+
 .akillR1 { 
 	width: 80px;
 	text-align: left;

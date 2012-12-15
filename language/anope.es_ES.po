@@ -13,59 +13,59 @@ msgstr ""
 "Language-Team: Spanish\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=ISO-8859-2\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: modules/commands/cs_xop.cpp:288
 #, fuzzy, c-format
 msgid "%s added to %s %s list."
-msgstr "%s añadido a la lista de AKILLs."
+msgstr "%s aÃ±adido a la lista de AKILLs."
 
 #: modules/commands/cs_access.cpp:182
 #, c-format
 msgid "%s added to %s access list at level %d."
-msgstr "%s añadido a la lista de acceso de %s con nivel %d."
+msgstr "%s aÃ±adido a la lista de acceso de %s con nivel %d."
 
 #: modules/commands/cs_akick.cpp:157
 #, c-format
 msgid "%s added to %s autokick list."
-msgstr "%s añadido a la lista de kicks automaticos en el canal %s."
+msgstr "%s aÃ±adido a la lista de kicks automaticos en el canal %s."
 
 #: modules/commands/bs_badwords.cpp:170
 #, c-format
 msgid "%s added to %s bad words list."
-msgstr "%s añadida a  la lista de bad words de  %s."
+msgstr "%s aÃ±adida a  la lista de bad words de  %s."
 
 #: modules/commands/ns_access.cpp:40
 #, fuzzy, c-format
 msgid "%s added to %s's access list."
-msgstr "%s añadido a tu lista de acceso."
+msgstr "%s aÃ±adido a tu lista de acceso."
 
 #: modules/commands/os_sxline.cpp:402
 #, fuzzy, c-format
 msgid "%s added to the %s list."
-msgstr "%s añadido a la lista de AKILLs."
+msgstr "%s aÃ±adido a la lista de AKILLs."
 
 #: modules/commands/os_akill.cpp:191
 #, c-format
 msgid "%s added to the AKILL list."
-msgstr "%s añadido a la lista de AKILLs."
+msgstr "%s aÃ±adido a la lista de AKILLs."
 
 #: modules/commands/os_sxline.cpp:626
 #, c-format
 msgid "%s added to the SQLINE list."
-msgstr "%s añadido a la lista de SQLINEs."
+msgstr "%s aÃ±adido a la lista de SQLINEs."
 
 #: modules/commands/ns_cert.cpp:66 modules/commands/ns_cert.cpp:83
 #, fuzzy, c-format
 msgid "%s added to your certificate list."
-msgstr "%s añadido a tu lista de acceso."
+msgstr "%s aÃ±adido a tu lista de acceso."
 
 #: modules/commands/ms_ignore.cpp:56
 #, fuzzy, c-format
 msgid "%s added to your ignore list."
-msgstr "%s añadido a tu lista de acceso."
+msgstr "%s aÃ±adido a tu lista de acceso."
 
 #: modules/pseudoclients/nickserv.cpp:324
 #, fuzzy, c-format
@@ -264,7 +264,7 @@ msgstr "You are already in %s! "
 #: modules/commands/ms_ignore.cpp:59
 #, fuzzy, c-format
 msgid "%s is already on your ignore list."
-msgstr "%s añadido a tu lista de acceso."
+msgstr "%s aÃ±adido a tu lista de acceso."
 
 #: modules/commands/ms_rsend.cpp:54 modules/commands/ms_send.cpp:38
 #, fuzzy, c-format
@@ -448,7 +448,7 @@ msgstr ""
 "de el limite de sesion. El contenido de este notice es un seteo\n"
 "de configuracion.\n"
 "\n"
-"EXCEPTION ADD añade la mascara de host dada a la lista de\n"
+"EXCEPTION ADD aÃ±ade la mascara de host dada a la lista de\n"
 "excepcion. Ten en cuenta que las mascaras nick!usuario@host\n"
 "y usuario@host son invalidas. Solo mascaras reales como\n"
 "box.host.dom and *.host.dom, son permitidas ya que el\n"
@@ -546,7 +546,7 @@ msgstr ""
 "                     ops este seteada).\n"
 "        <0   No puede ser opeado.\n"
 "\n"
-"Esyos niveles pueden ser cambiado, o nuevos añadidos,\n"
+"Esyos niveles pueden ser cambiado, o nuevos aÃ±adidos,\n"
 "usando el comando LEVELS; tipea /msg %s HELP LEVELS\n"
 "para mayor informacion."
 
@@ -1748,7 +1748,7 @@ msgstr "%s ya esta cubierto por %s."
 #: modules/commands/ns_ajoin.cpp:135
 #, fuzzy, c-format
 msgid "%s is already on your auto join list."
-msgstr "%s añadido a tu lista de acceso."
+msgstr "%s aÃ±adido a tu lista de acceso."
 
 #: modules/commands/cs_flags.cpp:348
 #, c-format
@@ -1870,7 +1870,7 @@ msgstr ""
 #: modules/commands/bs_bot.cpp:99
 #, c-format
 msgid "%s!%s@%s (%s) added to the bot list."
-msgstr "%s!%s@%s (%s) añadido a la lista de bots."
+msgstr "%s!%s@%s (%s) aÃ±adido a la lista de bots."
 
 #: modules/commands/ns_access.cpp:71
 #, fuzzy, c-format
@@ -2133,7 +2133,7 @@ msgstr ""
 #: modules/commands/ns_ajoin.cpp:145
 #, fuzzy, c-format
 msgid "Added %s to your auto join list."
-msgstr "%s añadido a la lista de kicks automaticos en el canal %s."
+msgstr "%s aÃ±adido a la lista de kicks automaticos en el canal %s."
 
 #: modules/commands/os_forbid.cpp:148
 #, c-format
@@ -2286,7 +2286,7 @@ msgstr ""
 "y borrar bots que usuarios podran usar en sus propios\n"
 "canales.\n"
 "\n"
-"BOT ADD añade un bot con el nickname, usuario, host\n"
+"BOT ADD aÃ±ade un bot con el nickname, usuario, host\n"
 "y nombre real dados. Ya que no se hacen chequeos de\n"
 "integridad para estos seteos, ten mucho cuidado.\n"
 "BOT CHANGE permite cambiar el nickname, usuario, host\n"
@@ -2468,17 +2468,17 @@ msgstr ""
 "AKILLS. Si un usuario concordando con una mascara en la\n"
 "lista de AKILLS se intenta conectar, los Servicios enviaran\n"
 "un KILL a ese usuario y, en tipos de servidores soportados,\n"
-"instruira a todos los servidores a añadir un ban (linea K)\n"
+"instruira a todos los servidores a aÃ±adir un ban (linea K)\n"
 "para la mascara que el usuario concordo con.\n"
 "\n"
-"AKILL ADD añade la mascara usuario@host dada a la lista\n"
+"AKILL ADD aÃ±ade la mascara usuario@host dada a la lista\n"
 "de AKILLS por la razon dada (la que debe ser dada).\n"
 "expiracion es especificada como un entero seguido por uno de\n"
 " d (dias), h (horas), o m (minutos). Combinaciones (como\n"
 "1h30m) no estan permitidas. Si un especificador de unidades no\n"
 "es incluido, por defecto seran dias (osea +30 por si solo\n"
-"significa 30 dias).  Para añadir un AKILL que no expire, usa +0.\n"
-"Si la la mascara a ser añadida comienza con un +, un tiempo\n"
+"significa 30 dias).  Para aÃ±adir un AKILL que no expire, usa +0.\n"
+"Si la la mascara a ser aÃ±adida comienza con un +, un tiempo\n"
 "de expiracion debe ser dado, aun si es el mismo que el por\n"
 "defecto. El tiempo de expiracion por defecto actual de AKILLS\n"
 "puede ser visto con el comando STATS AKILL.\n"
@@ -2498,7 +2498,7 @@ msgstr ""
 "      a 9.\n"
 "      \n"
 "AKILL VIEW es una version mas verbal de AKILL LIST, y \n"
-"mostrara quien añadio un AKILL, la fecha en que fue añadido,\n"
+"mostrara quien aÃ±adio un AKILL, la fecha en que fue aÃ±adido,\n"
 "y cuando expirara, asi como tambien la mascara usuario@host\n"
 "y la razon.\n"
 "\n"
@@ -2970,7 +2970,7 @@ msgid ""
 msgstr ""
 "El bot ahora kickeara bad words, y baneara despues de\n"
 "%d kicks al mismo usuario. Usa el comando BADWORDS\n"
-"para añadir o remover palabras."
+"para aÃ±adir o remover palabras."
 
 #: modules/commands/bs_kick.cpp:81
 msgid ""
@@ -2978,7 +2978,7 @@ msgid ""
 "to add or remove a bad word."
 msgstr ""
 "El bot ahora kickeara bad words. Usa el comando BADWORDS\n"
-"para añadir o remover palabras."
+"para aÃ±adir o remover palabras."
 
 #: modules/commands/bs_kick.cpp:113
 #, fuzzy, c-format
@@ -3229,7 +3229,7 @@ msgstr ""
 "\n"
 "Causa a los Servicios a parar inmediatamente; las bases de\n"
 "datos no son salvadas. Este comando no debe ser usado a\n"
-"menos que las copias en la memoria se crean dañadas y no\n"
+"menos que las copias en la memoria se crean daÃ±adas y no\n"
 "deban ser guardadas. Para parar normalmente, usa el comando\n"
 "SHUTDOWN.\n"
 "\n"
@@ -3406,7 +3406,7 @@ msgstr ""
 "Sintaxis: SET PASSWORD nueva-clave\n"
 "\n"
 "Cambia la clave usada para identificarte como el\n"
-"dueño del nick."
+"dueÃ±o del nick."
 
 #: modules/commands/ns_set.cpp:98
 #, fuzzy
@@ -3417,7 +3417,7 @@ msgstr ""
 "Sintaxis: SET PASSWORD nueva-clave\n"
 "\n"
 "Cambia la clave usada para identificarte como el\n"
-"dueño del nick."
+"dueÃ±o del nick."
 
 #: modules/commands/cs_set_successor.cpp:83
 #, fuzzy, c-format
@@ -4668,7 +4668,7 @@ msgstr ""
 #: modules/commands/ns_set_language.cpp:69
 #: modules/commands/ns_set_language.cpp:104
 msgid "English"
-msgstr "Español"
+msgstr "EspaÃ±ol"
 
 #: modules/commands/cs_entrymsg.cpp:172
 #, fuzzy, c-format
@@ -5203,7 +5203,7 @@ msgstr "LOGONNEWS {ADD|DEL|LIST} [texto|numero]"
 
 #: modules/commands/ns_set_language.cpp:47
 msgid "Language changed to English."
-msgstr "Lenguage cambiado a Español."
+msgstr "Lenguage cambiado a EspaÃ±ol."
 
 #: modules/commands/ms_cancel.cpp:55
 #, c-format
@@ -6040,7 +6040,7 @@ msgstr ""
 "cuando el kick por bad words esta habilitado. Para mayor\n"
 "informacion, tipea /msg %s HELP KICK BADWORDS.\n"
 "\n"
-"El comando BADWORDS ADD añade una palabra a la lista\n"
+"El comando BADWORDS ADD aÃ±ade una palabra a la lista\n"
 "de bad words. Si SINGLE es especificado, el kick sera\n"
 "hecho solo si el usuario dice la palabra completa. Si\n"
 "START es especificado, el kick sera hecho solo si el\n"
@@ -8654,8 +8654,8 @@ msgstr ""
 "a recibir y guardar cuantos memos quiera. Si no das un\n"
 "nickname o canal, tu propio limite es seteado.\n"
 "\n"
-"Añadir HARD previene al usuario de cambiar el limite. No\n"
-"añadir HARD tiene el efecto contrario, permitiendo al\n"
+"AÃ±adir HARD previene al usuario de cambiar el limite. No\n"
+"aÃ±adir HARD tiene el efecto contrario, permitiendo al\n"
 "usuario cambiar el limite (aun si un limite previo fue seteado\n"
 "con HARD).\n"
 "\n"
@@ -8790,7 +8790,7 @@ msgid ""
 msgstr ""
 "Sintaxis: IDENTIFY [account] clave\n"
 "\n"
-"Informa a %s que tu eres realmente el dueño de tu nick.\n"
+"Informa a %s que tu eres realmente el dueÃ±o de tu nick.\n"
 "Muchos comandos requieren que te autentifiques con este\n"
 "comando antes de usarlos. La clave deberia ser la misma\n"
 "que enviaste con el comando REGISTER."
@@ -8804,7 +8804,7 @@ msgid ""
 msgstr ""
 "Sintaxis: DEOWNER #canal\n"
 "\n"
-"Remueve tu estatus de dueño en canal.\n"
+"Remueve tu estatus de dueÃ±o en canal.\n"
 "\n"
 "Limitado a aquellos con nivel de fundador en el canal."
 
@@ -10210,7 +10210,7 @@ msgstr ""
 "Sintaxis: LOGOUT [nickname [REVALIDATE]]\n"
 "\n"
 "Sin un parametro, revierte el efecto del comando IDENTIFY, \n"
-"osea te hace ya no reconocido como el verdadero dueño del nick\n"
+"osea te hace ya no reconocido como el verdadero dueÃ±o del nick\n"
 "Ten en cuenta, que no seras requerido a reidentificarte.\n"
 "\n"
 "Con un parametro, hace los mismo para el nick dado. Si\n"
@@ -10244,7 +10244,7 @@ msgstr ""
 "numero de usuarios desde que los Servicios partieron, y\n"
 "el tiempo que los Servicios han estado corriendo.\n"
 "\n"
-"Con la opcion AKILL, muestra el tamaño actual de la\n"
+"Con la opcion AKILL, muestra el tamaÃ±o actual de la\n"
 "lista AKILL y el actual tiempo de expiracion por defecto.\n"
 "\n"
 "La opcion ALL esta solo disponible a administradores de\n"

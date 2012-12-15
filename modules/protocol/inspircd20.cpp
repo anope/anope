@@ -13,12 +13,7 @@
 
 #include "module.h"
 
-static bool has_chghostmod = false;
-static bool has_chgidentmod = false;
-static bool has_rlinemod = false;
-static bool has_svstopic_topiclock = false;
 static unsigned int spanningtree_proto_ver = 0;
-static bool has_servicesmod = false;
 
 static ServiceReference<IRCDProto> insp12("IRCDProto", "inspircd12");
 
@@ -190,10 +185,10 @@ struct IRCDMessageCapab : Message::Capab
 			}
 
 			/* reset CAPAB */
-			has_servicesmod = false;
-			has_chghostmod = false;
-			has_chgidentmod = false;
-			has_svstopic_topiclock = false;
+			Servers::Capab.insert("SERVERS");
+			Servers::Capab.insert("CHGHOST");
+			Servers::Capab.insert("CHGIDENT");
+			Servers::Capab.insert("TOPICLOCK");
 			IRCD->CanSVSHold = false;
 		}
 		else if (params[0].equals_cs("CHANMODES") && params.size() > 1)
@@ -364,12 +359,12 @@ struct IRCDMessageCapab : Message::Capab
 					IRCD->CanSVSHold = true;
 				else if (module.find("m_rline.so") == 0)
 				{
-					has_rlinemod = true;
+					Servers::Capab.insert("RLINE");
 					if (!Config->RegexEngine.empty() && module.length() > 11 && Config->RegexEngine != module.substr(11))
 						Log() << "Warning: InspIRCd is using regex engine " << module.substr(11) << ", but we have " << Config->RegexEngine << ". This may cause inconsistencies.";
 				}
 				else if (module.equals_cs("m_topiclock.so"))
-					has_svstopic_topiclock = true;
+					Servers::Capab.insert("TOPICLOCK");
 			}
 		}
 		else if (params[0].equals_cs("MODSUPPORT") && params.size() > 1)
@@ -380,11 +375,11 @@ struct IRCDMessageCapab : Message::Capab
 			while (ssep.GetToken(module))
 			{
 				if (module.equals_cs("m_services_account.so"))
-					has_servicesmod = true;
+					Servers::Capab.insert("SERVICES");
 				else if (module.equals_cs("m_chghost.so"))
-					has_chghostmod = true;
+					Servers::Capab.insert("CHGHOST");
 				else if (module.equals_cs("m_chgident.so"))
-					has_chgidentmod = true;
+					Servers::Capab.insert("CHGIDENT");
 			}
 		}
 		else if (params[0].equals_cs("CAPABILITIES") && params.size() > 1)
@@ -476,7 +471,7 @@ struct IRCDMessageCapab : Message::Capab
 		}
 		else if (params[0].equals_cs("END"))
 		{
-			if (!has_servicesmod)
+			if (!Servers::Capab.count("SERVICES"))
 			{
 				UplinkSocket::Message() << "ERROR :m_services_account.so is not loaded. This is required by Anope";
 				Anope::QuitReason = "ERROR: Remote server does not have the m_services_account module loaded, and this is required.";
@@ -492,11 +487,11 @@ struct IRCDMessageCapab : Message::Capab
 			}
 			if (!IRCD->CanSVSHold)
 				Log() << "SVSHOLD missing, Usage disabled until module is loaded.";
-			if (!has_chghostmod)
+			if (!Servers::Capab.count("CHGHOST"))
 				Log() << "CHGHOST missing, Usage disabled until module is loaded.";
-			if (!has_chgidentmod)
+			if (!Servers::Capab.count("CHGIDENT"))
 				Log() << "CHGIDENT missing, Usage disabled until module is loaded.";
-			if ((!has_svstopic_topiclock) && (Config->UseServerSideTopicLock))
+			if (!Servers::Capab.count("TOPICLOCK") && Config->UseServerSideTopicLock)
 				Log() << "m_topiclock missing, server side topic locking disabled until module is loaded.";
 		}
 
@@ -715,7 +710,7 @@ class ProtoInspIRCd : public Module
 			SendChannelMetadata(ci->c, "mlock", modes);
 		}
 
-		if (Config->UseServerSideTopicLock && has_svstopic_topiclock && ci->c)
+		if (Config->UseServerSideTopicLock && Servers::Capab.count("TOPICLOCK") && ci->c)
 		{
 			Anope::string on = ci->HasFlag(CI_TOPICLOCK) ? "1" : "";
 			SendChannelMetadata(ci->c, "topiclock", on);
@@ -727,7 +722,7 @@ class ProtoInspIRCd : public Module
 		if (Config->UseServerSideMLock && ci->c)
 			SendChannelMetadata(ci->c, "mlock", "");
 
-		if (Config->UseServerSideTopicLock && has_svstopic_topiclock && ci->c)
+		if (Config->UseServerSideTopicLock && Servers::Capab.count("TOPICLOCK") && ci->c)
 			SendChannelMetadata(ci->c, "topiclock", "");
 	}
 

@@ -774,6 +774,9 @@ static void LoadChannels()
 				if (level == ACCESS_INVALID)
 					level = ACCESS_FOUNDER;
 
+				if (j == 10 && level < 0) // NOJOIN
+					ci->UnsetFlag(CI_RESTRICTED); // If CSDefRestricted was enabled this can happen
+
 				ci->SetLevel(GetLevelName(j), level);
 			}
 

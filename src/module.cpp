@@ -9,8 +9,8 @@
 
 #include "services.h"
 #include "modules.h"
-#include "dns.h"
 #include "language.h"
+#include "account.h"
 
 #ifdef GETTEXT_FOUND
 # include <libintl.h>
@@ -46,8 +46,6 @@ Module::Module(const Anope::string &modname, const Anope::string &, ModType modt
 
 Module::~Module()
 {
-	if (DNS::Engine)
-		DNS::Engine->Cleanup(this);
 	/* Detach all event hooks for this module */
 	ModuleManager::DetachAll(this);
 	/* Clear any active callbacks this module has */

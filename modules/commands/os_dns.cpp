@@ -6,6 +6,9 @@
  */
 
 #include "module.h"
+#include "../extra/dns.h"
+
+static ServiceReference<DNS::Manager> dnsmanager("DNS::Manager", "dns/manager");
 
 class DNSServer;
 static std::vector<DNSServer *> dns_servers;
@@ -44,8 +47,8 @@ class DNSServer : public Serializable
 	void Pool(bool p)
 	{
 		pooled = p;
-		if (DNS::Engine)
-			DNS::Engine->UpdateSerial();
+		if (dnsmanager)
+			dnsmanager->UpdateSerial();
 	}
 
 
@@ -220,8 +223,8 @@ class CommandOSDNS : public Command
 		source.Reply(_("Added IP %s to %s."), params[2].c_str(), s->GetName().c_str());
 		Log(LOG_ADMIN, source, this) << "to add IP " << params[2] << " to " << s->GetName();
 
-		if (s->Pooled())
-			DNS::Engine->UpdateSerial();
+		if (s->Pooled() && dnsmanager)
+			dnsmanager->UpdateSerial();
 	}
 	
 	void DelIP(CommandSource &source, const std::vector<Anope::string> &params)
@@ -247,8 +250,8 @@ class CommandOSDNS : public Command
 					s->Pool(false);
 				}
 
-				if (s->Pooled())
-					DNS::Engine->UpdateSerial();
+				if (s->Pooled() && dnsmanager)
+					dnsmanager->UpdateSerial();
 
 				return;
 			}

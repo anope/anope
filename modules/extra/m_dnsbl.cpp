@@ -6,8 +6,12 @@
  */
 
 #include "module.h"
+#include "dns.h"
+
+using namespace DNS;
 
 static ServiceReference<XLineManager> akills("XLineManager", "xlinemanager/sgline");
+static ServiceReference<Manager> dnsmanager("DNS::Manager", "dns/manager");
 
 struct Blacklist
 {
@@ -19,21 +23,21 @@ struct Blacklist
 	Blacklist(const Anope::string &n, time_t b, const Anope::string &r, const std::map<int, Anope::string> &re) : name(n), bantime(b), reason(r), replies(re) { }
 };
 
-class DNSBLResolver : public DNS::Request
+class DNSBLResolver : public Request
 {
 	Reference<User> user;
 	Blacklist blacklist;
 	bool add_to_akill;
 
  public:
-	DNSBLResolver(Module *c, User *u, const Blacklist &b, const Anope::string &host, bool add_akill) : DNS::Request(host, DNS::QUERY_A, true, c), user(u), blacklist(b), add_to_akill(add_akill) { }
+	DNSBLResolver(Module *c, User *u, const Blacklist &b, const Anope::string &host, bool add_akill) : Request(dnsmanager, c, host, QUERY_A, true), user(u), blacklist(b), add_to_akill(add_akill) { }
 
-	void OnLookupComplete(const DNS::Query *record) anope_override
+	void OnLookupComplete(const Query *record) anope_override
 	{
 		if (!user || user->HasExt("m_dnsbl_akilled"))
 			return;
 
-		const DNS::ResourceRecord &ans_record = record->answers[0];
+		const ResourceRecord &ans_record = record->answers[0];
 		// Replies should be in 127.0.0.0/24
 		if (ans_record.rdata.find("127.0.0.") != 0)
 			return;
@@ -127,7 +131,7 @@ class ModuleDNSBL : public Module
 
 	void OnUserConnect(Reference<User> &user, bool &exempt) anope_override
 	{
-		if (exempt || !user || (!this->check_on_connect && !Me->IsSynced()))
+		if (exempt || !user || (!this->check_on_connect && !Me->IsSynced()) || !dnsmanager)
 			return;
 
 		if (!this->check_on_netburst && !user->server->IsSynced())
@@ -158,7 +162,7 @@ class ModuleDNSBL : public Module
 			{
 				Anope::string dnsbl_host = user_ip.addr() + "." + b.name;
 				DNSBLResolver *res = new DNSBLResolver(this, user, b, dnsbl_host, this->add_to_akill);
-				res->Process();
+				dnsmanager->Process(res);
 			}
 			catch (const SocketException &ex)
 			{

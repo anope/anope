@@ -15,7 +15,6 @@
 #include "config.h"
 #include "protocol.h"
 #include "servers.h"
-#include "dns.h"
 
 UplinkSocket *UplinkSock = NULL;
 
@@ -48,10 +47,9 @@ void Uplink::Connect()
 	if (!Config->LocalHost.empty())
 		UplinkSock->Bind(Config->LocalHost);
 	FOREACH_MOD(I_OnPreServerConnect, OnPreServerConnect());
-	DNS::Query rep = DNS::Manager::BlockingQuery(u->host, u->ipv6 ? DNS::QUERY_AAAA : DNS::QUERY_A);
-	Anope::string reply_ip = !rep.answers.empty() ? rep.answers.front().rdata : u->host;
-	Log(LOG_TERMINAL) << "Attempting to connect to uplink #" << (Anope::CurrentUplink + 1) << " " << u->host << " (" << reply_ip << "), port " << u->port;
-	UplinkSock->Connect(reply_ip, u->port);
+	Anope::string ip = Anope::Resolve(u->host, u->ipv6 ? AF_INET6 : AF_INET);
+	Log(LOG_TERMINAL) << "Attempting to connect to uplink #" << (Anope::CurrentUplink + 1) << " " << u->host << " (" << ip << "), port " << u->port;
+	UplinkSock->Connect(ip, u->port);
 }
 
 

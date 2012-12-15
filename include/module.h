@@ -21,7 +21,6 @@
 #include "channels.h"
 #include "commands.h"
 #include "config.h"
-#include "dns.h"
 #include "extensible.h"
 #include "hashcomp.h"
 #include "language.h"

@@ -478,20 +478,6 @@ class CoreExport ServerConfig
 	Anope::string MailEmailchangeSubject, MailEmailchangeMessage;
 	Anope::string MailMemoSubject, MailMemoMessage;
 
-	/* Nameserver to use for resolving hostnames */
-	Anope::string NameServer;
-	/* Time before a DNS query is considered dead */
-	time_t DNSTimeout;
-	/* The IP/port DNS queries come in on */
-	Anope::string DNSIP;
-	int DNSPort;
-	/* DNS SOA admin */
-	Anope::string DNSSOAAdmin;
-	/* DNS SOA primary NS */
-	Anope::string DNSSOANS;
-	/* SOA Refresh time */
-	unsigned DNSSOARefresh;
-
 	/* Prefix of guest nicks when a user gets forced off of a nick */
 	Anope::string NSGuestNickPrefix;
 	/* Allow users to set kill immed on */

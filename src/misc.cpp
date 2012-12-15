@@ -18,10 +18,13 @@
 #include "bots.h"
 #include "language.h"
 #include "regexpr.h"
+#include "sockets.h"
 
 #include <errno.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <sys/socket.h>
+#include <netdb.h>
 
 NumberList::NumberList(const Anope::string &list, bool descending) : is_valid(true), desc(descending)
 {
@@ -650,5 +653,33 @@ Anope::string Anope::NormalizeBuffer(const Anope::string &buf)
 	}
 
 	return newbuf;
+}
+
+Anope::string Anope::Resolve(const Anope::string &host, int type)
+{
+	Anope::string result = host;
+
+	addrinfo hints;
+	memset(&hints, 0, sizeof(hints));
+	hints.ai_family = type;
+
+	Log(LOG_DEBUG_2) << "Resolver: BlockingQuery: Looking up " << host;
+
+	addrinfo *addrresult = NULL;
+	if (getaddrinfo(host.c_str(), NULL, &hints, &addrresult) == 0)
+	{
+		sockaddrs addr;
+		memcpy(&addr, addrresult->ai_addr, addrresult->ai_addrlen);
+		try
+		{
+			result = addr.addr();
+			Log(LOG_DEBUG_2) << "Resolver: " << host << " -> " << result;
+		}
+		catch (const SocketException &) { }
+
+		freeaddrinfo(addrresult);
+	}
+
+	return result;
 }
 

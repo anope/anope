@@ -17,7 +17,6 @@
 #include "opertype.h"
 #include "channels.h"
 #include "hashcomp.h"
-#include "dns.h"
 
 #ifndef _WIN32
 #include <errno.h>
@@ -174,42 +173,6 @@ ServerConfig::ServerConfig()
 		Log() << "Configuration option options:seed should be set. It's for YOUR safety! Remember that!";
 
 	ModeManager::UpdateDefaultMLock(this);
-
-	if (IsFile(this->NameServer))
-	{
-		std::ifstream f(this->NameServer.c_str());
-		Anope::string server;
-		bool success = false;
-
-		while (f.is_open() && getline(f, server.str()))
-		{
-			if (server.find("nameserver") == 0)
-			{
-				size_t ip = server.find_first_of("123456789");
-				if (ip != Anope::string::npos)
-				{
-					if (server.substr(ip).is_pos_number_only())
-					{
-						this->NameServer = server.substr(ip);
-						Log(LOG_DEBUG) << "Nameserver set to " << this->NameServer;
-						success = true;
-						break;
-					}
-				}
-			}
-		}
-
-		if (f.is_open())
-			f.close();
-
-		if (!success)
-		{
-			Log() << "Unable to find nameserver, defaulting to 127.0.0.1";
-			this->NameServer = "127.0.0.1";
-		}
-	}
-	delete DNS::Engine;
-	DNS::Engine = new DNS::Manager(this->NameServer, this->DNSIP, this->DNSPort);
 
 	if (this->CaseMap == "ascii")
 		Anope::casemap = std::locale(std::locale(), new Anope::ascii_ctype<char>());
@@ -1262,13 +1225,6 @@ ConfigItems::ConfigItems(ServerConfig *conf)
 		{"mail", "emailchange_message", "", new ValueContainerString(&conf->MailEmailchangeMessage), DT_STRING | DT_ALLOW_NEWLINE, ValidateMail},
 		{"mail", "memo_subject", "", new ValueContainerString(&conf->MailMemoSubject), DT_STRING, ValidateMail},
 		{"mail", "memo_message", "", new ValueContainerString(&conf->MailMemoMessage), DT_STRING | DT_ALLOW_NEWLINE, ValidateMail},
-		{"dns", "nameserver", "127.0.0.1", new ValueContainerString(&conf->NameServer), DT_STRING, NoValidation},
-		{"dns", "timeout", "5", new ValueContainerTime(&conf->DNSTimeout), DT_TIME, NoValidation},
-		{"dns", "ip", "0.0.0.0", new ValueContainerString(&conf->DNSIP), DT_STRING, NoValidation},
-		{"dns", "port", "53", new ValueContainerInt(&conf->DNSPort), DT_INTEGER, NoValidation},
-		{"dns", "admin", "admin@example.com", new ValueContainerString(&conf->DNSSOAAdmin), DT_STRING, NoValidation},
-		{"dns", "nameservers", "ns1.example.com", new ValueContainerString(&conf->DNSSOANS), DT_STRING, NoValidation},
-		{"dns", "refresh", "3600", new ValueContainerUInt(&conf->DNSSOARefresh), DT_UINTEGER, NoValidation},
 		{"chanserv", "name", "", new ValueContainerString(&conf->ChanServ), DT_STRING, NoValidation},
 		{"chanserv", "defaults", "keeptopic secure securefounder signkick", new ValueContainerString(&CSDefaults), DT_STRING, ValidateChanServ},
 		{"chanserv", "maxregistered", "0", new ValueContainerUInt(&conf->CSMaxReg), DT_UINTEGER, ValidateChanServ},

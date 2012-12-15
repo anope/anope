@@ -48,7 +48,6 @@ class User;
 class XLine;
 class XLineManager;
 struct BadWord;
-namespace DNS { struct Query; }
 struct Exception;
 struct MemoInfo;
 struct ModeLock;

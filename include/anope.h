@@ -506,6 +506,13 @@ namespace Anope
 	 * @param Raw message from the uplink
 	 */
 	extern void Process(const Anope::string &);
+
+	/** Does a blocking dns query and returns the first IP.
+	 * @param host host to look up
+	 * @param type inet addr type
+	 * @return the IP if it was found, else the host
+	 */
+	extern Anope::string Resolve(const Anope::string &host, int type);
 }
 
 /** sepstream allows for splitting token seperated lists.

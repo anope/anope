@@ -13,7 +13,7 @@ msgstr ""
 "Language-Team: Catalan\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=ISO-8859-2\n"
+"Content-Type: text/plain; charset=ISO-8859-1\n"
 "Content-Transfer-Encoding: 8bit\n"
 
 #: modules/commands/cs_xop.cpp:288

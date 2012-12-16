@@ -4800,7 +4800,7 @@ NICK_HELP_SET_HIDE
 	Sk³adnia: SET HIDE {EMAIL | STATUS | USERMASK | QUIT} {ON | OFF}
 	
 	To polecenie pozwala na ukrycie czê¶ci informacji, które
-	s± wy¶wietlane przez polecenie INFO serwisu %s.
+	s± wy¶wietlane przez polecenie %S INFO serwisu.
 	Pierwszy argument okre¶la ukrywan± informacjê:
 	EMAIL - adres e-mail, USERMASK - ostatnio u¿ywany host,
 	QUIT - ostatnia wiadomo¶æ po¿egnalna, STATUS - status
@@ -4926,7 +4926,7 @@ NICK_HELP_SASET_HIDE
 	Sk³adnia: SASET nick HIDE {EMAIL | STATUS | USERMASK | QUIT} {ON | OFF}
 	
 	To polecenie pozwala na ukrycie czê¶ci informacji, które
-	s± wy¶wietlane przez polecenie INFO serwisu %s.
+	s± wy¶wietlane przez polecenie %S INFO serwisu.
 	Pierwszy argument okre¶la ukrywan± informacjê:
 	EMAIL - adres e-mail, USERMASK - ostatnio u¿ywany host,
 	QUIT - ostatnia wiadomo¶æ po¿egnalna, STATUS - status

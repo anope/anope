@@ -115,9 +115,12 @@ void TemplateFileServer::Serve(HTTPProvider *server, const Anope::string &page_n
 
 	Anope::string finished;
 
+	bool escaped = false;
 	for (unsigned j = 0; j < buf.length(); ++j)
 	{
-		if (buf[j] == '{')
+		if (buf[j] == '\\' && j + 1 < buf.length() && (buf[j + 1] == '{' || buf[j + 1] == '}'))
+			escaped = true;
+		else if (buf[j] == '{' && !escaped)
 		{
 			size_t f = buf.substr(j).find('}');
 			if (f == Anope::string::npos)
@@ -241,6 +244,8 @@ void TemplateFileServer::Serve(HTTPProvider *server, const Anope::string &page_n
 		}
 		else
 		{
+			escaped = false;
+
 			// If the if stack is empty or we are in a true statement
 			bool ifok = IfStack.empty() || IfStack.top();
 			bool forok = ForLoop::Stack.empty() || !ForLoop::Stack.back().finished(r);

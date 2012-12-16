@@ -29,28 +29,28 @@ void Language::InitLanguages()
 	Log(LOG_DEBUG) << "Initializing Languages...";
 
 	Languages.clear();
-	spacesepstream sep(Config->Languages);
-	Anope::string language;
-
-	while (sep.GetToken(language))
-	{
-		if (!IsFile(Anope::LocaleDir + "/" + language + "/LC_MESSAGES/anope.mo"))
-		{
-			Log() << "Error loading language " << language << ", file does not exist!";
-		}
-		else
-		{
-			Log(LOG_DEBUG) << "Found language file " << language;
-			Languages.push_back(language);
-		}
-	}
 
 	if (!bindtextdomain("anope", Anope::LocaleDir.c_str()))
 		Log() << "Error calling bindtextdomain, " << Anope::LastError();
 	else
 		Log(LOG_DEBUG) << "Successfully bound anope to " << Anope::LocaleDir;
-	
+
 	setlocale(LC_ALL, "");
+
+	spacesepstream sep(Config->Languages);
+	Anope::string language;
+	while (sep.GetToken(language))
+	{
+		const Anope::string &lang_name = Translate(language.c_str(), "English");
+		if (lang_name == "English")
+		{
+			Log() << "Unable to use language " << language;
+			continue;
+		}
+
+		Log(LOG_DEBUG) << "Found language " << language;
+		Languages.push_back(language);
+	}
 #else
 	Log() << "Unable to initialize languages, gettext is not installed";
 #endif

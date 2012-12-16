@@ -88,6 +88,8 @@ class WebPanelProtectedPage : public WebPanelPage
 
 		if (!panel || !(na = panel->GetNickFromSession(client, message)))
 		{
+			reply.error = HTTP_FOUND;
+			reply.headers["Location"] = Anope::string("http") + (use_ssl ? "s" : "") + "://" + message.headers["Host"] + "/";
 			return true; // Access denied
 		}
 

@@ -13,14 +13,6 @@
 
 #include "module.h"
 
-static bool has_globopsmod = false;
-static bool has_chghostmod = false;
-static bool has_chgidentmod = false;
-static bool has_rlinemod = false;
-static bool has_svstopic_topiclock = false;
-static bool has_servicesmod = false;
-static bool has_hidechansmod = false;
-
 class ChannelModeFlood : public ChannelModeParam
 {
  public:
@@ -45,7 +37,7 @@ class InspIRCd12Proto : public IRCDProto
  private:
 	void SendChgIdentInternal(const Anope::string &nick, const Anope::string &vIdent)
 	{
-		if (!has_chgidentmod)
+		if (!Servers::Capab.count("CHGIDENT"))
 			Log() << "CHGIDENT not loaded!";
 		else
 			UplinkSocket::Message(HostServ) << "CHGIDENT " << nick << " " << vIdent;
@@ -53,7 +45,7 @@ class InspIRCd12Proto : public IRCDProto
 
 	void SendChgHostInternal(const Anope::string &nick, const Anope::string &vhost)
 	{
-		if (!has_chghostmod)
+		if (!Servers::Capab.count("CHGHOST"))
 			Log() << "CHGHOST not loaded!";
 		else
 			UplinkSocket::Message(Me) << "CHGHOST " << nick << " " << vhost;
@@ -98,7 +90,7 @@ class InspIRCd12Proto : public IRCDProto
 	void SendAkillDel(const XLine *x) anope_override
 	{
 		/* InspIRCd may support regex bans */
-		if (x->IsRegex() && has_rlinemod)
+		if (x->IsRegex() && Servers::Capab.count("RLINE"))
 		{
 			Anope::string mask = x->mask;
 			size_t h = x->mask.find('#');
@@ -115,7 +107,7 @@ class InspIRCd12Proto : public IRCDProto
 
 	void SendTopic(BotInfo *whosets, Channel *c) anope_override
 	{
-		if (has_svstopic_topiclock)
+		if (Servers::Capab.count("SVSTOPIC"))
 		{
 			UplinkSocket::Message(c->ci->WhoSends()) << "SVSTOPIC " << c->name << " " << c->topic_ts << " " << c->topic_setter << " :" << c->topic;
 		}
@@ -137,7 +129,7 @@ class InspIRCd12Proto : public IRCDProto
 		else
 			this->SendChgHostInternal(u->nick, u->host);
 
-		if (has_chgidentmod && u->GetIdent() != u->GetVIdent())
+		if (Servers::Capab.count("CHGIDENT") && u->GetIdent() != u->GetVIdent())
 			this->SendChgIdentInternal(u->nick, u->GetIdent());
 	}
 
@@ -149,7 +141,7 @@ class InspIRCd12Proto : public IRCDProto
 			timeleft = 172800;
 
 		/* InspIRCd may support regex bans, if they do we can send this and forget about it */
-		if (x->IsRegex() && has_rlinemod)
+		if (x->IsRegex() && Servers::Capab.count("RLINE"))
 		{
 			Anope::string mask = x->mask;
 			size_t h = x->mask.find('#');
@@ -342,7 +334,7 @@ class InspIRCd12Proto : public IRCDProto
 
 	void SendGlobopsInternal(const BotInfo *source, const Anope::string &buf)
 	{
-		if (has_globopsmod)
+		if (Servers::Capab.count("GLOBOPS"))
 			UplinkSocket::Message(source) << "SNONOTICE g :" << buf;
 		else
 			UplinkSocket::Message(source) << "SNONOTICE A :" << buf;
@@ -431,31 +423,28 @@ struct IRCDMessageCapab : Message::Capab
 		if (params[0].equals_cs("START"))
 		{
 			/* reset CAPAB */
-			has_servicesmod = false;
-			has_globopsmod = false;
-			has_chghostmod = false;
-			has_chgidentmod = false;
-			has_hidechansmod = false;
+			Servers::Capab.clear();
+			Servers::Capab.insert("NOQUIT");
 			IRCD->CanSVSHold = false;
 		}
 		else if (params[0].equals_cs("MODULES") && params.size() > 1)
 		{
 			if (params[1].find("m_globops.so") != Anope::string::npos)
-				has_globopsmod = true;
+				Servers::Capab.insert("GLOBOPS");
 			if (params[1].find("m_services_account.so") != Anope::string::npos)
-				has_servicesmod = true;
+				Servers::Capab.insert("SERVICES");
 			if (params[1].find("m_svshold.so") != Anope::string::npos)
 				IRCD->CanSVSHold = true;
 			if (params[1].find("m_chghost.so") != Anope::string::npos)
-				has_chghostmod = true;
+				Servers::Capab.insert("CHGHOST");
 			if (params[1].find("m_chgident.so") != Anope::string::npos)
-				has_chgidentmod = true;
+				Servers::Capab.insert("CHGIDENT");
 			if (params[1].find("m_hidechans.so") != Anope::string::npos)
-				has_hidechansmod = true;
+				Servers::Capab.insert("HIDECHANELS");
 			if (params[1].find("m_servprotect.so") != Anope::string::npos)
 				IRCD->DefaultPseudoclientModes = "+Ik";
 			if (params[1].find("m_rline.so") != Anope::string::npos)
-				has_rlinemod = true;
+				Servers::Capab.insert("RLINE");
 		}
 		else if (params[0].equals_cs("CAPABILITIES") && params.size() > 1)
 		{
@@ -729,21 +718,21 @@ struct IRCDMessageCapab : Message::Capab
 		}
 		else if (params[0].equals_cs("END"))
 		{
-			if (!has_globopsmod)
+			if (!Servers::Capab.count("GLOBOPS"))
 			{
 				UplinkSocket::Message() << "ERROR :m_globops is not loaded. This is required by Anope";
 				Anope::QuitReason = "Remote server does not have the m_globops module loaded, and this is required.";
 				Anope::Quitting = true;
 				return;
 			}
-			if (!has_servicesmod)
+			if (!Servers::Capab.count("SERVICES"))
 			{
 				UplinkSocket::Message() << "ERROR :m_services_account.so is not loaded. This is required by Anope";
 				Anope::QuitReason = "ERROR: Remote server does not have the m_services_account module loaded, and this is required.";
 				Anope::Quitting = true;
 				return;
 			}
-			if (!has_hidechansmod)
+			if (!Servers::Capab.count("HIDECHANS"))
 			{
 				UplinkSocket::Message() << "ERROR :m_hidechans.so is not loaded. This is required by Anope";
 				Anope::QuitReason = "ERROR: Remote server does not have the m_hidechans module loaded, and this is required.";
@@ -752,9 +741,9 @@ struct IRCDMessageCapab : Message::Capab
 			}
 			if (!IRCD->CanSVSHold)
 				Log() << "SVSHOLD missing, Usage disabled until module is loaded.";
-			if (!has_chghostmod)
+			if (!Servers::Capab.count("CHGHOST"))
 				Log() << "CHGHOST missing, Usage disabled until module is loaded.";
-			if (!has_chgidentmod)
+			if (!Servers::Capab.count("CHGIDENT"))
 				Log() << "CHGIDENT missing, Usage disabled until module is loaded.";
 		}
 
@@ -990,22 +979,22 @@ struct IRCDMessageMetadata : IRCDMessage
 					return;
 
 				bool required = false;
-				Anope::string module = params[2].substr(1);
+				Anope::string capab, module = params[2].substr(1);
 
 				if (module.equals_cs("m_services_account.so"))
 					required = true;
 				else if (module.equals_cs("m_hidechans.so"))
 					required = true;
 				else if (module.equals_cs("m_chghost.so"))
-					has_chghostmod = plus;
+					capab = "CHGHOST";
 				else if (module.equals_cs("m_chgident.so"))
-					has_chgidentmod = plus;
+					capab = "CHGIDENT";
 				else if (module.equals_cs("m_svshold.so"))
-					IRCD->CanSVSHold = plus;
+					capab = "SVSHOLD";
 				else if (module.equals_cs("m_rline.so"))
-					has_rlinemod = plus;
+					capab = "RLINE";
 				else if (module.equals_cs("m_topiclock.so"))
-					has_svstopic_topiclock = plus;
+					capab = "TOPICLOCK";
 				else
 					return;
 
@@ -1016,6 +1005,11 @@ struct IRCDMessageMetadata : IRCDMessage
 				}
 				else
 				{
+					if (plus)
+						Servers::Capab.insert(capab);
+					else
+						Servers::Capab.erase(capab);
+
 					Log() << "InspIRCd " << (plus ? "loaded" : "unloaded") << " module " << module << ", adjusted functionality";
 				}
 

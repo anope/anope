@@ -17,7 +17,7 @@
 				\});	
 				
 				function hideModal() \{
-					$('.content').fadeIn(200);	
+					$('.master').fadeTo('slow',1.0);	
 					$('#mask, .window').fadeOut(200);					
 				\}
 				
@@ -27,7 +27,7 @@
 
 					$('#mask').css(\{'width': mWidth, 'height': mHeight\});	
 					$('#mask').fadeIn(200);		
-					$('#mask').fadeTo('fast',0.8);
+					$('#mask').fadeTo('fast',0.75);
 				
 					$(id).html('<br/><br/>{CMDR} <br/><a href="#" class="close">Close</a>');
 					var top = mHeight/2-$(id).height()/2;
@@ -35,8 +35,9 @@
 					
 					$(id).css('top', top);
 					$(id).css('left', left);
+					$('.master').fadeTo('fast',0.3);								
+					
 					$(id).fadeIn(500);	
-					$('.content').fadeOut(200);								
 				\}	
 				
 			\});

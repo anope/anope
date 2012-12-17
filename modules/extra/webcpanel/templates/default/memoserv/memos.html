@@ -1,7 +1,50 @@
 {INCLUDE header.html}
+		{IF EXISTS CMDR} 
+			<script type="text/javascript">
+			$(document).ready(function() \{
+				var id = "#dialog";
+					
+				showModal();
+				setInterval('hideModal()', t);		
+		
+				$('.close').click(function (e) \{
+					e.preventDefault();	
+					hideModal();
+				\});
+			
+				$('#mask').click(function () \{
+					hideModal();
+				\});	
+				
+				function hideModal() \{
+					$('.content').fadeIn(200);	
+					$('#mask, .window').fadeOut(200);					
+				\}
+				
+				function showModal() \{				
+					var mHeight = $(document).height();	
+					var mWidth = $(window).width();
+
+					$('#mask').css(\{'width': mWidth, 'height': mHeight\});	
+					$('#mask').fadeIn(200);		
+					$('#mask').fadeTo('fast',0.8);
+				
+					$(id).html('<br/><br/>{CMDR} <br/><a href="#" class="close">Close</a>');
+					var top = mHeight/2-$(id).height()/2;
+					var left= mWidth/2-$(id).width()/2;
+					
+					$(id).css('top', top);
+					$(id).css('left', left);
+					$(id).fadeIn(500);	
+					$('.content').fadeOut(200);								
+				\}	
+				
+			\});
+			</script>
+		{END IF}
 		<b>Channels you have access in:</b><br/>
 		{FOR CH,ECH IN CHANNEL_NAMES,ESCAPED_CHANNEL_NAMES}
-			<a href="/memoserv/memos?channel={ECH}">{CH}</a> 
+			<a href="/memoserv/memos?channel={ECH}" class="channel">{CH}</a> 
 		{END FOR}
 		<br/><br/>
 		{FOR M IN MESSAGES}

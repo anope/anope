@@ -217,12 +217,12 @@ class ModuleWebCPanel : public Module
 
 namespace WebPanel
 {
-	void RunCommand(const Anope::string &user, NickCore *nc, const Anope::string &service, const Anope::string &c, const std::vector<Anope::string> &params, TemplateFileServer::Replacements &r)
+	void RunCommand(const Anope::string &user, NickCore *nc, const Anope::string &service, const Anope::string &c, const std::vector<Anope::string> &params, TemplateFileServer::Replacements &r, const Anope::string &key)
 	{
 		ServiceReference<Command> cmd("Command", c);
 		if (!cmd)
 		{
-			r["MESSAGES"] = "Unable to find command " + c;
+			r[key] = "Unable to find command " + c;
 			return;
 		}
 
@@ -237,15 +237,16 @@ namespace WebPanel
 		struct MyComandReply : CommandReply
 		{
 			TemplateFileServer::Replacements &re;
+			const Anope::string &k;
 
-			MyComandReply(TemplateFileServer::Replacements &_r) : re(_r) { }
+			MyComandReply(TemplateFileServer::Replacements &_r, const Anope::string &_k) : re(_r), k(_k) { }
 
 			void SendMessage(const BotInfo *source, const Anope::string &msg) anope_override
 			{
-				re["MESSAGES"] = msg;
+				re[k] = msg;
 			}
 		}
-		my_reply(r);
+		my_reply(r, key);
 
 		CommandSource source(user, NULL, nc, &my_reply, bi);
 		cmd->Execute(source, params);

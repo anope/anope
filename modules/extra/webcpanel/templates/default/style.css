@@ -3,6 +3,7 @@ font-family: 'Cabin', Helvetica, Arial, sans-serif;
 }
 body {
 	overflow:hidden;
+	z-index: 10;
 }
 .master {
 	margin-left:0px;
@@ -122,4 +123,29 @@ body {
 .danger { 
 	color: red;
 	weight: bolder; 
+}
+
+/* Modal Window */
+#mask {
+	position: aboslute;
+	z-index: 9000;
+	background-color: #000;
+	height: 100%;
+	width: 100%;
+	display: none;
+}
+
+#boxes .window {
+  position:fixed;
+  width:440px;
+  height:200px;
+  display:none;
+  z-index:9999;
+  padding:20px;
+}
+ 
+ #boxes #dialog {
+  background-color: #FFF;
+  width:375px; 
+  height:203px;
 }

@@ -240,13 +240,21 @@ static void mAddLanguages(void)
         "%s bannato da %s, scadrà automaticamente tra %s"
     };
 
+    char *langtable_fr[] = {
+        "    TBAN       Bannit l'utilisateur pour une période définie",
+        "Syntaxe: \002TBAN \037canal\037 \037pseudo\037 \037durée\037\002",
+        "Bannit un utilisateur d'un canal pour une durée spécifiée.\n"
+            "Si le ban est retiré manuellement avant la fin du délai, il ne sera PAS remis.",
+        "%s banni de %s, avec expiration dans %s"
+    };
+
     moduleInsertLanguage(LANG_EN_US, LANG_NUM_STRINGS, langtable_en_us);
     moduleInsertLanguage(LANG_NL, LANG_NUM_STRINGS, langtable_nl);
     moduleInsertLanguage(LANG_DE, LANG_NUM_STRINGS, langtable_de);
     moduleInsertLanguage(LANG_PT, LANG_NUM_STRINGS, langtable_pt);
     moduleInsertLanguage(LANG_RU, LANG_NUM_STRINGS, langtable_ru);
 	moduleInsertLanguage(LANG_IT, LANG_NUM_STRINGS, langtable_it);
-
+	moduleInsertLanguage(LANG_FR, LANG_NUM_STRINGS, langtable_fr);
 }
 
 

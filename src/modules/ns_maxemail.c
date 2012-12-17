@@ -271,12 +271,20 @@ static void my_add_languages(void)
         "L'indirizzo email specificato ha raggiunto il suo limite d'utilizzo di 1 utente."
     };
 
+    char *langtable_fr[] = {
+        /* LNG_NSEMAILMAX_REACHED */
+        "L'adresse e-mail indiquée a atteint la limite fixée à %d utilisateurs.",
+        /* LNG_NSEMAILMAX_REACHED_ONE */
+        "L'adresse e-mail indiquée a atteint la limite fixée à 1 utilisateur."
+    };
+
     moduleInsertLanguage(LANG_EN_US, LNG_NUM_STRINGS, langtable_en_us);
     moduleInsertLanguage(LANG_NL, LNG_NUM_STRINGS, langtable_nl);
     moduleInsertLanguage(LANG_DE, LNG_NUM_STRINGS, langtable_de);
     moduleInsertLanguage(LANG_PT, LNG_NUM_STRINGS, langtable_pt);
     moduleInsertLanguage(LANG_RU, LNG_NUM_STRINGS, langtable_ru);
     moduleInsertLanguage(LANG_IT, LNG_NUM_STRINGS, langtable_it);
+    moduleInsertLanguage(LANG_FR, LNG_NUM_STRINGS, langtable_fr);
 }
 
 /* EOF */

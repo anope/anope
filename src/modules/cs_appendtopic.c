@@ -236,12 +236,25 @@ static void my_add_languages(void)
         "Sintassi: APPENDTOPIC canale testo\n"
     };
 
+    /* French (US) */
+    char *langtable_fr[] = {
+        /* LNG_CHAN_HELP */
+        "    APPENDTOPIC   Ajoute du texte dans le sujet d'un salon",
+        /* LNG_CHAN_HELP_APPENDTOPIC */
+        "Cette commande permet aux utilisateurs d'ajouter du texte à un sujet\n"
+            "du salon. Quand TOPICLOCK est actif, le sujet est mis à jour et\n"
+            "le nouveau sujet modifié est vérrouillé.",
+        /* LNG_APPENDTOPIC_SYNTAX */
+        "Syntaxe: \002APPENDTOPIC \037canal\037 \037texte\037\002\n"
+    };
+
     moduleInsertLanguage(LANG_EN_US, LNG_NUM_STRINGS, langtable_en_us);
     moduleInsertLanguage(LANG_NL, LNG_NUM_STRINGS, langtable_nl);
     moduleInsertLanguage(LANG_DE, LNG_NUM_STRINGS, langtable_de);
     moduleInsertLanguage(LANG_PT, LNG_NUM_STRINGS, langtable_pt);
     moduleInsertLanguage(LANG_RU, LNG_NUM_STRINGS, langtable_ru);
 	moduleInsertLanguage(LANG_IT, LNG_NUM_STRINGS, langtable_it);
+	moduleInsertLanguage(LANG_FR, LNG_NUM_STRINGS, langtable_fr);
 }
 
 /* EOF */

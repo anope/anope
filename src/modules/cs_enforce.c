@@ -464,12 +464,47 @@ static void my_add_languages(void)
         "Forzato %s"
     };
 
+    /* French (FR) */
+    char *langtable_fr[] = {
+        /* LNG_CHAN_HELP */
+        "    ENFORCE    Renforce divers modes et options de salons",
+        /* LNG_ENFORCE_SYNTAX */
+        "Syntaxe: \002ENFORCE \037canal\037 [\037option\037]\002",
+        /* LNG_CHAN_HELP_ENFORCE */
+        "Renforce divers modes et options de salons. Le paramètre \037canal\037\n"
+            "indique pour quel canal renforcer les options ou modes.\n"
+            "Le paramètre \037option\037 indique quels modes et options\n"
+            "renforcer, et peut être SET, SECUREOPS, RESTRICTED, MODES,\n"
+            "ou +R. Par défaut, il est SET.\n"
+            " \n"
+            "Si \037option\037 est SET, cela renforce les options SECUREOPS et RESTRICTED\n"
+            "pour les utilisateur présents sur le canal, si elles sont déjà actives. Indiquez\n"
+            "SECUREOPS pour renforcer l'option SECUREOPS, même si ce n'est pas déjà\n"
+            "activé. Utilisez RESTRICTED pour renforcer l'option RESTRICTED, également\n"
+            "même si ce n'est pas déjà activé.",
+        /* LNG_CHAN_HELP_ENFORCE_R_ENABLED */
+        "Si \037option\037 est MODES, cela renforce le mode de canal +R s'il est\n"
+            "actif. Si +R est spécifié pour \037option\037, le mode de canal +R sera\n"
+            "également renforcé, et même s'il n'est pas déjà actif. S'il n'est pas actif,\n"
+            "les utilisateurs seront bannis pour être sûr qu'ils ne reviennent pas.",
+        /* LNG_CHAN_HELP_ENFORCE_R_DISABLED */
+        "Si \037option\037 est MODES, rien ne sera renforcé, car cela\n"
+            "renforcerait des modes que le serveur Irc ne connait pas. Si +R est\n"
+            "specifié pour \037option\037, un équivalent du mode de canal +R des\n"
+            "autres serveurs Irc sera appliqué. Tous les utilisateurs qui sont sur le canal\n"
+            "mais non identifiés avec leur pseudo d'inscrit seront éjectés et\n"
+            "bannis du canal.",
+        /* LNG_CHAN_RESPONSE */
+        "Renforcé %s"
+    };
+
     moduleInsertLanguage(LANG_EN_US, LNG_NUM_STRINGS, langtable_en_us);
     moduleInsertLanguage(LANG_NL, LNG_NUM_STRINGS, langtable_nl);
     moduleInsertLanguage(LANG_DE, LNG_NUM_STRINGS, langtable_de);
     moduleInsertLanguage(LANG_PT, LNG_NUM_STRINGS, langtable_pt);
     moduleInsertLanguage(LANG_RU, LNG_NUM_STRINGS, langtable_ru);
 	moduleInsertLanguage(LANG_IT, LNG_NUM_STRINGS, langtable_it);
+	moduleInsertLanguage(LANG_FR, LNG_NUM_STRINGS, langtable_fr);
 }
 
 /* EOF */

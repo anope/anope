@@ -732,13 +732,43 @@ static void m_AddLanguages(void)
         "    OINFO         Aggiunge/Rimuove una linea OperInfo ad/da un canale"
     };
 
+    char *langtable_fr[] = {
+        /* OINFO_SYNTAX */
+        "Syntaxe: \002OINFO [ADD|DEL] \037pseudo\037 \037<info>\037\002",
+        /* OINFO_ADD_SUCCESS */
+        "Ligne OperInfo ajoutée au pseudo %s",
+        /* OINFO_DEL_SUCCESS */
+        "Ligne OperInfo retirée au pseudo %s",
+        /* OCINFO_SYNTAX */
+        "Syntaxe: \002OINFO [ADD|DEL] \037canal\037 \037<info>\037\002",
+        /* OCINFO_ADD_SUCCESS */
+        "Ligne OperInfo ajoutée au canal %s",
+        /* OCINFO_DEL_SUCCESS */
+        "Ligne OperInfo retirée au canal %s",
+        /* OINFO_HELP */
+        "Syntaxe: \002OINFO [ADD|DEL] \037pseudo\037 \037info\037\002\n"
+            "Ajoute ou supprime une information Oper au pseudo spécifié\n"
+            "Elle sera vue par un oper avec la commande /ns info pseudo pour l'utilisateur\n"
+            "et peut être utilisée pour 'taguer' les utilisateurs etc....",
+        /* OCINFO_HELP */
+        "Syntax: \002OINFO [ADD|DEL] \037canal\037 \037info\037\002\n"
+            "Ajoute ou supprime une information Oper au canal spécifié\n"
+            "Elle sera vue par un oper avec la commande /ns info canal pour le canal.\n"
+            "et peut être utilisée pour 'taguer' les canaux etc....",
+        /* OINFO_HELP_CMD */
+        "    OINFO         Ajoute / Supprime une ligne OperInfo à un pseudo",
+        /* OCINFO_HELP_CMD */
+        "    OINFO         Ajoute / Supprime une ligne OperInfo à un canal"
+    };
+
     moduleInsertLanguage(LANG_EN_US, LANG_NUM_STRINGS, langtable_en_us);
     moduleInsertLanguage(LANG_ES, LANG_NUM_STRINGS, langtable_es);
     moduleInsertLanguage(LANG_NL, LANG_NUM_STRINGS, langtable_nl);
     moduleInsertLanguage(LANG_DE, LANG_NUM_STRINGS, langtable_de);
     moduleInsertLanguage(LANG_PT, LANG_NUM_STRINGS, langtable_pt);
     moduleInsertLanguage(LANG_RU, LANG_NUM_STRINGS, langtable_ru);
-	moduleInsertLanguage(LANG_IT, LANG_NUM_STRINGS, langtable_it);
+    moduleInsertLanguage(LANG_IT, LANG_NUM_STRINGS, langtable_it);
+    moduleInsertLanguage(LANG_FR, LANG_NUM_STRINGS, langtable_fr);
 }
 
 /*************************************************************************/

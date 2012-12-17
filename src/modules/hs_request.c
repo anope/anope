@@ -1032,12 +1032,64 @@ static void my_add_languages(void)
         "Dieser Befehl ist Benutzerfreundlicher. Es ist genau derselbe\n"
             "als wenn man LIST +req benutzt."
     };
+
+    char *langtable_fr[] = {
+        /* LNG_REQUEST_SYNTAX */
+        "Syntaxe: \002REQUEST \037vhost\037\002",
+        /* LNG_REQUESTED */
+        "Votre demande de vHost a été envoyée",
+        /* LNG_REQUEST_WAIT */
+        "Merci d'attendre %d secondes avant de demander un autre vHost",
+        /* LNG_REQUEST_MEMO */
+        "[auto memo] Le vHost \002%s\002 a été demandé.",
+        /* LNG_ACTIVATE_SYNTAX */
+        "Syntaxe: \002ACTIVATE \037pseudo\037\002",
+        /* LNG_ACTIVATED */
+        "Le vHost de %s est activé",
+        /* LNG_ACTIVATE_MEMO */
+        "[auto memo] Votre demande de vHost a été approuvée.",
+        /* LNG_REJECT_SYNTAX */
+        "Syntaxe: \002REJECT \037pseudo\037\002",
+        /* LNG_REJECTED */
+        "Le vHost de %s a été refusé",
+        /* LNG_REJECT_MEMO */
+        "[auto memo] Votre demande de vHost a été refusée.",
+        /* LNG_REJECT_MEMO_REASON */
+        "[auto memo] Votre demande de vHost a été refusée pour le motif suivant : %s",
+        /* LNG_NO_REQUEST */
+        "Aucune demande faite pour %s.",
+        /* LNG_HELP */
+        "    REQUEST     Demander un vHost pour votre pseudo",
+        /* LNG_HELP_SETTER */
+        "    ACTIVATE    Approuver la demande de vHost d'un utilisateur\n"
+            "    REJECT      Refuser la demande de vHost d'un utilisateur\n"
+            "    WAITING     Raccourci de la commande LIST +req",
+        /* LNG_HELP_REQUEST */
+        "Demande le vHost spécifié à être activé pour votre pseudo par les\n"
+            "administrateurs du réseau. Merci d'être patient le temps que votre demande\n"
+            "soit prise en compte.",
+        /* LNG_HELP_ACTIVATE */
+        "Active le vHost demandé pour un pseudo spécifié.",
+        /* LNG_HELP_ACTIVATE_MEMO */
+        "Un mémo informant l'utilisateur de l'activation sera envoyé également.",
+        /* LNG_HELP_REJECT */
+        "Refuse le vHost demandé pour un pseudo spécifié.",
+        /* LNG_HELP_REJECT_MEMO */
+        "Un mémo informant l'utilisateur du refus sera envoyé également.",
+        /* LNG_WAITING_SYNTAX */
+        "Syntaxe: \002WAITING\002",
+        /* LNG_HELP_WAITING */
+        "Cette commande est fournie par commodité. C'est essentiellement\n"
+            "la même que LIST +req ."
+    };
+
     moduleInsertLanguage(LANG_EN_US, LNG_NUM_STRINGS, langtable_en_us);
     moduleInsertLanguage(LANG_NL, LNG_NUM_STRINGS, langtable_nl);
     moduleInsertLanguage(LANG_PT, LNG_NUM_STRINGS, langtable_pt);
     moduleInsertLanguage(LANG_RU, LNG_NUM_STRINGS, langtable_ru);
     moduleInsertLanguage(LANG_IT, LNG_NUM_STRINGS, langtable_it);
-	moduleInsertLanguage(LANG_DE, LNG_NUM_STRINGS, langtable_de);
+    moduleInsertLanguage(LANG_DE, LNG_NUM_STRINGS, langtable_de);
+    moduleInsertLanguage(LANG_FR, LNG_NUM_STRINGS, langtable_fr);
 }
 
 /* EOF */

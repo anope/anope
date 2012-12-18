@@ -124,9 +124,17 @@ body {
 	text-align: left;
 }
 
+td.right a:link, td.right a:visited {
+	color: #00F;
+	text-decoration: none;
+}
+
+td.right a:hover {
+	text-decoration: underline; 
+}
 /* Modal Window */
 #mask {
-	position: aboslute;
+	position: absolute;
 	z-index: 9000;
 	background-color: #000;
 	height: 100%;
@@ -143,11 +151,27 @@ body {
   padding:20px;
 }
  
- #boxes #dialog {
-  background-color: #FFF;
-  width:375px; 
-  height:203px;
-  padding: 20px;
-  -webkit-border-radius: 15px;
-  border-radius: 15px;
+#boxes #dialog {
+	text-align: center;
+	background-color: #FFF;
+  	width:375px; 
+  	height:203px;
+  	padding: 20px;
+  	-webkit-border-radius: 15px;
+  	border-radius: 15px;
+  	display: none;
+}
+
+#dialogClose {
+	padding-top: 20px;
+}
+
+#dialogClose a:link, #dialogClose a:visited { 
+	color: #000;
+	text-decoration: none;
+}
+
+#dialogClose a:hover {
+	color: #000;
+	text-decoration: underline;
 }

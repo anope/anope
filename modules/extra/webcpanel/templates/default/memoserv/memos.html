@@ -7,7 +7,6 @@
 				var id = "#dialog";
 					
 				showModal();
-				setInterval('hideModal()', t);		
 		
 				$('.close').click(function (e) \{
 					e.preventDefault();	
@@ -28,12 +27,14 @@
 				function showModal() \{				
 					var mHeight = $(document).height();	
 					var mWidth = $(window).width();
+					
+					var alertMsg = '<br/>{CMDR}<br/>';
 
 					$('#mask').css(\{'width': mWidth, 'height': mHeight\});	
 					$('#mask').fadeIn(200);		
 					$('#mask').fadeTo('fast',0.75);
 				
-					$(id).html('<br/><br/>{CMDR} <br/><a href="#" class="close">Close</a>');
+					$('#dialogMsg').html(alertMsg);
 					var top = mHeight/2-$(id).height()/2;
 					var left= mWidth/2-$(id).width()/2;
 					
@@ -41,8 +42,11 @@
 					$(id).css('left', left);
 					$('.master').fadeTo('fast',0.3);								
 					
-					$(id).fadeIn(500);	
-				\}							
+					$(id).fadeIn(500);
+					setTimeout(hideModal, t);		
+					
+				\}			
+								
 			\});
 			</script>
 		{END IF}
@@ -82,11 +86,13 @@
 					<td></td>
 					<td></td>
 				{IF EQ U YES}
-					<td class="right"><a href="/memoserv/memos?channel={ESCAPED_CHANNEL_NAME}&number={I}&read=1">Mark as Read</a> 
-					<a href="{S}" class="reply" id="memo{I}">Reply</a> <a href="/memoserv/memos?channel={ESCAPED_CHANNEL_NAME}&number={I}&del=1">Delete</a></td>
+					<td class="right"><a href="/memoserv/memos?channel={ESCAPED_CHANNEL_NAME}&number={I}&read=1">Mark as Read</a> &nbsp;&nbsp
+					<a href="{S}" class="reply" id="memo{I}">Reply</a>&nbsp;&nbsp; 
+					<a href="/memoserv/memos?channel={ESCAPED_CHANNEL_NAME}&number={I}&del=1">Delete</a></td>
 				{ELSE}
-					<td class="right"><a href="/memoserv/memos?channel={ESCAPED_CHANNEL_NAME}&number={I}&read=2">Mark as Unread</a> 
-					<a href="{S}" class="reply" id="memo{I}">Reply</a> <a href="/memoserv/memos?channel={ESCAPED_CHANNEL_NAME}&number={I}&del=1">Delete</a></td>
+					<td class="right"><a href="/memoserv/memos?channel={ESCAPED_CHANNEL_NAME}&number={I}&read=2">Mark as Unread</a> &nbsp;&nbsp
+					<a href="{S}" class="reply" id="memo{I}">Reply</a> &nbsp;&nbsp
+					<a href="/memoserv/memos?channel={ESCAPED_CHANNEL_NAME}&number={I}&del=1">Delete</a></td>
 				{END IF}
 
 				</tr>

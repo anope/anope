@@ -107,6 +107,10 @@ body {
 	height: 450px;
 }
 
+.right { 
+	text-align: right; 
+}
+/* Table Stuff */
 .akillR1 { 
 	width: 80px;
 	text-align: left;
@@ -118,11 +122,6 @@ body {
 .akillR3 {
 	width: 100px;
 	text-align: left;
-}
-
-.danger { 
-	color: red;
-	weight: bolder; 
 }
 
 /* Modal Window */

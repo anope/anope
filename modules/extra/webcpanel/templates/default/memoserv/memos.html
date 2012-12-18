@@ -2,6 +2,8 @@
 		{IF EXISTS CMDR} 
 			<script type="text/javascript">
 			$(document).ready(function() \{
+			
+				/*Modal*/
 				var id = "#dialog";
 					
 				showModal();
@@ -17,8 +19,10 @@
 				\});	
 				
 				function hideModal() \{
-					$('.master').fadeTo('slow',1.0);	
-					$('#mask, .window').fadeOut(200);					
+					if ($('#mask').not(':hidden')) \{
+						$('.master').fadeTo('slow',1.0);	
+						$('#mask, .window').fadeOut(200);
+					\}					
 				\}
 				
 				function showModal() \{				
@@ -38,8 +42,7 @@
 					$('.master').fadeTo('fast',0.3);								
 					
 					$(id).fadeIn(500);	
-				\}	
-				
+				\}							
 			\});
 			</script>
 		{END IF}
@@ -53,29 +56,39 @@
 		{END FOR}
 		<br/>
 		{IF EXISTS NUMBER}
+			<script type="text/javascript">
+				$("#memoTable").ready(function() \{
+					$(".reply").click(function(e) \{
+						e.preventDefault();
+						var recv = $(this).attr('href');
+						$("#receiver").val(recv);
+					\});
+				\});
+			</script>
 			<b>Memos List:</b>
-			<table width="100%" height="100%">
+			<table width="100%" height="100%" id="memoTable">
 				<tr>
-					<th>Number</th>
-					<th>Sender</th>
-					<th>Time/Message</th>
+					<th class="akillR1">Number</th>
+					<th class="akillR3">Sender</th>
+					<th class="akillR2">Time/Message</th>
 				</tr>
 				{FOR I,S,T,TXT,U IN NUMBER,SENDER,TIME,TEXT,UNREAD}
 				<tr>
-					<td>{I}</td>
-					<td>{S}</td>
-					<td>{T}</td>
-				{IF EQ U YES}
-					<td><a href="/memoserv/memos?channel={ESCAPED_CHANNEL_NAME}&number={I}&read=1">Mark as Read</a></td>
-				{ELSE}
-					<td><a href="/memoserv/memos?channel={ESCAPED_CHANNEL_NAME}&number={I}&read=2">Mark as Unread</a></td>
-				{END IF}
-					<td><a href="/memoserv/memos?channel={ESCAPED_CHANNEL_NAME}&number={I}&del=1">Delete</a></td>
-
+					<td class="akillR1">{I}</td>
+					<td class="akillR3">{S}</td>
+					<td class="akillR2"><abbr title="{T}">{TXT}</abbr></td>
 				</tr>
 				<tr>
-					<td></td><td></td>
-					<td>{TXT}</td>
+					<td></td>
+					<td></td>
+				{IF EQ U YES}
+					<td class="right"><a href="/memoserv/memos?channel={ESCAPED_CHANNEL_NAME}&number={I}&read=1">Mark as Read</a> 
+					<a href="{S}" class="reply" id="memo{I}">Reply</a> <a href="/memoserv/memos?channel={ESCAPED_CHANNEL_NAME}&number={I}&del=1">Delete</a></td>
+				{ELSE}
+					<td class="right"><a href="/memoserv/memos?channel={ESCAPED_CHANNEL_NAME}&number={I}&read=2">Mark as Unread</a> 
+					<a href="{S}" class="reply" id="memo{I}">Reply</a> <a href="/memoserv/memos?channel={ESCAPED_CHANNEL_NAME}&number={I}&del=1">Delete</a></td>
+				{END IF}
+
 				</tr>
 				{END FOR}
 			</table>
@@ -87,7 +100,7 @@
 
 		<b>Send a new Memo</b>
 		<form method="post" action="/memoserv/memos?channel={ESCAPED_CHANNEL}">
-		Receiver: <input type="text" name="receiver">
+		Receiver: <input type="text" name="receiver" id="receiver" value="">
 		Message: <input type="text" name="message">
 		<input type="submit" value="Send">
 		</form>

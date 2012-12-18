@@ -440,7 +440,7 @@ struct IRCDMessageCapab : Message::Capab
 			if (params[1].find("m_chgident.so") != Anope::string::npos)
 				Servers::Capab.insert("CHGIDENT");
 			if (params[1].find("m_hidechans.so") != Anope::string::npos)
-				Servers::Capab.insert("HIDECHANELS");
+				Servers::Capab.insert("HIDECHANS");
 			if (params[1].find("m_servprotect.so") != Anope::string::npos)
 				IRCD->DefaultPseudoclientModes = "+Ik";
 			if (params[1].find("m_rline.so") != Anope::string::npos)

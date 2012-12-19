@@ -582,7 +582,23 @@ Anope::string Anope::VersionShort()
 
 Anope::string Anope::VersionBuildString()
 {
-	return "build #" + stringify(BUILD) + ", compiled " + Anope::compiled;
+	Anope::string s = "build #" + stringify(BUILD) + ", compiled " + Anope::compiled;
+	Anope::string flags;
+
+#ifdef DEBUG_BUILD
+	flags += "D";
+#endif
+#ifdef VERSION_GIT
+	flags += "G";
+#endif
+#ifdef _WIN32
+	flags += "W";
+#endif
+
+	if (!flags.empty())
+		s += ", flags " + flags;
+	
+	return s;
 }
 
 int Anope::VersionMajor() { return VERSION_MAJOR; }

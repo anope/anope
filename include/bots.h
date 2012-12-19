@@ -35,7 +35,7 @@ enum BotFlag
 };
 
 /* A service bot (NickServ, ChanServ, a BotServ bot, etc). */
-class CoreExport BotInfo : public User, public Flags<BotFlag>, public Serializable, public Service
+class CoreExport BotInfo : public User, public Flags<BotFlag>, public Serializable
 {
  public:
 	time_t created;
@@ -138,5 +138,7 @@ class CoreExport BotInfo : public User, public Flags<BotFlag>, public Serializab
 	 */
 	static BotInfo* Find(const Anope::string &nick, bool nick_only = false);
 };
+
+extern CoreExport BotInfo *BotServ, *ChanServ, *Global, *HostServ, *MemoServ, *NickServ, *OperServ;
 
 #endif // BOTS_H

@@ -19,7 +19,6 @@
 #include "uplink.h"
 #include "bots.h"
 #include "channels.h"
-#include "operserv.h"
 
 IRCDProto *IRCD = NULL;
 

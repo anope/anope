@@ -20,7 +20,6 @@
 #include "bots.h"
 #include "language.h"
 #include "servers.h"
-#include "chanserv.h"
 
 Serialize::Checker<registered_channel_map> RegisteredChannelList("ChannelInfo");
 

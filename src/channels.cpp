@@ -23,7 +23,6 @@
 #include "config.h"
 #include "access.h"
 #include "sockets.h"
-#include "chanserv.h"
 
 channel_map ChannelList;
 

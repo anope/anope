@@ -10,7 +10,6 @@ class NickServService : public Service
 };
 
 static ServiceReference<NickServService> NickServService("NickServService", "NickServ");
-static ServiceReference<BotInfo> NickServ("BotInfo", "NickServ");
 
 #endif // NICKSERV_H
 

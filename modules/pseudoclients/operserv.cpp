@@ -175,24 +175,22 @@ class OperServCore : public Module
 	{
 		this->SetAuthor("Anope");
 
-		BotInfo *bi = BotInfo::Find(Config->OperServ);
-		if (!bi)
+		OperServ = BotInfo::Find(Config->OperServ);
+		if (!OperServ)
 			throw ModuleException("No bot named " + Config->OperServ);
 
-		Implementation i[] = { I_OnBotPrivmsg, I_OnServerQuit, I_OnUserModeSet, I_OnUserModeUnset, I_OnUserConnect, I_OnUserNickChange, I_OnPreHelp };
+		Implementation i[] = { I_OnBotDelete, I_OnBotPrivmsg, I_OnServerQuit, I_OnUserModeSet, I_OnUserModeUnset, I_OnUserConnect, I_OnUserNickChange, I_OnPreHelp };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 
 		/* Yes, these are in this order for a reason. Most violent->least violent. */
 		XLineManager::RegisterXLineManager(&sglines);
 		XLineManager::RegisterXLineManager(&sqlines);
 		XLineManager::RegisterXLineManager(&snlines);
-
-		Service::AddAlias("BotInfo", "OperServ", bi->nick);
 	}
 
 	~OperServCore()
 	{
-		Service::DelAlias("BotInfo", "OperServ");
+		OperServ = NULL;
 
 		this->sglines.Clear();
 		this->sqlines.Clear();
@@ -201,6 +199,12 @@ class OperServCore : public Module
 		XLineManager::UnregisterXLineManager(&sglines);
 		XLineManager::UnregisterXLineManager(&sqlines);
 		XLineManager::UnregisterXLineManager(&snlines);
+	}
+
+	void OnBotDelete(BotInfo *bi) anope_override
+	{
+		if (bi == OperServ)
+			OperServ = NULL;
 	}
 
 	EventReturn OnBotPrivmsg(User *u, BotInfo *bi, Anope::string &message) anope_override

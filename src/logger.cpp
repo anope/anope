@@ -22,8 +22,6 @@
 #include "uplink.h"
 #include "protocol.h"
 #include "global.h"
-#include "operserv.h"
-#include "chanserv.h"
 
 #ifndef _WIN32
 #include <sys/time.h>

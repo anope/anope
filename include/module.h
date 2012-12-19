@@ -47,12 +47,8 @@
 #include "users.h"
 #include "xline.h"
 
-#include "chanserv.h"
-#include "botserv.h"
 #include "global.h"
-#include "hostserv.h"
 #include "memoserv.h"
 #include "nickserv.h"
-#include "operserv.h"
 
 #endif // MODULE_H

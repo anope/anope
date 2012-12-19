@@ -165,19 +165,23 @@ class MemoServCore : public Module
 	{
 		this->SetAuthor("Anope");
 
-		BotInfo *bi = BotInfo::Find(Config->MemoServ);
-		if (!bi)
+		MemoServ = BotInfo::Find(Config->MemoServ);
+		if (!MemoServ)
 			throw ModuleException("No bot named " + Config->MemoServ);
 
-		Implementation i[] = { I_OnNickIdentify, I_OnJoinChannel, I_OnUserAway, I_OnNickUpdate, I_OnPreHelp, I_OnPostHelp };
+		Implementation i[] = { I_OnBotDelete, I_OnNickIdentify, I_OnJoinChannel, I_OnUserAway, I_OnNickUpdate, I_OnPreHelp, I_OnPostHelp };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
-
-		Service::AddAlias("BotInfo", "MemoServ", bi->nick);
 	}
 
 	~MemoServCore()
 	{
-		Service::DelAlias("BotInfo", "MemoServ");
+		MemoServ = NULL;
+	}
+
+	void OnBotDelete(BotInfo *bi) anope_override
+	{
+		if (bi == MemoServ)
+			MemoServ = NULL;
 	}
 
 	void OnNickIdentify(User *u) anope_override

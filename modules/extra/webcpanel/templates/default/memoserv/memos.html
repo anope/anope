@@ -86,12 +86,12 @@
 					<td></td>
 					<td></td>
 				{IF EQ U YES}
-					<td class="right"><a href="/memoserv/memos?channel={ESCAPED_CHANNEL_NAME}&number={I}&read=1">Mark as Read</a> &nbsp;&nbsp
-					<a href="{S}" class="reply" id="memo{I}">Reply</a>&nbsp;&nbsp; 
+					<td class="right"><a href="/memoserv/memos?channel={ESCAPED_CHANNEL_NAME}&number={I}&read=1">Mark as Read</a> &nbsp;
+					<a href="{S}" class="reply" id="memo{I}">Reply</a>&nbsp;
 					<a href="/memoserv/memos?channel={ESCAPED_CHANNEL_NAME}&number={I}&del=1">Delete</a></td>
 				{ELSE}
-					<td class="right"><a href="/memoserv/memos?channel={ESCAPED_CHANNEL_NAME}&number={I}&read=2">Mark as Unread</a> &nbsp;&nbsp
-					<a href="{S}" class="reply" id="memo{I}">Reply</a> &nbsp;&nbsp
+					<td class="right"><a href="/memoserv/memos?channel={ESCAPED_CHANNEL_NAME}&number={I}&read=2">Mark as Unread</a> ;&nbsp
+					<a href="{S}" class="reply" id="memo{I}">Reply</a> &nbsp;
 					<a href="/memoserv/memos?channel={ESCAPED_CHANNEL_NAME}&number={I}&del=1">Delete</a></td>
 				{END IF}
 

@@ -125,12 +125,16 @@ body {
 }
 
 td.right a:link, td.right a:visited {
-	color: #00F;
+	color: #000;
+	border: 1px solid #000;
+	padding: 1px 4px;
+	-webkit-border-radius: 5x;
+  	border-radius: 5px;
 	text-decoration: none;
 }
 
 td.right a:hover {
-	text-decoration: underline; 
+	color: #00F;
 }
 /* Modal Window */
 #mask {

@@ -18,6 +18,7 @@ class CommandNSUpdate : public Command
  public:
 	CommandNSUpdate(Module *creator) : Command(creator, "nickserv/update", 0, 0)
 	{
+		this->SetFlag(CFLAG_REQUIRE_USER);
 		this->SetDesc(_("Updates your current status, i.e. it checks for new memos"));
 		this->SetSyntax("");
 	}
@@ -25,9 +26,6 @@ class CommandNSUpdate : public Command
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		User *u = source.GetUser();
-		if (!u)
-			return;
-
 		NickAlias *na = NickAlias::Find(u->nick);
 
 		if (na && na->nc == source.GetAccount())

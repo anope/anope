@@ -65,6 +65,7 @@ class CommandNSIdentify : public Command
 	CommandNSIdentify(Module *creator) : Command(creator, "nickserv/identify", 1, 2)
 	{
 		this->SetFlag(CFLAG_ALLOW_UNREGISTERED);
+		this->SetFlag(CFLAG_REQUIRE_USER);
 		this->SetDesc(_("Identify yourself with your password"));
 		this->SetSyntax(_("[\037account\037] \037password\037"));
 	}
@@ -72,9 +73,6 @@ class CommandNSIdentify : public Command
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		User *u = source.GetUser();
-
-		if (!u)
-			return;
 
 		const Anope::string &nick = params.size() == 2 ? params[0] : u->nick;
 		Anope::string pass = params[params.size() - 1];
@@ -87,7 +85,7 @@ class CommandNSIdentify : public Command
 		else
 		{
 			NSIdentifyRequest *req = new NSIdentifyRequest(owner, source, this, na ? na->nc->display : nick, pass);
-			FOREACH_MOD(I_OnCheckAuthentication, OnCheckAuthentication(source.GetUser(), req));
+			FOREACH_MOD(I_OnCheckAuthentication, OnCheckAuthentication(u, req));
 			req->Dispatch();
 		}
 		return;

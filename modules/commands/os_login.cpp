@@ -19,6 +19,7 @@ class CommandOSLogin : public Command
  public:
 	CommandOSLogin(Module *creator) : Command(creator, "operserv/login", 1, 1)
 	{
+		this->SetFlag(CFLAG_REQUIRE_USER);
 		this->SetDesc(Anope::printf(_("Login to %s"), Config->OperServ.c_str()));
 		this->SetSyntax(_("\037password\037"));
 	}
@@ -28,9 +29,6 @@ class CommandOSLogin : public Command
 		const Anope::string &password = params[0];
 
 		User *u = source.GetUser();
-		if (!u)
-			return;
-
 		Oper *o = source.nc->o;
 		if (o == NULL)
 			source.Reply(_("No oper block for your nick."));
@@ -69,16 +67,14 @@ class CommandOSLogout : public Command
  public:
 	CommandOSLogout(Module *creator) : Command(creator, "operserv/logout", 0, 0)
 	{
-		this->SetDesc(Anope::printf(_("Logout from to %s"), Config->OperServ.c_str()));
+		this->SetFlag(CFLAG_REQUIRE_USER);
+		this->SetDesc(Anope::printf(_("Logout from %s"), Config->OperServ.c_str()));
 		this->SetSyntax("");
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		User *u = source.GetUser();
-		if (!u)
-			return;
-
 		Oper *o = source.nc->o;
 		if (o == NULL)
 			source.Reply(_("No oper block for your nick."));

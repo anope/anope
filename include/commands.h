@@ -18,8 +18,14 @@
 
 enum CommandFlag
 {
+	/* Command allow unidentified users to use it */
 	CFLAG_ALLOW_UNREGISTERED,
-	CFLAG_STRIP_CHANNEL
+	
+	/* Command's first parameter is a channel name */
+	CFLAG_STRIP_CHANNEL,
+
+	/* Command requires a user to execute */
+	CFLAG_REQUIRE_USER
 };
 
 /* Used in BotInfo::commands */

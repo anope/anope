@@ -78,6 +78,7 @@ class CommandNSGroup : public Command
  public:
 	CommandNSGroup(Module *creator) : Command(creator, "nickserv/group", 1, 2)
 	{
+		this->SetFlag(CFLAG_REQUIRE_USER);
 		this->SetFlag(CFLAG_ALLOW_UNREGISTERED);
 		this->SetDesc(_("Join a group"));
 		this->SetSyntax(_("\037target\037 \037password\037"));
@@ -86,10 +87,6 @@ class CommandNSGroup : public Command
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		User *u = source.GetUser();
-
-		if (!u)
-			return;
-
 		const Anope::string &nick = params[0];
 		const Anope::string &pass = params.size() > 1 ? params[1] : "";
 
@@ -206,6 +203,7 @@ class CommandNSUngroup : public Command
  public:
 	CommandNSUngroup(Module *creator) : Command(creator, "nickserv/ungroup", 0, 1)
 	{
+		this->SetFlag(CFLAG_REQUIRE_USER);
 		this->SetDesc(_("Remove a nick from a group"));
 		this->SetSyntax(_("[\037nick\037]"));
 	}
@@ -213,9 +211,6 @@ class CommandNSUngroup : public Command
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		User *u = source.GetUser();
-		if (!u)
-			return;
-
 		Anope::string nick = !params.empty() ? params[0] : "";
 		NickAlias *na = NickAlias::Find(!nick.empty() ? nick : u->nick);
 

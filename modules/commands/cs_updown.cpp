@@ -18,6 +18,7 @@ class CommandCSUp : public Command
  public:
 	CommandCSUp(Module *creator) : Command(creator, "chanserv/up", 0, 1)
 	{
+		this->SetFlag(CFLAG_REQUIRE_USER);
 		this->SetDesc(_("Updates your status on a channel"));
 		this->SetSyntax(_("[\037channel\037]"));
 	}
@@ -25,8 +26,6 @@ class CommandCSUp : public Command
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		User *u = source.GetUser();
-		if (!u)
-			return;
 
 		if (params.empty())
 			for (UChannelList::iterator it = u->chans.begin(); it != u->chans.end(); ++it)
@@ -75,6 +74,7 @@ class CommandCSDown : public Command
  public:
 	CommandCSDown(Module *creator) : Command(creator, "chanserv/down", 0, 1)
 	{
+		this->SetFlag(CFLAG_REQUIRE_USER);
 		this->SetDesc(_("Removes your status from a channel"));
 		this->SetSyntax(_("[\037channel\037]"));
 	}
@@ -82,8 +82,6 @@ class CommandCSDown : public Command
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		User *u = source.GetUser();
-		if (!u)
-			return;
 
 		if (params.empty())
 			for (UChannelList::iterator it = u->chans.begin(); it != u->chans.end(); ++it)

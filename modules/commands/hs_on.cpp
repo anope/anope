@@ -18,18 +18,17 @@ class CommandHSOn : public Command
  public:
 	CommandHSOn(Module *creator) : Command(creator, "hostserv/on", 0, 0)
 	{
+		this->SetFlag(CFLAG_REQUIRE_USER);
 		this->SetDesc(_("Activates your assigned vhost"));
 		this->SetSyntax("");
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		User *u = source.GetUser();
-		if (!u)
-			return;
-		else if (!IRCD->CanSetVHost)
+		if (!IRCD->CanSetVHost)
 			return; // HostServ wouldn't even be loaded at this point
 
+		User *u = source.GetUser();
 		const NickAlias *na = NickAlias::Find(u->nick);
 		if (na && u->Account() == na->nc && na->HasVhost())
 		{

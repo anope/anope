@@ -18,7 +18,7 @@
 #include "regchannel.h"
 #include "channels.h"
 
-static const Anope::string CommandFlagString[] = { "CFLAG_ALLOW_UNREGISTERED", "CFLAG_STRIP_CHANNEL", "" };
+static const Anope::string CommandFlagString[] = { "CFLAG_ALLOW_UNREGISTERED", "CFLAG_STRIP_CHANNEL", "CFLAG_REQUIRE_USER", "" };
 template<> const Anope::string* Flags<CommandFlag>::flags_strings = CommandFlagString;
 
 CommandSource::CommandSource(const Anope::string &n, User *user, NickCore *core, CommandReply *r, BotInfo *bi) : nick(n), u(user), nc(core), reply(r),
@@ -217,6 +217,9 @@ void RunCommand(CommandSource &source, const Anope::string &message)
 		Log(source.service) << "Command " << it->first << " exists on me, but its service " << info.name << " was not found!";
 		return;
 	}
+
+	if (c->HasFlag(CFLAG_REQUIRE_USER) && !source.GetUser())
+		return;
 
 	// Command requires registered users only
 	if (!c->HasFlag(CFLAG_ALLOW_UNREGISTERED) && !source.nc)

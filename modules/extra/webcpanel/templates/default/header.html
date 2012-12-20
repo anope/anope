@@ -7,6 +7,57 @@
 	<script type="text/javascript">
 		var t=5000; // Time in ms to display an overlay if one will be displayed	
 	</script>
+	{IF EXISTS CMDR} 
+	<script type="text/javascript">
+	$(document).ready(function() \{
+	
+		/*Modal*/
+		var id = "#dialog";
+			
+		showModal();
+
+		$('.close').click(function (e) \{
+			e.preventDefault();	
+			hideModal();
+		\});
+	
+		$('#mask').click(function () \{
+			hideModal();
+		\});	
+		
+		function hideModal() \{
+			if ($('#mask').not(':hidden')) \{
+				$('.master').fadeTo('slow',1.0);	
+				$('#mask, .window').fadeOut(200);
+			\}					
+		\}
+		
+		function showModal() \{				
+			var mHeight = $(document).height();	
+			var mWidth = $(window).width();
+			
+			var alertMsg = '<br/>{CMDR}<br/>';
+
+			$('#mask').css(\{'width': mWidth, 'height': mHeight\});	
+			$('#mask').fadeIn(200);		
+			$('#mask').fadeTo('fast',0.75);
+		
+			$('#dialogMsg').html(alertMsg);
+			var top = mHeight/2-$(id).height()/2;
+			var left= mWidth/2-$(id).width()/2;
+			
+			$(id).css('top', top);
+			$(id).css('left', left);
+			$('.master').fadeTo('fast',0.3);								
+			
+			$(id).fadeIn(500);
+			setTimeout(hideModal, t);		
+			
+		\}			
+						
+	\});
+	</script>
+	{END IF}
 </head>
 <body>
 	<div id="boxes">

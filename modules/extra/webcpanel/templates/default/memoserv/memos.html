@@ -77,20 +77,27 @@
 					<th class="akillR2">Time/Message</th>
 				</tr>
 				{FOR I,S,T,TXT,U IN NUMBER,SENDER,TIME,TEXT,UNREAD}
-				<tr>
+				{IF EQ U YES}
+				<tr class="read">
+				{ELSE}
+				<tr class="unread">
+				{END IF}
 					<td class="akillR1">{I}</td>
 					<td class="akillR3">{S}</td>
 					<td class="akillR2"><abbr title="{T}">{TXT}</abbr></td>
 				</tr>
-				<tr>
-					<td></td>
-					<td></td>
 				{IF EQ U YES}
+				<tr class="read">
+					<td></td>
+					<td></td>
 					<td class="right"><a href="/memoserv/memos?channel={ESCAPED_CHANNEL_NAME}&number={I}&read=1">Mark as Read</a> &nbsp;
 					<a href="{S}" class="reply" id="memo{I}">Reply</a>&nbsp;
 					<a href="/memoserv/memos?channel={ESCAPED_CHANNEL_NAME}&number={I}&del=1">Delete</a></td>
 				{ELSE}
-					<td class="right"><a href="/memoserv/memos?channel={ESCAPED_CHANNEL_NAME}&number={I}&read=2">Mark as Unread</a> ;&nbsp
+				<tr class="unread">
+					<td></td>
+					<td></td>
+					<td class="right"><a href="/memoserv/memos?channel={ESCAPED_CHANNEL_NAME}&number={I}&read=2">Mark as Unread</a> &nbsp;
 					<a href="{S}" class="reply" id="memo{I}">Reply</a> &nbsp;
 					<a href="/memoserv/memos?channel={ESCAPED_CHANNEL_NAME}&number={I}&del=1">Delete</a></td>
 				{END IF}

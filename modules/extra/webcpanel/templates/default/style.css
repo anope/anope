@@ -126,8 +126,9 @@ body {
 
 td.right a:link, td.right a:visited {
 	color: #000;
+	background-color: #FFF;
 	border: 1px solid #000;
-	padding: 1px 4px;
+	padding: 0px 4px;
 	-webkit-border-radius: 5x;
   	border-radius: 5px;
 	text-decoration: none;
@@ -136,6 +137,28 @@ td.right a:link, td.right a:visited {
 td.right a:hover {
 	color: #00F;
 }
+
+table#memoTable {
+	border-spacing: 0px;
+	border-collapse: collapse;
+}
+
+table#memoTable tr {
+	padding: 1px;
+}
+
+tr.read  { 
+	background-color: #FFF;
+}
+
+tr.unread {
+	background-color: #EEE;
+}
+ 
+tr.read td, tr.unread td {
+	padding: 2px;	
+}
+
 /* Modal Window */
 #mask {
 	position: absolute;

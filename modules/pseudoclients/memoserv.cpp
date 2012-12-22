@@ -21,13 +21,15 @@ static bool SendMemoMail(NickCore *nc, MemoInfo *mi, Memo *m)
 
 	subject = subject.replace_all_cs("%n", nc->display);
 	subject = subject.replace_all_cs("%s", m->sender);
-	subject = subject.replace_all_cs("%d", mi->GetIndex(m));
+	subject = subject.replace_all_cs("%d", stringify(mi->GetIndex(m) + 1));
 	subject = subject.replace_all_cs("%t", m->text);
+	subject = subject.replace_all_cs("%N", Config->NetworkName);
 
 	message = message.replace_all_cs("%n", nc->display);
 	message = message.replace_all_cs("%s", m->sender);
-	message = message.replace_all_cs("%d", mi->GetIndex(m));
+	message = message.replace_all_cs("%d", stringify(mi->GetIndex(m) + 1));
 	message = message.replace_all_cs("%t", m->text);
+	message = message.replace_all_cs("%N", Config->NetworkName);
 
 	return Mail::Send(nc, subject, message);
 }

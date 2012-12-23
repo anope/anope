@@ -2,17 +2,26 @@
 <html>
 <head>
 	<link href="/static/style.css" media="screen" rel="stylesheet" type="text/css" />
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js" type="text/javascript"></script>		
 	<title>{TITLE}</title>
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js" type="text/javascript"></script>
 	{IF EXISTS CMDR} 
 	<script type="text/javascript">
-	var t=5000; // Time in ms to display an overlay if one will be displayed	
+	var tSec=5; //Time in seconds to keep the overlay open
+	var t=(tSec*1000); //Convert the time to ms so we can use it
 	
 	$(document).ready(function() \{
 	
 		/*Modal*/
 		var id = "#dialog";
-			
+		
+		var mHeight;
+		var mWidth;
+		var oHeight = $(id).height();
+		var oWidth = $(id).height();
+		
+		var top;
+		var left;
+		
 		showModal();
 
 		$('.close').click(function (e) \{
@@ -32,8 +41,8 @@
 		\}
 		
 		function showModal() \{				
-			var mHeight = $(document).height();	
-			var mWidth = $(window).width();
+			mHeight = $(document).height();	
+			mWidth = $(window).width();
 			
 			var alertMsg = '<br/>{CMDR}<br/>';
 
@@ -42,8 +51,9 @@
 			$('#mask').fadeTo('fast',0.75);
 		
 			$('#dialogMsg').html(alertMsg);
-			var top = mHeight/2-$(id).height()/2;
-			var left= mWidth/2-$(id).width()/2;
+			
+			top = mHeight/2-oHeight/2;
+			left = mWidth/2-oHeight/2;
 			
 			$(id).css('top', top);
 			$(id).css('left', left);
@@ -52,7 +62,24 @@
 			$(id).fadeIn(500);
 			setTimeout(hideModal, t);		
 			
-		\}			
+		\}	
+		
+		$(window).resize(function() \{
+			if ($('#mask').not(':hidden')) \{
+				mHeight = $(document).height();
+				mWidth = $(window).width();
+
+				/* Might as well only change the postion of box if the window is large enough */
+				if ((mHeight > oHeight) && (mWidth > oWidth)) \{ 
+					top = mHeight/2-oHeight/2;
+					left = mWidth/2-oHeight/2;
+					$('#mask').css(\{'width': mWidth, 'height': mHeight\});
+					$(id).css('top', top);
+					$(id).css('left', left);
+				\}
+				
+			\}
+		\})
 						
 	\});
 	</script>

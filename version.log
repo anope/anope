@@ -8,9 +8,10 @@ VERSION_MAJOR="1"
 VERSION_MINOR="8"
 VERSION_PATCH="8"
 VERSION_EXTRA="-git"
-VERSION_BUILD="3105"
+VERSION_BUILD="3106"
 
 # Changes since 1.8.7 Release
+#Revision 3106 - Replaced experimental Hybrid 7.0 support by Hybrid 8.0 support. (Patch provided by Hybrid Development Team)
 #Revision 3105 - Added french language support to some modules (patch provided by Coolsmile)
 #Revision 3104 - Updated the Polish language file
 #Revision 3103 - Updated .gitignore

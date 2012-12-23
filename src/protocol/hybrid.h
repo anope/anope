@@ -1,7 +1,7 @@
 /* Hybrid IRCD functions
  *
  * (C) 2003-2012 Anope Team
- * Contact us at team@anope.org
+ * (C) 2012 by the Hybrid Development Team 
  *
  * Please read COPYING and README for further details.
  *
@@ -22,28 +22,30 @@
 #define UMODE_l 0x00002000  /* See LOCOPS messages */
 #define UMODE_n 0x00004000  /* See client nick changes */
 #define UMODE_o 0x00000008  /* Operator status */
-#define UMODE_r 0x00000010  /* See rejected client notices */
+#define UMODE_r 0x00000010  /* registered nick */
 #define UMODE_s 0x00008000  /* See general server notices */
 #define UMODE_u 0x00010000  /* See unauthorized client notices */
 #define UMODE_w 0x00000020  /* See server generated WALLOPS */
 #define UMODE_x 0x00020000  /* See remote server connection and split notices */
 #define UMODE_y 0x00040000  /* See LINKS, STATS (if configured), TRACE notices */
 #define UMODE_z 0x00080000  /* See oper generated WALLOPS */
+#define UMODE_R 0x80000000  /* unmode +R - No non registered msgs */
 
-#define CMODE_i 0x00000001     /* Invite only */
-#define CMODE_m 0x00000002     /* Users without +v/h/o cannot send text to the channel */
-#define CMODE_n 0x00000004     /* Users must be in the channel to send text to it */
-#define CMODE_p 0x00000008     /* Private is obsolete, this now restricts KNOCK */
-#define CMODE_s 0x00000010     /* The channel does not show up on NAMES or LIST */
-#define CMODE_t 0x00000020     /* Only chanops can change the topic */
-#define CMODE_k 0x00000040     /* Key/password for the channel. */
-#define CMODE_l 0x00000080     /* Limit the number of users in a channel */
-/* #define CMODE_a 0x00000400    */ /* Anonymous ops, chanops are hidden */
-#define CMODE_O 0x00000800     /* Oper only channel, as of hybrid7.3 */
-#define CMODE_S 0x00001000     /* SSL only channel, as of hybrid7.3 */
+#define CMODE_i 0x00000001   /* Invite only */
+#define CMODE_m 0x00000002   /* Users without +v/h/o cannot send text to the channel */
+#define CMODE_n 0x00000004   /* Users must be in the channel to send text to it */
+#define CMODE_p 0x00000008   /* Private is obsolete, this now restricts KNOCK */
+#define CMODE_s 0x00000010   /* The channel does not show up on NAMES or LIST */
+#define CMODE_t 0x00000020   /* Only chanops can change the topic */
+#define CMODE_k 0x00000040   /* Key/password for the channel. */
+#define CMODE_l 0x00000080   /* Limit the number of users in a channel */
+#define CMODE_R 0x00000100   /* Only identified users can join */
+#define CMODE_r 0x00000200   /* Set for all registered channels */
+#define CMODE_O 0x00000800   /* Oper only channel, as of hybrid7.3 */
+#define CMODE_S 0x00001000   /* SSL only channel, as of hybrid7.3 */
 
 
-#define DEFAULT_MLOCK CMODE_n | CMODE_t
+#define DEFAULT_MLOCK CMODE_n|CMODE_r|CMODE_t
 
 void hybrid_set_umode(User * user, int ac, char **av);
 void hybrid_cmd_svsnoop(char *server, int set);

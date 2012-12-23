@@ -123,8 +123,6 @@ bool ListFormatter::IsEmpty() const
 
 void ListFormatter::Process(std::vector<Anope::string> &buffer)
 {
-	buffer.clear();
-
 	std::map<Anope::string, size_t> lenghts;
 	std::set<Anope::string> breaks;
 	for (unsigned i = 0; i < this->columns.size(); ++i)

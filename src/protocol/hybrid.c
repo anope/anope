@@ -1,7 +1,7 @@
-/* Hybrid IRCD functions
+/* ircd-hybrid-8 protocol module
  *
  * (C) 2003-2012 Anope Team
- * Contact us at team@anope.org
+ * (C) 2012 by the Hybrid Development Team
  *
  * Please read COPYING and README for further details.
  *
@@ -17,61 +17,61 @@
 #include "version.h"
 
 IRCDVar myIrcd[] = {
-    {"HybridIRCd 7.3+",          /* ircd name */
+    {"Hybrid 8.0.*",            /* ircd name */
      "+o",                      /* nickserv mode */
      "+o",                      /* chanserv mode */
      "+o",                      /* memoserv mode */
-     NULL,                      /* hostserv mode */
-     "+aio",                    /* operserv mode */
+     "+",                       /* hostserv mode */
+     "+io",                     /* operserv mode */
      "+o",                      /* botserv mode  */
-     "+h",                      /* helpserv mode */
+     "+i",                      /* helpserv mode */
      "+i",                      /* Dev/Null mode */
      "+io",                     /* Global mode   */
      "+o",                      /* nickserv alias mode */
      "+o",                      /* chanserv alias mode */
      "+o",                      /* memoserv alias mode */
-     NULL,                      /* hostserv alias mode */
-     "+aio",                    /* operserv alias mode */
+     "+",                       /* hostserv alias mode */
+     "+io",                     /* operserv alias mode */
      "+o",                      /* botserv alias mode  */
-     "+h",                      /* helpserv alias mode */
+     "+i",                      /* helpserv alias mode */
      "+i",                      /* Dev/Null alias mode */
      "+io",                     /* Global alias mode   */
      "+",                       /* Used by BotServ Bots */
      3,                         /* Chan Max Symbols     */
-     "-ilmnpstOS",               /* Modes to Remove */
+     "-ilmnpstORS",             /* Modes to Remove */
      "+o",                      /* Channel Umode used by Botserv bots */
-     0,                         /* SVSNICK */
+     1,                         /* SVSNICK */
      0,                         /* Vhost  */
      0,                         /* Has Owner */
      NULL,                      /* Mode to set for an owner */
      NULL,                      /* Mode to unset for an owner */
      NULL,                      /* Mode to set for admin */
      NULL,                      /* Mode to unset for admin */
-     NULL,                      /* Mode On Reg          */
+     "+rd",                     /* Mode On Reg          */
      NULL,                      /* Mode on ID for Roots */
      NULL,                      /* Mode on ID for Admins */
      NULL,                      /* Mode on ID for Opers */
-     NULL,                      /* Mode on UnReg        */
-     NULL,                      /* Mode on Nick Change  */
+     "-r+d",                    /* Mode on UnReg        */
+     "+d",                      /* Mode on Nick Change  */
      1,                         /* Supports SGlines     */
      1,                         /* Supports SQlines     */
-     0,                         /* Supports SZlines     */
+     1,                         /* Supports SZlines     */
      1,                         /* Supports Halfop +h   */
      3,                         /* Number of server args */
      1,                         /* Join 2 Set           */
      1,                         /* Join 2 Message       */
      1,                         /* Has exceptions +e    */
      0,                         /* TS Topic Forward     */
-     0,                         /* TS Topci Backward    */
+     0,                         /* TS Topic Backward    */
      0,                         /* Protected Umode      */
      0,                         /* Has Admin            */
-     0,                         /* Chan SQlines         */
+     1,                         /* Chan SQlines         */
      0,                         /* Quit on Kill         */
      0,                         /* SVSMODE unban        */
      0,                         /* Has Protect          */
      0,                         /* Reverse              */
-     0,                         /* Chan Reg             */
-     0,                         /* Channel Mode         */
+     1,                         /* Chan Reg             */
+     CMODE_r,                   /* Channel Mode         */
      0,                         /* vidents              */
      0,                         /* svshold              */
      0,                         /* time stamp on mode   */
@@ -88,13 +88,13 @@ IRCDVar myIrcd[] = {
      0,                         /* +L                   */
      0,                         /* +f Mode                          */
      0,                         /* +L Mode                              */
-     0,                         /* On nick change check if they could be identified */
+     1,                         /* On nick change check if they could be identified */
      0,                         /* No Knock requires +i */
      NULL,                      /* CAPAB Chan Modes             */
      0,                         /* We support TOKENS */
      1,                         /* TOKENS are CASE inSensitive */
      0,                         /* TIME STAMPS are BASE64 */
-     0,                         /* +I support */
+     1,                         /* +I support */
      0,                         /* SJOIN ban char */
      0,                         /* SJOIN except char */
      0,                         /* SJOIN invite char */
@@ -105,8 +105,8 @@ IRCDVar myIrcd[] = {
      0,                         /* support helper umode */
      0,                         /* p10 */
      NULL,                      /* character set */
-     0,                         /* reports sync state */
-     0,                         /* CIDR channelbans */
+     1,                         /* reports sync state */
+     1,                         /* CIDR channelbans */
      0,                         /* +j */
      0,                         /* +j mode */
      0,                         /* Use delayed client introduction. */
@@ -122,7 +122,7 @@ IRCDCAPAB myIrcdcap[] = {
      0,                         /* UNCONNECT    */
      0,                         /* NICKIP       */
      0,                         /* SJOIN        */
-     CAPAB_ZIP,                 /* ZIP          */
+     0,                         /* ZIP          */
      0,                         /* BURST        */
      CAPAB_TS5,                 /* TS5          */
      0,                         /* TS3          */
@@ -130,7 +130,7 @@ IRCDCAPAB myIrcdcap[] = {
      0,                         /* PT4          */
      0,                         /* SCS          */
      CAPAB_QS,                  /* QS           */
-     CAPAB_UID,                 /* UID          */
+     0,                         /* UID          */
      CAPAB_KNOCK,               /* KNOCK        */
      0,                         /* CLIENT       */
      0,                         /* IPV6         */
@@ -150,7 +150,7 @@ IRCDCAPAB myIrcdcap[] = {
 
 
 
-void hybrid_set_umode(User * user, int ac, char **av)
+void hybrid_set_umode(User *user, int ac, char **av)
 {
     int add = 1;                /* 1 if adding modes, 0 if deleting */
     char *modes = av[0];
@@ -243,7 +243,7 @@ unsigned long umodes[128] = {
     0, 0, 0,                    /* G H I */
     0, 0, 0,                    /* J K L */
     0, 0, 0,                    /* M N O */
-    0, 0, 0,                    /* P Q R */
+    0, 0, UMODE_R,              /* P Q R */
     0, 0, 0,                    /* S T U */
     0, 0, 0,                    /* V W X */
     0,                          /* Y */
@@ -270,7 +270,7 @@ char myCsmodes[128] = {
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 
     0,
-    'a',                        /* (33) !  */
+    0,
     0, 0, 0,
     'h',
     0, 0, 0, 0,
@@ -363,7 +363,7 @@ CBMode myCbmodes[128] = {
     {CMODE_O, CBM_NO_USER_MLOCK, NULL, NULL},   /* O */
     {0},                        /* P */
     {0},                        /* Q */
-    {0},                        /* R */
+    {CMODE_R, 0, NULL, NULL},   /* R */
     {CMODE_S, 0, NULL, NULL},   /* S */
     {0},                        /* T */
     {0},                        /* U */
@@ -390,7 +390,7 @@ CBMode myCbmodes[128] = {
     {0},                        /* o */
     {CMODE_p, 0, NULL, NULL},
     {0},                        /* q */
-    {0},
+    {CMODE_r, CBM_NO_MLOCK, NULL, NULL},
     {CMODE_s, 0, NULL, NULL},
     {CMODE_t, 0, NULL, NULL},
     {0},
@@ -403,19 +403,20 @@ CBMode myCbmodes[128] = {
 };
 
 CBModeInfo myCbmodeinfos[] = {
-    {'O', CMODE_O, 0, NULL, NULL},
-    {'S', CMODE_S, 0, NULL, NULL},
     {'i', CMODE_i, 0, NULL, NULL},
     {'k', CMODE_k, 0, get_key, cs_get_key},
     {'l', CMODE_l, CBM_MINUS_NO_ARG, get_limit, cs_get_limit},
     {'m', CMODE_m, 0, NULL, NULL},
     {'n', CMODE_n, 0, NULL, NULL},
     {'p', CMODE_p, 0, NULL, NULL},
+    {'r', CMODE_r, 0, NULL, NULL},
     {'s', CMODE_s, 0, NULL, NULL},
     {'t', CMODE_t, 0, NULL, NULL},
+    {'O', CMODE_O, 0, NULL, NULL},
+    {'R', CMODE_R, 0, NULL, NULL},
+    {'S', CMODE_S, 0, NULL, NULL},
     {0}
 };
-
 
 CUMode myCumodes[128] = {
     {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0},
@@ -468,15 +469,13 @@ CUMode myCumodes[128] = {
 
 void hybrid_cmd_notice(char *source, char *dest, char *buf)
 {
-    if (!buf) {
+    if (!buf)
         return;
-    }
 
-    if (NSDefFlags & NI_MSG) {
+    if (NSDefFlags & NI_MSG)
         hybrid_cmd_privmsg2(source, dest, buf);
-    } else {
+    else
         send_cmd(source, "NOTICE %s :%s", dest, buf);
-    }
 }
 
 void hybrid_cmd_notice2(char *source, char *dest, char *msg)
@@ -486,9 +485,8 @@ void hybrid_cmd_notice2(char *source, char *dest, char *msg)
 
 void hybrid_cmd_privmsg(char *source, char *dest, char *buf)
 {
-    if (!buf) {
+    if (!buf)
         return;
-    }
 
     send_cmd(source, "PRIVMSG %s :%s", dest, buf);
 }
@@ -508,20 +506,18 @@ void hybrid_cmd_serv_privmsg(char *source, char *dest, char *msg)
     send_cmd(source, "PRIVMSG $$%s :%s", dest, msg);
 }
 
-
 void hybrid_cmd_global(char *source, char *buf)
 {
-    if (!buf) {
+    if (!buf)
         return;
-    }
 
-    send_cmd(source ? source : ServerName, "OPERWALL :%s", buf);
+    send_cmd(source ? source : ServerName, "GLOBOPS :%s", buf);
 }
 
 /* GLOBOPS - to handle old WALLOPS */
 void hybrid_cmd_global_legacy(char *source, char *fmt)
 {
-    send_cmd(source ? source : ServerName, "OPERWALL :%s", fmt);
+    send_cmd(source ? source : ServerName, "GLOBOPS :%s", fmt);
 }
 
 int anope_event_sjoin(char *source, int ac, char **av)
@@ -530,33 +526,54 @@ int anope_event_sjoin(char *source, int ac, char **av)
     return MOD_CONT;
 }
 
+/*
+** NICK - new
+**      source  = NULL
+**      parv[0] = nickname
+**      parv[1] = hopcount
+**      parv[2] = timestamp
+**      parv[3] = modes
+**      parv[4] = username
+**      parv[5] = hostname
+**      parv[6] = server
+**      parv[7] = servicestamp
+**      parv[8] = info
+** NICK - change 
+**      source  = oldnick
+**      parv[0] = new nickname
+**      parv[1] = timestamp
+*/
 int anope_event_nick(char *source, int ac, char **av)
 {
-    if (ac != 2) {
-        User *user = do_nick(source, av[0], av[4], av[5], av[6], av[7],
-                             strtoul(av[2], NULL, 10), 0, 0, NULL, NULL);
+    if (ac != 2)
+    {
+        User *user = do_nick(source, av[0], av[4], av[5], av[6], av[8],
+                             strtoul(av[2], NULL, 10),
+                             strtoul(av[7], NULL, 0), 0, NULL, NULL);
         if (user)
             anope_set_umode(user, 1, &av[3]);
-    } else {
-        do_nick(source, av[0], NULL, NULL, NULL, NULL,
-                strtoul(av[1], NULL, 10), 0, 0, NULL, NULL);
     }
+    else
+        do_nick(source, av[0], NULL, NULL, NULL, NULL,
+                strtoul(av[1], NULL, 10),
+                0, 0, NULL, NULL);
+
     return MOD_CONT;
 }
 
 int anope_event_topic(char *source, int ac, char **av)
 {
-    if (ac == 4) {
+    if (ac == 4)
         do_topic(source, ac, av);
-    } else {
+    else {
         Channel *c = findchan(av[0]);
         time_t topic_time = time(NULL);
 
         if (!c) {
-            if (debug) {
+            if (debug)
                 alog("debug: TOPIC %s for nonexistent channel %s",
                      merge_args(ac - 1, av + 1), av[0]);
-            }
+
             return MOD_CONT;
         }
 
@@ -575,11 +592,12 @@ int anope_event_topic(char *source, int ac, char **av)
 
         record_topic(av[0]);
 
-		if (ac > 1 && *av[1])
-		    send_event(EVENT_TOPIC_UPDATED, 2, av[0], av[1]);
-		else
-		    send_event(EVENT_TOPIC_UPDATED, 2, av[0], "");
+        if (ac > 1 && *av[1])
+          send_event(EVENT_TOPIC_UPDATED, 2, av[0], av[1]);
+        else
+          send_event(EVENT_TOPIC_UPDATED, 2, av[0], "");
     }
+
     return MOD_CONT;
 }
 
@@ -591,6 +609,7 @@ int anope_event_tburst(char *source, int ac, char **av)
     av[0] = av[1];
     av[1] = av[3];
     av[3] = av[4];
+
     do_topic(source, 4, av);
     return MOD_CONT;
 }
@@ -605,83 +624,73 @@ int anope_event_436(char *source, int ac, char **av)
 }
 
 
-/* *INDENT-OFF* */
-void moduleAddIRCDMsgs(void) {
-    Message *m;
-
-    updateProtectDetails("PROTECT","PROTECTME","protect","deprotect","AUTOPROTECT","+","-");
-
-    m = createMessage("401",       anope_event_null); addCoreMessage(IRCD,m);
-    m = createMessage("402",       anope_event_null); addCoreMessage(IRCD,m);
-    m = createMessage("436",       anope_event_436); addCoreMessage(IRCD,m);
-    m = createMessage("AWAY",      anope_event_away); addCoreMessage(IRCD,m);
-    m = createMessage("INVITE",    anope_event_invite); addCoreMessage(IRCD,m);
-    m = createMessage("JOIN",      anope_event_join); addCoreMessage(IRCD,m);
-    m = createMessage("KICK",      anope_event_kick); addCoreMessage(IRCD,m);
-    m = createMessage("KILL",      anope_event_kill); addCoreMessage(IRCD,m);
-    m = createMessage("MODE",      anope_event_mode); addCoreMessage(IRCD,m);
-    m = createMessage("MOTD",      anope_event_motd); addCoreMessage(IRCD,m);
-    m = createMessage("NICK",      anope_event_nick); addCoreMessage(IRCD,m);
-    m = createMessage("NOTICE",    anope_event_notice); addCoreMessage(IRCD,m);
-    m = createMessage("PART",      anope_event_part); addCoreMessage(IRCD,m);
-    m = createMessage("PASS",      anope_event_pass); addCoreMessage(IRCD,m);
-    m = createMessage("PING",      anope_event_ping); addCoreMessage(IRCD,m);
-    m = createMessage("PRIVMSG",   anope_event_privmsg); addCoreMessage(IRCD,m);
-    m = createMessage("QUIT",      anope_event_quit); addCoreMessage(IRCD,m);
-    m = createMessage("SERVER",    anope_event_server); addCoreMessage(IRCD,m);
-    m = createMessage("SQUIT",     anope_event_squit); addCoreMessage(IRCD,m);
-    m = createMessage("TOPIC",     anope_event_topic); addCoreMessage(IRCD,m);
-    m = createMessage("TBURST",    anope_event_tburst); addCoreMessage(IRCD,m);
-    m = createMessage("USER",      anope_event_null); addCoreMessage(IRCD,m);
-    m = createMessage("WALLOPS",   anope_event_null); addCoreMessage(IRCD,m);
-    m = createMessage("WHOIS",     anope_event_whois); addCoreMessage(IRCD,m);
-    m = createMessage("AKILL",     anope_event_null); addCoreMessage(IRCD,m);
-    m = createMessage("GLOBOPS",   anope_event_null); addCoreMessage(IRCD,m);
-    m = createMessage("GNOTICE",   anope_event_null); addCoreMessage(IRCD,m);
-    m = createMessage("GOPER",     anope_event_null); addCoreMessage(IRCD,m);
-    m = createMessage("RAKILL",    anope_event_null); addCoreMessage(IRCD,m);
-    m = createMessage("SILENCE",   anope_event_null); addCoreMessage(IRCD,m);
-    m = createMessage("SVSKILL",   anope_event_null); addCoreMessage(IRCD,m);
-    m = createMessage("SVSMODE",   anope_event_null); addCoreMessage(IRCD,m);
-    m = createMessage("SVSNICK",   anope_event_null); addCoreMessage(IRCD,m);
-    m = createMessage("SVSNOOP",   anope_event_null); addCoreMessage(IRCD,m);
-    m = createMessage("SQLINE",    anope_event_null); addCoreMessage(IRCD,m);
-    m = createMessage("UNSQLINE",  anope_event_null); addCoreMessage(IRCD,m);
-    m = createMessage("CAPAB",     anope_event_capab); addCoreMessage(IRCD,m);
-    m = createMessage("SJOIN",     anope_event_sjoin); addCoreMessage(IRCD,m);
-    m = createMessage("SVINFO",    anope_event_svinfo); addCoreMessage(IRCD,m);
-/*    m = createMessage("EOB",       anope_event_eob); addCoreMessage(IRCD,m); */
-    m = createMessage("ADMIN",     anope_event_admin); addCoreMessage(IRCD,m);
-    m = createMessage("ERROR",     anope_event_error); addCoreMessage(IRCD,m);
-}
-
-/* *INDENT-ON* */
-
-
 void hybrid_cmd_sqline(char *mask, char *reason)
 {
-    if (!mask || !reason) {
+    if (!mask || !reason)
         return;
-    }
-    
-    send_cmd(ServerName, "RESV * %s :%s", mask, reason);
+
+    send_cmd(s_OperServ, "RESV * %s :%s", mask, reason);
 }
+
+void hybrid_cmd_unsqline(char *user)
+{
+    if (!user)
+        return;
+
+    send_cmd(s_OperServ, "UNRESV * %s", user);
+}
+
+void hybrid_cmd_sgline(char *mask, char *reason)
+{
+    if (!mask || !reason)
+        return;
+
+    send_cmd(s_OperServ, "XLINE * %s 0 :%s", mask, reason);
+}
+
 void hybrid_cmd_unsgline(char *mask)
 {
-    if (!mask) {
+    if (!mask)
         return;
-    }
-    
-    send_cmd(ServerName, "UNXLINE * %s", mask);
+
+    send_cmd(s_OperServ, "UNXLINE * %s", mask);
+}
+
+void hybrid_cmd_szline(char *mask, char *reason, char *whom)
+{
+    if (!mask || !reason)
+        return;
+
+    send_cmd(s_OperServ, "DLINE * 172800 %s :%s", mask, reason);
 }
 
 void hybrid_cmd_unszline(char *mask)
 {
-    /* Does not support */
+    if (!mask)
+        return;
+
+    send_cmd(s_OperServ, "UNDLINE * %s", mask);
 }
-void hybrid_cmd_szline(char *mask, char *reason, char *whom)
+
+/*
+oper:           the nick of the oper performing the kline
+target.server:  the server(s) this kline is destined for
+duration:       the duration if a tkline, 0 if permanent.
+user:           the 'user' portion of the kline
+host:           the 'host' portion of the kline
+reason:         the reason for the kline.
+*/
+
+void hybrid_cmd_akill(char *user, char *host, char *who, time_t when,
+                      time_t expires, char *reason)
 {
-    /* Does not support */
+    send_cmd(s_OperServ, "KLINE * %ld %s %s :%s",
+             (long int) (expires - (long) time(NULL)), user, host, reason);
+}
+
+void hybrid_cmd_remove_akill(char *user, char *host)
+{
+    send_cmd(s_OperServ, "UNKLINE * %s %s", user, host);
 }
 
 void hybrid_cmd_svsnoop(char *server, int set)
@@ -694,21 +703,6 @@ void hybrid_cmd_svsadmin(char *server, int set)
     hybrid_cmd_svsnoop(server, set);
 }
 
-void hybrid_cmd_sgline(char *mask, char *reason)
-{
-    if (!mask || !reason) {
-        return;
-    }
-    
-    send_cmd(ServerName, "XLINE * %s 0 :%s", mask, reason);
-}
-
-void hybrid_cmd_remove_akill(char *user, char *host)
-{
-    /* hybrid seems to support UNKLINE  -Certus */
-    send_cmd(s_OperServ, "UNKLINE * %s %s", user, host);
-}
-
 void hybrid_cmd_topic(char *whosets, char *chan, char *whosetit,
                       char *topic, time_t when)
 {
@@ -717,29 +711,12 @@ void hybrid_cmd_topic(char *whosets, char *chan, char *whosetit,
 
 void hybrid_cmd_vhost_off(User * u)
 {
-	if (ircd->vhost && ircd->vident)
-	{
-		send_cmd(NULL, "ENCAP * CHGIDENT %s %s", u->nick, u->username);
-		send_cmd(NULL, "ENCAP * CHGHOST %s %s", u->nick, u->host);
-	}
+    /* Not Supported by this IRCD */
 }
 
 void hybrid_cmd_vhost_on(char *nick, char *vIdent, char *vhost)
 {
-	if (ircd->vhost && ircd->vident)
-	{
-		send_cmd(NULL, "ENCAP * CHGIDENT %s %s", nick, vIdent);
-		send_cmd(NULL, "ENCAP * CHGHOST %s %s", nick, vhost);
-	}
-}
-
-void hybrid_cmd_unsqline(char *user)
-{
-    if (!user) {
-        return;
-    }
-    
-    send_cmd(ServerName, "UNRESV * %s", user);
+    /* Not Supported by this IRCD */
 }
 
 void hybrid_cmd_join(char *user, char *channel, time_t chantime)
@@ -748,39 +725,19 @@ void hybrid_cmd_join(char *user, char *channel, time_t chantime)
              user);
 }
 
-/*
-oper:		the nick of the oper performing the kline
-target.server:	the server(s) this kline is destined for
-duration:	the duration if a tkline, 0 if permanent.
-user:		the 'user' portion of the kline
-host:		the 'host' portion of the kline
-reason:		the reason for the kline.
-*/
-
-void hybrid_cmd_akill(char *user, char *host, char *who, time_t when,
-                      time_t expires, char *reason)
-{
-    send_cmd(s_OperServ, "KLINE * %ld %s %s :%s",
-             (long int) (expires - (long) time(NULL)), user, host, reason);
-}
-
 void hybrid_cmd_svskill(char *source, char *user, char *buf)
 {
-    if (!buf) {
+    if (!buf || !source || !user)
         return;
-    }
-
-    if (!source || !user) {
-        return;
-    }
 
     send_cmd(source, "KILL %s :%s", user, buf);
 }
 
-
 void hybrid_cmd_svsmode(User * u, int ac, char **av)
 {
-    /* Hybrid does not support SVSMODE */
+    send_cmd(ServerName, "SVSMODE %s %ld %s%s%s", u->nick,
+             (long int)u->timestamp, av[0], (ac == 2 ? " " : ""),
+             (ac == 2 ? av[1] : ""));
 }
 
 /*
@@ -798,29 +755,23 @@ void hybrid_cmd_svinfo()
 
 /* CAPAB */
 /*
-  QS     - Can handle quit storm removal
-  EX     - Can do channel +e exemptions 
-  CHW    - Can do channel wall @#
-  LL     - Can do lazy links 
-  IE     - Can do invite exceptions 
-  EOB    - Can do EOB message
-  KLN    - Can do KLINE message 
-  GLN    - Can do GLINE message 
-  HOPS   - can do half ops (+h)
-  HUB    - This server is a HUB 
-  AOPS   - Can do anon ops (+a) 
-  UID    - Can do UIDs
-  ZIP    - Can do ZIPlinks
-  ENC    - Can do ENCrypted links 
-  KNOCK  -  supports KNOCK 
-  TBURST - supports TBURST
-  PARA	 - supports invite broadcasting for +p
-  ENCAP	 - ?
-*/
+ * As of December 21, 2012, ircd-hybrid-8 does support the following capabilities
+ * which are required to work with IRC-services:
+ *
+ * QS     - Can handle quit storm removal
+ * EX     - Can do channel +e exemptions
+ * CHW    - Can do channel wall @#
+ * IE     - Can do invite exceptions
+ * KNOCK  - Supports KNOCK
+ * TBURST - Supports topic burst
+ * ENCAP  - Supports ENCAP
+ * HOPS   - Supports HalfOps
+ * SVS    - Supports services
+ * EOB    - Supports End Of Burst message
+ */
 void hybrid_cmd_capab()
 {
-    send_cmd(NULL,
-             "CAPAB :QS EX CHW IE KLN GLN HOPS HUB AOPS KNOCK TBURST PARA");
+    send_cmd(NULL, "CAPAB :QS EX CHW IE ENCAP TBURST SVS HOPS EOB");
 }
 
 /* PASS */
@@ -834,6 +785,7 @@ void hybrid_cmd_server(char *servname, int hop, char *descript)
 {
     send_cmd(NULL, "SERVER %s %d :%s", servname, hop, descript);
 }
+
 void hybrid_cmd_connect(int servernum)
 {
     me_server =
@@ -861,39 +813,37 @@ void hybrid_cmd_svsinfo()
     /* not used */
 }
 
-
-
 void hybrid_cmd_bot_nick(char *nick, char *user, char *host, char *real,
                          char *modes)
 {
     EnforceQlinedNick(nick, s_BotServ);
-    send_cmd(NULL, "NICK %s 1 %ld %s %s %s %s :%s", nick,
+    send_cmd(NULL, "NICK %s 1 %ld %s %s %s %s 0 :%s", nick,
              (long int) time(NULL), modes, user, host, ServerName, real);
 
 }
 
 void hybrid_cmd_part(char *nick, char *chan, char *buf)
 {
-    if (buf) {
+    if (buf)
         send_cmd(nick, "PART %s :%s", chan, buf);
-    } else {
+    else
         send_cmd(nick, "PART %s", chan);
-    }
 }
 
 int anope_event_ping(char *source, int ac, char **av)
 {
     if (ac < 1)
         return MOD_CONT;
+
     hybrid_cmd_pong(ac > 1 ? av[1] : ServerName, av[0]);
     return MOD_CONT;
 }
 
 int anope_event_away(char *source, int ac, char **av)
 {
-    if (!source) {
+    if (!source)
         return MOD_CONT;
-    }
+
     m_away(source, (ac ? av[0] : NULL));
     return MOD_CONT;
 }
@@ -911,44 +861,44 @@ int anope_event_kick(char *source, int ac, char **av)
 {
     if (ac != 3)
         return MOD_CONT;
+
     do_kick(source, ac, av);
     return MOD_CONT;
 }
 
 int anope_event_eob(char *source, int ac, char **av)
 {
-    Server *s;
-    s = findserver(servlist, source);
+    Server *s = findserver(servlist, source);
+
     /* If we found a server with the given source, that one just
      * finished bursting. If there was no source, then our uplink
      * server finished bursting. -GD
      */
     if (!s && serv_uplink)
         s = serv_uplink;
-    finish_sync(s, 1);
 
+    finish_sync(s, 1);
     return MOD_CONT;
 }
 
 void hybrid_cmd_eob()
 {
-/*    send_cmd(ServerName, "EOB"); */
+    send_cmd(ServerName, "EOB");
 }
-
 
 int anope_event_join(char *source, int ac, char **av)
 {
     if (ac != 1)
         return MOD_CONT;
+
     do_join(source, ac, av);
     return MOD_CONT;
 }
 
 int anope_event_motd(char *source, int ac, char **av)
 {
-    if (!source) {
+    if (!source)
         return MOD_CONT;
-    }
 
     m_motd(source);
     return MOD_CONT;
@@ -958,6 +908,7 @@ int anope_event_privmsg(char *source, int ac, char **av)
 {
     if (ac != 2)
         return MOD_CONT;
+
     m_privmsg(source, av[0], av[1]);
     return MOD_CONT;
 }
@@ -966,24 +917,25 @@ int anope_event_part(char *source, int ac, char **av)
 {
     if (ac < 1 || ac > 2)
         return MOD_CONT;
+
     do_part(source, ac, av);
     return MOD_CONT;
 }
 
 int anope_event_whois(char *source, int ac, char **av)
 {
-    if (source && ac >= 1) {
+    if (source && ac >= 1)
         m_whois(source, av[0]);
-    }
+
     return MOD_CONT;
 }
 
 /* EVENT: SERVER */
 int anope_event_server(char *source, int ac, char **av)
 {
-    if (!stricmp(av[1], "1")) {
+    if (!stricmp(av[1], "1"))
         uplink = sstrdup(av[0]);
-    }
+
     do_server(source, av[0], av[1], av[2], NULL);
     return MOD_CONT;
 }
@@ -992,6 +944,7 @@ int anope_event_squit(char *source, int ac, char **av)
 {
     if (ac != 2)
         return MOD_CONT;
+
     do_squit(source, ac, av);
     return MOD_CONT;
 }
@@ -1000,6 +953,7 @@ int anope_event_quit(char *source, int ac, char **av)
 {
     if (ac != 1)
         return MOD_CONT;
+
     do_quit(source, ac, av);
     return MOD_CONT;
 }
@@ -1029,18 +983,17 @@ void hybrid_cmd_376(char *source)
 /* 391 */
 void hybrid_cmd_391(char *source, char *timestr)
 {
-    if (!timestr) {
+    if (!timestr)
         return;
-    }
+
     send_cmd(NULL, "391 :%s %s :%s", source, ServerName, timestr);
 }
 
 /* 250 */
 void hybrid_cmd_250(char *buf)
 {
-    if (!buf) {
+    if (!buf)
         return;
-    }
 
     send_cmd(NULL, "250 %s", buf);
 }
@@ -1048,9 +1001,8 @@ void hybrid_cmd_250(char *buf)
 /* 307 */
 void hybrid_cmd_307(char *buf)
 {
-    if (!buf) {
+    if (!buf)
         return;
-    }
 
     send_cmd(ServerName, "307 %s", buf);
 }
@@ -1058,9 +1010,8 @@ void hybrid_cmd_307(char *buf)
 /* 311 */
 void hybrid_cmd_311(char *buf)
 {
-    if (!buf) {
+    if (!buf)
         return;
-    }
 
     send_cmd(ServerName, "311 %s", buf);
 }
@@ -1068,9 +1019,8 @@ void hybrid_cmd_311(char *buf)
 /* 312 */
 void hybrid_cmd_312(char *buf)
 {
-    if (!buf) {
+    if (!buf)
         return;
-    }
 
     send_cmd(ServerName, "312 %s", buf);
 }
@@ -1078,9 +1028,8 @@ void hybrid_cmd_312(char *buf)
 /* 317 */
 void hybrid_cmd_317(char *buf)
 {
-    if (!buf) {
+    if (!buf)
         return;
-    }
 
     send_cmd(ServerName, "317 %s", buf);
 }
@@ -1088,33 +1037,30 @@ void hybrid_cmd_317(char *buf)
 /* 219 */
 void hybrid_cmd_219(char *source, char *letter)
 {
-    if (!source) {
+    if (!source)
         return;
-    }
 
-    if (letter) {
+    if (letter)
         send_cmd(NULL, "219 %s %c :End of /STATS report.", source,
                  *letter);
-    } else {
+    else
         send_cmd(NULL, "219 %s l :End of /STATS report.", source);
-    }
 }
 
 /* 401 */
 void hybrid_cmd_401(char *source, char *who)
 {
-    if (!source || !who) {
+    if (!source || !who)
         return;
-    }
+
     send_cmd(ServerName, "401 %s %s :No such service.", source, who);
 }
 
 /* 318 */
 void hybrid_cmd_318(char *source, char *who)
 {
-    if (!source || !who) {
+    if (!source || !who)
         return;
-    }
 
     send_cmd(ServerName, "318 %s %s :End of /WHOIS list.", source, who);
 }
@@ -1122,9 +1068,8 @@ void hybrid_cmd_318(char *source, char *who)
 /* 242 */
 void hybrid_cmd_242(char *buf)
 {
-    if (!buf) {
+    if (!buf)
         return;
-    }
 
     send_cmd(NULL, "242 %s", buf);
 }
@@ -1132,9 +1077,8 @@ void hybrid_cmd_242(char *buf)
 /* 243 */
 void hybrid_cmd_243(char *buf)
 {
-    if (!buf) {
+    if (!buf)
         return;
-    }
 
     send_cmd(NULL, "243 %s", buf);
 }
@@ -1142,18 +1086,16 @@ void hybrid_cmd_243(char *buf)
 /* 211 */
 void hybrid_cmd_211(char *buf)
 {
-    if (!buf) {
+    if (!buf)
         return;
-    }
 
     send_cmd(NULL, "211 %s", buf);
 }
 
 void hybrid_cmd_mode(char *source, char *dest, char *buf)
 {
-    if (!buf) {
+    if (!buf)
         return;
-    }
 
     send_cmd(source, "MODE %s %s", dest, buf);
 }
@@ -1161,25 +1103,23 @@ void hybrid_cmd_mode(char *source, char *dest, char *buf)
 void hybrid_cmd_nick(char *nick, char *name, char *mode)
 {
     EnforceQlinedNick(nick, NULL);
-    send_cmd(NULL, "NICK %s 1 %ld %s %s %s %s :%s", nick,
+    send_cmd(NULL, "NICK %s 1 %ld %s %s %s %s 0 :%s", nick,
              (long int) time(NULL), mode, ServiceUser, ServiceHost,
              ServerName, (name));
 }
 
 void hybrid_cmd_kick(char *source, char *chan, char *user, char *buf)
 {
-    if (buf) {
+    if (buf)
         send_cmd(source, "KICK %s %s :%s", chan, user, buf);
-    } else {
+    else
         send_cmd(source, "KICK %s %s", chan, user);
-    }
 }
 
 void hybrid_cmd_notice_ops(char *source, char *dest, char *buf)
 {
-    if (!buf) {
+    if (!buf)
         return;
-    }
 
     send_cmd(NULL, "NOTICE @%s :%s", dest, buf);
 }
@@ -1192,11 +1132,10 @@ void hybrid_cmd_bot_chan_mode(char *nick, char *chan)
 /* QUIT */
 void hybrid_cmd_quit(char *source, char *buf)
 {
-    if (buf) {
+    if (buf)
         send_cmd(source, "QUIT :%s", buf);
-    } else {
+    else
         send_cmd(source, "QUIT");
-    }
 }
 
 /* PONG */
@@ -1208,9 +1147,8 @@ void hybrid_cmd_pong(char *servname, char *who)
 /* INVITE */
 void hybrid_cmd_invite(char *source, char *chan, char *nick)
 {
-    if (!source || !chan || !nick) {
+    if (!source || !chan || !nick)
         return;
-    }
 
     send_cmd(source, "INVITE %s %s", nick, chan);
 }
@@ -1218,9 +1156,8 @@ void hybrid_cmd_invite(char *source, char *chan, char *nick)
 /* SQUIT */
 void hybrid_cmd_squit(char *servname, char *message)
 {
-    if (!servname || !message) {
+    if (!servname || !message)
         return;
-    }
 
     send_cmd(NULL, "SQUIT %s :%s", servname, message);
 }
@@ -1230,11 +1167,11 @@ int anope_event_mode(char *source, int ac, char **av)
     if (ac < 2)
         return MOD_CONT;
 
-    if (*av[0] == '#' || *av[0] == '&') {
+    if (*av[0] == '#' || *av[0] == '&')
         do_cmode(source, ac, av);
-    } else {
+    else
         do_umode(source, ac, av);
-    }
+
     return MOD_CONT;
 }
 
@@ -1248,34 +1185,36 @@ void hybrid_cmd_351(char *source)
 /* Event: PROTOCTL */
 int anope_event_capab(char *source, int ac, char **av)
 {
-	int argvsize = 8;
-	int argc;
-	char **argv;
-	char *str;
-	
-	if (ac < 1)
-		return MOD_CONT;
-	
-	/* We get the params as one arg, we should split it for capab_parse */
-	argv = scalloc(argvsize, sizeof(char *));
-	argc = 0;
-	while ((str = myStrGetToken(av[0], ' ', argc))) {
-		if (argc == argvsize) {
-			argvsize += 8;
-			argv = srealloc(argv, argvsize * sizeof(char *));
-		}
-		argv[argc] = str;
-		argc++;
-	}
-	
+    int argvsize = 8;
+    int argc;
+    char **argv;
+    char *str;
+
+    if (ac < 1)
+        return MOD_CONT;
+
+    /* We get the params as one arg, we should split it for capab_parse */
+    argv = scalloc(argvsize, sizeof(char *));
+    argc = 0;
+
+    while ((str = myStrGetToken(av[0], ' ', argc))) {
+        if (argc == argvsize) {
+            argvsize += 8;
+            argv = srealloc(argv, argvsize * sizeof(char *));
+        }
+
+        argv[argc] = str;
+        argc++;
+    }
+
     capab_parse(argc, argv);
-	
-	/* Free our built ac/av */
-	for (argvsize = 0; argvsize < argc; argvsize++) {
-		free(argv[argvsize]);
-	}
-	free(argv);
-	
+
+    /* Free our built ac/av */
+    for (argvsize = 0; argvsize < argc; argvsize++)
+        free(argv[argvsize]);
+
+    free(argv);
+
     return MOD_CONT;
 }
 
@@ -1292,16 +1231,20 @@ void hybrid_cmd_release_svshold(char *nick)
 }
 
 /* SVSNICK */
+/* parv[0] = sender
+ * parv[1] = old nickname
+ * parv[2] = new nickname
+ * parv[3] = timestamp
+ */
 void hybrid_cmd_svsnick(char *nick, char *newnick, time_t when)
 {
-	if (ircd->svsnick)
-		send_cmd(NULL, "SVSNICK %s %s", nick, newnick);
+    send_cmd(NULL, "SVSNICK %s %s :%ld", nick, newnick, (long int) when);
 }
 
 void hybrid_cmd_guest_nick(char *nick, char *user, char *host, char *real,
                            char *modes)
 {
-    send_cmd(NULL, "NICK %s 1 %ld %s %s %s %s :%s", nick,
+    send_cmd(NULL, "NICK %s 1 %ld %s %s %s %s 0 :%s", nick,
              (long int) time(NULL), modes, user, host, ServerName, real);
 }
 
@@ -1326,34 +1269,36 @@ void hybrid_cmd_svsmode_chan(char *name, char *mode, char *nick)
 /* sent if svid is something weird */
 void hybrid_cmd_svid_umode(char *nick, time_t ts)
 {
-    send_cmd(ServerName, "SVSMODE %s +d 1", nick);
+  send_cmd(ServerName, "SVSMODE %s %lu +d 1", nick,
+           (unsigned long int) ts);
 }
 
 /* SVSMODE +d */
 /* nc_change was = 1, and there is no na->status */
-void hybrid_cmd_nc_change(User * u)
+void hybrid_cmd_nc_change(User *u)
 {
-    /* not used */
+    common_svsmode(u, "+d", "1");
 }
 
 /* SVSMODE +d */
-void hybrid_cmd_svid_umode2(User * u, char *ts)
+void hybrid_cmd_svid_umode2(User *u, char *ts)
 {
     /* not used */
 }
 
-
-void hybrid_cmd_svid_umode3(User * u, char *ts)
+void hybrid_cmd_svid_umode3(User *u, char *ts)
 {
-    /* not used */
+    if (u->svid != u->timestamp)
+        common_svsmode(u, "+rd", ts);
+    else
+        common_svsmode(u, "+r", NULL);
 }
 
 /* NICK <newnick>  */
 void hybrid_cmd_chg_nick(char *oldnick, char *newnick)
 {
-    if (!oldnick || !newnick) {
+    if (!oldnick || !newnick)
         return;
-    }
 
     send_cmd(oldnick, "NICK %s", newnick);
 }
@@ -1415,11 +1360,10 @@ int hybrid_flood_mode_check(char *value)
 
 int anope_event_error(char *source, int ac, char **av)
 {
-    if (ac >= 1) {
-        if (debug) {
+    if (ac >= 1)
+        if (debug)
             alog("debug: %s", av[0]);
-        }
-    }
+
     return MOD_CONT;
 }
 
@@ -1432,6 +1376,7 @@ void hybrid_cmd_jupe(char *jserver, char *who, char *reason)
 
     if (findserver(servlist, jserver))
         hybrid_cmd_squit(jserver, rbuf);
+
     hybrid_cmd_server(jserver, 2, rbuf);
     new_server(me_server, jserver, rbuf, SERVER_JUPED, NULL);
 }
@@ -1459,59 +1404,64 @@ int hybrid_valid_chan(char *chan)
 
 void hybrid_cmd_ctcp(char *source, char *dest, char *buf)
 {
-    char *s;
+    char *s = NULL;
 
-    if (!buf) {
+    if (!buf)
         return;
-    } else {
-        s = normalizeBuffer(buf);
-    }
+
+    s = normalizeBuffer(buf);
 
     send_cmd(source, "NOTICE %s :\1%s \1", dest, s);
     free(s);
 }
 
-static int on_server_connect(int argc, char **argv)
-{
-	Server *s = findserver(servlist, argv[0]);
-	if (s != NULL && s->uplink == me_server && !(s->flags & SERVER_JUPED))
-	{
-		/* Test these commands to see if they exist */
-		send_cmd(s_ChanServ, "SVSNICK %s %s", s_ChanServ, s_ChanServ);
-		send_cmd(s_ChanServ, "ENCAP * CHGHOST %s .", s_ChanServ);
-	}
-	
-	return MOD_CONT;
-}
-
 int hybrid_event_notice(char *source, int argc, char **argv)
 {
-	if (argc > 1)
-	{
-		Server *s = findserver(servlist, source);
-		if (s != NULL)
-		{
-			if (!ircd->svsnick && !strcmp(argv[0], s_ChanServ) && strstr(argv[1], "already in use"))
-			{
-				ircd->svsnick = 1;
-				alog("SVSNICK support enabled");
-			}
-			else if (!ircd->vhost && !strcmp(argv[0], s_ChanServ) && !strcmp(argv[1], "Invalid hostname"))
-			{
-				ircd->vhost = ircd->vident = 1;
-				ircd->hostservmode = ircd->hostservaliasmode = sstrdup("+o");
-				alog("VHost support enabled");
-				if (s_HostServ)
-	        			anope_cmd_nick(s_HostServ, desc_HostServ, ircd->hostservmode);
-				if (s_HostServAlias)
-					anope_cmd_nick(s_HostServAlias, desc_HostServAlias, ircd->hostservaliasmode);
-			}
-		}
-	}
-	
-	return MOD_CONT;
+    return MOD_CONT;
 }
 
+/* *INDENT-OFF* */
+void moduleAddIRCDMsgs(void)
+{
+    Message *m;
+
+    updateProtectDetails("PROTECT","PROTECTME","protect","deprotect","AUTOPROTECT","+","-");
+
+    m = createMessage("401",       anope_event_null); addCoreMessage(IRCD,m);
+    m = createMessage("402",       anope_event_null); addCoreMessage(IRCD,m);
+    m = createMessage("436",       anope_event_436); addCoreMessage(IRCD,m);
+    m = createMessage("ADMIN",     anope_event_admin); addCoreMessage(IRCD,m);
+    m = createMessage("AWAY",      anope_event_away); addCoreMessage(IRCD,m);
+    m = createMessage("CAPAB",     anope_event_capab); addCoreMessage(IRCD,m);
+    m = createMessage("EOB",       anope_event_eob); addCoreMessage(IRCD,m);
+    m = createMessage("ERROR",     anope_event_error); addCoreMessage(IRCD,m);
+    m = createMessage("GLOBOPS",   anope_event_null); addCoreMessage(IRCD,m);
+    m = createMessage("INVITE",    anope_event_invite); addCoreMessage(IRCD,m);
+    m = createMessage("JOIN",      anope_event_join); addCoreMessage(IRCD,m);
+    m = createMessage("KICK",      anope_event_kick); addCoreMessage(IRCD,m);
+    m = createMessage("KILL",      anope_event_kill); addCoreMessage(IRCD,m);
+    m = createMessage("MODE",      anope_event_mode); addCoreMessage(IRCD,m);
+    m = createMessage("MOTD",      anope_event_motd); addCoreMessage(IRCD,m);
+    m = createMessage("NICK",      anope_event_nick); addCoreMessage(IRCD,m);
+    m = createMessage("NOTICE",    anope_event_notice); addCoreMessage(IRCD,m);
+    m = createMessage("PART",      anope_event_part); addCoreMessage(IRCD,m);
+    m = createMessage("PASS",      anope_event_pass); addCoreMessage(IRCD,m);
+    m = createMessage("PING",      anope_event_ping); addCoreMessage(IRCD,m);
+    m = createMessage("PRIVMSG",   anope_event_privmsg); addCoreMessage(IRCD,m);
+    m = createMessage("QUIT",      anope_event_quit); addCoreMessage(IRCD,m);
+    m = createMessage("SERVER",    anope_event_server); addCoreMessage(IRCD,m);
+    m = createMessage("SQUIT",     anope_event_squit); addCoreMessage(IRCD,m);
+    m = createMessage("TOPIC",     anope_event_topic); addCoreMessage(IRCD,m);
+    m = createMessage("TBURST",    anope_event_tburst); addCoreMessage(IRCD,m);
+    m = createMessage("USER",      anope_event_null); addCoreMessage(IRCD,m);
+    m = createMessage("WALLOPS",   anope_event_null); addCoreMessage(IRCD,m);
+    m = createMessage("WHOIS",     anope_event_whois); addCoreMessage(IRCD,m);
+    m = createMessage("SVSMODE",   anope_event_null); addCoreMessage(IRCD,m);
+    m = createMessage("SVSNICK",   anope_event_null); addCoreMessage(IRCD,m);
+    m = createMessage("SJOIN",     anope_event_sjoin); addCoreMessage(IRCD,m);
+    m = createMessage("SVINFO",    anope_event_svinfo); addCoreMessage(IRCD,m);
+}
+/* *INDENT-ON* */
 
 /**
  * Tell anope which function we want to perform each task inside of anope.
@@ -1601,13 +1551,11 @@ void moduleAddAnopeCmds()
  **/
 int AnopeInit(int argc, char **argv)
 {
-    EvtHook *hook;
-
     moduleAddAuthor("Anope");
     moduleAddVersion(VERSION_STRING);
     moduleSetType(PROTOCOL);
 
-    pmodule_ircd_version("Hybrid IRCd 7.3+");
+    pmodule_ircd_version("Hybrid 8.0.*");
     pmodule_ircd_cap(myIrcdcap);
     pmodule_ircd_var(myIrcd);
     pmodule_ircd_cbmodeinfos(myCbmodeinfos);
@@ -1619,7 +1567,7 @@ int AnopeInit(int argc, char **argv)
     pmodule_ircd_csmodes(myCsmodes);
     pmodule_ircd_useTSMode(0);
 
-        /** Deal with modes anope _needs_ to know **/
+    /** Deal with modes anope _needs_ to know **/
     pmodule_invis_umode(UMODE_i);
     pmodule_oper_umode(UMODE_o);
     pmodule_invite_cmode(CMODE_i);
@@ -1631,9 +1579,6 @@ int AnopeInit(int argc, char **argv)
 
     moduleAddAnopeCmds();
     moduleAddIRCDMsgs();
-
-    hook = createEventHook(EVENT_SERVER_CONNECT, on_server_connect);
-    moduleAddEventHook(hook);
 
     return MOD_CONT;
 }

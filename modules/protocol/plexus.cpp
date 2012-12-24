@@ -22,6 +22,7 @@ class PlexusProto : public IRCDProto
 	{
 		DefaultPseudoclientModes = "+oiU";
 		CanSVSNick = true;
+		CanSVSJoin = true;
 		CanSetVHost = true;
 		CanSetVIdent = true;
 		CanSNLine = true;

@@ -62,6 +62,7 @@ class DBSQL : public Module, public Pipe
 	std::set<Reference<Serializable> > updated_items;
 	bool shutting_down;
 	bool loading_databases;
+	bool loaded;
 
 	void RunBackground(const Query &q, Interface *iface = NULL)
 	{
@@ -85,11 +86,11 @@ class DBSQL : public Module, public Pipe
 	}
 
  public:
-	DBSQL(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, DATABASE), sql("", ""), sqlinterface(this), shutting_down(false), loading_databases(false)
+	DBSQL(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, DATABASE), sql("", ""), sqlinterface(this), shutting_down(false), loading_databases(false), loaded(false)
 	{
 		this->SetAuthor("Anope");
 
-		Implementation i[] = { I_OnReload, I_OnShutdown, I_OnRestart, I_OnLoadDatabase, I_OnSerializableConstruct, I_OnSerializableDestruct, I_OnSerializableUpdate };
+		Implementation i[] = { I_OnReload, I_OnShutdown, I_OnRestart, I_OnLoadDatabase, I_OnSerializableConstruct, I_OnSerializableDestruct, I_OnSerializableUpdate, I_OnSerializeTypeCreate };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 
 		this->OnReload();
@@ -163,37 +164,11 @@ class DBSQL : public Module, public Pipe
 		for (unsigned i = 0; i < type_order.size(); ++i)
 		{
 			Serialize::Type *sb = Serialize::Type::Find(type_order[i]);
-
-			Query query("SELECT * FROM `" + this->prefix + sb->GetName() + "`");
-			Result res = this->sql->RunQuery(query);
-
-			for (int j = 0; j < res.Rows(); ++j)
-			{
-				Data *data = new Data();
-
-				const std::map<Anope::string, Anope::string> &row = res.Row(j);
-				for (std::map<Anope::string, Anope::string>::const_iterator rit = row.begin(), rit_end = row.end(); rit != rit_end; ++rit)
-					(*data)[rit->first] << rit->second;
-
-				Serializable *obj = sb->Unserialize(NULL, *data);
-				try
-				{
-					if (obj)
-						obj->id = convertTo<unsigned int>(res.Get(j, "id"));
-				}
-				catch (const ConvertException &)
-				{
-					Log(this) << "Unable to convert id for object #" << j << " of type " << sb->GetName();
-				}
-
-				if (obj)
-					obj->UpdateCache(data); /* We know this is the most up to date copy */
-				else
-					delete data;
-			}
+			this->OnSerializeTypeCreate(sb);
 		}
 
 		this->loading_databases = false;
+		this->loaded = true;
 
 		return EVENT_STOP;
 	}
@@ -220,6 +195,40 @@ class DBSQL : public Module, public Pipe
 		obj->UpdateTS();
 		this->updated_items.insert(obj);
 		this->Notify();
+	}
+
+	void OnSerializeTypeCreate(Serialize::Type *sb) anope_override
+	{
+		if (!this->loading_databases && !this->loaded)
+			return;
+
+		Query query("SELECT * FROM `" + this->prefix + sb->GetName() + "`");
+		Result res = this->sql->RunQuery(query);
+
+		for (int j = 0; j < res.Rows(); ++j)
+		{
+			Data *data = new Data();
+
+			const std::map<Anope::string, Anope::string> &row = res.Row(j);
+			for (std::map<Anope::string, Anope::string>::const_iterator rit = row.begin(), rit_end = row.end(); rit != rit_end; ++rit)
+				(*data)[rit->first] << rit->second;
+
+			Serializable *obj = sb->Unserialize(NULL, *data);
+			try
+			{
+				if (obj)
+					obj->id = convertTo<unsigned int>(res.Get(j, "id"));
+			}
+			catch (const ConvertException &)
+			{
+				Log(this) << "Unable to convert id for object #" << j << " of type " << sb->GetName();
+			}
+
+			if (obj)
+				obj->UpdateCache(data); /* We know this is the most up to date copy */
+			else
+				delete data;
+		}
 	}
 };
 

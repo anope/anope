@@ -13,8 +13,8 @@ static ServiceReference<DNS::Manager> dnsmanager("DNS::Manager", "dns/manager");
 class DNSZone;
 class DNSServer;
 
-static std::vector<DNSZone *> zones;
-static std::vector<DNSServer *> dns_servers;
+static Serialize::Checker<std::vector<DNSZone *> > zones("DNSZone");
+static Serialize::Checker<std::vector<DNSServer *> > dns_servers("DNSServer");
 
 static std::map<Anope::string, std::list<time_t> > server_quit_times;
 
@@ -25,14 +25,14 @@ struct DNSZone : Serializable
 
 	DNSZone(const Anope::string &n) : Serializable("DNSZone"), name(n)
 	{
-		zones.push_back(this);
+		zones->push_back(this);
 	}
 
 	~DNSZone()
 	{
-		std::vector<DNSZone *>::iterator it = std::find(zones.begin(), zones.end(), this);
-		if (it != zones.end())
-			zones.erase(it);
+		std::vector<DNSZone *>::iterator it = std::find(zones->begin(), zones->end(), this);
+		if (it != zones->end())
+			zones->erase(it);
 	}
 
 	void Serialize(Serialize::Data &data) const anope_override
@@ -73,9 +73,13 @@ struct DNSZone : Serializable
 
 	static DNSZone *Find(const Anope::string &name)
 	{
-		for (unsigned i = 0; i < zones.size(); ++i)
-			if (zones[i]->name.equals_ci(name))
-				return zones[i];
+		for (unsigned i = 0; i < zones->size(); ++i)
+			if (zones->at(i)->name.equals_ci(name))
+			{
+				DNSZone *z = zones->at(i);
+				z->QueueUpdate();
+				return z;
+			}
 		return NULL;
 	}
 };
@@ -96,14 +100,14 @@ class DNSServer : public Serializable
 
 	DNSServer(const Anope::string &sn) : Serializable("DNSServer"), server_name(sn), limit(0), pooled(false), active(false), repool(0)
 	{
-		dns_servers.push_back(this);
+		dns_servers->push_back(this);
 	}
 
 	~DNSServer()
 	{
-		std::vector<DNSServer *>::iterator it = std::find(dns_servers.begin(), dns_servers.end(), this);
-		if (it != dns_servers.end())
-			dns_servers.erase(it);
+		std::vector<DNSServer *>::iterator it = std::find(dns_servers->begin(), dns_servers->end(), this);
+		if (it != dns_servers->end())
+			dns_servers->erase(it);
 	}
 
 	const Anope::string &GetName() const { return server_name; }
@@ -177,9 +181,13 @@ class DNSServer : public Serializable
 
 	static DNSServer *Find(const Anope::string &s)
 	{
-		for (unsigned i = 0; i < dns_servers.size(); ++i)
-			if (dns_servers[i]->GetName() == s)
-				return dns_servers[i];
+		for (unsigned i = 0; i < dns_servers->size(); ++i)
+			if (dns_servers->at(i)->GetName() == s)
+			{
+				DNSServer *serv = dns_servers->at(i);
+				serv->QueueUpdate();
+				return serv;
+			}
 		return NULL;
 	}
 };
@@ -188,7 +196,7 @@ class CommandOSDNS : public Command
 {
 	void DisplayPoolState(CommandSource &source)
 	{
-		if (dns_servers.empty())
+		if (dns_servers->empty())
 		{
 			source.Reply(_("There are no configured servers."));
 			return;
@@ -196,9 +204,9 @@ class CommandOSDNS : public Command
 
 		ListFormatter lf;
 		lf.AddColumn("Server").AddColumn("IP").AddColumn("Limit").AddColumn("State");
-		for (unsigned i = 0; i < dns_servers.size(); ++i)
+		for (unsigned i = 0; i < dns_servers->size(); ++i)
 		{
-			DNSServer *s = dns_servers[i];
+			DNSServer *s = dns_servers->at(i);
 			Server *srv = Server::Find(s->GetName());
 
 			ListFormatter::ListEntry entry;
@@ -228,14 +236,14 @@ class CommandOSDNS : public Command
 		std::vector<Anope::string> replies;
 		lf.Process(replies);
 
-		if (!zones.empty())
+		if (!zones->empty())
 		{
 			ListFormatter lf2;
 			lf2.AddColumn("Zone").AddColumn("Servers");
 
-			for (unsigned i = 0; i < zones.size(); ++i)
+			for (unsigned i = 0; i < zones->size(); ++i)
 			{
-				DNSZone *z = zones[i];
+				const DNSZone *z = zones->at(i);
 
 				ListFormatter::ListEntry entry;
 				entry["Zone"] = z->name;
@@ -297,7 +305,7 @@ class CommandOSDNS : public Command
 		}
 
 		source.Reply(_("Zone %s removed."), z->name.c_str());
-		delete z;
+		z->Destroy();
 	}
 
 	void AddServer(CommandSource &source, const std::vector<Anope::string> &params)
@@ -355,7 +363,7 @@ class CommandOSDNS : public Command
 			if (!z)
 			{
 				source.Reply(_("Zone %s does not exist."), zone.c_str());
-				delete s;
+				s->Destroy();
 				return;
 			}
 
@@ -411,7 +419,7 @@ class CommandOSDNS : public Command
 
 		Log(LOG_ADMIN, source, this) << "to delete server " << s->GetName();
 		source.Reply(_("Removed server %s."), s->GetName().c_str());
-		delete s;
+		s->Destroy();
 	}
 
 	void AddIP(CommandSource &source, const std::vector<Anope::string> &params)
@@ -630,7 +638,7 @@ class CommandOSDNS : public Command
 				" \n"
 				"The \2ADDIP\2 command associates an IP with a server.\n"
 				" \n"
-				"The \2POOL\2 and \2DEPOOL\2 commands actually add and remove servers to their given zones.\b"));
+				"The \2POOL\2 and \2DEPOOL\2 commands actually add and remove servers to their given zones."));
 		return true;
 	}
 };
@@ -657,14 +665,21 @@ class ModuleDNS : public Module
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 
 		this->OnReload();
+
+		for (unsigned j = 0; j < dns_servers->size(); ++j)
+		{
+			DNSServer *s = dns_servers->at(j);
+			if (s->Pooled() && Server::Find(s->GetName()))
+				s->SetActive(true);
+		}
 	}
 
 	~ModuleDNS()
 	{
-		for (unsigned i = 0; i < zones.size(); ++i)
-			delete zones[i];
-		for (unsigned i = 0; i < dns_servers.size(); ++i)
-			delete dns_servers[i];
+		for (unsigned i = zones->size(); i > 0; --i)
+			delete zones->at(i - 1);
+		for (unsigned i = dns_servers->size(); i > 0; --i)
+			delete dns_servers->at(i - 1);
 	}
 
 	void OnReload() anope_override
@@ -800,9 +815,9 @@ class ModuleDNS : public Module
 		if (packet->answers.size() == answer_size)
 		{
 			/* Default zone */
-			for (unsigned i = 0; i < dns_servers.size(); ++i)
+			for (unsigned i = 0; i < dns_servers->size(); ++i)
 			{
-				DNSServer *s = dns_servers[i];
+				DNSServer *s = dns_servers->at(i);
 				if (!s->Active())
 					continue;
 
@@ -831,9 +846,9 @@ class ModuleDNS : public Module
 			}
 
 			/* Something messed up, just return them all and hope one is available */
-			for (unsigned i = 0; i < dns_servers.size(); ++i)
+			for (unsigned i = 0; i < dns_servers->size(); ++i)
 			{
-				DNSServer *s = dns_servers[i];
+				DNSServer *s = dns_servers->at(i);
 
 				for (unsigned j = 0; j < s->GetIPs().size(); ++j)
 				{

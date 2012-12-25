@@ -188,52 +188,49 @@ class Serialize::Checker
 {
 	Anope::string name;
 	T obj;
+	mutable Serialize::Type *type;
+
+	inline void Check() const
+	{
+		if (!type)
+			type = Serialize::Type::Find(this->name);
+		if (type)
+			type->Check();
+	}
 
  public:
-	Checker(const Anope::string &n) : name(n) { }
+	Checker(const Anope::string &n) : name(n), type(NULL) { }
 
 	inline const T* operator->() const
 	{
-		static Serialize::Type *type = Serialize::Type::Find(this->name);
-		if (type)
-			type->Check();
+		this->Check();
 		return &this->obj;
 	}
 	inline T* operator->()
 	{
-		static Serialize::Type *type = Serialize::Type::Find(this->name);
-		if (type)
-			type->Check();
+		this->Check();
 		return &this->obj;
 	}
 
 	inline const T& operator*() const
 	{
-		static Serialize::Type *type = Serialize::Type::Find(this->name);
-		if (type)
-			type->Check();
+		this->Check();
 		return this->obj;
 	}
 	inline T& operator*()
 	{
-		static Serialize::Type *type = Serialize::Type::Find(this->name);
-		if (type)
-			type->Check();
+		this->Check();
 		return this->obj;
 	}
 
 	inline operator const T&() const
 	{
-		static Serialize::Type *type = Serialize::Type::Find(this->name);
-		if (type)
-			type->Check();
+		this->Check();
 		return this->obj;
 	}
 	inline operator T&()
 	{
-		static Serialize::Type *type = Serialize::Type::Find(this->name);
-		if (type)
-			type->Check();
+		this->Check();
 		return this->obj;
 	}
 };

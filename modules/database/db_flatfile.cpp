@@ -73,6 +73,7 @@ class DBFlatFile : public Module, public Pipe
 	/* Backup file names */
 	std::map<Anope::string, std::list<Anope::string> > backups;
 	bool use_fork;
+	bool loaded;
 
 	void BackupDatabase()
 	{
@@ -128,11 +129,11 @@ class DBFlatFile : public Module, public Pipe
 	}
 
  public:
-	DBFlatFile(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, DATABASE), last_day(0), use_fork(false)
+	DBFlatFile(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, DATABASE), last_day(0), use_fork(false), loaded(false)
 	{
 		this->SetAuthor("Anope");
 
-		Implementation i[] = { I_OnReload, I_OnLoadDatabase, I_OnSaveDatabase };
+		Implementation i[] = { I_OnReload, I_OnLoadDatabase, I_OnSaveDatabase, I_OnSerializeTypeCreate };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 
 		OnReload();
@@ -208,6 +209,7 @@ class DBFlatFile : public Module, public Pipe
 
 		fd.close();
 
+		loaded = true;
 		return EVENT_STOP;
 	}
 
@@ -305,6 +307,40 @@ class DBFlatFile : public Module, public Pipe
 		}
 
 		return EVENT_CONTINUE;
+	}
+
+	/* Load just one type. Done if a module is reloaded during runtime */
+	void OnSerializeTypeCreate(Serialize::Type *stype) anope_override
+	{
+		if (!loaded)
+			return;
+
+		Anope::string db_name;
+		if (stype->GetOwner())
+			db_name = Anope::DataDir + "/module_" + stype->GetOwner()->name + ".db";
+		else
+			db_name = Anope::DataDir + "/" + database_file;
+
+		std::fstream fd(db_name.c_str(), std::ios_base::in);
+		if (!fd.is_open())
+		{
+			Log(this) << "Unable to open " << db_name << " for reading!";
+			return;
+		}
+
+		LoadData ld;
+		ld.fs = &fd;
+
+		for (Anope::string buf; std::getline(fd, buf.str());)
+		{
+			if (buf == "OBJECT " + stype->GetName())
+			{
+				stype->Unserialize(NULL, ld);
+				ld.Reset();
+			}
+		}
+
+		fd.close();
 	}
 };
 

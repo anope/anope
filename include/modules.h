@@ -935,6 +935,7 @@ class CoreExport Module : public Extensible
 	virtual void OnSerializableConstruct(Serializable *) { }
 	virtual void OnSerializableDestruct(Serializable *) { }
 	virtual void OnSerializableUpdate(Serializable *) { }
+	virtual void OnSerializeTypeCreate(Serialize::Type *) { }
 
 	/** Called when a chanserv/set command is used
 	 * @param source The source of the command
@@ -1013,7 +1014,7 @@ enum Implementation
 		I_OnMLock, I_OnUnMLock, I_OnServerSync, I_OnUplinkSync, I_OnBotPrivmsg, I_OnPrivmsg, I_OnLog, I_OnDnsRequest,
 		I_OnMessage,
 
-		I_OnSerializeCheck, I_OnSerializableConstruct, I_OnSerializableDestruct, I_OnSerializableUpdate,
+		I_OnSerializeCheck, I_OnSerializableConstruct, I_OnSerializableDestruct, I_OnSerializableUpdate, I_OnSerializeTypeCreate,
 	I_END
 };
 

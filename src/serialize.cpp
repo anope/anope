@@ -35,57 +35,6 @@ void Serialize::RegisterTypes()
 		memo("Memo", Memo::Unserialize), xline("XLine", XLine::Unserialize);
 }
 
-/*stringstream::stringstream() : std::stringstream(), type(Serialize::DT_TEXT), _max(0)
-{
-}
-
-stringstream::stringstream(const stringstream &ss) : std::stringstream(ss.str()), type(Serialize::DT_TEXT), _max(0)
-{
-}
-
-Anope::string stringstream::astr() const
-{
-	return this->str();
-}
-
-std::istream &stringstream::operator>>(Anope::string &val)
-{
-	val = this->str();
-	return *this;
-}
-
-bool stringstream::operator==(const stringstream &other) const
-{
-	return this->astr() == other.astr();
-}
-
-bool stringstream::operator!=(const stringstream &other) const
-{
-	return !(*this == other);
-}
-
-stringstream &stringstream::SetType(Serialize::DataType t)
-{
-	this->type = t;
-	return *this;
-}
-
-DataType Serialize::stringstream::GetType() const
-{
-	return this->type;
-}
-
-stringstream &stringstream::SetMax(unsigned m)
-{
-	this->_max = m;
-	return *this;
-}
-
-unsigned stringstream::GetMax() const
-{
-	return this->_max;
-}*/
-
 Serializable::Serializable() : last_commit(NULL), last_commit_time(0), id(0)
 {
 	throw CoreException("Default Serializable constructor?");
@@ -175,6 +124,8 @@ Type::Type(const Anope::string &n, unserialize_func f, Module *o)  : name(n), un
 {
 	TypeOrder.push_back(this->name);
 	Types[this->name] = this;
+
+	FOREACH_MOD(I_OnSerializeTypeCreate, OnSerializeTypeCreate(this));
 }
 
 Type::~Type()

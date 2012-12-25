@@ -659,6 +659,14 @@ class ModuleDNS : public Module
 		this->OnReload();
 	}
 
+	~ModuleDNS()
+	{
+		for (unsigned i = 0; i < zones.size(); ++i)
+			delete zones[i];
+		for (unsigned i = 0; i < dns_servers.size(); ++i)
+			delete dns_servers[i];
+	}
+
 	void OnReload() anope_override
 	{
 		ConfigReader config;

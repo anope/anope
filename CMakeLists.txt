@@ -212,13 +212,13 @@ endif(CMAKE244_OR_BETTER)
 # If extra include directories were specified, tell cmake about them.
 if(EXTRA_INCLUDE)
   include_directories(${EXTRA_INCLUDE})
-  link_directories(${EXTRA_INCLUDE})
 endif(EXTRA_INCLUDE)
 
 # If extra library directories were specified, tell cmake about them.
 if(EXTRA_LIBS)
   foreach(LIB ${EXTRA_LIBS})
-    set(CXXFLAGS "${CXXFLAGS} -L${LIB}")
+    set(LDFLAGS "${LDFLAGS} -L${LIB}")
+    link_directories(${LIB})
   endforeach(LIB)
 endif(EXTRA_LIBS)
 

@@ -216,10 +216,7 @@ endif(EXTRA_INCLUDE)
 
 # If extra library directories were specified, tell cmake about them.
 if(EXTRA_LIBS)
-  foreach(LIB ${EXTRA_LIBS})
-    set(LDFLAGS "${LDFLAGS} -L${LIB}")
-    link_directories(${LIB})
-  endforeach(LIB)
+  link_directories(${EXTRA_LIBS})
 endif(EXTRA_LIBS)
 
 # Find gettext

@@ -765,6 +765,7 @@ class ModuleDNS : public Module
 			return;
 
 		DNSZone *zone = DNSZone::Find(q.name);
+		size_t answer_size = packet->answers.size();
 		if (zone)
 		{
 			for (std::set<Anope::string, ci::less>::iterator it = zone->servers.begin(), it_end = zone->servers.end(); it != it_end; ++it)
@@ -788,7 +789,7 @@ class ModuleDNS : public Module
 			}
 		}
 
-		if (packet->answers.empty())
+		if (packet->answers.size() == answer_size)
 		{
 			/* Default zone */
 			for (unsigned i = 0; i < dns_servers.size(); ++i)
@@ -812,7 +813,7 @@ class ModuleDNS : public Module
 			}
 		}
 
-		if (packet->answers.empty())
+		if (packet->answers.size() == answer_size)
 		{
 			static time_t last_warn = 0;
 			if (last_warn + 60 < Anope::CurTime)
@@ -840,7 +841,7 @@ class ModuleDNS : public Module
 				}
 			}
 
-			if (packet->answers.empty())
+			if (packet->answers.size() == answer_size)
 			{
 				Log(this) << "Error! There are no servers with any IPs. At all.";
 				/* Send back an empty answer anyway */

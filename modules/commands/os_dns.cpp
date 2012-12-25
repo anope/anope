@@ -678,7 +678,7 @@ class ModuleDNS : public Module
 		if (!Me->IsSynced() || this->readd_connected_servers)
 		{
 			DNSServer *dns = DNSServer::Find(s->GetName());
-			if (dns && dns->Pooled() && !dns->Active() && !dns->GetIPs().empty() && dns->GetLimit() < s->users)
+			if (dns && dns->Pooled() && !dns->Active() && !dns->GetIPs().empty())
 			{
 				dns->SetActive(true);
 				Log(this) << "Pooling server " << s->GetName();

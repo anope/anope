@@ -16,21 +16,21 @@
 
 class MyForbidService : public ForbidService
 {
-	std::vector<ForbidData *> forbidData;
+	Serialize::Checker<std::vector<ForbidData *> > forbid_data;
 
  public:
-	MyForbidService(Module *m) : ForbidService(m) { }
+	MyForbidService(Module *m) : ForbidService(m), forbid_data("ForbidData") { }
 
 	void AddForbid(ForbidData *d) anope_override
 	{
-		this->forbidData.push_back(d);
+		this->forbid_data->push_back(d);
 	}
 
 	void RemoveForbid(ForbidData *d) anope_override
 	{
-		std::vector<ForbidData *>::iterator it = std::find(this->forbidData.begin(), this->forbidData.end(), d);
-		if (it != this->forbidData.end())
-			this->forbidData.erase(it);
+		std::vector<ForbidData *>::iterator it = std::find(this->forbid_data->begin(), this->forbid_data->end(), d);
+		if (it != this->forbid_data->end())
+			this->forbid_data->erase(it);
 		d->Destroy();
 	}
 
@@ -49,9 +49,9 @@ class MyForbidService : public ForbidService
 
 	const std::vector<ForbidData *> &GetForbids() anope_override
 	{
-		for (unsigned i = this->forbidData.size(); i > 0; --i)
+		for (unsigned i = this->forbid_data->size(); i > 0; --i)
 		{
-			ForbidData *d = this->forbidData[i - 1];
+			ForbidData *d = this->forbid_data->at(i - 1);
 
 			if (d->expires && Anope::CurTime >= d->expires)
 			{
@@ -64,12 +64,12 @@ class MyForbidService : public ForbidService
 					ftype = "email";
 
 				Log(LOG_NORMAL, "expire/forbid") << "Expiring forbid for " << d->mask << " type " << ftype;
-				this->forbidData.erase(this->forbidData.begin() + i - 1);
+				this->forbid_data->erase(this->forbid_data->begin() + i - 1);
 				d->Destroy();
 			}
 		}
 
-		return this->forbidData;
+		return this->forbid_data;
 	}
 };
 
@@ -80,9 +80,9 @@ class CommandOSForbid : public Command
 	CommandOSForbid(Module *creator) : Command(creator, "operserv/forbid", 1, 5), fs("ForbidService", "forbid")
 	{
 		this->SetDesc(_("Forbid usage of nicknames, channels, and emails"));
-		this->SetSyntax(_("ADD {NICK|CHAN|EMAIL} [+\037expiry\037] \037entry\037\002 [\037reason\037]"));
-		this->SetSyntax(_("DEL {NICK|CHAN|EMAIL} \037entry\037"));
-		this->SetSyntax(_("LIST (NICK|CHAN|EMAIL)"));
+		this->SetSyntax(_("ADD {NICK|CHAN|EMAIL|REGISTER} [+\037expiry\037] \037entry\037\002 [\037reason\037]"));
+		this->SetSyntax(_("DEL {NICK|CHAN|EMAIL|REGISTER} \037entry\037"));
+		this->SetSyntax(_("LIST (NICK|CHAN|EMAIL|REGISTER)"));
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
@@ -100,6 +100,8 @@ class CommandOSForbid : public Command
 			ftype = FT_CHAN;
 		else if (subcommand.equals_ci("EMAIL"))
 			ftype = FT_EMAIL;
+		else if (subcommand.equals_ci("REGISTER"))
+			ftype = FT_REGISTER;
 
 		if (command.equals_ci("ADD") && params.size() > 3 && ftype != FT_NONE)
 		{
@@ -152,7 +154,7 @@ class CommandOSForbid : public Command
 				this->fs->AddForbid(d);
 
 			Log(LOG_ADMIN, source, this) << "to add a forbid on " << entry << " of type " << subcommand;
-			source.Reply(_("Added a%s forbid on %s to expire on %s"), ftype == FT_CHAN ? "n" : "", entry.c_str(), d->expires ? Anope::strftime(d->expires).c_str() : "never");
+			source.Reply(_("Added a forbid on %s to expire on %s"), entry.c_str(), d->expires ? Anope::strftime(d->expires).c_str() : "never");
 		}
 		else if (command.equals_ci("DEL") && params.size() > 2 && ftype != FT_NONE)
 		{
@@ -189,6 +191,8 @@ class CommandOSForbid : public Command
 						stype = "CHAN";
 					else if (d->type == FT_EMAIL)
 						stype = "EMAIL";
+					else if (d->type == FT_REGISTER)
+						stype = "REGISTER";
 					else
 						continue;
 
@@ -337,7 +341,14 @@ class OSForbid : public Module
 			return EVENT_CONTINUE;
 		else if (command->name == "nickserv/register" && params.size() > 1)
 		{
-			ForbidData *d = this->forbidService.FindForbid(params[1], FT_EMAIL);
+			ForbidData *d = this->forbidService.FindForbid(source.GetNick(), FT_REGISTER);
+			if (d != NULL)
+			{
+				source.Reply(NICK_CANNOT_BE_REGISTERED, source.GetNick().c_str());
+				return EVENT_STOP;
+			}
+
+			d = this->forbidService.FindForbid(params[1], FT_EMAIL);
 			if (d != NULL)
 			{
 				source.Reply("Your email address is not allowed, choose a different one.");
@@ -350,6 +361,15 @@ class OSForbid : public Module
 			if (d != NULL)
 			{
 				source.Reply("Your email address is not allowed, choose a different one.");
+				return EVENT_STOP;
+			}
+		}
+		else if (command->name == "chanserv/register" && !params.empty())
+		{
+			ForbidData *d = this->forbidService.FindForbid(params[0], FT_REGISTER);
+			if (d != NULL)
+			{
+				source.Reply(CHAN_X_INVALID, params[0].c_str());
 				return EVENT_STOP;
 			}
 		}

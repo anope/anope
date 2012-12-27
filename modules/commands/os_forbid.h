@@ -6,7 +6,8 @@ enum ForbidType
 	FT_NONE,
 	FT_NICK,
 	FT_CHAN,
-	FT_EMAIL
+	FT_EMAIL,
+	FT_REGISTER
 };
 
 struct ForbidData : Serializable

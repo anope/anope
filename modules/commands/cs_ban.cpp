@@ -13,28 +13,74 @@
 
 #include "module.h"
 
+static Module *me;
+
+class TempBan : public CallBack
+{
+ private:
+ 	Anope::string channel;
+	Anope::string mask;
+
+ public:
+	TempBan(time_t seconds, Channel *c, const Anope::string &banmask) : CallBack(me, seconds), channel(c->name), mask(banmask) { }
+
+	void Tick(time_t ctime) anope_override
+	{
+		Channel *c = Channel::Find(this->channel);
+		if (c)
+			c->RemoveMode(NULL, CMODE_BAN, this->mask);
+	}
+};
+
 class CommandCSBan : public Command
 {
  public:
-	CommandCSBan(Module *creator) : Command(creator, "chanserv/ban", 2, 3)
+	CommandCSBan(Module *creator) : Command(creator, "chanserv/ban", 2, 4)
 	{
-		this->SetDesc(_("Bans a selected nick on a channel"));
-		this->SetSyntax(_("\037channel\037 \037nick\037 [\037reason\037]"));
-		this->SetSyntax(_("\037channel\037 \037mask\037 [\037reason\037]"));
+		this->SetDesc(_("Bans a given nick or mask on a channel"));
+		this->SetSyntax(_("\037channel\037 [+\037expiry\037] \037nick\037 [\037reason\037]"));
+		this->SetSyntax(_("\037channel\037 [+\037expiry\037] \037mask\037 [\037reason\037]"));
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		const Anope::string &chan = params[0];
-		const Anope::string &target = params[1];
-		Anope::string reason = params.size() > 2 ? params[2] : "Requested";
 
-		ChannelInfo *ci = ChannelInfo::Find(params[0]);
+		ChannelInfo *ci = ChannelInfo::Find(chan);
 		if (ci == NULL)
 		{
-			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
+			source.Reply(CHAN_X_NOT_REGISTERED, chan.c_str());
 			return;
 		}
+
+		Anope::string expiry, target, reason;
+		time_t ban_time;
+		if (params[1][0] == '+')
+		{
+			ban_time = Anope::DoTime(params[1]);
+			if (params.size() < 3)
+			{
+				this->SendSyntax(source);
+				return;
+			}
+			target = params[2];
+			reason = "Requested";
+			if (params.size() > 3)
+				reason = params[3];
+		}
+		else
+		{
+			ban_time = 0;
+			target = params[1];
+			reason = "Requested";
+			if (params.size() > 2)
+				reason = params[2];
+			if (params.size() > 3)
+				reason += " " + params[3];
+		}
+
+		if (reason.length() > Config->CSReasonMax)
+			reason = reason.substr(0, Config->CSReasonMax);
 
 		Channel *c = ci->c;
 		User *u = source.GetUser();
@@ -42,23 +88,20 @@ class CommandCSBan : public Command
 
 		AccessGroup u_access = source.AccessFor(ci);
 
-		if (reason.length() > Config->CSReasonMax)
-			reason = reason.substr(0, Config->CSReasonMax);
-
 		if (!c)
 			source.Reply(CHAN_X_NOT_IN_USE, chan.c_str());
 		else if (!u_access.HasPriv("BAN"))
 			source.Reply(ACCESS_DENIED);
-		/*
-		 * Dont ban/kick the user on channels where he is excepted
-		 * to prevent services <-> server wars.
-		 */
 		else if (u2)
 		{
 			AccessGroup u2_access = ci->AccessFor(u2);
 
 			if (u != u2 && ci->HasFlag(CI_PEACE) && u2_access >= u_access)
 				source.Reply(ACCESS_DENIED);
+			/*
+			 * Dont ban/kick the user on channels where he is excepted
+			 * to prevent services <-> server wars.
+			 */
 			else if (ci->c->MatchesList(u2, CMODE_EXCEPT))
 				source.Reply(CHAN_EXCEPTED, u2->nick.c_str(), ci->name.c_str());
 			else if (u2->IsProtected())
@@ -70,7 +113,15 @@ class CommandCSBan : public Command
 				// XXX need a way to detect if someone is overriding
 				Log(LOG_COMMAND, source, this, ci) << "for " << mask;
 
-				c->SetMode(NULL, CMODE_BAN, mask);
+				if (!c->HasMode(CMODE_BAN, mask))
+				{
+					c->SetMode(NULL, CMODE_BAN, mask);
+					if (ban_time)
+					{
+						new TempBan(ban_time, c, mask);
+						source.Reply(_("Ban on \2%s\2 expires in %s."), mask.c_str(), Anope::Duration(ban_time, source.GetAccount()).c_str());
+					}
+				}
 
 				/* We still allow host banning while not allowing to kick */
 				if (!c->FindUser(u2))
@@ -86,7 +137,15 @@ class CommandCSBan : public Command
 		{
 			Log(LOG_COMMAND, source, this, ci) << "for " << target;
 
-			c->SetMode(NULL, CMODE_BAN, target);
+			if (!c->HasMode(CMODE_BAN, target))
+			{
+				c->SetMode(NULL, CMODE_BAN, target);
+				if (ban_time)
+				{
+					new TempBan(ban_time, c, target);
+					source.Reply(_("Ban on \2%s\2 expires in %s."), target.c_str(), Anope::Duration(ban_time, source.GetAccount()).c_str());
+				}
+			}
 
 			int matched = 0, kicked = 0;
 			for (CUserList::iterator it = c->users.begin(), it_end = c->users.end(); it != it_end;)
@@ -127,7 +186,9 @@ class CommandCSBan : public Command
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Bans a selected nick on a channel.\n"
+		source.Reply(_("Bans a given nick or mask on a channel. An optional expiry may\n"
+				"be given to cause services to remove the ban after a set amount\n"
+				"of time.\n"
 				" \n"
 				"By default, limited to AOPs or those with level 5 access\n"
 				"and above on the channel. Channel founders may ban masks."));
@@ -143,7 +204,7 @@ class CSBan : public Module
 	CSBan(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE), commandcsban(this)
 	{
 		this->SetAuthor("Anope");
-
+		me = this;
 	}
 };
 

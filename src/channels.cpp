@@ -346,7 +346,7 @@ void Channel::SetModeInternal(MessageSource &setter, ChannelMode *cm, const Anop
 
 	if (param.empty() && cm->type != MODE_REGULAR)
 	{
-		Log() << "Channel::SetModeInternal() mode " << cm->mchar << " for " << this->name << " with a paramater, but its not a param mode";
+		Log() << "Channel::SetModeInternal() mode " << cm->mchar << " for " << this->name << " with no paramater, but is a param mode";
 		return;
 	}
 
@@ -635,7 +635,10 @@ void Channel::SetModesInternal(MessageSource &source, const Anope::string &mode,
 	if (!ts)
 		;
 	else if (ts > this->creation_time)
+	{
+		Log(LOG_DEBUG) << "Dropping mode " << mode << " on " << this->name << ", " << ts << " > " << this->creation_time;
 		return;
+	}
 	else if (ts < this->creation_time)
 	{
 		Log(LOG_DEBUG) << "Changing TS of " << this->name << " from " << this->creation_time << " to " << ts;
@@ -684,9 +687,9 @@ void Channel::SetModesInternal(MessageSource &source, const Anope::string &mode,
 		if (cm->type == MODE_REGULAR)
 		{
 			if (add)
-				this->SetModeInternal(source, cm, "", enforce_mlock);
+				this->SetModeInternal(source, cm, "", false);
 			else
-				this->RemoveModeInternal(source, cm, "", enforce_mlock);
+				this->RemoveModeInternal(source, cm, "", false);
 			continue;
 		}
 		else if (cm->type == MODE_PARAM)
@@ -695,7 +698,7 @@ void Channel::SetModesInternal(MessageSource &source, const Anope::string &mode,
 
 			if (!add && cmp->minus_no_arg)
 			{
-				this->RemoveModeInternal(source, cm, "", enforce_mlock);
+				this->RemoveModeInternal(source, cm, "", false);
 				continue;
 			}
 		}
@@ -709,9 +712,9 @@ void Channel::SetModesInternal(MessageSource &source, const Anope::string &mode,
 				paramstring += " " + token;
 
 			if (add)
-				this->SetModeInternal(source, cm, token, enforce_mlock);
+				this->SetModeInternal(source, cm, token, false);
 			else
-				this->RemoveModeInternal(source, cm, token, enforce_mlock);
+				this->RemoveModeInternal(source, cm, token, false);
 		}
 		else
 			Log() << "warning: Channel::SetModesInternal() recieved more modes requiring params than params, modes: " << mode;
@@ -724,6 +727,9 @@ void Channel::SetModesInternal(MessageSource &source, const Anope::string &mode,
 		Log(setter, this, "mode") << modestring << paramstring;
 	else
 		Log(LOG_DEBUG) << source.GetName() << " is setting " << this->name << " to " << modestring << paramstring;
+	
+	if (enforce_mlock)
+		this->CheckModes();
 }
 
 bool Channel::MatchesList(User *u, ChannelModeName mode)

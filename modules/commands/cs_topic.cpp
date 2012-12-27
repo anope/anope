@@ -9,59 +9,100 @@
  * Based on the original code of Services by Andy Church.
  */
 
-/*************************************************************************/
-
 #include "module.h"
 
 class CommandCSTopic : public Command
 {
+	void Lock(CommandSource &source, ChannelInfo *ci, const std::vector<Anope::string> &params)
+	{
+		ci->SetFlag(CI_TOPICLOCK);
+		source.Reply(_("Topic lock option for %s is now \002on\002."), ci->name.c_str());
+	}
+
+	void Unlock(CommandSource &source, ChannelInfo *ci, const std::vector<Anope::string> &params)
+	{
+		ci->UnsetFlag(CI_TOPICLOCK);
+		source.Reply(_("Topic lock option for %s is now \002off\002."), ci->name.c_str());
+	}
+
+	void Set(CommandSource &source, ChannelInfo *ci, const std::vector<Anope::string> &params)
+	{
+		const Anope::string &topic = params.size() > 2 ? params[2] : "";
+
+		bool has_topiclock = ci->HasFlag(CI_TOPICLOCK);
+		ci->UnsetFlag(CI_TOPICLOCK);
+		ci->c->ChangeTopic(source.GetNick(), topic, Anope::CurTime);
+		if (has_topiclock)
+			ci->SetFlag(CI_TOPICLOCK);
+	
+		bool override = !source.AccessFor(ci).HasPriv("TOPIC");
+		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << (!topic.empty() ? "to change the topic to: " : "to unset the topic") << (!topic.empty() ? topic : "");
+	}
+
+	void Append(CommandSource &source, ChannelInfo *ci, const std::vector<Anope::string> &params)
+	{
+		const Anope::string &topic = params[2];
+
+		Anope::string new_topic;
+		if (!ci->c->topic.empty())
+		{
+			new_topic = ci->c->topic + " " + topic;
+			ci->last_topic.clear();
+		}
+		else
+			new_topic = topic;
+
+		std::vector<Anope::string> new_params;
+		new_params.push_back("SET");
+		new_params.push_back(ci->name);
+		new_params.push_back(new_topic);
+
+		this->Set(source, ci, new_params);
+	}
+
  public:
-	CommandCSTopic(Module *creator) : Command(creator, "chanserv/topic", 1, 2)
+	CommandCSTopic(Module *creator) : Command(creator, "chanserv/topic", 2, 3)
 	{
 		this->SetDesc(_("Manipulate the topic of the specified channel"));
-		this->SetSyntax(_("\037channel\037 [\037topic\037]"));
+		this->SetSyntax(_("\037channel\037 SET [\037topic\037]"));
+		this->SetSyntax(_("\037channel\037 APPEND \037topic\037"));
+		this->SetSyntax(_("\037channel\037 [UNLOCK|LOCK]"));
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		const Anope::string &topic = params.size() > 1 ? params[1] : "";
-
+		const Anope::string &subcmd = params[1];
 
 		ChannelInfo *ci = ChannelInfo::Find(params[0]);
 		if (ci == NULL)
-		{
 			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
-			return;
-		}
-
-		if (!ci->c)
-			source.Reply(CHAN_X_NOT_IN_USE, ci->name.c_str());
 		else if (!source.AccessFor(ci).HasPriv("TOPIC") && !source.HasCommand("chanserv/topic"))
 			source.Reply(ACCESS_DENIED);
+		else if (subcmd.equals_ci("LOCK"))
+			this->Lock(source, ci, params);
+		else if (subcmd.equals_ci("UNLOCK"))
+			this->Unlock(source, ci, params);
+		else if (!ci->c)
+			source.Reply(CHAN_X_NOT_IN_USE, ci->name.c_str());
+		else if (subcmd.equals_ci("SET"))
+			this->Set(source, ci, params);
+		else if (subcmd.equals_ci("APPEND") && params.size() > 2)
+			this->Append(source, ci, params);
 		else
-		{
-			bool has_topiclock = ci->HasFlag(CI_TOPICLOCK);
-			ci->UnsetFlag(CI_TOPICLOCK);
-			ci->c->ChangeTopic(source.GetNick(), topic, Anope::CurTime);
-			if (has_topiclock)
-				ci->SetFlag(CI_TOPICLOCK);
-	
-			bool override = !source.AccessFor(ci).HasPriv("TOPIC");
-			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << (!topic.empty() ? "to change the topic to: " : "to unset the topic") << (!topic.empty() ? topic : "");
-		}
-		return;
+			this->SendSyntax(source);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Causes %s to set the channel topic to the one\n"
-				"specified. If \002topic\002 is not given, then an empty topic\n"
-				"is set. This command is most useful in conjunction\n"
-				"with topic lock.\n"
-				"By default, limited to those with founder access on the\n"
-				"channel."), source.service->nick.c_str());
+		source.Reply(_("Allows manipulating the topic of the specified channel.\n"
+				"The \2SET\2 command changes the topic of the channel to the given topic\n"
+				"or unsets the topic if no topic is given. The \2APPEND\2 command appends\n"
+				"the given topic to the existing topic.\n"
+				" \n"
+				"\2LOCK\2 and \2UNLOCK\2 may be used to enable and disable topic lock. When\n"
+				"topic lock is set, the channel topic will be unchangable except via this command."));
 		return true;
 	}
 };

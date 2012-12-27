@@ -489,6 +489,7 @@ struct IRCDMessageNJoin : IRCDMessage
 				Log(LOG_DEBUG) << "NJOIN for nonexistant user " << buf << " on " << params[0];
 				continue;
 			}
+			users.push_back(sju);
 		} 
 
 		Message::Join::SJoin(source, params[0], 0, "", users);

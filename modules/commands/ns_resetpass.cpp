@@ -29,7 +29,7 @@ class CommandNSResetPass : public Command
 	{
 		const NickAlias *na;
 
-		if (Config->RestrictMail && source.HasCommand("nickserv/resetpass"))
+		if (Config->RestrictMail && !source.HasCommand("nickserv/resetpass"))
 			source.Reply(ACCESS_DENIED);
 		else if (!(na = NickAlias::Find(params[0])))
 			source.Reply(NICK_X_NOT_REGISTERED, params[0].c_str());
@@ -76,6 +76,12 @@ class NSResetPass : public Module
 
 
 		ModuleManager::Attach(I_OnPreCommand, this);
+	}
+
+	~NSResetPass()
+	{
+		for (nickcore_map::const_iterator it = NickCoreList->begin(), it_end = NickCoreList->end(); it != it_end; ++it)
+			it->second->Shrink("ns_resetpass");
 	}
 
 	EventReturn OnPreCommand(CommandSource &source, Command *command, std::vector<Anope::string> &params) anope_override

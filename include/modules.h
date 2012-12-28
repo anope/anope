@@ -642,9 +642,11 @@ class CoreExport Module : public Extensible
 	 * @param u The user
 	 * @param ci The channel
 	 * @param kick Set to true to kick
-	 * @return EVENT_ALLOW to stop processing immediatly
+	 * @param mask The mask to ban, if any
+	 * @param reason The reason for the kick
+	 * @return EVENT_STOP to prevent the user from joining by kicking/banning the user
 	 */
-	virtual EventReturn OnCheckKick(User *u, ChannelInfo *ci, bool &kick) { return EVENT_CONTINUE; }
+	virtual EventReturn OnCheckKick(User *u, ChannelInfo *ci, Anope::string &mask, Anope::string &reason) { return EVENT_CONTINUE; }
 
 	/** Called when a user requests info for a channel
 	 * @param source The user requesting info

@@ -216,7 +216,7 @@ class CSSuspend : public Module
 	{
 		this->SetAuthor("Anope");
 
-		Implementation i[] = { I_OnPreChanExpire };
+		Implementation i[] = { I_OnPreChanExpire, I_OnCheckKick };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 	}
 
@@ -249,6 +249,15 @@ class CSSuspend : public Module
 
 			Log(LOG_NORMAL, "expire", ChanServ) << "Expiring suspend for " << ci->name;
 		}
+	}
+
+	EventReturn OnCheckKick(User *u, ChannelInfo *ci, Anope::string &mask, Anope::string &reason) anope_override
+	{
+		if (u->HasMode(UMODE_OPER) || !ci->HasFlag(CI_SUSPENDED))
+			return EVENT_CONTINUE;
+
+		reason = Language::Translate(u, _("This channel may not be used."));
+		return EVENT_STOP;
 	}
 };
 

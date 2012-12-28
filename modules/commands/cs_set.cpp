@@ -1166,7 +1166,7 @@ class CSSet : public Module
 	{
 		this->SetAuthor("Anope");
 
-		Implementation i[] = { I_OnReload, I_OnChanRegistered };
+		Implementation i[] = { I_OnReload, I_OnChanRegistered, I_OnCheckKick };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 
 		this->OnReload();
@@ -1182,6 +1182,17 @@ class CSSet : public Module
 	{
 		if (CSDefChanstats)
 			ci->SetFlag(CI_STATS);
+	}
+
+	EventReturn OnCheckKick(User *u, ChannelInfo *ci, Anope::string &mask, Anope::string &reason) anope_override
+	{
+		if (!ci->HasFlag(CI_RESTRICTED) || ci->c->MatchesList(u, CMODE_EXCEPT))
+			return EVENT_CONTINUE;
+
+		if (ci->AccessFor(u).empty() && (!ci->GetFounder() || u->Account() != ci->GetFounder()))
+			return EVENT_STOP;
+
+		return EVENT_CONTINUE;
 	}
 };
 

@@ -945,69 +945,19 @@ bool ChannelInfo::CheckKick(User *user)
 	if (user->IsProtected())
 		return false;
 
-	bool set_modes = false, do_kick = false;
+	Anope::string mask, reason;
 
 	EventReturn MOD_RESULT;
-	FOREACH_RESULT(I_OnCheckKick, OnCheckKick(user, this, do_kick));
-	if (MOD_RESULT == EVENT_ALLOW)
+	FOREACH_RESULT(I_OnCheckKick, OnCheckKick(user, this, mask, reason));
+	if (MOD_RESULT != EVENT_STOP)
 		return false;
-
-	Anope::string mask, reason;
-	if (!user->HasMode(UMODE_OPER) && this->HasFlag(CI_SUSPENDED))
-	{
+	
+	if (mask.empty())
 		mask = this->GetIdealBan(user);
-		reason = Language::Translate(user, _("This channel may not be used."));
-		set_modes = true;
-		do_kick = true;
-	}
-
-	if (!do_kick && !this->c->MatchesList(user, CMODE_EXCEPT))
-		return false;
-
-	const NickCore *nc = user->Account() || user->IsRecognized() ? user->Account() : NULL;
-
-	if (!do_kick)
-	{
-		for (unsigned j = 0, end = this->GetAkickCount(); j < end; ++j)
-		{
-			AutoKick *autokick = this->GetAkick(j);
-
-			if (autokick->HasFlag(AK_ISNICK))
-			{
-				if (autokick->nc == nc)
-					do_kick = true;
-			}
-			else
-			{
-				Entry akick_mask(CMODE_BEGIN, autokick->mask);
-				if (akick_mask.Matches(user))
-					do_kick = true;
-			}
-			if (do_kick)
-			{
-				Log(LOG_DEBUG_2) << user->nick << " matched akick " << (autokick->HasFlag(AK_ISNICK) ? autokick->nc->display : autokick->mask);
-				autokick->last_used = Anope::CurTime;
-				if (autokick->HasFlag(AK_ISNICK))
-					mask = this->GetIdealBan(user);
-				else
-					mask = autokick->mask;
-				reason = autokick->reason.empty() ? Config->CSAutokickReason : autokick->reason;
-				break;
-			}
-		}
-	}
-
-	if (!do_kick && this->HasFlag(CI_RESTRICTED) && this->AccessFor(user).empty() && (!this->founder || user->Account() != this->founder))
-	{
-		do_kick = true;
-		mask = this->GetIdealBan(user);
+	if (reason.empty())
 		reason = Language::Translate(user->Account(), CHAN_NOT_ALLOWED_TO_JOIN);
-	}
 
-	if (!do_kick)
-		return false;
-
-	Log(LOG_DEBUG) << "Autokicking "<< user->GetMask() <<  " from " << this->name;
+	Log(LOG_DEBUG) << "Autokicking " << user->nick << " (" << mask << ") from " << this->name;
 
 	/* If the channel isn't syncing and doesn't have any users, join ChanServ
 	 * Note that the user AND POSSIBLY the botserv bot exist here
@@ -1016,14 +966,11 @@ bool ChannelInfo::CheckKick(User *user)
 	 */
 	if (this->c->users.size() == (this->bi && this->c->FindUser(this->bi) ? 2 : 1) && !this->c->HasFlag(CH_INHABIT) && !this->c->HasFlag(CH_SYNCING))
 	{
-		/* Set +si to prevent rejoin */
-		if (set_modes)
-		{
-			c->SetMode(NULL, CMODE_NOEXTERNAL);
-			c->SetMode(NULL, CMODE_TOPIC);
-			c->SetMode(NULL, CMODE_SECRET);
-			c->SetMode(NULL, CMODE_INVITE);
-		}
+		/* Set +ntsi to prevent rejoin */
+		c->SetMode(NULL, CMODE_NOEXTERNAL);
+		c->SetMode(NULL, CMODE_TOPIC);
+		c->SetMode(NULL, CMODE_SECRET);
+		c->SetMode(NULL, CMODE_INVITE);
 
 		/* Join ChanServ and set a timer for this channel to part ChanServ later */
 		this->c->Hold();

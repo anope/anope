@@ -502,6 +502,44 @@ class CSAKick : public Module
 	{
 		this->SetAuthor("Anope");
 
+		Implementation i[] = { I_OnCheckKick };
+		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
+	}
+
+	EventReturn OnCheckKick(User *u, ChannelInfo *ci, Anope::string &mask, Anope::string &reason) anope_override
+	{
+		if (ci->c->MatchesList(u, CMODE_EXCEPT))
+			return EVENT_CONTINUE;
+
+		for (unsigned j = 0, end = ci->GetAkickCount(); j < end; ++j)
+		{
+			AutoKick *autokick = ci->GetAkick(j);
+			bool kick = false;
+
+			if (autokick->HasFlag(AK_ISNICK))
+			{
+				if (autokick->nc == u->Account())
+					kick = true;
+			}
+			else
+			{
+				Entry akick_mask(CMODE_BEGIN, autokick->mask);
+				if (akick_mask.Matches(u))
+					kick = true;
+			}
+
+			if (kick)
+			{
+				Log(LOG_DEBUG_2) << u->nick << " matched akick " << (autokick->HasFlag(AK_ISNICK) ? autokick->nc->display : autokick->mask);
+				autokick->last_used = Anope::CurTime;
+				if (!autokick->HasFlag(AK_ISNICK))
+					mask = autokick->mask;
+				reason = autokick->reason.empty() ? Config->CSAutokickReason : autokick->reason;
+				return EVENT_STOP;
+			}
+		}
+
+		return EVENT_CONTINUE;
 	}
 };
 

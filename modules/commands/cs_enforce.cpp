@@ -62,9 +62,9 @@ class CommandCSEnforce : public Command
 			hadsecureops = true;
 		}
 
-		for (CUserList::iterator it = c->users.begin(), it_end = c->users.end(); it != it_end; ++it)
+		for (Channel::ChanUserList::iterator it = c->users.begin(), it_end = c->users.end(); it != it_end; ++it)
 		{
-			UserContainer *uc = *it;
+			ChanUserContainer *uc = *it;
 
 			c->SetCorrectModes(uc->user, false, false);
 		}
@@ -82,9 +82,9 @@ class CommandCSEnforce : public Command
 		Log(LOG_COMMAND, source, this) << "to enforce restricted";
 
 		std::vector<User *> users;
-		for (CUserList::iterator it = c->users.begin(), it_end = c->users.end(); it != it_end; ++it)
+		for (Channel::ChanUserList::iterator it = c->users.begin(), it_end = c->users.end(); it != it_end; ++it)
 		{
-			UserContainer *uc = *it;
+			ChanUserContainer *uc = *it;
 			User *user = uc->user;
 
 			if (ci->AccessFor(user).empty())
@@ -112,9 +112,9 @@ class CommandCSEnforce : public Command
 		Log(LOG_COMMAND, source, this) << "to enforce registered only";
 
 		std::vector<User *> users;
-		for (CUserList::iterator it = c->users.begin(), it_end = c->users.end(); it != it_end; ++it)
+		for (Channel::ChanUserList::iterator it = c->users.begin(), it_end = c->users.end(); it != it_end; ++it)
 		{
-			UserContainer *uc = *it;
+			ChanUserContainer *uc = *it;
 			User *user = uc->user;
 
 			if (!user->IsIdentified())

@@ -29,18 +29,6 @@ extern CoreExport int OperCount;
 extern CoreExport unsigned MaxUserCount;
 extern CoreExport time_t MaxUserTime;
 
-/* One per channel per user. Channel and status */
-struct ChannelContainer
-{
-	Channel *chan;
-	ChannelStatus *status;
-
-	ChannelContainer(Channel *c) : chan(c) { }
-	virtual ~ChannelContainer() { }
-};
-
-typedef std::list<ChannelContainer *> UChannelList;
-
 /* Online user and channel data. */
 class CoreExport User : public virtual Base, public Extensible, public CommandReply
 {
@@ -89,7 +77,8 @@ class CoreExport User : public virtual Base, public Extensible, public CommandRe
 	bool super_admin;
 
 	/* Channels the user is in */
-	UChannelList chans;
+	typedef std::list<ChanUserContainer *> ChanUserList;
+	ChanUserList chans;
 
 	/* Last time this user sent a memo command used */
 	time_t lastmemosend;
@@ -319,7 +308,7 @@ class CoreExport User : public virtual Base, public Extensible, public CommandRe
 	 * @param c The channel
 	 * @return The channel container, or NULL
 	 */
-	ChannelContainer *FindChannel(const Channel *c) const;
+	ChanUserContainer *FindChannel(const Channel *c) const;
 
 	/** Check if the user is protected from kicks and negative mode changes
 	 * @return true or false

@@ -172,10 +172,10 @@ class MyXMLRPCEvent : public XMLRPCEvent
 				request.reply("invite" + stringify(++count), iface->Sanitize(its.first->second));
 
 			Anope::string users;
-			for (CUserList::const_iterator it = c->users.begin(); it != c->users.end(); ++it)
+			for (Channel::ChanUserList::const_iterator it = c->users.begin(); it != c->users.end(); ++it)
 			{
-				UserContainer *uc = *it;
-				users += uc->status->BuildModePrefixList() + uc->user->nick + " ";
+				ChanUserContainer *uc = *it;
+				users += uc->status.BuildModePrefixList() + uc->user->nick + " ";
 			}
 			if (!users.empty())
 			{
@@ -224,10 +224,10 @@ class MyXMLRPCEvent : public XMLRPCEvent
 			}
 
 			Anope::string channels;
-			for (UChannelList::const_iterator it = u->chans.begin(); it != u->chans.end(); ++it)
+			for (User::ChanUserList::const_iterator it = u->chans.begin(); it != u->chans.end(); ++it)
 			{
-				ChannelContainer *cc = *it;
-				channels += cc->status->BuildModePrefixList() + cc->chan->name + " ";
+				ChanUserContainer *cc = *it;
+				channels += cc->status.BuildModePrefixList() + cc->chan->name + " ";
 			}
 			if (!channels.empty())
 			{

@@ -247,9 +247,9 @@ class NickServCore : public Module
 		}
 
 		if (Config->NSModeOnID)
-			for (UChannelList::iterator it = u->chans.begin(), it_end = u->chans.end(); it != it_end; ++it)
+			for (User::ChanUserList::iterator it = u->chans.begin(), it_end = u->chans.end(); it != it_end; ++it)
 			{
-				ChannelContainer *cc = *it;
+				ChanUserContainer *cc = *it;
 				Channel *c = cc->chan;
 				if (c)
 					c->SetCorrectModes(u, true, true);
@@ -286,9 +286,9 @@ class NickServCore : public Module
 
 	void OnNickUpdate(User *u) anope_override
 	{
-		for (UChannelList::iterator it = u->chans.begin(), it_end = u->chans.end(); it != it_end; ++it)
+		for (User::ChanUserList::iterator it = u->chans.begin(), it_end = u->chans.end(); it != it_end; ++it)
 		{
-			ChannelContainer *cc = *it;
+			ChanUserContainer *cc = *it;
 			Channel *c = cc->chan;
 			if (c)
 				c->SetCorrectModes(u, true, true);

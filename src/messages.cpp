@@ -62,16 +62,15 @@ void Join::Run(MessageSource &source, const std::vector<Anope::string> &params)
 		/* Special case for /join 0 */
 		if (channel == "0")
 		{
-			for (UChannelList::iterator it = user->chans.begin(), it_end = user->chans.end(); it != it_end; )
+			for (User::ChanUserList::iterator it = user->chans.begin(), it_end = user->chans.end(); it != it_end; )
 			{
-				ChannelContainer *cc = *it++;
+				ChanUserContainer *cc = *it++;
 
 				Anope::string channame = cc->chan->name;
 				FOREACH_MOD(I_OnPrePartChannel, OnPrePartChannel(user, cc->chan));
 				cc->chan->DeleteUser(user);
 				FOREACH_MOD(I_OnPartChannel, OnPartChannel(user, Channel::Find(channame), channame, ""));
 			}
-			user->chans.clear();
 			continue;
 		}
 
@@ -119,10 +118,10 @@ void Join::SJoin(MessageSource &source, const Anope::string &chan, time_t ts, co
 		FOREACH_RESULT(I_OnPreJoinChannel, OnPreJoinChannel(u, c));
 
 		/* Add the user to the channel */
-		UserContainer *cc = c->JoinUser(u);
+		ChanUserContainer *cc = c->JoinUser(u);
 
 		/* Update their status internally on the channel */
-		*cc->status = status;
+		cc->status = status;
 
 		/* Set whatever modes the user should have, and remove any that
 		 * they aren't allowed to have (secureops etc).
@@ -190,8 +189,8 @@ void Kill::Run(MessageSource &source, const std::vector<Anope::string> &params)
 		IRCD->SendClientIntroduction(bi);
 		bi->introduced = true;
 
-		for (UChannelList::const_iterator cit = bi->chans.begin(), cit_end = bi->chans.end(); cit != cit_end; ++cit)
-			IRCD->SendJoin(bi, (*cit)->chan, (*cit)->status);
+		for (User::ChanUserList::const_iterator cit = bi->chans.begin(), cit_end = bi->chans.end(); cit != cit_end; ++cit)
+			IRCD->SendJoin(bi, (*cit)->chan, &(*cit)->status);
 	}
 	else
 		u->KillInternal(source.GetSource(), params[1]);

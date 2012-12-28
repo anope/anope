@@ -164,9 +164,9 @@ class UnrealIRCdProto : public IRCDProto
 			/* If the user is internally on the channel with flags, kill them so that
 			 * the stacker will allow this.
 			 */
-			UserContainer *uc = c->FindUser(user);
+			ChanUserContainer *uc = c->FindUser(user);
 			if (uc != NULL)
-				uc->status->ClearFlags();
+				uc->status.ClearFlags();
 
 			BotInfo *setter = BotInfo::Find(user->nick);
 			for (unsigned i = 0; i < ModeManager::ChannelModes.size(); ++i)
@@ -400,9 +400,9 @@ class UnrealExtBan : public ChannelModeList
 			Channel *c = Channel::Find(channel);
 			if (c != NULL)
 			{
-				UserContainer *uc = c->FindUser(u);
+				ChanUserContainer *uc = c->FindUser(u);
 				if (uc != NULL)
-					if (cm == NULL || uc->status->HasFlag(cm->name))
+					if (cm == NULL || uc->status.HasFlag(cm->name))
 						return true;
 			}
 		}

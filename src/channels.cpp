@@ -72,12 +72,12 @@ void Channel::Reset()
 {
 	this->modes.clear();
 
-	for (CUserList::const_iterator it = this->users.begin(), it_end = this->users.end(); it != it_end; ++it)
+	for (ChanUserList::const_iterator it = this->users.begin(), it_end = this->users.end(); it != it_end; ++it)
 	{
-		UserContainer *uc = *it;
+		ChanUserContainer *uc = *it;
 
-		ChannelStatus flags = *uc->status;
-		uc->status->ClearFlags();
+		ChannelStatus flags = uc->status;
+		uc->status.ClearFlags();
 
 		if (BotInfo::Find(uc->user->nick))
 		{
@@ -93,7 +93,7 @@ void Channel::Reset()
 
 	this->CheckModes();
 
-	for (CUserList::const_iterator it = this->users.begin(), it_end = this->users.end(); it != it_end; ++it)
+	for (ChanUserList::const_iterator it = this->users.begin(), it_end = this->users.end(); it != it_end; ++it)
 		this->SetCorrectModes((*it)->user, true, false);
 	
 	if (this->ci && Me && Me->IsSynced())
@@ -183,18 +183,13 @@ void Channel::CheckModes()
 		}
 }
 
-UserContainer* Channel::JoinUser(User *user)
+ChanUserContainer* Channel::JoinUser(User *user)
 {
 	Log(user, this, "join");
 
-	ChannelStatus *status = new ChannelStatus();
-	ChannelContainer *cc = new ChannelContainer(this);
-	cc->status = status;
-	user->chans.push_back(cc);
-
-	UserContainer *uc = new UserContainer(user);
-	uc->status = status;
-	this->users.push_back(uc);
+	ChanUserContainer *cuc = new ChanUserContainer(user, this);
+	user->chans.push_back(cuc);
+	this->users.push_back(cuc);
 
 	if (this->ci && this->ci->HasFlag(CI_PERSIST) && this->creation_time > this->ci->time_registered)
 	{
@@ -204,7 +199,7 @@ UserContainer* Channel::JoinUser(User *user)
 		this->Reset();
 	}
 
-	return uc;
+	return cuc;
 }
 
 void Channel::DeleteUser(User *user)
@@ -212,27 +207,28 @@ void Channel::DeleteUser(User *user)
 	Log(user, this, "leaves");
 	FOREACH_MOD(I_OnLeaveChannel, OnLeaveChannel(user, this));
 
-	CUserList::iterator cit, cit_end = this->users.end();
-	for (cit = this->users.begin(); (*cit)->user != user && cit != cit_end; ++cit);
+	ChanUserContainer *cul;
+	ChanUserList::iterator cit, cit_end;
+	for (cit = this->users.begin(), cit_end = this->users.end(); cit != cit_end && (*cit)->user != user; ++cit);
 	if (cit == cit_end)
 	{
 		Log(LOG_DEBUG) << "Channel::DeleteUser() tried to delete nonexistant user " << user->nick << " from channel " << this->name;
 		return;
 	}
-
-	delete (*cit)->status;
-	delete *cit;
+	cul = *cit;
 	this->users.erase(cit);
 
-	UChannelList::iterator uit, uit_end = user->chans.end();
-	for (uit = user->chans.begin(); (*uit)->chan != this && uit != uit_end; ++uit);
+	ChanUserList::iterator uit, uit_end;
+	for (uit = user->chans.begin(), uit_end = user->chans.end(); uit != uit_end && (*uit)->chan != this; ++uit);
 	if (uit == uit_end)
 		Log(LOG_DEBUG) << "Channel::DeleteUser() tried to delete nonexistant channel " << this->name << " from " << user->nick << "'s channel list";
 	else
 	{
-		delete *uit;
+		if (cul != *uit)
+			Log(LOG_DEBUG) << "Channel::DeleteUser() mismatch between user and channel usre container objects";
 		user->chans.erase(uit);
 	}
+	delete cul;
 
 	/* Channel is persistent, it shouldn't be deleted and the service bot should stay */
 	if (this->HasFlag(CH_PERSIST) || (this->ci && this->ci->HasFlag(CI_PERSIST)))
@@ -252,9 +248,9 @@ void Channel::DeleteUser(User *user)
 		delete this;
 }
 
-UserContainer *Channel::FindUser(const User *u) const
+ChanUserContainer *Channel::FindUser(const User *u) const
 {
-	for (CUserList::const_iterator it = this->users.begin(), it_end = this->users.end(); it != it_end; ++it)
+	for (ChanUserList::const_iterator it = this->users.begin(), it_end = this->users.end(); it != it_end; ++it)
 		if ((*it)->user == u)
 			return *it;
 	return NULL;
@@ -266,13 +262,13 @@ bool Channel::HasUserStatus(const User *u, ChannelModeStatus *cms) const
 		throw CoreException("Channel::HasUserStatus got bad mode");
 
 	/* Usually its more efficient to search the users channels than the channels users */
-	ChannelContainer *cc = u->FindChannel(this);
+	ChanUserContainer *cc = u->FindChannel(this);
 	if (cc)
 	{
 		if (cms)
-			return cc->status->HasFlag(cms->name);
+			return cc->status.HasFlag(cms->name);
 		else
-			return !cc->status->FlagCount();
+			return !cc->status.FlagCount();
 	}
 
 	return false;
@@ -330,9 +326,9 @@ void Channel::SetModeInternal(MessageSource &setter, ChannelMode *cm, const Anop
 		Log(LOG_DEBUG) << "Setting +" << cm->mchar << " on " << this->name << " for " << u->nick;
 
 		/* Set the status on the user */
-		ChannelContainer *cc = u->FindChannel(this);
+		ChanUserContainer *cc = u->FindChannel(this);
 		if (cc)
-			cc->status->SetFlag(cm->name);
+			cc->status.SetFlag(cm->name);
 
 		/* Enforce secureops, etc */
 		if (enforce_mlock)
@@ -400,9 +396,9 @@ void Channel::RemoveModeInternal(MessageSource &setter, ChannelMode *cm, const A
 		Log(LOG_DEBUG) << "Setting -" << cm->mchar << " on " << this->name << " for " << u->nick;
 
 		/* Remove the status on the user */
-		ChannelContainer *cc = u->FindChannel(this);
+		ChanUserContainer *cc = u->FindChannel(this);
 		if (cc)
-			cc->status->UnsetFlag(cm->name);
+			cc->status.UnsetFlag(cm->name);
 
 		if (enforce_mlock)
 		{

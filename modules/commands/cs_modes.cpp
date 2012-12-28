@@ -79,7 +79,7 @@ class CommandModeBase : public Command
 		User *u = source.GetUser();
 
 		if (chan.empty() && u)
-			for (UChannelList::iterator it = u->chans.begin(); it != u->chans.end(); ++it)
+			for (User::ChanUserList::iterator it = u->chans.begin(); it != u->chans.end(); ++it)
 				do_mode(source, com, cm, (*it)->chan->name, u->nick, set, level, levelself);
 		else if (!chan.empty())
 			do_mode(source, com, cm, chan, !nick.empty() ? nick : u->nick, set, level, levelself);

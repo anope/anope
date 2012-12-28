@@ -265,9 +265,9 @@ class CommandCSMode : public Command
 
 							if (param.find_first_of("*?") != Anope::string::npos)
 							{
-								for (CUserList::const_iterator it = ci->c->users.begin(), it_end = ci->c->users.end(); it != it_end; ++it)
+								for (Channel::ChanUserList::const_iterator it = ci->c->users.begin(), it_end = ci->c->users.end(); it != it_end; ++it)
 								{
-									UserContainer *uc = *it;
+									ChanUserContainer *uc = *it;
 
 									AccessGroup targ_access = ci->AccessFor(uc->user);
 

@@ -708,7 +708,7 @@ class BSKick : public Module
 
 	UserData *GetUserData(User *u, Channel *c)
 	{
-		UserContainer *uc = c->FindUser(u);
+		ChanUserContainer *uc = c->FindUser(u);
 		if (uc == NULL)
 			return NULL;
 
@@ -776,7 +776,7 @@ class BSKick : public Module
 		for (channel_map::const_iterator cit = ChannelList.begin(), cit_end = ChannelList.end(); cit != cit_end; ++cit)
 		{
 			Channel *c = cit->second;
-			for (CUserList::iterator it = c->users.begin(), it_end = c->users.end(); it != it_end; ++it)
+			for (Channel::ChanUserList::iterator it = c->users.begin(), it_end = c->users.end(); it != it_end; ++it)
 				(*it)->Shrink("bs_main_userdata");
 			c->Shrink("bs_main_bandata");
 		}
@@ -1004,7 +1004,7 @@ class BSKick : public Module
 
 			if (ud->lastline.equals_ci(realbuf) && !ud->lasttarget.empty() && !ud->lasttarget.equals_ci(ci->name))
 			{
-				for (UChannelList::iterator it = u->chans.begin(); it != u->chans.end();)
+				for (User::ChanUserList::iterator it = u->chans.begin(); it != u->chans.end();)
 				{
 					Channel *chan = (*it)->chan;
 					++it;

@@ -108,8 +108,8 @@ Server::Server(Server *up, const Anope::string &sname, unsigned shops, const Ano
 				if (c->users.empty())
 					IRCD->SendChannel(c);
 				else
-					for (CUserList::const_iterator cit = c->users.begin(), cit_end = c->users.end(); cit != cit_end; ++cit)
-						IRCD->SendJoin((*cit)->user, c, (*cit)->status);
+					for (User::ChanUserList::const_iterator cit = c->users.begin(), cit_end = c->users.end(); cit != cit_end; ++cit)
+						IRCD->SendJoin((*cit)->user, c, &(*cit)->status);
 			}
 		}
 	}

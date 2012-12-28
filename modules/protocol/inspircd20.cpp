@@ -107,9 +107,9 @@ class InspIRCdExtBan : public ChannelModeList
 			Channel *c = Channel::Find(channel);
 			if (c != NULL)
 			{
-				UserContainer *uc = c->FindUser(u);
+				ChanUserContainer *uc = c->FindUser(u);
 				if (uc != NULL)
-					if (cm == NULL || uc->status->HasFlag(cm->name))
+					if (cm == NULL || uc->status.HasFlag(cm->name))
 						return true;
 			}
 		}

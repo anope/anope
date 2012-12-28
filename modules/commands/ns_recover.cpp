@@ -61,8 +61,8 @@ class NSRecoverRequest : public IdentifyRequest
 				if (!u->chans.empty())
 				{
 					NSRecoverExtensibleInfo *ei = new NSRecoverExtensibleInfo;
-					for (UChannelList::iterator it = u->chans.begin(), it_end = u->chans.end(); it != it_end; ++it)
-						(*ei)[(*it)->chan->name] = *(*it)->status;
+					for (User::ChanUserList::iterator it = u->chans.begin(), it_end = u->chans.end(); it != it_end; ++it)
+						(*ei)[(*it)->chan->name] = (*it)->status;
 
 					source.GetUser()->Extend("ns_recover_info", ei);
 				}

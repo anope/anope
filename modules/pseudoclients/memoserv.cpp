@@ -99,9 +99,9 @@ class MyMemoServService : public MemoServService
 
 			if (ci->c)
 			{
-				for (CUserList::iterator it = ci->c->users.begin(), it_end = ci->c->users.end(); it != it_end; ++it)
+				for (Channel::ChanUserList::iterator it = ci->c->users.begin(), it_end = ci->c->users.end(); it != it_end; ++it)
 				{
-					UserContainer *cu = *it;
+					ChanUserContainer *cu = *it;
 
 					if (ci->AccessFor(cu->user).HasPriv("MEMO"))
 					{

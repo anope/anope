@@ -148,9 +148,9 @@ class CommandCSBan : public Command
 			}
 
 			int matched = 0, kicked = 0;
-			for (CUserList::iterator it = c->users.begin(), it_end = c->users.end(); it != it_end;)
+			for (Channel::ChanUserList::iterator it = c->users.begin(), it_end = c->users.end(); it != it_end;)
 			{
-				UserContainer *uc = *it++;
+				ChanUserContainer *uc = *it++;
 
 				if (Anope::Match(uc->user->nick, target) || Anope::Match(uc->user->GetDisplayedMask(), target))
 				{

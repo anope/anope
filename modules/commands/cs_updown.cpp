@@ -28,7 +28,7 @@ class CommandCSUp : public Command
 		User *u = source.GetUser();
 
 		if (params.empty())
-			for (UChannelList::iterator it = u->chans.begin(); it != u->chans.end(); ++it)
+			for (User::ChanUserList::iterator it = u->chans.begin(); it != u->chans.end(); ++it)
 			{
 				Channel *c = (*it)->chan;
 				c->SetCorrectModes(u, true, false);
@@ -84,7 +84,7 @@ class CommandCSDown : public Command
 		User *u = source.GetUser();
 
 		if (params.empty())
-			for (UChannelList::iterator it = u->chans.begin(); it != u->chans.end(); ++it)
+			for (User::ChanUserList::iterator it = u->chans.begin(); it != u->chans.end(); ++it)
 			{
 				Channel *c = (*it)->chan;
 				RemoveAll(u, c);

@@ -42,9 +42,9 @@ class CommandOSChanList : public Command
 		{
 			source.Reply(_("\002%s\002 channel list:"), u2->nick.c_str());
 
-			for (UChannelList::iterator uit = u2->chans.begin(), uit_end = u2->chans.end(); uit != uit_end; ++uit)
+			for (User::ChanUserList::iterator uit = u2->chans.begin(), uit_end = u2->chans.end(); uit != uit_end; ++uit)
 			{
-				ChannelContainer *cc = *uit;
+				ChanUserContainer *cc = *uit;
 
 				if (!Modes.empty())
 					for (std::list<ChannelModeName>::iterator it = Modes.begin(), it_end = Modes.end(); it != it_end; ++it)
@@ -136,9 +136,9 @@ class CommandOSUserList : public Command
 		{
 			source.Reply(_("\002%s\002 users list:"), pattern.c_str());
 
-			for (CUserList::iterator cuit = c->users.begin(), cuit_end = c->users.end(); cuit != cuit_end; ++cuit)
+			for (Channel::ChanUserList::iterator cuit = c->users.begin(), cuit_end = c->users.end(); cuit != cuit_end; ++cuit)
 			{
-				UserContainer *uc = *cuit;
+				ChanUserContainer *uc = *cuit;
 
 				if (!Modes.empty())
 					for (std::list<UserModeName>::iterator it = Modes.begin(), it_end = Modes.end(); it != it_end; ++it)

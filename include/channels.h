@@ -20,17 +20,15 @@ typedef Anope::hash_map<Channel *> channel_map;
 extern CoreExport channel_map ChannelList;
 
 /* A user container, there is one of these per user per channel. */
-struct UserContainer : public Extensible
+struct ChanUserContainer : public Extensible
 {
 	User *user;
+	Channel *chan;
 	/* Status the user has in the channel */
-	ChannelStatus *status;
+	ChannelStatus status;
 
-	UserContainer(User *u) : user(u) { }
-	virtual ~UserContainer() { }
+	ChanUserContainer(User *u, Channel *c) : user(u), chan(c) { }
 };
-
-typedef std::list<UserContainer *> CUserList;
 
 enum ChannelFlag
 {
@@ -60,7 +58,8 @@ class CoreExport Channel : public Base, public Extensible, public Flags<ChannelF
 	time_t creation_time;
 
 	/* Users in the channel */
-	CUserList users;
+	typedef std::list<ChanUserContainer *> ChanUserList;
+	ChanUserList users;
 
 	/* Current topic of the channel */
 	Anope::string topic;
@@ -107,7 +106,7 @@ class CoreExport Channel : public Base, public Extensible, public Flags<ChannelF
 	 * @param u The user
 	 * @return The UserContainer for the user
 	 */
-	UserContainer* JoinUser(User *u);
+	ChanUserContainer* JoinUser(User *u);
 
 	/** Remove a user internally from the channel
 	 * @param u The user
@@ -118,7 +117,7 @@ class CoreExport Channel : public Base, public Extensible, public Flags<ChannelF
 	 * @param u The user
 	 * @return A user container if found, else NULL
 	 */
-	UserContainer *FindUser(const User *u) const;
+	ChanUserContainer *FindUser(const User *u) const;
 
 	/** Check if a user has a status on a channel
 	 * @param u The user

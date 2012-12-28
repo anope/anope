@@ -72,9 +72,9 @@ class CommandOSChanKill : public Command
 
 			if ((c = Channel::Find(channel)))
 			{
-				for (CUserList::iterator it = c->users.begin(), it_end = c->users.end(); it != it_end; )
+				for (Channel::ChanUserList::iterator it = c->users.begin(), it_end = c->users.end(); it != it_end; )
 				{
-					UserContainer *uc = *it++;
+					ChanUserContainer *uc = *it++;
 
 					if (uc->user->server == Me || uc->user->HasMode(UMODE_OPER))
 						continue;

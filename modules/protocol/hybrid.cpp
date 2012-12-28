@@ -100,10 +100,10 @@ class HybridProto : public IRCDProto
 		/* And update our internal status for this user since this is not going through our mode handling system */
 		if (status != NULL)
 		{
-			UserContainer *uc = c->FindUser(user);
+			ChanUserContainer *uc = c->FindUser(user);
 
 			if (uc != NULL)
-				*uc->status = *status;
+				uc->status = *status;
 		}
 	}
 

@@ -726,9 +726,9 @@ Anope::string User::GetModes() const
 	return ret;
 }
 
-ChannelContainer *User::FindChannel(const Channel *c) const
+ChanUserContainer *User::FindChannel(const Channel *c) const
 {
-	for (UChannelList::const_iterator it = this->chans.begin(), it_end = this->chans.end(); it != it_end; ++it)
+	for (User::ChanUserList::const_iterator it = this->chans.begin(), it_end = this->chans.end(); it != it_end; ++it)
 		if ((*it)->chan == c)
 			return *it;
 	return NULL;

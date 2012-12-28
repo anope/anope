@@ -573,20 +573,18 @@ void ModeManager::StackerDel(Mode *m)
 
 		for (std::list<std::pair<Mode *, Anope::string> >::iterator it2 = si->AddModes.begin(), it2_end = si->AddModes.end(); it2 != it2_end;)
 		{
-			Mode *mode = it2->first;
-			++it2;
-
-			if (mode == m)
-				si->AddModes.erase(it2);
+			if (it2->first == m)
+				it2 = si->AddModes.erase(it2);
+			else
+				++it2;
 		}
 
 		for (std::list<std::pair<Mode *, Anope::string> >::iterator it2 = si->DelModes.begin(), it2_end = si->DelModes.end(); it2 != it2_end;)
 		{
-			Mode *mode = it2->first;
-			++it2;
-
-			if (mode == m)
-				si->DelModes.erase(it2);
+			if (it2->first == m)
+				it2 = si->DelModes.erase(it2);
+			else
+				++it2;
 		}
 	}
 
@@ -597,20 +595,18 @@ void ModeManager::StackerDel(Mode *m)
 
 		for (std::list<std::pair<Mode *, Anope::string> >::iterator it2 = si->AddModes.begin(), it2_end = si->AddModes.end(); it2 != it2_end;)
 		{
-			Mode *mode = it2->first;
-			++it2;
-
-			if (mode == m)
-				si->AddModes.erase(it2);
+			if (it2->first == m)
+				it2 = si->AddModes.erase(it2);
+			else
+				++it2;
 		}
 
 		for (std::list<std::pair<Mode *, Anope::string> >::iterator it2 = si->DelModes.begin(), it2_end = si->DelModes.end(); it2 != it2_end;)
 		{
-			Mode *mode = it2->first;
-			++it2;
-
-			if (mode == m)
-				si->DelModes.erase(it2);
+			if (it2->first == m)
+				it2 = si->DelModes.erase(it2);
+			else
+				++it2;
 		}
 	}
 }

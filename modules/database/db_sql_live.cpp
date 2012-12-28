@@ -191,10 +191,7 @@ class DBMySQL : public Module, public Pipe
 				clear_null = true;
 				std::map<unsigned int, Serializable *>::iterator it = obj->objects.find(id);
 				if (it != obj->objects.end())
-				{
-					obj->objects.erase(it);
-					it->second->Destroy(); // This also tries to remove this object from the map
-				}
+					it->second->Destroy(); // This also removes this object from the map
 			}
 			else
 			{

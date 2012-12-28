@@ -88,10 +88,11 @@ void Serializable::Destroy()
 
 void Serializable::QueueUpdate()
 {
-	/* Check for modifications now */
-	FOREACH_MOD(I_OnSerializeCheck, OnSerializeCheck(this->GetSerializableType()));
 	/* Schedule updater */
 	FOREACH_MOD(I_OnSerializableUpdate, OnSerializableUpdate(this));
+
+	/* Check for modifications now - this can delete this object! */
+	FOREACH_MOD(I_OnSerializeCheck, OnSerializeCheck(this->GetSerializableType()));
 }
 
 bool Serializable::IsCached(Serialize::Data *data)

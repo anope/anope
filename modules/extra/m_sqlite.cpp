@@ -209,7 +209,7 @@ std::vector<Query> SQLiteService::CreateTable(const Anope::string &table, const 
 
 	if (known_cols.empty())
 	{
-		Anope::string query_text = "CREATE TABLE `" + table + "` (`id` INTEGER PRIMARY KEY, `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP";
+		Anope::string query_text = "CREATE TABLE `" + table + "` (`id` INTEGER PRIMARY KEY, `timestamp` timestamp DEFAULT CURRENT_TIMESTAMP";
 
 		for (Data::Map::const_iterator it = data.data.begin(), it_end = data.data.end(); it != it_end; ++it)
 		{

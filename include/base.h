@@ -73,6 +73,22 @@ class Reference : public ReferenceBase
 			ref->DelReference(this);
 	}
 
+	inline Reference<T>& operator=(const Reference<T> &other)
+	{
+		if (this != &other)
+		{
+			if (*this)
+				this->ref->DelReference(this);
+
+			this->ref = other.ref;
+			this->invalid = other.invalid;
+
+			if (*this)
+				this->ref->AddReference(this);
+		}
+		return *this;
+	}
+
 	/* We explicitly call operator bool here in several places to prevent other
 	 * operators, such operator T*, from being called instead, which will mess
 	 * with any class inheriting from this that overloads this operator.
@@ -103,16 +119,6 @@ class Reference : public ReferenceBase
 		if (operator bool())
 			return this->ref;
 		return NULL;
-	}
-
-	inline void operator=(T *newref)
-	{
-		if (operator bool())
-			this->ref->DelReference(this);
-		this->ref = newref;
-		this->invalid = false;
-		if (operator bool())
-			this->ref->AddReference(this);
 	}
 
 	inline bool operator<(const Reference<T> &other) const

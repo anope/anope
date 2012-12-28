@@ -258,16 +258,32 @@ class Serialize::Reference : public ReferenceBase
 			obj->AddReference(this);
 	}
 
-	Reference(const Reference<T> &other) : ref(other.ref)
+	Reference(const Reference<T> &other) : ReferenceBase(other), ref(other.ref)
 	{
-		if (*this)
+		if (ref && !invalid)
 			this->ref->AddReference(this);
 	}
 
 	~Reference()
 	{
-		if (*this)
+		if (ref && !invalid)
 			this->ref->DelReference(this);
+	}
+
+	inline Reference<T>& operator=(const Reference<T> &other)
+	{
+		if (this != &other)
+		{
+			if (ref && !invalid)
+				this->ref->DelReference(this);
+
+			this->ref = other.ref;
+			this->invalid = other.invalid;
+
+			if (ref && !invalid)
+				this->ref->AddReference(this);
+		}
+		return *this;
 	}
 
 	inline operator bool() const
@@ -277,25 +293,15 @@ class Serialize::Reference : public ReferenceBase
 		return false;
 	}
 
-	inline void operator=(T *newref)
-	{
-		if (*this)
-			this->ref->DelReference(this);
-
-		this->ref = newref;
-		this->invalid = false;
-
-		if (newref)
-			this->ref->AddReference(this);
-	}
-
 	inline operator T*() const
 	{
 		if (!this->invalid)
 		{
 			if (this->ref)
+				// This can invalidate me
 				this->ref->QueueUpdate();
-			return this->ref;
+			if (!this->invalid)
+				return this->ref;
 		}
 		return NULL;
 	}
@@ -305,8 +311,10 @@ class Serialize::Reference : public ReferenceBase
 		if (!this->invalid)
 		{
 			if (this->ref)
+				// This can invalidate me
 				this->ref->QueueUpdate();
-			return this->ref;
+			if (!this->invalid)
+				return this->ref;
 		}
 		return NULL;
 	}
@@ -316,8 +324,10 @@ class Serialize::Reference : public ReferenceBase
 		if (!this->invalid)
 		{
 			if (this->ref)
+				// This can invalidate me
 				this->ref->QueueUpdate();
-			return this->ref;
+			if (!this->invalid)
+				return this->ref;
 		}
 		return NULL;
 	}

@@ -97,6 +97,8 @@ ChanAccess::ChanAccess(AccessProvider *p) : Serializable("ChanAccess"), provider
 
 ChanAccess::~ChanAccess()
 {
+	if (ci)
+		ci->EraseAccess(this);
 }
 
 void ChanAccess::Serialize(Serialize::Data &data) const

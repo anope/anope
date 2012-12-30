@@ -138,11 +138,12 @@ enum BadWordType
 /* Structure used to contain bad words. */
 struct CoreExport BadWord : Serializable
 {
-	ChannelInfo *ci;
+	Serialize::Reference<ChannelInfo> ci;
 	Anope::string word;
 	BadWordType type;
 
-	BadWord() : Serializable("BadWord") { }
+	BadWord();
+	~BadWord();
 	void Serialize(Serialize::Data &data) const anope_override;
 	static Serializable* Unserialize(Serializable *obj, Serialize::Data &);
 };
@@ -172,6 +173,7 @@ class CoreExport AutoKick : public Flags<AutoKickFlag>, public Serializable
 	time_t last_used;
 
  	AutoKick();
+	~AutoKick();
 	void Serialize(Serialize::Data &data) const anope_override;
 	static Serializable* Unserialize(Serializable *obj, Serialize::Data &);
 };
@@ -187,6 +189,7 @@ struct CoreExport ModeLock : Serializable
 	time_t created;
 
 	ModeLock(ChannelInfo *ch, bool s, ChannelModeName n, const Anope::string &p, const Anope::string &se = "", time_t c = Anope::CurTime);
+	~ModeLock();
 
 	void Serialize(Serialize::Data &data) const anope_override;
 	static Serializable* Unserialize(Serializable *obj, Serialize::Data &);
@@ -357,6 +360,8 @@ class CoreExport ChannelInfo : public Serializable, public Extensible, public Fl
 	 */
 	unsigned GetAkickCount() const;
 
+	void EraseAkick(const AutoKick *akick);
+
 	/** Erase an entry from the channel akick list
 	 * @param index The index of the akick
 	 */
@@ -383,6 +388,8 @@ class CoreExport ChannelInfo : public Serializable, public Extensible, public Fl
 	 * @return The number of badwords in the vector
 	 */
 	unsigned GetBadWordCount() const;
+
+	void EraseBadWord(const BadWord *bw);
 
 	/** Remove a badword
 	 * @param index The index of the badword
@@ -418,6 +425,8 @@ class CoreExport ChannelInfo : public Serializable, public Extensible, public Fl
 	 * @return true on success, false on failure
 	 */
 	bool RemoveMLock(ChannelMode *mode, bool status, const Anope::string &param = "");
+
+	void RemoveMLock(ModeLock *mlock);
 
 	/** Clear all mlocks on the channel
 	 */

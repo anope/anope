@@ -847,7 +847,7 @@ struct IRCDMessageFJoin : IRCDMessage
 		}
 
 		time_t ts = Anope::string(params[1]).is_pos_number_only() ? convertTo<time_t>(params[1]) : Anope::CurTime;
-		Message::Join::SJoin(source, params[0], ts, "", users);
+		Message::Join::SJoin(source, params[0], ts, modes, users);
 	}
 };
 

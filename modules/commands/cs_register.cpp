@@ -54,16 +54,12 @@ class CommandCSRegister : public Command
 		{
 			ci = new ChannelInfo(chan);
 			ci->SetFounder(nc);
-			if (!chdesc.empty())
-				ci->desc = chdesc;
+			ci->desc = chdesc;
 
-			for (ChannelInfo::ModeList::iterator it = ModeManager::DefaultModeLocks.begin(), it_end = ModeManager::DefaultModeLocks.end(); it != it_end; ++it)
-			{
-				ModeLock *ml = new ModeLock(*it->second);
-				ml->setter = source.GetNick();
-				ml->ci = ci;
-				ci->mode_locks->insert(std::make_pair(it->first, ml));
-			}
+			for (std::list<std::pair<ChannelModeName, Anope::string> >::const_iterator it = ModeManager::ModeLockOn.begin(), it_end = ModeManager::ModeLockOn.end(); it != it_end; ++it)
+				ci->SetMLock(ModeManager::FindChannelModeByName(it->first), true, it->second, source.GetNick());
+			for (std::list<ChannelModeName>::const_iterator it = ModeManager::ModeLockOff.begin(), it_end = ModeManager::ModeLockOff.end(); it != it_end; ++it)
+				ci->SetMLock(ModeManager::FindChannelModeByName(*it), false, "", source.GetNick());
 
 			if (c && !c->topic.empty())
 			{

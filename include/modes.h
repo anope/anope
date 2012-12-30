@@ -350,7 +350,8 @@ class CoreExport ModeManager
 	/* Number of generic channel and user modes we are tracking */
 	static unsigned GenericChannelModes, GenericUserModes;
 	/* Default channel mode lock */
-	static std::multimap<ChannelModeName, ModeLock *> DefaultModeLocks;
+	static std::list<std::pair<ChannelModeName, Anope::string> > ModeLockOn;
+	static std::list<ChannelModeName> ModeLockOff;
 	/* Default modes bots have on channels */
 	static ChannelStatus DefaultBotModes;
 

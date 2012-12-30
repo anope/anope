@@ -26,7 +26,8 @@ std::vector<UserMode *> ModeManager::UserModes;
 unsigned ModeManager::GenericChannelModes = 0, ModeManager::GenericUserModes = 0;
 
 /* Default channel mode lock */
-ChannelInfo::ModeList ModeManager::DefaultModeLocks;
+std::list<std::pair<ChannelModeName, Anope::string> > ModeManager::ModeLockOn;
+std::list<ChannelModeName> ModeManager::ModeLockOff;
 
 /* Default modes bots have on channels */
 ChannelStatus ModeManager::DefaultBotModes;
@@ -613,9 +614,8 @@ void ModeManager::StackerDel(Mode *m)
 
 void ModeManager::UpdateDefaultMLock(ServerConfig *config)
 {
-	for (ChannelInfo::ModeList::iterator it = DefaultModeLocks.begin(), it_end = DefaultModeLocks.end(); it != it_end; ++it)
-		delete it->second;
-	DefaultModeLocks.clear();
+	ModeLockOn.clear();
+	ModeLockOff.clear();
 
 	Anope::string modes;
 	spacesepstream sep(config->MLock);
@@ -643,14 +643,25 @@ void ModeManager::UpdateDefaultMLock(ServerConfig *config)
 
 				if (cm->type != MODE_LIST) // Only MODE_LIST can have duplicates
 				{
-					ChannelInfo::ModeList::iterator it = DefaultModeLocks.find(cm->name);
-					if (it != DefaultModeLocks.end())
-					{
-						delete it->second;
-						DefaultModeLocks.erase(it);
-					}
+					for (std::list<std::pair<ChannelModeName, Anope::string> >::iterator it = ModeLockOn.begin(), it_end = ModeLockOn.end(); it != it_end; ++it)
+						if (it->first == cm->name)
+						{
+							ModeLockOn.erase(it);
+							break;
+						}
+
+					for (std::list<ChannelModeName>::iterator it = ModeLockOff.begin(), it_end = ModeLockOff.end(); it != it_end; ++it)
+						if (*it == cm->name)
+						{
+							ModeLockOff.erase(it);
+							break;
+						}
 				}
-				DefaultModeLocks.insert(std::make_pair(cm->name, new ModeLock(NULL, adding == 1, cm->name, param)));
+
+				if (adding)
+					ModeLockOn.push_back(std::make_pair(cm->name, param));
+				else
+					ModeLockOff.push_back(cm->name);
 			}
 		}
 	}

@@ -33,6 +33,16 @@ template<> const Anope::string* Flags<ChannelInfoFlag>::flags_strings = ChannelI
 static const Anope::string AutoKickFlagString[] = { "AK_ISNICK", "" };
 template<> const Anope::string* Flags<AutoKickFlag>::flags_strings = AutoKickFlagString;
 
+BadWord::BadWord() : Serializable("BadWord")
+{
+}
+
+BadWord::~BadWord()
+{
+	if (ci)
+		ci->EraseBadWord(this);
+}
+
 void BadWord::Serialize(Serialize::Data &data) const
 {
 	data["ci"] << this->ci->name;
@@ -69,6 +79,12 @@ Serializable* BadWord::Unserialize(Serializable *obj, Serialize::Data &data)
 
 AutoKick::AutoKick() : Serializable("AutoKick")
 {
+}
+
+AutoKick::~AutoKick()
+{
+	if (this->ci)
+		this->ci->EraseAkick(this);
 }
 
 void AutoKick::Serialize(Serialize::Data &data) const
@@ -135,6 +151,12 @@ Serializable* AutoKick::Unserialize(Serializable *obj, Serialize::Data &data)
 
 ModeLock::ModeLock(ChannelInfo *ch, bool s, ChannelModeName n, const Anope::string &p, const Anope::string &se, time_t c) : Serializable("ModeLock"), ci(ch), set(s), name(n), param(p), setter(se), created(c)
 {
+}
+
+ModeLock::~ModeLock()
+{
+	if (this->ci)
+		this->ci->RemoveMLock(this);
 }
 
 void ModeLock::Serialize(Serialize::Data &data) const
@@ -376,9 +398,8 @@ ChannelInfo::~ChannelInfo()
 		this->log_settings->at(i)->Destroy();
 	this->log_settings->clear();
 
-	for (ChannelInfo::ModeList::iterator it = this->mode_locks->begin(), it_end = this->mode_locks->end(); it != it_end; ++it)
-		it->second->Destroy();
-	this->mode_locks->clear();
+	while (!this->mode_locks->empty())
+		this->mode_locks->begin()->second->Destroy();
 
 	if (!this->memos.memos->empty())
 	{
@@ -609,26 +630,19 @@ void ChannelInfo::EraseAccess(unsigned index)
 		return;
 
 	this->access->at(index)->Destroy();
-	this->access->erase(this->access->begin() + index);
 }
 
 void ChannelInfo::EraseAccess(const ChanAccess *taccess)
 {
-	for (unsigned i = 0, end = this->access->size(); i < end; ++i)
-	{
-		if (this->GetAccess(i) == taccess)
-		{
-			this->EraseAccess(i);
-			break;
-		}
-	}
+	std::vector<ChanAccess *>::iterator it = std::find(this->access->begin(), this->access->end(), taccess);
+	if (it != this->access->end())
+		this->access->erase(it);
 }
 
 void ChannelInfo::ClearAccess()
 {
 	for (unsigned i = this->access->size(); i > 0; --i)
 		this->GetAccess(i - 1)->Destroy();
-	this->access->clear();
 }
 
 AutoKick *ChannelInfo::AddAkick(const Anope::string &user, NickCore *akicknc, const Anope::string &reason, time_t t, time_t lu)
@@ -678,19 +692,25 @@ unsigned ChannelInfo::GetAkickCount() const
 	return this->akick->size();
 }
 
+void ChannelInfo::EraseAkick(const AutoKick *takick)
+{
+	std::vector<AutoKick *>::iterator it = std::find(this->akick->begin(), this->akick->end(), takick);
+	if (it != this->akick->end())
+		this->akick->erase(it);
+}
+
 void ChannelInfo::EraseAkick(unsigned index)
 {
 	if (this->akick->empty() || index >= this->akick->size())
 		return;
 	
 	this->GetAkick(index)->Destroy();
-	this->akick->erase(this->akick->begin() + index);
 }
 
 void ChannelInfo::ClearAkick()
 {
 	while (!this->akick->empty())
-		EraseAkick(0);
+		this->akick->back()->Destroy();
 }
 
 BadWord* ChannelInfo::AddBadWord(const Anope::string &word, BadWordType type)
@@ -722,6 +742,13 @@ unsigned ChannelInfo::GetBadWordCount() const
 	return this->badwords->size();
 }
 
+void ChannelInfo::EraseBadWord(const BadWord *bw)
+{
+	std::vector<BadWord *>::iterator it = std::find(this->badwords->begin(), this->badwords->end(), bw);
+	if (it != this->badwords->end())
+		this->badwords->erase(it);
+}
+
 void ChannelInfo::EraseBadWord(unsigned index)
 {
 	if (this->badwords->empty() || index >= this->badwords->size())
@@ -729,14 +756,13 @@ void ChannelInfo::EraseBadWord(unsigned index)
 	
 	FOREACH_MOD(I_OnBadWordDel, OnBadWordDel(this, (*this->badwords)[index]));
 
-	delete (*this->badwords)[index];
-	this->badwords->erase(this->badwords->begin() + index);
+	this->badwords->at(index)->Destroy();
 }
 
 void ChannelInfo::ClearBadWords()
 {
 	while (!this->badwords->empty())
-		EraseBadWord(0);
+		this->badwords->back()->Destroy();
 }
 
 bool ChannelInfo::HasMLock(ChannelMode *mode, const Anope::string &param, bool status) const
@@ -776,13 +802,8 @@ bool ChannelInfo::SetMLock(ChannelMode *mode, bool status, const Anope::string &
 	/* First, remove this */
 	if (mode->type == MODE_REGULAR || mode->type == MODE_PARAM)
 	{
-		ChannelInfo::ModeList::const_iterator it = this->mode_locks->find(mode->name);
-		if (it != this->mode_locks->end())
-		{
-			ChannelInfo::ModeList::const_iterator it_end = this->mode_locks->upper_bound(mode->name);
-			for (; it != it_end; ++it)
-				it->second->Destroy();
-		}
+		for (ChannelInfo::ModeList::const_iterator it; (it = this->mode_locks->find(mode->name)) != this->mode_locks->end();)
+			it->second->Destroy();
 		this->mode_locks->erase(mode->name);
 	}
 	else
@@ -798,7 +819,6 @@ bool ChannelInfo::SetMLock(ChannelMode *mode, bool status, const Anope::string &
 				if (modelock->param == param)
 				{
 					it->second->Destroy();
-					this->mode_locks->erase(it);
 					break;
 				}
 			}
@@ -829,7 +849,6 @@ bool ChannelInfo::RemoveMLock(ChannelMode *mode, bool status, const Anope::strin
 				if (MOD_RESULT != EVENT_STOP)
 				{
 					it->second->Destroy();
-					this->mode_locks->erase(it);
 					return true;
 				}
 			}
@@ -852,7 +871,6 @@ bool ChannelInfo::RemoveMLock(ChannelMode *mode, bool status, const Anope::strin
 					if (MOD_RESULT == EVENT_STOP)
 						return false;
 					it->second->Destroy();
-					this->mode_locks->erase(it);
 					return true;
 				}
 			}
@@ -862,8 +880,22 @@ bool ChannelInfo::RemoveMLock(ChannelMode *mode, bool status, const Anope::strin
 	}
 }
 
+void ChannelInfo::RemoveMLock(ModeLock *mlock)
+{
+	ChannelInfo::ModeList::iterator it = this->mode_locks->find(mlock->name);
+	if (it != this->mode_locks->end())
+		for (; it != this->mode_locks->upper_bound(mlock->name); ++it)
+			if (it->second == mlock)
+			{
+				this->mode_locks->erase(it);
+				break;
+			}
+}
+
 void ChannelInfo::ClearMLock()
 {
+	while (!this->mode_locks->empty())
+		this->mode_locks->begin()->second->Destroy();
 	this->mode_locks->clear();
 }
 

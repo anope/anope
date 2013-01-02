@@ -261,15 +261,27 @@ struct IRCDMessageUID : IRCDMessage
 		if (ip == "0")
 			ip.clear();
 
-		User *user = new User(params[0], params[4], params[9], params[5], ip, source.GetServer(), params[10], params[2].is_pos_number_only() ? convertTo<time_t>(params[2]) : 0, params[3], params[7]);
-		if (params[8] != "0" && params[8].is_pos_number_only() && convertTo<time_t>(params[8]) == user->timestamp)
+		time_t ts;
+		try
 		{
-			NickAlias *na = NickAlias::Find(user->nick);
-			if (na)
-				user->Login(na->nc);
+			ts = convertTo<time_t>(params[2]);
 		}
-		else if (user && user->server->IsSynced() && NickServService)
-			NickServService->Validate(user);
+		catch (const ConvertException &)
+		{
+			ts = Anope::CurTime;
+		}
+
+		User *user = new User(params[0], params[4], params[9], params[5], ip, source.GetServer(), params[10], ts, params[3], params[7]);
+		try
+		{
+			if (NickServService && params[8].is_pos_number_only() && convertTo<time_t>(params[8]) == user->timestamp)
+			{
+				NickAlias *na = NickAlias::Find(user->nick);
+				if (na)
+					NickServService->Login(user, na);
+			}
+		}
+		catch (const ConvertException &) { }
 	}
 };
 
@@ -363,25 +375,11 @@ class ProtoPlexus : public Module
 			throw ModuleException("No protocol interface for hybrid");
 
 		this->AddModes();
-
-		Implementation i[] = { I_OnServerSync };
-		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 	}
 
 	~ProtoPlexus()
 	{
 		ModuleManager::UnloadModule(m_hybrid, NULL);
-	}
-
-	void OnServerSync(Server *s) anope_override
-	{
-		if (NickServService)
-			for (user_map::const_iterator it = UserListByNick.begin(); it != UserListByNick.end(); ++it)
-			{
-				User *u = it->second;
-				if (u->server == s && !u->IsIdentified())
-					NickServService->Validate(u);
-			}
 	}
 };
 

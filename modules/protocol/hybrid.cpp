@@ -502,22 +502,11 @@ struct IRCDMessageUID : IRCDMessage
 					params[9], params[2].is_pos_number_only() ? convertTo<time_t>(params[2]) : 0,
 					params[3], params[7]);
 
-		if (user && NickServService)
+		if (NickServService && params[8] != "0")
 		{
-			const NickAlias *na = NULL;
-
-			if (params[8] != "0")
-				na = NickAlias::Find(params[8]);
-
-			if (na)
-			{
-				user->Login(na->nc);
-
-				if (!Config->NoNicknameOwnership && na->nc->HasFlag(NI_UNCONFIRMED) == false)
-					user->SetMode(NickServ, UMODE_REGISTERED);
-			}
-			else
-				NickServService->Validate(user);
+			NickAlias *na = NickAlias::Find(params[8]);
+			if (na != NULL)
+				NickServService->Login(user, na);
 		}
 	}
 };

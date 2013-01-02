@@ -385,19 +385,13 @@ struct IRCDMessageNick : IRCDMessage
 			}
 
 			User *user = new User(params[0], params[4], params[5], "", params[8], s, params[9], params[2].is_pos_number_only() ? convertTo<time_t>(params[2]) : 0, params[3]);
-			if (user && NickServService)
+			try
 			{
-				const NickAlias *na;
-				if (user->signon == convertTo<time_t>(params[7]) && (na = NickAlias::Find(user->nick)))
-				{
-					NickCore *nc = na->nc;
-					user->Login(nc);
-					if (!Config->NoNicknameOwnership && na->nc->HasFlag(NI_UNCONFIRMED) == false)
-						user->SetMode(NickServ, UMODE_REGISTERED);
-				}
-				else
-					NickServService->Validate(user);
+				NickAlias *na;
+				if (NickServService && user->signon == convertTo<time_t>(params[7]) && (na = NickAlias::Find(user->nick)))
+					NickServService->Login(user, na);
 			}
+			catch (const ConvertException &) { }
 		}
 		else
 			source.GetUser()->ChangeNick(params[0]);

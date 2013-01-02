@@ -7,6 +7,7 @@ class NickServService : public Service
 	NickServService(Module *m) : Service(m, "NickServService", "NickServ") { }
 
 	virtual void Validate(User *u) = 0;
+	virtual void Login(User *u, NickAlias *na) = 0;
 };
 
 static ServiceReference<NickServService> NickServService("NickServService", "NickServ");

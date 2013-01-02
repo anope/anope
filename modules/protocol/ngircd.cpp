@@ -432,9 +432,7 @@ struct IRCDMessageNick : IRCDMessage
 		else if (params.size() == 7)
 		{
 			// a new user is connecting to the network
-			User *user = new User(params[0], params[2], params[3], "", "", source.GetServer(), params[6], Anope::CurTime, params[5], "");
-			if (user && NickServService)
-				NickServService->Validate(user);
+			new User(params[0], params[2], params[3], "", "", source.GetServer(), params[6], Anope::CurTime, params[5], "");
 		}
 		else
 		{

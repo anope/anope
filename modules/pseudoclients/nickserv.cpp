@@ -129,6 +129,14 @@ class MyNickServService : public NickServService
 		}
 
 	}
+
+	void Login(User *user, NickAlias *na) anope_override
+	{
+		const NickAlias *u_na = NickAlias::Find(user->nick);
+		user->Login(na->nc);
+		if (u_na && *u_na->nc == *na->nc && !Config->NoNicknameOwnership && na->nc->HasFlag(NI_UNCONFIRMED) == false)
+			user->SetMode(NickServ, UMODE_REGISTERED);
+	}
 };
 
 class ExpireCallback : public CallBack
@@ -190,7 +198,7 @@ class NickServCore : public Module
 			throw ModuleException("No bot named " + Config->NickServ);
 
 		Implementation i[] = { I_OnBotDelete, I_OnDelNick, I_OnDelCore, I_OnChangeCoreDisplay, I_OnNickIdentify, I_OnNickGroup,
-				I_OnNickUpdate, I_OnUserNickChange, I_OnPreHelp, I_OnPostHelp, I_OnUserConnect };
+				I_OnNickUpdate, I_OnUserConnect, I_OnServerSync, I_OnUserNickChange, I_OnPreHelp, I_OnPostHelp };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 	}
 
@@ -295,6 +303,28 @@ class NickServCore : public Module
 		}
 	}
 
+	void OnUserConnect(Reference<User> &u, bool &exempt) anope_override
+	{
+		if (!u || !u->server->IsSynced())
+			return;
+
+		const NickAlias *na = NickAlias::Find(u->nick);
+		if (!Config->NoNicknameOwnership && !Config->NSUnregisteredNotice.empty() && !na)
+			u->SendMessage(NickServ, Config->NSUnregisteredNotice);
+		else if (na)
+			this->mynickserv.Validate(u);
+	}
+
+	void OnServerSync(Server *s) anope_override
+	{
+		for (user_map::const_iterator it = UserListByNick.begin(); it != UserListByNick.end(); ++it)
+		{
+			User *u = it->second;
+			if (u->server == s && !u->IsIdentified())
+				NickServService->Validate(u);
+		}
+	}
+
 	void OnUserNickChange(User *u, const Anope::string &oldnick) anope_override
 	{
 		const NickAlias *na = NickAlias::Find(u->nick);
@@ -356,12 +386,6 @@ class NickServCore : public Module
 			"nicknames or other malicious actions. Abuse of %s\n"
 			"will result in, at minimum, loss of the abused\n"
 			"nickname(s)."), Config->NickServ.c_str());
-	}
-
-	void OnUserConnect(Reference<User> &u, bool &exempt) anope_override
-	{
-		if (!Config->NoNicknameOwnership && !Config->NSUnregisteredNotice.empty() && u && !NickAlias::Find(u->nick))
-			u->SendMessage(NickServ, Config->NSUnregisteredNotice);
 	}
 };
 

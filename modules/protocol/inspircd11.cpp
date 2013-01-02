@@ -766,14 +766,7 @@ struct IRCDMessageNick : IRCDMessage
 				NickAlias *na = NickAlias::Find(user->nick);
 				Anope::string *svidbuf = na ? na->nc->GetExt<ExtensibleItemClass<Anope::string> *>("authenticationtoken") : NULL;
 				if (na && svidbuf && *svidbuf == params[0])
-				{
-					NickCore *nc = na->nc;
-					user->Login(nc);
-					if (!Config->NoNicknameOwnership && na->nc->HasFlag(NI_UNCONFIRMED) == false)
-						user->SetMode(NickServ, UMODE_REGISTERED);
-				}
-				else
-					NickServService->Validate(user);
+					NickServService->Login(user, na);
 			}
 		}
 		else if (params.size() == 1 && source.GetUser())

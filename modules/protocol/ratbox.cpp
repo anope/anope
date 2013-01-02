@@ -171,9 +171,7 @@ struct IRCDMessageUID : IRCDMessage
 	void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		/* Source is always the server */
-		User *user = new User(params[0], params[4], params[5], "", params[6], source.GetServer(), params[8], params[2].is_pos_number_only() ? convertTo<time_t>(params[2]) : 0, params[3], params[7]);
-		if (user && user->server->IsSynced() && NickServService)
-			NickServService->Validate(user);
+		new User(params[0], params[4], params[5], "", params[6], source.GetServer(), params[8], params[2].is_pos_number_only() ? convertTo<time_t>(params[2]) : 0, params[3], params[7]);
 	}
 };
 
@@ -255,25 +253,11 @@ class ProtoRatbox : public Module
 			throw ModuleException("No protocol interface for hybrid");
 
 		this->AddModes();
-
-		Implementation i[] = { I_OnServerSync };
-		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 	}
 
 	~ProtoRatbox()
 	{
 		ModuleManager::UnloadModule(m_hybrid, NULL);
-	}
-
-	void OnServerSync(Server *s) anope_override
-	{
-		if (NickServService)
-			for (user_map::const_iterator it = UserListByNick.begin(); it != UserListByNick.end(); ++it)
-			{
-				User *u = it->second;
-				if (u->server == s && !u->IsIdentified())
-					NickServService->Validate(u);
-			}
 	}
 };
 

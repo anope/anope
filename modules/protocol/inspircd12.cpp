@@ -1161,9 +1161,7 @@ struct IRCDMessageUID : IRCDMessage
 		for (unsigned i = 9; i < params.size() - 1; ++i)
 			modes += " " + params[i];
 
-		User *u = new User(params[2], params[5], params[3], params[4], params[6], source.GetServer(), params[params.size() - 1], ts, modes, params[0]);
-		if (u->server->IsSynced() && NickServService)
-			NickServService->Validate(u);
+		new User(params[2], params[5], params[3], params[4], params[6], source.GetServer(), params[params.size() - 1], ts, modes, params[0]);
 	}
 };
 
@@ -1221,7 +1219,7 @@ class ProtoInspIRCd : public Module
 	{
 		this->SetAuthor("Anope");
 
-		Implementation i[] = { I_OnUserNickChange, I_OnServerSync };
+		Implementation i[] = { I_OnUserNickChange };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 
 		Servers::Capab.insert("NOQUIT");
@@ -1243,17 +1241,6 @@ class ProtoInspIRCd : public Module
 		 * this will cancel out this -r, resulting in no mode changes.
 		 */
 		u->RemoveMode(NickServ, UMODE_REGISTERED);
-	}
-
-	void OnServerSync(Server *s) anope_override
-	{
-		if (NickServService)
-			for (user_map::const_iterator it = UserListByNick.begin(); it != UserListByNick.end(); ++it)
-			{
-				User *u = it->second;
-				if (u->server == s && !u->IsIdentified())
-					NickServService->Validate(u);
-			}
 	}
 };
 

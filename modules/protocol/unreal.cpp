@@ -803,7 +803,7 @@ struct IRCDMessageNick : IRCDMessage
 		
 			User *user = new User(params[0], params[3], params[4], vhost, ip, s, params[10], user_ts, params[7]);
 
-			const NickAlias *na = NULL;
+			NickAlias *na = NULL;
 
 			if (params[6] == "0")
 				;
@@ -817,14 +817,8 @@ struct IRCDMessageNick : IRCDMessage
 				na = NickAlias::Find(params[6]);
 			}
 
-			if (na)
-			{
-				user->Login(na->nc);
-				if (!Config->NoNicknameOwnership && na->nc->HasFlag(NI_UNCONFIRMED) == false)
-					user->SetMode(NickServ, UMODE_REGISTERED);
-			}
-			else if (NickServService)
-				NickServService->Validate(user);
+			if (na && NickServService)
+				NickServService->Login(user, na);
 		}
 		else
 			source.GetUser()->ChangeNick(params[0]);

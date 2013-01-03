@@ -351,7 +351,7 @@ void Quit::Run(MessageSource &source, const std::vector<Anope::string> &params)
 		na->last_quit = reason;
 	}
 	FOREACH_MOD(I_OnUserQuit, OnUserQuit(user, reason));
-	delete user;
+	user->Quit(reason);
 
 	return;
 }

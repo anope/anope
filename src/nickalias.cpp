@@ -88,7 +88,7 @@ void NickAlias::Release()
 			User *u = User::Find(this->nick);
 			if (u && u->server == Me)
 			{
-				delete u;
+				u->Quit();
 			}
 		}
 

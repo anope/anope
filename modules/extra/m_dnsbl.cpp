@@ -129,9 +129,9 @@ class ModuleDNSBL : public Module
 		}
 	}
 
-	void OnUserConnect(Reference<User> &user, bool &exempt) anope_override
+	void OnUserConnect(User *user, bool &exempt) anope_override
 	{
-		if (exempt || !user || (!this->check_on_connect && !Me->IsSynced()) || !dnsmanager)
+		if (exempt || user->Quitting() || (!this->check_on_connect && !Me->IsSynced()) || !dnsmanager)
 			return;
 
 		if (!this->check_on_netburst && !user->server->IsSynced())

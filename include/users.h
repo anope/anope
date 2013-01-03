@@ -32,6 +32,10 @@ extern CoreExport time_t MaxUserTime;
 /* Online user and channel data. */
 class CoreExport User : public virtual Base, public Extensible, public CommandReply
 {
+	/* true if the user was quit or killed */
+	bool quit;
+	/* Users that are in the process of quitting */
+	static std::list<User *> quitting_users;
  protected:
 	Anope::string vident;
 	Anope::string ident;
@@ -103,10 +107,12 @@ class CoreExport User : public virtual Base, public Extensible, public CommandRe
 	 */
 	User(const Anope::string &snick, const Anope::string &sident, const Anope::string &shost, const Anope::string &svhost, const Anope::string &sip, Server *sserver, const Anope::string &srealname, time_t ssignon, const Anope::string &smodes, const Anope::string &suid = "");
 
+ protected:
 	/** Destroy a user.
 	 */
 	virtual ~User();
 
+ public:
 	/** Update the nickname of a user record accordingly, should be
 	 * called from ircd protocol.
 	 * @param newnick The new username
@@ -327,6 +333,13 @@ class CoreExport User : public virtual Base, public Extensible, public CommandRe
 	 */
 	void KillInternal(const Anope::string &source, const Anope::string &reason);
 
+	/** Processes a quit for the user, and marks them as quit
+	 * @param reason The reason for the quit
+	 */
+	void Quit(const Anope::string &reason = "");
+
+	bool Quitting() const;
+
 	/* Returns a mask that will most likely match any address the
 	 * user will have from that location.  For IP addresses, wildcards the
 	 * appropriate subnet mask (e.g. 35.1.1.1 -> 35.*; 128.2.1.1 -> 128.2.*);
@@ -348,6 +361,10 @@ class CoreExport User : public virtual Base, public Extensible, public CommandRe
 	 * @return the user, if they exist
 	 */
 	static User* Find(const Anope::string &name, bool nick_only = false);
+
+	/** Quits all users who are pending to be quit
+	 */
+	static void QuitUsers();
 };
 
 #endif // USERS_H

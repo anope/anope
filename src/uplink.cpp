@@ -116,9 +116,14 @@ UplinkSocket::~UplinkSocket()
 	}
 }
 
-bool UplinkSocket::Read(const Anope::string &buf)
+bool UplinkSocket::ProcessRead()
 {
-	Anope::Process(buf);
+	BufferedSocket::ProcessRead();
+	for (Anope::string buf; (buf = this->GetLine()).empty() == false;)
+	{
+		Anope::Process(buf);
+		User::QuitUsers();
+	}
 	return true;
 }
 

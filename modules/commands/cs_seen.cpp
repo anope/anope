@@ -351,9 +351,9 @@ class CSSeen : public Module
 			purger.SetSecs(expiretimeout);
 	}
 
-	void OnUserConnect(Reference<User> &u, bool &exempt) anope_override
+	void OnUserConnect(User *u, bool &exempt) anope_override
 	{
-		if (u)
+		if (!u->Quitting())
 			UpdateUser(u, NEW, u->nick, "", "", "");
 	}
 

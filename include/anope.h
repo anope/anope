@@ -158,12 +158,25 @@ namespace Anope
 		/**
 		 * Trim leading and trailing white spaces from the string.
 		 */
-		inline string& trim()
+
+		inline string& ltrim()
 		{
 			while (!this->_string.empty() && isspace(this->_string[0]))
 				this->_string.erase(this->_string.begin());
+			return *this;
+		}
+
+		inline string& rtrim()
+		{
 			while (!this->_string.empty() && isspace(this->_string[this->_string.length() - 1]))
 				this->_string.erase(this->_string.length() - 1);
+			return *this;
+		}
+
+		inline string& trim()
+		{
+			this->ltrim();
+			this->rtrim();
 			return *this;
 		}
 

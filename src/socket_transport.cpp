@@ -33,33 +33,8 @@ bool BufferedSocket::ProcessRead()
 		return false;
 	
 	tbuffer[len] = 0;
+	this->read_buffer.append(tbuffer);
 	this->recv_len = len;
-
-	Anope::string sbuffer = this->extra_buf;
-	sbuffer += tbuffer;
-	this->extra_buf.clear();
-	size_t lastnewline = sbuffer.rfind('\n');
-	if (lastnewline == Anope::string::npos)
-	{
-		this->extra_buf = sbuffer;
-		return true;
-	}
-	if (lastnewline < sbuffer.length() - 1)
-	{
-		this->extra_buf = sbuffer.substr(lastnewline);
-		this->extra_buf.trim();
-		sbuffer = sbuffer.substr(0, lastnewline);
-	}
-
-	sepstream stream(sbuffer, '\n');
-
-	Anope::string tbuf;
-	while (stream.GetToken(tbuf))
-	{
-		tbuf.trim();
-		if (!Read(tbuf))
-			return false;
-	}
 
 	return true;
 }
@@ -76,9 +51,15 @@ bool BufferedSocket::ProcessWrite()
 	return true;
 }
 
-bool BufferedSocket::Read(const Anope::string &buf)
+const Anope::string BufferedSocket::GetLine()
 {
-	return false;
+	size_t s = this->read_buffer.find('\n');
+	if (s == Anope::string::npos)
+		return "";
+	Anope::string str = this->read_buffer.substr(0, s + 1);
+	this->read_buffer.erase(0, s + 1);
+	this->read_buffer.ltrim();
+	return str.trim();
 }
 
 void BufferedSocket::Write(const char *buffer, size_t l)

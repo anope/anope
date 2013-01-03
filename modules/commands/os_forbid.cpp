@@ -252,9 +252,9 @@ class OSForbid : public Module
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 	}
 
-	void OnUserConnect(Reference<User> &u, bool &exempt) anope_override
+	void OnUserConnect(User *u, bool &exempt) anope_override
 	{
-		if (!u || exempt)
+		if (u->Quitting() || exempt)
 			return;
 
 		this->OnUserNickChange(u, "");

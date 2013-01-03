@@ -125,9 +125,10 @@ class HTTPProxyConnect : public ProxyConnect, public BufferedSocket
 		return "HTTP";
 	}
 
-	bool Read(const Anope::string &buf) anope_override
+	bool ProcessRead() anope_override
 	{
-		if (buf == ProxyCheckString)
+		BufferedSocket::ProcessRead();
+		if (this->GetLine() == ProxyCheckString)
 		{
 			this->Ban();
 			return false;
@@ -341,9 +342,9 @@ class ModuleProxyScan : public Module
 		}
 	}
 
-	void OnUserConnect(Reference<User> &user, bool &exempt) anope_override
+	void OnUserConnect(User *user, bool &exempt) anope_override
 	{
-		if (exempt || !user || !Me->IsSynced() || !user->server->IsSynced())
+		if (exempt || user->Quitting() || !Me->IsSynced() || !user->server->IsSynced())
 			return;
 
 		/* At this time we only support IPv4 */

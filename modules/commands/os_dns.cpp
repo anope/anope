@@ -719,9 +719,9 @@ class ModuleDNS : public Module
 		}
 	}
 
-	void OnUserConnect(Reference<User> &u, bool &exempt) anope_override
+	void OnUserConnect(User *u, bool &exempt) anope_override
 	{
-		if (u && u->server)
+		if (!u->Quitting() && u->server)
 		{
 			DNSServer *s = DNSServer::Find(u->server->GetName());
 			/* Check for user limit reached */

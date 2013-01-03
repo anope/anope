@@ -718,9 +718,9 @@ class OSSession : public Module
 		ModuleManager::SetPriority(this, PRIORITY_FIRST);
 	}
 
-	void OnUserConnect(Reference<User> &user, bool &exempt) anope_override
+	void OnUserConnect(User *user, bool &exempt) anope_override
 	{
-		if (user && Config->LimitSessions)
+		if (!user->Quitting() && Config->LimitSessions)
 			this->AddSession(user, exempt);
 	}
 

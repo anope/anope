@@ -137,7 +137,8 @@ Server::~Server()
 					na->last_quit = this->quit_reason;
 				}
 
-				delete u;
+				u->Quit(this->quit_reason);
+				u->server = NULL;
 			}
 		}
 

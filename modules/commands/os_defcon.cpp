@@ -408,27 +408,6 @@ class OSDefcon : public Module
 		this->ParseModeString();
 	}
 
-	EventReturn OnUserConnect(User *u, bool &exempt)
-	{
-		if (!exempt && u->server->IsSynced() && DConfig.Check(DEFCON_AKILL_NEW_CLIENTS) && !u->server->IsULined())
-		{
-			if (DConfig.Check(DEFCON_AKILL_NEW_CLIENTS) && akills)
-			{
-				Log(OperServ, "operserv/defcon") << "DEFCON: adding akill for *@" << u->host;
-				XLine *x = new XLine("*@" + u->host, Config->OperServ, Anope::CurTime + DConfig.akillexpire, DConfig.akillreason, XLineManager::GenerateUID());
-				x->by = Config->OperServ;
-				akills->AddXLine(x);
-			}
-
-			if (DConfig.Check(DEFCON_NO_NEW_CLIENTS) || DConfig.Check(DEFCON_AKILL_NEW_CLIENTS))
-				u->Kill(Config->OperServ, DConfig.akillreason);
-
-			return EVENT_STOP;
-		}
-
-		return EVENT_CONTINUE;
-	}
-
 	EventReturn OnChannelModeSet(Channel *c, MessageSource &, ChannelModeName Name, const Anope::string &param) anope_override
 	{
 		ChannelMode *cm = ModeManager::FindChannelModeByName(Name);
@@ -501,9 +480,9 @@ class OSDefcon : public Module
 		return EVENT_CONTINUE;
 	}
 
-	void OnUserConnect(Reference<User> &u, bool &exempt) anope_override
+	void OnUserConnect(User *u, bool &exempt) anope_override
 	{
-		if (exempt || !u || !u->server->IsSynced() || u->server->IsULined())
+		if (exempt || !u->Quitting() || !u->server->IsSynced() || u->server->IsULined())
 			return;
 
 		if (DConfig.Check(DEFCON_AKILL_NEW_CLIENTS) && akills)

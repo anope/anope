@@ -237,9 +237,9 @@ class OperServCore : public Module
 			Log(u, "oper", OperServ) << "is no longer an IRC operator";
 	}
 
-	void OnUserConnect(Reference<User> &u, bool &exempt) anope_override
+	void OnUserConnect(User *u, bool &exempt) anope_override
 	{
-		if (u && !exempt)
+		if (!u->Quitting() && !exempt)
 			XLineManager::CheckAll(u);
 	}
 
@@ -249,11 +249,9 @@ class OperServCore : public Module
 			this->sqlines.CheckAllXLines(u);
 	}
 
-	EventReturn OnCheckKick(User *u, ChannelInfo *ci, bool &kick) anope_override
+	EventReturn OnCheckKick(User *u, ChannelInfo *ci, Anope::string &mask, Anope::string &reason) anope_override
 	{
-		if (this->sqlines.CheckChannel(ci->c))
-			kick = true;
-		return EVENT_CONTINUE;
+		return this->sqlines.CheckChannel(ci->c) ? EVENT_STOP : EVENT_CONTINUE;
 	}
 
 	EventReturn OnPreHelp(CommandSource &source, const std::vector<Anope::string> &params) anope_override

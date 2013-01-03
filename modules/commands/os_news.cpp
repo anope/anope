@@ -405,9 +405,9 @@ class OSNews : public Module
 			DisplayNews(u, NEWS_OPER);
 	}
 
-	void OnUserConnect(Reference<User> &user, bool &) anope_override
+	void OnUserConnect(User *user, bool &) anope_override
 	{
-		if (!user || !user->server->IsSynced())
+		if (user->Quitting() || !user->server->IsSynced())
 			return;
 
 		DisplayNews(user, NEWS_LOGON);

@@ -303,9 +303,9 @@ class NickServCore : public Module
 		}
 	}
 
-	void OnUserConnect(Reference<User> &u, bool &exempt) anope_override
+	void OnUserConnect(User *u, bool &exempt) anope_override
 	{
-		if (!u || !u->server->IsSynced())
+		if (u->Quitting() || !u->server->IsSynced())
 			return;
 
 		const NickAlias *na = NickAlias::Find(u->nick);

@@ -30,12 +30,15 @@ int OperCount = 0;
 unsigned MaxUserCount = 0;
 time_t MaxUserTime = 0;
 
+std::list<User *> User::quitting_users;
+
 User::User(const Anope::string &snick, const Anope::string &sident, const Anope::string &shost, const Anope::string &svhost, const Anope::string &sip, Server *sserver, const Anope::string &srealname, time_t ssignon, const Anope::string &smodes, const Anope::string &suid)
 {
 	if (snick.empty() || sident.empty() || shost.empty())
 		throw CoreException("Bad args passed to User::User");
 
 	/* we used to do this by calloc, no more. */
+	quit = false;
 	server = NULL;
 	invalid_pw_count = invalid_pw_time = lastmemosend = lastnickreg = lastmail = 0;
 	on_access = false;
@@ -79,8 +82,7 @@ User::User(const Anope::string &snick, const Anope::string &sident, const Anope:
 	bool exempt = false;
 	if (server && server->IsULined())
 		exempt = true;
-	Reference<User> user = this;
-	FOREACH_MOD(I_OnUserConnect, OnUserConnect(user, exempt));
+	FOREACH_MOD(I_OnUserConnect, OnUserConnect(this, exempt));
 }
 
 void User::ChangeNick(const Anope::string &newnick, time_t ts)
@@ -229,10 +231,11 @@ void User::SetRealname(const Anope::string &srealname)
 
 User::~User()
 {
-	Log(LOG_DEBUG_2) << "User::~User() called";
-
-	Log(this, "disconnect") << "(" << this->realname << ") " << "disconnected from the network (" << this->server->GetName() << ")";
-	--this->server->users;
+	if (this->server != NULL)
+	{
+		Log(this, "disconnect") << "(" << this->realname << ") disconnected from the network (" << this->server->GetName() << ")";
+		--this->server->users;
+	}
 
 	FOREACH_MOD(I_OnUserLogoff, OnUserLogoff(this));
 
@@ -252,8 +255,6 @@ User::~User()
 	NickAlias *na = NickAlias::Find(this->nick);
 	if (na)
 		na->OnCancel(this);
-
-	Log(LOG_DEBUG_2) << "User::~User() done";
 }
 
 void User::SendMessage(const BotInfo *source, const char *fmt, ...)
@@ -752,6 +753,12 @@ void User::Kill(const Anope::string &source, const Anope::string &reason)
 
 void User::KillInternal(const Anope::string &source, const Anope::string &reason)
 {
+	if (this->quit)
+	{
+		Log(LOG_DEBUG) << "Duplicate quit for " << this->nick;
+		return;
+	}
+
 	Log(this, "killed") << "was killed by " << source << " (Reason: " << reason << ")";
 
 	NickAlias *na = NickAlias::Find(this->nick);
@@ -761,7 +768,25 @@ void User::KillInternal(const Anope::string &source, const Anope::string &reason
 		na->last_quit = reason;
 	}
 
-	delete this;
+	this->quit = true;
+	quitting_users.push_back(this);
+}
+
+void User::Quit(const Anope::string &reason)
+{
+	if (this->quit)
+	{
+		Log(LOG_DEBUG) << "Duplicate quit for " << this->nick;
+		return;
+	}
+
+	this->quit = true;
+	quitting_users.push_back(this);
+}
+
+bool User::Quitting() const
+{
+	return this->quit;
 }
 
 Anope::string User::Mask() const
@@ -827,5 +852,12 @@ User* User::Find(const Anope::string &name, bool nick_only)
 	}
 
 	return NULL;
+}
+
+void User::QuitUsers()
+{
+	for (std::list<User *>::iterator it = quitting_users.begin(), it_end = quitting_users.end(); it != it_end; ++it)
+		delete *it;
+	quitting_users.clear();
 }
 

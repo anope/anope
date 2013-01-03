@@ -261,10 +261,10 @@ class CoreExport Socket : public Flags<SocketFlag>
 class CoreExport BufferedSocket : public virtual Socket
 {
  protected:
+ 	/* Things read from the socket */
+ 	Anope::string read_buffer;
 	/* Things to be written to the socket */
 	Anope::string write_buffer;
-	/* Part of a message sent from the server, but not totally received */
-	Anope::string extra_buf;
 	/* How much data was received from this socket on this recv() */
 	int recv_len;
 
@@ -282,11 +282,9 @@ class CoreExport BufferedSocket : public virtual Socket
 	 */
 	bool ProcessWrite() anope_override;
 
-	/** Called with a line received from the socket
-	 * @param buf The line
-	 * @return true to continue reading, false to drop the socket
+	/** Gets the new line from the input buffer, if any
 	 */
-	virtual bool Read(const Anope::string &buf);
+	const Anope::string GetLine();
 
 	/** Write to the socket
 	* @param message The message

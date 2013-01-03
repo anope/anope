@@ -291,7 +291,7 @@ class CoreExport Module : public Extensible
 	 * @param u The connecting user.
 	 * @param exempt set to true/is true if the user should be excepted from bans etc
 	 */
-	virtual void OnUserConnect(Reference<User> &u, bool &exempt) { }
+	virtual void OnUserConnect(User *u, bool &exempt) { }
 
 	/** Called when a new server connects to the network.
 	 * @param s The server that has connected to the network

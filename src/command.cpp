@@ -262,13 +262,10 @@ void RunCommand(CommandSource &source, const Anope::string &message)
 		return;
 	}
 
-	bool had_u = source.GetUser(), had_nc = source.nc;
-	Reference<User> user_reference(source.GetUser());
 	Reference<NickCore> nc_reference(source.nc);
 	c->Execute(source, params);
-	if (had_u == user_reference && had_nc == nc_reference)
-	{
-		FOREACH_MOD(I_OnPostCommand, OnPostCommand(source, c, params));
-	}
+	if (!nc_reference)
+		source.nc = NULL;
+	FOREACH_MOD(I_OnPostCommand, OnPostCommand(source, c, params));
 }
 

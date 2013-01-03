@@ -150,14 +150,11 @@ class BotServCore : public Module
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
-		Reference<User> user_reference(u);
 		Reference<NickCore> nc_reference(u->Account());
 		cmd->Execute(source, params);
-
-		if (user_reference && nc_reference)
-		{
-			FOREACH_MOD(I_OnPostCommand, OnPostCommand(source, cmd, params));
-		}
+		if (!nc_reference)
+			source.nc = NULL;
+		FOREACH_MOD(I_OnPostCommand, OnPostCommand(source, cmd, params));
 	}
 
 	void OnJoinChannel(User *user, Channel *c) anope_override

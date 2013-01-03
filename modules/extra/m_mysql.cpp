@@ -406,7 +406,7 @@ std::vector<Query> MySQLService::CreateTable(const Anope::string &table, const D
 	return queries;
 }
 
-Query MySQLService::BuildInsert(const Anope::string &table, unsigned int id, Data &data) anope_override
+Query MySQLService::BuildInsert(const Anope::string &table, unsigned int id, Data &data)
 {
 	/* Empty columns not present in the data set */
 	const std::set<Anope::string> &known_cols = this->active_schema[table];

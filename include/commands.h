@@ -54,7 +54,7 @@ class CoreExport CommandSource
 	/* The nick executing the command */
 	Anope::string nick;
 	/* User executing the command, may be NULL */
-	Reference<User> u;
+	User *u;
  public:
 	/* The account executing the command */
 	Reference<NickCore> nc;

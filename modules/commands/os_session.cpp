@@ -713,7 +713,7 @@ class OSSession : public Module
 	{
 		this->SetAuthor("Anope");
 
-		Implementation i[] = { I_OnUserConnect, I_OnUserLogoff };
+		Implementation i[] = { I_OnUserConnect, I_OnPreUserLogoff };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 		ModuleManager::SetPriority(this, PRIORITY_FIRST);
 	}
@@ -724,7 +724,7 @@ class OSSession : public Module
 			this->AddSession(user, exempt);
 	}
 
-	void OnUserLogoff(User *u) anope_override
+	void OnPreUserLogoff(User *u) anope_override
 	{
 		if (Config->LimitSessions && (!u->server || !u->server->IsULined()))
 			this->DelSession(u);

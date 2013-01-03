@@ -198,7 +198,7 @@ class NickServCore : public Module
 			throw ModuleException("No bot named " + Config->NickServ);
 
 		Implementation i[] = { I_OnBotDelete, I_OnDelNick, I_OnDelCore, I_OnChangeCoreDisplay, I_OnNickIdentify, I_OnNickGroup,
-				I_OnNickUpdate, I_OnUserConnect, I_OnServerSync, I_OnUserNickChange, I_OnPreHelp, I_OnPostHelp };
+				I_OnNickUpdate, I_OnUserConnect, I_OnPostUserLogoff, I_OnServerSync, I_OnUserNickChange, I_OnPreHelp, I_OnPostHelp };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 	}
 
@@ -315,6 +315,13 @@ class NickServCore : public Module
 			this->mynickserv.Validate(u);
 	}
 
+	void OnPostUserLogoff(User *u) anope_override
+	{
+		NickAlias *na = NickAlias::Find(u->nick);
+		if (na)
+			na->OnCancel(u);
+	}
+
 	void OnServerSync(Server *s) anope_override
 	{
 		for (user_map::const_iterator it = UserListByNick.begin(); it != UserListByNick.end(); ++it)
@@ -327,7 +334,7 @@ class NickServCore : public Module
 
 	void OnUserNickChange(User *u, const Anope::string &oldnick) anope_override
 	{
-		const NickAlias *na = NickAlias::Find(u->nick);
+		NickAlias *old_na = NickAlias::Find(oldnick), *na = NickAlias::Find(u->nick);
 		/* If the new nick isnt registerd or its registerd and not yours */
 		if (!na || na->nc != u->Account())
 		{
@@ -344,6 +351,9 @@ class NickServCore : public Module
 				u->SetMode(NickServ, UMODE_REGISTERED);
 			Log(NickServ) << u->GetMask() << " automatically identified for group " << u->Account()->display;
 		}
+
+		if (!u->nick.equals_ci(oldnick) && old_na)
+			old_na->OnCancel(u);
 	}
 
 	void OnUserModeSet(User *u, UserModeName Name) anope_override

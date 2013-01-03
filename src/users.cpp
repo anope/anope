@@ -114,9 +114,6 @@ void User::ChangeNick(const Anope::string &newnick, time_t ts)
 		if (na)
 			on_access = na->nc->IsOnAccess(this);
 
-		if (old_na)
-			old_na->OnCancel(this);
-
 		if (na && na->nc == this->Account())
 		{
 			na->last_seen = Anope::CurTime;
@@ -237,7 +234,7 @@ User::~User()
 		--this->server->users;
 	}
 
-	FOREACH_MOD(I_OnUserLogoff, OnUserLogoff(this));
+	FOREACH_MOD(I_OnPreUserLogoff, OnPreUserLogoff(this));
 
 	ModeManager::StackerDel(this);
 	this->Logout();
@@ -252,9 +249,7 @@ User::~User()
 	if (!this->uid.empty())
 		UserListByUID.erase(this->uid);
 
-	NickAlias *na = NickAlias::Find(this->nick);
-	if (na)
-		na->OnCancel(this);
+	FOREACH_MOD(I_OnPostUserLogoff, OnPostUserLogoff(this));
 }
 
 void User::SendMessage(const BotInfo *source, const char *fmt, ...)

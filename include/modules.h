@@ -536,10 +536,12 @@ class CoreExport Module : public Extensible
 	 */
 	virtual void OnUserQuit(User *u, const Anope::string &msg) { }
 
-	/** Called when a user disconnects
+	/** Called when a user disconnects, before and after being internally removed from
+	 * all lists (channels, user list, etc)
 	 * @param u The user
 	 */
-	virtual void OnUserLogoff(User *u) { }
+	virtual void OnPreUserLogoff(User *u) { }
+	virtual void OnPostUserLogoff(User *u) { }
 
 	/** Called when a new bot is made
 	 * @param bi The bot
@@ -994,7 +996,7 @@ enum Implementation
 		I_OnMemoSend, I_OnMemoDel,
 
 		/* Users */
-		I_OnUserConnect, I_OnUserNickChange, I_OnUserQuit, I_OnUserLogoff, I_OnPreJoinChannel,
+		I_OnUserConnect, I_OnUserNickChange, I_OnUserQuit, I_OnPreUserLogoff, I_OnPostUserLogoff, I_OnPreJoinChannel,
 		I_OnJoinChannel, I_OnPrePartChannel, I_OnPartChannel, I_OnLeaveChannel, I_OnFingerprint, I_OnUserAway,
 
 		/* OperServ */

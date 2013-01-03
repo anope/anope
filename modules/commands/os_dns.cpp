@@ -661,7 +661,7 @@ class ModuleDNS : public Module
 	{
 		this->SetAuthor("Anope");
 
-		Implementation i[] = { I_OnReload, I_OnNewServer, I_OnServerQuit, I_OnUserConnect, I_OnUserLogoff, I_OnDnsRequest };
+		Implementation i[] = { I_OnReload, I_OnNewServer, I_OnServerQuit, I_OnUserConnect, I_OnPreUserLogoff, I_OnDnsRequest };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 
 		this->OnReload();
@@ -733,7 +733,7 @@ class ModuleDNS : public Module
 		}
 	}
 
-	void OnUserLogoff(User *u) anope_override
+	void OnPreUserLogoff(User *u) anope_override
 	{
 		if (u && u->server)
 		{

@@ -116,13 +116,20 @@ class DNSServer : public Serializable
 	void SetLimit(unsigned l) { limit = l; }
 
 	bool Pooled() const { return pooled; }
-	void Pool(bool p) { pooled = p; }
+	void Pool(bool p)
+	{
+		if (!p)
+			this->SetActive(p);
+		pooled = p;
+	}
 
 	bool Active() const { return pooled && active; }
 	void SetActive(bool p)
 	{
-		this->Pool(p);
+		if (p)
+			this->Pool(p);
 		active = p;
+
 		if (dnsmanager)
 			dnsmanager->UpdateSerial();
 	}
@@ -485,7 +492,7 @@ class CommandOSDNS : public Command
 				if (s->GetIPs().empty())
 				{
 					s->repool = 0;
-					s->SetActive(false);
+					s->Pool(false);
 				}
 
 				if (s->Active() && dnsmanager)
@@ -574,7 +581,7 @@ class CommandOSDNS : public Command
 			return;
 		}
 
-		s->SetActive(false);
+		s->Pool(false);
 
 		source.Reply(_("Depooled %s."), s->GetName().c_str());
 		Log(LOG_ADMIN, source, this) << "to depool " << s->GetName();

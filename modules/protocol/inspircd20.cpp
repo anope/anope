@@ -652,7 +652,7 @@ class ProtoInspIRCd : public Module
 		message_endburst("IRCDMessage", "inspircd20/endburst", "inspircd12/endburst"),
 		message_fhost("IRCDMessage", "inspircd20/fhost", "inspircd12/fhost"),
 		message_fjoin("IRCDMessage", "inspircd20/fjoin", "inspircd12/fjoin"),
-		message_fmode("IRCDMessage", "inspircd20/mode", "inspircd12/fmode"),
+		message_fmode("IRCDMessage", "inspircd20/fmode", "inspircd12/fmode"),
 		message_ftopic("IRCDMessage", "inspircd20/ftopic", "inspircd12/ftopic"),
 		message_idle("IRCDMessage", "inspircd20/idle", "inspircd12/idle"),
 		message_metadata("IRCDMessage", "inspircd20/metadata", "inspircd12/metadata"),

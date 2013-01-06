@@ -752,7 +752,9 @@ struct IRCDMessageMode : IRCDMessage
 
 struct IRCDMessageNick : IRCDMessage
 {
-	IRCDMessageNick(Module *creator) : IRCDMessage(creator, "NICK", 1) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
+	ServiceReference<NickServService> NSService;
+
+	IRCDMessageNick(Module *creator) : IRCDMessage(creator, "NICK", 1), NSService("NickServService", "NickServ") { SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
 
 	void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
 	{
@@ -761,12 +763,12 @@ struct IRCDMessageNick : IRCDMessage
 			time_t ts = Anope::string(params[0]).is_pos_number_only() ? convertTo<time_t>(params[0]) : Anope::CurTime;
 
 			User *user = new User(params[1], params[4], params[2], params[3], params[6], source.GetServer(), params[7], ts, params[5]);
-			if (NickServService)
+			if (NSService)
 			{
 				NickAlias *na = NickAlias::Find(user->nick);
 				Anope::string *svidbuf = na ? na->nc->GetExt<ExtensibleItemClass<Anope::string> *>("authenticationtoken") : NULL;
 				if (na && svidbuf && *svidbuf == params[0])
-					NickServService->Login(user, na);
+					NSService->Login(user, na);
 			}
 		}
 		else if (params.size() == 1 && source.GetUser())

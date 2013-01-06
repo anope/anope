@@ -238,7 +238,9 @@ struct IRCDMessageServer : IRCDMessage
 
 struct IRCDMessageUID : IRCDMessage
 {
-	IRCDMessageUID(Module *creator) : IRCDMessage(creator, "UID", 11) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
+	ServiceReference<NickServService> NSService;
+
+	IRCDMessageUID(Module *creator) : IRCDMessage(creator, "UID", 11), NSService("NickServService", "NickServ") { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
 
 	/*
 	   params[0] = nick
@@ -274,11 +276,11 @@ struct IRCDMessageUID : IRCDMessage
 		User *user = new User(params[0], params[4], params[9], params[5], ip, source.GetServer(), params[10], ts, params[3], params[7]);
 		try
 		{
-			if (NickServService && params[8].is_pos_number_only() && convertTo<time_t>(params[8]) == user->timestamp)
+			if (NSService && params[8].is_pos_number_only() && convertTo<time_t>(params[8]) == user->timestamp)
 			{
 				NickAlias *na = NickAlias::Find(user->nick);
 				if (na)
-					NickServService->Login(user, na);
+					NSService->Login(user, na);
 			}
 		}
 		catch (const ConvertException &) { }

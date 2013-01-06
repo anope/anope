@@ -371,7 +371,9 @@ struct IRCDMessageMode : IRCDMessage
  */
 struct IRCDMessageNick : IRCDMessage
 {
-	IRCDMessageNick(Module *creator) : IRCDMessage(creator, "NICK", 2) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
+	ServiceReference<NickServService> NSService;
+
+	IRCDMessageNick(Module *creator) : IRCDMessage(creator, "NICK", 2), NSService("NickServService", "NickServ") { SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
 
 	void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
 	{
@@ -388,8 +390,8 @@ struct IRCDMessageNick : IRCDMessage
 			try
 			{
 				NickAlias *na;
-				if (NickServService && user->signon == convertTo<time_t>(params[7]) && (na = NickAlias::Find(user->nick)))
-					NickServService->Login(user, na);
+				if (NSService && user->signon == convertTo<time_t>(params[7]) && (na = NickAlias::Find(user->nick)))
+					NSService->Login(user, na);
 			}
 			catch (const ConvertException &) { }
 		}

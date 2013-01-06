@@ -98,11 +98,10 @@ struct DefconConfig
 
 static DefconConfig DConfig;
 
-/**************************************************************************/
-
-void defcon_sendlvls(CommandSource &source);
-void runDefCon();
+static void runDefCon();
 static Anope::string defconReverseModes(const Anope::string &modes);
+
+static ServiceReference<GlobalService> GlobalService("GlobalService", "Global");
 
 class DefConTimeout : public CallBack
 {
@@ -556,34 +555,7 @@ class OSDefcon : public Module
 	}
 };
 
-/**
- * Send a message to the oper about which precautions are "active" for this level
- **/
-void defcon_sendlvls(CommandSource &source)
-{
-	if (DConfig.Check(DEFCON_NO_NEW_CHANNELS))
-		source.Reply(_("* No new channel registrations"));
-	if (DConfig.Check(DEFCON_NO_NEW_NICKS))
-		source.Reply(_("* No new nick registrations"));
-	if (DConfig.Check(DEFCON_NO_MLOCK_CHANGE))
-		source.Reply(_("* No MLOCK changes"));
-	if (DConfig.Check(DEFCON_FORCE_CHAN_MODES) && !DConfig.chanmodes.empty())
-		source.Reply(_("* Force Chan Modes (%s) to be set on all channels"), DConfig.chanmodes.c_str());
-	if (DConfig.Check(DEFCON_REDUCE_SESSION))
-		source.Reply(_("* Use the reduced session limit of %d"), DConfig.sessionlimit);
-	if (DConfig.Check(DEFCON_NO_NEW_CLIENTS))
-		source.Reply(_("* Kill any NEW clients connecting"));
-	if (DConfig.Check(DEFCON_OPER_ONLY))
-		source.Reply(_("* Ignore any non-opers with message"));
-	if (DConfig.Check(DEFCON_SILENT_OPER_ONLY))
-		source.Reply(_("* Silently ignore non-opers"));
-	if (DConfig.Check(DEFCON_AKILL_NEW_CLIENTS))
-		source.Reply(_("* AKILL any new clients connecting"));
-	if (DConfig.Check(DEFCON_NO_NEW_MEMOS))
-		source.Reply(_("* No new memos sent"));
-}
-
-void runDefCon()
+static void runDefCon()
 {
 	if (DConfig.Check(DEFCON_FORCE_CHAN_MODES))
 	{

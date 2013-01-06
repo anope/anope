@@ -14,6 +14,8 @@
 #include "module.h"
 #include "memoserv.h"
 
+static ServiceReference<MemoServService> MemoServService("MemoServService", "MemoServ");
+
 class CommandMSSendAll : public Command
 {
  public:

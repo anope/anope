@@ -10,7 +10,5 @@ class NickServService : public Service
 	virtual void Login(User *u, NickAlias *na) = 0;
 };
 
-static ServiceReference<NickServService> NickServService("NickServService", "NickServ");
-
 #endif // NICKSERV_H
 

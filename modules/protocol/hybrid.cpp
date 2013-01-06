@@ -485,7 +485,9 @@ struct IRCDMessageTMode : IRCDMessage
 
 struct IRCDMessageUID : IRCDMessage
 {
-	IRCDMessageUID(Module *creator) : IRCDMessage(creator, "UID", 10) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
+	ServiceReference<NickServService> NSService;
+
+	IRCDMessageUID(Module *creator) : IRCDMessage(creator, "UID", 10), NSService("NickServService", "NickServ") { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
 
 	/*          0     1 2          3   4      5             6        7         8           9                   */
 	/* :0MC UID Steve 1 1350157102 +oi ~steve resolved.host 10.0.0.1 0MCAAAAAB 1350157108 :Mining all the time */
@@ -502,11 +504,11 @@ struct IRCDMessageUID : IRCDMessage
 					params[9], params[2].is_pos_number_only() ? convertTo<time_t>(params[2]) : 0,
 					params[3], params[7]);
 
-		if (NickServService && params[8] != "0")
+		if (NSService && params[8] != "0")
 		{
 			NickAlias *na = NickAlias::Find(params[8]);
 			if (na != NULL)
-				NickServService->Login(user, na);
+				NSService->Login(user, na);
 		}
 	}
 };

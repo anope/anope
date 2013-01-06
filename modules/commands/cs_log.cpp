@@ -181,10 +181,12 @@ public:
 
 class CSLog : public Module
 {
+	ServiceReference<MemoServService> MSService;
 	CommandCSLog commandcslog;
 
  public:
-	CSLog(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE), commandcslog(this)
+	CSLog(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+		MSService("MemoServService", "MemoServ"), commandcslog(this)
 	{
 		this->SetAuthor("Anope");
 
@@ -212,8 +214,8 @@ class CSLog : public Module
 				}
 				else if (log->method.equals_ci("NOTICE") && l->ci->c && l->ci->bi && l->ci->c->FindUser(l->ci->bi) != NULL)
 					IRCD->SendNotice(l->ci->bi, log->extra + l->ci->c->name, "%s", buffer.c_str());
-				else if (log->method.equals_ci("MEMO") && MemoServService && l->ci->WhoSends() != NULL)
-					MemoServService->Send(l->ci->WhoSends()->nick, l->ci->name, buffer, true);
+				else if (log->method.equals_ci("MEMO") && MSService && l->ci->WhoSends() != NULL)
+					MSService->Send(l->ci->WhoSends()->nick, l->ci->name, buffer, true);
 			}
 		}
 	}

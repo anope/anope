@@ -18,6 +18,8 @@
 #include "module.h"
 #include "memoserv.h"
 
+static ServiceReference<MemoServService> MemoServService("MemoServService", "MemoServ");
+
 static bool HSRequestMemoUser = false;
 static bool HSRequestMemoOper = false;
 

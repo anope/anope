@@ -14,6 +14,8 @@
 #include "module.h"
 #include "memoserv.h"
 
+static ServiceReference<MemoServService> MemoServService("MemoServService", "MemoServ");
+
 static void rsend_notify(CommandSource &source, MemoInfo *mi, Memo *m, const Anope::string &targ)
 {
 	/* Only send receipt if memos are allowed */

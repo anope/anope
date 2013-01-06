@@ -750,7 +750,9 @@ struct IRCDMessageNetInfo : IRCDMessage
 
 struct IRCDMessageNick : IRCDMessage
 {
-	IRCDMessageNick(Module *creator) : IRCDMessage(creator, "NICK", 2) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
+	ServiceReference<NickServService> NSService;
+
+	IRCDMessageNick(Module *creator) : IRCDMessage(creator, "NICK", 2), NSService("NickServService", "NickServ") { SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
 
 	/*
 	** NICK - new
@@ -817,8 +819,8 @@ struct IRCDMessageNick : IRCDMessage
 				na = NickAlias::Find(params[6]);
 			}
 
-			if (na && NickServService)
-				NickServService->Login(user, na);
+			if (na && NSService)
+				NSService->Login(user, na);
 		}
 		else
 			source.GetUser()->ChangeNick(params[0]);

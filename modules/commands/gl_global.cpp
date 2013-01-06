@@ -16,8 +16,10 @@
 
 class CommandGLGlobal : public Command
 {
+	ServiceReference<GlobalService> GService;
+
  public:
-	CommandGLGlobal(Module *creator) : Command(creator, "global/global", 1, 1)
+	CommandGLGlobal(Module *creator) : Command(creator, "global/global", 1, 1), GService("GlobalService", "Global")
 	{
 		this->SetDesc(_("Send a message to all users"));
 		this->SetSyntax(_("\037message\037"));
@@ -27,12 +29,12 @@ class CommandGLGlobal : public Command
 	{
 		const Anope::string &msg = params[0];
 
-		if (!GlobalService)
+		if (!GService)
 			source.Reply("No global reference, is gl_main loaded?");
 		else
 		{
 			Log(LOG_ADMIN, source, this);
-			GlobalService->SendGlobal(Global, source.GetNick(), msg);
+			GService->SendGlobal(Global, source.GetNick(), msg);
 		}
 	}
 

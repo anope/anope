@@ -14,7 +14,5 @@ class GlobalService : public Service
 	virtual void SendGlobal(const BotInfo *sender, const Anope::string &source, const Anope::string &message) = 0;
 };
 
-static ServiceReference<GlobalService> GlobalService("GlobalService", "Global");
-
 #endif // GLOBAL_H
 

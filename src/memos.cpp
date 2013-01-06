@@ -35,6 +35,7 @@ void Memo::Serialize(Serialize::Data &data) const
 
 Serializable* Memo::Unserialize(Serializable *obj, Serialize::Data &data)
 {
+	ServiceReference<MemoServService> MemoServService("MemoServService", "MemoServ");
 	if (!MemoServService)
 		return NULL;
 	

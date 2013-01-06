@@ -35,7 +35,5 @@ class MemoServService : public Service
 	virtual void Check(User *u) = 0;
 };
 
-static ServiceReference<MemoServService> MemoServService("MemoServService", "MemoServ");
-
 #endif // MEMOSERV_H
 

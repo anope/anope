@@ -328,7 +328,7 @@ class NickServCore : public Module
 		{
 			User *u = it->second;
 			if (u->server == s && !u->IsIdentified())
-				NickServService->Validate(u);
+				this->mynickserv.Validate(u);
 		}
 	}
 

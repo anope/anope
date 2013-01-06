@@ -75,13 +75,13 @@ class GlobalCore : public Module
 	void OnRestart() anope_override
 	{
 		if (Config->GlobalOnCycle)
-			GlobalService->SendGlobal(Global, "", Config->GlobalOnCycleMessage);
+			this->myglobalservice.SendGlobal(Global, "", Config->GlobalOnCycleMessage);
 	}
 	
 	void OnShutdown() anope_override
 	{
 		if (Config->GlobalOnCycle)
-			GlobalService->SendGlobal(Global, "", Config->GlobalOnCycleMessage);
+			this->myglobalservice.SendGlobal(Global, "", Config->GlobalOnCycleMessage);
 	}
 
 	void OnNewServer(Server *s) anope_override

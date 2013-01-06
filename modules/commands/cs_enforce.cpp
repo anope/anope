@@ -115,7 +115,7 @@ class CommandCSEnforce : public Command
 			if (user->IsProtected())
 				continue;
 
-			if (!user->IsIdentified())
+			if (!user->HasMode(UMODE_SSL))
 				users.push_back(user);
 		}
 

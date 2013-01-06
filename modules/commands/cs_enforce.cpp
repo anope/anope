@@ -125,7 +125,7 @@ class CommandCSEnforce : public Command
 
 			Anope::string mask = ci->GetIdealBan(user);
 			Anope::string reason = Language::Translate(user, _("SSLONLY enforced by ")) + source.GetNick();
-			if (!ci->c->HasMode(CMODE_REGISTEREDONLY))
+			if (!ci->c->HasMode(CMODE_SSL))
 				ci->c->SetMode(NULL, CMODE_BAN, mask);
 			ci->c->Kick(NULL, user, "%s", reason.c_str());
 		}

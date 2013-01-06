@@ -319,7 +319,7 @@ class XOPBase : public Command
 		const ChanAccess *highest = access.Highest();
 		bool override = false;
 
-		if (mask.find_first_of("!*@") == Anope::string::npos && !NickAlias::Find(mask))
+		if (!isdigit(mask[0]) && mask.find_first_of("!*@") == Anope::string::npos && !NickAlias::Find(mask))
 		{
 			User *targ = User::Find(mask, true);
 			if (targ != NULL)

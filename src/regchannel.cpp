@@ -167,7 +167,10 @@ void ModeLock::Serialize(Serialize::Data &data) const
 	const Anope::string* ChannelModeNameStrings = Flags<ChannelModeName>::GetFlagStrings();
 	data["ci"] << this->ci->name;
 	data["set"] << this->set;
-	data["name"] << ChannelModeNameStrings[this->name];
+	if (this->name < CMODE_END)
+		data["name"] << ChannelModeNameStrings[this->name];
+	else
+		data["name"] << this->name - CMODE_END;
 	data["param"] << this->param;
 	data["setter"] << this->setter;
 	data.SetType("created", Serialize::Data::DT_INT); data["created"] << this->created;
@@ -186,13 +189,24 @@ Serializable* ModeLock::Unserialize(Serializable *obj, Serialize::Data &data)
 
 	ChannelModeName name = CMODE_END;
 
-	const Anope::string* ChannelModeNameStrings = Flags<ChannelModeName>::GetFlagStrings();
-	for (unsigned i = 0; !ChannelModeNameStrings[i].empty(); ++i)
-		if (ChannelModeNameStrings[i] == sname)
+	if (sname.is_pos_number_only())
+	{
+		try
 		{
-			name = static_cast<ChannelModeName>(i);
-			break;
+			name = static_cast<ChannelModeName>(CMODE_END + convertTo<unsigned>(sname));
 		}
+		catch (const ConvertException &) { }
+	}
+	else
+	{
+		const Anope::string* ChannelModeNameStrings = Flags<ChannelModeName>::GetFlagStrings();
+		for (unsigned i = 0; !ChannelModeNameStrings[i].empty(); ++i)
+			if (ChannelModeNameStrings[i] == sname)
+			{
+				name = static_cast<ChannelModeName>(i);
+				break;
+			}
+	}
 	if (name == CMODE_END)
 		return NULL;
 	

@@ -222,6 +222,8 @@ struct IRCDMessageCapab : Message::Capab
 					cm = new ChannelMode(CMODE_FILTER, modechar[0]);
 				else if (modename.equals_cs("delayjoin"))
 					cm = new ChannelMode(CMODE_DELAYEDJOIN, modechar[0]);
+				else if (modename.equals_cs("filter"))
+					cm = new ChannelModeList(CMODE_FILTER, modechar[0]);
 				else if (modename.equals_cs("flood"))
 					cm = new ChannelModeFlood(modechar[0], true);
 				else if (modename.equals_cs("founder"))

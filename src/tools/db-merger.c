@@ -1,6 +1,6 @@
 /*
  * Anope Database Merger
- * (C) 2003-2012 Anope Team
+ * (C) 2003-2013 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -9,7 +9,7 @@
  *
  *   Based on the original IRC, db-merger.c
  *   (C) Copyright 2005-2006, Florian Schulze (Certus)
- *   Based on the original code of Anope, (C) 2003-2012 Anope Team
+ *   Based on the original code of Anope, (C) 2003-2013 Anope Team
  *
  */
 

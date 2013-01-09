@@ -1,6 +1,6 @@
 /* ircd-hybrid-8 protocol module
  *
- * (C) 2003-2012 Anope Team
+ * (C) 2003-2013 Anope Team
  * (C) 2012 by the Hybrid Development Team
  *
  * Please read COPYING and README for further details.

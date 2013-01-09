@@ -1,6 +1,6 @@
 /* ns_noop.c - Allows users to optionaly set autoop to off
  *
- * (C) 2003-2012 Anope Team
+ * (C) 2003-2013 Anope Team
  * Contact us at team@anope.org
  *
  * Based on the original module by Rob <rob@anope.org>

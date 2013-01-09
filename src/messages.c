@@ -1,6 +1,6 @@
 /* Definitions of IRC message functions and list of messages.
  *
- * (C) 2003-2012 Anope Team
+ * (C) 2003-2013 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.

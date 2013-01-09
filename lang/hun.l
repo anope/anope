@@ -1,6 +1,6 @@
 # Hungarian (magyar) language file.
 #
-# (C) 2003-2012 Anope Team
+# (C) 2003-2013 Anope Team
 # Contact us at team@anope.org
 #    
 # Translated by:                                      

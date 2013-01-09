@@ -1,7 +1,7 @@
 /*
  * Config.cs - Windows Configuration
  *
- * (C) 2003-2012 Anope Team
+ * (C) 2003-2013 Anope Team
  * Contact us at team@anope.org
  *
  * This program is free but copyrighted software; see the file COPYING for

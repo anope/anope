@@ -108,9 +108,9 @@ class BotServCore : public Module
 		for (unsigned i = 0, j = params.size() - (count - 1); i < j; ++i)
 			params.erase(params.begin());
 
-		/* All ChanServ commands take the channel as a first parameter */
-		if (cmd->name.find("chanserv/") == 0 && !cmd->HasFlag(CFLAG_STRIP_CHANNEL))
-			params.insert(params.begin(), c->ci->name);
+		/* Some commands take the channel as a first parameter */
+		if (info.prepend_channel)
+			params.insert(params.begin(), c->name);
 
 		while (cmd->max_params > 0 && params.size() > cmd->max_params)
 		{

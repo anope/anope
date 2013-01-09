@@ -21,9 +21,6 @@ enum CommandFlag
 	/* Command allow unidentified users to use it */
 	CFLAG_ALLOW_UNREGISTERED,
 	
-	/* Command's first parameter is a channel name */
-	CFLAG_STRIP_CHANNEL,
-
 	/* Command requires a user to execute */
 	CFLAG_REQUIRE_USER
 };
@@ -33,10 +30,14 @@ struct CommandInfo
 {
 	typedef Anope::map<CommandInfo> map;
 
+	CommandInfo() : prepend_channel(false) { }
+
 	/* Service name of the command */
 	Anope::string name;
 	/* Permission required to execute the command */
 	Anope::string permission;
+	/* Only used with fantasy */
+	bool prepend_channel;
 };
 
 /* Where the replies from commands go to. User inheits from this and is the normal

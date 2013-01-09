@@ -18,7 +18,6 @@ class CommandCSList : public Command
  public:
 	CommandCSList(Module *creator) : Command(creator, "chanserv/list", 1, 2)
 	{
-		this->SetFlag(CFLAG_STRIP_CHANNEL);
 		this->SetDesc(_("Lists all registered channels matching the given pattern"));
 		this->SetSyntax(_("\037pattern\037 [SUSPENDED] [NOEXPIRE]"));
 	}

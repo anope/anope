@@ -38,7 +38,6 @@ class CommandCSStats : public Command
  public:
 	CommandCSStats(Module *creator) : Command (creator, "chanserv/stats", 0, 2)
 	{
-		this->SetFlag(CFLAG_STRIP_CHANNEL);
 		this->SetDesc(_("Displays your Channel Stats"));
 		this->SetSyntax(_("\037nick\037"));
 	}
@@ -51,7 +50,6 @@ class CommandCSGStats : public Command
  public:
 	CommandCSGStats(Module *creator) : Command (creator, "chanserv/gstats", 0, 2)
 	{
-		this->SetFlag(CFLAG_STRIP_CHANNEL);
 		this->SetDesc(_("Displays your Global Stats"));
 		this->SetSyntax(_("\037nick\037"));
 	}

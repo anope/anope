@@ -37,7 +37,6 @@ class CommandCSTop : public Command
  public:
 	CommandCSTop(Module *creator) : Command (creator, "chanserv/top", 0, 2)
 	{
-		this->SetFlag(CFLAG_STRIP_CHANNEL);
 		this->SetDesc(_("Displays the top 3 users of a channel"));
 		this->SetSyntax(_("\037channel\037"));
 	}
@@ -50,7 +49,6 @@ class CommandCSTop10 : public Command
  public:
 	CommandCSTop10(Module *creator) : Command (creator, "chanserv/top10", 0, 2)
 	{
-		this->SetFlag(CFLAG_STRIP_CHANNEL);
 		this->SetDesc(_("Displays the top 10 users of a channel"));
 		this->SetSyntax(_("\037channel\037"));
 	}
@@ -63,7 +61,6 @@ class CommandCSGTop : public Command
  public:
 	CommandCSGTop(Module *creator) : Command (creator, "chanserv/gtop", 0, 1)
 	{
-		this->SetFlag(CFLAG_STRIP_CHANNEL);
 		this->SetDesc(_("Displays the top 3 users of the network"));
 		this->SetSyntax("");
 	}
@@ -76,7 +73,6 @@ class CommandCSGTop10 : public Command
  public:
 	CommandCSGTop10(Module *creator) : Command (creator, "chanserv/gtop10", 0, 1)
 	{
-		this->SetFlag(CFLAG_STRIP_CHANNEL);
 		this->SetDesc(_("Displays the top 10 users of the network"));
 		this->SetSyntax("");
 	}

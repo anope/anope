@@ -19,7 +19,6 @@ class CommandHelp : public Command
 	CommandHelp(Module *creator) : Command(creator, "generic/help", 0)
 	{
 		this->SetDesc(_("Displays this list and give information about commands"));
-		this->SetFlag(CFLAG_STRIP_CHANNEL);
 		this->SetFlag(CFLAG_ALLOW_UNREGISTERED);
 	}
 

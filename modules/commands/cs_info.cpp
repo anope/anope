@@ -29,7 +29,6 @@ class CommandCSInfo : public Command
  public:
 	CommandCSInfo(Module *creator) : Command(creator, "chanserv/info", 1, 2)
 	{
-		this->SetFlag(CFLAG_ALLOW_UNREGISTERED);
 		this->SetDesc(_("Lists information about the named registered channel"));
 		this->SetSyntax(_("\037channel\037"));
 	}

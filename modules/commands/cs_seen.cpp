@@ -184,7 +184,6 @@ class CommandSeen : public Command
  public:
 	CommandSeen(Module *creator) : Command(creator, "chanserv/seen", 1, 2)
 	{
-		this->SetFlag(CFLAG_STRIP_CHANNEL);
 		this->SetDesc(_("Tells you about the last time a user was seen"));
 		this->SetSyntax(_("\037nick\037"));
 	}

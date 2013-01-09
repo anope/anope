@@ -15,19 +15,20 @@
 
 class CommandCSMode : public Command
 {
-	bool CanSet(CommandSource &source, ChannelInfo *ci, ChannelMode *cm)
+	bool CanSet(CommandSource &source, ChannelInfo *ci, ChannelMode *cm, bool self)
 	{
 		if (!ci || !cm || cm->type != MODE_STATUS)
 			return false;
 
-		const Anope::string accesses[] = { "VOICE", "HALFOP", "OPDEOP", "PROTECT", "OWNER", "" };
+		const Anope::string accesses[] = { "VOICE", "HALFOP", "OPDEOP", "PROTECT", "OWNER", "" },
+				accesses_self[] = { "VOICEME", "HALFOPME", "OPDEOPME", "PROTECTME", "OWNERME", "" };
 		const ChannelModeName modes[] = { CMODE_VOICE, CMODE_HALFOP, CMODE_OP, CMODE_PROTECT, CMODE_OWNER };
 		ChannelModeStatus *cms = anope_dynamic_static_cast<ChannelModeStatus *>(cm);
 		AccessGroup access = source.AccessFor(ci);
 		unsigned short u_level = 0;
 
 		for (int i = 0; !accesses[i].empty(); ++i)
-			if (access.HasPriv(accesses[i]))
+			if (access.HasPriv(self ? accesses_self[i] : accesses[i]))
 			{
 				ChannelMode *cm2 = ModeManager::FindChannelModeByName(modes[i]);
 				if (cm2 == NULL || cm2->type != MODE_STATUS)
@@ -193,10 +194,12 @@ class CommandCSMode : public Command
 	{
 		User *u = source.GetUser();
 
+		bool has_access = source.AccessFor(ci).HasPriv("MODE") || source.HasPriv("chanserv/set");
+
 		spacesepstream sep(params.size() > 3 ? params[3] : "");
 		Anope::string modes = params[2], param;
 
-		bool override = !source.AccessFor(ci).HasPriv("MODE");
+		bool override = !source.AccessFor(ci).HasPriv("MODE") && source.HasPriv("chanserv/set");
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to set " << params[2];
 
 		int adding = -1;
@@ -211,7 +214,7 @@ class CommandCSMode : public Command
 					adding = 0;
 					break;
 				case '*':
-					if (adding == -1)
+					if (adding == -1 || !has_access)
 						break;
 					for (unsigned j = 0; j < ModeManager::ChannelModes.size(); ++j)
 					{
@@ -237,12 +240,16 @@ class CommandCSMode : public Command
 					switch (cm->type)
 					{
 						case MODE_REGULAR:
+							if (!has_access)
+								break;
 							if (adding)
 								ci->c->SetMode(NULL, cm);
 							else
 								ci->c->RemoveMode(NULL, cm);
 							break;
 						case MODE_PARAM:
+							if (!has_access)
+								break;
 							if (adding && !sep.GetToken(param))
 								break;
 							if (adding)
@@ -253,25 +260,25 @@ class CommandCSMode : public Command
 						case MODE_STATUS:
 						{
 							if (!sep.GetToken(param))
-								break;
-
-							if (!this->CanSet(source, ci, cm))
-							{
-								source.Reply(_("You do not have access to set mode %c."), cm->mchar);
-								break;
-							}
+								param = source.GetNick();
 
 							AccessGroup u_access = source.AccessFor(ci);
 
 							if (param.find_first_of("*?") != Anope::string::npos)
 							{
+								if (!this->CanSet(source, ci, cm, false))
+								{
+									source.Reply(_("You do not have access to set mode %c."), cm->mchar);
+									break;
+								}
+
 								for (Channel::ChanUserList::const_iterator it = ci->c->users.begin(), it_end = ci->c->users.end(); it != it_end; ++it)
 								{
 									ChanUserContainer *uc = *it;
 
 									AccessGroup targ_access = ci->AccessFor(uc->user);
 
-									if (targ_access > u_access)
+									if (uc->user->IsProtected() || targ_access > u_access)
 									{
 										source.Reply(_("You do not have the access to change %s's modes."), uc->user->nick.c_str());
 										continue;
@@ -295,11 +302,25 @@ class CommandCSMode : public Command
 									break;
 								}
 
-								AccessGroup targ_access = ci->AccessFor(target);
-								if (targ_access > u_access)
+								if (!this->CanSet(source, ci, cm, source.GetUser() == target))
 								{
-									source.Reply(_("You do not have the access to change %s's modes."), target->nick.c_str());
+									source.Reply(_("You do not have access to set mode %c."), cm->mchar);
 									break;
+								}
+
+								if (source.GetUser() != target)
+								{
+									AccessGroup targ_access = ci->AccessFor(target);
+									if (targ_access > u_access)
+									{
+										source.Reply(_("You do not have the access to change %s's modes."), target->nick.c_str());
+										break;
+									}
+									else if (target->IsProtected())
+									{
+										source.Reply(ACCESS_DENIED);
+										break;
+									}
 								}
 
 								if (adding)
@@ -310,6 +331,8 @@ class CommandCSMode : public Command
 							break;
 						}
 						case MODE_LIST:
+							if (!has_access)
+								break;
 							if (!sep.GetToken(param))
 								break;
 							if (adding)
@@ -347,16 +370,17 @@ class CommandCSMode : public Command
 
 		if (!ci || !ci->c)
 			source.Reply(CHAN_X_NOT_IN_USE, params[0].c_str());
-		else if (!source.AccessFor(ci).HasPriv("MODE") && !source.HasPriv("chanserv/set"))
-			source.Reply(ACCESS_DENIED);
 		else if (subcommand.equals_ci("LOCK"))
-			this->DoLock(source, ci, params);
+		{
+			if (!source.AccessFor(ci).HasPriv("MODE") && !source.HasPriv("chanserv/set"))
+				source.Reply(ACCESS_DENIED);
+			else
+				this->DoLock(source, ci, params);
+		}
 		else if (subcommand.equals_ci("SET"))
 			this->DoSet(source, ci, params);
 		else
 			this->OnSyntaxError(source, "");
-
-		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override

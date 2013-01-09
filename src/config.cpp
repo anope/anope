@@ -1011,9 +1011,11 @@ static bool DoFantasy(ServerConfig *config, const Anope::string &, const Anope::
 	Anope::string name = values[0].GetValue();
 	Anope::string service = values[1].GetValue();
 	Anope::string permission = values[2].GetValue();
+	bool prepend_channel = values[3].GetBool();
 
 	config->Fantasy[name].name = service;
 	config->Fantasy[name].permission = permission;
+	config->Fantasy[name].prepend_channel = prepend_channel;
 	return true;
 }
 
@@ -1348,9 +1350,9 @@ ConfigItems::ConfigItems(ServerConfig *conf)
 			{DT_STRING, DT_STRING, DT_INTEGER, DT_STRING},
 			InitPrivileges, DoPrivileges, DonePrivileges},
 		{"fantasy",
-			{"name", "command", "permission", ""},
-			{"", "", "", ""},
-			{DT_STRING, DT_STRING, DT_STRING},
+			{"name", "command", "permission", "prepend_channel", ""},
+			{"", "", "", "yes", ""},
+			{DT_STRING, DT_STRING, DT_STRING, DT_BOOLEAN},
 			InitFantasy, DoFantasy, DoneFantasy},
 		{"",
 			{""},

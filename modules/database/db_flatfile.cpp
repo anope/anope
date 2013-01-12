@@ -102,8 +102,8 @@ class DBFlatFile : public Module, public Pipe
 				const Anope::string &oldname = Anope::DataDir + "/" + *it;
 				Anope::string newname = Anope::DataDir + "/backups/" + *it + "." + stringify(tm->tm_year) + "." + stringify(tm->tm_mon) + "." + stringify(tm->tm_mday);
 
-				/* Backup already exists */
-				if (Anope::IsFile(newname))
+				/* Backup already exists or no database to backup */
+				if (Anope::IsFile(newname) || !Anope::IsFile(oldname))
 					continue;
 
 				Log(LOG_DEBUG) << "db_flatfile: Attemping to rename " << *it << " to " << newname;

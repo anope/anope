@@ -1645,6 +1645,8 @@ void ServerConfig::LoadConf(ConfigurationFile &file)
 				++c;
 				continue;
 			}
+			else if (!in_word && (ch == '(' || ch == '_' || ch == ')'))
+				;
 			else if (ch == '"')
 			{
 				// Quotes are valid only in the value position

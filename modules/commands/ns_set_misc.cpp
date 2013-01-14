@@ -13,6 +13,8 @@
 
 #include "module.h"
 
+static std::map<Anope::string, Anope::string> descriptions;
+
 struct NSMiscData : ExtensibleItem, Serializable
 {
 	Serialize::Reference<NickCore> nc;
@@ -109,6 +111,25 @@ class CommandNSSetMisc : public Command
 	{
 		this->Run(source, source.nc->display, !params.empty() ? params[0] : "");
 	}
+
+	void OnServHelp(CommandSource &source) anope_override
+	{
+		if (descriptions.count(source.command))
+		{
+			this->SetDesc(descriptions[source.command]);
+			Command::OnServHelp(source);
+		}
+	}
+
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	{
+		if (descriptions.count(source.command))
+		{
+			source.Reply("%s", Language::Translate(source.nc, descriptions[source.command].c_str()));
+			return true;
+		}
+		return false;
+	}
 };
 
 class CommandNSSASetMisc : public CommandNSSetMisc
@@ -138,8 +159,31 @@ class NSSetMisc : public Module
 	{
 		this->SetAuthor("Anope");
 
-		Implementation i[] = { I_OnNickInfo };
+		Implementation i[] = { I_OnReload, I_OnNickInfo };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
+
+		this->OnReload();
+	}
+
+	void OnReload()
+	{
+		ConfigReader config;
+
+		descriptions.clear();
+
+		for (int i = 0; i < config.Enumerate("command"); ++i)
+		{
+			if (config.ReadValue("command", "command", "", i) != "nickserv/set/misc")
+				continue;
+
+			Anope::string cname = config.ReadValue("command", "name", "", i);
+			Anope::string desc = config.ReadValue("command", "misc_description", "", i);
+
+			if (cname.empty() || desc.empty())
+				continue;
+
+			descriptions[cname] = desc;
+		}
 	}
 
 	void OnNickInfo(CommandSource &source, NickAlias *na, InfoFormatter &info, bool ShowHidden) anope_override

@@ -12,6 +12,8 @@
 
 #include "module.h"
 
+static std::map<Anope::string, Anope::string> descriptions;
+
 struct CSMiscData : ExtensibleItem, Serializable
 {
 	Serialize::Reference<ChannelInfo> ci;
@@ -106,6 +108,25 @@ class CommandCSSetMisc : public Command
 		else
 			source.Reply(CHAN_SETTING_UNSET, scommand.c_str(), ci->name.c_str());
 	}
+
+	void OnServHelp(CommandSource &source) anope_override
+	{
+		if (descriptions.count(source.command))
+		{
+			this->SetDesc(descriptions[source.command]);
+			Command::OnServHelp(source);
+		}
+	}
+
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	{
+		if (descriptions.count(source.command))
+		{
+			source.Reply("%s", Language::Translate(source.nc, descriptions[source.command].c_str()));
+			return true;
+		}
+		return false;
+	}
 };
 
 class CSSetMisc : public Module
@@ -119,8 +140,31 @@ class CSSetMisc : public Module
 	{
 		this->SetAuthor("Anope");
 
-		Implementation i[] = { I_OnChanInfo };
+		Implementation i[] = { I_OnReload, I_OnChanInfo };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
+
+		this->OnReload();
+	}
+
+	void OnReload()
+	{
+		ConfigReader config;
+
+		descriptions.clear();
+
+		for (int i = 0; i < config.Enumerate("command"); ++i)
+		{
+			if (config.ReadValue("command", "command", "", i) != "chanserv/set/misc")
+				continue;
+
+			Anope::string cname = config.ReadValue("command", "name", "", i);
+			Anope::string desc = config.ReadValue("command", "misc_description", "", i);
+
+			if (cname.empty() || desc.empty())
+				continue;
+
+			descriptions[cname] = desc;
+		}
 	}
 
 	void OnChanInfo(CommandSource &source, ChannelInfo *ci, InfoFormatter &info, bool ShowHidden) anope_override

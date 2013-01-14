@@ -155,12 +155,12 @@ class PlexusProto : public IRCDProto
 
 	void SendSVSJoin(const BotInfo *source, const User *user, const Anope::string &chan, const Anope::string &param) anope_override
 	{
-		UplinkSocket::Message(source) << "ENCAP " << user->server->GetSID() << " SVSJOIN " << user->GetUID() << " " << chan;
+		UplinkSocket::Message(source) << "ENCAP " << user->server->GetName() << " SVSJOIN " << user->GetUID() << " " << chan;
 	}
 
 	void SendSVSPart(const BotInfo *source, const User *user, const Anope::string &chan, const Anope::string &param) anope_override
 	{
-		UplinkSocket::Message(source) << "ENCAP " << user->server->GetSID() << " SVSPART " << user->GetUID() << " " << chan;
+		UplinkSocket::Message(source) << "ENCAP " << user->server->GetName() << " SVSPART " << user->GetUID() << " " << chan;
 	}
 };
 

@@ -25,17 +25,26 @@ enum CommandFlag
 	CFLAG_REQUIRE_USER
 };
 
+struct CommandGroup
+{
+	Anope::string name, description;
+};
+
 /* Used in BotInfo::commands */
 struct CommandInfo
 {
 	typedef Anope::map<CommandInfo> map;
 
-	CommandInfo() : prepend_channel(false) { }
+	CommandInfo() : hide(false), prepend_channel(false) { }
 
 	/* Service name of the command */
 	Anope::string name;
 	/* Permission required to execute the command */
 	Anope::string permission;
+	/* Group this command is in */
+	Anope::string group;
+	/* whether or not to hide this command in help output */
+	bool hide;
 	/* Only used with fantasy */
 	bool prepend_channel;
 };

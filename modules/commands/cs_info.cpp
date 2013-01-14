@@ -31,6 +31,7 @@ class CommandCSInfo : public Command
 	{
 		this->SetDesc(_("Lists information about the named registered channel"));
 		this->SetSyntax(_("\037channel\037"));
+		this->SetFlag(CFLAG_ALLOW_UNREGISTERED);
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override

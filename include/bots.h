@@ -122,8 +122,9 @@ class CoreExport BotInfo : public User, public Flags<BotFlag>, public Serializab
 	 * @param cname The command name
 	 * @param sname The service name
 	 * @param permission Permission required to execute the command, if any
+	 * @return The commandinfo for the newly created command
 	 */
-	void SetCommand(const Anope::string &cname, const Anope::string &sname, const Anope::string &permission = "");
+	CommandInfo& SetCommand(const Anope::string &cname, const Anope::string &sname, const Anope::string &permission = "");
 
 	/** Get command info for a command
 	 * @param cname The command name

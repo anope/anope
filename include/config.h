@@ -678,6 +678,8 @@ class CoreExport ServerConfig
 
 	/* Map of fantasy commands */
 	CommandInfo::map Fantasy;
+
+	std::vector<CommandGroup> CommandGroups;
 };
 
 /** This class can be used on its own to represent an exception, or derived to represent a module-specific exception.

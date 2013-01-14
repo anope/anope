@@ -251,12 +251,13 @@ void BotInfo::OnMessage(User *u, const Anope::string &message)
 	RunCommand(source, message);
 }
 
-void BotInfo::SetCommand(const Anope::string &cname, const Anope::string &sname, const Anope::string &permission)
+CommandInfo& BotInfo::SetCommand(const Anope::string &cname, const Anope::string &sname, const Anope::string &permission)
 {
 	CommandInfo ci;
 	ci.name = sname;
 	ci.permission = permission;
 	this->commands[cname] = ci;
+	return this->commands[cname];
 }
 
 CommandInfo *BotInfo::GetCommand(const Anope::string &cname)

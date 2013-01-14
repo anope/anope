@@ -15,6 +15,20 @@
 
 class CommandHelp : public Command
 {
+	static const unsigned help_wrap_len = 40;
+
+	static CommandGroup *FindGroup(const Anope::string &name)
+	{
+		for (unsigned i = 0; i < Config->CommandGroups.size(); ++i)
+		{
+			CommandGroup &gr = Config->CommandGroups[i];
+			if (gr.name == name)
+				return &gr;
+		}
+
+		return NULL;
+	}
+
  public:
 	CommandHelp(Module *creator) : Command(creator, "generic/help", 0)
 	{
@@ -29,15 +43,26 @@ class CommandHelp : public Command
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 	
+		Anope::string source_command = source.command;
 		const BotInfo *bi = source.service;
 		const CommandInfo::map &map = source.c ? Config->Fantasy : bi->commands;
 
-		if (params.empty())
+		if (params.empty() || params[0].equals_ci("ALL"))
 		{
+			bool all = !params.empty() && params[0].equals_ci("ALL");
+			typedef std::map<CommandGroup *, std::list<Anope::string> > GroupInfo;
+			GroupInfo groups;
+
+			if (all)
+				source.Reply(_("All available commands for \2%s\2:"), source.service->nick.c_str());
+
 			for (CommandInfo::map::const_iterator it = map.begin(), it_end = map.end(); it != it_end; ++it)
 			{
 				const Anope::string &c_name = it->first;
 				const CommandInfo &info = it->second;
+
+				if (info.hide)
+					continue;
 
 				// Smaller command exists
 				Anope::string cmd;
@@ -55,9 +80,51 @@ class CommandHelp : public Command
 				else if (!info.permission.empty() && !source.HasCommand(info.permission))
 					continue;
 
+				if (!info.group.empty() && !all)
+				{
+					CommandGroup *gr = FindGroup(info.group);
+					if (gr != NULL)
+					{
+						groups[gr].push_back(c_name);
+						continue;
+					}
+				}
+
 				source.command = c_name;
 				c->OnServHelp(source);
 
+			}
+
+			for (GroupInfo::iterator it = groups.begin(), it_end = groups.end(); it != it_end; ++it)
+			{
+				CommandGroup *gr = it->first;
+
+				source.Reply(" ");
+				source.Reply("%s", gr->description.c_str());
+
+				Anope::string buf;
+				for (std::list<Anope::string>::iterator it2 = it->second.begin(), it2_end = it->second.end(); it2 != it2_end; ++it2)
+				{
+					const Anope::string &c_name = *it2;
+
+					buf += ", " + c_name;
+
+					if (buf.length() > help_wrap_len)
+					{
+						source.Reply("  %s", buf.substr(2).c_str());
+						buf.clear();
+					}
+				}
+				if (buf.length() > 2)
+				{
+					source.Reply("  %s", buf.substr(2).c_str());
+					buf.clear();
+				}
+			}
+			if (!groups.empty())
+			{
+				source.Reply(" ");
+				source.Reply(_("Use the \2%s ALL\2 command to list all command descriptions."), source_command.c_str());
 			}
 		}
 		else

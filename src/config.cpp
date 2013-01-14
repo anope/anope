@@ -819,6 +819,8 @@ static bool DoCommands(ServerConfig *config, const Anope::string &, const Anope:
 	Anope::string name = values[1].GetValue();
 	Anope::string command = values[2].GetValue();
 	Anope::string permission = values[3].GetValue();
+	Anope::string group = values[4].GetValue();
+	bool hide = values[5].GetBool();
 
 	ValueItem vi(service);
 	if (!ValidateNotEmpty(config, "command", "service", vi))
@@ -839,7 +841,9 @@ static bool DoCommands(ServerConfig *config, const Anope::string &, const Anope:
 	if (bi->commands.count(name))
 		throw ConfigException("Command name " + name + " already exists on " + bi->nick);
 
-	bi->SetCommand(name, command, permission);
+	CommandInfo &ci = bi->SetCommand(name, command, permission);
+	ci.group = group;
+	ci.hide = hide;
 	return true;
 }
 
@@ -1020,6 +1024,35 @@ static bool DoFantasy(ServerConfig *config, const Anope::string &, const Anope::
 }
 
 static bool DoneFantasy(ServerConfig *config, const Anope::string &)
+{
+	return true;
+}
+
+/*************************************************************************/
+
+static bool InitCommandGroups(ServerConfig *config, const Anope::string &)
+{
+	config->CommandGroups.clear();
+	return true;
+}
+
+static bool DoCommandGroups(ServerConfig *config, const Anope::string &, const Anope::string *, ValueList &values, int *)
+{
+	Anope::string name = values[0].GetValue();
+	Anope::string description = values[1].GetValue();
+
+	if (name.empty() || description.empty())
+		return true;
+
+	CommandGroup gr;
+	gr.name = name;
+	gr.description = description;
+
+	config->CommandGroups.push_back(gr);
+	return true;
+}
+
+static bool DoneCommandGroups(ServerConfig *config, const Anope::string &)
 {
 	return true;
 }
@@ -1340,9 +1373,9 @@ ConfigItems::ConfigItems(ServerConfig *conf)
 			{DT_STRING, DT_STRING, DT_INTEGER, DT_STRING, DT_STRING, DT_STRING, DT_STRING, DT_STRING, DT_STRING, DT_STRING, DT_BOOLEAN, DT_BOOLEAN},
 			InitLogs, DoLogs, DoneLogs},
 		{"command",
-			{"service", "name", "command", "permission", ""},
-			{"", "", "", "", ""},
-			{DT_STRING, DT_STRING, DT_STRING, DT_STRING},
+			{"service", "name", "command", "permission", "group", "hide", ""},
+			{"", "", "", "", "", "no", ""},
+			{DT_STRING, DT_STRING, DT_STRING, DT_STRING, DT_STRING, DT_BOOLEAN},
 			InitCommands, DoCommands, DoneCommands},
 		{"privilege",
 			{"name", "desc", "rank", ""},
@@ -1354,6 +1387,11 @@ ConfigItems::ConfigItems(ServerConfig *conf)
 			{"", "", "", "yes", ""},
 			{DT_STRING, DT_STRING, DT_STRING, DT_BOOLEAN},
 			InitFantasy, DoFantasy, DoneFantasy},
+		{"command_group",
+			{"name", "description", ""},
+			{"", "", ""},
+			{DT_STRING, DT_STRING},
+			InitCommandGroups, DoCommandGroups, DoneCommandGroups},
 		{"",
 			{""},
 			{""},

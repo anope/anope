@@ -30,8 +30,18 @@ class ExpireCallback : public CallBack
 
 			bool expire = false;
 
-			if (!ci->c && Anope::CurTime - ci->last_used >= Config->CSExpire)
-				expire = true;
+			if (Anope::CurTime - ci->last_used >= Config->CSExpire)
+			{
+				if (ci->c)
+				{
+					time_t last_used = ci->last_used;
+					for (User::ChanUserList::const_iterator cit = ci->c->users.begin(), cit_end = ci->c->users.end(); cit != cit_end && last_used == ci->last_used; ++cit)
+						ci->AccessFor((*cit)->user);
+					expire = last_used == ci->last_used;
+				}
+				else
+					expire = true;
+			}
 
 			if (ci->HasFlag(CI_NO_EXPIRE))
 				expire = false;

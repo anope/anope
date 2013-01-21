@@ -103,12 +103,22 @@ static Anope::string defconReverseModes(const Anope::string &modes);
 
 static ServiceReference<GlobalService> GlobalService("GlobalService", "Global");
 
+static Timer *timeout;
+
 class DefConTimeout : public CallBack
 {
 	int level;
 
  public:
-	DefConTimeout(Module *mod, int newlevel) : CallBack(mod, DConfig.timeout), level(newlevel) { }
+	DefConTimeout(Module *mod, int newlevel) : CallBack(mod, DConfig.timeout), level(newlevel)
+	{
+		timeout = this;
+	}
+
+	~DefConTimeout()
+	{
+		timeout = NULL;
+	}
 
 	void Tick(time_t) anope_override
 	{
@@ -133,7 +143,6 @@ class DefConTimeout : public CallBack
 		}
 	}
 };
-static DefConTimeout *timeout;
 
 class CommandOSDefcon : public Command
 {
@@ -196,11 +205,7 @@ class CommandOSDefcon : public Command
 
 		FOREACH_MOD(I_OnDefconLevel, OnDefconLevel(newLevel));
 
-		if (timeout)
-		{
-			delete timeout;
-			timeout = NULL;
-		}
+		delete timeout;
 
 		if (DConfig.timeout)
 			timeout = new DefConTimeout(this->module, 5);

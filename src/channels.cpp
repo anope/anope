@@ -827,9 +827,11 @@ Anope::string Channel::GetModes(bool complete, bool plus)
 
 		if (complete && !it->second.empty())
 		{
-			ChannelModeParam *cmp = anope_dynamic_static_cast<ChannelModeParam *>(cm);
+			ChannelModeParam *cmp = NULL;
+			if (cm->type == MODE_PARAM)
+				cmp = anope_dynamic_static_cast<ChannelModeParam *>(cm);
 
-			if (plus || !cmp->minus_no_arg)
+			if (plus || !cmp || !cmp->minus_no_arg)
 				params += " " + it->second;
 		}
 	}

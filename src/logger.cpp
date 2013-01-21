@@ -321,9 +321,9 @@ bool LogInfo::HasType(LogType ltype, const Anope::string &type) const
 		case LOG_TERMINAL:
 			return true;
 		case LOG_RAWIO:
-			return debug ? true : this->raw_io;
+			return (Anope::Debug || this->debug) ? true : this->raw_io;
 		case LOG_DEBUG:
-			return debug ? true : this->debug;
+			return Anope::Debug ? true : this->debug;
 		case LOG_DEBUG_2:
 		case LOG_DEBUG_3:
 		case LOG_DEBUG_4:

@@ -301,7 +301,6 @@ void Channel::SetModeInternal(MessageSource &setter, ChannelMode *cm, const Anop
 		return;
 
 	EventReturn MOD_RESULT;
-	FOREACH_RESULT(I_OnChannelModeSet, OnChannelModeSet(this, setter, cm->name, param));
 
 	/* Setting v/h/o/a/q etc */
 	if (cm->type == MODE_STATUS)
@@ -327,8 +326,10 @@ void Channel::SetModeInternal(MessageSource &setter, ChannelMode *cm, const Anop
 		if (cc)
 			cc->status.modes.insert(cm->name);
 
+		FOREACH_RESULT(I_OnChannelModeSet, OnChannelModeSet(this, setter, cm->name, param));
+
 		/* Enforce secureops, etc */
-		if (enforce_mlock)
+		if (enforce_mlock && MOD_RESULT != EVENT_STOP)
 			this->SetCorrectModes(u, false, false);
 		return;
 	}
@@ -357,6 +358,8 @@ void Channel::SetModeInternal(MessageSource &setter, ChannelMode *cm, const Anop
 			this->ci->ExtendMetadata("PERSIST");
 	}
 
+	FOREACH_RESULT(I_OnChannelModeSet, OnChannelModeSet(this, setter, cm->name, param));
+
 	/* Check if we should enforce mlock */
 	if (!enforce_mlock || MOD_RESULT == EVENT_STOP)
 		return;
@@ -370,7 +373,6 @@ void Channel::RemoveModeInternal(MessageSource &setter, ChannelMode *cm, const A
 		return;
 
 	EventReturn MOD_RESULT;
-	FOREACH_RESULT(I_OnChannelModeUnset, OnChannelModeUnset(this, setter, cm->name, param));
 
 	/* Setting v/h/o/a/q etc */
 	if (cm->type == MODE_STATUS)
@@ -396,6 +398,8 @@ void Channel::RemoveModeInternal(MessageSource &setter, ChannelMode *cm, const A
 		ChanUserContainer *cc = u->FindChannel(this);
 		if (cc)
 			cc->status.modes.erase(cm->name);
+
+		FOREACH_RESULT(I_OnChannelModeUnset, OnChannelModeUnset(this, setter, cm->name, param));
 
 		if (enforce_mlock)
 		{
@@ -444,8 +448,9 @@ void Channel::RemoveModeInternal(MessageSource &setter, ChannelMode *cm, const A
 		}
 	}
 
-	/* Check for mlock */
+	FOREACH_RESULT(I_OnChannelModeUnset, OnChannelModeUnset(this, setter, cm->name, param));
 
+	/* Check for mlock */
 	if (!enforce_mlock || MOD_RESULT == EVENT_STOP)
 		return;
 

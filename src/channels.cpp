@@ -437,7 +437,7 @@ void Channel::RemoveModeInternal(MessageSource &setter, ChannelMode *cm, const A
 		if (this->ci)
 			this->ci->Shrink("PERSIST");
 
-		if (this->users.empty())
+		if (this->users.empty() && !this->HasExt("SYNCING") && !this->HasExt("INHABIT"))
 		{
 			delete this;
 			return;

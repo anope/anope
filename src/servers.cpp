@@ -131,7 +131,8 @@ Server::~Server()
 				if (na && !na->nc->HasExt("SUSPENDED") && (u->IsRecognized() || u->IsIdentified()))
 				{
 					na->last_seen = Anope::CurTime;
-					na->last_quit = this->quit_reason;
+					if (!Config->NSHideNetSplitQuit)
+						na->last_quit = this->quit_reason;
 				}
 
 				u->Quit(this->quit_reason);

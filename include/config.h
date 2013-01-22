@@ -542,6 +542,8 @@ class CoreExport ServerConfig
 	bool NSRestoreOnRecover;
 	/* Whether or not to use SASL */
 	bool NSSASL;
+	/* If set, hides netsplits in the last_quit field of nicks */
+	bool NSHideNetSplitQuit;
 
 	/* Core ChanServ modules */
 	Anope::string ChanCoreModules;

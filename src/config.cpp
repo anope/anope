@@ -1192,6 +1192,7 @@ ConfigItems::ConfigItems(ServerConfig *conf)
 		{"nickserv", "modesonid", "", new ValueContainerString(&conf->NSModesOnID), DT_STRING, NoValidation},
 		{"nickserv", "restoreonrecover", "yes", new ValueContainerBool(&conf->NSRestoreOnRecover), DT_BOOLEAN, NoValidation},
 		{"nickserv", "sasl", "yes", new ValueContainerBool(&conf->NSSASL), DT_BOOLEAN, NoValidation},
+		{"nickserv", "hidenetsplitquit", "no", new ValueContainerBool(&conf->NSHideNetSplitQuit), DT_BOOLEAN, NoValidation},
 		{"mail", "usemail", "no", new ValueContainerBool(&conf->UseMail), DT_BOOLEAN, ValidateEmailReg},
 		{"mail", "sendmailpath", "", new ValueContainerString(&conf->SendMailPath), DT_STRING, ValidateMail},
 		{"mail", "sendfrom", "", new ValueContainerString(&conf->SendFrom), DT_STRING, ValidateMail},

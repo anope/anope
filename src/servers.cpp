@@ -20,18 +20,15 @@
 #include "config.h"
 #include "channels.h"
 
-const Anope::string ServerFlagStrings[] = { "SERVER_NONE", "SERVER_SYNCING", "SERVER_JUPED", "" };
-template<> const Anope::string* Flags<ServerFlag>::flags_strings = ServerFlagStrings;
-
 /* Anope */
 Server *Me = NULL;
 
 std::set<Anope::string> Servers::Capab;
 
-Server::Server(Server *up, const Anope::string &sname, unsigned shops, const Anope::string &desc, const Anope::string &ssid, ServerFlag flag) : name(sname), hops(shops), description(desc), sid(ssid), uplink(up)
+Server::Server(Server *up, const Anope::string &sname, unsigned shops, const Anope::string &desc, const Anope::string &ssid, bool jupe) : name(sname), hops(shops), description(desc), sid(ssid), uplink(up)
 {
-	this->SetFlag(SERVER_SYNCING);
-	this->SetFlag(flag);
+	syncing = true;
+	juped = jupe;
 
 	Log(this, "connect") << "uplinked to " << (this->uplink ? this->uplink->GetName() : "no uplink") << " connected to the network";
 
@@ -41,7 +38,7 @@ Server::Server(Server *up, const Anope::string &sname, unsigned shops, const Ano
 		this->uplink->AddLink(this);
 
 		/* Check to be sure this isn't a juped server */
-		if (Me == this->uplink && !this->HasFlag(SERVER_JUPED))
+		if (Me == this->uplink && !juped)
 		{
 			/* Now do mode related stuff as we know what modes exist .. */
 			for (botinfo_map::iterator it = BotListByNick->begin(), it_end = BotListByNick->end(); it != it_end; ++it)
@@ -81,7 +78,7 @@ Server::Server(Server *up, const Anope::string &sname, unsigned shops, const Ano
 			{
 				Server *s = Me->GetLinks()[i];
 
-				if (s->HasFlag(SERVER_JUPED))
+				if (s->juped)
 					IRCD->SendServer(s);
 			}
 
@@ -131,7 +128,7 @@ Server::~Server()
 			if (u->server == this)
 			{
 				NickAlias *na = NickAlias::Find(u->nick);
-				if (na && !na->nc->HasFlag(NI_SUSPENDED) && (u->IsRecognized() || u->IsIdentified()))
+				if (na && !na->nc->HasExt("SUSPENDED") && (u->IsRecognized() || u->IsIdentified()))
 				{
 					na->last_seen = Anope::CurTime;
 					na->last_quit = this->quit_reason;
@@ -231,7 +228,7 @@ void Server::Sync(bool sync_links)
 	if (this->IsSynced())
 		return;
 
-	this->UnsetFlag(SERVER_SYNCING);
+	syncing = false;
 
 	Log(this, "sync") << "is done syncing";
 
@@ -248,7 +245,7 @@ void Server::Sync(bool sync_links)
 		for (registered_channel_map::iterator it = RegisteredChannelList->begin(), it_end = RegisteredChannelList->end(); it != it_end; ++it)
 		{
 			ChannelInfo *ci = it->second;
-			if (ci->HasFlag(CI_PERSIST))
+			if (ci->HasExt("PERSIST"))
 			{
 				bool created = false;
 				if (!ci->c)
@@ -256,9 +253,9 @@ void Server::Sync(bool sync_links)
 					ci->c = new Channel(ci->name, ci->time_registered);
 					created = true;
 				}
-				if (ModeManager::FindChannelModeByName(CMODE_PERM) != NULL)
+				if (ModeManager::FindChannelModeByName("PERM") != NULL)
 				{
-					ci->c->SetMode(NULL, CMODE_PERM);
+					ci->c->SetMode(NULL, "PERM");
 					if (created)
 						IRCD->SendChannel(ci->c);
 				}
@@ -297,7 +294,12 @@ void Server::Sync(bool sync_links)
 
 bool Server::IsSynced() const
 {
-	return !this->HasFlag(SERVER_SYNCING);
+	return !syncing;
+}
+
+void Server::Unsync()
+{
+	syncing = true;
 }
 
 bool Server::IsULined() const
@@ -311,9 +313,14 @@ bool Server::IsULined() const
 	return false;
 }
 
+bool Server::IsJuped() const
+{
+	return juped;
+}
+
 void Server::Notice(const BotInfo *source, const Anope::string &message)
 {
-	if (Config->NSDefFlags.HasFlag(NI_MSG))
+	if (Config->NSDefFlags.count("MSG"))
 		IRCD->SendGlobalPrivmsg(source, this, message);
 	else
 		IRCD->SendGlobalNotice(source, this, message);
@@ -400,7 +407,7 @@ const Anope::string Servers::TS6_SID_Retrieve()
 Server* Servers::GetUplink()
 {
 	for (unsigned i = 0; Me && i < Me->GetLinks().size(); ++i)
-		if (!Me->GetLinks()[i]->HasFlag(SERVER_JUPED))
+		if (!Me->GetLinks()[i]->IsJuped())
 			return Me->GetLinks()[i];
 	return NULL;
 }

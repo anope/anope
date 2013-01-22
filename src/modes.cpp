@@ -26,50 +26,11 @@ std::vector<UserMode *> ModeManager::UserModes;
 unsigned ModeManager::GenericChannelModes = 0, ModeManager::GenericUserModes = 0;
 
 /* Default channel mode lock */
-std::list<std::pair<ChannelModeName, Anope::string> > ModeManager::ModeLockOn;
-std::list<ChannelModeName> ModeManager::ModeLockOff;
+std::list<std::pair<Anope::string, Anope::string> > ModeManager::ModeLockOn;
+std::list<Anope::string> ModeManager::ModeLockOff;
 
 /* Default modes bots have on channels */
 ChannelStatus ModeManager::DefaultBotModes;
-
-static const Anope::string UserModeNameStrings[] = {
-	"UMODE_BEGIN",
-
-	"UMODE_SERV_ADMIN", "UMODE_BOT", "UMODE_CO_ADMIN", "UMODE_FILTER", "UMODE_HIDEOPER", "UMODE_NETADMIN",
-	"UMODE_REGPRIV", "UMODE_PROTECTED", "UMODE_NOCTCP", "UMODE_WEBTV", "UMODE_WEBIRC", "UMODE_WHOIS", "UMODE_ADMIN", "UMODE_DEAF",
-	"UMODE_GLOBOPS", "UMODE_HELPOP", "UMODE_INVIS", "UMODE_OPER", "UMODE_PRIV", "UMODE_GOD", "UMODE_REGISTERED",
-	"UMODE_SNOMASK", "UMODE_VHOST", "UMODE_WALLOPS", "UMODE_CLOAK", "UMODE_SSL", "UMODE_SOFTCALLERID", "UMODE_CALLERID",
-	"UMODE_COMMONCHANS", "UMODE_HIDDEN", "UMODE_STRIPCOLOR", "UMODE_INVISIBLE_OPER", "UMODE_RESTRICTED", "UMODE_HIDEIDLE",
-
-	""
-};
-template<> const Anope::string* Flags<UserModeName>::flags_strings = UserModeNameStrings;
-
-static const Anope::string ChannelModeNameStrings[] = {
-	"CMODE_BEGIN",
-
-	/* Channel modes */
-	"CMODE_BLOCKCOLOR", "CMODE_FLOOD", "CMODE_INVITE", "CMODE_KEY", "CMODE_LIMIT", "CMODE_MODERATED", "CMODE_NOEXTERNAL",
-	"CMODE_PRIVATE", "CMODE_REGISTERED", "CMODE_SECRET", "CMODE_TOPIC", "CMODE_AUDITORIUM", "CMODE_SSL", "CMODE_ADMINONLY",
-	"CMODE_NOCTCP", "CMODE_FILTER", "CMODE_NOKNOCK", "CMODE_REDIRECT", "CMODE_REGMODERATED", "CMODE_NONICK", "CMODE_OPERONLY",
-	"CMODE_NOKICK", "CMODE_REGISTEREDONLY", "CMODE_STRIPCOLOR", "CMODE_NONOTICE", "CMODE_NOINVITE", "CMODE_ALLINVITE",
-	"CMODE_BLOCKCAPS", "CMODE_PERM", "CMODE_NICKFLOOD", "CMODE_JOINFLOOD", "CMODE_DELAYEDJOIN", "CMODE_NOREJOIN",
-	"CMODE_BANDWIDTH",
-
-	/* b/e/I */
-	"CMODE_BAN", "CMODE_EXCEPT",
-	"CMODE_INVITEOVERRIDE",
-
-	/* v/h/o/a/q */
-	"CMODE_VOICE", "CMODE_HALFOP", "CMODE_OP",
-	"CMODE_PROTECT", "CMODE_OWNER",
-
-	""
-};
-template<> const Anope::string* Flags<ChannelModeName>::flags_strings = ChannelModeNameStrings;
-
-static const Anope::string EntryFlagString[] = { "ENTRYTYPE_NONE", "ENTRYTYPE_CIDR", "ENTRYTYPE_NICK_WILD", "ENTRYTYPE_NICK", "ENTRYTYPE_USER_WILD", "ENTRYTYPE_USER", "ENTRYTYPE_HOST_WILD", "ENTRYTYPE_HOST", "" };
-template<> const Anope::string* Flags<EntryType>::flags_strings = EntryFlagString;
 
 Anope::string ChannelStatus::BuildCharPrefixList() const
 {
@@ -79,7 +40,7 @@ Anope::string ChannelStatus::BuildCharPrefixList() const
 	{
 		ChannelMode *cm = ModeManager::ChannelModes[i];
 
-		if (this->HasFlag(cm->name))
+		if (this->modes.count(cm->name))
 			ret += cm->mchar;
 	}
 
@@ -94,7 +55,7 @@ Anope::string ChannelStatus::BuildModePrefixList() const
 	{
 		ChannelMode *cm = ModeManager::ChannelModes[i];
 
-		if (this->HasFlag(cm->name))
+		if (this->modes.count(cm->name))
 		{
 			ChannelModeStatus *cms = anope_dynamic_static_cast<ChannelModeStatus *>(cm);
 			ret += cms->Symbol;
@@ -104,7 +65,7 @@ Anope::string ChannelStatus::BuildModePrefixList() const
 	return ret;
 }
 
-Mode::Mode(ModeClass mcl, char mch, ModeType mt) : mclass(mcl), mchar(mch), type(mt)
+Mode::Mode(const Anope::string &mname, ModeClass mcl, char mch, ModeType mt) : name(mname), mclass(mcl), mchar(mch), type(mt)
 {
 }
 
@@ -112,7 +73,7 @@ Mode::~Mode()
 {
 }
 
-UserMode::UserMode(UserModeName un, char mch) : Mode(MC_USER, mch, MODE_REGULAR), name(un)
+UserMode::UserMode(const Anope::string &un, char mch) : Mode(un, MC_USER, mch, MODE_REGULAR)
 {
 }
 
@@ -120,19 +81,12 @@ UserMode::~UserMode()
 {
 }
 
-const Anope::string UserMode::NameAsString()
-{
-	if (this->name >= UMODE_END)
-		return this->mchar;
-	return UserModeNameStrings[this->name];
-}
-
-UserModeParam::UserModeParam(UserModeName un, char mch) : UserMode(un, mch)
+UserModeParam::UserModeParam(const Anope::string &un, char mch) : UserMode(un, mch)
 {
 	this->type = MODE_PARAM;
 }
 
-ChannelMode::ChannelMode(ChannelModeName cm, char mch) : Mode(MC_CHANNEL, mch, MODE_REGULAR), name(cm)
+ChannelMode::ChannelMode(const Anope::string &cm, char mch) : Mode(cm, MC_CHANNEL, mch, MODE_REGULAR)
 {
 }
 
@@ -147,14 +101,7 @@ bool ChannelMode::CanSet(User *u) const
 	return true;
 }
 
-const Anope::string ChannelMode::NameAsString()
-{
-	if (this->name >= CMODE_END)
-		return this->mchar;
-	return ChannelModeNameStrings[this->name];
-}
-
-ChannelModeList::ChannelModeList(ChannelModeName cm, char mch) : ChannelMode(cm, mch)
+ChannelModeList::ChannelModeList(const Anope::string &cm, char mch) : ChannelMode(cm, mch)
 {
 	this->type = MODE_LIST;
 }
@@ -163,7 +110,7 @@ ChannelModeList::~ChannelModeList()
 {
 }
 
-ChannelModeParam::ChannelModeParam(ChannelModeName cm, char mch, bool ma) : ChannelMode(cm, mch), minus_no_arg(ma)
+ChannelModeParam::ChannelModeParam(const Anope::string &cm, char mch, bool ma) : ChannelMode(cm, mch), minus_no_arg(ma)
 {
 	this->type = MODE_PARAM;
 }
@@ -172,7 +119,7 @@ ChannelModeParam::~ChannelModeParam()
 {
 }
 
-ChannelModeStatus::ChannelModeStatus(ChannelModeName mName, char modeChar, char mSymbol, unsigned short mLevel) : ChannelMode(mName, modeChar), Symbol(mSymbol), Level(mLevel)
+ChannelModeStatus::ChannelModeStatus(const Anope::string &mname, char modeChar, char mSymbol, unsigned short mLevel) : ChannelMode(mname, modeChar), Symbol(mSymbol), Level(mLevel)
 {
 	this->type = MODE_STATUS;
 }
@@ -191,7 +138,7 @@ bool ChannelModeKey::IsValid(const Anope::string &value) const
 
 bool ChannelModeAdmin::CanSet(User *u) const
 {
-	if (u && u->HasMode(UMODE_OPER))
+	if (u && u->HasMode("OPER"))
 		return true;
 
 	return false;
@@ -199,7 +146,7 @@ bool ChannelModeAdmin::CanSet(User *u) const
 
 bool ChannelModeOper::CanSet(User *u) const
 {
-	if (u && u->HasMode(UMODE_OPER))
+	if (u && u->HasMode("OPER"))
 		return true;
 
 	return false;
@@ -343,11 +290,12 @@ bool ModeManager::AddUserMode(UserMode *um)
 	if (ModeManager::FindUserModeByChar(um->mchar) != NULL)
 		return false;
 	
-	if (um->name == UMODE_END)
+	if (um->name.empty())
 	{
-		um->name = static_cast<UserModeName>(UMODE_END + ++GenericUserModes);
+		um->name = stringify(++GenericUserModes);
 		Log() << "ModeManager: Added generic support for user mode " << um->mchar;
 	}
+
 	ModeManager::UserModes.push_back(um);
 
 	FOREACH_MOD(I_OnUserModeAdd, OnUserModeAdd(um));
@@ -360,11 +308,12 @@ bool ModeManager::AddChannelMode(ChannelMode *cm)
 	if (ModeManager::FindChannelModeByChar(cm->mchar) != NULL)
 		return false;
 
-	if (cm->name == CMODE_END)
+	if (cm->name.empty())
 	{
-		cm->name = static_cast<ChannelModeName>(CMODE_END + ++GenericChannelModes);
+		cm->name = stringify(++GenericChannelModes);
 		Log() << "ModeManager: Added generic support for channel mode " << cm->mchar;
 	}
+
 	ModeManager::ChannelModes.push_back(cm);
 
 	/* Apply this mode to the new default mlock if its used */
@@ -429,48 +378,24 @@ UserMode *ModeManager::FindUserModeByChar(char Mode)
 	return NULL;
 }
 
-ChannelMode *ModeManager::FindChannelModeByName(ChannelModeName Name)
+ChannelMode *ModeManager::FindChannelModeByName(const Anope::string &name)
 {
 	for (unsigned i = 0; i < ModeManager::ChannelModes.size(); ++i)
 	{
 		ChannelMode *cm = ModeManager::ChannelModes[i];
-		if (cm->name == Name)
+		if (cm->name == name)
 			return cm;
 	}
 
 	return NULL;
 }
 
-UserMode *ModeManager::FindUserModeByName(UserModeName Name)
+UserMode *ModeManager::FindUserModeByName(const Anope::string &name)
 {
 	for (unsigned i = 0; i < ModeManager::UserModes.size(); ++i)
 	{
 		UserMode *um = ModeManager::UserModes[i];
-		if (um->name == Name)
-			return um;
-	}
-
-	return NULL;
-}
-
-ChannelMode *ModeManager::FindChannelModeByString(const Anope::string &name)
-{
-	for (unsigned i = 0; i < ModeManager::ChannelModes.size(); ++i)
-	{
-		ChannelMode *cm = ModeManager::ChannelModes[i];
-		if (cm->NameAsString() == name || Anope::string(cm->mchar) == name)
-			return cm;
-	}
-
-	return NULL;
-}
-
-UserMode *ModeManager::FindUserModeByString(const Anope::string &name)
-{
-	for (size_t i = UMODE_BEGIN + 1; i != UMODE_END; ++i)
-	{
-		UserMode *um = ModeManager::FindUserModeByName(static_cast<UserModeName>(i));
-		if (um != NULL && (um->NameAsString() == name || Anope::string(um->mchar) == name))
+		if (um->name == name)
 			return um;
 	}
 
@@ -643,14 +568,14 @@ void ModeManager::UpdateDefaultMLock(ServerConfig *config)
 
 				if (cm->type != MODE_LIST) // Only MODE_LIST can have duplicates
 				{
-					for (std::list<std::pair<ChannelModeName, Anope::string> >::iterator it = ModeLockOn.begin(), it_end = ModeLockOn.end(); it != it_end; ++it)
+					for (std::list<std::pair<Anope::string, Anope::string> >::iterator it = ModeLockOn.begin(), it_end = ModeLockOn.end(); it != it_end; ++it)
 						if (it->first == cm->name)
 						{
 							ModeLockOn.erase(it);
 							break;
 						}
 
-					for (std::list<ChannelModeName>::iterator it = ModeLockOff.begin(), it_end = ModeLockOff.end(); it != it_end; ++it)
+					for (std::list<Anope::string>::iterator it = ModeLockOff.begin(), it_end = ModeLockOff.end(); it != it_end; ++it)
 						if (*it == cm->name)
 						{
 							ModeLockOff.erase(it);
@@ -667,19 +592,18 @@ void ModeManager::UpdateDefaultMLock(ServerConfig *config)
 	}
 
 	/* Set Bot Modes */
-	DefaultBotModes.ClearFlags();
+	DefaultBotModes.modes.clear();
 	for (unsigned i = 0; i < config->BotModes.length(); ++i)
 	{
 		ChannelMode *cm = ModeManager::FindChannelModeByChar(config->BotModes[i]);
 
 		if (cm && cm->type == MODE_STATUS)
-			DefaultBotModes.SetFlag(cm->name);
+			DefaultBotModes.modes.insert(cm->name);
 	}
 }
 
-Entry::Entry(ChannelModeName mode, const Anope::string &_host) : modename(mode)
+Entry::Entry(const Anope::string &m, const Anope::string &_host) : name(m)
 {
-	this->SetFlag(ENTRYTYPE_NONE);
 	this->cidr_len = 0;
 	this->mask = _host;
 
@@ -706,18 +630,18 @@ Entry::Entry(ChannelModeName mode, const Anope::string &_host) : modename(mode)
 	{
 		this->nick = _nick;
 		if (_nick.find_first_of("*?") != Anope::string::npos)
-			this->SetFlag(ENTRYTYPE_NICK_WILD);
+			this->types.insert(ENTRYTYPE_NICK_WILD);
 		else
-			this->SetFlag(ENTRYTYPE_NICK);
+			this->types.insert(ENTRYTYPE_NICK);
 	}
 
 	if (!_user.empty() && _user.find_first_not_of("*") != Anope::string::npos)
 	{
 		this->user = _user;
 		if (_user.find_first_of("*?") != Anope::string::npos)
-			this->SetFlag(ENTRYTYPE_USER_WILD);
+			this->types.insert(ENTRYTYPE_USER_WILD);
 		else
-			this->SetFlag(ENTRYTYPE_USER);
+			this->types.insert(ENTRYTYPE_USER);
 	}
 
 	if (!_realhost.empty() && _realhost.find_first_not_of("*") != Anope::string::npos)
@@ -735,21 +659,22 @@ Entry::Entry(ChannelModeName mode, const Anope::string &_host) : modename(mode)
 				{
 					_realhost = _realhost.substr(0, sl);
 					this->cidr_len = convertTo<unsigned int>(cidr_range);
-					this->SetFlag(ENTRYTYPE_CIDR);
+					this->types.insert(ENTRYTYPE_CIDR);
 					Log(LOG_DEBUG) << "Ban " << _realhost << " has cidr " << static_cast<unsigned int>(this->cidr_len);
 				}
 			}
 			catch (const SocketException &) { }
+			catch (const ConvertException &) { }
 		}
 
 		this->host = _realhost;
 
-		if (!this->HasFlag(ENTRYTYPE_CIDR))
+		if (!this->types.count(ENTRYTYPE_CIDR))
 		{
 			if (_realhost.find_first_of("*?") != Anope::string::npos)
-				this->SetFlag(ENTRYTYPE_HOST_WILD);
+				this->types.insert(ENTRYTYPE_HOST_WILD);
 			else
-				this->SetFlag(ENTRYTYPE_HOST);
+				this->types.insert(ENTRYTYPE_HOST);
 		}
 	}
 }
@@ -763,7 +688,7 @@ bool Entry::Matches(const User *u, bool full) const
 {
 	bool ret = true;
 	
-	if (this->HasFlag(ENTRYTYPE_CIDR))
+	if (this->types.count(ENTRYTYPE_CIDR))
 	{
 		try
 		{
@@ -783,26 +708,26 @@ bool Entry::Matches(const User *u, bool full) const
 			ret = false;
 		}
 	}
-	if (this->HasFlag(ENTRYTYPE_NICK) && !this->nick.equals_ci(u->nick))
+	if (this->types.count(ENTRYTYPE_NICK) && !this->nick.equals_ci(u->nick))
 		ret = false;
-	if (this->HasFlag(ENTRYTYPE_USER) && !this->user.equals_ci(u->GetVIdent()) && (!full ||
+	if (this->types.count(ENTRYTYPE_USER) && !this->user.equals_ci(u->GetVIdent()) && (!full ||
 		!this->user.equals_ci(u->GetIdent())))
 		ret = false;
-	if (this->HasFlag(ENTRYTYPE_HOST) && !this->host.equals_ci(u->GetDisplayedHost()) && (!full ||
+	if (this->types.count(ENTRYTYPE_HOST) && !this->host.equals_ci(u->GetDisplayedHost()) && (!full ||
 		(!this->host.equals_ci(u->host) && !this->host.equals_ci(u->chost) && !this->host.equals_ci(u->vhost) &&
 		!this->host.equals_ci(u->ip))))
 		ret = false;
-	if (this->HasFlag(ENTRYTYPE_NICK_WILD) && !Anope::Match(u->nick, this->nick))
+	if (this->types.count(ENTRYTYPE_NICK_WILD) && !Anope::Match(u->nick, this->nick))
 		ret = false;
-	if (this->HasFlag(ENTRYTYPE_USER_WILD) && !Anope::Match(u->GetVIdent(), this->user) && (!full ||
+	if (this->types.count(ENTRYTYPE_USER_WILD) && !Anope::Match(u->GetVIdent(), this->user) && (!full ||
 		!Anope::Match(u->GetIdent(), this->user)))
 		ret = false;
-	if (this->HasFlag(ENTRYTYPE_HOST_WILD) && !Anope::Match(u->GetDisplayedHost(), this->host) && (!full ||
+	if (this->types.count(ENTRYTYPE_HOST_WILD) && !Anope::Match(u->GetDisplayedHost(), this->host) && (!full ||
 		(!Anope::Match(u->host, this->host) && !Anope::Match(u->chost, this->host) &&
 		!Anope::Match(u->vhost, this->host) && !Anope::Match(u->ip, this->host))))
 		ret = false;
 	
-	ChannelMode *cm = ModeManager::FindChannelModeByName(this->modename);
+	ChannelMode *cm = ModeManager::FindChannelModeByName(this->name);
 	if (cm != NULL && cm->type == MODE_LIST)
 	{
 		ChannelModeList *cml = anope_dynamic_static_cast<ChannelModeList *>(cm);

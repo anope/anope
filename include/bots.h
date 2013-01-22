@@ -20,22 +20,8 @@ typedef Anope::map<BotInfo *> botinfo_map;
 
 extern CoreExport Serialize::Checker<botinfo_map> BotListByNick, BotListByUID;
 
-/** Flags settable on a bot
- */
-enum BotFlag
-{
-	BI_BEGIN,
-
-	/* This bot can only be assigned by IRCops */
-	BI_PRIVATE,
-	/* This bot is defined in the config */
-	BI_CONF,
-
-	BI_END
-};
-
 /* A service bot (NickServ, ChanServ, a BotServ bot, etc). */
-class CoreExport BotInfo : public User, public Flags<BotFlag>, public Serializable
+class CoreExport BotInfo : public User, public Serializable
 {
  public:
 	time_t created;
@@ -49,6 +35,10 @@ class CoreExport BotInfo : public User, public Flags<BotFlag>, public Serializab
 	std::vector<Anope::string> botchannels;
 	/* Whether or not this bot is introduced to the network */
 	bool introduced;
+	/* Bot can only be assigned by irc ops */
+	bool oper_only;
+	/* Bot is defined in the configuration file */
+	bool conf;
 
 	/** Create a new bot.
 	 * @param nick The nickname to assign to the bot.

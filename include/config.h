@@ -485,7 +485,7 @@ class CoreExport ServerConfig
 	/* Don't allow nicks to use /ns group to regroup nicks */
 	bool NSNoGroupChange;
 	/* Default flags for newly registered nicks */
-	Flags<NickCoreFlag> NSDefFlags;
+	std::set<Anope::string> NSDefFlags;
 	/* All languages Anope is aware about */
 	Anope::string Languages;
 	/* Default language used by services */
@@ -546,7 +546,7 @@ class CoreExport ServerConfig
 	/* Core ChanServ modules */
 	Anope::string ChanCoreModules;
 	/* Default flags for newly registered channels */
-	Flags<ChannelInfoFlag> CSDefFlags;
+	std::set<Anope::string> CSDefFlags;
 	/* Max number of channels a user can own */
 	unsigned CSMaxReg;
 	/* Time before a channel expires */
@@ -589,7 +589,7 @@ class CoreExport ServerConfig
 	/* Core BotServ modules */
 	Anope::string BotCoreModules;
 	/* Default BotServ flags */
-	Flags<BotServFlag> BSDefFlags;
+	std::set<Anope::string> BSDefFlags;
 	/* How long before botserv forgets a user. This is used for flood kickers etc */
 	time_t BSKeepData;
 	/* Min number of users to have in the channel before the service bot joins */

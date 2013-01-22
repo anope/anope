@@ -43,7 +43,7 @@ class ExpireCallback : public CallBack
 					expire = true;
 			}
 
-			if (ci->HasFlag(CI_NO_EXPIRE))
+			if (ci->HasExt("NO_EXPIRE"))
 				expire = false;
 
 			FOREACH_MOD(I_OnPreChanExpire, OnPreChanExpire(ci, expire));
@@ -51,7 +51,7 @@ class ExpireCallback : public CallBack
 			if (expire)
 			{
 				Anope::string extra;
-				if (ci->HasFlag(CI_SUSPENDED))
+				if (ci->HasExt("SUSPENDED"))
 					extra = "suspended ";
 
 				Log(LOG_NORMAL, "chanserv/expire") << "Expiring " << extra  << "channel " << ci->name << " (founder: " << (ci->GetFounder() ? ci->GetFounder()->display : "(none)") << ")";
@@ -92,7 +92,7 @@ class ChanServCore : public Module
 
 	EventReturn OnBotPrivmsg(User *u, BotInfo *bi, Anope::string &message) anope_override
 	{
-		if (Config->CSOpersOnly && !u->HasMode(UMODE_OPER) && bi->nick == Config->ChanServ)
+		if (Config->CSOpersOnly && bi == ChanServ && !u->HasMode("OPER"))
 		{
 			u->SendMessage(bi, ACCESS_DENIED);
 			return EVENT_STOP;
@@ -164,7 +164,7 @@ class ChanServCore : public Module
 			for (unsigned j = ci->GetAkickCount(); j > 0; --j)
 			{
 				const AutoKick *akick = ci->GetAkick(j - 1);
-				if (akick->HasFlag(AK_ISNICK) && akick->nc == nc)
+				if (akick->nc == nc)
 					ci->EraseAkick(j - 1);
 			}
 		}

@@ -42,10 +42,8 @@ class CoreExport User : public virtual Base, public Extensible, public CommandRe
 	Anope::string uid;
 	/* If the user is on the access list of the nick theyre on */
 	bool on_access;
-	/* Bitset of mode names the user has set on them */
-	Flags<UserModeName> modes;
-	/* Map of user modes and the params this user has */
-	std::map<UserModeName, Anope::string> mode_params;
+	/* Map of user modes and the params this user has (if any) */
+	std::map<Anope::string, Anope::string> modes;
 	/* NickCore account the user is currently loggged in as, if they are logged in */
 	Serialize::Reference<NickCore> nc;
 
@@ -250,10 +248,10 @@ class CoreExport User : public virtual Base, public Extensible, public CommandRe
 	void UpdateHost();
 
 	/** Check if the user has a mode
-	 * @param Name Mode name
+	 * @param name Mode name
 	 * @return true or false
 	 */
-	bool HasMode(UserModeName Name) const;
+	bool HasMode(const Anope::string &name) const;
 
 	/** Set a mode internally on the user, the IRCd is not informed
 	 * @param um The user mode
@@ -278,7 +276,7 @@ class CoreExport User : public virtual Base, public Extensible, public CommandRe
 	 * @param name The mode name
 	 * @param Param Optional param for the mode
 	 */
-	void SetMode(const BotInfo *bi, UserModeName name, const Anope::string &param = "");
+	void SetMode(const BotInfo *bi, const Anope::string &name, const Anope::string &param = "");
 
 	/** Remove a mode on the user
 	 * @param bi The client setting the mode
@@ -290,7 +288,7 @@ class CoreExport User : public virtual Base, public Extensible, public CommandRe
 	 * @param bi The client setting the mode
 	 * @param name The mode name
 	 */
-	void RemoveMode(const BotInfo *bi, UserModeName name);
+	void RemoveMode(const BotInfo *bi, const Anope::string &name);
 
 	/** Set a string of modes on a user
 	 * @param bi The client setting the modes

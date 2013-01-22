@@ -215,7 +215,7 @@ class ModuleProxyScan : public Module
 				ProxyConnect *p = *it;
 
 				if (p->created + this->GetSecs() < Anope::CurTime)
-					p->SetFlag(SF_DEAD);
+					p->flags[SF_DEAD] = true;
 			}
 		}
 	} connectionTimeout;

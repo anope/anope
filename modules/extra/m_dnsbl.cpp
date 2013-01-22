@@ -54,7 +54,7 @@ class DNSBLResolver : public Request
 			record_reason = this->blacklist.replies[result];
 		}
 
-		user->Extend("m_dnsbl_akilled", NULL);
+		user->Extend("m_dnsbl_akilled");
 
 		Anope::string reason = this->blacklist.reason;
 		reason = reason.replace_all_cs("%n", user->nick);

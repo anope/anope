@@ -34,9 +34,8 @@ bool DefConModesSet = false;
 struct DefconConfig
 {
 	std::vector<std::bitset<32> > DefCon;
-	Flags<ChannelModeName> DefConModesOn;
-	Flags<ChannelModeName> DefConModesOff;
-	std::map<ChannelModeName, Anope::string> DefConModesOnParams;
+	std::set<Anope::string> DefConModesOn, DefConModesOff;
+	std::map<Anope::string, Anope::string> DefConModesOnParams;
 
 	int defaultlevel, sessionlimit;
 	Anope::string chanmodes, message, offmessage, akillreason;
@@ -70,19 +69,19 @@ struct DefconConfig
 		this->DefCon[dlevel][level] = false;
 	}
 
-	bool SetDefConParam(ChannelModeName Name, const Anope::string &buf)
+	bool SetDefConParam(const Anope::string &name, const Anope::string &buf)
 	{
-	       return DefConModesOnParams.insert(std::make_pair(Name, buf)).second;
+	       return DefConModesOnParams.insert(std::make_pair(name, buf)).second;
 	}
 
-	void UnsetDefConParam(ChannelModeName Name)
+	void UnsetDefConParam(const Anope::string &name)
 	{
-		DefConModesOnParams.erase(Name);
+		DefConModesOnParams.erase(name);
 	}
 	
-	bool GetDefConParam(ChannelModeName Name, Anope::string &buf)
+	bool GetDefConParam(const Anope::string &name, Anope::string &buf)
 	{
-	       std::map<ChannelModeName, Anope::string>::iterator it = DefConModesOnParams.find(Name);
+	       std::map<Anope::string, Anope::string>::iterator it = DefConModesOnParams.find(name);
 	
 	       buf.clear();
 	
@@ -260,8 +259,8 @@ class OSDefcon : public Module
 
 		spacesepstream ss(DConfig.chanmodes);
 
-		DConfig.DefConModesOn.ClearFlags();
-		DConfig.DefConModesOff.ClearFlags();
+		DConfig.DefConModesOn.clear();
+		DConfig.DefConModesOff.clear();
 		ss.GetToken(modes);
 
 		/* Loop while there are modes to set */
@@ -291,8 +290,8 @@ class OSDefcon : public Module
 				}
 				else if (add)
 				{
-					DConfig.DefConModesOn.SetFlag(cm->name);
-					DConfig.DefConModesOff.UnsetFlag(cm->name);
+					DConfig.DefConModesOn.insert(cm->name);
+					DConfig.DefConModesOff.erase(cm->name);
 
 					if (cm->type == MODE_PARAM)
 					{
@@ -310,9 +309,9 @@ class OSDefcon : public Module
 						DConfig.SetDefConParam(cmp->name, param);
 					}
 				}
-				else if (DConfig.DefConModesOn.HasFlag(cm->name))
+				else if (DConfig.DefConModesOn.count(cm->name))
 				{
-					DConfig.DefConModesOn.UnsetFlag(cm->name);
+					DConfig.DefConModesOn.erase(cm->name);
 
 					if (cm->type == MODE_PARAM)
 						DConfig.UnsetDefConParam(cm->name);
@@ -321,9 +320,9 @@ class OSDefcon : public Module
 		}
 
 		/* We can't mlock +L if +l is not mlocked as well. */
-		if ((cm = ModeManager::FindChannelModeByName(CMODE_REDIRECT)) && DConfig.DefConModesOn.HasFlag(cm->name) && !DConfig.DefConModesOn.HasFlag(CMODE_LIMIT))
+		if ((cm = ModeManager::FindChannelModeByName("REDIRECT")) && DConfig.DefConModesOn.count(cm->name) && !DConfig.DefConModesOn.count("LIMIT"))
 		{
-			DConfig.DefConModesOn.UnsetFlag(CMODE_REDIRECT);
+			DConfig.DefConModesOn.erase("REDIRECT");
 	
 			Log(this) << "DefConChanModes must lock mode +l as well to lock mode +L";
 		}
@@ -412,13 +411,13 @@ class OSDefcon : public Module
 		this->ParseModeString();
 	}
 
-	EventReturn OnChannelModeSet(Channel *c, MessageSource &, ChannelModeName Name, const Anope::string &param) anope_override
+	EventReturn OnChannelModeSet(Channel *c, MessageSource &, const Anope::string &mname, const Anope::string &param) anope_override
 	{
-		ChannelMode *cm = ModeManager::FindChannelModeByName(Name);
+		ChannelMode *cm = ModeManager::FindChannelModeByName(mname);
 
-		if (DConfig.Check(DEFCON_FORCE_CHAN_MODES) && cm && DConfig.DefConModesOff.HasFlag(Name))
+		if (DConfig.Check(DEFCON_FORCE_CHAN_MODES) && cm && DConfig.DefConModesOff.count(mname))
 		{
-			c->RemoveMode(OperServ, Name, param);
+			c->RemoveMode(OperServ, cm, param);
 
 			return EVENT_STOP;
 		}
@@ -426,18 +425,18 @@ class OSDefcon : public Module
 		return EVENT_CONTINUE;
 	}
 
-	EventReturn OnChannelModeUnset(Channel *c, MessageSource &, ChannelModeName Name, const Anope::string &) anope_override
+	EventReturn OnChannelModeUnset(Channel *c, MessageSource &, const Anope::string &mname, const Anope::string &) anope_override
 	{
-		ChannelMode *cm = ModeManager::FindChannelModeByName(Name);
+		ChannelMode *cm = ModeManager::FindChannelModeByName(mname);
 
-		if (DConfig.Check(DEFCON_FORCE_CHAN_MODES) && cm && DConfig.DefConModesOn.HasFlag(Name))
+		if (DConfig.Check(DEFCON_FORCE_CHAN_MODES) && cm && DConfig.DefConModesOn.count(mname))
 		{
 			Anope::string param;
 
-			if (DConfig.GetDefConParam(Name, param))
-				c->SetMode(OperServ, Name, param);
+			if (DConfig.GetDefConParam(mname, param))
+				c->SetMode(OperServ, cm, param);
 			else
-				c->SetMode(OperServ, Name);
+				c->SetMode(OperServ, cm);
 
 			return EVENT_STOP;
 

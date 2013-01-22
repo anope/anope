@@ -21,11 +21,6 @@
 #include <fcntl.h>
 #endif
 
-static const Anope::string SocketFlagStrings[] = {
-	"SF_DEAD", "SF_WRITABLE", "SF_CONNECTING", "SF_CONNECTED", "SF_ACCEPTING", "SF_ACCEPTED", ""
-};
-template<> const Anope::string* Flags<SocketFlag>::flags_strings = SocketFlagStrings;
-
 std::map<int, Socket *> SocketEngine::Sockets;
 
 uint32_t TotalRead = 0;
@@ -339,7 +334,7 @@ ClientSocket *SocketIO::Accept(ListenSocket *s)
 	if (newsock >= 0)
 	{
 		ClientSocket *ns = s->OnAccept(newsock, conaddr);
-		ns->SetFlag(SF_ACCEPTED);
+		ns->flags[SF_ACCEPTED] = true;
 		ns->OnAccept();
 		return ns;
 	}
@@ -361,8 +356,7 @@ void SocketIO::Bind(Socket *s, const Anope::string &ip, int port)
 
 void SocketIO::Connect(ConnectionSocket *s, const Anope::string &target, int port)
 {
-	s->UnsetFlag(SF_CONNECTING);
-	s->UnsetFlag(SF_CONNECTED);
+	s->flags[SF_CONNECTING] = s->flags[SF_CONNECTED] = false;
 	s->conaddr.pton(s->IsIPv6() ? AF_INET6 : AF_INET, target, port);
 	int c = connect(s->GetFD(), &s->conaddr.sa, s->conaddr.size());
 	if (c == -1)
@@ -372,29 +366,29 @@ void SocketIO::Connect(ConnectionSocket *s, const Anope::string &target, int por
 		else
 		{
 			SocketEngine::Change(s, true, SF_WRITABLE);
-			s->SetFlag(SF_CONNECTING);
+			s->flags[SF_CONNECTING] = true;
 		}
 	}
 	else
 	{
-		s->SetFlag(SF_CONNECTED);
+		s->flags[SF_CONNECTED] = true;
 		s->OnConnect();
 	}
 }
 
 SocketFlag SocketIO::FinishConnect(ConnectionSocket *s)
 {
-	if (s->HasFlag(SF_CONNECTED))
+	if (s->flags[SF_CONNECTED])
 		return SF_CONNECTED;
-	else if (!s->HasFlag(SF_CONNECTING))
+	else if (!s->flags[SF_CONNECTING])
 		throw SocketException("SocketIO::FinishConnect called for a socket not connected nor connecting?");
 
 	int optval = 0;
 	socklen_t optlen = sizeof(optval);
 	if (!getsockopt(s->GetFD(), SOL_SOCKET, SO_ERROR, reinterpret_cast<char *>(&optval), &optlen) && !optval)
 	{
-		s->SetFlag(SF_CONNECTED);
-		s->UnsetFlag(SF_CONNECTING);
+		s->flags[SF_CONNECTED] = true;
+		s->flags[SF_CONNECTING] = false;
 		s->OnConnect();
 		return SF_CONNECTED;
 	}
@@ -445,11 +439,11 @@ bool Socket::IsIPv6() const
 
 bool Socket::SetBlocking(bool state)
 {
-	int flags = fcntl(this->GetFD(), F_GETFL, 0);
+	int f = fcntl(this->GetFD(), F_GETFL, 0);
 	if (state)
-		return !fcntl(this->GetFD(), F_SETFL, flags & ~O_NONBLOCK);
+		return !fcntl(this->GetFD(), F_SETFL, f & ~O_NONBLOCK);
 	else
-		return !fcntl(this->GetFD(), F_SETFL, flags | O_NONBLOCK);
+		return !fcntl(this->GetFD(), F_SETFL, f | O_NONBLOCK);
 }
 
 void Socket::Bind(const Anope::string &ip, int port)

@@ -63,7 +63,7 @@ class BotServCore : public Module
 			return;
 		}
 	
-		if (realbuf.empty() || !c->ci->botflags.HasFlag(BS_FANTASY))
+		if (realbuf.empty() || !c->ci->HasExt("BS_FANTASY"))
 			return;
 
 		std::vector<Anope::string> params;
@@ -119,7 +119,7 @@ class BotServCore : public Module
 		}
 
 		// Command requires registered users only
-		if (!cmd->HasFlag(CFLAG_ALLOW_UNREGISTERED) && !u->Account())
+		if (!cmd->AllowUnregistered() && !u->Account())
 			return;
 
 		if (params.size() < cmd->min_params)
@@ -173,7 +173,7 @@ class BotServCore : public Module
 			 * to has synced, or we'll get greet-floods when the net
 			 * recovers from a netsplit. -GD
 			 */
-			if (c->FindUser(c->ci->bi) && c->ci->botflags.HasFlag(BS_GREET) && user->Account() && !user->Account()->greet.empty() && c->ci->AccessFor(user).HasPriv("GREET") && user->server->IsSynced())
+			if (c->FindUser(c->ci->bi) && c->ci->HasExt("BS_GREET") && user->Account() && !user->Account()->greet.empty() && c->ci->AccessFor(user).HasPriv("GREET") && user->server->IsSynced())
 			{
 				IRCD->SendPrivmsg(c->ci->bi, c->name, "[%s] %s", user->Account()->display.c_str(), user->Account()->greet.c_str());
 				c->ci->bi->lastmsg = Anope::CurTime;
@@ -184,26 +184,26 @@ class BotServCore : public Module
 	void OnLeaveChannel(User *u, Channel *c) anope_override
 	{
 		/* Channel is persistent, it shouldn't be deleted and the service bot should stay */
-		if (c->HasFlag(CH_PERSIST) || (c->ci && c->ci->HasFlag(CI_PERSIST)))
+		if (c->HasExt("PERSIST") || (c->ci && c->ci->HasExt("PERSIST")))
 			return;
 	
 		/* Channel is syncing from a netburst, don't destroy it as more users are probably wanting to join immediatly
 		 * We also don't part the bot here either, if necessary we will part it after the sync
 		 */
-		if (c->HasFlag(CH_SYNCING))
+		if (c->HasExt("SYNCING"))
 			return;
 
 		/* Additionally, do not delete this channel if ChanServ/a BotServ bot is inhabiting it */
-		if (c->HasFlag(CH_INHABIT))
+		if (c->HasExt("INHABIT"))
 			return;
 
 		if (c->ci && c->ci->bi && u != *c->ci->bi && c->users.size() - 1 <= Config->BSMinUsers && c->FindUser(c->ci->bi))
 		{
-			bool persist = c->HasFlag(CH_PERSIST);
-			c->SetFlag(CH_PERSIST);
+			bool persist = c->Shrink("PERSIST");
+			c->Extend("PERSIST");
 			c->ci->bi->Part(c->ci->c);
 			if (!persist)
-				c->UnsetFlag(CH_PERSIST);
+				c->Shrink("PERSIST");
 		}
 	}
 
@@ -255,15 +255,15 @@ class BotServCore : public Module
 				"the following characters: %s"), Config->ChanServ.c_str(), Config->BSFantasyCharacter.c_str());
 	}
 
-	EventReturn OnChannelModeSet(Channel *c, MessageSource &, ChannelModeName Name, const Anope::string &param) anope_override
+	EventReturn OnChannelModeSet(Channel *c, MessageSource &, const Anope::string &mname, const Anope::string &param) anope_override
 	{
-		if (Config->BSSmartJoin && Name == CMODE_BAN && c->ci && c->ci->bi && c->FindUser(c->ci->bi))
+		if (Config->BSSmartJoin && mname == "BAN" && c->ci && c->ci->bi && c->FindUser(c->ci->bi))
 		{
 			BotInfo *bi = c->ci->bi;
 
-			Entry ban(CMODE_BAN, param);
+			Entry ban("BAN", param);
 			if (ban.Matches(bi))
-				c->RemoveMode(bi, CMODE_BAN, param);
+				c->RemoveMode(bi, "BAN", param);
 		}
 
 		return EVENT_CONTINUE;

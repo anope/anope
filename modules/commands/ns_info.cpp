@@ -16,9 +16,9 @@
 class CommandNSInfo : public Command
 {
  private:
-	template<typename T> void CheckOptStr(NickCore *core, Anope::string &buf, T opt, const char *str, const Flags<T> *nc, bool reverse_logic = false)
+	void CheckOptStr(NickCore *core, Anope::string &buf, const Anope::string &opt, const char *str, const Extensible *e, bool reverse_logic = false)
 	{
-		if (reverse_logic ? !nc->HasFlag(opt) : nc->HasFlag(opt))
+		if (reverse_logic != e->HasExt(opt))
 		{
 			if (!buf.empty())
 				buf += ", ";
@@ -29,9 +29,9 @@ class CommandNSInfo : public Command
  public:
 	CommandNSInfo(Module *creator) : Command(creator, "nickserv/info", 0, 2)
 	{
-		this->SetFlag(CFLAG_ALLOW_UNREGISTERED);
 		this->SetDesc(_("Displays information about a given nickname"));
 		this->SetSyntax(_("[\037nickname\037]"));
+		this->AllowUnregistered(true);
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
@@ -62,10 +62,10 @@ class CommandNSInfo : public Command
 
 			source.Reply(_("%s is %s"), na->nick.c_str(), na->last_realname.c_str());
 
-			if (na->nc->HasFlag(NI_UNCONFIRMED))
+			if (na->nc->HasExt("UNCONFIRMED"))
 				source.Reply(_("%s nickname is unconfirmed."), na->nick.c_str());
 
-			if (na->nc->IsServicesOper() && (show_hidden || !na->nc->HasFlag(NI_HIDE_STATUS)))
+			if (na->nc->IsServicesOper() && (show_hidden || !na->nc->HasExt("HIDE_STATUS")))
 				source.Reply(_("%s is a services operator of type %s."), na->nick.c_str(), na->nc->o->ot->GetName().c_str());
 
 			InfoFormatter info(source.nc);
@@ -74,14 +74,14 @@ class CommandNSInfo : public Command
 			{
 				if (show_hidden && !na->last_realhost.empty())
 					info[_("Online from")] = na->last_realhost;
-				if (show_hidden || !na->nc->HasFlag(NI_HIDE_MASK))
+				if (show_hidden || !na->nc->HasExt("HIDE_MASK"))
 					info[_("Online from")] = na->last_usermask;
 				else
 					source.Reply(_("%s is currently online."), na->nick.c_str());
 			}
 			else
 			{
-				if (show_hidden || !na->nc->HasFlag(NI_HIDE_MASK))
+				if (show_hidden || !na->nc->HasExt("HIDE_MASK"))
 					info[_("Last seen address")] = na->last_usermask;
 				if (show_hidden && !na->last_realhost.empty())
 					info[_("Last seen address")] = na->last_realhost;
@@ -92,10 +92,10 @@ class CommandNSInfo : public Command
 			if (!nick_online)
 				info[_("Last seen")] = Anope::strftime(na->last_seen);
 
-			if (!na->last_quit.empty() && (show_hidden || !na->nc->HasFlag(NI_HIDE_QUIT)))
+			if (!na->last_quit.empty() && (show_hidden || !na->nc->HasExt("HIDE_QUIT")))
 				info[_("Last quit message")] = na->last_quit;
 
-			if (!na->nc->email.empty() && (show_hidden || !na->nc->HasFlag(NI_HIDE_EMAIL)))
+			if (!na->nc->email.empty() && (show_hidden || !na->nc->HasExt("HIDE_EMAIL")))
 				info[_("Email address")] = na->nc->email;
 
 			if (show_hidden)
@@ -113,20 +113,20 @@ class CommandNSInfo : public Command
 
 				Anope::string optbuf;
 
-				CheckOptStr<NickCoreFlag>(source.nc, optbuf, NI_KILLPROTECT, _("Protection"), na->nc);
-				CheckOptStr<NickCoreFlag>(source.nc, optbuf, NI_SECURE, _("Security"), na->nc);
-				CheckOptStr<NickCoreFlag>(source.nc, optbuf, NI_PRIVATE, _("Private"), na->nc);
-				CheckOptStr<NickCoreFlag>(source.nc, optbuf, NI_MSG, _("Message mode"), na->nc);
-				CheckOptStr<NickCoreFlag>(source.nc, optbuf, NI_AUTOOP, _("Auto-op"), na->nc);
-				CheckOptStr<NickCoreFlag>(source.nc, optbuf, NI_SUSPENDED, _("Suspended"), na->nc);
-				CheckOptStr<NickCoreFlag>(source.nc, optbuf, NI_STATS, _("Chanstats"), na->nc);
-				CheckOptStr<NickNameFlag>(source.nc, optbuf, NS_NO_EXPIRE, _("No expire"), na);
+				CheckOptStr(source.nc, optbuf, "KILLPROTECT", _("Protection"), na->nc);
+				CheckOptStr(source.nc, optbuf, "SECURE", _("Security"), na->nc);
+				CheckOptStr(source.nc, optbuf, "PRIVATE", _("Private"), na->nc);
+				CheckOptStr(source.nc, optbuf, "MSG", _("Message mode"), na->nc);
+				CheckOptStr(source.nc, optbuf, "AUTOOP", _("Auto-op"), na->nc);
+				CheckOptStr(source.nc, optbuf, "SUSPENDED", _("Suspended"), na->nc);
+				CheckOptStr(source.nc, optbuf, "STATS", _("Chanstats"), na->nc);
+				CheckOptStr(source.nc, optbuf, "NO_EXPIRE", _("No expire"), na);
 
 				info[_("Options")] = optbuf.empty() ? _("None") : optbuf;
 
-				if (na->nc->HasFlag(NI_UNCONFIRMED) == false)
+				if (na->nc->HasExt("UNCONFIRMED") == false)
 				{
-					if (na->HasFlag(NS_NO_EXPIRE) || !Config->NSExpire)
+					if (na->HasExt("NO_EXPIRE") || !Config->NSExpire)
 						;
 					else
 						info[_("Expires")] = Anope::strftime(na->last_seen + Config->NSExpire);

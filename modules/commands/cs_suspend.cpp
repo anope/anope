@@ -13,46 +13,6 @@
 
 #include "module.h"
 
-struct ChanSuspend : ExtensibleItem, Serializable
-{
-	Anope::string chan;
-	time_t when;
-
-	ChanSuspend() : Serializable("ChanSuspend")
-	{
-	}
-
-	void Serialize(Serialize::Data &sd) const anope_override
-	{
-		sd["chan"] << this->chan;
-		sd["when"] << this->when;
-	}
-
-	static Serializable* Unserialize(Serializable *obj, Serialize::Data &sd)
-	{
-		Anope::string schan;
-
-		sd["chan"] >> schan;
-
-		ChannelInfo *ci = ChannelInfo::Find(schan);
-		if (ci == NULL)
-			return NULL;
-
-		ChanSuspend *cs;
-		if (obj)
-			cs = anope_dynamic_static_cast<ChanSuspend *>(obj);
-		else
-			cs = new ChanSuspend();
-		
-		sd["chan"] >> cs->chan;
-		sd["when"] >> cs->when;
-
-		if (!obj)
-			ci->Extend("ci_suspend_expire", cs);
-		return cs;
-	}
-};
-
 class CommandCSSuspend : public Command
 {
  public:
@@ -95,10 +55,10 @@ class CommandCSSuspend : public Command
 			return;
 		}
 
-		ci->SetFlag(CI_SUSPENDED);
-		ci->Extend("suspend_by", new ExtensibleItemClass<Anope::string>(source.GetNick()));
+		ci->ExtendMetadata("SUSPENDED");
+		ci->ExtendMetadata("suspend:by", source.GetNick());
 		if (!reason.empty())
-			ci->Extend("suspend_reason", new ExtensibleItemClass<Anope::string>(reason));
+			ci->ExtendMetadata("suspend:reason", reason);
 
 		if (ci->c)
 		{
@@ -108,7 +68,7 @@ class CommandCSSuspend : public Command
 			{
 				ChanUserContainer *uc = *it;
 				User *user = uc->user;
-				if (!user->HasMode(UMODE_OPER) && user->server != Me)
+				if (!user->HasMode("OPER") && user->server != Me)
 					users.push_back(user);
 			}
 
@@ -117,13 +77,7 @@ class CommandCSSuspend : public Command
 		}
 
 		if (expiry_secs > 0)
-		{
-			ChanSuspend *cs = new ChanSuspend();
-			cs->chan = ci->name;
-			cs->when = Anope::CurTime + expiry_secs;
-
-			ci->Extend("cs_suspend_expire", cs);
-		}
+			ci->ExtendMetadata("suspend:expire", stringify(Anope::CurTime + expiry_secs));
 
 		Log(LOG_ADMIN, source, this, ci) << (!reason.empty() ? reason : "No reason") << ", expires in " << (expiry_secs ? Anope::strftime(Anope::CurTime + expiry_secs) : "never");
 		source.Reply(_("Channel \002%s\002 is now suspended."), ci->name.c_str());
@@ -172,20 +126,20 @@ class CommandCSUnSuspend : public Command
 		}
 
 		/* Only UNSUSPEND already suspended channels */
-		if (!ci->HasFlag(CI_SUSPENDED))
+		if (!ci->HasExt("SUSPENDED"))
 		{
-			source.Reply(_("Couldn't release channel \002%s\002!"), ci->name.c_str());
+			source.Reply(_("Channel \2%s\2 isn't suspended."), ci->name.c_str());
 			return;
 		}
 
-		Anope::string *by = ci->GetExt<ExtensibleItemClass<Anope::string> *>("suspend_by"), *reason = ci->GetExt<ExtensibleItemClass<Anope::string> *>("suspend_reason");
+		Anope::string *by = ci->GetExt<ExtensibleItemClass<Anope::string> *>("suspend:by"), *reason = ci->GetExt<ExtensibleItemClass<Anope::string> *>("suspend:reason");
 		if (by != NULL)
 			Log(LOG_ADMIN, source, this, ci) << " which was suspended by " << *by << " for: " << (reason && !reason->empty() ? *reason : "No reason");
 
-		ci->UnsetFlag(CI_SUSPENDED);
-		ci->Shrink("suspend_by");
-		ci->Shrink("suspend_reason");
-		ci->Shrink("cs_suspend_expire");
+		ci->Shrink("SUSPENDED");
+		ci->Shrink("suspend:by");
+		ci->Shrink("suspend:reason");
+		ci->Shrink("suspend:expire");
 
 		source.Reply(_("Channel \002%s\002 is now released."), ci->name.c_str());
 
@@ -206,13 +160,12 @@ class CommandCSUnSuspend : public Command
 
 class CSSuspend : public Module
 {
-	Serialize::Type chansuspend_type;
 	CommandCSSuspend commandcssuspend;
 	CommandCSUnSuspend commandcsunsuspend;
 
  public:
 	CSSuspend(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
-		chansuspend_type("ChanSuspend", ChanSuspend::Unserialize), commandcssuspend(this), commandcsunsuspend(this)
+		commandcssuspend(this), commandcsunsuspend(this)
 	{
 		this->SetAuthor("Anope");
 
@@ -220,40 +173,37 @@ class CSSuspend : public Module
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 	}
 
-	~CSSuspend()
-	{
-		for (registered_channel_map::const_iterator it = RegisteredChannelList->begin(), it_end = RegisteredChannelList->end(); it != it_end; ++it)
-		{
-			ChannelInfo *ci = it->second;
-			ci->Shrink("cs_suspend_expire");
-			ci->Shrink("suspend_by");
-			ci->Shrink("suspend_reason");
-		}
-	}
-
 	void OnPreChanExpire(ChannelInfo *ci, bool &expire) anope_override
 	{
-		if (!ci->HasFlag(CI_SUSPENDED))
+		if (!ci->HasExt("SUSPENDED"))
 			return;
 
 		expire = false;
 
-		ChanSuspend *cs = ci->GetExt<ChanSuspend *>("cs_suspend_expire");
-		if (cs != NULL && cs->when < Anope::CurTime)
-		{
-			ci->last_used = Anope::CurTime;
-			ci->UnsetFlag(CI_SUSPENDED);
-			ci->Shrink("cs_suspend_expire");
-			ci->Shrink("suspend_by");
-			ci->Shrink("suspend_reason");
+		Anope::string *str = ci->GetExt<ExtensibleItemClass<Anope::string> *>("suspend:expire");
+		if (str == NULL)
+			return;
 
-			Log(LOG_NORMAL, "expire", ChanServ) << "Expiring suspend for " << ci->name;
+		try
+		{
+			time_t when = convertTo<time_t>(*str);
+			if (when < Anope::CurTime)
+			{
+				ci->last_used = Anope::CurTime;
+				ci->Shrink("SUSPENDED");
+				ci->Shrink("suspend:expire");
+				ci->Shrink("suspend:by");
+				ci->Shrink("suspend:reason");
+
+				Log(LOG_NORMAL, "expire", ChanServ) << "Expiring suspend for " << ci->name;
+			}
 		}
+		catch (const ConvertException &) { }
 	}
 
 	EventReturn OnCheckKick(User *u, ChannelInfo *ci, Anope::string &mask, Anope::string &reason) anope_override
 	{
-		if (u->HasMode(UMODE_OPER) || !ci->HasFlag(CI_SUSPENDED))
+		if (u->HasMode("OPER") || !ci->HasExt("SUSPENDED"))
 			return EVENT_CONTINUE;
 
 		reason = Language::Translate(u, _("This channel may not be used."));

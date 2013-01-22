@@ -36,46 +36,46 @@ bool WebCPanel::NickServ::Info::OnRequest(HTTPProvider *server, const Anope::str
 				replacements["MESSAGES"] = "Greet updated";
 			}
 		}
-		if (na->nc->HasFlag(NI_AUTOOP) != message.post_data.count("autoop"))
+		if (na->nc->HasExt("AUTOOP") != message.post_data.count("autoop"))
 		{
-			if (!na->nc->HasFlag(NI_AUTOOP))
-				na->nc->SetFlag(NI_AUTOOP);
+			if (!na->nc->HasExt("AUTOOP"))
+				na->nc->ExtendMetadata("AUTOOP");
 			else
-				na->nc->UnsetFlag(NI_AUTOOP);
+				na->nc->Shrink("AUTOOP");
 			replacements["MESSAGES"] = "Autoop updated";
 		}
-		if (na->nc->HasFlag(NI_PRIVATE) != message.post_data.count("private"))
+		if (na->nc->HasExt("PRIVATE") != message.post_data.count("private"))
 		{
-			if (!na->nc->HasFlag(NI_PRIVATE))
-				na->nc->SetFlag(NI_PRIVATE);
+			if (!na->nc->HasExt("PRIVATE"))
+				na->nc->ExtendMetadata("PRIVATE");
 			else
-				na->nc->UnsetFlag(NI_PRIVATE);
+				na->nc->Shrink("PRIVATE");
 			replacements["MESSAGES"] = "Private updated";
 		}
-		if (na->nc->HasFlag(NI_SECURE) != message.post_data.count("secure"))
+		if (na->nc->HasExt("SECURE") != message.post_data.count("secure"))
 		{
-			if (!na->nc->HasFlag(NI_SECURE))
-				na->nc->SetFlag(NI_SECURE);
+			if (!na->nc->HasExt("SECURE"))
+				na->nc->ExtendMetadata("SECURE");
 			else
-				na->nc->UnsetFlag(NI_SECURE);
+				na->nc->Shrink("SECURE");
 			replacements["MESSAGES"] = "Secure updated";
 		}
-		if (message.post_data["kill"] == "on" && !na->nc->HasFlag(NI_KILLPROTECT))
+		if (message.post_data["kill"] == "on" && !na->nc->HasExt("KILLPROTECT"))
 		{
-			na->nc->SetFlag(NI_KILLPROTECT);
-			na->nc->UnsetFlag(NI_KILL_QUICK);
+			na->nc->ExtendMetadata("KILLPROTECT");
+			na->nc->Shrink("KILL_QUICK");
 			replacements["MESSAGES"] = "Kill updated";
 		}
-		else if (message.post_data["kill"] == "quick" && !na->nc->HasFlag(NI_KILL_QUICK))
+		else if (message.post_data["kill"] == "quick" && !na->nc->HasExt("KILL_QUICK"))
 		{
-			na->nc->UnsetFlag(NI_KILLPROTECT);
-			na->nc->SetFlag(NI_KILL_QUICK);
+			na->nc->Shrink("KILLPROTECT");
+			na->nc->ExtendMetadata("KILL_QUICK");
 			replacements["MESSAGES"] = "Kill updated";
 		}
-		else if (message.post_data["kill"] == "off" && (na->nc->HasFlag(NI_KILLPROTECT) || na->nc->HasFlag(NI_KILL_QUICK)))
+		else if (message.post_data["kill"] == "off" && (na->nc->HasExt("KILLPROTECT") || na->nc->HasExt("KILL_QUICK")))
 		{
-			na->nc->UnsetFlag(NI_KILLPROTECT);
-			na->nc->UnsetFlag(NI_KILL_QUICK);
+			na->nc->Shrink("KILLPROTECT");
+			na->nc->Shrink("KILL_QUICK");
 			replacements["MESSAGES"] = "Kill updated";
 		}
 	}
@@ -92,17 +92,17 @@ bool WebCPanel::NickServ::Info::OnRequest(HTTPProvider *server, const Anope::str
 			replacements["VHOST"] = na->GetVhostHost();
 	}
 	replacements["GREET"] = HTTPUtils::Escape(na->nc->greet);
-	if (na->nc->HasFlag(NI_AUTOOP))
+	if (na->nc->HasExt("AUTOOP"))
 		replacements["AUTOOP"];
-	if (na->nc->HasFlag(NI_PRIVATE))
+	if (na->nc->HasExt("PRIVATE"))
 		replacements["PRIVATE"];
-	if (na->nc->HasFlag(NI_SECURE))
+	if (na->nc->HasExt("SECURE"))
 		replacements["SECURE"];
-	if (na->nc->HasFlag(NI_KILLPROTECT))
+	if (na->nc->HasExt("KILLPROTECT"))
 		replacements["KILL_ON"];
-	if (na->nc->HasFlag(NI_KILL_QUICK))
+	if (na->nc->HasExt("KILL_QUICK"))
 		replacements["KILL_QUICK"];
-	if (!na->nc->HasFlag(NI_KILLPROTECT) && !na->nc->HasFlag(NI_KILL_QUICK))
+	if (!na->nc->HasExt("KILLPROTECT") && !na->nc->HasExt("KILL_QUICK"))
 		replacements["KILL_OFF"];
 	
 	TemplateFileServer page("nickserv/info.html");

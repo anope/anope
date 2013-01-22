@@ -20,9 +20,9 @@ class CommandNSResetPass : public Command
  public:
 	CommandNSResetPass(Module *creator) : Command(creator, "nickserv/resetpass", 1, 1)
 	{
-		this->SetFlag(CFLAG_ALLOW_UNREGISTERED);
 		this->SetDesc(_("Helps you reset lost passwords"));
 		this->SetSyntax(_("\037nickname\037"));
+		this->AllowUnregistered(true);
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
@@ -106,7 +106,7 @@ class NSResetPass : public Module
 
 					Log(LOG_COMMAND, source, &commandnsresetpass) << "confirmed RESETPASS to forcefully identify to " << na->nick;
 
-					nc->UnsetFlag(NI_UNCONFIRMED);
+					nc->Shrink("UNCONFIRMED");
 
 					if (source.GetUser())
 					{

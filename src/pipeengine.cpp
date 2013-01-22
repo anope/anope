@@ -22,10 +22,10 @@ Pipe::Pipe() : Socket(-1), write_pipe(-1)
 	int fds[2];
 	if (pipe(fds))
 		throw CoreException("Could not create pipe: " + Anope::LastError());
-	int flags = fcntl(fds[0], F_GETFL, 0);
-	fcntl(fds[0], F_SETFL, flags | O_NONBLOCK);
-	flags = fcntl(fds[1], F_GETFL, 0);
-	fcntl(fds[1], F_SETFL, flags | O_NONBLOCK);
+	int sflags = fcntl(fds[0], F_GETFL, 0);
+	fcntl(fds[0], F_SETFL, sflags | O_NONBLOCK);
+	sflags = fcntl(fds[1], F_GETFL, 0);
+	fcntl(fds[1], F_SETFL, sflags | O_NONBLOCK);
 
 	SocketEngine::Change(this, false, SF_READABLE);
 	SocketEngine::Change(this, false, SF_WRITABLE);
@@ -67,11 +67,11 @@ int Pipe::Read(char *data, size_t sz)
 
 bool Pipe::SetWriteBlocking(bool state)
 {
-	int flags = fcntl(this->write_pipe, F_GETFL, 0);
+	int f = fcntl(this->write_pipe, F_GETFL, 0);
 	if (state)
-		return !fcntl(this->write_pipe, F_SETFL, flags & ~O_NONBLOCK);
+		return !fcntl(this->write_pipe, F_SETFL, f & ~O_NONBLOCK);
 	else
-		return !fcntl(this->write_pipe, F_SETFL, flags | O_NONBLOCK);
+		return !fcntl(this->write_pipe, F_SETFL, f | O_NONBLOCK);
 }
 
 void Pipe::Notify()

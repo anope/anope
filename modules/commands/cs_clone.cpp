@@ -74,18 +74,18 @@ public:
 				if (u && u->FindChannel(target_ci->c) != NULL)
 				{
 					/* On most ircds you do not receive the admin/owner mode till its registered */
-					if ((cm = ModeManager::FindChannelModeByName(CMODE_OWNER)))
+					if ((cm = ModeManager::FindChannelModeByName("OWNER")))
 						target_ci->c->SetMode(NULL, cm, u->GetUID());
-					else if ((cm = ModeManager::FindChannelModeByName(CMODE_PROTECT)))
+					else if ((cm = ModeManager::FindChannelModeByName("PROTECT")))
 						target_ci->c->RemoveMode(NULL, cm, u->GetUID());
 				}
 
 				/* Mark the channel as persistent */
-				if (target_ci->c->HasMode(CMODE_PERM))
-					target_ci->SetFlag(CI_PERSIST);
+				if (target_ci->c->HasMode("PERM"))
+					target_ci->ExtendMetadata("PERSIST");
 				/* Persist may be in def cflags, set it here */
-				else if (target_ci->HasFlag(CI_PERSIST) && (cm = ModeManager::FindChannelModeByName(CMODE_PERM)))
-					target_ci->c->SetMode(NULL, CMODE_PERM);
+				else if (target_ci->HasExt("PERSIST") && (cm = ModeManager::FindChannelModeByName("PERM")))
+					target_ci->c->SetMode(NULL, cm);
 	
 				if (target_ci->bi && target_ci->c->FindUser(target_ci->bi) == NULL)
 					target_ci->bi->Join(target_ci->c, &ModeManager::DefaultBotModes);
@@ -130,7 +130,7 @@ public:
 			for (unsigned i = 0; i < ci->GetAkickCount(); ++i)
 			{
 				const AutoKick *akick = ci->GetAkick(i);
-				if (akick->HasFlag(AK_ISNICK))
+				if (akick->nc)
 					target_ci->AddAkick(akick->creator, akick->nc, akick->reason, akick->addtime, akick->last_used);
 				else
 					target_ci->AddAkick(akick->creator, akick->mask, akick->reason, akick->addtime, akick->last_used);

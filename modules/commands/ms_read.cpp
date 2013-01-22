@@ -47,7 +47,7 @@ static void rsend_notify(CommandSource &source, MemoInfo *mi, Memo *m, const Ano
 	}
 
 	/* Remove receipt flag from the original memo */
-	m->UnsetFlag(MF_RECEIPT);
+	m->receipt = false;
 }
 
 class MemoListCallback : public NumberList
@@ -76,10 +76,10 @@ class MemoListCallback : public NumberList
 		else
 			source.Reply(_("Memo %d from %s (%s).  To delete, type: \002%s%s DEL %d\002"), index + 1, m->sender.c_str(), Anope::strftime(m->time).c_str(), Config->UseStrictPrivMsgString.c_str(), Config->MemoServ.c_str(), index + 1);
 		source.Reply("%s", m->text.c_str());
-		m->UnsetFlag(MF_UNREAD);
+		m->unread = false;
 
 		/* Check if a receipt notification was requested */
-		if (m->HasFlag(MF_RECEIPT))
+		if (m->receipt)
 			rsend_notify(source, mi, m, ci ? ci->name : source.GetNick());
 	}
 };
@@ -138,7 +138,7 @@ class CommandMSRead : public Command
 			{
 				int readcount = 0;
 				for (i = 0, end = mi->memos->size(); i < end; ++i)
-					if (mi->GetMemo(i)->HasFlag(MF_UNREAD))
+					if (mi->GetMemo(i)->unread)
 					{
 						MemoListCallback::DoRead(source, mi, ci, i);
 						++readcount;

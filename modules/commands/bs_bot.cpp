@@ -107,7 +107,7 @@ class CommandBSBot : public Command
 			return;
 		}
 
-		if (bi->HasFlag(BI_CONF))
+		if (bi->conf)
 		{
 			source.Reply(_("Bot %s is not changable."), bi->nick.c_str());
 			return;
@@ -232,7 +232,7 @@ class CommandBSBot : public Command
 			return;
 		}
 
-		if (bi->HasFlag(BI_CONF))
+		if (bi->conf)
 		{
 			source.Reply(_("Bot %s is not deletable."), bi->nick.c_str());
 			return;

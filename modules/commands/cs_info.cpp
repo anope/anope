@@ -15,9 +15,9 @@
 
 class CommandCSInfo : public Command
 {
-	void CheckOptStr(Anope::string &buf, ChannelInfoFlag opt, const char *str, const ChannelInfo *ci, const NickCore *nc)
+	void CheckOptStr(Anope::string &buf, const Anope::string &opt, const char *str, const ChannelInfo *ci, const NickCore *nc)
 	{
-		if (ci->HasFlag(opt))
+		if (ci->HasExt(opt))
 		{
 			if (!buf.empty())
 				buf += ", ";
@@ -31,7 +31,7 @@ class CommandCSInfo : public Command
 	{
 		this->SetDesc(_("Lists information about the named registered channel"));
 		this->SetSyntax(_("\037channel\037"));
-		this->SetFlag(CFLAG_ALLOW_UNREGISTERED);
+		this->AllowUnregistered(true);
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
@@ -68,8 +68,8 @@ class CommandCSInfo : public Command
 		info["Registered"] = Anope::strftime(ci->time_registered);
 		info["Last used"] = Anope::strftime(ci->last_used);
 
-		const ModeLock *secret = ci->GetMLock(CMODE_SECRET);
-		if (!ci->last_topic.empty() && (show_all || ((!secret || secret->set == false) && (!ci->c || !ci->c->HasMode(CMODE_SECRET)))))
+		const ModeLock *secret = ci->GetMLock("SECRET");
+		if (!ci->last_topic.empty() && (show_all || ((!secret || secret->set == false) && (!ci->c || !ci->c->HasMode("SECRET")))))
 		{
 			info["Last topic"] = ci->last_topic;
 			info["Topic set by"] = ci->last_topic_setter;
@@ -80,21 +80,21 @@ class CommandCSInfo : public Command
 			info["Ban type"] = stringify(ci->bantype);
 
 			Anope::string optbuf;
-			CheckOptStr(optbuf, CI_KEEPTOPIC, _("Topic Retention"), ci, nc);
-			CheckOptStr(optbuf, CI_PEACE, _("Peace"), ci, nc);
-			CheckOptStr(optbuf, CI_PRIVATE, _("Private"), ci, nc);
-			CheckOptStr(optbuf, CI_RESTRICTED, _("Restricted Access"), ci, nc);
-			CheckOptStr(optbuf, CI_SECURE, _("Secure"), ci, nc);
-			CheckOptStr(optbuf, CI_SECUREFOUNDER, _("Secure Founder"), ci, nc);
-			CheckOptStr(optbuf, CI_SECUREOPS, _("Secure Ops"), ci, nc);
-			if (ci->HasFlag(CI_SIGNKICK))
-				CheckOptStr(optbuf, CI_SIGNKICK, _("Signed kicks"), ci, nc);
+			CheckOptStr(optbuf, "KEEPTOPIC", _("Topic Retention"), ci, nc);
+			CheckOptStr(optbuf, "PEACE", _("Peace"), ci, nc);
+			CheckOptStr(optbuf, "PRIVATE", _("Private"), ci, nc);
+			CheckOptStr(optbuf, "RESTRICTED", _("Restricted Access"), ci, nc);
+			CheckOptStr(optbuf, "SECURE", _("Secure"), ci, nc);
+			CheckOptStr(optbuf, "SECUREFOUNDER", _("Secure Founder"), ci, nc);
+			CheckOptStr(optbuf, "SECUREOPS", _("Secure Ops"), ci, nc);
+			if (ci->HasExt("SIGNKICK"))
+				CheckOptStr(optbuf, "SIGNKICK", _("Signed kicks"), ci, nc);
 			else
-				CheckOptStr(optbuf, CI_SIGNKICK_LEVEL, _("Signed kicks"), ci, nc);
-			CheckOptStr(optbuf, CI_TOPICLOCK, _("Topic Lock"), ci, nc);
-			CheckOptStr(optbuf, CI_PERSIST, _("Persistant"), ci, nc);
-			CheckOptStr(optbuf, CI_NO_EXPIRE, _("No expire"), ci, nc);
-			CheckOptStr(optbuf, CI_STATS, _("Chanstats"), ci, nc);
+				CheckOptStr(optbuf, "SIGNKICK_LEVEL", _("Signed kicks"), ci, nc);
+			CheckOptStr(optbuf, "TOPICLOCK", _("Topic Lock"), ci, nc);
+			CheckOptStr(optbuf, "PERSIST", _("Persistant"), ci, nc);
+			CheckOptStr(optbuf, "NO_EXPIRE", _("No expire"), ci, nc);
+			CheckOptStr(optbuf, "STATS", _("Chanstats"), ci, nc);
 
 			info["Options"] = optbuf.empty() ? _("None") : optbuf;
 
@@ -102,12 +102,12 @@ class CommandCSInfo : public Command
 			if (!ml.empty())
 				info["Mode lock"] = ml;
 
-			if (!ci->HasFlag(CI_NO_EXPIRE))
+			if (!ci->HasExt("NO_EXPIRE"))
 				info["Expires on"] = Anope::strftime(ci->last_used + Config->CSExpire);
 		}
-		if (ci->HasFlag(CI_SUSPENDED))
+		if (ci->HasExt("SUSPENDED"))
 		{
-			Anope::string *by = ci->GetExt<ExtensibleItemClass<Anope::string> *>("suspend_by"), *reason = ci->GetExt<ExtensibleItemClass<Anope::string> *>("suspend_reason");
+			Anope::string *by = ci->GetExt<Anope::string *>("suspend_by"), *reason = ci->GetExt<Anope::string *>("suspend_reason");
 			if (by != NULL)
 				info["Suspended"] = Anope::printf("[%s] %s", by->c_str(), (reason && !reason->empty() ? reason->c_str() : NO_REASON));
 		}

@@ -80,13 +80,13 @@ class CommandNSList : public Command
 			const NickAlias *na = it->second;
 
 			/* Don't show private nicks to non-services admins. */
-			if (na->nc->HasFlag(NI_PRIVATE) && !is_servadmin && na->nc != mync)
+			if (na->nc->HasExt("PRIVATE") && !is_servadmin && na->nc != mync)
 				continue;
-			else if (nsnoexpire && !na->HasFlag(NS_NO_EXPIRE))
+			else if (nsnoexpire && !na->HasExt("NO_EXPIRE"))
 				continue;
-			else if (suspended && !na->nc->HasFlag(NI_SUSPENDED))
+			else if (suspended && !na->nc->HasExt("SUSPENDED"))
 				continue;
-			else if (unconfirmed && !na->nc->HasFlag(NI_UNCONFIRMED))
+			else if (unconfirmed && !na->nc->HasExt("UNCONFIRMED"))
 				continue;
 
 			/* We no longer compare the pattern against the output buffer.
@@ -98,16 +98,16 @@ class CommandNSList : public Command
 				if (((count + 1 >= from && count + 1 <= to) || (!from && !to)) && ++nnicks <= Config->NSListMax)
 				{
 					bool isnoexpire = false;
-					if (is_servadmin && na->HasFlag(NS_NO_EXPIRE))
+					if (is_servadmin && na->HasExt("NO_EXPIRE"))
 						isnoexpire = true;
 
 					ListFormatter::ListEntry entry;
 					entry["Nick"] = (isnoexpire ? "!" : "") + na->nick;
-					if (na->nc->HasFlag(NI_HIDE_MASK) && !is_servadmin && na->nc != mync)
+					if (na->nc->HasExt("HIDE_MASK") && !is_servadmin && na->nc != mync)
 						entry["Last usermask"] = "[Hostname hidden]";
-					else if (na->nc->HasFlag(NI_SUSPENDED))
+					else if (na->nc->HasExt("SUSPENDED"))
 						entry["Last usermask"] = "[Suspended]";
-					else if (na->nc->HasFlag(NI_UNCONFIRMED))
+					else if (na->nc->HasExt("UNCONFIRMED"))
 						entry["Last usermask"] = "[Unconfirmed]";
 					else
 						entry["Last usermask"] = na->last_usermask;

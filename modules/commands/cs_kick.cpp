@@ -55,7 +55,7 @@ class CommandCSKick : public Command
 		else if (u2)
 		{
 			AccessGroup u2_access = ci->AccessFor(u2);
-			if (u != u2 && ci->HasFlag(CI_PEACE) && u2_access >= u_access)
+			if (u != u2 && ci->HasExt("PEACE") && u2_access >= u_access)
 				source.Reply(ACCESS_DENIED);
 			else if (u2->IsProtected())
 				source.Reply(ACCESS_DENIED);
@@ -66,7 +66,7 @@ class CommandCSKick : public Command
 				 // XXX
 				Log(LOG_COMMAND, source, this, ci) << "for " << u2->nick;
 
-				if (ci->HasFlag(CI_SIGNKICK) || (ci->HasFlag(CI_SIGNKICK_LEVEL) && !u_access.HasPriv("SIGNKICK")))
+				if (ci->HasExt("SIGNKICK") || (ci->HasExt("SIGNKICK_LEVEL") && !u_access.HasPriv("SIGNKICK")))
 					c->Kick(ci->WhoSends(), u2, "%s (%s)", reason.c_str(), source.GetNick().c_str());
 				else
 					c->Kick(ci->WhoSends(), u2, "%s", reason.c_str());
@@ -86,13 +86,13 @@ class CommandCSKick : public Command
 					++matched;
 
 					AccessGroup u2_access = ci->AccessFor(uc->user);
-					if (u != uc->user && ci->HasFlag(CI_PEACE) && u2_access >= u_access)
+					if (u != uc->user && ci->HasExt("PEACE") && u2_access >= u_access)
 						continue;
 					else if (uc->user->IsProtected())
 						continue;
 
 					++kicked;
-					if (ci->HasFlag(CI_SIGNKICK) || (ci->HasFlag(CI_SIGNKICK_LEVEL) && !u_access.HasPriv("SIGNKICK")))
+					if (ci->HasExt("SIGNKICK") || (ci->HasExt("SIGNKICK_LEVEL") && !u_access.HasPriv("SIGNKICK")))
 						c->Kick(ci->WhoSends(), uc->user, "%s (Matches %s) (%s)", reason.c_str(), target.c_str(), source.GetNick().c_str());
 					else
 						c->Kick(ci->WhoSends(), uc->user, "%s (Matches %s)", reason.c_str(), target.c_str());

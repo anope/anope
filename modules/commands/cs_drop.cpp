@@ -39,19 +39,19 @@ class CommandCSDrop : public Command
 			return;
 		}
 
-		if (ci->HasFlag(CI_SUSPENDED) && !source.HasCommand("chanserv/drop"))
+		if (ci->HasExt("SUSPENDED") && !source.HasCommand("chanserv/drop"))
 		{
 			source.Reply(CHAN_X_SUSPENDED, chan.c_str());
 			return;
 		}
 
-		if ((ci->HasFlag(CI_SECUREFOUNDER) ? !source.IsFounder(ci) : !source.AccessFor(ci).HasPriv("FOUNDER")) && !source.HasCommand("chanserv/drop"))
+		if ((ci->HasExt("SECUREFOUNDER") ? !source.IsFounder(ci) : !source.AccessFor(ci).HasPriv("FOUNDER")) && !source.HasCommand("chanserv/drop"))
 		{
 			source.Reply(ACCESS_DENIED);
 			return;
 		}
 
-		bool override = (ci->HasFlag(CI_SECUREFOUNDER) ? !source.IsFounder(ci) : !source.AccessFor(ci).HasPriv("FOUNDER"));
+		bool override = (ci->HasExt("SECUREFOUNDER") ? !source.IsFounder(ci) : !source.AccessFor(ci).HasPriv("FOUNDER"));
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "(founder was: " << (ci->GetFounder() ? ci->GetFounder()->display : "none") << ")";
 
 		FOREACH_MOD(I_OnChanDrop, OnChanDrop(ci));

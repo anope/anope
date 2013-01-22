@@ -90,7 +90,7 @@ void Join::SJoin(MessageSource &source, const Anope::string &chan, time_t ts, co
 	if (!c)
 	{
 		c = new Channel(chan, ts ? ts : Anope::CurTime);
-		c->SetFlag(CH_SYNCING);
+		c->Extend("SYNCING");
 	}
 	/* Some IRCds do not include a TS */
 	else if (!ts)
@@ -139,9 +139,9 @@ void Join::SJoin(MessageSource &source, const Anope::string &chan, time_t ts, co
 	}
 
 	/* Channel is done syncing */
-	if (c->HasFlag(CH_SYNCING))
+	if (c->HasExt("SYNCING"))
 	{
-		c->UnsetFlag(CH_SYNCING);
+		c->Shrink("SYNCING");
 		/* Sync the channel (mode lock, topic, etc) */
 		c->Sync();
 	}
@@ -345,7 +345,7 @@ void Quit::Run(MessageSource &source, const std::vector<Anope::string> &params)
 	Log(user, "quit") << "quit (Reason: " << (!reason.empty() ? reason : "no reason") << ")";
 
 	NickAlias *na = NickAlias::Find(user->nick);
-	if (na && !na->nc->HasFlag(NI_SUSPENDED) && (user->IsRecognized() || user->IsIdentified(true)))
+	if (na && !na->nc->HasExt("SUSPENDED") && (user->IsRecognized() || user->IsIdentified(true)))
 	{
 		na->last_seen = Anope::CurTime;
 		na->last_quit = reason;
@@ -380,7 +380,7 @@ void Stats::Run(MessageSource &source, const std::vector<Anope::string> &params)
 	switch (params[0][0])
 	{
 		case 'l':
-			if (u->HasMode(UMODE_OPER))
+			if (u->HasMode("OPER"))
 			{
 				IRCD->SendNumeric(211, source.GetSource(), "Server SendBuf SentBytes SentMsgs RecvBuf RecvBytes RecvMsgs ConnTime");
 				IRCD->SendNumeric(211, source.GetSource(), "%s %d %d %d %d %d %d %ld", Config->Uplinks[Anope::CurrentUplink]->host.c_str(), UplinkSock->WriteBufferLen(), TotalWritten, -1, UplinkSock->ReadBufferLen(), TotalRead, -1, static_cast<long>(Anope::CurTime - Anope::StartTime));
@@ -391,7 +391,7 @@ void Stats::Run(MessageSource &source, const std::vector<Anope::string> &params)
 		case 'o':
 		case 'O':
 			/* Check whether the user is an operator */
-			if (!u->HasMode(UMODE_OPER) && Config->HideStatsO)
+			if (!u->HasMode("OPER") && Config->HideStatsO)
 				IRCD->SendNumeric(219, source.GetSource(), "%c :End of /STATS report.", params[0][0]);
 			else
 			{

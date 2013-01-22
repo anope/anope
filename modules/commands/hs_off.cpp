@@ -18,9 +18,9 @@ class CommandHSOff : public Command
  public:
 	CommandHSOff(Module *creator) : Command(creator, "hostserv/off", 0, 0)
 	{
-		this->SetFlag(CFLAG_REQUIRE_USER);
 		this->SetDesc(_("Deactivates your assigned vhost"));
 		this->SetSyntax("");
+		this->RequireUser(true);
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override

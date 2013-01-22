@@ -85,12 +85,12 @@ UplinkSocket::~UplinkSocket()
 
 	if (Me)
 		for (unsigned i = Me->GetLinks().size(); i > 0; --i)
-			if (!Me->GetLinks()[i - 1]->HasFlag(SERVER_JUPED))
+			if (!Me->GetLinks()[i - 1]->IsJuped())
 				Me->GetLinks()[i - 1]->Delete(Me->GetName() + " " + Me->GetLinks()[i - 1]->GetName());
 
 	UplinkSock = NULL;
 
-	Me->SetFlag(SERVER_SYNCING);
+	Me->Unsync();
 
 	if (Anope::AtTerm())
 	{
@@ -159,7 +159,7 @@ UplinkSocket::Message::~Message()
 
 	if (this->server != NULL)
 	{
-		if (this->server != Me && !this->server->HasFlag(SERVER_JUPED))
+		if (this->server != Me && !this->server->IsJuped())
 		{
 			Log(LOG_DEBUG) << "Attempted to send \"" << this->buffer.str() << "\" from " << this->server->GetName() << " who is not from me?";
 			return;
@@ -169,7 +169,7 @@ UplinkSocket::Message::~Message()
 	}
 	else if (this->user != NULL)
 	{
-		if (this->user->server != Me && !this->user->server->HasFlag(SERVER_JUPED))
+		if (this->user->server != Me && !this->user->server->IsJuped())
 		{
 			Log(LOG_DEBUG) << "Attempted to send \"" << this->buffer.str() << "\" from " << this->user->nick << " who is not from me?";
 			return;

@@ -17,18 +17,6 @@
 
 Serialize::Checker<nickcore_map> NickCoreList("NickCore");
 
-static const Anope::string NickNameFlagStrings[] = {
-	"BEGIN", "NO_EXPIRE", "HELD", "COLLIDED", ""
-};
-template<> const Anope::string* Flags<NickNameFlag>::flags_strings = NickNameFlagStrings;
-
-static const Anope::string NickCoreFlagStrings[] = {
-	"BEGIN", "KILLPROTECT", "SECURE", "MSG", "MEMO_HARDMAX", "MEMO_SIGNON", "MEMO_RECEIVE",
-	"PRIVATE", "HIDE_EMAIL", "HIDE_MASK", "HIDE_QUIT", "KILL_QUICK", "KILL_IMMED",
-	"MEMO_MAIL", "HIDE_STATUS", "SUSPENDED", "AUTOOP", "UNCONFIRMED", "STATS", ""
-};
-template<> const Anope::string* Flags<NickCoreFlag>::flags_strings = NickCoreFlagStrings;
-
 NickCore::NickCore(const Anope::string &coredisplay) : Serializable("NickCore")
 {
 	if (coredisplay.empty())
@@ -43,9 +31,8 @@ NickCore::NickCore(const Anope::string &coredisplay) : Serializable("NickCore")
 	this->display = coredisplay;
 
 	/* Set default nick core flags */
-	for (size_t t = NI_BEGIN + 1; t != NI_END; ++t)
-		if (Config->NSDefFlags.HasFlag(static_cast<NickCoreFlag>(t)))
-			this->SetFlag(static_cast<NickCoreFlag>(t));
+	for (std::set<Anope::string>::const_iterator it = Config->NSDefFlags.begin(), it_end = Config->NSDefFlags.end(); it != it_end; ++it)
+		this->ExtendMetadata(*it);
 
 	size_t old = NickCoreList->size();
 	(*NickCoreList)[this->display] = this;
@@ -85,7 +72,7 @@ void NickCore::Serialize(Serialize::Data &data) const
 	data["email"] << this->email;
 	data["greet"] << this->greet;
 	data["language"] << this->language;
-	data["flags"] << this->ToString();
+	this->ExtensibleSerialize(data);
 	for (unsigned i = 0; i < this->access.size(); ++i)
 		data["access"] << this->access[i] << " ";
 	for (unsigned i = 0; i < this->cert.size(); ++i)
@@ -99,10 +86,9 @@ Serializable* NickCore::Unserialize(Serializable *obj, Serialize::Data &data)
 {
 	NickCore *nc;
 
-	Anope::string sdisplay, sflags;
+	Anope::string sdisplay;
 
 	data["display"] >> sdisplay;
-	data["flags"] >> sflags;
 
 	if (obj)
 		nc = anope_dynamic_static_cast<NickCore *>(obj);
@@ -113,7 +99,7 @@ Serializable* NickCore::Unserialize(Serializable *obj, Serialize::Data &data)
 	data["email"] >> nc->email;
 	data["greet"] >> nc->greet;
 	data["language"] >> nc->language;
-	nc->FromString(sflags);
+	nc->ExtensibleUnserialize(data);
 	{
 		Anope::string buf;
 		data["access"] >> buf;
@@ -139,6 +125,15 @@ Serializable* NickCore::Unserialize(Serializable *obj, Serialize::Data &data)
 		while (sep.GetToken(buf))
 			nc->memos.ignores.push_back(buf);
 	}
+
+	/* Compat */
+	Anope::string sflags;
+	data["flags"] >> sflags;
+	spacesepstream sep(sflags);
+	Anope::string tok;
+	while (sep.GetToken(tok))
+		nc->ExtendMetadata(tok);
+	/* End compat */
 
 	return nc;
 }

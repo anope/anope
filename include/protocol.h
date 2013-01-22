@@ -224,13 +224,6 @@ class CoreExport IRCDProto : public Service
 	virtual bool IsHostValid(const Anope::string &);
 };
 
-enum IRCDMessageFlag
-{
-	IRCDMESSAGE_SOFT_LIMIT,
-	IRCDMESSAGE_REQUIRE_SERVER,
-	IRCDMESSAGE_REQUIRE_USER
-};
-
 class CoreExport MessageSource
 {
 	Anope::string source;
@@ -247,14 +240,25 @@ class CoreExport MessageSource
 	Server *GetServer();
 };
 
-class CoreExport IRCDMessage : public Flags<IRCDMessageFlag>, public Service
+enum IRCDMessageFlag
+{
+	IRCDMESSAGE_SOFT_LIMIT,
+	IRCDMESSAGE_REQUIRE_SERVER,
+	IRCDMESSAGE_REQUIRE_USER
+};
+
+class CoreExport IRCDMessage : public Service
 {
 	Anope::string name;
 	unsigned param_count;
+	std::set<IRCDMessageFlag> flags;
  public:
 	IRCDMessage(Module *owner, const Anope::string &n, unsigned p = 0);
 	unsigned GetParamCount() const;
 	virtual void Run(MessageSource &, const std::vector<Anope::string> &params) = 0;
+
+	void SetFlag(IRCDMessageFlag f) { flags.insert(f); }
+	bool HasFlag(IRCDMessageFlag f) const { return flags.count(f); }
 };
 
 extern CoreExport IRCDProto *IRCD;

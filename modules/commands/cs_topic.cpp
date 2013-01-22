@@ -15,13 +15,13 @@ class CommandCSTopic : public Command
 {
 	void Lock(CommandSource &source, ChannelInfo *ci, const std::vector<Anope::string> &params)
 	{
-		ci->SetFlag(CI_TOPICLOCK);
+		ci->ExtendMetadata("TOPICLOCK");
 		source.Reply(_("Topic lock option for %s is now \002on\002."), ci->name.c_str());
 	}
 
 	void Unlock(CommandSource &source, ChannelInfo *ci, const std::vector<Anope::string> &params)
 	{
-		ci->UnsetFlag(CI_TOPICLOCK);
+		ci->Shrink("TOPICLOCK");
 		source.Reply(_("Topic lock option for %s is now \002off\002."), ci->name.c_str());
 	}
 
@@ -29,11 +29,11 @@ class CommandCSTopic : public Command
 	{
 		const Anope::string &topic = params.size() > 2 ? params[2] : "";
 
-		bool has_topiclock = ci->HasFlag(CI_TOPICLOCK);
-		ci->UnsetFlag(CI_TOPICLOCK);
+		bool has_topiclock = ci->HasExt("TOPICLOCK");
+		ci->Shrink("TOPICLOCK");
 		ci->c->ChangeTopic(source.GetNick(), topic, Anope::CurTime);
 		if (has_topiclock)
-			ci->SetFlag(CI_TOPICLOCK);
+			ci->ExtendMetadata("TOPICLOCK");
 	
 		bool override = !source.AccessFor(ci).HasPriv("TOPIC");
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << (!topic.empty() ? "to change the topic to: " : "to unset the topic") << (!topic.empty() ? topic : "");

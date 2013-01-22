@@ -64,10 +64,10 @@ class CommandNSIdentify : public Command
  public:
 	CommandNSIdentify(Module *creator) : Command(creator, "nickserv/identify", 1, 2)
 	{
-		this->SetFlag(CFLAG_ALLOW_UNREGISTERED);
-		this->SetFlag(CFLAG_REQUIRE_USER);
 		this->SetDesc(_("Identify yourself with your password"));
 		this->SetSyntax(_("[\037account\037] \037password\037"));
+		this->AllowUnregistered(true);
+		this->RequireUser(true);
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
@@ -78,7 +78,7 @@ class CommandNSIdentify : public Command
 		Anope::string pass = params[params.size() - 1];
 
 		NickAlias *na = NickAlias::Find(nick);
-		if (na && na->nc->HasFlag(NI_SUSPENDED))
+		if (na && na->nc->HasExt("SUSPENDED"))
 			source.Reply(NICK_X_SUSPENDED, na->nick.c_str());
 		else if (u->Account() && na && u->Account() == na->nc)
 			source.Reply(_("You are already identified."));

@@ -33,7 +33,7 @@ class CommandHelp : public Command
 	CommandHelp(Module *creator) : Command(creator, "generic/help", 0)
 	{
 		this->SetDesc(_("Displays this list and give information about commands"));
-		this->SetFlag(CFLAG_ALLOW_UNREGISTERED);
+		this->AllowUnregistered(true);
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
@@ -75,7 +75,7 @@ class CommandHelp : public Command
 					continue;
 				else if (!Config->HidePrivilegedCommands)
 					; // Always show with HidePrivilegedCommands disabled
-				else if (!c->HasFlag(CFLAG_ALLOW_UNREGISTERED) && !source.GetAccount())
+				else if (!c->AllowUnregistered() && !source.GetAccount())
 					continue;
 				else if (!info.permission.empty() && !source.HasCommand(info.permission))
 					continue;
@@ -166,7 +166,7 @@ class CommandHelp : public Command
 					source.Reply(" ");
 					source.Reply(_("Access to this command requires the permission \002%s\002 to be present in your opertype."), info.permission.c_str());
 				}
-				if (!c->HasFlag(CFLAG_ALLOW_UNREGISTERED) && !source.nc)
+				if (!c->AllowUnregistered() && !source.nc)
 				{
 					if (info.permission.empty())
 						source.Reply(" ");

@@ -29,16 +29,16 @@ bool WebCPanel::ChanServ::Drop::OnRequest(HTTPProvider *server, const Anope::str
 	for (registered_channel_map::const_iterator it = RegisteredChannelList->begin(), it_end = RegisteredChannelList->end(); it != it_end; ++it)
 	{
 		ChannelInfo *ci = it->second;
-		if ((ci->HasFlag(CI_SECUREFOUNDER) ? ci->AccessFor(na->nc).founder : ci->AccessFor(na->nc).HasPriv("FOUNDER")) || (na->nc->IsServicesOper() && na->nc->o->ot->HasCommand("chanserv/drop")))
+		if ((ci->HasExt("SECUREFOUNDER") ? ci->AccessFor(na->nc).founder : ci->AccessFor(na->nc).HasPriv("FOUNDER")) || (na->nc->IsServicesOper() && na->nc->o->ot->HasCommand("chanserv/drop")))
 		{
 			replacements["CHANNEL_NAMES"] = ci->name;
 			replacements["ESCAPED_CHANNEL_NAMES"] = HTTPUtils::URLEncode(ci->name);
 		}
 	}
 
-	if (message.get_data.count("channel") > 0) {
+	if (message.get_data.count("channel") > 0)
 		replacements["CHANNEL_DROP"] = message.get_data["channel"];
-	}
+
 	TemplateFileServer page("chanserv/drop.html");
 	page.Serve(server, page_name, client, message, reply, replacements);
 	return true;

@@ -78,11 +78,11 @@ class CommandCSList : public Command
 		{
 			const ChannelInfo *ci = it->second;
 
-			if (!is_servadmin && (ci->HasFlag(CI_PRIVATE) || ci->HasFlag(CI_SUSPENDED)))
+			if (!is_servadmin && (ci->HasExt("PRIVATE") || ci->HasExt("SUSPENDED")))
 				continue;
-			else if (suspended && !ci->HasFlag(CI_SUSPENDED))
+			else if (suspended && !ci->HasExt("SUSPENDED"))
 				continue;
-			else if (channoexpire && !ci->HasFlag(CI_NO_EXPIRE))
+			else if (channoexpire && !ci->HasExt("NO_EXPIRE"))
 				continue;
 
 			if (pattern.equals_ci(ci->name) || ci->name.equals_ci(spattern) || Anope::Match(ci->name, pattern, false, true) || Anope::Match(ci->name, spattern, false, true))
@@ -90,12 +90,12 @@ class CommandCSList : public Command
 				if (((count + 1 >= from && count + 1 <= to) || (!from && !to)) && ++nchans <= Config->CSListMax)
 				{
 					bool isnoexpire = false;
-					if (is_servadmin && (ci->HasFlag(CI_NO_EXPIRE)))
+					if (is_servadmin && (ci->HasExt("NO_EXPIRE")))
 						isnoexpire = true;
 
 					ListFormatter::ListEntry entry;
 					entry["Name"] = (isnoexpire ? "!" : "") + ci->name;
-					if (ci->HasFlag(CI_SUSPENDED))
+					if (ci->HasExt("SUSPENDED"))
 						entry["Description"] = "[Suspended]";
 					else
 						entry["Description"] = ci->desc;

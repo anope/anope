@@ -19,9 +19,9 @@ class CommandOSLogin : public Command
  public:
 	CommandOSLogin(Module *creator) : Command(creator, "operserv/login", 1, 1)
 	{
-		this->SetFlag(CFLAG_REQUIRE_USER);
 		this->SetDesc(Anope::printf(_("Login to %s"), Config->OperServ.c_str()));
 		this->SetSyntax(_("\037password\037"));
+		this->RequireUser(true);
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
@@ -44,7 +44,7 @@ class CommandOSLogin : public Command
 		else
 		{
 			Log(LOG_ADMIN, source, this) << "and successfully identified to " << source.service->nick;
-			u->Extend("os_login_password_correct", NULL);
+			u->Extend("os_login_password_correct");
 			source.Reply(_("Password accepted."));
 		}
 
@@ -67,9 +67,9 @@ class CommandOSLogout : public Command
  public:
 	CommandOSLogout(Module *creator) : Command(creator, "operserv/logout", 0, 0)
 	{
-		this->SetFlag(CFLAG_REQUIRE_USER);
 		this->SetDesc(Anope::printf(_("Logout from %s"), Config->OperServ.c_str()));
 		this->SetSyntax("");
+		this->RequireUser(true);
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override

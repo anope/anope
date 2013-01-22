@@ -21,23 +21,13 @@
 
 Serialize::Checker<botinfo_map> BotListByNick("BotInfo"), BotListByUID("BotInfo");
 
-static const Anope::string BotFlagString[] = { "BEGIN", "CORE", "PRIVATE", "CONF", "" };
-template<> const Anope::string* Flags<BotFlag>::flags_strings = BotFlagString;
-
-static const Anope::string BotServFlagStrings[] = {
-	"BEGIN", "DONTKICKOPS", "DONTKICKVOICES", "FANTASY", "GREET", "NOBOT",
-	"KICK_BOLDs", "KICK_COLORS", "KICK_REVERSES", "KICK_UNDERLINES", "KICK_BADWORDS", "KICK_CAPS",
-	"KICK_FLOOD", "KICK_REPEAT", "KICK_ITALICS", "KICK_AMSGS", "MSG_PRIVMSG", "MSG_NOTICE",
-	"MSG_NOTICEOPS", ""
-};
-template<> const Anope::string* Flags<BotServFlag>::flags_strings = BotServFlagStrings;
-
 BotInfo *BotServ = NULL, *ChanServ = NULL, *Global = NULL, *HostServ = NULL, *MemoServ = NULL, *NickServ = NULL, *OperServ = NULL;
 
 BotInfo::BotInfo(const Anope::string &nnick, const Anope::string &nuser, const Anope::string &nhost, const Anope::string &nreal, const Anope::string &bmodes) : User(nnick, nuser, nhost, "", "", Me, nreal, Anope::CurTime, "", Servers::TS6_UID_Retrieve()), Serializable("BotInfo"), botmodes(bmodes)
 {
 	this->lastmsg = this->created = Anope::CurTime;
 	this->introduced = false;
+	this->oper_only = this->conf = false;
 
 	(*BotListByNick)[this->nick] = this;
 	if (!this->uid.empty())
@@ -91,7 +81,7 @@ void BotInfo::Serialize(Serialize::Data &data) const
 	data["host"] << this->host;
 	data["realname"] << this->realname;
 	data["created"] << this->created;
-	data["flags"] << this->ToString();
+	data["oper_only"] << this->oper_only;
 }
 
 Serializable* BotInfo::Unserialize(Serializable *obj, Serialize::Data &data)
@@ -102,15 +92,16 @@ Serializable* BotInfo::Unserialize(Serializable *obj, Serialize::Data &data)
 	data["user"] >> user;
 	data["host"] >> host;
 	data["realname"] >> realname;
-	data["flags"] >> flags;
 
 	BotInfo *bi;
 	if (obj)
 		bi = anope_dynamic_static_cast<BotInfo *>(obj);
 	else if (!(bi = BotInfo::Find(nick)))
 		bi = new BotInfo(nick, user, host, realname);
+
 	data["created"] >> bi->created;
-	bi->FromString(flags);
+	data["oper_only"] >> bi->oper_only;
+
 	return bi;
 }
 
@@ -198,23 +189,23 @@ void BotInfo::Join(Channel *c, ChannelStatus *status)
 
 	if (Config && IRCD && Config->BSSmartJoin)
 	{
-		std::pair<Channel::ModeList::iterator, Channel::ModeList::iterator> bans = c->GetModeList(CMODE_BAN);
+		std::pair<Channel::ModeList::iterator, Channel::ModeList::iterator> bans = c->GetModeList("BAN");
 
 		/* We check for bans */
 		for (; bans.first != bans.second; ++bans.first)
 		{
-			Entry ban(CMODE_BAN, bans.first->second);
+			Entry ban("BAN", bans.first->second);
 			if (ban.Matches(this))
-				c->RemoveMode(NULL, CMODE_BAN, ban.GetMask());
+				c->RemoveMode(NULL, "BAN", ban.GetMask());
 		}
 
 		Anope::string Limit;
 		unsigned limit = 0;
-		if (c->GetParam(CMODE_LIMIT, Limit) && Limit.is_pos_number_only())
+		if (c->GetParam("LIMIT", Limit) && Limit.is_pos_number_only())
 			limit = convertTo<unsigned>(Limit);
 
 		/* Should we be invited? */
-		if (c->HasMode(CMODE_INVITE) || (limit && c->users.size() >= limit))
+		if (c->HasMode("INVITE") || (limit && c->users.size() >= limit))
 			IRCD->SendNotice(this, "@" + c->name, "%s invited %s into the channel.", this->nick.c_str(), this->nick.c_str());
 
 		ModeManager::ProcessModes();

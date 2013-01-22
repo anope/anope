@@ -19,10 +19,10 @@
 #include "account.h"
 #include "regchannel.h"
 
-static const Anope::string MemoFlagString[] = { "MF_UNREAD", "MF_RECEIPT", "" };
-template<> const Anope::string* Flags<MemoFlag>::flags_strings = MemoFlagString;
-
-Memo::Memo() : Serializable("Memo") { }
+Memo::Memo() : Serializable("Memo")
+{
+	unread = receipt = false;
+}
 
 void Memo::Serialize(Serialize::Data &data) const
 {
@@ -30,7 +30,8 @@ void Memo::Serialize(Serialize::Data &data) const
 	data.SetType("time", Serialize::Data::DT_INT); data["time"] << this->time;
 	data["sender"] << this->sender;
 	data["text"] << this->text;
-	data["flags"] << this->ToString();
+	data["unread"] << this->unread;
+	data["receipt"] << this->receipt;
 }
 
 Serializable* Memo::Unserialize(Serializable *obj, Serialize::Data &data)
@@ -39,10 +40,9 @@ Serializable* Memo::Unserialize(Serializable *obj, Serialize::Data &data)
 	if (!MemoServService)
 		return NULL;
 	
-	Anope::string owner, flags;
+	Anope::string owner;
 
 	data["owner"] >> owner;
-	data["flags"] >> flags;
 	
 	bool ischan;
 	MemoInfo *mi = MemoServService->GetMemoInfo(owner, ischan);
@@ -54,11 +54,13 @@ Serializable* Memo::Unserialize(Serializable *obj, Serialize::Data &data)
 		m = anope_dynamic_static_cast<Memo *>(obj);
 	else
 		m = new Memo();
+
 	data["owner"] >> m->owner;
 	data["time"] >> m->time;
 	data["sender"] >> m->sender;
 	data["text"] >> m->text;
-	m->FromString(flags);
+	data["unread"] >> m->unread;
+	data["receipt"] >> m->receipt;
 
 	if (obj == NULL)
 		mi->memos->push_back(m);

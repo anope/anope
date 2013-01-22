@@ -72,7 +72,7 @@ class CommandCSAKick : public Command
 		/* Check excepts BEFORE we get this far */
 		if (ci->c)
 		{
-			std::pair<Channel::ModeList::iterator, Channel::ModeList::iterator> modes = ci->c->GetModeList(CMODE_EXCEPT);
+			std::pair<Channel::ModeList::iterator, Channel::ModeList::iterator> modes = ci->c->GetModeList("EXCEPT");
 			for (; modes.first != modes.second; ++modes.first)
 			{
 				if (Anope::Match(modes.first->second, mask))
@@ -85,7 +85,7 @@ class CommandCSAKick : public Command
 
 		/* Check whether target nick has equal/higher access
 		* or whether the mask matches a user with higher/equal access - Viper */
-		if (ci->HasFlag(CI_PEACE) && nc)
+		if (ci->HasExt("PEACE") && nc)
 		{
 			AccessGroup nc_access = ci->AccessFor(nc), u_access = source.AccessFor(ci);
 			if (nc == ci->GetFounder() || nc_access >= u_access)
@@ -94,7 +94,7 @@ class CommandCSAKick : public Command
 				return;
 			}
 		}
-		else if (ci->HasFlag(CI_PEACE))
+		else if (ci->HasExt("PEACE"))
 		{
 			/* Match against all currently online users with equal or
 			 * higher access. - Viper */
@@ -103,7 +103,7 @@ class CommandCSAKick : public Command
 				User *u2 = it->second;
 
 				AccessGroup nc_access = ci->AccessFor(nc), u_access = source.AccessFor(ci);
-				Entry entry_mask(CMODE_BEGIN, mask);
+				Entry entry_mask("", mask);
 
 				if ((ci->AccessFor(u2).HasPriv("FOUNDER") || nc_access >= u_access) && entry_mask.Matches(u2))
 				{
@@ -134,9 +134,9 @@ class CommandCSAKick : public Command
 		for (unsigned j = 0, end = ci->GetAkickCount(); j < end; ++j)
 		{
 			akick = ci->GetAkick(j);
-			if (akick->HasFlag(AK_ISNICK) ? akick->nc == nc : mask.equals_ci(akick->mask))
+			if (akick->nc ? akick->nc == nc : mask.equals_ci(akick->mask))
 			{
-				source.Reply(_("\002%s\002 already exists on %s autokick list."), akick->HasFlag(AK_ISNICK) ? akick->nc->display.c_str() : akick->mask.c_str(), ci->name.c_str());
+				source.Reply(_("\002%s\002 already exists on %s autokick list."), akick->nc ? akick->nc->display.c_str() : akick->mask.c_str(), ci->name.c_str());
 				return;
 			}
 		}
@@ -223,7 +223,7 @@ class CommandCSAKick : public Command
 			{
 				const AutoKick *akick = ci->GetAkick(i);
 
-				if ((akick->HasFlag(AK_ISNICK) && akick->nc == nc) || (!akick->HasFlag(AK_ISNICK) && mask.equals_ci(akick->mask)))
+				if (akick->nc ? akick->nc == nc : mask.equals_ci(akick->mask))
 					break;
 			}
 
@@ -298,9 +298,9 @@ class CommandCSAKick : public Command
 
 				if (!mask.empty())
 				{
-					if (!akick->HasFlag(AK_ISNICK) && !Anope::Match(akick->mask, mask))
+					if (!akick->nc && !Anope::Match(akick->mask, mask))
 						continue;
-					if (akick->HasFlag(AK_ISNICK) && !Anope::Match(akick->nc->display, mask))
+					if (akick->nc && !Anope::Match(akick->nc->display, mask))
 						continue;
 				}
 
@@ -508,7 +508,7 @@ class CSAKick : public Module
 
 	EventReturn OnCheckKick(User *u, ChannelInfo *ci, Anope::string &mask, Anope::string &reason) anope_override
 	{
-		if (ci->c->MatchesList(u, CMODE_EXCEPT))
+		if (ci->c->MatchesList(u, "EXCEPT"))
 			return EVENT_CONTINUE;
 
 		for (unsigned j = 0, end = ci->GetAkickCount(); j < end; ++j)
@@ -516,23 +516,23 @@ class CSAKick : public Module
 			AutoKick *autokick = ci->GetAkick(j);
 			bool kick = false;
 
-			if (autokick->HasFlag(AK_ISNICK))
+			if (autokick->nc)
 			{
 				if (autokick->nc == u->Account())
 					kick = true;
 			}
 			else
 			{
-				Entry akick_mask(CMODE_BEGIN, autokick->mask);
+				Entry akick_mask("", autokick->mask);
 				if (akick_mask.Matches(u))
 					kick = true;
 			}
 
 			if (kick)
 			{
-				Log(LOG_DEBUG_2) << u->nick << " matched akick " << (autokick->HasFlag(AK_ISNICK) ? autokick->nc->display : autokick->mask);
+				Log(LOG_DEBUG_2) << u->nick << " matched akick " << (autokick->nc ? autokick->nc->display : autokick->mask);
 				autokick->last_used = Anope::CurTime;
-				if (!autokick->HasFlag(AK_ISNICK))
+				if (!autokick->nc)
 					mask = autokick->mask;
 				reason = autokick->reason.empty() ? Config->CSAutokickReason : autokick->reason;
 				return EVENT_STOP;

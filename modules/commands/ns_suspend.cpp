@@ -13,47 +13,6 @@
 
 #include "module.h"
 
-struct NickSuspend : ExtensibleItem, Serializable
-{
-	Anope::string nick;
-	time_t when;
-
-	NickSuspend() : Serializable("NickSuspend")
-	{
-	}
-
-	void Serialize(Serialize::Data &sd) const anope_override
-	{
-		sd["nick"] << this->nick;
-		sd["when"] << this->when;
-	}
-
-	static Serializable* Unserialize(Serializable *obj, Serialize::Data &sd)
-	{
-		Anope::string snick;
-
-		sd["nick"] >> snick;
-
-		const NickAlias *na = NickAlias::Find(snick);
-		if (na == NULL)
-			return NULL;
-
-		NickSuspend *ns;
-		if (obj)
-			ns = anope_dynamic_static_cast<NickSuspend *>(obj);
-		else
-			ns = new NickSuspend();
-		
-		sd["nick"] >> ns->nick;
-		sd["when"] >> ns->when;
-
-		if (!obj)
-			na->nc->Extend("ns_suspend_expire", ns);
-
-		return ns;
-	}
-};
-
 class CommandNSSuspend : public Command
 {
  public:
@@ -101,11 +60,18 @@ class CommandNSSuspend : public Command
 
 		NickCore *nc = na->nc;
 
-		nc->SetFlag(NI_SUSPENDED);
-		nc->SetFlag(NI_SECURE);
-		nc->UnsetFlag(NI_KILLPROTECT);
-		nc->UnsetFlag(NI_KILL_QUICK);
-		nc->UnsetFlag(NI_KILL_IMMED);
+		nc->ExtendMetadata("SUSPENDED");
+		nc->ExtendMetadata("SECURE");
+		nc->Shrink("KILLPROTECT");
+		nc->Shrink("KILL_QUICK");
+		nc->Shrink("KILL_IMMED");
+
+		nc->ExtendMetadata("suspend:by", source.GetNick());
+		if (!reason.empty())
+			nc->ExtendMetadata("suspend:reason", reason);
+		if (expiry_secs > 0)
+			nc->ExtendMetadata("suspend:expire", stringify(Anope::CurTime + expiry_secs));
+
 
 		for (std::list<Serialize::Reference<NickAlias> >::iterator it = nc->aliases.begin(), it_end = nc->aliases.end(); it != it_end;)
 		{
@@ -122,15 +88,6 @@ class CommandNSSuspend : public Command
 					u2->Collide(na2);
 				}
 			}
-		}
-
-		if (expiry_secs > 0)
-		{
-			NickSuspend *ns = new NickSuspend();
-			ns->nick = na->nick;
-			ns->when = Anope::CurTime + expiry_secs;
-
-			nc->Extend("ns_suspend_expire", ns);
 		}
 
 		Log(LOG_ADMIN, source, this) << "for " << nick << " (" << (!reason.empty() ? reason : "No reason") << "), expires in " << (expiry_secs ? Anope::strftime(Anope::CurTime + expiry_secs) : "never");
@@ -179,14 +136,16 @@ class CommandNSUnSuspend : public Command
 			return;
 		}
 
-		if (!na->nc->HasFlag(NI_SUSPENDED))
+		if (!na->nc->HasExt("SUSPENDED"))
 		{
 			source.Reply(_("Nick %s is not suspended."), na->nick.c_str());
 			return;
 		}
 
-		na->nc->UnsetFlag(NI_SUSPENDED);
-		na->nc->Shrink("ns_suspend_expire");
+		na->nc->Shrink("SUSPENDED");
+		na->nc->Shrink("suspend:expire");
+		na->nc->Shrink("suspend:by");
+		na->nc->Shrink("suspend:reason");
 
 		Log(LOG_ADMIN, source, this) << "for " << na->nick;
 		source.Reply(_("Nick %s is now released."), nick.c_str());
@@ -207,13 +166,12 @@ class CommandNSUnSuspend : public Command
 
 class NSSuspend : public Module
 {
-	Serialize::Type nicksuspend_type;
 	CommandNSSuspend commandnssuspend;
 	CommandNSUnSuspend commandnsunsuspend;
 
  public:
 	NSSuspend(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
-		nicksuspend_type("NickSuspend", NickSuspend::Unserialize), commandnssuspend(this), commandnsunsuspend(this)
+		commandnssuspend(this), commandnsunsuspend(this)
 	{
 		this->SetAuthor("Anope");
 
@@ -221,28 +179,32 @@ class NSSuspend : public Module
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 	}
 
-	~NSSuspend()
-	{
-		for (nickcore_map::const_iterator it = NickCoreList->begin(), it_end = NickCoreList->end(); it != it_end; ++it)
-			it->second->Shrink("ns_suspend_expire");
-	}
-
 	void OnPreNickExpire(NickAlias *na, bool &expire) anope_override
 	{
-		if (!na->nc->HasFlag(NI_SUSPENDED))
+		if (!na->nc->HasExt("SUSPENDED"))
 			return;
 
 		expire = false;
 
-		NickSuspend *ns = na->nc->GetExt<NickSuspend *>("ns_suspend_expire");
-		if (ns != NULL && ns->when < Anope::CurTime)
-		{
-			na->last_seen = Anope::CurTime;
-			na->nc->UnsetFlag(NI_SUSPENDED);
-			na->nc->Shrink("ns_suspend_expire");
+		Anope::string *str = na->nc->GetExt<ExtensibleItemClass<Anope::string> *>("suspend:expire");
+		if (str == NULL)
+			return;
 
-			Log(LOG_NORMAL, "expire", NickServ) << "Expiring suspend for " << na->nick;
+		try
+		{
+			time_t when = convertTo<time_t>(*str);
+			if (when < Anope::CurTime)
+			{
+				na->last_seen = Anope::CurTime;
+				na->nc->Shrink("SUSPENDED");
+				na->nc->Shrink("suspend:expire");
+				na->nc->Shrink("suspend:by");
+				na->nc->Shrink("suspend:reason");
+
+				Log(LOG_NORMAL, "expire", NickServ) << "Expiring suspend for " << na->nick;
+			}
 		}
+		catch (const ConvertException &) { }
 	}
 };
 

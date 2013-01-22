@@ -48,13 +48,13 @@ class CommandBSAssign : public Command
 		}
 
 		AccessGroup access = source.AccessFor(ci);
- 		if (ci->botflags.HasFlag(BS_NOBOT) || (!access.HasPriv("ASSIGN") && !source.HasPriv("botserv/administration")))
+ 		if (ci->HasExt("BS_NOBOT") || (!access.HasPriv("ASSIGN") && !source.HasPriv("botserv/administration")))
 		{
 			source.Reply(ACCESS_DENIED);
 			return;
 		}
 
-		if (bi->HasFlag(BI_PRIVATE) && !source.HasCommand("botserv/assign/private"))
+		if (bi->oper_only && !source.HasCommand("botserv/assign/private"))
 		{
 			source.Reply(ACCESS_DENIED);
 			return;
@@ -121,7 +121,7 @@ class CommandBSUnassign : public Command
 			return;
 		}
 
-		if (ci->HasFlag(CI_PERSIST) && !ModeManager::FindChannelModeByName(CMODE_PERM))
+		if (ci->HasExt("PERSIST") && !ModeManager::FindChannelModeByName("PERM"))
 		{
 			source.Reply(_("You can not unassign bots while persist is set on the channel."));
 			return;

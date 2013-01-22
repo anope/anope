@@ -107,8 +107,8 @@ struct IRCDMessageEncap : IRCDMessage
 			u->Login(nc);
 
 			const NickAlias *user_na = NickAlias::Find(u->nick);
-			if (!Config->NoNicknameOwnership && user_na && user_na->nc == nc && user_na->nc->HasFlag(NI_UNCONFIRMED) == false)
-				u->SetMode(NickServ, UMODE_REGISTERED);
+			if (!Config->NoNicknameOwnership && user_na && user_na->nc == nc && user_na->nc->HasExt("UNCONFIRMED") == false)
+				u->SetMode(NickServ, "REGISTERED");
 		}
 	}
 };
@@ -214,17 +214,17 @@ class ProtoRatbox : public Module
 	void AddModes()
 	{
 		/* user modes */
-		ModeManager::RemoveUserMode(ModeManager::FindUserModeByName(UMODE_HIDEOPER));
-		ModeManager::RemoveUserMode(ModeManager::FindUserModeByName(UMODE_REGPRIV));
+		ModeManager::RemoveUserMode(ModeManager::FindUserModeByName("HIDEOPER"));
+		ModeManager::RemoveUserMode(ModeManager::FindUserModeByName("REGPRIV"));
 
 		/* v/h/o/a/q */
-		ModeManager::RemoveChannelMode(ModeManager::FindChannelModeByName(CMODE_HALFOP));
+		ModeManager::RemoveChannelMode(ModeManager::FindChannelModeByName("HALFOP"));
 
 		/* channel modes */
-		ModeManager::RemoveChannelMode(ModeManager::FindChannelModeByName(CMODE_REGISTERED));
-		ModeManager::RemoveChannelMode(ModeManager::FindChannelModeByName(CMODE_OPERONLY));
-		ModeManager::RemoveChannelMode(ModeManager::FindChannelModeByName(CMODE_REGISTEREDONLY));
-		ModeManager::RemoveChannelMode(ModeManager::FindChannelModeByName(CMODE_SSL));
+		ModeManager::RemoveChannelMode(ModeManager::FindChannelModeByName("REGISTERED"));
+		ModeManager::RemoveChannelMode(ModeManager::FindChannelModeByName("OPERONLY"));
+		ModeManager::RemoveChannelMode(ModeManager::FindChannelModeByName("REGISTEREDONLY"));
+		ModeManager::RemoveChannelMode(ModeManager::FindChannelModeByName("SSL"));
 	}
 
  public:

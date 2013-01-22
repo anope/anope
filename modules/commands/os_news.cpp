@@ -399,9 +399,9 @@ class OSNews : public Module
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 	}
 
-	void OnUserModeSet(User *u, UserModeName Name) anope_override
+	void OnUserModeSet(User *u, const Anope::string &mname) anope_override
 	{
-		if (Name == UMODE_OPER)
+		if (mname == "OPER")
 			DisplayNews(u, NEWS_OPER);
 	}
 

@@ -262,7 +262,7 @@ class OSForbid : public Module
 
 	void OnUserNickChange(User *u, const Anope::string &) anope_override
 	{
-		if (u->HasMode(UMODE_OPER))
+		if (u->HasMode("OPER"))
 			return;
 
 		ForbidData *d = this->forbidService.FindForbid(u->nick, FT_NICK);
@@ -281,7 +281,7 @@ class OSForbid : public Module
 
 	void OnJoinChannel(User *u, Channel *c) anope_override
 	{
-		if (u->HasMode(UMODE_OPER) || !OperServ)
+		if (u->HasMode("OPER") || !OperServ)
 			return;
 
 		ForbidData *d = this->forbidService.FindForbid(c->name, FT_CHAN);
@@ -292,16 +292,16 @@ class OSForbid : public Module
 				XLine x(c->name, OperServ->nick, Anope::CurTime + Config->CSInhabit, d->reason);
 				IRCD->SendSQLine(NULL, &x);
 			}
-			else if (!c->HasFlag(CH_INHABIT))
+			else if (!c->HasExt("INHABIT"))
 			{
 				/* Join ChanServ and set a timer for this channel to part ChanServ later */
 				c->Hold();
 
 				/* Set +si to prevent rejoin */
-				c->SetMode(NULL, CMODE_NOEXTERNAL);
-				c->SetMode(NULL, CMODE_TOPIC);
-				c->SetMode(NULL, CMODE_SECRET);
-				c->SetMode(NULL, CMODE_INVITE);
+				c->SetMode(NULL, "NOEXTERNAL");
+				c->SetMode(NULL, "TOPIC");
+				c->SetMode(NULL, "SECRET");
+				c->SetMode(NULL, "INVITE");
 			}
 
 			if (d->reason.empty())

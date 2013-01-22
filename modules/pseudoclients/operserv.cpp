@@ -209,7 +209,7 @@ class OperServCore : public Module
 
 	EventReturn OnBotPrivmsg(User *u, BotInfo *bi, Anope::string &message) anope_override
 	{
-		if (Config->OSOpersOnly && !u->HasMode(UMODE_OPER) && bi->nick == Config->OperServ)
+		if (Config->OSOpersOnly && !u->HasMode("OPER") && bi->nick == Config->OperServ)
 		{
 			u->SendMessage(bi, ACCESS_DENIED);
 			Log(OperServ, "bados") << "Denied access to " << Config->OperServ << " from " << u->GetMask() << " (non-oper)";
@@ -221,19 +221,19 @@ class OperServCore : public Module
 
 	void OnServerQuit(Server *server) anope_override
 	{
-		if (server->HasFlag(SERVER_JUPED))
+		if (server->IsJuped())
 			Log(server, "squit", OperServ) << "Received SQUIT for juped server " << server->GetName();
 	}
 
-	void OnUserModeSet(User *u, UserModeName Name) anope_override
+	void OnUserModeSet(User *u, const Anope::string &mname) anope_override
 	{
-		if (Name == UMODE_OPER)
+		if (mname == "OPER")
 			Log(u, "oper", OperServ) << "is now an IRC operator.";
 	}
 
-	void OnUserModeUnset(User *u, UserModeName Name) anope_override
+	void OnUserModeUnset(User *u, const Anope::string &mname) anope_override
 	{
-		if (Name == UMODE_OPER)
+		if (mname == "OPER")
 			Log(u, "oper", OperServ) << "is no longer an IRC operator";
 	}
 
@@ -245,7 +245,7 @@ class OperServCore : public Module
 
 	void OnUserNickChange(User *u, const Anope::string &oldnick) anope_override
 	{
-		if (IRCD->CanSQLine && !u->HasMode(UMODE_OPER))
+		if (IRCD->CanSQLine && !u->HasMode("OPER"))
 			this->sqlines.CheckAllXLines(u);
 	}
 

@@ -23,16 +23,6 @@
 
 Serialize::Checker<registered_channel_map> RegisteredChannelList("ChannelInfo");
 
-static const Anope::string ChannelInfoFlagStrings[] = {
-	"BEGIN", "KEEPTOPIC", "SECUREOPS", "PRIVATE", "TOPICLOCK", "RESTRICTED",
-	"PEACE", "SECURE", "NO_EXPIRE", "MEMO_HARDMAX", "SECUREFOUNDER",
-	"SIGNKICK", "SIGNKICK_LEVEL", "SUSPENDED", "PERSIST", "STATS", "NOAUTOOP", ""
-};
-template<> const Anope::string* Flags<ChannelInfoFlag>::flags_strings = ChannelInfoFlagStrings;
-
-static const Anope::string AutoKickFlagString[] = { "AK_ISNICK", "" };
-template<> const Anope::string* Flags<AutoKickFlag>::flags_strings = AutoKickFlagString;
-
 BadWord::BadWord() : Serializable("BadWord")
 {
 }
@@ -90,7 +80,7 @@ AutoKick::~AutoKick()
 void AutoKick::Serialize(Serialize::Data &data) const
 {
 	data["ci"] << this->ci->name;
-	if (this->HasFlag(AK_ISNICK) && this->nc)
+	if (this->nc)
 		data["nc"] << this->nc->display;
 	else
 		data["mask"] << this->mask;
@@ -98,7 +88,6 @@ void AutoKick::Serialize(Serialize::Data &data) const
 	data["creator"] << this->creator;
 	data.SetType("addtime", Serialize::Data::DT_INT); data["addtime"] << this->addtime;
 	data.SetType("last_used", Serialize::Data::DT_INT); data["last_used"] << this->last_used;
-	data["flags"] << this->ToString();
 }
 
 Serializable* AutoKick::Unserialize(Serializable *obj, Serialize::Data &data)
@@ -142,14 +131,10 @@ Serializable* AutoKick::Unserialize(Serializable *obj, Serialize::Data &data)
 			ak = ci->AddAkick(screator, smask, sreason, addtime, lastused);
 	}
 
-	Anope::string sflags;
-	data["flags"] >> sflags;
-	ak->FromString(sflags);
-
 	return ak;
 }
 
-ModeLock::ModeLock(ChannelInfo *ch, bool s, ChannelModeName n, const Anope::string &p, const Anope::string &se, time_t c) : Serializable("ModeLock"), ci(ch), set(s), name(n), param(p), setter(se), created(c)
+ModeLock::ModeLock(ChannelInfo *ch, bool s, const Anope::string &n, const Anope::string &p, const Anope::string &se, time_t c) : Serializable("ModeLock"), ci(ch), set(s), name(n), param(p), setter(se), created(c)
 {
 }
 
@@ -164,13 +149,9 @@ void ModeLock::Serialize(Serialize::Data &data) const
 	if (!this->ci)
 		return;
 
-	const Anope::string* ChannelModeNameStrings = Flags<ChannelModeName>::GetFlagStrings();
 	data["ci"] << this->ci->name;
 	data["set"] << this->set;
-	if (this->name < CMODE_END)
-		data["name"] << ChannelModeNameStrings[this->name];
-	else
-		data["name"] << this->name - CMODE_END;
+	data["name"] << this->name;
 	data["param"] << this->param;
 	data["setter"] << this->setter;
 	data.SetType("created", Serialize::Data::DT_INT); data["created"] << this->created;
@@ -178,36 +159,12 @@ void ModeLock::Serialize(Serialize::Data &data) const
 
 Serializable* ModeLock::Unserialize(Serializable *obj, Serialize::Data &data)
 {
-	Anope::string sci, sname;
+	Anope::string sci;
 	
 	data["ci"] >> sci;
-	data["name"] >> sname;
 
 	ChannelInfo *ci = ChannelInfo::Find(sci);
 	if (!ci)
-		return NULL;
-
-	ChannelModeName name = CMODE_END;
-
-	if (sname.is_pos_number_only())
-	{
-		try
-		{
-			name = static_cast<ChannelModeName>(CMODE_END + convertTo<unsigned>(sname));
-		}
-		catch (const ConvertException &) { }
-	}
-	else
-	{
-		const Anope::string* ChannelModeNameStrings = Flags<ChannelModeName>::GetFlagStrings();
-		for (unsigned i = 0; !ChannelModeNameStrings[i].empty(); ++i)
-			if (ChannelModeNameStrings[i] == sname)
-			{
-				name = static_cast<ChannelModeName>(i);
-				break;
-			}
-	}
-	if (name == CMODE_END)
 		return NULL;
 	
 	ModeLock *ml;
@@ -216,7 +173,7 @@ Serializable* ModeLock::Unserialize(Serializable *obj, Serialize::Data &data)
 		ml = anope_dynamic_static_cast<ModeLock *>(obj);
 
 		data["set"] >> ml->set;
-		ml->name = name;
+		data["name"] >> ml->name;
 		data["param"] >> ml->param;
 		data["setter"] >> ml->setter;
 		data["created"] >> ml->created;
@@ -233,7 +190,10 @@ Serializable* ModeLock::Unserialize(Serializable *obj, Serialize::Data &data)
 		Anope::string setter;
 		data["setter"] >> setter;
 
-		ml = new ModeLock(ci, set, name, "", setter, created);
+		Anope::string sname;
+		data["name"] >> sname;
+
+		ml = new ModeLock(ci, set, sname, "", setter, created);
 		data["param"] >> ml->param;
 
 		ci->mode_locks->insert(std::make_pair(ml->name, ml));
@@ -309,16 +269,13 @@ ChannelInfo::ChannelInfo(const Anope::string &chname) : Serializable("ChannelInf
 
 	this->name = chname;
 
-	size_t t;
 	/* Set default channel flags */
-	for (t = CI_BEGIN + 1; t != CI_END; ++t)
-		if (Config->CSDefFlags.HasFlag(static_cast<ChannelInfoFlag>(t)))
-			this->SetFlag(static_cast<ChannelInfoFlag>(t));
+	for (std::set<Anope::string>::const_iterator it = Config->CSDefFlags.begin(), it_end = Config->CSDefFlags.end(); it != it_end; ++it)
+		this->ExtendMetadata(*it);
 
 	/* Set default bot flags */
-	for (t = BS_BEGIN + 1; t != BS_END; ++t)
-		if (Config->BSDefFlags.HasFlag(static_cast<BotServFlag>(t)))
-			this->botflags.SetFlag(static_cast<BotServFlag>(t));
+	for (std::set<Anope::string>::const_iterator it = Config->BSDefFlags.begin(), it_end = Config->BSDefFlags.end(); it != it_end; ++it)
+		this->ExtendMetadata(*it);
 
 	this->bantype = Config->CSDefBantype;
 	this->memos.memomax = Config->MSMaxMemos;
@@ -370,7 +327,7 @@ ChannelInfo::ChannelInfo(const ChannelInfo &ci) : Serializable("ChannelInfo"),
 	for (unsigned i = 0; i < ci.GetAkickCount(); ++i)
 	{
 		const AutoKick *takick = ci.GetAkick(i);
-		if (takick->HasFlag(AK_ISNICK))
+		if (takick->nc)
 			this->AddAkick(takick->creator, takick->nc, takick->reason, takick->addtime, takick->last_used);
 		else
 			this->AddAkick(takick->creator, takick->mask, takick->reason, takick->addtime, takick->last_used);
@@ -440,8 +397,7 @@ void ChannelInfo::Serialize(Serialize::Data &data) const
 	data["last_topic_setter"] << this->last_topic_setter;
 	data.SetType("last_topic_time", Serialize::Data::DT_INT); data["last_topic_time"] << this->last_topic_time;
 	data.SetType("bantype", Serialize::Data::DT_INT); data["bantype"] << this->bantype;
-	data["flags"] << this->ToString();
-	data["botflags"] << this->botflags.ToString();
+	this->ExtensibleSerialize(data);
 	{
 		Anope::string levels_buffer;
 		for (std::map<Anope::string, int16_t>::const_iterator it = this->levels.begin(), it_end = this->levels.end(); it != it_end; ++it)
@@ -464,13 +420,11 @@ void ChannelInfo::Serialize(Serialize::Data &data) const
 
 Serializable* ChannelInfo::Unserialize(Serializable *obj, Serialize::Data &data)
 {
-	Anope::string sname, sfounder, ssuccessor, sflags, sbotflags, slevels, sbi;
+	Anope::string sname, sfounder, ssuccessor, slevels, sbi;
 
 	data["name"] >> sname;
 	data["founder"] >> sfounder;
 	data["successor"] >> ssuccessor;
-	data["flags"] >> sflags;
-	data["botflags"] >> sbotflags;
 	data["levels"] >> slevels;
 	data["bi"] >> sbi;
 
@@ -479,6 +433,8 @@ Serializable* ChannelInfo::Unserialize(Serializable *obj, Serialize::Data &data)
 		ci = anope_dynamic_static_cast<ChannelInfo *>(obj);
 	else
 		ci = new ChannelInfo(sname);
+
+	ci->ExtensibleUnserialize(data);
 
 	if (ci->founder)
 		--ci->founder->channelcount;
@@ -497,8 +453,6 @@ Serializable* ChannelInfo::Unserialize(Serializable *obj, Serialize::Data &data)
 	data["last_topic_setter"] >> ci->last_topic_setter;
 	data["last_topic_time"] >> ci->last_topic_time;
 	data["bantype"] >> ci->bantype;
-	ci->FromString(sflags);
-	ci->botflags.FromString(sbotflags);
 	{
 		std::vector<Anope::string> v;
 		spacesepstream(slevels).GetTokens(v);
@@ -528,6 +482,19 @@ Serializable* ChannelInfo::Unserialize(Serializable *obj, Serialize::Data &data)
 		while (sep.GetToken(buf))
 			ci->memos.ignores.push_back(buf);
 	}
+
+	/* Compat */
+	Anope::string sflags, sbotflags;
+	data["flags"] >> sflags;
+	data["botflags"] >> sbotflags;
+	spacesepstream sep(sflags);
+	Anope::string tok;
+	while (sep.GetToken(tok))
+		ci->ExtendMetadata(tok);
+	spacesepstream sep2(sbotflags);
+	while (sep2.GetToken(tok))
+		ci->ExtendMetadata(tok);
+	/* End compat */
 
 	return ci;
 }
@@ -663,7 +630,6 @@ AutoKick *ChannelInfo::AddAkick(const Anope::string &user, NickCore *akicknc, co
 {
 	AutoKick *autokick = new AutoKick();
 	autokick->ci = this;
-	autokick->SetFlag(AK_ISNICK);
 	autokick->nc = akicknc;
 	autokick->reason = reason;
 	autokick->creator = user;
@@ -781,13 +747,13 @@ void ChannelInfo::ClearBadWords()
 
 bool ChannelInfo::HasMLock(ChannelMode *mode, const Anope::string &param, bool status) const
 {
-	std::multimap<ChannelModeName, ModeLock *>::const_iterator it = this->mode_locks->find(mode->name);
+	std::multimap<Anope::string, ModeLock *>::const_iterator it = this->mode_locks->find(mode->name);
 
 	if (it != this->mode_locks->end())
 	{
 		if (mode->type != MODE_REGULAR)
 		{
-			std::multimap<ChannelModeName, ModeLock *>::const_iterator it_end = this->mode_locks->upper_bound(mode->name);
+			std::multimap<Anope::string, ModeLock *>::const_iterator it_end = this->mode_locks->upper_bound(mode->name);
 
 			for (; it != it_end; ++it)
 			{
@@ -806,7 +772,7 @@ bool ChannelInfo::SetMLock(ChannelMode *mode, bool status, const Anope::string &
 {
 	if (setter.empty())
 		setter = this->founder ? this->founder->display : "Unknown";
-	std::pair<ChannelModeName, ModeLock *> ml = std::make_pair(mode->name, new ModeLock(this, status, mode->name, param, setter, created));
+	std::pair<Anope::string, ModeLock *> ml = std::make_pair(mode->name, new ModeLock(this, status, mode->name, param, setter, created));
 
 	EventReturn MOD_RESULT;
 	FOREACH_RESULT(I_OnMLock, OnMLock(this, ml.second));
@@ -918,15 +884,15 @@ const ChannelInfo::ModeList &ChannelInfo::GetMLock() const
 	return this->mode_locks;
 }
 
-std::pair<ChannelInfo::ModeList::iterator, ChannelInfo::ModeList::iterator> ChannelInfo::GetModeList(ChannelModeName Name)
+std::pair<ChannelInfo::ModeList::iterator, ChannelInfo::ModeList::iterator> ChannelInfo::GetModeList(const Anope::string &mname)
 {
-	ChannelInfo::ModeList::iterator it = this->mode_locks->find(Name), it_end = it;
+	ChannelInfo::ModeList::iterator it = this->mode_locks->find(mname), it_end = it;
 	if (it != this->mode_locks->end())
-		it_end = this->mode_locks->upper_bound(Name);
+		it_end = this->mode_locks->upper_bound(mname);
 	return std::make_pair(it, it_end);
 }
 
-const ModeLock *ChannelInfo::GetMLock(ChannelModeName mname, const Anope::string &param)
+const ModeLock *ChannelInfo::GetMLock(const Anope::string &mname, const Anope::string &param)
 {
 	ChannelInfo::ModeList::iterator it = this->mode_locks->find(mname);
 	if (it != this->mode_locks->end())
@@ -1010,19 +976,19 @@ bool ChannelInfo::CheckKick(User *user)
 	 * ChanServ always enforces channels like this to keep people from deleting bots etc
 	 * that are holding channels.
 	 */
-	if (this->c->users.size() == (this->bi && this->c->FindUser(this->bi) ? 2 : 1) && !this->c->HasFlag(CH_INHABIT) && !this->c->HasFlag(CH_SYNCING))
+	if (this->c->users.size() == (this->bi && this->c->FindUser(this->bi) ? 2 : 1) && !this->c->HasExt("INHABIT") && !this->c->HasExt("SYNCING"))
 	{
 		/* Set +ntsi to prevent rejoin */
-		c->SetMode(NULL, CMODE_NOEXTERNAL);
-		c->SetMode(NULL, CMODE_TOPIC);
-		c->SetMode(NULL, CMODE_SECRET);
-		c->SetMode(NULL, CMODE_INVITE);
+		c->SetMode(NULL, "NOEXTERNAL");
+		c->SetMode(NULL, "TOPIC");
+		c->SetMode(NULL, "SECRET");
+		c->SetMode(NULL, "INVITE");
 
 		/* Join ChanServ and set a timer for this channel to part ChanServ later */
 		this->c->Hold();
 	}
 
-	this->c->SetMode(NULL, CMODE_BAN, mask);
+	this->c->SetMode(NULL, "BAN", mask);
 	this->c->Kick(NULL, user, "%s", reason.c_str());
 
 	return true;
@@ -1038,7 +1004,7 @@ void ChannelInfo::CheckTopic()
 	 * This desyncs what is really set with what we have stored, and we end up resetting the topic often when
 	 * it is not required
 	 */
-	if (this->HasFlag(CI_TOPICLOCK) && this->last_topic != this->c->topic)
+	if (this->HasExt("TOPICLOCK") && this->last_topic != this->c->topic)
 	{
 		this->c->ChangeTopic(this->last_topic_setter, this->last_topic, this->last_topic_time);
 	}
@@ -1055,7 +1021,7 @@ void ChannelInfo::RestoreTopic()
 	if (!this->c)
 		return;
 
-	if ((this->HasFlag(CI_KEEPTOPIC) || this->HasFlag(CI_TOPICLOCK)) && this->last_topic != this->c->topic)
+	if ((this->HasExt("KEEPTOPIC") || this->HasExt("TOPICLOCK")) && this->last_topic != this->c->topic)
 	{
 		this->c->ChangeTopic(!this->last_topic_setter.empty() ? this->last_topic_setter : this->WhoSends()->nick, this->last_topic, this->last_topic_time ? this->last_topic_time : Anope::CurTime);
 	}

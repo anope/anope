@@ -22,89 +22,6 @@ typedef Anope::hash_map<ChannelInfo *> registered_channel_map;
 
 extern CoreExport Serialize::Checker<registered_channel_map> RegisteredChannelList;
 
-/** Flags used for the ChannelInfo class
- */
-enum ChannelInfoFlag
-{
-	CI_BEGIN,
-
-	/* Retain the topic even after the channel is emptied */
-	CI_KEEPTOPIC,
-	/* Don't allow non-authorized users to be opped */
-	CI_SECUREOPS,
-	/* Hide channel from ChanServ LIST command */
-	CI_PRIVATE,
-	/* Topic can only be changed by SET TOPIC */
-	CI_TOPICLOCK,
-	/* Only users on the access list may join */
-	CI_RESTRICTED,
-	/* Don't allow ChanServ and BotServ commands to do bad things to users with higher access levels */
-	CI_PEACE,
-	/* Don't allow any privileges unless a user is IDENTIFIED with NickServ */
-	CI_SECURE,
-	/* Channel does not expire */
-	CI_NO_EXPIRE,
-	/* Channel memo limit may not be changed */
-	CI_MEMO_HARDMAX,
-	/* Stricter control of channel founder status */
-	CI_SECUREFOUNDER,
-	/* Sign kicks with the user who did the kick */
-	CI_SIGNKICK,
-	/* Sign kicks if level is < than the one defined by the SIGNKIGK level */
-	CI_SIGNKICK_LEVEL,
-	/* Channel is suspended */
-	CI_SUSPENDED,
-	/* Channel still exists when emptied, this can be caused by setting a perm
-	 * channel mode (+P on InspIRCd) or /cs set #chan persist on.
-	 * This keeps the service bot in the channel regardless if a +P type mode
-	 * is set or not
-	 */
-	CI_PERSIST,
-	/* Chanstats are enabled */
-	CI_STATS,
-	/* If set users are not auto given any status on join */
-	CI_NOAUTOOP,
-
-	CI_END
-};
-
-/* BotServ SET flags (ChannelInfo::botflags) */
-enum BotServFlag
-{
-	BS_BEGIN,
-	/* BotServ won't kick ops */
-	BS_DONTKICKOPS,
-	/* BotServ won't kick voices */
-	BS_DONTKICKVOICES,
-	/* BotServ bot accepts fantasy commands */
-	BS_FANTASY,
-	/* BotServ should show greets */
-	BS_GREET,
-	/* BotServ bots are not allowed to be in this channel */
-	BS_NOBOT,
-	/* BotServ kicks for bolds */
-	BS_KICK_BOLDS,
-	/* BotServ kicks for colors */
-	BS_KICK_COLORS,
-	/* BOtServ kicks for reverses */
-	BS_KICK_REVERSES,
-	/* BotServ kicks for underlines */
-	BS_KICK_UNDERLINES,
-	/* BotServ kicks for badwords */
-	BS_KICK_BADWORDS,
-	/* BotServ kicks for caps */
-	BS_KICK_CAPS,
-	/* BotServ kicks for flood */
-	BS_KICK_FLOOD,
-	/* BotServ kicks for repeating */
-	BS_KICK_REPEAT,
-	/* BotServ kicks for italics */
-	BS_KICK_ITALICS,
-	/* BotServ kicks for amsgs */
-	BS_KICK_AMSGS,
-	BS_END
-};
-
 /* Indices for TTB (Times To Ban) */
 enum
 {
@@ -148,22 +65,13 @@ struct CoreExport BadWord : Serializable
 	static Serializable* Unserialize(Serializable *obj, Serialize::Data &);
 };
 
-/** Flags for auto kick
- */
-enum AutoKickFlag
-{
-	/* Is by nick core, not mask */
-	AK_ISNICK
-};
-
 /* AutoKick data. */
-class CoreExport AutoKick : public Flags<AutoKickFlag>, public Serializable
+class CoreExport AutoKick : public Serializable
 {
  public:
 	/* Channel this autokick is on */
 	Serialize::Reference<ChannelInfo> ci;
 
-	/* Only one of these can be in use. if HasFlag(AK_ISNICK) then nc is in use */
 	Anope::string mask;
 	Serialize::Reference<NickCore> nc;
 
@@ -183,12 +91,12 @@ struct CoreExport ModeLock : Serializable
  public:
 	Serialize::Reference<ChannelInfo> ci;
 	bool set;
-	ChannelModeName name;
+	Anope::string name;
 	Anope::string param;
 	Anope::string setter;
 	time_t created;
 
-	ModeLock(ChannelInfo *ch, bool s, ChannelModeName n, const Anope::string &p, const Anope::string &se = "", time_t c = Anope::CurTime);
+	ModeLock(ChannelInfo *ch, bool s, const Anope::string &n, const Anope::string &p, const Anope::string &se = "", time_t c = Anope::CurTime);
 	~ModeLock();
 
 	void Serialize(Serialize::Data &data) const anope_override;
@@ -213,8 +121,41 @@ struct CoreExport LogSetting : Serializable
 	static Serializable* Unserialize(Serializable *obj, Serialize::Data &);
 };
 
-/* It matters that Base is here before Extensible (it is inherited by Serializable) */
-class CoreExport ChannelInfo : public Serializable, public Extensible, public Flags<ChannelInfoFlag>
+/* It matters that Base is here before Extensible (it is inherited by Serializable)
+ *
+ * Possible flags:
+ *     TOPICLOCK      - Topic can only be changed by TOPIC SET
+ *     RESTRICTED     - Only users on the access list may join
+ *     PEACE          - Don't allow ChanServ and BotServ commands to do bad things to users with higher access levels
+ *     SECURE         - Don't allow any privileges
+ *     NO_EXPIRE      - Channel does not expire
+ *     MEMO_HARDMAX   - Channel memo limit may not be changed
+ *     SECUREFOUNDER  - Stricter control of channel founder status
+ *     SIGNKICK       - Sign kicks with the user who did the kick
+ *     SIGNKICK_LEVEL - Sign kicks if level is < than the one defined by the SIGNKICK level
+ *     SUSPENDED      - Channel is suepended
+ *     PERSIST        - Channel still exists when empited (perm channel mode or leaving a botserv bot).
+ *     STATS          - Chanstats are enabled
+ *     NOAUTOOP       - If set users are not auto given any status on join
+ *
+ * BotServ flags:
+ *     BS_DONTKICKOPS     - BotServ won't kick ops
+ *     BS_DONTKICKVOICES  - BotServ won't kick voices
+ *     BS_FANTASY         - BotServ bot accepts fantasy commands
+ *     BS_GREET           - BotServ should show greets
+ *     BS_NOBOT           - BotServ bots are not allowed to be in this channel
+ *     BS_KICK_BOLDS      - BotServ kicks for bolds
+ *     BS_KICK_COLORS     - BotServ kicks for colors
+ *     BS_KICK_REVERSES   - BotServ kicks for reverses
+ *     BS_KICK_UNDERLINES - BotServ kicks for underlines
+ *     BS_KICK_BADWORD    - BotServ kicks for badwords
+ *     BS_KICK_CAPS       - BotServ kicks for caps
+ *     BS_KICK_FLOOD      - BotServ kicks for flood
+ *     BS_KICK_REPEAT     - BotServ kicks for repeating
+ *     BS_KICK_ITALICS    - BotServ kicks for italics
+ *     BS_KICK_AMSGS      - BotServ kicks for amsgs
+ */
+class CoreExport ChannelInfo : public Serializable, public Extensible
 {
  private:
 	Serialize::Reference<NickCore> founder;					/* Channel founder */
@@ -224,7 +165,7 @@ class CoreExport ChannelInfo : public Serializable, public Extensible, public Fl
 	std::map<Anope::string, int16_t> levels;
 
  public:
-	typedef std::multimap<ChannelModeName, ModeLock *> ModeList;
+	typedef std::multimap<Anope::string, ModeLock *> ModeList;
 	Serialize::Checker<ModeList> mode_locks;
 	Serialize::Checker<std::vector<LogSetting *> > log_settings;
 
@@ -247,7 +188,6 @@ class CoreExport ChannelInfo : public Serializable, public Extensible, public Fl
 
 	/* For BotServ */
 	Serialize::Reference<BotInfo> bi;         /* Bot used on this channel */
-	Flags<BotServFlag> botflags;
 	int16_t ttb[TTB_SIZE];                    /* Times to ban for each kicker */
 
 	int16_t capsmin, capspercent;	          /* For CAPS kicker */
@@ -441,14 +381,14 @@ class CoreExport ChannelInfo : public Serializable, public Extensible, public Fl
 	 * @param Name The mode name to get a list of
 	 * @return a pair of iterators for the beginning and end of the list
 	 */
-	std::pair<ModeList::iterator, ModeList::iterator> GetModeList(ChannelModeName Name);
+	std::pair<ModeList::iterator, ModeList::iterator> GetModeList(const Anope::string &name);
 
 	/** Get details for a specific mlock
 	 * @param mname The mode name
  	 * @param An optional param to match with
 	 * @return The MLock, if any
 	 */
-	const ModeLock *GetMLock(ChannelModeName mname, const Anope::string &param = "");
+	const ModeLock *GetMLock(const Anope::string &mname, const Anope::string &param = "");
 
 	/** Get the current mode locks as a string
 	 * @param complete True to show mlock parameters aswell

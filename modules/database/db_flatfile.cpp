@@ -15,13 +15,19 @@
 class SaveData : public Serialize::Data
 {
  public:
+ 	Anope::string last;
 	std::fstream *fs;
 
 	SaveData() : fs(NULL) { }
 
 	std::iostream& operator[](const Anope::string &key) anope_override
 	{
-		*fs << "\nDATA " << key << " ";
+		if (key != last)
+		{
+			*fs << "\nDATA " << key << " ";
+			last = key;
+		}
+
 		return *fs;
 	}
 };
@@ -56,6 +62,14 @@ class LoadData : public Serialize::Data
 		ss.clear();
 		this->ss << this->data[key];
 		return this->ss;
+	}
+
+	std::set<Anope::string> KeySet() const anope_override
+	{
+		std::set<Anope::string> keys;
+		for (std::map<Anope::string, Anope::string>::const_iterator it = this->data.begin(), it_end = this->data.end(); it != it_end; ++it)
+			keys.insert(it->first);
+		return keys;
 	}
 	
 	void Reset()

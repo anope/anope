@@ -93,13 +93,9 @@ bool WebCPanel::MemoServ::Memos::OnRequest(HTTPProvider *server, const Anope::st
 		}
 
 		if (!error && message.get_data["read"] == "1")
-		{
-			m->UnsetFlag(MF_UNREAD);
-		}
+			m->unread = false;
 		else if (!error && message.get_data["read"] == "2")
-		{
-			m->SetFlag(MF_UNREAD);
-		}
+			m->unread = true;
 	}
 
 	for (unsigned i = 0; i < mi->memos->size(); ++i)
@@ -109,7 +105,7 @@ bool WebCPanel::MemoServ::Memos::OnRequest(HTTPProvider *server, const Anope::st
 		replacements["SENDER"] = m->sender;
 		replacements["TIME"] = Anope::strftime(m->time);
 		replacements["TEXT"] = m->text;
-		if (m->HasFlag(MF_UNREAD))
+		if (m->unread)
 			replacements["UNREAD"] = "YES";
 		else
 			replacements["UNREAD"] = "NO";

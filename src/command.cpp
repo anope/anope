@@ -18,9 +18,6 @@
 #include "regchannel.h"
 #include "channels.h"
 
-static const Anope::string CommandFlagString[] = { "CFLAG_ALLOW_UNREGISTERED", "CFLAG_STRIP_CHANNEL", "CFLAG_REQUIRE_USER", "" };
-template<> const Anope::string* Flags<CommandFlag>::flags_strings = CommandFlagString;
-
 CommandSource::CommandSource(const Anope::string &n, User *user, NickCore *core, CommandReply *r, BotInfo *bi) : nick(n), u(user), nc(core), reply(r),
 	c(NULL), service(bi)
 {
@@ -90,7 +87,7 @@ bool CommandSource::IsServicesOper()
 bool CommandSource::IsOper()
 {
 	if (this->u)
-		return this->u->HasMode(UMODE_OPER);
+		return this->u->HasMode("OPER");
 	else if (this->nc)
 		return this->nc->IsServicesOper();
 	return false;
@@ -123,6 +120,7 @@ void CommandSource::Reply(const Anope::string &message)
 
 Command::Command(Module *o, const Anope::string &sname, size_t minparams, size_t maxparams) : Service(o, "Command", sname), max_params(maxparams), min_params(minparams), module(owner)
 {
+	allow_unregistered = require_user = false;
 }
 
 Command::~Command()
@@ -158,6 +156,26 @@ void Command::SendSyntax(CommandSource &source, const Anope::string &syn)
 {
 	source.Reply(_("Syntax: \002%s %s\002"), source.command.c_str(), syn.c_str());
 	source.Reply(MORE_INFO, Config->UseStrictPrivMsgString.c_str(), source.service->nick.c_str(), source.command.c_str());
+}
+
+bool Command::AllowUnregistered() const
+{
+	return this->allow_unregistered;
+}
+
+void Command::AllowUnregistered(bool b)
+{
+	this->allow_unregistered = b;
+}
+
+bool Command::RequireUser() const
+{
+	return this->require_user;
+}
+
+void Command::RequireUser(bool b)
+{
+	this->require_user = b;
 }
 
 const Anope::string &Command::GetDesc() const
@@ -218,11 +236,11 @@ void RunCommand(CommandSource &source, const Anope::string &message)
 		return;
 	}
 
-	if (c->HasFlag(CFLAG_REQUIRE_USER) && !source.GetUser())
+	if (c->RequireUser() && !source.GetUser())
 		return;
 
 	// Command requires registered users only
-	if (!c->HasFlag(CFLAG_ALLOW_UNREGISTERED) && !source.nc)
+	if (!c->AllowUnregistered() && !source.nc)
 	{
 		source.Reply(NICK_IDENTIFY_REQUIRED);
 		if (source.GetUser())

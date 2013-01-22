@@ -34,7 +34,7 @@ class CommandOSOLine : public Command
 		else if (u2 && flag[0] == '+')
 		{
 			IRCD->SendSVSO(source.service, nick, flag);
-			u2->SetMode(source.service, UMODE_OPER);
+			u2->SetMode(source.service, "OPER");
 			u2->SendMessage(source.service, _("You are now an IRC Operator."));
 			source.Reply(_("Operflags \002%s\002 have been added for \002%s\002."), flag.c_str(), nick.c_str());
 			Log(LOG_ADMIN, source, this) << "for " << nick;

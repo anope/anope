@@ -268,28 +268,28 @@ class NSAJoin : public Module
 			
 			if (ci != NULL)
 			{
-				if (ci->HasFlag(CI_SUSPENDED))
+				if (ci->HasExt("SUSPENDED"))
 					continue;
 			}
 			if (c != NULL)
 			{
 				if (c->FindUser(u) != NULL)
 					continue;
-				else if (c->HasMode(CMODE_OPERONLY) && !u->HasMode(UMODE_OPER))
+				else if (c->HasMode("OPERONLY") && !u->HasMode("OPER"))
 					continue;
-				else if (c->HasMode(CMODE_ADMINONLY) && !u->HasMode(UMODE_ADMIN))
+				else if (c->HasMode("ADMINONLY") && !u->HasMode("ADMIN"))
 					continue;
-				else if (c->HasMode(CMODE_SSL) && !u->HasMode(UMODE_SSL))
+				else if (c->HasMode("SSL") && !u->HasMode("SSL"))
 					continue;
-				else if (c->MatchesList(u, CMODE_BAN) == true && c->MatchesList(u, CMODE_EXCEPT) == false)
+				else if (c->MatchesList(u, "BAN") == true && c->MatchesList(u, "EXCEPT") == false)
 					need_invite = true;
-				else if (c->HasMode(CMODE_INVITE) && c->MatchesList(u, CMODE_INVITEOVERRIDE) == false)
+				else if (c->HasMode("INVITE") && c->MatchesList(u, "INVITEOVERRIDE") == false)
 					need_invite = true;
 					
-				if (c->HasMode(CMODE_KEY))
+				if (c->HasMode("KEY"))
 				{
 					Anope::string k;
-					if (c->GetParam(CMODE_KEY, k))
+					if (c->GetParam("KEY", k))
 					{
 						if (ci->AccessFor(u).HasPriv("GETKEY"))
 							key = k;
@@ -297,10 +297,10 @@ class NSAJoin : public Module
 							need_invite = true;
 					}
 				}
-				if (c->HasMode(CMODE_LIMIT))
+				if (c->HasMode("LIMIT"))
 				{
 					Anope::string l;
-					if (c->GetParam(CMODE_LIMIT, l))
+					if (c->GetParam("LIMIT", l))
 					{
 						try
 						{

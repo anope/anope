@@ -101,7 +101,7 @@ class InspIRCdProto : public IRCDProto
 
 	void SendVhostDel(User *u) anope_override
 	{
-		if (u->HasMode(UMODE_CLOAK))
+		if (u->HasMode("CLOAK"))
 			inspircd_cmd_chghost(u->nick, u->chost);
 		else
 			inspircd_cmd_chghost(u->nick, u->host);
@@ -215,11 +215,11 @@ class InspIRCdProto : public IRCDProto
 			 */
 			ChanUserContainer *uc = c->FindUser(user);
 			if (uc != NULL)
-				uc->status.ClearFlags();
+				uc->status.modes.clear();
 
 			BotInfo *setter = BotInfo::Find(user->nick);
 			for (unsigned i = 0; i < ModeManager::ChannelModes.size(); ++i)
-				if (cs.HasFlag(ModeManager::ChannelModes[i]->name))
+				if (cs.modes.count(ModeManager::ChannelModes[i]->name))
 					c->SetMode(setter, ModeManager::ChannelModes[i], user->GetUID(), false);
 		}
 	}
@@ -327,7 +327,7 @@ class InspIRCdProto : public IRCDProto
 class ChannelModeFlood : public ChannelModeParam
 {
  public:
-	ChannelModeFlood(char modeChar, bool minusNoArg) : ChannelModeParam(CMODE_FLOOD, modeChar, minusNoArg) { }
+	ChannelModeFlood(char modeChar, bool minusNoArg) : ChannelModeParam("FLOOD", modeChar, minusNoArg) { }
 
 	bool IsValid(const Anope::string &value) const anope_override
 	{
@@ -392,16 +392,16 @@ struct IRCDMessageCapab : Message::Capab
 						switch (modebuf[t])
 						{
 							case 'b':
-								ModeManager::AddChannelMode(new ChannelModeList(CMODE_BAN, 'b'));
+								ModeManager::AddChannelMode(new ChannelModeList("BAN", 'b'));
 								continue;
 							case 'e':
-								ModeManager::AddChannelMode(new ChannelModeList(CMODE_EXCEPT, 'e'));
+								ModeManager::AddChannelMode(new ChannelModeList("EXCEPT", 'e'));
 								continue;
 							case 'I':
-								ModeManager::AddChannelMode(new ChannelModeList(CMODE_INVITEOVERRIDE, 'I'));
+								ModeManager::AddChannelMode(new ChannelModeList("INVITEOVERRIDE", 'I'));
 								continue;
 							default:
-								ModeManager::AddChannelMode(new ChannelModeList(CMODE_END, modebuf[t]));
+								ModeManager::AddChannelMode(new ChannelModeList("END", modebuf[t]));
 						}
 					}
 
@@ -414,7 +414,7 @@ struct IRCDMessageCapab : Message::Capab
 								ModeManager::AddChannelMode(new ChannelModeKey('k'));
 								continue;
 							default:
-								ModeManager::AddChannelMode(new ChannelModeParam(CMODE_END, modebuf[t]));
+								ModeManager::AddChannelMode(new ChannelModeParam("END", modebuf[t]));
 						}
 					}
 
@@ -427,13 +427,13 @@ struct IRCDMessageCapab : Message::Capab
 								ModeManager::AddChannelMode(new ChannelModeFlood('f', false));
 								continue;
 							case 'l':
-								ModeManager::AddChannelMode(new ChannelModeParam(CMODE_LIMIT, 'l', true));
+								ModeManager::AddChannelMode(new ChannelModeParam("LIMIT", 'l', true));
 								continue;
 							case 'L':
-								ModeManager::AddChannelMode(new ChannelModeParam(CMODE_REDIRECT, 'L', true));
+								ModeManager::AddChannelMode(new ChannelModeParam("REDIRECT", 'L', true));
 								continue;
 							default:
-								ModeManager::AddChannelMode(new ChannelModeParam(CMODE_END, modebuf[t], true));
+								ModeManager::AddChannelMode(new ChannelModeParam("END", modebuf[t], true));
 						}
 					}
 
@@ -443,67 +443,67 @@ struct IRCDMessageCapab : Message::Capab
 						switch (modebuf[t])
 						{
 							case 'i':
-								ModeManager::AddChannelMode(new ChannelMode(CMODE_INVITE, 'i'));
+								ModeManager::AddChannelMode(new ChannelMode("INVITE", 'i'));
 								continue;
 							case 'm':
-								ModeManager::AddChannelMode(new ChannelMode(CMODE_MODERATED, 'm'));
+								ModeManager::AddChannelMode(new ChannelMode("MODERATED", 'm'));
 								continue;
 							case 'n':
-								ModeManager::AddChannelMode(new ChannelMode(CMODE_NOEXTERNAL, 'n'));
+								ModeManager::AddChannelMode(new ChannelMode("NOEXTERNAL", 'n'));
 								continue;
 							case 'p':
-								ModeManager::AddChannelMode(new ChannelMode(CMODE_PRIVATE, 'p'));
+								ModeManager::AddChannelMode(new ChannelMode("PRIVATE", 'p'));
 								continue;
 							case 's':
-								ModeManager::AddChannelMode(new ChannelMode(CMODE_SECRET, 's'));
+								ModeManager::AddChannelMode(new ChannelMode("SECRET", 's'));
 								continue;
 							case 't':
-								ModeManager::AddChannelMode(new ChannelMode(CMODE_TOPIC, 't'));
+								ModeManager::AddChannelMode(new ChannelMode("TOPIC", 't'));
 								continue;
 							case 'r':
 								ModeManager::AddChannelMode(new ChannelModeRegistered('r'));
 								continue;
 							case 'c':
-								ModeManager::AddChannelMode(new ChannelMode(CMODE_BLOCKCOLOR, 'c'));
+								ModeManager::AddChannelMode(new ChannelMode("BLOCKCOLOR", 'c'));
 								continue;
 							case 'u':
-								ModeManager::AddChannelMode(new ChannelMode(CMODE_AUDITORIUM, 'u'));
+								ModeManager::AddChannelMode(new ChannelMode("AUDITORIUM", 'u'));
 								continue;
 							case 'z':
-								ModeManager::AddChannelMode(new ChannelMode(CMODE_SSL, 'z'));
+								ModeManager::AddChannelMode(new ChannelMode("SSL", 'z'));
 								continue;
 							case 'A':
-								ModeManager::AddChannelMode(new ChannelMode(CMODE_ALLINVITE, 'A'));
+								ModeManager::AddChannelMode(new ChannelMode("ALLINVITE", 'A'));
 								continue;
 							case 'C':
-								ModeManager::AddChannelMode(new ChannelMode(CMODE_NOCTCP, 'C'));
+								ModeManager::AddChannelMode(new ChannelMode("NOCTCP", 'C'));
 								continue;
 							case 'G':
-								ModeManager::AddChannelMode(new ChannelMode(CMODE_FILTER, 'G'));
+								ModeManager::AddChannelMode(new ChannelMode("FILTER", 'G'));
 								continue;
 							case 'K':
-								ModeManager::AddChannelMode(new ChannelMode(CMODE_NOKNOCK, 'K'));
+								ModeManager::AddChannelMode(new ChannelMode("NOKNOCK", 'K'));
 								continue;
 							case 'N':
-								ModeManager::AddChannelMode(new ChannelMode(CMODE_NONICK, 'N'));
+								ModeManager::AddChannelMode(new ChannelMode("NONICK", 'N'));
 								continue;
 							case 'O':
 								ModeManager::AddChannelMode(new ChannelModeOper('O'));
 								continue;
 							case 'Q':
-								ModeManager::AddChannelMode(new ChannelMode(CMODE_NOKICK, 'Q'));
+								ModeManager::AddChannelMode(new ChannelMode("NOKICK", 'Q'));
 								continue;
 							case 'R':
-								ModeManager::AddChannelMode(new ChannelMode(CMODE_REGISTEREDONLY, 'R'));
+								ModeManager::AddChannelMode(new ChannelMode("REGISTEREDONLY", 'R'));
 								continue;
 							case 'S':
-								ModeManager::AddChannelMode(new ChannelMode(CMODE_STRIPCOLOR, 'S'));
+								ModeManager::AddChannelMode(new ChannelMode("STRIPCOLOR", 'S'));
 								continue;
 							case 'V':
-								ModeManager::AddChannelMode(new ChannelMode(CMODE_NOINVITE, 'V'));
+								ModeManager::AddChannelMode(new ChannelMode("NOINVITE", 'V'));
 								continue;
 							default:
-								ModeManager::AddChannelMode(new ChannelMode(CMODE_END, modebuf[t]));
+								ModeManager::AddChannelMode(new ChannelMode("END", modebuf[t]));
 						}
 					}
 				}
@@ -518,22 +518,22 @@ struct IRCDMessageCapab : Message::Capab
 						switch (modes[t])
 						{
 							case 'q':
-								ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_OWNER, 'q', '~', level--));
+								ModeManager::AddChannelMode(new ChannelModeStatus("OWNER", 'q', '~', level--));
 								continue;
 							case 'a':
-								ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_PROTECT, 'a', '&', level--));
+								ModeManager::AddChannelMode(new ChannelModeStatus("PROTECT", 'a', '&', level--));
 								continue;
 							case 'o':
-								ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_OP, 'o', '@', level--));
+								ModeManager::AddChannelMode(new ChannelModeStatus("OP", 'o', '@', level--));
 								continue;
 							case 'h':
-								ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_HALFOP, 'h', '%', level--));
+								ModeManager::AddChannelMode(new ChannelModeStatus("HALFOP", 'h', '%', level--));
 								continue;
 							case 'v':
-								ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_VOICE, 'v', '+', level--));
+								ModeManager::AddChannelMode(new ChannelModeStatus("VOICE", 'v', '+', level--));
 								continue;
 							default:
-								ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_END, modes[t], chars[t], level--));
+								ModeManager::AddChannelMode(new ChannelModeStatus("END", modes[t], chars[t], level--));
 						}
 					}
 				}
@@ -653,7 +653,7 @@ struct IRCDMessageFJoin : IRCDMessage
 					continue;
 				}
 
-				sju.first.SetFlag(cm->name);
+				sju.first.modes.insert(cm->name);
 			}
 			/* Erase the , */
 			buf.erase(buf.begin());
@@ -785,7 +785,7 @@ struct IRCDMessageOperType : IRCDMessage
 		/* opertype is equivalent to mode +o because servers
 		   dont do this directly */
 		User *u = source.GetUser();
-		if (!u->HasMode(UMODE_OPER))
+		if (!u->HasMode("OPER"))
 			u->SetModesInternal("+o");
 	}
 };
@@ -860,13 +860,13 @@ class ProtoInspIRCd : public Module
 
 	void AddModes()
 	{
-		ModeManager::AddUserMode(new UserMode(UMODE_CALLERID, 'g'));
-		ModeManager::AddUserMode(new UserMode(UMODE_HELPOP, 'h'));
-		ModeManager::AddUserMode(new UserMode(UMODE_INVIS, 'i'));
-		ModeManager::AddUserMode(new UserMode(UMODE_OPER, 'o'));
-		ModeManager::AddUserMode(new UserMode(UMODE_REGISTERED, 'r'));
-		ModeManager::AddUserMode(new UserMode(UMODE_WALLOPS, 'w'));
-		ModeManager::AddUserMode(new UserMode(UMODE_CLOAK, 'x'));
+		ModeManager::AddUserMode(new UserMode("CALLERID", 'g'));
+		ModeManager::AddUserMode(new UserMode("HELPOP", 'h'));
+		ModeManager::AddUserMode(new UserMode("INVIS", 'i'));
+		ModeManager::AddUserMode(new UserMode("OPER", 'o'));
+		ModeManager::AddUserMode(new UserMode("REGISTERED", 'r'));
+		ModeManager::AddUserMode(new UserMode("WALLOPS", 'w'));
+		ModeManager::AddUserMode(new UserMode("CLOAK", 'x'));
 	}
 
  public:
@@ -893,7 +893,7 @@ class ProtoInspIRCd : public Module
 
 	void OnUserNickChange(User *u, const Anope::string &) anope_override
 	{
-		u->RemoveModeInternal(ModeManager::FindUserModeByName(UMODE_REGISTERED));
+		u->RemoveModeInternal(ModeManager::FindUserModeByName("REGISTERED"));
 	}
 };
 

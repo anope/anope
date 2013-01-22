@@ -79,7 +79,7 @@ NickAlias::~NickAlias()
 
 void NickAlias::Release()
 {
-	if (this->HasFlag(NS_HELD))
+	if (this->HasExt("HELD"))
 	{
 		if (IRCD->CanSVSHold)
 			IRCD->SendSVSHoldDel(this->nick);
@@ -92,7 +92,7 @@ void NickAlias::Release()
 			}
 		}
 
-		this->UnsetFlag(NS_HELD);
+		this->Shrink("HELD");
 	}
 }
 
@@ -122,7 +122,7 @@ class NickServHeld : public Timer
 	void Tick(time_t)
 	{
 		if (na)
-			na->UnsetFlag(NS_HELD);
+			na->Shrink("HELD");
 	}
 };
 std::map<Anope::string, NickServHeld *> NickServHeld::NickServHelds;
@@ -171,10 +171,10 @@ std::map<Anope::string, NickServRelease *> NickServRelease::NickServReleases;
 
 void NickAlias::OnCancel(User *)
 {
-	if (this->HasFlag(NS_COLLIDED))
+	if (this->HasExt("COLLIDED"))
 	{
-		this->SetFlag(NS_HELD);
-		this->UnsetFlag(NS_COLLIDED);
+		this->Extend("HELD");
+		this->Shrink("COLLIDED");
 
 		new NickServHeld(this, Config->NSReleaseTimeout);
 
@@ -248,7 +248,7 @@ void NickAlias::Serialize(Serialize::Data &data) const
 	data.SetType("time_registered", Serialize::Data::DT_INT); data["time_registered"] << this->time_registered;
 	data.SetType("time_registered", Serialize::Data::DT_INT); data["last_seen"] << this->last_seen;
 	data["nc"] << this->nc->display;
-	data["flags"] << this->ToString();
+	this->ExtensibleSerialize(data);
 
 	if (this->HasVhost())
 	{
@@ -297,10 +297,7 @@ Serializable* NickAlias::Unserialize(Serializable *obj, Serialize::Data &data)
 	data["last_realhost"] >> na->last_realhost;
 	data["time_registered"] >> na->time_registered;
 	data["last_seen"] >> na->last_seen;
-
-	Anope::string flags;
-	data["flags"] >> flags;
-	na->FromString(flags);
+	na->ExtensibleUnserialize(data);
 
 	Anope::string vhost_ident, vhost_host, vhost_creator;
 	time_t vhost_time;
@@ -311,6 +308,16 @@ Serializable* NickAlias::Unserialize(Serializable *obj, Serialize::Data &data)
 	data["vhost_time"] >> vhost_time;
 
 	na->SetVhost(vhost_ident, vhost_host, vhost_creator, vhost_time);
+
+	/* Compat */
+	Anope::string sflags;
+	data["flags"] >> sflags;
+	spacesepstream sep(sflags);
+	Anope::string tok;
+	while (sep.GetToken(tok))
+		na->ExtendMetadata(tok);
+	/* End compat */
+
 	return na;
 }
 

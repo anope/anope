@@ -75,10 +75,10 @@ class UnrealIRCdProto : public IRCDProto
 
 	void SendVhostDel(User *u) anope_override
 	{
-		u->RemoveMode(HostServ, UMODE_CLOAK);
-		u->RemoveMode(HostServ, UMODE_VHOST);
+		u->RemoveMode(HostServ, "CLOAK");
+		u->RemoveMode(HostServ, "VHOST");
 		ModeManager::ProcessModes();
-		u->SetMode(HostServ, UMODE_CLOAK);
+		u->SetMode(HostServ, "CLOAK");
 	}
 
 	void SendAkill(User *u, XLine *x) anope_override
@@ -166,11 +166,11 @@ class UnrealIRCdProto : public IRCDProto
 			 */
 			ChanUserContainer *uc = c->FindUser(user);
 			if (uc != NULL)
-				uc->status.ClearFlags();
+				uc->status.modes.clear();
 
 			BotInfo *setter = BotInfo::Find(user->nick);
 			for (unsigned i = 0; i < ModeManager::ChannelModes.size(); ++i)
-				if (cs.HasFlag(ModeManager::ChannelModes[i]->name))
+				if (cs.modes.count(ModeManager::ChannelModes[i]->name))
 					c->SetMode(setter, ModeManager::ChannelModes[i], user->GetUID(), false);
 		}
 	}
@@ -377,7 +377,7 @@ class UnrealIRCdProto : public IRCDProto
 class UnrealExtBan : public ChannelModeList
 {
  public:
-	UnrealExtBan(ChannelModeName mName, char modeChar) : ChannelModeList(mName, modeChar) { }
+	UnrealExtBan(const Anope::string &mname, char modeChar) : ChannelModeList(mname, modeChar) { }
 
 	bool Matches(const User *u, const Entry *e) anope_override
 	{
@@ -402,7 +402,7 @@ class UnrealExtBan : public ChannelModeList
 			{
 				ChanUserContainer *uc = c->FindUser(u);
 				if (uc != NULL)
-					if (cm == NULL || uc->status.HasFlag(cm->name))
+					if (cm == NULL || uc->status.modes.count(cm->name))
 						return true;
 			}
 		}
@@ -423,7 +423,7 @@ class UnrealExtBan : public ChannelModeList
 		}
 		else if (mask.find("~R:") == 0)
 		{
-			if (u->HasMode(UMODE_REGISTERED) && mask.equals_ci(u->nick))
+			if (u->HasMode("REGISTERED") && mask.equals_ci(u->nick))
 				return true;
 		}
 		else if (mask.find("~a:") == 0)
@@ -441,7 +441,7 @@ class UnrealExtBan : public ChannelModeList
 class ChannelModeFlood : public ChannelModeParam
 {
  public:
-	ChannelModeFlood(char modeChar, bool minusNoArg) : ChannelModeParam(CMODE_FLOOD, modeChar, minusNoArg) { }
+	ChannelModeFlood(char modeChar, bool minusNoArg) : ChannelModeParam("FLOOD", modeChar, minusNoArg) { }
 
 	/* Borrowed part of this check from UnrealIRCd */
 	bool IsValid(const Anope::string &value) const anope_override
@@ -492,7 +492,7 @@ class ChannelModeFlood : public ChannelModeParam
 class ChannelModeUnrealSSL : public ChannelMode
 {
  public:
-	ChannelModeUnrealSSL(ChannelModeName n, char c) : ChannelMode(n, c)
+	ChannelModeUnrealSSL(const Anope::string &n, char c) : ChannelMode(n, c)
 	{
 	}
 
@@ -524,16 +524,16 @@ struct IRCDMessageCapab : Message::Capab
 					switch (modebuf[t])
 					{
 						case 'b':
-							ModeManager::AddChannelMode(new UnrealExtBan(CMODE_BAN, 'b'));
+							ModeManager::AddChannelMode(new UnrealExtBan("BAN", 'b'));
 							continue;
 						case 'e':
-							ModeManager::AddChannelMode(new UnrealExtBan(CMODE_EXCEPT, 'e'));
+							ModeManager::AddChannelMode(new UnrealExtBan("EXCEPT", 'e'));
 							continue;
 						case 'I':
-							ModeManager::AddChannelMode(new UnrealExtBan(CMODE_INVITEOVERRIDE, 'I'));
+							ModeManager::AddChannelMode(new UnrealExtBan("INVITEOVERRIDE", 'I'));
 							continue;
 						default:
-							ModeManager::AddChannelMode(new ChannelModeList(CMODE_END, modebuf[t]));
+							ModeManager::AddChannelMode(new ChannelModeList("END", modebuf[t]));
 					}
 				}
 
@@ -549,10 +549,10 @@ struct IRCDMessageCapab : Message::Capab
 							ModeManager::AddChannelMode(new ChannelModeFlood('f', false));
 							continue;
 						case 'L':
-							ModeManager::AddChannelMode(new ChannelModeParam(CMODE_REDIRECT, 'L'));
+							ModeManager::AddChannelMode(new ChannelModeParam("REDIRECT", 'L'));
 							continue;
 						default:
-							ModeManager::AddChannelMode(new ChannelModeParam(CMODE_END, modebuf[t]));
+							ModeManager::AddChannelMode(new ChannelModeParam("END", modebuf[t]));
 					}
 				}
 
@@ -562,13 +562,13 @@ struct IRCDMessageCapab : Message::Capab
 					switch (modebuf[t])
 					{
 						case 'l':
-							ModeManager::AddChannelMode(new ChannelModeParam(CMODE_LIMIT, 'l', true));
+							ModeManager::AddChannelMode(new ChannelModeParam("LIMIT", 'l', true));
 							continue;
 						case 'j':
-							ModeManager::AddChannelMode(new ChannelModeParam(CMODE_JOINFLOOD, 'j', true));
+							ModeManager::AddChannelMode(new ChannelModeParam("JOINFLOOD", 'j', true));
 							continue;
 						default:
-							ModeManager::AddChannelMode(new ChannelModeParam(CMODE_END, modebuf[t], true));
+							ModeManager::AddChannelMode(new ChannelModeParam("END", modebuf[t], true));
 					}
 				}
 
@@ -578,31 +578,31 @@ struct IRCDMessageCapab : Message::Capab
 					switch (modebuf[t])
 					{
 						case 'p':
-							ModeManager::AddChannelMode(new ChannelMode(CMODE_PRIVATE, 'p'));
+							ModeManager::AddChannelMode(new ChannelMode("PRIVATE", 'p'));
 							continue;
 						case 's':
-							ModeManager::AddChannelMode(new ChannelMode(CMODE_SECRET, 's'));
+							ModeManager::AddChannelMode(new ChannelMode("SECRET", 's'));
 							continue;
 						case 'm':
-							ModeManager::AddChannelMode(new ChannelMode(CMODE_MODERATED, 'm'));
+							ModeManager::AddChannelMode(new ChannelMode("MODERATED", 'm'));
 							continue;
 						case 'n':
-							ModeManager::AddChannelMode(new ChannelMode(CMODE_NOEXTERNAL, 'n'));
+							ModeManager::AddChannelMode(new ChannelMode("NOEXTERNAL", 'n'));
 							continue;
 						case 't':
-							ModeManager::AddChannelMode(new ChannelMode(CMODE_TOPIC, 't'));
+							ModeManager::AddChannelMode(new ChannelMode("TOPIC", 't'));
 							continue;
 						case 'i':
-							ModeManager::AddChannelMode(new ChannelMode(CMODE_INVITE, 'i'));
+							ModeManager::AddChannelMode(new ChannelMode("INVITE", 'i'));
 							continue;
 						case 'r':
 							ModeManager::AddChannelMode(new ChannelModeRegistered('r'));
 							continue;
 						case 'R':
-							ModeManager::AddChannelMode(new ChannelMode(CMODE_REGISTEREDONLY, 'R'));
+							ModeManager::AddChannelMode(new ChannelMode("REGISTEREDONLY", 'R'));
 							continue;
 						case 'c':
-							ModeManager::AddChannelMode(new ChannelMode(CMODE_BLOCKCOLOR, 'c'));
+							ModeManager::AddChannelMode(new ChannelMode("BLOCKCOLOR", 'c'));
 							continue;
 						case 'O':
 							ModeManager::AddChannelMode(new ChannelModeOper('O'));
@@ -611,43 +611,43 @@ struct IRCDMessageCapab : Message::Capab
 							ModeManager::AddChannelMode(new ChannelModeAdmin('A'));
 							continue;
 						case 'Q':
-							ModeManager::AddChannelMode(new ChannelMode(CMODE_NOKICK, 'Q'));
+							ModeManager::AddChannelMode(new ChannelMode("NOKICK", 'Q'));
 							continue;
 						case 'K':
-							ModeManager::AddChannelMode(new ChannelMode(CMODE_NOKNOCK, 'K'));
+							ModeManager::AddChannelMode(new ChannelMode("NOKNOCK", 'K'));
 							continue;
 						case 'V':
-							ModeManager::AddChannelMode(new ChannelMode(CMODE_NOINVITE, 'V'));
+							ModeManager::AddChannelMode(new ChannelMode("NOINVITE", 'V'));
 							continue;
 						case 'C':
-							ModeManager::AddChannelMode(new ChannelMode(CMODE_NOCTCP, 'C'));
+							ModeManager::AddChannelMode(new ChannelMode("NOCTCP", 'C'));
 							continue;
 						case 'u':
-							ModeManager::AddChannelMode(new ChannelMode(CMODE_AUDITORIUM, 'u'));
+							ModeManager::AddChannelMode(new ChannelMode("AUDITORIUM", 'u'));
 							continue;
 						case 'z':
-							ModeManager::AddChannelMode(new ChannelMode(CMODE_SSL, 'z'));
+							ModeManager::AddChannelMode(new ChannelMode("SSL", 'z'));
 							continue;
 						case 'N':
-							ModeManager::AddChannelMode(new ChannelMode(CMODE_NONICK, 'N'));
+							ModeManager::AddChannelMode(new ChannelMode("NONICK", 'N'));
 							continue;
 						case 'S':
-							ModeManager::AddChannelMode(new ChannelMode(CMODE_STRIPCOLOR, 'S'));
+							ModeManager::AddChannelMode(new ChannelMode("STRIPCOLOR", 'S'));
 							continue;
 						case 'M':
-							ModeManager::AddChannelMode(new ChannelMode(CMODE_REGMODERATED, 'M'));
+							ModeManager::AddChannelMode(new ChannelMode("REGMODERATED", 'M'));
 							continue;
 						case 'T':
-							ModeManager::AddChannelMode(new ChannelMode(CMODE_NONOTICE, 'T'));
+							ModeManager::AddChannelMode(new ChannelMode("NONOTICE", 'T'));
 							continue;
 						case 'G':
-							ModeManager::AddChannelMode(new ChannelMode(CMODE_FILTER, 'G'));
+							ModeManager::AddChannelMode(new ChannelMode("FILTER", 'G'));
 							continue;
 						case 'Z':
-							ModeManager::AddChannelMode(new ChannelModeUnrealSSL(CMODE_END, 'Z'));
+							ModeManager::AddChannelMode(new ChannelModeUnrealSSL("END", 'Z'));
 							continue;
 						default:
-							ModeManager::AddChannelMode(new ChannelMode(CMODE_END, modebuf[t]));
+							ModeManager::AddChannelMode(new ChannelMode("END", modebuf[t]));
 					}
 				}
 			}
@@ -940,7 +940,7 @@ struct IRCDMessageSetHost : IRCDMessage
 		User *u = source.GetUser();
 
 		/* When a user sets +x we recieve the new host and then the mode change */
-		if (u->HasMode(UMODE_CLOAK))
+		if (u->HasMode("CLOAK"))
 			u->SetDisplayedHost(params[0]);
 		else
 			u->SetCloakedHost(params[0]);
@@ -1045,7 +1045,7 @@ struct IRCDMessageSJoin : IRCDMessage
 						continue;
 					}
 
-					sju.first.SetFlag(cm->name);
+					sju.first.modes.insert(cm->name);
 				}
 
 				sju.second = User::Find(buf);
@@ -1069,9 +1069,9 @@ struct IRCDMessageSJoin : IRCDMessage
 			if (!c || c->creation_time != ts)
 				return;
 
-			ChannelMode *ban = ModeManager::FindChannelModeByName(CMODE_BAN),
-				*except = ModeManager::FindChannelModeByName(CMODE_EXCEPT),
-				*invex = ModeManager::FindChannelModeByName(CMODE_INVITEOVERRIDE);
+			ChannelMode *ban = ModeManager::FindChannelModeByName("BAN"),
+				*except = ModeManager::FindChannelModeByName("EXCEPT"),
+				*invex = ModeManager::FindChannelModeByName("INVITEOVERRIDE");
 
 			if (ban)
 				for (std::list<Anope::string>::iterator it = bans.begin(), it_end = bans.end(); it != it_end; ++it)
@@ -1158,40 +1158,40 @@ class ProtoUnreal : public Module
 
 	void AddModes()
 	{
-		ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_VOICE, 'v', '+', 0));
-		ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_HALFOP, 'h', '%', 1));
-		ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_OP, 'o', '@', 2));
+		ModeManager::AddChannelMode(new ChannelModeStatus("VOICE", 'v', '+', 0));
+		ModeManager::AddChannelMode(new ChannelModeStatus("HALFOP", 'h', '%', 1));
+		ModeManager::AddChannelMode(new ChannelModeStatus("OP", 'o', '@', 2));
 		/* Unreal sends +q as * and +a as ~ */
-		ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_PROTECT, 'a', '~', 3));
-		ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_OWNER, 'q', '*', 4));
+		ModeManager::AddChannelMode(new ChannelModeStatus("PROTECT", 'a', '~', 3));
+		ModeManager::AddChannelMode(new ChannelModeStatus("OWNER", 'q', '*', 4));
 
 		/* Add user modes */
-		ModeManager::AddUserMode(new UserMode(UMODE_SERV_ADMIN, 'A'));
-		ModeManager::AddUserMode(new UserMode(UMODE_BOT, 'B'));
-		ModeManager::AddUserMode(new UserMode(UMODE_CO_ADMIN, 'C'));
-		ModeManager::AddUserMode(new UserMode(UMODE_FILTER, 'G'));
-		ModeManager::AddUserMode(new UserMode(UMODE_HIDEOPER, 'H'));
-		ModeManager::AddUserMode(new UserMode(UMODE_HIDEIDLE, 'I'));
-		ModeManager::AddUserMode(new UserMode(UMODE_NETADMIN, 'N'));
-		ModeManager::AddUserMode(new UserMode(UMODE_REGPRIV, 'R'));
-		ModeManager::AddUserMode(new UserMode(UMODE_PROTECTED, 'S'));
-		ModeManager::AddUserMode(new UserMode(UMODE_NOCTCP, 'T'));
-		ModeManager::AddUserMode(new UserMode(UMODE_WEBTV, 'V'));
-		ModeManager::AddUserMode(new UserMode(UMODE_WHOIS, 'W'));
-		ModeManager::AddUserMode(new UserMode(UMODE_ADMIN, 'a'));
-		ModeManager::AddUserMode(new UserMode(UMODE_DEAF, 'd'));
-		ModeManager::AddUserMode(new UserMode(UMODE_GLOBOPS, 'g'));
-		ModeManager::AddUserMode(new UserMode(UMODE_HELPOP, 'h'));
-		ModeManager::AddUserMode(new UserMode(UMODE_INVIS, 'i'));
-		ModeManager::AddUserMode(new UserMode(UMODE_OPER, 'o'));
-		ModeManager::AddUserMode(new UserMode(UMODE_PRIV, 'p'));
-		ModeManager::AddUserMode(new UserMode(UMODE_GOD, 'q'));
-		ModeManager::AddUserMode(new UserMode(UMODE_REGISTERED, 'r'));
-		ModeManager::AddUserMode(new UserMode(UMODE_SNOMASK, 's'));
-		ModeManager::AddUserMode(new UserMode(UMODE_VHOST, 't'));
-		ModeManager::AddUserMode(new UserMode(UMODE_WALLOPS, 'w'));
-		ModeManager::AddUserMode(new UserMode(UMODE_CLOAK, 'x'));
-		ModeManager::AddUserMode(new UserMode(UMODE_SSL, 'z'));
+		ModeManager::AddUserMode(new UserMode("SERV_ADMIN", 'A'));
+		ModeManager::AddUserMode(new UserMode("BOT", 'B'));
+		ModeManager::AddUserMode(new UserMode("CO_ADMIN", 'C'));
+		ModeManager::AddUserMode(new UserMode("FILTER", 'G'));
+		ModeManager::AddUserMode(new UserMode("HIDEOPER", 'H'));
+		ModeManager::AddUserMode(new UserMode("HIDEIDLE", 'I'));
+		ModeManager::AddUserMode(new UserMode("NETADMIN", 'N'));
+		ModeManager::AddUserMode(new UserMode("REGPRIV", 'R'));
+		ModeManager::AddUserMode(new UserMode("PROTECTED", 'S'));
+		ModeManager::AddUserMode(new UserMode("NOCTCP", 'T'));
+		ModeManager::AddUserMode(new UserMode("WEBTV", 'V'));
+		ModeManager::AddUserMode(new UserMode("WHOIS", 'W'));
+		ModeManager::AddUserMode(new UserMode("ADMIN", 'a'));
+		ModeManager::AddUserMode(new UserMode("DEAF", 'd'));
+		ModeManager::AddUserMode(new UserMode("GLOBOPS", 'g'));
+		ModeManager::AddUserMode(new UserMode("HELPOP", 'h'));
+		ModeManager::AddUserMode(new UserMode("INVIS", 'i'));
+		ModeManager::AddUserMode(new UserMode("OPER", 'o'));
+		ModeManager::AddUserMode(new UserMode("PRIV", 'p'));
+		ModeManager::AddUserMode(new UserMode("GOD", 'q'));
+		ModeManager::AddUserMode(new UserMode("REGISTERED", 'r'));
+		ModeManager::AddUserMode(new UserMode("SNOMASK", 's'));
+		ModeManager::AddUserMode(new UserMode("VHOST", 't'));
+		ModeManager::AddUserMode(new UserMode("WALLOPS", 'w'));
+		ModeManager::AddUserMode(new UserMode("CLOAK", 'x'));
+		ModeManager::AddUserMode(new UserMode("SSL", 'z'));
 	}
 
  public:
@@ -1218,7 +1218,7 @@ class ProtoUnreal : public Module
 
 	void OnUserNickChange(User *u, const Anope::string &) anope_override
 	{
-		u->RemoveModeInternal(ModeManager::FindUserModeByName(UMODE_REGISTERED));
+		u->RemoveModeInternal(ModeManager::FindUserModeByName("REGISTERED"));
 		if (Servers::Capab.count("ESVID") == 0)
 			IRCD->SendLogout(u);
 	}

@@ -72,7 +72,7 @@ class CommandBSKick : public Command
 					else
 						ci->ttb[TTB_BADWORDS] = 0;
 
-					ci->botflags.SetFlag(BS_KICK_BADWORDS);
+					ci->ExtendMetadata("BS_KICK_BADWORDS");
 					if (ci->ttb[TTB_BADWORDS])
 						source.Reply(_("Bot will now kick \002bad words\002, and will place a ban after \n"
 											"%d kicks for the same user. Use the BADWORDS command\n"
@@ -83,7 +83,7 @@ class CommandBSKick : public Command
 				}
 				else
 				{
-					ci->botflags.UnsetFlag(BS_KICK_BADWORDS);
+					ci->Shrink("BS_KICK_BADWORDS");
 					source.Reply(_("Bot won't kick \002bad words\002 anymore."));
 				}
 			}
@@ -108,7 +108,7 @@ class CommandBSKick : public Command
 					}
 					else
 						ci->ttb[TTB_BOLDS] = 0;
-					ci->botflags.SetFlag(BS_KICK_BOLDS);
+					ci->ExtendMetadata("BS_KICK_BOLDS");
 					if (ci->ttb[TTB_BOLDS])
 						source.Reply(_("Bot will now kick \002bolds\002, and will place a ban after\n%d kicks to the same user."), ci->ttb[TTB_BOLDS]);
 					else
@@ -116,7 +116,7 @@ class CommandBSKick : public Command
 				}
 				else
 				{
-					ci->botflags.UnsetFlag(BS_KICK_BOLDS);
+					ci->Shrink("BS_KICK_BOLDS");
 					source.Reply(_("Bot won't kick \002bolds\002 anymore."));
 				}
 			}
@@ -163,7 +163,7 @@ class CommandBSKick : public Command
 					if (ci->capspercent < 1 || ci->capspercent > 100)
 						ci->capspercent = 25;
 
-					ci->botflags.SetFlag(BS_KICK_CAPS);
+					ci->ExtendMetadata("BS_KICK_CAPS");
 					if (ci->ttb[TTB_CAPS])
 						source.Reply(_("Bot will now kick \002caps\002 (they must constitute at least\n"
 								"%d characters and %d%% of the entire message), and will \n"
@@ -174,7 +174,7 @@ class CommandBSKick : public Command
 				}
 				else
 				{
-					ci->botflags.UnsetFlag(BS_KICK_CAPS);
+					ci->Shrink("BS_KICK_CAPS");
 					source.Reply(_("Bot won't kick \002caps\002 anymore."));
 				}
 			}
@@ -200,7 +200,7 @@ class CommandBSKick : public Command
 					else
 						ci->ttb[TTB_COLORS] = 0;
 
-					ci->botflags.SetFlag(BS_KICK_COLORS);
+					ci->ExtendMetadata("BS_KICK_COLORS");
 					if (ci->ttb[TTB_COLORS])
 						source.Reply(_("Bot will now kick \002colors\002, and will place a ban after %d\nkicks for the same user."), ci->ttb[TTB_COLORS]);
 					else
@@ -208,7 +208,7 @@ class CommandBSKick : public Command
 				}
 				else
 				{
-					ci->botflags.UnsetFlag(BS_KICK_COLORS);
+					ci->Shrink("BS_KICK_COLORS");
 					source.Reply(_("Bot won't kick \002colors\002 anymore."));
 				}
 			}
@@ -257,7 +257,7 @@ class CommandBSKick : public Command
 					if (ci->floodsecs > Config->BSKeepData)
 						ci->floodsecs = Config->BSKeepData;
 
-					ci->botflags.SetFlag(BS_KICK_FLOOD);
+					ci->ExtendMetadata("BS_KICK_FLOOD");
 					if (ci->ttb[TTB_FLOOD])
 						source.Reply(_("Bot will now kick \002flood\002 (%d lines in %d seconds and\nwill place a ban after %d kicks for the same user."), ci->floodlines, ci->floodsecs, ci->ttb[TTB_FLOOD]);
 					else
@@ -265,7 +265,7 @@ class CommandBSKick : public Command
 				}
 				else
 				{
-					ci->botflags.UnsetFlag(BS_KICK_FLOOD);
+					ci->Shrink("BS_KICK_FLOOD");
 					source.Reply(_("Bot won't kick \002flood\002 anymore."));
 				}
 			}
@@ -302,7 +302,7 @@ class CommandBSKick : public Command
 					if (ci->repeattimes < 2)
 						ci->repeattimes = 3;
 
-					ci->botflags.SetFlag(BS_KICK_REPEAT);
+					ci->ExtendMetadata("BS_KICK_REPEAT");
 					if (ci->ttb[TTB_REPEAT])
 						source.Reply(_("Bot will now kick \002repeats\002 (users that say the\n"
 								"same thing %d times), and will place a ban after %d \n"
@@ -313,7 +313,7 @@ class CommandBSKick : public Command
 				}
 				else
 				{
-					ci->botflags.UnsetFlag(BS_KICK_REPEAT);
+					ci->Shrink("BS_KICK_REPEAT");
 					source.Reply(_("Bot won't kick \002repeats\002 anymore."));
 				}
 			}
@@ -338,7 +338,7 @@ class CommandBSKick : public Command
 					}
 					else
 						ci->ttb[TTB_REVERSES] = 0;
-					ci->botflags.SetFlag(BS_KICK_REVERSES);
+					ci->ExtendMetadata("BS_KICK_REVERSES");
 					if (ci->ttb[TTB_REVERSES])
 						source.Reply(_("Bot will now kick \002reverses\002, and will place a ban after %d\nkicks for the same user."), ci->ttb[TTB_REVERSES]);
 					else
@@ -346,7 +346,7 @@ class CommandBSKick : public Command
 				}
 				else
 				{
-					ci->botflags.UnsetFlag(BS_KICK_REVERSES);
+					ci->Shrink("BS_KICK_REVERSES");
 					source.Reply(_("Bot won't kick \002reverses\002 anymore."));
 				}
 			}
@@ -372,7 +372,7 @@ class CommandBSKick : public Command
 					else
 						ci->ttb[TTB_UNDERLINES] = 0;
 
-					ci->botflags.SetFlag(BS_KICK_UNDERLINES);
+					ci->ExtendMetadata("BS_KICK_UNDERLINES");
 					if (ci->ttb[TTB_UNDERLINES])
 						source.Reply(_("Bot will now kick \002underlines\002, and will place a ban after %d\nkicks for the same user."), ci->ttb[TTB_UNDERLINES]);
 					else
@@ -380,7 +380,7 @@ class CommandBSKick : public Command
 				}
 				else
 				{
-					ci->botflags.UnsetFlag(BS_KICK_UNDERLINES);
+					ci->Shrink("BS_KICK_UNDERLINES");
 					source.Reply(_("Bot won't kick \002underlines\002 anymore."));
 				}
 			}
@@ -406,7 +406,7 @@ class CommandBSKick : public Command
 					else
 						ci->ttb[TTB_ITALICS] = 0;
 
-					ci->botflags.SetFlag(BS_KICK_ITALICS);
+					ci->ExtendMetadata("BS_KICK_ITALICS");
 					if (ci->ttb[TTB_ITALICS])
 						source.Reply(_("Bot will now kick \002italics\002, and will place a ban after\n%d kicks for the same user."), ci->ttb[TTB_ITALICS]);
 					else
@@ -414,7 +414,7 @@ class CommandBSKick : public Command
 				}
 				else
 				{
-					ci->botflags.UnsetFlag(BS_KICK_ITALICS);
+					ci->Shrink("BS_KICK_ITALICS");
 					source.Reply(_("Bot won't kick \002italics\002 anymore."));
 				}
 			}
@@ -440,7 +440,7 @@ class CommandBSKick : public Command
 					else
 						ci->ttb[TTB_AMSGS] = 0;
 
-					ci->botflags.SetFlag(BS_KICK_AMSGS);
+					ci->ExtendMetadata("BS_KICK_AMSGS");
 					if (ci->ttb[TTB_AMSGS])
 						source.Reply(_("Bot will now kick for \002amsgs\002, and will place a ban after %d\nkicks for the same user."), ci->ttb[TTB_AMSGS]);
 					else
@@ -448,7 +448,7 @@ class CommandBSKick : public Command
 				}
 				else
 				{
-					ci->botflags.UnsetFlag(BS_KICK_AMSGS);
+					ci->Shrink("BS_KICK_AMSGS");
 					source.Reply(_("Bot won't kick for \002amsgs\002 anymore."));
 				}
 			}
@@ -741,7 +741,7 @@ class BSKick : public Module
 
 			Anope::string mask = ci->GetIdealBan(u);
 
-			ci->c->SetMode(NULL, CMODE_BAN, mask);
+			ci->c->SetMode(NULL, "BAN", mask);
 			FOREACH_MOD(I_OnBotBan, OnBotBan(u, ci, mask));
 		}
 	}
@@ -796,15 +796,11 @@ class BSKick : public Module
 		if (ci == NULL)
 			return;
 
-		bool Allow = true;
 		if (ci->AccessFor(u).HasPriv("NOKICK"))
-			Allow = false;
-		else if (ci->botflags.HasFlag(BS_DONTKICKOPS) && (c->HasUserStatus(u, CMODE_HALFOP) || c->HasUserStatus(u, CMODE_OP) || c->HasUserStatus(u, CMODE_PROTECT) || c->HasUserStatus(u, CMODE_OWNER)))
-			Allow = false;
-		else if (ci->botflags.HasFlag(BS_DONTKICKVOICES) && c->HasUserStatus(u, CMODE_VOICE))
-			Allow = false;
-
-		if (!Allow)
+			return;
+		else if (ci->HasExt("BS_DONTKICKOPS") && (c->HasUserStatus(u, "HALFOP") || c->HasUserStatus(u, "OP") || c->HasUserStatus(u, "PROTECT") || c->HasUserStatus(u, "OWNER")))
+			return;
+		else if (ci->HasExt("BS_DONTKICKVOICES") && c->HasUserStatus(u, "VOICE"))
 			return;
 
 		Anope::string realbuf = msg;
@@ -822,7 +818,7 @@ class BSKick : public Module
 			return;
 
 		/* Bolds kicker */
-		if (ci->botflags.HasFlag(BS_KICK_BOLDS) && realbuf.find(2) != Anope::string::npos)
+		if (ci->HasExt("BS_KICK_BOLDS") && realbuf.find(2) != Anope::string::npos)
 		{
 			check_ban(ci, u, TTB_BOLDS);
 			bot_kick(ci, u, _("Don't use bolds on this channel!"));
@@ -830,7 +826,7 @@ class BSKick : public Module
 		}
 
 		/* Color kicker */
-		if (ci->botflags.HasFlag(BS_KICK_COLORS) && realbuf.find(3) != Anope::string::npos)
+		if (ci->HasExt("BS_KICK_COLORS") && realbuf.find(3) != Anope::string::npos)
 		{
 			check_ban(ci, u, TTB_COLORS);
 			bot_kick(ci, u, _("Don't use colors on this channel!"));
@@ -838,7 +834,7 @@ class BSKick : public Module
 		}
 
 		/* Reverses kicker */
-		if (ci->botflags.HasFlag(BS_KICK_REVERSES) && realbuf.find(22) != Anope::string::npos)
+		if (ci->HasExt("BS_KICK_REVERSES") && realbuf.find(22) != Anope::string::npos)
 		{
 			check_ban(ci, u, TTB_REVERSES);
 			bot_kick(ci, u, _("Don't use reverses on this channel!"));
@@ -846,7 +842,7 @@ class BSKick : public Module
 		}
 
 		/* Italics kicker */
-		if (ci->botflags.HasFlag(BS_KICK_ITALICS) && realbuf.find(29) != Anope::string::npos)
+		if (ci->HasExt("BS_KICK_ITALICS") && realbuf.find(29) != Anope::string::npos)
 		{
 			check_ban(ci, u, TTB_ITALICS);
 			bot_kick(ci, u, _("Don't use italics on this channel!"));
@@ -854,7 +850,7 @@ class BSKick : public Module
 		}
 
 		/* Underlines kicker */
-		if (ci->botflags.HasFlag(BS_KICK_UNDERLINES) && realbuf.find(31) != Anope::string::npos)
+		if (ci->HasExt("BS_KICK_UNDERLINES") && realbuf.find(31) != Anope::string::npos)
 		{
 			check_ban(ci, u, TTB_UNDERLINES);
 			bot_kick(ci, u, _("Don't use underlines on this channel!"));
@@ -862,7 +858,7 @@ class BSKick : public Module
 		}
 
 		/* Caps kicker */
-		if (ci->botflags.HasFlag(BS_KICK_CAPS) && realbuf.length() >= static_cast<unsigned>(ci->capsmin))
+		if (ci->HasExt("BS_KICK_CAPS") && realbuf.length() >= static_cast<unsigned>(ci->capsmin))
 		{
 			int i = 0, l = 0;
 
@@ -888,7 +884,7 @@ class BSKick : public Module
 		}
 
 		/* Bad words kicker */
-		if (ci->botflags.HasFlag(BS_KICK_BADWORDS))
+		if (ci->HasExt("BS_KICK_BADWORDS"))
 		{
 			bool mustkick = false;
 
@@ -969,7 +965,7 @@ class BSKick : public Module
 		if (ud)
 		{
 			/* Flood kicker */
-			if (ci->botflags.HasFlag(BS_KICK_FLOOD))
+			if (ci->HasExt("BS_KICK_FLOOD"))
 			{
 				if (Anope::CurTime - ud->last_start > ci->floodsecs)
 				{
@@ -987,7 +983,7 @@ class BSKick : public Module
 			}
 
 			/* Repeat kicker */
-			if (ci->botflags.HasFlag(BS_KICK_REPEAT))
+			if (ci->HasExt("BS_KICK_REPEAT"))
 			{
 				if (!ud->lastline.equals_ci(realbuf))
 					ud->times = 0;
@@ -1009,7 +1005,7 @@ class BSKick : public Module
 					Channel *chan = (*it)->chan;
 					++it;
 
-					if (chan->ci && chan->ci->botflags.HasFlag(BS_KICK_AMSGS) && !chan->ci->AccessFor(u).HasPriv("NOKICK"))
+					if (chan->ci && chan->ci->HasExt("BS_KICK_AMSGS") && !chan->ci->AccessFor(u).HasPriv("NOKICK"))
 					{
 						check_ban(chan->ci, u, TTB_AMSGS);
 						bot_kick(chan->ci, u, _("Don't use AMSGs!"));

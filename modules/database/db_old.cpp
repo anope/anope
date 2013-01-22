@@ -461,37 +461,37 @@ static void LoadNicks()
 
 			READ(read_uint32(&uint, f));
 			if (uint & OLD_NI_KILLPROTECT)
-				nc->SetFlag(NI_KILLPROTECT);
+				nc->ExtendMetadata("KILLPROTECT");
 			if (uint & OLD_NI_SECURE)
-				nc->SetFlag(NI_SECURE);
+				nc->ExtendMetadata("SECURE");
 			if (uint & OLD_NI_MSG)
-				nc->SetFlag(NI_MSG);
+				nc->ExtendMetadata("MSG");
 			if (uint & OLD_NI_MEMO_HARDMAX)
-				nc->SetFlag(NI_MEMO_HARDMAX);
+				nc->ExtendMetadata("MEMO_HARDMAX");
 			if (uint & OLD_NI_MEMO_SIGNON)
-				nc->SetFlag(NI_MEMO_SIGNON);
+				nc->ExtendMetadata("MEMO_SIGNON");
 			if (uint & OLD_NI_MEMO_RECEIVE)
-				nc->SetFlag(NI_MEMO_RECEIVE);
+				nc->ExtendMetadata("MEMO_RECEIVE");
 			if (uint & OLD_NI_PRIVATE)
-				nc->SetFlag(NI_PRIVATE);
+				nc->ExtendMetadata("PRIVATE");
 			if (uint & OLD_NI_HIDE_EMAIL)
-				nc->SetFlag(NI_HIDE_EMAIL);
+				nc->ExtendMetadata("HIDE_EMAIL");
 			if (uint & OLD_NI_HIDE_MASK)
-				nc->SetFlag(NI_HIDE_MASK);
+				nc->ExtendMetadata("HIDE_MASK");
 			if (uint & OLD_NI_HIDE_QUIT)
-				nc->SetFlag(NI_HIDE_QUIT);
+				nc->ExtendMetadata("HIDE_QUIT");
 			if (uint & OLD_NI_KILL_QUICK)
-				nc->SetFlag(NI_KILL_QUICK);
+				nc->ExtendMetadata("KILL_QUICK");
 			if (uint & OLD_NI_KILL_IMMED)
-				nc->SetFlag(NI_KILL_IMMED);
+				nc->ExtendMetadata("KILL_IMMED");
 			if (uint & OLD_NI_MEMO_MAIL)
-				nc->SetFlag(NI_MEMO_MAIL);
+				nc->ExtendMetadata("MEMO_MAIL");
 			if (uint & OLD_NI_HIDE_STATUS)
-				nc->SetFlag(NI_HIDE_STATUS);
+				nc->ExtendMetadata("HIDE_STATUS");
 			if (uint & OLD_NI_SUSPENDED)
-				nc->SetFlag(NI_SUSPENDED);
+				nc->ExtendMetadata("SUSPENDED");
 			if (!(uint & OLD_NI_AUTOOP))
-				nc->SetFlag(NI_AUTOOP);
+				nc->ExtendMetadata("AUTOOP");
 
 			uint16_t u16;
 			READ(read_uint16(&u16, f));
@@ -609,7 +609,7 @@ static void LoadNicks()
 			na->last_seen = last_seen;
 
 			if (tmpu16 & OLD_NS_NO_EXPIRE)
-				na->SetFlag(NS_NO_EXPIRE);
+				na->ExtendMetadata("NO_EXPIRE");
 
 			Log(LOG_DEBUG) << "Loaded NickAlias " << na->nick;
 		}
@@ -675,7 +675,7 @@ static void LoadBots()
 		bi->created = created;
 
 		if (flags & OLD_BI_PRIVATE)
-			bi->SetFlag(BI_PRIVATE);
+			bi->ExtendMetadata("PRIVATE");
 
 		Log(LOG_DEBUG) << "Loaded bot " << bi->nick;
 	}
@@ -730,31 +730,31 @@ static void LoadChannels()
 			// Temporary flags cleanup
 			tmpu32 &= ~0x80000000;
 			if (tmpu32 & OLD_CI_KEEPTOPIC)
-				ci->SetFlag(CI_KEEPTOPIC);
+				ci->ExtendMetadata("KEEPTOPIC");
 			if (tmpu32 & OLD_CI_SECUREOPS)
-				ci->SetFlag(CI_SECUREOPS);
+				ci->ExtendMetadata("SECUREOPS");
 			if (tmpu32 & OLD_CI_PRIVATE)
-				ci->SetFlag(CI_PRIVATE);
+				ci->ExtendMetadata("PRIVATE");
 			if (tmpu32 & OLD_CI_TOPICLOCK)
-				ci->SetFlag(CI_TOPICLOCK);
+				ci->ExtendMetadata("TOPICLOCK");
 			if (tmpu32 & OLD_CI_RESTRICTED)
-				ci->SetFlag(CI_RESTRICTED);
+				ci->ExtendMetadata("RESTRICTED");
 			if (tmpu32 & OLD_CI_PEACE)
-				ci->SetFlag(CI_PEACE);
+				ci->ExtendMetadata("PEACE");
 			if (tmpu32 & OLD_CI_SECURE)
-				ci->SetFlag(CI_SECURE);
+				ci->ExtendMetadata("SECURE");
 			if (tmpu32 & OLD_CI_NO_EXPIRE)
-				ci->SetFlag(CI_NO_EXPIRE);
+				ci->ExtendMetadata("NO_EXPIRE");
 			if (tmpu32 & OLD_CI_MEMO_HARDMAX)
-				ci->SetFlag(CI_MEMO_HARDMAX);
+				ci->ExtendMetadata("MEMO_HARDMAX");
 			if (tmpu32 & OLD_CI_SECUREFOUNDER)
-				ci->SetFlag(CI_SECUREFOUNDER);
+				ci->ExtendMetadata("SECUREFOUNDER");
 			if (tmpu32 & OLD_CI_SIGNKICK)
-				ci->SetFlag(CI_SIGNKICK);
+				ci->ExtendMetadata("SIGNKICK");
 			if (tmpu32 & OLD_CI_SIGNKICK_LEVEL)
-				ci->SetFlag(CI_SIGNKICK_LEVEL);
+				ci->ExtendMetadata("SIGNKICK_LEVEL");
 			if (tmpu32 & OLD_CI_SUSPENDED)
-				ci->SetFlag(CI_SUSPENDED);
+				ci->ExtendMetadata("SUSPENDED");
 
 			READ(read_string(buffer, f));
 			READ(read_string(buffer, f));
@@ -775,7 +775,7 @@ static void LoadChannels()
 					level = ACCESS_FOUNDER;
 
 				if (j == 10 && level < 0) // NOJOIN
-					ci->UnsetFlag(CI_RESTRICTED); // If CSDefRestricted was enabled this can happen
+					ci->Shrink("RESTRICTED"); // If CSDefRestricted was enabled this can happen
 
 				ci->SetLevel(GetLevelName(j), level);
 			}
@@ -865,31 +865,31 @@ static void LoadChannels()
 
 			READ(read_int32(&tmp32, f));
 			if (tmp32 & OLD_BS_DONTKICKOPS)
-				ci->botflags.SetFlag(BS_DONTKICKOPS);
+				ci->ExtendMetadata("BS_DONTKICKOPS");
 			if (tmp32 & OLD_BS_DONTKICKVOICES)
-				ci->botflags.SetFlag(BS_DONTKICKVOICES);
+				ci->ExtendMetadata("BS_DONTKICKVOICES");
 			if (tmp32 & OLD_BS_FANTASY)
-				ci->botflags.SetFlag(BS_FANTASY);
+				ci->ExtendMetadata("BS_FANTASY");
 			if (tmp32 & OLD_BS_GREET)
-				ci->botflags.SetFlag(BS_GREET);
+				ci->ExtendMetadata("BS_GREET");
 			if (tmp32 & OLD_BS_NOBOT)
-				ci->botflags.SetFlag(BS_NOBOT);
+				ci->ExtendMetadata("BS_NOBOT");
 			if (tmp32 & OLD_BS_KICK_BOLDS)
-				ci->botflags.SetFlag(BS_KICK_BOLDS);
+				ci->ExtendMetadata("BS_KICK_BOLDS");
 			if (tmp32 & OLD_BS_KICK_COLORS)
-				ci->botflags.SetFlag(BS_KICK_COLORS);
+				ci->ExtendMetadata("BS_KICK_COLORS");
 			if (tmp32 & OLD_BS_KICK_REVERSES)
-				ci->botflags.SetFlag(BS_KICK_REVERSES);
+				ci->ExtendMetadata("BS_KICK_REVERSES");
 			if (tmp32 & OLD_BS_KICK_UNDERLINES)
-				ci->botflags.SetFlag(BS_KICK_UNDERLINES);
+				ci->ExtendMetadata("BS_KICK_UNDERLINES");
 			if (tmp32 & OLD_BS_KICK_BADWORDS)
-				ci->botflags.SetFlag(BS_KICK_BADWORDS);
+				ci->ExtendMetadata("BS_KICK_BADWORDS");
 			if (tmp32 & OLD_BS_KICK_CAPS)
-				ci->botflags.SetFlag(BS_KICK_CAPS);
+				ci->ExtendMetadata("BS_KICK_CAPS");
 			if (tmp32 & OLD_BS_KICK_FLOOD)
-				ci->botflags.SetFlag(BS_KICK_FLOOD);
+				ci->ExtendMetadata("BS_KICK_FLOOD");
 			if (tmp32 & OLD_BS_KICK_REPEAT)
-				ci->botflags.SetFlag(BS_KICK_REPEAT);
+				ci->ExtendMetadata("BS_KICK_REPEAT");
 
 			READ(read_int16(&tmp16, f));
 			for (int16_t j = 0; j < tmp16; ++j)

@@ -25,79 +25,19 @@ typedef Anope::hash_map<NickCore *> nickcore_map;
 extern CoreExport Serialize::Checker<nickalias_map> NickAliasList;
 extern CoreExport Serialize::Checker<nickcore_map> NickCoreList;
 
-/** Flags set on NickAliases
- */
-enum NickNameFlag
-{
-	NS_BEGIN,
-
-	/* Nick never expires */
-	NS_NO_EXPIRE,
-	/* This nick is being held after a kill by an enforcer client
-	 * or is being SVSHeld. Used by ns_release to determin if something
-	 * should be allowed to be released
-	 */
-	NS_HELD,
-	/* We are taking over this nick, either by SVSNICK or KILL.
-	 * We are waiting for the confirmation of either of these actions to
-	 * proceed. This is checked in NickAlias::OnCancel
-	 */
-	NS_COLLIDED,
-
-	NS_END
-};
-
-/** Flags set on NickCores
- */
-enum NickCoreFlag
-{
-	NI_BEGIN,
-
-	/* Kill others who take this nick */
-	NI_KILLPROTECT,
-	/* Dont recognize unless IDENTIFIED */
-	NI_SECURE,
-	/* Use PRIVMSG instead of NOTICE */
-	NI_MSG,
-	/* Don't allow user to change memo limit */
-	NI_MEMO_HARDMAX,
-	/* Notify of memos at signon and un-away */
-	NI_MEMO_SIGNON,
-	/* Notify of new memos when sent */
-	NI_MEMO_RECEIVE,
-	/* Don't show in LIST to non-servadmins */
-	NI_PRIVATE,
-	/* Don't show email in INFO */
-	NI_HIDE_EMAIL,
-	/* Don't show last seen address in INFO */
-	NI_HIDE_MASK,
-	/* Don't show last quit message in INFO */
-	NI_HIDE_QUIT,
-	/* Kill in 20 seconds instead of in 60 */
-	NI_KILL_QUICK,
-	/* Kill immediatly */
-	NI_KILL_IMMED,
-	/* User gets email on memo */
-	NI_MEMO_MAIL,
-	/* Don't show services access status */
-	NI_HIDE_STATUS,
-	/* Nickname is suspended */
-	NI_SUSPENDED,
-	/* Autoop nickname in channels */
-	NI_AUTOOP,
-	/* If set means the nick core does not have their email addrses confirmed.
-	 */
-	NI_UNCONFIRMED,
-	/* Chanstats are enabled for this user */
-	NI_STATS,
-
-	NI_END
-};
-
 /* A registered nickname.
  * It matters that Base is here before Extensible (it is inherited by Serializable) 
+ *
+ * Possible flags:
+ *     NO_EXPIRE - Nick never expires
+ *     HELD      - This nick is being held after a kill by an enforcer client
+ *                    or is being SVSHeld.
+ *     COLLIDED  - We are taking over this nick, either by SVSNICK or KILL
+ *                    and are waiting for the confirmation of either of these actions to
+ *                    proceed. This is checked in NickAlias::OnCancel
+ *
  */
-class CoreExport NickAlias : public Serializable, public Extensible, public Flags<NickNameFlag>
+class CoreExport NickAlias : public Serializable, public Extensible
 {
 	Anope::string vhost_ident, vhost_host, vhost_creator;
 	time_t vhost_created;
@@ -184,8 +124,28 @@ class CoreExport NickAlias : public Serializable, public Extensible, public Flag
 /* A registered account. Each account must have a NickAlias with the same nick as the
  * account's display.
  * It matters that Base is here before Extensible (it is inherited by Serializable)
+ *
+ * Possible flags:
+ *     KILLPROTECT   - Kill other users who try to take this nick
+ *     SECURE        - Don't recognize unless identified
+ *     MSG           - Use PRIVMSG instead of notice
+ *     MEMO_HARDMAX  - Don't allow user to change memo limit
+ *     MEMO_SIGNON   - Notify of memos at signon and unaway
+ *     MEMO_RECEIEVE - Notify of new memos when sent
+ *     PRIVATE       - Don't show in LIST to non-servadmins
+ *     HIDE_EMAIL    - Don't show email in INFO
+ *     HIDE_MASK     - Don't show last seen address in INFO
+ *     HIDE_QUIT     - Don't show last quit message in INFO
+ *     KILL_QUICK    - Kill quicker
+ *     KILL_IMMED    - Kill immediately
+ *     MEMO_MAIL     - User gets email on memo
+ *     HIDE_STATUS   - Don't show services access status
+ *     SUSPEND       - Nickname is suspended
+ *     AUTOOP        - Autoop nickname in channels
+ *     UNCONFIRMED   - Account has not had email address confirmed
+ *     STATS         - ChanStats is enabled for this user
  */
-class CoreExport NickCore : public Serializable, public Extensible, public Flags<NickCoreFlag>
+class CoreExport NickCore : public Serializable, public Extensible
 {
  public:
  	/* Name of the account. Find(display)->nc == this. */

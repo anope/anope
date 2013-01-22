@@ -89,7 +89,7 @@ class MyMemoServService : public MemoServService
 		m->sender = source;
 		m->time = Anope::CurTime;
 		m->text = message;
-		m->SetFlag(MF_UNREAD);
+		m->unread = true;
 
 		FOREACH_MOD(I_OnMemoSend, OnMemoSend(source, target, mi, m));
 
@@ -105,7 +105,7 @@ class MyMemoServService : public MemoServService
 
 					if (ci->AccessFor(cu->user).HasPriv("MEMO"))
 					{
-						if (cu->user->Account() && cu->user->Account()->HasFlag(NI_MEMO_RECEIVE))
+						if (cu->user->Account() && cu->user->Account()->HasExt("MEMO_RECEIVE"))
 							cu->user->SendMessage(MemoServ, MEMO_NEW_X_MEMO_ARRIVED, ci->name.c_str(), Config->UseStrictPrivMsgString.c_str(), Config->MemoServ.c_str(), ci->name.c_str(), mi->memos->size());
 					}
 				}
@@ -115,7 +115,7 @@ class MyMemoServService : public MemoServService
 		{
 			NickCore *nc = NickAlias::Find(target)->nc;
 
-			if (nc->HasFlag(NI_MEMO_RECEIVE))
+			if (nc->HasExt("MEMO_RECEIVE"))
 			{
 				for (std::list<Serialize::Reference<NickAlias> >::const_iterator it = nc->aliases.begin(), it_end = nc->aliases.end(); it != it_end;)
 				{
@@ -129,7 +129,7 @@ class MyMemoServService : public MemoServService
 			}
 
 			/* let's get out the mail if set in the nickcore - certus */
-			if (nc->HasFlag(NI_MEMO_MAIL))
+			if (nc->HasExt("MEMO_MAIL"))
 				SendMemoMail(nc, mi, m);
 		}
 
@@ -144,7 +144,7 @@ class MyMemoServService : public MemoServService
 
 		unsigned i = 0, end = nc->memos.memos->size(), newcnt = 0;
 		for (; i < end; ++i)
-			if (nc->memos.GetMemo(i)->HasFlag(MF_UNREAD))
+			if (nc->memos.GetMemo(i)->unread)
 				++newcnt;
 		if (newcnt > 0)
 			u->SendMessage(MemoServ, newcnt == 1 ? _("You have 1 new memo.") : _("You have %d new memos."), newcnt);

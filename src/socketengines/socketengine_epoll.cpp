@@ -40,23 +40,20 @@ void SocketEngine::Shutdown()
 
 void SocketEngine::Change(Socket *s, bool set, SocketFlag flag)
 {
-	if (set == s->HasFlag(flag))
+	if (set == s->flags[flag])
 		return;
 
-	bool before_registered = s->HasFlag(SF_READABLE) || s->HasFlag(SF_WRITABLE);
+	bool before_registered = s->flags[SF_READABLE] || s->flags[SF_WRITABLE];
 
-	if (set)
-		s->SetFlag(flag);
-	else
-		s->UnsetFlag(flag);
+	s->flags[flag] = set;
 	
-	bool now_registered = s->HasFlag(SF_READABLE) || s->HasFlag(SF_WRITABLE);
+	bool now_registered = s->flags[SF_READABLE] || s->flags[SF_WRITABLE];
 
 	epoll_event ev;
 
 	memset(&ev, 0, sizeof(ev));
 
-	ev.events = (s->HasFlag(SF_READABLE) ? EPOLLIN : 0) | (s->HasFlag(SF_WRITABLE) ? EPOLLOUT : 0);
+	ev.events = (s->flags[SF_READABLE] ? EPOLLIN : 0) | (s->flags[SF_WRITABLE] ? EPOLLOUT : 0);
 	ev.data.fd = s->GetFD();
 
 	int mod;
@@ -107,18 +104,18 @@ void SocketEngine::Process()
 
 		if (!s->Process())
 		{
-			if (s->HasFlag(SF_DEAD))
+			if (s->flags[SF_DEAD])
 				delete s;
 			continue;
 		}
 
 		if ((ev.events & EPOLLIN) && !s->ProcessRead())
-			s->SetFlag(SF_DEAD);
+			s->flags[SF_DEAD] = true;
 
 		if ((ev.events & EPOLLOUT) && !s->ProcessWrite())
-			s->SetFlag(SF_DEAD);
+			s->flags[SF_DEAD] = true;
 
-		if (s->HasFlag(SF_DEAD))
+		if (s->flags[SF_DEAD])
 			delete s;
 	}
 }

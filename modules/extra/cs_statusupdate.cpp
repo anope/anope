@@ -10,14 +10,14 @@
 static struct ModeInfo
 {
 	Anope::string priv;
-	ChannelModeName name;
+	Anope::string name;
 } modeInfo[] = {
-	{ "AUTOOWNER", CMODE_OWNER },
-	{ "AUTOPROTECT", CMODE_PROTECT },
-	{ "AUTOOP", CMODE_OP },
-	{ "AUTOHALFOP", CMODE_HALFOP },
-	{ "AUTOVOICE", CMODE_VOICE },
-	{ "", CMODE_END }
+	{ "AUTOOWNER", "OWNER" },
+	{ "AUTOPROTECT", "PROTECT" },
+	{ "AUTOOP", "OP" },
+	{ "AUTOHALFOP", "HALFOP" },
+	{ "AUTOVOICE", "VOICE" },
+	{ "", "" }
 };
 
 class StatusUpdate : public Module

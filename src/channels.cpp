@@ -26,9 +26,6 @@
 
 channel_map ChannelList;
 
-static const Anope::string ChannelFlagString[] = { "CH_INABIT", "CH_PERSIST", "CH_SYNCING", "" };
-template<> const Anope::string* Flags<ChannelFlag>::flags_strings = ChannelFlagString;
-
 Channel::Channel(const Anope::string &nname, time_t ts)
 {
 	if (nname.empty())
@@ -76,8 +73,8 @@ void Channel::Reset()
 	{
 		ChanUserContainer *uc = *it;
 
-		ChannelStatus flags = uc->status;
-		uc->status.ClearFlags();
+		ChannelStatus f = uc->status;
+		uc->status.modes.clear();
 
 		if (BotInfo::Find(uc->user->nick))
 		{
@@ -85,7 +82,7 @@ void Channel::Reset()
 			{
 				ChannelMode *cm = ModeManager::ChannelModes[i];
 
-				if (flags.HasFlag(cm->name))
+				if (f.modes.count(cm->name))
 					 this->SetMode(NULL, cm, uc->user->GetUID(), false);
 			}
 		}
@@ -102,7 +99,7 @@ void Channel::Reset()
 
 void Channel::Sync()
 {
-	if (!this->HasMode(CMODE_PERM) && (this->users.empty() || (this->users.size() == 1 && this->ci && this->ci->bi && *this->ci->bi == this->users.front()->user)))
+	if (!this->HasMode("PERM") && (this->users.empty() || (this->users.size() == 1 && this->ci && this->ci->bi && *this->ci->bi == this->users.front()->user)))
 	{
 		this->Hold();
 	}
@@ -191,7 +188,7 @@ ChanUserContainer* Channel::JoinUser(User *user)
 	user->chans.push_back(cuc);
 	this->users.push_back(cuc);
 
-	if (this->ci && this->ci->HasFlag(CI_PERSIST) && this->creation_time > this->ci->time_registered)
+	if (this->ci && this->ci->HasExt("PERSIST") && this->creation_time > this->ci->time_registered)
 	{
 		Log(LOG_DEBUG) << "Changing TS of " << this->name << " from " << this->creation_time << " to " << this->ci->time_registered;
 		this->creation_time = this->ci->time_registered;
@@ -231,17 +228,17 @@ void Channel::DeleteUser(User *user)
 	delete cul;
 
 	/* Channel is persistent, it shouldn't be deleted and the service bot should stay */
-	if (this->HasFlag(CH_PERSIST) || (this->ci && this->ci->HasFlag(CI_PERSIST)))
+	if (this->HasExt("PERSIST") || (this->ci && this->ci->HasExt("PERSIST")))
 		return;
 
 	/* Channel is syncing from a netburst, don't destroy it as more users are probably wanting to join immediatly
 	 * We also don't part the bot here either, if necessary we will part it after the sync
 	 */
-	if (this->HasFlag(CH_SYNCING))
+	if (this->HasExt("SYNCING"))
 		return;
 
 	/* Additionally, do not delete this channel if ChanServ/a BotServ bot is inhabiting it */
-	if (this->HasFlag(CH_INHABIT))
+	if (this->HasExt("INHABIT"))
 		return;
 
 	if (this->users.empty())
@@ -258,39 +255,39 @@ ChanUserContainer *Channel::FindUser(const User *u) const
 
 bool Channel::HasUserStatus(const User *u, ChannelModeStatus *cms) const
 {
-	if (!u || (cms && cms->type != MODE_STATUS))
-		throw CoreException("Channel::HasUserStatus got bad mode");
+	if (!cms)
+		return false;
 
 	/* Usually its more efficient to search the users channels than the channels users */
 	ChanUserContainer *cc = u->FindChannel(this);
 	if (cc)
 	{
 		if (cms)
-			return cc->status.HasFlag(cms->name);
+			return cc->status.modes.count(cms->name);
 		else
-			return !cc->status.FlagCount();
+			return cc->status.modes.empty();
 	}
 
 	return false;
 }
 
-bool Channel::HasUserStatus(const User *u, ChannelModeName Name) const
+bool Channel::HasUserStatus(const User *u, const Anope::string &mname) const
 {
-	return HasUserStatus(u, anope_dynamic_static_cast<ChannelModeStatus *>(ModeManager::FindChannelModeByName(Name)));
+	return HasUserStatus(u, anope_dynamic_static_cast<ChannelModeStatus *>(ModeManager::FindChannelModeByName(mname)));
 }
 
-size_t Channel::HasMode(ChannelModeName Name, const Anope::string &param)
+size_t Channel::HasMode(const Anope::string &mname, const Anope::string &param)
 {
 	if (param.empty())
-		return modes.count(Name);
-	std::pair<Channel::ModeList::iterator, Channel::ModeList::iterator> its = this->GetModeList(Name);
+		return modes.count(mname);
+	std::pair<Channel::ModeList::iterator, Channel::ModeList::iterator> its = this->GetModeList(mname);
 	for (; its.first != its.second; ++its.first)
 		if (its.first->second == param)
 			return 1;
 	return 0;
 }
 
-std::pair<Channel::ModeList::iterator, Channel::ModeList::iterator> Channel::GetModeList(ChannelModeName mname)
+std::pair<Channel::ModeList::iterator, Channel::ModeList::iterator> Channel::GetModeList(const Anope::string &mname)
 {
 	Channel::ModeList::iterator it = this->modes.find(mname), it_end = it;
 	if (it != this->modes.end())
@@ -328,7 +325,7 @@ void Channel::SetModeInternal(MessageSource &setter, ChannelMode *cm, const Anop
 		/* Set the status on the user */
 		ChanUserContainer *cc = u->FindChannel(this);
 		if (cc)
-			cc->status.SetFlag(cm->name);
+			cc->status.modes.insert(cm->name);
 
 		/* Enforce secureops, etc */
 		if (enforce_mlock)
@@ -353,11 +350,11 @@ void Channel::SetModeInternal(MessageSource &setter, ChannelMode *cm, const Anop
 	}
 
 	/* Channel mode +P or so was set, mark this channel as persistent */
-	if (cm->name == CMODE_PERM)
+	if (cm->name == "PERM")
 	{
-		this->SetFlag(CH_PERSIST);
+		this->Extend("PERSIST");
 		if (this->ci)
-			this->ci->SetFlag(CI_PERSIST);
+			this->ci->ExtendMetadata("PERSIST");
 	}
 
 	/* Check if we should enforce mlock */
@@ -398,14 +395,14 @@ void Channel::RemoveModeInternal(MessageSource &setter, ChannelMode *cm, const A
 		/* Remove the status on the user */
 		ChanUserContainer *cc = u->FindChannel(this);
 		if (cc)
-			cc->status.UnsetFlag(cm->name);
+			cc->status.modes.erase(cm->name);
 
 		if (enforce_mlock)
 		{
 			/* Reset modes on bots if we're supposed to */
 			if (this->ci && this->ci->bi && this->ci->bi == bi)
 			{
-				if (ModeManager::DefaultBotModes.HasFlag(cm->name))
+				if (ModeManager::DefaultBotModes.modes.count(cm->name))
 					this->SetMode(bi, cm, bi->GetUID());
 			}
 
@@ -433,12 +430,12 @@ void Channel::RemoveModeInternal(MessageSource &setter, ChannelMode *cm, const A
 		cml->OnDel(this, param);
 	}
 
-	if (cm->name == CMODE_PERM)
+	if (cm->name == "PERM")
 	{
-		this->UnsetFlag(CH_PERSIST);
+		this->Shrink("PERSIST");
 
 		if (this->ci)
-			this->ci->UnsetFlag(CI_PERSIST);
+			this->ci->Shrink("PERSIST");
 
 		if (this->users.empty())
 		{
@@ -490,9 +487,9 @@ void Channel::SetMode(BotInfo *bi, ChannelMode *cm, const Anope::string &param, 
 	SetModeInternal(ms, cm, param, enforce_mlock);
 }
 
-void Channel::SetMode(BotInfo *bi, ChannelModeName Name, const Anope::string &param, bool enforce_mlock)
+void Channel::SetMode(BotInfo *bi, const Anope::string &mname, const Anope::string &param, bool enforce_mlock)
 {
-	SetMode(bi, ModeManager::FindChannelModeByName(Name), param, enforce_mlock);
+	SetMode(bi, ModeManager::FindChannelModeByName(mname), param, enforce_mlock);
 }
 
 void Channel::RemoveMode(BotInfo *bi, ChannelMode *cm, const Anope::string &param, bool enforce_mlock)
@@ -530,20 +527,20 @@ void Channel::RemoveMode(BotInfo *bi, ChannelMode *cm, const Anope::string &para
 	RemoveModeInternal(ms, cm, realparam, enforce_mlock);
 }
 
-void Channel::RemoveMode(BotInfo *bi, ChannelModeName Name, const Anope::string &param, bool enforce_mlock)
+void Channel::RemoveMode(BotInfo *bi, const Anope::string &mname, const Anope::string &param, bool enforce_mlock)
 {
-	RemoveMode(bi, ModeManager::FindChannelModeByName(Name), param, enforce_mlock);
+	RemoveMode(bi, ModeManager::FindChannelModeByName(mname), param, enforce_mlock);
 }
 
-bool Channel::GetParam(ChannelModeName Name, Anope::string &Target) const
+bool Channel::GetParam(const Anope::string &mname, Anope::string &target) const
 {
-	std::multimap<ChannelModeName, Anope::string>::const_iterator it = this->modes.find(Name);
+	std::multimap<Anope::string, Anope::string>::const_iterator it = this->modes.find(mname);
 
-	Target.clear();
+	target.clear();
 
 	if (it != this->modes.end())
 	{
-		Target = it->second;
+		target = it->second;
 		return true;
 	}
 
@@ -728,7 +725,7 @@ void Channel::SetModesInternal(MessageSource &source, const Anope::string &mode,
 		this->CheckModes();
 }
 
-bool Channel::MatchesList(User *u, ChannelModeName mode)
+bool Channel::MatchesList(User *u, const Anope::string &mode)
 {
 	if (!this->HasMode(mode))
 		return false;
@@ -770,7 +767,7 @@ void Channel::KickInternal(MessageSource &source, const Anope::string &nick, con
 	{
 		FOREACH_MOD(I_OnUserKicked, OnUserKicked(this, target, source, reason));
 		if (bi)
-			this->SetFlag(CH_INHABIT);
+			this->Extend("INHABIT");
 		this->DeleteUser(target);
 	}
 	else
@@ -780,7 +777,7 @@ void Channel::KickInternal(MessageSource &source, const Anope::string &nick, con
 	if (bi)
 	{
 		bi->Join(this, &ModeManager::DefaultBotModes);
-		this->UnsetFlag(CH_INHABIT);
+		this->Shrink("INHABIT");
 	}
 }
 
@@ -817,7 +814,7 @@ Anope::string Channel::GetModes(bool complete, bool plus)
 {
 	Anope::string res, params;
 
-	for (std::multimap<ChannelModeName, Anope::string>::const_iterator it = this->modes.begin(), it_end = this->modes.end(); it != it_end; ++it)
+	for (std::multimap<Anope::string, Anope::string>::const_iterator it = this->modes.begin(), it_end = this->modes.end(); it != it_end; ++it)
 	{
 		ChannelMode *cm = ModeManager::FindChannelModeByName(it->first);
 		if (!cm || cm->type == MODE_LIST)
@@ -893,7 +890,7 @@ void Channel::Hold()
 		{
 			if (!ChanServ || !c)
 				return;
-			c->SetFlag(CH_INHABIT);
+			c->Extend("INHABIT");
 			if (!c->ci || !c->ci->bi)
 				ChanServ->Join(c);
 			else if (!c->FindUser(c->ci->bi))
@@ -908,7 +905,7 @@ void Channel::Hold()
 			if (!c)
 				return;
 
-			c->UnsetFlag(CH_INHABIT);
+			c->Shrink("INHABIT");
 
 			if (!c->ci || !c->ci->bi)
 			{
@@ -925,11 +922,11 @@ void Channel::Hold()
 
 void Channel::SetCorrectModes(User *user, bool give_modes, bool check_noop)
 {
-	ChannelMode *owner = ModeManager::FindChannelModeByName(CMODE_OWNER),
-		*admin = ModeManager::FindChannelModeByName(CMODE_PROTECT),
-		*op = ModeManager::FindChannelModeByName(CMODE_OP),
-		*halfop = ModeManager::FindChannelModeByName(CMODE_HALFOP),
-		*voice = ModeManager::FindChannelModeByName(CMODE_VOICE);
+	ChannelMode *owner = ModeManager::FindChannelModeByName("OWNER"),
+		*admin = ModeManager::FindChannelModeByName("PROTECT"),
+		*op = ModeManager::FindChannelModeByName("OP"),
+		*halfop = ModeManager::FindChannelModeByName("HALFOP"),
+		*voice = ModeManager::FindChannelModeByName("VOICE");
 
 	if (user == NULL)
 		return;
@@ -941,34 +938,34 @@ void Channel::SetCorrectModes(User *user, bool give_modes, bool check_noop)
 
 	AccessGroup u_access = ci->AccessFor(user);
 
-	if (give_modes && (!user->Account() || user->Account()->HasFlag(NI_AUTOOP)) && (!check_noop || !ci->HasFlag(CI_NOAUTOOP)))
+	if (give_modes && (!user->Account() || user->Account()->HasExt("AUTOOP")) && (!check_noop || !ci->HasExt("NOAUTOOP")))
 	{
 		if (owner && u_access.HasPriv("AUTOOWNER"))
-			this->SetMode(NULL, CMODE_OWNER, user->GetUID());
+			this->SetMode(NULL, "OWNER", user->GetUID());
 		else if (admin && u_access.HasPriv("AUTOPROTECT"))
-			this->SetMode(NULL, CMODE_PROTECT, user->GetUID());
+			this->SetMode(NULL, "PROTECT", user->GetUID());
 
 		if (op && u_access.HasPriv("AUTOOP"))
-			this->SetMode(NULL, CMODE_OP, user->GetUID());
+			this->SetMode(NULL, "OP", user->GetUID());
 		else if (halfop && u_access.HasPriv("AUTOHALFOP"))
-			this->SetMode(NULL, CMODE_HALFOP, user->GetUID());
+			this->SetMode(NULL, "HALFOP", user->GetUID());
 		else if (voice && u_access.HasPriv("AUTOVOICE"))
-			this->SetMode(NULL, CMODE_VOICE, user->GetUID());
+			this->SetMode(NULL, "VOICE", user->GetUID());
 	}
 	/* If this channel has secureops or the channel is syncing and they are not ulined, check to remove modes */
-	if ((ci->HasFlag(CI_SECUREOPS) || (this->HasFlag(CH_SYNCING) && user->server->IsSynced())) && !user->server->IsULined())
+	if ((ci->HasExt("SECUREOPS") || (this->HasExt("SYNCING") && user->server->IsSynced())) && !user->server->IsULined())
 	{
 		if (owner && !u_access.HasPriv("AUTOOWNER") && !u_access.HasPriv("OWNERME"))
-			this->RemoveMode(NULL, CMODE_OWNER, user->GetUID());
+			this->RemoveMode(NULL, "OWNER", user->GetUID());
 
 		if (admin && !u_access.HasPriv("AUTOPROTECT") && !u_access.HasPriv("PROTECTME"))
-			this->RemoveMode(NULL, CMODE_PROTECT, user->GetUID());
+			this->RemoveMode(NULL, "PROTECT", user->GetUID());
 
-		if (op && this->HasUserStatus(user, CMODE_OP) && !u_access.HasPriv("AUTOOP") && !u_access.HasPriv("OPDEOPME"))
-			this->RemoveMode(NULL, CMODE_OP, user->GetUID());
+		if (op && this->HasUserStatus(user, "OP") && !u_access.HasPriv("AUTOOP") && !u_access.HasPriv("OPDEOPME"))
+			this->RemoveMode(NULL, "OP", user->GetUID());
 
 		if (halfop && !u_access.HasPriv("AUTOHALFOP") && !u_access.HasPriv("HALFOPME"))
-			this->RemoveMode(NULL, CMODE_HALFOP, user->GetUID());
+			this->RemoveMode(NULL, "HALFOP", user->GetUID());
 	}
 
 	// Check mlock
@@ -994,16 +991,16 @@ void Channel::SetCorrectModes(User *user, bool give_modes, bool check_noop)
 
 void Channel::Unban(const User *u, bool full)
 {
-	if (!this->HasMode(CMODE_BAN))
+	if (!this->HasMode("BAN"))
 		return;
 
-	std::pair<Channel::ModeList::iterator, Channel::ModeList::iterator> bans = this->GetModeList(CMODE_BAN);
+	std::pair<Channel::ModeList::iterator, Channel::ModeList::iterator> bans = this->GetModeList("BAN");
 	for (; bans.first != bans.second;)
 	{
-		Entry ban(CMODE_BAN, bans.first->second);
+		Entry ban("BAN", bans.first->second);
 		++bans.first;
 		if (ban.Matches(u, full))
-			this->RemoveMode(NULL, CMODE_BAN, ban.GetMask());
+			this->RemoveMode(NULL, "BAN", ban.GetMask());
 	}
 }
 

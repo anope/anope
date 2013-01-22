@@ -22,14 +22,14 @@ class HelpChannel : public Module
 		OnReload();
 	}
 
-	EventReturn OnChannelModeSet(Channel *c, MessageSource &setter, ChannelModeName Name, const Anope::string &param) anope_override
+	EventReturn OnChannelModeSet(Channel *c, MessageSource &setter, const Anope::string &mname, const Anope::string &param) anope_override
 	{
-		if (Name == CMODE_OP && c && c->ci && c->name.equals_ci(this->HelpChan))
+		if (mname == "OP" && c && c->ci && c->name.equals_ci(this->HelpChan))
 		{
 			User *u = User::Find(param);
 
 			if (u && c->ci->AccessFor(u).HasPriv("OPDEOPME"))
-				u->SetMode(OperServ, UMODE_HELPOP);
+				u->SetMode(OperServ, "HELPOP");
 		}
 
 		return EVENT_CONTINUE;

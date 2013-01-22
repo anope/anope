@@ -118,13 +118,14 @@ class SocketException : public CoreException
 
 enum SocketFlag
 {
-	SF_DEAD,
+	SF_DEAD = 1,
 	SF_READABLE,
 	SF_WRITABLE,
 	SF_CONNECTING,
 	SF_CONNECTED,
 	SF_ACCEPTING,
-	SF_ACCEPTED
+	SF_ACCEPTED,
+	SF_SIZE
 };
 
 class CoreExport SocketIO
@@ -185,7 +186,7 @@ class CoreExport SocketIO
 	virtual void Destroy() { }
 };
 
-class CoreExport Socket : public Flags<SocketFlag>
+class CoreExport Socket
 {
  protected:
 	/* Socket FD */
@@ -194,6 +195,8 @@ class CoreExport Socket : public Flags<SocketFlag>
 	bool ipv6;
 
  public:
+ 	std::bitset<SF_SIZE> flags;
+
 	/* Sockaddrs for bind() (if it's bound) */
 	sockaddrs bindaddr;
 

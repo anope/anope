@@ -40,7 +40,7 @@ class CommandCSGetKey : public Command
 		}
 
 		Anope::string key;
-		if (!ci->c || !ci->c->GetParam(CMODE_KEY, key))
+		if (!ci->c || !ci->c->GetParam("KEY", key))
 		{
 			source.Reply(_("Channel \002%s\002 has no key."), chan.c_str());
 			return;

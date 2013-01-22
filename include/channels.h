@@ -40,10 +40,10 @@ enum ChannelFlag
 	CH_SYNCING
 };
 
-class CoreExport Channel : public Base, public Extensible, public Flags<ChannelFlag>
+class CoreExport Channel : public Base, public Extensible
 {
  public:
-	typedef std::multimap<ChannelModeName, Anope::string> ModeList;
+	typedef std::multimap<Anope::string, Anope::string> ModeList;
  private:
 	/** A map of channel modes with their parameters set on this channel
 	 */
@@ -56,6 +56,7 @@ class CoreExport Channel : public Base, public Extensible, public Flags<ChannelF
 	Serialize::Reference<ChannelInfo> ci;
 	/* When the channel was created */
 	time_t creation_time;
+	std::set<ChannelFlag> flags;
 
 	/* Users in the channel */
 	typedef std::list<ChanUserContainer *> ChanUserList;
@@ -132,20 +133,20 @@ class CoreExport Channel : public Base, public Extensible, public Flags<ChannelF
 	 * @param name The mode name, eg CMODE_OP, CMODE_VOICE
 	 * @return true or false
 	 */
-	bool HasUserStatus(const User *u, ChannelModeName name) const;
+	bool HasUserStatus(const User *u, const Anope::string &name) const;
 
 	/** See if a channel has a mode
 	 * @param name The mode name
 	 * @return The number of modes set
  	 * @param param The optional mode param
 	 */
-	size_t HasMode(ChannelModeName name, const Anope::string &param = "");
+	size_t HasMode(const Anope::string &name, const Anope::string &param = "");
 
 	/** Get a list of modes on a channel
 	 * @param name A mode name to get the list of
 	 * @return a pair of iterators for the beginning and end of the list
 	 */
-	std::pair<ModeList::iterator, ModeList::iterator> GetModeList(ChannelModeName name);
+	std::pair<ModeList::iterator, ModeList::iterator> GetModeList(const Anope::string &name);
 
 	/** Set a mode internally on a channel, this is not sent out to the IRCd
 	 * @param setter The setter
@@ -178,7 +179,7 @@ class CoreExport Channel : public Base, public Extensible, public Flags<ChannelF
 	 * @param param Optional param arg for the mode
 	 * @param enforce_mlock true if mlocks should be enforced, false to override mlock
 	 */
-	void SetMode(BotInfo *bi, ChannelModeName name, const Anope::string &param = "", bool enforce_mlock = true);
+	void SetMode(BotInfo *bi, const Anope::string &name, const Anope::string &param = "", bool enforce_mlock = true);
 
 	/** Remove a mode from a channel
 	 * @param bi The client setting the modes
@@ -195,14 +196,14 @@ class CoreExport Channel : public Base, public Extensible, public Flags<ChannelF
 	 * @param param Optional param arg for the mode
 	 * @param enforce_mlock true if mlocks should be enforced, false to override mlock
 	 */
-	void RemoveMode(BotInfo *bi, ChannelModeName name, const Anope::string &param = "", bool enforce_mlock = true);
+	void RemoveMode(BotInfo *bi, const Anope::string &name, const Anope::string &param = "", bool enforce_mlock = true);
 
 	/** Get a modes parameter for the channel
 	 * @param name The mode
 	 * @param target a string to put the param into
 	 * @return true if the parameter was fetched, false if on error (mode not set) etc.
 	 */
-	bool GetParam(ChannelModeName name, Anope::string &target) const;
+	bool GetParam(const Anope::string &name, Anope::string &target) const;
 
 	/** Set a string of modes on the channel
 	 * @param bi The client setting the modes
@@ -223,7 +224,7 @@ class CoreExport Channel : public Base, public Extensible, public Flags<ChannelF
 	 * @param list The mode of the list to check (eg CMODE_BAN)
 	 * @return true if the user matches the list
 	 */
-	bool MatchesList(User *u, ChannelModeName list);
+	bool MatchesList(User *u, const Anope::string &list);
 
 	/** Kick a user from a channel internally
 	 * @param source The sender of the kick

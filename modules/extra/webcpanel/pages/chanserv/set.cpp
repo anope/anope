@@ -29,60 +29,60 @@ bool WebCPanel::ChanServ::Set::OnRequest(HTTPProvider *server, const Anope::stri
 
 	if (message.post_data.empty() == false)
 	{
-		if (ci->HasFlag(CI_KEEPTOPIC) != message.post_data.count("keeptopic"))
+		if (ci->HasExt("KEEPTOPIC") != message.post_data.count("keeptopic"))
 		{
-			if (!ci->HasFlag(CI_KEEPTOPIC))
-				ci->SetFlag(CI_KEEPTOPIC);
+			if (!ci->HasExt("KEEPTOPIC"))
+				ci->ExtendMetadata("KEEPTOPIC");
 			else
-				ci->UnsetFlag(CI_KEEPTOPIC);
+				ci->Shrink("KEEPTOPIC");
 			replacements["MESSAGES"] = "Secure updated";
 		}
-		if (ci->HasFlag(CI_PEACE) != message.post_data.count("peace"))
+		if (ci->HasExt("PEACE") != message.post_data.count("peace"))
 		{
-			if (!ci->HasFlag(CI_PEACE))
-				ci->SetFlag(CI_PEACE);
+			if (!ci->HasExt("PEACE"))
+				ci->ExtendMetadata("PEACE");
 			else
-				ci->UnsetFlag(CI_PEACE);
+				ci->Shrink("PEACE");
 			replacements["MESSAGES"] = "Peace updated";
 		}
-		if (ci->HasFlag(CI_PRIVATE) != message.post_data.count("private"))
+		if (ci->HasExt("PRIVATE") != message.post_data.count("private"))
 		{
-			if (!ci->HasFlag(CI_PRIVATE))
-				ci->SetFlag(CI_PRIVATE);
+			if (!ci->HasExt("PRIVATE"))
+				ci->ExtendMetadata("PRIVATE");
 			else
-				ci->UnsetFlag(CI_PRIVATE);
+				ci->Shrink("PRIVATE");
 			replacements["MESSAGES"] = "Private updated";
 		}
-		if (ci->HasFlag(CI_RESTRICTED) != message.post_data.count("restricted"))
+		if (ci->HasExt("RESTRICTED") != message.post_data.count("restricted"))
 		{
-			if (!ci->HasFlag(CI_RESTRICTED))
-				ci->SetFlag(CI_RESTRICTED);
+			if (!ci->HasExt("RESTRICTED"))
+				ci->ExtendMetadata("RESTRICTED");
 			else
-				ci->UnsetFlag(CI_RESTRICTED);
+				ci->Shrink("RESTRICTED");
 			replacements["MESSAGES"] = "Restricted updated";
 		}
-		if (ci->HasFlag(CI_SECURE) != message.post_data.count("secure"))
+		if (ci->HasExt("SECURE") != message.post_data.count("secure"))
 		{
-			if (!ci->HasFlag(CI_SECURE))
-				ci->SetFlag(CI_SECURE);
+			if (!ci->HasExt("SECURE"))
+				ci->ExtendMetadata("SECURE");
 			else
-				ci->UnsetFlag(CI_SECURE);
+				ci->Shrink("SECURE");
 			replacements["MESSAGES"] = "Secure updated";
 		}
-		if (ci->HasFlag(CI_SECUREOPS) != message.post_data.count("secureops"))
+		if (ci->HasExt("SECUREOPS") != message.post_data.count("secureops"))
 		{
-			if (!ci->HasFlag(CI_SECUREOPS))
-				ci->SetFlag(CI_SECUREOPS);
+			if (!ci->HasExt("SECUREOPS"))
+				ci->ExtendMetadata("SECUREOPS");
 			else
-				ci->UnsetFlag(CI_SECUREOPS);
+				ci->Shrink("SECUREOPS");
 			replacements["MESSAGES"] = "Secureops updated";
 		}
-		if (ci->HasFlag(CI_TOPICLOCK) != message.post_data.count("topiclock"))
+		if (ci->HasExt("TOPICLOCK") != message.post_data.count("topiclock"))
 		{
-			if (!ci->HasFlag(CI_TOPICLOCK))
-				ci->SetFlag(CI_TOPICLOCK);
+			if (!ci->HasExt("TOPICLOCK"))
+				ci->ExtendMetadata("TOPICLOCK");
 			else
-				ci->UnsetFlag(CI_TOPICLOCK);
+				ci->Shrink("TOPICLOCK");
 			replacements["MESSAGES"] = "Topiclock updated";
 		}
 	}
@@ -102,25 +102,25 @@ bool WebCPanel::ChanServ::Set::OnRequest(HTTPProvider *server, const Anope::stri
 		replacements["LAST_TOPIC_SETTER"] = HTTPUtils::Escape(ci->last_topic_setter);
 	}
 
-	if (ci->HasFlag(CI_KEEPTOPIC))
+	if (ci->HasExt("KEEPTOPIC"))
 		replacements["KEEPTOPIC"];
 	
-	if (ci->HasFlag(CI_PEACE))
+	if (ci->HasExt("PEACE"))
 		replacements["PEACE"];
 	
-	if (ci->HasFlag(CI_PRIVATE))
+	if (ci->HasExt("PRIVATE"))
 		replacements["PRIVATE"];
 
-	if (ci->HasFlag(CI_RESTRICTED))
+	if (ci->HasExt("RESTRICTED"))
 		replacements["RESTRICTED"];
 	
-	if (ci->HasFlag(CI_SECURE))
+	if (ci->HasExt("SECURE"))
 		replacements["SECURE"];
 	
-	if (ci->HasFlag(CI_SECUREOPS))
+	if (ci->HasExt("SECUREOPS"))
 		replacements["SECUREOPS"];
 	
-	if (ci->HasFlag(CI_TOPICLOCK))
+	if (ci->HasExt("TOPICLOCK"))
 		replacements["TOPICLOCK"];
 
 	TemplateFileServer page("chanserv/set.html");

@@ -71,14 +71,14 @@ public:
 			{
 				AutoKick *autokick = ci->GetAkick(j);
 
-				if (autokick->HasFlag(AK_ISNICK))
+				if (autokick->nc)
 				{
 					if (na && *autokick->nc == na->nc)
 						source.Reply(_("\2%s\2 is on the auto kick list (%s)."), na->nc->display.c_str(), autokick->reason.c_str());
 				}
 				else if (u != NULL)
 				{
-					Entry akick_mask(CMODE_BEGIN, autokick->mask);
+					Entry akick_mask("", autokick->mask);
 					if (akick_mask.Matches(u))
 						source.Reply(_("\2%s\2 matches auto kick entry %s (%s)."), u->nick.c_str(), autokick->mask.c_str(), autokick->reason.c_str());
 				}

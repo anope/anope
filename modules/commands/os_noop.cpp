@@ -31,7 +31,7 @@ class CommandOSNOOP : public Command
 		Server *s = Server::Find(server);
 		if (s == NULL)
 			source.Reply(_("Server %s does not exist."), server.c_str());
-		else if (s == Me || s->HasFlag(SERVER_JUPED))
+		else if (s == Me || s->IsJuped())
 			source.Reply(_("You may not NOOP services."));
 		else if (cmd.equals_ci("SET"))
 		{
@@ -49,7 +49,7 @@ class CommandOSNOOP : public Command
 				User *u2 = it->second;
 				++it;
 
-				if (u2->server == s && u2->HasMode(UMODE_OPER))
+				if (u2->server == s && u2->HasMode("OPER"))
 					u2->Kill(Config->OperServ, reason);
 			}
 		}
@@ -89,9 +89,9 @@ class OSNOOP : public Module
 		ModuleManager::Attach(I_OnUserModeSet, this);
 	}
 
-	void OnUserModeSet(User *u, UserModeName Name) anope_override
+	void OnUserModeSet(User *u, const Anope::string &mname) anope_override
 	{
-		if (Name == UMODE_OPER && u->server->HasExt("noop"))
+		if (mname == "OPER" && u->server->HasExt("noop"))
 		{
 			Anope::string *setter = u->server->GetExt<ExtensibleItemClass<Anope::string> *>("noop");
 			if (setter)

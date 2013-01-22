@@ -74,7 +74,7 @@ class MyNickServService : public NickServService
 		if (!na)
 			return;
 
-		if (na->nc->HasFlag(NI_SUSPENDED))
+		if (na->nc->HasExt("SUSPENDED"))
 		{
 			u->SendMessage(NickServ, NICK_X_SUSPENDED, u->nick.c_str());
 			u->Collide(na);
@@ -89,7 +89,7 @@ class MyNickServService : public NickServService
 			return;
 		}
 
-		if (!na->nc->HasFlag(NI_SECURE) && u->IsRecognized())
+		if (!na->nc->HasExt("SECURE") && u->IsRecognized())
 		{
 			na->last_seen = Anope::CurTime;
 			Anope::string last_usermask = u->GetIdent() + "@" + u->GetDisplayedHost();
@@ -101,22 +101,22 @@ class MyNickServService : public NickServService
 		if (Config->NoNicknameOwnership)
 			return;
 
-		if (u->IsRecognized(false) || !na->nc->HasFlag(NI_KILL_IMMED))
+		if (u->IsRecognized(false) || !na->nc->HasExt("KILL_IMMED"))
 		{
-			if (na->nc->HasFlag(NI_SECURE))
+			if (na->nc->HasExt("SECURE"))
 				u->SendMessage(NickServ, NICK_IS_SECURE, Config->UseStrictPrivMsgString.c_str(), Config->NickServ.c_str());
 			else
 				u->SendMessage(NickServ, NICK_IS_REGISTERED, Config->UseStrictPrivMsgString.c_str(), Config->NickServ.c_str());
 		}
 
-		if (na->nc->HasFlag(NI_KILLPROTECT) && !u->IsRecognized(false))
+		if (na->nc->HasExt("KILLPROTECT") && !u->IsRecognized(false))
 		{
-			if (na->nc->HasFlag(NI_KILL_IMMED))
+			if (na->nc->HasExt("KILL_IMMED"))
 			{
 				u->SendMessage(NickServ, FORCENICKCHANGE_NOW);
 				u->Collide(na);
 			}
-			else if (na->nc->HasFlag(NI_KILL_QUICK))
+			else if (na->nc->HasExt("KILL_QUICK"))
 			{
 				u->SendMessage(NickServ, _("If you do not change within %s, I will change your nick."), Anope::Duration(Config->NSKillQuick, u->Account()).c_str());
 				new NickServCollide(u, Config->NSKillQuick);
@@ -134,8 +134,8 @@ class MyNickServService : public NickServService
 	{
 		const NickAlias *u_na = NickAlias::Find(user->nick);
 		user->Login(na->nc);
-		if (u_na && *u_na->nc == *na->nc && !Config->NoNicknameOwnership && na->nc->HasFlag(NI_UNCONFIRMED) == false)
-			user->SetMode(NickServ, UMODE_REGISTERED);
+		if (u_na && *u_na->nc == *na->nc && !Config->NoNicknameOwnership && na->nc->HasExt("UNCONFIRMED") == false)
+			user->SetMode(NickServ, "REGISTERED");
 	}
 };
 
@@ -155,17 +155,17 @@ class ExpireCallback : public CallBack
 			++it;
 
 			User *u = User::Find(na->nick);
-			if (u && (na->nc->HasFlag(NI_SECURE) ? u->IsIdentified(true) : u->IsRecognized()))
+			if (u && (na->nc->HasExt("SECURE") ? u->IsIdentified(true) : u->IsRecognized()))
 				na->last_seen = Anope::CurTime;
 
 			bool expire = false;
 
-			if (na->nc->HasFlag(NI_UNCONFIRMED))
+			if (na->nc->HasExt("UNCONFIRMED"))
 				if (Config->NSUnconfirmedExpire && Anope::CurTime - na->time_registered >= Config->NSUnconfirmedExpire)
 					expire = true;
 			if (Config->NSExpire && Anope::CurTime - na->last_seen >= Config->NSExpire)
 				expire = true;
-			if (na->HasFlag(NS_NO_EXPIRE))
+			if (na->HasExt("NO_EXPIRE"))
 				expire = false;
 
 			FOREACH_MOD(I_OnPreNickExpire, OnPreNickExpire(na, expire));
@@ -173,7 +173,7 @@ class ExpireCallback : public CallBack
 			if (expire)
 			{
 				Anope::string extra;
-				if (na->nc->HasFlag(NI_SUSPENDED))
+				if (na->nc->HasExt("SUSPENDED"))
 					extra = "suspended ";
 				Log(LOG_NORMAL, "expire") << "Expiring " << extra << "nickname " << na->nick << " (group: " << na->nc->display << ") (e-mail: " << (na->nc->email.empty() ? "none" : na->nc->email) << ")";
 				FOREACH_MOD(I_OnNickExpire, OnNickExpire(na));
@@ -219,7 +219,7 @@ class NickServCore : public Module
 		if (u && u->Account() == na->nc)
 		{
 			IRCD->SendLogout(u);
-			u->RemoveMode(NickServ, UMODE_REGISTERED);
+			u->RemoveMode(NickServ, "REGISTERED");
 			u->Logout();
 		}
 	}
@@ -233,7 +233,7 @@ class NickServCore : public Module
 		{
 			User *user = *it++;
 			IRCD->SendLogout(user);
-			user->RemoveMode(NickServ, UMODE_REGISTERED);
+			user->RemoveMode(NickServ, "REGISTERED");
 			user->Logout();
 			FOREACH_MOD(I_OnNickLogout, OnNickLogout(user));
 		}
@@ -250,8 +250,8 @@ class NickServCore : public Module
 		if (!Config->NoNicknameOwnership)
 		{
 			const NickAlias *this_na = NickAlias::Find(u->nick);
-			if (this_na && this_na->nc == u->Account() && u->Account()->HasFlag(NI_UNCONFIRMED) == false)
-				u->SetMode(NickServ, UMODE_REGISTERED);
+			if (this_na && this_na->nc == u->Account() && u->Account()->HasExt("UNCONFIRMED") == false)
+				u->SetMode(NickServ, "REGISTERED");
 		}
 
 		if (Config->NSModeOnID)
@@ -276,7 +276,7 @@ class NickServCore : public Module
 							"any third-party person."), Config->UseStrictPrivMsgString.c_str(), Config->NickServ.c_str());
 		}
 
-		if (u->Account()->HasFlag(NI_UNCONFIRMED))
+		if (u->Account()->HasExt("UNCONFIRMED"))
 		{
 			u->SendMessage(NickServ, _("Your email address is not confirmed. To confirm it, follow the instructions that were emailed to you when you registered."));
 			const NickAlias *this_na = NickAlias::Find(u->Account()->display);
@@ -288,8 +288,8 @@ class NickServCore : public Module
 
 	void OnNickGroup(User *u, NickAlias *target) anope_override
 	{
-		if (target->nc->HasFlag(NI_UNCONFIRMED) == false)
-			u->SetMode(NickServ, UMODE_REGISTERED);
+		if (target->nc->HasExt("UNCONFIRMED") == false)
+			u->SetMode(NickServ, "REGISTERED");
 	}
 
 	void OnNickUpdate(User *u) anope_override
@@ -339,7 +339,7 @@ class NickServCore : public Module
 		if (!na || na->nc != u->Account())
 		{
 			/* Remove +r, but keep an account associated with the user */
-			u->RemoveMode(NickServ, UMODE_REGISTERED);
+			u->RemoveMode(NickServ, "REGISTERED");
 
 			this->mynickserv.Validate(u);
 		}
@@ -347,8 +347,8 @@ class NickServCore : public Module
 		{
 			/* Reset +r and re-send account (even though it really should be set at this point) */
 			IRCD->SendLogin(u);
-			if (!Config->NoNicknameOwnership && na->nc == u->Account() && na->nc->HasFlag(NI_UNCONFIRMED) == false)
-				u->SetMode(NickServ, UMODE_REGISTERED);
+			if (!Config->NoNicknameOwnership && na->nc == u->Account() && na->nc->HasExt("UNCONFIRMED") == false)
+				u->SetMode(NickServ, "REGISTERED");
 			Log(NickServ) << u->GetMask() << " automatically identified for group " << u->Account()->display;
 		}
 
@@ -356,10 +356,10 @@ class NickServCore : public Module
 			old_na->OnCancel(u);
 	}
 
-	void OnUserModeSet(User *u, UserModeName Name) anope_override
+	void OnUserModeSet(User *u, const Anope::string &mname) anope_override
 	{
-		if (Name == UMODE_REGISTERED && !u->IsIdentified())
-			u->RemoveMode(NickServ, Name);
+		if (mname == "REGISTERED" && !u->IsIdentified())
+			u->RemoveMode(NickServ, mname);
 	}
 
 	EventReturn OnPreHelp(CommandSource &source, const std::vector<Anope::string> &params) anope_override

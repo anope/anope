@@ -23,27 +23,27 @@ class CommandMSSet : public Command
 
 		if (param.equals_ci("ON"))
 		{
-			nc->SetFlag(NI_MEMO_SIGNON);
-			nc->SetFlag(NI_MEMO_RECEIVE);
+			nc->ExtendMetadata("MEMO_SIGNON");
+			nc->ExtendMetadata("MEMO_RECEIVE");
 			source.Reply(_("%s will now notify you of memos when you log on and when they are sent to you."), Config->MemoServ.c_str());
 		}
 		else if (param.equals_ci("LOGON"))
 		{
-			nc->SetFlag(NI_MEMO_SIGNON);
-			nc->UnsetFlag(NI_MEMO_RECEIVE);
+			nc->ExtendMetadata("MEMO_SIGNON");
+			nc->Shrink("MEMO_RECEIVE");
 			source.Reply(_("%s will now notify you of memos when you log on or unset /AWAY."), Config->MemoServ.c_str());
 		}
 		else if (param.equals_ci("NEW"))
 		{
-			nc->UnsetFlag(NI_MEMO_SIGNON);
-			nc->SetFlag(NI_MEMO_RECEIVE);
+			nc->Shrink("MEMO_SIGNON");
+			nc->ExtendMetadata("MEMO_RECEIVE");
 			source.Reply(_("%s will now notify you of memos when they are sent to you."), Config->MemoServ.c_str());
 		}
 		else if (param.equals_ci("MAIL"))
 		{
 			if (!nc->email.empty())
 			{
-				nc->SetFlag(NI_MEMO_MAIL);
+				nc->ExtendMetadata("MEMO_MAIL");
 				source.Reply(_("You will now be informed about new memos via email."));
 			}
 			else
@@ -51,14 +51,14 @@ class CommandMSSet : public Command
 		}
 		else if (param.equals_ci("NOMAIL"))
 		{
-			nc->UnsetFlag(NI_MEMO_MAIL);
+			nc->Shrink("MEMO_MAIL");
 			source.Reply(_("You will no longer be informed via email."));
 		}
 		else if (param.equals_ci("OFF"))
 		{
-			nc->UnsetFlag(NI_MEMO_SIGNON);
-			nc->UnsetFlag(NI_MEMO_RECEIVE);
-			nc->UnsetFlag(NI_MEMO_MAIL);
+			nc->Shrink("MEMO_SIGNON");
+			nc->Shrink("MEMO_RECEIVE");
+			nc->Shrink("MEMO_MAIL");
 			source.Reply(_("%s will not send you any notification of memos."), Config->MemoServ.c_str());
 		}
 		else
@@ -123,16 +123,16 @@ class CommandMSSet : public Command
 			if (!chan.empty())
 			{
 				if (!p2.empty())
-					ci->SetFlag(CI_MEMO_HARDMAX);
+					ci->ExtendMetadata("MEMO_HARDMAX");
 				else
-					ci->UnsetFlag(CI_MEMO_HARDMAX);
+					ci->Shrink("MEMO_HARDMAX");
 			}
 			else
 			{
 				if (!p2.empty())
-					nc->SetFlag(NI_MEMO_HARDMAX);
+					nc->ExtendMetadata("MEMO_HARDMAX");
 				else
-					nc->UnsetFlag(NI_MEMO_HARDMAX);
+					nc->Shrink("MEMO_HARDMAX");
 			}
 			limit = -1;
 			try
@@ -148,12 +148,12 @@ class CommandMSSet : public Command
 				this->OnSyntaxError(source, "");
 				return;
 			}
-			if (!chan.empty() && ci->HasFlag(CI_MEMO_HARDMAX))
+			if (!chan.empty() && ci->HasExt("MEMO_HARDMAX"))
 			{
 				source.Reply(_("The memo limit for %s may not be changed."), chan.c_str());
 				return;
 			}
-			else if (chan.empty() && nc->HasFlag(NI_MEMO_HARDMAX))
+			else if (chan.empty() && nc->HasExt("MEMO_HARDMAX"))
 			{
 				source.Reply(_("You are not permitted to change your memo limit."));
 				return;

@@ -28,7 +28,7 @@ class TempBan : public CallBack
 	{
 		Channel *c = Channel::Find(this->channel);
 		if (c)
-			c->RemoveMode(NULL, CMODE_BAN, this->mask);
+			c->RemoveMode(NULL, "BAN", this->mask);
 	}
 };
 
@@ -96,13 +96,13 @@ class CommandCSBan : public Command
 		{
 			AccessGroup u2_access = ci->AccessFor(u2);
 
-			if (u != u2 && ci->HasFlag(CI_PEACE) && u2_access >= u_access)
+			if (u != u2 && ci->HasExt("PEACE") && u2_access >= u_access)
 				source.Reply(ACCESS_DENIED);
 			/*
 			 * Dont ban/kick the user on channels where he is excepted
 			 * to prevent services <-> server wars.
 			 */
-			else if (ci->c->MatchesList(u2, CMODE_EXCEPT))
+			else if (ci->c->MatchesList(u2, "EXCEPT"))
 				source.Reply(CHAN_EXCEPTED, u2->nick.c_str(), ci->name.c_str());
 			else if (u2->IsProtected())
 				source.Reply(ACCESS_DENIED);
@@ -113,9 +113,9 @@ class CommandCSBan : public Command
 				// XXX need a way to detect if someone is overriding
 				Log(LOG_COMMAND, source, this, ci) << "for " << mask;
 
-				if (!c->HasMode(CMODE_BAN, mask))
+				if (!c->HasMode("BAN", mask))
 				{
-					c->SetMode(NULL, CMODE_BAN, mask);
+					c->SetMode(NULL, "BAN", mask);
 					if (ban_time)
 					{
 						new TempBan(ban_time, c, mask);
@@ -127,7 +127,7 @@ class CommandCSBan : public Command
 				if (!c->FindUser(u2))
 					return;
 
-				if (ci->HasFlag(CI_SIGNKICK) || (ci->HasFlag(CI_SIGNKICK_LEVEL) && !source.AccessFor(ci).HasPriv("SIGNKICK")))
+				if (ci->HasExt("SIGNKICK") || (ci->HasExt("SIGNKICK_LEVEL") && !source.AccessFor(ci).HasPriv("SIGNKICK")))
 					c->Kick(ci->WhoSends(), u2, "%s (%s)", reason.c_str(), source.GetNick().c_str());
 				else
 					c->Kick(ci->WhoSends(), u2, "%s", reason.c_str());
@@ -137,9 +137,9 @@ class CommandCSBan : public Command
 		{
 			Log(LOG_COMMAND, source, this, ci) << "for " << target;
 
-			if (!c->HasMode(CMODE_BAN, target))
+			if (!c->HasMode("BAN", target))
 			{
-				c->SetMode(NULL, CMODE_BAN, target);
+				c->SetMode(NULL, "BAN", target);
 				if (ban_time)
 				{
 					new TempBan(ban_time, c, target);
@@ -158,15 +158,15 @@ class CommandCSBan : public Command
 
 					AccessGroup u2_access = ci->AccessFor(uc->user);
 
-					if (u != uc->user && ci->HasFlag(CI_PEACE) && u2_access >= u_access)
+					if (u != uc->user && ci->HasExt("PEACE") && u2_access >= u_access)
 						continue;
-					else if (ci->c->MatchesList(uc->user, CMODE_EXCEPT))
+					else if (ci->c->MatchesList(uc->user, "EXCEPT"))
 						continue;
 					else if (uc->user->IsProtected())
 						continue;
 
 					++kicked;
-					if (ci->HasFlag(CI_SIGNKICK) || (ci->HasFlag(CI_SIGNKICK_LEVEL) && !u_access.HasPriv("SIGNKICK")))
+					if (ci->HasExt("SIGNKICK") || (ci->HasExt("SIGNKICK_LEVEL") && !u_access.HasPriv("SIGNKICK")))
 						c->Kick(ci->WhoSends(), uc->user, "%s (Matches %s) (%s)", reason.c_str(), target.c_str(), source.GetNick().c_str());
 					else
 						c->Kick(ci->WhoSends(), uc->user, "%s (Matches %s)", reason.c_str(), target.c_str());

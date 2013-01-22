@@ -20,25 +20,25 @@ class CommandNSConfirm : public Command
  public:
 	CommandNSConfirm(Module *creator) : Command(creator, "nickserv/confirm", 1, 2)
 	{
-		this->SetFlag(CFLAG_ALLOW_UNREGISTERED);
 		this->SetDesc(_("Confirm an auth code"));
 		this->SetSyntax(_("\037passcode\037"));
+		this->AllowUnregistered(true);
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		const Anope::string &passcode = params[0];
 
-		if (source.nc && !source.nc->HasFlag(NI_UNCONFIRMED) && source.HasPriv("nickserv/confirm"))
+		if (source.nc && !source.nc->HasExt("UNCONFIRMED") && source.HasPriv("nickserv/confirm"))
 		{
 			NickAlias *na = NickAlias::Find(passcode);
 			if (na == NULL)
 				source.Reply(NICK_X_NOT_REGISTERED, passcode.c_str());
-			else if (na->nc->HasFlag(NI_UNCONFIRMED) == false)
+			else if (na->nc->HasExt("UNCONFIRMED") == false)
 				source.Reply(_("Nick \002%s\002 is already confirmed."), na->nick.c_str());
 			else
 			{
-				na->nc->UnsetFlag(NI_UNCONFIRMED);
+				na->nc->Shrink("UNCONFIRMED");
 				Log(LOG_ADMIN, source, this) << "to confirm nick " << na->nick << " (" << na->nc->display << ")";
 				source.Reply(_("Nick \002%s\002 has been confirmed."), na->nick.c_str());
 			}
@@ -52,14 +52,14 @@ class CommandNSConfirm : public Command
 				nc->Shrink("ns_register_passcode");
 				Log(LOG_COMMAND, source, this) << "to confirm their email";
 				source.Reply(_("Your email address of \002%s\002 has been confirmed."), source.nc->email.c_str());
-				nc->UnsetFlag(NI_UNCONFIRMED);
+				nc->Shrink("UNCONFIRMED");
 
 				if (source.GetUser())
 				{
 					IRCD->SendLogin(source.GetUser());
 					const NickAlias *na = NickAlias::Find(source.GetNick());
-					if (!Config->NoNicknameOwnership && na != NULL && na->nc == source.GetAccount() && na->nc->HasFlag(NI_UNCONFIRMED) == false)
-						source.GetUser()->SetMode(NickServ, UMODE_REGISTERED);
+					if (!Config->NoNicknameOwnership && na != NULL && na->nc == source.GetAccount() && na->nc->HasExt("UNCONFIRMED") == false)
+						source.GetUser()->SetMode(NickServ, "REGISTERED");
 				}
 			}
 			else
@@ -100,12 +100,12 @@ class CommandNSRegister : public Command
  public:
 	CommandNSRegister(Module *creator) : Command(creator, "nickserv/register", 1, 2)
 	{
-		this->SetFlag(CFLAG_ALLOW_UNREGISTERED);
 		this->SetDesc(_("Register a nickname"));
 		if (Config->NSForceEmail)
 			this->SetSyntax(_("\037password\037 \037email\037"));
 		else
 			this->SetSyntax(_("\037password\037 \037[email]\037"));
+		this->AllowUnregistered(true);
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
@@ -130,7 +130,7 @@ class CommandNSRegister : public Command
 			return;
 		}
 
-		if (u && !u->HasMode(UMODE_OPER) && Config->NickRegDelay && Anope::CurTime - u->timestamp < Config->NickRegDelay)
+		if (u && !u->HasMode("OPER") && Config->NickRegDelay && Anope::CurTime - u->timestamp < Config->NickRegDelay)
 		{
 			source.Reply(_("You must have been using this nick for at least %d seconds to register."), Config->NickRegDelay);
 			return;
@@ -211,12 +211,12 @@ class CommandNSRegister : public Command
 
 			if (Config->NSRegistration.equals_ci("admin"))
 			{
-				nc->SetFlag(NI_UNCONFIRMED);
+				nc->ExtendMetadata("UNCONFIRMED");
 				source.Reply(_("All new accounts must be validated by an administrator. Please wait for your registration to be confirmed."));
 			}
 			else if (Config->NSRegistration.equals_ci("mail"))
 			{
-				nc->SetFlag(NI_UNCONFIRMED);
+				nc->ExtendMetadata("UNCONFIRMED");
 				if (SendRegmail(u, na, source.service))
 				{
 					source.Reply(_("A passcode has been sent to %s, please type %s%s confirm <passcode> to confirm your email address."), email.c_str(), Config->UseStrictPrivMsgString.c_str(), Config->NickServ.c_str());
@@ -228,8 +228,8 @@ class CommandNSRegister : public Command
 				if (u)
 				{
 					IRCD->SendLogin(u);
-					if (!Config->NoNicknameOwnership && na->nc == u->Account() && na->nc->HasFlag(NI_UNCONFIRMED) == false)
-						u->SetMode(NickServ, UMODE_REGISTERED);
+					if (!Config->NoNicknameOwnership && na->nc == u->Account() && na->nc->HasExt("UNCONFIRMED") == false)
+						u->SetMode(NickServ, "REGISTERED");
 				}
 			}
 
@@ -294,7 +294,7 @@ class CommandNSResend : public Command
 
 		if (na == NULL)
 			source.Reply(NICK_NOT_REGISTERED);
-		else if (na->nc != source.GetAccount() || source.nc->HasFlag(NI_UNCONFIRMED) == false)
+		else if (na->nc != source.GetAccount() || source.nc->HasExt("UNCONFIRMED") == false)
 			source.Reply(_("Your account is already confirmed."));
 		else
 		{

@@ -18,9 +18,9 @@ class CommandNSStatus : public Command
  public:
 	CommandNSStatus(Module *creator) : Command(creator, "nickserv/status", 0, 16)
 	{
-		this->SetFlag(CFLAG_ALLOW_UNREGISTERED);
 		this->SetDesc(_("Returns the owner status of the given nickname"));
 		this->SetSyntax(_("\037nickname\037..."));
+		this->AllowUnregistered(true);
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override

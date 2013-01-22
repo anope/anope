@@ -51,7 +51,7 @@ class SQLOperResult : public SQL::Interface
 				delete user->Account()->o;
 				user->Account()->o = NULL;
 				Log(this->owner) << "m_sql_oper: Removed services operator from " << user->nick << " (" << user->Account()->display << ")";
-				user->RemoveMode(OperServ, UMODE_OPER); // Probably not set, just incase
+				user->RemoveMode(OperServ, "OPER"); // Probably not set, just incase
 			}
 			return;
 		}
@@ -70,7 +70,7 @@ class SQLOperResult : public SQL::Interface
 			Config->Opers.push_back(user->Account()->o);
 		}
 
-		if (!user->HasMode(UMODE_OPER))
+		if (!user->HasMode("OPER"))
 		{
 			IRCD->SendOper(user);
 

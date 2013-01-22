@@ -76,7 +76,7 @@ class InspIRCd20Proto : public IRCDProto
 class InspIRCdExtBan : public ChannelModeList
 {
  public:
-	InspIRCdExtBan(ChannelModeName mName, char modeChar) : ChannelModeList(mName, modeChar) { }
+	InspIRCdExtBan(const Anope::string &mname, char modeChar) : ChannelModeList(mname, modeChar) { }
 
 	bool Matches(const User *u, const Entry *e) anope_override
 	{
@@ -109,7 +109,7 @@ class InspIRCdExtBan : public ChannelModeList
 			{
 				ChanUserContainer *uc = c->FindUser(u);
 				if (uc != NULL)
-					if (cm == NULL || uc->status.HasFlag(cm->name))
+					if (cm == NULL || uc->status.modes.count(cm->name))
 						return true;
 			}
 		}
@@ -149,7 +149,7 @@ class InspIRCdExtBan : public ChannelModeList
 class ChannelModeFlood : public ChannelModeParam
 {
  public:
-	ChannelModeFlood(char modeChar, bool minusNoArg) : ChannelModeParam(CMODE_FLOOD, modeChar, minusNoArg) { }
+	ChannelModeFlood(char modeChar, bool minusNoArg) : ChannelModeParam("FLOOD", modeChar, minusNoArg) { }
 
 	bool IsValid(const Anope::string &value) const anope_override
 	{
@@ -203,88 +203,88 @@ struct IRCDMessageCapab : Message::Capab
 				ChannelMode *cm = NULL;
 
 				if (modename.equals_cs("admin"))
-					cm = new ChannelModeStatus(CMODE_PROTECT, modechar.length() > 1 ? modechar[1] : modechar[0], modechar.length() > 1 ? modechar[0] : 0);
+					cm = new ChannelModeStatus("PROTECT", modechar.length() > 1 ? modechar[1] : modechar[0], modechar.length() > 1 ? modechar[0] : 0);
 				else if (modename.equals_cs("allowinvite"))
-					cm = new ChannelMode(CMODE_ALLINVITE, modechar[0]);
+					cm = new ChannelMode("ALLINVITE", modechar[0]);
 				else if (modename.equals_cs("auditorium"))
-					cm = new ChannelMode(CMODE_AUDITORIUM, modechar[0]);
+					cm = new ChannelMode("AUDITORIUM", modechar[0]);
 				else if (modename.equals_cs("ban"))
-					cm = new InspIRCdExtBan(CMODE_BAN, modechar[0]);
+					cm = new InspIRCdExtBan("BAN", modechar[0]);
 				else if (modename.equals_cs("banexception"))
-					cm = new InspIRCdExtBan(CMODE_EXCEPT, 'e');
+					cm = new InspIRCdExtBan("EXCEPT", 'e');
 				else if (modename.equals_cs("blockcaps"))
-					cm = new ChannelMode(CMODE_BLOCKCAPS, modechar[0]);
+					cm = new ChannelMode("BLOCKCAPS", modechar[0]);
 				else if (modename.equals_cs("blockcolor"))
-					cm = new ChannelMode(CMODE_BLOCKCOLOR, modechar[0]);
+					cm = new ChannelMode("BLOCKCOLOR", modechar[0]);
 				else if (modename.equals_cs("c_registered"))
 					cm = new ChannelModeRegistered(modechar[0]);
 				else if (modename.equals_cs("censor"))
-					cm = new ChannelMode(CMODE_FILTER, modechar[0]);
+					cm = new ChannelMode("FILTER", modechar[0]);
 				else if (modename.equals_cs("delayjoin"))
-					cm = new ChannelMode(CMODE_DELAYEDJOIN, modechar[0]);
+					cm = new ChannelMode("DELAYEDJOIN", modechar[0]);
 				else if (modename.equals_cs("filter"))
-					cm = new ChannelModeList(CMODE_FILTER, modechar[0]);
+					cm = new ChannelModeList("FILTER", modechar[0]);
 				else if (modename.equals_cs("flood"))
 					cm = new ChannelModeFlood(modechar[0], true);
 				else if (modename.equals_cs("founder"))
-					cm = new ChannelModeStatus(CMODE_OWNER, modechar.length() > 1 ? modechar[1] : modechar[0], modechar.length() > 1 ? modechar[0] : 0);
+					cm = new ChannelModeStatus("OWNER", modechar.length() > 1 ? modechar[1] : modechar[0], modechar.length() > 1 ? modechar[0] : 0);
 				else if (modename.equals_cs("halfop"))
-					cm = new ChannelModeStatus(CMODE_HALFOP, modechar.length() > 1 ? modechar[1] : modechar[0], modechar.length() > 1 ? modechar[0] : 0);
+					cm = new ChannelModeStatus("HALFOP", modechar.length() > 1 ? modechar[1] : modechar[0], modechar.length() > 1 ? modechar[0] : 0);
 				else if (modename.equals_cs("invex"))
-					cm = new InspIRCdExtBan(CMODE_INVITEOVERRIDE, 'I');
+					cm = new InspIRCdExtBan("INVITEOVERRIDE", 'I');
 				else if (modename.equals_cs("inviteonly"))
-					cm = new ChannelMode(CMODE_INVITE, modechar[0]);
+					cm = new ChannelMode("INVITE", modechar[0]);
 				else if (modename.equals_cs("joinflood"))
-					cm = new ChannelModeParam(CMODE_JOINFLOOD, modechar[0], true);
+					cm = new ChannelModeParam("JOINFLOOD", modechar[0], true);
 				else if (modename.equals_cs("key"))
 					cm = new ChannelModeKey(modechar[0]);
 				else if (modename.equals_cs("kicknorejoin"))
-					cm = new ChannelModeParam(CMODE_NOREJOIN, modechar[0], true);
+					cm = new ChannelModeParam("NOREJOIN", modechar[0], true);
 				else if (modename.equals_cs("limit"))
-					cm = new ChannelModeParam(CMODE_LIMIT, modechar[0], true);
+					cm = new ChannelModeParam("LIMIT", modechar[0], true);
 				else if (modename.equals_cs("moderated"))
-					cm = new ChannelMode(CMODE_MODERATED, modechar[0]);
+					cm = new ChannelMode("MODERATED", modechar[0]);
 				else if (modename.equals_cs("nickflood"))
-					cm = new ChannelModeParam(CMODE_NICKFLOOD, modechar[0], true);
+					cm = new ChannelModeParam("NICKFLOOD", modechar[0], true);
 				else if (modename.equals_cs("noctcp"))
-					cm = new ChannelMode(CMODE_NOCTCP, modechar[0]);
+					cm = new ChannelMode("NOCTCP", modechar[0]);
 				else if (modename.equals_cs("noextmsg"))
-					cm = new ChannelMode(CMODE_NOEXTERNAL, modechar[0]);
+					cm = new ChannelMode("NOEXTERNAL", modechar[0]);
 				else if (modename.equals_cs("nokick"))
-					cm = new ChannelMode(CMODE_NOKICK, modechar[0]);
+					cm = new ChannelMode("NOKICK", modechar[0]);
 				else if (modename.equals_cs("noknock"))
-					cm = new ChannelMode(CMODE_NOKNOCK, modechar[0]);
+					cm = new ChannelMode("NOKNOCK", modechar[0]);
 				else if (modename.equals_cs("nonick"))
-					cm = new ChannelMode(CMODE_NONICK, modechar[0]);
+					cm = new ChannelMode("NONICK", modechar[0]);
 				else if (modename.equals_cs("nonotice"))
-					cm = new ChannelMode(CMODE_NONOTICE, modechar[0]);
+					cm = new ChannelMode("NONOTICE", modechar[0]);
 				else if (modename.equals_cs("op"))
-					cm = new ChannelModeStatus(CMODE_OP, modechar.length() > 1 ? modechar[1] : modechar[0], modechar.length() > 1 ? modechar[0] : 0);
+					cm = new ChannelModeStatus("OP", modechar.length() > 1 ? modechar[1] : modechar[0], modechar.length() > 1 ? modechar[0] : 0);
 				else if (modename.equals_cs("operonly"))
 					cm = new ChannelModeOper(modechar[0]);
 				else if (modename.equals_cs("permanent"))
-					cm = new ChannelMode(CMODE_PERM, modechar[0]);
+					cm = new ChannelMode("PERM", modechar[0]);
 				else if (modename.equals_cs("private"))
-					cm = new ChannelMode(CMODE_PRIVATE, modechar[0]);
+					cm = new ChannelMode("PRIVATE", modechar[0]);
 				else if (modename.equals_cs("redirect"))
-					cm = new ChannelModeParam(CMODE_REDIRECT, modechar[0], true);
+					cm = new ChannelModeParam("REDIRECT", modechar[0], true);
 				else if (modename.equals_cs("reginvite"))
-					cm = new ChannelMode(CMODE_REGISTEREDONLY, modechar[0]);
+					cm = new ChannelMode("REGISTEREDONLY", modechar[0]);
 				else if (modename.equals_cs("regmoderated"))
-					cm = new ChannelMode(CMODE_REGMODERATED, modechar[0]);
+					cm = new ChannelMode("REGMODERATED", modechar[0]);
 				else if (modename.equals_cs("secret"))
-					cm = new ChannelMode(CMODE_SECRET, modechar[0]);
+					cm = new ChannelMode("SECRET", modechar[0]);
 				else if (modename.equals_cs("sslonly"))
-					cm = new ChannelMode(CMODE_SSL, modechar[0]);
+					cm = new ChannelMode("SSL", modechar[0]);
 				else if (modename.equals_cs("stripcolor"))
-					cm = new ChannelMode(CMODE_STRIPCOLOR, modechar[0]);
+					cm = new ChannelMode("STRIPCOLOR", modechar[0]);
 				else if (modename.equals_cs("topiclock"))
-					cm = new ChannelMode(CMODE_TOPIC, modechar[0]);
+					cm = new ChannelMode("TOPIC", modechar[0]);
 				else if (modename.equals_cs("voice"))
-					cm = new ChannelModeStatus(CMODE_VOICE, modechar.length() > 1 ? modechar[1] : modechar[0], modechar.length() > 1 ? modechar[0] : 0);
+					cm = new ChannelModeStatus("VOICE", modechar.length() > 1 ? modechar[1] : modechar[0], modechar.length() > 1 ? modechar[0] : 0);
 				/* Unknown status mode, (customprefix) - add it */
 				else if (modechar.length() == 2)
-					cm = new ChannelModeStatus(CMODE_END, modechar[1], modechar[0]);
+					cm = new ChannelModeStatus("END", modechar[1], modechar[0]);
 				/* else don't do anything here, we will get it in CAPAB CAPABILITIES */
 
 				if (cm)
@@ -305,44 +305,44 @@ struct IRCDMessageCapab : Message::Capab
 				UserMode *um = NULL;
 
 				if (modename.equals_cs("bot"))
-					um = new UserMode(UMODE_BOT, modechar[0]);
+					um = new UserMode("BOT", modechar[0]);
 				else if (modename.equals_cs("callerid"))
-					um = new UserMode(UMODE_CALLERID, modechar[0]);
+					um = new UserMode("CALLERID", modechar[0]);
 				else if (modename.equals_cs("cloak"))
-					um = new UserMode(UMODE_CLOAK, modechar[0]);
+					um = new UserMode("CLOAK", modechar[0]);
 				else if (modename.equals_cs("deaf"))
-					um = new UserMode(UMODE_DEAF, modechar[0]);
+					um = new UserMode("DEAF", modechar[0]);
 				else if (modename.equals_cs("deaf_commonchan"))
-					um = new UserMode(UMODE_COMMONCHANS, modechar[0]);
+					um = new UserMode("COMMONCHANS", modechar[0]);
 				else if (modename.equals_cs("helpop"))
-					um = new UserMode(UMODE_HELPOP, modechar[0]);
+					um = new UserMode("HELPOP", modechar[0]);
 				else if (modename.equals_cs("hidechans"))
-					um = new UserMode(UMODE_PRIV, modechar[0]);
+					um = new UserMode("PRIV", modechar[0]);
 				else if (modename.equals_cs("hideoper"))
-					um = new UserMode(UMODE_HIDEOPER, modechar[0]);
+					um = new UserMode("HIDEOPER", modechar[0]);
 				else if (modename.equals_cs("invisible"))
-					um = new UserMode(UMODE_INVIS, modechar[0]);
+					um = new UserMode("INVIS", modechar[0]);
 				else if (modename.equals_cs("invis-oper"))
-					um = new UserMode(UMODE_INVISIBLE_OPER, modechar[0]);
+					um = new UserMode("INVISIBLE_OPER", modechar[0]);
 				else if (modename.equals_cs("oper"))
-					um = new UserMode(UMODE_OPER, modechar[0]);
+					um = new UserMode("OPER", modechar[0]);
 				else if (modename.equals_cs("regdeaf"))
-					um = new UserMode(UMODE_REGPRIV, modechar[0]);
+					um = new UserMode("REGPRIV", modechar[0]);
 				else if (modename.equals_cs("servprotect"))
 				{
-					um = new UserMode(UMODE_PROTECTED, modechar[0]);
+					um = new UserMode("PROTECTED", modechar[0]);
 					IRCD->DefaultPseudoclientModes += "k";
 				}
 				else if (modename.equals_cs("showwhois"))
-					um = new UserMode(UMODE_WHOIS, modechar[0]);
+					um = new UserMode("WHOIS", modechar[0]);
 				else if (modename.equals_cs("u_censor"))
-					um = new UserMode(UMODE_FILTER, modechar[0]);
+					um = new UserMode("FILTER", modechar[0]);
 				else if (modename.equals_cs("u_registered"))
-					um = new UserMode(UMODE_REGISTERED, modechar[0]);
+					um = new UserMode("REGISTERED", modechar[0]);
 				else if (modename.equals_cs("u_stripcolor"))
-					um = new UserMode(UMODE_STRIPCOLOR, modechar[0]);
+					um = new UserMode("STRIPCOLOR", modechar[0]);
 				else if (modename.equals_cs("wallops"))
-					um = new UserMode(UMODE_WALLOPS, modechar[0]);
+					um = new UserMode("WALLOPS", modechar[0]);
 
 				if (um)
 					ModeManager::AddUserMode(um);
@@ -401,7 +401,7 @@ struct IRCDMessageCapab : Message::Capab
 					{
 						if (ModeManager::FindChannelModeByChar(modebuf[t]))
 							continue;
-						ModeManager::AddChannelMode(new ChannelModeList(CMODE_END, modebuf[t]));
+						ModeManager::AddChannelMode(new ChannelModeList("END", modebuf[t]));
 					}
 
 					sep.GetToken(modebuf);
@@ -409,7 +409,7 @@ struct IRCDMessageCapab : Message::Capab
 					{
 						if (ModeManager::FindChannelModeByChar(modebuf[t]))
 							continue;
-						ModeManager::AddChannelMode(new ChannelModeParam(CMODE_END, modebuf[t]));
+						ModeManager::AddChannelMode(new ChannelModeParam("END", modebuf[t]));
 					}
 
 					sep.GetToken(modebuf);
@@ -417,7 +417,7 @@ struct IRCDMessageCapab : Message::Capab
 					{
 						if (ModeManager::FindChannelModeByChar(modebuf[t]))
 							continue;
-						ModeManager::AddChannelMode(new ChannelModeParam(CMODE_END, true));
+						ModeManager::AddChannelMode(new ChannelModeParam("END", true));
 					}
 
 					sep.GetToken(modebuf);
@@ -425,7 +425,7 @@ struct IRCDMessageCapab : Message::Capab
 					{
 						if (ModeManager::FindChannelModeByChar(modebuf[t]))
 							continue;
-						ModeManager::AddChannelMode(new ChannelMode(CMODE_END, modebuf[t]));
+						ModeManager::AddChannelMode(new ChannelMode("END", modebuf[t]));
 					}
 				}
 				else if (capab.find("USERMODES") != Anope::string::npos)
@@ -439,11 +439,11 @@ struct IRCDMessageCapab : Message::Capab
 
 					if (sep.GetToken(modebuf))
 						for (size_t t = 0, end = modebuf.length(); t < end; ++t)
-							ModeManager::AddUserMode(new UserModeParam(UMODE_END, modebuf[t]));
+							ModeManager::AddUserMode(new UserModeParam("END", modebuf[t]));
 
 					if (sep.GetToken(modebuf))
 						for (size_t t = 0, end = modebuf.length(); t < end; ++t)
-							ModeManager::AddUserMode(new UserMode(UMODE_END, modebuf[t]));
+							ModeManager::AddUserMode(new UserMode("END", modebuf[t]));
 				}
 				else if (capab.find("MAXMODES=") != Anope::string::npos)
 				{
@@ -480,7 +480,7 @@ struct IRCDMessageCapab : Message::Capab
 				Anope::Quitting = true;
 				return;
 			}
-			if (!ModeManager::FindUserModeByName(UMODE_PRIV))
+			if (!ModeManager::FindUserModeByName("PRIV"))
 			{
 				UplinkSocket::Message() << "ERROR :m_hidechans.so is not loaded. This is required by Anope";
 				Anope::QuitReason = "ERROR: Remote server does not have the m_hidechans module loaded, and this is required.";
@@ -690,7 +690,7 @@ class ProtoInspIRCd : public Module
 
 	void OnUserNickChange(User *u, const Anope::string &) anope_override
 	{
-		u->RemoveModeInternal(ModeManager::FindUserModeByName(UMODE_REGISTERED));
+		u->RemoveModeInternal(ModeManager::FindUserModeByName("REGISTERED"));
 	}
 
 	void OnServerSync(Server *s) anope_override
@@ -714,7 +714,7 @@ class ProtoInspIRCd : public Module
 
 		if (Config->UseServerSideTopicLock && Servers::Capab.count("TOPICLOCK") && ci->c)
 		{
-			Anope::string on = ci->HasFlag(CI_TOPICLOCK) ? "1" : "";
+			Anope::string on = ci->HasExt("TOPICLOCK") ? "1" : "";
 			SendChannelMetadata(ci->c, "topiclock", on);
 		}
 	}

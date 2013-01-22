@@ -135,7 +135,7 @@ class CommandNSAccess : public Command
 			source.Reply(BAD_USERHOST_MASK);
 			source.Reply(MORE_INFO, Config->UseStrictPrivMsgString.c_str(), Config->NickServ.c_str(), this->name.c_str());
 		}
-		else if (nc->HasFlag(NI_SUSPENDED))
+		else if (nc->HasExt("SUSPENDED"))
 			source.Reply(NICK_X_SUSPENDED, nc->display.c_str());
 		else if (cmd.equals_ci("ADD"))
 			return this->DoAdd(source, nc, mask);

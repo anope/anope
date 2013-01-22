@@ -256,7 +256,7 @@ ClientSocket *SSLSocketIO::Accept(ListenSocket *s)
 	if (!SSL_set_fd(io->sslsock, newsocket->GetFD()))
 		throw SocketException("Unable to set SSL fd");
 
-	newsocket->SetFlag(SF_ACCEPTING);
+	newsocket->flags[SF_ACCEPTING] = true;
 	this->FinishAccept(newsocket);
 	
 	return newsocket;
@@ -266,9 +266,9 @@ SocketFlag SSLSocketIO::FinishAccept(ClientSocket *cs)
 {
 	if (cs->io == &NormalSocketIO)
 		throw SocketException("Attempting to finish connect uninitialized socket with SSL");
-	else if (cs->HasFlag(SF_ACCEPTED))
+	else if (cs->flags[SF_ACCEPTED])
 		return SF_ACCEPTED;
-	else if (!cs->HasFlag(SF_ACCEPTING))
+	else if (!cs->flags[SF_ACCEPTING])
 		throw SocketException("SSLSocketIO::FinishAccept called for a socket not accepted nor accepting?");
 
 	SSLSocketIO *io = anope_dynamic_static_cast<SSLSocketIO *>(cs->io);
@@ -286,15 +286,15 @@ SocketFlag SSLSocketIO::FinishAccept(ClientSocket *cs)
 		else
 		{
 			cs->OnError(ERR_error_string(ERR_get_error(), NULL));
-			cs->SetFlag(SF_DEAD);
-			cs->UnsetFlag(SF_ACCEPTING);
+			cs->flags[SF_DEAD] = true;
+			cs->flags[SF_ACCEPTING] = false;
 			return SF_DEAD;
 		}
 	}
 	else
 	{
-		cs->SetFlag(SF_ACCEPTED);
-		cs->UnsetFlag(SF_ACCEPTING);
+		cs->flags[SF_ACCEPTED] = true;
+		cs->flags[SF_ACCEPTING] = false;
 		SocketEngine::Change(cs, false, SF_WRITABLE);
 		SocketEngine::Change(cs, true, SF_READABLE);
 		cs->OnAccept();
@@ -307,8 +307,7 @@ void SSLSocketIO::Connect(ConnectionSocket *s, const Anope::string &target, int 
 	if (s->io == &NormalSocketIO)
 		throw SocketException("Attempting to connect uninitialized socket with SSL");
 
-	s->UnsetFlag(SF_CONNECTING);
-	s->UnsetFlag(SF_CONNECTED);
+	s->flags[SF_CONNECTING] = s->flags[SF_CONNECTED] = false;
 
 	s->conaddr.pton(s->IsIPv6() ? AF_INET6 : AF_INET, target, port);
 	int c = connect(s->GetFD(), &s->conaddr.sa, s->conaddr.size());
@@ -317,19 +316,19 @@ void SSLSocketIO::Connect(ConnectionSocket *s, const Anope::string &target, int 
 		if (Anope::LastErrorCode() != EINPROGRESS)
 		{
 			s->OnError(Anope::LastError());
-			s->SetFlag(SF_DEAD);
+			s->flags[SF_DEAD] = true;
 			return;
 		}
 		else
 		{
 			SocketEngine::Change(s, true, SF_WRITABLE);
-			s->SetFlag(SF_CONNECTING);
+			s->flags[SF_CONNECTING] = true;
 			return;
 		}
 	}
 	else
 	{
-		s->SetFlag(SF_CONNECTING);
+		s->flags[SF_CONNECTING] = true;
 		this->FinishConnect(s);
 	}
 }
@@ -338,9 +337,9 @@ SocketFlag SSLSocketIO::FinishConnect(ConnectionSocket *s)
 {
 	if (s->io == &NormalSocketIO)
 		throw SocketException("Attempting to finish connect uninitialized socket with SSL");
-	else if (s->HasFlag(SF_CONNECTED))
+	else if (s->flags[SF_CONNECTED])
 		return SF_CONNECTED;
-	else if (!s->HasFlag(SF_CONNECTING))
+	else if (!s->flags[SF_CONNECTING])
 		throw SocketException("SSLSocketIO::FinishConnect called for a socket not connected nor connecting?");
 
 	SSLSocketIO *io = anope_dynamic_static_cast<SSLSocketIO *>(s->io);
@@ -368,15 +367,15 @@ SocketFlag SSLSocketIO::FinishConnect(ConnectionSocket *s)
 		else
 		{
 			s->OnError(ERR_error_string(ERR_get_error(), NULL));
-			s->UnsetFlag(SF_CONNECTING);
-			s->SetFlag(SF_DEAD);
+			s->flags[SF_CONNECTING] = false;
+			s->flags[SF_DEAD] = true;
 			return SF_DEAD;
 		}
 	}
 	else
 	{
-		s->UnsetFlag(SF_CONNECTING);
-		s->SetFlag(SF_CONNECTED);
+		s->flags[SF_CONNECTING] = false;
+		s->flags[SF_CONNECTED] = true;
 		SocketEngine::Change(s, false, SF_WRITABLE);
 		SocketEngine::Change(s, true, SF_READABLE);
 		s->OnConnect();

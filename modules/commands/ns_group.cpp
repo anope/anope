@@ -46,8 +46,8 @@ class NSGroupRequest : public IdentifyRequest
 
 		u->Login(target->nc);
 		IRCD->SendLogin(u);
-		if (!Config->NoNicknameOwnership && na->nc == u->Account() && na->nc->HasFlag(NI_UNCONFIRMED) == false)
-			u->SetMode(NickServ, UMODE_REGISTERED);
+		if (!Config->NoNicknameOwnership && na->nc == u->Account() && na->nc->HasExt("UNCONFIRMED") == false)
+			u->SetMode(NickServ, "REGISTERED");
 		FOREACH_MOD(I_OnNickGroup, OnNickGroup(u, target));
 
 		Log(LOG_COMMAND, source, cmd) << "makes " << nick << " join group of " << target->nick << " (" << target->nc->display << ") (email: " << (!target->nc->email.empty() ? target->nc->email : "none") << ")";
@@ -78,10 +78,10 @@ class CommandNSGroup : public Command
  public:
 	CommandNSGroup(Module *creator) : Command(creator, "nickserv/group", 1, 2)
 	{
-		this->SetFlag(CFLAG_REQUIRE_USER);
-		this->SetFlag(CFLAG_ALLOW_UNREGISTERED);
 		this->SetDesc(_("Join a group"));
 		this->SetSyntax(_("\037target\037 \037password\037"));
+		this->AllowUnregistered(true);
+		this->RequireUser(true);
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
@@ -107,7 +107,7 @@ class CommandNSGroup : public Command
 			{
 				Oper *o = Config->Opers[i];
 
-				if (!u->HasMode(UMODE_OPER) && u->nick.find_ci(o->name) != Anope::string::npos)
+				if (!u->HasMode("OPER") && u->nick.find_ci(o->name) != Anope::string::npos)
 				{
 					source.Reply(NICK_CANNOT_BE_REGISTERED, u->nick.c_str());
 					return;
@@ -119,7 +119,7 @@ class CommandNSGroup : public Command
 			source.Reply(NICK_X_NOT_REGISTERED, nick.c_str());
 		else if (Anope::CurTime < u->lastnickreg + Config->NSRegDelay)
 			source.Reply(_("Please wait %d seconds before using the GROUP command again."), (Config->NSRegDelay + u->lastnickreg) - Anope::CurTime);
-		else if (target->nc->HasFlag(NI_SUSPENDED))
+		else if (target->nc->HasExt("SUSPENDED"))
 		{
 			Log(LOG_COMMAND, source, this) << "tried to use GROUP for SUSPENDED nick " << target->nick;
 			source.Reply(NICK_X_SUSPENDED, target->nick.c_str());
@@ -203,9 +203,9 @@ class CommandNSUngroup : public Command
  public:
 	CommandNSUngroup(Module *creator) : Command(creator, "nickserv/ungroup", 0, 1)
 	{
-		this->SetFlag(CFLAG_REQUIRE_USER);
 		this->SetDesc(_("Remove a nick from a group"));
 		this->SetSyntax(_("[\037nick\037]"));
+		this->RequireUser(true);
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
@@ -247,7 +247,7 @@ class CommandNSUngroup : public Command
 			User *user = User::Find(na->nick);
 			if (user)
 				/* The user on the nick who was ungrouped may be identified to the old group, set -r */
-				user->RemoveMode(NickServ, UMODE_REGISTERED);
+				user->RemoveMode(NickServ, "REGISTERED");
 		}
 
 		return;
@@ -308,7 +308,7 @@ class CommandNSGList : public Command
 
 			ListFormatter::ListEntry entry;
 			entry["Nick"] = na2->nick;
-			entry["Expires"] = (na2->HasFlag(NS_NO_EXPIRE) || !Config->NSExpire) ? "Does not expire" : ("expires in " + Anope::strftime(na2->last_seen + Config->NSExpire));
+			entry["Expires"] = (na2->HasExt("NO_EXPIRE") || !Config->NSExpire) ? "Does not expire" : ("expires in " + Anope::strftime(na2->last_seen + Config->NSExpire));
 			list.AddEntry(entry);
 		}
 

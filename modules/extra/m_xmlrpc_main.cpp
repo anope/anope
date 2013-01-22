@@ -153,21 +153,21 @@ class MyXMLRPCEvent : public XMLRPCEvent
 
 		if (c)
 		{
-			request.reply("bancount", stringify(c->HasMode(CMODE_BAN)));
+			request.reply("bancount", stringify(c->HasMode("BAN")));
 			int count = 0;
-			std::pair<Channel::ModeList::iterator, Channel::ModeList::iterator> its = c->GetModeList(CMODE_BAN);
+			std::pair<Channel::ModeList::iterator, Channel::ModeList::iterator> its = c->GetModeList("BAN");
 			for (; its.first != its.second; ++its.first)
 				request.reply("ban" + stringify(++count), iface->Sanitize(its.first->second));
 
-			request.reply("exceptcount", stringify(c->HasMode(CMODE_EXCEPT)));
+			request.reply("exceptcount", stringify(c->HasMode("EXCEPT")));
 			count = 0;
-			its = c->GetModeList(CMODE_EXCEPT);
+			its = c->GetModeList("EXCEPT");
 			for (; its.first != its.second; ++its.first)
 				request.reply("except" + stringify(++count), iface->Sanitize(its.first->second));
 
-			request.reply("invitecount", stringify(c->HasMode(CMODE_INVITEOVERRIDE)));
+			request.reply("invitecount", stringify(c->HasMode("INVITEOVERRIDE")));
 			count = 0;
-			its = c->GetModeList(CMODE_INVITEOVERRIDE);
+			its = c->GetModeList("INVITEOVERRIDE");
 			for (; its.first != its.second; ++its.first)
 				request.reply("invite" + stringify(++count), iface->Sanitize(its.first->second));
 

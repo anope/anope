@@ -223,12 +223,12 @@ class CommandNSSetAutoOp : public Command
 
 		 if (param.equals_ci("ON"))
 		 {
-			  nc->SetFlag(NI_AUTOOP);
+			  nc->ExtendMetadata("AUTOOP");
 			  source.Reply(_("Services will now autoop %s in channels."), nc->display.c_str());
 		 }
 		 else if (param.equals_ci("OFF"))
 		 {
-			  nc->UnsetFlag(NI_AUTOOP);
+			  nc->Shrink("AUTOOP");
 			  source.Reply(_("Services will no longer autoop %s in channels."), nc->display.c_str());
 		 }
 		 else
@@ -301,12 +301,12 @@ class CommandNSSetChanstats : public Command
 
 		if (param.equals_ci("ON"))
 		{
-			na->nc->SetFlag(NI_STATS);
+			na->nc->ExtendMetadata("STATS");
 			source.Reply(_("Chanstat statistics are now enabled for your nick"));
 		}
 		else if (param.equals_ci("OFF"))
 		{
-			na->nc->UnsetFlag(NI_STATS);
+			na->nc->Shrink("STATS");
 			source.Reply(_("Chanstat statistics are now disabled for your nick"));
 		}
 		else
@@ -669,30 +669,29 @@ class CommandNSSetHide : public Command
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
-		Anope::string onmsg, offmsg;
-		NickCoreFlag flag;
+		Anope::string onmsg, offmsg, flag;
 
 		if (param.equals_ci("EMAIL"))
 		{
-			flag = NI_HIDE_EMAIL;
+			flag = "HIDE_EMAIL";
 			onmsg = _("The E-mail address of \002%s\002 will now be hidden from %s INFO displays.");
 			offmsg = _("The E-mail address of \002%s\002 will now be shown in %s INFO displays.");
 		}
 		else if (param.equals_ci("USERMASK"))
 		{
-			flag = NI_HIDE_MASK;
+			flag = "HIDE_MASK";
 			onmsg = _("The last seen user@host mask of \002%s\002 will now be hidden from %s INFO displays.");
 			offmsg = _("The last seen user@host mask of \002%s\002 will now be shown in %s INFO displays.");
 		}
 		else if (param.equals_ci("STATUS"))
 		{
-			flag = NI_HIDE_STATUS;
+			flag = "HIDE_STATUS";
 			onmsg = _("The services access status of \002%s\002 will now be hidden from %s INFO displays.");
 			offmsg = _("The services access status of \002%s\002 will now be shown in %s INFO displays.");
 		}
 		else if (param.equals_ci("QUIT"))
 		{
-			flag = NI_HIDE_QUIT;
+			flag = "HIDE_QUIT";
 			onmsg = _("The last quit message of \002%s\002 will now be hidden from %s INFO displays.");
 			offmsg = _("The last quit message of \002%s\002 will now be shown in %s INFO displays.");
 		}
@@ -704,12 +703,12 @@ class CommandNSSetHide : public Command
 
 		if (arg.equals_ci("ON"))
 		{
-			nc->SetFlag(flag);
+			nc->ExtendMetadata(flag);
 			source.Reply(onmsg.c_str(), nc->display.c_str(), Config->NickServ.c_str());
 		}
 		else if (arg.equals_ci("OFF"))
 		{
-			nc->UnsetFlag(flag);
+			nc->Shrink(flag);
 			source.Reply(offmsg.c_str(), nc->display.c_str(), Config->NickServ.c_str());
 		}
 		else
@@ -799,25 +798,25 @@ class CommandNSSetKill : public Command
 
 		if (param.equals_ci("ON"))
 		{
-			nc->SetFlag(NI_KILLPROTECT);
-			nc->UnsetFlag(NI_KILL_QUICK);
-			nc->UnsetFlag(NI_KILL_IMMED);
+			nc->ExtendMetadata("KILLPROTECT");
+			nc->Shrink("KILL_QUICK");
+			nc->Shrink("KILL_IMMED");
 			source.Reply(_("Protection is now \002on\002 for \002%s\002."), nc->display.c_str());
 		}
 		else if (param.equals_ci("QUICK"))
 		{
-			nc->SetFlag(NI_KILLPROTECT);
-			nc->SetFlag(NI_KILL_QUICK);
-			nc->UnsetFlag(NI_KILL_IMMED);
+			nc->ExtendMetadata("KILLPROTECT");
+			nc->ExtendMetadata("KILL_QUICK");
+			nc->Shrink("KILL_IMMED");
 			source.Reply(_("Protection is now \002on\002 for \002%s\002, with a reduced delay."), nc->display.c_str());
 		}
 		else if (param.equals_ci("IMMED"))
 		{
 			if (Config->NSAllowKillImmed)
 			{
-				nc->SetFlag(NI_KILLPROTECT);
-				nc->SetFlag(NI_KILL_IMMED);
-				nc->UnsetFlag(NI_KILL_QUICK);
+				nc->ExtendMetadata("KILLPROTECT");
+				nc->ExtendMetadata("KILL_IMMED");
+				nc->Shrink("KILL_QUICK");
 				source.Reply(_("Protection is now \002on\002 for \002%s\002, with no delay."), nc->display.c_str());
 			}
 			else
@@ -825,9 +824,9 @@ class CommandNSSetKill : public Command
 		}
 		else if (param.equals_ci("OFF"))
 		{
-			nc->UnsetFlag(NI_KILLPROTECT);
-			nc->UnsetFlag(NI_KILL_QUICK);
-			nc->UnsetFlag(NI_KILL_IMMED);
+			nc->Shrink("KILLPROTECT");
+			nc->Shrink("KILL_QUICK");
+			nc->Shrink("KILL_IMMED");
 			source.Reply(_("Protection is now \002off\002 for \002%s\002."), nc->display.c_str());
 		}
 		else
@@ -1029,12 +1028,12 @@ class CommandNSSetMessage : public Command
 
 		if (param.equals_ci("ON"))
 		{
-			nc->SetFlag(NI_MSG);
+			nc->ExtendMetadata("MSG");
 			source.Reply(_("Services will now reply to \002%s\002 with \002messages\002."), nc->display.c_str());
 		}
 		else if (param.equals_ci("OFF"))
 		{
-			nc->UnsetFlag(NI_MSG);
+			nc->Shrink("MSG");
 			source.Reply(_("Services will now reply to \002%s\002 with \002notices\002."), nc->display.c_str());
 		}
 		else
@@ -1116,12 +1115,12 @@ class CommandNSSetPrivate : public Command
 
 		if (param.equals_ci("ON"))
 		{
-			nc->SetFlag(NI_PRIVATE);
+			nc->ExtendMetadata("PRIVATE");
 			source.Reply(_("Private option is now \002on\002 for \002%s\002."), nc->display.c_str());
 		}
 		else if (param.equals_ci("OFF"))
 		{
-			nc->UnsetFlag(NI_PRIVATE);
+			nc->Shrink("PRIVATE");
 			source.Reply(_("Private option is now \002off\002 for \002%s\002."), nc->display.c_str());
 		}
 		else
@@ -1203,12 +1202,12 @@ class CommandNSSetSecure : public Command
 
 		if (param.equals_ci("ON"))
 		{
-			nc->SetFlag(NI_SECURE);
+			nc->ExtendMetadata("SECURE");
 			source.Reply(_("Secure option is now \002on\002 for \002%s\002."), nc->display.c_str());
 		}
 		else if (param.equals_ci("OFF"))
 		{
-			nc->UnsetFlag(NI_SECURE);
+			nc->Shrink("SECURE");
 			source.Reply(_("Secure option is now \002off\002 for \002%s\002."), nc->display.c_str());
 		}
 		else
@@ -1286,12 +1285,12 @@ class CommandNSSASetNoexpire : public Command
 
 		if (param.equals_ci("ON"))
 		{
-			na->SetFlag(NS_NO_EXPIRE);
+			na->ExtendMetadata("NO_EXPIRE");
 			source.Reply(_("Nick %s \002will not\002 expire."), na->nick.c_str());
 		}
 		else if (param.equals_ci("OFF"))
 		{
-			na->UnsetFlag(NS_NO_EXPIRE);
+			na->Shrink("NO_EXPIRE");
 			source.Reply(_("Nick %s \002will\002 expire."), na->nick.c_str());
 		}
 		else
@@ -1388,7 +1387,7 @@ class NSSet : public Module
 	void OnNickRegister(NickAlias *na) anope_override
 	{
 		if (NSDefChanstats)
-			na->nc->SetFlag(NI_STATS);
+			na->nc->ExtendMetadata("STATS");
 	}
 
 	EventReturn OnPreCommand(CommandSource &source, Command *command, std::vector<Anope::string> &params) anope_override

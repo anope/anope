@@ -85,7 +85,7 @@ class CommandMSList : public Command
 						const Memo *m = mi->GetMemo(number);
 
 						ListFormatter::ListEntry entry;
-						entry["Number"] = (m->HasFlag(MF_UNREAD) ? "* " : "  ") + stringify(number + 1);
+						entry["Number"] = (m->unread ? "* " : "  ") + stringify(number + 1);
 						entry["Sender"] = m->sender;
 						entry["Date/Time"] = Anope::strftime(m->time);
 						this->list.AddEntry(entry);
@@ -100,7 +100,7 @@ class CommandMSList : public Command
 				{
 					unsigned i, end;
 					for (i = 0, end = mi->memos->size(); i < end; ++i)
-						if (mi->GetMemo(i)->HasFlag(MF_UNREAD))
+						if (mi->GetMemo(i)->unread)
 							break;
 					if (i == end)
 					{
@@ -114,13 +114,13 @@ class CommandMSList : public Command
 
 				for (unsigned i = 0, end = mi->memos->size(); i < end; ++i)
 				{
-					if (!param.empty() && !mi->GetMemo(i)->HasFlag(MF_UNREAD))
+					if (!param.empty() && !mi->GetMemo(i)->unread)
 						continue;
 
 					const Memo *m = mi->GetMemo(i);
 
 					ListFormatter::ListEntry entry;
-					entry["Number"] = (m->HasFlag(MF_UNREAD) ? "* " : "  ") + stringify(i + 1);
+					entry["Number"] = (m->unread ? "* " : "  ") + stringify(i + 1);
 					entry["Sender"] = m->sender;
 					entry["Date/Time"] = Anope::strftime(m->time);
 					list.AddEntry(entry);

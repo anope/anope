@@ -18,7 +18,7 @@ class MyGlobalService : public GlobalService
 {
 	void ServerGlobal(const BotInfo *sender, Server *s, const Anope::string &message)
 	{
-		if (s != Me && !s->HasFlag(SERVER_JUPED))
+		if (s != Me && !s->IsJuped())
 			s->Notice(sender, message);
 		for (unsigned i = 0, j = s->GetLinks().size(); i < j; ++i)
 			this->ServerGlobal(sender, s->GetLinks()[i], message);

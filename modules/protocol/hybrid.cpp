@@ -232,7 +232,7 @@ class HybridProto : public IRCDProto
 		{
 			ChannelStatus status;
 
-			status.SetFlag(CMODE_OP);
+			status.modes.insert("OP");
 			bi->Join(c, &status);
 		}
 
@@ -255,9 +255,9 @@ struct IRCDMessageBMask : IRCDMessage
 
 		if (c)
 		{
-			ChannelMode *ban = ModeManager::FindChannelModeByName(CMODE_BAN),
-					*except = ModeManager::FindChannelModeByName(CMODE_EXCEPT),
-					*invex = ModeManager::FindChannelModeByName(CMODE_INVITEOVERRIDE);
+			ChannelMode *ban = ModeManager::FindChannelModeByName("BAN"),
+					*except = ModeManager::FindChannelModeByName("EXCEPT"),
+					*invex = ModeManager::FindChannelModeByName("INVITEOVERRIDE");
 
 			spacesepstream bans(params[3]);
 			Anope::string token;
@@ -401,7 +401,7 @@ struct IRCDMessageSJoin : IRCDMessage
 					continue;
 				}
 
-				sju.first.SetFlag(cm->name);
+				sju.first.modes.insert(cm->name);
 			}
 
 			sju.second = User::Find(buf);
@@ -554,40 +554,40 @@ class ProtoHybrid : public Module
 	void AddModes()
 	{
 		/* Add user modes */
-		ModeManager::AddUserMode(new UserMode(UMODE_ADMIN, 'a'));
-		ModeManager::AddUserMode(new UserMode(UMODE_INVIS, 'i'));
-		ModeManager::AddUserMode(new UserMode(UMODE_OPER, 'o'));
-		ModeManager::AddUserMode(new UserMode(UMODE_REGISTERED, 'r'));
-		ModeManager::AddUserMode(new UserMode(UMODE_SNOMASK, 's'));
-		ModeManager::AddUserMode(new UserMode(UMODE_WALLOPS, 'w'));
-		ModeManager::AddUserMode(new UserMode(UMODE_HIDEOPER, 'H'));
-		ModeManager::AddUserMode(new UserMode(UMODE_REGPRIV, 'R'));
+		ModeManager::AddUserMode(new UserMode("ADMIN", 'a'));
+		ModeManager::AddUserMode(new UserMode("INVIS", 'i'));
+		ModeManager::AddUserMode(new UserMode("OPER", 'o'));
+		ModeManager::AddUserMode(new UserMode("REGISTERED", 'r'));
+		ModeManager::AddUserMode(new UserMode("SNOMASK", 's'));
+		ModeManager::AddUserMode(new UserMode("WALLOPS", 'w'));
+		ModeManager::AddUserMode(new UserMode("HIDEOPER", 'H'));
+		ModeManager::AddUserMode(new UserMode("REGPRIV", 'R'));
 
 		/* b/e/I */
-		ModeManager::AddChannelMode(new ChannelModeList(CMODE_BAN, 'b'));
-		ModeManager::AddChannelMode(new ChannelModeList(CMODE_EXCEPT, 'e'));
-		ModeManager::AddChannelMode(new ChannelModeList(CMODE_INVITEOVERRIDE, 'I'));
+		ModeManager::AddChannelMode(new ChannelModeList("BAN", 'b'));
+		ModeManager::AddChannelMode(new ChannelModeList("EXCEPT", 'e'));
+		ModeManager::AddChannelMode(new ChannelModeList("INVITEOVERRIDE", 'I'));
 
 		/* v/h/o/a/q */
-		ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_VOICE, 'v', '+', 0));
-		ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_HALFOP, 'h', '%', 1));
-		ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_OP, 'o', '@', 2));
+		ModeManager::AddChannelMode(new ChannelModeStatus("VOICE", 'v', '+', 0));
+		ModeManager::AddChannelMode(new ChannelModeStatus("HALFOP", 'h', '%', 1));
+		ModeManager::AddChannelMode(new ChannelModeStatus("OP", 'o', '@', 2));
 
 		/* l/k */
-		ModeManager::AddChannelMode(new ChannelModeParam(CMODE_LIMIT, 'l'));
+		ModeManager::AddChannelMode(new ChannelModeParam("LIMIT", 'l'));
 		ModeManager::AddChannelMode(new ChannelModeKey('k'));
 
 		/* Add channel modes */
-		ModeManager::AddChannelMode(new ChannelMode(CMODE_INVITE, 'i'));
-		ModeManager::AddChannelMode(new ChannelMode(CMODE_MODERATED, 'm'));
-		ModeManager::AddChannelMode(new ChannelMode(CMODE_NOEXTERNAL, 'n'));
-		ModeManager::AddChannelMode(new ChannelMode(CMODE_PRIVATE, 'p'));
+		ModeManager::AddChannelMode(new ChannelMode("INVITE", 'i'));
+		ModeManager::AddChannelMode(new ChannelMode("MODERATED", 'm'));
+		ModeManager::AddChannelMode(new ChannelMode("NOEXTERNAL", 'n'));
+		ModeManager::AddChannelMode(new ChannelMode("PRIVATE", 'p'));
 		ModeManager::AddChannelMode(new ChannelModeRegistered('r'));
-		ModeManager::AddChannelMode(new ChannelMode(CMODE_SECRET, 's'));
-		ModeManager::AddChannelMode(new ChannelMode(CMODE_TOPIC, 't'));
+		ModeManager::AddChannelMode(new ChannelMode("SECRET", 's'));
+		ModeManager::AddChannelMode(new ChannelMode("TOPIC", 't'));
 		ModeManager::AddChannelMode(new ChannelModeOper('O'));
-		ModeManager::AddChannelMode(new ChannelMode(CMODE_REGISTEREDONLY, 'R'));
-		ModeManager::AddChannelMode(new ChannelMode(CMODE_SSL, 'S'));
+		ModeManager::AddChannelMode(new ChannelMode("REGISTEREDONLY", 'R'));
+		ModeManager::AddChannelMode(new ChannelMode("SSL", 'S'));
 	}
 
 public:
@@ -620,7 +620,7 @@ public:
 
 	void OnUserNickChange(User *u, const Anope::string &) anope_override
 	{
-		u->RemoveModeInternal(ModeManager::FindUserModeByName(UMODE_REGISTERED));
+		u->RemoveModeInternal(ModeManager::FindUserModeByName("REGISTERED"));
 	}
 };
 

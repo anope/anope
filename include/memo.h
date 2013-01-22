@@ -16,19 +16,11 @@
 #include "anope.h"
 #include "serialize.h"
 
-/** Memo Flags
- */
-enum MemoFlag
-{
-	/* Memo is unread */
-	MF_UNREAD,
-	/* Sender requests a receipt */
-	MF_RECEIPT
-};
-
-class CoreExport Memo : public Flags<MemoFlag>, public Serializable
+class CoreExport Memo : public Serializable
 {
  public:
+ 	bool unread;
+	bool receipt;
  	Memo();
 
 	void Serialize(Serialize::Data &data) const anope_override;

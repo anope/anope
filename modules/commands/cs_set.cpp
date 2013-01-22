@@ -130,12 +130,12 @@ class CommandCSSetAutoOp : public Command
 
 		if (params[1].equals_ci("ON"))
 		{
-			ci->UnsetFlag(CI_NOAUTOOP);
+			ci->Shrink("NOAUTOOP");
 			source.Reply(_("Services will now automatically give modes to users in \2%s\2"), ci->name.c_str());
 		}
 		else if (params[1].equals_ci("OFF"))
 		{
-			ci->SetFlag(CI_NOAUTOOP);
+			ci->ExtendMetadata("NOAUTOOP");
 			source.Reply(_("Services will no longer automatically give modes to users in \2%s\2"), ci->name.c_str());
 		}
 		else
@@ -247,12 +247,12 @@ class CommandCSSetChanstats : public Command
 
 		if (params[1].equals_ci("ON"))
 		{
-			ci->SetFlag(CI_STATS);
+			ci->ExtendMetadata("STATS");
 			source.Reply(_("Chanstats statistics are now enabled for this channel"));
 		}
 		else if (params[1].equals_ci("OFF"))
 		{
-			ci->UnsetFlag(CI_STATS);
+			ci->Shrink("STATS");
 			source.Reply(_("Chanstats statistics are now disabled for this channel"));
 		}
 		else
@@ -351,7 +351,7 @@ class CommandCSSetFounder : public Command
 			return;
 		}
 
-		if (source.permission.empty() && (ci->HasFlag(CI_SECUREFOUNDER) ? !source.IsFounder(ci) : !source.AccessFor(ci).HasPriv("FOUNDER")))
+		if (source.permission.empty() && (ci->HasExt("SECUREFOUNDER") ? !source.IsFounder(ci) : !source.AccessFor(ci).HasPriv("FOUNDER")))
 		{
 			source.Reply(ACCESS_DENIED);
 			return;
@@ -421,12 +421,12 @@ class CommandCSSetKeepTopic : public Command
 
 		if (params[1].equals_ci("ON"))
 		{
-			ci->SetFlag(CI_KEEPTOPIC);
+			ci->ExtendMetadata("KEEPTOPIC");
 			source.Reply(_("Topic retention option for %s is now \002on\002."), ci->name.c_str());
 		}
 		else if (params[1].equals_ci("OFF"))
 		{
-			ci->UnsetFlag(CI_KEEPTOPIC);
+			ci->Shrink("KEEPTOPIC");
 			source.Reply(_("Topic retention option for %s is now \002off\002."), ci->name.c_str());
 		}
 		else
@@ -478,12 +478,12 @@ class CommandCSSetPeace : public Command
 
 		if (params[1].equals_ci("ON"))
 		{
-			ci->SetFlag(CI_PEACE);
+			ci->ExtendMetadata("PEACE");
 			source.Reply(_("Peace option for %s is now \002on\002."), ci->name.c_str());
 		}
 		else if (params[1].equals_ci("OFF"))
 		{
-			ci->UnsetFlag(CI_PEACE);
+			ci->Shrink("PEACE");
 			source.Reply(_("Peace option for %s is now \002off\002."), ci->name.c_str());
 		}
 		else
@@ -533,15 +533,15 @@ class CommandCSSetPersist : public Command
 			return;
 		}
 
-		ChannelMode *cm = ModeManager::FindChannelModeByName(CMODE_PERM);
+		ChannelMode *cm = ModeManager::FindChannelModeByName("PERM");
 
 		if (params[1].equals_ci("ON"))
 		{
-			if (!ci->HasFlag(CI_PERSIST))
+			if (!ci->HasExt("PERSIST"))
 			{
-				ci->SetFlag(CI_PERSIST);
+				ci->ExtendMetadata("PERSIST");
 				if (ci->c)
-					ci->c->SetFlag(CH_PERSIST);
+					ci->c->Extend("PERSIST");
 
 				/* Channel doesn't exist, create it */
 				if (!ci->c)
@@ -569,7 +569,7 @@ class CommandCSSetPersist : public Command
 				/* Set the perm mode */
 				if (cm)
 				{
-					if (ci->c && !ci->c->HasMode(CMODE_PERM))
+					if (ci->c && !ci->c->HasMode("PERM"))
 						ci->c->SetMode(NULL, cm);
 					/* Add it to the channels mlock */
 					ci->SetMLock(cm, true);
@@ -580,16 +580,16 @@ class CommandCSSetPersist : public Command
 		}
 		else if (params[1].equals_ci("OFF"))
 		{
-			if (ci->HasFlag(CI_PERSIST))
+			if (ci->HasExt("PERSIST"))
 			{
-				ci->UnsetFlag(CI_PERSIST);
+				ci->Shrink("PERSIST");
 				if (ci->c)
-					ci->c->UnsetFlag(CH_PERSIST);
+					ci->c->Shrink("PERSIST");
 
 				/* Unset perm mode */
 				if (cm)
 				{
-					if (ci->c && ci->c->HasMode(CMODE_PERM))
+					if (ci->c && ci->c->HasMode("PERM"))
 						ci->c->RemoveMode(NULL, cm);
 					/* Remove from mlock */
 					ci->RemoveMLock(cm, true);
@@ -676,12 +676,12 @@ class CommandCSSetPrivate : public Command
 
 		if (params[1].equals_ci("ON"))
 		{
-			ci->SetFlag(CI_PRIVATE);
+			ci->ExtendMetadata("PRIVATE");
 			source.Reply(_("Private option for %s is now \002on\002."), ci->name.c_str());
 		}
 		else if (params[1].equals_ci("OFF"))
 		{
-			ci->UnsetFlag(CI_PRIVATE);
+			ci->Shrink("PRIVATE");
 			source.Reply(_("Private option for %s is now \002off\002."), ci->name.c_str());
 		}
 		else
@@ -733,12 +733,12 @@ class CommandCSSetRestricted : public Command
 
 		if (params[1].equals_ci("ON"))
 		{
-			ci->SetFlag(CI_RESTRICTED);
+			ci->ExtendMetadata("RESTRICTED");
 			source.Reply(_("Restricted access option for %s is now \002on\002."), ci->name.c_str());
 		}
 		else if (params[1].equals_ci("OFF"))
 		{
-			ci->UnsetFlag(CI_RESTRICTED);
+			ci->Shrink("RESTRICTED");
 			source.Reply(_("Restricted access option for %s is now \002off\002."), ci->name.c_str());
 		}
 		else
@@ -789,12 +789,12 @@ class CommandCSSetSecure : public Command
 
 		if (params[1].equals_ci("ON"))
 		{
-			ci->SetFlag(CI_SECURE);
+			ci->ExtendMetadata("SECURE");
 			source.Reply(_("Secure option for %s is now \002on\002."), ci->name.c_str());
 		}
 		else if (params[1].equals_ci("OFF"))
 		{
-			ci->UnsetFlag(CI_SECURE);
+			ci->Shrink("SECURE");
 			source.Reply(_("Secure option for %s is now \002off\002."), ci->name.c_str());
 		}
 		else
@@ -847,12 +847,12 @@ class CommandCSSetSecureFounder : public Command
 
 		if (params[1].equals_ci("ON"))
 		{
-			ci->SetFlag(CI_SECUREFOUNDER);
+			ci->ExtendMetadata("SECUREFOUNDER");
 			source.Reply(_("Secure founder option for %s is now \002on\002."), ci->name.c_str());
 		}
 		else if (params[1].equals_ci("OFF"))
 		{
-			ci->UnsetFlag(CI_SECUREFOUNDER);
+			ci->Shrink("SECUREFOUNDER");
 			source.Reply(_("Secure founder option for %s is now \002off\002."), ci->name.c_str());
 		}
 		else
@@ -905,12 +905,12 @@ class CommandCSSetSecureOps : public Command
 
 		if (params[1].equals_ci("ON"))
 		{
-			ci->SetFlag(CI_SECUREOPS);
+			ci->ExtendMetadata("SECUREOPS");
 			source.Reply(_("Secure ops option for %s is now \002on\002."), ci->name.c_str());
 		}
 		else if (params[1].equals_ci("OFF"))
 		{
-			ci->UnsetFlag(CI_SECUREOPS);
+			ci->Shrink("SECUREOPS");
 			source.Reply(_("Secure ops option for %s is now \002off\002."), ci->name.c_str());
 		}
 		else
@@ -961,21 +961,21 @@ class CommandCSSetSignKick : public Command
 
 		if (params[1].equals_ci("ON"))
 		{
-			ci->SetFlag(CI_SIGNKICK);
-			ci->UnsetFlag(CI_SIGNKICK_LEVEL);
+			ci->ExtendMetadata("SIGNKICK");
+			ci->Shrink("SIGNKICK_LEVEL");
 			source.Reply(_("Signed kick option for %s is now \002on\002."), ci->name.c_str());
 		}
 		else if (params[1].equals_ci("LEVEL"))
 		{
-			ci->SetFlag(CI_SIGNKICK_LEVEL);
-			ci->UnsetFlag(CI_SIGNKICK);
+			ci->ExtendMetadata("SIGNKICK_LEVEL");
+			ci->Shrink("SIGNKICK");
 			source.Reply(_("Signed kick option for %s is now \002ON\002, but depends of the\n"
 				"level of the user that is using the command."), ci->name.c_str());
 		}
 		else if (params[1].equals_ci("OFF"))
 		{
-			ci->UnsetFlag(CI_SIGNKICK);
-			ci->UnsetFlag(CI_SIGNKICK_LEVEL);
+			ci->Shrink("SIGNKICK");
+			ci->Shrink("SIGNKICK_LEVEL");
 			source.Reply(_("Signed kick option for %s is now \002off\002."), ci->name.c_str());
 		}
 		else
@@ -1029,7 +1029,7 @@ class CommandCSSetSuccessor : public Command
 				return;
 			}
 
-			if (ci->HasFlag(CI_SECUREFOUNDER) ? !source.IsFounder(ci) : !source.AccessFor(ci).HasPriv("FOUNDER"))
+			if (ci->HasExt("SECUREFOUNDER") ? !source.IsFounder(ci) : !source.AccessFor(ci).HasPriv("FOUNDER"))
 			{
 				source.Reply(ACCESS_DENIED);
 				return;
@@ -1110,12 +1110,12 @@ class CommandCSSASetNoexpire : public Command
 
 		if (params[1].equals_ci("ON"))
 		{
-			ci->SetFlag(CI_NO_EXPIRE);
+			ci->ExtendMetadata("NO_EXPIRE");
 			source.Reply(_("Channel %s \002will not\002 expire."), ci->name.c_str());
 		}
 		else if (params[1].equals_ci("OFF"))
 		{
-			ci->UnsetFlag(CI_NO_EXPIRE);
+			ci->Shrink("NO_EXPIRE");
 			source.Reply(_("Channel %s \002will\002 expire."), ci->name.c_str());
 		}
 		else
@@ -1181,12 +1181,12 @@ class CSSet : public Module
 	void OnChanRegistered(ChannelInfo *ci) anope_override
 	{
 		if (CSDefChanstats)
-			ci->SetFlag(CI_STATS);
+			ci->ExtendMetadata("STATS");
 	}
 
 	EventReturn OnCheckKick(User *u, ChannelInfo *ci, Anope::string &mask, Anope::string &reason) anope_override
 	{
-		if (!ci->HasFlag(CI_RESTRICTED) || ci->c->MatchesList(u, CMODE_EXCEPT))
+		if (!ci->HasExt("RESTRICTED") || ci->c->MatchesList(u, "EXCEPT"))
 			return EVENT_CONTINUE;
 
 		if (ci->AccessFor(u).empty() && (!ci->GetFounder() || u->Account() != ci->GetFounder()))

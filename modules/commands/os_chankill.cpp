@@ -76,7 +76,7 @@ class CommandOSChanKill : public Command
 				{
 					ChanUserContainer *uc = *it++;
 
-					if (uc->user->server == Me || uc->user->HasMode(UMODE_OPER))
+					if (uc->user->server == Me || uc->user->HasMode("OPER"))
 						continue;
 
 					XLine *x = new XLine("*@" + uc->user->host, source.GetNick(), expires, realreason, XLineManager::GenerateUID());

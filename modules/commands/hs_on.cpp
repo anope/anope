@@ -18,9 +18,9 @@ class CommandHSOn : public Command
  public:
 	CommandHSOn(Module *creator) : Command(creator, "hostserv/on", 0, 0)
 	{
-		this->SetFlag(CFLAG_REQUIRE_USER);
 		this->SetDesc(_("Activates your assigned vhost"));
 		this->SetSyntax("");
+		this->RequireUser(true);
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override

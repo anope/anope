@@ -37,7 +37,7 @@ class NSRecoverRequest : public IdentifyRequest
 		Log(LOG_COMMAND, source, cmd) << "for " << na->nick;
 
 		/* Nick is being held by us, release it */
-		if (na->HasFlag(NS_HELD))
+		if (na->HasExt("HELD"))
 		{
 			na->Release();
 			source.Reply(_("Service's hold on \002%s\002 has been released."), na->nick.c_str());
@@ -50,7 +50,7 @@ class NSRecoverRequest : public IdentifyRequest
 		// same person that is executing the command, so kill them off (old GHOST command).
 		else if (u->Account() == na->nc)
 		{
-			if (!source.GetAccount() && na->nc->HasFlag(NI_SECURE))
+			if (!source.GetAccount() && na->nc->HasExt("SECURE"))
 			{
 				source.GetUser()->Login(u->Account());
 				Log(LOG_COMMAND, source, cmd) << "and was automatically identified to " << u->Account()->display;
@@ -83,7 +83,7 @@ class NSRecoverRequest : public IdentifyRequest
 		/* User is not identified or not identified to the same account as the person using this command */
 		else
 		{
-			if (!source.GetAccount() && na->nc->HasFlag(NI_SECURE))
+			if (!source.GetAccount() && na->nc->HasExt("SECURE"))
 			{
 				source.GetUser()->Login(na->nc); // Identify the user using the command if they arent identified
 				Log(LOG_COMMAND, source, cmd) << "and was automatically identified to " << na->nick << " (" << na->nc->display << ")";
@@ -126,9 +126,9 @@ class CommandNSRecover : public Command
  public:
 	CommandNSRecover(Module *creator) : Command(creator, "nickserv/recover", 1, 2)
 	{
-		this->SetFlag(CFLAG_ALLOW_UNREGISTERED);
 		this->SetDesc(_("Regains control of your nick"));
 		this->SetSyntax("\037nickname\037 [\037password\037]");
+		this->AllowUnregistered(true);
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
@@ -151,7 +151,7 @@ class CommandNSRecover : public Command
 			source.Reply(NICK_X_NOT_REGISTERED, nick.c_str());
 			return;
 		}
-		else if (na->nc->HasFlag(NI_SUSPENDED))
+		else if (na->nc->HasExt("SUSPENDED"))
 		{
 			source.Reply(NICK_X_SUSPENDED, na->nick.c_str());
 			return;
@@ -160,7 +160,7 @@ class CommandNSRecover : public Command
 		bool ok = false;
 		if (source.GetAccount() == na->nc)
 			ok = true;
-		else if (!na->nc->HasFlag(NI_SECURE) && source.GetUser() && na->nc->IsOnAccess(source.GetUser()))
+		else if (!na->nc->HasExt("SECURE") && source.GetUser() && na->nc->IsOnAccess(source.GetUser()))
 			ok = true;
 		else if (source.GetUser() && !source.GetUser()->fingerprint.empty() && na->nc->FindCert(source.GetUser()->fingerprint))
 			ok = true;
@@ -265,9 +265,8 @@ class NSRecover : public Module
 				std::map<Anope::string, ChannelStatus>::iterator it = ei->find(c->name);
 				if (it != ei->end())
 				{
-					for (size_t j = CMODE_BEGIN + 1; j < CMODE_END; ++j)
-						if (it->second.HasFlag(static_cast<ChannelModeName>(j)))
-							c->SetMode(c->ci->WhoSends(), ModeManager::FindChannelModeByName(static_cast<ChannelModeName>(j)), u->GetUID());
+					for (std::set<Anope::string>::iterator it2 = it->second.modes.begin(), it2_end = it->second.modes.end(); it2 != it2_end; ++it)
+						c->SetMode(c->ci->WhoSends(), ModeManager::FindChannelModeByName(*it2), u->GetUID());
 
 					ei->erase(it);
 					if (ei->empty())

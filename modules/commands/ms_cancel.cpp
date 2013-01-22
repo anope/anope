@@ -47,7 +47,7 @@ class CommandMSCancel : public Command
 			else
 				na = NickAlias::Find(nname);
 			for (int i = mi->memos->size() - 1; i >= 0; --i)
-				if (mi->GetMemo(i)->HasFlag(MF_UNREAD) && source.nc->display.equals_ci(mi->GetMemo(i)->sender))
+				if (mi->GetMemo(i)->unread && source.nc->display.equals_ci(mi->GetMemo(i)->sender))
 				{
 					if (ischan)
 						FOREACH_MOD(I_OnMemoDel, OnMemoDel(ci, mi, mi->GetMemo(i)));

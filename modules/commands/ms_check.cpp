@@ -47,7 +47,7 @@ class CommandMSCheck : public Command
 			{
 				found = true; /* Yes, we've found the memo */
 
-				if (mi->GetMemo(i)->HasFlag(MF_UNREAD))
+				if (mi->GetMemo(i)->unread)
 					source.Reply(_("The last memo you sent to %s (sent on %s) has not yet been read."), na->nick.c_str(), Anope::strftime(mi->GetMemo(i)->time).c_str());
 				else
 					source.Reply(_("The last memo you sent to %s (sent on %s) has been read."), na->nick.c_str(), Anope::strftime(mi->GetMemo(i)->time).c_str());

@@ -140,7 +140,7 @@ const Anope::string &User::GetDisplayedHost() const
 {
 	if (!this->vhost.empty())
 		return this->vhost;
-	else if (this->HasMode(UMODE_CLOAK) && !this->GetCloakedHost().empty())
+	else if (this->HasMode("CLOAK") && !this->GetCloakedHost().empty())
 		return this->GetCloakedHost();
 	else
 		return this->host;
@@ -239,7 +239,7 @@ User::~User()
 	ModeManager::StackerDel(this);
 	this->Logout();
 
-	if (this->HasMode(UMODE_OPER))
+	if (this->HasMode("OPER"))
 		--OperCount;
 
 	while (!this->chans.empty())
@@ -280,7 +280,7 @@ void User::SendMessage(const BotInfo *source, const Anope::string &msg)
 	Anope::string tok;
 	while (sep.GetToken(tok))
 	{
-		if (Config->UsePrivmsg && ((!this->nc && Config->NSDefFlags.HasFlag(NI_MSG)) || (this->nc && this->nc->HasFlag(NI_MSG))))
+		if (Config->UsePrivmsg && ((!this->nc && Config->NSDefFlags.count("msg")) || (this->nc && this->nc->HasExt("MSG"))))
 			IRCD->SendPrivmsg(source, this->GetUID(), "%s", tok.c_str());
 		else
 			IRCD->SendNotice(source, this->GetUID(), "%s", tok.c_str());
@@ -346,7 +346,7 @@ void User::SendMessage(const BotInfo *source, const Anope::string &msg)
 void User::Collide(NickAlias *na)
 {
 	if (na)
-		na->SetFlag(NS_COLLIDED);
+		na->Extend("COLLIDED");
 
 	if (IRCD->CanSVSNick)
 	{
@@ -393,8 +393,8 @@ void User::Identify(NickAlias *na)
 	IRCD->SendLogin(this);
 
 	const NickAlias *this_na = NickAlias::Find(this->nick);
-	if (!Config->NoNicknameOwnership && this_na && this_na->nc == *na->nc && na->nc->HasFlag(NI_UNCONFIRMED) == false)
-		this->SetMode(NickServ, UMODE_REGISTERED);
+	if (!Config->NoNicknameOwnership && this_na && this_na->nc == *na->nc && na->nc->HasExt("UNCONFIRMED") == false)
+		this->SetMode(NickServ, "REGISTERED");
 
 	FOREACH_MOD(I_OnNickIdentify, OnNickIdentify(this));
 
@@ -405,8 +405,8 @@ void User::Identify(NickAlias *na)
 			this->SetModes(OperServ, "%s", this->nc->o->ot->modes.c_str());
 			if (OperServ)
 				this->SendMessage(OperServ, "Changing your usermodes to \002%s\002", this->nc->o->ot->modes.c_str());
-			UserMode *um = ModeManager::FindUserModeByName(UMODE_OPER);
-			if (um && !this->HasMode(UMODE_OPER) && this->nc->o->ot->modes.find(um->mchar) != Anope::string::npos)
+			UserMode *um = ModeManager::FindUserModeByName("OPER");
+			if (um && !this->HasMode("OPER") && this->nc->o->ot->modes.find(um->mchar) != Anope::string::npos)
 				IRCD->SendOper(this);
 		}
 		if (IRCD->CanSetVHost && !this->nc->o->vhost.empty())
@@ -472,7 +472,7 @@ bool User::IsRecognized(bool CheckSecure) const
 	{
 		const NickAlias *na = NickAlias::Find(this->nick);
 
-		if (!na || na->nc->HasFlag(NI_SECURE))
+		if (!na || na->nc->HasExt("SECURE"))
 			return false;
 	}
 
@@ -484,7 +484,7 @@ bool User::IsServicesOper()
 	if (!this->nc || !this->nc->IsServicesOper())
 		// No opertype.
 		return false;
-	else if (this->nc->o->require_oper && !this->HasMode(UMODE_OPER))
+	else if (this->nc->o->require_oper && !this->HasMode("OPER"))
 		return false;
 	else if (!this->nc->o->certfp.empty() && this->fingerprint != this->nc->o->certfp)
 		// Certfp mismatch
@@ -541,9 +541,9 @@ void User::UpdateHost()
 	}
 }
 
-bool User::HasMode(UserModeName Name) const
+bool User::HasMode(const Anope::string &mname) const
 {
-	return this->modes.HasFlag(Name);
+	return this->modes.count(mname);
 }
 
 void User::SetModeInternal(UserMode *um, const Anope::string &param)
@@ -551,9 +551,7 @@ void User::SetModeInternal(UserMode *um, const Anope::string &param)
 	if (!um)
 		return;
 
-	this->modes.SetFlag(um->name);
-	if (!param.empty())
-		this->mode_params.insert(std::make_pair(um->name, param));
+	this->modes[um->name] = param;
 
 	FOREACH_MOD(I_OnUserModeSet, OnUserModeSet(this, um->name));
 }
@@ -563,10 +561,7 @@ void User::RemoveModeInternal(UserMode *um)
 	if (!um)
 		return;
 
-	this->modes.UnsetFlag(um->name);
-	std::map<UserModeName, Anope::string>::iterator it = this->mode_params.find(um->name);
-	if (it != this->mode_params.end())
-		this->mode_params.erase(it);
+	this->modes.erase(um->name);
 
 	FOREACH_MOD(I_OnUserModeUnset, OnUserModeUnset(this, um->name));
 }
@@ -580,9 +575,9 @@ void User::SetMode(const BotInfo *bi, UserMode *um, const Anope::string &Param)
 	SetModeInternal(um, Param);
 }
 
-void User::SetMode(const BotInfo *bi, UserModeName Name, const Anope::string &Param)
+void User::SetMode(const BotInfo *bi, const Anope::string &uname, const Anope::string &Param)
 {
-	SetMode(bi, ModeManager::FindUserModeByName(Name), Param);
+	SetMode(bi, ModeManager::FindUserModeByName(uname), Param);
 }
 
 void User::RemoveMode(const BotInfo *bi, UserMode *um)
@@ -594,9 +589,9 @@ void User::RemoveMode(const BotInfo *bi, UserMode *um)
 	RemoveModeInternal(um);
 }
 
-void User::RemoveMode(const BotInfo *bi, UserModeName Name)
+void User::RemoveMode(const BotInfo *bi, const Anope::string &name)
 {
-	RemoveMode(bi, ModeManager::FindUserModeByName(Name));
+	RemoveMode(bi, ModeManager::FindUserModeByName(name));
 }
 
 void User::SetModes(const BotInfo *bi, const char *umodes, ...)
@@ -687,39 +682,40 @@ void User::SetModesInternal(const char *umodes, ...)
 		else
 			this->RemoveModeInternal(um);
 
-		switch (um->name)
+		if (um->name == "OPER")
 		{
-			case UMODE_OPER:
-				if (add)
-					++OperCount;
-				else
-					--OperCount;
-				break;
-			case UMODE_CLOAK:
-			case UMODE_VHOST:
-				if (!add && !this->vhost.empty())
-					this->vhost.clear();
-				this->UpdateHost();
-			default:
-				break;
+			if (add)
+				++OperCount;
+			else
+				--OperCount;
+		}
+		else if (um->name == "CLOAK" || um->name == "VHOST")
+		{
+			if (!add && !this->vhost.empty())
+				this->vhost.clear();
+			this->UpdateHost();
 		}
 	}
 }
 
 Anope::string User::GetModes() const
 {
-	Anope::string ret;
+	Anope::string m, params;
 
-	for (size_t i = UMODE_BEGIN + 1; i < UMODE_END; ++i)
-		if (this->modes.HasFlag(static_cast<UserModeName>(i)))
-		{
-			UserMode *um = ModeManager::FindUserModeByName(static_cast<UserModeName>(i));
-			if (um == NULL)
-				continue;
-			ret += um->mchar;
-		}
+	typedef std::map<Anope::string, Anope::string> mode_map;
+	for (mode_map::const_iterator it = this->modes.begin(), it_end = this->modes.end(); it != it_end; ++it)
+	{
+		UserMode *um = ModeManager::FindUserModeByName(it->first);
+		if (um == NULL)
+			continue;
 
-	return ret;
+		m += um->mchar;
+
+		if (!it->second.empty())
+			params += " " + it->second;
+	}
+
+	return m + params;
 }
 
 ChanUserContainer *User::FindChannel(const Channel *c) const
@@ -732,7 +728,7 @@ ChanUserContainer *User::FindChannel(const Channel *c) const
 
 bool User::IsProtected() const
 {
-	if (this->HasMode(UMODE_PROTECTED) || this->HasMode(UMODE_GOD))
+	if (this->HasMode("PROTECTED") || this->HasMode("GOD"))
 		return true;
 
 	return false;
@@ -757,7 +753,7 @@ void User::KillInternal(const Anope::string &source, const Anope::string &reason
 	Log(this, "killed") << "was killed by " << source << " (Reason: " << reason << ")";
 
 	NickAlias *na = NickAlias::Find(this->nick);
-	if (na && !na->nc->HasFlag(NI_SUSPENDED) && (this->IsRecognized() || this->IsIdentified(true)))
+	if (na && !na->nc->HasExt("SUSPENDED") && (this->IsRecognized() || this->IsIdentified(true)))
 	{
 		na->last_seen = Anope::CurTime;
 		na->last_quit = reason;

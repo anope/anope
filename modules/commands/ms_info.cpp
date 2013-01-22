@@ -40,7 +40,7 @@ class CommandMSInfo : public Command
 				return;
 			}
 			mi = &na->nc->memos;
-			hardmax = na->nc->HasFlag(NI_MEMO_HARDMAX) ? 1 : 0;
+			hardmax = na->nc->HasExt("MEMO_HARDMAX") ? 1 : 0;
 		}
 		else if (!nname.empty() && nname[0] == '#')
 		{
@@ -56,7 +56,7 @@ class CommandMSInfo : public Command
 				return;
 			}
 			mi = &ci->memos;
-			hardmax = ci->HasFlag(CI_MEMO_HARDMAX) ? 1 : 0;
+			hardmax = ci->HasExt("MEMO_HARDMAX") ? 1 : 0;
 		}
 		else if (!nname.empty()) /* It's not a chan and we aren't services admin */
 		{
@@ -66,7 +66,7 @@ class CommandMSInfo : public Command
 		else
 		{
 			mi = &nc->memos;
-			hardmax = nc->HasFlag(NI_MEMO_HARDMAX) ? 1 : 0;
+			hardmax = nc->HasExt("MEMO_HARDMAX") ? 1 : 0;
 		}
 
 		if (!nname.empty() && (ci || na->nc != nc))
@@ -75,7 +75,7 @@ class CommandMSInfo : public Command
 				source.Reply(_("%s currently has no memos."), nname.c_str());
 			else if (mi->memos->size() == 1)
 			{
-				if (mi->GetMemo(0)->HasFlag(MF_UNREAD))
+				if (mi->GetMemo(0)->unread)
 					source.Reply(_("%s currently has \0021\002 memo, and it has not yet been read."), nname.c_str());
 				else
 					source.Reply(_("%s currently has \0021\002 memo."), nname.c_str());
@@ -84,7 +84,7 @@ class CommandMSInfo : public Command
 			{
 				unsigned count = 0, i, end;
 				for (i = 0, end = mi->memos->size(); i < end; ++i)
-					if (mi->GetMemo(i)->HasFlag(MF_UNREAD))
+					if (mi->GetMemo(i)->unread)
 						++count;
 				if (count == mi->memos->size())
 					source.Reply(_("%s currently has \002%d\002 memos; all of them are unread."), nname.c_str(), count);
@@ -116,11 +116,11 @@ class CommandMSInfo : public Command
 			   to rewrite the whole thing (it pisses me off). */
 			if (na)
 			{
-				if (na->nc->HasFlag(NI_MEMO_RECEIVE) && na->nc->HasFlag(NI_MEMO_SIGNON))
+				if (na->nc->HasExt("MEMO_RECEIVE") && na->nc->HasExt("MEMO_SIGNON"))
 					source.Reply(_("%s is notified of new memos at logon and when they arrive."), nname.c_str());
-				else if (na->nc->HasFlag(NI_MEMO_RECEIVE))
+				else if (na->nc->HasExt("MEMO_RECEIVE"))
 					source.Reply(_("%s is notified when new memos arrive."), nname.c_str());
-				else if (na->nc->HasFlag(NI_MEMO_SIGNON))
+				else if (na->nc->HasExt("MEMO_SIGNON"))
 					source.Reply(_("%s is notified of news memos at logon."), nname.c_str());
 				else
 					source.Reply(_("%s is not notified of new memos."), nname.c_str());
@@ -132,7 +132,7 @@ class CommandMSInfo : public Command
 				source.Reply(_("You currently have no memos."));
 			else if (mi->memos->size() == 1)
 			{
-				if (mi->GetMemo(0)->HasFlag(MF_UNREAD))
+				if (mi->GetMemo(0)->unread)
 					source.Reply(_("You currently have \0021\002 memo, and it has not yet been read."));
 				else
 					source.Reply(_("You currently have \0021\002 memo."));
@@ -141,7 +141,7 @@ class CommandMSInfo : public Command
 			{
 				unsigned count = 0, i, end;
 				for (i = 0, end = mi->memos->size(); i < end; ++i)
-					if (mi->GetMemo(i)->HasFlag(MF_UNREAD))
+					if (mi->GetMemo(i)->unread)
 						++count;
 				if (count == mi->memos->size())
 					source.Reply(_("You currently have \002%d\002 memos; all of them are unread."), count);
@@ -171,11 +171,11 @@ class CommandMSInfo : public Command
 				source.Reply(_("You have no limit on the number of memos you may keep."));
 
 			/* Ripped too. But differently because of a seg fault (loughs) */
-			if (nc->HasFlag(NI_MEMO_RECEIVE) && nc->HasFlag(NI_MEMO_SIGNON))
+			if (nc->HasExt("MEMO_RECEIVE") && nc->HasExt("MEMO_SIGNON"))
 				source.Reply(_("You will be notified of new memos at logon and when they arrive."));
-			else if (nc->HasFlag(NI_MEMO_RECEIVE))
+			else if (nc->HasExt("MEMO_RECEIVE"))
 				source.Reply(_("You will be notified when new memos arrive."));
-			else if (nc->HasFlag(NI_MEMO_SIGNON))
+			else if (nc->HasExt("MEMO_SIGNON"))
 				source.Reply(_("You will be notified of new memos at logon."));
 			else
 				source.Reply(_("You will not be notified of new memos."));

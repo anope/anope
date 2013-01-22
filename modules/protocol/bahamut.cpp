@@ -16,7 +16,7 @@
 class ChannelModeFlood : public ChannelModeParam
 {
  public:
-	ChannelModeFlood(char modeChar, bool minusNoArg) : ChannelModeParam(CMODE_FLOOD, modeChar, minusNoArg) { }
+	ChannelModeFlood(char modeChar, bool minusNoArg) : ChannelModeParam("FLOOD", modeChar, minusNoArg) { }
 
 	bool IsValid(const Anope::string &value) const anope_override
 	{
@@ -182,11 +182,11 @@ class BahamutIRCdProto : public IRCDProto
 			 */
 			ChanUserContainer *uc = c->FindUser(user);
 			if (uc != NULL)
-				uc->status.ClearFlags();
+				uc->status.modes.clear();
 
 			BotInfo *setter = BotInfo::Find(user->nick);
 			for (unsigned i = 0; i < ModeManager::ChannelModes.size(); ++i)
-				if (cs.HasFlag(ModeManager::ChannelModes[i]->name))
+				if (cs.modes.count(ModeManager::ChannelModes[i]->name))
 					c->SetMode(setter, ModeManager::ChannelModes[i], user->GetUID(), false);
 		}
 	}
@@ -455,7 +455,7 @@ struct IRCDMessageSJoin : IRCDMessage
 						continue;
 					}
 
-					sju.first.SetFlag(cm->name);
+					sju.first.modes.insert(cm->name);
 				}
 
 				sju.second = User::Find(buf);
@@ -519,38 +519,38 @@ class ProtoBahamut : public Module
 	void AddModes()
 	{
 		/* Add user modes */
-		ModeManager::AddUserMode(new UserMode(UMODE_SERV_ADMIN, 'A'));
-		ModeManager::AddUserMode(new UserMode(UMODE_REGPRIV, 'R'));
-		ModeManager::AddUserMode(new UserMode(UMODE_ADMIN, 'a'));
-		ModeManager::AddUserMode(new UserMode(UMODE_INVIS, 'i'));
-		ModeManager::AddUserMode(new UserMode(UMODE_OPER, 'o'));
-		ModeManager::AddUserMode(new UserMode(UMODE_REGISTERED, 'r'));
-		ModeManager::AddUserMode(new UserMode(UMODE_SNOMASK, 's'));
-		ModeManager::AddUserMode(new UserMode(UMODE_WALLOPS, 'w'));
-		ModeManager::AddUserMode(new UserMode(UMODE_DEAF, 'd'));
+		ModeManager::AddUserMode(new UserMode("SERV_ADMIN", 'A'));
+		ModeManager::AddUserMode(new UserMode("REGPRIV", 'R'));
+		ModeManager::AddUserMode(new UserMode("ADMIN", 'a'));
+		ModeManager::AddUserMode(new UserMode("INVIS", 'i'));
+		ModeManager::AddUserMode(new UserMode("OPER", 'o'));
+		ModeManager::AddUserMode(new UserMode("REGISTERED", 'r'));
+		ModeManager::AddUserMode(new UserMode("SNOMASK", 's'));
+		ModeManager::AddUserMode(new UserMode("WALLOPS", 'w'));
+		ModeManager::AddUserMode(new UserMode("DEAF", 'd'));
 
 		/* b/e/I */
-		ModeManager::AddChannelMode(new ChannelModeList(CMODE_BAN, 'b'));
+		ModeManager::AddChannelMode(new ChannelModeList("BAN", 'b'));
 
 		/* v/h/o/a/q */
-		ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_VOICE, 'v', '+', 0));
-		ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_OP, 'o', '@', 1));
+		ModeManager::AddChannelMode(new ChannelModeStatus("VOICE", 'v', '+', 0));
+		ModeManager::AddChannelMode(new ChannelModeStatus("OP", 'o', '@', 1));
 
 		/* Add channel modes */
-		ModeManager::AddChannelMode(new ChannelMode(CMODE_BLOCKCOLOR, 'c'));
-		ModeManager::AddChannelMode(new ChannelMode(CMODE_INVITE, 'i'));
+		ModeManager::AddChannelMode(new ChannelMode("BLOCKCOLOR", 'c'));
+		ModeManager::AddChannelMode(new ChannelMode("INVITE", 'i'));
 		ModeManager::AddChannelMode(new ChannelModeFlood('f', false));
 		ModeManager::AddChannelMode(new ChannelModeKey('k'));
-		ModeManager::AddChannelMode(new ChannelModeParam(CMODE_LIMIT, 'l'));
-		ModeManager::AddChannelMode(new ChannelMode(CMODE_MODERATED, 'm'));
-		ModeManager::AddChannelMode(new ChannelMode(CMODE_NOEXTERNAL, 'n'));
-		ModeManager::AddChannelMode(new ChannelMode(CMODE_PRIVATE, 'p'));
+		ModeManager::AddChannelMode(new ChannelModeParam("LIMIT", 'l'));
+		ModeManager::AddChannelMode(new ChannelMode("MODERATED", 'm'));
+		ModeManager::AddChannelMode(new ChannelMode("NOEXTERNAL", 'n'));
+		ModeManager::AddChannelMode(new ChannelMode("PRIVATE", 'p'));
 		ModeManager::AddChannelMode(new ChannelModeRegistered('r'));
-		ModeManager::AddChannelMode(new ChannelMode(CMODE_SECRET, 's'));
-		ModeManager::AddChannelMode(new ChannelMode(CMODE_TOPIC, 't'));
-		ModeManager::AddChannelMode(new ChannelMode(CMODE_REGMODERATED, 'M'));
+		ModeManager::AddChannelMode(new ChannelMode("SECRET", 's'));
+		ModeManager::AddChannelMode(new ChannelMode("TOPIC", 't'));
+		ModeManager::AddChannelMode(new ChannelMode("REGMODERATED", 'M'));
 		ModeManager::AddChannelMode(new ChannelModeOper('O'));
-		ModeManager::AddChannelMode(new ChannelMode(CMODE_REGISTEREDONLY, 'R'));
+		ModeManager::AddChannelMode(new ChannelMode("REGISTEREDONLY", 'R'));
 	}
 
  public:
@@ -573,7 +573,7 @@ class ProtoBahamut : public Module
 
 	void OnUserNickChange(User *u, const Anope::string &) anope_override
 	{
-		u->RemoveModeInternal(ModeManager::FindUserModeByName(UMODE_REGISTERED));
+		u->RemoveModeInternal(ModeManager::FindUserModeByName("REGISTERED"));
 		IRCD->SendLogout(u);
 	}
 };

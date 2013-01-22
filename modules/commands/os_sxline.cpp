@@ -391,7 +391,7 @@ class CommandOSSNLine : public CommandOSSXLineBase
 				User *user = it->second;
 				++it;
 
-				if (!user->HasMode(UMODE_OPER) && user->server != Me && Anope::Match(user->realname, x->mask, false, true))
+				if (!user->HasMode("OPER") && user->server != Me && Anope::Match(user->realname, x->mask, false, true))
 					user->Kill(Config->ServerName, rreason);
 			}
 		}
@@ -601,7 +601,7 @@ class CommandOSSQLine : public CommandOSSXLineBase
 						ChanUserContainer *uc = *it;
 						User *user = uc->user;
 
-						if (!user->HasMode(UMODE_OPER) && user->server != Me)
+						if (!user->HasMode("OPER") && user->server != Me)
 							users.push_back(user);
 					}
 
@@ -616,7 +616,7 @@ class CommandOSSQLine : public CommandOSSXLineBase
 					User *user = it->second;
 					++it;
 
-					if (!user->HasMode(UMODE_OPER) && user->server != Me && Anope::Match(user->nick, x->mask, false, true))
+					if (!user->HasMode("OPER") && user->server != Me && Anope::Match(user->nick, x->mask, false, true))
 						user->Kill(Config->ServerName, rreason);
 				}
 			}

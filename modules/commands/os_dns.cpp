@@ -352,7 +352,7 @@ class CommandOSDNS : public Command
 		}
 
 		Server *serv = Server::Find(params[1]);
-		if (!serv || serv == Me || serv->HasFlag(SERVER_JUPED))
+		if (!serv || serv == Me || serv->IsJuped())
 		{
 			source.Reply(_("Server %s is not linked to the network."), params[1].c_str());
 			return;
@@ -703,7 +703,7 @@ class ModuleDNS : public Module
 
 	void OnNewServer(Server *s) anope_override
 	{
-		if (s == Me || s->HasFlag(SERVER_JUPED))
+		if (s == Me || s->IsJuped())
 			return;
 		if (!Me->IsSynced() || this->readd_connected_servers)
 		{

@@ -32,6 +32,7 @@ namespace Serialize
 		virtual ~Data() { }
 
 		virtual std::iostream& operator[](const Anope::string &key) = 0;
+		virtual std::set<Anope::string> KeySet() const { throw CoreException("Not supported"); }
 
 		virtual bool IsEqual(Data *other) { throw CoreException("Not supported"); }
 

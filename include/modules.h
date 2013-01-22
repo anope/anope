@@ -833,7 +833,7 @@ class CoreExport Module : public Extensible
 	 * @param param The mode param, if there is one
 	 * @return EVENT_STOP to make mlock/secureops etc checks not happen
 	 */
-	virtual EventReturn OnChannelModeSet(Channel *c, MessageSource &setter, ChannelModeName mname, const Anope::string &param) { return EVENT_CONTINUE; }
+	virtual EventReturn OnChannelModeSet(Channel *c, MessageSource &setter, const Anope::string &mname, const Anope::string &param) { return EVENT_CONTINUE; }
 
 	/** Called when a mode is unset on a channel
 	 * @param c The channel
@@ -842,19 +842,19 @@ class CoreExport Module : public Extensible
 	 * @param param The mode param, if there is one
 	 * @return EVENT_STOP to make mlock/secureops etc checks not happen
 	 */
-	virtual EventReturn OnChannelModeUnset(Channel *c, MessageSource &setter, ChannelModeName mname, const Anope::string &param) { return EVENT_CONTINUE; }
+	virtual EventReturn OnChannelModeUnset(Channel *c, MessageSource &setter, const Anope::string &mname, const Anope::string &param) { return EVENT_CONTINUE; }
 
 	/** Called when a mode is set on a user
 	 * @param u The user
 	 * @param mname The mode name
 	 */
-	virtual void OnUserModeSet(User *u, UserModeName mname) { }
+	virtual void OnUserModeSet(User *u, const Anope::string &mname) { }
 
 	/** Called when a mode is unset from a user
 	 * @param u The user
 	 * @param mname The mode name
 	 */
-	virtual void OnUserModeUnset(User *u, UserModeName mname) { }
+	virtual void OnUserModeUnset(User *u, const Anope::string &mname) { }
 
 	/** Called when a channel mode is introducted into Anope
 	 * @param cm The mode

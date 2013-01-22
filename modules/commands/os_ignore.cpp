@@ -93,7 +93,7 @@ class OSIgnoreService : public IgnoreService
 		{
 			for (; ign != ign_end; ++ign)
 			{
-				Entry ignore_mask(CMODE_BEGIN, ign->mask);
+				Entry ignore_mask("", ign->mask);
 				if (ignore_mask.Matches(u, true))
 					break;
 			}
@@ -325,7 +325,7 @@ class OSIgnore : public Module
 
 	EventReturn OnBotPrivmsg(User *u, BotInfo *bi, Anope::string &message) anope_override
 	{
-		if (!u->HasMode(UMODE_OPER) && this->osignoreservice.Find(u->nick))
+		if (!u->HasMode("OPER") && this->osignoreservice.Find(u->nick))
 			return EVENT_STOP;
 
 		return EVENT_CONTINUE;

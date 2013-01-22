@@ -37,20 +37,9 @@ namespace Servers
 	extern CoreExport std::set<Anope::string> Capab;
 }
 
-/** Flags set on servers
- */
-enum ServerFlag
-{
-	SERVER_NONE,
-	/* Server is syncing */
-	SERVER_SYNCING,
-	/* This server was juped */
-	SERVER_JUPED
-};
-
 /** Class representing a server
  */
-class CoreExport Server : public Flags<ServerFlag>, public Extensible
+class CoreExport Server : public Extensible
 {
  private:
 	/* Server name */
@@ -65,6 +54,10 @@ class CoreExport Server : public Flags<ServerFlag>, public Extensible
 	std::vector<Server *> links;
 	/* Uplink for this server */
 	Server *uplink;
+	/* Server is syncing */
+	bool syncing;
+	/* The server is juped */
+	bool juped;
 
 	/* Reason this server was quit */
 	Anope::string quit_reason;
@@ -76,9 +69,9 @@ class CoreExport Server : public Flags<ServerFlag>, public Extensible
 	 * @param hops Hops from services server
 	 * @param description Server rdescription
 	 * @param sid Server sid/numeric
-	 * @param flag An optional server flag
+	 * @param jupe If the server is juped
 	 */
-	Server(Server *uplink, const Anope::string &name, unsigned hops, const Anope::string &description, const Anope::string &sid = "", ServerFlag flag = SERVER_NONE);
+	Server(Server *uplink, const Anope::string &name, unsigned hops, const Anope::string &description, const Anope::string &sid = "", bool jupe = false);
 
  private:
 	/** Destructor
@@ -145,7 +138,7 @@ class CoreExport Server : public Flags<ServerFlag>, public Extensible
 	void DelLink(Server *s);
 
 	/** Finish syncing this server and optionally all links to it
-	 * @param SyncLinks True to sync the links for this server too (if any)
+	 * @param sync_links True to sync the links for this server too (if any)
 	 */
 	void Sync(bool sync_links);
 
@@ -154,10 +147,19 @@ class CoreExport Server : public Flags<ServerFlag>, public Extensible
 	 */
 	bool IsSynced() const;
 
+	/** Unsync the server. Only used for Me->Unsync()
+	 */
+	void Unsync();
+
 	/** Check if this server is ULined
 	 * @return true or false
 	 */
 	bool IsULined() const;
+
+	/** Check if this server is juped (a pseudoserver other than us)
+	 * @return true if this server is a juped server
+	 */
+	bool IsJuped() const;
 
 	/** Send a message to alll users on this server
 	 * @param source The source of the message

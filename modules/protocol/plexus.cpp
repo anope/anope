@@ -58,11 +58,11 @@ class PlexusProto : public IRCDProto
 			 */
 			ChanUserContainer *uc = c->FindUser(user);
 			if (uc != NULL)
-				uc->status.ClearFlags();
+				uc->status.modes.clear();
 
 			BotInfo *setter = BotInfo::Find(user->nick);
 			for (unsigned i = 0; i < ModeManager::ChannelModes.size(); ++i)
-				if (cs.HasFlag(ModeManager::ChannelModes[i]->name))
+				if (cs.modes.count(ModeManager::ChannelModes[i]->name))
 					c->SetMode(setter, ModeManager::ChannelModes[i], user->GetUID(), false);
 		}
 	}
@@ -81,8 +81,8 @@ class PlexusProto : public IRCDProto
 
 	void SendVhostDel(User *u) anope_override
 	{
-		if (u->HasMode(UMODE_CLOAK))
-			u->RemoveMode(HostServ, UMODE_CLOAK);
+		if (u->HasMode("CLOAK"))
+			u->RemoveMode(HostServ, "CLOAK");
 		else
 			this->SendVhost(u, u->GetIdent(), u->chost);
 	}
@@ -185,8 +185,8 @@ struct IRCDMessageEncap : IRCDMessage
 			if (u && nc)
 			{
 				u->Login(nc);
-				if (!Config->NoNicknameOwnership && user_na && user_na->nc == nc && user_na->nc->HasFlag(NI_UNCONFIRMED) == false)
-					u->SetMode(NickServ, UMODE_REGISTERED);
+				if (!Config->NoNicknameOwnership && user_na && user_na->nc == nc && user_na->nc->HasExt("UNCONFIRMED") == false)
+					u->SetMode(NickServ, "REGISTERED");
 			}
 		}
 
@@ -325,30 +325,30 @@ class ProtoPlexus : public Module
 	void AddModes()
 	{
 		/* Add user modes */
-		ModeManager::RemoveUserMode(ModeManager::FindUserModeByName(UMODE_HIDEOPER));
-		ModeManager::AddUserMode(new UserMode(UMODE_NOCTCP, 'C'));
-		ModeManager::AddUserMode(new UserMode(UMODE_DEAF, 'D'));
-		ModeManager::AddUserMode(new UserMode(UMODE_SOFTCALLERID, 'G'));
-		ModeManager::AddUserMode(new UserMode(UMODE_NETADMIN, 'N'));
-		ModeManager::AddUserMode(new UserMode(UMODE_SSL, 'S'));
-		ModeManager::AddUserMode(new UserMode(UMODE_WEBIRC, 'W'));
-		ModeManager::AddUserMode(new UserMode(UMODE_CALLERID, 'g'));
-		ModeManager::AddUserMode(new UserMode(UMODE_PRIV, 'p'));
-		ModeManager::AddUserMode(new UserMode(UMODE_CLOAK, 'x'));
-		ModeManager::AddUserMode(new UserMode(UMODE_PROTECTED, 'U'));
+		ModeManager::RemoveUserMode(ModeManager::FindUserModeByName("HIDEOPER"));
+		ModeManager::AddUserMode(new UserMode("NOCTCP", 'C'));
+		ModeManager::AddUserMode(new UserMode("DEAF", 'D'));
+		ModeManager::AddUserMode(new UserMode("SOFTCALLERID", 'G'));
+		ModeManager::AddUserMode(new UserMode("NETADMIN", 'N'));
+		ModeManager::AddUserMode(new UserMode("SSL", 'S'));
+		ModeManager::AddUserMode(new UserMode("WEBIRC", 'W'));
+		ModeManager::AddUserMode(new UserMode("CALLERID", 'g'));
+		ModeManager::AddUserMode(new UserMode("PRIV", 'p'));
+		ModeManager::AddUserMode(new UserMode("CLOAK", 'x'));
+		ModeManager::AddUserMode(new UserMode("PROTECTED", 'U'));
 
 		/* v/h/o/a/q */
-		ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_PROTECT, 'a', '&', 3));
-		ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_OWNER, 'q', '~', 4));
+		ModeManager::AddChannelMode(new ChannelModeStatus("PROTECT", 'a', '&', 3));
+		ModeManager::AddChannelMode(new ChannelModeStatus("OWNER", 'q', '~', 4));
 
 		/* Add channel modes */
-		ModeManager::RemoveChannelMode(ModeManager::FindChannelModeByName(CMODE_REGISTERED));
-		ModeManager::AddChannelMode(new ChannelMode(CMODE_BANDWIDTH, 'B'));
-		ModeManager::AddChannelMode(new ChannelMode(CMODE_NOCTCP, 'C'));
-		ModeManager::AddChannelMode(new ChannelMode(CMODE_REGMODERATED, 'M'));
-		ModeManager::AddChannelMode(new ChannelMode(CMODE_NONOTICE, 'N'));
-		ModeManager::AddChannelMode(new ChannelMode(CMODE_BLOCKCOLOR, 'c'));
-		ModeManager::AddChannelMode(new ChannelMode(CMODE_PERM, 'z'));
+		ModeManager::RemoveChannelMode(ModeManager::FindChannelModeByName("REGISTERED"));
+		ModeManager::AddChannelMode(new ChannelMode("BANDWIDTH", 'B'));
+		ModeManager::AddChannelMode(new ChannelMode("NOCTCP", 'C'));
+		ModeManager::AddChannelMode(new ChannelMode("REGMODERATED", 'M'));
+		ModeManager::AddChannelMode(new ChannelMode("NONOTICE", 'N'));
+		ModeManager::AddChannelMode(new ChannelMode("BLOCKCOLOR", 'c'));
+		ModeManager::AddChannelMode(new ChannelMode("PERM", 'z'));
 	}
 
  public:

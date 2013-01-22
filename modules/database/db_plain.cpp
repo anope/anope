@@ -79,7 +79,10 @@ EventReturn OnDatabaseReadMetadata(NickCore *nc, const Anope::string &key, const
 		else if (key.equals_ci("CERT"))
 			nc->AddCert(params[0]);
 		else if (key.equals_ci("FLAGS"))
-			nc->FromVector(params);
+		{
+			for (unsigned i = 0; i < params.size(); ++i)
+				nc->ExtendMetadata(params[i]);
+		}
 		else if (key.equals_ci("MI"))
 		{
 			Memo *m = new Memo;
@@ -88,9 +91,9 @@ EventReturn OnDatabaseReadMetadata(NickCore *nc, const Anope::string &key, const
 			for (unsigned j = 2; params[j].equals_ci("UNREAD") || params[j].equals_ci("RECEIPT"); ++j)
 			{
 				if (params[j].equals_ci("UNREAD"))
-					m->SetFlag(MF_UNREAD);
+					m->unread = true;
 				else if (params[j].equals_ci("RECEIPT"))
-					m->SetFlag(MF_RECEIPT);
+					m->receipt = true;
 			}
 			m->text = params[params.size() - 1];
 			nc->memos.memos->push_back(m);
@@ -116,7 +119,8 @@ EventReturn OnDatabaseReadMetadata(NickAlias *na, const Anope::string &key, cons
 	else if (key.equals_ci("LAST_QUIT"))
 		na->last_quit = params[0];
 	else if (key.equals_ci("FLAGS"))
-		na->FromVector(params);
+		for (unsigned i = 0; i < params.size(); ++i)
+			na->ExtendMetadata(params[i]);
 	else if (key.equals_ci("VHOST"))
 		na->SetVhost(params.size() > 3 ? params[3] : "", params[2], params[0], params[1].is_pos_number_only() ? convertTo<time_t>(params[1]) : 0);
 	return EVENT_CONTINUE;
@@ -124,9 +128,6 @@ EventReturn OnDatabaseReadMetadata(NickAlias *na, const Anope::string &key, cons
 
 EventReturn OnDatabaseReadMetadata(BotInfo *bi, const Anope::string &key, const std::vector<Anope::string> &params)
 {
-	if (key.equals_ci("FLAGS"))
-		bi->FromVector(params);
-
 	return EVENT_CONTINUE;
 }
 
@@ -153,7 +154,8 @@ EventReturn OnDatabaseReadMetadata(ChannelInfo *ci, const Anope::string &key, co
 			}
 		}
 		else if (key.equals_ci("FLAGS"))
-			ci->FromVector(params);
+			for (unsigned i = 0; i < params.size(); ++i)
+				ci->ExtendMetadata(params[i]);
 		else if (key.equals_ci("DESC"))
 			ci->desc = params[0];
 		else if (key.equals_ci("TOPIC"))
@@ -164,8 +166,8 @@ EventReturn OnDatabaseReadMetadata(ChannelInfo *ci, const Anope::string &key, co
 		}
 		else if (key.equals_ci("SUSPEND"))
 		{
-			ci->Extend("suspend_by", new ExtensibleItemClass<Anope::string>(params[0]));
-			ci->Extend("suspend_reason", new ExtensibleItemClass<Anope::string>(params[1]));
+			ci->ExtendMetadata("suspend:by", params[0]);
+			ci->ExtendMetadata("suspend:reason", params[1]);
 		}
 		else if (key.equals_ci("ACCESS")) // Older access system, from Anope 1.9.4.
 		{
@@ -216,8 +218,6 @@ EventReturn OnDatabaseReadMetadata(ChannelInfo *ci, const Anope::string &key, co
 				ak = ci->AddAkick(params[3], nc, params.size() > 6 ? params[6] : "", params[4].is_pos_number_only() ? convertTo<time_t>(params[4]) : 0, params[5].is_pos_number_only() ? convertTo<time_t>(params[5]) : 0);
 			else
 				ak = ci->AddAkick(params[3], params[2], params.size() > 6 ? params[6] : "", params[4].is_pos_number_only() ? convertTo<time_t>(params[4]) : 0, params[5].is_pos_number_only() ? convertTo<time_t>(params[5]) : 0);
-			if (Nick)
-				ak->SetFlag(AK_ISNICK);
 
 		}
 		else if (key.equals_ci("LOG"))
@@ -238,18 +238,11 @@ EventReturn OnDatabaseReadMetadata(ChannelInfo *ci, const Anope::string &key, co
 		else if (key.equals_ci("MLOCK"))
 		{
 			bool set = params[0] == "1" ? true : false;
-			Anope::string mode_name = params[1];
+			Anope::string mode_name = params[1].substr(6);
 			Anope::string setter = params[2];
 			time_t mcreated = params[3].is_pos_number_only() ? convertTo<time_t>(params[3]) : Anope::CurTime;
 			Anope::string param = params.size() > 4 ? params[4] : "";
-			const Anope::string* ChannelModeNameStrings = Flags<ChannelModeName>::GetFlagStrings();
-			for (size_t i = CMODE_BEGIN + 1; i < CMODE_END; ++i)
-				if (ChannelModeNameStrings[i] == mode_name)
-				{
-					ChannelModeName n = static_cast<ChannelModeName>(i);
-					ci->mode_locks->insert(std::make_pair(n, new ModeLock(ci, set, n, param, setter, mcreated)));
-					break;
-				}
+			ci->mode_locks->insert(std::make_pair(mode_name, new ModeLock(ci, set, mode_name, param, setter, mcreated)));
 		}
 		else if (key.equals_ci("MI"))
 		{
@@ -259,9 +252,9 @@ EventReturn OnDatabaseReadMetadata(ChannelInfo *ci, const Anope::string &key, co
 			for (unsigned j = 2; params[j].equals_ci("UNREAD") || params[j].equals_ci("RECEIPT"); ++j)
 			{
 				if (params[j].equals_ci("UNREAD"))
-					m->SetFlag(MF_UNREAD);
+					m->unread = true;
 				else if (params[j].equals_ci("RECEIPT"))
-					m->SetFlag(MF_RECEIPT);
+					m->receipt = true;
 			}
 			m->text = params[params.size() - 1];
 			ci->memos.memos->push_back(m);
@@ -273,7 +266,8 @@ EventReturn OnDatabaseReadMetadata(ChannelInfo *ci, const Anope::string &key, co
 			if (params[0].equals_ci("NAME"))
 				ci->bi = BotInfo::Find(params[1]);
 			else if (params[0].equals_ci("FLAGS"))
-				ci->botflags.FromVector(params);
+				for (unsigned i = 0; i < params.size(); ++i)
+					ci->ExtendMetadata(params[i]);
 			else if (params[0].equals_ci("TTB"))
 			{
 				for (unsigned j = 1, end = params.size(); j < end; j += 2)
@@ -476,7 +470,10 @@ static void LoadNickCore(const std::vector<Anope::string> &params)
 {
 	NickCore *nc = new NickCore(params[0]);
 	/* Clear default flags */
-	nc->ClearFlags();
+	std::deque<Anope::string> list;
+	nc->GetExtList(list);
+	for (unsigned i = 0; i < list.size(); ++i)
+		nc->Shrink(list[i]);
 
 	nc->pass = params.size() > 1 ? params[1] : "";
 
@@ -520,8 +517,10 @@ static void LoadChanInfo(const std::vector<Anope::string> &params)
 	/* CLear default mlock */
 	ci->ClearMLock();
 	/* Remove default channel flags */
-	ci->ClearFlags();
-	ci->botflags.ClearFlags();
+	std::deque<Anope::string> list;
+	ci->GetExtList(list);
+	for (unsigned i = 0; i < list.size(); ++i)
+		ci->Shrink(list[i]);
 
 	ci->time_registered = params[1].is_pos_number_only() ? convertTo<time_t>(params[1]) : 0;
 
@@ -693,16 +692,20 @@ class DBPlain : public Module
 				for (std::vector<Anope::string>::const_iterator it = nc->cert.begin(), it_end = nc->cert.end(); it != it_end; ++it)
 					db_buffer << "MD CERT " << *it << endl;
 			}
-			if (nc->FlagCount())
-				db_buffer << "MD FLAGS " << nc->ToString() << endl;
+			db_buffer << "MD FLAGS ";
+			std::deque<Anope::string> list;
+			nc->GetExtList(list);
+			for (unsigned i = 0; i < list.size(); ++i)
+				db_buffer << list[i] << " ";
+			db_buffer << std::endl;
 			const MemoInfo *mi = &nc->memos;
 			for (unsigned k = 0, end = mi->memos->size(); k < end; ++k)
 			{
 				const Memo *m = mi->GetMemo(k);
 				db_buffer << "MD MI " << m->time << " " << m->sender;
-				if (m->HasFlag(MF_UNREAD))
+				if (m->unread)
 					db_buffer << " UNREAD";
-				if (m->HasFlag(MF_RECEIPT))
+				if (m->receipt)
 					db_buffer << " RECEIPT";
 				db_buffer << " :" << m->text << endl;
 			}
@@ -724,8 +727,12 @@ class DBPlain : public Module
 				db_buffer << "MD LAST_REALNAME :" << na->last_realname << endl;
 			if (!na->last_quit.empty())
 				db_buffer << "MD LAST_QUIT :" << na->last_quit << endl;
-			if (na->FlagCount())
-				db_buffer << "MD FLAGS " << na->ToString() << endl;
+			db_buffer << "MD FLAGS ";
+			std::deque<Anope::string> list;
+			na->GetExtList(list);
+			for (unsigned i = 0; i < list.size(); ++i)
+				db_buffer << list[i] << " ";
+			db_buffer << std::endl;
 			if (na->HasVhost())
 				db_buffer << "MD VHOST " << na->GetVhostCreator() << " " << na->GetVhostCreated() << " " << na->GetVhostHost() << " :" << na->GetVhostIdent() << endl;
 
@@ -736,12 +743,16 @@ class DBPlain : public Module
 		{
 			BotInfo *bi = it->second;
 
-			if (bi->HasFlag(BI_CONF))
+			if (bi->HasExt("CONF"))
 				continue;
 
 			db_buffer << "BI " << bi->nick << " " << bi->GetIdent() << " " << bi->host << " " << bi->created << " " << bi->GetChannelCount() << " :" << bi->realname << endl;
-			if (bi->FlagCount())
-				db_buffer << "MD FLAGS " << bi->ToString() << endl;
+			db_buffer << "MD FLAGS ";
+			std::deque<Anope::string> list;
+			bi->GetExtList(list);
+			for (unsigned i = 0; i < list.size(); ++i)
+				db_buffer << list[i] << " ";
+			db_buffer << std::endl;
 		}
 
 		for (registered_channel_map::const_iterator cit = RegisteredChannelList->begin(), cit_end = RegisteredChannelList->end(); cit != cit_end; ++cit)
@@ -767,9 +778,12 @@ class DBPlain : public Module
 				db_buffer << p.name << " " << ci->GetLevel(p.name);
 			}
 			db_buffer << endl;
-			if (ci->FlagCount())
-				db_buffer << "MD FLAGS " << ci->ToString() << endl;
-			if (ci->HasFlag(CI_SUSPENDED))
+			std::deque<Anope::string> list;
+			ci->GetExtList(list);
+			for (unsigned i = 0; i < list.size(); ++i)
+				db_buffer << list[i];
+			db_buffer << std::endl;
+			if (ci->HasExt("SUSPENDED"))
 			{
 				Anope::string *by = ci->GetExt<ExtensibleItemClass<Anope::string> *>("suspend_by"), *reason = ci->GetExt<ExtensibleItemClass<Anope::string> *>("suspend_reason");
 				if (by && reason)
@@ -782,8 +796,8 @@ class DBPlain : public Module
 			}
 			for (unsigned k = 0, end = ci->GetAkickCount(); k < end; ++k)
 			{
-				db_buffer << "MD AKICK 0 " << (ci->GetAkick(k)->HasFlag(AK_ISNICK) ? "NICK " : "MASK ") <<
-					(ci->GetAkick(k)->HasFlag(AK_ISNICK) ? ci->GetAkick(k)->nc->display : ci->GetAkick(k)->mask) << " " << ci->GetAkick(k)->creator << " " << ci->GetAkick(k)->addtime << " " << ci->last_used << " :";
+				db_buffer << "MD AKICK 0 " << (ci->GetAkick(k)->nc ? "NICK " : "MASK ") <<
+					(ci->GetAkick(k)->nc ? ci->GetAkick(k)->nc->display : ci->GetAkick(k)->mask) << " " << ci->GetAkick(k)->creator << " " << ci->GetAkick(k)->addtime << " " << ci->last_used << " :";
 				if (!ci->GetAkick(k)->reason.empty())
 					db_buffer << ci->GetAkick(k)->reason;
 				db_buffer << endl;
@@ -799,16 +813,16 @@ class DBPlain : public Module
 				const ModeLock &ml = *it->second;
 				ChannelMode *cm = ModeManager::FindChannelModeByName(ml.name);
 				if (cm != NULL)
-					db_buffer << "MD MLOCK " << (ml.set ? 1 : 0) << " " << cm->NameAsString() << " " << ml.setter << " " << ml.created << " " << ml.param << endl;
+					db_buffer << "MD MLOCK " << (ml.set ? 1 : 0) << " " << cm->name << " " << ml.setter << " " << ml.created << " " << ml.param << endl;
 			}
 			const MemoInfo *memos = &ci->memos;
 			for (unsigned k = 0, end = memos->memos->size(); k < end; ++k)
 			{
 				const Memo *m = memos->GetMemo(k);
 				db_buffer << "MD MI " << m->time << " " << m->sender;
-				if (m->HasFlag(MF_UNREAD))
+				if (m->unread)
 					db_buffer << " UNREAD";
-				if (m->HasFlag(MF_RECEIPT))
+				if (m->receipt)
 					db_buffer << " RECEIPT";
 				db_buffer << " :" << m->text << endl;
 			}
@@ -816,8 +830,6 @@ class DBPlain : public Module
 				db_buffer << "MD MIG " << Anope::string(memos->ignores[k]) << endl;
 			if (ci->bi)
 				db_buffer << "MD BI NAME " << ci->bi->nick << endl;
-			if (ci->botflags.FlagCount())
-				db_buffer << "MD BI FLAGS " << ci->botflags.ToString() << endl;
 			db_buffer << "MD BI TTB BOLDS " << ci->ttb[0] << " COLORS " << ci->ttb[1] << " REVERSES " << ci->ttb[2] << " UNDERLINES " << ci->ttb[3] << " BADWORDS " << ci->ttb[4] << " CAPS " << ci->ttb[5] << " FLOOD " << ci->ttb[6] << " REPEAT " << ci->ttb[7] << " ITALICS " << ci->ttb[8] << " AMSGS " << ci->ttb[9] << endl;
 			if (ci->capsmin)
 				db_buffer << "MD BI CAPSMIN " << ci->capsmin << endl;

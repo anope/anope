@@ -22,7 +22,7 @@ class CommandCSMode : public Command
 
 		const Anope::string accesses[] = { "VOICE", "HALFOP", "OPDEOP", "PROTECT", "OWNER", "" },
 				accesses_self[] = { "VOICEME", "HALFOPME", "OPDEOPME", "PROTECTME", "OWNERME", "" };
-		const ChannelModeName modes[] = { CMODE_VOICE, CMODE_HALFOP, CMODE_OP, CMODE_PROTECT, CMODE_OWNER };
+		const Anope::string modes[] = { "VOICE", "HALFOP", "OP", "PROTECT", "OWNER" };
 		ChannelModeStatus *cms = anope_dynamic_static_cast<ChannelModeStatus *>(cm);
 		AccessGroup access = source.AccessFor(ci);
 		unsigned short u_level = 0;

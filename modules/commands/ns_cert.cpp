@@ -24,7 +24,7 @@ class CommandNSCert : public Command
 			return;
 		}
 
-		if (nc->HasFlag(NI_SUSPENDED))
+		if (nc->HasExt("SUSPENDED"))
 		{
 			source.Reply(NICK_X_SUSPENDED, nc->display.c_str());
 			return;
@@ -157,7 +157,7 @@ class CommandNSCert : public Command
 
 		NickCore *nc = source.nc;
 
-		if (source.nc->HasFlag(NI_SUSPENDED))
+		if (source.nc->HasExt("SUSPENDED"))
 			source.Reply(NICK_X_SUSPENDED, source.nc->display.c_str());
 		else if (cmd.equals_ci("ADD"))
 			return this->DoAdd(source, nc, mask);
@@ -207,7 +207,7 @@ class NSCert : public Module
 			return;
 		if (u->IsIdentified() && u->Account() == na->nc)
 			return;
-		if (na->nc->HasFlag(NI_SUSPENDED))
+		if (na->nc->HasExt("SUSPENDED"))
 			return;
 		if (!na->nc->FindCert(u->fingerprint))
 			return;

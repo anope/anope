@@ -68,7 +68,7 @@ class CommandMSRSend : public Command
 					throw CoreException("NULL mi in ms_rsend");
 				Memo *m = (mi->memos->size() ? mi->GetMemo(mi->memos->size() - 1) : NULL);
 				if (m != NULL)
-					m->SetFlag(MF_RECEIPT);
+					m->receipt = true;
 			}
 		}
 

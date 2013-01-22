@@ -34,7 +34,7 @@ class CommandCSRegister : public Command
 
 		if (Anope::ReadOnly)
 			source.Reply(_("Sorry, channel registration is temporarily disabled."));
-		else if (nc->HasFlag(NI_UNCONFIRMED))
+		else if (nc->HasExt("UNCONFIRMED"))
 			source.Reply(_("You must confirm your account before you can register a channel."));
 		else if (chan[0] == '&')
 			source.Reply(_("Local channels cannot be registered."));
@@ -46,7 +46,7 @@ class CommandCSRegister : public Command
 			source.Reply(CHAN_X_NOT_IN_USE, chan.c_str());
 		else if (ci)
 			source.Reply(_("Channel \002%s\002 is already registered!"), chan.c_str());
-		else if (c && !c->HasUserStatus(u, CMODE_OP))
+		else if (c && !c->HasUserStatus(u, "OP"))
 			source.Reply(_("You must be a channel operator to register the channel."));
 		else if (Config->CSMaxReg && nc->channelcount >= Config->CSMaxReg && !source.HasPriv("chanserv/no-register-limit"))
 			source.Reply(nc->channelcount > Config->CSMaxReg ? CHAN_EXCEEDED_CHANNEL_LIMIT : CHAN_REACHED_CHANNEL_LIMIT, Config->CSMaxReg);
@@ -56,9 +56,9 @@ class CommandCSRegister : public Command
 			ci->SetFounder(nc);
 			ci->desc = chdesc;
 
-			for (std::list<std::pair<ChannelModeName, Anope::string> >::const_iterator it = ModeManager::ModeLockOn.begin(), it_end = ModeManager::ModeLockOn.end(); it != it_end; ++it)
+			for (std::list<std::pair<Anope::string, Anope::string> >::const_iterator it = ModeManager::ModeLockOn.begin(), it_end = ModeManager::ModeLockOn.end(); it != it_end; ++it)
 				ci->SetMLock(ModeManager::FindChannelModeByName(it->first), true, it->second, source.GetNick());
-			for (std::list<ChannelModeName>::const_iterator it = ModeManager::ModeLockOff.begin(), it_end = ModeManager::ModeLockOff.end(); it != it_end; ++it)
+			for (std::list<Anope::string>::const_iterator it = ModeManager::ModeLockOff.begin(), it_end = ModeManager::ModeLockOff.end(); it != it_end; ++it)
 				ci->SetMLock(ModeManager::FindChannelModeByName(*it), false, "", source.GetNick());
 
 			if (c && !c->topic.empty())
@@ -82,18 +82,18 @@ class CommandCSRegister : public Command
 				if (u && u->FindChannel(c) != NULL)
 				{
 					/* On most ircds you do not receive the admin/owner mode till its registered */
-					if ((cm = ModeManager::FindChannelModeByName(CMODE_OWNER)))
+					if ((cm = ModeManager::FindChannelModeByName("OWNER")))
 						c->SetMode(NULL, cm, u->GetUID());
-					else if ((cm = ModeManager::FindChannelModeByName(CMODE_PROTECT)))
+					else if ((cm = ModeManager::FindChannelModeByName("PROTECT")))
 						c->RemoveMode(NULL, cm, u->GetUID());
 				}
 
 				/* Mark the channel as persistent */
-				if (c->HasMode(CMODE_PERM))
-					ci->SetFlag(CI_PERSIST);
+				if (c->HasMode("PERM"))
+					ci->Extend("PERSIST");
 				/* Persist may be in def cflags, set it here */
-				else if (ci->HasFlag(CI_PERSIST) && (cm = ModeManager::FindChannelModeByName(CMODE_PERM)))
-					c->SetMode(NULL, CMODE_PERM);
+				else if (ci->HasExt("PERSIST") && (cm = ModeManager::FindChannelModeByName("PERM")))
+					c->SetMode(NULL, "PERM");
 			}
 
 			FOREACH_MOD(I_OnChanRegistered, OnChanRegistered(ci));

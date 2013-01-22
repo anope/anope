@@ -75,7 +75,7 @@ void Thread::Start()
 {
 	if (pthread_create(&this->handle, get_engine_attr(), entry_point, this))
 	{
-		this->SetFlag(SF_DEAD);
+		this->flags[SF_DEAD] = true;
 		throw CoreException("Unable to create thread: " + Anope::LastError());
 	}
 }
@@ -88,7 +88,7 @@ bool Thread::GetExitState() const
 void Thread::OnNotify()
 {
 	this->Join();
-	this->SetFlag(SF_DEAD);
+	this->flags[SF_DEAD] = true;
 }
 
 Mutex::Mutex()

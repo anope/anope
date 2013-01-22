@@ -64,7 +64,7 @@ void IRCDProto::SendKickInternal(const BotInfo *bi, const Channel *c, const User
 
 void IRCDProto::SendMessageInternal(const BotInfo *bi, const Anope::string &dest, const Anope::string &buf)
 {
-	if (Config->NSDefFlags.HasFlag(NI_MSG))
+	if (Config->NSDefFlags.count("msg"))
 		SendPrivmsgInternal(bi, dest, buf);
 	else
 		SendNoticeInternal(bi, dest, buf);
@@ -382,7 +382,7 @@ bool IRCDProto::IsHostValid(const Anope::string &host)
 void IRCDProto::SendOper(User *u)
 {
 	SendNumericInternal(381, u->GetUID(), ":You are now an IRC operator (set by services)");
-	u->SetMode(OperServ, UMODE_OPER);
+	u->SetMode(OperServ, "OPER");
 }
 
 MessageSource::MessageSource(const Anope::string &src) : source(src), u(NULL), s(NULL)

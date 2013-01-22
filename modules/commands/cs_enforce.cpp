@@ -25,8 +25,8 @@ class CommandCSEnforce : public Command
 		 * part of the code. This way we can enforce SECUREOPS even
 		 * if it's off.
 		 */
-		bool hadsecureops = ci->HasFlag(CI_SECUREOPS);
-		ci->SetFlag(CI_SECUREOPS);
+		bool hadsecureops = ci->HasExt("SECUREOPS");
+		ci->ExtendMetadata("SECUREOPS");
 
 		for (Channel::ChanUserList::iterator it = ci->c->users.begin(), it_end = ci->c->users.end(); it != it_end; ++it)
 		{
@@ -36,7 +36,7 @@ class CommandCSEnforce : public Command
 		}
 
 		if (!hadsecureops)
-			ci->UnsetFlag(CI_SECUREOPS);
+			ci->Shrink("SECUREOPS");
 
 		source.Reply(_("Secureops enforced on %s."), ci->name.c_str());
 	}
@@ -64,7 +64,7 @@ class CommandCSEnforce : public Command
 
 			Anope::string mask = ci->GetIdealBan(user);
 			Anope::string reason = Language::Translate(user, _("RESTRICTED enforced by ")) + source.GetNick();
-			ci->c->SetMode(NULL, CMODE_BAN, mask);
+			ci->c->SetMode(NULL, "BAN", mask);
 			ci->c->Kick(NULL, user, "%s", reason.c_str());
 		}
 
@@ -94,8 +94,8 @@ class CommandCSEnforce : public Command
 
 			Anope::string mask = ci->GetIdealBan(user);
 			Anope::string reason = Language::Translate(user, _("REGONLY enforced by ")) + source.GetNick();
-			if (!ci->c->HasMode(CMODE_REGISTEREDONLY))
-				ci->c->SetMode(NULL, CMODE_BAN, mask);
+			if (!ci->c->HasMode("REGISTEREDONLY"))
+				ci->c->SetMode(NULL, "BAN", mask);
 			ci->c->Kick(NULL, user, "%s", reason.c_str());
 		}
 
@@ -115,7 +115,7 @@ class CommandCSEnforce : public Command
 			if (user->IsProtected())
 				continue;
 
-			if (!user->HasMode(UMODE_SSL))
+			if (!user->HasMode("SSL"))
 				users.push_back(user);
 		}
 
@@ -125,8 +125,8 @@ class CommandCSEnforce : public Command
 
 			Anope::string mask = ci->GetIdealBan(user);
 			Anope::string reason = Language::Translate(user, _("SSLONLY enforced by ")) + source.GetNick();
-			if (!ci->c->HasMode(CMODE_SSL))
-				ci->c->SetMode(NULL, CMODE_BAN, mask);
+			if (!ci->c->HasMode("SSL"))
+				ci->c->SetMode(NULL, "BAN", mask);
 			ci->c->Kick(NULL, user, "%s", reason.c_str());
 		}
 
@@ -144,7 +144,7 @@ class CommandCSEnforce : public Command
 			if (user->IsProtected())
 				continue;
 
-			if (ci->c->MatchesList(user, CMODE_BAN) && !ci->c->MatchesList(user, CMODE_EXCEPT))
+			if (ci->c->MatchesList(user, "BAN") && !ci->c->MatchesList(user, "EXCEPT"))
 				users.push_back(user);
 		}
 
@@ -162,7 +162,7 @@ class CommandCSEnforce : public Command
 	void DoLimit(CommandSource &source, ChannelInfo *ci)
 	{
 		Anope::string l_str;
-		if (!ci->c->GetParam(CMODE_LIMIT, l_str))
+		if (!ci->c->GetParam("LIMIT", l_str))
 		{
 			source.Reply(_("No limit is set on %s."), ci->name.c_str());
 			return;

@@ -26,13 +26,13 @@ class CommandOSChanList : public Command
 	{
 		const Anope::string &pattern = !params.empty() ? params[0] : "";
 		const Anope::string &opt = params.size() > 1 ? params[1] : "";
-		std::list<ChannelModeName> Modes;
+		std::set<Anope::string> modes;
 		User *u2;
 
 		if (!opt.empty() && opt.equals_ci("SECRET"))
 		{
-			Modes.push_back(CMODE_SECRET);
-			Modes.push_back(CMODE_PRIVATE);
+			modes.insert("SECRET");
+			modes.insert("PRIVATE");
 		}
 
 		ListFormatter list;
@@ -46,8 +46,8 @@ class CommandOSChanList : public Command
 			{
 				ChanUserContainer *cc = *uit;
 
-				if (!Modes.empty())
-					for (std::list<ChannelModeName>::iterator it = Modes.begin(), it_end = Modes.end(); it != it_end; ++it)
+				if (!modes.empty())
+					for (std::set<Anope::string>::iterator it = modes.begin(), it_end = modes.end(); it != it_end; ++it)
 						if (!cc->chan->HasMode(*it))
 							continue;
 
@@ -69,8 +69,8 @@ class CommandOSChanList : public Command
 
 				if (!pattern.empty() && !Anope::Match(c->name, pattern, false, true))
 					continue;
-				if (!Modes.empty())
-					for (std::list<ChannelModeName>::iterator it = Modes.begin(), it_end = Modes.end(); it != it_end; ++it)
+				if (!modes.empty())
+					for (std::set<Anope::string>::iterator it = modes.begin(), it_end = modes.end(); it != it_end; ++it)
 						if (!c->HasMode(*it))
 							continue;
 
@@ -124,10 +124,10 @@ class CommandOSUserList : public Command
 		const Anope::string &pattern = !params.empty() ? params[0] : "";
 		const Anope::string &opt = params.size() > 1 ? params[1] : "";
 		Channel *c;
-		std::list<UserModeName> Modes;
+		std::set<Anope::string> modes;
 
 		if (!opt.empty() && opt.equals_ci("INVISIBLE"))
-			Modes.push_back(UMODE_INVIS);
+			modes.insert("INVIS");
 
 		ListFormatter list;
 		list.AddColumn("Name").AddColumn("Mask");
@@ -140,8 +140,8 @@ class CommandOSUserList : public Command
 			{
 				ChanUserContainer *uc = *cuit;
 
-				if (!Modes.empty())
-					for (std::list<UserModeName>::iterator it = Modes.begin(), it_end = Modes.end(); it != it_end; ++it)
+				if (!modes.empty())
+					for (std::set<Anope::string>::iterator it = modes.begin(), it_end = modes.end(); it != it_end; ++it)
 						if (!uc->user->HasMode(*it))
 							continue;
 
@@ -169,8 +169,8 @@ class CommandOSUserList : public Command
 					Anope::string mask = u2->nick + "!" + u2->GetIdent() + "@" + u2->GetDisplayedHost(), mask2 = u2->nick + "!" + u2->GetIdent() + "@" + u2->host, mask3 = u2->nick + "!" + u2->GetIdent() + "@" + (!u2->ip.empty() ? u2->ip : u2->host);
 					if (!Anope::Match(mask, pattern) && !Anope::Match(mask2, pattern) && !Anope::Match(mask3, pattern))
 						continue;
-					if (!Modes.empty())
-						for (std::list<UserModeName>::iterator mit = Modes.begin(), mit_end = Modes.end(); mit != mit_end; ++mit)
+					if (!modes.empty())
+						for (std::set<Anope::string>::iterator mit = modes.begin(), mit_end = modes.end(); mit != mit_end; ++mit)
 							if (!u2->HasMode(*mit))
 								continue;
 				}

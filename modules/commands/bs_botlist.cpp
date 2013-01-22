@@ -33,11 +33,11 @@ class CommandBSBotList : public Command
 		{
 			BotInfo *bi = it->second;
 
-			if (source.HasCommand("botserv/botlist") || !bi->HasFlag(BI_PRIVATE))
+			if (source.HasCommand("botserv/botlist") || !bi->oper_only)
 			{
 				++count;
 				ListFormatter::ListEntry entry;
-				entry["Nick"] = (bi->HasFlag(BI_PRIVATE) ? "* " : "") + bi->nick;
+				entry["Nick"] = (bi->oper_only ? "* " : "") + bi->nick;
 				entry["Mask"] = bi->GetIdent() + "@" + bi->host;
 				list.AddEntry(entry);
 			}

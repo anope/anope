@@ -30,12 +30,12 @@ bool ConnectionSocket::Process()
 {
 	try
 	{
-		if (this->HasFlag(SF_CONNECTED))
+		if (this->flags[SF_CONNECTED])
 			return true;
-		else if (this->HasFlag(SF_CONNECTING))
-			this->SetFlag(this->io->FinishConnect(this));
+		else if (this->flags[SF_CONNECTING])
+			this->flags[this->io->FinishConnect(this)] = true;
 		else
-			this->SetFlag(SF_DEAD);
+			this->flags[SF_DEAD] = true;
 	}
 	catch (const SocketException &ex)
 	{
@@ -70,12 +70,12 @@ bool ClientSocket::Process()
 {
 	try
 	{
-		if (this->HasFlag(SF_ACCEPTED))
+		if (this->flags[SF_ACCEPTED])
 			return true;
-		else if (this->HasFlag(SF_ACCEPTING))
-			this->SetFlag(this->io->FinishAccept(this));
+		else if (this->flags[SF_ACCEPTING])
+			this->flags[this->io->FinishAccept(this)] = true;
 		else
-			this->SetFlag(SF_DEAD);
+			this->flags[SF_DEAD] = true;
 	}
 	catch (const SocketException &ex)
 	{

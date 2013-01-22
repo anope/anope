@@ -16,15 +16,6 @@
 #include "anope.h"
 #include "channels.h"
 
-enum CommandFlag
-{
-	/* Command allow unidentified users to use it */
-	CFLAG_ALLOW_UNREGISTERED,
-	
-	/* Command requires a user to execute */
-	CFLAG_REQUIRE_USER
-};
-
 struct CommandGroup
 {
 	Anope::string name, description;
@@ -98,10 +89,14 @@ class CoreExport CommandSource
 
 /** Every services command is a class, inheriting from Command.
  */
-class CoreExport Command : public Service, public Flags<CommandFlag>
+class CoreExport Command : public Service
 {
 	Anope::string desc;
 	std::vector<Anope::string> syntax;
+	/* Allow unregistered users to use this command */
+	bool allow_unregistered;
+	/* Command requires that a user is executing it */
+	bool require_user;
 
  public:
  	/* Maximum paramaters accepted by this command */
@@ -112,6 +107,7 @@ class CoreExport Command : public Service, public Flags<CommandFlag>
 	/* Module which owns us */
 	Module *module;
 
+ protected:
 	/** Create a new command.
 	 * @param owner The owner of the command
 	 * @param sname The command name
@@ -121,6 +117,7 @@ class CoreExport Command : public Service, public Flags<CommandFlag>
 	 */
 	Command(Module *owner, const Anope::string &sname, size_t min_params, size_t max_params = 0);
 
+ public:
 	virtual ~Command();
 
  protected:
@@ -130,7 +127,14 @@ class CoreExport Command : public Service, public Flags<CommandFlag>
 	void SetSyntax(const Anope::string &s);
 	void SendSyntax(CommandSource &);
 	void SendSyntax(CommandSource &, const Anope::string &syntax);
+
+	void AllowUnregistered(bool b);
+	void RequireUser(bool b);
+
  public:
+	bool AllowUnregistered() const;
+	bool RequireUser() const;
+
  	/** Get the command description
 	 * @return The commands description
 	 */

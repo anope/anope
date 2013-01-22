@@ -90,7 +90,7 @@ class CommandBSSetDontKickOps : public Command
 			bool override = !access.HasPriv("SET");
 			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to enable dontkickops"; 
 
-			ci->botflags.SetFlag(BS_DONTKICKOPS);
+			ci->ExtendMetadata("BS_DONTKICKOPS");
 			source.Reply(_("Bot \002won't kick ops\002 on channel %s."), ci->name.c_str());
 		}
 		else if (params[1].equals_ci("OFF"))
@@ -98,7 +98,7 @@ class CommandBSSetDontKickOps : public Command
 			bool override = !access.HasPriv("SET");
 			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to disable dontkickops"; 
 
-			ci->botflags.UnsetFlag(BS_DONTKICKOPS);
+			ci->Shrink("BS_DONTKICKOPS");
 			source.Reply(_("Bot \002will kick ops\002 on channel %s."), ci->name.c_str());
 		}
 		else
@@ -152,7 +152,7 @@ class CommandBSSetDontKickVoices : public Command
 			bool override = !access.HasPriv("SET");
 			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to enable dontkickvoices"; 
 
-			ci->botflags.SetFlag(BS_DONTKICKVOICES);
+			ci->ExtendMetadata("BS_DONTKICKVOICES");
 			source.Reply(_("Bot \002won't kick voices\002 on channel %s."), ci->name.c_str());
 		}
 		else if (params[1].equals_ci("OFF"))
@@ -160,7 +160,7 @@ class CommandBSSetDontKickVoices : public Command
 			bool override = !access.HasPriv("SET");
 			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to disable dontkickvoices"; 
 
-			ci->botflags.UnsetFlag(BS_DONTKICKVOICES);
+			ci->Shrink("BS_DONTKICKVOICES");
 			source.Reply(_("Bot \002will kick voices\002 on channel %s."), ci->name.c_str());
 		}
 		else
@@ -215,7 +215,7 @@ class CommandBSSetFantasy : public Command
 			bool override = !source.AccessFor(ci).HasPriv("SET");
 			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to enable fantasy"; 
 
-			ci->botflags.SetFlag(BS_FANTASY);
+			ci->ExtendMetadata("BS_FANTASY");
 			source.Reply(_("Fantasy mode is now \002on\002 on channel %s."), ci->name.c_str());
 		}
 		else if (value.equals_ci("OFF"))
@@ -223,7 +223,7 @@ class CommandBSSetFantasy : public Command
 			bool override = !source.AccessFor(ci).HasPriv("SET");
 			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to disable fantasy"; 
 
-			ci->botflags.UnsetFlag(BS_FANTASY);
+			ci->Shrink("BS_FANTASY");
 			source.Reply(_("Fantasy mode is now \002off\002 on channel %s."), ci->name.c_str());
 		}
 		else
@@ -286,7 +286,7 @@ class CommandBSSetGreet : public Command
 			bool override = !source.AccessFor(ci).HasPriv("SET");
 			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to enable greets"; 
 
-			ci->botflags.SetFlag(BS_GREET);
+			ci->ExtendMetadata("BS_GREET");
 			source.Reply(_("Greet mode is now \002on\002 on channel %s."), ci->name.c_str());
 		}
 		else if (value.equals_ci("OFF"))
@@ -294,7 +294,7 @@ class CommandBSSetGreet : public Command
 			bool override = !source.AccessFor(ci).HasPriv("SET");
 			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to disable greets"; 
 
-			ci->botflags.UnsetFlag(BS_GREET);
+			ci->Shrink("BS_GREET");
 			source.Reply(_("Greet mode is now \002off\002 on channel %s."), ci->name.c_str());
 		}
 		else
@@ -338,7 +338,7 @@ class CommandBSSetNoBot : public Command
 			bool override = !source.AccessFor(ci).HasPriv("SET");
 			Log(override ? LOG_ADMIN : LOG_COMMAND, source, this, ci) << "to enable nobot"; 
 
-			ci->botflags.SetFlag(BS_NOBOT);
+			ci->ExtendMetadata("BS_NOBOT");
 			if (ci->bi)
 				ci->bi->UnAssign(source.GetUser(), ci);
 			source.Reply(_("No Bot mode is now \002on\002 on channel %s."), ci->name.c_str());
@@ -348,7 +348,7 @@ class CommandBSSetNoBot : public Command
 			bool override = !source.AccessFor(ci).HasPriv("SET");
 			Log(override ? LOG_ADMIN : LOG_COMMAND, source, this, ci) << "to disable nobot"; 
 
-			ci->botflags.UnsetFlag(BS_NOBOT);
+			ci->Shrink("BS_NOBOT");
 			source.Reply(_("No Bot mode is now \002off\002 on channel %s."), ci->name.c_str());
 		}
 		else
@@ -388,12 +388,12 @@ class CommandBSSetPrivate : public Command
 
 		if (value.equals_ci("ON"))
 		{
-			bi->SetFlag(BI_PRIVATE);
+			bi->ExtendMetadata("PRIVATE");
 			source.Reply(_("Private mode of bot %s is now \002on\002."), bi->nick.c_str());
 		}
 		else if (value.equals_ci("OFF"))
 		{
-			bi->UnsetFlag(BI_PRIVATE);
+			bi->Shrink("PRIVATE");
 			source.Reply(_("Private mode of bot %s is now \002off\002."), bi->nick.c_str());
 		}
 		else

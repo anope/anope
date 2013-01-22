@@ -43,9 +43,9 @@ ServerConfig::ServerConfig()
 
 	if (NSDefaults.empty())
 	{
-		this->NSDefFlags.SetFlag(NI_SECURE);
-		this->NSDefFlags.SetFlag(NI_MEMO_SIGNON);
-		this->NSDefFlags.SetFlag(NI_MEMO_RECEIVE);
+		this->NSDefFlags.insert("SECURE");
+		this->NSDefFlags.insert("MEMOSIGNON");
+		this->NSDefFlags.insert("MEMORECEIVE");
 	}
 	else if (!NSDefaults.equals_ci("none"))
 	{
@@ -53,33 +53,15 @@ ServerConfig::ServerConfig()
 		Anope::string option;
 		while (options.GetToken(option))
 		{
-			if (option.equals_ci("kill"))
-				this->NSDefFlags.SetFlag(NI_KILLPROTECT);
-			else if (option.equals_ci("killquick"))
-				this->NSDefFlags.SetFlag(NI_KILL_QUICK);
-			else if (option.equals_ci("secure"))
-				this->NSDefFlags.SetFlag(NI_SECURE);
-			else if (option.equals_ci("private"))
-				this->NSDefFlags.SetFlag(NI_PRIVATE);
-			else if (option.equals_ci("msg"))
+			if (option.equals_ci("msg"))
 			{
 				if (!this->UsePrivmsg)
 					Log() << "msg in <nickserv:defaults> can only be used when UsePrivmsg is set";
 				else
-					this->NSDefFlags.SetFlag(NI_MSG);
+					this->NSDefFlags.insert(option.upper());
 			}
-			else if (option.equals_ci("hideemail"))
-				this->NSDefFlags.SetFlag(NI_HIDE_EMAIL);
-			else if (option.equals_ci("hideusermask"))
-				this->NSDefFlags.SetFlag(NI_HIDE_MASK);
-			else if (option.equals_ci("hidequit"))
-				this->NSDefFlags.SetFlag(NI_HIDE_QUIT);
-			else if (option.equals_ci("memosignon"))
-				this->NSDefFlags.SetFlag(NI_MEMO_SIGNON);
-			else if (option.equals_ci("memoreceive"))
-				this->NSDefFlags.SetFlag(NI_MEMO_RECEIVE);
-			else if (option.equals_ci("autoop"))
-				this->NSDefFlags.SetFlag(NI_AUTOOP);
+			else
+				this->NSDefFlags.insert(option.upper());
 		}
 	}
 
@@ -90,42 +72,17 @@ ServerConfig::ServerConfig()
 
 	if (CSDefaults.empty())
 	{
-		this->CSDefFlags.SetFlag(CI_KEEPTOPIC);
-		this->CSDefFlags.SetFlag(CI_SECURE);
-		this->CSDefFlags.SetFlag(CI_SECUREFOUNDER);
-		this->CSDefFlags.SetFlag(CI_SIGNKICK);
+		this->CSDefFlags.insert("KEEPTOPIC");
+		this->CSDefFlags.insert("SECURE");
+		this->CSDefFlags.insert("SECUREFOUNDER");
+		this->CSDefFlags.insert("SIGNKICK");
 	}
 	else if (!CSDefaults.equals_ci("none"))
 	{
 		spacesepstream options(CSDefaults);
 		Anope::string option;
 		while (options.GetToken(option))
-		{
-			if (option.equals_ci("keeptopic"))
-				this->CSDefFlags.SetFlag(CI_KEEPTOPIC);
-			else if (option.equals_ci("topiclock"))
-				this->CSDefFlags.SetFlag(CI_TOPICLOCK);
-			else if (option.equals_ci("private"))
-				this->CSDefFlags.SetFlag(CI_PRIVATE);
-			else if (option.equals_ci("restricted"))
-				this->CSDefFlags.SetFlag(CI_RESTRICTED);
-			else if (option.equals_ci("secure"))
-				this->CSDefFlags.SetFlag(CI_SECURE);
-			else if (option.equals_ci("secureops"))
-				this->CSDefFlags.SetFlag(CI_SECUREOPS);
-			else if (option.equals_ci("securefounder"))
-				this->CSDefFlags.SetFlag(CI_SECUREFOUNDER);
-			else if (option.equals_ci("signkick"))
-				this->CSDefFlags.SetFlag(CI_SIGNKICK);
-			else if (option.equals_ci("signkicklevel"))
-				this->CSDefFlags.SetFlag(CI_SIGNKICK_LEVEL);
-			else if (option.equals_ci("peace"))
-				this->CSDefFlags.SetFlag(CI_PEACE);
-			else if (option.equals_ci("persist"))
-				this->CSDefFlags.SetFlag(CI_PERSIST);
-			else if (option.equals_ci("noautoop"))
-				this->CSDefFlags.SetFlag(CI_NOAUTOOP);
-		}
+			this->CSDefFlags.insert(option.upper());
 	}
 
 	if (UseStrictPrivMsg)
@@ -139,16 +96,7 @@ ServerConfig::ServerConfig()
 		spacesepstream options(BSDefaults);
 		Anope::string option;
 		while (options.GetToken(option))
-		{
-			if (option.equals_ci("dontkickops"))
-				this->BSDefFlags.SetFlag(BS_DONTKICKOPS);
-			else if (option.equals_ci("dontkickvoices"))
-				this->BSDefFlags.SetFlag(BS_DONTKICKVOICES);
-			else if (option.equals_ci("greet"))
-				this->BSDefFlags.SetFlag(BS_GREET);
-			else if (option.equals_ci("fantasy"))
-				this->BSDefFlags.SetFlag(BS_FANTASY);
-		}
+			this->BSDefFlags.insert(option.upper());
 	}
 
 	/* Ulines */
@@ -922,7 +870,7 @@ static bool DoServices(ServerConfig *config, const Anope::string &, const Anope:
 	BotInfo* bi = BotInfo::Find(nick);
 	if (!bi)
 		bi = new BotInfo(nick, user, host, gecos, modes);
-	bi->SetFlag(BI_CONF);
+	bi->conf = true;
 
 	Anope::string token;
 	commasepstream sep(channels);
@@ -995,7 +943,7 @@ static bool DoneServices(ServerConfig *config, const Anope::string &)
 		BotInfo *bi = it->second;
 		++it;
 
-		if (bi->HasFlag(BI_CONF) && services.count(bi->nick) == 0)
+		if (bi->conf && services.count(bi->nick) == 0)
 			bi->Destroy();
 	}
 	services.clear();

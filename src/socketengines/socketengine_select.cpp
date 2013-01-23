@@ -40,25 +40,22 @@ void SocketEngine::Shutdown()
 
 void SocketEngine::Change(Socket *s, bool set, SocketFlag flag)
 {
-	if (set == s->HasFlag(flag))
+	if (set == s->flags[flag])
 		return;
 
-	bool before_registered = s->HasFlag(SF_READABLE) || s->HasFlag(SF_WRITABLE);
+	bool before_registered = s->flags[SF_READABLE] || s->flags[SF_WRITABLE];
 
-	if (set)
-		s->SetFlag(flag);
-	else
-		s->UnsetFlag(flag);
+	s->flags[flag] = set;
 	
-	bool now_registered = s->HasFlag(SF_READABLE) || s->HasFlag(SF_WRITABLE);
+	bool now_registered = s->flags[SF_READABLE] || s->flags[SF_WRITABLE];
 
 	if (!before_registered && now_registered)
 	{
 		if (s->GetFD() > MaxFD)
 			MaxFD = s->GetFD();
-		if (s->HasFlag(SF_READABLE))
+		if (s->flags[SF_READABLE])
 			FD_SET(s->GetFD(), &ReadFDs);
-		if (s->HasFlag(SF_WRITABLE))
+		if (s->flags[SF_WRITABLE])
 			FD_SET(s->GetFD(), &WriteFDs);
 		++FDCount;
 	}
@@ -72,12 +69,12 @@ void SocketEngine::Change(Socket *s, bool set, SocketFlag flag)
 	}
 	else if (before_registered && now_registered)
 	{
-		if (s->HasFlag(SF_READABLE))
+		if (s->flags[SF_READABLE])
 			FD_SET(s->GetFD(), &ReadFDs);
 		else
 			FD_CLR(s->GetFD(), &ReadFDs);
 
-		if (s->HasFlag(SF_WRITABLE))
+		if (s->flags[SF_WRITABLE])
 			FD_SET(s->GetFD(), &WriteFDs);
 		else
 			FD_CLR(s->GetFD(), &WriteFDs);
@@ -133,18 +130,18 @@ void SocketEngine::Process()
 
 			if (!s->Process())
 			{
-				if (s->HasFlag(SF_DEAD))
+				if (s->flags[SF_DEAD])
 					delete s;
 				continue;
 			}
 
 			if (has_read && !s->ProcessRead())
-				s->SetFlag(SF_DEAD);
+				s->flags[SF_DEAD] = true;
 
 			if (has_write && !s->ProcessWrite())
-				s->SetFlag(SF_DEAD);
+				s->flags[SF_DEAD] = true;
 
-			if (s->HasFlag(SF_DEAD))
+			if (s->flags[SF_DEAD])
 				delete s;
 		}
 	}

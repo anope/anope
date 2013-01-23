@@ -48,17 +48,14 @@ void SocketEngine::Shutdown()
 
 void SocketEngine::Change(Socket *s, bool set, SocketFlag flag)
 {
-	if (set == s->HasFlag(flag))
+	if (set == s->flags[flag])
 		return;
 
-	bool before_registered = s->HasFlag(SF_READABLE) || s->HasFlag(SF_WRITABLE);
+	bool before_registered = s->flags[SF_READABLE] || s->flags[SF_WRITABLE];
 
-	if (set)
-		s->SetFlag(flag);
-	else
-		s->UnsetFlag(flag);
-	
-	bool now_registered = s->HasFlag(SF_READABLE) || s->HasFlag(SF_WRITABLE);
+	s->flags[flag] = set;
+
+	bool now_registered = s->flags[SF_READABLE] || s->flags[SF_WRITABLE];
 
 	if (!before_registered && now_registered)
 	{
@@ -69,7 +66,7 @@ void SocketEngine::Change(Socket *s, bool set, SocketFlag flag)
 		memset(&ev, 0, sizeof(ev));
 
 		ev.fd = s->GetFD();
-		ev.events = (s->HasFlag(SF_READABLE) ? POLLIN : 0) | (s->HasFlag(SF_WRITABLE) ? POLLOUT : 0);
+		ev.events = (s->flags[SF_READABLE] ? POLLIN : 0) | (s->flags[SF_WRITABLE] ? POLLOUT : 0);
 
 		socket_positions[ev.fd] = SocketCount;
 		++SocketCount;
@@ -100,7 +97,7 @@ void SocketEngine::Change(Socket *s, bool set, SocketFlag flag)
 			throw SocketException("Unable to modify fd " + stringify(s->GetFD()) + " in poll, it does not exist?");
 
 		pollfd &ev = events[pos->second];
-		ev.events = (s->HasFlag(SF_READABLE) ? POLLIN : 0) | (s->HasFlag(SF_WRITABLE) ? POLLOUT : 0);
+		ev.events = (s->flags[SF_READABLE] ? POLLIN : 0) | (s->flags[SF_WRITABLE] ? POLLOUT : 0);
 	}
 }
 
@@ -141,18 +138,18 @@ void SocketEngine::Process()
 
 		if (!s->Process())
 		{
-			if (s->HasFlag(SF_DEAD))
+			if (s->flags[SF_DEAD])
 				delete s;
 			continue;
 		}
 
 		if ((ev->revents & POLLIN) && !s->ProcessRead())
-			s->SetFlag(SF_DEAD);
+			s->flags[SF_DEAD] = true;
 
 		if ((ev->revents & POLLOUT) && !s->ProcessWrite())
-			s->SetFlag(SF_DEAD);
+			s->flags[SF_DEAD] = true;
 
-		if (s->HasFlag(SF_DEAD))
+		if (s->flags[SF_DEAD])
 			delete s;
 	}
 }

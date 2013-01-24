@@ -255,9 +255,6 @@ ChanUserContainer *Channel::FindUser(const User *u) const
 
 bool Channel::HasUserStatus(const User *u, ChannelModeStatus *cms) const
 {
-	if (!cms)
-		return false;
-
 	/* Usually its more efficient to search the users channels than the channels users */
 	ChanUserContainer *cc = u->FindChannel(this);
 	if (cc)

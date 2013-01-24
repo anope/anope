@@ -28,6 +28,14 @@ namespace SQL
 			return *ss;
 		}
 
+		std::set<Anope::string> KeySet() const anope_override
+		{
+			std::set<Anope::string> keys;
+			for (std::map<Anope::string, std::stringstream *>::const_iterator it = this->data.begin(), it_end = this->data.end(); it != it_end; ++it)
+				keys.insert(it->first);
+			return keys;
+		}
+
 		bool IsEqual(Serialize::Data *other) anope_override
 		{
 			try

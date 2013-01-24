@@ -44,8 +44,8 @@ ServerConfig::ServerConfig()
 	if (NSDefaults.empty())
 	{
 		this->NSDefFlags.insert("SECURE");
-		this->NSDefFlags.insert("MEMOSIGNON");
-		this->NSDefFlags.insert("MEMORECEIVE");
+		this->NSDefFlags.insert("MEMO_SIGNON");
+		this->NSDefFlags.insert("MEMO_RECEIVE");
 	}
 	else if (!NSDefaults.equals_ci("none"))
 	{
@@ -1165,7 +1165,7 @@ ConfigItems::ConfigItems(ServerConfig *conf)
 		{"nickserv", "unregistered_notice", "", new ValueContainerString(&conf->NSUnregisteredNotice), DT_STRING, NoValidation},
 		{"nickserv", "forceemail", "no", new ValueContainerBool(&conf->NSForceEmail), DT_BOOLEAN, ValidateEmailReg},
 		{"nickserv", "confirmemailchanges", "no", new ValueContainerBool(&conf->NSConfirmEmailChanges), DT_BOOLEAN, NoValidation},
-		{"nickserv", "defaults", "secure memosignon memoreceive", new ValueContainerString(&NSDefaults), DT_STRING, NoValidation},
+		{"nickserv", "defaults", "secure memo_signon memo_receive", new ValueContainerString(&NSDefaults), DT_STRING, NoValidation},
 		{"nickserv", "languages", "", new ValueContainerString(&conf->Languages), DT_STRING, NoValidation},
 		{"nickserv", "defaultlanguage", "0", new ValueContainerString(&conf->NSDefLanguage), DT_STRING, NoValidation},
 		{"nickserv", "regdelay", "0", new ValueContainerTime(&conf->NSRegDelay), DT_TIME, NoValidation},

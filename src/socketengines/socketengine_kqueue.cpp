@@ -52,13 +52,10 @@ void SocketEngine::Shutdown()
 
 void SocketEngine::Change(Socket *s, bool set, SocketFlag flag)
 {
-	if (set == s->HasFlag(flag))
+	if (set == s->flags[flag])
 		return;
 
-	if (set)
-		s->SetFlag(flag);
-	else
-		s->UnsetFlag(flag);
+	s->flags[flag] = set;
 	
 	int mod;
 	if (flag == SF_READABLE)
@@ -110,17 +107,17 @@ void SocketEngine::Process()
 
 		if (!s->Process())
 		{
-			if (s->HasFlag(SF_DEAD))
+			if (s->flags[SF_DEAD])
 				delete s;
 			continue;
 		}
 
 		if (event.filter == EVFILT_READ && !s->ProcessRead())
-			s->SetFlag(SF_DEAD);
+			s->flags[SF_DEAD] = true;
 		else if (event.filter == EVFILT_WRITE && !s->ProcessWrite())
-			s->SetFlag(SF_DEAD);
+			s->flags[SF_DEAD] = true;
 
-		if (s->HasFlag(SF_DEAD))
+		if (s->flags[SF_DEAD])
 			delete s;
 	}
 }

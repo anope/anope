@@ -232,7 +232,7 @@ time_t Anope::DoTime(const Anope::string &s)
 	if (s.empty())
 		return -1;
 
-	int amount;
+	int amount = 0;
 	Anope::string end;
 
 	try
@@ -261,7 +261,7 @@ time_t Anope::DoTime(const Anope::string &s)
 	}
 	catch (const ConvertException &) { }
 
-	return 0;
+	return amount;
 }
 
 Anope::string Anope::Duration(time_t t, const NickCore *nc)

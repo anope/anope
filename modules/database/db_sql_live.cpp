@@ -109,7 +109,7 @@ class DBMySQL : public Module, public Pipe
 					this->RunQueryResult(create[i]);
 
 				Result res = this->RunQueryResult(this->SQL->BuildInsert(this->prefix + s_type->GetName(), obj->id, *data));
-				if (obj->id != res.GetID())
+				if (res.GetID() && obj->id != res.GetID())
 				{
 					/* In this case obj is new, so place it into the object map */
 					obj->id = res.GetID();

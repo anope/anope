@@ -24,6 +24,19 @@ Memo::Memo() : Serializable("Memo")
 	unread = receipt = false;
 }
 
+Memo::~Memo()
+{
+	bool ischan;
+	MemoInfo *mi = MemoInfo::GetMemoInfo(this->owner, ischan);
+	if (mi)
+	{
+		std::vector<Memo *>::iterator it = std::find(mi->memos->begin(), mi->memos->end(), this);
+
+		if (it != mi->memos->end())
+			mi->memos->erase(it);
+	}
+}
+
 void Memo::Serialize(Serialize::Data &data) const
 {
 	data["owner"] << this->owner;
@@ -36,16 +49,12 @@ void Memo::Serialize(Serialize::Data &data) const
 
 Serializable* Memo::Unserialize(Serializable *obj, Serialize::Data &data)
 {
-	ServiceReference<MemoServService> MemoServService("MemoServService", "MemoServ");
-	if (!MemoServService)
-		return NULL;
-	
 	Anope::string owner;
 
 	data["owner"] >> owner;
 	
 	bool ischan;
-	MemoInfo *mi = MemoServService->GetMemoInfo(owner, ischan);
+	MemoInfo *mi = MemoInfo::GetMemoInfo(owner, ischan);
 	if (!mi)
 		return NULL;
 
@@ -55,7 +64,7 @@ Serializable* Memo::Unserialize(Serializable *obj, Serialize::Data &data)
 	else
 		m = new Memo();
 
-	data["owner"] >> m->owner;
+	m->owner = owner;
 	data["time"] >> m->time;
 	data["sender"] >> m->sender;
 	data["text"] >> m->text;
@@ -93,18 +102,6 @@ void MemoInfo::Del(unsigned index)
 	if (index >= this->memos->size())
 		return;
 	this->GetMemo(index)->Destroy();
-	this->memos->erase(this->memos->begin() + index);
-}
-
-void MemoInfo::Del(Memo *memo)
-{
-	std::vector<Memo *>::iterator it = std::find(this->memos->begin(), this->memos->end(), memo);
-
-	if (it != this->memos->end())
-	{
-		memo->Destroy();
-		this->memos->erase(it);
-	}
 }
 
 bool MemoInfo::HasIgnore(User *u)
@@ -113,5 +110,25 @@ bool MemoInfo::HasIgnore(User *u)
 		if (u->nick.equals_ci(this->ignores[i]) || (u->Account() && u->Account()->display.equals_ci(this->ignores[i])) || Anope::Match(u->GetMask(), Anope::string(this->ignores[i])))
 			return true;
 	return false;
+}
+
+MemoInfo *MemoInfo::GetMemoInfo(const Anope::string &target, bool &ischan)
+{
+	if (!target.empty() && target[0] == '#')
+	{
+		ischan = true;
+		ChannelInfo *ci = ChannelInfo::Find(target);
+		if (ci != NULL)
+			return &ci->memos;
+	}
+	else
+	{
+		ischan = false;
+		NickAlias *na = NickAlias::Find(target);
+		if (na != NULL)
+			return &na->nc->memos;
+	}
+
+	return NULL;
 }
 

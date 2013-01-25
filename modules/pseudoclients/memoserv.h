@@ -14,13 +14,6 @@ class MemoServService : public Service
 
 	MemoServService(Module *m) : Service(m, "MemoServService", "MemoServ") { }
 
-	/** Retrieve the memo info for a nick or channel
-	 * @param target Target
-	 * @param ischan Set to true if target is a channel
-	 * @return A memoinfo structure or NULL
-	 */
- 	virtual MemoInfo *GetMemoInfo(const Anope::string &target, bool &ischan) = 0;
-
 	/** Sends a memo.
 	 * @param source The source of the memo, can be anythin.
 	 * @param target The target of the memo, nick or channel.

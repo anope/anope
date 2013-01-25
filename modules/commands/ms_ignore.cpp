@@ -44,7 +44,7 @@ class CommandMSIgnore : public Command
 		}
 
 		bool ischan;
-		MemoInfo *mi = MemoServService->GetMemoInfo(channel, ischan);
+		MemoInfo *mi = MemoInfo::GetMemoInfo(channel, ischan);
 		ChannelInfo *ci = ChannelInfo::Find(channel);
 		if (!mi)
 			source.Reply(ischan ? CHAN_X_NOT_REGISTERED : _(NICK_X_NOT_REGISTERED), channel.c_str());

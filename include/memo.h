@@ -22,6 +22,7 @@ class CoreExport Memo : public Serializable
  	bool unread;
 	bool receipt;
  	Memo();
+	~Memo();
 
 	void Serialize(Serialize::Data &data) const anope_override;
 	static Serializable* Unserialize(Serializable *obj, Serialize::Data &);
@@ -46,8 +47,9 @@ struct CoreExport MemoInfo
 	Memo *GetMemo(unsigned index) const;
 	unsigned GetIndex(Memo *m) const;
 	void Del(unsigned index);
-	void Del(Memo *m);
 	bool HasIgnore(User *u);
+
+	static MemoInfo *GetMemoInfo(const Anope::string &targ, bool &is_chan);
 };
 
 #endif // MEMO_H

@@ -39,30 +39,10 @@ class MyMemoServService : public MemoServService
  public:
 	MyMemoServService(Module *m) : MemoServService(m) { }
 
- 	MemoInfo *GetMemoInfo(const Anope::string &target, bool &ischan) anope_override
-	{
-		if (!target.empty() && target[0] == '#')
-		{
-			ischan = true;
-			ChannelInfo *ci = ChannelInfo::Find(target);
-			if (ci != NULL)
-				return &ci->memos;
-		}
-		else
-		{
-			ischan = false;
-			NickAlias *na = NickAlias::Find(target);
-			if (na != NULL)
-				return &na->nc->memos;
-		}
-
-		return NULL;
-	}
-
 	MemoResult Send(const Anope::string &source, const Anope::string &target, const Anope::string &message, bool force) anope_override
 	{
 		bool ischan;
-		MemoInfo *mi = this->GetMemoInfo(target, ischan);
+		MemoInfo *mi = MemoInfo::GetMemoInfo(target, ischan);
 
 		if (mi == NULL)
 			return MEMO_INVALID_TARGET;

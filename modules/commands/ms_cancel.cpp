@@ -34,7 +34,7 @@ class CommandMSCancel : public Command
 		const Anope::string &nname = params[0];
 
 		bool ischan;
-		MemoInfo *mi = MemoServService->GetMemoInfo(nname, ischan);
+		MemoInfo *mi = MemoInfo::GetMemoInfo(nname, ischan);
 
 		if (mi == NULL)
 			source.Reply(ischan ? CHAN_X_NOT_REGISTERED : _(NICK_X_NOT_REGISTERED), nname.c_str());

@@ -34,7 +34,7 @@ void Extensible::Extend(const Anope::string &key, ExtensibleItem *p)
 
 void Extensible::ExtendMetadata(const Anope::string &key, const Anope::string &value)
 {
-	this->Extend(key, new ExtensibleMetadata(value));
+	this->Extend(key, new ExtensibleMetadata(!value.empty() ? value : "1"));
 }
 
 bool Extensible::Shrink(const Anope::string &key)
@@ -93,7 +93,8 @@ void Extensible::ExtensibleUnserialize(Serialize::Data &data)
 			Anope::string str;
 			data[*it] >> str;
 
-			this->ExtendMetadata(it->substr(11), str);
+			if (!str.empty())
+				this->ExtendMetadata(it->substr(11), str);
 		}
 }
 

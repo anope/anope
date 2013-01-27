@@ -493,7 +493,7 @@ Serializable* ChannelInfo::Unserialize(Serializable *obj, Serialize::Data &data)
 		ci->ExtendMetadata(tok);
 	spacesepstream sep2(sbotflags);
 	while (sep2.GetToken(tok))
-		ci->ExtendMetadata(tok);
+		ci->ExtendMetadata("BS_" + tok);
 	/* End compat */
 
 	return ci;

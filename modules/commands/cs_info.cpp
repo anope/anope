@@ -92,7 +92,7 @@ class CommandCSInfo : public Command
 			else
 				CheckOptStr(optbuf, "SIGNKICK_LEVEL", _("Signed kicks"), ci, nc);
 			CheckOptStr(optbuf, "TOPICLOCK", _("Topic Lock"), ci, nc);
-			CheckOptStr(optbuf, "PERSIST", _("Persistant"), ci, nc);
+			CheckOptStr(optbuf, "PERSIST", _("Persistent"), ci, nc);
 			CheckOptStr(optbuf, "NO_EXPIRE", _("No expire"), ci, nc);
 			CheckOptStr(optbuf, "STATS", _("Chanstats"), ci, nc);
 

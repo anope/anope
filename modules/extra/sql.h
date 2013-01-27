@@ -45,6 +45,9 @@ namespace SQL
 				for (std::map<Anope::string, std::stringstream *>::const_iterator it = o->data.begin(), it_end = o->data.end(); it != it_end; ++it)
 					if (!this->data.count(it->first) || it->second->str() != this->data[it->first]->str())
 						return false;
+				for (std::map<Anope::string, std::stringstream *>::const_iterator it = this->data.begin(), it_end = this->data.end(); it != it_end; ++it)
+					if (!o->data.count(it->first) || it->second->str() != o->data[it->first]->str())
+						return false;
 
 				return true;
 			}

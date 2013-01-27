@@ -176,6 +176,8 @@ class CoreExport Serialize::Type
 	static Serialize::Type *Find(const Anope::string &name);
 
 	static const std::vector<Anope::string> &GetTypeOrder();
+
+	static const std::map<Anope::string, Serialize::Type *>& GetTypes();
 };
 
 /** Should be used to hold lists and other objects of a specific type,

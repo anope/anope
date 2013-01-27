@@ -246,6 +246,29 @@ class DBFlatFile : public Module, public Pipe
 		{
 			std::map<Module *, std::fstream *> databases;
 
+			/* First open the databases of all of the registered types. This way, if we have a type with 0 objects, that database will be properly cleared */
+			for (std::map<Anope::string, Serialize::Type *>::const_iterator it = Serialize::Type::GetTypes().begin(), it_end = Serialize::Type::GetTypes().end(); it != it_end; ++it)
+			{
+				Serialize::Type *s_type = it->second;
+
+				if (databases[s_type->GetOwner()])
+					continue;
+
+				Anope::string db_name;
+				if (s_type->GetOwner())
+					db_name = Anope::DataDir + "/module_" + s_type->GetOwner()->name + ".db";
+				else
+					db_name = Anope::DataDir + "/" + database_file;
+
+				if (Anope::IsFile(db_name))
+					rename(db_name.c_str(), (db_name + ".tmp").c_str());
+
+				std::fstream *fs = databases[s_type->GetOwner()] = new std::fstream(db_name.c_str(), std::ios_base::out | std::ios_base::trunc);
+
+				if (!fs->is_open())
+					Log(this) << "Unable to open " << db_name << " for writing";
+			}
+
 			SaveData data;
 			const std::list<Serializable *> &items = Serializable::GetItems();
 			for (std::list<Serializable *>::const_iterator it = items.begin(), it_end = items.end(); it != it_end; ++it)
@@ -253,31 +276,8 @@ class DBFlatFile : public Module, public Pipe
 				Serializable *base = *it;
 				Serialize::Type *s_type = base->GetSerializableType();
 
-				if (!s_type)
-					continue;
-
 				data.fs = databases[s_type->GetOwner()];
-
-				if (!data.fs)
-				{
-					Anope::string db_name;
-					if (s_type->GetOwner())
-						db_name = Anope::DataDir + "/module_" + s_type->GetOwner()->name + ".db";
-					else
-						db_name = Anope::DataDir + "/" + database_file;
-
-					if (Anope::IsFile(db_name))
-						rename(db_name.c_str(), (db_name + ".tmp").c_str());
-
-					data.fs = databases[s_type->GetOwner()] = new std::fstream(db_name.c_str(), std::ios_base::out | std::ios_base::trunc);
-
-					if (!data.fs->is_open())
-					{
-						Log(this) << "Unable to open " << db_name << " for writing";
-						continue;
-					}
-				}
-				else if (!data.fs->is_open())
+				if (!data.fs || !data.fs->is_open())
 					continue;
 
 				*data.fs << "OBJECT " << s_type->GetName();

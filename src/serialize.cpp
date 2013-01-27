@@ -170,3 +170,8 @@ const std::vector<Anope::string> &Type::GetTypeOrder()
 	return TypeOrder;
 }
 
+const std::map<Anope::string, Serialize::Type *>& Type::GetTypes()
+{
+	return Types;
+}
+

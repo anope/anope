@@ -54,7 +54,7 @@ class CommandBSAssign : public Command
 			return;
 		}
 
-		if (bi->oper_only && !source.HasCommand("botserv/assign/private"))
+		if (bi->oper_only && !source.HasPriv("botserv/administration"))
 		{
 			source.Reply(ACCESS_DENIED);
 			return;

@@ -33,7 +33,7 @@ class CommandBSBotList : public Command
 		{
 			BotInfo *bi = it->second;
 
-			if (source.HasCommand("botserv/botlist") || !bi->oper_only)
+			if (source.HasPriv("botserv/administration") || !bi->oper_only)
 			{
 				++count;
 				ListFormatter::ListEntry entry;

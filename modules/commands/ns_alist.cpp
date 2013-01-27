@@ -27,7 +27,7 @@ class CommandNSAList : public Command
 		Anope::string nick = source.GetNick();
 		NickCore *nc = source.nc;
 
-		if (params.size() && source.IsServicesOper())
+		if (params.size() && source.HasPriv("nickserv/alist"))
 		{
 			nick = params[0];
 			const NickAlias *na = NickAlias::Find(nick);

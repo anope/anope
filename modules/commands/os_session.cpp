@@ -17,25 +17,25 @@
 class MySessionService : public SessionService
 {
 	SessionMap Sessions;
-	ExceptionVector Exceptions;
+	Serialize::Checker<ExceptionVector> Exceptions;
  public:
-	MySessionService(Module *m) : SessionService(m) { }
+	MySessionService(Module *m) : SessionService(m), Exceptions("Exception") { }
 
 	void AddException(Exception *e) anope_override
 	{
-		this->Exceptions.push_back(e);
+		this->Exceptions->push_back(e);
 	}
 
 	void DelException(Exception *e) anope_override
 	{
-		ExceptionVector::iterator it = std::find(this->Exceptions.begin(), this->Exceptions.end(), e);
-		if (it != this->Exceptions.end())
-			this->Exceptions.erase(it);
+		ExceptionVector::iterator it = std::find(this->Exceptions->begin(), this->Exceptions->end(), e);
+		if (it != this->Exceptions->end())
+			this->Exceptions->erase(it);
 	}
 
 	Exception *FindException(User *u) anope_override
 	{
-		for (std::vector<Exception *>::const_iterator it = this->Exceptions.begin(), it_end = this->Exceptions.end(); it != it_end; ++it)
+		for (std::vector<Exception *>::const_iterator it = this->Exceptions->begin(), it_end = this->Exceptions->end(); it != it_end; ++it)
 		{
 			Exception *e = *it;
 			if (Anope::Match(u->host, e->mask) || Anope::Match(u->ip, e->mask))
@@ -46,7 +46,7 @@ class MySessionService : public SessionService
 
 	Exception *FindException(const Anope::string &host) anope_override
 	{
-		for (std::vector<Exception *>::const_iterator it = this->Exceptions.begin(), it_end = this->Exceptions.end(); it != it_end; ++it)
+		for (std::vector<Exception *>::const_iterator it = this->Exceptions->begin(), it_end = this->Exceptions->end(); it != it_end; ++it)
 		{
 			Exception *e = *it;
 			if (Anope::Match(host, e->mask))

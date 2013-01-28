@@ -93,7 +93,7 @@ class ExpireTimer : public Timer
 
 	void Tick(time_t) anope_override
 	{
-		if (!session_service)
+		if (!session_service || Anope::NoExpire)
 			return;
 		for (unsigned i = session_service->GetExceptions().size(); i > 0; --i)
 		{

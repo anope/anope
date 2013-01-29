@@ -1,10 +1,13 @@
 Anope Version 1.8 - GIT
 -----------------------
-12/23  A Added Hybrid 8.0 support. (Patch provided by Hybrid Team)       [  #00]
-12/23  R Removed experimental Hybrid 7.0 support.                        [  #00]
+01/29  F Fixed user modes on BotServ bots on Unreal3.2.10                [#1474]
+
+Provided by Anope Dev. <team@anope.org> - 2012
 02/22  F Fixed several grammar errors in docs/ (patch provided by Simba) [  #00]
 02/25  F Do not allow akill masks to end in @                            [#1380]
 07/14  F Fixed crash with cs_enforce and empty permanent channels        [  #00]
+12/23  A Added Hybrid 8.0 support. (Patch provided by Hybrid Team)       [  #00]
+12/23  R Removed experimental Hybrid 7.0 support.                        [  #00]
 
 Provided by Anope Dev. <team@anope.org> - 2011
 12/31  F Fixed os_svsnick to allow changing the case of a users' nick    [#1369]

@@ -265,7 +265,7 @@ class NSRecover : public Module
 				std::map<Anope::string, ChannelStatus>::iterator it = ei->find(c->name);
 				if (it != ei->end())
 				{
-					for (std::set<Anope::string>::iterator it2 = it->second.modes.begin(), it2_end = it->second.modes.end(); it2 != it2_end; ++it)
+					for (std::set<Anope::string>::iterator it2 = it->second.modes.begin(), it2_end = it->second.modes.end(); it2 != it2_end; ++it2)
 						c->SetMode(c->ci->WhoSends(), ModeManager::FindChannelModeByName(*it2), u->GetUID());
 
 					ei->erase(it);

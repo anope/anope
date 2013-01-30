@@ -474,7 +474,6 @@ class CoreExport ServerConfig
 	/* Mail messages to send */
 	Anope::string MailRegistrationSubject, MailRegistrationMessage;
 	Anope::string MailResetSubject, MailResetMessage;
-	Anope::string MailSendpassSubject, MailSendpassMessage;
 	Anope::string MailEmailchangeSubject, MailEmailchangeMessage;
 	Anope::string MailMemoSubject, MailMemoMessage;
 

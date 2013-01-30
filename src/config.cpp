@@ -423,7 +423,7 @@ static bool ValidateMail(ServerConfig *config, const Anope::string &tag, const A
 {
 	if (config->UseMail)
 	{
-		Anope::string check[] = { "sendmailpath", "sendfrom", "registration_subject", "registration_message", "sendpass_subject", "sendpass_message", "emailchange_subject", "emailchange_message", "memo_subject", "memo_message", "" };
+		Anope::string check[] = { "sendmailpath", "sendfrom", "registration_subject", "registration_message", "emailchange_subject", "emailchange_message", "memo_subject", "memo_message", "" };
 		for (int i = 0; !check[i].empty(); ++i)
 			if (value.equals_ci(check[i]))
 				if (data.GetValue().empty())
@@ -1203,8 +1203,6 @@ ConfigItems::ConfigItems(ServerConfig *conf)
 		{"mail", "registration_message", "", new ValueContainerString(&conf->MailRegistrationMessage), DT_STRING | DT_ALLOW_NEWLINE, ValidateMail},
 		{"mail", "reset_subject", "", new ValueContainerString(&conf->MailResetSubject), DT_STRING, ValidateMail},
 		{"mail", "reset_message", "", new ValueContainerString(&conf->MailResetMessage), DT_STRING | DT_ALLOW_NEWLINE, ValidateMail},
-		{"mail", "sendpass_subject", "", new ValueContainerString(&conf->MailSendpassSubject), DT_STRING, ValidateMail},
-		{"mail", "sendpass_message", "", new ValueContainerString(&conf->MailSendpassMessage), DT_STRING | DT_ALLOW_NEWLINE, ValidateMail},
 		{"mail", "emailchange_subject", "", new ValueContainerString(&conf->MailEmailchangeSubject), DT_STRING, ValidateMail},
 		{"mail", "emailchange_message", "", new ValueContainerString(&conf->MailEmailchangeMessage), DT_STRING | DT_ALLOW_NEWLINE, ValidateMail},
 		{"mail", "memo_subject", "", new ValueContainerString(&conf->MailMemoSubject), DT_STRING, ValidateMail},

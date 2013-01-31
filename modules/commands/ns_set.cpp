@@ -424,7 +424,7 @@ class CommandNSSASetDisplay : public CommandNSSetDisplay
 		this->SendSyntax(source);
 		source.Reply(" ");
 		source.Reply(_("Changes the display used to refer to the nickname group in \n"
-				"Services. The new display MUST be a nick of your group."));
+				"Services. The new display MUST be a nick of the group."));
 		return true;
 	}
 };

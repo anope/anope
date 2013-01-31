@@ -56,7 +56,7 @@ ServerConfig::ServerConfig()
 			if (option.equals_ci("msg"))
 			{
 				if (!this->UsePrivmsg)
-					Log() << "msg in <nickserv:defaults> can only be used when UsePrivmsg is set";
+					Log() << "msg in <nickserv:defaults> can only be used when options:useprivmsg is set";
 				else
 					this->NSDefFlags.insert(option.upper());
 			}

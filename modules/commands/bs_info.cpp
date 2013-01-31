@@ -89,7 +89,7 @@ class CommandBSInfo : public Command
 		}
 		else if ((ci = ChannelInfo::Find(query)))
 		{
-			if (!source.AccessFor(ci).HasPriv("FOUNDER") && !source.HasPriv("botserv/administration"))
+			if (!source.AccessFor(ci).HasPriv("INFO") && !source.HasPriv("botserv/administration"))
 			{
 				source.Reply(ACCESS_DENIED);
 				return;

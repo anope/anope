@@ -339,7 +339,7 @@ static bool ValidateNickServ(ServerConfig *config, const Anope::string &tag, con
 				throw ConfigException("The value for <nickserv:guestnickprefix> cannot exceed 21 characters in length!");
 		}
 		else if (value.equals_ci("registration"))
-			if (!data.GetValue().equals_ci("none") && !data.GetValue().equals_ci("mail") && !data.GetValue().equals_ci("admin") && !data.GetValue().equals_ci("registration"))
+			if (!data.GetValue().equals_ci("none") && !data.GetValue().equals_ci("mail") && !data.GetValue().equals_ci("admin") && !data.GetValue().equals_ci("disable"))
 				throw ConfigException("The value for <nickserv:registration> must be one of \"none\", \"mail\", \"admin\", or \"disable\"");
 	}
 	return true;

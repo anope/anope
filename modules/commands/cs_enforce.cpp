@@ -18,7 +18,8 @@ class CommandCSEnforce : public Command
  private:
 	void DoSecureOps(CommandSource &source, ChannelInfo *ci)
 	{
-		Log(LOG_COMMAND, source, this) << "to enforce secureops";
+		bool override = !source.AccessFor(ci).HasPriv("AKICK") && source.HasPriv("chanserv/access/modify");
+		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to enforce secureops";
 
 		/* Dirty hack to allow Channel::SetCorrectModes to work ok.
 		 * We pretend like SECUREOPS is on so it doesn't ignore that
@@ -43,7 +44,8 @@ class CommandCSEnforce : public Command
 
 	void DoRestricted(CommandSource &source, ChannelInfo *ci)
 	{
-		Log(LOG_COMMAND, source, this) << "to enforce restricted";
+		bool override = !source.AccessFor(ci).HasPriv("AKICK") && source.HasPriv("chanserv/access/modify");
+		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to enforce restricted";
 
 		std::vector<User *> users;
 		for (Channel::ChanUserList::iterator it = ci->c->users.begin(), it_end = ci->c->users.end(); it != it_end; ++it)
@@ -73,7 +75,8 @@ class CommandCSEnforce : public Command
 
 	void DoRegOnly(CommandSource &source, ChannelInfo *ci)
 	{
-		Log(LOG_COMMAND, source, this) << "to enforce registered only";
+		bool override = !source.AccessFor(ci).HasPriv("AKICK") && source.HasPriv("chanserv/access/modify");
+		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to enforce registered only";
 
 		std::vector<User *> users;
 		for (Channel::ChanUserList::iterator it = ci->c->users.begin(), it_end = ci->c->users.end(); it != it_end; ++it)
@@ -104,7 +107,8 @@ class CommandCSEnforce : public Command
 
 	void DoSSLOnly(CommandSource &source, ChannelInfo *ci)
 	{
-		Log(LOG_COMMAND, source, this) << "to enforce SSL only";
+		bool override = !source.AccessFor(ci).HasPriv("AKICK") && source.HasPriv("chanserv/access/modify");
+		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to enforce SSL only";
 
 		std::vector<User *> users;
 		for (Channel::ChanUserList::iterator it = ci->c->users.begin(), it_end = ci->c->users.end(); it != it_end; ++it)
@@ -135,6 +139,9 @@ class CommandCSEnforce : public Command
 
 	void DoBans(CommandSource &source, ChannelInfo *ci)
 	{
+		bool override = !source.AccessFor(ci).HasPriv("AKICK") && source.HasPriv("chanserv/access/modify");
+		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to enforce bans";
+
 		std::vector<User *> users;
 		for (Channel::ChanUserList::iterator it = ci->c->users.begin(), it_end = ci->c->users.end(); it != it_end; ++it)
 		{
@@ -156,11 +163,14 @@ class CommandCSEnforce : public Command
 			ci->c->Kick(NULL, user, "%s", reason.c_str());
 		}
 
-		source.Reply(_("BANS enforced on %s."), ci->name.c_str());
+		source.Reply(_("Bans enforced on %s."), ci->name.c_str());
 	}
 
 	void DoLimit(CommandSource &source, ChannelInfo *ci)
 	{
+		bool override = !source.AccessFor(ci).HasPriv("AKICK") && source.HasPriv("chanserv/access/modify");
+		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to enforce limit";
+
 		Anope::string l_str;
 		if (!ci->c->GetParam("LIMIT", l_str))
 		{
@@ -228,7 +238,7 @@ class CommandCSEnforce : public Command
 			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
 		else if (!ci->c)
 			source.Reply(CHAN_X_NOT_IN_USE, ci->name.c_str());
-		else if (!source.AccessFor(ci).HasPriv("AKICK"))
+		else if (!source.AccessFor(ci).HasPriv("AKICK") && !source.HasPriv("chanserv/access/modify"))
 			source.Reply(ACCESS_DENIED);
 		else if (what.equals_ci("SECUREOPS"))
 			this->DoSecureOps(source, ci);

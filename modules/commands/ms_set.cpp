@@ -275,7 +275,7 @@ class CommandMSSet : public Command
 						"change the limit (even if a previous limit was set with\n"
 						"\002HARD\002).\n"
 						"This use of the \002SET LIMIT\002 command is limited to \002Services\002\n"
-						"\002admins\002.  Other users may only enter a limit for themselves\n"
+						"\002Admins\002.  Other users may only enter a limit for themselves\n"
 						"or a channel on which they have such privileges, may not\n"
 						"remove their limit, may not set a limit above %d, and may\n"
 						"not set a hard limit."), Config->MSMaxMemos);

@@ -54,7 +54,7 @@ class CommandHelp : public Command
 			GroupInfo groups;
 
 			if (all)
-				source.Reply(_("All available commands for \2%s\2:"), source.service->nick.c_str());
+				source.Reply(_("All available commands for \002%s\002:"), source.service->nick.c_str());
 
 			for (CommandInfo::map::const_iterator it = map.begin(), it_end = map.end(); it != it_end; ++it)
 			{
@@ -124,7 +124,7 @@ class CommandHelp : public Command
 			if (!groups.empty())
 			{
 				source.Reply(" ");
-				source.Reply(_("Use the \2%s ALL\2 command to list all command descriptions."), source_command.c_str());
+				source.Reply(_("Use the \002%s ALL\002 command to list all commands and their descriptions."), source_command.c_str());
 			}
 		}
 		else

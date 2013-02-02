@@ -18,7 +18,8 @@ class CommandCSEnforce : public Command
  private:
 	void DoSecureOps(CommandSource &source, ChannelInfo *ci)
 	{
-		Log(LOG_COMMAND, source, this) << "to enforce secureops";
+		bool override = !source.AccessFor(ci).HasPriv("AKICK") && source.HasPriv("chanserv/access/modify");
+		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to enforce secureops";
 
 		/* Dirty hack to allow Channel::SetCorrectModes to work ok.
 		 * We pretend like SECUREOPS is on so it doesn't ignore that
@@ -43,7 +44,8 @@ class CommandCSEnforce : public Command
 
 	void DoRestricted(CommandSource &source, ChannelInfo *ci)
 	{
-		Log(LOG_COMMAND, source, this) << "to enforce restricted";
+		bool override = !source.AccessFor(ci).HasPriv("AKICK") && source.HasPriv("chanserv/access/modify");
+		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to enforce restricted";
 
 		std::vector<User *> users;
 		for (Channel::ChanUserList::iterator it = ci->c->users.begin(), it_end = ci->c->users.end(); it != it_end; ++it)
@@ -73,7 +75,8 @@ class CommandCSEnforce : public Command
 
 	void DoRegOnly(CommandSource &source, ChannelInfo *ci)
 	{
-		Log(LOG_COMMAND, source, this) << "to enforce registered only";
+		bool override = !source.AccessFor(ci).HasPriv("AKICK") && source.HasPriv("chanserv/access/modify");
+		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to enforce registered only";
 
 		std::vector<User *> users;
 		for (Channel::ChanUserList::iterator it = ci->c->users.begin(), it_end = ci->c->users.end(); it != it_end; ++it)
@@ -104,7 +107,8 @@ class CommandCSEnforce : public Command
 
 	void DoSSLOnly(CommandSource &source, ChannelInfo *ci)
 	{
-		Log(LOG_COMMAND, source, this) << "to enforce SSL only";
+		bool override = !source.AccessFor(ci).HasPriv("AKICK") && source.HasPriv("chanserv/access/modify");
+		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to enforce SSL only";
 
 		std::vector<User *> users;
 		for (Channel::ChanUserList::iterator it = ci->c->users.begin(), it_end = ci->c->users.end(); it != it_end; ++it)
@@ -135,6 +139,9 @@ class CommandCSEnforce : public Command
 
 	void DoBans(CommandSource &source, ChannelInfo *ci)
 	{
+		bool override = !source.AccessFor(ci).HasPriv("AKICK") && source.HasPriv("chanserv/access/modify");
+		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to enforce bans";
+
 		std::vector<User *> users;
 		for (Channel::ChanUserList::iterator it = ci->c->users.begin(), it_end = ci->c->users.end(); it != it_end; ++it)
 		{
@@ -156,11 +163,14 @@ class CommandCSEnforce : public Command
 			ci->c->Kick(NULL, user, "%s", reason.c_str());
 		}
 
-		source.Reply(_("BANS enforced on %s."), ci->name.c_str());
+		source.Reply(_("Bans enforced on %s."), ci->name.c_str());
 	}
 
 	void DoLimit(CommandSource &source, ChannelInfo *ci)
 	{
+		bool override = !source.AccessFor(ci).HasPriv("AKICK") && source.HasPriv("chanserv/access/modify");
+		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to enforce limit";
+
 		Anope::string l_str;
 		if (!ci->c->GetParam("LIMIT", l_str))
 		{
@@ -228,7 +238,7 @@ class CommandCSEnforce : public Command
 			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
 		else if (!ci->c)
 			source.Reply(CHAN_X_NOT_IN_USE, ci->name.c_str());
-		else if (!source.AccessFor(ci).HasPriv("AKICK"))
+		else if (!source.AccessFor(ci).HasPriv("AKICK") && !source.HasPriv("chanserv/access/modify"))
 			source.Reply(ACCESS_DENIED);
 		else if (what.equals_ci("SECUREOPS"))
 			this->DoSecureOps(source, ci);
@@ -253,15 +263,15 @@ class CommandCSEnforce : public Command
 		source.Reply(_("Enforce various channel modes and set options. The \037channel\037\n"
 			"option indicates what channel to enforce the modes and options\n"
 			"on. The \037what\037 option indicates what modes and options to\n"
-			"enforce, and can be any of SECUREOPS, RESTRICTED, REGONLY, SSLONLY,\n"
-			"BANS, or LIMIT.\n"
+			"enforce, and can be any of \002SECUREOPS\002, \002RESTRICTED\002, \002REGONLY\002, \002SSLONLY\002,\n"
+			"\002BANS\002, or \002LIMIT\002.\n"
 			" \n"
-			"Use SECUREOPS to enforce the SECUREOPS option, even if it is not\n"
-			"enabled. Use RESTRICTED to enfore the RESTRICTED option, also\n"
-			"if it's not enabled. Use REGONLY to kick all unregistered users\n"
-			"from the channel. Use SSLONLY to kick all users not using a secure\n"
-			"connection from the channel. BANS will enforce bans on the channel by\n"
-			"kicking users affected by them, and LIMIT will kick users until the\n"
+			"Use \002SECUREOPS\002 to enforce the SECUREOPS option, even if it is not\n"
+			"enabled. Use \002RESTRICTED\002 to enfore the RESTRICTED option, also\n"
+			"if it's not enabled. Use \002REGONLY\002 to kick all unregistered users\n"
+			"from the channel. Use \002SSLONLY\002 to kick all users not using a secure\n"
+			"connection from the channel. \002BANS\002 will enforce bans on the channel by\n"
+			"kicking users affected by them, and \002LIMIT\002 will kick users until the\n"
 			"user count drops below the channel limit, if one is set."));
 		return true;
 	}

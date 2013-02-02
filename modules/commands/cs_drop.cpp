@@ -73,10 +73,10 @@ class CommandCSDrop : public Command
 		source.Reply(" ");
 		if (source.IsServicesOper())
 			source.Reply(_("Unregisters the named channel.  Only \002Services Operators\002\n"
-					"can drop a channel for which they have not identified."));
+					"can drop a channel of which they are not the founder."));
 		else
 			source.Reply(_("Unregisters the named channel.  Can only be used by\n"
-					"\002channel founder\002."));
+					"the \002channel founder\002."));
 
 		return true;
 	}

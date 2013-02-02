@@ -18,7 +18,7 @@ class CommandCSKick : public Command
  public:
 	CommandCSKick(Module *creator) : Command(creator, "chanserv/kick", 2, 3)
 	{
-		this->SetDesc(_("Kicks a selected nick from a channel"));
+		this->SetDesc(_("Kicks a specified nick from a channel"));
 		this->SetSyntax(_("\037channel\037 \037nick\037 [\037reason\037]"));
 		this->SetSyntax(_("\037channel\037 \037mask\037 [\037reason\037]"));
 	}
@@ -112,7 +112,7 @@ class CommandCSKick : public Command
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Kicks a selected nick on a channel.\n"
+		source.Reply(_("Kicks a specified nick from a channel.\n"
 				" \n"
 				"By default, limited to AOPs or those with level 5 access\n"
 				"and above on the channel. Channel founders may use masks too."));

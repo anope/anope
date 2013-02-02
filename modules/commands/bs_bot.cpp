@@ -31,38 +31,37 @@ class CommandBSBot : public Command
 
 		if (nick.length() > Config->NickLen)
 		{
-			source.Reply(_("Bot Nicks may only contain valid nick characters."));
+			source.Reply(_("Bot nicks may only be %d characters long."), Config->NickLen);
 			return;
 		}
 
 		if (user.length() > Config->UserLen)
 		{
-			source.Reply(_("Bot Idents may only contain %d characters."), Config->UserLen);
+			source.Reply(_("Bot idents may only be %d characters long."), Config->UserLen);
 			return;
 		}
 
 		if (host.length() > Config->HostLen)
 		{
-			source.Reply(_("Bot Hosts may only contain %d characters."), Config->HostLen);
+			source.Reply(_("Bot hosts may only be %d characters long."), Config->HostLen);
 			return;
 		}
 
 		if (!IRCD->IsNickValid(nick))
 		{
-			source.Reply(_("Bot Nicks may only contain valid nick characters."));
-			return;
-		}
-
-		/* Check the host is valid */
-		if (!IRCD->IsHostValid(host))
-		{
-			source.Reply(_("Bot Hosts may only contain valid host characters."));
+			source.Reply(_("Bot nicks may only contain valid nick characters."));
 			return;
 		}
 
 		if (!IRCD->IsIdentValid(user))
 		{
-			source.Reply(_("Bot Idents may only contain valid characters."));
+			source.Reply(_("Bot idents may only contain valid ident characters."));
+			return;
+		}
+
+		if (!IRCD->IsHostValid(host))
+		{
+			source.Reply(_("Bot hosts may only contain valid host characters."));
 			return;
 		}
 
@@ -109,25 +108,25 @@ class CommandBSBot : public Command
 
 		if (bi->conf)
 		{
-			source.Reply(_("Bot %s is not changable."), bi->nick.c_str());
+			source.Reply(_("Bot %s is not changeable."), bi->nick.c_str());
 			return;
 		}
 
 		if (nick.length() > Config->NickLen)
 		{
-			source.Reply(_("Bot Nicks may only contain valid nick characters."));
+			source.Reply(_("Bot nicks may only be %d characters long."), Config->NickLen);
 			return;
 		}
 
 		if (!user.empty() && user.length() > Config->UserLen)
 		{
-			source.Reply(_("Bot Idents may only contain %d characters."), Config->UserLen);
+			source.Reply(_("Bot idents may only be %d characters long."), Config->UserLen);
 			return;
 		}
 
 		if (!host.empty() && host.length() > Config->HostLen)
 		{
-			source.Reply(_("Bot Hosts may only contain %d characters."), Config->HostLen);
+			source.Reply(_("Bot hosts may only be %d characters long."), Config->HostLen);
 			return;
 		}
 
@@ -144,19 +143,19 @@ class CommandBSBot : public Command
 
 		if (!IRCD->IsNickValid(nick))
 		{
-			source.Reply(_("Bot Nicks may only contain valid nick characters."));
-			return;
-		}
-
-		if (!host.empty() && !IRCD->IsHostValid(host))
-		{
-			source.Reply(_("Bot Hosts may only contain valid host characters."));
+			source.Reply(_("Bot nicks may only contain valid nick characters."));
 			return;
 		}
 
 		if (!user.empty() && !IRCD->IsIdentValid(user))
 		{
-			source.Reply(_("Bot Idents may only contain valid characters."), Config->UserLen);
+			source.Reply(_("Bot idents may only contain valid ident characters."));
+			return;
+		}
+
+		if (!host.empty() && !IRCD->IsHostValid(host))
+		{
+			source.Reply(_("Bot hosts may only contain valid host characters."));
 			return;
 		}
 
@@ -208,7 +207,7 @@ class CommandBSBot : public Command
 			bi->RejoinAll();
 		}
 
-		source.Reply(_("Bot \002%s\002 has been changed to %s!%s@%s (%s)"), oldnick.c_str(), bi->nick.c_str(), bi->GetIdent().c_str(), bi->host.c_str(), bi->realname.c_str());
+		source.Reply(_("Bot \002%s\002 has been changed to %s!%s@%s (%s)."), oldnick.c_str(), bi->nick.c_str(), bi->GetIdent().c_str(), bi->host.c_str(), bi->realname.c_str());
 		Log(LOG_ADMIN, source, this) << "CHANGE " << oldnick << " to " << bi->GetMask() << " " << bi->realname;
 
 		FOREACH_MOD(I_OnBotChange, OnBotChange(bi));
@@ -337,12 +336,12 @@ class CommandBSBot : public Command
 				"channels.\n"
 				" \n"
 				"\002BOT ADD\002 adds a bot with the given nickname, username,\n"
-				"hostname and realname. Since no integrity checks are done \n"
+				"hostname and realname. Since no integrity checks are done\n"
 				"for these settings, be really careful.\n"
 				"\002BOT CHANGE\002 allows to change nickname, username, hostname\n"
 				"or realname of a bot without actually delete it (and all\n"
 				"the data associated with it).\n"
-				"\002BOT DEL\002 removes the given bot from the bot list.  \n"
+				"\002BOT DEL\002 removes the given bot from the bot list.\n"
 				" \n"
 				"\002Note\002: you cannot create a bot that has a nick that is\n"
 				"currently registered. If an unregistered user is currently\n"

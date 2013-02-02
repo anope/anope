@@ -113,8 +113,8 @@ class CommandOSSeen : public Command
 	CommandOSSeen(Module *creator) : Command(creator, "operserv/seen", 1, 2)
 	{
 		this->SetDesc(_("Statistics and maintenance for seen data"));
-		this->SetSyntax(_("\037STATS\037"));
-		this->SetSyntax(_("\037CLEAR\037 \037time\037"));
+		this->SetSyntax(_("STATS"));
+		this->SetSyntax(_("CLEAR \037time\037"));
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
@@ -132,7 +132,7 @@ class CommandOSSeen : public Command
 				mem_counter += it->second->channel.capacity();
 				mem_counter += it->second->message.capacity();
 			}
-			source.Reply(_("%lu nicks are stored in the database, using %.2Lf kB of memory"), database.size(), static_cast<long double>(mem_counter) / 1024);
+			source.Reply(_("%lu nicks are stored in the database, using %.2Lf kB of memory."), database.size(), static_cast<long double>(mem_counter) / 1024);
 		}
 		else if (params[0].equals_ci("CLEAR"))
 		{
@@ -158,7 +158,7 @@ class CommandOSSeen : public Command
 				}
 			}
 			Log(LOG_ADMIN, source, this) << "CLEAR and removed " << counter << " nicks that were added after " << Anope::strftime(time, NULL, true);
-			source.Reply(_("Database cleared, removed %lu nicks that were added after %s"), counter, Anope::strftime(time, source.nc, true).c_str());
+			source.Reply(_("Database cleared, removed %lu nicks that were added after %s."), counter, Anope::strftime(time, source.nc, true).c_str());
 		}
 		else
 			this->SendSyntax(source);
@@ -173,8 +173,8 @@ class CommandOSSeen : public Command
 				"entries from the database that were added within \037time\037.\n"
 				" \n"
 				"Example:\n"
-				"%s CLEAR 30m\n"
-				"will remove all entries that were added within the last 30 minutes."), source.command.c_str());
+				" %s CLEAR 30m\n"
+				" Will remove all entries that were added within the last 30 minutes."), source.command.c_str());
 		return true;
 	}
 };
@@ -194,7 +194,7 @@ class CommandSeen : public Command
 
 		if (target.length() > Config->NickLen)
 		{
-			source.Reply(_("Nick too long, max length is %u chars"), Config->NickLen);
+			source.Reply(_("Nick too long, max length is %u characters."), Config->NickLen);
 			return;
 		}
 
@@ -238,7 +238,7 @@ class CommandSeen : public Command
 			if (u2)
 				onlinestatus = Anope::printf( _(". %s is still online."), u2->nick.c_str());
 			else
-				onlinestatus = Anope::printf(_(", but %s mysteriously dematerialized"), info->nick2.c_str());
+				onlinestatus = Anope::printf(_(", but %s mysteriously dematerialized."), info->nick2.c_str());
 
 			source.Reply(_("%s (%s) was last seen changing nick to %s %s ago%s"),
 				target.c_str(), info->vhost.c_str(), info->nick2.c_str(), timebuf.c_str(), onlinestatus.c_str());
@@ -308,12 +308,12 @@ class DataBasePurger : public CallBack
 
 			if ((Anope::CurTime - cur->second->last) > purgetime)
 			{
-				Log(LOG_DEBUG) << cur->first << " was last seen " << Anope::strftime(cur->second->last) << ", purging entry";
+				Log(LOG_DEBUG) << cur->first << " was last seen " << Anope::strftime(cur->second->last) << ", purging entries";
 				cur->second->Destroy();
 				database.erase(cur);
 			}
 		}
-		Log(LOG_DEBUG) << "cs_seen: Purged Database, checked " << previous_size << " nicks and removed " << (previous_size - database.size()) << " old entries.";
+		Log(LOG_DEBUG) << "cs_seen: Purged database, checked " << previous_size << " nicks and removed " << (previous_size - database.size()) << " old entries.";
 	}
 };
 

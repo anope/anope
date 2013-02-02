@@ -52,7 +52,7 @@ class CommandBSInfo : public Command
 	CommandBSInfo(Module *creator) : Command(creator, "botserv/info", 1, 1)
 	{
 		this->SetDesc(_("Allows you to see BotServ information about a channel or a bot"));
-		this->SetSyntax(_("\002INFO {\037chan\037 | \037nick\037}\002"));
+		this->SetSyntax(_("{\037chan\037|\037nick\037}"));
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override

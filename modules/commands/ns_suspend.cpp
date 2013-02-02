@@ -54,7 +54,7 @@ class CommandNSSuspend : public Command
 
 		if (Config->NSSecureAdmins && na->nc->IsServicesOper())
 		{
-			source.Reply(_("You may not suspend other services operators nicknames."));
+			source.Reply(_("You may not suspend other Services Operators' nicknames."));
 			return;
 		}
 
@@ -102,7 +102,7 @@ class CommandNSSuspend : public Command
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Suspends a registered nickname, which prevents from being used\n"
+		source.Reply(_("Suspends a registered nickname, which prevents it from being used\n"
 				"while keeping all the data for that nick. If an expiry is given\n"
 				"the nick will be unsuspended after that period of time, else the\n"
 				"default expiry from the configuration is used."));

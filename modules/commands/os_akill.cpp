@@ -130,7 +130,7 @@ class CommandOSAKill : public Command
 			ServiceReference<RegexProvider> provider("Regex", Config->RegexEngine);
 			if (!provider)
 			{
-				source.Reply(_("Unable to find regex engine %s"), Config->RegexEngine.c_str());
+				source.Reply(_("Unable to find regex engine %s."), Config->RegexEngine.c_str());
 				return;
 			}
 
@@ -304,7 +304,7 @@ class CommandOSAKill : public Command
 			source.Reply(_("No matching entries on the AKILL list."));
 		else
 		{
-			source.Reply(_("Current akill list:"));
+			source.Reply(_("Current AKILL list:"));
 		
 			std::vector<Anope::string> replies;
 			list.Process(replies);
@@ -312,7 +312,7 @@ class CommandOSAKill : public Command
 			for (unsigned i = 0; i < replies.size(); ++i)
 				source.Reply(replies[i]);
 
-			source.Reply(_("End of \2akill\2 list."));
+			source.Reply(_("End of AKILL list."));
 		}
 	}
 
@@ -394,7 +394,7 @@ class CommandOSAKill : public Command
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Allows Services operators to manipulate the AKILL list. If\n"
+		source.Reply(_("Allows Services Operators to manipulate the AKILL list. If\n"
 				"a user matching an AKILL mask attempts to connect, Services\n"
 				"will issue a KILL for that user and, on supported server\n"
 				"types, will instruct all servers to add a ban for the mask\n"
@@ -405,36 +405,38 @@ class CommandOSAKill : public Command
 				"Mask should be in the format of nick!user@host#real name,\n"
 				"though all that is required is user@host. If a real name is specified,\n"
 				"the reason must be prepended with a :.\n"
-				"\037expiry\037 is specified as an integer followed by one of \037d\037 \n"
-				"(days), \037h\037 (hours), or \037m\037 (minutes). Combinations (such as \n"
-				"\0371h30m\037) are not permitted. If a unit specifier is not \n"
-				"included, the default is days (so \037+30\037 by itself means 30 \n"
+				"\037expiry\037 is specified as an integer followed by one of \037d\037\n"
+				"(days), \037h\037 (hours), or \037m\037 (minutes). Combinations (such as\n"
+				"\0371h30m\037) are not permitted. If a unit specifier is not\n"
+				"included, the default is days (so \037+30\037 by itself means 30\n"
 				"days). To add an AKILL which does not expire, use \037+0\037. If the\n"
 				"usermask to be added starts with a \037+\037, an expiry time must\n"
 				"be given, even if it is the same as the default. The\n"
 				"current AKILL default expiry time can be found with the\n"
-				"\002STATS AKILL\002 command.\n"));
+				"\002STATS AKILL\002 command."));
 		if (!Config->RegexEngine.empty())
-			source.Reply(" \n"
-					"Regex matches are also supported using the %s engine.\n"
-					"Enclose your mask in // if this desired.", Config->RegexEngine.c_str());
+		{
+			source.Reply(" ");
+			source.Reply(_("Regex matches are also supported using the %s engine.\n"
+					"Enclose your mask in // if this is desired."), Config->RegexEngine.c_str());
+		}
 		source.Reply(_(
 				" \n"
 				"The \002AKILL DEL\002 command removes the given mask from the\n"
-				"AKILL list if it is present.  If a list of entry numbers is \n"
-				"given, those entries are deleted.  (See the example for LIST \n"
+				"AKILL list if it is present.  If a list of entry numbers is\n"
+				"given, those entries are deleted.  (See the example for LIST\n"
 				"below.)\n"
 				" \n"
-				"The \002AKILL LIST\002 command displays the AKILL list.  \n"
+				"The \002AKILL LIST\002 command displays the AKILL list.\n"
 				"If a wildcard mask is given, only those entries matching the\n"
 				"mask are displayed.  If a list of entry numbers is given,\n"
 				"only those entries are shown; for example:\n"
 				"   \002AKILL LIST 2-5,7-9\002\n"
-				"      Lists AKILL entries numbered 2 through 5 and 7 \n"
+				"      Lists AKILL entries numbered 2 through 5 and 7\n"
 				"      through 9.\n"
 				"      \n"
-				"\002AKILL VIEW\002 is a more verbose version of \002AKILL LIST\002, and \n"
-				"will show who added an AKILL, the date it was added, and when \n"
+				"\002AKILL VIEW\002 is a more verbose version of \002AKILL LIST\002, and\n"
+				"will show who added an AKILL, the date it was added, and when\n"
 				"it expires, as well as the user@host/ip mask and reason.\n"
 				" \n"
 				"\002AKILL CLEAR\002 clears all entries of the AKILL list."));

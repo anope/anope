@@ -195,8 +195,8 @@ class CommandMSInfo : public Command
 				"the given channel.\n"
 				" \n"
 				"With a nickname parameter, displays the same information\n"
-				"for the given nickname.  This use limited to \002Services\n"
-				"Operators\002."));
+				"for the given nickname. This is limited to \002Services\002\n"
+				"\002Operators\002."));
 
 		return true;
 	}

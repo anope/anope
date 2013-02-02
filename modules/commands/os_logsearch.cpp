@@ -54,7 +54,7 @@ class CommandOSLogSearch : public Command
 						}
 						catch (const ConvertException &)
 						{
-							source.Reply(_("Invalid duration %s, using %d days"), dur.c_str(), days);
+							source.Reply(_("Invalid duration %s, using %d days."), dur.c_str(), days);
 						}
 					}
 					break;
@@ -70,12 +70,12 @@ class CommandOSLogSearch : public Command
 						}
 						catch (const ConvertException &)
 						{
-							source.Reply(_("Invalid limit %s, using %d"), dur.c_str(), replies);
+							source.Reply(_("Invalid limit %s, using %d."), dur.c_str(), replies);
 						}
 					}
 					break;
 				default:
-					source.Reply(_("Unknown parameter %s"), params[i].c_str());
+					source.Reply(_("Unknown parameter: %s"), params[i].c_str());
 			}
 		}
 
@@ -110,18 +110,18 @@ class CommandOSLogSearch : public Command
 		unsigned found = matches.size();
 		if (!found)
 		{
-			source.Reply(_("No matches for \2%s\2 found."), search_string.c_str());
+			source.Reply(_("No matches for \002%s\002 found."), search_string.c_str());
 			return;
 		}
 
 		while (matches.size() > static_cast<unsigned>(replies))
 			matches.pop_front();
 
-		source.Reply(_("Matches for \2%s\2:"), search_string.c_str());
+		source.Reply(_("Matches for \002%s\002:"), search_string.c_str());
 		unsigned count = 0;
 		for (std::list<Anope::string>::iterator it = matches.begin(), it_end = matches.end(); it != it_end; ++it)
 			source.Reply("#%d: %s", ++count, it->c_str());
-		source.Reply(_("Showed %d/%d matches for \2%s\2"), matches.size(), found, search_string.c_str());
+		source.Reply(_("Showed %d/%d matches for \002%s\002."), matches.size(), found, search_string.c_str());
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
@@ -134,11 +134,11 @@ class CommandOSLogSearch : public Command
 				"and the number of replies to limit to. By default this\n"
 				"command searches one week of logs, and limits replies\n"
 				"to 50.\n"
-				"\n"
+				" \n"
 				"For example:\n"
-				"    \2LOGSEARCH +21d +500l Anope\2\n"
+				"    \002LOGSEARCH +21d +500l Anope\002\n"
 				"      Searches the last 21 days worth of logs for messages\n"
-				"      containing Anope and lists the most recent 500 of them.\n"));
+				"      containing Anope and lists the most recent 500 of them."));
 		return true;
 	}
 };

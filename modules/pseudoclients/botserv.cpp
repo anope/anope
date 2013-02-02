@@ -214,8 +214,8 @@ class BotServCore : public Module
 
 		if (source.c)
 		{
-			source.Reply(_("\2%s\2 allows you to execute \"fantasy\" commands in the channel.\n"
-					"Fantasy commands are tied to existing commands, usually on \2%s\2,\n"
+			source.Reply(_("\002%s\002 allows you to execute \"fantasy\" commands in the channel.\n"
+					"Fantasy commands are tied to existing commands, usually on \002%s\002,\n"
 					"and provide a more convenient way to execute commands. Commands that\n"
 					"require a channel as a parameter will automatically have that parameter\n"
 					"given.\n"), source.service->nick.c_str(), Config->ChanServ.c_str());

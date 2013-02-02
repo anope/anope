@@ -242,7 +242,7 @@ class CommandBSSetFantasy : public Command
 				"Note that users wanting to use fantaisist\n"
 				"commands MUST have enough level for both\n"
 				"the FANTASIA and another level depending\n"
-				"of the command if required (for example, to use \n"
+				"of the command if required (for example, to use\n"
 				"!op, user must have enough access for the OPDEOP\n"
 				"level)."), Config->ChanServ.c_str(), Config->BSFantasyCharacter.c_str());
 		return true;
@@ -341,7 +341,7 @@ class CommandBSSetNoBot : public Command
 			ci->ExtendMetadata("BS_NOBOT");
 			if (ci->bi)
 				ci->bi->UnAssign(source.GetUser(), ci);
-			source.Reply(_("No Bot mode is now \002on\002 on channel %s."), ci->name.c_str());
+			source.Reply(_("No-bot mode is now \002on\002 on channel %s."), ci->name.c_str());
 		}
 		else if (value.equals_ci("OFF"))
 		{
@@ -349,7 +349,7 @@ class CommandBSSetNoBot : public Command
 			Log(override ? LOG_ADMIN : LOG_COMMAND, source, this, ci) << "to disable nobot"; 
 
 			ci->Shrink("BS_NOBOT");
-			source.Reply(_("No Bot mode is now \002off\002 on channel %s."), ci->name.c_str());
+			source.Reply(_("No-bot mode is now \002off\002 on channel %s."), ci->name.c_str());
 		}
 		else
 			this->OnSyntaxError(source, source.command);
@@ -359,7 +359,7 @@ class CommandBSSetNoBot : public Command
 	{
 		this->SendSyntax(source);
 		source.Reply(_(" \n"
-				"This option makes a channel be unassignable. If a bot \n"
+				"This option makes a channel be unassignable. If a bot\n"
 				"is already assigned to the channel, it is unassigned\n"
 				"automatically when you enable the option."));
 		return true;
@@ -405,7 +405,7 @@ class CommandBSSetPrivate : public Command
 		this->SendSyntax(source);
 		source.Reply(_(" \n"
 			"This option prevents a bot from being assigned to a\n"
-			"channel by users that aren't IRC operators."));
+			"channel by users that aren't IRC Operators."));
 		return true;
 	}
 };

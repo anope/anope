@@ -154,7 +154,7 @@ class CommandOSForbid : public Command
 				this->fs->AddForbid(d);
 
 			Log(LOG_ADMIN, source, this) << "to add a forbid on " << entry << " of type " << subcommand;
-			source.Reply(_("Added a forbid on %s to expire on %s"), entry.c_str(), d->expires ? Anope::strftime(d->expires).c_str() : "never");
+			source.Reply(_("Added a forbid on %s to expire on %s."), entry.c_str(), d->expires ? Anope::strftime(d->expires).c_str() : "never");
 		}
 		else if (command.equals_ci("DEL") && params.size() > 2 && ftype != FT_NONE)
 		{
@@ -228,10 +228,14 @@ class CommandOSForbid : public Command
 		source.Reply(" ");
 		source.Reply(_("Forbid allows you to forbid usage of certain nicknames, channels,\n"
 				"and email addresses. Wildcards are accepted for all entries."));
+
 		if (!Config->RegexEngine.empty())
-			source.Reply(" \n"
-					"Regex matches are also supported using the %s engine.\n"
-					"Enclose your pattern in // if this desired.", Config->RegexEngine.c_str());
+		{
+			source.Reply(" ");
+			source.Reply(_("Regex matches are also supported using the %s engine.\n"
+					"Enclose your pattern in // if this is desired."), Config->RegexEngine.c_str());
+		}
+
 		return true;
 	}
 };
@@ -319,9 +323,9 @@ class OSForbid : public Module
 			if (d != NULL)
 			{
 				if (source.IsOper())
-					source.Reply(_("Nick \2%s\2 is forbidden by %s: %s"), params[0].c_str(), d->creator.c_str(), d->reason.c_str());
+					source.Reply(_("Nick \002%s\002 is forbidden by %s: %s"), params[0].c_str(), d->creator.c_str(), d->reason.c_str());
 				else
-					source.Reply(_("Nick \2%s\2 is forbidden."), params[0].c_str());
+					source.Reply(_("Nick \002%s\002 is forbidden."), params[0].c_str());
 				return EVENT_STOP;
 			}
 		}
@@ -331,9 +335,9 @@ class OSForbid : public Module
 			if (d != NULL)
 			{
 				if (source.IsOper())
-					source.Reply(_("Channel \2%s\2 is forbidden by %s: %s"), params[0].c_str(), d->creator.c_str(), d->reason.c_str());
+					source.Reply(_("Channel \002%s\002 is forbidden by %s: %s"), params[0].c_str(), d->creator.c_str(), d->reason.c_str());
 				else
-					source.Reply(_("Channel \2%s\2 is forbidden."), params[0].c_str());
+					source.Reply(_("Channel \002%s\002 is forbidden."), params[0].c_str());
 				return EVENT_STOP;
 			}
 		}

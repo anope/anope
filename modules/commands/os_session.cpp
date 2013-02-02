@@ -250,8 +250,8 @@ class CommandOSSession : public Command
 		source.Reply(" ");
 		source.Reply(_("Allows Services Operators to view the session list.\n"
 				"\002SESSION LIST\002 lists hosts with at least \037threshold\037 sessions.\n"
-				"The threshold must be a number greater than 1. This is to \n"
-				"prevent accidental listing of the large number of single \n"
+				"The threshold must be a number greater than 1. This is to\n"
+				"prevent accidental listing of the large number of single\n"
 				"session hosts.\n"
 				"\002SESSION VIEW\002 displays detailed information about a specific\n"
 				"host - including the current session count and session limit.\n"
@@ -568,7 +568,7 @@ class CommandOSException : public Command
 		this->SendSyntax(source);
 		source.Reply(" ");
 		source.Reply(_("Allows Services Operators to manipulate the list of hosts that\n"
-				"have specific session limits - allowing certain machines, \n"
+				"have specific session limits - allowing certain machines,\n"
 				"such as shell servers, to carry more than the default number\n"
 				"of clients at a time. Once a host reaches its session limit,\n"
 				"all clients attempting to connect from that host will be\n"
@@ -593,7 +593,7 @@ class CommandOSException : public Command
 				"sessions if the optional mask is given, the list is limited\n"
 				"to those sessions matching the mask. The difference is that\n"
 				"\002EXCEPTION VIEW\002 is more verbose, displaying the name of the\n"
-				"person who added the exception, its session limit, reason, \n"
+				"person who added the exception, its session limit, reason,\n"
 				"host mask and the expiry date and time.\n"
 				" \n"
 				"Note that a connecting client will \"use\" the first exception\n"
@@ -664,7 +664,7 @@ class OSSession : public Module
 					XLine *x = new XLine(akillmask, Config->OperServ, Anope::CurTime + Config->SessionAutoKillExpiry, "Session limit exceeded", XLineManager::GenerateUID());
 					akills->AddXLine(x);
 					akills->Send(NULL, x);
-					Log(OperServ, "akill/session") << "Added a temporary AKILL for \2" << akillmask << "\2 due to excessive connections";
+					Log(OperServ, "akill/session") << "Added a temporary AKILL for \002" << akillmask << "\002 due to excessive connections";
 				}
 				else
 				{

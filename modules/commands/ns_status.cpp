@@ -19,7 +19,7 @@ class CommandNSStatus : public Command
 	CommandNSStatus(Module *creator) : Command(creator, "nickserv/status", 0, 16)
 	{
 		this->SetDesc(_("Returns the owner status of the given nickname"));
-		this->SetSyntax(_("\037nickname\037..."));
+		this->SetSyntax(_("\037nickname\037"));
 		this->AllowUnregistered(true);
 	}
 
@@ -67,11 +67,7 @@ class CommandNSStatus : public Command
 				"    0 - no such user online \002or\002 nickname not registered\n"
 				"    1 - user not recognized as nickname's owner\n"
 				"    2 - user recognized as owner via access list only\n"
-				"    3 - user recognized as owner via password identification\n"
-				" \n"
-				"Up to sixteen nicknames may be sent with each command; the\n"
-				"rest will be ignored. If no nickname is given, your status\n"
-				"will be returned."));
+				"    3 - user recognized as owner via password identification"));
 		return true;
 	}
 };

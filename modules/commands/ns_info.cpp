@@ -63,10 +63,10 @@ class CommandNSInfo : public Command
 			source.Reply(_("%s is %s"), na->nick.c_str(), na->last_realname.c_str());
 
 			if (na->nc->HasExt("UNCONFIRMED"))
-				source.Reply(_("%s nickname is unconfirmed."), na->nick.c_str());
+				source.Reply(_("%s is an unconfirmed nickname."), na->nick.c_str());
 
 			if (na->nc->IsServicesOper() && (show_hidden || !na->nc->HasExt("HIDE_STATUS")))
-				source.Reply(_("%s is a services operator of type %s."), na->nick.c_str(), na->nc->o->ot->GetName().c_str());
+				source.Reply(_("%s is a Services Operator of type %s."), na->nick.c_str(), na->nc->o->ot->GetName().c_str());
 
 			InfoFormatter info(source.nc);
 

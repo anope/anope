@@ -168,7 +168,7 @@ class CommandNSGroup : public Command
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("This command makes your nickname join the \037target\037 nickname's \n"
+		source.Reply(_("This command makes your nickname join the \037target\037 nickname's\n"
 				"group. \037password\037 is the password of the target nickname.\n"
 				" \n"
 				"Joining a group will allow you to share your configuration,\n"
@@ -185,9 +185,9 @@ class CommandNSGroup : public Command
 				"need to identify yourself before using this command.\n"
 				" \n"
 				"It is recommended to use this command with a non-registered\n"
-				"nick because it will be registered automatically when \n"
-				"using this command. You may use it with a registered nick (to \n"
-				"change your group) only if your network administrators allowed \n"
+				"nick because it will be registered automatically when\n"
+				"using this command. You may use it with a registered nick (to\n"
+				"change your group) only if your network administrators allowed\n"
 				"it.\n"
 				" \n"
 				"You can only be in one group at a time. Group merging is\n"
@@ -219,7 +219,7 @@ class CommandNSUngroup : public Command
 		else if (!na)
 			source.Reply(NICK_X_NOT_REGISTERED, !nick.empty() ? nick.c_str() : u->nick.c_str());
 		else if (na->nc != u->Account())
-			source.Reply(_("The nick %s is not in your group."), na->nick.c_str());
+			source.Reply(_("Nick %s is not in your group."), na->nick.c_str());
 		else
 		{
 			NickCore *oldcore = na->nc;
@@ -259,9 +259,9 @@ class CommandNSUngroup : public Command
 		source.Reply(" ");
 		source.Reply(_("This command ungroups your nick, or if given, the specificed nick,\n"
 				"from the group it is in. The ungrouped nick keeps its registration\n"
-				"time, password, email, greet, language, url, and icq. Everything\n"
-				"else is reset. You may not ungroup yourself if there is only one\n"
-				"nick in your group."));
+				"time, password, email, greet, language, and url. Everything else\n"
+				"is reset. You may not ungroup yourself if there is only one nick in\n"
+				"your group."));
 		return true;
 	}
 };
@@ -332,7 +332,7 @@ class CommandNSGList : public Command
 					" \n"
 					"With a parameter, lists all nicknames that are in the\n"
 					"group of the given nick.\n"
-					"This use limited to \002Services Operators\002."),
+					"Specifying a nick is limited to \002Services Operators\002."),
 					source.command.c_str());
 		else
 			source.Reply(_("Syntax: \002%s\002\n"

@@ -604,7 +604,7 @@ class CommandCSLevels : public Command
 		{
 			Privilege *p = PrivilegeManager::FindPrivilege(what);
 			if (p == NULL)
-				source.Reply(_("Setting \002%s\002 not known.  Type \002%s%s HELP LEVELS \002 for a list of valid settings."), what.c_str(), Config->UseStrictPrivMsgString.c_str(), source.service->nick.c_str());
+				source.Reply(_("Setting \002%s\002 not known.  Type \002%s%s HELP LEVELS\002 for a list of valid settings."), what.c_str(), Config->UseStrictPrivMsgString.c_str(), source.service->nick.c_str());
 			else
 			{
 				ci->SetLevel(p->name, level);
@@ -642,7 +642,7 @@ class CommandCSLevels : public Command
 			}
 		}
 
-		source.Reply(_("Setting \002%s\002 not known.  Type \002%s%s HELP LEVELS \002 for a list of valid settings."), what.c_str(), Config->UseStrictPrivMsgString.c_str(), source.service->nick.c_str());
+		source.Reply(_("Setting \002%s\002 not known.  Type \002%s%s HELP LEVELS\002 for a list of valid settings."), what.c_str(), Config->UseStrictPrivMsgString.c_str(), source.service->nick.c_str());
 
 		return;
 	}
@@ -741,7 +741,7 @@ class CommandCSLevels : public Command
 	{
 		if (subcommand.equals_ci("DESC"))
 		{
-			source.Reply(_("The following feature/function names are understood."));
+			source.Reply(_("The following feature/function names are available:"));
 
 			ListFormatter list;
 			list.AddColumn("Name").AddColumn("Description");

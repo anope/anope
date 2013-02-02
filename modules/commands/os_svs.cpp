@@ -66,7 +66,7 @@ class CommandOSSVSNick : public Command
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Forcefully changes a user's nickname from nick to newnick."));
+		source.Reply(_("Forcefully changes a user's nickname from \037nick\037 to \037newnick\037."));
 		return true;
 	}
 };
@@ -84,7 +84,7 @@ class CommandOSSVSJoin : public Command
 	{
 		if (!IRCD->CanSVSJoin)
 		{
-			source.Reply(_("Your IRCd does not support SVSJOIN"));
+			source.Reply(_("Your IRCd does not support SVSJOIN."));
 			return;
 		}
 
@@ -97,12 +97,12 @@ class CommandOSSVSJoin : public Command
 		else if (!IRCD->IsChannelValid(params[1]))
 			source.Reply(CHAN_X_INVALID, params[1].c_str());
 		else if (c && c->FindUser(target))
-			source.Reply(_("\2%s\2 is already in \2%s\2."), target->nick.c_str(), c->name.c_str());
+			source.Reply(_("\002%s\002 is already in \002%s\002."), target->nick.c_str(), c->name.c_str());
 		else
 		{
 			IRCD->SendSVSJoin(OperServ, target, params[1], "");
 			Log(LOG_ADMIN, source, this) << "to force " << target->nick << " to join " << params[1];
-			source.Reply(_("\2%s\2 has been joined to \2%s\2."), target->nick.c_str(), params[1].c_str());
+			source.Reply(_("\002%s\002 has been joined to \002%s\002."), target->nick.c_str(), params[1].c_str());
 		}
 	}
 
@@ -128,7 +128,7 @@ class CommandOSSVSPart : public Command
 	{
 		if (!IRCD->CanSVSJoin)
 		{
-			source.Reply(_("Your IRCd does not support SVSPART"));
+			source.Reply(_("Your IRCd does not support SVSPART."));
 			return;
 		}
 
@@ -141,12 +141,12 @@ class CommandOSSVSPart : public Command
 		else if (!c)
 			source.Reply(CHAN_X_NOT_IN_USE, params[1].c_str());
 		else if (!c->FindUser(target))
-			source.Reply(_("\2%s\2 is not in \2%s\2."), target->nick.c_str(), c->name.c_str());
+			source.Reply(_("\002%s\002 is not in \002%s\002."), target->nick.c_str(), c->name.c_str());
 		else
 		{
 			IRCD->SendSVSPart(OperServ, target, params[1], "");
 			Log(LOG_ADMIN, source, this) << "to force " << target->nick << " to part " << c->name;
-			source.Reply(_("\2%s\2 has been parted from \2%s\2."), target->nick.c_str(), c->name.c_str());
+			source.Reply(_("\002%s\002 has been parted from \002%s\002."), target->nick.c_str(), c->name.c_str());
 		}
 	}
 

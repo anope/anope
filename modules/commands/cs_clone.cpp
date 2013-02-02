@@ -102,7 +102,7 @@ public:
 
 			FOREACH_MOD(I_OnChanRegistered, OnChanRegistered(target_ci));
 
-			source.Reply(_("All settings from \002%s\002 have been cloned to \002%s\002"), channel.c_str(), target.c_str());
+			source.Reply(_("All settings from \002%s\002 have been cloned to \002%s\002."), channel.c_str(), target.c_str());
 		}
 		else if (what.equals_ci("ACCESS"))
 		{
@@ -122,7 +122,7 @@ public:
 				target_ci->AddAccess(newaccess);
 			}
 
-			source.Reply(_("All access entries from \002%s\002 have been cloned to \002%s\002"), channel.c_str(), target.c_str());
+			source.Reply(_("All access entries from \002%s\002 have been cloned to \002%s\002."), channel.c_str(), target.c_str());
 		}
 		else if (what.equals_ci("AKICK"))
 		{
@@ -136,7 +136,7 @@ public:
 					target_ci->AddAkick(akick->creator, akick->mask, akick->reason, akick->addtime, akick->last_used);
 			}
 
-			source.Reply(_("All akick entries from \002%s\002 have been cloned to \002%s\002"), channel.c_str(), target.c_str());
+			source.Reply(_("All akick entries from \002%s\002 have been cloned to \002%s\002."), channel.c_str(), target.c_str());
 		}
 		else if (what.equals_ci("BADWORDS"))
 		{
@@ -147,7 +147,7 @@ public:
 				target_ci->AddBadWord(bw->word, bw->type);
 			}
 
-			source.Reply(_("All badword entries from \002%s\002 have been cloned to \002%s\002"), channel.c_str(), target.c_str());
+			source.Reply(_("All badword entries from \002%s\002 have been cloned to \002%s\002."), channel.c_str(), target.c_str());
 		}
 		else
 		{

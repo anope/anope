@@ -66,7 +66,7 @@ class CommandMSCheck : public Command
 		this->SendSyntax(source);
 		source.Reply(" ");
 		source.Reply(_("Checks whether the _last_ memo you sent to \037nick\037 has been read\n"
-				"or not. Note that this does only work with nicks, not with chans."));
+				"or not. Note that this does only work with nicks, not with channels."));
 		return true;
 	}
 };

@@ -108,7 +108,7 @@ class CommandCSDown : public Command
 		this->SendSyntax(source);
 		source.Reply(" ");
 		source.Reply(_("Removes your status modes on a channel. If \037channel\037 is ommited\n"
-				"your channel status is remove on every channel you are in."));
+				"your channel status is removed on every channel you are in."));
 		return true;
 	}
 };

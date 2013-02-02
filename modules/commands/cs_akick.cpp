@@ -479,7 +479,7 @@ class CommandCSAKick : public Command
 				"optionally only those AutoKick entries which match the\n"
 				"given mask.\n"
 				" \n"
-				"The \002AKICK VIEW\002 command is a more verbose version of\n"
+				"The \002AKICK VIEW\002 command is a more verbose version of the\n"
 				"\002AKICK LIST\002 command.\n"
 				" \n"
 				"The \002AKICK ENFORCE\002 command causes %s to enforce the\n"

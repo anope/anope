@@ -259,8 +259,8 @@ class CommandOSIgnore : public Command
 	CommandOSIgnore(Module *creator) : Command(creator, "operserv/ignore", 1, 4)
 	{
 		this->SetDesc(_("Modify the Services ignore list"));
-		this->SetSyntax(_("ADD \037time\037 \037nick\037 \037reason\037"));
-		this->SetSyntax(_("DEL \037nick\037"));
+		this->SetSyntax(_("ADD \037time\037 {\037nick\037|\037mask\037} [\037reason\037]"));
+		this->SetSyntax(_("DEL {\037nick\037|\037mask\037}"));
 		this->SetSyntax(_("LIST"));
 		this->SetSyntax(_("CLEAR"));
 	}
@@ -290,19 +290,22 @@ class CommandOSIgnore : public Command
 		source.Reply(_("Allows Services Operators to make Services ignore a nick or mask\n"
 				"for a certain time or until the next restart. The default\n"
 				"time format is seconds. You can specify it by using units.\n"
-				"Valid units are: \037s\037 for seconds, \037m\037 for minutes, \n"
-				"\037h\037 for hours and \037d\037 for days. \n"
+				"Valid units are: \037s\037 for seconds, \037m\037 for minutes,\n"
+				"\037h\037 for hours and \037d\037 for days.\n"
 				"Combinations of these units are not permitted.\n"
 				"To make Services permanently ignore the user, type 0 as time.\n"
-				"When adding a \037mask\037, it should be in the format user@host\n"
-				"or nick!user@host, everything else will be considered a nick.\n"
-				"Wildcards are permitted.\n"
+				"When adding a \037mask\037, it should be in the format nick!user@host,\n"
+				"everything else will be considered a nick. Wildcards are permitted.\n"
 				" \n"
 				"Ignores will not be enforced on IRC Operators."));
+
 		if (!Config->RegexEngine.empty())
-			source.Reply(" \n"
-					"Regex matches are also supported using the %s engine.\n"
-					"Enclose your pattern in // if this desired.", Config->RegexEngine.c_str());
+		{
+			source.Reply(" ");
+			source.Reply(_("Regex matches are also supported using the %s engine.\n"
+					"Enclose your pattern in // if this is desired."), Config->RegexEngine.c_str());
+		}
+
 		return true;
 	}
 };

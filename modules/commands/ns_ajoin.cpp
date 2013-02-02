@@ -171,7 +171,9 @@ class CommandNSAJoin : public Command
 	CommandNSAJoin(Module *creator) : Command(creator, "nickserv/ajoin", 1, 3)
 	{
 		this->SetDesc(_("Manage your auto join list"));
-		this->SetSyntax(_("{ADD | DEL | LIST} \037[user]\037 [\037channel\037] [\037key\037]"));
+		this->SetSyntax(_("ADD [\037user\037] \037channel\037 [\037key\037]"));
+		this->SetSyntax(_("DEL [\037user\037] \037channel\037"));
+		this->SetSyntax(_("LIST [\037user\037]"));
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
@@ -216,7 +218,7 @@ class CommandNSAJoin : public Command
 		source.Reply(" ");
 		source.Reply(_("This command manages your auto join list. When you identify\n"
 				"you will automatically join the channels on your auto join list.\n"
-				"Services operators may provide a nick to modify other users'\n"
+				"Services Operators may provide a nick to modify other users'\n"
 				"auto join lists."));
 		return true;
 	}

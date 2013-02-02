@@ -121,7 +121,7 @@ class CommandNSAccess : public Command
 			}
 			else if (Config->NSSecureAdmins && source.GetAccount() != na->nc && na->nc->IsServicesOper() && !cmd.equals_ci("LIST"))
 			{
-				source.Reply(_("You may view but not modify the access list of other services operators."));
+				source.Reply(_("You may view but not modify the access list of other Services Operators."));
 				return;
 			}
 
@@ -158,7 +158,7 @@ class CommandNSAccess : public Command
 					"recognized by %s as allowed to use the nick.  If\n"
 					"you want to use the nick from a different address, you\n"
 					"need to send an \002IDENTIFY\002 command to make %s\n"
-					"recognize you. Services operators may provide a nick\n"
+					"recognize you. Services Operators may provide a nick\n"
 					"to modify other users' access lists.\n"
 					" \n"
 					"Examples:\n"

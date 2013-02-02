@@ -102,10 +102,14 @@ class CommandOSChanList : public Command
 				"is given, lists only the channels the user using it is on. If SECRET is\n"
 				"specified, lists only channels matching \002pattern\002 that have the +s or\n"
 				"+p mode."));
+
 		if (!Config->RegexEngine.empty())
-			source.Reply(" \n"
-					"Regex matches are also supported using the %s engine.\n"
-					"Enclose your pattern in // if this desired.", Config->RegexEngine.c_str());
+		{
+			source.Reply(" ");
+			source.Reply(_("Regex matches are also supported using the %s engine.\n"
+					"Enclose your pattern in // if this is desired."), Config->RegexEngine.c_str());
+		}
+
 		return true;
 	}
 };
@@ -203,10 +207,14 @@ class CommandOSUserList : public Command
 				"the format nick!user@host). If \002channel\002 is given, lists only users\n"
 				"that are on the given channel. If INVISIBLE is specified, only users\n"
 				"with the +i flag will be listed."));
+
 		if (!Config->RegexEngine.empty())
-			source.Reply(" \n"
-					"Regex matches are also supported using the %s engine.\n"
-					"Enclose your pattern in // if this desired.", Config->RegexEngine.c_str());
+		{
+			source.Reply(" ");
+			source.Reply(_("Regex matches are also supported using the %s engine.\n"
+					"Enclose your pattern in // if this is desired."), Config->RegexEngine.c_str());
+		}
+
 		return true;
 	}
 };

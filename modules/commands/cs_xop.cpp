@@ -622,11 +622,11 @@ class CommandCSQOP : public XOPBase
 				"      7 through 9.\n"
 				"      \n"
 				"The \002QOP CLEAR\002 command clears all entries of the\n"
-				"QOP list.\n"));
+				"QOP list."));
 		source.Reply(_(" \n"
 				"The \002QOP\002 commands are limited to founders\n"
 				"(unless SECUREOPS is off). However, any user on the\n"
-				"VOP list may use the \002QOP LIST\002 command.\n"
+				"VOP list or above may use the \002QOP LIST\002 command.\n"
 				" \n"));
 		source.Reply(_("Alternative methods of modifying channel access lists are\n"
 				"available. See \002%s%s HELP ACCESS\002 for information\n"
@@ -676,12 +676,12 @@ class CommandCSAOP : public XOPBase
 				"      7 through 9.\n"
 				"      \n"
 				"The \002AOP CLEAR\002 command clears all entries of the\n"
-				"AOP list.\n"));
+				"AOP list."));
 		source.Reply(_(" \n"
 				"The \002AOP ADD\002 and \002AOP DEL\002 commands are limited to\n"
 				"SOPs or above, while the \002AOP CLEAR\002 command can only\n"
 				"be used by the channel founder. However, any user on the\n"
-				"VOP list may use the \002AOP LIST\002 command.\n"
+				"VOP list or above may use the \002AOP LIST\002 command.\n"
 				" \n"));
 		source.Reply(_("Alternative methods of modifying channel access lists are\n"
 				"available. See \002%s%s HELP ACCESS\002 for information\n"
@@ -730,7 +730,7 @@ class CommandCSHOP : public XOPBase
 				"      7 through 9.\n"
 				"      \n"
 				"The \002HOP CLEAR\002 command clears all entries of the\n"
-				"HOP list.\n"));
+				"HOP list."));
 		source.Reply(_(" \n"
 				"The \002HOP ADD\002 and \002HOP DEL\002 commands are limited\n"
 				"to SOPs or above, while \002HOP LIST\002 is available to VOPs\n"
@@ -785,11 +785,11 @@ class CommandCSSOP : public XOPBase
 				"      7 through 9.\n"
 				"      \n"
 				"The \002SOP CLEAR\002 command clears all entries of the\n"
-				"SOP list.\n"));
+				"SOP list."));
 		source.Reply(_(" \n"
 				"The \002SOP ADD\002, \002SOP DEL\002 and \002SOP CLEAR\002 commands are\n"
 				"limited to the channel founder. However, any user on the\n"
-				"VOP list may use the \002SOP LIST\002 command.\n"
+				"VOP list or above may use the \002SOP LIST\002 command.\n"
 				" \n"));
 		source.Reply(_("Alternative methods of modifying channel access lists are\n"
 				"available. See \002%s%s HELP ACCESS\002 for information\n"
@@ -838,7 +838,7 @@ class CommandCSVOP : public XOPBase
 				"      7 through 9.\n"
 				"      \n"
 				"The \002VOP CLEAR\002 command clears all entries of the\n"
-				"VOP list.\n"));
+				"VOP list."));
 		source.Reply(_(" \n"
 				"The \002VOP ADD\002 and \002VOP DEL\002 commands are limited\n"
 				"to SOPs or above, while \002VOP LIST\002 is available to VOPs\n"

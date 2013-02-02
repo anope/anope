@@ -20,7 +20,7 @@ class CommandNSConfirm : public Command
  public:
 	CommandNSConfirm(Module *creator) : Command(creator, "nickserv/confirm", 1, 2)
 	{
-		this->SetDesc(_("Confirm an auth code"));
+		this->SetDesc(_("Confirm a passcode"));
 		this->SetSyntax(_("\037passcode\037"));
 		this->AllowUnregistered(true);
 	}
@@ -201,7 +201,7 @@ class CommandNSRegister : public Command
 			FOREACH_MOD(I_OnNickRegister, OnNickRegister(na));
 
 			if (Config->NSAddAccessOnReg)
-				source.Reply(_("Nickname \002%s\002 registered under your account: %s"), u_nick.c_str(), na->nc->GetAccess(0).c_str());
+				source.Reply(_("Nickname \002%s\002 registered under your user@host-mask: %s"), u_nick.c_str(), na->nc->GetAccess(0).c_str());
 			else
 				source.Reply(_("Nickname \002%s\002 registered."), u_nick.c_str());
 
@@ -219,7 +219,7 @@ class CommandNSRegister : public Command
 				nc->ExtendMetadata("UNCONFIRMED");
 				if (SendRegmail(u, na, source.service))
 				{
-					source.Reply(_("A passcode has been sent to %s, please type %s%s confirm <passcode> to confirm your email address."), email.c_str(), Config->UseStrictPrivMsgString.c_str(), Config->NickServ.c_str());
+					source.Reply(_("A passcode has been sent to %s, please type \002%s%s CONFIRM <passcode>\002 to confirm your email address."), email.c_str(), Config->UseStrictPrivMsgString.c_str(), Config->NickServ.c_str());
 					source.Reply(_("If you do not confirm your email address within %s your account will expire."), Anope::Duration(Config->NSUnconfirmedExpire).c_str());
 				}
 			}
@@ -241,13 +241,13 @@ class CommandNSRegister : public Command
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
 	{
 		this->SendSyntax(source);
-		source.Reply("\n");
+		source.Reply(" ");
 		source.Reply(_("Registers your nickname in the %s database. Once\n"
 				"your nick is registered, you can use the \002SET\002 and \002ACCESS\002\n"
 				"commands to configure your nick's settings as you like\n"
 				"them. Make sure you remember the password you use when\n"
 				"registering - you'll need it to make changes to your nick\n"
-				"later. (Note that \002case matters!\002 \037ANOPE\037, \037Anope\037, and \n"
+				"later. (Note that \002case matters!\002 \037ANOPE\037, \037Anope\037, and\n"
 				"\037anope\037 are all different passwords!)\n"
 				" \n"
 				"Guidelines on choosing passwords:\n"
@@ -258,17 +258,20 @@ class CommandNSRegister : public Command
 				"in fact, %s will not allow it. Also, short\n"
 				"passwords are vulnerable to trial-and-error searches, so\n"
 				"you should choose a password at least 5 characters long.\n"
-				"Finally, the space character cannot be used in passwords.\n"),
+				"Finally, the space character cannot be used in passwords."),
 				Config->NickServ.c_str(), Config->NickServ.c_str());
 
 		if (!Config->NSForceEmail)
-			source.Reply(_(" \n"
-					"The parameter \037email\037 is optional and will set the email\n"
+		{
+			source.Reply(" ");
+			source.Reply(_("The \037email\037 parameter is optional and will set the email\n"
 					"for your nick immediately.\n"
 					"Your privacy is respected; this e-mail won't be given to\n"
-					"any third-party person.\n"
-					" \n"));
+					"any third-party person. You may also wish to \002SET HIDE\002 it\n"
+					"after registering if it isn't the default setting already."));
+		}
 
+		source.Reply(" ");
 		source.Reply(_("This command also creates a new group for your nickname,\n"
 				"that will allow you to register other nicks later sharing\n"
 				"the same configuration, the same set of memos and the\n"
@@ -321,7 +324,7 @@ class CommandNSResend : public Command
 		this->SendSyntax(source);
 		source.Reply(" ");
 		source.Reply(_("This command will re-send the auth code (also called passcode)\n"
-				"to the e-mail address of the user whom is performing it."));
+				"to the e-mail address of the nickname in the database."));
 		return true;
 	}
 

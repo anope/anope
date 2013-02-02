@@ -137,7 +137,7 @@ class NewsBase : public Command
 			for (unsigned i = 0; i < replies.size(); ++i)
 				source.Reply(replies[i]);
 
-			source.Reply(_("End of \2news\2 list."));
+			source.Reply(_("End of news list."));
 		}
 
 		return;

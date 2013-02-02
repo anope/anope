@@ -53,10 +53,10 @@ class CommandOSOper : public Command
  public:
 	CommandOSOper(Module *creator) : Command(creator, "operserv/oper", 1, 3)
 	{
-		this->SetDesc(_("View and change services operators"));
+		this->SetDesc(_("View and change Services Operators"));
 		this->SetSyntax(_("ADD \037oper\037 \037type\037"));
-		this->SetSyntax(_("DEL [\037oper\037]"));
-		this->SetSyntax(_("INFO [\037type\037]"));
+		this->SetSyntax(_("DEL \037oper\037"));
+		this->SetSyntax(_("INFO \037type\037"));
 		this->SetSyntax(_("LIST"));
 	}
 
@@ -73,18 +73,18 @@ class CommandOSOper : public Command
 			if (na == NULL)
 				source.Reply(NICK_X_NOT_REGISTERED, oper.c_str());
 			else if (na->nc->o)
-				source.Reply(_("Nick \2%s\2 is already an operator."), na->nick.c_str());
+				source.Reply(_("Nick \002%s\002 is already an operator."), na->nick.c_str());
 			else
 			{
 				OperType *ot = OperType::Find(otype);
 				if (ot == NULL)
-					source.Reply(_("Oper type \2%s\2 has not been configured."), otype.c_str());
+					source.Reply(_("Oper type \002%s\002 has not been configured."), otype.c_str());
 				else
 				{
 					na->nc->o = new MyOper(na->nc->display, ot);
 
 					Log(LOG_ADMIN, source, this) << "ADD " << na->nick << " as type " << ot->GetName();
-					source.Reply("%s (%s) added to the \2%s\2 list.", na->nick.c_str(), na->nc->display.c_str(), ot->GetName().c_str());
+					source.Reply("%s (%s) added to the \002%s\002 list.", na->nick.c_str(), na->nc->display.c_str(), ot->GetName().c_str());
 				}
 			}
 		}
@@ -96,7 +96,7 @@ class CommandOSOper : public Command
 			if (na == NULL)
 				source.Reply(NICK_X_NOT_REGISTERED, oper.c_str());
 			else if (!na->nc || !na->nc->o)
-				source.Reply(_("Nick \2%s\2 is not a services operator."), oper.c_str());
+				source.Reply(_("Nick \002%s\002 is not a Services Operator."), oper.c_str());
 			else
 			{
 				delete na->nc->o;
@@ -133,14 +133,14 @@ class CommandOSOper : public Command
 				fulltype += " " + params[2];
 			OperType *ot = OperType::Find(fulltype);
 			if (ot == NULL)	
-				source.Reply(_("Oper type \2%s\2 has not been configured."), fulltype.c_str());
+				source.Reply(_("Oper type \002%s\002 has not been configured."), fulltype.c_str());
 			else
 			{
 				if (ot->GetCommands().empty())
-					source.Reply(_("Opertype \2%s\2 has no allowed commands."), ot->GetName().c_str());
+					source.Reply(_("Opertype \002%s\002 has no allowed commands."), ot->GetName().c_str());
 				else
 				{
-					source.Reply(_("Available commands for \2%s\2:"), ot->GetName().c_str());
+					source.Reply(_("Available commands for \002%s\002:"), ot->GetName().c_str());
 					Anope::string buf;
 					std::list<Anope::string> cmds = ot->GetCommands();
 					for (std::list<Anope::string>::const_iterator it = cmds.begin(), it_end = cmds.end(); it != it_end; ++it)
@@ -159,10 +159,10 @@ class CommandOSOper : public Command
 					}
 				}
 				if (ot->GetPrivs().empty())
-					source.Reply(_("Opertype \2%s\2 has no allowed privileges."), ot->GetName().c_str());
+					source.Reply(_("Opertype \002%s\002 has no allowed privileges."), ot->GetName().c_str());
 				else
 				{
-					source.Reply(_("Available privileges for \2%s\2:"), ot->GetName().c_str());
+					source.Reply(_("Available privileges for \002%s\002:"), ot->GetName().c_str());
 					Anope::string buf;
 					std::list<Anope::string> privs = ot->GetPrivs();
 					for (std::list<Anope::string>::const_iterator it = privs.begin(), it_end = privs.end(); it != it_end; ++it)
@@ -181,7 +181,7 @@ class CommandOSOper : public Command
 					}
 				}
 				if (!ot->modes.empty())
-					source.Reply(_("Opertype \2%s\2 receives modes \2%s\2 once identifying."), ot->GetName().c_str(), ot->modes.c_str());
+					source.Reply(_("Opertype \002%s\002 receives modes \002%s\002 once identified."), ot->GetName().c_str(), ot->modes.c_str());
 			}
 		}
 		else
@@ -194,7 +194,7 @@ class CommandOSOper : public Command
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Allows you to change and view services operators.\n"
+		source.Reply(_("Allows you to change and view Services Operators.\n"
 				"Note that operators removed by this command but are still set in\n"
 				"the configuration file are not permanently affected by this."));
 		return true;

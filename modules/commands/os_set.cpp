@@ -55,7 +55,7 @@ class CommandOSSet : public Command
 			source.Reply(_("Services are now in \002read-write\002 mode."));
 		}
 		else
-			source.Reply(_("Setting for READONLY must be \002on\002 or \002off\002."));
+			source.Reply(_("Setting for READONLY must be \002ON\002 or \002OFF\002."));
 
 		return;
 	}
@@ -79,21 +79,21 @@ class CommandOSSet : public Command
 		 * Rob
 		 **/
 		if (!Config->SuperAdmin)
-			source.Reply(_("Superadmin can not be set because it is not enabled in the configuration"));
+			source.Reply(_("SuperAdmin can not be set because it is not enabled in the configuration."));
 		else if (setting.equals_ci("ON"))
 		{
 			source.GetUser()->super_admin = true;
-			source.Reply(_("You are now a SuperAdmin"));
+			source.Reply(_("You are now a SuperAdmin."));
 			Log(LOG_ADMIN, source, this) << "SUPERADMIN ON";
 		}
 		else if (setting.equals_ci("OFF"))
 		{
 			source.GetUser()->super_admin = false;
-			source.Reply(_("You are no longer a SuperAdmin"));
+			source.Reply(_("You are no longer a SuperAdmin."));
 			Log(LOG_ADMIN, source, this) << "SUPERADMIN OFF";
 		}
 		else
-			source.Reply(_("Setting for SuperAdmin must be \002on\002 or \002off\002."));
+			source.Reply(_("Setting for SuperAdmin must be \002ON\002 or \002OFF\002."));
 
 		return;
 	}
@@ -112,13 +112,13 @@ class CommandOSSet : public Command
 		{
 			Anope::Debug = 1;
 			Log(LOG_ADMIN, source, this) << "DEBUG ON";
-			source.Reply(_("Services are now in debug mode."));
+			source.Reply(_("Services are now in \002debug\002 mode."));
 		}
 		else if (setting.equals_ci("OFF") || setting == "0")
 		{
 			Log(LOG_ADMIN, source, this) << "DEBUG OFF";
 			Anope::Debug = 0;
-			source.Reply(_("Services are now in non-debug mode."));
+			source.Reply(_("Services are now in \002non-debug\002 mode."));
 		}
 		else
 		{
@@ -126,7 +126,7 @@ class CommandOSSet : public Command
 			{
 				Anope::Debug = convertTo<int>(setting);
 				Log(LOG_ADMIN, source, this) << "DEBUG " << Anope::Debug;
-				source.Reply(_("Services are now in debug mode (level %d)."), Anope::Debug);
+				source.Reply(_("Services are now in \002debug\002 mode (level %d)."), Anope::Debug);
 				return;
 			}
 			catch (const ConvertException &) { }
@@ -160,7 +160,7 @@ class CommandOSSet : public Command
 			source.Reply(_("Services are now in \002expire\002 mode."));
 		}
 		else
-			source.Reply(_("Setting for NOEXPIRE must be \002on\002 or \002off\002."));
+			source.Reply(_("Setting for NOEXPIRE must be \002ON\002 or \002OFF\002."));
 
 		return;
 	}
@@ -202,7 +202,7 @@ class CommandOSSet : public Command
 					"    READONLY   Set read-only or read-write mode\n"
 					"    DEBUG      Activate or deactivate debug mode\n"
 					"    NOEXPIRE   Activate or deactivate no expire mode\n"
-					"    SUPERADMIN Activate or deactivate super-admin mode\n"
+					"    SUPERADMIN Activate or deactivate SuperAdmin mode\n"
 					"    LIST       List the options"));
 		}
 		else if (subcommand.equals_ci("LIST"))

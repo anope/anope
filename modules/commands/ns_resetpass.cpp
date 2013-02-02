@@ -49,7 +49,7 @@ class CommandNSResetPass : public Command
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Sends a code key to the nickname with instructions on how to\n"
+		source.Reply(_("Sends a passcode to the nickname with instructions on how to\n"
 				"reset their password."));
 		return true;
 	}
@@ -104,7 +104,7 @@ class NSResetPass : public Module
 				{
 					nc->Shrink("ns_resetpass");
 
-					Log(LOG_COMMAND, source, &commandnsresetpass) << "confirmed RESETPASS to forcefully identify to " << na->nick;
+					Log(LOG_COMMAND, source, &commandnsresetpass) << "confirmed RESETPASS to forcefully identify as " << na->nick;
 
 					nc->Shrink("UNCONFIRMED");
 

@@ -18,8 +18,8 @@ class CommandHSList : public Command
  public:
 	CommandHSList(Module *creator) : Command(creator, "hostserv/list", 0, 1)
 	{
-		this->SetDesc(_("Displays one or more vhost entries."));
-		this->SetSyntax(_("\002[<key>|<#X-Y>]"));
+		this->SetDesc(_("Displays one or more vhost entries"));
+		this->SetSyntax(_("[\037key\037|\037#X-Y\037]"));
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
@@ -115,13 +115,13 @@ class CommandHSList : public Command
 		}
 
 		if (!key.empty())
-			source.Reply(_("Displayed records matching key \002%s\002 (Count: \002%d\002)"), key.c_str(), display_counter);
+			source.Reply(_("Displayed records matching key \002%s\002 (count: \002%d\002)."), key.c_str(), display_counter);
 		else
 		{
 			if (from)
-				source.Reply(_("Displayed records from \002%d\002 to \002%d\002"), from, to);
+				source.Reply(_("Displayed records from \002%d\002 to \002%d\002."), from, to);
 			else
-				source.Reply(_("Displayed all records (Count: \002%d\002)"), display_counter);
+				source.Reply(_("Displayed all records (count: \002%d\002)."), display_counter);
 		}
 
 		std::vector<Anope::string> replies;
@@ -136,14 +136,14 @@ class CommandHSList : public Command
 		this->SendSyntax(source);
 		source.Reply(" ");
 		source.Reply(_("This command lists registered vhosts to the operator\n"
-				"if a Key is specified, only entries whos nick or vhost match\n"
-				"the pattern given in <key> are displayed e.g. Rob* for all\n"
+				"if a \037key\037 is specified, only entries whos nick or vhost match\n"
+				"the pattern given in \037key\037 are displayed e.g. Rob* for all\n"
 				"entries beginning with \"Rob\"\n"
-				"If a #X-Y style is used, only entries between the range of X\n"
-				"and Y will be displayed, e.g. #1-3 will display the first 3\n"
+				"If a \037#X-Y\037 style is used, only entries between the range of \002X\002\n"
+				"and \002Y\002 will be displayed, e.g. \002#1-3\002 will display the first 3\n"
 				"nick/vhost entries.\n"
 				"The list uses the value of NSListMax as a hard limit for the\n"
-				"number of items to display to a operator at any 1 time."));
+				"number of items to display to a operator at any one time."));
 		return true;
 	}
 };

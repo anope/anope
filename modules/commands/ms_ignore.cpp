@@ -22,8 +22,10 @@ class CommandMSIgnore : public Command
  public:
 	CommandMSIgnore(Module *creator) : Command(creator, "memoserv/ignore", 1, 3)
 	{
-		this->SetDesc(_("Manage your memo ignore list"));
-		this->SetSyntax(_("[\037channel\037] {\002ADD|DEL|LIST\002} [\037entry\037]"));
+		this->SetDesc(_("Manage the memo ignore list"));
+		this->SetSyntax(_("[\037channel\037] ADD \037entry\037"));
+		this->SetSyntax(_("[\037channel\037] DEL \037entry\037"));
+		this->SetSyntax(_("[\037channel\037] LIST"));
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
@@ -55,10 +57,10 @@ class CommandMSIgnore : public Command
 			if (std::find(mi->ignores.begin(), mi->ignores.end(), param.ci_str()) == mi->ignores.end())
 			{
 				mi->ignores.push_back(param.ci_str());
-				source.Reply(_("\002%s\002 added to your ignore list."), param.c_str());
+				source.Reply(_("\002%s\002 added to ignore list."), param.c_str());
 			}
 			else
-				source.Reply(_("\002%s\002 is already on your ignore list."), param.c_str());
+				source.Reply(_("\002%s\002 is already on the ignore list."), param.c_str());
 		}
 		else if (command.equals_ci("DEL") && !param.empty())
 		{
@@ -67,15 +69,15 @@ class CommandMSIgnore : public Command
 			if (it != mi->ignores.end())
 			{
 				mi->ignores.erase(it);
-				source.Reply(_("\002%s\002 removed from your ignore list."), param.c_str());
+				source.Reply(_("\002%s\002 removed from the ignore list."), param.c_str());
 			}
 			else
-				source.Reply(_("\002%s\002 is not on your ignore list."), param.c_str());
+				source.Reply(_("\002%s\002 is not on the ignore list."), param.c_str());
 		}
 		else if (command.equals_ci("LIST"))
 		{
 			if (mi->ignores.empty())
-				source.Reply(_("Your memo ignore list is empty."));
+				source.Reply(_("Memo ignore list is empty."));
 			else
 			{
 				ListFormatter list;
@@ -106,8 +108,10 @@ class CommandMSIgnore : public Command
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Allows you to ignore users by nick or host from memoing you. If someone on your\n"
-				"memo ignore list tries to memo you, they will not be told that you have them ignored."));
+		source.Reply(_("Allows you to ignore users by nick or host from memoing\n"
+					"you or a channel. If someone on the memo ignore list tries\n"
+					"to memo you or a channel, they will not be told that you have\n"
+					"them ignored."));
 		return true;
 	}
 };

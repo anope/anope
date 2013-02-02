@@ -140,7 +140,7 @@ class CSStats : public Module
 						res.Get(0, "actions").c_str());
 			}
 			else
-				source.Reply(_("No stats for %s"), display.c_str());
+				source.Reply(_("No stats for %s."), display.c_str());
 		}
 		catch (const SQL::Exception &ex)
 		{

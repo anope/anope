@@ -25,7 +25,7 @@ class SGLineManager : public XLineManager
 
 	void OnExpire(const XLine *x) anope_override
 	{
-		Log(OperServ, "expire/akill") << "AKILL on \2" << x->mask << "\2 has expired";
+		Log(OperServ, "expire/akill") << "AKILL on \002" << x->mask << "\002 has expired";
 	}
 	
 	void Send(User *u, XLine *x) anope_override
@@ -101,7 +101,7 @@ class SQLineManager : public XLineManager
 
 	void OnExpire(const XLine *x) anope_override
 	{
-		Log(OperServ, "expire/sqline") << "SQLINE on \2" << x->mask << "\2 has expired";
+		Log(OperServ, "expire/sqline") << "SQLINE on \002" << x->mask << "\002 has expired";
 	}
 
 	void Send(User *u, XLine *x) anope_override
@@ -142,7 +142,7 @@ class SNLineManager : public XLineManager
 
 	void OnExpire(const XLine *x) anope_override
 	{
-		Log(OperServ, "expire/snline") << "SNLINE on \2" << x->mask << "\2 has expired";
+		Log(OperServ, "expire/snline") << "SNLINE on \002" << x->mask << "\002 has expired";
 	}
 
 	void Send(User *u, XLine *x) anope_override

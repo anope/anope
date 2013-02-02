@@ -23,7 +23,7 @@ class CommandNSGetEMail : public Command
 	CommandNSGetEMail(Module *creator) : Command(creator, "nickserv/getemail", 1, 1)
 	{
 		this->SetDesc(_("Matches and returns all users that registered using given email"));
-		this->SetSyntax(_("\037user@email-host\037"));
+		this->SetSyntax(_("\037email\037"));
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
@@ -40,13 +40,13 @@ class CommandNSGetEMail : public Command
 			if (!nc->email.empty() && nc->email.equals_ci(email))
 			{
 				++j;
-				source.Reply(_("Emails Match \002%s\002 to \002%s\002."), nc->display.c_str(), email.c_str());
+				source.Reply(_("Email matched: \002%s\002 to \002%s\002."), nc->display.c_str(), email.c_str());
 			}
 		}
 
 		if (j <= 0)
 		{
-			source.Reply(_("No Emails listed for \002%s\002."), email.c_str());
+			source.Reply(_("No nick registrations matching \002%s\002 found."), email.c_str());
 			return;
 		}
 
@@ -58,9 +58,9 @@ class CommandNSGetEMail : public Command
 		this->SendSyntax(source);
 		source.Reply(" ");
 		source.Reply(_("Returns the matching nicks that used given email. \002Note\002 that\n"
-				"you can not use wildcards for either user or emailhost. Whenever\n"
-				"this command is used, a message including the person who issued\n"
-				"the command and the email it was used on will be logged."));
+				"you can not use wildcards. Whenever this command is used, a message\n"
+				"including the person who issued the command and the email it was used\n"
+				"on will be logged."));
 		return true;
 	}
 };

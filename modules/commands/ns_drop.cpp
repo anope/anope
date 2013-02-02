@@ -46,7 +46,7 @@ class CommandNSDrop : public Command
 		if (!is_mine && !source.HasPriv("nickserv/drop"))
 			source.Reply(ACCESS_DENIED);
 		else if (Config->NSSecureAdmins && !is_mine && na->nc->IsServicesOper())
-			source.Reply(_("You may not drop other services operators nicknames."));
+			source.Reply(_("You may not drop other Services Operators' nicknames."));
 		else
 		{
 			if (Anope::ReadOnly)
@@ -81,13 +81,13 @@ class CommandNSDrop : public Command
 					"Without a parameter, deletes your nickname.\n"
 					" \n"
 					"With a parameter, drops the named nick from the database.\n"
-					"You may drop any nick within your group without any \n"
-					"special privileges. Dropping any nick is limited to \n"
+					"You may drop any nick within your group without any\n"
+					"special privileges. Dropping any nick is limited to\n"
 					"\002Services Operators\002."), source.command.c_str());
 		else
 			source.Reply(_("Syntax: \002%s [\037nickname\037 | \037password\037]\002\n"
 					" \n"
-					"Deltes your nickname.  A nick\n"
+					"Deletes your nickname.  A nick\n"
 					"that has been dropped is free for anyone to re-register.\n"
 					" \n"
 					"You may drop a nick within your group by passing it\n"

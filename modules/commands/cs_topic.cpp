@@ -97,12 +97,12 @@ class CommandCSTopic : public Command
 		this->SendSyntax(source);
 		source.Reply(" ");
 		source.Reply(_("Allows manipulating the topic of the specified channel.\n"
-				"The \2SET\2 command changes the topic of the channel to the given topic\n"
-				"or unsets the topic if no topic is given. The \2APPEND\2 command appends\n"
+				"The \002SET\002 command changes the topic of the channel to the given topic\n"
+				"or unsets the topic if no topic is given. The \002APPEND\002 command appends\n"
 				"the given topic to the existing topic.\n"
 				" \n"
-				"\2LOCK\2 and \2UNLOCK\2 may be used to enable and disable topic lock. When\n"
-				"topic lock is set, the channel topic will be unchangable except via this command."));
+				"\002LOCK\002 and \002UNLOCK\002 may be used to enable and disable topic lock. When\n"
+				"topic lock is set, the channel topic will be unchangeable except via this command."));
 		return true;
 	}
 };

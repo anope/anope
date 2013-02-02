@@ -30,12 +30,12 @@ class CommandOSModLoad : public Command
 		if (status == MOD_ERR_OK)
 		{
 			Log(LOG_ADMIN, source, this) << "to load module " << mname;
-			source.Reply(_("Module \002%s\002 loaded"), mname.c_str());
+			source.Reply(_("Module \002%s\002 loaded."), mname.c_str());
 		}
 		else if (status == MOD_ERR_EXISTS)
 			source.Reply(_("Module \002%s\002 is already loaded."), mname.c_str());
 		else
-			source.Reply(_("Unable to load module \002%s\002"), mname.c_str());
+			source.Reply(_("Unable to load module \002%s\002."), mname.c_str());
 
 		return;
 	}
@@ -44,7 +44,7 @@ class CommandOSModLoad : public Command
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("This command loads the module named FileName from the modules\n"
+		source.Reply(_("This command loads the module named \037modname\037 from the modules\n"
 				"directory."));
 		return true;
 	}
@@ -72,14 +72,14 @@ class CommandOSModReLoad : public Command
 
 		if (!m->handle || m->GetPermanent())
 		{
-			source.Reply(_("Unable to remove module \002%s\002"), m->name.c_str());
+			source.Reply(_("Unable to remove module \002%s\002."), m->name.c_str());
 			return;
 		}
 
 		Module *protocol = ModuleManager::FindFirstOf(PROTOCOL);
 		if (m->type == PROTOCOL && m != protocol)
 		{
-			source.Reply(_("You may not reload this module directly, instead reload %s."), protocol ? protocol->name.c_str() : "(unknown)");
+			source.Reply(_("You can not reload this module directly, instead reload %s."), protocol ? protocol->name.c_str() : "(unknown)");
 			return;
 		}
 
@@ -89,7 +89,7 @@ class CommandOSModReLoad : public Command
 
 		if (status != MOD_ERR_OK)
 		{
-			source.Reply(_("Unable to remove module \002%s\002"), mname.c_str());
+			source.Reply(_("Unable to remove module \002%s\002."), mname.c_str());
 			return;
 		}
 
@@ -97,7 +97,7 @@ class CommandOSModReLoad : public Command
 		if (status == MOD_ERR_OK)
 		{
 			Log(LOG_ADMIN, source, this) << "to reload module " << mname;
-			source.Reply(_("Module \002%s\002 reloaded"), mname.c_str());
+			source.Reply(_("Module \002%s\002 reloaded."), mname.c_str());
 		}
 		else
 		{
@@ -107,7 +107,7 @@ class CommandOSModReLoad : public Command
 				Anope::Quitting = true;
 			}
 			else
-				source.Reply(_("Unable to load module \002%s\002"), mname.c_str());
+				source.Reply(_("Unable to load module \002%s\002."), mname.c_str());
 		}
 
 		return;
@@ -117,7 +117,7 @@ class CommandOSModReLoad : public Command
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("This command reloads the module named FileName."));
+		source.Reply(_("This command reloads the module named \037modname\037."));
 		return true;
 	}
 };
@@ -144,7 +144,7 @@ class CommandOSModUnLoad : public Command
 		
 		if (!m->handle || m->GetPermanent() || m->type == PROTOCOL)
 		{
-			source.Reply(_("Unable to remove module \002%s\002"), m->name.c_str());
+			source.Reply(_("Unable to remove module \002%s\002."), m->name.c_str());
 			return;
 		}
 
@@ -155,10 +155,10 @@ class CommandOSModUnLoad : public Command
 		if (status == MOD_ERR_OK)
 		{
 			Log(LOG_ADMIN, source, this) << "to unload module " << mname;
-			source.Reply(_("Module \002%s\002 unloaded"), mname.c_str());
+			source.Reply(_("Module \002%s\002 unloaded."), mname.c_str());
 		}
 		else
-			source.Reply(_("Unable to remove module \002%s\002"), mname.c_str());
+			source.Reply(_("Unable to remove module \002%s\002."), mname.c_str());
 
 		return;
 	}
@@ -167,7 +167,7 @@ class CommandOSModUnLoad : public Command
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("This command unloads the module named FileName from the modules\n"
+		source.Reply(_("This command unloads the module named \037modname\037 from the modules\n"
 				"directory."));
 		return true;
 	}

@@ -119,7 +119,7 @@ class CommandCSBan : public Command
 					if (ban_time)
 					{
 						new TempBan(ban_time, c, mask);
-						source.Reply(_("Ban on \2%s\2 expires in %s."), mask.c_str(), Anope::Duration(ban_time, source.GetAccount()).c_str());
+						source.Reply(_("Ban on \002%s\002 expires in %s."), mask.c_str(), Anope::Duration(ban_time, source.GetAccount()).c_str());
 					}
 				}
 
@@ -143,7 +143,7 @@ class CommandCSBan : public Command
 				if (ban_time)
 				{
 					new TempBan(ban_time, c, target);
-					source.Reply(_("Ban on \2%s\2 expires in %s."), target.c_str(), Anope::Duration(ban_time, source.GetAccount()).c_str());
+					source.Reply(_("Ban on \002%s\002 expires in %s."), target.c_str(), Anope::Duration(ban_time, source.GetAccount()).c_str());
 				}
 			}
 

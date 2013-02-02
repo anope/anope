@@ -110,18 +110,18 @@ class CommandBSBadwords : public Command
 		}
 
 		if (list.IsEmpty())
-			source.Reply(_("No matching entries on %s badword list."), ci->name.c_str());
+			source.Reply(_("No matching entries on %s bad words list."), ci->name.c_str());
 		else
 		{
 			std::vector<Anope::string> replies;
 			list.Process(replies);
 
-			source.Reply(_("Badword list for %s:"), ci->name.c_str());
+			source.Reply(_("Bad words list for %s:"), ci->name.c_str());
 
 			for (unsigned i = 0; i < replies.size(); ++i)
 				source.Reply(replies[i]);
 
-			source.Reply(_("End of badword list."));
+			source.Reply(_("End of bad words list."));
 		}
 	}
 
@@ -222,7 +222,7 @@ class CommandBSBadwords : public Command
  public:
 	CommandBSBadwords(Module *creator) : Command(creator, "botserv/badwords", 2, 3)
 	{
-		this->SetDesc(_("Maintains bad words list"));
+		this->SetDesc(_("Maintains the bad words list"));
 		this->SetSyntax(_("\037channel\037 ADD \037word\037 [\037SINGLE\037 | \037START\037 | \037END\037]"));
 		this->SetSyntax(_("\037channel\037 DEL {\037word\037 | \037entry-num\037 | \037list\037}"));
 		this->SetSyntax(_("\037channel\037 LIST [\037mask\037 | \037list\037]"));
@@ -282,8 +282,8 @@ class CommandBSBadwords : public Command
 				"type \002%s%s HELP KICK %s\002.\n"
 				" \n"
 				"The \002ADD\002 command adds the given word to the\n"
-				"badword list. If SINGLE is specified, a kick will be\n"
-				"done only if a user says the entire word. If START is \n"
+				"bad words list. If SINGLE is specified, a kick will be\n"
+				"done only if a user says the entire word. If START is\n"
 				"specified, a kick will be done if a user says a word\n"
 				"that starts with \037word\037. If END is specified, a kick\n"
 				"will be done if a user says a word that ends with\n"

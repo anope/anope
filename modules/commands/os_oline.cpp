@@ -42,7 +42,7 @@ class CommandOSOLine : public Command
 		else if (u2 && flag[0] == '-')
 		{
 			IRCD->SendSVSO(source.service, nick, flag);
-			source.Reply(_("Operflags \002%s\002 have been added for \002%s\002."), flag.c_str(), nick.c_str());
+			source.Reply(_("Operflags \002%s\002 have been removed from \002%s\002."), flag.c_str(), nick.c_str());
 			Log(LOG_ADMIN, source, this) << "for " << nick;
 		}
 		else
@@ -55,7 +55,7 @@ class CommandOSOLine : public Command
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Allows Services Opers to give Operflags to any user.\n"
+		source.Reply(_("Allows Services Operators to give Operflags to any user.\n"
 				"Flags have to be prefixed with a \"+\" or a \"-\". To\n"
 				"remove all flags simply type a \"-\" instead of any flags."));
 		return true;

@@ -146,7 +146,7 @@ class CommandHSRequest : public Command
 
 		if (HSRequestMemoOper && Config->MSSendDelay > 0 && u && u->lastmemosend + Config->MSSendDelay > Anope::CurTime)
 		{
-			source.Reply(_("Please wait %d seconds before requesting a new vHost"), Config->MSSendDelay);
+			source.Reply(_("Please wait %d seconds before requesting a new vHost."), Config->MSSendDelay);
 			u->lastmemosend = Anope::CurTime;
 			return;
 		}
@@ -159,7 +159,7 @@ class CommandHSRequest : public Command
 		req->time = Anope::CurTime;
 		na->Extend("hs_request", req);
 
-		source.Reply(_("Your vHost has been requested"));
+		source.Reply(_("Your vHost has been requested."));
 		req_send_memos(source, user, host);
 		Log(LOG_COMMAND, source, this) << "to request new vhost " << (!user.empty() ? user + "@" : "") << host;
 
@@ -201,7 +201,7 @@ class CommandHSActivate : public Command
 			if (HSRequestMemoUser && MemoServService)
 				MemoServService->Send(Config->HostServ, na->nick, _("[auto memo] Your requested vHost has been approved."), true);
 
-			source.Reply(_("vHost for %s has been activated"), na->nick.c_str());
+			source.Reply(_("vHost for %s has been activated."), na->nick.c_str());
 			Log(LOG_COMMAND, source, this) << "for " << na->nick << " for vhost " << (!req->ident.empty() ? req->ident + "@" : "") << req->host;
 			na->Shrink("hs_request");
 		}
@@ -252,7 +252,7 @@ class CommandHSReject : public Command
 				MemoServService->Send(Config->HostServ, nick, message, true);
 			}
 
-			source.Reply(_("vHost for %s has been rejected"), nick.c_str());
+			source.Reply(_("vHost for %s has been rejected."), nick.c_str());
 			Log(LOG_COMMAND, source, this, NULL) << "to reject vhost for " << nick << " (" << (!reason.empty() ? reason : "") << ")";
 		}
 		else
@@ -307,7 +307,7 @@ class CommandHSWaiting : public Command
 			}
 			++counter;
 		}
-		source.Reply(_("Displayed all records (Count: \002%d\002)"), display_counter);
+		source.Reply(_("Displayed all records (count: \002%d\002)."), display_counter);
 
 		std::vector<Anope::string> replies;
 		list.Process(replies);
@@ -332,7 +332,7 @@ class CommandHSWaiting : public Command
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("This command retrieves the vhost requests"));
+		source.Reply(_("This command retrieves the vhost requests."));
 
 		return true;
 	}

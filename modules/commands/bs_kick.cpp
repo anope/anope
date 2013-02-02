@@ -74,17 +74,17 @@ class CommandBSKick : public Command
 
 					ci->ExtendMetadata("BS_KICK_BADWORDS");
 					if (ci->ttb[TTB_BADWORDS])
-						source.Reply(_("Bot will now kick \002bad words\002, and will place a ban after \n"
-											"%d kicks for the same user. Use the BADWORDS command\n"
-											"to add or remove a bad word."), ci->ttb[TTB_BADWORDS]);
+						source.Reply(_("Bot will now kick for \002bad words\002, and will place a ban\n"
+								"after %d kicks for the same user. Use the BADWORDS command\n"
+								"to add or remove a bad word."), ci->ttb[TTB_BADWORDS]);
 					else
-						source.Reply(_("Bot will now kick \002bad words\002. Use the BADWORDS command\n"
+						source.Reply(_("Bot will now kick for \002bad words\002. Use the BADWORDS command\n"
 								"to add or remove a bad word."));
 				}
 				else
 				{
 					ci->Shrink("BS_KICK_BADWORDS");
-					source.Reply(_("Bot won't kick \002bad words\002 anymore."));
+					source.Reply(_("Bot won't kick for \002bad words\002 anymore."));
 				}
 			}
 			else if (option.equals_ci("BOLDS"))
@@ -110,14 +110,15 @@ class CommandBSKick : public Command
 						ci->ttb[TTB_BOLDS] = 0;
 					ci->ExtendMetadata("BS_KICK_BOLDS");
 					if (ci->ttb[TTB_BOLDS])
-						source.Reply(_("Bot will now kick \002bolds\002, and will place a ban after\n%d kicks to the same user."), ci->ttb[TTB_BOLDS]);
+						source.Reply(_("Bot will now kick for \002bolds\002, and will place a ban\n"
+								"after %d kicks for the same user."), ci->ttb[TTB_BOLDS]);
 					else
-						source.Reply(_("Bot will now kick \002bolds\002."));
+						source.Reply(_("Bot will now kick for \002bolds\002."));
 				}
 				else
 				{
 					ci->Shrink("BS_KICK_BOLDS");
-					source.Reply(_("Bot won't kick \002bolds\002 anymore."));
+					source.Reply(_("Bot won't kick for \002bolds\002 anymore."));
 				}
 			}
 			else if (option.equals_ci("CAPS"))
@@ -165,17 +166,17 @@ class CommandBSKick : public Command
 
 					ci->ExtendMetadata("BS_KICK_CAPS");
 					if (ci->ttb[TTB_CAPS])
-						source.Reply(_("Bot will now kick \002caps\002 (they must constitute at least\n"
-								"%d characters and %d%% of the entire message), and will \n"
+						source.Reply(_("Bot will now kick for \002caps\002 (they must constitute at least\n"
+								"%d characters and %d%% of the entire message), and will\n"
 								"place a ban after %d kicks for the same user."), ci->capsmin, ci->capspercent, ci->ttb[TTB_CAPS]);
 					else
-						source.Reply(_("Bot will now kick \002caps\002 (they must constitute at least\n"
+						source.Reply(_("Bot will now kick for \002caps\002 (they must constitute at least\n"
 								"%d characters and %d%% of the entire message)."), ci->capsmin, ci->capspercent);
 				}
 				else
 				{
 					ci->Shrink("BS_KICK_CAPS");
-					source.Reply(_("Bot won't kick \002caps\002 anymore."));
+					source.Reply(_("Bot won't kick for \002caps\002 anymore."));
 				}
 			}
 			else if (option.equals_ci("COLORS"))
@@ -202,14 +203,15 @@ class CommandBSKick : public Command
 
 					ci->ExtendMetadata("BS_KICK_COLORS");
 					if (ci->ttb[TTB_COLORS])
-						source.Reply(_("Bot will now kick \002colors\002, and will place a ban after %d\nkicks for the same user."), ci->ttb[TTB_COLORS]);
+						source.Reply(_("Bot will now kick for \002colors\002, and will place a ban\n"
+								"after %d kicks for the same user."), ci->ttb[TTB_COLORS]);
 					else
-						source.Reply(_("Bot will now kick \002colors\002."));
+						source.Reply(_("Bot will now kick for \002colors\002."));
 				}
 				else
 				{
 					ci->Shrink("BS_KICK_COLORS");
-					source.Reply(_("Bot won't kick \002colors\002 anymore."));
+					source.Reply(_("Bot won't kick for \002colors\002 anymore."));
 				}
 			}
 			else if (option.equals_ci("FLOOD"))
@@ -259,14 +261,15 @@ class CommandBSKick : public Command
 
 					ci->ExtendMetadata("BS_KICK_FLOOD");
 					if (ci->ttb[TTB_FLOOD])
-						source.Reply(_("Bot will now kick \002flood\002 (%d lines in %d seconds and\nwill place a ban after %d kicks for the same user."), ci->floodlines, ci->floodsecs, ci->ttb[TTB_FLOOD]);
+						source.Reply(_("Bot will now kick for \002flood\002 (%d lines in %d seconds\n"
+								"and will place a ban after %d kicks for the same user."), ci->floodlines, ci->floodsecs, ci->ttb[TTB_FLOOD]);
 					else
-						source.Reply(_("Bot will now kick \002flood\002 (%d lines in %d seconds)."), ci->floodlines, ci->floodsecs);
+						source.Reply(_("Bot will now kick for \002flood\002 (%d lines in %d seconds)."), ci->floodlines, ci->floodsecs);
 				}
 				else
 				{
 					ci->Shrink("BS_KICK_FLOOD");
-					source.Reply(_("Bot won't kick \002flood\002 anymore."));
+					source.Reply(_("Bot won't kick for \002flood\002 anymore."));
 				}
 			}
 			else if (option.equals_ci("REPEAT"))
@@ -304,17 +307,17 @@ class CommandBSKick : public Command
 
 					ci->ExtendMetadata("BS_KICK_REPEAT");
 					if (ci->ttb[TTB_REPEAT])
-						source.Reply(_("Bot will now kick \002repeats\002 (users that say the\n"
-								"same thing %d times), and will place a ban after %d \n"
+						source.Reply(_("Bot will now kick for \002repeats\002 (users that say the\n"
+								"same thing %d times), and will place a ban after %d\n"
 								"kicks for the same user."), ci->repeattimes, ci->ttb[TTB_REPEAT]);
 					else
-						source.Reply(_("Bot will now kick \002repeats\002 (users that say the\n"
+						source.Reply(_("Bot will now kick for \002repeats\002 (users that say the\n"
 							"same thing %d times)."), ci->repeattimes);
 				}
 				else
 				{
 					ci->Shrink("BS_KICK_REPEAT");
-					source.Reply(_("Bot won't kick \002repeats\002 anymore."));
+					source.Reply(_("Bot won't kick for \002repeats\002 anymore."));
 				}
 			}
 			else if (option.equals_ci("REVERSES"))
@@ -340,14 +343,15 @@ class CommandBSKick : public Command
 						ci->ttb[TTB_REVERSES] = 0;
 					ci->ExtendMetadata("BS_KICK_REVERSES");
 					if (ci->ttb[TTB_REVERSES])
-						source.Reply(_("Bot will now kick \002reverses\002, and will place a ban after %d\nkicks for the same user."), ci->ttb[TTB_REVERSES]);
+						source.Reply(_("Bot will now kick for \002reverses\002, and will place a ban\n"
+								"after %d kicks for the same user."), ci->ttb[TTB_REVERSES]);
 					else
-						source.Reply(_("Bot will now kick \002reverses\002."));
+						source.Reply(_("Bot will now kick for \002reverses\002."));
 				}
 				else
 				{
 					ci->Shrink("BS_KICK_REVERSES");
-					source.Reply(_("Bot won't kick \002reverses\002 anymore."));
+					source.Reply(_("Bot won't kick for \002reverses\002 anymore."));
 				}
 			}
 			else if (option.equals_ci("UNDERLINES"))
@@ -374,14 +378,15 @@ class CommandBSKick : public Command
 
 					ci->ExtendMetadata("BS_KICK_UNDERLINES");
 					if (ci->ttb[TTB_UNDERLINES])
-						source.Reply(_("Bot will now kick \002underlines\002, and will place a ban after %d\nkicks for the same user."), ci->ttb[TTB_UNDERLINES]);
+						source.Reply(_("Bot will now kick for \002underlines\002, and will place a ban\n"
+								"after %d kicks for the same user."), ci->ttb[TTB_UNDERLINES]);
 					else
-						source.Reply(_("Bot will now kick \002underlines\002."));
+						source.Reply(_("Bot will now kick for \002underlines\002."));
 				}
 				else
 				{
 					ci->Shrink("BS_KICK_UNDERLINES");
-					source.Reply(_("Bot won't kick \002underlines\002 anymore."));
+					source.Reply(_("Bot won't kick for \002underlines\002 anymore."));
 				}
 			}
 			else if (option.equals_ci("ITALICS"))
@@ -408,14 +413,15 @@ class CommandBSKick : public Command
 
 					ci->ExtendMetadata("BS_KICK_ITALICS");
 					if (ci->ttb[TTB_ITALICS])
-						source.Reply(_("Bot will now kick \002italics\002, and will place a ban after\n%d kicks for the same user."), ci->ttb[TTB_ITALICS]);
+						source.Reply(_("Bot will now kick for \002italics\002, and will place a ban\n"
+								"after %d kicks for the same user."), ci->ttb[TTB_ITALICS]);
 					else
-						source.Reply(_("Bot will now kick \002italics\002."));
+						source.Reply(_("Bot will now kick for \002italics\002."));
 				}
 				else
 				{
 					ci->Shrink("BS_KICK_ITALICS");
-					source.Reply(_("Bot won't kick \002italics\002 anymore."));
+					source.Reply(_("Bot won't kick for \002italics\002 anymore."));
 				}
 			}
 			else if (option.equals_ci("AMSGS"))
@@ -442,7 +448,8 @@ class CommandBSKick : public Command
 
 					ci->ExtendMetadata("BS_KICK_AMSGS");
 					if (ci->ttb[TTB_AMSGS])
-						source.Reply(_("Bot will now kick for \002amsgs\002, and will place a ban after %d\nkicks for the same user."), ci->ttb[TTB_AMSGS]);
+						source.Reply(_("Bot will now kick for \002amsgs\002, and will place a ban\n"
+								"after %d kicks for the same user."), ci->ttb[TTB_AMSGS]);
 					else
 						source.Reply(_("Bot will now kick for \002amsgs\002"));
 				}
@@ -485,7 +492,7 @@ class CommandBSKick : public Command
 					"level SET."), Config->UseStrictPrivMsgString.c_str(), source.service->nick.c_str());
 		}
 		else if (subcommand.equals_ci("BADWORDS"))
-			source.Reply(_("Syntax: \002\037#channel\037 BADWORDS {\037ON|OFF\037} [\037ttb\037]\002\n"
+			source.Reply(_("Syntax: \002\037channel\037 BADWORDS {\037ON|OFF\037} [\037ttb\037]\002\n"
 					"Sets the bad words kicker on or off. When enabled, this\n"
 					"option tells the bot to kick users who say certain words\n"
 					"on the channels.\n"
@@ -508,7 +515,7 @@ class CommandBSKick : public Command
 					"option tells the bot to kick users who are talking in\n"
 					"CAPS.\n"
 					"The bot kicks only if there are at least \002min\002 caps\n"
-					"and they constitute at least \002percent\002%% of the total \n"
+					"and they constitute at least \002percent\002%% of the total\n"
 					"text line (if not given, it defaults to 10 characters\n"
 					"and 25%%).\n"
 					"ttb is the number of times a user can be kicked\n"

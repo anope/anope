@@ -936,7 +936,7 @@ struct IRCDMessageMetadata : IRCDMessage
 					 * their server isn't syncing) and then we receive this.. so tell them about it.
 					 */
 					if (u->server->IsSynced() && NickServ)
-						u->SendMessage(NickServ, _("You have been logged in as \2%s\2."), nc->display.c_str());
+						u->SendMessage(NickServ, _("You have been logged in as \002%s\002."), nc->display.c_str());
 				}
 			}
 

@@ -131,12 +131,12 @@ class CommandCSSetAutoOp : public Command
 		if (params[1].equals_ci("ON"))
 		{
 			ci->Shrink("NOAUTOOP");
-			source.Reply(_("Services will now automatically give modes to users in \2%s\2"), ci->name.c_str());
+			source.Reply(_("Services will now automatically give modes to users in \002%s\002."), ci->name.c_str());
 		}
 		else if (params[1].equals_ci("OFF"))
 		{
 			ci->ExtendMetadata("NOAUTOOP");
-			source.Reply(_("Services will no longer automatically give modes to users in \2%s\2"), ci->name.c_str());
+			source.Reply(_("Services will no longer automatically give modes to users in \002%s\002."), ci->name.c_str());
 		}
 		else
 			this->OnSyntaxError(source, "AUTOOP");
@@ -148,7 +148,7 @@ class CommandCSSetAutoOp : public Command
 		source.Reply(" ");
 		source.Reply(_("Enables or disables %s's autoop feature for a\n"
 			"channel. When disabled, users who join the channel will\n"
-			"not automatically gain any status from %s"), Config->ChanServ.c_str(),
+			"not automatically gain any status from %s."), Config->ChanServ.c_str(),
 			Config->ChanServ.c_str(), this->name.c_str());
 		return true;
 	}
@@ -206,7 +206,7 @@ class CommandCSSetBanType : public Command
 		source.Reply(_("Sets the ban type that will be used by services whenever\n"
 				"they need to ban someone from your channel.\n"
 				" \n"
-				"bantype is a number between 0 and 3 that means:\n"
+				"Bantype is a number between 0 and 3 that means:\n"
 				" \n"
 				"0: ban in the form *!user@host\n"
 				"1: ban in the form *!*user@host\n"
@@ -248,12 +248,12 @@ class CommandCSSetChanstats : public Command
 		if (params[1].equals_ci("ON"))
 		{
 			ci->ExtendMetadata("STATS");
-			source.Reply(_("Chanstats statistics are now enabled for this channel"));
+			source.Reply(_("Chanstats statistics are now enabled for this channel."));
 		}
 		else if (params[1].equals_ci("OFF"))
 		{
 			ci->Shrink("STATS");
-			source.Reply(_("Chanstats statistics are now disabled for this channel"));
+			source.Reply(_("Chanstats statistics are now disabled for this channel."));
 		}
 		else
 			this->OnSyntaxError(source, "");
@@ -264,7 +264,7 @@ class CommandCSSetChanstats : public Command
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply("Turn Chanstats channel statistics ON or OFF");
+		source.Reply("Turn Chanstats channel statistics ON or OFF.");
 		return true;
 	}
 };
@@ -650,7 +650,7 @@ class CommandCSSetPrivate : public Command
  public:
 	CommandCSSetPrivate(Module *creator, const Anope::string &cname = "chanserv/set/private") : Command(creator, cname, 2, 2)
 	{
-		this->SetDesc(_("Hide channel from LIST command"));
+		this->SetDesc(_("Hide channel from the LIST command"));
 		this->SetSyntax(_("\037channel\037 {ON | OFF}"));
 	}
 
@@ -935,7 +935,7 @@ class CommandCSSetSignKick : public Command
  public:
 	CommandCSSetSignKick(Module *creator, const Anope::string &cname = "chanserv/set/signkick") : Command(creator, cname, 2, 2)
 	{
-		this->SetDesc(_("Sign kicks that are done with KICK command"));
+		this->SetDesc(_("Sign kicks that are done with the KICK command"));
 		this->SetSyntax(_("\037channel\037 SIGNKICK {ON | LEVEL | OFF}"));
 	}
 
@@ -969,7 +969,7 @@ class CommandCSSetSignKick : public Command
 		{
 			ci->ExtendMetadata("SIGNKICK_LEVEL");
 			ci->Shrink("SIGNKICK");
-			source.Reply(_("Signed kick option for %s is now \002ON\002, but depends of the\n"
+			source.Reply(_("Signed kick option for %s is now \002on\002, but depends of the\n"
 				"level of the user that is using the command."), ci->name.c_str());
 		}
 		else if (params[1].equals_ci("OFF"))

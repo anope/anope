@@ -41,7 +41,7 @@ class CommandMSSend : public Command
 		else if (result == MemoServService::MEMO_TOO_FAST)
 			source.Reply(_("Please wait %d seconds before using the SEND command again."), Config->MSSendDelay);
 		else if (result == MemoServService::MEMO_TARGET_FULL)
-			source.Reply(_("%s currently has too many memos and cannot receive more."), nick.c_str());
+			source.Reply(_("Sorry, %s currently has too many memos and cannot receive more."), nick.c_str());
 
 		return;
 	}

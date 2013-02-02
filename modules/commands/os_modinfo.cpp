@@ -56,7 +56,7 @@ class CommandOSModInfo : public Command
 			}
 		}
 		else
-			source.Reply(_("No information about module \002%s\002 is available"), file.c_str());
+			source.Reply(_("No information about module \002%s\002 is available."), file.c_str());
 
 		return;
 	}
@@ -65,7 +65,7 @@ class CommandOSModInfo : public Command
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("This command lists information about the specified loaded module"));
+		source.Reply(_("This command lists information about the specified loaded module."));
 		return true;
 	}
 };
@@ -158,7 +158,7 @@ class CommandOSModList : public Command
 
 		Module *protocol = ModuleManager::FindFirstOf(PROTOCOL);
 
-		source.Reply(_("Current Module list:"));
+		source.Reply(_("Current module list:"));
 
 		for (std::list<Module *>::iterator it = ModuleManager::Modules.begin(), it_end = ModuleManager::Modules.end(); it != it_end; ++it)
 		{
@@ -215,9 +215,9 @@ class CommandOSModList : public Command
 			}
 		}
 		if (!count)
-			source.Reply(_("No modules currently loaded"));
+			source.Reply(_("No modules currently loaded."));
 		else
-			source.Reply(_("%d Modules loaded."), count);
+			source.Reply(_("%d modules loaded."), count);
 
 		return;
 	}

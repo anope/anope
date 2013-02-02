@@ -170,7 +170,7 @@ class CSTop : public Module
 				}
 			}
 			else
-				source.Reply(_("No stats for %s"), is_global ? "Network" : channel.c_str());
+				source.Reply(_("No stats for %s."), is_global ? "Network" : channel.c_str());
 		}
 		catch (const SQL::Exception &ex)
 		{

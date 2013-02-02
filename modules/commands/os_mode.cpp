@@ -97,7 +97,7 @@ class CommandOSMode : public Command
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Allows Services operators to change modes for any channel.\n"
+		source.Reply(_("Allows Services Operators to change modes for any channel.\n"
 				"Parameters are the same as for the standard /MODE command."));
 		return true;
 	}
@@ -135,7 +135,7 @@ class CommandOSUMode : public Command
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Allows Services operators to change modes for any user.\n"
+		source.Reply(_("Allows Services Operators to change modes for any user.\n"
 				"Parameters are the same as for the standard /MODE command."));
 		return true;
 	}

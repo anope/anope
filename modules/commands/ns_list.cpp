@@ -160,11 +160,14 @@ class CommandNSList : public Command
 				"        Lists all registered nicks which have been set to not expire.\n"
 				" \n"
 				"    \002LIST #51-100\002\n"
-				"        Lists all registered nicks within the given range (51-100).\n"));
+				"        Lists all registered nicks within the given range (51-100)."));
+
 		if (!Config->RegexEngine.empty())
-			source.Reply(" \n"
-					"Regex matches are also supported using the %s engine.\n"
-					"Enclose your pattern in // if this desired.", Config->RegexEngine.c_str());
+		{
+			source.Reply(" ");
+			source.Reply(_("Regex matches are also supported using the %s engine.\n"
+					"Enclose your pattern in // if this is desired."), Config->RegexEngine.c_str());
+		}
 
 		return true;
 	}

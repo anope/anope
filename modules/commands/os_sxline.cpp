@@ -252,7 +252,7 @@ class CommandOSSNLine : public CommandOSSXLineBase
 	{
 		if (!this->xlm() || !IRCD->CanSNLine)
 		{
-			source.Reply(_("Your IRCd does not support SNLINE"));
+			source.Reply(_("Your IRCd does not support SNLINE."));
 			return;
 		}
 
@@ -321,7 +321,7 @@ class CommandOSSNLine : public CommandOSSXLineBase
 			ServiceReference<RegexProvider> provider("Regex", Config->RegexEngine);
 			if (!provider)
 			{
-				source.Reply(_("Unable to find regex engine %s"), Config->RegexEngine.c_str());
+				source.Reply(_("Unable to find regex engine %s."), Config->RegexEngine.c_str());
 				return;
 			}
 
@@ -417,44 +417,46 @@ class CommandOSSNLine : public CommandOSSXLineBase
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Allows Services operators to manipulate the SNLINE list.  If\n"
-				"a user with a realname matching an SNLINE mask attempts to \n"
+		source.Reply(_("Allows Services Operators to manipulate the SNLINE list.  If\n"
+				"a user with a realname matching an SNLINE mask attempts to\n"
 				"connect, Services will not allow it to pursue his IRC\n"
-				"session.\n"));
+				"session."));
 		source.Reply(_(" \n"
 				"\002SNLINE ADD\002 adds the given realname mask to the SNLINE\n"
 				"list for the given reason (which \002must\002 be given).\n"
-				"\037expiry\037 is specified as an integer followed by one of \037d\037 \n"
-				"(days), \037h\037 (hours), or \037m\037 (minutes).  Combinations (such as \n"
-				"\0371h30m\037) are not permitted.  If a unit specifier is not \n"
-				"included, the default is days (so \037+30\037 by itself means 30 \n"
+				"\037expiry\037 is specified as an integer followed by one of \037d\037\n"
+				"(days), \037h\037 (hours), or \037m\037 (minutes).  Combinations (such as\n"
+				"\0371h30m\037) are not permitted.  If a unit specifier is not\n"
+				"included, the default is days (so \037+30\037 by itself means 30\n"
 				"days).  To add an SNLINE which does not expire, use \037+0\037.  If the\n"
 				"realname mask to be added starts with a \037+\037, an expiry time must\n"
 				"be given, even if it is the same as the default.  The\n"
 				"current SNLINE default expiry time can be found with the\n"
 				"\002STATS AKILL\002 command.\n"
 				"Note: because the realname mask may contain spaces, the\n"
-				"separator between it and the reason is a colon.\n"));
+				"separator between it and the reason is a colon."));
 		if (!Config->RegexEngine.empty())
-			source.Reply(" \n"
-					"Regex matches are also supported using the %s engine.\n"
-					"Enclose your mask in // if this desired.", Config->RegexEngine.c_str());
+		{
+			source.Reply(" ");
+			source.Reply(_("Regex matches are also supported using the %s engine.\n"
+					"Enclose your mask in // if this is desired."), Config->RegexEngine.c_str());
+		}
 		source.Reply(_(" \n"
 				"The \002SNLINE DEL\002 command removes the given mask from the\n"
-				"SNLINE list if it is present.  If a list of entry numbers is \n"
-				"given, those entries are deleted.  (See the example for LIST \n"
+				"SNLINE list if it is present.  If a list of entry numbers is\n"
+				"given, those entries are deleted.  (See the example for LIST\n"
 				"below.)\n"
 				" \n"
-				"The \002SNLINE LIST\002 command displays the SNLINE list.  \n"
+				"The \002SNLINE LIST\002 command displays the SNLINE list.\n"
 				"If a wildcard mask is given, only those entries matching the\n"
 				"mask are displayed.  If a list of entry numbers is given,\n"
 				"only those entries are shown; for example:\n"
 				"   \002SNLINE LIST 2-5,7-9\002\n"
-				"      Lists SNLINE entries numbered 2 through 5 and 7 \n"
+				"      Lists SNLINE entries numbered 2 through 5 and 7\n"
 				"      through 9.\n"
 				" \n"
-				"\002SNLINE VIEW\002 is a more verbose version of \002SNLINE LIST\002, and \n"
-				"will show who added an SNLINE, the date it was added, and when \n"
+				"\002SNLINE VIEW\002 is a more verbose version of \002SNLINE LIST\002, and\n"
+				"will show who added an SNLINE, the date it was added, and when\n"
 				"it expires, as well as the realname mask and reason.\n"
 				" \n"
 				"\002SNLINE CLEAR\002 clears all entries of the SNLINE list."));
@@ -473,7 +475,7 @@ class CommandOSSQLine : public CommandOSSXLineBase
 	{
 		if (!this->xlm() || !IRCD->CanSQLine)
 		{
-			source.Reply(_("Your IRCd does not support SQLINE"));
+			source.Reply(_("Your IRCd does not support SQLINE."));
 			return;
 		}
 
@@ -531,7 +533,7 @@ class CommandOSSQLine : public CommandOSSXLineBase
 			ServiceReference<RegexProvider> provider("Regex", Config->RegexEngine);
 			if (!provider)
 			{
-				source.Reply(_("Unable to find regex engine %s"), Config->RegexEngine.c_str());
+				source.Reply(_("Unable to find regex engine %s."), Config->RegexEngine.c_str());
 				return;
 			}
 
@@ -646,44 +648,46 @@ class CommandOSSQLine : public CommandOSSXLineBase
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Allows Services operators to manipulate the SQLINE list.  If\n"
-				"a user with a nick matching an SQLINE mask attempts to \n"
+		source.Reply(_("Allows Services Operators to manipulate the SQLINE list.  If\n"
+				"a user with a nick matching an SQLINE mask attempts to\n"
 				"connect, Services will not allow it to pursue his IRC\n"
 				"session.\n"
-				"If the first character of the mask is #, services will \n"
+				"If the first character of the mask is #, services will\n"
 				"prevent the use of matching channels."));
 		source.Reply(_(" \n"
 				"\002SQLINE ADD\002 adds the given (nick's) mask to the SQLINE\n"
 				"list for the given reason (which \002must\002 be given).\n"
-				"\037expiry\037 is specified as an integer followed by one of \037d\037 \n"
-				"(days), \037h\037 (hours), or \037m\037 (minutes). Combinations (such as \n"
-				"\0371h30m\037) are not permitted. If a unit specifier is not \n"
-				"included, the default is days (so \037+30\037 by itself means 30 \n"
-				"days). To add an SQLINE which does not expire, use \037+0\037. \n"
-				"If the mask to be added starts with a \037+\037, an expiry time \n"
+				"\037expiry\037 is specified as an integer followed by one of \037d\037\n"
+				"(days), \037h\037 (hours), or \037m\037 (minutes). Combinations (such as\n"
+				"\0371h30m\037) are not permitted. If a unit specifier is not\n"
+				"included, the default is days (so \037+30\037 by itself means 30\n"
+				"days). To add an SQLINE which does not expire, use \037+0\037.\n"
+				"If the mask to be added starts with a \037+\037, an expiry time\n"
 				"must be given, even if it is the same as the default. The\n"
 				"current SQLINE default expiry time can be found with the\n"
-				"\002STATS AKILL\002 command.\n"));
+				"\002STATS AKILL\002 command."));
 		if (!Config->RegexEngine.empty())
-			source.Reply(" \n"
-					"Regex matches are also supported using the %s engine.\n"
-					"Enclose your mask in // if this desired.", Config->RegexEngine.c_str());
+		{
+			source.Reply(" ");
+			source.Reply(_("Regex matches are also supported using the %s engine.\n"
+					"Enclose your mask in // if this is desired."), Config->RegexEngine.c_str());
+		}
 		source.Reply(_(" \n"
 				"The \002SQLINE DEL\002 command removes the given mask from the\n"
-				"SQLINE list if it is present. If a list of entry numbers is \n"
-				"given, those entries are deleted. (See the example for LIST \n"
+				"SQLINE list if it is present. If a list of entry numbers is\n"
+				"given, those entries are deleted. (See the example for LIST\n"
 				"below.)\n"
 				" \n"
-				"The \002SQLINE LIST\002 command displays the SQLINE list. \n"
+				"The \002SQLINE LIST\002 command displays the SQLINE list.\n"
 				"If a wildcard mask is given, only those entries matching the\n"
 				"mask are displayed. If a list of entry numbers is given,\n"
 				"only those entries are shown; for example:\n"
 				"   \002SQLINE LIST 2-5,7-9\002\n"
-				"      Lists SQLINE entries numbered 2 through 5 and 7 \n"
+				"      Lists SQLINE entries numbered 2 through 5 and 7\n"
 				"      through 9.\n"
 				" \n"
-				"\002SQLINE VIEW\002 is a more verbose version of \002SQLINE LIST\002, and \n"
-				"will show who added an SQLINE, the date it was added, and when \n"
+				"\002SQLINE VIEW\002 is a more verbose version of \002SQLINE LIST\002, and\n"
+				"will show who added an SQLINE, the date it was added, and when\n"
 				"it expires, as well as the mask and reason.\n"
 				" \n"
 				"\002SQLINE CLEAR\002 clears all entries of the SQLINE list."));

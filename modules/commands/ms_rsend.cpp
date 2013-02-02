@@ -46,7 +46,7 @@ class CommandMSRSend : public Command
 			source.Reply(ACCESS_DENIED);
 		else if (Config->MSMemoReceipt > 2 || Config->MSMemoReceipt == 0)
 		{
-			Log(this->owner) << "MSMemoReceipt is set misconfigured to " << Config->MSMemoReceipt;
+			Log(this->owner) << "MSMemoReceipt is misconfigured to " << Config->MSMemoReceipt;
 			source.Reply(_("Sorry, RSEND has been disabled on this network."));
 		}
 		else
@@ -57,7 +57,7 @@ class CommandMSRSend : public Command
 			else if (result == MemoServService::MEMO_TOO_FAST)
 				source.Reply(_("Please wait %d seconds before using the SEND command again."), Config->MSSendDelay);
 			else if (result == MemoServService::MEMO_TARGET_FULL)
-				source.Reply(_("%s currently has too many memos and cannot receive more."), nick.c_str());
+				source.Reply(_("Sorry, %s currently has too many memos and cannot receive more."), nick.c_str());
 			else	
 			{
 				source.Reply(_("Memo sent to \002%s\002."), name.c_str());

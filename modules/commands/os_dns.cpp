@@ -531,7 +531,7 @@ class CommandOSDNS : public Command
 			}
 		}
 		else
-			source.Reply(_("Unknown SET option"));
+			source.Reply(_("Unknown SET option."));
 	}
 
 	void OnPool(CommandSource &source, const std::vector<Anope::string> &params)
@@ -597,7 +597,7 @@ class CommandOSDNS : public Command
 		this->SetSyntax(_("DELSERVER \037server.name\037 [\037zone.name\037]"));
 		this->SetSyntax(_("ADDIP \037server.name\037 \037ip\037"));
 		this->SetSyntax(_("DELIP \037server.name\037 \037ip\037"));
-		this->SetSyntax(_("SET \037server.name\037 \37option\37 \037value\037"));
+		this->SetSyntax(_("SET \037server.name\037 \037option\037 \037value\037"));
 		this->SetSyntax(_("POOL \037server.name\037"));
 		this->SetSyntax(_("DEPOOL \037server.name\037"));
 	}
@@ -636,16 +636,16 @@ class CommandOSDNS : public Command
 				"are directed to when connecting. Omitting all parameters prints out the status of\n"
 				"the DNS zone.\n"
 				" \n"
-				"\2ADDZONE\2 adds a zone, eg us.yournetwork.tld. Servers can then be added to this\n"
-				"zone with the \2ADDSERVER\2 command.\n"
+				"\002ADDZONE\002 adds a zone, eg us.yournetwork.tld. Servers can then be added to this\n"
+				"zone with the \002ADDSERVER\002 command.\n"
 				" \n"
-				"The \2ADDSERVER\2 command adds a server to the given zone. When a query is done, the\n"
+				"The \002ADDSERVER\002 command adds a server to the given zone. When a query is done, the\n"
 				"zone in question is served if it exists, else all servers in all zones are served.\n"
 				"A server may be in more than one zone.\n"
 				" \n"
-				"The \2ADDIP\2 command associates an IP with a server.\n"
+				"The \002ADDIP\002 command associates an IP with a server.\n"
 				" \n"
-				"The \2POOL\2 and \2DEPOOL\2 commands actually add and remove servers to their given zones."));
+				"The \002POOL\002 and \002DEPOOL\002 commands actually add and remove servers to their given zones."));
 		return true;
 	}
 };

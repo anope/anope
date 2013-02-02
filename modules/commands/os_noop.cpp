@@ -32,7 +32,7 @@ class CommandOSNOOP : public Command
 		if (s == NULL)
 			source.Reply(_("Server %s does not exist."), server.c_str());
 		else if (s == Me || s->IsJuped())
-			source.Reply(_("You may not NOOP services."));
+			source.Reply(_("You can not NOOP Services."));
 		else if (cmd.equals_ci("SET"))
 		{
 			/* Remove the O:lines */

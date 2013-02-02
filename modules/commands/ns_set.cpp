@@ -164,7 +164,7 @@ class CommandNSSASetPassword : public Command
 
 		if (Config->NSSecureAdmins && source.nc != nc && nc->IsServicesOper())
 		{
-			source.Reply(_("You may not change the password of other services operators."));
+			source.Reply(_("You may not change the password of other Services Operators."));
 			return;
 		}
 		else if (nc->display.equals_ci(params[1]) || (Config->StrictPasswords && len < 5))
@@ -202,53 +202,55 @@ class CommandNSSetAutoOp : public Command
  public:
 	CommandNSSetAutoOp(Module *creator, const Anope::string &sname = "nickserv/set/autoop", size_t min = 1) : Command(creator, sname, min, min + 1)
 	{
-		 this->SetDesc(_("Should services op you automatically."));
-		 this->SetSyntax(_("{ON | OFF}"));
+		this->SetDesc(_("Sets whether services should set channel status modes on you automatically."));
+		this->SetSyntax(_("{ON | OFF}"));
 	}
 
 	void Run(CommandSource &source, const Anope::string &user, const Anope::string &param)
 	{
-		 const NickAlias *na = NickAlias::Find(user);
-		 if (na == NULL)
-		 {
-			  source.Reply(NICK_X_NOT_REGISTERED, user.c_str());
-			  return;
-		 }
-		 NickCore *nc = na->nc;
+		const NickAlias *na = NickAlias::Find(user);
+		if (na == NULL)
+		{
+			source.Reply(NICK_X_NOT_REGISTERED, user.c_str());
+			return;
+		}
+		NickCore *nc = na->nc;
 
-		 EventReturn MOD_RESULT;
-		 FOREACH_RESULT(I_OnSetNickOption, OnSetNickOption(source, this, nc, param));
-		 if (MOD_RESULT == EVENT_STOP)
-			  return;
+		EventReturn MOD_RESULT;
+		FOREACH_RESULT(I_OnSetNickOption, OnSetNickOption(source, this, nc, param));
+		if (MOD_RESULT == EVENT_STOP)
+			return;
 
-		 if (param.equals_ci("ON"))
-		 {
-			  nc->ExtendMetadata("AUTOOP");
-			  source.Reply(_("Services will now autoop %s in channels."), nc->display.c_str());
-		 }
-		 else if (param.equals_ci("OFF"))
-		 {
-			  nc->Shrink("AUTOOP");
-			  source.Reply(_("Services will no longer autoop %s in channels."), nc->display.c_str());
-		 }
-		 else
-			  this->OnSyntaxError(source, "AUTOOP");
+		if (param.equals_ci("ON"))
+		{
+			nc->ExtendMetadata("AUTOOP");
+			source.Reply(_("Services will from now on set status modes on %s in channels."), nc->display.c_str());
+		}
+		else if (param.equals_ci("OFF"))
+		{
+			nc->Shrink("AUTOOP");
+			source.Reply(_("Services will no longer set status modes on %s in channels."), nc->display.c_str());
+		}
+		else
+			this->OnSyntaxError(source, "AUTOOP");
 
-		 return;
+		return;
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		 this->Run(source, source.nc->display, params[0]);
+		this->Run(source, source.nc->display, params[0]);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &) anope_override
 	{
-		 this->SendSyntax(source);
-		 source.Reply(" ");
-		 source.Reply(_("Sets whether you will be opped automatically. Set to ON to \n"
-				   "allow ChanServ to op you automatically when entering channels."));
-		 return true;
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_("Sets whether you will be given your channel status modes automatically.\n"
+					"Set to \002ON\002 to allow ChanServ to set status modes on you automatically\n"
+					"when entering channels. Note that depending on channel settings some modes\n"
+					"may not get set automatically."));
+		return true;
 	}
 };
 
@@ -270,9 +272,11 @@ class CommandNSSASetAutoOp : public CommandNSSetAutoOp
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Sets whether the given nickname will be opped automatically.\n"
-				"Set to \002ON\002 to allow ChanServ to op the given nickname \n"
-				"omatically when joining channels."));
+		source.Reply(_("Sets whether the given nickname will be given its status modes\n"
+				"in channels automatically. Set to \002ON\002 to allow ChanServ\n"
+				"to set status modes on the given nickname automatically when it\n"
+				"is entering channels. Note that depending on channel settings\n"
+				"some modes may not get set automatically."));
 		return true;
 	}
 };
@@ -302,12 +306,12 @@ class CommandNSSetChanstats : public Command
 		if (param.equals_ci("ON"))
 		{
 			na->nc->ExtendMetadata("STATS");
-			source.Reply(_("Chanstat statistics are now enabled for your nick"));
+			source.Reply(_("Chanstat statistics are now enabled for your nick."));
 		}
 		else if (param.equals_ci("OFF"))
 		{
 			na->nc->Shrink("STATS");
-			source.Reply(_("Chanstat statistics are now disabled for your nick"));
+			source.Reply(_("Chanstat statistics are now disabled for your nick."));
 		}
 		else
 			this->OnSyntaxError(source, "CHANSTATS");
@@ -324,7 +328,7 @@ class CommandNSSetChanstats : public Command
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Turns Chanstats statistics ON or OFF"));
+		source.Reply(_("Turns Chanstats statistics ON or OFF."));
 		return true;
 	}
 };
@@ -347,7 +351,7 @@ class CommandNSSASetChanstats : public CommandNSSetChanstats
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Turns chanstats channel statistics ON or OFF for this user"));
+		source.Reply(_("Turns chanstats channel statistics ON or OFF for this user."));
 		return true;
 	}
 };
@@ -377,7 +381,7 @@ class CommandNSSetDisplay : public Command
 		}
 		else if (!na || *na->nc != *user_na->nc)
 		{
-			source.Reply(_("The new display MUST be a nickname of the nickname group %s"), user_na->nc->display.c_str());
+			source.Reply(_("The new display MUST be a nickname of the nickname group %s."), user_na->nc->display.c_str());
 			return;
 		}
 
@@ -399,7 +403,7 @@ class CommandNSSetDisplay : public Command
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Changes the display used to refer to your nickname group in \n"
+		source.Reply(_("Changes the display used to refer to your nickname group in\n"
 				"Services. The new display MUST be a nick of your group."));
 		return true;
 	}
@@ -423,7 +427,7 @@ class CommandNSSASetDisplay : public CommandNSSetDisplay
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Changes the display used to refer to the nickname group in \n"
+		source.Reply(_("Changes the display used to refer to the nickname group in\n"
 				"Services. The new display MUST be a nick of the group."));
 		return true;
 	}
@@ -485,7 +489,7 @@ class CommandNSSetEmail : public Command
 		}
 		else if (Config->NSSecureAdmins && source.nc != nc && nc->IsServicesOper())
 		{
-			source.Reply(_("You may not change the email of other services operators."));
+			source.Reply(_("You may not change the e-mail of other Services Operators."));
 			return;
 		}
 		else if (!param.empty() && !Mail::Validate(param))
@@ -505,7 +509,7 @@ class CommandNSSetEmail : public Command
 			Anope::string old = source.nc->email;
 			source.nc->email = param;
 			if (SendConfirmMail(source.GetUser(), source.service))
-				source.Reply(_("A confirmation email has been sent to \002%s\002. Follow the instructions in it to change your email address."), param.c_str());
+				source.Reply(_("A confirmation e-mail has been sent to \002%s\002. Follow the instructions in it to change your e-mail address."), param.c_str());
 			source.nc->email = old;
 		}
 		else
@@ -613,7 +617,7 @@ class CommandNSSetGreet : public Command
 		source.Reply(" ");
 		source.Reply(_("Makes the given message the greet of your nickname, that\n"
 				"will be displayed when joining a channel that has GREET\n"
-				"option enabled, provided that you have the necessary \n"
+				"option enabled, provided that you have the necessary\n"
 				"access on it."));
 		return true;
 	}
@@ -639,7 +643,7 @@ class CommandNSSASetGreet : public CommandNSSetGreet
 		source.Reply(" ");
 		source.Reply(_("Makes the given message the greet of the nickname, that\n"
 				"will be displayed when joining a channel that has GREET\n"
-				"option enabled, provided that the user has the necessary \n"
+				"option enabled, provided that the user has the necessary\n"
 				"access on it."));
 		return true;
 	}
@@ -1051,8 +1055,8 @@ class CommandNSSetMessage : public Command
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Allows you to choose the way Services are communicating with \n"
-				"you. With \002MSG\002 set, Services will use messages, else they'll \n"
+		source.Reply(_("Allows you to choose the way Services are communicating with\n"
+				"you. With \002MSG\002 set, Services will use messages, else they'll\n"
 				"use notices."));
 		return true;
 	}
@@ -1077,7 +1081,7 @@ class CommandNSSASetMessage : public CommandNSSetMessage
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Allows you to choose the way Services are communicating with \n"
+		source.Reply(_("Allows you to choose the way Services are communicating with\n"
 				"the given user. With \002MSG\002 set, Services will use messages,\n"
 				"else they'll use notices."));
 		return true;

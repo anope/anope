@@ -37,7 +37,7 @@ class CommandNSLogout : public Command
 		else if (!(u2 = (!nick.empty() ? User::Find(nick, true) : source.GetUser())))
 			source.Reply(NICK_X_NOT_IN_USE, !nick.empty() ? nick.c_str() : source.GetNick().c_str());
 		else if (!nick.empty() && u2->IsServicesOper())
-			source.Reply(_("You can't logout %s because they are a Services Operator."), nick.c_str());
+			source.Reply(_("You can't logout %s, they are a Services Operator."), nick.c_str());
 		else
 		{
 			if (!nick.empty() && !param.empty() && param.equals_ci("REVALIDATE") && NickServService)
@@ -66,14 +66,14 @@ class CommandNSLogout : public Command
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Without a parameter, reverses the effect of the \002IDENTIFY\002 \n"
+		source.Reply(_("Without a parameter, reverses the effect of the \002IDENTIFY\002\n"
 				"command, i.e. make you not recognized as the real owner of the nick\n"
 				"anymore. Note, however, that you won't be asked to reidentify\n"
 				"yourself.\n"
 				" \n"
-				"With a parameter, does the same for the given nick. If you \n"
-				"specify REVALIDATE as well, Services will ask the given nick\n"
-				"to re-identify. This use limited to \002Services Operators\002."));
+				"With a parameter, does the same for the given nick. If you\n"
+				"specify \002REVALIDATE\002 as well, Services will ask the given nick\n"
+				"to re-identify. This is limited to \002Services Operators\002."));
 
 		return true;
 	}

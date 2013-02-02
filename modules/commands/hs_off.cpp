@@ -46,7 +46,7 @@ class CommandHSOff : public Command
 		source.Reply(" ");
 		source.Reply(_("Deactivates the vhost currently assigned to the nick in use.\n"
 				"When you use this command any user who performs a /whois\n"
-				"on you will see your real IP address."));
+				"on you will see your real host/IP address."));
 		return true;
 	}
 };

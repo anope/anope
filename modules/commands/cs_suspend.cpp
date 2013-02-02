@@ -92,7 +92,7 @@ class CommandCSSuspend : public Command
 		this->SendSyntax(source);
 		source.Reply(" ");
 		source.Reply(_("Disallows anyone from using the given channel.\n"
-				"May be cancelled by using the UNSUSPEND\n"
+				"May be cancelled by using the \002UNSUSPEND\002\n"
 				"command to preserve all previous channel data/settings.\n"
 				"If an expiry is given the channel will be unsuspended after\n"
 				"that period of time, else the default expiry from the"
@@ -128,7 +128,7 @@ class CommandCSUnSuspend : public Command
 		/* Only UNSUSPEND already suspended channels */
 		if (!ci->HasExt("SUSPENDED"))
 		{
-			source.Reply(_("Channel \2%s\2 isn't suspended."), ci->name.c_str());
+			source.Reply(_("Channel \002%s\002 isn't suspended."), ci->name.c_str());
 			return;
 		}
 

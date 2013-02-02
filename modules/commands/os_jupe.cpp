@@ -29,9 +29,9 @@ class CommandOSJupe : public Command
 		Server *server = Server::Find(jserver);
 
 		if (!IRCD->IsHostValid(jserver) || jserver.find('.') == Anope::string::npos)
-			source.Reply(_("Please use a valid server name when juping"));
+			source.Reply(_("Please use a valid server name when juping."));
 		else if (server && (server == Me || server == Me->GetLinks().front()))
-			source.Reply(_("You can not jupe your services server or your uplink server."));
+			source.Reply(_("You can not jupe your Services' pseudoserver or your uplink server."));
 		else
 		{
 			Anope::string rbuf = "Juped by " + source.GetNick() + (!reason.empty() ? ": " + reason : "");

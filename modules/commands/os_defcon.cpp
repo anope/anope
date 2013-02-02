@@ -182,7 +182,7 @@ class CommandOSDefcon : public Command
 
 		if (lvl.empty())
 		{
-			source.Reply(_("Services are now at DEFCON \002%d\002"), DConfig.defaultlevel);
+			source.Reply(_("Services are now at DEFCON \002%d\002."), DConfig.defaultlevel);
 			this->SendLevels(source);
 			return;
 		}
@@ -209,7 +209,7 @@ class CommandOSDefcon : public Command
 		if (DConfig.timeout)
 			timeout = new DefConTimeout(this->module, 5);
 
-		source.Reply(_("Services are now at DEFCON \002%d\002"), DConfig.defaultlevel);
+		source.Reply(_("Services are now at DEFCON \002%d\002."), DConfig.defaultlevel);
 		this->SendLevels(source);
 		Log(LOG_ADMIN, source, this) << "to change defcon level to " << newLevel;
 
@@ -451,7 +451,7 @@ class OSDefcon : public Module
 		{
 			if (DConfig.Check(DEFCON_NO_NEW_NICKS))
 			{
-				source.Reply(_("Services are in Defcon mode, Please try again later."));
+				source.Reply(_("Services are in DefCon mode, please try again later."));
 				return EVENT_STOP;
 			}
 		}
@@ -459,7 +459,7 @@ class OSDefcon : public Module
 		{
 			if (DConfig.Check(DEFCON_NO_MLOCK_CHANGE))
 			{
-				source.Reply(_("Services are in Defcon mode, Please try again later."));
+				source.Reply(_("Services are in DefCon mode, please try again later."));
 				return EVENT_STOP;
 			}
 		}
@@ -467,7 +467,7 @@ class OSDefcon : public Module
 		{
 			if (DConfig.Check(DEFCON_NO_NEW_CHANNELS))
 			{
-				source.Reply(_("Services are in Defcon mode, Please try again later."));
+				source.Reply(_("Services are in DefCon mode, please try again later."));
 				return EVENT_STOP;
 			}
 		}
@@ -475,7 +475,7 @@ class OSDefcon : public Module
 		{
 			if (DConfig.Check(DEFCON_NO_NEW_MEMOS))
 			{
-				source.Reply(_("Services are in Defcon mode, Please try again later."));
+				source.Reply(_("Services are in DefCon mode, please try again later."));
 				return EVENT_STOP;
 			}
 		}
@@ -535,7 +535,7 @@ class OSDefcon : public Module
 				{
 					XLine x("*@" + u->host, Config->OperServ, Anope::CurTime + Config->SessionAutoKillExpiry, "Defcon session limit exceeded", XLineManager::GenerateUID());
 					akills->Send(NULL, &x);
-					Log(OperServ, "akill/defcon") << "[DEFCON] Added a temporary AKILL for \2*@" << u->host << "\2 due to excessive connections";
+					Log(OperServ, "akill/defcon") << "[DEFCON] Added a temporary AKILL for \002*@" << u->host << "\002 due to excessive connections";
 				}
 				else
 				{

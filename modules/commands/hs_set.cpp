@@ -95,7 +95,7 @@ class CommandHSSet : public Command
 		source.Reply(" ");
 		source.Reply(_("Sets the vhost for the given nick to that of the given\n"
 				"hostmask.  If your IRCD supports vIdents, then using\n"
-				"SET <nick> <ident>@<hostmask> set idents for users as \n"
+				"SET <nick> <ident>@<hostmask> set idents for users as\n"
 				"well as vhosts."));
 		return true;
 	}

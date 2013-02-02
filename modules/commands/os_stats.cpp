@@ -133,7 +133,7 @@ class CommandOSStats : public Command
 		time_t uptime = Anope::CurTime - Anope::StartTime;
 		source.Reply(_("Current users: \002%d\002 (\002%d\002 ops)"), UserListByNick.size(), OperCount);
 		source.Reply(_("Maximum users: \002%d\002 (%s)"), MaxUserCount, Anope::strftime(MaxUserTime).c_str());
-		source.Reply(_("Services up %s"), Anope::Duration(uptime).c_str());
+		source.Reply(_("Services up %s."), Anope::Duration(uptime).c_str());
 
 		return;
 	}
@@ -197,7 +197,7 @@ class CommandOSStats : public Command
 		akills("XLineManager", "xlinemanager/sgline"), snlines("XLineManager", "xlinemanager/snline"), sqlines("XLineManager", "xlinemanager/sqline")
 	{
 		this->SetDesc(_("Show status of Services and network"));
-		this->SetSyntax(_("[AKILL | ALL | HASH | RESET | UPLINK]"));
+		this->SetSyntax(_("[AKILL | HASH | UPLINK | UPTIME | ALL | RESET]"));
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
@@ -210,17 +210,17 @@ class CommandOSStats : public Command
 		if (extra.equals_ci("ALL") || extra.equals_ci("AKILL"))
 			this->DoStatsAkill(source);
 
-		if (extra.empty() || extra.equals_ci("ALL") || extra.equals_ci("UPTIME"))
-			this->DoStatsUptime(source);
+		if (extra.equals_ci("ALL") || extra.equals_ci("HASH"))
+			this->DoStatsHash(source);
 
 		if (extra.equals_ci("ALL") || extra.equals_ci("UPLINK"))
 			this->DoStatsUplink(source);
 
-		if (extra.equals_ci("ALL") || extra.equals_ci("HASH"))
-			this->DoStatsHash(source);
+		if (extra.empty() || extra.equals_ci("ALL") || extra.equals_ci("UPTIME"))
+			this->DoStatsUptime(source);
 
-		if (!extra.empty() && !extra.equals_ci("ALL") && !extra.equals_ci("AKILL") && !extra.equals_ci("UPLINK") && !extra.equals_ci("HASH"))
-			source.Reply(_("Unknown STATS option \002%s\002."), extra.c_str());
+		if (!extra.empty() && !extra.equals_ci("ALL") && !extra.equals_ci("AKILL") && !extra.equals_ci("HASH") && !extra.equals_ci("UPLINK") && !extra.equals_ci("UPTIME"))
+			source.Reply(_("Unknown STATS option: \002%s\002"), extra.c_str());
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override

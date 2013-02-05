@@ -173,7 +173,7 @@ class NSSetMisc : public Module
 
 		for (int i = 0; i < config.Enumerate("command"); ++i)
 		{
-			if (config.ReadValue("command", "command", "", i) != "nickserv/set/misc")
+			if (config.ReadValue("command", "command", "", i) != "nickserv/set/misc" && config.ReadValue("command", "command", "", i) != "nickserv/saset/misc")
 				continue;
 
 			Anope::string cname = config.ReadValue("command", "name", "", i);

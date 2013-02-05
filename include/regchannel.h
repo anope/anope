@@ -165,6 +165,10 @@ class CoreExport ChannelInfo : public Serializable, public Extensible
 	std::map<Anope::string, int16_t> levels;
 
  public:
+ 	friend class ChanAccess;
+	friend class AutoKick;
+	friend class BadWord;
+
 	typedef std::multimap<Anope::string, ModeLock *> ModeList;
 	Serialize::Checker<ModeList> mode_locks;
 	Serialize::Checker<std::vector<LogSetting *> > log_settings;
@@ -257,14 +261,6 @@ class CoreExport ChannelInfo : public Serializable, public Extensible
 	 */
 	void EraseAccess(unsigned index);
 
-	/** Erase an entry from the channel access list
-	 *
-	 * @param taccess The access to remove
-	 *
-	 * Clears the memory used by the given access entry and removes it from the vector.
-	 */
-	void EraseAccess(const ChanAccess *taccess);
-
 	/** Clear the entire channel access list
 	 *
 	 * Clears the entire access list by deleting every item and then clearing the vector.
@@ -300,8 +296,6 @@ class CoreExport ChannelInfo : public Serializable, public Extensible
 	 */
 	unsigned GetAkickCount() const;
 
-	void EraseAkick(const AutoKick *akick);
-
 	/** Erase an entry from the channel akick list
 	 * @param index The index of the akick
 	 */
@@ -328,8 +322,6 @@ class CoreExport ChannelInfo : public Serializable, public Extensible
 	 * @return The number of badwords in the vector
 	 */
 	unsigned GetBadWordCount() const;
-
-	void EraseBadWord(const BadWord *bw);
 
 	/** Remove a badword
 	 * @param index The index of the badword

@@ -70,7 +70,7 @@ bool WebCPanel::ChanServ::Access::OnRequest(HTTPProvider *server, const Anope::s
 							denied = true;
 						}
 						else
-							ci->EraseAccess(acc);
+							acc->Destroy();
 						break;
 					}
 				}

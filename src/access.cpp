@@ -97,8 +97,12 @@ ChanAccess::ChanAccess(AccessProvider *p) : Serializable("ChanAccess"), provider
 
 ChanAccess::~ChanAccess()
 {
-	if (ci)
-		ci->EraseAccess(this);
+	if (this->ci)
+	{
+		std::vector<ChanAccess *>::iterator it = std::find(this->ci->access->begin(), this->ci->access->end(), this);
+		if (it != this->ci->access->end())
+			this->ci->access->erase(it);
+	}
 }
 
 void ChanAccess::Serialize(Serialize::Data &data) const

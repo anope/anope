@@ -29,8 +29,12 @@ BadWord::BadWord() : Serializable("BadWord")
 
 BadWord::~BadWord()
 {
-	if (ci)
-		ci->EraseBadWord(this);
+	if (this->ci)
+	{
+		std::vector<BadWord *>::iterator it = std::find(this->ci->badwords->begin(), this->ci->badwords->end(), this);
+		if (it != this->ci->badwords->end())
+			this->ci->badwords->erase(it);
+	}
 }
 
 void BadWord::Serialize(Serialize::Data &data) const
@@ -74,7 +78,11 @@ AutoKick::AutoKick() : Serializable("AutoKick")
 AutoKick::~AutoKick()
 {
 	if (this->ci)
-		this->ci->EraseAkick(this);
+	{
+		std::vector<AutoKick *>::iterator it = std::find(this->ci->akick->begin(), this->ci->akick->end(), this);
+		if (it != this->ci->akick->end())
+			this->ci->akick->erase(it);
+	}
 }
 
 void AutoKick::Serialize(Serialize::Data &data) const
@@ -613,13 +621,6 @@ void ChannelInfo::EraseAccess(unsigned index)
 	this->access->at(index)->Destroy();
 }
 
-void ChannelInfo::EraseAccess(const ChanAccess *taccess)
-{
-	std::vector<ChanAccess *>::iterator it = std::find(this->access->begin(), this->access->end(), taccess);
-	if (it != this->access->end())
-		this->access->erase(it);
-}
-
 void ChannelInfo::ClearAccess()
 {
 	for (unsigned i = this->access->size(); i > 0; --i)
@@ -672,13 +673,6 @@ unsigned ChannelInfo::GetAkickCount() const
 	return this->akick->size();
 }
 
-void ChannelInfo::EraseAkick(const AutoKick *takick)
-{
-	std::vector<AutoKick *>::iterator it = std::find(this->akick->begin(), this->akick->end(), takick);
-	if (it != this->akick->end())
-		this->akick->erase(it);
-}
-
 void ChannelInfo::EraseAkick(unsigned index)
 {
 	if (this->akick->empty() || index >= this->akick->size())
@@ -720,13 +714,6 @@ BadWord* ChannelInfo::GetBadWord(unsigned index) const
 unsigned ChannelInfo::GetBadWordCount() const
 {
 	return this->badwords->size();
-}
-
-void ChannelInfo::EraseBadWord(const BadWord *bw)
-{
-	std::vector<BadWord *>::iterator it = std::find(this->badwords->begin(), this->badwords->end(), bw);
-	if (it != this->badwords->end())
-		this->badwords->erase(it);
 }
 
 void ChannelInfo::EraseBadWord(unsigned index)

@@ -107,7 +107,10 @@ void Join::SJoin(MessageSource &source, const Anope::string &chan, time_t ts, co
 	
 	/* Update the modes for the channel */
 	if (keep_their_modes && !modes.empty())
-		c->SetModesInternal(source, modes);
+		/* If we are syncing, mlock is checked later in Channel::Sync. It is important to not check it here
+		 * so that Channel::SetCorrectModes can correctly detect the presence of channel mode +r.
+		 */
+		c->SetModesInternal(source, modes, ts, !c->HasExt("SYNCING"));
 	
 	for (std::list<SJoinUser>::const_iterator it = users.begin(), it_end = users.end(); it != it_end; ++it)
 	{

@@ -928,7 +928,8 @@ void Channel::SetCorrectModes(User *user, bool give_modes, bool check_noop)
 		*admin = ModeManager::FindChannelModeByName("PROTECT"),
 		*op = ModeManager::FindChannelModeByName("OP"),
 		*halfop = ModeManager::FindChannelModeByName("HALFOP"),
-		*voice = ModeManager::FindChannelModeByName("VOICE");
+		*voice = ModeManager::FindChannelModeByName("VOICE"),
+		*registered = ModeManager::FindChannelModeByName("REGISTERED");
 
 	if (user == NULL)
 		return;
@@ -954,8 +955,12 @@ void Channel::SetCorrectModes(User *user, bool give_modes, bool check_noop)
 		else if (voice && u_access.HasPriv("AUTOVOICE"))
 			this->SetMode(NULL, "VOICE", user->GetUID());
 	}
-	/* If this channel has secureops or the channel is syncing and they are not ulined, check to remove modes */
-	if ((ci->HasExt("SECUREOPS") || (this->HasExt("SYNCING") && user->server->IsSynced())) && !user->server->IsULined())
+	/* If this channel has secureops, or the registered channel mode exists and the channel does not have +r set (aka the channel
+	 * was created just now or while we were off), or the registered channel mode does not exist and channel is syncing (aka just
+	 * created *to us*) and the user's server is synced (aka this isn't us doing our initial uplink - without this we would be deopping all
+	 * users with no access on a non-secureops channel on startup), and the user's server isn't ulined, then set negative modes.
+	 */
+	if ((ci->HasExt("SECUREOPS") || (registered && !this->HasMode("REGISTERED")) || (!registered && this->HasExt("SYNCING") && user->server->IsSynced())) && !user->server->IsULined())
 	{
 		if (owner && !u_access.HasPriv("AUTOOWNER") && !u_access.HasPriv("OWNERME"))
 			this->RemoveMode(NULL, "OWNER", user->GetUID());

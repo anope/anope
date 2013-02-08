@@ -189,7 +189,7 @@ class DNSServer : public Serializable
 	static DNSServer *Find(const Anope::string &s)
 	{
 		for (unsigned i = 0; i < dns_servers->size(); ++i)
-			if (dns_servers->at(i)->GetName() == s)
+			if (dns_servers->at(i)->GetName().equals_ci(s))
 			{
 				DNSServer *serv = dns_servers->at(i);
 				serv->QueueUpdate();

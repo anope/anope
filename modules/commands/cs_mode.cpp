@@ -49,12 +49,29 @@ class CommandCSMode : public Command
 
 		bool override = !source.AccessFor(ci).HasPriv("MODE");
 
-		if (subcommand.equals_ci("ADD") && !param.empty())
+		if ((subcommand.equals_ci("ADD") || subcommand.equals_ci("SET")) && !param.empty())
 		{
+			/* If setting, remove the existing locks */
+			if (subcommand.equals_ci("SET"))
+			{
+				const ChannelInfo::ModeList &mlocks = ci->GetMLock();
+				for (ChannelInfo::ModeList::const_iterator it = mlocks.begin(), it_next; it != mlocks.end(); it = it_next)
+				{
+					const ModeLock *ml = it->second;
+					ChannelMode *cm = ModeManager::FindChannelModeByName(ml->name);
+					it_next = it;
+					++it_next;
+					if (cm && cm->CanSet(source.GetUser()))
+						ci->RemoveMLock(cm, ml->set, ml->param);
+				}
+			}
+
 			spacesepstream sep(param);
 			Anope::string modes;
 
 			sep.GetToken(modes);
+
+			Anope::string pos = "+", neg = "-", pos_params, neg_params;
 			
 			int adding = -1;
 			for (size_t i = 0; i < modes.length(); ++i)
@@ -88,13 +105,31 @@ class CommandCSMode : public Command
 						else
 						{
 							ci->SetMLock(cm, adding, mode_param, source.GetNick()); 
-							if (!mode_param.empty())
-								mode_param = " " + mode_param;
-							source.Reply(_("%c%c%s locked on %s"), adding ? '+' : '-', cm->mchar, mode_param.c_str(), ci->name.c_str());
-							Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to lock " << (adding ? '+' : '-') << cm->mchar << mode_param;
+
+							if (adding)
+							{
+								pos += cm->mchar;
+								if (!mode_param.empty())
+									pos_params += " " + mode_param;
+							}
+							else
+							{
+								neg += cm->mchar;
+								if (!mode_param.empty())
+									neg_params += " " + mode_param;
+							}
 						}
 				}
 			}
+
+			if (pos == "+")
+				pos.clear();
+			if (neg == "-")
+				neg.clear();
+			Anope::string reply = pos + neg + pos_params + neg_params;
+
+			source.Reply(_("%s locked on %s."), ci->GetMLockAsString(true).c_str(), ci->name.c_str());
+			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to lock " << ci->GetMLockAsString(true);
 
 			if (ci->c)
 				ci->c->CheckModes();
@@ -358,7 +393,7 @@ class CommandCSMode : public Command
 	CommandCSMode(Module *creator) : Command(creator, "chanserv/mode", 3, 4)
 	{
 		this->SetDesc(_("Control modes and mode locks on a channel"));
-		this->SetSyntax(_("\037channel\037 LOCK {ADD|DEL|LIST} [\037what\037]"));
+		this->SetSyntax(_("\037channel\037 LOCK {ADD|DEL|SET|LIST} [\037what\037]"));
 		this->SetSyntax(_("\037channel\037 SET \037modes\037"));
 	}
 
@@ -391,7 +426,9 @@ class CommandCSMode : public Command
 			"on a channel.\n"
 			" \n"
 			"The \002MODE LOCK\002 command allows you to add, delete, and view mode locks on a channel.\n"
-			"If a mode is locked on or off, services will not allow that mode to be changed.\n"
+			"If a mode is locked on or off, services will not allow that mode to be changed. The \2SET\2\n"
+			"command will clear all existing mode locks and set the new one given, while \2ADD\2 and \2DEL\2\n"
+			"modify the existing mode lock.\n"
 			"Example:\n"
 			"     \002MODE #channel LOCK ADD +bmnt *!*@*aol*\002\n"
 			" \n"

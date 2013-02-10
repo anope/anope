@@ -108,7 +108,7 @@ bool sepstream::GetToken(Anope::string &token)
 bool sepstream::GetToken(Anope::string &token, int num)
 {
 	int i;
-	for (i = 0; i < num + 1 && !this->GetToken(token); ++i);
+	for (i = 0; i < num + 1 && this->GetToken(token); ++i);
 	return i == num + 1;
 }
 

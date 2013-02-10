@@ -74,7 +74,11 @@ class CommandCSList : public Command
 		ListFormatter list;
 		list.AddColumn("Name").AddColumn("Description");
 
+		Anope::map<ChannelInfo *> ordered_map;
 		for (registered_channel_map::const_iterator it = RegisteredChannelList->begin(), it_end = RegisteredChannelList->end(); it != it_end; ++it)
+			ordered_map[it->first] = it->second;
+
+		for (Anope::map<ChannelInfo *>::const_iterator it = ordered_map.begin(), it_end = ordered_map.end(); it != it_end; ++it)
 		{
 			const ChannelInfo *ci = it->second;
 

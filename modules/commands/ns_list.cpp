@@ -75,7 +75,11 @@ class CommandNSList : public Command
 
 		list.AddColumn("Nick").AddColumn("Last usermask");
 
+		Anope::map<NickAlias *> ordered_map;
 		for (nickalias_map::const_iterator it = NickAliasList->begin(), it_end = NickAliasList->end(); it != it_end; ++it)
+			ordered_map[it->first] = it->second;
+
+		for (Anope::map<NickAlias *>::const_iterator it = ordered_map.begin(), it_end = ordered_map.end(); it != it_end; ++it)
 		{
 			const NickAlias *na = it->second;
 

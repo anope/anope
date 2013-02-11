@@ -43,6 +43,7 @@ static int langorder[NUM_LANGS] = {
     LANG_RU,                    /* Russian */
     LANG_HUN,                   /* Hungarian */
     LANG_PL,                    /* Polish */
+    LANG_JA_UTF8,               /* Japanese (UTF-8 encoding) */
 };
 
 /*************************************************************************/
@@ -191,6 +192,7 @@ void lang_init()
     load_lang(LANG_RU, "ru");
     load_lang(LANG_HUN, "hun");
     load_lang(LANG_PL, "pl");
+    load_lang(LANG_JA_UTF8, "ja_utf8");
 
     for (i = 0; i < NUM_LANGS; i++) {
         if (langtexts[langorder[i]] != NULL) {

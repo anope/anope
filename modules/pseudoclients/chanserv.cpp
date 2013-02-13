@@ -103,17 +103,18 @@ class ChanServCore : public Module
 
 	void OnDelCore(NickCore *nc) anope_override
 	{
-		// XXX this is slightly inefficient
-		for (registered_channel_map::const_iterator it = RegisteredChannelList->begin(), it_end = RegisteredChannelList->end(); it != it_end;)
+		std::deque<ChannelInfo *> chans;
+		nc->GetChannelReferences(chans);
+
+		for (unsigned i = 0; i < chans.size(); ++i)
 		{
-			ChannelInfo *ci = it->second;
-			++it;
+			ChannelInfo *ci = chans[i];
 
 			if (ci->GetFounder() == nc)
 			{
 				NickCore *newowner = NULL;
-				if (ci->successor && (ci->successor->IsServicesOper() || !Config->CSMaxReg || ci->successor->channelcount < Config->CSMaxReg))
-					newowner = ci->successor;
+				if (ci->GetSuccessor() && ci->GetSuccessor() != nc && (ci->GetSuccessor()->IsServicesOper() || !Config->CSMaxReg || ci->GetSuccessor()->channelcount < Config->CSMaxReg))
+					newowner = ci->GetSuccessor();
 				else
 				{
 					const ChanAccess *highest = NULL;
@@ -135,7 +136,7 @@ class ChanServCore : public Module
 				{
 					Log(LOG_NORMAL, "chanserv/expire") << "Transferring foundership of " << ci->name << " from deleted nick " << nc->display << " to " << newowner->display;
 					ci->SetFounder(newowner);
-					ci->successor = NULL;
+					ci->SetSuccessor(NULL);
 				}
 				else
 				{
@@ -146,8 +147,8 @@ class ChanServCore : public Module
 				}
 			}
 
-			if (ci->successor == nc)
-				ci->successor = NULL;
+			if (ci->GetSuccessor() == nc)
+				ci->SetSuccessor(NULL);
 
 			for (unsigned j = 0; j < ci->GetAccessCount(); ++j)
 			{
@@ -161,11 +162,14 @@ class ChanServCore : public Module
 				}
 			}
 
-			for (unsigned j = ci->GetAkickCount(); j > 0; --j)
+			for (unsigned j = 0; j < ci->GetAkickCount(); ++j)
 			{
-				const AutoKick *akick = ci->GetAkick(j - 1);
+				const AutoKick *akick = ci->GetAkick(j);
 				if (akick->nc == nc)
-					ci->EraseAkick(j - 1);
+				{
+					ci->EraseAkick(j);
+					break;
+				}
 			}
 		}
 	}

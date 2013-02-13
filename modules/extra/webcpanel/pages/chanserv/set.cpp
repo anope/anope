@@ -91,8 +91,8 @@ bool WebCPanel::ChanServ::Set::OnRequest(HTTPProvider *server, const Anope::stri
 	replacements["CHANNEL_ESCAPED"] = HTTPUtils::URLEncode(ci->name);
 	if (ci->GetFounder())
 		replacements["FOUNDER"] = ci->GetFounder()->display;
-	if (ci->successor)
-		replacements["SUCCESSOR"] = ci->successor->display;
+	if (ci->GetSuccessor())
+		replacements["SUCCESSOR"] = ci->GetSuccessor()->display;
 	replacements["TIME_REGISTERED"] = Anope::strftime(ci->time_registered, na->nc);
 	replacements["LAST_USED"] = Anope::strftime(ci->last_used, na->nc);
 

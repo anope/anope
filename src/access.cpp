@@ -102,6 +102,10 @@ ChanAccess::~ChanAccess()
 		std::vector<ChanAccess *>::iterator it = std::find(this->ci->access->begin(), this->ci->access->end(), this);
 		if (it != this->ci->access->end())
 			this->ci->access->erase(it);
+
+		const NickAlias *na = NickAlias::Find(this->mask);
+		if (na != NULL)
+			na->nc->RemoveChannelReference(this->ci);
 	}
 }
 

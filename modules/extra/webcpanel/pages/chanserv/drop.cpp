@@ -25,10 +25,12 @@ bool WebCPanel::ChanServ::Drop::OnRequest(HTTPProvider *server, const Anope::str
 		}
 		else replacements["MESSAGES"] = "Invalid Confirmation";
 	}
-	// XXX this is slightly inefficient
-	for (registered_channel_map::const_iterator it = RegisteredChannelList->begin(), it_end = RegisteredChannelList->end(); it != it_end; ++it)
+
+	std::deque<ChannelInfo *> queue;
+	na->nc->GetChannelReferences(queue);
+	for (unsigned i = 0; i < queue.size(); ++i)
 	{
-		ChannelInfo *ci = it->second;
+		ChannelInfo *ci = queue[i];
 		if ((ci->HasExt("SECUREFOUNDER") ? ci->AccessFor(na->nc).founder : ci->AccessFor(na->nc).HasPriv("FOUNDER")) || (na->nc->IsServicesOper() && na->nc->o->ot->HasCommand("chanserv/drop")))
 		{
 			replacements["CHANNEL_NAMES"] = ci->name;

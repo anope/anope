@@ -147,6 +147,8 @@ class CoreExport NickAlias : public Serializable, public Extensible
  */
 class CoreExport NickCore : public Serializable, public Extensible
 {
+	/* Channels which reference this core in some way (this is on their access list, akick list, is founder, successor, etc) */
+	Serialize::Checker<std::map<ChannelInfo *, int> > chanaccess;
  public:
  	/* Name of the account. Find(display)->nc == this. */
 	Anope::string display;
@@ -293,6 +295,10 @@ class CoreExport NickCore : public Serializable, public Extensible
 	 * @return The account, if it exists
 	 */
 	static NickCore* Find(const Anope::string &nick);
+	
+	void AddChannelReference(ChannelInfo *ci);
+	void RemoveChannelReference(ChannelInfo *ci);
+	void GetChannelReferences(std::deque<ChannelInfo *> &queue);
 };
 
 /* A request to check if an account/password is valid. These can exist for

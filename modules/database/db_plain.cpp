@@ -142,7 +142,7 @@ EventReturn OnDatabaseReadMetadata(ChannelInfo *ci, const Anope::string &key, co
 		else if (key.equals_ci("FOUNDER"))
 			ci->SetFounder(NickCore::Find(params[0]));
 		else if (key.equals_ci("SUCCESSOR"))
-			ci->successor = NickCore::Find(params[0]);
+			ci->SetSuccessor(NickCore::Find(params[0]));
 		else if (key.equals_ci("LEVELS"))
 		{
 			for (unsigned j = 0, end = params.size(); j < end; j += 2)
@@ -764,8 +764,8 @@ class DBPlain : public Module
 			db_buffer << "MD MEMOMAX " << ci->memos.memomax << endl;
 			if (ci->GetFounder())
 				db_buffer << "MD FOUNDER " << ci->GetFounder()->display << endl;
-			if (ci->successor)
-				db_buffer << "MD SUCCESSOR " << ci->successor->display << endl;
+			if (ci->GetSuccessor())
+				db_buffer << "MD SUCCESSOR " << ci->GetSuccessor()->display << endl;
 			if (!ci->desc.empty())
 				db_buffer << "MD DESC :" << ci->desc << endl;
 			if (!ci->last_topic.empty())

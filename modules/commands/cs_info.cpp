@@ -59,8 +59,8 @@ class CommandCSInfo : public Command
 		if (ci->GetFounder())
 			info["Founder"] = ci->GetFounder()->display;
 
-		if (show_all && ci->successor)
-			info["Successor"] = ci->successor->display;
+		if (show_all && ci->GetSuccessor())
+			info["Successor"] = ci->GetSuccessor()->display;
 
 		if (!ci->desc.empty())
 			info["Description"] = ci->desc;

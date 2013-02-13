@@ -17,7 +17,7 @@
 
 Serialize::Checker<nickcore_map> NickCoreList("NickCore");
 
-NickCore::NickCore(const Anope::string &coredisplay) : Serializable("NickCore"), aliases("NickAlias")
+NickCore::NickCore(const Anope::string &coredisplay) : Serializable("NickCore"), chanaccess("ChannelInfo"), aliases("NickAlias")
 {
 	if (coredisplay.empty())
 		throw CoreException("Empty display passed to NickCore constructor");
@@ -43,6 +43,9 @@ NickCore::NickCore(const Anope::string &coredisplay) : Serializable("NickCore"),
 NickCore::~NickCore()
 {
 	FOREACH_MOD(I_OnDelCore, OnDelCore(this));
+
+	if (!this->chanaccess->empty())
+		Log(LOG_DEBUG) << "Non-empty chanaccess list in destructor!";
 
 	for (std::list<User *>::iterator it = this->users.begin(); it != this->users.end();)
 	{
@@ -251,6 +254,25 @@ void NickCore::ClearCert()
 {
 	FOREACH_MOD(I_OnNickClearCert, OnNickClearCert(this));
 	this->cert.clear();
+}
+
+void NickCore::AddChannelReference(ChannelInfo *ci)
+{
+	++(*this->chanaccess)[ci];
+}
+
+void NickCore::RemoveChannelReference(ChannelInfo *ci)
+{
+	int& i = (*this->chanaccess)[ci];
+	if (--i <= 0)
+		this->chanaccess->erase(ci);
+}
+
+void NickCore::GetChannelReferences(std::deque<ChannelInfo *> &queue)
+{
+	queue.clear();
+	for (std::map<ChannelInfo *, int>::iterator it = this->chanaccess->begin(), it_end = this->chanaccess->end(); it != it_end; ++it)
+		queue.push_back(it->first);
 }
 
 NickCore* NickCore::Find(const Anope::string &nick)

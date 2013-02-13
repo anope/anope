@@ -701,7 +701,7 @@ static void LoadChannels()
 			ci->SetFounder(NickCore::Find(buffer));
 
 			READ(read_string(buffer, f));
-			ci->successor = NickCore::Find(buffer);
+			ci->SetSuccessor(NickCore::Find(buffer));
 
 			char pwbuf[32];
 			READ(read_buffer(pwbuf, f));

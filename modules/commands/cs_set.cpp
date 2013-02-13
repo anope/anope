@@ -1057,9 +1057,9 @@ class CommandCSSetSuccessor : public Command
 		else
 			nc = NULL;
 
-		Log(!source.permission.empty() ? LOG_ADMIN : LOG_COMMAND, source, this, ci) << "to change the successor from " << (ci->successor ? ci->successor->display : "(none)") << " to " << (nc ? nc->display : "(none)");
+		Log(!source.permission.empty() ? LOG_ADMIN : LOG_COMMAND, source, this, ci) << "to change the successor from " << (ci->GetSuccessor() ? ci->GetSuccessor()->display : "(none)") << " to " << (nc ? nc->display : "(none)");
 
-		ci->successor = nc;
+		ci->SetSuccessor(nc);
 
 		if (nc)
 			source.Reply(_("Successor for \002%s\002 changed to \002%s\002."), ci->name.c_str(), nc->display.c_str());

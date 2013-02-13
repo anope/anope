@@ -159,6 +159,7 @@ class CoreExport ChannelInfo : public Serializable, public Extensible
 {
  private:
 	Serialize::Reference<NickCore> founder;					/* Channel founder */
+	Serialize::Reference<NickCore> successor;                               /* Who gets the channel if the founder nick is dropped or expires */
 	Serialize::Checker<std::vector<ChanAccess *> > access;			/* List of authorized users */
 	Serialize::Checker<std::vector<AutoKick *> > akick;			/* List of users to kickban */
 	Serialize::Checker<std::vector<BadWord *> > badwords;			/* List of badwords */
@@ -174,7 +175,6 @@ class CoreExport ChannelInfo : public Serializable, public Extensible
 	Serialize::Checker<std::vector<LogSetting *> > log_settings;
 
 	Anope::string name;                       /* Channel name */
-	Serialize::Reference<NickCore> successor; /* Who gets the channel if the founder nick is dropped or expires */
 	Anope::string desc;
 
 	time_t time_registered;
@@ -222,6 +222,9 @@ class CoreExport ChannelInfo : public Serializable, public Extensible
 	 * @return The founder
 	 */
 	NickCore *GetFounder() const;
+
+	void SetSuccessor(NickCore *nc);
+	NickCore *GetSuccessor() const;
 
 	/** Find which bot should send mode/topic/etc changes for this channel
 	 * @return The bot

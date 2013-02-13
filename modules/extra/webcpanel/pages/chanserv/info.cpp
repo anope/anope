@@ -13,10 +13,11 @@ WebCPanel::ChanServ::Info::Info(const Anope::string &cat, const Anope::string &u
 
 bool WebCPanel::ChanServ::Info::OnRequest(HTTPProvider *server, const Anope::string &page_name, HTTPClient *client, HTTPMessage &message, HTTPReply &reply, NickAlias *na, TemplateFileServer::Replacements &replacements)
 {
-	// XXX this is slightly inefficient
-	for (registered_channel_map::const_iterator it = RegisteredChannelList->begin(), it_end = RegisteredChannelList->end(); it != it_end; ++it)
+	std::deque<ChannelInfo *> queue;
+	na->nc->GetChannelReferences(queue);
+	for (unsigned i = 0; i < queue.size(); ++i)
 	{
-		ChannelInfo *ci = it->second;
+		ChannelInfo *ci = queue[i];
 
 		if (ci->AccessFor(na->nc).HasPriv("SET") || ci->AccessFor(na->nc).HasPriv("ACCESS_LIST"))
 		{

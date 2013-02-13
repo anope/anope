@@ -46,17 +46,36 @@ class CommandNSAList : public Command
 
 		source.Reply(_("Channels that \002%s\002 has access on:"), nc->display.c_str());
 
-		for (registered_channel_map::const_iterator it = RegisteredChannelList->begin(), it_end = RegisteredChannelList->end(); it != it_end; ++it)
+		std::deque<ChannelInfo *> queue;
+		nc->GetChannelReferences(queue);
+
+		if (queue.empty())
 		{
-			ChannelInfo *ci = it->second;
+			source.Reply(_("\2%s\2 has no access in any channels."), nc->display.c_str());
+			return;
+		}
+
+		for (unsigned i = 0; i < queue.size(); ++i)
+		{
+			ChannelInfo *ci = queue[i];
 			ListFormatter::ListEntry entry;
 
-			if (ci->GetFounder() && ci->GetFounder() == nc)
+			if (ci->GetFounder() == nc)
 			{
 				++chan_count;
 				entry["Number"] = stringify(chan_count);
 				entry["Channel"] = (ci->HasExt("NO_EXPIRE") ? "!" : "") + ci->name;
 				entry["Access"] = "Founder";
+				list.AddEntry(entry);
+				continue;
+			}
+
+			if (ci->GetSuccessor() == nc)
+			{
+				++chan_count;
+				entry["Number"] = stringify(chan_count);
+				entry["Channel"] = (ci->HasExt("NO_EXPIRE") ? "!" : "") + ci->name;
+				entry["Access"] = "Successor";
 				list.AddEntry(entry);
 				continue;
 			}
@@ -69,8 +88,8 @@ class CommandNSAList : public Command
 
 			entry["Number"] = stringify(chan_count);
 			entry["Channel"] = (ci->HasExt("NO_EXPIRE") ? "!" : "") + ci->name;
-			for (unsigned i = 0; i < access.size(); ++i)
-				entry["Access"] = entry["Access"] + ", " + access[i]->AccessSerialize();
+			for (unsigned j = 0; j < access.size(); ++j)
+				entry["Access"] = entry["Access"] + ", " + access[j]->AccessSerialize();
 			entry["Access"] = entry["Access"].substr(2);
 			list.AddEntry(entry);
 		}
@@ -79,6 +98,8 @@ class CommandNSAList : public Command
 		list.Process(replies);
 		for (unsigned i = 0; i < replies.size(); ++i)
 			source.Reply(replies[i]);
+
+		source.Reply(_("End of list - %d channels shown."), chan_count);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override

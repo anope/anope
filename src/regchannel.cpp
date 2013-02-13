@@ -82,6 +82,10 @@ AutoKick::~AutoKick()
 		std::vector<AutoKick *>::iterator it = std::find(this->ci->akick->begin(), this->ci->akick->end(), this);
 		if (it != this->ci->akick->end())
 			this->ci->akick->erase(it);
+
+		const NickAlias *na = NickAlias::Find(this->mask);
+		if (na != NULL)
+			na->nc->RemoveChannelReference(this->ci);
 	}
 }
 
@@ -444,16 +448,9 @@ Serializable* ChannelInfo::Unserialize(Serializable *obj, Serialize::Data &data)
 
 	ci->ExtensibleUnserialize(data);
 
-	if (ci->founder)
-		--ci->founder->channelcount;
-	ci->founder = NickCore::Find(sfounder);
-	if (ci->founder)
-		++ci->founder->channelcount;
+	ci->SetFounder(NickCore::Find(sfounder));
+	ci->SetSuccessor(NickCore::Find(ssuccessor));
 
-	ci->successor = NickCore::Find(ssuccessor);
-	if (ci->founder && *ci->founder == *ci->successor)
-		ci->successor = NULL;
-	
 	data["description"] >> ci->desc;
 	data["time_registered"] >> ci->time_registered;
 	data["last_used"] >> ci->last_used;
@@ -511,17 +508,37 @@ Serializable* ChannelInfo::Unserialize(Serializable *obj, Serialize::Data &data)
 void ChannelInfo::SetFounder(NickCore *nc)
 {
 	if (this->founder)
+	{
 		--this->founder->channelcount;
+		this->founder->RemoveChannelReference(this);
+	}
+
 	this->founder = nc;
+
 	if (this->founder)
+	{
 		++this->founder->channelcount;
-	if (*this->founder == *this->successor)
-		this->successor = NULL;
+		this->founder->AddChannelReference(this);
+	}
 }
 
 NickCore *ChannelInfo::GetFounder() const
 {
 	return this->founder;
+}
+
+void ChannelInfo::SetSuccessor(NickCore *nc)
+{
+	if (this->successor)
+		this->successor->RemoveChannelReference(this);
+	this->successor = nc;
+	if (this->successor)
+		this->successor->AddChannelReference(this);
+}
+
+NickCore *ChannelInfo::GetSuccessor() const
+{
+	return this->successor;
 }
 
 BotInfo *ChannelInfo::WhoSends() const
@@ -538,6 +555,10 @@ BotInfo *ChannelInfo::WhoSends() const
 void ChannelInfo::AddAccess(ChanAccess *taccess)
 {
 	this->access->push_back(taccess);
+
+	const NickAlias *na = NickAlias::Find(taccess->mask);
+	if (na != NULL)
+		na->nc->AddChannelReference(this);
 }
 
 ChanAccess *ChannelInfo::GetAccess(unsigned index) const
@@ -638,6 +659,8 @@ AutoKick *ChannelInfo::AddAkick(const Anope::string &user, NickCore *akicknc, co
 	autokick->last_used = lu;
 
 	this->akick->push_back(autokick);
+
+	akicknc->AddChannelReference(this);
 
 	return autokick;
 }

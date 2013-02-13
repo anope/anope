@@ -59,7 +59,7 @@ class DBSQL : public Module, public Pipe
 	ServiceReference<Provider> sql;
 	SQLSQLInterface sqlinterface;
 	Anope::string prefix;
-	std::set<Reference<Serializable> > updated_items;
+	std::set<Serializable *> updated_items;
 	bool shutting_down;
 	bool loading_databases;
 	bool loaded;
@@ -98,11 +98,11 @@ class DBSQL : public Module, public Pipe
 
 	void OnNotify() anope_override
 	{
-		for (std::set<Reference<Serializable> >::iterator it = this->updated_items.begin(), it_end = this->updated_items.end(); it != it_end; ++it)
+		for (std::set<Serializable *>::iterator it = this->updated_items.begin(), it_end = this->updated_items.end(); it != it_end; ++it)
 		{
-			Reference<Serializable> obj = *it;
+			Serializable *obj = *it;
 
-			if (obj && this->sql)
+			if (this->sql)
 			{
 				Data *data = new Data();
 				obj->Serialize(*data);
@@ -177,6 +177,7 @@ class DBSQL : public Module, public Pipe
 	{
 		if (this->shutting_down || this->loading_databases)
 			return;
+		obj->UpdateTS();
 		this->updated_items.insert(obj);
 		this->Notify();
 	}
@@ -186,6 +187,7 @@ class DBSQL : public Module, public Pipe
 		Serialize::Type *s_type = obj->GetSerializableType();
 		if (s_type)
 			this->RunBackground("DELETE FROM `" + this->prefix + s_type->GetName() + "` WHERE `id` = " + stringify(obj->id));
+		this->updated_items.erase(obj);
 	}
 
 	void OnSerializableUpdate(Serializable *obj) anope_override

@@ -13,7 +13,7 @@ class DBMySQL : public Module, public Pipe
 	time_t lastwarn;
 	bool ro;
 	bool init;
-	std::set<Reference<Serializable> > updated_items;
+	std::set<Serializable *> updated_items;
 
 	bool CheckSQL()
 	{
@@ -83,9 +83,9 @@ class DBMySQL : public Module, public Pipe
 		if (!this->CheckInit())
 			return;
 
-		for (std::set<Reference<Serializable> >::iterator it = this->updated_items.begin(), it_end = this->updated_items.end(); it != it_end; ++it)
+		for (std::set<Serializable *>::iterator it = this->updated_items.begin(), it_end = this->updated_items.end(); it != it_end; ++it)
 		{
-			Reference<Serializable> obj = *it;
+			Serializable *obj = *it;
 
 			if (obj && this->SQL)
 			{
@@ -144,6 +144,7 @@ class DBMySQL : public Module, public Pipe
 	{
 		if (!this->CheckInit())
 			return;
+		obj->UpdateTS();
 		this->updated_items.insert(obj);
 		this->Notify();
 	}
@@ -153,10 +154,10 @@ class DBMySQL : public Module, public Pipe
 		if (!this->CheckInit())	
 			return;
 		Serialize::Type *s_type = obj->GetSerializableType();
-		if (!s_type)
-			return;
-		this->RunQuery("DELETE FROM `" + this->prefix + s_type->GetName() + "` WHERE `id` = " + stringify(obj->id));
+		if (s_type)
+			this->RunQuery("DELETE FROM `" + this->prefix + s_type->GetName() + "` WHERE `id` = " + stringify(obj->id));
 		s_type->objects.erase(obj->id);
+		this->updated_items.erase(obj);
 	}
 
 	void OnSerializeCheck(Serialize::Type *obj) anope_override

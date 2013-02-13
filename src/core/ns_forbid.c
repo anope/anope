@@ -73,6 +73,7 @@ static int do_forbid(User * u)
     NickAlias *na;
     char *nick = strtok(NULL, " ");
     char *reason = strtok(NULL, "");
+    char *ch;
 
     /* Assumes that permission checking has already been done. */
     if (!nick || (ForceForbidReason && !reason)) {
@@ -88,6 +89,21 @@ static int do_forbid(User * u)
         notice_lang(s_NickServ, u, NICK_X_FORBIDDEN, nick);
         return MOD_CONT;
     }
+
+    if (isdigit(nick[0]) || nick[0] == '-' || strlen(nick) > NICKMAX - 1)
+    {
+        notice_lang(s_NickServ, u, NICK_X_FORBIDDEN, nick);
+        return MOD_CONT;
+    }
+    for (ch = nick; *ch; ch++)
+    {
+        if (!isvalidnick(*ch))
+        {
+            notice_lang(s_NickServ, u, NICK_X_FORBIDDEN, nick);
+            return MOD_CONT;
+        }
+    }
+
     if ((na = findnick(nick)) != NULL) {
         if (NSSecureAdmins && nick_is_services_admin(na->nc)
             && !is_services_root(u)) {

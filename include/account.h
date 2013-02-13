@@ -167,7 +167,7 @@ class CoreExport NickCore : public Serializable, public Extensible
 	/* Nicknames registered that are grouped to this account.
 	 * for n in aliases, n->nc == this.
 	 */
-	std::list<Serialize::Reference<NickAlias> > aliases;
+	Serialize::Checker<std::vector<NickAlias *> > aliases;
 
 	/* Set if this user is a services operattor. o->ot must exist. */
 	Oper *o;

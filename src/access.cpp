@@ -156,9 +156,9 @@ bool ChanAccess::Matches(const User *u, const NickCore *nc) const
 	else if (u && Anope::Match(u->GetDisplayedMask(), this->mask))
 		return true;
 	else if (nc)
-		for (std::list<Serialize::Reference<NickAlias> >::const_iterator it = nc->aliases.begin(); it != nc->aliases.end();)
+		for (unsigned i = nc->aliases->size(); i > 0; --i)
 		{
-			const NickAlias *na = *it++;
+			const NickAlias *na = nc->aliases->at(i - 1);
 			if (na && Anope::Match(na->nick, this->mask))
 				return true;
 		}

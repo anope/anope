@@ -31,7 +31,7 @@ NickAlias::NickAlias(const Anope::string &nickname, NickCore* nickcore) : Serial
 	this->time_registered = this->last_seen = Anope::CurTime;
 	this->nick = nickname;
 	this->nc = nickcore;
-	nickcore->aliases.push_back(this);
+	nickcore->aliases->push_back(this);
 
 	size_t old = NickAliasList->size();
 	(*NickAliasList)[this->nick] = this;
@@ -57,10 +57,10 @@ NickAlias::~NickAlias()
 	if (this->nc)
 	{
 		/* Next: see if our core is still useful. */
-		std::list<Serialize::Reference<NickAlias> >::iterator it = std::find(this->nc->aliases.begin(), this->nc->aliases.end(), this);
-		if (it != this->nc->aliases.end())
-			this->nc->aliases.erase(it);
-		if (this->nc->aliases.empty())
+		std::vector<NickAlias *>::iterator it = std::find(this->nc->aliases->begin(), this->nc->aliases->end(), this);
+		if (it != this->nc->aliases->end())
+			this->nc->aliases->erase(it);
+		if (this->nc->aliases->empty())
 		{
 			this->nc->Destroy();
 			this->nc = NULL;
@@ -69,7 +69,7 @@ NickAlias::~NickAlias()
 		{
 			/* Display updating stuff */
 			if (this->nick.equals_ci(this->nc->display))
-				this->nc->SetDisplay(this->nc->aliases.front());
+				this->nc->SetDisplay(this->nc->aliases->front());
 		}
 	}
 
@@ -278,17 +278,17 @@ Serializable* NickAlias::Unserialize(Serializable *obj, Serialize::Data &data)
 
 	if (na->nc != core)
 	{
-		std::list<Serialize::Reference<NickAlias> >::iterator it = std::find(na->nc->aliases.begin(), na->nc->aliases.end(), na);
-		if (it != na->nc->aliases.end())
-			na->nc->aliases.erase(it);
+		std::vector<NickAlias *>::iterator it = std::find(na->nc->aliases->begin(), na->nc->aliases->end(), na);
+		if (it != na->nc->aliases->end())
+			na->nc->aliases->erase(it);
 
-		if (na->nc->aliases.empty())
+		if (na->nc->aliases->empty())
 			delete na->nc;
 		else if (na->nick.equals_ci(na->nc->display))
-			na->nc->SetDisplay(na->nc->aliases.front());
+			na->nc->SetDisplay(na->nc->aliases->front());
 
 		na->nc = core;
-		core->aliases.push_back(na);
+		core->aliases->push_back(na);
 	}
 
 	data["last_quit"] >> na->last_quit;

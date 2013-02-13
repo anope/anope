@@ -97,11 +97,9 @@ class MyMemoServService : public MemoServService
 
 			if (nc->HasExt("MEMO_RECEIVE"))
 			{
-				for (std::list<Serialize::Reference<NickAlias> >::const_iterator it = nc->aliases.begin(), it_end = nc->aliases.end(); it != it_end;)
+				for (unsigned i = 0; i < nc->aliases->size(); ++i)
 				{
-					const NickAlias *na = *it++;
-					if (!na)
-						continue;
+					const NickAlias *na = nc->aliases->at(i);
 					User *user = User::Find(na->nick);
 					if (user && user->IsIdentified())
 						user->SendMessage(MemoServ, MEMO_NEW_MEMO_ARRIVED, source.c_str(), Config->UseStrictPrivMsgString.c_str(), Config->MemoServ.c_str(), mi->memos->size());

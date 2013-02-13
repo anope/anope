@@ -130,7 +130,7 @@ class CommandNSGroup : public Command
 			source.Reply(NICK_IDENTIFY_REQUIRED, Config->UseStrictPrivMsgString.c_str(), Config->NickServ.c_str());
 		else if (na && Config->NSNoGroupChange)
 			source.Reply(_("Your nick is already registered."));
-		else if (Config->NSMaxAliases && (target->nc->aliases.size() >= Config->NSMaxAliases) && !target->nc->IsServicesOper())
+		else if (Config->NSMaxAliases && (target->nc->aliases->size() >= Config->NSMaxAliases) && !target->nc->IsServicesOper())
 			source.Reply(_("There are too many nicks in %s's group."));
 		else if (u->nick.length() <= Config->NSGuestNickPrefix.length() + 7 &&
 			u->nick.length() >= Config->NSGuestNickPrefix.length() + 1 &&
@@ -214,7 +214,7 @@ class CommandNSUngroup : public Command
 		Anope::string nick = !params.empty() ? params[0] : "";
 		NickAlias *na = NickAlias::Find(!nick.empty() ? nick : u->nick);
 
-		if (u->Account()->aliases.size() == 1)
+		if (u->Account()->aliases->size() == 1)
 			source.Reply(_("Your nick is not grouped to anything, you can't ungroup it."));
 		else if (!na)
 			source.Reply(NICK_X_NOT_REGISTERED, !nick.empty() ? nick.c_str() : u->nick.c_str());
@@ -224,16 +224,16 @@ class CommandNSUngroup : public Command
 		{
 			NickCore *oldcore = na->nc;
 
-			std::list<Serialize::Reference<NickAlias> >::iterator it = std::find(oldcore->aliases.begin(), oldcore->aliases.end(), na);
-			if (it != oldcore->aliases.end())
-				oldcore->aliases.erase(it);
+			std::vector<NickAlias *>::iterator it = std::find(oldcore->aliases->begin(), oldcore->aliases->end(), na);
+			if (it != oldcore->aliases->end())
+				oldcore->aliases->erase(it);
 
 			if (na->nick.equals_ci(oldcore->display))
-				oldcore->SetDisplay(oldcore->aliases.front());
+				oldcore->SetDisplay(oldcore->aliases->front());
 
 			NickCore *nc = new NickCore(na->nick);
 			na->nc = nc;
-			nc->aliases.push_back(na);
+			nc->aliases->push_back(na);
 
 			nc->pass = oldcore->pass;
 			if (!oldcore->email.empty())
@@ -300,11 +300,9 @@ class CommandNSGList : public Command
 
 		ListFormatter list;
 		list.AddColumn("Nick").AddColumn("Expires");
-		for (std::list<Serialize::Reference<NickAlias> >::const_iterator it = nc->aliases.begin(), it_end = nc->aliases.end(); it != it_end;)
+		for (unsigned i = 0; i < nc->aliases->size(); ++i)
 		{
-			const NickAlias *na2 = *it++;
-			if (!na2)
-				continue;
+			const NickAlias *na2 = nc->aliases->at(i);
 
 			ListFormatter::ListEntry entry;
 			entry["Nick"] = na2->nick;
@@ -319,7 +317,7 @@ class CommandNSGList : public Command
 		for (unsigned i = 0; i < replies.size(); ++i)
 			source.Reply(replies[i]);
 
-		source.Reply(_("%d nicknames in the group."), nc->aliases.size());
+		source.Reply(_("%d nicknames in the group."), nc->aliases->size());
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override

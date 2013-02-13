@@ -17,7 +17,7 @@
 
 Serialize::Checker<nickcore_map> NickCoreList("NickCore");
 
-NickCore::NickCore(const Anope::string &coredisplay) : Serializable("NickCore")
+NickCore::NickCore(const Anope::string &coredisplay) : Serializable("NickCore"), aliases("NickAlias")
 {
 	if (coredisplay.empty())
 		throw CoreException("Empty display passed to NickCore constructor");

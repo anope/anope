@@ -64,9 +64,9 @@ class CommandHSDelAll : public Command
 		{
 			FOREACH_MOD(I_OnDeleteVhost, OnDeleteVhost(na));
 			const NickCore *nc = na->nc;
-			for (std::list<Serialize::Reference<NickAlias> >::const_iterator it = nc->aliases.begin(), it_end = nc->aliases.end(); it != it_end; ++it)
+			for (unsigned i = 0; i < nc->aliases->size(); ++i)
 			{
-				na = *it;
+				na = nc->aliases->at(i);
 				na->RemoveVhost();
 			}
 			Log(LOG_ADMIN, source, this) << "for all nicks in group " << nc->display;

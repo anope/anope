@@ -73,9 +73,9 @@ class CommandNSSuspend : public Command
 			nc->ExtendMetadata("suspend:expire", stringify(Anope::CurTime + expiry_secs));
 
 
-		for (std::list<Serialize::Reference<NickAlias> >::iterator it = nc->aliases.begin(), it_end = nc->aliases.end(); it != it_end;)
+		for (unsigned i = 0; i < nc->aliases->size(); ++i)
 		{
-			NickAlias *na2 = *it++;
+			NickAlias *na2 = nc->aliases->at(i);
 
 			if (na2 && *na2->nc == *na->nc)
 			{

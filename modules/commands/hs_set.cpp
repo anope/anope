@@ -108,9 +108,9 @@ class CommandHSSetAll : public Command
 		if (!na || !na->HasVhost())
 			return;
 	
-		for (std::list<Serialize::Reference<NickAlias> >::const_iterator it = na->nc->aliases.begin(), it_end = na->nc->aliases.end(); it != it_end;)
+		for (unsigned i = 0; i < na->nc->aliases->size(); ++i)
 		{
-			NickAlias *nick = *it++;
+			NickAlias *nick = na->nc->aliases->at(i);
 			if (nick)
 				nick->SetVhost(na->GetVhostIdent(), na->GetVhostHost(), na->GetVhostCreator());
 		}

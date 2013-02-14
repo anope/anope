@@ -16,7 +16,7 @@
 class CommandCSUnban : public Command
 {
  public:
-	CommandCSUnban(Module *creator) : Command(creator, "chanserv/unban", 1, 2)
+	CommandCSUnban(Module *creator) : Command(creator, "chanserv/unban", 0, 2)
 	{
 		this->SetDesc(_("Remove all bans preventing a user from entering a channel"));
 		this->SetSyntax(_("\037channel\037 [\037nick\037]"));
@@ -24,6 +24,31 @@ class CommandCSUnban : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
+		if (params.empty())
+		{
+			if (!source.GetUser())
+				return;
+
+			std::deque<ChannelInfo *> queue;
+			source.GetAccount()->GetChannelReferences(queue);
+
+			unsigned count = 0;
+			for (unsigned i = 0; i < queue.size(); ++i)
+			{
+				ChannelInfo *ci = queue[i];
+
+				if (!ci->c || !source.AccessFor(ci).HasPriv("UNBAN"))
+					continue;
+
+				if (ci->c->Unban(source.GetUser(), true))
+					++count;
+			}
+
+			source.Reply(_("You have been unbanned from %d channels."), count);
+
+			return;
+		}
+
 		ChannelInfo *ci = ChannelInfo::Find(params[0]);
 		if (ci == NULL)
 		{
@@ -60,8 +85,6 @@ class CommandCSUnban : public Command
 			source.Reply(_("You have been unbanned from \002%s\002."), ci->c->name.c_str());
 		else
 			source.Reply(_("\002%s\002 has been unbanned from \002%s\002."), u2->nick.c_str(), ci->c->name.c_str());
-
-		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
@@ -69,7 +92,9 @@ class CommandCSUnban : public Command
 		this->SendSyntax(source);
 		source.Reply(" ");
 		source.Reply(_("Tells %s to remove all bans preventing you or the given\n"
-				"user from entering the given channel.\n"
+				"user from entering the given channel. If no channel is\n"
+				"given, all bans affecting you in channels you have access\n"
+				"in are removed.\n"
 				" \n"
 				"By default, limited to AOPs or those with level 5 and above\n"
 				"on the channel."), source.service->nick.c_str());

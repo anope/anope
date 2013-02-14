@@ -996,10 +996,12 @@ void Channel::SetCorrectModes(User *user, bool give_modes, bool check_noop)
 	}
 }
 
-void Channel::Unban(const User *u, bool full)
+bool Channel::Unban(const User *u, bool full)
 {
 	if (!this->HasMode("BAN"))
-		return;
+		return false;
+
+	bool ret = false;
 
 	std::pair<Channel::ModeList::iterator, Channel::ModeList::iterator> bans = this->GetModeList("BAN");
 	for (; bans.first != bans.second;)
@@ -1007,8 +1009,13 @@ void Channel::Unban(const User *u, bool full)
 		Entry ban("BAN", bans.first->second);
 		++bans.first;
 		if (ban.Matches(u, full))
+		{
 			this->RemoveMode(NULL, "BAN", ban.GetMask());
+			ret = true;
+		}
 	}
+
+	return ret;
 }
 
 Channel* Channel::Find(const Anope::string &name)

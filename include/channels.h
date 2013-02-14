@@ -277,8 +277,9 @@ class CoreExport Channel : public Base, public Extensible
 	/** Unbans a user from this channel.
 	 * @param u The user to unban
 	 * @param full Whether or not to match using the user's real host and IP
+	 * @return whether or not a ban was removed
 	 */
-	void Unban(const User *u, bool full = false);
+	bool Unban(const User *u, bool full = false);
 
 	/** Finds a channel
 	 * @param name The channel to find

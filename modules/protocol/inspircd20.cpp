@@ -454,7 +454,7 @@ struct IRCDMessageCapab : Message::Capab
 				{
 					Anope::string modes(capab.begin() + 8, capab.begin() + capab.find(')'));
 					Anope::string chars(capab.begin() + capab.find(')') + 1, capab.end());
-					unsigned short level = modes.length() - 1;
+					short level = modes.length() - 1;
 
 					for (size_t t = 0, end = modes.length(); t < end; ++t)
 					{
@@ -466,7 +466,7 @@ struct IRCDMessageCapab : Message::Capab
 						}
 
 						ChannelModeStatus *cms = anope_dynamic_static_cast<ChannelModeStatus *>(cm);
-						cms->Level = level--;
+						cms->level = level--;
 					}
 				}
 			}

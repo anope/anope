@@ -119,7 +119,7 @@ ChannelModeParam::~ChannelModeParam()
 {
 }
 
-ChannelModeStatus::ChannelModeStatus(const Anope::string &mname, char modeChar, char mSymbol, unsigned short mLevel) : ChannelMode(mname, modeChar), Symbol(mSymbol), Level(mLevel)
+ChannelModeStatus::ChannelModeStatus(const Anope::string &mname, char modeChar, char mSymbol, short mlevel) : ChannelMode(mname, modeChar), Symbol(mSymbol), level(mlevel)
 {
 	this->type = MODE_STATUS;
 }

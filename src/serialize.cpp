@@ -67,6 +67,8 @@ Serializable::Serializable(const Serializable &other) : last_commit(NULL), last_
 
 Serializable::~Serializable()
 {
+	FOREACH_MOD(I_OnSerializableDestruct, OnSerializableDestruct(this));
+
 	SerializableItems->erase(this->s_iter);
 	delete last_commit;
 }
@@ -74,16 +76,6 @@ Serializable::~Serializable()
 Serializable &Serializable::operator=(const Serializable &)
 {
 	return *this;
-}
-
-void Serializable::Destroy()
-{
-	if (!this)
-		return;
-
-	FOREACH_MOD(I_OnSerializableDestruct, OnSerializableDestruct(this));
-
-	delete this;
 }
 
 void Serializable::QueueUpdate()

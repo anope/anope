@@ -185,7 +185,7 @@ class DBSQL : public Module, public Pipe
 	void OnSerializableDestruct(Serializable *obj) anope_override
 	{
 		Serialize::Type *s_type = obj->GetSerializableType();
-		if (s_type)
+		if (s_type && obj->id > 0)
 			this->RunBackground("DELETE FROM `" + this->prefix + s_type->GetName() + "` WHERE `id` = " + stringify(obj->id));
 		this->updated_items.erase(obj);
 	}

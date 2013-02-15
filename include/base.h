@@ -121,10 +121,17 @@ class Reference : public ReferenceBase
 		return NULL;
 	}
 
-	inline bool operator<(const Reference<T> &other) const
-	{
-		return this < &other;
-	}
+	/** Note that we can't have an operator< that returns this->ref < other.ref
+	 * because this function is used to sort objects in containers (such as set
+	 * or map), and if the references themselves can change if the object they
+	 * refer to is invalidated or changed, then this screws with the order that
+	 * the objects would be in the container without properly adjusting the
+	 * container, resulting in weird stuff.
+	 *
+	 * As such, we don't allow storing references in containers that require
+	 * operator<, because they would not be able to compare what the references
+	 * actually referred to.
+	 */
 
 	inline bool operator==(const Reference<T> &other)
 	{

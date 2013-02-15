@@ -156,7 +156,8 @@ class DBMySQL : public Module, public Pipe
 		Serialize::Type *s_type = obj->GetSerializableType();
 		if (s_type)
 		{
-			this->RunQuery("DELETE FROM `" + this->prefix + s_type->GetName() + "` WHERE `id` = " + stringify(obj->id));
+			if (obj->id > 0)
+				this->RunQuery("DELETE FROM `" + this->prefix + s_type->GetName() + "` WHERE `id` = " + stringify(obj->id));
 			s_type->objects.erase(obj->id);
 		}
 		this->updated_items.erase(obj);

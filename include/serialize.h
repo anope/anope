@@ -83,11 +83,6 @@ class CoreExport Serializable : public virtual Base
  	/* Unique ID (per type, not globally) for this object */
 	unsigned int id;
 
-	/* Destroys this object. This is effectively the same thing as
-	 * delete, however it properly cleans up after this object.
-	 */
-	void Destroy();
-
 	/** Marks the object as potentially being updated "soon".
 	 */
 	void QueueUpdate();

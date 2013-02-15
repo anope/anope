@@ -944,7 +944,7 @@ static bool DoneServices(ServerConfig *config, const Anope::string &)
 		++it;
 
 		if (bi->conf && services.count(bi->nick) == 0)
-			bi->Destroy();
+			delete bi;
 	}
 	services.clear();
 	return true;

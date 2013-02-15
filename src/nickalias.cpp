@@ -62,7 +62,7 @@ NickAlias::~NickAlias()
 			this->nc->aliases->erase(it);
 		if (this->nc->aliases->empty())
 		{
-			this->nc->Destroy();
+			delete this->nc;
 			this->nc = NULL;
 		}
 		else

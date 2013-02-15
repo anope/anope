@@ -366,7 +366,7 @@ class CommandOSSNLine : public CommandOSSXLineBase
 		{
 			source.Reply(USERHOST_MASK_TOO_WIDE, mask.c_str());
 			Log(LOG_ADMIN, source, this) << "tried to " << source.command << " " << percent << "% of the network (" << affected << " users)";
-			x->Destroy();
+			delete x;
 			return;
 		}
 
@@ -374,7 +374,7 @@ class CommandOSSNLine : public CommandOSSXLineBase
 		FOREACH_RESULT(I_OnAddXLine, OnAddXLine(source, x, this->xlm()));
 		if (MOD_RESULT == EVENT_STOP)
 		{
-			x->Destroy();
+			delete x;
 			return;
 		}
 
@@ -571,7 +571,7 @@ class CommandOSSQLine : public CommandOSSXLineBase
 		{
 			source.Reply(USERHOST_MASK_TOO_WIDE, mask.c_str());
 			Log(LOG_ADMIN, source, this) << "tried to SQLine " << percent << "% of the network (" << affected << " users)";
-			x->Destroy();
+			delete x;
 			return;
 		}
 
@@ -579,7 +579,7 @@ class CommandOSSQLine : public CommandOSSXLineBase
 		FOREACH_RESULT(I_OnAddXLine, OnAddXLine(source, x, this->xlm()));
 		if (MOD_RESULT == EVENT_STOP)
 		{
-			x->Destroy();
+			delete x;
 			return;
 		}
 

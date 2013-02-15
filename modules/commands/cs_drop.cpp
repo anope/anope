@@ -57,7 +57,7 @@ class CommandCSDrop : public Command
 		FOREACH_MOD(I_OnChanDrop, OnChanDrop(ci));
 
 		Channel *c = ci->c;
-		ci->Destroy();
+		delete ci;
 
 		source.Reply(_("Channel \002%s\002 has been dropped."), chan.c_str());
 

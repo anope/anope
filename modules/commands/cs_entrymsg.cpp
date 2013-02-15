@@ -161,7 +161,7 @@ class CommandEntryMessage : public Command
 				unsigned i = convertTo<unsigned>(message);
 				if (i > 0 && i <= (*messages)->size())
 				{
-					(*messages)->at(i - 1)->Destroy();
+					delete (*messages)->at(i - 1);
 					(*messages)->erase((*messages)->begin() + i - 1);
 					if ((*messages)->empty())
 						ci->Shrink("cs_entrymsg");
@@ -184,7 +184,7 @@ class CommandEntryMessage : public Command
 		if (messages != NULL)
 		{
 			for (unsigned i = 0; i < (*messages)->size(); ++i)
-				(*messages)->at(i)->Destroy();
+				delete (*messages)->at(i);
 			(*messages)->clear();
 			ci->Shrink("cs_entrymsg");
 		}

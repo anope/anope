@@ -103,7 +103,7 @@ class ExpireTimer : public Timer
 				continue;
 			Log(OperServ, "expire/exception") << "Session exception for " << e->mask << "has expired.";
 			session_service->DelException(e);
-			e->Destroy();
+			delete e;
 		}
 	}
 };
@@ -144,7 +144,7 @@ class ExceptionDelCallback : public NumberList
 		FOREACH_MOD(I_OnExceptionDel, OnExceptionDel(source, e));
 
 		session_service->DelException(e);
-		e->Destroy();
+		delete e;
 	}
 };
 
@@ -352,7 +352,7 @@ class CommandOSException : public Command
 			EventReturn MOD_RESULT;
 			FOREACH_RESULT(I_OnExceptionAdd, OnExceptionAdd(exception));
 			if (MOD_RESULT == EVENT_STOP)
-				exception->Destroy();
+				delete exception;
 			else
 			{
 				session_service->AddException(exception);

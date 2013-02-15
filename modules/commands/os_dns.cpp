@@ -312,7 +312,7 @@ class CommandOSDNS : public Command
 		}
 
 		source.Reply(_("Zone %s removed."), z->name.c_str());
-		z->Destroy();
+		delete z;
 	}
 
 	void AddServer(CommandSource &source, const std::vector<Anope::string> &params)
@@ -370,7 +370,7 @@ class CommandOSDNS : public Command
 			if (!z)
 			{
 				source.Reply(_("Zone %s does not exist."), zone.c_str());
-				s->Destroy();
+				delete s;
 				return;
 			}
 
@@ -426,7 +426,7 @@ class CommandOSDNS : public Command
 
 		Log(LOG_ADMIN, source, this) << "to delete server " << s->GetName();
 		source.Reply(_("Removed server %s."), s->GetName().c_str());
-		s->Destroy();
+		delete s;
 	}
 
 	void AddIP(CommandSource &source, const std::vector<Anope::string> &params)

@@ -56,7 +56,7 @@ class ExpireCallback : public CallBack
 
 				Log(LOG_NORMAL, "chanserv/expire") << "Expiring " << extra  << "channel " << ci->name << " (founder: " << (ci->GetFounder() ? ci->GetFounder()->display : "(none)") << ")";
 				FOREACH_MOD(I_OnChanExpire, OnChanExpire(ci));
-				ci->Destroy();
+				delete ci;
 			}
 		}
 	}
@@ -142,7 +142,7 @@ class ChanServCore : public Module
 				{
 					Log(LOG_NORMAL, "chanserv/expire") << "Deleting channel " << ci->name << " owned by deleted nick " << nc->display;
 
-					ci->Destroy();
+					delete ci;
 					continue;
 				}
 			}

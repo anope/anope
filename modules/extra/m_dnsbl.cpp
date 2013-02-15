@@ -75,7 +75,7 @@ class DNSBLResolver : public Request
 		else
 		{
 			IRCD->SendAkill(NULL, x);
-			x->Destroy();
+			delete x;
 		}
 	}
 };

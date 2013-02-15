@@ -34,7 +34,7 @@ class NSGroupRequest : public IdentifyRequest
 		if (na)
 		{
 			FOREACH_MOD(I_OnChangeCoreDisplay, OnChangeCoreDisplay(na->nc, u->nick));
-			na->Destroy();
+			delete na;
 		}
 
 		na = new NickAlias(nick, target->nc);

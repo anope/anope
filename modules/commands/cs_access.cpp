@@ -286,7 +286,7 @@ class CommandCSAccess : public Command
 						Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to delete " << access->mask;
 
 						FOREACH_MOD(I_OnAccessDel, OnAccessDel(ci, source, access));
-						access->Destroy();
+						delete access;
 					}
 					return;
 				}

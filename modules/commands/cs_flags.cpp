@@ -180,7 +180,7 @@ class CommandCSFlags : public Command
 			if (current != NULL)
 			{
 				FOREACH_MOD(I_OnAccessDel, OnAccessDel(ci, source, current));
-				current->Destroy();
+				delete current;
 				Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to delete " << mask;
 				source.Reply(_("\002%s\002 removed from the %s access list."), mask.c_str(), ci->name.c_str());
 			}
@@ -203,7 +203,7 @@ class CommandCSFlags : public Command
 		access->flags = current_flags;
 
 		if (current != NULL)
-			current->Destroy();
+			delete current;
 
 		ci->AddAccess(access);
 

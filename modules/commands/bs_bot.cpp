@@ -242,7 +242,7 @@ class CommandBSBot : public Command
 		Log(LOG_ADMIN, source, this) << "DEL " << bi->nick;
 
 		source.Reply(_("Bot \002%s\002 has been deleted."), nick.c_str());
-		bi->Destroy();
+		delete bi;
 		return;
 	}
  public:

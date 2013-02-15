@@ -31,7 +31,7 @@ class MyForbidService : public ForbidService
 		std::vector<ForbidData *>::iterator it = std::find(this->forbid_data->begin(), this->forbid_data->end(), d);
 		if (it != this->forbid_data->end())
 			this->forbid_data->erase(it);
-		d->Destroy();
+		delete d;
 	}
 
 	ForbidData *FindForbid(const Anope::string &mask, ForbidType ftype) anope_override
@@ -65,7 +65,7 @@ class MyForbidService : public ForbidService
 
 				Log(LOG_NORMAL, "expire/forbid") << "Expiring forbid for " << d->mask << " type " << ftype;
 				this->forbid_data->erase(this->forbid_data->begin() + i - 1);
-				d->Destroy();
+				delete d;
 			}
 		}
 

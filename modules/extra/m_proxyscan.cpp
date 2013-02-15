@@ -98,7 +98,7 @@ class ProxyConnect : public ConnectionSocket
 				IRCD->SendSZLine(NULL, x);
 			else
 				IRCD->SendAkill(NULL, x);
-			x->Destroy();
+			delete x;
 		}
 	}
 };

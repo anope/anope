@@ -114,7 +114,7 @@ class CommandMSDel : public Command
 						FOREACH_MOD(I_OnMemoDel, OnMemoDel(ci, mi, mi->GetMemo(i)));
 					else
 						FOREACH_MOD(I_OnMemoDel, OnMemoDel(source.nc, mi, mi->GetMemo(i)));
-					mi->GetMemo(i)->Destroy();
+					delete mi->GetMemo(i);
 				}
 				mi->memos->clear();
 				if (!chan.empty())

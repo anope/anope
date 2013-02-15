@@ -411,7 +411,7 @@ class XOPBase : public Command
 					source.Reply(_("\002%s\002 deleted from %s %s list."), a->mask.c_str(), ci->name.c_str(), source.command.c_str());
 
 					FOREACH_MOD(I_OnAccessDel, OnAccessDel(ci, source, a));
-					a->Destroy();
+					delete a;
 
 					return;
 				}

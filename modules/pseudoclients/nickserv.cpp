@@ -177,7 +177,7 @@ class ExpireCallback : public CallBack
 					extra = "suspended ";
 				Log(LOG_NORMAL, "expire") << "Expiring " << extra << "nickname " << na->nick << " (group: " << na->nc->display << ") (e-mail: " << (na->nc->email.empty() ? "none" : na->nc->email) << ")";
 				FOREACH_MOD(I_OnNickExpire, OnNickExpire(na));
-				na->Destroy();
+				delete na;
 			}
 		}
 	}

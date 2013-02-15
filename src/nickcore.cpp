@@ -63,7 +63,7 @@ NickCore::~NickCore()
 	if (!this->memos.memos->empty())
 	{
 		for (unsigned i = 0, end = this->memos.memos->size(); i < end; ++i)
-			this->memos.GetMemo(i)->Destroy();
+			delete this->memos.GetMemo(i);
 		this->memos.memos->clear();
 	}
 }

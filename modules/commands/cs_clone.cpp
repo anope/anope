@@ -59,7 +59,7 @@ public:
 
 		if (what.empty())
 		{
-			target_ci->Destroy();
+			delete target_ci;
 			target_ci = new ChannelInfo(*ci);
 			target_ci->name = target;
 			(*RegisteredChannelList)[target_ci->name] = target_ci;

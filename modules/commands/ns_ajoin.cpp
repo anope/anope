@@ -161,7 +161,7 @@ class CommandNSAJoin : public Command
 			source.Reply(_("%s was not found on %s's auto join list."), chan.c_str(), nc->display.c_str());
 		else
 		{
-			(*channels)->at(i)->Destroy();
+			delete (*channels)->at(i);
 			(*channels)->erase((*channels)->begin() + i);
 			source.Reply(_("%s was removed from %s's auto join list."), chan.c_str(), nc->display.c_str());
 		}

@@ -101,7 +101,7 @@ void MemoInfo::Del(unsigned index)
 {
 	if (index >= this->memos->size())
 		return;
-	this->GetMemo(index)->Destroy();
+	delete this->GetMemo(index);
 }
 
 bool MemoInfo::HasIgnore(User *u)

@@ -301,7 +301,7 @@ bool XLineManager::DelXLine(XLine *x)
 	{
 		this->SendDel(x);
 
-		x->Destroy();
+		delete x;
 		this->xlines->erase(it);
 
 		return true;
@@ -327,7 +327,7 @@ void XLineManager::Clear()
 		XLine *x = this->xlines->at(i);
 		if (!x->id.empty())
 			XLinesByUID->erase(x->id);
-		x->Destroy();
+		delete x;
 	}
 	this->xlines->clear();
 }

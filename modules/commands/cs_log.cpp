@@ -117,7 +117,7 @@ public:
 				{
 					if (log->extra == extra)
 					{
-						log->Destroy();
+						delete log;
 						ci->log_settings->erase(ci->log_settings->begin() + i - 1);
 						Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to remove logging for " << command << " with method " << method << (extra == "" ? "" : " ") << extra;
 						source.Reply(_("Logging for command %s on %s with log method %s%s%s has been removed."), command_name.c_str(), bi->nick.c_str(), method.c_str(), extra.empty() ? "" : " ", extra.empty() ? "" : extra.c_str());

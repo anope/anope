@@ -75,11 +75,11 @@ class CoreExport Serializable : public virtual Base
  	Serializable(const Anope::string &serialize_type);
 	Serializable(const Serializable &);
 
-	virtual ~Serializable();
-
 	Serializable &operator=(const Serializable &);
 
  public:
+	virtual ~Serializable();
+
  	/* Unique ID (per type, not globally) for this object */
 	unsigned int id;
 

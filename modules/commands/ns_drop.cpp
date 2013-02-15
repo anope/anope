@@ -55,7 +55,7 @@ class CommandNSDrop : public Command
 			FOREACH_MOD(I_OnNickDrop, OnNickDrop(source, na));
 
 			Log(!is_mine ? LOG_OVERRIDE : LOG_COMMAND, source, this) << "to drop nickname " << na->nick << " (group: " << na->nc->display << ") (email: " << (!na->nc->email.empty() ? na->nc->email : "none") << ")";
-			na->Destroy();
+			delete na;
 
 			if (!is_mine)
 			{

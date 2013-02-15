@@ -72,7 +72,7 @@ class MyNewsService : public NewsService
 	{
 		for (unsigned i = 0; i < 3; ++i)
 			for (unsigned j = 0; j < newsItems[i].size(); ++j)
-				newsItems[i][j]->Destroy();
+				delete newsItems[i][j];
 	}
 
 	void AddNewsItem(NewsItem *n)
@@ -86,7 +86,7 @@ class MyNewsService : public NewsService
 		std::vector<NewsItem *>::iterator it = std::find(list.begin(), list.end(), n);
 		if (it != list.end())
 			list.erase(it);
-		n->Destroy();
+		delete n;
 	}
 
 	std::vector<NewsItem *> &GetNewsList(NewsType t)

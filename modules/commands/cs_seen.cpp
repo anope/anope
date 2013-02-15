@@ -152,7 +152,7 @@ class CommandOSSeen : public Command
 				if (time < buf->second->last)
 				{
 					Log(LOG_DEBUG) << buf->first << " was last seen " << Anope::strftime(buf->second->last) << ", deleting entry";
-					buf->second->Destroy();
+					delete buf->second;
 					database.erase(buf);
 					counter++;
 				}
@@ -309,7 +309,7 @@ class DataBasePurger : public CallBack
 			if ((Anope::CurTime - cur->second->last) > purgetime)
 			{
 				Log(LOG_DEBUG) << cur->first << " was last seen " << Anope::strftime(cur->second->last) << ", purging entries";
-				cur->second->Destroy();
+				delete cur->second;
 				database.erase(cur);
 			}
 		}

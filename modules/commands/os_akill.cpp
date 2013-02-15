@@ -172,7 +172,7 @@ class CommandOSAKill : public Command
 		{
 			source.Reply(USERHOST_MASK_TOO_WIDE, mask.c_str());
 			Log(LOG_ADMIN, source, this) << "tried to akill " << percent << "% of the network (" << affected << " users)";
-			x->Destroy();
+			delete x;
 			return;
 		}
 
@@ -180,7 +180,7 @@ class CommandOSAKill : public Command
 		FOREACH_RESULT(I_OnAddXLine, OnAddXLine(source, x, akills));
 		if (MOD_RESULT == EVENT_STOP)
 		{
-			x->Destroy();
+			delete x;
 			return;
 		}
 

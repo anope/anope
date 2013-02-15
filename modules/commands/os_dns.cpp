@@ -62,7 +62,7 @@ struct DNSZone : Serializable
 		for (unsigned count = 0; true; ++count)
 		{
 			Anope::string server_str;
-			data["server" + stringify(count++)] >> server_str;
+			data["server" + stringify(count)] >> server_str;
 			if (server_str.empty())
 				break;
 			zone->servers.insert(server_str);

@@ -104,14 +104,11 @@ class DBSQL : public Module, public Pipe
 
 			if (this->sql)
 			{
-				Data *data = new Data();
-				obj->Serialize(*data);
+				Data data;
+				obj->Serialize(data);
 
 				if (obj->IsCached(data))
-				{
-					delete data;
 					continue;
-				}
 
 				obj->UpdateCache(data);
 
@@ -119,12 +116,18 @@ class DBSQL : public Module, public Pipe
 				if (!s_type)
 					continue;
 
-				std::vector<Query> create = this->sql->CreateTable(this->prefix + s_type->GetName(), *data);
+				std::vector<Query> create = this->sql->CreateTable(this->prefix + s_type->GetName(), data);
 				for (unsigned i = 0; i < create.size(); ++i)
 					this->RunBackground(create[i]);
 
-				Query insert = this->sql->BuildInsert(this->prefix + s_type->GetName(), obj->id, *data);
-				this->RunBackground(insert, new ResultSQLSQLInterface(this, obj));
+				Query insert = this->sql->BuildInsert(this->prefix + s_type->GetName(), obj->id, data);
+				if (this->loaded)
+					this->RunBackground(insert, new ResultSQLSQLInterface(this, obj));
+				else
+					/* If we aren't loading these objects then we are importing them, so don't do asynchronous
+					 * queries in case for some reason the core has to shut down, it will cut short the import
+					 */
+					this->sql->RunQuery(insert);
 			}
 		}
 
@@ -209,13 +212,13 @@ class DBSQL : public Module, public Pipe
 
 		for (int j = 0; j < res.Rows(); ++j)
 		{
-			Data *data = new Data();
+			Data data;
 
 			const std::map<Anope::string, Anope::string> &row = res.Row(j);
 			for (std::map<Anope::string, Anope::string>::const_iterator rit = row.begin(), rit_end = row.end(); rit != rit_end; ++rit)
-				(*data)[rit->first] << rit->second;
+				data[rit->first] << rit->second;
 
-			Serializable *obj = sb->Unserialize(NULL, *data);
+			Serializable *obj = sb->Unserialize(NULL, data);
 			try
 			{
 				if (obj)
@@ -227,9 +230,14 @@ class DBSQL : public Module, public Pipe
 			}
 
 			if (obj)
-				obj->UpdateCache(data); /* We know this is the most up to date copy */
-			else
-				delete data;
+			{
+				Data data2;
+				/* The Unserialize operation is destructive so rebuild the data for UpdateCache */
+				for (std::map<Anope::string, Anope::string>::const_iterator rit = row.begin(), rit_end = row.end(); rit != rit_end; ++rit)
+					if (rit->first != "id" && rit->first != "timestamp")
+						data2[rit->first] << rit->second;
+				obj->UpdateCache(data2); /* We know this is the most up to date copy */
+			}
 		}
 	}
 };

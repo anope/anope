@@ -308,11 +308,19 @@ namespace Anope
 	inline const string operator+(const char *_str, const string &str) { string tmp(_str); tmp += str; return tmp; }
 	inline const string operator+(const std::string &_str, const string &str) { string tmp(_str); tmp += str; return tmp; }
 
-	struct hash
+	struct hash_ci
 	{
 		inline size_t operator()(const string &s) const
 		{
 			return std::tr1::hash<std::string>()(s.lower().str());
+		}
+	};
+
+	struct hash_cs
+	{
+		inline size_t operator()(const string &s) const
+		{
+			return std::tr1::hash<std::string>()(s.str());
 		}
 	};
 
@@ -325,7 +333,7 @@ namespace Anope
 	};
 
 	template<typename T> class map : public std::map<string, T, ci::less> { };
-	template<typename T> class hash_map : public std::tr1::unordered_map<string, T, hash, compare> { };
+	template<typename T> class hash_map : public std::tr1::unordered_map<string, T, hash_ci, compare> { };
 
 	static const char *const compiled = __TIME__ " " __DATE__;
 

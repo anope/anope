@@ -33,8 +33,7 @@ namespace Serialize
 
 		virtual std::iostream& operator[](const Anope::string &key) = 0;
 		virtual std::set<Anope::string> KeySet() const { throw CoreException("Not supported"); }
-
-		virtual bool IsEqual(Data *other) { throw CoreException("Not supported"); }
+		virtual size_t Hash() const { throw CoreException("Not supported"); }
 
 		virtual void SetType(const Anope::string &key, Type t) { }
 		virtual Type GetType(const Anope::string &key) const { return DT_TEXT; }
@@ -65,12 +64,11 @@ class CoreExport Serializable : public virtual Base
  private:
  	/* Iterator into serializable_items */
 	std::list<Serializable *>::iterator s_iter;
-	/* The last serialized form of this object commited to the database */
-	Serialize::Data *last_commit;
+	/* The hash of the last serialized form of this object commited to the database */
+	size_t last_commit;
 	/* The last time this object was commited to the database */
 	time_t last_commit_time;
 
-	Serializable();
  protected:
  	Serializable(const Anope::string &serialize_type);
 	Serializable(const Serializable &);
@@ -87,8 +85,8 @@ class CoreExport Serializable : public virtual Base
 	 */
 	void QueueUpdate();
 
-	bool IsCached(Serialize::Data *);
-	void UpdateCache(Serialize::Data *);
+	bool IsCached(Serialize::Data &);
+	void UpdateCache(Serialize::Data &);
 
 	bool IsTSCached();
 	void UpdateTS();

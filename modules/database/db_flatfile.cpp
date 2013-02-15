@@ -71,6 +71,15 @@ class LoadData : public Serialize::Data
 			keys.insert(it->first);
 		return keys;
 	}
+
+	size_t Hash() const anope_override
+	{
+		size_t hash = 0;
+		for (std::map<Anope::string, Anope::string>::const_iterator it = this->data.begin(), it_end = this->data.end(); it != it_end; ++it)
+			if (!it->second.empty())
+				hash ^= Anope::hash_cs()(it->second);
+		return hash;
+	}
 	
 	void Reset()
 	{

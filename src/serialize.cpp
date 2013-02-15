@@ -35,12 +35,7 @@ void Serialize::RegisterTypes()
 		memo("Memo", Memo::Unserialize), xline("XLine", XLine::Unserialize);
 }
 
-Serializable::Serializable() : last_commit(NULL), last_commit_time(0), id(0)
-{
-	throw CoreException("Default Serializable constructor?");
-}
-
-Serializable::Serializable(const Anope::string &serialize_type) : last_commit(NULL), last_commit_time(0), id(0)
+Serializable::Serializable(const Anope::string &serialize_type) : last_commit(0), last_commit_time(0), id(0)
 {
 	if (SerializableItems == NULL)
 		SerializableItems = new std::list<Serializable *>();
@@ -54,7 +49,7 @@ Serializable::Serializable(const Anope::string &serialize_type) : last_commit(NU
 	FOREACH_MOD(I_OnSerializableConstruct, OnSerializableConstruct(this));
 }
 
-Serializable::Serializable(const Serializable &other) : last_commit(NULL), last_commit_time(0), id(0)
+Serializable::Serializable(const Serializable &other) : last_commit(0), last_commit_time(0), id(0)
 {
 	SerializableItems->push_back(this);
 	this->s_iter = SerializableItems->end();
@@ -70,7 +65,6 @@ Serializable::~Serializable()
 	FOREACH_MOD(I_OnSerializableDestruct, OnSerializableDestruct(this));
 
 	SerializableItems->erase(this->s_iter);
-	delete last_commit;
 }
 
 Serializable &Serializable::operator=(const Serializable &)
@@ -87,15 +81,14 @@ void Serializable::QueueUpdate()
 	FOREACH_MOD(I_OnSerializeCheck, OnSerializeCheck(this->GetSerializableType()));
 }
 
-bool Serializable::IsCached(Serialize::Data *data)
+bool Serializable::IsCached(Serialize::Data &data)
 {
-	return this->last_commit && this->last_commit->IsEqual(data);
+	return this->last_commit == data.Hash();
 }
 
-void Serializable::UpdateCache(Serialize::Data *data)
+void Serializable::UpdateCache(Serialize::Data &data)
 {
-	delete this->last_commit;
-	this->last_commit = data;
+	this->last_commit = data.Hash();
 }
 
 bool Serializable::IsTSCached()

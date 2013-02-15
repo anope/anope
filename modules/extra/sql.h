@@ -31,45 +31,31 @@ namespace SQL
 		std::set<Anope::string> KeySet() const anope_override
 		{
 			std::set<Anope::string> keys;
-			for (std::map<Anope::string, std::stringstream *>::const_iterator it = this->data.begin(), it_end = this->data.end(); it != it_end; ++it)
+			for (Map::const_iterator it = this->data.begin(), it_end = this->data.end(); it != it_end; ++it)
 				keys.insert(it->first);
 			return keys;
 		}
 
-		bool IsEqual(Serialize::Data *other) anope_override
+		size_t Hash() const anope_override
 		{
-			try
-			{
-				Data *o = anope_dynamic_static_cast<Data *>(other);
-			
-				for (std::map<Anope::string, std::stringstream *>::const_iterator it = o->data.begin(), it_end = o->data.end(); it != it_end; ++it)
-					if (!this->data.count(it->first) || it->second->str() != this->data[it->first]->str())
-						return false;
-				for (std::map<Anope::string, std::stringstream *>::const_iterator it = this->data.begin(), it_end = this->data.end(); it != it_end; ++it)
-					if (!o->data.count(it->first) || it->second->str() != o->data[it->first]->str())
-						return false;
-
-				return true;
-			}
-			catch (const CoreException &ex)
-			{
-				Log(LOG_DEBUG) << ex.GetReason();
-			}
-
-			return false;
+			size_t hash = 0;
+			for (Map::const_iterator it = this->data.begin(), it_end = this->data.end(); it != it_end; ++it)
+				if (!it->second->str().empty())
+					hash ^= Anope::hash_cs()(it->second->str());
+			return hash;
 		}
 
 		std::map<Anope::string, std::iostream *> GetData() const
 		{
 			std::map<Anope::string, std::iostream *> d;
-			for (std::map<Anope::string, std::stringstream *>::const_iterator it = this->data.begin(), it_end = this->data.end(); it != it_end; ++it)
+			for (Map::const_iterator it = this->data.begin(), it_end = this->data.end(); it != it_end; ++it)
 				d[it->first] = it->second;
 			return d;
 		}
 
 		void Clear()
 		{
-			for (std::map<Anope::string, std::stringstream *>::iterator it = this->data.begin(), it_end = this->data.end(); it != it_end; ++it)
+			for (Map::const_iterator it = this->data.begin(), it_end = this->data.end(); it != it_end; ++it)
 				delete it->second;
 			this->data.clear();
 		}

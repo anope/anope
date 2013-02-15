@@ -89,14 +89,11 @@ class DBMySQL : public Module, public Pipe
 
 			if (obj && this->SQL)
 			{
-				Data *data = new Data();
-				obj->Serialize(*data);
+				Data data;
+				obj->Serialize(data);
 
 				if (obj->IsCached(data))
-				{
-					delete data;
 					continue;
-				}
 
 				obj->UpdateCache(data);
 
@@ -104,11 +101,11 @@ class DBMySQL : public Module, public Pipe
 				if (!s_type)
 					continue;
 
-				std::vector<Query> create = this->SQL->CreateTable(this->prefix + s_type->GetName(), *data);
+				std::vector<Query> create = this->SQL->CreateTable(this->prefix + s_type->GetName(), data);
 				for (unsigned i = 0; i < create.size(); ++i)
 					this->RunQueryResult(create[i]);
 
-				Result res = this->RunQueryResult(this->SQL->BuildInsert(this->prefix + s_type->GetName(), obj->id, *data));
+				Result res = this->RunQueryResult(this->SQL->BuildInsert(this->prefix + s_type->GetName(), obj->id, data));
 				if (res.GetID() && obj->id != res.GetID())
 				{
 					/* In this case obj is new, so place it into the object map */
@@ -199,17 +196,17 @@ class DBMySQL : public Module, public Pipe
 			}
 			else
 			{
-				Data *data = new Data();
+				Data data;
 
 				for (std::map<Anope::string, Anope::string>::const_iterator it = row.begin(), it_end = row.end(); it != it_end; ++it)
-					(*data)[it->first] << it->second;
+					data[it->first] << it->second;
 
 				Serializable *s = NULL;
 				std::map<unsigned int, Serializable *>::iterator it = obj->objects.find(id);
 				if (it != obj->objects.end())
 					s = it->second;
 
-				Serializable *new_s = obj->Unserialize(s, *data);
+				Serializable *new_s = obj->Unserialize(s, data);
 				if (new_s)
 				{
 					// If s == new_s then s->id == new_s->id
@@ -217,14 +214,17 @@ class DBMySQL : public Module, public Pipe
 					{
 						new_s->id = id;
 						obj->objects[id] = new_s;
-						new_s->UpdateCache(data); /* We know this is the most up to date copy */
+
+						Data data2;
+						/* The Unserialize operation is destructive so rebuild the data for UpdateCache */
+						for (std::map<Anope::string, Anope::string>::const_iterator rit = row.begin(), rit_end = row.end(); rit != rit_end; ++rit)
+							if (rit->first != "id" && rit->first != "timestamp")
+								data2[rit->first] << rit->second;
+						new_s->UpdateCache(data2); /* We know this is the most up to date copy */
 					}
-					else
-						delete data;
 				}
 				else
 				{
-					delete data;
 					delete s;
 				}
 			}

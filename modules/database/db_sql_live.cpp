@@ -239,7 +239,7 @@ class DBMySQL : public Module, public Pipe
 
 	void OnSerializableUpdate(Serializable *obj) anope_override
 	{
-		if (obj->IsTSCached())
+		if (!this->CheckInit() || obj->IsTSCached())
 			return;
 		obj->UpdateTS();
 		this->updated_items.insert(obj);

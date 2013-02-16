@@ -599,6 +599,9 @@ void ModeManager::UpdateDefaultMLock(ServerConfig *config)
 
 		if (cm && cm->type == MODE_STATUS)
 			DefaultBotModes.modes.insert(cm->name);
+		else
+			/* We don't know the mode yet so just use the mode char */
+			DefaultBotModes.modes.insert(config->BotModes[i]);
 	}
 }
 

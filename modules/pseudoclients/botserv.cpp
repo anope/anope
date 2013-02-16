@@ -159,7 +159,7 @@ class BotServCore : public Module
 
 	void OnJoinChannel(User *user, Channel *c) anope_override
 	{
-		if (c->ci && c->ci->bi)
+		if (user->server != Me && c->ci && c->ci->bi)
 		{
 			/**
 			 * We let the bot join even if it was an ignored user, as if we don't,

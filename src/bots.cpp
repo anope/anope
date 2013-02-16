@@ -147,7 +147,7 @@ void BotInfo::Assign(User *u, ChannelInfo *ci)
 		ci->bi->UnAssign(u, ci);
 	
 	ci->bi = this;
-	if (ci->c && ci->c->users.size() >= Config->BSMinUsers)
+	if (Me->IsSynced() && ci->c && ci->c->users.size() >= Config->BSMinUsers)
 		this->Join(ci->c, &ModeManager::DefaultBotModes);
 }
 

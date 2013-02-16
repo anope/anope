@@ -235,8 +235,15 @@ class InspIRCd12Proto : public IRCDProto
 
 			BotInfo *setter = BotInfo::Find(user->nick);
 			for (unsigned i = 0; i < ModeManager::ChannelModes.size(); ++i)
-				if (cs.modes.count(ModeManager::ChannelModes[i]->name))
+			{
+				ChannelMode *cm = ModeManager::ChannelModes[i];
+
+				if (cs.modes.count(cm->name) || cs.modes.count(cm->mchar))
+				{
 					c->SetMode(setter, ModeManager::ChannelModes[i], user->GetUID(), false);
+					cs.modes.insert(cm->name);
+				}
+			}
 		}
 	}
 

@@ -43,6 +43,7 @@ class InspIRCd20Proto : public IRCDProto
 		insp12->SendConnect();
 	}
 
+	void SendSVSKillInternal(const BotInfo *source, User *user, const Anope::string &buf) anope_override { insp12->SendSVSKillInternal(source, user, buf); }
 	void SendGlobalNotice(const BotInfo *bi, const Server *dest, const Anope::string &msg) anope_override { insp12->SendGlobalNotice(bi, dest, msg); }
 	void SendGlobalPrivmsg(const BotInfo *bi, const Server *dest, const Anope::string &msg) anope_override { insp12->SendGlobalPrivmsg(bi, dest, msg); }
 	void SendAkillDel(const XLine *x) anope_override { insp12->SendAkillDel(x); }

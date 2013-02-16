@@ -35,6 +35,12 @@ class ChannelModeFlood : public ChannelModeParam
 class InspIRCd12Proto : public IRCDProto
 {
  private:
+	void SendSVSKillInternal(const BotInfo *source, User *user, const Anope::string &buf) anope_override
+	{
+		IRCDProto::SendSVSKillInternal(source, user, buf);
+		user->KillInternal(source ? source->nick : Me->GetName(), buf);
+	}
+
 	void SendChgIdentInternal(const Anope::string &nick, const Anope::string &vIdent)
 	{
 		if (!Servers::Capab.count("CHGIDENT"))

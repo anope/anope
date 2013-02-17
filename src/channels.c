@@ -1741,6 +1741,7 @@ void chan_delete(Channel * c)
         while (c->bans->entries) {
             entry_delete(c->bans, c->bans->entries);
         }
+        free(c->bans);
     }
 
     if (ircd->except) {
@@ -1748,6 +1749,7 @@ void chan_delete(Channel * c)
             while (c->excepts->entries) {
                 entry_delete(c->excepts, c->excepts->entries);
             }
+            free(c->excepts);
         }
     }
 
@@ -1756,6 +1758,7 @@ void chan_delete(Channel * c)
             while (c->invites->entries) {
                 entry_delete(c->invites, c->invites->entries);
             }
+            free(c->invites);
         }
     }
 
@@ -1784,6 +1787,10 @@ void del_ban(Channel * chan, char *mask)
 
     if (ban) {
         entry_delete(chan->bans, ban);
+        if (chan->bans->count == 0) {
+            free(chan->bans);
+            chan->bans = NULL;
+        }
 
         if (debug)
             alog("debug: Deleted ban %s from channel %s", mask,
@@ -1808,6 +1815,10 @@ void del_exception(Channel * chan, char *mask)
 
     if (exception) {
         entry_delete(chan->excepts, exception);
+        if (chan->excepts->count == 0) {
+            free(chan->excepts);
+            chan->excepts = NULL;
+        }
 
         if (debug)
             alog("debug: Deleted except %s to channel %s", mask,
@@ -1830,6 +1841,10 @@ void del_invite(Channel * chan, char *mask)
 
     if (invite) {
         entry_delete(chan->invites, invite);
+        if(chan->invites->count == 0) {
+            free(chan->invites);
+            chan->invites = NULL;
+        }
 
         if (debug)
             alog("debug: Deleted invite %s to channel %s", mask,

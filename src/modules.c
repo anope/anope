@@ -2598,13 +2598,10 @@ int moduleGetConfigDirective(Directive * d)
             }
             retval = parse_directive(d, directive, ac, av, linenum, 0, s);
         }
-        if (directive)
-            free(directive);
+        Anope_Free(directive);
+		Anope_Free(dir);
+        Anope_Free(str);
     }
-    if (dir)
-        free(dir);
-    if (str)
-       free(str);
     fclose(config);
     return retval;
 }

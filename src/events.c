@@ -597,6 +597,7 @@ int moduleEventDelHook(const char *name)
     if (debug) {
         displayHookFromHash(evh->name);
     }
+    destroyEventHook(evh);
     return status;
 }
 
@@ -717,6 +718,7 @@ int delEventHook(EvtHookHash * hookEvtTable[], EvtHook * evh,
                 } else {
                     hookEvtTable[index] = current->next;
                     free(current->name);
+                    free(current);
                     return MOD_ERR_OK;
                 }
             } else {
@@ -738,6 +740,7 @@ int delEventHook(EvtHookHash * hookEvtTable[], EvtHook * evh,
                 } else {
                     lastHash->next = current->next;
                     free(current->name);
+                    free(current);
                     return MOD_ERR_OK;
                 }
             }
@@ -788,5 +791,6 @@ int destroyEventHook(EvtHook * evh)
         free(evh->mod_name);
     }
     evh->next = NULL;
+    free(evh);
     return MOD_ERR_OK;
 }

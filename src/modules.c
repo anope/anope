@@ -833,12 +833,12 @@ int prepForUnload(Module * m)
     CommandHash *current = NULL, *current_next = NULL;
     MessageHash *mcurrent = NULL, *mcurrent_next = NULL;
     EvtMessageHash *ecurrent = NULL, *ecurrent_next = NULL;
-    EvtHookHash *ehcurrent = NULL;
+    EvtHookHash *ehcurrent = NULL, *ehcurrent_next = NULL;
 
     Command *c, *c_next;
     Message *msg, *msg_next;
     EvtMessage *eMsg, *eMsg_next;
-    EvtHook *eHook;
+    EvtHook *eHook, *eHook_next;
 
     if (!m) {
         return MOD_ERR_PARAMS;
@@ -953,12 +953,14 @@ int prepForUnload(Module * m)
                 }
             }
         }
-        for (ehcurrent = EVENTHOOKS[idx]; ehcurrent;
-             ehcurrent = ehcurrent->next) {
-            for (eHook = ehcurrent->evh; eHook; eHook = eHook->next) {
+        for (ehcurrent = EVENTHOOKS[idx]; ehcurrent; ehcurrent = ehcurrent_next) {
+            ehcurrent_next = ehcurrent->next;
+            for (eHook = ehcurrent->evh; eHook; eHook = eHook_next) {
+                eHook_next = eHook->next;
                 if ((eHook->mod_name)
                     && (stricmp(eHook->mod_name, m->name) == 0)) {
                     delEventHook(EVENTHOOKS, eHook, m->name);
+                    destroyEventHook(eHook);
                 }
             }
         }

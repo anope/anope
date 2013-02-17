@@ -893,7 +893,12 @@ struct IRCDMessageSASL : IRCDMessage
 			return;
 
 		if (params[2] == "S")
-			UplinkSocket::Message() << "SASL " << params[1].substr(0, p) << " " << params[1] << " C +";
+		{
+			if (params[3] == "PLAIN")
+				UplinkSocket::Message() << "SASL " << params[1].substr(0, p) << " " << params[1] << " C +";
+			else
+				UplinkSocket::Message() << "SASL " << params[1].substr(0, p) << " " << params[1] << " C F";
+		}
 		else if (params[2] == "C")
 		{
 			Anope::string decoded;

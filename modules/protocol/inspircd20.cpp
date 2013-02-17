@@ -568,7 +568,12 @@ struct IRCDMessageEncap : IRCDMessage
 			                                            base64(account\0account\0pass)
 			*/
 			if (params[4] == "S")
-				UplinkSocket::Message(Me) << "ENCAP " << params[2].substr(0, 3) << " SASL " << Me->GetSID() << " " << params[2] << " C +";
+			{
+				if (params[5] == "PLAIN")
+					UplinkSocket::Message(Me) << "ENCAP " << params[2].substr(0, 3) << " SASL " << Me->GetSID() << " " << params[2] << " C +";
+				else
+					UplinkSocket::Message(Me) << "ENCAP " << params[2].substr(0, 3) << " SASL " << Me->GetSID() << " " << params[2] << " C F";
+			}
 			else if (params[4] == "C")
 			{
 				Anope::string decoded;

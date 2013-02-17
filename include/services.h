@@ -1326,9 +1326,10 @@ typedef struct ircd_modes_ {
 #define LANG_RU                13   	/* Russian */
 #define LANG_HUN               14   	/* Hungarian */
 #define LANG_PL                15   	/* Polish */
+#define LANG_JA_UTF8           16	/* Japanese (UTF-8 encoding) */
 
-#define NUM_LANGS              16	/* Number of languages */
-#define USED_LANGS             13	/* Number of languages provided */
+#define NUM_LANGS              17	/* Number of languages */
+#define USED_LANGS             14	/* Number of languages provided */
 
 
 #define DEF_LANGUAGE	LANG_EN_US

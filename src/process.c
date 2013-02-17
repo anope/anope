@@ -78,6 +78,7 @@ void add_ignore(const char *nick, time_t delta)
         else if (ign->time < now + delta)
             ign->time = now + delta;
 
+        free(mask);
     /* Create new entry.. */ 
     } else {
         ign = scalloc(sizeof(*ign), 1);

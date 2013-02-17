@@ -322,8 +322,8 @@ int slist_indexof(SList * slist, void *item)
     if (slist->count == 0)
         return -1;
 
-    for (i = 0, entry = slist->list[0]; i < slist->count;
-         i++, entry = slist->list[i]) {
+    for (i = 0; i < slist->count; i++) {
+        entry = slist->list[i];
         if ((slist->opts
              && slist->opts->isequal) ? (slist->opts->isequal(slist, item,
                                                               entry))

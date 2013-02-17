@@ -158,6 +158,8 @@ static int my_cs_appendtopic(User * u)
             }
         }
     }
+    Anope_Free(chan);
+    Anope_Free(newtopic);
     return MOD_CONT;
 }
 

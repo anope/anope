@@ -1736,6 +1736,7 @@ int destroyMessage(Message * m)
 void moduleAddVersion(const char *version)
 {
     if (mod_current_module && version) {
+        Anope_Free(mod_current_module->version);
         mod_current_module->version = sstrdup(version);
     }
 }
@@ -1747,6 +1748,7 @@ void moduleAddVersion(const char *version)
 void moduleAddAuthor(const char *author)
 {
     if (mod_current_module && author) {
+        Anope_Free(mod_current_module->author);
         mod_current_module->author = sstrdup(author);
     }
 }

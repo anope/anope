@@ -719,13 +719,12 @@ static void my_load_config(void)
     for (i = 0; i < 4; i++)
         moduleGetConfigDirective(confvalues[i]);
 
-    if (tmp) {
-        if (HSRequestDBName)
-            free(HSRequestDBName);
+    Anope_Free(HSRequestDBName);
+    
+    if (tmp)
         HSRequestDBName = sstrdup(tmp);
-    } else {
+    else
         HSRequestDBName = sstrdup(HSREQ_DEFAULT_DBNAME);
-    }
 
     if (debug)
         alog("debug: [hs_request] Set config vars: MemoUser=%d MemoOper=%d MemoSetters=%d DBName='%s'", HSRequestMemoUser, HSRequestMemoOper, HSRequestMemoSetters, HSRequestDBName);

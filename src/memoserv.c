@@ -275,6 +275,7 @@ void memo_send_from(User * u, char *name, char *text, int z, char *source)
         mi->memocount++;
         mi->memos = srealloc(mi->memos, sizeof(Memo) * mi->memocount);
         m = &mi->memos[mi->memocount - 1];
+        memset(m->sender, '\0', sizeof(m->sender));
         strscpy(m->sender, source, NICKMAX);
         m->moduleData = NULL;
         if (mi->memocount > 1) {

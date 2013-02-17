@@ -220,7 +220,7 @@ char *GlobalOnCycleMessage;
 char *GlobalOnCycleUP;
 char *ServicesRoot;
 char **ServicesRoots;
-int RootNumber;
+int RootNumber = 0;
 int SuperAdmin;
 int LogBot;
 int LogMaxUsers;
@@ -272,8 +272,8 @@ int OSOpersOnly;
 char *Modules;
 char *ModulesDelayed;
 char **ModulesAutoload;
-int ModulesNumber;
-int ModulesDelayedNumber;
+int ModulesNumber = 0;
+int ModulesDelayedNumber = 0;
 char **ModulesDelayedAutoload;
 
 /**
@@ -281,31 +281,31 @@ char **ModulesDelayedAutoload;
  **/
 char *HostCoreModules;
 char **HostServCoreModules;
-int HostServCoreNumber;
+int HostServCoreNumber = 0;
 
 char *MemoCoreModules;
 char **MemoServCoreModules;
-int MemoServCoreNumber;
+int MemoServCoreNumber = 0;
 
 char *HelpCoreModules;
 char **HelpServCoreModules;
-int HelpServCoreNumber;
+int HelpServCoreNumber = 0;
 
 char *BotCoreModules;
 char **BotServCoreModules;
-int BotServCoreNumber;
+int BotServCoreNumber = 0;
 
 char *OperCoreModules;
 char **OperServCoreModules;
-int OperServCoreNumber;
+int OperServCoreNumber = 0;
 
 char *NickCoreModules;
 char **NickServCoreModules;
-int NickServCoreNumber;
+int NickServCoreNumber = 0;
 
 char *ChanCoreModules;
 char **ChanServCoreModules;
-int ChanServCoreNumber;
+int ChanServCoreNumber = 0;
 
 
 char *MysqlHost;
@@ -346,7 +346,7 @@ int UnRestrictSAdmin;
 
 char *UlineServers;
 char **Ulines;
-int NumUlines;
+int NumUlines = 0;
 
 int UseTS6;
 
@@ -774,8 +774,7 @@ int parse_directive(Directive * d, char *dir, int ac, char *av[MAXPARAMS],
             *(int *) d->params[i].ptr = val;
             break;
         case PARAM_STRING:
-/*	      if (reload && *(char **)d->params[i].ptr)
-	      	free(*(char **)d->params[i].ptr); */
+            Anope_Free(*(char **)d->params[i].ptr);
             *(char **) d->params[i].ptr = sstrdup(av[optind++]);
             if (!d->params[i].ptr) {
                 error(linenum, "%s: Out of memory", d->name);
@@ -1247,7 +1246,8 @@ int read_config(int reload)
     /* Services Root building */
 
     if (ServicesRoot && !reload) {      /* Check to prevent segmentation fault if it's missing */
-        RootNumber = 0;
+        while( RootNumber )
+            free(ServicesRoots[--RootNumber]);
 
         s = strtok(ServicesRoot, " ");
         do {
@@ -1268,7 +1268,8 @@ int read_config(int reload)
     /* Ulines */
 
     if (UlineServers) {
-        NumUlines = 0;
+        while( NumUlines )
+            free(Ulines[--NumUlines]);
 
         s = strtok(UlineServers, " ");
         do {
@@ -1281,30 +1282,56 @@ int read_config(int reload)
     }
 
     /* Host Setters building... :P */
+    while( HostNumber )
+        free(HostSetters[--HostNumber]);
+    Anope_Free(HostSetters);
     HostSetters = buildStringList(HostSetter, &HostNumber);
 
     /* Modules Autoload building... :P */
+    while( ModulesNumber )
+        free(ModulesAutoload[--ModulesNumber]);
+    Anope_Free(ModulesAutoload);
     ModulesAutoload = buildStringList(Modules, &ModulesNumber);
-    ModulesDelayedAutoload =
-        buildStringList(ModulesDelayed, &ModulesDelayedNumber);
-    HostServCoreModules =
-        buildStringList(HostCoreModules, &HostServCoreNumber);
-    MemoServCoreModules =
-        buildStringList(MemoCoreModules, &MemoServCoreNumber);
-    HelpServCoreModules =
-        buildStringList(HelpCoreModules, &HelpServCoreNumber);
 
-    BotServCoreModules =
-        buildStringList(BotCoreModules, &BotServCoreNumber);
+    while( ModulesDelayedNumber )
+        free(ModulesDelayedAutoload[--ModulesDelayedNumber]);
+    Anope_Free(ModulesDelayedAutoload);
+    ModulesDelayedAutoload = buildStringList(ModulesDelayed, &ModulesDelayedNumber);
 
-    OperServCoreModules =
-        buildStringList(OperCoreModules, &OperServCoreNumber);
+    while( HostServCoreNumber )
+        free(HostServCoreModules[--HostServCoreNumber]);
+    Anope_Free(HostServCoreModules);
+    HostServCoreModules = buildStringList(HostCoreModules, &HostServCoreNumber);
 
-    ChanServCoreModules =
-        buildStringList(ChanCoreModules, &ChanServCoreNumber);
+    while( MemoServCoreNumber )
+        free(MemoServCoreModules[--MemoServCoreNumber]);
+    Anope_Free(MemoServCoreModules);
+    MemoServCoreModules = buildStringList(MemoCoreModules, &MemoServCoreNumber);
 
-    NickServCoreModules =
-        buildStringList(NickCoreModules, &NickServCoreNumber);
+    while( HelpServCoreNumber )
+        free(HelpServCoreModules[--HelpServCoreNumber]);
+    Anope_Free(HelpServCoreModules);
+    HelpServCoreModules = buildStringList(HelpCoreModules, &HelpServCoreNumber);
+
+    while( BotServCoreNumber )
+        free(BotServCoreModules[--BotServCoreNumber]);
+    Anope_Free(BotServCoreModules);
+    BotServCoreModules = buildStringList(BotCoreModules, &BotServCoreNumber);
+
+    while( OperServCoreNumber )
+        free(OperServCoreModules[--OperServCoreNumber]);
+    Anope_Free(OperServCoreModules);
+    OperServCoreModules = buildStringList(OperCoreModules, &OperServCoreNumber);
+
+    while( ChanServCoreNumber )
+        free(ChanServCoreModules[--ChanServCoreNumber]);
+    Anope_Free(ChanServCoreModules);
+    ChanServCoreModules = buildStringList(ChanCoreModules, &ChanServCoreNumber);
+
+    while( NickServCoreNumber )
+        free(NickServCoreModules[--NickServCoreNumber]);
+    Anope_Free(NickServCoreModules);
+    NickServCoreModules = buildStringList(NickCoreModules, &NickServCoreNumber);
 
 
     if (LimitSessions) {
@@ -1413,6 +1440,7 @@ int read_config(int reload)
         CHECK(UseMail);
         CHECK(NSForceEmail);
     } else {
+        Anope_Free(PreNickDBName);
         PreNickDBName = NULL;
         NSRExpire = 0;
     }

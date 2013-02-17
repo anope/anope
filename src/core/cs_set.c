@@ -37,6 +37,7 @@ static int do_set_opnotice(User * u, ChannelInfo * ci, char *param);
 static int do_set_xop(User * u, ChannelInfo * ci, char *param);
 static int do_set_peace(User * u, ChannelInfo * ci, char *param);
 static int do_set_noexpire(User * u, ChannelInfo * ci, char *param);
+static int reload_config(int argc, char **argv);
 static void myChanServHelp(User * u);
 
 /**
@@ -48,6 +49,7 @@ static void myChanServHelp(User * u);
 int AnopeInit(int argc, char **argv)
 {
     Command *c;
+    EvtHook *hook;
 
     moduleAddAuthor("Anope");
     moduleAddVersion(VERSION_STRING);
@@ -124,6 +126,12 @@ int AnopeInit(int argc, char **argv)
     moduleAddCommand(CHANSERV, c, MOD_UNIQUE);
 
     moduleSetChanHelp(myChanServHelp);
+
+    hook = createEventHook(EVENT_RELOAD, reload_config);
+    if (moduleAddEventHook(hook) != MOD_ERR_OK) {
+        alog("[\002cs_set\002] Can't hook to EVENT_RELOAD event");
+        return MOD_STOP;
+    }
 
     return MOD_CONT;
 }
@@ -896,5 +904,20 @@ static int do_set_noexpire(User * u, ChannelInfo * ci, char *param)
         syntax_error(s_ChanServ, u, "SET NOEXPIRE",
                      CHAN_SET_NOEXPIRE_SYNTAX);
     }
+    return MOD_CONT;
+}
+
+/*************************************************************************/
+
+/**
+ * Upon /os reload refresh the limit in help output
+ **/
+static int reload_config(int argc, char **argv) {
+    Command *c;
+
+    if (argc >= 1 && !stricmp(argv[0], EVENT_START))
+        if ((c = findCommand(CHANSERV, "SET SUCCESSOR")))
+            c->help_param1 = (char *) (long) CSMaxReg;
+
     return MOD_CONT;
 }

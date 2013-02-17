@@ -27,7 +27,6 @@ int AnopeInit(int argc, char **argv)
 {
     Command *c;
     EvtHook *hook;
-    char buf[BUFSIZE];
 
     moduleAddAuthor("Anope");
     moduleAddVersion(VERSION_STRING);
@@ -39,8 +38,7 @@ int AnopeInit(int argc, char **argv)
      **/
     c = createCommand("LOGONNEWS", do_logonnews, is_services_admin,
                       NEWS_HELP_LOGON, -1, -1, -1, -1);
-    snprintf(buf, BUFSIZE, "%d", NewsCount),
-    c->help_param1 = sstrdup(buf);
+    c->help_param1 = (char *) (long) NewsCount;
     moduleAddCommand(OPERSERV, c, MOD_UNIQUE);
 
     moduleSetOperHelp(myOperServHelp);
@@ -59,12 +57,6 @@ int AnopeInit(int argc, char **argv)
  **/
 void AnopeFini(void)
 {
-    Command *c = findCommand(OPERSERV, "LOGONNEWS");
-    if (c && c->help_param1)
-    {
-        free(c->help_param1);
-        c->help_param1 = NULL;
-    }
 }
 
 
@@ -84,18 +76,11 @@ static void myOperServHelp(User * u)
  * Upon /os reload refresh the count
  **/
 static int reload_config(int argc, char **argv) {
-    char buf[BUFSIZE];
     Command *c;
 
-    if (argc >= 1) {
-        if (!stricmp(argv[0], EVENT_START)) {
-            if ((c = findCommand(OPERSERV, "LOGONNEWS"))) {
-                free(c->help_param1);
-                snprintf(buf, BUFSIZE, "%d", NewsCount),
-                c->help_param1 = sstrdup(buf);
-            }
-        }
-    }
+    if (argc >= 1 && !stricmp(argv[0], EVENT_START))
+        if ((c = findCommand(OPERSERV, "LOGONNEWS")))
+            c->help_param1 = (char *) (long) NewsCount;
 
     return MOD_CONT;
 }

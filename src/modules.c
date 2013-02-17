@@ -347,6 +347,7 @@ Module *createModule(char *filename)
 
     m->type = THIRD;
     for (i = 0; i < NUM_LANGS; i++) {
+        m->lang[i].argv = NULL;
         m->lang[i].argc = 0;
     }
     return m;                   /* return a nice new module */
@@ -829,15 +830,15 @@ void moduleSetType(MODType type)
 int prepForUnload(Module * m)
 {
     int idx;
-    CommandHash *current = NULL;
-    MessageHash *mcurrent = NULL;
-    EvtMessageHash *ecurrent = NULL;
-    EvtHookHash *ehcurrent = NULL;
+    CommandHash *current = NULL, *current_next = NULL;
+    MessageHash *mcurrent = NULL, *mcurrent_next = NULL;
+    EvtMessageHash *ecurrent = NULL, *ecurrent_next = NULL;
+    EvtHookHash *ehcurrent = NULL, *ehcurrent_next = NULL;
 
-    Command *c;
-    Message *msg;
-    EvtMessage *eMsg;
-    EvtHook *eHook;
+    Command *c, *c_next;
+    Message *msg, *msg_next;
+    EvtMessage *eMsg, *eMsg_next;
+    EvtHook *eHook, *eHook_next;
 
     if (!m) {
         return MOD_ERR_PARAMS;
@@ -853,85 +854,113 @@ int prepForUnload(Module * m)
      * ok, im going to walk every hash looking for commands we own, now, not exactly elegant or efficiant :)
      **/
     for (idx = 0; idx < MAX_CMD_HASH; idx++) {
-        for (current = HS_cmdTable[idx]; current; current = current->next) {
-            for (c = current->c; c; c = c->next) {
+        for (current = HS_cmdTable[idx]; current; current = current_next) {
+            current_next = current->next;
+            for (c = current->c; c; c = c_next) {
+                c_next = c->next; 
                 if ((c->mod_name) && (strcmp(c->mod_name, m->name) == 0)) {
-                    moduleDelCommand(HOSTSERV, c->name);
+                    delCommand(HOSTSERV, c, m->name);
+                    destroyCommand(c);
                 }
             }
         }
 
-        for (current = BS_cmdTable[idx]; current; current = current->next) {
-            for (c = current->c; c; c = c->next) {
+        for (current = BS_cmdTable[idx]; current; current = current_next) {
+            current_next = current->next;
+            for (c = current->c; c; c = c_next) {
+                c_next = c->next;
                 if ((c->mod_name) && (strcmp(c->mod_name, m->name) == 0)) {
-                    moduleDelCommand(BOTSERV, c->name);
+                    delCommand(BOTSERV, c, m->name);
+                    destroyCommand(c);
                 }
             }
         }
 
-        for (current = MS_cmdTable[idx]; current; current = current->next) {
-            for (c = current->c; c; c = c->next) {
+        for (current = MS_cmdTable[idx]; current; current = current_next) {
+            current_next = current->next;
+            for (c = current->c; c; c = c_next) {
+                c_next = c->next;
                 if ((c->mod_name) && (strcmp(c->mod_name, m->name) == 0)) {
-                    moduleDelCommand(MEMOSERV, c->name);
+                    delCommand(MEMOSERV, c, m->name);
+                    destroyCommand(c);
                 }
             }
         }
 
-        for (current = NS_cmdTable[idx]; current; current = current->next) {
-            for (c = current->c; c; c = c->next) {
+        for (current = NS_cmdTable[idx]; current; current = current_next) {
+            current_next = current->next;
+            for (c = current->c; c; c = c_next) {
+                c_next = c->next;
                 if ((c->mod_name) && (strcmp(c->mod_name, m->name) == 0)) {
-                    moduleDelCommand(NICKSERV, c->name);
+                    delCommand(NICKSERV, c, m->name);
+                    destroyCommand(c);
                 }
             }
         }
 
-        for (current = CS_cmdTable[idx]; current; current = current->next) {
-            for (c = current->c; c; c = c->next) {
+        for (current = CS_cmdTable[idx]; current; current = current_next) {
+            current_next = current->next;
+            for (c = current->c; c; c = c_next) {
+                c_next = c->next;
                 if ((c->mod_name) && (strcmp(c->mod_name, m->name) == 0)) {
-                    moduleDelCommand(CHANSERV, c->name);
+                    delCommand(CHANSERV, c, m->name);
+                    destroyCommand(c);
                 }
             }
         }
 
-        for (current = HE_cmdTable[idx]; current; current = current->next) {
-            for (c = current->c; c; c = c->next) {
+        for (current = HE_cmdTable[idx]; current; current = current_next) {
+            current_next = current->next;
+            for (c = current->c; c; c = c_next) {
+                c_next = c->next;
                 if ((c->mod_name) && (strcmp(c->mod_name, m->name) == 0)) {
-                    moduleDelCommand(HELPSERV, c->name);
+                    delCommand(HELPSERV, c, m->name);
+                    destroyCommand(c);
                 }
             }
         }
 
-        for (current = OS_cmdTable[idx]; current; current = current->next) {
-            for (c = current->c; c; c = c->next) {
+        for (current = OS_cmdTable[idx]; current; current = current_next) {
+            current_next = current->next;
+            for (c = current->c; c; c = c_next) {
+                c_next = c->next;
                 if ((c->mod_name) && (stricmp(c->mod_name, m->name) == 0)) {
-                    moduleDelCommand(OPERSERV, c->name);
+                    delCommand(OPERSERV, c, m->name);
+                    destroyCommand(c);
                 }
             }
         }
 
-        for (mcurrent = IRCD[idx]; mcurrent; mcurrent = mcurrent->next) {
-            for (msg = mcurrent->m; msg; msg = msg->next) {
-                if ((msg->mod_name)
-                    && (stricmp(msg->mod_name, m->name) == 0)) {
-                    moduleDelMessage(msg->name);
+        for (mcurrent = IRCD[idx]; mcurrent; mcurrent = mcurrent_next) {
+            mcurrent_next = mcurrent->next;
+            for (msg = mcurrent->m; msg; msg = msg_next) {
+                msg_next = msg->next;
+                if (msg->mod_name && (stricmp(msg->mod_name, m->name) == 0)) {
+                    delMessage(IRCD, msg, m->name);
+                    destroyMessage(msg);
                 }
             }
         }
 
-        for (ecurrent = EVENT[idx]; ecurrent; ecurrent = ecurrent->next) {
-            for (eMsg = ecurrent->evm; eMsg; eMsg = eMsg->next) {
+        for (ecurrent = EVENT[idx]; ecurrent; ecurrent = ecurrent_next) {
+            ecurrent_next = ecurrent->next;
+            for (eMsg = ecurrent->evm; eMsg; eMsg = eMsg_next) {
+                eMsg_next = eMsg->next;
                 if ((eMsg->mod_name)
                     && (stricmp(eMsg->mod_name, m->name) == 0)) {
                     delEventHandler(EVENT, eMsg, m->name);
+                    destroyEventHandler(eMsg);
                 }
             }
         }
-        for (ehcurrent = EVENTHOOKS[idx]; ehcurrent;
-             ehcurrent = ehcurrent->next) {
-            for (eHook = ehcurrent->evh; eHook; eHook = eHook->next) {
+        for (ehcurrent = EVENTHOOKS[idx]; ehcurrent; ehcurrent = ehcurrent_next) {
+            ehcurrent_next = ehcurrent->next;
+            for (eHook = ehcurrent->evh; eHook; eHook = eHook_next) {
+                eHook_next = eHook->next;
                 if ((eHook->mod_name)
                     && (stricmp(eHook->mod_name, m->name) == 0)) {
                     delEventHook(EVENTHOOKS, eHook, m->name);
+                    destroyEventHook(eHook);
                 }
             }
         }
@@ -1014,18 +1043,6 @@ int destroyCommand(Command * c)
     c->helpmsg_oper = -1;
     c->helpmsg_admin = -1;
     c->helpmsg_root = -1;
-    if (c->help_param1) {
-        free(c->help_param1);
-    }
-    if (c->help_param2) {
-        free(c->help_param2);
-    }
-    if (c->help_param3) {
-        free(c->help_param3);
-    }
-    if (c->help_param4) {
-        free(c->help_param4);
-    }
     if (c->mod_name) {
         free(c->mod_name);
     }
@@ -1144,7 +1161,7 @@ int moduleAddCommand(CommandHash * cmdTable[], Command * c, int pos)
 int moduleDelCommand(CommandHash * cmdTable[], char *name)
 {
     Command *c = NULL;
-    Command *cmd = NULL;
+    Command *cmd = NULL, *cmd_next = NULL;
     int status = 0;
 
     if (!mod_current_module) {
@@ -1157,7 +1174,8 @@ int moduleDelCommand(CommandHash * cmdTable[], char *name)
     }
 
 
-    for (cmd = c; cmd; cmd = cmd->next) {
+    for (cmd = c; cmd; cmd = cmd_next) {
+        cmd_next = cmd->next;
         if (cmd->mod_name
             && stricmp(cmd->mod_name, mod_current_module->name) == 0) {
             if (debug >= 2) {
@@ -1167,6 +1185,7 @@ int moduleDelCommand(CommandHash * cmdTable[], char *name)
             if (debug >= 2) {
                 displayCommandFromHash(cmdTable, name);
             }
+            destroyCommand(cmd);
         }
     }
     return status;
@@ -1379,6 +1398,7 @@ int delCommand(CommandHash * cmdTable[], Command * c, char *mod_name)
                 } else {
                     cmdTable[index] = current->next;
                     free(current->name);
+                    free(current);
                     send_event(EVENT_DELCOMMAND, 2, c->mod_name, c->name);
                     return MOD_ERR_OK;
                 }
@@ -1402,6 +1422,7 @@ int delCommand(CommandHash * cmdTable[], Command * c, char *mod_name)
                 } else {
                     lastHash->next = current->next;
                     free(current->name);
+                    free(current);
                     send_event(EVENT_DELCOMMAND, 2, c->mod_name, c->name);
                     return MOD_ERR_OK;
                 }
@@ -1633,6 +1654,7 @@ int moduleDelMessage(char *name)
     if (debug) {
         displayMessageFromHash(m->name);
     }
+    destroyMessage(m);
     return status;
 }
 
@@ -1677,6 +1699,7 @@ int delMessage(MessageHash * msgTable[], Message * m, char *mod_name)
                 } else {
                     msgTable[index] = current->next;
                     free(current->name);
+                    free(current);
                     return MOD_ERR_OK;
                 }
             } else {
@@ -1698,6 +1721,7 @@ int delMessage(MessageHash * msgTable[], Message * m, char *mod_name)
                 } else {
                     lastHash->next = current->next;
                     free(current->name);
+                    free(current);
                     return MOD_ERR_OK;
                 }
             }
@@ -1725,6 +1749,7 @@ int destroyMessage(Message * m)
         free(m->mod_name);
     }
     m->next = NULL;
+    free(m);
     return MOD_ERR_OK;
 }
 
@@ -1735,6 +1760,7 @@ int destroyMessage(Message * m)
 void moduleAddVersion(const char *version)
 {
     if (mod_current_module && version) {
+        Anope_Free(mod_current_module->version);
         mod_current_module->version = sstrdup(version);
     }
 }
@@ -1746,6 +1772,7 @@ void moduleAddVersion(const char *version)
 void moduleAddAuthor(const char *author)
 {
     if (mod_current_module && author) {
+        Anope_Free(mod_current_module->author);
         mod_current_module->author = sstrdup(author);
     }
 }
@@ -1859,6 +1886,7 @@ void moduleCallBackDeleteEntry(ModuleCallBack * prev)
     for (i = 0; i < tmp->argc; i++) {
         free(tmp->argv[i]);
     }
+    free(tmp->argv);
     tmp->argc = 0;
     tmp->next = NULL;
     free(tmp);
@@ -2597,13 +2625,10 @@ int moduleGetConfigDirective(Directive * d)
             }
             retval = parse_directive(d, directive, ac, av, linenum, 0, s);
         }
-        if (directive)
-            free(directive);
+        Anope_Free(directive);
+        Anope_Free(dir);
+        Anope_Free(str);
     }
-    if (dir)
-        free(dir);
-    if (str)
-       free(str);
     fclose(config);
     return retval;
 }
@@ -2733,9 +2758,11 @@ void moduleDeleteLanguage(int langNumber)
     if ((mod_current_module_name) && (!mod_current_module || strcmp(mod_current_module_name, mod_current_module->name))) {
         mod_current_module = findModule(mod_current_module_name);
     }
-    for (idx = 0; idx > mod_current_module->lang[langNumber].argc; idx++) {
+    for (idx = 0; idx < mod_current_module->lang[langNumber].argc; idx++) {
         free(mod_current_module->lang[langNumber].argv[idx]);
     }
+    Anope_Free(mod_current_module->lang[langNumber].argv);
+    mod_current_module->lang[langNumber].argv = NULL;
     mod_current_module->lang[langNumber].argc = 0;
 }
 

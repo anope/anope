@@ -571,6 +571,7 @@ int moduleEventDelHandler(char *name)
     if (debug) {
         displayEvtMessageFromHash(evm->name);
     }
+    destroyEventHandler(evm);
     return status;
 }
 
@@ -596,6 +597,7 @@ int moduleEventDelHook(const char *name)
     if (debug) {
         displayHookFromHash(evh->name);
     }
+    destroyEventHook(evh);
     return status;
 }
 
@@ -641,6 +643,7 @@ int delEventHandler(EvtMessageHash * msgEvtTable[], EvtMessage * evm,
                 } else {
                     msgEvtTable[index] = current->next;
                     free(current->name);
+                    free(current);
                     return MOD_ERR_OK;
                 }
             } else {
@@ -662,6 +665,7 @@ int delEventHandler(EvtMessageHash * msgEvtTable[], EvtMessage * evm,
                 } else {
                     lastHash->next = current->next;
                     free(current->name);
+                    free(current);
                     return MOD_ERR_OK;
                 }
             }
@@ -714,6 +718,7 @@ int delEventHook(EvtHookHash * hookEvtTable[], EvtHook * evh,
                 } else {
                     hookEvtTable[index] = current->next;
                     free(current->name);
+                    free(current);
                     return MOD_ERR_OK;
                 }
             } else {
@@ -735,6 +740,7 @@ int delEventHook(EvtHookHash * hookEvtTable[], EvtHook * evh,
                 } else {
                     lastHash->next = current->next;
                     free(current->name);
+                    free(current);
                     return MOD_ERR_OK;
                 }
             }
@@ -763,6 +769,7 @@ int destroyEventHandler(EvtMessage * evm)
         free(evm->mod_name);
     }
     evm->next = NULL;
+    free(evm);
     return MOD_ERR_OK;
 }
 
@@ -784,5 +791,6 @@ int destroyEventHook(EvtHook * evh)
         free(evh->mod_name);
     }
     evh->next = NULL;
+    free(evh);
     return MOD_ERR_OK;
 }

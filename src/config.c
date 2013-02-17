@@ -1442,6 +1442,7 @@ int read_config(int reload)
         CHECK(UseMail);
         CHECK(NSForceEmail);
     } else {
+        Anope_Free(PreNickDBName);
         PreNickDBName = NULL;
         NSRExpire = 0;
     }

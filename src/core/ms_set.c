@@ -44,7 +44,8 @@ int AnopeInit(int argc, char **argv)
                       MEMO_SERVADMIN_HELP_SET_LIMIT,
                       MEMO_SERVADMIN_HELP_SET_LIMIT,
                       MEMO_SERVADMIN_HELP_SET_LIMIT);
-    c->help_param1 = (char *) (long) MSMaxMemos;
+    c->help_param1 = scalloc(8, sizeof(char *));
+    sprintf(c->help_param1, "%d\n", MSMaxMemos);
     moduleAddCommand(MEMOSERV, c, MOD_UNIQUE);
 
     moduleSetMemoHelp(myMemoServHelp);

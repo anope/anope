@@ -33,7 +33,7 @@ int AnopeInit(int argc, char **argv)
 
     c = createCommand("REGISTER", do_register, NULL, CHAN_HELP_REGISTER,
                       -1, -1, -1, -1);
-    c->help_param1 = s_NickServ;
+    c->help_param1 = sstrdup(s_NickServ);
     moduleAddCommand(CHANSERV, c, MOD_UNIQUE);
 
     moduleSetChanHelp(myChanServHelp);

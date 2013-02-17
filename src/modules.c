@@ -830,12 +830,12 @@ void moduleSetType(MODType type)
 int prepForUnload(Module * m)
 {
     int idx;
-    CommandHash *current = NULL;
+    CommandHash *current = NULL, *current_next = NULL;
     MessageHash *mcurrent = NULL, *mcurrent_next = NULL;
     EvtMessageHash *ecurrent = NULL;
     EvtHookHash *ehcurrent = NULL;
 
-    Command *c;
+    Command *c, *c_next;
     Message *msg, *msg_next;
     EvtMessage *eMsg;
     EvtHook *eHook;
@@ -854,58 +854,79 @@ int prepForUnload(Module * m)
      * ok, im going to walk every hash looking for commands we own, now, not exactly elegant or efficiant :)
      **/
     for (idx = 0; idx < MAX_CMD_HASH; idx++) {
-        for (current = HS_cmdTable[idx]; current; current = current->next) {
-            for (c = current->c; c; c = c->next) {
+        for (current = HS_cmdTable[idx]; current; current = current_next) {
+            current_next = current->next;
+            for (c = current->c; c; c = c_next) {
+                c_next = c->next; 
                 if ((c->mod_name) && (strcmp(c->mod_name, m->name) == 0)) {
-                    moduleDelCommand(HOSTSERV, c->name);
+                    delCommand(HOSTSERV, c, m->name);
+                    destroyCommand(c);
                 }
             }
         }
 
-        for (current = BS_cmdTable[idx]; current; current = current->next) {
-            for (c = current->c; c; c = c->next) {
+        for (current = BS_cmdTable[idx]; current; current = current_next) {
+            current_next = current->next;
+            for (c = current->c; c; c = c_next) {
+                c_next = c->next;
                 if ((c->mod_name) && (strcmp(c->mod_name, m->name) == 0)) {
-                    moduleDelCommand(BOTSERV, c->name);
+                    delCommand(BOTSERV, c, m->name);
+                    destroyCommand(c);
                 }
             }
         }
 
-        for (current = MS_cmdTable[idx]; current; current = current->next) {
-            for (c = current->c; c; c = c->next) {
+        for (current = MS_cmdTable[idx]; current; current = current_next) {
+            current_next = current->next;
+            for (c = current->c; c; c = c_next) {
+                c_next = c->next;
                 if ((c->mod_name) && (strcmp(c->mod_name, m->name) == 0)) {
-                    moduleDelCommand(MEMOSERV, c->name);
+                    delCommand(MEMOSERV, c, m->name);
+                    destroyCommand(c);
                 }
             }
         }
 
-        for (current = NS_cmdTable[idx]; current; current = current->next) {
-            for (c = current->c; c; c = c->next) {
+        for (current = NS_cmdTable[idx]; current; current = current_next) {
+            current_next = current->next;
+            for (c = current->c; c; c = c_next) {
+                c_next = c->next;
                 if ((c->mod_name) && (strcmp(c->mod_name, m->name) == 0)) {
-                    moduleDelCommand(NICKSERV, c->name);
+                    delCommand(NICKSERV, c, m->name);
+                    destroyCommand(c);
                 }
             }
         }
 
-        for (current = CS_cmdTable[idx]; current; current = current->next) {
-            for (c = current->c; c; c = c->next) {
+        for (current = CS_cmdTable[idx]; current; current = current_next) {
+            current_next = current->next;
+            for (c = current->c; c; c = c_next) {
+                c_next = c->next;
                 if ((c->mod_name) && (strcmp(c->mod_name, m->name) == 0)) {
-                    moduleDelCommand(CHANSERV, c->name);
+                    delCommand(CHANSERV, c, m->name);
+                    destroyCommand(c);
                 }
             }
         }
 
-        for (current = HE_cmdTable[idx]; current; current = current->next) {
-            for (c = current->c; c; c = c->next) {
+        for (current = HE_cmdTable[idx]; current; current = current_next) {
+            current_next = current->next;
+            for (c = current->c; c; c = c_next) {
+                c_next = c->next;
                 if ((c->mod_name) && (strcmp(c->mod_name, m->name) == 0)) {
-                    moduleDelCommand(HELPSERV, c->name);
+                    delCommand(HELPSERV, c, m->name);
+                    destroyCommand(c);
                 }
             }
         }
 
-        for (current = OS_cmdTable[idx]; current; current = current->next) {
-            for (c = current->c; c; c = c->next) {
+        for (current = OS_cmdTable[idx]; current; current = current_next) {
+            current_next = current->next;
+            for (c = current->c; c; c = c_next) {
+                c_next = c->next;
                 if ((c->mod_name) && (stricmp(c->mod_name, m->name) == 0)) {
-                    moduleDelCommand(OPERSERV, c->name);
+                    delCommand(OPERSERV, c, m->name);
+                    destroyCommand(c);
                 }
             }
         }
@@ -1147,7 +1168,7 @@ int moduleAddCommand(CommandHash * cmdTable[], Command * c, int pos)
 int moduleDelCommand(CommandHash * cmdTable[], char *name)
 {
     Command *c = NULL;
-    Command *cmd = NULL;
+    Command *cmd = NULL, *cmd_next = NULL;
     int status = 0;
 
     if (!mod_current_module) {
@@ -1160,7 +1181,8 @@ int moduleDelCommand(CommandHash * cmdTable[], char *name)
     }
 
 
-    for (cmd = c; cmd; cmd = cmd->next) {
+    for (cmd = c; cmd; cmd = cmd_next) {
+        cmd_next = cmd->next;
         if (cmd->mod_name
             && stricmp(cmd->mod_name, mod_current_module->name) == 0) {
             if (debug >= 2) {
@@ -1170,6 +1192,7 @@ int moduleDelCommand(CommandHash * cmdTable[], char *name)
             if (debug >= 2) {
                 displayCommandFromHash(cmdTable, name);
             }
+            destroyCommand(cmd);
         }
     }
     return status;
@@ -1382,6 +1405,7 @@ int delCommand(CommandHash * cmdTable[], Command * c, char *mod_name)
                 } else {
                     cmdTable[index] = current->next;
                     free(current->name);
+                    free(current);
                     send_event(EVENT_DELCOMMAND, 2, c->mod_name, c->name);
                     return MOD_ERR_OK;
                 }
@@ -1405,6 +1429,7 @@ int delCommand(CommandHash * cmdTable[], Command * c, char *mod_name)
                 } else {
                     lastHash->next = current->next;
                     free(current->name);
+                    free(current);
                     send_event(EVENT_DELCOMMAND, 2, c->mod_name, c->name);
                     return MOD_ERR_OK;
                 }

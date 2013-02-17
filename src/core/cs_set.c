@@ -61,7 +61,8 @@ int AnopeInit(int argc, char **argv)
     moduleAddCommand(CHANSERV, c, MOD_UNIQUE);
     c = createCommand("SET SUCCESSOR", NULL, NULL, CHAN_HELP_SET_SUCCESSOR,
                       -1, -1, -1, -1);
-    c->help_param1 = (char *) (long) CSMaxReg;
+    c->help_param1 = scalloc(8, sizeof(char *));
+    sprintf(c->help_param1, "%d\n", CSMaxReg);
     moduleAddCommand(CHANSERV, c, MOD_UNIQUE);
     c = createCommand("SET PASSWORD", NULL, NULL, CHAN_HELP_SET_PASSWORD,
                       -1, -1, -1, -1);
@@ -98,7 +99,7 @@ int AnopeInit(int argc, char **argv)
     moduleAddCommand(CHANSERV, c, MOD_UNIQUE);
     c = createCommand("SET SECURE", NULL, NULL, CHAN_HELP_SET_SECURE, -1,
                       -1, -1, -1);
-    c->help_param1 = s_NickServ;
+    c->help_param1 = sstrdup(s_NickServ);
     moduleAddCommand(CHANSERV, c, MOD_UNIQUE);
     c = createCommand("SET SECUREOPS", NULL, NULL, CHAN_HELP_SET_SECUREOPS,
                       -1, -1, -1, -1);

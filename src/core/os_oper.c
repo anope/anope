@@ -35,7 +35,7 @@ int AnopeInit(int argc, char **argv)
     moduleSetType(CORE);
     c = createCommand("OPER", do_oper, NULL, OPER_HELP_OPER, -1, -1, -1,
                       -1);
-    c->help_param1 = s_NickServ;
+    c->help_param1 = sstrdup(s_NickServ);
     moduleAddCommand(OPERSERV, c, MOD_UNIQUE);
 
     moduleSetOperHelp(myOperServHelp);

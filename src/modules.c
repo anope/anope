@@ -347,6 +347,7 @@ Module *createModule(char *filename)
 
     m->type = THIRD;
     for (i = 0; i < NUM_LANGS; i++) {
+        m->lang[i].argv = NULL;
         m->lang[i].argc = 0;
     }
     return m;                   /* return a nice new module */
@@ -2733,9 +2734,11 @@ void moduleDeleteLanguage(int langNumber)
     if ((mod_current_module_name) && (!mod_current_module || strcmp(mod_current_module_name, mod_current_module->name))) {
         mod_current_module = findModule(mod_current_module_name);
     }
-    for (idx = 0; idx > mod_current_module->lang[langNumber].argc; idx++) {
+    for (idx = 0; idx < mod_current_module->lang[langNumber].argc; idx++) {
         free(mod_current_module->lang[langNumber].argv[idx]);
     }
+    Anope_Free(mod_current_module->lang[langNumber].argv);
+    mod_current_module->lang[langNumber].argv = NULL;
     mod_current_module->lang[langNumber].argc = 0;
 }
 

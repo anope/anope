@@ -28,6 +28,7 @@ lang/pl
 lang/pt
 lang/ru
 lang/tr
+lang/ja_utf8
 src/services
 src/tools/anopesmtp
 src/tools/db-merger

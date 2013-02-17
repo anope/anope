@@ -831,12 +831,12 @@ int prepForUnload(Module * m)
 {
     int idx;
     CommandHash *current = NULL;
-    MessageHash *mcurrent = NULL;
+    MessageHash *mcurrent = NULL, *mcurrent_next = NULL;
     EvtMessageHash *ecurrent = NULL;
     EvtHookHash *ehcurrent = NULL;
 
     Command *c;
-    Message *msg;
+    Message *msg, *msg_next;
     EvtMessage *eMsg;
     EvtHook *eHook;
 
@@ -910,11 +910,13 @@ int prepForUnload(Module * m)
             }
         }
 
-        for (mcurrent = IRCD[idx]; mcurrent; mcurrent = mcurrent->next) {
-            for (msg = mcurrent->m; msg; msg = msg->next) {
-                if ((msg->mod_name)
-                    && (stricmp(msg->mod_name, m->name) == 0)) {
-                    moduleDelMessage(msg->name);
+        for (mcurrent = IRCD[idx]; mcurrent; mcurrent = mcurrent_next) {
+            mcurrent_next = mcurrent->next;
+            for (msg = mcurrent->m; msg; msg = msg_next) {
+                msg_next = msg->next;
+                if (msg->mod_name && (stricmp(msg->mod_name, m->name) == 0)) {
+                    delMessage(IRCD, msg, m->name);
+                    destroyMessage(msg);
                 }
             }
         }
@@ -1634,6 +1636,7 @@ int moduleDelMessage(char *name)
     if (debug) {
         displayMessageFromHash(m->name);
     }
+    destroyMessage(m);
     return status;
 }
 
@@ -1678,6 +1681,7 @@ int delMessage(MessageHash * msgTable[], Message * m, char *mod_name)
                 } else {
                     msgTable[index] = current->next;
                     free(current->name);
+                    free(current);
                     return MOD_ERR_OK;
                 }
             } else {
@@ -1699,6 +1703,7 @@ int delMessage(MessageHash * msgTable[], Message * m, char *mod_name)
                 } else {
                     lastHash->next = current->next;
                     free(current->name);
+                    free(current);
                     return MOD_ERR_OK;
                 }
             }
@@ -1726,6 +1731,7 @@ int destroyMessage(Message * m)
         free(m->mod_name);
     }
     m->next = NULL;
+    free(m);
     return MOD_ERR_OK;
 }
 

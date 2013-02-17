@@ -832,12 +832,12 @@ int prepForUnload(Module * m)
     int idx;
     CommandHash *current = NULL, *current_next = NULL;
     MessageHash *mcurrent = NULL, *mcurrent_next = NULL;
-    EvtMessageHash *ecurrent = NULL;
+    EvtMessageHash *ecurrent = NULL, *ecurrent_next = NULL;
     EvtHookHash *ehcurrent = NULL;
 
     Command *c, *c_next;
     Message *msg, *msg_next;
-    EvtMessage *eMsg;
+    EvtMessage *eMsg, *eMsg_next;
     EvtHook *eHook;
 
     if (!m) {
@@ -942,11 +942,14 @@ int prepForUnload(Module * m)
             }
         }
 
-        for (ecurrent = EVENT[idx]; ecurrent; ecurrent = ecurrent->next) {
-            for (eMsg = ecurrent->evm; eMsg; eMsg = eMsg->next) {
+        for (ecurrent = EVENT[idx]; ecurrent; ecurrent = ecurrent_next) {
+            ecurrent_next = ecurrent->next;
+            for (eMsg = ecurrent->evm; eMsg; eMsg = eMsg_next) {
+                eMsg_next = eMsg->next;
                 if ((eMsg->mod_name)
                     && (stricmp(eMsg->mod_name, m->name) == 0)) {
                     delEventHandler(EVENT, eMsg, m->name);
+                    destroyEventHandler(eMsg);
                 }
             }
         }

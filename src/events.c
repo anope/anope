@@ -571,6 +571,7 @@ int moduleEventDelHandler(char *name)
     if (debug) {
         displayEvtMessageFromHash(evm->name);
     }
+    destroyEventHandler(evm);
     return status;
 }
 
@@ -641,6 +642,7 @@ int delEventHandler(EvtMessageHash * msgEvtTable[], EvtMessage * evm,
                 } else {
                     msgEvtTable[index] = current->next;
                     free(current->name);
+                    free(current);
                     return MOD_ERR_OK;
                 }
             } else {
@@ -662,6 +664,7 @@ int delEventHandler(EvtMessageHash * msgEvtTable[], EvtMessage * evm,
                 } else {
                     lastHash->next = current->next;
                     free(current->name);
+                    free(current);
                     return MOD_ERR_OK;
                 }
             }
@@ -763,6 +766,7 @@ int destroyEventHandler(EvtMessage * evm)
         free(evm->mod_name);
     }
     evm->next = NULL;
+    free(evm);
     return MOD_ERR_OK;
 }
 

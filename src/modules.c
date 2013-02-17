@@ -1862,6 +1862,7 @@ void moduleCallBackDeleteEntry(ModuleCallBack * prev)
     for (i = 0; i < tmp->argc; i++) {
         free(tmp->argv[i]);
     }
+    free(tmp->argv);
     tmp->argc = 0;
     tmp->next = NULL;
     free(tmp);

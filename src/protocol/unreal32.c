@@ -1830,7 +1830,10 @@ void unreal_cmd_jupe(char *jserver, char *who, char *reason)
              reason ? ": " : "", reason ? reason : "");
 
     if (findserver(servlist, jserver))
+    {
         unreal_cmd_squit(jserver, rbuf);
+        do_squit(who, 1, &jserver);
+    }
     unreal_cmd_server(jserver, 2, rbuf);
     new_server(me_server, jserver, rbuf, SERVER_JUPED, NULL);
 }

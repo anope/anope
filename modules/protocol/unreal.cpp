@@ -897,7 +897,7 @@ struct IRCDMessageSASL : IRCDMessage
 			if (params[3] == "PLAIN")
 				UplinkSocket::Message() << "SASL " << params[1].substr(0, p) << " " << params[1] << " C +";
 			else
-				UplinkSocket::Message() << "SASL " << params[1].substr(0, p) << " " << params[1] << " C F";
+				UplinkSocket::Message() << "SASL " << params[1].substr(0, p) << " " << params[1] << " D F";
 		}
 		else if (params[2] == "C")
 		{

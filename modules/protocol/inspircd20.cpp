@@ -572,7 +572,7 @@ struct IRCDMessageEncap : IRCDMessage
 				if (params[5] == "PLAIN")
 					UplinkSocket::Message(Me) << "ENCAP " << params[2].substr(0, 3) << " SASL " << Me->GetSID() << " " << params[2] << " C +";
 				else
-					UplinkSocket::Message(Me) << "ENCAP " << params[2].substr(0, 3) << " SASL " << Me->GetSID() << " " << params[2] << " C F";
+					UplinkSocket::Message(Me) << "ENCAP " << params[2].substr(0, 3) << " SASL " << Me->GetSID() << " " << params[2] << " D F";
 			}
 			else if (params[4] == "C")
 			{

@@ -1,4 +1,4 @@
-/* RequiredLibraries: ssl,crypt */
+/* RequiredLibraries: ssl,crypto */
 
 #include "module.h"
 #include "ssl.h"

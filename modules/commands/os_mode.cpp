@@ -16,10 +16,11 @@
 class CommandOSMode : public Command
 {
  public:
-	CommandOSMode(Module *creator) : Command(creator, "operserv/mode", 2, 2)
+	CommandOSMode(Module *creator) : Command(creator, "operserv/mode", 2, 3)
 	{
 		this->SetDesc(_("Change channel modes"));
 		this->SetSyntax(_("\037channel\037 \037modes\037"));
+		this->SetSyntax(_("\037channel\037 CLEAR [ALL]"));
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
@@ -32,6 +33,32 @@ class CommandOSMode : public Command
 			source.Reply(CHAN_X_NOT_IN_USE, target.c_str());
 		else if (c->bouncy_modes)
 			source.Reply(_("Services is unable to change modes. Are your servers' U:lines configured correctly?"));
+		else if (modes.equals_ci("CLEAR"))
+		{
+			bool all = params.size() > 2 && params[2].equals_ci("ALL");
+
+			const Channel::ModeList chmodes = c->GetModes();
+			for (Channel::ModeList::const_iterator it = chmodes.begin(), it_end = chmodes.end(); it != it_end; ++it)
+				c->RemoveMode(c->ci->WhoSends(), it->first, it->second, false);
+
+			if (all)
+			{
+				for (Channel::ChanUserList::iterator it = c->users.begin(), it_end = c->users.end(); it != it_end; ++it)
+				{
+					ChanUserContainer *uc = *it;
+
+					if (uc->user->HasMode("OPER"))
+						continue;
+
+					for (std::set<Anope::string>::iterator it2 = uc->status.modes.begin(), it2_end = uc->status.modes.end(); it2 != it2_end; ++it2)
+						c->RemoveMode(c->ci->WhoSends(), *it2, uc->user->GetUID(), false);
+				}
+
+				source.Reply(_("All modes cleared on %s."), c->name.c_str());
+			}
+			else
+				source.Reply(_("Non-status modes cleared on %s."), c->name.c_str());
+		}
 		else
 		{
 			spacesepstream sep(modes);
@@ -98,7 +125,9 @@ class CommandOSMode : public Command
 		this->SendSyntax(source);
 		source.Reply(" ");
 		source.Reply(_("Allows Services Operators to change modes for any channel.\n"
-				"Parameters are the same as for the standard /MODE command."));
+				"Parameters are the same as for the standard /MODE command.\n"
+				"Alternatively, CLEAR may be given to clear all modes on the channel.\n"
+				"If CLEAR ALL is given then all modes, including user status, is removed.\n"));
 		return true;
 	}
 };

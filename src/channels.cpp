@@ -277,6 +277,37 @@ size_t Channel::HasMode(const Anope::string &mname, const Anope::string &param)
 	return 0;
 }
 
+Anope::string Channel::GetModes(bool complete, bool plus)
+{
+	Anope::string res, params;
+
+	for (std::multimap<Anope::string, Anope::string>::const_iterator it = this->modes.begin(), it_end = this->modes.end(); it != it_end; ++it)
+	{
+		ChannelMode *cm = ModeManager::FindChannelModeByName(it->first);
+		if (!cm || cm->type == MODE_LIST)
+			continue;
+
+		res += cm->mchar;
+
+		if (complete && !it->second.empty())
+		{
+			ChannelModeParam *cmp = NULL;
+			if (cm->type == MODE_PARAM)
+				cmp = anope_dynamic_static_cast<ChannelModeParam *>(cm);
+
+			if (plus || !cmp || !cmp->minus_no_arg)
+				params += " " + it->second;
+		}
+	}
+
+	return res + params;
+}
+
+const Channel::ModeList &Channel::GetModes() const
+{
+	return this->modes;
+}
+
 std::pair<Channel::ModeList::iterator, Channel::ModeList::iterator> Channel::GetModeList(const Anope::string &mname)
 {
 	Channel::ModeList::iterator it = this->modes.find(mname), it_end = it;
@@ -825,32 +856,6 @@ bool Channel::Kick(BotInfo *bi, User *u, const char *reason, ...)
 	MessageSource ms(bi);
 	this->KickInternal(ms, u->nick, buf);
 	return true;
-}
-
-Anope::string Channel::GetModes(bool complete, bool plus)
-{
-	Anope::string res, params;
-
-	for (std::multimap<Anope::string, Anope::string>::const_iterator it = this->modes.begin(), it_end = this->modes.end(); it != it_end; ++it)
-	{
-		ChannelMode *cm = ModeManager::FindChannelModeByName(it->first);
-		if (!cm || cm->type == MODE_LIST)
-			continue;
-
-		res += cm->mchar;
-
-		if (complete && !it->second.empty())
-		{
-			ChannelModeParam *cmp = NULL;
-			if (cm->type == MODE_PARAM)
-				cmp = anope_dynamic_static_cast<ChannelModeParam *>(cm);
-
-			if (plus || !cmp || !cmp->minus_no_arg)
-				params += " " + it->second;
-		}
-	}
-
-	return res + params;
 }
 
 void Channel::ChangeTopicInternal(const Anope::string &user, const Anope::string &newtopic, time_t ts)

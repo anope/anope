@@ -142,12 +142,6 @@ class CoreExport Channel : public Base, public Extensible
 	 */
 	size_t HasMode(const Anope::string &name, const Anope::string &param = "");
 
-	/** Get a list of modes on a channel
-	 * @param name A mode name to get the list of
-	 * @return a pair of iterators for the beginning and end of the list
-	 */
-	std::pair<ModeList::iterator, ModeList::iterator> GetModeList(const Anope::string &name);
-
 	/** Set a mode internally on a channel, this is not sent out to the IRCd
 	 * @param setter The setter
 	 * @param cm The mode
@@ -240,6 +234,17 @@ class CoreExport Channel : public Base, public Extensible
 	 * @return true if the kick was scucessful, false if a module blocked the kick
 	 */
 	bool Kick(BotInfo *bi, User *u, const char *reason = NULL, ...);
+
+	/** Get all modes set on this channel, excluding status modes.
+	 * @return a map of modes and their optional parameters.
+	 */
+	const ModeList &GetModes() const;
+
+	/** Get a list of modes on a channel
+	 * @param name A mode name to get the list of
+	 * @return a pair of iterators for the beginning and end of the list
+	 */
+	std::pair<ModeList::iterator, ModeList::iterator> GetModeList(const Anope::string &name);
 
 	/** Get a string of the modes set on this channel
 	 * @param complete Include mode parameters

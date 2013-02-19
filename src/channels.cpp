@@ -125,13 +125,6 @@ void Channel::CheckModes()
 		return;
 	}
 
-	if (this->chanserv_modetime != Anope::CurTime)
-	{
-		this->chanserv_modecount = 0;
-		this->chanserv_modetime = Anope::CurTime;
-	}
-	this->chanserv_modecount++;
-
 	EventReturn MOD_RESULT;
 	FOREACH_RESULT(I_OnCheckModes, OnCheckModes(this));
 	if (MOD_RESULT == EVENT_STOP)
@@ -484,6 +477,17 @@ void Channel::SetMode(BotInfo *bi, ChannelMode *cm, const Anope::string &param, 
 			return;
 	}
 
+	if (Me->IsSynced())
+	{
+		if (this->chanserv_modetime != Anope::CurTime)
+		{
+			this->chanserv_modecount = 0;
+			this->chanserv_modetime = Anope::CurTime;
+		}
+
+		this->chanserv_modecount++;
+	}
+
 	ModeManager::StackerAdd(bi, this, cm, true, param);
 	MessageSource ms(bi);
 	SetModeInternal(ms, cm, param, enforce_mlock);
@@ -522,6 +526,17 @@ void Channel::RemoveMode(BotInfo *bi, ChannelMode *cm, const Anope::string &para
 		ChannelModeParam *cmp = anope_dynamic_static_cast<ChannelModeParam *>(cm);
 		if (!cmp->minus_no_arg)
 			this->GetParam(cmp->name, realparam);
+	}
+
+	if (Me->IsSynced())
+	{
+		if (this->chanserv_modetime != Anope::CurTime)
+		{
+			this->chanserv_modecount = 0;
+			this->chanserv_modetime = Anope::CurTime;
+		}
+
+		this->chanserv_modecount++;
 	}
 
 	ModeManager::StackerAdd(bi, this, cm, false, realparam);
@@ -616,7 +631,7 @@ void Channel::SetModes(BotInfo *bi, bool enforce_mlock, const char *cmodes, ...)
 
 void Channel::SetModesInternal(MessageSource &source, const Anope::string &mode, time_t ts, bool enforce_mlock)
 {
-	if (source.GetServer())
+	if (source.GetServer() && source.GetServer()->IsSynced())
 	{
 		if (Anope::CurTime != this->server_modetime)
 		{

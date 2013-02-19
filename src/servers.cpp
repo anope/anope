@@ -280,9 +280,7 @@ void Server::Sync(bool sync_links)
 		for (channel_map::const_iterator it = ChannelList.begin(), it_end = ChannelList.end(); it != it_end; ++it)
 		{
 			Channel *c = it->second;
-			c->CheckModes();
-			if (c->ci)
-				c->ci->RestoreTopic();
+			c->Sync();
 		}
 
 		if (!Anope::NoFork && Anope::AtTerm())

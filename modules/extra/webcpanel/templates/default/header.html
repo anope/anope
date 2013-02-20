@@ -2,9 +2,98 @@
 <html>
 <head>
 	<link href="/static/style.css" media="screen" rel="stylesheet" type="text/css" />
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
 	<title>{TITLE}</title>
+	{IF EXISTS CMDR} 
+	<script type="text/javascript">
+	var tSec=5; //Time in seconds to keep the overlay open
+	var t=(tSec*1000); //Convert the time to ms so we can use it
+	
+	$(document).ready(function() \{
+	
+		/*Modal*/
+		var id = "#dialog";
+		
+		var mHeight;
+		var mWidth;
+		var oHeight = $(id).height();
+		var oWidth = $(id).height();
+		
+		var top;
+		var left;
+		
+		showModal();
+
+		$('.close').click(function (e) \{
+			e.preventDefault();	
+			hideModal();
+		\});
+	
+		$('#mask').click(function () \{
+			hideModal();
+		\});	
+		
+		function hideModal() \{
+			if ($('#mask').not(':hidden')) \{
+				$('.master').fadeTo('slow',1.0);	
+				$('#mask, .window').fadeOut(200);
+			\}					
+		\}
+		
+		function showModal() \{				
+			mHeight = $(document).height();	
+			mWidth = $(window).width();
+			
+			var alertMsg = '<br/>{CMDR}<br/>';
+
+			$('#mask').css(\{'width': mWidth, 'height': mHeight\});	
+			$('#mask').fadeIn(200);		
+			$('#mask').fadeTo('fast',0.75);
+		
+			$('#dialogMsg').html(alertMsg);
+			
+			top = mHeight/2-oHeight/2;
+			left = mWidth/2-oHeight/2;
+			
+			$(id).css('top', top);
+			$(id).css('left', left);
+			$('.master').fadeTo('fast',0.3);								
+			
+			$(id).fadeIn(500);
+			setTimeout(hideModal, t);		
+			
+		\}	
+		
+		$(window).resize(function() \{
+			if ($('#mask').not(':hidden')) \{
+				mHeight = $(document).height();
+				mWidth = $(window).width();
+
+				/* Might as well only change the postion of box if the window is large enough */
+				if ((mHeight > oHeight) && (mWidth > oWidth)) \{ 
+					top = mHeight/2-oHeight/2;
+					left = mWidth/2-oHeight/2;
+					$('#mask').css(\{'width': mWidth, 'height': mHeight\});
+					$(id).css('top', top);
+					$(id).css('left', left);
+				\}
+				
+			\}
+		\})
+						
+	\});
+	</script>
+	{END IF}
 </head>
 <body>
+	<div id="boxes">
+		<div id="dialog" class="window">
+			<h2>Status Message:</h2>
+			<div id="dialogMsg"></div>
+			<div id="dialogClose"><a href="#" class="close">Dismiss</a></div>
+		</div>
+		<div id="mask"></div>
+	</div>	
 	<div class="master">
 		<div class="header">
 			<ul id="button">

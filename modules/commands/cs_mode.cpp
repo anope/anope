@@ -389,12 +389,46 @@ class CommandCSMode : public Command
 		}
 	}
 
+	void DoClear(CommandSource &source, ChannelInfo *ci, const std::vector<Anope::string> &params)
+	{
+		const Anope::string &param = params.size() > 2 ? params[2] : "";
+
+		if (param.empty())
+		{
+			std::vector<Anope::string> new_params;
+			new_params.push_back(params[0]);
+			new_params.push_back("SET");
+			new_params.push_back("-*");
+			this->DoSet(source, ci, new_params);
+		}
+		else if (param.equals_ci("BANS") || param.equals_ci("EXCEPTS") || param.equals_ci("INVITEOVERRIDES") || param.equals_ci("VOICES") || param.equals_ci("HALFOPS") || param.equals_ci("OPS"))
+		{
+			const Anope::string &mname = param.upper().substr(0, param.length() - 1);
+			ChannelMode *cm = ModeManager::FindChannelModeByName(mname);
+			if (cm == NULL)
+			{
+				source.Reply(_("Your IRCD does not support %s."), mname.upper().c_str());
+				return;
+			}
+
+			std::vector<Anope::string> new_params;
+			new_params.push_back(params[0]);
+			new_params.push_back("SET");
+			new_params.push_back("-" + stringify(cm->mchar));
+			new_params.push_back("*");
+			this->DoSet(source, ci, new_params);
+		}
+		else
+			this->SendSyntax(source);
+	}
+
  public:
-	CommandCSMode(Module *creator) : Command(creator, "chanserv/mode", 3, 4)
+	CommandCSMode(Module *creator) : Command(creator, "chanserv/mode", 2, 4)
 	{
 		this->SetDesc(_("Control modes and mode locks on a channel"));
 		this->SetSyntax(_("\037channel\037 LOCK {ADD|DEL|SET|LIST} [\037what\037]"));
 		this->SetSyntax(_("\037channel\037 SET \037modes\037"));
+		this->SetSyntax(_("\037channel\037 CLEAR [\037what\037]"));
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
@@ -405,15 +439,22 @@ class CommandCSMode : public Command
 
 		if (!ci || !ci->c)
 			source.Reply(CHAN_X_NOT_IN_USE, params[0].c_str());
-		else if (subcommand.equals_ci("LOCK"))
+		else if (subcommand.equals_ci("LOCK") && params.size() > 2)
 		{
 			if (!source.AccessFor(ci).HasPriv("MODE") && !source.HasPriv("chanserv/set"))
 				source.Reply(ACCESS_DENIED);
 			else
 				this->DoLock(source, ci, params);
 		}
-		else if (subcommand.equals_ci("SET"))
+		else if (subcommand.equals_ci("SET") && params.size() > 2)
 			this->DoSet(source, ci, params);
+		else if (subcommand.equals_ci("CLEAR"))
+		{
+			if (!source.AccessFor(ci).HasPriv("MODE") && !source.HasPriv("chanserv/set"))
+				source.Reply(ACCESS_DENIED);
+			else
+				this->DoClear(source, ci, params);
+		}
 		else
 			this->OnSyntaxError(source, "");
 	}
@@ -425,21 +466,26 @@ class CommandCSMode : public Command
 		source.Reply(_("Mainly controls mode locks and mode access (which is different from channel access)\n"
 			"on a channel.\n"
 			" \n"
-			"The \002MODE LOCK\002 command allows you to add, delete, and view mode locks on a channel.\n"
+			"The \002%s LOCK\002 command allows you to add, delete, and view mode locks on a channel.\n"
 			"If a mode is locked on or off, services will not allow that mode to be changed. The \2SET\2\n"
 			"command will clear all existing mode locks and set the new one given, while \2ADD\2 and \2DEL\2\n"
 			"modify the existing mode lock.\n"
 			"Example:\n"
 			"     \002MODE #channel LOCK ADD +bmnt *!*@*aol*\002\n"
 			" \n"
-			"The \002MODE SET\002 command allows you to set modes through services. Wildcards * and ? may\n"
+			"The \002%s SET\002 command allows you to set modes through services. Wildcards * and ? may\n"
 			"be given as parameters for list and status modes.\n"
 			"Example:\n"
 			"     \002MODE #channel SET +v *\002\n"
 			"       Sets voice status to all users in the channel.\n"
 			" \n"
 			"     \002MODE #channel SET -b ~c:*\n"
-			"       Clears all extended bans that start with ~c:"));
+			"       Clears all extended bans that start with ~c:\n"
+			" \n"
+			"The \002%s CLEAR\002 command is an easy way to clear modes on a channel. \037what\037 may be\n"
+			"one of bans, exempts, inviteoverrides, ops, halfops, or voices. If \037what\037 is not given then all\n"
+			"basic modes are removed."),
+			source.command.upper().c_str(), source.command.upper().c_str(), source.command.upper().c_str());
 		return true;
 	}
 };

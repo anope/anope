@@ -3,6 +3,7 @@ font-family: 'Cabin', Helvetica, Arial, sans-serif;
 }
 body {
 	overflow:hidden;
+	z-index: 10;
 }
 .master {
 	margin-left:0px;
@@ -101,6 +102,15 @@ body {
 	height: 125px;
 }
 
+.cinfo {
+	overflow-x: scroll;
+	height: 450px;
+}
+
+.right { 
+	text-align: right; 
+}
+/* Table Stuff */
 .akillR1 { 
 	width: 80px;
 	text-align: left;
@@ -114,7 +124,81 @@ body {
 	text-align: left;
 }
 
-.danger { 
-	color: red;
-	weight: bolder; 
+td.right a:link, td.right a:visited {
+	color: #000;
+	background-color: #FFF;
+	border: 1px solid #000;
+	padding: 0px 4px;
+	-webkit-border-radius: 5x;
+  	border-radius: 5px;
+	text-decoration: none;
+}
+
+td.right a:hover {
+	color: #00F;
+}
+
+table#memoTable {
+	border-spacing: 0px;
+	border-collapse: collapse;
+}
+
+table#memoTable tr {
+	padding: 1px;
+}
+
+tr.read  { 
+	background-color: #FFF;
+}
+
+tr.unread {
+	background-color: #EEE;
+}
+ 
+tr.read td, tr.unread td {
+	padding: 2px;	
+}
+
+/* Modal Window */
+#mask {
+	position: absolute;
+	z-index: 9000;
+	background-color: #000;
+	height: 100%;
+	width: 100%;
+	display: none;
+}
+
+#boxes .window {
+  position:fixed;
+  width:440px;
+  height:200px;
+  display:none;
+  z-index:9999;
+  padding:20px;
+}
+ 
+#boxes #dialog {
+	text-align: center;
+	background-color: #FFF;
+  	width:375px; 
+  	height:203px;
+  	padding: 20px;
+  	-webkit-border-radius: 15px;
+  	border-radius: 15px;
+  	display: none;
+}
+
+#dialogClose {
+	padding-top: 20px;
+}
+
+#dialogClose a:link, #dialogClose a:visited { 
+	color: #000;
+	text-decoration: none;
+}
+
+#dialogClose a:hover {
+	color: #000;
+	text-decoration: underline;
 }

@@ -145,9 +145,10 @@ namespace WebPanel
 	 * @param service Service for source.owner and source.service
 	 * @param c Command to run (as a service name)
 	 * @param params Command parameters
-	 * @param r Replacements, reply from command goes back into r["MESSAGES"]
+	 * @param r Replacements, reply from command goes back here into key
+	 * @param key The key to put the replies into r
 	 */
-	extern void RunCommand(const Anope::string &user, NickCore *nc, const Anope::string &service, const Anope::string &c, const std::vector<Anope::string> &params, TemplateFileServer::Replacements &r);
+	extern void RunCommand(const Anope::string &user, NickCore *nc, const Anope::string &service, const Anope::string &c, const std::vector<Anope::string> &params, TemplateFileServer::Replacements &r, const Anope::string &key = "MESSAGES");
 }
 
 #include "pages/index.h"

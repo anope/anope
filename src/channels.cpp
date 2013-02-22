@@ -194,7 +194,7 @@ ChanUserContainer* Channel::JoinUser(User *user)
 
 void Channel::DeleteUser(User *user)
 {
-	Log(user, this, "leaves");
+	Log(user, this, "leave");
 	FOREACH_MOD(I_OnLeaveChannel, OnLeaveChannel(user, this));
 
 	ChanUserContainer *cul;

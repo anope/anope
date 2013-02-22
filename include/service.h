@@ -26,28 +26,35 @@ class CoreExport Service : public virtual Base
 {
 	static std::map<Anope::string, std::map<Anope::string, Service *> > Services;
 	static std::map<Anope::string, std::map<Anope::string, Anope::string> > Aliases;
- public:
- 	static Service *FindService(const Anope::string &t, const Anope::string &n)
+
+	static Service *FindService(const std::map<Anope::string, Service *> &services, const std::map<Anope::string, Anope::string> *aliases, const Anope::string &n)
 	{
-		std::map<Anope::string, std::map<Anope::string, Service *> >::iterator it = Services.find(t);
-		if (it != Services.end())
+		std::map<Anope::string, Service *>::const_iterator it = services.find(n);
+		if (it != services.end())
+			return it->second;
+
+		if (aliases != NULL)
 		{
-			Anope::string name = n;
-
-			std::map<Anope::string, std::map<Anope::string, Anope::string> >::iterator it2 = Aliases.find(t);
-			if (it2 != Aliases.end())
-			{
-				std::map<Anope::string, Anope::string>::iterator it3 = it2->second.find(n);
-				if (it3 != it2->second.end())
-					name = it3->second;
-			}
-
-			std::map<Anope::string, Service *>::iterator it4 = it->second.find(name);
-			if (it4 != it->second.end())
-				return it4->second;
+			std::map<Anope::string, Anope::string>::const_iterator it2 = aliases->find(n);
+			if (it2 != aliases->end())
+				return FindService(services, aliases, it2->second);
 		}
 
 		return NULL;
+	}
+
+ public:
+ 	static Service *FindService(const Anope::string &t, const Anope::string &n)
+	{
+		std::map<Anope::string, std::map<Anope::string, Service *> >::const_iterator it = Services.find(t);
+		if (it == Services.end())
+			return NULL;
+
+		std::map<Anope::string, std::map<Anope::string, Anope::string> >::const_iterator it2 = Aliases.find(t);
+		if (it2 != Aliases.end())
+			return FindService(it->second, &it2->second, n);
+
+		return FindService(it->second, NULL, n);
 	}
 
 	static std::vector<Anope::string> GetServiceKeys(const Anope::string &t)

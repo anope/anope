@@ -44,7 +44,7 @@ class HybridProto : public IRCDProto
 
 	void SendSQLine(User *, const XLine *x) anope_override
 	{
-		UplinkSocket::Message(OperServ) << "RESV * " << x->mask << " :" << x->GetReason();
+		UplinkSocket::Message(Me) << "RESV * " << x->mask << " :" << x->GetReason();
 	}
 
 	void SendSGLineDel(const XLine *x) anope_override

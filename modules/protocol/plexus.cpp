@@ -162,6 +162,16 @@ class PlexusProto : public IRCDProto
 	{
 		UplinkSocket::Message(source) << "ENCAP " << user->server->GetName() << " SVSPART " << user->GetUID() << " " << chan;
 	}
+
+	void SendSVSHold(const Anope::string &nick) anope_override
+	{
+		UplinkSocket::Message(OperServ) << "ENCAP * RESV " << Config->NSReleaseTimeout << " " << nick << " 0 :Being held for registered user";
+	}
+
+	void SendSVSHoldDel(const Anope::string &nick) anope_override
+	{
+		UplinkSocket::Message(OperServ) << "UNRESV * " << nick;
+	}
 };
 
 struct IRCDMessageEncap : IRCDMessage

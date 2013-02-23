@@ -279,7 +279,10 @@ class CommandCSAKick : public Command
 
 					ListFormatter::ListEntry entry;
 					entry["Number"] = stringify(number);
-					entry["Mask"] = akick->mask;
+					if (akick->nc)
+						entry["Mask"] = akick->nc->display;
+					else
+						entry["Mask"] = akick->mask;
 					entry["Creator"] = akick->creator;
 					entry["Created"] = timebuf;
 					entry["Last used"] = lastused;
@@ -316,7 +319,10 @@ class CommandCSAKick : public Command
 
 				ListFormatter::ListEntry entry;
 				entry["Number"] = stringify(i + 1);
-				entry["Mask"] = akick->mask;
+				if (akick->nc)
+					entry["Mask"] = akick->nc->display;
+				else
+					entry["Mask"] = akick->mask;
 				entry["Creator"] = akick->creator;
 				entry["Created"] = timebuf;
 				entry["Last used"] = lastused;

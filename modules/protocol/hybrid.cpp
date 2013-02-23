@@ -20,9 +20,11 @@ class HybridProto : public IRCDProto
 	HybridProto(Module *creator) : IRCDProto(creator, "Hybrid 8.0.0")
 	{
 		DefaultPseudoclientModes = "+oi";
+		CanSVSNick = true;
 		CanSNLine = true;
 		CanSQLine = true;
 		CanSZLine = true;
+		CanSVSHold = true;
 		RequiresID = true;
 		MaxModes = 4;
 	}
@@ -44,7 +46,7 @@ class HybridProto : public IRCDProto
 
 	void SendSQLine(User *, const XLine *x) anope_override
 	{
-		UplinkSocket::Message(OperServ) << "RESV * " << x->mask << " :" << x->GetReason();
+		UplinkSocket::Message(OperServ) << "ENCAP * RESV " << (x->expires ? x->expires - Anope::CurTime : 0) << " " << x->mask << " 0 :" << x->reason;
 	}
 
 	void SendSGLineDel(const XLine *x) anope_override
@@ -240,6 +242,23 @@ class HybridProto : public IRCDProto
 
 		if (needjoin)
 			bi->Part(c);
+	}
+
+	void SendForceNickChange(const User *u, const Anope::string &newnick, time_t when) anope_override
+	{
+		UplinkSocket::Message(Me) << "SVSNICK " << u->nick << " " << newnick << " " << when;
+	}
+
+	void SendSVSHold(const Anope::string &nick) anope_override
+	{
+		XLine x(nick, OperServ->nick, Anope::CurTime + Config->NSReleaseTimeout, "Being held for registered user");
+		this->SendSQLine(NULL, &x);
+	}
+
+	void SendSVSHoldDel(const Anope::string &nick) anope_override
+	{
+		XLine x(nick);
+		this->SendSQLineDel(&x);
 	}
 };
 

@@ -45,6 +45,8 @@ class PlexusProto : public IRCDProto
 	void SendAkill(User *u, XLine *x) anope_override { hybrid->SendAkill(u, x); }
 	void SendServer(const Server *server) anope_override { hybrid->SendServer(server); }
 	void SendChannel(Channel *c) anope_override { hybrid->SendChannel(c); }
+	void SendSVSHold(const Anope::string &nick) anope_override { hybrid->SendSVSHold(nick); }
+	void SendSVSHoldDel(const Anope::string &nick) anope_override { hybrid->SendSVSHoldDel(nick); }
 
 	void SendJoin(const User *user, Channel *c, const ChannelStatus *status) anope_override
 	{
@@ -161,16 +163,6 @@ class PlexusProto : public IRCDProto
 	void SendSVSPart(const BotInfo *source, const User *user, const Anope::string &chan, const Anope::string &param) anope_override
 	{
 		UplinkSocket::Message(source) << "ENCAP " << user->server->GetName() << " SVSPART " << user->GetUID() << " " << chan;
-	}
-
-	void SendSVSHold(const Anope::string &nick) anope_override
-	{
-		UplinkSocket::Message(OperServ) << "ENCAP * RESV " << Config->NSReleaseTimeout << " " << nick << " 0 :Being held for registered user";
-	}
-
-	void SendSVSHoldDel(const Anope::string &nick) anope_override
-	{
-		UplinkSocket::Message(OperServ) << "UNRESV * " << nick;
 	}
 };
 

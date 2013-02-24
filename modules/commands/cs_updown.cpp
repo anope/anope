@@ -16,7 +16,7 @@
 class CommandCSUp : public Command
 {
  public:
-	CommandCSUp(Module *creator) : Command(creator, "chanserv/up", 0, 1)
+	CommandCSUp(Module *creator) : Command(creator, "chanserv/up", 0, 3)
 	{
 		this->SetDesc(_("Updates your status on a channel"));
 		this->SetSyntax(_("[\037channel\037]"));
@@ -72,7 +72,7 @@ class CommandCSDown : public Command
 	}
 
  public:
-	CommandCSDown(Module *creator) : Command(creator, "chanserv/down", 0, 1)
+	CommandCSDown(Module *creator) : Command(creator, "chanserv/down", 0, 3)
 	{
 		this->SetDesc(_("Removes your status from a channel"));
 		this->SetSyntax(_("[\037channel\037]"));

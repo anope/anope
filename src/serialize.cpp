@@ -35,6 +35,15 @@ void Serialize::RegisterTypes()
 		memo("Memo", Memo::Unserialize), xline("XLine", XLine::Unserialize);
 }
 
+void Serialize::CheckTypes()
+{
+	for (std::map<Anope::string, Serialize::Type *>::const_iterator it = Serialize::Type::GetTypes().begin(), it_end = Serialize::Type::GetTypes().end(); it != it_end; ++it)
+	{
+		Serialize::Type *t = it->second;
+		t->Check();
+	}
+}
+
 Serializable::Serializable(const Anope::string &serialize_type) : last_commit(0), last_commit_time(0), id(0)
 {
 	if (SerializableItems == NULL)

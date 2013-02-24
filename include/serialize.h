@@ -40,6 +40,7 @@ namespace Serialize
 	};
 
 	extern void RegisterTypes();
+	extern void CheckTypes();
 
 	class Type;
 	template<typename T> class Checker;

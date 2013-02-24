@@ -460,6 +460,8 @@ void Anope::Init(int ac, char **av)
 	EventReturn MOD_RESULT;
 	FOREACH_RESULT(I_OnLoadDatabase, OnLoadDatabase());
 	Log() << "Databases loaded";
+
+	Serialize::CheckTypes();
 }
 
 /*************************************************************************/

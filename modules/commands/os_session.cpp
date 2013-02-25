@@ -652,7 +652,7 @@ class OSSession : public Module
 				if (OperServ)
 				{
 					if (!Config->SessionLimitExceeded.empty())
-						u->SendMessage(OperServ, Config->SessionLimitExceeded.c_str(), u->host.c_str());
+						u->SendMessage(OperServ, Config->SessionLimitExceeded.c_str(), u->ip.c_str());
 					if (!Config->SessionLimitDetailsLoc.empty())
 						u->SendMessage(OperServ, "%s", Config->SessionLimitDetailsLoc.c_str());
 				}
@@ -660,7 +660,7 @@ class OSSession : public Module
 				++session->hits;
 				if (Config->MaxSessionKill && session->hits >= Config->MaxSessionKill && akills)
 				{
-					const Anope::string &akillmask = "*@" + u->host;
+					const Anope::string &akillmask = "*@" + u->ip;
 					XLine *x = new XLine(akillmask, Config->OperServ, Anope::CurTime + Config->SessionAutoKillExpiry, "Session limit exceeded", XLineManager::GenerateUID());
 					akills->AddXLine(x);
 					akills->Send(NULL, x);
@@ -693,7 +693,7 @@ class OSSession : public Module
 		}
 		if (!session)
 		{
-			Log(LOG_DEBUG) << "Tried to delete non-existant session: " << u->host;
+			Log(LOG_DEBUG) << "Tried to delete non-existant session: " << u->ip;
 			return;
 		}
 
@@ -712,6 +712,7 @@ class OSSession : public Module
 		exception_type("Exception", Exception::Unserialize), ss(this), commandossession(this), commandosexception(this), akills("XLineManager", "xlinemanager/sgline")
 	{
 		this->SetAuthor("Anope");
+		this->SetPermanent(true);
 
 		Implementation i[] = { I_OnUserConnect, I_OnPreUserLogoff };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));

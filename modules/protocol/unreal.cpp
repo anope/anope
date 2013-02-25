@@ -778,17 +778,20 @@ struct IRCDMessageNick : IRCDMessage
 	{
 		if (params.size() == 11)
 		{
-			Anope::string decoded_ip;
-			Anope::B64Decode(params[9], decoded_ip);
-
 			Anope::string ip;
-			try
+			if (params[9] != "*")
 			{
-				sockaddrs ip_addr;
-				ip_addr.ntop(params[9].length() == 8 ? AF_INET : AF_INET6, decoded_ip.c_str());
-				ip = ip_addr.addr();
+				Anope::string decoded_ip;
+				Anope::B64Decode(params[9], decoded_ip);
+
+				try
+				{
+					sockaddrs ip_addr;
+					ip_addr.ntop(params[9].length() == 8 ? AF_INET : AF_INET6, decoded_ip.c_str());
+					ip = ip_addr.addr();
+				}
+				catch (const SocketException &ex) { }
 			}
-			catch (const SocketException &ex) { }
 
 			Anope::string vhost = params[8];
 			if (vhost.equals_cs("*"))

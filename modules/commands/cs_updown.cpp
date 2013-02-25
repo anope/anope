@@ -100,7 +100,7 @@ class CommandCSDown : public Command
 	CommandCSDown(Module *creator) : Command(creator, "chanserv/down", 0, 2)
 	{
 		this->SetDesc(_("Removes a selected nicks status from a channel"));
-		this->SetSyntax(_("[\037channel\037 ]\037nick\037]]"));
+		this->SetSyntax(_("[\037channel\037 [\037nick\037]]"));
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override

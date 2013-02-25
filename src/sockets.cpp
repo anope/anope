@@ -148,6 +148,11 @@ void sockaddrs::pton(int type, const Anope::string &address, int pport)
 
 void sockaddrs::ntop(int type, const void *src)
 {
+	char buf[INET6_ADDRSTRLEN];
+
+	if (inet_ntop(type, src, buf, sizeof(buf)) != buf)
+		throw SocketException("Invalid addr");
+
 	switch (type)
 	{
 		case AF_INET:

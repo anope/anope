@@ -385,6 +385,9 @@ class CSSeen : public Module
  private:
 	void UpdateUser(const User *u, const TypeInfo Type, const Anope::string &nick, const Anope::string &nick2, const Anope::string &channel, const Anope::string &message)
 	{
+		if (!u->server->IsSynced())
+			return;
+
 		SeenInfo *info = FindInfo(nick);
 		if (!info)
 		{

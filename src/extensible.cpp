@@ -78,11 +78,12 @@ void Extensible::ExtensibleSerialize(Serialize::Data &data) const
 
 void Extensible::ExtensibleUnserialize(Serialize::Data &data)
 {
-	/* Shrink existing extensible items */
+	/* Shrink existing extensible metadata items */
 	std::deque<Anope::string> list;
 	this->GetExtList(list);
 	for (unsigned i = 0; i < list.size(); ++i)
-		this->Shrink(list[i]);
+		if ((*extension_items)[list[i]]->Serialize())
+			this->Shrink(list[i]);
 		
 	std::set<Anope::string> keys = data.KeySet();
 	for (std::set<Anope::string>::iterator it = keys.begin(), it_end = keys.end(); it != it_end; ++it)

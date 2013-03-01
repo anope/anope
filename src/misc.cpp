@@ -23,8 +23,10 @@
 #include <errno.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#ifndef _WIN32
 #include <sys/socket.h>
 #include <netdb.h>
+#endif
 
 NumberList::NumberList(const Anope::string &list, bool descending) : is_valid(true), desc(descending)
 {

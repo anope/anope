@@ -30,7 +30,7 @@ class OldMD5Provider : public Encryption::Provider
 	{
 		if (md5)
 			return md5->GetDefaultIV();
-		return Encryption::IV(NULL, 0);
+		return Encryption::IV(static_cast<const uint32_t *>(NULL), 0);
 	}
 };
 

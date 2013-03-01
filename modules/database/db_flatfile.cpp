@@ -242,6 +242,7 @@ class DBFlatFile : public Module, public Pipe
 		BackupDatabase();
 
 		int i = -1;
+#ifndef _WIN32
 		if (use_fork)
 		{
 			i = fork();
@@ -250,6 +251,7 @@ class DBFlatFile : public Module, public Pipe
 			else if (i < 0)
 				Log(this) << "Unable to fork for database save";
 		}
+#endif
 
 		try
 		{

@@ -1029,7 +1029,7 @@ class CoreExport ModuleManager
  public:
  	/** List of all modules loaded in Anope
 	 */
-	static CoreExport std::list<Module *> Modules;
+	static std::list<Module *> Modules;
 
 	/** Event handler hooks.
 	 * This needs to be public to be used by FOREACH_MOD and friends.

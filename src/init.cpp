@@ -189,7 +189,9 @@ static void InitSignals()
 
 	sa.sa_handler = SIG_IGN;
 
+#ifndef _WIN32
 	sigaction(SIGCHLD, &sa, NULL);
+#endif
 	sigaction(SIGPIPE, &sa, NULL);
 }
 

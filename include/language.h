@@ -16,7 +16,7 @@ namespace Language
 	 * added to this list if we detect a language exists in the correct
 	 * location for each language.
 	 */
-	extern std::vector<Anope::string> Languages;
+	extern CoreExport std::vector<Anope::string> Languages;
 
 	/* Domains to search when looking for translations other than the
 	 * default "anope domain. This is used by modules who add their own
@@ -38,28 +38,28 @@ namespace Language
 	 * @param string A string to translate
 	 * @return The translated string if found, else the original string.
 	 */
-	extern const char *Translate(const char *string);
+	extern CoreExport const char *Translate(const char *string);
 
 	/** Translates a string to the language of the given user.
 	 * @param u The user to transate the string for
 	 * @param string A string to translate
 	 * @return The translated string if found, else the original string.
 	 */
-	extern const char *Translate(User *u, const char *string);
+	extern CoreExport const char *Translate(User *u, const char *string);
 
 	/** Translates a string to the language of the given account.
 	 * @param nc The account to translate the string for
 	 * @param string A string to translate
 	 * @return The translated string if count, else the original string
 	 */
-	extern const char *Translate(const NickCore *nc, const char *string);
+	extern CoreExport const char *Translate(const NickCore *nc, const char *string);
 
 	/** Translatesa string to the given language.
 	 * @param lang The language to trnalsate to
 	 * @param string The string to translate
 	 * @return The translated string if found, else the original string.
 	 */
-	extern const char *Translate(const char *lang, const char *string);
+	extern CoreExport const char *Translate(const char *lang, const char *string);
 
 } // namespace Language
 

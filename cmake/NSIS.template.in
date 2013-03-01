@@ -525,7 +525,7 @@ FunctionEnd
 
   !insertmacro MUI_PAGE_INSTFILES
 
-  !define MUI_FINISHPAGE_SHOWREADME "$INSTDIR\docs\README.txt"
+  !define MUI_FINISHPAGE_SHOWREADME "$INSTDIR\doc\README.txt"
   !insertmacro MUI_PAGE_FINISH
 
   !insertmacro MUI_UNPAGE_CONFIRM

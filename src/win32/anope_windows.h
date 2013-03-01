@@ -52,8 +52,6 @@
 #endif
 #define EINPROGRESS WSAEWOULDBLOCK
 
-#include "extensible.h"
-
 #include "socket.h"
 #include "dir/dir.h"
 #include "dl/dl.h"
@@ -76,8 +74,6 @@ extern int setenv(const char *name, const char *value, int overwrite);
 extern int unsetenv(const char *name);
 extern int mkstemp(char *input);
 extern void getcwd(char *buf, size_t sz);
-
-template struct ExtensibleItemClass<Anope::string>;
 
 #endif // _WIN32
 #endif // WINDOWS_H

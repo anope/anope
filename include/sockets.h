@@ -96,7 +96,7 @@ class CoreExport cidr
 	bool operator==(const cidr &other) const;
 	bool operator!=(const cidr &other) const;
 
-	struct hash
+	struct CoreExport hash
 	{
 		size_t operator()(const cidr &s) const;
 	};

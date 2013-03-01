@@ -13,6 +13,7 @@
 
 class AccessGroup;
 class AutoKick;
+namespace Anope { class String; }
 class BotInfo;
 class CallBack;
 class ChanAccess;

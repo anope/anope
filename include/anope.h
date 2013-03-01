@@ -339,16 +339,16 @@ namespace Anope
 
 	/** The time Anope started.
 	 */
-	extern time_t StartTime;
+	extern CoreExport time_t StartTime;
 
 	/** The value to return from main()
 	 */
 	extern int ReturnValue;
 
 	extern sig_atomic_t Signal;
-	extern bool Quitting;
-	extern bool Restarting;
-	extern Anope::string QuitReason;
+	extern CoreExport bool Quitting;
+	extern CoreExport bool Restarting;
+	extern CoreExport Anope::string QuitReason;
 
 	/** The current system time, which is pretty close to being accurate.
 	 * Use this unless you need very specific time checks
@@ -357,31 +357,31 @@ namespace Anope
 
 	/** The debug level we are running at.
 	 */
-	extern int Debug;
+	extern CoreExport int Debug;
 
 	/** Other comand line options.
 	 */
-	extern bool ReadOnly, NoFork, NoThird, NoExpire, ProtocolDebug;
+	extern CoreExport bool ReadOnly, NoFork, NoThird, NoExpire, ProtocolDebug;
 
 	/** The root of the services installation. Usually ~/services
 	 */
-	extern Anope::string ServicesDir;
+	extern CoreExport Anope::string ServicesDir;
 
 	/** Services binary name (eg services)
 	 */
-	extern Anope::string ServicesBin;
+	extern CoreExport Anope::string ServicesBin;
 
 	/** Various directory paths. These can be set at runtime by command line args
 	 */
-	extern Anope::string ConfigDir;
-	extern Anope::string DataDir;
-	extern Anope::string ModuleDir;
-	extern Anope::string LocaleDir;
-	extern Anope::string LogDir;
+	extern CoreExport Anope::string ConfigDir;
+	extern CoreExport Anope::string DataDir;
+	extern CoreExport Anope::string ModuleDir;
+	extern CoreExport Anope::string LocaleDir;
+	extern CoreExport Anope::string LogDir;
 
 	/** The uplink we are currently connected to
 	 */
-	extern int CurrentUplink;
+	extern CoreExport int CurrentUplink;
 
 	/** Various methods to determine the Anope version running
 	 */
@@ -417,7 +417,7 @@ namespace Anope
 
 	/** Calls the save database event
 	 */
-	extern void SaveDatabases();
+	extern CoreExport void SaveDatabases();
 
 	/** Check whether two strings match.
 	 * @param str The string to check against the pattern (e.g. foobar)
@@ -457,7 +457,7 @@ namespace Anope
 	 * @param src The source string to encrypt
 	 * @param dest The destination where the encrypted string is placed
 	 */
-	extern void Encrypt(const Anope::string &src, Anope::string &dest);
+	extern CoreExport void Encrypt(const Anope::string &src, Anope::string &dest);
 
 	/** Decrypts what is in 'src' to 'dest'.
 	 * @param src The source string to decrypt
@@ -465,7 +465,7 @@ namespace Anope
 	 * @return true if decryption was successful. This is usually not the case
 	 * as most encryption methods we use are one way.
 	 */
-	extern bool Decrypt(const Anope::string &src, Anope::string &dest);
+	extern CoreExport bool Decrypt(const Anope::string &src, Anope::string &dest);
 
 	/** Returns a sequence of data formatted as the format argument specifies.
 	 ** After the format parameter, the function expects at least as many
@@ -488,40 +488,40 @@ namespace Anope
 
 	/** Determines if a path is a file
 	 */
-	extern bool IsFile(const Anope::string &file);
+	extern CoreExport bool IsFile(const Anope::string &file);
 
 	/** Converts a string into seconds
 	 * @param s The string, eg 3d
 	 * @return The time represented by the string, eg 259,200
 	 */
-	extern time_t DoTime(const Anope::string &s);
+	extern CoreExport time_t DoTime(const Anope::string &s);
 
 	/** Retrieves a human readable string representing the time in seconds
 	 * @param seconds The time on seconds, eg 60
 	 * @param nc The account to use langauge settings for to translate this string, if applicable
 	 * @return A human readable string, eg "1 minute"
 	 */
-	extern Anope::string Duration(time_t seconds, const NickCore *nc = NULL);
+	extern CoreExport Anope::string Duration(time_t seconds, const NickCore *nc = NULL);
 
 	/** Generates a human readable string of type "expires in ..."
 	 * @param expires time in seconds
 	 * @param nc The account to use langauge settings for to translate this string, if applicable
 	 * @return A human readable string, eg "expires in 5 days"
 	 */
-	extern Anope::string Expires(time_t seconds, const NickCore *nc = NULL);
+	extern CoreExport Anope::string Expires(time_t seconds, const NickCore *nc = NULL);
 
 	/** Converts a time in seconds (epoch) to a human readable format.
 	 * @param t The time
 	 * @param nc The account to use langauge settings for to translate this string, if applicable
 	 * @param short_output If true, the output is just a date (eg, "Apr 12 20:18:22 2009 MSD"), else it includes the date and how long ago/from now that date is, (eg "Apr 12 20:18:22 2009 MSD (1313 days, 9 hours, 32 minutes ago)"
 	 */
-	extern Anope::string strftime(time_t t, const NickCore *nc = NULL, bool short_output = false);
+	extern CoreExport Anope::string strftime(time_t t, const NickCore *nc = NULL, bool short_output = false);
 
 	/** Normalize buffer, stripping control characters and colors
 	 * @param A string to be parsed for control and color codes
 	 * @return A string stripped of control and color codes
 	 */
-	extern Anope::string NormalizeBuffer(const Anope::string &);
+	extern CoreExport Anope::string NormalizeBuffer(const Anope::string &);
 
 	/** Main processing routine. Parses the message and takes the appropriate action.
 	 * @param Raw message from the uplink

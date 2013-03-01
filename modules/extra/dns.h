@@ -56,7 +56,7 @@ namespace DNS
 		ERROR_NONE,
 		ERROR_UNKNOWN,
 		ERROR_UNLOADED,
-		ERROR_TIMEOUT,
+		ERROR_TIMEDOUT,
 		ERROR_NOT_AN_ANSWER,
 		ERROR_NONSTANDARD_QUERY,
 		ERROR_FORMAT_ERROR,
@@ -166,7 +166,7 @@ namespace DNS
 		{
 			Log(LOG_DEBUG_2) << "Resolver: timeout for query " << this->name;
 			Query rr(*this);
-			rr.error = ERROR_TIMEOUT;
+			rr.error = ERROR_TIMEDOUT;
 			this->OnError(&rr);
 		}
 	};

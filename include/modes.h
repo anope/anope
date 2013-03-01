@@ -298,7 +298,8 @@ class CoreExport ModeManager
 	static std::vector<UserMode *> UserModes;
 
 	/* Number of generic channel and user modes we are tracking */
-	static unsigned GenericChannelModes, GenericUserModes;
+	static unsigned GenericChannelModes;
+	static unsigned GenericUserModes;
 	/* Default channel mode lock */
 	static std::list<std::pair<Anope::string, Anope::string> > ModeLockOn;
 	static std::list<Anope::string> ModeLockOff;

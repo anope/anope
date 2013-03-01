@@ -168,7 +168,7 @@ class CoreExport ChannelInfo : public Serializable, public Extensible
  public:
  	friend class ChanAccess;
 	friend class AutoKick;
-	friend class BadWord;
+	friend struct BadWord;
 
 	typedef std::multimap<Anope::string, ModeLock *> ModeList;
 	Serialize::Checker<ModeList> mode_locks;

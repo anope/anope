@@ -43,7 +43,7 @@ struct CommandInfo
 /* Where the replies from commands go to. User inheits from this and is the normal
  * source of a CommandReply
  */
-struct CommandReply
+struct CoreExport CommandReply
 {
 	virtual ~CommandReply() { }
 	virtual void SendMessage(const BotInfo *source, const Anope::string &msg) = 0;

@@ -49,6 +49,7 @@ struct EntryMessageList : Serialize::Checker<std::vector<EntryMsg *> >, Extensib
 Serializable* EntryMsg::Unserialize(Serializable *obj, Serialize::Data &data)
 {
 	Anope::string sci, screator, smessage;
+	time_t swhen;
 
 	data["ci"] >> sci;
 	data["creator"] >> screator;
@@ -75,7 +76,9 @@ Serializable* EntryMsg::Unserialize(Serializable *obj, Serialize::Data &data)
 		ci->Extend("cs_entrymsg", messages);
 	}
 
-	EntryMsg *m = new EntryMsg(ci, screator, smessage);
+	data["when"] >> swhen;
+
+	EntryMsg *m = new EntryMsg(ci, screator, smessage, swhen);
 	(*messages)->push_back(m);
 	return m;
 }

@@ -1,10 +1,10 @@
-Anope Version 1.8 - GIT
+Anope Version 1.8.8
 -----------------------
 01/29  F Fixed user modes on BotServ bots on Unreal3.2.10                [#1474]
 02/13  F Do not allow invalid nicknames to be forbidden in ns_forbid     [  #00]
 
 Provided by Ryuunosuke Ayanokouzi - 2013
-02/17  A Added japanese language support                                 [  #00]
+02/17  A Added Japanese language support                                 [  #00]
 
 Provided by Anope Dev. <team@anope.org> - 2012
 02/22  F Fixed several grammar errors in docs/ (patch provided by Simba) [  #00]

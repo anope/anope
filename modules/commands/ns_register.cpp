@@ -290,7 +290,7 @@ class CommandNSResend : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		if (Config->NSRegistration.equals_ci("mail"))
+		if (!Config->NSRegistration.equals_ci("mail"))
 			return;
 
 		const NickAlias *na = NickAlias::Find(source.GetNick());
@@ -318,7 +318,7 @@ class CommandNSResend : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
 	{
-		if (Config->NSRegistration.equals_ci("mail"))
+		if (!Config->NSRegistration.equals_ci("mail"))
 			return false;
 
 		this->SendSyntax(source);

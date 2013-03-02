@@ -3,8 +3,8 @@
 include ../Makefile.inc.win32
 
 
-LANGOBJS = cat de en_us es fr hun gr nl pl pt tr it ru
-LANGSRCS = cat de en_us.l es fr.l hun.l gr.l nl.l pl.l pt.l tr.l it.l ru.l
+LANGOBJS = cat de en_us es fr hun gr nl pl pt tr it ja_utf8 ru
+LANGSRCS = cat de en_us.l es fr.l hun.l gr.l nl.l pl.l pt.l tr.l it.l ja_utf8.l ru.l
 
 LANGCOMP = ./langcomp
 #LANGCOMP = ./langcomp -w
@@ -26,6 +26,7 @@ install: all
         -copy pt ..\$(DATDEST)\languages
         -copy tr ..\$(DATDEST)\languages
         -copy it ..\$(DATDEST)\languages
+        -copy ja_utf8 ..\$(DATDEST)\languages
         -copy ru ..\$(DATDEST)\languages
 
 clean:
@@ -58,6 +59,8 @@ pt:       pt.l       langtool.exe langcomp.exe index
 tr:       tr.l       langtool.exe langcomp.exe index
         langcomp $@.l
 it:       it.l       langtool.exe langcomp.exe index
+        langcomp $@.l
+ja_utf8:  ja_utf8.l  langtool.exe langcomp.exe index
         langcomp $@.l
 ru:       ru.l       langtool.exe langcomp.exe index
         langcomp $@.l

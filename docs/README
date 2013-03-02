@@ -366,13 +366,13 @@ Table of Contents
 
 6) Adding Your Translation Into The Source
 
-    First, get the latest svn version of Anope. This can be done by doing
-    'svn co http://anope.svn.sourceforge.net/svnroot/anope/stable ./anope-stable`
+    First, get the latest version of Anope. This can be done by doing
+    'git clone git://github.com/anope/anope anope-stable'
 
-    Second, Place your language file in lang/, and type 'svn add file.l`. Where file is
+    Second, Place your language file in lang/, and type 'git add file.l`. Where file is
     your language file.
 
-    Next, edit lang/Makefile and add your file into both the LANGOBJS variable and
+    Next, edit lang/Makefile(.win32) and add your file into both the LANGOBJS variable and
     the LANGSRCS variable (alphabetically please). Then, go down and add an entry for
     it similar the others, eg:
        en_us:    en_us.l    langcomp index
@@ -398,7 +398,7 @@ Table of Contents
        load_lang(LANG_PL, "pl");
        load_lang(LANG_BLAH, "blah");
 
-    Now use 'svn diff > language.diff` to get the changes you made, and if it looks good (test it)
+    Now use 'git diff HEAD > language.diff` to get the changes you made, and if it looks good (test it)
     email it to team@anope.org!
 
     Please be aware we will only include a new language if there is sufficient demand for it.

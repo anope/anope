@@ -34,7 +34,10 @@ class CommandNSDrop : public Command
 		NickAlias *na = NickAlias::Find(!nick.empty() ? nick : source.GetNick());
 		if (!na)
 		{
-			source.Reply(NICK_NOT_REGISTERED);
+			if (!nick.empty())
+				source.Reply(NICK_X_NOT_REGISTERED, nick.c_str());
+			else
+				source.Reply(NICK_NOT_REGISTERED);
 			return;
 		}
 

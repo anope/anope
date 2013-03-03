@@ -113,8 +113,10 @@ class IdentifyInterface : public LDAPInterface
 								ii->user->SendMessage(NickServ, _("Your account \002%s\002 has been successfully created."), na->nick.c_str());
 						}
 					}
-					na->nc->Extend("m_ldap_authentication_dn", new ExtensibleItemClass<Anope::string>(ii->dn));
+					// encrypt and store the password in the nickcore
+					Anope::Encrypt(ii->req->GetPassword(), na->nc->pass);
 
+					na->nc->Extend("m_ldap_authentication_dn", new ExtensibleItemClass<Anope::string>(ii->dn));
 					ii->req->Success(me);
 				}
 				break;

@@ -1,3 +1,15 @@
+Anope Version 1.9.8
+--------------------
+A Ability to configure fantasy commands in the config
+A Add SVSJOIN and SVSPART commands
+F Fix "leave" channel log level from not logging
+F Fix users able to "resend" their registration mail with registration set to admin only
+F Fix build on OpenBSD
+F Fix not logging debug logs to the logfile when debug mode is enabled
+F Fix defcon timeout timer
+F Fix crash in os_forbid with expiring entries
+F Fix several issues with db_sql_live
+
 Anope Version 1.9.7
 --------------------
 A Added ability for using regex as patterns for various commands

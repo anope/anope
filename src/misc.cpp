@@ -270,7 +270,7 @@ Anope::string Anope::Duration(time_t t, const NickCore *nc)
 {
 	/* We first calculate everything */
 	time_t years = t / 31536000;
-	time_t days = (t / 86400);
+	time_t days = (t / 86400) % 365;
 	time_t hours = (t / 3600) % 24;
 	time_t minutes = (t / 60) % 60;
 	time_t seconds = (t) % 60;
@@ -289,7 +289,7 @@ Anope::string Anope::Duration(time_t t, const NickCore *nc)
 		if (days)
 		{
 			buffer += need_comma ? ", " : "";
-			buffer = stringify(days) + " " + (days != 1 ? Language::Translate(nc, _("days")) : Language::Translate(nc, _("day")));
+			buffer += stringify(days) + " " + (days != 1 ? Language::Translate(nc, _("days")) : Language::Translate(nc, _("day")));
 			need_comma = true;
 		}
 		if (hours)

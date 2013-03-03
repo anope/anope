@@ -4,7 +4,7 @@ rm -f anope.pot
 touch anope.pot
 
 cd ..
-FILES=`find ./ -name *.cpp -o -name *.h -name *.conf | grep -v /modules/third/`
+FILES=`find ./ -name *.cpp -o -name *.h -o -name *.conf | grep -v /modules/third/`
 for f in $FILES
 do
 	xgettext -E -C -s -d Anope -j -o language/anope.pot --from-code=utf-8 --keyword --keyword=_ $f

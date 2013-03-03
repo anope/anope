@@ -631,11 +631,6 @@ struct BanData : public ExtensibleItem
 				data_map.erase(user);
 		}
 	}
-
-	void OnDelete() anope_override
-	{
-		delete this;
-	}
 };
 
 struct UserData : public ExtensibleItem
@@ -664,11 +659,6 @@ struct UserData : public ExtensibleItem
 	int16_t times;
 
 	Anope::string lastline;
-
-	void OnDelete() anope_override
-	{
-		delete this;
-	}
 };
 
 

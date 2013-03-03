@@ -71,8 +71,7 @@ bool WebCPanel::MemoServ::Memos::OnRequest(HTTPProvider *server, const Anope::st
 	if (message.get_data.count("read") > 0 && message.get_data.count("number") > 0)
 	{
 		std::vector<Anope::string> params;
-		int number;
-		bool error = false;
+		int number = -1;
 
 		try
 		{
@@ -81,21 +80,19 @@ bool WebCPanel::MemoServ::Memos::OnRequest(HTTPProvider *server, const Anope::st
 		catch (const ConvertException &ex)
 		{
 			replacements["MESSAGES"] = "ERROR - invalid parameter for NUMBER";
-			error = true;
 		}
 
-		m = mi->GetMemo(number-1);
-
-		if (!error && !m)
+		if (number > 0)
 		{
-			replacements["MESSAGES"] = "ERROR - invalid memo number.";
-			error = true;
-		}
+			m = mi->GetMemo(number-1);
 
-		if (!error && message.get_data["read"] == "1")
-			m->unread = false;
-		else if (!error && message.get_data["read"] == "2")
-			m->unread = true;
+			if (!m)
+				replacements["MESSAGES"] = "ERROR - invalid memo number.";
+			else if (message.get_data["read"] == "1")
+				m->unread = false;
+			else if (message.get_data["read"] == "2")
+				m->unread = true;
+		}
 	}
 
 	for (unsigned i = 0; i < mi->memos->size(); ++i)

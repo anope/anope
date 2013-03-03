@@ -61,7 +61,7 @@ class CommandOSMode : public Command
 		}
 		else
 		{
-			spacesepstream sep(modes);
+			spacesepstream sep(modes + (params.size() > 2 ? " " + params[2] : ""));
 			Anope::string mode;
 			int add = 1;
 			Anope::string log_modes, log_params;

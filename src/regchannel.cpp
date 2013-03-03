@@ -373,6 +373,9 @@ ChannelInfo::~ChannelInfo()
 
 	RegisteredChannelList->erase(this->name);
 
+	this->SetFounder(NULL);
+	this->SetSuccessor(NULL);
+
 	this->ClearAccess();
 	this->ClearAkick();
 	this->ClearBadWords();

@@ -1,5 +1,8 @@
+Anope Version 1.8 - GIT
+-------------------
+
 Anope Version 1.8.8
------------------------
+-------------------
 01/29  F Fixed user modes on BotServ bots on Unreal3.2.10                [#1474]
 02/13  F Do not allow invalid nicknames to be forbidden in ns_forbid     [  #00]
 
@@ -17,7 +20,7 @@ Provided by Anope Dev. <team@anope.org> - 2011
 12/31  F Fixed os_svsnick to allow changing the case of a users' nick    [#1369]
 
 Anope Version 1.8.7
------------------------
+-------------------
 08/18  A Added support for Hybrid's channel mode +S                      [#1319]
 08/18  A Added support for Hybrid's channel mode +O                      [#1320]
 08/21  A Added internal event when a nickcore is dropped.                [  #00]

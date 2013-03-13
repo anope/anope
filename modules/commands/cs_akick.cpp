@@ -83,9 +83,13 @@ class CommandCSAKick : public Command
 			}
 		}
 
+		bool override = !source.AccessFor(ci).HasPriv("AKICK");
+		/* Opers overriding get to bypass PEACE */
+		if (override)
+			;
 		/* Check whether target nick has equal/higher access
 		* or whether the mask matches a user with higher/equal access - Viper */
-		if (ci->HasExt("PEACE") && nc)
+		else if (ci->HasExt("PEACE") && nc)
 		{
 			AccessGroup nc_access = ci->AccessFor(nc), u_access = source.AccessFor(ci);
 			if (nc == ci->GetFounder() || nc_access >= u_access)
@@ -152,7 +156,6 @@ class CommandCSAKick : public Command
 		else
 			akick = ci->AddAkick(source.GetNick(), mask, reason);
 
-		bool override = !source.AccessFor(ci).HasPriv("AKICK");
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to add " << mask << (reason == "" ? "" : ": ") << reason;
 
 		FOREACH_MOD(I_OnAkickAdd, OnAkickAdd(source, ci, akick));

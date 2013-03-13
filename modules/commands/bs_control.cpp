@@ -33,7 +33,7 @@ class CommandBSSay : public Command
 			return;
 		}
 
-		if (!source.AccessFor(ci).HasPriv("SAY"))
+		if (!source.AccessFor(ci).HasPriv("SAY") && !source.HasPriv("botserv/administration"))
 		{
 			source.Reply(ACCESS_DENIED);
 			return;
@@ -60,10 +60,8 @@ class CommandBSSay : public Command
 		IRCD->SendPrivmsg(ci->bi, ci->name, "%s", text.c_str());
 		ci->bi->lastmsg = Anope::CurTime;
 
-		// XXX need a way to find if someone is overriding this
-		Log(LOG_COMMAND, source, this, ci) << text;
-
-		return;
+		bool override = !source.AccessFor(ci).HasPriv("SAY");
+		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to say: " << text;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
@@ -95,7 +93,7 @@ class CommandBSAct : public Command
 			return;
 		}
 
-		if (!source.AccessFor(ci).HasPriv("SAY"))
+		if (!source.AccessFor(ci).HasPriv("SAY") && !source.HasPriv("botserv/administration"))
 		{
 			source.Reply(ACCESS_DENIED);
 			return;
@@ -113,17 +111,15 @@ class CommandBSAct : public Command
 			return;
 		}
 
-		size_t i = 0;
-		while ((i = message.find(1)) && i != Anope::string::npos)
-			message.erase(i, 1);
+		message = message.replace_all_cs("\1", "");
+		if (message.empty())
+			return;
 
 		IRCD->SendAction(ci->bi, ci->name, "%s", message.c_str());
 		ci->bi->lastmsg = Anope::CurTime;
 
-		// XXX Need to be able to find if someone is overriding this.
-		Log(LOG_COMMAND, source, this, ci) << message;
-
-		return;
+		bool override = !source.AccessFor(ci).HasPriv("SAY");
+		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to say: " << message;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override

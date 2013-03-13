@@ -50,12 +50,12 @@ class CommandCSKick : public Command
 
 		AccessGroup u_access = source.AccessFor(ci);
 
-		if (!u_access.HasPriv("KICK"))
+		if (!u_access.HasPriv("KICK") && !source.HasPriv("chanserv/kick"))
 			source.Reply(ACCESS_DENIED);
 		else if (u2)
 		{
 			AccessGroup u2_access = ci->AccessFor(u2);
-			if (u != u2 && ci->HasExt("PEACE") && u2_access >= u_access)
+			if (u != u2 && ci->HasExt("PEACE") && u2_access >= u_access && !source.HasPriv("chanserv/kick"))
 				source.Reply(ACCESS_DENIED);
 			else if (u2->IsProtected())
 				source.Reply(ACCESS_DENIED);
@@ -63,8 +63,8 @@ class CommandCSKick : public Command
 				source.Reply(NICK_X_NOT_ON_CHAN, u2->nick.c_str(), c->name.c_str());
 			else
 			{
-				 // XXX
-				Log(LOG_COMMAND, source, this, ci) << "for " << u2->nick;
+				bool override = !u_access.HasPriv("KICK") || (u != u2 && ci->HasExt("PEACE") && u2_access >= u_access);
+				Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "for " << u2->nick;
 
 				if (ci->HasExt("SIGNKICK") || (ci->HasExt("SIGNKICK_LEVEL") && !u_access.HasPriv("SIGNKICK")))
 					c->Kick(ci->WhoSends(), u2, "%s (%s)", reason.c_str(), source.GetNick().c_str());

@@ -90,13 +90,13 @@ class CommandCSBan : public Command
 
 		if (!c)
 			source.Reply(CHAN_X_NOT_IN_USE, chan.c_str());
-		else if (!u_access.HasPriv("BAN"))
+		else if (!u_access.HasPriv("BAN") && !source.HasPriv("chanserv/kick"))
 			source.Reply(ACCESS_DENIED);
 		else if (u2)
 		{
 			AccessGroup u2_access = ci->AccessFor(u2);
 
-			if (u != u2 && ci->HasExt("PEACE") && u2_access >= u_access)
+			if (u != u2 && ci->HasExt("PEACE") && u2_access >= u_access && !source.HasPriv("chanserv/kick"))
 				source.Reply(ACCESS_DENIED);
 			/*
 			 * Dont ban/kick the user on channels where he is excepted
@@ -110,8 +110,8 @@ class CommandCSBan : public Command
 			{
 				Anope::string mask = ci->GetIdealBan(u2);
 
-				// XXX need a way to detect if someone is overriding
-				Log(LOG_COMMAND, source, this, ci) << "for " << mask;
+				bool override = !u_access.HasPriv("BAN") || (u != u2 && ci->HasExt("PEACE") && u2_access >= u_access);
+				Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "for " << mask;
 
 				if (!c->HasMode("BAN", mask))
 				{

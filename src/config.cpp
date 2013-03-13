@@ -96,7 +96,7 @@ ServerConfig::ServerConfig()
 		spacesepstream options(BSDefaults);
 		Anope::string option;
 		while (options.GetToken(option))
-			this->BSDefFlags.insert(option.upper());
+			this->BSDefFlags.insert("BS_" + option.upper());
 	}
 
 	/* Ulines */

@@ -85,12 +85,12 @@ class CoreExport cidr
 {
 	sockaddrs addr;
 	Anope::string cidr_ip;
-	unsigned char cidr_len;
+	unsigned short cidr_len;
  public:
  	cidr(const Anope::string &ip);
 	cidr(const Anope::string &ip, unsigned char len);
 	Anope::string mask() const;
-	bool match(sockaddrs &other);
+	bool match(const sockaddrs &other);
 
 	bool operator<(const cidr &other) const;
 	bool operator==(const cidr &other) const;

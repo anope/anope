@@ -393,28 +393,14 @@ class CoreExport ModeManager
 	static void UpdateDefaultMLock(ServerConfig *config);
 };
 
-/** Entry flags
- */
-enum EntryType
-{
-	ENTRYTYPE_CIDR,
-	ENTRYTYPE_NICK_WILD,
-	ENTRYTYPE_NICK,
-	ENTRYTYPE_USER_WILD,
-	ENTRYTYPE_USER,
-	ENTRYTYPE_HOST_WILD,
-	ENTRYTYPE_HOST
-};
-
 /** Represents a mask set on a channel (b/e/I)
  */
 class CoreExport Entry
 {
 	Anope::string name;
- public:
-	std::set<EntryType> types;
-	unsigned char cidr_len;
 	Anope::string mask;
+ public:
+	unsigned short cidr_len;
 	Anope::string nick, user, host;
 
 	/** Constructor
@@ -426,7 +412,7 @@ class CoreExport Entry
 	/** Get the banned mask for this entry
 	 * @return The mask
 	 */
-	const Anope::string GetMask();
+	const Anope::string GetMask() const;
 
 	/** Check if this entry matches a user
 	 * @param u The user

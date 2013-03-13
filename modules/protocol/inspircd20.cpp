@@ -81,7 +81,7 @@ class InspIRCdExtBan : public ChannelModeList
 
 	bool Matches(const User *u, const Entry *e) anope_override
 	{
-		const Anope::string &mask = e->mask;
+		const Anope::string &mask = e->GetMask();
 
 		if (mask.find("m:") == 0 || mask.find("N:") == 0)
 		{

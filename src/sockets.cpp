@@ -207,24 +207,29 @@ Anope::string cidr::mask() const
 	return Anope::printf("%s/%d", this->cidr_ip.c_str(), this->cidr_len);
 }
 
-bool cidr::match(sockaddrs &other)
+bool cidr::match(const sockaddrs &other)
 {
 	if (this->addr.sa.sa_family != other.sa.sa_family)
 		return false;
 
-	unsigned char *ip, *their_ip, byte;
+	const unsigned char *ip, *their_ip;
+	unsigned char byte, len = this->cidr_len;
 
 	switch (this->addr.sa.sa_family)
 	{
 		case AF_INET:
-			ip = reinterpret_cast<unsigned char *>(&this->addr.sa4.sin_addr);
-			byte = this->cidr_len / 8;
-			their_ip = reinterpret_cast<unsigned char *>(&other.sa4.sin_addr);
+			ip = reinterpret_cast<const unsigned char *>(&this->addr.sa4.sin_addr);
+			if (len > 32)
+				len = 32;
+			byte = len / 8;
+			their_ip = reinterpret_cast<const unsigned char *>(&other.sa4.sin_addr);
 			break;
 		case AF_INET6:
-			ip = reinterpret_cast<unsigned char *>(&this->addr.sa6.sin6_addr);
-			byte = this->cidr_len / 8;
-			their_ip = reinterpret_cast<unsigned char *>(&other.sa6.sin6_addr);
+			ip = reinterpret_cast<const unsigned char *>(&this->addr.sa6.sin6_addr);
+			if (len > 128)
+				len = 128;
+			byte = len / 8;
+			their_ip = reinterpret_cast<const unsigned char *>(&other.sa6.sin6_addr);
 			break;
 		default:
 			throw SocketException("Invalid address type");
@@ -233,11 +238,14 @@ bool cidr::match(sockaddrs &other)
 	if (memcmp(ip, their_ip, byte))
 		return false;
 
-	ip += byte;
-	their_ip += byte;
-	byte = this->cidr_len % 8;
-	if ((*ip & byte) != (*their_ip & byte))
-		return false;
+	byte = len % 8;
+	if (byte)
+	{
+		ip += byte;
+		their_ip += byte;
+		if ((*ip & byte) != (*their_ip & byte))
+			return false;
+	}
 
 	return true;
 }
@@ -295,7 +303,7 @@ size_t cidr::hash::operator()(const cidr &s) const
 		{
 			size_t h = 0;
 
-			for (int i = 0; i < s.cidr_len / 8; ++i)
+			for (unsigned i = 0; i < s.cidr_len / 8; ++i)
 				h ^= (s.addr.sa6.sin6_addr.s6_addr[i] << ((i * 8) % sizeof(size_t)));
 
 			int remaining = s.cidr_len % 8;

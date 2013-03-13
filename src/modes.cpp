@@ -605,105 +605,104 @@ void ModeManager::UpdateDefaultMLock(ServerConfig *config)
 	}
 }
 
-Entry::Entry(const Anope::string &m, const Anope::string &_host) : name(m)
+Entry::Entry(const Anope::string &m, const Anope::string &fh) : name(m), mask(fh), cidr_len(0)
 {
-	this->cidr_len = 0;
-	this->mask = _host;
+	Anope::string n, u, h;
 
-	Anope::string _nick, _user, _realhost;
-	size_t at = _host.find('@');
+	size_t at = fh.find('@');
 	if (at != Anope::string::npos)
 	{
-		_realhost = _host.substr(at + 1);
-		Anope::string _nickident = _host.substr(0, at);
+		this->host = fh.substr(at + 1);
 
-		size_t ex = _nickident.find('!');
+		const Anope::string &nu = fh.substr(0, at);
+
+		size_t ex = nu.find('!');
 		if (ex != Anope::string::npos)
 		{
-			_user = _nickident.substr(ex + 1);
-			_nick = _nickident.substr(0, ex);
+			this->user = nu.substr(ex + 1);
+			this->nick = nu.substr(0, ex);
 		}
 		else
-			_user = _nickident;
+			this->user = nu;
 	}
 	else
-		_realhost = _host;
+		this->host = fh;
 	
-	if (!_nick.empty() && _nick.find_first_not_of("*") != Anope::string::npos)
+	/* If the mask is all *'s it will match anything, so just clear it */
+	if (this->nick.find_first_not_of("*") == Anope::string::npos)
+		this->nick.clear();
+	
+	if (this->user.find_first_not_of("*") == Anope::string::npos)
+		this->user.clear();
+	
+	if (this->host.find_first_not_of("*") == Anope::string::npos)
+		this->host.clear();
+	else
 	{
-		this->nick = _nick;
-		if (_nick.find_first_of("*?") != Anope::string::npos)
-			this->types.insert(ENTRYTYPE_NICK_WILD);
-		else
-			this->types.insert(ENTRYTYPE_NICK);
-	}
-
-	if (!_user.empty() && _user.find_first_not_of("*") != Anope::string::npos)
-	{
-		this->user = _user;
-		if (_user.find_first_of("*?") != Anope::string::npos)
-			this->types.insert(ENTRYTYPE_USER_WILD);
-		else
-			this->types.insert(ENTRYTYPE_USER);
-	}
-
-	if (!_realhost.empty() && _realhost.find_first_not_of("*") != Anope::string::npos)
-	{
-		size_t sl = _realhost.find_last_of('/');
+		/* Host might be a CIDR range */
+		size_t sl = this->host.find_last_of('/');
 		if (sl != Anope::string::npos)
 		{
+			const Anope::string &cidr_ip = this->host.substr(0, sl),
+						&cidr_range = this->host.substr(sl + 1);
 			try
 			{
-				sockaddrs addr(_realhost.substr(0, sl));
-				/* If we got here, _realhost is a valid IP */
+				sockaddrs addr(cidr_ip);
+				/* If we got here, cidr_ip is a valid ip */
 
-				Anope::string cidr_range = _realhost.substr(sl + 1);
 				if (cidr_range.is_pos_number_only())
 				{
-					_realhost = _realhost.substr(0, sl);
-					this->cidr_len = convertTo<unsigned int>(cidr_range);
-					this->types.insert(ENTRYTYPE_CIDR);
-					Log(LOG_DEBUG) << "Ban " << _realhost << " has cidr " << static_cast<unsigned int>(this->cidr_len);
+					this->cidr_len = convertTo<unsigned short>(cidr_range);
+					/* If we got here, cidr_len is a valid number.
+					 * If cidr_len is >32 (or 128) it is handled later in
+					 * cidr::match
+					 */
+
+					this->host = cidr_ip;
+
+					Log(LOG_DEBUG) << "Ban " << this->mask << " has cidr " << this->cidr_len;
 				}
 			}
 			catch (const SocketException &) { }
 			catch (const ConvertException &) { }
 		}
-
-		this->host = _realhost;
-
-		if (!this->types.count(ENTRYTYPE_CIDR))
-		{
-			if (_realhost.find_first_of("*?") != Anope::string::npos)
-				this->types.insert(ENTRYTYPE_HOST_WILD);
-			else
-				this->types.insert(ENTRYTYPE_HOST);
-		}
 	}
 }
 
-const Anope::string Entry::GetMask()
+const Anope::string Entry::GetMask() const
 {
 	return this->mask;
 }
 
 bool Entry::Matches(const User *u, bool full) const
 {
+	/* First check if this mode has defined any matches (usually for extbans). */
+	ChannelMode *cm = ModeManager::FindChannelModeByName(this->name);
+	if (cm != NULL && cm->type == MODE_LIST)
+	{
+		ChannelModeList *cml = anope_dynamic_static_cast<ChannelModeList *>(cm);
+		if (cml->Matches(u, this))
+			return true;
+	}
+
+	/* If the user's displayed host is their real host, then we can do a full match without
+	 * having to worry about exposing a user's IP
+	 */
+	full |= u->GetDisplayedHost() == u->host;
+
 	bool ret = true;
-	
-	if (this->types.count(ENTRYTYPE_CIDR))
+
+	if (!this->nick.empty() && !Anope::Match(u->nick, this->nick))
+		ret = false;
+
+	if (!this->user.empty() && !Anope::Match(u->GetVIdent(), this->user) && (!full || !Anope::Match(u->GetIdent(), this->user)))
+		ret = false;
+
+	if (this->cidr_len && full)
 	{
 		try
 		{
-			if (full)
-			{
-				cidr cidr_mask(this->host, this->cidr_len);
-				sockaddrs addr(u->ip);
-				if (!cidr_mask.match(addr))
-					ret = false;
-			}
-			/* If we're not matching fully and their displayed host isnt their IP */
-			else if (u->ip != u->GetDisplayedHost())
+			if (!cidr(this->host, this->cidr_len).match(u->ip))
 				ret = false;
 		}
 		catch (const SocketException &)
@@ -711,33 +710,10 @@ bool Entry::Matches(const User *u, bool full) const
 			ret = false;
 		}
 	}
-	if (this->types.count(ENTRYTYPE_NICK) && !this->nick.equals_ci(u->nick))
-		ret = false;
-	if (this->types.count(ENTRYTYPE_USER) && !this->user.equals_ci(u->GetVIdent()) && (!full ||
-		!this->user.equals_ci(u->GetIdent())))
-		ret = false;
-	if (this->types.count(ENTRYTYPE_HOST) && !this->host.equals_ci(u->GetDisplayedHost()) && (!full ||
-		(!this->host.equals_ci(u->host) && !this->host.equals_ci(u->chost) && !this->host.equals_ci(u->vhost) &&
-		!this->host.equals_ci(u->ip))))
-		ret = false;
-	if (this->types.count(ENTRYTYPE_NICK_WILD) && !Anope::Match(u->nick, this->nick))
-		ret = false;
-	if (this->types.count(ENTRYTYPE_USER_WILD) && !Anope::Match(u->GetVIdent(), this->user) && (!full ||
-		!Anope::Match(u->GetIdent(), this->user)))
-		ret = false;
-	if (this->types.count(ENTRYTYPE_HOST_WILD) && !Anope::Match(u->GetDisplayedHost(), this->host) && (!full ||
-		(!Anope::Match(u->host, this->host) && !Anope::Match(u->chost, this->host) &&
-		!Anope::Match(u->vhost, this->host) && !Anope::Match(u->ip, this->host))))
+	else if (!this->host.empty() && !Anope::Match(u->GetDisplayedHost(), this->host) && !Anope::Match(u->GetCloakedHost(), this->host) &&
+		(!full || (!Anope::Match(u->host, this->host) && !Anope::Match(u->ip, this->host))))
 		ret = false;
 	
-	ChannelMode *cm = ModeManager::FindChannelModeByName(this->name);
-	if (cm != NULL && cm->type == MODE_LIST)
-	{
-		ChannelModeList *cml = anope_dynamic_static_cast<ChannelModeList *>(cm);
-		if (cml->Matches(u, this))
-			ret = true;
-	}
-
 	return ret;
 }
 

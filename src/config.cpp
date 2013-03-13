@@ -963,11 +963,18 @@ static bool DoFantasy(ServerConfig *config, const Anope::string &, const Anope::
 	Anope::string name = values[0].GetValue();
 	Anope::string service = values[1].GetValue();
 	Anope::string permission = values[2].GetValue();
-	bool prepend_channel = values[3].GetBool();
+	Anope::string group = values[3].GetValue();
+	bool hide = values[4].GetBool();
+	bool prepend_channel = values[5].GetBool();
 
-	config->Fantasy[name].name = service;
-	config->Fantasy[name].permission = permission;
-	config->Fantasy[name].prepend_channel = prepend_channel;
+	CommandInfo &c = config->Fantasy[name];
+
+	c.name = service;
+	c.permission = permission;
+	c.group = group;
+	c.hide = hide;
+	c.prepend_channel = prepend_channel;
+
 	return true;
 }
 
@@ -1330,9 +1337,9 @@ ConfigItems::ConfigItems(ServerConfig *conf)
 			{DT_STRING, DT_STRING, DT_INTEGER, DT_STRING},
 			InitPrivileges, DoPrivileges, DonePrivileges},
 		{"fantasy",
-			{"name", "command", "permission", "prepend_channel", ""},
-			{"", "", "", "yes", ""},
-			{DT_STRING, DT_STRING, DT_STRING, DT_BOOLEAN},
+			{"name", "command", "permission", "group", "hide", "prepend_channel", ""},
+			{"", "", "", "", "no", "yes", ""},
+			{DT_STRING, DT_STRING, DT_STRING, DT_STRING, DT_BOOLEAN, DT_BOOLEAN},
 			InitFantasy, DoFantasy, DoneFantasy},
 		{"command_group",
 			{"name", "description", ""},

@@ -212,8 +212,8 @@ class NSIdentifyLDAP : public Module
 	OnRegisterInterface orinterface;
 
 	Anope::string password_attribute;
-	bool disable_register;
-	Anope::string disable_reason;
+	Anope::string disable_register_reason;
+	Anope::string disable_email_reason;
  public:
 	NSIdentifyLDAP(const Anope::string &modname, const Anope::string &creator) :
 		Module(modname, creator, SUPPORTED), ldap("LDAPProvider", "ldap/main"), iinterface(this), oninterface(this), orinterface(this)
@@ -239,15 +239,24 @@ class NSIdentifyLDAP : public Module
 		username_attribute = config.ReadValue("m_ldap_authentication", "username_attribute", "", 0);
 		this->password_attribute = config.ReadValue("m_ldap_authentication", "password_attribute", "", 0);
 		email_attribute = config.ReadValue("m_ldap_authentication", "email_attribute", "", 0);
-		this->disable_register = config.ReadFlag("m_ldap_authentication", "disable_ns_register", "false", 0);
-		this->disable_reason = config.ReadValue("m_ldap_authentication", "disable_reason", "", 0);
+		this->disable_register_reason = config.ReadValue("m_ldap_authentication", "disable_register_reason", "", 0);
+		this->disable_email_reason = config.ReadValue("m_ldap_authentication", "disable_email_reason", "", 0);
+
+		if (!email_attribute.empty())
+			/* Don't complain to users about how they need to update their email, we will do it for them */
+			Config->NSForceEmail = false;
 	}
 
 	EventReturn OnPreCommand(CommandSource &source, Command *command, std::vector<Anope::string> &params) anope_override
 	{
-		if (this->disable_register && !this->disable_reason.empty() && command->name == "nickserv/register")
+		if (!this->disable_register_reason.empty() && command->name == "nickserv/register")
 		{
-			source.Reply(_(this->disable_reason.c_str()));
+			source.Reply(this->disable_register_reason);
+			return EVENT_STOP;
+		}
+		else if (!email_attribute.empty() && !this->disable_email_reason.empty() && command->name == "nickserv/set/email")
+		{
+			source.Reply(this->disable_email_reason);
 			return EVENT_STOP;
 		}
 
@@ -294,7 +303,7 @@ class NSIdentifyLDAP : public Module
 
 	void OnNickRegister(NickAlias *na) anope_override
 	{
-		if (this->disable_register || !this->ldap)
+		if (!this->disable_register_reason.empty() || !this->ldap)
 			return;
 
 		try

@@ -194,7 +194,7 @@ foreach(MODULE_FOLDER ${MODULES_FOLDERS})
             DESTINATION ${LIB_DIR}/modules
           )
          else(NOT SKIP_DEPENDS AND NOT SKIP_LIBRARIES AND HAS_FUNCTION)
-          message("  ${SRC} can not be built due to missing dependencies.")
+          message("  ${SUBDIR} can not be built due to missing dependencies.")
         endif(NOT SKIP_DEPENDS AND NOT SKIP_LIBRARIES AND HAS_FUNCTION)
 
 	# Run the directories CMakeLists.txt if there is one

@@ -337,6 +337,11 @@ class UnrealIRCdProto : public IRCDProto
 		return IRCDProto::IsChannelValid(chan);
 	}
 
+	bool IsExtbanValid(const Anope::string &mask) anope_override
+	{
+		return mask.length() >= 4 && mask[0] == '~' && mask[2] == ':';
+	}
+
 	void SendLogin(User *u) anope_override
 	{
 		if (!u->Account())

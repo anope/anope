@@ -222,6 +222,7 @@ class CoreExport IRCDProto : public Service
 	virtual bool IsChannelValid(const Anope::string &);
 	virtual bool IsIdentValid(const Anope::string &);
 	virtual bool IsHostValid(const Anope::string &);
+	virtual bool IsExtbanValid(const Anope::string &) { return false; }
 };
 
 class CoreExport MessageSource

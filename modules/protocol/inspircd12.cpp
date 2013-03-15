@@ -374,6 +374,11 @@ class InspIRCd12Proto : public IRCDProto
 	void SendOper(User *u) anope_override
 	{
 	}
+
+	bool IsExtbanValid(const Anope::string &mask) anope_override
+	{
+		return mask.length() >= 3 && mask[1] == ':';
+	}
 };
 
 class InspIRCdExtBan : public ChannelModeList

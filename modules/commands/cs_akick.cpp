@@ -13,39 +13,6 @@
 
 #include "module.h"
 
-static void split_usermask(const Anope::string &mask, Anope::string &nick, Anope::string &user, Anope::string &host)
-{
-	size_t ex = mask.find('!'), at = mask.find('@', ex == Anope::string::npos ? 0 : ex + 1);
-	if (ex == Anope::string::npos)
-	{
-		if (at == Anope::string::npos)
-		{
-			nick = mask;
-			user = host = "*";
-		}
-		else
-		{
-			nick = "*";
-			user = mask.substr(0, at);
-			host = mask.substr(at + 1);
-		}
-	}
-	else
-	{
-		nick = mask.substr(0, ex);
-		if (at == Anope::string::npos)
-		{
-			user = mask.substr(ex + 1);
-			host = "*";
-		}
-		else
-		{
-			user = mask.substr(ex + 1, at - ex - 1);
-			host = mask.substr(at + 1);
-		}
-	}
-}
-
 class CommandCSAKick : public Command
 {
 	void DoAdd(CommandSource &source, ChannelInfo *ci, const std::vector<Anope::string> &params)
@@ -59,12 +26,45 @@ class CommandCSAKick : public Command
 		if (reason.length() > Config->CSReasonMax)
 			reason = reason.substr(0, Config->CSReasonMax);
 
-		if (!na)
+		if (IRCD->IsExtbanValid(mask))
+			; /* If this is an extban don't try to complete the mask */
+		else if (IRCD->IsChannelValid(mask))
 		{
-			Anope::string nick, user, host;
+			/* Also don't try to complete the mask if this is a channel */
 
-			split_usermask(mask, nick, user, host);
-			mask = nick + "!" + user + "@" + host;
+			if (mask.equals_ci(ci->name) && ci->HasExt("PEACE"))
+			{
+				source.Reply(ACCESS_DENIED);
+				return;
+			}
+		}
+		else if (!na)
+		{
+			/* If the mask contains a realname the reason must be prepended with a : */
+			if (mask.find('#') != Anope::string::npos)
+			{
+				size_t r = reason.find(':');
+				if (r != Anope::string::npos)
+				{
+					mask += " " + reason.substr(0, r);
+					mask.trim();
+					reason = reason.substr(r + 1);
+					reason.trim();
+				}
+				else
+				{
+					mask = mask + " " + reason;
+					reason.clear();
+				}
+			}
+
+			Entry e("", mask);
+		
+			mask = (e.nick.empty() ? "*" : e.nick) + "!"
+				+ (e.user.empty() ? "*" : e.user) + "@"
+				+ (e.host.empty() ? "*" : e.host);
+			if (!e.real.empty())
+				mask += "#" + e.real;
 		}
 		else
 			nc = na->nc;
@@ -86,6 +86,9 @@ class CommandCSAKick : public Command
 		bool override = !source.AccessFor(ci).HasPriv("AKICK");
 		/* Opers overriding get to bypass PEACE */
 		if (override)
+			;
+		/* These peace checks are only for masks */
+		else if (IRCD->IsChannelValid(mask))
 			;
 		/* Check whether target nick has equal/higher access
 		* or whether the mask matches a user with higher/equal access - Viper */
@@ -526,22 +529,20 @@ class CSAKick : public Module
 			bool kick = false;
 
 			if (autokick->nc)
+				kick = autokick->nc == u->Account();
+			else if (IRCD->IsChannelValid(autokick->mask))
 			{
-				if (autokick->nc == u->Account())
-					kick = true;
+				Channel *c = Channel::Find(autokick->mask);
+				kick = c != NULL && c->FindUser(u);
 			}
 			else
-			{
-				Entry akick_mask("", autokick->mask);
-				if (akick_mask.Matches(u))
-					kick = true;
-			}
+				kick = Entry("BAN", autokick->mask).Matches(u);
 
 			if (kick)
 			{
 				Log(LOG_DEBUG_2) << u->nick << " matched akick " << (autokick->nc ? autokick->nc->display : autokick->mask);
 				autokick->last_used = Anope::CurTime;
-				if (!autokick->nc)
+				if (!autokick->nc && autokick->mask.find('#') == Anope::string::npos)
 					mask = autokick->mask;
 				reason = autokick->reason.empty() ? Config->CSAutokickReason : autokick->reason;
 				return EVENT_STOP;

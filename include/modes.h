@@ -401,11 +401,11 @@ class CoreExport Entry
 	Anope::string mask;
  public:
 	unsigned short cidr_len;
-	Anope::string nick, user, host;
+	Anope::string nick, user, host, real;
 
 	/** Constructor
  	 * @param mode What mode this host is for, can be empty for unknown/no mode
-	 * @param host A full nick!ident@host/cidr mask
+	 * @param host A full or poartial nick!ident@host/cidr#real name mask
 	 */
 	Entry(const Anope::string &mode, const Anope::string &host);
 

@@ -626,7 +626,19 @@ Entry::Entry(const Anope::string &m, const Anope::string &fh) : name(m), mask(fh
 			this->user = nu;
 	}
 	else
-		this->host = fh;
+	{
+		if (fh.find('.') != Anope::string::npos || fh.find(':') != Anope::string::npos)
+			this->host = fh;
+		else
+			this->nick = fh;
+	}
+	
+	at = this->host.find('#');
+	if (at != Anope::string::npos)
+	{
+		this->real = this->host.substr(at + 1);
+		this->host = this->host.substr(0, at);
+	}
 	
 	/* If the mask is all *'s it will match anything, so just clear it */
 	if (this->nick.find_first_not_of("*") == Anope::string::npos)
@@ -667,6 +679,9 @@ Entry::Entry(const Anope::string &m, const Anope::string &fh) : name(m), mask(fh
 			catch (const ConvertException &) { }
 		}
 	}
+
+	if (this->real.find_first_not_of("*") == Anope::string::npos)
+		this->real.clear();
 }
 
 const Anope::string Entry::GetMask() const
@@ -677,12 +692,15 @@ const Anope::string Entry::GetMask() const
 bool Entry::Matches(const User *u, bool full) const
 {
 	/* First check if this mode has defined any matches (usually for extbans). */
-	ChannelMode *cm = ModeManager::FindChannelModeByName(this->name);
-	if (cm != NULL && cm->type == MODE_LIST)
+	if (IRCD->IsExtbanValid(this->mask))
 	{
-		ChannelModeList *cml = anope_dynamic_static_cast<ChannelModeList *>(cm);
-		if (cml->Matches(u, this))
-			return true;
+		ChannelMode *cm = ModeManager::FindChannelModeByName(this->name);
+		if (cm != NULL && cm->type == MODE_LIST)
+		{
+			ChannelModeList *cml = anope_dynamic_static_cast<ChannelModeList *>(cm);
+			if (cml->Matches(u, this))
+				return true;
+		}
 	}
 
 	/* If the user's displayed host is their real host, then we can do a full match without
@@ -712,6 +730,9 @@ bool Entry::Matches(const User *u, bool full) const
 	}
 	else if (!this->host.empty() && !Anope::Match(u->GetDisplayedHost(), this->host) && !Anope::Match(u->GetCloakedHost(), this->host) &&
 		(!full || (!Anope::Match(u->host, this->host) && !Anope::Match(u->ip, this->host))))
+		ret = false;
+	
+	if (!this->real.empty() && !Anope::Match(u->realname, this->real))
 		ret = false;
 	
 	return ret;

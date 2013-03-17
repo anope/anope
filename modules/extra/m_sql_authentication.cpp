@@ -73,7 +73,6 @@ class ModuleSQLAuthentication : public Module
 {
 	Anope::string engine;
 	Anope::string query;
-	bool disable_register;
 	Anope::string disable_reason;
 
 	ServiceReference<SQL::Provider> SQL;
@@ -97,7 +96,6 @@ class ModuleSQLAuthentication : public Module
 
 		this->engine = config.ReadValue("m_sql_authentication", "engine", "", 0);
 		this->query = config.ReadValue("m_sql_authentication", "query", "", 0);
-		this->disable_register = config.ReadFlag("m_sql_authentication", "disable_ns_register", "false", 0);
 		this->disable_reason = config.ReadValue("m_sql_authentication", "disable_reason", "", 0);
 
 		this->SQL = ServiceReference<SQL::Provider>("SQL::Provider", this->engine);
@@ -105,7 +103,7 @@ class ModuleSQLAuthentication : public Module
 
 	EventReturn OnPreCommand(CommandSource &source, Command *command, std::vector<Anope::string> &params) anope_override
 	{
-		if (this->disable_register && !this->disable_reason.empty() && command->name == "nickserv/register")
+		if (!this->disable_reason.empty() && command->name == "nickserv/register")
 		{
 			source.Reply(this->disable_reason);
 			return EVENT_STOP;

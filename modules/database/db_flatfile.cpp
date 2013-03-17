@@ -36,11 +36,12 @@ class LoadData : public Serialize::Data
 {
  public:
  	std::fstream *fs;
+	unsigned int id;
 	std::map<Anope::string, Anope::string> data;
 	std::stringstream ss;
 	bool read;
 
-	LoadData() : fs(NULL), read(false) { }
+	LoadData() : fs(NULL), id(0), read(false) { }
 
 	std::iostream& operator[](const Anope::string &key) anope_override
 	{
@@ -48,7 +49,17 @@ class LoadData : public Serialize::Data
 		{
 			for (Anope::string token; std::getline(*this->fs, token.str());)
 			{
-				if (token.find("DATA ") != 0)
+				if (token.find("ID ") == 0)
+				{
+					try
+					{
+						this->id = convertTo<unsigned int>(token.substr(3));
+					}
+					catch (const ConvertException &) { }
+
+					continue;
+				}
+				else if (token.find("DATA ") != 0)
 					break;
 
 				size_t sp = token.find(' ', 5); // Skip DATA
@@ -83,6 +94,7 @@ class LoadData : public Serialize::Data
 	
 	void Reset()
 	{
+		id = 0;
 		read = false;
 		data.clear();
 	}
@@ -225,7 +237,9 @@ class DBFlatFile : public Module, public Pipe
 				fd.clear();
 				fd.seekg(pos[j]);
 
-				stype->Unserialize(NULL, ld);
+				Serializable *obj = stype->Unserialize(NULL, ld);
+				if (obj != NULL)
+					obj->id = ld.id;
 				ld.Reset();
 			}
 		}
@@ -292,6 +306,8 @@ class DBFlatFile : public Module, public Pipe
 					continue;
 
 				*data.fs << "OBJECT " << s_type->GetName();
+				if (base->id)
+					*data.fs << "\nID " << base->id;
 				base->Serialize(data);
 				*data.fs << "\nEND\n";
 			}

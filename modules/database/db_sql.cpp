@@ -63,6 +63,7 @@ class DBSQL : public Module, public Pipe
 	bool shutting_down;
 	bool loading_databases;
 	bool loaded;
+	bool imported;
 
 	void RunBackground(const Query &q, Interface *iface = NULL)
 	{
@@ -86,7 +87,7 @@ class DBSQL : public Module, public Pipe
 	}
 
  public:
-	DBSQL(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, DATABASE), sql("", ""), sqlinterface(this), shutting_down(false), loading_databases(false), loaded(false)
+	DBSQL(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, DATABASE), sql("", ""), sqlinterface(this), shutting_down(false), loading_databases(false), loaded(false), imported(false)
 	{
 		this->SetAuthor("Anope");
 
@@ -121,17 +122,22 @@ class DBSQL : public Module, public Pipe
 					this->RunBackground(create[i]);
 
 				Query insert = this->sql->BuildInsert(this->prefix + s_type->GetName(), obj->id, data);
-				if (this->loaded)
+				if (this->imported)
 					this->RunBackground(insert, new ResultSQLSQLInterface(this, obj));
 				else
-					/* If we aren't loading these objects then we are importing them, so don't do asynchronous
-					 * queries in case for some reason the core has to shut down, it will cut short the import
+				{
+					/* On the first loop we may be importing objects from another database module, so don't do asynchronous
+					 * queries in case the core has to shut down, it will cut short the import
 					 */
-					this->sql->RunQuery(insert);
+					Result r = this->sql->RunQuery(insert);
+					if (r.GetID() > 0)
+						obj->id = r.GetID();
+				}
 			}
 		}
 
 		this->updated_items.clear();
+		this->imported = true;
 	}
 
 	void OnReload() anope_override

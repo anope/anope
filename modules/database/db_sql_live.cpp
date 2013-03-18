@@ -76,6 +76,9 @@ class DBMySQL : public Module, public Pipe
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 
 		OnReload();
+
+		if (ModuleManager::FindFirstOf(DATABASE) != this)
+			throw ModuleException("If db_sql_live is loaded it must be the first database module loaded.");
 	}
 
 	void OnNotify() anope_override

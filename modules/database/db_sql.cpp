@@ -59,6 +59,8 @@ class DBSQL : public Module, public Pipe
 	ServiceReference<Provider> sql;
 	SQLSQLInterface sqlinterface;
 	Anope::string prefix;
+	bool import;
+
 	std::set<Serializable *> updated_items;
 	bool shutting_down;
 	bool loading_databases;
@@ -95,6 +97,9 @@ class DBSQL : public Module, public Pipe
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 
 		this->OnReload();
+
+		if (ModuleManager::FindModule("db_sql_live") != NULL)
+			throw ModuleException("db_sql can not be loaded after db_sql_live");
 	}
 
 	void OnNotify() anope_override
@@ -113,6 +118,10 @@ class DBSQL : public Module, public Pipe
 
 				obj->UpdateCache(data);
 
+				/* If we didn't load these objects and we don't want to import just update the cache and continue */
+				if (!this->loaded && !this->imported && !this->import)
+					continue;
+
 				Serialize::Type *s_type = obj->GetSerializableType();
 				if (!s_type)
 					continue;
@@ -126,7 +135,7 @@ class DBSQL : public Module, public Pipe
 					this->RunBackground(insert, new ResultSQLSQLInterface(this, obj));
 				else
 				{
-					/* On the first loop we may be importing objects from another database module, so don't do asynchronous
+					/* We are importing objects from another database module, so don't do asynchronous
 					 * queries in case the core has to shut down, it will cut short the import
 					 */
 					Result r = this->sql->RunQuery(insert);
@@ -146,6 +155,7 @@ class DBSQL : public Module, public Pipe
 		Anope::string engine = config.ReadValue("db_sql", "engine", "", 0);
 		this->sql = ServiceReference<Provider>("SQL::Provider", engine);
 		this->prefix = config.ReadValue("db_sql", "prefix", "anope_db_", 0);
+		this->import = config.ReadFlag("db_sql", "import", "false", 0);
 	}
 
 	void OnShutdown() anope_override

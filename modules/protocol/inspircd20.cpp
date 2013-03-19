@@ -633,7 +633,6 @@ class ProtoInspIRCd : public Module
 	Message::SQuit message_squit;
 	Message::Stats message_stats;
 	Message::Topic message_topic;
-	Message::Version message_version;
 
 	/* InspIRCd 1.2 message handlers */
 	ServiceAlias message_endburst, message_fhost, message_fjoin, message_fmode,
@@ -656,7 +655,7 @@ class ProtoInspIRCd : public Module
 		ircd_proto(this),
 		message_away(this), message_error(this), message_join(this), message_kick(this), message_kill(this),
 		message_motd(this), message_part(this), message_ping(this), message_privmsg(this), message_quit(this),
-		message_squit(this), message_stats(this), message_topic(this), message_version(this),
+		message_squit(this), message_stats(this), message_topic(this),
 
 		message_endburst("IRCDMessage", "inspircd20/endburst", "inspircd12/endburst"),
 		message_fhost("IRCDMessage", "inspircd20/fhost", "inspircd12/fhost"),

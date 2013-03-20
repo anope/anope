@@ -540,8 +540,6 @@ class CommandCSSetPersist : public Command
 			if (!ci->HasExt("PERSIST"))
 			{
 				ci->ExtendMetadata("PERSIST");
-				if (ci->c)
-					ci->c->Extend("PERSIST");
 
 				/* Channel doesn't exist, create it */
 				if (!ci->c)
@@ -583,8 +581,6 @@ class CommandCSSetPersist : public Command
 			if (ci->HasExt("PERSIST"))
 			{
 				ci->Shrink("PERSIST");
-				if (ci->c)
-					ci->c->Shrink("PERSIST");
 
 				/* Unset perm mode */
 				if (cm)

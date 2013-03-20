@@ -184,7 +184,7 @@ class BotServCore : public Module
 	void OnLeaveChannel(User *u, Channel *c) anope_override
 	{
 		/* Channel is persistent, it shouldn't be deleted and the service bot should stay */
-		if (c->HasExt("PERSIST") || (c->ci && c->ci->HasExt("PERSIST")))
+		if (c->ci && c->ci->HasExt("PERSIST"))
 			return;
 	
 		/* Channel is syncing from a netburst, don't destroy it as more users are probably wanting to join immediatly
@@ -197,14 +197,9 @@ class BotServCore : public Module
 		if (c->HasExt("INHABIT"))
 			return;
 
+		/* This is called prior to removing the user from the channnel, so c->users.size() - 1 should be safe */
 		if (c->ci && c->ci->bi && u != *c->ci->bi && c->users.size() - 1 <= Config->BSMinUsers && c->FindUser(c->ci->bi))
-		{
-			bool persist = c->Shrink("PERSIST");
-			c->Extend("PERSIST");
 			c->ci->bi->Part(c->ci->c);
-			if (!persist)
-				c->Shrink("PERSIST");
-		}
 	}
 
 	EventReturn OnPreHelp(CommandSource &source, const std::vector<Anope::string> &params) anope_override

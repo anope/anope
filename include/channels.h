@@ -30,16 +30,12 @@ struct ChanUserContainer : public Extensible
 	ChanUserContainer(User *u, Channel *c) : user(u), chan(c) { }
 };
 
-enum ChannelFlag
-{
-	/* ChanServ is currently holding the channel */
-	CH_INHABIT,
-	/* Channel still exists when emptied */
-	CH_PERSIST,
-	/* If set the channel is syncing users (channel was just created) and it should not be deleted */
-	CH_SYNCING
-};
-
+/* Possible flags:
+ *
+ * INHABIT - ChanServ is currently holding the channel
+ * PERSIST - Channel still exists when emptied (IRCd enforced)
+ * SYNCING - Channel is syncing users (channel was just created) and it should not be deleted
+ */
 class CoreExport Channel : public Base, public Extensible
 {
  public:
@@ -56,7 +52,6 @@ class CoreExport Channel : public Base, public Extensible
 	Serialize::Reference<ChannelInfo> ci;
 	/* When the channel was created */
 	time_t creation_time;
-	std::set<ChannelFlag> flags;
 
 	/* Users in the channel */
 	typedef std::list<ChanUserContainer *> ChanUserList;

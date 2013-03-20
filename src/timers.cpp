@@ -10,7 +10,7 @@
 #include "services.h"
 #include "timers.h"
 
-std::vector<Timer *> TimerManager::Timers;
+std::multimap<time_t, Timer *> TimerManager::Timers;
 
 Timer::Timer(long time_from_now, time_t now, bool repeating)
 {
@@ -29,7 +29,9 @@ Timer::~Timer()
 
 void Timer::SetTimer(time_t t)
 {
+	TimerManager::DelTimer(this);
 	trigger = t;
+	TimerManager::AddTimer(t);
 }
 
 time_t Timer::GetTimer() const
@@ -49,10 +51,9 @@ time_t Timer::GetSetTime() const
 
 void Timer::SetSecs(time_t t)
 {
+	TimerManager::DelTimer(this);
 	secs = t;
 	trigger = Anope::CurTime + t;
-
-	TimerManager::DelTimer(this);
 	TimerManager::AddTimer(this);
 }
 
@@ -63,37 +64,37 @@ long Timer::GetSecs() const
 
 void TimerManager::AddTimer(Timer *t)
 {
-	Timers.push_back(t);
-	sort(Timers.begin(), Timers.end(), TimerManager::TimerComparison);
+	Timers.insert(std::make_pair(t->GetTimer(), t));
 }
 
 void TimerManager::DelTimer(Timer *t)
 {
-	std::vector<Timer *>::iterator i = std::find(Timers.begin(), Timers.end(), t);
-
-	if (i != Timers.end())
-		Timers.erase(i);
+	std::pair<std::multimap<time_t, Timer *>::iterator, std::multimap<time_t, Timer *>::iterator> itpair = Timers.equal_range(t->GetTimer());
+	for (std::multimap<time_t, Timer *>::iterator i = itpair.first; i != itpair.second; ++i)
+	{
+		if (i->second == t)
+		{
+			Timers.erase(i);
+			break;
+		}
+	}
 }
 
 void TimerManager::TickTimers(time_t ctime)
 {
-	while (Timers.size() && ctime > Timers.front()->GetTimer())
+	while (!Timers.empty())
 	{
-		Timer *t = Timers.front();
+		std::multimap<time_t, Timer *>::iterator it = Timers.begin();
+		Timer *t = it->second;
+
+		if (t->GetTimer() > ctime)
+			break;
 
 		t->Tick(ctime);
 
 		if (t->GetRepeat())
-		{
 			t->SetTimer(ctime + t->GetSecs());
-			sort(Timers.begin(), Timers.end(), TimerManager::TimerComparison);
-		}
 		else
 			delete t;
 	}
-}
-
-bool TimerManager::TimerComparison(Timer *one, Timer *two)
-{
-	return one->GetTimer() < two->GetTimer();
 }

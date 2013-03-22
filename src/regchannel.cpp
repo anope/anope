@@ -762,6 +762,9 @@ void ChannelInfo::ClearBadWords()
 
 bool ChannelInfo::HasMLock(ChannelMode *mode, const Anope::string &param, bool status) const
 {
+	if (!mode)
+		return false;
+
 	std::multimap<Anope::string, ModeLock *>::const_iterator it = this->mode_locks->find(mode->name);
 
 	if (it != this->mode_locks->end())
@@ -785,6 +788,9 @@ bool ChannelInfo::HasMLock(ChannelMode *mode, const Anope::string &param, bool s
 
 bool ChannelInfo::SetMLock(ChannelMode *mode, bool status, const Anope::string &param, Anope::string setter, time_t created)
 {
+	if (!mode)
+		return false;
+
 	if (setter.empty())
 		setter = this->founder ? this->founder->display : "Unknown";
 	std::pair<Anope::string, ModeLock *> ml = std::make_pair(mode->name, new ModeLock(this, status, mode->name, param, setter, created));
@@ -827,6 +833,9 @@ bool ChannelInfo::SetMLock(ChannelMode *mode, bool status, const Anope::string &
 
 bool ChannelInfo::RemoveMLock(ChannelMode *mode, bool status, const Anope::string &param)
 {
+	if (!mode)
+		return false;
+
 	if (mode->type == MODE_REGULAR || mode->type == MODE_PARAM)
 	{
 		ChannelInfo::ModeList::iterator it = this->mode_locks->find(mode->name), it_end = this->mode_locks->upper_bound(mode->name), it_next = it;

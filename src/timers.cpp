@@ -31,7 +31,7 @@ void Timer::SetTimer(time_t t)
 {
 	TimerManager::DelTimer(this);
 	trigger = t;
-	TimerManager::AddTimer(t);
+	TimerManager::AddTimer(this);
 }
 
 time_t Timer::GetTimer() const

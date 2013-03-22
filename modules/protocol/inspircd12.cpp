@@ -1199,7 +1199,6 @@ class ProtoInspIRCd : public Module
 	Message::SQuit message_squit;
 	Message::Stats message_stats;
 	Message::Topic message_topic;
-	Message::Version message_version;
 
 	/* Our message handlers */
 	IRCDMessageChgIdent message_chgident;
@@ -1226,7 +1225,7 @@ class ProtoInspIRCd : public Module
 		ircd_proto(this),
 		message_away(this), message_error(this), message_join(this), message_kick(this), message_kill(this),
 		message_motd(this), message_part(this), message_ping(this), message_privmsg(this), message_quit(this),
-		message_squit(this), message_stats(this), message_topic(this), message_version(this),
+		message_squit(this), message_stats(this), message_topic(this),
 
 		message_chgident(this), message_setname(this, "SETNAME"), message_chgname(this, "FNAME"), message_capab(this), message_endburst(this),
 		message_fhost(this, "FHOST"), message_sethost(this, "SETHOST"), message_fjoin(this), message_fmode(this), message_ftopic(this),

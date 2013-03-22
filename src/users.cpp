@@ -47,8 +47,7 @@ User::User(const Anope::string &snick, const Anope::string &sident, const Anope:
 	this->ident = sident;
 	this->host = shost;
 	this->vhost = svhost;
-	if (!svhost.empty())
-		this->SetCloakedHost(svhost);
+	this->chost = svhost;
 	this->ip = sip;
 	this->server = sserver;
 	this->realname = srealname;
@@ -65,6 +64,7 @@ User::User(const Anope::string &snick, const Anope::string &sident, const Anope:
 		Log(LOG_DEBUG) << "Duplicate user " << snick << " in user table?";
 
 	this->nc = NULL;
+	this->UpdateHost();
 
 	if (sserver) // Our bots are introduced on startup with no server
 	{

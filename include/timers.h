@@ -90,7 +90,7 @@ class CoreExport TimerManager
 {
 	/** A list of timers
 	 */
-	static std::vector<Timer *> Timers;
+	static std::multimap<time_t, Timer *> Timers;
  public:
 	/** Add a timer to the list
 	 * @param t A Timer derived class to add
@@ -106,10 +106,6 @@ class CoreExport TimerManager
 	 * @param ctime The current time
 	 */
 	static void TickTimers(time_t ctime = Anope::CurTime);
-
-	/** Compares two timers
-	 */
-	static bool TimerComparison(Timer *one, Timer *two);
 };
 
 #endif // TIMERS_H

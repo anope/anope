@@ -44,6 +44,12 @@ static unsigned MaxEntries = 0;
 struct EntryMessageList : Serialize::Checker<std::vector<EntryMsg *> >, ExtensibleItem
 {
 	EntryMessageList() : Serialize::Checker<std::vector<EntryMsg *> >("EntryMsg") { }
+
+	~EntryMessageList()
+	{
+		for (unsigned i = 0; i < (*this)->size(); ++i)
+			delete (*this)->at(i);
+	}
 };
 
 Serializable* EntryMsg::Unserialize(Serializable *obj, Serialize::Data &data)

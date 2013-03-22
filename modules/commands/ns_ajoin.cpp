@@ -18,6 +18,7 @@ struct AJoinEntry;
 struct AJoinList : Serialize::Checker<std::vector<AJoinEntry *> >, ExtensibleItem
 {
 	AJoinList() : Serialize::Checker<std::vector<AJoinEntry *> >("AJoinEntry") { }
+	~AJoinList();
 };
 
 struct AJoinEntry : Serializable
@@ -74,6 +75,12 @@ struct AJoinEntry : Serializable
 		return aj;
 	}
 };
+
+AJoinList::~AJoinList()
+{
+	for (unsigned i = 0; i < (*this)->size(); ++i)
+		delete (*this)->at(i);
+}
 
 class CommandNSAJoin : public Command
 {

@@ -33,14 +33,23 @@ Module::Module(const Anope::string &modname, const Anope::string &, ModType modt
 
 #if GETTEXT_FOUND
 	for (unsigned i = 0; i < Language::Languages.size(); ++i)
-		if (Anope::IsFile(Anope::LocaleDir + "/" + Language::Languages[i] + "/LC_MESSAGES/" + modname + ".mo"))
+	{
+		/* Remove .UTF-8 or any other suffix */
+		Anope::string lang;
+		sepstream(Language::Languages[i], '.').GetToken(lang);
+
+		if (Anope::IsFile(Anope::LocaleDir + "/" + lang + "/LC_MESSAGES/" + modname + ".mo"))
 		{
 			if (!bindtextdomain(this->name.c_str(), Anope::LocaleDir.c_str()))
 				Log() << "Error calling bindtextdomain, " << Anope::LastError();
 			else
-				Language::Domains.push_back(modname);
+			{
+				Log() << "Found language file " << lang << " for " << modname;
+				Language::Domains.push_back(lang);
+			}
 			break;
 		}
+	}
 #endif
 }
 

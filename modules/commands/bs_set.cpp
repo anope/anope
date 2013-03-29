@@ -388,12 +388,12 @@ class CommandBSSetPrivate : public Command
 
 		if (value.equals_ci("ON"))
 		{
-			bi->ExtendMetadata("PRIVATE");
+			bi->oper_only = true;
 			source.Reply(_("Private mode of bot %s is now \002on\002."), bi->nick.c_str());
 		}
 		else if (value.equals_ci("OFF"))
 		{
-			bi->Shrink("PRIVATE");
+			bi->oper_only = false;
 			source.Reply(_("Private mode of bot %s is now \002off\002."), bi->nick.c_str());
 		}
 		else

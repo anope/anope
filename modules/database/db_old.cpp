@@ -675,7 +675,7 @@ static void LoadBots()
 		bi->created = created;
 
 		if (flags & OLD_BI_PRIVATE)
-			bi->ExtendMetadata("PRIVATE");
+			bi->oper_only = true;
 
 		Log(LOG_DEBUG) << "Loaded bot " << bi->nick;
 	}

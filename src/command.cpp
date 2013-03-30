@@ -280,10 +280,7 @@ void RunCommand(CommandSource &source, const Anope::string &message)
 		return;
 	}
 
-	Reference<NickCore> nc_reference(source.nc);
 	c->Execute(source, params);
-	if (!nc_reference)
-		source.nc = NULL;
 	FOREACH_MOD(I_OnPostCommand, OnPostCommand(source, c, params));
 }
 

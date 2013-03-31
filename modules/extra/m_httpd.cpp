@@ -279,14 +279,14 @@ class MyHTTPClient : public HTTPClient
 	}
 };
 
-class MyHTTPProvider : public HTTPProvider, public CallBack
+class MyHTTPProvider : public HTTPProvider, public Timer
 {
 	int timeout;
 	std::map<Anope::string, HTTPPage *> pages;
 	std::list<Reference<MyHTTPClient> > clients;
 
  public:
-	MyHTTPProvider(Module *c, const Anope::string &n, const Anope::string &i, const unsigned short p, const int t) : Socket(-1, i.find(':') != Anope::string::npos), HTTPProvider(c, n, i, p), CallBack(c, 10, Anope::CurTime, true), timeout(t) { }
+	MyHTTPProvider(Module *c, const Anope::string &n, const Anope::string &i, const unsigned short p, const int t) : Socket(-1, i.find(':') != Anope::string::npos), HTTPProvider(c, n, i, p), Timer(c, 10, Anope::CurTime, true), timeout(t) { }
 
 	void Tick(time_t) anope_override
 	{

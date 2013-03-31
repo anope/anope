@@ -104,12 +104,12 @@ static ServiceReference<GlobalService> GlobalService("GlobalService", "Global");
 
 static Timer *timeout;
 
-class DefConTimeout : public CallBack
+class DefConTimeout : public Timer
 {
 	int level;
 
  public:
-	DefConTimeout(Module *mod, int newlevel) : CallBack(mod, DConfig.timeout), level(newlevel)
+	DefConTimeout(Module *mod, int newlevel) : Timer(mod, DConfig.timeout), level(newlevel)
 	{
 		timeout = this;
 	}

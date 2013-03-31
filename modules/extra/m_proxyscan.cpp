@@ -201,10 +201,10 @@ class ModuleProxyScan : public Module
 
 	ProxyCallbackListener *listener;
 
-	class ConnectionTimeout : public CallBack
+	class ConnectionTimeout : public Timer
 	{
 	 public:
-		ConnectionTimeout(Module *creator, long timeout) : CallBack(creator, timeout, Anope::CurTime, true)
+		ConnectionTimeout(Module *c, long timeout) : Timer(c, timeout, Anope::CurTime, true)
 		{
 		}
 

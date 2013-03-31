@@ -15,14 +15,14 @@
 
 static Module *me;
 
-class TempBan : public CallBack
+class TempBan : public Timer
 {
  private:
  	Anope::string channel;
 	Anope::string mask;
 
  public:
-	TempBan(time_t seconds, Channel *c, const Anope::string &banmask) : CallBack(me, seconds), channel(c->name), mask(banmask) { }
+	TempBan(time_t seconds, Channel *c, const Anope::string &banmask) : Timer(me, seconds), channel(c->name), mask(banmask) { }
 
 	void Tick(time_t ctime) anope_override
 	{

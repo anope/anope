@@ -57,15 +57,15 @@ class CommandBSSet : public Command
 class CommandBSSetBanExpire : public Command
 {
  public:
- 	class Timer : public CallBack
+ 	class UnbanTimer : public Timer
 	{
 		Anope::string chname;
 		Anope::string mask;
 
 	 public:
-		Timer(Module *creator, const Anope::string &ch, const Anope::string &bmask, time_t t) : CallBack(creator, t), chname(ch), mask(bmask) { }
+		UnbanTimer(Module *creator, const Anope::string &ch, const Anope::string &bmask, time_t t) : Timer(creator, t), chname(ch), mask(bmask) { }
 
-		void Tick(time_t)
+		void Tick(time_t) anope_override
 		{
 			Channel *c = Channel::Find(chname);
 			if (c)
@@ -504,7 +504,7 @@ class BSSet : public Module
 		if (!ci->banexpire)
 			return;
 
-		new CommandBSSetBanExpire::Timer(this, ci->name, mask, ci->banexpire);
+		new CommandBSSetBanExpire::UnbanTimer(this, ci->name, mask, ci->banexpire);
 	}
 };
 

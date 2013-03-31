@@ -18,6 +18,10 @@
 class CoreExport Timer
 {
  private:
+ 	/** The owner of the timer, if any
+	 */
+	Module *owner;
+
 	/** The time this was created
 	 */
 	time_t settime;
@@ -41,6 +45,14 @@ class CoreExport Timer
 	 * @param repeating Repeat this timer every time_from_now if this is true
 	 */
 	Timer(long time_from_now, time_t now = Anope::CurTime, bool repeating = false);
+
+	/** Constructor, initializes the triggering time
+	 * @param creator The creator of the timer
+	 * @param time_from_now The number of seconds from now to trigger the timer
+	 * @param now The time now
+	 * @param repeating Repeat this timer every time_from_now if this is true
+	 */
+	Timer(Module *creator, long time_from_now, time_t now = Anope::CurTime, bool repeating = false);
 
 	/** Destructor, removes the timer from the list
 	 */
@@ -76,6 +88,11 @@ class CoreExport Timer
 	 */
 	time_t GetSetTime() const;
 
+	/** Returns the owner of this timer, if any
+	 * @return The owner of the timer
+	 */
+	Module *GetOwner() const;
+
 	/** Called when the timer ticks
 	 * This should be overridden with something useful
 	 */
@@ -106,6 +123,10 @@ class CoreExport TimerManager
 	 * @param ctime The current time
 	 */
 	static void TickTimers(time_t ctime = Anope::CurTime);
+
+	/** Deletes all timers owned by the given module
+	 */
+	static void DeleteTimersFor(Module *m);
 };
 
 #endif // TIMERS_H

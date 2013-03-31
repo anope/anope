@@ -293,10 +293,10 @@ class CommandSeen : public Command
 	}
 };
 
-class DataBasePurger : public CallBack
+class DataBasePurger : public Timer
 {
  public:
-	DataBasePurger(Module *owner) : CallBack(owner, 300, Anope::CurTime, true) { }
+	DataBasePurger(Module *o) : Timer(o, 300, Anope::CurTime, true) { }
 
 	void Tick(time_t) anope_override
 	{

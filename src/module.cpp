@@ -57,9 +57,9 @@ Module::~Module()
 {
 	/* Detach all event hooks for this module */
 	ModuleManager::DetachAll(this);
-	/* Clear any active callbacks this module has */
-	ModuleManager::ClearCallBacks(this);
 	IdentifyRequest::ModuleUnload(this);
+	/* Clear any active timers this module has */
+	TimerManager::DeleteTimersFor(this);
 
 	std::list<Module *>::iterator it = std::find(ModuleManager::Modules.begin(), ModuleManager::Modules.end(), this);
 	if (it != ModuleManager::Modules.end())
@@ -109,16 +109,5 @@ int ModuleVersion::GetMinor() const
 int ModuleVersion::GetPatch() const
 {
 	return this->version_patch;
-}
-
-CallBack::CallBack(Module *mod, long time_from_now, time_t now, bool repeating) : Timer(time_from_now, now, repeating),  m(mod)
-{
-}
-
-CallBack::~CallBack()
-{
-	std::list<CallBack *>::iterator it = std::find(m->callbacks.begin(), m->callbacks.end(), this);
-	if (it != m->callbacks.end())
-		m->callbacks.erase(it);
 }
 

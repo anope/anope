@@ -449,12 +449,6 @@ bool ModuleManager::SetPriority(Module *mod, Implementation i, Priority s, Modul
 	return true;
 }
 
-void ModuleManager::ClearCallBacks(Module *m)
-{
-	while (!m->callbacks.empty())
-		delete m->callbacks.front();
-}
-
 void ModuleManager::UnloadAll()
 {
 	std::vector<Anope::string> modules[MT_END];

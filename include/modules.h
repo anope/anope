@@ -195,10 +195,6 @@ class CoreExport Module : public Extensible
 	 */
 	Anope::string filename;
 
-	/** Callbacks used in this module
-	 */
-	std::list<CallBack *> callbacks;
-
 	/** Handle for this module, obtained from dlopen()
 	 */
 	void *handle;
@@ -1126,11 +1122,6 @@ class CoreExport ModuleManager
 	 */
 	static void Attach(Implementation *i, Module *mod, size_t sz);
 
-	/** Delete all callbacks attached to a module
-	 * @param m The module
-	 */
-	static void ClearCallBacks(Module *m);
-
 	/** Unloading all modules except the protocol module.
 	 */
 	static void UnloadAll();
@@ -1141,19 +1132,6 @@ class CoreExport ModuleManager
 	 * @return MOD_ERR_OK on success, anything else on fail
 	 */
 	static ModuleReturn DeleteModule(Module *m);
-};
-
-/** Class used for callbacks within modules. These are identical to Timers hwoever
- * they will be cleaned up automatically when a module is unloaded, and Timers will not.
- */
-class CoreExport CallBack : public Timer
-{
- private:
-	Module *m;
- public:
-	CallBack(Module *mod, long time_from_now, time_t now = Anope::CurTime, bool repeating = false);
-
-	virtual ~CallBack();
 };
 
 #endif // MODULES_H

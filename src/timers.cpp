@@ -14,6 +14,18 @@ std::multimap<time_t, Timer *> TimerManager::Timers;
 
 Timer::Timer(long time_from_now, time_t now, bool repeating)
 {
+	owner = NULL;
+	trigger = now + time_from_now;
+	secs = time_from_now;
+	repeat = repeating;
+	settime = now;
+
+	TimerManager::AddTimer(this);
+}
+
+Timer::Timer(Module *creator, long time_from_now, time_t now, bool repeating)
+{
+	owner = creator;
 	trigger = now + time_from_now;
 	secs = time_from_now;
 	repeat = repeating;
@@ -62,6 +74,11 @@ long Timer::GetSecs() const
 	return secs;
 }
 
+Module *Timer::GetOwner() const
+{
+	return owner;
+}
+
 void TimerManager::AddTimer(Timer *t)
 {
 	Timers.insert(std::make_pair(t->GetTimer(), t));
@@ -98,3 +115,14 @@ void TimerManager::TickTimers(time_t ctime)
 			delete t;
 	}
 }
+
+void TimerManager::DeleteTimersFor(Module *m)
+{
+	for (std::multimap<time_t, Timer *>::iterator it = Timers.begin(), it_next = it; it != Timers.end(); it = it_next)
+	{
+		++it_next;
+		if (it->second->GetOwner() == m)
+			delete it->second;
+	}
+}
+

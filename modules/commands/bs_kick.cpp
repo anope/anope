@@ -680,10 +680,10 @@ struct UserData : ExtensibleItem
 };
 
 
-class BanDataPurger : public CallBack
+class BanDataPurger : public Timer
 {
  public:
-	BanDataPurger(Module *owner) : CallBack(owner, 300, Anope::CurTime, true) { }
+	BanDataPurger(Module *o) : Timer(o, 300, Anope::CurTime, true) { }
 
 	void Tick(time_t) anope_override
 	{

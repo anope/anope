@@ -139,10 +139,10 @@ class MyNickServService : public NickServService
 	}
 };
 
-class ExpireCallback : public CallBack
+class ExpireCallback : public Timer
 {
  public:
-	ExpireCallback(Module *owner) : CallBack(owner, Config->ExpireTimeout, Anope::CurTime, true) { }
+	ExpireCallback(Module *o) : Timer(o, Config->ExpireTimeout, Anope::CurTime, true) { }
 
 	void Tick(time_t) anope_override
 	{

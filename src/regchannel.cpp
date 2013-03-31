@@ -480,6 +480,18 @@ Serializable* ChannelInfo::Unserialize(Serializable *obj, Serialize::Data &data)
 		if (ci->bi)
 			ci->bi->Assign(NULL, ci);
 	}
+	{
+		Anope::string ttb, tok;
+		data["ttb"] >> ttb;
+		spacesepstream sep(ttb);
+		for (int i = 0; sep.GetToken(tok) && i < TTB_SIZE; ++i)
+			try
+			{
+				ci->ttb[i] = convertTo<int16_t>(tok);
+			}
+			catch (const ConvertException &) { }
+
+	}
 	data["capsmin"] >> ci->capsmin;
 	data["capspercent"] >> ci->capspercent;
 	data["floodlines"] >> ci->floodlines;

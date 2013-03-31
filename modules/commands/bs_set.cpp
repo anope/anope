@@ -47,8 +47,8 @@ class CommandBSSet : public Command
 				}
 			}
 		}
-		source.Reply(_("Type \002%s%s HELP SET \037option\037\002 for more information on a\n"
-				"particular option."), Config->UseStrictPrivMsgString.c_str(), source.service->nick.c_str());
+		source.Reply(_("Type \002%s%s HELP %s \037option\037\002 for more information on a\n"
+				"particular option."), Config->UseStrictPrivMsgString.c_str(), source.service->nick.c_str(), this_name.c_str());
 
 		return true;
 	}

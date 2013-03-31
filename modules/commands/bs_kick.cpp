@@ -10,580 +10,598 @@
  *
  *
  */
-/*************************************************************************/
 
 #include "module.h"
 
 class CommandBSKick : public Command
 {
  public:
-	CommandBSKick(Module *creator) : Command(creator, "botserv/kick", 3, 6)
+	CommandBSKick(Module *creator) : Command(creator, "botserv/kick", 0)
 	{
 		this->SetDesc(_("Configures kickers"));
-		this->SetSyntax(_("\037channel\037 \037option\037 {\037ON|OFF\037} [\037settings\037]"));
+		this->SetSyntax(_("\037option\037 \037channel\037 {\037ON|OFF\037} [\037settings\037]"));
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
+		this->OnSyntaxError(source, "");
+	}
+
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	{
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_("Configures bot kickers.  \037option\037 can be one of:"));
+
+		Anope::string this_name = source.command;
+		for (CommandInfo::map::const_iterator it = source.service->commands.begin(), it_end = source.service->commands.end(); it != it_end; ++it)
+		{
+			const Anope::string &c_name = it->first;
+			const CommandInfo &info = it->second;
+
+			if (c_name.find_ci(this_name + " ") == 0)
+			{
+				ServiceReference<Command> command("Command", info.name);
+				if (command)
+				{
+					source.command = c_name;
+					command->OnServHelp(source);
+				}
+			}
+		}
+
+		source.Reply(_("Type \002%s%s HELP %s \037option\037\002 for more information\n"
+				"on a specific option.\n"
+				" \n"
+				"Note: access to this command is controlled by the\n"
+				"level SET."), Config->UseStrictPrivMsgString.c_str(), source.service->nick.c_str(), this_name.c_str());
+
+		return true;
+	}
+};
+
+class CommandBSKickBase : public Command
+{
+ public:
+	CommandBSKickBase(Module *creator, const Anope::string &cname, int minarg, int maxarg) : Command(creator, cname, minarg, maxarg)
+	{
+	}
+
+	virtual void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override = 0;
+
+	virtual bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override = 0;
+
+ protected:
+	bool CheckArguments(CommandSource &source, const std::vector<Anope::string> &params, ChannelInfo* &ci) anope_override
+	{
 		const Anope::string &chan = params[0];
 		const Anope::string &option = params[1];
-		const Anope::string &value = params[2];
-		const Anope::string &ttb = params.size() > 3 ? params[3] : "";
 
-		ChannelInfo *ci = ChannelInfo::Find(params[0]);
+		ci = ChannelInfo::Find(chan);
 
 		if (Anope::ReadOnly)
 			source.Reply(_("Sorry, kicker configuration is temporarily disabled."));
 		else if (ci == NULL)
 			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
-		else if (chan.empty() || option.empty() || value.empty())
+		else if (option.empty())
 			this->OnSyntaxError(source, "");
-		else if (!value.equals_ci("ON") && !value.equals_ci("OFF"))
+		else if (!option.equals_ci("ON") && !option.equals_ci("OFF"))
 			this->OnSyntaxError(source, "");
 		else if (!source.AccessFor(ci).HasPriv("SET") && !source.HasPriv("botserv/administration"))
 			source.Reply(ACCESS_DENIED);
 		else if (!ci->bi)
 			source.Reply(BOT_NOT_ASSIGNED);
 		else
+			return true;
+
+		return false;
+	}
+
+	void Process(CommandSource &source, ChannelInfo *ci, const Anope::string &param, const Anope::string &ttb, size_t ttb_idx, const Anope::string &optname, const Anope::string &mdname)
+	{
+		if (param.equals_ci("ON"))
 		{
-			bool override = !source.AccessFor(ci).HasPriv("SET");
-			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << option << " " << value;
-
-			if (option.equals_ci("BADWORDS"))
+			if (!ttb.empty())
 			{
-				if (value.equals_ci("ON"))
-				{
-					if (!ttb.empty())
-					{
-						try
-						{
-							ci->ttb[TTB_BADWORDS] = convertTo<int16_t>(ttb);
-							if (ci->ttb[TTB_BADWORDS] < 0)
-								throw ConvertException();
-						}
-						catch (const ConvertException &)
-						{
-							/* reset the value back to 0 - TSL */
-							ci->ttb[TTB_BADWORDS] = 0;
-							source.Reply(_("\002%s\002 cannot be taken as times to ban."), ttb.c_str());
-							return;
-						}
-					}
-					else
-						ci->ttb[TTB_BADWORDS] = 0;
+				int16_t i;
 
-					ci->ExtendMetadata("BS_KICK_BADWORDS");
-					if (ci->ttb[TTB_BADWORDS])
-						source.Reply(_("Bot will now kick for \002bad words\002, and will place a ban\n"
-								"after %d kicks for the same user. Use the BADWORDS command\n"
-								"to add or remove a bad word."), ci->ttb[TTB_BADWORDS]);
-					else
-						source.Reply(_("Bot will now kick for \002bad words\002. Use the BADWORDS command\n"
-								"to add or remove a bad word."));
-				}
-				else
+				try
 				{
-					ci->Shrink("BS_KICK_BADWORDS");
-					source.Reply(_("Bot won't kick for \002bad words\002 anymore."));
+					i = convertTo<int16_t>(ttb);
+					if (i < 0)
+						throw ConvertException();
 				}
-			}
-			else if (option.equals_ci("BOLDS"))
-			{
-				if (value.equals_ci("ON"))
+				catch (const ConvertException &)
 				{
-					if (!ttb.empty())
-					{
-						try
-						{
-							ci->ttb[TTB_BOLDS] = convertTo<int16_t>(ttb);
-							if (ci->ttb[TTB_BOLDS] < 0)
-								throw ConvertException();
-						}
-						catch (const ConvertException &)
-						{
-							ci->ttb[TTB_BOLDS] = 0;
-							source.Reply(_("\002%s\002 cannot be taken as times to ban."), ttb.c_str());
-							return;
-						}
-					}
-					else
-						ci->ttb[TTB_BOLDS] = 0;
-					ci->ExtendMetadata("BS_KICK_BOLDS");
-					if (ci->ttb[TTB_BOLDS])
-						source.Reply(_("Bot will now kick for \002bolds\002, and will place a ban\n"
-								"after %d kicks for the same user."), ci->ttb[TTB_BOLDS]);
-					else
-						source.Reply(_("Bot will now kick for \002bolds\002."));
+					source.Reply(_("\002%s\002 cannot be taken as times to ban."), ttb.c_str());
+					return;
 				}
-				else
-				{
-					ci->Shrink("BS_KICK_BOLDS");
-					source.Reply(_("Bot won't kick for \002bolds\002 anymore."));
-				}
-			}
-			else if (option.equals_ci("CAPS"))
-			{
-				if (value.equals_ci("ON"))
-				{
-					Anope::string min = params.size() > 4 ? params[4] : "";
-					Anope::string percent = params.size() > 5 ? params[5] : "";
 
-					if (!ttb.empty())
-					{
-						try
-						{
-							ci->ttb[TTB_CAPS] = convertTo<int16_t>(ttb);
-							if (ci->ttb[TTB_CAPS] < 0)
-								throw ConvertException();
-						}
-						catch (const ConvertException &)
-						{
-							ci->ttb[TTB_CAPS] = 0;
-							source.Reply(_("\002%s\002 cannot be taken as times to ban."), ttb.c_str());
-							return;
-						}
-					}
-					else
-						ci->ttb[TTB_CAPS] = 0;
-
-					ci->capsmin = 10;
-					try
-					{
-						ci->capsmin = convertTo<int16_t>(min);
-					}
-					catch (const ConvertException &) { }
-					if (ci->capsmin < 1)
-						ci->capsmin = 10;
-
-					ci->capspercent = 25;
-					try
-					{
-						ci->capspercent = convertTo<int16_t>(percent);
-					}
-					catch (const ConvertException &) { }
-					if (ci->capspercent < 1 || ci->capspercent > 100)
-						ci->capspercent = 25;
-
-					ci->ExtendMetadata("BS_KICK_CAPS");
-					if (ci->ttb[TTB_CAPS])
-						source.Reply(_("Bot will now kick for \002caps\002 (they must constitute at least\n"
-								"%d characters and %d%% of the entire message), and will\n"
-								"place a ban after %d kicks for the same user."), ci->capsmin, ci->capspercent, ci->ttb[TTB_CAPS]);
-					else
-						source.Reply(_("Bot will now kick for \002caps\002 (they must constitute at least\n"
-								"%d characters and %d%% of the entire message)."), ci->capsmin, ci->capspercent);
-				}
-				else
-				{
-					ci->Shrink("BS_KICK_CAPS");
-					source.Reply(_("Bot won't kick for \002caps\002 anymore."));
-				}
-			}
-			else if (option.equals_ci("COLORS"))
-			{
-				if (value.equals_ci("ON"))
-				{
-					if (!ttb.empty())
-					{
-						try
-						{
-							ci->ttb[TTB_COLORS] = convertTo<int16_t>(ttb);
-							if (ci->ttb[TTB_COLORS] < 1)
-								throw ConvertException();
-						}
-						catch (const ConvertException &)
-						{
-							ci->ttb[TTB_COLORS] = 0;
-							source.Reply(_("\002%s\002 cannot be taken as times to ban."), ttb.c_str());
-							return;
-						}
-					}
-					else
-						ci->ttb[TTB_COLORS] = 0;
-
-					ci->ExtendMetadata("BS_KICK_COLORS");
-					if (ci->ttb[TTB_COLORS])
-						source.Reply(_("Bot will now kick for \002colors\002, and will place a ban\n"
-								"after %d kicks for the same user."), ci->ttb[TTB_COLORS]);
-					else
-						source.Reply(_("Bot will now kick for \002colors\002."));
-				}
-				else
-				{
-					ci->Shrink("BS_KICK_COLORS");
-					source.Reply(_("Bot won't kick for \002colors\002 anymore."));
-				}
-			}
-			else if (option.equals_ci("FLOOD"))
-			{
-				if (value.equals_ci("ON"))
-				{
-					Anope::string lines = params.size() > 4 ? params[4] : "";
-					Anope::string secs = params.size() > 5 ? params[5] : "";
-
-					if (!ttb.empty())
-					{
-						try
-						{
-							ci->ttb[TTB_FLOOD] = convertTo<int16_t>(ttb);
-							if (ci->ttb[TTB_FLOOD] < 1)
-								throw ConvertException();
-						}
-						catch (const ConvertException &)
-						{
-							ci->ttb[TTB_FLOOD] = 0;
-							source.Reply(_("\002%s\002 cannot be taken as times to ban."), ttb.c_str());
-							return;
-						}
-					}
-					else
-						ci->ttb[TTB_FLOOD] = 0;
-
-					ci->floodlines = 6;
-					try
-					{
-						ci->floodlines = convertTo<int16_t>(lines);
-					}
-					catch (const ConvertException &) { }
-					if (ci->floodlines < 2)
-						ci->floodlines = 6;
-
-					ci->floodsecs = 10;
-					try
-					{
-						ci->floodsecs = convertTo<int16_t>(secs);
-					}
-					catch (const ConvertException &) { }
-					if (ci->floodsecs < 1)
-						ci->floodsecs = 10;
-					if (ci->floodsecs > Config->BSKeepData)
-						ci->floodsecs = Config->BSKeepData;
-
-					ci->ExtendMetadata("BS_KICK_FLOOD");
-					if (ci->ttb[TTB_FLOOD])
-						source.Reply(_("Bot will now kick for \002flood\002 (%d lines in %d seconds\n"
-								"and will place a ban after %d kicks for the same user."), ci->floodlines, ci->floodsecs, ci->ttb[TTB_FLOOD]);
-					else
-						source.Reply(_("Bot will now kick for \002flood\002 (%d lines in %d seconds)."), ci->floodlines, ci->floodsecs);
-				}
-				else
-				{
-					ci->Shrink("BS_KICK_FLOOD");
-					source.Reply(_("Bot won't kick for \002flood\002 anymore."));
-				}
-			}
-			else if (option.equals_ci("REPEAT"))
-			{
-				if (value.equals_ci("ON"))
-				{
-					Anope::string times = params.size() > 4 ? params[4] : "";
-
-					if (!ttb.empty())
-					{
-						try
-						{
-							ci->ttb[TTB_REPEAT] = convertTo<int16_t>(ttb);
-							if (ci->ttb[TTB_REPEAT] < 0)
-								throw ConvertException();
-						}
-						catch (const ConvertException &)
-						{
-							ci->ttb[TTB_REPEAT] = 0;
-							source.Reply(_("\002%s\002 cannot be taken as times to ban."), ttb.c_str());
-							return;
-						}
-					}
-					else
-						ci->ttb[TTB_REPEAT] = 0;
-
-					ci->repeattimes = 3;
-					try
-					{
-						ci->repeattimes = convertTo<int16_t>(times);
-					}
-					catch (const ConvertException &) { }
-					if (ci->repeattimes < 2)
-						ci->repeattimes = 3;
-
-					ci->ExtendMetadata("BS_KICK_REPEAT");
-					if (ci->ttb[TTB_REPEAT])
-						source.Reply(_("Bot will now kick for \002repeats\002 (users that say the\n"
-								"same thing %d times), and will place a ban after %d\n"
-								"kicks for the same user."), ci->repeattimes, ci->ttb[TTB_REPEAT]);
-					else
-						source.Reply(_("Bot will now kick for \002repeats\002 (users that say the\n"
-							"same thing %d times)."), ci->repeattimes);
-				}
-				else
-				{
-					ci->Shrink("BS_KICK_REPEAT");
-					source.Reply(_("Bot won't kick for \002repeats\002 anymore."));
-				}
-			}
-			else if (option.equals_ci("REVERSES"))
-			{
-				if (value.equals_ci("ON"))
-				{
-					if (!ttb.empty())
-					{
-						try
-						{
-							ci->ttb[TTB_REVERSES] = convertTo<int16_t>(ttb);
-							if (ci->ttb[TTB_REVERSES] < 0)
-								throw ConvertException();
-						}
-						catch (const ConvertException &)
-						{
-							ci->ttb[TTB_REVERSES] = 0;
-							source.Reply(_("\002%s\002 cannot be taken as times to ban."), ttb.c_str());
-							return;
-						}
-					}
-					else
-						ci->ttb[TTB_REVERSES] = 0;
-					ci->ExtendMetadata("BS_KICK_REVERSES");
-					if (ci->ttb[TTB_REVERSES])
-						source.Reply(_("Bot will now kick for \002reverses\002, and will place a ban\n"
-								"after %d kicks for the same user."), ci->ttb[TTB_REVERSES]);
-					else
-						source.Reply(_("Bot will now kick for \002reverses\002."));
-				}
-				else
-				{
-					ci->Shrink("BS_KICK_REVERSES");
-					source.Reply(_("Bot won't kick for \002reverses\002 anymore."));
-				}
-			}
-			else if (option.equals_ci("UNDERLINES"))
-			{
-				if (value.equals_ci("ON"))
-				{
-					if (!ttb.empty())
-					{
-						try
-						{
-							ci->ttb[TTB_UNDERLINES] = convertTo<int16_t>(ttb);
-							if (ci->ttb[TTB_REVERSES] < 0)
-								throw ConvertException();
-						}
-						catch (const ConvertException &)
-						{
-							ci->ttb[TTB_UNDERLINES] = 0;
-							source.Reply(_("\002%s\002 cannot be taken as times to ban."), ttb.c_str());
-							return;
-						}
-					}
-					else
-						ci->ttb[TTB_UNDERLINES] = 0;
-
-					ci->ExtendMetadata("BS_KICK_UNDERLINES");
-					if (ci->ttb[TTB_UNDERLINES])
-						source.Reply(_("Bot will now kick for \002underlines\002, and will place a ban\n"
-								"after %d kicks for the same user."), ci->ttb[TTB_UNDERLINES]);
-					else
-						source.Reply(_("Bot will now kick for \002underlines\002."));
-				}
-				else
-				{
-					ci->Shrink("BS_KICK_UNDERLINES");
-					source.Reply(_("Bot won't kick for \002underlines\002 anymore."));
-				}
-			}
-			else if (option.equals_ci("ITALICS"))
-			{
-				if (value.equals_ci("ON"))
-				{
-					if (!ttb.empty())
-					{
-						try
-						{
-							ci->ttb[TTB_ITALICS] = convertTo<int16_t>(ttb);
-							if (ci->ttb[TTB_ITALICS] < 0)
-								throw ConvertException();
-						}
-						catch (const ConvertException &)
-						{
-							ci->ttb[TTB_ITALICS] = 0;
-							source.Reply(_("\002%s\002 cannot be taken as times to ban."), ttb.c_str());
-							return;
-						}
-					}
-					else
-						ci->ttb[TTB_ITALICS] = 0;
-
-					ci->ExtendMetadata("BS_KICK_ITALICS");
-					if (ci->ttb[TTB_ITALICS])
-						source.Reply(_("Bot will now kick for \002italics\002, and will place a ban\n"
-								"after %d kicks for the same user."), ci->ttb[TTB_ITALICS]);
-					else
-						source.Reply(_("Bot will now kick for \002italics\002."));
-				}
-				else
-				{
-					ci->Shrink("BS_KICK_ITALICS");
-					source.Reply(_("Bot won't kick for \002italics\002 anymore."));
-				}
-			}
-			else if (option.equals_ci("AMSGS"))
-			{
-				if (value.equals_ci("ON"))
-				{
-					if (!ttb.empty())
-					{
-						try
-						{
-							ci->ttb[TTB_AMSGS] = convertTo<int16_t>(ttb);
-							if (ci->ttb[TTB_AMSGS] < 0)
-								throw ConvertException();
-						}
-						catch (const ConvertException &)
-						{
-							ci->ttb[TTB_AMSGS] = 0;
-							source.Reply(_("\002%s\002 cannot be taken as times to ban."), ttb.c_str());
-							return;
-						}
-					}
-					else
-						ci->ttb[TTB_AMSGS] = 0;
-
-					ci->ExtendMetadata("BS_KICK_AMSGS");
-					if (ci->ttb[TTB_AMSGS])
-						source.Reply(_("Bot will now kick for \002amsgs\002, and will place a ban\n"
-								"after %d kicks for the same user."), ci->ttb[TTB_AMSGS]);
-					else
-						source.Reply(_("Bot will now kick for \002amsgs\002"));
-				}
-				else
-				{
-					ci->Shrink("BS_KICK_AMSGS");
-					source.Reply(_("Bot won't kick for \002amsgs\002 anymore."));
-				}
+				ci->ttb[ttb_idx] = i;
 			}
 			else
-				this->OnSyntaxError(source, "");
+				ci->ttb[ttb_idx] = 0;
+
+			ci->ExtendMetadata(mdname);
+			if (ci->ttb[ttb_idx])
+				source.Reply(_("Bot will now kick for \002%s\002, and will place a ban\n"
+						"after %d kicks for the same user."), optname.c_str(), ci->ttb[ttb_idx]);
+			else
+				source.Reply(_("Bot will now kick for \002%s\002."), optname.c_str());
+
+			bool override = !source.AccessFor(ci).HasPriv("SET");
+			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to enable the " << optname << "kicker";
 		}
-		return;
+		else if (param.equals_ci("OFF"))
+		{
+			bool override = !source.AccessFor(ci).HasPriv("SET");
+			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to disable the " << optname << "kicker";
+
+			ci->Shrink(mdname);
+			source.Reply(_("Bot won't kick for \002%s\002 anymore."), optname.c_str());
+		}
+		else
+			this->OnSyntaxError(source, "");
+	}
+};
+
+class CommandBSKickAMSG : public CommandBSKickBase
+{
+ public:
+	CommandBSKickAMSG(Module *creator) : CommandBSKickBase(creator, "botserv/kick/amsg", 2, 3)
+	{
+		this->SetDesc(_("Configures AMSG kicker"));
+		this->SetSyntax(_("\037channel\037 {\037ON|OFF\037} [\037ttb\037]"));
+	}
+
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	{
+		ChannelInfo *ci;
+		if (CheckArguments(source, params, ci))
+			Process(source, ci, params[1], params.size() > 2 ? params[2] : "", TTB_AMSGS, "AMSG", "BS_KICK_AMSGS");
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
 	{
-		if (subcommand.empty())
-		{
-			this->SendSyntax(source);
-			source.Reply(" ");
-			source.Reply(_("Configures bot kickers.  \037option\037 can be one of:\n"
-					" \n"
-					"    AMSGS         Sets if the bot kicks for amsgs\n"
-					"    BOLDS         Sets if the bot kicks bolds\n"
-					"    BADWORDS      Sets if the bot kicks bad words\n"
-					"    CAPS          Sets if the bot kicks caps\n"
-					"    COLORS        Sets if the bot kicks colors\n"
-					"    FLOOD         Sets if the bot kicks flooding users\n"
-					"    REPEAT        Sets if the bot kicks users who repeat\n"
-					"                       themselves\n"
-					"    REVERSES      Sets if the bot kicks reverses\n"
-					"    UNDERLINES    Sets if the bot kicks underlines\n"
-					"    ITALICS       Sets if the bot kicks italics\n"
-					" \n"
-					"Type \002%s%s HELP KICK \037option\037\002 for more information\n"
-					"on a specific option.\n"
-					" \n"
-					"Note: access to this command is controlled by the\n"
-					"level SET."), Config->UseStrictPrivMsgString.c_str(), source.service->nick.c_str());
-		}
-		else if (subcommand.equals_ci("BADWORDS"))
-			source.Reply(_("Syntax: \002\037channel\037 BADWORDS {\037ON|OFF\037} [\037ttb\037]\002\n"
-					"Sets the bad words kicker on or off. When enabled, this\n"
-					"option tells the bot to kick users who say certain words\n"
-					"on the channels.\n"
-					"You can define bad words for your channel using the\n"
-					"\002BADWORDS\002 command. Type \002%s%s HELP BADWORDS\002 for\n"
-					"more information.\n"
-					"ttb is the number of times a user can be kicked\n"
-					"before it get banned. Don't give ttb to disable\n"
-					"the ban system once activated."), Config->UseStrictPrivMsgString.c_str(), source.service->nick.c_str());
-		else if (subcommand.equals_ci("BOLDS"))
-			source.Reply(_("Syntax: \002\037channel\037 BOLDS {\037ON|OFF\037} [\037ttb\037]\002\n"
-					"Sets the bolds kicker on or off. When enabled, this\n"
-					"option tells the bot to kick users who use bolds.\n"
-					"ttb is the number of times a user can be kicked\n"
-					"before it get banned. Don't give ttb to disable\n"
-					"the ban system once activated."));
-		else if (subcommand.equals_ci("CAPS"))
-			source.Reply(_("Syntax: \002\037channel\037 CAPS {\037ON|OFF\037} [\037ttb\037 [\037min\037 [\037percent\037]]]\002\n"
-					"Sets the caps kicker on or off. When enabled, this\n"
-					"option tells the bot to kick users who are talking in\n"
-					"CAPS.\n"
-					"The bot kicks only if there are at least \002min\002 caps\n"
-					"and they constitute at least \002percent\002%% of the total\n"
-					"text line (if not given, it defaults to 10 characters\n"
-					"and 25%%).\n"
-					"ttb is the number of times a user can be kicked\n"
-					"before it get banned. Don't give ttb to disable\n"
-					"the ban system once activated."));
-		else if (subcommand.equals_ci("COLORS"))
-			source.Reply(_("Syntax: \002\037channel\037 COLORS {\037ON|OFF\037} [\037ttb\037]\002\n"
-					"Sets the colors kicker on or off. When enabled, this\n"
-					"option tells the bot to kick users who use colors.\n"
-					"ttb is the number of times a user can be kicked\n"
-					"before it get banned. Don't give ttb to disable\n"
-					"the ban system once activated."));
-		else if (subcommand.equals_ci("FLOOD"))
-			source.Reply(_("Syntax: \002\037channel\037 FLOOD {\037ON|OFF\037} [\037ttb\037 [\037ln\037 [\037secs\037]]]\002\n"
-					"Sets the flood kicker on or off. When enabled, this\n"
-					"option tells the bot to kick users who are flooding\n"
-					"the channel using at least \002ln\002 lines in \002secs\002 seconds\n"
-					"(if not given, it defaults to 6 lines in 10 seconds).\n"
-					" \n"
-					"ttb is the number of times a user can be kicked\n"
-					"before it get banned. Don't give ttb to disable\n"
-					"the ban system once activated."));
-		else if (subcommand.equals_ci("REPEAT"))
-			source.Reply(_("Syntax: \002\037#channel\037 REPEAT {\037ON|OFF\037} [\037ttb\037 [\037num\037]]\002\n"
-					"Sets the repeat kicker on or off. When enabled, this\n"
-					"option tells the bot to kick users who are repeating\n"
-					"themselves \002num\002 times (if num is not given, it\n"
-					"defaults to 3).\n"
-					"ttb is the number of times a user can be kicked\n"
-					"before it get banned. Don't give ttb to disable\n"
-					"the ban system once activated."));
-		else if (subcommand.equals_ci("REVERSES"))
-			source.Reply(_("Syntax: \002\037channel\037 REVERSES {\037ON|OFF\037} [\037ttb\037]\002\n"
-					"Sets the reverses kicker on or off. When enabled, this\n"
-					"option tells the bot to kick users who use reverses.\n"
-					"ttb is the number of times a user can be kicked\n"
-					"before it get banned. Don't give ttb to disable\n"
-					"the ban system once activated."));
-		else if (subcommand.equals_ci("UNDERLINES"))
-			source.Reply(_("Syntax: \002\037channel\037 UNDERLINES {\037ON|OFF\037} [\037ttb\037]\002\n"
-					"Sets the underlines kicker on or off. When enabled, this\n"
-					"option tells the bot to kick users who use underlines.\n"
-					"ttb is the number of times a user can be kicked\n"
-					"before it get banned. Don't give ttb to disable\n"
-					"the ban system once activated."));
-		else if (subcommand.equals_ci("ITALICS"))
-			source.Reply(_("Syntax: \002\037channel\037 ITALICS {\037ON|OFF\037} [\037ttb\037]\002\n"
-					"Sets the italics kicker on or off. When enabled, this\n"
-					"option tells the bot to kick users who use italics.\n"
-					"ttb is the number of times a user can be kicked\n"
-					"before it get banned. Don't give ttb to disable\n"
-					"the ban system once activated."));
-		else if (subcommand.equals_ci("AMSGS"))
-			source.Reply(_("Syntax: \002\037channel\037 AMSGS {\037ON|OFF\037} [\037ttb\037]\002\n"
-					"Sets the amsg kicker on or off. When enabled, the bot will\n"
-					"kick users who send the same message to multiple channels\n"
-					"where BotServ bots are.\n"
-					"Ttb is the number of times a user can be kicked\n"
-					"before it get banned. Don't give ttb to disable\n"
-					"the ban system once activated."));
-		else
-			return false;
-
+		source.Reply(_("Sets the AMSG kicker on or off. When enabled, the bot will\n"
+				"kick users who send the same message to multiple channels\n"
+				"where BotServ bots are.\n"
+				"\037ttb\037 is the number of times a user can be kicked\n"
+				"before they get banned. Don't give ttb to disable\n"
+				"the ban system once activated."));
 		return true;
 	}
 };
 
-struct BanData : public ExtensibleItem
+class CommandBSKickBadwords : public CommandBSKickBase
+{
+ public:
+	CommandBSKickBadwords(Module *creator) : CommandBSKickBase(creator, "botserv/kick/badwords", 2, 3)
+	{
+		this->SetDesc(_("Configures badwords kicker"));
+		this->SetSyntax(_("\037channel\037 {\037ON|OFF\037} [\037ttb\037]"));
+	}
+
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	{
+		ChannelInfo *ci;
+		if (CheckArguments(source, params, ci))
+			Process(source, ci, params[1], params.size() > 2 ? params[2] : "", TTB_BADWORDS, "badwords", "BS_KICK_BADWORDS");
+	}
+
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	{
+		source.Reply(_("Sets the bad words kicker on or off. When enabled, this\n"
+				"option tells the bot to kick users who say certain words\n"
+				"on the channels.\n"
+				"You can define bad words for your channel using the\n"
+				"\002BADWORDS\002 command. Type \002%s%s HELP BADWORDS\002 for\n"
+				"more information.\n"
+				"ttb is the number of times a user can be kicked\n"
+				"before it get banned. Don't give ttb to disable\n"
+				"the ban system once activated."), Config->UseStrictPrivMsgString.c_str(), source.service->nick.c_str());
+		return true;
+	}
+};
+
+class CommandBSKickBolds : public CommandBSKickBase
+{
+ public:
+	CommandBSKickBolds(Module *creator) : CommandBSKickBase(creator, "botserv/kick/bolds", 2, 3)
+	{
+		this->SetDesc(_("Configures badwords kicker"));
+		this->SetSyntax(_("\037channel\037 {\037ON|OFF\037} [\037ttb\037]"));
+	}
+
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	{
+		ChannelInfo *ci;
+		if (CheckArguments(source, params, ci))
+			Process(source, ci, params[1], params.size() > 2 ? params[2] : "", TTB_BOLDS, "bolds", "BS_KICK_BOLDS");
+	}
+
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	{
+		source.Reply(_("Sets the bolds kicker on or off. When enabled, this\n"
+				"option tells the bot to kick users who use bolds.\n"
+				"ttb is the number of times a user can be kicked\n"
+				"before it get banned. Don't give ttb to disable\n"
+				"the ban system once activated."));
+		return true;
+	}
+};
+
+class CommandBSKickCaps : public CommandBSKickBase
+{
+ public:
+	CommandBSKickCaps(Module *creator) : CommandBSKickBase(creator, "botserv/kick/caps", 2, 5)
+	{
+		this->SetDesc(_("Configures caps kicker"));
+		this->SetSyntax(_("\037channel\037 {\037ON|OFF\037} [\037ttb\037 [\037min\037 [\037percent\037]]]\002"));
+	}
+
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	{
+		ChannelInfo *ci;
+		if (!CheckArguments(source, params, ci))
+			return;
+
+		if (params[1].equals_ci("ON"))
+		{
+			const Anope::string &ttb = params.size() > 2 ? params[2] : "",
+				&min = params.size() > 3 ? params[3] : "",
+				&percent = params.size() > 4 ? params[4] : "";
+
+			if (!ttb.empty())
+			{
+				try
+				{
+					ci->ttb[TTB_CAPS] = convertTo<int16_t>(ttb);
+					if (ci->ttb[TTB_CAPS] < 0)
+						throw ConvertException();
+				}
+				catch (const ConvertException &)
+				{
+					ci->ttb[TTB_CAPS] = 0;
+					source.Reply(_("\002%s\002 cannot be taken as times to ban."), ttb.c_str());
+					return;
+				}
+			}
+			else
+				ci->ttb[TTB_CAPS] = 0;
+
+			ci->capsmin = 10;
+			try
+			{
+				ci->capsmin = convertTo<int16_t>(min);
+			}
+			catch (const ConvertException &) { }
+			if (ci->capsmin < 1)
+				ci->capsmin = 10;
+
+			ci->capspercent = 25;
+			try
+			{
+				ci->capspercent = convertTo<int16_t>(percent);
+			}
+			catch (const ConvertException &) { }
+			if (ci->capspercent < 1 || ci->capspercent > 100)
+				ci->capspercent = 25;
+
+			ci->ExtendMetadata("BS_KICK_CAPS");
+			if (ci->ttb[TTB_CAPS])
+				source.Reply(_("Bot will now kick for \002caps\002 (they must constitute at least\n"
+						"%d characters and %d%% of the entire message), and will\n"
+						"place a ban after %d kicks for the same user."), ci->capsmin, ci->capspercent, ci->ttb[TTB_CAPS]);
+			else
+				source.Reply(_("Bot will now kick for \002caps\002 (they must constitute at least\n"
+						"%d characters and %d%% of the entire message)."), ci->capsmin, ci->capspercent);
+		}
+		else
+		{
+			ci->Shrink("BS_KICK_CAPS");
+			source.Reply(_("Bot won't kick for \002caps\002 anymore."));
+		}
+	}
+
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	{
+		source.Reply(_("Sets the caps kicker on or off. When enabled, this\n"
+				"option tells the bot to kick users who are talking in\n"
+				"CAPS.\n"
+				"The bot kicks only if there are at least \002min\002 caps\n"
+				"and they constitute at least \002percent\002%% of the total\n"
+				"text line (if not given, it defaults to 10 characters\n"
+				"and 25%%).\n"
+				"ttb is the number of times a user can be kicked\n"
+				"before it get banned. Don't give ttb to disable\n"
+				"the ban system once activated."));
+		return true;
+	}
+};
+
+class CommandBSKickColors : public CommandBSKickBase
+{
+ public:
+	CommandBSKickColors(Module *creator) : CommandBSKickBase(creator, "botserv/kick/colors", 2, 3)
+	{
+		this->SetDesc(_("Configures color kicker"));
+		this->SetSyntax(_("\037channel\037 {\037ON|OFF\037} [\037ttb\037]"));
+	}
+
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	{
+		ChannelInfo *ci;
+		if (CheckArguments(source, params, ci))
+			Process(source, ci, params[1], params.size() > 2 ? params[2] : "", TTB_COLORS, "colors", "BS_KICK_COLORS");
+	}
+
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	{
+		source.Reply(_("Sets the colors kicker on or off. When enabled, this\n"
+				"option tells the bot to kick users who use colors.\n"
+				"ttb is the number of times a user can be kicked\n"
+				"before it get banned. Don't give ttb to disable\n"
+				"the ban system once activated."));
+		return true;
+	}
+};
+
+class CommandBSKickFlood : public CommandBSKickBase
+{
+ public:
+	CommandBSKickFlood(Module *creator) : CommandBSKickBase(creator, "botserv/kick/flood", 2, 5)
+	{
+		this->SetDesc(_("Configures flood kicker"));
+		this->SetSyntax(_("\037channel\037 {\037ON|OFF\037} [\037ttb\037 [\037ln\037 [\037secs\037]]]\002"));
+	}
+
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	{
+		ChannelInfo *ci;
+		if (!CheckArguments(source, params, ci))
+			return;
+
+		if (params[1].equals_ci("ON"))
+		{
+			const Anope::string &ttb = params.size() > 2 ? params[2] : "",
+						&lines = params.size() > 3 ? params[3] : "",
+						&secs = params.size() > 4 ? params[4] : "";
+
+			if (!ttb.empty())
+			{
+				int16_t i;
+
+				try
+				{
+					i = convertTo<int16_t>(ttb);
+					if (i < 1)
+						throw ConvertException();
+				}
+				catch (const ConvertException &)
+				{
+					source.Reply(_("\002%s\002 cannot be taken as times to ban."), ttb.c_str());
+					return;
+				}
+
+				ci->ttb[TTB_FLOOD] = i;
+			}
+			else
+				ci->ttb[TTB_FLOOD] = 0;
+
+			ci->floodlines = 6;
+			try
+			{
+				ci->floodlines = convertTo<int16_t>(lines);
+			}
+			catch (const ConvertException &) { }
+			if (ci->floodlines < 2)
+				ci->floodlines = 6;
+
+			ci->floodsecs = 10;
+			try
+			{
+				ci->floodsecs = convertTo<int16_t>(secs);
+			}
+			catch (const ConvertException &) { }
+			if (ci->floodsecs < 1)
+				ci->floodsecs = 10;
+			if (ci->floodsecs > Config->BSKeepData)
+				ci->floodsecs = Config->BSKeepData;
+
+			ci->ExtendMetadata("BS_KICK_FLOOD");
+			if (ci->ttb[TTB_FLOOD])
+				source.Reply(_("Bot will now kick for \002flood\002 (%d lines in %d seconds\n"
+						"and will place a ban after %d kicks for the same user."), ci->floodlines, ci->floodsecs, ci->ttb[TTB_FLOOD]);
+			else
+				source.Reply(_("Bot will now kick for \002flood\002 (%d lines in %d seconds)."), ci->floodlines, ci->floodsecs);
+		}
+		else if (params[1].equals_ci("OFF"))
+		{
+			ci->Shrink("BS_KICK_FLOOD");
+			source.Reply(_("Bot won't kick for \002flood\002 anymore."));
+		}
+		else
+			this->OnSyntaxError(source, params[1]);
+	}
+
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	{
+		source.Reply(_("Sets the flood kicker on or off. When enabled, this\n"
+				"option tells the bot to kick users who are flooding\n"
+				"the channel using at least \002ln\002 lines in \002secs\002 seconds\n"
+				"(if not given, it defaults to 6 lines in 10 seconds).\n"
+				" \n"
+				"ttb is the number of times a user can be kicked\n"
+				"before it get banned. Don't give ttb to disable\n"
+				"the ban system once activated."));
+		return true;
+	}
+};
+
+class CommandBSKickItalics : public CommandBSKickBase
+{
+ public:
+	CommandBSKickItalics(Module *creator) : CommandBSKickBase(creator, "botserv/kick/italics", 2, 3)
+	{
+		this->SetDesc(_("Configures italics kicker"));
+		this->SetSyntax(_("\037channel\037 {\037ON|OFF\037} [\037ttb\037]"));
+	}
+
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	{
+		ChannelInfo *ci;
+		if (CheckArguments(source, params, ci))
+			Process(source, ci, params[1], params.size() > 2 ? params[2] : "", TTB_ITALICS, "italics", "BS_KICK_ITALICS");
+	}
+
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	{
+		source.Reply(_("Sets the italics kicker on or off. When enabled, this\n"
+				"option tells the bot to kick users who use italics.\n"
+				"ttb is the number of times a user can be kicked\n"
+				"before it get banned. Don't give ttb to disable\n"
+				"the ban system once activated."));
+		return true;
+	}
+};
+
+class CommandBSKickRepeat : public CommandBSKickBase
+{
+ public:
+	CommandBSKickRepeat(Module *creator) : CommandBSKickBase(creator, "botserv/kick/repeat", 2, 4)
+	{
+		this->SetDesc(_("Configures repeat kicker"));
+		this->SetSyntax(_("\037channel\037 {\037ON|OFF\037} [\037ttb\037 [\037num\037]]\002"));
+	}
+
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	{
+		ChannelInfo *ci;
+		if (!CheckArguments(source, params, ci))
+			return;
+
+		if (params[1].equals_ci("ON"))
+		{
+			const Anope::string &ttb = params[2],
+						&times = params.size() > 3 ? params[3] : "";
+
+			if (!ttb.empty())
+			{
+				int16_t i;
+
+				try
+				{
+					i = convertTo<int16_t>(ttb);
+					if (i < 0)
+						throw ConvertException();
+				}
+				catch (const ConvertException &)
+				{
+					source.Reply(_("\002%s\002 cannot be taken as times to ban."), ttb.c_str());
+					return;
+				}
+
+				ci->ttb[TTB_REPEAT] = i;
+			}
+			else
+				ci->ttb[TTB_REPEAT] = 0;
+
+			ci->repeattimes = 3;
+			try
+			{
+				ci->repeattimes = convertTo<int16_t>(times);
+			}
+			catch (const ConvertException &) { }
+			if (ci->repeattimes < 2)
+				ci->repeattimes = 3;
+
+			ci->ExtendMetadata("BS_KICK_REPEAT");
+			if (ci->ttb[TTB_REPEAT])
+				source.Reply(_("Bot will now kick for \002repeats\002 (users that say the\n"
+						"same thing %d times), and will place a ban after %d\n"
+						"kicks for the same user."), ci->repeattimes, ci->ttb[TTB_REPEAT]);
+			else
+				source.Reply(_("Bot will now kick for \002repeats\002 (users that say the\n"
+					"same thing %d times)."), ci->repeattimes);
+		}
+		else if (params[1].equals_ci("OFF"))
+		{
+			ci->Shrink("BS_KICK_REPEAT");
+			source.Reply(_("Bot won't kick for \002repeats\002 anymore."));
+		}
+		else
+			this->OnSyntaxError(source, params[1]);
+	}
+
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	{
+		source.Reply(_("Sets the repeat kicker on or off. When enabled, this\n"
+				"option tells the bot to kick users who are repeating\n"
+				"themselves \002num\002 times (if num is not given, it\n"
+				"defaults to 3).\n"
+				"ttb is the number of times a user can be kicked\n"
+				"before it get banned. Don't give ttb to disable\n"
+				"the ban system once activated."));
+		return true;
+	}
+};
+
+class CommandBSKickReverses : public CommandBSKickBase
+{
+ public:
+ 	CommandBSKickReverses(Module *creator) : CommandBSKickBase(creator, "botserv/kick/reverses", 2, 3)
+	{
+		this->SetDesc(_("Configures reverses kicker"));
+		this->SetSyntax(_("\037channel\037 {\037ON|OFF\037} [\037ttb\037]"));
+	}
+
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	{
+		ChannelInfo *ci;
+		if (CheckArguments(source, params, ci))
+			Process(source, ci, params[1], params.size() > 2 ? params[2] : "", TTB_ITALICS, "italics", "BS_KICK_ITALICS");
+	}
+
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	{
+		source.Reply(_("Sets the reverses kicker on or off. When enabled, this\n"
+				"option tells the bot to kick users who use reverses.\n"
+				"ttb is the number of times a user can be kicked\n"
+				"before it get banned. Don't give ttb to disable\n"
+				"the ban system once activated."));
+		return true;
+	}
+};
+
+class CommandBSKickUnderlines : public CommandBSKickBase
+{
+ public:
+	CommandBSKickUnderlines(Module *creator) : CommandBSKickBase(creator, "botserv/kick/underlines", 2, 3)
+	{
+		this->SetDesc(_("Configures underlines kicker"));
+		this->SetSyntax(_("\037channel\037 {\037ON|OFF\037} [\037ttb\037]"));
+	}
+
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	{
+		ChannelInfo *ci;
+		if (CheckArguments(source, params, ci))
+			Process(source, ci, params[1], params.size() > 2 ? params[2] : "", TTB_ITALICS, "italics", "BS_KICK_ITALICS");
+	}
+
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	{
+		source.Reply(_("Sets the underlines kicker on or off. When enabled, this\n"
+			"option tells the bot to kick users who use underlines.\n"
+			"ttb is the number of times a user can be kicked\n"
+			"before it get banned. Don't give ttb to disable\n"
+			"the ban system once activated."));
+		return true;
+	}
+};
+
+struct BanData : ExtensibleItem
 {
 	struct Data
 	{
@@ -633,7 +651,7 @@ struct BanData : public ExtensibleItem
 	}
 };
 
-struct UserData : public ExtensibleItem
+struct UserData : ExtensibleItem
 {
 	UserData()
 	{
@@ -689,6 +707,17 @@ class BanDataPurger : public CallBack
 class BSKick : public Module
 {
 	CommandBSKick commandbskick;
+	CommandBSKickAMSG commandbskickamsg;
+	CommandBSKickBadwords commandbskickbadwords;
+	CommandBSKickBolds commandbskickbolds;
+	CommandBSKickCaps commandbskickcaps;
+	CommandBSKickColors commandbskickcolors;
+	CommandBSKickFlood commandbskickflood;
+	CommandBSKickItalics commandbskickitalics;
+	CommandBSKickRepeat commandbskickrepeat;
+	CommandBSKickReverses commandbskickreverse;
+	CommandBSKickUnderlines commandbskickunderlines;
+
 	BanDataPurger purger;
 
 	BanData::Data &GetBanData(User *u, Channel *c)
@@ -761,7 +790,12 @@ class BSKick : public Module
 
  public:
 	BSKick(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
-		commandbskick(this), purger(this)
+		commandbskick(this),
+		commandbskickamsg(this), commandbskickbadwords(this), commandbskickbolds(this), commandbskickcaps(this),
+		commandbskickcolors(this), commandbskickflood(this), commandbskickitalics(this), commandbskickrepeat(this),
+		commandbskickreverse(this), commandbskickunderlines(this),
+
+		purger(this)
 	{
 		this->SetAuthor("Anope");
 

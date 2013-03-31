@@ -50,7 +50,7 @@ class CommandNSSet : public Command
 		}
 
 		source.Reply(_("Type \002%s%s HELP %s \037option\037\002 for more information\n"
-			"on a specific option."), Config->UseStrictPrivMsgString.c_str(), source.service->nick.c_str(), source.command.c_str());
+			"on a specific option."), Config->UseStrictPrivMsgString.c_str(), source.service->nick.c_str(), this_name.c_str());
 
 		return true;
 	}
@@ -74,7 +74,9 @@ class CommandNSSASet : public Command
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
 	{
 		this->SendSyntax(source);
+		source.Reply(" ");
 		source.Reply(_("Sets various nickname options. \037option\037 can be one of:"));
+
 		Anope::string this_name = source.command;
 		for (CommandInfo::map::const_iterator it = source.service->commands.begin(), it_end = source.service->commands.end(); it != it_end; ++it)
 		{
@@ -91,9 +93,10 @@ class CommandNSSASet : public Command
 				}
 			}
 		}
-		source.Reply(_("Type \002%s%s HELP SASET \037option\037\002 for more information\n"
+
+		source.Reply(_("Type \002%s%s HELP %s \037option\037\002 for more information\n"
 				"on a specific option. The options will be set on the given\n"
-				"\037nickname\037."), Config->UseStrictPrivMsgString.c_str(), Config->NickServ.c_str());
+				"\037nickname\037."), Config->UseStrictPrivMsgString.c_str(), Config->NickServ.c_str(), this_name.c_str());
 		return true;
 	}
 };

@@ -206,7 +206,7 @@ void Message::Mode::Run(MessageSource &source, const std::vector<Anope::string> 
 		Channel *c = Channel::Find(params[0]);
 
 		if (c)
-			c->SetModesInternal(source, params[2], 0);
+			c->SetModesInternal(source, params[1], 0);
 	}
 	else
 	{

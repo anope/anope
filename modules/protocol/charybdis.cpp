@@ -294,28 +294,6 @@ struct IRCDMessageEUID : IRCDMessage
 	}
 };
 
-struct IRCDMessageMode : IRCDMessage
-{
-	IRCDMessageMode(Module *creator) : IRCDMessage(creator, "MODE", 2) { }
-
-	// Received: :42CAAAIHS MODE 42CAAAIHS :+ao
-	void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
-	{
-		if (IRCD->IsChannelValid(params[0]))
-		{
-			Channel *c = Channel::Find(params[0]);
-			if (c)
-				c->SetModesInternal(source, params[1], Anope::CurTime);
-		}
-		else
-		{
-			User *u = User::Find(params[0]);
-			if (u)
-				u->SetModesInternal("%s", params[1].c_str());
-		}
-	}
-};
-
 // we cant use this function from ratbox because we set a local variable here
 struct IRCDMessageServer : IRCDMessage
 {
@@ -356,6 +334,7 @@ class ProtoCharybdis : public Module
 	Message::Error message_error;
 	Message::Kick message_kick;
 	Message::Kill message_kill;
+	Message::Mode message_mode;
 	Message::MOTD message_motd;
 	Message::Part message_part;
 	Message::Ping message_ping;
@@ -375,7 +354,6 @@ class ProtoCharybdis : public Module
 	/* Our message handlers */
 	IRCDMessageEncap message_encap;
 	IRCDMessageEUID message_euid;
-	IRCDMessageMode message_mode;
 	IRCDMessagePass message_pass;
 	IRCDMessageServer message_server;
 
@@ -415,9 +393,9 @@ class ProtoCharybdis : public Module
 	ProtoCharybdis(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PROTOCOL),
 		ircd_proto(this),
 		message_away(this), message_capab(this), message_error(this), message_kick(this), message_kill(this),
-		message_motd(this), message_part(this), message_ping(this), message_privmsg(this), message_quit(this),
-		message_squit(this), message_stats(this), message_time(this), message_topic(this), message_version(this),
-		message_whois(this),
+		message_mode(this), message_motd(this), message_part(this), message_ping(this), message_privmsg(this),
+		message_quit(this), message_squit(this), message_stats(this), message_time(this), message_topic(this),
+		message_version(this), message_whois(this),
 
 		message_bmask("IRCDMessage", "charybdis/bmask", "ratbox/bmask"),
 		message_join("IRCDMessage", "charybdis/join", "ratbox/join"),
@@ -428,8 +406,7 @@ class ProtoCharybdis : public Module
 		message_tb("IRCDMessage", "charybdis/tb", "ratbox/tb"),
 		message_tmode("IRCDMessage", "charybdis/tmode", "ratbox/tmode"),
 
-		message_encap(this), message_euid(this), message_mode(this), message_pass(this),
-		message_server(this)
+		message_encap(this), message_euid(this), message_pass(this), message_server(this)
 
 	{
 		this->SetAuthor("Anope");

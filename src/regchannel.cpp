@@ -274,6 +274,7 @@ ChannelInfo::ChannelInfo(const Anope::string &chname) : Serializable("ChannelInf
 	this->capsmin = this->capspercent = 0;
 	this->floodlines = this->floodsecs = 0;
 	this->repeattimes = 0;
+	this->banexpire = 0;
 	this->bi = NULL;
 
 	this->last_topic_setter = Config->ChanServ;
@@ -430,6 +431,7 @@ void ChannelInfo::Serialize(Serialize::Data &data) const
 	data.SetType("floodlines", Serialize::Data::DT_INT); data["floodlines"] << this->floodlines;
 	data.SetType("floodsecs", Serialize::Data::DT_INT); data["floodsecs"] << this->floodsecs;
 	data.SetType("repeattimes", Serialize::Data::DT_INT); data["repeattimes"] << this->repeattimes;
+	data.SetType("banexpire", Serialize::Data::DT_INT); data["banexpire"] << this->banexpire;
 	data["memomax"] << this->memos.memomax;
 	for (unsigned i = 0; i < this->memos.ignores.size(); ++i)
 		data["memoignores"] << this->memos.ignores[i] << " ";
@@ -483,6 +485,7 @@ Serializable* ChannelInfo::Unserialize(Serializable *obj, Serialize::Data &data)
 	data["floodlines"] >> ci->floodlines;
 	data["floodsecs"] >> ci->floodsecs;
 	data["repeattimes"] >> ci->repeattimes;
+	data["banexpire"] >> ci->banexpire;
 	data["memomax"] >> ci->memos.memomax;
 	{
 		Anope::string buf;

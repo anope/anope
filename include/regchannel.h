@@ -198,6 +198,8 @@ class CoreExport ChannelInfo : public Serializable, public Extensible
 	int16_t floodlines, floodsecs;            /* For FLOOD kicker */
 	int16_t repeattimes;                      /* For REPEAT kicker */
 
+	time_t banexpire;                       /* Time bans expire in */
+
  	/** Constructor
 	 * @param chname The channel name
 	 */

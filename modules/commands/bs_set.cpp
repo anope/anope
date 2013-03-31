@@ -54,6 +54,75 @@ class CommandBSSet : public Command
 	}
 };
 
+class CommandBSSetBanExpire : public Command
+{
+ public:
+ 	class Timer : public CallBack
+	{
+		Anope::string chname;
+		Anope::string mask;
+
+	 public:
+		Timer(Module *creator, const Anope::string &ch, const Anope::string &bmask, time_t t) : CallBack(creator, t), chname(ch), mask(bmask) { }
+
+		void Tick(time_t)
+		{
+			Channel *c = Channel::Find(chname);
+			if (c)
+				c->RemoveMode(NULL, "BAN", mask);
+		}
+	};
+
+	CommandBSSetBanExpire(Module *creator, const Anope::string &sname = "botserv/set/banexpire") : Command(creator, sname, 2, 2)
+	{
+		this->SetDesc(_("Configures the time bot bans expire in"));
+		this->SetSyntax(_("\037channel\037 \037time\037"));
+	}
+
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	{
+		const Anope::string &chan = params[0];
+		const Anope::string &arg = params[1];
+
+		ChannelInfo *ci = ChannelInfo::Find(chan);
+		if (ci == NULL)
+		{
+			source.Reply(CHAN_X_NOT_REGISTERED, chan.c_str());
+			return;
+		}
+
+		AccessGroup access = source.AccessFor(ci);
+		if (!source.HasPriv("botserv/administration") && !access.HasPriv("SET"))
+		{
+			source.Reply(ACCESS_DENIED);
+			return;
+		}
+
+		if (Anope::ReadOnly)
+		{
+			source.Reply(_("Sorry, bot option setting is temporarily disabled."));
+			return;
+		}
+
+		ci->banexpire = Anope::DoTime(arg);
+		if (!ci->banexpire)
+			source.Reply(_("Bot bans will no longer automatically expire."));
+		else
+			source.Reply(_("Bot bans will automatically expire after %s."), Anope::Duration(ci->banexpire, source.GetAccount()).c_str());
+	}
+
+	bool OnHelp(CommandSource &source, const Anope::string &) anope_override
+	{
+		this->SendSyntax(source);
+		source.Reply(_(" \n"
+				"Sets the time bot bans expire in. If enabled, any bans placed by\n"
+				"bots, such as flood kicker, badwords kicker, etc. will automatically\n"
+				"be removed after the given time. Set to 0 to disable bans from\n"
+				"automatically expiring."));
+		return true;
+	}
+};
+
 class CommandBSSetDontKickOps : public Command
 {
  public:
@@ -413,6 +482,7 @@ class CommandBSSetPrivate : public Command
 class BSSet : public Module
 {
 	CommandBSSet commandbsset;
+	CommandBSSetBanExpire commandbssetbanexpire;
 	CommandBSSetDontKickOps commandbssetdontkickops;
 	CommandBSSetDontKickVoices commandbssetdontkickvoices;
 	CommandBSSetFantasy commandbssetfantasy;
@@ -421,11 +491,20 @@ class BSSet : public Module
 
  public:
 	BSSet(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
-		commandbsset(this), commandbssetdontkickops(this), commandbssetdontkickvoices(this),
+		commandbsset(this), commandbssetbanexpire(this), commandbssetdontkickops(this), commandbssetdontkickvoices(this),
 		commandbssetfantasy(this), commandbssetnobot(this), commandbssetprivate(this)
 	{
 		this->SetAuthor("Anope");
 
+		ModuleManager::Attach(I_OnBotBan, this);
+	}
+
+	void OnBotBan(User *u, ChannelInfo *ci, const Anope::string &mask) anope_override
+	{
+		if (!ci->banexpire)
+			return;
+
+		new CommandBSSetBanExpire::Timer(this, ci->name, mask, ci->banexpire);
 	}
 };
 

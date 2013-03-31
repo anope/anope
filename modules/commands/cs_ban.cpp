@@ -53,6 +53,18 @@ class CommandCSBan : public Command
 			return;
 		}
 
+		Channel *c = ci->c;
+		if (c == NULL)
+		{
+			source.Reply(CHAN_X_NOT_IN_USE, chan.c_str());
+			return;
+		}
+		else if (IRCD->GetMaxListFor(c) && c->HasMode("BAN") >= IRCD->GetMaxListFor(c))
+		{
+			source.Reply(_("The ban list for %s is full."), c->name.c_str());
+			return;
+		}
+
 		Anope::string expiry, target, reason;
 		time_t ban_time;
 		if (params[1][0] == '+')
@@ -82,15 +94,12 @@ class CommandCSBan : public Command
 		if (reason.length() > Config->CSReasonMax)
 			reason = reason.substr(0, Config->CSReasonMax);
 
-		Channel *c = ci->c;
 		User *u = source.GetUser();
 		User *u2 = User::Find(target, true);
 
 		AccessGroup u_access = source.AccessFor(ci);
 
-		if (!c)
-			source.Reply(CHAN_X_NOT_IN_USE, chan.c_str());
-		else if (!u_access.HasPriv("BAN") && !source.HasPriv("chanserv/kick"))
+		if (!u_access.HasPriv("BAN") && !source.HasPriv("chanserv/kick"))
 			source.Reply(ACCESS_DENIED);
 		else if (u2)
 		{
@@ -102,7 +111,7 @@ class CommandCSBan : public Command
 			 * Dont ban/kick the user on channels where he is excepted
 			 * to prevent services <-> server wars.
 			 */
-			else if (ci->c->MatchesList(u2, "EXCEPT"))
+			else if (c->MatchesList(u2, "EXCEPT"))
 				source.Reply(CHAN_EXCEPTED, u2->nick.c_str(), ci->name.c_str());
 			else if (u2->IsProtected())
 				source.Reply(ACCESS_DENIED);

@@ -1139,6 +1139,7 @@ ConfigItems::ConfigItems(ServerConfig *conf)
 		{"networkinfo", "userlen", "10", new ValueContainerUInt(&conf->UserLen), DT_UINTEGER | DT_NORELOAD, NoValidation},
 		{"networkinfo", "hostlen", "64", new ValueContainerUInt(&conf->HostLen), DT_UINTEGER | DT_NORELOAD, NoValidation},
 		{"networkinfo", "chanlen", "32", new ValueContainerUInt(&conf->ChanLen), DT_UINTEGER | DT_NORELOAD, NoValidation},
+		{"networkinfo", "modelistsize", "0", new ValueContainerUInt(&conf->ListSize), DT_UINTEGER, NoValidation},
 		{"options", "user", "", new ValueContainerString(&conf->User), DT_STRING, NoValidation},
 		{"options", "group", "", new ValueContainerString(&conf->Group), DT_STRING, NoValidation},
 		{"options", "casemap", "ascii", new ValueContainerString(&conf->CaseMap), DT_STRING, NoValidation},

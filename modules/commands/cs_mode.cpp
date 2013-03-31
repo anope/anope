@@ -102,6 +102,8 @@ class CommandCSMode : public Command
 						Anope::string mode_param;
 						if (((cm->type == MODE_STATUS || cm->type == MODE_LIST) && !sep.GetToken(mode_param)) || (cm->type == MODE_PARAM && adding && !sep.GetToken(mode_param)))
 							source.Reply(_("Missing parameter for mode %c."), cm->mchar);
+						else if (cm->type == MODE_LIST && ci->c && IRCD->GetMaxListFor(ci->c) && ci->c->HasMode(cm->name) >= IRCD->GetMaxListFor(ci->c))
+							source.Reply(_("List for mode %c is full."), cm->mchar);
 						else
 						{
 							ci->SetMLock(cm, adding, mode_param, source.GetNick()); 
@@ -371,7 +373,10 @@ class CommandCSMode : public Command
 							if (!sep.GetToken(param))
 								break;
 							if (adding)
-								ci->c->SetMode(NULL, cm, param);
+							{
+								if (IRCD->GetMaxListFor(ci->c) && ci->c->HasMode(cm->name) < IRCD->GetMaxListFor(ci->c))
+									ci->c->SetMode(NULL, cm, param);
+							}
 							else
 							{
 								std::pair<Channel::ModeList::iterator, Channel::ModeList::iterator> its = ci->c->GetModeList(cm->name);

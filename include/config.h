@@ -375,6 +375,8 @@ class CoreExport ServerConfig
 	unsigned HostLen;
 	/* Max length of channel names */
 	unsigned ChanLen;
+	/* Max length of b/e/I lists */
+	unsigned ListSize;
 
 	/* User and group to run as */
 	Anope::string User;

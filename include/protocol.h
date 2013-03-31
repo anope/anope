@@ -223,6 +223,11 @@ class CoreExport IRCDProto : public Service
 	virtual bool IsIdentValid(const Anope::string &);
 	virtual bool IsHostValid(const Anope::string &);
 	virtual bool IsExtbanValid(const Anope::string &) { return false; }
+
+	/** Retrieve the maximum number of list modes settable on this channel
+	 * Defaults to Config->ListSize
+	 */
+	virtual unsigned GetMaxListFor(Channel *c);
 };
 
 class CoreExport MessageSource

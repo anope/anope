@@ -385,6 +385,11 @@ void IRCDProto::SendOper(User *u)
 	u->SetMode(OperServ, "OPER");
 }
 
+unsigned IRCDProto::GetMaxListFor(Channel *c)
+{
+	return c->HasMode("LBAN") ? 0 : Config->ListSize;
+}
+
 MessageSource::MessageSource(const Anope::string &src) : source(src), u(NULL), s(NULL)
 {
 	if (src.empty())

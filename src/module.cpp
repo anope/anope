@@ -45,7 +45,7 @@ Module::Module(const Anope::string &modname, const Anope::string &, ModType modt
 			else
 			{
 				Log() << "Found language file " << lang << " for " << modname;
-				Language::Domains.push_back(lang);
+				Language::Domains.push_back(modname);
 			}
 			break;
 		}

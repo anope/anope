@@ -227,6 +227,7 @@ class CommandHSReject : public Command
 	CommandHSReject(Module *creator) : Command(creator, "hostserv/reject", 1, 2)
 	{
 		this->SetDesc(_("Reject the requested vHost of a user"));
+		this->SetSyntax(_("\037nick\037"));
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override

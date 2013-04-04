@@ -389,7 +389,6 @@ class CommandOSSNLine : public CommandOSSXLineBase
 			for (user_map::const_iterator it = UserListByNick.begin(); it != UserListByNick.end(); ++it)
 			{
 				User *user = it->second;
-				++it;
 
 				if (!user->HasMode("OPER") && user->server != Me && Anope::Match(user->realname, x->mask, false, true))
 					user->Kill(Config->ServerName, rreason);
@@ -616,7 +615,6 @@ class CommandOSSQLine : public CommandOSSXLineBase
 				for (user_map::const_iterator it = UserListByNick.begin(); it != UserListByNick.end(); ++it)
 				{
 					User *user = it->second;
-					++it;
 
 					if (!user->HasMode("OPER") && user->server != Me && Anope::Match(user->nick, x->mask, false, true))
 						user->Kill(Config->ServerName, rreason);

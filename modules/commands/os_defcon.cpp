@@ -485,7 +485,7 @@ class OSDefcon : public Module
 
 	void OnUserConnect(User *u, bool &exempt) anope_override
 	{
-		if (exempt || !u->Quitting() || !u->server->IsSynced() || u->server->IsULined())
+		if (exempt || u->Quitting() || !u->server->IsSynced() || u->server->IsULined())
 			return;
 
 		if (DConfig.Check(DEFCON_AKILL_NEW_CLIENTS) && akills)

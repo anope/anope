@@ -486,13 +486,14 @@ class BSSet : public Module
 	CommandBSSetDontKickOps commandbssetdontkickops;
 	CommandBSSetDontKickVoices commandbssetdontkickvoices;
 	CommandBSSetFantasy commandbssetfantasy;
+	CommandBSSetGreet commandbssetgreet;
 	CommandBSSetNoBot commandbssetnobot;
 	CommandBSSetPrivate commandbssetprivate;
 
  public:
 	BSSet(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
 		commandbsset(this), commandbssetbanexpire(this), commandbssetdontkickops(this), commandbssetdontkickvoices(this),
-		commandbssetfantasy(this), commandbssetnobot(this), commandbssetprivate(this)
+		commandbssetfantasy(this), commandbssetgreet(this), commandbssetnobot(this), commandbssetprivate(this)
 	{
 		this->SetAuthor("Anope");
 

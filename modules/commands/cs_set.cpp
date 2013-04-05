@@ -345,13 +345,7 @@ class CommandCSSetFounder : public Command
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
-		if (MOD_RESULT != EVENT_ALLOW && source.permission.empty() && !source.AccessFor(ci).HasPriv("SET"))
-		{
-			source.Reply(ACCESS_DENIED);
-			return;
-		}
-
-		if (source.permission.empty() && (ci->HasExt("SECUREFOUNDER") ? !source.IsFounder(ci) : !source.AccessFor(ci).HasPriv("FOUNDER")))
+		if (MOD_RESULT != EVENT_ALLOW && source.permission.empty() && (ci->HasExt("SECUREFOUNDER") ? !source.IsFounder(ci) : !source.AccessFor(ci).HasPriv("FOUNDER")))
 		{
 			source.Reply(ACCESS_DENIED);
 			return;
@@ -835,7 +829,7 @@ class CommandCSSetSecureFounder : public Command
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
-		if (MOD_RESULT != EVENT_ALLOW && source.permission.empty() && !source.AccessFor(ci).HasPriv("SET"))
+		if (MOD_RESULT != EVENT_ALLOW && source.permission.empty() && (ci->HasExt("SECUREFOUNDER") ? !source.IsFounder(ci) : !source.AccessFor(ci).HasPriv("FOUNDER")))
 		{
 			source.Reply(ACCESS_DENIED);
 			return;
@@ -1017,19 +1011,10 @@ class CommandCSSetSuccessor : public Command
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
-		if (MOD_RESULT != EVENT_ALLOW && source.permission.empty())
+		if (MOD_RESULT != EVENT_ALLOW && source.permission.empty() && (ci->HasExt("SECUREFOUNDER") ? !source.IsFounder(ci) : !source.AccessFor(ci).HasPriv("FOUNDER")))
 		{
-			if (!source.AccessFor(ci).HasPriv("SET"))
-			{
-				source.Reply(ACCESS_DENIED);
-				return;
-			}
-
-			if (ci->HasExt("SECUREFOUNDER") ? !source.IsFounder(ci) : !source.AccessFor(ci).HasPriv("FOUNDER"))
-			{
-				source.Reply(ACCESS_DENIED);
-				return;
-			}
+			source.Reply(ACCESS_DENIED);
+			return;
 		}
 
 		NickCore *nc;

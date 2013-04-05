@@ -350,29 +350,6 @@ void Anope::Init(int ac, char **av)
 	}
 
 	Log(LOG_TERMINAL) << "Anope " << Anope::Version() << ", " << Anope::VersionBuildString();
-#ifdef _WIN32
-	Log(LOG_TERMINAL) << "Using configuration file " << Anope::ConfigDir << "\\" << ServicesConf.GetName();
-#else
-	Log(LOG_TERMINAL) << "Using configuration file " << Anope::ConfigDir << "/" << ServicesConf.GetName();
-#endif
-
-	/* Initialize the socket engine */
-	SocketEngine::Init();
-
-	/* Read configuration file; exit if there are problems. */
-	try
-	{
-		Config = new ServerConfig();
-	}
-	catch (const ConfigException &ex)
-	{
-		Log(LOG_TERMINAL) << ex.GetReason();
-		Log(LOG_TERMINAL) << "*** Support resources: Read through the services.conf self-contained";
-		Log(LOG_TERMINAL) << "*** documentation. Read the documentation files found in the 'docs'";
-		Log(LOG_TERMINAL) << "*** folder. Visit our portal located at http://www.anope.org/. Join";
-		Log(LOG_TERMINAL) << "*** our support channel on /server irc.anope.org channel #anope.";
-		throw CoreException("Configuration file failed to validate");
-	}
 
 #ifdef _WIN32
 	if (!SupportedWindowsVersion())
@@ -386,7 +363,14 @@ void Anope::Init(int ac, char **av)
 		std::cerr << "         as the root superuser." << std::endl;
 		sleep(3);
 	}
+#endif
 
+#ifdef _WIN32
+	Log(LOG_TERMINAL) << "Using configuration file " << Anope::ConfigDir << "\\" << ServicesConf.GetName();
+#else
+	Log(LOG_TERMINAL) << "Using configuration file " << Anope::ConfigDir << "/" << ServicesConf.GetName();
+
+	/* Fork to background */
 	if (!Anope::NoFork && Anope::AtTerm())
 	{
 		/* Install these before fork() - it is possible for the child to
@@ -422,7 +406,26 @@ void Anope::Init(int ac, char **av)
 		sigaction(SIGUSR2, &old_sigusr2, NULL);
 		sigaction(SIGCHLD, &old_sigchld, NULL);
 	}
+
 #endif
+
+	/* Initialize the socket engine. Note that some engines can not survive a fork(), so this must be here. */
+	SocketEngine::Init();
+
+	/* Read configuration file; exit if there are problems. */
+	try
+	{
+		Config = new ServerConfig();
+	}
+	catch (const ConfigException &ex)
+	{
+		Log(LOG_TERMINAL) << ex.GetReason();
+		Log(LOG_TERMINAL) << "*** Support resources: Read through the services.conf self-contained";
+		Log(LOG_TERMINAL) << "*** documentation. Read the documentation files found in the 'docs'";
+		Log(LOG_TERMINAL) << "*** folder. Visit our portal located at http://www.anope.org/. Join";
+		Log(LOG_TERMINAL) << "*** our support channel on /server irc.anope.org channel #anope.";
+		throw CoreException("Configuration file failed to validate");
+	}
 
 	/* Write our PID to the PID file. */
 	write_pidfile();

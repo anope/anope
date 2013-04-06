@@ -15,12 +15,22 @@ class CommandCSTopic : public Command
 {
 	void Lock(CommandSource &source, ChannelInfo *ci, const std::vector<Anope::string> &params)
 	{
+		EventReturn MOD_RESULT;
+		FOREACH_RESULT(I_OnSetChannelOption, OnSetChannelOption(source, this, ci, "topiclock on"));
+		if (MOD_RESULT == EVENT_STOP)
+			return;
+
 		ci->ExtendMetadata("TOPICLOCK");
 		source.Reply(_("Topic lock option for %s is now \002on\002."), ci->name.c_str());
 	}
 
 	void Unlock(CommandSource &source, ChannelInfo *ci, const std::vector<Anope::string> &params)
 	{
+		EventReturn MOD_RESULT;
+		FOREACH_RESULT(I_OnSetChannelOption, OnSetChannelOption(source, this, ci, "topiclock off"));
+		if (MOD_RESULT == EVENT_STOP)
+			return;
+
 		ci->Shrink("TOPICLOCK");
 		source.Reply(_("Topic lock option for %s is now \002off\002."), ci->name.c_str());
 	}

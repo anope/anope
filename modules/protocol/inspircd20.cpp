@@ -755,8 +755,14 @@ class ProtoInspIRCd : public Module
 
 	EventReturn OnSetChannelOption(CommandSource &source, Command *cmd, ChannelInfo *ci, const Anope::string &setting) anope_override
 	{
-		if (cmd->name == "chanserv/set/topiclock" && ci->c)
-			SendChannelMetadata(ci->c, "topiclock", setting.equals_ci("ON") ? "1" : "");
+		if (cmd->name == "chanserv/topic" && ci->c)
+		{
+
+			if (setting == "topiclock on")
+				SendChannelMetadata(ci->c, "topiclock", "1");
+			else if (setting == "topiclock off")
+				SendChannelMetadata(ci->c, "topiclock", "0");
+		}
 
 		return EVENT_CONTINUE;
 	}

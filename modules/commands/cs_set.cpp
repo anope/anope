@@ -1147,7 +1147,7 @@ class CSSet : public Module
 	{
 		this->SetAuthor("Anope");
 
-		Implementation i[] = { I_OnReload, I_OnChanRegistered, I_OnCheckKick };
+		Implementation i[] = { I_OnReload, I_OnChanRegistered, I_OnCheckKick, I_OnDelChan };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 
 		this->OnReload();
@@ -1174,6 +1174,12 @@ class CSSet : public Module
 			return EVENT_STOP;
 
 		return EVENT_CONTINUE;
+	}
+
+	void OnDelChan(ChannelInfo *ci) anope_override
+	{
+		if (ci->c && ci->HasExt("PERSIST"))
+			ci->c->RemoveMode(ci->WhoSends(), "PERM", "", false);
 	}
 };
 

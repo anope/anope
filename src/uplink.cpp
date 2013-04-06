@@ -118,13 +118,13 @@ UplinkSocket::~UplinkSocket()
 
 bool UplinkSocket::ProcessRead()
 {
-	BufferedSocket::ProcessRead();
+	bool b = BufferedSocket::ProcessRead();
 	for (Anope::string buf; (buf = this->GetLine()).empty() == false;)
 	{
 		Anope::Process(buf);
 		User::QuitUsers();
 	}
-	return true;
+	return b;
 }
 
 void UplinkSocket::OnConnect()

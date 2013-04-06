@@ -127,13 +127,13 @@ class HTTPProxyConnect : public ProxyConnect, public BufferedSocket
 
 	bool ProcessRead() anope_override
 	{
-		BufferedSocket::ProcessRead();
+		bool b = BufferedSocket::ProcessRead();
 		if (this->GetLine() == ProxyCheckString)
 		{
 			this->Ban();
 			return false;
 		}
-		return true;
+		return b;
 	}
 };
 

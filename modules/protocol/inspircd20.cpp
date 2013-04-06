@@ -148,22 +148,113 @@ class InspIRCdExtBan : public ChannelModeList
 	}
 };
 
-class ChannelModeFlood : public ChannelModeParam
+class ColonDelimitedParamMode : public ChannelModeParam
 {
  public:
-	ChannelModeFlood(char modeChar, bool minusNoArg) : ChannelModeParam("FLOOD", modeChar, minusNoArg) { }
+	ColonDelimitedParamMode(const Anope::string &modename, char modeChar) : ChannelModeParam(modename, modeChar, true) { }
 
 	bool IsValid(const Anope::string &value) const anope_override
 	{
+		return IsValid(value, false);
+	}
+
+	bool IsValid(const Anope::string &value, bool historymode) const
+	{
+		if (value.empty())
+			return false; // empty param is never valid
+
+		Anope::string::size_type pos = value.find(':');
+		if ((pos == Anope::string::npos) || (pos == 0))
+			return false; // no ':' or it's the first char, both are invalid
+
+		Anope::string rest;
 		try
 		{
-			Anope::string rest;
-			if (!value.empty() && value[0] != ':' && convertTo<int>(value[0] == '*' ? value.substr(1) : value, rest, false) > 0 && rest[0] == ':' && rest.length() > 1 && convertTo<int>(rest.substr(1), rest, false) > 0 && rest.empty())
-				return true;
-		}
-		catch (const ConvertException &) { }
+			if (convertTo<int>(value, rest, false) <= 0)
+				return false; // negative numbers and zero are invalid
 
-		return false;
+			rest = rest.substr(1);
+			int n;
+			if (historymode)
+			{
+				// For the history mode, the part after the ':' is a duration and it
+				// can be in the user friendly "1d3h20m" format, make sure we accept that
+				n = Anope::DoTime(rest);
+			}
+			else
+				n = convertTo<int>(rest);
+
+			if (n <= 0)
+				return false;
+		}
+		catch (const ConvertException &e)
+		{
+			// conversion error, invalid
+			return false;
+		}
+
+		return true;
+	}
+};
+
+class SimpleNumberParamMode : public ChannelModeParam
+{
+ public:
+	SimpleNumberParamMode(const Anope::string &modename, char modeChar) : ChannelModeParam(modename, modeChar, true) { }
+
+	bool IsValid(const Anope::string &value) const anope_override
+	{
+		if (value.empty())
+			return false; // empty param is never valid
+
+		try
+		{
+			if (convertTo<int>(value) <= 0)
+				return false;
+		}
+		catch (const ConvertException &e)
+		{
+			// conversion error, invalid
+			return false;
+		}
+
+		return true;
+	}
+};
+
+class ChannelModeFlood : public ColonDelimitedParamMode
+{
+ public:
+	ChannelModeFlood(char modeChar) : ColonDelimitedParamMode("FLOOD", modeChar) { }
+
+	bool IsValid(const Anope::string &value) const anope_override
+	{
+		// The parameter of this mode is a bit different, it may begin with a '*',
+		// ignore it if that's the case
+		return ((!value.empty()) && (ColonDelimitedParamMode::IsValid(value[0] == '*' ? value.substr(1) : value)));
+	}
+};
+
+class ChannelModeHistory : public ColonDelimitedParamMode
+{
+ public:
+	ChannelModeHistory(char modeChar) : ColonDelimitedParamMode("HISTORY", modeChar) { }
+
+	bool IsValid(const Anope::string &value) const anope_override
+	{
+		return (ColonDelimitedParamMode::IsValid(value, true));
+	}
+};
+
+class ChannelModeRedirect : public ChannelModeParam
+{
+ public:
+	ChannelModeRedirect(char modeChar) : ChannelModeParam("REDIRECT", modeChar, true) { }
+
+	bool IsValid(const Anope::string &value) const anope_override
+	{
+		// The parameter of this mode is a channel, and channel names start with '#'
+		return ((!value.empty()) && (value[0] == '#'));
 	}
 };
 
@@ -224,30 +315,34 @@ struct IRCDMessageCapab : Message::Capab
 					cm = new ChannelMode("FILTER", modechar[0]);
 				else if (modename.equals_cs("delayjoin"))
 					cm = new ChannelMode("DELAYEDJOIN", modechar[0]);
+				else if (modename.equals_cs("delaymsg"))
+					cm = new SimpleNumberParamMode("DELAYMSG", modechar[0]);
 				else if (modename.equals_cs("filter"))
 					cm = new ChannelModeList("FILTER", modechar[0]);
 				else if (modename.equals_cs("flood"))
-					cm = new ChannelModeFlood(modechar[0], true);
+					cm = new ChannelModeFlood(modechar[0]);
 				else if (modename.equals_cs("founder"))
 					cm = new ChannelModeStatus("OWNER", modechar.length() > 1 ? modechar[1] : modechar[0], modechar.length() > 1 ? modechar[0] : 0);
 				else if (modename.equals_cs("halfop"))
 					cm = new ChannelModeStatus("HALFOP", modechar.length() > 1 ? modechar[1] : modechar[0], modechar.length() > 1 ? modechar[0] : 0);
+				else if (modename.equals_cs("history"))
+					cm = new ChannelModeHistory(modechar[0]);
 				else if (modename.equals_cs("invex"))
 					cm = new InspIRCdExtBan("INVITEOVERRIDE", 'I');
 				else if (modename.equals_cs("inviteonly"))
 					cm = new ChannelMode("INVITE", modechar[0]);
 				else if (modename.equals_cs("joinflood"))
-					cm = new ChannelModeParam("JOINFLOOD", modechar[0], true);
+					cm = new ColonDelimitedParamMode("JOINFLOOD", modechar[0]);
 				else if (modename.equals_cs("key"))
 					cm = new ChannelModeKey(modechar[0]);
 				else if (modename.equals_cs("kicknorejoin"))
-					cm = new ChannelModeParam("NOREJOIN", modechar[0], true);
+					cm = new SimpleNumberParamMode("NOREJOIN", modechar[0]);
 				else if (modename.equals_cs("limit"))
 					cm = new ChannelModeParam("LIMIT", modechar[0], true);
 				else if (modename.equals_cs("moderated"))
 					cm = new ChannelMode("MODERATED", modechar[0]);
 				else if (modename.equals_cs("nickflood"))
-					cm = new ChannelModeParam("NICKFLOOD", modechar[0], true);
+					cm = new ColonDelimitedParamMode("NICKFLOOD", modechar[0]);
 				else if (modename.equals_cs("noctcp"))
 					cm = new ChannelMode("NOCTCP", modechar[0]);
 				else if (modename.equals_cs("noextmsg"))
@@ -269,7 +364,7 @@ struct IRCDMessageCapab : Message::Capab
 				else if (modename.equals_cs("private"))
 					cm = new ChannelMode("PRIVATE", modechar[0]);
 				else if (modename.equals_cs("redirect"))
-					cm = new ChannelModeParam("REDIRECT", modechar[0], true);
+					cm = new ChannelModeRedirect(modechar[0]);
 				else if (modename.equals_cs("reginvite"))
 					cm = new ChannelMode("REGISTEREDONLY", modechar[0]);
 				else if (modename.equals_cs("regmoderated"))

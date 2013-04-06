@@ -142,7 +142,7 @@ class CommandCSBan : public Command
 					c->Kick(ci->WhoSends(), u2, "%s", reason.c_str());
 			}
 		}
-		else if (u_access.HasPriv("FOUNDER"))
+		else
 		{
 			Log(LOG_COMMAND, source, this, ci) << "for " << target;
 
@@ -156,6 +156,7 @@ class CommandCSBan : public Command
 				}
 			}
 
+			bool founder = u_access.HasPriv("FOUNDER");
 			int matched = 0, kicked = 0;
 			for (Channel::ChanUserList::iterator it = c->users.begin(), it_end = c->users.end(); it != it_end;)
 			{
@@ -167,6 +168,8 @@ class CommandCSBan : public Command
 
 					AccessGroup u2_access = ci->AccessFor(uc->user);
 
+					if (matched > 1 && !founder)
+						continue;
 					if (u != uc->user && ci->HasExt("PEACE") && u2_access >= u_access)
 						continue;
 					else if (ci->c->MatchesList(uc->user, "EXCEPT"))
@@ -187,8 +190,6 @@ class CommandCSBan : public Command
 			else
 				source.Reply(_("No users on %s match %s."), c->name.c_str(), target.c_str());
 		}
-		else
-			source.Reply(NICK_X_NOT_IN_USE, target.c_str());
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override

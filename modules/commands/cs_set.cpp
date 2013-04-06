@@ -130,11 +130,13 @@ class CommandCSSetAutoOp : public Command
 
 		if (params[1].equals_ci("ON"))
 		{
+			Log(source.permission.empty() ? LOG_COMMAND : LOG_ADMIN, source, this, ci) << "to enable autoop";
 			ci->Shrink("NOAUTOOP");
 			source.Reply(_("Services will now automatically give modes to users in \002%s\002."), ci->name.c_str());
 		}
 		else if (params[1].equals_ci("OFF"))
 		{
+			Log(source.permission.empty() ? LOG_COMMAND : LOG_ADMIN, source, this, ci) << "to disable autoop";
 			ci->ExtendMetadata("NOAUTOOP");
 			source.Reply(_("Services will no longer automatically give modes to users in \002%s\002."), ci->name.c_str());
 		}
@@ -188,6 +190,7 @@ class CommandCSSetBanType : public Command
 			int16_t new_type = convertTo<int16_t>(params[1]);
 			if (new_type < 0 || new_type > 3)
 				throw ConvertException("Invalid range");
+			Log(source.permission.empty() ? LOG_COMMAND : LOG_ADMIN, source, this, ci) << "to change the ban type to " << new_type;
 			ci->bantype = new_type;
 			source.Reply(_("Ban type for channel %s is now #%d."), ci->name.c_str(), ci->bantype);
 		}
@@ -195,8 +198,6 @@ class CommandCSSetBanType : public Command
 		{
 			source.Reply(_("\002%s\002 is not a valid ban type."), params[1].c_str());
 		}
-
-		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &) anope_override
@@ -249,15 +250,16 @@ class CommandCSSetChanstats : public Command
 		{
 			ci->ExtendMetadata("STATS");
 			source.Reply(_("Chanstats statistics are now enabled for this channel."));
+			Log(source.permission.empty() ? LOG_COMMAND : LOG_ADMIN, source, this, ci) << "to enable chanstats";
 		}
 		else if (params[1].equals_ci("OFF"))
 		{
+			Log(source.permission.empty() ? LOG_COMMAND : LOG_ADMIN, source, this, ci) << "to disable chanstats";
 			ci->Shrink("STATS");
 			source.Reply(_("Chanstats statistics are now disabled for this channel."));
 		}
 		else
 			this->OnSyntaxError(source, "");
-		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &) anope_override
@@ -301,11 +303,13 @@ class CommandCSSetDescription : public Command
 		if (params.size() > 1)
 		{
 			ci->desc = params[1];
+			Log(source.permission.empty() ? LOG_COMMAND : LOG_ADMIN, source, this, ci) << "to change the description to " << ci->desc;
 			source.Reply(_("Description of %s changed to \002%s\002."), ci->name.c_str(), ci->desc.c_str());
 		}
 		else
 		{
 			ci->desc.clear();
+			Log(source.permission.empty() ? LOG_COMMAND : LOG_ADMIN, source, this, ci) << "to unset the description";
 			source.Reply(_("Description of %s unset."), ci->name.c_str());
 		}
 
@@ -365,7 +369,7 @@ class CommandCSSetFounder : public Command
 			return;
 		}
 
-		Log(!source.permission.empty() ? LOG_ADMIN : LOG_COMMAND, source, this, ci) << "to change the founder from " << (ci->GetFounder() ? ci->GetFounder()->display : "(none)") << " to " << nc->display;
+		Log(source.permission.empty() ? LOG_COMMAND : LOG_ADMIN, source, this, ci) << "to change the founder from " << (ci->GetFounder() ? ci->GetFounder()->display : "(none)") << " to " << nc->display;
 
 		ci->SetFounder(nc);
 
@@ -415,18 +419,18 @@ class CommandCSSetKeepTopic : public Command
 
 		if (params[1].equals_ci("ON"))
 		{
+			Log(source.permission.empty() ? LOG_COMMAND : LOG_ADMIN, source, this, ci) << "to enable keeptopic";
 			ci->ExtendMetadata("KEEPTOPIC");
 			source.Reply(_("Topic retention option for %s is now \002on\002."), ci->name.c_str());
 		}
 		else if (params[1].equals_ci("OFF"))
 		{
+			Log(source.permission.empty() ? LOG_COMMAND : LOG_ADMIN, source, this, ci) << "to disable keeptopic";
 			ci->Shrink("KEEPTOPIC");
 			source.Reply(_("Topic retention option for %s is now \002off\002."), ci->name.c_str());
 		}
 		else
 			this->OnSyntaxError(source, "KEEPTOPIC");
-
-		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &) anope_override
@@ -472,11 +476,13 @@ class CommandCSSetPeace : public Command
 
 		if (params[1].equals_ci("ON"))
 		{
+			Log(source.permission.empty() ? LOG_COMMAND : LOG_ADMIN, source, this, ci) << "to enable peace";
 			ci->ExtendMetadata("PEACE");
 			source.Reply(_("Peace option for %s is now \002on\002."), ci->name.c_str());
 		}
 		else if (params[1].equals_ci("OFF"))
 		{
+			Log(source.permission.empty() ? LOG_COMMAND : LOG_ADMIN, source, this, ci) << "to disable peace";
 			ci->Shrink("PEACE");
 			source.Reply(_("Peace option for %s is now \002off\002."), ci->name.c_str());
 		}
@@ -568,6 +574,7 @@ class CommandCSSetPersist : public Command
 				}
 			}
 
+			Log(source.permission.empty() ? LOG_COMMAND : LOG_ADMIN, source, this, ci) << "to enable persist";
 			source.Reply(_("Channel \002%s\002 is now persistent."), ci->name.c_str());
 		}
 		else if (params[1].equals_ci("OFF"))
@@ -600,6 +607,7 @@ class CommandCSSetPersist : public Command
 				}
 			}
 
+			Log(source.permission.empty() ? LOG_COMMAND : LOG_ADMIN, source, this, ci) << "to disable persist";
 			source.Reply(_("Channel \002%s\002 is no longer persistent."), ci->name.c_str());
 		}
 		else
@@ -666,11 +674,13 @@ class CommandCSSetPrivate : public Command
 
 		if (params[1].equals_ci("ON"))
 		{
+			Log(source.permission.empty() ? LOG_COMMAND : LOG_ADMIN, source, this, ci) << "to enable private";
 			ci->ExtendMetadata("PRIVATE");
 			source.Reply(_("Private option for %s is now \002on\002."), ci->name.c_str());
 		}
 		else if (params[1].equals_ci("OFF"))
 		{
+			Log(source.permission.empty() ? LOG_COMMAND : LOG_ADMIN, source, this, ci) << "to disable private";
 			ci->Shrink("PRIVATE");
 			source.Reply(_("Private option for %s is now \002off\002."), ci->name.c_str());
 		}
@@ -723,18 +733,18 @@ class CommandCSSetRestricted : public Command
 
 		if (params[1].equals_ci("ON"))
 		{
+			Log(source.permission.empty() ? LOG_COMMAND : LOG_ADMIN, source, this, ci) << "to enable restricted";
 			ci->ExtendMetadata("RESTRICTED");
 			source.Reply(_("Restricted access option for %s is now \002on\002."), ci->name.c_str());
 		}
 		else if (params[1].equals_ci("OFF"))
 		{
+			Log(source.permission.empty() ? LOG_COMMAND : LOG_ADMIN, source, this, ci) << "to disable restricted";
 			ci->Shrink("RESTRICTED");
 			source.Reply(_("Restricted access option for %s is now \002off\002."), ci->name.c_str());
 		}
 		else
 			this->OnSyntaxError(source, "RESTRICTED");
-
-		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &) anope_override
@@ -779,18 +789,18 @@ class CommandCSSetSecure : public Command
 
 		if (params[1].equals_ci("ON"))
 		{
+			Log(source.permission.empty() ? LOG_COMMAND : LOG_ADMIN, source, this, ci) << "to enable secure";
 			ci->ExtendMetadata("SECURE");
 			source.Reply(_("Secure option for %s is now \002on\002."), ci->name.c_str());
 		}
 		else if (params[1].equals_ci("OFF"))
 		{
+			Log(source.permission.empty() ? LOG_COMMAND : LOG_ADMIN, source, this, ci) << "to disable secure";
 			ci->Shrink("SECURE");
 			source.Reply(_("Secure option for %s is now \002off\002."), ci->name.c_str());
 		}
 		else
 			this->OnSyntaxError(source, "SECURE");
-
-		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &) anope_override
@@ -837,18 +847,18 @@ class CommandCSSetSecureFounder : public Command
 
 		if (params[1].equals_ci("ON"))
 		{
+			Log(source.permission.empty() ? LOG_COMMAND : LOG_ADMIN, source, this, ci) << "to enable secure founder";
 			ci->ExtendMetadata("SECUREFOUNDER");
 			source.Reply(_("Secure founder option for %s is now \002on\002."), ci->name.c_str());
 		}
 		else if (params[1].equals_ci("OFF"))
 		{
+			Log(source.permission.empty() ? LOG_COMMAND : LOG_ADMIN, source, this, ci) << "to disable secure founder";
 			ci->Shrink("SECUREFOUNDER");
 			source.Reply(_("Secure founder option for %s is now \002off\002."), ci->name.c_str());
 		}
 		else
 			this->OnSyntaxError(source, "SECUREFOUNDER");
-
-		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &) anope_override
@@ -895,18 +905,18 @@ class CommandCSSetSecureOps : public Command
 
 		if (params[1].equals_ci("ON"))
 		{
+			Log(source.permission.empty() ? LOG_COMMAND : LOG_ADMIN, source, this, ci) << "to enable secure ops";
 			ci->ExtendMetadata("SECUREOPS");
 			source.Reply(_("Secure ops option for %s is now \002on\002."), ci->name.c_str());
 		}
 		else if (params[1].equals_ci("OFF"))
 		{
+			Log(source.permission.empty() ? LOG_COMMAND : LOG_ADMIN, source, this, ci) << "to disable secure ops";
 			ci->Shrink("SECUREOPS");
 			source.Reply(_("Secure ops option for %s is now \002off\002."), ci->name.c_str());
 		}
 		else
 			this->OnSyntaxError(source, "SECUREOPS");
-
-		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &) anope_override
@@ -954,6 +964,7 @@ class CommandCSSetSignKick : public Command
 			ci->ExtendMetadata("SIGNKICK");
 			ci->Shrink("SIGNKICK_LEVEL");
 			source.Reply(_("Signed kick option for %s is now \002on\002."), ci->name.c_str());
+			Log(source.permission.empty() ? LOG_COMMAND : LOG_ADMIN, source, this, ci) << "to enable sign kick";
 		}
 		else if (params[1].equals_ci("LEVEL"))
 		{
@@ -961,12 +972,14 @@ class CommandCSSetSignKick : public Command
 			ci->Shrink("SIGNKICK");
 			source.Reply(_("Signed kick option for %s is now \002on\002, but depends of the\n"
 				"level of the user that is using the command."), ci->name.c_str());
+			Log(source.permission.empty() ? LOG_COMMAND : LOG_ADMIN, source, this, ci) << "to enable sign kick level";
 		}
 		else if (params[1].equals_ci("OFF"))
 		{
 			ci->Shrink("SIGNKICK");
 			ci->Shrink("SIGNKICK_LEVEL");
 			source.Reply(_("Signed kick option for %s is now \002off\002."), ci->name.c_str());
+			Log(source.permission.empty() ? LOG_COMMAND : LOG_ADMIN, source, this, ci) << "to disable sign kick";
 		}
 		else
 			this->OnSyntaxError(source, "SIGNKICK");
@@ -1091,11 +1104,13 @@ class CommandCSSASetNoexpire : public Command
 
 		if (params[1].equals_ci("ON"))
 		{
+			Log(LOG_ADMIN, source, this, ci) << "to enable noexpire";
 			ci->ExtendMetadata("NO_EXPIRE");
 			source.Reply(_("Channel %s \002will not\002 expire."), ci->name.c_str());
 		}
 		else if (params[1].equals_ci("OFF"))
 		{
+			Log(LOG_ADMIN, source, this, ci) << "to disable noexpire";
 			ci->Shrink("NO_EXPIRE");
 			source.Reply(_("Channel %s \002will\002 expire."), ci->name.c_str());
 		}

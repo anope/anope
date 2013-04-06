@@ -126,6 +126,8 @@ class CommandNSSetPassword : public Command
 			return;
 		}
 
+		Log(LOG_COMMAND, source, this) << "to change their password";
+
 		Anope::Encrypt(param, source.nc->pass);
 		Anope::string tmp_pass;
 		if (Anope::Decrypt(source.nc->pass, tmp_pass) == 1)
@@ -181,6 +183,8 @@ class CommandNSSASetPassword : public Command
 			return;
 		}
 
+		Log(LOG_ADMIN, source, this) << "to change the password of " << nc->display;
+
 		Anope::Encrypt(params[1], nc->pass);
 		Anope::string tmp_pass;
 		if (Anope::Decrypt(nc->pass, tmp_pass) == 1)
@@ -226,18 +230,18 @@ class CommandNSSetAutoOp : public Command
 
 		if (param.equals_ci("ON"))
 		{
+			Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to enable autoop for " << na->nc->display;
 			nc->ExtendMetadata("AUTOOP");
 			source.Reply(_("Services will from now on set status modes on %s in channels."), nc->display.c_str());
 		}
 		else if (param.equals_ci("OFF"))
 		{
+			Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to disable autoop for " << na->nc->display;
 			nc->Shrink("AUTOOP");
 			source.Reply(_("Services will no longer set status modes on %s in channels."), nc->display.c_str());
 		}
 		else
 			this->OnSyntaxError(source, "AUTOOP");
-
-		return;
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
@@ -308,11 +312,13 @@ class CommandNSSetChanstats : public Command
 
 		if (param.equals_ci("ON"))
 		{
+			Log(na->nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to enable chanstats for " << na->nc->display;
 			na->nc->ExtendMetadata("STATS");
 			source.Reply(_("Chanstat statistics are now enabled for your nick."));
 		}
 		else if (param.equals_ci("OFF"))
 		{
+			Log(na->nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to disable chanstats for " << na->nc->display;
 			na->nc->Shrink("STATS");
 			source.Reply(_("Chanstat statistics are now disabled for your nick."));
 		}
@@ -392,6 +398,8 @@ class CommandNSSetDisplay : public Command
 		FOREACH_RESULT(I_OnSetNickOption, OnSetNickOption(source, this, user_na->nc, param));
 		if (MOD_RESULT == EVENT_STOP)
 			return;
+
+		Log(user_na->nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to change the display of " << user_na->nc->display << " to " << na->nick;
 
 		user_na->nc->SetDisplay(na);
 		source.Reply(NICK_SET_DISPLAY_CHANGED, user_na->nc->display.c_str());
@@ -519,17 +527,17 @@ class CommandNSSetEmail : public Command
 		{
 			if (!param.empty())
 			{
+				Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to change the email of " << nc->display << " to " << param;
 				nc->email = param;
 				source.Reply(_("E-mail address for \002%s\002 changed to \002%s\002."), nc->display.c_str(), param.c_str());
 			}
 			else
 			{
+				Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to unset the email of " << nc->display;
 				nc->email.clear();
 				source.Reply(_("E-mail address for \002%s\002 unset."), nc->display.c_str());
 			}
 		}
-
-		return;
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
@@ -597,11 +605,13 @@ class CommandNSSetGreet : public Command
 
 		if (!param.empty())
 		{
+			Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to change the greet of " << nc->display;
 			nc->greet = param;
 			source.Reply(_("Greet message for \002%s\002 changed to \002%s\002."), nc->display.c_str(), nc->greet.c_str());
 		}
 		else
 		{
+			Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to unset the greet of " << nc->display;
 			nc->greet.clear();
 			source.Reply(_("Greet message for \002%s\002 unset."), nc->display.c_str());
 		}
@@ -710,11 +720,13 @@ class CommandNSSetHide : public Command
 
 		if (arg.equals_ci("ON"))
 		{
+			Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to change hide " << param << " to " << arg << " for " << nc->display;
 			nc->ExtendMetadata(flag);
 			source.Reply(onmsg.c_str(), nc->display.c_str(), Config->NickServ.c_str());
 		}
 		else if (arg.equals_ci("OFF"))
 		{
+			Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to change hide " << param << " to " << arg << " for " << nc->display;
 			nc->Shrink(flag);
 			source.Reply(offmsg.c_str(), nc->display.c_str(), Config->NickServ.c_str());
 		}
@@ -808,6 +820,7 @@ class CommandNSSetKill : public Command
 			nc->ExtendMetadata("KILLPROTECT");
 			nc->Shrink("KILL_QUICK");
 			nc->Shrink("KILL_IMMED");
+			Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to set kill on for " << nc->display;
 			source.Reply(_("Protection is now \002on\002 for \002%s\002."), nc->display.c_str());
 		}
 		else if (param.equals_ci("QUICK"))
@@ -815,6 +828,7 @@ class CommandNSSetKill : public Command
 			nc->ExtendMetadata("KILLPROTECT");
 			nc->ExtendMetadata("KILL_QUICK");
 			nc->Shrink("KILL_IMMED");
+			Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to set kill quick for " << nc->display;
 			source.Reply(_("Protection is now \002on\002 for \002%s\002, with a reduced delay."), nc->display.c_str());
 		}
 		else if (param.equals_ci("IMMED"))
@@ -824,6 +838,7 @@ class CommandNSSetKill : public Command
 				nc->ExtendMetadata("KILLPROTECT");
 				nc->ExtendMetadata("KILL_IMMED");
 				nc->Shrink("KILL_QUICK");
+				Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to set kill immed for " << nc->display;
 				source.Reply(_("Protection is now \002on\002 for \002%s\002, with no delay."), nc->display.c_str());
 			}
 			else
@@ -834,6 +849,7 @@ class CommandNSSetKill : public Command
 			nc->Shrink("KILLPROTECT");
 			nc->Shrink("KILL_QUICK");
 			nc->Shrink("KILL_IMMED");
+			Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to disable kill for " << nc->display;
 			source.Reply(_("Protection is now \002off\002 for \002%s\002."), nc->display.c_str());
 		}
 		else
@@ -936,6 +952,8 @@ class CommandNSSetLanguage : public Command
 			}
 		}
 
+		Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to change the langauge of " << nc->display << " to " << param;
+
 		nc->language = param != "en" ? param : "";
 		source.Reply(_("Language changed to \002English\002."));
 
@@ -1035,11 +1053,13 @@ class CommandNSSetMessage : public Command
 
 		if (param.equals_ci("ON"))
 		{
+			Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to enable " << source.command << " for " << nc->display;
 			nc->ExtendMetadata("MSG");
 			source.Reply(_("Services will now reply to \002%s\002 with \002messages\002."), nc->display.c_str());
 		}
 		else if (param.equals_ci("OFF"))
 		{
+			Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to disable " << source.command << " for " << nc->display;
 			nc->Shrink("MSG");
 			source.Reply(_("Services will now reply to \002%s\002 with \002notices\002."), nc->display.c_str());
 		}
@@ -1122,11 +1142,13 @@ class CommandNSSetPrivate : public Command
 
 		if (param.equals_ci("ON"))
 		{
+			Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to enable private for " << nc->display;
 			nc->ExtendMetadata("PRIVATE");
 			source.Reply(_("Private option is now \002on\002 for \002%s\002."), nc->display.c_str());
 		}
 		else if (param.equals_ci("OFF"))
 		{
+			Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to disable private for " << nc->display;
 			nc->Shrink("PRIVATE");
 			source.Reply(_("Private option is now \002off\002 for \002%s\002."), nc->display.c_str());
 		}
@@ -1209,11 +1231,13 @@ class CommandNSSetSecure : public Command
 
 		if (param.equals_ci("ON"))
 		{
+			Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to enable secure for " << nc->display;
 			nc->ExtendMetadata("SECURE");
 			source.Reply(_("Secure option is now \002on\002 for \002%s\002."), nc->display.c_str());
 		}
 		else if (param.equals_ci("OFF"))
 		{
+			Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to disable secure for " << nc->display;
 			nc->Shrink("SECURE");
 			source.Reply(_("Secure option is now \002off\002 for \002%s\002."), nc->display.c_str());
 		}
@@ -1292,18 +1316,18 @@ class CommandNSSASetNoexpire : public Command
 
 		if (param.equals_ci("ON"))
 		{
+			Log(LOG_ADMIN, source, this) << "to enable noexpire " << na->nc->display;
 			na->ExtendMetadata("NO_EXPIRE");
 			source.Reply(_("Nick %s \002will not\002 expire."), na->nick.c_str());
 		}
 		else if (param.equals_ci("OFF"))
 		{
+			Log(LOG_ADMIN, source, this) << "to disable noexpire " << na->nc->display;
 			na->Shrink("NO_EXPIRE");
 			source.Reply(_("Nick %s \002will\002 expire."), na->nick.c_str());
 		}
 		else
 			this->OnSyntaxError(source, "NOEXPIRE");
-
-		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &) anope_override

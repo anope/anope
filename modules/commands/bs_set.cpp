@@ -105,6 +105,10 @@ class CommandBSSetBanExpire : public Command
 		}
 
 		ci->banexpire = Anope::DoTime(arg);
+
+		bool override = !access.HasPriv("SET");
+		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to change banexpire to " << ci->banexpire;
+
 		if (!ci->banexpire)
 			source.Reply(_("Bot bans will no longer automatically expire."));
 		else
@@ -404,8 +408,7 @@ class CommandBSSetNoBot : public Command
 
 		if (value.equals_ci("ON"))
 		{
-			bool override = !source.AccessFor(ci).HasPriv("SET");
-			Log(override ? LOG_ADMIN : LOG_COMMAND, source, this, ci) << "to enable nobot"; 
+			Log(LOG_ADMIN, source, this, ci) << "to enable nobot"; 
 
 			ci->ExtendMetadata("BS_NOBOT");
 			if (ci->bi)
@@ -414,8 +417,7 @@ class CommandBSSetNoBot : public Command
 		}
 		else if (value.equals_ci("OFF"))
 		{
-			bool override = !source.AccessFor(ci).HasPriv("SET");
-			Log(override ? LOG_ADMIN : LOG_COMMAND, source, this, ci) << "to disable nobot"; 
+			Log(LOG_ADMIN, source, this, ci) << "to disable nobot"; 
 
 			ci->Shrink("BS_NOBOT");
 			source.Reply(_("No-bot mode is now \002off\002 on channel %s."), ci->name.c_str());

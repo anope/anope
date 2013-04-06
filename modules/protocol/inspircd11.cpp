@@ -401,7 +401,7 @@ struct IRCDMessageCapab : Message::Capab
 								ModeManager::AddChannelMode(new ChannelModeList("INVITEOVERRIDE", 'I'));
 								continue;
 							default:
-								ModeManager::AddChannelMode(new ChannelModeList("END", modebuf[t]));
+								ModeManager::AddChannelMode(new ChannelModeList("", modebuf[t]));
 						}
 					}
 
@@ -414,7 +414,7 @@ struct IRCDMessageCapab : Message::Capab
 								ModeManager::AddChannelMode(new ChannelModeKey('k'));
 								continue;
 							default:
-								ModeManager::AddChannelMode(new ChannelModeParam("END", modebuf[t]));
+								ModeManager::AddChannelMode(new ChannelModeParam("", modebuf[t]));
 						}
 					}
 
@@ -433,7 +433,7 @@ struct IRCDMessageCapab : Message::Capab
 								ModeManager::AddChannelMode(new ChannelModeParam("REDIRECT", 'L', true));
 								continue;
 							default:
-								ModeManager::AddChannelMode(new ChannelModeParam("END", modebuf[t], true));
+								ModeManager::AddChannelMode(new ChannelModeParam("", modebuf[t], true));
 						}
 					}
 
@@ -503,7 +503,7 @@ struct IRCDMessageCapab : Message::Capab
 								ModeManager::AddChannelMode(new ChannelMode("NOINVITE", 'V'));
 								continue;
 							default:
-								ModeManager::AddChannelMode(new ChannelMode("END", modebuf[t]));
+								ModeManager::AddChannelMode(new ChannelMode("", modebuf[t]));
 						}
 					}
 				}
@@ -533,7 +533,7 @@ struct IRCDMessageCapab : Message::Capab
 								ModeManager::AddChannelMode(new ChannelModeStatus("VOICE", 'v', '+', level--));
 								continue;
 							default:
-								ModeManager::AddChannelMode(new ChannelModeStatus("END", modes[t], chars[t], level--));
+								ModeManager::AddChannelMode(new ChannelModeStatus("", modes[t], chars[t], level--));
 						}
 					}
 				}

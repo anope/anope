@@ -286,7 +286,7 @@ struct IRCDMessageCapab : Message::Capab
 					cm = new ChannelModeStatus("VOICE", modechar.length() > 1 ? modechar[1] : modechar[0], modechar.length() > 1 ? modechar[0] : 0);
 				/* Unknown status mode, (customprefix) - add it */
 				else if (modechar.length() == 2)
-					cm = new ChannelModeStatus("END", modechar[1], modechar[0]);
+					cm = new ChannelModeStatus("", modechar[1], modechar[0]);
 				/* else don't do anything here, we will get it in CAPAB CAPABILITIES */
 
 				if (cm)
@@ -403,7 +403,7 @@ struct IRCDMessageCapab : Message::Capab
 					{
 						if (ModeManager::FindChannelModeByChar(modebuf[t]))
 							continue;
-						ModeManager::AddChannelMode(new ChannelModeList("END", modebuf[t]));
+						ModeManager::AddChannelMode(new ChannelModeList("", modebuf[t]));
 					}
 
 					sep.GetToken(modebuf);
@@ -411,7 +411,7 @@ struct IRCDMessageCapab : Message::Capab
 					{
 						if (ModeManager::FindChannelModeByChar(modebuf[t]))
 							continue;
-						ModeManager::AddChannelMode(new ChannelModeParam("END", modebuf[t]));
+						ModeManager::AddChannelMode(new ChannelModeParam("", modebuf[t]));
 					}
 
 					sep.GetToken(modebuf);
@@ -419,7 +419,7 @@ struct IRCDMessageCapab : Message::Capab
 					{
 						if (ModeManager::FindChannelModeByChar(modebuf[t]))
 							continue;
-						ModeManager::AddChannelMode(new ChannelModeParam("END", true));
+						ModeManager::AddChannelMode(new ChannelModeParam("", modebuf[t], true));
 					}
 
 					sep.GetToken(modebuf);
@@ -427,7 +427,7 @@ struct IRCDMessageCapab : Message::Capab
 					{
 						if (ModeManager::FindChannelModeByChar(modebuf[t]))
 							continue;
-						ModeManager::AddChannelMode(new ChannelMode("END", modebuf[t]));
+						ModeManager::AddChannelMode(new ChannelMode("", modebuf[t]));
 					}
 				}
 				else if (capab.find("USERMODES") != Anope::string::npos)
@@ -441,11 +441,11 @@ struct IRCDMessageCapab : Message::Capab
 
 					if (sep.GetToken(modebuf))
 						for (size_t t = 0, end = modebuf.length(); t < end; ++t)
-							ModeManager::AddUserMode(new UserModeParam("END", modebuf[t]));
+							ModeManager::AddUserMode(new UserModeParam("", modebuf[t]));
 
 					if (sep.GetToken(modebuf))
 						for (size_t t = 0, end = modebuf.length(); t < end; ++t)
-							ModeManager::AddUserMode(new UserMode("END", modebuf[t]));
+							ModeManager::AddUserMode(new UserMode("", modebuf[t]));
 				}
 				else if (capab.find("MAXMODES=") != Anope::string::npos)
 				{

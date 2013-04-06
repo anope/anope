@@ -538,7 +538,7 @@ struct IRCDMessageCapab : Message::Capab
 							ModeManager::AddChannelMode(new UnrealExtBan("INVITEOVERRIDE", 'I'));
 							continue;
 						default:
-							ModeManager::AddChannelMode(new ChannelModeList("END", modebuf[t]));
+							ModeManager::AddChannelMode(new ChannelModeList("", modebuf[t]));
 					}
 				}
 
@@ -557,7 +557,7 @@ struct IRCDMessageCapab : Message::Capab
 							ModeManager::AddChannelMode(new ChannelModeParam("REDIRECT", 'L'));
 							continue;
 						default:
-							ModeManager::AddChannelMode(new ChannelModeParam("END", modebuf[t]));
+							ModeManager::AddChannelMode(new ChannelModeParam("", modebuf[t]));
 					}
 				}
 
@@ -573,7 +573,7 @@ struct IRCDMessageCapab : Message::Capab
 							ModeManager::AddChannelMode(new ChannelModeParam("JOINFLOOD", 'j', true));
 							continue;
 						default:
-							ModeManager::AddChannelMode(new ChannelModeParam("END", modebuf[t], true));
+							ModeManager::AddChannelMode(new ChannelModeParam("", modebuf[t], true));
 					}
 				}
 
@@ -649,10 +649,10 @@ struct IRCDMessageCapab : Message::Capab
 							ModeManager::AddChannelMode(new ChannelMode("FILTER", 'G'));
 							continue;
 						case 'Z':
-							ModeManager::AddChannelMode(new ChannelModeUnrealSSL("END", 'Z'));
+							ModeManager::AddChannelMode(new ChannelModeUnrealSSL("", 'Z'));
 							continue;
 						default:
-							ModeManager::AddChannelMode(new ChannelMode("END", modebuf[t]));
+							ModeManager::AddChannelMode(new ChannelMode("", modebuf[t]));
 					}
 				}
 			}

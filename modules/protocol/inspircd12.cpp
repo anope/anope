@@ -498,7 +498,7 @@ struct IRCDMessageCapab : Message::Capab
 								ModeManager::AddChannelMode(new ChannelModeStatus("PROTECT" , 'a', '@'));
 								continue;
 							default:
-								ModeManager::AddChannelMode(new ChannelModeList("END", modebuf[t]));
+								ModeManager::AddChannelMode(new ChannelModeList("", modebuf[t]));
 						}
 					}
 
@@ -511,7 +511,7 @@ struct IRCDMessageCapab : Message::Capab
 								ModeManager::AddChannelMode(new ChannelModeKey('k'));
 								continue;
 							default:
-								ModeManager::AddChannelMode(new ChannelModeParam("END", modebuf[t]));
+								ModeManager::AddChannelMode(new ChannelModeParam("", modebuf[t]));
 						}
 					}
 
@@ -539,7 +539,7 @@ struct IRCDMessageCapab : Message::Capab
 								ModeManager::AddChannelMode(new ChannelModeParam("LIMIT", 'l', true));
 								continue;
 							default:
-								ModeManager::AddChannelMode(new ChannelModeParam("END", modebuf[t], true));
+								ModeManager::AddChannelMode(new ChannelModeParam("", modebuf[t], true));
 						}
 					}
 
@@ -621,7 +621,7 @@ struct IRCDMessageCapab : Message::Capab
 								ModeManager::AddChannelMode(new ChannelMode("SSL", 'z'));
 								continue;
 							default:
-								ModeManager::AddChannelMode(new ChannelMode("END", modebuf[t]));
+								ModeManager::AddChannelMode(new ChannelMode("", modebuf[t]));
 						}
 					}
 				}
@@ -692,7 +692,7 @@ struct IRCDMessageCapab : Message::Capab
 									ModeManager::AddUserMode(new UserMode("DEAF", 'd'));
 									continue;
 								default:
-									ModeManager::AddUserMode(new UserMode("END", modebuf[t]));
+									ModeManager::AddUserMode(new UserMode("", modebuf[t]));
 							}
 						}
 					}
@@ -723,7 +723,7 @@ struct IRCDMessageCapab : Message::Capab
 								ModeManager::AddChannelMode(new ChannelModeStatus("VOICE", 'v', chars[t], level--));
 								continue;
 							default:
-								ModeManager::AddChannelMode(new ChannelModeStatus("END", modes[t], chars[t], level--));
+								ModeManager::AddChannelMode(new ChannelModeStatus("", modes[t], chars[t], level--));
 						}
 					}
 				}

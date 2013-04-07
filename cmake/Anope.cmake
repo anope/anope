@@ -359,12 +359,12 @@ macro(find_includes SRC INCLUDES)
 endmacro(find_includes)
 
 ###############################################################################
-# calculate_depends(<source filename> <output variable set to TRUE on fail> <TRUE to output error messages> [<optional output variable for includes>])
+# calculate_depends(<source filename> <output variable set to TRUE on fail> <TRUE if the source file is a module> [<optional output variable for includes>])
 #
 # This macro is used in most of the src (sub)directories to calculate the
 #   header file dependencies for the given source file.
 ###############################################################################
-macro(calculate_depends SRC SKIP VERBOSE)
+macro(calculate_depends SRC SKIP MODULE)
   # Temporarily set that we didn't get a 3rd argument before we actually check if we did get one or not
   set(CHECK_ANGLE_INCLUDES FALSE)
   # Check for a third argument
@@ -409,9 +409,11 @@ macro(calculate_depends SRC SKIP VERBOSE)
           endif(FOUND_IN_DEFAULTS EQUAL -1)
         else(FOUND_${FILENAME}_INCLUDE)
           set(${SKIP} TRUE)
-          if(VERBOSE)
-            message("${SRC} needs header file ${FILENAME} but we were unable to locate that header file! Check that the header file is within the search path of your OS.")
-          endif(VERBOSE)
+          if(NOT ${MODULE})
+            message(FATAL_ERROR "${SRC} needs header file ${FILENAME} but we were unable to locate that header file! Check that the header file is within the search path of your OS.")
+          else(NOT ${MODULE})
+            message("  ${SRC} can not be built due to missing dependencies - requires header file ${FILENAME}")
+          endif(NOT ${MODULE})
         endif(FOUND_${FILENAME}_INCLUDE)
       endif(CHECK_ANGLE_INCLUDES)
     endif(QUOTE_TYPE STREQUAL "angle brackets")
@@ -419,12 +421,12 @@ macro(calculate_depends SRC SKIP VERBOSE)
 endmacro(calculate_depends)
 
 ###############################################################################
-# calculate_libraries(<source filename> <output variable set to TRUE on fail> <TRUE to output error messages> <output variable for linker flags> <output variable for extra depends>)
+# calculate_libraries(<source filename> <output variable set to TRUE on fail> <TRUE if the source file is a module> <output variable for linker flags> <output variable for extra depends>)
 #
 # This macro is used in most of the module (sub)directories to calculate the
 #   library dependencies for the given source file.
 ###############################################################################
-macro(calculate_libraries SRC SKIP VERBOSE SRC_LDFLAGS EXTRA_DEPENDS)
+macro(calculate_libraries SRC SKIP MODULE SRC_LDFLAGS EXTRA_DEPENDS)
   # Set up a temporary LDFLAGS for this file
   set(THIS_LDFLAGS "${LDFLAGS}")
   # Reset extra dependencies
@@ -466,10 +468,12 @@ macro(calculate_libraries SRC SKIP VERBOSE SRC_LDFLAGS EXTRA_DEPENDS)
       else(FOUND_${LIBRARY}_LIBRARY)
         # Skip this file
         set(${SKIP} TRUE)
-        if(VERBOSE)
+        if(NOT ${MODULE})
           # In the case of the library not being found, we fatally error so CMake stops trying to generate
           message(FATAL_ERROR "${SRC} needs library ${LIBRARY} but we were unable to locate that library! Check that the library is within the search path of your OS.")
-        endif(VERBOSE)
+        else(NOT ${MODULE})
+            message("  ${SRC} can not be built due to missing dependencies - requires library ${LIBRARY}")
+        endif(NOT ${MODULE})
       endif(FOUND_${LIBRARY}_LIBRARY)
     endforeach(LIBRARY)
   endforeach(REQUIRED_LIBRARY)

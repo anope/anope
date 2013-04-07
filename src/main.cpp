@@ -117,10 +117,10 @@ int main(int ac, char **av, char **envp)
 #endif
 	Anope::ServicesDir = BinaryDir.substr(0, n);
 
+#ifdef _WIN32
 	/* Clean out the module runtime directory prior to running, just in case files were left behind during a previous run */
 	ModuleManager::CleanupRuntimeDirectory();
 
-#ifdef _WIN32
 	OnStartup();
 #endif
 
@@ -187,9 +187,9 @@ int main(int ac, char **av, char **envp)
 	for (Module *m; (m = ModuleManager::FindFirstOf(PROTOCOL)) != NULL;)
 		ModuleManager::UnloadModule(m, NULL);
 
+#ifdef _WIN32
 	ModuleManager::CleanupRuntimeDirectory();
 
-#ifdef _WIN32
 	OnShutdown();
 #endif
 

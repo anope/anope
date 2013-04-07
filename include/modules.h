@@ -1032,9 +1032,11 @@ class CoreExport ModuleManager
 	 */
 	static std::vector<Module *> EventHandlers[I_END];
 
+#ifdef _WIN32
 	/** Clean up the module runtime directory
 	 */
 	static void CleanupRuntimeDirectory();
+#endif
 
 	/** Loads a given module.
 	 * @param m the module to load

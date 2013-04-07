@@ -23,6 +23,7 @@
 std::list<Module *> ModuleManager::Modules;
 std::vector<Module *> ModuleManager::EventHandlers[I_END];
 
+#ifdef _WIN32
 void ModuleManager::CleanupRuntimeDirectory()
 {
 	Anope::string dirbuf = Anope::DataDir + "/runtime";
@@ -108,6 +109,7 @@ static ModuleReturn moduleCopyFile(const Anope::string &name, Anope::string &out
 
 	return !source.fail() && !target.fail() ? MOD_ERR_OK : MOD_ERR_FILE_IO;
 }
+#endif
 
 /* This code was found online at http://www.linuxjournal.com/article/3687#comment-26593
  *
@@ -133,8 +135,9 @@ ModuleReturn ModuleManager::LoadModule(const Anope::string &modname, User *u)
 	if (FindModule(modname))
 		return MOD_ERR_EXISTS;
 
-	Log(LOG_DEBUG) << "trying to load [" << modname <<  "]";
+	Log(LOG_DEBUG) << "Trying to load module: " << modname;
 
+#ifdef _WIN32
 	/* Generate the filename for the temporary copy of the module */
 	Anope::string pbuf = Anope::DataDir + "/runtime/" + modname + ".so.XXXXXX";
 
@@ -148,6 +151,9 @@ ModuleReturn ModuleManager::LoadModule(const Anope::string &modname, User *u)
 			Log(LOG_TERMINAL) << "Error while loading " << modname << " (file IO error, check file permissions and diskspace)";
 		return ret;
 	}
+#else
+	Anope::string pbuf = Anope::ModuleDir + "/modules/" + modname + ".so";
+#endif
 
 	dlerror();
 	void *handle = dlopen(pbuf.c_str(), RTLD_NOW);
@@ -219,7 +225,7 @@ ModuleReturn ModuleManager::LoadModule(const Anope::string &modname, User *u)
 	else
 		Log(LOG_DEBUG_2) << "Module " << modname << " is compiled against current version of Anope " << Anope::VersionShort();
 
-	Log(LOG_DEBUG) << "Module loaded.";
+	Log(LOG_DEBUG) << "Module " << modname << " loaded.";
 	FOREACH_MOD(I_OnModuleLoad, OnModuleLoad(u, m));
 
 	return MOD_ERR_OK;
@@ -309,8 +315,10 @@ ModuleReturn ModuleManager::DeleteModule(Module *m)
 	if (dlclose(handle))
 		Log() << dlerror();
 
+#ifdef _WIN32
 	if (!filename.empty())
 		unlink(filename.c_str());
+#endif
 	
 	return MOD_ERR_OK;
 }

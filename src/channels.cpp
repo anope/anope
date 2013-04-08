@@ -400,7 +400,7 @@ void Channel::RemoveModeInternal(MessageSource &setter, ChannelMode *cm, const A
 
 		FOREACH_RESULT(I_OnChannelModeUnset, OnChannelModeUnset(this, setter, cm->name, param));
 
-		if (enforce_mlock)
+		if (enforce_mlock && MOD_RESULT != EVENT_STOP)
 		{
 			/* Reset modes on bots if we're supposed to */
 			if (this->ci && this->ci->bi && this->ci->bi == bi)
@@ -730,10 +730,11 @@ void Channel::SetModesInternal(MessageSource &source, const Anope::string &mode,
 			else
 				paramstring += " " + token;
 
+			/* CheckModes below doesn't check secureops (+ the module event) */
 			if (add)
-				this->SetModeInternal(source, cm, token, false);
+				this->SetModeInternal(source, cm, token, enforce_mlock);
 			else
-				this->RemoveModeInternal(source, cm, token, false);
+				this->RemoveModeInternal(source, cm, token, enforce_mlock);
 		}
 		else
 			Log() << "warning: Channel::SetModesInternal() recieved more modes requiring params than params, modes: " << mode;

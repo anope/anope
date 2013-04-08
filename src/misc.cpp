@@ -406,7 +406,7 @@ bool Anope::Match(const Anope::string &str, const Anope::string &mask, bool case
 		}
 		else
 		{
-			if (tolower(wild) != tolower(string) && wild != '?')
+			if (Anope::tolower(wild) != Anope::tolower(string) && wild != '?')
 				return false;
 		}
 
@@ -441,7 +441,7 @@ bool Anope::Match(const Anope::string &str, const Anope::string &mask, bool case
 		}
 		else
 		{
-			if (tolower(wild) == tolower(string) || wild == '?')
+			if (Anope::tolower(wild) == Anope::tolower(string) || wild == '?')
 			{
 				++m;
 				++s;
@@ -529,7 +529,7 @@ void Anope::Unhex(const Anope::string &src, Anope::string &dest)
 	Anope::string rv;
 	for (size_t i = 0; i + 1 < len; i += 2)
 	{
-		char h = std::tolower(src[i], Anope::casemap), l = std::tolower(src[i + 1], Anope::casemap);
+		char h = Anope::tolower(src[i]), l = Anope::tolower(src[i + 1]);
 		unsigned char byte = (h >= 'a' ? h - 'a' + 10 : h - '0') << 4;
 		byte += (l >= 'a' ? l - 'a' + 10 : l - '0');
 		rv += byte;

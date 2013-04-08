@@ -80,16 +80,14 @@ class InspIRCdProto : public IRCDProto
 			return;
 
 		/* ZLine if we can instead */
-		try
-		{
-			if (x->GetUser() == "*")
+		if (x->GetUser() == "*" && x->GetHost().find_first_not_of("0123456789:.") == Anope::string::npos)
+			try
 			{
 				sockaddrs(x->GetHost());
 				IRCD->SendSZLineDel(x);
 				return;
 			}
-		}
-		catch (const SocketException &) { }
+			catch (const SocketException &) { }
 
 		UplinkSocket::Message(OperServ) << "GLINE " << x->mask;
 	}
@@ -136,16 +134,14 @@ class InspIRCdProto : public IRCDProto
 		}
 
 		/* ZLine if we can instead */
-		try
-		{
-			if (x->GetUser() == "*")
+		if (x->GetUser() == "*" && x->GetHost().find_first_not_of("0123456789:.") == Anope::string::npos)
+			try
 			{
 				sockaddrs(x->GetHost());
 				IRCD->SendSZLine(u, x);
 				return;
 			}
-		}
-		catch (const SocketException &) { }
+			catch (const SocketException &) { }
 
 		// Calculate the time left before this would expire, capping it at 2 days
 		time_t timeleft = x->expires - Anope::CurTime;
@@ -203,7 +199,7 @@ class InspIRCdProto : public IRCDProto
 	}
 
 	/* JOIN */
-	void SendJoin(const User *user, Channel *c, const ChannelStatus *status) anope_override
+	void SendJoin(User *user, Channel *c, const ChannelStatus *status) anope_override
 	{
 		UplinkSocket::Message(user) << "JOIN " << c->name << " " << c->creation_time;
 		if (status)
@@ -215,12 +211,11 @@ class InspIRCdProto : public IRCDProto
 			 */
 			ChanUserContainer *uc = c->FindUser(user);
 			if (uc != NULL)
-				uc->status.modes.clear();
+				uc->status.Clear();
 
 			BotInfo *setter = BotInfo::Find(user->nick);
-			for (unsigned i = 0; i < ModeManager::ChannelModes.size(); ++i)
-				if (cs.modes.count(ModeManager::ChannelModes[i]->name))
-					c->SetMode(setter, ModeManager::ChannelModes[i], user->GetUID(), false);
+			for (size_t i = 0; i < cs.Modes().length(); ++i)
+				c->SetMode(setter, ModeManager::FindChannelModeByChar(cs.Modes()[i]), user->GetUID(), false);
 		}
 	}
 
@@ -653,7 +648,7 @@ struct IRCDMessageFJoin : IRCDMessage
 					continue;
 				}
 
-				sju.first.modes.insert(cm->name);
+				sju.first.AddMode(cm->mchar);
 			}
 			/* Erase the , */
 			buf.erase(buf.begin());

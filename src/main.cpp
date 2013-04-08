@@ -106,6 +106,9 @@ static Anope::string GetFullProgDir(const Anope::string &argv0)
 
 int main(int ac, char **av, char **envp)
 {
+	/* String comparisons won't work until we build the case map cache, so do it first */
+	Anope::CaseMapRebuild();
+
 	BinaryDir = GetFullProgDir(av[0]);
 	if (BinaryDir[BinaryDir.length() - 1] == '.')
 		BinaryDir = BinaryDir.substr(0, BinaryDir.length() - 2);

@@ -599,7 +599,7 @@ class CommandOSSQLine : public CommandOSSXLineBase
 					std::vector<User *> users;
 					for (Channel::ChanUserList::iterator it = c->users.begin(), it_end = c->users.end(); it != it_end; ++it)
 					{
-						ChanUserContainer *uc = *it;
+						ChanUserContainer *uc = it->second;
 						User *user = uc->user;
 
 						if (!user->HasMode("OPER") && user->server != Me)

@@ -253,9 +253,11 @@ class CommandCSMode : public Command
 				case '*':
 					if (adding == -1 || !has_access)
 						break;
-					for (unsigned j = 0; j < ModeManager::ChannelModes.size(); ++j)
+					for (unsigned j = 0; j < ModeManager::GetChannelModes().size(); ++j)
 					{
-						ChannelMode *cm = ModeManager::ChannelModes[j];
+						ChannelMode *cm = ModeManager::GetChannelModes()[j];
+						if (!cm)
+							continue;
 						if (!u || cm->CanSet(u))
 						{
 							if (cm->type == MODE_REGULAR || (!adding && cm->type == MODE_PARAM))
@@ -309,9 +311,10 @@ class CommandCSMode : public Command
 									break;
 								}
 
-								for (Channel::ChanUserList::const_iterator it = ci->c->users.begin(), it_end = ci->c->users.end(); it != it_end; ++it)
+								for (Channel::ChanUserList::const_iterator it = ci->c->users.begin(), it_end = ci->c->users.end(); it != it_end;)
 								{
-									ChanUserContainer *uc = *it;
+									ChanUserContainer *uc = it->second;
+									++it;
 
 									AccessGroup targ_access = ci->AccessFor(uc->user);
 

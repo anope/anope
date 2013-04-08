@@ -30,7 +30,7 @@ class CommandCSUp : public Command
 				return;
 			for (User::ChanUserList::iterator it = source.GetUser()->chans.begin(); it != source.GetUser()->chans.end(); ++it)
 			{
-				Channel *c = (*it)->chan;
+				Channel *c = it->second->chan;
 				c->SetCorrectModes(source.GetUser(), true, false);
 			}
 		}
@@ -87,13 +87,10 @@ class CommandCSDown : public Command
 {
 	void RemoveAll(User *u, Channel *c)
 	{
-		for (unsigned i = 0; i < ModeManager::ChannelModes.size(); ++i)
-		{
-			ChannelMode *cm = ModeManager::ChannelModes[i];
-
-			if (cm != NULL && cm->type == MODE_STATUS)
-				c->RemoveMode(NULL, cm, u->nick);
-		}
+		ChanUserContainer *cu = c->FindUser(u);
+		if (cu != NULL)
+			for (size_t i = 0; i < cu->status.Modes().length(); ++i)
+				c->RemoveMode(NULL, ModeManager::FindChannelModeByChar(cu->status.Modes()[i]), u->GetUID());
 	}
 
  public:
@@ -111,7 +108,7 @@ class CommandCSDown : public Command
 				return;
 			for (User::ChanUserList::iterator it = source.GetUser()->chans.begin(); it != source.GetUser()->chans.end(); ++it)
 			{
-				Channel *c = (*it)->chan;
+				Channel *c = it->second->chan;
 				RemoveAll(source.GetUser(), c);
 			}
 		}

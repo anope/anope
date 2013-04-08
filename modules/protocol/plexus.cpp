@@ -48,7 +48,7 @@ class PlexusProto : public IRCDProto
 	void SendSVSHold(const Anope::string &nick) anope_override { hybrid->SendSVSHold(nick); }
 	void SendSVSHoldDel(const Anope::string &nick) anope_override { hybrid->SendSVSHoldDel(nick); }
 
-	void SendJoin(const User *user, Channel *c, const ChannelStatus *status) anope_override
+	void SendJoin(User *user, Channel *c, const ChannelStatus *status) anope_override
 	{
 		UplinkSocket::Message(Me) << "SJOIN " << c->creation_time << " " << c->name << " +" << c->GetModes(true, true) << " :" << user->GetUID();
 		if (status)
@@ -60,12 +60,11 @@ class PlexusProto : public IRCDProto
 			 */
 			ChanUserContainer *uc = c->FindUser(user);
 			if (uc != NULL)
-				uc->status.modes.clear();
+				uc->status.Clear();
 
 			BotInfo *setter = BotInfo::Find(user->nick);
-			for (unsigned i = 0; i < ModeManager::ChannelModes.size(); ++i)
-				if (cs.modes.count(ModeManager::ChannelModes[i]->name))
-					c->SetMode(setter, ModeManager::ChannelModes[i], user->GetUID(), false);
+			for (size_t i = 0; i < cs.Modes().length(); ++i)
+				c->SetMode(setter, ModeManager::FindChannelModeByChar(cs.Modes()[i]), user->GetUID(), false);
 		}
 	}
 

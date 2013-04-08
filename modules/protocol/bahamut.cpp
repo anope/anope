@@ -143,16 +143,14 @@ class BahamutIRCdProto : public IRCDProto
 			return;
 
 		/* ZLine if we can instead */
-		try
-		{
-			if (x->GetUser() == "*")
+		if (x->GetUser() == "*" && x->GetHost().find_first_not_of("0123456789:.") == Anope::string::npos)
+			try
 			{
 				sockaddrs(x->GetHost());
 				IRCD->SendSZLineDel(x);
 				return;
 			}
-		}
-		catch (const SocketException &) { }
+			catch (const SocketException &) { }
 
 		UplinkSocket::Message() << "RAKILL " << x->GetHost() << " " << x->GetUser();
 	}
@@ -170,7 +168,7 @@ class BahamutIRCdProto : public IRCDProto
 	}
 
 	/* JOIN - SJOIN */
-	void SendJoin(const User *user, Channel *c, const ChannelStatus *status) anope_override
+	void SendJoin(User *user, Channel *c, const ChannelStatus *status) anope_override
 	{
 		UplinkSocket::Message(user) << "SJOIN " << c->creation_time << " " << c->name;
 		if (status)
@@ -182,12 +180,11 @@ class BahamutIRCdProto : public IRCDProto
 			 */
 			ChanUserContainer *uc = c->FindUser(user);
 			if (uc != NULL)
-				uc->status.modes.clear();
+				uc->status.Clear();
 
 			BotInfo *setter = BotInfo::Find(user->nick);
-			for (unsigned i = 0; i < ModeManager::ChannelModes.size(); ++i)
-				if (cs.modes.count(ModeManager::ChannelModes[i]->name))
-					c->SetMode(setter, ModeManager::ChannelModes[i], user->GetUID(), false);
+			for (size_t i = 0; i < cs.Modes().length(); ++i)
+				c->SetMode(setter, ModeManager::FindChannelModeByChar(cs.Modes()[i]), user->GetUID(), false);
 		}
 	}
 
@@ -217,16 +214,14 @@ class BahamutIRCdProto : public IRCDProto
 		}
 
 		/* ZLine if we can instead */
-		try
-		{
-			if (x->GetUser() == "*")
+		if (x->GetUser() == "*" && x->GetHost().find_first_not_of("0123456789:.") == Anope::string::npos)
+			try
 			{
 				sockaddrs(x->GetHost());
 				IRCD->SendSZLine(u, x);
 				return;
 			}
-		}
-		catch (const SocketException &) { }
+			catch (const SocketException &) { }
 
 		// Calculate the time left before this would expire, capping it at 2 days
 		time_t timeleft = x->expires - Anope::CurTime;
@@ -448,14 +443,7 @@ struct IRCDMessageSJoin : IRCDMessage
 				for (char ch; (ch = ModeManager::GetStatusChar(buf[0]));)
 				{
 					buf.erase(buf.begin());
-					ChannelMode *cm = ModeManager::FindChannelModeByChar(ch);
-					if (!cm)
-					{
-						Log() << "Received unknown mode prefix " << cm << " in SJOIN string";
-						continue;
-					}
-
-					sju.first.modes.insert(cm->name);
+					sju.first.AddMode(ch);
 				}
 
 				sju.second = User::Find(buf);

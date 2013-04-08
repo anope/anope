@@ -35,19 +35,7 @@ class SGLineManager : public XLineManager
 
 	void SendDel(XLine *x) anope_override
 	{
-		try
-		{
-			if (!IRCD->CanSZLine)
-				throw SocketException("SZLine is not supported");
-			else if (x->GetUser() != "*")
-				throw SocketException("Can not ZLine a username");
-			sockaddrs(x->GetHost());
-			IRCD->SendSZLineDel(x);
-		}
-		catch (const SocketException &)
-		{
-			IRCD->SendAkillDel(x);
-		}
+		IRCD->SendAkillDel(x);
 	}
 
 	bool Check(User *u, const XLine *x) anope_override
@@ -70,7 +58,7 @@ class SGLineManager : public XLineManager
 		if (!x->GetReal().empty() && !Anope::Match(u->realname, x->GetReal()))
 			return false;
 
-		if (!x->GetHost().empty())
+		if (x->GetHost().find('/') != Anope::string::npos)
 		{
 			try
 			{
@@ -82,7 +70,7 @@ class SGLineManager : public XLineManager
 			catch (const SocketException &) { }
 		}
 
-		if (x->GetHost().empty() || Anope::Match(u->host, x->GetHost()))
+		if (x->GetHost().empty() || Anope::Match(u->host, x->GetHost()) || Anope::Match(u->ip, x->GetHost()))
 			return true;
 
 		return false;

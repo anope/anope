@@ -35,8 +35,8 @@ class ExpireCallback : public Timer
 				if (ci->c)
 				{
 					time_t last_used = ci->last_used;
-					for (User::ChanUserList::const_iterator cit = ci->c->users.begin(), cit_end = ci->c->users.end(); cit != cit_end && last_used == ci->last_used; ++cit)
-						ci->AccessFor((*cit)->user);
+					for (Channel::ChanUserList::const_iterator cit = ci->c->users.begin(), cit_end = ci->c->users.end(); cit != cit_end && last_used == ci->last_used; ++cit)
+						ci->AccessFor(cit->second->user);
 					expire = last_used == ci->last_used;
 				}
 				else

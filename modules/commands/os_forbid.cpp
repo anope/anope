@@ -16,60 +16,64 @@
 
 class MyForbidService : public ForbidService
 {
-	Serialize::Checker<std::vector<ForbidData *> > forbid_data;
+	Serialize::Checker<std::vector<ForbidData *>[FT_SIZE]> forbid_data;
 
  public:
 	MyForbidService(Module *m) : ForbidService(m), forbid_data("ForbidData") { }
 
 	void AddForbid(ForbidData *d) anope_override
 	{
-		this->forbid_data->push_back(d);
+		this->forbid_data[d->type].push_back(d);
 	}
 
 	void RemoveForbid(ForbidData *d) anope_override
 	{
-		std::vector<ForbidData *>::iterator it = std::find(this->forbid_data->begin(), this->forbid_data->end(), d);
-		if (it != this->forbid_data->end())
-			this->forbid_data->erase(it);
+		std::vector<ForbidData *>::iterator it = std::find(this->forbid_data[d->type].begin(), this->forbid_data[d->type].end(), d);
+		if (it != this->forbid_data[d->type].end())
+			this->forbid_data[d->type].erase(it);
 		delete d;
 	}
 
 	ForbidData *FindForbid(const Anope::string &mask, ForbidType ftype) anope_override
 	{
-		const std::vector<ForbidData *> &forbids = this->GetForbids();
+		const std::vector<ForbidData *> &forbids = this->forbid_data[ftype];
 		for (unsigned i = forbids.size(); i > 0; --i)
 		{
 			ForbidData *d = forbids[i - 1];
 
-			if ((ftype == FT_NONE || ftype == d->type) && Anope::Match(mask, d->mask, false, true))
+			if (Anope::Match(mask, d->mask, false, true))
 				return d;
 		}
 		return NULL;
 	}
 
-	const std::vector<ForbidData *> &GetForbids() anope_override
+	std::vector<ForbidData *> GetForbids() anope_override
 	{
-		for (unsigned i = this->forbid_data->size(); i > 0; --i)
-		{
-			ForbidData *d = this->forbid_data->at(i - 1);
-
-			if (d->expires && Anope::CurTime >= d->expires)
+		std::vector<ForbidData *> forbids;
+		for (unsigned j = 0; j < FT_SIZE; ++j)
+			for (unsigned i = this->forbid_data[j].size(); i > 0; --i)
 			{
-				Anope::string ftype = "none";
-				if (d->type == FT_NICK)
-					ftype = "nick";
-				else if (d->type == FT_CHAN)
-					ftype = "chan";
-				else if (d->type == FT_EMAIL)
-					ftype = "email";
+				ForbidData *d = this->forbid_data[j].at(i - 1);
 
-				Log(LOG_NORMAL, "expire/forbid") << "Expiring forbid for " << d->mask << " type " << ftype;
-				this->forbid_data->erase(this->forbid_data->begin() + i - 1);
-				delete d;
+				if (d->expires && Anope::CurTime >= d->expires)
+				{
+					Anope::string ftype = "none";
+					if (d->type == FT_NICK)
+						ftype = "nick";
+					else if (d->type == FT_CHAN)
+						ftype = "chan";
+					else if (d->type == FT_EMAIL)
+						ftype = "email";
+
+					Log(LOG_NORMAL, "expire/forbid") << "Expiring forbid for " << d->mask << " type " << ftype;
+					this->forbid_data[j].erase(this->forbid_data[j].begin() + i - 1);
+					delete d;
+				}
+				else
+					forbids.push_back(d);
 			}
-		}
 
-		return this->forbid_data;
+		return forbids;
 	}
 };
 
@@ -93,7 +97,7 @@ class CommandOSForbid : public Command
 		const Anope::string &command = params[0];
 		const Anope::string &subcommand = params.size() > 1 ? params[1] : "";
 
-		ForbidType ftype = FT_NONE;
+		ForbidType ftype = FT_SIZE;
 		if (subcommand.equals_ci("NICK"))
 			ftype = FT_NICK;
 		else if (subcommand.equals_ci("CHAN"))
@@ -103,7 +107,7 @@ class CommandOSForbid : public Command
 		else if (subcommand.equals_ci("REGISTER"))
 			ftype = FT_REGISTER;
 
-		if (command.equals_ci("ADD") && params.size() > 3 && ftype != FT_NONE)
+		if (command.equals_ci("ADD") && params.size() > 3 && ftype != FT_SIZE)
 		{
 			const Anope::string &expiry = params[2][0] == '+' ? params[2] : "";
 			const Anope::string &entry = !expiry.empty() ? params[3] : params[2];
@@ -156,7 +160,7 @@ class CommandOSForbid : public Command
 			Log(LOG_ADMIN, source, this) << "to add a forbid on " << entry << " of type " << subcommand;
 			source.Reply(_("Added a forbid on %s to expire on %s."), entry.c_str(), d->expires ? Anope::strftime(d->expires).c_str() : "never");
 		}
-		else if (command.equals_ci("DEL") && params.size() > 2 && ftype != FT_NONE)
+		else if (command.equals_ci("DEL") && params.size() > 2 && ftype != FT_SIZE)
 		{
 			const Anope::string &entry = params[2];
 

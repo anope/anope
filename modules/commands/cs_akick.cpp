@@ -390,9 +390,10 @@ class CommandCSAKick : public Command
 			return;
 		}
 
-		for (User::ChanUserList::iterator it = c->users.begin(), it_end = c->users.end(); it != it_end; )
+		for (Channel::ChanUserList::iterator it = c->users.begin(), it_end = c->users.end(); it != it_end; )
 		{
-			ChanUserContainer *uc = *it++;
+			ChanUserContainer *uc = it->second;
+			++it;
 
 			if (ci->CheckKick(uc->user))
 				++count;

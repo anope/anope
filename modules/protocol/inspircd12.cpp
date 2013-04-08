@@ -180,16 +180,15 @@ class InspIRCd12Proto : public IRCDProto
 		}
 
 		/* ZLine if we can instead */
-		try
-		{
-			if (x->GetUser() == "*")
+		if (x->GetUser() == "*" && x->GetHost().find_first_not_of("0123456789:.") == Anope::string::npos)
+			try
 			{
 				sockaddrs(x->GetHost());
 				IRCD->SendSZLine(u, x);
 				return;
 			}
-		}
-		catch (const SocketException &) { }
+			catch (const SocketException &) { }
+
 		SendAddLine("G", x->GetUser() + "@" + x->GetHost(), timeleft, x->by, x->GetReason());
 	}
 
@@ -221,7 +220,7 @@ class InspIRCd12Proto : public IRCDProto
 	}
 
 	/* JOIN */
-	void SendJoin(const User *user, Channel *c, const ChannelStatus *status) anope_override
+	void SendJoin(User *user, Channel *c, const ChannelStatus *status) anope_override
 	{
 		UplinkSocket::Message(Me) << "FJOIN " << c->name << " " << c->creation_time << " +" << c->GetModes(true, true) << " :," << user->GetUID();
 		/* Note that we can send this with the FJOIN but choose not to
@@ -237,19 +236,11 @@ class InspIRCd12Proto : public IRCDProto
 			 */
 			ChanUserContainer *uc = c->FindUser(user);
 			if (uc != NULL)
-				uc->status.modes.clear();
+				uc->status.Clear();
 
 			BotInfo *setter = BotInfo::Find(user->nick);
-			for (unsigned i = 0; i < ModeManager::ChannelModes.size(); ++i)
-			{
-				ChannelMode *cm = ModeManager::ChannelModes[i];
-
-				if (cs.modes.count(cm->name) || cs.modes.count(cm->mchar))
-				{
-					c->SetMode(setter, ModeManager::ChannelModes[i], user->GetUID(), false);
-					cs.modes.insert(cm->name);
-				}
-			}
+			for (size_t i = 0; i < cs.Modes().length(); ++i)
+				c->SetMode(setter, ModeManager::FindChannelModeByChar(cs.Modes()[i]), user->GetUID(), false);
 		}
 	}
 
@@ -386,7 +377,7 @@ class InspIRCdExtBan : public ChannelModeList
  public:
 	InspIRCdExtBan(const Anope::string &mname, char modeChar) : ChannelModeList(mname, modeChar) { }
 
-	bool Matches(const User *u, const Entry *e) anope_override
+	bool Matches(User *u, const Entry *e) anope_override
 	{
 		const Anope::string &mask = e->GetMask();
 
@@ -839,20 +830,14 @@ struct IRCDMessageFJoin : IRCDMessage
 			Message::Join::SJoinUser sju;
 
 			/* Loop through prefixes and find modes for them */
-			for (char c;  (c = buf[0]) != ',';)
+			for (char c; (c = buf[0]) != ',' && c;)
 			{
 				buf.erase(buf.begin());
-				ChannelMode *cm = ModeManager::FindChannelModeByChar(c);
-				if (!cm)
-				{
-					Log() << "Received unknown mode prefix " << c << " in FJOIN string";
-					continue;
-				}
-
-				sju.first.modes.insert(cm->name);
+				sju.first.AddMode(c);
 			}
 			/* Erase the , */
-			buf.erase(buf.begin());
+			if (!buf.empty())
+				buf.erase(buf.begin());
 
 			sju.second = User::Find(buf);
 			if (!sju.second)

@@ -224,8 +224,8 @@ void BotInfo::Join(Channel *c, ChannelStatus *status)
 
 void BotInfo::Join(const Anope::string &chname, ChannelStatus *status)
 {
-	Channel *c = Channel::Find(chname);
-	return this->Join(c ? c : new Channel(chname), status);
+	bool c;
+	return this->Join(Channel::FindOrCreate(chname, c), status);
 }
 
 void BotInfo::Part(Channel *c, const Anope::string &reason)

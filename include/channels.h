@@ -54,7 +54,7 @@ class CoreExport Channel : public Base, public Extensible
 	time_t creation_time;
 
 	/* Users in the channel */
-	typedef std::list<ChanUserContainer *> ChanUserList;
+	typedef std::map<User *, ChanUserContainer *> ChanUserList;
 	ChanUserList users;
 
 	/* Current topic of the channel */
@@ -75,12 +75,14 @@ class CoreExport Channel : public Base, public Extensible
 	int16_t chanserv_modecount;	/* Number of check_mode()'s this sec */
 	int16_t bouncy_modes;		/* Did we fail to set modes here? */
 
+ private:
 	/** Constructor
 	 * @param name The channel name
 	 * @param ts The time the channel was created
 	 */
 	Channel(const Anope::string &nname, time_t ts = Anope::CurTime);
 
+ public:
 	/** Destructor
 	 */
 	~Channel();
@@ -113,14 +115,14 @@ class CoreExport Channel : public Base, public Extensible
 	 * @param u The user
 	 * @return A user container if found, else NULL
 	 */
-	ChanUserContainer *FindUser(const User *u) const;
+	ChanUserContainer *FindUser(User *u) const;
 
 	/** Check if a user has a status on a channel
 	 * @param u The user
 	 * @param cms The status mode, or NULL to represent no status
 	 * @return true or false
 	 */
-	bool HasUserStatus(const User *u, ChannelModeStatus *cms) const;
+	bool HasUserStatus(User *u, ChannelModeStatus *cms);
 
 	/** Check if a user has a status on a channel
 	 * Use the overloaded function for ChannelModeStatus* to check for no status
@@ -128,7 +130,7 @@ class CoreExport Channel : public Base, public Extensible
 	 * @param name The mode name, eg CMODE_OP, CMODE_VOICE
 	 * @return true or false
 	 */
-	bool HasUserStatus(const User *u, const Anope::string &name) const;
+	bool HasUserStatus(User *u, const Anope::string &name);
 
 	/** See if a channel has a mode
 	 * @param name The mode name
@@ -279,13 +281,20 @@ class CoreExport Channel : public Base, public Extensible
 	 * @param full Whether or not to match using the user's real host and IP
 	 * @return whether or not a ban was removed
 	 */
-	bool Unban(const User *u, bool full = false);
+	bool Unban(User *u, bool full = false);
 
 	/** Finds a channel
 	 * @param name The channel to find
 	 * @return The channel, if found
 	 */
 	static Channel* Find(const Anope::string &name);
+
+	/** Finds or creates a channel
+	 * @param name The channel name
+	 * @param created Set to true if the channel was just created
+	 * @param ts The time the channel was created
+	 */
+	static Channel *FindOrCreate(const Anope::string &name, bool &created, time_t ts = Anope::CurTime);
 };
 
 #endif // CHANNELS_H

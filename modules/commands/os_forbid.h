@@ -3,11 +3,11 @@
 
 enum ForbidType
 {
-	FT_NONE,
 	FT_NICK,
 	FT_CHAN,
 	FT_EMAIL,
-	FT_REGISTER
+	FT_REGISTER,
+	FT_SIZE
 };
 
 struct ForbidData : Serializable
@@ -35,7 +35,7 @@ class ForbidService : public Service
 
 	virtual ForbidData *FindForbid(const Anope::string &mask, ForbidType type) = 0;
 
-	virtual const std::vector<ForbidData *> &GetForbids() = 0;
+	virtual std::vector<ForbidData *> GetForbids() = 0;
 };
 
 static ServiceReference<ForbidService> forbid_service("ForbidService", "forbid");

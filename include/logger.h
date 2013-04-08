@@ -45,7 +45,8 @@ struct LogFile
 	std::ofstream stream;
 
 	LogFile(const Anope::string &name);
-	Anope::string GetName() const;
+	~LogFile();
+	const Anope::string &GetName() const;
 };
 
 /* Represents a single log message */
@@ -72,7 +73,6 @@ class CoreExport Log
 	Module *m;
 	LogType type;
 	Anope::string category;
-	std::list<Anope::string> sources;
 
 	std::stringstream buf;
 
@@ -109,17 +109,18 @@ class CoreExport Log
 class CoreExport LogInfo
 {
  public:
-	std::list<Anope::string> targets;
-	std::map<Anope::string, LogFile *> logfiles;
-	std::list<Anope::string> sources;
+	std::vector<Anope::string> targets;
+	std::vector<LogFile *> logfiles;
+	int last_day;
+	std::vector<Anope::string> sources;
 	int log_age;
-	std::list<Anope::string> admin;
-	std::list<Anope::string> override;
-	std::list<Anope::string> commands;
-	std::list<Anope::string> servers;
-	std::list<Anope::string> users;
-	std::list<Anope::string> channels;
-	std::list<Anope::string> normal;
+	std::vector<Anope::string> admin;
+	std::vector<Anope::string> override;
+	std::vector<Anope::string> commands;
+	std::vector<Anope::string> servers;
+	std::vector<Anope::string> users;
+	std::vector<Anope::string> channels;
+	std::vector<Anope::string> normal;
 	bool raw_io;
 	bool debug;
 
@@ -127,7 +128,7 @@ class CoreExport LogInfo
 
 	~LogInfo();
 
-	void AddType(std::list<Anope::string> &list, const Anope::string &type);
+	void OpenLogFiles();
 
 	bool HasType(LogType ltype, const Anope::string &type) const;
 

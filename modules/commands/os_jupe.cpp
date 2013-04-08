@@ -26,7 +26,7 @@ class CommandOSJupe : public Command
 	{
 		const Anope::string &jserver = params[0];
 		const Anope::string &reason = params.size() > 1 ? params[1] : "";
-		Server *server = Server::Find(jserver);
+		Server *server = Server::Find(jserver, true);
 
 		if (!IRCD->IsHostValid(jserver) || jserver.find('.') == Anope::string::npos)
 			source.Reply(_("Please use a valid server name when juping."));

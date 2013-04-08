@@ -74,7 +74,7 @@ class CommandOSChanKill : public Command
 			{
 				for (Channel::ChanUserList::iterator it = c->users.begin(), it_end = c->users.end(); it != it_end; )
 				{
-					ChanUserContainer *uc = *it++;
+					ChanUserContainer *uc = it->second;
 
 					if (uc->user->server == Me || uc->user->HasMode("OPER"))
 						continue;

@@ -544,7 +544,8 @@ class CommandCSSetPersist : public Command
 				/* Channel doesn't exist, create it */
 				if (!ci->c)
 				{
-					Channel *c = new Channel(ci->name);
+					bool created;
+					Channel *c = Channel::FindOrCreate(ci->name, created);
 					if (ci->bi)
 						ci->bi->Join(c);
 				}

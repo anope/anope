@@ -137,6 +137,7 @@ ServerConfig::ServerConfig()
 			Log() << "Unknown casemap " << this->CaseMap << " - casemap not changed";
 		}
 	}
+	Anope::CaseMapRebuild();
 
 	if (this->SessionIPv4CIDR > 32 || this->SessionIPv6CIDR > 128)
 		throw ConfigException("Session CIDR value out of range");
@@ -894,12 +895,10 @@ static bool DoServices(ServerConfig *config, const Anope::string &, const Anope:
 			continue; // Can't happen
 
 		/* Remove all existing modes */
-		for (unsigned i = 0; i < ModeManager::ChannelModes.size(); ++i)
-		{
-			ChannelMode *cm = ModeManager::ChannelModes[i];
-			if (cm && cm->type == MODE_STATUS)
-				c->RemoveMode(bi, cm, bi->GetUID());
-		}
+		ChanUserContainer *cu = c->FindUser(bi);
+		if (cu != NULL)
+			for (size_t i = 0; i < cu->status.Modes().length(); ++i)
+				c->RemoveMode(bi, ModeManager::FindChannelModeByChar(cu->status.Modes()[i]), bi->GetUID());
 		/* Set the new modes */
 		for (unsigned j = 0; j < want_modes.length(); ++j)
 		{

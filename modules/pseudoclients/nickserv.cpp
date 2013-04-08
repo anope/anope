@@ -257,7 +257,7 @@ class NickServCore : public Module
 		if (Config->NSModeOnID)
 			for (User::ChanUserList::iterator it = u->chans.begin(), it_end = u->chans.end(); it != it_end; ++it)
 			{
-				ChanUserContainer *cc = *it;
+				ChanUserContainer *cc = it->second;
 				Channel *c = cc->chan;
 				if (c)
 					c->SetCorrectModes(u, true, true);
@@ -296,7 +296,7 @@ class NickServCore : public Module
 	{
 		for (User::ChanUserList::iterator it = u->chans.begin(), it_end = u->chans.end(); it != it_end; ++it)
 		{
-			ChanUserContainer *cc = *it;
+			ChanUserContainer *cc = it->second;
 			Channel *c = cc->chan;
 			if (c)
 				c->SetCorrectModes(u, true, true);

@@ -174,7 +174,7 @@ class MyXMLRPCEvent : public XMLRPCEvent
 			Anope::string users;
 			for (Channel::ChanUserList::const_iterator it = c->users.begin(); it != c->users.end(); ++it)
 			{
-				ChanUserContainer *uc = *it;
+				ChanUserContainer *uc = it->second;
 				users += uc->status.BuildModePrefixList() + uc->user->nick + " ";
 			}
 			if (!users.empty())
@@ -226,7 +226,7 @@ class MyXMLRPCEvent : public XMLRPCEvent
 			Anope::string channels;
 			for (User::ChanUserList::const_iterator it = u->chans.begin(); it != u->chans.end(); ++it)
 			{
-				ChanUserContainer *cc = *it;
+				ChanUserContainer *cc = it->second;
 				channels += cc->status.BuildModePrefixList() + cc->chan->name + " ";
 			}
 			if (!channels.empty())

@@ -61,11 +61,6 @@ class MySessionService : public SessionService
 		return this->Exceptions;
 	}
 
-	void AddSession(Session *s) anope_override
-	{
-		this->Sessions[s->addr] = s;
-	}
-
 	void DelSession(Session *s) anope_override
 	{
 		this->Sessions.erase(s->addr);
@@ -78,6 +73,18 @@ class MySessionService : public SessionService
 		if (it != this->Sessions.end())
 			return it->second;
 		return NULL;
+	}
+
+	SessionMap::iterator FindSessionIterator(const Anope::string &ip)
+	{
+		cidr c(ip, ip.find(':') != Anope::string::npos ? Config->SessionIPv6CIDR : Config->SessionIPv4CIDR);
+		return this->Sessions.find(c);
+	}
+
+	Session* &FindOrCreateSession(const Anope::string &ip)
+	{
+		cidr c(ip, ip.find(':') != Anope::string::npos ? Config->SessionIPv6CIDR : Config->SessionIPv4CIDR);
+		return this->Sessions[c];
 	}
 
 	SessionMap &GetSessions() anope_override
@@ -611,102 +618,6 @@ class OSSession : public Module
 	CommandOSException commandosexception;
 	ServiceReference<XLineManager> akills;
 
-	void AddSession(User *u, bool exempt)
-	{
-		Session *session;
-		try
-		{
-			session = this->ss.FindSession(u->ip);
-		}
-		catch (const SocketException &)
-		{
-			return;
-		}
-
-		if (session)
-		{
-			bool kill = false;
-			if (Config->DefSessionLimit && session->count >= Config->DefSessionLimit)
-			{
-				kill = true;
-				Exception *exception = this->ss.FindException(u);
-				if (exception)
-				{
-					kill = false;
-					if (exception->limit && session->count >= exception->limit)
-						kill = true;
-				}
-			}
-
-			/* Previously on IRCds that send a QUIT (InspIRCD) when a user is killed, the session for a host was
-			 * decremented in do_quit, which caused problems and fixed here
-			 *
-			 * Now, we create the user struture before calling this to fix some user tracking issues,
-			 * so we must increment this here no matter what because it will either be
-			 * decremented in do_kill or in do_quit - Adam
-			 */
-			++session->count;
-	
-			if (kill && !exempt)
-			{
-				if (OperServ)
-				{
-					if (!Config->SessionLimitExceeded.empty())
-						u->SendMessage(OperServ, Config->SessionLimitExceeded.c_str(), u->ip.c_str());
-					if (!Config->SessionLimitDetailsLoc.empty())
-						u->SendMessage(OperServ, "%s", Config->SessionLimitDetailsLoc.c_str());
-				}
-
-				++session->hits;
-				if (Config->MaxSessionKill && session->hits >= Config->MaxSessionKill && akills)
-				{
-					const Anope::string &akillmask = "*@" + u->ip;
-					XLine *x = new XLine(akillmask, Config->OperServ, Anope::CurTime + Config->SessionAutoKillExpiry, "Session limit exceeded", XLineManager::GenerateUID());
-					akills->AddXLine(x);
-					akills->Send(NULL, x);
-					Log(OperServ, "akill/session") << "Added a temporary AKILL for \002" << akillmask << "\002 due to excessive connections";
-				}
-				else
-				{
-					u->Kill(Config->OperServ, "Session limit exceeded");
-					u = NULL; /* No guarentee u still exists */
-				}
-			}
-		}
-		else
-		{
-			session = new Session(u->ip, u->ip.find(':') != Anope::string::npos ? Config->SessionIPv6CIDR : Config->SessionIPv4CIDR);
-			this->ss.AddSession(session);
-		}
-	}
-
-	void DelSession(User *u)
-	{
-		Session *session;
-		try
-		{
-			session = this->ss.FindSession(u->ip);
-		}
-		catch (const SocketException &)
-		{
-			return;
-		}
-		if (!session)
-		{
-			Log(LOG_DEBUG) << "Tried to delete non-existant session: " << u->ip;
-			return;
-		}
-
-		if (session->count > 1)
-		{
-			--session->count;
-			return;
-		}
-
-		this->ss.DelSession(session);
-		delete session;
-	}
-
  public:
 	OSSession(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
 		exception_type("Exception", Exception::Unserialize), ss(this), commandossession(this), commandosexception(this), akills("XLineManager", "xlinemanager/sgline")
@@ -719,16 +630,105 @@ class OSSession : public Module
 		ModuleManager::SetPriority(this, PRIORITY_FIRST);
 	}
 
-	void OnUserConnect(User *user, bool &exempt) anope_override
+	void OnUserConnect(User *u, bool &exempt) anope_override
 	{
-		if (!user->Quitting() && Config->LimitSessions)
-			this->AddSession(user, exempt);
+		if (u->Quitting() || !Config->LimitSessions || exempt || !u->server || u->server->IsULined())
+			return;
+
+		try
+		{
+			Session* &session = this->ss.FindOrCreateSession(u->ip);
+
+			if (session)
+			{
+				bool kill = false;
+				if (Config->DefSessionLimit && session->count >= Config->DefSessionLimit)
+				{
+					kill = true;
+					Exception *exception = this->ss.FindException(u);
+					if (exception)
+					{
+						kill = false;
+						if (exception->limit && session->count >= exception->limit)
+							kill = true;
+					}
+				}
+
+				/* Previously on IRCds that send a QUIT (InspIRCD) when a user is killed, the session for a host was
+				 * decremented in do_quit, which caused problems and fixed here
+				 *
+				 * Now, we create the user struture before calling this to fix some user tracking issues,
+				 * so we must increment this here no matter what because it will either be
+				 * decremented in do_kill or in do_quit - Adam
+				 */
+				++session->count;
+	
+				if (kill && !exempt)
+				{
+					if (OperServ)
+					{
+						if (!Config->SessionLimitExceeded.empty())
+							u->SendMessage(OperServ, Config->SessionLimitExceeded.c_str(), u->ip.c_str());
+						if (!Config->SessionLimitDetailsLoc.empty())
+							u->SendMessage(OperServ, "%s", Config->SessionLimitDetailsLoc.c_str());
+					}
+
+					++session->hits;
+					if (Config->MaxSessionKill && session->hits >= Config->MaxSessionKill && akills)
+					{
+						const Anope::string &akillmask = "*@" + u->ip;
+						XLine *x = new XLine(akillmask, Config->OperServ, Anope::CurTime + Config->SessionAutoKillExpiry, "Session limit exceeded", XLineManager::GenerateUID());
+						akills->AddXLine(x);
+						akills->Send(NULL, x);
+						Log(OperServ, "akill/session") << "Added a temporary AKILL for \002" << akillmask << "\002 due to excessive connections";
+					}
+					else
+					{
+						u->Kill(Config->OperServ, "Session limit exceeded");
+					}
+				}
+			}
+			else
+			{
+				session = new Session(u->ip, u->ip.find(':') != Anope::string::npos ? Config->SessionIPv6CIDR : Config->SessionIPv4CIDR);
+			}
+		}
+		catch (const SocketException &) { }
 	}
 
 	void OnPreUserLogoff(User *u) anope_override
 	{
-		if (Config->LimitSessions && (!u->server || !u->server->IsULined()))
-			this->DelSession(u);
+		if (!Config->LimitSessions || !u->server || u->server->IsULined())
+			return;
+
+		SessionService::SessionMap::iterator sit;
+		try
+		{
+			sit = this->ss.FindSessionIterator(u->ip);
+		}
+		catch (const SocketException &)
+		{
+			return;
+		}
+
+		SessionService::SessionMap &sessions = this->ss.GetSessions();
+
+		if (sit == sessions.end())
+		{
+			Log(LOG_DEBUG) << "Tried to delete non-existant session: " << u->ip;
+			return;
+		}
+
+		Session *session = sit->second;
+
+		if (session->count > 1)
+		{
+			--session->count;
+			return;
+		}
+
+		delete session;
+		sessions.erase(sit);
 	}
 };
 

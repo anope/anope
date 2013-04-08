@@ -83,7 +83,7 @@ class ngIRCdProto : public IRCDProto
 			UplinkSocket::Message(Me) << "WALLOPS :" << buf;
 	}
 
-	void SendJoin(const User *user, Channel *c, const ChannelStatus *status) anope_override
+	void SendJoin(User *user, Channel *c, const ChannelStatus *status) anope_override
 	{
 		UplinkSocket::Message(user) << "JOIN " << c->name;
 		if (status)
@@ -95,12 +95,11 @@ class ngIRCdProto : public IRCDProto
 			 */
 			ChanUserContainer *uc = c->FindUser(user);
 			if (uc != NULL)
-				uc->status.modes.clear();
+				uc->status.Clear();
 
 			BotInfo *setter = BotInfo::Find(user->nick);
-			for (unsigned i = 0; i < ModeManager::ChannelModes.size(); ++i)
-				if (cs.modes.count(ModeManager::ChannelModes[i]->name))
-					c->SetMode(setter, ModeManager::ChannelModes[i], user->GetUID(), false);
+			for (size_t i = 0; i < cs.Modes().length(); ++i)
+				c->SetMode(setter, ModeManager::FindChannelModeByChar(cs.Modes()[i]), user->GetUID(), false);
 		}
 	}
 
@@ -245,10 +244,8 @@ struct IRCDMessageChaninfo : IRCDMessage
 	 */
 	void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-
-		Channel *c = Channel::Find(params[0]);
-		if (!c)
-			c = new Channel(params[0]);
+		bool created;
+		Channel *c = Channel::FindOrCreate(params[0], created);
 
 		Anope::string modes = params[1];
 
@@ -470,15 +467,8 @@ struct IRCDMessageNJoin : IRCDMessage
 			/* Get prefixes from the nick */
 			for (char ch; (ch = ModeManager::GetStatusChar(buf[0]));)
 			{
-				ChannelMode *cm = ModeManager::FindChannelModeByChar(ch);
 				buf.erase(buf.begin());
-				if (!cm)
-				{
-					Log(LOG_DEBUG) << "Received unknown mode prefix " << ch << " in NJOIN string.";
-					continue;
-				}
-
-				sju.first.modes.insert(cm->name);
+				sju.first.AddMode(ch);
 			}
 
 			sju.second = User::Find(buf);

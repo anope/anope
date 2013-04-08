@@ -393,7 +393,7 @@ unsigned IRCDProto::GetMaxListFor(Channel *c)
 MessageSource::MessageSource(const Anope::string &src) : source(src), u(NULL), s(NULL)
 {
 	if (src.empty())
-		this->s = !Me->GetLinks().empty() ? Me->GetLinks().front() : NULL;
+		this->s = Servers::GetUplink();
 	else if (IRCD->RequiresID || src.find('.') != Anope::string::npos)
 		this->s = Server::Find(src);
 	if (this->s == NULL)

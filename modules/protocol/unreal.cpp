@@ -44,16 +44,14 @@ class UnrealIRCdProto : public IRCDProto
 			return;
 
 		/* ZLine if we can instead */
-		try
-		{
-			if (x->GetUser() == "*")
+		if (x->GetUser() == "*" && x->GetHost().find_first_not_of("0123456789:.") == Anope::string::npos)
+			try
 			{
 				sockaddrs(x->GetHost());
 				IRCD->SendSZLineDel(x);
 				return;
 			}
-		}
-		catch (const SocketException &) { }
+			catch (const SocketException &) { }
 
 		UplinkSocket::Message() << "TKL - G " << x->GetUser() << " " << x->GetHost() << " " << Config->OperServ;
 	}
@@ -108,16 +106,14 @@ class UnrealIRCdProto : public IRCDProto
 		}
 
 		/* ZLine if we can instead */
-		try
-		{
-			if (x->GetUser() == "*")
+		if (x->GetUser() == "*" && x->GetHost().find_first_not_of("0123456789:.") == Anope::string::npos)
+			try
 			{
 				sockaddrs(x->GetHost());
 				IRCD->SendSZLine(u, x);
 				return;
 			}
-		}
-		catch (const SocketException &) { }
+			catch (const SocketException &) { }
 
 		// Calculate the time left before this would expire, capping it at 2 days
 		time_t timeleft = x->expires - Anope::CurTime;
@@ -154,7 +150,7 @@ class UnrealIRCdProto : public IRCDProto
 	}
 
 	/* JOIN */
-	void SendJoin(const User *user, Channel *c, const ChannelStatus *status) anope_override
+	void SendJoin(User *user, Channel *c, const ChannelStatus *status) anope_override
 	{
 		UplinkSocket::Message(Me) << "SJOIN " << c->creation_time << " " << c->name << " :" << user->nick;
 		if (status)
@@ -166,12 +162,11 @@ class UnrealIRCdProto : public IRCDProto
 			 */
 			ChanUserContainer *uc = c->FindUser(user);
 			if (uc != NULL)
-				uc->status.modes.clear();
+				uc->status.Clear();
 
 			BotInfo *setter = BotInfo::Find(user->nick);
-			for (unsigned i = 0; i < ModeManager::ChannelModes.size(); ++i)
-				if (cs.modes.count(ModeManager::ChannelModes[i]->name))
-					c->SetMode(setter, ModeManager::ChannelModes[i], user->GetUID(), false);
+			for (size_t i = 0; i < cs.Modes().length(); ++i)
+				c->SetMode(setter, ModeManager::FindChannelModeByChar(cs.Modes()[i]), user->GetUID(), false);
 		}
 	}
 
@@ -384,7 +379,7 @@ class UnrealExtBan : public ChannelModeList
  public:
 	UnrealExtBan(const Anope::string &mname, char modeChar) : ChannelModeList(mname, modeChar) { }
 
-	bool Matches(const User *u, const Entry *e) anope_override
+	bool Matches(User *u, const Entry *e) anope_override
 	{
 		const Anope::string &mask = e->GetMask();
 
@@ -407,7 +402,7 @@ class UnrealExtBan : public ChannelModeList
 			{
 				ChanUserContainer *uc = c->FindUser(u);
 				if (uc != NULL)
-					if (cm == NULL || uc->status.modes.count(cm->name))
+					if (cm == NULL || uc->status.HasMode(cm->mchar))
 						return true;
 			}
 		}
@@ -1050,15 +1045,8 @@ struct IRCDMessageSJoin : IRCDMessage
 				/* Get prefixes from the nick */
 				for (char ch; (ch = ModeManager::GetStatusChar(buf[0]));)
 				{
+					sju.first.AddMode(ch);
 					buf.erase(buf.begin());
-					ChannelMode *cm = ModeManager::FindChannelModeByChar(ch);
-					if (!cm)
-					{
-						Log(LOG_DEBUG) << "Received unknown mode prefix " << ch << " in SJOIN string";
-						continue;
-					}
-
-					sju.first.modes.insert(cm->name);
 				}
 
 				sju.second = User::Find(buf);

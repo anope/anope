@@ -79,7 +79,7 @@ class CoreExport User : public virtual Base, public Extensible, public CommandRe
 	bool super_admin;
 
 	/* Channels the user is in */
-	typedef std::list<ChanUserContainer *> ChanUserList;
+	typedef std::map<Channel *, ChanUserContainer *> ChanUserList;
 	ChanUserList chans;
 
 	/* Last time this user sent a memo command used */
@@ -312,7 +312,7 @@ class CoreExport User : public virtual Base, public Extensible, public CommandRe
 	 * @param c The channel
 	 * @return The channel container, or NULL
 	 */
-	ChanUserContainer *FindChannel(const Channel *c) const;
+	ChanUserContainer *FindChannel(Channel *c) const;
 
 	/** Check if the user is protected from kicks and negative mode changes
 	 * @return true or false

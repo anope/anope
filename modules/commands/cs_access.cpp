@@ -326,7 +326,7 @@ class CommandCSAccess : public Command
 					Anope::string timebuf;
 					if (ci->c)
 						for (Channel::ChanUserList::const_iterator cit = ci->c->users.begin(), cit_end = ci->c->users.end(); cit != cit_end; ++cit)
-							if (access->Matches((*cit)->user, (*cit)->user->Account()))
+							if (access->Matches(cit->second->user, cit->second->user->Account()))
 								timebuf = "Now";
 					if (timebuf.empty())
 					{
@@ -360,7 +360,7 @@ class CommandCSAccess : public Command
 				Anope::string timebuf;
 				if (ci->c)
 					for (Channel::ChanUserList::const_iterator cit = ci->c->users.begin(), cit_end = ci->c->users.end(); cit != cit_end; ++cit)
-						if (access->Matches((*cit)->user, (*cit)->user->Account()))
+						if (access->Matches(cit->second->user, cit->second->user->Account()))
 							timebuf = "Now";
 				if (timebuf.empty())
 				{

@@ -55,7 +55,7 @@ class InspIRCd20Proto : public IRCDProto
 	void SendModeInternal(const BotInfo *bi, const User *u, const Anope::string &buf) anope_override { insp12->SendModeInternal(bi, u, buf); }
 	void SendClientIntroduction(const User *u) anope_override { insp12->SendClientIntroduction(u); }
 	void SendServer(const Server *server) anope_override { insp12->SendServer(server); }
-	void SendJoin(const User *user, Channel *c, const ChannelStatus *status) anope_override { insp12->SendJoin(user, c, status); }
+	void SendJoin(User *user, Channel *c, const ChannelStatus *status) anope_override { insp12->SendJoin(user, c, status); }
 	void SendSQLineDel(const XLine *x) anope_override { insp12->SendSQLineDel(x); }
 	void SendSQLine(User *u, const XLine *x) anope_override { insp12->SendSQLine(u, x); }
 	void SendVhost(User *u, const Anope::string &vident, const Anope::string &vhost) anope_override { insp12->SendVhost(u, vident, vhost); }
@@ -80,7 +80,7 @@ class InspIRCdExtBan : public ChannelModeList
  public:
 	InspIRCdExtBan(const Anope::string &mname, char modeChar) : ChannelModeList(mname, modeChar) { }
 
-	bool Matches(const User *u, const Entry *e) anope_override
+	bool Matches(User *u, const Entry *e) anope_override
 	{
 		const Anope::string &mask = e->GetMask();
 
@@ -111,7 +111,7 @@ class InspIRCdExtBan : public ChannelModeList
 			{
 				ChanUserContainer *uc = c->FindUser(u);
 				if (uc != NULL)
-					if (cm == NULL || uc->status.modes.count(cm->name))
+					if (cm == NULL || uc->status.HasMode(cm->mchar))
 						return true;
 			}
 		}

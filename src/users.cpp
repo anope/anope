@@ -66,7 +66,7 @@ User::User(const Anope::string &snick, const Anope::string &sident, const Anope:
 	this->nc = NULL;
 	this->UpdateHost();
 
-	if (sserver) // Our bots are introduced on startup with no server
+	if (sserver && sserver->IsSynced()) // Our bots are introduced on startup with no server
 	{
 		++sserver->users;
 		Log(this, "connect") << (!svhost.empty() ? Anope::string("(") + svhost + ") " : "") << "(" << srealname << ") " << sip << " connected to the network (" << sserver->GetName() << ")";
@@ -76,7 +76,8 @@ User::User(const Anope::string &snick, const Anope::string &sident, const Anope:
 	{
 		MaxUserCount = UserListByNick.size();
 		MaxUserTime = Anope::CurTime;
-		Log(this, "maxusers") << "connected - new maximum user count: " << UserListByNick.size();
+		if (sserver && sserver->IsSynced())
+			Log(this, "maxusers") << "connected - new maximum user count: " << UserListByNick.size();
 	}
 
 	bool exempt = false;
@@ -230,7 +231,8 @@ User::~User()
 {
 	if (this->server != NULL)
 	{
-		Log(this, "disconnect") << "(" << this->realname << ") disconnected from the network (" << this->server->GetName() << ")";
+		if (this->server->IsSynced())
+			Log(this, "disconnect") << "(" << this->realname << ") disconnected from the network (" << this->server->GetName() << ")";
 		--this->server->users;
 	}
 
@@ -243,7 +245,7 @@ User::~User()
 		--OperCount;
 
 	while (!this->chans.empty())
-		this->chans.front()->chan->DeleteUser(this);
+		this->chans.begin()->second->chan->DeleteUser(this);
 
 	UserListByNick.erase(this->nick);
 	if (!this->uid.empty())
@@ -422,6 +424,9 @@ void User::Identify(NickAlias *na)
 
 void User::Login(NickCore *core)
 {
+	if (core == this->nc)
+		return;
+
 	this->Logout();
 	this->nc = core;
 	core->users.push_back(this);
@@ -648,7 +653,8 @@ void User::SetModesInternal(const char *umodes, ...)
 	vsnprintf(buf, BUFSIZE - 1, umodes, args);
 	va_end(args);
 
-	Log(this, "mode") << "changes modes to " << buf;
+	if (this->server && this->server->IsSynced())
+		Log(this, "mode") << "changes modes to " << buf;
 
 	spacesepstream sep(buf);
 	sep.GetToken(modebuf);
@@ -718,11 +724,11 @@ Anope::string User::GetModes() const
 	return m + params;
 }
 
-ChanUserContainer *User::FindChannel(const Channel *c) const
+ChanUserContainer *User::FindChannel(Channel *c) const
 {
-	for (User::ChanUserList::const_iterator it = this->chans.begin(), it_end = this->chans.end(); it != it_end; ++it)
-		if ((*it)->chan == c)
-			return *it;
+	User::ChanUserList::const_iterator it = this->chans.find(c);
+	if (it != this->chans.end())
+		return it->second;
 	return NULL;
 }
 

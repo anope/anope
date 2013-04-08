@@ -578,7 +578,10 @@ void ChannelInfo::AddAccess(ChanAccess *taccess)
 
 	const NickAlias *na = NickAlias::Find(taccess->mask);
 	if (na != NULL)
+	{
 		na->nc->AddChannelReference(this);
+		taccess->nc = na->nc;
+	}
 }
 
 ChanAccess *ChannelInfo::GetAccess(unsigned index) const
@@ -612,8 +615,19 @@ AccessGroup ChannelInfo::AccessFor(const User *u)
 	group.nc = nc;
 
 	for (unsigned i = 0, end = this->GetAccessCount(); i < end; ++i)
-		if (this->GetAccess(i)->Matches(u, nc))
-			group.push_back(this->GetAccess(i));
+	{
+		ChanAccess *a = this->GetAccess(i);
+
+		if (a->nc)
+		{
+			if (a->nc == nc)
+				group.push_back(a);
+		}
+		else if (a->Matches(u, nc))
+		{
+			group.push_back(a);
+		}
+	}
 
 	if (group.founder || !group.empty())
 	{
@@ -635,8 +649,19 @@ AccessGroup ChannelInfo::AccessFor(const NickCore *nc)
 	group.nc = nc;
 
 	for (unsigned i = 0, end = this->GetAccessCount(); i < end; ++i)
-		if (this->GetAccess(i)->Matches(NULL, nc))
+	{
+		ChanAccess *a = this->GetAccess(i);
+
+		if (a->nc)
+		{
+			if (a->nc == nc)
+				group.push_back(a);
+		}
+		else if (this->GetAccess(i)->Matches(NULL, nc))
+		{
 			group.push_back(this->GetAccess(i));
+		}
+	}
 	
 	if (group.founder || !group.empty())
 	{

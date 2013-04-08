@@ -31,7 +31,7 @@ class CommandCSEnforce : public Command
 
 		for (Channel::ChanUserList::iterator it = ci->c->users.begin(), it_end = ci->c->users.end(); it != it_end; ++it)
 		{
-			ChanUserContainer *uc = *it;
+			ChanUserContainer *uc = it->second;
 
 			ci->c->SetCorrectModes(uc->user, false, false);
 		}
@@ -50,7 +50,7 @@ class CommandCSEnforce : public Command
 		std::vector<User *> users;
 		for (Channel::ChanUserList::iterator it = ci->c->users.begin(), it_end = ci->c->users.end(); it != it_end; ++it)
 		{
-			ChanUserContainer *uc = *it;
+			ChanUserContainer *uc = it->second;
 			User *user = uc->user;
 
 			if (user->IsProtected())
@@ -81,7 +81,7 @@ class CommandCSEnforce : public Command
 		std::vector<User *> users;
 		for (Channel::ChanUserList::iterator it = ci->c->users.begin(), it_end = ci->c->users.end(); it != it_end; ++it)
 		{
-			ChanUserContainer *uc = *it;
+			ChanUserContainer *uc = it->second;
 			User *user = uc->user;
 
 			if (user->IsProtected())
@@ -113,7 +113,7 @@ class CommandCSEnforce : public Command
 		std::vector<User *> users;
 		for (Channel::ChanUserList::iterator it = ci->c->users.begin(), it_end = ci->c->users.end(); it != it_end; ++it)
 		{
-			ChanUserContainer *uc = *it;
+			ChanUserContainer *uc = it->second;
 			User *user = uc->user;
 
 			if (user->IsProtected())
@@ -145,7 +145,7 @@ class CommandCSEnforce : public Command
 		std::vector<User *> users;
 		for (Channel::ChanUserList::iterator it = ci->c->users.begin(), it_end = ci->c->users.end(); it != it_end; ++it)
 		{
-			ChanUserContainer *uc = *it;
+			ChanUserContainer *uc = it->second;
 			User *user = uc->user;
 
 			if (user->IsProtected())
@@ -195,7 +195,7 @@ class CommandCSEnforce : public Command
 		/* The newer users are at the end of the list, so kick users starting from the end */
 		for (Channel::ChanUserList::reverse_iterator it = ci->c->users.rbegin(), it_end = ci->c->users.rend(); it != it_end; ++it)
 		{
-			ChanUserContainer *uc = *it;
+			ChanUserContainer *uc = it->second;
 			User *user = uc->user;
 
 			if (user->IsProtected())

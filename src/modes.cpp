@@ -22,6 +22,9 @@ std::map<Channel *, StackerInfo *> ModeManager::ChannelStackerObjects;
 std::vector<ChannelMode *> ModeManager::ChannelModes;
 std::vector<UserMode *> ModeManager::UserModes;
 
+static std::map<Anope::string, ChannelMode *> ChannelModesByName;
+static std::map<Anope::string, UserMode *> UserModesByName;
+
 /* Number of generic modes we support */
 unsigned ModeManager::GenericChannelModes = 0, ModeManager::GenericUserModes = 0;
 
@@ -32,33 +35,48 @@ std::list<Anope::string> ModeManager::ModeLockOff;
 /* Default modes bots have on channels */
 ChannelStatus ModeManager::DefaultBotModes;
 
-Anope::string ChannelStatus::BuildCharPrefixList() const
+void ChannelStatus::AddMode(char c)
 {
-	Anope::string ret;
+	if (modes.find(c) == Anope::string::npos)
+		modes.append(c);
+}
 
-	for (unsigned i = 0; i < ModeManager::ChannelModes.size(); ++i)
-	{
-		ChannelMode *cm = ModeManager::ChannelModes[i];
+void ChannelStatus::DelMode(char c)
+{
+	modes = modes.replace_all_cs(c, "");
+}
 
-		if (this->modes.count(cm->name))
-			ret += cm->mchar;
-	}
+bool ChannelStatus::HasMode(char c) const
+{
+	return modes.find(c) != Anope::string::npos;
+}
 
-	return ret;
+bool ChannelStatus::Empty() const
+{
+	return modes.empty();
+}
+
+void ChannelStatus::Clear()
+{
+	modes.clear();
+}
+
+const Anope::string &ChannelStatus::Modes() const
+{
+	return modes;
 }
 
 Anope::string ChannelStatus::BuildModePrefixList() const
 {
 	Anope::string ret;
 
-	for (unsigned i = 0; i < ModeManager::ChannelModes.size(); ++i)
+	for (size_t i = 0; i < modes.length(); ++i)
 	{
-		ChannelMode *cm = ModeManager::ChannelModes[i];
-
-		if (this->modes.count(cm->name))
+		ChannelMode *cm = ModeManager::FindChannelModeByName(modes[i]);
+		if (cm != NULL && cm->type == MODE_STATUS)
 		{
 			ChannelModeStatus *cms = anope_dynamic_static_cast<ChannelModeStatus *>(cm);
-			ret += cms->Symbol;
+			ret += cms->symbol;
 		}
 	}
 
@@ -119,7 +137,7 @@ ChannelModeParam::~ChannelModeParam()
 {
 }
 
-ChannelModeStatus::ChannelModeStatus(const Anope::string &mname, char modeChar, char mSymbol, short mlevel) : ChannelMode(mname, modeChar), Symbol(mSymbol), level(mlevel)
+ChannelModeStatus::ChannelModeStatus(const Anope::string &mname, char modeChar, char msymbol, short mlevel) : ChannelMode(mname, modeChar), symbol(msymbol), level(mlevel)
 {
 	this->type = MODE_STATUS;
 }
@@ -296,7 +314,12 @@ bool ModeManager::AddUserMode(UserMode *um)
 		Log() << "ModeManager: Added generic support for user mode " << um->mchar;
 	}
 
-	ModeManager::UserModes.push_back(um);
+	unsigned want = um->mchar;
+	if (want >= ModeManager::UserModes.size())
+		ModeManager::UserModes.resize(want + 1);
+	ModeManager::UserModes[want] = um;
+
+	UserModesByName[um->name] = um;
 
 	FOREACH_MOD(I_OnUserModeAdd, OnUserModeAdd(um));
 
@@ -314,7 +337,21 @@ bool ModeManager::AddChannelMode(ChannelMode *cm)
 		Log() << "ModeManager: Added generic support for channel mode " << cm->mchar;
 	}
 
-	ModeManager::ChannelModes.push_back(cm);
+	unsigned want = cm->mchar;
+	if (want >= ModeManager::ChannelModes.size())
+		ModeManager::ChannelModes.resize(want + 1);
+	ModeManager::ChannelModes[want] = cm;
+
+	if (cm->type == MODE_STATUS)
+	{
+		ChannelModeStatus *cms = anope_dynamic_static_cast<ChannelModeStatus *>(cm);
+		want = cms->symbol;
+		if (want >= ModeManager::ChannelModes.size())
+			ModeManager::ChannelModes.resize(want + 1);
+		ModeManager::ChannelModes[want] = cms;
+	}
+
+	ChannelModesByName[cm->name] = cm;
 
 	/* Apply this mode to the new default mlock if its used */
 	UpdateDefaultMLock(Config);
@@ -326,97 +363,111 @@ bool ModeManager::AddChannelMode(ChannelMode *cm)
 
 void ModeManager::RemoveUserMode(UserMode *um)
 {
-	for (unsigned i = 0; i < ModeManager::UserModes.size(); ++i)
-	{
-		UserMode *mode = ModeManager::UserModes[i];
-		if (um == mode)
-		{
-			ModeManager::UserModes.erase(ModeManager::UserModes.begin() + i);
-			break;
-		}
-	}
+	if (!um)
+		return;
+	
+	unsigned want = um->mchar;
+	if (want >= ModeManager::UserModes.size())
+		return;
+	
+	if (ModeManager::UserModes[want] != um)
+		return;
+	
+	ModeManager::UserModes[want] = NULL;
+
+	UserModesByName.erase(um->name);
 
 	StackerDel(um);
 }
 
 void ModeManager::RemoveChannelMode(ChannelMode *cm)
 {
-	for (unsigned i = 0; i < ModeManager::ChannelModes.size(); ++i)
+	if (!cm)
+		return;
+	
+	unsigned want = cm->mchar;
+	if (want >= ModeManager::ChannelModes.size())
+		return;
+	
+	if (ModeManager::ChannelModes[want] != cm)
+		return;
+	
+	ModeManager::ChannelModes[want] = NULL;
+
+	if (cm->type == MODE_STATUS)
 	{
-		ChannelMode *mode = ModeManager::ChannelModes[i];
-		if (cm == mode)
-		{
-			ModeManager::ChannelModes.erase(ModeManager::ChannelModes.begin() + i);
-			break;
-		}
+		ChannelModeStatus *cms = anope_dynamic_static_cast<ChannelModeStatus *>(cm);
+		want = cms->symbol;
+
+		if (want >= ModeManager::ChannelModes.size())
+			return;
+
+		if (ModeManager::ChannelModes[want] != cm)
+			return;
+
+		ModeManager::ChannelModes[want] = NULL;
 	}
+
+	ChannelModesByName.erase(cm->name);
 
 	StackerDel(cm);
 }
 
-ChannelMode *ModeManager::FindChannelModeByChar(char Mode)
+ChannelMode *ModeManager::FindChannelModeByChar(char mode)
 {
-	for (unsigned i = 0; i < ModeManager::ChannelModes.size(); ++i)
-	{
-		ChannelMode *cm = ModeManager::ChannelModes[i];
-		if (cm->mchar == Mode)
-			return cm;
-	}
-
-	return NULL;
+	unsigned want = mode;
+	if (want >= ModeManager::ChannelModes.size())
+		return NULL;
+	
+	return ModeManager::ChannelModes[want];
 }
 
-UserMode *ModeManager::FindUserModeByChar(char Mode)
+UserMode *ModeManager::FindUserModeByChar(char mode)
 {
-	for (unsigned i = 0; i < ModeManager::UserModes.size(); ++i)
-	{
-		UserMode *um = ModeManager::UserModes[i];
-		if (um->mchar == Mode)
-			return um;
-	}
-
-	return NULL;
+	unsigned want = mode;
+	if (want >= ModeManager::UserModes.size())
+		return NULL;
+	
+	return ModeManager::UserModes[want];
 }
 
 ChannelMode *ModeManager::FindChannelModeByName(const Anope::string &name)
 {
-	for (unsigned i = 0; i < ModeManager::ChannelModes.size(); ++i)
-	{
-		ChannelMode *cm = ModeManager::ChannelModes[i];
-		if (cm->name == name)
-			return cm;
-	}
-
+	std::map<Anope::string, ChannelMode *>::iterator it = ChannelModesByName.find(name);
+	if (it != ChannelModesByName.end())
+		return it->second;
 	return NULL;
 }
 
 UserMode *ModeManager::FindUserModeByName(const Anope::string &name)
 {
-	for (unsigned i = 0; i < ModeManager::UserModes.size(); ++i)
-	{
-		UserMode *um = ModeManager::UserModes[i];
-		if (um->name == name)
-			return um;
-	}
-
+	std::map<Anope::string, UserMode *>::iterator it = UserModesByName.find(name);
+	if (it != UserModesByName.end())
+		return it->second;
 	return NULL;
 }
 
-char ModeManager::GetStatusChar(char Value)
+char ModeManager::GetStatusChar(char value)
 {
-	for (unsigned i = 0; i < ModeManager::ChannelModes.size(); ++i)
-	{
-		ChannelMode *cm = ModeManager::ChannelModes[i];
-		if (cm->type == MODE_STATUS)
-		{
-			ChannelModeStatus *cms = anope_dynamic_static_cast<ChannelModeStatus *>(cm);
+	unsigned want = value;
+	if (want >= ModeManager::ChannelModes.size())
+		return 0;
+	
+	ChannelMode *cm = ModeManager::ChannelModes[want];
+	if (cm == NULL || cm->type != MODE_STATUS)
+		return 0;
+	
+	return cm->mchar;
+}
 
-			if (Value == cms->Symbol)
-				return cms->mchar;
-		}
-	}
+const std::vector<ChannelMode *> &ModeManager::GetChannelModes()
+{
+	return ChannelModes;
+}
 
-	return 0;
+const std::vector<UserMode *> &ModeManager::GetUserModes()
+{
+	return UserModes;
 }
 
 void ModeManager::StackerAdd(const BotInfo *bi, Channel *c, ChannelMode *cm, bool Set, const Anope::string &Param)
@@ -592,17 +643,9 @@ void ModeManager::UpdateDefaultMLock(ServerConfig *config)
 	}
 
 	/* Set Bot Modes */
-	DefaultBotModes.modes.clear();
+	DefaultBotModes.Clear();
 	for (unsigned i = 0; i < config->BotModes.length(); ++i)
-	{
-		ChannelMode *cm = ModeManager::FindChannelModeByChar(config->BotModes[i]);
-
-		if (cm && cm->type == MODE_STATUS)
-			DefaultBotModes.modes.insert(cm->name);
-		else
-			/* We don't know the mode yet so just use the mode char */
-			DefaultBotModes.modes.insert(config->BotModes[i]);
-	}
+		DefaultBotModes.AddMode(config->BotModes[i]);
 }
 
 Entry::Entry(const Anope::string &m, const Anope::string &fh) : name(m), mask(fh), cidr_len(0)
@@ -689,7 +732,7 @@ const Anope::string Entry::GetMask() const
 	return this->mask;
 }
 
-bool Entry::Matches(const User *u, bool full) const
+bool Entry::Matches(User *u, bool full) const
 {
 	/* First check if this mode has defined any matches (usually for extbans). */
 	if (IRCD->IsExtbanValid(this->mask))

@@ -148,7 +148,7 @@ class CoreExport IRCDProto : public Service
 	 * be set on the user. This may include the modes in the join, but will usually place them on the mode
 	 * stacker to be set "soon".
 	 */
-	virtual void SendJoin(const User *u, Channel *c, const ChannelStatus *status) = 0;
+	virtual void SendJoin(User *u, Channel *c, const ChannelStatus *status) = 0;
 	virtual void SendPart(const BotInfo *bi, const Channel *chan, const char *fmt, ...);
 
 	/** Force joins a user that isn't ours to a channel.

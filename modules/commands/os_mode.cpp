@@ -45,13 +45,13 @@ class CommandOSMode : public Command
 			{
 				for (Channel::ChanUserList::iterator it = c->users.begin(), it_end = c->users.end(); it != it_end; ++it)
 				{
-					ChanUserContainer *uc = *it;
+					ChanUserContainer *uc = it->second;
 
 					if (uc->user->HasMode("OPER"))
 						continue;
 
-					for (std::set<Anope::string>::iterator it2 = uc->status.modes.begin(), it2_end = uc->status.modes.end(); it2 != it2_end; ++it2)
-						c->RemoveMode(c->ci->WhoSends(), *it2, uc->user->GetUID(), false);
+					for (size_t i = 0; i < uc->status.Modes().length(); ++i)
+						c->RemoveMode(c->ci->WhoSends(), ModeManager::FindChannelModeByChar(uc->status.Modes()[i]), uc->user->GetUID(), false);
 				}
 
 				source.Reply(_("All modes cleared on %s."), c->name.c_str());

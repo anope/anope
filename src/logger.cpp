@@ -56,9 +56,7 @@ static Anope::string GetTimeStamp()
 static inline Anope::string CreateLogName(const Anope::string &file, time_t t = Anope::CurTime)
 {
 	char timestamp[32];
-
 	tm *tm = localtime(&t);
-	
 	strftime(timestamp, sizeof(timestamp), "%Y%m%d", tm);
 
 	return Anope::LogDir + "/" + file + "." + timestamp;
@@ -68,7 +66,12 @@ LogFile::LogFile(const Anope::string &name) : filename(name), stream(name.c_str(
 {
 }
 
-Anope::string LogFile::GetName() const
+LogFile::~LogFile()
+{
+	this->stream.close();
+}
+
+const Anope::string &LogFile::GetName() const
 {
 	return this->filename;
 }
@@ -77,8 +80,6 @@ Log::Log(LogType t, const Anope::string &cat, const BotInfo *b) : bi(b), u(NULL)
 {
 	if (!bi && Config)
 		bi = Global;
-	if (bi)
-		this->sources.push_back(bi->nick);
 }
 
 Log::Log(LogType t, CommandSource &source, Command *_c, const ChannelInfo *_ci) : nick(source.GetNick()), u(source.GetUser()), nc(source.nc), c(_c), chan(NULL), ci(_ci), s(NULL), m(NULL), type(t)
@@ -96,13 +97,6 @@ Log::Log(LogType t, CommandSource &source, Command *_c, const ChannelInfo *_ci) 
 	if (this->bi == NULL && Config)
 		this->bi = Global;
 	this->category = c->name;
-	if (this->bi)
-		this->sources.push_back(this->bi->nick);
-	if (u)
-		this->sources.push_back(u->nick);
-	this->sources.push_back(c->name);
-	if (ci)
-		this->sources.push_back(ci->name);
 }
 
 Log::Log(const User *_u, Channel *ch, const Anope::string &cat) : bi(NULL), u(_u), nc(NULL), c(NULL), chan(ch), ci(chan ? *chan->ci : NULL), s(NULL), m(NULL), type(LOG_CHANNEL), category(cat)
@@ -112,11 +106,6 @@ Log::Log(const User *_u, Channel *ch, const Anope::string &cat) : bi(NULL), u(_u
 	
 	if (Config)
 		this->bi = ChanServ;
-	if (this->bi)
-		this->sources.push_back(this->bi->nick);
-	if (u)
-		this->sources.push_back(u->nick);
-	this->sources.push_back(chan->name);
 }
 
 Log::Log(const User *_u, const Anope::string &cat, const BotInfo *_bi) : bi(_bi), u(_u), nc(NULL), c(NULL), chan(NULL), ci(NULL), s(NULL), m(NULL), type(LOG_USER), category(cat)
@@ -126,9 +115,6 @@ Log::Log(const User *_u, const Anope::string &cat, const BotInfo *_bi) : bi(_bi)
 	
 	if (!this->bi && Config)
 		this->bi = Global;
-	if (this->bi)
-		this->sources.push_back(this->bi->nick);
-	this->sources.push_back(u->nick);
 }
 
 Log::Log(Server *serv, const Anope::string &cat, const BotInfo *_bi) : bi(_bi), u(NULL), nc(NULL), c(NULL), chan(NULL), ci(NULL), s(serv), m(NULL), type(LOG_SERVER), category(cat)
@@ -140,23 +126,16 @@ Log::Log(Server *serv, const Anope::string &cat, const BotInfo *_bi) : bi(_bi), 
 		this->bi = OperServ;
 	if (!this->bi && Config)
 		this->bi = Global;
-	if (this->bi)
-		this->sources.push_back(this->bi->nick);
-	this->sources.push_back(s->GetName());
 }
 
 Log::Log(const BotInfo *b, const Anope::string &cat) : bi(b), u(NULL), nc(NULL), c(NULL), chan(NULL), ci(NULL), s(NULL), m(NULL), type(LOG_NORMAL), category(cat)
 {
 	if (!this->bi && Config)
 		this->bi = Global;
-	if (this->bi)
-		this->sources.push_back(bi->nick);
 }
 
 Log::Log(Module *mod, const Anope::string &cat) : bi(NULL), u(NULL), nc(NULL), c(NULL), chan(NULL), ci(NULL), s(NULL), m(mod), type(LOG_MODULE), category(cat)
 {
-	if (m)
-		this->sources.push_back(m->name);
 }
 
 Log::~Log()
@@ -167,11 +146,12 @@ Log::~Log()
 		std::cout << GetTimeStamp() << " " << this->BuildPrefix() << this->buf.str() << std::endl;
 	else if (this->type == LOG_TERMINAL)
 		std::cout << this->BuildPrefix() << this->buf.str() << std::endl;
-	for (unsigned i = 0; Config && i < Config->LogInfos.size(); ++i)
-	{
-		LogInfo *l = Config->LogInfos[i];
-		l->ProcessMessage(this);
-	}
+	
+	if (Config)
+		for (unsigned i = 0; i < Config->LogInfos.size(); ++i)
+			if (Config->LogInfos[i]->HasType(this->type, this->category))
+				Config->LogInfos[i]->ProcessMessage(this);
+
 	FOREACH_MOD(I_OnLog, OnLog(this));
 }
 
@@ -264,40 +244,20 @@ Anope::string Log::BuildPrefix() const
 	return buffer;
 }
 
-LogInfo::LogInfo(int la, bool rio, bool ldebug) : log_age(la), raw_io(rio), debug(ldebug)
+LogInfo::LogInfo(int la, bool rio, bool ldebug) : last_day(0), log_age(la), raw_io(rio), debug(ldebug)
 {
 }
 
 LogInfo::~LogInfo()
 {
-	for (std::map<Anope::string, LogFile *>::iterator it = this->logfiles.begin(), it_end = this->logfiles.end(); it != it_end; ++it)
-	{
-		LogFile *f = it->second;
-
-		if (f && f->stream.is_open())
-			f->stream.close();
-		delete f;
-	}
+	for (unsigned i = 0; i < this->logfiles.size(); ++i)
+		delete this->logfiles[i];
 	this->logfiles.clear();
-}
-
-void LogInfo::AddType(std::list<Anope::string> &list, const Anope::string &type)
-{
-	for (std::list<Anope::string>::iterator it = list.begin(), it_end = list.end(); it != it_end; ++it)
-	{
-		if (Anope::Match(type, *it))
-		{
-			Log() << "Log: Type " << type << " is already covered by " << *it;
-			return;
-		}
-	}
-
-	list.push_back(type);
 }
 
 bool LogInfo::HasType(LogType ltype, const Anope::string &type) const
 {
-	const std::list<Anope::string> *list = NULL;
+	const std::vector<Anope::string> *list = NULL;
 	switch (ltype)
 	{
 		case LOG_ADMIN:
@@ -338,9 +298,9 @@ bool LogInfo::HasType(LogType ltype, const Anope::string &type) const
 	if (list == NULL)
 		return false;
 
-	for (std::list<Anope::string>::const_iterator it = list->begin(), it_end = list->end(); it != it_end; ++it)
+	for (unsigned i = 0; i < list->size(); ++i)
 	{
-		Anope::string cat = *it;
+		Anope::string cat = list->at(i);
 		bool inverse = false;
 		if (cat[0] == '~')
 		{
@@ -356,36 +316,63 @@ bool LogInfo::HasType(LogType ltype, const Anope::string &type) const
 	return false;
 }
 
+void LogInfo::OpenLogFiles()
+{
+	for (unsigned i = 0; i < this->logfiles.size(); ++i)
+		delete this->logfiles[i];
+	this->logfiles.clear();
+
+	for (unsigned i = 0; i < this->targets.size(); ++i)
+	{
+		const Anope::string &target = this->targets[i];
+
+		if (target.empty() || target[0] == '#' || target == "globops")
+			continue;
+
+		LogFile *lf = new LogFile(CreateLogName(target));
+		if (!lf->stream.is_open())
+		{
+			Log() << "Unable to open logfile " << lf->GetName();
+			delete lf;
+		}
+		else
+			this->logfiles.push_back(lf);
+	}
+}
+
 void LogInfo::ProcessMessage(const Log *l)
 {
-	static time_t lastwarn = Anope::CurTime;
-
-	if (!l)
-		throw CoreException("Bad values passed to LogInfo::ProcessMessages");
-	else if (!this->HasType(l->type, l->category))
-		return;
-	
 	if (!this->sources.empty())
 	{
 		bool log = false;
-		for (std::list<Anope::string>::const_iterator it = this->sources.begin(), it_end = this->sources.end(); it != it_end; ++it)
+		for (unsigned i = 0; i < this->sources.size() && !log; ++i)
 		{
-			if (std::find(l->sources.begin(), l->sources.end(), *it) != l->sources.end())
-			{
+			const Anope::string &src = this->sources[i];
+
+			if (l->bi && src == l->bi->nick)
 				log = true;
-				break;
-			}
+			else if (l->u && src == l->u->nick)
+				log = true;
+			else if (l->nc && src == l->nc->display)
+				log = true;
+			else if (l->ci && src == l->ci->name)
+				log = true;
+			else if (l->m && src == l->m->name)
+				log = true;
+			else if (l->s && src == l->s->GetName())
+				log = true;
 		}
 		if (!log)
 			return;
 	}
 
-	for (std::list<Anope::string>::iterator it = this->targets.begin(), it_end = this->targets.end(); it != it_end; ++it)
-	{
-		const Anope::string &target = *it;
-		Anope::string buffer = l->BuildPrefix() + l->buf.str();
+	const Anope::string &buffer = l->BuildPrefix() + l->buf.str();
 
-		if (target[0] == '#')
+	for (unsigned i = 0; i < this->targets.size(); ++i)
+	{
+		const Anope::string &target = this->targets[i];
+
+		if (!target.empty() && target[0] == '#')
 		{
 			if (UplinkSock && l->type <= LOG_NORMAL && Me && Me->IsSynced())
 			{
@@ -402,63 +389,35 @@ void LogInfo::ProcessMessage(const Log *l)
 				IRCD->SendGlobops(l->bi, "%s", buffer.c_str());
 			}
 		}
-		else
-		{
-			LogFile *log = NULL;
-			std::map<Anope::string, LogFile *>::iterator lit = this->logfiles.find(target);
-			if (lit != this->logfiles.end())
-			{
-				log = lit->second;
-				if (log && log->GetName() != CreateLogName(target))
-				{
-					delete log;
-					this->logfiles.erase(lit);
-					log = new LogFile(CreateLogName(target));
-					this->logfiles[target] = log;
+	}
+	
+	tm *tm = localtime(&Anope::CurTime);
+	if (tm->tm_mday != this->last_day)
+	{
+		this->last_day = tm->tm_mday;
+		this->OpenLogFiles();
 
-					if (this->log_age)
-					{
-						Anope::string oldlog = CreateLogName(target, Anope::CurTime - 86400 * this->log_age);
-						if (IsFile(oldlog))
-						{
-							unlink(oldlog.c_str());
-							Log(LOG_DEBUG) << "Deleted old logfile " << oldlog;
-						}
-					}
-				}
-				if (!log || !log->stream.is_open())
+		if (this->log_age)
+			for (unsigned i = 0; i < this->targets.size(); ++i)
+			{
+				const Anope::string &target = this->targets[i];
+
+				if (target.empty() || target[0] == '#' || target == "globops")
+					continue;
+
+				Anope::string oldlog = CreateLogName(target, Anope::CurTime - 86400 * this->log_age);
+				if (IsFile(oldlog))
 				{
-					if (log && lastwarn + 300 < Anope::CurTime)
-					{
-						lastwarn = Anope::CurTime;
-						Log() << "Unable to open logfile " << log->GetName();
-					}
-					delete log;
-					this->logfiles.erase(lit);
-					log = NULL;
+					unlink(oldlog.c_str());
+					Log(LOG_DEBUG) << "Deleted old logfile " << oldlog;
 				}
 			}
-			else if (lit == this->logfiles.end())
-			{
-				log = new LogFile(CreateLogName(target));
+	}
 
-				if (!log->stream.is_open())
-				{
-					if (lastwarn + 300 < Anope::CurTime)
-					{
-						lastwarn = Anope::CurTime;
-						Log() << "Unable to open logfile " << log->GetName();
-					}
-					delete log;
-					log = NULL;
-				}
-				else
-					this->logfiles[target] = log;
-			}
-
-			if (log)
-				log->stream << GetTimeStamp() << " " << buffer << std::endl;
-		}
+	for (unsigned i = 0; i < this->logfiles.size(); ++i)
+	{
+		LogFile *lf = this->logfiles[i];
+		lf->stream << GetTimeStamp() << " " << buffer << std::endl;
 	}
 }
 

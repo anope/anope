@@ -62,7 +62,7 @@ class NSRecoverRequest : public IdentifyRequest
 				{
 					NSRecoverExtensibleInfo *ei = new NSRecoverExtensibleInfo;
 					for (User::ChanUserList::iterator it = u->chans.begin(), it_end = u->chans.end(); it != it_end; ++it)
-						(*ei)[(*it)->chan->name] = (*it)->status;
+						(*ei)[it->first->name] = it->second->status;
 
 					source.GetUser()->Extend("ns_recover_info", ei);
 				}
@@ -265,8 +265,8 @@ class NSRecover : public Module
 				std::map<Anope::string, ChannelStatus>::iterator it = ei->find(c->name);
 				if (it != ei->end())
 				{
-					for (std::set<Anope::string>::iterator it2 = it->second.modes.begin(), it2_end = it->second.modes.end(); it2 != it2_end; ++it2)
-						c->SetMode(c->ci->WhoSends(), ModeManager::FindChannelModeByName(*it2), u->GetUID());
+					for (size_t i = 0; i < it->second.Modes().length(); ++i)
+						c->SetMode(c->ci->WhoSends(), ModeManager::FindChannelModeByChar(it->second.Modes()[i]), u->GetUID());
 
 					ei->erase(it);
 					if (ei->empty())

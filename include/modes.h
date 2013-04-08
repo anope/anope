@@ -134,7 +134,7 @@ class CoreExport ChannelModeList : public ChannelMode
 	 * @param e The entry to match against
 	 * @return true on match
 	 */
-	virtual bool Matches(const User *u, const Entry *e) { return false; }
+	virtual bool Matches(User *u, const Entry *e) { return false; }
 
 	/** Called when a mask is added to a channel
 	 * @param chan The channel
@@ -181,7 +181,7 @@ class CoreExport ChannelModeStatus : public ChannelMode
 {
  public:
 	/* The symbol, eg @ % + */
-	char Symbol;
+	char symbol;
 	/* The "level" of the mode, used to compare with other modes.
 	 * Used so we know op > halfop > voice etc.
 	 */
@@ -190,10 +190,10 @@ class CoreExport ChannelModeStatus : public ChannelMode
 	/** constructor
 	 * @param name The mode name
 	 * @param mc The mode char
-	 * @param mSymbol The symbol for the mode, eg @ % 
+	 * @param msymbol The symbol for the mode, eg @ % 
 	 * @param mlevel A level for the mode, which is usually determined by the PREFIX capab
 	 */
-	ChannelModeStatus(const Anope::string &name, char mc, char mSymbol, short mlevel = 0);
+	ChannelModeStatus(const Anope::string &name, char mc, char msymbol, short mlevel = 0);
 
 	/** destructor
 	 */
@@ -203,9 +203,14 @@ class CoreExport ChannelModeStatus : public ChannelMode
 /* The status a user has on a channel (+v, +h, +o) etc */
 class CoreExport ChannelStatus
 {
+	Anope::string modes;
  public:
-	std::set<Anope::string> modes;
-	Anope::string BuildCharPrefixList() const;
+ 	void AddMode(char c);
+	void DelMode(char c);
+	bool HasMode(char c) const;
+	bool Empty() const;
+	void Clear();
+	const Anope::string &Modes() const;
 	Anope::string BuildModePrefixList() const;
 };
 
@@ -292,10 +297,13 @@ class CoreExport ModeManager
 	 */
 	static std::list<Anope::string> BuildModeStrings(StackerInfo *info);
 
- public:
- 	/* List of all modes Anope knows about */
+	/* Array of all modes Anope knows about. Modes are in this array at position
+	 * modechar. Additionally, status modes are in this array (again) at statuschar.
+	 */
 	static std::vector<ChannelMode *> ChannelModes;
 	static std::vector<UserMode *> UserModes;
+
+ public:
 
 	/* Number of generic channel and user modes we are tracking */
 	static unsigned GenericChannelModes;
@@ -358,6 +366,9 @@ class CoreExport ModeManager
 	 */
 	static char GetStatusChar(char symbol);
 
+	static const std::vector<ChannelMode *> &GetChannelModes();
+	static const std::vector<UserMode *> &GetUserModes();
+
 	/** Add a mode to the stacker to be set on a channel
 	 * @param bi The client to set the modes from
 	 * @param c The channel
@@ -419,7 +430,7 @@ class CoreExport Entry
 	 * @param full True to match against a users real host and IP
 	 * @return true on match
 	 */
-	bool Matches(const User *u, bool full = false) const;
+	bool Matches(User *u, bool full = false) const;
 };
 
 #endif // MODES_H

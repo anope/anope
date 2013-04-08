@@ -66,7 +66,7 @@ class CommandCSSuspend : public Command
 
 			for (Channel::ChanUserList::iterator it = ci->c->users.begin(), it_end = ci->c->users.end(); it != it_end; ++it)
 			{
-				ChanUserContainer *uc = *it;
+				ChanUserContainer *uc = it->second;
 				User *user = uc->user;
 				if (!user->HasMode("OPER") && user->server != Me)
 					users.push_back(user);

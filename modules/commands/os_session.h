@@ -42,11 +42,7 @@ class SessionService : public Service
 
 	virtual ExceptionVector &GetExceptions() = 0;
 
-	virtual void AddSession(Session *s) = 0;
-
-	virtual void DelSession(Session *s) = 0;
-
-	virtual Session *FindSession(const Anope::string &mask) = 0;
+	virtual Session *FindSession(const Anope::string &ip) = 0;
 
 	virtual SessionMap &GetSessions() = 0;
 };

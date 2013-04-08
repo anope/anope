@@ -64,7 +64,7 @@ void Join::Run(MessageSource &source, const std::vector<Anope::string> &params)
 		{
 			for (User::ChanUserList::iterator it = user->chans.begin(), it_end = user->chans.end(); it != it_end; )
 			{
-				ChanUserContainer *cc = *it++;
+				ChanUserContainer *cc = it->second++;
 
 				Anope::string channame = cc->chan->name;
 				FOREACH_MOD(I_OnPrePartChannel, OnPrePartChannel(user, cc->chan));
@@ -84,14 +84,12 @@ void Join::Run(MessageSource &source, const std::vector<Anope::string> &params)
 
 void Join::SJoin(MessageSource &source, const Anope::string &chan, time_t ts, const Anope::string &modes, const std::list<SJoinUser> &users)
 {
-	Channel *c = Channel::Find(chan);
+	bool created;
+	Channel *c = Channel::FindOrCreate(chan, created, ts ? ts : Anope::CurTime);
 	bool keep_their_modes = true;
 
-	if (!c)
-	{
-		c = new Channel(chan, ts ? ts : Anope::CurTime);
+	if (created)
 		c->Extend("SYNCING");
-	}
 	/* Some IRCds do not include a TS */
 	else if (!ts)
 		;
@@ -124,7 +122,8 @@ void Join::SJoin(MessageSource &source, const Anope::string &chan, time_t ts, co
 		ChanUserContainer *cc = c->JoinUser(u);
 
 		/* Update their status internally on the channel */
-		cc->status = status;
+		if (keep_their_modes)
+			cc->status = status;
 
 		/* Set whatever modes the user should have, and remove any that
 		 * they aren't allowed to have (secureops etc).
@@ -193,7 +192,7 @@ void Kill::Run(MessageSource &source, const std::vector<Anope::string> &params)
 		bi->introduced = true;
 
 		for (User::ChanUserList::const_iterator cit = bi->chans.begin(), cit_end = bi->chans.end(); cit != cit_end; ++cit)
-			IRCD->SendJoin(bi, (*cit)->chan, &(*cit)->status);
+			IRCD->SendJoin(bi, cit->second->chan, &cit->second->status);
 	}
 	else
 		u->KillInternal(source.GetSource(), params[1]);

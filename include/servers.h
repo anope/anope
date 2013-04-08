@@ -33,6 +33,10 @@ namespace Servers
 	 */
 	extern CoreExport Server* GetUplink();
 
+	/* Server maps by name and id */
+	extern CoreExport Anope::map<Server *> ByName;
+	extern CoreExport Anope::map<Server *> ByID;
+
 	/* CAPAB/PROTOCTL given by the uplink */
 	extern CoreExport std::set<Anope::string> Capab;
 }
@@ -169,10 +173,10 @@ class CoreExport Server : public Extensible
 
 	/** Find a server
 	 * @param name The name or SID/numeric
-	 * @param s The server list to search for this server on, defaults to our Uplink
+	 * @param name_only set to true to only look up by name, not SID
 	 * @return The server
 	 */
-	static Server *Find(const Anope::string &name, Server *s = NULL);
+	static Server *Find(const Anope::string &name, bool name_only = false);
 };
 
 #endif // SERVERS_H

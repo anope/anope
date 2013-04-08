@@ -255,7 +255,7 @@ namespace Anope
 		{
 			Anope::string new_string = *this;
 			for (size_type i = 0; i < new_string.length(); ++i)
-				new_string[i] = std::tolower(new_string[i], Anope::casemap);
+				new_string[i] = Anope::tolower(new_string[i]);
 			return new_string;
 		}
 
@@ -266,7 +266,7 @@ namespace Anope
 		{
 			Anope::string new_string = *this;
 			for (size_type i = 0; i < new_string.length(); ++i)
-				new_string[i] = std::toupper(new_string[i], Anope::casemap);
+				new_string[i] = Anope::toupper(new_string[i]);
 			return new_string;
 		}
 
@@ -547,15 +547,12 @@ class CoreExport sepstream
 	/** Original string.
 	 */
 	Anope::string tokens;
-	/** Last position of a seperator token
-	 */
-	Anope::string::iterator last_starting_position;
-	/** Current string position
-	 */
-	Anope::string::iterator n;
 	/** Seperator value
 	 */
 	char sep;
+	/** Current string position
+	 */
+	size_t pos;
  public:
 	/** Create a sepstream and fill it with the provided data
 	 */
@@ -570,7 +567,7 @@ class CoreExport sepstream
 	/** Gets token number 'num' from the stream
 	 * @param token The token is placed here
 	 * @param num The token number to featch
-	 * @return True if the token was able to be detched
+	 * @return True if the token was able to be fetched
 	 */
 	bool GetToken(Anope::string &token, int num);
 
@@ -588,7 +585,7 @@ class CoreExport sepstream
 	/** Gets token number 'num' from the stream and all remaining tokens.
 	 * @param token The token is placed here
 	 * @param num The token number to featch
-	 * @return True if the token was able to be detched
+	 * @return True if the token was able to be fetched
 	 */
 	bool GetTokenRemainder(Anope::string &token, int num);
 

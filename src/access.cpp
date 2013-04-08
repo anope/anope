@@ -152,18 +152,18 @@ Serializable* ChanAccess::Unserialize(Serializable *obj, Serialize::Data &data)
 	return access;
 }
 
-bool ChanAccess::Matches(const User *u, const NickCore *nc) const
+bool ChanAccess::Matches(const User *u, const NickCore *acc) const
 {
 	bool is_mask = this->mask.find_first_of("!@?*") != Anope::string::npos;
 	if (u && is_mask && Anope::Match(u->nick, this->mask))
 		return true;
 	else if (u && Anope::Match(u->GetDisplayedMask(), this->mask))
 		return true;
-	else if (nc)
-		for (unsigned i = nc->aliases->size(); i > 0; --i)
+	else if (acc)
+		for (unsigned i = 0; i < acc->aliases->size(); ++i)
 		{
-			const NickAlias *na = nc->aliases->at(i - 1);
-			if (na && Anope::Match(na->nick, this->mask))
+			const NickAlias *na = acc->aliases->at(i);
+			if (Anope::Match(na->nick, this->mask))
 				return true;
 		}
 	return false;

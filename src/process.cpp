@@ -21,30 +21,21 @@ void Anope::Process(const Anope::string &buffer)
 	/* If debugging, log the buffer */
 	Log(LOG_RAWIO) << "Received: " << buffer;
 
-	/* Strip all extra spaces */
-	Anope::string buf = buffer;
-	while (buf.find("  ") != Anope::string::npos)
-		buf = buf.replace_all_cs("  ", " ");
-
-	if (buf.empty())
+	if (buffer.empty())
 		return;
 
+	spacesepstream buf_sep(buffer);
+
 	Anope::string source;
-	if (buf[0] == ':')
+	if (buffer[0] == ':')
 	{
-		size_t space = buf.find_first_of(" ");
-		if (space == Anope::string::npos)
-			return;
-		source = buf.substr(1, space - 1);
-		buf = buf.substr(space + 1);
-		if (source.empty() || buf.empty())
-			return;
+		buf_sep.GetToken(source);
+		source.erase(0, 1);
 	}
 
-	spacesepstream buf_sep(buf);
-
-	Anope::string command = buf;
-	buf_sep.GetToken(command);
+	Anope::string command;
+	if (!buf_sep.GetToken(command))
+		return;
 	
 	Anope::string buf_token;
 	std::vector<Anope::string> params;
@@ -95,7 +86,7 @@ void Anope::Process(const Anope::string &buffer)
 	else if (m->HasFlag(IRCDMESSAGE_REQUIRE_USER) && !src.GetUser())
 		Log(LOG_DEBUG) << "unexpected non-user source " << source << " for " << command;
 	else if (m->HasFlag(IRCDMESSAGE_REQUIRE_SERVER) && !source.empty() && !src.GetServer())
-		Log(LOG_DEBUG) << "unexpected non-server soruce " << source << " for " << command;
+		Log(LOG_DEBUG) << "unexpected non-server source " << source << " for " << command;
 	else
 		m->Run(src, params);
 }

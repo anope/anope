@@ -28,7 +28,7 @@ class CommandOSNOOP : public Command
 		const Anope::string &cmd = params[0];
 		const Anope::string &server = params[1];
 
-		Server *s = Server::Find(server);
+		Server *s = Server::Find(server, true);
 		if (s == NULL)
 			source.Reply(_("Server %s does not exist."), server.c_str());
 		else if (s == Me || s->IsJuped())

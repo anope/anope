@@ -37,7 +37,7 @@ class RatboxProto : public IRCDProto
 	void SendAkill(User *u, XLine *x) anope_override { hybrid->SendAkill(u, x); }
 	void SendAkillDel(const XLine *x) anope_override { hybrid->SendAkillDel(x); }
 	void SendSQLineDel(const XLine *x) anope_override { hybrid->SendSQLineDel(x); }
-	void SendJoin(const User *user, Channel *c, const ChannelStatus *status) anope_override { hybrid->SendJoin(user, c, status); }
+	void SendJoin(User *user, Channel *c, const ChannelStatus *status) anope_override { hybrid->SendJoin(user, c, status); }
 	void SendServer(const Server *server) anope_override { hybrid->SendServer(server); }
 	void SendModeInternal(const BotInfo *bi, const User *u, const Anope::string &buf) anope_override { hybrid->SendModeInternal(bi, u, buf); }
 	void SendChannel(Channel *c) anope_override { hybrid->SendChannel(c); }

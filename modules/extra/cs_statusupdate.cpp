@@ -36,7 +36,7 @@ class StatusUpdate : public Module
 		if (ci->c)
 			for (Channel::ChanUserList::iterator it = ci->c->users.begin(), it_end = ci->c->users.end(); it != it_end; ++it)
 			{
-				User *user = (*it)->user;
+				User *user = it->second->user;
 
 				if (access->Matches(user, user->Account()))
 				{
@@ -53,7 +53,7 @@ class StatusUpdate : public Module
 		if (ci->c)
 			for (Channel::ChanUserList::iterator it = ci->c->users.begin(), it_end = ci->c->users.end(); it != it_end; ++it)
 			{
-				User *user = (*it)->user;
+				User *user = it->second->user;
 
 				if (access->Matches(user, user->Account()))
 				{

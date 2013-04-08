@@ -23,12 +23,19 @@
 /* Anope */
 Server *Me = NULL;
 
+Anope::map<Server *> Servers::ByName;
+Anope::map<Server *> Servers::ByID;
+
 std::set<Anope::string> Servers::Capab;
 
 Server::Server(Server *up, const Anope::string &sname, unsigned shops, const Anope::string &desc, const Anope::string &ssid, bool jupe) : name(sname), hops(shops), description(desc), sid(ssid), uplink(up)
 {
 	syncing = true;
 	juped = jupe;
+
+	Servers::ByName[sname] = this;
+	if (!ssid.empty())
+		Servers::ByID[ssid] = this;
 
 	Log(this, "connect") << "uplinked to " << (this->uplink ? this->uplink->GetName() : "no uplink") << " connected to the network";
 
@@ -105,8 +112,8 @@ Server::Server(Server *up, const Anope::string &sname, unsigned shops, const Ano
 				if (c->users.empty())
 					IRCD->SendChannel(c);
 				else
-					for (User::ChanUserList::const_iterator cit = c->users.begin(), cit_end = c->users.end(); cit != cit_end; ++cit)
-						IRCD->SendJoin((*cit)->user, c, &(*cit)->status);
+					for (Channel::ChanUserList::const_iterator cit = c->users.begin(), cit_end = c->users.end(); cit != cit_end; ++cit)
+						IRCD->SendJoin(cit->second->user, c, &cit->second->status);
 			}
 		}
 	}
@@ -148,6 +155,10 @@ Server::~Server()
 
 	for (unsigned i = this->links.size(); i > 0; --i)
 		this->links[i - 1]->Delete(this->quit_reason);
+	
+	Servers::ByName.erase(this->name);
+	if (!this->sid.empty())
+		Servers::ByID.erase(this->sid);
 }
 
 void Server::Delete(const Anope::string &reason)
@@ -248,12 +259,8 @@ void Server::Sync(bool sync_links)
 			ChannelInfo *ci = it->second;
 			if (ci->HasExt("PERSIST"))
 			{
-				bool created = false;
-				if (!ci->c)
-				{
-					ci->c = new Channel(ci->name, ci->time_registered);
-					created = true;
-				}
+				bool created;
+				ci->c = Channel::FindOrCreate(ci->name, created, ci->time_registered);
 				if (ModeManager::FindChannelModeByName("PERM") != NULL)
 				{
 					ci->c->SetMode(NULL, "PERM");
@@ -325,30 +332,21 @@ void Server::Notice(const BotInfo *source, const Anope::string &message)
 		IRCD->SendGlobalNotice(source, this, message);
 }
 
-Server *Server::Find(const Anope::string &name, Server *s)
+Server *Server::Find(const Anope::string &name, bool name_only)
 {
-	Log(LOG_DEBUG_2) << "Server::Find called for " << name;
-
-	if (!s)
-		s = Me;
-	if (s->GetName().equals_ci(name) || s->GetSID().equals_cs(name))
-		return s;
-
-	if (!s->GetLinks().empty())
+	Anope::map<Server *>::iterator it;
+	
+	if (!name_only)
 	{
-		for (unsigned i = 0, j = s->GetLinks().size(); i < j; ++i)
-		{
-			Server *serv = s->GetLinks()[i];
-
-			if (serv->GetName().equals_ci(name) || serv->GetSID().equals_cs(name))
-				return serv;
-			Log(LOG_DEBUG_2) << "Server::Find checking " << serv->GetName() << " server tree for " << name;
-			Server *server = Server::Find(name, serv);
-			if (server)
-				return server;
-		}
+		it = Servers::ByID.find(name);
+		if (it != Servers::ByID.end())
+			return it->second;
 	}
-
+	
+	it = Servers::ByName.find(name);
+	if (it != Servers::ByName.end())
+		return it->second;
+	
 	return NULL;
 }
 

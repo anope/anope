@@ -28,6 +28,10 @@ namespace Anope
 	/* Casemap in use by Anope. ci::string's comparation functions use this (and thus Anope::string) */
 	extern std::locale casemap;
 
+	extern void CaseMapRebuild();
+	extern unsigned char tolower(unsigned char);
+	extern unsigned char toupper(unsigned char);
+
 	/* ASCII case insensitive ctype. */
 	template<typename char_type>
 	class ascii_ctype : public std::ctype<char_type>

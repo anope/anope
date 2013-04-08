@@ -808,7 +808,7 @@ class BSKick : public Module
 		{
 			Channel *c = cit->second;
 			for (Channel::ChanUserList::iterator it = c->users.begin(), it_end = c->users.end(); it != it_end; ++it)
-				(*it)->Shrink("bs_main_userdata");
+				it->second->Shrink("bs_main_userdata");
 			c->Shrink("bs_main_bandata");
 		}
 	}
@@ -1033,7 +1033,7 @@ class BSKick : public Module
 			{
 				for (User::ChanUserList::iterator it = u->chans.begin(); it != u->chans.end();)
 				{
-					Channel *chan = (*it)->chan;
+					Channel *chan = it->second->chan;
 					++it;
 
 					if (chan->ci && chan->ci->HasExt("BS_KICK_AMSGS") && !chan->ci->AccessFor(u).HasPriv("NOKICK"))

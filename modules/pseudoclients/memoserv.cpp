@@ -81,7 +81,7 @@ class MyMemoServService : public MemoServService
 			{
 				for (Channel::ChanUserList::iterator it = ci->c->users.begin(), it_end = ci->c->users.end(); it != it_end; ++it)
 				{
-					ChanUserContainer *cu = *it;
+					ChanUserContainer *cu = it->second;
 
 					if (ci->AccessFor(cu->user).HasPriv("MEMO"))
 					{
@@ -171,7 +171,7 @@ class MemoServCore : public Module
 
 	void OnJoinChannel(User *u, Channel *c) anope_override
 	{
-		if (c->ci && c->ci->AccessFor(u).HasPriv("MEMO") && c->ci->memos.memos->size() > 0)
+		if (c->ci && !c->ci->memos.memos->empty() && c->ci->AccessFor(u).HasPriv("MEMO"))
 		{
 			if (c->ci->memos.memos->size() == 1)
 				u->SendMessage(MemoServ, _("There is \002%d\002 memo on channel %s."), c->ci->memos.memos->size(), c->ci->name.c_str());

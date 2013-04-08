@@ -52,7 +52,7 @@ class CharybdisProto : public IRCDProto
 	void SendAkill(User *u, XLine *x) anope_override { ratbox->SendAkill(u, x); }
 	void SendAkillDel(const XLine *x) anope_override { ratbox->SendAkillDel(x); }
 	void SendSQLineDel(const XLine *x) anope_override { ratbox->SendSQLineDel(x); }
-	void SendJoin(const User *user, Channel *c, const ChannelStatus *status) anope_override { ratbox->SendJoin(user, c, status); }
+	void SendJoin(User *user, Channel *c, const ChannelStatus *status) anope_override { ratbox->SendJoin(user, c, status); }
 	void SendServer(const Server *server) anope_override { ratbox->SendServer(server); }
 	void SendChannel(Channel *c) anope_override { ratbox->SendChannel(c); }
 	void SendTopic(BotInfo *bi, Channel *c) anope_override { ratbox->SendTopic(bi, c); }

@@ -60,10 +60,10 @@ struct SeenInfo : Serializable
 			s = anope_dynamic_static_cast<SeenInfo *>(obj);
 		else
 		{
-			/* ignore duplicate entries in the db, created by an old bug */
-			s = FindInfo(snick);
-			if (!s)
-				s = new SeenInfo();
+			SeenInfo* &info = database[snick];
+			if (!info)
+				info = new SeenInfo();
+			s = info;
 		}
 
 		data["nick"] >> s->nick;
@@ -388,12 +388,9 @@ class CSSeen : public Module
 		if (!u->server->IsSynced())
 			return;
 
-		SeenInfo *info = FindInfo(nick);
+		SeenInfo* &info = database[nick];
 		if (!info)
-		{
-			info = new SeenInfo;
-			database.insert(std::pair<Anope::string, SeenInfo *>(nick, info));
-		}
+			info = new SeenInfo();
 		info->nick = nick;
 		info->vhost = u->GetVIdent() + "@" + u->GetDisplayedHost();
 		info->type = Type;

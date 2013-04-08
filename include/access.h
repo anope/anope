@@ -79,6 +79,8 @@ class CoreExport ChanAccess : public Serializable
 	AccessProvider *provider;
 	/* Channel this access entry is on */
 	Serialize::Reference<ChannelInfo> ci;
+	/* account this access entry is for, if any */
+	Serialize::Reference<NickCore> nc;
 	Anope::string mask;
 	Anope::string creator;
 	time_t last_seen;

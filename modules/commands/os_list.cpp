@@ -44,7 +44,7 @@ class CommandOSChanList : public Command
 
 			for (User::ChanUserList::iterator uit = u2->chans.begin(), uit_end = u2->chans.end(); uit != uit_end; ++uit)
 			{
-				ChanUserContainer *cc = *uit;
+				ChanUserContainer *cc = uit->second;
 
 				if (!modes.empty())
 					for (std::set<Anope::string>::iterator it = modes.begin(), it_end = modes.end(); it != it_end; ++it)
@@ -142,7 +142,7 @@ class CommandOSUserList : public Command
 
 			for (Channel::ChanUserList::iterator cuit = c->users.begin(), cuit_end = c->users.end(); cuit != cuit_end; ++cuit)
 			{
-				ChanUserContainer *uc = *cuit;
+				ChanUserContainer *uc = cuit->second;
 
 				if (!modes.empty())
 					for (std::set<Anope::string>::iterator it = modes.begin(), it_end = modes.end(); it != it_end; ++it)

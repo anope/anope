@@ -214,7 +214,7 @@ class CommandOSDNS : public Command
 		for (unsigned i = 0; i < dns_servers->size(); ++i)
 		{
 			DNSServer *s = dns_servers->at(i);
-			Server *srv = Server::Find(s->GetName());
+			Server *srv = Server::Find(s->GetName(), true);
 
 			ListFormatter::ListEntry entry;
 			entry["Server"] = s->GetName();
@@ -351,7 +351,7 @@ class CommandOSDNS : public Command
 			return;
 		}
 
-		Server *serv = Server::Find(params[1]);
+		Server *serv = Server::Find(params[1], true);
 		if (!serv || serv == Me || serv->IsJuped())
 		{
 			source.Reply(_("Server %s is not linked to the network."), params[1].c_str());
@@ -411,7 +411,7 @@ class CommandOSDNS : public Command
 			source.Reply(_("Removed server %s from zone %s."), s->GetName().c_str(), z->name.c_str());
 			return;
 		}
-		else if (Server::Find(s->GetName()))
+		else if (Server::Find(s->GetName(), true))
 		{
 			source.Reply(_("Server %s must be quit before it can be deleted."), s->GetName().c_str());
 			return;
@@ -543,7 +543,7 @@ class CommandOSDNS : public Command
 			source.Reply(_("Server %s does not exist."), params[1].c_str());
 			return;
 		}
-		else if (!Server::Find(s->GetName()))
+		else if (!Server::Find(s->GetName(), true))
 		{
 			source.Reply(_("Server %s is not currently linked."), s->GetName().c_str());
 			return;
@@ -676,7 +676,7 @@ class ModuleDNS : public Module
 		for (unsigned j = 0; j < dns_servers->size(); ++j)
 		{
 			DNSServer *s = dns_servers->at(j);
-			if (s->Pooled() && Server::Find(s->GetName()))
+			if (s->Pooled() && Server::Find(s->GetName(), true))
 				s->SetActive(true);
 		}
 	}

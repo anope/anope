@@ -88,7 +88,7 @@ class HybridProto : public IRCDProto
 		UplinkSocket::Message(OperServ) << "UNRESV * " << x->mask;
 	}
 
-	void SendJoin(const User *user, Channel *c, const ChannelStatus *status) anope_override
+	void SendJoin(User *user, Channel *c, const ChannelStatus *status) anope_override
 	{
 		/*
 		 * Note that we must send our modes with the SJOIN and
@@ -234,7 +234,7 @@ class HybridProto : public IRCDProto
 		{
 			ChannelStatus status;
 
-			status.modes.insert("OP");
+			status.AddMode('o');
 			bi->Join(c, &status);
 		}
 
@@ -271,24 +271,14 @@ struct IRCDMessageBMask : IRCDMessage
 	void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		Channel *c = Channel::Find(params[1]);
+		ChannelMode *mode = ModeManager::FindChannelModeByChar(params[2][0]);
 
-		if (c)
+		if (c && mode)
 		{
-			ChannelMode *ban = ModeManager::FindChannelModeByName("BAN"),
-					*except = ModeManager::FindChannelModeByName("EXCEPT"),
-					*invex = ModeManager::FindChannelModeByName("INVITEOVERRIDE");
-
 			spacesepstream bans(params[3]);
 			Anope::string token;
 			while (bans.GetToken(token))
-			{
-				if (ban && params[2].equals_cs("b"))
-					c->SetModeInternal(source, ban, token);
-				else if (except && params[2].equals_cs("e"))
-					c->SetModeInternal(source, except, token);
-				else if (invex && params[2].equals_cs("I"))
-					c->SetModeInternal(source, invex, token);
-			}
+				c->SetModeInternal(source, mode, token);
 		}
 	}
 };
@@ -412,15 +402,7 @@ struct IRCDMessageSJoin : IRCDMessage
 			for (char ch; (ch = ModeManager::GetStatusChar(buf[0]));)
 			{
 				buf.erase(buf.begin());
-				ChannelMode *cm = ModeManager::FindChannelModeByChar(ch);
-
-				if (!cm)
-				{
-					Log() << "Received unknown mode prefix " << ch << " in SJOIN string";
-					continue;
-				}
-
-				sju.first.modes.insert(cm->name);
+				sju.first.AddMode(ch);
 			}
 
 			sju.second = User::Find(buf);

@@ -602,7 +602,7 @@ AccessGroup ChannelInfo::AccessFor(const User *u)
 		return group;
 
 	const NickCore *nc = u->Account();
-	if (nc == NULL && u->IsRecognized())
+	if (nc == NULL && !this->HasExt("SECURE") && u->IsRecognized())
 	{
 		const NickAlias *na = NickAlias::Find(u->nick);
 		if (na != NULL)

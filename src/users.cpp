@@ -456,24 +456,20 @@ NickCore *User::Account() const
 	return this->nc;
 }
 
-bool User::IsIdentified(bool CheckNick) const
+bool User::IsIdentified(bool check_nick) const
 {
-	if (CheckNick && this->nc)
+	if (check_nick && this->nc)
 	{
 		NickAlias *na = NickAlias::Find(this->nc->display);
-
-		if (na && *na->nc == *this->nc)
-			return true;
-
-		return false;
+		return na && *na->nc == *this->nc;
 	}
 
 	return this->nc ? true : false;
 }
 
-bool User::IsRecognized(bool CheckSecure) const
+bool User::IsRecognized(bool check_secure) const
 {
-	if (CheckSecure && on_access)
+	if (check_secure && on_access)
 	{
 		const NickAlias *na = NickAlias::Find(this->nick);
 

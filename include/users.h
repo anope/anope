@@ -221,10 +221,10 @@ class CoreExport User : public virtual Base, public Extensible, public CommandRe
 	bool IsIdentified(bool check_nick = false) const;
 
 	/** Check if the user is recognized for their nick (on the nicks access list)
-	 * @param check_nick Only returns true if the user has secure off
+	 * @param check_secure Only returns true if the user has secure off
 	 * @return true or false
 	 */
-	bool IsRecognized(bool check_nick = true) const;
+	bool IsRecognized(bool check_secure = true) const;
 
 	/** Check if the user is a services oper
 	 * @return true if they are an oper

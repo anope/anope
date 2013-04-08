@@ -717,6 +717,8 @@ struct IRCDMessageCapab : Message::Capab
 								ModeManager::AddChannelMode(new ChannelModeStatus("", modes[t], chars[t], level--));
 						}
 					}
+
+					ModeManager::RebuildStatusModes();
 				}
 				else if (capab.find("MAXMODES=") != Anope::string::npos)
 				{

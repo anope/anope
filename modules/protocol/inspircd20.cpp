@@ -469,7 +469,11 @@ struct IRCDMessageCapab : Message::Capab
 
 						ChannelModeStatus *cms = anope_dynamic_static_cast<ChannelModeStatus *>(cm);
 						cms->level = level--;
+
+						Log(LOG_DEBUG) << cms->name << " is now level " << cms->level;
 					}
+
+					ModeManager::RebuildStatusModes();
 				}
 			}
 		}

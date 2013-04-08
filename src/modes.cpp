@@ -25,6 +25,9 @@ std::vector<UserMode *> ModeManager::UserModes;
 static std::map<Anope::string, ChannelMode *> ChannelModesByName;
 static std::map<Anope::string, UserMode *> UserModesByName;
 
+/* Sorted by status */
+static std::vector<ChannelModeStatus *> ChannelModesByStatus;
+
 /* Number of generic modes we support */
 unsigned ModeManager::GenericChannelModes = 0, ModeManager::GenericUserModes = 0;
 
@@ -349,6 +352,8 @@ bool ModeManager::AddChannelMode(ChannelMode *cm)
 		if (want >= ModeManager::ChannelModes.size())
 			ModeManager::ChannelModes.resize(want + 1);
 		ModeManager::ChannelModes[want] = cms;
+
+		RebuildStatusModes();
 	}
 
 	ChannelModesByName[cm->name] = cm;
@@ -406,6 +411,8 @@ void ModeManager::RemoveChannelMode(ChannelMode *cm)
 			return;
 
 		ModeManager::ChannelModes[want] = NULL;
+
+		RebuildStatusModes();
 	}
 
 	ChannelModesByName.erase(cm->name);
@@ -468,6 +475,32 @@ const std::vector<ChannelMode *> &ModeManager::GetChannelModes()
 const std::vector<UserMode *> &ModeManager::GetUserModes()
 {
 	return UserModes;
+}
+
+const std::vector<ChannelModeStatus *> &ModeManager::GetStatusChannelModesByRank()
+{
+	return ChannelModesByStatus;
+}
+
+static struct StatusSort
+{
+	bool operator()(ChannelModeStatus *cm1, ChannelModeStatus *cm2) const
+	{
+		return cm1->level > cm2->level;
+	}
+} statuscmp;
+
+void ModeManager::RebuildStatusModes()
+{
+	ChannelModesByStatus.clear();
+	for (unsigned j = 0; j < ModeManager::GetChannelModes().size(); ++j)
+	{
+		ChannelMode *cm = ModeManager::GetChannelModes()[j];
+
+		if (cm && cm->type == MODE_STATUS && std::find(ChannelModesByStatus.begin(), ChannelModesByStatus.end(), cm) == ChannelModesByStatus.end())
+			ChannelModesByStatus.push_back(anope_dynamic_static_cast<ChannelModeStatus *>(cm));
+	}
+	std::sort(ChannelModesByStatus.begin(), ChannelModesByStatus.end(), statuscmp);
 }
 
 void ModeManager::StackerAdd(const BotInfo *bi, Channel *c, ChannelMode *cm, bool Set, const Anope::string &Param)

@@ -20,25 +20,7 @@ class CommandCSMode : public Command
 		if (!ci || !cm || cm->type != MODE_STATUS)
 			return false;
 
-		const Anope::string accesses[] = { "VOICE", "HALFOP", "OPDEOP", "PROTECT", "OWNER", "" },
-				accesses_self[] = { "VOICEME", "HALFOPME", "OPDEOPME", "PROTECTME", "OWNERME", "" };
-		const Anope::string modes[] = { "VOICE", "HALFOP", "OP", "PROTECT", "OWNER" };
-		ChannelModeStatus *cms = anope_dynamic_static_cast<ChannelModeStatus *>(cm);
-		AccessGroup access = source.AccessFor(ci);
-		short u_level = -1;
-
-		for (int i = 0; !accesses[i].empty(); ++i)
-			if (access.HasPriv(self ? accesses_self[i] : accesses[i]))
-			{
-				ChannelMode *cm2 = ModeManager::FindChannelModeByName(modes[i]);
-				if (cm2 == NULL || cm2->type != MODE_STATUS)
-					continue;
-				ChannelModeStatus *cms2 = anope_dynamic_static_cast<ChannelModeStatus *>(cm2);
-				if (cms2->level > u_level)
-					u_level = cms2->level;
-			}
-
-		return u_level >= cms->level;
+		return source.AccessFor(ci).HasPriv(cm->name + (self ? "ME" : ""));
 	}
 
 	void DoLock(CommandSource &source, ChannelInfo *ci, const std::vector<Anope::string> &params)

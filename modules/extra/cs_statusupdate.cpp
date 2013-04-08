@@ -7,19 +7,6 @@
 
 #include "module.h"
 
-static struct ModeInfo
-{
-	Anope::string priv;
-	Anope::string name;
-} modeInfo[] = {
-	{ "AUTOOWNER", "OWNER" },
-	{ "AUTOPROTECT", "PROTECT" },
-	{ "AUTOOP", "OP" },
-	{ "AUTOHALFOP", "HALFOP" },
-	{ "AUTOVOICE", "VOICE" },
-	{ "", "" }
-};
-
 class StatusUpdate : public Module
 {
  public:
@@ -38,11 +25,14 @@ class StatusUpdate : public Module
 			{
 				User *user = it->second->user;
 
-				if (access->Matches(user, user->Account()))
+				if (user->server != Me && access->Matches(user, user->Account()))
 				{
-					for (int i = 0; !modeInfo[i].priv.empty(); ++i)
-						if (!access->HasPriv(modeInfo[i].priv))
-							ci->c->RemoveMode(NULL, modeInfo[i].name, user->nick);
+					for (unsigned i = 0; i < ModeManager::GetStatusChannelModesByRank().size(); ++i)
+					{
+						ChannelModeStatus *cms = ModeManager::GetStatusChannelModesByRank()[i];
+						if (!access->HasPriv("AUTO" + cms->name))
+							ci->c->RemoveMode(NULL, cms, user->GetUID());
+					}
 					ci->c->SetCorrectModes(user, true, false);
 				}
 			}
@@ -55,11 +45,20 @@ class StatusUpdate : public Module
 			{
 				User *user = it->second->user;
 
-				if (access->Matches(user, user->Account()))
+				if (user->server != Me && access->Matches(user, user->Account()))
 				{
-					for (int i = 0; !modeInfo[i].priv.empty(); ++i)
-						if (access->HasPriv(modeInfo[i].priv))
-							ci->c->RemoveMode(NULL, modeInfo[i].name, user->nick);
+					/* Get user's current access and remove the entry about to be deleted */
+					AccessGroup ag = ci->AccessFor(user);
+					AccessGroup::iterator iter = std::find(ag.begin(), ag.end(), access);
+					if (iter != ag.end())
+						ag.erase(iter);
+
+					for (unsigned i = 0; i < ModeManager::GetStatusChannelModesByRank().size(); ++i)
+					{
+						ChannelModeStatus *cms = ModeManager::GetStatusChannelModesByRank()[i];
+						if (!ag.HasPriv("AUTO" + cms->name))
+							ci->c->RemoveMode(NULL, cms, user->GetUID());
+					}
 				}
 			}
 	}

@@ -368,6 +368,8 @@ class CoreExport ModeManager
 
 	static const std::vector<ChannelMode *> &GetChannelModes();
 	static const std::vector<UserMode *> &GetUserModes();
+	static const std::vector<ChannelModeStatus *> &GetStatusChannelModesByRank();
+	static void RebuildStatusModes();
 
 	/** Add a mode to the stacker to be set on a channel
 	 * @param bi The client to set the modes from

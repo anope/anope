@@ -15,6 +15,49 @@
 
 static std::map<Anope::string, int16_t, ci::less> defaultLevels;
 
+static struct
+{
+	Anope::string name;
+	Anope::string desc;
+} descriptions[] = {
+	{"ACCESS_CHANGE", _("Allowed to modify the access list")},
+	{"ACCESS_LIST", _("Allowed to view the access list")},
+	{"AKICK", _("Allowed to use the AKICK command")},
+	{"ASSIGN", _("Allowed to assign/unassign a bot")},
+	{"AUTOHALFOP", _("Automatic halfop upon join")},
+	{"AUTOOP", _("Automatic channel operator status upon join")},
+	{"AUTOOWNER", _("Automatic owner upon join")},
+	{"AUTOPROTECT", _("Automatic protect upon join")},
+	{"AUTOVOICE", _("Automatic voice on join")},
+	{"BADWORDS", _("Allowed to modify channel badwords list")},
+	{"BAN", _("Allowed to ban users")},
+	{"FANTASIA", _("Allowed to use fantasy commands")},
+	{"FOUNDER", _("Allowed to issue commands restricted to channel founders")},
+	{"GETKEY", _("Allowed to use GETKEY command")},
+	{"GREET", _("Greet message displayed on join")},
+	{"HALFOP", _("Allowed to (de)halfop users")},
+	{"HALFOPME", _("Allowed to (de)halfop him/herself")},
+	{"INFO", _("Allowed to get full INFO output")},
+	{"INVITE", _("Allowed to use the INVITE command")},
+	{"KICK", _("Allowed to use the KICK command")},
+	{"MEMO", _("Allowed to read channel memos")},
+	{"MODE", _("Allowed to use the MODE command")},
+	{"NOKICK", _("Prevents users being kicked by Services")},
+	{"OPDEOP", _("Allowed to (de)op users")},
+	{"OPDEOPME", _("Allowed to (de)op him/herself")},
+	{"OWNER", _("Allowed to (de)owner users")},
+	{"OWNERME", _("Allowed to (de)owner him/herself")},
+	{"PROTECT", _("Allowed to (de)protect users")},
+	{"PROTECTME", _("Allowed to (de)protect him/herself")},
+	{"SAY", _("Allowed to use SAY and ACT commands")},
+	{"SET", _("Allowed to set channel settings")},
+	{"SIGNKICK", _("No signed kick when SIGNKICK LEVEL is used")},
+	{"TOPIC", _("Allowed to change channel topics")},
+	{"UNBAN", _("Allowed to unban users")},
+	{"VOICE", _("Allowed to (de)voice users")},
+	{"VOICEME", _("Allowed to (de)voice him/herself")}
+};
+
 static inline void reset_levels(ChannelInfo *ci)
 {
 	ci->ClearLevels();
@@ -552,22 +595,8 @@ class CommandCSAccess : public Command
 				" \n"
 				"The \002ACCESS CLEAR\002 command clears all entries of the\n"
 				"access list."));
-		source.Reply(_("\002User access levels\002\n"
-				" \n"
-				"By default, the following access levels are defined:\n"
-				" \n"
-				"   \002Founder\002   Full access to %s functions; automatic\n"
-				"                     opping upon entering channel.  Note\n"
-				"                     that only one person may have founder\n"
-				"                     status (it cannot be given using the\n"
-				"                     \002ACCESS\002 command).\n"
-				"   \002     10\002   Access to AKICK command; automatic opping.\n"
-				"   \002      5\002   Automatic opping.\n"
-				"   \002      3\002   Automatic voicing.\n"
-				"   \002      0\002   No special privileges; can be opped by other\n"
-				"                     ops (unless \002secure-ops\002 is set).\n"
-				" \n"
-				"These levels may be changed, or new ones added, using the\n"
+		source.Reply(" ");
+		source.Reply(_("\002User access levels\002 can be seen by using the\n"
 				"\002LEVELS\002 command; type \002%s%s HELP LEVELS\002 for\n"
 				"information."), source.service->nick.c_str(), Config->UseStrictPrivMsgString.c_str(), source.service->nick.c_str());
 		return true;
@@ -806,14 +835,7 @@ class CSAccess : public Module
 		Implementation i[] = { I_OnReload, I_OnCreateChan, I_OnGroupCheckPriv };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 
-		try
-		{
-			this->OnReload();
-		}
-		catch (const ConfigException &ex)
-		{
-			throw ModuleException(ex.GetReason());
-		}
+		this->OnReload();
 	}
 
 	void OnReload() anope_override
@@ -828,6 +850,11 @@ class CSAccess : public Module
 			Privilege *p = PrivilegeManager::FindPrivilege(pname);
 			if (p == NULL)
 				continue;
+
+			if (p->desc.empty())
+				for (unsigned j = 0; j < sizeof(descriptions) / sizeof(*descriptions); ++j)
+					if (descriptions[j].name == pname)
+						p->desc = descriptions[j].desc;
 
 			const Anope::string &value = config.ReadValue("privilege", "level", "", i);
 			if (value.empty())

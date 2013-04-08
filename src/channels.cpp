@@ -922,13 +922,6 @@ void Channel::Hold()
 
 void Channel::SetCorrectModes(User *user, bool give_modes, bool check_noop)
 {
-	ChannelMode *owner = ModeManager::FindChannelModeByName("OWNER"),
-		*admin = ModeManager::FindChannelModeByName("PROTECT"),
-		*op = ModeManager::FindChannelModeByName("OP"),
-		*halfop = ModeManager::FindChannelModeByName("HALFOP"),
-		*voice = ModeManager::FindChannelModeByName("VOICE"),
-		*registered = ModeManager::FindChannelModeByName("REGISTERED");
-
 	if (user == NULL)
 		return;
 	
@@ -938,39 +931,33 @@ void Channel::SetCorrectModes(User *user, bool give_modes, bool check_noop)
 	Log(LOG_DEBUG) << "Setting correct user modes for " << user->nick << " on " << this->name << " (" << (give_modes ? "" : "not ") << "giving modes)";
 
 	AccessGroup u_access = ci->AccessFor(user);
+	ChannelMode *registered = ModeManager::FindChannelModeByName("REGISTERED");
 
-	if (give_modes && (!user->Account() || user->Account()->HasExt("AUTOOP")) && (!check_noop || !ci->HasExt("NOAUTOOP")))
-	{
-		if (owner && u_access.HasPriv("AUTOOWNER"))
-			this->SetMode(NULL, owner, user->GetUID());
-		else if (admin && u_access.HasPriv("AUTOPROTECT"))
-			this->SetMode(NULL, admin, user->GetUID());
-
-		if (op && u_access.HasPriv("AUTOOP"))
-			this->SetMode(NULL, op, user->GetUID());
-		else if (halfop && u_access.HasPriv("AUTOHALFOP"))
-			this->SetMode(NULL, halfop, user->GetUID());
-		else if (voice && u_access.HasPriv("AUTOVOICE"))
-			this->SetMode(NULL, voice, user->GetUID());
-	}
+	/* Only give modes if autoop isn't set */
+	give_modes &= (!user->Account() || user->Account()->HasExt("AUTOOP")) && (!check_noop || !ci->HasExt("NOAUTOOP"));
 	/* If this channel has secureops, or the registered channel mode exists and the channel does not have +r set (aka the channel
 	 * was created just now or while we were off), or the registered channel mode does not exist and channel is syncing (aka just
 	 * created *to us*) and the user's server is synced (aka this isn't us doing our initial uplink - without this we would be deopping all
 	 * users with no access on a non-secureops channel on startup), and the user's server isn't ulined, then set negative modes.
 	 */
-	if ((ci->HasExt("SECUREOPS") || (registered && !this->HasMode("REGISTERED")) || (!registered && this->HasExt("SYNCING") && user->server->IsSynced())) && !user->server->IsULined())
+	bool take_modes = (ci->HasExt("SECUREOPS") || (registered && !this->HasMode("REGISTERED")) || (!registered && this->HasExt("SYNCING") && user->server->IsSynced())) && !user->server->IsULined();
+
+	bool given = false;
+	for (unsigned i = 0; i < ModeManager::GetStatusChannelModesByRank().size(); ++i)
 	{
-		if (owner && !u_access.HasPriv("AUTOOWNER") && !u_access.HasPriv("OWNERME"))
-			this->RemoveMode(NULL, owner, user->GetUID());
+		ChannelModeStatus *cm = ModeManager::GetStatusChannelModesByRank()[i];
+		bool has_priv = u_access.HasPriv("AUTO" + cm->name);
 
-		if (admin && !u_access.HasPriv("AUTOPROTECT") && !u_access.HasPriv("PROTECTME"))
-			this->RemoveMode(NULL, admin, user->GetUID());
-
-		if (op && this->HasUserStatus(user, "OP") && !u_access.HasPriv("AUTOOP") && !u_access.HasPriv("OPDEOPME"))
-			this->RemoveMode(NULL, op, user->GetUID());
-
-		if (halfop && !u_access.HasPriv("AUTOHALFOP") && !u_access.HasPriv("HALFOPME"))
-			this->RemoveMode(NULL, halfop, user->GetUID());
+		/* If we have already given one mode, don't give more until it has a symbol */
+		if (give_modes && has_priv && (!given || cm->symbol))
+		{
+			this->SetMode(NULL, cm, user->GetUID());
+			/* Now if this contains a symbol don't give any more modes, to prevent setting +qaohv etc on users */
+			give_modes = !cm->symbol;
+			given = true;
+		}
+		else if (take_modes && !has_priv)
+			this->RemoveMode(NULL, cm, user->GetUID());
 	}
 
 	// Check mlock

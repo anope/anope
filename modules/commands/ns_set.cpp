@@ -378,7 +378,7 @@ class CommandNSSetDisplay : public Command
 	{
 		const NickAlias *user_na = NickAlias::Find(user), *na = NickAlias::Find(param);
 
-		if (!Config->NoNicknameOwnership)
+		if (Config->NoNicknameOwnership)
 		{
 			source.Reply(_("This command may not be used on this network because nickname ownership is disabled."));
 			return;

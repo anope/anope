@@ -95,7 +95,8 @@ const Anope::string &OperType::GetName() const
 
 void OperType::Inherits(OperType *ot)
 {
-	this->inheritances.insert(ot);
+	if (ot != this)
+		this->inheritances.insert(ot);
 }
 
 const std::list<Anope::string> OperType::GetCommands() const
@@ -104,7 +105,7 @@ const std::list<Anope::string> OperType::GetCommands() const
 	for (std::set<OperType *>::const_iterator it = this->inheritances.begin(), it_end = this->inheritances.end(); it != it_end; ++it)
 	{
 		OperType *ot = *it;
-		std::list<Anope::string> cmds = ot->GetPrivs();
+		std::list<Anope::string> cmds = ot->GetCommands();
 		for (std::list<Anope::string>::const_iterator it2 = cmds.begin(), it2_end = cmds.end(); it2 != it2_end; ++it2)
 			cmd_list.push_back(*it2);
 	}

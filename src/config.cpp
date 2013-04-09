@@ -812,13 +812,14 @@ static bool InitPrivileges(ServerConfig *config, const Anope::string &)
 static bool DoPrivileges(ServerConfig *config, const Anope::string &, const Anope::string *, ValueList &values, int *)
 {
 	Anope::string name = values[0].GetValue();
-	int rank = values[1].GetInteger();
+	Anope::string desc = values[1].GetValue();
+	int rank = values[2].GetInteger();
 
 	ValueItem vi(name);
 	if (!ValidateNotEmpty(config, "privilege", "name", vi))
 		throw ConfigException("One or more values in your configuration file failed to validate. Please see your log for more information.");
 
-	PrivilegeManager::AddPrivilege(Privilege(name, "", rank));
+	PrivilegeManager::AddPrivilege(Privilege(name, desc, rank));
 	return true;
 }
 

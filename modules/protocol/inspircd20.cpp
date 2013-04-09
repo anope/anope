@@ -168,6 +168,8 @@ class ChannelModeFlood : public ChannelModeParam
 
 struct IRCDMessageCapab : Message::Capab
 {
+	std::map<char, Anope::string> chmodes, umodes;
+
 	IRCDMessageCapab(Module *creator) : Message::Capab(creator, "CAPAB") { SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
 
 	void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
@@ -186,6 +188,8 @@ struct IRCDMessageCapab : Message::Capab
 			}
 
 			/* reset CAPAB */
+			chmodes.clear();
+			umodes.clear();
 			Servers::Capab.insert("SERVERS");
 			Servers::Capab.insert("CHGHOST");
 			Servers::Capab.insert("CHGIDENT");
@@ -285,13 +289,13 @@ struct IRCDMessageCapab : Message::Capab
 					cm = new ChannelModeStatus("VOICE", modechar.length() > 1 ? modechar[1] : modechar[0], modechar.length() > 1 ? modechar[0] : 0);
 				/* Unknown status mode, (customprefix) - add it */
 				else if (modechar.length() == 2)
-					cm = new ChannelModeStatus("", modechar[1], modechar[0]);
-				/* else don't do anything here, we will get it in CAPAB CAPABILITIES */
+					cm = new ChannelModeStatus(modename.upper(), modechar[1], modechar[0]);
+				/* Unknown non status mode, add it to our list for later */
+				else
+					chmodes[modechar[0]] = modename.upper();
 
 				if (cm)
 					ModeManager::AddChannelMode(cm);
-				else
-					Log() << "Unrecognized mode string in CAPAB CHANMODES: " << capab;
 			}
 		}
 		if (params[0].equals_cs("USERMODES") && params.size() > 1)
@@ -344,11 +348,11 @@ struct IRCDMessageCapab : Message::Capab
 					um = new UserMode("STRIPCOLOR", modechar[0]);
 				else if (modename.equals_cs("wallops"))
 					um = new UserMode("WALLOPS", modechar[0]);
+				else
+					umodes[modechar[0]] = modename.upper();
 
 				if (um)
 					ModeManager::AddUserMode(um);
-				else
-					Log() << "Unrecognized mode string in CAPAB USERMODES: " << capab;
 			}
 		}
 		else if (params[0].equals_cs("MODULES") && params.size() > 1)
@@ -402,7 +406,7 @@ struct IRCDMessageCapab : Message::Capab
 					{
 						if (ModeManager::FindChannelModeByChar(modebuf[t]))
 							continue;
-						ModeManager::AddChannelMode(new ChannelModeList("", modebuf[t]));
+						ModeManager::AddChannelMode(new ChannelModeList(chmodes[modebuf[t]], modebuf[t]));
 					}
 
 					sep.GetToken(modebuf);
@@ -410,7 +414,7 @@ struct IRCDMessageCapab : Message::Capab
 					{
 						if (ModeManager::FindChannelModeByChar(modebuf[t]))
 							continue;
-						ModeManager::AddChannelMode(new ChannelModeParam("", modebuf[t]));
+						ModeManager::AddChannelMode(new ChannelModeParam(chmodes[modebuf[t]], modebuf[t]));
 					}
 
 					sep.GetToken(modebuf);
@@ -418,7 +422,7 @@ struct IRCDMessageCapab : Message::Capab
 					{
 						if (ModeManager::FindChannelModeByChar(modebuf[t]))
 							continue;
-						ModeManager::AddChannelMode(new ChannelModeParam("", modebuf[t], true));
+						ModeManager::AddChannelMode(new ChannelModeParam(chmodes[modebuf[t]], modebuf[t], true));
 					}
 
 					sep.GetToken(modebuf);
@@ -426,7 +430,7 @@ struct IRCDMessageCapab : Message::Capab
 					{
 						if (ModeManager::FindChannelModeByChar(modebuf[t]))
 							continue;
-						ModeManager::AddChannelMode(new ChannelMode("", modebuf[t]));
+						ModeManager::AddChannelMode(new ChannelMode(chmodes[modebuf[t]], modebuf[t]));
 					}
 				}
 				else if (capab.find("USERMODES") != Anope::string::npos)
@@ -440,11 +444,11 @@ struct IRCDMessageCapab : Message::Capab
 
 					if (sep.GetToken(modebuf))
 						for (size_t t = 0, end = modebuf.length(); t < end; ++t)
-							ModeManager::AddUserMode(new UserModeParam("", modebuf[t]));
+							ModeManager::AddUserMode(new UserModeParam(umodes[modebuf[t]], modebuf[t]));
 
 					if (sep.GetToken(modebuf))
 						for (size_t t = 0, end = modebuf.length(); t < end; ++t)
-							ModeManager::AddUserMode(new UserMode("", modebuf[t]));
+							ModeManager::AddUserMode(new UserMode(umodes[modebuf[t]], modebuf[t]));
 				}
 				else if (capab.find("MAXMODES=") != Anope::string::npos)
 				{
@@ -500,6 +504,9 @@ struct IRCDMessageCapab : Message::Capab
 				Log() << "CHGIDENT missing, Usage disabled until module is loaded.";
 			if (!Servers::Capab.count("TOPICLOCK") && Config->UseServerSideTopicLock)
 				Log() << "m_topiclock missing, server side topic locking disabled until module is loaded.";
+
+			chmodes.clear();
+			umodes.clear();
 		}
 
 		Message::Capab::Run(source, params);

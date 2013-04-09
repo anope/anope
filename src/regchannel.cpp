@@ -418,7 +418,7 @@ void ChannelInfo::Serialize(Serialize::Data &data) const
 	this->ExtensibleSerialize(data);
 	{
 		Anope::string levels_buffer;
-		for (std::map<Anope::string, int16_t>::const_iterator it = this->levels.begin(), it_end = this->levels.end(); it != it_end; ++it)
+		for (Anope::map<int16_t>::const_iterator it = this->levels.begin(), it_end = this->levels.end(); it != it_end; ++it)
 			levels_buffer += it->first + " " + stringify(it->second) + " ";
 		data["levels"] << levels_buffer;
 	}
@@ -1099,7 +1099,7 @@ int16_t ChannelInfo::GetLevel(const Anope::string &priv) const
 		return ACCESS_INVALID;
 	}
 
-	std::map<Anope::string, int16_t>::const_iterator it = this->levels.find(priv);
+	Anope::map<int16_t>::const_iterator it = this->levels.find(priv);
 	if (it == this->levels.end())
 		return 0;
 	return it->second;

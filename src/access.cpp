@@ -63,13 +63,13 @@ Privilege::Privilege(const Anope::string &n, const Anope::string &d, int r) : na
 {
 	if (this->desc.empty())
 		for (unsigned j = 0; j < sizeof(descriptions) / sizeof(*descriptions); ++j)
-			if (descriptions[j].name == name)
+			if (descriptions[j].name.equals_ci(name))
 				this->desc = descriptions[j].desc;
 }
 
 bool Privilege::operator==(const Privilege &other) const
 {
-	return this->name == other.name;
+	return this->name.equals_ci(other.name);
 }
 
 std::vector<Privilege> PrivilegeManager::Privileges;

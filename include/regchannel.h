@@ -163,7 +163,7 @@ class CoreExport ChannelInfo : public Serializable, public Extensible
 	Serialize::Checker<std::vector<ChanAccess *> > access;			/* List of authorized users */
 	Serialize::Checker<std::vector<AutoKick *> > akick;			/* List of users to kickban */
 	Serialize::Checker<std::vector<BadWord *> > badwords;			/* List of badwords */
-	std::map<Anope::string, int16_t> levels;
+	Anope::map<int16_t> levels;
 
  public:
  	friend class ChanAccess;

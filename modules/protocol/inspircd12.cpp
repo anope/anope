@@ -202,11 +202,6 @@ class InspIRCd12Proto : public IRCDProto
 		UplinkSocket::Message(source) << "FMODE " << dest->name << " " << dest->creation_time << " " << buf;
 	}
 
-	void SendModeInternal(const BotInfo *bi, const User *u, const Anope::string &buf) anope_override
-	{
-		UplinkSocket::Message(bi) << "MODE " << u->GetUID() << " " << buf;
-	}
-
 	void SendClientIntroduction(const User *u) anope_override
 	{
 		Anope::string modes = "+" + u->GetModes();

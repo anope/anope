@@ -54,6 +54,11 @@ void IRCDProto::SendModeInternal(const BotInfo *bi, const Channel *dest, const A
 	UplinkSocket::Message(bi) << "MODE " << dest->name << " " << buf;
 }
 
+void IRCDProto::SendModeInternal(const BotInfo *bi, const User *dest, const Anope::string &buf)
+{
+	UplinkSocket::Message(bi) << "MODE " << dest->GetUID() << " " << buf;
+}
+
 void IRCDProto::SendKickInternal(const BotInfo *bi, const Channel *c, const User *u, const Anope::string &r)
 {
 	if (!r.empty())

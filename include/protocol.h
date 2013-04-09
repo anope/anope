@@ -29,7 +29,7 @@ class CoreExport IRCDProto : public Service
 
 	virtual void SendSVSKillInternal(const BotInfo *, User *, const Anope::string &);
 	virtual void SendModeInternal(const BotInfo *, const Channel *, const Anope::string &);
-	virtual void SendModeInternal(const BotInfo *, const User *, const Anope::string &) = 0;
+	virtual void SendModeInternal(const BotInfo *, const User *, const Anope::string &);
 	virtual void SendKickInternal(const BotInfo *, const Channel *, const User *, const Anope::string &);
 	virtual void SendMessageInternal(const BotInfo *bi, const Anope::string &dest, const Anope::string &buf);
 	virtual void SendNoticeInternal(const BotInfo *bi, const Anope::string &dest, const Anope::string &msg);

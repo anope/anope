@@ -123,14 +123,6 @@ class ngIRCdProto : public IRCDProto
 			UplinkSocket::Message(Me) << "MODE " << dest->name << " " << buf;
 	}
 
-	void SendModeInternal(const BotInfo *bi, const User *u, const Anope::string &buf) anope_override
-	{
-		if (bi)
-			UplinkSocket::Message(bi) << "MODE " << u->nick << " " << buf;
-		else
-			UplinkSocket::Message(Me) << "MODE " << u->nick << " " << buf;
-	}
-
 	void SendPartInternal(const BotInfo *bi, const Channel *chan, const Anope::string &buf) anope_override
 	{
 		if (!buf.empty())

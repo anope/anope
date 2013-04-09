@@ -109,14 +109,6 @@ class CharybdisProto : public IRCDProto
 		UplinkSocket::Message(Me) << "EUID " << u->nick << " 1 " << u->timestamp << " " << modes << " " << u->GetIdent() << " " << u->host << " 0 " << u->GetUID() << " * * :" << u->realname;
 	}
 
-	void SendModeInternal(const BotInfo *bi, const User *u, const Anope::string &buf) anope_override
-	{
-		if (bi)
-			UplinkSocket::Message(bi) << "MODE " << u->GetUID() << " " << buf;
-		else
-			UplinkSocket::Message(Me) << "MODE " << u->GetUID() << " " << buf;
-	}
-
 	void SendLogin(User *u) anope_override
 	{
 		if (!u->Account())

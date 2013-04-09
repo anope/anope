@@ -52,7 +52,6 @@ class InspIRCd20Proto : public IRCDProto
 	void SendAkill(User *u, XLine *x) anope_override { insp12->SendAkill(u, x); }
 	void SendNumericInternal(int numeric, const Anope::string &dest, const Anope::string &buf) anope_override { insp12->SendNumericInternal(numeric, dest, buf); }
 	void SendModeInternal(const BotInfo *source, const Channel *dest, const Anope::string &buf) anope_override { insp12->SendModeInternal(source, dest, buf); }
-	void SendModeInternal(const BotInfo *bi, const User *u, const Anope::string &buf) anope_override { insp12->SendModeInternal(bi, u, buf); }
 	void SendClientIntroduction(const User *u) anope_override { insp12->SendClientIntroduction(u); }
 	void SendServer(const Server *server) anope_override { insp12->SendServer(server); }
 	void SendJoin(User *user, Channel *c, const ChannelStatus *status) anope_override { insp12->SendJoin(user, c, status); }

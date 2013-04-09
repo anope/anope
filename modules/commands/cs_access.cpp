@@ -15,49 +15,6 @@
 
 static std::map<Anope::string, int16_t, ci::less> defaultLevels;
 
-static struct
-{
-	Anope::string name;
-	Anope::string desc;
-} descriptions[] = {
-	{"ACCESS_CHANGE", _("Allowed to modify the access list")},
-	{"ACCESS_LIST", _("Allowed to view the access list")},
-	{"AKICK", _("Allowed to use the AKICK command")},
-	{"ASSIGN", _("Allowed to assign/unassign a bot")},
-	{"AUTOHALFOP", _("Automatic halfop upon join")},
-	{"AUTOOP", _("Automatic channel operator status upon join")},
-	{"AUTOOWNER", _("Automatic owner upon join")},
-	{"AUTOPROTECT", _("Automatic protect upon join")},
-	{"AUTOVOICE", _("Automatic voice on join")},
-	{"BADWORDS", _("Allowed to modify channel badwords list")},
-	{"BAN", _("Allowed to ban users")},
-	{"FANTASIA", _("Allowed to use fantasy commands")},
-	{"FOUNDER", _("Allowed to issue commands restricted to channel founders")},
-	{"GETKEY", _("Allowed to use GETKEY command")},
-	{"GREET", _("Greet message displayed on join")},
-	{"HALFOP", _("Allowed to (de)halfop users")},
-	{"HALFOPME", _("Allowed to (de)halfop him/herself")},
-	{"INFO", _("Allowed to get full INFO output")},
-	{"INVITE", _("Allowed to use the INVITE command")},
-	{"KICK", _("Allowed to use the KICK command")},
-	{"MEMO", _("Allowed to read channel memos")},
-	{"MODE", _("Allowed to use the MODE command")},
-	{"NOKICK", _("Prevents users being kicked by Services")},
-	{"OPDEOP", _("Allowed to (de)op users")},
-	{"OPDEOPME", _("Allowed to (de)op him/herself")},
-	{"OWNER", _("Allowed to (de)owner users")},
-	{"OWNERME", _("Allowed to (de)owner him/herself")},
-	{"PROTECT", _("Allowed to (de)protect users")},
-	{"PROTECTME", _("Allowed to (de)protect him/herself")},
-	{"SAY", _("Allowed to use SAY and ACT commands")},
-	{"SET", _("Allowed to set channel settings")},
-	{"SIGNKICK", _("No signed kick when SIGNKICK LEVEL is used")},
-	{"TOPIC", _("Allowed to change channel topics")},
-	{"UNBAN", _("Allowed to unban users")},
-	{"VOICE", _("Allowed to (de)voice users")},
-	{"VOICEME", _("Allowed to (de)voice him/herself")}
-};
-
 static inline void reset_levels(ChannelInfo *ci)
 {
 	ci->ClearLevels();
@@ -850,11 +807,6 @@ class CSAccess : public Module
 			Privilege *p = PrivilegeManager::FindPrivilege(pname);
 			if (p == NULL)
 				continue;
-
-			if (p->desc.empty())
-				for (unsigned j = 0; j < sizeof(descriptions) / sizeof(*descriptions); ++j)
-					if (descriptions[j].name == pname)
-						p->desc = descriptions[j].desc;
 
 			const Anope::string &value = config.ReadValue("privilege", "level", "", i);
 			if (value.empty())

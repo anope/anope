@@ -178,14 +178,14 @@ void Command::RequireUser(bool b)
 	this->require_user = b;
 }
 
-const Anope::string &Command::GetDesc() const
+const Anope::string Command::GetDesc(CommandSource &) const
 {
 	return this->desc;
 }
 
 void Command::OnServHelp(CommandSource &source)
 {
-	source.Reply("    %-14s %s", source.command.c_str(), Language::Translate(source.nc, this->GetDesc().c_str()));
+	source.Reply("    %-14s %s", source.command.c_str(), Language::Translate(source.nc, this->GetDesc(source).c_str()));
 }
 
 bool Command::OnHelp(CommandSource &source, const Anope::string &subcommand) { return false; }

@@ -136,9 +136,10 @@ class CoreExport Command : public Service
 	bool RequireUser() const;
 
  	/** Get the command description
+	 * @param source The source wanting the command description
 	 * @return The commands description
 	 */
- 	const Anope::string &GetDesc() const;
+ 	virtual const Anope::string GetDesc(CommandSource &source) const;
 
 	/** Execute this command.
 	 * @param source The source

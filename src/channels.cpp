@@ -165,7 +165,7 @@ void Channel::CheckModes()
 
 ChanUserContainer* Channel::JoinUser(User *user)
 {
-	if (user->server->IsSynced())
+	if (user->server && user->server->IsSynced())
 		Log(user, this, "join");
 
 	ChanUserContainer *cuc = new ChanUserContainer(user, this);
@@ -185,7 +185,7 @@ ChanUserContainer* Channel::JoinUser(User *user)
 
 void Channel::DeleteUser(User *user)
 {
-	if (user->server->IsSynced() && !user->Quitting())
+	if (user->server && user->server->IsSynced() && !user->Quitting())
 		Log(user, this, "leave");
 
 	FOREACH_MOD(I_OnLeaveChannel, OnLeaveChannel(user, this));

@@ -41,7 +41,7 @@ Channel::Channel(const Anope::string &nname, time_t ts)
 	if (this->ci)
 		this->ci->c = this;
 
-	if (Me->IsSynced())
+	if (Me && Me->IsSynced())
 		Log(NULL, this, "create");
 
 	FOREACH_MOD(I_OnChannelCreate, OnChannelCreate(this));
@@ -53,7 +53,7 @@ Channel::~Channel()
 
 	ModeManager::StackerDel(this);
 
-	if (Me->IsSynced())
+	if (Me && Me->IsSynced())
 		Log(NULL, this, "destroy");
 
 	if (this->ci)

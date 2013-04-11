@@ -285,7 +285,6 @@ class CommandNSResend : public Command
  public:
 	CommandNSResend(Module *creator) : Command(creator, "nickserv/resend", 0, 0)
 	{
-		this->SetSyntax("");
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override

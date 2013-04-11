@@ -68,7 +68,6 @@ class CommandOSLogout : public Command
 	CommandOSLogout(Module *creator) : Command(creator, "operserv/logout", 0, 0)
 	{
 		this->SetDesc(Anope::printf(_("Logout from %s"), Config->OperServ.c_str()));
-		this->SetSyntax("");
 		this->RequireUser(true);
 	}
 

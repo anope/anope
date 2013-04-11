@@ -19,7 +19,6 @@ class CommandOSQuit : public Command
 	CommandOSQuit(Module *creator) : Command(creator, "operserv/quit", 0, 0)
 	{
 		this->SetDesc(_("Terminate Services WITHOUT saving"));
-		this->SetSyntax("");
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
@@ -47,7 +46,6 @@ class CommandOSRestart : public Command
 	CommandOSRestart(Module *creator) : Command(creator, "operserv/restart", 0, 0)
 	{
 		this->SetDesc(_("Save databases and restart Services"));
-		this->SetSyntax("");
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
@@ -73,7 +71,6 @@ class CommandOSShutdown : public Command
 	CommandOSShutdown(Module *creator) : Command(creator, "operserv/shutdown", 0, 0)
 	{
 		this->SetDesc(_("Terminate services with save"));
-		this->SetSyntax("");
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override

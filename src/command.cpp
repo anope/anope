@@ -150,12 +150,8 @@ void Command::SendSyntax(CommandSource &source)
 		for (unsigned i = 1, j = this->syntax.size(); i < j; ++i)
 			source.Reply("        \002%s %s\002", source.command.c_str(), this->syntax[i].c_str());
 	}
-}
-
-void Command::SendSyntax(CommandSource &source, const Anope::string &syn)
-{
-	source.Reply(_("Syntax: \002%s %s\002"), source.command.c_str(), syn.c_str());
-	source.Reply(MORE_INFO, Config->UseStrictPrivMsgString.c_str(), source.service->nick.c_str(), source.command.c_str());
+	else
+		source.Reply(_("Syntax: \002%s\002"), source.command.c_str());
 }
 
 bool Command::AllowUnregistered() const

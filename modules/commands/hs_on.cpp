@@ -19,7 +19,6 @@ class CommandHSOn : public Command
 	CommandHSOn(Module *creator) : Command(creator, "hostserv/on", 0, 0)
 	{
 		this->SetDesc(_("Activates your assigned vhost"));
-		this->SetSyntax("");
 		this->RequireUser(true);
 	}
 

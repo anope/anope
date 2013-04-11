@@ -19,7 +19,6 @@ class CommandNSUpdate : public Command
 	CommandNSUpdate(Module *creator) : Command(creator, "nickserv/update", 0, 0)
 	{
 		this->SetDesc(_("Updates your current status, i.e. it checks for new memos"));
-		this->SetSyntax("");
 		this->RequireUser(true);
 	}
 

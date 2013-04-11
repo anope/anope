@@ -19,7 +19,6 @@ class CommandOSReload : public Command
 	CommandOSReload(Module *creator) : Command(creator, "operserv/reload", 0, 0)
 	{
 		this->SetDesc(_("Reload services' configuration file"));
-		this->SetSyntax("");
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override

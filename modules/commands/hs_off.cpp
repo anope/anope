@@ -19,7 +19,6 @@ class CommandHSOff : public Command
 	CommandHSOff(Module *creator) : Command(creator, "hostserv/off", 0, 0)
 	{
 		this->SetDesc(_("Deactivates your assigned vhost"));
-		this->SetSyntax("");
 		this->RequireUser(true);
 	}
 

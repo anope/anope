@@ -126,7 +126,6 @@ class CoreExport Command : public Service
 	void ClearSyntax();
 	void SetSyntax(const Anope::string &s);
 	void SendSyntax(CommandSource &);
-	void SendSyntax(CommandSource &, const Anope::string &syntax);
 
 	void AllowUnregistered(bool b);
 	void RequireUser(bool b);

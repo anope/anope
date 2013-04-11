@@ -321,7 +321,6 @@ class CommandHSWaiting : public Command
 	CommandHSWaiting(Module *creator) : Command(creator, "hostserv/waiting", 0, 0)
 	{
 		this->SetDesc(_("Retrieves the vhost requests"));
-		this->SetSyntax("");
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override

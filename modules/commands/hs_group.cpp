@@ -32,7 +32,6 @@ class CommandHSGroup : public Command
 	CommandHSGroup(Module *creator) : Command(creator, "hostserv/group", 0, 0)
 	{
 		this->SetDesc(_("Syncs the vhost for all nicks in a group"));
-		this->SetSyntax("");
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override

@@ -19,7 +19,6 @@ class CommandOSUpdate : public Command
 	CommandOSUpdate(Module *creator) : Command(creator, "operserv/update", 0, 0)
 	{
 		this->SetDesc(_("Force the Services databases to be updated immediately"));
-		this->SetSyntax("");
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override

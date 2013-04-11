@@ -62,7 +62,6 @@ class CommandCSGTop : public Command
 	CommandCSGTop(Module *creator) : Command (creator, "chanserv/gtop", 0, 1)
 	{
 		this->SetDesc(_("Displays the top 3 users of the network"));
-		this->SetSyntax("");
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params);
@@ -74,7 +73,6 @@ class CommandCSGTop10 : public Command
 	CommandCSGTop10(Module *creator) : Command (creator, "chanserv/gtop10", 0, 1)
 	{
 		this->SetDesc(_("Displays the top 10 users of the network"));
-		this->SetSyntax("");
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params);

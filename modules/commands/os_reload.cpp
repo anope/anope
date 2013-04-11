@@ -60,10 +60,9 @@ class OSReload : public Module
 	CommandOSReload commandosreload;
 
  public:
-	OSReload(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+	OSReload(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandosreload(this)
 	{
-		this->SetAuthor("Anope");
 
 	}
 };

@@ -933,9 +933,8 @@ class ModuleDNS : public Module
 	int port;
 
  public:
-	ModuleDNS(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, SUPPORTED), manager(this)
+	ModuleDNS(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, EXTRA | VENDOR), manager(this)
 	{
-		this->SetAuthor("Anope");
 
 		Implementation i[] = { I_OnReload, I_OnModuleUnload };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));

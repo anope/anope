@@ -1092,9 +1092,8 @@ static void LoadExceptions()
 class DBOld : public Module
 {
  public:
-	DBOld(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, DATABASE)
+	DBOld(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, DATABASE | VENDOR)
 	{
-		this->SetAuthor("Anope");
 
 		Implementation i[] = { I_OnLoadDatabase, I_OnUplinkSync };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));

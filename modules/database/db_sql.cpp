@@ -89,9 +89,8 @@ class DBSQL : public Module, public Pipe
 	}
 
  public:
-	DBSQL(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, DATABASE), sql("", ""), sqlinterface(this), shutting_down(false), loading_databases(false), loaded(false), imported(false)
+	DBSQL(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, DATABASE | VENDOR), sql("", ""), sqlinterface(this), shutting_down(false), loading_databases(false), loaded(false), imported(false)
 	{
-		this->SetAuthor("Anope");
 
 		Implementation i[] = { I_OnReload, I_OnShutdown, I_OnRestart, I_OnLoadDatabase, I_OnSerializableConstruct, I_OnSerializableDestruct, I_OnSerializableUpdate, I_OnSerializeTypeCreate };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));

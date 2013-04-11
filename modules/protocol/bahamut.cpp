@@ -542,7 +542,7 @@ class ProtoBahamut : public Module
 	}
 
  public:
-	ProtoBahamut(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PROTOCOL),
+	ProtoBahamut(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PROTOCOL | VENDOR),
 		ircd_proto(this),
 		message_away(this), message_capab(this), message_error(this), message_join(this),
 		message_kick(this), message_kill(this), message_motd(this), message_part(this),
@@ -552,7 +552,6 @@ class ProtoBahamut : public Module
 		message_burst(this), message_mode(this, "MODE"), message_svsmode(this, "SVSMODE"),
 		message_nick(this), message_server(this), message_sjoin(this), message_topic(this)
 	{
-		this->SetAuthor("Anope");
 
 		this->AddModes();
 

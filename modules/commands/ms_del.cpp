@@ -153,10 +153,9 @@ class MSDel : public Module
 	CommandMSDel commandmsdel;
 
  public:
-	MSDel(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+	MSDel(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandmsdel(this)
 	{
-		this->SetAuthor("Anope");
 
 	}
 };

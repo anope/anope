@@ -197,10 +197,9 @@ class ESHA1 : public Module
 	SHA1Provider sha1provider;
 
  public:
-	ESHA1(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, ENCRYPTION),
+	ESHA1(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, ENCRYPTION | VENDOR),
 		sha1provider(this)
 	{
-		this->SetAuthor("Anope");
 
 		Implementation i[] = { I_OnEncrypt, I_OnCheckAuthentication };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));

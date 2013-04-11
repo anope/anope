@@ -87,9 +87,8 @@ class CSDrop : public Module
 	CommandCSDrop commandcsdrop;
 
  public:
-	CSDrop(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE), commandcsdrop(this)
+	CSDrop(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR), commandcsdrop(this)
 	{
-		this->SetAuthor("Anope");
 
 	}
 };

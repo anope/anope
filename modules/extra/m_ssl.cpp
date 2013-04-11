@@ -92,11 +92,10 @@ class SSLModule : public Module
  public:
 	MySSLService service;
 
-	SSLModule(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, SUPPORTED), service(this, "ssl")
+	SSLModule(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, EXTRA | VENDOR), service(this, "ssl")
 	{
 		me = this;
 
-		this->SetAuthor("Anope");
 		this->SetPermanent(true);
 
 		SSL_library_init();

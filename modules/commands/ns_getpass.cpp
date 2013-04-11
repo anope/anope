@@ -62,10 +62,9 @@ class NSGetPass : public Module
 	CommandNSGetPass commandnsgetpass;
 
  public:
-	NSGetPass(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+	NSGetPass(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandnsgetpass(this)
 	{
-		this->SetAuthor("Anope");
 
 		Anope::string tmp_pass = "plain:tmp";
 		if (Anope::Decrypt(tmp_pass, tmp_pass) == -1)

@@ -67,10 +67,9 @@ class OSOLine : public Module
 	CommandOSOLine commandosoline;
 
  public:
-	OSOLine(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+	OSOLine(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandosoline(this)
 	{
-		this->SetAuthor("Anope");
 
 		if (!IRCD || !IRCD->CanSVSO)
 			throw ModuleException("Your IRCd does not support OMODE.");

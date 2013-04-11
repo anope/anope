@@ -47,10 +47,9 @@ class ModuleRegexTRE : public Module
 	TRERegexProvider tre_regex_provider;
 
  public:
-	ModuleRegexTRE(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, SUPPORTED),
+	ModuleRegexTRE(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, EXTRA | VENDOR),
 		tre_regex_provider(this)
 	{
-		this->SetAuthor("Anope");
 		this->SetPermanent(true);
 	}
 };

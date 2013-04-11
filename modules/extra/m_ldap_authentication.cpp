@@ -216,9 +216,8 @@ class NSIdentifyLDAP : public Module
 	Anope::string disable_email_reason;
  public:
 	NSIdentifyLDAP(const Anope::string &modname, const Anope::string &creator) :
-		Module(modname, creator, SUPPORTED), ldap("LDAPProvider", "ldap/main"), iinterface(this), oninterface(this), orinterface(this)
+		Module(modname, creator, EXTRA | VENDOR), ldap("LDAPProvider", "ldap/main"), iinterface(this), oninterface(this), orinterface(this)
 	{
-		this->SetAuthor("Anope");
 
 		me = this;
 

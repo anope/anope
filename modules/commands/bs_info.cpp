@@ -238,10 +238,9 @@ class BSInfo : public Module
 	CommandBSInfo commandbsinfo;
 
  public:
-	BSInfo(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+	BSInfo(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandbsinfo(this)
 	{
-		this->SetAuthor("Anope");
 
 	}
 };

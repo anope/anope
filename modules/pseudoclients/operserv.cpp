@@ -158,10 +158,9 @@ class OperServCore : public Module
 	SNLineManager snlines;
 
  public:
-	OperServCore(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+	OperServCore(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PSEUDOCLIENT | VENDOR),
 		sglines(this), sqlines(this), snlines(this)
 	{
-		this->SetAuthor("Anope");
 
 		OperServ = BotInfo::Find(Config->OperServ);
 		if (!OperServ)

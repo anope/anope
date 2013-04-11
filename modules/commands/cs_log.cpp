@@ -185,10 +185,9 @@ class CSLog : public Module
 	CommandCSLog commandcslog;
 
  public:
-	CSLog(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+	CSLog(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		MSService("MemoServService", "MemoServ"), commandcslog(this)
 	{
-		this->SetAuthor("Anope");
 
 		Implementation i[] = { I_OnLog };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));

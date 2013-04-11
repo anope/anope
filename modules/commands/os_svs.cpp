@@ -166,10 +166,9 @@ class OSSVS : public Module
 	CommandOSSVSPart commandossvspart;
 
  public:
-	OSSVS(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+	OSSVS(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandossvsnick(this), commandossvsjoin(this), commandossvspart(this)
 	{
-		this->SetAuthor("Anope");
 	}
 };
 

@@ -237,10 +237,9 @@ class NSAJoin : public Module
 	CommandNSAJoin commandnsajoin;
 
  public:
-	NSAJoin(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+	NSAJoin(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		ajoinentry_type("AJoinEntry", AJoinEntry::Unserialize), commandnsajoin(this)
 	{
-		this->SetAuthor("Anope");
 
 		if (!IRCD->CanSVSJoin)
 			throw ModuleException("Your IRCd does not support SVSJOIN");

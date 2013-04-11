@@ -299,10 +299,9 @@ class MSSet : public Module
 	CommandMSSet commandmsset;
 
  public:
-	MSSet(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+	MSSet(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandmsset(this)
 	{
-		this->SetAuthor("Anope");
 
 	}
 };

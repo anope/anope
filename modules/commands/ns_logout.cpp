@@ -84,10 +84,9 @@ class NSLogout : public Module
 	CommandNSLogout commandnslogout;
 
  public:
-	NSLogout(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+	NSLogout(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandnslogout(this)
 	{
-		this->SetAuthor("Anope");
 
 	}
 };

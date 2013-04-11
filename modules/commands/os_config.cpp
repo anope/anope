@@ -217,10 +217,9 @@ class OSConfig : public Module
 	CommandOSConfig commandosconfig;
 
  public:
-	OSConfig(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+	OSConfig(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandosconfig(this)
 	{
-		this->SetAuthor("Anope");
 
 	}
 };

@@ -148,10 +148,9 @@ class OSLogSearch : public Module
 	CommandOSLogSearch commandoslogsearch;
 
  public:
-	OSLogSearch(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+	OSLogSearch(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandoslogsearch(this)
 	{
-		this->SetAuthor("Anope");
 	
 		Implementation i[] = { I_OnReload };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));

@@ -107,10 +107,9 @@ class CSUnban : public Module
 	CommandCSUnban commandcsunban;
 
  public:
-	CSUnban(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+	CSUnban(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandcsunban(this)
 	{
-		this->SetAuthor("Anope");
 
 	}
 };

@@ -153,10 +153,9 @@ class BSAssign : public Module
 	CommandBSUnassign commandbsunassign;
 
  public:
-	BSAssign(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+	BSAssign(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandbsassign(this), commandbsunassign(this)
 	{
-		this->SetAuthor("Anope");
 
 	}
 };

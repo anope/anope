@@ -56,10 +56,9 @@ class HSOff : public Module
 	CommandHSOff commandhsoff;
 
  public:
-	HSOff(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+	HSOff(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandhsoff(this)
 	{
-		this->SetAuthor("Anope");
 
 	}
 };

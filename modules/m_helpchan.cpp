@@ -12,9 +12,8 @@ class HelpChannel : public Module
 	Anope::string HelpChan;
 
  public:
-	HelpChannel(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, SUPPORTED)
+	HelpChannel(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
 	{
-		this->SetAuthor("Anope");
 
 		Implementation i[] = { I_OnChannelModeSet, I_OnReload };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
@@ -28,7 +27,7 @@ class HelpChannel : public Module
 		{
 			User *u = User::Find(param);
 
-			if (u && c->ci->AccessFor(u).HasPriv("OPDEOPME"))
+			if (u && c->ci->AccessFor(u).HasPriv("OPME"))
 				u->SetMode(OperServ, "HELPOP");
 		}
 

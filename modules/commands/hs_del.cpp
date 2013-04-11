@@ -92,10 +92,9 @@ class HSDel : public Module
 	CommandHSDelAll commandhsdelall;
 
  public:
-	HSDel(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+	HSDel(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandhsdel(this), commandhsdelall(this)
 	{
-		this->SetAuthor("Anope");
 
 	}
 };

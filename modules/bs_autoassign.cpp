@@ -5,8 +5,6 @@
  *
  * Please read COPYING and README for further details.
  *
- * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church.
  */
 
 #include "module.h"
@@ -16,9 +14,8 @@ class BSAutoAssign : public Module
 	Anope::string bot;
 
  public:
-	BSAutoAssign(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, SUPPORTED)
+	BSAutoAssign(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
 	{
-		this->SetAuthor("Anope");
 
 		Implementation i[] = { I_OnChanRegistered, I_OnReload };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));

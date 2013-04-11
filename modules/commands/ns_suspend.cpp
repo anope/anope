@@ -170,10 +170,9 @@ class NSSuspend : public Module
 	CommandNSUnSuspend commandnsunsuspend;
 
  public:
-	NSSuspend(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+	NSSuspend(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandnssuspend(this), commandnsunsuspend(this)
 	{
-		this->SetAuthor("Anope");
 
 		Implementation i[] = { I_OnPreNickExpire };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));

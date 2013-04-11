@@ -112,10 +112,9 @@ class NSDrop : public Module
 	CommandNSDrop commandnsdrop;
 
  public:
-	NSDrop(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+	NSDrop(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandnsdrop(this)
 	{
-		this->SetAuthor("Anope");
 
 	}
 };

@@ -1203,7 +1203,7 @@ class ProtoInspIRCd : public Module
 	IRCDMessageUID message_uid;
 
  public:
-	ProtoInspIRCd(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PROTOCOL),
+	ProtoInspIRCd(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PROTOCOL | VENDOR),
 		ircd_proto(this),
 		message_away(this), message_error(this), message_join(this), message_kick(this), message_kill(this),
 		message_motd(this), message_part(this), message_ping(this), message_privmsg(this), message_quit(this),
@@ -1214,7 +1214,6 @@ class ProtoInspIRCd : public Module
 		message_idle(this), message_metadata(this), message_mode(this), message_nick(this), message_opertype(this), message_rsquit(this),
 		message_setident(this), message_server(this), message_time(this), message_uid(this)
 	{
-		this->SetAuthor("Anope");
 
 		Implementation i[] = { I_OnUserNickChange };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));

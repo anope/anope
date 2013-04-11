@@ -196,10 +196,9 @@ class Help : public Module
 	CommandHelp commandhelp;
 
  public:
-	Help(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+	Help(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandhelp(this)
 	{
-		this->SetAuthor("Anope");
 
 	}
 };

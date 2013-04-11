@@ -41,7 +41,7 @@ class ModuleWebCPanel : public Module
 
 
  public:
-	ModuleWebCPanel(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, SUPPORTED),
+	ModuleWebCPanel(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, EXTRA | VENDOR),
 		panel(this, "webcpanel"),
 		style_css("style.css", "/static/style.css", "text/css"), logo_png("logo.png", "/static/logo.png", "image/png"), favicon_ico("favicon.ico", "/favicon.ico", "image/x-icon"),
 		index("/"), logout("/logout"), _register("/register"), confirm("/confirm"),
@@ -49,7 +49,6 @@ class ModuleWebCPanel : public Module
 		chanserv_info(Config->ChanServ, "/chanserv/info"), chanserv_set(Config->ChanServ, "/chanserv/set"), chanserv_access(Config->ChanServ, "/chanserv/access"), chanserv_akick(Config->ChanServ, "/chanserv/akick"),
 		chanserv_drop(Config->ChanServ, "/chanserv/drop"), memoserv_memos(Config->MemoServ, "/memoserv/memos"), hostserv_request(Config->HostServ, "/hostserv/request"), operserv_akill(Config->OperServ, "/operserv/akill")
 	{
-		this->SetAuthor("Anope");
 
 		me = this;
 

@@ -46,10 +46,9 @@ class ModuleRegexPOSIX : public Module
 	POSIXRegexProvider posix_regex_provider;
 
  public:
-	ModuleRegexPOSIX(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, SUPPORTED),
+	ModuleRegexPOSIX(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, EXTRA | VENDOR),
 		posix_regex_provider(this)
 	{
-		this->SetAuthor("Anope");
 		this->SetPermanent(true);
 	}
 };

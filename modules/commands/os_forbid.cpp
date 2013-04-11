@@ -251,10 +251,9 @@ class OSForbid : public Module
 	CommandOSForbid commandosforbid;
 
  public:
-	OSForbid(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+	OSForbid(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		forbiddata_type("ForbidData", ForbidData::Unserialize), forbidService(this), commandosforbid(this)
 	{
-		this->SetAuthor("Anope");
 
 		Implementation i[] = { I_OnUserConnect, I_OnUserNickChange, I_OnJoinChannel, I_OnPreCommand };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));

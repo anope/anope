@@ -641,7 +641,7 @@ class ProtongIRCd : public Module
 	}
 
  public:
-	ProtongIRCd(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PROTOCOL),
+	ProtongIRCd(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PROTOCOL | VENDOR),
 		ircd_proto(this),
 		message_capab(this), message_error(this), message_kick(this), message_kill(this), message_motd(this),
 		message_part(this), message_ping(this), message_privmsg(this), message_squery(this, "SQUERY"),
@@ -651,7 +651,6 @@ class ProtongIRCd : public Module
 		message_mode(this), message_nick(this), message_njoin(this), message_pong(this), message_server(this),
 		message_topic(this)
 	{
-		this->SetAuthor("Anope");
 
 		Servers::Capab.insert("QS");
 

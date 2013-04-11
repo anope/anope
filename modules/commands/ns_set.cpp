@@ -1385,7 +1385,7 @@ class NSSet : public Module
 	CommandNSSASetNoexpire commandnssasetnoexpire;
 
  public:
-	NSSet(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+	NSSet(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandnsset(this), commandnssaset(this),
 		commandnssetautoop(this), commandnssasetautoop(this),
 		commandnssetchanstats(this), commandnssasetchanstats(this), NSDefChanstats(false),
@@ -1401,7 +1401,6 @@ class NSSet : public Module
 		commandnssetsecure(this), commandnssasetsecure(this),
 		commandnssasetnoexpire(this)
 	{
-		this->SetAuthor("Anope");
 
 		Implementation i[] = { I_OnReload, I_OnNickRegister, I_OnPreCommand };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));

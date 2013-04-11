@@ -94,9 +94,8 @@ class ModuleSQLOper : public Module
 	ServiceReference<SQL::Provider> SQL;
 
  public:
-	ModuleSQLOper(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, SUPPORTED)
+	ModuleSQLOper(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, EXTRA | VENDOR)
 	{
-		this->SetAuthor("Anope");
 
 		Implementation i[] = { I_OnReload, I_OnNickIdentify };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));

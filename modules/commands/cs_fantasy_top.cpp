@@ -94,12 +94,11 @@ class CSTop : public Module
 	Anope::string prefix;
 
  public:
-	CSTop(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+	CSTop(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandcstop(this), commandcsgtop(this), commandcstop10(this), commandcsgtop10(this), sql("", ""),
 		sqlinterface(this)
 	{
 		me = this;
-		this->SetAuthor("Anope");
 
 		Implementation i[] = { I_OnReload };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));

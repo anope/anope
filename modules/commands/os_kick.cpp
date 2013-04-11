@@ -70,10 +70,9 @@ class OSKick : public Module
 	CommandOSKick commandoskick;
 
  public:
-	OSKick(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+	OSKick(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandoskick(this)
 	{
-		this->SetAuthor("Anope");
 
 	}
 };

@@ -539,10 +539,9 @@ class CSXOP : public Module
 	CommandCSXOP commandcsxop;
 
  public:
-	CSXOP(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+	CSXOP(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		accessprovider(this), commandcsxop(this)
 	{
-		this->SetAuthor("Anope");
 		this->SetPermanent(true);
 
 		this->OnReload();

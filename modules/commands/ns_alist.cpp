@@ -121,10 +121,9 @@ class NSAList : public Module
 	CommandNSAList commandnsalist;
 
  public:
-	NSAList(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+	NSAList(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandnsalist(this)
 	{
-		this->SetAuthor("Anope");
 
 	}
 };

@@ -258,7 +258,7 @@ class ModuleXMLRPCMain : public Module
 	MyXMLRPCEvent stats;
 
  public:
-	ModuleXMLRPCMain(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, SUPPORTED), xmlrpc("XMLRPCServiceInterface", "xmlrpc")
+	ModuleXMLRPCMain(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, EXTRA | VENDOR), xmlrpc("XMLRPCServiceInterface", "xmlrpc")
 	{
 		me = this;
 

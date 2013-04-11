@@ -164,10 +164,9 @@ class NSInfo : public Module
 	CommandNSInfo commandnsinfo;
 
  public:
-	NSInfo(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+	NSInfo(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandnsinfo(this)
 	{
-		this->SetAuthor("Anope");
 
 	}
 };

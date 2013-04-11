@@ -211,9 +211,8 @@ class HSSet : public Module
 	CommandHSSetAll commandhssetall;
 
  public:
-	HSSet(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE), commandhsset(this), commandhssetall(this)
+	HSSet(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR), commandhsset(this), commandhssetall(this)
 	{
-		this->SetAuthor("Anope");
 
 	}
 };

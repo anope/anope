@@ -6,7 +6,7 @@
  */
 
 #include "module.h"
-#include "dns.h"
+#include "extra/dns.h"
 
 using namespace DNS;
 
@@ -88,9 +88,8 @@ class ModuleDNSBL : public Module
 	bool add_to_akill;
 
  public:
-	ModuleDNSBL(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, SUPPORTED)
+	ModuleDNSBL(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
 	{
-		this->SetAuthor("Anope");
 
 		Implementation i[] = { I_OnReload, I_OnUserConnect };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));

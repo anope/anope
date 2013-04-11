@@ -1154,14 +1154,13 @@ class CSSet : public Module
 	CommandCSSASetNoexpire commandcssasetnoexpire;
 
  public:
-	CSSet(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+	CSSet(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandcsset(this), commandcssaset(this), commandcssetautoop(this), commandcssetbantype(this), commandcssetchanstats(this),
 		CSDefChanstats(false), commandcssetdescription(this), commandcssetfounder(this), commandcssetkeeptopic(this),
 		commandcssetpeace(this), commandcssetpersist(this), commandcssetprivate(this), commandcssetrestricted(this),
 		commandcssetsecure(this), commandcssetsecurefounder(this), commandcssetsecureops(this), commandcssetsignkick(this),
 		commandcssetsuccessor(this), commandcssasetnoexpire(this)
 	{
-		this->SetAuthor("Anope");
 
 		Implementation i[] = { I_OnReload, I_OnChanRegistered, I_OnCheckKick, I_OnDelChan };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));

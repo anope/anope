@@ -382,7 +382,7 @@ class ProtoCharybdis : public Module
 	}
 
  public:
-	ProtoCharybdis(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PROTOCOL),
+	ProtoCharybdis(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PROTOCOL | VENDOR),
 		ircd_proto(this),
 		message_away(this), message_capab(this), message_error(this), message_kick(this), message_kill(this),
 		message_mode(this), message_motd(this), message_part(this), message_ping(this), message_privmsg(this),
@@ -401,7 +401,6 @@ class ProtoCharybdis : public Module
 		message_encap(this), message_euid(this), message_pass(this), message_server(this)
 
 	{
-		this->SetAuthor("Anope");
 
 		Implementation i[] = { I_OnChannelCreate, I_OnMLock, I_OnUnMLock };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));

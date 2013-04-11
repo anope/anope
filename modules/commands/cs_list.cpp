@@ -166,9 +166,8 @@ class CSList : public Module
 	CommandCSList commandcslist;
 
  public:
-	CSList(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE), commandcslist(this)
+	CSList(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR), commandcslist(this)
 	{
-		this->SetAuthor("Anope");
 
 	}
 };

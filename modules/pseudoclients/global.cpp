@@ -48,10 +48,9 @@ class GlobalCore : public Module
 	MyGlobalService myglobalservice;
 
  public:
-	GlobalCore(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+	GlobalCore(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PSEUDOCLIENT | VENDOR),
 		myglobalservice(this)
 	{
-		this->SetAuthor("Anope");
 
 		Global = BotInfo::Find(Config->Global);
 		if (!Global)

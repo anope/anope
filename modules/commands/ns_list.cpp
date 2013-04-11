@@ -182,10 +182,9 @@ class NSList : public Module
 	CommandNSList commandnslist;
 
  public:
-	NSList(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+	NSList(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandnslist(this)
 	{
-		this->SetAuthor("Anope");
 
 	}
 };

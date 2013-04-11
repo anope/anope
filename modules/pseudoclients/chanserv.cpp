@@ -67,9 +67,8 @@ class ChanServCore : public Module
 	ExpireCallback expires;
 
  public:
-	ChanServCore(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE), expires(this)
+	ChanServCore(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PSEUDOCLIENT | VENDOR), expires(this)
 	{
-		this->SetAuthor("Anope");
 
 		ChanServ  = BotInfo::Find(Config->ChanServ);
 		if (!ChanServ)

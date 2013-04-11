@@ -12,9 +12,8 @@
 class ENone : public Module
 {
  public:
-	ENone(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, ENCRYPTION)
+	ENone(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, ENCRYPTION | VENDOR)
 	{
-		this->SetAuthor("Anope");
 
 		Implementation i[] = { I_OnEncrypt, I_OnDecrypt, I_OnCheckAuthentication };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));

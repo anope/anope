@@ -663,10 +663,9 @@ class ModuleDNS : public Module
 	bool readd_connected_servers;
 
  public:
-	ModuleDNS(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, SUPPORTED),
+	ModuleDNS(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, EXTRA | VENDOR),
 		zone_type("DNSZone", DNSZone::Unserialize), dns_type("DNSServer", DNSServer::Unserialize), commandosdns(this)
 	{
-		this->SetAuthor("Anope");
 
 		Implementation i[] = { I_OnReload, I_OnNewServer, I_OnServerQuit, I_OnUserConnect, I_OnPreUserLogoff, I_OnDnsRequest };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));

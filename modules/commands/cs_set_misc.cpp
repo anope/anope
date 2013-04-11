@@ -135,10 +135,9 @@ class CSSetMisc : public Module
 	CommandCSSetMisc commandcssetmisc;
 
  public:
-	CSSetMisc(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+	CSSetMisc(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		csmiscdata_type("CSMiscData", CSMiscData::Unserialize), commandcssetmisc(this)
 	{
-		this->SetAuthor("Anope");
 
 		Implementation i[] = { I_OnReload, I_OnChanInfo };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));

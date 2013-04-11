@@ -44,10 +44,9 @@ class ModuleRegexPCRE : public Module
 	PCRERegexProvider pcre_regex_provider;
 
  public:
-	ModuleRegexPCRE(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, SUPPORTED),
+	ModuleRegexPCRE(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, EXTRA | VENDOR),
 		pcre_regex_provider(this)
 	{
-		this->SetAuthor("Anope");
 		this->SetPermanent(true);
 	}
 };

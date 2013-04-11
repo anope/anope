@@ -164,9 +164,8 @@ class DBFlatFile : public Module, public Pipe
 	}
 
  public:
-	DBFlatFile(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, DATABASE), last_day(0), use_fork(false), loaded(false)
+	DBFlatFile(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, DATABASE | VENDOR), last_day(0), use_fork(false), loaded(false)
 	{
-		this->SetAuthor("Anope");
 
 		Implementation i[] = { I_OnReload, I_OnLoadDatabase, I_OnSaveDatabase, I_OnSerializeTypeCreate };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));

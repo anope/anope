@@ -109,10 +109,9 @@ class NSIdentify : public Module
 	CommandNSIdentify commandnsidentify;
 
  public:
-	NSIdentify(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+	NSIdentify(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandnsidentify(this)
 	{
-		this->SetAuthor("Anope");
 
 	}
 };

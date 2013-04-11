@@ -64,7 +64,7 @@ class ModuleSQLite : public Module
 	/* SQL connections */
 	std::map<Anope::string, SQLiteService *> SQLiteServices;
  public:
-	ModuleSQLite(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, SUPPORTED)
+	ModuleSQLite(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, EXTRA | VENDOR)
 	{
 		Implementation i[] = { I_OnReload };
 		ModuleManager::Attach(i, this,  sizeof(i) / sizeof(Implementation));

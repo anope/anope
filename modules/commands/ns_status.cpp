@@ -77,10 +77,9 @@ class NSStatus : public Module
 	CommandNSStatus commandnsstatus;
 
  public:
-	NSStatus(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+	NSStatus(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandnsstatus(this)
 	{
-		this->SetAuthor("Anope");
 
 	}
 };

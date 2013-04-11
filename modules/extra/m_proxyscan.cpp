@@ -221,10 +221,9 @@ class ModuleProxyScan : public Module
 	} connectionTimeout;
 
  public:
-	ModuleProxyScan(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, SUPPORTED),
+	ModuleProxyScan(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, EXTRA | VENDOR),
 		connectionTimeout(this, 5)
 	{
-		this->SetAuthor("Anope");
 
 		Implementation i[] = { I_OnReload, I_OnUserConnect };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));

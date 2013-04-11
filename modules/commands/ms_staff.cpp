@@ -64,10 +64,9 @@ class MSStaff : public Module
 	CommandMSStaff commandmsstaff;
 
  public:
-	MSStaff(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+	MSStaff(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandmsstaff(this)
 	{
-		this->SetAuthor("Anope");
 
 		if (!MemoServService)
 			throw ModuleException("No MemoServ!");

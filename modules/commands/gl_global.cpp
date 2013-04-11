@@ -53,10 +53,9 @@ class GLGlobal : public Module
 	CommandGLGlobal commandglglobal;
 
  public:
-	GLGlobal(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+	GLGlobal(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandglglobal(this)
 	{
-		this->SetAuthor("Anope");
 
 	}
 };

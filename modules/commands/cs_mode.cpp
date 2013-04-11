@@ -485,10 +485,9 @@ class CSMode : public Module
 	CommandCSMode commandcsmode;
 
  public:
-	CSMode(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+	CSMode(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandcsmode(this)
 	{
-		this->SetAuthor("Anope");
 
 	}
 };

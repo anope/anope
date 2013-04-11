@@ -176,10 +176,9 @@ class OSMode : public Module
 	CommandOSUMode commandosumode;
 
  public:
-	OSMode(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+	OSMode(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandosmode(this), commandosumode(this)
 	{
-		this->SetAuthor("Anope");
 
 	}
 };

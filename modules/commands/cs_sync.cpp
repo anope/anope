@@ -55,10 +55,9 @@ class CSSync : public Module
 {
 	CommandCSSync commandcssync;
  public:
-	CSSync(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+	CSSync(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandcssync(this)
 	{
-		this->SetAuthor("Anope");
 
 	}
 };

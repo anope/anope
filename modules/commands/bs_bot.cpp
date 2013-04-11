@@ -355,10 +355,9 @@ class BSBot : public Module
 	CommandBSBot commandbsbot;
 
  public:
-	BSBot(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+	BSBot(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandbsbot(this)
 	{
-		this->SetAuthor("Anope");
 
 	}
 };

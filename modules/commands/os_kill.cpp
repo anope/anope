@@ -59,10 +59,9 @@ class OSKill : public Module
 	CommandOSKill commandoskill;
 
  public:
-	OSKill(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+	OSKill(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandoskill(this)
 	{
-		this->SetAuthor("Anope");
 
 	}
 };

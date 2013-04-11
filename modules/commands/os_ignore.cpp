@@ -317,10 +317,9 @@ class OSIgnore : public Module
 	CommandOSIgnore commandosignore;
 
  public:
-	OSIgnore(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+	OSIgnore(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		ignoredata_type("IgnoreData", IgnoreData::Unserialize), osignoreservice(this), commandosignore(this)
 	{
-		this->SetAuthor("Anope");
 
 		Implementation i[] = { I_OnBotPrivmsg };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));

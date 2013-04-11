@@ -1196,7 +1196,7 @@ class ProtoUnreal : public Module
 	}
 
  public:
-	ProtoUnreal(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PROTOCOL),
+	ProtoUnreal(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PROTOCOL | VENDOR),
 		ircd_proto(this),
 		message_away(this), message_error(this), message_join(this), message_kick(this), message_kill(this),
 		message_motd(this), message_part(this), message_ping(this), message_privmsg(this), message_quit(this),
@@ -1208,7 +1208,6 @@ class ProtoUnreal : public Module
 		message_sasl(this), message_sdesc(this), message_sethost(this), message_setident(this), message_setname(this), message_server(this),
 		message_sjoin(this), message_topic(this), message_umode2(this)
 	{
-		this->SetAuthor("Anope");
 
 		this->AddModes();
 

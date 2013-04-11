@@ -164,10 +164,9 @@ class CSSuspend : public Module
 	CommandCSUnSuspend commandcsunsuspend;
 
  public:
-	CSSuspend(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+	CSSuspend(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandcssuspend(this), commandcsunsuspend(this)
 	{
-		this->SetAuthor("Anope");
 
 		Implementation i[] = { I_OnPreChanExpire, I_OnCheckKick };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));

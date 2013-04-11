@@ -324,9 +324,8 @@ class CSSeen : public Module
 	CommandOSSeen commandosseen;
 	DataBasePurger purger;
  public:
-	CSSeen(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE), seeninfo_type("SeenInfo", SeenInfo::Unserialize), commandseen(this), commandosseen(this), purger(this)
+	CSSeen(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR), seeninfo_type("SeenInfo", SeenInfo::Unserialize), commandseen(this), commandosseen(this), purger(this)
 	{
-		this->SetAuthor("Anope");
 
 		Implementation eventlist[] =  { I_OnReload,
 						I_OnUserConnect,

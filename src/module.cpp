@@ -23,10 +23,19 @@ Module::Module(const Anope::string &modname, const Anope::string &, ModType modt
 	this->created = Anope::CurTime;
 	this->SetVersion(Anope::Version());
 
+	if (type & VENDOR)
+		this->SetAuthor("Anope");
+	else
+	{
+		/* Not vendor implies third */
+		type |= THIRD;
+		this->SetAuthor("Unknown");
+	}
+
 	if (ModuleManager::FindModule(this->name))
 		throw CoreException("Module already exists!");
 	
-	if (Anope::NoThird && modtype == THIRD)
+	if (Anope::NoThird && type & THIRD)
 		throw ModuleException("Third party modules may not be loaded");
 
 	ModuleManager::Modules.push_back(this);

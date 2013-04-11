@@ -390,10 +390,9 @@ class OSNews : public Module
 	}
 
  public:
-	OSNews(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+	OSNews(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		newsitem_type("NewsItem", NewsItem::Unserialize), newsservice(this), commandoslogonnews(this), commandosopernews(this), commandosrandomnews(this)
 	{
-		this->SetAuthor("Anope");
 
 		Implementation i[] = { I_OnUserModeSet, I_OnUserConnect };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));

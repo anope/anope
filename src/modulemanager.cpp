@@ -260,7 +260,7 @@ Module *ModuleManager::FindFirstOf(ModType type)
 	{
 		Module *m = *it;
 
-		if (m->type == type)
+		if (m->type & type)
 			return m;
 	}
 
@@ -459,17 +459,20 @@ bool ModuleManager::SetPriority(Module *mod, Implementation i, Priority s, Modul
 
 void ModuleManager::UnloadAll()
 {
-	std::vector<Anope::string> modules[MT_END];
-	for (std::list<Module *>::iterator it = Modules.begin(), it_end = Modules.end(); it != it_end; ++it)
-		if ((*it)->type != PROTOCOL && !(*it)->GetPermanent())
-			modules[(*it)->type].push_back((*it)->name);
-
-	for (size_t i = MT_BEGIN + 1; i != MT_END; ++i)
-		for (unsigned j = 0; j < modules[i].size(); ++j)
+	std::vector<Anope::string> modules;
+	for (size_t i = 1, j = 0; i != MT_END; i <<= 1, j |= i)
+		for (std::list<Module *>::iterator it = Modules.begin(), it_end = Modules.end(); it != it_end; ++it)
 		{
-			Module *m = FindModule(modules[i][j]);
-			if (m != NULL)
-				UnloadModule(m, NULL);
+			Module *m = *it;
+			if ((m->type & j) == m->type)
+				modules.push_back(m->name);
 		}
+	
+	for (unsigned i = 0; i < modules.size(); ++i)
+	{
+		Module *m = FindModule(modules[i]);
+		if (m != NULL)
+			UnloadModule(m, NULL);
+	}
 }
 

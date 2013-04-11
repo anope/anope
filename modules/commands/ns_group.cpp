@@ -348,10 +348,9 @@ class NSGroup : public Module
 	CommandNSGList commandnsglist;
 
  public:
-	NSGroup(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+	NSGroup(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandnsgroup(this), commandnsungroup(this), commandnsglist(this)
 	{
-		this->SetAuthor("Anope");
 
 		if (Config->NoNicknameOwnership)
 			throw ModuleException(modname + " can not be used with options:nonicknameownership enabled");

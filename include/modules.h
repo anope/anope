@@ -139,7 +139,28 @@ enum ModuleReturn
  */
 enum Priority { PRIORITY_FIRST, PRIORITY_DONTCARE, PRIORITY_LAST, PRIORITY_BEFORE, PRIORITY_AFTER };
 /* Module types, in the order in which they are unloaded. The order these are in is IMPORTANT */
-enum ModType { MT_BEGIN, THIRD, SUPPORTED, CORE, DATABASE, ENCRYPTION, PROTOCOL, MT_END };
+enum
+{
+	MT_BEGIN,
+	/* Module is 3rd party. All 3rd party modules should set this. Mutually exclusive to VENDOR. */
+	THIRD = 1 << 0,
+	/* A vendor module, which is made and shipped by Anope. Mutually exclusive to THIRD. */
+	VENDOR = 1 << 1,
+	/* Extra module not required for standard use. Probably requires external dependencies.
+	 * This module does something extreme enough that we want it to show in the default /os modlist command
+	 */
+	EXTRA = 1 << 2,
+	/* Module provides access to a database */
+	DATABASE = 1 << 3,
+	/* Module provides encryption */
+	ENCRYPTION = 1 << 4,
+	/* Module provides a pseudoclient */
+	PSEUDOCLIENT = 1 << 5,
+	/* Module provides IRCd protocol support */
+	PROTOCOL = 1 << 6,
+	MT_END = 1 << 7
+};
+typedef unsigned short ModType;
 
 /** Returned by Module::GetVersion, used to see what version of Anope
  * a module is compiled against.

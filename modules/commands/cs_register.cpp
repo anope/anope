@@ -134,10 +134,9 @@ class CSRegister : public Module
 	CommandCSRegister commandcsregister;
 
  public:
-	CSRegister(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+	CSRegister(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandcsregister(this)
 	{
-		this->SetAuthor("Anope");
 	}
 };
 

@@ -66,10 +66,9 @@ class NSResetPass : public Module
 	CommandNSResetPass commandnsresetpass;
 
  public:
-	NSResetPass(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+	NSResetPass(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandnsresetpass(this)
 	{
-		this->SetAuthor("Anope");
 
 		if (!Config->UseMail)
 			throw ModuleException("Not using mail.");

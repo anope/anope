@@ -329,9 +329,8 @@ class OSDefcon : public Module
 	}
 
  public:
-	OSDefcon(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE), session_service("SessionService", "session"), akills("XLineManager", "xlinemanager/sgline"), commandosdefcon(this)
+	OSDefcon(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR), session_service("SessionService", "session"), akills("XLineManager", "xlinemanager/sgline"), commandosdefcon(this)
 	{
-		this->SetAuthor("Anope");
 
 		Implementation i[] = { I_OnReload, I_OnChannelModeSet, I_OnChannelModeUnset, I_OnPreCommand, I_OnUserConnect, I_OnChannelModeAdd, I_OnChannelCreate };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));

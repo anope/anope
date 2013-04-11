@@ -342,10 +342,9 @@ class NSRegister : public Module
 	CommandNSResend commandnsrsend;
 
  public:
-	NSRegister(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+	NSRegister(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandnsregister(this), commandnsconfirm(this), commandnsrsend(this)
 	{
-		this->SetAuthor("Anope");
 
 		if (Config->NSRegistration.equals_ci("disable"))
 			throw ModuleException("Module will not load with nickserv:registration disabled.");

@@ -78,9 +78,8 @@ class ModuleSQLAuthentication : public Module
 	ServiceReference<SQL::Provider> SQL;
 
  public:
-	ModuleSQLAuthentication(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, SUPPORTED)
+	ModuleSQLAuthentication(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, EXTRA | VENDOR)
 	{
-		this->SetAuthor("Anope");
 
 		me = this;
 

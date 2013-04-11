@@ -68,11 +68,10 @@ class CSStats : public Module
 	MySQLInterface sqlinterface;
 	Anope::string prefix;
  public:
-	CSStats(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+	CSStats(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandcsstats(this), commandcsgstats(this), sql("", ""), sqlinterface(this)
 	{
 		me = this;
-		this->SetAuthor("Anope");
 
 		Implementation i[] = { I_OnReload };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));

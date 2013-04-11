@@ -180,10 +180,9 @@ class OSModule : public Module
 	CommandOSModUnLoad commandosmodunload;
 
  public:
-	OSModule(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+	OSModule(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandosmodload(this), commandosmodreload(this), commandosmodunload(this)
 	{
-		this->SetAuthor("Anope");
 		this->SetPermanent(true);
 
 	}

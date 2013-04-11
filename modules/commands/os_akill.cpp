@@ -449,10 +449,9 @@ class OSAKill : public Module
 	CommandOSAKill commandosakill;
 
  public:
-	OSAKill(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+	OSAKill(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandosakill(this)
 	{
-		this->SetAuthor("Anope");
 
 	}
 };

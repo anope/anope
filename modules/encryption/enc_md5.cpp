@@ -344,10 +344,9 @@ class EMD5 : public Module
 	MD5Provider md5provider;
 
  public:
-	EMD5(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, ENCRYPTION),
+	EMD5(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, ENCRYPTION | VENDOR),
 		md5provider(this)
 	{
-		this->SetAuthor("Anope");
 
 		Implementation i[] = { I_OnEncrypt, I_OnCheckAuthentication };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));

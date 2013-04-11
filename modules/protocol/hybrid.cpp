@@ -592,7 +592,7 @@ class ProtoHybrid : public Module
 	}
 
 public:
-	ProtoHybrid(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PROTOCOL),
+	ProtoHybrid(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PROTOCOL | VENDOR),
 		ircd_proto(this),
 		message_away(this), message_capab(this), message_error(this), message_kick(this), message_kill(this),
 		message_mode(this), message_motd(this), message_part(this), message_ping(this), message_privmsg(this),
@@ -603,7 +603,6 @@ public:
 		message_nick(this), message_pass(this), message_pong(this), message_server(this), message_sid(this),
 		message_sjoin(this), message_svsmode(this), message_tburst(this), message_tmode(this), message_uid(this)
 	{
-		this->SetAuthor("Anope");
 		this->AddModes();
 
 		ModuleManager::Attach(I_OnUserNickChange, this);

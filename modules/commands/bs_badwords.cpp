@@ -313,10 +313,9 @@ class BSBadwords : public Module
 	CommandBSBadwords commandbsbadwords;
 
  public:
-	BSBadwords(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+	BSBadwords(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandbsbadwords(this)
 	{
-		this->SetAuthor("Anope");
 
 	}
 };

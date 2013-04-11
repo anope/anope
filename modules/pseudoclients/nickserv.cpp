@@ -189,9 +189,8 @@ class NickServCore : public Module
 	ExpireCallback expires;
 
  public:
-	NickServCore(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE), mynickserv(this), expires(this)
+	NickServCore(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PSEUDOCLIENT | VENDOR), mynickserv(this), expires(this)
 	{
-		this->SetAuthor("Anope");
 
 		NickServ = BotInfo::Find(Config->NickServ);
 		if (!NickServ)

@@ -789,7 +789,7 @@ class BSKick : public Module
 	}
 
  public:
-	BSKick(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+	BSKick(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandbskick(this),
 		commandbskickamsg(this), commandbskickbadwords(this), commandbskickbolds(this), commandbskickcaps(this),
 		commandbskickcolors(this), commandbskickflood(this), commandbskickitalics(this), commandbskickrepeat(this),
@@ -797,7 +797,6 @@ class BSKick : public Module
 
 		purger(this)
 	{
-		this->SetAuthor("Anope");
 
 		ModuleManager::Attach(I_OnPrivmsg, this);
 	}

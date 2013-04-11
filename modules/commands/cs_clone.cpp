@@ -177,9 +177,8 @@ class CSClone : public Module
 	CommandCSClone commandcsclone;
 
  public:
-	CSClone(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE), commandcsclone(this)
+	CSClone(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR), commandcsclone(this)
 	{
-		this->SetAuthor("Anope");
 
 	}
 };

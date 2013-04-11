@@ -122,10 +122,9 @@ class CSTopic : public Module
 	CommandCSTopic commandcstopic;
 
  public:
-	CSTopic(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+	CSTopic(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandcstopic(this)
 	{
-		this->SetAuthor("Anope");
 
 	}
 };

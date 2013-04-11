@@ -76,10 +76,9 @@ class MSCheck : public Module
 	CommandMSCheck commandmscheck;
 
  public:
-	MSCheck(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+	MSCheck(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandmscheck(this)
 	{
-		this->SetAuthor("Anope");
 
 	}
 };

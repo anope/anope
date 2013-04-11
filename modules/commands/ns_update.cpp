@@ -55,10 +55,9 @@ class NSUpdate : public Module
 	CommandNSUpdate commandnsupdate;
 
  public:
-	NSUpdate(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+	NSUpdate(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandnsupdate(this)
 	{
-		this->SetAuthor("Anope");
 
 	}
 };

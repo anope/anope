@@ -107,10 +107,9 @@ class OSLogin : public Module
 	CommandOSLogout commandoslogout;
 
  public:
-	OSLogin(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+	OSLogin(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandoslogin(this), commandoslogout(this)
 	{
-		this->SetAuthor("Anope");
 
 		ModuleManager::Attach(I_IsServicesOper, this);
 	}

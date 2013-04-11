@@ -387,10 +387,9 @@ class CSFlags : public Module
 	CommandCSFlags commandcsflags;
 
  public:
-	CSFlags(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+	CSFlags(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		accessprovider(this), commandcsflags(this)
 	{
-		this->SetAuthor("Anope");
 		this->SetPermanent(true);
 
 		Implementation i[] = { I_OnReload };

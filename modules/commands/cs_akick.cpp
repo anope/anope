@@ -510,10 +510,9 @@ class CSAKick : public Module
 	CommandCSAKick commandcsakick;
 
  public:
-	CSAKick(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+	CSAKick(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandcsakick(this)
 	{
-		this->SetAuthor("Anope");
 
 		Implementation i[] = { I_OnCheckKick };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));

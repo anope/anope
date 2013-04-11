@@ -80,10 +80,9 @@ class OSNOOP : public Module
 	CommandOSNOOP commandosnoop;
 
  public:
-	OSNOOP(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+	OSNOOP(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandosnoop(this)
 	{
-		this->SetAuthor("Anope");
 
 		ModuleManager::Attach(I_OnUserModeSet, this);
 	}

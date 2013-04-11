@@ -331,9 +331,8 @@ class HTTPD : public Module
 	ServiceReference<SSLService> sslref;
 	std::map<Anope::string, HTTPProvider *> providers;
  public:
-	HTTPD(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, SUPPORTED), sslref("SSLService", "ssl")
+	HTTPD(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, EXTRA | VENDOR), sslref("SSLService", "ssl")
 	{
-		this->SetAuthor("Anope");
 
 		Implementation i[] = { I_OnReload };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));

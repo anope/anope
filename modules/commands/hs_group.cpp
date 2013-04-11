@@ -68,10 +68,9 @@ class HSGroup : public Module
 	CommandHSGroup commandhsgroup;
 
  public:
-	HSGroup(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+	HSGroup(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandhsgroup(this)
 	{
-		this->SetAuthor("Anope");
 
 	}
 };

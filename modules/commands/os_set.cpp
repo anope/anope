@@ -246,10 +246,9 @@ class OSSet : public Module
 	CommandOSSet commandosset;
 
  public:
-	OSSet(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+	OSSet(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandosset(this)
 	{
-		this->SetAuthor("Anope");
 
 	}
 };

@@ -273,9 +273,8 @@ class CSEntryMessage : public Module
 	CommandEntryMessage commandentrymsg;
 
  public:
-	CSEntryMessage(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE), entrymsg_type("EntryMsg", EntryMsg::Unserialize), commandentrymsg(this)
+	CSEntryMessage(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR), entrymsg_type("EntryMsg", EntryMsg::Unserialize), commandentrymsg(this)
 	{
-		this->SetAuthor("Anope");
 
 		Implementation i[] = { I_OnReload, I_OnJoinChannel };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));

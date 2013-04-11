@@ -69,10 +69,9 @@ class NSGetEMail : public Module
 {
 	CommandNSGetEMail commandnsgetemail;
  public:
-	NSGetEMail(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+	NSGetEMail(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandnsgetemail(this)
 	{
-		this->SetAuthor("Anope");
 
 	}
 };

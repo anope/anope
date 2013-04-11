@@ -67,9 +67,8 @@ class CSGetKey : public Module
 	CommandCSGetKey commandcsgetkey;
 
  public:
-	CSGetKey(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE), commandcsgetkey(this)
+	CSGetKey(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR), commandcsgetkey(this)
 	{
-		this->SetAuthor("Anope");
 
 	}
 };

@@ -334,9 +334,8 @@ class MChanstats : public Module
 
  public:
 	MChanstats(const Anope::string &modname, const Anope::string &creator) :
-		Module(modname, creator, CORE), sql("", ""), sqlinterface(this)
+		Module(modname, creator, EXTRA | VENDOR), sql("", ""), sqlinterface(this)
 	{
-		this->SetAuthor("Anope");
 
 		Implementation i[] = {	I_OnPrivmsg,
 					I_OnUserKicked,

@@ -273,10 +273,9 @@ class ESHA256 : public Module
 	}
 
  public:
-	ESHA256(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, ENCRYPTION),
+	ESHA256(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, ENCRYPTION | VENDOR),
 		sha256provider(this)
 	{
-		this->SetAuthor("Anope");
 
 		Implementation i[] = { I_OnEncrypt, I_OnCheckAuthentication };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));

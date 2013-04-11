@@ -212,9 +212,8 @@ class CSBan : public Module
 	CommandCSBan commandcsban;
 
  public:
-	CSBan(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE), commandcsban(this)
+	CSBan(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR), commandcsban(this)
 	{
-		this->SetAuthor("Anope");
 		me = this;
 	}
 };

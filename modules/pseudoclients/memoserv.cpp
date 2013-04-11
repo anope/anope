@@ -140,10 +140,9 @@ class MemoServCore : public Module
 {
 	MyMemoServService mymemoserv;
  public:
-	MemoServCore(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+	MemoServCore(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PSEUDOCLIENT | VENDOR),
 		mymemoserv(this)
 	{
-		this->SetAuthor("Anope");
 
 		MemoServ = BotInfo::Find(Config->MemoServ);
 		if (!MemoServ)

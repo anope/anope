@@ -86,9 +86,8 @@ class LDAPOper : public Module
 	Anope::string filter;
  public:
 	LDAPOper(const Anope::string &modname, const Anope::string &creator) :
-		Module(modname, creator, SUPPORTED), ldap("LDAPProvider", "ldap/main"), iinterface(this)
+		Module(modname, creator, EXTRA | VENDOR), ldap("LDAPProvider", "ldap/main"), iinterface(this)
 	{
-		this->SetAuthor("Anope");
 
 		Implementation i[] = { I_OnReload, I_OnNickIdentify, I_OnDelCore };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));

@@ -348,10 +348,9 @@ class HSRequest : public Module
 	CommandHSWaiting commandhswaiting;
 
  public:
-	HSRequest(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+	HSRequest(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		request_type("HostRequest", HostRequest::Unserialize), commandhsrequest(this), commandhsactive(this), commandhsreject(this), commandhswaiting(this)
 	{
-		this->SetAuthor("Anope");
 
 		if (!IRCD || !IRCD->CanSetVHost)
 			throw ModuleException("Your IRCd does not support vhosts");

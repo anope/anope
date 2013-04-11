@@ -619,10 +619,9 @@ class OSSession : public Module
 	ServiceReference<XLineManager> akills;
 
  public:
-	OSSession(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+	OSSession(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		exception_type("Exception", Exception::Unserialize), ss(this), commandossession(this), commandosexception(this), akills("XLineManager", "xlinemanager/sgline")
 	{
-		this->SetAuthor("Anope");
 		this->SetPermanent(true);
 
 		Implementation i[] = { I_OnUserConnect, I_OnPreUserLogoff };

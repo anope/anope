@@ -699,10 +699,9 @@ class OSSXLine : public Module
 	CommandOSSQLine commandossqline;
 
  public:
-	OSSXLine(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+	OSSXLine(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandossnline(this), commandossqline(this)
 	{
-		this->SetAuthor("Anope");
 	}
 };
 

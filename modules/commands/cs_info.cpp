@@ -142,10 +142,9 @@ class CSInfo : public Module
 	CommandCSInfo commandcsinfo;
 
  public:
-	CSInfo(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+	CSInfo(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandcsinfo(this)
 	{
-		this->SetAuthor("Anope");
 
 	}
 };

@@ -41,10 +41,9 @@ class EOld : public Module
 	inline static char XTOI(char c) { return c > 9 ? c - 'A' + 10 : c - '0'; }
 
  public:
-	EOld(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, ENCRYPTION),
+	EOld(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, ENCRYPTION | VENDOR),
 		oldmd5provider(this)
 	{
-		this->SetAuthor("Anope");
 
 		ModuleManager::LoadModule("enc_md5", User::Find(creator));
 		if (!md5)

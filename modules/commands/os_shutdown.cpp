@@ -100,10 +100,9 @@ class OSShutdown : public Module
 	CommandOSShutdown commandosshutdown;
 
  public:
-	OSShutdown(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+	OSShutdown(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandosquit(this), commandosrestart(this), commandosshutdown(this)
 	{
-		this->SetAuthor("Anope");
 
 	}
 };

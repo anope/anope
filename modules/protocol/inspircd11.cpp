@@ -859,7 +859,7 @@ class ProtoInspIRCd : public Module
 	}
 
  public:
-	ProtoInspIRCd(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PROTOCOL),
+	ProtoInspIRCd(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PROTOCOL | VENDOR),
 		ircd_proto(this),
 		message_away(this), message_error(this), message_join(this), message_kick(this), message_kill(this),
 		message_motd(this), message_part(this), message_ping(this), message_privmsg(this), message_quit(this),
@@ -871,7 +871,6 @@ class ProtoInspIRCd : public Module
 		message_fmode(this), message_ftopic(this), message_idle(this), message_mode(this),
 		message_nick(this), message_opertype(this), message_rsquit(this), message_server(this)
 	{
-		this->SetAuthor("Anope");
 
 		Servers::Capab.insert("NOQUIT");
 

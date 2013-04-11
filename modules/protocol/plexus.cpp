@@ -353,7 +353,7 @@ class ProtoPlexus : public Module
 	}
 
  public:
-	ProtoPlexus(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PROTOCOL),
+	ProtoPlexus(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PROTOCOL | VENDOR),
 		ircd_proto(this),
 		message_away(this), message_capab(this), message_error(this), message_kick(this), message_kill(this),
 		message_mode(this), message_motd(this), message_part(this), message_ping(this), message_privmsg(this), message_quit(this),
@@ -367,7 +367,6 @@ class ProtoPlexus : public Module
 
 		message_encap(this), message_pass(this), message_server(this), message_uid(this)
 	{
-		this->SetAuthor("Anope");
 
 		if (ModuleManager::LoadModule("hybrid", User::Find(creator)) != MOD_ERR_OK)
 			throw ModuleException("Unable to load hybrid");

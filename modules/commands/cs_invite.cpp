@@ -104,9 +104,8 @@ class CSInvite : public Module
 	CommandCSInvite commandcsinvite;
 
  public:
-	CSInvite(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE), commandcsinvite(this)
+	CSInvite(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR), commandcsinvite(this)
 	{
-		this->SetAuthor("Anope");
 
 	}
 };

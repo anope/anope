@@ -10,9 +10,8 @@
 class StatusUpdate : public Module
 {
  public:
-	StatusUpdate(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, SUPPORTED)
+	StatusUpdate(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
 	{
-		this->SetAuthor("Anope");
 
 		Implementation i[] = { I_OnAccessAdd, I_OnAccessDel };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));

@@ -64,10 +64,9 @@ class MSSendAll : public Module
 	CommandMSSendAll commandmssendall;
 
  public:
-	MSSendAll(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+	MSSendAll(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandmssendall(this)
 	{
-		this->SetAuthor("Anope");
 
 		if (!MemoServService)
 			throw ModuleException("No MemoServ!");

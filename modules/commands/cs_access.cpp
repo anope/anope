@@ -783,10 +783,9 @@ class CSAccess : public Module
 	CommandCSLevels commandcslevels;
 
  public:
-	CSAccess(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+	CSAccess(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		accessprovider(this), commandcsaccess(this), commandcslevels(this)
 	{
-		this->SetAuthor("Anope");
 		this->SetPermanent(true);
 
 		Implementation i[] = { I_OnReload, I_OnCreateChan, I_OnGroupCheckPriv };

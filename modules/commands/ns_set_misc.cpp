@@ -154,10 +154,9 @@ class NSSetMisc : public Module
 	CommandNSSASetMisc commandnssasetmisc;
 
  public:
-	NSSetMisc(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+	NSSetMisc(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		nsmiscdata_type("NSMiscData", NSMiscData::Unserialize), commandnssetmisc(this), commandnssasetmisc(this)
 	{
-		this->SetAuthor("Anope");
 
 		Implementation i[] = { I_OnReload, I_OnNickInfo };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));

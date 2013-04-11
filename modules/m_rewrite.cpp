@@ -153,9 +153,8 @@ class ModuleRewrite : public Module
 	RewriteCommand cmdrewrite;
 
  public:
-	ModuleRewrite(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, SUPPORTED), cmdrewrite(this)
+	ModuleRewrite(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR), cmdrewrite(this)
 	{
-		this->SetAuthor("Anope");
 
 		Implementation i[] = { I_OnReload };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));

@@ -225,10 +225,9 @@ class OSList : public Module
 	CommandOSUserList commandosuserlist;
 
  public:
-	OSList(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+	OSList(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandoschanlist(this), commandosuserlist(this)
 	{
-		this->SetAuthor("Anope");
 
 	}
 };

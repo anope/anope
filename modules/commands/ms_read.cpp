@@ -186,10 +186,9 @@ class MSRead : public Module
 	CommandMSRead commandmsread;
 
  public:
-	MSRead(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+	MSRead(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandmsread(this)
 	{
-		this->SetAuthor("Anope");
 
 	}
 };

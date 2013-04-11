@@ -207,10 +207,9 @@ class MSInfo : public Module
 	CommandMSInfo commandmsinfo;
 
  public:
-	MSInfo(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+	MSInfo(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandmsinfo(this)
 	{
-		this->SetAuthor("Anope");
 
 	}
 };

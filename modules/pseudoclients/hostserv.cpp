@@ -16,9 +16,8 @@
 class HostServCore : public Module
 {
  public:
-	HostServCore(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
+	HostServCore(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PSEUDOCLIENT | VENDOR)
 	{
-		this->SetAuthor("Anope");
 
 		if (!IRCD || !IRCD->CanSetVHost)
 			throw ModuleException("Your IRCd does not support vhosts");

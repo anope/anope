@@ -16,9 +16,8 @@
 class BotServCore : public Module
 {
  public:
-	BotServCore(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
+	BotServCore(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PSEUDOCLIENT | VENDOR)
 	{
-		this->SetAuthor("Anope");
 
 		BotServ = BotInfo::Find(Config->BotServ);
 		if (!BotServ)

@@ -224,22 +224,19 @@ class NSIdentifyLDAP : public Module
 		Implementation i[] = { I_OnReload, I_OnPreCommand, I_OnCheckAuthentication, I_OnNickIdentify, I_OnNickRegister };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 		ModuleManager::SetPriority(this, PRIORITY_FIRST);
-
-		OnReload();
 	}
 
-	void OnReload() anope_override
+	void OnReload(ServerConfig *conf, ConfigReader &reader) anope_override
 	{
-		ConfigReader config;
 
-		basedn = config.ReadValue("m_ldap_authentication", "basedn", "", 0);
-		search_filter = config.ReadValue("m_ldap_authentication", "search_filter", "", 0);
-		object_class = config.ReadValue("m_ldap_authentication", "object_class", "", 0);
-		username_attribute = config.ReadValue("m_ldap_authentication", "username_attribute", "", 0);
-		this->password_attribute = config.ReadValue("m_ldap_authentication", "password_attribute", "", 0);
-		email_attribute = config.ReadValue("m_ldap_authentication", "email_attribute", "", 0);
-		this->disable_register_reason = config.ReadValue("m_ldap_authentication", "disable_register_reason", "", 0);
-		this->disable_email_reason = config.ReadValue("m_ldap_authentication", "disable_email_reason", "", 0);
+		basedn = reader.ReadValue("m_ldap_authentication", "basedn", "", 0);
+		search_filter = reader.ReadValue("m_ldap_authentication", "search_filter", "", 0);
+		object_class = reader.ReadValue("m_ldap_authentication", "object_class", "", 0);
+		username_attribute = reader.ReadValue("m_ldap_authentication", "username_attribute", "", 0);
+		this->password_attribute = reader.ReadValue("m_ldap_authentication", "password_attribute", "", 0);
+		email_attribute = reader.ReadValue("m_ldap_authentication", "email_attribute", "", 0);
+		this->disable_register_reason = reader.ReadValue("m_ldap_authentication", "disable_register_reason", "", 0);
+		this->disable_email_reason = reader.ReadValue("m_ldap_authentication", "disable_email_reason", "", 0);
 
 		if (!email_attribute.empty())
 			/* Don't complain to users about how they need to update their email, we will do it for them */

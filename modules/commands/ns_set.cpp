@@ -1404,14 +1404,11 @@ class NSSet : public Module
 
 		Implementation i[] = { I_OnReload, I_OnNickRegister, I_OnPreCommand };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
-
-		this->OnReload();
 	}
 
-	void OnReload() anope_override
+	void OnReload(ServerConfig *conf, ConfigReader &reader) anope_override
 	{
-		ConfigReader config;
-		NSDefChanstats = config.ReadFlag("chanstats", "NSDefChanstats", "0", 0);
+		NSDefChanstats = reader.ReadFlag("chanstats", "NSDefChanstats", "0", 0);
 	}
 
 	void OnNickRegister(NickAlias *na) anope_override

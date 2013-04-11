@@ -14,11 +14,8 @@ class HelpChannel : public Module
  public:
 	HelpChannel(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
 	{
-
 		Implementation i[] = { I_OnChannelModeSet, I_OnReload };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
-
-		OnReload();
 	}
 
 	EventReturn OnChannelModeSet(Channel *c, MessageSource &setter, const Anope::string &mname, const Anope::string &param) anope_override
@@ -34,11 +31,9 @@ class HelpChannel : public Module
 		return EVENT_CONTINUE;
 	}
 
-	void OnReload() anope_override
+	void OnReload(ServerConfig *conf, ConfigReader &reader) anope_override
 	{
-		ConfigReader config;
-
-		this->HelpChan = config.ReadValue("m_helpchan", "helpchannel", "", 0);
+		this->HelpChan = reader.ReadValue("m_helpchan", "helpchannel", "", 0);
 	}
 };
 

@@ -229,15 +229,6 @@ class ModuleProxyScan : public Module
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 
 		this->listener = NULL;
-
-		try
-		{
-			OnReload();
-		}
-		catch (const ConfigException &ex)
-		{
-			throw ModuleException(ex.GetReason());
-		}
 	}
 
 	~ModuleProxyScan()
@@ -262,23 +253,21 @@ class ModuleProxyScan : public Module
 		delete this->listener;
 	}
 
-	void OnReload() anope_override
+	void OnReload(ServerConfig *conf, ConfigReader &reader) anope_override
 	{
-		ConfigReader config;
-
-		Anope::string s_target_ip = config.ReadValue("m_proxyscan", "target_ip", "", 0);
+		Anope::string s_target_ip = reader.ReadValue("m_proxyscan", "target_ip", "", 0);
 		if (s_target_ip.empty())
 			throw ConfigException("m_proxyscan:target_ip may not be empty");
 
-		int s_target_port = config.ReadInteger("m_proxyscan", "target_port", "-1", 0, true);
+		int s_target_port = reader.ReadInteger("m_proxyscan", "target_port", "-1", 0, true);
 		if (s_target_port <= 0)
 			throw ConfigException("m_proxyscan:target_port may not be empty and must be a positive number");
 
-		Anope::string s_listen_ip = config.ReadValue("m_proxyscan", "listen_ip", "", 0);
+		Anope::string s_listen_ip = reader.ReadValue("m_proxyscan", "listen_ip", "", 0);
 		if (s_listen_ip.empty())
 			throw ConfigException("m_proxyscan:listen_ip may not be empty");
 
-		int s_listen_port = config.ReadInteger("m_proxyscan", "listen_port", "-1", 0, true);
+		int s_listen_port = reader.ReadInteger("m_proxyscan", "listen_port", "-1", 0, true);
 		if (s_listen_port <= 0)
 			throw ConfigException("m_proxyscan:listen_port may not be empty and must be a positive number");
 
@@ -286,10 +275,10 @@ class ModuleProxyScan : public Module
 		target_port = s_target_port;
 		this->listen_ip = s_listen_ip;
 		this->listen_port = s_listen_port;
-		this->con_notice = config.ReadValue("m_proxyscan", "connect_notice", "", 0);
-		this->con_source = config.ReadValue("m_proxyscan", "connect_source", "", 0);
-		add_to_akill = config.ReadFlag("m_proxyscan", "add_to_akill", "true", 0);
-		this->connectionTimeout.SetSecs(config.ReadInteger("m_proxyscan", "timeout", "5", 0, true));
+		this->con_notice = reader.ReadValue("m_proxyscan", "connect_notice", "", 0);
+		this->con_source = reader.ReadValue("m_proxyscan", "connect_source", "", 0);
+		add_to_akill = reader.ReadFlag("m_proxyscan", "add_to_akill", "true", 0);
+		this->connectionTimeout.SetSecs(reader.ReadInteger("m_proxyscan", "timeout", "5", 0, true));
 
 		ProxyCheckString = Config->NetworkName + " proxy check";
 		delete this->listener;
@@ -304,12 +293,12 @@ class ModuleProxyScan : public Module
 		}
 
 		this->proxyscans.clear();
-		for (int i = 0; i < config.Enumerate("proxyscan"); ++i)
+		for (int i = 0; i < reader.Enumerate("proxyscan"); ++i)
 		{
 			ProxyCheck p;
 			Anope::string token;
 
-			commasepstream sep(config.ReadValue("proxyscan", "type", "", i));
+			commasepstream sep(reader.ReadValue("proxyscan", "type", "", i));
 			while (sep.GetToken(token))
 			{
 				if (!token.equals_ci("HTTP") && !token.equals_ci("SOCKS5"))
@@ -319,7 +308,7 @@ class ModuleProxyScan : public Module
 			if (p.types.empty())
 				continue;
 
-			commasepstream sep2(config.ReadValue("proxyscan", "port", "", i));
+			commasepstream sep2(reader.ReadValue("proxyscan", "port", "", i));
 			while (sep2.GetToken(token))
 			{
 				try
@@ -332,8 +321,8 @@ class ModuleProxyScan : public Module
 			if (p.ports.empty())
 				continue;
 
-			p.duration = Anope::DoTime(config.ReadValue("proxyscan", "time", "4h", i));
-			p.reason = config.ReadValue("proxyscan", "reason", "", i);
+			p.duration = Anope::DoTime(reader.ReadValue("proxyscan", "time", "4h", i));
+			p.reason = reader.ReadValue("proxyscan", "reason", "", i);
 			if (p.reason.empty())
 				continue;
 

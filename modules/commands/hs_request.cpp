@@ -357,8 +357,6 @@ class HSRequest : public Module
 
 		Implementation i[] = { I_OnReload };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
-
-		this->OnReload();
 	}
 
 	~HSRequest()
@@ -370,13 +368,10 @@ class HSRequest : public Module
 		}
 	}
 
-	void OnReload() anope_override
+	void OnReload(ServerConfig *conf, ConfigReader &reader) anope_override
 	{
-		ConfigReader config;
-		HSRequestMemoUser = config.ReadFlag("hs_request", "memouser", "no", 0);
-		HSRequestMemoOper = config.ReadFlag("hs_request", "memooper", "no", 0);
-
-		Log(LOG_DEBUG) << "[hs_request] Set config vars: MemoUser=" << HSRequestMemoUser << " MemoOper=" <<  HSRequestMemoOper;
+		HSRequestMemoUser = reader.ReadFlag("hs_request", "memouser", "no", 0);
+		HSRequestMemoOper = reader.ReadFlag("hs_request", "memooper", "no", 0);
 	}
 };
 

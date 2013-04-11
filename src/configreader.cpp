@@ -27,11 +27,15 @@
 #include "services.h"
 #include "config.h"
 
-ConfigReader::ConfigReader() : error(CONF_NO_ERROR)
+ConfigReader::ConfigReader() : conf(Config), error(CONF_NO_ERROR)
 {
 }
 
-ConfigReader::ConfigReader(const Anope::string &filename) : error(CONF_NO_ERROR)
+ConfigReader::ConfigReader(const Anope::string &filename) : conf(Config), error(CONF_NO_ERROR)
+{
+}
+
+ConfigReader::ConfigReader(ServerConfig *c) : conf(c), error(CONF_NO_ERROR)
 {
 }
 
@@ -44,7 +48,7 @@ Anope::string ConfigReader::ReadValue(const Anope::string &tag, const Anope::str
 	/* Don't need to strlcpy() tag and name anymore, ReadConf() takes const char* */
 	Anope::string result;
 
-	if (!Config->ConfValue(Config->config_data, tag, name, default_value, index, result, allow_linefeeds))
+	if (!conf->ConfValue(conf->config_data, tag, name, default_value, index, result, allow_linefeeds))
 		this->error = CONF_VALUE_NOT_FOUND;
 
 	return result;
@@ -57,7 +61,7 @@ Anope::string ConfigReader::ReadValue(const Anope::string &tag, const Anope::str
 
 bool ConfigReader::ReadFlag(const Anope::string &tag, const Anope::string &name, const Anope::string &default_value, int index)
 {
-	return Config->ConfValueBool(Config->config_data, tag, name, default_value, index);
+	return conf->ConfValueBool(conf->config_data, tag, name, default_value, index);
 }
 
 bool ConfigReader::ReadFlag(const Anope::string &tag, const Anope::string &name, int index)
@@ -69,7 +73,7 @@ int ConfigReader::ReadInteger(const Anope::string &tag, const Anope::string &nam
 {
 	int result;
 
-	if (!Config->ConfValueInteger(Config->config_data, tag, name, default_value, index, result))
+	if (!conf->ConfValueInteger(conf->config_data, tag, name, default_value, index, result))
 	{
 		this->error = CONF_VALUE_NOT_FOUND;
 		return 0;
@@ -98,12 +102,12 @@ long ConfigReader::GetError()
 
 int ConfigReader::Enumerate(const Anope::string &tag) const
 {
-	return Config->ConfValueEnum(Config->config_data, tag);
+	return conf->ConfValueEnum(conf->config_data, tag);
 }
 
 int ConfigReader::EnumerateValues(const Anope::string &tag, int index)
 {
-	return Config->ConfVarEnum(Config->config_data, tag, index);
+	return conf->ConfVarEnum(conf->config_data, tag, index);
 }
 
 bool ConfigReader::Verify()

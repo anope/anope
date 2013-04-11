@@ -118,16 +118,14 @@ void Anope::HandleSignal()
 		{
 			Anope::SaveDatabases();
 
-			ServerConfig *old_config = Config;
 			try
 			{
-				Config = new ServerConfig();
-				FOREACH_MOD(I_OnReload, OnReload());
-				delete old_config;
+				ServerConfig *new_config = new ServerConfig();
+				delete Config;
+				Config = new_config;
 			}
 			catch (const ConfigException &ex)
 			{
-				Config = old_config;
 				Log() << "Error reloading configuration file: " << ex.GetReason();
 			}
 			break;

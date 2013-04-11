@@ -938,21 +938,18 @@ class ModuleDNS : public Module
 
 		Implementation i[] = { I_OnReload, I_OnModuleUnload };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
-
-		this->OnReload();
 	}
 
-	void OnReload() anope_override
+	void OnReload(ServerConfig *conf, ConfigReader &reader) anope_override
 	{
-		ConfigReader config;
 
-		nameserver = config.ReadValue("dns", "nameserver", "127.0.0.1", 0);
-		timeout = Anope::DoTime(config.ReadValue("dns", "timeout", "5", 0));
-		ip = config.ReadValue("dns", "ip", "0.0.0.0", 0);
-		port = config.ReadInteger("dns", "port", "53", 0, false);
-		admin = config.ReadValue("dns", "admin", "admin@example.com", 0);
-		nameservers = config.ReadValue("dns", "nameservers", "ns1.example.com", 0);
-		refresh = config.ReadInteger("dns", "refresh", "3600", 0, false);
+		nameserver = reader.ReadValue("dns", "nameserver", "127.0.0.1", 0);
+		timeout = Anope::DoTime(reader.ReadValue("dns", "timeout", "5", 0));
+		ip = reader.ReadValue("dns", "ip", "0.0.0.0", 0);
+		port = reader.ReadInteger("dns", "port", "53", 0, false);
+		admin = reader.ReadValue("dns", "admin", "admin@example.com", 0);
+		nameservers = reader.ReadValue("dns", "nameservers", "ns1.example.com", 0);
+		refresh = reader.ReadInteger("dns", "refresh", "3600", 0, false);
 
 		if (Anope::IsFile(nameserver))
 		{

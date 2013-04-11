@@ -394,24 +394,21 @@ class CSFlags : public Module
 
 		Implementation i[] = { I_OnReload };
 		ModuleManager::Attach(i, this, 1);
-
-		this->OnReload();
 	}
 
-	void OnReload() anope_override
+	void OnReload(ServerConfig *conf, ConfigReader &reader) anope_override
 	{
-		ConfigReader config;
 		defaultFlags.clear();
 
-		for (int i = 0; i < config.Enumerate("privilege"); ++i)
+		for (int i = 0; i < reader.Enumerate("privilege"); ++i)
 		{
-			const Anope::string &pname = config.ReadValue("privilege", "name", "", i);
+			const Anope::string &pname = reader.ReadValue("privilege", "name", "", i);
 
 			Privilege *p = PrivilegeManager::FindPrivilege(pname);
 			if (p == NULL)
 				continue;
 
-			const Anope::string &value = config.ReadValue("privilege", "flag", "", i);
+			const Anope::string &value = reader.ReadValue("privilege", "flag", "", i);
 			if (value.empty())
 				continue;
 

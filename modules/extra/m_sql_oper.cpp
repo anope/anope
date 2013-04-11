@@ -99,16 +99,12 @@ class ModuleSQLOper : public Module
 
 		Implementation i[] = { I_OnReload, I_OnNickIdentify };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
-
-		this->OnReload();
 	}
 
-	void OnReload() anope_override
+	void OnReload(ServerConfig *conf, ConfigReader &reader) anope_override
 	{
-		ConfigReader config;
-
-		this->engine = config.ReadValue("m_sql_oper", "engine", "", 0);
-		this->query = config.ReadValue("m_sql_oper", "query", "", 0);
+		this->engine = reader.ReadValue("m_sql_oper", "engine", "", 0);
+		this->query = reader.ReadValue("m_sql_oper", "query", "", 0);
 
 		this->SQL = ServiceReference<SQL::Provider>("SQL::Provider", this->engine);
 	}

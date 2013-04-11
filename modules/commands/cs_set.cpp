@@ -1164,14 +1164,11 @@ class CSSet : public Module
 
 		Implementation i[] = { I_OnReload, I_OnChanRegistered, I_OnCheckKick, I_OnDelChan };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
-
-		this->OnReload();
 	}
 
-	void OnReload() anope_override
+	void OnReload(ServerConfig *conf, ConfigReader &reader) anope_override
 	{
-		ConfigReader config;
-		CSDefChanstats = config.ReadFlag("chanstats", "CSDefChanstats", "0", 0);
+		CSDefChanstats = reader.ReadFlag("chanstats", "CSDefChanstats", "0", 0);
 	}
 
 	void OnChanRegistered(ChannelInfo *ci) anope_override

@@ -75,8 +75,6 @@ class DBMySQL : public Module, public Pipe
 		Implementation i[] = { I_OnReload, I_OnShutdown, I_OnLoadDatabase, I_OnSerializableConstruct, I_OnSerializableDestruct, I_OnSerializeCheck, I_OnSerializableUpdate };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 
-		OnReload();
-
 		if (ModuleManager::FindFirstOf(DATABASE) != this)
 			throw ModuleException("If db_sql_live is loaded it must be the first database module loaded.");
 	}
@@ -132,12 +130,11 @@ class DBMySQL : public Module, public Pipe
 		init = false;
 	}
 
-	void OnReload() anope_override
+	void OnReload(ServerConfig *conf, ConfigReader &reader) anope_override
 	{
-		ConfigReader config;
-		this->engine = config.ReadValue("db_sql", "engine", "", 0);
+		this->engine = reader.ReadValue("db_sql", "engine", "", 0);
 		this->SQL = ServiceReference<Provider>("SQL::Provider", this->engine);
-		this->prefix = config.ReadValue("db_sql", "prefix", "anope_db_", 0);
+		this->prefix = reader.ReadValue("db_sql", "prefix", "anope_db_", 0);
 	}
 
 	void OnSerializableConstruct(Serializable *obj) anope_override

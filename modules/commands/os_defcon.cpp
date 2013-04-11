@@ -334,36 +334,25 @@ class OSDefcon : public Module
 
 		Implementation i[] = { I_OnReload, I_OnChannelModeSet, I_OnChannelModeUnset, I_OnPreCommand, I_OnUserConnect, I_OnChannelModeAdd, I_OnChannelCreate };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
-
-
-		try
-		{
-			this->OnReload();
-		}
-		catch (const ConfigException &ex)
-		{
-			throw ModuleException(ex.GetReason());
-		}
 	}
 
-	void OnReload() anope_override
+	void OnReload(ServerConfig *conf, ConfigReader &reader) anope_override
 	{
-		ConfigReader config;
 		DefconConfig dconfig;
 
-		dconfig.defaultlevel = config.ReadInteger("defcon", "defaultlevel", 0, 0);
-		dconfig.defcons[4] = config.ReadValue("defcon", "level4", 0);
-		dconfig.defcons[3] = config.ReadValue("defcon", "level3", 0);
-		dconfig.defcons[2] = config.ReadValue("defcon", "level2", 0);
-		dconfig.defcons[1] = config.ReadValue("defcon", "level1", 0);
-		dconfig.sessionlimit = config.ReadInteger("defcon", "sessionlimit", 0, 0);
-		dconfig.akillreason = config.ReadValue("defcon", "akillreason", 0);
-		dconfig.akillexpire = Anope::DoTime(config.ReadValue("defcon", "akillexpire", 0));
-		dconfig.chanmodes = config.ReadValue("defcon", "chanmodes", 0);
-		dconfig.timeout = Anope::DoTime(config.ReadValue("defcon", "timeout", 0));
-		dconfig.globalondefcon = config.ReadFlag("defcon", "globalondefcon", 0);
-		dconfig.message = config.ReadValue("defcon", "message", 0);
-		dconfig.offmessage = config.ReadValue("defcon", "offmessage", 0);
+		dconfig.defaultlevel = reader.ReadInteger("defcon", "defaultlevel", 0, 0);
+		dconfig.defcons[4] = reader.ReadValue("defcon", "level4", 0);
+		dconfig.defcons[3] = reader.ReadValue("defcon", "level3", 0);
+		dconfig.defcons[2] = reader.ReadValue("defcon", "level2", 0);
+		dconfig.defcons[1] = reader.ReadValue("defcon", "level1", 0);
+		dconfig.sessionlimit = reader.ReadInteger("defcon", "sessionlimit", 0, 0);
+		dconfig.akillreason = reader.ReadValue("defcon", "akillreason", 0);
+		dconfig.akillexpire = Anope::DoTime(reader.ReadValue("defcon", "akillexpire", 0));
+		dconfig.chanmodes = reader.ReadValue("defcon", "chanmodes", 0);
+		dconfig.timeout = Anope::DoTime(reader.ReadValue("defcon", "timeout", 0));
+		dconfig.globalondefcon = reader.ReadFlag("defcon", "globalondefcon", 0);
+		dconfig.message = reader.ReadValue("defcon", "message", 0);
+		dconfig.offmessage = reader.ReadValue("defcon", "offmessage", 0);
 
 		if (dconfig.defaultlevel < 1 || dconfig.defaultlevel > 5)
 			throw ConfigException("The value for <defcon:defaultlevel> must be between 1 and 5");

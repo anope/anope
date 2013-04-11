@@ -11,6 +11,7 @@
 #include "modules.h"
 #include "users.h"
 #include "regchannel.h"
+#include "config.h"
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -225,7 +226,24 @@ ModuleReturn ModuleManager::LoadModule(const Anope::string &modname, User *u)
 	else
 		Log(LOG_DEBUG_2) << "Module " << modname << " is compiled against current version of Anope " << Anope::VersionShort();
 
+	/* If the module is hooked to the reload event it wants to initialize its config here */
+	if (std::find(EventHandlers[I_OnReload].begin(), EventHandlers[I_OnReload].end(), m) != EventHandlers[I_OnReload].end())
+	{
+		ConfigReader reader;
+		try
+		{
+			m->OnReload(Config, reader);
+		}
+		catch (const ConfigException &ex)
+		{
+			Log() << "Module " << modname << " couldn't load due to configuration problems: " << ex.GetReason();
+			DeleteModule(m);
+			return MOD_ERR_EXCEPTION;
+		}
+	}
+
 	Log(LOG_DEBUG) << "Module " << modname << " loaded.";
+
 	FOREACH_MOD(I_OnModuleLoad, OnModuleLoad(u, m));
 
 	return MOD_ERR_OK;

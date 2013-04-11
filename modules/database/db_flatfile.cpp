@@ -169,8 +169,6 @@ class DBFlatFile : public Module, public Pipe
 
 		Implementation i[] = { I_OnReload, I_OnLoadDatabase, I_OnSaveDatabase, I_OnSerializeTypeCreate };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
-
-		OnReload();
 	}
 
 	void OnNotify() anope_override
@@ -193,11 +191,10 @@ class DBFlatFile : public Module, public Pipe
 			Anope::Quitting = true;
 	}
 
-	void OnReload() anope_override
+	void OnReload(ServerConfig *conf, ConfigReader &reader) anope_override
 	{
-		ConfigReader config;
-		database_file = config.ReadValue("db_flatfile", "database", "anope.db", 0);
-		use_fork = config.ReadFlag("db_flatfile", "fork", "no", 0);
+		database_file = reader.ReadValue("db_flatfile", "database", "anope.db", 0);
+		use_fork = reader.ReadFlag("db_flatfile", "fork", "no", 0);
 	}
 
 	EventReturn OnLoadDatabase() anope_override

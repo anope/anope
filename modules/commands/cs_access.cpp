@@ -790,24 +790,21 @@ class CSAccess : public Module
 
 		Implementation i[] = { I_OnReload, I_OnCreateChan, I_OnGroupCheckPriv };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
-
-		this->OnReload();
 	}
 
-	void OnReload() anope_override
+	void OnReload(ServerConfig *conf, ConfigReader &reader) anope_override
 	{
 		defaultLevels.clear();
-		ConfigReader config;
 
-		for (int i = 0; i < config.Enumerate("privilege"); ++i)
+		for (int i = 0; i < reader.Enumerate("privilege"); ++i)
 		{
-			const Anope::string &pname = config.ReadValue("privilege", "name", "", i);
+			const Anope::string &pname = reader.ReadValue("privilege", "name", "", i);
 
 			Privilege *p = PrivilegeManager::FindPrivilege(pname);
 			if (p == NULL)
 				continue;
 
-			const Anope::string &value = config.ReadValue("privilege", "level", "", i);
+			const Anope::string &value = reader.ReadValue("privilege", "level", "", i);
 			if (value.empty())
 				continue;
 			else if (value.equals_ci("founder"))
@@ -815,7 +812,7 @@ class CSAccess : public Module
 			else if (value.equals_ci("disabled"))
 				defaultLevels[p->name] = ACCESS_INVALID;
 			else
-				defaultLevels[p->name] = config.ReadInteger("privilege", "level", i, false);
+				defaultLevels[p->name] = reader.ReadInteger("privilege", "level", i, false);
 		}
 	}
 

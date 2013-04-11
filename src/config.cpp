@@ -142,6 +142,9 @@ ServerConfig::ServerConfig()
 	if (this->SessionIPv4CIDR > 32 || this->SessionIPv6CIDR > 128)
 		throw ConfigException("Session CIDR value out of range");
 
+	ConfigReader reader(this);
+	FOREACH_MOD(I_OnReload, OnReload(this, reader));
+
 #ifndef _WIN32
 	if (!this->User.empty())
 	{

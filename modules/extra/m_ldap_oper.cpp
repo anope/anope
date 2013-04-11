@@ -91,19 +91,15 @@ class LDAPOper : public Module
 
 		Implementation i[] = { I_OnReload, I_OnNickIdentify, I_OnDelCore };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
-
-		OnReload();
 	}
 
-	void OnReload() anope_override
+	void OnReload(ServerConfig *conf, ConfigReader &reader) anope_override
 	{
-		ConfigReader config;
-
-		this->binddn = config.ReadValue("m_ldap_oper", "binddn", "", 0);
-		this->password = config.ReadValue("m_ldap_oper", "password", "", 0);
-		this->basedn = config.ReadValue("m_ldap_oper", "basedn", "", 0);
-		this->filter = config.ReadValue("m_ldap_oper", "filter", "", 0);
-		opertype_attribute = config.ReadValue("m_ldap_oper", "opertype_attribute", "", 0);
+		this->binddn = reader.ReadValue("m_ldap_oper", "binddn", "", 0);
+		this->password = reader.ReadValue("m_ldap_oper", "password", "", 0);
+		this->basedn = reader.ReadValue("m_ldap_oper", "basedn", "", 0);
+		this->filter = reader.ReadValue("m_ldap_oper", "filter", "", 0);
+		opertype_attribute = reader.ReadValue("m_ldap_oper", "opertype_attribute", "", 0);
 
 		for (std::set<Oper *>::iterator it = my_opers.begin(), it_end = my_opers.end(); it != it_end; ++it)
 			delete *it;

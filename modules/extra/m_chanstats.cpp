@@ -347,18 +347,16 @@ class MChanstats : public Module
 					I_OnChanDrop,
 					I_OnReload};
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
-		this->OnReload();
 	}
 
-	void OnReload() anope_override
+	void OnReload(ServerConfig *conf, ConfigReader &reader) anope_override
 	{
-		ConfigReader config;
-		prefix = config.ReadValue("chanstats", "prefix", "anope_", 0);
-		SmileysHappy = config.ReadValue("chanstats", "SmileysHappy", ":) :-) ;) :D :-D", 0);
-		SmileysSad = config.ReadValue("chanstats", "SmileysSad", ":( :-( ;( ;-(", 0);
-		SmileysOther = config.ReadValue("chanstats", "SmileysOther", ":/", 0);
+		prefix = reader.ReadValue("chanstats", "prefix", "anope_", 0);
+		SmileysHappy = reader.ReadValue("chanstats", "SmileysHappy", ":) :-) ;) :D :-D", 0);
+		SmileysSad = reader.ReadValue("chanstats", "SmileysSad", ":( :-( ;( ;-(", 0);
+		SmileysOther = reader.ReadValue("chanstats", "SmileysOther", ":/", 0);
 
-		Anope::string engine = config.ReadValue("chanstats", "engine", "", 0);
+		Anope::string engine = reader.ReadValue("chanstats", "engine", "", 0);
 		this->sql = ServiceReference<SQL::Provider>("SQL::Provider", engine);
 		if (sql)
 			this->CheckTables();

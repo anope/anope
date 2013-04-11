@@ -278,8 +278,6 @@ class CSEntryMessage : public Module
 
 		Implementation i[] = { I_OnReload, I_OnJoinChannel };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
-
-		this->OnReload();
 	}
 
 	void OnJoinChannel(User *u, Channel *c) anope_override
@@ -294,10 +292,9 @@ class CSEntryMessage : public Module
 		}
 	}
 		
-	void OnReload() anope_override
+	void OnReload(ServerConfig *conf, ConfigReader &reader) anope_override
 	{
-		ConfigReader config;
-		MaxEntries = config.ReadInteger("cs_entrymsg", "maxentries", "5", 0, true);
+		MaxEntries = reader.ReadInteger("cs_entrymsg", "maxentries", "5", 0, true);
 	}
 };
 

@@ -19,8 +19,6 @@ class BSAutoAssign : public Module
 
 		Implementation i[] = { I_OnChanRegistered, I_OnReload };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
-
-		this->OnReload();
 	}
 
 	void OnChanRegistered(ChannelInfo *ci) anope_override
@@ -38,10 +36,9 @@ class BSAutoAssign : public Module
 		bi->Assign(NULL, ci);
 	}
 
-	void OnReload() anope_override
+	void OnReload(ServerConfig *conf, ConfigReader &reader) anope_override
 	{
-		ConfigReader config;
-		this->bot = config.ReadValue("bs_autoassign", "bot", "", 0);
+		this->bot = reader.ReadValue("bs_autoassign", "bot", "", 0);
 	}
 };
 

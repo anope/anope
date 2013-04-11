@@ -157,26 +157,21 @@ class NSSetMisc : public Module
 	NSSetMisc(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		nsmiscdata_type("NSMiscData", NSMiscData::Unserialize), commandnssetmisc(this), commandnssasetmisc(this)
 	{
-
 		Implementation i[] = { I_OnReload, I_OnNickInfo };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
-
-		this->OnReload();
 	}
 
-	void OnReload()
+	void OnReload(ServerConfig *conf, ConfigReader &reader) anope_override
 	{
-		ConfigReader config;
-
 		descriptions.clear();
 
-		for (int i = 0; i < config.Enumerate("command"); ++i)
+		for (int i = 0; i < reader.Enumerate("command"); ++i)
 		{
-			if (config.ReadValue("command", "command", "", i) != "nickserv/set/misc" && config.ReadValue("command", "command", "", i) != "nickserv/saset/misc")
+			if (reader.ReadValue("command", "command", "", i) != "nickserv/set/misc" && reader.ReadValue("command", "command", "", i) != "nickserv/saset/misc")
 				continue;
 
-			Anope::string cname = config.ReadValue("command", "name", "", i);
-			Anope::string desc = config.ReadValue("command", "misc_description", "", i);
+			Anope::string cname = reader.ReadValue("command", "name", "", i);
+			Anope::string desc = reader.ReadValue("command", "misc_description", "", i);
 
 			if (cname.empty() || desc.empty())
 				continue;

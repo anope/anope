@@ -335,15 +335,12 @@ class CSSeen : public Module
 						I_OnPartChannel,
 						I_OnUserKicked };
 		ModuleManager::Attach(eventlist, this, sizeof(eventlist)/sizeof(Implementation));
-
-		OnReload();
 	}
 
-	void OnReload() anope_override
+	void OnReload(ServerConfig *conf, ConfigReader &reader) anope_override
 	{
-		ConfigReader config;
-		purgetime = Anope::DoTime(config.ReadValue("cs_seen", "purgetime", "30d", 0));
-		expiretimeout = Anope::DoTime(config.ReadValue("cs_seen", "expiretimeout", "1d", 0));
+		purgetime = Anope::DoTime(reader.ReadValue("cs_seen", "purgetime", "30d", 0));
+		expiretimeout = Anope::DoTime(reader.ReadValue("cs_seen", "expiretimeout", "1d", 0));
 
 		if (purger.GetSecs() != expiretimeout)
 			purger.SetSecs(expiretimeout);

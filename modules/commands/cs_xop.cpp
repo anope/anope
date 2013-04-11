@@ -543,36 +543,33 @@ class CSXOP : public Module
 		accessprovider(this), commandcsxop(this)
 	{
 		this->SetPermanent(true);
-
-		this->OnReload();
 	}
 
-	void OnReload() anope_override
+	void OnReload(ServerConfig *conf, ConfigReader &reader) anope_override
 	{
 		order.clear();
 		permissions.clear();
 
-		ConfigReader config;
 
-		for (int i = 0; i < config.Enumerate("privilege"); ++i)
+		for (int i = 0; i < reader.Enumerate("privilege"); ++i)
 		{
-			const Anope::string &pname = config.ReadValue("privilege", "name", "", i);
+			const Anope::string &pname = reader.ReadValue("privilege", "name", "", i);
 
 			Privilege *p = PrivilegeManager::FindPrivilege(pname);
 			if (p == NULL)
 				continue;
 
-			const Anope::string &xop = config.ReadValue("privilege", "xop", "", i);
+			const Anope::string &xop = reader.ReadValue("privilege", "xop", "", i);
 			if (xop.empty())
 				continue;
 
 			permissions[xop].push_back(pname);
 		}
 
-		for (int i = 0; i < config.Enumerate("command"); ++i)
+		for (int i = 0; i < reader.Enumerate("command"); ++i)
 		{
-			const Anope::string &cname = config.ReadValue("command", "name", "", i),
-						&cserv = config.ReadValue("command", "command", "", i);
+			const Anope::string &cname = reader.ReadValue("command", "name", "", i),
+						&cserv = reader.ReadValue("command", "command", "", i);
 			if (cname.empty() || cserv != "chanserv/xop")
 				continue;
 

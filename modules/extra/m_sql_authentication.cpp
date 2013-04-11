@@ -85,17 +85,13 @@ class ModuleSQLAuthentication : public Module
 
 		Implementation i[] = { I_OnReload, I_OnPreCommand, I_OnCheckAuthentication };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
-
-		this->OnReload();
 	}
 
-	void OnReload() anope_override
+	void OnReload(ServerConfig *conf, ConfigReader &reader) anope_override
 	{
-		ConfigReader config;
-
-		this->engine = config.ReadValue("m_sql_authentication", "engine", "", 0);
-		this->query = config.ReadValue("m_sql_authentication", "query", "", 0);
-		this->disable_reason = config.ReadValue("m_sql_authentication", "disable_reason", "", 0);
+		this->engine = reader.ReadValue("m_sql_authentication", "engine", "", 0);
+		this->query = reader.ReadValue("m_sql_authentication", "query", "", 0);
+		this->disable_reason = reader.ReadValue("m_sql_authentication", "disable_reason", "", 0);
 
 		this->SQL = ServiceReference<SQL::Provider>("SQL::Provider", this->engine);
 	}

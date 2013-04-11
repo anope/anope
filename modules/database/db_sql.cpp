@@ -95,8 +95,6 @@ class DBSQL : public Module, public Pipe
 		Implementation i[] = { I_OnReload, I_OnShutdown, I_OnRestart, I_OnLoadDatabase, I_OnSerializableConstruct, I_OnSerializableDestruct, I_OnSerializableUpdate, I_OnSerializeTypeCreate };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 
-		this->OnReload();
-
 		if (ModuleManager::FindModule("db_sql_live") != NULL)
 			throw ModuleException("db_sql can not be loaded after db_sql_live");
 	}
@@ -148,13 +146,12 @@ class DBSQL : public Module, public Pipe
 		this->imported = true;
 	}
 
-	void OnReload() anope_override
+	void OnReload(ServerConfig *conf, ConfigReader &reader) anope_override
 	{
-		ConfigReader config;
-		Anope::string engine = config.ReadValue("db_sql", "engine", "", 0);
+		Anope::string engine = reader.ReadValue("db_sql", "engine", "", 0);
 		this->sql = ServiceReference<Provider>("SQL::Provider", engine);
-		this->prefix = config.ReadValue("db_sql", "prefix", "anope_db_", 0);
-		this->import = config.ReadFlag("db_sql", "import", "false", 0);
+		this->prefix = reader.ReadValue("db_sql", "prefix", "anope_db_", 0);
+		this->import = reader.ReadFlag("db_sql", "import", "false", 0);
 	}
 
 	void OnShutdown() anope_override

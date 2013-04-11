@@ -670,8 +670,6 @@ class ModuleDNS : public Module
 		Implementation i[] = { I_OnReload, I_OnNewServer, I_OnServerQuit, I_OnUserConnect, I_OnPreUserLogoff, I_OnDnsRequest };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 
-		this->OnReload();
-
 		for (unsigned j = 0; j < dns_servers->size(); ++j)
 		{
 			DNSServer *s = dns_servers->at(j);
@@ -688,16 +686,15 @@ class ModuleDNS : public Module
 			delete dns_servers->at(i - 1);
 	}
 
-	void OnReload() anope_override
+	void OnReload(ServerConfig *conf, ConfigReader &reader) anope_override
 	{
-		ConfigReader config;
 
-		this->ttl = Anope::DoTime(config.ReadValue("os_dns", "ttl", 0));
-		this->user_drop_mark = config.ReadInteger("os_dns", "user_drop_mark", 0, false);
-		this->user_drop_time = Anope::DoTime(config.ReadValue("os_dns", "user_drop_time", 0, false));
-		this->user_drop_readd_time = Anope::DoTime(config.ReadValue("os_dns", "user_drop_readd_time", 0, false));
-		this->remove_split_servers = config.ReadFlag("os_dns", "remove_split_servers", 0);
-		this->readd_connected_servers = config.ReadFlag("os_dns", "readd_connected_servers", 0);
+		this->ttl = Anope::DoTime(reader.ReadValue("os_dns", "ttl", 0));
+		this->user_drop_mark = reader.ReadInteger("os_dns", "user_drop_mark", 0, false);
+		this->user_drop_time = Anope::DoTime(reader.ReadValue("os_dns", "user_drop_time", 0, false));
+		this->user_drop_readd_time = Anope::DoTime(reader.ReadValue("os_dns", "user_drop_readd_time", 0, false));
+		this->remove_split_servers = reader.ReadFlag("os_dns", "remove_split_servers", 0);
+		this->readd_connected_servers = reader.ReadFlag("os_dns", "readd_connected_servers", 0);
 	}
 
 	void OnNewServer(Server *s) anope_override

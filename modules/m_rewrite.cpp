@@ -155,30 +155,26 @@ class ModuleRewrite : public Module
  public:
 	ModuleRewrite(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR), cmdrewrite(this)
 	{
-
 		Implementation i[] = { I_OnReload };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
-
-		this->OnReload();
 	}
 
-	void OnReload() anope_override
+	void OnReload(ServerConfig *conf, ConfigReader &reader) anope_override
 	{
-		ConfigReader config;
 
 		Rewrite::rewrites.clear();
 
-		for (int i = 0; i < config.Enumerate("command"); ++i)
+		for (int i = 0; i < reader.Enumerate("command"); ++i)
 		{
-			if (!config.ReadFlag("command", "rewrite", "no", i))
+			if (!reader.ReadFlag("command", "rewrite", "no", i))
 				continue;
 
 			Rewrite rw;
 
-			rw.client = config.ReadValue("command", "service", "", i);
-			rw.source_message = config.ReadValue("command", "rewrite_source", "", i),
-			rw.target_message = config.ReadValue("command", "rewrite_target", "", i);
-			rw.desc = config.ReadValue("command", "rewrite_description", "", i);
+			rw.client = reader.ReadValue("command", "service", "", i);
+			rw.source_message = reader.ReadValue("command", "rewrite_source", "", i),
+			rw.target_message = reader.ReadValue("command", "rewrite_target", "", i);
+			rw.desc = reader.ReadValue("command", "rewrite_description", "", i);
 
 			if (rw.client.empty() || rw.source_message.empty() || rw.target_message.empty())
 				continue;

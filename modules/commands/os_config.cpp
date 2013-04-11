@@ -64,7 +64,7 @@ class CommandOSConfig : public Command
 						bool allow_wild = dt & DT_ALLOW_WILD;
 						dt &= ~(DT_ALLOW_NEWLINE | DT_ALLOW_WILD);
 
-						/* Yay for *massive* copypaste from config.cpp */
+						/* Yay for *massive* copypaste from reader.cpp */
 						switch (dt)
 						{
 							case DT_NOSPACES:

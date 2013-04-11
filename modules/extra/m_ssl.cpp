@@ -107,8 +107,6 @@ class SSLModule : public Module
 		if (!client_ctx || !server_ctx)
 			throw ModuleException("Error initializing SSL CTX");
 
-		this->OnReload();
-
 		if (Anope::IsFile(this->certfile.c_str()))
 		{
 			if (!SSL_CTX_use_certificate_file(client_ctx, this->certfile.c_str(), SSL_FILETYPE_PEM) || !SSL_CTX_use_certificate_file(server_ctx, this->certfile.c_str(), SSL_FILETYPE_PEM))
@@ -175,19 +173,17 @@ class SSLModule : public Module
 		SSL_CTX_free(server_ctx);
 	}
 
-	void OnReload() anope_override
+	void OnReload(ServerConfig *conf, ConfigReader &reader) anope_override
 	{
-		ConfigReader config;
-
-		this->certfile = config.ReadValue("ssl", "cert", "data/anope.crt", 0);
-		this->keyfile = config.ReadValue("ssl", "key", "data/anope.key", 0);
+		this->certfile = reader.ReadValue("ssl", "cert", "data/anope.crt", 0);
+		this->keyfile = reader.ReadValue("ssl", "key", "data/anope.key", 0);
 	}
 
 	void OnPreServerConnect() anope_override
 	{
-		ConfigReader config;
+		ConfigReader reader;
 
-		if (config.ReadFlag("uplink", "ssl", "no", Anope::CurrentUplink))
+		if (reader.ReadFlag("uplink", "ssl", "no", Anope::CurrentUplink))
 		{
 			this->service.Init(UplinkSock);
 		}

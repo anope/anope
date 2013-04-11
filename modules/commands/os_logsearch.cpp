@@ -151,17 +151,13 @@ class OSLogSearch : public Module
 	OSLogSearch(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandoslogsearch(this)
 	{
-	
 		Implementation i[] = { I_OnReload };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
-
-		OnReload();
 	}
 
-	void OnReload() anope_override
+	void OnReload(ServerConfig *conf, ConfigReader &reader) anope_override
 	{
-		ConfigReader config;
-		logfile_name = config.ReadValue("logsearch", "name", "services.log", 0);
+		logfile_name = reader.ReadValue("logsearch", "name", "services.log", 0);
 	}
 };
 

@@ -409,8 +409,6 @@ class ModuleLDAP : public Module, public Pipe
 
 		Implementation i[] = { I_OnReload, I_OnModuleUnload };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
-
-		OnReload();
 	}
 
 	~ModuleLDAP()
@@ -425,9 +423,8 @@ class ModuleLDAP : public Module, public Pipe
 		LDAPServices.clear();
 	}
 
-	void OnReload() anope_override
+	void OnReload(ServerConfig *conf, ConfigReader &reader) anope_override
 	{
-		ConfigReader config;
 		int i, num;
 
 		for (std::map<Anope::string, LDAPService *>::iterator it = this->LDAPServices.begin(); it != this->LDAPServices.end();)
@@ -436,9 +433,9 @@ class ModuleLDAP : public Module, public Pipe
 			LDAPService *s = it->second;
 			++it;
 
-			for (i = 0, num = config.Enumerate("ldap"); i < num; ++i)
+			for (i = 0, num = reader.Enumerate("ldap"); i < num; ++i)
 			{
-				if (config.ReadValue("ldap", "name", "main", i) == cname)
+				if (reader.ReadValue("ldap", "name", "main", i) == cname)
 				{
 					break;
 				}
@@ -454,16 +451,16 @@ class ModuleLDAP : public Module, public Pipe
 			}
 		}
 
-		for (i = 0, num = config.Enumerate("ldap"); i < num; ++i)
+		for (i = 0, num = reader.Enumerate("ldap"); i < num; ++i)
 		{
-			Anope::string connname = config.ReadValue("ldap", "name", "main", i);
+			Anope::string connname = reader.ReadValue("ldap", "name", "main", i);
 
 			if (this->LDAPServices.find(connname) == this->LDAPServices.end())
 			{
-				Anope::string server = config.ReadValue("ldap", "server", "127.0.0.1", i);
-				int port = config.ReadInteger("ldap", "port", "389", i, true);
-				Anope::string admin_binddn = config.ReadValue("ldap", "admin_binddn", "", i);
-				Anope::string admin_password = config.ReadValue("ldap", "admin_password", "", i);
+				Anope::string server = reader.ReadValue("ldap", "server", "127.0.0.1", i);
+				int port = reader.ReadInteger("ldap", "port", "389", i, true);
+				Anope::string admin_binddn = reader.ReadValue("ldap", "admin_binddn", "", i);
+				Anope::string admin_password = reader.ReadValue("ldap", "admin_password", "", i);
 
 				try
 				{

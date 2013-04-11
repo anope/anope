@@ -707,11 +707,12 @@ class ConfigException : public CoreException
 	virtual ~ConfigException() throw() { }
 };
 
-#define CONF_NO_ERROR 0x000000
-#define CONF_NOT_A_NUMBER 0x000010
-#define CONF_INT_NEGATIVE 0x000080
-#define CONF_VALUE_NOT_FOUND 0x000100
-#define CONF_FILE_NOT_FOUND 0x000200
+enum
+{
+	CONF_NO_ERROR,
+	CONF_INT_NEGATIVE = 1 << 1,
+	CONF_VALUE_NOT_FOUND = 1 << 2
+};
 
 /** Allows reading of values from configuration files
  * This class allows a module to read from either the main configuration file (services.conf) or from
@@ -721,6 +722,7 @@ class ConfigException : public CoreException
  */
 class CoreExport ConfigReader
 {
+	ServerConfig *conf;
  protected:
 	/** True if an error occured reading the config file
 	 */
@@ -737,6 +739,10 @@ class CoreExport ConfigReader
 	 * This constructor initialises the ConfigReader class to read a user-specified config file
 	 */
 	ConfigReader(const Anope::string &);
+	/** Overloaded constructor
+	 * This constructor initialises the ConfigReader class to use a user sepcific ServerConfig object,
+	 */
+	ConfigReader(ServerConfig *);
 	/** Default destructor.
 	 * This method destroys the ConfigReader class.
 	 */

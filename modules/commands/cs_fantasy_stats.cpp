@@ -75,14 +75,12 @@ class CSStats : public Module
 
 		Implementation i[] = { I_OnReload };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
-		this->OnReload();
 	}
 
-	void OnReload() anope_override
+	void OnReload(ServerConfig *conf, ConfigReader &reader) anope_override
 	{
-		ConfigReader config;
-		prefix = config.ReadValue("chanstats", "prefix", "anope_", 0);
-		Anope::string engine = config.ReadValue("chanstats", "engine", "", 0);
+		prefix = reader.ReadValue("chanstats", "prefix", "anope_", 0);
+		Anope::string engine = reader.ReadValue("chanstats", "engine", "", 0);
 		this->sql = ServiceReference<SQL::Provider>("SQL::Provider", engine);
 	}
 

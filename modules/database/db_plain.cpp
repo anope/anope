@@ -589,17 +589,10 @@ class DBPlain : public Module
  public:
 	DBPlain(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, DATABASE | VENDOR)
 	{
-
 		Implementation i[] = { I_OnReload, I_OnLoadDatabase, I_OnSaveDatabase };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 
-		OnReload();
-
 		LastDay = 0;
-	}
-
-	~DBPlain()
-	{
 	}
 
 	void BackupDatabase()
@@ -642,11 +635,10 @@ class DBPlain : public Module
 		}
 	}
 
-	void OnReload() anope_override
+	void OnReload(ServerConfig *conf, ConfigReader &reader) anope_override
 	{
-		ConfigReader config;
-		DatabaseFile = Anope::DataDir + "/" + config.ReadValue("db_plain", "database", "anope.db", 0);
-		BackupFile = Anope::DataDir + "/backups/" + config.ReadValue("db_plain", "database", "anope.db", 0);
+		DatabaseFile = Anope::DataDir + "/" + reader.ReadValue("db_plain", "database", "anope.db", 0);
+		BackupFile = Anope::DataDir + "/backups/" + reader.ReadValue("db_plain", "database", "anope.db", 0);
 	}
 
 	EventReturn OnLoadDatabase() anope_override

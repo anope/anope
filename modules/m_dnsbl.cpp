@@ -93,33 +93,29 @@ class ModuleDNSBL : public Module
 
 		Implementation i[] = { I_OnReload, I_OnUserConnect };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
-
-		OnReload();
 	}
 
-	void OnReload() anope_override
+	void OnReload(ServerConfig *conf, ConfigReader &reader) anope_override
 	{
-		ConfigReader config;
-
-		this->check_on_connect = config.ReadFlag("m_dnsbl", "check_on_connect", "no", 0);
-		this->check_on_netburst = config.ReadFlag("m_dnsbl", "check_on_netburst", "no", 0);
-		this->add_to_akill = config.ReadFlag("m_dnsbl", "add_to_akill", "yes", 0);
+		this->check_on_connect = reader.ReadFlag("m_dnsbl", "check_on_connect", "no", 0);
+		this->check_on_netburst = reader.ReadFlag("m_dnsbl", "check_on_netburst", "no", 0);
+		this->add_to_akill = reader.ReadFlag("m_dnsbl", "add_to_akill", "yes", 0);
 
 		this->blacklists.clear();
-		for (int i = 0, num = config.Enumerate("blacklist"); i < num; ++i)
+		for (int i = 0, num = reader.Enumerate("blacklist"); i < num; ++i)
 		{
-			Anope::string bname = config.ReadValue("blacklist", "name", "", i);
+			Anope::string bname = reader.ReadValue("blacklist", "name", "", i);
 			if (bname.empty())
 				continue;
-			Anope::string sbantime = config.ReadValue("blacklist", "time", "4h", i);
+			Anope::string sbantime = reader.ReadValue("blacklist", "time", "4h", i);
 			time_t bantime = Anope::DoTime(sbantime);
 			if (bantime < 0)
 				bantime = 9000;
-			Anope::string reason = config.ReadValue("blacklist", "reason", "", i);
+			Anope::string reason = reader.ReadValue("blacklist", "reason", "", i);
 			std::map<int, Anope::string> replies;
 			for (int j = 0; j < 256; ++j)
 			{
-				Anope::string k = config.ReadValue("blacklist", stringify(j), "", i);
+				Anope::string k = reader.ReadValue("blacklist", stringify(j), "", i);
 				if (!k.empty())
 					replies[j] = k;
 			}

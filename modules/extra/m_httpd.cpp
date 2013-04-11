@@ -336,8 +336,6 @@ class HTTPD : public Module
 
 		Implementation i[] = { I_OnReload };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
-
-		this->OnReload();
 	}
 
 	~HTTPD()
@@ -354,22 +352,21 @@ class HTTPD : public Module
 		this->providers.clear();
 	}
 
-	void OnReload() anope_override
+	void OnReload(ServerConfig *conf, ConfigReader &reader) anope_override
 	{
-		ConfigReader config;
 		std::set<Anope::string> existing;
 
-		for (int i = 0, num = config.Enumerate("httpd"); i < num; ++i)
+		for (int i = 0, num = reader.Enumerate("httpd"); i < num; ++i)
 		{
-			Anope::string hname = config.ReadValue("httpd", "name", "httpd/main", i);
+			Anope::string hname = reader.ReadValue("httpd", "name", "httpd/main", i);
 			existing.insert(hname);
 
-			Anope::string ip = config.ReadValue("httpd", "ip", "", i);
-			int port = config.ReadInteger("httpd", "port", "8080", i, true);
-			int timeout = config.ReadInteger("httpd", "timeout", "30", i, true);
-			bool ssl = config.ReadFlag("httpd", "ssl", "no", i);
-			Anope::string ext_ip = config.ReadValue("httpd", "extforward_ip", "", i);
-			Anope::string ext_header = config.ReadValue("httpd", "extforward_header", "", i);
+			Anope::string ip = reader.ReadValue("httpd", "ip", "", i);
+			int port = reader.ReadInteger("httpd", "port", "8080", i, true);
+			int timeout = reader.ReadInteger("httpd", "timeout", "30", i, true);
+			bool ssl = reader.ReadFlag("httpd", "ssl", "no", i);
+			Anope::string ext_ip = reader.ReadValue("httpd", "extforward_ip", "", i);
+			Anope::string ext_header = reader.ReadValue("httpd", "extforward_header", "", i);
 
 			if (ip.empty())
 			{

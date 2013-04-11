@@ -174,8 +174,6 @@ class ModuleSQL : public Module, public Pipe
 
 		DThread = new DispatcherThread();
 		DThread->Start();
-
-		OnReload();
 	}
 
 	~ModuleSQL()
@@ -190,9 +188,8 @@ class ModuleSQL : public Module, public Pipe
 		delete DThread;
 	}
 
-	void OnReload() anope_override
+	void OnReload(ServerConfig *conf, ConfigReader &reader) anope_override
 	{
-		ConfigReader config;
 		int i, num;
 
 		for (std::map<Anope::string, MySQLService *>::iterator it = this->MySQLServices.begin(); it != this->MySQLServices.end();)
@@ -201,9 +198,9 @@ class ModuleSQL : public Module, public Pipe
 			MySQLService *s = it->second;
 			++it;
 
-			for (i = 0, num = config.Enumerate("mysql"); i < num; ++i)
+			for (i = 0, num = reader.Enumerate("mysql"); i < num; ++i)
 			{
-				if (config.ReadValue("mysql", "name", "main", i) == cname)
+				if (reader.ReadValue("mysql", "name", "main", i) == cname)
 				{
 					break;
 				}
@@ -218,17 +215,17 @@ class ModuleSQL : public Module, public Pipe
 			}
 		}
 
-		for (i = 0, num = config.Enumerate("mysql"); i < num; ++i)
+		for (i = 0, num = reader.Enumerate("mysql"); i < num; ++i)
 		{
-			Anope::string connname = config.ReadValue("mysql", "name", "mysql/main", i);
+			Anope::string connname = reader.ReadValue("mysql", "name", "mysql/main", i);
 
 			if (this->MySQLServices.find(connname) == this->MySQLServices.end())
 			{
-				Anope::string database = config.ReadValue("mysql", "database", "anope", i);
-				Anope::string server = config.ReadValue("mysql", "server", "127.0.0.1", i);
-				Anope::string user = config.ReadValue("mysql", "username", "anope", i);
-				Anope::string password = config.ReadValue("mysql", "password", "", i);
-				int port = config.ReadInteger("mysql", "port", "3306", i, true);
+				Anope::string database = reader.ReadValue("mysql", "database", "anope", i);
+				Anope::string server = reader.ReadValue("mysql", "server", "127.0.0.1", i);
+				Anope::string user = reader.ReadValue("mysql", "username", "anope", i);
+				Anope::string password = reader.ReadValue("mysql", "password", "", i);
+				int port = reader.ReadInteger("mysql", "port", "3306", i, true);
 
 				try
 				{

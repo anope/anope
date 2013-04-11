@@ -112,6 +112,8 @@ if (true) \
 else \
 	static_cast<void>(0)
 
+class ConfigReader;
+
 /** Possible return types from events.
  */
 enum EventReturn
@@ -124,7 +126,6 @@ enum EventReturn
 enum ModuleReturn
 {
 	MOD_ERR_OK,
-	MOD_ERR_MEMORY,
 	MOD_ERR_PARAMS,
 	MOD_ERR_EXISTS,
 	MOD_ERR_NOEXIST,
@@ -285,9 +286,12 @@ class CoreExport Module : public Extensible
 	 */
 	virtual void OnUserKicked(Channel *c, User *target, MessageSource &source, const Anope::string &kickmsg) { }
 
-	/** Called when Services' configuration has been loaded.
+	/** Called when Services' configuration is being (re)loaded.
+	 * @param conf The config that is being built now and will replace the global Config object
+	 * @param reader A config reader for conf
+	 * @throws A ConfigException to abort the config (re)loading process.
 	 */
-	virtual void OnReload() { }
+	virtual void OnReload(ServerConfig *conf, ConfigReader &reader) { }
 
 	/** Called before a bot is assigned to a channel.
 	 * @param sender The user assigning the bot

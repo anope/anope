@@ -24,23 +24,18 @@ class CommandOSReload : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		ServerConfig *old_config = Config;
-
 		try
 		{
-			Config = new ServerConfig();
-			FOREACH_MOD(I_OnReload, OnReload());
-			delete old_config;
+			ServerConfig *new_config = new ServerConfig();
+			delete Config;
+			Config = new_config;
 			source.Reply(_("Services' configuration file has been reloaded."));
 		}
 		catch (const ConfigException &ex)
 		{
-			Config = old_config;
 			Log(this->owner) << "Error reloading configuration file: " << ex.GetReason();
-			source.Reply(_("Error reloading configuration file: ") + ex.GetReason());
+			source.Reply(_("Error reloading configuration file: %s"), ex.GetReason().c_str());
 		}
-
-		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override

@@ -60,7 +60,7 @@ class CommandMSRSend : public Command
 				source.Reply(_("Sorry, %s currently has too many memos and cannot receive more."), nick.c_str());
 			else	
 			{
-				source.Reply(_("Memo sent to \002%s\002."), name.c_str());
+				source.Reply(_("Memo sent to \002%s\002."), nick.c_str());
 
 				bool ischan;
 				MemoInfo *mi = MemoInfo::GetMemoInfo(nick, ischan);

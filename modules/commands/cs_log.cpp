@@ -31,7 +31,7 @@ public:
 		ChannelInfo *ci = ChannelInfo::Find(channel);
 		if (ci == NULL)
 			source.Reply(CHAN_X_NOT_REGISTERED, channel.c_str());
-		else if (!source.AccessFor(ci).HasPriv("SET") && !source.HasPriv("chanserv/set"))
+		else if (!source.AccessFor(ci).HasPriv("SET") && !source.HasPriv("chanserv/administration"))
 			source.Reply(ACCESS_DENIED);
 		else if (params.size() == 1)
 		{

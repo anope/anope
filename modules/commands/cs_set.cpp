@@ -55,50 +55,6 @@ class CommandCSSet : public Command
 	}
 };
 
-class CommandCSSASet : public Command
-{
- public:
-	CommandCSSASet(Module *creator) : Command(creator, "chanserv/saset", 2, 3)
-	{
-		this->SetDesc(_("Forcefully set channel options and information"));
-		this->SetSyntax(_("\037option\037 \037channel\037 \037parameters\037"));
-	}
-
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
-	{
-		this->OnSyntaxError(source, "");
-		return;
-	}
-
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
-	{
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("Allows Services Operators to forcefully change settings\n"
-				"on channels.\n"
-				" \n"
-				"Available options:"));
-		Anope::string this_name = source.command;
-		for (CommandInfo::map::const_iterator it = source.service->commands.begin(), it_end = source.service->commands.end(); it != it_end; ++it)
-		{
-			const Anope::string &c_name = it->first;
-			const CommandInfo &info = it->second;
-			if (c_name.find_ci(this_name + " ") == 0)
-			{
-				ServiceReference<Command> command("Command", info.name);
-				if (command)
-				{
-					source.command = it->first;
-					command->OnServHelp(source);
-				}
-			}
-		}
-		source.Reply(_("Type \002%s%s HELP %s \037option\037\002 for more information on a\n"
-			"particular option."), Config->UseStrictPrivMsgString.c_str(), source.service->nick.c_str(), this_name.c_str());
-		return true;
-	}
-};
-
 class CommandCSSetAutoOp : public Command
 {
  public:
@@ -122,7 +78,7 @@ class CommandCSSetAutoOp : public Command
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
-		if (MOD_RESULT != EVENT_ALLOW && source.permission.empty() && !source.AccessFor(ci).HasPriv("SET"))
+		if (MOD_RESULT != EVENT_ALLOW && !source.AccessFor(ci).HasPriv("SET") && source.permission.empty() && !source.HasPriv("chanserv/administration"))
 		{
 			source.Reply(ACCESS_DENIED);
 			return;
@@ -130,13 +86,13 @@ class CommandCSSetAutoOp : public Command
 
 		if (params[1].equals_ci("ON"))
 		{
-			Log(source.permission.empty() ? LOG_COMMAND : LOG_ADMIN, source, this, ci) << "to enable autoop";
+			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to enable autoop";
 			ci->Shrink("NOAUTOOP");
 			source.Reply(_("Services will now automatically give modes to users in \002%s\002."), ci->name.c_str());
 		}
 		else if (params[1].equals_ci("OFF"))
 		{
-			Log(source.permission.empty() ? LOG_COMMAND : LOG_ADMIN, source, this, ci) << "to disable autoop";
+			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to disable autoop";
 			ci->ExtendMetadata("NOAUTOOP");
 			source.Reply(_("Services will no longer automatically give modes to users in \002%s\002."), ci->name.c_str());
 		}
@@ -179,7 +135,7 @@ class CommandCSSetBanType : public Command
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
-		if (MOD_RESULT != EVENT_ALLOW && source.permission.empty() && !source.AccessFor(ci).HasPriv("SET"))
+		if (MOD_RESULT != EVENT_ALLOW && !source.AccessFor(ci).HasPriv("SET") && source.permission.empty() && !source.HasPriv("chanserv/administration"))
 		{
 			source.Reply(ACCESS_DENIED);
 			return;
@@ -190,7 +146,7 @@ class CommandCSSetBanType : public Command
 			int16_t new_type = convertTo<int16_t>(params[1]);
 			if (new_type < 0 || new_type > 3)
 				throw ConvertException("Invalid range");
-			Log(source.permission.empty() ? LOG_COMMAND : LOG_ADMIN, source, this, ci) << "to change the ban type to " << new_type;
+			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to change the ban type to " << new_type;
 			ci->bantype = new_type;
 			source.Reply(_("Ban type for channel %s is now #%d."), ci->name.c_str(), ci->bantype);
 		}
@@ -240,7 +196,7 @@ class CommandCSSetChanstats : public Command
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
-		if (MOD_RESULT != EVENT_ALLOW && source.permission.empty() && !source.AccessFor(ci).HasPriv("SET"))
+		if (MOD_RESULT != EVENT_ALLOW && !source.AccessFor(ci).HasPriv("SET") && source.permission.empty() && !source.HasPriv("chanserv/administration"))
 		{
 			source.Reply(ACCESS_DENIED);
 			return;
@@ -250,11 +206,11 @@ class CommandCSSetChanstats : public Command
 		{
 			ci->ExtendMetadata("STATS");
 			source.Reply(_("Chanstats statistics are now enabled for this channel."));
-			Log(source.permission.empty() ? LOG_COMMAND : LOG_ADMIN, source, this, ci) << "to enable chanstats";
+			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to enable chanstats";
 		}
 		else if (params[1].equals_ci("OFF"))
 		{
-			Log(source.permission.empty() ? LOG_COMMAND : LOG_ADMIN, source, this, ci) << "to disable chanstats";
+			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to disable chanstats";
 			ci->Shrink("STATS");
 			source.Reply(_("Chanstats statistics are now disabled for this channel."));
 		}
@@ -294,7 +250,7 @@ class CommandCSSetDescription : public Command
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
-		if (MOD_RESULT != EVENT_ALLOW && source.permission.empty() && !source.AccessFor(ci).HasPriv("SET"))
+		if (MOD_RESULT != EVENT_ALLOW && !source.AccessFor(ci).HasPriv("SET") && source.permission.empty() && !source.HasPriv("chanserv/administration"))
 		{
 			source.Reply(ACCESS_DENIED);
 			return;
@@ -303,13 +259,13 @@ class CommandCSSetDescription : public Command
 		if (params.size() > 1)
 		{
 			ci->desc = params[1];
-			Log(source.permission.empty() ? LOG_COMMAND : LOG_ADMIN, source, this, ci) << "to change the description to " << ci->desc;
+			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to change the description to " << ci->desc;
 			source.Reply(_("Description of %s changed to \002%s\002."), ci->name.c_str(), ci->desc.c_str());
 		}
 		else
 		{
 			ci->desc.clear();
-			Log(source.permission.empty() ? LOG_COMMAND : LOG_ADMIN, source, this, ci) << "to unset the description";
+			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to unset the description";
 			source.Reply(_("Description of %s unset."), ci->name.c_str());
 		}
 
@@ -349,7 +305,7 @@ class CommandCSSetFounder : public Command
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
-		if (MOD_RESULT != EVENT_ALLOW && source.permission.empty() && (ci->HasExt("SECUREFOUNDER") ? !source.IsFounder(ci) : !source.AccessFor(ci).HasPriv("FOUNDER")))
+		if (MOD_RESULT != EVENT_ALLOW && (ci->HasExt("SECUREFOUNDER") ? !source.IsFounder(ci) : !source.AccessFor(ci).HasPriv("FOUNDER")) && source.permission.empty() && !source.HasPriv("chanserv/administration"))
 		{
 			source.Reply(ACCESS_DENIED);
 			return;
@@ -369,7 +325,7 @@ class CommandCSSetFounder : public Command
 			return;
 		}
 
-		Log(source.permission.empty() ? LOG_COMMAND : LOG_ADMIN, source, this, ci) << "to change the founder from " << (ci->GetFounder() ? ci->GetFounder()->display : "(none)") << " to " << nc->display;
+		Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to change the founder from " << (ci->GetFounder() ? ci->GetFounder()->display : "(none)") << " to " << nc->display;
 
 		ci->SetFounder(nc);
 
@@ -411,7 +367,7 @@ class CommandCSSetKeepTopic : public Command
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
-		if (MOD_RESULT != EVENT_ALLOW && source.permission.empty() && !source.AccessFor(ci).HasPriv("SET"))
+		if (MOD_RESULT != EVENT_ALLOW && !source.AccessFor(ci).HasPriv("SET") && source.permission.empty() && !source.HasPriv("chanserv/administration"))
 		{
 			source.Reply(ACCESS_DENIED);
 			return;
@@ -419,13 +375,13 @@ class CommandCSSetKeepTopic : public Command
 
 		if (params[1].equals_ci("ON"))
 		{
-			Log(source.permission.empty() ? LOG_COMMAND : LOG_ADMIN, source, this, ci) << "to enable keeptopic";
+			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to enable keeptopic";
 			ci->ExtendMetadata("KEEPTOPIC");
 			source.Reply(_("Topic retention option for %s is now \002on\002."), ci->name.c_str());
 		}
 		else if (params[1].equals_ci("OFF"))
 		{
-			Log(source.permission.empty() ? LOG_COMMAND : LOG_ADMIN, source, this, ci) << "to disable keeptopic";
+			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to disable keeptopic";
 			ci->Shrink("KEEPTOPIC");
 			source.Reply(_("Topic retention option for %s is now \002off\002."), ci->name.c_str());
 		}
@@ -468,7 +424,7 @@ class CommandCSSetPeace : public Command
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
-		if (MOD_RESULT != EVENT_ALLOW && source.permission.empty() && !source.AccessFor(ci).HasPriv("SET"))
+		if (MOD_RESULT != EVENT_ALLOW && !source.AccessFor(ci).HasPriv("SET") && source.permission.empty() && !source.HasPriv("chanserv/administration"))
 		{
 			source.Reply(ACCESS_DENIED);
 			return;
@@ -476,13 +432,13 @@ class CommandCSSetPeace : public Command
 
 		if (params[1].equals_ci("ON"))
 		{
-			Log(source.permission.empty() ? LOG_COMMAND : LOG_ADMIN, source, this, ci) << "to enable peace";
+			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to enable peace";
 			ci->ExtendMetadata("PEACE");
 			source.Reply(_("Peace option for %s is now \002on\002."), ci->name.c_str());
 		}
 		else if (params[1].equals_ci("OFF"))
 		{
-			Log(source.permission.empty() ? LOG_COMMAND : LOG_ADMIN, source, this, ci) << "to disable peace";
+			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to disable peace";
 			ci->Shrink("PEACE");
 			source.Reply(_("Peace option for %s is now \002off\002."), ci->name.c_str());
 		}
@@ -527,7 +483,7 @@ class CommandCSSetPersist : public Command
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
-		if (MOD_RESULT != EVENT_ALLOW && source.permission.empty() && !source.AccessFor(ci).HasPriv("SET"))
+		if (MOD_RESULT != EVENT_ALLOW && !source.AccessFor(ci).HasPriv("SET") && source.permission.empty() && !source.HasPriv("chanserv/administration"))
 		{
 			source.Reply(ACCESS_DENIED);
 			return;
@@ -575,7 +531,7 @@ class CommandCSSetPersist : public Command
 				}
 			}
 
-			Log(source.permission.empty() ? LOG_COMMAND : LOG_ADMIN, source, this, ci) << "to enable persist";
+			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to enable persist";
 			source.Reply(_("Channel \002%s\002 is now persistent."), ci->name.c_str());
 		}
 		else if (params[1].equals_ci("OFF"))
@@ -608,7 +564,7 @@ class CommandCSSetPersist : public Command
 				}
 			}
 
-			Log(source.permission.empty() ? LOG_COMMAND : LOG_ADMIN, source, this, ci) << "to disable persist";
+			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to disable persist";
 			source.Reply(_("Channel \002%s\002 is no longer persistent."), ci->name.c_str());
 		}
 		else
@@ -667,7 +623,7 @@ class CommandCSSetPrivate : public Command
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
-		if (MOD_RESULT != EVENT_ALLOW && source.permission.empty() && !source.AccessFor(ci).HasPriv("SET"))
+		if (MOD_RESULT != EVENT_ALLOW && !source.AccessFor(ci).HasPriv("SET") && source.permission.empty() && !source.HasPriv("chanserv/administration"))
 		{
 			source.Reply(ACCESS_DENIED);
 			return;
@@ -675,13 +631,13 @@ class CommandCSSetPrivate : public Command
 
 		if (params[1].equals_ci("ON"))
 		{
-			Log(source.permission.empty() ? LOG_COMMAND : LOG_ADMIN, source, this, ci) << "to enable private";
+			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to enable private";
 			ci->ExtendMetadata("PRIVATE");
 			source.Reply(_("Private option for %s is now \002on\002."), ci->name.c_str());
 		}
 		else if (params[1].equals_ci("OFF"))
 		{
-			Log(source.permission.empty() ? LOG_COMMAND : LOG_ADMIN, source, this, ci) << "to disable private";
+			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to disable private";
 			ci->Shrink("PRIVATE");
 			source.Reply(_("Private option for %s is now \002off\002."), ci->name.c_str());
 		}
@@ -726,7 +682,7 @@ class CommandCSSetRestricted : public Command
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
-		if (MOD_RESULT != EVENT_ALLOW && source.permission.empty() && !source.AccessFor(ci).HasPriv("SET"))
+		if (MOD_RESULT != EVENT_ALLOW && !source.AccessFor(ci).HasPriv("SET") && source.permission.empty() && !source.HasPriv("chanserv/administration"))
 		{
 			source.Reply(ACCESS_DENIED);
 			return;
@@ -734,13 +690,13 @@ class CommandCSSetRestricted : public Command
 
 		if (params[1].equals_ci("ON"))
 		{
-			Log(source.permission.empty() ? LOG_COMMAND : LOG_ADMIN, source, this, ci) << "to enable restricted";
+			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to enable restricted";
 			ci->ExtendMetadata("RESTRICTED");
 			source.Reply(_("Restricted access option for %s is now \002on\002."), ci->name.c_str());
 		}
 		else if (params[1].equals_ci("OFF"))
 		{
-			Log(source.permission.empty() ? LOG_COMMAND : LOG_ADMIN, source, this, ci) << "to disable restricted";
+			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to disable restricted";
 			ci->Shrink("RESTRICTED");
 			source.Reply(_("Restricted access option for %s is now \002off\002."), ci->name.c_str());
 		}
@@ -782,7 +738,7 @@ class CommandCSSetSecure : public Command
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
-		if (MOD_RESULT != EVENT_ALLOW && source.permission.empty() && !source.AccessFor(ci).HasPriv("SET"))
+		if (MOD_RESULT != EVENT_ALLOW && !source.AccessFor(ci).HasPriv("SET") && source.permission.empty() && !source.HasPriv("chanserv/administration"))
 		{
 			source.Reply(ACCESS_DENIED);
 			return;
@@ -790,13 +746,13 @@ class CommandCSSetSecure : public Command
 
 		if (params[1].equals_ci("ON"))
 		{
-			Log(source.permission.empty() ? LOG_COMMAND : LOG_ADMIN, source, this, ci) << "to enable secure";
+			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to enable secure";
 			ci->ExtendMetadata("SECURE");
 			source.Reply(_("Secure option for %s is now \002on\002."), ci->name.c_str());
 		}
 		else if (params[1].equals_ci("OFF"))
 		{
-			Log(source.permission.empty() ? LOG_COMMAND : LOG_ADMIN, source, this, ci) << "to disable secure";
+			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to disable secure";
 			ci->Shrink("SECURE");
 			source.Reply(_("Secure option for %s is now \002off\002."), ci->name.c_str());
 		}
@@ -840,7 +796,7 @@ class CommandCSSetSecureFounder : public Command
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
-		if (MOD_RESULT != EVENT_ALLOW && source.permission.empty() && (ci->HasExt("SECUREFOUNDER") ? !source.IsFounder(ci) : !source.AccessFor(ci).HasPriv("FOUNDER")))
+		if (MOD_RESULT != EVENT_ALLOW && (ci->HasExt("SECUREFOUNDER") ? !source.IsFounder(ci) : !source.AccessFor(ci).HasPriv("FOUNDER")) && source.permission.empty() && !source.HasPriv("chanserv/administration"))
 		{
 			source.Reply(ACCESS_DENIED);
 			return;
@@ -848,13 +804,13 @@ class CommandCSSetSecureFounder : public Command
 
 		if (params[1].equals_ci("ON"))
 		{
-			Log(source.permission.empty() ? LOG_COMMAND : LOG_ADMIN, source, this, ci) << "to enable secure founder";
+			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to enable secure founder";
 			ci->ExtendMetadata("SECUREFOUNDER");
 			source.Reply(_("Secure founder option for %s is now \002on\002."), ci->name.c_str());
 		}
 		else if (params[1].equals_ci("OFF"))
 		{
-			Log(source.permission.empty() ? LOG_COMMAND : LOG_ADMIN, source, this, ci) << "to disable secure founder";
+			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to disable secure founder";
 			ci->Shrink("SECUREFOUNDER");
 			source.Reply(_("Secure founder option for %s is now \002off\002."), ci->name.c_str());
 		}
@@ -898,7 +854,7 @@ class CommandCSSetSecureOps : public Command
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
-		if (MOD_RESULT != EVENT_ALLOW && source.permission.empty() && !source.AccessFor(ci).HasPriv("SET"))
+		if (MOD_RESULT != EVENT_ALLOW && !source.AccessFor(ci).HasPriv("SET") && source.permission.empty() && !source.HasPriv("chanserv/administration"))
 		{
 			source.Reply(ACCESS_DENIED);
 			return;
@@ -906,13 +862,13 @@ class CommandCSSetSecureOps : public Command
 
 		if (params[1].equals_ci("ON"))
 		{
-			Log(source.permission.empty() ? LOG_COMMAND : LOG_ADMIN, source, this, ci) << "to enable secure ops";
+			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to enable secure ops";
 			ci->ExtendMetadata("SECUREOPS");
 			source.Reply(_("Secure ops option for %s is now \002on\002."), ci->name.c_str());
 		}
 		else if (params[1].equals_ci("OFF"))
 		{
-			Log(source.permission.empty() ? LOG_COMMAND : LOG_ADMIN, source, this, ci) << "to disable secure ops";
+			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to disable secure ops";
 			ci->Shrink("SECUREOPS");
 			source.Reply(_("Secure ops option for %s is now \002off\002."), ci->name.c_str());
 		}
@@ -954,7 +910,7 @@ class CommandCSSetSignKick : public Command
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
-		if (MOD_RESULT != EVENT_ALLOW && source.permission.empty() && !source.AccessFor(ci).HasPriv("SET"))
+		if (MOD_RESULT != EVENT_ALLOW && !source.AccessFor(ci).HasPriv("SET") && source.permission.empty() && !source.HasPriv("chanserv/administration"))
 		{
 			source.Reply(ACCESS_DENIED);
 			return;
@@ -965,7 +921,7 @@ class CommandCSSetSignKick : public Command
 			ci->ExtendMetadata("SIGNKICK");
 			ci->Shrink("SIGNKICK_LEVEL");
 			source.Reply(_("Signed kick option for %s is now \002on\002."), ci->name.c_str());
-			Log(source.permission.empty() ? LOG_COMMAND : LOG_ADMIN, source, this, ci) << "to enable sign kick";
+			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to enable sign kick";
 		}
 		else if (params[1].equals_ci("LEVEL"))
 		{
@@ -973,14 +929,14 @@ class CommandCSSetSignKick : public Command
 			ci->Shrink("SIGNKICK");
 			source.Reply(_("Signed kick option for %s is now \002on\002, but depends of the\n"
 				"level of the user that is using the command."), ci->name.c_str());
-			Log(source.permission.empty() ? LOG_COMMAND : LOG_ADMIN, source, this, ci) << "to enable sign kick level";
+			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to enable sign kick level";
 		}
 		else if (params[1].equals_ci("OFF"))
 		{
 			ci->Shrink("SIGNKICK");
 			ci->Shrink("SIGNKICK_LEVEL");
 			source.Reply(_("Signed kick option for %s is now \002off\002."), ci->name.c_str());
-			Log(source.permission.empty() ? LOG_COMMAND : LOG_ADMIN, source, this, ci) << "to disable sign kick";
+			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to disable sign kick";
 		}
 		else
 			this->OnSyntaxError(source, "SIGNKICK");
@@ -1025,7 +981,7 @@ class CommandCSSetSuccessor : public Command
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
-		if (MOD_RESULT != EVENT_ALLOW && source.permission.empty() && (ci->HasExt("SECUREFOUNDER") ? !source.IsFounder(ci) : !source.AccessFor(ci).HasPriv("FOUNDER")))
+		if (MOD_RESULT != EVENT_ALLOW && (ci->HasExt("SECUREFOUNDER") ? !source.IsFounder(ci) : !source.AccessFor(ci).HasPriv("FOUNDER")) && source.permission.empty() && !source.HasPriv("chanserv/administration"))
 		{
 			source.Reply(ACCESS_DENIED);
 			return;
@@ -1079,10 +1035,10 @@ class CommandCSSetSuccessor : public Command
 	}
 };
 
-class CommandCSSASetNoexpire : public Command
+class CommandCSSetNoexpire : public Command
 {
  public:
-	CommandCSSASetNoexpire(Module *creator) : Command(creator, "chanserv/saset/noexpire", 2, 2)
+	CommandCSSetNoexpire(Module *creator) : Command(creator, "chanserv/saset/noexpire", 2, 2)
 	{
 		this->SetDesc(_("Prevent the channel from expiring"));
 		this->SetSyntax(_("\037channel\037 {ON | OFF}"));
@@ -1134,7 +1090,6 @@ class CommandCSSASetNoexpire : public Command
 class CSSet : public Module
 {
 	CommandCSSet commandcsset;
-	CommandCSSASet commandcssaset;
 	CommandCSSetAutoOp commandcssetautoop;
 	CommandCSSetBanType commandcssetbantype;
 	CommandCSSetChanstats commandcssetchanstats;
@@ -1151,15 +1106,15 @@ class CSSet : public Module
 	CommandCSSetSecureOps commandcssetsecureops;
 	CommandCSSetSignKick commandcssetsignkick;
 	CommandCSSetSuccessor commandcssetsuccessor;
-	CommandCSSASetNoexpire commandcssasetnoexpire;
+	CommandCSSetNoexpire commandcssetnoexpire;
 
  public:
 	CSSet(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		commandcsset(this), commandcssaset(this), commandcssetautoop(this), commandcssetbantype(this), commandcssetchanstats(this),
+		commandcsset(this), commandcssetautoop(this), commandcssetbantype(this), commandcssetchanstats(this),
 		CSDefChanstats(false), commandcssetdescription(this), commandcssetfounder(this), commandcssetkeeptopic(this),
 		commandcssetpeace(this), commandcssetpersist(this), commandcssetprivate(this), commandcssetrestricted(this),
 		commandcssetsecure(this), commandcssetsecurefounder(this), commandcssetsecureops(this), commandcssetsignkick(this),
-		commandcssetsuccessor(this), commandcssasetnoexpire(this)
+		commandcssetsuccessor(this), commandcssetnoexpire(this)
 	{
 
 		Implementation i[] = { I_OnReload, I_OnChanRegistered, I_OnCheckKick, I_OnDelChan };

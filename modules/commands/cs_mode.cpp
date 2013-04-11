@@ -213,12 +213,12 @@ class CommandCSMode : public Command
 	{
 		User *u = source.GetUser();
 
-		bool has_access = source.AccessFor(ci).HasPriv("MODE") || source.HasPriv("chanserv/set");
+		bool has_access = source.AccessFor(ci).HasPriv("MODE") || source.HasPriv("chanserv/administration");
 
 		spacesepstream sep(params.size() > 3 ? params[3] : "");
 		Anope::string modes = params[2], param;
 
-		bool override = !source.AccessFor(ci).HasPriv("MODE") && source.HasPriv("chanserv/set");
+		bool override = !source.AccessFor(ci).HasPriv("MODE") && source.HasPriv("chanserv/administration");
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to set " << params[2];
 
 		int adding = -1;
@@ -431,7 +431,7 @@ class CommandCSMode : public Command
 			source.Reply(CHAN_X_NOT_IN_USE, params[0].c_str());
 		else if (subcommand.equals_ci("LOCK") && params.size() > 2)
 		{
-			if (!source.AccessFor(ci).HasPriv("MODE") && !source.HasPriv("chanserv/set"))
+			if (!source.AccessFor(ci).HasPriv("MODE") && !source.HasPriv("chanserv/administration"))
 				source.Reply(ACCESS_DENIED);
 			else
 				this->DoLock(source, ci, params);
@@ -440,7 +440,7 @@ class CommandCSMode : public Command
 			this->DoSet(source, ci, params);
 		else if (subcommand.equals_ci("CLEAR"))
 		{
-			if (!source.AccessFor(ci).HasPriv("MODE") && !source.HasPriv("chanserv/set"))
+			if (!source.AccessFor(ci).HasPriv("MODE") && !source.HasPriv("chanserv/administration"))
 				source.Reply(ACCESS_DENIED);
 			else
 				this->DoClear(source, ci, params);

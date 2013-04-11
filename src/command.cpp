@@ -189,7 +189,9 @@ bool Command::OnHelp(CommandSource &source, const Anope::string &subcommand) { r
 void Command::OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 {
 	this->SendSyntax(source);
-	source.Reply(MORE_INFO, Config->UseStrictPrivMsgString.c_str(), source.service->nick.c_str(), source.command.c_str());
+	bool has_help = source.service->commands.find("HELP") != source.service->commands.end();
+	if (has_help)
+		source.Reply(MORE_INFO, Config->UseStrictPrivMsgString.c_str(), source.service->nick.c_str(), source.command.c_str());
 }
 
 void RunCommand(CommandSource &source, const Anope::string &message)

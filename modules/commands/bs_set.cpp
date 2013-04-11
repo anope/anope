@@ -313,11 +313,9 @@ class CommandBSSetFantasy : public Command
 				"with one of the following fantasy characters: \002%s\002\n"
 				" \n"
 				"Note that users wanting to use fantaisist\n"
-				"commands MUST have enough level for both\n"
-				"the FANTASIA and another level depending\n"
-				"of the command if required (for example, to use\n"
-				"!op, user must have enough access for the OPDEOP\n"
-				"level)."), Config->ChanServ.c_str(), Config->BSFantasyCharacter.c_str());
+				"commands MUST have enough access for both\n"
+				"the FANTASIA and the command they are executing."),
+				Config->ChanServ.c_str(), Config->BSFantasyCharacter.c_str());
 		return true;
 	}
 };

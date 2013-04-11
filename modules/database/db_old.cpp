@@ -222,7 +222,7 @@ static Anope::string GetLevelName(int level)
 		case 6:
 			return "AUTOVOICE";
 		case 7:
-			return "OPDEOP";
+			return "OP";
 		case 8:
 			return "LIST";
 		case 9:
@@ -256,7 +256,7 @@ static Anope::string GetLevelName(int level)
 		case 23:
 			return "AUTOPROTECT";
 		case 24:
-			return "OPDEOPME";
+			return "OPME";
 		case 25:
 			return "HALFOPME";
 		case 26:

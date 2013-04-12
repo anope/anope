@@ -75,10 +75,8 @@ Anope for Windows
        will probably not find them and should be told where they are by passing
        additional search paths to the last question in Config, such as:
 
-       -DEXTRA_INCLUDES:STRING=c:/openssl/include;c:/openssl/lib
-
-       Which would have cmake search both C:\openssl\include and
-       C:\openssl\lib.
+       -DEXTRA_INCLUDE:STRING=c:/openssl/include;c:/mysql/include
+       -DEXTRA_LIBS:STRING=c:/openssl/lib;c:/mysql/lib
 
        Building Anope with gettext requires libintl, libiconv, libgcc and
        libmingex. We have precompiled these libraries for you that you may

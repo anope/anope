@@ -18,25 +18,27 @@ class MyForbidService : public ForbidService
 {
 	Serialize::Checker<std::vector<ForbidData *>[FT_SIZE]> forbid_data;
 
+	inline std::vector<ForbidData *>* forbids() { return *this->forbid_data; }
+
  public:
 	MyForbidService(Module *m) : ForbidService(m), forbid_data("ForbidData") { }
 
 	void AddForbid(ForbidData *d) anope_override
 	{
-		this->forbid_data[d->type].push_back(d);
+		this->forbids()[d->type].push_back(d);
 	}
 
 	void RemoveForbid(ForbidData *d) anope_override
 	{
-		std::vector<ForbidData *>::iterator it = std::find(this->forbid_data[d->type].begin(), this->forbid_data[d->type].end(), d);
-		if (it != this->forbid_data[d->type].end())
-			this->forbid_data[d->type].erase(it);
+		std::vector<ForbidData *>::iterator it = std::find(this->forbids()[d->type].begin(), this->forbids()[d->type].end(), d);
+		if (it != this->forbids()[d->type].end())
+			this->forbids()[d->type].erase(it);
 		delete d;
 	}
 
 	ForbidData *FindForbid(const Anope::string &mask, ForbidType ftype) anope_override
 	{
-		const std::vector<ForbidData *> &forbids = this->forbid_data[ftype];
+		const std::vector<ForbidData *> &forbids = this->forbids()[ftype];
 		for (unsigned i = forbids.size(); i > 0; --i)
 		{
 			ForbidData *d = forbids[i - 1];
@@ -51,9 +53,9 @@ class MyForbidService : public ForbidService
 	{
 		std::vector<ForbidData *> forbids;
 		for (unsigned j = 0; j < FT_SIZE; ++j)
-			for (unsigned i = this->forbid_data[j].size(); i > 0; --i)
+			for (unsigned i = this->forbids()[j].size(); i > 0; --i)
 			{
-				ForbidData *d = this->forbid_data[j].at(i - 1);
+				ForbidData *d = this->forbids()[j].at(i - 1);
 
 				if (d->expires && Anope::CurTime >= d->expires)
 				{
@@ -66,7 +68,8 @@ class MyForbidService : public ForbidService
 						ftype = "email";
 
 					Log(LOG_NORMAL, "expire/forbid") << "Expiring forbid for " << d->mask << " type " << ftype;
-					this->forbid_data[j].erase(this->forbid_data[j].begin() + i - 1);
+					std::vector<ForbidData *> &forbids = this->forbids()[j];
+					forbids.erase(forbids.begin() + i - 1);
 					delete d;
 				}
 				else

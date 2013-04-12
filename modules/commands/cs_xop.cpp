@@ -543,6 +543,9 @@ class CSXOP : public Module
 		accessprovider(this), commandcsxop(this)
 	{
 		this->SetPermanent(true);
+
+		Implementation i[] = { I_OnReload };
+		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 	}
 
 	void OnReload(ServerConfig *conf, ConfigReader &reader) anope_override

@@ -84,12 +84,15 @@ foreach(MODULE_FOLDER ${MODULES_FOLDERS})
           if(GETTEXT_FOUND)
             add_dependencies(${SO} module_language)
           endif(GETTEXT_FOUND)
+          target_link_libraries(${SO} ${TEMP_DEPENDENCIES})
           # For Windows only, have the module link to the export library of Anope as well as wsock32 and Ws2_32 libraries (most of the modules probably don't need this, but this is to be on the safe side), also set it's version
           if(WIN32)
-            target_link_libraries(${SO} ${PROGRAM_NAME} wsock32 Ws2_32 ${WIN32_MEMORY} ${TEMP_DEPENDENCIES})
+            target_link_libraries(${SO} ${PROGRAM_NAME} wsock32 Ws2_32 ${WIN32_MEMORY})
             set_target_properties(${PROGRAM_NAME} PROPERTIES VERSION "${VERSION_DOTTED}")
           else(WIN32)
-            target_link_libraries(${SO} ${TEMP_DEPENDENCIES})
+            if(APPLE)
+              target_link_libraries(${SO} ${PROGRAM_NAME})
+            endif(APPLE)
           endif(WIN32)
           # Set the module to be installed to the module directory under the data directory
           install(TARGETS ${SO}

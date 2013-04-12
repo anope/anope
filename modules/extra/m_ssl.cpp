@@ -107,43 +107,6 @@ class SSLModule : public Module
 		if (!client_ctx || !server_ctx)
 			throw ModuleException("Error initializing SSL CTX");
 
-		if (Anope::IsFile(this->certfile.c_str()))
-		{
-			if (!SSL_CTX_use_certificate_file(client_ctx, this->certfile.c_str(), SSL_FILETYPE_PEM) || !SSL_CTX_use_certificate_file(server_ctx, this->certfile.c_str(), SSL_FILETYPE_PEM))
-			{
-				SSL_CTX_free(client_ctx);
-				SSL_CTX_free(server_ctx);
-				throw ModuleException("Error loading certificate");
-			}
-			else
-				Log(LOG_DEBUG) << "m_ssl: Successfully loaded certificate " << this->certfile;
-		}
-		else
-			Log() << "Unable to open certificate " << this->certfile;
-
-		if (Anope::IsFile(this->keyfile.c_str()))
-		{
-			if (!SSL_CTX_use_PrivateKey_file(client_ctx, this->keyfile.c_str(), SSL_FILETYPE_PEM) || !SSL_CTX_use_PrivateKey_file(server_ctx, this->keyfile.c_str(), SSL_FILETYPE_PEM))
-			{
-				SSL_CTX_free(client_ctx);
-				SSL_CTX_free(server_ctx);
-				throw ModuleException("Error loading private key");
-			}
-			else
-				Log(LOG_DEBUG) << "m_ssl: Successfully loaded private key " << this->keyfile;
-		}
-		else
-		{
-			if (Anope::IsFile(this->certfile.c_str()))
-			{
-				SSL_CTX_free(client_ctx);
-				SSL_CTX_free(server_ctx);
-				throw ModuleException("Error loading private key " + this->keyfile + " - file not found");
-			}
-			else
-				Log() << "Unable to open private key " << this->keyfile;
-		}
-
 		SSL_CTX_set_mode(client_ctx, SSL_MODE_ENABLE_PARTIAL_WRITE | SSL_MODE_ACCEPT_MOVING_WRITE_BUFFER);
 		SSL_CTX_set_mode(server_ctx, SSL_MODE_ENABLE_PARTIAL_WRITE | SSL_MODE_ACCEPT_MOVING_WRITE_BUFFER);
 
@@ -177,6 +140,44 @@ class SSLModule : public Module
 	{
 		this->certfile = reader.ReadValue("ssl", "cert", "data/anope.crt", 0);
 		this->keyfile = reader.ReadValue("ssl", "key", "data/anope.key", 0);
+
+		if (Anope::IsFile(this->certfile.c_str()))
+		{
+			if (!SSL_CTX_use_certificate_file(client_ctx, this->certfile.c_str(), SSL_FILETYPE_PEM) || !SSL_CTX_use_certificate_file(server_ctx, this->certfile.c_str(), SSL_FILETYPE_PEM))
+			{
+				SSL_CTX_free(client_ctx);
+				SSL_CTX_free(server_ctx);
+				throw ConfigException("Error loading certificate");
+			}
+			else
+				Log(LOG_DEBUG) << "m_ssl: Successfully loaded certificate " << this->certfile;
+		}
+		else
+			Log() << "Unable to open certificate " << this->certfile;
+
+		if (Anope::IsFile(this->keyfile.c_str()))
+		{
+			if (!SSL_CTX_use_PrivateKey_file(client_ctx, this->keyfile.c_str(), SSL_FILETYPE_PEM) || !SSL_CTX_use_PrivateKey_file(server_ctx, this->keyfile.c_str(), SSL_FILETYPE_PEM))
+			{
+				SSL_CTX_free(client_ctx);
+				SSL_CTX_free(server_ctx);
+				throw ConfigException("Error loading private key");
+			}
+			else
+				Log(LOG_DEBUG) << "m_ssl: Successfully loaded private key " << this->keyfile;
+		}
+		else
+		{
+			if (Anope::IsFile(this->certfile.c_str()))
+			{
+				SSL_CTX_free(client_ctx);
+				SSL_CTX_free(server_ctx);
+				throw ConfigException("Error loading private key " + this->keyfile + " - file not found");
+			}
+			else
+				Log() << "Unable to open private key " << this->keyfile;
+		}
+
 	}
 
 	void OnPreServerConnect() anope_override

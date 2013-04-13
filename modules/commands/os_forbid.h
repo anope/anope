@@ -3,7 +3,7 @@
 
 enum ForbidType
 {
-	FT_NICK,
+	FT_NICK = 1,
 	FT_CHAN,
 	FT_EMAIL,
 	FT_REGISTER,
@@ -69,6 +69,9 @@ Serializable* ForbidData::Unserialize(Serializable *obj, Serialize::Data &data)
 	unsigned int t;
 	data["type"] >> t;
 	fb->type = static_cast<ForbidType>(t);
+
+	if (t > FT_SIZE - 1)
+		return NULL;
 
 	if (!obj)
 		forbid_service->AddForbid(fb);

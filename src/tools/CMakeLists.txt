@@ -24,6 +24,9 @@ foreach(SRC ${TOOLS_SRCS})
     if(WIN32 AND ${EXE} STREQUAL anopesmtp)
       target_link_libraries(${EXE} wsock32)
     endif(WIN32 AND ${EXE} STREQUAL anopesmtp)
+    if(${CMAKE_SYSTEM_NAME} STREQUAL "SunOS" AND ${EXE} STREQUAL anopesmtp)
+      target_link_libraries(${EXE} socket nsl)
+    endif(${CMAKE_SYSTEM_NAME} STREQUAL "SunOS" AND ${EXE} STREQUAL anopesmtp)
     # Set the executable to be installed to the bin directory under the main directory
     install(TARGETS ${EXE}
       DESTINATION ${BIN_DIR}

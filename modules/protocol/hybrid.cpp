@@ -522,6 +522,7 @@ class ProtoHybrid : public Module
 	Message::Away message_away;
 	Message::Capab message_capab;
 	Message::Error message_error;
+	Message::Invite message_invite;
 	Message::Kick message_kick;
 	Message::Kill message_kill;
 	Message::Mode message_mode;
@@ -594,10 +595,10 @@ class ProtoHybrid : public Module
 public:
 	ProtoHybrid(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PROTOCOL | VENDOR),
 		ircd_proto(this),
-		message_away(this), message_capab(this), message_error(this), message_kick(this), message_kill(this),
-		message_mode(this), message_motd(this), message_part(this), message_ping(this), message_privmsg(this),
-		message_quit(this), message_squit(this), message_stats(this), message_time(this), message_topic(this),
-		message_version(this), message_whois(this),
+		message_away(this), message_capab(this), message_error(this), message_invite(this), message_kick(this),
+		message_kill(this), message_mode(this), message_motd(this), message_part(this), message_ping(this),
+		message_privmsg(this), message_quit(this), message_squit(this), message_stats(this), message_time(this),
+		message_topic(this), message_version(this), message_whois(this),
 
 		message_bmask(this), message_eob(this), message_join(this),
 		message_nick(this), message_pass(this), message_pong(this), message_server(this), message_sid(this),

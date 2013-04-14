@@ -49,6 +49,17 @@ void Error::Run(MessageSource &source, const std::vector<Anope::string> &params)
 	Anope::Quitting = true;
 }
 
+void Invite::Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
+{
+	User *targ = User::Find(params[0]);
+	Channel *c = Channel::Find(params[1]);
+
+	if (!targ || targ->server != Me || !c || c->FindUser(targ))
+		return;
+	
+	FOREACH_MOD(I_OnInvite, OnInvite(source.GetUser(), c, targ));
+}
+
 void Join::Run(MessageSource &source, const std::vector<Anope::string> &params)
 {
 	User *user = source.GetUser();

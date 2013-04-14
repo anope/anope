@@ -570,6 +570,7 @@ class ProtongIRCd : public Module
 	/* Core message handlers */
 	Message::Capab message_capab;
 	Message::Error message_error;
+	Message::Invite message_invite;
 	Message::Kick message_kick;
 	Message::Kill message_kill;
 	Message::MOTD message_motd;
@@ -643,8 +644,8 @@ class ProtongIRCd : public Module
  public:
 	ProtongIRCd(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PROTOCOL | VENDOR),
 		ircd_proto(this),
-		message_capab(this), message_error(this), message_kick(this), message_kill(this), message_motd(this),
-		message_part(this), message_ping(this), message_privmsg(this), message_squery(this, "SQUERY"),
+		message_capab(this), message_error(this), message_invite(this), message_kick(this), message_kill(this),
+		message_motd(this), message_part(this), message_ping(this), message_privmsg(this), message_squery(this, "SQUERY"),
 		message_quit(this), message_squit(this), message_stats(this), message_time(this), message_version(this),
 
 		message_005(this), message_376(this), message_chaninfo(this), message_join(this), message_metadata(this),

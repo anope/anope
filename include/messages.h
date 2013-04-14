@@ -40,6 +40,13 @@ namespace Message
 	
 		void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override;
 	};
+
+	struct CoreExport Invite : IRCDMessage
+	{
+		Invite(Module *creator, const Anope::string &mname = "INVITE") : IRCDMessage(creator, mname, 2) { SetFlag(IRCDMESSAGE_REQUIRE_USER); SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
+
+		void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override;
+	};
 	
 	struct CoreExport Join : IRCDMessage
 	{

@@ -1170,6 +1170,7 @@ class ProtoInspIRCd : public Module
 	/* Core message handlers */
 	Message::Away message_away;
 	Message::Error message_error;
+	Message::Invite message_invite;
 	Message::Join message_join;
 	Message::Kick message_kick;
 	Message::Kill message_kill;
@@ -1205,9 +1206,9 @@ class ProtoInspIRCd : public Module
  public:
 	ProtoInspIRCd(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PROTOCOL | VENDOR),
 		ircd_proto(this),
-		message_away(this), message_error(this), message_join(this), message_kick(this), message_kill(this),
-		message_motd(this), message_part(this), message_ping(this), message_privmsg(this), message_quit(this),
-		message_squit(this), message_stats(this), message_topic(this),
+		message_away(this), message_error(this), message_invite(this), message_join(this), message_kick(this), message_kill(this),
+		message_motd(this), message_part(this), message_ping(this), message_privmsg(this), message_quit(this), message_squit(this),
+		message_stats(this), message_topic(this),
 
 		message_chgident(this), message_setname(this, "SETNAME"), message_chgname(this, "FNAME"), message_capab(this), message_endburst(this),
 		message_fhost(this, "FHOST"), message_sethost(this, "SETHOST"), message_fjoin(this), message_fmode(this), message_ftopic(this),

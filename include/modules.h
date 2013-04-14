@@ -815,6 +815,13 @@ class CoreExport Module : public Extensible
 	 */
 	virtual void OnUserAway(User *u, const Anope::string &message) { }
 
+	/** Called when a user invites one of our users to a channel
+	 * @param source The user doing the inviting
+	 * @param c The channel the user is inviting to
+	 * @param targ The user being invited
+	 */
+	virtual void OnInvite(User *source, Channel *c, User *targ) { }
+
 	/** Called when a vhost is deleted
 	 * @param na The nickalias of the vhost
 	 */
@@ -1018,7 +1025,7 @@ enum Implementation
 
 		/* Users */
 		I_OnUserConnect, I_OnUserNickChange, I_OnUserQuit, I_OnPreUserLogoff, I_OnPostUserLogoff, I_OnPreJoinChannel,
-		I_OnJoinChannel, I_OnPrePartChannel, I_OnPartChannel, I_OnLeaveChannel, I_OnFingerprint, I_OnUserAway,
+		I_OnJoinChannel, I_OnPrePartChannel, I_OnPartChannel, I_OnLeaveChannel, I_OnFingerprint, I_OnUserAway, I_OnInvite,
 
 		/* OperServ */
 		I_OnDefconLevel, I_OnAddAkill, I_OnDelAkill, I_OnExceptionAdd, I_OnExceptionDel,

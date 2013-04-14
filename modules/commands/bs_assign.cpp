@@ -156,7 +156,37 @@ class BSAssign : public Module
 	BSAssign(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandbsassign(this), commandbsunassign(this)
 	{
+		Implementation i[] = { I_OnInvite };
+		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
+	}
 
+	void OnInvite(User *source, Channel *c, User *targ) anope_override
+	{
+		BotInfo *bi;
+		if (Anope::ReadOnly || !c->ci || targ->server != Me || !(bi = dynamic_cast<BotInfo *>(targ)))
+			return;
+
+		AccessGroup access = c->ci->AccessFor(source);
+ 		if (c->ci->HasExt("BS_NOBOT") || (!access.HasPriv("ASSIGN") && !source->HasPriv("botserv/administration")))
+		{
+			targ->SendMessage(bi, ACCESS_DENIED);
+			return;
+		}
+
+		if (bi->oper_only && !source->HasPriv("botserv/administration"))
+		{
+			targ->SendMessage(bi, ACCESS_DENIED);
+			return;
+		}
+
+		if (c->ci->bi == bi)
+		{
+			targ->SendMessage(bi, _("Bot \002%s\002 is already assigned to channel \002%s\002."), c->ci->bi->nick.c_str(), c->name.c_str());
+			return;
+		}
+
+		bi->Assign(source, c->ci);
+		targ->SendMessage(bi, _("Bot \002%s\002 has been assigned to %s."), bi->nick.c_str(), c->name.c_str());
 	}
 };
 

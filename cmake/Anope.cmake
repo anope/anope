@@ -359,24 +359,22 @@ macro(find_includes SRC INCLUDES)
 endmacro(find_includes)
 
 ###############################################################################
-# calculate_depends(<source filename> <output variable set to TRUE on fail> <TRUE if the source file is a module> [<optional output variable for includes>])
+# calculate_depends(<source filename> [<optional output variable for includes>])
 #
 # This macro is used in most of the src (sub)directories to calculate the
 #   header file dependencies for the given source file.
 ###############################################################################
-macro(calculate_depends SRC SKIP MODULE)
+macro(calculate_depends SRC)
   # Temporarily set that we didn't get a 3rd argument before we actually check if we did get one or not
   set(CHECK_ANGLE_INCLUDES FALSE)
   # Check for a third argument
-  if(${ARGC} GREATER 3)
+  if(${ARGC} GREATER 1)
     set(CHECK_ANGLE_INCLUDES TRUE)
-  endif(${ARGC} GREATER 3)
+  endif(${ARGC} GREATER 1)
   # Find all the lines in the given source file that have any form of #include on them, regardless of whitespace, but only if they are valid for the platform we are on
   find_includes(${SRC} INCLUDES)
   # Reset the list of headers to empty
   set(HEADERS)
-  # Reset skip
-  set(${SKIP} FALSE)
   # Iterate through the strings containing #include (if any)
   foreach(INCLUDE ${INCLUDES})
     # Extract the filename from the #include line
@@ -402,22 +400,16 @@ macro(calculate_depends SRC SKIP MODULE)
             endif(FOUND_DEFAULT)
           endforeach(DEFAULT_INCLUDE_DIR)
           if(FOUND_IN_DEFAULTS EQUAL -1)
-            find_in_list(${ARGV3} "${FOUND_${FILENAME}_INCLUDE}" FOUND_IN_INCLUDES)
+            find_in_list(${ARGV1} "${FOUND_${FILENAME}_INCLUDE}" FOUND_IN_INCLUDES)
             if(FOUND_IN_INCLUDES EQUAL -1)
-              append_to_list(${ARGV3} "${FOUND_${FILENAME}_INCLUDE}")
+              append_to_list(${ARGV1} "${FOUND_${FILENAME}_INCLUDE}")
             endif(FOUND_IN_INCLUDES EQUAL -1)
           endif(FOUND_IN_DEFAULTS EQUAL -1)
         else(FOUND_${FILENAME}_INCLUDE)
-          if(${FILENAME} STREQUAL "libintl.h")
-            # XXX
-          else(${FILENAME} STREQUAL "libintl.h")
-            set(${SKIP} TRUE)
-            if(NOT ${MODULE})
-              message(FATAL_ERROR "${SRC} needs header file ${FILENAME} but we were unable to locate that header file! Check that the header file is within the search path of your OS.")
-            else(NOT ${MODULE})
-              message("  ${SRC} can not be built due to missing dependencies - requires header file ${FILENAME}")
-            endif(NOT ${MODULE})
-          endif(${FILENAME} STREQUAL "libintl.h")
+          # XXX
+          if(NOT ${FILENAME} STREQUAL "libintl.h")
+            message(FATAL_ERROR "${SRC} needs header file ${FILENAME} but we were unable to locate that header file! Check that the header file is within the search path of your OS.")
+          endif(NOT ${FILENAME} STREQUAL "libintl.h")
         endif(FOUND_${FILENAME}_INCLUDE)
       endif(CHECK_ANGLE_INCLUDES)
     endif(QUOTE_TYPE STREQUAL "angle brackets")
@@ -425,12 +417,12 @@ macro(calculate_depends SRC SKIP MODULE)
 endmacro(calculate_depends)
 
 ###############################################################################
-# calculate_libraries(<source filename> <output variable set to TRUE on fail> <TRUE if the source file is a module> <output variable for linker flags> <output variable for extra depends>)
+# calculate_libraries(<source filename> <output variable for linker flags> <output variable for extra depends>)
 #
 # This macro is used in most of the module (sub)directories to calculate the
 #   library dependencies for the given source file.
 ###############################################################################
-macro(calculate_libraries SRC SKIP MODULE SRC_LDFLAGS EXTRA_DEPENDS)
+macro(calculate_libraries SRC SRC_LDFLAGS EXTRA_DEPENDS)
   # Set up a temporary LDFLAGS for this file
   set(THIS_LDFLAGS "${LDFLAGS}")
   # Reset extra dependencies
@@ -439,8 +431,6 @@ macro(calculate_libraries SRC SKIP MODULE SRC_LDFLAGS EXTRA_DEPENDS)
   set(LIBRARY_PATHS)
   # Reset libraries
   set(LIBRARIES)
-  # Default to not skipping this file
-  set(${SKIP} FALSE)
   # Check to see if there are any lines matching: /* RequiredLibraries: [something] */
   read_from_file(${SRC} "/\\\\*[ \t]*RequiredLibraries:[ \t]*.*[ \t]*\\\\*/" REQUIRED_LIBRARIES)
   # Iterate through those lines
@@ -470,40 +460,32 @@ macro(calculate_libraries SRC SKIP MODULE SRC_LDFLAGS EXTRA_DEPENDS)
           append_to_list(LIBRARIES "${LIBRARY}")
         endif(MSVC)
       else(FOUND_${LIBRARY}_LIBRARY)
-        # Skip this file
-        set(${SKIP} TRUE)
-        if(NOT ${MODULE})
-          # In the case of the library not being found, we fatally error so CMake stops trying to generate
-          message(FATAL_ERROR "${SRC} needs library ${LIBRARY} but we were unable to locate that library! Check that the library is within the search path of your OS.")
-        else(NOT ${MODULE})
-            message("  ${SRC} can not be built due to missing dependencies - requires library ${LIBRARY}")
-        endif(NOT ${MODULE})
+        # In the case of the library not being found, we fatally error so CMake stops trying to generate
+        message(FATAL_ERROR "${SRC} needs library ${LIBRARY} but we were unable to locate that library! Check that the library is within the search path of your OS.")
       endif(FOUND_${LIBRARY}_LIBRARY)
     endforeach(LIBRARY)
   endforeach(REQUIRED_LIBRARY)
-  if(NOT ${SKIP})
-    # Remove duplicates from the library paths
-    if(LIBRARY_PATHS)
-      remove_list_duplicates(LIBRARY_PATHS)
-    endif(LIBRARY_PATHS)
-    # Remove diplicates from the libraries
-    if(LIBRARIES)
-      remove_list_duplicates(LIBRARIES)
-    endif(LIBRARIES)
-    # Iterate through library paths and add them to the linker flags
-    foreach(LIBRARY_PATH ${LIBRARY_PATHS})
-      find_in_list(DEFAULT_LIBRARY_DIRS "${LIBRARY_PATH}" FOUND_IN_DEFAULTS)
-      if(FOUND_IN_DEFAULTS EQUAL -1)
-        set(THIS_LDFLAGS "${THIS_LDFLAGS} -L${LIBRARY_PATH}")
-      endif(FOUND_IN_DEFAULTS EQUAL -1)
-    endforeach(LIBRARY_PATH)
-    # Iterate through libraries and add them to the linker flags
-    foreach(LIBRARY ${LIBRARIES})
-      append_to_list(EXTRA_DEPENDENCIES "${LIBRARY}")
-    endforeach(LIBRARY)
-    set(${SRC_LDFLAGS} "${THIS_LDFLAGS}")
-    set(${EXTRA_DEPENDS} "${EXTRA_DEPENDENCIES}")
-  endif(NOT ${SKIP})
+  # Remove duplicates from the library paths
+  if(LIBRARY_PATHS)
+    remove_list_duplicates(LIBRARY_PATHS)
+  endif(LIBRARY_PATHS)
+  # Remove diplicates from the libraries
+  if(LIBRARIES)
+    remove_list_duplicates(LIBRARIES)
+  endif(LIBRARIES)
+  # Iterate through library paths and add them to the linker flags
+  foreach(LIBRARY_PATH ${LIBRARY_PATHS})
+    find_in_list(DEFAULT_LIBRARY_DIRS "${LIBRARY_PATH}" FOUND_IN_DEFAULTS)
+    if(FOUND_IN_DEFAULTS EQUAL -1)
+      set(THIS_LDFLAGS "${THIS_LDFLAGS} -L${LIBRARY_PATH}")
+    endif(FOUND_IN_DEFAULTS EQUAL -1)
+  endforeach(LIBRARY_PATH)
+  # Iterate through libraries and add them to the linker flags
+  foreach(LIBRARY ${LIBRARIES})
+    append_to_list(EXTRA_DEPENDENCIES "${LIBRARY}")
+  endforeach(LIBRARY)
+  set(${SRC_LDFLAGS} "${THIS_LDFLAGS}")
+  set(${EXTRA_DEPENDS} "${EXTRA_DEPENDENCIES}")
 endmacro(calculate_libraries)
 
 ###############################################################################

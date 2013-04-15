@@ -36,11 +36,8 @@ set(EXTRA_INCLUDES)
 foreach(SRC ${SRC_SRCS})
   # Temporary variable for the current source's include directories
   set(TEMP_INCLUDES)
-  # Create unused skip variable
-  set(SKIP)
-  set(MODULE FALSE)
   # Calculate the header file dependencies for the given source file
-  calculate_depends(${SRC} SKIP MODULE TEMP_INCLUDES)
+  calculate_depends(${SRC} TEMP_INCLUDES)
   # If there were some extra include directories, add them to the list
   if(TEMP_INCLUDES)
     append_to_list(EXTRA_INCLUDES ${TEMP_INCLUDES})

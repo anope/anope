@@ -6,7 +6,7 @@
  */
 
 #include "module.h"
-#include "extra/dns.h"
+#include "dns.h"
 
 using namespace DNS;
 

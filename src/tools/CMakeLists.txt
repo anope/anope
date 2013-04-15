@@ -9,11 +9,8 @@ set_source_files_properties(${TOOLS_SRCS} PROPERTIES LANGUAGE CXX COMPILE_FLAGS 
 foreach(SRC ${TOOLS_SRCS})
   # Convert the source file extension to have no extension
   string(REGEX REPLACE "\\.cpp$" "" EXE ${SRC})
-  # Create skip variable
-  set(SKIP)
-  set(MODULE FALSE)
   # Calculate the header file dependencies for the given source file
-  calculate_depends(${SRC} SKIP MODULE)
+  calculate_depends(${SRC})
   # Only continue if this file isn't skipped
   if(NOT SKIP)
     # Generate the executable and set its linker flags, also set it to depend on the main Anope executable to be built beforehand

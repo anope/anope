@@ -159,5 +159,6 @@ function(build_subdir)
   endif(HAS_FUNCTION)
 endfunction(build_subdir)
 
+include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 build_modules(${CMAKE_CURRENT_SOURCE_DIR})
 

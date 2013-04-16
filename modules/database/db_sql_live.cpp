@@ -1,5 +1,5 @@
 #include "module.h"
-#include "../extra/sql.h"
+#include "sql.h"
 #include "../commands/os_session.h"
 
 using namespace SQL;

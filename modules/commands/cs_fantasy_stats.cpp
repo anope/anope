@@ -12,7 +12,7 @@
 /*************************************************************************/
 
 #include "module.h"
-#include "../extra/sql.h"
+#include "sql.h"
 
 class MySQLInterface : public SQL::Interface
 {

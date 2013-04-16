@@ -9,7 +9,7 @@
  */
 
 #include "module.h"
-#include "../extra/sql.h"
+#include "sql.h"
 
 using namespace SQL;
 

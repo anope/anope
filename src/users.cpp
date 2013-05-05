@@ -21,7 +21,6 @@
 #include "bots.h"
 #include "config.h"
 #include "opertype.h"
-#include "nickserv.h"
 #include "language.h"
 
 user_map UserListByNick, UserListByUID;

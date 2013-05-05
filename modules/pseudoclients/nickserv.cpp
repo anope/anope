@@ -12,13 +12,11 @@
 /*************************************************************************/
 
 #include "module.h"
-#include "nickserv.h"
 
 class NickServCollide;
 
 typedef std::map<Anope::string, NickServCollide *> nickservcollides_map;
 
-static ServiceReference<NickServService> nickserv("NickServService", "NickServ");
 static nickservcollides_map NickServCollides;
 
 /** Timer for colliding nicks to force people off of nicknames

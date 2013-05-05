@@ -12,9 +12,11 @@
 /*************************************************************************/
 
 #include "module.h"
-#include "memoserv.h"
 
-static ServiceReference<MemoServService> MemoServService("MemoServService", "MemoServ");
+namespace
+{
+	ServiceReference<MemoServService> memoserv("MemoServService", "MemoServ");
+}
 
 class CommandMSSend : public Command
 {
@@ -27,13 +29,13 @@ class CommandMSSend : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		if (!MemoServService)
+		if (!memoserv)
 			return;
 
 		const Anope::string &nick = params[0];
 		const Anope::string &text = params[1];
 
-		MemoServService::MemoResult result = MemoServService->Send(source.GetNick(), nick, text);
+		MemoServService::MemoResult result = memoserv->Send(source.GetNick(), nick, text);
 		if (result == MemoServService::MEMO_SUCCESS)
 			source.Reply(_("Memo sent to \002%s\002."), nick.c_str());
 		else if (result == MemoServService::MEMO_INVALID_TARGET)
@@ -65,7 +67,7 @@ class MSSend : public Module
 		commandmssend(this)
 	{
 
-		if (!MemoServService)
+		if (!memoserv)
 			throw ModuleException("No MemoServ!");
 	}
 };

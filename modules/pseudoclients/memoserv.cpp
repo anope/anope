@@ -12,7 +12,6 @@
 /*************************************************************************/
 
 #include "module.h"
-#include "memoserv.h"
 
 static bool SendMemoMail(NickCore *nc, MemoInfo *mi, Memo *m)
 {

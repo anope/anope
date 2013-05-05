@@ -12,9 +12,11 @@
 /*************************************************************************/
 
 #include "module.h"
-#include "memoserv.h"
 
-static ServiceReference<MemoServService> MemoServService("MemoServService", "MemoServ");
+namespace
+{
+	ServiceReference<MemoServService> memoserv("MemoServService", "MemoServ");
+}
 
 class CommandMSStaff : public Command
 {
@@ -27,7 +29,7 @@ class CommandMSStaff : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		if (!MemoServService)
+		if (!memoserv)
 			return;
 
 		const Anope::string &text = params[0];
@@ -43,10 +45,8 @@ class CommandMSStaff : public Command
 			const NickCore *nc = it->second;
 
 			if (source.nc != nc && nc->IsServicesOper())
-				MemoServService->Send(source.GetNick(), nc->display, text, true);
+				memoserv->Send(source.GetNick(), nc->display, text, true);
 		}
-
-		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
@@ -67,8 +67,7 @@ class MSStaff : public Module
 	MSStaff(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandmsstaff(this)
 	{
-
-		if (!MemoServService)
+		if (!memoserv)
 			throw ModuleException("No MemoServ!");
 	}
 };

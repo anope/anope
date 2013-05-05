@@ -12,8 +12,7 @@
 /*************************************************************************/
 
 #include "module.h"
-#include "global.h"
-#include "os_session.h"
+#include "modules/os_session.h"
 
 enum DefconLevel
 {

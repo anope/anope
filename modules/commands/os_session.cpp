@@ -12,7 +12,7 @@
 /*************************************************************************/
 
 #include "module.h"
-#include "os_session.h"
+#include "modules/os_session.h"
 
 namespace
 {

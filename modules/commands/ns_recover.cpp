@@ -13,11 +13,6 @@
 
 #include "module.h"
 
-namespace
-{
-	bool restoreonrecover;
-}
-
 struct NSRecoverExtensibleInfo : ExtensibleItem, std::map<Anope::string, ChannelStatus> { };
 
 class NSRecoverRequest : public IdentifyRequest
@@ -61,7 +56,7 @@ class NSRecoverRequest : public IdentifyRequest
 				Log(LOG_COMMAND, source, cmd) << "and was automatically identified to " << u->Account()->display;
 			}
 
-			if (restoreonrecover)
+			if (Config->GetModule("ns_recover")->Get<bool>("restoreonrecover"))
 			{
 				if (!u->chans.empty())
 				{

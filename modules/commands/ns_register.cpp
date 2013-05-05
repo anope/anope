@@ -13,10 +13,6 @@
 
 #include "module.h"
 
-namespace
-{
-	ServiceReference<NickServService> nickserv("NickServService", "NickServ");
-}
 static bool SendRegmail(User *u, const NickAlias *na, const BotInfo *bi);
 
 class CommandNSConfirm : public Command

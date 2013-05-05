@@ -46,9 +46,9 @@
 #include "users.h"
 #include "xline.h"
 
-#include "chanserv.h"
-#include "global.h"
-#include "memoserv.h"
-#include "nickserv.h"
+#include "modules/chanserv.h"
+#include "modules/global.h"
+#include "modules/memoserv.h"
+#include "modules/nickserv.h"
 
 #endif // MODULE_H

@@ -12,8 +12,7 @@
 /*************************************************************************/
 
 #include "module.h"
-#include "global.h"
-#include "os_news.h"
+#include "modules/os_news.h"
 
 /* List of messages for each news type.  This simplifies message sending. */
 

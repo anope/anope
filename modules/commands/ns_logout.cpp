@@ -12,7 +12,6 @@
 /*************************************************************************/
 
 #include "module.h"
-#include "nickserv.h"
 
 static ServiceReference<NickServService> NickServService("NickServService", "NickServ");
 

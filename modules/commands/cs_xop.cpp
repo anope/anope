@@ -13,7 +13,6 @@
 
 namespace
 {
-	ServiceReference<ChanServService> chanserv("ChanServService", "ChanServ");
 	std::vector<Anope::string> order;
 	std::map<Anope::string, std::vector<Anope::string> > permissions;
 }

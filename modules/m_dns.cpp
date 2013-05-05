@@ -11,7 +11,7 @@
  */
 
 #include "module.h"
-#include "dns.h"
+#include "modules/dns.h"
 
 using namespace DNS;
 

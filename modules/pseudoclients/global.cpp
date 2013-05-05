@@ -12,7 +12,6 @@
 /*************************************************************************/
 
 #include "module.h"
-#include "global.h"
 
 class MyGlobalService : public GlobalService
 {

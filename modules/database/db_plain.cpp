@@ -11,7 +11,7 @@
 /*************************************************************************/
 
 #include "module.h"
-#include "../commands/os_session.h"
+#include "modules/os_session.h"
 
 Anope::string DatabaseFile;
 Anope::string BackupFile;

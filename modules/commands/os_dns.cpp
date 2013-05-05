@@ -6,7 +6,7 @@
  */
 
 #include "module.h"
-#include "../dns.h"
+#include "modules/dns.h"
 
 static ServiceReference<DNS::Manager> dnsmanager("DNS::Manager", "dns/manager");
 

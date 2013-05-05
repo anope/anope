@@ -12,7 +12,7 @@
 /*************************************************************************/
 
 #include "module.h"
-#include "os_ignore.h"
+#include "modules/os_ignore.h"
 
 class OSIgnoreService : public IgnoreService
 {

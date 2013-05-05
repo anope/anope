@@ -13,11 +13,6 @@
 
 #include "module.h"
 
-namespace
-{
-	ServiceReference<MemoServService> memoserv("MemoServService", "MemoServ");
-}
-
 class CommandMSSet : public Command
 {
  private:

@@ -12,9 +12,11 @@
 /*************************************************************************/
 
 #include "module.h"
-#include "memoserv.h"
 
-static ServiceReference<MemoServService> MemoServService("MemoServService", "MemoServ");
+namespace
+{
+	ServiceReference<MemoServService> memoserv("MemoServService", "MemoServ");
+}
 
 class CommandMSSendAll : public Command
 {
@@ -27,7 +29,7 @@ class CommandMSSendAll : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		if (!MemoServService)
+		if (!memoserv)
 			return;
 
 		const Anope::string &text = params[0];
@@ -43,11 +45,10 @@ class CommandMSSendAll : public Command
 			const NickCore *nc = it->second;
 
 			if (nc != source.nc)
-				MemoServService->Send(source.GetNick(), nc->display, text);
+				memoserv->Send(source.GetNick(), nc->display, text);
 		}
 
 		source.Reply(_("A massmemo has been sent to all registered users."));
-		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
@@ -67,8 +68,7 @@ class MSSendAll : public Module
 	MSSendAll(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandmssendall(this)
 	{
-
-		if (!MemoServService)
+		if (!memoserv)
 			throw ModuleException("No MemoServ!");
 	}
 };

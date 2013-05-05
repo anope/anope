@@ -12,9 +12,6 @@
 /*************************************************************************/
 
 #include "module.h"
-#include "memoserv.h"
-
-static ServiceReference<MemoServService> MemoServService("MemoServService", "MemoServ");
 
 class CommandMSCancel : public Command
 {
@@ -27,10 +24,6 @@ class CommandMSCancel : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		if (!MemoServService)
-			return;
-
-
 		const Anope::string &nname = params[0];
 
 		bool ischan;
@@ -81,9 +74,6 @@ class MSCancel : public Module
 	MSCancel(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandmscancel(this)
 	{
-
-		if (!MemoServService)
-			throw ModuleException("No MemoServ!");
 	}
 };
 

@@ -278,7 +278,7 @@ void User::SendMessage(const BotInfo *source, const Anope::string &msg)
 	* - The user is not registered and NSDefMsg is enabled
 	* - The user is registered and has set /ns set msg on
 	*/
-	sepstream sep(translated_message, '\n');
+	sepstream sep(translated_message, '\n', true);
 	for (Anope::string tok; sep.GetToken(tok);)
 	{
 		if (Config->UsePrivmsg && ((!this->nc && Config->DefPrivmsg) || (this->nc && this->nc->HasExt("MSG"))))

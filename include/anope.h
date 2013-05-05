@@ -554,10 +554,13 @@ class CoreExport sepstream
 	/** Current string position
 	 */
 	size_t pos;
+	/** If set then GetToken() can return an empty string
+	 */
+	bool allow_empty;
  public:
 	/** Create a sepstream and fill it with the provided data
 	 */
-	sepstream(const Anope::string &source, char seperator);
+	sepstream(const Anope::string &source, char seperator, bool allowempty = false);
 
 	/** Fetch the next token from the stream
 	 * @param token The next token from the stream is placed here

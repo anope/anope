@@ -112,7 +112,7 @@ void CommandSource::Reply(const Anope::string &message)
 {
 	const char *translated_message = Language::Translate(this->nc, message.c_str());
 
-	sepstream sep(translated_message, '\n');
+	sepstream sep(translated_message, '\n', true);
 	Anope::string tok;
 	while (sep.GetToken(tok))
 		this->reply->SendMessage(this->service, tok);

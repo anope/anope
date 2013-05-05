@@ -92,28 +92,28 @@ bool ci::less::operator()(const Anope::string &s1, const Anope::string &s2) cons
 	return s1.ci_str().compare(s2.ci_str()) < 0;
 }
 
-sepstream::sepstream(const Anope::string &source, char seperator) : tokens(source), sep(seperator), pos(0)
+sepstream::sepstream(const Anope::string &source, char seperator, bool ae) : tokens(source), sep(seperator), pos(0), allow_empty(ae)
 {
 }
 
 bool sepstream::GetToken(Anope::string &token)
 {
-	size_t p = this->pos;
-
-	while (p < this->tokens.length() && this->tokens[p] == this->sep)
-		++p;
-	
 	if (this->StreamEnd())
 	{
 		token.clear();
 		return false;
 	}
 
+	size_t p = this->pos;
 	while (p < this->tokens.length() && this->tokens[p] != this->sep)
 		++p;
 	
 	token = this->tokens.substr(this->pos, p - this->pos);
 	this->pos = p + 1;
+
+	if (!this->allow_empty && token.empty())
+		return GetToken(token);
+
 	return true;
 }
 
@@ -152,6 +152,6 @@ const Anope::string sepstream::GetRemaining()
 
 bool sepstream::StreamEnd()
 {
-	return this->pos >= this->tokens.length();
+	return this->pos > this->tokens.length();
 }
 

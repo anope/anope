@@ -93,6 +93,8 @@ namespace Configuration
 		bool DefPrivmsg;
 		/* Default language */
 		Anope::string DefLanguage;
+		/* options:timeoutcheck */
+		time_t TimeoutCheck;
 
 		/* either "/msg " or "/" */
 		Anope::string StrictPrivmsg;

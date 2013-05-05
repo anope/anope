@@ -187,6 +187,7 @@ Conf::Conf() : Block("")
 		this->DefPrivmsg = std::find(defaults.begin(), defaults.end(), "msg") != defaults.end();
 	}
 	this->DefLanguage = options->Get<const Anope::string &>("defaultlanguage");
+	this->TimeoutCheck = options->Get<time_t>("timeoutcheck");
 
 	for (int i = 0; i < this->CountBlock("uplink"); ++i)
 	{

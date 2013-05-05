@@ -157,7 +157,7 @@ int main(int ac, char **av, char **envp)
 		Log(LOG_DEBUG_2) << "Top of main loop";
 
 		/* Process timers */
-		if (Anope::CurTime - last_check >= Config->GetBlock("options")->Get<time_t>("timeoutcheck"))
+		if (Anope::CurTime - last_check >= Config->TimeoutCheck)
 		{
 			TimerManager::TickTimers(Anope::CurTime);
 			last_check = Anope::CurTime;

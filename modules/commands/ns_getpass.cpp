@@ -13,6 +13,8 @@
 
 #include "module.h"
 
+static ServiceReference<NickServService> nickserv("NickServService", "NickServ");
+
 class CommandNSGetPass : public Command
 {
  public:
@@ -30,7 +32,7 @@ class CommandNSGetPass : public Command
 
 		if (!(na = NickAlias::Find(nick)))
 			source.Reply(NICK_X_NOT_REGISTERED, nick.c_str());
-		else if (Config->NSSecureAdmins && na->nc->IsServicesOper())
+		else if (Config->GetModule("nickserv")->Get<bool>("secureadmins", "yes") && na->nc->IsServicesOper())
 			source.Reply(_("You may not get the password of other Services Operators."));
 		else
 		{

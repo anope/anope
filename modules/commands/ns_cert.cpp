@@ -13,6 +13,8 @@
 
 #include "module.h"
 
+static unsigned accessmax;
+
 class CommandNSCert : public Command
 {
  private:
@@ -54,9 +56,9 @@ class CommandNSCert : public Command
 	void DoAdd(CommandSource &source, NickCore *nc, const Anope::string &mask)
 	{
 
-		if (nc->cert.size() >= Config->NSAccessMax)
+		if (nc->cert.size() >= Config->GetModule(this->owner)->Get<unsigned>("accessmax"))
 		{
-			source.Reply(_("Sorry, you can only have %d certificate entries for a nickname."), Config->NSAccessMax);
+			source.Reply(_("Sorry, you can only have %d certificate entries for a nickname."), Config->GetModule(this->owner)->Get<unsigned>("accessmax"));
 			return;
 		}
 
@@ -179,7 +181,7 @@ class CommandNSCert : public Command
 				"If you connect to IRC and provide a client certificate with a\n"
 				"matching fingerprint in the cert list, your nick will be\n"
 				"automatically identified to %s.\n"
-				" \n"), Config->NickServ.c_str(), Config->NickServ.c_str());
+				" \n"), NickServ ? NickServ->nick.c_str() : source.service->nick.c_str());
 		source.Reply(_("Examples:\n"
 				" \n"
 				"    \002CERT ADD <fingerprint>\002\n"
@@ -191,7 +193,7 @@ class CommandNSCert : public Command
 				"        Reverses the previous command.\n"
 				" \n"
 				"    \002CERT LIST\002\n"
-				"        Displays the current certificate list."), Config->NickServ.c_str());
+				"        Displays the current certificate list."));
 		return true;
 	}
 };

@@ -13,6 +13,8 @@
 
 #include "module.h"
 
+static ServiceReference<NickServService> nickserv("NickServService", "NickServ");
+
 class CommandNSAccess : public Command
 {
  private:
@@ -24,9 +26,9 @@ class CommandNSAccess : public Command
 			return;
 		}
 
-		if (nc->access.size() >= Config->NSAccessMax)
+		if (nc->access.size() >= Config->GetModule(this->owner)->Get<unsigned>("accessmax"))
 		{
-			source.Reply(_("Sorry, you can only have %d access entries for a nickname."), Config->NSAccessMax);
+			source.Reply(_("Sorry, you can only have %d access entries for a nickname."), Config->GetModule(this->owner)->Get<unsigned>("accessmax"));
 			return;
 		}
 
@@ -119,7 +121,7 @@ class CommandNSAccess : public Command
 				source.Reply(ACCESS_DENIED);
 				return;
 			}
-			else if (Config->NSSecureAdmins && source.GetAccount() != na->nc && na->nc->IsServicesOper() && !cmd.equals_ci("LIST"))
+			else if (Config->GetModule("nickserv")->Get<bool>("secureadmins", "yes") && source.GetAccount() != na->nc && na->nc->IsServicesOper() && !cmd.equals_ci("LIST"))
 			{
 				source.Reply(_("You may view but not modify the access list of other Services Operators."));
 				return;
@@ -133,7 +135,7 @@ class CommandNSAccess : public Command
 		if (!mask.empty() && (mask.find('@') == Anope::string::npos || mask.find('!') != Anope::string::npos))
 		{
 			source.Reply(BAD_USERHOST_MASK);
-			source.Reply(MORE_INFO, Config->UseStrictPrivMsgString.c_str(), Config->NickServ.c_str(), this->name.c_str());
+			source.Reply(MORE_INFO, Config->StrictPrivmsg.c_str(), source.service->nick.c_str(), source.command.c_str());
 		}
 		else if (nc->HasExt("SUSPENDED"))
 			source.Reply(NICK_X_SUSPENDED, nc->display.c_str());
@@ -145,8 +147,6 @@ class CommandNSAccess : public Command
 			return this->DoList(source, nc, mask);
 		else
 			this->OnSyntaxError(source, "");
-
-		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
@@ -171,7 +171,7 @@ class CommandNSAccess : public Command
 					"        Reverses the previous command.\n"
 					" \n"
 					"    \002ACCESS LIST\002\n"
-					"        Displays the current access list."), Config->NickServ.c_str(), Config->NickServ.c_str());
+					"        Displays the current access list."), source.service->nick.c_str(), source.service->nick.c_str());
 		return true;
 	}
 };
@@ -184,7 +184,14 @@ class NSAccess : public Module
 	NSAccess(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandnsaccess(this)
 	{
+		Implementation i[] = { I_OnNickRegister };
+		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
+	}
 
+	void OnNickRegister(User *u, NickAlias *na) anope_override
+	{
+		if (u && Config->GetModule(this)->Get<bool>("addaccessonreg"))
+			na->nc->AddAccess(u->Mask());
 	}
 };
 

@@ -25,10 +25,10 @@ class CommandOSReload : public Command
 	{
 		try
 		{
-			ServerConfig *new_config = new ServerConfig();
+			Configuration::Conf *new_config = new Configuration::Conf();
 			delete Config;
 			Config = new_config;
-			source.Reply(_("Services' configuration file has been reloaded."));
+			source.Reply(_("Services' configuration has been reloaded."));
 		}
 		catch (const ConfigException &ex)
 		{

@@ -21,7 +21,6 @@
 #include "servers.h"
 #include "uplink.h"
 #include "protocol.h"
-#include "global.h"
 
 #ifndef _WIN32
 #include <sys/time.h>
@@ -149,8 +148,8 @@ Log::~Log()
 	
 	if (Config)
 		for (unsigned i = 0; i < Config->LogInfos.size(); ++i)
-			if (Config->LogInfos[i]->HasType(this->type, this->category))
-				Config->LogInfos[i]->ProcessMessage(this);
+			if (Config->LogInfos[i].HasType(this->type, this->category))
+				Config->LogInfos[i].ProcessMessage(this);
 
 	FOREACH_MOD(I_OnLog, OnLog(this));
 }

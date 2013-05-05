@@ -31,12 +31,13 @@ static std::vector<ChannelModeStatus *> ChannelModesByStatus;
 /* Number of generic modes we support */
 unsigned ModeManager::GenericChannelModes = 0, ModeManager::GenericUserModes = 0;
 
-/* Default channel mode lock */
-std::list<std::pair<Anope::string, Anope::string> > ModeManager::ModeLockOn;
-std::list<Anope::string> ModeManager::ModeLockOff;
+ChannelStatus::ChannelStatus()
+{
+}
 
-/* Default modes bots have on channels */
-ChannelStatus ModeManager::DefaultBotModes;
+ChannelStatus::ChannelStatus(const Anope::string &m) : modes(m)
+{
+}
 
 void ChannelStatus::AddMode(char c)
 {
@@ -75,7 +76,7 @@ Anope::string ChannelStatus::BuildModePrefixList() const
 
 	for (size_t i = 0; i < modes.length(); ++i)
 	{
-		ChannelMode *cm = ModeManager::FindChannelModeByName(modes[i]);
+		ChannelMode *cm = ModeManager::FindChannelModeByChar(modes[i]);
 		if (cm != NULL && cm->type == MODE_STATUS)
 		{
 			ChannelModeStatus *cms = anope_dynamic_static_cast<ChannelModeStatus *>(cm);
@@ -117,9 +118,9 @@ ChannelMode::~ChannelMode()
 
 bool ChannelMode::CanSet(User *u) const
 {
-	if (Config->NoMLock.find(this->mchar) != Anope::string::npos || Config->CSRequire.find(this->mchar) != Anope::string::npos)
-		return false;
-	return true;
+	EventReturn MOD_RESULT;
+	FOREACH_RESULT(I_OnCanSet, OnCanSet(u, this));
+	return MOD_RESULT == EVENT_ALLOW;
 }
 
 ChannelModeList::ChannelModeList(const Anope::string &cm, char mch) : ChannelMode(cm, mch)
@@ -357,9 +358,6 @@ bool ModeManager::AddChannelMode(ChannelMode *cm)
 	}
 
 	ChannelModesByName[cm->name] = cm;
-
-	/* Apply this mode to the new default mlock if its used */
-	UpdateDefaultMLock(Config);
 
 	FOREACH_MOD(I_OnChannelModeAdd, OnChannelModeAdd(cm));
 
@@ -619,66 +617,6 @@ void ModeManager::StackerDel(Mode *m)
 				++it2;
 		}
 	}
-}
-
-void ModeManager::UpdateDefaultMLock(ServerConfig *config)
-{
-	ModeLockOn.clear();
-	ModeLockOff.clear();
-
-	Anope::string modes;
-	spacesepstream sep(config->MLock);
-	sep.GetToken(modes);
-
-	int adding = -1;
-	for (unsigned i = 0, end_mode = modes.length(); i < end_mode; ++i)
-	{
-		if (modes[i] == '+')
-			adding = 1;
-		else if (modes[i] == '-')
-			adding = 0;
-		else if (adding != -1)
-		{
-			ChannelMode *cm = ModeManager::FindChannelModeByChar(modes[i]);
-
-			if (cm && cm->type != MODE_STATUS)
-			{
-				Anope::string param;
-				if (adding == 1 && cm->type != MODE_REGULAR && !sep.GetToken(param)) // MODE_LIST OR MODE_PARAM
-				{
-					Log() << "Warning: Got default mlock mode " << cm->mchar << " with no param?";
-					continue;
-				}
-
-				if (cm->type != MODE_LIST) // Only MODE_LIST can have duplicates
-				{
-					for (std::list<std::pair<Anope::string, Anope::string> >::iterator it = ModeLockOn.begin(), it_end = ModeLockOn.end(); it != it_end; ++it)
-						if (it->first == cm->name)
-						{
-							ModeLockOn.erase(it);
-							break;
-						}
-
-					for (std::list<Anope::string>::iterator it = ModeLockOff.begin(), it_end = ModeLockOff.end(); it != it_end; ++it)
-						if (*it == cm->name)
-						{
-							ModeLockOff.erase(it);
-							break;
-						}
-				}
-
-				if (adding)
-					ModeLockOn.push_back(std::make_pair(cm->name, param));
-				else
-					ModeLockOff.push_back(cm->name);
-			}
-		}
-	}
-
-	/* Set Bot Modes */
-	DefaultBotModes.Clear();
-	for (unsigned i = 0; i < config->BotModes.length(); ++i)
-		DefaultBotModes.AddMode(config->BotModes[i]);
 }
 
 Entry::Entry(const Anope::string &m, const Anope::string &fh) : name(m), mask(fh), cidr_len(0)

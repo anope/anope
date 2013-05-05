@@ -67,9 +67,9 @@ class CommandHSSet : public Command
 			}
 		}
 
-		if (host.length() > Config->HostLen)
+		if (host.length() > Config->GetBlock("networkinfo")->Get<unsigned>("hostlen"))
 		{
-			source.Reply(HOST_SET_TOOLONG, Config->HostLen);
+			source.Reply(HOST_SET_TOOLONG, Config->GetBlock("networkinfo")->Get<unsigned>("hostlen"));
 			return;
 		}
 
@@ -168,9 +168,9 @@ class CommandHSSetAll : public Command
 			}
 		}
 
-		if (host.length() > Config->HostLen)
+		if (host.length() > Config->GetBlock("networkinfo")->Get<unsigned>("hostlen"))
 		{
-			source.Reply(HOST_SET_TOOLONG, Config->HostLen);
+			source.Reply(HOST_SET_TOOLONG, Config->GetBlock("networkinfo")->Get<unsigned>("hostlen"));
 			return;
 		}
 

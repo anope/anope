@@ -13,6 +13,11 @@
 
 #include "module.h"
 
+namespace
+{
+	ServiceReference<MemoServService> memoserv("MemoServService", "MemoServ");
+}
+
 class CommandMSSet : public Command
 {
  private:
@@ -25,19 +30,19 @@ class CommandMSSet : public Command
 		{
 			nc->ExtendMetadata("MEMO_SIGNON");
 			nc->ExtendMetadata("MEMO_RECEIVE");
-			source.Reply(_("%s will now notify you of memos when you log on and when they are sent to you."), Config->MemoServ.c_str());
+			source.Reply(_("%s will now notify you of memos when you log on and when they are sent to you."), MemoServ->nick.c_str());
 		}
 		else if (param.equals_ci("LOGON"))
 		{
 			nc->ExtendMetadata("MEMO_SIGNON");
 			nc->Shrink("MEMO_RECEIVE");
-			source.Reply(_("%s will now notify you of memos when you log on or unset /AWAY."), Config->MemoServ.c_str());
+			source.Reply(_("%s will now notify you of memos when you log on or unset /AWAY."), MemoServ->nick.c_str());
 		}
 		else if (param.equals_ci("NEW"))
 		{
 			nc->Shrink("MEMO_SIGNON");
 			nc->ExtendMetadata("MEMO_RECEIVE");
-			source.Reply(_("%s will now notify you of memos when they are sent to you."), Config->MemoServ.c_str());
+			source.Reply(_("%s will now notify you of memos when they are sent to you."), MemoServ->nick.c_str());
 		}
 		else if (param.equals_ci("MAIL"))
 		{
@@ -59,7 +64,7 @@ class CommandMSSet : public Command
 			nc->Shrink("MEMO_SIGNON");
 			nc->Shrink("MEMO_RECEIVE");
 			nc->Shrink("MEMO_MAIL");
-			source.Reply(_("%s will not send you any notification of memos."), Config->MemoServ.c_str());
+			source.Reply(_("%s will not send you any notification of memos."), MemoServ->nick.c_str());
 		}
 		else
 			this->OnSyntaxError(source, "");
@@ -158,6 +163,7 @@ class CommandMSSet : public Command
 				source.Reply(_("You are not permitted to change your memo limit."));
 				return;
 			}
+			int max_memos = Config->GetModule("memoserv")->Get<int>("maxmemos");
 			limit = -1;
 			try
 			{
@@ -166,12 +172,12 @@ class CommandMSSet : public Command
 			catch (const ConvertException &) { }
 			/* The first character is a digit, but we could still go negative
 			 * from overflow... watch out! */
-			if (limit < 0 || (Config->MSMaxMemos > 0 && static_cast<unsigned>(limit) > Config->MSMaxMemos))
+			if (limit < 0 || (max_memos > 0 && limit > max_memos))
 			{
 				if (!chan.empty())
-					source.Reply(_("You cannot set the memo limit for %s higher than %d."), chan.c_str(), Config->MSMaxMemos);
+					source.Reply(_("You cannot set the memo limit for %s higher than %d."), chan.c_str(), max_memos);
 				else
-					source.Reply(_("You cannot set your memo limit higher than %d."), Config->MSMaxMemos);
+					source.Reply(_("You cannot set your memo limit higher than %d."), max_memos);
 				return;
 			}
 		}
@@ -239,7 +245,7 @@ class CommandMSSet : public Command
 					"                   receive\n"
 					" \n"
 					"Type \002%s%s HELP %s \037option\037\002 for more information\n"
-					"on a specific option."), Config->UseStrictPrivMsgString.c_str(), source.service->nick.c_str(), source.command.c_str());
+					"on a specific option."), Config->StrictPrivmsg.c_str(), source.service->nick.c_str(), source.command.c_str());
 		}
 		else if (subcommand.equals_ci("NOTIFY"))
 			source.Reply(_("Syntax: \002NOTIFY {ON | LOGON | NEW | MAIL | NOMAIL | OFF}\002\n"
@@ -260,6 +266,7 @@ class CommandMSSet : public Command
 					"\002ON\002 is essentially \002LOGON\002 and \002NEW\002 combined."));
 		else if (subcommand.equals_ci("LIMIT"))
 		{
+			int max_memos = Config->GetModule("memoserv")->Get<int>("maxmemos");
 			if (source.IsServicesOper())
 				source.Reply(_("Syntax: \002LIMIT [\037user\037 | \037channel\037] {\037limit\037 | NONE} [HARD]\002\n"
 						" \n"
@@ -278,14 +285,14 @@ class CommandMSSet : public Command
 						"\002Admins\002.  Other users may only enter a limit for themselves\n"
 						"or a channel on which they have such privileges, may not\n"
 						"remove their limit, may not set a limit above %d, and may\n"
-						"not set a hard limit."), Config->MSMaxMemos);
+						"not set a hard limit."), max_memos);
 			else
 				source.Reply(_("Syntax: \002LIMIT [\037channel\037] \037limit\037\002\n"
 									" \n"
 									"Sets the maximum number of memos you (or the given channel)\n"
 									"are allowed to have. If you set this to 0, no one will be\n"
 									"able to send any memos to you.  However, you cannot set\n"
-									"this any higher than %d."), Config->MSMaxMemos);
+									"this any higher than %d."), max_memos);
 		}
 		else
 			return false;

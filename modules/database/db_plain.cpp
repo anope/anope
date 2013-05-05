@@ -136,7 +136,7 @@ EventReturn OnDatabaseReadMetadata(ChannelInfo *ci, const Anope::string &key, co
 	try
 	{
 		if (key.equals_ci("BANTYPE"))
-			ci->bantype = params[0].is_pos_number_only() ? convertTo<int16_t>(params[0]) : Config->CSDefBantype;
+			ci->bantype = params[0].is_pos_number_only() ? convertTo<int16_t>(params[0]) : 2;
 		else if (key.equals_ci("MEMOMAX"))
 			ci->memos.memomax = params[0].is_pos_number_only() ? convertTo<int16_t>(params[0]) : -1;
 		else if (key.equals_ci("FOUNDER"))
@@ -618,7 +618,7 @@ class DBPlain : public Module
 			{
 				Log() << "Unable to back up database!";
 
-				if (!Config->NoBackupOkay)
+				if (!Config->GetModule(this)->Get<bool>("nobackupok"))
 					Anope::Quitting = true;
 
 				return;
@@ -626,7 +626,7 @@ class DBPlain : public Module
 
 			Backups.push_back(newname);
 
-			unsigned KeepBackups = Config->KeepBackups;
+			unsigned KeepBackups = Config->GetModule(this)->Get<unsigned>("keepbackups");
 			if (KeepBackups && Backups.size() > KeepBackups)
 			{
 				unlink(Backups.front().c_str());
@@ -635,10 +635,12 @@ class DBPlain : public Module
 		}
 	}
 
-	void OnReload(ServerConfig *conf, ConfigReader &reader) anope_override
+	void OnReload(Configuration::Conf *conf) anope_override
 	{
-		DatabaseFile = Anope::DataDir + "/" + reader.ReadValue("db_plain", "database", "anope.db", 0);
-		BackupFile = Anope::DataDir + "/backups/" + reader.ReadValue("db_plain", "database", "anope.db", 0);
+		DatabaseFile = Anope::DataDir + "/" + conf->GetModule(this)->Get<const Anope::string &>("database");
+		if (DatabaseFile.empty())
+			DatabaseFile = "anope.db";
+		BackupFile = Anope::DataDir + "/backups/" + DatabaseFile;
 	}
 
 	EventReturn OnLoadDatabase() anope_override

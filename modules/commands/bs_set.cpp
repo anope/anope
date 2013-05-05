@@ -48,7 +48,7 @@ class CommandBSSet : public Command
 			}
 		}
 		source.Reply(_("Type \002%s%s HELP %s \037option\037\002 for more information on a\n"
-				"particular option."), Config->UseStrictPrivMsgString.c_str(), source.service->nick.c_str(), this_name.c_str());
+				"particular option."), Config->StrictPrivmsg.c_str(), source.service->nick.c_str(), this_name.c_str());
 
 		return true;
 	}
@@ -309,13 +309,13 @@ class CommandBSSetFantasy : public Command
 		source.Reply(_(" \n"
 				"Enables or disables \002fantasy\002 mode on a channel.\n"
 				"When it is enabled, users will be able to use\n"
-				"%s commands on a channel when prefixed\n"
+				"fantasy commands on a channel when prefixed\n"
 				"with one of the following fantasy characters: \002%s\002\n"
 				" \n"
 				"Note that users wanting to use fantaisist\n"
 				"commands MUST have enough access for both\n"
 				"the FANTASIA and the command they are executing."),
-				Config->ChanServ.c_str(), Config->BSFantasyCharacter.c_str());
+				Config->GetModule("botserv")->Get<const char *>("fantasycharacter", "!"));
 		return true;
 	}
 };
@@ -495,7 +495,6 @@ class BSSet : public Module
 		commandbsset(this), commandbssetbanexpire(this), commandbssetdontkickops(this), commandbssetdontkickvoices(this),
 		commandbssetfantasy(this), commandbssetgreet(this), commandbssetnobot(this), commandbssetprivate(this)
 	{
-
 		ModuleManager::Attach(I_OnBotBan, this);
 	}
 

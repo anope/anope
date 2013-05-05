@@ -1,5 +1,5 @@
 #include "module.h"
-#include "../extra/sql.h"
+#include "sql.h"
 
 class MySQLInterface : public SQL::Interface
 {
@@ -338,7 +338,7 @@ class MChanstats : public Module
 	{
 
 		Implementation i[] = {	I_OnPrivmsg,
-					I_OnUserKicked,
+					I_OnPreUserKicked,
 					I_OnChannelModeSet,
 					I_OnChannelModeUnset,
 					I_OnTopicUpdated,
@@ -349,14 +349,15 @@ class MChanstats : public Module
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 	}
 
-	void OnReload(ServerConfig *conf, ConfigReader &reader) anope_override
+	void OnReload(Configuration::Conf *conf) anope_override
 	{
-		prefix = reader.ReadValue("chanstats", "prefix", "anope_", 0);
-		SmileysHappy = reader.ReadValue("chanstats", "SmileysHappy", ":) :-) ;) :D :-D", 0);
-		SmileysSad = reader.ReadValue("chanstats", "SmileysSad", ":( :-( ;( ;-(", 0);
-		SmileysOther = reader.ReadValue("chanstats", "SmileysOther", ":/", 0);
+		Configuration::Block *block = conf->GetModule(this);
+		prefix = block->Get<const Anope::string &>("prefix", "anope_");
+		SmileysHappy = block->Get<const Anope::string &>("SmileysHappy");
+		SmileysSad = block->Get<const Anope::string &>("SmileysSad");
+		SmileysOther = block->Get<const Anope::string &>("SmileysOther");
 
-		Anope::string engine = reader.ReadValue("chanstats", "engine", "", 0);
+		Anope::string engine = block->Get<const Anope::string &>("engine");
 		this->sql = ServiceReference<SQL::Provider>("SQL::Provider", engine);
 		if (sql)
 			this->CheckTables();
@@ -399,24 +400,24 @@ class MChanstats : public Module
 		this->RunQuery(query);
 	}
  public:
-	void OnUserKicked(Channel *c, User *target, MessageSource &source, const Anope::string &kickmsg) anope_override
+	void OnPreUserKicked(MessageSource &source, ChanUserContainer *cu, const Anope::string &kickmsg) anope_override
 	{
-		if (!c->ci || !c->ci->HasExt("STATS"))
+		if (!cu->chan->ci || !cu->chan->ci->HasExt("STATS"))
 			return;
 
 		query = "CALL " + prefix + "chanstats_proc_update(@channel@, @nick@, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0);";
-		query.SetValue("channel", c->name);
-		query.SetValue("nick", GetDisplay(target));
+		query.SetValue("channel", cu->chan->name);
+		query.SetValue("nick", GetDisplay(cu->user));
 		this->RunQuery(query);
 
 		query = "CALL " + prefix + "chanstats_proc_update(@channel@, @nick@, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0);";
-		query.SetValue("channel", c->name);
+		query.SetValue("channel", cu->chan->name);
 		query.SetValue("nick", GetDisplay(source.GetUser()));
 		this->RunQuery(query);
 	}
 	void OnPrivmsg(User *u, Channel *c, Anope::string &msg) anope_override
 	{
-		if (!c->ci || !c->ci->HasExt("STATS") || (msg[0] == Config->BSFantasyCharacter[0]))
+		if (!c->ci || !c->ci->HasExt("STATS"))
 			return;
 
 		size_t letters = msg.length();

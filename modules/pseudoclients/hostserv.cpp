@@ -22,17 +22,27 @@ class HostServCore : public Module
 		if (!IRCD || !IRCD->CanSetVHost)
 			throw ModuleException("Your IRCd does not support vhosts");
 	
-		HostServ = BotInfo::Find(Config->HostServ);
-		if (!HostServ)
-			throw ModuleException("No bot named " + Config->HostServ);
-
-		Implementation i[] = { I_OnBotDelete, I_OnNickIdentify, I_OnNickUpdate, I_OnPreHelp };
+		Implementation i[] = { I_OnReload, I_OnBotDelete, I_OnNickIdentify, I_OnNickUpdate, I_OnPreHelp };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 	}
 
 	~HostServCore()
 	{
 		HostServ = NULL;
+	}
+
+	void OnReload(Configuration::Conf *conf) anope_override
+	{
+		const Anope::string &hsnick = conf->GetModule(this)->Get<const Anope::string &>("client");
+
+		if (hsnick.empty())
+			throw ConfigException(this->name + ": <client> must be defined");
+
+		BotInfo *bi = BotInfo::Find(hsnick, true);
+		if (!bi)
+			throw ConfigException(this->name + ": no bot named " + hsnick);
+
+		HostServ = bi;
 	}
 
 	void OnBotDelete(BotInfo *bi) anope_override
@@ -76,9 +86,9 @@ class HostServCore : public Module
 
 	EventReturn OnPreHelp(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		if (!params.empty() || source.c || source.service->nick != Config->HostServ)
+		if (!params.empty() || source.c || source.service != HostServ)
 			return EVENT_CONTINUE;
-		source.Reply(_("%s commands:"), Config->HostServ.c_str());
+		source.Reply(_("%s commands:"), HostServ->nick.c_str());
 		return EVENT_CONTINUE;
 	}
 };

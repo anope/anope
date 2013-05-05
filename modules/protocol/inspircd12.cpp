@@ -211,7 +211,7 @@ class InspIRCd12Proto : public IRCDProto
 	/* SERVER services-dev.chatspike.net password 0 :Description here */
 	void SendServer(const Server *server) anope_override
 	{
-		UplinkSocket::Message() << "SERVER " << server->GetName() << " " << Config->Uplinks[Anope::CurrentUplink]->password << " " << server->GetHops() << " " << server->GetSID() << " :" << server->GetDescription();
+		UplinkSocket::Message() << "SERVER " << server->GetName() << " " << Config->Uplinks[Anope::CurrentUplink].password << " " << server->GetHops() << " " << server->GetSID() << " :" << server->GetDescription();
 	}
 
 	/* JOIN */
@@ -270,13 +270,13 @@ class InspIRCd12Proto : public IRCDProto
 		SendServer(Me);
 		UplinkSocket::Message(Me) << "BURST";
 		Module *enc = ModuleManager::FindFirstOf(ENCRYPTION);
-		UplinkSocket::Message(Me) << "VERSION :Anope-" << Anope::Version() << " " << Config->ServerName << " :" << IRCD->GetProtocolName() << " - (" << (enc ? enc->name : "none") << ") -- " << Anope::VersionBuildString();
+		UplinkSocket::Message(Me) << "VERSION :Anope-" << Anope::Version() << " " << Me->GetName() << " :" << IRCD->GetProtocolName() << " - (" << (enc ? enc->name : "none") << ") -- " << Anope::VersionBuildString();
 	}
 
 	/* SVSHOLD - set */
-	void SendSVSHold(const Anope::string &nick) anope_override
+	void SendSVSHold(const Anope::string &nick, time_t t) anope_override
 	{
-		UplinkSocket::Message(NickServ) << "SVSHOLD " << nick << " " << Config->NSReleaseTimeout << " :Being held for registered user";
+		UplinkSocket::Message(NickServ) << "SVSHOLD " << nick << " " << t << " :Being held for registered user";
 	}
 
 	/* SVSHOLD - release */
@@ -929,7 +929,7 @@ struct IRCDMessageMetadata : IRCDMessage
 					u->Login(nc);
 
 					const NickAlias *user_na = NickAlias::Find(u->nick);
-					if (!Config->NoNicknameOwnership && user_na && user_na->nc == nc && user_na->nc->HasExt("UNCONFIRMED") == false)
+					if (!Config->GetBlock("options")->Get<bool>("nonicknameownership") && user_na && user_na->nc == nc && user_na->nc->HasExt("UNCONFIRMED") == false)
 						u->SetMode(NickServ, "REGISTERED");
 
 					/* Sometimes a user connects, we send them the usual "this nickname is registered" mess (if
@@ -1221,12 +1221,8 @@ class ProtoInspIRCd : public Module
 
 		Servers::Capab.insert("NOQUIT");
 
-		if (Config->Numeric.empty())
-		{
-			Anope::string numeric = Servers::TS6_SID_Retrieve();
-			Me->SetSID(numeric);
-			Config->Numeric = numeric;
-		}
+		if (Me->GetSID() == Me->GetName())
+			Me->SetSID(Servers::TS6_SID_Retrieve());
 
 		for (botinfo_map::iterator it = BotListByNick->begin(), it_end = BotListByNick->end(); it != it_end; ++it)
 			it->second->GenerateUID();

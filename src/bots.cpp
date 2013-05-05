@@ -23,7 +23,7 @@ Serialize::Checker<botinfo_map> BotListByNick("BotInfo"), BotListByUID("BotInfo"
 
 BotInfo *BotServ = NULL, *ChanServ = NULL, *Global = NULL, *HostServ = NULL, *MemoServ = NULL, *NickServ = NULL, *OperServ = NULL;
 
-BotInfo::BotInfo(const Anope::string &nnick, const Anope::string &nuser, const Anope::string &nhost, const Anope::string &nreal, const Anope::string &bmodes) : User(nnick, nuser, nhost, "", "", Me, nreal, Anope::CurTime, "", Servers::TS6_UID_Retrieve()), Serializable("BotInfo"), botmodes(bmodes)
+BotInfo::BotInfo(const Anope::string &nnick, const Anope::string &nuser, const Anope::string &nhost, const Anope::string &nreal, const Anope::string &bmodes) : User(nnick, nuser, nhost, "", "", Me, nreal, Anope::CurTime, "", Servers::TS6_UID_Retrieve()), Serializable("BotInfo"), channels("ChannelInfo"), botmodes(bmodes)
 {
 	this->lastmsg = this->created = Anope::CurTime;
 	this->introduced = false;
@@ -58,15 +58,10 @@ BotInfo::~BotInfo()
 		IRCD->SendSQLineDel(&x);
 	}
 
-	for (registered_channel_map::const_iterator it = RegisteredChannelList->begin(), it_end = RegisteredChannelList->end(); it != it_end; ++it)
+	for (std::set<ChannelInfo *>::iterator it = this->channels->begin(), it_end = this->channels->end(); it != it_end; ++it)
 	{
-		ChannelInfo *ci = it->second;
-
-		if (ci->bi == this)
-		{
-			ci->QueueUpdate();
-			ci->bi = NULL;
-		}
+		ChannelInfo *ci = *it;
+		this->UnAssign(NULL, ci);
 	}
 
 	BotListByNick->erase(this->nick);
@@ -129,21 +124,15 @@ void BotInfo::SetNewNick(const Anope::string &newnick)
 	(*BotListByNick)[this->nick] = this;
 }
 
-void BotInfo::RejoinAll()
+const std::set<ChannelInfo *> &BotInfo::GetChannels() const
 {
-	for (registered_channel_map::const_iterator it = RegisteredChannelList->begin(), it_end = RegisteredChannelList->end(); it != it_end; ++it)
-	{
-		const ChannelInfo *ci = it->second;
-
-		if (ci->bi == this && ci->c && ci->c->users.size() >= Config->BSMinUsers)
-			this->Join(ci->c);
-	}
+	return this->channels;
 }
 
 void BotInfo::Assign(User *u, ChannelInfo *ci)
 {
 	EventReturn MOD_RESULT = EVENT_CONTINUE;
-	FOREACH_RESULT(I_OnBotAssign, OnBotAssign(u, ci, this));
+	FOREACH_RESULT(I_OnPreBotAssign, OnPreBotAssign(u, ci, this));
 	if (MOD_RESULT == EVENT_STOP)
 		return;
 
@@ -151,8 +140,10 @@ void BotInfo::Assign(User *u, ChannelInfo *ci)
 		ci->bi->UnAssign(u, ci);
 	
 	ci->bi = this;
-	if (Me->IsSynced() && ci->c && ci->c->users.size() >= Config->BSMinUsers)
-		this->Join(ci->c, &ModeManager::DefaultBotModes);
+	this->channels->insert(ci);
+
+	ChannelStatus status;
+	FOREACH_MOD(I_OnBotAssign, OnBotAssign(u, ci, this));
 }
 
 void BotInfo::UnAssign(User *u, ChannelInfo *ci)
@@ -171,19 +162,12 @@ void BotInfo::UnAssign(User *u, ChannelInfo *ci)
 	}
 
 	ci->bi = NULL;
+	this->channels->erase(ci);
 }
 
 unsigned BotInfo::GetChannelCount() const
 {
-	unsigned count = 0;
-	for (registered_channel_map::const_iterator it = RegisteredChannelList->begin(), it_end = RegisteredChannelList->end(); it != it_end; ++it)
-	{
-		const ChannelInfo *ci = it->second;
-
-		if (ci->bi == this)
-			++count;
-	}
-	return count;
+	return this->channels->size();
 }
 
 void BotInfo::Join(Channel *c, ChannelStatus *status)
@@ -191,35 +175,9 @@ void BotInfo::Join(Channel *c, ChannelStatus *status)
 	if (c->FindUser(this) != NULL)
 		return;
 
-	if (Config && IRCD && Config->BSSmartJoin)
-	{
-		std::pair<Channel::ModeList::iterator, Channel::ModeList::iterator> bans = c->GetModeList("BAN");
-
-		/* We check for bans */
-		for (; bans.first != bans.second; ++bans.first)
-		{
-			Entry ban("BAN", bans.first->second);
-			if (ban.Matches(this))
-				c->RemoveMode(NULL, "BAN", ban.GetMask());
-		}
-
-		Anope::string Limit;
-		unsigned limit = 0;
-		if (c->GetParam("LIMIT", Limit) && Limit.is_pos_number_only())
-			limit = convertTo<unsigned>(Limit);
-
-		/* Should we be invited? */
-		if (c->HasMode("INVITE") || (limit && c->users.size() >= limit))
-			IRCD->SendNotice(this, "@" + c->name, "%s invited %s into the channel.", this->nick.c_str(), this->nick.c_str());
-
-		ModeManager::ProcessModes();
-	}
-
 	c->JoinUser(this);
 	if (IRCD)
 		IRCD->SendJoin(this, c, status);
-
-	FOREACH_MOD(I_OnBotJoin, OnBotJoin(c, this));
 }
 
 void BotInfo::Join(const Anope::string &chname, ChannelStatus *status)

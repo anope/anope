@@ -68,6 +68,7 @@ class CommandCSList : public Command
 		}
 
 		Anope::string spattern = "#" + pattern;
+		unsigned listmax = Config->GetModule(this->owner)->Get<unsigned>("listmax");
 
 		source.Reply(_("List of entries matching \002%s\002:"), pattern.c_str());
 
@@ -91,7 +92,7 @@ class CommandCSList : public Command
 
 			if (pattern.equals_ci(ci->name) || ci->name.equals_ci(spattern) || Anope::Match(ci->name, pattern, false, true) || Anope::Match(ci->name, spattern, false, true))
 			{
-				if (((count + 1 >= from && count + 1 <= to) || (!from && !to)) && ++nchans <= Config->CSListMax)
+				if (((count + 1 >= from && count + 1 <= to) || (!from && !to)) && ++nchans <= listmax)
 				{
 					bool isnoexpire = false;
 					if (is_servadmin && (ci->HasExt("NO_EXPIRE")))
@@ -115,7 +116,7 @@ class CommandCSList : public Command
 		for (unsigned i = 0; i < replies.size(); ++i)
 			source.Reply(replies[i]);
 
-		source.Reply(_("End of list - %d/%d matches shown."), nchans > Config->CSListMax ? Config->CSListMax : nchans, nchans);
+		source.Reply(_("End of list - %d/%d matches shown."), nchans > listmax ? listmax : nchans, nchans);
 		return;
 	}
 
@@ -150,11 +151,11 @@ class CommandCSList : public Command
 				"    \002LIST #51-100\002\n"
 				"        Lists all registered channels within the given range (51-100)."));
 
-		if (!Config->RegexEngine.empty())
+		if (!Config->GetBlock("options")->Get<const Anope::string &>("regexengine").empty())
 		{
 			source.Reply(" ");
 			source.Reply(_("Regex matches are also supported using the %s engine.\n"
-					"Enclose your pattern in // if this is desired."), Config->RegexEngine.c_str());
+					"Enclose your pattern in // if this is desired."), Config->GetBlock("options")->Get<const char *>("regexengine"));
 		}
 
 		return true;
@@ -168,7 +169,6 @@ class CSList : public Module
  public:
 	CSList(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR), commandcslist(this)
 	{
-
 	}
 };
 

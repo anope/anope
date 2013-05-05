@@ -11,34 +11,27 @@
 
 class BSAutoAssign : public Module
 {
-	Anope::string bot;
-
  public:
 	BSAutoAssign(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
 	{
-
-		Implementation i[] = { I_OnChanRegistered, I_OnReload };
+		Implementation i[] = { I_OnChanRegistered };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 	}
 
 	void OnChanRegistered(ChannelInfo *ci) anope_override
 	{
-		if (this->bot.empty())
+		const Anope::string &bot = Config->GetModule(this)->Get<const Anope::string &>("bot");
+		if (bot.empty())
 			return;
 
-		BotInfo *bi = BotInfo::Find(this->bot);
+		BotInfo *bi = BotInfo::Find(bot);
 		if (bi == NULL)
 		{
-			Log(this) << "bs_autoassign is configured to assign bot " << this->bot << ", but it does not exist?";
+			Log(this) << "bs_autoassign is configured to assign bot " << bot << ", but it does not exist?";
 			return;
 		}
 
 		bi->Assign(NULL, ci);
-	}
-
-	void OnReload(ServerConfig *conf, ConfigReader &reader) anope_override
-	{
-		this->bot = reader.ReadValue("bs_autoassign", "bot", "", 0);
 	}
 };
 

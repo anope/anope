@@ -127,21 +127,12 @@ Server::~Server()
 
 	if (Servers::Capab.count("NOQUIT") > 0 || Servers::Capab.count("QS") > 0)
 	{
-		for (user_map::const_iterator it = UserListByNick.begin(); it != UserListByNick.end();)
+		for (user_map::const_iterator it = UserListByNick.begin(); it != UserListByNick.end(); ++it)
 		{
 			User *u = it->second;
-			++it;
 
 			if (u->server == this)
 			{
-				NickAlias *na = NickAlias::Find(u->nick);
-				if (na && !na->nc->HasExt("SUSPENDED") && (u->IsRecognized() || u->IsIdentified()))
-				{
-					na->last_seen = Anope::CurTime;
-					if (!Config->NSHideNetSplitQuit)
-						na->last_quit = this->quit_reason;
-				}
-
 				u->Quit(this->quit_reason);
 				u->server = NULL;
 			}
@@ -199,6 +190,11 @@ const Anope::string &Server::GetSID() const
 		return this->sid;
 	else
 		return this->name;
+}
+
+const Anope::string &Server::GetQuitReason() const
+{
+	return this->quit_reason;
 }
 
 const std::vector<Server *> &Server::GetLinks() const
@@ -313,8 +309,8 @@ bool Server::IsULined() const
 	if (this == Me)
 		return true;
 
-	for (std::list<Anope::string>::const_iterator it = Config->Ulines.begin(), it_end = Config->Ulines.end(); it != it_end; ++it)
-		if (it->equals_ci(this->GetName()))
+	for (unsigned i = 0; i < Config->Ulines.size(); ++i)
+		if (Config->Ulines[i].equals_ci(this->GetName()))
 			return true;
 	return false;
 }
@@ -326,7 +322,7 @@ bool Server::IsJuped() const
 
 void Server::Notice(const BotInfo *source, const Anope::string &message)
 {
-	if (Config->NSDefFlags.count("MSG"))
+	if (Config->UsePrivmsg && Config->DefPrivmsg)
 		IRCD->SendGlobalPrivmsg(source, this, message);
 	else
 		IRCD->SendGlobalNotice(source, this, message);
@@ -370,13 +366,13 @@ const Anope::string Servers::TS6_UID_Retrieve()
 
 	static Anope::string current_uid = "AAAAAA";
 
-	while (User::Find(Config->Numeric + current_uid) != NULL)
+	while (User::Find(Me->GetSID() + current_uid) != NULL)
 	{
 		int current_len = current_uid.length() - 1;
 		while (current_len >= 0 && nextID(current_uid[current_len--]) == 'A');
 	}
 
-	return Config->Numeric + current_uid;
+	return Me->GetSID() + current_uid;
 }
 
 const Anope::string Servers::TS6_SID_Retrieve()
@@ -384,13 +380,9 @@ const Anope::string Servers::TS6_SID_Retrieve()
 	if (!IRCD || !IRCD->RequiresID)
 		return "";
 
-	static Anope::string current_sid;
+	static Anope::string current_sid = Config->GetBlock("options")->Get<const Anope::string &>("id");
 	if (current_sid.empty())
-	{
-		current_sid = Config->Numeric;
-		if (current_sid.empty())
-			current_sid = "00A";
-	}
+		current_sid = "00A";
 
 	while (Server::Find(current_sid) != NULL)
 	{

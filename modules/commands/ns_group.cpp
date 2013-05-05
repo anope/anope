@@ -13,6 +13,8 @@
 
 #include "module.h"
 
+static ServiceReference<NickServService> nickserv("NickServService", "NickServ");
+
 class NSGroupRequest : public IdentifyRequest
 {
 	CommandSource source;
@@ -46,7 +48,7 @@ class NSGroupRequest : public IdentifyRequest
 
 		u->Login(target->nc);
 		IRCD->SendLogin(u);
-		if (!Config->NoNicknameOwnership && na->nc == u->Account() && na->nc->HasExt("UNCONFIRMED") == false)
+		if (!Config->GetBlock("options")->Get<bool>("nonicknameownership") && na->nc == u->Account() && na->nc->HasExt("UNCONFIRMED") == false)
 			u->SetMode(NickServ, "REGISTERED");
 		FOREACH_MOD(I_OnNickGroup, OnNickGroup(u, target));
 
@@ -102,7 +104,7 @@ class CommandNSGroup : public Command
 			return;
 		}
 
-		if (Config->RestrictOperNicks)
+		if (Config->GetBlock("nickserv")->Get<bool>("restrictopernicks"))
 			for (unsigned i = 0; i < Config->Opers.size(); ++i)
 			{
 				Oper *o = Config->Opers[i];
@@ -115,10 +117,12 @@ class CommandNSGroup : public Command
 			}
 
 		NickAlias *target, *na = NickAlias::Find(u->nick);
+		const Anope::string &guestnick = Config->GetBlock("options")->Get<const Anope::string &>("guestnickprefix");
+		time_t reg_delay = Config->GetModule("nickserv")->Get<time_t>("regdelay");
 		if (!(target = NickAlias::Find(nick)))
 			source.Reply(NICK_X_NOT_REGISTERED, nick.c_str());
-		else if (Anope::CurTime < u->lastnickreg + Config->NSRegDelay)
-			source.Reply(_("Please wait %d seconds before using the GROUP command again."), (Config->NSRegDelay + u->lastnickreg) - Anope::CurTime);
+		else if (Anope::CurTime < u->lastnickreg + reg_delay)
+			source.Reply(_("Please wait %d seconds before using the GROUP command again."), (reg_delay + u->lastnickreg) - Anope::CurTime);
 		else if (target->nc->HasExt("SUSPENDED"))
 		{
 			Log(LOG_COMMAND, source, this) << "tried to use GROUP for SUSPENDED nick " << target->nick;
@@ -127,14 +131,14 @@ class CommandNSGroup : public Command
 		else if (na && *target->nc == *na->nc)
 			source.Reply(_("You are already a member of the group of \002%s\002."), target->nick.c_str());
 		else if (na && na->nc != u->Account())
-			source.Reply(NICK_IDENTIFY_REQUIRED, Config->UseStrictPrivMsgString.c_str(), Config->NickServ.c_str());
-		else if (na && Config->NSNoGroupChange)
+			source.Reply(NICK_IDENTIFY_REQUIRED, Config->StrictPrivmsg.c_str(), NickServ->nick.c_str());
+		else if (na && Config->GetModule(this->owner)->Get<bool>("nogroupchange"))
 			source.Reply(_("Your nick is already registered."));
-		else if (Config->NSMaxAliases && (target->nc->aliases->size() >= Config->NSMaxAliases) && !target->nc->IsServicesOper())
-			source.Reply(_("There are too many nicks in %s's group."));
-		else if (u->nick.length() <= Config->NSGuestNickPrefix.length() + 7 &&
-			u->nick.length() >= Config->NSGuestNickPrefix.length() + 1 &&
-			!u->nick.find_ci(Config->NSGuestNickPrefix) && !u->nick.substr(Config->NSGuestNickPrefix.length()).find_first_not_of("1234567890"))
+		else if (target->nc->aliases->size() >= Config->GetModule(this->owner)->Get<unsigned>("maxaliases") && !target->nc->IsServicesOper())
+			source.Reply(_("There are too many nicks in your group."));
+		else if (u->nick.length() <= guestnick.length() + 7 &&
+			u->nick.length() >= guestnick.length() + 1 &&
+			!u->nick.find_ci(guestnick) && !u->nick.substr(guestnick.length()).find_first_not_of("1234567890"))
 		{
 			source.Reply(NICK_CANNOT_BE_REGISTERED, u->nick.c_str());
 		}
@@ -289,7 +293,7 @@ class CommandNSGList : public Command
 			}
 			else if (na->nc != source.GetAccount() && !source.IsServicesOper())
 			{
-				source.Reply(ACCESS_DENIED, Config->NickServ.c_str());
+				source.Reply(ACCESS_DENIED);
 				return;
 			}
 
@@ -300,13 +304,14 @@ class CommandNSGList : public Command
 
 		ListFormatter list;
 		list.AddColumn("Nick").AddColumn("Expires");
+		time_t nickserv_expire = Config->GetModule("nickserv")->Get<time_t>("expire");
 		for (unsigned i = 0; i < nc->aliases->size(); ++i)
 		{
 			const NickAlias *na2 = nc->aliases->at(i);
 
 			ListFormatter::ListEntry entry;
 			entry["Nick"] = na2->nick;
-			entry["Expires"] = (na2->HasExt("NO_EXPIRE") || !Config->NSExpire) ? "Does not expire" : ("expires in " + Anope::strftime(na2->last_seen + Config->NSExpire));
+			entry["Expires"] = (na2->HasExt("NO_EXPIRE") || !nickserv_expire || Anope::NoExpire) ? "Does not expire" : ("expires in " + Anope::strftime(na2->last_seen + nickserv_expire));
 			list.AddEntry(entry);
 		}
 
@@ -351,8 +356,7 @@ class NSGroup : public Module
 	NSGroup(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandnsgroup(this), commandnsungroup(this), commandnsglist(this)
 	{
-
-		if (Config->NoNicknameOwnership)
+		if (Config->GetBlock("options")->Get<bool>("nonicknameownership"))
 			throw ModuleException(modname + " can not be used with options:nonicknameownership enabled");
 	}
 };

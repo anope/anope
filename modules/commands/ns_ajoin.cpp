@@ -133,7 +133,7 @@ class CommandNSAJoin : public Command
 			if ((*channels)->at(i)->channel.equals_ci(chan))
 				break;
 
-		if (*source.nc == nc && (*channels)->size() >= Config->AJoinMax)
+		if (*source.nc == nc && (*channels)->size() >= Config->GetModule(this->owner)->Get<unsigned>("ajoinmax"))
 			source.Reply(_("Your auto join list is full."));
 		else if (i != (*channels)->size())
 			source.Reply(_("%s is already on %s's auto join list."), chan.c_str(), nc->display.c_str());

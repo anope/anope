@@ -271,10 +271,8 @@ class CommandOSLogonNews : public NewsBase
 			"user connects to the network, these messages will be sent\n"
 			"to them.  (However, no more than \002%d\002 messages will be\n"
 			"sent in order to avoid flooding the user.  If there are\n"
-			"more news messages, only the most recent will be sent.)\n"
-			"NewsCount can be configured in services.conf.\n"
-			" \n"
-			"LOGONNEWS may only be used by Services Operators."), Config->NewsCount);
+			"more news messages, only the most recent will be sent."),
+			Config->GetModule(this->owner)->Get<unsigned>("newscount", "3"));
 		return true;
 	}
 };
@@ -300,10 +298,8 @@ class CommandOSOperNews : public NewsBase
 				"user opers up (with the /OPER command), these messages will\n"
 				"be sent to them.  (However, no more than \002%d\002 messages will\n"
 				"be sent in order to avoid flooding the user.  If there are\n"
-				"more news messages, only the most recent will be sent.)\n"
-				"NewsCount can be configured in services.conf.\n"
-				" \n"
-				"OPERNEWS may only be used by Services Operators."), Config->NewsCount);
+				"more news messages, only the most recent will be sent."),
+				Config->GetModule(this->owner)->Get<unsigned>("newscount", "3"));
 		return true;
 	}
 };
@@ -327,9 +323,7 @@ class CommandOSRandomNews : public NewsBase
 		source.Reply(" ");
 		source.Reply(_("Edits or displays the list of random news messages.  When a\n"
 				"user connects to the network, one (and only one) of the\n"
-				"random news will be randomly chosen and sent to them.\n"
-				" \n"
-				"RANDOMNEWS may only be used by Services Operators."));
+				"random news will be randomly chosen and sent to them.\n"));
 		return true;
 	}
 };
@@ -358,7 +352,7 @@ class OSNews : public Module
 			msg = _("[\002Random News\002 - %s] %s");
 
 		static unsigned cur_rand_news = 0;
-		unsigned displayed = 0;
+		unsigned displayed = 0, news_count = Config->GetModule(this)->Get<unsigned>("newscount", "3");
 		for (unsigned i = 0, end = newsList.size(); i < end; ++i)
 		{
 			if (Type == NEWS_RANDOM && i != cur_rand_news)
@@ -380,7 +374,7 @@ class OSNews : public Module
 				++cur_rand_news;
 				break;
 			}
-			else if (displayed >= Config->NewsCount)
+			else if (displayed >= news_count)
 				break;
 		}
 
@@ -393,7 +387,6 @@ class OSNews : public Module
 	OSNews(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		newsitem_type("NewsItem", NewsItem::Unserialize), newsservice(this), commandoslogonnews(this), commandosopernews(this), commandosrandomnews(this)
 	{
-
 		Implementation i[] = { I_OnUserModeSet, I_OnUserConnect };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 	}

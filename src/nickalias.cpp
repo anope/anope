@@ -139,7 +139,8 @@ class CoreExport NickServRelease : public User, public Timer
 	 * @param na The nick
 	 * @param delay The delay before the nick is released
 	 */
-	NickServRelease(NickAlias *na, time_t delay) : User(na->nick, Config->NSEnforcerUser, Config->NSEnforcerHost, "", "", Me, "Services Enforcer", Anope::CurTime, "", Servers::TS6_UID_Retrieve()), Timer(delay), nick(na->nick)
+	NickServRelease(NickAlias *na, time_t delay) : User(na->nick, Config->GetBlock("options")->Get<const Anope::string &>("enforceruser"),
+		Config->GetBlock("options")->Get<const Anope::string &>("enforcerhost"), "", "", Me, "Services Enforcer", Anope::CurTime, "", Servers::TS6_UID_Retrieve()), Timer(delay), nick(na->nick)
 	{
 		/* Erase the current release timer and use the new one */
 		std::map<Anope::string, NickServRelease *>::iterator nit = NickServReleases.find(this->nick);
@@ -176,12 +177,12 @@ void NickAlias::OnCancel(User *)
 		this->Extend("HELD");
 		this->Shrink("COLLIDED");
 
-		new NickServHeld(this, Config->NSReleaseTimeout);
+		new NickServHeld(this, Config->GetBlock("options")->Get<time_t>("releasetimeout"));
 
 		if (IRCD->CanSVSHold)
-			IRCD->SendSVSHold(this->nick);
+			IRCD->SendSVSHold(this->nick, Config->GetBlock("options")->Get<time_t>("releasetimeout"));
 		else
-			new NickServRelease(this, Config->NSReleaseTimeout);
+			new NickServRelease(this, Config->GetBlock("options")->Get<time_t>("releasetimeout"));
 	}
 }
 

@@ -13,6 +13,8 @@
 
 #include "module.h"
 
+static ServiceReference<NickServService> nickserv("NickServService", "NickServ");
+
 class CommandNSDrop : public Command
 {
  public:
@@ -43,7 +45,7 @@ class CommandNSDrop : public Command
 
 		if (!is_mine && !source.HasPriv("nickserv/drop"))
 			source.Reply(ACCESS_DENIED);
-		else if (Config->NSSecureAdmins && !is_mine && na->nc->IsServicesOper())
+		else if (Config->GetModule("nickserv")->Get<bool>("secureadmins", "yes") && !is_mine && na->nc->IsServicesOper())
 			source.Reply(_("You may not drop other Services Operators' nicknames."));
 		else
 		{

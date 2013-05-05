@@ -205,6 +205,8 @@ class CoreExport ChannelStatus
 {
 	Anope::string modes;
  public:
+ 	ChannelStatus();
+ 	ChannelStatus(const Anope::string &modes);
  	void AddMode(char c);
 	void DelMode(char c);
 	bool HasMode(char c) const;
@@ -308,11 +310,6 @@ class CoreExport ModeManager
 	/* Number of generic channel and user modes we are tracking */
 	static unsigned GenericChannelModes;
 	static unsigned GenericUserModes;
-	/* Default channel mode lock */
-	static std::list<std::pair<Anope::string, Anope::string> > ModeLockOn;
-	static std::list<Anope::string> ModeLockOff;
-	/* Default modes bots have on channels */
-	static ChannelStatus DefaultBotModes;
 
 	/** Add a user mode to Anope
 	 * @param um A UserMode or UserMode derived class
@@ -398,12 +395,6 @@ class CoreExport ModeManager
 	static void StackerDel(User *u);
 	static void StackerDel(Channel *c);
 	static void StackerDel(Mode *m);
-
-	/** Updates the default mode locks and default bot modes
-	 * @param config The configuration to read from. This is often called
-	 * during a config reload.
-	 */
-	static void UpdateDefaultMLock(ServerConfig *config);
 };
 
 /** Represents a mask set on a channel (b/e/I)

@@ -13,6 +13,7 @@
 
 #include "module.h"
 
+static bool sasl = true;
 static unsigned int spanningtree_proto_ver = 0;
 
 static ServiceReference<IRCDProto> insp12("IRCDProto", "inspircd12");
@@ -58,7 +59,7 @@ class InspIRCd20Proto : public IRCDProto
 	void SendSQLineDel(const XLine *x) anope_override { insp12->SendSQLineDel(x); }
 	void SendSQLine(User *u, const XLine *x) anope_override { insp12->SendSQLine(u, x); }
 	void SendVhost(User *u, const Anope::string &vident, const Anope::string &vhost) anope_override { insp12->SendVhost(u, vident, vhost); }
-	void SendSVSHold(const Anope::string &nick) anope_override { insp12->SendSVSHold(nick); }
+	void SendSVSHold(const Anope::string &nick, time_t t) anope_override { insp12->SendSVSHold(nick, t); }
 	void SendSVSHoldDel(const Anope::string &nick) anope_override { insp12->SendSVSHoldDel(nick); }
 	void SendSZLineDel(const XLine *x) anope_override { insp12->SendSZLineDel(x); }
 	void SendSZLine(User *u, const XLine *x) anope_override { insp12->SendSZLine(u, x); }
@@ -367,8 +368,9 @@ struct IRCDMessageCapab : Message::Capab
 				else if (module.find("m_rline.so") == 0)
 				{
 					Servers::Capab.insert("RLINE");
-					if (!Config->RegexEngine.empty() && module.length() > 11 && Config->RegexEngine != module.substr(11))
-						Log() << "Warning: InspIRCd is using regex engine " << module.substr(11) << ", but we have " << Config->RegexEngine << ". This may cause inconsistencies.";
+					const Anope::string &regexengine = Config->GetBlock("options")->Get<const Anope::string &>("regexengine");
+					if (!regexengine.empty() && module.length() > 11 && regexengine != module.substr(11))
+						Log() << "Warning: InspIRCd is using regex engine " << module.substr(11) << ", but we have " << regexengine << ". This may cause inconsistencies.";
 				}
 				else if (module.equals_cs("m_topiclock.so"))
 					Servers::Capab.insert("TOPICLOCK");
@@ -502,8 +504,6 @@ struct IRCDMessageCapab : Message::Capab
 				Log() << "CHGHOST missing, Usage disabled until module is loaded.";
 			if (!Servers::Capab.count("CHGIDENT"))
 				Log() << "CHGIDENT missing, Usage disabled until module is loaded.";
-			if (!Servers::Capab.count("TOPICLOCK") && Config->UseServerSideTopicLock)
-				Log() << "m_topiclock missing, server side topic locking disabled until module is loaded.";
 
 			chmodes.clear();
 			umodes.clear();
@@ -549,7 +549,7 @@ struct IRCDMessageEncap : IRCDMessage
 			u->SetRealname(params[3]);
 			UplinkSocket::Message(u) << "FNAME " << params[3];
 		}
-		else if (Config->NSSASL && params[1] == "SASL" && params.size() == 6)
+		else if (sasl && params[1] == "SASL" && params.size() == 6)
 		{
 			class InspIRCDSASLIdentifyRequest : public IdentifyRequest
 			{
@@ -656,6 +656,8 @@ class ProtoInspIRCd : public Module
 	IRCDMessageEncap message_encap;
 	IRCDMessageFIdent message_fident;
 
+	bool use_server_side_topiclock, use_server_side_mlock;
+
 	void SendChannelMetadata(Channel *c, const Anope::string &metadataname, const Anope::string &value)
 	{
 		UplinkSocket::Message(Me) << "METADATA " << c->name << " " << metadataname << " :" << value;
@@ -695,13 +697,20 @@ class ProtoInspIRCd : public Module
 			throw ModuleException("No protocol interface for insp12");
 		ModuleManager::DetachAll(m_insp12);
 
-		Implementation i[] = { I_OnUserNickChange, I_OnChannelCreate, I_OnChanRegistered, I_OnDelChan, I_OnMLock, I_OnUnMLock, I_OnSetChannelOption };
+		Implementation i[] = { I_OnReload, I_OnUserNickChange, I_OnChannelCreate, I_OnChanRegistered, I_OnDelChan, I_OnMLock, I_OnUnMLock, I_OnSetChannelOption };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 	}
 
 	~ProtoInspIRCd()
 	{
 		ModuleManager::UnloadModule(m_insp12, NULL);
+	}
+
+	void OnReload(Configuration::Conf *conf) anope_override
+	{
+		use_server_side_topiclock = conf->GetModule(this)->Get<bool>("use_server_side_topiclock");
+		use_server_side_mlock = conf->GetModule(this)->Get<bool>("use_server_side_mlock");
+		sasl = conf->GetModule(this)->Get<bool>("sasl");
 	}
 
 	void OnUserNickChange(User *u, const Anope::string &) anope_override
@@ -711,19 +720,18 @@ class ProtoInspIRCd : public Module
 
 	void OnChannelCreate(Channel *c) anope_override
 	{
-		if (c->ci && (Config->UseServerSideMLock || Config->UseServerSideTopicLock))
-			this->OnChanRegistered(c->ci);
+		this->OnChanRegistered(c->ci);
 	}
 
 	void OnChanRegistered(ChannelInfo *ci) anope_override
 	{
-		if (Config->UseServerSideMLock && ci->c)
+		if (use_server_side_mlock && ci->c)
 		{
 			Anope::string modes = ci->GetMLockAsString(false).replace_all_cs("+", "").replace_all_cs("-", "");
 			SendChannelMetadata(ci->c, "mlock", modes);
 		}
 
-		if (Config->UseServerSideTopicLock && Servers::Capab.count("TOPICLOCK") && ci->c)
+		if (use_server_side_topiclock && Servers::Capab.count("TOPICLOCK") && ci->c)
 		{
 			Anope::string on = ci->HasExt("TOPICLOCK") ? "1" : "";
 			SendChannelMetadata(ci->c, "topiclock", on);
@@ -732,17 +740,17 @@ class ProtoInspIRCd : public Module
 
 	void OnDelChan(ChannelInfo *ci) anope_override
 	{
-		if (Config->UseServerSideMLock && ci->c)
+		if (use_server_side_mlock && ci->c)
 			SendChannelMetadata(ci->c, "mlock", "");
 
-		if (Config->UseServerSideTopicLock && Servers::Capab.count("TOPICLOCK") && ci->c)
+		if (use_server_side_topiclock && Servers::Capab.count("TOPICLOCK") && ci->c)
 			SendChannelMetadata(ci->c, "topiclock", "");
 	}
 
 	EventReturn OnMLock(ChannelInfo *ci, ModeLock *lock) anope_override
 	{
 		ChannelMode *cm = ModeManager::FindChannelModeByName(lock->name);
-		if (cm && ci->c && (cm->type == MODE_REGULAR || cm->type == MODE_PARAM) && Config->UseServerSideMLock)
+		if (use_server_side_mlock && cm && ci->c && (cm->type == MODE_REGULAR || cm->type == MODE_PARAM))
 		{
 			Anope::string modes = ci->GetMLockAsString(false).replace_all_cs("+", "").replace_all_cs("-", "") + cm->mchar;
 			SendChannelMetadata(ci->c, "mlock", modes);
@@ -754,7 +762,7 @@ class ProtoInspIRCd : public Module
 	EventReturn OnUnMLock(ChannelInfo *ci, ModeLock *lock) anope_override
 	{
 		ChannelMode *cm = ModeManager::FindChannelModeByName(lock->name);
-		if (cm && ci->c && (cm->type == MODE_REGULAR || cm->type == MODE_PARAM) && Config->UseServerSideMLock)
+		if (use_server_side_mlock && cm && ci->c && (cm->type == MODE_REGULAR || cm->type == MODE_PARAM))
 		{
 			Anope::string modes = ci->GetMLockAsString(false).replace_all_cs("+", "").replace_all_cs("-", "").replace_all_cs(cm->mchar, "");
 			SendChannelMetadata(ci->c, "mlock", modes);
@@ -767,7 +775,6 @@ class ProtoInspIRCd : public Module
 	{
 		if (cmd->name == "chanserv/topic" && ci->c)
 		{
-
 			if (setting == "topiclock on")
 				SendChannelMetadata(ci->c, "topiclock", "1");
 			else if (setting == "topiclock off")

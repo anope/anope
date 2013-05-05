@@ -13,6 +13,10 @@
 
 #include "module.h"
 
+namespace
+{
+	ServiceReference<NickServService> nickserv("NickServService", "NickServ");
+}
 static bool SendRegmail(User *u, const NickAlias *na, const BotInfo *bi);
 
 class CommandNSConfirm : public Command
@@ -58,7 +62,7 @@ class CommandNSConfirm : public Command
 				{
 					IRCD->SendLogin(source.GetUser());
 					const NickAlias *na = NickAlias::Find(source.GetNick());
-					if (!Config->NoNicknameOwnership && na != NULL && na->nc == source.GetAccount() && na->nc->HasExt("UNCONFIRMED") == false)
+					if (!Config->GetBlock("options")->Get<bool>("nonicknameownership") && na != NULL && na->nc == source.GetAccount() && na->nc->HasExt("UNCONFIRMED") == false)
 						source.GetUser()->SetMode(NickServ, "REGISTERED");
 				}
 			}
@@ -101,7 +105,7 @@ class CommandNSRegister : public Command
 	CommandNSRegister(Module *creator) : Command(creator, "nickserv/register", 1, 2)
 	{
 		this->SetDesc(_("Register a nickname"));
-		if (Config->NSForceEmail)
+		if (Config->GetModule("nickserv")->Get<bool>("forceemail", "yes"))
 			this->SetSyntax(_("\037password\037 \037email\037"));
 		else
 			this->SetSyntax(_("\037password\037 \037[email]\037"));
@@ -111,12 +115,12 @@ class CommandNSRegister : public Command
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		NickAlias *na;
-		size_t prefixlen = Config->NSGuestNickPrefix.length();
 		User *u = source.GetUser();
 		Anope::string u_nick = source.GetNick();
 		size_t nicklen = u_nick.length();
 		Anope::string pass = params[0];
 		Anope::string email = params.size() > 1 ? params[1] : "";
+		const Anope::string &nsregister = Config->GetModule(this->owner)->Get<const Anope::string &>("registration");
 
 		if (Anope::ReadOnly)
 		{
@@ -124,15 +128,17 @@ class CommandNSRegister : public Command
 			return;
 		}
 
-		if (Config->NSRegistration.equals_ci("disable"))
+		if (nsregister.equals_ci("disable"))
 		{
 			source.Reply(_("Registration is currently disabled."));
 			return;
 		}
 
-		if (u && !u->HasMode("OPER") && Config->NickRegDelay && Anope::CurTime - u->timestamp < Config->NickRegDelay)
+		time_t nickregdelay = Config->GetModule(this->owner)->Get<time_t>("nickregdelay");
+		time_t reg_delay = Config->GetModule("nickserv")->Get<time_t>("regdelay");
+		if (u && !u->HasMode("OPER") && nickregdelay && Anope::CurTime - u->timestamp < nickregdelay)
 		{
-			source.Reply(_("You must have been using this nick for at least %d seconds to register."), Config->NickRegDelay);
+			source.Reply(_("You must have been using this nick for at least %d seconds to register."), nickregdelay);
 			return;
 		}
 
@@ -141,7 +147,8 @@ class CommandNSRegister : public Command
 		/* Guest nick can now have a series of between 1 and 7 digits.
 		 *   --lara
 		 */
-		if (nicklen <= prefixlen + 7 && nicklen >= prefixlen + 1 && !u_nick.find_ci(Config->NSGuestNickPrefix) && u_nick.substr(prefixlen).find_first_not_of("1234567890") == Anope::string::npos)
+		const Anope::string &guestnick = Config->GetBlock("options")->Get<const Anope::string &>("guestnickprefix");
+		if (nicklen <= guestnick.length() + 7 && nicklen >= guestnick.length() + 1 && !u_nick.find_ci(guestnick) && u_nick.substr(guestnick.length()).find_first_not_of("1234567890") == Anope::string::npos)
 		{
 			source.Reply(NICK_CANNOT_BE_REGISTERED, u_nick.c_str());
 			return;
@@ -153,7 +160,7 @@ class CommandNSRegister : public Command
 			return;
 		}
 
-		if (Config->RestrictOperNicks)
+		if (Config->GetBlock("nickserv")->Get<bool>("restrictopernicks"))
 			for (unsigned i = 0; i < Config->Opers.size(); ++i)
 			{
 				Oper *o = Config->Opers[i];
@@ -165,15 +172,15 @@ class CommandNSRegister : public Command
 				}
 			}
 
-		if (Config->NSForceEmail && email.empty())
+		if (Config->GetModule("nickserv")->Get<bool>("forceemail", "yes") && email.empty())
 			this->OnSyntaxError(source, "");
-		else if (u && Anope::CurTime < u->lastnickreg + Config->NSRegDelay)
-			source.Reply(_("Please wait %d seconds before using the REGISTER command again."), (u->lastnickreg + Config->NSRegDelay) - Anope::CurTime);
+		else if (u && Anope::CurTime < u->lastnickreg + reg_delay)
+			source.Reply(_("Please wait %d seconds before using the REGISTER command again."), (u->lastnickreg + reg_delay) - Anope::CurTime);
 		else if ((na = NickAlias::Find(u_nick)))
 			source.Reply(NICK_ALREADY_REGISTERED, u_nick.c_str());
-		else if (pass.equals_ci(u_nick) || (Config->StrictPasswords && pass.length() < 5))
+		else if (pass.equals_ci(u_nick) || (Config->GetBlock("options")->Get<bool>("strictpasswords") && pass.length() < 5))
 			source.Reply(MORE_OBSCURE_PASSWORD);
-		else if (pass.length() > Config->PassLen)
+		else if (pass.length() > Config->GetBlock("options")->Get<unsigned>("passlen"))
 			source.Reply(PASSWORD_TOO_LONG);
 		else if (!email.empty() && !Mail::Validate(email))
 			source.Reply(MAIL_X_INVALID, email.c_str());
@@ -191,16 +198,13 @@ class CommandNSRegister : public Command
 				na->last_realname = u->realname;
 
 				u->Login(nc);
-
-				if (Config->NSAddAccessOnReg)
-					nc->AddAccess(u->Mask());
 			}
 
 			Log(LOG_COMMAND, source, this) << "to register " << na->nick << " (email: " << (!na->nc->email.empty() ? na->nc->email : "none") << ")";
 
-			FOREACH_MOD(I_OnNickRegister, OnNickRegister(na));
+			FOREACH_MOD(I_OnNickRegister, OnNickRegister(source.GetUser(), na));
 
-			if (Config->NSAddAccessOnReg)
+			if (na->nc->GetAccessCount())
 				source.Reply(_("Nickname \002%s\002 registered under your user@host-mask: %s"), u_nick.c_str(), na->nc->GetAccess(0).c_str());
 			else
 				source.Reply(_("Nickname \002%s\002 registered."), u_nick.c_str());
@@ -209,26 +213,27 @@ class CommandNSRegister : public Command
 			if (Anope::Decrypt(na->nc->pass, tmp_pass) == 1)
 				source.Reply(_("Your password is \002%s\002 - remember this for later use."), tmp_pass.c_str());
 
-			if (Config->NSRegistration.equals_ci("admin"))
+			if (nsregister.equals_ci("admin"))
 			{
 				nc->ExtendMetadata("UNCONFIRMED");
 				source.Reply(_("All new accounts must be validated by an administrator. Please wait for your registration to be confirmed."));
 			}
-			else if (Config->NSRegistration.equals_ci("mail"))
+			else if (nsregister.equals_ci("mail"))
 			{
 				nc->ExtendMetadata("UNCONFIRMED");
 				if (SendRegmail(u, na, source.service))
 				{
-					source.Reply(_("A passcode has been sent to %s, please type \002%s%s CONFIRM <passcode>\002 to confirm your email address."), email.c_str(), Config->UseStrictPrivMsgString.c_str(), Config->NickServ.c_str());
-					source.Reply(_("If you do not confirm your email address within %s your account will expire."), Anope::Duration(Config->NSUnconfirmedExpire).c_str());
+					time_t unconfirmed_expire = Config->GetModule("nickserv")->Get<time_t>("unconfirmedexpire", "1d");
+					source.Reply(_("A passcode has been sent to %s, please type \002%s%s CONFIRM <passcode>\002 to confirm your email address."), email.c_str(), Config->StrictPrivmsg.c_str(), NickServ->nick.c_str());
+					source.Reply(_("If you do not confirm your email address within %s your account will expire."), Anope::Duration(unconfirmed_expire).c_str());
 				}
 			}
-			else if (Config->NSRegistration.equals_ci("none"))
+			else if (nsregister.equals_ci("none"))
 			{
 				if (u)
 				{
 					IRCD->SendLogin(u);
-					if (!Config->NoNicknameOwnership && na->nc == u->Account() && na->nc->HasExt("UNCONFIRMED") == false)
+					if (!Config->GetBlock("options")->Get<bool>("nonicknameownership") && na->nc == u->Account() && na->nc->HasExt("UNCONFIRMED") == false)
 						u->SetMode(NickServ, "REGISTERED");
 				}
 			}
@@ -259,9 +264,9 @@ class CommandNSRegister : public Command
 				"passwords are vulnerable to trial-and-error searches, so\n"
 				"you should choose a password at least 5 characters long.\n"
 				"Finally, the space character cannot be used in passwords."),
-				Config->NickServ.c_str(), Config->NickServ.c_str());
+				source.service->nick.c_str(), source.service->nick.c_str());
 
-		if (!Config->NSForceEmail)
+		if (!Config->GetModule("nickserv")->Get<bool>("forceemail", "yes"))
 		{
 			source.Reply(" ");
 			source.Reply(_("The \037email\037 parameter is optional and will set the email\n"
@@ -289,7 +294,7 @@ class CommandNSResend : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		if (!Config->NSRegistration.equals_ci("mail"))
+		if (!Config->GetModule(this->owner)->Get<const Anope::string &>("registration").equals_ci("mail"))
 			return;
 
 		const NickAlias *na = NickAlias::Find(source.GetNick());
@@ -300,7 +305,7 @@ class CommandNSResend : public Command
 			source.Reply(_("Your account is already confirmed."));
 		else
 		{
-			if (Anope::CurTime < source.nc->lastmail + Config->NSResendDelay)
+			if (Anope::CurTime < source.nc->lastmail + Config->GetModule(this->owner)->Get<time_t>("resenddelay"))
 				source.Reply(_("Cannot send mail now; please retry a little later."));
 			else if (SendRegmail(source.GetUser(), na, source.service))
 			{
@@ -317,7 +322,7 @@ class CommandNSResend : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
 	{
-		if (!Config->NSRegistration.equals_ci("mail"))
+		if (!Config->GetModule(this->owner)->Get<const Anope::string &>("registration").equals_ci("mail"))
 			return false;
 
 		this->SendSyntax(source);
@@ -329,7 +334,7 @@ class CommandNSResend : public Command
 
 	void OnServHelp(CommandSource &source) anope_override
 	{
-		if (Config->NSRegistration.equals_ci("mail"))
+		if (Config->GetModule(this->owner)->Get<const Anope::string &>("registration").equals_ci("mail"))
 			Command::OnServHelp(source);
 	}
 };
@@ -344,9 +349,8 @@ class NSRegister : public Module
 	NSRegister(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandnsregister(this), commandnsconfirm(this), commandnsrsend(this)
 	{
-
-		if (Config->NSRegistration.equals_ci("disable"))
-			throw ModuleException("Module will not load with nickserv:registration disabled.");
+		if (Config->GetModule(this)->Get<const Anope::string &>("registration").equals_ci("disable"))
+			throw ModuleException("Module " + this->name + " will not load with registration disabled.");
 	}
 };
 
@@ -373,15 +377,15 @@ static bool SendRegmail(User *u, const NickAlias *na, const BotInfo *bi)
 	else
 		codebuf = *code;
 
-	Anope::string subject = Language::Translate(na->nc, Config->MailRegistrationSubject.c_str());
-	Anope::string message = Language::Translate(na->nc, Config->MailRegistrationMessage.c_str());
+	Anope::string subject = Language::Translate(na->nc, Config->GetBlock("mail")->Get<const char *>("registration_subject")),
+		message = Language::Translate(na->nc, Config->GetBlock("mail")->Get<const char *>("registration_message"));
 
 	subject = subject.replace_all_cs("%n", na->nick);
-	subject = subject.replace_all_cs("%N", Config->NetworkName);
+	subject = subject.replace_all_cs("%N", Config->GetBlock("networkinfo")->Get<const Anope::string &>("networkname"));
 	subject = subject.replace_all_cs("%c", codebuf);
 
 	message = message.replace_all_cs("%n", na->nick);
-	message = message.replace_all_cs("%N", Config->NetworkName);
+	message = message.replace_all_cs("%N", Config->GetBlock("networkinfo")->Get<const Anope::string &>("networkname"));
 	message = message.replace_all_cs("%c", codebuf);
 
 	return Mail::Send(u, nc, bi, subject, message);

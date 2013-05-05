@@ -20,9 +20,11 @@ class ChanAccess;
 class Channel;
 class ChannelInfo;
 class ChannelStatus;
+struct ChanUserContainer;
 class ClientSocket;
 class Command;
 class CommandSource;
+namespace Configuration { class Conf; }
 class ConnectionSocket;
 namespace DNS { class Packet; }
 class Entry;
@@ -42,7 +44,6 @@ class ReferenceBase;
 class Regex;
 class Serializable;
 class Server;
-class ServerConfig;
 class Socket;
 class Thread;
 class User;

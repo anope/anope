@@ -91,8 +91,9 @@ class CommandCSBan : public Command
 				reason += " " + params[3];
 		}
 
-		if (reason.length() > Config->CSReasonMax)
-			reason = reason.substr(0, Config->CSReasonMax);
+		unsigned reasonmax = Config->GetModule("chanserv")->Get<unsigned>("reasonmax", "200");
+		if (reason.length() > reasonmax)
+			reason = reason.substr(0, reasonmax);
 
 		User *u = source.GetUser();
 		User *u2 = User::Find(target, true);

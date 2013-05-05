@@ -13,6 +13,8 @@
 
 #include "module.h"
 
+static ServiceReference<NickServService> nickserv("NickServService", "NickServ");
+
 class CommandNSInfo : public Command
 {
  private:
@@ -126,13 +128,15 @@ class CommandNSInfo : public Command
 
 				if (na->nc->HasExt("UNCONFIRMED") == false)
 				{
-					if (na->HasExt("NO_EXPIRE") || !Config->NSExpire)
-						;
-					else
-						info[_("Expires")] = Anope::strftime(na->last_seen + Config->NSExpire);
+					time_t nickserv_expire = Config->GetModule("nickserv")->Get<time_t>("expire");
+					if (!na->HasExt("NO_EXPIRE") && nickserv_expire && !Anope::NoExpire)
+						info[_("Expires")] = Anope::strftime(na->last_seen + nickserv_expire);
 				}
 				else
-					info[_("Expires")] = Anope::strftime(na->time_registered + Config->NSUnconfirmedExpire);
+				{
+					time_t unconfirmed_expire = Config->GetModule("nickserv")->Get<time_t>("unconfirmedexpire", "1d");
+					info[_("Expires")] = Anope::strftime(na->time_registered + unconfirmed_expire);
+				}
 			}
 
 			FOREACH_MOD(I_OnNickInfo, OnNickInfo(source, na, info, show_hidden));

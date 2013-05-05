@@ -27,8 +27,7 @@ class CommandCSSuspend : public Command
 		const Anope::string &chan = params[0];
 		Anope::string expiry = params.size() > 1 ? params[1] : "";
 		Anope::string reason = params.size() > 2 ? params[2] : "";
-		time_t expiry_secs = Config->CSSuspendExpire;
-
+		time_t expiry_secs = Config->GetModule(this->owner)->Get<time_t>("expire");
 
 		if (!expiry.empty() && expiry[0] != '+')
 		{
@@ -38,12 +37,6 @@ class CommandCSSuspend : public Command
 		}
 		else
 			expiry_secs = Anope::DoTime(expiry);
-
-		if (Config->ForceForbidReason && reason.empty())
-		{
-			this->OnSyntaxError(source, "");
-			return;
-		}
 
 		if (Anope::ReadOnly)
 			source.Reply(READ_ONLY_MODE);
@@ -171,6 +164,8 @@ class CSSuspend : public Module
 		Implementation i[] = { I_OnPreChanExpire, I_OnCheckKick };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 	}
+
+	// cs info output?
 
 	void OnPreChanExpire(ChannelInfo *ci, bool &expire) anope_override
 	{

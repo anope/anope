@@ -1,5 +1,5 @@
 #include "module.h"
-#include "ldap.h"
+#include "ldapapi.h"
 
 static std::set<Oper *> my_opers;
 static Anope::string opertype_attribute;
@@ -93,13 +93,15 @@ class LDAPOper : public Module
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 	}
 
-	void OnReload(ServerConfig *conf, ConfigReader &reader) anope_override
+	void OnReload(Configuration::Conf *conf) anope_override
 	{
-		this->binddn = reader.ReadValue("m_ldap_oper", "binddn", "", 0);
-		this->password = reader.ReadValue("m_ldap_oper", "password", "", 0);
-		this->basedn = reader.ReadValue("m_ldap_oper", "basedn", "", 0);
-		this->filter = reader.ReadValue("m_ldap_oper", "filter", "", 0);
-		opertype_attribute = reader.ReadValue("m_ldap_oper", "opertype_attribute", "", 0);
+		Configuration::Block *config = Config->GetModule(this);
+
+		this->binddn = config->Get<const Anope::string &>("binddn");
+		this->password = config->Get<const Anope::string &>("password");
+		this->basedn = config->Get<const Anope::string &>("basedn");
+		this->filter = config->Get<const Anope::string &>("filter");
+		opertype_attribute = config->Get<const Anope::string &>("opertype_attribute");
 
 		for (std::set<Oper *>::iterator it = my_opers.begin(), it_end = my_opers.end(); it != it_end; ++it)
 			delete *it;

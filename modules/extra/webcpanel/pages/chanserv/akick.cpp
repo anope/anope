@@ -40,7 +40,7 @@ bool WebCPanel::ChanServ::Akick::OnRequest(HTTPProvider *server, const Anope::st
 		params.push_back("DEL");
 		params.push_back(message.get_data["mask"]);
 
-		WebPanel::RunCommand(na->nc->display, na->nc, Config->ChanServ, "chanserv/akick", params, replacements);
+		WebPanel::RunCommand(na->nc->display, na->nc, ::ChanServ->nick, "chanserv/akick", params, replacements);
 	}
 	else if (message.post_data["mask"].empty() == false)
 	{
@@ -51,7 +51,7 @@ bool WebCPanel::ChanServ::Akick::OnRequest(HTTPProvider *server, const Anope::st
 		if (message.post_data["reason"].empty() == false)
 			params.push_back(message.get_data["reason"]);
 
-		WebPanel::RunCommand(na->nc->display, na->nc, Config->ChanServ, "chanserv/akick", params, replacements);
+		WebPanel::RunCommand(na->nc->display, na->nc, ::ChanServ->nick, "chanserv/akick", params, replacements);
 	}
 
 	replacements["ESCAPED_CHANNEL"] = HTTPUtils::URLEncode(chname);

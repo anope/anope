@@ -23,8 +23,9 @@ class CommandCSAKick : public Command
 		NickCore *nc = NULL;
 		const AutoKick *akick;
 
-		if (reason.length() > Config->CSReasonMax)
-			reason = reason.substr(0, Config->CSReasonMax);
+		unsigned reasonmax = Config->GetModule("chanserv")->Get<unsigned>("reasonmax", "200");
+		if (reason.length() > reasonmax)
+			reason = reason.substr(0, reasonmax);
 
 		if (IRCD->IsExtbanValid(mask))
 			; /* If this is an extban don't try to complete the mask */
@@ -148,9 +149,9 @@ class CommandCSAKick : public Command
 			}
 		}
 
-		if (ci->GetAkickCount() >= Config->CSAutokickMax)
+		if (ci->GetAkickCount() >= Config->GetModule(this->owner)->Get<unsigned>("autokickmax"))
 		{
-			source.Reply(_("Sorry, you can only have %d autokick masks on a channel."), Config->CSAutokickMax);
+			source.Reply(_("Sorry, you can only have %d autokick masks on a channel."), Config->GetModule(this->owner)->Get<unsigned>("autokickmax"));
 			return;
 		}
 
@@ -513,7 +514,6 @@ class CSAKick : public Module
 	CSAKick(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandcsakick(this)
 	{
-
 		Implementation i[] = { I_OnCheckKick };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 	}
@@ -544,7 +544,11 @@ class CSAKick : public Module
 				autokick->last_used = Anope::CurTime;
 				if (!autokick->nc && autokick->mask.find('#') == Anope::string::npos)
 					mask = autokick->mask;
-				reason = autokick->reason.empty() ? Config->CSAutokickReason : autokick->reason;
+				reason = autokick->reason;
+				if (reason.empty())
+					reason = Config->GetModule(this)->Get<const Anope::string &>("autokickreason");
+				if (reason.empty())
+					reason = "User has been banned from the channel";
 				return EVENT_STOP;
 			}
 		}

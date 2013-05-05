@@ -219,6 +219,10 @@ class CoreExport NickCore : public Serializable, public Extensible
 	 */
 	Anope::string GetAccess(unsigned entry) const;
 
+	/** Get the number of entries on the access list for this account.
+	 */
+	unsigned GetAccessCount() const;
+
 	/** Find an entry in the nick's access list
 	 *
 	 * @param entry The nick!ident@host entry to search for

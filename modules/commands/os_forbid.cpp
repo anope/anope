@@ -14,6 +14,8 @@
 #include "module.h"
 #include "os_forbid.h"
 
+static ServiceReference<NickServService> nickserv("NickServService", "NickServ");
+
 class MyForbidService : public ForbidService
 {
 	Serialize::Checker<std::vector<ForbidData *>[FT_SIZE - 1]> forbid_data;
@@ -121,12 +123,6 @@ class CommandOSForbid : public Command
 
 			time_t expiryt = 0;
 
-			if (Config->ForceForbidReason && reason.empty())
-			{
-				this->OnSyntaxError(source, "");
-				return;
-			}
-
 			if (!expiry.empty())
 			{
 				expiryt = Anope::DoTime(expiry);
@@ -135,7 +131,7 @@ class CommandOSForbid : public Command
 			}
 
 			NickAlias *target = NickAlias::Find(entry);
-			if (target != NULL && Config->NSSecureAdmins && target->nc->IsServicesOper())
+			if (target != NULL && Config->GetModule("nickserv")->Get<bool>("secureadmins", "yes") && target->nc->IsServicesOper())
 			{
 				source.Reply(ACCESS_DENIED);
 				return;
@@ -234,11 +230,12 @@ class CommandOSForbid : public Command
 		source.Reply(_("Forbid allows you to forbid usage of certain nicknames, channels,\n"
 				"and email addresses. Wildcards are accepted for all entries."));
 
-		if (!Config->RegexEngine.empty())
+		const Anope::string &regexengine = Config->GetBlock("options")->Get<const Anope::string &>("regexengine");
+		if (!regexengine.empty())
 		{
 			source.Reply(" ");
 			source.Reply(_("Regex matches are also supported using the %s engine.\n"
-					"Enclose your pattern in // if this is desired."), Config->RegexEngine.c_str());
+					"Enclose your pattern in // if this is desired."), regexengine.c_str());
 		}
 
 		return true;
@@ -295,21 +292,19 @@ class OSForbid : public Module
 		ForbidData *d = this->forbidService.FindForbid(c->name, FT_CHAN);
 		if (d != NULL)
 		{
-			if (IRCD->CanSQLineChannel)
+			ServiceReference<ChanServService> chanserv("ChanServService", "ChanServ");
+			if (!chanserv)
+				;
+			else if (IRCD->CanSQLineChannel)
 			{
-				XLine x(c->name, OperServ->nick, Anope::CurTime + Config->CSInhabit, d->reason);
+				time_t inhabit = Config->GetModule("chanserv")->Get<time_t>("inhabit", "15s");
+				XLine x(c->name, OperServ->nick, Anope::CurTime + inhabit, d->reason);
 				IRCD->SendSQLine(NULL, &x);
 			}
-			else if (!c->HasExt("INHABIT"))
+			else
 			{
-				/* Join ChanServ and set a timer for this channel to part ChanServ later */
-				c->Hold();
-
-				/* Set +si to prevent rejoin */
-				c->SetMode(NULL, "NOEXTERNAL");
-				c->SetMode(NULL, "TOPIC");
-				c->SetMode(NULL, "SECRET");
-				c->SetMode(NULL, "INVITE");
+				if (chanserv)
+					chanserv->Hold(c);
 			}
 
 			if (d->reason.empty())

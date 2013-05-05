@@ -29,21 +29,23 @@ class CommandBSBot : public Command
 			return;
 		}
 
-		if (nick.length() > Config->NickLen)
+		Configuration::Block *networkinfo = Config->GetBlock("networkinfo");
+
+		if (nick.length() > networkinfo->Get<unsigned>("nicklen"))
 		{
-			source.Reply(_("Bot nicks may only be %d characters long."), Config->NickLen);
+			source.Reply(_("Bot nicks may only be %d characters long."), networkinfo->Get<unsigned>("nicklen"));
 			return;
 		}
 
-		if (user.length() > Config->UserLen)
+		if (user.length() > networkinfo->Get<unsigned>("userlen"))
 		{
-			source.Reply(_("Bot idents may only be %d characters long."), Config->UserLen);
+			source.Reply(_("Bot idents may only be %d characters long."), networkinfo->Get<unsigned>("userlen"));
 			return;
 		}
 
-		if (host.length() > Config->HostLen)
+		if (host.length() > networkinfo->Get<unsigned>("hostlen"))
 		{
-			source.Reply(_("Bot hosts may only be %d characters long."), Config->HostLen);
+			source.Reply(_("Bot hosts may only be %d characters long."), networkinfo->Get<unsigned>("hostlen"));
 			return;
 		}
 
@@ -112,21 +114,23 @@ class CommandBSBot : public Command
 			return;
 		}
 
-		if (nick.length() > Config->NickLen)
+		Configuration::Block *networkinfo = Config->GetBlock("networkinfo");
+
+		if (nick.length() > networkinfo->Get<unsigned>("nicklen"))
 		{
-			source.Reply(_("Bot nicks may only be %d characters long."), Config->NickLen);
+			source.Reply(_("Bot nicks may only be %d characters long."), networkinfo->Get<unsigned>("nicklen"));
 			return;
 		}
 
-		if (!user.empty() && user.length() > Config->UserLen)
+		if (user.length() > networkinfo->Get<unsigned>("userlen"))
 		{
-			source.Reply(_("Bot idents may only be %d characters long."), Config->UserLen);
+			source.Reply(_("Bot idents may only be %d characters long."), networkinfo->Get<unsigned>("userlen"));
 			return;
 		}
 
-		if (!host.empty() && host.length() > Config->HostLen)
+		if (host.length() > networkinfo->Get<unsigned>("hostlen"))
 		{
-			source.Reply(_("Bot hosts may only be %d characters long."), Config->HostLen);
+			source.Reply(_("Bot hosts may only be %d characters long."), networkinfo->Get<unsigned>("hostlen"));
 			return;
 		}
 
@@ -204,7 +208,15 @@ class CommandBSBot : public Command
 		if (!user.empty())
 		{
 			IRCD->SendClientIntroduction(bi);
-			bi->RejoinAll();
+			unsigned minusers = Config->GetBlock("botserv")->Get<unsigned>("minusers");
+			const std::set<ChannelInfo *> &channels = bi->GetChannels();
+			for (std::set<ChannelInfo *>::const_iterator it = channels.begin(), it_end = channels.end(); it != it_end; ++it)
+			{
+				const ChannelInfo *ci = *it;
+
+				if (ci->c && ci->c->users.size() >= minusers)
+					bi->Join(ci->c);
+			}
 		}
 
 		source.Reply(_("Bot \002%s\002 has been changed to %s!%s@%s (%s)."), oldnick.c_str(), bi->nick.c_str(), bi->GetIdent().c_str(), bi->host.c_str(), bi->realname.c_str());

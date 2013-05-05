@@ -89,17 +89,7 @@ void Channel::Reset()
 
 void Channel::Sync()
 {
-	if (!this->HasMode("PERM") && (this->users.empty() || (this->users.size() == 1 && this->ci && this->ci->bi && *this->ci->bi == this->users.begin()->second->user)))
-	{
-		this->Hold();
-	}
-	if (this->ci)
-	{
-		this->CheckModes();
-
-		if (Me && Me->IsSynced())
-			this->ci->RestoreTopic();
-	}
+	FOREACH_MOD(I_OnChannelSync, OnChannelSync(this));
 }
 
 void Channel::CheckModes()
@@ -167,6 +157,8 @@ ChanUserContainer* Channel::JoinUser(User *user)
 {
 	if (user->server && user->server->IsSynced())
 		Log(user, this, "join");
+
+	FOREACH_MOD(I_OnJoinChannel, OnJoinChannel(user, this));
 
 	ChanUserContainer *cuc = new ChanUserContainer(user, this);
 	user->chans[this] = cuc;
@@ -401,16 +393,8 @@ void Channel::RemoveModeInternal(MessageSource &setter, ChannelMode *cm, const A
 		FOREACH_RESULT(I_OnChannelModeUnset, OnChannelModeUnset(this, setter, cm->name, param));
 
 		if (enforce_mlock && MOD_RESULT != EVENT_STOP)
-		{
-			/* Reset modes on bots if we're supposed to */
-			if (this->ci && this->ci->bi && this->ci->bi == bi)
-			{
-				if (ModeManager::DefaultBotModes.HasMode(cm->mchar))
-					this->SetMode(bi, cm, bi->GetUID());
-			}
-
 			this->SetCorrectModes(u, false, false);
-		}
+
 		return;
 	}
 
@@ -790,22 +774,19 @@ void Channel::KickInternal(MessageSource &source, const Anope::string &nick, con
 
 	Anope::string chname = this->name;
 
-	if (target->FindChannel(this))
+	ChanUserContainer *cu = target->FindChannel(this);
+	if (cu == NULL)
 	{
-		FOREACH_MOD(I_OnUserKicked, OnUserKicked(this, target, source, reason));
-		if (bi)
-			this->Extend("INHABIT");
-		this->DeleteUser(target);
-	}
-	else
 		Log() << "Channel::KickInternal got kick for user " << target->nick << " from " << source.GetSource() << " who isn't on channel " << this->name;
-
-	/* Bots get rejoined */
-	if (bi)
-	{
-		bi->Join(this, &ModeManager::DefaultBotModes);
-		this->Shrink("INHABIT");
+		return;
 	}
+
+	Anope::string this_name = this->name;
+	ChannelStatus status = cu->status;
+
+	FOREACH_MOD(I_OnPreUserKicked, OnPreUserKicked(source, cu, reason));
+	this->DeleteUser(target); /* This can delete this; */
+	FOREACH_MOD(I_OnUserKicked, OnUserKicked(source, target, this_name, status, reason));
 }
 
 bool Channel::Kick(BotInfo *bi, User *u, const char *reason, ...)
@@ -873,54 +854,6 @@ void Channel::ChangeTopic(const Anope::string &user, const Anope::string &newtop
 		this->ci->CheckTopic();
 }
 
-void Channel::Hold()
-{
-	/** A timer used to keep the BotServ bot/ChanServ in the channel
-	 * after kicking the last user in a channel
-	 */
-	class ChanServTimer : public Timer
-	{
-	 private:
-		Reference<Channel> c;
-
-	 public:
-	 	/** Constructor
-		 * @param chan The channel
-		 */
-		ChanServTimer(Channel *chan) : Timer(Config->CSInhabit), c(chan)
-		{
-			if (!ChanServ || !c)
-				return;
-			c->Extend("INHABIT");
-			if (!c->ci || !c->ci->bi)
-				ChanServ->Join(c);
-			else if (!c->FindUser(c->ci->bi))
-				c->ci->bi->Join(c);
-		}
-
-		/** Called when the delay is up
-		 * @param The current time
-		 */
-		void Tick(time_t) anope_override
-		{
-			if (!c)
-				return;
-
-			c->Shrink("INHABIT");
-
-			if (!c->ci || !c->ci->bi)
-			{
-				if (ChanServ)
-					ChanServ->Part(c);
-			}
-			else if (c->users.size() == 1 || c->users.size() < Config->BSMinUsers)
-				c->ci->bi->Part(c);
-		}
-	};
-
-	new ChanServTimer(this);
-}
-
 void Channel::SetCorrectModes(User *user, bool give_modes, bool check_noop)
 {
 	if (user == NULL)
@@ -980,6 +913,8 @@ void Channel::SetCorrectModes(User *user, bool give_modes, bool check_noop)
 			}
 		}
 	}
+
+	FOREACH_MOD(I_OnSetCorrectModes, OnSetCorrectModes(user, this, u_access, give_modes));
 }
 
 bool Channel::Unban(User *u, bool full)

@@ -43,6 +43,10 @@ struct DefconConfig
 	time_t akillexpire, timeout;
 	bool globalondefcon;
 
+	unsigned max_session_kill;
+	time_t session_autokill_expiry;
+	Anope::string sle_reason, sle_detailsloc;
+
 	DefconConfig()
 	{
 		this->DefCon.resize(6);
@@ -336,23 +340,32 @@ class OSDefcon : public Module
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 	}
 
-	void OnReload(ServerConfig *conf, ConfigReader &reader) anope_override
+	void OnReload(Configuration::Conf *conf) anope_override
 	{
+		Configuration::Block *block = conf->GetModule(this);
 		DefconConfig dconfig;
 
-		dconfig.defaultlevel = reader.ReadInteger("defcon", "defaultlevel", 0, 0);
-		dconfig.defcons[4] = reader.ReadValue("defcon", "level4", 0);
-		dconfig.defcons[3] = reader.ReadValue("defcon", "level3", 0);
-		dconfig.defcons[2] = reader.ReadValue("defcon", "level2", 0);
-		dconfig.defcons[1] = reader.ReadValue("defcon", "level1", 0);
-		dconfig.sessionlimit = reader.ReadInteger("defcon", "sessionlimit", 0, 0);
-		dconfig.akillreason = reader.ReadValue("defcon", "akillreason", 0);
-		dconfig.akillexpire = Anope::DoTime(reader.ReadValue("defcon", "akillexpire", 0));
-		dconfig.chanmodes = reader.ReadValue("defcon", "chanmodes", 0);
-		dconfig.timeout = Anope::DoTime(reader.ReadValue("defcon", "timeout", 0));
-		dconfig.globalondefcon = reader.ReadFlag("defcon", "globalondefcon", 0);
-		dconfig.message = reader.ReadValue("defcon", "message", 0);
-		dconfig.offmessage = reader.ReadValue("defcon", "offmessage", 0);
+		dconfig.defaultlevel = block->Get<int>("defaultlevel");
+		dconfig.defcons[4] = block->Get<const Anope::string &>("level4");
+		dconfig.defcons[3] = block->Get<const Anope::string &>("level3");
+		dconfig.defcons[2] = block->Get<const Anope::string &>("level2");
+		dconfig.defcons[1] = block->Get<const Anope::string &>("level1");
+		dconfig.sessionlimit = block->Get<int>("sessionlimit");
+		dconfig.akillreason = block->Get<const Anope::string &>("akillreason");
+		dconfig.akillexpire = block->Get<time_t>("akillexpire");
+		dconfig.chanmodes = block->Get<const Anope::string &>("chanmodes");
+		dconfig.timeout = block->Get<time_t>("timeout");
+		dconfig.globalondefcon = block->Get<bool>("globalondefcon");
+		dconfig.message = block->Get<const Anope::string &>("message");
+		dconfig.offmessage = block->Get<const Anope::string &>("offmessage");
+
+		Module *session = ModuleManager::FindModule("os_session");
+		block = conf->GetModule(session);
+
+		dconfig.max_session_kill = block->Get<int>("maxsessionkill");
+		dconfig.session_autokill_expiry = block->Get<time_t>("sessionautokillexpiry");
+		dconfig.sle_reason = block->Get<const Anope::string &>("sessionlimitexceeded");
+		dconfig.sle_detailsloc = block->Get<const Anope::string &>("sessionlimitdetailsloc");
 
 		if (dconfig.defaultlevel < 1 || dconfig.defaultlevel > 5)
 			throw ConfigException("The value for <defcon:defaultlevel> must be between 1 and 5");
@@ -479,19 +492,18 @@ class OSDefcon : public Module
 		if (DConfig.Check(DEFCON_AKILL_NEW_CLIENTS) && akills)
 		{
 			Log(OperServ, "operserv/defcon") << "DEFCON: adding akill for *@" << u->host;
-			XLine x("*@" + u->host, Config->OperServ, Anope::CurTime + DConfig.akillexpire, DConfig.akillreason, XLineManager::GenerateUID());
-			x.by = Config->OperServ;
+			XLine x("*@" + u->host, OperServ ? OperServ->nick : "defcon", Anope::CurTime + DConfig.akillexpire, DConfig.akillreason, XLineManager::GenerateUID());
 			akills->Send(NULL, &x);
 		}
 		if (DConfig.Check(DEFCON_NO_NEW_CLIENTS) || DConfig.Check(DEFCON_AKILL_NEW_CLIENTS))
 		{
-			u->Kill(Config->OperServ, DConfig.akillreason);
+			u->Kill(OperServ ? OperServ->nick : "", DConfig.akillreason);
 			return;
 		}
 
 		if (DConfig.Check(DEFCON_NO_NEW_CLIENTS) || DConfig.Check(DEFCON_AKILL_NEW_CLIENTS))
 		{
-			u->Kill(Config->OperServ, DConfig.akillreason);
+			u->Kill(OperServ ? OperServ->nick : "", DConfig.akillreason);
 			return;
 		}
 
@@ -513,22 +525,24 @@ class OSDefcon : public Module
 		{
 			if (session && session->count > static_cast<unsigned>(DConfig.sessionlimit))
 			{
-				if (!Config->SessionLimitExceeded.empty())
-					IRCD->SendMessage(OperServ, u->nick, Config->SessionLimitExceeded.c_str(), u->host.c_str());
-				if (!Config->SessionLimitDetailsLoc.empty())
-					IRCD->SendMessage(OperServ, u->nick, "%s", Config->SessionLimitDetailsLoc.c_str());
+				if (!DConfig.sle_reason.empty())
+				{
+					Anope::string message = DConfig.sle_reason.replace_all_cs("%IP%", u->ip);
+					u->SendMessage(OperServ, message);
+				}
+				if (!DConfig.sle_detailsloc.empty())
+					u->SendMessage(OperServ, DConfig.sle_detailsloc);
 
 				++session->hits;
-				if (akills && Config->MaxSessionKill && session->hits >= Config->MaxSessionKill)
+				if (akills && DConfig.max_session_kill && session->hits >= DConfig.max_session_kill)
 				{
-					XLine x("*@" + u->host, Config->OperServ, Anope::CurTime + Config->SessionAutoKillExpiry, "Defcon session limit exceeded", XLineManager::GenerateUID());
+					XLine x("*@" + u->host, OperServ ? OperServ->nick : "", Anope::CurTime + DConfig.session_autokill_expiry, "Defcon session limit exceeded", XLineManager::GenerateUID());
 					akills->Send(NULL, &x);
 					Log(OperServ, "akill/defcon") << "[DEFCON] Added a temporary AKILL for \002*@" << u->host << "\002 due to excessive connections";
 				}
 				else
 				{
-					u->Kill(Config->OperServ, "Defcon session limit exceeded");
-					u = NULL; /* No guarentee u still exists */
+					u->Kill(OperServ ? OperServ->nick : "", "Defcon session limit exceeded");
 				}
 			}
 		}

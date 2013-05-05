@@ -43,10 +43,18 @@ NumberList::NumberList(const Anope::string &list, bool descending) : is_valid(tr
 
 		if (t == Anope::string::npos)
 		{
-			unsigned num = convertTo<unsigned>(token, error, false);
-			if (error.empty())
-				numbers.insert(num);
-			else
+			try
+			{
+				unsigned num = convertTo<unsigned>(token, error, false);
+				if (error.empty())
+					numbers.insert(num);
+			}
+			catch (const ConvertException &)
+			{
+				error = "1";
+			}
+
+			if (!error.empty())
 			{
 				if (!this->InvalidRange(list))
 				{
@@ -58,14 +66,20 @@ NumberList::NumberList(const Anope::string &list, bool descending) : is_valid(tr
 		else
 		{
 			Anope::string error2;
-			unsigned num1 = convertTo<unsigned>(token.substr(0, t), error, false);
-			unsigned num2 = convertTo<unsigned>(token.substr(t + 1), error2, false);
-			if (error.empty() && error2.empty())
+			try
 			{
-				for (unsigned i = num1; i <= num2; ++i)
-					numbers.insert(i);
+				unsigned num1 = convertTo<unsigned>(token.substr(0, t), error, false);
+				unsigned num2 = convertTo<unsigned>(token.substr(t + 1), error2, false);
+				if (error.empty() && error2.empty())
+					for (unsigned i = num1; i <= num2; ++i)
+						numbers.insert(i);
 			}
-			else
+			catch (const ConvertException &)
+			{
+				error = "1";
+			}
+
+			if (!error.empty() || !error2.empty())
 			{
 				if (!this->InvalidRange(list))
 				{
@@ -232,7 +246,7 @@ bool Anope::IsFile(const Anope::string &filename)
 time_t Anope::DoTime(const Anope::string &s)
 {
 	if (s.empty())
-		return -1;
+		return 0;
 
 	int amount = 0;
 	Anope::string end;
@@ -257,7 +271,7 @@ time_t Anope::DoTime(const Anope::string &s)
 				case 'y':
 					return amount * 86400 * 365;
 				default:
-					return -1;
+					break;
 			}
 		}
 	}
@@ -368,7 +382,7 @@ bool Anope::Match(const Anope::string &str, const Anope::string &mask, bool case
 
 		if (r == NULL || r->GetExpression() != stripped_mask)
 		{
-			ServiceReference<RegexProvider> provider("Regex", Config->RegexEngine);
+			ServiceReference<RegexProvider> provider("Regex", Config->GetBlock("options")->Get<const Anope::string &>("regexengine"));
 			if (provider)
 			{
 				try

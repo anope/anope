@@ -13,6 +13,7 @@
 
 #include "module.h"
 
+static ServiceReference<ChanServService> chanserv("ChanServService", "ChanServ");
 static std::map<Anope::string, char> defaultFlags;
 
 class FlagsChanAccess : public ChanAccess
@@ -113,9 +114,10 @@ class CommandCSFlags : public Command
 			}
 		}
 
-		if (ci->GetAccessCount() >= Config->CSAccessMax)
+		unsigned access_max = Config->GetModule("chanserv")->Get<unsigned>("accessmax", "1024");
+		if (access_max && ci->GetAccessCount() >= access_max)
 		{
-			source.Reply(_("Sorry, you can only have %d access entries on a channel."), Config->CSAccessMax);
+			source.Reply(_("Sorry, you can only have %d access entries on a channel."), access_max);
 			return;
 		}
 
@@ -396,19 +398,21 @@ class CSFlags : public Module
 		ModuleManager::Attach(i, this, 1);
 	}
 
-	void OnReload(ServerConfig *conf, ConfigReader &reader) anope_override
+	void OnReload(Configuration::Conf *conf) anope_override
 	{
 		defaultFlags.clear();
 
-		for (int i = 0; i < reader.Enumerate("privilege"); ++i)
+		for (int i = 0; i < conf->CountBlock("privilege"); ++i)
 		{
-			const Anope::string &pname = reader.ReadValue("privilege", "name", "", i);
+			Configuration::Block *priv = conf->GetBlock("privilege", i);
+
+			const Anope::string &pname = priv->Get<const Anope::string &>("name");
 
 			Privilege *p = PrivilegeManager::FindPrivilege(pname);
 			if (p == NULL)
 				continue;
 
-			const Anope::string &value = reader.ReadValue("privilege", "flag", "", i);
+			const Anope::string &value = priv->Get<const Anope::string &>("flag");
 			if (value.empty())
 				continue;
 

@@ -101,10 +101,12 @@ class ModuleSQLOper : public Module
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 	}
 
-	void OnReload(ServerConfig *conf, ConfigReader &reader) anope_override
+	void OnReload(Configuration::Conf *conf) anope_override
 	{
-		this->engine = reader.ReadValue("m_sql_oper", "engine", "", 0);
-		this->query = reader.ReadValue("m_sql_oper", "query", "", 0);
+		Configuration::Block *config = conf->GetModule(this);
+
+		this->engine = config->Get<const Anope::string &>("engine");
+		this->query = config->Get<const Anope::string &>("query");
 
 		this->SQL = ServiceReference<SQL::Provider>("SQL::Provider", this->engine);
 	}

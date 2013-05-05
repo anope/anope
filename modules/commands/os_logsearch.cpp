@@ -11,8 +11,6 @@
 
 #include "module.h"
 
-static Anope::string logfile_name;
-
 class CommandOSLogSearch : public Command
 {
 	static inline Anope::string CreateLogName(const Anope::string &file, time_t t = Anope::CurTime)
@@ -91,6 +89,7 @@ class CommandOSLogSearch : public Command
 
 		Log(LOG_ADMIN, source, this) << "for " << search_string;
 
+		const Anope::string &logfile_name = Config->GetModule(this->owner)->Get<const Anope::string &>("logname");
 		std::list<Anope::string> matches;
 		for (int d = days - 1; d >= 0; --d)
 		{
@@ -151,13 +150,6 @@ class OSLogSearch : public Module
 	OSLogSearch(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandoslogsearch(this)
 	{
-		Implementation i[] = { I_OnReload };
-		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
-	}
-
-	void OnReload(ServerConfig *conf, ConfigReader &reader) anope_override
-	{
-		logfile_name = reader.ReadValue("logsearch", "name", "services.log", 0);
 	}
 };
 

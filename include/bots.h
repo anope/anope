@@ -23,6 +23,8 @@ extern CoreExport Serialize::Checker<botinfo_map> BotListByNick, BotListByUID;
 /* A service bot (NickServ, ChanServ, a BotServ bot, etc). */
 class CoreExport BotInfo : public User, public Serializable
 {
+	/* Channels this bot is assigned to */
+	Serialize::Checker<std::set<ChannelInfo *> > channels;
  public:
 	time_t created;
 	/* Last time this bot said something (via privmsg) */
@@ -63,10 +65,9 @@ class CoreExport BotInfo : public User, public Serializable
 	 */
 	void SetNewNick(const Anope::string &newnick);
 
-	/** Rejoins all channels that this bot is assigned to.
-	 * Used on /kill, rename, etc.
+	/** Return the channels this bot is assigned to
 	 */
-	void RejoinAll();
+	const std::set<ChannelInfo *> &GetChannels() const;
 
 	/** Assign this bot to a given channel, removing the existing assigned bot if one exists.
 	 * @param u The user assigning the bot, or NULL

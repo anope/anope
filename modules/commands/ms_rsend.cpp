@@ -14,7 +14,10 @@
 #include "module.h"
 #include "memoserv.h"
 
-static ServiceReference<MemoServService> MemoServService("MemoServService", "MemoServ");
+namespace
+{
+	ServiceReference<MemoServService> memoserv("MemoServService", "MemoServ");
+}
 
 class CommandMSRSend : public Command
 {
@@ -27,9 +30,8 @@ class CommandMSRSend : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		if (!MemoServService)
+		if (!memoserv)
 			return;
-
 
 		const Anope::string &nick = params[0];
 		const Anope::string &text = params[1];
@@ -42,20 +44,15 @@ class CommandMSRSend : public Command
 			return;
 		}
 
-		if (Config->MSMemoReceipt == 1 && !source.IsServicesOper())
+		if (Config->GetModule(this->owner)->Get<bool>("operonly") && !source.IsServicesOper())
 			source.Reply(ACCESS_DENIED);
-		else if (Config->MSMemoReceipt > 2 || Config->MSMemoReceipt == 0)
-		{
-			Log(this->owner) << "MSMemoReceipt is misconfigured to " << Config->MSMemoReceipt;
-			source.Reply(_("Sorry, RSEND has been disabled on this network."));
-		}
 		else
 		{
-			MemoServService::MemoResult result = MemoServService->Send(source.GetNick(), nick, text);
+			MemoServService::MemoResult result = memoserv->Send(source.GetNick(), nick, text);
 			if (result == MemoServService::MEMO_INVALID_TARGET)
 				source.Reply(_("\002%s\002 is not a registered unforbidden nick or channel."), nick.c_str());
 			else if (result == MemoServService::MEMO_TOO_FAST)
-				source.Reply(_("Please wait %d seconds before using the SEND command again."), Config->MSSendDelay);
+				source.Reply(_("Please wait %d seconds before using the %s command again."), Config->GetModule("memoserv")->Get<time_t>("senddelay"), source.command.c_str());
 			else if (result == MemoServService::MEMO_TARGET_FULL)
 				source.Reply(_("Sorry, %s currently has too many memos and cannot receive more."), nick.c_str());
 			else	
@@ -71,8 +68,6 @@ class CommandMSRSend : public Command
 					m->receipt = true;
 			}
 		}
-
-		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
@@ -98,11 +93,8 @@ class MSRSend : public Module
 	MSRSend(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandmsrsend(this)
 	{
-
-		if (!MemoServService)
+		if (!memoserv)
 			throw ModuleException("No MemoServ!");
-		else if (!Config->MSMemoReceipt)
-			throw ModuleException("Invalid value for memoreceipt");
 	}
 };
 

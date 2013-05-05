@@ -44,7 +44,7 @@ bool WebCPanel::ChanServ::Access::OnRequest(HTTPProvider *server, const Anope::s
 			params.push_back("DEL");
 			params.push_back(message.get_data["mask"]);
 
-			WebPanel::RunCommand(na->nc->display, na->nc, Config->ChanServ, "chanserv/access", params, replacements);
+			WebPanel::RunCommand(na->nc->display, na->nc, ::ChanServ->nick, "chanserv/access", params, replacements);
 		}
 		else if (message.post_data["mask"].empty() == false && message.post_data["access"].empty() == false && message.post_data["provider"].empty() == false)
 		{
@@ -75,8 +75,10 @@ bool WebCPanel::ChanServ::Access::OnRequest(HTTPProvider *server, const Anope::s
 					}
 				}
 
-				if (ci->GetAccessCount() >= Config->CSAccessMax)
-					replacements["MESSAGES"] = "Sorry, you can only have " + stringify(Config->CSAccessMax) + " access entries on a channel.";
+
+				unsigned access_max = Config->GetModule("chanserv")->Get<unsigned>("accessmax", "1024");
+				if (access_max && ci->GetAccessCount() >= access_max)
+					replacements["MESSAGES"] = "Sorry, you can only have " + stringify(access_max) + " access entries on a channel.";
 				else if (!denied)
 				{
 					ChanAccess *new_acc = a->Create();

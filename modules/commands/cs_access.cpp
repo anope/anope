@@ -158,9 +158,10 @@ class CommandCSAccess : public Command
 			}
 		}
 
-		if (ci->GetAccessCount() >= Config->CSAccessMax)
+		unsigned access_max = Config->GetModule("chanserv")->Get<unsigned>("accessmax", "1024");
+		if (access_max && ci->GetAccessCount() >= access_max)
 		{
-			source.Reply(_("Sorry, you can only have %d access entries on a channel."), Config->CSAccessMax);
+			source.Reply(_("Sorry, you can only have %d access entries on a channel."), access_max);
 			return;
 		}
 
@@ -555,7 +556,7 @@ class CommandCSAccess : public Command
 		source.Reply(" ");
 		source.Reply(_("\002User access levels\002 can be seen by using the\n"
 				"\002LEVELS\002 command; type \002%s%s HELP LEVELS\002 for\n"
-				"information."), source.service->nick.c_str(), Config->UseStrictPrivMsgString.c_str(), source.service->nick.c_str());
+				"information."), source.service->nick.c_str(), Config->StrictPrivmsg.c_str(), source.service->nick.c_str());
 		return true;
 	}
 };
@@ -590,7 +591,7 @@ class CommandCSLevels : public Command
 		{
 			Privilege *p = PrivilegeManager::FindPrivilege(what);
 			if (p == NULL)
-				source.Reply(_("Setting \002%s\002 not known.  Type \002%s%s HELP LEVELS\002 for a list of valid settings."), what.c_str(), Config->UseStrictPrivMsgString.c_str(), source.service->nick.c_str());
+				source.Reply(_("Setting \002%s\002 not known.  Type \002%s%s HELP LEVELS\002 for a list of valid settings."), what.c_str(), Config->StrictPrivmsg.c_str(), source.service->nick.c_str());
 			else
 			{
 				ci->SetLevel(p->name, level);
@@ -628,7 +629,7 @@ class CommandCSLevels : public Command
 			}
 		}
 
-		source.Reply(_("Setting \002%s\002 not known.  Type \002%s%s HELP LEVELS\002 for a list of valid settings."), what.c_str(), Config->UseStrictPrivMsgString.c_str(), source.service->nick.c_str());
+		source.Reply(_("Setting \002%s\002 not known.  Type \002%s%s HELP LEVELS\002 for a list of valid settings."), what.c_str(), Config->StrictPrivmsg.c_str(), source.service->nick.c_str());
 
 		return;
 	}
@@ -792,19 +793,21 @@ class CSAccess : public Module
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 	}
 
-	void OnReload(ServerConfig *conf, ConfigReader &reader) anope_override
+	void OnReload(Configuration::Conf *conf) anope_override
 	{
 		defaultLevels.clear();
 
-		for (int i = 0; i < reader.Enumerate("privilege"); ++i)
+		for (int i = 0; i < conf->CountBlock("privilege"); ++i)
 		{
-			const Anope::string &pname = reader.ReadValue("privilege", "name", "", i);
+			Configuration::Block *priv = conf->GetBlock("privilege", i);
+
+			const Anope::string &pname = priv->Get<const Anope::string &>("name");
 
 			Privilege *p = PrivilegeManager::FindPrivilege(pname);
 			if (p == NULL)
 				continue;
 
-			const Anope::string &value = reader.ReadValue("privilege", "level", "", i);
+			const Anope::string &value = priv->Get<const Anope::string &>("level");
 			if (value.empty())
 				continue;
 			else if (value.equals_ci("founder"))
@@ -812,7 +815,7 @@ class CSAccess : public Module
 			else if (value.equals_ci("disabled"))
 				defaultLevels[p->name] = ACCESS_INVALID;
 			else
-				defaultLevels[p->name] = reader.ReadInteger("privilege", "level", i, false);
+				defaultLevels[p->name] = priv->Get<int16_t>("level");
 		}
 	}
 

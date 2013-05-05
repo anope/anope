@@ -11,6 +11,8 @@
 
 #include "module.h"
 
+static ServiceReference<NickServService> nickserv("NickServService", "NickServ");
+
 class CommandNSSet : public Command
 {
  public:
@@ -50,7 +52,7 @@ class CommandNSSet : public Command
 		}
 
 		source.Reply(_("Type \002%s%s HELP %s \037option\037\002 for more information\n"
-			"on a specific option."), Config->UseStrictPrivMsgString.c_str(), source.service->nick.c_str(), this_name.c_str());
+			"on a specific option."), Config->StrictPrivmsg.c_str(), source.service->nick.c_str(), this_name.c_str());
 
 		return true;
 	}
@@ -96,7 +98,7 @@ class CommandNSSASet : public Command
 
 		source.Reply(_("Type \002%s%s HELP %s \037option\037\002 for more information\n"
 				"on a specific option. The options will be set on the given\n"
-				"\037nickname\037."), Config->UseStrictPrivMsgString.c_str(), Config->NickServ.c_str(), this_name.c_str());
+				"\037nickname\037."), Config->StrictPrivmsg.c_str(), NickServ->nick.c_str(), this_name.c_str());
 		return true;
 	}
 };
@@ -115,12 +117,12 @@ class CommandNSSetPassword : public Command
 		const Anope::string &param = params[1];
 		unsigned len = param.length();
 
-		if (source.GetNick().equals_ci(param) || (Config->StrictPasswords && len < 5))
+		if (source.GetNick().equals_ci(param) || (Config->GetBlock("options")->Get<bool>("strictpasswords") && len < 5))
 		{
 			source.Reply(MORE_OBSCURE_PASSWORD);
 			return;
 		}
-		else if (len > Config->PassLen)
+		else if (len > Config->GetBlock("options")->Get<unsigned>("passlen"))
 		{
 			source.Reply(PASSWORD_TOO_LONG);
 			return;
@@ -167,17 +169,17 @@ class CommandNSSASetPassword : public Command
 
 		size_t len = params[1].length();
 
-		if (Config->NSSecureAdmins && source.nc != nc && nc->IsServicesOper())
+		if (Config->GetModule("nickserv")->Get<bool>("secureadmins", "yes") && source.nc != nc && nc->IsServicesOper())
 		{
 			source.Reply(_("You may not change the password of other Services Operators."));
 			return;
 		}
-		else if (nc->display.equals_ci(params[1]) || (Config->StrictPasswords && len < 5))
+		else if (nc->display.equals_ci(params[1]) || (Config->GetBlock("options")->Get<bool>("strictpasswords") && len < 5))
 		{
 			source.Reply(MORE_OBSCURE_PASSWORD);
 			return;
 		}
-		else if (len > Config->PassLen)
+		else if (len > Config->GetBlock("options")->Get<unsigned>("passlen"))
 		{
 			source.Reply(PASSWORD_TOO_LONG);
 			return;
@@ -378,7 +380,7 @@ class CommandNSSetDisplay : public Command
 	{
 		const NickAlias *user_na = NickAlias::Find(user), *na = NickAlias::Find(param);
 
-		if (Config->NoNicknameOwnership)
+		if (Config->GetBlock("options")->Get<bool>("nonicknameownership"))
 		{
 			source.Reply(_("This command may not be used on this network because nickname ownership is disabled."));
 			return;
@@ -462,15 +464,15 @@ class CommandNSSetEmail : public Command
 	
 		u->Account()->Extend("ns_set_email_passcode", new ExtensibleItemClass<Anope::string>(code));
 
-		Anope::string subject = Config->MailEmailchangeSubject;
-		Anope::string message = Config->MailEmailchangeMessage;
+		Anope::string subject = Config->GetBlock("mail")->Get<const char *>("emailchange_subject"),
+			message = Config->GetBlock("mail")->Get<const char *>("emailchange_message");
 
 		subject = subject.replace_all_cs("%e", u->Account()->email);
-		subject = subject.replace_all_cs("%N", Config->NetworkName);
+		subject = subject.replace_all_cs("%N", Config->GetBlock("networkinfo")->Get<const Anope::string &>("networkname"));
 		subject = subject.replace_all_cs("%c", code);
 
 		message = message.replace_all_cs("%e", u->Account()->email);
-		message = message.replace_all_cs("%N", Config->NetworkName);
+		message = message.replace_all_cs("%N", Config->GetBlock("networkinfo")->Get<const Anope::string &>("networkname"));
 		message = message.replace_all_cs("%c", code);
 
 		return Mail::Send(u, u->Account(), bi, subject, message);
@@ -493,12 +495,12 @@ class CommandNSSetEmail : public Command
 		}
 		NickCore *nc = na->nc;
 
-		if (param.empty() && Config->NSForceEmail)
+		if (param.empty() && Config->GetModule("nickserv")->Get<bool>("forceemail", "yes"))
 		{
 			source.Reply(_("You cannot unset the e-mail on this network."));
 			return;
 		}
-		else if (Config->NSSecureAdmins && source.nc != nc && nc->IsServicesOper())
+		else if (Config->GetModule("nickserv")->Get<bool>("secureadmins", "yes") && source.nc != nc && nc->IsServicesOper())
 		{
 			source.Reply(_("You may not change the e-mail of other Services Operators."));
 			return;
@@ -514,7 +516,7 @@ class CommandNSSetEmail : public Command
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
-		if (!param.empty() && Config->NSConfirmEmailChanges && !source.IsServicesOper())
+		if (!param.empty() && Config->GetModule("nickserv")->Get<bool>("forceemail", "yes") && !source.IsServicesOper())
 		{
 			source.nc->Extend("ns_set_email", new ExtensibleItemClass<Anope::string>(param));
 			Anope::string old = source.nc->email;
@@ -722,13 +724,13 @@ class CommandNSSetHide : public Command
 		{
 			Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to change hide " << param << " to " << arg << " for " << nc->display;
 			nc->ExtendMetadata(flag);
-			source.Reply(onmsg.c_str(), nc->display.c_str(), Config->NickServ.c_str());
+			source.Reply(onmsg.c_str(), nc->display.c_str(), NickServ->nick.c_str());
 		}
 		else if (arg.equals_ci("OFF"))
 		{
 			Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to change hide " << param << " to " << arg << " for " << nc->display;
 			nc->Shrink(flag);
-			source.Reply(offmsg.c_str(), nc->display.c_str(), Config->NickServ.c_str());
+			source.Reply(offmsg.c_str(), nc->display.c_str(), NickServ->nick.c_str());
 		}
 		else
 			this->OnSyntaxError(source, "HIDE");
@@ -751,7 +753,7 @@ class CommandNSSetHide : public Command
 				"user@host mask (\002USERMASK\002), your services access status\n"
 				"(\002STATUS\002) and  last quit message (\002QUIT\002).\n"
 				"The second parameter specifies whether the information should\n"
-				"be displayed (\002OFF\002) or hidden (\002ON\002)."), Config->NickServ.c_str());
+				"be displayed (\002OFF\002) or hidden (\002ON\002)."), NickServ->nick.c_str());
 		return true;
 	}
 };
@@ -780,7 +782,7 @@ class CommandNSSASetHide : public CommandNSSetHide
 				"user@host mask (\002USERMASK\002), the services access status\n"
 				"(\002STATUS\002) and  last quit message (\002QUIT\002).\n"
 				"The second parameter specifies whether the information should\n"
-				"be displayed (\002OFF\002) or hidden (\002ON\002)."), Config->NickServ.c_str());
+				"be displayed (\002OFF\002) or hidden (\002ON\002)."), NickServ->nick.c_str());
 		return true;
 	}
 };
@@ -796,7 +798,7 @@ class CommandNSSetKill : public Command
 
 	void Run(CommandSource &source, const Anope::string &user, const Anope::string &param)
 	{
-		if (Config->NoNicknameOwnership)
+		if (Config->GetBlock("options")->Get<bool>("nonicknameownership"))
 		{
 			source.Reply(_("This command may not be used on this network because nickname ownership is disabled."));
 			return;
@@ -833,7 +835,7 @@ class CommandNSSetKill : public Command
 		}
 		else if (param.equals_ci("IMMED"))
 		{
-			if (Config->NSAllowKillImmed)
+			if (Config->GetModule(this->owner)->Get<bool>("allowkillimmed"))
 			{
 				nc->ExtendMetadata("KILLPROTECT");
 				nc->ExtendMetadata("KILL_IMMED");
@@ -878,7 +880,7 @@ class CommandNSSetKill : public Command
 				"\002IMMED\002, user's nick will be changed immediately \037without\037 being\n"
 				"warned first or given a chance to change their nick; please\n"
 				"do not use this option unless necessary. Also, your\n"
-				"network's administrators may have disabled this option."), Config->NickServ.c_str());
+				"network's administrators may have disabled this option."), NickServ->nick.c_str());
 		return true;
 	}
 };
@@ -912,7 +914,7 @@ class CommandNSSASetKill : public CommandNSSetKill
 				"\002IMMED\002, the user's nick will be changed immediately \037without\037 being\n"
 				"warned first or given a chance to change their nick; please\n"
 				"do not use this option unless necessary. Also, your\n"
-				"network's administrators may have disabled this option."), Config->NickServ.c_str());
+				"network's administrators may have disabled this option."), NickServ->nick.c_str());
 		return true;
 	}
 };
@@ -956,8 +958,6 @@ class CommandNSSetLanguage : public Command
 
 		nc->language = param != "en" ? param : "";
 		source.Reply(_("Language changed to \002English\002."));
-
-		return;
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &param) anope_override
@@ -1040,7 +1040,7 @@ class CommandNSSetMessage : public Command
 		}
 		NickCore *nc = na->nc;
 
-		if (!Config->UsePrivmsg)
+		if (!Config->GetBlock("options")->Get<bool>("useprivmsg"))
 		{
 			source.Reply(_("You cannot %s on this network."), source.command.c_str());
 			return;
@@ -1086,7 +1086,7 @@ class CommandNSSetMessage : public Command
 
 	void OnServHelp(CommandSource &source) anope_override
 	{
-		if (Config->UsePrivmsg)
+		if (!Config->GetBlock("options")->Get<bool>("useprivmsg"))
 			Command::OnServHelp(source);
 	}
 };
@@ -1121,7 +1121,7 @@ class CommandNSSetPrivate : public Command
  public:
 	CommandNSSetPrivate(Module *creator, const Anope::string &sname = "nickserv/set/private", size_t min = 1) : Command(creator, sname, min, min + 1)
 	{
-		this->SetDesc(Anope::printf(_("Prevent the nickname from appearing in a \002%s%s LIST\002"), Config->UseStrictPrivMsgString.c_str(), Config->NickServ.c_str()));
+		this->SetDesc(_("Prevent the nickname from appearing in the LIST command"));
 		this->SetSyntax(_("{ON | OFF}"));
 	}
 
@@ -1172,7 +1172,7 @@ class CommandNSSetPrivate : public Command
 				"nickname lists generated with %s's \002LIST\002 command.\n"
 				"(However, anyone who knows your nickname can still get\n"
 				"information on it using the \002INFO\002 command.)"),
-				Config->NickServ.c_str(), Config->NickServ.c_str());
+				NickServ->nick.c_str(), NickServ->nick.c_str());
 		return true;
 	}
 };
@@ -1200,7 +1200,7 @@ class CommandNSSASetPrivate : public CommandNSSetPrivate
 				"nickname lists generated with %s's \002LIST\002 command.\n"
 				"(However, anyone who knows the nickname can still get\n"
 				"information on it using the \002INFO\002 command.)"),
-				Config->NickServ.c_str(), Config->NickServ.c_str());
+				NickServ->nick.c_str(), NickServ->nick.c_str());
 		return true;
 	}
 };
@@ -1260,7 +1260,7 @@ class CommandNSSetSecure : public Command
 				"regardless of whether your address is on the access\n"
 				"list. However, if you are on the access list, %s\n"
 				"will not auto-kill you regardless of the setting of the\n"
-				"\002KILL\002 option."), Config->NickServ.c_str(), Config->NickServ.c_str());
+				"\002KILL\002 option."), NickServ->nick.c_str(), NickServ->nick.c_str());
 		return true;
 	}
 };
@@ -1289,7 +1289,7 @@ class CommandNSSASetSecure : public CommandNSSetSecure
 				"regardless of whether your address is on the access\n"
 				"list. However, if you are on the access list, %s\n"
 				"will not auto-kill you regardless of the setting of the\n"
-				"\002KILL\002 option."), Config->NickServ.c_str(), Config->NickServ.c_str());
+				"\002KILL\002 option."), NickServ->nick.c_str(), NickServ->nick.c_str());
 		return true;
 	}
 };
@@ -1402,19 +1402,8 @@ class NSSet : public Module
 		commandnssasetnoexpire(this)
 	{
 
-		Implementation i[] = { I_OnReload, I_OnNickRegister, I_OnPreCommand };
+		Implementation i[] = { I_OnPreCommand };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
-	}
-
-	void OnReload(ServerConfig *conf, ConfigReader &reader) anope_override
-	{
-		NSDefChanstats = reader.ReadFlag("chanstats", "NSDefChanstats", "0", 0);
-	}
-
-	void OnNickRegister(NickAlias *na) anope_override
-	{
-		if (NSDefChanstats)
-			na->nc->ExtendMetadata("STATS");
 	}
 
 	EventReturn OnPreCommand(CommandSource &source, Command *command, std::vector<Anope::string> &params) anope_override

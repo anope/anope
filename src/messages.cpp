@@ -126,9 +126,6 @@ void Join::SJoin(MessageSource &source, const Anope::string &chan, time_t ts, co
 		const ChannelStatus &status = it->first;
 		User *u = it->second;
 
-		EventReturn MOD_RESULT;
-		FOREACH_RESULT(I_OnPreJoinChannel, OnPreJoinChannel(u, c));
-
 		/* Add the user to the channel */
 		ChanUserContainer *cc = c->JoinUser(u);
 
@@ -141,14 +138,8 @@ void Join::SJoin(MessageSource &source, const Anope::string &chan, time_t ts, co
 		 */
 		c->SetCorrectModes(u, true, true);
 
-		/* Check to see if modules want the user to join, if they do
-		 * check to see if they are allowed to join (CheckKick will kick/ban them
-		 * if they aren't).
-		 */
-		if (MOD_RESULT != EVENT_STOP && c->ci && c->ci->CheckKick(u))
-			continue;
-
-		FOREACH_MOD(I_OnJoinChannel, OnJoinChannel(u, c));
+		if (c->ci)
+			c->ci->CheckKick(u);
 	}
 
 	/* Channel is done syncing */
@@ -234,10 +225,10 @@ void MOTD::Run(MessageSource &source, const std::vector<Anope::string> &params)
 	if (s != Me)
 		return;
 
-	FILE *f = fopen(Config->MOTDFilename.c_str(), "r");
+	FILE *f = fopen(Config->GetBlock("serverinfo")->Get<const char *>("motd"), "r");
 	if (f)
 	{
-		IRCD->SendNumeric(375, source.GetSource(), ":- %s Message of the Day", Config->ServerName.c_str());
+		IRCD->SendNumeric(375, source.GetSource(), ":- %s Message of the Day", s->GetName().c_str());
 		char buf[BUFSIZE];
 		while (fgets(buf, sizeof(buf), f))
 		{
@@ -304,16 +295,16 @@ void Privmsg::Run(MessageSource &source, const std::vector<Anope::string> &param
 		{
 			Anope::string servername(receiver.begin() + s + 1, receiver.end());
 			botname = botname.substr(0, s);
-			if (!servername.equals_ci(Config->ServerName))
+			if (!servername.equals_ci(Me->GetName()))
 				return;
 		}
-		else if (Config->UseStrictPrivMsg)
+		else if (Config->GetBlock("options")->Get<bool>("usestrictprivmsg"))
 		{
 			const BotInfo *bi = BotInfo::Find(receiver);
 			if (!bi)
 				return;
 			Log(LOG_DEBUG) << "Ignored PRIVMSG without @ from " << u->nick;
-			u->SendMessage(bi, _("\"/msg %s\" is no longer supported.  Use \"/msg %s@%s\" or \"/%s\" instead."), bi->nick.c_str(), bi->nick.c_str(), Config->ServerName.c_str(), bi->nick.c_str());
+			u->SendMessage(bi, _("\"/msg %s\" is no longer supported.  Use \"/msg %s@%s\" or \"/%s\" instead."), bi->nick.c_str(), bi->nick.c_str(), Me->GetName().c_str(), bi->nick.c_str());
 			return;
 		}
 
@@ -338,7 +329,7 @@ void Privmsg::Run(MessageSource &source, const std::vector<Anope::string> &param
 				else if (message.substr(0, 9).equals_ci("\1VERSION\1"))
 				{
 					Module *enc = ModuleManager::FindFirstOf(ENCRYPTION);
-					IRCD->SendCTCP(bi, u->nick, "VERSION Anope-%s %s :%s - (%s) -- %s", Anope::Version().c_str(), Config->ServerName.c_str(), IRCD->GetProtocolName().c_str(), enc ? enc->name.c_str() : "(none)", Anope::VersionBuildString().c_str());
+					IRCD->SendCTCP(bi, u->nick, "VERSION Anope-%s %s :%s - (%s) -- %s", Anope::Version().c_str(), Me->GetName().c_str(), IRCD->GetProtocolName().c_str(), enc ? enc->name.c_str() : "(none)", Anope::VersionBuildString().c_str());
 				}
 				return;
 			}
@@ -357,16 +348,7 @@ void Quit::Run(MessageSource &source, const std::vector<Anope::string> &params)
 
 	Log(user, "quit") << "quit (Reason: " << (!reason.empty() ? reason : "no reason") << ")";
 
-	NickAlias *na = NickAlias::Find(user->nick);
-	if (na && !na->nc->HasExt("SUSPENDED") && (user->IsRecognized() || user->IsIdentified(true)))
-	{
-		na->last_seen = Anope::CurTime;
-		na->last_quit = reason;
-	}
-	FOREACH_MOD(I_OnUserQuit, OnUserQuit(user, reason));
 	user->Quit(reason);
-
-	return;
 }
 
 void SQuit::Run(MessageSource &source, const std::vector<Anope::string> &params)
@@ -382,8 +364,6 @@ void SQuit::Run(MessageSource &source, const std::vector<Anope::string> &params)
 	FOREACH_MOD(I_OnServerQuit, OnServerQuit(s));
 
 	s->Delete(s->GetName() + " " + s->GetUplink()->GetName());
-
-	return;
 }
 
 void Stats::Run(MessageSource &source, const std::vector<Anope::string> &params)
@@ -396,7 +376,7 @@ void Stats::Run(MessageSource &source, const std::vector<Anope::string> &params)
 			if (u->HasMode("OPER"))
 			{
 				IRCD->SendNumeric(211, source.GetSource(), "Server SendBuf SentBytes SentMsgs RecvBuf RecvBytes RecvMsgs ConnTime");
-				IRCD->SendNumeric(211, source.GetSource(), "%s %d %d %d %d %d %d %ld", Config->Uplinks[Anope::CurrentUplink]->host.c_str(), UplinkSock->WriteBufferLen(), TotalWritten, -1, UplinkSock->ReadBufferLen(), TotalRead, -1, static_cast<long>(Anope::CurTime - Anope::StartTime));
+				IRCD->SendNumeric(211, source.GetSource(), "%s %d %d %d %d %d %d %ld", Config->Uplinks[Anope::CurrentUplink].host.c_str(), UplinkSock->WriteBufferLen(), TotalWritten, -1, UplinkSock->ReadBufferLen(), TotalRead, -1, static_cast<long>(Anope::CurTime - Anope::StartTime));
 			}
 
 			IRCD->SendNumeric(219, source.GetSource(), "%c :End of /STATS report.", params[0][0]);
@@ -404,7 +384,7 @@ void Stats::Run(MessageSource &source, const std::vector<Anope::string> &params)
 		case 'o':
 		case 'O':
 			/* Check whether the user is an operator */
-			if (!u->HasMode("OPER") && Config->HideStatsO)
+			if (!u->HasMode("OPER") && Config->GetBlock("options")->Get<bool>("hidestatso"))
 				IRCD->SendNumeric(219, source.GetSource(), "%c :End of /STATS report.", params[0][0]);
 			else
 			{
@@ -444,7 +424,7 @@ void Time::Run(MessageSource &source, const std::vector<Anope::string> &params)
 	struct tm *tm = localtime(&t);
 	char buf[64];
 	strftime(buf, sizeof(buf), "%a %b %d %H:%M:%S %Y %Z", tm);
-	IRCD->SendNumeric(391, source.GetSource(), "%s :%s", Config->ServerName.c_str(), buf);
+	IRCD->SendNumeric(391, source.GetSource(), "%s :%s", Me->GetName().c_str(), buf);
 	return;
 }
 
@@ -460,7 +440,7 @@ void Topic::Run(MessageSource &source, const std::vector<Anope::string> &params)
 void Version::Run(MessageSource &source, const std::vector<Anope::string> &params)
 {
 	Module *enc = ModuleManager::FindFirstOf(ENCRYPTION);
-	IRCD->SendNumeric(351, source.GetSource(), "Anope-%s %s :%s -(%s) -- %s", Anope::Version().c_str(), Config->ServerName.c_str(), IRCD->GetProtocolName().c_str(), enc ? enc->name.c_str() : "(none)", Anope::VersionBuildString().c_str());
+	IRCD->SendNumeric(351, source.GetSource(), "Anope-%s %s :%s -(%s) -- %s", Anope::Version().c_str(), Me->GetName().c_str(), IRCD->GetProtocolName().c_str(), enc ? enc->name.c_str() : "(none)", Anope::VersionBuildString().c_str());
 	return;
 }
 
@@ -474,7 +454,7 @@ void Whois::Run(MessageSource &source, const std::vector<Anope::string> &params)
 		IRCD->SendNumeric(311, source.GetSource(), "%s %s %s * :%s", u->nick.c_str(), u->GetIdent().c_str(), u->host.c_str(), u->realname.c_str());
 		if (bi)
 			IRCD->SendNumeric(307, source.GetSource(), "%s :is a registered nick", bi->nick.c_str());
-		IRCD->SendNumeric(312, source.GetSource(), "%s %s :%s", u->nick.c_str(), Config->ServerName.c_str(), Config->ServerDesc.c_str());
+		IRCD->SendNumeric(312, source.GetSource(), "%s %s :%s", u->nick.c_str(), Me->GetName().c_str(), Config->GetBlock("serverinfo")->Get<const char *>("description"));
 		if (bi)
 			IRCD->SendNumeric(317, source.GetSource(), "%s %ld %ld :seconds idle, signon time", bi->nick.c_str(), static_cast<long>(Anope::CurTime - bi->lastmsg), static_cast<long>(bi->signon));
 		IRCD->SendNumeric(318, source.GetSource(), "%s :End of /WHOIS list.", params[0].c_str());

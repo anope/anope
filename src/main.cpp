@@ -144,12 +144,12 @@ int main(int ac, char **av, char **envp)
 	}
 	catch (const SocketException &ex)
 	{
-		Log(LOG_TERMINAL) << "Unable to connect to uplink #" << Anope::CurrentUplink << " (" << Config->Uplinks[Anope::CurrentUplink]->host << ":" << Config->Uplinks[Anope::CurrentUplink]->port << "): " << ex.GetReason();
+		Log(LOG_TERMINAL) << "Unable to connect to uplink #" << (Anope::CurrentUplink + 1) << " (" << Config->Uplinks[Anope::CurrentUplink].host << ":" << Config->Uplinks[Anope::CurrentUplink].port << "): " << ex.GetReason();
 	}
 
 	/* Set up timers */
 	time_t last_check = Anope::CurTime;
-	UpdateTimer updateTimer(Config->UpdateTimeout);
+	UpdateTimer updateTimer(Config->GetBlock("options")->Get<time_t>("updatetimeout"));
 
 	/*** Main loop. ***/
 	while (!Anope::Quitting)
@@ -157,7 +157,7 @@ int main(int ac, char **av, char **envp)
 		Log(LOG_DEBUG_2) << "Top of main loop";
 
 		/* Process timers */
-		if (Anope::CurTime - last_check >= Config->TimeoutCheck)
+		if (Anope::CurTime - last_check >= Config->GetBlock("options")->Get<time_t>("timeoutcheck"))
 		{
 			TimerManager::TickTimers(Anope::CurTime);
 			last_check = Anope::CurTime;

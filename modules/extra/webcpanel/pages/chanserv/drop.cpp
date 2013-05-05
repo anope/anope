@@ -21,7 +21,7 @@ bool WebCPanel::ChanServ::Drop::OnRequest(HTTPProvider *server, const Anope::str
 			std::vector<Anope::string> params;
 			params.push_back(HTTPUtils::URLDecode(message.post_data["channel"]));
 
-			WebPanel::RunCommand(na->nc->display, na->nc, Config->ChanServ, "chanserv/drop", params, replacements);
+			WebPanel::RunCommand(na->nc->display, na->nc, ::ChanServ->nick, "chanserv/drop", params, replacements);
 		}
 		else replacements["MESSAGES"] = "Invalid Confirmation";
 	}

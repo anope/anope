@@ -112,8 +112,6 @@ if (true) \
 else \
 	static_cast<void>(0)
 
-class ConfigReader;
-
 /** Possible return types from events.
  */
 enum EventReturn
@@ -278,20 +276,27 @@ class CoreExport Module : public Extensible
 	 * before they will be called.
 	 */
 
-	/** Called when the ircd notifies that a user has been kicked from a channel.
-	 * @param c The channel the user has been kicked from.
-	 * @param target The user that has been kicked.
-	 * @param source The nick of the sender.
+	/** Called before a user has been kicked from a channel.
+	 * @param source The kicker
+	 * @param cu The user, channel, and status of the user being kicked
 	 * @param kickmsg The reason for the kick.
 	 */
-	virtual void OnUserKicked(Channel *c, User *target, MessageSource &source, const Anope::string &kickmsg) { }
+	virtual void OnPreUserKicked(MessageSource &source, ChanUserContainer *cu, const Anope::string &kickmsg) { }
+
+	/** Called when a user has been kicked from a channel.
+	 * @param source The kicker
+	 * @param target The user being kicked
+	 * @param channel The channel the user was kicked from, which may no longer exist
+	 * @param status The status the kicked user had on the channel before they were kicked
+	 * @param kickmsg The reason for the kick.
+	 */
+	virtual void OnUserKicked(MessageSource &source, User *target, const Anope::string &channel, ChannelStatus &status, const Anope::string &kickmsg) { }
 
 	/** Called when Services' configuration is being (re)loaded.
 	 * @param conf The config that is being built now and will replace the global Config object
-	 * @param reader A config reader for conf
 	 * @throws A ConfigException to abort the config (re)loading process.
 	 */
-	virtual void OnReload(ServerConfig *conf, ConfigReader &reader) { }
+	virtual void OnReload(Configuration::Conf *conf) { }
 
 	/** Called before a bot is assigned to a channel.
 	 * @param sender The user assigning the bot
@@ -299,7 +304,11 @@ class CoreExport Module : public Extensible
 	 * @param bi The bot being assigned.
 	 * @return EVENT_CONTINUE to let other modules decide, EVENT_STOP to deny the assign.
 	 */
-	virtual EventReturn OnBotAssign(User *sender, ChannelInfo *ci, BotInfo *bi) { return EVENT_CONTINUE; }
+	virtual EventReturn OnPreBotAssign(User *sender, ChannelInfo *ci, BotInfo *bi) { return EVENT_CONTINUE; }
+
+	/** Called when a bot is assigned ot a channel
+	 */
+	virtual void OnBotAssign(User *sender, ChannelInfo *ci, BotInfo *bi) { }
 
 	/** Called before a bot is unassigned from a channel.
 	 * @param sender The user unassigning the bot
@@ -387,12 +396,6 @@ class CoreExport Module : public Extensible
 	 */
 	virtual EventReturn OnBotNoFantasyAccess(CommandSource &source, Command *c, ChannelInfo *ci, const std::vector<Anope::string> &params) { return EVENT_CONTINUE; }
 
-	/** Called after a bot joins a channel
-	 * @param c The channel
-	 * @param bi The bot
-	 */
-	virtual void OnBotJoin(Channel *c, BotInfo *bi) { }
-
 	/** Called when a bot places a ban
 	 * @param u User being banned
 	 * @param ci Channel the ban is placed on
@@ -441,13 +444,6 @@ class CoreExport Module : public Extensible
 	 * @param c The channel
 	 */
 	virtual void OnLeaveChannel(User *u, Channel *c) { }
-
-	/** Called before a user joins a channel
-	 * @param u The user
-	 * @param c The channel
-	 * @return EVENT_STOP to allow the user to join the channel through restrictions, EVENT_CONTINUE to let other modules decide
-	 */
-	virtual EventReturn OnPreJoinChannel(User *u, Channel *c) { return EVENT_CONTINUE; }
 
 	/** Called when a user joins a channel
 	 * @param u The user
@@ -551,13 +547,15 @@ class CoreExport Module : public Extensible
 	 */
 	virtual void OnServerQuit(Server *server) { }
 
-	/** Called on a QUIT
+	/** Called when a user quits, or is killed
 	 * @param u The user
 	 * @param msg The quit message
 	 */
 	virtual void OnUserQuit(User *u, const Anope::string &msg) { }
 
-	/** Called when a user disconnects, before and after being internally removed from
+	/** Called when a user is quit, before and after being internally removed from
+	 * This is different from OnUserQuit, which takes place at the time of the quit.
+	 * This happens shortly after when all message processing is finished.
 	 * all lists (channels, user list, etc)
 	 * @param u The user
 	 */
@@ -721,9 +719,10 @@ class CoreExport Module : public Extensible
 	virtual void OnNickLogout(User *u) { }
 
 	/** Called when a nick is registered
+	 * @param user The user registering the nick, of any
 	 * @param The nick
 	 */
-	virtual void OnNickRegister(NickAlias *na) { }
+	virtual void OnNickRegister(User *user, NickAlias *na) { }
 
 	/** Called when a nick is suspended
 	 * @param na The nick alias
@@ -739,6 +738,11 @@ class CoreExport Module : public Extensible
 	 * @ param na pointer to the nickalias
 	 */
 	virtual void OnDelNick(NickAlias *na) { }
+
+	/** Called when a nickcore is created
+	 * @param nc The nickcore
+	 */
+	virtual void OnNickCoreCreate(NickCore *nc) { }
 
 	/** Called on delcore()
 	 * @param nc pointer to the NickCore
@@ -963,6 +967,21 @@ class CoreExport Module : public Extensible
 	 */
 	virtual EventReturn OnCheckModes(Channel *c) { return EVENT_CONTINUE; }
 
+	/** Called when a channel is synced.
+	 * Channels are synced after a sjoin is finished processing
+	 * for a newly created channel to set the correct modes, topic,
+	 * set.
+	 */
+	virtual void OnChannelSync(Channel *c) { }
+
+	/** Called to set the correct modes on the user on the given channel
+	 * @param user The user
+	 * @param chan The channel
+	 * @param access The user's access on the channel
+	 * @param give_modes If giving modes is desired
+	 */
+	virtual void OnSetCorrectModes(User *user, Channel *chan, AccessGroup &access, bool give_modes) { }
+
 	virtual void OnSerializeCheck(Serialize::Type *) { }
 	virtual void OnSerializableConstruct(Serializable *) { }
 	virtual void OnSerializableDestruct(Serializable *) { }
@@ -994,6 +1013,12 @@ class CoreExport Module : public Extensible
 	 * @return EVENT_STOP to prevent the protocol module from processing this message
 	 */
 	virtual EventReturn OnMessage(MessageSource &source, Anope::string &command, std::vector<Anope::string> &param) { return EVENT_CONTINUE; }
+
+	/** Called to determine if a chnanel mode can be set by a user
+	 * @param u The user
+	 * @param cm The mode
+	 */
+	virtual EventReturn OnCanSet(User *u, const ChannelMode *cm) { return EVENT_CONTINUE; }
 };
 
 /** Implementation-specific flags which may be set in ModuleManager::Attach()
@@ -1003,7 +1028,7 @@ enum Implementation
 	I_BEGIN,
 		/* NickServ */
 		I_OnPreNickExpire, I_OnNickExpire, I_OnNickForbidden, I_OnNickGroup, I_OnNickLogout, I_OnNickIdentify, I_OnNickDrop,
-		I_OnNickRegister, I_OnNickSuspended, I_OnNickUnsuspended, I_OnDelNick, I_OnDelCore, I_OnChangeCoreDisplay,
+		I_OnNickRegister, I_OnNickSuspended, I_OnNickUnsuspended, I_OnDelNick, I_OnNickCoreCreate, I_OnDelCore, I_OnChangeCoreDisplay,
 		I_OnNickClearAccess, I_OnNickAddAccess, I_OnNickEraseAccess, I_OnNickClearCert, I_OnNickAddCert, I_OnNickEraseCert,
 		I_OnNickInfo, I_OnCheckAuthentication, I_OnNickUpdate, I_OnSetNickOption,
 
@@ -1011,11 +1036,11 @@ enum Implementation
 		I_OnChanSuspend, I_OnChanDrop, I_OnPreChanExpire, I_OnChanExpire, I_OnAccessAdd,
 		I_OnAccessDel, I_OnAccessClear, I_OnLevelChange, I_OnChanRegistered, I_OnChanUnsuspend, I_OnCreateChan, I_OnDelChan, I_OnChannelCreate,
 		I_OnChannelDelete, I_OnAkickAdd, I_OnAkickDel, I_OnCheckKick, I_OnCheckModes,
-		I_OnChanInfo, I_OnCheckPriv, I_OnGroupCheckPriv, I_OnSetChannelOption,
+		I_OnChanInfo, I_OnCheckPriv, I_OnGroupCheckPriv, I_OnSetChannelOption, I_OnChannelSync, I_OnSetCorrectModes,
 
 		/* BotServ */
-		I_OnBotJoin, I_OnBotKick, I_OnBotCreate, I_OnBotChange, I_OnBotDelete, I_OnBotAssign, I_OnBotUnAssign,
-		I_OnUserKicked, I_OnBotFantasy, I_OnBotNoFantasyAccess, I_OnBotBan, I_OnBadWordAdd, I_OnBadWordDel,
+		I_OnBotKick, I_OnBotCreate, I_OnBotChange, I_OnBotDelete, I_OnPreBotAssign, I_OnBotAssign, I_OnBotUnAssign,
+		I_OnPreUserKicked, I_OnUserKicked, I_OnBotFantasy, I_OnBotNoFantasyAccess, I_OnBotBan, I_OnBadWordAdd, I_OnBadWordDel,
 
 		/* HostServ */
 		I_OnSetVhost, I_OnDeleteVhost,
@@ -1024,7 +1049,7 @@ enum Implementation
 		I_OnMemoSend, I_OnMemoDel,
 
 		/* Users */
-		I_OnUserConnect, I_OnUserNickChange, I_OnUserQuit, I_OnPreUserLogoff, I_OnPostUserLogoff, I_OnPreJoinChannel,
+		I_OnUserConnect, I_OnUserNickChange, I_OnUserQuit, I_OnPreUserLogoff, I_OnPostUserLogoff,
 		I_OnJoinChannel, I_OnPrePartChannel, I_OnPartChannel, I_OnLeaveChannel, I_OnFingerprint, I_OnUserAway, I_OnInvite,
 
 		/* OperServ */
@@ -1044,7 +1069,7 @@ enum Implementation
 		I_OnEncrypt, I_OnDecrypt,
 		I_OnChannelModeSet, I_OnChannelModeUnset, I_OnUserModeSet, I_OnUserModeUnset, I_OnChannelModeAdd, I_OnUserModeAdd,
 		I_OnMLock, I_OnUnMLock, I_OnServerSync, I_OnUplinkSync, I_OnBotPrivmsg, I_OnPrivmsg, I_OnLog, I_OnDnsRequest,
-		I_OnMessage,
+		I_OnMessage, I_OnCanSet,
 
 		I_OnSerializeCheck, I_OnSerializableConstruct, I_OnSerializableDestruct, I_OnSerializableUpdate, I_OnSerializeTypeCreate,
 	I_END

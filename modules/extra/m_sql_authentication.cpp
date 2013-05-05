@@ -2,6 +2,7 @@
 #include "sql.h"
 
 static Module *me;
+static ServiceReference<NickServService> nickserv("NickServService", "NickServ");
 
 class SQLAuthenticationResult : public SQL::Interface
 {
@@ -41,14 +42,9 @@ class SQLAuthenticationResult : public SQL::Interface
 		if (na == NULL)
 		{
 			na = new NickAlias(req->GetAccount(), new NickCore(req->GetAccount()));
-			if (user)
-			{
-				if (Config->NSAddAccessOnReg)
-					na->nc->AddAccess(user->Mask());
-		
-				if (NickServ)
-					user->SendMessage(NickServ, _("Your account \002%s\002 has been successfully created."), na->nick.c_str());
-			}
+			FOREACH_MOD(I_OnNickRegister, OnNickRegister(user, na));
+			if (user && nickserv)
+				user->SendMessage(NickServ, _("Your account \002%s\002 has been successfully created."), na->nick.c_str());
 		}
 
 		if (!email.empty() && email != na->nc->email)
@@ -80,18 +76,18 @@ class ModuleSQLAuthentication : public Module
  public:
 	ModuleSQLAuthentication(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, EXTRA | VENDOR)
 	{
-
 		me = this;
 
 		Implementation i[] = { I_OnReload, I_OnPreCommand, I_OnCheckAuthentication };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 	}
 
-	void OnReload(ServerConfig *conf, ConfigReader &reader) anope_override
+	void OnReload(Configuration::Conf *conf) anope_override
 	{
-		this->engine = reader.ReadValue("m_sql_authentication", "engine", "", 0);
-		this->query = reader.ReadValue("m_sql_authentication", "query", "", 0);
-		this->disable_reason = reader.ReadValue("m_sql_authentication", "disable_reason", "", 0);
+		Configuration::Block *config = conf->GetModule(this);
+		this->engine = config->Get<const Anope::string &>("engine");
+		this->query =  config->Get<const Anope::string &>("query");
+		this->disable_reason = config->Get<const Anope::string &>("disable_reason");
 
 		this->SQL = ServiceReference<SQL::Provider>("SQL::Provider", this->engine);
 	}

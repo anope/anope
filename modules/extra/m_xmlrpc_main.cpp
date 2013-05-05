@@ -239,14 +239,15 @@ class MyXMLRPCEvent : public XMLRPCEvent
 
 	void DoOperType(XMLRPCServiceInterface *iface, HTTPClient *client, XMLRPCRequest &request)
 	{
-		for (std::list<OperType *>::const_iterator it = Config->MyOperTypes.begin(), it_end = Config->MyOperTypes.end(); it != it_end; ++it)
+		for (unsigned i = 0; i < Config->MyOperTypes.size(); ++i)
 		{
+			OperType *ot = Config->MyOperTypes[i];
 			Anope::string perms;
-			for (std::list<Anope::string>::const_iterator it2 = (*it)->GetPrivs().begin(), it2_end = (*it)->GetPrivs().end(); it2 != it2_end; ++it2)
+			for (std::list<Anope::string>::const_iterator it2 = ot->GetPrivs().begin(), it2_end = ot->GetPrivs().end(); it2 != it2_end; ++it2)
 				perms += " " + *it2;
-			for (std::list<Anope::string>::const_iterator it2 = (*it)->GetCommands().begin(), it2_end = (*it)->GetCommands().end(); it2 != it2_end; ++it2)
+			for (std::list<Anope::string>::const_iterator it2 = ot->GetCommands().begin(), it2_end = ot->GetCommands().end(); it2 != it2_end; ++it2)
 				perms += " " + *it2;
-			request.reply((*it)->GetName(), perms);
+			request.reply(ot->GetName(), perms);
 		}
 	}
 };

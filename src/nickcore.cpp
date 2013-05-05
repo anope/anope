@@ -25,19 +25,16 @@ NickCore::NickCore(const Anope::string &coredisplay) : Serializable("NickCore"),
 	this->o = NULL;
 	this->channelcount = 0;
 	this->lastmail = 0;
-	this->memos.memomax = Config->MSMaxMemos;
-	this->language = Config->NSDefLanguage;
+	this->memos.memomax = 0;
 
 	this->display = coredisplay;
-
-	/* Set default nick core flags */
-	for (std::set<Anope::string>::const_iterator it = Config->NSDefFlags.begin(), it_end = Config->NSDefFlags.end(); it != it_end; ++it)
-		this->ExtendMetadata(*it);
 
 	size_t old = NickCoreList->size();
 	(*NickCoreList)[this->display] = this;
 	if (old == NickCoreList->size())
 		Log(LOG_DEBUG) << "Duplicate account " << coredisplay << " in nickcore table?";
+	
+	FOREACH_MOD(I_OnNickCoreCreate, OnNickCoreCreate(this));
 }
 
 NickCore::~NickCore()
@@ -172,6 +169,11 @@ Anope::string NickCore::GetAccess(unsigned entry) const
 	if (this->access.empty() || entry >= this->access.size())
 		return "";
 	return this->access[entry];
+}
+
+unsigned NickCore::GetAccessCount() const
+{
+	return this->access.size();
 }
 
 bool NickCore::FindAccess(const Anope::string &entry)

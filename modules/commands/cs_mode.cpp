@@ -391,7 +391,7 @@ class CommandCSMode : public Command
 			new_params.push_back("-*");
 			this->DoSet(source, ci, new_params);
 		}
-		else if (param.equals_ci("BANS") || param.equals_ci("EXCEPTS") || param.equals_ci("INVITEOVERRIDES") || param.equals_ci("VOICES") || param.equals_ci("HALFOPS") || param.equals_ci("OPS"))
+		else if (param.equals_ci("BANS") || param.equals_ci("EXEMPTS") || param.equals_ci("INVITEOVERRIDES") || param.equals_ci("VOICES") || param.equals_ci("HALFOPS") || param.equals_ci("OPS"))
 		{
 			const Anope::string &mname = param.upper().substr(0, param.length() - 1);
 			ChannelMode *cm = ModeManager::FindChannelModeByName(mname);

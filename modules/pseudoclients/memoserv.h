@@ -12,7 +12,9 @@ class MemoServService : public Service
 		MEMO_TARGET_FULL
 	};
 
-	MemoServService(Module *m) : Service(m, "MemoServService", "MemoServ") { }
+	MemoServService(Module *m) : Service(m, "MemoServService", "MemoServ")
+	{
+	}
 
 	/** Sends a memo.
 	 * @param source The source of the memo, can be anythin.

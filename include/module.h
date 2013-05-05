@@ -12,7 +12,6 @@
 #ifndef MODULE_H
 #define MODULE_H
 
-/* Just include everything for now */
 #include "access.h"
 #include "account.h"
 #include "anope.h"
@@ -47,6 +46,7 @@
 #include "users.h"
 #include "xline.h"
 
+#include "chanserv.h"
 #include "global.h"
 #include "memoserv.h"
 #include "nickserv.h"

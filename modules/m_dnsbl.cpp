@@ -63,10 +63,10 @@ class DNSBLResolver : public Request
 		reason = reason.replace_all_cs("%h", user->host);
 		reason = reason.replace_all_cs("%i", user->ip);
 		reason = reason.replace_all_cs("%r", record_reason);
-		reason = reason.replace_all_cs("%N", Config->NetworkName);
+		reason = reason.replace_all_cs("%N", Config->GetBlock("networkinfo")->Get<const Anope::string &>("networkname"));
 
 		Log(OperServ) << "DNSBL: " << user->GetMask() << " (" << user->ip << ") appears in " << this->blacklist.name;
-		XLine *x = new XLine("*@" + user->ip, Config->OperServ, Anope::CurTime + this->blacklist.bantime, reason, XLineManager::GenerateUID());
+		XLine *x = new XLine("*@" + user->ip, OperServ ? OperServ->nick : "m_dnsbl", Anope::CurTime + this->blacklist.bantime, reason, XLineManager::GenerateUID());
 		if (this->add_to_akill && akills)
 		{
 			akills->AddXLine(x);
@@ -95,27 +95,27 @@ class ModuleDNSBL : public Module
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 	}
 
-	void OnReload(ServerConfig *conf, ConfigReader &reader) anope_override
+	void OnReload(Configuration::Conf *conf) anope_override
 	{
-		this->check_on_connect = reader.ReadFlag("m_dnsbl", "check_on_connect", "no", 0);
-		this->check_on_netburst = reader.ReadFlag("m_dnsbl", "check_on_netburst", "no", 0);
-		this->add_to_akill = reader.ReadFlag("m_dnsbl", "add_to_akill", "yes", 0);
+		Configuration::Block *block = conf->GetModule(this);
+		this->check_on_connect = block->Get<bool>("check_on_connect");
+		this->check_on_netburst = block->Get<bool>("check_on_netburst");
+		this->add_to_akill = block->Get<bool>("add_to_akill", "yes");
 
 		this->blacklists.clear();
-		for (int i = 0, num = reader.Enumerate("blacklist"); i < num; ++i)
+		for (int i = 0, num = conf->CountBlock("blacklist"); i < num; ++i)
 		{
-			Anope::string bname = reader.ReadValue("blacklist", "name", "", i);
+			Configuration::Block *bl = conf->GetBlock("blacklist", i);
+
+			Anope::string bname = bl->Get<const Anope::string &>("name");
 			if (bname.empty())
 				continue;
-			Anope::string sbantime = reader.ReadValue("blacklist", "time", "4h", i);
-			time_t bantime = Anope::DoTime(sbantime);
-			if (bantime < 0)
-				bantime = 9000;
-			Anope::string reason = reader.ReadValue("blacklist", "reason", "", i);
+			time_t bantime = bl->Get<time_t>("time", "4h");
+			Anope::string reason = bl->Get<const Anope::string &>("reason");
 			std::map<int, Anope::string> replies;
 			for (int j = 0; j < 256; ++j)
 			{
-				Anope::string k = reader.ReadValue("blacklist", stringify(j), "", i);
+				Anope::string k = bl->Get<const Anope::string &>(stringify(j));
 				if (!k.empty())
 					replies[j] = k;
 			}

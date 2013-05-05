@@ -11,6 +11,7 @@
 
 #include "module.h"
 
+static bool sasl = true;
 static Anope::string UplinkSID;
 
 static ServiceReference<IRCDProto> ratbox("IRCDProto", "ratbox");
@@ -64,7 +65,7 @@ class CharybdisProto : public IRCDProto
 
 	void SendConnect() anope_override
 	{
-		UplinkSocket::Message() << "PASS " << Config->Uplinks[Anope::CurrentUplink]->password << " TS 6 :" << Me->GetSID();
+		UplinkSocket::Message() << "PASS " << Config->Uplinks[Anope::CurrentUplink].password << " TS 6 :" << Me->GetSID();
 		/*
 		 * Received: CAPAB :BAN CHW CLUSTER ENCAP EOPMOD EUID EX IE KLN
 		 *           KNOCK MLOCK QS RSFNC SAVE SERVICES TB UNKLN
@@ -128,12 +129,12 @@ class CharybdisProto : public IRCDProto
 						<< " " << newnick << " " << when << " " << u->timestamp;
 	}
 
-	void SendSVSHold(const Anope::string &nick)
+	void SendSVSHold(const Anope::string &nick, time_t delay) anope_override
 	{
-		UplinkSocket::Message(Me) << "ENCAP * NICKDELAY " << Config->NSReleaseTimeout << " " << nick;
+		UplinkSocket::Message(Me) << "ENCAP * NICKDELAY " << delay << " " << nick;
 	}
 
-	void SendSVSHoldDel(const Anope::string &nick)
+	void SendSVSHoldDel(const Anope::string &nick) anope_override
 	{
 		UplinkSocket::Message(Me) << "ENCAP * NICKDELAY 0 " << nick;
 	}
@@ -183,7 +184,7 @@ struct IRCDMessageEncap : IRCDMessage
 		 *
 		 * Charybdis only accepts messages from SASL agents; these must have umode +S
 		 */
-		if (params[1] == "SASL" && Config->NSSASL && params.size() == 6)
+		if (params[1] == "SASL" && sasl && params.size() == 6)
 		{
 			class CharybdisSASLIdentifyRequest : public IdentifyRequest
 			{
@@ -298,7 +299,7 @@ struct IRCDMessageServer : IRCDMessage
 		if (params[1] != "1")
 			return;
 		new Server(source.GetServer() == NULL ? Me : source.GetServer(), params[0], 1, params[2], UplinkSID);
-		IRCD->SendPing(Config->ServerName, params[0]);
+		IRCD->SendPing(Me->GetName(), params[0]);
 	}
 };
 
@@ -349,6 +350,8 @@ class ProtoCharybdis : public Module
 	IRCDMessageEUID message_euid;
 	IRCDMessagePass message_pass;
 	IRCDMessageServer message_server;
+
+	bool use_server_side_mlock;
 
 	void AddModes()
 	{
@@ -403,7 +406,7 @@ class ProtoCharybdis : public Module
 
 	{
 
-		Implementation i[] = { I_OnChannelCreate, I_OnMLock, I_OnUnMLock };
+		Implementation i[] = { I_OnReload, I_OnChannelCreate, I_OnMLock, I_OnUnMLock };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 
 		if (ModuleManager::LoadModule("ratbox", User::Find(creator)) != MOD_ERR_OK)
@@ -422,9 +425,15 @@ class ProtoCharybdis : public Module
 		ModuleManager::UnloadModule(m_ratbox, NULL);
 	}
 
+	void OnReload(Configuration::Conf *conf) anope_override
+	{
+		use_server_side_mlock = conf->GetModule(this)->Get<bool>("use_server_side_mlock");
+		sasl = conf->GetModule(this)->Get<bool>("sasl");
+	}
+
 	void OnChannelCreate(Channel *c) anope_override
 	{
-		if (c->ci && Config->UseServerSideMLock && Servers::Capab.count("MLOCK") > 0)
+		if (use_server_side_mlock && c->ci && Servers::Capab.count("MLOCK") > 0)
 		{
 			Anope::string modes = c->ci->GetMLockAsString(false).replace_all_cs("+", "").replace_all_cs("-", "");
 			UplinkSocket::Message(Me) << "MLOCK " << static_cast<long>(c->creation_time) << " " << c->ci->name << " " << modes;
@@ -434,7 +443,7 @@ class ProtoCharybdis : public Module
 	EventReturn OnMLock(ChannelInfo *ci, ModeLock *lock) anope_override
 	{
 		ChannelMode *cm = ModeManager::FindChannelModeByName(lock->name);
-		if (cm && ci->c && (cm->type == MODE_REGULAR || cm->type == MODE_PARAM) && Servers::Capab.count("MLOCK") > 0 && Config->UseServerSideMLock)
+		if (use_server_side_mlock && cm && ci->c && (cm->type == MODE_REGULAR || cm->type == MODE_PARAM) && Servers::Capab.count("MLOCK") > 0)
 		{
 			Anope::string modes = ci->GetMLockAsString(false).replace_all_cs("+", "").replace_all_cs("-", "") + cm->mchar;
 			UplinkSocket::Message(Me) << "MLOCK " << static_cast<long>(ci->c->creation_time) << " " << ci->name << " " << modes;
@@ -446,7 +455,7 @@ class ProtoCharybdis : public Module
 	EventReturn OnUnMLock(ChannelInfo *ci, ModeLock *lock) anope_override
 	{
 		ChannelMode *cm = ModeManager::FindChannelModeByName(lock->name);
-		if (cm && ci->c && (cm->type == MODE_REGULAR || cm->type == MODE_PARAM) && Servers::Capab.count("MLOCK") > 0 && Config->UseServerSideMLock)
+		if (use_server_side_mlock && cm && ci->c && (cm->type == MODE_REGULAR || cm->type == MODE_PARAM) && Servers::Capab.count("MLOCK") > 0)
 		{
 			Anope::string modes = ci->GetMLockAsString(false).replace_all_cs("+", "").replace_all_cs("-", "").replace_all_cs(cm->mchar, "");
 			UplinkSocket::Message(Me) << "MLOCK " << static_cast<long>(ci->c->creation_time) << " " << ci->name << " " << modes;

@@ -35,7 +35,7 @@ class CommandNSUpdate : public Command
 
 		FOREACH_MOD(I_OnNickUpdate, OnNickUpdate(u));
 
-		source.Reply(_("Status updated (memos, vhost, chmodes, flags)."), Config->NickServ.c_str());
+		source.Reply(_("Status updated (memos, vhost, chmodes, flags)."));
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &) anope_override

@@ -191,7 +191,7 @@ void Command::OnSyntaxError(CommandSource &source, const Anope::string &subcomma
 	this->SendSyntax(source);
 	bool has_help = source.service->commands.find("HELP") != source.service->commands.end();
 	if (has_help)
-		source.Reply(MORE_INFO, Config->UseStrictPrivMsgString.c_str(), source.service->nick.c_str(), source.command.c_str());
+		source.Reply(MORE_INFO, Config->StrictPrivmsg.c_str(), source.service->nick.c_str(), source.command.c_str());
 }
 
 void RunCommand(CommandSource &source, const Anope::string &message)
@@ -216,7 +216,7 @@ void RunCommand(CommandSource &source, const Anope::string &message)
 	if (it == source.service->commands.end())
 	{
 		if (has_help)
-			source.Reply(_("Unknown command \002%s\002. \"%s%s HELP\" for help."), message.c_str(), Config->UseStrictPrivMsgString.c_str(), source.service->nick.c_str());
+			source.Reply(_("Unknown command \002%s\002. \"%s %s HELP\" for help."), message.c_str(), Config->StrictPrivmsg.c_str(), source.service->nick.c_str());
 		else
 			source.Reply(_("Unknown command \002%s\002."), message.c_str());
 		return;
@@ -227,7 +227,7 @@ void RunCommand(CommandSource &source, const Anope::string &message)
 	if (!c)
 	{
 		if (has_help)
-			source.Reply(_("Unknown command \002%s\002. \"%s%s HELP\" for help."), message.c_str(), Config->UseStrictPrivMsgString.c_str(), source.service->nick.c_str());
+			source.Reply(_("Unknown command \002%s\002. \"%s%s HELP\" for help."), message.c_str(), Config->StrictPrivmsg.c_str(), source.service->nick.c_str());
 		else
 			source.Reply(_("Unknown command \002%s\002."), message.c_str());
 		Log(source.service) << "Command " << it->first << " exists on me, but its service " << info.name << " was not found!";

@@ -82,9 +82,6 @@ struct SeenInfo : Serializable
 	}
 };
 
-static time_t purgetime;
-static time_t expiretimeout;
-
 static SeenInfo *FindInfo(const Anope::string &nick)
 {
 	database_map::iterator iter = database.find(nick);
@@ -192,9 +189,9 @@ class CommandSeen : public Command
 	{
 		const Anope::string &target = params[0];
 
-		if (target.length() > Config->NickLen)
+		if (target.length() > Config->GetBlock("networkinfo")->Get<unsigned>("nicklen"))
 		{
-			source.Reply(_("Nick too long, max length is %u characters."), Config->NickLen);
+			source.Reply(_("Nick too long, max length is %u characters."), Config->GetBlock("networkinfo")->Get<unsigned>("nicklen"));
 			return;
 		}
 
@@ -300,7 +297,9 @@ class DataBasePurger : public Timer
 
 	void Tick(time_t) anope_override
 	{
-		size_t previous_size = database.size();
+		size_t previous_size = database.size(), purgetime = Config->GetModule(this->GetOwner())->Get<time_t>("purgetime");
+		if (!purgetime)
+			purgetime = Anope::DoTime("30d");
 		for (database_map::iterator it = database.begin(), it_end = database.end(); it != it_end;)
 		{
 			database_map::iterator cur = it;
@@ -333,14 +332,15 @@ class CSSeen : public Module
 						I_OnUserQuit,
 						I_OnJoinChannel,
 						I_OnPartChannel,
-						I_OnUserKicked };
+						I_OnPreUserKicked };
 		ModuleManager::Attach(eventlist, this, sizeof(eventlist)/sizeof(Implementation));
 	}
 
-	void OnReload(ServerConfig *conf, ConfigReader &reader) anope_override
+	void OnReload(Configuration::Conf *conf) anope_override
 	{
-		purgetime = Anope::DoTime(reader.ReadValue("cs_seen", "purgetime", "30d", 0));
-		expiretimeout = Anope::DoTime(reader.ReadValue("cs_seen", "expiretimeout", "1d", 0));
+		time_t expiretimeout = conf->GetModule(this)->Get<time_t>("expiretimeout");
+		if (!expiretimeout)
+			expiretimeout = Anope::DoTime("1d");
 
 		if (purger.GetSecs() != expiretimeout)
 			purger.SetSecs(expiretimeout);
@@ -373,9 +373,9 @@ class CSSeen : public Module
 		UpdateUser(u, PART, u->nick, "", channel, msg);
 	}
 
-	void OnUserKicked(Channel *c, User *target, MessageSource &source, const Anope::string &msg) anope_override
+	void OnPreUserKicked(MessageSource &source, ChanUserContainer *cu, const Anope::string &msg) anope_override
 	{
-		UpdateUser(target, KICK, target->nick, source.GetSource(), c->name, msg);
+		UpdateUser(cu->user, KICK, cu->user->nick, source.GetSource(), cu->chan->name, msg);
 	}
 
  private:

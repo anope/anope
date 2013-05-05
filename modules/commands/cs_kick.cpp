@@ -13,6 +13,8 @@
 
 #include "module.h"
 
+static ServiceReference<ChanServService> chanserv("ChanServService", "ChanServ");
+
 class CommandCSKick : public Command
 {
  public:
@@ -45,8 +47,9 @@ class CommandCSKick : public Command
 			return;
 		}
 
-		if (reason.length() > Config->CSReasonMax)
-			reason = reason.substr(0, Config->CSReasonMax);
+		unsigned reasonmax = Config->GetModule("chanserv")->Get<unsigned>("reasonmax", "200");
+		if (reason.length() > reasonmax)
+			reason = reason.substr(0, reasonmax);
 
 		AccessGroup u_access = source.AccessFor(ci);
 

@@ -49,7 +49,7 @@ class CommandOSNOOP : public Command
 				User *u2 = it->second;
 
 				if (u2->server == s && u2->HasMode("OPER"))
-					u2->Kill(Config->OperServ, reason);
+					u2->Kill(source.service->nick, reason);
 			}
 		}
 		else if (cmd.equals_ci("REVOKE"))
@@ -95,7 +95,7 @@ class OSNOOP : public Module
 			if (setter)
 			{
 				Anope::string reason = "NOOP command used by " + *setter;
-				u->Kill(Config->OperServ, reason);
+				u->Kill(OperServ ? OperServ->nick : "", reason);
 			}
 		}
 	}

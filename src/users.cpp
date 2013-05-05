@@ -279,10 +279,9 @@ void User::SendMessage(const BotInfo *source, const Anope::string &msg)
 	* - The user is registered and has set /ns set msg on
 	*/
 	sepstream sep(translated_message, '\n');
-	Anope::string tok;
-	while (sep.GetToken(tok))
+	for (Anope::string tok; sep.GetToken(tok);)
 	{
-		if (Config->UsePrivmsg && ((!this->nc && Config->NSDefFlags.count("msg")) || (this->nc && this->nc->HasExt("MSG"))))
+		if (Config->UsePrivmsg && ((!this->nc && Config->DefPrivmsg) || (this->nc && this->nc->HasExt("MSG"))))
 			IRCD->SendPrivmsg(source, this->GetUID(), "%s", tok.c_str());
 		else
 			IRCD->SendNotice(source, this->GetUID(), "%s", tok.c_str());
@@ -291,17 +290,16 @@ void User::SendMessage(const BotInfo *source, const Anope::string &msg)
 
 /** Collides a nick.
  *
- * First, it marks the nick (if the user is on a registered nick, we don't use it without but it could be)
- * as COLLIDED, this is checked in NickAlias::OnCancel.
+ * First, it marks the nick as COLLIDED, this is checked in NickAlias::OnCancel.
  *
  * Then it does one of two things.
  *
  * 1. This will force change the users nick to the guest nick. This gets processed by the IRCd and comes
- *    back to call do_nick. do_nick changes the nick of the use to the new one, then calls NickAlias::OnCancel
+ *    back as a nick change, which calls NickAlias::OnCancel
  *    with the users old nick's nickalias (if there is one).
  *
- * 2. Calls User::Kill, which will either delete the user immediatly or kill them, wait for the QUIT,
- *    then delete the user then. Users destructor then calls NickAlias::OnCancel
+ * 2. Calls User::Kill, which kills the user and deletes the user at the end of the I/O loop.
+ *     Users destructor then calls NickAlias::OnCancel
  *
  * NickAlias::OnCancel checks for NS_COLLIDED, it then does one of two things.
  *
@@ -309,39 +307,12 @@ void User::SendMessage(const BotInfo *source, const Anope::string &msg)
  *
  * 2. We create a new client with SendClientIntroduction(). Note that is it important that this is called either after the
  *    user has been removed from our internal list of user or after the users nick has been updated completely internally.
- *    This is beacuse SendClientIntroduction will destroy any users we think are currently on the nickname (which causes a
- *    lot of problems, eg, deleting the user which recalls OnCancel), whether they really are or not. We then create a
- *    release timer for this new client that waits and later on sends a QUIT for the client. Release timers are never used
- *    for SVSHolds. Ever.
+ *    We then create a release timer for this new client that waits and later on sends a QUIT for the client. Release timers
+ *    are never used for SVSHolds. Ever.
  *
  *
  *  Note that now for the timers we only store the users name, not the NickAlias* pointer. We never remove timers when
  *  a user changes nick or a nick is deleted, the timers must assume that either of these may have happend.
- *
- *  Storing NickAlias* pointers caused quite a problem, some of which are:
- *
- *  Having a valid timer alive that calls User::Collide would either:
- *
- *  1. Kill the user, causing users destructor to cancel all timers for the nick (as it should, it has no way of knowing
- *     if we are in a timer or not) which would delete the currently active timer while it was running, causing TimerManager
- *     to explode.
- *
- *  2. Force a user off of their nick, this would call NickAlias::Cancel before updating the user internally (to cancel the
- *     current nicks timers, granted we could have easially saved this and called it after) which could possibly try to
- *     introduce an enforcer nick. We would then check to see if the nick is already in use (it is, internally) and send
- *     a kill for that nick. That may in turn delete the user immediatly, calling users destructor, which would attempt to
- *     delete the timer, causing TimerManager to explode.
- *
- *     Additionally, if we marked the timer as "in use" so that calling the ClearTimer function wouldn't delete them, users
- *     destructor would then call NickAlias::OnCancel, which would (at this point, it was unsetting GUESTED after introducing
- *     the new client) introduce the same new client again, without actually deleting the originial user, causing an infinite
- *     loop.
- *
- *     This is why we remove NS_GUESTED first in NickAlias::OnCancel before introducing a new client, although this should
- *     not happen anymore. If I must emphasize this again, users need to be GONE from the internal list before calling
- *     NickAlias::OnCancel. NickAlias::OnCancel intentionally reffers to this->nick, not the user passed to it. They *can*
- *     (but not always) be different, depending if the user changed nicks or disconnected.
- *
  *
  *  Adam
  */
@@ -352,16 +323,18 @@ void User::Collide(NickAlias *na)
 
 	if (IRCD->CanSVSNick)
 	{
+		const Anope::string &guestprefix = Config->GetBlock("options")->Get<const Anope::string &>("guestnickprefix");
+
 		Anope::string guestnick;
 
 		int i = 0;
 		do
 		{
-			guestnick = Config->NSGuestNickPrefix + stringify(static_cast<uint16_t>(rand()));
+			guestnick = guestprefix + stringify(static_cast<uint16_t>(rand()));
 		} while (User::Find(guestnick) && i++ < 10);
 
 		if (i == 11)
-			this->Kill(Config->NickServ, "Services nickname-enforcer kill");
+			this->Kill(NickServ ? NickServ->nick : "", "Services nickname-enforcer kill");
 		else
 		{
 			if (NickServ)
@@ -370,7 +343,7 @@ void User::Collide(NickAlias *na)
 		}
 	}
 	else
-		this->Kill(Config->NickServ, "Services nickname-enforcer kill");
+		this->Kill(NickServ ? NickServ->nick : "", "Services nickname-enforcer kill");
 }
 
 void User::Identify(NickAlias *na)
@@ -395,7 +368,7 @@ void User::Identify(NickAlias *na)
 	IRCD->SendLogin(this);
 
 	const NickAlias *this_na = NickAlias::Find(this->nick);
-	if (!Config->NoNicknameOwnership && this_na && this_na->nc == *na->nc && na->nc->HasExt("UNCONFIRMED") == false)
+	if (!Config->GetBlock("options")->Get<bool>("nonicknameownership") && this_na && this_na->nc == *na->nc && na->nc->HasExt("UNCONFIRMED") == false)
 		this->SetMode(NickServ, "REGISTERED");
 
 	FOREACH_MOD(I_OnNickIdentify, OnNickIdentify(this));
@@ -738,8 +711,7 @@ bool User::IsProtected() const
 
 void User::Kill(const Anope::string &source, const Anope::string &reason)
 {
-	Anope::string real_source = source.empty() ? Config->ServerName : source;
-	Anope::string real_reason = real_source + " (" + reason + ")";
+	Anope::string real_reason = (source.empty() ? Me->GetName() : source) + " (" + reason + ")";
 
 	IRCD->SendSVSKill(BotInfo::Find(source), this, "%s", real_reason.c_str());
 }
@@ -754,12 +726,7 @@ void User::KillInternal(const Anope::string &source, const Anope::string &reason
 
 	Log(this, "killed") << "was killed by " << source << " (Reason: " << reason << ")";
 
-	NickAlias *na = NickAlias::Find(this->nick);
-	if (na && !na->nc->HasExt("SUSPENDED") && (this->IsRecognized() || this->IsIdentified(true)))
-	{
-		na->last_seen = Anope::CurTime;
-		na->last_quit = reason;
-	}
+	this->Quit(reason);
 
 	this->quit = true;
 	quitting_users.push_back(this);
@@ -772,6 +739,8 @@ void User::Quit(const Anope::string &reason)
 		Log(LOG_DEBUG) << "Duplicate quit for " << this->nick;
 		return;
 	}
+
+	FOREACH_MOD(I_OnUserQuit, OnUserQuit(this, reason));
 
 	this->quit = true;
 	quitting_users.push_back(this);
@@ -813,16 +782,16 @@ Anope::string User::Mask() const
 
 bool User::BadPassword()
 {
-	if (!Config->BadPassLimit)
+	if (!Config->GetBlock("options")->Get<int>("badpasslimit"))
 		return false;
 
-	if (Config->BadPassTimeout > 0 && this->invalid_pw_time > 0 && this->invalid_pw_time < Anope::CurTime - Config->BadPassTimeout)
+	if (Config->GetBlock("options")->Get<time_t>("badpasstimeout") > 0 && this->invalid_pw_time > 0 && this->invalid_pw_time < Anope::CurTime - Config->GetBlock("options")->Get<time_t>("badpasstimeout"))
 		this->invalid_pw_count = 0;
 	++this->invalid_pw_count;
 	this->invalid_pw_time = Anope::CurTime;
-	if (this->invalid_pw_count >= Config->BadPassLimit)
+	if (this->invalid_pw_count >= Config->GetBlock("options")->Get<int>("badpasslimit"))
 	{
-		this->Kill(Config->ServerName, "Too many invalid passwords");
+		this->Kill(Me->GetName(), "Too many invalid passwords");
 		return true;
 	}
 

@@ -212,7 +212,7 @@ class CoreExport User : public virtual Base, public Extensible, public CommandRe
 	/** Get the account the user is logged in using
 	 * @return The account or NULL
 	 */
-	virtual NickCore *Account() const;
+	NickCore *Account() const;
 
 	/** Check if the user is identified for their nick
 	 * @param check_nick True to check if the user is identified to the nickname they are on too

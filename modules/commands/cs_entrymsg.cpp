@@ -39,8 +39,6 @@ struct EntryMsg : Serializable
 	static Serializable* Unserialize(Serializable *obj, Serialize::Data &data);
 };
 
-static unsigned MaxEntries = 0;
-
 struct EntryMessageList : Serialize::Checker<std::vector<EntryMsg *> >, ExtensibleItem
 {
 	EntryMessageList() : Serialize::Checker<std::vector<EntryMsg *> >("EntryMsg") { }
@@ -140,7 +138,7 @@ class CommandEntryMessage : public Command
 			ci->Extend("cs_entrymsg", messages);
 		}
 
-		if (MaxEntries && (*messages)->size() >= MaxEntries)
+		if ((*messages)->size() >= Config->GetModule(this->owner)->Get<unsigned>("maxentries"))
 			source.Reply(_("The entry message list for \002%s\002 is full."), ci->name.c_str());
 		else
 		{
@@ -276,7 +274,7 @@ class CSEntryMessage : public Module
 	CSEntryMessage(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR), entrymsg_type("EntryMsg", EntryMsg::Unserialize), commandentrymsg(this)
 	{
 
-		Implementation i[] = { I_OnReload, I_OnJoinChannel };
+		Implementation i[] = { I_OnJoinChannel };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 	}
 
@@ -290,11 +288,6 @@ class CSEntryMessage : public Module
 				for (unsigned i = 0; i < (*messages)->size(); ++i)
 					u->SendMessage(c->ci->WhoSends(), "[%s] %s", c->ci->name.c_str(), (*messages)->at(i)->message.c_str());
 		}
-	}
-		
-	void OnReload(ServerConfig *conf, ConfigReader &reader) anope_override
-	{
-		MaxEntries = reader.ReadInteger("cs_entrymsg", "maxentries", "5", 0, true);
 	}
 };
 

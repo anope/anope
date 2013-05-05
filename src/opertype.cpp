@@ -27,9 +27,9 @@ Oper *Oper::Find(const Anope::string &name)
 
 OperType *OperType::Find(const Anope::string &name)
 {
-	for (std::list<OperType *>::iterator it = Config->MyOperTypes.begin(), it_end = Config->MyOperTypes.end(); it != it_end; ++it)
+	for (unsigned i = 0; i < Config->MyOperTypes.size(); ++i)
 	{
-		OperType *ot = *it;
+		OperType *ot = Config->MyOperTypes[i];
 
 		if (ot->GetName() == name)
 			return ot;

@@ -46,6 +46,7 @@ class CommandHelp : public Command
 		Anope::string source_command = source.command;
 		const BotInfo *bi = source.service;
 		const CommandInfo::map &map = source.c ? Config->Fantasy : bi->commands;
+		bool hide_privileged_commands = Config->GetBlock("options")->Get<bool>("hideprivilegedcommands");
 
 		if (params.empty() || params[0].equals_ci("ALL"))
 		{
@@ -73,8 +74,8 @@ class CommandHelp : public Command
 				ServiceReference<Command> c("Command", info.name);
 				if (!c)
 					continue;
-				else if (!Config->HidePrivilegedCommands)
-					; // Always show with HidePrivilegedCommands disabled
+				else if (!hide_privileged_commands)
+					; // Always show with hide_privileged_commands disabled
 				else if (!c->AllowUnregistered() && !source.GetAccount())
 					continue;
 				else if (!info.permission.empty() && !source.HasCommand(info.permission))
@@ -146,8 +147,8 @@ class CommandHelp : public Command
 				ServiceReference<Command> c("Command", info.name);
 				if (!c)
 					continue;
-				else if (!Config->HidePrivilegedCommands)
-					; // Always show with HidePrivilegedCommands disabled
+				else if (!hide_privileged_commands)
+					; // Always show with hide_privileged_commands disabled
 				else if (!info.permission.empty() && !source.HasCommand(info.permission))
 					continue;
 				

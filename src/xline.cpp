@@ -25,11 +25,11 @@ Serialize::Checker<std::multimap<Anope::string, XLine *, ci::less> > XLineManage
 
 void XLine::InitRegex()
 {
-	if (!Config->RegexEngine.empty() && this->mask.length() >= 2 && this->mask[0] == '/' && this->mask[this->mask.length() - 1] == '/')
+	if (this->mask.length() >= 2 && this->mask[0] == '/' && this->mask[this->mask.length() - 1] == '/' && !Config->GetBlock("options")->Get<const Anope::string &>("regexengine").empty())
 	{
 		Anope::string stripped_mask = this->mask.substr(1, this->mask.length() - 2);
 
-		ServiceReference<RegexProvider> provider("Regex", Config->RegexEngine);
+		ServiceReference<RegexProvider> provider("Regex", Config->GetBlock("options")->Get<const Anope::string &>("regexengine"));
 		if (provider)
 		{
 			try
@@ -44,7 +44,7 @@ void XLine::InitRegex()
 	}
 }
 
-XLine::XLine(const Anope::string &ma, const Anope::string &r, const Anope::string &uid) : Serializable("XLine"), mask(ma), by(Config->OperServ), created(0), expires(0), reason(r), id(uid)
+XLine::XLine(const Anope::string &ma, const Anope::string &r, const Anope::string &uid) : Serializable("XLine"), mask(ma), by(OperServ ? OperServ->nick : ""), created(0), expires(0), reason(r), id(uid)
 {
 	regex = NULL;
 	manager = NULL;
@@ -118,8 +118,6 @@ Anope::string XLine::GetReal() const
 Anope::string XLine::GetReason() const
 {
 	Anope::string r = this->reason;
-	if (Config->AddAkiller && !this->by.empty())
-		r = "[" + this->by + "] " + r;
 	if (!this->id.empty())
 		r += " (ID: " + this->id + ")";
 	return r;

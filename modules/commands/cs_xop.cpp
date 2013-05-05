@@ -13,6 +13,7 @@
 
 namespace
 {
+	ServiceReference<ChanServService> chanserv("ChanServService", "ChanServ");
 	std::vector<Anope::string> order;
 	std::map<Anope::string, std::vector<Anope::string> > permissions;
 }
@@ -161,9 +162,10 @@ class CommandCSXOP : public Command
 			}
 		}
 
-		if (ci->GetAccessCount() >= Config->CSAccessMax)
+		unsigned access_max = Config->GetModule("chanserv")->Get<unsigned>("accessmax", "1024");
+		if (access_max && ci->GetAccessCount() >= access_max)
 		{
-			source.Reply(_("Sorry, you can only have %d %s entries on a channel."), Config->CSAccessMax, source.command.c_str());
+			source.Reply(_("Sorry, you can only have %d %s entries on a channel."), access_max, source.command.c_str());
 			return;
 		}
 
@@ -527,8 +529,8 @@ class CommandCSXOP : public Command
 				"available. See \002%s%s HELP ACCESS\002 for information\n"
 				"about the access list, and \002%s%s HELP FLAGS\002 for\n"
 				"information about the flags based system."),
-				Config->UseStrictPrivMsgString.c_str(), source.service->nick.c_str(),
-				Config->UseStrictPrivMsgString.c_str(), source.service->nick.c_str());
+				Config->StrictPrivmsg.c_str(), source.service->nick.c_str(),
+				Config->StrictPrivmsg.c_str(), source.service->nick.c_str());
 		return true;
 	}
 };
@@ -548,31 +550,32 @@ class CSXOP : public Module
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 	}
 
-	void OnReload(ServerConfig *conf, ConfigReader &reader) anope_override
+	void OnReload(Configuration::Conf *conf) anope_override
 	{
 		order.clear();
 		permissions.clear();
 
-
-		for (int i = 0; i < reader.Enumerate("privilege"); ++i)
+		for (int i = 0; i < conf->CountBlock("privilege"); ++i)
 		{
-			const Anope::string &pname = reader.ReadValue("privilege", "name", "", i);
+			Configuration::Block *block = conf->GetBlock("privilege", i);
+			const Anope::string &pname = block->Get<const Anope::string &>("name");
 
 			Privilege *p = PrivilegeManager::FindPrivilege(pname);
 			if (p == NULL)
 				continue;
 
-			const Anope::string &xop = reader.ReadValue("privilege", "xop", "", i);
-			if (xop.empty())
+			const Anope::string &xop = block->Get<const Anope::string &>("xop");
+			if (pname.empty() || xop.empty())
 				continue;
 
 			permissions[xop].push_back(pname);
 		}
 
-		for (int i = 0; i < reader.Enumerate("command"); ++i)
+		for (int i = 0; i < conf->CountBlock("command"); ++i)
 		{
-			const Anope::string &cname = reader.ReadValue("command", "name", "", i),
-						&cserv = reader.ReadValue("command", "command", "", i);
+			Configuration::Block *block = conf->GetBlock("command", i);
+			const Anope::string &cname = block->Get<const Anope::string &>("name"),
+				&cserv = block->Get<const Anope::string &>("command");
 			if (cname.empty() || cserv != "chanserv/xop")
 				continue;
 

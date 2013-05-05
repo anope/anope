@@ -31,6 +31,7 @@ class CommandNSList : public Command
 		bool is_servadmin = source.HasCommand("nickserv/list");
 		int count = 0, from = 0, to = 0;
 		bool suspended, nsnoexpire, unconfirmed;
+		unsigned listmax = Config->GetModule(this->owner)->Get<unsigned>("listmax");
 
 		suspended = nsnoexpire = unconfirmed = false;
 
@@ -99,7 +100,7 @@ class CommandNSList : public Command
 			Anope::string buf = Anope::printf("%s!%s", na->nick.c_str(), !na->last_usermask.empty() ? na->last_usermask.c_str() : "*@*");
 			if (na->nick.equals_ci(pattern) || Anope::Match(buf, pattern, false, true))
 			{
-				if (((count + 1 >= from && count + 1 <= to) || (!from && !to)) && ++nnicks <= Config->NSListMax)
+				if (((count + 1 >= from && count + 1 <= to) || (!from && !to)) && ++nnicks <= listmax)
 				{
 					bool isnoexpire = false;
 					if (is_servadmin && na->HasExt("NO_EXPIRE"))
@@ -129,7 +130,7 @@ class CommandNSList : public Command
 		for (unsigned i = 0; i < replies.size(); ++i)
 			source.Reply(replies[i]);
 
-		source.Reply(_("End of list - %d/%d matches shown."), nnicks > Config->NSListMax ? Config->NSListMax : nnicks, nnicks);
+		source.Reply(_("End of list - %d/%d matches shown."), nnicks > listmax ? listmax : nnicks, nnicks);
 		return;
 	}
 
@@ -166,11 +167,12 @@ class CommandNSList : public Command
 				"    \002LIST #51-100\002\n"
 				"        Lists all registered nicks within the given range (51-100)."));
 
-		if (!Config->RegexEngine.empty())
+		const Anope::string &regexengine = Config->GetBlock("options")->Get<const Anope::string &>("regexengine");
+		if (!regexengine.empty())
 		{
 			source.Reply(" ");
 			source.Reply(_("Regex matches are also supported using the %s engine.\n"
-					"Enclose your pattern in // if this is desired."), Config->RegexEngine.c_str());
+					"Enclose your pattern in // if this is desired."), regexengine.c_str());
 		}
 
 		return true;
@@ -185,7 +187,6 @@ class NSList : public Module
 	NSList(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandnslist(this)
 	{
-
 	}
 };
 

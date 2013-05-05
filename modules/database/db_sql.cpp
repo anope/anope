@@ -146,12 +146,12 @@ class DBSQL : public Module, public Pipe
 		this->imported = true;
 	}
 
-	void OnReload(ServerConfig *conf, ConfigReader &reader) anope_override
+	void OnReload(Configuration::Conf *conf) anope_override
 	{
-		Anope::string engine = reader.ReadValue("db_sql", "engine", "", 0);
-		this->sql = ServiceReference<Provider>("SQL::Provider", engine);
-		this->prefix = reader.ReadValue("db_sql", "prefix", "anope_db_", 0);
-		this->import = reader.ReadFlag("db_sql", "import", "false", 0);
+		Configuration::Block *block = conf->GetModule(this);
+		this->sql = ServiceReference<Provider>("SQL::Provider", block->Get<const Anope::string &>("engine"));
+		this->prefix = block->Get<const Anope::string &>("prefix", "anope_db_");
+		this->import = block->Get<bool>("import");
 	}
 
 	void OnShutdown() anope_override

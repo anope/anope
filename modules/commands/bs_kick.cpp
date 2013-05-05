@@ -13,6 +13,8 @@
 
 #include "module.h"
 
+static Module *me;
+
 class CommandBSKick : public Command
 {
  public:
@@ -54,7 +56,7 @@ class CommandBSKick : public Command
 				"on a specific option.\n"
 				" \n"
 				"Note: access to this command is controlled by the\n"
-				"level SET."), Config->UseStrictPrivMsgString.c_str(), source.service->nick.c_str(), this_name.c_str());
+				"level SET."), Config->StrictPrivmsg.c_str(), source.service->nick.c_str(), this_name.c_str());
 
 		return true;
 	}
@@ -199,7 +201,7 @@ class CommandBSKickBadwords : public CommandBSKickBase
 				"more information.\n"
 				"ttb is the number of times a user can be kicked\n"
 				"before it get banned. Don't give ttb to disable\n"
-				"the ban system once activated."), Config->UseStrictPrivMsgString.c_str(), source.service->nick.c_str());
+				"the ban system once activated."), Config->StrictPrivmsg.c_str(), source.service->nick.c_str());
 		return true;
 	}
 };
@@ -406,8 +408,8 @@ class CommandBSKickFlood : public CommandBSKickBase
 			catch (const ConvertException &) { }
 			if (ci->floodsecs < 1)
 				ci->floodsecs = 10;
-			if (ci->floodsecs > Config->BSKeepData)
-				ci->floodsecs = Config->BSKeepData;
+			if (ci->floodsecs > Config->GetModule(me)->Get<time_t>("keepdata"))
+				ci->floodsecs = Config->GetModule(me)->Get<time_t>("keepdata");
 
 			ci->ExtendMetadata("BS_KICK_FLOOD");
 			if (ci->ttb[TTB_FLOOD])
@@ -639,13 +641,14 @@ struct BanData : ExtensibleItem
 
 	void purge()
 	{
+		time_t keepdata = Config->GetModule(me)->Get<time_t>("keepdata");
 		for (data_type::iterator it = data_map.begin(), it_end = data_map.end(); it != it_end;)
 		{
 			const Anope::string &user = it->first;
 			Data &bd = it->second;
 			++it;
 
-			if (Anope::CurTime - bd.last_use > Config->BSKeepData)
+			if (Anope::CurTime - bd.last_use > keepdata)
 				data_map.erase(user);
 		}
 	}
@@ -797,8 +800,10 @@ class BSKick : public Module
 
 		purger(this)
 	{
+		me = this;
 
-		ModuleManager::Attach(I_OnPrivmsg, this);
+		Implementation i[] = { I_OnPrivmsg };
+		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 	}
 
 	~BSKick()
@@ -920,30 +925,31 @@ class BSKick : public Module
 
 			/* Normalize the buffer */
 			Anope::string nbuf = Anope::NormalizeBuffer(realbuf);
+			bool casesensitive = Config->GetModule("botserv")->Get<bool>("casesensitive");
 
 			for (unsigned i = 0, end = ci->GetBadWordCount(); i < end; ++i)
 			{
 				const BadWord *bw = ci->GetBadWord(i);
 
-				if (bw->type == BW_ANY && ((Config->BSCaseSensitive && nbuf.find(bw->word) != Anope::string::npos) || (!Config->BSCaseSensitive && nbuf.find_ci(bw->word) != Anope::string::npos)))
+				if (bw->type == BW_ANY && ((casesensitive && nbuf.find(bw->word) != Anope::string::npos) || (!casesensitive && nbuf.find_ci(bw->word) != Anope::string::npos)))
 					mustkick = true;
 				else if (bw->type == BW_SINGLE)
 				{
 					size_t len = bw->word.length();
 
-					if ((Config->BSCaseSensitive && bw->word.equals_cs(nbuf)) || (!Config->BSCaseSensitive && bw->word.equals_ci(nbuf)))
+					if ((casesensitive && bw->word.equals_cs(nbuf)) || (!casesensitive && bw->word.equals_ci(nbuf)))
 						mustkick = true;
-					else if (nbuf.find(' ') == len && ((Config->BSCaseSensitive && bw->word.equals_cs(nbuf)) || (!Config->BSCaseSensitive && bw->word.equals_ci(nbuf))))
+					else if (nbuf.find(' ') == len && ((casesensitive && bw->word.equals_cs(nbuf)) || (!casesensitive && bw->word.equals_ci(nbuf))))
 						mustkick = true;
 					else
 					{
-						if (nbuf.rfind(' ') == nbuf.length() - len - 1 && ((Config->BSCaseSensitive && nbuf.find(bw->word) == nbuf.length() - len) || (!Config->BSCaseSensitive && nbuf.find_ci(bw->word) == nbuf.length() - len)))
+						if (nbuf.rfind(' ') == nbuf.length() - len - 1 && ((casesensitive && nbuf.find(bw->word) == nbuf.length() - len) || (!casesensitive && nbuf.find_ci(bw->word) == nbuf.length() - len)))
 							mustkick = true;
 						else
 						{
 							Anope::string wordbuf = " " + bw->word + " ";
 
-							if ((Config->BSCaseSensitive && nbuf.find(wordbuf) != Anope::string::npos) || (!Config->BSCaseSensitive && nbuf.find_ci(wordbuf) != Anope::string::npos))
+							if ((casesensitive && nbuf.find(wordbuf) != Anope::string::npos) || (!casesensitive && nbuf.find_ci(wordbuf) != Anope::string::npos))
 								mustkick = true;
 						}
 					}
@@ -952,13 +958,13 @@ class BSKick : public Module
 				{
 					size_t len = bw->word.length();
 
-					if ((Config->BSCaseSensitive && nbuf.substr(0, len).equals_cs(bw->word)) || (!Config->BSCaseSensitive && nbuf.substr(0, len).equals_ci(bw->word)))
+					if ((casesensitive && nbuf.substr(0, len).equals_cs(bw->word)) || (!casesensitive && nbuf.substr(0, len).equals_ci(bw->word)))
 						mustkick = true;
 					else
 					{
 						Anope::string wordbuf = " " + bw->word;
 
-						if ((Config->BSCaseSensitive && nbuf.find(wordbuf) != Anope::string::npos) || (!Config->BSCaseSensitive && nbuf.find_ci(wordbuf) != Anope::string::npos))
+						if ((casesensitive && nbuf.find(wordbuf) != Anope::string::npos) || (!casesensitive && nbuf.find_ci(wordbuf) != Anope::string::npos))
 							mustkick = true;
 					}
 				}
@@ -966,13 +972,13 @@ class BSKick : public Module
 				{
 					size_t len = bw->word.length();
 
-					if ((Config->BSCaseSensitive && nbuf.substr(nbuf.length() - len).equals_cs(bw->word)) || (!Config->BSCaseSensitive && nbuf.substr(nbuf.length() - len).equals_ci(bw->word)))
+					if ((casesensitive && nbuf.substr(nbuf.length() - len).equals_cs(bw->word)) || (!casesensitive && nbuf.substr(nbuf.length() - len).equals_ci(bw->word)))
 						mustkick = true;
 					else
 					{
 						Anope::string wordbuf = bw->word + " ";
 
-						if ((Config->BSCaseSensitive && nbuf.find(wordbuf) != Anope::string::npos) || (!Config->BSCaseSensitive && nbuf.find_ci(wordbuf) != Anope::string::npos))
+						if ((casesensitive && nbuf.find(wordbuf) != Anope::string::npos) || (!casesensitive && nbuf.find_ci(wordbuf) != Anope::string::npos))
 							mustkick = true;
 					}
 				}
@@ -980,7 +986,7 @@ class BSKick : public Module
 				if (mustkick)
 				{
 					check_ban(ci, u, TTB_BADWORDS);
-					if (Config->BSGentleBWReason)
+					if (Config->GetModule(me)->Get<bool>("gentlebadwordreason"))
 						bot_kick(ci, u, _("Watch your language!"));
 					else
 						bot_kick(ci, u, _("Don't use the word \"%s\" on this channel!"), bw->word.c_str());

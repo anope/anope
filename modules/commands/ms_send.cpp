@@ -39,11 +39,9 @@ class CommandMSSend : public Command
 		else if (result == MemoServService::MEMO_INVALID_TARGET)
 			source.Reply(_("\002%s\002 is not a registered unforbidden nick or channel."), nick.c_str());
 		else if (result == MemoServService::MEMO_TOO_FAST)
-			source.Reply(_("Please wait %d seconds before using the SEND command again."), Config->MSSendDelay);
+			source.Reply(_("Please wait %d seconds before using the %s command again."), Config->GetModule("memoserv")->Get<time_t>("senddelay"), source.command.c_str());
 		else if (result == MemoServService::MEMO_TARGET_FULL)
 			source.Reply(_("Sorry, %s currently has too many memos and cannot receive more."), nick.c_str());
-
-		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override

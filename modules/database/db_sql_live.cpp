@@ -7,7 +7,6 @@ using namespace SQL;
 class DBMySQL : public Module, public Pipe
 {
  private:
-	Anope::string engine;
 	Anope::string prefix;
 	ServiceReference<Provider> SQL;
 	time_t lastwarn;
@@ -29,7 +28,7 @@ class DBMySQL : public Module, public Pipe
 		}
 		else
 		{
-			if (Anope::CurTime - Config->UpdateTimeout > lastwarn)
+			if (Anope::CurTime - Config->GetBlock("options")->Get<time_t>("updatetimeout") > lastwarn)
 			{
 				Log() << "Unable to locate SQL reference, going to readonly...";
 				Anope::ReadOnly = this->ro = true;
@@ -130,11 +129,11 @@ class DBMySQL : public Module, public Pipe
 		init = false;
 	}
 
-	void OnReload(ServerConfig *conf, ConfigReader &reader) anope_override
+	void OnReload(Configuration::Conf *conf) anope_override
 	{
-		this->engine = reader.ReadValue("db_sql", "engine", "", 0);
-		this->SQL = ServiceReference<Provider>("SQL::Provider", this->engine);
-		this->prefix = reader.ReadValue("db_sql", "prefix", "anope_db_", 0);
+		Configuration::Block *block = conf->GetModule(this);
+		this->SQL = ServiceReference<Provider>("SQL::Provider", block->Get<const Anope::string &>("engine"));
+		this->prefix = block->Get<const Anope::string &>("prefix", "anope_db_");
 	}
 
 	void OnSerializableConstruct(Serializable *obj) anope_override

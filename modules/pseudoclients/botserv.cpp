@@ -18,19 +18,48 @@ class BotServCore : public Module
  public:
 	BotServCore(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PSEUDOCLIENT | VENDOR)
 	{
-
-		BotServ = BotInfo::Find(Config->BotServ);
-		if (!BotServ)
-			throw ModuleException("No bot named " + Config->BotServ);
-
-		Implementation i[] = { I_OnBotDelete, I_OnPrivmsg, I_OnJoinChannel, I_OnLeaveChannel,
-					I_OnPreHelp, I_OnPostHelp, I_OnChannelModeSet };
+		Implementation i[] = { I_OnReload, I_OnSetCorrectModes, I_OnBotAssign, I_OnBotDelete, I_OnPrivmsg, I_OnJoinChannel, I_OnLeaveChannel,
+					I_OnPreHelp, I_OnPostHelp, I_OnChannelModeSet, I_OnCreateChan, I_OnUserKicked };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 	}
 
 	~BotServCore()
 	{
 		BotServ = NULL;
+	}
+
+	void OnReload(Configuration::Conf *conf) anope_override
+	{
+		const Anope::string &bsnick = conf->GetModule(this)->Get<const Anope::string &>("client");
+
+		if (bsnick.empty())
+			throw ConfigException(this->name + ": <client> must be defined");
+
+		BotInfo *bi = BotInfo::Find(bsnick, true);
+		if (!bi)
+			throw ConfigException(this->name + ": no bot named " + bsnick);
+
+		BotServ = bi;
+	}
+
+	void OnSetCorrectModes(User *user, Channel *chan, AccessGroup &access, bool give_modes) anope_override
+	{
+		/* Do not allow removing bot modes on our service bots */
+		if (chan->ci && chan->ci->bi == user)
+		{
+			const Anope::string &botmodes = Config->GetModule(this)->Get<const Anope::string &>("botmodes");
+			for (unsigned i = 0; i < botmodes.length(); ++i)
+				chan->SetMode(chan->ci->bi, ModeManager::FindChannelModeByChar(botmodes[i]), chan->ci->bi->GetUID());
+		}
+	}
+
+	void OnBotAssign(User *sender, ChannelInfo *ci, BotInfo *bi) anope_override
+	{
+		if (Me->IsSynced() && ci->c && ci->c->users.size() >= Config->GetModule(this)->Get<unsigned>("minusers"))
+		{
+			ChannelStatus status(Config->GetModule(this)->Get<const Anope::string &>("botmodes"));
+			bi->Join(ci->c, &status);
+		}
 	}
 
 	void OnBotDelete(BotInfo *bi) anope_override
@@ -70,9 +99,7 @@ class BotServCore : public Module
 
 		if (!realbuf.find(c->ci->bi->nick))
 			params.erase(params.begin());
-		else if (Config->BSFantasyCharacter.empty())
-			;
-		else if (!realbuf.find_first_of(Config->BSFantasyCharacter))
+		else if (!realbuf.find_first_of(Config->GetModule(this)->Get<const Anope::string &>("fantasycharacter", "!")))
 			params[0].erase(params[0].begin());
 		else
 			return;
@@ -158,6 +185,42 @@ class BotServCore : public Module
 
 	void OnJoinChannel(User *user, Channel *c) anope_override
 	{
+		if (!Config || !IRCD)
+			return;
+
+		BotInfo *bi = user->server == Me ? dynamic_cast<BotInfo *>(user) : NULL;
+		if (bi && Config->GetModule(this)->Get<bool>("smartjoin"))
+		{
+			std::pair<Channel::ModeList::iterator, Channel::ModeList::iterator> bans = c->GetModeList("BAN");
+
+			/* We check for bans */
+			for (; bans.first != bans.second; ++bans.first)
+			{
+				Entry ban("BAN", bans.first->second);
+				if (ban.Matches(user))
+					c->RemoveMode(NULL, "BAN", ban.GetMask());
+			}
+
+			Anope::string Limit;
+			unsigned limit = 0;
+			try
+			{
+				if (c->GetParam("LIMIT", Limit))
+					limit = convertTo<unsigned>(Limit);
+			}
+			catch (const ConvertException &) { }
+
+			/* Should we be invited? */
+			if (c->HasMode("INVITE") || (limit && c->users.size() >= limit))
+			{
+				ChannelMode *cm = ModeManager::FindChannelModeByName("OP");
+				char symbol = cm ? anope_dynamic_static_cast<ChannelModeStatus *>(cm)->symbol : 0;
+				IRCD->SendNotice(bi, (symbol ? Anope::string(symbol) : "") + c->name, "%s invited %s into the channel.", user->nick.c_str(), user->nick.c_str());
+			}
+
+			ModeManager::ProcessModes();
+		}
+
 		if (user->server != Me && c->ci && c->ci->bi)
 		{
 			/**
@@ -166,8 +229,11 @@ class BotServCore : public Module
 			 * make it into the channel, leaving the channel botless even for
 			 * legit users - Rob
 			 **/
-			if (c->users.size() >= Config->BSMinUsers && !c->FindUser(c->ci->bi))
-				c->ci->bi->Join(c, &ModeManager::DefaultBotModes);
+			if (c->users.size() >= Config->GetModule(this)->Get<unsigned>("minusers") && !c->FindUser(c->ci->bi))
+			{
+				ChannelStatus status(Config->GetModule(this)->Get<const Anope::string &>("botmodes"));
+				c->ci->bi->Join(c, &status);
+			}
 			/* Only display the greet if the main uplink we're connected
 			 * to has synced, or we'll get greet-floods when the net
 			 * recovers from a netsplit. -GD
@@ -197,7 +263,7 @@ class BotServCore : public Module
 			return;
 
 		/* This is called prior to removing the user from the channnel, so c->users.size() - 1 should be safe */
-		if (c->ci && c->ci->bi && u != *c->ci->bi && c->users.size() - 1 <= Config->BSMinUsers && c->FindUser(c->ci->bi))
+		if (c->ci && c->ci->bi && u != *c->ci->bi && c->users.size() - 1 <= Config->GetModule(this)->Get<unsigned>("minusers") && c->FindUser(c->ci->bi))
 			c->ci->bi->Part(c->ci->c);
 	}
 
@@ -209,17 +275,18 @@ class BotServCore : public Module
 		if (source.c)
 		{
 			source.Reply(_("\002%s\002 allows you to execute \"fantasy\" commands in the channel.\n"
-					"Fantasy commands are tied to existing commands, usually on \002%s\002,\n"
-					"and provide a more convenient way to execute commands. Commands that\n"
+					"Fantasy commands are commands that can be executed from messaging a\n"
+					"channel, and provide a more convenient way to execute commands. Commands that\n"
 					"require a channel as a parameter will automatically have that parameter\n"
-					"given.\n"), source.service->nick.c_str(), Config->ChanServ.c_str());
-			if (!Config->BSFantasyCharacter.empty())
+					"given.\n"), source.service->nick.c_str());
+			const Anope::string &fantasycharacters = Config->GetModule(this)->Get<const Anope::string &>("fantasycharacter", "!");
+			if (!fantasycharacters.empty())
 				source.Reply(_(" \n"
-						"Fantasy commands may be prefixed with one of the following characters: %s\n"), Config->BSFantasyCharacter.c_str());
+						"Fantasy commands may be prefixed with one of the following characters: %s\n"), fantasycharacters.c_str());
 			source.Reply(_(" \n"
 					"Available commands are:"));
 		}
-		else if (source.service->nick == Config->BotServ)
+		else if (*source.service == BotServ)
 		{
 			source.Reply(_("\002%s\002 allows you to have a bot on your own channel.\n"
 				"It has been created for users that can't host or\n"
@@ -228,8 +295,8 @@ class BotServCore : public Module
 				"below; to use them, type \002%s%s \037command\037\002. For\n"
 				"more information on a specific command, type\n"
 				"\002%s%s %s \037command\037\002.\n "),
-				Config->BotServ.c_str(), Config->UseStrictPrivMsgString.c_str(), Config->BotServ.c_str(),
-				Config->UseStrictPrivMsgString.c_str(), Config->BotServ.c_str(), source.command.c_str());
+				BotServ->nick.c_str(), Config->StrictPrivmsg.c_str(), BotServ->nick.c_str(),
+				Config->StrictPrivmsg.c_str(), BotServ->nick.c_str(), source.command.c_str());
 		}
 
 		return EVENT_CONTINUE;
@@ -237,21 +304,22 @@ class BotServCore : public Module
 
 	void OnPostHelp(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		if (!params.empty() || source.c || source.service->nick != Config->BotServ)
+		if (!params.empty() || source.c || source.service != BotServ)
 			return;
 
 		source.Reply(_(" \n"
 			"Bot will join a channel whenever there is at least\n"
-			"\002%d\002 user(s) on it."), Config->BSMinUsers);
-		if (!Config->BSFantasyCharacter.empty())
-			source.Reply(_("Additionally, all %s commands can be used if fantasy\n"
-				"is enabled by prefixing the command name with one of\n"
-				"the following characters: %s"), Config->ChanServ.c_str(), Config->BSFantasyCharacter.c_str());
+			"\002%d\002 user(s) on it."), Config->GetModule(this)->Get<unsigned>("minusers"));
+		const Anope::string &fantasycharacters = Config->GetModule(this)->Get<const Anope::string &>("fantasycharacter", "!");
+		if (!fantasycharacters.empty())
+			source.Reply(_("Additionally, if fantasy is enabled fantasy commands\n"
+				"can be executed by  prefixing the command name with\n"
+				"one of the following characters: %s"), fantasycharacters.c_str());
 	}
 
 	EventReturn OnChannelModeSet(Channel *c, MessageSource &, const Anope::string &mname, const Anope::string &param) anope_override
 	{
-		if (Config->BSSmartJoin && mname == "BAN" && c->ci && c->ci->bi && c->FindUser(c->ci->bi))
+		if (Config->GetModule(this)->Get<bool>("smartjoin") && mname == "BAN" && c->ci && c->ci->bi && c->FindUser(c->ci->bi))
 		{
 			BotInfo *bi = c->ci->bi;
 
@@ -261,6 +329,26 @@ class BotServCore : public Module
 		}
 
 		return EVENT_CONTINUE;
+	}
+
+	void OnCreateChan(ChannelInfo *ci) anope_override
+	{
+		/* Set default bot flags */
+		spacesepstream sep(Config->GetModule(this)->Get<const Anope::string &>("defaults", "greet fantasy"));
+		for (Anope::string token; sep.GetToken(token);)
+			this->ExtendMetadata("BS_" + token);
+	}
+
+	void OnPreUserKicked(MessageSource &source, ChanUserContainer *cu, const Anope::string &kickmsg) anope_override
+	{
+	}
+
+	void OnUserKicked(MessageSource &source, User *target, const Anope::string &channel, ChannelStatus &status, const Anope::string &kickmsg) anope_override
+	{
+		BotInfo *bi = BotInfo::Find(target->nick);
+		if (bi)
+			/* Bots get rejoined */
+			bi->Join(channel, &status);
 	}
 };
 

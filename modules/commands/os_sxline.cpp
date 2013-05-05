@@ -258,7 +258,6 @@ class CommandOSSNLine : public CommandOSSXLineBase
 
 		unsigned last_param = 2;
 		Anope::string param, expiry;
-		time_t expires;
 
 		param = params.size() > 1 ? params[1] : "";
 		if (!param.empty() && param[0] == '+')
@@ -268,7 +267,7 @@ class CommandOSSNLine : public CommandOSSXLineBase
 			last_param = 3;
 		}
 
-		expires = !expiry.empty() ? Anope::DoTime(expiry) : Config->SNLineExpiry;
+		time_t expires = !expiry.empty() ? Anope::DoTime(expiry) : Config->GetModule("operserv")->Get<time_t>("snlineexpiry", "30d");
 		/* If the expiry given does not contain a final letter, it's in days,
 		 * said the doc. Ah well.
 		 */
@@ -312,16 +311,18 @@ class CommandOSSNLine : public CommandOSSXLineBase
 
 		if (mask[0] == '/' && mask[mask.length() - 1] == '/')
 		{
-			if (Config->RegexEngine.empty())
+			const Anope::string &regexengine = Config->GetBlock("options")->Get<const Anope::string &>("regexengine");
+
+			if (regexengine.empty())
 			{
-				source.Reply(_("Regex is enabled."));
+				source.Reply(_("Regex is disabled."));
 				return;
 			}
 
-			ServiceReference<RegexProvider> provider("Regex", Config->RegexEngine);
+			ServiceReference<RegexProvider> provider("Regex", regexengine);
 			if (!provider)
 			{
-				source.Reply(_("Unable to find regex engine %s."), Config->RegexEngine.c_str());
+				source.Reply(_("Unable to find regex engine %s."), regexengine.c_str());
 				return;
 			}
 
@@ -352,8 +353,11 @@ class CommandOSSNLine : public CommandOSSXLineBase
 		if (mask[masklen - 1] == ' ')
 			mask.erase(masklen - 1);
 
+		if (Config->GetModule("operserv")->Get<bool>("addakiller", "yes") && !source.GetNick().empty())
+			reason = "[" + source.GetNick() + "] " + reason;
+
 		XLine *x = new XLine(mask, source.GetNick(), expires, reason);
-		if (Config->AkillIds)
+		if (Config->GetBlock("operserv")->Get<bool>("akilids"))
 			x->id = XLineManager::GenerateUID();
 
 		unsigned int affected = 0;
@@ -380,7 +384,7 @@ class CommandOSSNLine : public CommandOSSXLineBase
 
 		this->xlm()->AddXLine(x);
 
-		if (Config->KillonSNline)
+		if (Config->GetModule("operserv")->Get<bool>("killonsnline", "yes"))
 		{
 			this->xlm()->Send(source.GetUser(), x);
 
@@ -391,7 +395,7 @@ class CommandOSSNLine : public CommandOSSXLineBase
 				User *user = it->second;
 
 				if (!user->HasMode("OPER") && user->server != Me && Anope::Match(user->realname, x->mask, false, true))
-					user->Kill(Config->ServerName, rreason);
+					user->Kill(Me->GetName(), rreason);
 			}
 		}
 
@@ -434,11 +438,12 @@ class CommandOSSNLine : public CommandOSSXLineBase
 				"\002STATS AKILL\002 command.\n"
 				"Note: because the realname mask may contain spaces, the\n"
 				"separator between it and the reason is a colon."));
-		if (!Config->RegexEngine.empty())
+		const Anope::string &regexengine = Config->GetBlock("options")->Get<const Anope::string &>("regexengine");
+		if (!regexengine.empty())
 		{
 			source.Reply(" ");
 			source.Reply(_("Regex matches are also supported using the %s engine.\n"
-					"Enclose your mask in // if this is desired."), Config->RegexEngine.c_str());
+					"Enclose your mask in // if this is desired."), regexengine.c_str());
 		}
 		source.Reply(_(" \n"
 				"The \002SNLINE DEL\002 command removes the given mask from the\n"
@@ -480,7 +485,6 @@ class CommandOSSQLine : public CommandOSSXLineBase
 
 		unsigned last_param = 2;
 		Anope::string expiry, mask;
-		time_t expires;
 
 		mask = params.size() > 1 ? params[1] : "";
 		if (!mask.empty() && mask[0] == '+')
@@ -490,7 +494,7 @@ class CommandOSSQLine : public CommandOSSXLineBase
 			last_param = 3;
 		}
 
-		expires = !expiry.empty() ? Anope::DoTime(expiry) : Config->SQLineExpiry;
+		time_t expires = !expiry.empty() ? Anope::DoTime(expiry) : Config->GetModule("operserv")->Get<time_t>("sqlineexpiry", "30d");
 		/* If the expiry given does not contain a final letter, it's in days,
 		 * said the doc. Ah well.
 		 */
@@ -523,16 +527,18 @@ class CommandOSSQLine : public CommandOSSXLineBase
 
 		if (mask[0] == '/' && mask[mask.length() - 1] == '/')
 		{
-			if (Config->RegexEngine.empty())
+			const Anope::string &regexengine = Config->GetBlock("options")->Get<const Anope::string &>("regexengine");
+
+			if (regexengine.empty())
 			{
-				source.Reply(_("Regex is enabled."));
+				source.Reply(_("Regex is disabled."));
 				return;
 			}
 
-			ServiceReference<RegexProvider> provider("Regex", Config->RegexEngine);
+			ServiceReference<RegexProvider> provider("Regex", regexengine);
 			if (!provider)
 			{
-				source.Reply(_("Unable to find regex engine %s."), Config->RegexEngine.c_str());
+				source.Reply(_("Unable to find regex engine %s."), regexengine.c_str());
 				return;
 			}
 
@@ -556,8 +562,11 @@ class CommandOSSQLine : public CommandOSSXLineBase
 			return;
 		}
 
+		if (Config->GetModule("operserv")->Get<bool>("addakiller", "yes") && !source.GetNick().empty())
+			reason = "[" + source.GetNick() + "] " + reason;
+
 		XLine *x = new XLine(mask, source.GetNick(), expires, reason);
-		if (Config->AkillIds)
+		if (Config->GetBlock("operserv")->Get<bool>("akilids"))
 			x->id = XLineManager::GenerateUID();
 
 		unsigned int affected = 0;
@@ -583,7 +592,8 @@ class CommandOSSQLine : public CommandOSSXLineBase
 		}
 
 		this->xlm()->AddXLine(x);
-		if (Config->KillonSQline)
+
+		if (Config->GetModule("operserv")->Get<bool>("killonsqline", "yes"))
 		{
 			Anope::string rreason = "Q-Lined: " + reason;
 
@@ -617,7 +627,7 @@ class CommandOSSQLine : public CommandOSSXLineBase
 					User *user = it->second;
 
 					if (!user->HasMode("OPER") && user->server != Me && Anope::Match(user->nick, x->mask, false, true))
-						user->Kill(Config->ServerName, rreason);
+						user->Kill(Me->GetName(), rreason);
 				}
 			}
 
@@ -664,11 +674,12 @@ class CommandOSSQLine : public CommandOSSXLineBase
 				"must be given, even if it is the same as the default. The\n"
 				"current SQLINE default expiry time can be found with the\n"
 				"\002STATS AKILL\002 command."));
-		if (!Config->RegexEngine.empty())
+		const Anope::string &regexengine = Config->GetBlock("options")->Get<const Anope::string &>("regexengine");
+		if (!regexengine.empty())
 		{
 			source.Reply(" ");
 			source.Reply(_("Regex matches are also supported using the %s engine.\n"
-					"Enclose your mask in // if this is desired."), Config->RegexEngine.c_str());
+					"Enclose your mask in // if this is desired."), regexengine.c_str());
 		}
 		source.Reply(_(" \n"
 				"The \002SQLINE DEL\002 command removes the given mask from the\n"

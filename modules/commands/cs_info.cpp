@@ -13,6 +13,8 @@
 
 #include "module.h"
 
+static ServiceReference<ChanServService> chanserv("ChanServService", "ChanServ");
+
 class CommandCSInfo : public Command
 {
 	void CheckOptStr(Anope::string &buf, const Anope::string &opt, const char *str, const ChannelInfo *ci, const NickCore *nc)
@@ -102,8 +104,9 @@ class CommandCSInfo : public Command
 			if (!ml.empty())
 				info["Mode lock"] = ml;
 
-			if (!ci->HasExt("NO_EXPIRE"))
-				info["Expires on"] = Anope::strftime(ci->last_used + Config->CSExpire);
+			time_t chanserv_expire = Config->GetModule("chanserv")->Get<time_t>("expire", "14d");
+			if (!ci->HasExt("NO_EXPIRE") && chanserv_expire && !Anope::NoExpire)
+				info["Expires on"] = Anope::strftime(ci->last_used + chanserv_expire);
 		}
 		if (ci->HasExt("SUSPENDED"))
 		{

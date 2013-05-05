@@ -26,6 +26,7 @@ class CommandCSRegister : public Command
 	{
 		const Anope::string &chan = params[0];
 		const Anope::string &chdesc = params.size() > 1 ? params[1] : "";
+		unsigned maxregistered = Config->GetModule("chanserv")->Get<unsigned>("maxregistered");
 
 		User *u = source.GetUser();
 		NickCore *nc = source.nc;
@@ -48,18 +49,13 @@ class CommandCSRegister : public Command
 			source.Reply(_("Channel \002%s\002 is already registered!"), chan.c_str());
 		else if (c && !c->HasUserStatus(u, "OP"))
 			source.Reply(_("You must be a channel operator to register the channel."));
-		else if (Config->CSMaxReg && nc->channelcount >= Config->CSMaxReg && !source.HasPriv("chanserv/no-register-limit"))
-			source.Reply(nc->channelcount > Config->CSMaxReg ? CHAN_EXCEEDED_CHANNEL_LIMIT : CHAN_REACHED_CHANNEL_LIMIT, Config->CSMaxReg);
+		else if (maxregistered && nc->channelcount >= maxregistered && !source.HasPriv("chanserv/no-register-limit"))
+			source.Reply(nc->channelcount > maxregistered ? CHAN_EXCEEDED_CHANNEL_LIMIT : CHAN_REACHED_CHANNEL_LIMIT, maxregistered);
 		else
 		{
 			ci = new ChannelInfo(chan);
 			ci->SetFounder(nc);
 			ci->desc = chdesc;
-
-			for (std::list<std::pair<Anope::string, Anope::string> >::const_iterator it = ModeManager::ModeLockOn.begin(), it_end = ModeManager::ModeLockOn.end(); it != it_end; ++it)
-				ci->SetMLock(ModeManager::FindChannelModeByName(it->first), true, it->second, source.GetNick());
-			for (std::list<Anope::string>::const_iterator it = ModeManager::ModeLockOff.begin(), it_end = ModeManager::ModeLockOff.end(); it != it_end; ++it)
-				ci->SetMLock(ModeManager::FindChannelModeByName(*it), false, "", source.GetNick());
 
 			if (c && !c->topic.empty())
 			{
@@ -113,9 +109,8 @@ class CommandCSRegister : public Command
 			"other channel users.\n"
 			" \n"
 			"NOTICE: In order to register a channel, you must have\n"
-			"first registered your nickname.  If you haven't,\n"
-			"\002%s%s HELP\002 for information on how to do so."),
-			source.service->nick.c_str(), source.service->nick.c_str(), Config->UseStrictPrivMsgString.c_str(), source.service->nick.c_str(), Config->UseStrictPrivMsgString.c_str(), Config->NickServ.c_str());
+			"first registered your nickname."),
+			source.service->nick.c_str(), source.service->nick.c_str(), Config->StrictPrivmsg.c_str(), source.service->nick.c_str());
 		return true;
 	}
 };

@@ -34,11 +34,12 @@ class CommandOSSVSNick : public Command
 			return;
 		}
 
-		/* Truncate long nicknames to Config->NickLen characters */
-		if (newnick.length() > Config->NickLen)
+		/* Truncate long nicknames to nicklen characters */
+		unsigned nicklen = Config->GetBlock("networkinfo")->Get<unsigned>("nicklen");
+		if (newnick.length() > nicklen)
 		{
-			source.Reply(_("Nick \002%s\002 was truncated to %d characters."), newnick.c_str(), Config->NickLen, newnick.c_str());
-			newnick = params[1].substr(0, Config->NickLen);
+			source.Reply(_("Nick \002%s\002 was truncated to %d characters."), newnick.c_str(), nicklen, newnick.c_str());
+			newnick = params[1].substr(0, nicklen);
 		}
 
 		/* Check for valid characters */

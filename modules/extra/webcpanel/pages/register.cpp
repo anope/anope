@@ -13,7 +13,7 @@ bool WebCPanel::Register::OnRequest(HTTPProvider *server, const Anope::string &p
 
 	replacements["TITLE"] = page_title;
 
-	if (!Config->NSForceEmail)
+	if (!Config->GetModule("nickserv")->Get<bool>("forceemail", "yes"))
 		replacements["EMAIL_TYPE"] = "hidden";
 
 	TemplateFileServer page("register.html");

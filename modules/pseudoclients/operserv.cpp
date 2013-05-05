@@ -161,12 +161,7 @@ class OperServCore : public Module
 	OperServCore(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PSEUDOCLIENT | VENDOR),
 		sglines(this), sqlines(this), snlines(this)
 	{
-
-		OperServ = BotInfo::Find(Config->OperServ);
-		if (!OperServ)
-			throw ModuleException("No bot named " + Config->OperServ);
-
-		Implementation i[] = { I_OnBotDelete, I_OnBotPrivmsg, I_OnServerQuit, I_OnUserModeSet, I_OnUserModeUnset, I_OnUserConnect, I_OnUserNickChange, I_OnPreHelp };
+		Implementation i[] = { I_OnReload, I_OnBotDelete, I_OnBotPrivmsg, I_OnServerQuit, I_OnUserModeSet, I_OnUserModeUnset, I_OnUserConnect, I_OnUserNickChange, I_OnPreHelp };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 
 		/* Yes, these are in this order for a reason. Most violent->least violent. */
@@ -188,6 +183,20 @@ class OperServCore : public Module
 		XLineManager::UnregisterXLineManager(&snlines);
 	}
 
+	void OnReload(Configuration::Conf *conf) anope_override
+	{
+		const Anope::string &osnick = conf->GetModule(this)->Get<const Anope::string &>("client");
+
+		if (osnick.empty())
+			throw ConfigException(this->name + ": <client> must be defined");
+
+		BotInfo *bi = BotInfo::Find(osnick, true);
+		if (!bi)
+			throw ConfigException(this->name + ": no bot named " + osnick);
+
+		OperServ = bi;
+	}
+
 	void OnBotDelete(BotInfo *bi) anope_override
 	{
 		if (bi == OperServ)
@@ -196,10 +205,10 @@ class OperServCore : public Module
 
 	EventReturn OnBotPrivmsg(User *u, BotInfo *bi, Anope::string &message) anope_override
 	{
-		if (Config->OSOpersOnly && !u->HasMode("OPER") && bi->nick == Config->OperServ)
+		if (bi == OperServ && !u->HasMode("OPER") && Config->GetModule(this)->Get<bool>("opersonly"))
 		{
 			u->SendMessage(bi, ACCESS_DENIED);
-			Log(OperServ, "bados") << "Denied access to " << Config->OperServ << " from " << u->GetMask() << " (non-oper)";
+			Log(OperServ, "bados") << "Denied access to " << bi->nick << " from " << u->GetMask() << " (non-oper)";
 			return EVENT_STOP;
 		}
 
@@ -243,9 +252,9 @@ class OperServCore : public Module
 
 	EventReturn OnPreHelp(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		if (!params.empty() || source.c || source.service->nick != Config->OperServ)
+		if (!params.empty() || source.c || source.service != OperServ)
 			return EVENT_CONTINUE;
-		source.Reply(_("%s commands:"), Config->OperServ.c_str());
+		source.Reply(_("%s commands:"), OperServ->nick.c_str());
 		return EVENT_CONTINUE;
 	}
 };

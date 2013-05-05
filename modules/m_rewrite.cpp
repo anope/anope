@@ -159,22 +159,23 @@ class ModuleRewrite : public Module
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 	}
 
-	void OnReload(ServerConfig *conf, ConfigReader &reader) anope_override
+	void OnReload(Configuration::Conf *conf) anope_override
 	{
-
 		Rewrite::rewrites.clear();
 
-		for (int i = 0; i < reader.Enumerate("command"); ++i)
+		for (int i = 0; i < conf->CountBlock("command"); ++i)
 		{
-			if (!reader.ReadFlag("command", "rewrite", "no", i))
+			Configuration::Block *block = conf->GetBlock("command", i);
+
+			if (!block->Get<bool>("rewrite"))
 				continue;
 
 			Rewrite rw;
 
-			rw.client = reader.ReadValue("command", "service", "", i);
-			rw.source_message = reader.ReadValue("command", "rewrite_source", "", i),
-			rw.target_message = reader.ReadValue("command", "rewrite_target", "", i);
-			rw.desc = reader.ReadValue("command", "rewrite_description", "", i);
+			rw.client = block->Get<const Anope::string &>("service");
+			rw.source_message = block->Get<const Anope::string &>("rewrite_source");
+			rw.target_message = block->Get<const Anope::string &>("rewrite_target");
+			rw.desc = block->Get<const Anope::string &>("rewrite_description");
 
 			if (rw.client.empty() || rw.source_message.empty() || rw.target_message.empty())
 				continue;

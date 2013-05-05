@@ -50,7 +50,7 @@ class CommandCSSet : public Command
 			}
 		}
 		source.Reply(_("Type \002%s%s HELP %s \037option\037\002 for more information on a\n"
-				"particular option."), Config->UseStrictPrivMsgString.c_str(), source.service->nick.c_str(), this_name.c_str());
+				"particular option."), Config->StrictPrivmsg.c_str(), source.service->nick.c_str(), this_name.c_str());
 		return true;
 	}
 };
@@ -106,8 +106,8 @@ class CommandCSSetAutoOp : public Command
 		source.Reply(" ");
 		source.Reply(_("Enables or disables %s's autoop feature for a\n"
 			"channel. When disabled, users who join the channel will\n"
-			"not automatically gain any status from %s."), Config->ChanServ.c_str(),
-			Config->ChanServ.c_str(), this->name.c_str());
+			"not automatically gain any status from %s."), ChanServ->nick.c_str(),
+			ChanServ->nick.c_str(), this->name.c_str());
 		return true;
 	}
 };
@@ -319,7 +319,8 @@ class CommandCSSetFounder : public Command
 		}
 
 		NickCore *nc = na->nc;
-		if (Config->CSMaxReg && nc->channelcount >= Config->CSMaxReg && !source.HasPriv("chanserv/no-register-limit"))
+		unsigned max_reg = Config->GetModule("chanserv")->Get<unsigned>("maxregistered");
+		if (max_reg && nc->channelcount >= max_reg && !source.HasPriv("chanserv/no-register-limit"))
 		{
 			source.Reply(_("\002%s\002 has too many channels registered."), na->nick.c_str());
 			return;
@@ -552,7 +553,7 @@ class CommandCSSetPersist : public Command
 				/* No channel mode, no BotServ, but using ChanServ as the botserv bot
 				 * which was assigned when persist was set on
 				 */
-				if (!cm && Config->BotServ.empty() && ci->bi)
+				if (!cm && !BotServ && ci->bi)
 				{
 					if (!ChanServ)
 					{
@@ -654,7 +655,7 @@ class CommandCSSetPrivate : public Command
 		source.Reply(_("Enables or disables the \002private\002 option for a channel.\n"
 				"When \002private\002 is set, a \002%s%s LIST\002 will not\n"
 				"include the channel in any lists."),
-				Config->UseStrictPrivMsgString.c_str(), source.service->nick.c_str());
+				Config->StrictPrivmsg.c_str(), source.service->nick.c_str());
 		return true;
 	}
 };
@@ -1027,10 +1028,12 @@ class CommandCSSetSuccessor : public Command
 		source.Reply(_("Changes the successor of a channel. If the founder's\n"
 				"nickname expires or is dropped while the channel is still\n"
 				"registered, the successor will become the new founder of the\n"
-				"channel.  However, if the successor already has too many\n"
+				"channel. The new nickname must be a registered one."));
+		unsigned max_reg = Config->GetModule("chanserv")->Get<unsigned>("maxregistered");
+		if (max_reg)
+			source.Reply(_("However, if the successor already has too many\n"
 				"channels registered (%d), the channel will be dropped\n"
-				"instead, just as if no successor had been set.  The new\n"
-				"nickname must be a registered one."), Config->CSMaxReg);
+				"instead, just as if no successor had been set."), max_reg);
 		return true;
 	}
 };
@@ -1117,19 +1120,8 @@ class CSSet : public Module
 		commandcssetsuccessor(this), commandcssetnoexpire(this)
 	{
 
-		Implementation i[] = { I_OnReload, I_OnChanRegistered, I_OnCheckKick, I_OnDelChan };
+		Implementation i[] = { I_OnCheckKick, I_OnDelChan };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
-	}
-
-	void OnReload(ServerConfig *conf, ConfigReader &reader) anope_override
-	{
-		CSDefChanstats = reader.ReadFlag("chanstats", "CSDefChanstats", "0", 0);
-	}
-
-	void OnChanRegistered(ChannelInfo *ci) anope_override
-	{
-		if (CSDefChanstats)
-			ci->ExtendMetadata("STATS");
 	}
 
 	EventReturn OnCheckKick(User *u, ChannelInfo *ci, Anope::string &mask, Anope::string &reason) anope_override

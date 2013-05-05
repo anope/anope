@@ -16,20 +16,20 @@
 
 static bool SendMemoMail(NickCore *nc, MemoInfo *mi, Memo *m)
 {
-	Anope::string subject = Language::Translate(nc, Config->MailMemoSubject.c_str());
-	Anope::string message = Language::Translate(nc, Config->MailMemoMessage.c_str());
+	Anope::string subject = Language::Translate(nc, Config->GetBlock("mail")->Get<const char *>("memo_subject")),
+		message = Language::Translate(Config->GetBlock("mail")->Get<const char *>("memo_message"));
 
 	subject = subject.replace_all_cs("%n", nc->display);
 	subject = subject.replace_all_cs("%s", m->sender);
 	subject = subject.replace_all_cs("%d", stringify(mi->GetIndex(m) + 1));
 	subject = subject.replace_all_cs("%t", m->text);
-	subject = subject.replace_all_cs("%N", Config->NetworkName);
+	subject = subject.replace_all_cs("%N", Config->GetBlock("networkinfo")->Get<const Anope::string &>("networkname"));
 
 	message = message.replace_all_cs("%n", nc->display);
 	message = message.replace_all_cs("%s", m->sender);
 	message = message.replace_all_cs("%d", stringify(mi->GetIndex(m) + 1));
 	message = message.replace_all_cs("%t", m->text);
-	message = message.replace_all_cs("%N", Config->NetworkName);
+	message = message.replace_all_cs("%N", Config->GetBlock("networkinfo")->Get<const Anope::string &>("networkname"));
 
 	return Mail::Send(nc, subject, message);
 }
@@ -50,7 +50,8 @@ class MyMemoServService : public MemoServService
 		User *sender = User::Find(source);
 		if (sender != NULL && !sender->HasPriv("memoserv/no-limit") && !force)
 		{
-			if (Config->MSSendDelay > 0 && sender->lastmemosend + Config->MSSendDelay > Anope::CurTime)
+			time_t send_delay = Config->GetModule("memoserv")->Get<time_t>("senddelay");
+			if (send_delay > 0 && sender->lastmemosend + send_delay > Anope::CurTime)
 				return MEMO_TOO_FAST;
 			else if (!mi->memomax)
 				return MEMO_TARGET_FULL;
@@ -86,7 +87,7 @@ class MyMemoServService : public MemoServService
 					if (ci->AccessFor(cu->user).HasPriv("MEMO"))
 					{
 						if (cu->user->Account() && cu->user->Account()->HasExt("MEMO_RECEIVE"))
-							cu->user->SendMessage(MemoServ, MEMO_NEW_X_MEMO_ARRIVED, ci->name.c_str(), Config->UseStrictPrivMsgString.c_str(), Config->MemoServ.c_str(), ci->name.c_str(), mi->memos->size());
+							cu->user->SendMessage(MemoServ, MEMO_NEW_X_MEMO_ARRIVED, ci->name.c_str(), Config->StrictPrivmsg.c_str(), MemoServ->nick.c_str(), ci->name.c_str(), mi->memos->size());
 					}
 				}
 			}
@@ -102,7 +103,7 @@ class MyMemoServService : public MemoServService
 					const NickAlias *na = nc->aliases->at(i);
 					User *user = User::Find(na->nick);
 					if (user && user->IsIdentified())
-						user->SendMessage(MemoServ, MEMO_NEW_MEMO_ARRIVED, source.c_str(), Config->UseStrictPrivMsgString.c_str(), Config->MemoServ.c_str(), mi->memos->size());
+						user->SendMessage(MemoServ, MEMO_NEW_MEMO_ARRIVED, source.c_str(), Config->StrictPrivmsg.c_str(), MemoServ->nick.c_str(), mi->memos->size());
 				}
 			}
 
@@ -138,23 +139,42 @@ class MyMemoServService : public MemoServService
 
 class MemoServCore : public Module
 {
-	MyMemoServService mymemoserv;
+	MyMemoServService memoserv;
  public:
 	MemoServCore(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PSEUDOCLIENT | VENDOR),
-		mymemoserv(this)
+		memoserv(this)
 	{
-
-		MemoServ = BotInfo::Find(Config->MemoServ);
-		if (!MemoServ)
-			throw ModuleException("No bot named " + Config->MemoServ);
-
-		Implementation i[] = { I_OnBotDelete, I_OnNickIdentify, I_OnJoinChannel, I_OnUserAway, I_OnNickUpdate, I_OnPreHelp, I_OnPostHelp };
+		Implementation i[] = { I_OnNickCoreCreate, I_OnCreateChan, I_OnReload, I_OnBotDelete, I_OnNickIdentify, I_OnJoinChannel, I_OnUserAway, I_OnNickUpdate, I_OnPreHelp, I_OnPostHelp };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 	}
 
 	~MemoServCore()
 	{
 		MemoServ = NULL;
+	}
+
+	void OnReload(Configuration::Conf *conf) anope_override
+	{
+		const Anope::string &msnick = conf->GetModule(this)->Get<const Anope::string &>("client");
+
+		if (msnick.empty())
+			throw ConfigException(this->name + ": <client> must be defined");
+
+		BotInfo *bi = BotInfo::Find(msnick, true);
+		if (!bi)
+			throw ConfigException(this->name + ": no bot named " + msnick);
+
+		MemoServ = bi;
+	}
+
+	void OnNickCoreCreate(NickCore *nc) anope_override
+	{
+		nc->memos.memomax = Config->GetModule(this)->Get<int>("maxmemos");
+	}
+
+	void OnCreateChan(ChannelInfo *ci) anope_override
+	{
+		ci->memos.memomax = Config->GetModule(this)->Get<int>("maxmemos");
 	}
 
 	void OnBotDelete(BotInfo *bi) anope_override
@@ -165,7 +185,7 @@ class MemoServCore : public Module
 
 	void OnNickIdentify(User *u) anope_override
 	{
-		this->mymemoserv.Check(u);
+		this->memoserv.Check(u);
 	}
 
 	void OnJoinChannel(User *u, Channel *c) anope_override
@@ -182,37 +202,37 @@ class MemoServCore : public Module
 	void OnUserAway(User *u, const Anope::string &message) anope_override
 	{
 		if (message.empty())
-			this->mymemoserv.Check(u);
+			this->memoserv.Check(u);
 	}
 
 	void OnNickUpdate(User *u) anope_override
 	{
-		this->mymemoserv.Check(u);
+		this->memoserv.Check(u);
 	}
 
 	EventReturn OnPreHelp(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		if (!params.empty() || source.c || source.service->nick != Config->MemoServ)
+		if (!params.empty() || source.c || source.service != MemoServ)
 			return EVENT_CONTINUE;
 		source.Reply(_("\002%s\002 is a utility allowing IRC users to send short\n"
 			"messages to other IRC users, whether they are online at\n"
 			"the time or not, or to channels(*). Both the sender's\n"
 			"nickname and the target nickname or channel must be\n"
 			"registered in order to send a memo.\n"
-			"%s's commands include:"), Config->MemoServ.c_str(), Config->MemoServ.c_str());
+			"%s's commands include:"), MemoServ->nick.c_str(), MemoServ->nick.c_str());
 		return EVENT_CONTINUE;
 	}
 
 	void OnPostHelp(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		if (!params.empty() || source.c || source.service->nick != Config->MemoServ)
+		if (!params.empty() || source.c || source.service != MemoServ)
 			return;
 		source.Reply(_(" \n"
 			"Type \002%s%s HELP \037command\037\002 for help on any of the\n"
 			"above commands.\n"
 			"(*) By default, any user with at least level 10 access on a\n"
 			"    channel can read that channel's memos. This can be\n"
-			"    changed with the %s \002LEVELS\002 command."), Config->UseStrictPrivMsgString.c_str(), Config->MemoServ.c_str(), Config->ChanServ.c_str());
+			"    changed with the %s \002LEVELS\002 command."), Config->StrictPrivmsg.c_str(), MemoServ->nick.c_str(), ChanServ->nick.c_str());
 	}
 };
 

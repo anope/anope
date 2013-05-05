@@ -299,11 +299,12 @@ class CommandOSIgnore : public Command
 				" \n"
 				"Ignores will not be enforced on IRC Operators."));
 
-		if (!Config->RegexEngine.empty())
+		const Anope::string &regexengine = Config->GetBlock("options")->Get<const Anope::string &>("regexengine");
+		if (!regexengine.empty())
 		{
 			source.Reply(" ");
 			source.Reply(_("Regex matches are also supported using the %s engine.\n"
-					"Enclose your pattern in // if this is desired."), Config->RegexEngine.c_str());
+					"Enclose your pattern in // if this is desired."), regexengine.c_str());
 		}
 
 		return true;

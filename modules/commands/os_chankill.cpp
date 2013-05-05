@@ -30,7 +30,6 @@ class CommandOSChanKill : public Command
 			return;
 
 		Anope::string expiry, channel;
-		time_t expires;
 		unsigned last_param = 1;
 		Channel *c;
 
@@ -42,7 +41,7 @@ class CommandOSChanKill : public Command
 			last_param = 2;
 		}
 
-		expires = !expiry.empty() ? Anope::DoTime(expiry) : Config->ChankillExpiry;
+		time_t expires = !expiry.empty() ? Anope::DoTime(expiry) : Config->GetModule("operserv")->Get<time_t>("autokillexpiry", "30d");
 		if (!expiry.empty() && isdigit(expiry[expiry.length() - 1]))
 			expires *= 86400;
 		if (expires && expires < 60)
@@ -65,7 +64,7 @@ class CommandOSChanKill : public Command
 		if (!reason.empty())
 		{
 			Anope::string realreason;
-			if (Config->AddAkiller)
+			if (Config->GetBlock("operserv")->Get<bool>("addakiller") && !source.GetNick().empty())
 				realreason = "[" + source.GetNick() + "] " + reason;
 			else
 				realreason = reason;

@@ -352,21 +352,24 @@ class HTTPD : public Module
 		this->providers.clear();
 	}
 
-	void OnReload(ServerConfig *conf, ConfigReader &reader) anope_override
+	void OnReload(Configuration::Conf *conf) anope_override
 	{
 		std::set<Anope::string> existing;
 
-		for (int i = 0, num = reader.Enumerate("httpd"); i < num; ++i)
+		for (int i = 0; i < conf->CountBlock("httpd"); ++i)
 		{
-			Anope::string hname = reader.ReadValue("httpd", "name", "httpd/main", i);
+			Configuration::Block *block = conf->GetBlock("httpd", i);
+
+
+			const Anope::string &hname = block->Get<const Anope::string &>("name", "httpd/main");
 			existing.insert(hname);
 
-			Anope::string ip = reader.ReadValue("httpd", "ip", "", i);
-			int port = reader.ReadInteger("httpd", "port", "8080", i, true);
-			int timeout = reader.ReadInteger("httpd", "timeout", "30", i, true);
-			bool ssl = reader.ReadFlag("httpd", "ssl", "no", i);
-			Anope::string ext_ip = reader.ReadValue("httpd", "extforward_ip", "", i);
-			Anope::string ext_header = reader.ReadValue("httpd", "extforward_header", "", i);
+			Anope::string ip = block->Get<const Anope::string &>("ip");
+			int port = block->Get<int>("port", "8080");
+			int timeout = block->Get<int>("timeout", "30");
+			bool ssl = block->Get<bool>("ssl", "no");
+			Anope::string ext_ip = block->Get<const Anope::string &>("extforward_ip");
+			Anope::string ext_header = block->Get<const Anope::string &>("extforward_header");
 
 			if (ip.empty())
 			{

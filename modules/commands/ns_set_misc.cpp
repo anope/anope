@@ -161,17 +161,21 @@ class NSSetMisc : public Module
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 	}
 
-	void OnReload(ServerConfig *conf, ConfigReader &reader) anope_override
+	void OnReload(Configuration::Conf *conf) anope_override
 	{
 		descriptions.clear();
 
-		for (int i = 0; i < reader.Enumerate("command"); ++i)
+		for (int i = 0; i < conf->CountBlock("command"); ++i)
 		{
-			if (reader.ReadValue("command", "command", "", i) != "nickserv/set/misc" && reader.ReadValue("command", "command", "", i) != "nickserv/saset/misc")
+			Configuration::Block *block = conf->GetBlock("command", i);
+			
+			const Anope::string &cmd = block->Get<const Anope::string &>("command");
+
+			if (cmd != "nickserv/set/misc" && cmd != "nickserv/saset/misc")
 				continue;
 
-			Anope::string cname = reader.ReadValue("command", "name", "", i);
-			Anope::string desc = reader.ReadValue("command", "misc_description", "", i);
+			Anope::string cname = block->Get<const Anope::string &>("name");
+			Anope::string desc = block->Get<const Anope::string &>("misc_description");
 
 			if (cname.empty() || desc.empty())
 				continue;

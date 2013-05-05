@@ -13,6 +13,8 @@
 
 #include "module.h"
 
+static ServiceReference<NickServService> nickserv("NickServService", "NickServ");
+
 class CommandNSSuspend : public Command
 {
  public:
@@ -28,7 +30,7 @@ class CommandNSSuspend : public Command
 		const Anope::string &nick = params[0];
 		Anope::string expiry = params[1];
 		Anope::string reason = params.size() > 2 ? params[2] : "";
-		time_t expiry_secs = Config->NSSuspendExpire;
+		time_t expiry_secs = Config->GetModule(this->owner)->Get<time_t>("suspendexpire");
 
 		if (Anope::ReadOnly)
 		{
@@ -52,7 +54,7 @@ class CommandNSSuspend : public Command
 			return;
 		}
 
-		if (Config->NSSecureAdmins && na->nc->IsServicesOper())
+		if (Config->GetModule("nickserv")->Get<bool>("secureadmins", "yes") && na->nc->IsServicesOper())
 		{
 			source.Reply(_("You may not suspend other Services Operators' nicknames."));
 			return;
@@ -173,7 +175,6 @@ class NSSuspend : public Module
 	NSSuspend(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandnssuspend(this), commandnsunsuspend(this)
 	{
-
 		Implementation i[] = { I_OnPreNickExpire };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 	}

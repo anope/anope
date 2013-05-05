@@ -77,18 +77,19 @@ class ModuleSQLite : public Module
 		SQLiteServices.clear();
 	}
 
-	void OnReload(ServerConfig *conf, ConfigReader &reader) anope_override
+	void OnReload(Configuration::Conf *conf) anope_override
 	{
-		int i, num;
+		Configuration::Block *config = conf->GetModule(this);
 
 		for (std::map<Anope::string, SQLiteService *>::iterator it = this->SQLiteServices.begin(); it != this->SQLiteServices.end();)
 		{
 			const Anope::string &cname = it->first;
 			SQLiteService *s = it->second;
+			int i, num;
 			++it;
 
-			for (i = 0, num = reader.Enumerate("sqlite"); i < num; ++i)
-				if (reader.ReadValue("sqlite", "name", "sqlite/main", i) == cname)
+			for (i = 0, num = config->CountBlock("sqlite"); i < num; ++i)
+				if (config->GetBlock("sqlite", i)->Get<const Anope::string &>("name", "sqlite/main") == cname)
 					break;
 
 			if (i == num)
@@ -100,13 +101,14 @@ class ModuleSQLite : public Module
 			}
 		}
 
-		for (i = 0, num = reader.Enumerate("sqlite"); i < num; ++i)
+		for (int i = 0; i < config->CountBlock("sqlite"); ++i)
 		{
-			Anope::string connname = reader.ReadValue("sqlite", "name", "sqlite/main", i);
+			Configuration::Block *block = config->GetBlock("sqlite", i);
+			Anope::string connname = block->Get<const Anope::string &>("name", "sqlite/main");
 
 			if (this->SQLiteServices.find(connname) == this->SQLiteServices.end())
 			{
-				Anope::string database = Anope::DataDir + "/" + reader.ReadValue("sqlite", "database", "anope", i);
+				Anope::string database = Anope::DataDir + "/" + block->Get<const Anope::string &>("database", "anope");
 
 				try
 				{

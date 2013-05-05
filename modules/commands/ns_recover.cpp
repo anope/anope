@@ -13,6 +13,11 @@
 
 #include "module.h"
 
+namespace
+{
+	bool restoreonrecover;
+}
+
 struct NSRecoverExtensibleInfo : ExtensibleItem, std::map<Anope::string, ChannelStatus> { };
 
 class NSRecoverRequest : public IdentifyRequest
@@ -56,7 +61,7 @@ class NSRecoverRequest : public IdentifyRequest
 				Log(LOG_COMMAND, source, cmd) << "and was automatically identified to " << u->Account()->display;
 			}
 
-			if (Config->NSRestoreOnRecover)
+			if (restoreonrecover)
 			{
 				if (!u->chans.empty())
 				{
@@ -205,7 +210,7 @@ class NSRecover : public Module
 		commandnsrecover(this)
 	{
 
-		if (Config->NoNicknameOwnership)
+		if (Config->GetBlock("options")->Get<bool>("nonicknameownership"))
 			throw ModuleException(modname + " can not be used with options:nonicknameownership enabled");
 
 		Implementation i[] = { I_OnUserNickChange, I_OnJoinChannel, I_OnShutdown, I_OnRestart };
@@ -233,7 +238,7 @@ class NSRecover : public Module
 
 	void OnUserNickChange(User *u, const Anope::string &oldnick) anope_override
 	{
-		if (Config->NSRestoreOnRecover)
+		if (Config->GetModule(this)->Get<bool>("restoreonrecover"))
 		{
 			NSRecoverExtensibleInfo *ei = u->GetExt<NSRecoverExtensibleInfo *>("ns_recover_info");
 
@@ -255,7 +260,7 @@ class NSRecover : public Module
 
 	void OnJoinChannel(User *u, Channel *c) anope_override
 	{
-		if (Config->NSRestoreOnRecover)
+		if (Config->GetModule(this)->Get<bool>("restoreonrecover"))
 		{
 			NSRecoverExtensibleInfo *ei = u->GetExt<NSRecoverExtensibleInfo *>("ns_recover_info");
 

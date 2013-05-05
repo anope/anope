@@ -31,7 +31,6 @@ class CoreExport IRCDProto : public Service
 	virtual void SendModeInternal(const BotInfo *, const Channel *, const Anope::string &);
 	virtual void SendModeInternal(const BotInfo *, const User *, const Anope::string &);
 	virtual void SendKickInternal(const BotInfo *, const Channel *, const User *, const Anope::string &);
-	virtual void SendMessageInternal(const BotInfo *bi, const Anope::string &dest, const Anope::string &buf);
 	virtual void SendNoticeInternal(const BotInfo *bi, const Anope::string &dest, const Anope::string &msg);
 	virtual void SendPrivmsgInternal(const BotInfo *bi, const Anope::string &dest, const Anope::string &buf);
 	virtual void SendQuitInternal(const User *u, const Anope::string &buf);
@@ -127,8 +126,6 @@ class CoreExport IRCDProto : public Service
 
 	virtual void SendKick(const BotInfo *bi, const Channel *chan, const User *user, const char *fmt, ...);
 
-	/* Sends a message using SendPrivmsg or SendNotice, depending on the default message method. */
-	virtual void SendMessage(const BotInfo *bi, const Anope::string &dest, const char *fmt, ...);
 	virtual void SendNotice(const BotInfo *bi, const Anope::string &dest, const char *fmt, ...);
 	virtual void SendPrivmsg(const BotInfo *bi, const Anope::string &dest, const char *fmt, ...);
 	virtual void SendAction(const BotInfo *bi, const Anope::string &dest, const char *fmt, ...);
@@ -193,7 +190,7 @@ class CoreExport IRCDProto : public Service
 	virtual void SendBOB() { }
 	virtual void SendEOB() { }
 
-	virtual void SendSVSHold(const Anope::string &) { }
+	virtual void SendSVSHold(const Anope::string &, time_t) { }
 	virtual void SendSVSHoldDel(const Anope::string &) { }
 
 	virtual void SendSWhois(const BotInfo *bi, const Anope::string &, const Anope::string &) { }

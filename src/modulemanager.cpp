@@ -229,10 +229,9 @@ ModuleReturn ModuleManager::LoadModule(const Anope::string &modname, User *u)
 	/* If the module is hooked to the reload event it wants to initialize its config here */
 	if (std::find(EventHandlers[I_OnReload].begin(), EventHandlers[I_OnReload].end(), m) != EventHandlers[I_OnReload].end())
 	{
-		ConfigReader reader;
 		try
 		{
-			m->OnReload(Config, reader);
+			m->OnReload(Config);
 		}
 		catch (const ConfigException &ex)
 		{

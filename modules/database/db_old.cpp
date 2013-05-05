@@ -1098,8 +1098,7 @@ class DBOld : public Module
 		Implementation i[] = { I_OnLoadDatabase, I_OnUplinkSync };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 
-		ConfigReader conf;
-		hashm = conf.ReadValue("db_old", "hash", "", 0);
+		hashm = Config->GetModule(this)->Get<const Anope::string &>("hash");
 
 		if (hashm != "md5" && hashm != "oldmd5" && hashm != "sha1" && hashm != "plain" && hashm != "sha256")
 			throw ModuleException("Invalid hash method");

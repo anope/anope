@@ -188,8 +188,9 @@ class ModuleSQL : public Module, public Pipe
 		delete DThread;
 	}
 
-	void OnReload(ServerConfig *conf, ConfigReader &reader) anope_override
+	void OnReload(Configuration::Conf *conf) anope_override
 	{
+		Configuration::Block *config = Config->GetModule(this);
 		int i, num;
 
 		for (std::map<Anope::string, MySQLService *>::iterator it = this->MySQLServices.begin(); it != this->MySQLServices.end();)
@@ -198,13 +199,9 @@ class ModuleSQL : public Module, public Pipe
 			MySQLService *s = it->second;
 			++it;
 
-			for (i = 0, num = reader.Enumerate("mysql"); i < num; ++i)
-			{
-				if (reader.ReadValue("mysql", "name", "main", i) == cname)
-				{
+			for (i = 0; i < Config->CountBlock("mysql"); ++i)
+				if (Config->GetBlock("mysql", i)->Get<const Anope::string &>("name", "main") == cname)
 					break;
-				}
-			}
 
 			if (i == num)
 			{
@@ -215,17 +212,18 @@ class ModuleSQL : public Module, public Pipe
 			}
 		}
 
-		for (i = 0, num = reader.Enumerate("mysql"); i < num; ++i)
+		for (i = 0; i < Config->CountBlock("mysql"); ++i)
 		{
-			Anope::string connname = reader.ReadValue("mysql", "name", "mysql/main", i);
+			Configuration::Block *block = Config->GetBlock("mysql", i);
+			const Anope::string &connname = block->Get<const Anope::string &>("name", "mysql/main");
 
 			if (this->MySQLServices.find(connname) == this->MySQLServices.end())
 			{
-				Anope::string database = reader.ReadValue("mysql", "database", "anope", i);
-				Anope::string server = reader.ReadValue("mysql", "server", "127.0.0.1", i);
-				Anope::string user = reader.ReadValue("mysql", "username", "anope", i);
-				Anope::string password = reader.ReadValue("mysql", "password", "", i);
-				int port = reader.ReadInteger("mysql", "port", "3306", i, true);
+				const Anope::string &database = block->Get<const Anope::string &>("database", "anope");
+				const Anope::string &server = block->Get<const Anope::string &>("server", "127.0.0.1");
+				const Anope::string &user = block->Get<const Anope::string &>("username", "anope");
+				const Anope::string &password = block->Get<const Anope::string &>("password");
+				int port = block->Get<int>("port", "3306");
 
 				try
 				{

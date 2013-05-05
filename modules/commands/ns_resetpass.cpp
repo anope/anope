@@ -29,7 +29,7 @@ class CommandNSResetPass : public Command
 	{
 		const NickAlias *na;
 
-		if (Config->RestrictMail && !source.HasCommand("nickserv/resetpass"))
+		if (Config->GetBlock("mail")->Get<bool>("restrict") && !source.HasCommand("nickserv/resetpass"))
 			source.Reply(ACCESS_DENIED);
 		else if (!(na = NickAlias::Find(params[0])))
 			source.Reply(NICK_X_NOT_REGISTERED, params[0].c_str());
@@ -69,8 +69,7 @@ class NSResetPass : public Module
 	NSResetPass(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandnsresetpass(this)
 	{
-
-		if (!Config->UseMail)
+		if (!Config->GetBlock("mail")->Get<bool>("usemail"))
 			throw ModuleException("Not using mail.");
 
 
@@ -140,15 +139,15 @@ static bool SendResetEmail(User *u, const NickAlias *na, const BotInfo *bi)
 	for (idx = 0; idx < 20; ++idx)
 		passcode += chars[1 + static_cast<int>((static_cast<float>(max - min)) * static_cast<uint16_t>(rand()) / 65536.0) + min];
 
-	Anope::string subject = Language::Translate(na->nc, Config->MailResetSubject.c_str());
-	Anope::string message = Language::Translate(na->nc, Config->MailResetMessage.c_str());
+	Anope::string subject = Language::Translate(na->nc, Config->GetBlock("mail")->Get<const char *>("reset_subject")),
+		message = Language::Translate(na->nc, Config->GetBlock("mail")->Get<const char *>("reset_message"));
 
 	subject = subject.replace_all_cs("%n", na->nick);
-	subject = subject.replace_all_cs("%N", Config->NetworkName);
+	subject = subject.replace_all_cs("%N", Config->GetBlock("networkinfo")->Get<const Anope::string &>("networkname"));
 	subject = subject.replace_all_cs("%c", passcode);
 
 	message = message.replace_all_cs("%n", na->nick);
-	message = message.replace_all_cs("%N", Config->NetworkName);
+	message = message.replace_all_cs("%N", Config->GetBlock("networkinfo")->Get<const Anope::string &>("networkname"));
 	message = message.replace_all_cs("%c", passcode);
 
 	ResetInfo *ri = new ResetInfo;

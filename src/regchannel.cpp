@@ -276,22 +276,12 @@ ChannelInfo::ChannelInfo(const Anope::string &chname) : Serializable("ChannelInf
 	this->repeattimes = 0;
 	this->banexpire = 0;
 	this->bi = NULL;
-
-	this->last_topic_setter = Config->ChanServ;
-	this->last_topic_time = Anope::CurTime;
+	this->last_topic_time = 0;
 
 	this->name = chname;
 
-	/* Set default channel flags */
-	for (std::set<Anope::string>::const_iterator it = Config->CSDefFlags.begin(), it_end = Config->CSDefFlags.end(); it != it_end; ++it)
-		this->ExtendMetadata(*it);
-
-	/* Set default bot flags */
-	for (std::set<Anope::string>::const_iterator it = Config->BSDefFlags.begin(), it_end = Config->BSDefFlags.end(); it != it_end; ++it)
-		this->ExtendMetadata(*it);
-
-	this->bantype = Config->CSDefBantype;
-	this->memos.memomax = Config->MSMaxMemos;
+	this->bantype = 2;
+	this->memos.memomax = 0;
 	this->last_used = this->time_registered = Anope::CurTime;
 
 	for (int i = 0; i < TTB_SIZE; ++i)
@@ -357,6 +347,8 @@ ChannelInfo::ChannelInfo(const ChannelInfo &ci) : Serializable("ChannelInfo"),
 		l->ci = this;
 		this->log_settings->push_back(l);
 	}
+
+	FOREACH_MOD(I_OnCreateChan, OnCreateChan(this));
 }
 
 ChannelInfo::~ChannelInfo()
@@ -474,11 +466,10 @@ Serializable* ChannelInfo::Unserialize(Serializable *obj, Serialize::Data &data)
 	BotInfo *bi = BotInfo::Find(sbi);
 	if (*ci->bi != bi)
 	{
-		if (ci->bi)
+		if (bi)
+			bi->Assign(NULL, ci);
+		else if (ci->bi)
 			ci->bi->UnAssign(NULL, ci);
-		ci->bi = bi;
-		if (ci->bi)
-			ci->bi->Assign(NULL, ci);
 	}
 	{
 		Anope::string ttb, tok;
@@ -1034,23 +1025,6 @@ bool ChannelInfo::CheckKick(User *user)
 		reason = Language::Translate(user->Account(), CHAN_NOT_ALLOWED_TO_JOIN);
 
 	Log(LOG_DEBUG) << "Autokicking " << user->nick << " (" << mask << ") from " << this->name;
-
-	/* If the channel isn't syncing and doesn't have any users, join ChanServ
-	 * Note that the user AND POSSIBLY the botserv bot exist here
-	 * ChanServ always enforces channels like this to keep people from deleting bots etc
-	 * that are holding channels.
-	 */
-	if (this->c->users.size() == (this->bi && this->c->FindUser(this->bi) ? 2 : 1) && !this->c->HasExt("INHABIT") && !this->c->HasExt("SYNCING"))
-	{
-		/* Set +ntsi to prevent rejoin */
-		c->SetMode(NULL, "NOEXTERNAL");
-		c->SetMode(NULL, "TOPIC");
-		c->SetMode(NULL, "SECRET");
-		c->SetMode(NULL, "INVITE");
-
-		/* Join ChanServ and set a timer for this channel to part ChanServ later */
-		this->c->Hold();
-	}
 
 	this->c->SetMode(NULL, "BAN", mask);
 	this->c->Kick(NULL, user, "%s", reason.c_str());

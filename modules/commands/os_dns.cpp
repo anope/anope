@@ -686,15 +686,15 @@ class ModuleDNS : public Module
 			delete dns_servers->at(i - 1);
 	}
 
-	void OnReload(ServerConfig *conf, ConfigReader &reader) anope_override
+	void OnReload(Configuration::Conf *conf) anope_override
 	{
-
-		this->ttl = Anope::DoTime(reader.ReadValue("os_dns", "ttl", 0));
-		this->user_drop_mark = reader.ReadInteger("os_dns", "user_drop_mark", 0, false);
-		this->user_drop_time = Anope::DoTime(reader.ReadValue("os_dns", "user_drop_time", 0, false));
-		this->user_drop_readd_time = Anope::DoTime(reader.ReadValue("os_dns", "user_drop_readd_time", 0, false));
-		this->remove_split_servers = reader.ReadFlag("os_dns", "remove_split_servers", 0);
-		this->readd_connected_servers = reader.ReadFlag("os_dns", "readd_connected_servers", 0);
+		Configuration::Block *block = conf->GetModule(this);
+		this->ttl = block->Get<time_t>("ttl");
+		this->user_drop_mark =  block->Get<int>("user_drop_mark");
+		this->user_drop_time = block->Get<time_t>("user_drop_time");
+		this->user_drop_readd_time = block->Get<time_t>("user_drop_readd_time");
+		this->remove_split_servers = block->Get<bool>("remove_split_servers");
+		this->readd_connected_servers = block->Get<bool>("readd_connected_servers");
 	}
 
 	void OnNewServer(Server *s) anope_override

@@ -45,7 +45,7 @@ class PlexusProto : public IRCDProto
 	void SendAkill(User *u, XLine *x) anope_override { hybrid->SendAkill(u, x); }
 	void SendServer(const Server *server) anope_override { hybrid->SendServer(server); }
 	void SendChannel(Channel *c) anope_override { hybrid->SendChannel(c); }
-	void SendSVSHold(const Anope::string &nick) anope_override { hybrid->SendSVSHold(nick); }
+	void SendSVSHold(const Anope::string &nick, time_t t) anope_override { hybrid->SendSVSHold(nick, t); }
 	void SendSVSHoldDel(const Anope::string &nick) anope_override { hybrid->SendSVSHoldDel(nick); }
 
 	void SendJoin(User *user, Channel *c, const ChannelStatus *status) anope_override
@@ -90,7 +90,7 @@ class PlexusProto : public IRCDProto
 
 	void SendConnect() anope_override
 	{
-		UplinkSocket::Message() << "PASS " << Config->Uplinks[Anope::CurrentUplink]->password << " TS 6 :" << Me->GetSID();
+		UplinkSocket::Message() << "PASS " << Config->Uplinks[Anope::CurrentUplink].password << " TS 6 :" << Me->GetSID();
 		/* CAPAB
 		 * QS     - Can handle quit storm removal
 		 * EX     - Can do channel +e exemptions
@@ -186,7 +186,7 @@ struct IRCDMessageEncap : IRCDMessage
 			if (u && nc)
 			{
 				u->Login(nc);
-				if (!Config->NoNicknameOwnership && user_na && user_na->nc == nc && user_na->nc->HasExt("UNCONFIRMED") == false)
+				if (!Config->GetBlock("options")->Get<bool>("nonicknameownership") && user_na && user_na->nc == nc && user_na->nc->HasExt("UNCONFIRMED") == false)
 					u->SetMode(NickServ, "REGISTERED");
 			}
 		}

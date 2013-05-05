@@ -1,7 +1,7 @@
 /* RequiredLibraries: ldap,lber */
 
 #include "module.h"
-#include "ldap.h"
+#include "ldapapi.h"
 #include <ldap.h>
 
 static Pipe *me;
@@ -423,7 +423,7 @@ class ModuleLDAP : public Module, public Pipe
 		LDAPServices.clear();
 	}
 
-	void OnReload(ServerConfig *conf, ConfigReader &reader) anope_override
+	void OnReload(Configuration::Conf *conf) anope_override
 	{
 		int i, num;
 
@@ -433,13 +433,9 @@ class ModuleLDAP : public Module, public Pipe
 			LDAPService *s = it->second;
 			++it;
 
-			for (i = 0, num = reader.Enumerate("ldap"); i < num; ++i)
-			{
-				if (reader.ReadValue("ldap", "name", "main", i) == cname)
-				{
+			for (i = 0; i < Config->CountBlock("ldap"); ++i)
+				if (Config->GetBlock("ldap", i)->Get<const Anope::string &>("name", "ldap/main") == cname)
 					break;
-				}
-			}
 
 			if (i == num)
 			{
@@ -451,16 +447,16 @@ class ModuleLDAP : public Module, public Pipe
 			}
 		}
 
-		for (i = 0, num = reader.Enumerate("ldap"); i < num; ++i)
+		for (i = 0; i < Config->CountBlock("ldap"); ++i)
 		{
-			Anope::string connname = reader.ReadValue("ldap", "name", "main", i);
+			const Anope::string &connname = Config->GetBlock("ldap", i)->Get<const Anope::string &>("name", "ldap/main");
 
 			if (this->LDAPServices.find(connname) == this->LDAPServices.end())
 			{
-				Anope::string server = reader.ReadValue("ldap", "server", "127.0.0.1", i);
-				int port = reader.ReadInteger("ldap", "port", "389", i, true);
-				Anope::string admin_binddn = reader.ReadValue("ldap", "admin_binddn", "", i);
-				Anope::string admin_password = reader.ReadValue("ldap", "admin_password", "", i);
+				const Anope::string &server = Config->GetBlock("ldap", i)->Get<const Anope::string &>("server", "127.0.0.1");
+				int port = Config->GetBlock("ldap", i)->Get<int>("port", "389");
+				const Anope::string &admin_binddn = Config->GetBlock("ldap", i)->Get<const Anope::string &>("admin_binddn");
+				const Anope::string &admin_password = Config->GetBlock("ldap", i)->Get<const Anope::string &>("admin_password");
 
 				try
 				{

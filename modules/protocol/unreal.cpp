@@ -13,6 +13,8 @@
 
 #include "module.h"
 
+static bool sasl = true;
+
 class UnrealIRCdProto : public IRCDProto
 {
  public:
@@ -53,7 +55,7 @@ class UnrealIRCdProto : public IRCDProto
 			}
 			catch (const SocketException &) { }
 
-		UplinkSocket::Message() << "TKL - G " << x->GetUser() << " " << x->GetHost() << " " << Config->OperServ;
+		UplinkSocket::Message() << "TKL - G " << x->GetUser() << " " << x->GetHost() << " " << x->by;
 	}
 
 	void SendTopic(BotInfo *whosets, Channel *c) anope_override
@@ -143,8 +145,8 @@ class UnrealIRCdProto : public IRCDProto
 	/* Unreal 3.2 actually sends some info about itself in the descript area */
 	void SendServer(const Server *server) anope_override
 	{
-		if (!Config->Numeric.empty())
-			UplinkSocket::Message() << "SERVER " << server->GetName() << " " << server->GetHops() << " :U0-*-" << Config->Numeric << " " << server->GetDescription();
+		if (!server->GetSID().empty() && server == Me)
+			UplinkSocket::Message() << "SERVER " << server->GetName() << " " << server->GetHops() << " :U0-*-" << server->GetSID() << " " << server->GetDescription();
 		else
 			UplinkSocket::Message() << "SERVER " << server->GetName() << " " << server->GetHops() << " :" << server->GetDescription();
 	}
@@ -225,24 +227,24 @@ class UnrealIRCdProto : public IRCDProto
 		   VL     = Version Info
 		   NS     = Config->Numeric Server
 		*/
-		if (!Config->Numeric.empty())
-			UplinkSocket::Message() << "PROTOCTL NICKv2 VHP UMODE2 NICKIP SJOIN SJOIN2 SJ3 NOQUIT TKLEXT ESVID MLOCK VL";
-		else
-			UplinkSocket::Message() << "PROTOCTL NICKv2 VHP UMODE2 NICKIP SJOIN SJOIN2 SJ3 NOQUIT TKLEXT ESVID MLOCK";
-		UplinkSocket::Message() << "PASS :" << Config->Uplinks[Anope::CurrentUplink]->password;
+		Anope::string protoctl = "NICKv2 VHP UMODE2 NICKIP SJOIN SJOIN2 SJ3 NOQUIT TKLEXT ESVID MLOCK VL";
+		if (!Me->GetSID().empty())
+			protoctl += " VL";
+		UplinkSocket::Message() << "PROTOCTL " << protoctl;
+		UplinkSocket::Message() << "PASS :" << Config->Uplinks[Anope::CurrentUplink].password;
 		SendServer(Me);
 	}
 
 	/* SVSHOLD - set */
-	void SendSVSHold(const Anope::string &nick) anope_override
+	void SendSVSHold(const Anope::string &nick, time_t t) anope_override
 	{
-		UplinkSocket::Message() << "TKL + Q H " << nick << " " << Config->ServerName << " " << Anope::CurTime + Config->NSReleaseTimeout << " " << Anope::CurTime << " :Being held for registered user";
+		UplinkSocket::Message() << "TKL + Q H " << nick << " " << Me->GetName() << " " << Anope::CurTime + t << " " << Anope::CurTime << " :Being held for registered user";
 	}
 
 	/* SVSHOLD - release */
 	void SendSVSHoldDel(const Anope::string &nick) anope_override
 	{
-		UplinkSocket::Message() << "TKL - Q * " << nick << " " << Config->ServerName;
+		UplinkSocket::Message() << "TKL - Q * " << nick << " " << Me->GetName();
 	}
 
 	/* UNSGLINE */
@@ -257,7 +259,7 @@ class UnrealIRCdProto : public IRCDProto
 	/* UNSZLINE */
 	void SendSZLineDel(const XLine *x) anope_override
 	{
-		UplinkSocket::Message() << "TKL - Z * " << x->GetHost() << " " << Config->OperServ;
+		UplinkSocket::Message() << "TKL - Z * " << x->GetHost() << " " << x->by;
 	}
 
 	/* SZLINE */
@@ -892,7 +894,7 @@ struct IRCDMessageSASL : IRCDMessage
 	void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		size_t p = params[1].find('!');
-		if (!Config->NSSASL || p == Anope::string::npos)	
+		if (!sasl || p == Anope::string::npos)	
 			return;
 
 		if (params[2] == "S")
@@ -996,7 +998,7 @@ struct IRCDMessageServer : IRCDMessage
 		else
 			new Server(source.GetServer(), params[0], hops, params[2]);
 
-		IRCD->SendPing(Config->ServerName, params[0]);
+		IRCD->SendPing(Me->GetName(), params[0]);
 	}
 };
 
@@ -1158,6 +1160,8 @@ class ProtoUnreal : public Module
 	IRCDMessageTopic message_topic;
 	IRCDMessageUmode2 message_umode2;
 
+	bool use_server_side_mlock;
+
 	void AddModes()
 	{
 		ModeManager::AddChannelMode(new ChannelModeStatus("VOICE", 'v', '+', 0));
@@ -1212,9 +1216,15 @@ class ProtoUnreal : public Module
 
 		this->AddModes();
 
-		Implementation i[] = { I_OnUserNickChange, I_OnChannelCreate, I_OnChanRegistered, I_OnDelChan, I_OnMLock, I_OnUnMLock };
+		Implementation i[] = { I_OnReload, I_OnUserNickChange, I_OnChannelCreate, I_OnChanRegistered, I_OnDelChan, I_OnMLock, I_OnUnMLock };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 		ModuleManager::SetPriority(this, PRIORITY_FIRST);
+	}
+
+	void OnReload(Configuration::Conf *conf) anope_override
+	{
+		use_server_side_mlock = conf->GetModule(this)->Get<bool>("use_server_side_mlock");
+		sasl = conf->GetModule(this)->Get<bool>("sasl");
 	}
 
 	void OnUserNickChange(User *u, const Anope::string &) anope_override
@@ -1226,7 +1236,7 @@ class ProtoUnreal : public Module
 
 	void OnChannelCreate(Channel *c) anope_override
 	{
-		if (Config->UseServerSideMLock && Servers::Capab.count("MLOCK") > 0 && c->ci)
+		if (use_server_side_mlock && Servers::Capab.count("MLOCK") > 0 && c->ci)
 		{
 			Anope::string modes = c->ci->GetMLockAsString(false).replace_all_cs("+", "").replace_all_cs("-", "");
 			UplinkSocket::Message(Me) << "MLOCK " << static_cast<long>(c->creation_time) << " " << c->ci->name << " " << modes;
@@ -1235,7 +1245,7 @@ class ProtoUnreal : public Module
 
 	void OnChanRegistered(ChannelInfo *ci) anope_override
 	{
-		if (!ci->c || !Config->UseServerSideMLock)
+		if (!ci->c || !use_server_side_mlock || !Servers::Capab.count("MLOCK"))
 			return;
 		Anope::string modes = ci->GetMLockAsString(false).replace_all_cs("+", "").replace_all_cs("-", "");
 		UplinkSocket::Message(Me) << "MLOCK " << static_cast<long>(ci->c->creation_time) << " " << ci->name << " " << modes;
@@ -1243,7 +1253,7 @@ class ProtoUnreal : public Module
 
 	void OnDelChan(ChannelInfo *ci) anope_override
 	{
-		if (!ci->c || !Config->UseServerSideMLock)
+		if (!ci->c || !use_server_side_mlock || !Servers::Capab.count("MLOCK"))
 			return;
 		UplinkSocket::Message(Me) << "MLOCK " << static_cast<long>(ci->c->creation_time) << " " << ci->name << " :";
 	}
@@ -1251,7 +1261,7 @@ class ProtoUnreal : public Module
 	EventReturn OnMLock(ChannelInfo *ci, ModeLock *lock) anope_override
 	{
 		ChannelMode *cm = ModeManager::FindChannelModeByName(lock->name);
-		if (cm && ci->c && (cm->type == MODE_REGULAR || cm->type == MODE_PARAM) && Servers::Capab.count("MLOCK") > 0 && Config->UseServerSideMLock)
+		if (use_server_side_mlock && cm && ci->c && (cm->type == MODE_REGULAR || cm->type == MODE_PARAM) && Servers::Capab.count("MLOCK") > 0)
 		{
 			Anope::string modes = ci->GetMLockAsString(false).replace_all_cs("+", "").replace_all_cs("-", "") + cm->mchar;
 			UplinkSocket::Message(Me) << "MLOCK " << static_cast<long>(ci->c->creation_time) << " " << ci->name << " " << modes;
@@ -1263,7 +1273,7 @@ class ProtoUnreal : public Module
 	EventReturn OnUnMLock(ChannelInfo *ci, ModeLock *lock) anope_override
 	{
 		ChannelMode *cm = ModeManager::FindChannelModeByName(lock->name);
-		if (cm && ci->c && (cm->type == MODE_REGULAR || cm->type == MODE_PARAM) && Servers::Capab.count("MLOCK") > 0 && Config->UseServerSideMLock)
+		if (use_server_side_mlock && cm && ci->c && (cm->type == MODE_REGULAR || cm->type == MODE_PARAM) && Servers::Capab.count("MLOCK") > 0)
 		{
 			Anope::string modes = ci->GetMLockAsString(false).replace_all_cs("+", "").replace_all_cs("-", "").replace_all_cs(cm->mchar, "");
 			UplinkSocket::Message(Me) << "MLOCK " << static_cast<long>(ci->c->creation_time) << " " << ci->name << " " << modes;

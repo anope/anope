@@ -14,20 +14,20 @@
 
 class NSMaxEmail : public Module
 {
-	int NSEmailMax;
-
 	bool CheckLimitReached(CommandSource &source, const Anope::string &email)
 	{
-		if (this->NSEmailMax < 1 || email.empty())
+		int NSEmailMax = Config->GetModule(this)->Get<int>("maxemails");
+
+		if (NSEmailMax < 1 || email.empty())
 			return false;
 
-		if (this->CountEmail(email, source.nc) < this->NSEmailMax)
+		if (this->CountEmail(email, source.nc) < NSEmailMax)
 			return false;
 
-		if (this->NSEmailMax == 1)
+		if (NSEmailMax == 1)
 			source.Reply(_("The given email address has reached its usage limit of 1 user."));
 		else
-			source.Reply(_("The given email address has reached its usage limit of %d users."), this->NSEmailMax);
+			source.Reply(_("The given email address has reached its usage limit of %d users."), NSEmailMax);
 
 		return true;
 	}
@@ -53,14 +53,6 @@ class NSMaxEmail : public Module
  public:
 	NSMaxEmail(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
 	{
-
-		Implementation i[] = { I_OnReload, I_OnPreCommand };
-		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
-	}
-
-	void OnReload(ServerConfig *conf, ConfigReader &reader) anope_override
-	{
-		this->NSEmailMax = reader.ReadInteger("ns_maxemail", "maxemails", "0", 0, false);
 	}
 
 	EventReturn OnPreCommand(CommandSource &source, Command *command, std::vector<Anope::string> &params) anope_override

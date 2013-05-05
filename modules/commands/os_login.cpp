@@ -19,7 +19,6 @@ class CommandOSLogin : public Command
  public:
 	CommandOSLogin(Module *creator) : Command(creator, "operserv/login", 1, 1)
 	{
-		this->SetDesc(Anope::printf(_("Login to %s"), Config->OperServ.c_str()));
 		this->SetSyntax(_("\037password\037"));
 		this->RequireUser(true);
 	}
@@ -60,6 +59,11 @@ class CommandOSLogin : public Command
 				"configured without a password."), source.service->nick.c_str());
 		return true;
 	}
+
+ 	const Anope::string GetDesc(CommandSource &source) const anope_override
+	{
+		return Anope::printf(_("Login to %s"), source.service->nick.c_str());
+	}
 };
 
 class CommandOSLogout : public Command
@@ -67,7 +71,6 @@ class CommandOSLogout : public Command
  public:
 	CommandOSLogout(Module *creator) : Command(creator, "operserv/logout", 0, 0)
 	{
-		this->SetDesc(Anope::printf(_("Logout from %s"), Config->OperServ.c_str()));
 		this->RequireUser(true);
 	}
 
@@ -97,6 +100,11 @@ class CommandOSLogout : public Command
 				"This command is only useful if your oper block is configured\n"
 				"with a password."), source.service->nick.c_str());
 		return true;
+	}
+
+ 	const Anope::string GetDesc(CommandSource &source) const anope_override
+	{
+		return Anope::printf(_("Logout from %s"), source.service->nick.c_str());
 	}
 };
 

@@ -121,6 +121,10 @@ class CoreExport Server : public Extensible
 	 */
 	const Anope::string &GetSID() const;
 
+	/** Retrieves the reason this server is quitting
+	 */
+	const Anope::string &GetQuitReason() const;
+
 	/** Get the list of links this server has, or NULL if it has none
 	 * @return A list of servers
 	 */

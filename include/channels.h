@@ -264,10 +264,6 @@ class CoreExport Channel : public Base, public Extensible
 	 */
 	void ChangeTopic(const Anope::string &user, const Anope::string &newtopic, time_t ts = Anope::CurTime);
 
-	/** Hold the channel open using ChanServ
-	 */
-	void Hold();
-
 	/** Set the correct modes, or remove the ones granted without permission,
 	 * for the specified user.
 	 * @param user The user to give/remove modes to/from

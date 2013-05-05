@@ -67,14 +67,6 @@ void IRCDProto::SendKickInternal(const BotInfo *bi, const Channel *c, const User
 		UplinkSocket::Message(bi) << "KICK " << c->name << " " << u->GetUID();
 }
 
-void IRCDProto::SendMessageInternal(const BotInfo *bi, const Anope::string &dest, const Anope::string &buf)
-{
-	if (Config->NSDefFlags.count("msg"))
-		SendPrivmsgInternal(bi, dest, buf);
-	else
-		SendNoticeInternal(bi, dest, buf);
-}
-
 void IRCDProto::SendNoticeInternal(const BotInfo *bi, const Anope::string &dest, const Anope::string &msg)
 {
 	UplinkSocket::Message(bi) << "NOTICE " << dest << " :" << msg;
@@ -174,16 +166,6 @@ void IRCDProto::SendKick(const BotInfo *bi, const Channel *chan, const User *use
 	vsnprintf(buf, BUFSIZE - 1, fmt, args);
 	va_end(args);
 	SendKickInternal(bi, chan, user, buf);
-}
-
-void IRCDProto::SendMessage(const BotInfo *bi, const Anope::string &dest, const char *fmt, ...)
-{
-	va_list args;
-	char buf[BUFSIZE] = "";
-	va_start(args, fmt);
-	vsnprintf(buf, BUFSIZE - 1, fmt, args);
-	va_end(args);
-	SendMessageInternal(bi, dest, buf);
 }
 
 void IRCDProto::SendNotice(const BotInfo *bi, const Anope::string &dest, const char *fmt, ...)
@@ -339,7 +321,7 @@ bool IRCDProto::IsNickValid(const Anope::string &nick)
 
 bool IRCDProto::IsChannelValid(const Anope::string &chan)
 {
-	if (chan.empty() || chan[0] != '#' || chan.length() > Config->ChanLen)
+	if (chan.empty() || chan[0] != '#' || chan.length() > Config->GetBlock("networkinfo")->Get<unsigned>("chanlen"))
 		return false;
 
 	return true;
@@ -347,7 +329,7 @@ bool IRCDProto::IsChannelValid(const Anope::string &chan)
 
 bool IRCDProto::IsIdentValid(const Anope::string &ident)
 {
-	if (ident.empty() || ident.length() > Config->UserLen)
+	if (ident.empty() || ident.length() > Config->GetBlock("networkinfo")->Get<unsigned>("chanlen"))
 		return false;
 
 	for (unsigned i = 0; i < ident.length(); ++i)
@@ -364,12 +346,15 @@ bool IRCDProto::IsIdentValid(const Anope::string &ident)
 
 bool IRCDProto::IsHostValid(const Anope::string &host)
 {
-	if (host.empty() || host.length() > Config->HostLen)
+	if (host.empty() || host.length() > Config->GetBlock("networkinfo")->Get<unsigned>("hostlen"))
 		return false;
 
-	if (Config->VhostDisallowBE.find_first_of(host[0]) != Anope::string::npos)
+	const Anope::string &vhostdisablebe = Config->GetBlock("networkinfo")->Get<const Anope::string &>("disallow_start_or_end"),
+		vhostchars = Config->GetBlock("networkinfo")->Get<const Anope::string &>("vhost_chars");
+
+	if (vhostdisablebe.find_first_of(host[0]) != Anope::string::npos)
 		return false;
-	else if (Config->VhostDisallowBE.find_first_of(host[host.length() - 1]) != Anope::string::npos)
+	else if (vhostdisablebe.find_first_of(host[host.length() - 1]) != Anope::string::npos)
 		return false;
 
 	int dots = 0;
@@ -377,11 +362,11 @@ bool IRCDProto::IsHostValid(const Anope::string &host)
 	{
 		if (host[i] == '.')
 			++dots;
-		if (Config->VhostChars.find_first_of(host[i]) == Anope::string::npos)
+		if (vhostchars.find_first_of(host[i]) == Anope::string::npos)
 			return false;
 	}
 
-	return Config->VhostUndotted || dots > 0;
+	return dots > 0 || Config->GetBlock("networkinfo")->Get<bool>("allow_undotted_vhosts");
 }
 
 void IRCDProto::SendOper(User *u)
@@ -392,7 +377,7 @@ void IRCDProto::SendOper(User *u)
 
 unsigned IRCDProto::GetMaxListFor(Channel *c)
 {
-	return c->HasMode("LBAN") ? 0 : Config->ListSize;
+	return c->HasMode("LBAN") ? 0 : Config->GetBlock("networkinfo")->Get<int>("modelistsize");
 }
 
 MessageSource::MessageSource(const Anope::string &src) : source(src), u(NULL), s(NULL)

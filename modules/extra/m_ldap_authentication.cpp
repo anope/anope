@@ -1,6 +1,6 @@
 #include "module.h"
 #include "nickserv.h"
-#include "ldap.h"
+#include "ldapapi.h"
 
 static Module *me;
 
@@ -104,14 +104,9 @@ class IdentifyInterface : public LDAPInterface
 					if (na == NULL)
 					{
 						na = new NickAlias(ii->req->GetAccount(), new NickCore(ii->req->GetAccount()));
-						if (ii->user)
-						{
-							if (Config->NSAddAccessOnReg)
-								na->nc->AddAccess(ii->user->Mask());
-
-							if (NickServ)
-								ii->user->SendMessage(NickServ, _("Your account \002%s\002 has been successfully created."), na->nick.c_str());
-						}
+						FOREACH_MOD(I_OnNickRegister, OnNickRegister(ii->user, na));
+						if (ii->user && NickServ)
+							ii->user->SendMessage(NickServ, _("Your account \002%s\002 has been successfully created."), na->nick.c_str());
 					}
 					// encrypt and store the password in the nickcore
 					Anope::Encrypt(ii->req->GetPassword(), na->nc->pass);
@@ -226,21 +221,22 @@ class NSIdentifyLDAP : public Module
 		ModuleManager::SetPriority(this, PRIORITY_FIRST);
 	}
 
-	void OnReload(ServerConfig *conf, ConfigReader &reader) anope_override
+	void OnReload(Configuration::Conf *conf) anope_override
 	{
+		Configuration::Block *config = Config->GetModule(this);
 
-		basedn = reader.ReadValue("m_ldap_authentication", "basedn", "", 0);
-		search_filter = reader.ReadValue("m_ldap_authentication", "search_filter", "", 0);
-		object_class = reader.ReadValue("m_ldap_authentication", "object_class", "", 0);
-		username_attribute = reader.ReadValue("m_ldap_authentication", "username_attribute", "", 0);
-		this->password_attribute = reader.ReadValue("m_ldap_authentication", "password_attribute", "", 0);
-		email_attribute = reader.ReadValue("m_ldap_authentication", "email_attribute", "", 0);
-		this->disable_register_reason = reader.ReadValue("m_ldap_authentication", "disable_register_reason", "", 0);
-		this->disable_email_reason = reader.ReadValue("m_ldap_authentication", "disable_email_reason", "", 0);
+		basedn = conf->Get<const Anope::string &>("basedn");
+		search_filter = conf->Get<const Anope::string &>("search_filter");
+		object_class = conf->Get<const Anope::string &>("object_class");
+		username_attribute = conf->Get<const Anope::string &>("username_attribute");
+		this->password_attribute = conf->Get<const Anope::string &>("password_attribute");
+		email_attribute = conf->Get<const Anope::string &>("email_attribute");
+		this->disable_register_reason = conf->Get<const Anope::string &>("disable_register_reason");
+		this->disable_email_reason = conf->Get<const Anope::string &>("disable_email_reason");
 
 		if (!email_attribute.empty())
 			/* Don't complain to users about how they need to update their email, we will do it for them */
-			Config->NSForceEmail = false;
+			Config->GetBlock("nickserv")->Set("forceemail", "false");
 	}
 
 	EventReturn OnPreCommand(CommandSource &source, Command *command, std::vector<Anope::string> &params) anope_override
@@ -297,7 +293,7 @@ class NSIdentifyLDAP : public Module
 		}
 	}
 
-	void OnNickRegister(NickAlias *na) anope_override
+	void OnNickRegister(User *, NickAlias *na) anope_override
 	{
 		if (!this->disable_register_reason.empty() || !this->ldap)
 			return;

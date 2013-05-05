@@ -37,7 +37,7 @@ void Language::InitLanguages()
 
 	setlocale(LC_ALL, "");
 
-	spacesepstream sep(Config->Languages);
+	spacesepstream sep(Config->GetBlock("options")->Get<const Anope::string &>("languages"));
 	Anope::string language;
 	while (sep.GetToken(language))
 	{
@@ -58,7 +58,7 @@ void Language::InitLanguages()
 
 const char *Language::Translate(const char *string)
 {
-	return Translate(Config->NSDefLanguage.c_str(), string);
+	return Translate("", string);
 }
 
 const char *Language::Translate(User *u, const char *string)
@@ -66,12 +66,12 @@ const char *Language::Translate(User *u, const char *string)
 	if (u && u->Account())
 		return Translate(u->Account(), string);
 	else
-		return Translate(string);
+		return Translate("", string);
 }
 
 const char *Language::Translate(const NickCore *nc, const char *string)
 {
-	return Translate(nc ? nc->language.c_str() : Config->NSDefLanguage.c_str(), string);
+	return Translate(nc ? nc->language.c_str() : "", string);
 }
 
 #if GETTEXT_FOUND
@@ -81,8 +81,11 @@ extern "C" int _nl_msg_cat_cntr;
 
 const char *Language::Translate(const char *lang, const char *string)
 {
-	if (!string || !*string || !lang || !*lang)
-		return string ? string : "";
+	if (!string || !*string)
+		return "";
+	
+	if (!lang || !*lang)
+		lang = Config->DefLanguage.c_str();
 
 	++_nl_msg_cat_cntr;
 #ifdef _WIN32

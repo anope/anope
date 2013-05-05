@@ -9,10 +9,7 @@
  * Based on the original code of Services by Andy Church.
  */
 
-/*************************************************************************/
-
 #include "module.h"
-
 
 class BadwordsDelCallback : public NumberList
 {
@@ -146,17 +143,20 @@ class CommandBSBadwords : public Command
 			realword = word.substr(0, pos);
 		}
 
-		if (ci->GetBadWordCount() >= Config->BSBadWordsMax)
+		unsigned badwordsmax = Config->GetModule(this->module)->Get<unsigned>("badwordsmax");
+		if (ci->GetBadWordCount() >= badwordsmax)
 		{
-			source.Reply(_("Sorry, you can only have %d bad words entries on a channel."), Config->BSBadWordsMax);
+			source.Reply(_("Sorry, you can only have %d bad words entries on a channel."), badwordsmax);
 			return;
 		}
+
+		bool casesensitive = Config->GetModule("botserv")->Get<bool>("casesensitive");
 
 		for (unsigned i = 0, end = ci->GetBadWordCount(); i < end; ++i)
 		{
 			const BadWord *bw = ci->GetBadWord(i);
 
-			if (!bw->word.empty() && ((Config->BSCaseSensitive && realword.equals_cs(bw->word)) || (!Config->BSCaseSensitive && realword.equals_ci(bw->word))))
+			if ((casesensitive && realword.equals_cs(bw->word)) || (!casesensitive && realword.equals_ci(bw->word)))
 			{
 				source.Reply(_("\002%s\002 already exists in %s bad words list."), bw->word.c_str(), ci->name.c_str());
 				return;
@@ -168,8 +168,6 @@ class CommandBSBadwords : public Command
 		ci->AddBadWord(realword, bwtype);
 
 		source.Reply(_("\002%s\002 added to %s bad words list."), realword.c_str(), ci->name.c_str());
-
-		return;
 	}
 
 	void DoDelete(CommandSource &source, ChannelInfo *ci, const Anope::string &word)
@@ -219,6 +217,7 @@ class CommandBSBadwords : public Command
 		source.Reply(_("Bad words list is now empty."));
 		return;
 	}
+
  public:
 	CommandBSBadwords(Module *creator) : Command(creator, "botserv/badwords", 2, 3)
 	{
@@ -289,7 +288,7 @@ class CommandBSBadwords : public Command
 				"will be done if a user says a word that ends with\n"
 				"\037word\037. If you don't specify anything, a kick will\n"
 				"be issued every time \037word\037 is said by a user.\n"
-				" \n"), Config->UseStrictPrivMsgString.c_str(), source.service->nick.c_str(), source.command.c_str());
+				" \n"), Config->StrictPrivmsg.c_str(), source.service->nick.c_str(), source.command.c_str());
 		source.Reply(_("The \002DEL\002 command removes the given word from the\n"
 				"bad words list.  If a list of entry numbers is given, those\n"
 				"entries are deleted.  (See the example for LIST below.)\n"
@@ -316,7 +315,6 @@ class BSBadwords : public Module
 	BSBadwords(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandbsbadwords(this)
 	{
-
 	}
 };
 

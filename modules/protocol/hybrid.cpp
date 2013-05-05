@@ -160,7 +160,7 @@ class HybridProto : public IRCDProto
 
 	void SendConnect() anope_override
 	{
-		UplinkSocket::Message() << "PASS " << Config->Uplinks[Anope::CurrentUplink]->password << " TS 6 :" << Me->GetSID();
+		UplinkSocket::Message() << "PASS " << Config->Uplinks[Anope::CurrentUplink].password << " TS 6 :" << Me->GetSID();
 
 		/*
 		 * As of October 13, 2012, ircd-hybrid-8 does support the following capabilities
@@ -249,9 +249,9 @@ class HybridProto : public IRCDProto
 		UplinkSocket::Message(Me) << "SVSNICK " << u->nick << " " << newnick << " " << when;
 	}
 
-	void SendSVSHold(const Anope::string &nick) anope_override
+	void SendSVSHold(const Anope::string &nick, time_t t) anope_override
 	{
-		XLine x(nick, OperServ->nick, Anope::CurTime + Config->NSReleaseTimeout, "Being held for registered user");
+		XLine x(nick, OperServ->nick, Anope::CurTime + t, "Being held for registered user");
 		this->SendSQLine(NULL, &x);
 	}
 
@@ -357,7 +357,7 @@ struct IRCDMessageServer : IRCDMessage
 
 		new Server(source.GetServer() == NULL ? Me : source.GetServer(), params[0], 1, params[2], UplinkSID);
 
-		IRCD->SendPing(Config->ServerName, params[0]);
+		IRCD->SendPing(Me->GetName(), params[0]);
 	}
 };
 
@@ -372,7 +372,7 @@ struct IRCDMessageSID : IRCDMessage
 		unsigned int hops = params[1].is_pos_number_only() ? convertTo<unsigned>(params[1]) : 0;
 		new Server(source.GetServer() == NULL ? Me : source.GetServer(), params[0], hops, params[3], params[2]);
 
-		IRCD->SendPing(Config->ServerName, params[0]);
+		IRCD->SendPing(Me->GetName(), params[0]);
 	}
 };
 
@@ -608,12 +608,8 @@ public:
 
 		ModuleManager::Attach(I_OnUserNickChange, this);
 
-		if (Config->Numeric.empty())
-		{
-			Anope::string numeric = Servers::TS6_SID_Retrieve();
-			Me->SetSID(numeric);
-			Config->Numeric = numeric;
-		}
+		if (Me->GetSID() == Me->GetName())
+			Me->SetSID(Servers::TS6_SID_Retrieve());
 
 		for (botinfo_map::iterator it = BotListByNick->begin(), it_end = BotListByNick->end(); it != it_end; ++it)
 			it->second->GenerateUID();

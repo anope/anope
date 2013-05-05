@@ -14,6 +14,29 @@
 #include "module.h"
 #include "os_session.h"
 
+namespace
+{
+	/* The default session limit */
+	unsigned session_limit;
+	/* How many times to kill before adding an AKILL */
+	unsigned max_session_kill;
+	/* How long session akills should last */
+	time_t session_autokill_expiry;
+	/* Reason to use for session kills */
+	Anope::string sle_reason;
+	/* Optional second reason */
+	Anope::string sle_detailsloc;
+
+	/* Max limit that can be used for exceptions */
+	unsigned max_exception_limit;
+	/* How long before exceptions expire by default */
+	time_t exception_expiry;
+
+	/* Number of bits to use when comparing session IPs */
+	unsigned ipv4_cidr;
+	unsigned ipv6_cidr;
+}
+
 class MySessionService : public SessionService
 {
 	SessionMap Sessions;
@@ -68,7 +91,7 @@ class MySessionService : public SessionService
 
 	Session *FindSession(const Anope::string &ip) anope_override
 	{
-		cidr c(ip, ip.find(':') != Anope::string::npos ? Config->SessionIPv6CIDR : Config->SessionIPv4CIDR);
+		cidr c(ip, ip.find(':') != Anope::string::npos ? ipv6_cidr : ipv4_cidr);
 		SessionMap::iterator it = this->Sessions.find(c);
 		if (it != this->Sessions.end())
 			return it->second;
@@ -77,13 +100,13 @@ class MySessionService : public SessionService
 
 	SessionMap::iterator FindSessionIterator(const Anope::string &ip)
 	{
-		cidr c(ip, ip.find(':') != Anope::string::npos ? Config->SessionIPv6CIDR : Config->SessionIPv4CIDR);
+		cidr c(ip, ip.find(':') != Anope::string::npos ? ipv6_cidr : ipv4_cidr);
 		return this->Sessions.find(c);
 	}
 
 	Session* &FindOrCreateSession(const Anope::string &ip)
 	{
-		cidr c(ip, ip.find(':') != Anope::string::npos ? Config->SessionIPv6CIDR : Config->SessionIPv4CIDR);
+		cidr c(ip, ip.find(':') != Anope::string::npos ? ipv6_cidr : ipv4_cidr);
 		return this->Sessions[c];
 	}
 
@@ -96,7 +119,7 @@ class MySessionService : public SessionService
 class ExpireTimer : public Timer
 {
  public:
-	ExpireTimer() : Timer(Config->ExpireTimeout, Anope::CurTime, true) { }
+	ExpireTimer() : Timer(Config->GetBlock("options")->Get<time_t>("expiretimeout"), Anope::CurTime, true) { }
 
 	void Tick(time_t) anope_override
 	{
@@ -218,10 +241,16 @@ class CommandOSSession : public Command
 		else
 		{
 			Exception *exception = session_service->FindException(param);
-			source.Reply(_("The host \002%s\002 currently has \002%d\002 sessions with a limit of \002%d\002."), session->addr.mask().c_str(), session->count, exception && exception->limit > Config->DefSessionLimit ? exception->limit : Config->DefSessionLimit);
+			unsigned limit = session_limit;
+			if (exception)
+			{
+				if (!exception->limit)
+					limit = 0;
+				else if (exception->limit > limit)
+					limit = exception->limit;
+			}
+			source.Reply(_("The host \002%s\002 currently has \002%d\002 sessions with a limit of \002%d\002."), session->addr.mask().c_str(), session->count, limit);
 		}
-
-		return;
 	}
  public:
 	CommandOSSession(Module *creator) : Command(creator, "operserv/session", 2, 2)
@@ -235,20 +264,14 @@ class CommandOSSession : public Command
 	{
 		const Anope::string &cmd = params[0];
 
-		if (!Config->LimitSessions)
-		{
+		if (!session_limit)
 			source.Reply(_("Session limiting is disabled."));
-			return;
-		}
-
-		if (cmd.equals_ci("LIST"))
+		else if (cmd.equals_ci("LIST"))
 			return this->DoList(source, params);
 		else if (cmd.equals_ci("VIEW"))
 			return this->DoView(source, params);
 		else
 			this->OnSyntaxError(source, "");
-
-		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
@@ -303,7 +326,7 @@ class CommandOSException : public Command
 			return;
 		}
 
-		time_t expires = !expiry.empty() ? Anope::DoTime(expiry) : Config->ExceptionExpiry;
+		time_t expires = !expiry.empty() ? Anope::DoTime(expiry) : exception_expiry;
 		if (expires < 0)
 		{
 			source.Reply(BAD_EXPIRY_TIME);
@@ -319,9 +342,9 @@ class CommandOSException : public Command
 		}
 		catch (const ConvertException &) { }
 
-		if (limit > Config->MaxSessionLimit)
+		if (limit > max_exception_limit)
 		{
-			source.Reply(_("Invalid session limit. It must be a valid integer greater than or equal to zero and less than \002%d\002."), Config->MaxSessionLimit);
+			source.Reply(_("Invalid session limit. It must be a valid integer greater than or equal to zero and less than \002%d\002."), max_exception_limit);
 			return;
 		}
 		else
@@ -548,13 +571,9 @@ class CommandOSException : public Command
 	{
 		const Anope::string &cmd = params[0];
 
-		if (!Config->LimitSessions)
-		{
+		if (!session_limit)
 			source.Reply(_("Session limiting is disabled."));
-			return;
-		}
-
-		if (cmd.equals_ci("ADD"))
+		else if (cmd.equals_ci("ADD"))
 			return this->DoAdd(source, params);
 		else if (cmd.equals_ci("DEL"))
 			return this->DoDel(source, params);
@@ -566,8 +585,6 @@ class CommandOSException : public Command
 			return this->DoView(source, params);
 		else
 			this->OnSyntaxError(source, "");
-
-		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
@@ -579,10 +596,9 @@ class CommandOSException : public Command
 				"such as shell servers, to carry more than the default number\n"
 				"of clients at a time. Once a host reaches its session limit,\n"
 				"all clients attempting to connect from that host will be\n"
-				"killed. Before the user is killed, they are notified, via a\n"
-				"/NOTICE from %s, of a source of help regarding session\n"
-				"limiting. The content of this notice is a config setting.\n"),
-				Config->OperServ.c_str());
+				"killed. Before the user is killed, they are notified, of a\n"
+				"source of help regarding session limiting. The content of\n"
+				"this notice is a config setting.\n"));
 		source.Reply(" ");
 		source.Reply(_("\002EXCEPTION ADD\002 adds the given host mask to the exception list.\n"
 				"Note that \002nick!user@host\002 and \002user@host\002 masks are invalid!\n"
@@ -624,14 +640,34 @@ class OSSession : public Module
 	{
 		this->SetPermanent(true);
 
-		Implementation i[] = { I_OnUserConnect, I_OnPreUserLogoff };
+		Implementation i[] = { I_OnReload, I_OnUserConnect, I_OnPreUserLogoff };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 		ModuleManager::SetPriority(this, PRIORITY_FIRST);
 	}
 
+	void OnReload(Configuration::Conf *conf) anope_override
+	{
+		Configuration::Block *block = Config->GetModule(this);
+
+		session_limit = block->Get<int>("defaultsessionlimit");
+		max_session_kill = block->Get<int>("maxsessionkill");
+		session_autokill_expiry = block->Get<time_t>("sessionautokillexpiry");
+		sle_reason = block->Get<const Anope::string &>("sessionlimitexceeded");
+		sle_detailsloc = block->Get<const Anope::string &>("sessionlimitdetailsloc");
+
+		max_exception_limit = block->Get<int>("maxsessionlimit");
+		exception_expiry = block->Get<time_t>("exceptionexpiry");
+
+		ipv4_cidr = block->Get<unsigned>("session_ipv4_cidr", "32");
+		ipv6_cidr = block->Get<unsigned>("session_ipv6_cidr", "128");
+
+		if (ipv4_cidr > 32 || ipv6_cidr > 128)
+			throw ConfigException(this->name + ": session CIDR value out of range");
+	}
+
 	void OnUserConnect(User *u, bool &exempt) anope_override
 	{
-		if (u->Quitting() || !Config->LimitSessions || exempt || !u->server || u->server->IsULined())
+		if (u->Quitting() || !session_limit || exempt || !u->server || u->server->IsULined())
 			return;
 
 		try
@@ -641,7 +677,7 @@ class OSSession : public Module
 			if (session)
 			{
 				bool kill = false;
-				if (Config->DefSessionLimit && session->count >= Config->DefSessionLimit)
+				if (session->count >= session_limit)
 				{
 					kill = true;
 					Exception *exception = this->ss.FindException(u);
@@ -658,7 +694,7 @@ class OSSession : public Module
 				 *
 				 * Now, we create the user struture before calling this to fix some user tracking issues,
 				 * so we must increment this here no matter what because it will either be
-				 * decremented in do_kill or in do_quit - Adam
+				 * decremented when the user is killed or quits - Adam
 				 */
 				++session->count;
 	
@@ -666,30 +702,33 @@ class OSSession : public Module
 				{
 					if (OperServ)
 					{
-						if (!Config->SessionLimitExceeded.empty())
-							u->SendMessage(OperServ, Config->SessionLimitExceeded.c_str(), u->ip.c_str());
-						if (!Config->SessionLimitDetailsLoc.empty())
-							u->SendMessage(OperServ, "%s", Config->SessionLimitDetailsLoc.c_str());
+						if (!sle_reason.empty())
+						{
+							Anope::string message = sle_reason.replace_all_cs("%IP%", u->ip);
+							u->SendMessage(OperServ, message);
+						}
+						if (!sle_detailsloc.empty())
+							u->SendMessage(OperServ, sle_detailsloc);
 					}
 
 					++session->hits;
-					if (Config->MaxSessionKill && session->hits >= Config->MaxSessionKill && akills)
+					if (max_session_kill && session->hits >= max_session_kill && akills)
 					{
 						const Anope::string &akillmask = "*@" + u->ip;
-						XLine *x = new XLine(akillmask, Config->OperServ, Anope::CurTime + Config->SessionAutoKillExpiry, "Session limit exceeded", XLineManager::GenerateUID());
+						XLine *x = new XLine(akillmask, OperServ ? OperServ->nick : "", Anope::CurTime + session_autokill_expiry, "Session limit exceeded", XLineManager::GenerateUID());
 						akills->AddXLine(x);
 						akills->Send(NULL, x);
 						Log(OperServ, "akill/session") << "Added a temporary AKILL for \002" << akillmask << "\002 due to excessive connections";
 					}
 					else
 					{
-						u->Kill(Config->OperServ, "Session limit exceeded");
+						u->Kill(OperServ ? OperServ->nick : "", "Session limit exceeded");
 					}
 				}
 			}
 			else
 			{
-				session = new Session(u->ip, u->ip.find(':') != Anope::string::npos ? Config->SessionIPv6CIDR : Config->SessionIPv4CIDR);
+				session = new Session(u->ip, u->ip.find(':') != Anope::string::npos ? ipv6_cidr : ipv4_cidr);
 			}
 		}
 		catch (const SocketException &) { }
@@ -697,7 +736,7 @@ class OSSession : public Module
 
 	void OnPreUserLogoff(User *u) anope_override
 	{
-		if (!Config->LimitSessions || !u->server || u->server->IsULined())
+		if (!session_limit || !u->server || u->server->IsULined())
 			return;
 
 		SessionService::SessionMap::iterator sit;

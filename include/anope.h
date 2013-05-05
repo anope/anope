@@ -333,6 +333,7 @@ namespace Anope
 	};
 
 	template<typename T> class map : public std::map<string, T, ci::less> { };
+	template<typename T> class multimap : public std::multimap<string, T, ci::less> { };
 	template<typename T> class hash_map : public std::tr1::unordered_map<string, T, hash_ci, compare> { };
 
 	static const char *const compiled = __TIME__ " " __DATE__;

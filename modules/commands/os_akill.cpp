@@ -76,7 +76,7 @@ class CommandOSAKill : public Command
 			sep.GetToken(mask);
 		}
 
-		time_t expires = !expiry.empty() ? Anope::DoTime(expiry) : Config->AutokillExpiry;
+		time_t expires = !expiry.empty() ? Anope::DoTime(expiry) : Config->GetModule("operserv")->Get<time_t>("autokillexpiry", "30d");
 		/* If the expiry given does not contain a final letter, it's in days,
 		 * said the doc. Ah well.
 		 */
@@ -121,16 +121,18 @@ class CommandOSAKill : public Command
 
 		if (mask[0] == '/' && mask[mask.length() - 1] == '/')
 		{
-			if (Config->RegexEngine.empty())
+			const Anope::string &regexengine = Config->GetBlock("options")->Get<const Anope::string &>("regexengine");
+
+			if (regexengine.empty())
 			{
-				source.Reply(_("Regex is enabled."));
+				source.Reply(_("Regex is disabled."));
 				return;
 			}
 
-			ServiceReference<RegexProvider> provider("Regex", Config->RegexEngine);
+			ServiceReference<RegexProvider> provider("Regex", regexengine);
 			if (!provider)
 			{
-				source.Reply(_("Unable to find regex engine %s."), Config->RegexEngine.c_str());
+				source.Reply(_("Unable to find regex engine %s."), regexengine.c_str());
 				return;
 			}
 
@@ -158,8 +160,11 @@ class CommandOSAKill : public Command
 			return;
 		}
 
+		if (Config->GetModule("operserv")->Get<bool>("addakiller", "yes") && !source.GetNick().empty())
+			reason = "[" + source.GetNick() + "] " + reason;
+
 		XLine *x = new XLine(mask, source.GetNick(), expires, reason);
-		if (Config->AkillIds)
+		if (Config->GetBlock("operserv")->Get<bool>("akilids"))
 			x->id = XLineManager::GenerateUID();
 
 		unsigned int affected = 0;
@@ -185,7 +190,7 @@ class CommandOSAKill : public Command
 		}
 
 		akills->AddXLine(x);
-		if (Config->AkillOnAdd)
+		if (Config->GetModule("operserv")->Get<bool>("akillonadd"))
 			akills->Send(NULL, x);
 
 		source.Reply(_("\002%s\002 added to the AKILL list."), mask.c_str());
@@ -414,11 +419,12 @@ class CommandOSAKill : public Command
 				"be given, even if it is the same as the default. The\n"
 				"current AKILL default expiry time can be found with the\n"
 				"\002STATS AKILL\002 command."));
-		if (!Config->RegexEngine.empty())
+		const Anope::string &regexengine = Config->GetBlock("options")->Get<const Anope::string &>("regexengine");
+		if (!regexengine.empty())
 		{
 			source.Reply(" ");
 			source.Reply(_("Regex matches are also supported using the %s engine.\n"
-					"Enclose your mask in // if this is desired."), Config->RegexEngine.c_str());
+					"Enclose your mask in // if this is desired."), regexengine.c_str());
 		}
 		source.Reply(_(
 				" \n"

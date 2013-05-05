@@ -55,7 +55,7 @@ class CommandHSList : public Command
 			}
 		}
 
-		unsigned display_counter = 0;
+		unsigned display_counter = 0, listmax = Config->GetModule(this->owner)->Get<unsigned>("listmax");
 		ListFormatter list;
 		list.AddColumn("Number").AddColumn("Nick").AddColumn("Vhost").AddColumn("Creator").AddColumn("Created");
 
@@ -68,7 +68,7 @@ class CommandHSList : public Command
 
 			if (!key.empty() && key[0] != '#')
 			{
-				if ((Anope::Match(na->nick, key) || Anope::Match(na->GetVhostHost(), key)) && display_counter < Config->NSListMax)
+				if ((Anope::Match(na->nick, key) || Anope::Match(na->GetVhostHost(), key)) && display_counter < listmax)
 				{
 					++display_counter;
 
@@ -90,7 +90,7 @@ class CommandHSList : public Command
 				 * List the host if its in the display range, and not more
 				 * than NSListMax records have been displayed...
 				 **/
-				if (((counter >= from && counter <= to) || (!from && !to)) && display_counter < Config->NSListMax)
+				if (((counter >= from && counter <= to) || (!from && !to)) && display_counter < listmax)
 				{
 					++display_counter;
 					ListFormatter::ListEntry entry;
@@ -141,9 +141,7 @@ class CommandHSList : public Command
 				"entries beginning with \"Rob\"\n"
 				"If a \037#X-Y\037 style is used, only entries between the range of \002X\002\n"
 				"and \002Y\002 will be displayed, e.g. \002#1-3\002 will display the first 3\n"
-				"nick/vhost entries.\n"
-				"The list uses the value of NSListMax as a hard limit for the\n"
-				"number of items to display to a operator at any one time."));
+				"nick/vhost entries."));
 		return true;
 	}
 };
@@ -156,7 +154,6 @@ class HSList : public Module
 	HSList(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandhslist(this)
 	{
-
 	}
 };
 

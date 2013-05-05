@@ -77,11 +77,12 @@ class CSStats : public Module
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 	}
 
-	void OnReload(ServerConfig *conf, ConfigReader &reader) anope_override
+	void OnReload(Configuration::Conf *conf) anope_override
 	{
-		prefix = reader.ReadValue("chanstats", "prefix", "anope_", 0);
-		Anope::string engine = reader.ReadValue("chanstats", "engine", "", 0);
-		this->sql = ServiceReference<SQL::Provider>("SQL::Provider", engine);
+		prefix = conf->GetModule(this)->Get<const Anope::string &>("prefix");
+		if (prefix.empty())
+			prefix = "anope_";
+		this->sql = ServiceReference<SQL::Provider>("SQL::Provider", conf->GetModule(this)->Get<const Anope::string &>("engine"));
 	}
 
 	SQL::Result RunQuery(const SQL::Query &query)

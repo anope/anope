@@ -79,9 +79,9 @@ class BahamutIRCdProto : public IRCDProto
 	}
 
 	/* SVSHOLD - set */
-	void SendSVSHold(const Anope::string &nick) anope_override
+	void SendSVSHold(const Anope::string &nick, time_t time) anope_override
 	{
-		UplinkSocket::Message(Me) << "SVSHOLD " << nick << " " << Config->NSReleaseTimeout << " :Being held for registered user";
+		UplinkSocket::Message(Me) << "SVSHOLD " << nick << " " << time << " :Being held for registered user";
 	}
 
 	/* SVSHOLD - release */
@@ -265,7 +265,7 @@ class BahamutIRCdProto : public IRCDProto
 
 	void SendConnect() anope_override
 	{
-		UplinkSocket::Message() << "PASS " << Config->Uplinks[Anope::CurrentUplink]->password << " :TS";
+		UplinkSocket::Message() << "PASS " << Config->Uplinks[Anope::CurrentUplink].password << " :TS";
 		UplinkSocket::Message() << "CAPAB SSJOIN NOQUIT BURST UNCONNECT NICKIP TSMODE TS3";
 		SendServer(Me);
 		/*

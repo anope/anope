@@ -120,8 +120,8 @@ void Anope::HandleSignal()
 
 			try
 			{
-				ServerConfig *new_config = new ServerConfig();
-				delete Config;
+				Configuration::Conf *new_config = new Configuration::Conf();
+				delete new_config;
 				Config = new_config;
 			}
 			catch (const ConfigException &ex)
@@ -197,14 +197,14 @@ static void InitSignals()
 
 static void remove_pidfile()
 {
-	remove(Config->PIDFilename.c_str());
+	remove(Config->GetBlock("serverinfo")->Get<const char *>("pid"));
 }
 
 /* Create our PID file and write the PID to it. */
 
 static void write_pidfile()
 {
-	FILE *pidfile = fopen(Config->PIDFilename.c_str(), "w");
+	FILE *pidfile = fopen(Config->GetBlock("serverinfo")->Get<const char *>("pid"), "w");
 	if (pidfile)
 	{
 #ifdef _WIN32
@@ -216,7 +216,7 @@ static void write_pidfile()
 		atexit(remove_pidfile);
 	}
 	else
-		throw CoreException("Can not write to PID file " + Config->PIDFilename);
+		throw CoreException("Can not write to PID file " + Config->GetBlock("serverinfo")->Get<const Anope::string &>("pid"));
 }
 
 void Anope::Init(int ac, char **av)
@@ -303,7 +303,7 @@ void Anope::Init(int ac, char **av)
 	{
 		if (arg.empty())
 			throw CoreException("The --config option requires a file name");
-		ServicesConf = ConfigurationFile(arg, false);
+		ServicesConf = Configuration::File(arg, false);
 	}
 
 	if (GetCommandLineArgument("confdir", 0, arg))
@@ -413,7 +413,7 @@ void Anope::Init(int ac, char **av)
 	/* Read configuration file; exit if there are problems. */
 	try
 	{
-		Config = new ServerConfig();
+		Config = new Configuration::Conf();
 	}
 	catch (const ConfigException &ex)
 	{
@@ -429,7 +429,8 @@ void Anope::Init(int ac, char **av)
 	write_pidfile();
 
 	/* Create me */
-	Me = new Server(NULL, Config->ServerName, 0, Config->ServerDesc, Config->Numeric);
+	Configuration::Block *block = Config->GetBlock("serverinfo");
+	Me = new Server(NULL, block->Get<const Anope::string &>("name"), 0, block->Get<const Anope::string &>("description"), block->Get<const Anope::string &>("id"));
 	for (botinfo_map::const_iterator it = BotListByNick->begin(), it_end = BotListByNick->end(); it != it_end; ++it)
 	{
 		it->second->server = Me;
@@ -445,12 +446,13 @@ void Anope::Init(int ac, char **av)
 	Language::InitLanguages();
 
 	/* Initialize random number generator */
-	srand(Config->Seed);
+	block = Config->GetBlock("options");
+	srand(block->Get<unsigned>("seed"));
 
 	/* load modules */
 	Log() << "Loading modules...";
-	for (std::list<Anope::string>::iterator it = Config->ModulesAutoLoad.begin(), it_end = Config->ModulesAutoLoad.end(); it != it_end; ++it)
-		ModuleManager::LoadModule(*it, NULL);
+	for (int i = 0; i < Config->CountBlock("module"); ++i)
+		ModuleManager::LoadModule(Config->GetBlock("module", i)->Get<const Anope::string &>("name"), NULL);
 
 	Module *protocol = ModuleManager::FindFirstOf(PROTOCOL);
 	if (protocol == NULL)

@@ -45,19 +45,19 @@ class ModuleWebCPanel : public Module
 		panel(this, "webcpanel"),
 		style_css("style.css", "/static/style.css", "text/css"), logo_png("logo.png", "/static/logo.png", "image/png"), favicon_ico("favicon.ico", "/favicon.ico", "image/x-icon"),
 		index("/"), logout("/logout"), _register("/register"), confirm("/confirm"),
-		nickserv_info(Config->NickServ, "/nickserv/info"), nickserv_cert(Config->NickServ, "/nickserv/cert"), nickserv_access(Config->NickServ, "/nickserv/access"), nickserv_alist(Config->NickServ, "/nickserv/alist"),
-		chanserv_info(Config->ChanServ, "/chanserv/info"), chanserv_set(Config->ChanServ, "/chanserv/set"), chanserv_access(Config->ChanServ, "/chanserv/access"), chanserv_akick(Config->ChanServ, "/chanserv/akick"),
-		chanserv_drop(Config->ChanServ, "/chanserv/drop"), memoserv_memos(Config->MemoServ, "/memoserv/memos"), hostserv_request(Config->HostServ, "/hostserv/request"), operserv_akill(Config->OperServ, "/operserv/akill")
+		nickserv_info("NickServ", "/nickserv/info"), nickserv_cert("NickServ", "/nickserv/cert"), nickserv_access("NickServ", "/nickserv/access"), nickserv_alist("NickServ", "/nickserv/alist"),
+		chanserv_info("ChanServ", "/chanserv/info"), chanserv_set("ChanServ", "/chanserv/set"), chanserv_access("ChanServ", "/chanserv/access"), chanserv_akick("ChanServ", "/chanserv/akick"),
+		chanserv_drop("ChanServ", "/chanserv/drop"), memoserv_memos("MemoServ", "/memoserv/memos"), hostserv_request("HostServ", "/hostserv/request"), operserv_akill("OperServ", "/operserv/akill")
 	{
 
 		me = this;
 
-		ConfigReader reader;
-		provider_name = reader.ReadValue("webcpanel", "server", "httpd/main", 0);
-		template_name = reader.ReadValue("webcpanel", "template", "template", 0);
+		Configuration::Block *block = Config->GetModule(this);
+		provider_name = block->Get<const Anope::string &>("server", "httpd/main");
+		template_name = block->Get<const Anope::string &>("template", "default");
 		template_base = Anope::DataDir + "/modules/webcpanel/templates/" + template_name;
-		page_title = reader.ReadValue("webcpanel", "title", "Anope IRC Services", 0);
-		use_ssl = reader.ReadFlag("webcpanel", "ssl", "no", 0); // This is dumb, is there a better way to do this?
+		page_title = block->Get<const Anope::string &>("title", "Anope IRC Services");
+		use_ssl = block->Get<bool>("ssl", "no"); // This is dumb, is there a better way to do this?
 
 		ServiceReference<HTTPProvider> provider("HTTPProvider", provider_name);
 		if (!provider)
@@ -72,10 +72,10 @@ class ModuleWebCPanel : public Module
 		provider->RegisterPage(&this->_register);
 		provider->RegisterPage(&this->confirm);
 
-		if (Config->NickServ.empty() == false)
+		if (NickServ)
 		{
 			Section s;
-			s.name = Config->NickServ;
+			s.name = NickServ->nick;
 
 			SubSection ss;
 			ss.name = "Information";
@@ -103,10 +103,11 @@ class ModuleWebCPanel : public Module
 
 			panel.sections.push_back(s);
 		}
-		if (Config->ChanServ.empty() == false)
+
+		if (ChanServ)
 		{
 			Section s;
-			s.name = Config->ChanServ;
+			s.name = ChanServ->nick;
 
 			SubSection ss;
 			ss.name = "Channels";
@@ -137,10 +138,10 @@ class ModuleWebCPanel : public Module
 			panel.sections.push_back(s);
 		}
 
-		if (Config->MemoServ.empty() == false)
+		if (MemoServ)
 		{
 			Section s;
-			s.name = Config->MemoServ;
+			s.name = MemoServ->nick;
 
 			SubSection ss;
 			ss.name = "Memos";
@@ -151,10 +152,10 @@ class ModuleWebCPanel : public Module
 			panel.sections.push_back(s);
 		}
 
-		if (Config->HostServ.empty() == false)
+		if (HostServ)
 		{
 			Section s;
-			s.name = Config->HostServ;
+			s.name = HostServ->nick;
 
 			SubSection ss;
 			ss.name = "vHost Request";
@@ -165,10 +166,10 @@ class ModuleWebCPanel : public Module
 			panel.sections.push_back(s);
 		}
 
-		if (Config->OperServ.empty() == false)
+		if (OperServ)
 		{
 			Section s;
-			s.name = Config->OperServ;
+			s.name = OperServ->nick;
 
 			SubSection ss;
 			ss.name = "Akill";

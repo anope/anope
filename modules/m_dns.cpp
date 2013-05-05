@@ -940,16 +940,17 @@ class ModuleDNS : public Module
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 	}
 
-	void OnReload(ServerConfig *conf, ConfigReader &reader) anope_override
+	void OnReload(Configuration::Conf *conf) anope_override
 	{
+		Configuration::Block *block = conf->GetModule(this);
 
-		nameserver = reader.ReadValue("dns", "nameserver", "127.0.0.1", 0);
-		timeout = Anope::DoTime(reader.ReadValue("dns", "timeout", "5", 0));
-		ip = reader.ReadValue("dns", "ip", "0.0.0.0", 0);
-		port = reader.ReadInteger("dns", "port", "53", 0, false);
-		admin = reader.ReadValue("dns", "admin", "admin@example.com", 0);
-		nameservers = reader.ReadValue("dns", "nameservers", "ns1.example.com", 0);
-		refresh = reader.ReadInteger("dns", "refresh", "3600", 0, false);
+		nameserver = block->Get<const Anope::string &>("nameserver", "127.0.0.1");
+		timeout =  block->Get<time_t>("timeout", "5");
+		ip = block->Get<const Anope::string &>("ip", "0.0.0.0");
+		port = block->Get<int>("port", "53");
+		admin = block->Get<const Anope::string &>("admin", "admin@example.com");
+		nameservers = block->Get<const Anope::string &>("nameservers", "ns1.example.com");
+		refresh = block->Get<int>("refresh", "3600");
 
 		if (Anope::IsFile(nameserver))
 		{

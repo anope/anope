@@ -239,7 +239,7 @@ class InspIRCdProto : public IRCDProto
 
 	void SendConnect() anope_override
 	{
-		current_pass = Config->Uplinks[Anope::CurrentUplink]->password;
+		current_pass = Config->Uplinks[Anope::CurrentUplink].password;
 		SendServer(Me);
 		UplinkSocket::Message() << "BURST";
 		Module *enc = ModuleManager::FindFirstOf(ENCRYPTION);
@@ -247,9 +247,9 @@ class InspIRCdProto : public IRCDProto
 	}
 
 	/* SVSHOLD - set */
-	void SendSVSHold(const Anope::string &nick) anope_override
+	void SendSVSHold(const Anope::string &nick, time_t t) anope_override
 	{
-		UplinkSocket::Message(OperServ) << "SVSHOLD " << nick << " " << Config->NSReleaseTimeout << "s :Being held for registered user";
+		UplinkSocket::Message(OperServ) << "SVSHOLD " << nick << " " << t << "s :Being held for registered user";
 	}
 
 	/* SVSHOLD - release */
@@ -790,7 +790,7 @@ struct IRCDMessageRSQuit : IRCDMessage
 
 		Server *s;
 		/* Horrible workaround to an insp bug (#) in how RSQUITs are sent - mark */
-		if (params.size() > 1 && Config->ServerName.equals_cs(params[0]))
+		if (params.size() > 1 && params[0] == Me->GetName())
 			s = Server::Find(params[1]);
 		else
 			s = Server::Find(params[0]);

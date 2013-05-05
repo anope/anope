@@ -78,22 +78,23 @@ class CommandOSSet : public Command
 		 *
 		 * Rob
 		 **/
-		if (!Config->SuperAdmin)
-			source.Reply(_("SuperAdmin can not be set because it is not enabled in the configuration."));
+		bool super_admin = Config->GetModule(this->owner)->Get<bool>("superadmin");
+		if (!super_admin)
+			source.Reply(_("Super admin can not be set because it is not enabled in the configuration."));
 		else if (setting.equals_ci("ON"))
 		{
 			source.GetUser()->super_admin = true;
-			source.Reply(_("You are now a SuperAdmin."));
+			source.Reply(_("You are now a super admin."));
 			Log(LOG_ADMIN, source, this) << "SUPERADMIN ON";
 		}
 		else if (setting.equals_ci("OFF"))
 		{
 			source.GetUser()->super_admin = false;
-			source.Reply(_("You are no longer a SuperAdmin."));
+			source.Reply(_("You are no longer a super admin."));
 			Log(LOG_ADMIN, source, this) << "SUPERADMIN OFF";
 		}
 		else
-			source.Reply(_("Setting for SuperAdmin must be \002ON\002 or \002OFF\002."));
+			source.Reply(_("Setting for super admin must be \002ON\002 or \002OFF\002."));
 
 		return;
 	}
@@ -202,12 +203,12 @@ class CommandOSSet : public Command
 					"    READONLY   Set read-only or read-write mode\n"
 					"    DEBUG      Activate or deactivate debug mode\n"
 					"    NOEXPIRE   Activate or deactivate no expire mode\n"
-					"    SUPERADMIN Activate or deactivate SuperAdmin mode\n"
+					"    SUPERADMIN Activate or deactivate super admin mode\n"
 					"    LIST       List the options"));
 		}
 		else if (subcommand.equals_ci("LIST"))
 			source.Reply(_("Syntax: \002LIST\n"
-					"Display the various %s settings"), Config->OperServ.c_str());
+					"Display the various %s settings"), source.service->nick.c_str());
 		else if (subcommand.equals_ci("READONLY"))
 			source.Reply(_("Syntax: \002READONLY {ON | OFF}\002\n"
 					" \n"
@@ -249,7 +250,6 @@ class OSSet : public Module
 	OSSet(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandosset(this)
 	{
-
 	}
 };
 

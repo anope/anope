@@ -45,7 +45,7 @@ class RatboxProto : public IRCDProto
 
 	void SendConnect() anope_override
 	{
-		UplinkSocket::Message() << "PASS " << Config->Uplinks[Anope::CurrentUplink]->password << " TS 6 :" << Me->GetSID();
+		UplinkSocket::Message() << "PASS " << Config->Uplinks[Anope::CurrentUplink].password << " TS 6 :" << Me->GetSID();
 		/*
 		  QS     - Can handle quit storm removal
 		  EX     - Can do channel +e exemptions
@@ -107,7 +107,7 @@ struct IRCDMessageEncap : IRCDMessage
 			u->Login(nc);
 
 			const NickAlias *user_na = NickAlias::Find(u->nick);
-			if (!Config->NoNicknameOwnership && user_na && user_na->nc == nc && user_na->nc->HasExt("UNCONFIRMED") == false)
+			if (!Config->GetBlock("options")->Get<bool>("nonicknameownership") && user_na && user_na->nc == nc && user_na->nc->HasExt("UNCONFIRMED") == false)
 				u->SetMode(NickServ, "REGISTERED");
 		}
 	}
@@ -134,7 +134,7 @@ struct IRCDMessageServer : IRCDMessage
 		if (params[1] != "1")
 			return;
 		new Server(source.GetServer() == NULL ? Me : source.GetServer(), params[0], 1, params[2], UplinkSID);
-		IRCD->SendPing(Config->ServerName, params[0]);
+		IRCD->SendPing(Me->GetName(), params[0]);
 	}
 };
 
@@ -217,6 +217,7 @@ class ProtoRatbox : public Module
 		/* user modes */
 		ModeManager::RemoveUserMode(ModeManager::FindUserModeByName("HIDEOPER"));
 		ModeManager::RemoveUserMode(ModeManager::FindUserModeByName("REGPRIV"));
+		ModeManager::AddUserMode(new UserMode("PROTECTED", 'S'));
 
 		/* v/h/o/a/q */
 		ModeManager::RemoveChannelMode(ModeManager::FindChannelModeByName("HALFOP"));

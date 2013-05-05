@@ -142,17 +142,19 @@ class CSSetMisc : public Module
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 	}
 
-	void OnReload(ServerConfig *conf, ConfigReader &reader) anope_override
+	void OnReload(Configuration::Conf *conf) anope_override
 	{
 		descriptions.clear();
 
-		for (int i = 0; i < reader.Enumerate("command"); ++i)
+		for (int i = 0; i < conf->CountBlock("command"); ++i)
 		{
-			if (reader.ReadValue("command", "command", "", i) != "chanserv/set/misc")
+			Configuration::Block *block = conf->GetBlock("command", i);
+
+			if (block->Get<const Anope::string &>("command") != "chanserv/set/misc")
 				continue;
 
-			Anope::string cname = reader.ReadValue("command", "name", "", i);
-			Anope::string desc = reader.ReadValue("command", "misc_description", "", i);
+			Anope::string cname = block->Get<const Anope::string &>("name");
+			Anope::string desc = block->Get<const Anope::string &>("misc_description");
 
 			if (cname.empty() || desc.empty())
 				continue;

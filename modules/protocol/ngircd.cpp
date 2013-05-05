@@ -53,7 +53,7 @@ class ngIRCdProto : public IRCDProto
 
 	void SendConnect() anope_override
 	{
-		UplinkSocket::Message() << "PASS " << Config->Uplinks[Anope::CurrentUplink]->password << " 0210-IRC+ Anope|" << Anope::VersionShort() << ":CLHMSo P";
+		UplinkSocket::Message() << "PASS " << Config->Uplinks[Anope::CurrentUplink].password << " 0210-IRC+ Anope|" << Anope::VersionShort() << ":CLHMSo P";
 		/* Make myself known to myself in the serverlist */
 		SendServer(Me);
 		/* finish the enhanced server handshake and register the connection */
@@ -184,11 +184,10 @@ struct IRCDMessage005 : IRCDMessage
 				}
 				else if (parameter == "NICKLEN")
 				{
-					unsigned newlen = convertTo<unsigned>(data);
-					if (Config->NickLen != newlen)
+					unsigned newlen = convertTo<unsigned>(data), len = Config->GetBlock("networkinfo")->Get<unsigned>("nicklen");
+					if (len != newlen)
 					{
-						Log() << "NickLen changed from " << Config->NickLen << " to " << newlen;
-						Config->NickLen = newlen;
+						Log() << "Warning: NICKLEN is " << newlen << " but networkinfo:nicklen is " << len;
 					}
 				}
 			}
@@ -540,7 +539,7 @@ struct IRCDMessageServer : IRCDMessage
 		 * when receiving a new server and then finish sync once we
 		 * get a pong back from that server.
 		 */
-		IRCD->SendPing(Config->ServerName, params[0]);
+		IRCD->SendPing(Me->GetName(), params[0]);
 	}
 };
 

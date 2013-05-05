@@ -71,10 +71,13 @@ class MemoListCallback : public NumberList
 	static void DoRead(CommandSource &source, MemoInfo *mi, const ChannelInfo *ci, unsigned index)
 	{
 		Memo *m = mi->GetMemo(index);
+		if (!m)
+			return;
+
 		if (ci)
-			source.Reply(_("Memo %d from %s (%s).  To delete, type: \002%s%s DEL %s %d\002"), index + 1, m->sender.c_str(), Anope::strftime(m->time).c_str(), Config->UseStrictPrivMsgString.c_str(), Config->MemoServ.c_str(), ci->name.c_str(), index + 1);
+			source.Reply(_("Memo %d from %s (%s).  To delete, type: \002%s%s DEL %s %d\002"), index + 1, m->sender.c_str(), Anope::strftime(m->time).c_str(), Config->StrictPrivmsg.c_str(), MemoServ->nick.c_str(), ci->name.c_str(), index + 1);
 		else
-			source.Reply(_("Memo %d from %s (%s).  To delete, type: \002%s%s DEL %d\002"), index + 1, m->sender.c_str(), Anope::strftime(m->time).c_str(), Config->UseStrictPrivMsgString.c_str(), Config->MemoServ.c_str(), index + 1);
+			source.Reply(_("Memo %d from %s (%s).  To delete, type: \002%s%s DEL %d\002"), index + 1, m->sender.c_str(), Anope::strftime(m->time).c_str(), Config->StrictPrivmsg.c_str(), MemoServ->nick.c_str(), index + 1);
 		source.Reply("%s", m->text.c_str());
 		m->unread = false;
 

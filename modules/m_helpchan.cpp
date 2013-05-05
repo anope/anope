@@ -9,18 +9,16 @@
 
 class HelpChannel : public Module
 {
-	Anope::string HelpChan;
-
  public:
 	HelpChannel(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
 	{
-		Implementation i[] = { I_OnChannelModeSet, I_OnReload };
+		Implementation i[] = { I_OnChannelModeSet };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 	}
 
 	EventReturn OnChannelModeSet(Channel *c, MessageSource &setter, const Anope::string &mname, const Anope::string &param) anope_override
 	{
-		if (mname == "OP" && c && c->ci && c->name.equals_ci(this->HelpChan))
+		if (mname == "OP" && c && c->ci && c->name.equals_ci(Config->GetModule(this)->Get<const Anope::string &>("helpchannel")))
 		{
 			User *u = User::Find(param);
 
@@ -29,11 +27,6 @@ class HelpChannel : public Module
 		}
 
 		return EVENT_CONTINUE;
-	}
-
-	void OnReload(ServerConfig *conf, ConfigReader &reader) anope_override
-	{
-		this->HelpChan = reader.ReadValue("m_helpchan", "helpchannel", "", 0);
 	}
 };
 

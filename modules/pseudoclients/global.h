@@ -4,7 +4,9 @@
 class GlobalService : public Service
 {
  public:
-	GlobalService(Module *m) : Service(m, "GlobalService", "Global") { }
+	GlobalService(Module *m) : Service(m, "GlobalService", "Global")
+	{
+	}
 
 	/** Send out a global message to all users
 	 * @param sender Our client which should send the global

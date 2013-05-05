@@ -23,9 +23,9 @@ struct ChanUserContainer;
 class ClientSocket;
 class Command;
 class CommandSource;
-namespace Configuration { class Conf; }
+namespace Configuration { struct Conf; }
 class ConnectionSocket;
-namespace DNS { class Query; }
+namespace DNS { struct Query; }
 class Entry;
 class IdentifyRequest;
 class InfoFormatter;

@@ -21,9 +21,9 @@
 
 namespace Configuration
 {
-	class Block
+	class CoreExport Block
 	{
-		friend class Conf;
+		friend struct Conf;
 
 	 public:
 		typedef Anope::map<Anope::string> item_map;
@@ -40,7 +40,14 @@ namespace Configuration
 		int CountBlock(const Anope::string &name);
 		Block* GetBlock(const Anope::string &name, int num = 0);
 
-		template<typename T> T Get(const Anope::string &tag, const Anope::string &def = "") const
+		template<typename T> inline T Get(const Anope::string &tag)
+		{
+			return this->Get<T>(tag, "");
+		}
+		/* VS 2008 has an issue with having a default argument here (def = ""), which is why the above
+		 * function exists.
+		 */
+		template<typename T> T Get(const Anope::string &tag, const Anope::string &def) const
 		{
 			const Anope::string &value = this->Get<const Anope::string &>(tag, def);
 			try
@@ -57,10 +64,10 @@ namespace Configuration
 		const item_map* GetItems() const;
 	};
 
-	template<> const Anope::string& Block::Get(const Anope::string &tag, const Anope::string& def) const;
-	template<> time_t Block::Get(const Anope::string &tag, const Anope::string &def) const;
-	template<> const char* Block::Get(const Anope::string &tag, const Anope::string &def) const;
-	template<> bool Block::Get(const Anope::string &tag, const Anope::string &def) const;
+	template<> CoreExport const Anope::string& Block::Get(const Anope::string &tag, const Anope::string& def) const;
+	template<> CoreExport time_t Block::Get(const Anope::string &tag, const Anope::string &def) const;
+	template<> CoreExport const char* Block::Get(const Anope::string &tag, const Anope::string &def) const;
+	template<> CoreExport bool Block::Get(const Anope::string &tag, const Anope::string &def) const;
 
 	/** Represents a configuration file
 	 */
@@ -83,7 +90,7 @@ namespace Configuration
 
 	struct Uplink;
 
-	struct Conf : Block
+	struct CoreExport Conf : Block
 	{
 		/* options:readtimeout */
 		time_t ReadTimeout;

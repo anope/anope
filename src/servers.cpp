@@ -125,21 +125,18 @@ Server::~Server()
 {
 	Log(this, "quit") << "quit from " << (this->uplink ? this->uplink->GetName() : "no uplink") << " for " << this->quit_reason;
 
-	if (Servers::Capab.count("NOQUIT") > 0 || Servers::Capab.count("QS") > 0)
+	for (user_map::const_iterator it = UserListByNick.begin(); it != UserListByNick.end(); ++it)
 	{
-		for (user_map::const_iterator it = UserListByNick.begin(); it != UserListByNick.end(); ++it)
+		User *u = it->second;
+
+		if (u->server == this)
 		{
-			User *u = it->second;
-
-			if (u->server == this)
-			{
-				u->Quit(this->quit_reason);
-				u->server = NULL;
-			}
+			u->Quit(this->quit_reason);
+			u->server = NULL;
 		}
-
-		Log(LOG_DEBUG) << "Finished removing all users for " << this->GetName();
 	}
+
+	Log(LOG_DEBUG) << "Finished removing all users for " << this->GetName();
 
 	if (this->uplink)
 		this->uplink->DelLink(this);

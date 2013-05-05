@@ -958,7 +958,7 @@ class CoreExport Module : public Extensible
 	 * @param req The dns request
 	 * @param reply The reply that will be sent
 	 */
-	virtual void OnDnsRequest(DNS::Packet &req, DNS::Packet *reply) { }
+	virtual void OnDnsRequest(DNS::Query &req, DNS::Query *reply) { }
 
 	/** Called when a channels modes are being checked to see if they are allowed,
 	 * mostly to ensure mlock/+r are set.

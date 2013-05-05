@@ -24,11 +24,11 @@ namespace
 
 /** A full packet sent or recieved to/from the nameserver
  */
-class MyPacket : public Packet
+class Packet : public Query
 {
 	void PackName(unsigned char *output, unsigned short output_size, unsigned short &pos, const Anope::string &name)
 	{
-		if (name.length() + 2 > output_size)
+		if (pos + name.length() + 2 > output_size)
 			throw SocketException("Unable to pack name");
 
 		Log(LOG_DEBUG_2) << "Resolver: PackName packing " << name;
@@ -98,6 +98,9 @@ class MyPacket : public Packet
 
 		/* +1 pos either to one byte after the compression pointer or one byte after the ending \0 */
 		++pos;
+
+		if (name.empty())
+			throw SocketException("Unable to unpack name - no name");
 
 		Log(LOG_DEBUG_2) << "Resolver: UnpackName successfully unpacked " << name;
 
@@ -184,6 +187,10 @@ class MyPacket : public Packet
 	}
 
  public:
+	static const int POINTER = 0xC0;
+	static const int LABEL = 0x3F;
+	static const int HEADER_LENGTH = 12;
+
 	Manager *manager;
 	/* Source or destination of the packet */
 	sockaddrs addr;
@@ -192,7 +199,7 @@ class MyPacket : public Packet
 	/* Flags on the packet */
 	unsigned short flags;
 	
-	MyPacket(Manager *m, sockaddrs *a) : manager(m), id(0), flags(0)
+	Packet(Manager *m, sockaddrs *a) : manager(m), id(0), flags(0)
 	{
 		if (a)
 			addr = *a;
@@ -436,7 +443,7 @@ namespace DNS
 	{
 	 public:
 		virtual ~ReplySocket() { }
-		virtual void Reply(MyPacket *p) = 0;
+		virtual void Reply(Packet *p) = 0;
 	};
 }
 
@@ -448,7 +455,7 @@ class TCPSocket : public ListenSocket
 	{
 		Manager *manager;
 		TCPSocket *tcpsock;
- 		MyPacket *packet;
+ 		Packet *packet;
 		unsigned char packet_buffer[524];
 		int length;
 	
@@ -468,7 +475,7 @@ class TCPSocket : public ListenSocket
 		/* Times out after a few seconds */
 		void Tick(time_t) anope_override { }
 
-		void Reply(MyPacket *p) anope_override
+		void Reply(Packet *p) anope_override
 		{
 			delete packet;
 			packet = p;
@@ -538,7 +545,7 @@ class TCPSocket : public ListenSocket
 class UDPSocket : public ReplySocket
 {
 	Manager *manager;
-	std::deque<MyPacket *> packets;
+	std::deque<Packet *> packets;
 
  public:
 	UDPSocket(Manager *m, const Anope::string &ip, int port) : Socket(-1, ip.find(':') != Anope::string::npos, SOCK_DGRAM), manager(m) { }
@@ -549,13 +556,13 @@ class UDPSocket : public ReplySocket
 			delete packets[i];
 	}
 	
-	void Reply(MyPacket *p) anope_override
+	void Reply(Packet *p) anope_override
 	{
 		packets.push_back(p);
 		SocketEngine::Change(this, true, SF_WRITABLE);
 	}
 	
-	std::deque<MyPacket *>& GetPackets() { return packets; }
+	std::deque<Packet *>& GetPackets() { return packets; }
 	
 	bool ProcessRead() anope_override
 	{
@@ -572,7 +579,7 @@ class UDPSocket : public ReplySocket
 	{
 		Log(LOG_DEBUG_2) << "Resolver: Writing to DNS UDP socket";
 
-		MyPacket *r = !packets.empty() ? packets.front() : NULL;
+		Packet *r = !packets.empty() ? packets.front() : NULL;
 		if (r != NULL)
 		{
 			try
@@ -599,7 +606,7 @@ class MyManager : public Manager, public Timer
 {
 	uint32_t serial;
 
-	typedef std::multimap<Anope::string, ResourceRecord, ci::less> cache_map;
+	typedef std::tr1::unordered_map<Question, Query, Question::hash> cache_map;
 	cache_map cache;
 
 	TCPSocket *tcpsock;
@@ -690,11 +697,11 @@ class MyManager : public Manager, public Timer
 
 		req->SetSecs(timeout);
 	
-		MyPacket *p = new MyPacket(this, &this->addrs);
+		Packet *p = new Packet(this, &this->addrs);
 		p->flags = QUERYFLAGS_RD;
-
 		p->id = req->id;
 		p->questions.push_back(*req);
+
 		this->udpsock->Reply(p);
 	}
 
@@ -708,7 +715,7 @@ class MyManager : public Manager, public Timer
 		if (length < Packet::HEADER_LENGTH)
 			return true;
 
-		MyPacket recv_packet(this, from);
+		Packet recv_packet(this, from);
 
 		try
 		{
@@ -730,7 +737,7 @@ class MyManager : public Manager, public Timer
 				return true;
 			}
 
-			MyPacket *packet = new MyPacket(recv_packet);
+			Packet *packet = new Packet(recv_packet);
 			packet->flags |= QUERYFLAGS_QR; /* This is a reponse */
 			packet->flags |= QUERYFLAGS_AA; /* And we are authoritative */
 
@@ -838,7 +845,7 @@ class MyManager : public Manager, public Timer
 			recv_packet.error = error;
 			request->OnError(&recv_packet);
 		}
-		else if (recv_packet.answers.empty())
+		else if (recv_packet.questions.empty() || recv_packet.answers.empty())
 		{
 			Log(LOG_DEBUG_2) << "Resolver: No resource records returned";
 			recv_packet.error = ERROR_NO_RECORDS;
@@ -865,26 +872,14 @@ class MyManager : public Manager, public Timer
 		return serial;
 	}
 
-	/** Add a record to the dns cache
-	 * @param r The record
-	 */
-	void AddCache(Query &r)
-	{
-		for (unsigned i = 0; i < r.answers.size(); ++i)
-		{
-			ResourceRecord &rr = r.answers[i];
-			Log(LOG_DEBUG_3) << "Resolver cache: added cache for " << rr.name << " -> " << rr.rdata << ", ttl: " << rr.ttl;
-			this->cache.insert(std::make_pair(rr.name, rr));
-		}
-	}
-
 	void Tick(time_t now) anope_override
 	{
 		Log(LOG_DEBUG_2) << "Resolver: Purging DNS cache";
 
 		for (cache_map::iterator it = this->cache.begin(), it_next; it != this->cache.end(); it = it_next)
 		{
-			ResourceRecord &req = it->second;
+			const Query &q = it->second;
+			const ResourceRecord &req = q.answers[0];
 			it_next = it;
 			++it_next;
 
@@ -894,29 +889,28 @@ class MyManager : public Manager, public Timer
 	}
 	
  private:
+	/** Add a record to the dns cache
+	 * @param r The record
+	 */
+	void AddCache(Query &r)
+	{
+		const ResourceRecord &rr = r.answers[0];
+		Log(LOG_DEBUG_3) << "Resolver cache: added cache for " << rr.name << " -> " << rr.rdata << ", ttl: " << rr.ttl;
+		this->cache[r.questions[0]] = r;
+	}
+
 	/** Check the DNS cache to see if request can be handled by a cached result
 	 * @return true if a cached result was found.
 	 */
 	bool CheckCache(Request *request)
 	{
-		cache_map::iterator it = this->cache.find(request->name);
+		cache_map::iterator it = this->cache.find(*request);
 		if (it != this->cache.end())
 		{
-			Query record(*request);
-		
-			for (cache_map::iterator it_end = this->cache.upper_bound(request->name); it != it_end; ++it)
-			{
-				ResourceRecord &rec = it->second;
-				if (rec.created + static_cast<time_t>(rec.ttl) >= Anope::CurTime)
-					record.answers.push_back(rec);
-			}
-
-			if (!record.answers.empty())
-			{
-				Log(LOG_DEBUG_3) << "Resolver: Using cached result for " << request->name;
-				request->OnLookupComplete(&record);
-				return true;
-			}
+			Query &record = it->second;
+			Log(LOG_DEBUG_3) << "Resolver: Using cached result for " << request->name;
+			request->OnLookupComplete(&record);
+			return true;
 		}
 
 		return false;

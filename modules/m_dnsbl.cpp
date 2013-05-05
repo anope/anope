@@ -153,14 +153,16 @@ class ModuleDNSBL : public Module
 		{
 			const Blacklist &b = this->blacklists[i];
 
+			Anope::string dnsbl_host = user_ip.addr() + "." + b.name;
+			DNSBLResolver *res = NULL;
 			try
 			{
-				Anope::string dnsbl_host = user_ip.addr() + "." + b.name;
-				DNSBLResolver *res = new DNSBLResolver(this, user, b, dnsbl_host, this->add_to_akill);
+				res = new DNSBLResolver(this, user, b, dnsbl_host, this->add_to_akill);
 				dnsmanager->Process(res);
 			}
 			catch (const SocketException &ex)
 			{
+				delete res;
 				Log(this) << ex.GetReason();
 			}
 		}

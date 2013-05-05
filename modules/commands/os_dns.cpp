@@ -781,7 +781,7 @@ class ModuleDNS : public Module
 		}
 	}
 
-	void OnDnsRequest(DNS::Packet &req, DNS::Packet *packet) anope_override
+	void OnDnsRequest(DNS::Query &req, DNS::Query *packet) anope_override
 	{
 		if (req.questions.empty())
 			return;

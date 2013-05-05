@@ -76,9 +76,18 @@ namespace DNS
 	
 		Question() : type(QUERY_NONE), qclass(0) { }
 		Question(const Anope::string &n, QueryType t, unsigned short c = 1) : name(n), type(t), qclass(c) { }
+		inline bool operator==(const Question & other) const { return name == other.name && type == other.type && qclass == other.qclass; } 
+
+		struct hash
+		{
+			size_t operator()(const Question &q) const 
+			{
+				return Anope::hash_ci()(q.name);
+			}
+		};
 	};
 	
-	struct ResourceRecord : public Question
+	struct ResourceRecord : Question
 	{
 		unsigned int ttl;
 		Anope::string rdata;
@@ -96,16 +105,6 @@ namespace DNS
 	
 		Query() : error(ERROR_NONE) { }
 		Query(const Question &q) : error(ERROR_NONE) { questions.push_back(q); }
-	};
-
-	class Packet : public Query
-	{
-	 public:
-		static const int POINTER = 0xC0;
-		static const int LABEL = 0x3F;
-		static const int HEADER_LENGTH = 12;
-
-		virtual ~Packet() { }
 	};
 
 	class ReplySocket;

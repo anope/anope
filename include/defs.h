@@ -13,7 +13,6 @@
 
 class AccessGroup;
 class AutoKick;
-namespace Anope { class String; }
 class BotInfo;
 class CallBack;
 class ChanAccess;
@@ -26,7 +25,7 @@ class Command;
 class CommandSource;
 namespace Configuration { class Conf; }
 class ConnectionSocket;
-namespace DNS { class Packet; }
+namespace DNS { class Query; }
 class Entry;
 class IdentifyRequest;
 class InfoFormatter;

@@ -79,14 +79,20 @@ const Block::item_map* Block::GetItems() const
 
 template<> const Anope::string& Block::Get(const Anope::string &tag, const Anope::string& def) const
 {
+	static Anope::string ret;
+
 	if (!this)
-		return def;
+	{
+		ret = def;
+		return ret;
+	}
 
 	Anope::map<Anope::string>::const_iterator it = items.find(tag);
 	if (it != items.end())
 		return it->second;
 
-	return def;
+	ret = def;
+	return ret;
 }
 
 template<> time_t Block::Get(const Anope::string &tag, const Anope::string &def) const
@@ -166,9 +172,16 @@ Conf::Conf() : Block("")
 	Block *options = this->GetBlock("options"), *mail = this->GetBlock("mail");
 
 	ValidateNotZero("options", "releasetimeout", options->Get<time_t>("releasetimeout"));
+	ValidateNotZero("options", "updatetimeout", options->Get<time_t>("updatetimeout"));
+	ValidateNotZero("options", "expiretimeout", options->Get<time_t>("expiretimeout"));
+	ValidateNotZero("options", "readtimeout", options->Get<time_t>("readtimeout"));
+	ValidateNotZero("options", "warningtimeout", options->Get<time_t>("warningtimeout"));
+	ValidateNotZero("options", "timeoutcheck", options->Get<time_t>("timeoutcheck"));
+
 	ValidateNotEmpty("options", "enforceruser", options->Get<const Anope::string &>("enforceruser"));
 	ValidateNotEmpty("options", "enforcerhost", options->Get<const Anope::string &>("enforcerhost"));
 	ValidateNotEmpty("options", "guestnickprefix", options->Get<const Anope::string &>("guestnickprefix"));
+
 	spacesepstream(options->Get<const Anope::string &>("ulineservers")).GetTokens(this->Ulines);
 
 	if (mail->Get<bool>("usemail"))

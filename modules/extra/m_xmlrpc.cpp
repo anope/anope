@@ -177,6 +177,11 @@ class ModuleXMLRPC : public Module
 		if (httpref)
 			httpref->UnregisterPage(&xmlrpcinterface);
 	}
+
+	void OnReload(Configuration::Conf *conf) anope_override
+	{
+		this->httpref = ServiceReference<HTTPProvider>("HTTPProvider", conf->GetModule(this)->Get<const Anope::string>("server", "httpd/main"));
+	}
 };
 
 MODULE_INIT(ModuleXMLRPC)

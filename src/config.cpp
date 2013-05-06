@@ -180,7 +180,7 @@ Conf::Conf() : Block("")
 			ValidateNotEmpty("mail", check[i], mail->Get<const Anope::string>(check[i]));
 	}
 
-	this->ReadTimeout = options->Get<unsigned>("readtimeout");
+	this->ReadTimeout = options->Get<time_t>("readtimeout");
 	this->UsePrivmsg = options->Get<bool>("useprivmsg");
 	this->StrictPrivmsg = options->Get<bool>("usestrictprivmsg") ? "/msg " : "/";
 	{

@@ -82,7 +82,7 @@ class MyChanServService : public ChanServService
 		 	/** Constructor
 			 * @param chan The channel
 			 */
-			ChanServTimer(Module *m, Channel *chan) : Timer(m, Config->GetModule(this->GetOwner())->Get<time_t>("inhabit", "15s")), c(chan)
+			ChanServTimer(Module *m, Channel *chan) : Timer(m, Config->GetModule(m)->Get<time_t>("inhabit", "15s")), c(chan)
 			{
 				if (!ChanServ || !c)
 					return;

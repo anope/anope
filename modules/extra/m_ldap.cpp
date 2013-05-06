@@ -423,7 +423,7 @@ class ModuleLDAP : public Module, public Pipe
 		LDAPServices.clear();
 	}
 
-	void OnReload(Configuration::Conf *conf) anope_override
+	void OnReload(Configuration::Conf *config) anope_override
 	{
 		int i, num;
 
@@ -433,8 +433,9 @@ class ModuleLDAP : public Module, public Pipe
 			LDAPService *s = it->second;
 			++it;
 
-			for (i = 0; i < Config->CountBlock("ldap"); ++i)
-				if (Config->GetBlock("ldap", i)->Get<const Anope::string>("name", "ldap/main") == cname)
+			Configuration::Block *conf = Config->GetModule(this);
+			for (i = 0; i < conf->CountBlock("ldap"); ++i)
+				if (conf->GetBlock("ldap", i)->Get<const Anope::string>("name", "ldap/main") == cname)
 					break;
 
 			if (i == num)
@@ -447,16 +448,19 @@ class ModuleLDAP : public Module, public Pipe
 			}
 		}
 
-		for (i = 0; i < Config->CountBlock("ldap"); ++i)
+		Configuration::Block *conf = config->GetModule(this);
+		for (i = 0; i < conf->CountBlock("ldap"); ++i)
 		{
-			const Anope::string &connname = Config->GetBlock("ldap", i)->Get<const Anope::string>("name", "ldap/main");
+			Configuration::Block *ldap = conf->GetBlock("ldap", i);
+
+			const Anope::string &connname = ldap->Get<const Anope::string>("name", "ldap/main");
 
 			if (this->LDAPServices.find(connname) == this->LDAPServices.end())
 			{
-				const Anope::string &server = Config->GetBlock("ldap", i)->Get<const Anope::string>("server", "127.0.0.1");
-				int port = Config->GetBlock("ldap", i)->Get<int>("port", "389");
-				const Anope::string &admin_binddn = Config->GetBlock("ldap", i)->Get<const Anope::string>("admin_binddn");
-				const Anope::string &admin_password = Config->GetBlock("ldap", i)->Get<const Anope::string>("admin_password");
+				const Anope::string &server = ldap->Get<const Anope::string>("server", "127.0.0.1");
+				int port = ldap->Get<int>("port", "389");
+				const Anope::string &admin_binddn = ldap->Get<const Anope::string>("admin_binddn");
+				const Anope::string &admin_password = ldap->Get<const Anope::string>("admin_password");
 
 				try
 				{

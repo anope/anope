@@ -352,8 +352,9 @@ class HTTPD : public Module
 		this->providers.clear();
 	}
 
-	void OnReload(Configuration::Conf *conf) anope_override
+	void OnReload(Configuration::Conf *config) anope_override
 	{
+		Configuration::Block *conf = config->GetModule(this);
 		std::set<Anope::string> existing;
 
 		for (int i = 0; i < conf->CountBlock("httpd"); ++i)

@@ -300,7 +300,7 @@ struct IRCDMessageCapab : Message::Capab
 				ChannelMode *cm = NULL;
 
 				if (modename.equals_cs("admin"))
-					cm = new ChannelModeStatus("PROTECT", modechar.length() > 1 ? modechar[1] : modechar[0], modechar.length() > 1 ? modechar[0] : 0);
+					cm = new ChannelModeStatus("PROTECT", modechar.length() > 1 ? modechar[1] : modechar[0], modechar.length() > 1 ? modechar[0] : 0, 3);
 				else if (modename.equals_cs("allowinvite"))
 					cm = new ChannelMode("ALLINVITE", modechar[0]);
 				else if (modename.equals_cs("auditorium"))
@@ -326,9 +326,9 @@ struct IRCDMessageCapab : Message::Capab
 				else if (modename.equals_cs("flood"))
 					cm = new ChannelModeFlood(modechar[0]);
 				else if (modename.equals_cs("founder"))
-					cm = new ChannelModeStatus("OWNER", modechar.length() > 1 ? modechar[1] : modechar[0], modechar.length() > 1 ? modechar[0] : 0);
+					cm = new ChannelModeStatus("OWNER", modechar.length() > 1 ? modechar[1] : modechar[0], modechar.length() > 1 ? modechar[0] : 0, 4);
 				else if (modename.equals_cs("halfop"))
-					cm = new ChannelModeStatus("HALFOP", modechar.length() > 1 ? modechar[1] : modechar[0], modechar.length() > 1 ? modechar[0] : 0);
+					cm = new ChannelModeStatus("HALFOP", modechar.length() > 1 ? modechar[1] : modechar[0], modechar.length() > 1 ? modechar[0] : 0, 1);
 				else if (modename.equals_cs("history"))
 					cm = new ChannelModeHistory(modechar[0]);
 				else if (modename.equals_cs("invex"))
@@ -360,7 +360,7 @@ struct IRCDMessageCapab : Message::Capab
 				else if (modename.equals_cs("nonotice"))
 					cm = new ChannelMode("NONOTICE", modechar[0]);
 				else if (modename.equals_cs("op"))
-					cm = new ChannelModeStatus("OP", modechar.length() > 1 ? modechar[1] : modechar[0], modechar.length() > 1 ? modechar[0] : 0);
+					cm = new ChannelModeStatus("OP", modechar.length() > 1 ? modechar[1] : modechar[0], modechar.length() > 1 ? modechar[0] : 2);
 				else if (modename.equals_cs("operonly"))
 					cm = new ChannelModeOper(modechar[0]);
 				else if (modename.equals_cs("permanent"))
@@ -382,7 +382,7 @@ struct IRCDMessageCapab : Message::Capab
 				else if (modename.equals_cs("topiclock"))
 					cm = new ChannelMode("TOPIC", modechar[0]);
 				else if (modename.equals_cs("voice"))
-					cm = new ChannelModeStatus("VOICE", modechar.length() > 1 ? modechar[1] : modechar[0], modechar.length() > 1 ? modechar[0] : 0);
+					cm = new ChannelModeStatus("VOICE", modechar.length() > 1 ? modechar[1] : modechar[0], modechar.length() > 1 ? modechar[0] : 0, 0);
 				/* Unknown status mode, (customprefix) - add it */
 				else if (modechar.length() == 2)
 					cm = new ChannelModeStatus(modename.upper(), modechar[1], modechar[0]);

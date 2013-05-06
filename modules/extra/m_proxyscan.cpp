@@ -295,9 +295,9 @@ class ModuleProxyScan : public Module
 		}
 
 		this->proxyscans.clear();
-		for (int i = 0; i < conf->CountBlock("proxyscan"); ++i)
+		for (int i = 0; i < config->CountBlock("proxyscan"); ++i)
 		{
-			Configuration::Block *block = conf->GetBlock("proxyscan", i);
+			Configuration::Block *block = config->GetBlock("proxyscan", i);
 			ProxyCheck p;
 			Anope::string token;
 

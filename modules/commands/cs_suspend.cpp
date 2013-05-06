@@ -19,7 +19,7 @@ class CommandCSSuspend : public Command
 	CommandCSSuspend(Module *creator) : Command(creator, "chanserv/suspend", 1, 3)
 	{ 
 		this->SetDesc(_("Prevent a channel from being used preserving channel data and settings"));
-		this->SetSyntax(_("\037channel\037 [+\037expiry\037] [\037reason\037]"));
+		this->SetSyntax(_("\037channel\037 [+\037expiry\037] \037reason\037"));
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override

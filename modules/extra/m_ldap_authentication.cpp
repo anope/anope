@@ -220,9 +220,9 @@ class NSIdentifyLDAP : public Module
 		ModuleManager::SetPriority(this, PRIORITY_FIRST);
 	}
 
-	void OnReload(Configuration::Conf *conf) anope_override
+	void OnReload(Configuration::Conf *config) anope_override
 	{
-		Configuration::Block *config = Config->GetModule(this);
+		Configuration::Block *conf = Config->GetModule(this);
 
 		basedn = conf->Get<const Anope::string>("basedn");
 		search_filter = conf->Get<const Anope::string>("search_filter");

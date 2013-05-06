@@ -103,9 +103,9 @@ class ModuleDNSBL : public Module
 		this->add_to_akill = block->Get<bool>("add_to_akill", "yes");
 
 		this->blacklists.clear();
-		for (int i = 0, num = conf->CountBlock("blacklist"); i < num; ++i)
+		for (int i = 0, num = block->CountBlock("blacklist"); i < num; ++i)
 		{
-			Configuration::Block *bl = conf->GetBlock("blacklist", i);
+			Configuration::Block *bl = block->GetBlock("blacklist", i);
 
 			Anope::string bname = bl->Get<const Anope::string>("name");
 			if (bname.empty())

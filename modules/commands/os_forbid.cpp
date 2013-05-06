@@ -14,8 +14,6 @@
 #include "module.h"
 #include "modules/os_forbid.h"
 
-static ServiceReference<NickServService> nickserv("NickServService", "NickServ");
-
 class MyForbidService : public ForbidService
 {
 	Serialize::Checker<std::vector<ForbidData *>[FT_SIZE - 1]> forbid_data;
@@ -87,7 +85,7 @@ class CommandOSForbid : public Command
 	CommandOSForbid(Module *creator) : Command(creator, "operserv/forbid", 1, 5), fs("ForbidService", "forbid")
 	{
 		this->SetDesc(_("Forbid usage of nicknames, channels, and emails"));
-		this->SetSyntax(_("ADD {NICK|CHAN|EMAIL|REGISTER} [+\037expiry\037] \037entry\037\002 [\037reason\037]"));
+		this->SetSyntax(_("ADD {NICK|CHAN|EMAIL|REGISTER} [+\037expiry\037] \037entry\037\002 \037reason\037"));
 		this->SetSyntax(_("DEL {NICK|CHAN|EMAIL|REGISTER} \037entry\037"));
 		this->SetSyntax(_("LIST (NICK|CHAN|EMAIL|REGISTER)"));
 	}

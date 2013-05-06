@@ -212,9 +212,9 @@ class ModuleSQL : public Module, public Pipe
 			}
 		}
 
-		for (i = 0; i < Config->CountBlock("mysql"); ++i)
+		for (i = 0; i < config->CountBlock("mysql"); ++i)
 		{
-			Configuration::Block *block = Config->GetBlock("mysql", i);
+			Configuration::Block *block = config->GetBlock("mysql", i);
 			const Anope::string &connname = block->Get<const Anope::string>("name", "mysql/main");
 
 			if (this->MySQLServices.find(connname) == this->MySQLServices.end())

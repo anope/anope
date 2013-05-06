@@ -315,7 +315,7 @@ class CommandBSSetFantasy : public Command
 				"Note that users wanting to use fantaisist\n"
 				"commands MUST have enough access for both\n"
 				"the FANTASIA and the command they are executing."),
-				Config->GetModule("botserv")->Get<const char *>("fantasycharacter", "!"));
+				Config->GetModule("botserv")->Get<const Anope::string>("fantasycharacter", "!").c_str());
 		return true;
 	}
 };

@@ -155,7 +155,7 @@ class CommandCSList : public Command
 		{
 			source.Reply(" ");
 			source.Reply(_("Regex matches are also supported using the %s engine.\n"
-					"Enclose your pattern in // if this is desired."), Config->GetBlock("options")->Get<const char *>("regexengine"));
+					"Enclose your pattern in // if this is desired."), Config->GetBlock("options")->Get<const Anope::string>("regexengine").c_str());
 		}
 
 		return true;

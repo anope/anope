@@ -94,11 +94,6 @@ template<> time_t Block::Get(const Anope::string &tag, const Anope::string &def)
 	return Anope::DoTime(Get<const Anope::string>(tag, def));
 }
 
-template<> const char* Block::Get(const Anope::string &tag, const Anope::string &def) const
-{
-	return this->Get<const Anope::string>(tag, def).c_str();
-}
-
 template<> bool Block::Get(const Anope::string &tag, const Anope::string &def) const
 {
 	const Anope::string &str = Get<const Anope::string>(tag, def);
@@ -507,7 +502,7 @@ Conf::Conf() : Block("")
 	{
 		try
 		{
-			Anope::casemap = std::locale(options->Get<const char *>("casemap"));
+			Anope::casemap = std::locale(options->Get<const Anope::string>("casemap").c_str());
 		}
 		catch (const std::runtime_error &)
 		{
@@ -524,7 +519,7 @@ Conf::Conf() : Block("")
 	if (!options->Get<const Anope::string>("user").empty())
 	{
 		errno = 0;
-		struct passwd *u = getpwnam(options->Get<const char *>("user"));
+		struct passwd *u = getpwnam(options->Get<const Anope::string>("user").c_str());
 		if (u == NULL)
 			Log() << "Unable to setuid to " << options->Get<const Anope::string>("user") << ": " << Anope::LastError();
 		else if (setuid(u->pw_uid) == -1)
@@ -535,7 +530,7 @@ Conf::Conf() : Block("")
 	if (!options->Get<const Anope::string>("group").empty())
 	{
 		errno = 0;
-		struct group *g = getgrnam(options->Get<const char *>("group"));
+		struct group *g = getgrnam(options->Get<const Anope::string>("group").c_str());
 		if (g == NULL)
 			Log() << "Unable to setgid to " << options->Get<const Anope::string>("group") << ": " << Anope::LastError();
 		else if (setuid(g->gr_gid) == -1)

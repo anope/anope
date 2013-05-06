@@ -197,14 +197,14 @@ static void InitSignals()
 
 static void remove_pidfile()
 {
-	remove(Config->GetBlock("serverinfo")->Get<const char *>("pid"));
+	remove(Config->GetBlock("serverinfo")->Get<const Anope::string>("pid").c_str());
 }
 
 /* Create our PID file and write the PID to it. */
 
 static void write_pidfile()
 {
-	FILE *pidfile = fopen(Config->GetBlock("serverinfo")->Get<const char *>("pid"), "w");
+	FILE *pidfile = fopen(Config->GetBlock("serverinfo")->Get<const Anope::string>("pid").c_str(), "w");
 	if (pidfile)
 	{
 #ifdef _WIN32

@@ -15,8 +15,8 @@
 
 static bool SendMemoMail(NickCore *nc, MemoInfo *mi, Memo *m)
 {
-	Anope::string subject = Language::Translate(nc, Config->GetBlock("mail")->Get<const char *>("memo_subject")),
-		message = Language::Translate(Config->GetBlock("mail")->Get<const char *>("memo_message"));
+	Anope::string subject = Language::Translate(nc, Config->GetBlock("mail")->Get<const Anope::string>("memo_subject").c_str()),
+		message = Language::Translate(Config->GetBlock("mail")->Get<const Anope::string>("memo_message").c_str());
 
 	subject = subject.replace_all_cs("%n", nc->display);
 	subject = subject.replace_all_cs("%s", m->sender);

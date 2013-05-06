@@ -373,8 +373,8 @@ static bool SendRegmail(User *u, const NickAlias *na, const BotInfo *bi)
 	else
 		codebuf = *code;
 
-	Anope::string subject = Language::Translate(na->nc, Config->GetBlock("mail")->Get<const char *>("registration_subject")),
-		message = Language::Translate(na->nc, Config->GetBlock("mail")->Get<const char *>("registration_message"));
+	Anope::string subject = Language::Translate(na->nc, Config->GetBlock("mail")->Get<const Anope::string>("registration_subject").c_str()),
+		message = Language::Translate(na->nc, Config->GetBlock("mail")->Get<const Anope::string>("registration_message").c_str());
 
 	subject = subject.replace_all_cs("%n", na->nick);
 	subject = subject.replace_all_cs("%N", Config->GetBlock("networkinfo")->Get<const Anope::string>("networkname"));

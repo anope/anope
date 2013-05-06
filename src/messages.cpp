@@ -225,7 +225,7 @@ void MOTD::Run(MessageSource &source, const std::vector<Anope::string> &params)
 	if (s != Me)
 		return;
 
-	FILE *f = fopen(Config->GetBlock("serverinfo")->Get<const char *>("motd"), "r");
+	FILE *f = fopen(Config->GetBlock("serverinfo")->Get<const Anope::string>("motd").c_str(), "r");
 	if (f)
 	{
 		IRCD->SendNumeric(375, source.GetSource(), ":- %s Message of the Day", s->GetName().c_str());
@@ -454,7 +454,7 @@ void Whois::Run(MessageSource &source, const std::vector<Anope::string> &params)
 		IRCD->SendNumeric(311, source.GetSource(), "%s %s %s * :%s", u->nick.c_str(), u->GetIdent().c_str(), u->host.c_str(), u->realname.c_str());
 		if (bi)
 			IRCD->SendNumeric(307, source.GetSource(), "%s :is a registered nick", bi->nick.c_str());
-		IRCD->SendNumeric(312, source.GetSource(), "%s %s :%s", u->nick.c_str(), Me->GetName().c_str(), Config->GetBlock("serverinfo")->Get<const char *>("description"));
+		IRCD->SendNumeric(312, source.GetSource(), "%s %s :%s", u->nick.c_str(), Me->GetName().c_str(), Config->GetBlock("serverinfo")->Get<const Anope::string>("description").c_str());
 		if (bi)
 			IRCD->SendNumeric(317, source.GetSource(), "%s %ld %ld :seconds idle, signon time", bi->nick.c_str(), static_cast<long>(Anope::CurTime - bi->lastmsg), static_cast<long>(bi->signon));
 		IRCD->SendNumeric(318, source.GetSource(), "%s :End of /WHOIS list.", params[0].c_str());

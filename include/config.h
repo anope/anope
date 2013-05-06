@@ -66,7 +66,6 @@ namespace Configuration
 
 	template<> CoreExport const Anope::string Block::Get(const Anope::string &tag, const Anope::string& def) const;
 	template<> CoreExport time_t Block::Get(const Anope::string &tag, const Anope::string &def) const;
-	template<> CoreExport const char* Block::Get(const Anope::string &tag, const Anope::string &def) const;
 	template<> CoreExport bool Block::Get(const Anope::string &tag, const Anope::string &def) const;
 
 	/** Represents a configuration file

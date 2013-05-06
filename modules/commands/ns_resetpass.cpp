@@ -139,8 +139,8 @@ static bool SendResetEmail(User *u, const NickAlias *na, const BotInfo *bi)
 	for (idx = 0; idx < 20; ++idx)
 		passcode += chars[1 + static_cast<int>((static_cast<float>(max - min)) * static_cast<uint16_t>(rand()) / 65536.0) + min];
 
-	Anope::string subject = Language::Translate(na->nc, Config->GetBlock("mail")->Get<const char *>("reset_subject")),
-		message = Language::Translate(na->nc, Config->GetBlock("mail")->Get<const char *>("reset_message"));
+	Anope::string subject = Language::Translate(na->nc, Config->GetBlock("mail")->Get<const Anope::string>("reset_subject").c_str()),
+		message = Language::Translate(na->nc, Config->GetBlock("mail")->Get<const Anope::string>("reset_message").c_str());
 
 	subject = subject.replace_all_cs("%n", na->nick);
 	subject = subject.replace_all_cs("%N", Config->GetBlock("networkinfo")->Get<const Anope::string>("networkname"));

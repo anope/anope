@@ -464,8 +464,8 @@ class CommandNSSetEmail : public Command
 	
 		u->Account()->Extend("ns_set_email_passcode", new ExtensibleItemClass<Anope::string>(code));
 
-		Anope::string subject = Config->GetBlock("mail")->Get<const char *>("emailchange_subject"),
-			message = Config->GetBlock("mail")->Get<const char *>("emailchange_message");
+		Anope::string subject = Config->GetBlock("mail")->Get<const Anope::string>("emailchange_subject"),
+			message = Config->GetBlock("mail")->Get<const Anope::string>("emailchange_message");
 
 		subject = subject.replace_all_cs("%e", u->Account()->email);
 		subject = subject.replace_all_cs("%N", Config->GetBlock("networkinfo")->Get<const Anope::string>("networkname"));

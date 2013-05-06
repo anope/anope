@@ -763,10 +763,6 @@ void Channel::KickInternal(MessageSource &source, const Anope::string &nick, con
 		return;
 	}
 
-	BotInfo *bi = NULL;
-	if (target->server == Me)
-		bi = BotInfo::Find(nick);
-
 	if (sender)
 		Log(sender, this, "kick") << "kicked " << target->nick << " (" << reason << ")";
 	else

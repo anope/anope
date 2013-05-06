@@ -1,7 +1,7 @@
 
 #include "module.h"
-#include "xmlrpc.h"
-#include "httpd.h"
+#include "modules/xmlrpc.h"
+#include "modules/httpd.h"
 
 class MyXMLRPCServiceInterface : public XMLRPCServiceInterface, public HTTPPage
 {

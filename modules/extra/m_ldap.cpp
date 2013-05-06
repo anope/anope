@@ -1,7 +1,7 @@
 /* RequiredLibraries: ldap,lber */
 
 #include "module.h"
-#include "ldapapi.h"
+#include "modules/ldap.h"
 #include <ldap.h>
 
 static Pipe *me;

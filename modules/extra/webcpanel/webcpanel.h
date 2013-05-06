@@ -6,7 +6,7 @@
  */
 
 #include "module.h"
-#include "../httpd.h"
+#include "modules/httpd.h"
 
 #include "static_fileserver.h"
 #include "template_fileserver.h"

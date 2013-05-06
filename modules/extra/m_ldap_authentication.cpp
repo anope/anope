@@ -1,6 +1,5 @@
 #include "module.h"
-#include "nickserv.h"
-#include "ldapapi.h"
+#include "modules/ldap.h"
 
 static Module *me;
 

@@ -1,8 +1,7 @@
 #include "module.h"
-#include "sql.h"
+#include "modules/sql.h"
 
 static Module *me;
-static ServiceReference<NickServService> nickserv("NickServService", "NickServ");
 
 class SQLAuthenticationResult : public SQL::Interface
 {
@@ -43,7 +42,7 @@ class SQLAuthenticationResult : public SQL::Interface
 		{
 			na = new NickAlias(req->GetAccount(), new NickCore(req->GetAccount()));
 			FOREACH_MOD(I_OnNickRegister, OnNickRegister(user, na));
-			if (user && nickserv)
+			if (user && NickServ)
 				user->SendMessage(NickServ, _("Your account \002%s\002 has been successfully created."), na->nick.c_str());
 		}
 

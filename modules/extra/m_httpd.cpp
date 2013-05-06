@@ -6,8 +6,8 @@
  */
 
 #include "module.h"
-#include "httpd.h"
-#include "ssl.h"
+#include "modules/httpd.h"
+#include "modules/ssl.h"
 
 static Anope::string BuildDate()
 {

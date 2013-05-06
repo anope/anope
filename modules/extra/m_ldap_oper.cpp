@@ -1,5 +1,5 @@
 #include "module.h"
-#include "ldapapi.h"
+#include "modules/ldap.h"
 
 static std::set<Oper *> my_opers;
 static Anope::string opertype_attribute;

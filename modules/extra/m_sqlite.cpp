@@ -1,8 +1,8 @@
 /* RequiredLibraries: sqlite3 */
 
 #include "module.h"
+#include "modules/sql.h"
 #include <sqlite3.h>
-#include "sql.h"
 
 using namespace SQL;
 

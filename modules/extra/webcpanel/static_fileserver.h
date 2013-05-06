@@ -5,7 +5,7 @@
  * Please read COPYING and README for further details.
  */
 
-#include "../httpd.h"
+#include "modules/httpd.h"
 
 /* A basic file server. Used for serving static content on disk. */
 class StaticFileServer : public HTTPPage

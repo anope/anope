@@ -5,7 +5,7 @@
  * Please read COPYING and README for further details.
  */
 
-#include "../../httpd.h"
+#include "modules/httpd.h"
 
 namespace WebCPanel
 {

@@ -1,9 +1,9 @@
 /* RequiredLibraries: mysqlclient */
 
 #include "module.h"
+#include "modules/sql.h"
 #define NO_CLIENT_LONG_LONG
 #include <mysql/mysql.h>
-#include "sql.h"
 
 using namespace SQL;
 

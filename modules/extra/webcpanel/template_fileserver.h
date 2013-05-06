@@ -5,7 +5,7 @@
  * Please read COPYING and README for further details.
  */
 
-#include "../httpd.h"
+#include "modules/httpd.h"
 
 /* A basic file server. Used for serving non-static non-binary content on disk. */
 class TemplateFileServer

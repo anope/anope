@@ -1,5 +1,5 @@
 #include "module.h"
-#include "xmlrpc.h"
+#include "modules/xmlrpc.h"
 
 static Module *me;
 

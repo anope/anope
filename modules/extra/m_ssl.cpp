@@ -1,7 +1,7 @@
 /* RequiredLibraries: ssl,crypto */
 
 #include "module.h"
-#include "ssl.h"
+#include "modules/ssl.h"
 
 #define OPENSSL_NO_SHA512
 #include <openssl/bio.h>

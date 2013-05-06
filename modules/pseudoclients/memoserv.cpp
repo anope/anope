@@ -22,13 +22,13 @@ static bool SendMemoMail(NickCore *nc, MemoInfo *mi, Memo *m)
 	subject = subject.replace_all_cs("%s", m->sender);
 	subject = subject.replace_all_cs("%d", stringify(mi->GetIndex(m) + 1));
 	subject = subject.replace_all_cs("%t", m->text);
-	subject = subject.replace_all_cs("%N", Config->GetBlock("networkinfo")->Get<const Anope::string &>("networkname"));
+	subject = subject.replace_all_cs("%N", Config->GetBlock("networkinfo")->Get<const Anope::string>("networkname"));
 
 	message = message.replace_all_cs("%n", nc->display);
 	message = message.replace_all_cs("%s", m->sender);
 	message = message.replace_all_cs("%d", stringify(mi->GetIndex(m) + 1));
 	message = message.replace_all_cs("%t", m->text);
-	message = message.replace_all_cs("%N", Config->GetBlock("networkinfo")->Get<const Anope::string &>("networkname"));
+	message = message.replace_all_cs("%N", Config->GetBlock("networkinfo")->Get<const Anope::string>("networkname"));
 
 	return Mail::Send(nc, subject, message);
 }
@@ -154,7 +154,7 @@ class MemoServCore : public Module
 
 	void OnReload(Configuration::Conf *conf) anope_override
 	{
-		const Anope::string &msnick = conf->GetModule(this)->Get<const Anope::string &>("client");
+		const Anope::string &msnick = conf->GetModule(this)->Get<const Anope::string>("client");
 
 		if (msnick.empty())
 			throw ConfigException(this->name + ": <client> must be defined");

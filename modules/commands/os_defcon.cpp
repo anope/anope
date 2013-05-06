@@ -345,26 +345,26 @@ class OSDefcon : public Module
 		DefconConfig dconfig;
 
 		dconfig.defaultlevel = block->Get<int>("defaultlevel");
-		dconfig.defcons[4] = block->Get<const Anope::string &>("level4");
-		dconfig.defcons[3] = block->Get<const Anope::string &>("level3");
-		dconfig.defcons[2] = block->Get<const Anope::string &>("level2");
-		dconfig.defcons[1] = block->Get<const Anope::string &>("level1");
+		dconfig.defcons[4] = block->Get<const Anope::string>("level4");
+		dconfig.defcons[3] = block->Get<const Anope::string>("level3");
+		dconfig.defcons[2] = block->Get<const Anope::string>("level2");
+		dconfig.defcons[1] = block->Get<const Anope::string>("level1");
 		dconfig.sessionlimit = block->Get<int>("sessionlimit");
-		dconfig.akillreason = block->Get<const Anope::string &>("akillreason");
+		dconfig.akillreason = block->Get<const Anope::string>("akillreason");
 		dconfig.akillexpire = block->Get<time_t>("akillexpire");
-		dconfig.chanmodes = block->Get<const Anope::string &>("chanmodes");
+		dconfig.chanmodes = block->Get<const Anope::string>("chanmodes");
 		dconfig.timeout = block->Get<time_t>("timeout");
 		dconfig.globalondefcon = block->Get<bool>("globalondefcon");
-		dconfig.message = block->Get<const Anope::string &>("message");
-		dconfig.offmessage = block->Get<const Anope::string &>("offmessage");
+		dconfig.message = block->Get<const Anope::string>("message");
+		dconfig.offmessage = block->Get<const Anope::string>("offmessage");
 
 		Module *session = ModuleManager::FindModule("os_session");
 		block = conf->GetModule(session);
 
 		dconfig.max_session_kill = block->Get<int>("maxsessionkill");
 		dconfig.session_autokill_expiry = block->Get<time_t>("sessionautokillexpiry");
-		dconfig.sle_reason = block->Get<const Anope::string &>("sessionlimitexceeded");
-		dconfig.sle_detailsloc = block->Get<const Anope::string &>("sessionlimitdetailsloc");
+		dconfig.sle_reason = block->Get<const Anope::string>("sessionlimitexceeded");
+		dconfig.sle_detailsloc = block->Get<const Anope::string>("sessionlimitdetailsloc");
 
 		if (dconfig.defaultlevel < 1 || dconfig.defaultlevel > 5)
 			throw ConfigException("The value for <defcon:defaultlevel> must be between 1 and 5");

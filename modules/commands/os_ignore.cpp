@@ -299,7 +299,7 @@ class CommandOSIgnore : public Command
 				" \n"
 				"Ignores will not be enforced on IRC Operators."));
 
-		const Anope::string &regexengine = Config->GetBlock("options")->Get<const Anope::string &>("regexengine");
+		const Anope::string &regexengine = Config->GetBlock("options")->Get<const Anope::string>("regexengine");
 		if (!regexengine.empty())
 		{
 			source.Reply(" ");

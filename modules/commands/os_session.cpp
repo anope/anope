@@ -652,8 +652,8 @@ class OSSession : public Module
 		session_limit = block->Get<int>("defaultsessionlimit");
 		max_session_kill = block->Get<int>("maxsessionkill");
 		session_autokill_expiry = block->Get<time_t>("sessionautokillexpiry");
-		sle_reason = block->Get<const Anope::string &>("sessionlimitexceeded");
-		sle_detailsloc = block->Get<const Anope::string &>("sessionlimitdetailsloc");
+		sle_reason = block->Get<const Anope::string>("sessionlimitexceeded");
+		sle_detailsloc = block->Get<const Anope::string>("sessionlimitdetailsloc");
 
 		max_exception_limit = block->Get<int>("maxsessionlimit");
 		exception_expiry = block->Get<time_t>("exceptionexpiry");

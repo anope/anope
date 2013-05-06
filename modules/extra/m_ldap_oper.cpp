@@ -97,11 +97,11 @@ class LDAPOper : public Module
 	{
 		Configuration::Block *config = Config->GetModule(this);
 
-		this->binddn = config->Get<const Anope::string &>("binddn");
-		this->password = config->Get<const Anope::string &>("password");
-		this->basedn = config->Get<const Anope::string &>("basedn");
-		this->filter = config->Get<const Anope::string &>("filter");
-		opertype_attribute = config->Get<const Anope::string &>("opertype_attribute");
+		this->binddn = config->Get<const Anope::string>("binddn");
+		this->password = config->Get<const Anope::string>("password");
+		this->basedn = config->Get<const Anope::string>("basedn");
+		this->filter = config->Get<const Anope::string>("filter");
+		opertype_attribute = config->Get<const Anope::string>("opertype_attribute");
 
 		for (std::set<Oper *>::iterator it = my_opers.begin(), it_end = my_opers.end(); it != it_end; ++it)
 			delete *it;

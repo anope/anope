@@ -25,11 +25,11 @@ Serialize::Checker<std::multimap<Anope::string, XLine *, ci::less> > XLineManage
 
 void XLine::InitRegex()
 {
-	if (this->mask.length() >= 2 && this->mask[0] == '/' && this->mask[this->mask.length() - 1] == '/' && !Config->GetBlock("options")->Get<const Anope::string &>("regexengine").empty())
+	if (this->mask.length() >= 2 && this->mask[0] == '/' && this->mask[this->mask.length() - 1] == '/' && !Config->GetBlock("options")->Get<const Anope::string>("regexengine").empty())
 	{
 		Anope::string stripped_mask = this->mask.substr(1, this->mask.length() - 2);
 
-		ServiceReference<RegexProvider> provider("Regex", Config->GetBlock("options")->Get<const Anope::string &>("regexengine"));
+		ServiceReference<RegexProvider> provider("Regex", Config->GetBlock("options")->Get<const Anope::string>("regexengine"));
 		if (provider)
 		{
 			try

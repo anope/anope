@@ -149,8 +149,8 @@ class DBSQL : public Module, public Pipe
 	void OnReload(Configuration::Conf *conf) anope_override
 	{
 		Configuration::Block *block = conf->GetModule(this);
-		this->sql = ServiceReference<Provider>("SQL::Provider", block->Get<const Anope::string &>("engine"));
-		this->prefix = block->Get<const Anope::string &>("prefix", "anope_db_");
+		this->sql = ServiceReference<Provider>("SQL::Provider", block->Get<const Anope::string>("engine"));
+		this->prefix = block->Get<const Anope::string>("prefix", "anope_db_");
 		this->import = block->Get<bool>("import");
 	}
 

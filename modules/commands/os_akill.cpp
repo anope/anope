@@ -121,7 +121,7 @@ class CommandOSAKill : public Command
 
 		if (mask[0] == '/' && mask[mask.length() - 1] == '/')
 		{
-			const Anope::string &regexengine = Config->GetBlock("options")->Get<const Anope::string &>("regexengine");
+			const Anope::string &regexengine = Config->GetBlock("options")->Get<const Anope::string>("regexengine");
 
 			if (regexengine.empty())
 			{
@@ -419,7 +419,7 @@ class CommandOSAKill : public Command
 				"be given, even if it is the same as the default. The\n"
 				"current AKILL default expiry time can be found with the\n"
 				"\002STATS AKILL\002 command."));
-		const Anope::string &regexengine = Config->GetBlock("options")->Get<const Anope::string &>("regexengine");
+		const Anope::string &regexengine = Config->GetBlock("options")->Get<const Anope::string>("regexengine");
 		if (!regexengine.empty())
 		{
 			source.Reply(" ");

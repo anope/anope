@@ -216,7 +216,7 @@ static void write_pidfile()
 		atexit(remove_pidfile);
 	}
 	else
-		throw CoreException("Can not write to PID file " + Config->GetBlock("serverinfo")->Get<const Anope::string &>("pid"));
+		throw CoreException("Can not write to PID file " + Config->GetBlock("serverinfo")->Get<const Anope::string>("pid"));
 }
 
 void Anope::Init(int ac, char **av)
@@ -430,7 +430,7 @@ void Anope::Init(int ac, char **av)
 
 	/* Create me */
 	Configuration::Block *block = Config->GetBlock("serverinfo");
-	Me = new Server(NULL, block->Get<const Anope::string &>("name"), 0, block->Get<const Anope::string &>("description"), block->Get<const Anope::string &>("id"));
+	Me = new Server(NULL, block->Get<const Anope::string>("name"), 0, block->Get<const Anope::string>("description"), block->Get<const Anope::string>("id"));
 	for (botinfo_map::const_iterator it = BotListByNick->begin(), it_end = BotListByNick->end(); it != it_end; ++it)
 	{
 		it->second->server = Me;
@@ -452,7 +452,7 @@ void Anope::Init(int ac, char **av)
 	/* load modules */
 	Log() << "Loading modules...";
 	for (int i = 0; i < Config->CountBlock("module"); ++i)
-		ModuleManager::LoadModule(Config->GetBlock("module", i)->Get<const Anope::string &>("name"), NULL);
+		ModuleManager::LoadModule(Config->GetBlock("module", i)->Get<const Anope::string>("name"), NULL);
 
 	Module *protocol = ModuleManager::FindFirstOf(PROTOCOL);
 	if (protocol == NULL)

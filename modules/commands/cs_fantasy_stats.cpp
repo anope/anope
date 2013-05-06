@@ -79,10 +79,10 @@ class CSStats : public Module
 
 	void OnReload(Configuration::Conf *conf) anope_override
 	{
-		prefix = conf->GetModule(this)->Get<const Anope::string &>("prefix");
+		prefix = conf->GetModule(this)->Get<const Anope::string>("prefix");
 		if (prefix.empty())
 			prefix = "anope_";
-		this->sql = ServiceReference<SQL::Provider>("SQL::Provider", conf->GetModule(this)->Get<const Anope::string &>("engine"));
+		this->sql = ServiceReference<SQL::Provider>("SQL::Provider", conf->GetModule(this)->Get<const Anope::string>("engine"));
 	}
 
 	SQL::Result RunQuery(const SQL::Query &query)

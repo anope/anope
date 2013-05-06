@@ -382,7 +382,7 @@ bool Anope::Match(const Anope::string &str, const Anope::string &mask, bool case
 
 		if (r == NULL || r->GetExpression() != stripped_mask)
 		{
-			ServiceReference<RegexProvider> provider("Regex", Config->GetBlock("options")->Get<const Anope::string &>("regexengine"));
+			ServiceReference<RegexProvider> provider("Regex", Config->GetBlock("options")->Get<const Anope::string>("regexengine"));
 			if (provider)
 			{
 				try

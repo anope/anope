@@ -140,8 +140,8 @@ class SSLModule : public Module
 	{
 		Configuration::Block *config = conf->GetModule(this);
 
-		this->certfile = config->Get<const Anope::string &>("cert", "data/anope.crt");
-		this->keyfile = config->Get<const Anope::string &>("key", "data/anope.key");
+		this->certfile = config->Get<const Anope::string>("cert", "data/anope.crt");
+		this->keyfile = config->Get<const Anope::string>("key", "data/anope.key");
 
 		if (Anope::IsFile(this->certfile.c_str()))
 		{

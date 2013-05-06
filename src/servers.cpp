@@ -377,7 +377,7 @@ const Anope::string Servers::TS6_SID_Retrieve()
 	if (!IRCD || !IRCD->RequiresID)
 		return "";
 
-	static Anope::string current_sid = Config->GetBlock("options")->Get<const Anope::string &>("id");
+	static Anope::string current_sid = Config->GetBlock("options")->Get<const Anope::string>("id");
 	if (current_sid.empty())
 		current_sid = "00A";
 

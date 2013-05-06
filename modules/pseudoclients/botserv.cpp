@@ -30,7 +30,7 @@ class BotServCore : public Module
 
 	void OnReload(Configuration::Conf *conf) anope_override
 	{
-		const Anope::string &bsnick = conf->GetModule(this)->Get<const Anope::string &>("client");
+		const Anope::string &bsnick = conf->GetModule(this)->Get<const Anope::string>("client");
 
 		if (bsnick.empty())
 			throw ConfigException(this->name + ": <client> must be defined");
@@ -47,7 +47,7 @@ class BotServCore : public Module
 		/* Do not allow removing bot modes on our service bots */
 		if (chan->ci && chan->ci->bi == user)
 		{
-			const Anope::string &botmodes = Config->GetModule(this)->Get<const Anope::string &>("botmodes");
+			const Anope::string &botmodes = Config->GetModule(this)->Get<const Anope::string>("botmodes");
 			for (unsigned i = 0; i < botmodes.length(); ++i)
 				chan->SetMode(chan->ci->bi, ModeManager::FindChannelModeByChar(botmodes[i]), chan->ci->bi->GetUID());
 		}
@@ -57,7 +57,7 @@ class BotServCore : public Module
 	{
 		if (Me->IsSynced() && ci->c && ci->c->users.size() >= Config->GetModule(this)->Get<unsigned>("minusers"))
 		{
-			ChannelStatus status(Config->GetModule(this)->Get<const Anope::string &>("botmodes"));
+			ChannelStatus status(Config->GetModule(this)->Get<const Anope::string>("botmodes"));
 			bi->Join(ci->c, &status);
 		}
 	}
@@ -99,7 +99,7 @@ class BotServCore : public Module
 
 		if (!realbuf.find(c->ci->bi->nick))
 			params.erase(params.begin());
-		else if (!realbuf.find_first_of(Config->GetModule(this)->Get<const Anope::string &>("fantasycharacter", "!")))
+		else if (!realbuf.find_first_of(Config->GetModule(this)->Get<const Anope::string>("fantasycharacter", "!")))
 			params[0].erase(params[0].begin());
 		else
 			return;
@@ -231,7 +231,7 @@ class BotServCore : public Module
 			 **/
 			if (c->users.size() >= Config->GetModule(this)->Get<unsigned>("minusers") && !c->FindUser(c->ci->bi))
 			{
-				ChannelStatus status(Config->GetModule(this)->Get<const Anope::string &>("botmodes"));
+				ChannelStatus status(Config->GetModule(this)->Get<const Anope::string>("botmodes"));
 				c->ci->bi->Join(c, &status);
 			}
 			/* Only display the greet if the main uplink we're connected
@@ -279,7 +279,7 @@ class BotServCore : public Module
 					"channel, and provide a more convenient way to execute commands. Commands that\n"
 					"require a channel as a parameter will automatically have that parameter\n"
 					"given.\n"), source.service->nick.c_str());
-			const Anope::string &fantasycharacters = Config->GetModule(this)->Get<const Anope::string &>("fantasycharacter", "!");
+			const Anope::string &fantasycharacters = Config->GetModule(this)->Get<const Anope::string>("fantasycharacter", "!");
 			if (!fantasycharacters.empty())
 				source.Reply(_(" \n"
 						"Fantasy commands may be prefixed with one of the following characters: %s\n"), fantasycharacters.c_str());
@@ -310,7 +310,7 @@ class BotServCore : public Module
 		source.Reply(_(" \n"
 			"Bot will join a channel whenever there is at least\n"
 			"\002%d\002 user(s) on it."), Config->GetModule(this)->Get<unsigned>("minusers"));
-		const Anope::string &fantasycharacters = Config->GetModule(this)->Get<const Anope::string &>("fantasycharacter", "!");
+		const Anope::string &fantasycharacters = Config->GetModule(this)->Get<const Anope::string>("fantasycharacter", "!");
 		if (!fantasycharacters.empty())
 			source.Reply(_("Additionally, if fantasy is enabled fantasy commands\n"
 				"can be executed by  prefixing the command name with\n"
@@ -334,7 +334,7 @@ class BotServCore : public Module
 	void OnCreateChan(ChannelInfo *ci) anope_override
 	{
 		/* Set default bot flags */
-		spacesepstream sep(Config->GetModule(this)->Get<const Anope::string &>("defaults", "greet fantasy"));
+		spacesepstream sep(Config->GetModule(this)->Get<const Anope::string>("defaults", "greet fantasy"));
 		for (Anope::string token; sep.GetToken(token);)
 			this->ExtendMetadata("BS_" + token);
 	}

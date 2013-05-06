@@ -209,7 +209,7 @@ class NickServCore : public Module
 
 	void OnReload(Configuration::Conf *conf) anope_override
 	{
-		const Anope::string &nsnick = conf->GetModule(this)->Get<const Anope::string &>("client");
+		const Anope::string &nsnick = conf->GetModule(this)->Get<const Anope::string>("client");
 
 		if (nsnick.empty())
 			throw ConfigException(this->name + ": <client> must be defined");
@@ -220,7 +220,7 @@ class NickServCore : public Module
 
 		NickServ = bi;
 
-		spacesepstream(conf->GetModule(this)->Get<const Anope::string &>("defaults", "secure memo_signon memo_receive")).GetTokens(defaults);
+		spacesepstream(conf->GetModule(this)->Get<const Anope::string>("defaults", "secure memo_signon memo_receive")).GetTokens(defaults);
 		if (defaults.empty())
 		{
 			defaults.push_back("SECURE");
@@ -287,7 +287,7 @@ class NickServCore : public Module
 					c->SetCorrectModes(u, true, true);
 			}
 
-		const Anope::string &modesonid = block->Get<const Anope::string &>("modesonid");
+		const Anope::string &modesonid = block->Get<const Anope::string>("modesonid");
 		if (!modesonid.empty())
 			u->SetModes(NickServ, "%s", modesonid.c_str());
 
@@ -335,7 +335,7 @@ class NickServCore : public Module
 			return;
 
 		const NickAlias *na = NickAlias::Find(u->nick);
-		const Anope::string &unregistered_notice = Config->GetModule(this)->Get<const Anope::string &>("unregistered_notice");
+		const Anope::string &unregistered_notice = Config->GetModule(this)->Get<const Anope::string>("unregistered_notice");
 		if (!Config->GetBlock("options")->Get<bool>("nonicknameownership") && !unregistered_notice.empty() && !na)
 			u->SendMessage(NickServ, unregistered_notice);
 		else if (na)

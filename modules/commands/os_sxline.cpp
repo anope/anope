@@ -311,7 +311,7 @@ class CommandOSSNLine : public CommandOSSXLineBase
 
 		if (mask[0] == '/' && mask[mask.length() - 1] == '/')
 		{
-			const Anope::string &regexengine = Config->GetBlock("options")->Get<const Anope::string &>("regexengine");
+			const Anope::string &regexengine = Config->GetBlock("options")->Get<const Anope::string>("regexengine");
 
 			if (regexengine.empty())
 			{
@@ -438,7 +438,7 @@ class CommandOSSNLine : public CommandOSSXLineBase
 				"\002STATS AKILL\002 command.\n"
 				"Note: because the realname mask may contain spaces, the\n"
 				"separator between it and the reason is a colon."));
-		const Anope::string &regexengine = Config->GetBlock("options")->Get<const Anope::string &>("regexengine");
+		const Anope::string &regexengine = Config->GetBlock("options")->Get<const Anope::string>("regexengine");
 		if (!regexengine.empty())
 		{
 			source.Reply(" ");
@@ -527,7 +527,7 @@ class CommandOSSQLine : public CommandOSSXLineBase
 
 		if (mask[0] == '/' && mask[mask.length() - 1] == '/')
 		{
-			const Anope::string &regexengine = Config->GetBlock("options")->Get<const Anope::string &>("regexengine");
+			const Anope::string &regexengine = Config->GetBlock("options")->Get<const Anope::string>("regexengine");
 
 			if (regexengine.empty())
 			{
@@ -674,7 +674,7 @@ class CommandOSSQLine : public CommandOSSXLineBase
 				"must be given, even if it is the same as the default. The\n"
 				"current SQLINE default expiry time can be found with the\n"
 				"\002STATS AKILL\002 command."));
-		const Anope::string &regexengine = Config->GetBlock("options")->Get<const Anope::string &>("regexengine");
+		const Anope::string &regexengine = Config->GetBlock("options")->Get<const Anope::string>("regexengine");
 		if (!regexengine.empty())
 		{
 			source.Reply(" ");

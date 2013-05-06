@@ -143,11 +143,11 @@ static bool SendResetEmail(User *u, const NickAlias *na, const BotInfo *bi)
 		message = Language::Translate(na->nc, Config->GetBlock("mail")->Get<const char *>("reset_message"));
 
 	subject = subject.replace_all_cs("%n", na->nick);
-	subject = subject.replace_all_cs("%N", Config->GetBlock("networkinfo")->Get<const Anope::string &>("networkname"));
+	subject = subject.replace_all_cs("%N", Config->GetBlock("networkinfo")->Get<const Anope::string>("networkname"));
 	subject = subject.replace_all_cs("%c", passcode);
 
 	message = message.replace_all_cs("%n", na->nick);
-	message = message.replace_all_cs("%N", Config->GetBlock("networkinfo")->Get<const Anope::string &>("networkname"));
+	message = message.replace_all_cs("%N", Config->GetBlock("networkinfo")->Get<const Anope::string>("networkname"));
 	message = message.replace_all_cs("%c", passcode);
 
 	ResetInfo *ri = new ResetInfo;

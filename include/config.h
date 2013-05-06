@@ -49,7 +49,7 @@ namespace Configuration
 		 */
 		template<typename T> T Get(const Anope::string &tag, const Anope::string &def) const
 		{
-			const Anope::string &value = this->Get<const Anope::string &>(tag, def);
+			const Anope::string &value = this->Get<const Anope::string>(tag, def);
 			try
 			{
 				return convertTo<T>(value);
@@ -64,7 +64,7 @@ namespace Configuration
 		const item_map* GetItems() const;
 	};
 
-	template<> CoreExport const Anope::string& Block::Get(const Anope::string &tag, const Anope::string& def) const;
+	template<> CoreExport const Anope::string Block::Get(const Anope::string &tag, const Anope::string& def) const;
 	template<> CoreExport time_t Block::Get(const Anope::string &tag, const Anope::string &def) const;
 	template<> CoreExport const char* Block::Get(const Anope::string &tag, const Anope::string &def) const;
 	template<> CoreExport bool Block::Get(const Anope::string &tag, const Anope::string &def) const;

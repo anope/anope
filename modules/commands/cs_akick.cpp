@@ -546,7 +546,7 @@ class CSAKick : public Module
 					mask = autokick->mask;
 				reason = autokick->reason;
 				if (reason.empty())
-					reason = Config->GetModule(this)->Get<const Anope::string &>("autokickreason");
+					reason = Config->GetModule(this)->Get<const Anope::string>("autokickreason");
 				if (reason.empty())
 					reason = "User has been banned from the channel";
 				return EVENT_STOP;

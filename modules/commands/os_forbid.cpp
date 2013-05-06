@@ -230,7 +230,7 @@ class CommandOSForbid : public Command
 		source.Reply(_("Forbid allows you to forbid usage of certain nicknames, channels,\n"
 				"and email addresses. Wildcards are accepted for all entries."));
 
-		const Anope::string &regexengine = Config->GetBlock("options")->Get<const Anope::string &>("regexengine");
+		const Anope::string &regexengine = Config->GetBlock("options")->Get<const Anope::string>("regexengine");
 		if (!regexengine.empty())
 		{
 			source.Reply(" ");

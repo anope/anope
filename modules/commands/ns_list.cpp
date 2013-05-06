@@ -167,7 +167,7 @@ class CommandNSList : public Command
 				"    \002LIST #51-100\002\n"
 				"        Lists all registered nicks within the given range (51-100)."));
 
-		const Anope::string &regexengine = Config->GetBlock("options")->Get<const Anope::string &>("regexengine");
+		const Anope::string &regexengine = Config->GetBlock("options")->Get<const Anope::string>("regexengine");
 		if (!regexengine.empty())
 		{
 			source.Reply(" ");

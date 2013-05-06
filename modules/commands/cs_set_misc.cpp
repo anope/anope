@@ -150,11 +150,11 @@ class CSSetMisc : public Module
 		{
 			Configuration::Block *block = conf->GetBlock("command", i);
 
-			if (block->Get<const Anope::string &>("command") != "chanserv/set/misc")
+			if (block->Get<const Anope::string>("command") != "chanserv/set/misc")
 				continue;
 
-			Anope::string cname = block->Get<const Anope::string &>("name");
-			Anope::string desc = block->Get<const Anope::string &>("misc_description");
+			Anope::string cname = block->Get<const Anope::string>("name");
+			Anope::string desc = block->Get<const Anope::string>("misc_description");
 
 			if (cname.empty() || desc.empty())
 				continue;

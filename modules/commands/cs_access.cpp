@@ -801,13 +801,13 @@ class CSAccess : public Module
 		{
 			Configuration::Block *priv = conf->GetBlock("privilege", i);
 
-			const Anope::string &pname = priv->Get<const Anope::string &>("name");
+			const Anope::string &pname = priv->Get<const Anope::string>("name");
 
 			Privilege *p = PrivilegeManager::FindPrivilege(pname);
 			if (p == NULL)
 				continue;
 
-			const Anope::string &value = priv->Get<const Anope::string &>("level");
+			const Anope::string &value = priv->Get<const Anope::string>("level");
 			if (value.empty())
 				continue;
 			else if (value.equals_ci("founder"))

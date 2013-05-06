@@ -225,14 +225,14 @@ class NSIdentifyLDAP : public Module
 	{
 		Configuration::Block *config = Config->GetModule(this);
 
-		basedn = conf->Get<const Anope::string &>("basedn");
-		search_filter = conf->Get<const Anope::string &>("search_filter");
-		object_class = conf->Get<const Anope::string &>("object_class");
-		username_attribute = conf->Get<const Anope::string &>("username_attribute");
-		this->password_attribute = conf->Get<const Anope::string &>("password_attribute");
-		email_attribute = conf->Get<const Anope::string &>("email_attribute");
-		this->disable_register_reason = conf->Get<const Anope::string &>("disable_register_reason");
-		this->disable_email_reason = conf->Get<const Anope::string &>("disable_email_reason");
+		basedn = conf->Get<const Anope::string>("basedn");
+		search_filter = conf->Get<const Anope::string>("search_filter");
+		object_class = conf->Get<const Anope::string>("object_class");
+		username_attribute = conf->Get<const Anope::string>("username_attribute");
+		this->password_attribute = conf->Get<const Anope::string>("password_attribute");
+		email_attribute = conf->Get<const Anope::string>("email_attribute");
+		this->disable_register_reason = conf->Get<const Anope::string>("disable_register_reason");
+		this->disable_email_reason = conf->Get<const Anope::string>("disable_email_reason");
 
 		if (!email_attribute.empty())
 			/* Don't complain to users about how they need to update their email, we will do it for them */

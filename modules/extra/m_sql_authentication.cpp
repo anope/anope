@@ -85,9 +85,9 @@ class ModuleSQLAuthentication : public Module
 	void OnReload(Configuration::Conf *conf) anope_override
 	{
 		Configuration::Block *config = conf->GetModule(this);
-		this->engine = config->Get<const Anope::string &>("engine");
-		this->query =  config->Get<const Anope::string &>("query");
-		this->disable_reason = config->Get<const Anope::string &>("disable_reason");
+		this->engine = config->Get<const Anope::string>("engine");
+		this->query =  config->Get<const Anope::string>("query");
+		this->disable_reason = config->Get<const Anope::string>("disable_reason");
 
 		this->SQL = ServiceReference<SQL::Provider>("SQL::Provider", this->engine);
 	}

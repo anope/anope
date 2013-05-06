@@ -149,7 +149,7 @@ class ChanServCore : public Module
 
 	void OnReload(Configuration::Conf *conf) anope_override
 	{
-		const Anope::string &channick = conf->GetModule(this)->Get<const Anope::string &>("client");
+		const Anope::string &channick = conf->GetModule(this)->Get<const Anope::string>("client");
 
 		if (channick.empty())
 			throw ConfigException(this->name + ": <client> must be defined");
@@ -160,7 +160,7 @@ class ChanServCore : public Module
 
 		ChanServ = bi;
 
-		spacesepstream(conf->GetModule(this)->Get<const Anope::string &>("defaults", "greet fantasy")).GetTokens(defaults);
+		spacesepstream(conf->GetModule(this)->Get<const Anope::string>("defaults", "greet fantasy")).GetTokens(defaults);
 		if (defaults.empty())
 		{
 			defaults.push_back("KEEPTOPIC");
@@ -297,7 +297,7 @@ class ChanServCore : public Module
 
 	EventReturn OnCheckModes(Channel *c) anope_override
 	{
-		const Anope::string &require = Config->GetModule(this)->Get<const Anope::string &>("require", "r");
+		const Anope::string &require = Config->GetModule(this)->Get<const Anope::string>("require", "r");
 		if (!require.empty())
 		{
 			if (c->ci)
@@ -319,7 +319,7 @@ class ChanServCore : public Module
 
 		{
 			Anope::string modes;
-			spacesepstream sep(Config->GetModule(this)->Get<const Anope::string &>("mlock", "+nrt"));
+			spacesepstream sep(Config->GetModule(this)->Get<const Anope::string>("mlock", "+nrt"));
 			if (sep.GetToken(modes))
 			{
 				bool add = true;
@@ -343,8 +343,8 @@ class ChanServCore : public Module
 
 	EventReturn OnCanSet(User *u, const ChannelMode *cm) anope_override
 	{
-		if (Config->GetModule(this)->Get<const Anope::string &>("nomlock").find(cm->mchar) != Anope::string::npos
-			|| Config->GetModule(this)->Get<const Anope::string &>("require", "r").find(cm->mchar) || Anope::string::npos)
+		if (Config->GetModule(this)->Get<const Anope::string>("nomlock").find(cm->mchar) != Anope::string::npos
+			|| Config->GetModule(this)->Get<const Anope::string>("require", "r").find(cm->mchar) || Anope::string::npos)
 			return EVENT_STOP;
 		return EVENT_CONTINUE;
 	}

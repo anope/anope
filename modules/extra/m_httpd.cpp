@@ -361,15 +361,15 @@ class HTTPD : public Module
 			Configuration::Block *block = conf->GetBlock("httpd", i);
 
 
-			const Anope::string &hname = block->Get<const Anope::string &>("name", "httpd/main");
+			const Anope::string &hname = block->Get<const Anope::string>("name", "httpd/main");
 			existing.insert(hname);
 
-			Anope::string ip = block->Get<const Anope::string &>("ip");
+			Anope::string ip = block->Get<const Anope::string>("ip");
 			int port = block->Get<int>("port", "8080");
 			int timeout = block->Get<int>("timeout", "30");
 			bool ssl = block->Get<bool>("ssl", "no");
-			Anope::string ext_ip = block->Get<const Anope::string &>("extforward_ip");
-			Anope::string ext_header = block->Get<const Anope::string &>("extforward_header");
+			Anope::string ext_ip = block->Get<const Anope::string>("extforward_ip");
+			Anope::string ext_header = block->Get<const Anope::string>("extforward_header");
 
 			if (ip.empty())
 			{

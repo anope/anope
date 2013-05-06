@@ -637,7 +637,7 @@ class DBPlain : public Module
 
 	void OnReload(Configuration::Conf *conf) anope_override
 	{
-		DatabaseFile = Anope::DataDir + "/" + conf->GetModule(this)->Get<const Anope::string &>("database");
+		DatabaseFile = Anope::DataDir + "/" + conf->GetModule(this)->Get<const Anope::string>("database");
 		if (DatabaseFile.empty())
 			DatabaseFile = "anope.db";
 		BackupFile = Anope::DataDir + "/backups/" + DatabaseFile;

@@ -89,7 +89,7 @@ class CommandOSLogSearch : public Command
 
 		Log(LOG_ADMIN, source, this) << "for " << search_string;
 
-		const Anope::string &logfile_name = Config->GetModule(this->owner)->Get<const Anope::string &>("logname");
+		const Anope::string &logfile_name = Config->GetModule(this->owner)->Get<const Anope::string>("logname");
 		std::list<Anope::string> matches;
 		for (int d = days - 1; d >= 0; --d)
 		{

@@ -468,11 +468,11 @@ class CommandNSSetEmail : public Command
 			message = Config->GetBlock("mail")->Get<const char *>("emailchange_message");
 
 		subject = subject.replace_all_cs("%e", u->Account()->email);
-		subject = subject.replace_all_cs("%N", Config->GetBlock("networkinfo")->Get<const Anope::string &>("networkname"));
+		subject = subject.replace_all_cs("%N", Config->GetBlock("networkinfo")->Get<const Anope::string>("networkname"));
 		subject = subject.replace_all_cs("%c", code);
 
 		message = message.replace_all_cs("%e", u->Account()->email);
-		message = message.replace_all_cs("%N", Config->GetBlock("networkinfo")->Get<const Anope::string &>("networkname"));
+		message = message.replace_all_cs("%N", Config->GetBlock("networkinfo")->Get<const Anope::string>("networkname"));
 		message = message.replace_all_cs("%c", code);
 
 		return Mail::Send(u, u->Account(), bi, subject, message);

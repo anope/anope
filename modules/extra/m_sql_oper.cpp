@@ -105,8 +105,8 @@ class ModuleSQLOper : public Module
 	{
 		Configuration::Block *config = conf->GetModule(this);
 
-		this->engine = config->Get<const Anope::string &>("engine");
-		this->query = config->Get<const Anope::string &>("query");
+		this->engine = config->Get<const Anope::string>("engine");
+		this->query = config->Get<const Anope::string>("query");
 
 		this->SQL = ServiceReference<SQL::Provider>("SQL::Provider", this->engine);
 	}

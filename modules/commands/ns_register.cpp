@@ -116,7 +116,7 @@ class CommandNSRegister : public Command
 		size_t nicklen = u_nick.length();
 		Anope::string pass = params[0];
 		Anope::string email = params.size() > 1 ? params[1] : "";
-		const Anope::string &nsregister = Config->GetModule(this->owner)->Get<const Anope::string &>("registration");
+		const Anope::string &nsregister = Config->GetModule(this->owner)->Get<const Anope::string>("registration");
 
 		if (Anope::ReadOnly)
 		{
@@ -143,7 +143,7 @@ class CommandNSRegister : public Command
 		/* Guest nick can now have a series of between 1 and 7 digits.
 		 *   --lara
 		 */
-		const Anope::string &guestnick = Config->GetBlock("options")->Get<const Anope::string &>("guestnickprefix");
+		const Anope::string &guestnick = Config->GetBlock("options")->Get<const Anope::string>("guestnickprefix");
 		if (nicklen <= guestnick.length() + 7 && nicklen >= guestnick.length() + 1 && !u_nick.find_ci(guestnick) && u_nick.substr(guestnick.length()).find_first_not_of("1234567890") == Anope::string::npos)
 		{
 			source.Reply(NICK_CANNOT_BE_REGISTERED, u_nick.c_str());
@@ -290,7 +290,7 @@ class CommandNSResend : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		if (!Config->GetModule(this->owner)->Get<const Anope::string &>("registration").equals_ci("mail"))
+		if (!Config->GetModule(this->owner)->Get<const Anope::string>("registration").equals_ci("mail"))
 			return;
 
 		const NickAlias *na = NickAlias::Find(source.GetNick());
@@ -318,7 +318,7 @@ class CommandNSResend : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
 	{
-		if (!Config->GetModule(this->owner)->Get<const Anope::string &>("registration").equals_ci("mail"))
+		if (!Config->GetModule(this->owner)->Get<const Anope::string>("registration").equals_ci("mail"))
 			return false;
 
 		this->SendSyntax(source);
@@ -330,7 +330,7 @@ class CommandNSResend : public Command
 
 	void OnServHelp(CommandSource &source) anope_override
 	{
-		if (Config->GetModule(this->owner)->Get<const Anope::string &>("registration").equals_ci("mail"))
+		if (Config->GetModule(this->owner)->Get<const Anope::string>("registration").equals_ci("mail"))
 			Command::OnServHelp(source);
 	}
 };
@@ -345,7 +345,7 @@ class NSRegister : public Module
 	NSRegister(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandnsregister(this), commandnsconfirm(this), commandnsrsend(this)
 	{
-		if (Config->GetModule(this)->Get<const Anope::string &>("registration").equals_ci("disable"))
+		if (Config->GetModule(this)->Get<const Anope::string>("registration").equals_ci("disable"))
 			throw ModuleException("Module " + this->name + " will not load with registration disabled.");
 	}
 };
@@ -377,11 +377,11 @@ static bool SendRegmail(User *u, const NickAlias *na, const BotInfo *bi)
 		message = Language::Translate(na->nc, Config->GetBlock("mail")->Get<const char *>("registration_message"));
 
 	subject = subject.replace_all_cs("%n", na->nick);
-	subject = subject.replace_all_cs("%N", Config->GetBlock("networkinfo")->Get<const Anope::string &>("networkname"));
+	subject = subject.replace_all_cs("%N", Config->GetBlock("networkinfo")->Get<const Anope::string>("networkname"));
 	subject = subject.replace_all_cs("%c", codebuf);
 
 	message = message.replace_all_cs("%n", na->nick);
-	message = message.replace_all_cs("%N", Config->GetBlock("networkinfo")->Get<const Anope::string &>("networkname"));
+	message = message.replace_all_cs("%N", Config->GetBlock("networkinfo")->Get<const Anope::string>("networkname"));
 	message = message.replace_all_cs("%c", codebuf);
 
 	return Mail::Send(u, nc, bi, subject, message);

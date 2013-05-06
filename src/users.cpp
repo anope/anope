@@ -322,7 +322,7 @@ void User::Collide(NickAlias *na)
 
 	if (IRCD->CanSVSNick)
 	{
-		const Anope::string &guestprefix = Config->GetBlock("options")->Get<const Anope::string &>("guestnickprefix");
+		const Anope::string &guestprefix = Config->GetBlock("options")->Get<const Anope::string>("guestnickprefix");
 
 		Anope::string guestnick;
 

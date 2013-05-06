@@ -172,10 +172,10 @@ class ModuleRewrite : public Module
 
 			Rewrite rw;
 
-			rw.client = block->Get<const Anope::string &>("service");
-			rw.source_message = block->Get<const Anope::string &>("rewrite_source");
-			rw.target_message = block->Get<const Anope::string &>("rewrite_target");
-			rw.desc = block->Get<const Anope::string &>("rewrite_description");
+			rw.client = block->Get<const Anope::string>("service");
+			rw.source_message = block->Get<const Anope::string>("rewrite_source");
+			rw.target_message = block->Get<const Anope::string>("rewrite_target");
+			rw.desc = block->Get<const Anope::string>("rewrite_description");
 
 			if (rw.client.empty() || rw.source_message.empty() || rw.target_message.empty())
 				continue;

@@ -103,7 +103,7 @@ class CommandOSChanList : public Command
 				"specified, lists only channels matching \002pattern\002 that have the +s or\n"
 				"+p mode."));
 
-		const Anope::string &regexengine = Config->GetBlock("options")->Get<const Anope::string &>("regexengine");
+		const Anope::string &regexengine = Config->GetBlock("options")->Get<const Anope::string>("regexengine");
 		if (!regexengine.empty())
 		{
 			source.Reply(" ");
@@ -209,7 +209,7 @@ class CommandOSUserList : public Command
 				"that are on the given channel. If INVISIBLE is specified, only users\n"
 				"with the +i flag will be listed."));
 
-		const Anope::string &regexengine = Config->GetBlock("options")->Get<const Anope::string &>("regexengine");
+		const Anope::string &regexengine = Config->GetBlock("options")->Get<const Anope::string>("regexengine");
 		if (!regexengine.empty())
 		{
 			source.Reply(" ");

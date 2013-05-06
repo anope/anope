@@ -352,12 +352,12 @@ class MChanstats : public Module
 	void OnReload(Configuration::Conf *conf) anope_override
 	{
 		Configuration::Block *block = conf->GetModule(this);
-		prefix = block->Get<const Anope::string &>("prefix", "anope_");
-		SmileysHappy = block->Get<const Anope::string &>("SmileysHappy");
-		SmileysSad = block->Get<const Anope::string &>("SmileysSad");
-		SmileysOther = block->Get<const Anope::string &>("SmileysOther");
+		prefix = block->Get<const Anope::string>("prefix", "anope_");
+		SmileysHappy = block->Get<const Anope::string>("SmileysHappy");
+		SmileysSad = block->Get<const Anope::string>("SmileysSad");
+		SmileysOther = block->Get<const Anope::string>("SmileysOther");
 
-		Anope::string engine = block->Get<const Anope::string &>("engine");
+		Anope::string engine = block->Get<const Anope::string>("engine");
 		this->sql = ServiceReference<SQL::Provider>("SQL::Provider", engine);
 		if (sql)
 			this->CheckTables();

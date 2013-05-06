@@ -117,7 +117,7 @@ class CommandNSGroup : public Command
 			}
 
 		NickAlias *target, *na = NickAlias::Find(u->nick);
-		const Anope::string &guestnick = Config->GetBlock("options")->Get<const Anope::string &>("guestnickprefix");
+		const Anope::string &guestnick = Config->GetBlock("options")->Get<const Anope::string>("guestnickprefix");
 		time_t reg_delay = Config->GetModule("nickserv")->Get<time_t>("regdelay");
 		if (!(target = NickAlias::Find(nick)))
 			source.Reply(NICK_X_NOT_REGISTERED, nick.c_str());

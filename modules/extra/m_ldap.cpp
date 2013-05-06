@@ -434,7 +434,7 @@ class ModuleLDAP : public Module, public Pipe
 			++it;
 
 			for (i = 0; i < Config->CountBlock("ldap"); ++i)
-				if (Config->GetBlock("ldap", i)->Get<const Anope::string &>("name", "ldap/main") == cname)
+				if (Config->GetBlock("ldap", i)->Get<const Anope::string>("name", "ldap/main") == cname)
 					break;
 
 			if (i == num)
@@ -449,14 +449,14 @@ class ModuleLDAP : public Module, public Pipe
 
 		for (i = 0; i < Config->CountBlock("ldap"); ++i)
 		{
-			const Anope::string &connname = Config->GetBlock("ldap", i)->Get<const Anope::string &>("name", "ldap/main");
+			const Anope::string &connname = Config->GetBlock("ldap", i)->Get<const Anope::string>("name", "ldap/main");
 
 			if (this->LDAPServices.find(connname) == this->LDAPServices.end())
 			{
-				const Anope::string &server = Config->GetBlock("ldap", i)->Get<const Anope::string &>("server", "127.0.0.1");
+				const Anope::string &server = Config->GetBlock("ldap", i)->Get<const Anope::string>("server", "127.0.0.1");
 				int port = Config->GetBlock("ldap", i)->Get<int>("port", "389");
-				const Anope::string &admin_binddn = Config->GetBlock("ldap", i)->Get<const Anope::string &>("admin_binddn");
-				const Anope::string &admin_password = Config->GetBlock("ldap", i)->Get<const Anope::string &>("admin_password");
+				const Anope::string &admin_binddn = Config->GetBlock("ldap", i)->Get<const Anope::string>("admin_binddn");
+				const Anope::string &admin_password = Config->GetBlock("ldap", i)->Get<const Anope::string>("admin_password");
 
 				try
 				{

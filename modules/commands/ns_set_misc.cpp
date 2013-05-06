@@ -169,13 +169,13 @@ class NSSetMisc : public Module
 		{
 			Configuration::Block *block = conf->GetBlock("command", i);
 			
-			const Anope::string &cmd = block->Get<const Anope::string &>("command");
+			const Anope::string &cmd = block->Get<const Anope::string>("command");
 
 			if (cmd != "nickserv/set/misc" && cmd != "nickserv/saset/misc")
 				continue;
 
-			Anope::string cname = block->Get<const Anope::string &>("name");
-			Anope::string desc = block->Get<const Anope::string &>("misc_description");
+			Anope::string cname = block->Get<const Anope::string>("name");
+			Anope::string desc = block->Get<const Anope::string>("misc_description");
 
 			if (cname.empty() || desc.empty())
 				continue;

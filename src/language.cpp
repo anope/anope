@@ -37,7 +37,7 @@ void Language::InitLanguages()
 
 	setlocale(LC_ALL, "");
 
-	spacesepstream sep(Config->GetBlock("options")->Get<const Anope::string &>("languages"));
+	spacesepstream sep(Config->GetBlock("options")->Get<const Anope::string>("languages"));
 	Anope::string language;
 	while (sep.GetToken(language))
 	{

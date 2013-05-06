@@ -368,7 +368,7 @@ struct IRCDMessageCapab : Message::Capab
 				else if (module.find("m_rline.so") == 0)
 				{
 					Servers::Capab.insert("RLINE");
-					const Anope::string &regexengine = Config->GetBlock("options")->Get<const Anope::string &>("regexengine");
+					const Anope::string &regexengine = Config->GetBlock("options")->Get<const Anope::string>("regexengine");
 					if (!regexengine.empty() && module.length() > 11 && regexengine != module.substr(11))
 						Log() << "Warning: InspIRCd is using regex engine " << module.substr(11) << ", but we have " << regexengine << ". This may cause inconsistencies.";
 				}

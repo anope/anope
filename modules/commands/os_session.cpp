@@ -63,6 +63,15 @@ class MySessionService : public SessionService
 			Exception *e = *it;
 			if (Anope::Match(u->host, e->mask) || Anope::Match(u->ip, e->mask))
 				return e;
+			else if (e->mask.find_first_not_of("0123456789.:/") == Anope::string::npos && e->mask.find('/') != Anope::string::npos && u->ip.find_first_not_of("0123456789.:") == Anope::string::npos)
+			{
+				try
+				{
+					if (cidr(e->mask).match(u->ip))
+						return e;
+				}
+				catch (const SocketException &) { }
+			}
 		}
 		return NULL;
 	}
@@ -74,6 +83,15 @@ class MySessionService : public SessionService
 			Exception *e = *it;
 			if (Anope::Match(host, e->mask))
 				return e;
+			else if (e->mask.find_first_not_of("0123456789.:/") == Anope::string::npos && e->mask.find('/') != Anope::string::npos && host.find_first_not_of("0123456789.:") == Anope::string::npos)
+			{
+				try
+				{
+					if (cidr(e->mask).match(host))
+						return e;
+				}
+				catch (const SocketException &) { }
+			}
 		}
 
 		return NULL;
@@ -241,6 +259,7 @@ class CommandOSSession : public Command
 		else
 		{
 			Exception *exception = session_service->FindException(param);
+			Anope::string entry = "no entry";
 			unsigned limit = session_limit;
 			if (exception)
 			{
@@ -248,8 +267,9 @@ class CommandOSSession : public Command
 					limit = 0;
 				else if (exception->limit > limit)
 					limit = exception->limit;
+				entry = exception->mask;
 			}
-			source.Reply(_("The host \002%s\002 currently has \002%d\002 sessions with a limit of \002%d\002."), session->addr.mask().c_str(), session->count, limit);
+			source.Reply(_("The host \002%s\002 currently has \002%d\002 sessions with a limit of \002%d\002 because it matches entry: \2%s\2."), session->addr.mask().c_str(), session->count, limit, entry.c_str());
 		}
 	}
  public:

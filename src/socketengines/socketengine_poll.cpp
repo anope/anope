@@ -32,7 +32,6 @@
 #endif
 
 static std::vector<pollfd> events;
-static unsigned SocketCount;
 static std::map<int, unsigned> socket_positions;
 
 void SocketEngine::Init()
@@ -59,17 +58,14 @@ void SocketEngine::Change(Socket *s, bool set, SocketFlag flag)
 
 	if (!before_registered && now_registered)
 	{
-		if (SocketCount >= events.size())
-			events.resize(events.size() * 2);
-
-		pollfd &ev = events[SocketCount];
+		pollfd ev;
 		memset(&ev, 0, sizeof(ev));
 
 		ev.fd = s->GetFD();
 		ev.events = (s->flags[SF_READABLE] ? POLLIN : 0) | (s->flags[SF_WRITABLE] ? POLLOUT : 0);
 
-		socket_positions[ev.fd] = SocketCount;
-		++SocketCount;
+		socket_positions[ev.fd] = events.size();
+		events.push_back(ev);
 	}
 	else if (before_registered && !now_registered)
 	{
@@ -77,10 +73,10 @@ void SocketEngine::Change(Socket *s, bool set, SocketFlag flag)
 		if (pos == socket_positions.end())
 			throw SocketException("Unable to remove fd " + stringify(s->GetFD()) + " from poll, it does not exist?");
 
-		if (pos->second != SocketCount - 1)
+		if (pos->second != events.size() - 1)
 		{
 			pollfd &ev = events[pos->second],
-				&last_ev = events[SocketCount - 1];
+				&last_ev = events[events.size() - 1];
 
 			ev = last_ev;
 
@@ -88,7 +84,7 @@ void SocketEngine::Change(Socket *s, bool set, SocketFlag flag)
 		}
 
 		socket_positions.erase(pos);
-		--SocketCount;
+		events.pop_back();
 	}
 	else if (before_registered && now_registered)
 	{
@@ -103,9 +99,6 @@ void SocketEngine::Change(Socket *s, bool set, SocketFlag flag)
 
 void SocketEngine::Process()
 {
-	if (Sockets.size() > events.size())
-		events.resize(events.size() * 2);
-
 	int total = poll(&events.front(), events.size(), Config->ReadTimeout * 1000);
 	Anope::CurTime = time(NULL);
 
@@ -117,7 +110,7 @@ void SocketEngine::Process()
 		return;
 	}
 
-	for (unsigned i = 0, processed = 0; i < SocketCount && processed != static_cast<unsigned>(total); ++i)
+	for (unsigned i = 0, processed = 0; i < events.size() && processed != static_cast<unsigned>(total); ++i)
 	{
 		pollfd *ev = &events[i];
 		

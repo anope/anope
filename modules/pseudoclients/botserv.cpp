@@ -229,7 +229,8 @@ class BotServCore : public Module
 			 * make it into the channel, leaving the channel botless even for
 			 * legit users - Rob
 			 **/
-			if (c->users.size() >= Config->GetModule(this)->Get<unsigned>("minusers") && !c->FindUser(c->ci->bi))
+			/* This is before the user has joined the channel, so check usercount + 1 */
+			if (c->users.size() + 1 >= Config->GetModule(this)->Get<unsigned>("minusers") && !c->FindUser(c->ci->bi))
 			{
 				ChannelStatus status(Config->GetModule(this)->Get<const Anope::string>("botmodes"));
 				c->ci->bi->Join(c, &status);
@@ -336,7 +337,7 @@ class BotServCore : public Module
 		/* Set default bot flags */
 		spacesepstream sep(Config->GetModule(this)->Get<const Anope::string>("defaults", "greet fantasy"));
 		for (Anope::string token; sep.GetToken(token);)
-			this->ExtendMetadata("BS_" + token);
+			ci->ExtendMetadata("BS_" + token.upper());
 	}
 
 	void OnPreUserKicked(MessageSource &source, ChanUserContainer *cu, const Anope::string &kickmsg) anope_override

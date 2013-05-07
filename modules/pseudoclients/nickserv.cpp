@@ -437,7 +437,7 @@ class NickServCore : public Module
 	{
 		/* Set default flags */
 		for (unsigned i = 0; i < defaults.size(); ++i)
-			this->ExtendMetadata(defaults[i].upper());
+			nc->ExtendMetadata(defaults[i].upper());
 	}
 
 	void OnUserQuit(User *u, const Anope::string &msg)

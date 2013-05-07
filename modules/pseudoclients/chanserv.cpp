@@ -315,7 +315,7 @@ class ChanServCore : public Module
 
 		/* Set default chan flags */
 		for (unsigned i = 0; i < defaults.size(); ++i)
-			this->ExtendMetadata(defaults[i]);
+			ci->ExtendMetadata(defaults[i].upper());
 
 		{
 			Anope::string modes;

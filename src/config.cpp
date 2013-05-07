@@ -452,7 +452,7 @@ Conf::Conf() : Block("")
 		ValidateNotEmpty("fantasy", "name", nname);
 		ValidateNotEmpty("fantasy", "command", service);
 
-		CommandInfo &c = this->Fantasy[name];
+		CommandInfo &c = this->Fantasy[nname];
 		c.name = service;
 		c.permission = permission;
 		c.group = group;

@@ -640,7 +640,7 @@ class OSSession : public Module
 	{
 		this->SetPermanent(true);
 
-		Implementation i[] = { I_OnReload, I_OnUserConnect, I_OnPreUserLogoff };
+		Implementation i[] = { I_OnReload, I_OnUserConnect, I_OnUserQuit };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 		ModuleManager::SetPriority(this, PRIORITY_FIRST);
 	}
@@ -734,7 +734,7 @@ class OSSession : public Module
 		catch (const SocketException &) { }
 	}
 
-	void OnPreUserLogoff(User *u) anope_override
+	void OnUserQuit(User *u, const Anope::string &msg) anope_override
 	{
 		if (!session_limit || !u->server || u->server->IsULined())
 			return;

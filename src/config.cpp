@@ -237,7 +237,7 @@ Conf::Conf() : Block("")
 			ot->AddCommand(str);
 
 		spacesepstream privstr(privs);
-		for (Anope::string str; cmdstr.GetToken(str);)
+		for (Anope::string str; privstr.GetToken(str);)
 			ot->AddPriv(str);
 
 		commasepstream inheritstr(inherits);

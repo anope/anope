@@ -815,7 +815,8 @@ class ProtoInspIRCd : public Module
 
 	void OnChannelCreate(Channel *c) anope_override
 	{
-		this->OnChanRegistered(c->ci);
+		if (c->ci)
+			this->OnChanRegistered(c->ci);
 	}
 
 	void OnChanRegistered(ChannelInfo *ci) anope_override

@@ -727,9 +727,6 @@ void User::KillInternal(const Anope::string &source, const Anope::string &reason
 	Log(this, "killed") << "was killed by " << source << " (Reason: " << reason << ")";
 
 	this->Quit(reason);
-
-	this->quit = true;
-	quitting_users.push_back(this);
 }
 
 void User::Quit(const Anope::string &reason)

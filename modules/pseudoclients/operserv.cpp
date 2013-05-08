@@ -100,12 +100,20 @@ class SQLineManager : public XLineManager
 		return Anope::Match(u->nick, x->mask);
 	}
 
-	bool CheckChannel(Channel *c)
+	XLine *CheckChannel(Channel *c)
 	{
 		for (std::vector<XLine *>::const_iterator it = this->GetList().begin(), it_end = this->GetList().end(); it != it_end; ++it)
-			if (Anope::Match(c->name, (*it)->mask, false, true))
-				return true;
-		return false;
+		{
+			XLine *x = *it;
+			if (x->regex)
+			{
+				if (x->regex->Matches(c->name))
+					return x;
+			}
+			else if (Anope::Match(c->name, x->mask, false, true))
+				return x;
+		}
+		return NULL;
 	}
 };
 
@@ -238,7 +246,14 @@ class OperServCore : public Module
 
 	EventReturn OnCheckKick(User *u, ChannelInfo *ci, Anope::string &mask, Anope::string &reason) anope_override
 	{
-		return this->sqlines.CheckChannel(ci->c) ? EVENT_STOP : EVENT_CONTINUE;
+		XLine *x = this->sqlines.CheckChannel(ci->c);
+		if (x)
+		{
+			this->sqlines.OnMatch(u, x);
+			return EVENT_STOP;
+		}
+
+		return EVENT_CONTINUE;
 	}
 
 	EventReturn OnPreHelp(CommandSource &source, const std::vector<Anope::string> &params) anope_override

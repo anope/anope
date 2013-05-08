@@ -22,7 +22,8 @@ class HostServCore : public Module
 		if (!IRCD || !IRCD->CanSetVHost)
 			throw ModuleException("Your IRCd does not support vhosts");
 	
-		Implementation i[] = { I_OnReload, I_OnBotDelete, I_OnNickIdentify, I_OnNickUpdate, I_OnPreHelp };
+		Implementation i[] = { I_OnReload, I_OnBotDelete, I_OnNickIdentify, I_OnNickUpdate, I_OnPreHelp,
+					I_OnSetVhost, I_OnDeleteVhost };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 	}
 
@@ -90,6 +91,44 @@ class HostServCore : public Module
 			return EVENT_CONTINUE;
 		source.Reply(_("%s commands:"), HostServ->nick.c_str());
 		return EVENT_CONTINUE;
+	}
+
+	void OnSetVhost(NickAlias *na) anope_override
+	{
+		if (Config->GetModule(this)->Get<bool>("activate_on_set"))
+		{
+			User *u = User::Find(na->nick);
+
+			if (u && u->Account() == na->nc)
+			{
+				IRCD->SendVhost(u, na->GetVhostIdent(), na->GetVhostHost());
+
+				u->vhost = na->GetVhostHost();
+				u->UpdateHost();
+
+				if (IRCD->CanSetVIdent && !na->GetVhostIdent().empty())
+					u->SetVIdent(na->GetVhostIdent());
+
+				if (HostServ)
+				{
+					if (!na->GetVhostIdent().empty())
+						u->SendMessage(HostServ, _("Your vhost of \002%s\002@\002%s\002 is now activated."), na->GetVhostIdent().c_str(), na->GetVhostHost().c_str());
+					else
+						u->SendMessage(HostServ, _("Your vhost of \002%s\002 is now activated."), na->GetVhostHost().c_str());
+				}
+			}
+		}
+	}
+
+	void OnDeleteVhost(NickAlias *na) anope_override
+	{
+		if (Config->GetModule(this)->Get<bool>("activate_on_set"))
+		{
+			User *u = User::Find(na->nick);
+
+			if (u && u->Account() == na->nc)
+				IRCD->SendVhostDel(u);
+		}
 	}
 };
 

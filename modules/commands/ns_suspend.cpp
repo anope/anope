@@ -73,7 +73,7 @@ class CommandNSSuspend : public Command
 			nc->ExtendMetadata("suspend:reason", reason);
 		if (expiry_secs > 0)
 			nc->ExtendMetadata("suspend:expire", stringify(Anope::CurTime + expiry_secs));
-
+		nc->ExtendMetadata("suspend:time", stringify(Anope::CurTime));
 
 		for (unsigned i = 0; i < nc->aliases->size(); ++i)
 		{
@@ -148,6 +148,7 @@ class CommandNSUnSuspend : public Command
 		na->nc->Shrink("suspend:expire");
 		na->nc->Shrink("suspend:by");
 		na->nc->Shrink("suspend:reason");
+		na->nc->Shrink("suspend:time");
 
 		Log(LOG_ADMIN, source, this) << "for " << na->nick;
 		source.Reply(_("Nick %s is now released."), nick.c_str());
@@ -175,8 +176,23 @@ class NSSuspend : public Module
 	NSSuspend(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandnssuspend(this), commandnsunsuspend(this)
 	{
-		Implementation i[] = { I_OnPreNickExpire };
+		Implementation i[] = { I_OnPreNickExpire, I_OnNickInfo };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
+	}
+
+	void OnNickInfo(CommandSource &source, NickAlias *na, InfoFormatter &info, bool show_hidden) anope_override
+	{
+		if (na->nc->HasExt("SUSPENDED"))
+		{
+			Anope::string *by = na->nc->GetExt<ExtensibleItemClass<Anope::string> *>("suspend:by"), *reason = na->nc->GetExt<ExtensibleItemClass<Anope::string> *>("suspend:reason"), *t = na->nc->GetExt<ExtensibleItemClass<Anope::string> *>("suspend:time");
+			info["Suspended"] = "This nickname is \2suspended\2.";
+			if (by)
+				info["Suspended by"] = *by;
+			if (reason)
+				info["Suspend reason"] = *reason;
+			if (t)
+				info["Suspended on"] = Anope::strftime(convertTo<time_t>(*t), source.GetAccount(), true);
+		}
 	}
 
 	void OnPreNickExpire(NickAlias *na, bool &expire) anope_override
@@ -200,6 +216,7 @@ class NSSuspend : public Module
 				na->nc->Shrink("suspend:expire");
 				na->nc->Shrink("suspend:by");
 				na->nc->Shrink("suspend:reason");
+				na->nc->Shrink("suspend:time");
 
 				Log(LOG_NORMAL, "expire", NickServ) << "Expiring suspend for " << na->nick;
 			}

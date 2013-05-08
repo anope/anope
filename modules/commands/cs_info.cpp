@@ -108,12 +108,6 @@ class CommandCSInfo : public Command
 			if (!ci->HasExt("NO_EXPIRE") && chanserv_expire && !Anope::NoExpire)
 				info["Expires on"] = Anope::strftime(ci->last_used + chanserv_expire);
 		}
-		if (ci->HasExt("SUSPENDED"))
-		{
-			Anope::string *by = ci->GetExt<ExtensibleItemClass<Anope::string> *>("suspend_by"), *reason = ci->GetExt<ExtensibleItemClass<Anope::string> *>("suspend_reason");
-			if (by != NULL)
-				info["Suspended"] = Anope::printf("[%s] %s", by->c_str(), (reason && !reason->empty() ? reason->c_str() : NO_REASON));
-		}
 
 		FOREACH_MOD(I_OnChanInfo, OnChanInfo(source, ci, info, show_all));
 

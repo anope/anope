@@ -52,6 +52,7 @@ class CommandCSSuspend : public Command
 		ci->ExtendMetadata("suspend:by", source.GetNick());
 		if (!reason.empty())
 			ci->ExtendMetadata("suspend:reason", reason);
+		ci->ExtendMetadata("suspend:time", stringify(Anope::CurTime));
 
 		if (ci->c)
 		{
@@ -133,6 +134,7 @@ class CommandCSUnSuspend : public Command
 		ci->Shrink("suspend:by");
 		ci->Shrink("suspend:reason");
 		ci->Shrink("suspend:expire");
+		ci->Shrink("suspend:time");
 
 		source.Reply(_("Channel \002%s\002 is now released."), ci->name.c_str());
 
@@ -161,11 +163,24 @@ class CSSuspend : public Module
 		commandcssuspend(this), commandcsunsuspend(this)
 	{
 
-		Implementation i[] = { I_OnPreChanExpire, I_OnCheckKick };
+		Implementation i[] = { I_OnChanInfo, I_OnPreChanExpire, I_OnCheckKick };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 	}
 
-	// cs info output?
+	void OnChanInfo(CommandSource &source, ChannelInfo *ci, InfoFormatter &info, bool show_hidden) anope_override
+	{
+		if (ci->HasExt("SUSPENDED"))
+		{
+			Anope::string *by = ci->GetExt<ExtensibleItemClass<Anope::string> *>("suspend:by"), *reason = ci->GetExt<ExtensibleItemClass<Anope::string> *>("suspend:reason"), *t = ci->GetExt<ExtensibleItemClass<Anope::string> *>("suspend:time");
+			info["Suspended"] = "This channel is \2suspended\2.";
+			if (by)
+				info["Suspended by"] = *by;
+			if (reason)
+				info["Suspend reason"] = *reason;
+			if (t)
+				info["Suspended on"] = Anope::strftime(convertTo<time_t>(*t), source.GetAccount(), true);
+		}
+	}
 
 	void OnPreChanExpire(ChannelInfo *ci, bool &expire) anope_override
 	{
@@ -188,6 +203,7 @@ class CSSuspend : public Module
 				ci->Shrink("suspend:expire");
 				ci->Shrink("suspend:by");
 				ci->Shrink("suspend:reason");
+				ci->Shrink("suspend:time");
 
 				Log(LOG_NORMAL, "expire", ChanServ) << "Expiring suspend for " << ci->name;
 			}

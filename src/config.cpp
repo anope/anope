@@ -664,6 +664,10 @@ void Conf::LoadConf(File &file)
 	{	
 		Anope::string line = file.Read();
 		++linenumber;
+		
+		/* If this line is completely empty and we are in a quote, just append a newline */
+		if (line.empty() && in_quote)
+			wordbuffer += "\n";
 
 		for (unsigned c = 0, len = line.length(); c < len; ++c)
 		{
@@ -673,7 +677,6 @@ void Conf::LoadConf(File &file)
 				/* Strip leading white spaces from multi line quotes */
 				if (c == 0)
 				{
-					wordbuffer += "\n";
 					while (c < len && isspace(line[c]))
 						++c;
 					ch = line[c];
@@ -784,9 +787,9 @@ void Conf::LoadConf(File &file)
 				in_word = true;
 			}
 
-			if (ch == ';' || ch == '}' || c + 1 == len)
+			if (ch == ';' || ch == '}' || c + 1 >= len)
 			{
-				bool eol = c + 1 == len;
+				bool eol = c + 1 >= len;
 
 				if (!eol && in_quote)
 					// Allow ; and } in quoted strings

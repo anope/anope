@@ -300,7 +300,7 @@ class CommandCSMode : public Command
 
 									AccessGroup targ_access = ci->AccessFor(uc->user);
 
-									if (uc->user->IsProtected() || targ_access > u_access)
+									if (uc->user->IsProtected() || (ci->HasExt("PEACE") && targ_access >= u_access))
 									{
 										source.Reply(_("You do not have the access to change %s's modes."), uc->user->nick.c_str());
 										continue;
@@ -333,7 +333,7 @@ class CommandCSMode : public Command
 								if (source.GetUser() != target)
 								{
 									AccessGroup targ_access = ci->AccessFor(target);
-									if (targ_access > u_access)
+									if (ci->HasExt("PEACE") && targ_access >= u_access)
 									{
 										source.Reply(_("You do not have the access to change %s's modes."), target->nick.c_str());
 										break;

@@ -151,6 +151,8 @@ class Packet : public Query
 
 				sockaddrs addrs;
 				addrs.ntop(AF_INET, &a);
+				if (!addrs.valid())
+					throw SocketException("Invalid IP");
 
 				record.rdata = addrs.addr();
 				break;
@@ -167,6 +169,8 @@ class Packet : public Query
 
 				sockaddrs addrs;
 				addrs.ntop(AF_INET6, &a);
+				if (!addrs.valid())
+					throw SocketException("Invalid IP");
 
 				record.rdata = addrs.addr();
 				break;
@@ -272,6 +276,8 @@ class Packet : public Query
 			if (q.type == QUERY_PTR)
 			{
 				sockaddrs ip(q.name);
+				if (!ip.valid())
+					throw SocketException("Invalid IP");
 
 				if (q.name.find(':') != Anope::string::npos)
 				{
@@ -347,6 +353,8 @@ class Packet : public Query
 							throw SocketException("Unable to pack packet");
 
 						sockaddrs a(rr.rdata);
+						if (!a.valid())
+							throw SocketException("Invalid IP");
 
 						s = htons(4);
 						memcpy(&output[pos], &s, 2);
@@ -362,6 +370,8 @@ class Packet : public Query
 							throw SocketException("Unable to pack packet");
 
 						sockaddrs a(rr.rdata);
+						if (!a.valid())
+							throw SocketException("Invalid IP");
 
 						s = htons(16);
 						memcpy(&output[pos], &s, 2);

@@ -671,12 +671,12 @@ Entry::Entry(const Anope::string &m, const Anope::string &fh) : name(m), mask(fh
 		{
 			const Anope::string &cidr_ip = this->host.substr(0, sl),
 						&cidr_range = this->host.substr(sl + 1);
+
+			sockaddrs addr(cidr_ip);
+
 			try
 			{
-				sockaddrs addr(cidr_ip);
-				/* If we got here, cidr_ip is a valid ip */
-
-				if (cidr_range.is_pos_number_only())
+				if (addr.valid() && cidr_range.is_pos_number_only())
 				{
 					this->cidr_len = convertTo<unsigned short>(cidr_range);
 					/* If we got here, cidr_len is a valid number.
@@ -689,7 +689,6 @@ Entry::Entry(const Anope::string &m, const Anope::string &fh) : name(m), mask(fh
 					Log(LOG_DEBUG) << "Ban " << this->mask << " has cidr " << this->cidr_len;
 				}
 			}
-			catch (const SocketException &) { }
 			catch (const ConvertException &) { }
 		}
 	}

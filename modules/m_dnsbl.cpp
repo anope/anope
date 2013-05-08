@@ -134,15 +134,10 @@ class ModuleDNSBL : public Module
 
 		/* At this time we only support IPv4 */
 		sockaddrs user_ip;
-		try
-		{
-			user_ip.pton(AF_INET, user->ip);
-		}
-		catch (const SocketException &)
-		{
+		user_ip.pton(AF_INET, user->ip);
+		if (!user_ip.valid())
 			/* User doesn't have a valid IPv4 IP (ipv6/spoof/etc) */
 			return;
-		}
 
 		const unsigned long &ip = user_ip.sa4.sin_addr.s_addr;
 		unsigned long reverse_ip = (ip << 24) | ((ip & 0xFF00) << 8) | ((ip & 0xFF0000) >> 8) | (ip >> 24);

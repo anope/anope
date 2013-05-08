@@ -43,10 +43,7 @@ class SGLineManager : public XLineManager
 		if (x->regex)
 		{
 			Anope::string uh = u->GetIdent() + "@" + u->host, nuhr = u->nick + "!" + uh + "#" + u->realname;
-			if (x->regex->Matches(uh) || x->regex->Matches(nuhr))
-				return true;
-
-			return false;
+			return x->regex->Matches(uh) || x->regex->Matches(nuhr);
 		}
 
 		if (!x->GetNick().empty() && !Anope::Match(u->nick, x->GetNick()))
@@ -60,14 +57,8 @@ class SGLineManager : public XLineManager
 
 		if (x->GetHost().find('/') != Anope::string::npos)
 		{
-			try
-			{
-				cidr cidr_ip(x->GetHost());
-				sockaddrs ip(u->ip);
-				if (cidr_ip.match(ip))
-					return true;
-			}
-			catch (const SocketException &) { }
+			if (cidr(x->GetHost()).match(sockaddrs(u->ip)))
+				return true;
 		}
 
 		if (x->GetHost().empty() || Anope::Match(u->host, x->GetHost()) || Anope::Match(u->ip, x->GetHost()))

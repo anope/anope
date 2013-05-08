@@ -22,6 +22,7 @@
 #include "config.h"
 #include "opertype.h"
 #include "language.h"
+#include "sockets.h"
 
 user_map UserListByNick, UserListByUID;
 
@@ -753,24 +754,24 @@ bool User::Quitting() const
 Anope::string User::Mask() const
 {
 	Anope::string mask;
-	Anope::string mident = this->GetIdent();
-	Anope::string mhost = this->GetDisplayedHost();
+	const Anope::string &mident = this->GetIdent();
+	const Anope::string &mhost = this->GetDisplayedHost();
 
 	if (mident[0] == '~')
 		mask = "*" + mident + "@";
 	else
 		mask = mident + "@";
 
-	size_t dot;
-	/* To make sure this is an IP, make sure the host contains only numbers and dots, and check to make sure it only contains 3 dots */
-	if (mhost.find_first_not_of("0123456789.") == Anope::string::npos && (dot = mhost.find('.')) != Anope::string::npos && (dot = mhost.find('.', dot + 1)) != Anope::string::npos && (dot = mhost.find('.', dot + 1)) != Anope::string::npos && mhost.find('.', dot + 1) == Anope::string::npos)
-	{ /* IP addr */
-		dot = mhost.find('.');
-		mask += mhost.substr(0, dot) + ".*";
+	sockaddrs addr(mhost);
+	if (addr.valid() && addr.sa.sa_family == AF_INET)
+	{
+		size_t dot = mhost.find('.');
+		mask += mhost.substr(0, dot) + (dot == Anope::string::npos ? "" : ".*");
 	}
 	else
 	{
-		if ((dot = mhost.find('.')) != Anope::string::npos && mhost.find('.', dot + 1) != Anope::string::npos)
+		size_t dot = mhost.find('.');
+		if (dot != Anope::string::npos && mhost.find('.', dot + 1) != Anope::string::npos)
 			mask += "*" + mhost.substr(dot);
 		else
 			mask += mhost;

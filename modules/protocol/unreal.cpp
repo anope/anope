@@ -46,14 +46,15 @@ class UnrealIRCdProto : public IRCDProto
 			return;
 
 		/* ZLine if we can instead */
-		if (x->GetUser() == "*" && x->GetHost().find_first_not_of("0123456789:.") == Anope::string::npos)
-			try
+		if (x->GetUser() == "*")
+		{
+			sockaddrs a(x->GetHost());
+			if (a.valid())
 			{
-				sockaddrs(x->GetHost());
 				IRCD->SendSZLineDel(x);
 				return;
 			}
-			catch (const SocketException &) { }
+		}
 
 		UplinkSocket::Message() << "TKL - G " << x->GetUser() << " " << x->GetHost() << " " << x->by;
 	}
@@ -108,14 +109,15 @@ class UnrealIRCdProto : public IRCDProto
 		}
 
 		/* ZLine if we can instead */
-		if (x->GetUser() == "*" && x->GetHost().find_first_not_of("0123456789:.") == Anope::string::npos)
-			try
+		if (x->GetUser() == "*")
+		{
+			sockaddrs a(x->GetHost());
+			if (a.valid())
 			{
-				sockaddrs(x->GetHost());
 				IRCD->SendSZLine(u, x);
 				return;
 			}
-			catch (const SocketException &) { }
+		}
 
 		// Calculate the time left before this would expire, capping it at 2 days
 		time_t timeleft = x->expires - Anope::CurTime;
@@ -786,13 +788,9 @@ struct IRCDMessageNick : IRCDMessage
 				Anope::string decoded_ip;
 				Anope::B64Decode(params[9], decoded_ip);
 
-				try
-				{
-					sockaddrs ip_addr;
-					ip_addr.ntop(params[9].length() == 8 ? AF_INET : AF_INET6, decoded_ip.c_str());
-					ip = ip_addr.addr();
-				}
-				catch (const SocketException &ex) { }
+				sockaddrs ip_addr;
+				ip_addr.ntop(params[9].length() == 8 ? AF_INET : AF_INET6, decoded_ip.c_str());
+				ip = ip_addr.addr();
 			}
 
 			Anope::string vhost = params[8];

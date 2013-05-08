@@ -82,7 +82,7 @@ int ci::ci_char_traits::compare(const char *str1, const char *str2, size_t n)
 
 const char *ci::ci_char_traits::find(const char *s1, int n, char c)
 {
-	while (n-- > 0 && case_map_upper[static_cast<unsigned char>(*s1)] != static_cast<unsigned char>(c))
+	while (n-- > 0 && case_map_upper[static_cast<unsigned char>(*s1)] != case_map_upper[static_cast<unsigned char>(c)])
 		++s1;
 	return n >= 0 ? s1 : NULL;
 }

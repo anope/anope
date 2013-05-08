@@ -63,15 +63,9 @@ class MySessionService : public SessionService
 			Exception *e = *it;
 			if (Anope::Match(u->host, e->mask) || Anope::Match(u->ip, e->mask))
 				return e;
-			else if (e->mask.find_first_not_of("0123456789.:/") == Anope::string::npos && e->mask.find('/') != Anope::string::npos && u->ip.find_first_not_of("0123456789.:") == Anope::string::npos)
-			{
-				try
-				{
-					if (cidr(e->mask).match(u->ip))
-						return e;
-				}
-				catch (const SocketException &) { }
-			}
+			
+			if (cidr(e->mask).match(sockaddrs(u->ip)))
+				return e;
 		}
 		return NULL;
 	}
@@ -83,15 +77,9 @@ class MySessionService : public SessionService
 			Exception *e = *it;
 			if (Anope::Match(host, e->mask))
 				return e;
-			else if (e->mask.find_first_not_of("0123456789.:/") == Anope::string::npos && e->mask.find('/') != Anope::string::npos && host.find_first_not_of("0123456789.:") == Anope::string::npos)
-			{
-				try
-				{
-					if (cidr(e->mask).match(host))
-						return e;
-				}
-				catch (const SocketException &) { }
-			}
+
+			if (cidr(e->mask).match(sockaddrs(host)))
+				return e;
 		}
 
 		return NULL;
@@ -110,6 +98,8 @@ class MySessionService : public SessionService
 	Session *FindSession(const Anope::string &ip) anope_override
 	{
 		cidr c(ip, ip.find(':') != Anope::string::npos ? ipv6_cidr : ipv4_cidr);
+		if (!c.valid())
+			return NULL;
 		SessionMap::iterator it = this->Sessions.find(c);
 		if (it != this->Sessions.end())
 			return it->second;
@@ -119,13 +109,14 @@ class MySessionService : public SessionService
 	SessionMap::iterator FindSessionIterator(const Anope::string &ip)
 	{
 		cidr c(ip, ip.find(':') != Anope::string::npos ? ipv6_cidr : ipv4_cidr);
+		if (!c.valid())
+			return this->Sessions.end();
 		return this->Sessions.find(c);
 	}
 
-	Session* &FindOrCreateSession(const Anope::string &ip)
+	Session* &FindOrCreateSession(const cidr &ip)
 	{
-		cidr c(ip, ip.find(':') != Anope::string::npos ? ipv6_cidr : ipv4_cidr);
-		return this->Sessions[c];
+		return this->Sessions[ip];
 	}
 
 	SessionMap &GetSessions() anope_override
@@ -246,31 +237,24 @@ class CommandOSSession : public Command
 	void DoView(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		Anope::string param = params[1];
-		Session *session = NULL;
-		
-		try
+		Session *session = session_service->FindSession(param);
+
+		Exception *exception = session_service->FindException(param);
+		Anope::string entry = "no entry";
+		unsigned limit = session_limit;
+		if (exception)
 		{
-			session = session_service->FindSession(param);
+			if (!exception->limit)
+				limit = 0;
+			else if (exception->limit > limit)
+				limit = exception->limit;
+			entry = exception->mask;
 		}
-		catch (const SocketException &) { }
 
 		if (!session)
-			source.Reply(_("\002%s\002 not found on session list."), param.c_str());
+			source.Reply(_("\002%s\002 not found on session list, but has a limit of \002%d\002 because it matches entry: \2%s\2."), param.c_str(), limit, entry.c_str());
 		else
-		{
-			Exception *exception = session_service->FindException(param);
-			Anope::string entry = "no entry";
-			unsigned limit = session_limit;
-			if (exception)
-			{
-				if (!exception->limit)
-					limit = 0;
-				else if (exception->limit > limit)
-					limit = exception->limit;
-				entry = exception->mask;
-			}
 			source.Reply(_("The host \002%s\002 currently has \002%d\002 sessions with a limit of \002%d\002 because it matches entry: \2%s\2."), session->addr.mask().c_str(), session->count, limit, entry.c_str());
-		}
 	}
  public:
 	CommandOSSession(Module *creator) : Command(creator, "operserv/session", 2, 2)
@@ -690,68 +674,68 @@ class OSSession : public Module
 		if (u->Quitting() || !session_limit || exempt || !u->server || u->server->IsULined())
 			return;
 
-		try
+		cidr u_ip(u->ip);
+		if (!u_ip.valid())
+			return;
+
+		Session* &session = this->ss.FindOrCreateSession(u_ip);
+
+		if (session)
 		{
-			Session* &session = this->ss.FindOrCreateSession(u->ip);
-
-			if (session)
+			bool kill = false;
+			if (session->count >= session_limit)
 			{
-				bool kill = false;
-				if (session->count >= session_limit)
+				kill = true;
+				Exception *exception = this->ss.FindException(u);
+				if (exception)
 				{
-					kill = true;
-					Exception *exception = this->ss.FindException(u);
-					if (exception)
-					{
-						kill = false;
-						if (exception->limit && session->count >= exception->limit)
-							kill = true;
-					}
-				}
-
-				/* Previously on IRCds that send a QUIT (InspIRCD) when a user is killed, the session for a host was
-				 * decremented in do_quit, which caused problems and fixed here
-				 *
-				 * Now, we create the user struture before calling this to fix some user tracking issues,
-				 * so we must increment this here no matter what because it will either be
-				 * decremented when the user is killed or quits - Adam
-				 */
-				++session->count;
-	
-				if (kill && !exempt)
-				{
-					if (OperServ)
-					{
-						if (!sle_reason.empty())
-						{
-							Anope::string message = sle_reason.replace_all_cs("%IP%", u->ip);
-							u->SendMessage(OperServ, message);
-						}
-						if (!sle_detailsloc.empty())
-							u->SendMessage(OperServ, sle_detailsloc);
-					}
-
-					++session->hits;
-					if (max_session_kill && session->hits >= max_session_kill && akills)
-					{
-						const Anope::string &akillmask = "*@" + u->ip;
-						XLine *x = new XLine(akillmask, OperServ ? OperServ->nick : "", Anope::CurTime + session_autokill_expiry, "Session limit exceeded", XLineManager::GenerateUID());
-						akills->AddXLine(x);
-						akills->Send(NULL, x);
-						Log(OperServ, "akill/session") << "Added a temporary AKILL for \002" << akillmask << "\002 due to excessive connections";
-					}
-					else
-					{
-						u->Kill(OperServ ? OperServ->nick : "", "Session limit exceeded");
-					}
+					kill = false;
+					if (exception->limit && session->count >= exception->limit)
+						kill = true;
 				}
 			}
-			else
+
+			/* Previously on IRCds that send a QUIT (InspIRCD) when a user is killed, the session for a host was
+			 * decremented in do_quit, which caused problems and fixed here
+			 *
+			 * Now, we create the user struture before calling this to fix some user tracking issues,
+			 * so we must increment this here no matter what because it will either be
+			 * decremented when the user is killed or quits - Adam
+			 */
+			++session->count;
+	
+			if (kill && !exempt)
 			{
-				session = new Session(u->ip, u->ip.find(':') != Anope::string::npos ? ipv6_cidr : ipv4_cidr);
+				if (OperServ)
+				{
+					if (!sle_reason.empty())
+					{
+						Anope::string message = sle_reason.replace_all_cs("%IP%", u->ip);
+						u->SendMessage(OperServ, message);
+					}
+					if (!sle_detailsloc.empty())
+						u->SendMessage(OperServ, sle_detailsloc);
+				}
+
+				++session->hits;
+				if (max_session_kill && session->hits >= max_session_kill && akills)
+				{
+					const Anope::string &akillmask = "*@" + u->ip;
+					XLine *x = new XLine(akillmask, OperServ ? OperServ->nick : "", Anope::CurTime + session_autokill_expiry, "Session limit exceeded", XLineManager::GenerateUID());
+					akills->AddXLine(x);
+					akills->Send(NULL, x);
+					Log(OperServ, "akill/session") << "Added a temporary AKILL for \002" << akillmask << "\002 due to excessive connections";
+				}
+				else
+				{
+					u->Kill(OperServ ? OperServ->nick : "", "Session limit exceeded");
+				}
 			}
 		}
-		catch (const SocketException &) { }
+		else
+		{
+			session = new Session(u->ip, u->ip.find(':') != Anope::string::npos ? ipv6_cidr : ipv4_cidr);
+		}
 	}
 
 	void OnUserQuit(User *u, const Anope::string &msg) anope_override
@@ -759,23 +743,11 @@ class OSSession : public Module
 		if (!session_limit || !u->server || u->server->IsULined())
 			return;
 
-		SessionService::SessionMap::iterator sit;
-		try
-		{
-			sit = this->ss.FindSessionIterator(u->ip);
-		}
-		catch (const SocketException &)
-		{
-			return;
-		}
-
 		SessionService::SessionMap &sessions = this->ss.GetSessions();
+		SessionService::SessionMap::iterator sit = this->ss.FindSessionIterator(u->ip);
 
 		if (sit == sessions.end())
-		{
-			Log(LOG_DEBUG) << "Tried to delete non-existant session: " << u->ip;
 			return;
-		}
 
 		Session *session = sit->second;
 

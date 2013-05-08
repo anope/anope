@@ -80,14 +80,15 @@ class InspIRCdProto : public IRCDProto
 			return;
 
 		/* ZLine if we can instead */
-		if (x->GetUser() == "*" && x->GetHost().find_first_not_of("0123456789:.") == Anope::string::npos)
-			try
+		if (x->GetUser() == "*")
+		{
+			sockaddrs a(x->GetHost());
+			if (a.valid())
 			{
-				sockaddrs(x->GetHost());
 				IRCD->SendSZLineDel(x);
 				return;
 			}
-			catch (const SocketException &) { }
+		}
 
 		UplinkSocket::Message(OperServ) << "GLINE " << x->mask;
 	}
@@ -134,14 +135,15 @@ class InspIRCdProto : public IRCDProto
 		}
 
 		/* ZLine if we can instead */
-		if (x->GetUser() == "*" && x->GetHost().find_first_not_of("0123456789:.") == Anope::string::npos)
-			try
+		if (x->GetUser() == "*")
+		{
+			sockaddrs a(x->GetHost());
+			if (a.valid())
 			{
-				sockaddrs(x->GetHost());
 				IRCD->SendSZLine(u, x);
 				return;
 			}
-			catch (const SocketException &) { }
+		}
 
 		// Calculate the time left before this would expire, capping it at 2 days
 		time_t timeleft = x->expires - Anope::CurTime;

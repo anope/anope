@@ -149,14 +149,9 @@ class SOCKS5ProxyConnect : public ProxyConnect, public BinarySocket
 		sockaddrs target_addr;
 		char buf[4 + sizeof(target_addr.sa4.sin_addr.s_addr) + sizeof(target_addr.sa4.sin_port)];
 		int ptr = 0;
-		try
-		{
-			target_addr.pton(AF_INET, target_ip, target_port);
-		}
-		catch (const SocketException &)
-		{
+		target_addr.pton(AF_INET, target_ip, target_port);
+		if (!target_addr.valid())
 			return;
-		}
 
 		buf[ptr++] = 5; // Version
 		buf[ptr++] = 1; // # of methods
@@ -340,15 +335,10 @@ class ModuleProxyScan : public Module
 
 		/* At this time we only support IPv4 */
 		sockaddrs user_ip;
-		try
-		{
-			user_ip.pton(AF_INET, user->ip);
-		}
-		catch (const SocketException &)
-		{
+		user_ip.pton(AF_INET, user->ip);
+		if (!user_ip.valid())
 			/* User doesn't have a valid IPv4 IP (ipv6/spoof/etc) */
 			return;
-		}
 
 		if (!this->con_notice.empty() && !this->con_source.empty())
 		{

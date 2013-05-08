@@ -31,7 +31,7 @@ SocketIO NormalSocketIO;
 sockaddrs::sockaddrs(const Anope::string &address)
 {
 	this->clear();
-	if (!address.empty())
+	if (!address.empty() && address.find_first_not_of_ci("0123456789abcdef.:") == Anope::string::npos)
 		this->pton(address.find(':') != Anope::string::npos ? AF_INET6 : AF_INET, address);
 }
 
@@ -72,28 +72,28 @@ int sockaddrs::port() const
 
 Anope::string sockaddrs::addr() const
 {
-	char address[INET6_ADDRSTRLEN + 1] = "";
+	char address[INET6_ADDRSTRLEN];
 
 	switch (sa.sa_family)
 	{
 		case AF_INET:
-			if (!inet_ntop(AF_INET, &sa4.sin_addr, address, sizeof(address)))
-				throw SocketException(Anope::LastError());
-			return address;
+			if (inet_ntop(AF_INET, &sa4.sin_addr, address, sizeof(address)))
+				return address;
+			break;
 		case AF_INET6:
-			if (!inet_ntop(AF_INET6, &sa6.sin6_addr, address, sizeof(address)))
-				throw SocketException(Anope::LastError());
-			return address;
+			if (inet_ntop(AF_INET6, &sa6.sin6_addr, address, sizeof(address)))
+				return address;
+			break;
 		default:
 			break;
 	}
 
-	return address;
+	return "";
 }
 
 bool sockaddrs::operator()() const
 {
-	return this->sa.sa_family != 0;
+	return valid();
 }
 
 bool sockaddrs::operator==(const sockaddrs &other) const
@@ -115,35 +115,37 @@ bool sockaddrs::operator==(const sockaddrs &other) const
 
 void sockaddrs::pton(int type, const Anope::string &address, int pport)
 {
+	this->clear();
+
 	switch (type)
 	{
 		case AF_INET:
 		{
 			int i = inet_pton(type, address.c_str(), &sa4.sin_addr);
-			if (i == 0)
-				throw SocketException("Invalid IP");
-			else if (i <= -1)
-				throw SocketException("Invalid IP: "  + Anope::LastError());
-			sa4.sin_family = type;
-			sa4.sin_port = htons(pport);
-			return;
+			if (i <= 0)
+				this->clear();
+			else
+			{
+				sa4.sin_family = type;
+				sa4.sin_port = htons(pport);
+			}
+			break;
 		}
 		case AF_INET6:
 		{
 			int i = inet_pton(type, address.c_str(), &sa6.sin6_addr);
-			if (i == 0)
-				throw SocketException("Invalid IP");
-			else if (i <= -1)
-				throw SocketException("Invalid IP: " + Anope::LastError());
-			sa6.sin6_family = type;
-			sa6.sin6_port = htons(pport);
-			return;
+			if (i <= 0)
+				this->clear();
+			else
+			{
+				sa6.sin6_family = type;
+				sa6.sin6_port = htons(pport);
+			}
+			break;
 		}
 		default:
 			break;
 	}
-
-	throw CoreException("Invalid socket type");
 }
 
 void sockaddrs::ntop(int type, const void *src)
@@ -151,7 +153,10 @@ void sockaddrs::ntop(int type, const void *src)
 	char buf[INET6_ADDRSTRLEN];
 
 	if (inet_ntop(type, src, buf, sizeof(buf)) != buf)
-		throw SocketException("Invalid addr");
+	{
+		this->clear();
+		return;
+	}
 
 	switch (type)
 	{
@@ -167,7 +172,12 @@ void sockaddrs::ntop(int type, const void *src)
 			break;
 	}
 
-	throw CoreException("Invalid socket type");
+	this->clear();
+}
+
+bool sockaddrs::valid() const
+{
+	return size() != 0;
 }
 
 cidr::cidr(const Anope::string &ip)
@@ -185,11 +195,15 @@ cidr::cidr(const Anope::string &ip)
 	{
 		Anope::string real_ip = ip.substr(0, sl);
 		Anope::string cidr_range = ip.substr(sl + 1);
-		if (!cidr_range.is_pos_number_only())
-			throw SocketException("Invalid CIDR range");
 
 		this->cidr_ip = real_ip;
-		this->cidr_len = convertTo<unsigned int>(cidr_range);
+		this->cidr_len = ipv6 ? 128 : 32;
+		try
+		{
+			if (cidr_range.is_pos_number_only())
+				this->cidr_len = convertTo<unsigned int>(cidr_range);
+		}
+		catch (const ConvertException &) { }
 		this->addr.pton(ipv6 ? AF_INET6 : AF_INET, real_ip);
 	}
 }
@@ -209,7 +223,7 @@ Anope::string cidr::mask() const
 
 bool cidr::match(const sockaddrs &other)
 {
-	if (this->addr.sa.sa_family != other.sa.sa_family)
+	if (!valid() || !other.valid() || this->addr.sa.sa_family != other.sa.sa_family)
 		return false;
 
 	const unsigned char *ip, *their_ip;
@@ -232,7 +246,7 @@ bool cidr::match(const sockaddrs &other)
 			their_ip = reinterpret_cast<const unsigned char *>(&other.sa6.sin6_addr);
 			break;
 		default:
-			throw SocketException("Invalid address type");
+			return false;
 	}
 
 	if (memcmp(ip, their_ip, byte))
@@ -288,6 +302,11 @@ bool cidr::operator==(const cidr &other) const
 bool cidr::operator!=(const cidr &other) const
 {
 	return !(*this == other);
+}
+
+bool cidr::valid() const
+{
+	return this->addr.valid();
 }
 
 size_t cidr::hash::operator()(const cidr &s) const

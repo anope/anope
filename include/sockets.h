@@ -79,6 +79,8 @@ union CoreExport sockaddrs
 	 * @throws A socket exception if given an invalid structure
 	 */
 	void ntop(int type, const void *src);
+
+	bool valid() const;
 };
 
 class CoreExport cidr
@@ -91,6 +93,7 @@ class CoreExport cidr
 	cidr(const Anope::string &ip, unsigned char len);
 	Anope::string mask() const;
 	bool match(const sockaddrs &other);
+	bool valid() const;
 
 	bool operator<(const cidr &other) const;
 	bool operator==(const cidr &other) const;

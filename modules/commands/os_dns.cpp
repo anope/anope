@@ -446,22 +446,11 @@ class CommandOSDNS : public Command
 				return;
 			}
 
-		sockaddrs addr;
-		try
+		sockaddrs addr(params[2]);
+		if (!addr.valid())
 		{
-			addr.pton(AF_INET, params[2]);
-		}
-		catch (const SocketException &)
-		{
-			try
-			{
-				addr.pton(AF_INET6, params[2]);
-			}
-			catch (const SocketException &)
-			{
-				source.Reply(_("%s is not a valid IP address."), params[2].c_str());
-				return;
-			}
+			source.Reply(_("%s is not a valid IP address."), params[2].c_str());
+			return;
 		}
 
 		s->GetIPs().push_back(params[2]);

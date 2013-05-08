@@ -180,14 +180,15 @@ class InspIRCd12Proto : public IRCDProto
 		}
 
 		/* ZLine if we can instead */
-		if (x->GetUser() == "*" && x->GetHost().find_first_not_of("0123456789:.") == Anope::string::npos)
-			try
+		if (x->GetUser() == "*")
+		{
+			sockaddrs addr(x->GetHost());
+			if (addr.valid())
 			{
-				sockaddrs(x->GetHost());
 				IRCD->SendSZLine(u, x);
 				return;
 			}
-			catch (const SocketException &) { }
+		}
 
 		SendAddLine("G", x->GetUser() + "@" + x->GetHost(), timeleft, x->by, x->GetReason());
 	}

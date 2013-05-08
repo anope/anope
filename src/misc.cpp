@@ -707,12 +707,8 @@ Anope::string Anope::Resolve(const Anope::string &host, int type)
 	{
 		sockaddrs addr;
 		memcpy(&addr, addrresult->ai_addr, addrresult->ai_addrlen);
-		try
-		{
-			result = addr.addr();
-			Log(LOG_DEBUG_2) << "Resolver: " << host << " -> " << result;
-		}
-		catch (const SocketException &) { }
+		result = addr.addr();
+		Log(LOG_DEBUG_2) << "Resolver: " << host << " -> " << result;
 
 		freeaddrinfo(addrresult);
 	}

@@ -100,6 +100,10 @@ class CoreExport Channel : public Base, public Extensible
 	 */
 	void CheckModes();
 
+	/** Check if this channel should be deleted
+	 */
+	bool CheckDelete();
+
 	/** Join a user internally to the channel
 	 * @param u The user
 	 * @return The UserContainer for the user

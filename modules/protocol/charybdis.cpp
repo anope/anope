@@ -406,7 +406,7 @@ class ProtoCharybdis : public Module
 
 	{
 
-		Implementation i[] = { I_OnReload, I_OnChannelCreate, I_OnMLock, I_OnUnMLock };
+		Implementation i[] = { I_OnReload, I_OnChannelSync, I_OnMLock, I_OnUnMLock };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 
 		if (ModuleManager::LoadModule("ratbox", User::Find(creator)) != MOD_ERR_OK)
@@ -431,7 +431,7 @@ class ProtoCharybdis : public Module
 		sasl = conf->GetModule(this)->Get<bool>("sasl");
 	}
 
-	void OnChannelCreate(Channel *c) anope_override
+	void OnChannelSync(Channel *c) anope_override
 	{
 		if (use_server_side_mlock && c->ci && Servers::Capab.count("MLOCK") > 0)
 		{

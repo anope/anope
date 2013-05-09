@@ -792,7 +792,7 @@ class ProtoInspIRCd : public Module
 			throw ModuleException("No protocol interface for insp12");
 		ModuleManager::DetachAll(m_insp12);
 
-		Implementation i[] = { I_OnReload, I_OnUserNickChange, I_OnChannelCreate, I_OnChanRegistered, I_OnDelChan, I_OnMLock, I_OnUnMLock, I_OnSetChannelOption };
+		Implementation i[] = { I_OnReload, I_OnUserNickChange, I_OnChannelSync, I_OnChanRegistered, I_OnDelChan, I_OnMLock, I_OnUnMLock, I_OnSetChannelOption };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 	}
 
@@ -813,7 +813,7 @@ class ProtoInspIRCd : public Module
 		u->RemoveModeInternal(ModeManager::FindUserModeByName("REGISTERED"));
 	}
 
-	void OnChannelCreate(Channel *c) anope_override
+	void OnChannelSync(Channel *c) anope_override
 	{
 		if (c->ci)
 			this->OnChanRegistered(c->ci);

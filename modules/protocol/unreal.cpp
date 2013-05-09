@@ -1214,7 +1214,7 @@ class ProtoUnreal : public Module
 
 		this->AddModes();
 
-		Implementation i[] = { I_OnReload, I_OnUserNickChange, I_OnChannelCreate, I_OnChanRegistered, I_OnDelChan, I_OnMLock, I_OnUnMLock };
+		Implementation i[] = { I_OnReload, I_OnUserNickChange, I_OnChannelSync, I_OnChanRegistered, I_OnDelChan, I_OnMLock, I_OnUnMLock };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 		ModuleManager::SetPriority(this, PRIORITY_FIRST);
 	}
@@ -1232,7 +1232,7 @@ class ProtoUnreal : public Module
 			IRCD->SendLogout(u);
 	}
 
-	void OnChannelCreate(Channel *c) anope_override
+	void OnChannelSync(Channel *c) anope_override
 	{
 		if (use_server_side_mlock && Servers::Capab.count("MLOCK") > 0 && c->ci)
 		{

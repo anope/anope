@@ -78,13 +78,10 @@ void Channel::Reset()
 				this->SetMode(NULL, ModeManager::FindChannelModeByName(f.Modes()[i]), uc->user->GetUID(), false);
 	}
 
-	this->CheckModes();
-
 	for (ChanUserList::const_iterator it = this->users.begin(), it_end = this->users.end(); it != it_end; ++it)
 		this->SetCorrectModes(it->second->user, true, false);
 	
-	if (this->ci && Me && Me->IsSynced())
-		this->ci->RestoreTopic();
+	this->Sync();
 }
 
 void Channel::Sync()
@@ -153,6 +150,25 @@ void Channel::CheckModes()
 		}
 }
 
+bool Channel::CheckDelete()
+{
+	/* Channel is persistent, it shouldn't be deleted and the service bot should stay */
+	if (this->HasExt("PERSIST") || (this->ci && this->ci->HasExt("PERSIST")))
+		return false;
+
+	/* Channel is syncing from a netburst, don't destroy it as more users are probably wanting to join immediatly
+	 * We also don't part the bot here either, if necessary we will part it after the sync
+	 */
+	if (this->HasExt("SYNCING"))
+		return false;
+
+	/* Additionally, do not delete this channel if ChanServ/a BotServ bot is inhabiting it */
+	if (this->HasExt("INHABIT"))
+		return false;
+
+	return this->users.empty();
+}
+
 ChanUserContainer* Channel::JoinUser(User *user)
 {
 	if (user->server && user->server->IsSynced())
@@ -190,21 +206,7 @@ void Channel::DeleteUser(User *user)
 		Log(LOG_DEBUG) << "Channel::DeleteUser() tried to delete nonexistant channel " << this->name << " from " << user->nick << "'s channel list";
 	delete cu;
 
-	/* Channel is persistent, it shouldn't be deleted and the service bot should stay */
-	if (this->HasExt("PERSIST") || (this->ci && this->ci->HasExt("PERSIST")))
-		return;
-
-	/* Channel is syncing from a netburst, don't destroy it as more users are probably wanting to join immediatly
-	 * We also don't part the bot here either, if necessary we will part it after the sync
-	 */
-	if (this->HasExt("SYNCING"))
-		return;
-
-	/* Additionally, do not delete this channel if ChanServ/a BotServ bot is inhabiting it */
-	if (this->HasExt("INHABIT"))
-		return;
-
-	if (this->users.empty())
+	if (this->CheckDelete())
 		delete this;
 }
 

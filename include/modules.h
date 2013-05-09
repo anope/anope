@@ -636,6 +636,7 @@ class CoreExport Module : public Extensible
 	virtual void OnDelChan(ChannelInfo *ci) { }
 
 	/** Called when a new channel is created
+	 * Note that this channel may not be introduced to the uplink at this point.
 	 * @param c The channel
 	 */
 	virtual void OnChannelCreate(Channel *c) { }

@@ -361,9 +361,16 @@ ChannelInfo::~ChannelInfo()
 	{
 		if (this->bi && this->c->FindUser(this->bi))
 			this->bi->Part(this->c);
+
 		/* Parting the service bot can cause the channel to go away */
+
 		if (this->c)
-			this->c->ci = NULL;
+		{
+			if (this->c && this->c->CheckDelete())
+				delete this->c;
+
+			this->c = NULL;
+		}
 	}
 
 	RegisteredChannelList->erase(this->name);

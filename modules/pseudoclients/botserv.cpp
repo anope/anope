@@ -340,10 +340,6 @@ class BotServCore : public Module
 			ci->ExtendMetadata("BS_" + token.upper());
 	}
 
-	void OnPreUserKicked(MessageSource &source, ChanUserContainer *cu, const Anope::string &kickmsg) anope_override
-	{
-	}
-
 	void OnUserKicked(MessageSource &source, User *target, const Anope::string &channel, ChannelStatus &status, const Anope::string &kickmsg) anope_override
 	{
 		BotInfo *bi = BotInfo::Find(target->nick);

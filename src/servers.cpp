@@ -254,34 +254,38 @@ void Server::Sync(bool sync_links)
 			{
 				bool created;
 				ci->c = Channel::FindOrCreate(ci->name, created, ci->time_registered);
+
 				if (ModeManager::FindChannelModeByName("PERM") != NULL)
 				{
-					ci->c->SetMode(NULL, "PERM");
 					if (created)
 						IRCD->SendChannel(ci->c);
+					ci->c->SetMode(NULL, "PERM");
 				}
 				else
 				{
 					if (!ci->bi)
 						ci->WhoSends()->Assign(NULL, ci);
 					if (ci->c->FindUser(ci->bi) == NULL)
-						ci->bi->Join(ci->c);
+					{
+						ChannelStatus status(Config->GetModule("botserv")->Get<const Anope::string>("botmodes"));
+						ci->bi->Join(ci->c, &status);
+					}
 				}
 			}
 		}
 
 		FOREACH_MOD(I_OnPreUplinkSync, OnPreUplinkSync(this));
 
-		IRCD->SendEOB();
-		Me->Sync(false);
-
-		FOREACH_MOD(I_OnUplinkSync, OnUplinkSync(this));
-
 		for (channel_map::const_iterator it = ChannelList.begin(), it_end = ChannelList.end(); it != it_end; ++it)
 		{
 			Channel *c = it->second;
 			c->Sync();
 		}
+
+		IRCD->SendEOB();
+		Me->Sync(false);
+
+		FOREACH_MOD(I_OnUplinkSync, OnUplinkSync(this));
 
 		if (!Anope::NoFork && Anope::AtTerm())
 		{

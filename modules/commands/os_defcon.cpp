@@ -335,7 +335,7 @@ class OSDefcon : public Module
 	OSDefcon(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR), session_service("SessionService", "session"), akills("XLineManager", "xlinemanager/sgline"), commandosdefcon(this)
 	{
 
-		Implementation i[] = { I_OnReload, I_OnChannelModeSet, I_OnChannelModeUnset, I_OnPreCommand, I_OnUserConnect, I_OnChannelModeAdd, I_OnChannelCreate };
+		Implementation i[] = { I_OnReload, I_OnChannelModeSet, I_OnChannelModeUnset, I_OnPreCommand, I_OnUserConnect, I_OnChannelModeAdd, I_OnChannelSync };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 	}
 
@@ -509,15 +509,7 @@ class OSDefcon : public Module
 		if (DConfig.sessionlimit <= 0 || !session_service)
 			return;
 
-		Session *session;
-		try
-		{
-			session = session_service->FindSession(u->ip);
-		}
-		catch (const SocketException &)
-		{
-			return;
-		}
+		Session *session = session_service->FindSession(u->ip);
 		Exception *exception = session_service->FindException(u);
 
 		if (DConfig.Check(DEFCON_REDUCE_SESSION) && !exception)
@@ -553,7 +545,7 @@ class OSDefcon : public Module
 			this->ParseModeString();
 	}
 
-	void OnChannelCreate(Channel *c) anope_override
+	void OnChannelSync(Channel *c) anope_override
 	{
 		if (DConfig.Check(DEFCON_FORCE_CHAN_MODES))
 			c->SetModes(OperServ, false, "%s", DConfig.chanmodes.c_str());

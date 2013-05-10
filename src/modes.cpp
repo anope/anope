@@ -120,7 +120,7 @@ bool ChannelMode::CanSet(User *u) const
 {
 	EventReturn MOD_RESULT;
 	FOREACH_RESULT(I_OnCanSet, OnCanSet(u, this));
-	return MOD_RESULT == EVENT_ALLOW;
+	return MOD_RESULT != EVENT_STOP;
 }
 
 ChannelModeList::ChannelModeList(const Anope::string &cm, char mch) : ChannelMode(cm, mch)

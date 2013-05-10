@@ -344,7 +344,7 @@ class ChanServCore : public Module
 	EventReturn OnCanSet(User *u, const ChannelMode *cm) anope_override
 	{
 		if (Config->GetModule(this)->Get<const Anope::string>("nomlock").find(cm->mchar) != Anope::string::npos
-			|| Config->GetModule(this)->Get<const Anope::string>("require", "r").find(cm->mchar) || Anope::string::npos)
+			|| Config->GetModule(this)->Get<const Anope::string>("require", "r").find(cm->mchar) != Anope::string::npos)
 			return EVENT_STOP;
 		return EVENT_CONTINUE;
 	}

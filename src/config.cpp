@@ -447,7 +447,7 @@ Conf::Conf() : Block("")
 					&permission = fantasy->Get<const Anope::string>("permission"),
 					&group = fantasy->Get<const Anope::string>("group");
 		bool hide = fantasy->Get<bool>("hide"),
-			prepend_channel = fantasy->Get<bool>("prepend_channel");
+			prepend_channel = fantasy->Get<bool>("prepend_channel", "yes");
 
 		ValidateNotEmpty("fantasy", "name", nname);
 		ValidateNotEmpty("fantasy", "command", service);

@@ -821,7 +821,7 @@ class ProtoInspIRCd : public Module
 
 	void OnChanRegistered(ChannelInfo *ci) anope_override
 	{
-		if (use_server_side_mlock && ci->c)
+		if (use_server_side_mlock && ci->c && !ci->GetMLockAsString(false).empty())
 		{
 			Anope::string modes = ci->GetMLockAsString(false).replace_all_cs("+", "").replace_all_cs("-", "");
 			SendChannelMetadata(ci->c, "mlock", modes);
@@ -829,8 +829,8 @@ class ProtoInspIRCd : public Module
 
 		if (use_server_side_topiclock && Servers::Capab.count("TOPICLOCK") && ci->c)
 		{
-			Anope::string on = ci->HasExt("TOPICLOCK") ? "1" : "";
-			SendChannelMetadata(ci->c, "topiclock", on);
+			if (ci->HasExt("TOPICLOCK"))
+				SendChannelMetadata(ci->c, "topiclock", "1");
 		}
 	}
 

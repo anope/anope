@@ -147,7 +147,9 @@ void Join::SJoin(MessageSource &source, const Anope::string &chan, time_t ts, co
 	{
 		c->Shrink("SYNCING");
 		/* Sync the channel (mode lock, topic, etc) */
-		c->Sync();
+		/* the channel is synced when the netmerge is complete */
+		if (Me && Me->IsSynced())
+			c->Sync();
 	}
 }
 

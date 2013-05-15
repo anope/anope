@@ -331,10 +331,11 @@ class NickServCore : public Module
 
 	void OnUserConnect(User *u, bool &exempt) anope_override
 	{
-		if (u->Quitting() || !u->server->IsSynced())
+		if (u->Quitting() || !u->server->IsSynced() || u->server->IsULined())
 			return;
 
 		const NickAlias *na = NickAlias::Find(u->nick);
+
 		const Anope::string &unregistered_notice = Config->GetModule(this)->Get<const Anope::string>("unregistered_notice");
 		if (!Config->GetBlock("options")->Get<bool>("nonicknameownership") && !unregistered_notice.empty() && !na)
 			u->SendMessage(NickServ, unregistered_notice);

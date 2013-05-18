@@ -109,6 +109,7 @@ class CoreExport Log
 class CoreExport LogInfo
 {
  public:
+ 	BotInfo *bot;
 	std::vector<Anope::string> targets;
 	std::vector<LogFile *> logfiles;
 	int last_day;

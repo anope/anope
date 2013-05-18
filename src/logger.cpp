@@ -77,8 +77,6 @@ const Anope::string &LogFile::GetName() const
 
 Log::Log(LogType t, const Anope::string &cat, const BotInfo *b) : bi(b), u(NULL), nc(NULL), c(NULL), chan(NULL), ci(NULL), s(NULL), type(t), category(cat)
 {
-	if (!bi && Config)
-		bi = Global;
 }
 
 Log::Log(LogType t, CommandSource &source, Command *_c, const ChannelInfo *_ci) : nick(source.GetNick()), u(source.GetUser()), nc(source.nc), c(_c), chan(NULL), ci(_ci), s(NULL), m(NULL), type(t)
@@ -93,8 +91,6 @@ Log::Log(LogType t, CommandSource &source, Command *_c, const ChannelInfo *_ci) 
 	this->bi = NULL;
 	if (sl != Anope::string::npos)
 		this->bi = BotInfo::Find(c->name.substr(0, sl));
-	if (this->bi == NULL && Config)
-		this->bi = Global;
 	this->category = c->name;
 }
 
@@ -111,9 +107,6 @@ Log::Log(const User *_u, const Anope::string &cat, const BotInfo *_bi) : bi(_bi)
 {
 	if (!u)
 		throw CoreException("Invalid pointers passed to Log::Log");
-	
-	if (!this->bi && Config)
-		this->bi = Global;
 }
 
 Log::Log(Server *serv, const Anope::string &cat, const BotInfo *_bi) : bi(_bi), u(NULL), nc(NULL), c(NULL), chan(NULL), ci(NULL), s(serv), m(NULL), type(LOG_SERVER), category(cat)
@@ -121,16 +114,12 @@ Log::Log(Server *serv, const Anope::string &cat, const BotInfo *_bi) : bi(_bi), 
 	if (!s)
 		throw CoreException("Invalid pointer passed to Log::Log");
 	
-	if (!this->bi && Config)
+	if (!this->bi)
 		this->bi = OperServ;
-	if (!this->bi && Config)
-		this->bi = Global;
 }
 
 Log::Log(const BotInfo *b, const Anope::string &cat) : bi(b), u(NULL), nc(NULL), c(NULL), chan(NULL), ci(NULL), s(NULL), m(NULL), type(LOG_NORMAL), category(cat)
 {
-	if (!this->bi && Config)
-		this->bi = Global;
 }
 
 Log::Log(Module *mod, const Anope::string &cat) : bi(NULL), u(NULL), nc(NULL), c(NULL), chan(NULL), ci(NULL), s(NULL), m(mod), type(LOG_MODULE), category(cat)
@@ -243,7 +232,7 @@ Anope::string Log::BuildPrefix() const
 	return buffer;
 }
 
-LogInfo::LogInfo(int la, bool rio, bool ldebug) : last_day(0), log_age(la), raw_io(rio), debug(ldebug)
+LogInfo::LogInfo(int la, bool rio, bool ldebug) : bot(NULL), last_day(0), log_age(la), raw_io(rio), debug(ldebug)
 {
 }
 
@@ -376,9 +365,16 @@ void LogInfo::ProcessMessage(const Log *l)
 			if (UplinkSock && l->type <= LOG_NORMAL && Me && Me->IsSynced())
 			{
 				Channel *c = Channel::Find(target);
-				if (!c || !l->bi)
+				if (!c)
 					continue;
-				IRCD->SendPrivmsg(l->bi, c->name, "%s", buffer.c_str());
+
+				const BotInfo *bi = l->bi;
+				if (!bi)
+					bi = this->bot;
+				if (!bi)
+					bi = c->ci->WhoSends();
+				if (bi)
+					IRCD->SendPrivmsg(bi, c->name, "%s", buffer.c_str());
 			}
 		}
 		else if (target == "globops")

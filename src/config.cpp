@@ -387,6 +387,7 @@ Conf::Conf() : Block("")
 
 		LogInfo l(logage, rawio, debug);
 
+		l.bot = BotInfo::Find(log->Get<const Anope::string>("bot", "Global"));
 		spacesepstream(log->Get<const Anope::string>("target")).GetTokens(l.targets);
 		spacesepstream(log->Get<const Anope::string>("source")).GetTokens(l.sources);
 		spacesepstream(log->Get<const Anope::string>("admin")).GetTokens(l.admin);

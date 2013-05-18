@@ -248,15 +248,15 @@ void TypeLoader::OnResult(const Reply &r)
 
 	for (unsigned i = 0; i < r.multi_bulk.size(); ++i)
 	{
-		const Reply &reply = r.multi_bulk[i];
+		const Reply *reply = r.multi_bulk[i];
 
-		if (reply.type != Reply::BULK)
+		if (reply->type != Reply::BULK)
 			continue;
 
 		int64_t id;
 		try
 		{
-			id = convertTo<int64_t>(reply.bulk);
+			id = convertTo<int64_t>(reply->bulk);
 		}
 		catch (const ConvertException &)
 		{
@@ -287,10 +287,10 @@ void ObjectLoader::OnResult(const Reply &r)
 
 	for (unsigned i = 0; i + 1 < r.multi_bulk.size(); i += 2)
 	{
-		const Reply &key = r.multi_bulk[i],
-			&value = r.multi_bulk[i + 1];
+		const Reply *key = r.multi_bulk[i],
+			*value = r.multi_bulk[i + 1];
 
-		data[key.bulk] << value.bulk;
+		data[key->bulk] << value->bulk;
 	}
 
 	Serializable* &obj = st->objects[this->id];
@@ -354,12 +354,12 @@ void Deleter::OnResult(const Reply &r)
 
 	for (unsigned i = 0; i + 1 < r.multi_bulk.size(); i += 2)
 	{
-		const Reply &key = r.multi_bulk[i],
-			&value = r.multi_bulk[i + 1];
+		const Reply *key = r.multi_bulk[i],
+			*value = r.multi_bulk[i + 1];
 
 		args.clear();
 		args.push_back("SREM");
-		args.push_back("value:" + this->type + ":" + key.bulk + ":" + value.bulk);
+		args.push_back("value:" + this->type + ":" + key->bulk + ":" + value->bulk);
 		args.push_back(stringify(this->id));
 
 		/* Delete value -> object id */
@@ -397,12 +397,12 @@ void Updater::OnResult(const Reply &r)
 
 	for (unsigned i = 0; i + 1 < r.multi_bulk.size(); i += 2)
 	{
-		const Reply &key = r.multi_bulk[i],
-			&value = r.multi_bulk[i + 1];
+		const Reply *key = r.multi_bulk[i],
+			*value = r.multi_bulk[i + 1];
 
 		std::vector<Anope::string> args;
 		args.push_back("SREM");
-		args.push_back("value:" + this->type + ":" + key.bulk + ":" + value.bulk);
+		args.push_back("value:" + this->type + ":" + key->bulk + ":" + value->bulk);
 		args.push_back(stringify(this->id));
 
 		/* Delete value -> object id */
@@ -461,12 +461,12 @@ void SubscriptionListener::OnResult(const Reply &r)
 	if (r.multi_bulk.size() != 4)
 		return;
 	
-	size_t sz = r.multi_bulk[2].bulk.find(':');
+	size_t sz = r.multi_bulk[2]->bulk.find(':');
 	if (sz == Anope::string::npos)
 		return;
 	
-	const Anope::string &key = r.multi_bulk[2].bulk.substr(sz + 1),
-				&op = r.multi_bulk[3].bulk;
+	const Anope::string &key = r.multi_bulk[2]->bulk.substr(sz + 1),
+				&op = r.multi_bulk[3]->bulk;
 	
 	sz = key.rfind(':');
 	if (sz == Anope::string::npos)
@@ -602,10 +602,10 @@ void ModifiedObject::OnResult(const Reply &r)
 
 	for (unsigned i = 0; i + 1 < r.multi_bulk.size(); i += 2)
 	{
-		const Reply &key = r.multi_bulk[i],
-			&value = r.multi_bulk[i + 1];
+		const Reply *key = r.multi_bulk[i],
+			*value = r.multi_bulk[i + 1];
 
-		data[key.bulk] << value.bulk;
+		data[key->bulk] << value->bulk;
 	}
 
 	obj = st->Unserialize(obj, data);

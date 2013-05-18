@@ -14,7 +14,7 @@ namespace Redis
 		enum Type
 		{
 			NOT_PARSED,
-			ERROR,
+			NOT_OK,
 			OK,
 			INT,
 			BULK,
@@ -23,12 +23,23 @@ namespace Redis
 		type;
 
 		Reply() { Clear(); }
-		void Clear() { type = NOT_PARSED; i = 0; bulk.clear(); multi_bulk_size = 0; multi_bulk.clear(); }
+		~Reply() { Clear(); }
+		
+		void Clear()
+		{
+			type = NOT_PARSED;
+			i = 0;
+			bulk.clear();
+			multi_bulk_size = 0;
+			for (unsigned j = 0; j < multi_bulk.size(); ++j)
+				delete multi_bulk[j];
+			multi_bulk.clear();
+		}
 
 		int64_t i;
 		Anope::string bulk;
 		int multi_bulk_size;
-		std::deque<Reply> multi_bulk;
+		std::deque<Reply *> multi_bulk;
 	};
 
 	class Interface

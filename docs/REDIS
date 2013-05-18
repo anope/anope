@@ -9,7 +9,7 @@ Table of Contents
 -----------------
 1) Data structure
 2) Keyspace notifications
-3) Examples of modfying, deleting, and creating objects
+3) Examples of modifying, deleting, and creating objects
 
 1) Data structure
 
@@ -99,7 +99,7 @@ Table of Contents
     multiple commands, or inserting multiple objects at once, specifically if the
     objects depend on each other, you MUST use a transaction.
 
-3) Examples of modfying, deleting, and creating objects
+3) Examples of modifying, deleting, and creating objects
 
    These examples will ONLY work if you meet the criteria in section 2.
 

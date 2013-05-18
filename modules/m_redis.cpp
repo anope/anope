@@ -11,6 +11,8 @@
 #include "module.h"
 #include "modules/redis.h"
 
+#include <iterator> // back_inserter
+
 using namespace Redis;
 
 class MyRedisService;
@@ -63,7 +65,7 @@ class Transaction : public Interface
 
 		for (unsigned i = 0; i < r.multi_bulk.size(); ++i)
 		{
-			const Reply &reply = r.multi_bulk[i];
+			const Reply *reply = r.multi_bulk[i];
 
 			if (interfaces.empty())
 				break;
@@ -72,7 +74,7 @@ class Transaction : public Interface
 			interfaces.pop_front();
 
 			if (inter)
-				inter->OnResult(reply);
+				inter->OnResult(*reply);
 		}
 	}
 };
@@ -321,7 +323,7 @@ size_t RedisSocket::ParseReply(Reply &r, const char *buffer, size_t l)
 			Log(LOG_DEBUG) << "redis: status error: " << reason.substr(0, nl);
 			if (nl != Anope::string::npos)
 			{
-				r.type = Reply::ERROR;
+				r.type = Reply::NOT_OK;
 				used = 1 + nl + 2;
 			}
 			break;
@@ -398,21 +400,22 @@ size_t RedisSocket::ParseReply(Reply &r, const char *buffer, size_t l)
 			{
 				/* This multi bulk is already complete, so check the sub bulks */
 				for (unsigned i = 0; i < r.multi_bulk.size(); ++i)
-					if (r.multi_bulk[i].type == Reply::MULTI_BULK)
-						ParseReply(r.multi_bulk[i], buffer + used, l - used);
+					if (r.multi_bulk[i]->type == Reply::MULTI_BULK)
+						ParseReply(*r.multi_bulk[i], buffer + used, l - used);
 				break;
 			}
 
 			for (int i = r.multi_bulk.size(); i < r.multi_bulk_size; ++i)
 			{
-				r.multi_bulk.push_back(Reply());
-				size_t u = ParseReply(r.multi_bulk.back(), buffer + used, l - used);
+				Reply *reply = new Reply();
+				size_t u = ParseReply(*reply, buffer + used, l - used);
 				if (!u)
 				{
 					Log(LOG_DEBUG) << "redis: ran out of data to parse";
-					r.multi_bulk.pop_back();
+					delete reply;
 					break;
 				}
+				r.multi_bulk.push_back(reply);
 				used += u;
 			}
 			break;
@@ -474,7 +477,7 @@ bool RedisSocket::Read(const char *buffer, size_t l)
 				 * __keyevent@0__:set
 				 * key
 				 */
-				std::map<Anope::string, Interface *>::iterator it = this->subinterfaces.find(r.multi_bulk[1].bulk);
+				std::map<Anope::string, Interface *>::iterator it = this->subinterfaces.find(r.multi_bulk[1]->bulk);
 				if (it != this->subinterfaces.end())
 					it->second->OnResult(r);
 			}
@@ -492,7 +495,7 @@ bool RedisSocket::Read(const char *buffer, size_t l)
 
 				if (i)
 				{
-					if (r.type != Reply::ERROR)
+					if (r.type != Reply::NOT_OK)
 						i->OnResult(r);
 					else
 						i->OnError(r.bulk);

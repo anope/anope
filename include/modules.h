@@ -415,6 +415,11 @@ class CoreExport Module : public Extensible
 	 */
 	virtual void OnBadWordDel(ChannelInfo *ci, const BadWord *bw) { }
 
+	/** Called when a bot is created or destroyed
+	 */
+	virtual void OnCreateBot(BotInfo *bi) { }
+	virtual void OnDelBot(BotInfo *bi) { }
+
 	/** Called before a bot kicks a user
 	 * @param bi The bot sending the kick
 	 * @param c The channel the user is being kicked on
@@ -1040,6 +1045,7 @@ enum Implementation
 		I_OnChanInfo, I_OnCheckPriv, I_OnGroupCheckPriv, I_OnSetChannelOption, I_OnChannelSync, I_OnSetCorrectModes,
 
 		/* BotServ */
+		I_OnCreateBot, I_OnDelBot,
 		I_OnBotKick, I_OnBotCreate, I_OnBotChange, I_OnBotDelete, I_OnPreBotAssign, I_OnBotAssign, I_OnBotUnAssign,
 		I_OnPreUserKicked, I_OnUserKicked, I_OnBotFantasy, I_OnBotNoFantasyAccess, I_OnBotBan, I_OnBadWordAdd, I_OnBadWordDel,
 

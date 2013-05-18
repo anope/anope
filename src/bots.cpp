@@ -32,6 +32,8 @@ BotInfo::BotInfo(const Anope::string &nnick, const Anope::string &nuser, const A
 	(*BotListByNick)[this->nick] = this;
 	if (!this->uid.empty())
 		(*BotListByUID)[this->uid] = this;
+	
+	FOREACH_MOD(I_OnCreateBot, OnCreateBot(this));
 
 	// If we're synchronised with the uplink already, send the bot.
 	if (Me && Me->IsSynced())
@@ -49,6 +51,8 @@ BotInfo::BotInfo(const Anope::string &nnick, const Anope::string &nuser, const A
 
 BotInfo::~BotInfo()
 {
+	FOREACH_MOD(I_OnDelBot, OnDelBot(this));
+
 	// If we're synchronised with the uplink already, send the bot.
 	if (Me && Me->IsSynced())
 	{

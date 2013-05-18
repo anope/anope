@@ -19,7 +19,7 @@ class BotServCore : public Module
 	BotServCore(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PSEUDOCLIENT | VENDOR)
 	{
 		Implementation i[] = { I_OnReload, I_OnSetCorrectModes, I_OnBotAssign, I_OnBotDelete, I_OnPrivmsg, I_OnJoinChannel, I_OnLeaveChannel,
-					I_OnPreHelp, I_OnPostHelp, I_OnChannelModeSet, I_OnCreateChan, I_OnUserKicked };
+					I_OnPreHelp, I_OnPostHelp, I_OnChannelModeSet, I_OnCreateChan, I_OnUserKicked, I_OnCreateBot };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 	}
 
@@ -346,6 +346,12 @@ class BotServCore : public Module
 		if (bi)
 			/* Bots get rejoined */
 			bi->Join(channel, &status);
+	}
+
+	void OnCreateBot(BotInfo *bi) anope_override
+	{
+		if (bi->botmodes.empty())
+			bi->botmodes = Config->GetModule(this)->Get<const Anope::string>("botumodes");
 	}
 };
 

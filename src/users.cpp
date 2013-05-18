@@ -69,7 +69,7 @@ User::User(const Anope::string &snick, const Anope::string &sident, const Anope:
 	if (sserver && sserver->IsSynced()) // Our bots are introduced on startup with no server
 	{
 		++sserver->users;
-		Log(this, "connect") << (!svhost.empty() ? Anope::string("(") + svhost + ") " : "") << "(" << srealname << ") " << sip << " connected to the network (" << sserver->GetName() << ")";
+		Log(this, "connect") << (!vhost.empty() && vhost != host ? "(" + vhost + ") " : "") << "(" << srealname << ") " << (!sip.empty() && sip != host ? "[" + sip + "] " : "") << "connected to the network (" << sserver->GetName() << ")";
 	}
 
 	if (UserListByNick.size() > MaxUserCount)
@@ -622,7 +622,7 @@ void User::SetModesInternal(const char *umodes, ...)
 	vsnprintf(buf, BUFSIZE - 1, umodes, args);
 	va_end(args);
 
-	if (this->server && this->server->IsSynced())
+	if (this->server && this->server->IsSynced() && Anope::string(buf) != "+")
 		Log(this, "mode") << "changes modes to " << buf;
 
 	spacesepstream sep(buf);

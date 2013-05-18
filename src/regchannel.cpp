@@ -359,6 +359,8 @@ ChannelInfo::~ChannelInfo()
 
 	if (this->c)
 	{
+		this->Shrink("PERSIST");
+
 		if (this->bi && this->c->FindUser(this->bi))
 			this->bi->Part(this->c);
 

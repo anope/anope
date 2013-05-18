@@ -56,15 +56,13 @@ class CommandCSDrop : public Command
 
 		FOREACH_MOD(I_OnChanDrop, OnChanDrop(ci));
 
-		Channel *c = ci->c;
+		Reference<Channel> c = ci->c;
 		delete ci;
 
 		source.Reply(_("Channel \002%s\002 has been dropped."), chan.c_str());
 
 		if (c)
 			c->CheckModes();
-
-		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override

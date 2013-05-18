@@ -830,7 +830,7 @@ void Conf::LoadConf(File &file)
 
 						const Anope::string &dname = define->Get<const Anope::string>("name");
 
-						if (dname == wordbuffer)
+						if (dname == wordbuffer && define != b)
 							wordbuffer = define->Get<const Anope::string>("value");
 					}
 

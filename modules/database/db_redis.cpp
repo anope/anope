@@ -253,10 +253,10 @@ void TypeLoader::OnResult(const Reply &r)
 		if (reply.type != Reply::BULK)
 			continue;
 
-		int64_t i;
+		int64_t id;
 		try
 		{
-			i = convertTo<int64_t>(reply.bulk);
+			id = convertTo<int64_t>(reply.bulk);
 		}
 		catch (const ConvertException &)
 		{
@@ -265,9 +265,9 @@ void TypeLoader::OnResult(const Reply &r)
 
 		std::vector<Anope::string> args;
 		args.push_back("HGETALL");
-		args.push_back("hash:" + this->type + ":" + stringify(i));
+		args.push_back("hash:" + this->type + ":" + stringify(id));
 
-		me->redis->SendCommand(new ObjectLoader(me, this->type, i), args);
+		me->redis->SendCommand(new ObjectLoader(me, this->type, id), args);
 	}
 
 	delete this;

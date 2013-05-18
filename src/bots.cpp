@@ -201,7 +201,7 @@ void BotInfo::OnMessage(User *u, const Anope::string &message)
 		return;
 
 	CommandSource source(u->nick, u, u->Account(), u, this);
-	RunCommand(source, message);
+	Command::Run(source, message);
 }
 
 CommandInfo& BotInfo::SetCommand(const Anope::string &cname, const Anope::string &sname, const Anope::string &permission)

@@ -106,8 +106,8 @@ class CommandCSSetAutoOp : public Command
 		source.Reply(" ");
 		source.Reply(_("Enables or disables %s's autoop feature for a\n"
 			"channel. When disabled, users who join the channel will\n"
-			"not automatically gain any status from %s."), ChanServ->nick.c_str(),
-			ChanServ->nick.c_str(), this->name.c_str());
+			"not automatically gain any status from %s."), source.service->nick.c_str(),
+			source.service->nick.c_str(), this->name.c_str());
 		return true;
 	}
 };
@@ -652,10 +652,13 @@ class CommandCSSetPrivate : public Command
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Enables or disables the \002private\002 option for a channel.\n"
-				"When \002private\002 is set, a \002%s%s LIST\002 will not\n"
-				"include the channel in any lists."),
-				Config->StrictPrivmsg.c_str(), source.service->nick.c_str());
+		source.Reply(_("Enables or disables the \002private\002 option for a channel."));
+		
+		BotInfo *bi;
+		Anope::string cmd;
+		if (Command::FindCommandFromService("chanserv/list", bi, cmd))
+			source.Reply(_("When \002private\002 is set, the channel will not appear in\n"
+				"%s's %s command."), bi->nick.c_str(), cmd.c_str());
 		return true;
 	}
 };

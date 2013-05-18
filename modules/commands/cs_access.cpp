@@ -554,9 +554,13 @@ class CommandCSAccess : public Command
 				"The \002ACCESS CLEAR\002 command clears all entries of the\n"
 				"access list."));
 		source.Reply(" ");
-		source.Reply(_("\002User access levels\002 can be seen by using the\n"
-				"\002LEVELS\002 command; type \002%s%s HELP LEVELS\002 for\n"
-				"information."), source.service->nick.c_str(), Config->StrictPrivmsg.c_str(), source.service->nick.c_str());
+
+		BotInfo *bi;
+		Anope::string cmd;
+		if (Command::FindCommandFromService("chanserv/levels", bi, cmd))
+			source.Reply(_("\002User access levels\002 can be seen by using the\n"
+					"\002%s\002 command; type \002%s%s HELP LEVELS\002 for\n"
+					"information."), cmd.c_str(), Config->StrictPrivmsg.c_str(), bi->nick.c_str());
 		return true;
 	}
 };

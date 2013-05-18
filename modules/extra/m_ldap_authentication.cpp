@@ -235,7 +235,7 @@ class NSIdentifyLDAP : public Module
 
 		if (!email_attribute.empty())
 			/* Don't complain to users about how they need to update their email, we will do it for them */
-			Config->GetBlock("nickserv")->Set("forceemail", "false");
+			config->GetBlock("nickserv")->Set("forceemail", "false");
 	}
 
 	EventReturn OnPreCommand(CommandSource &source, Command *command, std::vector<Anope::string> &params) anope_override

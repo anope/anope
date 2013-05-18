@@ -524,12 +524,21 @@ class CommandCSXOP : public Command
 				"(unless SECUREOPS is off). However, any user on the\n"
 				"VOP list or above may use the \002%s LIST\002 command.\n"
 				" \n"), cmd.c_str(), cmd.c_str());
-		source.Reply(_("Alternative methods of modifying channel access lists are\n"
-				"available. See \002%s%s HELP ACCESS\002 for information\n"
-				"about the access list, and \002%s%s HELP FLAGS\002 for\n"
-				"information about the flags based system."),
-				Config->StrictPrivmsg.c_str(), source.service->nick.c_str(),
-				Config->StrictPrivmsg.c_str(), source.service->nick.c_str());
+		BotInfo *access_bi, *flags_bi;
+		Anope::string access_cmd, flags_cmd;
+		Command::FindCommandFromService("chanserv/access", access_bi, access_cmd);
+		Command::FindCommandFromService("chanserv/flags", flags_bi, access_cmd);
+		if (!access_cmd.empty() || !flags_cmd.empty())
+		{
+			source.Reply(_("Alternative methods of modifying channel access lists are\n"
+					"available. "));
+			if (!access_cmd.empty())
+				source.Reply(_("See \002%s%s HELP %s\002 for more information\n"
+						"about the access list."), Config->StrictPrivmsg.c_str(), access_bi->nick.c_str(), access_cmd.c_str());
+			if (!flags_cmd.empty())
+				source.Reply(_("See \002%s%s HELP %s\002 for more information\n"
+						"about the flags system."), Config->StrictPrivmsg.c_str(), flags_bi->nick.c_str(), flags_cmd.c_str());
+		}
 		return true;
 	}
 };

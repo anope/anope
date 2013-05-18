@@ -99,7 +99,7 @@ class MyXMLRPCEvent : public XMLRPCEvent
 				reply(out);
 
 				CommandSource source(user, NULL, na ? *na->nc : NULL, &reply, bi);
-				RunCommand(source, command);
+				Command::Run(source, command);
 
 				if (!out.empty())
 					request.reply("return", iface->Sanitize(out));

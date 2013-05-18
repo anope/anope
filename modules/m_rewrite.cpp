@@ -118,7 +118,7 @@ class RewriteCommand : public Command
 			source.service = BotInfo::Find(r->client);
 			if (!source.service)
 				return;
-			RunCommand(source, new_message);
+			Command::Run(source, new_message);
 		}
 		else
 			Log() << "m_rewrite: Unable to rewrite '" << source.command << (!params.empty() ? " " + params[0] : "") << "'";

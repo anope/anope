@@ -163,8 +163,21 @@ class CoreExport Command : public Service
 	 * @param subcommand The subcommand the user tried to use
 	 */
 	virtual void OnSyntaxError(CommandSource &source, const Anope::string &subcommand);
-};
 
-extern CoreExport void RunCommand(CommandSource &source, const Anope::string &message);
+	/** Runs a command
+	 * @param source The source of the command
+	 * @param message The full message to run, the command is at the beginning of the message
+	 */
+	static void Run(CommandSource &source, const Anope::string &message);
+
+	/** Looks up a command name from the service name.
+	 * Note that if the same command exists multiple places this will return the first one encountered
+	 * @param command_service The command service to lookup, eg, nickserv/register
+	 * @param bot If found, is set to the bot the command is on, eg NickServ
+	 * @param name If found, is set to the comand name, eg REGISTER
+	 * @return true if the given command service exists
+	 */
+	static bool FindCommandFromService(const Anope::string &command_service, BotInfo* &bi, Anope::string &name);
+};
 
 #endif // COMMANDS_H

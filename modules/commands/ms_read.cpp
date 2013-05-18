@@ -72,11 +72,20 @@ class MemoListCallback : public NumberList
 		Memo *m = mi->GetMemo(index);
 		if (!m)
 			return;
-
+			
 		if (ci)
-			source.Reply(_("Memo %d from %s (%s).  To delete, type: \002%s%s DEL %s %d\002"), index + 1, m->sender.c_str(), Anope::strftime(m->time).c_str(), Config->StrictPrivmsg.c_str(), MemoServ->nick.c_str(), ci->name.c_str(), index + 1);
+			source.Reply(_("Memo %d from %s (%s)."), index + 1, m->sender.c_str(), Anope::strftime(m->time).c_str());
 		else
-			source.Reply(_("Memo %d from %s (%s).  To delete, type: \002%s%s DEL %d\002"), index + 1, m->sender.c_str(), Anope::strftime(m->time).c_str(), Config->StrictPrivmsg.c_str(), MemoServ->nick.c_str(), index + 1);
+			source.Reply(_("Memo %d from %s (%s)."), index + 1, m->sender.c_str(), Anope::strftime(m->time).c_str());
+
+		BotInfo *bi;
+		Anope::string cmd;
+		if (Command::FindCommandFromService("memoserv/del", bi, cmd))
+			if (ci)
+				source.Reply(_("To delete, type: \002%s%s %s %s %d\002"), Config->StrictPrivmsg.c_str(), bi->nick.c_str(), cmd.c_str(), ci->name.c_str(), index + 1);
+			else
+				source.Reply(_("To delete, type: \002%s%s %s %d\002"), Config->StrictPrivmsg.c_str(), bi->nick.c_str(), cmd.c_str(), index + 1);
+
 		source.Reply("%s", m->text.c_str());
 		m->unread = false;
 

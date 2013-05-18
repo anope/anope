@@ -131,7 +131,7 @@ class CommandNSGroup : public Command
 		else if (na && *target->nc == *na->nc)
 			source.Reply(_("You are already a member of the group of \002%s\002."), target->nick.c_str());
 		else if (na && na->nc != u->Account())
-			source.Reply(NICK_IDENTIFY_REQUIRED, Config->StrictPrivmsg.c_str(), NickServ->nick.c_str());
+			source.Reply(NICK_IDENTIFY_REQUIRED);
 		else if (na && Config->GetModule(this->owner)->Get<bool>("nogroupchange"))
 			source.Reply(_("Your nick is already registered."));
 		else if (target->nc->aliases->size() >= Config->GetModule(this->owner)->Get<unsigned>("maxaliases") && !target->nc->IsServicesOper())

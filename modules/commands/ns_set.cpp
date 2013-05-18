@@ -98,7 +98,7 @@ class CommandNSSASet : public Command
 
 		source.Reply(_("Type \002%s%s HELP %s \037option\037\002 for more information\n"
 				"on a specific option. The options will be set on the given\n"
-				"\037nickname\037."), Config->StrictPrivmsg.c_str(), NickServ->nick.c_str(), this_name.c_str());
+				"\037nickname\037."), Config->StrictPrivmsg.c_str(), source.service->nick.c_str(), this_name.c_str());
 		return true;
 	}
 };
@@ -724,13 +724,13 @@ class CommandNSSetHide : public Command
 		{
 			Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to change hide " << param << " to " << arg << " for " << nc->display;
 			nc->ExtendMetadata(flag);
-			source.Reply(onmsg.c_str(), nc->display.c_str(), NickServ->nick.c_str());
+			source.Reply(onmsg.c_str(), nc->display.c_str(), source.service->nick.c_str());
 		}
 		else if (arg.equals_ci("OFF"))
 		{
 			Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to change hide " << param << " to " << arg << " for " << nc->display;
 			nc->Shrink(flag);
-			source.Reply(offmsg.c_str(), nc->display.c_str(), NickServ->nick.c_str());
+			source.Reply(offmsg.c_str(), nc->display.c_str(), source.service->nick.c_str());
 		}
 		else
 			this->OnSyntaxError(source, "HIDE");
@@ -753,7 +753,7 @@ class CommandNSSetHide : public Command
 				"user@host mask (\002USERMASK\002), your services access status\n"
 				"(\002STATUS\002) and  last quit message (\002QUIT\002).\n"
 				"The second parameter specifies whether the information should\n"
-				"be displayed (\002OFF\002) or hidden (\002ON\002)."), NickServ->nick.c_str());
+				"be displayed (\002OFF\002) or hidden (\002ON\002)."), source.service->nick.c_str());
 		return true;
 	}
 };
@@ -782,7 +782,7 @@ class CommandNSSASetHide : public CommandNSSetHide
 				"user@host mask (\002USERMASK\002), the services access status\n"
 				"(\002STATUS\002) and  last quit message (\002QUIT\002).\n"
 				"The second parameter specifies whether the information should\n"
-				"be displayed (\002OFF\002) or hidden (\002ON\002)."), NickServ->nick.c_str());
+				"be displayed (\002OFF\002) or hidden (\002ON\002)."), source.service->nick.c_str());
 		return true;
 	}
 };
@@ -880,7 +880,7 @@ class CommandNSSetKill : public Command
 				"\002IMMED\002, user's nick will be changed immediately \037without\037 being\n"
 				"warned first or given a chance to change their nick; please\n"
 				"do not use this option unless necessary. Also, your\n"
-				"network's administrators may have disabled this option."), NickServ->nick.c_str());
+				"network's administrators may have disabled this option."), source.service->nick.c_str());
 		return true;
 	}
 };
@@ -914,7 +914,7 @@ class CommandNSSASetKill : public CommandNSSetKill
 				"\002IMMED\002, the user's nick will be changed immediately \037without\037 being\n"
 				"warned first or given a chance to change their nick; please\n"
 				"do not use this option unless necessary. Also, your\n"
-				"network's administrators may have disabled this option."), NickServ->nick.c_str());
+				"network's administrators may have disabled this option."), source.service->nick.c_str());
 		return true;
 	}
 };
@@ -1172,7 +1172,7 @@ class CommandNSSetPrivate : public Command
 				"nickname lists generated with %s's \002LIST\002 command.\n"
 				"(However, anyone who knows your nickname can still get\n"
 				"information on it using the \002INFO\002 command.)"),
-				NickServ->nick.c_str(), NickServ->nick.c_str());
+				source.service->nick.c_str(), source.service->nick.c_str());
 		return true;
 	}
 };
@@ -1200,7 +1200,7 @@ class CommandNSSASetPrivate : public CommandNSSetPrivate
 				"nickname lists generated with %s's \002LIST\002 command.\n"
 				"(However, anyone who knows the nickname can still get\n"
 				"information on it using the \002INFO\002 command.)"),
-				NickServ->nick.c_str(), NickServ->nick.c_str());
+				source.service->nick.c_str(), source.service->nick.c_str());
 		return true;
 	}
 };
@@ -1260,7 +1260,7 @@ class CommandNSSetSecure : public Command
 				"regardless of whether your address is on the access\n"
 				"list. However, if you are on the access list, %s\n"
 				"will not auto-kill you regardless of the setting of the\n"
-				"\002KILL\002 option."), NickServ->nick.c_str(), NickServ->nick.c_str());
+				"\002KILL\002 option."), source.service->nick.c_str(), source.service->nick.c_str());
 		return true;
 	}
 };
@@ -1289,7 +1289,7 @@ class CommandNSSASetSecure : public CommandNSSetSecure
 				"regardless of whether your address is on the access\n"
 				"list. However, if you are on the access list, %s\n"
 				"will not auto-kill you regardless of the setting of the\n"
-				"\002KILL\002 option."), NickServ->nick.c_str(), NickServ->nick.c_str());
+				"\002KILL\002 option."), source.service->nick.c_str(), source.service->nick.c_str());
 		return true;
 	}
 };

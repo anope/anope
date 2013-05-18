@@ -194,7 +194,7 @@ void Command::OnSyntaxError(CommandSource &source, const Anope::string &subcomma
 		source.Reply(MORE_INFO, Config->StrictPrivmsg.c_str(), source.service->nick.c_str(), source.command.c_str());
 }
 
-void RunCommand(CommandSource &source, const Anope::string &message)
+void Command::Run(CommandSource &source, const Anope::string &message)
 {
 	std::vector<Anope::string> params;
 	spacesepstream(message).GetTokens(params);
@@ -280,5 +280,30 @@ void RunCommand(CommandSource &source, const Anope::string &message)
 
 	c->Execute(source, params);
 	FOREACH_MOD(I_OnPostCommand, OnPostCommand(source, c, params));
+}
+
+bool Command::FindCommandFromService(const Anope::string &command_service, BotInfo* &bot, Anope::string &name)
+{
+	bot = NULL;
+
+	for (botinfo_map::iterator it = BotListByNick->begin(), it_end = BotListByNick->end(); it != it_end; ++it)
+	{
+		BotInfo *bi = it->second;
+
+		for (CommandInfo::map::const_iterator cit = bi->commands.begin(), cit_end = bi->commands.end(); cit != cit_end; ++cit)
+		{
+			const Anope::string &c_name = cit->first;
+			const CommandInfo &info = cit->second;
+
+			if (info.name != command_service)
+				continue;
+
+			bot = bi;
+			name = c_name;
+			return true;
+		}
+	}
+	
+	return false;
 }
 

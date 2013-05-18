@@ -103,14 +103,16 @@ class CommandCSRegister : public Command
 			"\"founder\" of the channel. The channel founder is allowed\n"
 			"to change all of the channel settings for the channel;\n"
 			"%s will also automatically give the founder\n"
-			"channel-operator privileges when s/he enters the channel.\n"
-			"See the \002ACCESS\002 command (\002%s%s HELP ACCESS\002) for\n"
-			"information on giving a subset of these privileges to\n"
-			"other channel users.\n"
-			" \n"
+			"channel-operator privileges when s/he enters the channel."));
+		BotInfo *bi;
+		Anope::string cmd;
+		if (Command::FindCommandFromService("chanserv/access", bi, cmd))
+			source.Reply(_("See the \002%s002 command (\002%s%s HELP ACCESS\002) for\n"
+				"information on giving a subset of these privileges to\n"
+				"other channel users.\n"), cmd.c_str(), Config->StrictPrivmsg.c_str(), bi->nick.c_str());
+		source.Reply(_(" \n"
 			"NOTICE: In order to register a channel, you must have\n"
-			"first registered your nickname."),
-			source.service->nick.c_str(), source.service->nick.c_str(), Config->StrictPrivmsg.c_str(), source.service->nick.c_str());
+			"first registered your nickname."));
 		return true;
 	}
 };

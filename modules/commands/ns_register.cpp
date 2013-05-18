@@ -220,7 +220,10 @@ class CommandNSRegister : public Command
 				if (SendRegmail(u, na, source.service))
 				{
 					time_t unconfirmed_expire = Config->GetModule("nickserv")->Get<time_t>("unconfirmedexpire", "1d");
-					source.Reply(_("A passcode has been sent to %s, please type \002%s%s CONFIRM <passcode>\002 to confirm your email address."), email.c_str(), Config->StrictPrivmsg.c_str(), NickServ->nick.c_str());
+					BotInfo *bi;
+					Anope::string cmd;
+					if (Command::FindCommandFromService("nickserv/confirm", bi, cmd))
+						source.Reply(_("A passcode has been sent to %s, please type \002%s%s %s <passcode>\002 to confirm your email address."), email.c_str(), Config->StrictPrivmsg.c_str(), bi->nick.c_str(), cmd.c_str());
 					source.Reply(_("If you do not confirm your email address within %s your account will expire."), Anope::Duration(unconfirmed_expire).c_str());
 				}
 			}

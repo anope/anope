@@ -318,63 +318,63 @@ Conf::Conf() : Block("")
 			bi = new BotInfo(nick, user, host, gecos, modes);
 		bi->conf = true;
 
-	        std::vector<Anope::string> oldchannels = bi->botchannels;
-	        bi->botchannels.clear();
-	        commasepstream sep(channels);
+		std::vector<Anope::string> oldchannels = bi->botchannels;
+		bi->botchannels.clear();
+		commasepstream sep(channels);
 		for (Anope::string token; sep.GetToken(token);)
-	        {
-	                bi->botchannels.push_back(token);
-	                size_t ch = token.find('#');
-        	        Anope::string chname, want_modes;
-	                if (ch == Anope::string::npos)
-	                        chname = token;
-	                else
-	                {
-	                        want_modes = token.substr(0, ch);
-	                        chname = token.substr(ch);
-	                }
-	                bi->Join(chname);
-	                Channel *c = Channel::Find(chname);
-	                if (!c)
-	                        continue; // Can't happen
+		{
+			bi->botchannels.push_back(token);
+			size_t ch = token.find('#');
+			Anope::string chname, want_modes;
+			if (ch == Anope::string::npos)
+				chname = token;
+			else
+			{
+				want_modes = token.substr(0, ch);
+				chname = token.substr(ch);
+			}
+			bi->Join(chname);
+			Channel *c = Channel::Find(chname);
+			if (!c)
+				continue; // Can't happen
 
-	                /* Remove all existing modes */
-	                ChanUserContainer *cu = c->FindUser(bi);
-	                if (cu != NULL)
-	                        for (size_t j = 0; j < cu->status.Modes().length(); ++j)
-	                                c->RemoveMode(bi, ModeManager::FindChannelModeByChar(cu->status.Modes()[j]), bi->GetUID());
-	                /* Set the new modes */
-	                for (unsigned j = 0; j < want_modes.length(); ++j)
-	                {
-	                        ChannelMode *cm = ModeManager::FindChannelModeByChar(want_modes[j]);
-	                        if (cm == NULL)
-	                                cm = ModeManager::FindChannelModeByChar(ModeManager::GetStatusChar(want_modes[j]));
-	                        if (cm && cm->type == MODE_STATUS)
-	                                c->SetMode(bi, cm, bi->GetUID());
-	                }
-	        }
-	        for (unsigned k = 0; k < oldchannels.size(); ++k)
-	        {
-	                size_t ch = oldchannels[k].find('#');
-	                Anope::string chname = oldchannels[k].substr(ch != Anope::string::npos ? ch : 0);
+			/* Remove all existing modes */
+			ChanUserContainer *cu = c->FindUser(bi);
+			if (cu != NULL)
+				for (size_t j = 0; j < cu->status.Modes().length(); ++j)
+					c->RemoveMode(bi, ModeManager::FindChannelModeByChar(cu->status.Modes()[j]), bi->GetUID());
+			/* Set the new modes */
+			for (unsigned j = 0; j < want_modes.length(); ++j)
+			{
+				ChannelMode *cm = ModeManager::FindChannelModeByChar(want_modes[j]);
+				if (cm == NULL)
+					cm = ModeManager::FindChannelModeByChar(ModeManager::GetStatusChar(want_modes[j]));
+				if (cm && cm->type == MODE_STATUS)
+					c->SetMode(bi, cm, bi->GetUID());
+			}
+		}
+		for (unsigned k = 0; k < oldchannels.size(); ++k)
+		{
+			size_t ch = oldchannels[k].find('#');
+			Anope::string chname = oldchannels[k].substr(ch != Anope::string::npos ? ch : 0);
 
-	                bool found = false;
-	                for (unsigned j = 0; j < bi->botchannels.size(); ++j)
-	                {
-	                        ch = bi->botchannels[j].find('#');
-	                        Anope::string ochname = bi->botchannels[j].substr(ch != Anope::string::npos ? ch : 0);
+			bool found = false;
+			for (unsigned j = 0; j < bi->botchannels.size(); ++j)
+			{
+				ch = bi->botchannels[j].find('#');
+				Anope::string ochname = bi->botchannels[j].substr(ch != Anope::string::npos ? ch : 0);
 
-	                        if (chname.equals_ci(ochname))
-	                                found = true;
-	                }
+				if (chname.equals_ci(ochname))
+					found = true;
+			}
 
-	                if (found)
-	                        continue;
+			if (found)
+				continue;
 
-	                Channel *c = Channel::Find(chname);
-	                if (c)
-	                        bi->Part(c);
-        	}
+			Channel *c = Channel::Find(chname);
+			if (c)
+				bi->Part(c);
+		}
 	}
 
 	for (int i = 0; i < this->CountBlock("log"); ++i)

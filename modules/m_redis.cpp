@@ -68,11 +68,11 @@ class Transaction : public Interface
 			if (interfaces.empty())
 				break;
 
-			Interface *i = interfaces.front();
+			Interface *inter = interfaces.front();
 			interfaces.pop_front();
 
-			if (i)
-				i->OnResult(reply);
+			if (inter)
+				inter->OnResult(reply);
 		}
 	}
 };

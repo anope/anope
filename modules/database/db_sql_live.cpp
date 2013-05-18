@@ -188,7 +188,7 @@ class DBMySQL : public Module, public Pipe
 			if (res.Get(i, "timestamp").empty())
 			{
 				clear_null = true;
-				std::map<unsigned int, Serializable *>::iterator it = obj->objects.find(id);
+				std::map<uint64_t, Serializable *>::iterator it = obj->objects.find(id);
 				if (it != obj->objects.end())
 					delete it->second; // This also removes this object from the map
 			}
@@ -200,7 +200,7 @@ class DBMySQL : public Module, public Pipe
 					data[it->first] << it->second;
 
 				Serializable *s = NULL;
-				std::map<unsigned int, Serializable *>::iterator it = obj->objects.find(id);
+				std::map<uint64_t, Serializable *>::iterator it = obj->objects.find(id);
 				if (it != obj->objects.end())
 					s = it->second;
 

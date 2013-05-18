@@ -17,10 +17,6 @@
 
 #include <errno.h>
 
-ConnectionSocket::ConnectionSocket() : Socket()
-{
-}
-
 void ConnectionSocket::Connect(const Anope::string &TargetHost, int Port)
 {
 	this->io->Connect(this, TargetHost, Port);

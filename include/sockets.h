@@ -388,10 +388,6 @@ class CoreExport ConnectionSocket : public virtual Socket
 	/* Sockaddrs for connection ip/port */
 	sockaddrs conaddr;
 
-	/** Constructor
-	 */
-	ConnectionSocket();
-
 	/** Connect the socket
 	 * @param TargetHost The target host to connect to
 	 * @param Port The target port to connect to

@@ -80,7 +80,10 @@ class CoreExport Serializable : public virtual Base
 	virtual ~Serializable();
 
  	/* Unique ID (per type, not globally) for this object */
-	unsigned int id;
+	uint64_t id;
+
+	/* Only used by redis, to ignore updates */
+	unsigned short redis_ignore;
 
 	/** Marks the object as potentially being updated "soon".
 	 */
@@ -129,7 +132,7 @@ class CoreExport Serialize::Type
 
  public:
  	/* Map of Serializable::id to Serializable objects */
-	std::map<unsigned int, Serializable *> objects;
+	std::map<uint64_t, Serializable *> objects;
 
 	/** Creates a new serializable type
 	 * @param n Type name

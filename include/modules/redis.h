@@ -1,0 +1,62 @@
+/*
+ *
+ * (C) 2003-2013 Anope Team
+ * Contact us at team@anope.org
+ *
+ * Please read COPYING and README for further details.
+ *
+ */
+
+namespace Redis
+{
+	struct Reply
+	{
+		enum Type
+		{
+			NOT_PARSED,
+			ERROR,
+			OK,
+			INT,
+			BULK,
+			MULTI_BULK
+		}
+		type;
+
+		Reply() { Clear(); }
+		void Clear() { type = NOT_PARSED; i = 0; bulk.clear(); multi_bulk_size = 0; multi_bulk.clear(); }
+
+		int64_t i;
+		Anope::string bulk;
+		int multi_bulk_size;
+		std::deque<Reply> multi_bulk;
+	};
+
+	class Interface
+	{
+	 public:
+		Module *owner;
+
+		Interface(Module *m) : owner(m) { }
+
+		virtual void OnResult(const Reply &r) = 0;
+		virtual void OnError(const Anope::string &error) { Log(owner) << error; }
+	};
+
+	class Provider : public Service
+	{
+	 public:
+		Provider(Module *c, const Anope::string &n) : Service(c, "Redis::Provider", n) { }
+
+		virtual void SendCommand(Interface *i, const std::vector<Anope::string> &cmds) = 0;
+		virtual void SendCommand(Interface *i, const Anope::string &str) = 0;
+
+		virtual bool BlockAndProcess() = 0;
+
+		virtual void Subscribe(Interface *i, const Anope::string &pattern) = 0;
+		virtual void Unsubscribe(const Anope::string &pattern) = 0;
+
+		virtual void StartTransaction() = 0;
+		virtual void CommitTransaction() = 0;
+	};
+}
+

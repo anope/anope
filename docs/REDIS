@@ -1,0 +1,160 @@
+Starting in Anope 1.9.9, Anope has Redis database support (http://redis.io/).
+This document explains the data structure used by Anope, and explains how
+keyspace notification works.
+
+This is not a tutorial on how to use Redis, see http://redis.io/documentation
+for that.
+
+Table of Contents
+-----------------
+1) Data structure
+2) Keyspace notifications
+3) Examples of modfying, deleting, and creating objects
+
+1) Data structure
+
+    There are 4 key namespaces in Anope, they are:
+    
+        id -    The keys in id are used to atomically create object ids for new
+                objects. For example, if I were to create a new BotInfo I would first:
+
+                redis 127.0.0.1:6379> INCR id:BotInfo
+
+                To get the object ID of the new object.
+
+        ids -   The keys in ids contain a set of all object ids of the given type.
+                For example:
+
+                redis 127.0.0.1:6379> SMEMBERS ids:BotInfo
+
+                Returns "1", "2", "3", "4", "5", "6", "7", "8" because I have 8 bots that
+                have IDs 1, 2, 3, 4, 5, 6, 7, and 8, respectively.
+
+        hash -  The keys in hash are the actual objects, stored as hashes. For
+                example, if I had just looked up all BotInfo ids and wanted to iterate
+                over all of them, I woulld start by:
+
+                redis 127.0.0.1:6379> HGETALL hash:BotInfo:1
+
+                Which gets all keys and values from the hash of type BotInfo with id 1.
+                This may return:
+
+                "nick" -> "BotServ"
+                "user" -> "services"
+                "host" -> "services.anope.org"
+                "created" -> "1368704765"
+
+        value - The keys in value only exist to aid looking up object IDs. They
+                are sets of object IDs and are used to map key+value pairs to objects.
+                For example:
+
+                redis 127.0.0.1:6379> SMEMBERS value:NickAlias:nick:Adam
+
+                Returns a set of object ids of NickAlias objects that have the key
+                'nick' set to the value 'Adam' in its hash. Clearly this can only
+                ever contain at most one object, since it is not possible to have
+                more than one registered nick with the same name, but other keys
+                will contain more than one, such as:
+
+                redis 127.0.0.1:6379> SMEMBERS value:NickCore:email:adam@anope.org
+
+                Which would return all accounts with the email "adam@anope.org".
+
+                redis 127.0.0.1:6379> SMEMBERS value:ChanAccess:mask:Adam
+
+                Which would return all access entries set on the account "Adam".
+
+                Behavior similar to SQL's AND, can be achieved using the
+                SINTER command, which does set intersection on one or more sets.
+
+2) Keyspace notifications
+
+    Redis 2.7 (unstable) and 2.8 (stable) and newer support keyspace notifications
+    (http://redis.io/topics/notifications). This allows Redis to notify Anope of
+    any external changes to objects in the database. Once notified, Anope will
+    immediately update the object. Otherwise, Anope keeps all objects in memory
+    and will not regularly read from the databaes once started.
+
+    You can use this to modify objects in Redis and have them immediately reflected
+    back into Anope. Additionally you can use this feature to run multiple Anope
+    instances simultaneously from the same database (see also, Redis database
+    replication).
+
+    To use keyspace notifications you MUST execute
+
+    redis 127.0.0.1:6379> CONFIG SET notify-keyspace-events KA
+    OK
+
+    or set notify-keyspace-events in redis.conf properly. Anope always executes
+    CONFIG SET when it first connects.
+
+    If you do not enable keyspace events properly Anope will be UNABLE to see any
+    object modifications you do.
+
+    The key space ids and value are managed entirely by Anope, you do
+    not (and should not) modify them. Once you modify the object (hash), Anope will
+    update them for you to correctly refelect any changes made to the object.
+
+    Finally, always use atomic operations. If you are inserting a new object with
+    multiple commands, or inserting multiple objects at once, specifically if the
+    objects depend on each other, you MUST use a transaction.
+
+3) Examples of modfying, deleting, and creating objects
+
+   These examples will ONLY work if you meet the criteria in section 2.
+
+    If I want to change the email account 'Adam' to 'Adam@anope.org', I would execute the following:
+
+        redis 127.0.0.1:6379> SMEMBERS value:NickCore:display:Adam
+
+        Which returns a value of "1", which is the object id I want to modify.
+        Now to change the email:
+
+        redis 127.0.0.1:6379> HSET hash:NickCore:1 email Adam@anope.org
+
+        You can now see this in NickServ's INFO command:
+        -NickServ-   Email address: Adam@anope.org
+
+   If I want to drop the account "Adam", I would execute the following:
+
+        redis 127.0.0.1:6379> SMEMBERS value:NickCore:display:Adam
+
+        Which returns a value of "1". I would then check:
+
+        redis 127.0.0.1:6379> SMEMBERS value:NickAlias:nc:Adam
+
+        To see what nicknames depend on this account to exist, as I will
+        have to remove those too. This returns the values "2", and "3".
+
+        Finally, I can drop the nick using a transaction via:
+
+        redis 127.0.0.1:6379> MULTI
+        OK
+        redis 127.0.0.1:6379> DEL hash:NickAlias:2
+        QUEUED
+        redis 127.0.0.1:6379> DEL hash:NickAlias:3
+        QUEUED
+        redis 127.0.0.1:6379> DEL hash:NickCore:1
+        QUEUED
+        redis 127.0.0.1:6379> EXEC
+
+        Or alternatively simply:
+
+        redis 127.0.0.1:6379> DEL hash:NickAlias:2 hash:NickAlias:3 hash:NickCore:1
+
+  If I wanted to create a BotServ bot, I would execute the following:
+
+        redis 127.0.0.1:6379> INCR id:BotInfo
+
+        Which returns a new object ID for me, in this example it will be "8".
+        Now I can create the object:
+
+        HMSET hash:BotInfo:8 nick redis user redis host services.anope.org realname "Services for IRC Networks"
+
+        Note if you are using HSET instead of HMSET you will need to use a transaction, as shown in the above example.
+        If you are watching your services logs you will immediatly see:
+
+        USERS: redis!redis@services.anope.org (Services for IRC Networks) connected to the network (services.anope.org)
+
+        And the bot redis will be in BotServ's bot list.
+        Notice how ids:BotInfo and the value keys are updated automatically.

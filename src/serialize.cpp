@@ -44,7 +44,7 @@ void Serialize::CheckTypes()
 	}
 }
 
-Serializable::Serializable(const Anope::string &serialize_type) : last_commit(0), last_commit_time(0), id(0)
+Serializable::Serializable(const Anope::string &serialize_type) : last_commit(0), last_commit_time(0), id(0), redis_ignore(0)
 {
 	if (SerializableItems == NULL)
 		SerializableItems = new std::list<Serializable *>();
@@ -58,7 +58,7 @@ Serializable::Serializable(const Anope::string &serialize_type) : last_commit(0)
 	FOREACH_MOD(I_OnSerializableConstruct, OnSerializableConstruct(this));
 }
 
-Serializable::Serializable(const Serializable &other) : last_commit(0), last_commit_time(0), id(0)
+Serializable::Serializable(const Serializable &other) : last_commit(0), last_commit_time(0), id(0), redis_ignore(0)
 {
 	SerializableItems->push_back(this);
 	this->s_iter = SerializableItems->end();

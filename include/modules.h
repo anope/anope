@@ -368,7 +368,7 @@ class CoreExport Module : public Extensible
 	virtual EventReturn OnSaveDatabase() { return EVENT_CONTINUE; }
 
 	/** Called when the databases are loaded
-	 * @return EVENT_CONTINUE to let other modules continue saving, EVENT_STOP to stop
+	 * @return EVENT_CONTINUE to let other modules continue loading, EVENT_STOP to stop
 	 */
 	virtual EventReturn OnLoadDatabase() { return EVENT_CONTINUE; }
 

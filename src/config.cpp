@@ -338,6 +338,8 @@ Conf::Conf() : Block("")
 			if (!c)
 				continue; // Can't happen
 
+			c->Extend("BOTCHANNEL");
+
 			/* Remove all existing modes */
 			ChanUserContainer *cu = c->FindUser(bi);
 			if (cu != NULL)
@@ -373,7 +375,10 @@ Conf::Conf() : Block("")
 
 			Channel *c = Channel::Find(chname);
 			if (c)
+			{
+				c->Shrink("BOTCHANNEL");
 				bi->Part(c);
+			}
 		}
 	}
 

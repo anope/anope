@@ -31,7 +31,7 @@ Anope Mutli Language Support
 
 3) Using langages with modules
 
-    Module authors can easially add the ability to have their modules translated by adding _() around the strings they
+    Module authors can easily add the ability to have their modules translated by adding _() around the strings they
     want translated (messages to the user, etc).
 
     If you want to translate a module someone has made, first generate a .pot file if there isn't one already using

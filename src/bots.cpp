@@ -146,7 +146,6 @@ void BotInfo::Assign(User *u, ChannelInfo *ci)
 	ci->bi = this;
 	this->channels->insert(ci);
 
-	ChannelStatus status;
 	FOREACH_MOD(I_OnBotAssign, OnBotAssign(u, ci, this));
 }
 

@@ -504,11 +504,14 @@ class CommandCSSetPersist : public Command
 					bool created;
 					Channel *c = Channel::FindOrCreate(ci->name, created);
 					if (ci->bi)
-						ci->bi->Join(c);
+					{
+						ChannelStatus status(Config->GetModule("botserv")->Get<const Anope::string>("botmodes"));
+						ci->bi->Join(c, &status);
+					}
 				}
 
 				/* No botserv bot, no channel mode, give them ChanServ.
-				 * Yes, this works fine with no Config->BotServ.
+				 * Yes, this works fine with no BotServ.
 				 */
 				if (!ci->bi && !cm)
 				{
@@ -519,7 +522,10 @@ class CommandCSSetPersist : public Command
 					}
 					ChanServ->Assign(NULL, ci);
 					if (!ci->c->FindUser(ChanServ))
-						ChanServ->Join(ci->c);
+					{
+						ChannelStatus status(Config->GetModule("botserv")->Get<const Anope::string>("botmodes"));
+						ChanServ->Join(ci->c, &status);
+					}
 				}
 
 				/* Set the perm mode */

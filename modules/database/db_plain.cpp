@@ -607,13 +607,13 @@ class DBPlain : public Module
 		if (tm->tm_mday != LastDay)
 		{
 			LastDay = tm->tm_mday;
-			Anope::string newname = BackupFile + "." + stringify(tm->tm_year) + stringify(tm->tm_mon) + stringify(tm->tm_mday);
+			Anope::string newname = BackupFile + "-" + stringify(tm->tm_year + 1900) + Anope::printf("-%02i-", tm->tm_mon + 1) + Anope::printf("%02i", tm->tm_mday);
 
 			/* Backup already exists */
 			if (IsFile(newname))
 				return;
 
-			Log(LOG_DEBUG) << "db_plain: Attemping to rename " << DatabaseFile << " to " << newname;
+			Log(LOG_DEBUG) << "db_plain: Attempting to rename " << DatabaseFile << " to " << newname;
 			if (rename(DatabaseFile.c_str(), newname.c_str()))
 			{
 				Log() << "Unable to back up database!";

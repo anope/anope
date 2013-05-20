@@ -133,13 +133,13 @@ class DBFlatFile : public Module, public Pipe
 			for (std::set<Anope::string>::const_iterator it = dbs.begin(), it_end = dbs.end(); it != it_end; ++it)
 			{
 				const Anope::string &oldname = Anope::DataDir + "/" + *it;
-				Anope::string newname = Anope::DataDir + "/backups/" + *it + "." + stringify(tm->tm_year) + "." + stringify(tm->tm_mon) + "." + stringify(tm->tm_mday);
+				Anope::string newname = Anope::DataDir + "/backups/" + *it + "-" + stringify(tm->tm_year + 1900) + Anope::printf("-%02i-", tm->tm_mon + 1) + Anope::printf("%02i", tm->tm_mday);
 
 				/* Backup already exists or no database to backup */
 				if (Anope::IsFile(newname) || !Anope::IsFile(oldname))
 					continue;
 
-				Log(LOG_DEBUG) << "db_flatfile: Attemping to rename " << *it << " to " << newname;
+				Log(LOG_DEBUG) << "db_flatfile: Attempting to rename " << *it << " to " << newname;
 				if (rename(oldname.c_str(), newname.c_str()))
 				{
 					Log(this) << "Unable to back up database " << *it << "!";

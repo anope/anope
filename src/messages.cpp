@@ -75,7 +75,8 @@ void Join::Run(MessageSource &source, const std::vector<Anope::string> &params)
 		{
 			for (User::ChanUserList::iterator it = user->chans.begin(), it_end = user->chans.end(); it != it_end; )
 			{
-				ChanUserContainer *cc = it->second++;
+				ChanUserContainer *cc = it->second;
+				++it;
 
 				Anope::string channame = cc->chan->name;
 				FOREACH_MOD(I_OnPrePartChannel, OnPrePartChannel(user, cc->chan));

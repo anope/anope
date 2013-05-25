@@ -30,7 +30,7 @@ using namespace Configuration;
 File ServicesConf("services.conf", false); // Services configuration file name
 Conf *Config = NULL;
 
-Block::Block(const Anope::string &n) : name(n)
+Block::Block(const Anope::string &n) : name(n), linenum(-1)
 {
 }
 
@@ -769,7 +769,9 @@ void Conf::LoadConf(File &file)
 
 				Block *b = block_stack.empty() ? this : block_stack.top();
 				block_map::iterator it = b->blocks.insert(std::make_pair(wordbuffer, Configuration::Block(wordbuffer)));
-				block_stack.push(&it->second);
+				b = &it->second;
+				b->linenum = linenumber;
+				block_stack.push(b);
 
 				in_word = false;
 				wordbuffer.clear();
@@ -859,22 +861,16 @@ void Conf::LoadConf(File &file)
 			}
 		}
 	}
-	if (in_comment)
-	{
-		file.Close();
-		throw ConfigException("Unterminated multiline comment at end of file: " + file.GetName());
-	}
-	if (in_quote)
-	{
-		file.Close();
-		throw ConfigException("Unterminated quote at end of file: " + file.GetName());
-	}
-	if (!itemname.empty() || !wordbuffer.empty())
-	{
-		file.Close();
-		throw ConfigException("Unexpected garbage at end of file: " + file.GetName());
-	}
 
 	file.Close();
+
+	if (in_comment)
+		throw ConfigException("Unterminated multiline comment at end of file: " + file.GetName());
+	if (in_quote)
+		throw ConfigException("Unterminated quote at end of file: " + file.GetName());
+	if (!itemname.empty() || !wordbuffer.empty())
+		throw ConfigException("Unexpected garbage at end of file: " + file.GetName());
+	if (!block_stack.empty())
+		throw ConfigException("Unterminated block at end of file: " + file.GetName() + ". Block was opened on line " + stringify(block_stack.top()->linenum));
 }
 

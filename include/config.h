@@ -33,6 +33,7 @@ namespace Configuration
 		Anope::string name;
 		item_map items;
 		block_map blocks;
+		int linenum;
 
 	 public:
 	 	Block(const Anope::string &);

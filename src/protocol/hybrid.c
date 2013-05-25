@@ -17,7 +17,7 @@
 #include "version.h"
 
 IRCDVar myIrcd[] = {
-    {"Hybrid 8.0.*",            /* ircd name */
+    {"Hybrid 8.1.*",            /* ircd name */
      "+o",                      /* nickserv mode */
      "+o",                      /* chanserv mode */
      "+o",                      /* memoserv mode */
@@ -204,7 +204,7 @@ void hybrid_set_umode(User *user, int ac, char **av)
             break;
         case 'r':
             if (add && !nick_identified(user)) {
-                send_cmd(ServerName, "SVSMODE %s -r", user->nick);
+                common_svsmode(user, "-r", NULL);
                 user->mode &= ~UMODE_r;
             }
             break;
@@ -358,7 +358,7 @@ CBMode myCbmodes[128] = {
     {0},                        /* J */
     {0},                        /* K */
     {0},                        /* L */
-    {0},                        /* M */
+    {CMODE_M, 0, NULL, NULL},   /* M */
     {0},                        /* N */
     {CMODE_O, CBM_NO_USER_MLOCK, NULL, NULL},   /* O */
     {0},                        /* P */
@@ -375,7 +375,7 @@ CBMode myCbmodes[128] = {
     {0}, {0}, {0}, {0}, {0}, {0},
     {0},                        /* a */
     {0},                        /* b */
-    {0},                        /* c */
+    {CMODE_c, 0, NULL, NULL},   /* c */
     {0},                        /* d */
     {0},                        /* e */
     {0},                        /* f */
@@ -403,6 +403,7 @@ CBMode myCbmodes[128] = {
 };
 
 CBModeInfo myCbmodeinfos[] = {
+    {'c', CMODE_c, 0, NULL, NULL},
     {'i', CMODE_i, 0, NULL, NULL},
     {'k', CMODE_k, 0, get_key, cs_get_key},
     {'l', CMODE_l, CBM_MINUS_NO_ARG, get_limit, cs_get_limit},
@@ -412,6 +413,7 @@ CBModeInfo myCbmodeinfos[] = {
     {'r', CMODE_r, 0, NULL, NULL},
     {'s', CMODE_s, 0, NULL, NULL},
     {'t', CMODE_t, 0, NULL, NULL},
+    {'M', CMODE_M, 0, NULL, NULL},
     {'O', CMODE_O, 0, NULL, NULL},
     {'R', CMODE_R, 0, NULL, NULL},
     {'S', CMODE_S, 0, NULL, NULL},

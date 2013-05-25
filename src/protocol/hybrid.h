@@ -41,8 +41,10 @@
 #define CMODE_l 0x00000080   /* Limit the number of users in a channel */
 #define CMODE_R 0x00000100   /* Only identified users can join */
 #define CMODE_r 0x00000200   /* Set for all registered channels */
+#define CMODE_c 0x00000400   /* Control codes cannot be sent to a channel */
 #define CMODE_O 0x00000800   /* Oper only channel, as of hybrid7.3 */
 #define CMODE_S 0x00001000   /* SSL only channel, as of hybrid7.3 */
+#define CMODE_M 0x00002000   /* Non-regged nicks can't send messages */
 
 
 #define DEFAULT_MLOCK CMODE_n|CMODE_r|CMODE_t

@@ -1,6 +1,9 @@
 Anope Version 1.8 - GIT
 -------------------
 
+Provided by Michael Wobst - 2013
+05/25  U Update Hybrid protocol module to support Hybrid 8.1
+
 Anope Version 1.8.8
 -------------------
 01/29  F Fixed user modes on BotServ bots on Unreal3.2.10                [#1474]

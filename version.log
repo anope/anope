@@ -8,13 +8,14 @@ VERSION_MAJOR="1"
 VERSION_MINOR="8"
 VERSION_PATCH="9"
 VERSION_EXTRA="-git"
-VERSION_BUILD="3114"
+VERSION_BUILD="3115"
 
 # Changes since 1.8.8 Release
 
 
 
 # Leading up to 1.8.8 Release
+#Revision 3115 - Update Hybrid protocol module for Hybrid 8.1
 #Revision 3110 - Added japanese language support, patch provided by Ryuunosuke Ayanokouzi
 #Revision 3109 - Do not allow invalid nicknames to be forbidden in ns_forbid
 #Revision 3108 - Bug #1474 - Fixed setting umodes on BotServ bots on Unreal3.2.10

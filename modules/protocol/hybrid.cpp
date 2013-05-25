@@ -17,7 +17,7 @@ static Anope::string UplinkSID;
 class HybridProto : public IRCDProto
 {
   public:
-	HybridProto(Module *creator) : IRCDProto(creator, "Hybrid 8.0.0")
+	HybridProto(Module *creator) : IRCDProto(creator, "Hybrid 8.1")
 	{
 		DefaultPseudoclientModes = "+oi";
 		CanSVSNick = true;
@@ -41,12 +41,12 @@ class HybridProto : public IRCDProto
 
 	void SendGlobopsInternal(const BotInfo *source, const Anope::string &buf) anope_override
 	{
-		UplinkSocket::Message(source) << "OPERWALL :" << buf;
+		UplinkSocket::Message(source) << "GLOBOPS :" << buf;
 	}
 
 	void SendSQLine(User *, const XLine *x) anope_override
 	{
-		UplinkSocket::Message(OperServ) << "ENCAP * RESV " << (x->expires ? x->expires - Anope::CurTime : 0) << " " << x->mask << " 0 :" << x->reason;
+		UplinkSocket::Message(OperServ) << "RESV " << (x->expires ? x->expires - Anope::CurTime : 0) << " " << x->mask << " 0 :" << x->reason;
 	}
 
 	void SendSGLineDel(const XLine *x) anope_override
@@ -557,11 +557,15 @@ class ProtoHybrid : public Module
 	{
 		/* Add user modes */
 		ModeManager::AddUserMode(new UserMode("ADMIN", 'a'));
+		ModeManager::AddUserMode(new UserMode("CALLERID", 'g'));
 		ModeManager::AddUserMode(new UserMode("INVIS", 'i'));
+		ModeManager::AddUserMode(new UserMode("LOCOPS", 'l'));
 		ModeManager::AddUserMode(new UserMode("OPER", 'o'));
 		ModeManager::AddUserMode(new UserMode("REGISTERED", 'r'));
 		ModeManager::AddUserMode(new UserMode("SNOMASK", 's'));
 		ModeManager::AddUserMode(new UserMode("WALLOPS", 'w'));
+		ModeManager::AddUserMode(new UserMode("OPERWALLS", 'z'));
+		ModeManager::AddUserMode(new UserMode("DEAF", 'D'));
 		ModeManager::AddUserMode(new UserMode("HIDEOPER", 'H'));
 		ModeManager::AddUserMode(new UserMode("REGPRIV", 'R'));
 
@@ -580,6 +584,7 @@ class ProtoHybrid : public Module
 		ModeManager::AddChannelMode(new ChannelModeKey('k'));
 
 		/* Add channel modes */
+		ModeManager::AddChannelMode(new ChannelMode("BLOCKCOLOR", 'c'));
 		ModeManager::AddChannelMode(new ChannelMode("INVITE", 'i'));
 		ModeManager::AddChannelMode(new ChannelMode("MODERATED", 'm'));
 		ModeManager::AddChannelMode(new ChannelMode("NOEXTERNAL", 'n'));
@@ -588,6 +593,7 @@ class ProtoHybrid : public Module
 		ModeManager::AddChannelMode(new ChannelMode("SECRET", 's'));
 		ModeManager::AddChannelMode(new ChannelMode("TOPIC", 't'));
 		ModeManager::AddChannelMode(new ChannelModeOper('O'));
+		ModeManager::AddChannelMode(new ChannelMode("REGMODERATED", 'M'));
 		ModeManager::AddChannelMode(new ChannelMode("REGISTEREDONLY", 'R'));
 		ModeManager::AddChannelMode(new ChannelMode("SSL", 'S'));
 	}

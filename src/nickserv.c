@@ -697,6 +697,12 @@ void load_ns_dbase(void)
             na->nc = findcore(s);
             free(s);
 
+            if (!na->nc)
+            {
+                free(na);
+                continue;
+            }
+
             slist_add(&na->nc->aliases, na);
 
             if (!(na->status & NS_VERBOTEN)) {

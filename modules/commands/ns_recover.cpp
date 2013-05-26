@@ -9,9 +9,9 @@
  * Based on the original code of Services by Andy Church.
  */
 
-/*************************************************************************/
-
 #include "module.h"
+
+static ServiceReference<NickServService> nickserv("NickServService", "NickServ");
 
 struct NSRecoverExtensibleInfo : ExtensibleItem, std::map<Anope::string, ChannelStatus> { };
 
@@ -39,7 +39,7 @@ class NSRecoverRequest : public IdentifyRequest
 		/* Nick is being held by us, release it */
 		if (na->HasExt("HELD"))
 		{
-			na->Release();
+			nickserv->Release(na);
 			source.Reply(_("Service's hold on \002%s\002 has been released."), na->nick.c_str());
 		}
 		else if (!u)
@@ -68,7 +68,7 @@ class NSRecoverRequest : public IdentifyRequest
 				}
 			}
 
-			u->SendMessage(NickServ, _("This nickname has been recovered by %s. If you did not do\n"
+			u->SendMessage(source.service, _("This nickname has been recovered by %s. If you did not do\n"
 							"this then %s may have your password, and you should change it.\n"),
 							source.GetNick().c_str(), source.GetNick().c_str());
 
@@ -89,13 +89,14 @@ class NSRecoverRequest : public IdentifyRequest
 				Log(LOG_COMMAND, source, cmd) << "and was automatically identified to " << na->nick << " (" << na->nc->display << ")";
 			}
 
-			u->SendMessage(NickServ, _("This nickname has been recovered by %s."), source.GetNick().c_str());
-			u->Collide(na);
+			u->SendMessage(source.service, _("This nickname has been recovered by %s."), source.GetNick().c_str());
+			if (nickserv)
+				nickserv->Collide(u, na);
 
 			if (IRCD->CanSVSNick)
 			{
 				/* If we can svsnick then release our hold and svsnick the user using the command */
-				na->Release();
+				nickserv->Release(na);
 				IRCD->SendForceNickChange(source.GetUser(), GetAccount(), Anope::CurTime);
 			}
 			else
@@ -226,7 +227,7 @@ class NSRecover : public Module
 		 * because some IRCds do not allow us to have these automatically expire
 		 */
 		for (nickalias_map::const_iterator it = NickAliasList->begin(); it != NickAliasList->end(); ++it)
-			it->second->Release();
+			nickserv->Release(it->second);
 	}
 
 	void OnRestart() anope_override { OnShutdown(); }
@@ -236,8 +237,9 @@ class NSRecover : public Module
 		if (Config->GetModule(this)->Get<bool>("restoreonrecover"))
 		{
 			NSRecoverExtensibleInfo *ei = u->GetExt<NSRecoverExtensibleInfo *>("ns_recover_info");
+			BotInfo *NickServ = Config->GetClient("NickServ");
 
-			if (ei != NULL)
+			if (ei != NULL && NickServ != NULL)
 				for (std::map<Anope::string, ChannelStatus>::iterator it = ei->begin(), it_end = ei->end(); it != it_end;)
 				{
 					Channel *c = Channel::Find(it->first);

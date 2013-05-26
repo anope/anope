@@ -478,6 +478,7 @@ void Anope::Encrypt(const Anope::string &src, Anope::string &dest)
 {
 	EventReturn MOD_RESULT;
 	FOREACH_RESULT(I_OnEncrypt, OnEncrypt(src, dest));
+	static_cast<void>(MOD_RESULT);
 }
 
 bool Anope::Decrypt(const Anope::string &src, Anope::string &dest)

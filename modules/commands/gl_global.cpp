@@ -9,8 +9,6 @@
  * Based on the original code of Services by Andy Church.
  */
 
-/*************************************************************************/
-
 #include "module.h"
 
 class CommandGLGlobal : public Command
@@ -33,7 +31,7 @@ class CommandGLGlobal : public Command
 		else
 		{
 			Log(LOG_ADMIN, source, this);
-			GService->SendGlobal(Global, source.GetNick(), msg);
+			GService->SendGlobal(NULL, source.GetNick(), msg);
 		}
 	}
 

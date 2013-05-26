@@ -9,8 +9,6 @@
  * Based on the original code of Services by Andy Church.
  */
 
-/*************************************************************************/
-
 #include "module.h"
 
 class CommandCSClone : public Command
@@ -75,14 +73,7 @@ public:
 
 				target_ci->c->CheckModes();
 
-				target_ci->c->SetCorrectModes(u, true, true);
-
-				/* Mark the channel as persistent */
-				if (target_ci->c->HasMode("PERM"))
-					target_ci->ExtendMetadata("PERSIST");
-				/* Persist may be in def cflags, set it here */
-				else if (target_ci->HasExt("PERSIST"))
-					target_ci->c->SetMode(NULL, "PERM");
+				target_ci->c->SetCorrectModes(u, true);
 			}
 
 			if (target_ci->c && !target_ci->c->topic.empty())

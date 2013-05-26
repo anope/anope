@@ -9,11 +9,7 @@
  * Based on the original code of Services by Andy Church.
  */
 
-/*************************************************************************/
-
 #include "module.h"
-
-static ServiceReference<NickServService> nickserv("NickServService", "NickServ");
 
 class NSGroupRequest : public IdentifyRequest
 {
@@ -48,8 +44,6 @@ class NSGroupRequest : public IdentifyRequest
 
 		u->Login(target->nc);
 		IRCD->SendLogin(u);
-		if (!Config->GetBlock("options")->Get<bool>("nonicknameownership") && na->nc == u->Account() && na->nc->HasExt("UNCONFIRMED") == false)
-			u->SetMode(NickServ, "REGISTERED");
 		FOREACH_MOD(I_OnNickGroup, OnNickGroup(u, target));
 
 		Log(LOG_COMMAND, source, cmd) << "makes " << nick << " join group of " << target->nick << " (" << target->nc->display << ") (email: " << (!target->nc->email.empty() ? target->nc->email : "none") << ")";
@@ -251,10 +245,8 @@ class CommandNSUngroup : public Command
 			User *user = User::Find(na->nick);
 			if (user)
 				/* The user on the nick who was ungrouped may be identified to the old group, set -r */
-				user->RemoveMode(NickServ, "REGISTERED");
+				user->RemoveMode(source.service, "REGISTERED");
 		}
-
-		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override

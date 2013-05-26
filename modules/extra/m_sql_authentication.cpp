@@ -38,6 +38,7 @@ class SQLAuthenticationResult : public SQL::Interface
 		catch (const SQL::Exception &) { }
 
 		NickAlias *na = NickAlias::Find(req->GetAccount());
+		BotInfo *NickServ = Config->GetClient("NickServ");
 		if (na == NULL)
 		{
 			na = new NickAlias(req->GetAccount(), new NickCore(req->GetAccount()));

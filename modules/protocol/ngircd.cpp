@@ -150,7 +150,7 @@ class ngIRCdProto : public IRCDProto
 		UplinkSocket::Message(Me) << "METADATA " << u->nick << " cloakhost :" << vhost;
 		if (!u->HasMode("CLOAK"))
 		{
-			u->SetMode(HostServ, "CLOAK");
+			u->SetMode(Config->GetClient("HostServ"), "CLOAK");
 			ModeManager::ProcessModes();
 		}
 	}

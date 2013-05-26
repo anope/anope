@@ -124,6 +124,7 @@ namespace Configuration
 
 		/* module configuration blocks */
 		std::map<Anope::string, Block *> modules;
+		Anope::map<Anope::string> bots;
 
 		Conf();
 
@@ -131,6 +132,8 @@ namespace Configuration
 
 		Block *GetModule(Module *);
 		Block *GetModule(const Anope::string &name);
+
+		BotInfo *GetClient(const Anope::string &name);
 	};
 
 	struct Uplink

@@ -9,8 +9,6 @@
  * Based on the original code of Services by Andy Church.
  */
 
-/*************************************************************************/
-
 #include "module.h"
 
 class CommandCSRegister : public Command
@@ -74,19 +72,11 @@ class CommandCSRegister : public Command
 			{
 				c->CheckModes();
 				if (u)
-					c->SetCorrectModes(u, true, true);
-
-				/* Mark the channel as persistent */
-				if (c->HasMode("PERM"))
-					ci->Extend("PERSIST");
-				/* Persist may be in def cflags, set it here */
-				else if (ci->HasExt("PERSIST"))
-					c->SetMode(NULL, "PERM");
+					c->SetCorrectModes(u, true);
 			}
 
 			FOREACH_MOD(I_OnChanRegistered, OnChanRegistered(ci));
 		}
-		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
@@ -103,7 +93,8 @@ class CommandCSRegister : public Command
 			"\"founder\" of the channel. The channel founder is allowed\n"
 			"to change all of the channel settings for the channel;\n"
 			"%s will also automatically give the founder\n"
-			"channel-operator privileges when s/he enters the channel."));
+			"channel-operator privileges when s/he enters the channel."),
+				source.service->nick.c_str(), source.service->nick.c_str());
 		BotInfo *bi;
 		Anope::string cmd;
 		if (Command::FindCommandFromService("chanserv/access", bi, cmd))

@@ -9,11 +9,7 @@
  * Based on the original code of Services by Andy Church.
  */
 
-/*************************************************************************/
-
 #include "module.h"
-
-static ServiceReference<ChanServService> chanserv("ChanServService", "ChanServ");
 
 class CommandCSInfo : public Command
 {
@@ -116,8 +112,6 @@ class CommandCSInfo : public Command
 
 		for (unsigned i = 0; i < replies.size(); ++i)
 			source.Reply(replies[i]);
-
-		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override

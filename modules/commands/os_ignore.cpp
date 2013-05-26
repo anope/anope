@@ -9,8 +9,6 @@
  * Based on the original code of Services by Andy Church.
  */
 
-/*************************************************************************/
-
 #include "module.h"
 #include "modules/os_ignore.h"
 

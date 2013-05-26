@@ -65,6 +65,7 @@ class DNSBLResolver : public Request
 		reason = reason.replace_all_cs("%r", record_reason);
 		reason = reason.replace_all_cs("%N", Config->GetBlock("networkinfo")->Get<const Anope::string>("networkname"));
 
+		BotInfo *OperServ = Config->GetClient("OperServ");
 		Log(OperServ) << "DNSBL: " << user->GetMask() << " (" << user->ip << ") appears in " << this->blacklist.name;
 		XLine *x = new XLine("*@" + user->ip, OperServ ? OperServ->nick : "m_dnsbl", Anope::CurTime + this->blacklist.bantime, reason, XLineManager::GenerateUID());
 		if (this->add_to_akill && akills)

@@ -9,8 +9,6 @@
  * Based on the original code of Services by Andy Church.
  */
 
-/*************************************************************************/
-
 #include "module.h"
 
 static std::map<Anope::string, int16_t, ci::less> defaultLevels;

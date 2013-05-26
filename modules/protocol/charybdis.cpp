@@ -196,6 +196,10 @@ struct IRCDMessageEncap : IRCDMessage
 
 				void OnSuccess() anope_override
 				{
+					BotInfo *NickServ = Config->GetClient("NickServ");
+					if (!NickServ)
+						return;
+
 					/* SVSLOGIN
 					 * parameters: target, new nick, new username, new visible hostname, new login name
 					 * Sent after successful SASL authentication.
@@ -212,6 +216,10 @@ struct IRCDMessageEncap : IRCDMessage
 
 				void OnFail() anope_override
 				{
+					BotInfo *NickServ = Config->GetClient("NickServ");
+					if (!NickServ)
+						return;
+
 					UplinkSocket::Message(Me) << "ENCAP " << msource.GetName() << " SASL " << NickServ->GetUID() << " " << this->uid << " " << " D F";
 
 					Log(NickServ) << "A user failed to identify for account " << this->GetAccount() << " using SASL";
@@ -219,6 +227,10 @@ struct IRCDMessageEncap : IRCDMessage
 			};
 			if (params[4] == "S")
 			{
+				BotInfo *NickServ = Config->GetClient("NickServ");
+				if (!NickServ)
+					return;
+
 				if (params[5] == "PLAIN")
 					UplinkSocket::Message(Me) << "ENCAP " << source.GetName() << " SASL " << NickServ->GetUID() << " " << params[2] << " C +";
 				else
@@ -280,6 +292,7 @@ struct IRCDMessageEUID : IRCDMessage
 			{
 				u->Login(na->nc);
 
+				BotInfo *NickServ = Config->GetClient("NickServ");
 				if (u->server->IsSynced() && NickServ)
 					u->SendMessage(NickServ, _("You have been logged in as \2%s\2."), na->nc->display.c_str());
 			}

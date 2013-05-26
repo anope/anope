@@ -9,8 +9,6 @@
  * Based on the original code of Services by Andy Church.
  */
 
-/*************************************************************************/
-
 #include "module.h"
 
 static ServiceReference<NickServService> nickserv("NickServService", "NickServ");
@@ -87,7 +85,8 @@ class CommandNSSuspend : public Command
 				if (u2)
 				{
 					u2->Logout();
-					u2->Collide(na2);
+					if (nickserv)
+						nickserv->Collide(u2, na2);
 				}
 			}
 		}
@@ -96,8 +95,6 @@ class CommandNSSuspend : public Command
 		source.Reply(_("Nick %s is now suspended."), nick.c_str());
 
 		FOREACH_MOD(I_OnNickSuspended, OnNickSuspend(na));
-
-		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
@@ -218,7 +215,7 @@ class NSSuspend : public Module
 				na->nc->Shrink("suspend:reason");
 				na->nc->Shrink("suspend:time");
 
-				Log(LOG_NORMAL, "expire", NickServ) << "Expiring suspend for " << na->nick;
+				Log(LOG_NORMAL, "expire", Config->GetClient("NickServ")) << "Expiring suspend for " << na->nick;
 			}
 		}
 		catch (const ConvertException &) { }

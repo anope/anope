@@ -9,8 +9,6 @@
  * Based on the original code of Services by Andy Church.
  */
 
-/*************************************************************************/
-
 #include "module.h"
 
 static unsigned accessmax;
@@ -169,8 +167,6 @@ class CommandNSCert : public Command
 			return this->DoList(source, nc);
 		else
 			this->OnSyntaxError(source, cmd);
-
-		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
@@ -180,8 +176,8 @@ class CommandNSCert : public Command
 		source.Reply(_("Modifies or displays the certificate list for your nick.\n"
 				"If you connect to IRC and provide a client certificate with a\n"
 				"matching fingerprint in the cert list, your nick will be\n"
-				"automatically identified to %s.\n"
-				" \n"), NickServ ? NickServ->nick.c_str() : source.service->nick.c_str());
+				"automatically identified to services.\n"
+				" \n"));
 		source.Reply(_("Examples:\n"
 				" \n"
 				"    \002CERT ADD <fingerprint>\002\n"
@@ -205,6 +201,7 @@ class NSCert : public Module
 	void DoAutoIdentify(User *u)
 	{
 		NickAlias *na = NickAlias::Find(u->nick);
+		BotInfo *NickServ = Config->GetClient("NickServ");
 		if (!NickServ || !na)
 			return;
 		if (u->IsIdentified() && u->Account() == na->nc)

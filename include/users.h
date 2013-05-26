@@ -187,12 +187,6 @@ class CoreExport User : public virtual Base, public Extensible, public CommandRe
 	void SendMessage(const BotInfo *source, const char *fmt, ...);
 	void SendMessage(const BotInfo *source, const Anope::string &msg) anope_override;
 
-	/** Collide a nick
-	 * See the comment in users.cpp
-	 * @param na The nick
-	 */
-	void Collide(NickAlias *na);
-
 	/** Identify the user to the Nick
 	 * updates last_seen, logs the user in,
 	 * send messages, checks for mails, set vhost and more

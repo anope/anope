@@ -9,23 +9,18 @@
  * Based on the original code of Services by Andy Church.
  */
 
-/*************************************************************************/
-
 #include "module.h"
 
 class BotServCore : public Module
 {
+	Reference<BotInfo> BotServ;
+
  public:
 	BotServCore(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PSEUDOCLIENT | VENDOR)
 	{
-		Implementation i[] = { I_OnReload, I_OnSetCorrectModes, I_OnBotAssign, I_OnBotDelete, I_OnPrivmsg, I_OnJoinChannel, I_OnLeaveChannel,
+		Implementation i[] = { I_OnReload, I_OnSetCorrectModes, I_OnBotAssign, I_OnPrivmsg, I_OnJoinChannel, I_OnLeaveChannel,
 					I_OnPreHelp, I_OnPostHelp, I_OnChannelModeSet, I_OnCreateChan, I_OnUserKicked, I_OnCreateBot };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
-	}
-
-	~BotServCore()
-	{
-		BotServ = NULL;
 	}
 
 	void OnReload(Configuration::Conf *conf) anope_override
@@ -33,16 +28,16 @@ class BotServCore : public Module
 		const Anope::string &bsnick = conf->GetModule(this)->Get<const Anope::string>("client");
 
 		if (bsnick.empty())
-			throw ConfigException(this->name + ": <client> must be defined");
+			throw ConfigException(Module::name + ": <client> must be defined");
 
 		BotInfo *bi = BotInfo::Find(bsnick, true);
 		if (!bi)
-			throw ConfigException(this->name + ": no bot named " + bsnick);
+			throw ConfigException(Module::name + ": no bot named " + bsnick);
 
 		BotServ = bi;
 	}
 
-	void OnSetCorrectModes(User *user, Channel *chan, AccessGroup &access, bool give_modes) anope_override
+	void OnSetCorrectModes(User *user, Channel *chan, AccessGroup &access, bool &give_modes, bool &take_modes) anope_override
 	{
 		/* Do not allow removing bot modes on our service bots */
 		if (chan->ci && chan->ci->bi == user)
@@ -60,12 +55,6 @@ class BotServCore : public Module
 			ChannelStatus status(Config->GetModule(this)->Get<const Anope::string>("botmodes"));
 			bi->Join(ci->c, &status);
 		}
-	}
-
-	void OnBotDelete(BotInfo *bi) anope_override
-	{
-		if (bi == BotServ)
-			BotServ = NULL;
 	}
 
 	void OnPrivmsg(User *u, Channel *c, Anope::string &msg) anope_override
@@ -256,7 +245,7 @@ class BotServCore : public Module
 		/* Channel is syncing from a netburst, don't destroy it as more users are probably wanting to join immediatly
 		 * We also don't part the bot here either, if necessary we will part it after the sync
 		 */
-		if (c->HasExt("SYNCING"))
+		if (c->syncing)
 			return;
 
 		/* Additionally, do not delete this channel if ChanServ/a BotServ bot is inhabiting it */
@@ -305,7 +294,7 @@ class BotServCore : public Module
 
 	void OnPostHelp(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		if (!params.empty() || source.c || source.service != BotServ)
+		if (!params.empty() || source.c || source.service != *BotServ)
 			return;
 
 		source.Reply(_(" \n"

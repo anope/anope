@@ -9,8 +9,6 @@
  * Based on the original code of Services by Andy Church.
  */
 
-/*************************************************************************/
-
 #include "module.h"
 #include "modules/os_news.h"
 
@@ -342,6 +340,14 @@ class OSNews : public Module
 		if (newsList.empty())
 			return;
 
+		BotInfo *bi = NULL;
+		if (Type == NEWS_OPER)
+			bi = BotInfo::Find(Config->GetModule(this)->Get<const Anope::string>("oper_announcer", "OperServ"), true);
+		else
+			bi = BotInfo::Find(Config->GetModule(this)->Get<const Anope::string>("announcer", "Global"), true);
+		if (bi == NULL)
+			return;
+
 		Anope::string msg;
 		if (Type == NEWS_LOGON)
 			msg = _("[\002Logon News\002 - %s] %s");
@@ -357,14 +363,7 @@ class OSNews : public Module
 			if (Type == NEWS_RANDOM && i != cur_rand_news)
 				continue;
 
-			const BotInfo *gl = Global;
-			if (!gl && !BotListByNick->empty())
-				gl = BotListByNick->begin()->second;
-			const BotInfo *os = OperServ;
-			if (!os)
-				os = gl;
-			if (gl)
-				u->SendMessage(Type != NEWS_OPER ? gl : os, msg.c_str(), Anope::strftime(newsList[i]->time).c_str(), newsList[i]->text.c_str());
+			u->SendMessage(bi, msg.c_str(), Anope::strftime(newsList[i]->time).c_str(), newsList[i]->text.c_str());
 
 			++displayed;
 

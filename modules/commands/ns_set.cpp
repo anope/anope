@@ -11,8 +11,6 @@
 
 #include "module.h"
 
-static ServiceReference<NickServService> nickserv("NickServService", "NickServ");
-
 class CommandNSSet : public Command
 {
  public:
@@ -1350,7 +1348,6 @@ class NSSet : public Module
 
 	CommandNSSetChanstats commandnssetchanstats;
 	CommandNSSASetChanstats commandnssasetchanstats;
-	bool NSDefChanstats;
 
 	CommandNSSetDisplay commandnssetdisplay;
 	CommandNSSASetDisplay commandnssasetdisplay;
@@ -1388,7 +1385,7 @@ class NSSet : public Module
 	NSSet(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandnsset(this), commandnssaset(this),
 		commandnssetautoop(this), commandnssasetautoop(this),
-		commandnssetchanstats(this), commandnssasetchanstats(this), NSDefChanstats(false),
+		commandnssetchanstats(this), commandnssasetchanstats(this),
 		commandnssetdisplay(this), commandnssasetdisplay(this),
 		commandnssetemail(this), commandnssasetemail(this),
 		commandnssetgreet(this), commandnssasetgreet(this),
@@ -1402,7 +1399,7 @@ class NSSet : public Module
 		commandnssasetnoexpire(this)
 	{
 
-		Implementation i[] = { I_OnPreCommand };
+		Implementation i[] = { I_OnPreCommand, I_OnSetCorrectModes };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 	}
 
@@ -1428,6 +1425,15 @@ class NSSet : public Module
 		}
 
 		return EVENT_CONTINUE;
+	}
+
+	void OnSetCorrectModes(User *user, Channel *chan, AccessGroup &access, bool &give_modes, bool &take_modes) anope_override
+	{
+		if (chan->ci)
+		{
+			/* Only give modes if autoop is set */
+			give_modes &= !user->Account() || user->Account()->HasExt("AUTOOP");
+		}
 	}
 };
 

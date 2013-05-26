@@ -9,8 +9,6 @@
  * Based on the original code of Services by Andy Church.
  */
 
-/*************************************************************************/
-
 #include "module.h"
 #include "modules/os_session.h"
 
@@ -90,7 +88,7 @@ class MySessionService : public SessionService
 		return this->Exceptions;
 	}
 
-	void DelSession(Session *s) anope_override
+	void DelSession(Session *s)
 	{
 		this->Sessions.erase(s->addr);
 	}
@@ -122,28 +120,6 @@ class MySessionService : public SessionService
 	SessionMap &GetSessions() anope_override
 	{
 		return this->Sessions;
-	}
-};
-
-class ExpireTimer : public Timer
-{
- public:
-	ExpireTimer() : Timer(Config->GetBlock("options")->Get<time_t>("expiretimeout"), Anope::CurTime, true) { }
-
-	void Tick(time_t) anope_override
-	{
-		if (!session_service || Anope::NoExpire)
-			return;
-		for (unsigned i = session_service->GetExceptions().size(); i > 0; --i)
-		{
-			Exception *e = session_service->GetExceptions()[i - 1];
-
-			if (!e->expires || e->expires > Anope::CurTime)
-				continue;
-			Log(OperServ, "expire/exception") << "Session exception for " << e->mask << "has expired.";
-			session_service->DelException(e);
-			delete e;
-		}
 	}
 };
 
@@ -633,7 +609,6 @@ class OSSession : public Module
 {
 	Serialize::Type exception_type;
 	MySessionService ss;
-	ExpireTimer expiretimer;
 	CommandOSSession commandossession;
 	CommandOSException commandosexception;
 	ServiceReference<XLineManager> akills;
@@ -644,7 +619,7 @@ class OSSession : public Module
 	{
 		this->SetPermanent(true);
 
-		Implementation i[] = { I_OnReload, I_OnUserConnect, I_OnUserQuit };
+		Implementation i[] = { I_OnReload, I_OnUserConnect, I_OnUserQuit, I_OnExpireTick };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 		ModuleManager::SetPriority(this, PRIORITY_FIRST);
 	}
@@ -706,6 +681,7 @@ class OSSession : public Module
 	
 			if (kill && !exempt)
 			{
+				BotInfo *OperServ = Config->GetClient("OperServ");
 				if (OperServ)
 				{
 					if (!sle_reason.empty())
@@ -759,6 +735,23 @@ class OSSession : public Module
 
 		delete session;
 		sessions.erase(sit);
+	}
+
+	void OnExpireTick() anope_override
+	{
+		if (!Anope::NoExpire)
+			return;
+		for (unsigned i = this->ss.GetExceptions().size(); i > 0; --i)
+		{
+			Exception *e = this->ss.GetExceptions()[i - 1];
+
+			if (!e->expires || e->expires > Anope::CurTime)
+				continue;
+			BotInfo *OperServ = Config->GetClient("OperServ");
+			Log(OperServ, "expire/exception") << "Session exception for " << e->mask << "has expired.";
+			this->ss.DelException(e);
+			delete e;
+		}
 	}
 };
 

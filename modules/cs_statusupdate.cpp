@@ -32,7 +32,7 @@ class StatusUpdate : public Module
 						if (!access->HasPriv("AUTO" + cms->name))
 							ci->c->RemoveMode(NULL, cms, user->GetUID());
 					}
-					ci->c->SetCorrectModes(user, true, false);
+					ci->c->SetCorrectModes(user, true);
 				}
 			}
 	}

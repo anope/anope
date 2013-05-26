@@ -9,12 +9,11 @@
  * Based on the original code of Services by Andy Church.
  */
 
-/*************************************************************************/
-
 #include "module.h"
 
 class HostServCore : public Module
 {
+	Reference<BotInfo> HostServ;
  public:
 	HostServCore(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PSEUDOCLIENT | VENDOR)
 	{
@@ -22,14 +21,9 @@ class HostServCore : public Module
 		if (!IRCD || !IRCD->CanSetVHost)
 			throw ModuleException("Your IRCd does not support vhosts");
 	
-		Implementation i[] = { I_OnReload, I_OnBotDelete, I_OnNickIdentify, I_OnNickUpdate, I_OnPreHelp,
+		Implementation i[] = { I_OnReload, I_OnNickIdentify, I_OnNickUpdate, I_OnPreHelp,
 					I_OnSetVhost, I_OnDeleteVhost };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
-	}
-
-	~HostServCore()
-	{
-		HostServ = NULL;
 	}
 
 	void OnReload(Configuration::Conf *conf) anope_override
@@ -37,19 +31,13 @@ class HostServCore : public Module
 		const Anope::string &hsnick = conf->GetModule(this)->Get<const Anope::string>("client");
 
 		if (hsnick.empty())
-			throw ConfigException(this->name + ": <client> must be defined");
+			throw ConfigException(Module::name + ": <client> must be defined");
 
 		BotInfo *bi = BotInfo::Find(hsnick, true);
 		if (!bi)
-			throw ConfigException(this->name + ": no bot named " + hsnick);
+			throw ConfigException(Module::name + ": no bot named " + hsnick);
 
 		HostServ = bi;
-	}
-
-	void OnBotDelete(BotInfo *bi) anope_override
-	{
-		if (bi == HostServ)
-			HostServ = NULL;
 	}
 
 	void OnNickIdentify(User *u) anope_override
@@ -87,7 +75,7 @@ class HostServCore : public Module
 
 	EventReturn OnPreHelp(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		if (!params.empty() || source.c || source.service != HostServ)
+		if (!params.empty() || source.c || source.service != *HostServ)
 			return EVENT_CONTINUE;
 		source.Reply(_("%s commands:"), HostServ->nick.c_str());
 		return EVENT_CONTINUE;

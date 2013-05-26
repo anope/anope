@@ -65,18 +65,6 @@ class CoreExport NickAlias : public Serializable, public Extensible
 	void Serialize(Serialize::Data &data) const anope_override;
 	static Serializable* Unserialize(Serializable *obj, Serialize::Data &);
 
-	/** Release a nick
-	 * See the comment in users.cpp
-	 */
-	void Release();
-
-	/** This function is called when a user on this nick either disconnects or changes nick.
-	 * Note that the user isnt necessarially identified to this nick
-	 * See the comment in users.cpp
-	 * @param u The user
-	 */
-	void OnCancel(User *u);
-
  	/** Set a vhost for the user
 	 * @param ident The ident
 	 * @param host The host
@@ -306,7 +294,7 @@ class CoreExport NickCore : public Serializable, public Extensible
 };
 
 /* A request to check if an account/password is valid. These can exist for
- * extended periods of time due to some authentication modules take.
+ * extended periods due to the time some authentication modules take.
  */
 class CoreExport IdentifyRequest
 {

@@ -359,8 +359,6 @@ ChannelInfo::~ChannelInfo()
 
 	if (this->c)
 	{
-		this->Shrink("PERSIST");
-
 		if (this->bi && this->c->FindUser(this->bi))
 			this->bi->Part(this->c);
 
@@ -565,10 +563,14 @@ BotInfo *ChannelInfo::WhoSends() const
 {
 	if (this && this->bi)
 		return this->bi;
-	else if (ChanServ)
+	
+	BotInfo *ChanServ = Config->GetClient("ChanServ");
+	if (ChanServ)
 		return ChanServ;
-	else if (!BotListByNick->empty())
+
+	if (!BotListByNick->empty())
 		return BotListByNick->begin()->second;
+
 	return NULL;
 }
 
@@ -1039,39 +1041,6 @@ bool ChannelInfo::CheckKick(User *user)
 	this->c->Kick(NULL, user, "%s", reason.c_str());
 
 	return true;
-}
-
-void ChannelInfo::CheckTopic()
-{
-	if (!this->c)
-		return;
-
-	/* We only compare the topics here, not the time or setter. This is because some (old) IRCds do not
-	 * allow us to set the topic as someone else, meaning we have to bump the TS and change the setter to us.
-	 * This desyncs what is really set with what we have stored, and we end up resetting the topic often when
-	 * it is not required
-	 */
-	if (this->HasExt("TOPICLOCK") && this->last_topic != this->c->topic)
-	{
-		this->c->ChangeTopic(this->last_topic_setter, this->last_topic, this->last_topic_time);
-	}
-	else
-	{
-		this->last_topic = this->c->topic;
-		this->last_topic_setter = this->c->topic_setter;
-		this->last_topic_time = this->c->topic_ts;
-	}
-}
-
-void ChannelInfo::RestoreTopic()
-{
-	if (!this->c)
-		return;
-
-	if ((this->HasExt("KEEPTOPIC") || this->HasExt("TOPICLOCK")) && this->last_topic != this->c->topic)
-	{
-		this->c->ChangeTopic(!this->last_topic_setter.empty() ? this->last_topic_setter : this->WhoSends()->nick, this->last_topic, this->last_topic_time ? this->last_topic_time : Anope::CurTime);
-	}
 }
 
 int16_t ChannelInfo::GetLevel(const Anope::string &priv) const

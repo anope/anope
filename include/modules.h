@@ -363,9 +363,8 @@ class CoreExport Module : public Extensible
 	virtual void OnPostCommand(CommandSource &source, Command *command, const std::vector<Anope::string> &params) { }
 
 	/** Called when the databases are saved
-	 * @return EVENT_CONTINUE to let other modules continue saving, EVENT_STOP to stop
 	 */
-	virtual EventReturn OnSaveDatabase() { return EVENT_CONTINUE; }
+	virtual void OnSaveDatabase() { }
 
 	/** Called when the databases are loaded
 	 * @return EVENT_CONTINUE to let other modules continue loading, EVENT_STOP to stop
@@ -714,10 +713,15 @@ class CoreExport Module : public Extensible
 	 */
 	virtual void OnNickGroup(User *u, NickAlias *target) { }
 
-	/** Called when a user identifies
+	/** Called when a user identifies to a nick
 	 * @param u The user
 	 */
 	virtual void OnNickIdentify(User *u) { }
+
+	/** Called when a user is logged into an account
+	 * @param u The user
+	 */
+	virtual void OnUserLogin(User *u) { }
 
 	/** Called when a nick logs out
 	 * @param u The nick
@@ -985,8 +989,9 @@ class CoreExport Module : public Extensible
 	 * @param chan The channel
 	 * @param access The user's access on the channel
 	 * @param give_modes If giving modes is desired
+	 * @param take_modes If taking modes is desired
 	 */
-	virtual void OnSetCorrectModes(User *user, Channel *chan, AccessGroup &access, bool give_modes) { }
+	virtual void OnSetCorrectModes(User *user, Channel *chan, AccessGroup &access, bool &give_modes, bool &take_modes) { }
 
 	virtual void OnSerializeCheck(Serialize::Type *) { }
 	virtual void OnSerializableConstruct(Serializable *) { }
@@ -1025,6 +1030,13 @@ class CoreExport Module : public Extensible
 	 * @param cm The mode
 	 */
 	virtual EventReturn OnCanSet(User *u, const ChannelMode *cm) { return EVENT_CONTINUE; }
+
+	virtual EventReturn OnCheckDelete(Channel *) { return EVENT_CONTINUE; }
+
+	/** Called every options:expiretimeout seconds. Should be used to expire nicks,
+	 * channels, etc.
+	 */
+	virtual void OnExpireTick() { }
 };
 
 /** Implementation-specific flags which may be set in ModuleManager::Attach()
@@ -1036,13 +1048,13 @@ enum Implementation
 		I_OnPreNickExpire, I_OnNickExpire, I_OnNickForbidden, I_OnNickGroup, I_OnNickLogout, I_OnNickIdentify, I_OnNickDrop,
 		I_OnNickRegister, I_OnNickSuspended, I_OnNickUnsuspended, I_OnDelNick, I_OnNickCoreCreate, I_OnDelCore, I_OnChangeCoreDisplay,
 		I_OnNickClearAccess, I_OnNickAddAccess, I_OnNickEraseAccess, I_OnNickClearCert, I_OnNickAddCert, I_OnNickEraseCert,
-		I_OnNickInfo, I_OnCheckAuthentication, I_OnNickUpdate, I_OnSetNickOption,
+		I_OnNickInfo, I_OnCheckAuthentication, I_OnNickUpdate, I_OnSetNickOption, I_OnUserLogin,
 
 		/* ChanServ */
 		I_OnChanSuspend, I_OnChanDrop, I_OnPreChanExpire, I_OnChanExpire, I_OnAccessAdd,
 		I_OnAccessDel, I_OnAccessClear, I_OnLevelChange, I_OnChanRegistered, I_OnChanUnsuspend, I_OnCreateChan, I_OnDelChan, I_OnChannelCreate,
-		I_OnChannelDelete, I_OnAkickAdd, I_OnAkickDel, I_OnCheckKick, I_OnCheckModes,
-		I_OnChanInfo, I_OnCheckPriv, I_OnGroupCheckPriv, I_OnSetChannelOption, I_OnChannelSync, I_OnSetCorrectModes,
+		I_OnAkickAdd, I_OnAkickDel, I_OnCheckKick, I_OnCheckModes,
+		I_OnChanInfo, I_OnCheckPriv, I_OnGroupCheckPriv, I_OnSetChannelOption, I_OnSetCorrectModes,
 
 		/* BotServ */
 		I_OnCreateBot, I_OnDelBot,
@@ -1054,6 +1066,9 @@ enum Implementation
 
 		/* MemoServ */
 		I_OnMemoSend, I_OnMemoDel,
+
+		/* Channels */
+		I_OnChannelModeSet, I_OnChannelModeUnset, I_OnChannelDelete, I_OnChannelSync, I_OnCheckDelete,
 
 		/* Users */
 		I_OnUserConnect, I_OnUserNickChange, I_OnUserQuit, I_OnPreUserLogoff, I_OnPostUserLogoff,
@@ -1074,9 +1089,9 @@ enum Implementation
 		I_OnPreHelp, I_OnPostHelp, I_OnPreCommand, I_OnPostCommand, I_OnRestart, I_OnShutdown,
 		I_OnServerQuit, I_OnTopicUpdated,
 		I_OnEncrypt, I_OnDecrypt,
-		I_OnChannelModeSet, I_OnChannelModeUnset, I_OnUserModeSet, I_OnUserModeUnset, I_OnChannelModeAdd, I_OnUserModeAdd,
+		I_OnUserModeSet, I_OnUserModeUnset, I_OnChannelModeAdd, I_OnUserModeAdd,
 		I_OnMLock, I_OnUnMLock, I_OnServerSync, I_OnUplinkSync, I_OnBotPrivmsg, I_OnPrivmsg, I_OnLog, I_OnDnsRequest,
-		I_OnMessage, I_OnCanSet,
+		I_OnMessage, I_OnCanSet, I_OnExpireTick,
 
 		I_OnSerializeCheck, I_OnSerializableConstruct, I_OnSerializableDestruct, I_OnSerializableUpdate, I_OnSerializeTypeCreate,
 	I_END

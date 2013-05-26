@@ -9,12 +9,12 @@
  * Based on the original code of Services by Andy Church.
  */
 
-/*************************************************************************/
-
 #include "module.h"
 
-class MyGlobalService : public GlobalService
+class GlobalCore : public Module, public GlobalService
 {
+	Reference<BotInfo> Global;
+
 	void ServerGlobal(const BotInfo *sender, Server *s, const Anope::string &message)
 	{
 		if (s != Me && !s->IsJuped())
@@ -24,11 +24,20 @@ class MyGlobalService : public GlobalService
 	}
 
  public:
-	MyGlobalService(Module *m) : GlobalService(m) { }
+	GlobalCore(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PSEUDOCLIENT | VENDOR),
+		GlobalService(this)
+	{
+		Implementation i[] = { I_OnReload, I_OnRestart, I_OnShutdown, I_OnNewServer, I_OnPreHelp };
+		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
+	}
 
 	void SendGlobal(const BotInfo *sender, const Anope::string &source, const Anope::string &message) anope_override
 	{
 		if (Me->GetLinks().empty())
+			return;
+		if (!sender)
+			sender = Global;
+		if (!sender)
 			return;
 
 		Anope::string rmessage;
@@ -40,57 +49,33 @@ class MyGlobalService : public GlobalService
 
 		this->ServerGlobal(sender, Servers::GetUplink(), rmessage);
 	}
-};
-
-class GlobalCore : public Module
-{
-	MyGlobalService global;
-
- public:
-	GlobalCore(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PSEUDOCLIENT | VENDOR),
-		global(this)
-	{
-		Implementation i[] = { I_OnReload, I_OnBotDelete, I_OnRestart, I_OnShutdown, I_OnNewServer, I_OnPreHelp };
-		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
-	}
-
-	~GlobalCore()
-	{
-		Global = NULL;
-	}
 
 	void OnReload(Configuration::Conf *conf) anope_override
 	{
 		const Anope::string &glnick = conf->GetModule(this)->Get<const Anope::string>("client");
 
 		if (glnick.empty())
-			throw ConfigException(this->name + ": <client> must be defined");
+			throw ConfigException(Module::name + ": <client> must be defined");
 
 		BotInfo *bi = BotInfo::Find(glnick, true);
 		if (!bi)
-			throw ConfigException(this->name + ": no bot named " + glnick);
+			throw ConfigException(Module::name + ": no bot named " + glnick);
 
 		Global = bi;
-	}
-
-	void OnBotDelete(BotInfo *bi) anope_override
-	{
-		if (bi == Global)
-			Global = NULL;
 	}
 
 	void OnRestart() anope_override
 	{
 		const Anope::string &gl = Config->GetModule(this)->Get<const Anope::string>("globaloncycledown");
 		if (!gl.empty())
-			this->global.SendGlobal(Global, "", gl);
+			this->SendGlobal(Global, "", gl);
 	}
 	
 	void OnShutdown() anope_override
 	{
 		const Anope::string &gl = Config->GetModule(this)->Get<const Anope::string>("globaloncycledown");
 		if (!gl.empty())
-			this->global.SendGlobal(Global, "", gl);
+			this->SendGlobal(Global, "", gl);
 	}
 
 	void OnNewServer(Server *s) anope_override
@@ -102,7 +87,7 @@ class GlobalCore : public Module
 
 	EventReturn OnPreHelp(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		if (!params.empty() || source.c || source.service != Global)
+		if (!params.empty() || source.c || source.service != *Global)
 			return EVENT_CONTINUE;
 		source.Reply(_("%s commands:"), Global->nick.c_str());
 		return EVENT_CONTINUE;

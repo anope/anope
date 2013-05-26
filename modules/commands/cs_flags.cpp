@@ -9,11 +9,8 @@
  * Based on the original code of Services by Andy Church.
  */
 
-/*************************************************************************/
-
 #include "module.h"
 
-static ServiceReference<ChanServService> chanserv("ChanServService", "ChanServ");
 static std::map<Anope::string, char> defaultFlags;
 
 class FlagsChanAccess : public ChanAccess

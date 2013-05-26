@@ -23,7 +23,6 @@ class CommandCSSet : public Command
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		this->OnSyntaxError(source, "");
-		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
@@ -515,11 +514,13 @@ class CommandCSSetPersist : public Command
 				 */
 				if (!ci->bi && !cm)
 				{
+					BotInfo *ChanServ = Config->GetClient("ChanServ");
 					if (!ChanServ)
 					{
 						source.Reply(_("ChanServ is required to enable persist on this network."));
 						return;
 					}
+
 					ChanServ->Assign(NULL, ci);
 					if (!ci->c->FindUser(ChanServ))
 					{
@@ -559,6 +560,8 @@ class CommandCSSetPersist : public Command
 				/* No channel mode, no BotServ, but using ChanServ as the botserv bot
 				 * which was assigned when persist was set on
 				 */
+				BotInfo *ChanServ = Config->GetClient("ChanServ"),
+					*BotServ = Config->GetClient("BotServ");
 				if (!cm && !BotServ && ci->bi)
 				{
 					if (!ChanServ)
@@ -576,8 +579,6 @@ class CommandCSSetPersist : public Command
 		}
 		else
 			this->OnSyntaxError(source, "PERSIST");
-
-		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &) anope_override
@@ -1105,7 +1106,6 @@ class CSSet : public Module
 	CommandCSSetAutoOp commandcssetautoop;
 	CommandCSSetBanType commandcssetbantype;
 	CommandCSSetChanstats commandcssetchanstats;
-	bool CSDefChanstats;
 	CommandCSSetDescription commandcssetdescription;
 	CommandCSSetFounder commandcssetfounder;
 	CommandCSSetKeepTopic commandcssetkeeptopic;
@@ -1123,13 +1123,14 @@ class CSSet : public Module
  public:
 	CSSet(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandcsset(this), commandcssetautoop(this), commandcssetbantype(this), commandcssetchanstats(this),
-		CSDefChanstats(false), commandcssetdescription(this), commandcssetfounder(this), commandcssetkeeptopic(this),
+		commandcssetdescription(this), commandcssetfounder(this), commandcssetkeeptopic(this),
 		commandcssetpeace(this), commandcssetpersist(this), commandcssetprivate(this), commandcssetrestricted(this),
 		commandcssetsecure(this), commandcssetsecurefounder(this), commandcssetsecureops(this), commandcssetsignkick(this),
 		commandcssetsuccessor(this), commandcssetnoexpire(this)
 	{
 
-		Implementation i[] = { I_OnCheckKick, I_OnDelChan };
+		Implementation i[] = { I_OnCheckKick, I_OnDelChan, I_OnChannelModeSet, I_OnChannelModeUnset, I_OnCheckDelete, I_OnJoinChannel,
+			I_OnSetCorrectModes };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 	}
 
@@ -1148,6 +1149,62 @@ class CSSet : public Module
 	{
 		if (ci->c && ci->HasExt("PERSIST"))
 			ci->c->RemoveMode(ci->WhoSends(), "PERM", "", false);
+		ci->Shrink("PERSIST");
+	}
+
+	EventReturn OnChannelModeSet(Channel *c, MessageSource &setter, const Anope::string &mname, const Anope::string &param) anope_override
+	{
+		/* Channel mode +P or so was set, mark this channel as persistent */
+		if (mname == "PERM" && c->ci)
+		{
+			c->ci->ExtendMetadata("PERSIST");
+		}
+
+		return EVENT_CONTINUE;
+	}
+
+	EventReturn OnChannelModeUnset(Channel *c, MessageSource &setter, const Anope::string &mname, const Anope::string &param) anope_override
+	{
+		if (mname == "PERM")
+		{
+			if (c->ci)
+				c->ci->Shrink("PERSIST");
+
+			if (c->users.empty() && !c->syncing && c->CheckDelete())
+			{
+				delete c;
+				return EVENT_STOP;
+			}
+		}
+
+		return EVENT_CONTINUE;
+	}
+
+	EventReturn OnCheckDelete(Channel *c) anope_override
+	{
+		if (c->ci && c->ci->HasExt("PERSIST"))
+			return EVENT_STOP;
+		return EVENT_CONTINUE;
+	}
+
+	void OnJoinChannel(User *u, Channel *c) anope_override
+	{
+		if (c->ci && c->ci->HasExt("PERSIST") && c->creation_time > c->ci->time_registered)
+		{
+			Log(LOG_DEBUG) << "Changing TS of " << c->name << " from " << c->creation_time << " to " << c->ci->time_registered;
+			c->creation_time = c->ci->time_registered;
+			IRCD->SendChannel(c);
+			c->Reset();
+		}
+	}
+
+	void OnSetCorrectModes(User *user, Channel *chan, AccessGroup &access, bool &give_modes, bool &take_modes) anope_override
+	{
+		if (chan->ci)
+		{
+			give_modes &= !chan->ci->HasExt("NOAUTOOP");
+			take_modes  |= chan->ci->HasExt("SECUREOPS");
+		}
 	}
 };
 

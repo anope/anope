@@ -9,34 +9,39 @@
  * Based on the original code of Services by Andy Church.
  */
 
-/*************************************************************************/
-
 #include "module.h"
 
-static bool SendMemoMail(NickCore *nc, MemoInfo *mi, Memo *m)
+class MemoServCore : public Module, public MemoServService
 {
-	Anope::string subject = Language::Translate(nc, Config->GetBlock("mail")->Get<const Anope::string>("memo_subject").c_str()),
-		message = Language::Translate(Config->GetBlock("mail")->Get<const Anope::string>("memo_message").c_str());
+	Reference<BotInfo> MemoServ;
 
-	subject = subject.replace_all_cs("%n", nc->display);
-	subject = subject.replace_all_cs("%s", m->sender);
-	subject = subject.replace_all_cs("%d", stringify(mi->GetIndex(m) + 1));
-	subject = subject.replace_all_cs("%t", m->text);
-	subject = subject.replace_all_cs("%N", Config->GetBlock("networkinfo")->Get<const Anope::string>("networkname"));
+	bool SendMemoMail(NickCore *nc, MemoInfo *mi, Memo *m)
+	{
+		Anope::string subject = Language::Translate(nc, Config->GetBlock("mail")->Get<const Anope::string>("memo_subject").c_str()),
+			message = Language::Translate(Config->GetBlock("mail")->Get<const Anope::string>("memo_message").c_str());
 
-	message = message.replace_all_cs("%n", nc->display);
-	message = message.replace_all_cs("%s", m->sender);
-	message = message.replace_all_cs("%d", stringify(mi->GetIndex(m) + 1));
-	message = message.replace_all_cs("%t", m->text);
-	message = message.replace_all_cs("%N", Config->GetBlock("networkinfo")->Get<const Anope::string>("networkname"));
+		subject = subject.replace_all_cs("%n", nc->display);
+		subject = subject.replace_all_cs("%s", m->sender);
+		subject = subject.replace_all_cs("%d", stringify(mi->GetIndex(m) + 1));
+		subject = subject.replace_all_cs("%t", m->text);
+		subject = subject.replace_all_cs("%N", Config->GetBlock("networkinfo")->Get<const Anope::string>("networkname"));
 
-	return Mail::Send(nc, subject, message);
-}
+		message = message.replace_all_cs("%n", nc->display);
+		message = message.replace_all_cs("%s", m->sender);
+		message = message.replace_all_cs("%d", stringify(mi->GetIndex(m) + 1));
+		message = message.replace_all_cs("%t", m->text);
+		message = message.replace_all_cs("%N", Config->GetBlock("networkinfo")->Get<const Anope::string>("networkname"));
 
-class MyMemoServService : public MemoServService
-{
+		return Mail::Send(nc, subject, message);
+	}
+
  public:
-	MyMemoServService(Module *m) : MemoServService(m) { }
+	MemoServCore(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PSEUDOCLIENT | VENDOR),
+		MemoServService(this)
+	{
+		Implementation i[] = { I_OnNickCoreCreate, I_OnCreateChan, I_OnReload, I_OnBotDelete, I_OnNickIdentify, I_OnJoinChannel, I_OnUserAway, I_OnNickUpdate, I_OnPreHelp, I_OnPostHelp };
+		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
+	}
 
 	MemoResult Send(const Anope::string &source, const Anope::string &target, const Anope::string &message, bool force) anope_override
 	{
@@ -134,34 +139,17 @@ class MyMemoServService : public MemoServService
 				u->SendMessage(MemoServ, _("You have reached your maximum number of memos (%d). You will be unable to receive any new memos until you delete some of your current ones."), nc->memos.memomax);
 		}
 	}
-};
-
-class MemoServCore : public Module
-{
-	MyMemoServService memoserv;
- public:
-	MemoServCore(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PSEUDOCLIENT | VENDOR),
-		memoserv(this)
-	{
-		Implementation i[] = { I_OnNickCoreCreate, I_OnCreateChan, I_OnReload, I_OnBotDelete, I_OnNickIdentify, I_OnJoinChannel, I_OnUserAway, I_OnNickUpdate, I_OnPreHelp, I_OnPostHelp };
-		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
-	}
-
-	~MemoServCore()
-	{
-		MemoServ = NULL;
-	}
 
 	void OnReload(Configuration::Conf *conf) anope_override
 	{
 		const Anope::string &msnick = conf->GetModule(this)->Get<const Anope::string>("client");
 
 		if (msnick.empty())
-			throw ConfigException(this->name + ": <client> must be defined");
+			throw ConfigException(Module::name + ": <client> must be defined");
 
 		BotInfo *bi = BotInfo::Find(msnick, true);
 		if (!bi)
-			throw ConfigException(this->name + ": no bot named " + msnick);
+			throw ConfigException(Module::name + ": no bot named " + msnick);
 
 		MemoServ = bi;
 	}
@@ -184,7 +172,7 @@ class MemoServCore : public Module
 
 	void OnNickIdentify(User *u) anope_override
 	{
-		this->memoserv.Check(u);
+		this->Check(u);
 	}
 
 	void OnJoinChannel(User *u, Channel *c) anope_override
@@ -201,17 +189,17 @@ class MemoServCore : public Module
 	void OnUserAway(User *u, const Anope::string &message) anope_override
 	{
 		if (message.empty())
-			this->memoserv.Check(u);
+			this->Check(u);
 	}
 
 	void OnNickUpdate(User *u) anope_override
 	{
-		this->memoserv.Check(u);
+		this->Check(u);
 	}
 
 	EventReturn OnPreHelp(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		if (!params.empty() || source.c || source.service != MemoServ)
+		if (!params.empty() || source.c || source.service != *MemoServ)
 			return EVENT_CONTINUE;
 		source.Reply(_("\002%s\002 is a utility allowing IRC users to send short\n"
 			"messages to other IRC users, whether they are online at\n"
@@ -224,14 +212,11 @@ class MemoServCore : public Module
 
 	void OnPostHelp(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		if (!params.empty() || source.c || source.service != MemoServ)
+		if (!params.empty() || source.c || source.service != *MemoServ)
 			return;
 		source.Reply(_(" \n"
 			"Type \002%s%s HELP \037command\037\002 for help on any of the\n"
-			"above commands.\n"
-			"(*) By default, any user with at least level 10 access on a\n"
-			"    channel can read that channel's memos. This can be\n"
-			"    changed with the %s \002LEVELS\002 command."), Config->StrictPrivmsg.c_str(), MemoServ->nick.c_str(), ChanServ->nick.c_str());
+			"above commands."), Config->StrictPrivmsg.c_str(), MemoServ->nick.c_str());
 	}
 };
 

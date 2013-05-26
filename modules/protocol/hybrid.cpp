@@ -46,22 +46,22 @@ class HybridProto : public IRCDProto
 
 	void SendSQLine(User *, const XLine *x) anope_override
 	{
-		UplinkSocket::Message(OperServ) << "RESV " << (x->expires ? x->expires - Anope::CurTime : 0) << " " << x->mask << " 0 :" << x->reason;
+		UplinkSocket::Message(Config->GetClient("OperServ")) << "RESV " << (x->expires ? x->expires - Anope::CurTime : 0) << " " << x->mask << " 0 :" << x->reason;
 	}
 
 	void SendSGLineDel(const XLine *x) anope_override
 	{
-		UplinkSocket::Message(OperServ) << "UNXLINE * " << x->mask;
+		UplinkSocket::Message(Config->GetClient("OperServ")) << "UNXLINE * " << x->mask;
 	}
 
 	void SendSGLine(User *, const XLine *x) anope_override
 	{
-		UplinkSocket::Message(OperServ) << "XLINE * " << x->mask << " 0 :" << x->GetReason();
+		UplinkSocket::Message(Config->GetClient("OperServ")) << "XLINE * " << x->mask << " 0 :" << x->GetReason();
 	}
 
 	void SendSZLineDel(const XLine *x) anope_override
 	{
-		UplinkSocket::Message(OperServ) << "UNDLINE * " << x->GetHost();
+		UplinkSocket::Message(Config->GetClient("OperServ")) << "UNDLINE * " << x->GetHost();
 	}
 
 	void SendSZLine(User *, const XLine *x) anope_override
@@ -72,7 +72,7 @@ class HybridProto : public IRCDProto
 		if (timeleft > 172800 || !x->expires)
 			timeleft = 172800;
 
-		UplinkSocket::Message(OperServ) << "DLINE * " << timeleft << " " << x->GetHost() << " :" << x->GetReason();
+		UplinkSocket::Message(Config->GetClient("OperServ")) << "DLINE * " << timeleft << " " << x->GetHost() << " :" << x->GetReason();
 	}
 
 	void SendAkillDel(const XLine *x) anope_override
@@ -80,12 +80,12 @@ class HybridProto : public IRCDProto
 		if (x->IsRegex() || x->HasNickOrReal())
 			return;
 
-		UplinkSocket::Message(OperServ) << "UNKLINE * " << x->GetUser() << " " << x->GetHost();
+		UplinkSocket::Message(Config->GetClient("OperServ")) << "UNKLINE * " << x->GetUser() << " " << x->GetHost();
 	}
 
 	void SendSQLineDel(const XLine *x) anope_override
 	{
-		UplinkSocket::Message(OperServ) << "UNRESV * " << x->mask;
+		UplinkSocket::Message(Config->GetClient("OperServ")) << "UNRESV * " << x->mask;
 	}
 
 	void SendJoin(User *user, Channel *c, const ChannelStatus *status) anope_override
@@ -137,7 +137,7 @@ class HybridProto : public IRCDProto
 			old->manager->AddXLine(xline);
 			x = xline;
 
-			Log(OperServ, "akill") << "AKILL: Added an akill for " << x->mask << " because " << u->GetMask() << "#"
+			Log(Config->GetClient("OperServ"), "akill") << "AKILL: Added an akill for " << x->mask << " because " << u->GetMask() << "#"
 					<< u->realname << " matches " << old->mask;
 		}
 
@@ -147,7 +147,7 @@ class HybridProto : public IRCDProto
 		if (timeleft > 172800 || !x->expires)
 			timeleft = 172800;
 
-		UplinkSocket::Message(OperServ) << "KLINE * " << timeleft << " " << x->GetUser() << " " << x->GetHost() << " :" << x->GetReason();
+		UplinkSocket::Message(Config->GetClient("OperServ")) << "KLINE * " << timeleft << " " << x->GetUser() << " " << x->GetHost() << " :" << x->GetReason();
 	}
 
 	void SendServer(const Server *server) anope_override
@@ -208,12 +208,12 @@ class HybridProto : public IRCDProto
 
 	void SendLogin(User *u) anope_override
 	{
-		IRCD->SendMode(NickServ, u, "+d %s", u->Account()->display.c_str());
+		IRCD->SendMode(Config->GetClient("NickServ"), u, "+d %s", u->Account()->display.c_str());
 	}
 
 	void SendLogout(User *u) anope_override
 	{
-		IRCD->SendMode(NickServ, u, "+d 0");
+		IRCD->SendMode(Config->GetClient("NickServ"), u, "+d 0");
 	}
 
 	void SendChannel(Channel *c) anope_override
@@ -251,7 +251,7 @@ class HybridProto : public IRCDProto
 
 	void SendSVSHold(const Anope::string &nick, time_t t) anope_override
 	{
-		XLine x(nick, OperServ->nick, Anope::CurTime + t, "Being held for registered user");
+		XLine x(nick, Me->GetName(), Anope::CurTime + t, "Being held for registered user");
 		this->SendSQLine(NULL, &x);
 	}
 
@@ -486,9 +486,7 @@ struct IRCDMessageTMode : IRCDMessage
 
 struct IRCDMessageUID : IRCDMessage
 {
-	ServiceReference<NickServService> NSService;
-
-	IRCDMessageUID(Module *creator) : IRCDMessage(creator, "UID", 10), NSService("NickServService", "NickServ") { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
+	IRCDMessageUID(Module *creator) : IRCDMessage(creator, "UID", 10) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
 
 	/*          0     1 2          3   4      5             6        7         8           9                   */
 	/* :0MC UID Steve 1 1350157102 +oi ~steve resolved.host 10.0.0.1 0MCAAAAAB 1350157108 :Mining all the time */
@@ -505,11 +503,11 @@ struct IRCDMessageUID : IRCDMessage
 					params[9], params[2].is_pos_number_only() ? convertTo<time_t>(params[2]) : 0,
 					params[3], params[7]);
 
-		if (NSService && params[8] != "0")
+		if (params[8] != "0")
 		{
 			NickAlias *na = NickAlias::Find(params[8]);
 			if (na != NULL)
-				NSService->Login(user, na);
+				user->Login(na->nc);
 		}
 	}
 };

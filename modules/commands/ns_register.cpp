@@ -9,8 +9,6 @@
  * Based on the original code of Services by Andy Church.
  */
 
-/*************************************************************************/
-
 #include "module.h"
 
 static bool SendRegmail(User *u, const NickAlias *na, const BotInfo *bi);
@@ -59,7 +57,7 @@ class CommandNSConfirm : public Command
 					IRCD->SendLogin(source.GetUser());
 					const NickAlias *na = NickAlias::Find(source.GetNick());
 					if (!Config->GetBlock("options")->Get<bool>("nonicknameownership") && na != NULL && na->nc == source.GetAccount() && na->nc->HasExt("UNCONFIRMED") == false)
-						source.GetUser()->SetMode(NickServ, "REGISTERED");
+						source.GetUser()->SetMode(source.service, "REGISTERED");
 				}
 			}
 			else
@@ -192,8 +190,6 @@ class CommandNSRegister : public Command
 			{
 				na->last_usermask = u->GetIdent() + "@" + u->GetDisplayedHost();
 				na->last_realname = u->realname;
-
-				u->Login(nc);
 			}
 
 			Log(LOG_COMMAND, source, this) << "to register " << na->nick << " (email: " << (!na->nc->email.empty() ? na->nc->email : "none") << ")";
@@ -227,18 +223,14 @@ class CommandNSRegister : public Command
 					source.Reply(_("If you do not confirm your email address within %s your account will expire."), Anope::Duration(unconfirmed_expire).c_str());
 				}
 			}
-			else if (nsregister.equals_ci("none"))
-			{
-				if (u)
-				{
-					IRCD->SendLogin(u);
-					if (!Config->GetBlock("options")->Get<bool>("nonicknameownership") && na->nc == u->Account() && na->nc->HasExt("UNCONFIRMED") == false)
-						u->SetMode(NickServ, "REGISTERED");
-				}
-			}
 
 			if (u)
+			{
+				u->Login(nc);
+				if (!nc->HasExt("UNCONFIRMED"))
+					IRCD->SendLogin(u);
 				u->lastnickreg = Anope::CurTime;
+			}
 		}
 	}
 

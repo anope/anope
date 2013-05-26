@@ -9,8 +9,6 @@
  * Based on the original code of Services by Andy Church.
  */
 
-/*************************************************************************/
-
 #include "module.h"
 
 class CommandMSSet : public Command
@@ -20,6 +18,10 @@ class CommandMSSet : public Command
 	{
 		const Anope::string &param = params[1];
 		NickCore *nc = source.nc;
+		BotInfo *MemoServ = Config->GetClient("MemoServ");
+
+		if (!MemoServ)
+			return;
 
 		if (param.equals_ci("ON"))
 		{

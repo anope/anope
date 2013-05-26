@@ -9,8 +9,6 @@
  * Based on the original code of Services by Andy Church.
  */
 
-/*************************************************************************/
-
 #include "module.h"
 #include "modules/os_session.h"
 
@@ -128,17 +126,17 @@ class DefConTimeout : public Timer
 		{
 			DConfig.defaultlevel = level;
 			FOREACH_MOD(I_OnDefconLevel, OnDefconLevel(level));
-			Log(OperServ, "operserv/defcon") << "Defcon level timeout, returning to level " << level;
+			Log(Config->GetClient("OperServ"), "operserv/defcon") << "Defcon level timeout, returning to level " << level;
 
 			if (DConfig.globalondefcon)
 			{
 				if (!DConfig.offmessage.empty())
-					GlobalService->SendGlobal(Global, "", DConfig.offmessage);
+					GlobalService->SendGlobal(NULL, "", DConfig.offmessage);
 				else
-					GlobalService->SendGlobal(Global, "", Anope::printf(Language::Translate(_("The Defcon Level is now at Level: \002%d\002")), DConfig.defaultlevel));
+					GlobalService->SendGlobal(NULL, "", Anope::printf(Language::Translate(_("The Defcon Level is now at Level: \002%d\002")), DConfig.defaultlevel));
 
 				if (!DConfig.message.empty())
-					GlobalService->SendGlobal(Global, "", DConfig.message);
+					GlobalService->SendGlobal(NULL, "", DConfig.message);
 			}
 
 			runDefCon();
@@ -221,12 +219,12 @@ class CommandOSDefcon : public Command
 		if (DConfig.globalondefcon)
 		{
 			if (DConfig.defaultlevel == 5 && !DConfig.offmessage.empty())
-				GlobalService->SendGlobal(Global, "", DConfig.offmessage);
+				GlobalService->SendGlobal(NULL, "", DConfig.offmessage);
 			else if (DConfig.defaultlevel != 5)
 			{
-				GlobalService->SendGlobal(Global, "", Anope::printf(_("The Defcon level is now at: \002%d\002"), DConfig.defaultlevel));
+				GlobalService->SendGlobal(NULL, "", Anope::printf(_("The Defcon level is now at: \002%d\002"), DConfig.defaultlevel));
 				if (!DConfig.message.empty())
-					GlobalService->SendGlobal(Global, "", DConfig.message);
+					GlobalService->SendGlobal(NULL, "", DConfig.message);
 			}
 		}
 
@@ -417,7 +415,7 @@ class OSDefcon : public Module
 
 		if (DConfig.Check(DEFCON_FORCE_CHAN_MODES) && cm && DConfig.DefConModesOff.count(mname))
 		{
-			c->RemoveMode(OperServ, cm, param);
+			c->RemoveMode(Config->GetClient("OperServ"), cm, param);
 
 			return EVENT_STOP;
 		}
@@ -434,9 +432,9 @@ class OSDefcon : public Module
 			Anope::string param;
 
 			if (DConfig.GetDefConParam(mname, param))
-				c->SetMode(OperServ, cm, param);
+				c->SetMode(Config->GetClient("OperServ"), cm, param);
 			else
-				c->SetMode(OperServ, cm);
+				c->SetMode(Config->GetClient("OperServ"), cm);
 
 			return EVENT_STOP;
 
@@ -488,6 +486,7 @@ class OSDefcon : public Module
 		if (exempt || u->Quitting() || !u->server->IsSynced() || u->server->IsULined())
 			return;
 
+		BotInfo *OperServ = Config->GetClient("OperServ");
 		if (DConfig.Check(DEFCON_AKILL_NEW_CLIENTS) && akills)
 		{
 			Log(OperServ, "operserv/defcon") << "DEFCON: adding akill for *@" << u->host;
@@ -548,12 +547,13 @@ class OSDefcon : public Module
 	void OnChannelSync(Channel *c) anope_override
 	{
 		if (DConfig.Check(DEFCON_FORCE_CHAN_MODES))
-			c->SetModes(OperServ, false, "%s", DConfig.chanmodes.c_str());
+			c->SetModes(Config->GetClient("OperServ"), false, "%s", DConfig.chanmodes.c_str());
 	}
 };
 
 static void runDefCon()
 {
+	BotInfo *OperServ = Config->GetClient("OperServ");
 	if (DConfig.Check(DEFCON_FORCE_CHAN_MODES))
 	{
 		if (!DConfig.chanmodes.empty() && !DefConModesSet)

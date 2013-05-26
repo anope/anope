@@ -150,7 +150,7 @@ const Anope::string &User::GetDisplayedHost() const
 void User::SetCloakedHost(const Anope::string &newhost)
 {
 	if (newhost.empty())
-		throw "empty host in User::SetCloakedHost";
+		throw CoreException("empty host in User::SetCloakedHost");
 
 	chost = newhost;
 
@@ -278,88 +278,23 @@ void User::SendMessage(const BotInfo *source, const Anope::string &msg)
 	* - The user is not registered and NSDefMsg is enabled
 	* - The user is registered and has set /ns set msg on
 	*/
+	bool send_privmsg = Config->UsePrivmsg && ((!this->nc && Config->DefPrivmsg) || (this->nc && this->nc->HasExt("MSG")));
 	sepstream sep(translated_message, '\n', true);
 	for (Anope::string tok; sep.GetToken(tok);)
 	{
-		if (Config->UsePrivmsg && ((!this->nc && Config->DefPrivmsg) || (this->nc && this->nc->HasExt("MSG"))))
+		if (send_privmsg)
 			IRCD->SendPrivmsg(source, this->GetUID(), "%s", tok.c_str());
 		else
 			IRCD->SendNotice(source, this->GetUID(), "%s", tok.c_str());
 	}
 }
 
-/** Collides a nick.
- *
- * First, it marks the nick as COLLIDED, this is checked in NickAlias::OnCancel.
- *
- * Then it does one of two things.
- *
- * 1. This will force change the users nick to the guest nick. This gets processed by the IRCd and comes
- *    back as a nick change, which calls NickAlias::OnCancel
- *    with the users old nick's nickalias (if there is one).
- *
- * 2. Calls User::Kill, which kills the user and deletes the user at the end of the I/O loop.
- *     Users destructor then calls NickAlias::OnCancel
- *
- * NickAlias::OnCancel checks for NS_COLLIDED, it then does one of two things.
- *
- * 1. If supported, we send a SVSHold for the user. We are done here, the IRCds expires this at the time we give it.
- *
- * 2. We create a new client with SendClientIntroduction(). Note that is it important that this is called either after the
- *    user has been removed from our internal list of user or after the users nick has been updated completely internally.
- *    We then create a release timer for this new client that waits and later on sends a QUIT for the client. Release timers
- *    are never used for SVSHolds. Ever.
- *
- *
- *  Note that now for the timers we only store the users name, not the NickAlias* pointer. We never remove timers when
- *  a user changes nick or a nick is deleted, the timers must assume that either of these may have happend.
- *
- *  Adam
- */
-void User::Collide(NickAlias *na)
-{
-	if (na)
-		na->Extend("COLLIDED");
-
-	if (IRCD->CanSVSNick)
-	{
-		const Anope::string &guestprefix = Config->GetBlock("options")->Get<const Anope::string>("guestnickprefix");
-
-		Anope::string guestnick;
-
-		int i = 0;
-		do
-		{
-			guestnick = guestprefix + stringify(static_cast<uint16_t>(rand()));
-		} while (User::Find(guestnick) && i++ < 10);
-
-		if (i == 11)
-			this->Kill(NickServ ? NickServ->nick : "", "Services nickname-enforcer kill");
-		else
-		{
-			if (NickServ)
-				this->SendMessage(NickServ, _("Your nickname is now being changed to \002%s\002"), guestnick.c_str());
-			IRCD->SendForceNickChange(this, guestnick, Anope::CurTime);
-		}
-	}
-	else
-		this->Kill(NickServ ? NickServ->nick : "", "Services nickname-enforcer kill");
-}
-
 void User::Identify(NickAlias *na)
 {
-	if (!na)
-	{
-		Log() << "User::Identify() called with NULL pointer";
-		return;
-	}
-
 	if (this->nick.equals_ci(na->nick))
 	{
-		Anope::string last_usermask = this->GetIdent() + "@" + this->GetDisplayedHost();
-		Anope::string last_realhost = this->GetIdent() + "@" + this->host;
-		na->last_usermask = last_usermask;
-		na->last_realhost = last_realhost;
+		na->last_usermask = this->GetIdent() + "@" + this->GetDisplayedHost();
+		na->last_realhost = this->GetIdent() + "@" + this->host;
 		na->last_realname = this->realname;
 		na->last_seen = Anope::CurTime;
 	}
@@ -367,27 +302,21 @@ void User::Identify(NickAlias *na)
 	this->Login(na->nc);
 	IRCD->SendLogin(this);
 
-	const NickAlias *this_na = NickAlias::Find(this->nick);
-	if (!Config->GetBlock("options")->Get<bool>("nonicknameownership") && this_na && this_na->nc == *na->nc && na->nc->HasExt("UNCONFIRMED") == false)
-		this->SetMode(NickServ, "REGISTERED");
-
 	FOREACH_MOD(I_OnNickIdentify, OnNickIdentify(this));
 
 	if (this->IsServicesOper())
 	{
 		if (!this->nc->o->ot->modes.empty())
 		{
-			this->SetModes(OperServ, "%s", this->nc->o->ot->modes.c_str());
-			if (OperServ)
-				this->SendMessage(OperServ, "Changing your usermodes to \002%s\002", this->nc->o->ot->modes.c_str());
+			this->SetModes(NULL, "%s", this->nc->o->ot->modes.c_str());
+			this->SendMessage(NULL, "Changing your usermodes to \002%s\002", this->nc->o->ot->modes.c_str());
 			UserMode *um = ModeManager::FindUserModeByName("OPER");
 			if (um && !this->HasMode("OPER") && this->nc->o->ot->modes.find(um->mchar) != Anope::string::npos)
 				IRCD->SendOper(this);
 		}
 		if (IRCD->CanSetVHost && !this->nc->o->vhost.empty())
 		{
-			if (OperServ)
-				this->SendMessage(OperServ, "Changing your vhost to \002%s\002", this->nc->o->vhost.c_str());
+			this->SendMessage(NULL, "Changing your vhost to \002%s\002", this->nc->o->vhost.c_str());
  			this->SetDisplayedHost(this->nc->o->vhost);
 			IRCD->SendVhost(this, "", this->nc->o->vhost);
 		}
@@ -408,6 +337,8 @@ void User::Login(NickCore *core)
 
 	if (this->server->IsSynced())
 		Log(this, "account") << "is now identified as " << this->nc->display;
+	
+	FOREACH_MOD(I_OnUserLogin, OnUserLogin(this));
 }
 
 void User::Logout()

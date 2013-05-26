@@ -131,6 +131,4 @@ class CoreExport BotInfo : public User, public Serializable
 	static BotInfo* Find(const Anope::string &nick, bool nick_only = false);
 };
 
-extern CoreExport BotInfo *BotServ, *ChanServ, *Global, *HostServ, *MemoServ, *NickServ, *OperServ;
-
 #endif // BOTS_H

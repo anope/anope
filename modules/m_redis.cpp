@@ -176,7 +176,7 @@ class MyRedisService : public Provider
 		this->SendCommand(s, i, args);
 	}
 
-	void Send(Interface *i, const std::vector<std::pair<const char *, size_t> > &args) anope_override
+	void Send(Interface *i, const std::vector<std::pair<const char *, size_t> > &args)
 	{
 		if (!sock)
 		{
@@ -202,6 +202,7 @@ class MyRedisService : public Provider
 		this->SendCommand(i, args);
 	}
 
+ public:
 	bool BlockAndProcess() anope_override
 	{
 		this->sock->ProcessWrite();

@@ -34,6 +34,7 @@ Channel::Channel(const Anope::string &nname, time_t ts)
 	this->name = nname;
 
 	this->creation_time = ts;
+	this->syncing = false;
 	this->server_modetime = this->chanserv_modetime = 0;
 	this->server_modecount = this->chanserv_modecount = this->bouncy_modes = this->topic_ts = this->topic_time = 0;
 
@@ -79,7 +80,7 @@ void Channel::Reset()
 	}
 
 	for (ChanUserList::const_iterator it = this->users.begin(), it_end = this->users.end(); it != it_end; ++it)
-		this->SetCorrectModes(it->second->user, true, false);
+		this->SetCorrectModes(it->second->user, true);
 	
 	this->Sync();
 }
@@ -152,21 +153,20 @@ void Channel::CheckModes()
 
 bool Channel::CheckDelete()
 {
-	/* Channel is persistent, it shouldn't be deleted and the service bot should stay */
-	if (this->HasExt("PERSIST") || (this->ci && this->ci->HasExt("PERSIST")))
-		return false;
-
 	/* Channel is syncing from a netburst, don't destroy it as more users are probably wanting to join immediatly
 	 * We also don't part the bot here either, if necessary we will part it after the sync
 	 */
-	if (this->HasExt("SYNCING"))
+	if (this->syncing)
+		return false;
+	
+	/* Permanent channels never get deleted */
+	if (this->HasMode("PERM"))
 		return false;
 
-	/* Additionally, do not delete this channel if ChanServ/a BotServ bot is inhabiting it */
-	if (this->HasExt("INHABIT"))
-		return false;
+	EventReturn MOD_RESULT;
+	FOREACH_RESULT(I_OnCheckDelete, OnCheckDelete(this));
 
-	return this->users.empty();
+	return MOD_RESULT != EVENT_STOP && this->users.empty();
 }
 
 ChanUserContainer* Channel::JoinUser(User *user)
@@ -179,14 +179,6 @@ ChanUserContainer* Channel::JoinUser(User *user)
 	ChanUserContainer *cuc = new ChanUserContainer(user, this);
 	user->chans[this] = cuc;
 	this->users[user] = cuc;
-
-	if (this->ci && this->ci->HasExt("PERSIST") && this->creation_time > this->ci->time_registered)
-	{
-		Log(LOG_DEBUG) << "Changing TS of " << this->name << " from " << this->creation_time << " to " << this->ci->time_registered;
-		this->creation_time = this->ci->time_registered;
-		IRCD->SendChannel(this);
-		this->Reset();
-	}
 
 	return cuc;
 }
@@ -323,7 +315,7 @@ void Channel::SetModeInternal(MessageSource &setter, ChannelMode *cm, const Anop
 
 		/* Enforce secureops, etc */
 		if (enforce_mlock && MOD_RESULT != EVENT_STOP)
-			this->SetCorrectModes(u, false, false);
+			this->SetCorrectModes(u, false);
 		return;
 	}
 
@@ -341,14 +333,6 @@ void Channel::SetModeInternal(MessageSource &setter, ChannelMode *cm, const Anop
 	{
 		ChannelModeList *cml = anope_dynamic_static_cast<ChannelModeList *>(cm);
 		cml->OnAdd(this, param);
-	}
-
-	/* Channel mode +P or so was set, mark this channel as persistent */
-	if (cm->name == "PERM")
-	{
-		this->Extend("PERSIST");
-		if (this->ci)
-			this->ci->ExtendMetadata("PERSIST");
 	}
 
 	FOREACH_RESULT(I_OnChannelModeSet, OnChannelModeSet(this, setter, cm->name, param));
@@ -395,7 +379,7 @@ void Channel::RemoveModeInternal(MessageSource &setter, ChannelMode *cm, const A
 		FOREACH_RESULT(I_OnChannelModeUnset, OnChannelModeUnset(this, setter, cm->name, param));
 
 		if (enforce_mlock && MOD_RESULT != EVENT_STOP)
-			this->SetCorrectModes(u, false, false);
+			this->SetCorrectModes(u, false);
 
 		return;
 	}
@@ -417,20 +401,6 @@ void Channel::RemoveModeInternal(MessageSource &setter, ChannelMode *cm, const A
 	{
 		ChannelModeList *cml = anope_dynamic_static_cast<ChannelModeList *>(cm);
 		cml->OnDel(this, param);
-	}
-
-	if (cm->name == "PERM")
-	{
-		this->Shrink("PERSIST");
-
-		if (this->ci)
-			this->ci->Shrink("PERSIST");
-
-		if (this->users.empty() && !this->HasExt("SYNCING") && !this->HasExt("INHABIT"))
-		{
-			delete this;
-			return;
-		}
 	}
 
 	FOREACH_RESULT(I_OnChannelModeUnset, OnChannelModeUnset(this, setter, cm->name, param));
@@ -828,9 +798,6 @@ void Channel::ChangeTopicInternal(const Anope::string &user, const Anope::string
 	Log(LOG_DEBUG) << "Topic of " << this->name << " changed by " << (u ? u->nick : user) << " to " << newtopic;
 
 	FOREACH_MOD(I_OnTopicUpdated, OnTopicUpdated(this, user, this->topic));
-
-	if (this->ci)
-		this->ci->CheckTopic();
 }
 
 void Channel::ChangeTopic(const Anope::string &user, const Anope::string &newtopic, time_t ts)
@@ -847,12 +814,9 @@ void Channel::ChangeTopic(const Anope::string &user, const Anope::string &newtop
 	this->topic_time = Anope::CurTime;
 
 	FOREACH_MOD(I_OnTopicUpdated, OnTopicUpdated(this, user, this->topic));
-
-	if (this->ci)
-		this->ci->CheckTopic();
 }
 
-void Channel::SetCorrectModes(User *user, bool give_modes, bool check_noop)
+void Channel::SetCorrectModes(User *user, bool give_modes)
 {
 	if (user == NULL)
 		return;
@@ -865,14 +829,17 @@ void Channel::SetCorrectModes(User *user, bool give_modes, bool check_noop)
 	AccessGroup u_access = ci->AccessFor(user);
 	ChannelMode *registered = ModeManager::FindChannelModeByName("REGISTERED");
 
-	/* Only give modes if autoop isn't set */
-	give_modes &= (!user->Account() || user->Account()->HasExt("AUTOOP")) && (!check_noop || !ci->HasExt("NOAUTOOP"));
 	/* If this channel has secureops, or the registered channel mode exists and the channel does not have +r set (aka the channel
 	 * was created just now or while we were off), or the registered channel mode does not exist and channel is syncing (aka just
 	 * created *to us*) and the user's server is synced (aka this isn't us doing our initial uplink - without this we would be deopping all
 	 * users with no access on a non-secureops channel on startup), and the user's server isn't ulined, then set negative modes.
 	 */
-	bool take_modes = (ci->HasExt("SECUREOPS") || (registered && !this->HasMode("REGISTERED")) || (!registered && this->HasExt("SYNCING") && user->server->IsSynced())) && !user->server->IsULined();
+	bool take_modes = (registered && !this->HasMode("REGISTERED")) || (!registered && this->syncing && user->server->IsSynced());
+
+	FOREACH_MOD(I_OnSetCorrectModes, OnSetCorrectModes(user, this, u_access, give_modes, take_modes));
+
+	/* Never take modes from ulines */
+	take_modes &= !user->server->IsULined();
 
 	bool given = false;
 	for (unsigned i = 0; i < ModeManager::GetStatusChannelModesByRank().size(); ++i)
@@ -911,8 +878,6 @@ void Channel::SetCorrectModes(User *user, bool give_modes, bool check_noop)
 			}
 		}
 	}
-
-	FOREACH_MOD(I_OnSetCorrectModes, OnSetCorrectModes(user, this, u_access, give_modes));
 }
 
 bool Channel::Unban(User *u, bool full)

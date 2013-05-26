@@ -65,8 +65,6 @@ extern int connect(int, struct sockaddr *, int);
 # endif
 #endif
 
-/*************************************************************************/
-
 #ifdef _WIN32
 typedef SOCKET ano_socket_t;
 #define ano_sockclose(fd) closesocket(fd)
@@ -141,8 +139,6 @@ void alog(const char *fmt, ...)
 	file.close();
 }
 
-/*************************************************************************/
-
 /* Remove a trailing \r\n */
 std::string strip(const std::string &buf)
 {
@@ -156,8 +152,6 @@ std::string strip(const std::string &buf)
 	return newbuf;
 }
 
-/*************************************************************************/
-
 /* Is the buffer a header? */
 bool smtp_is_header(const std::string &buf)
 {
@@ -170,8 +164,6 @@ bool smtp_is_header(const std::string &buf)
 		return true;
 	return false;
 }
-
-/*************************************************************************/
 
 /* Parse a header into a name and value */
 void smtp_parse_header(const std::string &buf, std::string &header, std::string &value)
@@ -191,8 +183,6 @@ void smtp_parse_header(const std::string &buf, std::string &header, std::string 
 	}
 }
 
-/*************************************************************************/
-
 /* Have we reached the end of input? */
 bool smtp_is_end(const std::string &buf)
 {
@@ -202,8 +192,6 @@ bool smtp_is_end(const std::string &buf)
 
 	return false;
 }
-
-/*************************************************************************/
 
 /* Set who the email is to */
 void smtp_set_to(const std::string &to)
@@ -216,8 +204,6 @@ void smtp_set_to(const std::string &to)
 		smail.to.erase(smail.to.end() - 1);
 	}
 }
-
-/*************************************************************************/
 
 /* Establish a connection to the SMTP server */
 int smtp_connect(const char *host, unsigned short port)
@@ -245,8 +231,6 @@ int smtp_connect(const char *host, unsigned short port)
 	return 1;
 }
 
-/*************************************************************************/
-
 /* Send a line of text */
 int smtp_send(const char *text)
 {
@@ -259,8 +243,6 @@ int smtp_send(const char *text)
 
 	return result;
 }
-
-/*************************************************************************/
 
 /* Read a line of text */
 int smtp_read(char *buf, int len)
@@ -276,8 +258,6 @@ int smtp_read(char *buf, int len)
 	return result;
 }
 
-/*************************************************************************/
-
 /* Retrieve a response code */
 int smtp_get_code(const std::string &text)
 {
@@ -288,8 +268,6 @@ int smtp_get_code(const std::string &text)
 
 	return atol(text.substr(0, tmp).c_str());
 }
-
-/*************************************************************************/
 
 /* Send the email */
 int smtp_send_email()
@@ -424,15 +402,11 @@ int smtp_send_email()
 	return 1;
 }
 
-/*************************************************************************/
-
 void smtp_disconnect()
 {
 	smtp_send("QUIT\r\n");
 	ano_sockclose(smail.sock);
 }
-
-/*************************************************************************/
 
 int main(int argc, char *argv[])
 {

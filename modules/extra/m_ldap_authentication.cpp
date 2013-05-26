@@ -104,6 +104,7 @@ class IdentifyInterface : public LDAPInterface
 					{
 						na = new NickAlias(ii->req->GetAccount(), new NickCore(ii->req->GetAccount()));
 						FOREACH_MOD(I_OnNickRegister, OnNickRegister(ii->user, na));
+						BotInfo *NickServ = Config->GetClient("NickServ");
 						if (ii->user && NickServ)
 							ii->user->SendMessage(NickServ, _("Your account \002%s\002 has been successfully created."), na->nick.c_str());
 					}
@@ -164,6 +165,7 @@ class OnIdentifyInterface : public LDAPInterface
 			if (!email.equals_ci(u->Account()->email))
 			{
 				u->Account()->email = email;
+				BotInfo *NickServ = Config->GetClient("NickServ");
 				if (NickServ)
 					u->SendMessage(NickServ, _("Your email has been updated to \002%s\002"), email.c_str());
 				Log(this->owner) << "m_ldap_authentication: Updated email address for " << u->nick << " (" << u->Account()->display << ") to " << email;

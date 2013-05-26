@@ -215,7 +215,6 @@ class CommandBSBadwords : public Command
 
 		ci->ClearBadWords();
 		source.Reply(_("Bad words list is now empty."));
-		return;
 	}
 
  public:

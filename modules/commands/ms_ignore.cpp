@@ -9,12 +9,7 @@
  * Based on the original code of Services by Andy Church.
  */
 
-/*************************************************************************/
-
-
 #include "module.h"
-
-static ServiceReference<MemoServService> MemoServService("MemoServService", "MemoServ");
 
 class CommandMSIgnore : public Command
 {
@@ -29,10 +24,6 @@ class CommandMSIgnore : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		if (!MemoServService)
-			return;
-
-
 		Anope::string channel = params[0];
 		Anope::string command = (params.size() > 1 ? params[1] : "");
 		Anope::string param = (params.size() > 2 ? params[2] : "");
@@ -123,9 +114,6 @@ class MSIgnore : public Module
 	MSIgnore(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandmsignore(this)
 	{
-
-		if (!MemoServService)
-			throw ModuleException("No MemoServ!");
 	}
 };
 

@@ -25,7 +25,6 @@ NickCore::NickCore(const Anope::string &coredisplay) : Serializable("NickCore"),
 	this->o = NULL;
 	this->channelcount = 0;
 	this->lastmail = 0;
-	this->memos.memomax = 0;
 
 	this->display = coredisplay;
 
@@ -51,10 +50,8 @@ NickCore::~NickCore()
 	}
 	this->users.clear();
 
-	/* Remove the core from the list */
 	NickCoreList->erase(this->display);
 
-	/* Clear access before deleting display name, we want to be able to use the display name in the clear access event */
 	this->ClearAccess();
 
 	if (!this->memos.memos->empty())

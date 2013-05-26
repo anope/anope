@@ -8,8 +8,6 @@
  * Based on the original code of Services by Andy Church.
  */
 
-/*************************************************************************/
-
 #include "module.h"
 
 class SaveData : public Serialize::Data
@@ -240,7 +238,7 @@ class DBFlatFile : public Module, public Pipe
 	}
 
 
-	EventReturn OnSaveDatabase() anope_override
+	void OnSaveDatabase() anope_override
 	{
 		BackupDatabase();
 
@@ -250,7 +248,7 @@ class DBFlatFile : public Module, public Pipe
 		{
 			i = fork();
 			if (i > 0)
-				return EVENT_CONTINUE;
+				return;
 			else if (i < 0)
 				Log(this) << "Unable to fork for database save";
 		}
@@ -335,8 +333,6 @@ class DBFlatFile : public Module, public Pipe
 			this->Notify();
 			exit(0);
 		}
-
-		return EVENT_CONTINUE;
 	}
 
 	/* Load just one type. Done if a module is reloaded during runtime */

@@ -83,7 +83,7 @@ class PlexusProto : public IRCDProto
 	void SendVhostDel(User *u) anope_override
 	{
 		if (u->HasMode("CLOAK"))
-			u->RemoveMode(HostServ, "CLOAK");
+			u->RemoveMode(Config->GetClient("HostServ"), "CLOAK");
 		else
 			this->SendVhost(u, u->GetIdent(), u->chost);
 	}
@@ -186,8 +186,6 @@ struct IRCDMessageEncap : IRCDMessage
 			if (u && nc)
 			{
 				u->Login(nc);
-				if (!Config->GetBlock("options")->Get<bool>("nonicknameownership") && user_na && user_na->nc == nc && user_na->nc->HasExt("UNCONFIRMED") == false)
-					u->SetMode(NickServ, "REGISTERED");
 			}
 		}
 
@@ -239,9 +237,7 @@ struct IRCDMessageServer : IRCDMessage
 
 struct IRCDMessageUID : IRCDMessage
 {
-	ServiceReference<NickServService> NSService;
-
-	IRCDMessageUID(Module *creator) : IRCDMessage(creator, "UID", 11), NSService("NickServService", "NickServ") { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
+	IRCDMessageUID(Module *creator) : IRCDMessage(creator, "UID", 11) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
 
 	/*
 	   params[0] = nick
@@ -277,11 +273,11 @@ struct IRCDMessageUID : IRCDMessage
 		User *user = new User(params[0], params[4], params[9], params[5], ip, source.GetServer(), params[10], ts, params[3], params[7]);
 		try
 		{
-			if (NSService && params[8].is_pos_number_only() && convertTo<time_t>(params[8]) == user->timestamp)
+			if (params[8].is_pos_number_only() && convertTo<time_t>(params[8]) == user->timestamp)
 			{
 				NickAlias *na = NickAlias::Find(user->nick);
 				if (na)
-					NSService->Login(user, na);
+					user->Login(na->nc);
 			}
 		}
 		catch (const ConvertException &) { }

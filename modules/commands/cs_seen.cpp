@@ -9,8 +9,6 @@
  * Based on the original code of Services by Andy Church.
  */
 
-/*************************************************************************/
-
 
 #include "module.h"
 
@@ -290,14 +288,28 @@ class CommandSeen : public Command
 	}
 };
 
-class DataBasePurger : public Timer
+class CSSeen : public Module
 {
+	Serialize::Type seeninfo_type;
+	CommandSeen commandseen;
+	CommandOSSeen commandosseen;
  public:
-	DataBasePurger(Module *o) : Timer(o, 300, Anope::CurTime, true) { }
-
-	void Tick(time_t) anope_override
+	CSSeen(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR), seeninfo_type("SeenInfo", SeenInfo::Unserialize), commandseen(this), commandosseen(this)
 	{
-		size_t previous_size = database.size(), purgetime = Config->GetModule(this->GetOwner())->Get<time_t>("purgetime");
+
+		Implementation eventlist[] =  { I_OnExpireTick,
+						I_OnUserConnect,
+						I_OnUserNickChange,
+						I_OnUserQuit,
+						I_OnJoinChannel,
+						I_OnPartChannel,
+						I_OnPreUserKicked };
+		ModuleManager::Attach(eventlist, this, sizeof(eventlist) / sizeof(Implementation));
+	}
+
+	void OnExpireTick() anope_override
+	{
+		size_t previous_size = database.size(), purgetime = Config->GetModule(this)->Get<time_t>("purgetime");
 		if (!purgetime)
 			purgetime = Anope::DoTime("30d");
 		for (database_map::iterator it = database.begin(), it_end = database.end(); it != it_end;)
@@ -313,37 +325,6 @@ class DataBasePurger : public Timer
 			}
 		}
 		Log(LOG_DEBUG) << "cs_seen: Purged database, checked " << previous_size << " nicks and removed " << (previous_size - database.size()) << " old entries.";
-	}
-};
-
-class CSSeen : public Module
-{
-	Serialize::Type seeninfo_type;
-	CommandSeen commandseen;
-	CommandOSSeen commandosseen;
-	DataBasePurger purger;
- public:
-	CSSeen(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR), seeninfo_type("SeenInfo", SeenInfo::Unserialize), commandseen(this), commandosseen(this), purger(this)
-	{
-
-		Implementation eventlist[] =  { I_OnReload,
-						I_OnUserConnect,
-						I_OnUserNickChange,
-						I_OnUserQuit,
-						I_OnJoinChannel,
-						I_OnPartChannel,
-						I_OnPreUserKicked };
-		ModuleManager::Attach(eventlist, this, sizeof(eventlist)/sizeof(Implementation));
-	}
-
-	void OnReload(Configuration::Conf *conf) anope_override
-	{
-		time_t expiretimeout = conf->GetModule(this)->Get<time_t>("expiretimeout");
-		if (!expiretimeout)
-			expiretimeout = Anope::DoTime("1d");
-
-		if (purger.GetSecs() != expiretimeout)
-			purger.SetSecs(expiretimeout);
 	}
 
 	void OnUserConnect(User *u, bool &exempt) anope_override

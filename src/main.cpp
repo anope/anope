@@ -47,9 +47,20 @@ class UpdateTimer : public Timer
  public:
 	UpdateTimer(time_t timeout) : Timer(timeout, Anope::CurTime, true) { }
 
-	void Tick(time_t)
+	void Tick(time_t) anope_override
 	{
 		Anope::SaveDatabases();
+	}
+};
+
+class ExpireTimer : public Timer
+{
+ public:
+	ExpireTimer(time_t timeout) : Timer(timeout, Anope::CurTime, true) { }
+
+	void Tick(time_t) anope_override
+	{
+		FOREACH_MOD(I_OnExpireTick, OnExpireTick());
 	}
 };
 
@@ -58,9 +69,8 @@ void Anope::SaveDatabases()
 	if (Anope::ReadOnly)
 		return;
 
-	EventReturn MOD_RESULT;
-	FOREACH_RESULT(I_OnSaveDatabase, OnSaveDatabase());
 	Log(LOG_DEBUG) << "Saving databases";
+	FOREACH_MOD(I_OnSaveDatabase, OnSaveDatabase());
 }
 
 /** The following comes from InspIRCd to get the full path of the Anope executable
@@ -99,8 +109,6 @@ static Anope::string GetFullProgDir(const Anope::string &argv0)
 #endif
 	return "/";
 }
-
-/*************************************************************************/
 
 /* Main routine.  (What does it look like? :-) ) */
 
@@ -150,6 +158,7 @@ int main(int ac, char **av, char **envp)
 	/* Set up timers */
 	time_t last_check = Anope::CurTime;
 	UpdateTimer updateTimer(Config->GetBlock("options")->Get<time_t>("updatetimeout"));
+	ExpireTimer expireTimer(Config->GetBlock("options")->Get<time_t>("expiretimeout"));
 
 	/*** Main loop. ***/
 	while (!Anope::Quitting)

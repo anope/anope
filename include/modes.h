@@ -262,24 +262,6 @@ class CoreExport ChannelModeRegistered : public ChannelMode
 	bool CanSet(User *u) const anope_override;
 };
 
-class StackerInfo
-{
- public:
-	/* Modes to be added */
-	std::list<std::pair<Mode *, Anope::string> > AddModes;
-	/* Modes to be deleted */
-	std::list<std::pair<Mode *, Anope::string> > DelModes;
-	/* Bot this is sent from */
-	const BotInfo *bi;
-
-	/** Add a mode to this object
-	 * @param mode The mode
-	 * @param set true if setting, false if unsetting
-	 * @param param The param for the mode
-	 */
-	void AddMode(Mode *mode, bool set, const Anope::string &param);
-};
-
 /** This is the mode manager
  * It contains functions for adding modes to Anope so Anope can track them
  * and do things such as MLOCK.
@@ -289,16 +271,6 @@ class StackerInfo
 class CoreExport ModeManager
 {
  protected:
-	/* List of pairs of user/channels and their stacker info */
-	static std::map<User *, StackerInfo *> UserStackerObjects;
-	static std::map<Channel *, StackerInfo *> ChannelStackerObjects;
-
-	/** Build a list of mode strings to send to the IRCd from the mode stacker
-	 * @param info The stacker info for a channel or user
-	 * @return a list of strings
-	 */
-	static std::list<Anope::string> BuildModeStrings(StackerInfo *info);
-
 	/* Array of all modes Anope knows about. Modes are in this array at position
 	 * modechar. Additionally, status modes are in this array (again) at statuschar.
 	 */

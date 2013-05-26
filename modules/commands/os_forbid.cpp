@@ -9,10 +9,10 @@
  * Based on the original code of Services by Andy Church.
  */
 
-/*************************************************************************/
-
 #include "module.h"
 #include "modules/os_forbid.h"
+
+static ServiceReference<NickServService> nickserv("NickServService", "NickServ");
 
 class MyForbidService : public ForbidService
 {
@@ -271,6 +271,7 @@ class OSForbid : public Module
 		ForbidData *d = this->forbidService.FindForbid(u->nick, FT_NICK);
 		if (d != NULL)
 		{
+			BotInfo *OperServ = Config->GetClient("OperServ");
 			if (OperServ)
 			{
 				if (d->reason.empty())
@@ -278,12 +279,14 @@ class OSForbid : public Module
 				else
 					u->SendMessage(OperServ, _("This nickname has been forbidden: %s"), d->reason.c_str());
 			}
-			u->Collide(NULL);
+			if (nickserv)
+				nickserv->Collide(u, NULL);
 		}
 	}
 
 	void OnJoinChannel(User *u, Channel *c) anope_override
 	{
+		BotInfo *OperServ = Config->GetClient("OperServ");
 		if (u->HasMode("OPER") || !OperServ)
 			return;
 

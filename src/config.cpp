@@ -589,6 +589,18 @@ Block *Conf::GetModule(const Anope::string &mname)
 	return GetModule(mname);
 }
 
+BotInfo *Conf::GetClient(const Anope::string &cname)
+{
+	Anope::map<Anope::string>::iterator it = bots.find(cname);
+	if (it != bots.end())
+		return BotInfo::Find(!it->second.empty() ? it->second : cname, true);
+
+	Block *block = GetModule(cname.lower());
+	const Anope::string &client = block->Get<const Anope::string>("client");
+	bots[cname] = client;
+	return GetClient(cname);
+}
+
 File::File(const Anope::string &n, bool e) : name(n), executable(e), fp(NULL)
 {
 }

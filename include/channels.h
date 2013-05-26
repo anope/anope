@@ -30,12 +30,6 @@ struct ChanUserContainer : public Extensible
 	ChanUserContainer(User *u, Channel *c) : user(u), chan(c) { }
 };
 
-/* Possible flags:
- *
- * INHABIT - ChanServ is currently holding the channel
- * PERSIST - Channel still exists when emptied (IRCd enforced)
- * SYNCING - Channel is syncing users (channel was just created) and it should not be deleted
- */
 class CoreExport Channel : public Base, public Extensible
 {
  public:
@@ -52,6 +46,8 @@ class CoreExport Channel : public Base, public Extensible
 	Serialize::Reference<ChannelInfo> ci;
 	/* When the channel was created */
 	time_t creation_time;
+	/* If the channel has just been created in a netjoin */
+	bool syncing;
 
 	/* Users in the channel */
 	typedef std::map<User *, ChanUserContainer *> ChanUserList;
@@ -272,9 +268,8 @@ class CoreExport Channel : public Base, public Extensible
 	 * for the specified user.
 	 * @param user The user to give/remove modes to/from
 	 * @param give_modes if true modes may be given to the user
-	 * @param check_noop if true, CI_NOAUTOOP is checked before giving modes
 	 */
-	void SetCorrectModes(User *u, bool give_mode, bool check_noop);
+	void SetCorrectModes(User *u, bool give_modes);
 
 	/** Unbans a user from this channel.
 	 * @param u The user to unban

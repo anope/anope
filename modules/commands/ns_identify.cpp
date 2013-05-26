@@ -9,8 +9,6 @@
  * Based on the original code of Services by Andy Church.
  */
 
-/*************************************************************************/
-
 #include "module.h"
 
 class NSIdentifyRequest : public IdentifyRequest
@@ -39,7 +37,6 @@ class NSIdentifyRequest : public IdentifyRequest
 			Log(LOG_COMMAND, source, cmd) << "and identified for account " << na->nc->display;
 			source.Reply(_("Password accepted - you are now recognized."));
 			u->Identify(na);
-			na->Release();
 		}
 	}
 

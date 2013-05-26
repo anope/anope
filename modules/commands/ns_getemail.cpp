@@ -13,8 +13,6 @@
  * Cards are not excepted. Must use user@email-host.
  */
 
-/*************************************************************************/
-
 #include "module.h"
 
 class CommandNSGetEMail : public Command

@@ -8,8 +8,6 @@
  * Based on the original code of Services by Andy Church.
  */
 
-/*************************************************************************/
-
 #include "module.h"
 #include "modules/os_session.h"
 
@@ -654,7 +652,7 @@ class DBPlain : public Module
 	}
 
 
-	EventReturn OnSaveDatabase() anope_override
+	void OnSaveDatabase() anope_override
 	{
 		BackupDatabase();
 
@@ -868,15 +866,13 @@ class DBPlain : public Module
 		if (!db.is_open())
 		{
 			IRCD->SendGlobops(NULL, "Unable to open %s for writing!", DatabaseFile.c_str());
-			return EVENT_CONTINUE;
+			return;
 		}
 
 		db << db_buffer.str();
 		db_buffer.str("");
 
 		db.close();
-
-		return EVENT_CONTINUE;
 	}
 };
 

@@ -9,8 +9,6 @@
  * Based on the original code of Services by Andy Church.
  */
 
-/*************************************************************************/
-
 #include "module.h"
 
 static ServiceReference<NickServService> NickServService("NickServService", "NickServ");
@@ -52,7 +50,7 @@ class CommandNSLogout : public Command
 				source.Reply(_("Your nick has been logged out."));
 
 			IRCD->SendLogout(u2);
-			u2->RemoveMode(NickServ, "REGISTERED");
+			u2->RemoveMode(source.service, "REGISTERED");
 			u2->Logout();
 
 			/* Send out an event */

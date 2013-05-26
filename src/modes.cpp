@@ -14,9 +14,11 @@
 #include "protocol.h"
 #include "channels.h"
 
+struct StackerInfo;
+
 /* List of pairs of user/channels and their stacker info */
-std::map<User *, StackerInfo *> ModeManager::UserStackerObjects;
-std::map<Channel *, StackerInfo *> ModeManager::ChannelStackerObjects;
+static std::map<User *, StackerInfo *> UserStackerObjects;
+static std::map<Channel *, StackerInfo *> ChannelStackerObjects;
 
 /* List of all modes Anope knows about */
 std::vector<ChannelMode *> ModeManager::ChannelModes;
@@ -30,6 +32,25 @@ static std::vector<ChannelModeStatus *> ChannelModesByStatus;
 
 /* Number of generic modes we support */
 unsigned ModeManager::GenericChannelModes = 0, ModeManager::GenericUserModes = 0;
+
+struct StackerInfo
+{
+	/* Modes to be added */
+	std::list<std::pair<Mode *, Anope::string> > AddModes;
+	/* Modes to be deleted */
+	std::list<std::pair<Mode *, Anope::string> > DelModes;
+	/* Bot this is sent from */
+	const BotInfo *bi;
+
+	StackerInfo() : bi(NULL) { }
+
+	/** Add a mode to this object
+	 * @param mode The mode
+	 * @param set true if setting, false if unsetting
+	 * @param param The param for the mode
+	 */
+	void AddMode(Mode *mode, bool set, const Anope::string &param);
+};
 
 ChannelStatus::ChannelStatus()
 {
@@ -255,7 +276,11 @@ static StackerInfo *GetInfo(List &l, Object *o)
 	return s;
 }
 
-std::list<Anope::string> ModeManager::BuildModeStrings(StackerInfo *info)
+/** Build a list of mode strings to send to the IRCd from the mode stacker
+ * @param info The stacker info for a channel or user
+ * @return a list of strings
+ */
+static std::list<Anope::string> BuildModeStrings(StackerInfo *info)
 {
 	std::list<Anope::string> ret;
 	std::list<std::pair<Mode *, Anope::string> >::iterator it, it_end;
@@ -521,8 +546,6 @@ void ModeManager::StackerAdd(const BotInfo *bi, User *u, UserMode *um, bool Set,
 	s->AddMode(um, Set, Param);
 	if (bi)
 		s->bi = bi;
-	else
-		s->bi = NULL;
 
 	if (!modePipe)
 		modePipe = new ModePipe();

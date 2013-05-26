@@ -9,8 +9,6 @@
  * Based on the original code of Services by Andy Church.
  */
 
-/*************************************************************************/
-
 #include "module.h"
 
 class CommandOSNOOP : public Command
@@ -95,6 +93,7 @@ class OSNOOP : public Module
 			if (setter)
 			{
 				Anope::string reason = "NOOP command used by " + *setter;
+				BotInfo *OperServ = Config->GetClient("OperServ");
 				u->Kill(OperServ ? OperServ->nick : "", reason);
 			}
 		}

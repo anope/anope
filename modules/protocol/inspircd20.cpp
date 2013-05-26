@@ -9,8 +9,6 @@
  * Based on the original code of Services by Andy Church.
  */
 
-/*************************************************************************/
-
 #include "module.h"
 
 static bool sasl = true;
@@ -663,7 +661,7 @@ struct IRCDMessageEncap : IRCDMessage
 				{
 					UplinkSocket::Message(Me) << "ENCAP " << this->uid.substr(0, 3) << " SASL " << Me->GetSID() << " " << this->uid << " " << " D F";
 
-					Log(NickServ) << "A user failed to identify for account " << this->GetAccount() << " using SASL";
+					Log(Config->GetClient("NickServ")) << "A user failed to identify for account " << this->GetAccount() << " using SASL";
 				}
 			};
 

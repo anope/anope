@@ -9,11 +9,7 @@
  * Based on the original code of Services by Andy Church.
  */
 
-/*************************************************************************/
-
 #include "module.h"
-
-static ServiceReference<ChanServService> chanserv("ChanServService", "ChanServ");
 
 class CommandCSKick : public Command
 {

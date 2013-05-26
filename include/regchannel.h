@@ -399,17 +399,6 @@ class CoreExport ChannelInfo : public Serializable, public Extensible
 	 */
 	bool CheckKick(User *user);
 
-	/** Check the channel topic
-	 * If topic lock is enabled will change the topic back, else it records
-	 * the new topic in the ChannelInfo
-	 */
-	void CheckTopic();
-
-	/** Restore the channel topic, used on channel creation when not syncing with the uplink
-	 * and after uplink sync
-	 */
-	void RestoreTopic();
-
 	/** Get the level for a privilege
 	 * @param priv The privilege name
 	 * @return the level

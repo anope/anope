@@ -193,7 +193,7 @@ class CommandHSActivate : public Command
 			FOREACH_MOD(I_OnSetVhost, OnSetVhost(na));
 
 			if (Config->GetModule(this->owner)->Get<bool>("memouser") && memoserv)
-				memoserv->Send(HostServ->nick, na->nick, _("[auto memo] Your requested vHost has been approved."), true);
+				memoserv->Send(source.service->nick, na->nick, _("[auto memo] Your requested vHost has been approved."), true);
 
 			source.Reply(_("vHost for %s has been activated."), na->nick.c_str());
 			Log(LOG_COMMAND, source, this) << "for " << na->nick << " for vhost " << (!req->ident.empty() ? req->ident + "@" : "") << req->host;
@@ -244,7 +244,7 @@ class CommandHSReject : public Command
 				else
 					message = _("[auto memo] Your requested vHost has been rejected.");
 
-				memoserv->Send(HostServ->nick, nick, message, true);
+				memoserv->Send(source.service->nick, nick, message, true);
 			}
 
 			source.Reply(_("vHost for %s has been rejected."), nick.c_str());
@@ -380,7 +380,7 @@ static void req_send_memos(Module *me, CommandSource &source, const Anope::strin
 
 			Anope::string message = Anope::printf(_("[auto memo] vHost \002%s\002 has been requested by %s."), host.c_str(), source.GetNick().c_str());
 
-			memoserv->Send(HostServ->nick, na->nick, message, true);
+			memoserv->Send(source.service->nick, na->nick, message, true);
 		}
 }
 

@@ -33,7 +33,7 @@ class CommandCSEnforce : public Command
 		{
 			ChanUserContainer *uc = it->second;
 
-			ci->c->SetCorrectModes(uc->user, false, false);
+			ci->c->SetCorrectModes(uc->user, false);
 		}
 
 		if (!hadsecureops)

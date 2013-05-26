@@ -9,8 +9,6 @@
  * Based on the original code of Services by Andy Church.
  */
 
-/*************************************************************************/
-
 #include "module.h"
 
 class ChannelModeFlood : public ChannelModeParam
@@ -211,7 +209,7 @@ class BahamutIRCdProto : public IRCDProto
 			x = new XLine("*@" + u->host, old->by, old->expires, old->reason, old->id);
 			old->manager->AddXLine(x);
 
-			Log(OperServ, "akill") << "AKILL: Added an akill for " << x->mask << " because " << u->GetMask() << "#" << u->realname << " matches " << old->mask;
+			Log(Config->GetClient("OperServ"), "akill") << "AKILL: Added an akill for " << x->mask << " because " << u->GetMask() << "#" << u->realname << " matches " << old->mask;
 		}
 
 		/* ZLine if we can instead */
@@ -292,12 +290,12 @@ class BahamutIRCdProto : public IRCDProto
 
 	void SendLogin(User *u) anope_override
 	{
-		IRCD->SendMode(NickServ, u, "+d %d", u->signon);
+		IRCD->SendMode(Config->GetClient("NickServ"), u, "+d %d", u->signon);
 	}
 
 	void SendLogout(User *u) anope_override
 	{
-		IRCD->SendMode(NickServ, u, "+d 1");
+		IRCD->SendMode(Config->GetClient("NickServ"), u, "+d 1");
 	}
 };
 
@@ -368,9 +366,7 @@ struct IRCDMessageMode : IRCDMessage
  */
 struct IRCDMessageNick : IRCDMessage
 {
-	ServiceReference<NickServService> NSService;
-
-	IRCDMessageNick(Module *creator) : IRCDMessage(creator, "NICK", 2), NSService("NickServService", "NickServ") { SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
+	IRCDMessageNick(Module *creator) : IRCDMessage(creator, "NICK", 2) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
 
 	void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
 	{
@@ -387,8 +383,8 @@ struct IRCDMessageNick : IRCDMessage
 			try
 			{
 				NickAlias *na;
-				if (NSService && user->signon == convertTo<time_t>(params[7]) && (na = NickAlias::Find(user->nick)))
-					NSService->Login(user, na);
+				if (user->signon == convertTo<time_t>(params[7]) && (na = NickAlias::Find(user->nick)))
+					user->Login(na->nc);
 			}
 			catch (const ConvertException &) { }
 		}

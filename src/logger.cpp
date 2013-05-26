@@ -98,9 +98,6 @@ Log::Log(const User *_u, Channel *ch, const Anope::string &cat) : bi(NULL), u(_u
 {
 	if (!chan)
 		throw CoreException("Invalid pointers passed to Log::Log");
-	
-	if (Config)
-		this->bi = ChanServ;
 }
 
 Log::Log(const User *_u, const Anope::string &cat, const BotInfo *_bi) : bi(_bi), u(_u), nc(NULL), c(NULL), chan(NULL), ci(NULL), s(NULL), m(NULL), type(LOG_USER), category(cat)
@@ -113,9 +110,6 @@ Log::Log(Server *serv, const Anope::string &cat, const BotInfo *_bi) : bi(_bi), 
 {
 	if (!s)
 		throw CoreException("Invalid pointer passed to Log::Log");
-	
-	if (!this->bi)
-		this->bi = OperServ;
 }
 
 Log::Log(const BotInfo *b, const Anope::string &cat) : bi(b), u(NULL), nc(NULL), c(NULL), chan(NULL), ci(NULL), s(NULL), m(NULL), type(LOG_NORMAL), category(cat)
@@ -134,13 +128,13 @@ Log::~Log()
 		std::cout << GetTimeStamp() << " " << this->BuildPrefix() << this->buf.str() << std::endl;
 	else if (this->type == LOG_TERMINAL)
 		std::cout << this->BuildPrefix() << this->buf.str() << std::endl;
+
+	FOREACH_MOD(I_OnLog, OnLog(this));
 	
 	if (Config)
 		for (unsigned i = 0; i < Config->LogInfos.size(); ++i)
 			if (Config->LogInfos[i].HasType(this->type, this->category))
 				Config->LogInfos[i].ProcessMessage(this);
-
-	FOREACH_MOD(I_OnLog, OnLog(this));
 }
 
 Anope::string Log::BuildPrefix() const

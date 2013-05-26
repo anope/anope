@@ -9,8 +9,6 @@
  * Based on the original code of Services by Andy Church.
  */
 
-/*************************************************************************/
-
 #include "module.h"
 
 struct AJoinEntry;
@@ -250,6 +248,7 @@ class NSAJoin : public Module
 
 	void OnNickIdentify(User *u) anope_override
 	{
+		BotInfo *NickServ = Config->GetClient("NickServ");
 		if (!NickServ)
 			return;
 

@@ -75,7 +75,7 @@ Serializable* Memo::Unserialize(Serializable *obj, Serialize::Data &data)
 	return m;
 }
 
-MemoInfo::MemoInfo() : memos("Memo")
+MemoInfo::MemoInfo() : memomax(0), memos("Memo")
 {
 }
 

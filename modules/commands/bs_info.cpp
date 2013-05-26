@@ -10,8 +10,6 @@
  *
  *
  */
-/*************************************************************************/
-
 #include "module.h"
 
 class CommandBSInfo : public Command

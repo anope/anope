@@ -9,8 +9,6 @@
  * Based on the original code of Services by Andy Church.
  */
 
-/*************************************************************************/
-
 #include "module.h"
 
 class ChannelModeFlood : public ChannelModeParam
@@ -46,7 +44,7 @@ class InspIRCd12Proto : public IRCDProto
 		if (!Servers::Capab.count("CHGIDENT"))
 			Log() << "CHGIDENT not loaded!";
 		else
-			UplinkSocket::Message(HostServ) << "CHGIDENT " << nick << " " << vIdent;
+			UplinkSocket::Message(Me) << "CHGIDENT " << nick << " " << vIdent;
 	}
 
 	void SendChgHostInternal(const Anope::string &nick, const Anope::string &vhost)
@@ -176,7 +174,7 @@ class InspIRCd12Proto : public IRCDProto
 			x = new XLine("*@" + u->host, old->by, old->expires, old->reason, old->id);
 			old->manager->AddXLine(x);
 
-			Log(OperServ, "akill") << "AKILL: Added an akill for " << x->mask << " because " << u->GetMask() << "#" << u->realname << " matches " << old->mask;
+			Log(Config->GetClient("OperServ"), "akill") << "AKILL: Added an akill for " << x->mask << " because " << u->GetMask() << "#" << u->realname << " matches " << old->mask;
 		}
 
 		/* ZLine if we can instead */
@@ -277,13 +275,13 @@ class InspIRCd12Proto : public IRCDProto
 	/* SVSHOLD - set */
 	void SendSVSHold(const Anope::string &nick, time_t t) anope_override
 	{
-		UplinkSocket::Message(NickServ) << "SVSHOLD " << nick << " " << t << " :Being held for registered user";
+		UplinkSocket::Message(Config->GetClient("NickServ")) << "SVSHOLD " << nick << " " << t << " :Being held for registered user";
 	}
 
 	/* SVSHOLD - release */
 	void SendSVSHoldDel(const Anope::string &nick) anope_override
 	{
-		UplinkSocket::Message(NickServ) << "SVSHOLD " << nick;
+		UplinkSocket::Message(Config->GetClient("NickServ")) << "SVSHOLD " << nick;
 	}
 
 	/* UNSZLINE */
@@ -929,9 +927,7 @@ struct IRCDMessageMetadata : IRCDMessage
 				{
 					u->Login(nc);
 
-					const NickAlias *user_na = NickAlias::Find(u->nick);
-					if (!Config->GetBlock("options")->Get<bool>("nonicknameownership") && user_na && user_na->nc == nc && user_na->nc->HasExt("UNCONFIRMED") == false)
-						u->SetMode(NickServ, "REGISTERED");
+					BotInfo *NickServ = Config->GetClient("nickserv");
 
 					/* Sometimes a user connects, we send them the usual "this nickname is registered" mess (if
 					 * their server isn't syncing) and then we receive this.. so tell them about it.
@@ -1234,7 +1230,7 @@ class ProtoInspIRCd : public Module
 		/* InspIRCd 1.2 doesn't set -r on nick change, remove -r here. Note that if we have to set +r later
 		 * this will cancel out this -r, resulting in no mode changes.
 		 */
-		u->RemoveMode(NickServ, "REGISTERED");
+		u->RemoveMode(Config->GetClient("NickServ"), "REGISTERED");
 	}
 };
 

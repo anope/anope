@@ -9,8 +9,6 @@
  * Based on the original code of Services by Andy Church.
  */
 
-/*************************************************************************/
-
 #include "module.h"
 
 class SGLineManager : public XLineManager
@@ -25,7 +23,7 @@ class SGLineManager : public XLineManager
 
 	void OnExpire(const XLine *x) anope_override
 	{
-		Log(OperServ, "expire/akill") << "AKILL on \002" << x->mask << "\002 has expired";
+		Log(Config->GetClient("OperServ"), "expire/akill") << "AKILL on \002" << x->mask << "\002 has expired";
 	}
 	
 	void Send(User *u, XLine *x) anope_override
@@ -80,7 +78,7 @@ class SQLineManager : public XLineManager
 
 	void OnExpire(const XLine *x) anope_override
 	{
-		Log(OperServ, "expire/sqline") << "SQLINE on \002" << x->mask << "\002 has expired";
+		Log(Config->GetClient("OperServ"), "expire/sqline") << "SQLINE on \002" << x->mask << "\002 has expired";
 	}
 
 	void Send(User *u, XLine *x) anope_override
@@ -129,7 +127,7 @@ class SNLineManager : public XLineManager
 
 	void OnExpire(const XLine *x) anope_override
 	{
-		Log(OperServ, "expire/snline") << "SNLINE on \002" << x->mask << "\002 has expired";
+		Log(Config->GetClient("OperServ"), "expire/snline") << "SNLINE on \002" << x->mask << "\002 has expired";
 	}
 
 	void Send(User *u, XLine *x) anope_override
@@ -152,6 +150,7 @@ class SNLineManager : public XLineManager
 
 class OperServCore : public Module
 {
+	Reference<BotInfo> OperServ;
 	SGLineManager sglines;
 	SQLineManager sqlines;
 	SNLineManager snlines;
@@ -160,7 +159,7 @@ class OperServCore : public Module
 	OperServCore(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PSEUDOCLIENT | VENDOR),
 		sglines(this), sqlines(this), snlines(this)
 	{
-		Implementation i[] = { I_OnReload, I_OnBotDelete, I_OnBotPrivmsg, I_OnServerQuit, I_OnUserModeSet, I_OnUserModeUnset, I_OnUserConnect, I_OnUserNickChange, I_OnPreHelp };
+		Implementation i[] = { I_OnReload, I_OnBotPrivmsg, I_OnServerQuit, I_OnUserModeSet, I_OnUserModeUnset, I_OnUserConnect, I_OnUserNickChange, I_OnPreHelp, I_OnLog };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 
 		/* Yes, these are in this order for a reason. Most violent->least violent. */
@@ -171,8 +170,6 @@ class OperServCore : public Module
 
 	~OperServCore()
 	{
-		OperServ = NULL;
-
 		this->sglines.Clear();
 		this->sqlines.Clear();
 		this->snlines.Clear();
@@ -196,18 +193,12 @@ class OperServCore : public Module
 		OperServ = bi;
 	}
 
-	void OnBotDelete(BotInfo *bi) anope_override
-	{
-		if (bi == OperServ)
-			OperServ = NULL;
-	}
-
 	EventReturn OnBotPrivmsg(User *u, BotInfo *bi, Anope::string &message) anope_override
 	{
 		if (bi == OperServ && !u->HasMode("OPER") && Config->GetModule(this)->Get<bool>("opersonly"))
 		{
 			u->SendMessage(bi, ACCESS_DENIED);
-			Log(OperServ, "bados") << "Denied access to " << bi->nick << " from " << u->GetMask() << " (non-oper)";
+			Log(bi, "bados") << "Denied access to " << bi->nick << " from " << u->GetMask() << " (non-oper)";
 			return EVENT_STOP;
 		}
 
@@ -258,10 +249,16 @@ class OperServCore : public Module
 
 	EventReturn OnPreHelp(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		if (!params.empty() || source.c || source.service != OperServ)
+		if (!params.empty() || source.c || source.service != *OperServ)
 			return EVENT_CONTINUE;
 		source.Reply(_("%s commands:"), OperServ->nick.c_str());
 		return EVENT_CONTINUE;
+	}
+
+	void OnLog(Log *l) anope_override
+	{
+		if (l->type == LOG_SERVER)
+			l->bi = OperServ;
 	}
 };
 

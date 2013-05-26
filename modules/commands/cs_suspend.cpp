@@ -9,8 +9,6 @@
  * Based on the original code of Services by Andy Church.
  */
 
-/*************************************************************************/
-
 #include "module.h"
 
 class CommandCSSuspend : public Command
@@ -205,7 +203,7 @@ class CSSuspend : public Module
 				ci->Shrink("suspend:reason");
 				ci->Shrink("suspend:time");
 
-				Log(LOG_NORMAL, "expire", ChanServ) << "Expiring suspend for " << ci->name;
+				Log(this) << "Expiring suspend for " << ci->name;
 			}
 		}
 		catch (const ConvertException &) { }

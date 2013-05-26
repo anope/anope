@@ -9,7 +9,8 @@ class NickServService : public Service
 	}
 
 	virtual void Validate(User *u) = 0;
-	virtual void Login(User *u, NickAlias *na) = 0;
+	virtual void Collide(User *u, NickAlias *na) = 0;
+	virtual void Release(NickAlias *na) = 0;
 };
 
 #endif // NICKSERV_H

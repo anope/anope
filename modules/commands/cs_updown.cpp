@@ -9,8 +9,6 @@
  * Based on the original code of Services by Andy Church.
  */
 
-/*************************************************************************/
-
 #include "module.h"
 
 class CommandCSUp : public Command
@@ -31,7 +29,7 @@ class CommandCSUp : public Command
 			for (User::ChanUserList::iterator it = source.GetUser()->chans.begin(); it != source.GetUser()->chans.end(); ++it)
 			{
 				Channel *c = it->second->chan;
-				c->SetCorrectModes(source.GetUser(), true, false);
+				c->SetCorrectModes(source.GetUser(), true);
 			}
 		}
 		else
@@ -58,6 +56,11 @@ class CommandCSUp : public Command
 				source.Reply(NICK_X_NOT_IN_USE, nick.c_str());
 				return;
 			}
+			else if (!u->FindChannel(c))
+			{
+				source.Reply(NICK_X_NOT_ON_CHAN, nick.c_str(), channel.c_str());
+				return;
+			}
 			else if (source.GetUser() && u != source.GetUser() && c->ci->HasExt("PEACE"))
 			{
 				if (c->ci->AccessFor(u) > c->ci->AccessFor(source.GetUser()))
@@ -67,7 +70,7 @@ class CommandCSUp : public Command
 				}
 			}
 
-			c->SetCorrectModes(u, true, false);
+			c->SetCorrectModes(u, true);
 		}
 
 	}
@@ -134,6 +137,11 @@ class CommandCSDown : public Command
 			if (u == NULL)
 			{
 				source.Reply(NICK_X_NOT_IN_USE, nick.c_str());
+				return;
+			}
+			else if (!u->FindChannel(c))
+			{
+				source.Reply(NICK_X_NOT_ON_CHAN, nick.c_str(), channel.c_str());
 				return;
 			}
 			else if (source.GetUser() && u != source.GetUser() && c->ci->HasExt("PEACE"))

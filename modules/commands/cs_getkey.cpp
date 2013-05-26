@@ -9,8 +9,6 @@
  * Based on the original code of Services by Andy Church.
  */
 
-/*************************************************************************/
-
 #include "module.h"
 
 class CommandCSGetKey : public Command
@@ -50,7 +48,6 @@ class CommandCSGetKey : public Command
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci);
 
 		source.Reply(_("Key for channel \002%s\002 is \002%s\002."), chan.c_str(), key.c_str());
-		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override

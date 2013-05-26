@@ -105,10 +105,6 @@ struct IRCDMessageEncap : IRCDMessage
 			if (!nc)
 				return;
 			u->Login(nc);
-
-			const NickAlias *user_na = NickAlias::Find(u->nick);
-			if (!Config->GetBlock("options")->Get<bool>("nonicknameownership") && user_na && user_na->nc == nc && user_na->nc->HasExt("UNCONFIRMED") == false)
-				u->SetMode(NickServ, "REGISTERED");
 		}
 	}
 };

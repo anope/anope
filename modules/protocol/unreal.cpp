@@ -9,8 +9,6 @@
  * Based on the original code of Services by Andy Church.
  */
 
-/*************************************************************************/
-
 #include "module.h"
 
 static bool sasl = true;
@@ -76,6 +74,7 @@ class UnrealIRCdProto : public IRCDProto
 
 	void SendVhostDel(User *u) anope_override
 	{
+		BotInfo *HostServ = Config->GetClient("HostServ");
 		u->RemoveMode(HostServ, "CLOAK");
 		u->RemoveMode(HostServ, "VHOST");
 		ModeManager::ProcessModes();
@@ -105,7 +104,7 @@ class UnrealIRCdProto : public IRCDProto
 			old->manager->AddXLine(xline);
 			x = xline;
 
-			Log(OperServ, "akill") << "AKILL: Added an akill for " << x->mask << " because " << u->GetMask() << "#" << u->realname << " matches " << old->mask;
+			Log(Config->GetClient("OperServ"), "akill") << "AKILL: Added an akill for " << x->mask << " because " << u->GetMask() << "#" << u->realname << " matches " << old->mask;
 		}
 
 		/* ZLine if we can instead */
@@ -347,14 +346,14 @@ class UnrealIRCdProto : public IRCDProto
 			return;
 
 		if (Servers::Capab.count("ESVID") > 0)
-			IRCD->SendMode(NickServ, u, "+d %s", u->Account()->display.c_str());
+			IRCD->SendMode(Config->GetClient("NickServ"), u, "+d %s", u->Account()->display.c_str());
 		else
-			IRCD->SendMode(NickServ, u, "+d %d", u->signon);
+			IRCD->SendMode(Config->GetClient("NickServ"), u, "+d %d", u->signon);
 	}
 
 	void SendLogout(User *u) anope_override
 	{
-		IRCD->SendMode(NickServ, u, "+d 0");
+		IRCD->SendMode(Config->GetClient("NickServ"), u, "+d 0");
 	}
 
 	void SendChannel(Channel *c) anope_override
@@ -754,9 +753,7 @@ struct IRCDMessageNetInfo : IRCDMessage
 
 struct IRCDMessageNick : IRCDMessage
 {
-	ServiceReference<NickServService> NSService;
-
-	IRCDMessageNick(Module *creator) : IRCDMessage(creator, "NICK", 2), NSService("NickServService", "NickServ") { SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
+	IRCDMessageNick(Module *creator) : IRCDMessage(creator, "NICK", 2) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
 
 	/*
 	** NICK - new
@@ -822,8 +819,8 @@ struct IRCDMessageNick : IRCDMessage
 				na = NickAlias::Find(params[6]);
 			}
 
-			if (na && NSService)
-				NSService->Login(user, na);
+			if (na)
+				user->Login(na->nc);
 		}
 		else
 			source.GetUser()->ChangeNick(params[0]);
@@ -877,7 +874,7 @@ struct IRCDMessageSASL : IRCDMessage
 
 			UplinkSocket::Message() << "SASL " << this->uid.substr(0, p) << " " << this->uid << " D F";
 
-			Log(NickServ) << "A user failed to identify for account " << this->GetAccount() << " using SASL";
+			Log(Config->GetClient("NickServ")) << "A user failed to identify for account " << this->GetAccount() << " using SASL";
 		}
 	};
 	

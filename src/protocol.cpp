@@ -372,7 +372,7 @@ bool IRCDProto::IsHostValid(const Anope::string &host)
 void IRCDProto::SendOper(User *u)
 {
 	SendNumericInternal(381, u->GetUID(), ":You are now an IRC operator (set by services)");
-	u->SetMode(OperServ, "OPER");
+	u->SetMode(NULL, "OPER");
 }
 
 unsigned IRCDProto::GetMaxListFor(Channel *c)

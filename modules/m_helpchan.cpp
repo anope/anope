@@ -23,7 +23,7 @@ class HelpChannel : public Module
 			User *u = User::Find(param);
 
 			if (u && c->ci->AccessFor(u).HasPriv("OPME"))
-				u->SetMode(OperServ, "HELPOP");
+				u->SetMode(Config->GetClient("OperServ"), "HELPOP");
 		}
 
 		return EVENT_CONTINUE;

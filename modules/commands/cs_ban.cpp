@@ -9,7 +9,6 @@
  * Based on the original code of Services by Andy Church.
  */
 
-/*************************************************************************/
 
 #include "module.h"
 

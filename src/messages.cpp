@@ -49,7 +49,7 @@ void Error::Run(MessageSource &source, const std::vector<Anope::string> &params)
 	Anope::Quitting = true;
 }
 
-void Invite::Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
+void Invite::Run(MessageSource &source, const std::vector<Anope::string> &params)
 {
 	User *targ = User::Find(params[0]);
 	Channel *c = Channel::Find(params[1]);
@@ -101,7 +101,7 @@ void Join::SJoin(MessageSource &source, const Anope::string &chan, time_t ts, co
 	bool keep_their_modes = true;
 
 	if (created)
-		c->Extend("SYNCING");
+		c->syncing = true;
 	/* Some IRCds do not include a TS */
 	else if (!ts)
 		;
@@ -120,7 +120,7 @@ void Join::SJoin(MessageSource &source, const Anope::string &chan, time_t ts, co
 		/* If we are syncing, mlock is checked later in Channel::Sync. It is important to not check it here
 		 * so that Channel::SetCorrectModes can correctly detect the presence of channel mode +r.
 		 */
-		c->SetModesInternal(source, modes, ts, !c->HasExt("SYNCING"));
+		c->SetModesInternal(source, modes, ts, !c->syncing);
 	
 	for (std::list<SJoinUser>::const_iterator it = users.begin(), it_end = users.end(); it != it_end; ++it)
 	{
@@ -137,16 +137,16 @@ void Join::SJoin(MessageSource &source, const Anope::string &chan, time_t ts, co
 		/* Set whatever modes the user should have, and remove any that
 		 * they aren't allowed to have (secureops etc).
 		 */
-		c->SetCorrectModes(u, true, true);
+		c->SetCorrectModes(u, true);
 
 		if (c->ci)
 			c->ci->CheckKick(u);
 	}
 
 	/* Channel is done syncing */
-	if (c->HasExt("SYNCING"))
+	if (c->syncing)
 	{
-		c->Shrink("SYNCING");
+		c->syncing = false;
 		/* Sync the channel (mode lock, topic, etc) */
 		/* the channel is synced when the netmerge is complete */
 		if (Me && Me->IsSynced())
@@ -444,7 +444,6 @@ void Version::Run(MessageSource &source, const std::vector<Anope::string> &param
 {
 	Module *enc = ModuleManager::FindFirstOf(ENCRYPTION);
 	IRCD->SendNumeric(351, source.GetSource(), "Anope-%s %s :%s -(%s) -- %s", Anope::Version().c_str(), Me->GetName().c_str(), IRCD->GetProtocolName().c_str(), enc ? enc->name.c_str() : "(none)", Anope::VersionBuildString().c_str());
-	return;
 }
 
 void Whois::Run(MessageSource &source, const std::vector<Anope::string> &params)
@@ -464,7 +463,5 @@ void Whois::Run(MessageSource &source, const std::vector<Anope::string> &params)
 	}
 	else
 		IRCD->SendNumeric(401, source.GetSource(), "%s :No such user.", params[0].c_str());
-
-	return;
 }
 

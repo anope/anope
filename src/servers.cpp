@@ -247,33 +247,6 @@ void Server::Sync(bool sync_links)
 
 	if (this->GetUplink() && this->GetUplink() == Me)
 	{
-		for (registered_channel_map::iterator it = RegisteredChannelList->begin(), it_end = RegisteredChannelList->end(); it != it_end; ++it)
-		{
-			ChannelInfo *ci = it->second;
-			if (ci->HasExt("PERSIST"))
-			{
-				bool created;
-				ci->c = Channel::FindOrCreate(ci->name, created, ci->time_registered);
-
-				if (ModeManager::FindChannelModeByName("PERM") != NULL)
-				{
-					if (created)
-						IRCD->SendChannel(ci->c);
-					ci->c->SetMode(NULL, "PERM");
-				}
-				else
-				{
-					if (!ci->bi)
-						ci->WhoSends()->Assign(NULL, ci);
-					if (ci->c->FindUser(ci->bi) == NULL)
-					{
-						ChannelStatus status(Config->GetModule("botserv")->Get<const Anope::string>("botmodes"));
-						ci->bi->Join(ci->c, &status);
-					}
-				}
-			}
-		}
-
 		FOREACH_MOD(I_OnPreUplinkSync, OnPreUplinkSync(this));
 
 		for (channel_map::const_iterator it = ChannelList.begin(), it_end = ChannelList.end(); it != it_end; ++it)
@@ -346,8 +319,6 @@ Server *Server::Find(const Anope::string &name, bool name_only)
 	
 	return NULL;
 }
-
-/*************************************************************************/
 
 static inline char& nextID(char &c)
 {

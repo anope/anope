@@ -41,6 +41,7 @@ class SQLOperResult : public SQL::Interface
 		}
 		catch (const SQL::Exception &) { }
 
+		BotInfo *OperServ = Config->GetClient("OperServ");
 		if (opertype.empty())
 		{
 			if (user->Account() && user->Account()->o && !user->Account()->o->config)

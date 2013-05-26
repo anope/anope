@@ -80,15 +80,6 @@ Note: You should also read the README and FAQ files!
 
 2) Upgrading Anope
 
-    If you got a .diff file and want to patch the old Anope sources with it,
-    do the following:
-
-        * Copy the .diff file into the root Anope sources directory.
-        * Type patch -p1 <file.diff
-
-    Note that upgrading anope with a patchfile isn't recommended. You should
-    download a new, clean source package, as this will give the best results.
-
     To upgrade Anope, just follow the installation instructions described in
     section 1. There are however a few specific guidelines:
 
@@ -99,63 +90,19 @@ Note: You should also read the README and FAQ files!
 3) Setting up the IRCd
 
     Services acts as an IRC server with pseudo-clients on it. To link them to
-    your network, you'll need to add some lines in the ircd.conf of their hub
-    server (as stated in the RemoteServer configuration directive).
+    your network, you'll need to configure your IRCd to allow services to link.
 
-    For samples below we'll take services.localhost.net as the name of the
-    Services (as stated in the ServerName configuration directive). Note that
-    this samples are made to be as generic as possible, but there might be
-    small variations, depending on your IRCd. For IRCd-specific help with
-    configuration, read near the end of this section.
+    The configuration varies depending on the IRCd, but you will probably need
+    a link block (also called connect block, or C line), a U line (also called
+    a shared block), and be sure that the IRCd is listneing on the given port
+    in the link block.
 
-    First, the C/N lines, that allow Services to link. They also need a
-    Y:line to work correctly.
-
-        Y:27:180:0:0:4000000
-        C:127.0.0.1:mypass:services.localhost.net::30
-        N:127.0.0.1:mypass:services.localhost.net::30
-
-    "mypass" is the same password you mentioned in the RemoteServer
-    configuration directive. 127.0.0.1 is the IP from which Services connect
-    from (linking in localhost is the most efficient way to run Services).
-
-    Then, you have to set-up an U:line, that will allow Services to change
-    channel modes, topics, and much more without being opped in the channel.
-
-        U:services.localhost.net:*:*
-
-    NOTE: if you have more than one server in your network, this line MUST
-          be added on ALL servers, or things won't work correctly.
-
-    Finally, you'll need to add an H:line, to make the OperServ JUPE command
-    work correctly.
-
-        H:*::Services.LocalHost.Net
+    Example link configurations can be found in example.conf for some of the
+    popular IRCds.
 
     Don't forget to /rehash your IRCd to apply changes.
 
-    A new trend in ircd configuration is popping all over the place, good
-    examples are the latest Hybrid, Unreal and Bahamut, which use a more
-    "readable" form of configuration. For those, use something like:
-
-        link services.localhost.net
-        {
-            username        *;
-            hostname        localhost;
-            bind-ip         *;
-            port            6667;
-            hub             *;
-            password-connect "mypass";
-            password-receive "mypass";
-            class           servers;
-        };
-
-    Note that this block-style configuration files differ heavily, depending
-    on the IRCd. Consult the interactive link maker (link is below) for more
-    details on the exact configuration used by your IRCd.
-
-    If you're unable to get a link with your IRCd after reading this section,
-    you might try the interactive link maker, which is located at:
+    You may also try our interactive link maker, which is located at:
 
         http://anope.org/ilm.php
 

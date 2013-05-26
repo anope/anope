@@ -19,7 +19,7 @@ bool WebCPanel::NickServ::Access::OnRequest(HTTPProvider *server, const Anope::s
 		params.push_back("ADD");
 		params.push_back(message.post_data["access"]);
 
-		WebPanel::RunCommand(na->nc->display, na->nc, ::NickServ->nick, "nickserv/access", params, replacements);
+		WebPanel::RunCommand(na->nc->display, na->nc, "NickServ", "nickserv/access", params, replacements);
 	}
 	else if (message.get_data.count("del") > 0 && message.get_data.count("mask") > 0)
 	{
@@ -27,7 +27,7 @@ bool WebCPanel::NickServ::Access::OnRequest(HTTPProvider *server, const Anope::s
 		params.push_back("DEL");
 		params.push_back(message.get_data["mask"]);
 
-		WebPanel::RunCommand(na->nc->display, na->nc, ::NickServ->nick, "nickserv/access", params, replacements);
+		WebPanel::RunCommand(na->nc->display, na->nc, "NickServ", "nickserv/access", params, replacements);
 	}
 
 	for (unsigned i = 0; i < na->nc->access.size(); ++i)

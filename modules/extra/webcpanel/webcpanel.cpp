@@ -13,6 +13,7 @@ bool use_ssl = false;
 
 class ModuleWebCPanel : public Module
 {
+	ServiceReference<HTTPProvider> provider;
 	Panel panel;
 
 	StaticFileServer style_css, logo_png, favicon_ico;
@@ -59,7 +60,7 @@ class ModuleWebCPanel : public Module
 		page_title = block->Get<const Anope::string>("title", "Anope IRC Services");
 		use_ssl = block->Get<bool>("ssl", "no"); // This is dumb, is there a better way to do this?
 
-		ServiceReference<HTTPProvider> provider("HTTPProvider", provider_name);
+		provider = ServiceReference<HTTPProvider>("HTTPProvider", provider_name);
 		if (!provider)
 			throw ModuleException("Unable to find HTTPD provider. Is m_httpd loaded?");
 
@@ -72,6 +73,7 @@ class ModuleWebCPanel : public Module
 		provider->RegisterPage(&this->_register);
 		provider->RegisterPage(&this->confirm);
 
+		BotInfo *NickServ = Config->GetClient("NickServ");
 		if (NickServ)
 		{
 			Section s;
@@ -104,6 +106,7 @@ class ModuleWebCPanel : public Module
 			panel.sections.push_back(s);
 		}
 
+		BotInfo *ChanServ = Config->GetClient("ChanServ");
 		if (ChanServ)
 		{
 			Section s;
@@ -138,6 +141,7 @@ class ModuleWebCPanel : public Module
 			panel.sections.push_back(s);
 		}
 
+		BotInfo *MemoServ = Config->GetClient("MemoServ");
 		if (MemoServ)
 		{
 			Section s;
@@ -152,6 +156,7 @@ class ModuleWebCPanel : public Module
 			panel.sections.push_back(s);
 		}
 
+		BotInfo *HostServ = Config->GetClient("HostServ");
 		if (HostServ)
 		{
 			Section s;
@@ -166,6 +171,7 @@ class ModuleWebCPanel : public Module
 			panel.sections.push_back(s);
 		}
 
+		BotInfo *OperServ = Config->GetClient("OperServ");
 		if (OperServ)
 		{
 			Section s;
@@ -183,7 +189,6 @@ class ModuleWebCPanel : public Module
 
 	~ModuleWebCPanel()
 	{
-		ServiceReference<HTTPProvider> provider("HTTPProvider", provider_name);
 		if (provider)
 		{
 			provider->UnregisterPage(&this->style_css);
@@ -226,7 +231,7 @@ namespace WebPanel
 			return;
 		}
 
-		BotInfo *bi = BotInfo::Find(service);
+		BotInfo *bi = Config->GetClient(service);
 		if (!bi)
 		{
 			if (BotListByNick->empty())

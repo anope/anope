@@ -18,7 +18,7 @@ bool WebCPanel::HostServ::Request::OnRequest(HTTPProvider *server, const Anope::
 		std::vector<Anope::string> params;
 		params.push_back(HTTPUtils::URLDecode(message.post_data["req"]));
 
-		WebPanel::RunCommand(na->nc->display, na->nc, ::HostServ->nick, "hostserv/request", params, replacements, "CMDR");
+		WebPanel::RunCommand(na->nc->display, na->nc, "HostServ", "hostserv/request", params, replacements, "CMDR");
 	}
 
 	if (na->HasVhost())

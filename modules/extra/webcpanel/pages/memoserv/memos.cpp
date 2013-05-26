@@ -57,7 +57,7 @@ bool WebCPanel::MemoServ::Memos::OnRequest(HTTPProvider *server, const Anope::st
 		params.push_back(HTTPUtils::URLDecode(message.post_data["receiver"]));
 		params.push_back(HTTPUtils::URLDecode(message.post_data["message"]));
 
-		WebPanel::RunCommand(na->nc->display, na->nc, ::MemoServ->nick, "memoserv/send", params, replacements, "CMDR");
+		WebPanel::RunCommand(na->nc->display, na->nc, "MemoServ", "memoserv/send", params, replacements, "CMDR");
 	}
 	if (message.get_data.count("del") > 0 && message.get_data.count("number") > 0)
 	{
@@ -66,7 +66,7 @@ bool WebCPanel::MemoServ::Memos::OnRequest(HTTPProvider *server, const Anope::st
 			params.push_back(chname);
 		params.push_back(message.get_data["number"]);
 
-		WebPanel::RunCommand(na->nc->display, na->nc, ::MemoServ->nick, "memoserv/del", params, replacements, "CMDR");
+		WebPanel::RunCommand(na->nc->display, na->nc, "MemoServ", "memoserv/del", params, replacements, "CMDR");
 	}
 	if (message.get_data.count("read") > 0 && message.get_data.count("number") > 0)
 	{

@@ -21,7 +21,7 @@ bool WebCPanel::Confirm::OnRequest(HTTPProvider *server, const Anope::string &pa
 		if (!email.empty())
 			params.push_back(email);
 
-		WebPanel::RunCommand(user, NULL, ::NickServ->nick, "nickserv/register", params, replacements);
+		WebPanel::RunCommand(user, NULL, "NickServ", "nickserv/register", params, replacements);
 	}
 
 	TemplateFileServer page("confirm.html");

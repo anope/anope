@@ -19,7 +19,7 @@ bool WebCPanel::NickServ::Cert::OnRequest(HTTPProvider *server, const Anope::str
 		params.push_back("ADD");
 		params.push_back(message.post_data["certfp"]);
 
-		WebPanel::RunCommand(na->nc->display, na->nc, ::NickServ->nick, "nickserv/cert", params, replacements);
+		WebPanel::RunCommand(na->nc->display, na->nc, "NickServ", "nickserv/cert", params, replacements);
 	}
 	else if (message.get_data.count("del") > 0 && message.get_data.count("mask") > 0)
 	{
@@ -27,7 +27,7 @@ bool WebCPanel::NickServ::Cert::OnRequest(HTTPProvider *server, const Anope::str
 		params.push_back("DEL");
 		params.push_back(message.get_data["mask"]);
 
-		WebPanel::RunCommand(na->nc->display, na->nc, ::NickServ->nick, "nickserv/cert", params, replacements);
+		WebPanel::RunCommand(na->nc->display, na->nc, "NickServ", "nickserv/cert", params, replacements);
 	}
 
 	for (unsigned i = 0; i < na->nc->cert.size(); ++i)

@@ -44,7 +44,7 @@ bool WebCPanel::ChanServ::Access::OnRequest(HTTPProvider *server, const Anope::s
 			params.push_back("DEL");
 			params.push_back(message.get_data["mask"]);
 
-			WebPanel::RunCommand(na->nc->display, na->nc, ::ChanServ->nick, "chanserv/access", params, replacements);
+			WebPanel::RunCommand(na->nc->display, na->nc, "ChanServ", "chanserv/access", params, replacements);
 		}
 		else if (message.post_data["mask"].empty() == false && message.post_data["access"].empty() == false && message.post_data["provider"].empty() == false)
 		{

@@ -39,8 +39,6 @@ class MemoServCore : public Module, public MemoServService
 	MemoServCore(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PSEUDOCLIENT | VENDOR),
 		MemoServService(this)
 	{
-		Implementation i[] = { I_OnNickCoreCreate, I_OnCreateChan, I_OnReload, I_OnBotDelete, I_OnNickIdentify, I_OnJoinChannel, I_OnUserAway, I_OnNickUpdate, I_OnPreHelp, I_OnPostHelp };
-		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 	}
 
 	MemoResult Send(const Anope::string &source, const Anope::string &target, const Anope::string &message, bool force) anope_override
@@ -76,7 +74,7 @@ class MemoServCore : public Module, public MemoServService
 		m->text = message;
 		m->unread = true;
 
-		FOREACH_MOD(I_OnMemoSend, OnMemoSend(source, target, mi, m));
+		FOREACH_MOD(OnMemoSend, (source, target, mi, m));
 
 		if (ischan)
 		{

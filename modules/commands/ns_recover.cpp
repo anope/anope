@@ -169,7 +169,7 @@ class CommandNSRecover : public Command
 		if (ok == false && !pass.empty())
 		{
 			NSRecoverRequest *req = new NSRecoverRequest(owner, source, this, na->nick, pass);
-			FOREACH_MOD(I_OnCheckAuthentication, OnCheckAuthentication(source.GetUser(), req));
+			FOREACH_MOD(OnCheckAuthentication, (source.GetUser(), req));
 			req->Dispatch();
 		}
 		else
@@ -209,8 +209,6 @@ class NSRecover : public Module
 		if (Config->GetBlock("options")->Get<bool>("nonicknameownership"))
 			throw ModuleException(modname + " can not be used with options:nonicknameownership enabled");
 
-		Implementation i[] = { I_OnUserNickChange, I_OnJoinChannel, I_OnShutdown, I_OnRestart };
-		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 	}
 
 	~NSRecover()

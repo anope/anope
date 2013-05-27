@@ -105,7 +105,7 @@ class CommandCSInfo : public Command
 				info["Expires on"] = Anope::strftime(ci->last_used + chanserv_expire);
 		}
 
-		FOREACH_MOD(I_OnChanInfo, OnChanInfo(source, ci, info, show_all));
+		FOREACH_MOD(OnChanInfo, (source, ci, info, show_all));
 
 		std::vector<Anope::string> replies;
 		info.Process(replies);

@@ -16,7 +16,7 @@ class CommandCSTopic : public Command
 	void Lock(CommandSource &source, ChannelInfo *ci, const std::vector<Anope::string> &params)
 	{
 		EventReturn MOD_RESULT;
-		FOREACH_RESULT(I_OnSetChannelOption, OnSetChannelOption(source, this, ci, "topiclock on"));
+		FOREACH_RESULT(OnSetChannelOption, MOD_RESULT, (source, this, ci, "topiclock on"));
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
@@ -27,7 +27,7 @@ class CommandCSTopic : public Command
 	void Unlock(CommandSource &source, ChannelInfo *ci, const std::vector<Anope::string> &params)
 	{
 		EventReturn MOD_RESULT;
-		FOREACH_RESULT(I_OnSetChannelOption, OnSetChannelOption(source, this, ci, "topiclock off"));
+		FOREACH_RESULT(OnSetChannelOption, MOD_RESULT, (source, this, ci, "topiclock off"));
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 

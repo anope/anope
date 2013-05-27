@@ -12,8 +12,6 @@ class HelpChannel : public Module
  public:
 	HelpChannel(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
 	{
-		Implementation i[] = { I_OnChannelModeSet };
-		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 	}
 
 	EventReturn OnChannelModeSet(Channel *c, MessageSource &setter, const Anope::string &mname, const Anope::string &param) anope_override

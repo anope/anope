@@ -82,7 +82,6 @@ class OSNOOP : public Module
 		commandosnoop(this)
 	{
 
-		ModuleManager::Attach(I_OnUserModeSet, this);
 	}
 
 	void OnUserModeSet(User *u, const Anope::string &mname) anope_override

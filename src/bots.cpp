@@ -31,7 +31,7 @@ BotInfo::BotInfo(const Anope::string &nnick, const Anope::string &nuser, const A
 	if (!this->uid.empty())
 		(*BotListByUID)[this->uid] = this;
 	
-	FOREACH_MOD(I_OnCreateBot, OnCreateBot(this));
+	FOREACH_MOD(OnCreateBot, (this));
 
 	// If we're synchronised with the uplink already, send the bot.
 	if (Me && Me->IsSynced())
@@ -49,7 +49,7 @@ BotInfo::BotInfo(const Anope::string &nnick, const Anope::string &nuser, const A
 
 BotInfo::~BotInfo()
 {
-	FOREACH_MOD(I_OnDelBot, OnDelBot(this));
+	FOREACH_MOD(OnDelBot, (this));
 
 	// If we're synchronised with the uplink already, send the bot.
 	if (Me && Me->IsSynced())
@@ -133,8 +133,8 @@ const std::set<ChannelInfo *> &BotInfo::GetChannels() const
 
 void BotInfo::Assign(User *u, ChannelInfo *ci)
 {
-	EventReturn MOD_RESULT = EVENT_CONTINUE;
-	FOREACH_RESULT(I_OnPreBotAssign, OnPreBotAssign(u, ci, this));
+	EventReturn MOD_RESULT;
+	FOREACH_RESULT(OnPreBotAssign, MOD_RESULT, (u, ci, this));
 	if (MOD_RESULT == EVENT_STOP)
 		return;
 
@@ -144,13 +144,13 @@ void BotInfo::Assign(User *u, ChannelInfo *ci)
 	ci->bi = this;
 	this->channels->insert(ci);
 
-	FOREACH_MOD(I_OnBotAssign, OnBotAssign(u, ci, this));
+	FOREACH_MOD(OnBotAssign, (u, ci, this));
 }
 
 void BotInfo::UnAssign(User *u, ChannelInfo *ci)
 {
-	EventReturn MOD_RESULT = EVENT_CONTINUE;
-	FOREACH_RESULT(I_OnBotUnAssign, OnBotUnAssign(u, ci));
+	EventReturn MOD_RESULT;
+	FOREACH_RESULT(OnBotUnAssign, MOD_RESULT, (u, ci));
 	if (MOD_RESULT == EVENT_STOP)
 		return;
 

@@ -164,8 +164,6 @@ class DBFlatFile : public Module, public Pipe
 	DBFlatFile(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, DATABASE | VENDOR), last_day(0), loaded(false)
 	{
 
-		Implementation i[] = { I_OnLoadDatabase, I_OnSaveDatabase, I_OnSerializeTypeCreate };
-		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 	}
 
 	void OnNotify() anope_override

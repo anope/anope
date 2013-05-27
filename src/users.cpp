@@ -83,7 +83,7 @@ User::User(const Anope::string &snick, const Anope::string &sident, const Anope:
 	bool exempt = false;
 	if (server && server->IsULined())
 		exempt = true;
-	FOREACH_MOD(I_OnUserConnect, OnUserConnect(this, exempt));
+	FOREACH_MOD(OnUserConnect, (this, exempt));
 }
 
 void User::ChangeNick(const Anope::string &newnick, time_t ts)
@@ -122,7 +122,7 @@ void User::ChangeNick(const Anope::string &newnick, time_t ts)
 		}
 	}
 
-	FOREACH_MOD(I_OnUserNickChange, OnUserNickChange(this, old));
+	FOREACH_MOD(OnUserNickChange, (this, old));
 }
 
 void User::SetDisplayedHost(const Anope::string &shost)
@@ -236,7 +236,7 @@ User::~User()
 		--this->server->users;
 	}
 
-	FOREACH_MOD(I_OnPreUserLogoff, OnPreUserLogoff(this));
+	FOREACH_MOD(OnPreUserLogoff, (this));
 
 	ModeManager::StackerDel(this);
 	this->Logout();
@@ -251,7 +251,7 @@ User::~User()
 	if (!this->uid.empty())
 		UserListByUID.erase(this->uid);
 
-	FOREACH_MOD(I_OnPostUserLogoff, OnPostUserLogoff(this));
+	FOREACH_MOD(OnPostUserLogoff, (this));
 }
 
 void User::SendMessage(const BotInfo *source, const char *fmt, ...)
@@ -302,7 +302,7 @@ void User::Identify(NickAlias *na)
 	this->Login(na->nc);
 	IRCD->SendLogin(this);
 
-	FOREACH_MOD(I_OnNickIdentify, OnNickIdentify(this));
+	FOREACH_MOD(OnNickIdentify, (this));
 
 	if (this->IsServicesOper())
 	{
@@ -338,7 +338,7 @@ void User::Login(NickCore *core)
 	if (this->server->IsSynced())
 		Log(this, "account") << "is now identified as " << this->nc->display;
 	
-	FOREACH_MOD(I_OnUserLogin, OnUserLogin(this));
+	FOREACH_MOD(OnUserLogin, (this));
 }
 
 void User::Logout()
@@ -406,7 +406,7 @@ bool User::IsServicesOper()
 	}
 
 	EventReturn MOD_RESULT;
-	FOREACH_RESULT(I_IsServicesOper, IsServicesOper(this));
+	FOREACH_RESULT(IsServicesOper, MOD_RESULT, (this));
 	if (MOD_RESULT == EVENT_STOP)
 		return false;
 
@@ -458,7 +458,7 @@ void User::SetModeInternal(UserMode *um, const Anope::string &param)
 
 	this->modes[um->name] = param;
 
-	FOREACH_MOD(I_OnUserModeSet, OnUserModeSet(this, um->name));
+	FOREACH_MOD(OnUserModeSet, (this, um->name));
 }
 
 void User::RemoveModeInternal(UserMode *um)
@@ -468,7 +468,7 @@ void User::RemoveModeInternal(UserMode *um)
 
 	this->modes.erase(um->name);
 
-	FOREACH_MOD(I_OnUserModeUnset, OnUserModeUnset(this, um->name));
+	FOREACH_MOD(OnUserModeUnset, (this, um->name));
 }
 
 void User::SetMode(const BotInfo *bi, UserMode *um, const Anope::string &Param)
@@ -668,7 +668,7 @@ void User::Quit(const Anope::string &reason)
 		return;
 	}
 
-	FOREACH_MOD(I_OnUserQuit, OnUserQuit(this, reason));
+	FOREACH_MOD(OnUserQuit, (this, reason));
 
 	this->quit = true;
 	quitting_users.push_back(this);

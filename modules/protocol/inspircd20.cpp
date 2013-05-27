@@ -699,7 +699,7 @@ struct IRCDMessageEncap : IRCDMessage
 					return;
 
 				IdentifyRequest *req = new InspIRCDSASLIdentifyRequest(this->owner, params[2], acc, pass);
-				FOREACH_MOD(I_OnCheckAuthentication, OnCheckAuthentication(NULL, req));
+				FOREACH_MOD(OnCheckAuthentication, (NULL, req));
 				req->Dispatch();
 			}
 		}
@@ -790,8 +790,6 @@ class ProtoInspIRCd : public Module
 			throw ModuleException("No protocol interface for insp12");
 		ModuleManager::DetachAll(m_insp12);
 
-		Implementation i[] = { I_OnReload, I_OnUserNickChange, I_OnChannelSync, I_OnChanRegistered, I_OnDelChan, I_OnMLock, I_OnUnMLock, I_OnSetChannelOption };
-		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 	}
 
 	~ProtoInspIRCd()

@@ -75,7 +75,7 @@ class CommandCSRegister : public Command
 					c->SetCorrectModes(u, true);
 			}
 
-			FOREACH_MOD(I_OnChanRegistered, OnChanRegistered(ci));
+			FOREACH_MOD(OnChanRegistered, (ci));
 		}
 	}
 

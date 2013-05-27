@@ -132,8 +132,6 @@ class DatabaseRedis : public Module, public Pipe
 	{
 		me = this;
 
-		Implementation i[] = { I_OnReload, I_OnLoadDatabase, I_OnSerializeTypeCreate, I_OnSerializableConstruct, I_OnSerializableDestruct, I_OnSerializableUpdate };
-		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 	}
 
 	/* Insert or update an object */

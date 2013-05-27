@@ -169,8 +169,6 @@ class ModuleSQL : public Module, public Pipe
 	{
 		me = this;
 
-		Implementation i[] = { I_OnReload, I_OnModuleUnload };
-		ModuleManager::Attach(i, this,  2);
 
 		DThread = new DispatcherThread();
 		DThread->Start();

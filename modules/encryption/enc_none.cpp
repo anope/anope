@@ -15,8 +15,6 @@ class ENone : public Module
 	ENone(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, ENCRYPTION | VENDOR)
 	{
 
-		Implementation i[] = { I_OnEncrypt, I_OnDecrypt, I_OnCheckAuthentication };
-		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 	}
 
 	EventReturn OnEncrypt(const Anope::string &src, Anope::string &dest) anope_override

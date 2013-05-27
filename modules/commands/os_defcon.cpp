@@ -125,7 +125,7 @@ class DefConTimeout : public Timer
 		if (DConfig.defaultlevel != level)
 		{
 			DConfig.defaultlevel = level;
-			FOREACH_MOD(I_OnDefconLevel, OnDefconLevel(level));
+			FOREACH_MOD(OnDefconLevel, (level));
 			Log(Config->GetClient("OperServ"), "operserv/defcon") << "Defcon level timeout, returning to level " << level;
 
 			if (DConfig.globalondefcon)
@@ -203,7 +203,7 @@ class CommandOSDefcon : public Command
 
 		DConfig.defaultlevel = newLevel;
 
-		FOREACH_MOD(I_OnDefconLevel, OnDefconLevel(newLevel));
+		FOREACH_MOD(OnDefconLevel, (newLevel));
 
 		delete timeout;
 
@@ -333,8 +333,6 @@ class OSDefcon : public Module
 	OSDefcon(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR), session_service("SessionService", "session"), akills("XLineManager", "xlinemanager/sgline"), commandosdefcon(this)
 	{
 
-		Implementation i[] = { I_OnReload, I_OnChannelModeSet, I_OnChannelModeUnset, I_OnPreCommand, I_OnUserConnect, I_OnChannelModeAdd, I_OnChannelSync };
-		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 	}
 
 	void OnReload(Configuration::Conf *conf) anope_override

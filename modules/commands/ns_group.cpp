@@ -31,7 +31,7 @@ class NSGroupRequest : public IdentifyRequest
 		/* If the nick is already registered, drop it. */
 		if (na)
 		{
-			FOREACH_MOD(I_OnChangeCoreDisplay, OnChangeCoreDisplay(na->nc, u->nick));
+			FOREACH_MOD(OnChangeCoreDisplay, (na->nc, u->nick));
 			delete na;
 		}
 
@@ -44,7 +44,7 @@ class NSGroupRequest : public IdentifyRequest
 
 		u->Login(target->nc);
 		IRCD->SendLogin(u);
-		FOREACH_MOD(I_OnNickGroup, OnNickGroup(u, target));
+		FOREACH_MOD(OnNickGroup, (u, target));
 
 		Log(LOG_COMMAND, source, cmd) << "makes " << nick << " join group of " << target->nick << " (" << target->nc->display << ") (email: " << (!target->nc->email.empty() ? target->nc->email : "none") << ")";
 		source.Reply(_("You are now in the group of \002%s\002."), target->nick.c_str());
@@ -147,7 +147,7 @@ class CommandNSGroup : public Command
 			if (ok == false && !pass.empty())
 			{
 				NSGroupRequest *req = new NSGroupRequest(owner, source, this, u->nick, target, pass);
-				FOREACH_MOD(I_OnCheckAuthentication, OnCheckAuthentication(source.GetUser(), req));
+				FOREACH_MOD(OnCheckAuthentication, (source.GetUser(), req));
 				req->Dispatch();
 			}
 			else

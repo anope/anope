@@ -130,7 +130,7 @@ Conf::Conf() : Block("")
 		this->LoadConf(f);
 	}
 
-	FOREACH_MOD(I_OnReload, OnReload(this));
+	FOREACH_MOD(OnReload, (this));
 
 	/* Check for modified values that aren't allowed to be modified */
 	if (Config)

@@ -27,8 +27,6 @@ class GlobalCore : public Module, public GlobalService
 	GlobalCore(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PSEUDOCLIENT | VENDOR),
 		GlobalService(this)
 	{
-		Implementation i[] = { I_OnReload, I_OnRestart, I_OnShutdown, I_OnNewServer, I_OnPreHelp };
-		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 	}
 
 	void SendGlobal(const BotInfo *sender, const Anope::string &source, const Anope::string &message) anope_override

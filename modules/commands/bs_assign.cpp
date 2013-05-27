@@ -154,8 +154,6 @@ class BSAssign : public Module
 	BSAssign(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandbsassign(this), commandbsunassign(this)
 	{
-		Implementation i[] = { I_OnInvite };
-		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 	}
 
 	void OnInvite(User *source, Channel *c, User *targ) anope_override

@@ -98,8 +98,6 @@ class ModuleSQLOper : public Module
 	ModuleSQLOper(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, EXTRA | VENDOR)
 	{
 
-		Implementation i[] = { I_OnReload, I_OnNickIdentify };
-		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 	}
 
 	void OnReload(Configuration::Conf *conf) anope_override

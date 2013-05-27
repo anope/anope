@@ -22,7 +22,7 @@
 #endif
 
 std::list<Module *> ModuleManager::Modules;
-std::vector<Module *> ModuleManager::EventHandlers[I_END];
+std::map<Anope::string, std::vector<Module *> > ModuleManager::EventHandlers;
 
 #ifdef _WIN32
 void ModuleManager::CleanupRuntimeDirectory()
@@ -111,6 +111,19 @@ static ModuleReturn moduleCopyFile(const Anope::string &name, Anope::string &out
 	return !source.fail() && !target.fail() ? MOD_ERR_OK : MOD_ERR_FILE_IO;
 }
 #endif
+
+std::vector<Module *> &ModuleManager::GetEventHandlers(const Anope::string &name)
+{
+	std::map<Anope::string, std::vector<Module *> >::iterator it = EventHandlers.find(name);
+	if (it != EventHandlers.end())
+		return it->second;
+
+	std::vector<Module *> &modules = EventHandlers[name];
+	/* Populate initial vector */
+	std::copy(Modules.begin(), Modules.end(), std::back_inserter(modules));
+
+	return modules;
+}
 
 /* This code was found online at http://www.linuxjournal.com/article/3687#comment-26593
  *
@@ -226,24 +239,38 @@ ModuleReturn ModuleManager::LoadModule(const Anope::string &modname, User *u)
 	else
 		Log(LOG_DEBUG_2) << "Module " << modname << " is compiled against current version of Anope " << Anope::VersionShort();
 
-	/* If the module is hooked to the reload event it wants to initialize its config here */
-	if (std::find(EventHandlers[I_OnReload].begin(), EventHandlers[I_OnReload].end(), m) != EventHandlers[I_OnReload].end())
+	/* Initialize config */
+	try
 	{
-		try
-		{
-			m->OnReload(Config);
-		}
-		catch (const ConfigException &ex)
-		{
-			Log() << "Module " << modname << " couldn't load due to configuration problems: " << ex.GetReason();
-			DeleteModule(m);
-			return MOD_ERR_EXCEPTION;
-		}
+		m->OnReload(Config);
+	}
+	catch (const ModuleException &ex)
+	{
+		Log() << "Module " << modname << " couldn't load:" << ex.GetReason();
+		DeleteModule(m);
+		return MOD_ERR_EXCEPTION;
+	}
+	catch (const ConfigException &ex)
+	{
+		Log() << "Module " << modname << " couldn't load due to configuration problems: " << ex.GetReason();
+		DeleteModule(m);
+		return MOD_ERR_EXCEPTION;
+	}
+	catch (const NotImplementedException &ex)
+	{
 	}
 
 	Log(LOG_DEBUG) << "Module " << modname << " loaded.";
 
-	FOREACH_MOD(I_OnModuleLoad, OnModuleLoad(u, m));
+	/* Attach module to all events */
+	for (std::map<Anope::string, std::vector<Module *> >::iterator it = EventHandlers.begin(); it != EventHandlers.end(); ++it)
+		/* Modules can already be attached here if loading them causes a new event to trigged, which initializes this vector
+		 * to all known modules, which includes this one.
+		 */
+		if (std::find(it->second.begin(), it->second.end(), m) != it->second.end())
+			it->second.push_back(m);
+
+	FOREACH_MOD(OnModuleLoad, (u, m));
 
 	return MOD_ERR_OK;
 }
@@ -253,7 +280,7 @@ ModuleReturn ModuleManager::UnloadModule(Module *m, User *u)
 	if (!m)
 		return MOD_ERR_PARAMS;
 
-	FOREACH_MOD(I_OnModuleUnload, OnModuleUnload(u, m));
+	FOREACH_MOD(OnModuleUnload, (u, m));
 
 	return DeleteModule(m);
 }
@@ -340,47 +367,26 @@ ModuleReturn ModuleManager::DeleteModule(Module *m)
 	return MOD_ERR_OK;
 }
 
-bool ModuleManager::Attach(Implementation i, Module *mod)
-{
-	if (std::find(EventHandlers[i].begin(), EventHandlers[i].end(), mod) != EventHandlers[i].end())
-		return false;
-
-	EventHandlers[i].push_back(mod);
-	return true;
-}
-
-bool ModuleManager::Detach(Implementation i, Module *mod)
-{
-	std::vector<Module *>::iterator x = std::find(EventHandlers[i].begin(), EventHandlers[i].end(), mod);
-
-	if (x == EventHandlers[i].end())
-		return false;
-
-	EventHandlers[i].erase(x);
-	return true;
-}
-
-void ModuleManager::Attach(Implementation *i, Module *mod, size_t sz)
-{
-	for (size_t n = 0; n < sz; ++n)
-		Attach(i[n], mod);
-}
-
 void ModuleManager::DetachAll(Module *mod)
 {
-	for (size_t n = I_BEGIN + 1; n != I_END; ++n)
-		Detach(static_cast<Implementation>(n), mod);
+	for (std::map<Anope::string, std::vector<Module *> >::iterator it = EventHandlers.begin(); it != EventHandlers.end(); ++it)
+	{
+		std::vector<Module *> &mods = it->second;
+		std::vector<Module *>::iterator it2 = std::find(mods.begin(), mods.end(), mod);
+		if (it2 != mods.end())
+			mods.erase(it2);
+	}
 }
 
 bool ModuleManager::SetPriority(Module *mod, Priority s)
 {
-	for (size_t n = I_BEGIN + 1; n != I_END; ++n)
-		SetPriority(mod, static_cast<Implementation>(n), s);
+	for (std::map<Anope::string, std::vector<Module *> >::iterator it = EventHandlers.begin(); it != EventHandlers.end(); ++it)
+		SetPriority(mod, it->first, s);
 
 	return true;
 }
 
-bool ModuleManager::SetPriority(Module *mod, Implementation i, Priority s, Module **modules, size_t sz)
+bool ModuleManager::SetPriority(Module *mod, const Anope::string &i, Priority s, Module **modules, size_t sz)
 {
 	/** To change the priority of a module, we first find its position in the vector,
 	 * then we find the position of the other modules in the vector that this module

@@ -49,8 +49,6 @@ class EOld : public Module
 		if (!md5)
 			throw ModuleException("Unable to find md5 reference");
 
-		Implementation i[] = { I_OnEncrypt, I_OnCheckAuthentication };
-		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 	}
 
 	EventReturn OnEncrypt(const Anope::string &src, Anope::string &dest) anope_override

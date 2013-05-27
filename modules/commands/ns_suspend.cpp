@@ -94,7 +94,7 @@ class CommandNSSuspend : public Command
 		Log(LOG_ADMIN, source, this) << "for " << nick << " (" << (!reason.empty() ? reason : "No reason") << "), expires in " << (expiry_secs ? Anope::strftime(Anope::CurTime + expiry_secs) : "never");
 		source.Reply(_("Nick %s is now suspended."), nick.c_str());
 
-		FOREACH_MOD(I_OnNickSuspended, OnNickSuspend(na));
+		FOREACH_MOD(OnNickSuspend, (na));
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
@@ -150,7 +150,7 @@ class CommandNSUnSuspend : public Command
 		Log(LOG_ADMIN, source, this) << "for " << na->nick;
 		source.Reply(_("Nick %s is now released."), nick.c_str());
 
-		FOREACH_MOD(I_OnNickUnsuspended, OnNickUnsuspended(na));
+		FOREACH_MOD(OnNickUnsuspended, (na));
 
 		return;
 	}
@@ -173,8 +173,6 @@ class NSSuspend : public Module
 	NSSuspend(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandnssuspend(this), commandnsunsuspend(this)
 	{
-		Implementation i[] = { I_OnPreNickExpire, I_OnNickInfo };
-		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 	}
 
 	void OnNickInfo(CommandSource &source, NickAlias *na, InfoFormatter &info, bool show_hidden) anope_override

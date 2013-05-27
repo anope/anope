@@ -17,13 +17,8 @@ class HostServCore : public Module
  public:
 	HostServCore(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PSEUDOCLIENT | VENDOR)
 	{
-
 		if (!IRCD || !IRCD->CanSetVHost)
 			throw ModuleException("Your IRCd does not support vhosts");
-	
-		Implementation i[] = { I_OnReload, I_OnNickIdentify, I_OnNickUpdate, I_OnPreHelp,
-					I_OnSetVhost, I_OnDeleteVhost };
-		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 	}
 
 	void OnReload(Configuration::Conf *conf) anope_override

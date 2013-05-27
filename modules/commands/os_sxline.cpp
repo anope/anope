@@ -91,7 +91,7 @@ class CommandOSSXLineBase : public Command
 				return;
 			}
 
-			FOREACH_MOD(I_OnDelXLine, OnDelXLine(source, x, this->xlm()));
+			FOREACH_MOD(OnDelXLine, (source, x, this->xlm()));
 
 			SXLineDelCallback::DoDel(this->xlm(), source, x);
 			source.Reply(_("\002%s\002 deleted from the %s list."), mask.c_str(), source.command.c_str());
@@ -198,7 +198,7 @@ class CommandOSSXLineBase : public Command
 
 	void OnClear(CommandSource &source)
 	{
-		FOREACH_MOD(I_OnDelXLine, OnDelXLine(source, NULL, this->xlm()));
+		FOREACH_MOD(OnDelXLine, (source, NULL, this->xlm()));
 
 		for (unsigned i = this->xlm()->GetCount(); i > 0; --i)
 		{
@@ -370,7 +370,7 @@ class CommandOSSNLine : public CommandOSSXLineBase
 		}
 
 		EventReturn MOD_RESULT;
-		FOREACH_RESULT(I_OnAddXLine, OnAddXLine(source, x, this->xlm()));
+		FOREACH_RESULT(OnAddXLine, MOD_RESULT, (source, x, this->xlm()));
 		if (MOD_RESULT == EVENT_STOP)
 		{
 			delete x;
@@ -576,7 +576,7 @@ class CommandOSSQLine : public CommandOSSXLineBase
 		}
 
 		EventReturn MOD_RESULT;
-		FOREACH_RESULT(I_OnAddXLine, OnAddXLine(source, x, this->xlm()));
+		FOREACH_RESULT(OnAddXLine, MOD_RESULT, (source, x, this->xlm()));
 		if (MOD_RESULT == EVENT_STOP)
 		{
 			delete x;

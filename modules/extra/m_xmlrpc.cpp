@@ -168,8 +168,6 @@ class ModuleXMLRPC : public Module
 			throw ModuleException("Unable to find http reference, is m_httpd loaded?");
 		httpref->RegisterPage(&xmlrpcinterface);
 
-		Implementation i[] = { I_OnReload };
-		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 	}
 
 	~ModuleXMLRPC()

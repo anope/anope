@@ -140,7 +140,7 @@ ChannelMode::~ChannelMode()
 bool ChannelMode::CanSet(User *u) const
 {
 	EventReturn MOD_RESULT;
-	FOREACH_RESULT(I_OnCanSet, OnCanSet(u, this));
+	FOREACH_RESULT(OnCanSet, MOD_RESULT, (u, this));
 	return MOD_RESULT != EVENT_STOP;
 }
 
@@ -350,7 +350,7 @@ bool ModeManager::AddUserMode(UserMode *um)
 
 	UserModesByName[um->name] = um;
 
-	FOREACH_MOD(I_OnUserModeAdd, OnUserModeAdd(um));
+	FOREACH_MOD(OnUserModeAdd, (um));
 
 	return true;
 }
@@ -384,7 +384,7 @@ bool ModeManager::AddChannelMode(ChannelMode *cm)
 
 	ChannelModesByName[cm->name] = cm;
 
-	FOREACH_MOD(I_OnChannelModeAdd, OnChannelModeAdd(cm));
+	FOREACH_MOD(OnChannelModeAdd, (cm));
 
 	return true;
 }

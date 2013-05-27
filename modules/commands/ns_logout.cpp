@@ -54,7 +54,7 @@ class CommandNSLogout : public Command
 			u2->Logout();
 
 			/* Send out an event */
-			FOREACH_MOD(I_OnNickLogout, OnNickLogout(u2));
+			FOREACH_MOD(OnNickLogout, (u2));
 		}
 		return;
 	}

@@ -87,7 +87,7 @@ class CommandNSSetMisc : public Command
 		NickCore *nc = na->nc;
 
 		EventReturn MOD_RESULT;
-		FOREACH_RESULT(I_OnSetNickOption, OnSetNickOption(source, this, nc, param));
+		FOREACH_RESULT(OnSetNickOption, MOD_RESULT, (source, this, nc, param));
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
@@ -155,8 +155,6 @@ class NSSetMisc : public Module
 	NSSetMisc(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		nsmiscdata_type("NSMiscData", NSMiscData::Unserialize), commandnssetmisc(this), commandnssasetmisc(this)
 	{
-		Implementation i[] = { I_OnReload, I_OnNickInfo };
-		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 	}
 
 	void OnReload(Configuration::Conf *conf) anope_override

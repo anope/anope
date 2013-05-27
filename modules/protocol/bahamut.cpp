@@ -554,7 +554,6 @@ class ProtoBahamut : public Module
 
 		this->AddModes();
 
-		ModuleManager::Attach(I_OnUserNickChange, this);
 	}
 
 	void OnUserNickChange(User *u, const Anope::string &) anope_override

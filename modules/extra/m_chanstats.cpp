@@ -336,17 +336,6 @@ class MChanstats : public Module
 	MChanstats(const Anope::string &modname, const Anope::string &creator) :
 		Module(modname, creator, EXTRA | VENDOR), sql("", ""), sqlinterface(this)
 	{
-
-		Implementation i[] = {	I_OnPrivmsg,
-					I_OnPreUserKicked,
-					I_OnChannelModeSet,
-					I_OnChannelModeUnset,
-					I_OnTopicUpdated,
-					I_OnDelCore,
-					I_OnChangeCoreDisplay,
-					I_OnChanDrop,
-					I_OnReload};
-		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 	}
 
 	void OnReload(Configuration::Conf *conf) anope_override

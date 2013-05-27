@@ -27,7 +27,7 @@ class CommandHSDel : public Command
 		if (na)
 		{
 			Log(LOG_ADMIN, source, this) << "for user " << na->nick;
-			FOREACH_MOD(I_OnDeleteVhost, OnDeleteVhost(na));
+			FOREACH_MOD(OnDeleteVhost, (na));
 			na->RemoveVhost();
 			source.Reply(_("Vhost for \002%s\002 removed."), nick.c_str());
 		}
@@ -60,7 +60,7 @@ class CommandHSDelAll : public Command
 		NickAlias *na = NickAlias::Find(nick);
 		if (na)
 		{
-			FOREACH_MOD(I_OnDeleteVhost, OnDeleteVhost(na));
+			FOREACH_MOD(OnDeleteVhost, (na));
 			const NickCore *nc = na->nc;
 			for (unsigned i = 0; i < nc->aliases->size(); ++i)
 			{

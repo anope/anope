@@ -320,8 +320,6 @@ class OSIgnore : public Module
 		ignoredata_type("IgnoreData", IgnoreData::Unserialize), osignoreservice(this), commandosignore(this)
 	{
 
-		Implementation i[] = { I_OnBotPrivmsg };
-		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 	}
 
 	EventReturn OnBotPrivmsg(User *u, BotInfo *bi, Anope::string &message) anope_override

@@ -45,7 +45,7 @@ class CommandNSDrop : public Command
 			source.Reply(_("You may not drop other Services Operators' nicknames."));
 		else
 		{
-			FOREACH_MOD(I_OnNickDrop, OnNickDrop(source, na));
+			FOREACH_MOD(OnNickDrop, (source, na));
 
 			Log(!is_mine ? LOG_ADMIN : LOG_COMMAND, source, this) << "to drop nickname " << na->nick << " (group: " << na->nc->display << ") (email: " << (!na->nc->email.empty() ? na->nc->email : "none") << ")";
 			delete na;

@@ -156,7 +156,7 @@ class ExceptionDelCallback : public NumberList
 	static void DoDel(CommandSource &source, unsigned index)
 	{
 		Exception *e = session_service->GetExceptions()[index];
-		FOREACH_MOD(I_OnExceptionDel, OnExceptionDel(source, e));
+		FOREACH_MOD(OnExceptionDel, (source, e));
 
 		session_service->DelException(e);
 		delete e;
@@ -360,7 +360,7 @@ class CommandOSException : public Command
 			exception->expires = expires;
 
 			EventReturn MOD_RESULT;
-			FOREACH_RESULT(I_OnExceptionAdd, OnExceptionAdd(exception));
+			FOREACH_RESULT(OnExceptionAdd, MOD_RESULT, (exception));
 			if (MOD_RESULT == EVENT_STOP)
 				delete exception;
 			else
@@ -619,8 +619,6 @@ class OSSession : public Module
 	{
 		this->SetPermanent(true);
 
-		Implementation i[] = { I_OnReload, I_OnUserConnect, I_OnUserQuit, I_OnExpireTick };
-		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 		ModuleManager::SetPriority(this, PRIORITY_FIRST);
 	}
 

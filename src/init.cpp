@@ -463,7 +463,7 @@ void Anope::Init(int ac, char **av)
 	/* Load up databases */
 	Log() << "Loading databases...";
 	EventReturn MOD_RESULT;
-	FOREACH_RESULT(I_OnLoadDatabase, OnLoadDatabase());
+	FOREACH_RESULT(OnLoadDatabase, MOD_RESULT, ());
 	static_cast<void>(MOD_RESULT);
 	Log() << "Databases loaded";
 

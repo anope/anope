@@ -308,13 +308,13 @@ bool AccessGroup::HasPriv(const Anope::string &name) const
 	else if (this->founder)
 		return true;
 	EventReturn MOD_RESULT;
-	FOREACH_RESULT(I_OnGroupCheckPriv, OnGroupCheckPriv(this, name));
+	FOREACH_RESULT(OnGroupCheckPriv, MOD_RESULT, (this, name));
 	if (MOD_RESULT != EVENT_CONTINUE)
 		return MOD_RESULT == EVENT_ALLOW;
 	for (unsigned i = this->size(); i > 0; --i)
 	{
 		ChanAccess *access = this->at(i - 1);
-		FOREACH_RESULT(I_OnCheckPriv, OnCheckPriv(access, name));
+		FOREACH_RESULT(OnCheckPriv, MOD_RESULT, (access, name));
 		if (MOD_RESULT == EVENT_ALLOW || access->HasPriv(name))
 			return true;
 	}

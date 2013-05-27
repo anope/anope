@@ -610,7 +610,6 @@ public:
 	{
 		this->AddModes();
 
-		ModuleManager::Attach(I_OnUserNickChange, this);
 
 		if (Me->GetSID() == Me->GetName())
 			Me->SetSID(Servers::TS6_SID_Retrieve());

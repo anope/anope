@@ -277,8 +277,6 @@ class ESHA256 : public Module
 		sha256provider(this)
 	{
 
-		Implementation i[] = { I_OnEncrypt, I_OnCheckAuthentication };
-		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 
 		use_iv = false;
 	}

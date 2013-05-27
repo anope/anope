@@ -385,8 +385,6 @@ class OSNews : public Module
 	OSNews(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		newsitem_type("NewsItem", NewsItem::Unserialize), newsservice(this), commandoslogonnews(this), commandosopernews(this), commandosrandomnews(this)
 	{
-		Implementation i[] = { I_OnUserModeSet, I_OnUserConnect };
-		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 	}
 
 	void OnUserModeSet(User *u, const Anope::string &mname) anope_override

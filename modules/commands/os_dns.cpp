@@ -656,8 +656,6 @@ class ModuleDNS : public Module
 		zone_type("DNSZone", DNSZone::Unserialize), dns_type("DNSServer", DNSServer::Unserialize), commandosdns(this)
 	{
 
-		Implementation i[] = { I_OnReload, I_OnNewServer, I_OnServerQuit, I_OnUserConnect, I_OnPreUserLogoff, I_OnDnsRequest };
-		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 
 		for (unsigned j = 0; j < dns_servers->size(); ++j)
 		{

@@ -178,7 +178,7 @@ class CommandCSFlags : public Command
 		{
 			if (current != NULL)
 			{
-				FOREACH_MOD(I_OnAccessDel, OnAccessDel(ci, source, current));
+				FOREACH_MOD(OnAccessDel, (ci, source, current));
 				delete current;
 				Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to delete " << mask;
 				source.Reply(_("\002%s\002 removed from the %s access list."), mask.c_str(), ci->name.c_str());
@@ -206,7 +206,7 @@ class CommandCSFlags : public Command
 
 		ci->AddAccess(access);
 
-		FOREACH_MOD(I_OnAccessAdd, OnAccessAdd(ci, source, access));
+		FOREACH_MOD(OnAccessAdd, (ci, source, access));
 
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to modify " << mask << "'s flags to " << access->AccessSerialize();
 		source.Reply(_("Access for \002%s\002 on %s set to +\002%s\002"), access->mask.c_str(), ci->name.c_str(), access->AccessSerialize().c_str());
@@ -285,7 +285,7 @@ class CommandCSFlags : public Command
 		{
 			ci->ClearAccess();
 
-			FOREACH_MOD(I_OnAccessClear, OnAccessClear(ci, source));
+			FOREACH_MOD(OnAccessClear, (ci, source));
 
 			source.Reply(_("Channel %s access list has been cleared."), ci->name.c_str());
 
@@ -391,8 +391,6 @@ class CSFlags : public Module
 	{
 		this->SetPermanent(true);
 
-		Implementation i[] = { I_OnReload };
-		ModuleManager::Attach(i, this, 1);
 	}
 
 	void OnReload(Configuration::Conf *conf) anope_override

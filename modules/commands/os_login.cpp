@@ -116,7 +116,6 @@ class OSLogin : public Module
 		commandoslogin(this), commandoslogout(this)
 	{
 
-		ModuleManager::Attach(I_IsServicesOper, this);
 	}
 
 	~OSLogin()

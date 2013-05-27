@@ -103,7 +103,7 @@ class IdentifyInterface : public LDAPInterface
 					if (na == NULL)
 					{
 						na = new NickAlias(ii->req->GetAccount(), new NickCore(ii->req->GetAccount()));
-						FOREACH_MOD(I_OnNickRegister, OnNickRegister(ii->user, na));
+						FOREACH_MOD(OnNickRegister, (ii->user, na));
 						BotInfo *NickServ = Config->GetClient("NickServ");
 						if (ii->user && NickServ)
 							ii->user->SendMessage(NickServ, _("Your account \002%s\002 has been successfully created."), na->nick.c_str());
@@ -217,8 +217,6 @@ class NSIdentifyLDAP : public Module
 
 		me = this;
 
-		Implementation i[] = { I_OnReload, I_OnPreCommand, I_OnCheckAuthentication, I_OnNickIdentify, I_OnNickRegister };
-		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 		ModuleManager::SetPriority(this, PRIORITY_FIRST);
 	}
 

@@ -71,7 +71,6 @@ class NSResetPass : public Module
 			throw ModuleException("Not using mail.");
 
 
-		ModuleManager::Attach(I_OnPreCommand, this);
 	}
 
 	~NSResetPass()

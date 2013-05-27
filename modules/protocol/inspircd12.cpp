@@ -953,7 +953,7 @@ struct IRCDMessageMetadata : IRCDMessage
 				if ((pos2 - pos1) >= 32) // inspircd supports md5 and sha1 fingerprint hashes -> size 32 or 40 bytes.
 				{
 					u->fingerprint = data.substr(pos1, pos2 - pos1);
-					FOREACH_MOD(I_OnFingerprint, OnFingerprint(u));
+					FOREACH_MOD(OnFingerprint, (u));
 				}
 			}
 		}
@@ -1213,8 +1213,6 @@ class ProtoInspIRCd : public Module
 		message_setident(this), message_server(this), message_time(this), message_uid(this)
 	{
 
-		Implementation i[] = { I_OnUserNickChange };
-		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 
 		Servers::Capab.insert("NOQUIT");
 

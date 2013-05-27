@@ -89,8 +89,6 @@ class LDAPOper : public Module
 		Module(modname, creator, EXTRA | VENDOR), ldap("LDAPProvider", "ldap/main"), iinterface(this)
 	{
 
-		Implementation i[] = { I_OnReload, I_OnNickIdentify, I_OnDelCore };
-		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 	}
 
 	void OnReload(Configuration::Conf *conf) anope_override

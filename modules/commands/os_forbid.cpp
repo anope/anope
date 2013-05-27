@@ -251,8 +251,6 @@ class OSForbid : public Module
 		forbiddata_type("ForbidData", ForbidData::Unserialize), forbidService(this), commandosforbid(this)
 	{
 
-		Implementation i[] = { I_OnUserConnect, I_OnUserNickChange, I_OnJoinChannel, I_OnPreCommand };
-		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 	}
 
 	void OnUserConnect(User *u, bool &exempt) anope_override

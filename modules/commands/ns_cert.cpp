@@ -225,8 +225,6 @@ class NSCert : public Module
 		if (!IRCD || !IRCD->CanCertFP)
 			throw ModuleException("Your IRCd does not support ssl client certificates");
 
-		Implementation i[] = { I_OnFingerprint };
-		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 
 	}
 

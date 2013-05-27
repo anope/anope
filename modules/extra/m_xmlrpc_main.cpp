@@ -117,7 +117,7 @@ class MyXMLRPCEvent : public XMLRPCEvent
 		else
 		{
 			XMLRPCIdentifyRequest *req = new XMLRPCIdentifyRequest(me, request, client, iface, username, password);
-			FOREACH_MOD(I_OnCheckAuthentication, OnCheckAuthentication(NULL, req));
+			FOREACH_MOD(OnCheckAuthentication, (NULL, req));
 			req->Dispatch();
 			return false;
 		}

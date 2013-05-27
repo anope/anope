@@ -33,12 +33,12 @@ NickCore::NickCore(const Anope::string &coredisplay) : Serializable("NickCore"),
 	if (old == NickCoreList->size())
 		Log(LOG_DEBUG) << "Duplicate account " << coredisplay << " in nickcore table?";
 	
-	FOREACH_MOD(I_OnNickCoreCreate, OnNickCoreCreate(this));
+	FOREACH_MOD(OnNickCoreCreate, (this));
 }
 
 NickCore::~NickCore()
 {
-	FOREACH_MOD(I_OnDelCore, OnDelCore(this));
+	FOREACH_MOD(OnDelCore, (this));
 
 	if (!this->chanaccess->empty())
 		Log(LOG_DEBUG) << "Non-empty chanaccess list in destructor!";
@@ -140,7 +140,7 @@ void NickCore::SetDisplay(const NickAlias *na)
 	if (na->nc != this || na->nick == this->display)
 		return;
 
-	FOREACH_MOD(I_OnChangeCoreDisplay, OnChangeCoreDisplay(this, na->nick));
+	FOREACH_MOD(OnChangeCoreDisplay, (this, na->nick));
 
 	/* Remove the core from the list */
 	NickCoreList->erase(this->display);
@@ -158,7 +158,7 @@ bool NickCore::IsServicesOper() const
 void NickCore::AddAccess(const Anope::string &entry)
 {
 	this->access.push_back(entry);
-	FOREACH_MOD(I_OnNickAddAccess, OnNickAddAccess(this, entry));
+	FOREACH_MOD(OnNickAddAccess, (this, entry));
 }
 
 Anope::string NickCore::GetAccess(unsigned entry) const
@@ -187,7 +187,7 @@ void NickCore::EraseAccess(const Anope::string &entry)
 	for (unsigned i = 0, end = this->access.size(); i < end; ++i)
 		if (this->access[i] == entry)
 		{
-			FOREACH_MOD(I_OnNickEraseAccess, OnNickEraseAccess(this, entry));
+			FOREACH_MOD(OnNickEraseAccess, (this, entry));
 			this->access.erase(this->access.begin() + i);
 			break;
 		}
@@ -195,7 +195,7 @@ void NickCore::EraseAccess(const Anope::string &entry)
 
 void NickCore::ClearAccess()
 {
-	FOREACH_MOD(I_OnNickClearAccess, OnNickClearAccess(this));
+	FOREACH_MOD(OnNickClearAccess, (this));
 	this->access.clear();
 }
 
@@ -219,7 +219,7 @@ bool NickCore::IsOnAccess(const User *u) const
 void NickCore::AddCert(const Anope::string &entry)
 {
 	this->cert.push_back(entry);
-	FOREACH_MOD(I_OnNickAddCert, OnNickAddCert(this, entry));
+	FOREACH_MOD(OnNickAddCert, (this, entry));
 }
 
 Anope::string NickCore::GetCert(unsigned entry) const
@@ -243,7 +243,7 @@ void NickCore::EraseCert(const Anope::string &entry)
 	for (unsigned i = 0, end = this->cert.size(); i < end; ++i)
 		if (this->cert[i] == entry)
 		{
-			FOREACH_MOD(I_OnNickEraseCert, OnNickEraseCert(this, entry));
+			FOREACH_MOD(OnNickEraseCert, (this, entry));
 			this->cert.erase(this->cert.begin() + i);
 			break;
 		}
@@ -251,7 +251,7 @@ void NickCore::EraseCert(const Anope::string &entry)
 
 void NickCore::ClearCert()
 {
-	FOREACH_MOD(I_OnNickClearCert, OnNickClearCert(this));
+	FOREACH_MOD(OnNickClearCert, (this));
 	this->cert.clear();
 }
 

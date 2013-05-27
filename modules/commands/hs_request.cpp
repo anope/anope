@@ -190,7 +190,7 @@ class CommandHSActivate : public Command
 		if (req)
 		{
 			na->SetVhost(req->ident, req->host, source.GetNick(), req->time);
-			FOREACH_MOD(I_OnSetVhost, OnSetVhost(na));
+			FOREACH_MOD(OnSetVhost, (na));
 
 			if (Config->GetModule(this->owner)->Get<bool>("memouser") && memoserv)
 				memoserv->Send(source.service->nick, na->nick, _("[auto memo] Your requested vHost has been approved."), true);

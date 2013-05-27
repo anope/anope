@@ -272,8 +272,6 @@ class CSEntryMessage : public Module
 	CSEntryMessage(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR), entrymsg_type("EntryMsg", EntryMsg::Unserialize), commandentrymsg(this)
 	{
 
-		Implementation i[] = { I_OnJoinChannel };
-		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 	}
 
 	void OnJoinChannel(User *u, Channel *c) anope_override

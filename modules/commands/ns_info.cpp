@@ -135,7 +135,7 @@ class CommandNSInfo : public Command
 				}
 			}
 
-			FOREACH_MOD(I_OnNickInfo, OnNickInfo(source, na, info, show_hidden));
+			FOREACH_MOD(OnNickInfo, (source, na, info, show_hidden));
 
 			std::vector<Anope::string> replies;
 			info.Process(replies);

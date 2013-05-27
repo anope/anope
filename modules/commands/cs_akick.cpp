@@ -160,7 +160,7 @@ class CommandCSAKick : public Command
 
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to add " << mask << (reason == "" ? "" : ": ") << reason;
 
-		FOREACH_MOD(I_OnAkickAdd, OnAkickAdd(source, ci, akick));
+		FOREACH_MOD(OnAkickAdd, (source, ci, akick));
 
 		source.Reply(_("\002%s\002 added to %s autokick list."), mask.c_str(), ci->name.c_str());
 
@@ -210,7 +210,7 @@ class CommandCSAKick : public Command
 					if (!number || number > ci->GetAkickCount())
 						return;
 
-					FOREACH_MOD(I_OnAkickDel, OnAkickDel(source, ci, ci->GetAkick(number - 1)));
+					FOREACH_MOD(OnAkickDel, (source, ci, ci->GetAkick(number - 1)));
 
 					++deleted;
 					ci->EraseAkick(number - 1);
@@ -241,7 +241,7 @@ class CommandCSAKick : public Command
 			bool override = !source.AccessFor(ci).HasPriv("AKICK");
 			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to delete " << mask;
 
-			FOREACH_MOD(I_OnAkickDel, OnAkickDel(source, ci, ci->GetAkick(i)));
+			FOREACH_MOD(OnAkickDel, (source, ci, ci->GetAkick(i)));
 
 			ci->EraseAkick(i);
 
@@ -512,8 +512,6 @@ class CSAKick : public Module
 	CSAKick(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandcsakick(this)
 	{
-		Implementation i[] = { I_OnCheckKick };
-		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 	}
 
 	EventReturn OnCheckKick(User *u, ChannelInfo *ci, Anope::string &mask, Anope::string &reason) anope_override

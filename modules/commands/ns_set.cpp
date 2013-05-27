@@ -224,7 +224,7 @@ class CommandNSSetAutoOp : public Command
 		NickCore *nc = na->nc;
 
 		EventReturn MOD_RESULT;
-		FOREACH_RESULT(I_OnSetNickOption, OnSetNickOption(source, this, nc, param));
+		FOREACH_RESULT(OnSetNickOption, MOD_RESULT, (source, this, nc, param));
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
@@ -306,7 +306,7 @@ class CommandNSSetChanstats : public Command
 		}
 
 		EventReturn MOD_RESULT;
-		FOREACH_RESULT(I_OnSetNickOption, OnSetNickOption(source, this, na->nc, param));
+		FOREACH_RESULT(OnSetNickOption, MOD_RESULT, (source, this, na->nc, param));
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
@@ -395,7 +395,7 @@ class CommandNSSetDisplay : public Command
 		}
 
 		EventReturn MOD_RESULT;
-		FOREACH_RESULT(I_OnSetNickOption, OnSetNickOption(source, this, user_na->nc, param));
+		FOREACH_RESULT(OnSetNickOption, MOD_RESULT, (source, this, user_na->nc, param));
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
@@ -510,7 +510,7 @@ class CommandNSSetEmail : public Command
 		}
 
 		EventReturn MOD_RESULT;
-		FOREACH_RESULT(I_OnSetNickOption, OnSetNickOption(source, this, nc, param));
+		FOREACH_RESULT(OnSetNickOption, MOD_RESULT, (source, this, nc, param));
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
@@ -599,7 +599,7 @@ class CommandNSSetGreet : public Command
 		NickCore *nc = na->nc;
 
 		EventReturn MOD_RESULT;
-		FOREACH_RESULT(I_OnSetNickOption, OnSetNickOption(source, this, nc, param));
+		FOREACH_RESULT(OnSetNickOption, MOD_RESULT, (source, this, nc, param));
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
@@ -682,7 +682,7 @@ class CommandNSSetHide : public Command
 		NickCore *nc = na->nc;
 
 		EventReturn MOD_RESULT;
-		FOREACH_RESULT(I_OnSetNickOption, OnSetNickOption(source, this, nc, param));
+		FOREACH_RESULT(OnSetNickOption, MOD_RESULT, (source, this, nc, param));
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
@@ -811,7 +811,7 @@ class CommandNSSetKill : public Command
 		NickCore *nc = na->nc;
 
 		EventReturn MOD_RESULT;
-		FOREACH_RESULT(I_OnSetNickOption, OnSetNickOption(source, this, nc, param));
+		FOREACH_RESULT(OnSetNickOption, MOD_RESULT, (source, this, nc, param));
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
@@ -937,7 +937,7 @@ class CommandNSSetLanguage : public Command
 		NickCore *nc = na->nc;
 
 		EventReturn MOD_RESULT;
-		FOREACH_RESULT(I_OnSetNickOption, OnSetNickOption(source, this, nc, param));
+		FOREACH_RESULT(OnSetNickOption, MOD_RESULT, (source, this, nc, param));
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
@@ -1045,7 +1045,7 @@ class CommandNSSetMessage : public Command
 		}
 
 		EventReturn MOD_RESULT;
-		FOREACH_RESULT(I_OnSetNickOption, OnSetNickOption(source, this, nc, param));
+		FOREACH_RESULT(OnSetNickOption, MOD_RESULT, (source, this, nc, param));
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
@@ -1134,7 +1134,7 @@ class CommandNSSetPrivate : public Command
 		NickCore *nc = na->nc;
 
 		EventReturn MOD_RESULT;
-		FOREACH_RESULT(I_OnSetNickOption, OnSetNickOption(source, this, nc, param));
+		FOREACH_RESULT(OnSetNickOption, MOD_RESULT, (source, this, nc, param));
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
@@ -1223,7 +1223,7 @@ class CommandNSSetSecure : public Command
 		NickCore *nc = na->nc;
 
 		EventReturn MOD_RESULT;
-		FOREACH_RESULT(I_OnSetNickOption, OnSetNickOption(source, this, nc, param));
+		FOREACH_RESULT(OnSetNickOption, MOD_RESULT, (source, this, nc, param));
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
@@ -1399,8 +1399,6 @@ class NSSet : public Module
 		commandnssasetnoexpire(this)
 	{
 
-		Implementation i[] = { I_OnPreCommand, I_OnSetCorrectModes };
-		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 	}
 
 	EventReturn OnPreCommand(CommandSource &source, Command *command, std::vector<Anope::string> &params) anope_override

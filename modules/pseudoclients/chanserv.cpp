@@ -20,11 +20,6 @@ class ChanServCore : public Module, public ChanServService
 	ChanServCore(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PSEUDOCLIENT | VENDOR),
 		ChanServService(this)
 	{
-		Implementation i[] = { I_OnReload, I_OnBotDelete, I_OnBotPrivmsg, I_OnDelCore,
-			I_OnPreHelp, I_OnPostHelp, I_OnCheckModes, I_OnCreateChan, I_OnCanSet,
-			I_OnChannelSync, I_OnBotKick, I_OnExpireTick, I_OnCheckDelete, I_OnPreUplinkSync,
-			I_OnChanRegistered, I_OnTopicUpdated };
-		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 	}
 
 	void Hold(Channel *c) anope_override
@@ -360,7 +355,7 @@ class ChanServCore : public Module, public ChanServService
 			if (ci->HasExt("NO_EXPIRE"))
 				expire = false;
 
-			FOREACH_MOD(I_OnPreChanExpire, OnPreChanExpire(ci, expire));
+			FOREACH_MOD(OnPreChanExpire, (ci, expire));
 
 			if (expire)
 			{
@@ -369,7 +364,7 @@ class ChanServCore : public Module, public ChanServService
 					extra = "suspended ";
 
 				Log(LOG_NORMAL, "chanserv/expire") << "Expiring " << extra  << "channel " << ci->name << " (founder: " << (ci->GetFounder() ? ci->GetFounder()->display : "(none)") << ")";
-				FOREACH_MOD(I_OnChanExpire, OnChanExpire(ci));
+				FOREACH_MOD(OnChanExpire, (ci));
 				delete ci;
 			}
 		}

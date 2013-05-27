@@ -52,7 +52,7 @@ class CommandCSDrop : public Command
 		bool override = (ci->HasExt("SECUREFOUNDER") ? !source.IsFounder(ci) : !source.AccessFor(ci).HasPriv("FOUNDER"));
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "(founder was: " << (ci->GetFounder() ? ci->GetFounder()->display : "none") << ")";
 
-		FOREACH_MOD(I_OnChanDrop, OnChanDrop(ci));
+		FOREACH_MOD(OnChanDrop, (ci));
 
 		Reference<Channel> c = ci->c;
 		delete ci;

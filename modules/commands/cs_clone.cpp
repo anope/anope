@@ -85,7 +85,7 @@ public:
 			else
 				target_ci->last_topic_setter = source.service->nick;
 
-			FOREACH_MOD(I_OnChanRegistered, OnChanRegistered(target_ci));
+			FOREACH_MOD(OnChanRegistered, (target_ci));
 
 			source.Reply(_("All settings from \002%s\002 have been cloned to \002%s\002."), channel.c_str(), target.c_str());
 		}

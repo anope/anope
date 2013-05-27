@@ -242,8 +242,6 @@ class NSAJoin : public Module
 		if (!IRCD->CanSVSJoin)
 			throw ModuleException("Your IRCd does not support SVSJOIN");
 
-		Implementation i[] = { I_OnNickIdentify };
-		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 	}
 
 	void OnNickIdentify(User *u) anope_override

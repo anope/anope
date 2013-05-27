@@ -66,8 +66,6 @@ class ModuleSQLite : public Module
  public:
 	ModuleSQLite(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, EXTRA | VENDOR)
 	{
-		Implementation i[] = { I_OnReload };
-		ModuleManager::Attach(i, this,  sizeof(i) / sizeof(Implementation));
 	}
 
 	~ModuleSQLite()

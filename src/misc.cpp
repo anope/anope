@@ -477,7 +477,7 @@ bool Anope::Match(const Anope::string &str, const Anope::string &mask, bool case
 void Anope::Encrypt(const Anope::string &src, Anope::string &dest)
 {
 	EventReturn MOD_RESULT;
-	FOREACH_RESULT(I_OnEncrypt, OnEncrypt(src, dest));
+	FOREACH_RESULT(OnEncrypt, MOD_RESULT, (src, dest));
 	static_cast<void>(MOD_RESULT);
 }
 
@@ -492,7 +492,7 @@ bool Anope::Decrypt(const Anope::string &src, Anope::string &dest)
 	Anope::string hashm(src.begin(), src.begin() + pos);
 
 	EventReturn MOD_RESULT;
-	FOREACH_RESULT(I_OnDecrypt, OnDecrypt(hashm, src, dest));
+	FOREACH_RESULT(OnDecrypt, MOD_RESULT, (hashm, src, dest));
 	if (MOD_RESULT == EVENT_ALLOW)
 		return true;
 

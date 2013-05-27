@@ -155,8 +155,6 @@ class ModuleRewrite : public Module
  public:
 	ModuleRewrite(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR), cmdrewrite(this)
 	{
-		Implementation i[] = { I_OnReload };
-		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 	}
 
 	void OnReload(Configuration::Conf *conf) anope_override

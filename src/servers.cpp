@@ -118,7 +118,7 @@ Server::Server(Server *up, const Anope::string &sname, unsigned shops, const Ano
 		}
 	}
 
-	FOREACH_MOD(I_OnNewServer, OnNewServer(this));
+	FOREACH_MOD(OnNewServer, (this));
 }
 
 Server::~Server()
@@ -152,7 +152,7 @@ Server::~Server()
 void Server::Delete(const Anope::string &reason)
 {
 	this->quit_reason = reason;
-	FOREACH_MOD(I_OnServerQuit, OnServerQuit(this));
+	FOREACH_MOD(OnServerQuit, (this));
 	delete this;
 }
 
@@ -237,7 +237,7 @@ void Server::Sync(bool sync_links)
 
 	Log(this, "sync") << "is done syncing";
 
-	FOREACH_MOD(I_OnServerSync, OnServerSync(this));
+	FOREACH_MOD(OnServerSync, (this));
 
 	if (sync_links && !this->links.empty())
 	{
@@ -247,7 +247,7 @@ void Server::Sync(bool sync_links)
 
 	if (this->GetUplink() && this->GetUplink() == Me)
 	{
-		FOREACH_MOD(I_OnPreUplinkSync, OnPreUplinkSync(this));
+		FOREACH_MOD(OnPreUplinkSync, (this));
 
 		for (channel_map::const_iterator it = ChannelList.begin(), it_end = ChannelList.end(); it != it_end; ++it)
 		{
@@ -258,7 +258,7 @@ void Server::Sync(bool sync_links)
 		IRCD->SendEOB();
 		Me->Sync(false);
 
-		FOREACH_MOD(I_OnUplinkSync, OnUplinkSync(this));
+		FOREACH_MOD(OnUplinkSync, (this));
 
 		if (!Anope::NoFork && Anope::AtTerm())
 		{

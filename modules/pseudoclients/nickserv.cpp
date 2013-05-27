@@ -114,10 +114,6 @@ class NickServCore : public Module, public NickServService
  public:
 	NickServCore(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PSEUDOCLIENT | VENDOR), NickServService(this)
 	{
-		Implementation i[] = { I_OnReload, I_OnDelNick, I_OnDelCore, I_OnChangeCoreDisplay, I_OnNickIdentify, I_OnNickGroup,
-				I_OnNickUpdate, I_OnUserConnect, I_OnPostUserLogoff, I_OnServerSync, I_OnUserNickChange, I_OnPreHelp, I_OnPostHelp,
-				I_OnNickCoreCreate, I_OnUserQuit, I_OnExpireTick, I_OnUserLogin };
-		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 	}
 
 	void Validate(User *u) anope_override
@@ -285,7 +281,7 @@ class NickServCore : public Module, public NickServService
 			IRCD->SendLogout(user);
 			user->RemoveMode(NickServ, "REGISTERED");
 			user->Logout();
-			FOREACH_MOD(I_OnNickLogout, OnNickLogout(user));
+			FOREACH_MOD(OnNickLogout, (user));
 		}
 		nc->users.clear();
 	}
@@ -510,7 +506,7 @@ class NickServCore : public Module, public NickServService
 			if (na->HasExt("NO_EXPIRE"))
 				expire = false;
 
-			FOREACH_MOD(I_OnPreNickExpire, OnPreNickExpire(na, expire));
+			FOREACH_MOD(OnPreNickExpire, (na, expire));
 		
 			if (expire)
 			{
@@ -518,7 +514,7 @@ class NickServCore : public Module, public NickServService
 				if (na->nc->HasExt("SUSPENDED"))
 					extra = "suspended ";
 				Log(LOG_NORMAL, "expire") << "Expiring " << extra << "nickname " << na->nick << " (group: " << na->nc->display << ") (e-mail: " << (na->nc->email.empty() ? "none" : na->nc->email) << ")";
-				FOREACH_MOD(I_OnNickExpire, OnNickExpire(na));
+				FOREACH_MOD(OnNickExpire, (na));
 				delete na;
 			}
 		}

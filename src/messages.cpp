@@ -25,7 +25,7 @@ using namespace Message;
 
 void Away::Run(MessageSource &source, const std::vector<Anope::string> &params)
 {
-	FOREACH_MOD(I_OnUserAway, OnUserAway(source.GetUser(), params.empty() ? "" : params[0]));
+	FOREACH_MOD(OnUserAway, (source.GetUser(), params.empty() ? "" : params[0]));
 }
 
 void Capab::Run(MessageSource &source, const std::vector<Anope::string> &params)
@@ -57,7 +57,7 @@ void Invite::Run(MessageSource &source, const std::vector<Anope::string> &params
 	if (!targ || targ->server != Me || !c || c->FindUser(targ))
 		return;
 	
-	FOREACH_MOD(I_OnInvite, OnInvite(source.GetUser(), c, targ));
+	FOREACH_MOD(OnInvite, (source.GetUser(), c, targ));
 }
 
 void Join::Run(MessageSource &source, const std::vector<Anope::string> &params)
@@ -79,9 +79,9 @@ void Join::Run(MessageSource &source, const std::vector<Anope::string> &params)
 				++it;
 
 				Anope::string channame = cc->chan->name;
-				FOREACH_MOD(I_OnPrePartChannel, OnPrePartChannel(user, cc->chan));
+				FOREACH_MOD(OnPrePartChannel, (user, cc->chan));
 				cc->chan->DeleteUser(user);
-				FOREACH_MOD(I_OnPartChannel, OnPartChannel(user, Channel::Find(channame), channame, ""));
+				FOREACH_MOD(OnPartChannel, (user, Channel::Find(channame), channame, ""));
 			}
 			continue;
 		}
@@ -261,10 +261,10 @@ void Part::Run(MessageSource &source, const std::vector<Anope::string> &params)
 			continue;
 
 		Log(u, c, "part") << "Reason: " << (!reason.empty() ? reason : "No reason");
-		FOREACH_MOD(I_OnPrePartChannel, OnPrePartChannel(u, c));
+		FOREACH_MOD(OnPrePartChannel, (u, c));
 		Anope::string ChannelName = c->name;
 		c->DeleteUser(u);
-		FOREACH_MOD(I_OnPartChannel, OnPartChannel(u, c, ChannelName, !reason.empty() ? reason : ""));
+		FOREACH_MOD(OnPartChannel, (u, c, ChannelName, !reason.empty() ? reason : ""));
 	}
 }
 
@@ -285,7 +285,7 @@ void Privmsg::Run(MessageSource &source, const std::vector<Anope::string> &param
 		Channel *c = Channel::Find(receiver);
 		if (c)
 		{
-			FOREACH_MOD(I_OnPrivmsg, OnPrivmsg(u, c, message));
+			FOREACH_MOD(OnPrivmsg, (u, c, message));
 		}
 	}
 	else
@@ -316,7 +316,7 @@ void Privmsg::Run(MessageSource &source, const std::vector<Anope::string> &param
 		if (bi)
 		{
 			EventReturn MOD_RESULT;
-			FOREACH_RESULT(I_OnBotPrivmsg, OnBotPrivmsg(u, bi, message));
+			FOREACH_RESULT(OnBotPrivmsg, MOD_RESULT, (u, bi, message));
 			if (MOD_RESULT == EVENT_STOP)
 				return;
 
@@ -364,7 +364,7 @@ void SQuit::Run(MessageSource &source, const std::vector<Anope::string> &params)
 		return;
 	}
 
-	FOREACH_MOD(I_OnServerQuit, OnServerQuit(s));
+	FOREACH_MOD(OnServerQuit, (s));
 
 	s->Delete(s->GetName() + " " + s->GetUplink()->GetName());
 }

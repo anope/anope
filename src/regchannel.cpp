@@ -292,7 +292,7 @@ ChannelInfo::ChannelInfo(const Anope::string &chname) : Serializable("ChannelInf
 	if (old == RegisteredChannelList->size())
 		Log(LOG_DEBUG) << "Duplicate channel " << this->name << " in registered channel table?";
 
-	FOREACH_MOD(I_OnCreateChan, OnCreateChan(this));
+	FOREACH_MOD(OnCreateChan, (this));
 }
 
 ChannelInfo::ChannelInfo(const ChannelInfo &ci) : Serializable("ChannelInfo"),
@@ -348,12 +348,12 @@ ChannelInfo::ChannelInfo(const ChannelInfo &ci) : Serializable("ChannelInfo"),
 		this->log_settings->push_back(l);
 	}
 
-	FOREACH_MOD(I_OnCreateChan, OnCreateChan(this));
+	FOREACH_MOD(OnCreateChan, (this));
 }
 
 ChannelInfo::~ChannelInfo()
 {
-	FOREACH_MOD(I_OnDelChan, OnDelChan(this));
+	FOREACH_MOD(OnDelChan, (this));
 
 	Log(LOG_DEBUG) << "Deleting channel " << this->name;
 
@@ -766,7 +766,7 @@ BadWord* ChannelInfo::AddBadWord(const Anope::string &word, BadWordType type)
 
 	this->badwords->push_back(bw);
 
-	FOREACH_MOD(I_OnBadWordAdd, OnBadWordAdd(this, bw));
+	FOREACH_MOD(OnBadWordAdd, (this, bw));
 
 	return bw;
 }
@@ -791,7 +791,7 @@ void ChannelInfo::EraseBadWord(unsigned index)
 	if (this->badwords->empty() || index >= this->badwords->size())
 		return;
 	
-	FOREACH_MOD(I_OnBadWordDel, OnBadWordDel(this, (*this->badwords)[index]));
+	FOREACH_MOD(OnBadWordDel, (this, (*this->badwords)[index]));
 
 	delete this->badwords->at(index);
 }
@@ -838,7 +838,7 @@ bool ChannelInfo::SetMLock(ChannelMode *mode, bool status, const Anope::string &
 	std::pair<Anope::string, ModeLock *> ml = std::make_pair(mode->name, new ModeLock(this, status, mode->name, param, setter, created));
 
 	EventReturn MOD_RESULT;
-	FOREACH_RESULT(I_OnMLock, OnMLock(this, ml.second));
+	FOREACH_RESULT(OnMLock, MOD_RESULT, (this, ml.second));
 	if (MOD_RESULT == EVENT_STOP)
 		return false;
 
@@ -891,7 +891,7 @@ bool ChannelInfo::RemoveMLock(ChannelMode *mode, bool status, const Anope::strin
 					continue;
 
 				EventReturn MOD_RESULT;
-				FOREACH_RESULT(I_OnUnMLock, OnUnMLock(this, it->second));
+				FOREACH_RESULT(OnUnMLock, MOD_RESULT, (this, it->second));
 				if (MOD_RESULT != EVENT_STOP)
 				{
 					delete it->second;
@@ -913,7 +913,7 @@ bool ChannelInfo::RemoveMLock(ChannelMode *mode, bool status, const Anope::strin
 				if (ml->set == status && ml->param == param)
 				{
 					EventReturn MOD_RESULT;
-					FOREACH_RESULT(I_OnUnMLock, OnUnMLock(this, it->second));
+					FOREACH_RESULT(OnUnMLock, MOD_RESULT, (this, it->second));
 					if (MOD_RESULT == EVENT_STOP)
 						return false;
 					delete it->second;
@@ -1026,7 +1026,7 @@ bool ChannelInfo::CheckKick(User *user)
 	Anope::string mask, reason;
 
 	EventReturn MOD_RESULT;
-	FOREACH_RESULT(I_OnCheckKick, OnCheckKick(user, this, mask, reason));
+	FOREACH_RESULT(OnCheckKick, MOD_RESULT, (user, this, mask, reason));
 	if (MOD_RESULT != EVENT_STOP)
 		return false;
 	

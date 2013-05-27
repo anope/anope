@@ -31,7 +31,7 @@ class CommandNSUpdate : public Command
 			na->last_seen = Anope::CurTime;
 		}
 
-		FOREACH_MOD(I_OnNickUpdate, OnNickUpdate(u));
+		FOREACH_MOD(OnNickUpdate, (u));
 
 		source.Reply(_("Status updated (memos, vhost, chmodes, flags)."));
 	}

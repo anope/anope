@@ -380,7 +380,7 @@ static void ReadDatabase(Module *m = NULL)
 		/*if (m)
 			MOD_RESULT = m->OnDatabaseRead(params);
 		else
-			FOREACH_RESULT(I_OnDatabaseRead, OnDatabaseRead(params));
+			FOREACH_RESULT(OnDatabaseRead, MOD_RESULT, (params));
 		if (MOD_RESULT == EVENT_STOP)
 			continue;*/
 		OnDatabaseRead(params);
@@ -587,8 +587,6 @@ class DBPlain : public Module
  public:
 	DBPlain(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, DATABASE | VENDOR)
 	{
-		Implementation i[] = { I_OnReload, I_OnLoadDatabase, I_OnSaveDatabase };
-		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 
 		LastDay = 0;
 	}
@@ -645,9 +643,6 @@ class DBPlain : public Module
 	{
 		ReadDatabase();
 
-		/* No need to ever reload this again, although this should never be trigged again */
-		ModuleManager::Detach(I_OnLoadDatabase, this);
-
 		return EVENT_STOP;
 	}
 
@@ -702,7 +697,7 @@ class DBPlain : public Module
 			}
 			for (unsigned k = 0, end = mi->ignores.size(); k < end; ++k)
 				db_buffer << "MD MIG " << Anope::string(mi->ignores[k]) << endl;
-			//FOREACH_MOD(I_OnDatabaseWriteMetadata, OnDatabaseWriteMetadata(WriteMetadata, nc));
+			//FOREACH_MOD(OnDatabaseWriteMetadata, (WriteMetadata, nc));
 		}
 
 		for (nickalias_map::const_iterator it = NickAliasList->begin(), it_end = NickAliasList->end(); it != it_end; ++it)
@@ -727,7 +722,7 @@ class DBPlain : public Module
 			if (na->HasVhost())
 				db_buffer << "MD VHOST " << na->GetVhostCreator() << " " << na->GetVhostCreated() << " " << na->GetVhostHost() << " :" << na->GetVhostIdent() << endl;
 
-			//FOREACH_MOD(I_OnDatabaseWriteMetadata, OnDatabaseWriteMetadata(WriteMetadata, na));
+			//FOREACH_MOD(OnDatabaseWriteMetadata, (WriteMetadata, na));
 		}
 
 		for (botinfo_map::const_iterator it = BotListByNick->begin(), it_end = BotListByNick->end(); it != it_end; ++it)
@@ -836,7 +831,7 @@ class DBPlain : public Module
 				db_buffer << "MD BI BADWORD " << (ci->GetBadWord(k)->type == BW_ANY ? "ANY " : "") << (ci->GetBadWord(k)->type == BW_SINGLE ? "SINGLE " : "") << (ci->GetBadWord(k)->type == BW_START ? "START " : "") <<
 					(ci->GetBadWord(k)->type == BW_END ? "END " : "") << ":" << ci->GetBadWord(k)->word << endl;
 
-			//FOREACH_MOD(I_OnDatabaseWriteMetadata, OnDatabaseWriteMetadata(WriteMetadata, ci));
+			//FOREACH_MOD(OnDatabaseWriteMetadata, (WriteMetadata, ci));
 		}
 
 		db_buffer << "OS STATS " << MaxUserCount << " " << MaxUserTime << endl;
@@ -858,7 +853,7 @@ class DBPlain : public Module
 				db_buffer << "OS EXCEPTION " << e->mask << " " << e->limit << " " << e->who << " " << e->time << " " << e->expires << " " << e->reason << endl;
 			}
 
-		//FOREACH_MOD(I_OnDatabaseWrite, OnDatabaseWrite(Write));
+		//FOREACH_MOD(OnDatabaseWrite, (Write));
 
 		std::fstream db;
 		db.open(DatabaseFile.c_str(), std::ios_base::out | std::ios_base::trunc);

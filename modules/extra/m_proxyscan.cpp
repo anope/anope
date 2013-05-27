@@ -221,8 +221,6 @@ class ModuleProxyScan : public Module
 		connectionTimeout(this, 5)
 	{
 
-		Implementation i[] = { I_OnReload, I_OnUserConnect };
-		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 
 		this->listener = NULL;
 	}

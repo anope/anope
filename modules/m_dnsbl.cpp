@@ -92,8 +92,6 @@ class ModuleDNSBL : public Module
 	ModuleDNSBL(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
 	{
 
-		Implementation i[] = { I_OnReload, I_OnUserConnect };
-		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 	}
 
 	void OnReload(Configuration::Conf *conf) anope_override

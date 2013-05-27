@@ -194,7 +194,7 @@ class CommandNSRegister : public Command
 
 			Log(LOG_COMMAND, source, this) << "to register " << na->nick << " (email: " << (!na->nc->email.empty() ? na->nc->email : "none") << ")";
 
-			FOREACH_MOD(I_OnNickRegister, OnNickRegister(source.GetUser(), na));
+			FOREACH_MOD(OnNickRegister, (source.GetUser(), na));
 
 			if (na->nc->GetAccessCount())
 				source.Reply(_("Nickname \002%s\002 registered under your user@host-mask: %s"), u_nick.c_str(), na->nc->GetAccess(0).c_str());

@@ -37,7 +37,7 @@ class CommandHelp : public Command
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		EventReturn MOD_RESULT;
-		FOREACH_RESULT(I_OnPreHelp, OnPreHelp(source, params));
+		FOREACH_RESULT(OnPreHelp, MOD_RESULT, (source, params));
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 	
@@ -184,7 +184,7 @@ class CommandHelp : public Command
 				source.Reply(_("No help available for \002%s\002."), params[0].c_str());
 		}
 	
-		FOREACH_MOD(I_OnPostHelp, OnPostHelp(source, params));
+		FOREACH_MOD(OnPostHelp, (source, params));
 
 		return;
 	}

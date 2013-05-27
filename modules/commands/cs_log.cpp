@@ -186,8 +186,6 @@ class CSLog : public Module
 		MSService("MemoServService", "MemoServ"), commandcslog(this)
 	{
 
-		Implementation i[] = { I_OnLog };
-		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 	}
 
 	void OnLog(Log *l) anope_override

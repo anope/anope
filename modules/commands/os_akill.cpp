@@ -180,7 +180,7 @@ class CommandOSAKill : public Command
 		}
 
 		EventReturn MOD_RESULT;
-		FOREACH_RESULT(I_OnAddXLine, OnAddXLine(source, x, akills));
+		FOREACH_RESULT(OnAddXLine, MOD_RESULT, (source, x, akills));
 		if (MOD_RESULT == EVENT_STOP)
 		{
 			delete x;
@@ -231,7 +231,7 @@ class CommandOSAKill : public Command
 
 			do
 			{
-				FOREACH_MOD(I_OnDelXLine, OnDelXLine(source, x, akills));
+				FOREACH_MOD(OnDelXLine, (source, x, akills));
 
 				source.Reply(_("\002%s\002 deleted from the AKILL list."), x->mask.c_str());
 				AkillDelCallback::DoDel(source, x);
@@ -353,7 +353,7 @@ class CommandOSAKill : public Command
 		for (unsigned i = akills->GetCount(); i > 0; --i)
 		{
 			XLine *x = akills->GetEntry(i - 1);
-			FOREACH_MOD(I_OnDelXLine, OnDelXLine(source, x, akills));
+			FOREACH_MOD(OnDelXLine, (source, x, akills));
 			akills->DelXLine(x);
 		}
 

@@ -175,7 +175,7 @@ class CommandCSAccess : public Command
 		access->created = Anope::CurTime;
 		ci->AddAccess(access);
 
-		FOREACH_MOD(I_OnAccessAdd, OnAccessAdd(ci, source, access));
+		FOREACH_MOD(OnAccessAdd, (ci, source, access));
 
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to add " << mask << " with level " << level;
 		source.Reply(_("\002%s\002 added to %s access list at level \002%d\002."), access->mask.c_str(), ci->name.c_str(), level);
@@ -258,7 +258,7 @@ class CommandCSAccess : public Command
 					else
 						Nicks = access->mask;
 
-					FOREACH_MOD(I_OnAccessDel, OnAccessDel(ci, source, access));
+					FOREACH_MOD(OnAccessDel, (ci, source, access));
 
 					ci->EraseAccess(Number - 1);
 				}
@@ -284,7 +284,7 @@ class CommandCSAccess : public Command
 						bool override = !u_access.founder && !u_access.HasPriv("ACCESS_CHANGE") && !access->mask.equals_ci(source.nc->display);
 						Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to delete " << access->mask;
 
-						FOREACH_MOD(I_OnAccessDel, OnAccessDel(ci, source, access));
+						FOREACH_MOD(OnAccessDel, (ci, source, access));
 						delete access;
 					}
 					return;
@@ -429,7 +429,7 @@ class CommandCSAccess : public Command
 			source.Reply(ACCESS_DENIED);
 		else
 		{
-			FOREACH_MOD(I_OnAccessClear, OnAccessClear(ci, source));
+			FOREACH_MOD(OnAccessClear, (ci, source));
 
 			ci->ClearAccess();
 
@@ -597,7 +597,7 @@ class CommandCSLevels : public Command
 			else
 			{
 				ci->SetLevel(p->name, level);
-				FOREACH_MOD(I_OnLevelChange, OnLevelChange(source, ci, p->name, level));
+				FOREACH_MOD(OnLevelChange, (source, ci, p->name, level));
 
 				bool override = !source.AccessFor(ci).HasPriv("FOUNDER");
 				Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to set " << p->name << " to level " << level;
@@ -621,7 +621,7 @@ class CommandCSLevels : public Command
 			if (p != NULL)
 			{
 				ci->SetLevel(p->name, ACCESS_INVALID);
-				FOREACH_MOD(I_OnLevelChange, OnLevelChange(source, ci, p->name, ACCESS_INVALID));
+				FOREACH_MOD(OnLevelChange, (source, ci, p->name, ACCESS_INVALID));
 
 				bool override = !source.AccessFor(ci).HasPriv("FOUNDER");
 				Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to disable " << p->name;
@@ -673,7 +673,7 @@ class CommandCSLevels : public Command
 	void DoReset(CommandSource &source, ChannelInfo *ci)
 	{
 		reset_levels(ci);
-		FOREACH_MOD(I_OnLevelChange, OnLevelChange(source, ci, "ALL", 0));
+		FOREACH_MOD(OnLevelChange, (source, ci, "ALL", 0));
 
 		bool override = !source.AccessFor(ci).HasPriv("FOUNDER");
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to reset all levels";
@@ -791,8 +791,6 @@ class CSAccess : public Module
 	{
 		this->SetPermanent(true);
 
-		Implementation i[] = { I_OnReload, I_OnCreateChan, I_OnGroupCheckPriv };
-		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 	}
 
 	void OnReload(Configuration::Conf *conf) anope_override

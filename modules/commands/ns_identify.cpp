@@ -82,7 +82,7 @@ class CommandNSIdentify : public Command
 		else
 		{
 			NSIdentifyRequest *req = new NSIdentifyRequest(owner, source, this, na ? na->nc->display : nick, pass);
-			FOREACH_MOD(I_OnCheckAuthentication, OnCheckAuthentication(u, req));
+			FOREACH_MOD(OnCheckAuthentication, (u, req));
 			req->Dispatch();
 		}
 		return;

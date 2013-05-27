@@ -495,7 +495,6 @@ class BSSet : public Module
 		commandbsset(this), commandbssetbanexpire(this), commandbssetdontkickops(this), commandbssetdontkickvoices(this),
 		commandbssetfantasy(this), commandbssetgreet(this), commandbssetnobot(this), commandbssetprivate(this)
 	{
-		ModuleManager::Attach(I_OnBotBan, this);
 	}
 
 	void OnBotBan(User *u, ChannelInfo *ci, const Anope::string &mask) anope_override

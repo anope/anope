@@ -92,8 +92,6 @@ class DBSQL : public Module, public Pipe
 	DBSQL(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, DATABASE | VENDOR), sql("", ""), sqlinterface(this), shutting_down(false), loading_databases(false), loaded(false), imported(false)
 	{
 
-		Implementation i[] = { I_OnReload, I_OnShutdown, I_OnRestart, I_OnLoadDatabase, I_OnSerializableConstruct, I_OnSerializableDestruct, I_OnSerializableUpdate, I_OnSerializeTypeCreate };
-		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 
 		if (ModuleManager::FindModule("db_sql_live") != NULL)
 			throw ModuleException("db_sql can not be loaded after db_sql_live");

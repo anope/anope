@@ -45,12 +45,12 @@ Channel::Channel(const Anope::string &nname, time_t ts)
 	if (Me && Me->IsSynced())
 		Log(NULL, this, "create");
 
-	FOREACH_MOD(I_OnChannelCreate, OnChannelCreate(this));
+	FOREACH_MOD(OnChannelCreate, (this));
 }
 
 Channel::~Channel()
 {
-	FOREACH_MOD(I_OnChannelDelete, OnChannelDelete(this));
+	FOREACH_MOD(OnChannelDelete, (this));
 
 	ModeManager::StackerDel(this);
 
@@ -87,7 +87,7 @@ void Channel::Reset()
 
 void Channel::Sync()
 {
-	FOREACH_MOD(I_OnChannelSync, OnChannelSync(this));
+	FOREACH_MOD(OnChannelSync, (this));
 }
 
 void Channel::CheckModes()
@@ -104,7 +104,7 @@ void Channel::CheckModes()
 	}
 
 	EventReturn MOD_RESULT;
-	FOREACH_RESULT(I_OnCheckModes, OnCheckModes(this));
+	FOREACH_RESULT(OnCheckModes, MOD_RESULT, (this));
 	if (MOD_RESULT == EVENT_STOP)
 		return;
 
@@ -164,7 +164,7 @@ bool Channel::CheckDelete()
 		return false;
 
 	EventReturn MOD_RESULT;
-	FOREACH_RESULT(I_OnCheckDelete, OnCheckDelete(this));
+	FOREACH_RESULT(OnCheckDelete, MOD_RESULT, (this));
 
 	return MOD_RESULT != EVENT_STOP && this->users.empty();
 }
@@ -174,7 +174,7 @@ ChanUserContainer* Channel::JoinUser(User *user)
 	if (user->server && user->server->IsSynced())
 		Log(user, this, "join");
 
-	FOREACH_MOD(I_OnJoinChannel, OnJoinChannel(user, this));
+	FOREACH_MOD(OnJoinChannel, (user, this));
 
 	ChanUserContainer *cuc = new ChanUserContainer(user, this);
 	user->chans[this] = cuc;
@@ -188,7 +188,7 @@ void Channel::DeleteUser(User *user)
 	if (user->server && user->server->IsSynced() && !user->Quitting())
 		Log(user, this, "leave");
 
-	FOREACH_MOD(I_OnLeaveChannel, OnLeaveChannel(user, this));
+	FOREACH_MOD(OnLeaveChannel, (user, this));
 
 	ChanUserContainer *cu = user->FindChannel(this);
 	if (!this->users.erase(user))
@@ -311,7 +311,7 @@ void Channel::SetModeInternal(MessageSource &setter, ChannelMode *cm, const Anop
 		if (cc)
 			cc->status.AddMode(cm->mchar);
 
-		FOREACH_RESULT(I_OnChannelModeSet, OnChannelModeSet(this, setter, cm->name, param));
+		FOREACH_RESULT(OnChannelModeSet, MOD_RESULT, (this, setter, cm->name, param));
 
 		/* Enforce secureops, etc */
 		if (enforce_mlock && MOD_RESULT != EVENT_STOP)
@@ -335,7 +335,7 @@ void Channel::SetModeInternal(MessageSource &setter, ChannelMode *cm, const Anop
 		cml->OnAdd(this, param);
 	}
 
-	FOREACH_RESULT(I_OnChannelModeSet, OnChannelModeSet(this, setter, cm->name, param));
+	FOREACH_RESULT(OnChannelModeSet, MOD_RESULT, (this, setter, cm->name, param));
 
 	/* Check if we should enforce mlock */
 	if (!enforce_mlock || MOD_RESULT == EVENT_STOP)
@@ -376,7 +376,7 @@ void Channel::RemoveModeInternal(MessageSource &setter, ChannelMode *cm, const A
 		if (cc)
 			cc->status.DelMode(cm->mchar);
 
-		FOREACH_RESULT(I_OnChannelModeUnset, OnChannelModeUnset(this, setter, cm->name, param));
+		FOREACH_RESULT(OnChannelModeUnset, MOD_RESULT, (this, setter, cm->name, param));
 
 		if (enforce_mlock && MOD_RESULT != EVENT_STOP)
 			this->SetCorrectModes(u, false);
@@ -403,7 +403,7 @@ void Channel::RemoveModeInternal(MessageSource &setter, ChannelMode *cm, const A
 		cml->OnDel(this, param);
 	}
 
-	FOREACH_RESULT(I_OnChannelModeUnset, OnChannelModeUnset(this, setter, cm->name, param));
+	FOREACH_RESULT(OnChannelModeUnset, MOD_RESULT, (this, setter, cm->name, param));
 
 	/* Check for mlock */
 	if (!enforce_mlock || MOD_RESULT == EVENT_STOP)
@@ -752,9 +752,9 @@ void Channel::KickInternal(MessageSource &source, const Anope::string &nick, con
 	Anope::string this_name = this->name;
 	ChannelStatus status = cu->status;
 
-	FOREACH_MOD(I_OnPreUserKicked, OnPreUserKicked(source, cu, reason));
+	FOREACH_MOD(OnPreUserKicked, (source, cu, reason));
 	this->DeleteUser(target); /* This can delete this; */
-	FOREACH_MOD(I_OnUserKicked, OnUserKicked(source, target, this_name, status, reason));
+	FOREACH_MOD(OnUserKicked, (source, target, this_name, status, reason));
 }
 
 bool Channel::Kick(BotInfo *bi, User *u, const char *reason, ...)
@@ -777,7 +777,7 @@ bool Channel::Kick(BotInfo *bi, User *u, const char *reason, ...)
 		bi = this->ci->WhoSends();
 
 	EventReturn MOD_RESULT;
-	FOREACH_RESULT(I_OnBotKick, OnBotKick(bi, this, u, buf));
+	FOREACH_RESULT(OnBotKick, MOD_RESULT, (bi, this, u, buf));
 	if (MOD_RESULT == EVENT_STOP)
 		return false;
 	IRCD->SendKick(bi, this, u, "%s", buf);
@@ -797,7 +797,7 @@ void Channel::ChangeTopicInternal(const Anope::string &user, const Anope::string
 
 	Log(LOG_DEBUG) << "Topic of " << this->name << " changed by " << (u ? u->nick : user) << " to " << newtopic;
 
-	FOREACH_MOD(I_OnTopicUpdated, OnTopicUpdated(this, user, this->topic));
+	FOREACH_MOD(OnTopicUpdated, (this, user, this->topic));
 }
 
 void Channel::ChangeTopic(const Anope::string &user, const Anope::string &newtopic, time_t ts)
@@ -813,7 +813,7 @@ void Channel::ChangeTopic(const Anope::string &user, const Anope::string &newtop
 	/* Now that the topic is set update the time set. This is *after* we set it so the protocol modules are able to tell the old last set time */
 	this->topic_time = Anope::CurTime;
 
-	FOREACH_MOD(I_OnTopicUpdated, OnTopicUpdated(this, user, this->topic));
+	FOREACH_MOD(OnTopicUpdated, (this, user, this->topic));
 }
 
 void Channel::SetCorrectModes(User *user, bool give_modes)
@@ -836,7 +836,7 @@ void Channel::SetCorrectModes(User *user, bool give_modes)
 	 */
 	bool take_modes = (registered && !this->HasMode("REGISTERED")) || (!registered && this->syncing && user->server->IsSynced());
 
-	FOREACH_MOD(I_OnSetCorrectModes, OnSetCorrectModes(user, this, u_access, give_modes, take_modes));
+	FOREACH_MOD(OnSetCorrectModes, (user, this, u_access, give_modes, take_modes));
 
 	/* Never take modes from ulines */
 	take_modes &= !user->server->IsULined();

@@ -85,7 +85,7 @@ class CommandCSSetMisc : public Command
 		}
 
 		EventReturn MOD_RESULT;
-		FOREACH_RESULT(I_OnSetChannelOption, OnSetChannelOption(source, this, ci, params[1]));
+		FOREACH_RESULT(OnSetChannelOption, MOD_RESULT, (source, this, ci, params[1]));
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
@@ -136,8 +136,6 @@ class CSSetMisc : public Module
 	CSSetMisc(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		csmiscdata_type("CSMiscData", CSMiscData::Unserialize), commandcssetmisc(this)
 	{
-		Implementation i[] = { I_OnReload, I_OnChanInfo };
-		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 	}
 
 	void OnReload(Configuration::Conf *conf) anope_override

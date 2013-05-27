@@ -74,7 +74,7 @@ class CommandCSSuspend : public Command
 		Log(LOG_ADMIN, source, this, ci) << (!reason.empty() ? reason : "No reason") << ", expires in " << (expiry_secs ? Anope::strftime(Anope::CurTime + expiry_secs) : "never");
 		source.Reply(_("Channel \002%s\002 is now suspended."), ci->name.c_str());
 
-		FOREACH_MOD(I_OnChanSuspend, OnChanSuspend(ci));
+		FOREACH_MOD(OnChanSuspend, (ci));
 
 		return;
 	}
@@ -136,7 +136,7 @@ class CommandCSUnSuspend : public Command
 
 		source.Reply(_("Channel \002%s\002 is now released."), ci->name.c_str());
 
-		FOREACH_MOD(I_OnChanUnsuspend, OnChanUnsuspend(ci));
+		FOREACH_MOD(OnChanUnsuspend, (ci));
 
 		return;
 	}
@@ -161,8 +161,6 @@ class CSSuspend : public Module
 		commandcssuspend(this), commandcsunsuspend(this)
 	{
 
-		Implementation i[] = { I_OnChanInfo, I_OnPreChanExpire, I_OnCheckKick };
-		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 	}
 
 	void OnChanInfo(CommandSource &source, ChannelInfo *ci, InfoFormatter &info, bool show_hidden) anope_override

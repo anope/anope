@@ -13,8 +13,6 @@ class StatusUpdate : public Module
 	StatusUpdate(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
 	{
 
-		Implementation i[] = { I_OnAccessAdd, I_OnAccessDel };
-		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 	}
 
 	void OnAccessAdd(ChannelInfo *ci, CommandSource &, ChanAccess *access) anope_override

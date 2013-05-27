@@ -81,7 +81,7 @@ class CommandBSBot : public Command
 
 		source.Reply(_("%s!%s@%s (%s) added to the bot list."), bi->nick.c_str(), bi->GetIdent().c_str(), bi->host.c_str(), bi->realname.c_str());
 
-		FOREACH_MOD(I_OnBotCreate, OnBotCreate(bi));
+		FOREACH_MOD(OnBotCreate, (bi));
 		return;
 	}
 
@@ -220,7 +220,7 @@ class CommandBSBot : public Command
 		source.Reply(_("Bot \002%s\002 has been changed to %s!%s@%s (%s)."), oldnick.c_str(), bi->nick.c_str(), bi->GetIdent().c_str(), bi->host.c_str(), bi->realname.c_str());
 		Log(LOG_ADMIN, source, this) << "CHANGE " << oldnick << " to " << bi->GetMask() << " " << bi->realname;
 
-		FOREACH_MOD(I_OnBotChange, OnBotChange(bi));
+		FOREACH_MOD(OnBotChange, (bi));
 		return;
 	}
 
@@ -247,7 +247,7 @@ class CommandBSBot : public Command
 			return;
 		}
 
-		FOREACH_MOD(I_OnBotDelete, OnBotDelete(bi));
+		FOREACH_MOD(OnBotDelete, (bi));
 
 		Log(LOG_ADMIN, source, this) << "DEL " << bi->nick;
 

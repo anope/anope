@@ -180,8 +180,6 @@ class NSAccess : public Module
 	NSAccess(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandnsaccess(this)
 	{
-		Implementation i[] = { I_OnNickRegister };
-		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 	}
 
 	void OnNickRegister(User *u, NickAlias *na) anope_override

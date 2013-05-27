@@ -182,7 +182,7 @@ class CommandCSXOP : public Command
 
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to add " << mask;
 
-		FOREACH_MOD(I_OnAccessAdd, OnAccessAdd(ci, source, acc));
+		FOREACH_MOD(OnAccessAdd, (ci, source, acc));
 		source.Reply(_("\002%s\002 added to %s %s list."), acc->mask.c_str(), ci->name.c_str(), source.command.c_str());
 	}
 
@@ -287,7 +287,7 @@ class CommandCSXOP : public Command
 					else
 						nicks = caccess->mask;
 
-					FOREACH_MOD(I_OnAccessDel, OnAccessDel(ci, source, caccess));
+					FOREACH_MOD(OnAccessDel, (ci, source, caccess));
 
 					ci->EraseAccess(number - 1);
 				}
@@ -307,7 +307,7 @@ class CommandCSXOP : public Command
 
 					source.Reply(_("\002%s\002 deleted from %s %s list."), a->mask.c_str(), ci->name.c_str(), source.command.c_str());
 
-					FOREACH_MOD(I_OnAccessDel, OnAccessDel(ci, source, a));
+					FOREACH_MOD(OnAccessDel, (ci, source, a));
 					delete a;
 
 					return;
@@ -431,7 +431,7 @@ class CommandCSXOP : public Command
 				ci->EraseAccess(i - 1);
 		}
 
-		FOREACH_MOD(I_OnAccessClear, OnAccessClear(ci, source));
+		FOREACH_MOD(OnAccessClear, (ci, source));
 
 		source.Reply(_("Channel %s %s list has been cleared."), ci->name.c_str(), source.command.c_str());
 	}
@@ -554,8 +554,6 @@ class CSXOP : public Module
 	{
 		this->SetPermanent(true);
 
-		Implementation i[] = { I_OnReload };
-		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 	}
 
 	void OnReload(Configuration::Conf *conf) anope_override

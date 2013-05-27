@@ -18,9 +18,6 @@ class BotServCore : public Module
  public:
 	BotServCore(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PSEUDOCLIENT | VENDOR)
 	{
-		Implementation i[] = { I_OnReload, I_OnSetCorrectModes, I_OnBotAssign, I_OnPrivmsg, I_OnJoinChannel, I_OnLeaveChannel,
-					I_OnPreHelp, I_OnPostHelp, I_OnChannelModeSet, I_OnCreateChan, I_OnUserKicked, I_OnCreateBot };
-		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 	}
 
 	void OnReload(Configuration::Conf *conf) anope_override
@@ -148,11 +145,11 @@ class BotServCore : public Module
 		EventReturn MOD_RESULT;
 		if (c->ci->AccessFor(u).HasPriv("FANTASIA"))
 		{
-			FOREACH_RESULT(I_OnBotFantasy, OnBotFantasy(source, cmd, c->ci, params));
+			FOREACH_RESULT(OnBotFantasy, MOD_RESULT, (source, cmd, c->ci, params));
 		}
 		else
 		{
-			FOREACH_RESULT(I_OnBotNoFantasyAccess, OnBotNoFantasyAccess(source, cmd, c->ci, params));
+			FOREACH_RESULT(OnBotNoFantasyAccess, MOD_RESULT, (source, cmd, c->ci, params));
 		}
 
 		if (MOD_RESULT == EVENT_STOP || !c->ci->AccessFor(u).HasPriv("FANTASIA"))
@@ -161,7 +158,7 @@ class BotServCore : public Module
 		if (MOD_RESULT != EVENT_ALLOW && !info.permission.empty() && !source.HasCommand(info.permission))
 			return;
 
-		FOREACH_RESULT(I_OnPreCommand, OnPreCommand(source, cmd, params));
+		FOREACH_RESULT(OnPreCommand, MOD_RESULT, (source, cmd, params));
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
@@ -169,7 +166,7 @@ class BotServCore : public Module
 		cmd->Execute(source, params);
 		if (!nc_reference)
 			source.nc = NULL;
-		FOREACH_MOD(I_OnPostCommand, OnPostCommand(source, cmd, params));
+		FOREACH_MOD(OnPostCommand, (source, cmd, params));
 	}
 
 	void OnJoinChannel(User *user, Channel *c) anope_override

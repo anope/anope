@@ -656,8 +656,6 @@ class ProtongIRCd : public Module
 
 		this->AddModes();
 
-		Implementation i[] = { I_OnUserNickChange };
-		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 	}
 
 	void OnUserNickChange(User *u, const Anope::string &) anope_override

@@ -87,7 +87,7 @@ bool WebCPanel::Index::OnRequest(HTTPProvider *server, const Anope::string &page
 		// Rate limit check.
 
 		WebpanelRequest *req = new WebpanelRequest(me, reply, message, server, page_name, client, replacements, user, pass);
-		FOREACH_MOD(I_OnCheckAuthentication, OnCheckAuthentication(NULL, req));
+		FOREACH_MOD(OnCheckAuthentication, (NULL, req));
 		req->Dispatch();
 		return false;
 	}

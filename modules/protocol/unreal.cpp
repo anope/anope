@@ -920,7 +920,7 @@ struct IRCDMessageSASL : IRCDMessage
 				return;
 
 			IdentifyRequest *req = new UnrealSASLIdentifyRequest(this->owner, params[1], acc, pass);
-			FOREACH_MOD(I_OnCheckAuthentication, OnCheckAuthentication(NULL, req));
+			FOREACH_MOD(OnCheckAuthentication, (NULL, req));
 			req->Dispatch();
 		}
 	}
@@ -1211,8 +1211,6 @@ class ProtoUnreal : public Module
 
 		this->AddModes();
 
-		Implementation i[] = { I_OnReload, I_OnUserNickChange, I_OnChannelSync, I_OnChanRegistered, I_OnDelChan, I_OnMLock, I_OnUnMLock };
-		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 		ModuleManager::SetPriority(this, PRIORITY_FIRST);
 	}
 

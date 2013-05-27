@@ -771,7 +771,7 @@ class BSKick : public Module
 			Anope::string mask = ci->GetIdealBan(u);
 
 			ci->c->SetMode(NULL, "BAN", mask);
-			FOREACH_MOD(I_OnBotBan, OnBotBan(u, ci, mask));
+			FOREACH_MOD(OnBotBan, (u, ci, mask));
 		}
 	}
 
@@ -802,8 +802,6 @@ class BSKick : public Module
 	{
 		me = this;
 
-		Implementation i[] = { I_OnPrivmsg };
-		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 	}
 
 	~BSKick()

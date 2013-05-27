@@ -129,7 +129,7 @@ Log::~Log()
 	else if (this->type == LOG_TERMINAL)
 		std::cout << this->BuildPrefix() << this->buf.str() << std::endl;
 
-	FOREACH_MOD(I_OnLog, OnLog(this));
+	FOREACH_MOD(OnLog, (this));
 	
 	if (Config)
 		for (unsigned i = 0; i < Config->LogInfos.size(); ++i)

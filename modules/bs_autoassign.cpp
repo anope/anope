@@ -14,8 +14,6 @@ class BSAutoAssign : public Module
  public:
 	BSAutoAssign(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
 	{
-		Implementation i[] = { I_OnChanRegistered };
-		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 	}
 
 	void OnChanRegistered(ChannelInfo *ci) anope_override

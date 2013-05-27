@@ -41,9 +41,9 @@ class CommandMSCancel : public Command
 				if (mi->GetMemo(i)->unread && source.nc->display.equals_ci(mi->GetMemo(i)->sender))
 				{
 					if (ischan)
-						FOREACH_MOD(I_OnMemoDel, OnMemoDel(ci, mi, mi->GetMemo(i)));
+						FOREACH_MOD(OnMemoDel, (ci, mi, mi->GetMemo(i)));
 					else
-						FOREACH_MOD(I_OnMemoDel, OnMemoDel(na->nc, mi, mi->GetMemo(i)));
+						FOREACH_MOD(OnMemoDel, (na->nc, mi, mi->GetMemo(i)));
 					mi->Del(i);
 					source.Reply(_("Last memo to \002%s\002 has been cancelled."), nname.c_str());
 					return;

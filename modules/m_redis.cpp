@@ -529,8 +529,6 @@ class ModuleRedis : public Module
  public:
 	ModuleRedis(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, EXTRA | VENDOR)
 	{
-		Implementation i[] = { I_OnReload, I_OnModuleUnload };
-		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 	}
 
 	~ModuleRedis()

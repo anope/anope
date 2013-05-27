@@ -159,8 +159,6 @@ class OperServCore : public Module
 	OperServCore(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PSEUDOCLIENT | VENDOR),
 		sglines(this), sqlines(this), snlines(this)
 	{
-		Implementation i[] = { I_OnReload, I_OnBotPrivmsg, I_OnServerQuit, I_OnUserModeSet, I_OnUserModeUnset, I_OnUserConnect, I_OnUserNickChange, I_OnPreHelp, I_OnLog };
-		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 
 		/* Yes, these are in this order for a reason. Most violent->least violent. */
 		XLineManager::RegisterXLineManager(&sglines);

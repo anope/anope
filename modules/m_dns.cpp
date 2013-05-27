@@ -779,7 +779,7 @@ class MyManager : public Manager, public Timer
 				}
 			}
 
-			FOREACH_MOD(I_OnDnsRequest, OnDnsRequest(recv_packet, packet));
+			FOREACH_MOD(OnDnsRequest, (recv_packet, packet));
 
 			for (unsigned i = 0; i < recv_packet.questions.size(); ++i)
 			{
@@ -940,8 +940,6 @@ class ModuleDNS : public Module
 	ModuleDNS(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, EXTRA | VENDOR), manager(this)
 	{
 
-		Implementation i[] = { I_OnReload, I_OnModuleUnload };
-		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 	}
 
 	void OnReload(Configuration::Conf *conf) anope_override

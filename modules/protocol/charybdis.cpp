@@ -171,7 +171,7 @@ struct IRCDMessageEncap : IRCDMessage
 		if (params[1] == "CERTFP")
 		{
 			u->fingerprint = params[2];
-			FOREACH_MOD(I_OnFingerprint, OnFingerprint(u));
+			FOREACH_MOD(OnFingerprint, (u));
 		}
 		/*
 		 * Received: :42X ENCAP * SASL 42XAAAAAH * S PLAIN
@@ -257,7 +257,7 @@ struct IRCDMessageEncap : IRCDMessage
 					return;
 
 				IdentifyRequest *req = new CharybdisSASLIdentifyRequest(this->owner, source, params[2], acc, pass);
-				FOREACH_MOD(I_OnCheckAuthentication, OnCheckAuthentication(NULL, req));
+				FOREACH_MOD(OnCheckAuthentication, (NULL, req));
 				req->Dispatch();
 			}
 		}
@@ -419,8 +419,6 @@ class ProtoCharybdis : public Module
 
 	{
 
-		Implementation i[] = { I_OnReload, I_OnChannelSync, I_OnMLock, I_OnUnMLock };
-		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 
 		if (ModuleManager::LoadModule("ratbox", User::Find(creator)) != MOD_ERR_OK)
 			throw ModuleException("Unable to load ratbox");

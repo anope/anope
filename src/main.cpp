@@ -60,7 +60,7 @@ class ExpireTimer : public Timer
 
 	void Tick(time_t) anope_override
 	{
-		FOREACH_MOD(I_OnExpireTick, OnExpireTick());
+		FOREACH_MOD(OnExpireTick, ());
 	}
 };
 
@@ -70,7 +70,7 @@ void Anope::SaveDatabases()
 		return;
 
 	Log(LOG_DEBUG) << "Saving databases";
-	FOREACH_MOD(I_OnSaveDatabase, OnSaveDatabase());
+	FOREACH_MOD(OnSaveDatabase, ());
 }
 
 /** The following comes from InspIRCd to get the full path of the Anope executable
@@ -181,11 +181,11 @@ int main(int ac, char **av, char **envp)
 
 	if (Anope::Restarting)
 	{
-		FOREACH_MOD(I_OnRestart, OnRestart());
+		FOREACH_MOD(OnRestart, ());
 	}
 	else
 	{
-		FOREACH_MOD(I_OnShutdown, OnShutdown());
+		FOREACH_MOD(OnShutdown, ());
 	}
 
 	if (Anope::QuitReason.empty())

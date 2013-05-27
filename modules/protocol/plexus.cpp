@@ -202,7 +202,7 @@ struct IRCDMessageEncap : IRCDMessage
 			if (u)
 			{
 				u->fingerprint = params[3];
-				FOREACH_MOD(I_OnFingerprint, OnFingerprint(u));
+				FOREACH_MOD(OnFingerprint, (u));
 			}
 		}
 		return;

@@ -296,15 +296,6 @@ class CSSeen : public Module
  public:
 	CSSeen(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR), seeninfo_type("SeenInfo", SeenInfo::Unserialize), commandseen(this), commandosseen(this)
 	{
-
-		Implementation eventlist[] =  { I_OnExpireTick,
-						I_OnUserConnect,
-						I_OnUserNickChange,
-						I_OnUserQuit,
-						I_OnJoinChannel,
-						I_OnPartChannel,
-						I_OnPreUserKicked };
-		ModuleManager::Attach(eventlist, this, sizeof(eventlist) / sizeof(Implementation));
 	}
 
 	void OnExpireTick() anope_override

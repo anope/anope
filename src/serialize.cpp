@@ -55,7 +55,7 @@ Serializable::Serializable(const Anope::string &serialize_type) : last_commit(0)
 	this->s_iter = SerializableItems->end();
 	--this->s_iter;
 
-	FOREACH_MOD(I_OnSerializableConstruct, OnSerializableConstruct(this));
+	FOREACH_MOD(OnSerializableConstruct, (this));
 }
 
 Serializable::Serializable(const Serializable &other) : last_commit(0), last_commit_time(0), id(0), redis_ignore(0)
@@ -66,12 +66,12 @@ Serializable::Serializable(const Serializable &other) : last_commit(0), last_com
 
 	this->s_type = other.s_type;
 
-	FOREACH_MOD(I_OnSerializableConstruct, OnSerializableConstruct(this));
+	FOREACH_MOD(OnSerializableConstruct, (this));
 }
 
 Serializable::~Serializable()
 {
-	FOREACH_MOD(I_OnSerializableDestruct, OnSerializableDestruct(this));
+	FOREACH_MOD(OnSerializableDestruct, (this));
 
 	SerializableItems->erase(this->s_iter);
 }
@@ -84,10 +84,10 @@ Serializable &Serializable::operator=(const Serializable &)
 void Serializable::QueueUpdate()
 {
 	/* Schedule updater */
-	FOREACH_MOD(I_OnSerializableUpdate, OnSerializableUpdate(this));
+	FOREACH_MOD(OnSerializableUpdate, (this));
 
 	/* Check for modifications now - this can delete this object! */
-	FOREACH_MOD(I_OnSerializeCheck, OnSerializeCheck(this->GetSerializableType()));
+	FOREACH_MOD(OnSerializeCheck, (this->GetSerializableType()));
 }
 
 bool Serializable::IsCached(Serialize::Data &data)
@@ -120,7 +120,7 @@ Type::Type(const Anope::string &n, unserialize_func f, Module *o)  : name(n), un
 	TypeOrder.push_back(this->name);
 	Types[this->name] = this;
 
-	FOREACH_MOD(I_OnSerializeTypeCreate, OnSerializeTypeCreate(this));
+	FOREACH_MOD(OnSerializeTypeCreate, (this));
 }
 
 Type::~Type()
@@ -138,7 +138,7 @@ Serializable *Type::Unserialize(Serializable *obj, Serialize::Data &data)
 
 void Type::Check()
 {
-	FOREACH_MOD(I_OnSerializeCheck, OnSerializeCheck(this));
+	FOREACH_MOD(OnSerializeCheck, (this));
 }
 
 time_t Type::GetTimestamp() const

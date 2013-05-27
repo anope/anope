@@ -259,7 +259,7 @@ void Command::Run(CommandSource &source, const Anope::string &message)
 	source.permission = info.permission;
 
 	EventReturn MOD_RESULT;
-	FOREACH_RESULT(I_OnPreCommand, OnPreCommand(source, c, params));
+	FOREACH_RESULT(OnPreCommand, MOD_RESULT, (source, c, params));
 	if (MOD_RESULT == EVENT_STOP)
 		return;
 
@@ -279,7 +279,7 @@ void Command::Run(CommandSource &source, const Anope::string &message)
 	}
 
 	c->Execute(source, params);
-	FOREACH_MOD(I_OnPostCommand, OnPostCommand(source, c, params));
+	FOREACH_MOD(OnPostCommand, (source, c, params));
 }
 
 bool Command::FindCommandFromService(const Anope::string &command_service, BotInfo* &bot, Anope::string &name)

@@ -73,7 +73,7 @@ class CommandCSSetAutoOp : public Command
 		}
 
 		EventReturn MOD_RESULT;
-		FOREACH_RESULT(I_OnSetChannelOption, OnSetChannelOption(source, this, ci, params[1]));
+		FOREACH_RESULT(OnSetChannelOption, MOD_RESULT, (source, this, ci, params[1]));
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
@@ -130,7 +130,7 @@ class CommandCSSetBanType : public Command
 		}
 
 		EventReturn MOD_RESULT;
-		FOREACH_RESULT(I_OnSetChannelOption, OnSetChannelOption(source, this, ci, params[1]));
+		FOREACH_RESULT(OnSetChannelOption, MOD_RESULT, (source, this, ci, params[1]));
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
@@ -191,7 +191,7 @@ class CommandCSSetChanstats : public Command
 		}
 
 		EventReturn MOD_RESULT;
-		FOREACH_RESULT(I_OnSetChannelOption, OnSetChannelOption(source, this, ci, params[1]));
+		FOREACH_RESULT(OnSetChannelOption, MOD_RESULT, (source, this, ci, params[1]));
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
@@ -245,7 +245,7 @@ class CommandCSSetDescription : public Command
 		}
 
 		EventReturn MOD_RESULT;
-		FOREACH_RESULT(I_OnSetChannelOption, OnSetChannelOption(source, this, ci, params[1]));
+		FOREACH_RESULT(OnSetChannelOption, MOD_RESULT, (source, this, ci, params[1]));
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
@@ -300,7 +300,7 @@ class CommandCSSetFounder : public Command
 		}
 
 		EventReturn MOD_RESULT;
-		FOREACH_RESULT(I_OnSetChannelOption, OnSetChannelOption(source, this, ci, params[1]));
+		FOREACH_RESULT(OnSetChannelOption, MOD_RESULT, (source, this, ci, params[1]));
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
@@ -363,7 +363,7 @@ class CommandCSSetKeepTopic : public Command
 		}
 
 		EventReturn MOD_RESULT;
-		FOREACH_RESULT(I_OnSetChannelOption, OnSetChannelOption(source, this, ci, params[1]));
+		FOREACH_RESULT(OnSetChannelOption, MOD_RESULT, (source, this, ci, params[1]));
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
@@ -420,7 +420,7 @@ class CommandCSSetPeace : public Command
 			return;
 		}
 		EventReturn MOD_RESULT;
-		FOREACH_RESULT(I_OnSetChannelOption, OnSetChannelOption(source, this, ci, params[1]));
+		FOREACH_RESULT(OnSetChannelOption, MOD_RESULT, (source, this, ci, params[1]));
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
@@ -479,7 +479,7 @@ class CommandCSSetPersist : public Command
 		}
 
 		EventReturn MOD_RESULT;
-		FOREACH_RESULT(I_OnSetChannelOption, OnSetChannelOption(source, this, ci, params[1]));
+		FOREACH_RESULT(OnSetChannelOption, MOD_RESULT, (source, this, ci, params[1]));
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
@@ -627,7 +627,7 @@ class CommandCSSetPrivate : public Command
 		}
 
 		EventReturn MOD_RESULT;
-		FOREACH_RESULT(I_OnSetChannelOption, OnSetChannelOption(source, this, ci, params[1]));
+		FOREACH_RESULT(OnSetChannelOption, MOD_RESULT, (source, this, ci, params[1]));
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
@@ -689,7 +689,7 @@ class CommandCSSetRestricted : public Command
 		}
 
 		EventReturn MOD_RESULT;
-		FOREACH_RESULT(I_OnSetChannelOption, OnSetChannelOption(source, this, ci, params[1]));
+		FOREACH_RESULT(OnSetChannelOption, MOD_RESULT, (source, this, ci, params[1]));
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
@@ -745,7 +745,7 @@ class CommandCSSetSecure : public Command
 		}
 
 		EventReturn MOD_RESULT;
-		FOREACH_RESULT(I_OnSetChannelOption, OnSetChannelOption(source, this, ci, params[1]));
+		FOREACH_RESULT(OnSetChannelOption, MOD_RESULT, (source, this, ci, params[1]));
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
@@ -803,7 +803,7 @@ class CommandCSSetSecureFounder : public Command
 		}
 
 		EventReturn MOD_RESULT;
-		FOREACH_RESULT(I_OnSetChannelOption, OnSetChannelOption(source, this, ci, params[1]));
+		FOREACH_RESULT(OnSetChannelOption, MOD_RESULT, (source, this, ci, params[1]));
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
@@ -861,7 +861,7 @@ class CommandCSSetSecureOps : public Command
 		}
 
 		EventReturn MOD_RESULT;
-		FOREACH_RESULT(I_OnSetChannelOption, OnSetChannelOption(source, this, ci, params[1]));
+		FOREACH_RESULT(OnSetChannelOption, MOD_RESULT, (source, this, ci, params[1]));
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
@@ -917,7 +917,7 @@ class CommandCSSetSignKick : public Command
 		}
 
 		EventReturn MOD_RESULT;
-		FOREACH_RESULT(I_OnSetChannelOption, OnSetChannelOption(source, this, ci, params[1]));
+		FOREACH_RESULT(OnSetChannelOption, MOD_RESULT, (source, this, ci, params[1]));
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
@@ -988,7 +988,7 @@ class CommandCSSetSuccessor : public Command
 		}
 
 		EventReturn MOD_RESULT;
-		FOREACH_RESULT(I_OnSetChannelOption, OnSetChannelOption(source, this, ci, params[1]));
+		FOREACH_RESULT(OnSetChannelOption, MOD_RESULT, (source, this, ci, params[1]));
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
@@ -1128,10 +1128,6 @@ class CSSet : public Module
 		commandcssetsecure(this), commandcssetsecurefounder(this), commandcssetsecureops(this), commandcssetsignkick(this),
 		commandcssetsuccessor(this), commandcssetnoexpire(this)
 	{
-
-		Implementation i[] = { I_OnCheckKick, I_OnDelChan, I_OnChannelModeSet, I_OnChannelModeUnset, I_OnCheckDelete, I_OnJoinChannel,
-			I_OnSetCorrectModes };
-		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 	}
 
 	EventReturn OnCheckKick(User *u, ChannelInfo *ci, Anope::string &mask, Anope::string &reason) anope_override

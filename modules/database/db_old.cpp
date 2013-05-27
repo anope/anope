@@ -1093,8 +1093,6 @@ class DBOld : public Module
 	DBOld(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, DATABASE | VENDOR)
 	{
 
-		Implementation i[] = { I_OnLoadDatabase, I_OnUplinkSync };
-		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 
 		hashm = Config->GetModule(this)->Get<const Anope::string>("hash");
 

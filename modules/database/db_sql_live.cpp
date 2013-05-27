@@ -70,8 +70,6 @@ class DBMySQL : public Module, public Pipe
 		this->ro = false;
 		this->init = false;
 
-		Implementation i[] = { I_OnReload, I_OnShutdown, I_OnLoadDatabase, I_OnSerializableConstruct, I_OnSerializableDestruct, I_OnSerializeCheck, I_OnSerializableUpdate };
-		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 
 		if (ModuleManager::FindFirstOf(DATABASE) != this)
 			throw ModuleException("If db_sql_live is loaded it must be the first database module loaded.");

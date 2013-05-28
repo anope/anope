@@ -11,8 +11,6 @@
 #include "module.h"
 #include "modules/redis.h"
 
-#include <iterator> // back_inserter
-
 using namespace Redis;
 
 class MyRedisService;

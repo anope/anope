@@ -43,6 +43,7 @@
 #include <bitset>
 #include <set>
 #include <algorithm>
+#include <iterator>
 
 #include "defs.h"
 

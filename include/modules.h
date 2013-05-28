@@ -75,7 +75,6 @@ if (true) \
 		} \
 		catch (const NotImplementedException &) \
 		{ \
-			Log(LOG_DEBUG_2) << "Detaching event " << #ename << " from " << (*_i)->name; \
 			_i = _modules.erase(_i); \
 			continue; \
 		} \
@@ -115,7 +114,6 @@ if (true) \
 		} \
 		catch (const NotImplementedException &) \
 		{ \
-			Log(LOG_DEBUG_2) << "Detaching event " << #ename << " from " << (*_i)->name; \
 			_i = _modules.erase(_i); \
 			continue; \
 		} \

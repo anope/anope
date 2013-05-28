@@ -264,11 +264,7 @@ ModuleReturn ModuleManager::LoadModule(const Anope::string &modname, User *u)
 
 	/* Attach module to all events */
 	for (std::map<Anope::string, std::vector<Module *> >::iterator it = EventHandlers.begin(); it != EventHandlers.end(); ++it)
-		/* Modules can already be attached here if loading them causes a new event to trigged, which initializes this vector
-		 * to all known modules, which includes this one.
-		 */
-		if (std::find(it->second.begin(), it->second.end(), m) != it->second.end())
-			it->second.push_back(m);
+		it->second.push_back(m);
 
 	FOREACH_MOD(OnModuleLoad, (u, m));
 

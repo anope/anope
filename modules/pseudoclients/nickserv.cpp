@@ -17,10 +17,11 @@ class NickServCollide : public Timer
 {
 	NickServService *service;
 	Reference<User> u;
+	time_t ts;
 	Reference<NickAlias> na;
 
  public:
-	NickServCollide(NickServService *nss, User *user, NickAlias *nick, time_t delay) : Timer(delay), service(nss), u(user), na(nick)
+	NickServCollide(NickServService *nss, User *user, NickAlias *nick, time_t delay) : Timer(delay), service(nss), u(user), ts(user->timestamp), na(nick)
 	{
 	}
 
@@ -29,7 +30,7 @@ class NickServCollide : public Timer
 		if (!u || !na)
 			return;
 		/* If they identified or don't exist anymore, don't kill them. */
-		if (u->Account() == na->nc || u->timestamp > this->GetSetTime())
+		if (u->Account() == na->nc || u->timestamp > ts)
 			return;
 
 		service->Collide(u, na);
@@ -56,7 +57,7 @@ class NickServHeld : public Timer
 
 /** Timer for releasing nicks to be available for use
  */
-class CoreExport NickServRelease : public User, public Timer
+class NickServRelease : public User, public Timer
 {
 	static std::map<Anope::string, NickServRelease *> NickServReleases;
 	Anope::string nick;

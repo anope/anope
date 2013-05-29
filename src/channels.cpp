@@ -856,7 +856,13 @@ void Channel::SetCorrectModes(User *user, bool give_modes)
 			given = true;
 		}
 		else if (take_modes && !has_priv)
-			this->RemoveMode(NULL, cm, user->GetUID());
+		{
+			/* Only remove modes if they are > voice */
+			if (cm->name == "VOICE")
+				take_modes = false;
+			else
+				this->RemoveMode(NULL, cm, user->GetUID());
+		}
 	}
 
 	// Check mlock

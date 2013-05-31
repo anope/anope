@@ -270,10 +270,15 @@ class CommandHSReject : public Command
 
 class CommandHSWaiting : public Command
 {
-	void DoList(CommandSource &source)
+ public:
+	CommandHSWaiting(Module *creator) : Command(creator, "hostserv/waiting", 0, 0)
 	{
-		int counter = 1;
-		int from = 0, to = 0;
+		this->SetDesc(_("Retrieves the vhost requests"));
+	}
+
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	{
+		unsigned counter = 0;
 		unsigned display_counter = 0, listmax = Config->GetModule(this->owner)->Get<unsigned>("listmax");
 		ListFormatter list;
 
@@ -286,12 +291,12 @@ class CommandHSWaiting : public Command
 			if (!hr)
 				continue;
 
-			if (((counter >= from && counter <= to) || (!from && !to)) && display_counter < listmax)
+			if (!listmax || display_counter < listmax)
 			{
 				++display_counter;
 
 				ListFormatter::ListEntry entry;
-				entry["Number"] = stringify(counter);
+				entry["Number"] = stringify(display_counter);
 				entry["Nick"] = it->first;
 				if (!hr->ident.empty())
 					entry["Vhost"] = hr->ident + "@" + hr->host;
@@ -302,24 +307,14 @@ class CommandHSWaiting : public Command
 			}
 			++counter;
 		}
-		source.Reply(_("Displayed all records (count: \002%d\002)."), display_counter);
 
 		std::vector<Anope::string> replies;
 		list.Process(replies);
 
 		for (unsigned i = 0; i < replies.size(); ++i)
 			source.Reply(replies[i]);
-	}
 
- public:
-	CommandHSWaiting(Module *creator) : Command(creator, "hostserv/waiting", 0, 0)
-	{
-		this->SetDesc(_("Retrieves the vhost requests"));
-	}
-
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
-	{
-		return this->DoList(source);
+		source.Reply(_("Displayed \2%d\2 records (\2%d\2 total)."), display_counter, counter);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override

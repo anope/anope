@@ -469,9 +469,9 @@ bool MySQLService::CheckConnection()
 
 Anope::string MySQLService::Escape(const Anope::string &query)
 {
-	char buffer[BUFSIZE];
-	mysql_real_escape_string(this->sql, buffer, query.c_str(), query.length());
-	return buffer;
+	std::vector<char> buffer(query.length() * 2 + 1);
+	mysql_real_escape_string(this->sql, &buffer[0], query.c_str(), query.length());
+	return &buffer[0];
 }
 
 Anope::string MySQLService::BuildQuery(const Query &q)

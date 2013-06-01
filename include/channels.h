@@ -278,6 +278,12 @@ class CoreExport Channel : public Base, public Extensible
 	 */
 	bool Unban(User *u, bool full = false);
 
+	/** Check whether a user is permitted to be on this channel
+	 * @param u The user
+	 * @return true if they are allowed, false if they aren't and were kicked
+	 */
+	bool CheckKick(User *user);
+
 	/** Finds a channel
 	 * @param name The channel to find
 	 * @return The channel, if found

@@ -18,7 +18,6 @@
 #include "channels.h"
 #include "config.h"
 #include "bots.h"
-#include "language.h"
 #include "servers.h"
 
 Serialize::Checker<registered_channel_map> RegisteredChannelList("ChannelInfo");
@@ -1007,42 +1006,6 @@ Anope::string ChannelInfo::GetMLockAsString(bool complete) const
 	return pos + neg + params;
 }
 
-bool ChannelInfo::CheckKick(User *user)
-{
-	if (!user || !this->c)
-		return false;
-
-	if (user->super_admin)
-		return false;
-
-	/* We don't enforce services restrictions on clients on ulined services
-	 * as this will likely lead to kick/rejoin floods. ~ Viper */
-	if (user->server->IsULined())
-		return false;
-
-	if (user->IsProtected())
-		return false;
-
-	Anope::string mask, reason;
-
-	EventReturn MOD_RESULT;
-	FOREACH_RESULT(OnCheckKick, MOD_RESULT, (user, this, mask, reason));
-	if (MOD_RESULT != EVENT_STOP)
-		return false;
-	
-	if (mask.empty())
-		mask = this->GetIdealBan(user);
-	if (reason.empty())
-		reason = Language::Translate(user->Account(), CHAN_NOT_ALLOWED_TO_JOIN);
-
-	Log(LOG_DEBUG) << "Autokicking " << user->nick << " (" << mask << ") from " << this->name;
-
-	this->c->SetMode(NULL, "BAN", mask);
-	this->c->Kick(NULL, user, "%s", reason.c_str());
-
-	return true;
-}
-
 int16_t ChannelInfo::GetLevel(const Anope::string &priv) const
 {
 	if (PrivilegeManager::FindPrivilege(priv) == NULL)
@@ -1074,7 +1037,8 @@ void ChannelInfo::ClearLevels()
 
 Anope::string ChannelInfo::GetIdealBan(User *u) const
 {
-	switch (this->bantype)
+	int bt = this ? this->bantype : -1;
+	switch (bt)
 	{
 		case 0:
 			return "*!" + u->GetVIdent() + "@" + u->GetDisplayedHost();

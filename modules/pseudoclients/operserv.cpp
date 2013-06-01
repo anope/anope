@@ -233,9 +233,9 @@ class OperServCore : public Module
 			this->sqlines.CheckAllXLines(u);
 	}
 
-	EventReturn OnCheckKick(User *u, ChannelInfo *ci, Anope::string &mask, Anope::string &reason) anope_override
+	EventReturn OnCheckKick(User *u, Channel *c, Anope::string &mask, Anope::string &reason) anope_override
 	{
-		XLine *x = this->sqlines.CheckChannel(ci->c);
+		XLine *x = this->sqlines.CheckChannel(c);
 		if (x)
 		{
 			this->sqlines.OnMatch(u, x);

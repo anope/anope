@@ -207,9 +207,9 @@ class CSSuspend : public Module
 		catch (const ConvertException &) { }
 	}
 
-	EventReturn OnCheckKick(User *u, ChannelInfo *ci, Anope::string &mask, Anope::string &reason) anope_override
+	EventReturn OnCheckKick(User *u, Channel *c, Anope::string &mask, Anope::string &reason) anope_override
 	{
-		if (u->HasMode("OPER") || !ci->HasExt("SUSPENDED"))
+		if (u->HasMode("OPER") || !c->ci || !c->ci->HasExt("SUSPENDED"))
 			return EVENT_CONTINUE;
 
 		reason = Language::Translate(u, _("This channel may not be used."));

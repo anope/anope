@@ -394,7 +394,7 @@ class CommandCSAKick : public Command
 			ChanUserContainer *uc = it->second;
 			++it;
 
-			if (ci->CheckKick(uc->user))
+			if (c->CheckKick(uc->user))
 				++count;
 		}
 
@@ -514,14 +514,14 @@ class CSAKick : public Module
 	{
 	}
 
-	EventReturn OnCheckKick(User *u, ChannelInfo *ci, Anope::string &mask, Anope::string &reason) anope_override
+	EventReturn OnCheckKick(User *u, Channel *c, Anope::string &mask, Anope::string &reason) anope_override
 	{
-		if (ci->c->MatchesList(u, "EXCEPT"))
+		if (!c->ci || c->MatchesList(u, "EXCEPT"))
 			return EVENT_CONTINUE;
 
-		for (unsigned j = 0, end = ci->GetAkickCount(); j < end; ++j)
+		for (unsigned j = 0, end = c->ci->GetAkickCount(); j < end; ++j)
 		{
-			AutoKick *autokick = ci->GetAkick(j);
+			AutoKick *autokick = c->ci->GetAkick(j);
 			bool kick = false;
 
 			if (autokick->nc)

@@ -23,6 +23,7 @@
 #include "config.h"
 #include "access.h"
 #include "sockets.h"
+#include "language.h"
 
 channel_map ChannelList;
 
@@ -174,11 +175,11 @@ ChanUserContainer* Channel::JoinUser(User *user)
 	if (user->server && user->server->IsSynced())
 		Log(user, this, "join");
 
-	FOREACH_MOD(OnJoinChannel, (user, this));
-
 	ChanUserContainer *cuc = new ChanUserContainer(user, this);
 	user->chans[this] = cuc;
 	this->users[user] = cuc;
+
+	FOREACH_MOD(OnJoinChannel, (user, this));
 
 	return cuc;
 }
@@ -906,6 +907,39 @@ bool Channel::Unban(User *u, bool full)
 	}
 
 	return ret;
+}
+
+bool Channel::CheckKick(User *user)
+{
+	if (user->super_admin)
+		return false;
+
+	/* We don't enforce services restrictions on clients on ulined services
+	 * as this will likely lead to kick/rejoin floods. ~ Viper */
+	if (user->server->IsULined())
+		return false;
+
+	if (user->IsProtected())
+		return false;
+
+	Anope::string mask, reason;
+
+	EventReturn MOD_RESULT;
+	FOREACH_RESULT(OnCheckKick, MOD_RESULT, (user, this, mask, reason));
+	if (MOD_RESULT != EVENT_STOP)
+		return false;
+	
+	if (mask.empty())
+		mask = this->ci->GetIdealBan(user);
+	if (reason.empty())
+		reason = Language::Translate(user->Account(), CHAN_NOT_ALLOWED_TO_JOIN);
+
+	Log(LOG_DEBUG) << "Autokicking " << user->nick << " (" << mask << ") from " << this->name;
+
+	this->SetMode(NULL, "BAN", mask);
+	this->Kick(NULL, user, "%s", reason.c_str());
+
+	return true;
 }
 
 Channel* Channel::Find(const Anope::string &name)

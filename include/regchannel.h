@@ -393,12 +393,6 @@ class CoreExport ChannelInfo : public Serializable, public Extensible
 	 */
 	Anope::string GetMLockAsString(bool complete) const;
 
-	/** Check whether a user is permitted to be on this channel
-	 * @param u The user
-	 * @return true if they are allowed, false if they aren't and were kicked
-	 */
-	bool CheckKick(User *user);
-
 	/** Get the level for a privilege
 	 * @param priv The privilege name
 	 * @return the level

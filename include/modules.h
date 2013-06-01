@@ -679,13 +679,13 @@ class CoreExport Module : public Extensible
 
 	/** Called after a user join a channel when we decide whether to kick them or not
 	 * @param u The user
-	 * @param ci The channel
+	 * @param c The channel
 	 * @param kick Set to true to kick
 	 * @param mask The mask to ban, if any
 	 * @param reason The reason for the kick
 	 * @return EVENT_STOP to prevent the user from joining by kicking/banning the user
 	 */
-	virtual EventReturn OnCheckKick(User *u, ChannelInfo *ci, Anope::string &mask, Anope::string &reason) { throw NotImplementedException(); }
+	virtual EventReturn OnCheckKick(User *u, Channel *c, Anope::string &mask, Anope::string &reason) { throw NotImplementedException(); }
 
 	/** Called when a user requests info for a channel
 	 * @param source The user requesting info

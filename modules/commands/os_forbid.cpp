@@ -282,35 +282,36 @@ class OSForbid : public Module
 		}
 	}
 
-	void OnJoinChannel(User *u, Channel *c) anope_override
+	EventReturn OnCheckKick(User *u, Channel *c, Anope::string &mask, Anope::string &reason) anope_override
 	{
 		BotInfo *OperServ = Config->GetClient("OperServ");
 		if (u->HasMode("OPER") || !OperServ)
-			return;
+			return EVENT_CONTINUE;
 
 		ForbidData *d = this->forbidService.FindForbid(c->name, FT_CHAN);
 		if (d != NULL)
 		{
 			ServiceReference<ChanServService> chanserv("ChanServService", "ChanServ");
-			if (!chanserv)
-				;
-			else if (IRCD->CanSQLineChannel)
+			if (IRCD->CanSQLineChannel)
 			{
 				time_t inhabit = Config->GetModule("chanserv")->Get<time_t>("inhabit", "15s");
 				XLine x(c->name, OperServ->nick, Anope::CurTime + inhabit, d->reason);
 				IRCD->SendSQLine(NULL, &x);
 			}
-			else
+			else if (chanserv)
 			{
-				if (chanserv)
-					chanserv->Hold(c);
+				chanserv->Hold(c);
 			}
 
 			if (d->reason.empty())
-				c->Kick(OperServ, u, _("This channel has been forbidden."));
+				reason = Language::Translate(u, _("This channel has been forbidden."));
 			else
-				c->Kick(OperServ, u, _("This channel has been forbidden: %s"), d->reason.c_str());
+				reason = Anope::printf(Language::Translate(u, _("This channel has been forbidden: %s")), d->reason.c_str());
+
+			return EVENT_STOP;
 		}
+
+		return EVENT_CONTINUE;
 	}
 
 	EventReturn OnPreCommand(CommandSource &source, Command *command, std::vector<Anope::string> &params) anope_override

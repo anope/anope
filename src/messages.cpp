@@ -139,8 +139,7 @@ void Join::SJoin(MessageSource &source, const Anope::string &chan, time_t ts, co
 		 */
 		c->SetCorrectModes(u, true);
 
-		if (c->ci)
-			c->ci->CheckKick(u);
+		c->CheckKick(u);
 	}
 
 	/* Channel is done syncing */

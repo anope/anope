@@ -104,15 +104,23 @@ bool sepstream::GetToken(Anope::string &token)
 		return false;
 	}
 
-	size_t p = this->pos;
-	while (p < this->tokens.length() && this->tokens[p] != this->sep)
-		++p;
-	
+	if (!this->allow_empty)
+	{
+		this->pos = this->tokens.find_first_not_of(this->sep, this->pos);
+		if (this->pos == std::string::npos)
+		{
+			this->pos = this->tokens.length() + 1;
+			token.clear();
+			return false;
+		}
+	}
+
+	size_t p = this->tokens.find(this->sep, this->pos);
+	if (p == std::string::npos)
+		p = this->tokens.length();
+
 	token = this->tokens.substr(this->pos, p - this->pos);
 	this->pos = p + 1;
-
-	if (!this->allow_empty && token.empty())
-		return GetToken(token);
 
 	return true;
 }

@@ -102,9 +102,10 @@ class CoreExport Channel : public Base, public Extensible
 
 	/** Join a user internally to the channel
 	 * @param u The user
+	 * @param status The status to give the user, if any
 	 * @return The UserContainer for the user
 	 */
-	ChanUserContainer* JoinUser(User *u);
+	ChanUserContainer* JoinUser(User *u, const ChannelStatus *status);
 
 	/** Remove a user internally from the channel
 	 * @param u The user

@@ -128,18 +128,18 @@ void Join::SJoin(MessageSource &source, const Anope::string &chan, time_t ts, co
 		User *u = it->second;
 
 		/* Add the user to the channel */
-		ChanUserContainer *cc = c->JoinUser(u);
+		c->JoinUser(u, keep_their_modes ? &status : NULL);
 
-		/* Update their status internally on the channel */
-		if (keep_their_modes)
-			cc->status = status;
+		/* Check if the user is allowed to join */
+		if (c->CheckKick(u))
+			continue;
 
 		/* Set whatever modes the user should have, and remove any that
 		 * they aren't allowed to have (secureops etc).
 		 */
 		c->SetCorrectModes(u, true);
-
-		c->CheckKick(u);
+		
+		FOREACH_MOD(OnJoinChannel, (u, c));
 	}
 
 	/* Channel is done syncing */

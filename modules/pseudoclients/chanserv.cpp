@@ -288,17 +288,14 @@ class ChanServCore : public Module, public ChanServService
 		{
 			this->Hold(c);
 		}
-		if (c->ci)
-		{
-			c->CheckModes();
 
-			if (Me && Me->IsSynced())
+		c->CheckModes();
+		if (Me && Me->IsSynced() && c->ci)
+		{
+			/* Update channel topic */
+			if ((c->ci->HasExt("KEEPTOPIC") || c->ci->HasExt("TOPICLOCK")) && c->ci->last_topic != c->topic)
 			{
-				/* Update channel topic */
-				if ((c->ci->HasExt("KEEPTOPIC") || c->ci->HasExt("TOPICLOCK")) && c->ci->last_topic != c->topic)
-				{
-					c->ChangeTopic(!c->ci->last_topic_setter.empty() ? c->ci->last_topic_setter : c->ci->WhoSends()->nick, c->ci->last_topic, c->ci->last_topic_time ? c->ci->last_topic_time : Anope::CurTime);
-				}
+				c->ChangeTopic(!c->ci->last_topic_setter.empty() ? c->ci->last_topic_setter : c->ci->WhoSends()->nick, c->ci->last_topic, c->ci->last_topic_time ? c->ci->last_topic_time : Anope::CurTime);
 			}
 		}
 	}

@@ -176,7 +176,7 @@ void BotInfo::Join(Channel *c, ChannelStatus *status)
 	if (c->FindUser(this) != NULL)
 		return;
 
-	c->JoinUser(this);
+	c->JoinUser(this, status);
 	if (IRCD)
 		IRCD->SendJoin(this, c, status);
 }

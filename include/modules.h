@@ -462,7 +462,10 @@ class CoreExport Module : public Extensible
 	 */
 	virtual void OnLeaveChannel(User *u, Channel *c) { throw NotImplementedException(); }
 
-	/** Called when a user joins a channel
+	/** Called after a user joins a channel
+	 * If this event triggers the user is allowed to be in the channel, and will
+	 * not be kicked for restricted/akick/forbidden, etc. If you want to kick the user,
+	 * use the CheckKick event instead.
 	 * @param u The user
 	 * @param channel The channel
 	 */

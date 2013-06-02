@@ -93,7 +93,7 @@ void Channel::Sync()
 
 void Channel::CheckModes()
 {
-	if (this->bouncy_modes)
+	if (this->bouncy_modes || this->syncing)
 		return;
 
 	/* Check for mode bouncing */
@@ -170,7 +170,7 @@ bool Channel::CheckDelete()
 	return MOD_RESULT != EVENT_STOP && this->users.empty();
 }
 
-ChanUserContainer* Channel::JoinUser(User *user)
+ChanUserContainer* Channel::JoinUser(User *user, const ChannelStatus *status)
 {
 	if (user->server && user->server->IsSynced())
 		Log(user, this, "join");
@@ -178,8 +178,8 @@ ChanUserContainer* Channel::JoinUser(User *user)
 	ChanUserContainer *cuc = new ChanUserContainer(user, this);
 	user->chans[this] = cuc;
 	this->users[user] = cuc;
-
-	FOREACH_MOD(OnJoinChannel, (user, this));
+	if (status)
+		cuc->status = *status;
 
 	return cuc;
 }
@@ -732,7 +732,7 @@ void Channel::KickInternal(MessageSource &source, const Anope::string &nick, con
 	User *target = User::Find(nick);
 	if (!target)
 	{
-		Log() << "Channel::KickInternal got a nonexistent user " << nick << " on " << this->name << ": " << reason;
+		Log(LOG_DEBUG) << "Channel::KickInternal got a nonexistent user " << nick << " on " << this->name << ": " << reason;
 		return;
 	}
 
@@ -746,7 +746,7 @@ void Channel::KickInternal(MessageSource &source, const Anope::string &nick, con
 	ChanUserContainer *cu = target->FindChannel(this);
 	if (cu == NULL)
 	{
-		Log() << "Channel::KickInternal got kick for user " << target->nick << " from " << source.GetSource() << " who isn't on channel " << this->name;
+		Log(LOG_DEBUG) << "Channel::KickInternal got kick for user " << target->nick << " from " << source.GetSource() << " who isn't on channel " << this->name;
 		return;
 	}
 

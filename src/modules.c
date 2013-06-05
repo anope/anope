@@ -92,7 +92,7 @@ void modules_init(void)
 {
 #ifdef USE_MODULES
     int idx;
-	int ret;
+    int ret;
     Module *m;
 
     if(nothird) {
@@ -107,10 +107,10 @@ void modules_init(void)
             mod_current_module_name = m->name;
             mod_current_user = NULL;
             alog("trying to load [%s]", mod_current_module->name);
-			ret = loadModule(mod_current_module, NULL);
+            ret = loadModule(mod_current_module, NULL);
             alog("status: [%d][%s]", ret, ModuleGetErrStr(ret));
-			if (ret != MOD_ERR_OK)
-				destroyModule(m);
+            if (ret != MOD_ERR_OK)
+                destroyModule(m);
             mod_current_module = NULL;
             mod_current_module_name = NULL;
             mod_current_user = NULL;
@@ -143,8 +143,8 @@ void modules_core_init(int number, char **list)
                 alog("debug: trying to load core module [%s]",
                      mod_current_module->name);
                 alog("debug: status: [%d][%s]", status, ModuleGetErrStr(status));
-				if (status != MOD_ERR_OK)
-					destroyModule(mod_current_module);
+                if (status != MOD_ERR_OK)
+                    destroyModule(mod_current_module);
             }
             mod_current_module = NULL;
             mod_current_module_name = NULL;
@@ -158,7 +158,7 @@ void modules_core_init(int number, char **list)
 int encryption_module_init(void) {
     int ret = 0;
     Module *m;
-	
+
     m = createModule(EncModule);
     mod_current_module = m;
     mod_current_module_name = m->name;
@@ -184,7 +184,7 @@ int protocol_module_init(void)
 {
     int ret = 0, noforksave = nofork;
     Module *m;
-	
+
     m = createModule(IRCDModule);
     mod_current_module = m;
     mod_current_module_name = m->name;
@@ -197,33 +197,33 @@ int protocol_module_init(void)
     alog("status: [%d][%s]", ret, ModuleGetErrStr(ret));
     mod_current_module = NULL;
     mod_current_module_name = NULL;
-	
-	if (ret == MOD_ERR_OK) {
-		/* This is really NOT the correct place to do config checks, but
-		 * as we only have the ircd struct filled here, we have to over
-		 * here. -GD
-		 */
-		if (UseTokens && !ircd->token) {
-			alog("Anope does not support TOKENS for this ircd setting; unsetting UseToken");
-			UseTokens = 0;
-		}
-		
-		if (UseTS6 && !ircd->ts6) {
-			alog("Chosen IRCd does not support TS6, unsetting UseTS6");
-			UseTS6 = 0;
-		}
-		
-		/* We can assume the ircd supports TS6 here */
-                if (UseTS6 && !Numeric) {
-                    nofork = 1; /* We're going down, set nofork so this error is printed */
-                    alog("UseTS6 requires the setting of Numeric to be enabled.");
-                    nofork = noforksave;
-                    ret = -1;
-                }
-	} else {
-		destroyModule(m);
-	}
-	
+
+    if (ret == MOD_ERR_OK) {
+        /* This is really NOT the correct place to do config checks, but
+         * as we only have the ircd struct filled here, we have to over
+         * here. -GD
+         */
+        if (UseTokens && !ircd->token) {
+            alog("Anope does not support TOKENS for this ircd setting; unsetting UseToken");
+            UseTokens = 0;
+        }
+
+        if (UseTS6 && !ircd->ts6) {
+            alog("Chosen IRCd does not support TS6, unsetting UseTS6");
+            UseTS6 = 0;
+        }
+
+        /* We can assume the ircd supports TS6 here */
+        if (UseTS6 && !Numeric) {
+            nofork = 1; /* We're going down, set nofork so this error is printed */
+            alog("UseTS6 requires the setting of Numeric to be enabled.");
+            nofork = noforksave;
+            ret = -1;
+        }
+    } else {
+        destroyModule(m);
+    }
+
     return ret;
 }
 
@@ -251,13 +251,13 @@ void modules_delayed_init(void)
             mod_current_module_name = m->name;
             mod_current_user = NULL;
             alog("trying to load [%s]", mod_current_module->name);
-			ret = loadModule(mod_current_module, NULL);
+            ret = loadModule(mod_current_module, NULL);
             alog("status: [%d][%s]", ret, ModuleGetErrStr(ret));
             mod_current_module = NULL;
             mod_current_module_name = NULL;
             mod_current_user = NULL;
-			if (ret != MOD_ERR_OK)
-				destroyModule(m);
+            if (ret != MOD_ERR_OK)
+                destroyModule(m);
         }
     }
 #endif
@@ -276,44 +276,44 @@ void modules_delayed_init(void)
 void modules_unload_all(boolean fini, boolean unload_proto)
 {
 #ifdef USE_MODULES
-	int idx;
-	ModuleHash *mh, *next;
-       	
-	for (idx = 0; idx < MAX_CMD_HASH; idx++) {
-		mh = MODULE_HASH[idx];
-		while (mh) {
-			next = mh->next;
-			if (unload_proto || (mh->m->type != PROTOCOL)) {
-				mod_current_module = mh->m;
-				mod_current_module_name = mh->m->name;
-			    if(fini) {
-				union fini_union
-				{
-					void *ptr;
-					void (*func)(void);
-				} u;
-				u.ptr = ano_modsym(mh->m->handle, "AnopeFini");
-				if (u.ptr)
-					u.func(); /* exec AnopeFini */
-				
-		    	    if (prepForUnload(mh->m) != MOD_ERR_OK) {
-			    		mh = next;
-						continue;
-			        }
-				
-		        	if ((ano_modclose(mh->m->handle)) != 0)
-			            alog("%s", ano_moderr());
-			        else
-			            delModule(mh->m);
-		    	} else {
-                	        delModule(mh->m);
-				}
-			mod_current_module = NULL;
-			mod_current_module_name = NULL;
-		    }
-	   	    mh = next;
-		}
-	}
+    int idx;
+    ModuleHash *mh, *next;
+
+    for (idx = 0; idx < MAX_CMD_HASH; idx++) {
+        mh = MODULE_HASH[idx];
+        while (mh) {
+            next = mh->next;
+            if (unload_proto || (mh->m->type != PROTOCOL)) {
+                mod_current_module = mh->m;
+                mod_current_module_name = mh->m->name;
+                if(fini) {
+                    union fini_union
+                    {
+                        void *ptr;
+                        void (*func)(void);
+                    } u;
+                    u.ptr = ano_modsym(mh->m->handle, "AnopeFini");
+                    if (u.ptr)
+                        u.func(); /* exec AnopeFini */
+
+                    if (prepForUnload(mh->m) != MOD_ERR_OK) {
+                        mh = next;
+                        continue;
+                    }
+
+                    if ((ano_modclose(mh->m->handle)) != 0)
+                        alog("%s", ano_moderr());
+                    else
+                        delModule(mh->m);
+                } else
+                    delModule(mh->m);
+
+                mod_current_module = NULL;
+                mod_current_module_name = NULL;
+            }
+            mh = next;
+        }
+    }
 #endif
 }
 
@@ -539,7 +539,7 @@ int moduleCopyFile(char *name, char *output)
 #ifdef USE_MODULES
     int ch;
     FILE *source, *target;
-	int srcfp;
+    int srcfp;
     char input[4096] = "";
     int len;
 
@@ -550,19 +550,18 @@ int moduleCopyFile(char *name, char *output)
     strncat(input, MODULE_EXT, 4095 - len);
 
 #ifndef _WIN32
-	if ((srcfp = mkstemp(output)) == -1)
-		return MOD_ERR_FILE_IO;
+    if ((srcfp = mkstemp(output)) == -1)
+        return MOD_ERR_FILE_IO;
 #else
-	if (!mktemp(output))
-		return MOD_ERR_FILE_IO;
+    if (!mktemp(output))
+        return MOD_ERR_FILE_IO;
 #endif
-	
-	if (debug)
-		alog("Runtime module location: %s", output);
-	
-	/* Linux/UNIX should ignore the b param, why do we still have seperate
-	 * calls for it here? -GD
-	 */
+    if (debug)
+        alog("Runtime module location: %s", output);
+
+    /* Linux/UNIX should ignore the b param, why do we still have seperate
+     * calls for it here? -GD
+     */
 #ifndef _WIN32
     if ((source = fopen(input, "r")) == NULL) {
         close(srcfp);
@@ -608,8 +607,8 @@ int loadModule(Module * m, User * u)
 
     union init_func_union
     {
-    	void *ptr;
-	int (*func)(int, char **);
+        void *ptr;
+        int (*func)(int, char **);
     } init_union;
 
     union version_func_union
@@ -628,8 +627,8 @@ int loadModule(Module * m, User * u)
     if ((m2 = findModule(m->name)) != NULL) {
         return MOD_ERR_EXISTS;
     }
-	
-	/* Generate the filename for the temporary copy of the module */
+
+    /* Generate the filename for the temporary copy of the module */
     strncpy(buf, MODULE_PATH, 4095);    /* Get full path with module extension */
     len = strlen(buf);
 #ifndef _WIN32
@@ -641,16 +640,16 @@ int loadModule(Module * m, User * u)
     strncat(buf, m->name, 4095 - len);
     len = strlen(buf);
     strncat(buf, MODULE_EXT, 4095 - len);
-	len = strlen(buf);
-	strncat(buf, ".", 4095 - len);
-	len = strlen(buf);
-	strncat(buf, "XXXXXX", 4095 - len);
+    len = strlen(buf);
+    strncat(buf, ".", 4095 - len);
+    len = strlen(buf);
+    strncat(buf, "XXXXXX", 4095 - len);
     buf[4095] = '\0';
-	/* Don't skip return value checking! -GD */
+    /* Don't skip return value checking! -GD */
     if ((ret = moduleCopyFile(m->name, buf)) != MOD_ERR_OK) {
         m->filename = sstrdup(buf);
-	return ret;
-	}
+        return ret;
+    }
 
     m->filename = sstrdup(buf);
     ano_modclearerr();
@@ -668,27 +667,26 @@ int loadModule(Module * m, User * u)
         return MOD_ERR_NOLOAD;
     }
     if (init_union.ptr) {
-	version_union.ptr = ano_modsym(m->handle,"getAnopeBuildVersion");
-	if (version_union.ptr) {
-        if (version_union.func() >= VERSION_BUILD ) {
-            if(debug) {
-                alog("Module %s compiled against current or newer anope revision %d, this is %d",m->name,version_union.func(),VERSION_BUILD);
+        version_union.ptr = ano_modsym(m->handle,"getAnopeBuildVersion");
+        if (version_union.ptr) {
+            if (version_union.func() >= VERSION_BUILD ) {
+                if(debug)
+                    alog("Module %s compiled against current or newer anope revision %d, this is %d",m->name,version_union.func(),VERSION_BUILD);
+            } else {
+                alog("Module %s is compiled against an old version of anope (%d) current is %d", m->name, version_union.func(), VERSION_BUILD);
+                alog("Rebuild module %s against the current version to resolve this error", m->name);
+                ano_modclose(m->handle);
+                ano_modclearerr();
+                return MOD_ERR_NOLOAD;
             }
         } else {
-            alog("Module %s is compiled against an old version of anope (%d) current is %d", m->name, version_union.func(), VERSION_BUILD);
-            alog("Rebuild module %s against the current version to resolve this error", m->name);
             ano_modclose(m->handle);
             ano_modclearerr();
+            alog("Module %s is compiled against an older version of anope (unknown)", m->name);
+            alog("Rebuild module %s against the current version to resolve this error", m->name);
             return MOD_ERR_NOLOAD;
         }
-    } else {
-        ano_modclose(m->handle);
-        ano_modclearerr();
-        alog("Module %s is compiled against an older version of anope (unknown)", m->name);
-        alog("Rebuild module %s against the current version to resolve this error", m->name);
-        return MOD_ERR_NOLOAD;
-	}
-	/* TODO */
+
         mod_current_module = m;
         mod_current_module_name = m->name;
         /* argv[0] is the user if there was one, or NULL if not */
@@ -1823,19 +1821,19 @@ int moduleAddCallback(char *name, time_t when,
 void moduleCallBackRun(void)
 {
     ModuleCallBack *tmp;
-	
-	while ((tmp = moduleCallBackHead) && (tmp->when <= time(NULL))) {
-		if (debug)
-			alog("debug: executing callback: %s", tmp->name ? tmp->name : "<unknown>");
-		if (tmp->func) {
-			mod_current_module = findModule(tmp->owner_name);
-			mod_current_module_name = tmp->owner_name;
-			tmp->func(tmp->argc, tmp->argv);
-			mod_current_module = NULL;
-			mod_current_module_name = NULL;
-			moduleCallBackDeleteEntry(NULL);
-		}
-	}
+
+    while ((tmp = moduleCallBackHead) && (tmp->when <= time(NULL))) {
+        if (debug)
+            alog("debug: executing callback: %s", tmp->name ? tmp->name : "<unknown>");
+        if (tmp->func) {
+            mod_current_module = findModule(tmp->owner_name);
+            mod_current_module_name = tmp->owner_name;
+            tmp->func(tmp->argc, tmp->argv);
+            mod_current_module = NULL;
+            mod_current_module_name = NULL;
+            moduleCallBackDeleteEntry(NULL);
+        }
+    }
 }
 
 /**
@@ -2138,14 +2136,14 @@ void moduleDisplayHelp(int service, User * u)
 #ifdef USE_MODULES
     int idx;
     ModuleHash *current = NULL;
-	Module *calling_module = mod_current_module;
-	char *calling_module_name = mod_current_module_name;
+    Module *calling_module = mod_current_module;
+    char *calling_module_name = mod_current_module_name;
 
     for (idx = 0; idx != MAX_CMD_HASH; idx++) {
         for (current = MODULE_HASH[idx]; current; current = current->next) {
-			mod_current_module_name = current->name;
-			mod_current_module = current->m;
-			
+            mod_current_module_name = current->name;
+            mod_current_module = current->m;
+
             if ((service == 1) && current->m->nickHelp) {
                 current->m->nickHelp(u);
             } else if ((service == 2) && current->m->chanHelp) {
@@ -2163,9 +2161,9 @@ void moduleDisplayHelp(int service, User * u)
             }
         }
     }
-	
-	mod_current_module = calling_module;
-	mod_current_module_name = calling_module_name;
+
+    mod_current_module = calling_module;
+    mod_current_module_name = calling_module_name;
 #endif
 }
 
@@ -2529,13 +2527,13 @@ int moduleGetConfigDirective(Directive * d)
     FILE *config;
     char *dir = NULL;
     char buf[1024];
-	char *directive;
+    char *directive;
     int linenum = 0;
     int ac = 0;
     char *av[MAXPARAMS];
-	char *str = NULL;
+    char *str = NULL;
     char *s = NULL;
-	char *t = NULL;
+    char *t = NULL;
     int retval = 1;
 
     config = fopen(SERVICES_CONF, "r");
@@ -2547,7 +2545,7 @@ int moduleGetConfigDirective(Directive * d)
         linenum++;
         if (*buf == '#' || *buf == '\r' || *buf == '\n') {
             continue;
-		}
+        }
         dir = myStrGetOnlyToken(buf, '\t', 0);
         if (dir) {
             str = myStrGetTokenRemainder(buf, '\t', 1);
@@ -2559,15 +2557,14 @@ int moduleGetConfigDirective(Directive * d)
                 continue;
             }
         }
-		if (dir) {
-			directive = normalizeBuffer(dir);
-		} else {
-			continue;
-		}	
+        if (dir)
+            directive = normalizeBuffer(dir);
+        else
+            continue;
 
         if (stricmp(directive, d->name) == 0) {
             if (str) {
-				s = str;
+                s = str;
                 while (isspace(*s))
                     s++;
                 while (*s) {
@@ -2600,12 +2597,11 @@ int moduleGetConfigDirective(Directive * d)
             }
             retval = parse_directive(d, directive, ac, av, linenum, 0, s);
         }
-		if (directive) {
-			free(directive);
-		}
+        if (directive)
+            free(directive);
     }
     if (dir)
-    	free(dir);
+        free(dir);
     if (str)
        free(str);
     fclose(config);
@@ -2625,10 +2621,10 @@ void moduleInsertLanguage(int langNumber, int ac, char **av)
     if ((mod_current_module_name) && (!mod_current_module || strcmp(mod_current_module_name, mod_current_module->name))) {
         mod_current_module = findModule(mod_current_module_name);
     }
-	
-	if (debug)
-		alog("debug: %s Adding %d texts for language %d", mod_current_module->name, ac, langNumber);
-	
+
+    if (debug)
+        alog("debug: %s Adding %d texts for language %d", mod_current_module->name, ac, langNumber);
+
     if (mod_current_module->lang[langNumber].argc > 0) {
         moduleDeleteLanguage(langNumber);
     }
@@ -2659,7 +2655,7 @@ void moduleNoticeLang(char *source, User * u, int number, ...)
     if ((mod_current_module_name) && (!mod_current_module || strcmp(mod_current_module_name, mod_current_module->name))) {
         mod_current_module = findModule(mod_current_module_name);
     }
-	
+
     /* Find the users lang, and use it if we can */
     if (u && u->na && u->na->nc) {
         lang = u->na->nc->language;
@@ -2687,7 +2683,7 @@ void moduleNoticeLang(char *source, User * u, int number, ...)
             strscpy(outbuf, t, sizeof(outbuf));
             notice_user(source, u, "%s", outbuf);
         }
-		free(buf);
+        free(buf);
     } else {
         alog("%s: INVALID language string call, language: [%d], String [%d]", mod_current_module->name, lang, number);
     }
@@ -2705,7 +2701,7 @@ char *moduleGetLangString(User * u, int number)
 
     if ((mod_current_module_name) && (!mod_current_module || strcmp(mod_current_module_name, mod_current_module->name)))
         mod_current_module = findModule(mod_current_module_name);
-	
+
     /* Find the users lang, and use it if we can */
     if (u && u->na && u->na->nc)
         lang = u->na->nc->language;
@@ -2717,13 +2713,13 @@ char *moduleGetLangString(User * u, int number)
     /* If the requested lang string exists for the language */
     if (mod_current_module->lang[lang].argc > number) {
         return mod_current_module->lang[lang].argv[number];
-	/* Return an empty string otherwise, because we might be used without
-	 * the return value being checked. If we would return NULL, bad things
-	 * would happen!
-	 */
-	} else {
+    /* Return an empty string otherwise, because we might be used without
+     * the return value being checked. If we would return NULL, bad things
+     * would happen!
+     */
+    } else {
         alog("%s: INVALID language string call, language: [%d], String [%d]", mod_current_module->name, lang, number);
-		return "";
+        return "";
     }
 }
 
@@ -2751,14 +2747,14 @@ void moduleDeleteLanguage(int langNumber)
  **/
 void queueModuleOperation(Module *m, ModuleOperation op, User *u)
 {
-	ModuleQueue *qm;
-	
-	qm = scalloc(1, sizeof(ModuleQueue));
-	qm->m = m;
-	qm->op = op;
-	qm->u = u;
-	qm->next = mod_operation_queue;
-	mod_operation_queue = qm;
+    ModuleQueue *qm;
+
+    qm = scalloc(1, sizeof(ModuleQueue));
+    qm->m = m;
+    qm->op = op;
+    qm->u = u;
+    qm->next = mod_operation_queue;
+    mod_operation_queue = qm;
 }
 
 /**
@@ -2769,17 +2765,17 @@ void queueModuleOperation(Module *m, ModuleOperation op, User *u)
  **/
 int queueModuleLoad(char *name, User *u)
 {
-	Module *m;
-	
-	if (!name || !u)
-		return 0;
-	
-	if (findModule(name))
-		return 0;
-	m = createModule(name);
-	queueModuleOperation(m, MOD_OP_LOAD, u);
-	
-	return 1;
+    Module *m;
+
+    if (!name || !u)
+        return 0;
+
+    if (findModule(name))
+        return 0;
+    m = createModule(name);
+    queueModuleOperation(m, MOD_OP_LOAD, u);
+
+    return 1;
 }
 
 /**
@@ -2790,17 +2786,17 @@ int queueModuleLoad(char *name, User *u)
  **/
 int queueModuleUnload(char *name, User *u)
 {
-	Module *m;
-	
-	if (!name || !u)
-		return 0;
-	
-	m = findModule(name);
-	if (!m)
-		return 0;
-	queueModuleOperation(m, MOD_OP_UNLOAD, u);
-	
-	return 1;
+    Module *m;
+
+    if (!name || !u)
+        return 0;
+
+    m = findModule(name);
+    if (!m)
+        return 0;
+    queueModuleOperation(m, MOD_OP_UNLOAD, u);
+
+    return 1;
 }
 
 /**
@@ -2808,42 +2804,42 @@ int queueModuleUnload(char *name, User *u)
  **/
 void handleModuleOperationQueue(void)
 {
-	ModuleQueue *next;
-	int status;
-	
-	if (!mod_operation_queue)
-		return;
-	
-	while (mod_operation_queue) {
-		next = mod_operation_queue->next;
-		
-		mod_current_module = mod_operation_queue->m;
-		mod_current_user = mod_operation_queue->u;
+    ModuleQueue *next;
+    int status;
 
-		if (mod_operation_queue->op == MOD_OP_LOAD) {
-			alog("Trying to load module [%s]", mod_operation_queue->m->name);
-			status = loadModule(mod_operation_queue->m, mod_operation_queue->u);
-			alog("Module loading status: %d (%s)", status, ModuleGetErrStr(status));
-			if (status != MOD_ERR_OK) {
-			        if(mod_current_user) {
-                                   notice_lang(s_OperServ, mod_current_user, OPER_MODULE_LOAD_FAIL,mod_operation_queue->m->name);
-				}
-				destroyModule(mod_operation_queue->m);
-			}
-		} else if (mod_operation_queue->op == MOD_OP_UNLOAD) {
-			alog("Trying to unload module [%s]", mod_operation_queue->m->name);
-			status = unloadModule(mod_operation_queue->m, mod_operation_queue->u);
-			alog("Module unloading status: %d (%s)", status, ModuleGetErrStr(status));
-		}
-		
-		/* Remove the ModuleQueue from memory */
-		free(mod_operation_queue);
-		
-		mod_operation_queue = next;
-	}
-	
-	mod_current_module = NULL;
-	mod_current_user = NULL;
+    if (!mod_operation_queue)
+        return;
+
+    while (mod_operation_queue) {
+        next = mod_operation_queue->next;
+
+        mod_current_module = mod_operation_queue->m;
+        mod_current_user = mod_operation_queue->u;
+
+        if (mod_operation_queue->op == MOD_OP_LOAD) {
+            alog("Trying to load module [%s]", mod_operation_queue->m->name);
+            status = loadModule(mod_operation_queue->m, mod_operation_queue->u);
+            alog("Module loading status: %d (%s)", status, ModuleGetErrStr(status));
+            if (status != MOD_ERR_OK) {
+                    if(mod_current_user) {
+                        notice_lang(s_OperServ, mod_current_user, OPER_MODULE_LOAD_FAIL,mod_operation_queue->m->name);
+                }
+                destroyModule(mod_operation_queue->m);
+            }
+        } else if (mod_operation_queue->op == MOD_OP_UNLOAD) {
+            alog("Trying to unload module [%s]", mod_operation_queue->m->name);
+            status = unloadModule(mod_operation_queue->m, mod_operation_queue->u);
+            alog("Module unloading status: %d (%s)", status, ModuleGetErrStr(status));
+        }
+
+        /* Remove the ModuleQueue from memory */
+        free(mod_operation_queue);
+
+        mod_operation_queue = next;
+    }
+
+    mod_current_module = NULL;
+    mod_current_user = NULL;
 }
 
 void ModuleRunTimeDirCleanUp(void)
@@ -2869,15 +2865,14 @@ void ModuleRunTimeDirCleanUp(void)
     snprintf(dirbuf, BUFSIZE, "\\%s", "modules/runtime");
 #endif
 
-	if (debug) {
-		alog("debug: Cleaning out Module run time directory (%s) - this may take a moment please wait", dirbuf);
-	}
+    if (debug) {
+        alog("debug: Cleaning out Module run time directory (%s) - this may take a moment please wait", dirbuf);
+    }
 
 #ifndef _WIN32
     if ((dirp = opendir(dirbuf)) == NULL) {
-		if (debug) {
-	        alog("debug: cannot open directory (%s)", dirbuf);
-		}
+        if (debug)
+            alog("debug: cannot open directory (%s)", dirbuf);
         return;
     }
     while ((dp = readdir(dirp)) != NULL) {
@@ -2887,16 +2882,15 @@ void ModuleRunTimeDirCleanUp(void)
         if (!stricmp(dp->d_name, ".") || !stricmp(dp->d_name, "..")) {
             continue;
         }
-	    snprintf(filebuf, BUFSIZE, "%s/%s", dirbuf, dp->d_name);
-		unlink(filebuf);
+        snprintf(filebuf, BUFSIZE, "%s/%s", dirbuf, dp->d_name);
+        unlink(filebuf);
     }
     closedir(dirp);
 #else
     /* Get the current working directory: */
     if (_getcwd(buffer, _MAX_PATH) == NULL) {
-		if (debug) {
-	        alog("debug: Unable to set Current working directory");
-		}
+        if (debug)
+            alog("debug: Unable to set Current working directory");
     }
     snprintf(szDir, sizeof(szDir), "%s\\%s\\*", buffer, dirbuf);
 
@@ -2905,8 +2899,8 @@ void ModuleRunTimeDirCleanUp(void)
         fFinished = FALSE;
         while (!fFinished) {
             if (!(FileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)) {
-			    snprintf(filebuf, BUFSIZE, "%s/%s", dirbuf, FileData.cFileName);
-				DeleteFile(filebuf);
+                snprintf(filebuf, BUFSIZE, "%s/%s", dirbuf, FileData.cFileName);
+                DeleteFile(filebuf);
             }
             if (!FindNextFile(hList, &FileData)) {
                 if (GetLastError() == ERROR_NO_MORE_FILES) {
@@ -2915,15 +2909,13 @@ void ModuleRunTimeDirCleanUp(void)
             }
         }
     } else {
-		if (debug) {
-	        alog("debug: Invalid File Handle. GetLastError reports %d\n", GetLastError());
-		}
+        if (debug)
+            alog("debug: Invalid File Handle. GetLastError reports %d\n", GetLastError());
     }
     FindClose(hList);
 #endif
-	if (debug) {
-		alog("debug: Module run time directory has been cleaned out");
-	}
+    if (debug)
+        alog("debug: Module run time directory has been cleaned out");
 }
 
 /* EOF */

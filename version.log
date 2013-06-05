@@ -8,9 +8,10 @@ VERSION_MAJOR="1"
 VERSION_MINOR="8"
 VERSION_PATCH="9"
 VERSION_EXTRA="-git"
-VERSION_BUILD="3115"
+VERSION_BUILD="3116"
 
 # Changes since 1.8.8 Release
+#Revision 3116 - Bug #1527 - Fixed modules being loaded regardless of the load abort signal returned by a modules AnopeInit function. (Introduced in commit. e0c3069c)
 
 
 

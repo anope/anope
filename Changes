@@ -1,5 +1,6 @@
 Anope Version 1.8 - GIT
 -------------------
+06/05  F Fixed modules being loaded regardless of the load abort signal. [#1527]
 
 Provided by Michael Wobst - 2013
 05/25  U Update Hybrid protocol module to support Hybrid 8.1

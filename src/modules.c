@@ -697,7 +697,7 @@ int loadModule(Module * m, User * u)
         }
         argc++;
 
-        init_union.func(argc, argv); /* exec AnopeInit */
+        ret = init_union.func(argc, argv); /* exec AnopeInit */
         if (u) {
             free(argv[0]);
         }

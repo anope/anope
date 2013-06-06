@@ -328,7 +328,11 @@ class NickServCore : public Module, public NickServService
 
 		if (u->Account()->HasExt("UNCONFIRMED"))
 		{
-			u->SendMessage(NickServ, _("Your email address is not confirmed. To confirm it, follow the instructions that were emailed to you when you registered."));
+			const Anope::string &nsregister = Config->GetModule("ns_register")->Get<const Anope::string>("registration");
+			if (nsregister.equals_ci("admin"))
+				u->SendMessage(NickServ, _("All new accounts must be validated by an administrator. Please wait for your registration to be confirmed."));
+			else
+				u->SendMessage(NickServ, _("Your email address is not confirmed. To confirm it, follow the instructions that were emailed to you when you registered."));
 			const NickAlias *this_na = NickAlias::Find(u->Account()->display);
 			time_t time_registered = Anope::CurTime - this_na->time_registered;
 			time_t unconfirmed_expire = Config->GetModule(this)->Get<time_t>("unconfirmedexpire", "1d");

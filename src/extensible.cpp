@@ -82,8 +82,11 @@ void Extensible::ExtensibleUnserialize(Serialize::Data &data)
 	std::deque<Anope::string> list;
 	this->GetExtList(list);
 	for (unsigned i = 0; i < list.size(); ++i)
-		if ((*extension_items)[list[i]]->Serialize())
+	{
+		ExtensibleItem *item = extension_items->at(list[i]);
+		if (item && item->Serialize())
 			this->Shrink(list[i]);
+	}
 		
 	std::set<Anope::string> keys = data.KeySet();
 	for (std::set<Anope::string>::iterator it = keys.begin(), it_end = keys.end(); it != it_end; ++it)

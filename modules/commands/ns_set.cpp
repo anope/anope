@@ -941,20 +941,21 @@ class CommandNSSetLanguage : public Command
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
-		for (unsigned j = 0; j < Language::Languages.size(); ++j)
-		{
-			if (param == "en" || Language::Languages[j] == param)
-				break;
-			else if (j + 1 == Language::Languages.size())
+		if (param != "en")
+			for (unsigned j = 0; j < Language::Languages.size(); ++j)
 			{
-				this->OnSyntaxError(source, "");
-				return;
+				if (Language::Languages[j] == param)
+					break;
+				else if (j + 1 == Language::Languages.size())
+				{
+					this->OnSyntaxError(source, "");
+					return;
+				}
 			}
-		}
 
 		Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to change the langauge of " << nc->display << " to " << param;
 
-		nc->language = param != "en" ? param : "";
+		nc->language = param;
 		source.Reply(_("Language changed to \002English\002."));
 	}
 

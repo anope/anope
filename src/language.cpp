@@ -41,7 +41,7 @@ void Language::InitLanguages()
 	Anope::string language;
 	while (sep.GetToken(language))
 	{
-		const Anope::string &lang_name = Translate(language.c_str(), "English");
+		const Anope::string &lang_name = Translate(language.c_str(), _("English"));
 		if (lang_name == "English")
 		{
 			Log() << "Unable to use language " << language;
@@ -86,6 +86,9 @@ const char *Language::Translate(const char *lang, const char *string)
 	
 	if (!lang || !*lang)
 		lang = Config->DefLanguage.c_str();
+	
+	if (Anope::string(lang) == "en")
+		return string != NULL ? string : "";
 
 	++_nl_msg_cat_cntr;
 #ifdef _WIN32

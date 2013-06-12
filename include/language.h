@@ -55,7 +55,7 @@ namespace Language
 	extern CoreExport const char *Translate(const NickCore *nc, const char *string);
 
 	/** Translatesa string to the given language.
-	 * @param lang The language to trnalsate to
+	 * @param lang The language to translate to
 	 * @param string The string to translate
 	 * @return The translated string if found, else the original string.
 	 */

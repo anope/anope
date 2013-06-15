@@ -226,24 +226,24 @@ bool cidr::match(const sockaddrs &other)
 	if (!valid() || !other.valid() || this->addr.sa.sa_family != other.sa.sa_family)
 		return false;
 
-	const unsigned char *ip, *their_ip;
-	unsigned char byte, len = this->cidr_len;
+	const uint8_t *ip, *their_ip;
+	uint8_t byte, len = this->cidr_len;
 
 	switch (this->addr.sa.sa_family)
 	{
 		case AF_INET:
-			ip = reinterpret_cast<const unsigned char *>(&this->addr.sa4.sin_addr);
+			ip = reinterpret_cast<const uint8_t *>(&this->addr.sa4.sin_addr);
 			if (len > 32)
 				len = 32;
 			byte = len / 8;
-			their_ip = reinterpret_cast<const unsigned char *>(&other.sa4.sin_addr);
+			their_ip = reinterpret_cast<const uint8_t *>(&other.sa4.sin_addr);
 			break;
 		case AF_INET6:
-			ip = reinterpret_cast<const unsigned char *>(&this->addr.sa6.sin6_addr);
+			ip = reinterpret_cast<const uint8_t *>(&this->addr.sa6.sin6_addr);
 			if (len > 128)
 				len = 128;
 			byte = len / 8;
-			their_ip = reinterpret_cast<const unsigned char *>(&other.sa6.sin6_addr);
+			their_ip = reinterpret_cast<const uint8_t *>(&other.sa6.sin6_addr);
 			break;
 		default:
 			return false;
@@ -252,13 +252,14 @@ bool cidr::match(const sockaddrs &other)
 	if (memcmp(ip, their_ip, byte))
 		return false;
 
+	ip += byte;
+	their_ip += byte;
+
 	byte = len % 8;
 	if (byte)
 	{
-		ip += byte;
-		their_ip += byte;
-		if ((*ip & byte) != (*their_ip & byte))
-			return false;
+		uint8_t m = ~0 << (8 - byte);
+		return *ip & m == *their_ip & m;
 	}
 
 	return true;

@@ -566,6 +566,7 @@ class ProtoHybrid : public Module
 		ModeManager::AddUserMode(new UserMode("DEAF", 'D'));
 		ModeManager::AddUserMode(new UserMode("HIDEOPER", 'H'));
 		ModeManager::AddUserMode(new UserMode("REGPRIV", 'R'));
+		ModeManager::AddUserMode(new UserMode("SSL", 'S'));
 
 		/* b/e/I */
 		ModeManager::AddChannelMode(new ChannelModeList("BAN", 'b'));

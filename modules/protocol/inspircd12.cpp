@@ -947,7 +947,8 @@ struct IRCDMessageMetadata : IRCDMessage
 				User *u = User::Find(params[0]);
 				if (!u)
 					return;
-				std::string data = params[2].c_str();
+				u->Extend("SSL");
+				Anope::string data = params[2].c_str();
 				size_t pos1 = data.find(' ') + 1;
 				size_t pos2 = data.find(' ', pos1);
 				if ((pos2 - pos1) >= 32) // inspircd supports md5 and sha1 fingerprint hashes -> size 32 or 40 bytes.

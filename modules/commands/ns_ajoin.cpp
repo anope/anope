@@ -284,7 +284,7 @@ class NSAJoin : public Module
 					continue;
 				else if (c->HasMode("ADMINONLY") && !u->HasMode("ADMIN"))
 					continue;
-				else if (c->HasMode("SSL") && !u->HasMode("SSL"))
+				else if (c->HasMode("SSL") && !(u->HasMode("SSL") || u->HasExt("SSL")))
 					continue;
 				else if (c->MatchesList(u, "BAN") == true && c->MatchesList(u, "EXCEPT") == false)
 					need_invite = true;

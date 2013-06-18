@@ -213,7 +213,7 @@ class ProtoRatbox : public Module
 		/* user modes */
 		ModeManager::RemoveUserMode(ModeManager::FindUserModeByName("HIDEOPER"));
 		ModeManager::RemoveUserMode(ModeManager::FindUserModeByName("REGPRIV"));
-		Modemanager::RemoveUserMode(ModeManager::FindUserModeByName("SSL"));
+		ModeManager::RemoveUserMode(ModeManager::FindUserModeByName("SSL"));
 		ModeManager::AddUserMode(new UserMode("PROTECTED", 'S'));
 
 		/* v/h/o/a/q */

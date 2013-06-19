@@ -11,6 +11,16 @@
 
 #include "module.h"
 
+struct SASLUser
+{
+	Anope::string uid;
+	Anope::string acc;
+	time_t created;
+};
+
+static bool sasl = true;
+static std::list<SASLUser> saslusers;
+
 class ChannelModeFlood : public ChannelModeParam
 {
  public:
@@ -924,17 +934,7 @@ struct IRCDMessageMetadata : IRCDMessage
 				User *u = User::Find(params[0]);
 				NickCore *nc = NickCore::Find(params[2]);
 				if (u && nc)
-				{
 					u->Login(nc);
-
-					BotInfo *NickServ = Config->GetClient("nickserv");
-
-					/* Sometimes a user connects, we send them the usual "this nickname is registered" mess (if
-					 * their server isn't syncing) and then we receive this.. so tell them about it.
-					 */
-					if (u->server->IsSynced() && NickServ)
-						u->SendMessage(NickServ, _("You have been logged in as \002%s\002."), nc->display.c_str());
-				}
 			}
 
 			/*
@@ -1157,7 +1157,114 @@ struct IRCDMessageUID : IRCDMessage
 		for (unsigned i = 9; i < params.size() - 1; ++i)
 			modes += " " + params[i];
 
-		new User(params[2], params[5], params[3], params[4], params[6], source.GetServer(), params[params.size() - 1], ts, modes, params[0]);
+		NickAlias *na = NULL;
+		if (sasl)
+			for (std::list<SASLUser>::iterator it = saslusers.begin(); it != saslusers.end();)
+			{
+				SASLUser &u = *it;
+
+				if (u.created + 30 < Anope::CurTime)
+					it = saslusers.erase(it);
+				else if (u.uid == params[0])
+				{
+					na = NickAlias::Find(u.acc);
+					it = saslusers.erase(it);
+				}
+				else
+					++it;
+			}
+
+		new User(params[2], params[5], params[3], params[4], params[6], source.GetServer(), params[params.size() - 1], ts, modes, params[0], na ? *na->nc : NULL);
+	}
+};
+
+struct IRCDMessageEncap : IRCDMessage
+{
+	IRCDMessageEncap(Module *creator) : IRCDMessage(creator, "ENCAP", 4) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
+
+	void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
+	{
+		if (Anope::Match(Me->GetSID(), params[0]) == false)
+			return;
+
+		if (sasl && params[1] == "SASL" && params.size() == 6)
+		{
+			class InspIRCDSASLIdentifyRequest : public IdentifyRequest
+			{
+				Anope::string uid;
+
+			 public:
+				InspIRCDSASLIdentifyRequest(Module *m, const Anope::string &id, const Anope::string &acc, const Anope::string &pass) : IdentifyRequest(m, acc, pass), uid(id) { }
+
+				void OnSuccess() anope_override
+				{
+					UplinkSocket::Message(Me) << "METADATA " << this->uid << " accountname :" << this->GetAccount();
+					UplinkSocket::Message(Me) << "ENCAP " << this->uid.substr(0, 3) << " SASL " << Me->GetSID() << " " << this->uid << " D S";
+
+					SASLUser su;
+					su.uid = this->uid;
+					su.acc = this->GetAccount();
+					su.created = Anope::CurTime;
+
+					for (std::list<SASLUser>::iterator it = saslusers.begin(); it != saslusers.end();)
+					{
+						SASLUser &u = *it;
+
+						if (u.created + 30 < Anope::CurTime || u.uid == this->uid)
+							it = saslusers.erase(it);
+						else
+							++it;
+					}
+
+					saslusers.push_back(su);
+				}
+
+				void OnFail() anope_override
+				{
+					UplinkSocket::Message(Me) << "ENCAP " << this->uid.substr(0, 3) << " SASL " << Me->GetSID() << " " << this->uid << " " << " D F";
+
+					Log(Config->GetClient("NickServ")) << "A user failed to identify for account " << this->GetAccount() << " using SASL";
+				}
+			};
+
+			/*
+			Received: :869 ENCAP * SASL 869AAAAAH * S PLAIN
+			Sent: :00B ENCAP 869 SASL 00B 869AAAAAH C +
+			Received: :869 ENCAP * SASL 869AAAAAH 00B C QWRhbQBBZGFtAG1vbw==
+			                                            base64(account\0account\0pass)
+			*/
+			if (params[4] == "S")
+			{
+				if (params[5] == "PLAIN")
+					UplinkSocket::Message(Me) << "ENCAP " << params[2].substr(0, 3) << " SASL " << Me->GetSID() << " " << params[2] << " C +";
+				else
+					UplinkSocket::Message(Me) << "ENCAP " << params[2].substr(0, 3) << " SASL " << Me->GetSID() << " " << params[2] << " D F";
+			}
+			else if (params[4] == "C")
+			{
+				Anope::string decoded;
+				Anope::B64Decode(params[5], decoded);
+
+				size_t p = decoded.find('\0');
+				if (p == Anope::string::npos)
+					return;
+				decoded = decoded.substr(p + 1);
+
+				p = decoded.find('\0');
+				if (p == Anope::string::npos)
+					return;
+
+				Anope::string acc = decoded.substr(0, p),
+					pass = decoded.substr(p + 1);
+
+				if (acc.empty() || pass.empty())
+					return;
+
+				IdentifyRequest *req = new InspIRCDSASLIdentifyRequest(this->owner, params[2], acc, pass);
+				FOREACH_MOD(OnCheckAuthentication, (NULL, req));
+				req->Dispatch();
+			}
+		}
 	}
 };
 
@@ -1200,6 +1307,7 @@ class ProtoInspIRCd : public Module
 	IRCDMessageServer message_server;
 	IRCDMessageTime message_time;
 	IRCDMessageUID message_uid;
+	IRCDMessageEncap message_encap;
 
  public:
 	ProtoInspIRCd(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PROTOCOL | VENDOR),
@@ -1211,7 +1319,7 @@ class ProtoInspIRCd : public Module
 		message_chgident(this), message_setname(this, "SETNAME"), message_chgname(this, "FNAME"), message_capab(this), message_endburst(this),
 		message_fhost(this, "FHOST"), message_sethost(this, "SETHOST"), message_fjoin(this), message_fmode(this), message_ftopic(this),
 		message_idle(this), message_metadata(this), message_mode(this), message_nick(this), message_opertype(this), message_rsquit(this),
-		message_setident(this), message_server(this), message_time(this), message_uid(this)
+		message_setident(this), message_server(this), message_time(this), message_uid(this), message_encap(this)
 	{
 
 
@@ -1222,6 +1330,11 @@ class ProtoInspIRCd : public Module
 
 		for (botinfo_map::iterator it = BotListByNick->begin(), it_end = BotListByNick->end(); it != it_end; ++it)
 			it->second->GenerateUID();
+	}
+
+	void OnReload(Configuration::Conf *conf) anope_override
+	{
+		sasl = conf->GetModule(this)->Get<bool>("sasl") || conf->GetModule("inspircd20")->Get<bool>("sasl");
 	}
 
 	void OnUserNickChange(User *u, const Anope::string &) anope_override

@@ -420,7 +420,7 @@ struct IRCDMessageNick : IRCDMessage
 		else if (params.size() == 7)
 		{
 			// a new user is connecting to the network
-			new User(params[0], params[2], params[3], "", "", source.GetServer(), params[6], Anope::CurTime, params[5], "");
+			new User(params[0], params[2], params[3], "", "", source.GetServer(), params[6], Anope::CurTime, params[5], "", NULL);
 		}
 		else
 		{

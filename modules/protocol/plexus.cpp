@@ -270,17 +270,17 @@ struct IRCDMessageUID : IRCDMessage
 			ts = Anope::CurTime;
 		}
 
-		User *user = new User(params[0], params[4], params[9], params[5], ip, source.GetServer(), params[10], ts, params[3], params[7]);
+		NickAlias *na = NULL;
 		try
 		{
-			if (params[8].is_pos_number_only() && convertTo<time_t>(params[8]) == user->timestamp)
-			{
-				NickAlias *na = NickAlias::Find(user->nick);
-				if (na)
-					user->Login(na->nc);
-			}
+			if (params[8].is_pos_number_only() && convertTo<time_t>(params[8]) == ts)
+				na = NickAlias::Find(params[0]);
 		}
 		catch (const ConvertException &) { }
+		if (params[8] != "0" && !na)
+			na = NickAlias::Find(params[8]);
+
+		new User(params[0], params[4], params[9], params[5], ip, source.GetServer(), params[10], ts, params[3], params[7], na ? *na->nc : NULL);
 	}
 };
 

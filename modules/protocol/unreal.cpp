@@ -803,24 +803,21 @@ struct IRCDMessageNick : IRCDMessage
 				return;
 			}
 		
-			User *user = new User(params[0], params[3], params[4], vhost, ip, s, params[10], user_ts, params[7]);
-
 			NickAlias *na = NULL;
 
 			if (params[6] == "0")
 				;
 			else if (params[6].is_pos_number_only())
 			{
-				if (convertTo<time_t>(params[6]) == user->signon)
-					na = NickAlias::Find(user->nick);
+				if (convertTo<time_t>(params[6]) == user_ts)
+					na = NickAlias::Find(params[0]);
 			}
 			else
 			{
 				na = NickAlias::Find(params[6]);
 			}
 
-			if (na)
-				user->Login(na->nc);
+			new User(params[0], params[3], params[4], vhost, ip, s, params[10], user_ts, params[7], "", na ? *na->nc : NULL);
 		}
 		else
 			source.GetUser()->ChangeNick(params[0]);

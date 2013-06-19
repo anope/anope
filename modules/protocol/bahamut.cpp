@@ -379,14 +379,13 @@ struct IRCDMessageNick : IRCDMessage
 				return;
 			}
 
-			User *user = new User(params[0], params[4], params[5], "", params[8], s, params[9], params[2].is_pos_number_only() ? convertTo<time_t>(params[2]) : 0, params[3]);
-			try
-			{
-				NickAlias *na;
-				if (user->signon == convertTo<time_t>(params[7]) && (na = NickAlias::Find(user->nick)))
-					user->Login(na->nc);
-			}
-			catch (const ConvertException &) { }
+			NickAlias *na = NULL;
+			time_t signon = params[2].is_pos_number_only() ? convertTo<time_t>(params[2]) : 0,
+				stamp = params[7].is_pos_number_only() ? convertTo<time_t>(params[7]) : 0;
+			if (signon && signon == stamp)
+				na = NickAlias::Find(params[0]);
+
+			new User(params[0], params[4], params[5], "", params[8], s, params[9], signon, params[3], "", na ? *na->nc : NULL);
 		}
 		else
 			source.GetUser()->ChangeNick(params[0]);

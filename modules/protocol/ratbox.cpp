@@ -105,6 +105,12 @@ struct IRCDMessageEncap : IRCDMessage
 			if (!nc)
 				return;
 			u->Login(nc);
+
+			/* Sometimes a user connects, we send them the usual "this nickname is registered" mess (if
+			 * their server isn't syncing) and then we receive this.. so tell them about it.
+			 */
+			if (u->server->IsSynced())
+				u->SendMessage(Config->GetClient("NickServ"), _("You have been logged in as \002%s\002."), nc->display.c_str());
 		}
 	}
 };
@@ -167,7 +173,7 @@ struct IRCDMessageUID : IRCDMessage
 	void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		/* Source is always the server */
-		new User(params[0], params[4], params[5], "", params[6], source.GetServer(), params[8], params[2].is_pos_number_only() ? convertTo<time_t>(params[2]) : 0, params[3], params[7]);
+		new User(params[0], params[4], params[5], "", params[6], source.GetServer(), params[8], params[2].is_pos_number_only() ? convertTo<time_t>(params[2]) : 0, params[3], params[7], NULL);
 	}
 };
 

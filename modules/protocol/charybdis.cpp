@@ -283,20 +283,11 @@ struct IRCDMessageEUID : IRCDMessage
 	 */
 	void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		/* Source is always the server */
-		User *u = new User(params[0], params[4], params[8], params[5], params[6], source.GetServer(), params[10], params[2].is_pos_number_only() ? convertTo<time_t>(params[2]) : Anope::CurTime, params[3], params[7]);
+		NickAlias *na = NULL;
 		if (params[9] != "*")
-		{
-			NickAlias *na = NickAlias::Find(params[9]);
-			if (na)
-			{
-				u->Login(na->nc);
+			na = NickAlias::Find(params[9]);
 
-				BotInfo *NickServ = Config->GetClient("NickServ");
-				if (u->server->IsSynced() && NickServ)
-					u->SendMessage(NickServ, _("You have been logged in as \2%s\2."), na->nc->display.c_str());
-			}
-		}
+		new User(params[0], params[4], params[8], params[5], params[6], source.GetServer(), params[10], params[2].is_pos_number_only() ? convertTo<time_t>(params[2]) : Anope::CurTime, params[3], params[7], na ? *na->nc : NULL);
 	}
 };
 

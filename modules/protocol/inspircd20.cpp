@@ -11,7 +11,6 @@
 
 #include "module.h"
 
-static bool sasl = true;
 static unsigned int spanningtree_proto_ver = 0;
 
 static ServiceReference<IRCDProto> insp12("IRCDProto", "inspircd12");
@@ -608,7 +607,9 @@ struct IRCDMessageCapab : Message::Capab
 
 struct IRCDMessageEncap : IRCDMessage
 {
-	IRCDMessageEncap(Module *creator) : IRCDMessage(creator, "ENCAP", 4) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
+	ServiceReference<IRCDMessage> insp12_encap;
+
+	IRCDMessageEncap(Module *creator) : IRCDMessage(creator, "ENCAP", 4), insp12_encap("IRCDMessage", "inspircd12/encap") { SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
 
 	void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
 	{
@@ -642,67 +643,9 @@ struct IRCDMessageEncap : IRCDMessage
 			u->SetRealname(params[3]);
 			UplinkSocket::Message(u) << "FNAME " << params[3];
 		}
-		else if (sasl && params[1] == "SASL" && params.size() == 6)
-		{
-			class InspIRCDSASLIdentifyRequest : public IdentifyRequest
-			{
-				Anope::string uid;
 
-			 public:
-				InspIRCDSASLIdentifyRequest(Module *m, const Anope::string &id, const Anope::string &acc, const Anope::string &pass) : IdentifyRequest(m, acc, pass), uid(id) { }
-
-				void OnSuccess() anope_override
-				{
-					UplinkSocket::Message(Me) << "METADATA " << this->uid << " accountname :" << this->GetAccount();
-					UplinkSocket::Message(Me) << "ENCAP " << this->uid.substr(0, 3) << " SASL " << Me->GetSID() << " " << this->uid << " D S";
-				}
-
-				void OnFail() anope_override
-				{
-					UplinkSocket::Message(Me) << "ENCAP " << this->uid.substr(0, 3) << " SASL " << Me->GetSID() << " " << this->uid << " " << " D F";
-
-					Log(Config->GetClient("NickServ")) << "A user failed to identify for account " << this->GetAccount() << " using SASL";
-				}
-			};
-
-			/*
-			Received: :869 ENCAP * SASL 869AAAAAH * S PLAIN
-			Sent: :00B ENCAP 869 SASL 00B 869AAAAAH C +
-			Received: :869 ENCAP * SASL 869AAAAAH 00B C QWRhbQBBZGFtAG1vbw==
-			                                            base64(account\0account\0pass)
-			*/
-			if (params[4] == "S")
-			{
-				if (params[5] == "PLAIN")
-					UplinkSocket::Message(Me) << "ENCAP " << params[2].substr(0, 3) << " SASL " << Me->GetSID() << " " << params[2] << " C +";
-				else
-					UplinkSocket::Message(Me) << "ENCAP " << params[2].substr(0, 3) << " SASL " << Me->GetSID() << " " << params[2] << " D F";
-			}
-			else if (params[4] == "C")
-			{
-				Anope::string decoded;
-				Anope::B64Decode(params[5], decoded);
-
-				size_t p = decoded.find('\0');
-				if (p == Anope::string::npos)
-					return;
-				decoded = decoded.substr(p + 1);
-
-				p = decoded.find('\0');
-				if (p == Anope::string::npos)
-					return;
-
-				Anope::string acc = decoded.substr(0, p),
-					pass = decoded.substr(p + 1);
-
-				if (acc.empty() || pass.empty())
-					return;
-
-				IdentifyRequest *req = new InspIRCDSASLIdentifyRequest(this->owner, params[2], acc, pass);
-				FOREACH_MOD(OnCheckAuthentication, (NULL, req));
-				req->Dispatch();
-			}
-		}
+		if (insp12_encap)
+			insp12_encap->Run(source, params);
 	}
 };
 
@@ -801,7 +744,6 @@ class ProtoInspIRCd : public Module
 	{
 		use_server_side_topiclock = conf->GetModule(this)->Get<bool>("use_server_side_topiclock");
 		use_server_side_mlock = conf->GetModule(this)->Get<bool>("use_server_side_mlock");
-		sasl = conf->GetModule(this)->Get<bool>("sasl");
 	}
 
 	void OnUserNickChange(User *u, const Anope::string &) anope_override

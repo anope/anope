@@ -35,12 +35,15 @@ class HostServCore : public Module
 		HostServ = bi;
 	}
 
-	void OnNickIdentify(User *u) anope_override
+	void OnUserLogin(User *u) anope_override
 	{
+		if (!IRCD->CanSetVHost)
+			return;
+
 		const NickAlias *na = NickAlias::Find(u->nick);
-		if (!na || !na->HasVhost())
+		if (!na || na->nc != u->Account() || !na->HasVhost())
 			na = NickAlias::Find(u->Account()->display);
-		if (!IRCD->CanSetVHost || !na || !na->HasVhost())
+		if (!na || !na->HasVhost())
 			return;
 
 		if (u->vhost.empty() || !u->vhost.equals_cs(na->GetVhostHost()) || (!na->GetVhostIdent().empty() && !u->GetVIdent().equals_cs(na->GetVhostIdent())))

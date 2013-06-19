@@ -32,7 +32,7 @@ time_t MaxUserTime = 0;
 
 std::list<User *> User::quitting_users;
 
-User::User(const Anope::string &snick, const Anope::string &sident, const Anope::string &shost, const Anope::string &svhost, const Anope::string &sip, Server *sserver, const Anope::string &srealname, time_t ssignon, const Anope::string &smodes, const Anope::string &suid)
+User::User(const Anope::string &snick, const Anope::string &sident, const Anope::string &shost, const Anope::string &svhost, const Anope::string &sip, Server *sserver, const Anope::string &srealname, time_t ssignon, const Anope::string &smodes, const Anope::string &suid, NickCore *account)
 {
 	if (snick.empty() || sident.empty() || shost.empty())
 		throw CoreException("Bad args passed to User::User");
@@ -55,6 +55,7 @@ User::User(const Anope::string &snick, const Anope::string &sident, const Anope:
 	this->SetModesInternal("%s", smodes.c_str());
 	this->uid = suid;
 	this->super_admin = false;
+	this->nc = NULL;
 
 	size_t old = UserListByNick.size();
 	UserListByNick[snick] = this;
@@ -63,7 +64,7 @@ User::User(const Anope::string &snick, const Anope::string &sident, const Anope:
 	if (old == UserListByNick.size())
 		Log(LOG_DEBUG) << "Duplicate user " << snick << " in user table?";
 
-	this->nc = NULL;
+	this->Login(account);
 	this->UpdateHost();
 
 	if (sserver && sserver->IsSynced()) // Our bots are introduced on startup with no server
@@ -326,7 +327,7 @@ void User::Identify(NickAlias *na)
 
 void User::Login(NickCore *core)
 {
-	if (core == this->nc)
+	if (!core || core == this->nc)
 		return;
 
 	this->Logout();

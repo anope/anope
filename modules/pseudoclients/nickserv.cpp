@@ -64,7 +64,7 @@ class NickServRelease : public User, public Timer
 
  public:
 	NickServRelease(NickAlias *na, time_t delay) : User(na->nick, Config->GetBlock("options")->Get<const Anope::string>("enforceruser"),
-		Config->GetBlock("options")->Get<const Anope::string>("enforcerhost"), "", "", Me, "Services Enforcer", Anope::CurTime, "", Servers::TS6_UID_Retrieve()), Timer(delay), nick(na->nick)
+		Config->GetBlock("options")->Get<const Anope::string>("enforcerhost"), "", "", Me, "Services Enforcer", Anope::CurTime, "", Servers::TS6_UID_Retrieve(), NULL), Timer(delay), nick(na->nick)
 	{
 		/* Erase the current release timer and use the new one */
 		std::map<Anope::string, NickServRelease *>::iterator nit = NickServReleases.find(this->nick);
@@ -368,7 +368,7 @@ class NickServCore : public Module, public NickServService
 		const Anope::string &unregistered_notice = Config->GetModule(this)->Get<const Anope::string>("unregistered_notice");
 		if (!Config->GetBlock("options")->Get<bool>("nonicknameownership") && !unregistered_notice.empty() && !na)
 			u->SendMessage(NickServ, unregistered_notice);
-		else if (na)
+		else if (na && !u->IsIdentified(true))
 			this->Validate(u);
 	}
 

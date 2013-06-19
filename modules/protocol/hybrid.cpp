@@ -497,18 +497,15 @@ struct IRCDMessageUID : IRCDMessage
 		if (ip == "0") /* Can be 0 for spoofed clients */
 			ip.clear();
 
-		/* Source is always the server */
-		User *user = new User(params[0], params[4], params[5], "",
-					ip, source.GetServer(),
-					params[9], params[2].is_pos_number_only() ? convertTo<time_t>(params[2]) : 0,
-					params[3], params[7]);
-
+		NickAlias *na = NULL;
 		if (params[8] != "0")
-		{
-			NickAlias *na = NickAlias::Find(params[8]);
-			if (na != NULL)
-				user->Login(na->nc);
-		}
+			na = NickAlias::Find(params[8]);
+
+		/* Source is always the server */
+		new User(params[0], params[4], params[5], "",
+				ip, source.GetServer(),
+				params[9], params[2].is_pos_number_only() ? convertTo<time_t>(params[2]) : 0,
+				params[3], params[7], na ? *na->nc : NULL);
 	}
 };
 

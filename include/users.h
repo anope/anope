@@ -102,8 +102,9 @@ class CoreExport User : public virtual Base, public Extensible, public CommandRe
 	 * @param ssignon User's timestamp
 	 * @param smodes User's modes
 	 * @param suid The unique identifier of the user.
+	 * @param nc The account the user is identified as, if any
 	 */
-	User(const Anope::string &snick, const Anope::string &sident, const Anope::string &shost, const Anope::string &svhost, const Anope::string &sip, Server *sserver, const Anope::string &srealname, time_t ssignon, const Anope::string &smodes, const Anope::string &suid = "");
+	User(const Anope::string &snick, const Anope::string &sident, const Anope::string &shost, const Anope::string &svhost, const Anope::string &sip, Server *sserver, const Anope::string &srealname, time_t ssignon, const Anope::string &smodes, const Anope::string &suid, NickCore *nc);
 
  protected:
 	/** Destroy a user.

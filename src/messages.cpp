@@ -300,7 +300,7 @@ void Privmsg::Run(MessageSource &source, const std::vector<Anope::string> &param
 			if (!servername.equals_ci(Me->GetName()))
 				return;
 		}
-		else if (Config->GetBlock("options")->Get<bool>("usestrictprivmsg"))
+		else if (!IRCD->RequiresID && Config->UseStrictPrivmsg)
 		{
 			const BotInfo *bi = BotInfo::Find(receiver);
 			if (!bi)

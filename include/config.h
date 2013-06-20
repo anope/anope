@@ -102,6 +102,8 @@ namespace Configuration
 		Anope::string DefLanguage;
 		/* options:timeoutcheck */
 		time_t TimeoutCheck;
+		/* options:usestrictprivmsg */
+		bool UseStrictPrivmsg;
 
 		/* either "/msg " or "/" */
 		Anope::string StrictPrivmsg;

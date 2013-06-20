@@ -182,7 +182,8 @@ Conf::Conf() : Block("")
 
 	this->ReadTimeout = options->Get<time_t>("readtimeout");
 	this->UsePrivmsg = options->Get<bool>("useprivmsg");
-	this->StrictPrivmsg = !options->Get<bool>("usestrictprivmsg") ? "/msg " : "/";
+	this->UseStrictPrivmsg = options->Get<bool>("usestrictprivmsg");
+	this->StrictPrivmsg = !UseStrictPrivmsg ? "/msg " : "/";
 	{
 		std::vector<Anope::string> defaults;
 		spacesepstream(this->GetModule("nickserv")->Get<const Anope::string>("defaults")).GetTokens(defaults);

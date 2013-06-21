@@ -1,13 +1,13 @@
 /* Hybrid IRCD functions
  *
  * (C) 2003-2013 Anope Team
- * (C) 2012 by the Hybrid Development Team 
+ * (C) 2012-2013 by the Hybrid Development Team
  *
  * Please read COPYING and README for further details.
  *
  * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church. 
- * 
+ * Based on the original code of Services by Andy Church.
+ *
  *
  */
 
@@ -26,7 +26,7 @@
 #define UMODE_s 0x00008000  /* See general server notices */
 #define UMODE_u 0x00010000  /* See unauthorized client notices */
 #define UMODE_w 0x00000020  /* See server generated WALLOPS */
-#define UMODE_x 0x00020000  /* See remote server connection and split notices */
+#define UMODE_x 0x00020000  /* Host name is hidden */
 #define UMODE_y 0x00040000  /* See LINKS, STATS (if configured), TRACE notices */
 #define UMODE_z 0x00080000  /* See oper generated WALLOPS */
 #define UMODE_R 0x80000000  /* unmode +R - No non registered msgs */

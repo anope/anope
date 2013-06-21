@@ -1,7 +1,7 @@
 /* ircd-hybrid-8 protocol module
  *
  * (C) 2003-2013 Anope Team
- * (C) 2012 by the Hybrid Development Team
+ * (C) 2012-2013 by the Hybrid Development Team
  *
  * Please read COPYING and README for further details.
  *
@@ -38,10 +38,10 @@ IRCDVar myIrcd[] = {
      "+io",                     /* Global alias mode   */
      "+",                       /* Used by BotServ Bots */
      3,                         /* Chan Max Symbols     */
-     "-ilmnpstORS",             /* Modes to Remove */
+     "-cilmnpstMORS",           /* Modes to Remove */
      "+o",                      /* Channel Umode used by Botserv bots */
      1,                         /* SVSNICK */
-     0,                         /* Vhost  */
+     1,                         /* Vhost  */
      0,                         /* Has Owner */
      NULL,                      /* Mode to set for an owner */
      NULL,                      /* Mode to unset for an owner */
@@ -74,7 +74,7 @@ IRCDVar myIrcd[] = {
      CMODE_r,                   /* Channel Mode         */
      0,                         /* vidents              */
      0,                         /* svshold              */
-     0,                         /* time stamp on mode   */
+     1,                         /* time stamp on mode   */
      0,                         /* NICKIP               */
      0,                         /* UMODE                */
      0,                         /* O:LINE               */
@@ -83,7 +83,7 @@ IRCDVar myIrcd[] = {
      CMODE_p,                   /* No Knock             */
      0,                         /* Admin Only           */
      DEFAULT_MLOCK,             /* Default MLOCK        */
-     0,                         /* Vhost Mode           */
+     UMODE_x,                   /* Vhost Mode           */
      0,                         /* +f                   */
      0,                         /* +L                   */
      0,                         /* +f Mode                          */
@@ -100,7 +100,7 @@ IRCDVar myIrcd[] = {
      0,                         /* SJOIN invite char */
      0,                         /* Can remove User Channel Modes with SVSMODE */
      0,                         /* Sglines are not enforced until user reconnects */
-     NULL,                      /* vhost char */
+     "x",                       /* vhost char */
      0,                         /* ts6 */
      0,                         /* support helper umode */
      0,                         /* p10 */
@@ -161,6 +161,7 @@ void hybrid_set_umode(User *user, int ac, char **av)
         alog("debug: Changing mode for %s to %s", user->nick, modes);
 
     while (*modes) {
+        uint32 backup = user->mode;
 
         /* This looks better, much better than "add ? (do_add) : (do_remove)".
          * At least this is readable without paying much attention :) -GD
@@ -178,6 +179,8 @@ void hybrid_set_umode(User *user, int ac, char **av)
             add = 0;
             break;
         case 'd':
+            user->mode = backup;
+
             if (ac == 0) {
                 alog("user: umode +d with no parameter (?) for user %s",
                      user->nick);
@@ -208,7 +211,16 @@ void hybrid_set_umode(User *user, int ac, char **av)
                 user->mode &= ~UMODE_r;
             }
             break;
+        case 'x':
+            if (!add) {
+                if (user->vhost) {
+                    free(user->vhost);
+                    user->vhost = NULL;
+                }
+            }
 
+            update_host(user);
+            break;
         }
     }
 }
@@ -711,14 +723,20 @@ void hybrid_cmd_topic(char *whosets, char *chan, char *whosetit,
     send_cmd(whosets, "TOPIC %s :%s", chan, topic);
 }
 
-void hybrid_cmd_vhost_off(User * u)
+void hybrid_cmd_vhost_off(User *user)
 {
-    /* Not Supported by this IRCD */
+    common_svsmode(user, "-x", user->host);
+    notice_lang(s_HostServ, user, HOST_OFF);
 }
 
 void hybrid_cmd_vhost_on(char *nick, char *vIdent, char *vhost)
 {
-    /* Not Supported by this IRCD */
+    User *user = finduser(nick);
+
+    if (!user)
+        return;
+
+    common_svsmode(user, "+x", vhost);
 }
 
 void hybrid_cmd_join(char *user, char *channel, time_t chantime)
@@ -1557,7 +1575,7 @@ int AnopeInit(int argc, char **argv)
     moduleAddVersion(VERSION_STRING);
     moduleSetType(PROTOCOL);
 
-    pmodule_ircd_version("Hybrid 8.0.*");
+    pmodule_ircd_version("Hybrid 8.1.*");
     pmodule_ircd_cap(myIrcdcap);
     pmodule_ircd_var(myIrcd);
     pmodule_ircd_cbmodeinfos(myCbmodeinfos);

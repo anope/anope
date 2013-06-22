@@ -1,7 +1,7 @@
 /* ircd-hybrid-8 protocol module
  *
  * (C) 2003-2013 Anope Team
- * (C) 2012 by the Hybrid Development Team
+ * (C) 2012-2013 by the Hybrid Development Team
  *
  * Please read COPYING and README for further details.
  *
@@ -17,7 +17,7 @@ static Anope::string UplinkSID;
 class HybridProto : public IRCDProto
 {
   public:
-	HybridProto(Module *creator) : IRCDProto(creator, "Hybrid 8.1")
+	HybridProto(Module *creator) : IRCDProto(creator, "Hybrid 8.1.x")
 	{
 		DefaultPseudoclientModes = "+oi";
 		CanSVSNick = true;
@@ -25,6 +25,7 @@ class HybridProto : public IRCDProto
 		CanSQLine = true;
 		CanSZLine = true;
 		CanSVSHold = true;
+		CanCertFP = true;
 		RequiresID = true;
 		MaxModes = 4;
 	}
@@ -509,6 +510,21 @@ struct IRCDMessageUID : IRCDMessage
 	}
 };
 
+struct IRCDMessageCertFP: IRCDMessage
+{
+	IRCDMessageCertFP(Module *creator) : IRCDMessage(creator, "CERTFP", 1) { SetFlag(IRCDMESSAGE_REQUIRE_USER); }
+
+	/*                   0                                                                */
+	/* :0MCAAAAAB CERTFP 4C62287BA6776A89CD4F8FF10A62FFB35E79319F51AF6C62C674984974FCCB1D */
+	void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
+	{
+		User *u = source.GetUser();
+
+		u->fingerprint = params[0];
+		FOREACH_MOD(OnFingerprint, (u));
+	}
+};
+
 class ProtoHybrid : public Module
 {
 	HybridProto ircd_proto;
@@ -547,6 +563,7 @@ class ProtoHybrid : public Module
 	IRCDMessageTBurst message_tburst;
 	IRCDMessageTMode message_tmode;
 	IRCDMessageUID message_uid;
+	IRCDMessageCertFP message_certfp;
 
 	void AddModes()
 	{
@@ -601,10 +618,10 @@ public:
 		message_kill(this), message_mode(this), message_motd(this), message_part(this), message_ping(this),
 		message_privmsg(this), message_quit(this), message_squit(this), message_stats(this), message_time(this),
 		message_topic(this), message_version(this), message_whois(this),
-
 		message_bmask(this), message_eob(this), message_join(this),
 		message_nick(this), message_pass(this), message_pong(this), message_server(this), message_sid(this),
-		message_sjoin(this), message_svsmode(this), message_tburst(this), message_tmode(this), message_uid(this)
+		message_sjoin(this), message_svsmode(this), message_tburst(this), message_tmode(this), message_uid(this),
+		message_certfp(this)
 	{
 		this->AddModes();
 

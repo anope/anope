@@ -179,6 +179,8 @@ void BotInfo::Join(Channel *c, ChannelStatus *status)
 	c->JoinUser(this, status);
 	if (IRCD)
 		IRCD->SendJoin(this, c, status);
+
+	FOREACH_MOD(OnJoinChannel, (this, c));
 }
 
 void BotInfo::Join(const Anope::string &chname, ChannelStatus *status)
@@ -193,6 +195,9 @@ void BotInfo::Part(Channel *c, const Anope::string &reason)
 		return;
 
 	IRCD->SendPart(this, c, "%s", !reason.empty() ? reason.c_str() : "");
+
+	FOREACH_MOD(OnPartChannel, (this, c, c->name, reason));
+
 	c->DeleteUser(this);
 }
 

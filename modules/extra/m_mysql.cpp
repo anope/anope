@@ -332,6 +332,15 @@ Result MySQLService::RunQuery(const Query &query)
 		MYSQL_RES *res = mysql_store_result(this->sql);
 		unsigned int id = mysql_insert_id(this->sql);
 
+		/* because we enabled CLIENT_MULTI_RESULTS in our options
+		 * a multiple statement or a procedure call can return
+		 * multiple result sets.
+		 * we must process them all before the next query.
+		 */
+
+		while (!mysql_next_result(this->sql))
+			mysql_free_result(mysql_store_result(this->sql));
+
 		this->Lock.Unlock();
 		return MySQLResult(id, query, real_query, res);
 	}

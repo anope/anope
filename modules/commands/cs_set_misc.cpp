@@ -101,6 +101,7 @@ class CommandCSSetMisc : public Command
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		ChannelInfo *ci = ChannelInfo::Find(params[0]);
+		const Anope::string &param = params.size() > 1 ? params[1] : "";
 		if (ci == NULL)
 		{
 			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
@@ -108,7 +109,7 @@ class CommandCSSetMisc : public Command
 		}
 
 		EventReturn MOD_RESULT;
-		FOREACH_RESULT(OnSetChannelOption, MOD_RESULT, (source, this, ci, params[1]));
+		FOREACH_RESULT(OnSetChannelOption, MOD_RESULT, (source, this, ci, param));
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
@@ -124,9 +125,9 @@ class CommandCSSetMisc : public Command
 		if (item == NULL)
 			return;
 
-		if (params.size() > 1)
+		if (!param.empty())
 		{
-			item->Set(ci, CSMiscData(ci, key, params[1]));
+			item->Set(ci, CSMiscData(ci, key, param));
 			source.Reply(CHAN_SETTING_CHANGED, scommand.c_str(), ci->name.c_str(), params[1].c_str());
 		}
 		else

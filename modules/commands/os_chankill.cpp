@@ -69,7 +69,7 @@ class CommandOSChanKill : public Command
 
 			if ((c = Channel::Find(channel)))
 			{
-				for (Channel::ChanUserList::iterator it = c->users.begin(), it_end = c->users.end(); it != it_end; )
+				for (Channel::ChanUserList::iterator it = c->users.begin(), it_end = c->users.end(); it != it_end; ++it)
 				{
 					ChanUserContainer *uc = it->second;
 

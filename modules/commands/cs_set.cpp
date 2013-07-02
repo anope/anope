@@ -239,6 +239,7 @@ class CommandCSSetDescription : public Command
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		ChannelInfo *ci = ChannelInfo::Find(params[0]);
+		const Anope::string &param = params.size() > 1 ? params[1] : "";
 		if (ci == NULL)
 		{
 			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
@@ -246,7 +247,7 @@ class CommandCSSetDescription : public Command
 		}
 
 		EventReturn MOD_RESULT;
-		FOREACH_RESULT(OnSetChannelOption, MOD_RESULT, (source, this, ci, params[1]));
+		FOREACH_RESULT(OnSetChannelOption, MOD_RESULT, (source, this, ci, param));
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
@@ -256,9 +257,9 @@ class CommandCSSetDescription : public Command
 			return;
 		}
 
-		if (params.size() > 1)
+		if (!param.empty())
 		{
-			ci->desc = params[1];
+			ci->desc = param;
 			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to change the description to " << ci->desc;
 			source.Reply(_("Description of %s changed to \002%s\002."), ci->name.c_str(), ci->desc.c_str());
 		}
@@ -866,6 +867,7 @@ class CommandCSSetSuccessor : public Command
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		ChannelInfo *ci = ChannelInfo::Find(params[0]);
+		const Anope::string &param = params.size() > 1 ? params[1] : "";
 		if (ci == NULL)
 		{
 			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
@@ -873,7 +875,7 @@ class CommandCSSetSuccessor : public Command
 		}
 
 		EventReturn MOD_RESULT;
-		FOREACH_RESULT(OnSetChannelOption, MOD_RESULT, (source, this, ci, params[1]));
+		FOREACH_RESULT(OnSetChannelOption, MOD_RESULT, (source, this, ci, param));
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
@@ -885,13 +887,13 @@ class CommandCSSetSuccessor : public Command
 
 		NickCore *nc;
 
-		if (params.size() > 1)
+		if (!param.empty())
 		{
-			const NickAlias *na = NickAlias::Find(params[1]);
+			const NickAlias *na = NickAlias::Find(param);
 
 			if (!na)
 			{
-				source.Reply(NICK_X_NOT_REGISTERED, params[1].c_str());
+				source.Reply(NICK_X_NOT_REGISTERED, param.c_str());
 				return;
 			}
 			if (na->nc == ci->GetFounder())

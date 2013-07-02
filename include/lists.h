@@ -87,6 +87,7 @@ class CoreExport InfoFormatter
 	InfoFormatter(NickCore *nc);
 	void Process(std::vector<Anope::string> &);
 	Anope::string &operator[](const Anope::string &key);
+	void AddOption(const Anope::string &opt);
 };
 
 #endif // LISTS_H

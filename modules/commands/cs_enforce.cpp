@@ -27,7 +27,7 @@ class CommandCSEnforce : public Command
 		 * if it's off.
 		 */
 		bool hadsecureops = ci->HasExt("SECUREOPS");
-		ci->ExtendMetadata("SECUREOPS");
+		ci->Extend<bool>("SECUREOPS");
 
 		for (Channel::ChanUserList::iterator it = ci->c->users.begin(), it_end = ci->c->users.end(); it != it_end; ++it)
 		{
@@ -37,7 +37,7 @@ class CommandCSEnforce : public Command
 		}
 
 		if (!hadsecureops)
-			ci->Shrink("SECUREOPS");
+			ci->Shrink<bool>("SECUREOPS");
 
 		source.Reply(_("Secureops enforced on %s."), ci->name.c_str());
 	}

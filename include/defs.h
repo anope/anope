@@ -32,7 +32,6 @@ class InfoFormatter;
 class IRCDProto;
 class ListenSocket;
 class Log;
-class LogInfo;
 class Memo;
 class MessageSource;
 class Module;

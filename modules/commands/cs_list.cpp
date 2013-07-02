@@ -81,11 +81,11 @@ class CommandCSList : public Command
 		{
 			const ChannelInfo *ci = it->second;
 
-			if (!is_servadmin && (ci->HasExt("PRIVATE") || ci->HasExt("SUSPENDED")))
+			if (!is_servadmin && (ci->HasExt("CS_PRIVATE") || ci->HasExt("SUSPENDED")))
 				continue;
 			else if (suspended && !ci->HasExt("SUSPENDED"))
 				continue;
-			else if (channoexpire && !ci->HasExt("NO_EXPIRE"))
+			else if (channoexpire && !ci->HasExt("CS_NO_EXPIRE"))
 				continue;
 
 			if (pattern.equals_ci(ci->name) || ci->name.equals_ci(spattern) || Anope::Match(ci->name, pattern, false, true) || Anope::Match(ci->name, spattern, false, true))
@@ -93,7 +93,7 @@ class CommandCSList : public Command
 				if (((count + 1 >= from && count + 1 <= to) || (!from && !to)) && ++nchans <= listmax)
 				{
 					bool isnoexpire = false;
-					if (is_servadmin && (ci->HasExt("NO_EXPIRE")))
+					if (is_servadmin && (ci->HasExt("CS_NO_EXPIRE")))
 						isnoexpire = true;
 
 					ListFormatter::ListEntry entry;
@@ -159,13 +159,88 @@ class CommandCSList : public Command
 	}
 };
 
+class CommandCSSetPrivate : public Command
+{
+ public:
+	CommandCSSetPrivate(Module *creator, const Anope::string &cname = "chanserv/set/private") : Command(creator, cname, 2, 2)
+	{
+		this->SetDesc(_("Hide channel from the LIST command"));
+		this->SetSyntax(_("\037channel\037 {ON | OFF}"));
+	}
+
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	{
+		ChannelInfo *ci = ChannelInfo::Find(params[0]);
+		if (ci == NULL)
+		{
+			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
+			return;
+		}
+
+		EventReturn MOD_RESULT;
+		FOREACH_RESULT(OnSetChannelOption, MOD_RESULT, (source, this, ci, params[1]));
+		if (MOD_RESULT == EVENT_STOP)
+			return;
+
+		if (MOD_RESULT != EVENT_ALLOW && !source.AccessFor(ci).HasPriv("SET") && source.permission.empty() && !source.HasPriv("chanserv/administration"))
+		{
+			source.Reply(ACCESS_DENIED);
+			return;
+		}
+
+		if (params[1].equals_ci("ON"))
+		{
+			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to enable private";
+			ci->Extend<bool>("CS_PRIVATE");
+			source.Reply(_("Private option for %s is now \002on\002."), ci->name.c_str());
+		}
+		else if (params[1].equals_ci("OFF"))
+		{
+			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to disable private";
+			ci->Shrink<bool>("CS_PRIVATE");
+			source.Reply(_("Private option for %s is now \002off\002."), ci->name.c_str());
+		}
+		else
+			this->OnSyntaxError(source, "PRIVATE");
+
+		return;
+	}
+
+	bool OnHelp(CommandSource &source, const Anope::string &) anope_override
+	{
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_("Enables or disables the \002private\002 option for a channel."));
+		
+		BotInfo *bi;
+		Anope::string cmd;
+		if (Command::FindCommandFromService("chanserv/list", bi, cmd))
+			source.Reply(_("When \002private\002 is set, the channel will not appear in\n"
+				"%s's %s command."), bi->nick.c_str(), cmd.c_str());
+		return true;
+	}
+};
+
 class CSList : public Module
 {
 	CommandCSList commandcslist;
+	CommandCSSetPrivate commandcssetprivate;
+
+	SerializableExtensibleItem<bool> priv;
 
  public:
-	CSList(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR), commandcslist(this)
+	CSList(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
+		commandcslist(this), commandcssetprivate(this), priv(this, "CS_PRIVATE")
 	{
+	}
+
+	void OnChanInfo(CommandSource &source, ChannelInfo *ci, InfoFormatter &info, bool show_all) anope_override
+	{
+		if (!show_all)
+			return;
+
+		if (priv.HasExt(ci))
+			info.AddOption(_("Private"));
 	}
 };
 

@@ -56,7 +56,7 @@ class MChanstats : public Module
 
 	const Anope::string GetDisplay(User *u)
 	{
-		if (u && u->Account() && u->Account()->HasExt("STATS"))
+		if (u && u->Account() && u->Account()->HasExt("NS_STATS"))
 			return u->Account()->display;
 		else
 			return "";
@@ -357,7 +357,7 @@ class MChanstats : public Module
 	void OnTopicUpdated(Channel *c, const Anope::string &user, const Anope::string &topic) anope_override
 	{
 		User *u = User::Find(user);
-		if (!u || !u->Account() || !c->ci || !c->ci->HasExt("STATS"))
+		if (!u || !u->Account() || !c->ci || !c->ci->HasExt("CS_STATS"))
 			return;
 		query = "CALL " + prefix + "chanstats_proc_update(@channel@, @nick@, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1);";
 		query.SetValue("channel", c->name);
@@ -365,13 +365,13 @@ class MChanstats : public Module
 		this->RunQuery(query);
 	}
 
-	EventReturn OnChannelModeSet(Channel *c, MessageSource &setter, const Anope::string &, const Anope::string &param) anope_override
+	EventReturn OnChannelModeSet(Channel *c, MessageSource &setter, ChannelMode *mode, const Anope::string &param) anope_override
 	{
 		this->OnModeChange(c, setter.GetUser());
 		return EVENT_CONTINUE;
 	}
 
-	EventReturn OnChannelModeUnset(Channel *c, MessageSource &setter, const Anope::string &, const Anope::string &param) anope_override
+	EventReturn OnChannelModeUnset(Channel *c, MessageSource &setter, ChannelMode *, const Anope::string &param) anope_override
 	{
 		this->OnModeChange(c, setter.GetUser());
 		return EVENT_CONTINUE;
@@ -380,7 +380,7 @@ class MChanstats : public Module
  private:
 	void OnModeChange(Channel *c, User *u)
 	{
-		if (!u || !u->Account() || !c->ci || !c->ci->HasExt("STATS"))
+		if (!u || !u->Account() || !c->ci || !c->ci->HasExt("CS_STATS"))
 			return;
 
 		query = "CALL " + prefix + "chanstats_proc_update(@channel@, @nick@, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0);";
@@ -391,7 +391,7 @@ class MChanstats : public Module
  public:
 	void OnPreUserKicked(MessageSource &source, ChanUserContainer *cu, const Anope::string &kickmsg) anope_override
 	{
-		if (!cu->chan->ci || !cu->chan->ci->HasExt("STATS"))
+		if (!cu->chan->ci || !cu->chan->ci->HasExt("CS_STATS"))
 			return;
 
 		query = "CALL " + prefix + "chanstats_proc_update(@channel@, @nick@, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0);";
@@ -406,7 +406,7 @@ class MChanstats : public Module
 	}
 	void OnPrivmsg(User *u, Channel *c, Anope::string &msg) anope_override
 	{
-		if (!c->ci || !c->ci->HasExt("STATS"))
+		if (!c->ci || !c->ci->HasExt("CS_STATS"))
 			return;
 
 		size_t letters = msg.length();
@@ -452,7 +452,7 @@ class MChanstats : public Module
 		query.SetValue("new_display", newdisplay);
 		this->RunQuery(query);
 	}
-	void OnChanDrop(ChannelInfo *ci) anope_override
+	void OnDelChan(ChannelInfo *ci) anope_override
 	{
 		query = "DELETE FROM `" + prefix + "chanstats` WHERE `chan` = @channel@;";
 		query.SetValue("channel", ci->name);

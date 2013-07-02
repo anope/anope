@@ -35,7 +35,7 @@ class CommandOSNOOP : public Command
 		{
 			/* Remove the O:lines */
 			IRCD->SendSVSNOOP(s, true);
-			s->Extend("noop", new ExtensibleItemClass<Anope::string>(source.GetNick()));
+			s->Extend<Anope::string>("noop", source.GetNick());
 
 			Log(LOG_ADMIN, source, this) << "SET on " << s->GetName();
 			source.Reply(_("All operators from \002%s\002 have been removed."), s->GetName().c_str());
@@ -52,7 +52,7 @@ class CommandOSNOOP : public Command
 		}
 		else if (cmd.equals_ci("REVOKE"))
 		{
-			s->Shrink("noop");
+			s->Shrink<Anope::string>("noop");
 			IRCD->SendSVSNOOP(s, false);
 			Log(LOG_ADMIN, source, this) << "REVOKE on " << s->GetName();
 			source.Reply(_("All O:lines of \002%s\002 have been reset."), s->GetName().c_str());
@@ -76,25 +76,23 @@ class CommandOSNOOP : public Command
 class OSNOOP : public Module
 {
 	CommandOSNOOP commandosnoop;
+	PrimitiveExtensibleItem<Anope::string> noop;
 
  public:
 	OSNOOP(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		commandosnoop(this)
+		commandosnoop(this), noop(this, "noop")
 	{
 
 	}
 
 	void OnUserModeSet(User *u, const Anope::string &mname) anope_override
 	{
-		if (mname == "OPER" && u->server->HasExt("noop"))
+		Anope::string *setter;
+		if (mname == "OPER" && (setter = noop.Get(u->server)))
 		{
-			Anope::string *setter = u->server->GetExt<ExtensibleItemClass<Anope::string> *>("noop");
-			if (setter)
-			{
-				Anope::string reason = "NOOP command used by " + *setter;
-				BotInfo *OperServ = Config->GetClient("OperServ");
-				u->Kill(OperServ ? OperServ->nick : "", reason);
-			}
+			Anope::string reason = "NOOP command used by " + *setter;
+			BotInfo *OperServ = Config->GetClient("OperServ");
+			u->Kill(OperServ ? OperServ->nick : "", reason);
 		}
 	}
 };

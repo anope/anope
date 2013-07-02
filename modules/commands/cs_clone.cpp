@@ -10,6 +10,7 @@
  */
 
 #include "module.h"
+#include "modules/bs_badwords.h"
 
 class CommandCSClone : public Command
 {
@@ -125,12 +126,16 @@ public:
 		}
 		else if (what.equals_ci("BADWORDS"))
 		{
-			target_ci->ClearBadWords();
-			for (unsigned i = 0; i < ci->GetBadWordCount(); ++i)
-			{
-				const BadWord *bw = ci->GetBadWord(i);
-				target_ci->AddBadWord(bw->word, bw->type);
-			}
+			BadWords *target_badwords = target_ci->GetExt<BadWords>("badwords"),
+				*badwords = ci->Require<BadWords>("badwords");
+			if (target_badwords)
+				target_badwords->ClearBadWords();
+			if (badwords)
+				for (unsigned i = 0; i < badwords->GetBadWordCount(); ++i)
+				{
+					const BadWord *bw = badwords->GetBadWord(i);
+					target_badwords->AddBadWord(bw->word, bw->type);
+				}
 
 			source.Reply(_("All badword entries from \002%s\002 have been cloned to \002%s\002."), channel.c_str(), target.c_str());
 		}
@@ -141,8 +146,6 @@ public:
 		}
 
 		Log(LOG_COMMAND, source, this, ci) << "to clone " << (what.empty() ? "everything from it" : what) << " to " << target_ci->name;
-
-		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override

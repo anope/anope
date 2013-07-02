@@ -626,9 +626,10 @@ class CoreExport Module : public Extensible
 	virtual void OnLevelChange(CommandSource &source, ChannelInfo *ci, const Anope::string &priv, int16_t what) { throw NotImplementedException(); }
 
 	/** Called right before a channel is dropped
+	 * @param source The user dropping the channel
 	 * @param ci The channel
 	 */
-	virtual void OnChanDrop(ChannelInfo *ci) { throw NotImplementedException(); }
+	virtual EventReturn OnChanDrop(CommandSource &source, ChannelInfo *ci) { throw NotImplementedException(); }
 
 	/** Called when a channel is registered
 	 * @param ci The channel
@@ -823,6 +824,10 @@ class CoreExport Module : public Extensible
 	 */
 	virtual void OnNickInfo(CommandSource &source, NickAlias *na, InfoFormatter &info, bool show_hidden) { throw NotImplementedException(); }
 
+	/** Called when a user uses botserv/info on a bot or channel.
+	 */
+	virtual void OnBotInfo(CommandSource &source, BotInfo *bi, ChannelInfo *ci, InfoFormatter &info) { throw NotImplementedException(); }
+
 	/** Check whether a username and password is correct
 	 * @param u The user trying to identify, if applicable.
 	 * @param req The login request
@@ -887,20 +892,20 @@ class CoreExport Module : public Extensible
 	/** Called when a mode is set on a channel
 	 * @param c The channel
 	 * @param setter The user or server that is setting the mode
-	 * @param mname The mode name
+	 * @param mode The mode
 	 * @param param The mode param, if there is one
 	 * @return EVENT_STOP to make mlock/secureops etc checks not happen
 	 */
-	virtual EventReturn OnChannelModeSet(Channel *c, MessageSource &setter, const Anope::string &mname, const Anope::string &param) { throw NotImplementedException(); }
+	virtual EventReturn OnChannelModeSet(Channel *c, MessageSource &setter, ChannelMode *mode, const Anope::string &param) { throw NotImplementedException(); }
 
 	/** Called when a mode is unset on a channel
 	 * @param c The channel
 	 * @param setter The user or server that is unsetting the mode
-	 * @param mname The mode name
+	 * @param mode The mode
 	 * @param param The mode param, if there is one
 	 * @return EVENT_STOP to make mlock/secureops etc checks not happen
 	 */
-	virtual EventReturn OnChannelModeUnset(Channel *c, MessageSource &setter, const Anope::string &mname, const Anope::string &param) { throw NotImplementedException(); }
+	virtual EventReturn OnChannelModeUnset(Channel *c, MessageSource &setter, ChannelMode *mode, const Anope::string &param) { throw NotImplementedException(); }
 
 	/** Called when a mode is set on a user
 	 * @param u The user
@@ -1053,6 +1058,14 @@ class CoreExport Module : public Extensible
 	 * channels, etc.
 	 */
 	virtual void OnExpireTick() { throw NotImplementedException(); }
+
+	/** Called when a nick is validated. That is, to determine if a user is permissted
+	 * to be on the given nick.
+	 * @param u The user
+	 * @param na The nick they are on
+	 * @return EVENT_STOP to force the user off of the nick
+	 */
+	virtual EventReturn OnNickValidate(User *u, NickAlias *na) { throw NotImplementedException(); }
 };
 
 /** Used to manage modules.

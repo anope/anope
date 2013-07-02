@@ -10,6 +10,7 @@
  */
 
 #include "module.h"
+#include "modules/cs_mode.h"
 
 static unsigned int spanningtree_proto_ver = 0;
 
@@ -137,7 +138,7 @@ class InspIRCdExtBan : public ChannelModeList
 		{
 			Anope::string real_mask = mask.substr(2);
 
-			if (Anope::Match(u->fingerprint, real_mask))
+			if (!u->fingerprint.empty() && Anope::Match(u->fingerprint, real_mask))
 				return true;
 		}
 
@@ -759,9 +760,10 @@ class ProtoInspIRCd : public Module
 
 	void OnChanRegistered(ChannelInfo *ci) anope_override
 	{
-		if (use_server_side_mlock && ci->c && !ci->GetMLockAsString(false).empty())
+		ModeLocks *modelocks = ci->GetExt<ModeLocks>("modelocks");
+		if (use_server_side_mlock && ci->c && modelocks && !modelocks->GetMLockAsString(false).empty())
 		{
-			Anope::string modes = ci->GetMLockAsString(false).replace_all_cs("+", "").replace_all_cs("-", "");
+			Anope::string modes = modelocks->GetMLockAsString(false).replace_all_cs("+", "").replace_all_cs("-", "");
 			SendChannelMetadata(ci->c, "mlock", modes);
 		}
 
@@ -783,10 +785,11 @@ class ProtoInspIRCd : public Module
 
 	EventReturn OnMLock(ChannelInfo *ci, ModeLock *lock) anope_override
 	{
+		ModeLocks *modelocks = ci->GetExt<ModeLocks>("modelocks");
 		ChannelMode *cm = ModeManager::FindChannelModeByName(lock->name);
-		if (use_server_side_mlock && cm && ci->c && (cm->type == MODE_REGULAR || cm->type == MODE_PARAM))
+		if (use_server_side_mlock && cm && ci->c && modelocks && (cm->type == MODE_REGULAR || cm->type == MODE_PARAM))
 		{
-			Anope::string modes = ci->GetMLockAsString(false).replace_all_cs("+", "").replace_all_cs("-", "") + cm->mchar;
+			Anope::string modes = modelocks->GetMLockAsString(false).replace_all_cs("+", "").replace_all_cs("-", "") + cm->mchar;
 			SendChannelMetadata(ci->c, "mlock", modes);
 		}
 
@@ -795,10 +798,11 @@ class ProtoInspIRCd : public Module
 
 	EventReturn OnUnMLock(ChannelInfo *ci, ModeLock *lock) anope_override
 	{
+		ModeLocks *modelocks = ci->GetExt<ModeLocks>("modelocks");
 		ChannelMode *cm = ModeManager::FindChannelModeByName(lock->name);
-		if (use_server_side_mlock && cm && ci->c && (cm->type == MODE_REGULAR || cm->type == MODE_PARAM))
+		if (use_server_side_mlock && cm && ci->c && modelocks && (cm->type == MODE_REGULAR || cm->type == MODE_PARAM))
 		{
-			Anope::string modes = ci->GetMLockAsString(false).replace_all_cs("+", "").replace_all_cs("-", "").replace_all_cs(cm->mchar, "");
+			Anope::string modes = modelocks->GetMLockAsString(false).replace_all_cs("+", "").replace_all_cs("-", "").replace_all_cs(cm->mchar, "");
 			SendChannelMetadata(ci->c, "mlock", modes);
 		}
 

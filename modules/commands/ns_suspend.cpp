@@ -10,8 +10,47 @@
  */
 
 #include "module.h"
+#include "modules/ns_suspend.h"
 
 static ServiceReference<NickServService> nickserv("NickServService", "NickServ");
+
+struct NSSuspendInfoImpl : NSSuspendInfo, Serializable
+{
+	NSSuspendInfoImpl(Extensible *) : Serializable("NSSuspendInfo") { }
+
+	void Serialize(Serialize::Data &data) const anope_override
+	{
+		data["nick"] << nick;
+		data["by"] << by;
+		data["reason"] << reason;
+		data["time"] << when;
+		data["expires"] << expires;
+	}
+
+	static Serializable* Unserialize(Serializable *obj, Serialize::Data &data)
+	{
+		Anope::string snick;
+		data["nick"] >> snick;
+
+		NSSuspendInfoImpl *si;
+		if (obj)
+			si = anope_dynamic_static_cast<NSSuspendInfoImpl *>(obj);
+		else
+		{
+			NickAlias *na = NickAlias::Find(snick);
+			if (!na)
+				return NULL;
+			si = na->Extend<NSSuspendInfoImpl>("SUSPENDED");
+			data["nick"] >> si->nick;
+		}
+
+		data["bi"] >> si->by;
+		data["reason"] >> si->reason;
+		data["time"] >> si->when;
+		data["expires"] >> si->expires;
+		return si;
+	}
+};
 
 class CommandNSSuspend : public Command
 {
@@ -60,18 +99,12 @@ class CommandNSSuspend : public Command
 
 		NickCore *nc = na->nc;
 
-		nc->ExtendMetadata("SUSPENDED");
-		nc->ExtendMetadata("SECURE");
-		nc->Shrink("KILLPROTECT");
-		nc->Shrink("KILL_QUICK");
-		nc->Shrink("KILL_IMMED");
-
-		nc->ExtendMetadata("suspend:by", source.GetNick());
-		if (!reason.empty())
-			nc->ExtendMetadata("suspend:reason", reason);
-		if (expiry_secs > 0)
-			nc->ExtendMetadata("suspend:expire", stringify(Anope::CurTime + expiry_secs));
-		nc->ExtendMetadata("suspend:time", stringify(Anope::CurTime));
+		NSSuspendInfo *si = nc->Extend<NSSuspendInfo>("SUSPENDED");
+		si->nick = nc->display;
+		si->by = source.GetNick();
+		si->reason = reason;
+		si->when = Anope::CurTime;
+		si->expires = expiry_secs ? expiry_secs + Anope::CurTime : 0;
 
 		for (unsigned i = 0; i < nc->aliases->size(); ++i)
 		{
@@ -81,7 +114,7 @@ class CommandNSSuspend : public Command
 			{
 				na2->last_quit = reason;
 
-				User *u2 = User::Find(na2->nick);
+				User *u2 = User::Find(na2->nick, true);
 				if (u2)
 				{
 					u2->Logout();
@@ -141,18 +174,12 @@ class CommandNSUnSuspend : public Command
 			return;
 		}
 
-		na->nc->Shrink("SUSPENDED");
-		na->nc->Shrink("suspend:expire");
-		na->nc->Shrink("suspend:by");
-		na->nc->Shrink("suspend:reason");
-		na->nc->Shrink("suspend:time");
+		na->nc->Shrink<NSSuspendInfo>("SUSPENDED");
 
 		Log(LOG_ADMIN, source, this) << "for " << na->nick;
 		source.Reply(_("Nick %s is now released."), nick.c_str());
 
 		FOREACH_MOD(OnNickUnsuspended, (na));
-
-		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
@@ -168,55 +195,61 @@ class NSSuspend : public Module
 {
 	CommandNSSuspend commandnssuspend;
 	CommandNSUnSuspend commandnsunsuspend;
+	ExtensibleItem<NSSuspendInfoImpl> suspend;
+	Serialize::Type suspend_type;
 
  public:
 	NSSuspend(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		commandnssuspend(this), commandnsunsuspend(this)
+		commandnssuspend(this), commandnsunsuspend(this), suspend(this, "SUSPENDED"),
+		suspend_type("NSSuspendInfo", NSSuspendInfoImpl::Unserialize)
 	{
 	}
 
 	void OnNickInfo(CommandSource &source, NickAlias *na, InfoFormatter &info, bool show_hidden) anope_override
 	{
-		if (na->nc->HasExt("SUSPENDED"))
+		NSSuspendInfo *s = suspend.Get(na->nc);
+		if (s)
 		{
-			Anope::string *by = na->nc->GetExt<ExtensibleItemClass<Anope::string> *>("suspend:by"), *reason = na->nc->GetExt<ExtensibleItemClass<Anope::string> *>("suspend:reason"), *t = na->nc->GetExt<ExtensibleItemClass<Anope::string> *>("suspend:time");
 			info["Suspended"] = "This nickname is \2suspended\2.";
-			if (by)
-				info["Suspended by"] = *by;
-			if (reason)
-				info["Suspend reason"] = *reason;
-			if (t)
-				info["Suspended on"] = Anope::strftime(convertTo<time_t>(*t), source.GetAccount(), true);
+			if (!s->by.empty())
+				info["Suspended by"] = s->by;
+			if (!s->reason.empty())
+				info["Suspend reason"] = s->reason;
+			if (s->when)
+				info["Suspended on"] = Anope::strftime(s->when, source.GetAccount(), true);
+			if (s->expires)
+				info["Suspended expires"] = Anope::strftime(s->expires, source.GetAccount(), true);
 		}
 	}
 
 	void OnPreNickExpire(NickAlias *na, bool &expire) anope_override
 	{
-		if (!na->nc->HasExt("SUSPENDED"))
+		NSSuspendInfo *s = suspend.Get(na->nc);
+		if (!s)
 			return;
 
 		expire = false;
 
-		Anope::string *str = na->nc->GetExt<ExtensibleItemClass<Anope::string> *>("suspend:expire");
-		if (str == NULL)
+		if (!s->expires)
 			return;
 
-		try
+		if (s->expires < Anope::CurTime)
 		{
-			time_t when = convertTo<time_t>(*str);
-			if (when < Anope::CurTime)
-			{
-				na->last_seen = Anope::CurTime;
-				na->nc->Shrink("SUSPENDED");
-				na->nc->Shrink("suspend:expire");
-				na->nc->Shrink("suspend:by");
-				na->nc->Shrink("suspend:reason");
-				na->nc->Shrink("suspend:time");
+			na->last_seen = Anope::CurTime;
+			suspend.Unset(na->nc);
 
-				Log(LOG_NORMAL, "expire", Config->GetClient("NickServ")) << "Expiring suspend for " << na->nick;
-			}
+			Log(LOG_NORMAL, "expire", Config->GetClient("NickServ")) << "Expiring suspend for " << na->nick;
 		}
-		catch (const ConvertException &) { }
+	}
+
+	EventReturn OnNickValidate(User *u, NickAlias *na) anope_override
+	{
+		NSSuspendInfo *s = suspend.Get(na->nc);
+		if (!s)
+			return EVENT_CONTINUE;
+
+		u->SendMessage(Config->GetClient("NickServ"), NICK_X_SUSPENDED, u->nick.c_str());
+		return EVENT_STOP;
 	}
 };
 

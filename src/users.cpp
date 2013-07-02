@@ -301,7 +301,6 @@ void User::Identify(NickAlias *na)
 	}
 
 	this->Login(na->nc);
-	IRCD->SendLogin(this);
 
 	FOREACH_MOD(OnNickIdentify, (this));
 
@@ -335,6 +334,8 @@ void User::Login(NickCore *core)
 	core->users.push_back(this);
 
 	this->UpdateHost();
+
+	IRCD->SendLogin(this);
 
 	if (this->server->IsSynced())
 		Log(this, "account") << "is now identified as " << this->nc->display;
@@ -378,7 +379,7 @@ bool User::IsRecognized(bool check_secure) const
 	{
 		const NickAlias *na = NickAlias::Find(this->nick);
 
-		if (!na || na->nc->HasExt("SECURE"))
+		if (!na || na->nc->HasExt("NS_SECURE"))
 			return false;
 	}
 

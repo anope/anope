@@ -12,109 +12,242 @@
 
 #include "anope.h"
 #include "serialize.h"
+#include "service.h"
+#include "logger.h"
 
-/* All items added to Extensible must inherit from this.
- */
-class CoreExport ExtensibleItem
+class Extensible;
+
+class CoreExport ExtensibleBase : public Service
 {
+ protected:
+	std::map<Extensible *, void *> items;
+
+	ExtensibleBase(Module *m, const Anope::string &n);
+	~ExtensibleBase();
+
  public:
-	virtual ~ExtensibleItem() { }
+	virtual void Unset(Extensible *obj) = 0;
 
-	virtual const Anope::string *Serialize() { return NULL; }
+	/* called when an object we are keep track of is serializing */
+	virtual void ExtensibleSerialize(const Extensible *, const Serializable *, Serialize::Data &) const { }
+	virtual void ExtensibleUnserialize(Extensible *, Serializable *, Serialize::Data &) { }
 };
 
-/** Common class used to Extensible::Extend as it inherits from both ExtensibleItem
- * and whatever basic object you're trying to store.
- * Eg, obj->Extend(key, new ExtensibleItemClass<Anope::string>(value));
- */
-template<typename T> struct CoreExport ExtensibleItemClass : T, ExtensibleItem
-{
-	ExtensibleItemClass(const T& t) : T(t) { }
-};
-
-/* Used to attach metadata to this object that is automatically saved
- * when the object is saved (assuming the object's Serialize method
- * correcly calls Extensible::ExtensibleSerialize).
- */
-struct CoreExport ExtensibleMetadata : ExtensibleItemClass<Anope::string>
-{
-	ExtensibleMetadata(const Anope::string &t) : ExtensibleItemClass<Anope::string>(t) { }
-
-	const Anope::string *Serialize() anope_override { return this; }
-};
-
-/* Used to attach arbitrary objects to this object using unique keys */
 class CoreExport Extensible
 {
- private:
- 	typedef std::map<Anope::string, ExtensibleItem *> extensible_map;
-	extensible_map *extension_items;
-
  public:
-	/** Default constructor
-	 */
-	Extensible();
+	std::set<ExtensibleBase *> extension_items;
 
-	/** Destructor, deletes all of the extensible items in this object
-	 * then clears the map
-	 */
 	virtual ~Extensible();
 
-	/** Extend an Extensible class.
-	 *
-	 * @param key The key parameter is an arbitary string which identifies the extension data
-	 * @param p This parameter is a pointer to an ExtensibleItem or ExtensibleItemBase derived class
-	 *
-	 * You must provide a key to store the data as via the parameter 'key'.
-	 * The data will be inserted into the map. If the data already exists, it will be overwritten.
-	 */
-	void Extend(const Anope::string &key, ExtensibleItem *p = NULL);
+	template<typename T> T* GetExt(const Anope::string &name) const;
+	bool HasExt(const Anope::string &name) const;
 
-	void ExtendMetadata(const Anope::string &key, const Anope::string &value = "");
+	template<typename T> T* Extend(const Anope::string &name, const T &what);
+	template<typename T> T* Extend(const Anope::string &name);
+	template<typename T> T* Require(const Anope::string &name);
+	template<typename T> void Shrink(const Anope::string &name);
 
-	/** Shrink an Extensible class.
-	 *
-	 * @param key The key parameter is an arbitary string which identifies the extension data
-	 *
-	 * You must provide a key name. The given key name will be removed from the classes data. If
-	 * you provide a nonexistent key (case is important) then the function will return false.
-	 * @return Returns true on success.
-	 */
-	bool Shrink(const Anope::string &key);
+	static void ExtensibleSerialize(const Extensible *, const Serializable *, Serialize::Data &data);
+	static void ExtensibleUnserialize(Extensible *, Serializable *, Serialize::Data &data);
+};
 
-	/** Get an extension item.
-	 *
-	 * @param key The key parameter is an arbitary string which identifies the extension data
-	 * @return The item found
-	 */
-	template<typename T> T GetExt(const Anope::string &key) const
+template<typename T>
+class BaseExtensibleItem : public ExtensibleBase
+{
+ protected:
+	virtual T *Create(Extensible *) = 0;
+
+ public:
+	BaseExtensibleItem(Module *m, const Anope::string &n) : ExtensibleBase(m, n) { }
+
+	~BaseExtensibleItem()
 	{
-		if (this->extension_items)
+		for (std::map<Extensible *, void *>::iterator it = items.begin(); it != items.end(); ++it)
 		{
-			extensible_map::const_iterator it = this->extension_items->find(key);
-			if (it != this->extension_items->end())
-				return anope_dynamic_static_cast<T>(it->second);
-		}
+			T *value = static_cast<T *>(it->second);
 
+			items.erase(it->first);
+			it->first->extension_items.erase(this);
+			delete value;
+		}
+	}
+
+	T* Set(Extensible *obj, const T &value)
+	{
+		T* t = Set(obj);
+		*t = value;
+		return t;
+	}
+
+	T* Set(Extensible *obj)
+	{
+		T* t = Create(obj);
+		Unset(obj);
+		items[obj] = t;
+		obj->extension_items.insert(this);
+		return t;
+	}
+
+	void Unset(Extensible *obj) anope_override
+	{
+		T *value = Get(obj);
+		items.erase(obj);
+		obj->extension_items.erase(this);
+		delete value;
+	}
+
+	T* Get(const Extensible *obj) const
+	{
+		std::map<Extensible *, void *>::const_iterator it = items.find(const_cast<Extensible *>(obj));
+		if (it != items.end())
+			return static_cast<T *>(it->second);
 		return NULL;
 	}
 
-	/** Check if an extension item exists.
-	 *
-	 * @param key The key parameter is an arbitary string which identifies the extension data
-	 * @return True if the item was found.
-	 */
-	bool HasExt(const Anope::string &key) const;
+	bool HasExt(const Extensible *obj) const
+	{
+		return items.find(const_cast<Extensible *>(obj)) != items.end();
+	}
 
-	/** Get a list of all extension items names.
-	 * @param list A deque of strings to receive the list
-	 * @return This function writes a list of all extension items stored
-	 *	 in this object by name into the given deque and returns void.
-	 */
-	void GetExtList(std::deque<Anope::string> &list) const;
+	T* Require(Extensible *obj)
+	{
+		T* t = Get(obj);
+		if (t)
+			return t;
 
-	void ExtensibleSerialize(Serialize::Data &data) const;
-	void ExtensibleUnserialize(Serialize::Data &data);
+		return Set(obj);
+	}
 };
+
+template<typename T>
+class ExtensibleItem : public BaseExtensibleItem<T>
+{
+ protected:
+	T* Create(Extensible *obj) anope_override
+	{
+		return new T(obj);
+	}
+ public:
+	ExtensibleItem(Module *m, const Anope::string &n) : BaseExtensibleItem<T>(m, n) { }
+};
+
+template<typename T>
+class PrimitiveExtensibleItem : public BaseExtensibleItem<T>
+{
+ protected:
+	T* Create(Extensible *obj) anope_override
+	{
+		return new T();
+	}
+ public:
+	PrimitiveExtensibleItem(Module *m, const Anope::string &n) : BaseExtensibleItem<T>(m, n) { }
+};
+
+template<>
+class PrimitiveExtensibleItem<bool> : public BaseExtensibleItem<bool>
+{
+ protected:
+	bool* Create(Extensible *) anope_override
+	{
+		return NULL;
+	}
+ public:
+	PrimitiveExtensibleItem(Module *m, const Anope::string &n) : BaseExtensibleItem<bool>(m, n) { }
+};
+
+template<typename T>
+class SerializableExtensibleItem : public PrimitiveExtensibleItem<T>
+{
+ public:
+ 	SerializableExtensibleItem(Module *m, const Anope::string &n) : PrimitiveExtensibleItem<T>(m, n) { }
+
+	void ExtensibleSerialize(const Extensible *e, const Serializable *s, Serialize::Data &data) const anope_override
+	{
+		T* t = this->Get(e);
+		data[this->name] << *t;
+	}
+
+	void ExtensibleUnserialize(Extensible *e, Serializable *s, Serialize::Data &data) anope_override
+	{
+		T* t = this->Require(e);
+		data[this->name] >> *t;
+	}
+};
+
+template<>
+class SerializableExtensibleItem<bool> : public PrimitiveExtensibleItem<bool>
+{
+ public:
+ 	SerializableExtensibleItem(Module *m, const Anope::string &n) : PrimitiveExtensibleItem<bool>(m, n) { }
+
+	void ExtensibleSerialize(const Extensible *e, const Serializable *s, Serialize::Data &data) const anope_override
+	{
+		data[this->name] << true;
+	}
+
+	void ExtensibleUnserialize(Extensible *e, Serializable *s, Serialize::Data &data) anope_override
+	{
+		bool b;
+		data[this->name] >> b;
+		if (b)
+			this->Set(e);
+	}
+};
+
+template<typename T>
+struct ExtensibleRef : ServiceReference<BaseExtensibleItem<T> >
+{
+	ExtensibleRef(const Anope::string &n) : ServiceReference<BaseExtensibleItem<T> >("Extensible", n) { }
+};
+
+template<typename T>
+T* Extensible::GetExt(const Anope::string &name) const
+{
+	ExtensibleRef<T> ref(name);
+	if (ref)
+		return ref->Get(this);
+
+	Log(LOG_DEBUG) << "GetExt for nonexistent type " << name << " on " << static_cast<const void *>(this);
+	return NULL;
+}
+
+template<typename T>
+T* Extensible::Extend(const Anope::string &name, const T &what)
+{
+	T* t = Extend<T>(name);
+	*t = what;
+	return t;
+}
+
+template<typename T>
+T* Extensible::Extend(const Anope::string &name)
+{
+	ExtensibleRef<T> ref(name);
+	if (ref)
+		return ref->Set(this);
+
+	Log(LOG_DEBUG) << "Extend for nonexistent type " << name << " on " << static_cast<void *>(this);
+	return NULL;
+}
+
+template<typename T>
+T* Extensible::Require(const Anope::string &name)
+{
+	if (HasExt(name))
+		return GetExt<T>(name);
+	else
+		return Extend<T>(name);
+}
+
+template<typename T>
+void Extensible::Shrink(const Anope::string &name)
+{
+	ExtensibleRef<T> ref(name);
+	if (ref)
+		ref->Unset(this);
+	else
+		Log(LOG_DEBUG) << "Shrink for nonexistent type " << name << " on " << static_cast<void *>(this);
+}
 
 #endif // EXTENSIBLE_H

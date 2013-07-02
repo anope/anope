@@ -10,11 +10,132 @@
  */
 
 #include "module.h"
+#include "modules/bs_badwords.h"
+
+struct BadWordImpl : BadWord, Serializable
+{
+	BadWordImpl() : Serializable("BadWord") { }
+	~BadWordImpl();
+
+	void Serialize(Serialize::Data &data) const anope_override
+	{
+		data["ci"] << this->chan;
+		data["word"] << this->word;
+		data.SetType("type", Serialize::Data::DT_INT); data["type"] << this->type;
+	}
+
+	static Serializable* Unserialize(Serializable *obj, Serialize::Data &);
+};
+
+struct BadWordsImpl : BadWords
+{
+	Serialize::Reference<ChannelInfo> ci;
+	typedef std::vector<BadWordImpl *> list;
+	Serialize::Checker<list> badwords;
+
+	BadWordsImpl(Extensible *obj) : ci(anope_dynamic_static_cast<ChannelInfo *>(obj)), badwords("BadWord") { }
+
+	BadWord* AddBadWord(const Anope::string &word, BadWordType type) anope_override
+	{
+		BadWordImpl *bw = new BadWordImpl();
+		bw->chan = ci->name;
+		bw->word = word;
+		bw->type = type;
+
+		this->badwords->push_back(bw);
+
+		FOREACH_MOD(OnBadWordAdd, (ci, bw));
+
+		return bw;
+	}
+
+	BadWord* GetBadWord(unsigned index) const anope_override
+	{
+		if (this->badwords->empty() || index >= this->badwords->size())
+			return NULL;
+
+		BadWordImpl *bw = (*this->badwords)[index];
+		bw->QueueUpdate();
+		return bw;
+	}
+
+	unsigned GetBadWordCount() const anope_override
+	{
+		return this->badwords->size();
+	}
+
+	void EraseBadWord(unsigned index) anope_override
+	{
+		if (this->badwords->empty() || index >= this->badwords->size())
+			return;
+	
+		FOREACH_MOD(OnBadWordDel, (ci, (*this->badwords)[index]));
+
+		delete this->badwords->at(index);
+	}
+
+	void ClearBadWords() anope_override
+	{
+		while (!this->badwords->empty())
+			delete this->badwords->back();
+	}
+
+	void Check() anope_override
+	{
+		if (this->badwords->empty())
+			ci->Shrink<BadWords>("badwords");
+	}
+};
+
+BadWordImpl::~BadWordImpl()
+{
+	ChannelInfo *ci = ChannelInfo::Find(chan);
+	if (ci)
+	{
+		BadWordsImpl *badwords = ci->GetExt<BadWordsImpl>("badwords");
+		if (badwords)
+		{
+			BadWordsImpl::list::iterator it = std::find(badwords->badwords->begin(), badwords->badwords->end(), this);
+			if (it != badwords->badwords->end())
+				badwords->badwords->erase(it);
+		}
+	}
+}
+
+Serializable* BadWordImpl::Unserialize(Serializable *obj, Serialize::Data &data)
+{
+	Anope::string sci, sword;
+
+	data["ci"] >> sci;
+	data["word"] >> sword;
+
+	ChannelInfo *ci = ChannelInfo::Find(sci);
+	if (!ci)
+		return NULL;
+
+	unsigned int n;
+	data["type"] >> n;
+	
+	BadWordImpl *bw;
+	if (obj)
+		bw = anope_dynamic_static_cast<BadWordImpl *>(obj);
+	else
+		bw = new BadWordImpl();
+	bw->chan = sci;
+	bw->word = sword;
+	bw->type = static_cast<BadWordType>(n);
+
+	BadWordsImpl *bws = ci->Require<BadWordsImpl>("badwords");
+	bws->badwords->push_back(bw);
+	
+	return bw;
+}
 
 class BadwordsDelCallback : public NumberList
 {
 	CommandSource &source;
 	ChannelInfo *ci;
+	BadWords *bw;
 	Command *c;
 	unsigned deleted;
 	bool override;
@@ -23,6 +144,7 @@ class BadwordsDelCallback : public NumberList
 	{
 		if (!source.AccessFor(ci).HasPriv("BADWORDS") && source.HasPriv("botserv/administration"))
 			this->override = true;
+		bw = ci->Require<BadWords>("badwords");
 	}
 
 	~BadwordsDelCallback()
@@ -37,12 +159,12 @@ class BadwordsDelCallback : public NumberList
 
 	void HandleNumber(unsigned Number) anope_override
 	{
-		if (!Number || Number > ci->GetBadWordCount())
+		if (!bw || !Number || Number > bw->GetBadWordCount())
 			return;
 
-		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, c, ci) << "DEL " << ci->GetBadWord(Number - 1)->word;
+		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, c, ci) << "DEL " << bw->GetBadWord(Number - 1)->word;
 		++deleted;
-		ci->EraseBadWord(Number - 1);
+		bw->EraseBadWord(Number - 1);
 	}
 };
 
@@ -54,10 +176,11 @@ class CommandBSBadwords : public Command
 		bool override = !source.AccessFor(ci).HasPriv("BADWORDS");
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "LIST";
 		ListFormatter list;
+		BadWords *bw = ci->GetExt<BadWords>("badwords");
 
 		list.AddColumn("Number").AddColumn("Word").AddColumn("Type");
 
-		if (!ci->GetBadWordCount())
+		if (!bw || !bw->GetBadWordCount())
 		{
 			source.Reply(_("%s bad words list is empty."), ci->name.c_str());
 			return;
@@ -68,40 +191,41 @@ class CommandBSBadwords : public Command
 			{
 				ListFormatter &list;
 				ChannelInfo *ci;
+				BadWords *bw;
 			 public:
-				BadwordsListCallback(ListFormatter &_list, ChannelInfo *_ci, const Anope::string &numlist) : NumberList(numlist, false), list(_list), ci(_ci)
+				BadwordsListCallback(ListFormatter &_list, ChannelInfo *_ci, BadWords *_bw, const Anope::string &numlist) : NumberList(numlist, false), list(_list), ci(_ci), bw(_bw)
 				{
 				}
 
 				void HandleNumber(unsigned Number) anope_override
 				{
-					if (!Number || Number > ci->GetBadWordCount())
+					if (!Number || Number > bw->GetBadWordCount())
 						return;
 
-					const BadWord *bw = ci->GetBadWord(Number - 1);
+					const BadWord *b = bw->GetBadWord(Number - 1);
 					ListFormatter::ListEntry entry;
 					entry["Number"] = stringify(Number);
-					entry["Word"] = bw->word;
-					entry["Type"] = bw->type == BW_SINGLE ? "(SINGLE)" : (bw->type == BW_START ? "(START)" : (bw->type == BW_END ? "(END)" : ""));
+					entry["Word"] = b->word;
+					entry["Type"] = b->type == BW_SINGLE ? "(SINGLE)" : (b->type == BW_START ? "(START)" : (b->type == BW_END ? "(END)" : ""));
 					this->list.AddEntry(entry);
 				}
 			}
-			nl_list(list, ci, word);
+			nl_list(list, ci, bw, word);
 			nl_list.Process();
 		}
 		else
 		{
-			for (unsigned i = 0, end = ci->GetBadWordCount(); i < end; ++i)
+			for (unsigned i = 0, end = bw->GetBadWordCount(); i < end; ++i)
 			{
-				const BadWord *bw = ci->GetBadWord(i);
+				const BadWord *b = bw->GetBadWord(i);
 
-				if (!word.empty() && !Anope::Match(bw->word, word))
+				if (!word.empty() && !Anope::Match(b->word, word))
 					continue;
 
 				ListFormatter::ListEntry entry;
 				entry["Number"] = stringify(i + 1);
-				entry["Word"] = bw->word;
-				entry["Type"] = bw->type == BW_SINGLE ? "(SINGLE)" : (bw->type == BW_START ? "(START)" : (bw->type == BW_END ? "(END)" : ""));
+				entry["Word"] = b->word;
+				entry["Type"] = b->type == BW_SINGLE ? "(SINGLE)" : (b->type == BW_START ? "(START)" : (b->type == BW_END ? "(END)" : ""));
 				list.AddEntry(entry);
 			}
 		}
@@ -127,6 +251,7 @@ class CommandBSBadwords : public Command
 		size_t pos = word.rfind(' ');
 		BadWordType bwtype = BW_ANY;
 		Anope::string realword = word;
+		BadWords *badwords = ci->Require<BadWords>("badwords");
 
 		if (pos != Anope::string::npos)
 		{
@@ -144,7 +269,7 @@ class CommandBSBadwords : public Command
 		}
 
 		unsigned badwordsmax = Config->GetModule(this->module)->Get<unsigned>("badwordsmax");
-		if (ci->GetBadWordCount() >= badwordsmax)
+		if (badwords->GetBadWordCount() >= badwordsmax)
 		{
 			source.Reply(_("Sorry, you can only have %d bad words entries on a channel."), badwordsmax);
 			return;
@@ -152,9 +277,9 @@ class CommandBSBadwords : public Command
 
 		bool casesensitive = Config->GetModule("botserv")->Get<bool>("casesensitive");
 
-		for (unsigned i = 0, end = ci->GetBadWordCount(); i < end; ++i)
+		for (unsigned i = 0, end = badwords->GetBadWordCount(); i < end; ++i)
 		{
-			const BadWord *bw = ci->GetBadWord(i);
+			const BadWord *bw = badwords->GetBadWord(i);
 
 			if ((casesensitive && realword.equals_cs(bw->word)) || (!casesensitive && realword.equals_ci(bw->word)))
 			{
@@ -165,13 +290,21 @@ class CommandBSBadwords : public Command
 
 		bool override = !source.AccessFor(ci).HasPriv("BADWORDS");
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "ADD " << realword;
-		ci->AddBadWord(realword, bwtype);
+		badwords->AddBadWord(realword, bwtype);
 
 		source.Reply(_("\002%s\002 added to %s bad words list."), realword.c_str(), ci->name.c_str());
 	}
 
 	void DoDelete(CommandSource &source, ChannelInfo *ci, const Anope::string &word)
 	{
+		BadWords *badwords = ci->GetExt<BadWords>("badwords");
+
+		if (!badwords || !badwords->GetBadWordCount())
+		{
+			source.Reply(_("%s bad words list is empty."), ci->name.c_str());
+			return;
+		}
+
 		/* Special case: is it a number/list?  Only do search if it isn't. */
 		if (!word.empty() && isdigit(word[0]) && word.find_first_not_of("1234567890,-") == Anope::string::npos)
 		{
@@ -183,9 +316,9 @@ class CommandBSBadwords : public Command
 			unsigned i, end;
 			const BadWord *badword;
 
-			for (i = 0, end = ci->GetBadWordCount(); i < end; ++i)
+			for (i = 0, end = badwords->GetBadWordCount(); i < end; ++i)
 			{
-				badword = ci->GetBadWord(i);
+				badword = badwords->GetBadWord(i);
 
 				if (word.equals_ci(badword->word))
 					break;
@@ -202,10 +335,10 @@ class CommandBSBadwords : public Command
 
 			source.Reply(_("\002%s\002 deleted from %s bad words list."), badword->word.c_str(), ci->name.c_str());
 
-			ci->EraseBadWord(i);
+			badwords->EraseBadWord(i);
 		}
 
-		return;
+		badwords->Check();
 	}
 
 	void DoClear(CommandSource &source, ChannelInfo *ci)
@@ -213,7 +346,9 @@ class CommandBSBadwords : public Command
 		bool override = !source.AccessFor(ci).HasPriv("BADWORDS");
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "CLEAR";
 
-		ci->ClearBadWords();
+		BadWords *badwords = ci->GetExt<BadWords>("badwords");
+		if (badwords)
+			badwords->ClearBadWords();
 		source.Reply(_("Bad words list is now empty."));
 	}
 
@@ -309,10 +444,12 @@ class CommandBSBadwords : public Command
 class BSBadwords : public Module
 {
 	CommandBSBadwords commandbsbadwords;
+	ExtensibleItem<BadWordsImpl> badwords;
+	Serialize::Type badword_type;
 
  public:
 	BSBadwords(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		commandbsbadwords(this)
+		commandbsbadwords(this), badwords(this, "badwords"), badword_type("BadWord", BadWordImpl::Unserialize)
 	{
 	}
 };

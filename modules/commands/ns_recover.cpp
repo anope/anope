@@ -10,10 +10,11 @@
  */
 
 #include "module.h"
+#include "modules/ns_cert.h"
 
 static ServiceReference<NickServService> nickserv("NickServService", "NickServ");
 
-struct NSRecoverExtensibleInfo : ExtensibleItem, std::map<Anope::string, ChannelStatus> { };
+typedef std::map<Anope::string, ChannelStatus> NSRecoverInfo;
 
 class NSRecoverRequest : public IdentifyRequest
 {
@@ -50,7 +51,7 @@ class NSRecoverRequest : public IdentifyRequest
 		// same person that is executing the command, so kill them off (old GHOST command).
 		else if (u->Account() == na->nc)
 		{
-			if (!source.GetAccount() && na->nc->HasExt("SECURE"))
+			if (!source.GetAccount() && na->nc->HasExt("NS_SECURE"))
 			{
 				source.GetUser()->Login(u->Account());
 				Log(LOG_COMMAND, source, cmd) << "and was automatically identified to " << u->Account()->display;
@@ -60,11 +61,9 @@ class NSRecoverRequest : public IdentifyRequest
 			{
 				if (!u->chans.empty())
 				{
-					NSRecoverExtensibleInfo *ei = new NSRecoverExtensibleInfo;
+					NSRecoverInfo *ei = source.GetUser()->Extend<NSRecoverInfo>("recover");
 					for (User::ChanUserList::iterator it = u->chans.begin(), it_end = u->chans.end(); it != it_end; ++it)
 						(*ei)[it->first->name] = it->second->status;
-
-					source.GetUser()->Extend("ns_recover_info", ei);
 				}
 			}
 
@@ -83,7 +82,7 @@ class NSRecoverRequest : public IdentifyRequest
 		/* User is not identified or not identified to the same account as the person using this command */
 		else
 		{
-			if (!source.GetAccount() && na->nc->HasExt("SECURE"))
+			if (!source.GetAccount() && na->nc->HasExt("NS_SECURE"))
 			{
 				source.GetUser()->Login(na->nc); // Identify the user using the command if they arent identified
 				Log(LOG_COMMAND, source, cmd) << "and was automatically identified to " << na->nick << " (" << na->nc->display << ")";
@@ -161,9 +160,11 @@ class CommandNSRecover : public Command
 		bool ok = false;
 		if (source.GetAccount() == na->nc)
 			ok = true;
-		else if (!na->nc->HasExt("SECURE") && source.GetUser() && na->nc->IsOnAccess(source.GetUser()))
+		else if (!na->nc->HasExt("NS_SECURE") && source.GetUser() && na->nc->IsOnAccess(source.GetUser()))
 			ok = true;
-		else if (source.GetUser() && !source.GetUser()->fingerprint.empty() && na->nc->FindCert(source.GetUser()->fingerprint))
+
+		NSCertList *cl = na->nc->GetExt<NSCertList>("certificates");
+		if (source.GetUser() && !source.GetUser()->fingerprint.empty() && cl && cl->FindCert(source.GetUser()->fingerprint))
 			ok = true;
 
 		if (ok == false && !pass.empty())
@@ -200,10 +201,11 @@ class CommandNSRecover : public Command
 class NSRecover : public Module
 {
 	CommandNSRecover commandnsrecover;
+	PrimitiveExtensibleItem<NSRecoverInfo> recover;
 
  public:
 	NSRecover(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		commandnsrecover(this)
+		commandnsrecover(this), recover(this, "recover")
 	{
 
 		if (Config->GetBlock("options")->Get<bool>("nonicknameownership"))
@@ -211,34 +213,15 @@ class NSRecover : public Module
 
 	}
 
-	~NSRecover()
-	{
-		for (user_map::const_iterator it = UserListByNick.begin(); it != UserListByNick.end(); ++it)
-			it->second->Shrink("ns_recover_info");
-
-		OnShutdown();
-	}
-
-	void OnShutdown() anope_override
-	{
-		/* On shutdown, restart, or mod unload, remove all of our holds for nicks (svshold or qlines)
-		 * because some IRCds do not allow us to have these automatically expire
-		 */
-		for (nickalias_map::const_iterator it = NickAliasList->begin(); it != NickAliasList->end(); ++it)
-			nickserv->Release(it->second);
-	}
-
-	void OnRestart() anope_override { OnShutdown(); }
-
 	void OnUserNickChange(User *u, const Anope::string &oldnick) anope_override
 	{
 		if (Config->GetModule(this)->Get<bool>("restoreonrecover"))
 		{
-			NSRecoverExtensibleInfo *ei = u->GetExt<NSRecoverExtensibleInfo *>("ns_recover_info");
+			NSRecoverInfo *ei = recover.Get(u);
 			BotInfo *NickServ = Config->GetClient("NickServ");
 
 			if (ei != NULL && NickServ != NULL)
-				for (std::map<Anope::string, ChannelStatus>::iterator it = ei->begin(), it_end = ei->end(); it != it_end;)
+				for (NSRecoverInfo::iterator it = ei->begin(), it_end = ei->end(); it != it_end;)
 				{
 					Channel *c = Channel::Find(it->first);
 					const Anope::string &cname = it->first;
@@ -257,11 +240,11 @@ class NSRecover : public Module
 	{
 		if (Config->GetModule(this)->Get<bool>("restoreonrecover"))
 		{
-			NSRecoverExtensibleInfo *ei = u->GetExt<NSRecoverExtensibleInfo *>("ns_recover_info");
+			NSRecoverInfo *ei = recover.Get(u);
 
 			if (ei != NULL)
 			{
-				std::map<Anope::string, ChannelStatus>::iterator it = ei->find(c->name);
+				NSRecoverInfo::iterator it = ei->find(c->name);
 				if (it != ei->end())
 				{
 					for (size_t i = 0; i < it->second.Modes().length(); ++i)
@@ -269,7 +252,7 @@ class NSRecover : public Module
 
 					ei->erase(it);
 					if (ei->empty())
-						u->Shrink("ns_recover_info");
+						recover.Unset(u);
 				}
 			}
 		}

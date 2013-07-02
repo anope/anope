@@ -30,9 +30,8 @@ std::list<Serializable *> *Serializable::SerializableItems;
 void Serialize::RegisterTypes()
 {
 	static Type nc("NickCore", NickCore::Unserialize), na("NickAlias", NickAlias::Unserialize), bi("BotInfo", BotInfo::Unserialize),
-		ci("ChannelInfo", ChannelInfo::Unserialize), access("ChanAccess", ChanAccess::Unserialize), logsetting("LogSetting", LogSetting::Unserialize),
-		modelock("ModeLock", ModeLock::Unserialize), akick("AutoKick", AutoKick::Unserialize), badword("BadWord", BadWord::Unserialize),
-		memo("Memo", Memo::Unserialize), xline("XLine", XLine::Unserialize);
+		ci("ChannelInfo", ChannelInfo::Unserialize), access("ChanAccess", ChanAccess::Unserialize),
+		akick("AutoKick", AutoKick::Unserialize), memo("Memo", Memo::Unserialize), xline("XLine", XLine::Unserialize);
 }
 
 void Serialize::CheckTypes()

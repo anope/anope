@@ -25,27 +25,27 @@ class CommandMSSet : public Command
 
 		if (param.equals_ci("ON"))
 		{
-			nc->ExtendMetadata("MEMO_SIGNON");
-			nc->ExtendMetadata("MEMO_RECEIVE");
+			nc->Extend<bool>("MEMO_SIGNON");
+			nc->Extend<bool>("MEMO_RECEIVE");
 			source.Reply(_("%s will now notify you of memos when you log on and when they are sent to you."), MemoServ->nick.c_str());
 		}
 		else if (param.equals_ci("LOGON"))
 		{
-			nc->ExtendMetadata("MEMO_SIGNON");
-			nc->Shrink("MEMO_RECEIVE");
+			nc->Extend<bool>("MEMO_SIGNON");
+			nc->Shrink<bool>("MEMO_RECEIVE");
 			source.Reply(_("%s will now notify you of memos when you log on or unset /AWAY."), MemoServ->nick.c_str());
 		}
 		else if (param.equals_ci("NEW"))
 		{
-			nc->Shrink("MEMO_SIGNON");
-			nc->ExtendMetadata("MEMO_RECEIVE");
+			nc->Shrink<bool>("MEMO_SIGNON");
+			nc->Extend<bool>("MEMO_RECEIVE");
 			source.Reply(_("%s will now notify you of memos when they are sent to you."), MemoServ->nick.c_str());
 		}
 		else if (param.equals_ci("MAIL"))
 		{
 			if (!nc->email.empty())
 			{
-				nc->ExtendMetadata("MEMO_MAIL");
+				nc->Extend<bool>("MEMO_MAIL");
 				source.Reply(_("You will now be informed about new memos via email."));
 			}
 			else
@@ -53,20 +53,18 @@ class CommandMSSet : public Command
 		}
 		else if (param.equals_ci("NOMAIL"))
 		{
-			nc->Shrink("MEMO_MAIL");
+			nc->Shrink<bool>("MEMO_MAIL");
 			source.Reply(_("You will no longer be informed via email."));
 		}
 		else if (param.equals_ci("OFF"))
 		{
-			nc->Shrink("MEMO_SIGNON");
-			nc->Shrink("MEMO_RECEIVE");
-			nc->Shrink("MEMO_MAIL");
+			nc->Shrink<bool>("MEMO_SIGNON");
+			nc->Shrink<bool>("MEMO_RECEIVE");
+			nc->Shrink<bool>("MEMO_MAIL");
 			source.Reply(_("%s will not send you any notification of memos."), MemoServ->nick.c_str());
 		}
 		else
 			this->OnSyntaxError(source, "");
-
-		return;
 	}
 
 	void DoLimit(CommandSource &source, const std::vector<Anope::string> &params, MemoInfo *mi)
@@ -125,16 +123,16 @@ class CommandMSSet : public Command
 			if (!chan.empty())
 			{
 				if (!p2.empty())
-					ci->ExtendMetadata("MEMO_HARDMAX");
+					ci->Extend<bool>("MEMO_HARDMAX");
 				else
-					ci->Shrink("MEMO_HARDMAX");
+					ci->Shrink<bool>("MEMO_HARDMAX");
 			}
 			else
 			{
 				if (!p2.empty())
-					nc->ExtendMetadata("MEMO_HARDMAX");
+					nc->Extend<bool>("MEMO_HARDMAX");
 				else
-					nc->Shrink("MEMO_HARDMAX");
+					nc->Shrink<bool>("MEMO_HARDMAX");
 			}
 			limit = -1;
 			try
@@ -301,10 +299,12 @@ class CommandMSSet : public Command
 class MSSet : public Module
 {
 	CommandMSSet commandmsset;
+	PrimitiveExtensibleItem<bool> memo_signon, memo_receive, memo_mail, memo_hardmax;
 
  public:
 	MSSet(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		commandmsset(this)
+		commandmsset(this), memo_signon(this, "MEMO_SIGNON"), memo_receive(this, "MEMO_RECEIVE"), memo_mail(this, "MEMO_MAIL"),
+		memo_hardmax(this, "MEMO_HARDMAX")
 	{
 
 	}

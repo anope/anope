@@ -36,16 +36,6 @@ class CommandBSInfo : public Command
 			buffers.push_back(buf);
 	}
 
-	void CheckOptStr(Anope::string &buf, const Anope::string &flag, const char *option, Extensible *flags, const NickCore *nc)
-	{
-		if (flags->HasExt(flag))
-		{
-			if (!buf.empty())
-				buf += ", ";
-			buf += Language::Translate(nc, option);
-		}
-	}
-
  public:
 	CommandBSInfo(Module *creator) : Command(creator, "botserv/info", 1, 1)
 	{
@@ -57,8 +47,8 @@ class CommandBSInfo : public Command
 	{
 		const Anope::string &query = params[0];
 
-		const BotInfo *bi = BotInfo::Find(query, true);
-		ChannelInfo *ci;
+		BotInfo *bi = BotInfo::Find(query, true);
+		ChannelInfo *ci = ChannelInfo::Find(query);
 		InfoFormatter info(source.nc);
 
 		if (bi)
@@ -69,6 +59,8 @@ class CommandBSInfo : public Command
 			info[_("Created")] = Anope::strftime(bi->created);
 			info[_("Options")] = bi->oper_only ? _("Private") : _("None");
 			info[_("Used on")] = stringify(bi->GetChannelCount()) + " channel(s)";
+
+			FOREACH_MOD(OnBotInfo, (source, bi, ci, info));
 
 			std::vector<Anope::string> replies;
 			info.Process(replies);
@@ -85,7 +77,7 @@ class CommandBSInfo : public Command
 			}
 
 		}
-		else if ((ci = ChannelInfo::Find(query)))
+		else if (ci)
 		{
 			if (!source.AccessFor(ci).HasPriv("INFO") && !source.HasPriv("botserv/administration"))
 			{
@@ -99,114 +91,7 @@ class CommandBSInfo : public Command
 			Anope::string enabled = Language::Translate(source.nc, _("Enabled"));
 			Anope::string disabled = Language::Translate(source.nc, _("Disabled"));
 
-			if (ci->HasExt("BS_KICK_BADWORDS"))
-			{
-				if (ci->ttb[TTB_BADWORDS])
-					info[_("Bad words kicker")] = Anope::printf("%s (%d kick(s) to ban)", enabled.c_str(), ci->ttb[TTB_BADWORDS]);
-				else
-					info[_("Bad words kicker")] = enabled;
-			}
-			else
-				info[_("Bad words kicker")] = disabled;
-
-			if (ci->HasExt("BS_KICK_BOLDS"))
-			{
-				if (ci->ttb[TTB_BOLDS])
-					info[_("Bolds kicker")] = Anope::printf("%s (%d kick(s) to ban)", enabled.c_str(), ci->ttb[TTB_BOLDS]);
-				else
-					info[_("Bolds kicker")] = enabled;
-			}
-			else
-				info[_("Bolds kicker")] = disabled;
-
-			if (ci->HasExt("BS_KICK_CAPS"))
-			{
-				if (ci->ttb[TTB_CAPS])
-					info[_("Caps kicker")] = Anope::printf(_("%s (%d kick(s) to ban; minimum %d/%d%%"), enabled.c_str(), ci->ttb[TTB_CAPS], ci->capsmin, ci->capspercent);
-				else
-					info[_("Caps kicker")] = Anope::printf(_("%s (minimum %d/%d%%)"), enabled.c_str(), ci->capsmin, ci->capspercent);
-			}
-			else
-				info[_("Caps kicker")] = disabled;
-
-			if (ci->HasExt("BS_KICK_COLORS"))
-			{
-				if (ci->ttb[TTB_COLORS])
-					info[_("Colors kicker")] = Anope::printf(_("%s (%d kick(s) to ban)"), enabled.c_str(), ci->ttb[TTB_COLORS]);
-				else
-					info[_("Colors kicker")] = enabled;
-			}
-			else
-				info[_("Colors kicker")] = disabled;
-
-			if (ci->HasExt("BS_KICK_FLOOD"))
-			{
-				if (ci->ttb[TTB_FLOOD])
-					info[_("Flood kicker")] = Anope::printf(_("%s (%d kick(s) to ban; %d lines in %ds"), enabled.c_str(), ci->ttb[TTB_FLOOD], ci->floodlines, ci->floodsecs);
-				else
-					info[_("Flood kicker")] = Anope::printf(_("%s (%d lines in %ds)"), enabled.c_str(), ci->floodlines, ci->floodsecs);
-			}
-			else
-				info[_("Flood kicker")] = disabled;
-
-			if (ci->HasExt("BS_KICK_REPEAT"))
-			{
-				if (ci->ttb[TTB_REPEAT])
-					info[_("Repeat kicker")] = Anope::printf(_("%s (%d kick(s) to ban; %d times)"), enabled.c_str(), ci->ttb[TTB_REPEAT], ci->repeattimes);
-				else
-					info[_("Repeat kicker")] = Anope::printf(_("%s (%d times)"), enabled.c_str(), ci->repeattimes);
-			}
-			else
-				info[_("Repeat kicker")] = disabled;
-
-			if (ci->HasExt("BS_KICK_REVERSES"))
-			{
-				if (ci->ttb[TTB_REVERSES])
-					info[_("Reverses kicker")] = Anope::printf(_("%s (%d kick(s) to ban)"), enabled.c_str(), ci->ttb[TTB_REVERSES]);
-				else
-					info[_("Reverses kicker")] = enabled;
-			}
-			else
-				info[_("Reverses kicker")] = disabled;
-
-			if (ci->HasExt("BS_KICK_UNDERLINES"))
-			{
-				if (ci->ttb[TTB_UNDERLINES])
-					info[_("Underlines kicker")] = Anope::printf(_("%s (%d kick(s) to ban)"), enabled.c_str(), ci->ttb[TTB_UNDERLINES]);
-				else
-					info[_("Underlines kicker")] = enabled;
-			}
-			else
-				info[_("Underlines kicker")] = disabled;
-
-                        if (ci->HasExt("BS_KICK_ITALICS"))
-			{
-				if (ci->ttb[TTB_ITALICS])
-					info[_("Italics kicker")] = Anope::printf(_("%s (%d kick(s) to ban)"), enabled.c_str(), ci->ttb[TTB_ITALICS]);
-				else
-					info[_("Italics kicker")] = enabled;
-			}
-			else
-				info[_("Italics kicker")] = disabled;
-
-			if (ci->HasExt("BS_KICK_AMSGS"))
-			{
-				if (ci->ttb[TTB_AMSGS])
-					info[_("AMSG kicker")] = Anope::printf(_("%s (%d kick(s) to ban)"), enabled.c_str(), ci->ttb[TTB_AMSGS]);
-				else
-					info[_("AMSG kicker")] = enabled;
-			}
-			else
-				info[_("AMSG kicker")] = disabled;
-
-			Anope::string flags;
-			CheckOptStr(flags, "BS_DONTKICKOPS", _("Ops protection"), ci, source.nc);
-			CheckOptStr(flags, "BS_DONTKICKVOICES", _("Voices protection"), ci, source.nc);
-			CheckOptStr(flags, "BS_FANTASY", _("Fantasy"), ci, source.nc);
-			CheckOptStr(flags, "BS_GREET", _("Greet"), ci, source.nc);
-			CheckOptStr(flags, "BS_NOBOT", _("No bot"), ci, source.nc);
-
-			info[_("Options")] = flags.empty() ? _("None") : flags;
+			FOREACH_MOD(OnBotInfo, (source, bi, ci, info));
 
 			std::vector<Anope::string> replies;
 			info.Process(replies);

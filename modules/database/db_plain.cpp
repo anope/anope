@@ -10,6 +10,11 @@
 
 #include "module.h"
 #include "modules/os_session.h"
+#include "modules/cs_suspend.h"
+#include "modules/bs_kick.h"
+#include "modules/cs_log.h"
+#include "modules/cs_mode.h"
+#include "modules/bs_badwords.h"
 
 Anope::string DatabaseFile;
 Anope::string BackupFile;
@@ -71,15 +76,13 @@ EventReturn OnDatabaseReadMetadata(NickCore *nc, const Anope::string &key, const
 		else if (key.equals_ci("EMAIL"))
 			nc->email = params[0];
 		else if (key.equals_ci("GREET"))
-			nc->greet = params[0];
+			nc->Extend<Anope::string>("greet", params[0]);
 		else if (key.equals_ci("ACCESS"))
 			nc->AddAccess(params[0]);
-		else if (key.equals_ci("CERT"))
-			nc->AddCert(params[0]);
 		else if (key.equals_ci("FLAGS"))
 		{
 			for (unsigned i = 0; i < params.size(); ++i)
-				nc->ExtendMetadata(params[i]);
+				nc->Extend<bool>(params[i]);
 		}
 		else if (key.equals_ci("MI"))
 		{
@@ -118,7 +121,7 @@ EventReturn OnDatabaseReadMetadata(NickAlias *na, const Anope::string &key, cons
 		na->last_quit = params[0];
 	else if (key.equals_ci("FLAGS"))
 		for (unsigned i = 0; i < params.size(); ++i)
-			na->ExtendMetadata(params[i]);
+			na->Extend<bool>(params[i]);
 	else if (key.equals_ci("VHOST"))
 		na->SetVhost(params.size() > 3 ? params[3] : "", params[2], params[0], params[1].is_pos_number_only() ? convertTo<time_t>(params[1]) : 0);
 	return EVENT_CONTINUE;
@@ -131,6 +134,7 @@ EventReturn OnDatabaseReadMetadata(BotInfo *bi, const Anope::string &key, const 
 
 EventReturn OnDatabaseReadMetadata(ChannelInfo *ci, const Anope::string &key, const std::vector<Anope::string> &params)
 {
+	KickerData *kd = ci->GetExt<KickerData>("kickerdata");
 	try
 	{
 		if (key.equals_ci("BANTYPE"))
@@ -153,7 +157,7 @@ EventReturn OnDatabaseReadMetadata(ChannelInfo *ci, const Anope::string &key, co
 		}
 		else if (key.equals_ci("FLAGS"))
 			for (unsigned i = 0; i < params.size(); ++i)
-				ci->ExtendMetadata(params[i]);
+				ci->Extend<bool>(params[i]);
 		else if (key.equals_ci("DESC"))
 			ci->desc = params[0];
 		else if (key.equals_ci("TOPIC"))
@@ -164,8 +168,9 @@ EventReturn OnDatabaseReadMetadata(ChannelInfo *ci, const Anope::string &key, co
 		}
 		else if (key.equals_ci("SUSPEND"))
 		{
-			ci->ExtendMetadata("suspend:by", params[0]);
-			ci->ExtendMetadata("suspend:reason", params[1]);
+			CSSuspendInfo *si = ci->Extend<CSSuspendInfo>("suspend");
+			si->by = params[0];
+			si->reason = params[1];
 		}
 		else if (key.equals_ci("ACCESS")) // Older access system, from Anope 1.9.4.
 		{
@@ -220,18 +225,22 @@ EventReturn OnDatabaseReadMetadata(ChannelInfo *ci, const Anope::string &key, co
 		}
 		else if (key.equals_ci("LOG"))
 		{
-			LogSetting *l = new LogSetting();
+			LogSettings *ls = ci->Require<LogSettings>("logsettings");
+			if (ls)
+			{
+				LogSetting *l = ls->Create();
 
-			l->ci = ci;
-			l->service_name = params[0];
-			l->command_service = params[1];
-			l->command_name = params[2];
-			l->method = params[3];
-			l->creator = params[4];
-			l->created = params[5].is_pos_number_only() ? convertTo<time_t>(params[5]) : Anope::CurTime;
-			l->extra = params.size() > 6 ? params[6] : "";
+				l->chan = ci->name;
+				l->service_name = params[0];
+				l->command_service = params[1];
+				l->command_name = params[2];
+				l->method = params[3];
+				l->creator = params[4];
+				l->created = params[5].is_pos_number_only() ? convertTo<time_t>(params[5]) : Anope::CurTime;
+				l->extra = params.size() > 6 ? params[6] : "";
 
-			ci->log_settings->push_back(l);
+				(*ls)->push_back(l);
+			}
 		}
 		else if (key.equals_ci("MLOCK"))
 		{
@@ -240,7 +249,9 @@ EventReturn OnDatabaseReadMetadata(ChannelInfo *ci, const Anope::string &key, co
 			Anope::string setter = params[2];
 			time_t mcreated = params[3].is_pos_number_only() ? convertTo<time_t>(params[3]) : Anope::CurTime;
 			Anope::string param = params.size() > 4 ? params[4] : "";
-			ci->mode_locks->insert(std::make_pair(mode_name, new ModeLock(ci, set, mode_name, param, setter, mcreated)));
+			ModeLocks *ml = ci->Require<ModeLocks>("modelocks");
+			if (ml)
+				ml->SetMLock(ModeManager::FindChannelModeByName(mode_name), set, param, setter, mcreated);
 		}
 		else if (key.equals_ci("MI"))
 		{
@@ -265,44 +276,44 @@ EventReturn OnDatabaseReadMetadata(ChannelInfo *ci, const Anope::string &key, co
 				ci->bi = BotInfo::Find(params[1]);
 			else if (params[0].equals_ci("FLAGS"))
 				for (unsigned i = 0; i < params.size(); ++i)
-					ci->ExtendMetadata(params[i]);
+					ci->Extend<bool>(params[i]);
 			else if (params[0].equals_ci("TTB"))
 			{
-				for (unsigned j = 1, end = params.size(); j < end; j += 2)
+				for (unsigned j = 1, end = params.size(); j < end &&& kd; j += 2)
 				{
 					if (params[j].equals_ci("BOLDS"))
-						ci->ttb[0] = params[j + 1].is_pos_number_only() ? convertTo<int16_t>(params[j + 1]) : 0;
+						kd->ttb[0] = params[j + 1].is_pos_number_only() ? convertTo<int16_t>(params[j + 1]) : 0;
 					else if (params[j].equals_ci("COLORS"))
-						ci->ttb[1] = params[j + 1].is_pos_number_only() ? convertTo<int16_t>(params[j + 1]) : 0;
+						kd->ttb[1] = params[j + 1].is_pos_number_only() ? convertTo<int16_t>(params[j + 1]) : 0;
 					else if (params[j].equals_ci("REVERSES"))
-						ci->ttb[2] = params[j + 1].is_pos_number_only() ? convertTo<int16_t>(params[j + 1]) : 0;
+						kd->ttb[2] = params[j + 1].is_pos_number_only() ? convertTo<int16_t>(params[j + 1]) : 0;
 					else if (params[j].equals_ci("UNDERLINES"))
-						ci->ttb[3] = params[j + 1].is_pos_number_only() ? convertTo<int16_t>(params[j + 1]) : 0;
+						kd->ttb[3] = params[j + 1].is_pos_number_only() ? convertTo<int16_t>(params[j + 1]) : 0;
 					else if (params[j].equals_ci("BADWORDS"))
-						ci->ttb[4] = params[j + 1].is_pos_number_only() ? convertTo<int16_t>(params[j + 1]) : 0;
+						kd->ttb[4] = params[j + 1].is_pos_number_only() ? convertTo<int16_t>(params[j + 1]) : 0;
 					else if (params[j].equals_ci("CAPS"))
-						ci->ttb[5] = params[j + 1].is_pos_number_only() ? convertTo<int16_t>(params[j + 1]) : 0;
+						kd->ttb[5] = params[j + 1].is_pos_number_only() ? convertTo<int16_t>(params[j + 1]) : 0;
 					else if (params[j].equals_ci("FLOOD"))
-						ci->ttb[6] = params[j + 1].is_pos_number_only() ? convertTo<int16_t>(params[j + 1]) : 0;
+						kd->ttb[6] = params[j + 1].is_pos_number_only() ? convertTo<int16_t>(params[j + 1]) : 0;
 					else if (params[j].equals_ci("REPEAT"))
-						ci->ttb[7] = params[j + 1].is_pos_number_only() ? convertTo<int16_t>(params[j + 1]) : 0;
+						kd->ttb[7] = params[j + 1].is_pos_number_only() ? convertTo<int16_t>(params[j + 1]) : 0;
 					else if (params[j].equals_ci("ITALICS"))
-						ci->ttb[8] = params[j + 1].is_pos_number_only() ? convertTo<int16_t>(params[j + 1]) : 0;
+						kd->ttb[8] = params[j + 1].is_pos_number_only() ? convertTo<int16_t>(params[j + 1]) : 0;
 					else if (params[j].equals_ci("AMSGS"))
-						ci->ttb[9] = params[j + 1].is_pos_number_only() ? convertTo<int16_t>(params[j + 1]) : 0;
+						kd->ttb[9] = params[j + 1].is_pos_number_only() ? convertTo<int16_t>(params[j + 1]) : 0;
 				}
 			}
-			else if (params[0].equals_ci("CAPSMIN"))
-				ci->capsmin = params[1].is_pos_number_only() ? convertTo<int16_t>(params[1]) : 0;
-			else if (params[0].equals_ci("CAPSPERCENT"))
-				ci->capspercent = params[1].is_pos_number_only() ? convertTo<int16_t>(params[1]) : 0;
-			else if (params[0].equals_ci("FLOODLINES"))
-				ci->floodlines = params[1].is_pos_number_only() ? convertTo<int16_t>(params[1]) : 0;
-			else if (params[0].equals_ci("FLOODSECS"))
-				ci->floodsecs = params[1].is_pos_number_only() ? convertTo<int16_t>(params[1]) : 0;
-			else if (params[0].equals_ci("REPEATTIMES"))
-				ci->repeattimes = params[1].is_pos_number_only() ? convertTo<int16_t>(params[1]) : 0;
-			else if (params[0].equals_ci("BADWORD"))
+			else if (kd && params[0].equals_ci("CAPSMIN"))
+				kd->capsmin = params[1].is_pos_number_only() ? convertTo<int16_t>(params[1]) : 0;
+			else if (kd && params[0].equals_ci("CAPSPERCENT"))
+				kd->capspercent = params[1].is_pos_number_only() ? convertTo<int16_t>(params[1]) : 0;
+			else if (kd && params[0].equals_ci("FLOODLINES"))
+				kd->floodlines = params[1].is_pos_number_only() ? convertTo<int16_t>(params[1]) : 0;
+			else if (kd && params[0].equals_ci("FLOODSECS"))
+				kd->floodsecs = params[1].is_pos_number_only() ? convertTo<int16_t>(params[1]) : 0;
+			else if (kd && params[0].equals_ci("REPEATTIMES"))
+				kd->repeattimes = params[1].is_pos_number_only() ? convertTo<int16_t>(params[1]) : 0;
+			else if (kd && params[0].equals_ci("BADWORD"))
 			{
 				BadWordType Type;
 				if (params[1].equals_ci("SINGLE"))
@@ -313,7 +324,9 @@ EventReturn OnDatabaseReadMetadata(ChannelInfo *ci, const Anope::string &key, co
 					Type = BW_END;
 				else
 					Type = BW_ANY;
-				ci->AddBadWord(params[2], Type);
+				BadWords *bw = ci->Require<BadWords>("badwords");
+				if (bw)
+					bw->AddBadWord(params[2], Type);
 			}
 		}
 	}
@@ -467,11 +480,6 @@ static void ReadDatabase(Module *m = NULL)
 static void LoadNickCore(const std::vector<Anope::string> &params)
 {
 	NickCore *nc = new NickCore(params[0]);
-	/* Clear default flags */
-	std::deque<Anope::string> list;
-	nc->GetExtList(list);
-	for (unsigned i = 0; i < list.size(); ++i)
-		nc->Shrink(list[i]);
 
 	nc->pass = params.size() > 1 ? params[1] : "";
 
@@ -512,13 +520,6 @@ static void LoadBotInfo(const std::vector<Anope::string> &params)
 static void LoadChanInfo(const std::vector<Anope::string> &params)
 {
 	ChannelInfo *ci = new ChannelInfo(params[0]);
-	/* CLear default mlock */
-	ci->ClearMLock();
-	/* Remove default channel flags */
-	std::deque<Anope::string> list;
-	ci->GetExtList(list);
-	for (unsigned i = 0; i < list.size(); ++i)
-		ci->Shrink(list[i]);
 
 	ci->time_registered = params[1].is_pos_number_only() ? convertTo<time_t>(params[1]) : 0;
 
@@ -644,230 +645,6 @@ class DBPlain : public Module
 		ReadDatabase();
 
 		return EVENT_STOP;
-	}
-
-
-	void OnSaveDatabase() anope_override
-	{
-		BackupDatabase();
-
-		db_buffer << "VER 2" << endl;
-
-		for (nickcore_map::const_iterator nit = NickCoreList->begin(), nit_end = NickCoreList->end(); nit != nit_end; ++nit)
-		{
-			const NickCore *nc = nit->second;
-
-			db_buffer << "NC " << nc->display << " " << nc->pass << endl;
-
-			db_buffer << "MD MEMOMAX " << nc->memos.memomax << endl;
-
-			if (!nc->language.empty())
-				db_buffer << "MD LANGUAGE " << nc->language << endl;
-			if (!nc->email.empty())
-				db_buffer << "MD EMAIL " << nc->email << endl;
-			if (!nc->greet.empty())
-				db_buffer << "MD GREET :" << nc->greet << endl;
-
-			if (!nc->access.empty())
-			{
-				for (std::vector<Anope::string>::const_iterator it = nc->access.begin(), it_end = nc->access.end(); it != it_end; ++it)
-					db_buffer << "MD ACCESS " << *it << endl;
-			}
-			if (!nc->cert.empty())
-			{
-				for (std::vector<Anope::string>::const_iterator it = nc->cert.begin(), it_end = nc->cert.end(); it != it_end; ++it)
-					db_buffer << "MD CERT " << *it << endl;
-			}
-			db_buffer << "MD FLAGS ";
-			std::deque<Anope::string> list;
-			nc->GetExtList(list);
-			for (unsigned i = 0; i < list.size(); ++i)
-				db_buffer << list[i] << " ";
-			db_buffer << std::endl;
-			const MemoInfo *mi = &nc->memos;
-			for (unsigned k = 0, end = mi->memos->size(); k < end; ++k)
-			{
-				const Memo *m = mi->GetMemo(k);
-				db_buffer << "MD MI " << m->time << " " << m->sender;
-				if (m->unread)
-					db_buffer << " UNREAD";
-				if (m->receipt)
-					db_buffer << " RECEIPT";
-				db_buffer << " :" << m->text << endl;
-			}
-			for (unsigned k = 0, end = mi->ignores.size(); k < end; ++k)
-				db_buffer << "MD MIG " << Anope::string(mi->ignores[k]) << endl;
-			//FOREACH_MOD(OnDatabaseWriteMetadata, (WriteMetadata, nc));
-		}
-
-		for (nickalias_map::const_iterator it = NickAliasList->begin(), it_end = NickAliasList->end(); it != it_end; ++it)
-		{
-			const NickAlias *na = it->second;
-
-			db_buffer << "NA " << na->nc->display << " " << na->nick << " " << na->time_registered << " " << na->last_seen << endl;
-			if (!na->last_usermask.empty())
-				db_buffer << "MD LAST_USERMASK " << na->last_usermask << endl;
-			if (!na->last_realhost.empty())
-				db_buffer << "MD LAST_REALHOST " << na->last_realhost << endl;
-			if (!na->last_realname.empty())
-				db_buffer << "MD LAST_REALNAME :" << na->last_realname << endl;
-			if (!na->last_quit.empty())
-				db_buffer << "MD LAST_QUIT :" << na->last_quit << endl;
-			db_buffer << "MD FLAGS ";
-			std::deque<Anope::string> list;
-			na->GetExtList(list);
-			for (unsigned i = 0; i < list.size(); ++i)
-				db_buffer << list[i] << " ";
-			db_buffer << std::endl;
-			if (na->HasVhost())
-				db_buffer << "MD VHOST " << na->GetVhostCreator() << " " << na->GetVhostCreated() << " " << na->GetVhostHost() << " :" << na->GetVhostIdent() << endl;
-
-			//FOREACH_MOD(OnDatabaseWriteMetadata, (WriteMetadata, na));
-		}
-
-		for (botinfo_map::const_iterator it = BotListByNick->begin(), it_end = BotListByNick->end(); it != it_end; ++it)
-		{
-			BotInfo *bi = it->second;
-
-			if (bi->HasExt("CONF"))
-				continue;
-
-			db_buffer << "BI " << bi->nick << " " << bi->GetIdent() << " " << bi->host << " " << bi->created << " " << bi->GetChannelCount() << " :" << bi->realname << endl;
-			db_buffer << "MD FLAGS ";
-			std::deque<Anope::string> list;
-			bi->GetExtList(list);
-			for (unsigned i = 0; i < list.size(); ++i)
-				db_buffer << list[i] << " ";
-			db_buffer << std::endl;
-		}
-
-		for (registered_channel_map::const_iterator cit = RegisteredChannelList->begin(), cit_end = RegisteredChannelList->end(); cit != cit_end; ++cit)
-		{
-			const ChannelInfo *ci = cit->second;
-
-			db_buffer << "CH " << ci->name << " " << ci->time_registered << " " << ci->last_used << endl;
-			db_buffer << "MD BANTYPE " << ci->bantype << endl;
-			db_buffer << "MD MEMOMAX " << ci->memos.memomax << endl;
-			if (ci->GetFounder())
-				db_buffer << "MD FOUNDER " << ci->GetFounder()->display << endl;
-			if (ci->GetSuccessor())
-				db_buffer << "MD SUCCESSOR " << ci->GetSuccessor()->display << endl;
-			if (!ci->desc.empty())
-				db_buffer << "MD DESC :" << ci->desc << endl;
-			if (!ci->last_topic.empty())
-				db_buffer << "MD TOPIC " << ci->last_topic_setter << " " << ci->last_topic_time << " :" << ci->last_topic << endl;
-			db_buffer << "MD LEVELS";
-			const std::vector<Privilege> &privs = PrivilegeManager::GetPrivileges();
-			for (unsigned i = 0; i < privs.size(); ++i)
-			{
-				const Privilege &p = privs[i];
-				db_buffer << p.name << " " << ci->GetLevel(p.name);
-			}
-			db_buffer << endl;
-			std::deque<Anope::string> list;
-			ci->GetExtList(list);
-			for (unsigned i = 0; i < list.size(); ++i)
-				db_buffer << list[i];
-			db_buffer << std::endl;
-			if (ci->HasExt("SUSPENDED"))
-			{
-				Anope::string *by = ci->GetExt<ExtensibleItemClass<Anope::string> *>("suspend_by"), *reason = ci->GetExt<ExtensibleItemClass<Anope::string> *>("suspend_reason");
-				if (by && reason)
-					db_buffer << "MD SUSPEND " << *by << " :" << *reason << endl;
-			}
-			for (unsigned k = 0, end = ci->GetAccessCount(); k < end; ++k)
-			{
-				const ChanAccess *access = ci->GetAccess(k);
-				db_buffer << "MD ACCESS2 " << access->provider->name << " " << access->mask << " " << access->AccessSerialize() << " " << access->last_seen << " " << access->creator << " " << access->created << endl;
-			}
-			for (unsigned k = 0, end = ci->GetAkickCount(); k < end; ++k)
-			{
-				db_buffer << "MD AKICK 0 " << (ci->GetAkick(k)->nc ? "NICK " : "MASK ") <<
-					(ci->GetAkick(k)->nc ? ci->GetAkick(k)->nc->display : ci->GetAkick(k)->mask) << " " << ci->GetAkick(k)->creator << " " << ci->GetAkick(k)->addtime << " " << ci->last_used << " :";
-				if (!ci->GetAkick(k)->reason.empty())
-					db_buffer << ci->GetAkick(k)->reason;
-				db_buffer << endl;
-			}
-			for (unsigned k = 0, end = ci->log_settings->size(); k < end; ++k)
-			{
-				const LogSetting &l = *ci->log_settings->at(k);
-
-				db_buffer << "MD LOG " << l.service_name << " " << l.command_service << " " << l.command_name << " " << l.method << " " << l.creator << " " << l.created << " " << l.extra << endl;
-			}
-			for (ChannelInfo::ModeList::const_iterator it = ci->GetMLock().begin(), it_end = ci->GetMLock().end(); it != it_end; ++it)
-			{
-				const ModeLock &ml = *it->second;
-				ChannelMode *cm = ModeManager::FindChannelModeByName(ml.name);
-				if (cm != NULL)
-					db_buffer << "MD MLOCK " << (ml.set ? 1 : 0) << " " << cm->name << " " << ml.setter << " " << ml.created << " " << ml.param << endl;
-			}
-			const MemoInfo *memos = &ci->memos;
-			for (unsigned k = 0, end = memos->memos->size(); k < end; ++k)
-			{
-				const Memo *m = memos->GetMemo(k);
-				db_buffer << "MD MI " << m->time << " " << m->sender;
-				if (m->unread)
-					db_buffer << " UNREAD";
-				if (m->receipt)
-					db_buffer << " RECEIPT";
-				db_buffer << " :" << m->text << endl;
-			}
-			for (unsigned k = 0, end = memos->ignores.size(); k < end; ++k)
-				db_buffer << "MD MIG " << Anope::string(memos->ignores[k]) << endl;
-			if (ci->bi)
-				db_buffer << "MD BI NAME " << ci->bi->nick << endl;
-			db_buffer << "MD BI TTB BOLDS " << ci->ttb[0] << " COLORS " << ci->ttb[1] << " REVERSES " << ci->ttb[2] << " UNDERLINES " << ci->ttb[3] << " BADWORDS " << ci->ttb[4] << " CAPS " << ci->ttb[5] << " FLOOD " << ci->ttb[6] << " REPEAT " << ci->ttb[7] << " ITALICS " << ci->ttb[8] << " AMSGS " << ci->ttb[9] << endl;
-			if (ci->capsmin)
-				db_buffer << "MD BI CAPSMIN " << ci->capsmin << endl;
-			if (ci->capspercent)
-				db_buffer << "MD BI CAPSPERCENT " << ci->capspercent << endl;
-			if (ci->floodlines)
-				db_buffer << "MD BI FLOODLINES " << ci->floodlines << endl;
-			if (ci->floodsecs)
-				db_buffer << "MD BI FLOODSECS " << ci->floodsecs << endl;
-			if (ci->repeattimes)
-				db_buffer << "MD BI REPEATTIMES " << ci->repeattimes << endl;
-			for (unsigned k = 0, end = ci->GetBadWordCount(); k < end; ++k)
-				db_buffer << "MD BI BADWORD " << (ci->GetBadWord(k)->type == BW_ANY ? "ANY " : "") << (ci->GetBadWord(k)->type == BW_SINGLE ? "SINGLE " : "") << (ci->GetBadWord(k)->type == BW_START ? "START " : "") <<
-					(ci->GetBadWord(k)->type == BW_END ? "END " : "") << ":" << ci->GetBadWord(k)->word << endl;
-
-			//FOREACH_MOD(OnDatabaseWriteMetadata, (WriteMetadata, ci));
-		}
-
-		db_buffer << "OS STATS " << MaxUserCount << " " << MaxUserTime << endl;
-
-		for (std::list<XLineManager *>::iterator it = XLineManager::XLineManagers.begin(), it_end = XLineManager::XLineManagers.end(); it != it_end; ++it)
-		{
-			XLineManager *xl = *it;
-			for (unsigned i = 0, end = xl->GetCount(); i < end; ++i)
-			{
-				const XLine *x = xl->GetEntry(i);
-				db_buffer << "OS SXLINE " << xl->Type() << " " << x->GetUser() << " " << x->GetHost() << " " << x->by << " " << x->created << " " << x->expires << " :" << x->reason << endl;
-			}
-		}
-
-		if (session_service)
-			for (SessionService::ExceptionVector::iterator it = session_service->GetExceptions().begin(); it != session_service->GetExceptions().end(); ++it)
-			{
-				Exception *e = *it;
-				db_buffer << "OS EXCEPTION " << e->mask << " " << e->limit << " " << e->who << " " << e->time << " " << e->expires << " " << e->reason << endl;
-			}
-
-		//FOREACH_MOD(OnDatabaseWrite, (Write));
-
-		std::fstream db;
-		db.open(DatabaseFile.c_str(), std::ios_base::out | std::ios_base::trunc);
-
-		if (!db.is_open())
-		{
-			IRCD->SendGlobops(NULL, "Unable to open %s for writing!", DatabaseFile.c_str());
-			return;
-		}
-
-		db << db_buffer.str();
-		db_buffer.str("");
-
-		db.close();
 	}
 };
 

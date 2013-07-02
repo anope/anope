@@ -83,9 +83,9 @@ class CommandNSList : public Command
 			const NickAlias *na = it->second;
 
 			/* Don't show private nicks to non-services admins. */
-			if (na->nc->HasExt("PRIVATE") && !is_servadmin && na->nc != mync)
+			if (na->nc->HasExt("NS_PRIVATE") && !is_servadmin && na->nc != mync)
 				continue;
-			else if (nsnoexpire && !na->HasExt("NO_EXPIRE"))
+			else if (nsnoexpire && !na->HasExt("NS_NO_EXPIRE"))
 				continue;
 			else if (suspended && !na->nc->HasExt("SUSPENDED"))
 				continue;
@@ -101,7 +101,7 @@ class CommandNSList : public Command
 				if (((count + 1 >= from && count + 1 <= to) || (!from && !to)) && ++nnicks <= listmax)
 				{
 					bool isnoexpire = false;
-					if (is_servadmin && na->HasExt("NO_EXPIRE"))
+					if (is_servadmin && na->HasExt("NS_NO_EXPIRE"))
 						isnoexpire = true;
 
 					ListFormatter::ListEntry entry;
@@ -177,14 +177,118 @@ class CommandNSList : public Command
 	}
 };
 
+
+class CommandNSSetPrivate : public Command
+{
+ public:
+	CommandNSSetPrivate(Module *creator, const Anope::string &sname = "nickserv/set/private", size_t min = 1) : Command(creator, sname, min, min + 1)
+	{
+		this->SetDesc(_("Prevent the nickname from appearing in the LIST command"));
+		this->SetSyntax(_("{ON | OFF}"));
+	}
+
+	void Run(CommandSource &source, const Anope::string &user, const Anope::string &param)
+	{
+		const NickAlias *na = NickAlias::Find(user);
+		if (!na)
+		{
+			source.Reply(NICK_X_NOT_REGISTERED, user.c_str());
+			return;
+		}
+		NickCore *nc = na->nc;
+
+		EventReturn MOD_RESULT;
+		FOREACH_RESULT(OnSetNickOption, MOD_RESULT, (source, this, nc, param));
+		if (MOD_RESULT == EVENT_STOP)
+			return;
+
+		if (param.equals_ci("ON"))
+		{
+			Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to enable private for " << nc->display;
+			nc->Extend<bool>("NS_PRIVATE");
+			source.Reply(_("Private option is now \002on\002 for \002%s\002."), nc->display.c_str());
+		}
+		else if (param.equals_ci("OFF"))
+		{
+			Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to disable private for " << nc->display;
+			nc->Shrink<bool>("NS_PRIVATE");
+			source.Reply(_("Private option is now \002off\002 for \002%s\002."), nc->display.c_str());
+		}
+		else
+			this->OnSyntaxError(source, "PRIVATE");
+	}
+
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	{
+		this->Run(source, source.nc->display, params[0]);
+	}
+
+	bool OnHelp(CommandSource &source, const Anope::string &) anope_override
+	{
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_("Turns %s's privacy option on or off for your nick.\n"
+				"With \002PRIVATE\002 set, your nickname will not appear in\n"
+				"nickname lists generated with %s's \002LIST\002 command.\n"
+				"(However, anyone who knows your nickname can still get\n"
+				"information on it using the \002INFO\002 command.)"),
+				source.service->nick.c_str(), source.service->nick.c_str());
+		return true;
+	}
+};
+
+class CommandNSSASetPrivate : public CommandNSSetPrivate
+{
+ public:
+	CommandNSSASetPrivate(Module *creator) : CommandNSSetPrivate(creator, "nickserv/saset/private", 2)
+	{
+		this->ClearSyntax();
+		this->SetSyntax(_("\037nickname\037 {ON | OFF}"));
+	}
+
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	{
+		this->Run(source, params[0], params[1]);
+	}
+
+	bool OnHelp(CommandSource &source, const Anope::string &) anope_override
+	{
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_("Turns %s's privacy option on or off for the nick.\n"
+				"With \002PRIVATE\002 set, the nickname will not appear in\n"
+				"nickname lists generated with %s's \002LIST\002 command.\n"
+				"(However, anyone who knows the nickname can still get\n"
+				"information on it using the \002INFO\002 command.)"),
+				source.service->nick.c_str(), source.service->nick.c_str());
+		return true;
+	}
+};
+
+
 class NSList : public Module
 {
 	CommandNSList commandnslist;
 
+	CommandNSSetPrivate commandnssetprivate;
+	CommandNSSASetPrivate commandnssasetprivate;
+
+	SerializableExtensibleItem<bool> priv;
+
  public:
 	NSList(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		commandnslist(this)
+		commandnslist(this), commandnssetprivate(this), commandnssasetprivate(this),
+		priv(this, "NS_PRIVATE")
 	{
+	}
+
+	void OnNickInfo(CommandSource &source, NickAlias *na, InfoFormatter &info, bool show_all) anope_override
+	{
+		if (!show_all)
+			return;
+
+		if (priv.HasExt(na->nc))
+			info.AddOption(_("Private"));
 	}
 };
 

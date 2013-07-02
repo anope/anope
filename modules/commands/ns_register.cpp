@@ -36,27 +36,27 @@ class CommandNSConfirm : public Command
 				source.Reply(_("Nick \002%s\002 is already confirmed."), na->nick.c_str());
 			else
 			{
-				na->nc->Shrink("UNCONFIRMED");
+				na->nc->Shrink<bool>("UNCONFIRMED");
 				Log(LOG_ADMIN, source, this) << "to confirm nick " << na->nick << " (" << na->nc->display << ")";
 				source.Reply(_("Nick \002%s\002 has been confirmed."), na->nick.c_str());
 			}
 		}
 		else if (source.nc)
 		{
-			Anope::string *code = source.nc->GetExt<ExtensibleItemClass<Anope::string> *>("ns_register_passcode");
+			Anope::string *code = source.nc->GetExt<Anope::string>("passcode");
 			if (code != NULL && *code == passcode)
 			{
 				NickCore *nc = source.nc;
-				nc->Shrink("ns_register_passcode");
+				nc->Shrink<Anope::string>("passcode");
 				Log(LOG_COMMAND, source, this) << "to confirm their email";
 				source.Reply(_("Your email address of \002%s\002 has been confirmed."), source.nc->email.c_str());
-				nc->Shrink("UNCONFIRMED");
+				nc->Shrink<bool>("UNCONFIRMED");
 
 				if (source.GetUser())
 				{
 					IRCD->SendLogin(source.GetUser());
 					const NickAlias *na = NickAlias::Find(source.GetNick());
-					if (!Config->GetBlock("options")->Get<bool>("nonicknameownership") && na != NULL && na->nc == source.GetAccount() && na->nc->HasExt("UNCONFIRMED") == false)
+					if (!Config->GetBlock("options")->Get<bool>("nonicknameownership") && na != NULL && na->nc == source.GetAccount() && !na->nc->HasExt("UNCONFIRMED"))
 						source.GetUser()->SetMode(source.service, "REGISTERED");
 				}
 			}
@@ -207,12 +207,12 @@ class CommandNSRegister : public Command
 
 			if (nsregister.equals_ci("admin"))
 			{
-				nc->ExtendMetadata("UNCONFIRMED");
+				nc->Extend<bool>("UNCONFIRMED");
 				source.Reply(_("All new accounts must be validated by an administrator. Please wait for your registration to be confirmed."));
 			}
 			else if (nsregister.equals_ci("mail"))
 			{
-				nc->ExtendMetadata("UNCONFIRMED");
+				nc->Extend<bool>("UNCONFIRMED");
 				if (SendRegmail(u, na, source.service))
 				{
 					time_t unconfirmed_expire = Config->GetModule("nickserv")->Get<time_t>("unconfirmedexpire", "1d");
@@ -292,7 +292,7 @@ class CommandNSResend : public Command
 
 		if (na == NULL)
 			source.Reply(NICK_NOT_REGISTERED);
-		else if (na->nc != source.GetAccount() || source.nc->HasExt("UNCONFIRMED") == false)
+		else if (na->nc != source.GetAccount() || !source.nc->HasExt("UNCONFIRMED"))
 			source.Reply(_("Your account is already confirmed."));
 		else
 		{
@@ -336,12 +336,44 @@ class NSRegister : public Module
 	CommandNSConfirm commandnsconfirm;
 	CommandNSResend commandnsrsend;
 
+	PrimitiveExtensibleItem<bool> unconfirmed;
+	PrimitiveExtensibleItem<Anope::string> passcode;
+
  public:
 	NSRegister(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		commandnsregister(this), commandnsconfirm(this), commandnsrsend(this)
+		commandnsregister(this), commandnsconfirm(this), commandnsrsend(this), unconfirmed(this, "UNCONFIRMED"),
+		passcode(this, "passcode")
 	{
 		if (Config->GetModule(this)->Get<const Anope::string>("registration").equals_ci("disable"))
 			throw ModuleException("Module " + this->name + " will not load with registration disabled.");
+	}
+
+	void OnNickIdentify(User *u) anope_override
+	{
+		BotInfo *NickServ;
+		if (unconfirmed.HasExt(u->Account()) && (NickServ = Config->GetClient("NickServ")))
+		{
+			const Anope::string &nsregister = Config->GetModule(this)->Get<const Anope::string>("registration");
+			if (nsregister.equals_ci("admin"))
+				u->SendMessage(NickServ, _("All new accounts must be validated by an administrator. Please wait for your registration to be confirmed."));
+			else
+				u->SendMessage(NickServ, _("Your email address is not confirmed. To confirm it, follow the instructions that were emailed to you when you registered."));
+			const NickAlias *this_na = NickAlias::Find(u->Account()->display);
+			time_t time_registered = Anope::CurTime - this_na->time_registered;
+			time_t unconfirmed_expire = Config->GetModule(this)->Get<time_t>("unconfirmedexpire", "1d");
+			if (unconfirmed_expire > time_registered)
+				u->SendMessage(NickServ, _("Your account will expire, if not confirmed, in %s"), Anope::Duration(unconfirmed_expire - time_registered).c_str());
+		}
+	}
+
+	void OnPreNickExpire(NickAlias *na, bool &expire) anope_override
+	{
+		if (unconfirmed.HasExt(na->nc))
+		{
+			time_t unconfirmed_expire = Config->GetModule(this)->Get<time_t>("unconfirmedexpire", "1d");
+			if (unconfirmed_expire && Anope::CurTime - na->time_registered >= unconfirmed_expire)
+				expire = true;
+		}
 	}
 };
 
@@ -349,10 +381,10 @@ static bool SendRegmail(User *u, const NickAlias *na, const BotInfo *bi)
 {
 	NickCore *nc = na->nc;
 
-	Anope::string *code = na->nc->GetExt<ExtensibleItemClass<Anope::string> *>("ns_register_passcode");
-	Anope::string codebuf;
+	Anope::string *code = na->nc->GetExt<Anope::string>("passcode");
 	if (code == NULL)
 	{
+		code = na->nc->Extend<Anope::string>("passcode");
 		int chars[] = {
 			' ', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l',
 			'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y',
@@ -362,22 +394,19 @@ static bool SendRegmail(User *u, const NickAlias *na, const BotInfo *bi)
 		};
 		int idx, min = 1, max = 62;
 		for (idx = 0; idx < 9; ++idx)
-			codebuf += chars[1 + static_cast<int>((static_cast<float>(max - min)) * static_cast<uint16_t>(rand()) / 65536.0) + min];
-		nc->Extend("ns_register_passcode", new ExtensibleItemClass<Anope::string>(codebuf));
+			*code += chars[1 + static_cast<int>((static_cast<float>(max - min)) * static_cast<uint16_t>(rand()) / 65536.0) + min];
 	}
-	else
-		codebuf = *code;
 
 	Anope::string subject = Language::Translate(na->nc, Config->GetBlock("mail")->Get<const Anope::string>("registration_subject").c_str()),
 		message = Language::Translate(na->nc, Config->GetBlock("mail")->Get<const Anope::string>("registration_message").c_str());
 
 	subject = subject.replace_all_cs("%n", na->nick);
 	subject = subject.replace_all_cs("%N", Config->GetBlock("networkinfo")->Get<const Anope::string>("networkname"));
-	subject = subject.replace_all_cs("%c", codebuf);
+	subject = subject.replace_all_cs("%c", *code);
 
 	message = message.replace_all_cs("%n", na->nick);
 	message = message.replace_all_cs("%N", Config->GetBlock("networkinfo")->Get<const Anope::string>("networkname"));
-	message = message.replace_all_cs("%c", codebuf);
+	message = message.replace_all_cs("%c", *code);
 
 	return Mail::Send(u, nc, bi, subject, message);
 }

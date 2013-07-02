@@ -10,15 +10,18 @@
  */
 
 #include "module.h"
+#include "modules/cs_mode.h"
 
 class ChanServCore : public Module, public ChanServService
 {
 	Reference<BotInfo> ChanServ;
 	std::vector<Anope::string> defaults;
+	ExtensibleItem<bool> inhabit;
+	ExtensibleRef<bool> persist;
 
  public:
 	ChanServCore(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PSEUDOCLIENT | VENDOR),
-		ChanServService(this)
+		ChanServService(this), inhabit(this, "inhabit"), persist("PERSIST")
 	{
 	}
 
@@ -30,17 +33,18 @@ class ChanServCore : public Module, public ChanServService
 		class ChanServTimer : public Timer
 		{
 			Reference<BotInfo> &ChanServ;
+			ExtensibleItem<bool> &inhabit;
 			Reference<Channel> c;
 
 		 public:
 		 	/** Constructor
 			 * @param chan The channel
 			 */
-			ChanServTimer(Reference<BotInfo> &cs, Module *m, Channel *chan) : Timer(m, Config->GetModule(m)->Get<time_t>("inhabit", "15s")), ChanServ(cs), c(chan)
+			ChanServTimer(Reference<BotInfo> &cs, ExtensibleItem<bool> &i, Module *m, Channel *chan) : Timer(m, Config->GetModule(m)->Get<time_t>("inhabit", "15s")), ChanServ(cs), inhabit(i), c(chan)
 			{
 				if (!ChanServ || !c)
 					return;
-				c->Extend("INHABIT");
+				inhabit.Set(c, true);
 				if (!c->ci || !c->ci->bi)
 					ChanServ->Join(c);
 				else if (!c->FindUser(c->ci->bi))
@@ -61,7 +65,7 @@ class ChanServCore : public Module, public ChanServService
 				if (!c)
 					return;
 
-				c->Shrink("INHABIT");
+				inhabit.Unset(c);
 
 				if (!c->ci || !c->ci->bi)
 				{
@@ -73,10 +77,10 @@ class ChanServCore : public Module, public ChanServService
 			}
 		};
 
-		if (c->HasExt("INHABIT"))
+		if (inhabit.HasExt(c))
 			return;
 
-		new ChanServTimer(ChanServ, this->owner, c);
+		new ChanServTimer(ChanServ, inhabit, this->owner, c);
 	}
 
 	void OnReload(Configuration::Conf *conf) anope_override
@@ -96,7 +100,7 @@ class ChanServCore : public Module, public ChanServService
 		if (defaults.empty())
 		{
 			defaults.push_back("KEEPTOPIC");
-			defaults.push_back("SECURE");
+			defaults.push_back("CS_SECURE");
 			defaults.push_back("SECUREFOUNDER");
 			defaults.push_back("SIGNKICK");
 		}
@@ -243,34 +247,9 @@ class ChanServCore : public Module, public ChanServService
 
 	void OnCreateChan(ChannelInfo *ci) anope_override
 	{
-		ci->bantype = Config->GetModule(this)->Get<int>("defbantype", "2");
-
 		/* Set default chan flags */
 		for (unsigned i = 0; i < defaults.size(); ++i)
-			ci->ExtendMetadata(defaults[i].upper());
-
-		{
-			Anope::string modes;
-			spacesepstream sep(Config->GetModule(this)->Get<const Anope::string>("mlock", "+nrt"));
-			if (sep.GetToken(modes))
-			{
-				bool add = true;
-				for (unsigned i = 0; i < modes.length(); ++i)
-				{
-					if (modes[i] == '+')
-						add = true;
-					else if (modes[i] == '-')
-						add = false;
-					else
-					{
-						ChannelMode *cm = ModeManager::FindChannelModeByChar(modes[i]);
-						Anope::string param;
-						if (cm && (cm->type == MODE_REGULAR || sep.GetToken(param)))
-							ci->SetMLock(cm, add, param);
-					}
-				}
-			}
-		}
+			ci->Extend<bool>(defaults[i].upper());
 	}
 
 	EventReturn OnCanSet(User *u, const ChannelMode *cm) anope_override
@@ -283,21 +262,13 @@ class ChanServCore : public Module, public ChanServService
 
 	void OnChannelSync(Channel *c) anope_override
 	{
-		bool perm = c->HasMode("PERM") || (c->ci && c->ci->HasExt("PERSIST"));
-		if (!perm && !c->HasExt("BOTCHANNEL") && (c->users.empty() || (c->users.size() == 1 && c->users.begin()->second->user->server == Me)))
+		bool perm = c->HasMode("PERM") || (c->ci && persist && persist->Get(c->ci));
+		if (!perm && !c->botchannel && (c->users.empty() || (c->users.size() == 1 && c->users.begin()->second->user->server == Me)))
 		{
 			this->Hold(c);
 		}
 
 		c->CheckModes();
-		if (Me && Me->IsSynced() && c->ci)
-		{
-			/* Update channel topic */
-			if ((c->ci->HasExt("KEEPTOPIC") || c->ci->HasExt("TOPICLOCK")) && c->ci->last_topic != c->topic)
-			{
-				c->ChangeTopic(!c->ci->last_topic_setter.empty() ? c->ci->last_topic_setter : c->ci->WhoSends()->nick, c->ci->last_topic, c->ci->last_topic_time ? c->ci->last_topic_time : Anope::CurTime);
-			}
-		}
 	}
 
 	EventReturn OnBotKick(BotInfo *bi, Channel *c, User *u, const Anope::string &reason)
@@ -307,7 +278,7 @@ class ChanServCore : public Module, public ChanServService
 		 * ChanServ always enforces channels like this to keep people from deleting bots etc
 		 * that are holding channels.
 		 */
-		if (c->ci && c->users.size() == (c->ci->bi && c->FindUser(c->ci->bi) ? 2 : 1) && !c->HasExt("INHABIT") && !c->syncing)
+		if (c->ci && c->users.size() == (c->ci->bi && c->FindUser(c->ci->bi) ? 2 : 1) && !inhabit.HasExt(c) && !c->syncing)
 		{
 			/* Join ChanServ and set a timer for this channel to part ChanServ later */
 			this->Hold(c);
@@ -349,18 +320,11 @@ class ChanServCore : public Module, public ChanServService
 					expire = true;
 			}
 
-			if (ci->HasExt("NO_EXPIRE"))
-				expire = false;
-
 			FOREACH_MOD(OnPreChanExpire, (ci, expire));
 
 			if (expire)
 			{
-				Anope::string extra;
-				if (ci->HasExt("SUSPENDED"))
-					extra = "suspended ";
-
-				Log(LOG_NORMAL, "chanserv/expire") << "Expiring " << extra  << "channel " << ci->name << " (founder: " << (ci->GetFounder() ? ci->GetFounder()->display : "(none)") << ")";
+				Log(LOG_NORMAL, "chanserv/expire") << "Expiring channel " << ci->name << " (founder: " << (ci->GetFounder() ? ci->GetFounder()->display : "(none)") << ")";
 				FOREACH_MOD(OnChanExpire, (ci));
 				delete ci;
 			}
@@ -370,11 +334,11 @@ class ChanServCore : public Module, public ChanServService
 	EventReturn OnCheckDelete(Channel *c) anope_override
 	{
 		/* Do not delete this channel if ChanServ/a BotServ bot is inhabiting it */
-		if (c->HasExt("INHABIT"))
+		if (inhabit.HasExt(c))
 			return EVENT_STOP;
 
 		/* Channel is persistent, it shouldn't be deleted and the service bot should stay */
-		if (c->ci && c->ci->HasExt("PERSIST"))
+		if (c->ci && persist && persist->Get(c->ci))
 			return EVENT_STOP;
 
 		return EVENT_CONTINUE;
@@ -382,11 +346,13 @@ class ChanServCore : public Module, public ChanServService
 
 	void OnPreUplinkSync(Server *serv) anope_override
 	{
+		if (!persist)
+			return;
 		/* Find all persistent channels and create them, as we are about to finish burst to our uplink */
 		for (registered_channel_map::iterator it = RegisteredChannelList->begin(), it_end = RegisteredChannelList->end(); it != it_end; ++it)
 		{
 			ChannelInfo *ci = it->second;
-			if (ci->HasExt("PERSIST"))
+			if (persist->Get(ci))
 			{
 				bool created;
 				ci->c = Channel::FindOrCreate(ci->name, created, ci->time_registered);
@@ -414,34 +380,14 @@ class ChanServCore : public Module, public ChanServService
 	
 	void OnChanRegistered(ChannelInfo *ci) anope_override
 	{
+		if (!persist)
+			return;
 		/* Mark the channel as persistent */
 		if (ci->c->HasMode("PERM"))
-			ci->ExtendMetadata("PERSIST");
+			persist->Unset(ci);
 		/* Persist may be in def cflags, set it here */
-		else if (ci->HasExt("PERSIST"))
+		else if (persist->Get(ci))
 			ci->c->SetMode(NULL, "PERM");
-	}
-
-	void OnTopicUpdated(Channel *c, const Anope::string &user, const Anope::string &topic) anope_override
-	{
-		if (!c->ci)
-			return;
-
-		/* We only compare the topics here, not the time or setter. This is because some (old) IRCds do not
-		 * allow us to set the topic as someone else, meaning we have to bump the TS and change the setter to us.
-		 * This desyncs what is really set with what we have stored, and we end up resetting the topic often when
-		 * it is not required
-		 */
-		if (c->ci->HasExt("TOPICLOCK") && c->ci->last_topic != c->topic)
-		{
-			c->ChangeTopic(c->ci->last_topic_setter, c->ci->last_topic, c->ci->last_topic_time);
-		}
-		else
-		{
-			c->ci->last_topic = c->topic;
-			c->ci->last_topic_setter = c->topic_setter;
-			c->ci->last_topic_time = c->topic_ts;
-		}
 	}
 };
 

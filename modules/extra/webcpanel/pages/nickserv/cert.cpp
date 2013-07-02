@@ -6,6 +6,7 @@
  */
 
 #include "../../webcpanel.h"
+#include "modules/ns_cert.h"
 
 WebCPanel::NickServ::Cert::Cert(const Anope::string &cat, const Anope::string &u) : WebPanelProtectedPage(cat, u)
 {
@@ -30,8 +31,10 @@ bool WebCPanel::NickServ::Cert::OnRequest(HTTPProvider *server, const Anope::str
 		WebPanel::RunCommand(na->nc->display, na->nc, "NickServ", "nickserv/cert", params, replacements);
 	}
 
-	for (unsigned i = 0; i < na->nc->cert.size(); ++i)
-		replacements["CERTS"] = na->nc->cert[i];
+	NSCertList *cl = na->nc->GetExt<NSCertList>("certificates");
+	if (cl)
+		for (unsigned i = 0; i < cl->GetCertCount(); ++i)
+			replacements["CERTS"] = cl->GetCert(i);
 
 	TemplateFileServer page("nickserv/cert.html");
 	page.Serve(server, page_name, client, message, reply, replacements);

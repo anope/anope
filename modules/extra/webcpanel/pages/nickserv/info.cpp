@@ -30,52 +30,56 @@ bool WebCPanel::NickServ::Info::OnRequest(HTTPProvider *server, const Anope::str
 		}
 		if (message.post_data.count("greet") > 0)
 		{
-			if (message.post_data["greet"].replace_all_cs("+", " ") != na->nc->greet)
-			{
-				na->nc->greet = HTTPUtils::URLDecode(message.post_data["greet"]);
-				replacements["MESSAGES"] = "Greet updated";
-			}
+			Anope::string *greet = na->nc->GetExt<Anope::string>("greet");
+			const Anope::string &post_greet = HTTPUtils::URLDecode(message.post_data["greet"].replace_all_cs("+", " "));
+
+			if (post_greet.empty())
+				na->nc->Shrink<Anope::string>("greet");
+			else if (!greet || post_greet != *greet)
+				na->nc->Extend<Anope::string>("greet", post_greet);
+
+			replacements["MESSAGES"] = "Greet updated";
 		}
 		if (na->nc->HasExt("AUTOOP") != message.post_data.count("autoop"))
 		{
 			if (!na->nc->HasExt("AUTOOP"))
-				na->nc->ExtendMetadata("AUTOOP");
+				na->nc->Extend<bool>("AUTOOP");
 			else
-				na->nc->Shrink("AUTOOP");
+				na->nc->Shrink<bool>("AUTOOP");
 			replacements["MESSAGES"] = "Autoop updated";
 		}
-		if (na->nc->HasExt("PRIVATE") != message.post_data.count("private"))
+		if (na->nc->HasExt("NS_PRIVATE") != message.post_data.count("private"))
 		{
-			if (!na->nc->HasExt("PRIVATE"))
-				na->nc->ExtendMetadata("PRIVATE");
+			if (!na->nc->HasExt("NS_PRIVATE"))
+				na->nc->Extend<bool>("NS_PRIVATE");
 			else
-				na->nc->Shrink("PRIVATE");
+				na->nc->Shrink<bool>("NS_PRIVATE");
 			replacements["MESSAGES"] = "Private updated";
 		}
-		if (na->nc->HasExt("SECURE") != message.post_data.count("secure"))
+		if (na->nc->HasExt("NS_SECURE") != message.post_data.count("secure"))
 		{
-			if (!na->nc->HasExt("SECURE"))
-				na->nc->ExtendMetadata("SECURE");
+			if (!na->nc->HasExt("NS_SECURE"))
+				na->nc->Extend<bool>("NS_SECURE");
 			else
-				na->nc->Shrink("SECURE");
+				na->nc->Shrink<bool>("NS_SECURE");
 			replacements["MESSAGES"] = "Secure updated";
 		}
 		if (message.post_data["kill"] == "on" && !na->nc->HasExt("KILLPROTECT"))
 		{
-			na->nc->ExtendMetadata("KILLPROTECT");
-			na->nc->Shrink("KILL_QUICK");
+			na->nc->Extend<bool>("KILLPROTECT");
+			na->nc->Shrink<bool>("KILL_QUICK");
 			replacements["MESSAGES"] = "Kill updated";
 		}
 		else if (message.post_data["kill"] == "quick" && !na->nc->HasExt("KILL_QUICK"))
 		{
-			na->nc->Shrink("KILLPROTECT");
-			na->nc->ExtendMetadata("KILL_QUICK");
+			na->nc->Shrink<bool>("KILLPROTECT");
+			na->nc->Extend<bool>("KILL_QUICK");
 			replacements["MESSAGES"] = "Kill updated";
 		}
 		else if (message.post_data["kill"] == "off" && (na->nc->HasExt("KILLPROTECT") || na->nc->HasExt("KILL_QUICK")))
 		{
-			na->nc->Shrink("KILLPROTECT");
-			na->nc->Shrink("KILL_QUICK");
+			na->nc->Shrink<bool>("KILLPROTECT");
+			na->nc->Shrink<bool>("KILL_QUICK");
 			replacements["MESSAGES"] = "Kill updated";
 		}
 	}
@@ -91,12 +95,14 @@ bool WebCPanel::NickServ::Info::OnRequest(HTTPProvider *server, const Anope::str
 		else
 			replacements["VHOST"] = na->GetVhostHost();
 	}
-	replacements["GREET"] = HTTPUtils::Escape(na->nc->greet);
+	Anope::string *greet = na->nc->GetExt<Anope::string>("greet");
+	if (greet)
+		replacements["GREET"] = HTTPUtils::Escape(*greet);
 	if (na->nc->HasExt("AUTOOP"))
 		replacements["AUTOOP"];
-	if (na->nc->HasExt("PRIVATE"))
+	if (na->nc->HasExt("NS_PRIVATE"))
 		replacements["PRIVATE"];
-	if (na->nc->HasExt("SECURE"))
+	if (na->nc->HasExt("NS_SECURE"))
 		replacements["SECURE"];
 	if (na->nc->HasExt("KILLPROTECT"))
 		replacements["KILL_ON"];

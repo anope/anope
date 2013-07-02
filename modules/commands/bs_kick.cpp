@@ -12,8 +12,106 @@
  */
 
 #include "module.h"
+#include "modules/bs_kick.h"
+#include "modules/bs_badwords.h"
 
 static Module *me;
+
+struct KickerDataImpl : KickerData
+{
+	KickerDataImpl(Extensible *obj)
+	{
+		amsgs = badwords = bolds = caps = colors = flood = italics = repeat = reverses = underlines = false;
+		for (int16_t i = 0; i < TTB_SIZE; ++i)
+			ttb[i] = 0;
+		capsmin = capspercent = 0;
+		floodlines = floodsecs = 0;
+		repeattimes = 0;
+		
+		dontkickops = dontkickvoices = false;
+	}
+
+	void Check(ChannelInfo *ci) anope_override
+	{
+		if (amsgs || badwords || bolds || caps || colors || flood || italics || repeat || reverses || underlines)
+			return;
+		
+		ci->Shrink<KickerData>("kickerdata");
+	}
+
+	struct ExtensibleItem : ::ExtensibleItem<KickerDataImpl>
+	{
+		ExtensibleItem(Module *m, const Anope::string &name) : ::ExtensibleItem<KickerDataImpl>(m, name) { }
+
+		void ExtensibleSerialize(const Extensible *e, const Serializable *s, Serialize::Data &data) const anope_override
+		{
+			if (s->GetSerializableType()->GetName() != "ChannelInfo")
+				return;
+
+			const ChannelInfo *ci = anope_dynamic_static_cast<const ChannelInfo *>(e);
+			KickerData *kd = this->Get(ci);
+			if (kd == NULL)
+				return;
+
+			data["kickerdata:amsgs"] << kd->amsgs;
+			data["kickerdata:badwords"] << kd->badwords;
+			data["kickerdata:bolds"] << kd->bolds;
+			data["kickerdata:caps"] << kd->caps;
+			data["kickerdata:colors"] << kd->colors;
+			data["kickerdata:flood"] << kd->flood;
+			data["kickerdata:italics"] << kd->italics;
+			data["kickerdata:repeat"] << kd->repeat;
+			data["kickerdata:reverses"] << kd->reverses;
+			data["kickerdata:underlines"] << kd->underlines;
+
+			data.SetType("capsmin", Serialize::Data::DT_INT); data["capsmin"] << kd->capsmin;
+			data.SetType("capspercent", Serialize::Data::DT_INT); data["capspercent"] << kd->capspercent;
+			data.SetType("floodlines", Serialize::Data::DT_INT); data["floodlines"] << kd->floodlines;
+			data.SetType("floodsecs", Serialize::Data::DT_INT); data["floodsecs"] << kd->floodsecs;
+			data.SetType("repeattimes", Serialize::Data::DT_INT); data["repeattimes"] << kd->repeattimes;
+			for (int16_t i = 0; i < TTB_SIZE; ++i)
+				data["ttb"] << kd->ttb[i] << " ";
+		}
+
+		void ExtensibleUnserialize(Extensible *e, Serializable *s, Serialize::Data &data) anope_override
+		{
+			if (s->GetSerializableType()->GetName() != "ChannelInfo")
+				return;
+
+			ChannelInfo *ci = anope_dynamic_static_cast<ChannelInfo *>(e);
+			KickerData *kd = ci->Require<KickerData>("kickerdata");
+
+			data["kickerdata:amsgs"] >> kd->amsgs;
+			data["kickerdata:badwords"] >> kd->badwords;
+			data["kickerdata:bolds"] >> kd->bolds;
+			data["kickerdata:caps"] >> kd->caps;
+			data["kickerdata:colors"] >> kd->colors;
+			data["kickerdata:flood"] >> kd->flood;
+			data["kickerdata:italics"] >> kd->italics;
+			data["kickerdata:repeat"] >> kd->repeat;
+			data["kickerdata:reverses"] >> kd->reverses;
+			data["kickerdata:underlines"] >> kd->underlines;
+
+			data["capsmin"] >> kd->capsmin;
+			data["capspercent"] >> kd->capspercent;
+			data["floodlines"] >> kd->floodlines;
+			data["floodsecs"] >> kd->floodsecs;
+			data["repeattimes"] >> kd->repeattimes;
+
+			Anope::string ttb, tok;
+			data["ttb"] >> ttb;
+			spacesepstream sep(ttb);
+			for (int i = 0; sep.GetToken(tok) && i < TTB_SIZE; ++i)
+				try
+				{
+					ttb[i] = convertTo<int16_t>(tok);
+				}
+				catch (const ConvertException &) { }
+
+			kd->Check(ci);
+		}
+	};
+};
 
 class CommandBSKick : public Command
 {
@@ -99,7 +197,7 @@ class CommandBSKickBase : public Command
 		return false;
 	}
 
-	void Process(CommandSource &source, ChannelInfo *ci, const Anope::string &param, const Anope::string &ttb, size_t ttb_idx, const Anope::string &optname, const Anope::string &mdname)
+	void Process(CommandSource &source, ChannelInfo *ci, const Anope::string &param, const Anope::string &ttb, size_t ttb_idx, const Anope::string &optname, KickerData *kd, bool &val)
 	{
 		if (param.equals_ci("ON"))
 		{
@@ -119,15 +217,15 @@ class CommandBSKickBase : public Command
 					return;
 				}
 
-				ci->ttb[ttb_idx] = i;
+				kd->ttb[ttb_idx] = i;
 			}
 			else
-				ci->ttb[ttb_idx] = 0;
+				kd->ttb[ttb_idx] = 0;
 
-			ci->ExtendMetadata(mdname);
-			if (ci->ttb[ttb_idx])
+			val = true;
+			if (kd->ttb[ttb_idx])
 				source.Reply(_("Bot will now kick for \002%s\002, and will place a ban\n"
-						"after %d kicks for the same user."), optname.c_str(), ci->ttb[ttb_idx]);
+						"after %d kicks for the same user."), optname.c_str(), kd->ttb[ttb_idx]);
 			else
 				source.Reply(_("Bot will now kick for \002%s\002."), optname.c_str());
 
@@ -139,7 +237,7 @@ class CommandBSKickBase : public Command
 			bool override = !source.AccessFor(ci).HasPriv("SET");
 			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to disable the " << optname << "kicker";
 
-			ci->Shrink(mdname);
+			val = false;
 			source.Reply(_("Bot won't kick for \002%s\002 anymore."), optname.c_str());
 		}
 		else
@@ -160,7 +258,11 @@ class CommandBSKickAMSG : public CommandBSKickBase
 	{
 		ChannelInfo *ci;
 		if (CheckArguments(source, params, ci))
-			Process(source, ci, params[1], params.size() > 2 ? params[2] : "", TTB_AMSGS, "AMSG", "BS_KICK_AMSGS");
+		{
+			KickerData *kd = ci->Require<KickerData>("kickerdata");
+			Process(source, ci, params[1], params.size() > 2 ? params[2] : "", TTB_AMSGS, "AMSG", kd, kd->amsgs);
+			kd->Check(ci);
+		}
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
@@ -188,7 +290,12 @@ class CommandBSKickBadwords : public CommandBSKickBase
 	{
 		ChannelInfo *ci;
 		if (CheckArguments(source, params, ci))
-			Process(source, ci, params[1], params.size() > 2 ? params[2] : "", TTB_BADWORDS, "badwords", "BS_KICK_BADWORDS");
+		{
+			KickerData *kd = ci->Require<KickerData>("kickerdata");
+			Process(source, ci, params[1], params.size() > 2 ? params[2] : "", TTB_BADWORDS, "badwords", kd, kd->badwords);
+			kd->Check(ci);
+		}
+		
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
@@ -219,7 +326,11 @@ class CommandBSKickBolds : public CommandBSKickBase
 	{
 		ChannelInfo *ci;
 		if (CheckArguments(source, params, ci))
-			Process(source, ci, params[1], params.size() > 2 ? params[2] : "", TTB_BOLDS, "bolds", "BS_KICK_BOLDS");
+		{
+			KickerData *kd = ci->Require<KickerData>("kickerdata");
+			Process(source, ci, params[1], params.size() > 2 ? params[2] : "", TTB_BOLDS, "bolds", kd, kd->bolds);
+			kd->Check(ci);
+		}
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
@@ -248,6 +359,8 @@ class CommandBSKickCaps : public CommandBSKickBase
 		if (!CheckArguments(source, params, ci))
 			return;
 
+		KickerData *kd = ci->Require<KickerData>("kickerdata");
+
 		if (params[1].equals_ci("ON"))
 		{
 			const Anope::string &ttb = params.size() > 2 ? params[2] : "",
@@ -258,52 +371,54 @@ class CommandBSKickCaps : public CommandBSKickBase
 			{
 				try
 				{
-					ci->ttb[TTB_CAPS] = convertTo<int16_t>(ttb);
-					if (ci->ttb[TTB_CAPS] < 0)
+					kd->ttb[TTB_CAPS] = convertTo<int16_t>(ttb);
+					if (kd->ttb[TTB_CAPS] < 0)
 						throw ConvertException();
 				}
 				catch (const ConvertException &)
 				{
-					ci->ttb[TTB_CAPS] = 0;
+					kd->ttb[TTB_CAPS] = 0;
 					source.Reply(_("\002%s\002 cannot be taken as times to ban."), ttb.c_str());
 					return;
 				}
 			}
 			else
-				ci->ttb[TTB_CAPS] = 0;
+				kd->ttb[TTB_CAPS] = 0;
 
-			ci->capsmin = 10;
+			kd->capsmin = 10;
 			try
 			{
-				ci->capsmin = convertTo<int16_t>(min);
+				kd->capsmin = convertTo<int16_t>(min);
 			}
 			catch (const ConvertException &) { }
-			if (ci->capsmin < 1)
-				ci->capsmin = 10;
+			if (kd->capsmin < 1)
+				kd->capsmin = 10;
 
-			ci->capspercent = 25;
+			kd->capspercent = 25;
 			try
 			{
-				ci->capspercent = convertTo<int16_t>(percent);
+				kd->capspercent = convertTo<int16_t>(percent);
 			}
 			catch (const ConvertException &) { }
-			if (ci->capspercent < 1 || ci->capspercent > 100)
-				ci->capspercent = 25;
+			if (kd->capspercent < 1 || kd->capspercent > 100)
+				kd->capspercent = 25;
 
-			ci->ExtendMetadata("BS_KICK_CAPS");
-			if (ci->ttb[TTB_CAPS])
+			kd->caps = true;
+			if (kd->ttb[TTB_CAPS])
 				source.Reply(_("Bot will now kick for \002caps\002 (they must constitute at least\n"
 						"%d characters and %d%% of the entire message), and will\n"
-						"place a ban after %d kicks for the same user."), ci->capsmin, ci->capspercent, ci->ttb[TTB_CAPS]);
+						"place a ban after %d kicks for the same user."), kd->capsmin, kd->capspercent, kd->ttb[TTB_CAPS]);
 			else
 				source.Reply(_("Bot will now kick for \002caps\002 (they must constitute at least\n"
-						"%d characters and %d%% of the entire message)."), ci->capsmin, ci->capspercent);
+						"%d characters and %d%% of the entire message)."), kd->capsmin, kd->capspercent);
 		}
 		else
 		{
-			ci->Shrink("BS_KICK_CAPS");
+			kd->caps = false;
 			source.Reply(_("Bot won't kick for \002caps\002 anymore."));
 		}
+
+		kd->Check(ci);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
@@ -335,7 +450,11 @@ class CommandBSKickColors : public CommandBSKickBase
 	{
 		ChannelInfo *ci;
 		if (CheckArguments(source, params, ci))
-			Process(source, ci, params[1], params.size() > 2 ? params[2] : "", TTB_COLORS, "colors", "BS_KICK_COLORS");
+		{
+			KickerData *kd = ci->Require<KickerData>("kickerdata");
+			Process(source, ci, params[1], params.size() > 2 ? params[2] : "", TTB_COLORS, "colors", kd, kd->colors);
+			kd->Check(ci);
+		}
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
@@ -364,6 +483,8 @@ class CommandBSKickFlood : public CommandBSKickBase
 		if (!CheckArguments(source, params, ci))
 			return;
 
+		KickerData *kd = ci->Require<KickerData>("kickerdata");
+
 		if (params[1].equals_ci("ON"))
 		{
 			const Anope::string &ttb = params.size() > 2 ? params[2] : "",
@@ -386,45 +507,47 @@ class CommandBSKickFlood : public CommandBSKickBase
 					return;
 				}
 
-				ci->ttb[TTB_FLOOD] = i;
+				kd->ttb[TTB_FLOOD] = i;
 			}
 			else
-				ci->ttb[TTB_FLOOD] = 0;
+				kd->ttb[TTB_FLOOD] = 0;
 
-			ci->floodlines = 6;
+			kd->floodlines = 6;
 			try
 			{
-				ci->floodlines = convertTo<int16_t>(lines);
+				kd->floodlines = convertTo<int16_t>(lines);
 			}
 			catch (const ConvertException &) { }
-			if (ci->floodlines < 2)
-				ci->floodlines = 6;
+			if (kd->floodlines < 2)
+				kd->floodlines = 6;
 
-			ci->floodsecs = 10;
+			kd->floodsecs = 10;
 			try
 			{
-				ci->floodsecs = convertTo<int16_t>(secs);
+				kd->floodsecs = convertTo<int16_t>(secs);
 			}
 			catch (const ConvertException &) { }
-			if (ci->floodsecs < 1)
-				ci->floodsecs = 10;
-			if (ci->floodsecs > Config->GetModule(me)->Get<time_t>("keepdata"))
-				ci->floodsecs = Config->GetModule(me)->Get<time_t>("keepdata");
+			if (kd->floodsecs < 1)
+				kd->floodsecs = 10;
+			if (kd->floodsecs > Config->GetModule(me)->Get<time_t>("keepdata"))
+				kd->floodsecs = Config->GetModule(me)->Get<time_t>("keepdata");
 
-			ci->ExtendMetadata("BS_KICK_FLOOD");
-			if (ci->ttb[TTB_FLOOD])
+			kd->flood = true;
+			if (kd->ttb[TTB_FLOOD])
 				source.Reply(_("Bot will now kick for \002flood\002 (%d lines in %d seconds\n"
-						"and will place a ban after %d kicks for the same user."), ci->floodlines, ci->floodsecs, ci->ttb[TTB_FLOOD]);
+						"and will place a ban after %d kicks for the same user."), kd->floodlines, kd->floodsecs, kd->ttb[TTB_FLOOD]);
 			else
-				source.Reply(_("Bot will now kick for \002flood\002 (%d lines in %d seconds)."), ci->floodlines, ci->floodsecs);
+				source.Reply(_("Bot will now kick for \002flood\002 (%d lines in %d seconds)."), kd->floodlines, kd->floodsecs);
 		}
 		else if (params[1].equals_ci("OFF"))
 		{
-			ci->Shrink("BS_KICK_FLOOD");
+			kd->flood = false;
 			source.Reply(_("Bot won't kick for \002flood\002 anymore."));
 		}
 		else
 			this->OnSyntaxError(source, params[1]);
+
+		kd->Check(ci);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
@@ -454,7 +577,11 @@ class CommandBSKickItalics : public CommandBSKickBase
 	{
 		ChannelInfo *ci;
 		if (CheckArguments(source, params, ci))
-			Process(source, ci, params[1], params.size() > 2 ? params[2] : "", TTB_ITALICS, "italics", "BS_KICK_ITALICS");
+		{
+			KickerData *kd = ci->Require<KickerData>("kickerdata");
+			Process(source, ci, params[1], params.size() > 2 ? params[2] : "", TTB_ITALICS, "italics", kd, kd->italics);
+			kd->Check(ci);
+		}
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
@@ -483,6 +610,8 @@ class CommandBSKickRepeat : public CommandBSKickBase
 		if (!CheckArguments(source, params, ci))
 			return;
 
+		KickerData *kd = ci->Require<KickerData>("kickerdata");
+
 		if (params[1].equals_ci("ON"))
 		{
 			const Anope::string &ttb = params[2],
@@ -504,36 +633,38 @@ class CommandBSKickRepeat : public CommandBSKickBase
 					return;
 				}
 
-				ci->ttb[TTB_REPEAT] = i;
+				kd->ttb[TTB_REPEAT] = i;
 			}
 			else
-				ci->ttb[TTB_REPEAT] = 0;
+				kd->ttb[TTB_REPEAT] = 0;
 
-			ci->repeattimes = 3;
+			kd->repeattimes = 3;
 			try
 			{
-				ci->repeattimes = convertTo<int16_t>(times);
+				kd->repeattimes = convertTo<int16_t>(times);
 			}
 			catch (const ConvertException &) { }
-			if (ci->repeattimes < 2)
-				ci->repeattimes = 3;
+			if (kd->repeattimes < 2)
+				kd->repeattimes = 3;
 
-			ci->ExtendMetadata("BS_KICK_REPEAT");
-			if (ci->ttb[TTB_REPEAT])
+			kd->repeat = true;
+			if (kd->ttb[TTB_REPEAT])
 				source.Reply(_("Bot will now kick for \002repeats\002 (users that say the\n"
 						"same thing %d times), and will place a ban after %d\n"
-						"kicks for the same user."), ci->repeattimes, ci->ttb[TTB_REPEAT]);
+						"kicks for the same user."), kd->repeattimes, kd->ttb[TTB_REPEAT]);
 			else
 				source.Reply(_("Bot will now kick for \002repeats\002 (users that say the\n"
-					"same thing %d times)."), ci->repeattimes);
+					"same thing %d times)."), kd->repeattimes);
 		}
 		else if (params[1].equals_ci("OFF"))
 		{
-			ci->Shrink("BS_KICK_REPEAT");
+			kd->repeat = false;
 			source.Reply(_("Bot won't kick for \002repeats\002 anymore."));
 		}
 		else
 			this->OnSyntaxError(source, params[1]);
+
+		kd->Check(ci);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
@@ -562,7 +693,11 @@ class CommandBSKickReverses : public CommandBSKickBase
 	{
 		ChannelInfo *ci;
 		if (CheckArguments(source, params, ci))
-			Process(source, ci, params[1], params.size() > 2 ? params[2] : "", TTB_ITALICS, "italics", "BS_KICK_ITALICS");
+		{
+			KickerData *kd = ci->Require<KickerData>("kickerdata");
+			Process(source, ci, params[1], params.size() > 2 ? params[2] : "", TTB_REVERSES, "reverses", kd, kd->reverses);
+			kd->Check(ci);
+		}
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
@@ -589,7 +724,11 @@ class CommandBSKickUnderlines : public CommandBSKickBase
 	{
 		ChannelInfo *ci;
 		if (CheckArguments(source, params, ci))
-			Process(source, ci, params[1], params.size() > 2 ? params[2] : "", TTB_ITALICS, "italics", "BS_KICK_ITALICS");
+		{
+			KickerData *kd = ci->Require<KickerData>("kickerdata");
+			Process(source, ci, params[1], params.size() > 2 ? params[2] : "", TTB_UNDERLINES, "underlines", kd, kd->underlines);
+			kd->Check(ci);
+		}
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
@@ -603,7 +742,137 @@ class CommandBSKickUnderlines : public CommandBSKickBase
 	}
 };
 
-struct BanData : ExtensibleItem
+class CommandBSSetDontKickOps : public Command
+{
+ public:
+	CommandBSSetDontKickOps(Module *creator, const Anope::string &sname = "botserv/set/dontkickops") : Command(creator, sname, 2, 2)
+	{
+		this->SetDesc(_("To protect ops against bot kicks"));
+		this->SetSyntax(_("\037channel\037 {ON | OFF}"));
+	}
+
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	{
+		ChannelInfo *ci = ChannelInfo::Find(params[0]);
+		if (ci == NULL)
+		{
+			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
+			return;
+		}
+
+		AccessGroup access = source.AccessFor(ci);
+		if (!source.HasPriv("botserv/administration") && !access.HasPriv("SET"))
+		{
+			source.Reply(ACCESS_DENIED);
+			return;
+		}
+
+		if (Anope::ReadOnly)
+		{
+			source.Reply(_("Sorry, bot option setting is temporarily disabled."));
+			return;
+		}
+
+		KickerData *kd = ci->Require<KickerData>("kickerdata");
+		if (params[1].equals_ci("ON"))
+		{
+			bool override = !access.HasPriv("SET");
+			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to enable dontkickops"; 
+
+			kd->dontkickops = true;
+			source.Reply(_("Bot \002won't kick ops\002 on channel %s."), ci->name.c_str());
+		}
+		else if (params[1].equals_ci("OFF"))
+		{
+			bool override = !access.HasPriv("SET");
+			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to disable dontkickops"; 
+
+			kd->dontkickops = false;
+			source.Reply(_("Bot \002will kick ops\002 on channel %s."), ci->name.c_str());
+		}
+		else
+			this->OnSyntaxError(source, source.command);
+
+		kd->Check(ci);
+	}
+
+	bool OnHelp(CommandSource &source, const Anope::string &) anope_override
+	{
+		this->SendSyntax(source);
+		source.Reply(_(" \n"
+				"Enables or disables \002ops protection\002 mode on a channel.\n"
+				"When it is enabled, ops won't be kicked by the bot\n"
+				"even if they don't match the NOKICK level."));
+		return true;
+	}
+};
+
+class CommandBSSetDontKickVoices : public Command
+{
+ public:
+	CommandBSSetDontKickVoices(Module *creator, const Anope::string &sname = "botserv/set/dontkickvoices") : Command(creator, sname, 2, 2)
+	{
+		this->SetDesc(_("To protect voices against bot kicks"));
+		this->SetSyntax(_("\037channel\037 {ON | OFF}"));
+	}
+
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	{
+		ChannelInfo *ci = ChannelInfo::Find(params[0]);
+		if (ci == NULL)
+		{
+			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
+			return;
+		}
+
+		AccessGroup access = source.AccessFor(ci);
+		if (!source.HasPriv("botserv/administration") && !access.HasPriv("SET"))
+		{
+			source.Reply(ACCESS_DENIED);
+			return;
+		}
+
+		if (Anope::ReadOnly)
+		{
+			source.Reply(_("Sorry, bot option setting is temporarily disabled."));
+			return;
+		}
+
+		KickerData *kd = ci->Require<KickerData>("kickerdata");
+		if (params[1].equals_ci("ON"))
+		{
+			bool override = !access.HasPriv("SET");
+			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to enable dontkickvoices"; 
+
+			kd->dontkickvoices = true;
+			source.Reply(_("Bot \002won't kick voices\002 on channel %s."), ci->name.c_str());
+		}
+		else if (params[1].equals_ci("OFF"))
+		{
+			bool override = !access.HasPriv("SET");
+			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to disable dontkickvoices"; 
+
+			kd->dontkickvoices = false;
+			source.Reply(_("Bot \002will kick voices\002 on channel %s."), ci->name.c_str());
+		}
+		else
+			this->OnSyntaxError(source, source.command);
+
+		kd->Check(ci);
+	}
+
+	bool OnHelp(CommandSource &source, const Anope::string &) anope_override
+	{
+		this->SendSyntax(source);
+		source.Reply(_(" \n"
+				"Enables or disables \002voices protection\002 mode on a channel.\n"
+				"When it is enabled, voices won't be kicked by the bot\n"
+				"even if they don't match the NOKICK level."));
+		return true;
+	}
+};
+
+struct BanData
 {
 	struct Data
 	{
@@ -613,11 +882,6 @@ struct BanData : ExtensibleItem
 
 		Data()
 		{
-			this->Clear();
-		}
-
-		void Clear()
-		{
 			last_use = 0;
 			for (int i = 0; i < TTB_SIZE; ++i)
 				this->ttb[i] = 0;
@@ -625,10 +889,12 @@ struct BanData : ExtensibleItem
 	};
 
  private:
- 	typedef std::map<Anope::string, Data, ci::less> data_type;
+	typedef Anope::map<Data> data_type;
 	data_type data_map;
 
  public:
+ 	BanData(Extensible *) { }
+
 	Data &get(const Anope::string &key)
 	{
 		return this->data_map[key];
@@ -654,14 +920,9 @@ struct BanData : ExtensibleItem
 	}
 };
 
-struct UserData : ExtensibleItem
+struct UserData
 {
-	UserData()
-	{
-		this->Clear();
-	}
-
-	void Clear()
+	UserData(Extensible *)
 	{
 		last_use = last_start = Anope::CurTime;
 		lines = times = 0;
@@ -682,7 +943,6 @@ struct UserData : ExtensibleItem
 	Anope::string lastline;
 };
 
-
 class BanDataPurger : public Timer
 {
  public:
@@ -696,12 +956,12 @@ class BanDataPurger : public Timer
 		{
 			Channel *c = it->second;
 
-			BanData *bd = c->GetExt<BanData *>("bs_main_bandata");
+			BanData *bd = c->GetExt<BanData>("bandata");
 			if (bd != NULL)
 			{
 				bd->purge();
 				if (bd->empty())
-					c->Shrink("bs_main_bandata");
+					c->Shrink<BanData>("bandata");
 			}
 		}
 	}
@@ -709,6 +969,10 @@ class BanDataPurger : public Timer
 
 class BSKick : public Module
 {
+	ExtensibleItem<BanData> bandata;
+	ExtensibleItem<UserData> userdata;
+	KickerDataImpl::ExtensibleItem kickerdata;
+
 	CommandBSKick commandbskick;
 	CommandBSKickAMSG commandbskickamsg;
 	CommandBSKickBadwords commandbskickbadwords;
@@ -721,17 +985,14 @@ class BSKick : public Module
 	CommandBSKickReverses commandbskickreverse;
 	CommandBSKickUnderlines commandbskickunderlines;
 
+	CommandBSSetDontKickOps commandbssetdontkickops;
+	CommandBSSetDontKickVoices commandbssetdontkickvoices;
+
 	BanDataPurger purger;
 
 	BanData::Data &GetBanData(User *u, Channel *c)
 	{
-		BanData *bd = c->GetExt<BanData *>("bs_main_bandata");
-		if (bd == NULL)
-		{
-			bd = new BanData();
-			c->Extend("bs_main_bandata", bd);
-		}
-
+		BanData *bd = bandata.Require(c);
 		return bd->get(u->GetMask());
 	}
 
@@ -741,17 +1002,11 @@ class BSKick : public Module
 		if (uc == NULL)
 			return NULL;
 
-		UserData *ud = uc->GetExt<UserData *>("bs_main_userdata");
-		if (ud == NULL)
-		{
-			ud = new UserData();
-			uc->Extend("bs_main_userdata", ud);
-		}
-
+		UserData *ud = userdata.Require(uc);
 		return ud;
        }
 
-	void check_ban(ChannelInfo *ci, User *u, int ttbtype)
+	void check_ban(ChannelInfo *ci, User *u, KickerData *kd, int ttbtype)
 	{
 		/* Don't ban ulines */
 		if (u->server->IsULined())
@@ -760,9 +1015,9 @@ class BSKick : public Module
 		BanData::Data &bd = this->GetBanData(u, ci->c);
 
 		++bd.ttb[ttbtype];
-		if (ci->ttb[ttbtype] && bd.ttb[ttbtype] >= ci->ttb[ttbtype])
+		if (kd->ttb[ttbtype] && bd.ttb[ttbtype] >= kd->ttb[ttbtype])
 		{
-			/* Should not use == here because bd.ttb[ttbtype] could possibly be > ci->ttb[ttbtype]
+			/* Should not use == here because bd.ttb[ttbtype] could possibly be > kd->ttb[ttbtype]
 			 * if the TTB was changed after it was not set (0) before and the user had already been
 			 * kicked a few times. Bug #1056 - Adam */
 
@@ -793,10 +1048,16 @@ class BSKick : public Module
 
  public:
 	BSKick(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
+		bandata(this, "bandata"),
+		userdata(this, "userdata"),
+		kickerdata(this, "kickerdata"),
+
 		commandbskick(this),
 		commandbskickamsg(this), commandbskickbadwords(this), commandbskickbolds(this), commandbskickcaps(this),
 		commandbskickcolors(this), commandbskickflood(this), commandbskickitalics(this), commandbskickrepeat(this),
 		commandbskickreverse(this), commandbskickunderlines(this),
+
+		commandbssetdontkickops(this), commandbssetdontkickvoices(this),
 
 		purger(this)
 	{
@@ -804,15 +1065,119 @@ class BSKick : public Module
 
 	}
 
-	~BSKick()
+	void OnBotInfo(CommandSource &source, BotInfo *bi, ChannelInfo *ci, InfoFormatter &info) anope_override
 	{
-		for (channel_map::const_iterator cit = ChannelList.begin(), cit_end = ChannelList.end(); cit != cit_end; ++cit)
+		if (!ci)
+			return;
+
+		Anope::string enabled = Language::Translate(source.nc, _("Enabled"));
+		Anope::string disabled = Language::Translate(source.nc, _("Disabled"));
+		KickerData *kd = kickerdata.Get(ci);
+
+		if (kd && kd->badwords)
 		{
-			Channel *c = cit->second;
-			for (Channel::ChanUserList::iterator it = c->users.begin(), it_end = c->users.end(); it != it_end; ++it)
-				it->second->Shrink("bs_main_userdata");
-			c->Shrink("bs_main_bandata");
+			if (kd->ttb[TTB_BADWORDS])
+				info[_("Bad words kicker")] = Anope::printf("%s (%d kick(s) to ban)", enabled.c_str(), kd->ttb[TTB_BADWORDS]);
+			else
+				info[_("Bad words kicker")] = enabled;
 		}
+		else
+			info[_("Bad words kicker")] = disabled;
+
+		if (kd && kd->bolds)
+		{
+			if (kd->ttb[TTB_BOLDS])
+				info[_("Bolds kicker")] = Anope::printf("%s (%d kick(s) to ban)", enabled.c_str(), kd->ttb[TTB_BOLDS]);
+			else
+				info[_("Bolds kicker")] = enabled;
+		}
+		else
+			info[_("Bolds kicker")] = disabled;
+
+		if (kd && kd->caps)
+		{
+			if (kd->ttb[TTB_CAPS])
+				info[_("Caps kicker")] = Anope::printf(_("%s (%d kick(s) to ban; minimum %d/%d%%"), enabled.c_str(), kd->ttb[TTB_CAPS], kd->capsmin, kd->capspercent);
+			else
+				info[_("Caps kicker")] = Anope::printf(_("%s (minimum %d/%d%%)"), enabled.c_str(), kd->capsmin, kd->capspercent);
+		}
+		else
+			info[_("Caps kicker")] = disabled;
+
+		if (kd && kd->colors)
+		{
+			if (kd->ttb[TTB_COLORS])
+				info[_("Colors kicker")] = Anope::printf(_("%s (%d kick(s) to ban)"), enabled.c_str(), kd->ttb[TTB_COLORS]);
+			else
+				info[_("Colors kicker")] = enabled;
+		}
+		else
+			info[_("Colors kicker")] = disabled;
+
+		if (kd && kd->flood)
+		{
+			if (kd->ttb[TTB_FLOOD])
+				info[_("Flood kicker")] = Anope::printf(_("%s (%d kick(s) to ban; %d lines in %ds"), enabled.c_str(), kd->ttb[TTB_FLOOD], kd->floodlines, kd->floodsecs);
+			else
+				info[_("Flood kicker")] = Anope::printf(_("%s (%d lines in %ds)"), enabled.c_str(), kd->floodlines, kd->floodsecs);
+		}
+		else
+			info[_("Flood kicker")] = disabled;
+
+		if (kd && kd->repeat)
+		{
+			if (kd->ttb[TTB_REPEAT])
+				info[_("Repeat kicker")] = Anope::printf(_("%s (%d kick(s) to ban; %d times)"), enabled.c_str(), kd->ttb[TTB_REPEAT], kd->repeattimes);
+			else
+				info[_("Repeat kicker")] = Anope::printf(_("%s (%d times)"), enabled.c_str(), kd->repeattimes);
+		}
+		else
+			info[_("Repeat kicker")] = disabled;
+
+		if (kd && kd->reverses)
+		{
+			if (kd->ttb[TTB_REVERSES])
+				info[_("Reverses kicker")] = Anope::printf(_("%s (%d kick(s) to ban)"), enabled.c_str(), kd->ttb[TTB_REVERSES]);
+			else
+				info[_("Reverses kicker")] = enabled;
+		}
+		else
+			info[_("Reverses kicker")] = disabled;
+
+		if (kd && kd->underlines)
+		{
+			if (kd->ttb[TTB_UNDERLINES])
+				info[_("Underlines kicker")] = Anope::printf(_("%s (%d kick(s) to ban)"), enabled.c_str(), kd->ttb[TTB_UNDERLINES]);
+			else
+				info[_("Underlines kicker")] = enabled;
+		}
+		else
+			info[_("Underlines kicker")] = disabled;
+
+		if (kd && kd->italics)
+		{
+			if (kd->ttb[TTB_ITALICS])
+				info[_("Italics kicker")] = Anope::printf(_("%s (%d kick(s) to ban)"), enabled.c_str(), kd->ttb[TTB_ITALICS]);
+			else
+				info[_("Italics kicker")] = enabled;
+		}
+		else
+			info[_("Italics kicker")] = disabled;
+
+		if (kd && kd->amsgs)
+		{
+			if (kd->ttb[TTB_AMSGS])
+				info[_("AMSG kicker")] = Anope::printf(_("%s (%d kick(s) to ban)"), enabled.c_str(), kd->ttb[TTB_AMSGS]);
+			else
+				info[_("AMSG kicker")] = enabled;
+		}
+		else
+			info[_("AMSG kicker")] = disabled;
+
+		if (kd && kd->dontkickops)
+			info.AddOption(_("Ops Protection"));
+		if (kd && kd->dontkickvoices)
+			info.AddOption(_("Voices Protection"));
 	}
 
 	void OnPrivmsg(User *u, Channel *c, Anope::string &msg) anope_override
@@ -828,12 +1193,15 @@ class BSKick : public Module
 		ChannelInfo *ci = c->ci;
 		if (ci == NULL)
 			return;
+		KickerData *kd = kickerdata.Get(ci);
+		if (kd == NULL)
+			return;
 
 		if (ci->AccessFor(u).HasPriv("NOKICK"))
 			return;
-		else if (ci->HasExt("BS_DONTKICKOPS") && (c->HasUserStatus(u, "HALFOP") || c->HasUserStatus(u, "OP") || c->HasUserStatus(u, "PROTECT") || c->HasUserStatus(u, "OWNER")))
+		else if (kd->dontkickops && (c->HasUserStatus(u, "HALFOP") || c->HasUserStatus(u, "OP") || c->HasUserStatus(u, "PROTECT") || c->HasUserStatus(u, "OWNER")))
 			return;
-		else if (ci->HasExt("BS_DONTKICKVOICES") && c->HasUserStatus(u, "VOICE"))
+		else if (kd->dontkickvoices && c->HasUserStatus(u, "VOICE"))
 			return;
 
 		Anope::string realbuf = msg;
@@ -851,47 +1219,47 @@ class BSKick : public Module
 			return;
 
 		/* Bolds kicker */
-		if (ci->HasExt("BS_KICK_BOLDS") && realbuf.find(2) != Anope::string::npos)
+		if (kd->bolds && realbuf.find(2) != Anope::string::npos)
 		{
-			check_ban(ci, u, TTB_BOLDS);
+			check_ban(ci, u, kd, TTB_BOLDS);
 			bot_kick(ci, u, _("Don't use bolds on this channel!"));
 			return;
 		}
 
 		/* Color kicker */
-		if (ci->HasExt("BS_KICK_COLORS") && realbuf.find(3) != Anope::string::npos)
+		if (kd->colors && realbuf.find(3) != Anope::string::npos)
 		{
-			check_ban(ci, u, TTB_COLORS);
+			check_ban(ci, u, kd, TTB_COLORS);
 			bot_kick(ci, u, _("Don't use colors on this channel!"));
 			return;
 		}
 
 		/* Reverses kicker */
-		if (ci->HasExt("BS_KICK_REVERSES") && realbuf.find(22) != Anope::string::npos)
+		if (kd->reverses && realbuf.find(22) != Anope::string::npos)
 		{
-			check_ban(ci, u, TTB_REVERSES);
+			check_ban(ci, u, kd, TTB_REVERSES);
 			bot_kick(ci, u, _("Don't use reverses on this channel!"));
 			return;
 		}
 
 		/* Italics kicker */
-		if (ci->HasExt("BS_KICK_ITALICS") && realbuf.find(29) != Anope::string::npos)
+		if (kd->italics && realbuf.find(29) != Anope::string::npos)
 		{
-			check_ban(ci, u, TTB_ITALICS);
+			check_ban(ci, u, kd, TTB_ITALICS);
 			bot_kick(ci, u, _("Don't use italics on this channel!"));
 			return;
 		}
 
 		/* Underlines kicker */
-		if (ci->HasExt("BS_KICK_UNDERLINES") && realbuf.find(31) != Anope::string::npos)
+		if (kd->underlines && realbuf.find(31) != Anope::string::npos)
 		{
-			check_ban(ci, u, TTB_UNDERLINES);
+			check_ban(ci, u, kd, TTB_UNDERLINES);
 			bot_kick(ci, u, _("Don't use underlines on this channel!"));
 			return;
 		}
 
 		/* Caps kicker */
-		if (ci->HasExt("BS_KICK_CAPS") && realbuf.length() >= static_cast<unsigned>(ci->capsmin))
+		if (kd->caps && realbuf.length() >= static_cast<unsigned>(kd->capsmin))
 		{
 			int i = 0, l = 0;
 
@@ -908,26 +1276,27 @@ class BSKick : public Module
 			 * percentage of caps to kick for; the rest is ignored. -GD
 			 */
 
-			if ((i || l) && i >= ci->capsmin && i * 100 / (i + l) >= ci->capspercent)
+			if ((i || l) && i >= kd->capsmin && i * 100 / (i + l) >= kd->capspercent)
 			{
-				check_ban(ci, u, TTB_CAPS);
+				check_ban(ci, u, kd, TTB_CAPS);
 				bot_kick(ci, u, _("Turn caps lock OFF!"));
 				return;
 			}
 		}
 
 		/* Bad words kicker */
-		if (ci->HasExt("BS_KICK_BADWORDS"))
+		if (kd->badwords)
 		{
 			bool mustkick = false;
+			BadWords *badwords = ci->GetExt<BadWords>("badwords");
 
 			/* Normalize the buffer */
 			Anope::string nbuf = Anope::NormalizeBuffer(realbuf);
 			bool casesensitive = Config->GetModule("botserv")->Get<bool>("casesensitive");
 
-			for (unsigned i = 0, end = ci->GetBadWordCount(); i < end; ++i)
+			for (unsigned i = 0; badwords && i < badwords->GetBadWordCount(); ++i)
 			{
-				const BadWord *bw = ci->GetBadWord(i);
+				const BadWord *bw = badwords->GetBadWord(i);
 
 				if (bw->type == BW_ANY && ((casesensitive && nbuf.find(bw->word) != Anope::string::npos) || (!casesensitive && nbuf.find_ci(bw->word) != Anope::string::npos)))
 					mustkick = true;
@@ -983,7 +1352,7 @@ class BSKick : public Module
 
 				if (mustkick)
 				{
-					check_ban(ci, u, TTB_BADWORDS);
+					check_ban(ci, u, kd, TTB_BADWORDS);
 					if (Config->GetModule(me)->Get<bool>("gentlebadwordreason"))
 						bot_kick(ci, u, _("Watch your language!"));
 					else
@@ -999,34 +1368,34 @@ class BSKick : public Module
 		if (ud)
 		{
 			/* Flood kicker */
-			if (ci->HasExt("BS_KICK_FLOOD"))
+			if (kd->flood)
 			{
-				if (Anope::CurTime - ud->last_start > ci->floodsecs)
+				if (Anope::CurTime - ud->last_start > kd->floodsecs)
 				{
 					ud->last_start = Anope::CurTime;
 					ud->lines = 0;
 				}
 
 				++ud->lines;
-				if (ud->lines >= ci->floodlines)
+				if (ud->lines >= kd->floodlines)
 				{
-					check_ban(ci, u, TTB_FLOOD);
+					check_ban(ci, u, kd, TTB_FLOOD);
 					bot_kick(ci, u, _("Stop flooding!"));
 					return;
 				}
 			}
 
 			/* Repeat kicker */
-			if (ci->HasExt("BS_KICK_REPEAT"))
+			if (kd->repeat)
 			{
 				if (!ud->lastline.equals_ci(realbuf))
 					ud->times = 0;
 				else
 					++ud->times;
 
-				if (ud->times >= ci->repeattimes)
+				if (ud->times >= kd->repeattimes)
 				{
-					check_ban(ci, u, TTB_REPEAT);
+					check_ban(ci, u, kd, TTB_REPEAT);
 					bot_kick(ci, u, _("Stop repeating yourself!"));
 					return;
 				}
@@ -1039,9 +1408,9 @@ class BSKick : public Module
 					Channel *chan = it->second->chan;
 					++it;
 
-					if (chan->ci && chan->ci->HasExt("BS_KICK_AMSGS") && !chan->ci->AccessFor(u).HasPriv("NOKICK"))
+					if (chan->ci && kd->amsgs && !chan->ci->AccessFor(u).HasPriv("NOKICK"))
 					{
-						check_ban(chan->ci, u, TTB_AMSGS);
+						check_ban(chan->ci, u, kd, TTB_AMSGS);
 						bot_kick(chan->ci, u, _("Don't use AMSGs!"));
 					}
 				}

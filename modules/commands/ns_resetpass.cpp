@@ -53,7 +53,7 @@ class CommandNSResetPass : public Command
 	}
 };
 
-struct ResetInfo : ExtensibleItem
+struct ResetInfo
 {
 	Anope::string code;
 	time_t time;
@@ -62,21 +62,14 @@ struct ResetInfo : ExtensibleItem
 class NSResetPass : public Module
 {
 	CommandNSResetPass commandnsresetpass;
+	PrimitiveExtensibleItem<ResetInfo> reset;
 
  public:
 	NSResetPass(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		commandnsresetpass(this)
+		commandnsresetpass(this), reset(this, "reset")
 	{
 		if (!Config->GetBlock("mail")->Get<bool>("usemail"))
 			throw ModuleException("Not using mail.");
-
-
-	}
-
-	~NSResetPass()
-	{
-		for (nickcore_map::const_iterator it = NickCoreList->begin(), it_end = NickCoreList->end(); it != it_end; ++it)
-			it->second->Shrink("ns_resetpass");
 	}
 
 	EventReturn OnPreCommand(CommandSource &source, Command *command, std::vector<Anope::string> &params) anope_override
@@ -85,23 +78,22 @@ class NSResetPass : public Module
 		{
 			NickAlias *na = NickAlias::Find(params[0]);
 
-			ResetInfo *ri = na ? na->nc->GetExt<ResetInfo *>("ns_resetpass") : NULL;
+			ResetInfo *ri = na ? reset.Get(na->nc) : NULL;
 			if (na && ri)
 			{
 				NickCore *nc = na->nc;
 				const Anope::string &passcode = params[1];
 				if (ri->time < Anope::CurTime - 3600)
 				{
-					nc->Shrink("ns_resetpass");
+					reset.Unset(nc);
 					source.Reply(_("Your password reset request has expired."));
 				}
 				else if (passcode.equals_cs(ri->code))
 				{
-					nc->Shrink("ns_resetpass");
+					reset.Unset(nc);
+					nc->Shrink<bool>("UNCONFIRMED");
 
 					Log(LOG_COMMAND, source, &commandnsresetpass) << "confirmed RESETPASS to forcefully identify as " << na->nick;
-
-					nc->Shrink("UNCONFIRMED");
 
 					if (source.GetUser())
 					{
@@ -147,13 +139,11 @@ static bool SendResetEmail(User *u, const NickAlias *na, const BotInfo *bi)
 	message = message.replace_all_cs("%N", Config->GetBlock("networkinfo")->Get<const Anope::string>("networkname"));
 	message = message.replace_all_cs("%c", passcode);
 
-	ResetInfo *ri = new ResetInfo;
+	ResetInfo *ri = na->nc->Extend<ResetInfo>("reset");
 	ri->code = passcode;
 	ri->time = Anope::CurTime;
-	NickCore *nc = na->nc;
-	nc->Extend("ns_resetpass", ri);
 
-	return Mail::Send(u, nc, bi, subject, message);
+	return Mail::Send(u, na->nc, bi, subject, message);
 }
 
 MODULE_INIT(NSResetPass)

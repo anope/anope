@@ -407,13 +407,11 @@ class OSDefcon : public Module
 		this->ParseModeString();
 	}
 
-	EventReturn OnChannelModeSet(Channel *c, MessageSource &, const Anope::string &mname, const Anope::string &param) anope_override
+	EventReturn OnChannelModeSet(Channel *c, MessageSource &, ChannelMode *mode, const Anope::string &param) anope_override
 	{
-		ChannelMode *cm = ModeManager::FindChannelModeByName(mname);
-
-		if (DConfig.Check(DEFCON_FORCE_CHAN_MODES) && cm && DConfig.DefConModesOff.count(mname))
+		if (DConfig.Check(DEFCON_FORCE_CHAN_MODES) && DConfig.DefConModesOff.count(mode->name))
 		{
-			c->RemoveMode(Config->GetClient("OperServ"), cm, param);
+			c->RemoveMode(Config->GetClient("OperServ"), mode, param);
 
 			return EVENT_STOP;
 		}
@@ -421,18 +419,16 @@ class OSDefcon : public Module
 		return EVENT_CONTINUE;
 	}
 
-	EventReturn OnChannelModeUnset(Channel *c, MessageSource &, const Anope::string &mname, const Anope::string &) anope_override
+	EventReturn OnChannelModeUnset(Channel *c, MessageSource &, ChannelMode *mode, const Anope::string &) anope_override
 	{
-		ChannelMode *cm = ModeManager::FindChannelModeByName(mname);
-
-		if (DConfig.Check(DEFCON_FORCE_CHAN_MODES) && cm && DConfig.DefConModesOn.count(mname))
+		if (DConfig.Check(DEFCON_FORCE_CHAN_MODES) && DConfig.DefConModesOn.count(mode->name))
 		{
 			Anope::string param;
 
-			if (DConfig.GetDefConParam(mname, param))
-				c->SetMode(Config->GetClient("OperServ"), cm, param);
+			if (DConfig.GetDefConParam(mode->name, param))
+				c->SetMode(Config->GetClient("OperServ"), mode, param);
 			else
-				c->SetMode(Config->GetClient("OperServ"), cm);
+				c->SetMode(Config->GetClient("OperServ"), mode);
 
 			return EVENT_STOP;
 

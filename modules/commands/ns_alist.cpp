@@ -62,7 +62,7 @@ class CommandNSAList : public Command
 			{
 				++chan_count;
 				entry["Number"] = stringify(chan_count);
-				entry["Channel"] = (ci->HasExt("NO_EXPIRE") ? "!" : "") + ci->name;
+				entry["Channel"] = (ci->HasExt("CS_NO_EXPIRE") ? "!" : "") + ci->name;
 				entry["Access"] = "Founder";
 				list.AddEntry(entry);
 				continue;
@@ -72,7 +72,7 @@ class CommandNSAList : public Command
 			{
 				++chan_count;
 				entry["Number"] = stringify(chan_count);
-				entry["Channel"] = (ci->HasExt("NO_EXPIRE") ? "!" : "") + ci->name;
+				entry["Channel"] = (ci->HasExt("CS_NO_EXPIRE") ? "!" : "") + ci->name;
 				entry["Access"] = "Successor";
 				list.AddEntry(entry);
 				continue;
@@ -85,7 +85,7 @@ class CommandNSAList : public Command
 			++chan_count;
 
 			entry["Number"] = stringify(chan_count);
-			entry["Channel"] = (ci->HasExt("NO_EXPIRE") ? "!" : "") + ci->name;
+			entry["Channel"] = (ci->HasExt("CS_NO_EXPIRE") ? "!" : "") + ci->name;
 			for (unsigned j = 0; j < access.size(); ++j)
 				entry["Access"] = entry["Access"] + ", " + access[j]->AccessSerialize();
 			entry["Access"] = entry["Access"].substr(2);

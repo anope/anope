@@ -22,49 +22,6 @@ typedef Anope::hash_map<ChannelInfo *> registered_channel_map;
 
 extern CoreExport Serialize::Checker<registered_channel_map> RegisteredChannelList;
 
-/* Indices for TTB (Times To Ban) */
-enum
-{
-	TTB_BOLDS,
-	TTB_COLORS,
-	TTB_REVERSES,
-	TTB_UNDERLINES,
-	TTB_BADWORDS,
-	TTB_CAPS,
-	TTB_FLOOD,
-	TTB_REPEAT,
-	TTB_ITALICS,
-	TTB_AMSGS,
-	TTB_SIZE
-};
-
-/** Flags for badwords
- */
-enum BadWordType
-{
-	/* Always kicks if the word is said */
-	BW_ANY,
-	/* User must way the entire word */
-	BW_SINGLE,
-	/* The word has to start with the badword */
-	BW_START,
-	/* The word has to end with the badword */
-	BW_END
-};
-
-/* Structure used to contain bad words. */
-struct CoreExport BadWord : Serializable
-{
-	Serialize::Reference<ChannelInfo> ci;
-	Anope::string word;
-	BadWordType type;
-
-	BadWord();
-	~BadWord();
-	void Serialize(Serialize::Data &data) const anope_override;
-	static Serializable* Unserialize(Serializable *obj, Serialize::Data &);
-};
-
 /* AutoKick data. */
 class CoreExport AutoKick : public Serializable
 {
@@ -86,74 +43,7 @@ class CoreExport AutoKick : public Serializable
 	static Serializable* Unserialize(Serializable *obj, Serialize::Data &);
 };
 
-struct CoreExport ModeLock : Serializable
-{
- public:
-	Serialize::Reference<ChannelInfo> ci;
-	bool set;
-	Anope::string name;
-	Anope::string param;
-	Anope::string setter;
-	time_t created;
-
-	ModeLock(ChannelInfo *ch, bool s, const Anope::string &n, const Anope::string &p, const Anope::string &se = "", time_t c = Anope::CurTime);
-	~ModeLock();
-
-	void Serialize(Serialize::Data &data) const anope_override;
-	static Serializable* Unserialize(Serializable *obj, Serialize::Data &);
-};
-
-struct CoreExport LogSetting : Serializable
-{
-	Serialize::Reference<ChannelInfo> ci;
-	/* Our service name of the command */
-	Anope::string service_name;
-	/* The name of the client the command is on */
-	Anope::string command_service;
-	/* Name of the command to the user, can have spaces */
-	Anope::string command_name;
-	Anope::string method, extra;
-	Anope::string creator;
-	time_t created;
-
-	LogSetting() : Serializable("LogSetting") { }
-	void Serialize(Serialize::Data &data) const anope_override;
-	static Serializable* Unserialize(Serializable *obj, Serialize::Data &);
-};
-
 /* It matters that Base is here before Extensible (it is inherited by Serializable)
- *
- * Possible flags:
- *     TOPICLOCK      - Topic can only be changed by TOPIC SET
- *     RESTRICTED     - Only users on the access list may join
- *     PEACE          - Don't allow ChanServ and BotServ commands to do bad things to users with higher access levels
- *     SECURE         - Don't allow any privileges
- *     NO_EXPIRE      - Channel does not expire
- *     MEMO_HARDMAX   - Channel memo limit may not be changed
- *     SECUREFOUNDER  - Stricter control of channel founder status
- *     SIGNKICK       - Sign kicks with the user who did the kick
- *     SIGNKICK_LEVEL - Sign kicks if level is < than the one defined by the SIGNKICK level
- *     SUSPENDED      - Channel is suepended
- *     PERSIST        - Channel still exists when empited (perm channel mode or leaving a botserv bot).
- *     STATS          - Chanstats are enabled
- *     NOAUTOOP       - If set users are not auto given any status on join
- *
- * BotServ flags:
- *     BS_DONTKICKOPS     - BotServ won't kick ops
- *     BS_DONTKICKVOICES  - BotServ won't kick voices
- *     BS_FANTASY         - BotServ bot accepts fantasy commands
- *     BS_GREET           - BotServ should show greets
- *     BS_NOBOT           - BotServ bots are not allowed to be in this channel
- *     BS_KICK_BOLDS      - BotServ kicks for bolds
- *     BS_KICK_COLORS     - BotServ kicks for colors
- *     BS_KICK_REVERSES   - BotServ kicks for reverses
- *     BS_KICK_UNDERLINES - BotServ kicks for underlines
- *     BS_KICK_BADWORD    - BotServ kicks for badwords
- *     BS_KICK_CAPS       - BotServ kicks for caps
- *     BS_KICK_FLOOD      - BotServ kicks for flood
- *     BS_KICK_REPEAT     - BotServ kicks for repeating
- *     BS_KICK_ITALICS    - BotServ kicks for italics
- *     BS_KICK_AMSGS      - BotServ kicks for amsgs
  */
 class CoreExport ChannelInfo : public Serializable, public Extensible
 {
@@ -162,17 +52,11 @@ class CoreExport ChannelInfo : public Serializable, public Extensible
 	Serialize::Reference<NickCore> successor;                               /* Who gets the channel if the founder nick is dropped or expires */
 	Serialize::Checker<std::vector<ChanAccess *> > access;			/* List of authorized users */
 	Serialize::Checker<std::vector<AutoKick *> > akick;			/* List of users to kickban */
-	Serialize::Checker<std::vector<BadWord *> > badwords;			/* List of badwords */
 	Anope::map<int16_t> levels;
 
  public:
  	friend class ChanAccess;
 	friend class AutoKick;
-	friend struct BadWord;
-
-	typedef std::multimap<Anope::string, ModeLock *> ModeList;
-	Serialize::Checker<ModeList> mode_locks;
-	Serialize::Checker<std::vector<LogSetting *> > log_settings;
 
 	Anope::string name;                       /* Channel name */
 	Anope::string desc;
@@ -192,11 +76,6 @@ class CoreExport ChannelInfo : public Serializable, public Extensible
 
 	/* For BotServ */
 	Serialize::Reference<BotInfo> bi;         /* Bot used on this channel */
-	int16_t ttb[TTB_SIZE];                    /* Times to ban for each kicker */
-
-	int16_t capsmin, capspercent;	          /* For CAPS kicker */
-	int16_t floodlines, floodsecs;            /* For FLOOD kicker */
-	int16_t repeattimes;                      /* For REPEAT kicker */
 
 	time_t banexpire;                       /* Time bans expire in */
 
@@ -206,7 +85,7 @@ class CoreExport ChannelInfo : public Serializable, public Extensible
 	ChannelInfo(const Anope::string &chname);
 
 	/** Copy constructor
-	 * @param ci The ChannelInfo to copy settings to
+	 * @param ci The ChannelInfo to copy settings from
 	 */
 	ChannelInfo(const ChannelInfo &ci);
 
@@ -309,89 +188,6 @@ class CoreExport ChannelInfo : public Serializable, public Extensible
 	/** Clear the whole akick list
 	 */
 	void ClearAkick();
-
-	/** Add a badword to the badword list
-	 * @param word The badword
-	 * @param type The type (SINGLE START END)
-	 * @return The badword
-	 */
-	BadWord* AddBadWord(const Anope::string &word, BadWordType type);
-
-	/** Get a badword structure by index
-	 * @param index The index
-	 * @return The badword
-	 */
-	BadWord* GetBadWord(unsigned index) const;
-
-	/** Get how many badwords are on this channel
-	 * @return The number of badwords in the vector
-	 */
-	unsigned GetBadWordCount() const;
-
-	/** Remove a badword
-	 * @param index The index of the badword
-	 */
-	void EraseBadWord(unsigned index);
-
-	/** Clear all badwords from the channel
-	 */
-	void ClearBadWords();
-
-	/** Check if a mode is mlocked
-	 * @param mode The mode
-	 * @param An optional param
-	 * @param status True to check mlock on, false for mlock off
-	 * @return true on success, false on fail
-	 */
-	bool HasMLock(ChannelMode *mode, const Anope::string &param, bool status) const;
-
-	/** Set a mlock
-	 * @param mode The mode
-	 * @param status True for mlock on, false for mlock off
-	 * @param param An optional param arg for + mlocked modes
-	 * @param setter Who is setting the mlock
-	 * @param created When the mlock was created
-	 * @return true on success, false on failure (module blocking)
-	 */
-	bool SetMLock(ChannelMode *mode, bool status, const Anope::string &param = "", Anope::string setter = "", time_t created = Anope::CurTime);
-
-	/** Remove a mlock
-	 * @param mode The mode
-	 * @param status True for mlock on, false for mlock off
-	 * @param param The param of the mode, required if it is a list or status mode
-	 * @return true on success, false on failure
-	 */
-	bool RemoveMLock(ChannelMode *mode, bool status, const Anope::string &param = "");
-
-	void RemoveMLock(ModeLock *mlock);
-
-	/** Clear all mlocks on the channel
-	 */
-	void ClearMLock();
-
-	/** Get all of the mlocks for this channel
-	 * @return The mlocks
-	 */
-	const ModeList &GetMLock() const;
-
-	/** Get a list of modes on a channel
-	 * @param Name The mode name to get a list of
-	 * @return a pair of iterators for the beginning and end of the list
-	 */
-	std::pair<ModeList::iterator, ModeList::iterator> GetModeList(const Anope::string &name);
-
-	/** Get details for a specific mlock
-	 * @param mname The mode name
- 	 * @param An optional param to match with
-	 * @return The MLock, if any
-	 */
-	const ModeLock *GetMLock(const Anope::string &mname, const Anope::string &param = "");
-
-	/** Get the current mode locks as a string
-	 * @param complete True to show mlock parameters aswell
-	 * @return A string of mode locks, eg: +nrt
-	 */
-	Anope::string GetMLockAsString(bool complete) const;
 
 	/** Get the level for a privilege
 	 * @param priv The privilege name

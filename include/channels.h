@@ -48,6 +48,8 @@ class CoreExport Channel : public Base, public Extensible
 	time_t creation_time;
 	/* If the channel has just been created in a netjoin */
 	bool syncing;
+	/* Is configured in the conf as a channel bots should be in */
+	bool botchannel;
 
 	/* Users in the channel */
 	typedef std::map<User *, ChanUserContainer *> ChanUserList;

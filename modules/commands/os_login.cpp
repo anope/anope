@@ -31,7 +31,7 @@ class CommandOSLogin : public Command
 			source.Reply(_("No oper block for your nick."));
 		else if (o->password.empty())
 			source.Reply(_("Your oper block doesn't require logging in."));
-		else if (u->HasExt("os_login_password_correct"))
+		else if (u->HasExt("os_login"))
 			source.Reply(_("You are already identified."));
 		else if (o->password != password)
 		{
@@ -41,11 +41,9 @@ class CommandOSLogin : public Command
 		else
 		{
 			Log(LOG_ADMIN, source, this) << "and successfully identified to " << source.service->nick;
-			u->Extend("os_login_password_correct");
+			u->Extend<bool>("os_login");
 			source.Reply(_("Password accepted."));
 		}
-
-		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
@@ -80,12 +78,12 @@ class CommandOSLogout : public Command
 			source.Reply(_("No oper block for your nick."));
 		else if (o->password.empty())
 			source.Reply(_("Your oper block doesn't require logging in."));
-		else if (!u->HasExt("os_login_password_correct"))
+		else if (!u->HasExt("os_login"))
 			source.Reply(_("You are not identified."));
 		else
 		{
 			Log(LOG_ADMIN, source, this);
-			u->Shrink("os_login_password_correct");
+			u->Shrink<bool>("os_login");
 			source.Reply(_("You have been logged out."));
 		}
 	}
@@ -110,25 +108,20 @@ class OSLogin : public Module
 {
 	CommandOSLogin commandoslogin;
 	CommandOSLogout commandoslogout;
+	ExtensibleItem<bool> os_login;
 
  public:
 	OSLogin(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		commandoslogin(this), commandoslogout(this)
+		commandoslogin(this), commandoslogout(this), os_login(this, "os_login")
 	{
 
-	}
-
-	~OSLogin()
-	{
-		for (user_map::const_iterator it = UserListByNick.begin(); it != UserListByNick.end(); ++it)
-			it->second->Shrink("os_login_password_correct");
 	}
 
 	EventReturn IsServicesOper(User *u) anope_override
 	{
 		if (!u->Account()->o->password.empty())
 		{
-			if (u->HasExt("os_login_password_correct"))
+			if (os_login.HasExt(u))
 				return EVENT_ALLOW;
 			return EVENT_STOP;
 		}

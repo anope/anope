@@ -20,8 +20,8 @@ class CommandCSAKick : public Command
 		const NickAlias *na = NickAlias::Find(mask);
 		NickCore *nc = NULL;
 		const AutoKick *akick;
-
 		unsigned reasonmax = Config->GetModule("chanserv")->Get<unsigned>("reasonmax", "200");
+
 		if (reason.length() > reasonmax)
 			reason = reason.substr(0, reasonmax);
 

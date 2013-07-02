@@ -27,7 +27,7 @@ class CommandMSInfo : public Command
 		const NickAlias *na = NULL;
 		ChannelInfo *ci = NULL;
 		const Anope::string &nname = !params.empty() ? params[0] : "";
-		int hardmax = 0;
+		bool hardmax;
 
 		if (!nname.empty() && nname[0] != '#' && source.HasPriv("memoserv/info"))
 		{
@@ -38,7 +38,7 @@ class CommandMSInfo : public Command
 				return;
 			}
 			mi = &na->nc->memos;
-			hardmax = na->nc->HasExt("MEMO_HARDMAX") ? 1 : 0;
+			hardmax = na->nc->HasExt("MEMO_HARDMAX");
 		}
 		else if (!nname.empty() && nname[0] == '#')
 		{
@@ -54,7 +54,7 @@ class CommandMSInfo : public Command
 				return;
 			}
 			mi = &ci->memos;
-			hardmax = ci->HasExt("MEMO_HARDMAX") ? 1 : 0;
+			hardmax = ci->HasExt("MEMO_HARDMAX");
 		}
 		else if (!nname.empty()) /* It's not a chan and we aren't services admin */
 		{
@@ -64,7 +64,7 @@ class CommandMSInfo : public Command
 		else
 		{
 			mi = &nc->memos;
-			hardmax = nc->HasExt("MEMO_HARDMAX") ? 1 : 0;
+			hardmax = nc->HasExt("MEMO_HARDMAX");
 		}
 
 		if (!nname.empty() && (ci || na->nc != nc))
@@ -178,7 +178,6 @@ class CommandMSInfo : public Command
 			else
 				source.Reply(_("You will not be notified of new memos."));
 		}
-		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override

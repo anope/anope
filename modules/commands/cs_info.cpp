@@ -13,17 +13,6 @@
 
 class CommandCSInfo : public Command
 {
-	void CheckOptStr(Anope::string &buf, const Anope::string &opt, const char *str, const ChannelInfo *ci, const NickCore *nc)
-	{
-		if (ci->HasExt(opt))
-		{
-			if (!buf.empty())
-				buf += ", ";
-
-			buf += Language::Translate(nc, str);
-		}
-	}
-
  public:
 	CommandCSInfo(Module *creator) : Command(creator, "chanserv/info", 1, 2)
 	{
@@ -66,43 +55,9 @@ class CommandCSInfo : public Command
 		info["Registered"] = Anope::strftime(ci->time_registered);
 		info["Last used"] = Anope::strftime(ci->last_used);
 
-		const ModeLock *secret = ci->GetMLock("SECRET");
-		if (!ci->last_topic.empty() && (show_all || ((!secret || secret->set == false) && (!ci->c || !ci->c->HasMode("SECRET")))))
-		{
-			info["Last topic"] = ci->last_topic;
-			info["Topic set by"] = ci->last_topic_setter;
-		}
-
 		if (show_all)
 		{
 			info["Ban type"] = stringify(ci->bantype);
-
-			Anope::string optbuf;
-			CheckOptStr(optbuf, "KEEPTOPIC", _("Topic Retention"), ci, nc);
-			CheckOptStr(optbuf, "PEACE", _("Peace"), ci, nc);
-			CheckOptStr(optbuf, "PRIVATE", _("Private"), ci, nc);
-			CheckOptStr(optbuf, "RESTRICTED", _("Restricted Access"), ci, nc);
-			CheckOptStr(optbuf, "SECURE", _("Secure"), ci, nc);
-			CheckOptStr(optbuf, "SECUREFOUNDER", _("Secure Founder"), ci, nc);
-			CheckOptStr(optbuf, "SECUREOPS", _("Secure Ops"), ci, nc);
-			if (ci->HasExt("SIGNKICK"))
-				CheckOptStr(optbuf, "SIGNKICK", _("Signed kicks"), ci, nc);
-			else
-				CheckOptStr(optbuf, "SIGNKICK_LEVEL", _("Signed kicks"), ci, nc);
-			CheckOptStr(optbuf, "TOPICLOCK", _("Topic Lock"), ci, nc);
-			CheckOptStr(optbuf, "PERSIST", _("Persistent"), ci, nc);
-			CheckOptStr(optbuf, "NO_EXPIRE", _("No expire"), ci, nc);
-			CheckOptStr(optbuf, "STATS", _("Chanstats"), ci, nc);
-
-			info["Options"] = optbuf.empty() ? _("None") : optbuf;
-
-			const Anope::string &ml = ci->GetMLockAsString(true);
-			if (!ml.empty())
-				info["Mode lock"] = ml;
-
-			time_t chanserv_expire = Config->GetModule("chanserv")->Get<time_t>("expire", "14d");
-			if (!ci->HasExt("NO_EXPIRE") && chanserv_expire && !Anope::NoExpire)
-				info["Expires on"] = Anope::strftime(ci->last_used + chanserv_expire);
 		}
 
 		FOREACH_MOD(OnChanInfo, (source, ci, info, show_all));

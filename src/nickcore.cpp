@@ -67,13 +67,10 @@ void NickCore::Serialize(Serialize::Data &data) const
 	data["display"] << this->display;
 	data["pass"] << this->pass;
 	data["email"] << this->email;
-	data["greet"] << this->greet;
 	data["language"] << this->language;
-	this->ExtensibleSerialize(data);
+	Extensible::ExtensibleSerialize(this, this, data);
 	for (unsigned i = 0; i < this->access.size(); ++i)
 		data["access"] << this->access[i] << " ";
-	for (unsigned i = 0; i < this->cert.size(); ++i)
-		data["cert"] << this->cert[i] << " ";
 	data["memomax"] << this->memos.memomax;
 	for (unsigned i = 0; i < this->memos.ignores.size(); ++i)
 		data["memoignores"] << this->memos.ignores[i] << " ";
@@ -94,9 +91,8 @@ Serializable* NickCore::Unserialize(Serializable *obj, Serialize::Data &data)
 
 	data["pass"] >> nc->pass;
 	data["email"] >> nc->email;
-	data["greet"] >> nc->greet;
 	data["language"] >> nc->language;
-	nc->ExtensibleUnserialize(data);
+	Extensible::ExtensibleUnserialize(nc, nc, data);
 	{
 		Anope::string buf;
 		data["access"] >> buf;
@@ -104,14 +100,6 @@ Serializable* NickCore::Unserialize(Serializable *obj, Serialize::Data &data)
 		nc->access.clear();
 		while (sep.GetToken(buf))
 			nc->access.push_back(buf);
-	}
-	{
-		Anope::string buf;
-		data["cert"] >> buf;
-		spacesepstream sep(buf);
-		nc->cert.clear();
-		while (sep.GetToken(buf))
-			nc->cert.push_back(buf);
 	}
 	data["memomax"] >> nc->memos.memomax;
 	{
@@ -123,14 +111,15 @@ Serializable* NickCore::Unserialize(Serializable *obj, Serialize::Data &data)
 			nc->memos.ignores.push_back(buf);
 	}
 
-	/* Compat */
-	Anope::string sflags;
-	data["flags"] >> sflags;
-	spacesepstream sep(sflags);
-	Anope::string tok;
-	while (sep.GetToken(tok))
-		nc->ExtendMetadata(tok);
-	/* End compat */
+	/* compat */
+	bool b;
+	data["extensible:SECURE"] >> b;
+	if (b)
+		nc->Extend<bool>("NS_SECURE");
+	data["extensible:PRIVATE"] >> b;
+	if (b)
+		nc->Extend<bool>("NS_PRIVATE");
+	/* end compat */
 
 	return nc;
 }
@@ -214,45 +203,6 @@ bool NickCore::IsOnAccess(const User *u) const
 			return true;
 	}
 	return false;
-}
-
-void NickCore::AddCert(const Anope::string &entry)
-{
-	this->cert.push_back(entry);
-	FOREACH_MOD(OnNickAddCert, (this, entry));
-}
-
-Anope::string NickCore::GetCert(unsigned entry) const
-{
-	if (this->cert.empty() || entry >= this->cert.size())
-		return "";
-	return this->cert[entry];
-}
-
-bool NickCore::FindCert(const Anope::string &entry) const
-{
-	for (unsigned i = 0, end = this->cert.size(); i < end; ++i)
-		if (this->cert[i] == entry)
-			return true;
-
-	return false;
-}
-
-void NickCore::EraseCert(const Anope::string &entry)
-{
-	for (unsigned i = 0, end = this->cert.size(); i < end; ++i)
-		if (this->cert[i] == entry)
-		{
-			FOREACH_MOD(OnNickEraseCert, (this, entry));
-			this->cert.erase(this->cert.begin() + i);
-			break;
-		}
-}
-
-void NickCore::ClearCert()
-{
-	FOREACH_MOD(OnNickClearCert, (this));
-	this->cert.clear();
 }
 
 void NickCore::AddChannelReference(ChannelInfo *ci)

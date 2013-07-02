@@ -37,9 +37,9 @@ struct EntryMsg : Serializable
 	static Serializable* Unserialize(Serializable *obj, Serialize::Data &data);
 };
 
-struct EntryMessageList : Serialize::Checker<std::vector<EntryMsg *> >, ExtensibleItem
+struct EntryMessageList : Serialize::Checker<std::vector<EntryMsg *> >
 {
-	EntryMessageList() : Serialize::Checker<std::vector<EntryMsg *> >("EntryMsg") { }
+	EntryMessageList(Extensible *) : Serialize::Checker<std::vector<EntryMsg *> >("EntryMsg") { }
 
 	~EntryMessageList()
 	{
@@ -71,12 +71,9 @@ Serializable* EntryMsg::Unserialize(Serializable *obj, Serialize::Data &data)
 		return msg;
 	}
 
-	EntryMessageList *messages = ci->GetExt<EntryMessageList *>("cs_entrymsg");
+	EntryMessageList *messages = ci->GetExt<EntryMessageList>("entrymsg");
 	if (messages == NULL)
-	{
-		messages = new EntryMessageList();
-		ci->Extend("cs_entrymsg", messages);
-	}
+		messages = ci->Extend<EntryMessageList>("entrymsg");
 
 	data["when"] >> swhen;
 
@@ -90,12 +87,9 @@ class CommandEntryMessage : public Command
  private:
 	void DoList(CommandSource &source, ChannelInfo *ci)
 	{
-		EntryMessageList *messages = ci->GetExt<EntryMessageList *>("cs_entrymsg");
+		EntryMessageList *messages = ci->GetExt<EntryMessageList>("entrymsg");
 		if (messages == NULL)
-		{
-			messages = new EntryMessageList();
-			ci->Extend("cs_entrymsg", messages);
-		}
+			messages = ci->Extend<EntryMessageList>("entrymsg");
 
 		if ((*messages)->empty())
 		{
@@ -129,12 +123,9 @@ class CommandEntryMessage : public Command
 		
 	void DoAdd(CommandSource &source, ChannelInfo *ci, const Anope::string &message)
 	{
-		EntryMessageList *messages = ci->GetExt<EntryMessageList *>("cs_entrymsg");
+		EntryMessageList *messages = ci->GetExt<EntryMessageList>("entrymsg");
 		if (messages == NULL)
-		{
-			messages = new EntryMessageList();
-			ci->Extend("cs_entrymsg", messages);
-		}
+			messages = ci->Extend<EntryMessageList>("entrymsg");
 
 		if ((*messages)->size() >= Config->GetModule(this->owner)->Get<unsigned>("maxentries"))
 			source.Reply(_("The entry message list for \002%s\002 is full."), ci->name.c_str());
@@ -148,12 +139,9 @@ class CommandEntryMessage : public Command
 
 	void DoDel(CommandSource &source, ChannelInfo *ci, const Anope::string &message)
 	{
-		EntryMessageList *messages = ci->GetExt<EntryMessageList *>("cs_entrymsg");
+		EntryMessageList *messages = ci->GetExt<EntryMessageList>("entrymsg");
 		if (messages == NULL)
-		{
-			messages = new EntryMessageList();
-			ci->Extend("cs_entrymsg", messages);
-		}
+			messages = ci->Extend<EntryMessageList>("entrymsg");
 
 		if (!message.is_pos_number_only())
 			source.Reply(("Entry message \002%s\002 not found on channel \002%s\002."), message.c_str(), ci->name.c_str());
@@ -169,7 +157,7 @@ class CommandEntryMessage : public Command
 					delete (*messages)->at(i - 1);
 					(*messages)->erase((*messages)->begin() + i - 1);
 					if ((*messages)->empty())
-						ci->Shrink("cs_entrymsg");
+						ci->Shrink<EntryMessageList>("entrymsg");
 					Log(source.IsFounder(ci) ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to remove a message";
 					source.Reply(_("Entry message \002%i\002 for \002%s\002 deleted."), i, ci->name.c_str());
 				}
@@ -185,14 +173,7 @@ class CommandEntryMessage : public Command
 
 	void DoClear(CommandSource &source, ChannelInfo *ci)
 	{
-		EntryMessageList *messages = ci->GetExt<EntryMessageList *>("cs_entrymsg");
-		if (messages != NULL)
-		{
-			for (unsigned i = 0; i < (*messages)->size(); ++i)
-				delete (*messages)->at(i);
-			(*messages)->clear();
-			ci->Shrink("cs_entrymsg");
-		}
+		ci->Shrink<EntryMessageList>("entrymsg");
 
 		Log(source.IsFounder(ci) ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to remove all messages";
 		source.Reply(_("Entry messages for \002%s\002 have been cleared."), ci->name.c_str());
@@ -267,9 +248,10 @@ class CSEntryMessage : public Module
 {
 	Serialize::Type entrymsg_type;
 	CommandEntryMessage commandentrymsg;
+	ExtensibleItem<EntryMessageList> eml;
 
  public:
-	CSEntryMessage(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR), entrymsg_type("EntryMsg", EntryMsg::Unserialize), commandentrymsg(this)
+	CSEntryMessage(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR), entrymsg_type("EntryMsg", EntryMsg::Unserialize), commandentrymsg(this), eml(this, "entrymsg")
 	{
 
 	}
@@ -278,7 +260,7 @@ class CSEntryMessage : public Module
 	{
 		if (u && c && c->ci && u->server->IsSynced())
 		{
-			EntryMessageList *messages = c->ci->GetExt<EntryMessageList *>("cs_entrymsg");
+			EntryMessageList *messages = c->ci->GetExt<EntryMessageList>("entrymsg");
 
 			if (messages != NULL)
 				for (unsigned i = 0; i < (*messages)->size(); ++i)

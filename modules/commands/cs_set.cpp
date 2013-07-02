@@ -10,6 +10,7 @@
  */
 
 #include "module.h"
+#include "modules/cs_mode.h"
 
 class CommandCSSet : public Command
 {
@@ -86,13 +87,13 @@ class CommandCSSetAutoOp : public Command
 		if (params[1].equals_ci("ON"))
 		{
 			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to enable autoop";
-			ci->Shrink("NOAUTOOP");
+			ci->Shrink<bool>("NOAUTOOP");
 			source.Reply(_("Services will now automatically give modes to users in \002%s\002."), ci->name.c_str());
 		}
 		else if (params[1].equals_ci("OFF"))
 		{
 			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to disable autoop";
-			ci->ExtendMetadata("NOAUTOOP");
+			ci->Extend<bool>("NOAUTOOP");
 			source.Reply(_("Services will no longer automatically give modes to users in \002%s\002."), ci->name.c_str());
 		}
 		else
@@ -203,14 +204,14 @@ class CommandCSSetChanstats : public Command
 
 		if (params[1].equals_ci("ON"))
 		{
-			ci->ExtendMetadata("STATS");
+			ci->Extend<bool>("CS_STATS");
 			source.Reply(_("Chanstats statistics are now enabled for this channel."));
 			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to enable chanstats";
 		}
 		else if (params[1].equals_ci("OFF"))
 		{
 			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to disable chanstats";
-			ci->Shrink("STATS");
+			ci->Shrink<bool>("CS_STATS");
 			source.Reply(_("Chanstats statistics are now disabled for this channel."));
 		}
 		else
@@ -344,64 +345,6 @@ class CommandCSSetFounder : public Command
 	}
 };
 
-class CommandCSSetKeepTopic : public Command
-{
- public:
-	CommandCSSetKeepTopic(Module *creator, const Anope::string &cname = "chanserv/set/keeptopic") : Command(creator, cname, 2, 2)
-	{
-		this->SetDesc(_("Retain topic when channel is not in use"));
-		this->SetSyntax(_("\037channel\037 {ON | OFF}"));
-	}
-
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
-	{
-		ChannelInfo *ci = ChannelInfo::Find(params[0]);
-		if (ci == NULL)
-		{
-			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
-			return;
-		}
-
-		EventReturn MOD_RESULT;
-		FOREACH_RESULT(OnSetChannelOption, MOD_RESULT, (source, this, ci, params[1]));
-		if (MOD_RESULT == EVENT_STOP)
-			return;
-
-		if (MOD_RESULT != EVENT_ALLOW && !source.AccessFor(ci).HasPriv("SET") && source.permission.empty() && !source.HasPriv("chanserv/administration"))
-		{
-			source.Reply(ACCESS_DENIED);
-			return;
-		}
-
-		if (params[1].equals_ci("ON"))
-		{
-			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to enable keeptopic";
-			ci->ExtendMetadata("KEEPTOPIC");
-			source.Reply(_("Topic retention option for %s is now \002on\002."), ci->name.c_str());
-		}
-		else if (params[1].equals_ci("OFF"))
-		{
-			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to disable keeptopic";
-			ci->Shrink("KEEPTOPIC");
-			source.Reply(_("Topic retention option for %s is now \002off\002."), ci->name.c_str());
-		}
-		else
-			this->OnSyntaxError(source, "KEEPTOPIC");
-	}
-
-	bool OnHelp(CommandSource &source, const Anope::string &) anope_override
-	{
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("Enables or disables the \002topic retention\002 option for a\n"
-				"channel. When \002%s\002 is set, the topic for the\n"
-				"channel will be remembered by %s even after the\n"
-				"last user leaves the channel, and will be restored the\n"
-				"next time the channel is created."), this->name.c_str(), source.service->nick.c_str());
-		return true;
-	}
-};
-
 class CommandCSSetPeace : public Command
 {
  public:
@@ -433,13 +376,13 @@ class CommandCSSetPeace : public Command
 		if (params[1].equals_ci("ON"))
 		{
 			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to enable peace";
-			ci->ExtendMetadata("PEACE");
+			ci->Extend<bool>("PEACE");
 			source.Reply(_("Peace option for %s is now \002on\002."), ci->name.c_str());
 		}
 		else if (params[1].equals_ci("OFF"))
 		{
 			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to disable peace";
-			ci->Shrink("PEACE");
+			ci->Shrink<bool>("PEACE");
 			source.Reply(_("Peace option for %s is now \002off\002."), ci->name.c_str());
 		}
 		else
@@ -495,7 +438,7 @@ class CommandCSSetPersist : public Command
 		{
 			if (!ci->HasExt("PERSIST"))
 			{
-				ci->ExtendMetadata("PERSIST");
+				ci->Extend<bool>("PERSIST");
 
 				/* Channel doesn't exist, create it */
 				if (!ci->c)
@@ -535,7 +478,9 @@ class CommandCSSetPersist : public Command
 					if (ci->c && !ci->c->HasMode("PERM"))
 						ci->c->SetMode(NULL, cm);
 					/* Add it to the channels mlock */
-					ci->SetMLock(cm, true);
+					ModeLocks *ml = ci->Require<ModeLocks>("modelocks");
+					if (ml)
+						ml->SetMLock(cm, true);
 				}
 			}
 
@@ -546,7 +491,7 @@ class CommandCSSetPersist : public Command
 		{
 			if (ci->HasExt("PERSIST"))
 			{
-				ci->Shrink("PERSIST");
+				ci->Shrink<bool>("PERSIST");
 
 				/* Unset perm mode */
 				if (cm)
@@ -554,7 +499,9 @@ class CommandCSSetPersist : public Command
 					if (ci->c && ci->c->HasMode("PERM"))
 						ci->c->RemoveMode(NULL, cm);
 					/* Remove from mlock */
-					ci->RemoveMLock(cm, true);
+					ModeLocks *ml = ci->GetExt<ModeLocks>("modelocks");
+					if (ml)
+						ml->RemoveMLock(cm, true);
 				}
 
 				/* No channel mode, no BotServ, but using ChanServ as the botserv bot
@@ -608,68 +555,6 @@ class CommandCSSetPersist : public Command
 	}
 };
 
-class CommandCSSetPrivate : public Command
-{
- public:
-	CommandCSSetPrivate(Module *creator, const Anope::string &cname = "chanserv/set/private") : Command(creator, cname, 2, 2)
-	{
-		this->SetDesc(_("Hide channel from the LIST command"));
-		this->SetSyntax(_("\037channel\037 {ON | OFF}"));
-	}
-
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
-	{
-		ChannelInfo *ci = ChannelInfo::Find(params[0]);
-		if (ci == NULL)
-		{
-			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
-			return;
-		}
-
-		EventReturn MOD_RESULT;
-		FOREACH_RESULT(OnSetChannelOption, MOD_RESULT, (source, this, ci, params[1]));
-		if (MOD_RESULT == EVENT_STOP)
-			return;
-
-		if (MOD_RESULT != EVENT_ALLOW && !source.AccessFor(ci).HasPriv("SET") && source.permission.empty() && !source.HasPriv("chanserv/administration"))
-		{
-			source.Reply(ACCESS_DENIED);
-			return;
-		}
-
-		if (params[1].equals_ci("ON"))
-		{
-			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to enable private";
-			ci->ExtendMetadata("PRIVATE");
-			source.Reply(_("Private option for %s is now \002on\002."), ci->name.c_str());
-		}
-		else if (params[1].equals_ci("OFF"))
-		{
-			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to disable private";
-			ci->Shrink("PRIVATE");
-			source.Reply(_("Private option for %s is now \002off\002."), ci->name.c_str());
-		}
-		else
-			this->OnSyntaxError(source, "PRIVATE");
-
-		return;
-	}
-
-	bool OnHelp(CommandSource &source, const Anope::string &) anope_override
-	{
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("Enables or disables the \002private\002 option for a channel."));
-		
-		BotInfo *bi;
-		Anope::string cmd;
-		if (Command::FindCommandFromService("chanserv/list", bi, cmd))
-			source.Reply(_("When \002private\002 is set, the channel will not appear in\n"
-				"%s's %s command."), bi->nick.c_str(), cmd.c_str());
-		return true;
-	}
-};
-
 class CommandCSSetRestricted : public Command
 {
  public:
@@ -702,13 +587,13 @@ class CommandCSSetRestricted : public Command
 		if (params[1].equals_ci("ON"))
 		{
 			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to enable restricted";
-			ci->ExtendMetadata("RESTRICTED");
+			ci->Extend<bool>("RESTRICTED");
 			source.Reply(_("Restricted access option for %s is now \002on\002."), ci->name.c_str());
 		}
 		else if (params[1].equals_ci("OFF"))
 		{
 			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to disable restricted";
-			ci->Shrink("RESTRICTED");
+			ci->Shrink<bool>("RESTRICTED");
 			source.Reply(_("Restricted access option for %s is now \002off\002."), ci->name.c_str());
 		}
 		else
@@ -758,13 +643,13 @@ class CommandCSSetSecure : public Command
 		if (params[1].equals_ci("ON"))
 		{
 			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to enable secure";
-			ci->ExtendMetadata("SECURE");
+			ci->Extend<bool>("CS_SECURE");
 			source.Reply(_("Secure option for %s is now \002on\002."), ci->name.c_str());
 		}
 		else if (params[1].equals_ci("OFF"))
 		{
 			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to disable secure";
-			ci->Shrink("SECURE");
+			ci->Shrink<bool>("CS_SECURE");
 			source.Reply(_("Secure option for %s is now \002off\002."), ci->name.c_str());
 		}
 		else
@@ -816,13 +701,13 @@ class CommandCSSetSecureFounder : public Command
 		if (params[1].equals_ci("ON"))
 		{
 			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to enable secure founder";
-			ci->ExtendMetadata("SECUREFOUNDER");
+			ci->Extend<bool>("SECUREFOUNDER");
 			source.Reply(_("Secure founder option for %s is now \002on\002."), ci->name.c_str());
 		}
 		else if (params[1].equals_ci("OFF"))
 		{
 			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to disable secure founder";
-			ci->Shrink("SECUREFOUNDER");
+			ci->Shrink<bool>("SECUREFOUNDER");
 			source.Reply(_("Secure founder option for %s is now \002off\002."), ci->name.c_str());
 		}
 		else
@@ -874,13 +759,13 @@ class CommandCSSetSecureOps : public Command
 		if (params[1].equals_ci("ON"))
 		{
 			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to enable secure ops";
-			ci->ExtendMetadata("SECUREOPS");
+			ci->Extend<bool>("SECUREOPS");
 			source.Reply(_("Secure ops option for %s is now \002on\002."), ci->name.c_str());
 		}
 		else if (params[1].equals_ci("OFF"))
 		{
 			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to disable secure ops";
-			ci->Shrink("SECUREOPS");
+			ci->Shrink<bool>("SECUREOPS");
 			source.Reply(_("Secure ops option for %s is now \002off\002."), ci->name.c_str());
 		}
 		else
@@ -904,7 +789,7 @@ class CommandCSSetSignKick : public Command
 	CommandCSSetSignKick(Module *creator, const Anope::string &cname = "chanserv/set/signkick") : Command(creator, cname, 2, 2)
 	{
 		this->SetDesc(_("Sign kicks that are done with the KICK command"));
-		this->SetSyntax(_("\037channel\037 SIGNKICK {ON | LEVEL | OFF}"));
+		this->SetSyntax(_("\037channel\037 {ON | LEVEL | OFF}"));
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
@@ -929,23 +814,23 @@ class CommandCSSetSignKick : public Command
 
 		if (params[1].equals_ci("ON"))
 		{
-			ci->ExtendMetadata("SIGNKICK");
-			ci->Shrink("SIGNKICK_LEVEL");
+			ci->Extend<bool>("SIGNKICK");
+			ci->Shrink<bool>("SIGNKICK_LEVEL");
 			source.Reply(_("Signed kick option for %s is now \002on\002."), ci->name.c_str());
 			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to enable sign kick";
 		}
 		else if (params[1].equals_ci("LEVEL"))
 		{
-			ci->ExtendMetadata("SIGNKICK_LEVEL");
-			ci->Shrink("SIGNKICK");
+			ci->Extend<bool>("SIGNKICK_LEVEL");
+			ci->Shrink<bool>("SIGNKICK");
 			source.Reply(_("Signed kick option for %s is now \002on\002, but depends of the\n"
 				"level of the user that is using the command."), ci->name.c_str());
 			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to enable sign kick level";
 		}
 		else if (params[1].equals_ci("OFF"))
 		{
-			ci->Shrink("SIGNKICK");
-			ci->Shrink("SIGNKICK_LEVEL");
+			ci->Shrink<bool>("SIGNKICK");
+			ci->Shrink<bool>("SIGNKICK_LEVEL");
 			source.Reply(_("Signed kick option for %s is now \002off\002."), ci->name.c_str());
 			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to disable sign kick";
 		}
@@ -1075,13 +960,13 @@ class CommandCSSetNoexpire : public Command
 		if (params[1].equals_ci("ON"))
 		{
 			Log(LOG_ADMIN, source, this, ci) << "to enable noexpire";
-			ci->ExtendMetadata("NO_EXPIRE");
+			ci->Extend<bool>("CS_NO_EXPIRE");
 			source.Reply(_("Channel %s \002will not\002 expire."), ci->name.c_str());
 		}
 		else if (params[1].equals_ci("OFF"))
 		{
 			Log(LOG_ADMIN, source, this, ci) << "to disable noexpire";
-			ci->Shrink("NO_EXPIRE");
+			ci->Shrink<bool>("CS_NO_EXPIRE");
 			source.Reply(_("Channel %s \002will\002 expire."), ci->name.c_str());
 		}
 		else
@@ -1102,16 +987,17 @@ class CommandCSSetNoexpire : public Command
 
 class CSSet : public Module
 {
+	SerializableExtensibleItem<bool> persist, noautoop, stats, peace, securefounder,
+		restricted, secure, secureops, signkick, signkick_level, noexpire;
+
 	CommandCSSet commandcsset;
 	CommandCSSetAutoOp commandcssetautoop;
 	CommandCSSetBanType commandcssetbantype;
 	CommandCSSetChanstats commandcssetchanstats;
 	CommandCSSetDescription commandcssetdescription;
 	CommandCSSetFounder commandcssetfounder;
-	CommandCSSetKeepTopic commandcssetkeeptopic;
 	CommandCSSetPeace commandcssetpeace;
 	CommandCSSetPersist commandcssetpersist;
-	CommandCSSetPrivate commandcssetprivate;
 	CommandCSSetRestricted commandcssetrestricted;
 	CommandCSSetSecure commandcssetsecure;
 	CommandCSSetSecureFounder commandcssetsecurefounder;
@@ -1122,17 +1008,27 @@ class CSSet : public Module
 
  public:
 	CSSet(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
+		persist(this, "PERSIST"), noautoop(this, "NOAUTOOP"), stats(this, "CS_STATS"), peace(this, "PEACE"),
+		securefounder(this, "SECUREFOUNDER"), restricted(this, "RESTRICTED"),
+		secure(this, "CS_SECURE"), secureops(this, "SECUREOPS"), signkick(this, "SIGNKICK"),
+		signkick_level(this, "SIGNKICK_LEVEL"), noexpire(this, "CS_NO_EXPIRE"),
+
 		commandcsset(this), commandcssetautoop(this), commandcssetbantype(this), commandcssetchanstats(this),
-		commandcssetdescription(this), commandcssetfounder(this), commandcssetkeeptopic(this),
-		commandcssetpeace(this), commandcssetpersist(this), commandcssetprivate(this), commandcssetrestricted(this),
+		commandcssetdescription(this), commandcssetfounder(this),
+		commandcssetpeace(this), commandcssetpersist(this), commandcssetrestricted(this),
 		commandcssetsecure(this), commandcssetsecurefounder(this), commandcssetsecureops(this), commandcssetsignkick(this),
 		commandcssetsuccessor(this), commandcssetnoexpire(this)
 	{
 	}
 
+	void OnCreateChan(ChannelInfo *ci) anope_override
+	{
+		ci->bantype = Config->GetModule(this)->Get<int>("defbantype", "2");
+	}
+
 	EventReturn OnCheckKick(User *u, Channel *c, Anope::string &mask, Anope::string &reason) anope_override
 	{
-		if (!c->ci || !c->ci->HasExt("RESTRICTED") || c->MatchesList(u, "EXCEPT"))
+		if (!c->ci || !restricted.HasExt(c->ci) || c->MatchesList(u, "EXCEPT"))
 			return EVENT_CONTINUE;
 
 		if (c->ci->AccessFor(u).empty() && (!c->ci->GetFounder() || u->Account() != c->ci->GetFounder()))
@@ -1143,30 +1039,30 @@ class CSSet : public Module
 
 	void OnDelChan(ChannelInfo *ci) anope_override
 	{
-		if (ci->c && ci->HasExt("PERSIST"))
+		if (ci->c && persist.HasExt(ci))
 			ci->c->RemoveMode(ci->WhoSends(), "PERM", "", false);
-		ci->Shrink("PERSIST");
+		persist.Unset(ci);
 	}
 
-	EventReturn OnChannelModeSet(Channel *c, MessageSource &setter, const Anope::string &mname, const Anope::string &param) anope_override
+	EventReturn OnChannelModeSet(Channel *c, MessageSource &setter, ChannelMode *mode, const Anope::string &param) anope_override
 	{
 		/* Channel mode +P or so was set, mark this channel as persistent */
-		if (mname == "PERM" && c->ci)
+		if (mode->name == "PERM" && c->ci)
 		{
-			c->ci->ExtendMetadata("PERSIST");
+			persist.Set(c->ci, true);
 		}
 
 		return EVENT_CONTINUE;
 	}
 
-	EventReturn OnChannelModeUnset(Channel *c, MessageSource &setter, const Anope::string &mname, const Anope::string &param) anope_override
+	EventReturn OnChannelModeUnset(Channel *c, MessageSource &setter, ChannelMode *mode, const Anope::string &param) anope_override
 	{
-		if (mname == "PERM")
+		if (mode->name == "PERM")
 		{
 			if (c->ci)
-				c->ci->Shrink("PERSIST");
+				persist.Unset(c->ci);
 
-			if (c->users.empty() && !c->syncing && c->CheckDelete())
+			if (c->CheckDelete())
 			{
 				delete c;
 				return EVENT_STOP;
@@ -1178,14 +1074,14 @@ class CSSet : public Module
 
 	EventReturn OnCheckDelete(Channel *c) anope_override
 	{
-		if (c->ci && c->ci->HasExt("PERSIST"))
+		if (c->ci && persist.HasExt(c->ci))
 			return EVENT_STOP;
 		return EVENT_CONTINUE;
 	}
 
 	void OnJoinChannel(User *u, Channel *c) anope_override
 	{
-		if (c->ci && c->ci->HasExt("PERSIST") && c->creation_time > c->ci->time_registered)
+		if (c->ci && persist.HasExt(c->ci) && c->creation_time > c->ci->time_registered)
 		{
 			Log(LOG_DEBUG) << "Changing TS of " << c->name << " from " << c->creation_time << " to " << c->ci->time_registered;
 			c->creation_time = c->ci->time_registered;
@@ -1198,9 +1094,46 @@ class CSSet : public Module
 	{
 		if (chan->ci)
 		{
-			give_modes &= !chan->ci->HasExt("NOAUTOOP");
-			take_modes  |= chan->ci->HasExt("SECUREOPS");
+			if (noautoop.HasExt(chan->ci))	
+				give_modes = false;
+			if (secureops.HasExt(chan->ci))
+				take_modes = true;
 		}
+	}
+
+	void OnPreChanExpire(ChannelInfo *ci, bool &expire) anope_override
+	{
+		if (noexpire.HasExt(ci))
+			expire = false;
+	}
+
+	void OnChanInfo(CommandSource &source, ChannelInfo *ci, InfoFormatter &info, bool show_all) anope_override
+	{
+		if (!show_all)
+			return;
+
+		if (peace.HasExt(ci))
+			info.AddOption(_("Peace"));
+		if (restricted.HasExt(ci))
+			info.AddOption(_("Restricted Access"));
+		if (secure.HasExt(ci))
+			info.AddOption(_("Secure"));
+		if (securefounder.HasExt(ci))
+			info.AddOption(_("Secure Founder"));
+		if (secureops.HasExt(ci))
+			info.AddOption(_("Secure Ops"));
+		if (signkick.HasExt(ci) || signkick_level.HasExt(ci))
+			info.AddOption(_("Signed kicks"));
+		if (persist.HasExt(ci))
+			info.AddOption(_("Persistent"));
+		if (noexpire.HasExt(ci))
+			info.AddOption(_("No expire"));
+		if (stats.HasExt(ci))
+			info.AddOption(_("Chanstats"));
+
+		time_t chanserv_expire = Config->GetModule(this)->Get<time_t>("expire", "14d");
+		if (!noexpire.HasExt(ci) && chanserv_expire && !Anope::NoExpire)
+			info["Expires on"] = Anope::strftime(ci->last_used + chanserv_expire);
 	}
 };
 

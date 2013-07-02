@@ -10,9 +10,70 @@
  */
 
 #include "module.h"
+#include "modules/cs_mode.h"
+
+class CommandCSSetKeepTopic : public Command
+{
+ public:
+	CommandCSSetKeepTopic(Module *creator, const Anope::string &cname = "chanserv/set/keeptopic") : Command(creator, cname, 2, 2)
+	{
+		this->SetDesc(_("Retain topic when channel is not in use"));
+		this->SetSyntax(_("\037channel\037 {ON | OFF}"));
+	}
+
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	{
+		ChannelInfo *ci = ChannelInfo::Find(params[0]);
+		if (ci == NULL)
+		{
+			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
+			return;
+		}
+
+		EventReturn MOD_RESULT;
+		FOREACH_RESULT(OnSetChannelOption, MOD_RESULT, (source, this, ci, params[1]));
+		if (MOD_RESULT == EVENT_STOP)
+			return;
+
+		if (MOD_RESULT != EVENT_ALLOW && !source.AccessFor(ci).HasPriv("SET") && source.permission.empty() && !source.HasPriv("chanserv/administration"))
+		{
+			source.Reply(ACCESS_DENIED);
+			return;
+		}
+
+		if (params[1].equals_ci("ON"))
+		{
+			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to enable keeptopic";
+			ci->Extend<bool>("KEEPTOPIC");
+			source.Reply(_("Topic retention option for %s is now \002on\002."), ci->name.c_str());
+		}
+		else if (params[1].equals_ci("OFF"))
+		{
+			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to disable keeptopic";
+			ci->Shrink<bool>("KEEPTOPIC");
+			source.Reply(_("Topic retention option for %s is now \002off\002."), ci->name.c_str());
+		}
+		else
+			this->OnSyntaxError(source, "KEEPTOPIC");
+	}
+
+	bool OnHelp(CommandSource &source, const Anope::string &) anope_override
+	{
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_("Enables or disables the \002topic retention\002 option for a\n"
+				"channel. When \002%s\002 is set, the topic for the\n"
+				"channel will be remembered by %s even after the\n"
+				"last user leaves the channel, and will be restored the\n"
+				"next time the channel is created."), source.command.c_str(), source.service->nick.c_str());
+		return true;
+	}
+};
 
 class CommandCSTopic : public Command
 {
+	ExtensibleRef<bool> topiclock;
+
 	void Lock(CommandSource &source, ChannelInfo *ci, const std::vector<Anope::string> &params)
 	{
 		EventReturn MOD_RESULT;
@@ -20,7 +81,7 @@ class CommandCSTopic : public Command
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
-		ci->ExtendMetadata("TOPICLOCK");
+		topiclock->Set(ci, true);
 		source.Reply(_("Topic lock option for %s is now \002on\002."), ci->name.c_str());
 	}
 
@@ -31,7 +92,7 @@ class CommandCSTopic : public Command
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
-		ci->Shrink("TOPICLOCK");
+		topiclock->Unset(ci);
 		source.Reply(_("Topic lock option for %s is now \002off\002."), ci->name.c_str());
 	}
 
@@ -39,11 +100,11 @@ class CommandCSTopic : public Command
 	{
 		const Anope::string &topic = params.size() > 2 ? params[2] : "";
 
-		bool has_topiclock = ci->HasExt("TOPICLOCK");
-		ci->Shrink("TOPICLOCK");
+		bool *has_topiclock = topiclock->Get(ci);
+		topiclock->Unset(ci);
 		ci->c->ChangeTopic(source.GetNick(), topic, Anope::CurTime);
 		if (has_topiclock)
-			ci->ExtendMetadata("TOPICLOCK");
+			topiclock->Set(ci, *has_topiclock);
 	
 		bool override = !source.AccessFor(ci).HasPriv("TOPIC");
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << (!topic.empty() ? "to change the topic to: " : "to unset the topic") << (!topic.empty() ? topic : "");
@@ -71,7 +132,8 @@ class CommandCSTopic : public Command
 	}
 
  public:
-	CommandCSTopic(Module *creator) : Command(creator, "chanserv/topic", 2, 3)
+	CommandCSTopic(Module *creator) : Command(creator, "chanserv/topic", 2, 3),
+		topiclock("TOPICLOCK")
 	{
 		this->SetDesc(_("Manipulate the topic of the specified channel"));
 		this->SetSyntax(_("\037channel\037 SET [\037topic\037]"));
@@ -120,12 +182,65 @@ class CommandCSTopic : public Command
 class CSTopic : public Module
 {
 	CommandCSTopic commandcstopic;
+	CommandCSSetKeepTopic commandcssetkeeptopic;
+
+	SerializableExtensibleItem<bool> topiclock, keeptopic;
 
  public:
 	CSTopic(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		commandcstopic(this)
+		commandcstopic(this), commandcssetkeeptopic(this), topiclock(this, "TOPICLOCK"), keeptopic(this, "KEEPTOPIC")
 	{
 
+	}
+
+	void OnChannelSync(Channel *c) anope_override
+	{
+		if (Me && Me->IsSynced() && c->ci)
+		{
+			/* Update channel topic */
+			if ((topiclock.HasExt(c->ci) || keeptopic.HasExt(c->ci)) && c->ci->last_topic != c->topic)
+			{
+				c->ChangeTopic(!c->ci->last_topic_setter.empty() ? c->ci->last_topic_setter : c->ci->WhoSends()->nick, c->ci->last_topic, c->ci->last_topic_time ? c->ci->last_topic_time : Anope::CurTime);
+			}
+		}
+	}
+
+	void OnTopicUpdated(Channel *c, const Anope::string &user, const Anope::string &topic) anope_override
+	{
+		if (!c->ci)
+			return;
+
+		/* We only compare the topics here, not the time or setter. This is because some (old) IRCds do not
+		 * allow us to set the topic as someone else, meaning we have to bump the TS and change the setter to us.
+		 * This desyncs what is really set with what we have stored, and we end up resetting the topic often when
+		 * it is not required
+		 */
+		if (topiclock.HasExt(c->ci) && c->ci->last_topic != c->topic)
+		{
+			c->ChangeTopic(c->ci->last_topic_setter, c->ci->last_topic, c->ci->last_topic_time);
+		}
+		else
+		{
+			c->ci->last_topic = c->topic;
+			c->ci->last_topic_setter = c->topic_setter;
+			c->ci->last_topic_time = c->topic_ts;
+		}
+	}
+
+	void OnChanInfo(CommandSource &source, ChannelInfo *ci, InfoFormatter &info, bool show_all)
+	{
+		if (keeptopic.HasExt(ci))
+			info.AddOption(_("Topic Retention"));
+		if (topiclock.HasExt(ci))
+			info.AddOption(_("Topic Lock"));
+
+		ModeLocks *ml = ci->GetExt<ModeLocks>("modelocks");
+		const ModeLock *secret = ml ? ml->GetMLock("SECRET") : NULL;
+		if (!ci->last_topic.empty() && (show_all || ((!secret || secret->set == false) && (!ci->c || !ci->c->HasMode("SECRET")))))
+		{
+			info["Last topic"] = ci->last_topic;
+			info["Topic set by"] = ci->last_topic_setter;
+		}
 	}
 };
 

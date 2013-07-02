@@ -34,7 +34,7 @@ class DNSBLResolver : public Request
 
 	void OnLookupComplete(const Query *record) anope_override
 	{
-		if (!user || user->HasExt("m_dnsbl_akilled"))
+		if (!user || user->Quitting())
 			return;
 
 		const ResourceRecord &ans_record = record->answers[0];
@@ -53,8 +53,6 @@ class DNSBLResolver : public Request
 				return;
 			record_reason = this->blacklist.replies[result];
 		}
-
-		user->Extend("m_dnsbl_akilled");
 
 		Anope::string reason = this->blacklist.reason;
 		reason = reason.replace_all_cs("%n", user->nick);

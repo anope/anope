@@ -10,6 +10,9 @@
 
 #include "module.h"
 #include "modules/os_session.h"
+#include "modules/bs_kick.h"
+#include "modules/cs_mode.h"
+#include "modules/bs_badwords.h"
 
 #define READ(x) \
 if (true) \
@@ -81,13 +84,6 @@ else \
 #define OLD_BS_KICK_FLOOD		0x02000000
 #define OLD_BS_KICK_REPEAT		0x01000000
 
-struct ExtensibleItemUint32 : ExtensibleItem
-{
-	uint32_t u;
-	ExtensibleItemUint32(uint32_t i) : u(i) { }
-};
-
-
 static struct mlock_info
 {
 	char c;
@@ -139,12 +135,13 @@ enum
 
 static void process_mlock(ChannelInfo *ci, uint32_t lock, bool status)
 {
+	ModeLocks *ml = ci->Require<ModeLocks>("modelocks");
 	for (unsigned i = 0; i < (sizeof(mlock_infos) / sizeof(mlock_info)); ++i)
 		if (lock & mlock_infos[i].m)
 		{
 			ChannelMode *cm = ModeManager::FindChannelModeByChar(mlock_infos[i].c);
-			if (cm)
-				ci->SetMLock(cm, status);
+			if (cm && ml)
+				ml->SetMLock(cm, status);
 		}
 }
 
@@ -448,7 +445,7 @@ static void LoadNicks()
 			nc->email = buffer;
 
 			READ(read_string(buffer, f));
-			nc->greet = buffer;
+			nc->Extend<Anope::string>("greet", buffer);
 
 			uint32_t uint;
 			READ(read_uint32(&uint, f));
@@ -459,37 +456,37 @@ static void LoadNicks()
 
 			READ(read_uint32(&uint, f));
 			if (uint & OLD_NI_KILLPROTECT)
-				nc->ExtendMetadata("KILLPROTECT");
+				nc->Extend<bool>("KILLPROTECT");
 			if (uint & OLD_NI_SECURE)
-				nc->ExtendMetadata("SECURE");
+				nc->Extend<bool>("NS_SECURE");
 			if (uint & OLD_NI_MSG)
-				nc->ExtendMetadata("MSG");
+				nc->Extend<bool>("MSG");
 			if (uint & OLD_NI_MEMO_HARDMAX)
-				nc->ExtendMetadata("MEMO_HARDMAX");
+				nc->Extend<bool>("MEMO_HARDMAX");
 			if (uint & OLD_NI_MEMO_SIGNON)
-				nc->ExtendMetadata("MEMO_SIGNON");
+				nc->Extend<bool>("MEMO_SIGNON");
 			if (uint & OLD_NI_MEMO_RECEIVE)
-				nc->ExtendMetadata("MEMO_RECEIVE");
+				nc->Extend<bool>("MEMO_RECEIVE");
 			if (uint & OLD_NI_PRIVATE)
-				nc->ExtendMetadata("PRIVATE");
+				nc->Extend<bool>("NS_PRIVATE");
 			if (uint & OLD_NI_HIDE_EMAIL)
-				nc->ExtendMetadata("HIDE_EMAIL");
+				nc->Extend<bool>("HIDE_EMAIL");
 			if (uint & OLD_NI_HIDE_MASK)
-				nc->ExtendMetadata("HIDE_MASK");
+				nc->Extend<bool>("HIDE_MASK");
 			if (uint & OLD_NI_HIDE_QUIT)
-				nc->ExtendMetadata("HIDE_QUIT");
+				nc->Extend<bool>("HIDE_QUIT");
 			if (uint & OLD_NI_KILL_QUICK)
-				nc->ExtendMetadata("KILL_QUICK");
+				nc->Extend<bool>("KILL_QUICK");
 			if (uint & OLD_NI_KILL_IMMED)
-				nc->ExtendMetadata("KILL_IMMED");
+				nc->Extend<bool>("KILL_IMMED");
 			if (uint & OLD_NI_MEMO_MAIL)
-				nc->ExtendMetadata("MEMO_MAIL");
+				nc->Extend<bool>("MEMO_MAIL");
 			if (uint & OLD_NI_HIDE_STATUS)
-				nc->ExtendMetadata("HIDE_STATUS");
+				nc->Extend<bool>("HIDE_STATUS");
 			if (uint & OLD_NI_SUSPENDED)
-				nc->ExtendMetadata("SUSPENDED");
+				nc->Extend<bool>("SUSPENDED");
 			if (!(uint & OLD_NI_AUTOOP))
-				nc->ExtendMetadata("AUTOOP");
+				nc->Extend<bool>("AUTOOP");
 
 			uint16_t u16;
 			READ(read_uint16(&u16, f));
@@ -607,7 +604,7 @@ static void LoadNicks()
 			na->last_seen = last_seen;
 
 			if (tmpu16 & OLD_NS_NO_EXPIRE)
-				na->ExtendMetadata("NO_EXPIRE");
+				na->Extend<bool>("NS_NO_EXPIRE");
 
 			Log(LOG_DEBUG) << "Loaded NickAlias " << na->nick;
 		}
@@ -728,31 +725,31 @@ static void LoadChannels()
 			// Temporary flags cleanup
 			tmpu32 &= ~0x80000000;
 			if (tmpu32 & OLD_CI_KEEPTOPIC)
-				ci->ExtendMetadata("KEEPTOPIC");
+				ci->Extend<bool>("KEEPTOPIC");
 			if (tmpu32 & OLD_CI_SECUREOPS)
-				ci->ExtendMetadata("SECUREOPS");
+				ci->Extend<bool>("SECUREOPS");
 			if (tmpu32 & OLD_CI_PRIVATE)
-				ci->ExtendMetadata("PRIVATE");
+				ci->Extend<bool>("CS_PRIVATE");
 			if (tmpu32 & OLD_CI_TOPICLOCK)
-				ci->ExtendMetadata("TOPICLOCK");
+				ci->Extend<bool>("TOPICLOCK");
 			if (tmpu32 & OLD_CI_RESTRICTED)
-				ci->ExtendMetadata("RESTRICTED");
+				ci->Extend<bool>("RESTRICTED");
 			if (tmpu32 & OLD_CI_PEACE)
-				ci->ExtendMetadata("PEACE");
+				ci->Extend<bool>("PEACE");
 			if (tmpu32 & OLD_CI_SECURE)
-				ci->ExtendMetadata("SECURE");
+				ci->Extend<bool>("CS_SECURE");
 			if (tmpu32 & OLD_CI_NO_EXPIRE)
-				ci->ExtendMetadata("NO_EXPIRE");
+				ci->Extend<bool>("CI_NO_EXPIRE");
 			if (tmpu32 & OLD_CI_MEMO_HARDMAX)
-				ci->ExtendMetadata("MEMO_HARDMAX");
+				ci->Extend<bool>("MEMO_HARDMAX");
 			if (tmpu32 & OLD_CI_SECUREFOUNDER)
-				ci->ExtendMetadata("SECUREFOUNDER");
+				ci->Extend<bool>("SECUREFOUNDER");
 			if (tmpu32 & OLD_CI_SIGNKICK)
-				ci->ExtendMetadata("SIGNKICK");
+				ci->Extend<bool>("SIGNKICK");
 			if (tmpu32 & OLD_CI_SIGNKICK_LEVEL)
-				ci->ExtendMetadata("SIGNKICK_LEVEL");
+				ci->Extend<bool>("SIGNKICK_LEVEL");
 			if (tmpu32 & OLD_CI_SUSPENDED)
-				ci->ExtendMetadata("SUSPENDED");
+				ci->Extend<bool>("SUSPENDED");
 
 			READ(read_string(buffer, f));
 			READ(read_string(buffer, f));
@@ -773,7 +770,7 @@ static void LoadChannels()
 					level = ACCESS_FOUNDER;
 
 				if (j == 10 && level < 0) // NOJOIN
-					ci->Shrink("RESTRICTED"); // If CSDefRestricted was enabled this can happen
+					ci->Shrink<bool>("RESTRICTED"); // If CSDefRestricted was enabled this can happen
 
 				ci->SetLevel(GetLevelName(j), level);
 			}
@@ -831,9 +828,9 @@ static void LoadChannels()
 			}
 
 			READ(read_uint32(&tmpu32, f)); // mlock on
-			ci->Extend("mlock_on", new ExtensibleItemUint32(tmpu32));
+			ci->Extend<uint32_t>("mlock_on", tmpu32);
 			READ(read_uint32(&tmpu32, f)); // mlock off
-			ci->Extend("mlock_off", new ExtensibleItemUint32(tmpu32));
+			ci->Extend<uint32_t>("mlock_off", tmpu32);
 			READ(read_uint32(&tmpu32, f)); // mlock limit
 			READ(read_string(buffer, f));
 			READ(read_string(buffer, f));
@@ -863,52 +860,63 @@ static void LoadChannels()
 
 			READ(read_int32(&tmp32, f));
 			if (tmp32 & OLD_BS_DONTKICKOPS)
-				ci->ExtendMetadata("BS_DONTKICKOPS");
+				ci->Extend<bool>("BS_DONTKICKOPS");
 			if (tmp32 & OLD_BS_DONTKICKVOICES)
-				ci->ExtendMetadata("BS_DONTKICKVOICES");
+				ci->Extend<bool>("BS_DONTKICKVOICES");
 			if (tmp32 & OLD_BS_FANTASY)
-				ci->ExtendMetadata("BS_FANTASY");
+				ci->Extend<bool>("BS_FANTASY");
 			if (tmp32 & OLD_BS_GREET)
-				ci->ExtendMetadata("BS_GREET");
+				ci->Extend<bool>("BS_GREET");
 			if (tmp32 & OLD_BS_NOBOT)
-				ci->ExtendMetadata("BS_NOBOT");
-			if (tmp32 & OLD_BS_KICK_BOLDS)
-				ci->ExtendMetadata("BS_KICK_BOLDS");
-			if (tmp32 & OLD_BS_KICK_COLORS)
-				ci->ExtendMetadata("BS_KICK_COLORS");
-			if (tmp32 & OLD_BS_KICK_REVERSES)
-				ci->ExtendMetadata("BS_KICK_REVERSES");
-			if (tmp32 & OLD_BS_KICK_UNDERLINES)
-				ci->ExtendMetadata("BS_KICK_UNDERLINES");
-			if (tmp32 & OLD_BS_KICK_BADWORDS)
-				ci->ExtendMetadata("BS_KICK_BADWORDS");
-			if (tmp32 & OLD_BS_KICK_CAPS)
-				ci->ExtendMetadata("BS_KICK_CAPS");
-			if (tmp32 & OLD_BS_KICK_FLOOD)
-				ci->ExtendMetadata("BS_KICK_FLOOD");
-			if (tmp32 & OLD_BS_KICK_REPEAT)
-				ci->ExtendMetadata("BS_KICK_REPEAT");
+				ci->Extend<bool>("BS_NOBOT");
+
+			KickerData *kd = ci->Require<KickerData>("kickerdata");
+			if (kd)
+			{
+				if (tmp32 & OLD_BS_KICK_BOLDS)
+					kd->bolds = true;
+				if (tmp32 & OLD_BS_KICK_COLORS)
+					kd->colors = true;
+				if (tmp32 & OLD_BS_KICK_REVERSES)
+					kd->reverses = true;
+				if (tmp32 & OLD_BS_KICK_UNDERLINES)
+					kd->underlines = true;
+				if (tmp32 & OLD_BS_KICK_BADWORDS)
+					kd->badwords = true;
+				if (tmp32 & OLD_BS_KICK_CAPS)
+					kd->caps = true;
+				if (tmp32 & OLD_BS_KICK_FLOOD)
+					kd->flood = true;
+				if (tmp32 & OLD_BS_KICK_REPEAT)
+					kd->repeat = true;
+			}
 
 			READ(read_int16(&tmp16, f));
 			for (int16_t j = 0; j < tmp16; ++j)
 			{
 				int16_t ttb;
 				READ(read_int16(&ttb, f));
-				if (j < TTB_SIZE)
-					ci->ttb[j] = ttb;
+				if (j < TTB_SIZE && kd)
+					kd->ttb[j] = ttb;
 			}
 
 			READ(read_int16(&tmp16, f));
-			ci->capsmin = tmp16;
+			if (kd)
+				kd->capsmin = tmp16;
 			READ(read_int16(&tmp16, f));
-			ci->capspercent = tmp16;
+			if (kd)
+				kd->capspercent = tmp16;
 			READ(read_int16(&tmp16, f));
-			ci->floodlines = tmp16;
+			if (kd)
+				kd->floodlines = tmp16;
 			READ(read_int16(&tmp16, f));
-			ci->floodsecs = tmp16;
+			if (kd)
+				kd->floodsecs = tmp16;
 			READ(read_int16(&tmp16, f));
-			ci->repeattimes = tmp16;
+			if (kd)
+				kd->repeattimes = tmp16;
 
+			BadWords *bw = ci->Require<BadWords>("badwords");
 			READ(read_uint16(&tmpu16, f));
 			for (uint16_t j = 0; j < tmpu16; ++j)
 			{
@@ -928,7 +936,8 @@ static void LoadChannels()
 					else if (type == 3)
 						bwtype = BW_END;
 
-					ci->AddBadWord(buffer, bwtype);
+					if (bw)
+						bw->AddBadWord(buffer, bwtype);
 				}
 			}
 
@@ -1089,8 +1098,11 @@ static void LoadExceptions()
 
 class DBOld : public Module
 {
+	PrimitiveExtensibleItem<uint32_t> mlock_on, mlock_off;
+
  public:
-	DBOld(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, DATABASE | VENDOR)
+	DBOld(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, DATABASE | VENDOR),
+		mlock_on(this, "mlock_on"), mlock_off(this, "mlock_off")
 	{
 
 
@@ -1114,22 +1126,21 @@ class DBOld : public Module
 
 	void OnUplinkSync(Server *s) anope_override
 	{
-		ExtensibleItemUint32 *mlock;
 		for (registered_channel_map::iterator it = RegisteredChannelList->begin(), it_end = RegisteredChannelList->end(); it != it_end; ++it)
 		{
 			ChannelInfo *ci = it->second;
-			if (ci->HasExt("mlock_on"))
+
+			uint32_t *u = mlock_on.Get(ci);
+			if (u)
 			{
-				mlock = ci->GetExt<ExtensibleItemUint32 *>("mlock_on");
-				process_mlock(ci, mlock->u, true);
-				ci->Shrink("mlock_on");
+				process_mlock(ci, *u, true);
+				mlock_on.Unset(ci);
 			}
 
-			if (ci->HasExt("mlock_off"))
+			u = mlock_off.Get(ci);
 			{
-				mlock = ci->GetExt<ExtensibleItemUint32 *>("mlock_off");
-				process_mlock(ci, mlock->u, false);
-				ci->Shrink("mlock_off");
+				process_mlock(ci, *u, false);
+				mlock_off.Unset(ci);
 			}
 		}
 	}

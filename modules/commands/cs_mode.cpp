@@ -10,6 +10,234 @@
  */
 
 #include "module.h"
+#include "modules/cs_mode.h"
+
+struct ModeLockImpl : ModeLock, Serializable
+{
+	ModeLockImpl() : Serializable("ModeLock")
+	{
+	}
+
+	~ModeLockImpl()
+	{
+		ChannelInfo *chan = ChannelInfo::Find(ci);
+		if (chan)
+		{
+			ModeLocks *ml = chan->GetExt<ModeLocks>("modelocks");
+			if (ml)
+				ml->RemoveMLock(this);
+		}
+	}
+
+	void Serialize(Serialize::Data &data) const anope_override;
+	static Serializable* Unserialize(Serializable *obj, Serialize::Data &data);
+};
+
+struct ModeLocksImpl : ModeLocks
+{
+	Serialize::Reference<ChannelInfo> ci;
+	Serialize::Checker<ModeList> mlocks;
+
+	ModeLocksImpl(Extensible *obj) : ci(anope_dynamic_static_cast<ChannelInfo *>(obj)), mlocks("ModeLock")
+	{
+	}
+
+	bool HasMLock(ChannelMode *mode, const Anope::string &param, bool status) const anope_override
+	{
+		if (!mode)
+			return false;
+
+		for (ModeList::const_iterator it = this->mlocks->begin(); it != this->mlocks->end(); ++it)
+		{
+			const ModeLock *ml = *it;
+
+			if (ml->name == mode->name && ml->set == status && ml->param == param)
+				return true;
+		}
+
+		return false;
+	}
+
+	bool SetMLock(ChannelMode *mode, bool status, const Anope::string &param, Anope::string setter, time_t created = Anope::CurTime) anope_override
+	{
+		if (!mode)
+			return false;
+
+		RemoveMLock(mode, status, param);
+
+		if (setter.empty())
+			setter = ci->GetFounder() ? ci->GetFounder()->display : "Unknown";
+
+		ModeLock *ml = new ModeLockImpl();
+		ml->ci = ci->name;
+		ml->set = status;
+		ml->name = mode->name;
+		ml->param = param;
+		ml->setter = setter;
+		ml->created = created;
+
+		EventReturn MOD_RESULT;
+		FOREACH_RESULT(OnMLock, MOD_RESULT, (this->ci, ml));
+		if (MOD_RESULT == EVENT_STOP)
+		{
+			delete ml;
+			return false;
+		}
+
+		this->mlocks->push_back(ml);
+		return true;
+	}
+
+	bool RemoveMLock(ChannelMode *mode, bool status, const Anope::string &param = "") anope_override
+	{
+		if (!mode)
+			return false;
+
+		for (ModeList::iterator it = this->mlocks->begin(); it != this->mlocks->end(); ++it)
+		{
+			ModeLock *m = *it;
+
+			if (m->name == mode->name)
+			{
+				// For list or status modes, we must check the parameter
+				if (mode->type == MODE_LIST || mode->type == MODE_STATUS)
+					if (m->param != param)
+						continue;
+
+				EventReturn MOD_RESULT;
+				FOREACH_RESULT(OnUnMLock, MOD_RESULT, (this->ci, m));
+				if (MOD_RESULT == EVENT_STOP)
+					break;
+
+				delete m;
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	void RemoveMLock(ModeLock *mlock) anope_override
+	{
+		ModeList::iterator it = std::find(this->mlocks->begin(), this->mlocks->end(), mlock);
+		if (it != this->mlocks->end())
+			this->mlocks->erase(it);
+	}
+
+	void ClearMLock() anope_override
+	{
+		ModeList ml;
+		this->mlocks->swap(ml);
+		for (unsigned i = 0; i < ml.size(); ++i)
+			delete ml[i];
+	}
+
+	const ModeList &GetMLock() const anope_override
+	{
+		return this->mlocks;
+	}
+
+	std::list<ModeLock *> GetModeLockList(const Anope::string &name) anope_override
+	{
+		std::list<ModeLock *> mlist;
+		for (ModeList::const_iterator it = this->mlocks->begin(); it != this->mlocks->end(); ++it)
+		{
+			ModeLock *m = *it;
+			if (m->name == name)
+				mlist.push_back(m);
+		}
+		return mlist;
+	}
+
+	const ModeLock *GetMLock(const Anope::string &mname, const Anope::string &param = "") anope_override
+	{
+		for (ModeList::const_iterator it = this->mlocks->begin(); it != this->mlocks->end(); ++it)
+		{
+			ModeLock *m = *it;
+
+			if (m->name == mname && m->param == param)
+				return m;
+		}
+
+		return NULL;
+	}
+
+	Anope::string GetMLockAsString(bool complete) const anope_override
+	{
+		Anope::string pos = "+", neg = "-", params;
+
+		for (ModeList::const_iterator it = this->mlocks->begin(); it != this->mlocks->end(); ++it)
+		{
+			const ModeLock *ml = *it;
+			ChannelMode *cm = ModeManager::FindChannelModeByName(ml->name);
+
+			if (!cm || cm->type == MODE_LIST || cm->type == MODE_STATUS)
+				continue;
+
+			if (ml->set)
+				pos += cm->mchar;
+			else
+				neg += cm->mchar;
+
+			if (complete && ml->set && !ml->param.empty() && cm->type == MODE_PARAM)
+				params += " " + ml->param;
+		}
+
+		if (pos.length() == 1)
+			pos.clear();
+		if (neg.length() == 1)
+			neg.clear();
+
+		return pos + neg + params;
+	}
+
+	void Check() anope_override
+	{
+		if (this->mlocks->empty())
+			ci->Shrink<ModeLocks>("modelocks");
+	}
+};
+
+void ModeLockImpl::Serialize(Serialize::Data &data) const
+{
+	data["ci"] << this->ci;
+	data["set"] << this->set;
+	data["name"] << this->name;
+	data["param"] << this->param;
+	data["setter"] << this->setter;
+	data.SetType("created", Serialize::Data::DT_INT); data["created"] << this->created;
+}
+
+Serializable* ModeLockImpl::Unserialize(Serializable *obj, Serialize::Data &data)
+{
+	Anope::string sci;
+	
+	data["ci"] >> sci;
+
+	ChannelInfo *ci = ChannelInfo::Find(sci);
+	if (!ci)
+		return NULL;
+	
+	ModeLockImpl *ml;
+	if (obj)
+		ml = anope_dynamic_static_cast<ModeLockImpl *>(obj);
+	else
+	{
+		ml = new ModeLockImpl();
+		ml->ci = ci->name;
+	}
+
+	data["set"] >> ml->set;
+	data["created"] >> ml->created;
+	data["setter"] >> ml->setter;
+	data["name"] >> ml->name;
+	data["param"] >> ml->param;
+
+	if (!obj)
+		ci->Require<ModeLocksImpl>("modelocks")->mlocks->push_back(ml);
+
+	return ml;
+}
 
 class CommandCSMode : public Command
 {
@@ -28,21 +256,20 @@ class CommandCSMode : public Command
 		const Anope::string &param = params.size() > 3 ? params[3] : "";
 
 		bool override = !source.AccessFor(ci).HasPriv("MODE");
+		ModeLocks *modelocks = ci->Require<ModeLocks>("modelocks");
 
 		if ((subcommand.equals_ci("ADD") || subcommand.equals_ci("SET")) && !param.empty())
 		{
 			/* If setting, remove the existing locks */
 			if (subcommand.equals_ci("SET"))
 			{
-				const ChannelInfo::ModeList &mlocks = ci->GetMLock();
-				for (ChannelInfo::ModeList::const_iterator it = mlocks.begin(), it_next; it != mlocks.end(); it = it_next)
+				const ModeLocks::ModeList mlocks = modelocks->GetMLock();
+				for (ModeLocks::ModeList::const_iterator it = mlocks.begin(); it != mlocks.end(); ++it)
 				{
-					const ModeLock *ml = it->second;
+					const ModeLock *ml = *it;
 					ChannelMode *cm = ModeManager::FindChannelModeByName(ml->name);
-					it_next = it;
-					++it_next;
 					if (cm && cm->CanSet(source.GetUser()))
-						ci->RemoveMLock(cm, ml->set, ml->param);
+						modelocks->RemoveMLock(cm, ml->set, ml->param);
 				}
 			}
 
@@ -86,7 +313,7 @@ class CommandCSMode : public Command
 							source.Reply(_("List for mode %c is full."), cm->mchar);
 						else
 						{
-							ci->SetMLock(cm, adding, mode_param, source.GetNick()); 
+							modelocks->SetMLock(cm, adding, mode_param, source.GetNick()); 
 
 							if (adding)
 							{
@@ -110,8 +337,8 @@ class CommandCSMode : public Command
 				neg.clear();
 			Anope::string reply = pos + neg + pos_params + neg_params;
 
-			source.Reply(_("%s locked on %s."), ci->GetMLockAsString(true).c_str(), ci->name.c_str());
-			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to lock " << ci->GetMLockAsString(true);
+			source.Reply(_("%s locked on %s."), modelocks->GetMLockAsString(true).c_str(), ci->name.c_str());
+			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to lock " << modelocks->GetMLockAsString(true);
 
 			if (ci->c)
 				ci->c->CheckModes();
@@ -154,7 +381,7 @@ class CommandCSMode : public Command
 							source.Reply(_("Missing parameter for mode %c."), cm->mchar);
 						else
 						{
-							if (ci->RemoveMLock(cm, adding, mode_param))
+							if (modelocks->RemoveMLock(cm, adding, mode_param))
 							{
 								if (!mode_param.empty())
 									mode_param = " " + mode_param;
@@ -169,7 +396,7 @@ class CommandCSMode : public Command
 		}
 		else if (subcommand.equals_ci("LIST"))
 		{
-			const ChannelInfo::ModeList &mlocks = ci->GetMLock();
+			const ModeLocks::ModeList mlocks = modelocks->GetMLock();
 			if (mlocks.empty())
 			{
 				source.Reply(_("Channel %s has no mode locks."), ci->name.c_str());
@@ -179,9 +406,9 @@ class CommandCSMode : public Command
 				ListFormatter list;
 				list.AddColumn("Mode").AddColumn("Param").AddColumn("Creator").AddColumn("Created");
 
-				for (ChannelInfo::ModeList::const_iterator it = mlocks.begin(), it_end = mlocks.end(); it != it_end; ++it)
+				for (ModeLocks::ModeList::const_iterator it = mlocks.begin(), it_end = mlocks.end(); it != it_end; ++it)
 				{
-					const ModeLock *ml = it->second;
+					const ModeLock *ml = *it;
 					ChannelMode *cm = ModeManager::FindChannelModeByName(ml->name);
 					if (!cm)
 						continue;
@@ -481,12 +708,125 @@ class CommandCSMode : public Command
 class CSMode : public Module
 {
 	CommandCSMode commandcsmode;
+	ExtensibleItem<ModeLocksImpl> modelocks;
+	Serialize::Type modelocks_type;
 
  public:
 	CSMode(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		commandcsmode(this)
+		commandcsmode(this), modelocks(this, "modelocks"), modelocks_type("ModeLock", ModeLockImpl::Unserialize)
 	{
 
+	}
+
+	EventReturn OnCheckModes(Channel *c) anope_override
+	{
+		if (!c->ci)
+			return EVENT_CONTINUE;
+
+		ModeLocks *ml = modelocks.Get(c->ci);
+		if (ml)
+			for (ModeLocks::ModeList::const_iterator it = ml->GetMLock().begin(), it_end = ml->GetMLock().end(); it != it_end; ++it)
+			{
+				const ModeLock *ml = *it;
+				ChannelMode *cm = ModeManager::FindChannelModeByName(ml->name);
+				if (!cm)
+					continue;
+
+				if (cm->type == MODE_REGULAR)
+				{
+					if (!c->HasMode(cm->name) && ml->set)
+						c->SetMode(NULL, cm);
+					else if (c->HasMode(cm->name) && !ml->set)
+						c->RemoveMode(NULL, cm);
+				}
+				else if (cm->type == MODE_PARAM)
+				{
+					/* If the channel doesnt have the mode, or it does and it isn't set correctly */
+					if (ml->set)
+					{
+						Anope::string param;
+						c->GetParam(cm->name, param);
+
+						if (!c->HasMode(cm->name) || (!param.empty() && !ml->param.empty() && !param.equals_cs(ml->param)))
+							c->SetMode(NULL, cm, ml->param);
+					}
+					else
+					{
+						if (c->HasMode(cm->name))
+							c->RemoveMode(NULL, cm);
+					}
+		
+				}
+				else if (cm->type == MODE_LIST)
+				{
+					if (ml->set)
+						c->SetMode(NULL, cm, ml->param);
+					else
+						c->RemoveMode(NULL, cm, ml->param);
+				}
+			}
+	}
+
+	EventReturn OnChannelModeSet(Channel *c, MessageSource &setter, ChannelMode *mode, const Anope::string &param) anope_override
+	{
+		if (!c->ci)
+			return EVENT_CONTINUE;
+
+		ModeLocks *ml = modelocks.Get(c->ci);
+		if (!ml)
+			return EVENT_CONTINUE;
+
+		if (ml->HasMLock(mode, param, false))
+			c->RemoveMode(c->ci->WhoSends(), mode, param);
+	}
+
+	EventReturn OnChannelModeUnset(Channel *c, MessageSource &setter, ChannelMode *mode, const Anope::string &param) anope_override
+	{
+		if (!c->ci)
+			return EVENT_CONTINUE;
+
+		ModeLocks *ml = modelocks.Get(c->ci);
+		if (!ml)
+			return EVENT_CONTINUE;
+
+		if (ml->HasMLock(mode, param, true))
+			c->SetMode(c->ci->WhoSends(), mode, param);
+	}
+
+	void OnCreateChan(ChannelInfo *ci) anope_override
+	{
+		ModeLocks *ml = modelocks.Require(ci);
+		Anope::string modes;
+		spacesepstream sep(Config->GetModule(this)->Get<const Anope::string>("mlock", "+nrt"));
+		if (sep.GetToken(modes))
+		{
+			bool add = true;
+			for (unsigned i = 0; i < modes.length(); ++i)
+			{
+				if (modes[i] == '+')
+					add = true;
+				else if (modes[i] == '-')
+					add = false;
+				else
+				{
+					ChannelMode *cm = ModeManager::FindChannelModeByChar(modes[i]);
+					Anope::string param;
+					if (cm && (cm->type == MODE_REGULAR || sep.GetToken(param)))
+						ml->SetMLock(cm, add, param);
+				}
+			}
+		}
+		ml->Check();
+	}
+
+	void OnChanInfo(CommandSource &source, ChannelInfo *ci, InfoFormatter &info, bool show_hidden) anope_override
+	{
+		if (!show_hidden)
+			return;
+
+		ModeLocks *ml = modelocks.Get(ci);
+		if (ml)
+			info[_("Mode lock")] = ml->GetMLockAsString(true);
 	}
 };
 

@@ -40,8 +40,8 @@ class WebpanelRequest : public IdentifyRequest
 			id += c;
 		}
 
-		na->Extend("webcpanel_id", new ExtensibleItemClass<Anope::string>(id));
-		na->Extend("webcpanel_ip", new ExtensibleItemClass<Anope::string>(client->GetIP()));
+		na->Extend<Anope::string>("webcpanel_id", id);
+		na->Extend<Anope::string>("webcpanel_ip", client->GetIP());
 
 		{
 			HTTPReply::cookie c;

@@ -947,7 +947,7 @@ struct IRCDMessageMetadata : IRCDMessage
 				User *u = User::Find(params[0]);
 				if (!u)
 					return;
-				u->Extend("SSL");
+				u->Extend<bool>("ssl");
 				Anope::string data = params[2].c_str();
 				size_t pos1 = data.find(' ') + 1;
 				size_t pos2 = data.find(' ', pos1);
@@ -1271,6 +1271,7 @@ struct IRCDMessageEncap : IRCDMessage
 class ProtoInspIRCd : public Module
 {
 	InspIRCd12Proto ircd_proto;
+	ExtensibleItem<bool> ssl;
 
 	/* Core message handlers */
 	Message::Away message_away;
@@ -1311,7 +1312,7 @@ class ProtoInspIRCd : public Module
 
  public:
 	ProtoInspIRCd(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PROTOCOL | VENDOR),
-		ircd_proto(this),
+		ircd_proto(this), ssl(this, "ssl"),
 		message_away(this), message_error(this), message_invite(this), message_join(this), message_kick(this), message_kill(this),
 		message_motd(this), message_part(this), message_ping(this), message_privmsg(this), message_quit(this), message_squit(this),
 		message_stats(this), message_topic(this),

@@ -111,7 +111,7 @@ class IdentifyInterface : public LDAPInterface
 					// encrypt and store the password in the nickcore
 					Anope::Encrypt(ii->req->GetPassword(), na->nc->pass);
 
-					na->nc->Extend("m_ldap_authentication_dn", new ExtensibleItemClass<Anope::string>(ii->dn));
+					na->nc->Extend<Anope::string>("m_ldap_authentication_dn", ii->dn);
 					ii->req->Success(me);
 				}
 				break;
@@ -207,12 +207,15 @@ class NSIdentifyLDAP : public Module
 	OnIdentifyInterface oninterface;
 	OnRegisterInterface orinterface;
 
+	PrimitiveExtensibleItem<Anope::string> dn;
+
 	Anope::string password_attribute;
 	Anope::string disable_register_reason;
 	Anope::string disable_email_reason;
  public:
 	NSIdentifyLDAP(const Anope::string &modname, const Anope::string &creator) :
-		Module(modname, creator, EXTRA | VENDOR), ldap("LDAPProvider", "ldap/main"), iinterface(this), oninterface(this), orinterface(this)
+		Module(modname, creator, EXTRA | VENDOR), ldap("LDAPProvider", "ldap/main"), iinterface(this), oninterface(this), orinterface(this),
+		dn(this, "m_ldap_authentication_dn")
 	{
 
 		me = this;
@@ -274,16 +277,16 @@ class NSIdentifyLDAP : public Module
 
 	void OnNickIdentify(User *u) anope_override
 	{
-		if (email_attribute.empty() || !this->ldap || !u->Account()->HasExt("m_ldap_authentication_dn"))
+		if (email_attribute.empty() || !this->ldap)
 			return;
 
-		Anope::string *dn = u->Account()->GetExt<ExtensibleItemClass<Anope::string> *>("m_ldap_authentication_dn");
-		if (!dn || dn->empty())
+		Anope::string *d = dn.Get(u->Account());
+		if (!d || d->empty())
 			return;
 
 		try
 		{
-			LDAPQuery id = this->ldap->Search(&this->oninterface, *dn, "(" + email_attribute + "=*)");
+			LDAPQuery id = this->ldap->Search(&this->oninterface, *d, "(" + email_attribute + "=*)");
 			this->oninterface.Add(id, u->nick);
 		}
 		catch (const LDAPException &ex)

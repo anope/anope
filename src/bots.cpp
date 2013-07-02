@@ -80,7 +80,7 @@ void BotInfo::Serialize(Serialize::Data &data) const
 	data["created"] << this->created;
 	data["oper_only"] << this->oper_only;
 
-	this->ExtensibleSerialize(data);
+	Extensible::ExtensibleSerialize(this, this, data);
 }
 
 Serializable* BotInfo::Unserialize(Serializable *obj, Serialize::Data &data)
@@ -101,7 +101,7 @@ Serializable* BotInfo::Unserialize(Serializable *obj, Serialize::Data &data)
 	data["created"] >> bi->created;
 	data["oper_only"] >> bi->oper_only;
 
-	bi->ExtensibleUnserialize(data);
+	Extensible::ExtensibleUnserialize(bi, bi, data);
 
 	return bi;
 }

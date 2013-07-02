@@ -11,13 +11,23 @@
 
 #include "module.h"
 
+static Module *me;
+
 static std::map<Anope::string, Anope::string> descriptions;
 
-struct NSMiscData : ExtensibleItem, Serializable
+struct NSMiscData;
+static Anope::map<ExtensibleItem<NSMiscData> *> items;
+static ExtensibleItem<NSMiscData> *GetItem(const Anope::string &name);
+
+struct NSMiscData : Serializable
 {
 	Serialize::Reference<NickCore> nc;
 	Anope::string name;
 	Anope::string data;
+
+	NSMiscData(Extensible *obj) : Serializable("NSMiscData"), nc(anope_dynamic_static_cast<NickCore *>(obj))
+	{
+	}
 
 	NSMiscData(NickCore *ncore, const Anope::string &n, const Anope::string &d) : Serializable("NSMiscData"), nc(ncore), name(n), data(d)
 	{
@@ -52,13 +62,26 @@ struct NSMiscData : ExtensibleItem, Serializable
 		}
 		else
 		{
-			d = new NSMiscData(nc, sname, sdata);
-			nc->Extend(sname, d);
+			ExtensibleItem<NSMiscData> *item = GetItem(sname);
+			if (item)
+				d = item->Set(nc, NSMiscData(nc, sname, sdata));
 		}
 
 		return d;
 	}
 };
+
+static ExtensibleItem<NSMiscData> *GetItem(const Anope::string &name)
+{
+	ExtensibleItem<NSMiscData>* &it = items[name];
+	if (!it)
+		try
+		{
+			it = new ExtensibleItem<NSMiscData>(me, name);
+		}
+		catch (const ModuleException &) { }
+	return it;
+}
 
 static Anope::string GetAttribute(const Anope::string &command)
 {
@@ -93,16 +116,20 @@ class CommandNSSetMisc : public Command
 
 		Anope::string scommand = GetAttribute(source.command);
 		Anope::string key = "ns_set_misc:" + scommand;
-		nc->Shrink(key);
+		ExtensibleItem<NSMiscData> *item = GetItem(key);
+		if (item == NULL)
+			return;
+
 		if (!param.empty())
 		{
-			nc->Extend(key, new NSMiscData(nc, key, param));
+			item->Set(nc, NSMiscData(nc, key, param));
 			source.Reply(CHAN_SETTING_CHANGED, scommand.c_str(), nc->display.c_str(), param.c_str());
 		}
 		else
+		{
+			item->Unset(nc);
 			source.Reply(CHAN_SETTING_UNSET, scommand.c_str(), nc->display.c_str());
-
-		return;
+		}
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
@@ -155,6 +182,7 @@ class NSSetMisc : public Module
 	NSSetMisc(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		nsmiscdata_type("NSMiscData", NSMiscData::Unserialize), commandnssetmisc(this), commandnssasetmisc(this)
 	{
+		me = this;
 	}
 
 	void OnReload(Configuration::Conf *conf) anope_override
@@ -182,17 +210,14 @@ class NSSetMisc : public Module
 
 	void OnNickInfo(CommandSource &source, NickAlias *na, InfoFormatter &info, bool ShowHidden) anope_override
 	{
-		std::deque<Anope::string> list;
-		na->nc->GetExtList(list);
-
-		for (unsigned i = 0; i < list.size(); ++i)
+		Anope::map<ExtensibleItem<NSMiscData> *> items;
+		for (Anope::map<ExtensibleItem<NSMiscData> *>::iterator it = items.begin(); it != items.end(); ++it)
 		{
-			if (list[i].find("ns_set_misc:") != 0)
-				continue;
+			ExtensibleItem<NSMiscData> *e = it->second;
+			NSMiscData *data = e->Get(na->nc);
 
-			NSMiscData *data = na->nc->GetExt<NSMiscData *>(list[i]);
-			if (data)
-				info[list[i].substr(12).replace_all_cs("_", " ")] = data->data;
+			if (data != NULL)
+				info[e->name.substr(12).replace_all_cs("_", " ")] = data->data;
 		}
 	}
 };

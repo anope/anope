@@ -220,7 +220,7 @@ void InfoFormatter::Process(std::vector<Anope::string> &buffer)
 		Anope::string s;
 		for (unsigned i = it->first.length(); i < this->longest; ++i)
 			s += " ";
-		s += Anope::string(Language::Translate(this->nc, it->first.c_str())) + ": " + it->second;
+		s += Anope::string(Language::Translate(this->nc, it->first.c_str())) + ": " + Language::Translate(this->nc, it->second.c_str());
 
 		buffer.push_back(s);
 	}
@@ -232,6 +232,25 @@ Anope::string& InfoFormatter::operator[](const Anope::string &key)
 		this->longest = key.length();
 	this->replies.push_back(std::make_pair(key, ""));
 	return this->replies.back().second;
+}
+
+void InfoFormatter::AddOption(const Anope::string &opt)
+{
+	Anope::string *optstr = NULL;
+	for (std::vector<std::pair<Anope::string, Anope::string> >::iterator it = this->replies.begin(), it_end = this->replies.end(); it != it_end; ++it)
+	{
+		if (it->first == "Options")
+		{
+			optstr = &it->second;
+			break;
+		}
+	}
+	if (!optstr)
+		optstr = &(*this)["Options"];
+
+	if (!optstr->empty())
+		*optstr += ", ";
+	*optstr += Language::Translate(nc, opt.c_str());
 }
 
 bool Anope::IsFile(const Anope::string &filename)

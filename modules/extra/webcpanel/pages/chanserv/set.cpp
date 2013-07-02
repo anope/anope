@@ -32,57 +32,57 @@ bool WebCPanel::ChanServ::Set::OnRequest(HTTPProvider *server, const Anope::stri
 		if (ci->HasExt("KEEPTOPIC") != message.post_data.count("keeptopic"))
 		{
 			if (!ci->HasExt("KEEPTOPIC"))
-				ci->ExtendMetadata("KEEPTOPIC");
+				ci->Extend<bool>("KEEPTOPIC");
 			else
-				ci->Shrink("KEEPTOPIC");
+				ci->Shrink<bool>("KEEPTOPIC");
 			replacements["MESSAGES"] = "Secure updated";
 		}
 		if (ci->HasExt("PEACE") != message.post_data.count("peace"))
 		{
 			if (!ci->HasExt("PEACE"))
-				ci->ExtendMetadata("PEACE");
+				ci->Extend<bool>("PEACE");
 			else
-				ci->Shrink("PEACE");
+				ci->Shrink<bool>("PEACE");
 			replacements["MESSAGES"] = "Peace updated";
 		}
-		if (ci->HasExt("PRIVATE") != message.post_data.count("private"))
+		if (ci->HasExt("CS_PRIVATE") != message.post_data.count("private"))
 		{
-			if (!ci->HasExt("PRIVATE"))
-				ci->ExtendMetadata("PRIVATE");
+			if (!ci->HasExt("CS_PRIVATE"))
+				ci->Extend<bool>("CS_PRIVATE");
 			else
-				ci->Shrink("PRIVATE");
+				ci->Shrink<bool>("CS_PRIVATE");
 			replacements["MESSAGES"] = "Private updated";
 		}
 		if (ci->HasExt("RESTRICTED") != message.post_data.count("restricted"))
 		{
 			if (!ci->HasExt("RESTRICTED"))
-				ci->ExtendMetadata("RESTRICTED");
+				ci->Extend<bool>("RESTRICTED");
 			else
-				ci->Shrink("RESTRICTED");
+				ci->Shrink<bool>("RESTRICTED");
 			replacements["MESSAGES"] = "Restricted updated";
 		}
-		if (ci->HasExt("SECURE") != message.post_data.count("secure"))
+		if (ci->HasExt("CS_SECURE") != message.post_data.count("secure"))
 		{
-			if (!ci->HasExt("SECURE"))
-				ci->ExtendMetadata("SECURE");
+			if (!ci->HasExt("CS_SECURE"))
+				ci->Extend<bool>("CS_SECURE");
 			else
-				ci->Shrink("SECURE");
+				ci->Shrink<bool>("CS_SECURE");
 			replacements["MESSAGES"] = "Secure updated";
 		}
 		if (ci->HasExt("SECUREOPS") != message.post_data.count("secureops"))
 		{
 			if (!ci->HasExt("SECUREOPS"))
-				ci->ExtendMetadata("SECUREOPS");
+				ci->Extend<bool>("SECUREOPS");
 			else
-				ci->Shrink("SECUREOPS");
+				ci->Shrink<bool>("SECUREOPS");
 			replacements["MESSAGES"] = "Secureops updated";
 		}
 		if (ci->HasExt("TOPICLOCK") != message.post_data.count("topiclock"))
 		{
 			if (!ci->HasExt("TOPICLOCK"))
-				ci->ExtendMetadata("TOPICLOCK");
+				ci->Extend<bool>("TOPICLOCK");
 			else
-				ci->Shrink("TOPICLOCK");
+				ci->Shrink<bool>("TOPICLOCK");
 			replacements["MESSAGES"] = "Topiclock updated";
 		}
 	}
@@ -108,13 +108,13 @@ bool WebCPanel::ChanServ::Set::OnRequest(HTTPProvider *server, const Anope::stri
 	if (ci->HasExt("PEACE"))
 		replacements["PEACE"];
 	
-	if (ci->HasExt("PRIVATE"))
+	if (ci->HasExt("CS_PRIVATE"))
 		replacements["PRIVATE"];
 
 	if (ci->HasExt("RESTRICTED"))
 		replacements["RESTRICTED"];
 	
-	if (ci->HasExt("SECURE"))
+	if (ci->HasExt("CS_SECURE"))
 		replacements["SECURE"];
 	
 	if (ci->HasExt("SECUREOPS"))

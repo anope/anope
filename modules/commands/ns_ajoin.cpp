@@ -13,9 +13,9 @@
 
 struct AJoinEntry;
 
-struct AJoinList : Serialize::Checker<std::vector<AJoinEntry *> >, ExtensibleItem
+struct AJoinList : Serialize::Checker<std::vector<AJoinEntry *> >
 {
-	AJoinList() : Serialize::Checker<std::vector<AJoinEntry *> >("AJoinEntry") { }
+	AJoinList(Extensible *) : Serialize::Checker<std::vector<AJoinEntry *> >("AJoinEntry") { }
 	~AJoinList();
 };
 
@@ -25,7 +25,7 @@ struct AJoinEntry : Serializable
 	Anope::string channel;
 	Anope::string key;
 
-	AJoinEntry() : Serializable("AJoinEntry") { }
+	AJoinEntry(Extensible *) : Serializable("AJoinEntry") { }
 
 	void Serialize(Serialize::Data &sd) const anope_override
 	{
@@ -52,7 +52,7 @@ struct AJoinEntry : Serializable
 			aj = anope_dynamic_static_cast<AJoinEntry *>(obj);
 		else
 		{
-			aj = new AJoinEntry();
+			aj = new AJoinEntry(nc);
 			aj->owner = nc;
 		}
 
@@ -61,12 +61,7 @@ struct AJoinEntry : Serializable
 
 		if (!obj)
 		{
-			AJoinList *channels = nc->GetExt<AJoinList *>("ns_ajoin_channels");
-			if (channels == NULL)
-			{
-				channels = new AJoinList();
-				nc->Extend("ns_ajoin_channels", channels);
-			}
+			AJoinList *channels = nc->Require<AJoinList>("ajoinlist");
 			(*channels)->push_back(aj);
 		}
 
@@ -84,12 +79,7 @@ class CommandNSAJoin : public Command
 {
 	void DoList(CommandSource &source, NickCore *nc)
 	{
-		AJoinList *channels = nc->GetExt<AJoinList *>("ns_ajoin_channels");
-		if (channels == NULL)
-		{
-			channels = new AJoinList();
-			nc->Extend("ns_ajoin_channels", channels);
-		}
+		AJoinList *channels = nc->Require<AJoinList>("ajoinlist");
 
 		if ((*channels)->empty())
 			source.Reply(_("%s's auto join list is empty."), nc->display.c_str());
@@ -119,12 +109,7 @@ class CommandNSAJoin : public Command
 
 	void DoAdd(CommandSource &source, NickCore *nc, const Anope::string &chan, const Anope::string &key)
 	{
-		AJoinList *channels = nc->GetExt<AJoinList *>("ns_ajoin_channels");
-		if (channels == NULL)
-		{
-			channels = new AJoinList();
-			nc->Extend("ns_ajoin_channels", channels);
-		}
+		AJoinList *channels = nc->Require<AJoinList>("ajoinlist");
 
 		unsigned i = 0;
 		for (; i < (*channels)->size(); ++i)
@@ -139,7 +124,7 @@ class CommandNSAJoin : public Command
  			source.Reply(CHAN_X_INVALID, chan.c_str());
 		else
 		{
-			AJoinEntry *entry = new AJoinEntry();
+			AJoinEntry *entry = new AJoinEntry(nc);
 			entry->owner = nc;
 			entry->channel = chan;
 			entry->key = key;
@@ -150,12 +135,7 @@ class CommandNSAJoin : public Command
 
 	void DoDel(CommandSource &source, NickCore *nc, const Anope::string &chan)
 	{
-		AJoinList *channels = nc->GetExt<AJoinList *>("ns_ajoin_channels");
-		if (channels == NULL)
-		{
-			channels = new AJoinList();
-			nc->Extend("ns_ajoin_channels", channels);
-		}
+		AJoinList *channels = nc->Require<AJoinList>("ajoinlist");
 
 		unsigned i = 0;
 		for (; i < (*channels)->size(); ++i)
@@ -170,6 +150,9 @@ class CommandNSAJoin : public Command
 			(*channels)->erase((*channels)->begin() + i);
 			source.Reply(_("%s was removed from %s's auto join list."), chan.c_str(), nc->display.c_str());
 		}
+
+		if ((*channels)->empty())
+			nc->Shrink<AJoinList>("ajoinlist");
 	}
 
  public:
@@ -233,10 +216,11 @@ class NSAJoin : public Module
 {
 	Serialize::Type ajoinentry_type;
 	CommandNSAJoin commandnsajoin;
+	ExtensibleItem<AJoinList> ajoinlist;
 
  public:
 	NSAJoin(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		ajoinentry_type("AJoinEntry", AJoinEntry::Unserialize), commandnsajoin(this)
+		ajoinentry_type("AJoinEntry", AJoinEntry::Unserialize), commandnsajoin(this), ajoinlist(this, "ajoinlist")
 	{
 
 		if (!IRCD->CanSVSJoin)
@@ -250,12 +234,9 @@ class NSAJoin : public Module
 		if (!NickServ)
 			return;
 
-		AJoinList *channels = u->Account()->GetExt<AJoinList *>("ns_ajoin_channels");
+		AJoinList *channels = u->Account()->GetExt<AJoinList>("ajoinlist");
 		if (channels == NULL)
-		{
-			channels = new AJoinList();
-			u->Account()->Extend("ns_ajoin_channels", channels);
-		}
+			channels = u->Account()->Extend<AJoinList>("ajoinlist");
 
 		for (unsigned i = 0; i < (*channels)->size(); ++i)
 		{
@@ -284,7 +265,7 @@ class NSAJoin : public Module
 					continue;
 				else if (c->HasMode("ADMINONLY") && !u->HasMode("ADMIN"))
 					continue;
-				else if (c->HasMode("SSL") && !(u->HasMode("SSL") || u->HasExt("SSL")))
+				else if (c->HasMode("SSL") && !(u->HasMode("SSL") || u->HasExt("ssl")))
 					continue;
 				else if (c->MatchesList(u, "BAN") == true && c->MatchesList(u, "EXCEPT") == false)
 					need_invite = true;

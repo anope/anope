@@ -10,6 +10,7 @@
  */
 
 #include "module.h"
+#include "modules/ns_cert.h"
 
 class NSGroupRequest : public IdentifyRequest
 {
@@ -43,7 +44,6 @@ class NSGroupRequest : public IdentifyRequest
 		na->time_registered = na->last_seen = Anope::CurTime;
 
 		u->Login(target->nc);
-		IRCD->SendLogin(u);
 		FOREACH_MOD(OnNickGroup, (u, target));
 
 		Log(LOG_COMMAND, source, cmd) << "makes " << nick << " join group of " << target->nick << " (" << target->nc->display << ") (email: " << (!target->nc->email.empty() ? target->nc->email : "none") << ")";
@@ -141,7 +141,9 @@ class CommandNSGroup : public Command
 			bool ok = false;
 			if (!na && u->Account())
 				ok = true;
-			else if (!u->fingerprint.empty() && target->nc->FindCert(u->fingerprint))
+
+			NSCertList *cl = target->nc->GetExt<NSCertList>("certificates");
+			if (!u->fingerprint.empty() && cl && cl->FindCert(u->fingerprint))
 				ok = true;
 
 			if (ok == false && !pass.empty())
@@ -236,8 +238,6 @@ class CommandNSUngroup : public Command
 			nc->pass = oldcore->pass;
 			if (!oldcore->email.empty())
 				nc->email = oldcore->email;
-			if (!oldcore->greet.empty())
-				nc->greet = oldcore->greet;
 			nc->language = oldcore->language;
 
 			source.Reply(_("Nick %s has been ungrouped from %s."), na->nick.c_str(), oldcore->display.c_str());
@@ -303,7 +303,7 @@ class CommandNSGList : public Command
 
 			ListFormatter::ListEntry entry;
 			entry["Nick"] = na2->nick;
-			entry["Expires"] = (na2->HasExt("NO_EXPIRE") || !nickserv_expire || Anope::NoExpire) ? "Does not expire" : ("expires in " + Anope::strftime(na2->last_seen + nickserv_expire));
+			entry["Expires"] = (na2->HasExt("NS_NO_EXPIRE") || !nickserv_expire || Anope::NoExpire) ? "Does not expire" : ("expires in " + Anope::strftime(na2->last_seen + nickserv_expire));
 			list.AddEntry(entry);
 		}
 

@@ -10,96 +10,63 @@
 
 #include "extensible.h"
 
-Extensible::Extensible() : extension_items(NULL)
+static std::set<ExtensibleBase *> extensible_items;
+
+ExtensibleBase::ExtensibleBase(Module *m, const Anope::string &n) : Service(m, "Extensible", n)
 {
+	extensible_items.insert(this);
+}
+
+ExtensibleBase::~ExtensibleBase()
+{
+	extensible_items.erase(this);
 }
 
 Extensible::~Extensible()
 {
-	if (extension_items)
-	{
-		for (extensible_map::iterator it = extension_items->begin(), it_end = extension_items->end(); it != it_end; ++it)
-			delete it->second;
-		delete extension_items;
-	}
+	for (std::set<ExtensibleBase *>::iterator it = extension_items.begin(); it != extension_items.end(); ++it)
+		(*it)->Unset(this);
 }
 
-void Extensible::Extend(const Anope::string &key, ExtensibleItem *p)
+bool Extensible::HasExt(const Anope::string &name) const
 {
-	this->Shrink(key);
-	if (!extension_items)
-		extension_items = new extensible_map();
-	(*this->extension_items)[key] = p;
-}
+	ExtensibleRef<void *> ref(name);
+	if (ref)
+		return ref->HasExt(this);
 
-void Extensible::ExtendMetadata(const Anope::string &key, const Anope::string &value)
-{
-	this->Extend(key, new ExtensibleMetadata(!value.empty() ? value : "1"));
-}
-
-bool Extensible::Shrink(const Anope::string &key)
-{
-	if (!extension_items)
-		return false;
-
-	extensible_map::iterator it = this->extension_items->find(key);
-	if (it != this->extension_items->end())
-	{
-		delete it->second;
-		/* map::size_type map::erase( const key_type& key );
-		 * returns the number of elements removed, std::map
-		 * is single-associative so this should only be 0 or 1
-		 */
-		return this->extension_items->erase(key) > 0;
-	}
-
+	Log(LOG_DEBUG) << "HasExt for nonexistent type " << name << " on " << static_cast<const void *>(this);
 	return false;
 }
 
-bool Extensible::HasExt(const Anope::string &key) const
+void Extensible::ExtensibleSerialize(const Extensible *e, const Serializable *s, Serialize::Data &data)
 {
-	return this->extension_items != NULL && this->extension_items->count(key) > 0;
-}
-
-void Extensible::GetExtList(std::deque<Anope::string> &list) const
-{
-	if (extension_items)
-		for (extensible_map::const_iterator it = extension_items->begin(), it_end = extension_items->end(); it != it_end; ++it)
-			list.push_back(it->first);
-}
-
-void Extensible::ExtensibleSerialize(Serialize::Data &data) const
-{
-	if (extension_items)
-		for (extensible_map::const_iterator it = extension_items->begin(), it_end = extension_items->end(); it != it_end; ++it)
-			if (it->second && it->second->Serialize())
-				data["extensible:" + it->first] << *it->second->Serialize();
-}
-
-void Extensible::ExtensibleUnserialize(Serialize::Data &data)
-{
-	/* Shrink existing extensible metadata items */
-	std::deque<Anope::string> list;
-	this->GetExtList(list);
-	for (unsigned i = 0; i < list.size(); ++i)
+	for (std::set<ExtensibleBase *>::iterator it = e->extension_items.begin(); it != e->extension_items.end(); ++it)
 	{
-		ExtensibleItem *item = extension_items->at(list[i]);
-		if (item && item->Serialize())
-			this->Shrink(list[i]);
+		ExtensibleBase *eb = *it;
+		eb->ExtensibleSerialize(e, s, data);
 	}
-		
-	std::set<Anope::string> keys = data.KeySet();
-	for (std::set<Anope::string>::iterator it = keys.begin(), it_end = keys.end(); it != it_end; ++it)
-		if (it->find("extensible:") == 0)
-		{
-			if (!extension_items)
-				extension_items = new extensible_map();
+}
 
-			Anope::string str;
-			data[*it] >> str;
+void Extensible::ExtensibleUnserialize(Extensible *e, Serializable *s, Serialize::Data &data)
+{
+	while (!e->extension_items.empty())
+		(*e->extension_items.begin())->Unset(e);
 
-			if (!str.empty())
-				this->ExtendMetadata(it->substr(11), str);
-		}
+	for (std::set<ExtensibleBase *>::iterator it = extensible_items.begin(); it != extensible_items.end(); ++it)
+	{
+		ExtensibleBase *eb = *it;
+		eb->ExtensibleUnserialize(e, s, data);
+	}
+}
+
+template<>
+bool* Extensible::Extend(const Anope::string &name, const bool &what)
+{
+	ExtensibleRef<bool> ref(name);
+	if (ref)
+		return ref->Set(this);
+
+	Log(LOG_DEBUG) << "Shrink for nonexistant type " << name << " on " << static_cast<void *>(this);
+	return NULL;
 }
 

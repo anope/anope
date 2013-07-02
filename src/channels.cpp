@@ -35,7 +35,7 @@ Channel::Channel(const Anope::string &nname, time_t ts)
 	this->name = nname;
 
 	this->creation_time = ts;
-	this->syncing = false;
+	this->syncing = this->botchannel = false;
 	this->server_modetime = this->chanserv_modetime = 0;
 	this->server_modecount = this->chanserv_modecount = this->bouncy_modes = this->topic_ts = this->topic_time = 0;
 
@@ -108,48 +108,6 @@ void Channel::CheckModes()
 	FOREACH_RESULT(OnCheckModes, MOD_RESULT, (this));
 	if (MOD_RESULT == EVENT_STOP)
 		return;
-
-	if (this->ci)
-		for (ChannelInfo::ModeList::const_iterator it = this->ci->GetMLock().begin(), it_end = this->ci->GetMLock().end(); it != it_end; ++it)
-		{
-			const ModeLock *ml = it->second;
-			ChannelMode *cm = ModeManager::FindChannelModeByName(ml->name);
-			if (!cm)
-				continue;
-
-			if (cm->type == MODE_REGULAR)
-			{
-				if (!this->HasMode(cm->name) && ml->set)
-					this->SetMode(NULL, cm);
-				else if (this->HasMode(cm->name) && !ml->set)
-					this->RemoveMode(NULL, cm);
-			}
-			else if (cm->type == MODE_PARAM)
-			{
-				/* If the channel doesnt have the mode, or it does and it isn't set correctly */
-				if (ml->set)
-				{
-					Anope::string param;
-					this->GetParam(cm->name, param);
-
-					if (!this->HasMode(cm->name) || (!param.empty() && !ml->param.empty() && !param.equals_cs(ml->param)))
-						this->SetMode(NULL, cm, ml->param);
-				}
-				else
-				{
-					if (this->HasMode(cm->name))
-						this->RemoveMode(NULL, cm);
-				}
-	
-			}
-			else if (cm->type == MODE_LIST)
-			{
-				if (ml->set)
-					this->SetMode(NULL, cm, ml->param);
-				else
-					this->RemoveMode(NULL, cm, ml->param);
-			}
-		}
 }
 
 bool Channel::CheckDelete()
@@ -312,7 +270,7 @@ void Channel::SetModeInternal(MessageSource &setter, ChannelMode *cm, const Anop
 		if (cc)
 			cc->status.AddMode(cm->mchar);
 
-		FOREACH_RESULT(OnChannelModeSet, MOD_RESULT, (this, setter, cm->name, param));
+		FOREACH_RESULT(OnChannelModeSet, MOD_RESULT, (this, setter, cm, param));
 
 		/* Enforce secureops, etc */
 		if (enforce_mlock && MOD_RESULT != EVENT_STOP)
@@ -336,7 +294,7 @@ void Channel::SetModeInternal(MessageSource &setter, ChannelMode *cm, const Anop
 		cml->OnAdd(this, param);
 	}
 
-	FOREACH_RESULT(OnChannelModeSet, MOD_RESULT, (this, setter, cm->name, param));
+	FOREACH_RESULT(OnChannelModeSet, MOD_RESULT, (this, setter, cm, param));
 
 	/* Check if we should enforce mlock */
 	if (!enforce_mlock || MOD_RESULT == EVENT_STOP)
@@ -377,7 +335,7 @@ void Channel::RemoveModeInternal(MessageSource &setter, ChannelMode *cm, const A
 		if (cc)
 			cc->status.DelMode(cm->mchar);
 
-		FOREACH_RESULT(OnChannelModeUnset, MOD_RESULT, (this, setter, cm->name, param));
+		FOREACH_RESULT(OnChannelModeUnset, MOD_RESULT, (this, setter, cm, param));
 
 		if (enforce_mlock && MOD_RESULT != EVENT_STOP)
 			this->SetCorrectModes(u, false);
@@ -404,7 +362,7 @@ void Channel::RemoveModeInternal(MessageSource &setter, ChannelMode *cm, const A
 		cml->OnDel(this, param);
 	}
 
-	FOREACH_RESULT(OnChannelModeUnset, MOD_RESULT, (this, setter, cm->name, param));
+	FOREACH_RESULT(OnChannelModeUnset, MOD_RESULT, (this, setter, cm, param));
 
 	/* Check for mlock */
 	if (!enforce_mlock || MOD_RESULT == EVENT_STOP)
@@ -863,26 +821,6 @@ void Channel::SetCorrectModes(User *user, bool give_modes)
 				take_modes = false;
 			else
 				this->RemoveMode(NULL, cm, user->GetUID());
-		}
-	}
-
-	// Check mlock
-	for (ChannelInfo::ModeList::const_iterator it = ci->GetMLock().begin(), it_end = ci->GetMLock().end(); it != it_end; ++it)
-	{
-		const ModeLock *ml = it->second;
-		ChannelMode *cm = ModeManager::FindChannelModeByName(ml->name);
-		if (!cm || cm->type != MODE_STATUS)
-			continue;
-
-		if (Anope::Match(user->nick, ml->param) || Anope::Match(user->GetDisplayedMask(), ml->param))
-		{
-			if (ml->set != this->HasUserStatus(user, ml->name))
-			{
-				if (ml->set)
-					this->SetMode(NULL, cm, user->GetUID(), false);
-				else if (!ml->set)
-					this->RemoveMode(NULL, cm, user->GetUID(), false);
-			}
 		}
 	}
 }

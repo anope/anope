@@ -13,17 +13,6 @@
 
 class CommandNSInfo : public Command
 {
- private:
-	void CheckOptStr(NickCore *core, Anope::string &buf, const Anope::string &opt, const char *str, const Extensible *e, bool reverse_logic = false)
-	{
-		if (reverse_logic != e->HasExt(opt))
-		{
-			if (!buf.empty())
-				buf += ", ";
-
-			buf += Language::Translate(core, str);
-		}
-	}
  public:
 	CommandNSInfo(Module *creator) : Command(creator, "nickserv/info", 0, 2)
 	{
@@ -105,34 +94,6 @@ class CommandNSInfo : public Command
 					else
 						info[_("VHost")] = na->GetVhostHost();
 				}
-
-				if (!na->nc->greet.empty())
-					info[_("Greet")] = na->nc->greet;
-
-				Anope::string optbuf;
-
-				CheckOptStr(source.nc, optbuf, "KILLPROTECT", _("Protection"), na->nc);
-				CheckOptStr(source.nc, optbuf, "SECURE", _("Security"), na->nc);
-				CheckOptStr(source.nc, optbuf, "PRIVATE", _("Private"), na->nc);
-				CheckOptStr(source.nc, optbuf, "MSG", _("Message mode"), na->nc);
-				CheckOptStr(source.nc, optbuf, "AUTOOP", _("Auto-op"), na->nc);
-				CheckOptStr(source.nc, optbuf, "SUSPENDED", _("Suspended"), na->nc);
-				CheckOptStr(source.nc, optbuf, "STATS", _("Chanstats"), na->nc);
-				CheckOptStr(source.nc, optbuf, "NO_EXPIRE", _("No expire"), na);
-
-				info[_("Options")] = optbuf.empty() ? _("None") : optbuf;
-
-				if (na->nc->HasExt("UNCONFIRMED") == false)
-				{
-					time_t nickserv_expire = Config->GetModule("nickserv")->Get<time_t>("expire");
-					if (!na->HasExt("NO_EXPIRE") && nickserv_expire && !Anope::NoExpire)
-						info[_("Expires")] = Anope::strftime(na->last_seen + nickserv_expire);
-				}
-				else
-				{
-					time_t unconfirmed_expire = Config->GetModule("nickserv")->Get<time_t>("unconfirmedexpire", "1d");
-					info[_("Expires")] = Anope::strftime(na->time_registered + unconfirmed_expire);
-				}
 			}
 
 			FOREACH_MOD(OnNickInfo, (source, na, info, show_hidden));
@@ -159,13 +120,142 @@ class CommandNSInfo : public Command
 	}
 };
 
+
+class CommandNSSetHide : public Command
+{
+ public:
+	CommandNSSetHide(Module *creator, const Anope::string &sname = "nickserv/set/hide", size_t min = 2) : Command(creator, sname, min, min + 1)
+	{
+		this->SetDesc(_("Hide certain pieces of nickname information"));
+		this->SetSyntax(_("{EMAIL | STATUS | USERMASK | QUIT} {ON | OFF}"));
+	}
+
+	void Run(CommandSource &source, const Anope::string &user, const Anope::string &param, const Anope::string &arg)
+	{
+		const NickAlias *na = NickAlias::Find(user);
+		if (!na)
+		{
+			source.Reply(NICK_X_NOT_REGISTERED, user.c_str());
+			return;
+		}
+		NickCore *nc = na->nc;
+
+		EventReturn MOD_RESULT;
+		FOREACH_RESULT(OnSetNickOption, MOD_RESULT, (source, this, nc, param));
+		if (MOD_RESULT == EVENT_STOP)
+			return;
+
+		Anope::string onmsg, offmsg, flag;
+
+		if (param.equals_ci("EMAIL"))
+		{
+			flag = "HIDE_EMAIL";
+			onmsg = _("The E-mail address of \002%s\002 will now be hidden from %s INFO displays.");
+			offmsg = _("The E-mail address of \002%s\002 will now be shown in %s INFO displays.");
+		}
+		else if (param.equals_ci("USERMASK"))
+		{
+			flag = "HIDE_MASK";
+			onmsg = _("The last seen user@host mask of \002%s\002 will now be hidden from %s INFO displays.");
+			offmsg = _("The last seen user@host mask of \002%s\002 will now be shown in %s INFO displays.");
+		}
+		else if (param.equals_ci("STATUS"))
+		{
+			flag = "HIDE_STATUS";
+			onmsg = _("The services access status of \002%s\002 will now be hidden from %s INFO displays.");
+			offmsg = _("The services access status of \002%s\002 will now be shown in %s INFO displays.");
+		}
+		else if (param.equals_ci("QUIT"))
+		{
+			flag = "HIDE_QUIT";
+			onmsg = _("The last quit message of \002%s\002 will now be hidden from %s INFO displays.");
+			offmsg = _("The last quit message of \002%s\002 will now be shown in %s INFO displays.");
+		}
+		else
+		{
+			this->OnSyntaxError(source, "HIDE");
+			return;
+		}
+
+		if (arg.equals_ci("ON"))
+		{
+			Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to change hide " << param << " to " << arg << " for " << nc->display;
+			nc->Extend<bool>(flag);
+			source.Reply(onmsg.c_str(), nc->display.c_str(), source.service->nick.c_str());
+		}
+		else if (arg.equals_ci("OFF"))
+		{
+			Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to change hide " << param << " to " << arg << " for " << nc->display;
+			nc->Shrink<bool>(flag);
+			source.Reply(offmsg.c_str(), nc->display.c_str(), source.service->nick.c_str());
+		}
+		else
+			this->OnSyntaxError(source, "HIDE");
+	}
+
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	{
+		this->Run(source, source.nc->display, params[0], params[1]);
+	}
+
+	bool OnHelp(CommandSource &source, const Anope::string &) anope_override
+	{
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_("Allows you to prevent certain pieces of information from\n"
+				"being displayed when someone does a %s \002INFO\002 on your\n"
+				"nick.  You can hide your E-mail address (\002EMAIL\002), last seen\n"
+				"user@host mask (\002USERMASK\002), your services access status\n"
+				"(\002STATUS\002) and  last quit message (\002QUIT\002).\n"
+				"The second parameter specifies whether the information should\n"
+				"be displayed (\002OFF\002) or hidden (\002ON\002)."), source.service->nick.c_str());
+		return true;
+	}
+};
+
+class CommandNSSASetHide : public CommandNSSetHide
+{
+ public:
+	CommandNSSASetHide(Module *creator) : CommandNSSetHide(creator, "nickserv/saset/hide", 3)
+	{
+		this->SetSyntax("\037nickname\037 {EMAIL | STATUS | USERMASK | QUIT} {ON | OFF}");
+	}
+
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	{
+		this->ClearSyntax();
+		this->Run(source, params[0], params[1], params[2]);
+	}
+
+	bool OnHelp(CommandSource &source, const Anope::string &) anope_override
+	{
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_("Allows you to prevent certain pieces of information from\n"
+				"being displayed when someone does a %s \002INFO\002 on the\n"
+				"nick.  You can hide the E-mail address (\002EMAIL\002), last seen\n"
+				"user@host mask (\002USERMASK\002), the services access status\n"
+				"(\002STATUS\002) and  last quit message (\002QUIT\002).\n"
+				"The second parameter specifies whether the information should\n"
+				"be displayed (\002OFF\002) or hidden (\002ON\002)."), source.service->nick.c_str());
+		return true;
+	}
+};
+
 class NSInfo : public Module
 {
 	CommandNSInfo commandnsinfo;
 
+	CommandNSSetHide commandnssethide;
+	CommandNSSASetHide commandnssasethide;
+
+	SerializableExtensibleItem<bool> hide_email, hide_usermask, hide_status, hide_quit;
+
  public:
 	NSInfo(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		commandnsinfo(this)
+		commandnsinfo(this), commandnssethide(this), commandnssasethide(this),
+		 hide_email(this, "HIDE_EMAIL"), hide_usermask(this, "HIDE_MASK"), hide_status(this, "HIDE_STATUS"),
+		 hide_quit(this, "HIDE_QUIT")
 	{
 
 	}

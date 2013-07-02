@@ -15,7 +15,7 @@
 
 #include "services.h"
 #include "anope.h"
-#include "modules.h"
+#include "base.h"
 
 /** Anything that inherits from this class can be referred to
  * using ServiceReference. Any interfaces provided by modules,

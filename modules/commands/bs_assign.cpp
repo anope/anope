@@ -145,14 +145,69 @@ class CommandBSUnassign : public Command
 	}
 };
 
+class CommandBSSetNoBot : public Command
+{
+ public:
+	CommandBSSetNoBot(Module *creator, const Anope::string &sname = "botserv/set/nobot") : Command(creator, sname, 2, 2)
+	{
+		this->SetDesc(_("Prevent a bot from being assigned to a channel"));
+		this->SetSyntax(_("\037channel\037 {\037ON|OFF\037}"));
+	}
+
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	{
+		ChannelInfo *ci = ChannelInfo::Find(params[0]);
+		const Anope::string &value = params[1];
+
+		if (ci == NULL)
+		{
+			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
+			return;
+		}
+
+		if (value.equals_ci("ON"))
+		{
+			Log(LOG_ADMIN, source, this, ci) << "to enable nobot"; 
+
+			ci->Extend<bool>("BS_NOBOT");
+			if (ci->bi)
+				ci->bi->UnAssign(source.GetUser(), ci);
+			source.Reply(_("No-bot mode is now \002on\002 on channel %s."), ci->name.c_str());
+		}
+		else if (value.equals_ci("OFF"))
+		{
+			Log(LOG_ADMIN, source, this, ci) << "to disable nobot"; 
+
+			ci->Shrink<bool>("BS_NOBOT");
+			source.Reply(_("No-bot mode is now \002off\002 on channel %s."), ci->name.c_str());
+		}
+		else
+			this->OnSyntaxError(source, source.command);
+	}
+
+	bool OnHelp(CommandSource &source, const Anope::string &) anope_override
+	{
+		this->SendSyntax(source);
+		source.Reply(_(" \n"
+				"This option makes a channel be unassignable. If a bot\n"
+				"is already assigned to the channel, it is unassigned\n"
+				"automatically when you enable the option."));
+		return true;
+	}
+};
+
 class BSAssign : public Module
 {
+	ExtensibleItem<bool> nobot;
+
 	CommandBSAssign commandbsassign;
 	CommandBSUnassign commandbsunassign;
+	CommandBSSetNoBot commandbssetnobot;
 
  public:
 	BSAssign(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		commandbsassign(this), commandbsunassign(this)
+		nobot(this, "BS_NOBOT"),
+		commandbsassign(this), commandbsunassign(this), commandbssetnobot(this)
 	{
 	}
 
@@ -163,7 +218,7 @@ class BSAssign : public Module
 			return;
 
 		AccessGroup access = c->ci->AccessFor(source);
- 		if (c->ci->HasExt("BS_NOBOT") || (!access.HasPriv("ASSIGN") && !source->HasPriv("botserv/administration")))
+		if (nobot.HasExt(c->ci) || (!access.HasPriv("ASSIGN") && !source->HasPriv("botserv/administration")))
 		{
 			targ->SendMessage(bi, ACCESS_DENIED);
 			return;
@@ -183,6 +238,12 @@ class BSAssign : public Module
 
 		bi->Assign(source, c->ci);
 		targ->SendMessage(bi, _("Bot \002%s\002 has been assigned to %s."), bi->nick.c_str(), c->name.c_str());
+	}
+
+	void OnBotInfo(CommandSource &source, BotInfo *bi, ChannelInfo *ci, InfoFormatter &info) anope_override
+	{
+		if (nobot.HasExt(ci))
+			info.AddOption(_("No bot"));
 	}
 };
 

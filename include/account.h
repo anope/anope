@@ -27,15 +27,6 @@ extern CoreExport Serialize::Checker<nickcore_map> NickCoreList;
 
 /* A registered nickname.
  * It matters that Base is here before Extensible (it is inherited by Serializable) 
- *
- * Possible flags:
- *     NO_EXPIRE - Nick never expires
- *     HELD      - This nick is being held after a kill by an enforcer client
- *                    or is being SVSHeld.
- *     COLLIDED  - We are taking over this nick, either by SVSNICK or KILL
- *                    and are waiting for the confirmation of either of these actions to
- *                    proceed. This is checked in NickAlias::OnCancel
- *
  */
 class CoreExport NickAlias : public Serializable, public Extensible
 {
@@ -112,26 +103,6 @@ class CoreExport NickAlias : public Serializable, public Extensible
 /* A registered account. Each account must have a NickAlias with the same nick as the
  * account's display.
  * It matters that Base is here before Extensible (it is inherited by Serializable)
- *
- * Possible flags:
- *     KILLPROTECT   - Kill other users who try to take this nick
- *     SECURE        - Don't recognize unless identified
- *     MSG           - Use PRIVMSG instead of notice
- *     MEMO_HARDMAX  - Don't allow user to change memo limit
- *     MEMO_SIGNON   - Notify of memos at signon and unaway
- *     MEMO_RECEIEVE - Notify of new memos when sent
- *     PRIVATE       - Don't show in LIST to non-servadmins
- *     HIDE_EMAIL    - Don't show email in INFO
- *     HIDE_MASK     - Don't show last seen address in INFO
- *     HIDE_QUIT     - Don't show last quit message in INFO
- *     KILL_QUICK    - Kill quicker
- *     KILL_IMMED    - Kill immediately
- *     MEMO_MAIL     - User gets email on memo
- *     HIDE_STATUS   - Don't show services access status
- *     SUSPEND       - Nickname is suspended
- *     AUTOOP        - Autoop nickname in channels
- *     UNCONFIRMED   - Account has not had email address confirmed
- *     STATS         - ChanStats is enabled for this user
  */
 class CoreExport NickCore : public Serializable, public Extensible
 {
@@ -143,15 +114,11 @@ class CoreExport NickCore : public Serializable, public Extensible
 	/* User password in form of hashm:data */
 	Anope::string pass;
 	Anope::string email;
-	/* Greet associated with the account, sometimes sent when the user joins a channel */
-	Anope::string greet;
 	/* Locale name of the language of the user. Empty means default language */
 	Anope::string language;
 	/* Access list, contains user@host masks of users who get certain privileges based
 	 * on if NI_SECURE is set and what (if any) kill protection is enabled. */
 	std::vector<Anope::string> access;
-	/* SSL certificate list. Users who have a matching certificate may be automatically logged in */
-	std::vector<Anope::string> cert;
 	MemoInfo memos;
 
 	/* Nicknames registered that are grouped to this account.
@@ -241,46 +208,6 @@ class CoreExport NickCore : public Serializable, public Extensible
 	 * @return true if the user is on the access list
 	 */
 	bool IsOnAccess(const User *u) const;
-
-	/** Add an entry to the nick's certificate list
-	 *
-	 * @param entry The fingerprint to add to the cert list
-	 *
-	 * Adds a new entry into the cert list.
-	 */
-	void AddCert(const Anope::string &entry);
-
-	/** Get an entry from the nick's cert list by index
-	 *
-	 * @param entry Index in the certificaate list vector to retrieve
-	 * @return The fingerprint entry of the given index if within bounds, an empty string if the vector is empty or the index is out of bounds
-	 *
-	 * Retrieves an entry from the certificate list corresponding to the given index.
-	 */
-	Anope::string GetCert(unsigned entry) const;
-
-	/** Find an entry in the nick's cert list
-	 *
-	 * @param entry The fingerprint to search for
-	 * @return True if the fingerprint is found in the cert list, false otherwise
-	 *
-	 * Search for an fingerprint within the cert list.
-	 */
-	bool FindCert(const Anope::string &entry) const;
-
-	/** Erase a fingerprint from the nick's certificate list
-	 *
-	 * @param entry The fingerprint to remove
-	 *
-	 * Removes the specified fingerprint from the cert list.
-	 */
-	void EraseCert(const Anope::string &entry);
-
-	/** Clears the entire nick's cert list
-	 *
-	 * Deletes all the memory allocated in the certificate list vector and then clears the vector.
-	 */
-	void ClearCert();
 
 	/** Finds an account
 	 * @param nick The account name to find

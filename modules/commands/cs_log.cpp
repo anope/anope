@@ -51,7 +51,7 @@ struct LogSettingImpl : LogSetting, Serializable
 		if (ci == NULL)
 			return NULL;
 	
-		LogSetting *ls;
+		LogSettingImpl *ls;
 		if (obj)
 			ls = anope_dynamic_static_cast<LogSettingImpl *>(obj);
 		else
@@ -69,6 +69,8 @@ struct LogSettingImpl : LogSetting, Serializable
 		data["extra"] >> ls->extra;
 		data["creator"] >> ls->creator;
 		data["created"] >> ls->created;
+
+		return ls;
 	}
 };
 

@@ -290,10 +290,12 @@ Serializable* ChannelInfo::Unserialize(Serializable *obj, Serialize::Data &data)
 
 	/* compat */
 	bool b;
+	b = false;
 	data["extensible:SECURE"] >> b;
 	if (b)
 		ci->Extend<bool>("CS_SECURE");
 	data["extensible:PRIVATE"] >> b;
+	b = false;
 	if (b)
 		ci->Extend<bool>("CS_PRIVATE");
 	/* end compat */

@@ -113,9 +113,11 @@ Serializable* NickCore::Unserialize(Serializable *obj, Serialize::Data &data)
 
 	/* compat */
 	bool b;
+	b = false;
 	data["extensible:SECURE"] >> b;
 	if (b)
 		nc->Extend<bool>("NS_SECURE");
+	b = false;
 	data["extensible:PRIVATE"] >> b;
 	if (b)
 		nc->Extend<bool>("NS_PRIVATE");

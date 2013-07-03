@@ -63,12 +63,14 @@ class BaseExtensibleItem : public ExtensibleBase
 
 	~BaseExtensibleItem()
 	{
-		for (std::map<Extensible *, void *>::iterator it = items.begin(); it != items.end(); ++it)
+		while (!items.empty())
 		{
+			std::map<Extensible *, void *>::iterator it = items.begin();
+			Extensible *obj = it->first;
 			T *value = static_cast<T *>(it->second);
 
-			items.erase(it->first);
-			it->first->extension_items.erase(this);
+			obj->extension_items.erase(this);
+			items.erase(it);
 			delete value;
 		}
 	}
@@ -188,7 +190,7 @@ class SerializableExtensibleItem<bool> : public PrimitiveExtensibleItem<bool>
 
 	void ExtensibleUnserialize(Extensible *e, Serializable *s, Serialize::Data &data) anope_override
 	{
-		bool b;
+		bool b = false;
 		data[this->name] >> b;
 		if (b)
 			this->Set(e);

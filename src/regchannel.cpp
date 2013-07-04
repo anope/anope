@@ -400,16 +400,8 @@ AccessGroup ChannelInfo::AccessFor(const User *u)
 	for (unsigned i = 0, end = this->GetAccessCount(); i < end; ++i)
 	{
 		ChanAccess *a = this->GetAccess(i);
-
-		if (a->nc)
-		{
-			if (a->nc == nc)
-				group.push_back(a);
-		}
-		else if (a->Matches(u, nc))
-		{
+		if (a->Matches(u, u->Account(), group.path))
 			group.push_back(a);
-		}
 	}
 
 	if (group.founder || !group.empty())
@@ -434,18 +426,10 @@ AccessGroup ChannelInfo::AccessFor(const NickCore *nc)
 	for (unsigned i = 0, end = this->GetAccessCount(); i < end; ++i)
 	{
 		ChanAccess *a = this->GetAccess(i);
-
-		if (a->nc)
-		{
-			if (a->nc == nc)
-				group.push_back(a);
-		}
-		else if (this->GetAccess(i)->Matches(NULL, nc))
-		{
-			group.push_back(this->GetAccess(i));
-		}
+		if (a->Matches(NULL, nc, group.path))
+			group.push_back(a);
 	}
-	
+
 	if (group.founder || !group.empty())
 	{
 		this->last_used = Anope::CurTime;
@@ -462,12 +446,38 @@ unsigned ChannelInfo::GetAccessCount() const
 	return this->access->size();
 }
 
-void ChannelInfo::EraseAccess(unsigned index)
+unsigned ChannelInfo::GetDeepAccessCount() const
+{
+	ChanAccess::Path path;
+	for (unsigned i = 0, end = this->GetAccessCount(); i < end; ++i)
+	{
+		ChanAccess *a = this->GetAccess(i);
+		a->Matches(NULL, NULL, path);
+	}
+
+	unsigned count = this->GetAccessCount();
+	std::set<const ChannelInfo *> channels;
+	channels.insert(this);
+	for (ChanAccess::Set::iterator it = path.first.begin(); it != path.first.end(); ++it)
+	{
+		const ChannelInfo *ci = it->first->ci;
+		if (!channels.count(ci))
+		{
+			channels.count(ci);
+			count += ci->GetAccessCount();
+		}
+	}
+	return count;
+}
+
+ChanAccess *ChannelInfo::EraseAccess(unsigned index)
 {
 	if (this->access->empty() || index >= this->access->size())
-		return;
+		return NULL;
 
-	delete this->access->at(index);
+	ChanAccess *ca = this->access->at(index);
+	this->access->erase(this->access->begin() + index);
+	return ca;
 }
 
 void ChannelInfo::ClearAccess()

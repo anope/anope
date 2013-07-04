@@ -22,12 +22,15 @@ class StatusUpdate : public Module
 			{
 				User *user = it->second->user;
 
-				if (user->server != Me && access->Matches(user, user->Account()))
+				ChanAccess::Path p;
+				if (user->server != Me && access->Matches(user, user->Account(), p))
 				{
+					AccessGroup ag = ci->AccessFor(user);
+
 					for (unsigned i = 0; i < ModeManager::GetStatusChannelModesByRank().size(); ++i)
 					{
 						ChannelModeStatus *cms = ModeManager::GetStatusChannelModesByRank()[i];
-						if (!access->HasPriv("AUTO" + cms->name))
+						if (!ag.HasPriv("AUTO" + cms->name))
 							ci->c->RemoveMode(NULL, cms, user->GetUID());
 					}
 					ci->c->SetCorrectModes(user, true);
@@ -42,13 +45,10 @@ class StatusUpdate : public Module
 			{
 				User *user = it->second->user;
 
-				if (user->server != Me && access->Matches(user, user->Account()))
+				ChanAccess::Path p;
+				if (user->server != Me && access->Matches(user, user->Account(), p))
 				{
-					/* Get user's current access and remove the entry about to be deleted */
 					AccessGroup ag = ci->AccessFor(user);
-					AccessGroup::iterator iter = std::find(ag.begin(), ag.end(), access);
-					if (iter != ag.end())
-						ag.erase(iter);
 
 					for (unsigned i = 0; i < ModeManager::GetStatusChannelModesByRank().size(); ++i)
 					{

@@ -84,23 +84,55 @@ class CommandCSFlags : public Command
 
 		AccessGroup u_access = source.AccessFor(ci);
 
-		if (mask.find_first_of("!*@") == Anope::string::npos && !NickAlias::Find(mask))
+		if (IRCD->IsChannelValid(mask))
 		{
-			User *targ = User::Find(mask, true);
-			if (targ != NULL)
-				mask = "*!*@" + targ->GetDisplayedHost();
-			else
+			if (Config->GetModule("chanserv")->Get<bool>("disallow_channel_access"))
 			{
-				source.Reply(NICK_X_NOT_REGISTERED, mask.c_str());
+				source.Reply(_("Channels may not be on access lists."));
 				return;
+			}
+
+			ChannelInfo *targ_ci = ChannelInfo::Find(mask);
+			if (targ_ci == NULL)
+			{
+				source.Reply(CHAN_X_NOT_REGISTERED, mask.c_str());
+				return;
+			}
+			else if (ci == targ_ci)
+			{
+				source.Reply(_("You can't add a channel to its own access list."));
+				return;
+			}
+
+			mask = targ_ci->name;
+		}
+		else
+		{
+			const NickAlias *na = NickAlias::Find(mask);
+			if (!na && Config->GetModule("chanserv")->Get<bool>("disallow_hostmask_access"))
+			{
+				source.Reply(_("Masks and unregistered users may not be on access lists."));
+				return;
+			}
+			else if (mask.find_first_of("!*@") == Anope::string::npos && !na)
+			{
+				User *targ = User::Find(mask, true);
+				if (targ != NULL)
+					mask = "*!*@" + targ->GetDisplayedHost();
+				else
+				{
+					source.Reply(NICK_X_NOT_REGISTERED, mask.c_str());
+					return;
+				}
 			}
 		}
 
 		ChanAccess *current = NULL;
+		unsigned current_idx;
 		std::set<char> current_flags;
-		for (unsigned i = ci->GetAccessCount(); i > 0; --i)
+		for (current_idx = ci->GetAccessCount(); current_idx > 0; --current_idx)
 		{
-			ChanAccess *access = ci->GetAccess(i - 1);
+			ChanAccess *access = ci->GetAccess(current_idx - 1);
 			if (mask.equals_ci(access->mask))
 			{
 				current = access;
@@ -112,9 +144,9 @@ class CommandCSFlags : public Command
 		}
 
 		unsigned access_max = Config->GetModule("chanserv")->Get<unsigned>("accessmax", "1024");
-		if (access_max && ci->GetAccessCount() >= access_max)
+		if (access_max && ci->GetDeepAccessCount() >= access_max)
 		{
-			source.Reply(_("Sorry, you can only have %d access entries on a channel."), access_max);
+			source.Reply(_("Sorry, you can only have %d access entries on a channel, including access entries from other channels."), access_max);
 			return;
 		}
 
@@ -178,6 +210,7 @@ class CommandCSFlags : public Command
 		{
 			if (current != NULL)
 			{
+				ci->EraseAccess(current_idx - 1);
 				FOREACH_MOD(OnAccessDel, (ci, source, current));
 				delete current;
 				Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to delete " << mask;

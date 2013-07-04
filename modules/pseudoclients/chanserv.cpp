@@ -182,7 +182,7 @@ class ChanServCore : public Module, public ChanServService
 
 				if (anc && anc == nc)
 				{
-					ci->EraseAccess(j);
+					delete ci->EraseAccess(j);
 					break;
 				}
 			}

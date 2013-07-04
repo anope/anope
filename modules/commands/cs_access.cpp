@@ -128,15 +128,46 @@ class CommandCSAccess : public Command
 			}
 		}
 
-		if (mask.find_first_of("!*@") == Anope::string::npos && !NickAlias::Find(mask))
+		if (IRCD->IsChannelValid(mask))
 		{
-			User *targ = User::Find(mask, true);
-			if (targ != NULL)
-				mask = "*!*@" + targ->GetDisplayedHost();
-			else
+			if (Config->GetModule("chanserv")->Get<bool>("disallow_channel_access"))
 			{
-				source.Reply(NICK_X_NOT_REGISTERED, mask.c_str());
+				source.Reply(_("Channels may not be on access lists."));
 				return;
+			}
+
+			ChannelInfo *targ_ci = ChannelInfo::Find(mask);
+			if (targ_ci == NULL)
+			{
+				source.Reply(CHAN_X_NOT_REGISTERED, mask.c_str());
+				return;
+			}
+			else if (ci == targ_ci)
+			{
+				source.Reply(_("You can't add a channel to its own access list."));
+				return;
+			}
+
+			mask = targ_ci->name;
+		}
+		else
+		{
+			const NickAlias *na = NickAlias::Find(mask);
+			if (!na && Config->GetModule("chanserv")->Get<bool>("disallow_hostmask_access"))
+			{
+				source.Reply(_("Masks and unregistered users may not be on access lists."));
+				return;
+			}
+			else if (mask.find_first_of("!*@") == Anope::string::npos && !na)
+			{
+				User *targ = User::Find(mask, true);
+				if (targ != NULL)
+					mask = "*!*@" + targ->GetDisplayedHost();
+				else
+				{
+					source.Reply(NICK_X_NOT_REGISTERED, mask.c_str());
+					return;
+				}
 			}
 		}
 
@@ -151,15 +182,15 @@ class CommandCSAccess : public Command
 					source.Reply(ACCESS_DENIED);
 					return;
 				}
-				ci->EraseAccess(i - 1);
+				delete ci->EraseAccess(i - 1);
 				break;
 			}
 		}
 
 		unsigned access_max = Config->GetModule("chanserv")->Get<unsigned>("accessmax", "1024");
-		if (access_max && ci->GetAccessCount() >= access_max)
+		if (access_max && ci->GetDeepAccessCount() >= access_max)
 		{
-			source.Reply(_("Sorry, you can only have %d access entries on a channel."), access_max);
+			source.Reply(_("Sorry, you can only have %d access entries on a channel, including access entries from other channels."), access_max);
 			return;
 		}
 
@@ -187,7 +218,7 @@ class CommandCSAccess : public Command
 	{
 		Anope::string mask = params[2];
 
-		if (!isdigit(mask[0]) && mask.find_first_of("!*@") == Anope::string::npos && !NickAlias::Find(mask))
+		if (!isdigit(mask[0]) && mask.find_first_of("#!*@") == Anope::string::npos && !NickAlias::Find(mask))
 		{
 			User *targ = User::Find(mask, true);
 			if (targ != NULL)
@@ -258,9 +289,10 @@ class CommandCSAccess : public Command
 					else
 						Nicks = access->mask;
 
-					FOREACH_MOD(OnAccessDel, (ci, source, access));
-
 					ci->EraseAccess(Number - 1);
+
+					FOREACH_MOD(OnAccessDel, (ci, source, access));
+					delete access;
 				}
 			}
 			delcallback(source, ci, this, mask);
@@ -284,6 +316,7 @@ class CommandCSAccess : public Command
 						bool override = !u_access.founder && !u_access.HasPriv("ACCESS_CHANGE") && !access->mask.equals_ci(source.nc->display);
 						Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to delete " << access->mask;
 
+						ci->EraseAccess(i - 1);
 						FOREACH_MOD(OnAccessDel, (ci, source, access));
 						delete access;
 					}
@@ -325,8 +358,11 @@ class CommandCSAccess : public Command
 					Anope::string timebuf;
 					if (ci->c)
 						for (Channel::ChanUserList::const_iterator cit = ci->c->users.begin(), cit_end = ci->c->users.end(); cit != cit_end; ++cit)
-							if (access->Matches(cit->second->user, cit->second->user->Account()))
+						{
+							ChanAccess::Path p;
+							if (access->Matches(cit->second->user, cit->second->user->Account(), p))
 								timebuf = "Now";
+						}
 					if (timebuf.empty())
 					{
 						if (access->last_seen == 0)
@@ -359,8 +395,11 @@ class CommandCSAccess : public Command
 				Anope::string timebuf;
 				if (ci->c)
 					for (Channel::ChanUserList::const_iterator cit = ci->c->users.begin(), cit_end = ci->c->users.end(); cit != cit_end; ++cit)
-						if (access->Matches(cit->second->user, cit->second->user->Account()))
+					{
+						ChanAccess::Path p;
+						if (access->Matches(cit->second->user, cit->second->user->Account(), p))
 							timebuf = "Now";
+					}
 				if (timebuf.empty())
 				{
 					if (access->last_seen == 0)
@@ -527,10 +566,13 @@ class CommandCSAccess : public Command
 				"the level specified in the command.  The \037level\037 specified\n"
 				"must be less than that of the user giving the command, and\n"
 				"if the \037mask\037 is already on the access list, the current\n"
-				"access level of that nick must be less than the access level\n"
+				"access level of that mask must be less than the access level\n"
 				"of the user giving the command. When a user joins the channel\n"
 				"the access they receive is from the highest level entry in the\n"
 				"access list."));
+		if (!Config->GetModule("chanserv")->Get<bool>("disallow_channel_access"))
+			source.Reply(_("The given mask may also be a channel, which will use the\n"
+					"access list from the other channel up to the given \037level\037"));
 		source.Reply(" ");
 		source.Reply(_("The \002ACCESS DEL\002 command removes the given nick from the\n"
 				"access list.  If a list of entry numbers is given, those\n"

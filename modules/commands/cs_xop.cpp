@@ -132,15 +132,46 @@ class CommandCSXOP : public Command
 			}
 		}
 
-		if (mask.find_first_of("!*@") == Anope::string::npos && !NickAlias::Find(mask))
+		if (IRCD->IsChannelValid(mask))
 		{
-			User *targ = User::Find(mask, true);
-			if (targ != NULL)
-				mask = "*!*@" + targ->GetDisplayedHost();
-			else
+			if (Config->GetModule("chanserv")->Get<bool>("disallow_channel_access"))
 			{
-				source.Reply(NICK_X_NOT_REGISTERED, mask.c_str());
+				source.Reply(_("Channels may not be on access lists."));
 				return;
+			}
+
+			ChannelInfo *targ_ci = ChannelInfo::Find(mask);
+			if (targ_ci == NULL)
+			{
+				source.Reply(CHAN_X_NOT_REGISTERED, mask.c_str());
+				return;
+			}
+			else if (ci == targ_ci)
+			{
+				source.Reply(_("You can't add a channel to its own access list."));
+				return;
+			}
+
+			mask = targ_ci->name;
+		}
+		else
+		{
+			const NickAlias *na = NickAlias::Find(mask);
+			if (!na && Config->GetModule("chanserv")->Get<bool>("disallow_hostmask_access"))
+			{
+				source.Reply(_("Masks and unregistered users may not be on access lists."));
+				return;
+			}
+			else if (mask.find_first_of("!*@") == Anope::string::npos && !na)
+			{
+				User *targ = User::Find(mask, true);
+				if (targ != NULL)
+					mask = "*!*@" + targ->GetDisplayedHost();
+				else
+				{
+					source.Reply(NICK_X_NOT_REGISTERED, mask.c_str());
+					return;
+				}
 			}
 		}
 
@@ -156,15 +187,15 @@ class CommandCSXOP : public Command
 					return;
 				}
 
-				ci->EraseAccess(i);
+				delete ci->EraseAccess(i);
 				break;
 			}
 		}
 
 		unsigned access_max = Config->GetModule("chanserv")->Get<unsigned>("accessmax", "1024");
-		if (access_max && ci->GetAccessCount() >= access_max)
+		if (access_max && ci->GetDeepAccessCount() >= access_max)
 		{
-			source.Reply(_("Sorry, you can only have %d %s entries on a channel."), access_max, source.command.c_str());
+			source.Reply(_("Sorry, you can only have %d access entries on a channel, including access entries from other channels."), access_max);
 			return;
 		}
 
@@ -217,7 +248,7 @@ class CommandCSXOP : public Command
 		const ChanAccess *highest = access.Highest();
 		bool override = false;
 
-		if (!isdigit(mask[0]) && mask.find_first_of("!*@") == Anope::string::npos && !NickAlias::Find(mask))
+		if (!isdigit(mask[0]) && mask.find_first_of("#!*@") == Anope::string::npos && !NickAlias::Find(mask))
 		{
 			User *targ = User::Find(mask, true);
 			if (targ != NULL)
@@ -287,9 +318,9 @@ class CommandCSXOP : public Command
 					else
 						nicks = caccess->mask;
 
-					FOREACH_MOD(OnAccessDel, (ci, source, caccess));
-
 					ci->EraseAccess(number - 1);
+					FOREACH_MOD(OnAccessDel, (ci, source, caccess));
+					delete caccess;
 				}
 			}
 			delcallback(source, ci, this, override, mask);
@@ -307,6 +338,7 @@ class CommandCSXOP : public Command
 
 					source.Reply(_("\002%s\002 deleted from %s %s list."), a->mask.c_str(), ci->name.c_str(), source.command.c_str());
 
+					ci->EraseAccess(i);
 					FOREACH_MOD(OnAccessDel, (ci, source, a));
 					delete a;
 
@@ -428,7 +460,7 @@ class CommandCSXOP : public Command
 		{
 			const ChanAccess *access = ci->GetAccess(i - 1);
 			if (XOPChanAccess::DetermineLevel(access) == source.command.upper())
-				ci->EraseAccess(i - 1);
+				delete ci->EraseAccess(i - 1);
 		}
 
 		FOREACH_MOD(OnAccessClear, (ci, source));

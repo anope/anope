@@ -75,6 +75,13 @@ class CoreExport AccessProvider : public Service
 class CoreExport ChanAccess : public Serializable
 {
  public:
+	typedef std::multimap<const ChanAccess *, const ChanAccess *> Set;
+ 	/* shows the 'path' taken to determine if an access entry matches a user
+	 * .first are access entries checked
+	 * .second are access entries which match
+	 */
+	typedef std::pair<Set, Set> Path;
+
  	/* The provider that created this access entry */
 	AccessProvider *provider;
 	/* Channel this access entry is on */
@@ -95,8 +102,9 @@ class CoreExport ChanAccess : public Serializable
 	/** Check if this access entry matches the given user or account
 	 * @param u The user
 	 * @param nc The account
+	 * @param p The path to the access object which matches will be put here
 	 */
-	virtual bool Matches(const User *u, const NickCore *nc) const;
+	virtual bool Matches(const User *u, const NickCore *nc, Path &p) const;
 
 	/** Check if this access entry has the given privilege.
 	 * @param name The privilege name
@@ -127,8 +135,10 @@ class CoreExport ChanAccess : public Serializable
 class CoreExport AccessGroup : public std::vector<ChanAccess *>
 {
  public:
- 	/* Channel these access entries are on */
+	/* Channel these access entries are on */
  	const ChannelInfo *ci;
+	/* Path from these entries to other entries that they depend on */
+	ChanAccess::Path path;
 	/* Account these entries affect, if any */
 	const NickCore *nc;
 	/* super_admin always gets all privs. founder is a special case where ci->founder == nc */

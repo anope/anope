@@ -597,10 +597,10 @@ class CoreExport Module : public Extensible
 	 */
 	virtual void OnBotDelete(BotInfo *bi) { throw NotImplementedException(); }
 
-	/** Called when access is deleted from a channel
+	/** Called after an access entry is deleted from a channel
 	 * @param ci The channel
 	 * @param source The source of the command
-	 * @param access The access entry being removed
+	 * @param access The access entry that was removed
 	 */
 	virtual void OnAccessDel(ChannelInfo *ci, CommandSource &source, ChanAccess *access) { throw NotImplementedException(); }
 
@@ -704,7 +704,7 @@ class CoreExport Module : public Extensible
 	 * @param priv The privilege being checked for
 	 * @return EVENT_ALLOW for yes, EVENT_STOP to stop all processing
 	 */
-	virtual EventReturn OnCheckPriv(ChanAccess *access, const Anope::string &priv) { throw NotImplementedException(); }
+	virtual EventReturn OnCheckPriv(const ChanAccess *access, const Anope::string &priv) { throw NotImplementedException(); }
 
 	/** Check whether an access group has a privilege
 	 * @param group The group

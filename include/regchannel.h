@@ -137,13 +137,18 @@ class CoreExport ChannelInfo : public Serializable, public Extensible
 	 */
 	unsigned GetAccessCount() const;
 
+	/** Get the number of access entries for this channel,
+	 * including those that are on other channels.
+	 */
+	unsigned GetDeepAccessCount() const;
+
 	/** Erase an entry from the channel access list
 	 *
 	 * @param index The index in the access list vector
 	 *
-	 * Clears the memory used by the given access entry and removes it from the vector.
+	 * @return The erased entry
 	 */
-	void EraseAccess(unsigned index);
+	ChanAccess *EraseAccess(unsigned index);
 
 	/** Clear the entire channel access list
 	 *

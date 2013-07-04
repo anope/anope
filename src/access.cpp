@@ -15,6 +15,7 @@
 #include "regchannel.h"
 #include "users.h"
 #include "account.h"
+#include "protocol.h"
 
 static struct
 {
@@ -172,7 +173,7 @@ Serializable* ChanAccess::Unserialize(Serializable *obj, Serialize::Data &data)
 	Anope::string provider, chan;
 
 	data["provider"] >> provider;
-	data["ci"] >>chan;
+	data["ci"] >> chan;
 
 	ServiceReference<AccessProvider> aprovider("AccessProvider", provider);
 	ChannelInfo *ci = ChannelInfo::Find(chan);
@@ -199,20 +200,56 @@ Serializable* ChanAccess::Unserialize(Serializable *obj, Serialize::Data &data)
 	return access;
 }
 
-bool ChanAccess::Matches(const User *u, const NickCore *acc) const
+bool ChanAccess::Matches(const User *u, const NickCore *acc, Path &p) const
 {
-	bool is_mask = this->mask.find_first_of("!@?*") != Anope::string::npos;
-	if (u && is_mask && Anope::Match(u->nick, this->mask))
-		return true;
-	else if (u && Anope::Match(u->GetDisplayedMask(), this->mask))
-		return true;
-	else if (acc)
+	if (this->nc)
+		return this->nc == acc;
+
+	if (u)
+	{
+		bool is_mask = this->mask.find_first_of("!@?*") != Anope::string::npos;
+		if (is_mask && Anope::Match(u->nick, this->mask))
+			return true;
+		else if (Anope::Match(u->GetDisplayedMask(), this->mask))
+			return true;
+	}
+	
+	if (acc)
+	{
 		for (unsigned i = 0; i < acc->aliases->size(); ++i)
 		{
 			const NickAlias *na = acc->aliases->at(i);
 			if (Anope::Match(na->nick, this->mask))
 				return true;
 		}
+	}
+	
+	if (IRCD->IsChannelValid(this->mask))
+	{
+		ChannelInfo *tci = ChannelInfo::Find(this->mask);
+		if (tci)
+		{
+			for (unsigned i = 0; i < tci->GetAccessCount(); ++i)
+			{
+				ChanAccess *a = tci->GetAccess(i);
+				std::pair<const ChanAccess *, const ChanAccess *> pair = std::make_pair(this, a);
+
+				std::pair<Set::iterator, Set::iterator> range = p.first.equal_range(this);
+				for (; range.first != range.second; ++range.first)
+					if (range.first->first == pair.first && range.first->second == pair.second)
+						goto cont;
+
+				p.first.insert(pair);
+				if (a->Matches(u, acc, p))
+					p.second.insert(pair);
+
+				cont:;
+			}
+
+			return p.second.count(this) > 0;
+		}
+	}
+	
 	return false;
 }
 
@@ -299,6 +336,32 @@ AccessGroup::AccessGroup() : std::vector<ChanAccess *>()
 	this->super_admin = this->founder = false;
 }
 
+static bool HasPriv(const AccessGroup &ag, const ChanAccess *access, const Anope::string &name)
+{
+	EventReturn MOD_RESULT;
+	FOREACH_RESULT(OnCheckPriv, MOD_RESULT, (access, name));
+	if (MOD_RESULT == EVENT_ALLOW || access->HasPriv(name))
+	{
+		typedef std::multimap<const ChanAccess *, const ChanAccess *> path;
+		std::pair<path::const_iterator, path::const_iterator> it = ag.path.second.equal_range(access);
+		if (it.first != it.second)
+			/* check all of the paths for this entry */
+			for (; it.first != it.second; ++it.first)
+			{
+				const ChanAccess *a = it.first->second;
+				/* if only one path fully matches then we are ok */
+				if (HasPriv(ag, a, name))
+					return true;
+			}
+		else
+			/* entry is the end of a chain, all entries match, ok */
+			return true;
+	}
+
+	/* entry does not match or none of the chains fully match */
+	return false;
+}
+
 bool AccessGroup::HasPriv(const Anope::string &name) const
 {
 	if (this->super_admin)
@@ -307,17 +370,20 @@ bool AccessGroup::HasPriv(const Anope::string &name) const
 		return false;
 	else if (this->founder)
 		return true;
+
 	EventReturn MOD_RESULT;
 	FOREACH_RESULT(OnGroupCheckPriv, MOD_RESULT, (this, name));
 	if (MOD_RESULT != EVENT_CONTINUE)
 		return MOD_RESULT == EVENT_ALLOW;
+	
 	for (unsigned i = this->size(); i > 0; --i)
 	{
 		ChanAccess *access = this->at(i - 1);
-		FOREACH_RESULT(OnCheckPriv, MOD_RESULT, (access, name));
-		if (MOD_RESULT == EVENT_ALLOW || access->HasPriv(name))
+
+		if (::HasPriv(*this, access, name))
 			return true;
 	}
+
 	return false;
 }
 

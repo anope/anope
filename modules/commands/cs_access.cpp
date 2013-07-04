@@ -89,13 +89,19 @@ class CommandCSAccess : public Command
 	void DoAdd(CommandSource &source, ChannelInfo *ci, const std::vector<Anope::string> &params)
 	{
 		Anope::string mask = params[2];
+		Privilege *p = NULL;
 		int level = ACCESS_INVALID;
 
 		try
 		{
 			level = convertTo<int>(params[3]);
 		}
-		catch (const ConvertException &) { }
+		catch (const ConvertException &)
+		{
+			p = PrivilegeManager::FindPrivilege(params[3]);
+			if (p != NULL && defaultLevels[p->name])
+				level = defaultLevels[p->name];
+		}
 
 		if (!level)
 		{
@@ -209,9 +215,10 @@ class CommandCSAccess : public Command
 		FOREACH_MOD(OnAccessAdd, (ci, source, access));
 
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to add " << mask << " with level " << level;
-		source.Reply(_("\002%s\002 added to %s access list at level \002%d\002."), access->mask.c_str(), ci->name.c_str(), level);
-
-		return;
+		if (p != NULL)
+			source.Reply(_("\002%s\002 added to %s access list at privilege %s (level %d)"), access->mask.c_str(), ci->name.c_str(), p->name.c_str(), level);
+		else
+			source.Reply(_("\002%s\002 added to %s access list at level \002%d\002."), access->mask.c_str(), ci->name.c_str(), level);
 	}
 
 	void DoDel(CommandSource &source, ChannelInfo *ci, const std::vector<Anope::string> &params)
@@ -564,12 +571,9 @@ class CommandCSAccess : public Command
 				"access list with the given user level; if the mask is\n"
 				"already present on the list, its access level is changed to\n"
 				"the level specified in the command.  The \037level\037 specified\n"
-				"must be less than that of the user giving the command, and\n"
-				"if the \037mask\037 is already on the access list, the current\n"
-				"access level of that mask must be less than the access level\n"
-				"of the user giving the command. When a user joins the channel\n"
-				"the access they receive is from the highest level entry in the\n"
-				"access list."));
+				"may be a numerical level or the name of a privilege (eg AUTOOP).\n"
+				"When a user joins the channel the access they receive is from the"
+				"highest level entry in the access list."));
 		if (!Config->GetModule("chanserv")->Get<bool>("disallow_channel_access"))
 			source.Reply(_("The given mask may also be a channel, which will use the\n"
 					"access list from the other channel up to the given \037level\037"));

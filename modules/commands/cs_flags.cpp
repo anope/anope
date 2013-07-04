@@ -150,8 +150,9 @@ class CommandCSFlags : public Command
 			return;
 		}
 
+		Privilege *p = NULL;
 		bool override = false;
-		int add = -1;
+		int add = 1;
 		for (size_t i = 0; i < flags.length(); ++i)
 		{
 			char f = flags[i];
@@ -164,8 +165,6 @@ class CommandCSFlags : public Command
 					add = 0;
 					break;
 				case '*':
-					if (add == -1)
-						break;
 					for (std::map<Anope::string, char>::iterator it = defaultFlags.begin(), it_end = defaultFlags.end(); it != it_end; ++it)
 					{
 						if (!u_access.HasPriv(it->first))
@@ -182,8 +181,13 @@ class CommandCSFlags : public Command
 					}
 					break;
 				default:
-					if (add == -1)
-						break;
+					p = PrivilegeManager::FindPrivilege(flags.substr(i));
+					if (p != NULL && defaultFlags[p->name])
+					{
+						f = defaultFlags[p->name];
+						i = flags.length();
+					}
+
 					for (std::map<Anope::string, char>::iterator it = defaultFlags.begin(), it_end = defaultFlags.end(); it != it_end; ++it)
 					{
 						if (f != it->second)
@@ -242,9 +246,15 @@ class CommandCSFlags : public Command
 		FOREACH_MOD(OnAccessAdd, (ci, source, access));
 
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to modify " << mask << "'s flags to " << access->AccessSerialize();
-		source.Reply(_("Access for \002%s\002 on %s set to +\002%s\002"), access->mask.c_str(), ci->name.c_str(), access->AccessSerialize().c_str());
-
-		return;
+		if (p != NULL)
+		{
+			if (add)
+				source.Reply(_("Privilege \2%s\2 added to \2%s\2 on \2%s\2, new flags are +\2%s\2"), p->name.c_str(), access->mask.c_str(), ci->name.c_str(), access->AccessSerialize().c_str());
+			else
+				source.Reply(_("Privilege \2%s\2 removed from \2%s\2 on \2%s\2, new flags are +\2%s\2"), p->name.c_str(), access->mask.c_str(), ci->name.c_str(), access->AccessSerialize().c_str());
+		}
+		else
+			source.Reply(_("Access for \002%s\002 on %s set to +\002%s\002"), access->mask.c_str(), ci->name.c_str(), access->AccessSerialize().c_str());
 	}
 
 	void DoList(CommandSource &source, ChannelInfo *ci, const std::vector<Anope::string> &params)

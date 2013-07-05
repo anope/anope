@@ -298,6 +298,26 @@ Serializable* ChannelInfo::Unserialize(Serializable *obj, Serialize::Data &data)
 	b = false;
 	if (b)
 		ci->Extend<bool>("CS_PRIVATE");
+	b = false;
+	data["extensible:NO_EXPIRE"] >> b;
+	if (b)
+		ci->Extend<bool>("CS_NO_EXPIRE");
+	b = false;
+	data["extensible:FANTASY"] >> b;
+	if (b)
+		ci->Extend<bool>("BS_FANTASY");
+	b = false;
+	data["extensible:GREET"] >> b;
+	if (b)
+		ci->Extend<bool>("BS_GREET");
+	b = false;
+	data["extensible:PEACE"] >> b;
+	if (b)
+		ci->Extend<bool>("PEACE");
+	b = false;
+	data["extensible:SECUREFOUNDER"] >> b;
+	if (b)
+		ci->Extend<bool>("SECUREFOUNDER");
 	/* end compat */
 
 	return ci;

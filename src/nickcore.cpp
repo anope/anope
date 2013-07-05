@@ -121,6 +121,34 @@ Serializable* NickCore::Unserialize(Serializable *obj, Serialize::Data &data)
 	data["extensible:PRIVATE"] >> b;
 	if (b)
 		nc->Extend<bool>("NS_PRIVATE");
+	b = false;
+	data["exensible:AUTOOP"] >> b;
+	if (b)
+		nc->Extend<bool>("AUTOOP");
+	b = false;
+	data["extensible:HIDE_EMAIL"] >> b;
+	if (b)
+		nc->Extend<bool>("HIDE_EMAIL");
+	b = false;
+	data["extensible:HIDE_QUIT"] >> b;
+	if (b)
+		nc->Extend<bool>("HIDE_QUIT");
+	b = false;
+	data["extensible:MEMO_RECEIVE"] >> b;
+	if (b)
+		nc->Extend<bool>("MEMO_RECEIVE");
+	b = false;
+	data["extensible:MEMO_SIGNON"] >> b;
+	if (b)
+		nc->Extend<bool>("MEMO_SIGNON");
+	b = false;
+	data["extensible:NO_EXPIRE"] >> b;
+	if (b)
+		nc->Extend<bool>("NO_EXPIRE");
+	b = false;
+	data["extensible:KILLPROTECT"] >> b;
+	if (b)
+		nc->Extend<bool>("KILLPROTECT");
 	/* end compat */
 
 	return nc;

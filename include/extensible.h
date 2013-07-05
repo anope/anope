@@ -172,8 +172,9 @@ class SerializableExtensibleItem : public PrimitiveExtensibleItem<T>
 
 	void ExtensibleUnserialize(Extensible *e, Serializable *s, Serialize::Data &data) anope_override
 	{
-		T* t = this->Require(e);
-		data[this->name] >> *t;
+		T t;
+		if (data[this->name] >> t)
+			this->Set(e, t);
 	}
 };
 

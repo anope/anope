@@ -190,9 +190,8 @@ class CSSetMisc : public Module
 		}
 	}
 
-	void OnChanInfo(CommandSource &source, ChannelInfo *ci, InfoFormatter &info, bool ShowHidden) anope_override
+	void OnChanInfo(CommandSource &source, ChannelInfo *ci, InfoFormatter &info, bool) anope_override
 	{
-		Anope::map<ExtensibleItem<CSMiscData> *> items;
 		for (Anope::map<ExtensibleItem<CSMiscData> *>::iterator it = items.begin(); it != items.end(); ++it)
 		{
 			ExtensibleItem<CSMiscData> *e = it->second;

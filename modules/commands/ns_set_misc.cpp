@@ -208,9 +208,8 @@ class NSSetMisc : public Module
 		}
 	}
 
-	void OnNickInfo(CommandSource &source, NickAlias *na, InfoFormatter &info, bool ShowHidden) anope_override
+	void OnNickInfo(CommandSource &source, NickAlias *na, InfoFormatter &info, bool) anope_override
 	{
-		Anope::map<ExtensibleItem<NSMiscData> *> items;
 		for (Anope::map<ExtensibleItem<NSMiscData> *>::iterator it = items.begin(); it != items.end(); ++it)
 		{
 			ExtensibleItem<NSMiscData> *e = it->second;

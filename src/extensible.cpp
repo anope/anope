@@ -24,8 +24,8 @@ ExtensibleBase::~ExtensibleBase()
 
 Extensible::~Extensible()
 {
-	for (std::set<ExtensibleBase *>::iterator it = extension_items.begin(); it != extension_items.end(); ++it)
-		(*it)->Unset(this);
+	while (!extension_items.empty())
+		(*extension_items.begin())->Unset(this);
 }
 
 bool Extensible::HasExt(const Anope::string &name) const

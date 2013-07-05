@@ -18,6 +18,7 @@ struct ModeLock
 	Anope::string setter;
 	time_t created;
 
+	virtual ~ModeLock() { }
  protected:
 	ModeLock() { }
 };

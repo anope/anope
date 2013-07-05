@@ -479,7 +479,7 @@ bool ModuleManager::SetPriority(Module *mod, const Anope::string &i, Priority s,
 void ModuleManager::UnloadAll()
 {
 	std::vector<Anope::string> modules;
-	for (size_t i = 1, j = 0; i != MT_END; i <<= 1, j |= i)
+	for (size_t i = 1, j = 0; i != MT_END; j |= i, i <<= 1)
 		for (std::list<Module *>::iterator it = Modules.begin(), it_end = Modules.end(); it != it_end; ++it)
 		{
 			Module *m = *it;

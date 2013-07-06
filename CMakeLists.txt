@@ -499,6 +499,8 @@ if(WIN32)
   )
 endif(WIN32)
 
+install(CODE "file(REMOVE_RECURSE \"${CMAKE_INSTALL_PREFIX}/${LIB_DIR}/modules\")")
+
 # Only process the CPack section if we have CPack
 if(EXISTS "${CMAKE_ROOT}/Modules/CPack.cmake")
   # Various options for CPack

@@ -239,7 +239,7 @@ void MailEnd(MailInfo * mail)
 	fclose(mail->readpipe);
         _exit(EXIT_SUCCESS);
     }
-    else if (pid < 0)
+    else
 #endif
     {
 	if (mail->pipe != mail->writepipe)

@@ -538,6 +538,7 @@ class ProtoHybrid : public Module
 	Message::Kill message_kill;
 	Message::Mode message_mode;
 	Message::MOTD message_motd;
+	Message::Notice message_notice;
 	Message::Part message_part;
 	Message::Ping message_ping;
 	Message::Privmsg message_privmsg;
@@ -615,9 +616,9 @@ public:
 	ProtoHybrid(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PROTOCOL | VENDOR),
 		ircd_proto(this),
 		message_away(this), message_capab(this), message_error(this), message_invite(this), message_kick(this),
-		message_kill(this), message_mode(this), message_motd(this), message_part(this), message_ping(this),
-		message_privmsg(this), message_quit(this), message_squit(this), message_stats(this), message_time(this),
-		message_topic(this), message_version(this), message_whois(this),
+		message_kill(this), message_mode(this), message_motd(this), message_notice(this), message_part(this),
+		message_ping(this), message_privmsg(this), message_quit(this), message_squit(this), message_stats(this),
+		message_time(this), message_topic(this), message_version(this), message_whois(this),
 		message_bmask(this), message_eob(this), message_join(this),
 		message_nick(this), message_pass(this), message_pong(this), message_server(this), message_sid(this),
 		message_sjoin(this), message_svsmode(this), message_tburst(this), message_tmode(this), message_uid(this),

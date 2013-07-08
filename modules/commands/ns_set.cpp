@@ -1156,7 +1156,7 @@ class NSSet : public Module
 			info.AddOption(_("Auto-op"));
 		if (chanstats.HasExt(na->nc))
 			info.AddOption(_("Chanstats"));
-		if (noexpire.HasExt(na->nc))
+		if (noexpire.HasExt(na))
 			info.AddOption(_("No expire"));
 	}
 };

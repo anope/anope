@@ -201,6 +201,14 @@ Serializable* NickAlias::Unserialize(Serializable *obj, Serialize::Data &data)
 
 	na->SetVhost(vhost_ident, vhost_host, vhost_creator, vhost_time);
 
+	/* compat */
+	bool b;
+	b = false;
+	data["extensible:NO_EXPIRE"] >> b;
+	if (b)
+		na->Extend<bool>("NS_NO_EXPIRE");
+	/* end compat */
+
 	return na;
 }
 

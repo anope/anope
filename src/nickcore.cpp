@@ -122,7 +122,7 @@ Serializable* NickCore::Unserialize(Serializable *obj, Serialize::Data &data)
 	if (b)
 		nc->Extend<bool>("NS_PRIVATE");
 	b = false;
-	data["exensible:AUTOOP"] >> b;
+	data["extensible:AUTOOP"] >> b;
 	if (b)
 		nc->Extend<bool>("AUTOOP");
 	b = false;
@@ -141,10 +141,6 @@ Serializable* NickCore::Unserialize(Serializable *obj, Serialize::Data &data)
 	data["extensible:MEMO_SIGNON"] >> b;
 	if (b)
 		nc->Extend<bool>("MEMO_SIGNON");
-	b = false;
-	data["extensible:NO_EXPIRE"] >> b;
-	if (b)
-		nc->Extend<bool>("NO_EXPIRE");
 	b = false;
 	data["extensible:KILLPROTECT"] >> b;
 	if (b)

@@ -55,14 +55,14 @@ class CoreExport Log
  public:
  	/* Bot that should log this message */
 	const BotInfo *bi;
-	/* For commands, the user executing the command */
-	Anope::string nick;
 	/* For commands, the user executing the command, but might not always exist */
 	const User *u;
 	/* For commands, the account executing teh command, but will not always exist */
 	const NickCore *nc;
 	/* For commands, the command being executed */
 	Command *c;
+	/* For commands, the command source */
+	CommandSource *source;
 	/* Used for LOG_CHANNEL */
 	Channel *chan;
 	/* For commands, the channel the command was executed on, will not always exist */

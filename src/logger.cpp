@@ -75,11 +75,11 @@ const Anope::string &LogFile::GetName() const
 	return this->filename;
 }
 
-Log::Log(LogType t, const Anope::string &cat, const BotInfo *b) : bi(b), u(NULL), nc(NULL), c(NULL), chan(NULL), ci(NULL), s(NULL), type(t), category(cat)
+Log::Log(LogType t, const Anope::string &cat, const BotInfo *b) : bi(b), u(NULL), nc(NULL), c(NULL), source(NULL), chan(NULL), ci(NULL), s(NULL), type(t), category(cat)
 {
 }
 
-Log::Log(LogType t, CommandSource &source, Command *_c, const ChannelInfo *_ci) : nick(source.GetNick()), u(source.GetUser()), nc(source.nc), c(_c), chan(NULL), ci(_ci), s(NULL), m(NULL), type(t)
+Log::Log(LogType t, CommandSource &src, Command *_c, const ChannelInfo *_ci) : u(src.GetUser()), nc(src.nc), c(_c), source(&src), chan(NULL), ci(_ci), s(NULL), m(NULL), type(t)
 {
 	if (!c)
 		throw CoreException("Invalid pointers passed to Log::Log");
@@ -94,29 +94,29 @@ Log::Log(LogType t, CommandSource &source, Command *_c, const ChannelInfo *_ci) 
 	this->category = c->name;
 }
 
-Log::Log(const User *_u, Channel *ch, const Anope::string &cat) : bi(NULL), u(_u), nc(NULL), c(NULL), chan(ch), ci(chan ? *chan->ci : NULL), s(NULL), m(NULL), type(LOG_CHANNEL), category(cat)
+Log::Log(const User *_u, Channel *ch, const Anope::string &cat) : bi(NULL), u(_u), nc(NULL), c(NULL), source(NULL), chan(ch), ci(chan ? *chan->ci : NULL), s(NULL), m(NULL), type(LOG_CHANNEL), category(cat)
 {
 	if (!chan)
 		throw CoreException("Invalid pointers passed to Log::Log");
 }
 
-Log::Log(const User *_u, const Anope::string &cat, const BotInfo *_bi) : bi(_bi), u(_u), nc(NULL), c(NULL), chan(NULL), ci(NULL), s(NULL), m(NULL), type(LOG_USER), category(cat)
+Log::Log(const User *_u, const Anope::string &cat, const BotInfo *_bi) : bi(_bi), u(_u), nc(NULL), c(NULL), source(NULL), chan(NULL), ci(NULL), s(NULL), m(NULL), type(LOG_USER), category(cat)
 {
 	if (!u)
 		throw CoreException("Invalid pointers passed to Log::Log");
 }
 
-Log::Log(Server *serv, const Anope::string &cat, const BotInfo *_bi) : bi(_bi), u(NULL), nc(NULL), c(NULL), chan(NULL), ci(NULL), s(serv), m(NULL), type(LOG_SERVER), category(cat)
+Log::Log(Server *serv, const Anope::string &cat, const BotInfo *_bi) : bi(_bi), u(NULL), nc(NULL), c(NULL), source(NULL), chan(NULL), ci(NULL), s(serv), m(NULL), type(LOG_SERVER), category(cat)
 {
 	if (!s)
 		throw CoreException("Invalid pointer passed to Log::Log");
 }
 
-Log::Log(const BotInfo *b, const Anope::string &cat) : bi(b), u(NULL), nc(NULL), c(NULL), chan(NULL), ci(NULL), s(NULL), m(NULL), type(LOG_NORMAL), category(cat)
+Log::Log(const BotInfo *b, const Anope::string &cat) : bi(b), u(NULL), nc(NULL), c(NULL), source(NULL), chan(NULL), ci(NULL), s(NULL), m(NULL), type(LOG_NORMAL), category(cat)
 {
 }
 
-Log::Log(Module *mod, const Anope::string &cat) : bi(NULL), u(NULL), nc(NULL), c(NULL), chan(NULL), ci(NULL), s(NULL), m(mod), type(LOG_MODULE), category(cat)
+Log::Log(Module *mod, const Anope::string &cat) : bi(NULL), u(NULL), nc(NULL), c(NULL), source(NULL), chan(NULL), ci(NULL), s(NULL), m(mod), type(LOG_MODULE), category(cat)
 {
 }
 
@@ -182,10 +182,10 @@ Anope::string Log::BuildPrefix() const
 			Anope::string cname = sl != Anope::string::npos ? this->c->name.substr(sl + 1) : this->c->name;
 			if (this->u)
 				buffer += this->u->GetMask() + " used " + cname + " ";
+			else if (this->source)
+				buffer += this->source->GetNick() + " used " + cname + " ";
 			else if (this->nc)
 				buffer += this->nc->display + " used " + cname + " ";
-			else
-				buffer += this->nick + " used " + cname + " ";
 			if (this->ci)
 				buffer += "on " + this->ci->name + " ";
 			break;

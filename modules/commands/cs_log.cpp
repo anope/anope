@@ -23,10 +23,13 @@ struct LogSettingImpl : LogSetting, Serializable
 		ChannelInfo *ci = ChannelInfo::Find(chan);
 		if (ci)
 		{
-			LogSettings *ls = ci->Require<LogSettings>("logsettings");
-			LogSettings::iterator it = std::find((*ls)->begin(), (*ls)->end(), this);
-			if (it != (*ls)->end())
-				(*ls)->erase(it);
+			LogSettings *ls = ci->GetExt<LogSettings>("logsettings");
+			if (ls)
+			{
+				LogSettings::iterator it = std::find((*ls)->begin(), (*ls)->end(), this);
+				if (it != (*ls)->end())
+					(*ls)->erase(it);
+			}
 		}
 	}
 
@@ -78,6 +81,16 @@ struct LogSettingsImpl : LogSettings
 {
 	LogSettingsImpl(Extensible *) { }
 
+ 	~LogSettingsImpl()
+	{
+		for (iterator it = (*this)->begin(); it != (*this)->end();)
+		{
+			LogSetting *ls = *it;
+			++it;
+			delete ls;
+		}
+	}
+
 	LogSetting *Create() anope_override
 	{
 		return new LogSettingImpl();
@@ -120,7 +133,7 @@ public:
 					ListFormatter::ListEntry entry;
 					entry["Number"] = stringify(i + 1);
 					entry["Service"] = log->command_service;
-					entry["Command"] = log->command_name;
+					entry["Command"] = !log->command_name.empty() ? log->command_name : log->service_name;
 					entry["Method"] = log->method;
 					entry[""] = log->extra;
 					list.AddEntry(entry);
@@ -153,14 +166,22 @@ public:
 				command_name = command.substr(sl + 1);
 			BotInfo *bi = BotInfo::Find(service, true);
 
-			if (bi == NULL || bi->commands.count(command_name) == 0)
-			{
-				source.Reply(_("%s is not a valid command."), command.c_str());
-				return;
-			}
+			Anope::string service_name;
 
-			ServiceReference<Command> c_service("Command", bi->commands[command_name].name);
-			if (!c_service)
+			/* Allow either a command name or a service name. */
+			if (bi && bi->commands.count(command_name))
+			{
+				/* Get service name from command */
+				service_name = bi->commands[command_name].name;
+			}
+			else if (ServiceReference<Command>("Command", command))
+			{
+				/* This is the service name, don't use any specific command */
+				service_name = command;
+				bi = NULL;
+				command_name.clear();
+			}
+			else
 			{
 				source.Reply(_("%s is not a valid command."), command.c_str());
 				return;
@@ -185,19 +206,19 @@ public:
 			{
 				LogSetting *log = (*ls)->at(i - 1);
 
-				if (log->service_name == bi->commands[command_name].name && log->method.equals_ci(method))
+				if (log->service_name == service_name && log->method.equals_ci(method))
 				{
 					if (log->extra == extra)
 					{
+						Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to remove logging for " << (!log->command_name.empty() ? log->command_name : log->service_name) << " with method " << method << (extra == "" ? "" : " ") << extra;
+						source.Reply(_("Logging for command %s on %s with log method %s%s%s has been removed."), !log->command_name.empty() ? log->command_name.c_str() : log->service_name.c_str(), !log->command_service.empty() ? log->command_service.c_str() : "any service", method.c_str(), extra.empty() ? "" : " ", extra.empty() ? "" : extra.c_str());
 						delete log;
-						Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to remove logging for " << command << " with method " << method << (extra == "" ? "" : " ") << extra;
-						source.Reply(_("Logging for command %s on %s with log method %s%s%s has been removed."), command_name.c_str(), bi->nick.c_str(), method.c_str(), extra.empty() ? "" : " ", extra.empty() ? "" : extra.c_str());
 					}
 					else
 					{
 						log->extra = extra;
-						Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to change logging for " << command << " to method " << method << (extra == "" ? "" : " ") << extra;
-						source.Reply(_("Logging changed for command %s on %s, now using log method %s%s%s."), command_name.c_str(), bi->nick.c_str(), method.c_str(), extra.empty() ? "" : " ", extra.empty() ? "" : extra.c_str());
+						Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to change logging for " << (!log->command_name.empty() ? log->command_name : log->service_name) << " to method " << method << (extra == "" ? "" : " ") << extra;
+						source.Reply(_("Logging changed for command %s on %s, now using log method %s%s%s has been removed."), !log->command_name.empty() ? log->command_name.c_str() : log->service_name.c_str(), !log->command_service.empty() ? log->command_service.c_str() : "any service", method.c_str(), extra.empty() ? "" : " ", extra.empty() ? "" : extra.c_str());
 					}
 					return;
 				}
@@ -205,8 +226,9 @@ public:
 
 			LogSetting *log = new LogSettingImpl();
 			log->chan = ci->name;
-			log->service_name = bi->commands[command_name].name;
-			log->command_service = bi->nick;
+			log->service_name = service_name;
+			if (bi)
+				log->command_service = bi->nick;
 			log->command_name = command_name;
 			log->method = method;
 			log->extra = extra;
@@ -217,7 +239,7 @@ public:
 
 			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to log " << command << " with method " << method << (extra == "" ? "" : " ") << extra;
 
-			source.Reply(_("Logging is now active for command %s on %s, using log method %s%s%s."), command_name.c_str(), bi->nick.c_str(), method.c_str(), extra.empty() ? "" : " ", extra.empty() ? "" : extra.c_str());
+			source.Reply(_("Logging is now active for command %s on %s, using log method %s%s%s."), !command_name.empty() ? command_name.c_str() : service_name.c_str(), bi ? bi->nick.c_str() : "any service", method.c_str(), extra.empty() ? "" : " ", extra.empty() ? "" : extra.c_str());
 		}
 		else
 			this->OnSyntaxError(source, "");
@@ -258,12 +280,71 @@ class CSLog : public Module
 	ExtensibleItem<LogSettingsImpl> logsettings;
 	Serialize::Type logsetting_type;
 
+	struct LogDefault
+	{
+		Anope::string service, command, method;
+	};
+
+	std::vector<LogDefault> defaults;
+
  public:
 	CSLog(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		MSService("MemoServService", "MemoServ"), commandcslog(this), logsettings(this, "logsettings"),
 		logsetting_type("LogSetting", LogSettingImpl::Unserialize)
 	{
 
+	}
+
+	void OnReload(Configuration::Conf *conf) anope_override
+	{
+		Configuration::Block *block = conf->GetModule(this);
+		defaults.clear();
+
+		for (int i = 0; i < block->CountBlock("default"); ++i)
+		{
+			Configuration::Block *def = block->GetBlock("default", i);
+
+			LogDefault ld;
+
+			ld.service = def->Get<const Anope::string>("service");
+			ld.command = def->Get<const Anope::string>("command");
+			ld.method = def->Get<const Anope::string>("method");
+
+			defaults.push_back(ld);
+		}
+	}
+
+	void OnChanRegistered(ChannelInfo *ci) anope_override
+	{
+		if (defaults.empty())
+			return;
+
+		LogSettings *ls = logsettings.Require(ci);
+		for (unsigned i = 0; i < defaults.size(); ++i)
+		{
+			LogDefault &d = defaults[i];
+
+			LogSetting *log = new LogSettingImpl();
+			log->chan = ci->name;
+
+			if (!d.service.empty())
+			{
+				log->service_name = d.service.lower() + "/" + d.command.lower();
+				log->command_service = d.service;
+				log->command_name = d.command;
+			}
+			else
+				log->service_name = d.command;
+
+			spacesepstream sep(d.method);
+			sep.GetToken(log->method);
+			log->extra = sep.GetRemaining();
+
+			log->created = Anope::CurTime;
+			log->creator = ci->GetFounder() ? ci->GetFounder()->display : "(default)";
+
+			(*ls)->push_back(log);
+		}
 	}
 
 	void OnLog(Log *l) anope_override
@@ -277,20 +358,34 @@ class CSLog : public Module
 			{
 				const LogSetting *log = (*ls)->at(i);
 
-				if (log->service_name == l->c->name)
-				{
-					Anope::string buffer = l->u->nick + " used " + log->command_name + " " + l->buf.str();
+				/* wrong command */
+				if (log->service_name != l->c->name)
+					continue;
 
-					if (log->method.equals_ci("MESSAGE") && l->ci->c && l->ci->bi && l->ci->c->FindUser(l->ci->bi) != NULL)
-					{
-						IRCD->SendPrivmsg(l->ci->bi, log->extra + l->ci->c->name, "%s", buffer.c_str());
-						l->ci->bi->lastmsg = Anope::CurTime;
-					}
-					else if (log->method.equals_ci("NOTICE") && l->ci->c && l->ci->bi && l->ci->c->FindUser(l->ci->bi) != NULL)
-						IRCD->SendNotice(l->ci->bi, log->extra + l->ci->c->name, "%s", buffer.c_str());
-					else if (log->method.equals_ci("MEMO") && MSService && l->ci->WhoSends() != NULL)
-						MSService->Send(l->ci->WhoSends()->nick, l->ci->name, buffer, true);
+				/* if a command name is given check the service and the command */
+				if (!log->command_name.empty())
+				{
+					/* wrong service (only check if not a fantasy command, though) */
+					if (!l->source->c && log->command_service != l->source->service->nick)
+						continue;
+
+					if (!log->command_name.equals_ci(l->source->command))
+						continue;
 				}
+
+				Anope::string buffer = l->u->nick + " used " + l->source->command.upper() + " " + l->buf.str();
+
+				if (log->method.equals_ci("MEMO") && MSService && l->ci->WhoSends() != NULL)
+					MSService->Send(l->ci->WhoSends()->nick, l->ci->name, buffer, true);
+				else if (l->source->c)
+					/* Sending a channel message or notice in response to a fantasy command */;
+				else if (log->method.equals_ci("MESSAGE") && l->ci->c)
+				{
+					IRCD->SendPrivmsg(l->ci->WhoSends(), log->extra + l->ci->c->name, "%s", buffer.c_str());
+					l->ci->WhoSends()->lastmsg = Anope::CurTime;
+				}
+				else if (log->method.equals_ci("NOTICE") && l->ci->c)
+					IRCD->SendNotice(l->ci->WhoSends(), log->extra + l->ci->c->name, "%s", buffer.c_str());
 			}
 	}
 };

@@ -705,17 +705,152 @@ class CommandCSMode : public Command
 	}
 };
 
+static Anope::map<std::pair<bool, Anope::string> > modes;
+
+class CommandCSModes : public Command
+{
+ public:
+	CommandCSModes(Module *creator) : Command(creator, "chanserv/modes", 1, 2)
+	{
+		this->SetSyntax(_("\037channel\037 [\037user\037]"));
+	}
+
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	{
+		User *u = source.GetUser(),
+			*targ = params.size() > 1 ? User::Find(params[1], true) : u;
+		ChannelInfo *ci = ChannelInfo::Find(params[0]);
+
+		if (!targ)
+		{
+			if (params.size() > 1)
+				source.Reply(NICK_X_NOT_IN_USE, params[1].c_str());
+			return;
+		}
+
+		if (!ci)
+		{
+			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
+			return;
+		}
+		else if (!ci->c)
+		{
+			source.Reply(CHAN_X_NOT_IN_USE, ci->name.c_str());
+			return;
+		}
+
+		AccessGroup u_access = source.AccessFor(ci), targ_access = ci->AccessFor(targ);
+		const std::pair<bool, Anope::string> &m = modes[source.command];
+
+		if (m.second.empty())
+		{
+			source.Reply(ACCESS_DENIED);
+			return;
+		}
+		
+		if (!source.HasPriv("chanserv/administration"))
+		{
+			if (u == targ ? !u_access.HasPriv(m.second + "ME") : !u_access.HasPriv(m.second))
+			{
+				source.Reply(ACCESS_DENIED);
+				return;
+			}
+
+			if (!m.first && u != targ && (targ->IsProtected() || (ci->HasExt("PEACE") && targ_access >= u_access)))
+			{
+				source.Reply(ACCESS_DENIED);
+				return;
+			}
+		}
+
+		if (!ci->c->FindUser(targ))
+		{
+			source.Reply(NICK_X_NOT_ON_CHAN, targ->nick.c_str(), ci->name.c_str());
+			return;
+		}
+
+		if (m.first)
+			ci->c->SetMode(NULL, m.second, targ->GetUID());
+		else
+			ci->c->RemoveMode(NULL, m.second, targ->GetUID());
+
+		Log(LOG_COMMAND, source, this, ci) << "on " << targ->nick;
+	}
+
+ 	const Anope::string GetDesc(CommandSource &source) const anope_override
+	{
+		const std::pair<bool, Anope::string> &m = modes[source.command];
+		if (!m.second.empty())
+		{
+			if (m.first)
+				return Anope::printf(_("Gives you or the specific nick %s status on a channel"), m.second.c_str());
+			else
+				return Anope::printf(_("Removes %s status from you or the specific on a channel"), m.second.c_str());
+		}
+		else
+			return "";
+	}
+
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	{
+		const std::pair<bool, Anope::string> &m = modes[source.command];
+		if (m.second.empty())
+			return false;
+
+		this->SendSyntax(source);
+		source.Reply(" ");
+		if (m.first)
+			source.Reply(_("Gives %s status to the selected nick on a channel. If \037nick\037 is\n"
+					"not given, it will %s you."),
+					m.second.upper().c_str(), m.second.lower().c_str());
+		else
+			source.Reply(_("Removes %s status from the selected nick on a channel. If \037nick\037 is\n"
+					"not given, it will de%s you."),
+					 m.second.upper().c_str(), m.second.lower().c_str());
+		source.Reply(" ");
+		source.Reply(_("You must have the %s(ME) privilege on the channel to use this command."), m.second.upper().c_str());
+
+		return true;
+	}
+};
+
 class CSMode : public Module
 {
 	CommandCSMode commandcsmode;
+	CommandCSModes commandcsmodes;
 	ExtensibleItem<ModeLocksImpl> modelocks;
 	Serialize::Type modelocks_type;
 
  public:
 	CSMode(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		commandcsmode(this), modelocks(this, "modelocks"), modelocks_type("ModeLock", ModeLockImpl::Unserialize)
+		commandcsmode(this), commandcsmodes(this),
+		modelocks(this, "modelocks"), modelocks_type("ModeLock", ModeLockImpl::Unserialize)
 	{
 
+	}
+
+	void OnReload(Configuration::Conf *conf) anope_override
+	{
+		modes.clear();
+
+		for (int i = 0; i < conf->CountBlock("command"); ++i)
+		{
+			Configuration::Block *block = conf->GetBlock("command", i);
+			
+			const Anope::string &cname = block->Get<const Anope::string>("name"),
+					&cmd = block->Get<const Anope::string>("command");
+
+			if (cname.empty() || cmd != "chanserv/modes")
+				continue;
+
+			const Anope::string &set = block->Get<const Anope::string>("set"),
+					&unset = block->Get<const Anope::string>("unset");
+			
+			if (set.empty() && unset.empty())
+				continue;
+
+			modes[cname] = std::make_pair(!set.empty(), !set.empty() ? set : unset);
+		}
 	}
 
 	EventReturn OnCheckModes(Channel *c) anope_override

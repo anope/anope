@@ -9,14 +9,14 @@
  * Based on the original code of Services by Andy Church.
  *
  */
-	
+
 #include "protocol.h"
-	
+
 /* Common IRCD messages.
  * Protocol modules may chose to include some, none, or all of these handlers
  * as they see fit.
  */
-	
+
 namespace Message
 {
 
@@ -94,6 +94,13 @@ namespace Message
 		void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override;
 	};
 	
+	struct CoreExport Notice : IRCDMessage
+	{
+		Notice(Module *creator, const Anope::string &mname = "NOTICE") : IRCDMessage(creator, mname, 2) { SetFlag(IRCDMESSAGE_REQUIRE_USER); }
+
+		void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override;
+	};
+
 	struct CoreExport Part : IRCDMessage
 	{
 		Part(Module *creator, const Anope::string &mname = "PART") : IRCDMessage(creator, mname, 1) { SetFlag(IRCDMESSAGE_REQUIRE_USER); SetFlag(IRCDMESSAGE_SOFT_LIMIT); }

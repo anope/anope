@@ -1281,6 +1281,7 @@ class ProtoInspIRCd : public Module
 	Message::Kick message_kick;
 	Message::Kill message_kill;
 	Message::MOTD message_motd;
+	Message::Notice message_notice;
 	Message::Part message_part;
 	Message::Ping message_ping;
 	Message::Privmsg message_privmsg;
@@ -1314,8 +1315,8 @@ class ProtoInspIRCd : public Module
 	ProtoInspIRCd(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PROTOCOL | VENDOR),
 		ircd_proto(this), ssl(this, "ssl"),
 		message_away(this), message_error(this), message_invite(this), message_join(this), message_kick(this), message_kill(this),
-		message_motd(this), message_part(this), message_ping(this), message_privmsg(this), message_quit(this), message_squit(this),
-		message_stats(this), message_topic(this),
+		message_motd(this), message_notice(this), message_part(this), message_ping(this), message_privmsg(this), message_quit(this),
+		message_squit(this), message_stats(this), message_topic(this),
 
 		message_chgident(this), message_setname(this, "SETNAME"), message_chgname(this, "FNAME"), message_capab(this), message_endburst(this),
 		message_fhost(this, "FHOST"), message_sethost(this, "SETHOST"), message_fjoin(this), message_fmode(this), message_ftopic(this),
@@ -1342,8 +1343,12 @@ class ProtoInspIRCd : public Module
 	{
 		/* InspIRCd 1.2 doesn't set -r on nick change, remove -r here. Note that if we have to set +r later
 		 * this will cancel out this -r, resulting in no mode changes.
+		 *
+		 * Do not set -r if we dont have a NickServ loaded - DP
 		 */
-		u->RemoveMode(Config->GetClient("NickServ"), "REGISTERED");
+		BotInfo *NickServ = Config->GetClient("NickServ");
+		if (NickServ)
+			u->RemoveMode(NickServ, "REGISTERED");
 	}
 };
 

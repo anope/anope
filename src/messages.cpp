@@ -244,6 +244,22 @@ void MOTD::Run(MessageSource &source, const std::vector<Anope::string> &params)
 		IRCD->SendNumeric(422, source.GetSource(), ":- MOTD file not found!  Please contact your IRC administrator.");
 }
 
+void Notice::Run(MessageSource &source, const std::vector<Anope::string> &params)
+{
+	Anope::string message = params[1];
+
+	User *u = source.GetUser();
+
+	/* ignore channel notices */
+	if (!IRCD->IsChannelValid(params[0]))
+	{
+		BotInfo *bi = BotInfo::Find(params[0]);
+		if (!bi)
+			return;
+		FOREACH_MOD(OnBotNotice, (u, bi, message));
+	}
+}
+
 void Part::Run(MessageSource &source, const std::vector<Anope::string> &params)
 {
 	User *u = source.GetUser();

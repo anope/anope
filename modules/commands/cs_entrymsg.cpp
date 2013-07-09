@@ -26,6 +26,8 @@ struct EntryMsg : Serializable
 		this->when = ct;
 	}
 
+	~EntryMsg();
+
 	void Serialize(Serialize::Data &data) const anope_override
 	{
 		data["ci"] << this->ci->name;
@@ -43,10 +45,22 @@ struct EntryMessageList : Serialize::Checker<std::vector<EntryMsg *> >
 
 	~EntryMessageList()
 	{
-		for (unsigned i = 0; i < (*this)->size(); ++i)
-			delete (*this)->at(i);
+		for (unsigned i = (*this)->size(); i > 0; --i)
+			delete (*this)->at(i - 1);
 	}
 };
+
+EntryMsg::~EntryMsg()
+{
+	EntryMessageList *messages = ci->GetExt<EntryMessageList>("entrymsg");
+	if (messages)
+	{
+		std::vector<EntryMsg *>::iterator it = std::find((*messages)->begin(), (*messages)->end(), this);
+		if (it != (*messages)->end())
+			(*messages)->erase(it);
+	}
+}
+
 
 Serializable* EntryMsg::Unserialize(Serializable *obj, Serialize::Data &data)
 {
@@ -71,9 +85,7 @@ Serializable* EntryMsg::Unserialize(Serializable *obj, Serialize::Data &data)
 		return msg;
 	}
 
-	EntryMessageList *messages = ci->GetExt<EntryMessageList>("entrymsg");
-	if (messages == NULL)
-		messages = ci->Extend<EntryMessageList>("entrymsg");
+	EntryMessageList *messages = ci->Require<EntryMessageList>("entrymsg");
 
 	data["when"] >> swhen;
 
@@ -87,9 +99,7 @@ class CommandEntryMessage : public Command
  private:
 	void DoList(CommandSource &source, ChannelInfo *ci)
 	{
-		EntryMessageList *messages = ci->GetExt<EntryMessageList>("entrymsg");
-		if (messages == NULL)
-			messages = ci->Extend<EntryMessageList>("entrymsg");
+		EntryMessageList *messages = ci->Require<EntryMessageList>("entrymsg");
 
 		if ((*messages)->empty())
 		{
@@ -123,9 +133,7 @@ class CommandEntryMessage : public Command
 		
 	void DoAdd(CommandSource &source, ChannelInfo *ci, const Anope::string &message)
 	{
-		EntryMessageList *messages = ci->GetExt<EntryMessageList>("entrymsg");
-		if (messages == NULL)
-			messages = ci->Extend<EntryMessageList>("entrymsg");
+		EntryMessageList *messages = ci->Require<EntryMessageList>("entrymsg");
 
 		if ((*messages)->size() >= Config->GetModule(this->owner)->Get<unsigned>("maxentries"))
 			source.Reply(_("The entry message list for \002%s\002 is full."), ci->name.c_str());
@@ -139,9 +147,7 @@ class CommandEntryMessage : public Command
 
 	void DoDel(CommandSource &source, ChannelInfo *ci, const Anope::string &message)
 	{
-		EntryMessageList *messages = ci->GetExt<EntryMessageList>("entrymsg");
-		if (messages == NULL)
-			messages = ci->Extend<EntryMessageList>("entrymsg");
+		EntryMessageList *messages = ci->Require<EntryMessageList>("entrymsg");
 
 		if (!message.is_pos_number_only())
 			source.Reply(("Entry message \002%s\002 not found on channel \002%s\002."), message.c_str(), ci->name.c_str());
@@ -155,7 +161,6 @@ class CommandEntryMessage : public Command
 				if (i > 0 && i <= (*messages)->size())
 				{
 					delete (*messages)->at(i - 1);
-					(*messages)->erase((*messages)->begin() + i - 1);
 					if ((*messages)->empty())
 						ci->Shrink<EntryMessageList>("entrymsg");
 					Log(source.IsFounder(ci) ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to remove a message";
@@ -246,14 +251,15 @@ class CommandEntryMessage : public Command
 
 class CSEntryMessage : public Module
 {
-	Serialize::Type entrymsg_type;
 	CommandEntryMessage commandentrymsg;
+	Serialize::Type entrymsg_type;
 	ExtensibleItem<EntryMessageList> eml;
 
  public:
-	CSEntryMessage(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR), entrymsg_type("EntryMsg", EntryMsg::Unserialize), commandentrymsg(this), eml(this, "entrymsg")
+	CSEntryMessage(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
+	commandentrymsg(this), eml(this, "entrymsg"),
+	entrymsg_type("EntryMsg", EntryMsg::Unserialize)
 	{
-
 	}
 
 	void OnJoinChannel(User *u, Channel *c) anope_override

@@ -42,6 +42,16 @@ struct ModeLocksImpl : ModeLocks
 	{
 	}
 
+	~ModeLocksImpl()
+	{
+		for (ModeList::iterator it = this->mlocks->begin(); it != this->mlocks->end();)
+		{
+			ModeLock *ml = *it;
+			++it;
+			delete ml;
+		}
+	}
+
 	bool HasMLock(ChannelMode *mode, const Anope::string &param, bool status) const anope_override
 	{
 		if (!mode)
@@ -818,13 +828,14 @@ class CSMode : public Module
 {
 	CommandCSMode commandcsmode;
 	CommandCSModes commandcsmodes;
-	ExtensibleItem<ModeLocksImpl> modelocks;
 	Serialize::Type modelocks_type;
+	ExtensibleItem<ModeLocksImpl> modelocks;
 
  public:
 	CSMode(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandcsmode(this), commandcsmodes(this),
-		modelocks(this, "modelocks"), modelocks_type("ModeLock", ModeLockImpl::Unserialize)
+		modelocks_type("ModeLock", ModeLockImpl::Unserialize),
+		modelocks(this, "modelocks")
 	{
 
 	}

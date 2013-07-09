@@ -35,6 +35,8 @@ struct BadWordsImpl : BadWords
 
 	BadWordsImpl(Extensible *obj) : ci(anope_dynamic_static_cast<ChannelInfo *>(obj)), badwords("BadWord") { }
 
+	~BadWordsImpl();
+
 	BadWord* AddBadWord(const Anope::string &word, BadWordType type) anope_override
 	{
 		BadWordImpl *bw = new BadWordImpl();
@@ -86,6 +88,16 @@ struct BadWordsImpl : BadWords
 			ci->Shrink<BadWords>("badwords");
 	}
 };
+
+BadWordsImpl::~BadWordsImpl()
+{
+	for (list::iterator it = badwords->begin(); it != badwords->end();)
+	{
+		BadWord *bw = *it;
+		++it;
+		delete bw;
+	}
+}
 
 BadWordImpl::~BadWordImpl()
 {

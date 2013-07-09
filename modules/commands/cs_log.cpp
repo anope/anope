@@ -277,8 +277,8 @@ class CSLog : public Module
 {
 	ServiceReference<MemoServService> MSService;
 	CommandCSLog commandcslog;
-	ExtensibleItem<LogSettingsImpl> logsettings;
 	Serialize::Type logsetting_type;
+	ExtensibleItem<LogSettingsImpl> logsettings;
 
 	struct LogDefault
 	{
@@ -289,8 +289,9 @@ class CSLog : public Module
 
  public:
 	CSLog(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		MSService("MemoServService", "MemoServ"), commandcslog(this), logsettings(this, "logsettings"),
-		logsetting_type("LogSetting", LogSettingImpl::Unserialize)
+		MSService("MemoServService", "MemoServ"), commandcslog(this),
+		logsetting_type("LogSetting", LogSettingImpl::Unserialize),
+		logsettings(this, "logsettings")
 	{
 
 	}

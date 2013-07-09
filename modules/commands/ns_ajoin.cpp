@@ -27,6 +27,17 @@ struct AJoinEntry : Serializable
 
 	AJoinEntry(Extensible *) : Serializable("AJoinEntry") { }
 
+	~AJoinEntry()
+	{
+		AJoinList *channels = owner->GetExt<AJoinList>("ajoinlist");
+		if (channels)
+		{
+			std::vector<AJoinEntry *>::iterator it = std::find((*channels)->begin(), (*channels)->end(), this);
+			if (it != (*channels)->end())
+				(*channels)->erase(it);
+		}
+	}
+
 	void Serialize(Serialize::Data &sd) const anope_override
 	{
 		if (!this->owner)
@@ -147,7 +158,6 @@ class CommandNSAJoin : public Command
 		else
 		{
 			delete (*channels)->at(i);
-			(*channels)->erase((*channels)->begin() + i);
 			source.Reply(_("%s was removed from %s's auto join list."), chan.c_str(), nc->display.c_str());
 		}
 
@@ -214,13 +224,14 @@ class CommandNSAJoin : public Command
 
 class NSAJoin : public Module
 {
-	Serialize::Type ajoinentry_type;
 	CommandNSAJoin commandnsajoin;
+	Serialize::Type ajoinentry_type;
 	ExtensibleItem<AJoinList> ajoinlist;
 
  public:
 	NSAJoin(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		ajoinentry_type("AJoinEntry", AJoinEntry::Unserialize), commandnsajoin(this), ajoinlist(this, "ajoinlist")
+		commandnsajoin(this),
+		ajoinentry_type("AJoinEntry", AJoinEntry::Unserialize), ajoinlist(this, "ajoinlist")
 	{
 
 		if (!IRCD->CanSVSJoin)

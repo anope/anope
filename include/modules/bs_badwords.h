@@ -32,6 +32,7 @@ struct BadWord
 	Anope::string word;
 	BadWordType type;
 
+	virtual ~BadWord() { }
  protected:
 	BadWord() { }
 };

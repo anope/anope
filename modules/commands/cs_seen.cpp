@@ -36,6 +36,13 @@ struct SeenInfo : Serializable
 	{
 	}
 
+	~SeenInfo()
+	{
+		database_map::iterator iter = database.find(nick);
+		if (iter != database.end() && iter->second == this)
+			database.erase(iter);
+	}
+
 	void Serialize(Serialize::Data &data) const anope_override
 	{
 		data["nick"] << nick;
@@ -148,7 +155,6 @@ class CommandOSSeen : public Command
 				{
 					Log(LOG_DEBUG) << buf->first << " was last seen " << Anope::strftime(buf->second->last) << ", deleting entry";
 					delete buf->second;
-					database.erase(buf);
 					counter++;
 				}
 			}
@@ -312,7 +318,6 @@ class CSSeen : public Module
 			{
 				Log(LOG_DEBUG) << cur->first << " was last seen " << Anope::strftime(cur->second->last) << ", purging entries";
 				delete cur->second;
-				database.erase(cur);
 			}
 		}
 		Log(LOG_DEBUG) << "cs_seen: Purged database, checked " << previous_size << " nicks and removed " << (previous_size - database.size()) << " old entries.";

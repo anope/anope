@@ -78,7 +78,8 @@ class BaseExtensibleItem : public ExtensibleBase
 	T* Set(Extensible *obj, const T &value)
 	{
 		T* t = Set(obj);
-		*t = value;
+		if (t)
+			*t = value;
 		return t;
 	}
 

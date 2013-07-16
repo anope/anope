@@ -18,6 +18,7 @@
 #include "regexpr.h"
 #include "config.h"
 #include "commands.h"
+#include "servers.h"
 
 /* List of XLine managers we check users against in XLineManager::CheckAll */
 std::list<XLineManager *> XLineManager::XLineManagers;
@@ -44,7 +45,7 @@ void XLine::InitRegex()
 	}
 }
 
-XLine::XLine(const Anope::string &ma, const Anope::string &r, const Anope::string &uid) : Serializable("XLine"), mask(ma), created(0), expires(0), reason(r), id(uid)
+XLine::XLine(const Anope::string &ma, const Anope::string &r, const Anope::string &uid) : Serializable("XLine"), mask(ma), by(Me->GetName()), created(0), expires(0), reason(r), id(uid)
 {
 	regex = NULL;
 	manager = NULL;

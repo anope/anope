@@ -484,7 +484,7 @@ char ModeManager::GetStatusChar(char value)
 		return 0;
 	
 	ChannelMode *cm = ModeManager::ChannelModes[want];
-	if (cm == NULL || cm->type != MODE_STATUS)
+	if (cm == NULL || cm->type != MODE_STATUS || cm->mchar == value)
 		return 0;
 	
 	return cm->mchar;

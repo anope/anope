@@ -71,7 +71,7 @@ struct SeenInfo : Serializable
 			s = info;
 		}
 
-		data["nick"] >> s->nick;
+		s->nick = snick;
 		data["vhost"] >> s->vhost;
 		unsigned int n;
 		data["type"] >> n;

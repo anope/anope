@@ -48,6 +48,7 @@ namespace Redis
 		Module *owner;
 
 		Interface(Module *m) : owner(m) { }
+		virtual ~Interface() { }
 
 		virtual void OnResult(const Reply &r) = 0;
 		virtual void OnError(const Anope::string &error) { Log(owner) << error; }

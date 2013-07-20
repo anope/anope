@@ -39,6 +39,8 @@ struct BadWord
 
 struct BadWords
 {
+	virtual ~BadWords() { }
+
 	/** Add a badword to the badword list
 	 * @param word The badword
 	 * @param type The type (SINGLE START END)

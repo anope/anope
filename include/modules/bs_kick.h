@@ -41,5 +41,6 @@ struct KickerData
 	KickerData() { }
 
  public:
+	virtual ~KickerData() { }
 	virtual void Check(ChannelInfo *ci) = 0;
 };

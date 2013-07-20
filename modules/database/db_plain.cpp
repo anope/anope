@@ -216,11 +216,10 @@ EventReturn OnDatabaseReadMetadata(ChannelInfo *ci, const Anope::string &key, co
 					throw DatabaseException("Akick for nonexistant core " + params[2] + " on " + ci->name);
 			}
 
-			AutoKick *ak;
 			if (Nick)
-				ak = ci->AddAkick(params[3], nc, params.size() > 6 ? params[6] : "", params[4].is_pos_number_only() ? convertTo<time_t>(params[4]) : 0, params[5].is_pos_number_only() ? convertTo<time_t>(params[5]) : 0);
+				ci->AddAkick(params[3], nc, params.size() > 6 ? params[6] : "", params[4].is_pos_number_only() ? convertTo<time_t>(params[4]) : 0, params[5].is_pos_number_only() ? convertTo<time_t>(params[5]) : 0);
 			else
-				ak = ci->AddAkick(params[3], params[2], params.size() > 6 ? params[6] : "", params[4].is_pos_number_only() ? convertTo<time_t>(params[4]) : 0, params[5].is_pos_number_only() ? convertTo<time_t>(params[5]) : 0);
+				ci->AddAkick(params[3], params[2], params.size() > 6 ? params[6] : "", params[4].is_pos_number_only() ? convertTo<time_t>(params[4]) : 0, params[5].is_pos_number_only() ? convertTo<time_t>(params[5]) : 0);
 
 		}
 		else if (key.equals_ci("LOG"))

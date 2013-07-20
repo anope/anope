@@ -14,6 +14,7 @@ struct NSCertList
  protected:
 	NSCertList() { }
  public:
+	virtual ~NSCertList() { }
 
 	/** Add an entry to the nick's certificate list
 	 *

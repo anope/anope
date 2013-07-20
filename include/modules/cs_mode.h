@@ -27,6 +27,8 @@ struct ModeLocks
 {
 	typedef std::vector<ModeLock *> ModeList;
 
+	virtual ~ModeLocks() { }
+
 	/** Check if a mode is mlocked
 	 * @param mode The mode
 	 * @param An optional param

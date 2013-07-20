@@ -447,45 +447,45 @@ static void LoadNicks()
 			READ(read_string(buffer, f));
 			nc->Extend<Anope::string>("greet", buffer);
 
-			uint32_t uint;
-			READ(read_uint32(&uint, f));
-			//nc->icq = uint;
+			uint32_t u32;
+			READ(read_uint32(&u32, f));
+			//nc->icq = u32;
 
 			READ(read_string(buffer, f));
 			//nc->url = buffer;
 
-			READ(read_uint32(&uint, f));
-			if (uint & OLD_NI_KILLPROTECT)
+			READ(read_uint32(&u32, f));
+			if (u32 & OLD_NI_KILLPROTECT)
 				nc->Extend<bool>("KILLPROTECT");
-			if (uint & OLD_NI_SECURE)
+			if (u32 & OLD_NI_SECURE)
 				nc->Extend<bool>("NS_SECURE");
-			if (uint & OLD_NI_MSG)
+			if (u32 & OLD_NI_MSG)
 				nc->Extend<bool>("MSG");
-			if (uint & OLD_NI_MEMO_HARDMAX)
+			if (u32 & OLD_NI_MEMO_HARDMAX)
 				nc->Extend<bool>("MEMO_HARDMAX");
-			if (uint & OLD_NI_MEMO_SIGNON)
+			if (u32 & OLD_NI_MEMO_SIGNON)
 				nc->Extend<bool>("MEMO_SIGNON");
-			if (uint & OLD_NI_MEMO_RECEIVE)
+			if (u32 & OLD_NI_MEMO_RECEIVE)
 				nc->Extend<bool>("MEMO_RECEIVE");
-			if (uint & OLD_NI_PRIVATE)
+			if (u32 & OLD_NI_PRIVATE)
 				nc->Extend<bool>("NS_PRIVATE");
-			if (uint & OLD_NI_HIDE_EMAIL)
+			if (u32 & OLD_NI_HIDE_EMAIL)
 				nc->Extend<bool>("HIDE_EMAIL");
-			if (uint & OLD_NI_HIDE_MASK)
+			if (u32 & OLD_NI_HIDE_MASK)
 				nc->Extend<bool>("HIDE_MASK");
-			if (uint & OLD_NI_HIDE_QUIT)
+			if (u32 & OLD_NI_HIDE_QUIT)
 				nc->Extend<bool>("HIDE_QUIT");
-			if (uint & OLD_NI_KILL_QUICK)
+			if (u32 & OLD_NI_KILL_QUICK)
 				nc->Extend<bool>("KILL_QUICK");
-			if (uint & OLD_NI_KILL_IMMED)
+			if (u32 & OLD_NI_KILL_IMMED)
 				nc->Extend<bool>("KILL_IMMED");
-			if (uint & OLD_NI_MEMO_MAIL)
+			if (u32 & OLD_NI_MEMO_MAIL)
 				nc->Extend<bool>("MEMO_MAIL");
-			if (uint & OLD_NI_HIDE_STATUS)
+			if (u32 & OLD_NI_HIDE_STATUS)
 				nc->Extend<bool>("HIDE_STATUS");
-			if (uint & OLD_NI_SUSPENDED)
+			if (u32 & OLD_NI_SUSPENDED)
 				nc->Extend<bool>("SUSPENDED");
-			if (!(uint & OLD_NI_AUTOOP))
+			if (!(u32 & OLD_NI_AUTOOP))
 				nc->Extend<bool>("AUTOOP");
 
 			uint16_t u16;
@@ -549,7 +549,7 @@ static void LoadNicks()
 			for (int16_t j = 0; j < i16; ++j)
 			{
 				Memo *m = new Memo;
-				READ(read_uint32(&uint, f));
+				READ(read_uint32(&u32, f));
 				uint16_t flags;
 				READ(read_uint16(&flags, f));
 				int32_t tmp32;

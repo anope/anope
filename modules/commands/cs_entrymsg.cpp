@@ -257,8 +257,9 @@ class CSEntryMessage : public Module
 
  public:
 	CSEntryMessage(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-	commandentrymsg(this), eml(this, "entrymsg"),
-	entrymsg_type("EntryMsg", EntryMsg::Unserialize)
+	commandentrymsg(this),
+	entrymsg_type("EntryMsg", EntryMsg::Unserialize),
+	eml(this, "entrymsg")
 	{
 	}
 

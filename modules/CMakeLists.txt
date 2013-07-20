@@ -14,6 +14,8 @@ function(build_modules SRC)
       else(IS_DIRECTORY "${MODULE_SRC}")
         string(REGEX MATCH "\\.cpp$" CPP ${MODULE_SRC})
         if(CPP)
+          set_source_files_properties(${MODULE_SRC} PROPERTIES LANGUAGE CXX COMPILE_FLAGS "${CXXFLAGS}")
+
           file(RELATIVE_PATH FNAME ${SRC} ${MODULE_SRC})
           # Convert the real source file extension to have a .so extension
           string(REGEX REPLACE "\\.cpp$" ".so" SO ${FNAME})

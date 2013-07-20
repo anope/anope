@@ -41,7 +41,7 @@ struct KickerDataImpl : KickerData
 
 	struct ExtensibleItem : ::ExtensibleItem<KickerDataImpl>
 	{
-		ExtensibleItem(Module *m, const Anope::string &name) : ::ExtensibleItem<KickerDataImpl>(m, name) { }
+		ExtensibleItem(Module *m, const Anope::string &ename) : ::ExtensibleItem<KickerDataImpl>(m, ename) { }
 
 		void ExtensibleSerialize(const Extensible *e, const Serializable *s, Serialize::Data &data) const anope_override
 		{

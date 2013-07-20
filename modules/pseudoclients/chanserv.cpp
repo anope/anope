@@ -231,7 +231,7 @@ class ChanServCore : public Module, public ChanServService
 				"lists and settings for any channel."));
 	}
 
-	EventReturn OnCheckModes(Channel *c) anope_override
+	void OnCheckModes(Channel *c) anope_override
 	{
 		const Anope::string &require = Config->GetModule(this)->Get<const Anope::string>("require", "r");
 		if (!require.empty())
@@ -241,8 +241,6 @@ class ChanServCore : public Module, public ChanServService
 			else
 				c->SetModes(NULL, false, "-%s", require.c_str());
 		}
-
-		return EVENT_CONTINUE;
 	}
 
 	void OnCreateChan(ChannelInfo *ci) anope_override
@@ -354,12 +352,12 @@ class ChanServCore : public Module, public ChanServService
 			ChannelInfo *ci = it->second;
 			if (persist->Get(ci))
 			{
-				bool created;
-				ci->c = Channel::FindOrCreate(ci->name, created, ci->time_registered);
+				bool c;
+				ci->c = Channel::FindOrCreate(ci->name, c, ci->time_registered);
 
 				if (ModeManager::FindChannelModeByName("PERM") != NULL)
 				{
-					if (created)
+					if (c)
 						IRCD->SendChannel(ci->c);
 					ci->c->SetMode(NULL, "PERM");
 				}

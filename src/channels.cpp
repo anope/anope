@@ -104,10 +104,7 @@ void Channel::CheckModes()
 		return;
 	}
 
-	EventReturn MOD_RESULT;
-	FOREACH_RESULT(OnCheckModes, MOD_RESULT, (this));
-	if (MOD_RESULT == EVENT_STOP)
-		return;
+	FOREACH_MOD(OnCheckModes, (this));
 }
 
 bool Channel::CheckDelete()

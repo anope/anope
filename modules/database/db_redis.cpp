@@ -137,11 +137,11 @@ class DatabaseRedis : public Module, public Pipe
 	/* Insert or update an object */
 	void InsertObject(Serializable *obj)
 	{
-		Serialize::Type *type = obj->GetSerializableType();
+		Serialize::Type *t = obj->GetSerializableType();
 
 		/* If there is no id yet for ths object, get one */
 		if (!obj->id)
-			redis->SendCommand(new IDInterface(this, obj), "INCR id:" + type->GetName());
+			redis->SendCommand(new IDInterface(this, obj), "INCR id:" + t->GetName());
 		else
 		{
 			Data data;
@@ -154,10 +154,10 @@ class DatabaseRedis : public Module, public Pipe
 
 			std::vector<Anope::string> args;
 			args.push_back("HGETALL");
-			args.push_back("hash:" + type->GetName() + ":" + stringify(obj->id));
+			args.push_back("hash:" + t->GetName() + ":" + stringify(obj->id));
 
 			/* Get object attrs to clear before updating */
-			redis->SendCommand(new Updater(this, type->GetName(), obj->id), args);
+			redis->SendCommand(new Updater(this, t->GetName(), obj->id), args);
 		}
 	}
 
@@ -215,17 +215,17 @@ class DatabaseRedis : public Module, public Pipe
 
 	void OnSerializableDestruct(Serializable *obj) anope_override
 	{
-		Serialize::Type *type = obj->GetSerializableType();
+		Serialize::Type *t = obj->GetSerializableType();
 
 		std::vector<Anope::string> args;
 		args.push_back("HGETALL");
-		args.push_back("hash:" + type->GetName() + ":" + stringify(obj->id));
+		args.push_back("hash:" + t->GetName() + ":" + stringify(obj->id));
 
 		/* Get all of the attributes for this object */
-		redis->SendCommand(new Deleter(this, type->GetName(), obj->id), args);
+		redis->SendCommand(new Deleter(this, t->GetName(), obj->id), args);
 
 		this->updated_items.erase(obj);
-		type->objects.erase(obj->id);
+		t->objects.erase(obj->id);
 		this->Notify();
 	}
 
@@ -530,12 +530,12 @@ void SubscriptionListener::OnResult(const Reply &r)
 		typedef std::map<Anope::string, std::stringstream *> items;
 		for (items::iterator it = data.data.begin(), it_end = data.data.end(); it != it_end; ++it)
 		{
-			const Anope::string &key = it->first;
+			const Anope::string &k = it->first;
 			std::stringstream *value = it->second;
 
 			std::vector<Anope::string> args;
 			args.push_back("SREM");
-			args.push_back("value:" + type + ":" + key + ":" + value->str());
+			args.push_back("value:" + type + ":" + k + ":" + value->str());
 			args.push_back(id);
 
 			/* Delete value -> object id */

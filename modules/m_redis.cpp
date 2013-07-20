@@ -23,7 +23,7 @@ class RedisSocket : public BinarySocket, public ConnectionSocket
 	std::deque<Interface *> interfaces;
 	std::map<Anope::string, Interface *> subinterfaces;
 
-	RedisSocket(MyRedisService *pro, bool ipv6) : Socket(-1, ipv6), provider(pro) { }
+	RedisSocket(MyRedisService *pro, bool v6) : Socket(-1, v6), provider(pro) { }
 
 	~RedisSocket();
 
@@ -395,7 +395,7 @@ size_t RedisSocket::ParseReply(Reply &r, const char *buffer, size_t l)
 				else
 					break;
 			}
-			else if (r.multi_bulk.size() == r.multi_bulk_size)
+			else if (r.multi_bulk_size >= 0 && r.multi_bulk.size() == static_cast<unsigned>(r.multi_bulk_size))
 			{
 				/* This multi bulk is already complete, so check the sub bulks */
 				for (unsigned i = 0; i < r.multi_bulk.size(); ++i)
@@ -553,14 +553,14 @@ class ModuleRedis : public Module
 		{
 			Configuration::Block *redis = block->GetBlock("redis", i);
 
-			const Anope::string &name = redis->Get<const Anope::string>("name"),
+			const Anope::string &n = redis->Get<const Anope::string>("name"),
 						&ip = redis->Get<const Anope::string>("ip");
 			int port = redis->Get<int>("port");
 			unsigned db = redis->Get<unsigned>("db");
 
-			delete services[name];
-			services[name] = new MyRedisService(this, name, ip, port, db);
-			new_services.push_back(name);
+			delete services[n];
+			services[n] = new MyRedisService(this, n, ip, port, db);
+			new_services.push_back(n);
 		}
 
 		for (std::map<Anope::string, MyRedisService *>::iterator it = services.begin(); it != services.end();)

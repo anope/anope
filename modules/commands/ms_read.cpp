@@ -79,10 +79,12 @@ class MemoListCallback : public NumberList
 		BotInfo *bi;
 		Anope::string cmd;
 		if (Command::FindCommandFromService("memoserv/del", bi, cmd))
+		{
 			if (ci)
 				source.Reply(_("To delete, type: \002%s%s %s %s %d\002"), Config->StrictPrivmsg.c_str(), bi->nick.c_str(), cmd.c_str(), ci->name.c_str(), index + 1);
 			else
 				source.Reply(_("To delete, type: \002%s%s %s %d\002"), Config->StrictPrivmsg.c_str(), bi->nick.c_str(), cmd.c_str(), index + 1);
+		}
 
 		source.Reply("%s", m->text.c_str());
 		m->unread = false;

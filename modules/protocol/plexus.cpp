@@ -181,7 +181,6 @@ struct IRCDMessageEncap : IRCDMessage
 		if (params[1].equals_cs("SU"))
 		{
 			User *u = User::Find(params[2]);
-			const NickAlias *user_na = NickAlias::Find(params[2]);
 			NickCore *nc = NickCore::Find(params[3]);
 			if (u && nc)
 			{

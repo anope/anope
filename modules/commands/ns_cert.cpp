@@ -97,7 +97,7 @@ struct NSCertListImpl : NSCertList
 
 	struct ExtensibleItem : ::ExtensibleItem<NSCertListImpl>
 	{
-		ExtensibleItem(Module *m, const Anope::string &name) : ::ExtensibleItem<NSCertListImpl>(m, name) { }
+		ExtensibleItem(Module *m, const Anope::string &ename) : ::ExtensibleItem<NSCertListImpl>(m, ename) { }
 
 		void ExtensibleSerialize(const Extensible *e, const Serializable *s, Serialize::Data &data) const anope_override
 		{

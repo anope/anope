@@ -1001,9 +1001,8 @@ class CoreExport Module : public Extensible
 	/** Called when a channels modes are being checked to see if they are allowed,
 	 * mostly to ensure mlock/+r are set.
 	 * @param c The channel
-	 * @return EVENT_STOP to stop checking modes
 	 */
-	virtual EventReturn OnCheckModes(Channel *c) { throw NotImplementedException(); }
+	virtual void OnCheckModes(Channel *c) { throw NotImplementedException(); }
 
 	/** Called when a channel is synced.
 	 * Channels are synced after a sjoin is finished processing

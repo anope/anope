@@ -279,7 +279,7 @@ EventReturn OnDatabaseReadMetadata(ChannelInfo *ci, const Anope::string &key, co
 					ci->Extend<bool>(params[i]);
 			else if (params[0].equals_ci("TTB"))
 			{
-				for (unsigned j = 1, end = params.size(); j < end &&& kd; j += 2)
+				for (unsigned j = 1, end = params.size(); j < end && kd; j += 2)
 				{
 					if (params[j].equals_ci("BOLDS"))
 						kd->ttb[0] = params[j + 1].is_pos_number_only() ? convertTo<int16_t>(params[j + 1]) : 0;

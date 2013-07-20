@@ -69,8 +69,8 @@ class CommandOSConfig : public Command
 
 				source.Reply(_("%s settings:"), block->GetName().c_str());
 
-				for (unsigned i = 0; i < replies.size(); ++i)
-					source.Reply(replies[i]);
+				for (unsigned j = 0; j < replies.size(); ++j)
+					source.Reply(replies[j]);
 			}
 
 			source.Reply(_("End of configuration."));

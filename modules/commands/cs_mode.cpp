@@ -864,14 +864,14 @@ class CSMode : public Module
 		}
 	}
 
-	EventReturn OnCheckModes(Channel *c) anope_override
+	void OnCheckModes(Channel *c) anope_override
 	{
 		if (!c->ci)
-			return EVENT_CONTINUE;
+			return;
 
-		ModeLocks *ml = modelocks.Get(c->ci);
-		if (ml)
-			for (ModeLocks::ModeList::const_iterator it = ml->GetMLock().begin(), it_end = ml->GetMLock().end(); it != it_end; ++it)
+		ModeLocks *locks = modelocks.Get(c->ci);
+		if (locks)
+			for (ModeLocks::ModeList::const_iterator it = locks->GetMLock().begin(), it_end = locks->GetMLock().end(); it != it_end; ++it)
 			{
 				const ModeLock *ml = *it;
 				ChannelMode *cm = ModeManager::FindChannelModeByName(ml->name);
@@ -924,6 +924,8 @@ class CSMode : public Module
 
 		if (ml->HasMLock(mode, param, false))
 			c->RemoveMode(c->ci->WhoSends(), mode, param);
+
+		return EVENT_CONTINUE;
 	}
 
 	EventReturn OnChannelModeUnset(Channel *c, MessageSource &setter, ChannelMode *mode, const Anope::string &param) anope_override
@@ -937,25 +939,27 @@ class CSMode : public Module
 
 		if (ml->HasMLock(mode, param, true))
 			c->SetMode(c->ci->WhoSends(), mode, param);
+
+		return EVENT_CONTINUE;
 	}
 
 	void OnCreateChan(ChannelInfo *ci) anope_override
 	{
 		ModeLocks *ml = modelocks.Require(ci);
-		Anope::string modes;
+		Anope::string mlock;
 		spacesepstream sep(Config->GetModule(this)->Get<const Anope::string>("mlock", "+nrt"));
-		if (sep.GetToken(modes))
+		if (sep.GetToken(mlock))
 		{
 			bool add = true;
-			for (unsigned i = 0; i < modes.length(); ++i)
+			for (unsigned i = 0; i < mlock.length(); ++i)
 			{
-				if (modes[i] == '+')
+				if (mlock[i] == '+')
 					add = true;
-				else if (modes[i] == '-')
+				else if (mlock[i] == '-')
 					add = false;
 				else
 				{
-					ChannelMode *cm = ModeManager::FindChannelModeByChar(modes[i]);
+					ChannelMode *cm = ModeManager::FindChannelModeByChar(mlock[i]);
 					Anope::string param;
 					if (cm && (cm->type == MODE_REGULAR || sep.GetToken(param)))
 						ml->SetMLock(cm, add, param);

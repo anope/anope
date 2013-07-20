@@ -528,8 +528,8 @@ class CSAKick : public Module
 				kick = autokick->nc == u->Account();
 			else if (IRCD->IsChannelValid(autokick->mask))
 			{
-				Channel *c = Channel::Find(autokick->mask);
-				kick = c != NULL && c->FindUser(u);
+				Channel *chan = Channel::Find(autokick->mask);
+				kick = chan != NULL && chan->FindUser(u);
 			}
 			else
 				kick = Entry("BAN", autokick->mask).Matches(u);

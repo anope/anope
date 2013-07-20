@@ -121,7 +121,10 @@ class CommandCSXOP : public Command
 		const ChanAccess *highest = access.Highest();
 		bool override = false;
 
-		if ((!access.founder && !access.HasPriv("ACCESS_CHANGE")) || ((!highest || *highest <= tmp_access) && !access.founder))
+		std::vector<Anope::string>::iterator cmd_it = std::find(order.begin(), order.end(), source.command.upper()),
+			access_it = highest ? std::find(order.begin(), order.end(), XOPChanAccess::DetermineLevel(highest)) : order.end();
+
+		if (!access.founder && (!access.HasPriv("ACCESS_CHANGE") || cmd_it <= access_it))
 		{
 			if (source.HasPriv("chanserv/access/modify"))
 				override = true;
@@ -260,7 +263,10 @@ class CommandCSXOP : public Command
 			}
 		}
 
-		if ((!mask.equals_ci(nc->display) && !access.HasPriv("ACCESS_CHANGE") && !access.founder) || ((!highest || tmp_access >= *highest) && !access.founder))
+		std::vector<Anope::string>::iterator cmd_it = std::find(order.begin(), order.end(), source.command.upper()),
+			access_it = highest ? std::find(order.begin(), order.end(), XOPChanAccess::DetermineLevel(highest)) : order.end();
+
+		if (!mask.equals_ci(nc->display) && !access.founder && (!access.HasPriv("ACCESS_CHANGE") || cmd_it <= access_it))
 		{
 			if (source.HasPriv("chanserv/access/modify"))
 				override = true;

@@ -195,7 +195,7 @@ class CSTopic : public Module
 
 	void OnChannelSync(Channel *c) anope_override
 	{
-		if (Me && Me->IsSynced() && c->ci)
+		if (c->ci)
 		{
 			/* Update channel topic */
 			if ((topiclock.HasExt(c->ci) || keeptopic.HasExt(c->ci)) && c->ci->last_topic != c->topic)
@@ -227,7 +227,7 @@ class CSTopic : public Module
 		}
 	}
 
-	void OnChanInfo(CommandSource &source, ChannelInfo *ci, InfoFormatter &info, bool show_all)
+	void OnChanInfo(CommandSource &source, ChannelInfo *ci, InfoFormatter &info, bool show_all) anope_override
 	{
 		if (keeptopic.HasExt(ci))
 			info.AddOption(_("Topic Retention"));

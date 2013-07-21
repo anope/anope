@@ -74,7 +74,7 @@ class IdentifyInterface : public LDAPInterface
 					}
 					catch (const LDAPException &ex)
 					{
-						Log(this->owner) << "m_ldap_authentication: Error binding after search: " << ex.GetReason();
+						Log(this->owner) << "Error binding after search: " << ex.GetReason();
 					}
 				}
 				break;
@@ -94,7 +94,7 @@ class IdentifyInterface : public LDAPInterface
 					}
 					catch (const LDAPException &ex)
 					{
-						Log(this->owner) << "m_ldap_authentication: Unable to search for " << sf << ": " << ex.GetReason();
+						Log(this->owner) << "Unable to search for " << sf << ": " << ex.GetReason();
 					}
 				}
 				else
@@ -168,19 +168,19 @@ class OnIdentifyInterface : public LDAPInterface
 				BotInfo *NickServ = Config->GetClient("NickServ");
 				if (NickServ)
 					u->SendMessage(NickServ, _("Your email has been updated to \002%s\002"), email.c_str());
-				Log(this->owner) << "m_ldap_authentication: Updated email address for " << u->nick << " (" << u->Account()->display << ") to " << email;
+				Log(this->owner) << "Updated email address for " << u->nick << " (" << u->Account()->display << ") to " << email;
 			}
 		}
 		catch (const LDAPException &ex)
 		{
-			Log(this->owner) << "m_ldap_authentication: " << ex.GetReason();
+			Log(this->owner) << ex.GetReason();
 		}
 	}
 
 	void OnError(const LDAPResult &r) anope_override
 	{
 		this->requests.erase(r.id);
-		Log(this->owner) << "m_ldap_authentication: " << r.error;
+		Log(this->owner) << r.error;
 	}
 };
 
@@ -191,12 +191,12 @@ class OnRegisterInterface : public LDAPInterface
 
 	void OnResult(const LDAPResult &r) anope_override
 	{
-		Log(this->owner) << "m_ldap_authentication: Successfully added newly created account to LDAP";
+		Log(this->owner) << "Successfully added newly created account to LDAP";
 	}
 
 	void OnError(const LDAPResult &r) anope_override
 	{
-		Log(this->owner) << "m_ldap_authentication: Error adding newly created account to LDAP: " << r.getError();
+		Log(this->owner) << "Error adding newly created account to LDAP: " << r.getError();
 	}
 };
 
@@ -238,7 +238,7 @@ class NSIdentifyLDAP : public Module
 
 		if (!email_attribute.empty())
 			/* Don't complain to users about how they need to update their email, we will do it for them */
-			config->GetBlock("nickserv")->Set("forceemail", "false");
+			config->GetModule("nickserv")->Set("forceemail", "false");
 	}
 
 	EventReturn OnPreCommand(CommandSource &source, Command *command, std::vector<Anope::string> &params) anope_override

@@ -75,7 +75,7 @@ class LDAPService : public LDAPProvider, public Thread, public Condition
 	query_queue queries;
 	result_queue results;
 
-	LDAPService(Module *o, const Anope::string &n, const Anope::string &s, int po, const Anope::string &b, const Anope::string &p) : LDAPProvider(o, "ldap/" + n), server(s), port(po), admin_binddn(b), admin_pass(p), last_connect(0)
+	LDAPService(Module *o, const Anope::string &n, const Anope::string &s, int po, const Anope::string &b, const Anope::string &p) : LDAPProvider(o, n), server(s), port(po), admin_binddn(b), admin_pass(p), last_connect(0)
 	{
 		int i = ldap_initialize(&this->con, this->server.c_str());
 		if (i != LDAP_SUCCESS)

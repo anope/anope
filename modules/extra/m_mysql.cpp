@@ -199,7 +199,7 @@ class ModuleSQL : public Module, public Pipe
 			++it;
 
 			for (i = 0; i < config->CountBlock("mysql"); ++i)
-				if (config->GetBlock("mysql", i)->Get<const Anope::string>("name", "main") == cname)
+				if (config->GetBlock("mysql", i)->Get<const Anope::string>("name", "mysql/main") == cname)
 					break;
 
 			if (i == config->CountBlock("mysql"))

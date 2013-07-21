@@ -188,15 +188,16 @@ class CoreExport User : public virtual Base, public Extensible, public CommandRe
 	void SendMessage(const BotInfo *source, const char *fmt, ...);
 	void SendMessage(const BotInfo *source, const Anope::string &msg) anope_override;
 
-	/** Identify the user to the Nick
+	/** Identify the user to a nick.
 	 * updates last_seen, logs the user in,
 	 * send messages, checks for mails, set vhost and more
-	 * @param the NickAlias
+	 * @param na the nick to identify to, should be the same as
+	 * the user's current nick
 	 */
 	void Identify(NickAlias *na);
 
-	/** Login the user to a NickCore
-	 * @param core The account the user is useing
+	/** Login the user to an account
+	 * @param core The account
 	 */
 	void Login(NickCore *core);
 

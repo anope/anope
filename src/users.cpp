@@ -302,6 +302,8 @@ void User::Identify(NickAlias *na)
 
 	this->Login(na->nc);
 
+	IRCD->SendLogin(this);
+
 	FOREACH_MOD(OnNickIdentify, (this));
 
 	if (this->IsServicesOper())
@@ -334,8 +336,6 @@ void User::Login(NickCore *core)
 	core->users.push_back(this);
 
 	this->UpdateHost();
-
-	IRCD->SendLogin(this);
 
 	if (this->server->IsSynced())
 		Log(this, "account") << "is now identified as " << this->nc->display;

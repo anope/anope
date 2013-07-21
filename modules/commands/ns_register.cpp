@@ -226,9 +226,7 @@ class CommandNSRegister : public Command
 
 			if (u)
 			{
-				u->Login(nc);
-				if (!nc->HasExt("UNCONFIRMED"))
-					IRCD->SendLogin(u);
+				u->Identify(na);
 				u->lastnickreg = Anope::CurTime;
 			}
 		}

@@ -38,6 +38,12 @@ class ReconnectTimer : public Timer
 
 void Uplink::Connect()
 {
+	if (Config->Uplinks.empty())
+	{
+		Log() << "Warning: There are no configured uplinks.";
+		return;
+	}
+
 	if (static_cast<unsigned>(++Anope::CurrentUplink) >= Config->Uplinks.size())
 		Anope::CurrentUplink = 0;
 

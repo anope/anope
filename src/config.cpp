@@ -106,6 +106,12 @@ static void ValidateNotEmpty(const Anope::string &block, const Anope::string &na
 		throw ConfigException("The value for <" + block + ":" + name + "> cannot be empty!");
 }
 
+static void ValidateNoSpaces(const Anope::string &block, const Anope::string &name, const Anope::string &value)
+{
+	if (value.find(' ') != Anope::string::npos)
+		throw ConfigException("The value for <" + block + ":" + name + "> may not contain spaces!");
+}
+
 template<typename T> static void ValidateNotZero(const Anope::string &block, const Anope::string &name, T value)
 {
 	if (!value)
@@ -158,14 +164,18 @@ Conf::Conf() : Block("")
 				throw ConfigException("<" + noreload[i].block + ":" + noreload[i].name + "> can not be modified once set");
 	}
 
-	Block *options = this->GetBlock("options"), *mail = this->GetBlock("mail");
+	Block *serverinfo = this->GetBlock("serverinfo"), *options = this->GetBlock("options"), *mail = this->GetBlock("mail");
+
+	ValidateNotEmpty("serverinfo", "name", serverinfo->Get<const Anope::string>("name"));
+	ValidateNotEmpty("serverinfo", "description", serverinfo->Get<const Anope::string>("description"));
+	ValidateNotEmpty("serverinfo", "pid", serverinfo->Get<const Anope::string>("pid"));
+	ValidateNotEmpty("serverinfo", "motd", serverinfo->Get<const Anope::string>("motd"));
 
 	ValidateNotZero("options", "releasetimeout", options->Get<time_t>("releasetimeout"));
 	ValidateNotZero("options", "updatetimeout", options->Get<time_t>("updatetimeout"));
 	ValidateNotZero("options", "expiretimeout", options->Get<time_t>("expiretimeout"));
 	ValidateNotZero("options", "readtimeout", options->Get<time_t>("readtimeout"));
 	ValidateNotZero("options", "warningtimeout", options->Get<time_t>("warningtimeout"));
-	ValidateNotZero("options", "timeoutcheck", options->Get<time_t>("timeoutcheck"));
 
 	ValidateNotEmpty("options", "enforceruser", options->Get<const Anope::string>("enforceruser"));
 	ValidateNotEmpty("options", "enforcerhost", options->Get<const Anope::string>("enforcerhost"));
@@ -313,6 +323,7 @@ Conf::Conf() : Block("")
 		ValidateNotEmpty("service", "user", user);
 		ValidateNotEmpty("service", "host", host);
 		ValidateNotEmpty("service", "gecos", gecos);
+		ValidateNoSpaces("service", "channels", channels);
 
 		BotInfo *bi = BotInfo::Find(nick, true);
 		if (!bi)

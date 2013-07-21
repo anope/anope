@@ -145,26 +145,26 @@ Conf::Conf() : Block("")
 		{
 			Anope::string block;
 			Anope::string name;
-			Anope::string def;
 		} noreload[] = {
-			{"serverinfo", "name", ""},
-			{"serverinfo", "description", ""},
-			{"serverinfo", "localhost", ""},
-			{"serverinfo", "id", ""},
-			{"serverinfo", "pid", ""},
-			{"networkinfo", "nicklen", "31"},
-			{"networkinfo", "userlen", "10"},
-			{"networkinfo", "hostlen", "64"},
-			{"networkinfo", "chanlen", "32"},
-			{"options", "passlen", "32"},
+			{"serverinfo", "name"},
+			{"serverinfo", "description"},
+			{"serverinfo", "localhost"},
+			{"serverinfo", "id"},
+			{"serverinfo", "pid"},
+			{"networkinfo", "nicklen"},
+			{"networkinfo", "userlen"},
+			{"networkinfo", "hostlen"},
+			{"networkinfo", "chanlen"},
+			{"options", "passlen"},
 		};
 
 		for (unsigned i = 0; i < sizeof(noreload) / sizeof(noreload[0]); ++i)
-			if (this->GetBlock(noreload[i].block)->Get<const Anope::string>(noreload[i].name, noreload[i].def) != Config->GetBlock(noreload[i].block)->Get<const Anope::string>(noreload[i].name, noreload[i].def))
+			if (this->GetBlock(noreload[i].block)->Get<const Anope::string>(noreload[i].name) != Config->GetBlock(noreload[i].block)->Get<const Anope::string>(noreload[i].name))
 				throw ConfigException("<" + noreload[i].block + ":" + noreload[i].name + "> can not be modified once set");
 	}
 
-	Block *serverinfo = this->GetBlock("serverinfo"), *options = this->GetBlock("options"), *mail = this->GetBlock("mail");
+	Block *serverinfo = this->GetBlock("serverinfo"), *options = this->GetBlock("options"),
+		*mail = this->GetBlock("mail"), *networkinfo = this->GetBlock("networkinfo");
 
 	ValidateNotEmpty("serverinfo", "name", serverinfo->Get<const Anope::string>("name"));
 	ValidateNotEmpty("serverinfo", "description", serverinfo->Get<const Anope::string>("description"));
@@ -176,10 +176,16 @@ Conf::Conf() : Block("")
 	ValidateNotZero("options", "expiretimeout", options->Get<time_t>("expiretimeout"));
 	ValidateNotZero("options", "readtimeout", options->Get<time_t>("readtimeout"));
 	ValidateNotZero("options", "warningtimeout", options->Get<time_t>("warningtimeout"));
+	ValidateNotZero("options", "passlen", options->Get<time_t>("passlen"));
 
 	ValidateNotEmpty("options", "enforceruser", options->Get<const Anope::string>("enforceruser"));
 	ValidateNotEmpty("options", "enforcerhost", options->Get<const Anope::string>("enforcerhost"));
 	ValidateNotEmpty("options", "guestnickprefix", options->Get<const Anope::string>("guestnickprefix"));
+
+	ValidateNotZero("networkinfo", "nicklen", networkinfo->Get<unsigned>("nicklen"));
+	ValidateNotZero("networkinfo", "userlen", networkinfo->Get<unsigned>("userlen"));
+	ValidateNotZero("networkinfo", "hostlen", networkinfo->Get<unsigned>("hostlen"));
+	ValidateNotZero("networkinfo", "chanlen", networkinfo->Get<unsigned>("chanlen"));
 
 	spacesepstream(options->Get<const Anope::string>("ulineservers")).GetTokens(this->Ulines);
 
@@ -212,6 +218,7 @@ Conf::Conf() : Block("")
 		const Anope::string &password = uplink->Get<const Anope::string>("password");
 
 		ValidateNotEmpty("uplink", "host", host);
+		ValidateNotZero("uplink", "port", port);
 		ValidateNotEmpty("uplink", "password", password);
 
 		this->Uplinks.push_back(Uplink(host, port, password, ipv6));

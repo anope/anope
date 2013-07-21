@@ -128,6 +128,12 @@ class CommandNSRegister : public Command
 			return;
 		}
 
+		if (nsregister.equals_ci("mail") && email.empty())
+		{
+			source.Reply(_("You must specify an email address."));
+			return;
+		}
+
 		time_t nickregdelay = Config->GetModule(this->owner)->Get<time_t>("nickregdelay");
 		time_t reg_delay = Config->GetModule("nickserv")->Get<time_t>("regdelay");
 		if (u && !u->HasMode("OPER") && nickregdelay && Anope::CurTime - u->timestamp < nickregdelay)

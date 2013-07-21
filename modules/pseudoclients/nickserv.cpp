@@ -324,7 +324,7 @@ class NickServCore : public Module, public NickServService
 		if (!modesonid.empty())
 			u->SetModes(NickServ, "%s", modesonid.c_str());
 
-		if (block->Get<bool>("forceemail") && u->Account()->email.empty())
+		if (block->Get<bool>("forceemail", "yes") && u->Account()->email.empty())
 		{
 			u->SendMessage(NickServ, _("You must now supply an e-mail for your nick.\n"
 							"This e-mail will allow you to retrieve your password in\n"

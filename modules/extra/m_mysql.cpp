@@ -188,20 +188,21 @@ class ModuleSQL : public Module, public Pipe
 
 	void OnReload(Configuration::Conf *conf) anope_override
 	{
-		Configuration::Block *config = Config->GetModule(this);
-		int i;
+		Configuration::Block *config = conf->GetModule(this);
 
 		for (std::map<Anope::string, MySQLService *>::iterator it = this->MySQLServices.begin(); it != this->MySQLServices.end();)
 		{
 			const Anope::string &cname = it->first;
 			MySQLService *s = it->second;
+			int i;
+
 			++it;
 
-			for (i = 0; i < Config->CountBlock("mysql"); ++i)
-				if (Config->GetBlock("mysql", i)->Get<const Anope::string>("name", "main") == cname)
+			for (i = 0; i < config->CountBlock("mysql"); ++i)
+				if (config->GetBlock("mysql", i)->Get<const Anope::string>("name", "main") == cname)
 					break;
 
-			if (i == Config->CountBlock("mysql"))
+			if (i == config->CountBlock("mysql"))
 			{
 				Log(LOG_NORMAL, "mysql") << "MySQL: Removing server connection " << cname;
 
@@ -210,7 +211,7 @@ class ModuleSQL : public Module, public Pipe
 			}
 		}
 
-		for (i = 0; i < config->CountBlock("mysql"); ++i)
+		for (int i = 0; i < config->CountBlock("mysql"); ++i)
 		{
 			Configuration::Block *block = config->GetBlock("mysql", i);
 			const Anope::string &connname = block->Get<const Anope::string>("name", "mysql/main");

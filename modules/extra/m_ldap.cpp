@@ -423,20 +423,21 @@ class ModuleLDAP : public Module, public Pipe
 
 	void OnReload(Configuration::Conf *config) anope_override
 	{
-		int i, num;
+		Configuration::Block *conf = config->GetModule(this);
 
 		for (std::map<Anope::string, LDAPService *>::iterator it = this->LDAPServices.begin(); it != this->LDAPServices.end();)
 		{
 			const Anope::string &cname = it->first;
 			LDAPService *s = it->second;
+			int i;
+
 			++it;
 
-			Configuration::Block *conf = Config->GetModule(this);
 			for (i = 0; i < conf->CountBlock("ldap"); ++i)
 				if (conf->GetBlock("ldap", i)->Get<const Anope::string>("name", "ldap/main") == cname)
 					break;
 
-			if (i == num)
+			if (i == conf->CountBlock("ldap"))
 			{
 				Log(LOG_NORMAL, "ldap") << "LDAP: Removing server connection " << cname;
 
@@ -446,8 +447,7 @@ class ModuleLDAP : public Module, public Pipe
 			}
 		}
 
-		Configuration::Block *conf = config->GetModule(this);
-		for (i = 0; i < conf->CountBlock("ldap"); ++i)
+		for (int i = 0; i < conf->CountBlock("ldap"); ++i)
 		{
 			Configuration::Block *ldap = conf->GetBlock("ldap", i);
 

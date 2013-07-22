@@ -299,7 +299,7 @@ class CommandMSSet : public Command
 class MSSet : public Module
 {
 	CommandMSSet commandmsset;
-	PrimitiveExtensibleItem<bool> memo_signon, memo_receive, memo_mail, memo_hardmax;
+	SerializableExtensibleItem<bool> memo_signon, memo_receive, memo_mail, memo_hardmax;
 
  public:
 	MSSet(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),

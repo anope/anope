@@ -572,7 +572,7 @@ class CommandCSAccess : public Command
 				"already present on the list, its access level is changed to\n"
 				"the level specified in the command.  The \037level\037 specified\n"
 				"may be a numerical level or the name of a privilege (eg AUTOOP).\n"
-				"When a user joins the channel the access they receive is from the"
+				"When a user joins the channel the access they receive is from the\n"
 				"highest level entry in the access list."));
 		if (!Config->GetModule("chanserv")->Get<bool>("disallow_channel_access"))
 			source.Reply(_("The given mask may also be a channel, which will use the\n"

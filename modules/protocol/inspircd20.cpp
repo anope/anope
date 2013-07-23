@@ -358,7 +358,7 @@ struct IRCDMessageCapab : Message::Capab
 				else if (modename.equals_cs("nonotice"))
 					cm = new ChannelMode("NONOTICE", modechar[0]);
 				else if (modename.equals_cs("op"))
-					cm = new ChannelModeStatus("OP", modechar.length() > 1 ? modechar[1] : modechar[0], modechar.length() > 1 ? modechar[0] : 2);
+					cm = new ChannelModeStatus("OP", modechar.length() > 1 ? modechar[1] : modechar[0], modechar.length() > 1 ? modechar[0] : 0, 2);
 				else if (modename.equals_cs("operonly"))
 					cm = new ChannelModeOper(modechar[0]);
 				else if (modename.equals_cs("permanent"))
@@ -383,7 +383,7 @@ struct IRCDMessageCapab : Message::Capab
 					cm = new ChannelModeStatus("VOICE", modechar.length() > 1 ? modechar[1] : modechar[0], modechar.length() > 1 ? modechar[0] : 0, 0);
 				/* Unknown status mode, (customprefix) - add it */
 				else if (modechar.length() == 2)
-					cm = new ChannelModeStatus(modename.upper(), modechar[1], modechar[0]);
+					cm = new ChannelModeStatus(modename.upper(), modechar[1], modechar[0], -1);
 				/* Unknown non status mode, add it to our list for later */
 				else
 					chmodes[modechar[0]] = modename.upper();

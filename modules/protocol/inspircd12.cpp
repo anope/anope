@@ -487,10 +487,10 @@ struct IRCDMessageCapab : Message::Capab
 								continue;
 							/* InspIRCd sends q and a here if they have no prefixes */
 							case 'q':
-								ModeManager::AddChannelMode(new ChannelModeStatus("OWNER", 'q', '@'));
+								ModeManager::AddChannelMode(new ChannelModeStatus("OWNER", 'q', '@', 4));
 								continue;
 							case 'a':
-								ModeManager::AddChannelMode(new ChannelModeStatus("PROTECT" , 'a', '@'));
+								ModeManager::AddChannelMode(new ChannelModeStatus("PROTECT" , 'a', '@', 3));
 								continue;
 							default:
 								ModeManager::AddChannelMode(new ChannelModeList("", modebuf[t]));

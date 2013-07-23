@@ -618,11 +618,11 @@ class ProtongIRCd : public Module
 		ModeManager::AddChannelMode(new ChannelModeList("INVITEOVERRIDE", 'I'));
 
 		/* Add channel user modes */
-		ModeManager::AddChannelMode(new ChannelModeStatus("VOICE", 'v', '+'));
-		ModeManager::AddChannelMode(new ChannelModeStatus("HALFOP", 'h', '%'));
-		ModeManager::AddChannelMode(new ChannelModeStatus("OP", 'o', '@'));
-		ModeManager::AddChannelMode(new ChannelModeStatus("PROTECT", 'a', '&'));
-		ModeManager::AddChannelMode(new ChannelModeStatus("OWNER", 'q','~'));
+		ModeManager::AddChannelMode(new ChannelModeStatus("VOICE", 'v', '+', 0));
+		ModeManager::AddChannelMode(new ChannelModeStatus("HALFOP", 'h', '%', 1));
+		ModeManager::AddChannelMode(new ChannelModeStatus("OP", 'o', '@', 2));
+		ModeManager::AddChannelMode(new ChannelModeStatus("PROTECT", 'a', '&', 3));
+		ModeManager::AddChannelMode(new ChannelModeStatus("OWNER", 'q', '~', 4));
 
 		/* Add channel modes */
 		ModeManager::AddChannelMode(new ChannelMode("INVITE", 'i'));

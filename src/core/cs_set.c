@@ -916,7 +916,7 @@ static int reload_config(int argc, char **argv) {
     Command *c;
 
     if (argc >= 1 && !stricmp(argv[0], EVENT_START))
-        if ((c = findCommand(OPERSERV, "SET SUCCESSOR")))
+        if ((c = findCommand(CHANSERV, "SET SUCCESSOR")))
             c->help_param1 = (char *) (long) CSMaxReg;
 
     return MOD_CONT;

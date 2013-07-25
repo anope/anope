@@ -309,7 +309,7 @@ static int reload_config(int argc, char **argv) {
     Command *c;
 
     if (argc >= 1 && !stricmp(argv[0], EVENT_START))
-        if ((c = findCommand(OPERSERV, "SET LIMIT")))
+        if ((c = findCommand(MEMOSERV, "SET LIMIT")))
             c->help_param1 = (char *) (long) MSMaxMemos;
 
     return MOD_CONT;

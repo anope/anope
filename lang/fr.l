@@ -3483,7 +3483,7 @@ NEWS_HELP_LOGON
 	
 	Édite ou affiche la liste de messages Logon News. Lorsqu'un 
 	utilisateur se connecte au réseau, ces messages leur seront 
-	envoyés. (Cependant, pas plus de %s messages ne seront envoyés 
+	envoyés. (Cependant, pas plus de %d messages ne seront envoyés 
 	pour éviter le flood des utilisateurs. Si il y a plusieurs 
 	messages de news, seuls les plus récents seront envoyés.) Le 
 	nombre de news envoyées peut être configuré dans le 
@@ -3498,7 +3498,7 @@ NEWS_HELP_OPER
 	
 	Édite ou affiche la liste des messages Oper News. Quand un 
 	utilisateur utilise la commande /OPER, ces messages lui seront 
-	envoyés. (Cependant, pas plus de %s messages ne seront envoyés 
+	envoyés. (Cependant, pas plus de %d messages ne seront envoyés 
 	afin de ne pas flooder l'utilisateur. Si il y a plusieurs 
 	messages news, seuls les plus récents seront envoyés.) Le nombre 
 	de news envoyées peut être configuré dans le services.conf.

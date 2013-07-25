@@ -3418,7 +3418,7 @@ NEWS_HELP_LOGON
 	
 	Giriþ haberleri ve mesajlarýný düzenlemek icin kullanýlýr. 
 	Kullanýcý sunucuya baðlantýðý anda bu belirtilen mesajlar giris yapan kullanýcýya 
-	iletilir.  (Bununla beraber, %s adetten fazla mesaj kullanýcýya
+	iletilir.  (Bununla beraber, %d adetten fazla mesaj kullanýcýya
 	gonderilmez.  Eðer cok fazla mesaj eklenmiþ bulunuyor ise
 	bunlardan en yenileri kullanýcýya ulaþtýrýlýr.)
 	NewsCount(Giriþ haberleri) Özellikleri services.conf'ta belirtilmiþtir ve bu dosyadan ayarlanabilir.
@@ -3432,7 +3432,7 @@ NEWS_HELP_OPER
 	
 	Giriþ haberleri ve mesajlarýný düzenlemek icin kullanýlýr(Yönetici giriþleri). 
 	Kullanýcý sunucu içerisinde yönetici konumuna gectiði anda bu belirtilen mesajlar giris yapan operatore 
-	iletilir.  (Bununla beraber, %s adetten fazla mesaj yöneticiye
+	iletilir.  (Bununla beraber, %d adetten fazla mesaj yöneticiye
 	gonderilmez.  Eðer cok fazla mesaj eklenmiþ bulunuyor ise
 	bunlardan en yenileri kullanýcýya ulaþtýrýlýr.)
 	NewsCount(Giriþ haberleri) Özellikleri services.conf'ta belirtilmiþtir ve bu dosyadan ayarlanabilir.

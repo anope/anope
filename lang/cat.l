@@ -3423,7 +3423,7 @@ NEWS_HELP_LOGON
 	
 	Edits or displays the list of logon news messages.  When a
 	user connects to the network, these messages will be sent
-	to them.  (However, no more than %s messages will be
+	to them.  (However, no more than %d messages will be
 	sent in order to avoid flooding the user.  If there are
 	more news messages, only the most recent will be sent.)
 	NewsCount can be configured in services.conf.
@@ -3437,7 +3437,7 @@ NEWS_HELP_OPER
 	
 	Edits or displays the list of oper news messages.  When a
 	user opers up (with the /OPER command), these messages will
-	be sent to them.  (However, no more than %s messages will
+	be sent to them.  (However, no more than %d messages will
 	be sent in order to avoid flooding the user.  If there are
 	more news messages, only the most recent will be sent.)
 	NewsCount can be configured in services.conf.

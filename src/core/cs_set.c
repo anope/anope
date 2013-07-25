@@ -37,6 +37,7 @@ static int do_set_opnotice(User * u, ChannelInfo * ci, char *param);
 static int do_set_xop(User * u, ChannelInfo * ci, char *param);
 static int do_set_peace(User * u, ChannelInfo * ci, char *param);
 static int do_set_noexpire(User * u, ChannelInfo * ci, char *param);
+static int reload_config(int argc, char **argv);
 static void myChanServHelp(User * u);
 
 /**
@@ -48,6 +49,7 @@ static void myChanServHelp(User * u);
 int AnopeInit(int argc, char **argv)
 {
     Command *c;
+    EvtHook *hook;
 
     moduleAddAuthor("Anope");
     moduleAddVersion(VERSION_STRING);
@@ -61,8 +63,7 @@ int AnopeInit(int argc, char **argv)
     moduleAddCommand(CHANSERV, c, MOD_UNIQUE);
     c = createCommand("SET SUCCESSOR", NULL, NULL, CHAN_HELP_SET_SUCCESSOR,
                       -1, -1, -1, -1);
-    c->help_param1 = scalloc(8, sizeof(char *));
-    sprintf(c->help_param1, "%d\n", CSMaxReg);
+    c->help_param1 = (char *) (long) CSMaxReg;
     moduleAddCommand(CHANSERV, c, MOD_UNIQUE);
     c = createCommand("SET PASSWORD", NULL, NULL, CHAN_HELP_SET_PASSWORD,
                       -1, -1, -1, -1);
@@ -99,7 +100,7 @@ int AnopeInit(int argc, char **argv)
     moduleAddCommand(CHANSERV, c, MOD_UNIQUE);
     c = createCommand("SET SECURE", NULL, NULL, CHAN_HELP_SET_SECURE, -1,
                       -1, -1, -1);
-    c->help_param1 = sstrdup(s_NickServ);
+    c->help_param1 = s_NickServ;
     moduleAddCommand(CHANSERV, c, MOD_UNIQUE);
     c = createCommand("SET SECUREOPS", NULL, NULL, CHAN_HELP_SET_SECUREOPS,
                       -1, -1, -1, -1);
@@ -125,6 +126,12 @@ int AnopeInit(int argc, char **argv)
     moduleAddCommand(CHANSERV, c, MOD_UNIQUE);
 
     moduleSetChanHelp(myChanServHelp);
+
+    hook = createEventHook(EVENT_RELOAD, reload_config);
+    if (moduleAddEventHook(hook) != MOD_ERR_OK) {
+        alog("[\002cs_set\002] Can't hook to EVENT_RELOAD event");
+        return MOD_STOP;
+    }
 
     return MOD_CONT;
 }
@@ -897,5 +904,20 @@ static int do_set_noexpire(User * u, ChannelInfo * ci, char *param)
         syntax_error(s_ChanServ, u, "SET NOEXPIRE",
                      CHAN_SET_NOEXPIRE_SYNTAX);
     }
+    return MOD_CONT;
+}
+
+/*************************************************************************/
+
+/**
+ * Upon /os reload refresh the limit in help output
+ **/
+static int reload_config(int argc, char **argv) {
+    Command *c;
+
+    if (argc >= 1 && !stricmp(argv[0], EVENT_START))
+        if ((c = findCommand(OPERSERV, "SET SUCCESSOR")))
+            c->help_param1 = (char *) (long) MSMaxMemos;
+
     return MOD_CONT;
 }

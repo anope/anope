@@ -48,7 +48,7 @@ int AnopeInit(int argc, char **argv)
     moduleAddCommand(BOTSERV, c, MOD_UNIQUE);
     c = createCommand("SET SYMBIOSIS", NULL, NULL, BOT_HELP_SET_SYMBIOSIS,
                       -1, -1, -1, -1);
-    c->help_param1 = sstrdup(s_ChanServ);
+    c->help_param1 = s_ChanServ;
     moduleAddCommand(BOTSERV, c, MOD_UNIQUE);
     c = createCommand("SET NOBOT", NULL, NULL, -1, -1, -1,
                       BOT_SERVADMIN_HELP_SET_NOBOT,

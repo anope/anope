@@ -17,6 +17,7 @@
 static int do_set(User * u);
 static int do_set_notify(User * u, MemoInfo * mi, char *param);
 static int do_set_limit(User * u, MemoInfo * mi, char *param);
+static int reload_config(int argc, char **argv);
 static void myMemoServHelp(User * u);
 
 /**
@@ -28,6 +29,7 @@ static void myMemoServHelp(User * u);
 int AnopeInit(int argc, char **argv)
 {
     Command *c;
+    EvtHook *hook;
 
     moduleAddAuthor("Anope");
     moduleAddVersion(VERSION_STRING);
@@ -44,11 +46,16 @@ int AnopeInit(int argc, char **argv)
                       MEMO_SERVADMIN_HELP_SET_LIMIT,
                       MEMO_SERVADMIN_HELP_SET_LIMIT,
                       MEMO_SERVADMIN_HELP_SET_LIMIT);
-    c->help_param1 = scalloc(8, sizeof(char *));
-    sprintf(c->help_param1, "%d\n", MSMaxMemos);
+    c->help_param1 = (char *) (long) MSMaxMemos;
     moduleAddCommand(MEMOSERV, c, MOD_UNIQUE);
 
     moduleSetMemoHelp(myMemoServHelp);
+
+    hook = createEventHook(EVENT_RELOAD, reload_config);
+    if (moduleAddEventHook(hook) != MOD_ERR_OK) {
+        alog("[\002ms_set\002] Can't hook to EVENT_RELOAD event");
+        return MOD_STOP;
+    }
 
     return MOD_CONT;
 }
@@ -292,5 +299,18 @@ static int do_set_limit(User * u, MemoInfo * mi, char *param)
                         chan ? chan : user);
         }
     }
+    return MOD_CONT;
+}
+
+/**
+ * Upon /os reload refresh the limit in help output
+ **/
+static int reload_config(int argc, char **argv) {
+    Command *c;
+
+    if (argc >= 1 && !stricmp(argv[0], EVENT_START))
+        if ((c = findCommand(OPERSERV, "SET LIMIT")))
+            c->help_param1 = (char *) (long) MSMaxMemos;
+
     return MOD_CONT;
 }

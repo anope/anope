@@ -1043,18 +1043,6 @@ int destroyCommand(Command * c)
     c->helpmsg_oper = -1;
     c->helpmsg_admin = -1;
     c->helpmsg_root = -1;
-    if (c->help_param1) {
-        free(c->help_param1);
-    }
-    if (c->help_param2) {
-        free(c->help_param2);
-    }
-    if (c->help_param3) {
-        free(c->help_param3);
-    }
-    if (c->help_param4) {
-        free(c->help_param4);
-    }
     if (c->mod_name) {
         free(c->mod_name);
     }
@@ -2638,7 +2626,7 @@ int moduleGetConfigDirective(Directive * d)
             retval = parse_directive(d, directive, ac, av, linenum, 0, s);
         }
         Anope_Free(directive);
-		Anope_Free(dir);
+        Anope_Free(dir);
         Anope_Free(str);
     }
     fclose(config);

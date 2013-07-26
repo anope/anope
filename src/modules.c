@@ -2563,6 +2563,14 @@ int moduleGetConfigDirective(Directive * d)
     char *s = NULL;
     char *t = NULL;
     int retval = 1;
+    int i;
+
+    /* Dumb modules pass uninitialized string pointers here. Dumb people will not add the proper configuration values to services.conf.
+     * Combine the two and you end up with parse_directive never setting the char* pointers passed here. So, null them out now.
+     */
+    for (i = 0; i < MAXPARAMS && d->params[i].type != PARAM_NONE; i++)
+        if (d->params[i].type == PARAM_STRING)
+            *(char **) d->params[i].ptr = NULL;
 
     config = fopen(SERVICES_CONF, "r");
     if (!config) {

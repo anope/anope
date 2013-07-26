@@ -774,7 +774,11 @@ int parse_directive(Directive * d, char *dir, int ac, char *av[MAXPARAMS],
             *(int *) d->params[i].ptr = val;
             break;
         case PARAM_STRING:
-            Anope_Free(*(char **)d->params[i].ptr);
+            /*
+	     * Anope_Free(*(char **)d->params[i].ptr);
+	     * Historically dumb modules pass uninitialized values here so
+	     * we can't free this
+	     */
             *(char **) d->params[i].ptr = sstrdup(av[optind++]);
             if (!d->params[i].ptr) {
                 error(linenum, "%s: Out of memory", d->name);

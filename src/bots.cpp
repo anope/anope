@@ -106,13 +106,25 @@ Serializable* BotInfo::Unserialize(Serializable *obj, Serialize::Data &data)
 	return bi;
 }
 
-void BotInfo::GenerateUID()
+void BotInfo::Up()
 {
 	if (!this->uid.empty())
 		throw CoreException("Bot already has a uid?");
+
 	this->uid = Servers::TS6_UID_Retrieve();
 	(*BotListByUID)[this->uid] = this;
 	UserListByUID[this->uid] = this;
+	this->server = Me;
+	++this->server->users;
+}
+
+void BotInfo::Down()
+{
+	BotListByUID->erase(this->uid);
+	UserListByUID.erase(this->uid);
+	--this->server->users;
+	this->server = NULL;
+	this->uid = "";
 }
 
 void BotInfo::SetNewNick(const Anope::string &newnick)

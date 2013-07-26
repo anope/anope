@@ -58,7 +58,8 @@ class CoreExport BotInfo : public User, public Serializable
 	void Serialize(Serialize::Data &data) const;
 	static Serializable* Unserialize(Serializable *obj, Serialize::Data &);
 
-	void GenerateUID();
+	void Up();
+	void Down();
 
 	/** Change the nickname for the bot.
 	 * @param newnick The nick to change to

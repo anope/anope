@@ -686,7 +686,7 @@ class ModuleDNS : public Module
 
 	void OnNewServer(Server *s) anope_override
 	{
-		if (s == Me || s->IsJuped())
+		if (Me == NULL || s == Me || s->IsJuped())
 			return;
 		if (!Me->IsSynced() || this->readd_connected_servers)
 		{

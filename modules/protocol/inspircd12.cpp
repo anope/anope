@@ -1323,15 +1323,7 @@ class ProtoInspIRCd : public Module
 		message_idle(this), message_metadata(this), message_mode(this), message_nick(this), message_opertype(this), message_rsquit(this),
 		message_setident(this), message_server(this), message_time(this), message_uid(this), message_encap(this)
 	{
-
-
 		Servers::Capab.insert("NOQUIT");
-
-		if (Me->GetSID() == Me->GetName())
-			Me->SetSID(Servers::TS6_SID_Retrieve());
-
-		for (botinfo_map::iterator it = BotListByNick->begin(), it_end = BotListByNick->end(); it != it_end; ++it)
-			it->second->GenerateUID();
 	}
 
 	void OnReload(Configuration::Conf *conf) anope_override

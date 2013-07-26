@@ -428,15 +428,6 @@ void Anope::Init(int ac, char **av)
 	/* Write our PID to the PID file. */
 	write_pidfile();
 
-	/* Create me */
-	Configuration::Block *block = Config->GetBlock("serverinfo");
-	Me = new Server(NULL, block->Get<const Anope::string>("name"), 0, block->Get<const Anope::string>("description"), block->Get<const Anope::string>("id"));
-	for (botinfo_map::const_iterator it = BotListByNick->begin(), it_end = BotListByNick->end(); it != it_end; ++it)
-	{
-		it->second->server = Me;
-		++Me->users;
-	}
-
 	/* Announce ourselves to the logfile. */
 	Log() << "Anope " << Anope::Version() << " starting up" << (Anope::Debug || Anope::ReadOnly ? " (options:" : "") << (Anope::Debug ? " debug" : "") << (Anope::ReadOnly ? " readonly" : "") << (Anope::Debug || Anope::ReadOnly ? ")" : "");
 
@@ -446,7 +437,7 @@ void Anope::Init(int ac, char **av)
 	Language::InitLanguages();
 
 	/* Initialize random number generator */
-	block = Config->GetBlock("options");
+	Configuration::Block *block = Config->GetBlock("options");
 	srand(block->Get<unsigned>("seed"));
 
 	/* load modules */

@@ -49,7 +49,7 @@ class BotServCore : public Module
 
 	void OnBotAssign(User *sender, ChannelInfo *ci, BotInfo *bi) anope_override
 	{
-		if (Me->IsSynced() && ci->c && ci->c->users.size() >= Config->GetModule(this)->Get<unsigned>("minusers"))
+		if (ci->c && ci->c->users.size() >= Config->GetModule(this)->Get<unsigned>("minusers"))
 		{
 			ChannelStatus status(Config->GetModule(this)->Get<const Anope::string>("botmodes"));
 			bi->Join(ci->c, &status);

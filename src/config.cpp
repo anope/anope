@@ -149,7 +149,6 @@ Conf::Conf() : Block("")
 			{"serverinfo", "name"},
 			{"serverinfo", "description"},
 			{"serverinfo", "localhost"},
-			{"serverinfo", "id"},
 			{"serverinfo", "pid"},
 			{"networkinfo", "nicklen"},
 			{"networkinfo", "userlen"},

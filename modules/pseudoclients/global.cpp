@@ -79,7 +79,7 @@ class GlobalCore : public Module, public GlobalService
 	void OnNewServer(Server *s) anope_override
 	{
 		const Anope::string &gl = Config->GetModule(this)->Get<const Anope::string>("globaloncycleup");
-		if (!gl.empty() && !Me->IsSynced())
+		if (!gl.empty() && Me && !Me->IsSynced())
 			s->Notice(Global, gl);
 	}
 

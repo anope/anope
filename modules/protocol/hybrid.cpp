@@ -625,13 +625,6 @@ public:
 		message_certfp(this)
 	{
 		this->AddModes();
-
-
-		if (Me->GetSID() == Me->GetName())
-			Me->SetSID(Servers::TS6_SID_Retrieve());
-
-		for (botinfo_map::iterator it = BotListByNick->begin(), it_end = BotListByNick->end(); it != it_end; ++it)
-			it->second->GenerateUID();
 	}
 
 	void OnUserNickChange(User *u, const Anope::string &) anope_override

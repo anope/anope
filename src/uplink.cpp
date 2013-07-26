@@ -61,42 +61,55 @@ void Uplink::Connect()
 
 UplinkSocket::UplinkSocket() : Socket(-1, Config->Uplinks[Anope::CurrentUplink].ipv6), ConnectionSocket(), BufferedSocket()
 {
+	/* Create me */
+	Configuration::Block *block = Config->GetBlock("serverinfo");
+	Anope::string id = block->Get<const Anope::string>("id");
+	if (id.empty())
+		/* Defalt to a valid ts6 sid if this ircd is ts6 */
+		id = Servers::TS6_SID_Retrieve();
+	Me = new Server(NULL, block->Get<const Anope::string>("name"), 0, block->Get<const Anope::string>("description"), id);
+
+	for (botinfo_map::const_iterator it = BotListByNick->begin(), it_end = BotListByNick->end(); it != it_end; ++it)
+	{
+		BotInfo *bi = it->second;
+		bi->Up();
+	}
+
 	UplinkSock = this;
 }
 
 UplinkSocket::~UplinkSocket()
 {
-	if (IRCD && Servers::GetUplink() && Servers::GetUplink()->IsSynced())
+	for (user_map::const_iterator it = UserListByNick.begin(); it != UserListByNick.end(); ++it)
 	{
-		FOREACH_MOD(OnServerDisconnect, ());
+		User *u = it->second;
 
-		for (user_map::const_iterator it = UserListByNick.begin(); it != UserListByNick.end(); ++it)
+		if (u->server == Me)
 		{
-			User *u = it->second;
-
-			if (u->server == Me)
+			/* Don't use quitmsg here, it may contain information you don't want people to see */
+			IRCD->SendQuit(u, "Shutting down");
+			BotInfo* bi = BotInfo::Find(u->nick);
+			if (bi != NULL)
 			{
-				/* Don't use quitmsg here, it may contain information you don't want people to see */
-				IRCD->SendQuit(u, "Shutting down");
-				BotInfo* bi = BotInfo::Find(u->nick);
-				if (bi != NULL)
-					bi->introduced = false;
+				bi->introduced = false;
+				bi->Down();
 			}
+			else
+				/* Enforcer client or some other non-service bot */
+				u->Quit("Shutting down");
 		}
-
-		IRCD->SendSquit(Me, Anope::QuitReason);
-
-		this->ProcessWrite(); // Write out the last bit
 	}
 
-	if (Me)
-		for (unsigned i = Me->GetLinks().size(); i > 0; --i)
-			if (!Me->GetLinks()[i - 1]->IsJuped())
-				Me->GetLinks()[i - 1]->Delete(Me->GetName() + " " + Me->GetLinks()[i - 1]->GetName());
+	User::QuitUsers();
+
+	FOREACH_MOD(OnServerDisconnect, ());
+
+	IRCD->SendSquit(Me, Anope::QuitReason);
+	Me = NULL;
+
+	this->ProcessWrite(); // Write out the last bit
 
 	UplinkSock = NULL;
-
-	Me->Unsync();
 
 	if (Anope::AtTerm())
 	{

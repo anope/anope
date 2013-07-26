@@ -8,7 +8,7 @@ VERSION_MAJOR="1"
 VERSION_MINOR="8"
 VERSION_PATCH="9"
 VERSION_EXTRA="-git"
-VERSION_BUILD="3122"
+VERSION_BUILD="3123"
 
 # Changes since 1.8.8 Release
 #Revision 3120 - Fix many memory leaks and valgrind warnings, see pull request #15

@@ -1459,9 +1459,25 @@ int anope_event_topic(char *source, int ac, char **av)
 
 int anope_event_squit(char *source, int ac, char **av)
 {
+	Server *s;
+
 	if (ac != 2)
 		return MOD_CONT;
-	do_squit(source, ac, av);
+	
+	s = findserver(servlist, av[0]);
+	if (!s)
+		s = findserver_uid(servlist, av[0]);
+	if (s && (s->flags & SERVER_JUPED))
+	{
+		/* a squit for a juped server is not possible, this is an squit for a
+		 * server we have just juped and already internally quit. introduce the
+		 * new server now.
+		 */
+		inspircd_cmd_server(s->name, s->hops, s->desc, s->suid);
+	}
+	else
+		do_squit(source, ac, av);
+
 	return MOD_CONT;
 }
 
@@ -2419,15 +2435,23 @@ void inspircd_cmd_jupe(char *jserver, char *who, char *reason)
 {
 	char rbuf[256];
 	char *sid;
+	boolean found = false;
+	Server *s;
+
+	for (sid = ts6_sid_retrieve(); findserver_uid(servlist, sid); sid = ts6_sid_retrieve());
 
 	snprintf(rbuf, sizeof(rbuf), "Juped by %s%s%s", who,
 			 reason ? ": " : "", reason ? reason : "");
 
 	if (findserver(servlist, jserver))
-		inspircd_cmd_squit(jserver, rbuf);
-	for (sid = ts6_sid_retrieve(); findserver_uid(servlist, sid); sid = ts6_sid_retrieve());
-	inspircd_cmd_server(jserver, 1, rbuf, sid);
-	new_server(me_server, jserver, rbuf, SERVER_JUPED, sid);
+	{
+		send_cmd(TS6SID, "RSQUIT %s :%s", jserver, rbuf);
+		do_squit(who, 1, &jserver);
+		found = true;
+	}
+	s = new_server(me_server, jserver, rbuf, SERVER_JUPED, sid);
+	if (!found)
+		inspircd_cmd_server(s->name, s->hops, s->desc, s->suid);
 }
 
 /* GLOBOPS - to handle old WALLOPS */

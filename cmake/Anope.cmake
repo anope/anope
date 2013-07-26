@@ -208,7 +208,7 @@ macro(read_from_file FILE REGEX STRINGS)
     endif(REGEX STREQUAL "")
   else(CMAKE26_OR_BETTER)
     # For CMake 2.4.x, we need to do this manually, firstly we read the file in
-    execute_process(COMMAND ${CMAKE_COMMAND} -DFILE:STRING=${FILE} -P ${Anope_SOURCE_DIR}/ReadFile.cmake ERROR_VARIABLE ALL_STRINGS)
+    execute_process(COMMAND ${CMAKE_COMMAND} -DFILE:STRING=${FILE} -P ${Anope_SOURCE_DIR}/cmake/ReadFile.cmake ERROR_VARIABLE ALL_STRINGS)
     # Next we replace all newlines with semicolons
     string(REGEX REPLACE "\n" ";" ALL_STRINGS ${ALL_STRINGS})
     if(REGEX STREQUAL "")

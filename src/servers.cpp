@@ -178,7 +178,10 @@ const Anope::string &Server::GetDescription() const
 
 void Server::SetSID(const Anope::string &nsid)
 {
+	if (!this->sid.empty())
+		throw CoreException("Server already has an id?");
 	this->sid = nsid;
+	Servers::ByID[nsid] = this;
 }
 
 const Anope::string &Server::GetSID() const

@@ -375,11 +375,9 @@ void SQuit::Run(MessageSource &source, const std::vector<Anope::string> &params)
 
 	if (!s)
 	{
-		Log() << "SQUIT for nonexistent server " << params[0];
+		Log(LOG_DEBUG) << "SQUIT for nonexistent server " << params[0];
 		return;
 	}
-
-	FOREACH_MOD(OnServerQuit, (s));
 
 	s->Delete(s->GetName() + " " + s->GetUplink()->GetName());
 }

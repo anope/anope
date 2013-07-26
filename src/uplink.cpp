@@ -173,7 +173,12 @@ UplinkSocket::Message::~Message()
 	}
 	else if (this->user != NULL)
 	{
-		if (this->user->server != Me && !this->user->server->IsJuped())
+		if (this->user->server == NULL)
+		{
+			Log(LOG_DEBUG) << "Attempted to send \"" << this->buffer.str() << "\" from " << this->user->nick << " who has no server (I'm not introduced?)";
+			return;
+		}
+		else if (this->user->server != Me && !this->user->server->IsJuped())
 		{
 			Log(LOG_DEBUG) << "Attempted to send \"" << this->buffer.str() << "\" from " << this->user->nick << " who is not from me?";
 			return;

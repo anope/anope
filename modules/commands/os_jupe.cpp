@@ -36,7 +36,10 @@ class CommandOSJupe : public Command
 			/* Generate the new sid before quitting the old server, so they can't collide */
 			Anope::string sid = Servers::TS6_SID_Retrieve();
 			if (server)
+			{
 				IRCD->SendSquit(server, rbuf);
+				server->Delete(rbuf);
+			}
 			Server *juped_server = new Server(Me, jserver, 1, rbuf, sid, true);
 			IRCD->SendServer(juped_server);
 

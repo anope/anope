@@ -53,6 +53,7 @@ class InspIRCd20Proto : public IRCDProto
 	void SendModeInternal(const BotInfo *source, const Channel *dest, const Anope::string &buf) anope_override { insp12->SendModeInternal(source, dest, buf); }
 	void SendClientIntroduction(const User *u) anope_override { insp12->SendClientIntroduction(u); }
 	void SendServer(const Server *server) anope_override { insp12->SendServer(server); }
+	void SendSquit(Server *s, const Anope::string &message) anope_override { insp12->SendSquit(s, message); }
 	void SendJoin(User *user, Channel *c, const ChannelStatus *status) anope_override { insp12->SendJoin(user, c, status); }
 	void SendSQLineDel(const XLine *x) anope_override { insp12->SendSQLineDel(x); }
 	void SendSQLine(User *u, const XLine *x) anope_override { insp12->SendSQLine(u, x); }
@@ -679,7 +680,6 @@ class ProtoInspIRCd : public Module
 	Message::Ping message_ping;
 	Message::Privmsg message_privmsg;
 	Message::Quit message_quit;
-	Message::SQuit message_squit;
 	Message::Stats message_stats;
 	Message::Topic message_topic;
 
@@ -687,7 +687,7 @@ class ProtoInspIRCd : public Module
 	ServiceAlias message_endburst, message_fhost, message_fjoin, message_fmode,
 				message_ftopic, message_idle, message_metadata, message_mode,
 				message_nick, message_opertype, message_rsquit, message_server,
-				message_time, message_uid;
+				message_squit, message_time, message_uid;
 
 	/* Our message handlers */
 	IRCDMessageCapab message_capab;
@@ -706,7 +706,7 @@ class ProtoInspIRCd : public Module
 		ircd_proto(this),
 		message_away(this), message_error(this), message_invite(this), message_join(this), message_kick(this),
 		message_kill(this), message_motd(this), message_notice(this), message_part(this), message_ping(this),
-		message_privmsg(this), message_quit(this), message_squit(this), message_stats(this), message_topic(this),
+		message_privmsg(this), message_quit(this), message_stats(this), message_topic(this),
 
 		message_endburst("IRCDMessage", "inspircd20/endburst", "inspircd12/endburst"),
 		message_fhost("IRCDMessage", "inspircd20/fhost", "inspircd12/fhost"),
@@ -720,6 +720,7 @@ class ProtoInspIRCd : public Module
 		message_opertype("IRCDMessage", "inspircd20/opertype", "inspircd12/opertype"),
 		message_rsquit("IRCDMessage", "inspircd20/rsquit", "inspircd12/rsquit"),
 		message_server("IRCDMessage", "inspircd20/server", "inspircd12/server"),
+		message_squit("IRCDMessage", "inspircd20/squit", "inspircd12/squit"),
 		message_time("IRCDMessage", "inspircd20/time", "inspircd12/time"),
 		message_uid("IRCDMessage", "inspircd20/uid", "inspircd12/uid"),
 

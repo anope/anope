@@ -61,55 +61,41 @@ void Uplink::Connect()
 
 UplinkSocket::UplinkSocket() : Socket(-1, Config->Uplinks[Anope::CurrentUplink].ipv6), ConnectionSocket(), BufferedSocket()
 {
-	/* Create me */
-	Configuration::Block *block = Config->GetBlock("serverinfo");
-	Anope::string id = block->Get<const Anope::string>("id");
-	if (id.empty())
-		/* Defalt to a valid ts6 sid if this ircd is ts6 */
-		id = Servers::TS6_SID_Retrieve();
-	Me = new Server(NULL, block->Get<const Anope::string>("name"), 0, block->Get<const Anope::string>("description"), id);
-
-	for (botinfo_map::const_iterator it = BotListByNick->begin(), it_end = BotListByNick->end(); it != it_end; ++it)
-	{
-		BotInfo *bi = it->second;
-		bi->Up();
-	}
-
 	UplinkSock = this;
 }
 
 UplinkSocket::~UplinkSocket()
 {
-	for (user_map::const_iterator it = UserListByNick.begin(); it != UserListByNick.end(); ++it)
+	if (IRCD && Servers::GetUplink() && Servers::GetUplink()->IsSynced())
 	{
-		User *u = it->second;
+		FOREACH_MOD(OnServerDisconnect, ());
 
-		if (u->server == Me)
+		for (user_map::const_iterator it = UserListByNick.begin(); it != UserListByNick.end(); ++it)
 		{
-			/* Don't use quitmsg here, it may contain information you don't want people to see */
-			IRCD->SendQuit(u, "Shutting down");
-			BotInfo* bi = BotInfo::Find(u->nick);
-			if (bi != NULL)
+			User *u = it->second;
+
+			if (u->server == Me)
 			{
-				bi->introduced = false;
-				bi->Down();
+				/* Don't use quitmsg here, it may contain information you don't want people to see */
+				IRCD->SendQuit(u, "Shutting down");
+				BotInfo* bi = BotInfo::Find(u->nick);
+				if (bi != NULL)
+					bi->introduced = false;
 			}
-			else
-				/* Enforcer client or some other non-service bot */
-				u->Quit("Shutting down");
 		}
+
+		IRCD->SendSquit(Me, Anope::QuitReason);
+
+		this->ProcessWrite(); // Write out the last bit
 	}
 
-	User::QuitUsers();
-
-	FOREACH_MOD(OnServerDisconnect, ());
-
-	IRCD->SendSquit(Me, Anope::QuitReason);
-	Me = NULL;
-
-	this->ProcessWrite(); // Write out the last bit
+	for (unsigned i = Me->GetLinks().size(); i > 0; --i)
+		if (!Me->GetLinks()[i - 1]->IsJuped())
+			Me->GetLinks()[i - 1]->Delete(Me->GetName() + " " + Me->GetLinks()[i - 1]->GetName());
 
 	UplinkSock = NULL;
+
+	Me->Unsync();
 
 	if (Anope::AtTerm())
 	{
@@ -186,12 +172,7 @@ UplinkSocket::Message::~Message()
 	}
 	else if (this->user != NULL)
 	{
-		if (this->user->server == NULL)
-		{
-			Log(LOG_DEBUG) << "Attempted to send \"" << this->buffer.str() << "\" from " << this->user->nick << " who has no server (I'm not introduced?)";
-			return;
-		}
-		else if (this->user->server != Me && !this->user->server->IsJuped())
+		if (this->user->server != Me && !this->user->server->IsJuped())
 		{
 			Log(LOG_DEBUG) << "Attempted to send \"" << this->buffer.str() << "\" from " << this->user->nick << " who is not from me?";
 			return;

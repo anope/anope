@@ -264,7 +264,6 @@ void IRCDProto::SendGlobops(const BotInfo *source, const char *fmt, ...)
 void IRCDProto::SendSquit(Server *s, const Anope::string &message)
 {
 	UplinkSocket::Message() << "SQUIT " << s->GetSID() << " :" << message;
-	s->Delete(message);
 }
 
 void IRCDProto::SendNickChange(const User *u, const Anope::string &newnick)

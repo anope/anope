@@ -220,7 +220,16 @@ class InspIRCd12Proto : public IRCDProto
 	/* SERVER services-dev.chatspike.net password 0 :Description here */
 	void SendServer(const Server *server) anope_override
 	{
-		UplinkSocket::Message() << "SERVER " << server->GetName() << " " << Config->Uplinks[Anope::CurrentUplink].password << " " << server->GetHops() << " " << server->GetSID() << " :" << server->GetDescription();
+		if (!server->IsJuped())
+			UplinkSocket::Message() << "SERVER " << server->GetName() << " " << Config->Uplinks[Anope::CurrentUplink].password << " " << server->GetHops() << " " << server->GetSID() << " :" << server->GetDescription();
+	}
+
+	void SendSquit(Server *s, const Anope::string &message) anope_override
+	{
+		if (s != Me)
+			UplinkSocket::Message() << "RSQUIT " << s->GetName() << " :" << message;
+		else
+			UplinkSocket::Message() << "SQUIT " << s->GetName() << " :" << message;
 	}
 
 	/* JOIN */
@@ -788,6 +797,96 @@ struct IRCDMessageChgName : IRCDMessage
 	}
 };
 
+struct IRCDMessageEncap : IRCDMessage
+{
+	IRCDMessageEncap(Module *creator) : IRCDMessage(creator, "ENCAP", 4) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
+
+	void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
+	{
+		if (Anope::Match(Me->GetSID(), params[0]) == false)
+			return;
+
+		if (sasl && params[1] == "SASL" && params.size() == 6)
+		{
+			class InspIRCDSASLIdentifyRequest : public IdentifyRequest
+			{
+				Anope::string uid;
+
+			 public:
+				InspIRCDSASLIdentifyRequest(Module *m, const Anope::string &id, const Anope::string &acc, const Anope::string &pass) : IdentifyRequest(m, acc, pass), uid(id) { }
+
+				void OnSuccess() anope_override
+				{
+					UplinkSocket::Message(Me) << "METADATA " << this->uid << " accountname :" << this->GetAccount();
+					UplinkSocket::Message(Me) << "ENCAP " << this->uid.substr(0, 3) << " SASL " << Me->GetSID() << " " << this->uid << " D S";
+
+					SASLUser su;
+					su.uid = this->uid;
+					su.acc = this->GetAccount();
+					su.created = Anope::CurTime;
+
+					for (std::list<SASLUser>::iterator it = saslusers.begin(); it != saslusers.end();)
+					{
+						SASLUser &u = *it;
+
+						if (u.created + 30 < Anope::CurTime || u.uid == this->uid)
+							it = saslusers.erase(it);
+						else
+							++it;
+					}
+
+					saslusers.push_back(su);
+				}
+
+				void OnFail() anope_override
+				{
+					UplinkSocket::Message(Me) << "ENCAP " << this->uid.substr(0, 3) << " SASL " << Me->GetSID() << " " << this->uid << " " << " D F";
+
+					Log(Config->GetClient("NickServ")) << "A user failed to identify for account " << this->GetAccount() << " using SASL";
+				}
+			};
+
+			/*
+			Received: :869 ENCAP * SASL 869AAAAAH * S PLAIN
+			Sent: :00B ENCAP 869 SASL 00B 869AAAAAH C +
+			Received: :869 ENCAP * SASL 869AAAAAH 00B C QWRhbQBBZGFtAG1vbw==
+			                                            base64(account\0account\0pass)
+			*/
+			if (params[4] == "S")
+			{
+				if (params[5] == "PLAIN")
+					UplinkSocket::Message(Me) << "ENCAP " << params[2].substr(0, 3) << " SASL " << Me->GetSID() << " " << params[2] << " C +";
+				else
+					UplinkSocket::Message(Me) << "ENCAP " << params[2].substr(0, 3) << " SASL " << Me->GetSID() << " " << params[2] << " D F";
+			}
+			else if (params[4] == "C")
+			{
+				Anope::string decoded;
+				Anope::B64Decode(params[5], decoded);
+
+				size_t p = decoded.find('\0');
+				if (p == Anope::string::npos)
+					return;
+				decoded = decoded.substr(p + 1);
+
+				p = decoded.find('\0');
+				if (p == Anope::string::npos)
+					return;
+
+				Anope::string acc = decoded.substr(0, p),
+					pass = decoded.substr(p + 1);
+
+				if (acc.empty() || pass.empty())
+					return;
+
+				IdentifyRequest *req = new InspIRCDSASLIdentifyRequest(this->owner, params[2], acc, pass);
+				FOREACH_MOD(OnCheckAuthentication, (NULL, req));
+				req->Dispatch();
+			}
+		}
+	}
+};
+
 struct IRCDMessageEndburst : IRCDMessage
 {
 	IRCDMessageEndburst(Module *creator) : IRCDMessage(creator, "ENDBURST", 0) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
@@ -1122,6 +1221,29 @@ struct IRCDMessageServer : IRCDMessage
 	}
 };
 
+struct IRCDMessageSQuit : Message::SQuit
+{
+	IRCDMessageSQuit(Module *creator) : Message::SQuit(creator) { }
+	
+	void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
+	{
+		Server *server = Server::Find(params[0]);
+		if (server && server->IsJuped())
+		{
+			/* It is not possible to recieve a SQUIT for a server we have juped
+			 * unless we have recently sent a RSQUIT. So, this SQUIT is a response
+			 * to the server we just SQUIT off and is not meant for our juped server.
+			 *
+			 * Send the juped server now.
+			 */
+
+			UplinkSocket::Message() << "SERVER " << server->GetName() << " jupe " << server->GetHops() << " " << server->GetSID() << " :" << server->GetDescription();
+		}
+		else
+			Message::SQuit::Run(source, params);
+	}
+};
+
 struct IRCDMessageTime : IRCDMessage
 {
 	IRCDMessageTime(Module *creator) : IRCDMessage(creator, "TIME", 2) { }
@@ -1178,96 +1300,6 @@ struct IRCDMessageUID : IRCDMessage
 	}
 };
 
-struct IRCDMessageEncap : IRCDMessage
-{
-	IRCDMessageEncap(Module *creator) : IRCDMessage(creator, "ENCAP", 4) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
-
-	void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
-	{
-		if (Anope::Match(Me->GetSID(), params[0]) == false)
-			return;
-
-		if (sasl && params[1] == "SASL" && params.size() == 6)
-		{
-			class InspIRCDSASLIdentifyRequest : public IdentifyRequest
-			{
-				Anope::string uid;
-
-			 public:
-				InspIRCDSASLIdentifyRequest(Module *m, const Anope::string &id, const Anope::string &acc, const Anope::string &pass) : IdentifyRequest(m, acc, pass), uid(id) { }
-
-				void OnSuccess() anope_override
-				{
-					UplinkSocket::Message(Me) << "METADATA " << this->uid << " accountname :" << this->GetAccount();
-					UplinkSocket::Message(Me) << "ENCAP " << this->uid.substr(0, 3) << " SASL " << Me->GetSID() << " " << this->uid << " D S";
-
-					SASLUser su;
-					su.uid = this->uid;
-					su.acc = this->GetAccount();
-					su.created = Anope::CurTime;
-
-					for (std::list<SASLUser>::iterator it = saslusers.begin(); it != saslusers.end();)
-					{
-						SASLUser &u = *it;
-
-						if (u.created + 30 < Anope::CurTime || u.uid == this->uid)
-							it = saslusers.erase(it);
-						else
-							++it;
-					}
-
-					saslusers.push_back(su);
-				}
-
-				void OnFail() anope_override
-				{
-					UplinkSocket::Message(Me) << "ENCAP " << this->uid.substr(0, 3) << " SASL " << Me->GetSID() << " " << this->uid << " " << " D F";
-
-					Log(Config->GetClient("NickServ")) << "A user failed to identify for account " << this->GetAccount() << " using SASL";
-				}
-			};
-
-			/*
-			Received: :869 ENCAP * SASL 869AAAAAH * S PLAIN
-			Sent: :00B ENCAP 869 SASL 00B 869AAAAAH C +
-			Received: :869 ENCAP * SASL 869AAAAAH 00B C QWRhbQBBZGFtAG1vbw==
-			                                            base64(account\0account\0pass)
-			*/
-			if (params[4] == "S")
-			{
-				if (params[5] == "PLAIN")
-					UplinkSocket::Message(Me) << "ENCAP " << params[2].substr(0, 3) << " SASL " << Me->GetSID() << " " << params[2] << " C +";
-				else
-					UplinkSocket::Message(Me) << "ENCAP " << params[2].substr(0, 3) << " SASL " << Me->GetSID() << " " << params[2] << " D F";
-			}
-			else if (params[4] == "C")
-			{
-				Anope::string decoded;
-				Anope::B64Decode(params[5], decoded);
-
-				size_t p = decoded.find('\0');
-				if (p == Anope::string::npos)
-					return;
-				decoded = decoded.substr(p + 1);
-
-				p = decoded.find('\0');
-				if (p == Anope::string::npos)
-					return;
-
-				Anope::string acc = decoded.substr(0, p),
-					pass = decoded.substr(p + 1);
-
-				if (acc.empty() || pass.empty())
-					return;
-
-				IdentifyRequest *req = new InspIRCDSASLIdentifyRequest(this->owner, params[2], acc, pass);
-				FOREACH_MOD(OnCheckAuthentication, (NULL, req));
-				req->Dispatch();
-			}
-		}
-	}
-};
-
 class ProtoInspIRCd : public Module
 {
 	InspIRCd12Proto ircd_proto;
@@ -1286,7 +1318,6 @@ class ProtoInspIRCd : public Module
 	Message::Ping message_ping;
 	Message::Privmsg message_privmsg;
 	Message::Quit message_quit;
-	Message::SQuit message_squit;
 	Message::Stats message_stats;
 	Message::Topic message_topic;
 
@@ -1294,6 +1325,7 @@ class ProtoInspIRCd : public Module
 	IRCDMessageChgIdent message_chgident;
 	IRCDMessageChgName message_setname, message_chgname;
 	IRCDMessageCapab message_capab;
+	IRCDMessageEncap message_encap;
 	IRCDMessageEndburst message_endburst;
 	IRCDMessageFHost message_fhost, message_sethost;
 	IRCDMessageFJoin message_fjoin;
@@ -1307,21 +1339,22 @@ class ProtoInspIRCd : public Module
 	IRCDMessageRSQuit message_rsquit;
 	IRCDMessageSetIdent message_setident;
 	IRCDMessageServer message_server;
+	IRCDMessageSQuit message_squit;
 	IRCDMessageTime message_time;
 	IRCDMessageUID message_uid;
-	IRCDMessageEncap message_encap;
 
  public:
 	ProtoInspIRCd(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PROTOCOL | VENDOR),
 		ircd_proto(this), ssl(this, "ssl"),
 		message_away(this), message_error(this), message_invite(this), message_join(this), message_kick(this), message_kill(this),
 		message_motd(this), message_notice(this), message_part(this), message_ping(this), message_privmsg(this), message_quit(this),
-		message_squit(this), message_stats(this), message_topic(this),
+		message_stats(this), message_topic(this),
 
-		message_chgident(this), message_setname(this, "SETNAME"), message_chgname(this, "FNAME"), message_capab(this), message_endburst(this),
+		message_chgident(this), message_setname(this, "SETNAME"), message_chgname(this, "FNAME"), message_capab(this), message_encap(this),
+		message_endburst(this),
 		message_fhost(this, "FHOST"), message_sethost(this, "SETHOST"), message_fjoin(this), message_fmode(this), message_ftopic(this),
 		message_idle(this), message_metadata(this), message_mode(this), message_nick(this), message_opertype(this), message_rsquit(this),
-		message_setident(this), message_server(this), message_time(this), message_uid(this), message_encap(this)
+		message_setident(this), message_server(this), message_squit(this), message_time(this), message_uid(this)
 	{
 		Servers::Capab.insert("NOQUIT");
 	}

@@ -428,6 +428,15 @@ void Anope::Init(int ac, char **av)
 	/* Write our PID to the PID file. */
 	write_pidfile();
 
+	/* Create me */
+	Configuration::Block *block = Config->GetBlock("serverinfo");
+	Me = new Server(NULL, block->Get<const Anope::string>("name"), 0, block->Get<const Anope::string>("description"), block->Get<const Anope::string>("id"));
+	for (botinfo_map::const_iterator it = BotListByNick->begin(), it_end = BotListByNick->end(); it != it_end; ++it)
+	{
+		it->second->server = Me;
+		++Me->users;
+	}
+
 	/* Announce ourselves to the logfile. */
 	Log() << "Anope " << Anope::Version() << " starting up" << (Anope::Debug || Anope::ReadOnly ? " (options:" : "") << (Anope::Debug ? " debug" : "") << (Anope::ReadOnly ? " readonly" : "") << (Anope::Debug || Anope::ReadOnly ? ")" : "");
 
@@ -437,7 +446,7 @@ void Anope::Init(int ac, char **av)
 	Language::InitLanguages();
 
 	/* Initialize random number generator */
-	Configuration::Block *block = Config->GetBlock("options");
+	block = Config->GetBlock("options");
 	srand(block->Get<unsigned>("seed"));
 
 	/* load modules */
@@ -450,6 +459,16 @@ void Anope::Init(int ac, char **av)
 		throw CoreException("You must load a protocol module!");
 
 	Log() << "Using IRCd protocol " << protocol->name;
+
+	/* Auto assign sid if applicable */
+	if (IRCD->RequiresID)
+	{
+		Anope::string sid = Servers::TS6_SID_Retrieve();
+		if (Me->GetSID() == Me->GetName())
+			Me->SetSID(sid);
+		for (botinfo_map::iterator it = BotListByNick->begin(), it_end = BotListByNick->end(); it != it_end; ++it)
+			it->second->GenerateUID();
+	}
 
 	/* Load up databases */
 	Log() << "Loading databases...";

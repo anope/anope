@@ -173,60 +173,6 @@ class CommandCSSetBanType : public Command
 	}
 };
 
-class CommandCSSetChanstats : public Command
-{
- public:
-	CommandCSSetChanstats(Module *creator) : Command(creator, "chanserv/set/chanstats", 2, 2)
-	{
-		this->SetDesc(_("Turn chanstat statistics on or off"));
-		this->SetSyntax(_("\037channel\037 {ON | OFF}"));
-	}
-
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
-	{
-		ChannelInfo *ci = ChannelInfo::Find(params[0]);
-		if (!ci)
-		{
-			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
-			return;
-		}
-
-		EventReturn MOD_RESULT;
-		FOREACH_RESULT(OnSetChannelOption, MOD_RESULT, (source, this, ci, params[1]));
-		if (MOD_RESULT == EVENT_STOP)
-			return;
-
-		if (MOD_RESULT != EVENT_ALLOW && !source.AccessFor(ci).HasPriv("SET") && source.permission.empty() && !source.HasPriv("chanserv/administration"))
-		{
-			source.Reply(ACCESS_DENIED);
-			return;
-		}
-
-		if (params[1].equals_ci("ON"))
-		{
-			ci->Extend<bool>("CS_STATS");
-			source.Reply(_("Chanstats statistics are now enabled for this channel."));
-			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to enable chanstats";
-		}
-		else if (params[1].equals_ci("OFF"))
-		{
-			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to disable chanstats";
-			ci->Shrink<bool>("CS_STATS");
-			source.Reply(_("Chanstats statistics are now disabled for this channel."));
-		}
-		else
-			this->OnSyntaxError(source, "");
-	}
-
-	bool OnHelp(CommandSource &source, const Anope::string &) anope_override
-	{
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply("Turn Chanstats channel statistics ON or OFF.");
-		return true;
-	}
-};
-
 class CommandCSSetDescription : public Command
 {
  public:
@@ -989,13 +935,12 @@ class CommandCSSetNoexpire : public Command
 
 class CSSet : public Module
 {
-	SerializableExtensibleItem<bool> persist, noautoop, stats, peace, securefounder,
+	SerializableExtensibleItem<bool> persist, noautoop, peace, securefounder,
 		restricted, secure, secureops, signkick, signkick_level, noexpire;
 
 	CommandCSSet commandcsset;
 	CommandCSSetAutoOp commandcssetautoop;
 	CommandCSSetBanType commandcssetbantype;
-	CommandCSSetChanstats commandcssetchanstats;
 	CommandCSSetDescription commandcssetdescription;
 	CommandCSSetFounder commandcssetfounder;
 	CommandCSSetPeace commandcssetpeace;
@@ -1010,12 +955,12 @@ class CSSet : public Module
 
  public:
 	CSSet(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		persist(this, "PERSIST"), noautoop(this, "NOAUTOOP"), stats(this, "CS_STATS"), peace(this, "PEACE"),
+		persist(this, "PERSIST"), noautoop(this, "NOAUTOOP"), peace(this, "PEACE"),
 		securefounder(this, "SECUREFOUNDER"), restricted(this, "RESTRICTED"),
 		secure(this, "CS_SECURE"), secureops(this, "SECUREOPS"), signkick(this, "SIGNKICK"),
 		signkick_level(this, "SIGNKICK_LEVEL"), noexpire(this, "CS_NO_EXPIRE"),
 
-		commandcsset(this), commandcssetautoop(this), commandcssetbantype(this), commandcssetchanstats(this),
+		commandcsset(this), commandcssetautoop(this), commandcssetbantype(this),
 		commandcssetdescription(this), commandcssetfounder(this),
 		commandcssetpeace(this), commandcssetpersist(this), commandcssetrestricted(this),
 		commandcssetsecure(this), commandcssetsecurefounder(this), commandcssetsecureops(this), commandcssetsignkick(this),
@@ -1130,8 +1075,6 @@ class CSSet : public Module
 			info.AddOption(_("Persistent"));
 		if (noexpire.HasExt(ci))
 			info.AddOption(_("No expire"));
-		if (stats.HasExt(ci))
-			info.AddOption(_("Chanstats"));
 
 		time_t chanserv_expire = Config->GetModule(this)->Get<time_t>("expire", "14d");
 		if (!noexpire.HasExt(ci) && chanserv_expire && !Anope::NoExpire)

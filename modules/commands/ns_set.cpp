@@ -286,81 +286,6 @@ class CommandNSSASetAutoOp : public CommandNSSetAutoOp
 	}
 };
 
-class CommandNSSetChanstats : public Command
-{
- public:
-	CommandNSSetChanstats(Module *creator, const Anope::string &sname = "nickserv/set/chanstats", size_t min = 1 ) : Command(creator, sname, min, min + 1)
-	{
-		this->SetDesc(_("Turn chanstat statistic on or off"));
-		this->SetSyntax(_("{ON | OFF}"));
-	}
-	void Run(CommandSource &source, const Anope::string &user, const Anope::string &param)
-	{
-		NickAlias *na = NickAlias::Find(user);
-		if (!na)
-		{
-			source.Reply(NICK_X_NOT_REGISTERED, user.c_str());
-			return;
-		}
-
-		EventReturn MOD_RESULT;
-		FOREACH_RESULT(OnSetNickOption, MOD_RESULT, (source, this, na->nc, param));
-		if (MOD_RESULT == EVENT_STOP)
-			return;
-
-		if (param.equals_ci("ON"))
-		{
-			Log(na->nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to enable chanstats for " << na->nc->display;
-			na->nc->Extend<bool>("NS_STATS");
-			source.Reply(_("Chanstat statistics are now enabled for your nick."));
-		}
-		else if (param.equals_ci("OFF"))
-		{
-			Log(na->nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to disable chanstats for " << na->nc->display;
-			na->nc->Shrink<bool>("NS_STATS");
-			source.Reply(_("Chanstat statistics are now disabled for your nick."));
-		}
-		else
-			this->OnSyntaxError(source, "CHANSTATS");
-	}
-
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
-	{
-		this->Run(source, source.nc->display, params[0]);
-	}
-	
-	bool OnHelp(CommandSource &source, const Anope::string &) anope_override
-	{
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("Turns Chanstats statistics ON or OFF."));
-		return true;
-	}
-};
-
-class CommandNSSASetChanstats : public CommandNSSetChanstats
-{
- public:
-	CommandNSSASetChanstats(Module *creator) : CommandNSSetChanstats(creator, "nickserv/saset/chanstats", 2)
-	{
-		this->ClearSyntax();
-		this->SetSyntax(_("\037nickname\037 {ON | OFF}"));
-	}
-
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
-	{
-		this->Run(source, params[0], params[1]);
-	}
-
-	bool OnHelp(CommandSource &source, const Anope::string &) anope_override
-	{
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("Turns chanstats channel statistics ON or OFF for this user."));
-		return true;
-	}
-};
-
 class CommandNSSetDisplay : public Command
 {
  public:
@@ -1048,9 +973,6 @@ class NSSet : public Module
 	CommandNSSetAutoOp commandnssetautoop;
 	CommandNSSASetAutoOp commandnssasetautoop;
 
-	CommandNSSetChanstats commandnssetchanstats;
-	CommandNSSASetChanstats commandnssasetchanstats;
-
 	CommandNSSetDisplay commandnssetdisplay;
 	CommandNSSASetDisplay commandnssasetdisplay;
 
@@ -1074,7 +996,7 @@ class NSSet : public Module
 
 	CommandNSSASetNoexpire commandnssasetnoexpire;
 
-	SerializableExtensibleItem<bool> autoop, chanstats, killprotect, kill_quick, kill_immed,
+	SerializableExtensibleItem<bool> autoop, killprotect, kill_quick, kill_immed,
 		message, secure, noexpire;
 
 	/* email, passcode */
@@ -1084,7 +1006,6 @@ class NSSet : public Module
 	NSSet(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandnsset(this), commandnssaset(this),
 		commandnssetautoop(this), commandnssasetautoop(this),
-		commandnssetchanstats(this), commandnssasetchanstats(this),
 		commandnssetdisplay(this), commandnssasetdisplay(this),
 		commandnssetemail(this), commandnssasetemail(this),
 		commandnssetkill(this), commandnssasetkill(this),
@@ -1094,7 +1015,7 @@ class NSSet : public Module
 		commandnssetsecure(this), commandnssasetsecure(this),
 		commandnssasetnoexpire(this),
 
-		autoop(this, "AUTOOP"), chanstats(this, "NS_STATS"), killprotect(this, "KILLPROTECT"),
+		autoop(this, "AUTOOP"), killprotect(this, "KILLPROTECT"),
 		kill_quick(this, "KILL_QUICK"), kill_immed(this, "KILL_IMMED"), message(this, "MSG"),
 		secure(this, "NS_SECURE"), noexpire(this, "NS_NO_EXPIRE"),
 
@@ -1154,8 +1075,6 @@ class NSSet : public Module
 			info.AddOption(_("Message mode"));
 		if (autoop.HasExt(na->nc))
 			info.AddOption(_("Auto-op"));
-		if (chanstats.HasExt(na->nc))
-			info.AddOption(_("Chanstats"));
 		if (noexpire.HasExt(na))
 			info.AddOption(_("No expire"));
 	}

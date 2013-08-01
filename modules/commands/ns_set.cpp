@@ -502,6 +502,87 @@ class CommandNSSASetEmail : public CommandNSSetEmail
 	}
 };
 
+class CommandNSSetKeepModes : public Command
+{
+ public:
+	CommandNSSetKeepModes(Module *creator, const Anope::string &sname = "nickserv/set/keepmodes", size_t min = 1) : Command(creator, sname, min, min + 1)
+	{
+		this->SetDesc(_("Enable or disable keep modes"));
+		this->SetSyntax(_("{ON | OFF}"));
+	}
+
+	void Run(CommandSource &source, const Anope::string &user, const Anope::string &param)
+	{
+		const NickAlias *na = NickAlias::Find(user);
+		if (!na)
+		{
+			source.Reply(NICK_X_NOT_REGISTERED, user.c_str());
+			return;
+		}
+		NickCore *nc = na->nc;
+
+		EventReturn MOD_RESULT;
+		FOREACH_RESULT(OnSetNickOption, MOD_RESULT, (source, this, nc, param));
+		if (MOD_RESULT == EVENT_STOP)
+			return;
+
+		if (param.equals_ci("ON"))
+		{
+			Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to enable keepmodes for " << nc->display;
+			nc->Extend<bool>("NS_KEEP_MODES");
+			source.Reply(_("Keep modes for %s is now \002on\002."), nc->display.c_str());
+		}
+		else if (param.equals_ci("OFF"))
+		{
+			Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to disable keepmodes for " << nc->display;
+			nc->Shrink<bool>("NS_KEEP_MODES");
+			source.Reply(_("Keep modes for %s is now \002off\002."), nc->display.c_str());
+		}
+		else
+			this->OnSyntaxError(source, "");
+	}
+
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	{
+		this->Run(source, source.nc->display, params[0]);
+	}
+
+	bool OnHelp(CommandSource &source, const Anope::string &) anope_override
+	{
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_("Enables or disables keepmodes for your nick. If keep\n"
+				"modes is enabled, services will remember your usermodes\n"
+				"and attempt to re-set them the next time you authenticate."));
+		return true;
+	}
+};
+
+class CommandNSSASetKeepModes : public CommandNSSetKeepModes
+{
+ public:
+	CommandNSSASetKeepModes(Module *creator) : CommandNSSetKeepModes(creator, "nickserv/saset/keepmodes", 2)
+	{
+		this->ClearSyntax();
+		this->SetSyntax(_("\037nickname\037 {ON | OFF}"));
+	}
+
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	{
+		this->Run(source, params[0], params[1]);
+	}
+
+	bool OnHelp(CommandSource &source, const Anope::string &) anope_override
+	{
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_("Enables or disables keepmodes for the given nick. If keep\n"
+				"modes is enabled, services will remember users' usermodes\n"
+				"and attempt to re-set them the next time they authenticate."));
+		return true;
+	}
+};
+
 class CommandNSSetKill : public Command
 {
  public:
@@ -605,12 +686,12 @@ class CommandNSSASetKill : public CommandNSSetKill
  public:
 	CommandNSSASetKill(Module *creator) : CommandNSSetKill(creator, "nickserv/saset/kill", 2)
 	{
+		this->ClearSyntax();
 		this->SetSyntax(_("\037nickname\037 {ON | QUICK | IMMED | OFF}"));
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		this->ClearSyntax();
 		this->Run(source, params[0], params[1]);
 	}
 
@@ -979,6 +1060,9 @@ class NSSet : public Module
 	CommandNSSetEmail commandnssetemail;
 	CommandNSSASetEmail commandnssasetemail;
 
+	CommandNSSetKeepModes commandnssetkeepmodes;
+	CommandNSSASetKeepModes commandnssasetkeepmodes;
+
 	CommandNSSetKill commandnssetkill;
 	CommandNSSASetKill commandnssasetkill;
 
@@ -998,6 +1082,51 @@ class NSSet : public Module
 
 	SerializableExtensibleItem<bool> autoop, killprotect, kill_quick, kill_immed,
 		message, secure, noexpire;
+	
+	struct KeepModes : SerializableExtensibleItem<bool>
+	{
+		KeepModes(Module *m, const Anope::string &n) : SerializableExtensibleItem<bool>(m, n) { }
+
+		void ExtensibleSerialize(const Extensible *e, const Serializable *s, Serialize::Data &data) const anope_override
+		{
+			SerializableExtensibleItem<bool>::ExtensibleSerialize(e, s, data);
+
+			if (s->GetSerializableType()->GetName() != "NickCore")
+				return;
+
+			const NickCore *nc = anope_dynamic_static_cast<const NickCore *>(s);
+			Anope::string modes;
+			for (User::ModeList::const_iterator it = nc->last_modes.begin(); it != nc->last_modes.end(); ++it)
+			{
+				if (!modes.empty())
+					modes += " ";
+				modes += it->first;
+				if (!it->second.empty())
+					modes += "," + it->second;
+			}
+			data["last_modes"] << modes;
+		}
+
+		void ExtensibleUnserialize(Extensible *e, Serializable *s, Serialize::Data &data) anope_override
+		{
+			SerializableExtensibleItem<bool>::ExtensibleUnserialize(e, s, data);
+
+			if (s->GetSerializableType()->GetName() != "NickCore")
+				return;
+
+			NickCore *nc = anope_dynamic_static_cast<NickCore *>(s);
+			Anope::string modes;
+			data["last_modes"] >> modes;
+			for (spacesepstream sep(modes); sep.GetToken(modes);)
+			{
+				size_t c = modes.find(',');
+				if (c == Anope::string::npos)
+					nc->last_modes.insert(std::make_pair(modes, ""));
+				else
+					nc->last_modes.insert(std::make_pair(modes.substr(0, c), modes.substr(c + 1)));
+			}
+		}
+	} keep_modes;
 
 	/* email, passcode */
 	PrimitiveExtensibleItem<std::pair<Anope::string, Anope::string > > ns_set_email;
@@ -1008,6 +1137,7 @@ class NSSet : public Module
 		commandnssetautoop(this), commandnssasetautoop(this),
 		commandnssetdisplay(this), commandnssasetdisplay(this),
 		commandnssetemail(this), commandnssasetemail(this),
+		commandnssetkeepmodes(this), commandnssasetkeepmodes(this),
 		commandnssetkill(this), commandnssasetkill(this),
 		commandnssetlanguage(this), commandnssasetlanguage(this),
 		commandnssetmessage(this), commandnssasetmessage(this),
@@ -1015,11 +1145,12 @@ class NSSet : public Module
 		commandnssetsecure(this), commandnssasetsecure(this),
 		commandnssasetnoexpire(this),
 
-		autoop(this, "AUTOOP"), killprotect(this, "KILLPROTECT"),
-		kill_quick(this, "KILL_QUICK"), kill_immed(this, "KILL_IMMED"), message(this, "MSG"),
+		autoop(this, "AUTOOP"),
+		killprotect(this, "KILLPROTECT"), kill_quick(this, "KILL_QUICK"),
+		kill_immed(this, "KILL_IMMED"), message(this, "MSG"),
 		secure(this, "NS_SECURE"), noexpire(this, "NS_NO_EXPIRE"),
 
-		ns_set_email(this, "ns_set_email")
+		keep_modes(this, "NS_KEEP_MODES"), ns_set_email(this, "ns_set_email")
 	{
 
 	}
@@ -1077,6 +1208,35 @@ class NSSet : public Module
 			info.AddOption(_("Auto-op"));
 		if (noexpire.HasExt(na))
 			info.AddOption(_("No expire"));
+		if (keep_modes.HasExt(na->nc))
+			info.AddOption(_("Keep modes"));
+	}
+
+	void OnUserModeSet(const MessageSource &setter, User *u, const Anope::string &mname) anope_override
+	{
+		if (u->Account() && setter.GetUser() == u)
+			u->Account()->last_modes = u->GetModeList();
+	}
+
+	void OnUserModeUnset(const MessageSource &setter, User *u, const Anope::string &mname) anope_override
+	{
+		if (u->Account() && setter.GetUser() == u)
+			u->Account()->last_modes = u->GetModeList();
+	}
+
+	void OnUserLogin(User *u) anope_override
+	{
+		if (keep_modes.HasExt(u->Account()))
+		{
+			User::ModeList modes = u->Account()->last_modes;
+			for (User::ModeList::iterator it = modes.begin(); it != modes.end(); ++it)
+			{
+				UserMode *um = ModeManager::FindUserModeByName(it->first);
+				/* if the null user can set the mode, then it's probably safe */
+				if (um && um->CanSet(NULL))
+					u->SetMode(NULL, it->first, it->second);
+			}
+		}
 	}
 };
 

@@ -68,6 +68,8 @@ class CoreExport ChannelInfo : public Serializable, public Extensible
 	Anope::string last_topic_setter;          /* Setter */
 	time_t last_topic_time;	                  /* Time */
 
+	Channel::ModeList last_modes;             /* The last modes set on this channel */
+
 	int16_t bantype;
 
 	MemoInfo memos;

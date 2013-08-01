@@ -120,6 +120,7 @@ class CoreExport NickCore : public Serializable, public Extensible
 	 * on if NI_SECURE is set and what (if any) kill protection is enabled. */
 	std::vector<Anope::string> access;
 	MemoInfo memos;
+	std::map<Anope::string, Anope::string> last_modes;
 
 	/* Nicknames registered that are grouped to this account.
 	 * for n in aliases, n->nc == this.

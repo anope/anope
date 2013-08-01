@@ -292,6 +292,51 @@ class CommandCSSetFounder : public Command
 	}
 };
 
+class CommandCSSetKeepModes : public Command
+{
+ public:
+	CommandCSSetKeepModes(Module *creator, const Anope::string &cname = "chanserv/set/keepmodes") :  Command(creator, cname, 2, 2)
+	{
+		this->SetDesc(_("Retain modes when channel is not in use"));
+		this->SetSyntax(_("\037channel\037 {ON | OFF}"));
+	}
+
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	{
+		ChannelInfo *ci = ChannelInfo::Find(params[0]);
+		if (ci == NULL)
+		{
+			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
+			return;
+		}
+		EventReturn MOD_RESULT;
+		FOREACH_RESULT(OnSetChannelOption, MOD_RESULT, (source, this, ci, params[1]));
+		if (MOD_RESULT == EVENT_STOP)
+			return;
+
+		if (MOD_RESULT != EVENT_ALLOW && !source.AccessFor(ci).HasPriv("SET") && source.permission.empty() && !source.HasPriv("chanserv/administration"))
+		{
+			source.Reply(ACCESS_DENIED);
+			return;
+		}
+
+		if (params[1].equals_ci("ON"))
+		{
+			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to enable keep modes";
+			ci->Extend<bool>("CS_KEEP_MODES");
+			source.Reply(_("Keep modes for %s is now \002on\002."), ci->name.c_str());
+		}
+		else if (params[1].equals_ci("OFF"))
+		{
+			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to disable keep modes";
+			ci->Shrink<bool>("CS_KEEP_MODES");
+			source.Reply(_("Keep modes for %s is now \002off\002."), ci->name.c_str());
+		}
+		else
+			this->OnSyntaxError(source, "PEACE");
+	}
+};
+
 class CommandCSSetPeace : public Command
 {
  public:
@@ -938,11 +983,57 @@ class CSSet : public Module
 	SerializableExtensibleItem<bool> persist, noautoop, peace, securefounder,
 		restricted, secure, secureops, signkick, signkick_level, noexpire;
 
+	struct KeepModes : SerializableExtensibleItem<bool>
+	{
+		KeepModes(Module *m, const Anope::string &n) : SerializableExtensibleItem<bool>(m, n) { }
+
+		void ExtensibleSerialize(const Extensible *e, const Serializable *s, Serialize::Data &data) const anope_override
+		{
+			SerializableExtensibleItem<bool>::ExtensibleSerialize(e, s, data);
+
+			if (s->GetSerializableType()->GetName() != "ChannelInfo")
+				return;
+
+			const ChannelInfo *ci = anope_dynamic_static_cast<const ChannelInfo *>(s);
+			Anope::string modes;
+			for (Channel::ModeList::const_iterator it = ci->last_modes.begin(); it != ci->last_modes.end(); ++it)
+			{
+				if (!modes.empty())
+					modes += " ";
+				modes += it->first;
+				if (!it->second.empty())
+					modes += "," + it->second;
+			}
+			data["last_modes"] << modes;
+		}
+
+		void ExtensibleUnserialize(Extensible *e, Serializable *s, Serialize::Data &data) anope_override
+		{
+			SerializableExtensibleItem<bool>::ExtensibleUnserialize(e, s, data);
+
+			if (s->GetSerializableType()->GetName() != "ChannelInfo")
+				return;
+
+			ChannelInfo *ci = anope_dynamic_static_cast<ChannelInfo *>(s);
+			Anope::string modes;
+			data["last_modes"] >> modes;
+			for (spacesepstream sep(modes); sep.GetToken(modes);)
+			{
+				size_t c = modes.find(',');
+				if (c == Anope::string::npos)
+					ci->last_modes.insert(std::make_pair(modes, ""));
+				else
+					ci->last_modes.insert(std::make_pair(modes.substr(0, c), modes.substr(c + 1)));
+			}
+		}
+	} keep_modes;
+
 	CommandCSSet commandcsset;
 	CommandCSSetAutoOp commandcssetautoop;
 	CommandCSSetBanType commandcssetbantype;
 	CommandCSSetDescription commandcssetdescription;
 	CommandCSSetFounder commandcssetfounder;
+	CommandCSSetKeepModes commandcssetkeepmodes;
 	CommandCSSetPeace commandcssetpeace;
 	CommandCSSetPersist commandcssetpersist;
 	CommandCSSetRestricted commandcssetrestricted;
@@ -959,9 +1050,10 @@ class CSSet : public Module
 		securefounder(this, "SECUREFOUNDER"), restricted(this, "RESTRICTED"),
 		secure(this, "CS_SECURE"), secureops(this, "SECUREOPS"), signkick(this, "SIGNKICK"),
 		signkick_level(this, "SIGNKICK_LEVEL"), noexpire(this, "CS_NO_EXPIRE"),
+		keep_modes(this, "CS_KEEP_MODES"),
 
 		commandcsset(this), commandcssetautoop(this), commandcssetbantype(this),
-		commandcssetdescription(this), commandcssetfounder(this),
+		commandcssetdescription(this), commandcssetfounder(this), commandcssetkeepmodes(this),
 		commandcssetpeace(this), commandcssetpersist(this), commandcssetrestricted(this),
 		commandcssetsecure(this), commandcssetsecurefounder(this), commandcssetsecureops(this), commandcssetsignkick(this),
 		commandcssetsuccessor(this), commandcssetnoexpire(this)
@@ -971,6 +1063,16 @@ class CSSet : public Module
 	void OnCreateChan(ChannelInfo *ci) anope_override
 	{
 		ci->bantype = Config->GetModule(this)->Get<int>("defbantype", "2");
+	}
+
+	void OnChannelCreate(Channel *c) anope_override
+	{
+		if (c->ci && keep_modes.HasExt(c->ci))
+		{
+			Channel::ModeList ml = c->ci->last_modes;
+			for (Channel::ModeList::iterator it = ml.begin(); it != ml.end(); ++it)
+				c->SetMode(c->ci->WhoSends(), it->first, it->second);
+		}
 	}
 
 	EventReturn OnCheckKick(User *u, Channel *c, Anope::string &mask, Anope::string &reason) anope_override
@@ -993,10 +1095,14 @@ class CSSet : public Module
 
 	EventReturn OnChannelModeSet(Channel *c, MessageSource &setter, ChannelMode *mode, const Anope::string &param) anope_override
 	{
-		/* Channel mode +P or so was set, mark this channel as persistent */
-		if (mode->name == "PERM" && c->ci)
+		if (c->ci)
 		{
-			persist.Set(c->ci, true);
+			/* Channel mode +P or so was set, mark this channel as persistent */
+			if (mode->name == "PERM")
+				persist.Set(c->ci, true);
+
+			if (mode->type != MODE_STATUS)
+				c->ci->last_modes = c->GetModes();
 		}
 
 		return EVENT_CONTINUE;
@@ -1015,6 +1121,9 @@ class CSSet : public Module
 				return EVENT_STOP;
 			}
 		}
+
+		if (c->ci && mode->type != MODE_STATUS)
+			c->ci->last_modes = c->GetModes();
 
 		return EVENT_CONTINUE;
 	}
@@ -1075,6 +1184,8 @@ class CSSet : public Module
 			info.AddOption(_("Persistent"));
 		if (noexpire.HasExt(ci))
 			info.AddOption(_("No expire"));
+		if (keep_modes.HasExt(ci))
+			info.AddOption(_("Keep modes"));
 
 		time_t chanserv_expire = Config->GetModule(this)->Get<time_t>("expire", "14d");
 		if (!noexpire.HasExt(ci) && chanserv_expire && !Anope::NoExpire)

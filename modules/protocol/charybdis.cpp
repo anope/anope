@@ -46,9 +46,9 @@ class CharybdisProto : public IRCDProto
 		MaxModes = 4;
 	}
 
-	void SendGlobalNotice(const BotInfo *bi, const Server *dest, const Anope::string &msg) anope_override { ratbox->SendGlobalNotice(bi, dest, msg); }
-	void SendGlobalPrivmsg(const BotInfo *bi, const Server *dest, const Anope::string &msg) anope_override { ratbox->SendGlobalPrivmsg(bi, dest, msg); }
-	void SendGlobopsInternal(const BotInfo *source, const Anope::string &buf) anope_override { ratbox->SendGlobopsInternal(source, buf); }
+	void SendGlobalNotice(BotInfo *bi, const Server *dest, const Anope::string &msg) anope_override { ratbox->SendGlobalNotice(bi, dest, msg); }
+	void SendGlobalPrivmsg(BotInfo *bi, const Server *dest, const Anope::string &msg) anope_override { ratbox->SendGlobalPrivmsg(bi, dest, msg); }
+	void SendGlobopsInternal(const MessageSource &source, const Anope::string &buf) anope_override { ratbox->SendGlobopsInternal(source, buf); }
 	void SendSGLine(User *u, const XLine *x) anope_override { ratbox->SendSGLine(u, x); }
 	void SendSGLineDel(const XLine *x) anope_override { ratbox->SendSGLineDel(x); }
 	void SendAkill(User *u, XLine *x) anope_override { ratbox->SendAkill(u, x); }
@@ -57,7 +57,7 @@ class CharybdisProto : public IRCDProto
 	void SendJoin(User *user, Channel *c, const ChannelStatus *status) anope_override { ratbox->SendJoin(user, c, status); }
 	void SendServer(const Server *server) anope_override { ratbox->SendServer(server); }
 	void SendChannel(Channel *c) anope_override { ratbox->SendChannel(c); }
-	void SendTopic(BotInfo *bi, Channel *c) anope_override { ratbox->SendTopic(bi, c); }
+	void SendTopic(const MessageSource &source, Channel *c) anope_override { ratbox->SendTopic(source, c); }
 
 	void SendSQLine(User *, const XLine *x) anope_override
 	{
@@ -105,7 +105,7 @@ class CharybdisProto : public IRCDProto
 		UplinkSocket::Message() << "SVINFO 6 6 0 :" << Anope::CurTime;
 	}
 
-	void SendClientIntroduction(const User *u) anope_override
+	void SendClientIntroduction(User *u) anope_override
 	{
 		Anope::string modes = "+" + u->GetModes();
 		UplinkSocket::Message(Me) << "EUID " << u->nick << " 1 " << u->timestamp << " " << modes << " " << u->GetIdent() << " " << u->host << " 0 " << u->GetUID() << " * * :" << u->realname;
@@ -124,7 +124,7 @@ class CharybdisProto : public IRCDProto
 		UplinkSocket::Message(Me) << "ENCAP * SU " << u->GetUID();
 	}
 
-	void SendForceNickChange(const User *u, const Anope::string &newnick, time_t when) anope_override
+	void SendForceNickChange(User *u, const Anope::string &newnick, time_t when) anope_override
 	{
 		UplinkSocket::Message(Me) << "ENCAP " << u->server->GetName() << " RSFNC " << u->GetUID()
 						<< " " << newnick << " " << when << " " << u->timestamp;
@@ -362,13 +362,13 @@ class ProtoCharybdis : public Module
 	void AddModes()
 	{
 		/* Add user modes */
-		ModeManager::AddUserMode(new UserMode("DEAF", 'D'));
+		ModeManager::AddUserMode(new UserModeOperOnly("DEAF", 'D'));
 		ModeManager::AddUserMode(new UserMode("CALLERID", 'g'));
 		ModeManager::AddUserMode(new UserMode("REGPRIV", 'R'));
-		ModeManager::AddUserMode(new UserMode("SSL", 'Z')); 
-		ModeManager::AddUserMode(new UserMode("LOCOPS", 'l'));
-		ModeManager::AddUserMode(new UserMode("OPERWALLS", 'z'));
-		ModeManager::AddUserMode(new UserMode("PROTECTED", 'S'));
+		ModeManager::AddUserMode(new UserModeNoone("SSL", 'Z')); 
+		ModeManager::AddUserMode(new UserModeOperOnly("LOCOPS", 'l'));
+		ModeManager::AddUserMode(new UserModeOperOnly("OPERWALLS", 'z'));
+		ModeManager::AddUserMode(new UserModeNoone("PROTECTED", 'S'));
 		ModeManager::AddUserMode(new UserMode("NOFORWARD", 'Q'));
 
 		// charybdis has no usermode for registered users

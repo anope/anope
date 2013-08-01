@@ -43,10 +43,10 @@ class ChannelModeFlood : public ChannelModeParam
 class InspIRCd12Proto : public IRCDProto
 {
  private:
-	void SendSVSKillInternal(const BotInfo *source, User *user, const Anope::string &buf) anope_override
+	void SendSVSKillInternal(const MessageSource &source, User *user, const Anope::string &buf) anope_override
 	{
 		IRCDProto::SendSVSKillInternal(source, user, buf);
-		user->KillInternal(source ? source->nick : Me->GetName(), buf);
+		user->KillInternal(source, buf);
 	}
 
 	void SendChgIdentInternal(const Anope::string &nick, const Anope::string &vIdent)
@@ -91,12 +91,12 @@ class InspIRCd12Proto : public IRCDProto
 		MaxModes = 20;
 	}
 
-	void SendGlobalNotice(const BotInfo *bi, const Server *dest, const Anope::string &msg) anope_override
+	void SendGlobalNotice(BotInfo *bi, const Server *dest, const Anope::string &msg) anope_override
 	{
 		UplinkSocket::Message(bi) << "NOTICE $" << dest->GetName() << " :" << msg;
 	}
 
-	void SendGlobalPrivmsg(const BotInfo *bi, const Server *dest, const Anope::string &msg) anope_override
+	void SendGlobalPrivmsg(BotInfo *bi, const Server *dest, const Anope::string &msg) anope_override
 	{
 		UplinkSocket::Message(bi) << "PRIVMSG $" << dest->GetName() << " :" << msg;
 	}
@@ -119,7 +119,7 @@ class InspIRCd12Proto : public IRCDProto
 		SendDelLine("G", x->mask);
 	}
 
-	void SendTopic(BotInfo *whosets, Channel *c) anope_override
+	void SendTopic(const MessageSource &source, Channel *c) anope_override
 	{
 		if (Servers::Capab.count("SVSTOPIC"))
 		{
@@ -132,7 +132,7 @@ class InspIRCd12Proto : public IRCDProto
 			if (c->topic_time > ts)
 				ts = Anope::CurTime;
 			/* But don't modify c->topic_ts, it should remain set to the real TS we want as ci->last_topic_time pulls from it */
-			UplinkSocket::Message(whosets) << "FTOPIC " << c->name << " " << ts << " " << c->topic_setter << " :" << c->topic;
+			UplinkSocket::Message(source) << "FTOPIC " << c->name << " " << ts << " " << c->topic_setter << " :" << c->topic;
 		}
 	}
 
@@ -206,12 +206,12 @@ class InspIRCd12Proto : public IRCDProto
 		UplinkSocket::Message() << "PUSH " << dest << " ::" << Me->GetName() << " " << numeric << " " << dest << " " << buf;
 	}
 
-	void SendModeInternal(const BotInfo *source, const Channel *dest, const Anope::string &buf) anope_override
+	void SendModeInternal(const MessageSource &source, const Channel *dest, const Anope::string &buf) anope_override
 	{
 		UplinkSocket::Message(source) << "FMODE " << dest->name << " " << dest->creation_time << " " << buf;
 	}
 
-	void SendClientIntroduction(const User *u) anope_override
+	void SendClientIntroduction(User *u) anope_override
 	{
 		Anope::string modes = "+" + u->GetModes();
 		UplinkSocket::Message(Me) << "UID " << u->GetUID() << " " << u->timestamp << " " << u->nick << " " << u->host << " " << u->host << " " << u->GetIdent() << " 0.0.0.0 " << u->timestamp << " " << modes << " :" << u->realname;
@@ -319,12 +319,12 @@ class InspIRCd12Proto : public IRCDProto
 		SendAddLine("Z", x->GetHost(), timeleft, x->by, x->GetReason());
 	}
 
-	void SendSVSJoin(const BotInfo *source, const User *u, const Anope::string &chan, const Anope::string &) anope_override
+	void SendSVSJoin(const MessageSource &source, User *u, const Anope::string &chan, const Anope::string &) anope_override
 	{
 		UplinkSocket::Message(source) << "SVSJOIN " << u->GetUID() << " " << chan;
 	}
 
-	void SendSVSPart(const BotInfo *source, const User *u, const Anope::string &chan, const Anope::string &param) anope_override
+	void SendSVSPart(const MessageSource &source, User *u, const Anope::string &chan, const Anope::string &param) anope_override
 	{
 		if (!param.empty())
 			UplinkSocket::Message(source) << "SVSPART " << u->GetUID() << " " << chan << " :" << param;
@@ -332,7 +332,7 @@ class InspIRCd12Proto : public IRCDProto
 			UplinkSocket::Message(source) << "SVSPART " << u->GetUID() << " " << chan;
 	}
 
-	void SendSWhois(const BotInfo *, const Anope::string &who, const Anope::string &mask) anope_override
+	void SendSWhois(const MessageSource &, const Anope::string &who, const Anope::string &mask) anope_override
 	{
 		User *u = User::Find(who);
 
@@ -349,7 +349,7 @@ class InspIRCd12Proto : public IRCDProto
 		UplinkSocket::Message(Me) << "ENDBURST";
 	}
 
-	void SendGlobopsInternal(const BotInfo *source, const Anope::string &buf)
+	void SendGlobopsInternal(BotInfo *source, const Anope::string &buf)
 	{
 		if (Servers::Capab.count("GLOBOPS"))
 			UplinkSocket::Message(source) << "SNONOTICE g :" << buf;
@@ -577,7 +577,7 @@ struct IRCDMessageCapab : Message::Capab
 								ModeManager::AddChannelMode(new ChannelMode("NONICK", 'N'));
 								continue;
 							case 'O':
-								ModeManager::AddChannelMode(new ChannelModeOper('O'));
+								ModeManager::AddChannelMode(new ChannelModeOperOnly("OPERONLY", 'O'));
 								continue;
 							case 'P':
 								ModeManager::AddChannelMode(new ChannelMode("PERM", 'P'));
@@ -610,7 +610,7 @@ struct IRCDMessageCapab : Message::Capab
 								ModeManager::AddChannelMode(new ChannelMode("PRIVATE", 'p'));
 								continue;
 							case 'r':
-								ModeManager::AddChannelMode(new ChannelModeRegistered('r'));
+								ModeManager::AddChannelMode(new ChannelModeNoone("REGISTERED", 'r'));
 								continue;
 							case 's':
 								ModeManager::AddChannelMode(new ChannelMode("SECRET", 's'));
@@ -642,7 +642,7 @@ struct IRCDMessageCapab : Message::Capab
 							switch (modebuf[t])
 							{
 								case 'h':
-									ModeManager::AddUserMode(new UserMode("HELPOP", 'h'));
+									ModeManager::AddUserMode(new UserModeOperOnly("HELPOP", 'h'));
 									continue;
 								case 'B':
 									ModeManager::AddUserMode(new UserMode("BOT", 'B'));
@@ -651,13 +651,13 @@ struct IRCDMessageCapab : Message::Capab
 									ModeManager::AddUserMode(new UserMode("FILTER", 'G'));
 									continue;
 								case 'H':
-									ModeManager::AddUserMode(new UserMode("HIDEOPER", 'H'));
+									ModeManager::AddUserMode(new UserModeOperOnly("HIDEOPER", 'H'));
 									continue;
 								case 'I':
 									ModeManager::AddUserMode(new UserMode("PRIV", 'I'));
 									continue;
 								case 'Q':
-									ModeManager::AddUserMode(new UserMode("HIDDEN", 'Q'));
+									ModeManager::AddUserMode(new UserModeOperOnly("HIDDEN", 'Q'));
 									continue;
 								case 'R':
 									ModeManager::AddUserMode(new UserMode("REGPRIV", 'R'));
@@ -678,13 +678,13 @@ struct IRCDMessageCapab : Message::Capab
 									ModeManager::AddUserMode(new UserMode("INVIS", 'i'));
 									continue;
 								case 'k':
-									ModeManager::AddUserMode(new UserMode("PROTECTED", 'k'));
+									ModeManager::AddUserMode(new UserModeNoone("PROTECTED", 'k'));
 									continue;
 								case 'o':
-									ModeManager::AddUserMode(new UserMode("OPER", 'o'));
+									ModeManager::AddUserMode(new UserModeOperOnly("OPER", 'o'));
 									continue;
 								case 'r':
-									ModeManager::AddUserMode(new UserMode("REGISTERED", 'r'));
+									ModeManager::AddUserMode(new UserModeNoone("REGISTERED", 'r'));
 									continue;
 								case 'w':
 									ModeManager::AddUserMode(new UserMode("WALLOPS", 'w'));
@@ -1008,7 +1008,7 @@ struct IRCDMessageIdle : IRCDMessage
 
 	void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		const BotInfo *bi = BotInfo::Find(params[0]);
+		BotInfo *bi = BotInfo::Find(params[0]);
 		if (bi)
 			UplinkSocket::Message(bi) << "IDLE " << source.GetSource() << " " << Anope::StartTime << " " << (Anope::CurTime - bi->lastmsg);
 	}
@@ -1145,7 +1145,7 @@ struct IRCDMessageMode : IRCDMessage
 			// if it's still null, drop it like fire.
 			// most likely situation was that server introduced a nick which we subsequently akilled
 			if (u)
-				u->SetModesInternal("%s", params[1].c_str());
+				u->SetModesInternal(source, "%s", params[1].c_str());
 		}
 	}
 };
@@ -1170,7 +1170,7 @@ struct IRCDMessageOperType : IRCDMessage
 		   dont do this directly */
 		User *u = source.GetUser();
 		if (!u->HasMode("OPER"))
-			u->SetModesInternal("+o");
+			u->SetModesInternal(source, "+o");
 	}
 };
 

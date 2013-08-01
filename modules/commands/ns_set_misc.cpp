@@ -65,6 +65,8 @@ struct NSMiscData : Serializable
 			ExtensibleItem<NSMiscData> *item = GetItem(sname);
 			if (item)
 				d = item->Set(nc, NSMiscData(nc, sname, sdata));
+			else
+				d = NULL;
 		}
 
 		return d;

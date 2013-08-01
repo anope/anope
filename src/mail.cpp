@@ -51,7 +51,7 @@ void Mail::Message::Run()
 	SetExitState();
 }
 
-bool Mail::Send(User *u, NickCore *nc, const BotInfo *service, const Anope::string &subject, const Anope::string &message)
+bool Mail::Send(User *u, NickCore *nc, BotInfo *service, const Anope::string &subject, const Anope::string &message)
 {
 	if (!nc || !service || subject.empty() || message.empty())
 		return false;

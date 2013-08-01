@@ -45,33 +45,27 @@ class BahamutIRCdProto : public IRCDProto
 		MaxModes = 60;
 	}
 
-	void SendModeInternal(const BotInfo *source, const Channel *dest, const Anope::string &buf) anope_override
+	void SendModeInternal(const MessageSource &source, const Channel *dest, const Anope::string &buf) anope_override
 	{
 		if (Servers::Capab.count("TSMODE") > 0)
 		{
-			if (source)
-				UplinkSocket::Message(source) << "MODE " << dest->name << " " << dest->creation_time << " " << buf;
-			else
-				UplinkSocket::Message(Me) << "MODE " << dest->name << " " << dest->creation_time << " " << buf;
+			UplinkSocket::Message(source) << "MODE " << dest->name << " " << dest->creation_time << " " << buf;
 		}
 		else
 			IRCDProto::SendModeInternal(source, dest, buf);
 	}
 
-	void SendModeInternal(const BotInfo *bi, const User *u, const Anope::string &buf) anope_override
+	void SendModeInternal(const MessageSource &source, User *u, const Anope::string &buf) anope_override
 	{
-		if (bi)
-			UplinkSocket::Message(bi) << "SVSMODE " << u->nick << " " << u->timestamp << " " << buf;
-		else
-			UplinkSocket::Message(Me) << "SVSMODE " << u->nick << " " << u->timestamp << " " << buf;
+		UplinkSocket::Message(source) << "SVSMODE " << u->nick << " " << u->timestamp << " " << buf;
 	}
 
-	void SendGlobalNotice(const BotInfo *bi, const Server *dest, const Anope::string &msg) anope_override
+	void SendGlobalNotice(BotInfo *bi, const Server *dest, const Anope::string &msg) anope_override
 	{
 		UplinkSocket::Message(bi) << "NOTICE $" << dest->GetName() << " :" << msg;
 	}
 
-	void SendGlobalPrivmsg(const BotInfo *bi, const Server *dest, const Anope::string &msg) anope_override
+	void SendGlobalPrivmsg(BotInfo *bi, const Server *dest, const Anope::string &msg) anope_override
 	{
 		UplinkSocket::Message(bi) << "PRIVMSG $" << dest->GetName() << " :" << msg;
 	}
@@ -155,9 +149,9 @@ class BahamutIRCdProto : public IRCDProto
 	}
 
 	/* TOPIC */
-	void SendTopic(BotInfo *whosets, Channel *c) anope_override
+	void SendTopic(const MessageSource &source, Channel *c) anope_override
 	{
-		UplinkSocket::Message(whosets) << "TOPIC " << c->name << " " << c->topic_setter << " " << c->topic_ts << " :" << c->topic;
+		UplinkSocket::Message(source) << "TOPIC " << c->name << " " << c->topic_setter << " " << c->topic_ts << " :" << c->topic;
 	}
 
 	/* UNSQLINE */
@@ -233,12 +227,9 @@ class BahamutIRCdProto : public IRCDProto
 	/*
 	  Note: if the stamp is null 0, the below usage is correct of Bahamut
 	*/
-	void SendSVSKillInternal(const BotInfo *source, User *user, const Anope::string &buf) anope_override
+	void SendSVSKillInternal(const MessageSource &source, User *user, const Anope::string &buf) anope_override
 	{
-		if (source)
-			UplinkSocket::Message(source) << "SVSKILL " << user->nick << " :" << buf;
-		else
-			UplinkSocket::Message() << "SVSKILL " << user->nick << " :" << buf;
+		UplinkSocket::Message(source) << "SVSKILL " << user->nick << " :" << buf;
 	}
 
 	void SendBOB() anope_override
@@ -251,7 +242,7 @@ class BahamutIRCdProto : public IRCDProto
 		UplinkSocket::Message() << "BURST 0";
 	}
 
-	void SendClientIntroduction(const User *u) anope_override
+	void SendClientIntroduction(User *u) anope_override
 	{
 		Anope::string modes = "+" + u->GetModes();
 		UplinkSocket::Message() << "NICK " << u->nick << " 1 " << u->timestamp << " " << modes << " " << u->GetIdent() << " " << u->host << " " << u->server->GetName() << " 0 0 :" << u->realname;
@@ -341,7 +332,7 @@ struct IRCDMessageMode : IRCDMessage
 		{
 			User *u = User::Find(params[0]);
 			if (u)
-				u->SetModesInternal("%s", params[1].c_str());
+				u->SetModesInternal(source, "%s", params[1].c_str());
 		}
 	}
 };
@@ -506,14 +497,14 @@ class ProtoBahamut : public Module
 	void AddModes()
 	{
 		/* Add user modes */
-		ModeManager::AddUserMode(new UserMode("SERV_ADMIN", 'A'));
+		ModeManager::AddUserMode(new UserModeOperOnly("SERV_ADMIN", 'A'));
 		ModeManager::AddUserMode(new UserMode("REGPRIV", 'R'));
-		ModeManager::AddUserMode(new UserMode("ADMIN", 'a'));
+		ModeManager::AddUserMode(new UserModeOperOnly("ADMIN", 'a'));
 		ModeManager::AddUserMode(new UserMode("INVIS", 'i'));
-		ModeManager::AddUserMode(new UserMode("OPER", 'o'));
-		ModeManager::AddUserMode(new UserMode("REGISTERED", 'r'));
-		ModeManager::AddUserMode(new UserMode("SNOMASK", 's'));
-		ModeManager::AddUserMode(new UserMode("WALLOPS", 'w'));
+		ModeManager::AddUserMode(new UserModeOperOnly("OPER", 'o'));
+		ModeManager::AddUserMode(new UserModeNoone("REGISTERED", 'r'));
+		ModeManager::AddUserMode(new UserModeOperOnly("SNOMASK", 's'));
+		ModeManager::AddUserMode(new UserModeOperOnly("WALLOPS", 'w'));
 		ModeManager::AddUserMode(new UserMode("DEAF", 'd'));
 
 		/* b/e/I */
@@ -532,11 +523,11 @@ class ProtoBahamut : public Module
 		ModeManager::AddChannelMode(new ChannelMode("MODERATED", 'm'));
 		ModeManager::AddChannelMode(new ChannelMode("NOEXTERNAL", 'n'));
 		ModeManager::AddChannelMode(new ChannelMode("PRIVATE", 'p'));
-		ModeManager::AddChannelMode(new ChannelModeRegistered('r'));
+		ModeManager::AddChannelMode(new ChannelModeNoone("REGISTERED", 'r'));
 		ModeManager::AddChannelMode(new ChannelMode("SECRET", 's'));
 		ModeManager::AddChannelMode(new ChannelMode("TOPIC", 't'));
 		ModeManager::AddChannelMode(new ChannelMode("REGMODERATED", 'M'));
-		ModeManager::AddChannelMode(new ChannelModeOper('O'));
+		ModeManager::AddChannelMode(new ChannelModeOperOnly("OPERONLY", 'O'));
 		ModeManager::AddChannelMode(new ChannelMode("REGISTEREDONLY", 'R'));
 	}
 
@@ -558,7 +549,7 @@ class ProtoBahamut : public Module
 
 	void OnUserNickChange(User *u, const Anope::string &) anope_override
 	{
-		u->RemoveModeInternal(ModeManager::FindUserModeByName("REGISTERED"));
+		u->RemoveModeInternal(Me, ModeManager::FindUserModeByName("REGISTERED"));
 		IRCD->SendLogout(u);
 	}
 };

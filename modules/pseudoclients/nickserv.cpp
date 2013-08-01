@@ -407,7 +407,7 @@ class NickServCore : public Module, public NickServService
 			OnCancel(u, old_na);
 	}
 
-	void OnUserModeSet(User *u, const Anope::string &mname) anope_override
+	void OnUserModeSet(const MessageSource &setter, User *u, const Anope::string &mname) anope_override
 	{
 		if (mname == "REGISTERED" && !u->IsIdentified())
 			u->RemoveMode(NickServ, mname);

@@ -11,7 +11,7 @@
 
 #include "module.h"
 
-static bool SendResetEmail(User *u, const NickAlias *na, const BotInfo *bi);
+static bool SendResetEmail(User *u, const NickAlias *na, BotInfo *bi);
 
 class CommandNSResetPass : public Command
 {
@@ -112,7 +112,7 @@ class NSResetPass : public Module
 	}
 };
 
-static bool SendResetEmail(User *u, const NickAlias *na, const BotInfo *bi)
+static bool SendResetEmail(User *u, const NickAlias *na, BotInfo *bi)
 {
 	int min = 1, max = 62;
 	int chars[] = {

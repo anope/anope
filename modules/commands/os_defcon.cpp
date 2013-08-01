@@ -284,7 +284,7 @@ class OSDefcon : public Module
 
 			if ((cm = ModeManager::FindChannelModeByChar(mode)))
 			{
-				if (cm->type == MODE_STATUS || cm->type == MODE_LIST || !cm->CanSet(NULL))
+				if (cm->type == MODE_STATUS || cm->type == MODE_LIST)
 				{
 					Log(this) << "DefConChanModes mode character '" << mode << "' cannot be locked";
 					continue;

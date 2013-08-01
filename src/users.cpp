@@ -23,6 +23,7 @@
 #include "opertype.h"
 #include "language.h"
 #include "sockets.h"
+#include "uplink.h"
 
 user_map UserListByNick, UserListByUID;
 
@@ -52,7 +53,7 @@ User::User(const Anope::string &snick, const Anope::string &sident, const Anope:
 	this->server = sserver;
 	this->realname = srealname;
 	this->timestamp = this->signon = ssignon;
-	this->SetModesInternal("%s", smodes.c_str());
+	this->SetModesInternal(sserver, "%s", smodes.c_str());
 	this->uid = suid;
 	this->super_admin = false;
 	this->nc = NULL;
@@ -255,7 +256,7 @@ User::~User()
 	FOREACH_MOD(OnPostUserLogoff, (this));
 }
 
-void User::SendMessage(const BotInfo *source, const char *fmt, ...)
+void User::SendMessage(BotInfo *source, const char *fmt, ...)
 {
 	va_list args;
 	char buf[BUFSIZE] = "";
@@ -270,7 +271,7 @@ void User::SendMessage(const BotInfo *source, const char *fmt, ...)
 	va_end(args);
 }
 
-void User::SendMessage(const BotInfo *source, const Anope::string &msg)
+void User::SendMessage(BotInfo *source, const Anope::string &msg)
 {
 	const char *translated_message = Language::Translate(this, msg.c_str());
 
@@ -453,55 +454,55 @@ bool User::HasMode(const Anope::string &mname) const
 	return this->modes.count(mname);
 }
 
-void User::SetModeInternal(UserMode *um, const Anope::string &param)
+void User::SetModeInternal(const MessageSource &source, UserMode *um, const Anope::string &param)
 {
 	if (!um)
 		return;
 
 	this->modes[um->name] = param;
 
-	FOREACH_MOD(OnUserModeSet, (this, um->name));
+	FOREACH_MOD(OnUserModeSet, (source, this, um->name));
 }
 
-void User::RemoveModeInternal(UserMode *um)
+void User::RemoveModeInternal(const MessageSource &source, UserMode *um)
 {
 	if (!um)
 		return;
 
 	this->modes.erase(um->name);
 
-	FOREACH_MOD(OnUserModeUnset, (this, um->name));
+	FOREACH_MOD(OnUserModeUnset, (source, this, um->name));
 }
 
-void User::SetMode(const BotInfo *bi, UserMode *um, const Anope::string &Param)
+void User::SetMode(BotInfo *bi, UserMode *um, const Anope::string &param)
 {
 	if (!um || HasMode(um->name))
 		return;
 
-	ModeManager::StackerAdd(bi, this, um, true, Param);
-	SetModeInternal(um, Param);
+	ModeManager::StackerAdd(bi, this, um, true, param);
+	SetModeInternal(bi, um, param);
 }
 
-void User::SetMode(const BotInfo *bi, const Anope::string &uname, const Anope::string &Param)
+void User::SetMode(BotInfo *bi, const Anope::string &uname, const Anope::string &param)
 {
-	SetMode(bi, ModeManager::FindUserModeByName(uname), Param);
+	SetMode(bi, ModeManager::FindUserModeByName(uname), param);
 }
 
-void User::RemoveMode(const BotInfo *bi, UserMode *um)
+void User::RemoveMode(BotInfo *bi, UserMode *um)
 {
 	if (!um || !HasMode(um->name))
 		return;
 
 	ModeManager::StackerAdd(bi, this, um, false);
-	RemoveModeInternal(um);
+	RemoveModeInternal(bi, um);
 }
 
-void User::RemoveMode(const BotInfo *bi, const Anope::string &name)
+void User::RemoveMode(BotInfo *bi, const Anope::string &name)
 {
 	RemoveMode(bi, ModeManager::FindUserModeByName(name));
 }
 
-void User::SetModes(const BotInfo *bi, const char *umodes, ...)
+void User::SetModes(BotInfo *bi, const char *umodes, ...)
 {
 	char buf[BUFSIZE] = "";
 	va_list args;
@@ -545,7 +546,7 @@ void User::SetModes(const BotInfo *bi, const char *umodes, ...)
 	}
 }
 
-void User::SetModesInternal(const char *umodes, ...)
+void User::SetModesInternal(const MessageSource &source, const char *umodes, ...)
 {
 	char buf[BUFSIZE] = "";
 	va_list args;
@@ -583,12 +584,12 @@ void User::SetModesInternal(const char *umodes, ...)
 		if (add)
 		{
 			if (um->type == MODE_PARAM && sep.GetToken(sbuf))
-				this->SetModeInternal(um, sbuf);
+				this->SetModeInternal(source, um, sbuf);
 			else
-				this->SetModeInternal(um);
+				this->SetModeInternal(source, um);
 		}
 		else
-			this->RemoveModeInternal(um);
+			this->RemoveModeInternal(source, um);
 
 		if (um->name == "OPER")
 		{
@@ -610,8 +611,7 @@ Anope::string User::GetModes() const
 {
 	Anope::string m, params;
 
-	typedef std::map<Anope::string, Anope::string> mode_map;
-	for (mode_map::const_iterator it = this->modes.begin(), it_end = this->modes.end(); it != it_end; ++it)
+	for (ModeList::const_iterator it = this->modes.begin(), it_end = this->modes.end(); it != it_end; ++it)
 	{
 		UserMode *um = ModeManager::FindUserModeByName(it->first);
 		if (um == NULL)
@@ -624,6 +624,11 @@ Anope::string User::GetModes() const
 	}
 
 	return m + params;
+}
+
+const User::ModeList &User::GetModeList() const
+{
+	return modes;
 }
 
 ChanUserContainer *User::FindChannel(Channel *c) const
@@ -642,14 +647,14 @@ bool User::IsProtected() const
 	return false;
 }
 
-void User::Kill(const Anope::string &source, const Anope::string &reason)
+void User::Kill(const MessageSource &source, const Anope::string &reason)
 {
-	Anope::string real_reason = (source.empty() ? Me->GetName() : source) + " (" + reason + ")";
+	Anope::string real_reason = source.GetName() + " (" + reason + ")";
 
-	IRCD->SendSVSKill(BotInfo::Find(source), this, "%s", real_reason.c_str());
+	IRCD->SendSVSKill(source, this, "%s", real_reason.c_str());
 }
 
-void User::KillInternal(const Anope::string &source, const Anope::string &reason)
+void User::KillInternal(const MessageSource &source, const Anope::string &reason)
 {
 	if (this->quit)
 	{
@@ -657,7 +662,7 @@ void User::KillInternal(const Anope::string &source, const Anope::string &reason
 		return;
 	}
 
-	Log(this, "killed") << "was killed by " << source << " (Reason: " << reason << ")";
+	Log(this, "killed") << "was killed by " << source.GetName() << " (Reason: " << reason << ")";
 
 	this->Quit(reason);
 }

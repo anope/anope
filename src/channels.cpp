@@ -24,6 +24,7 @@
 #include "access.h"
 #include "sockets.h"
 #include "language.h"
+#include "uplink.h"
 
 channel_map ChannelList;
 
@@ -681,7 +682,7 @@ bool Channel::MatchesList(User *u, const Anope::string &mode)
 	return false;
 }
 
-void Channel::KickInternal(MessageSource &source, const Anope::string &nick, const Anope::string &reason)
+void Channel::KickInternal(const MessageSource &source, const Anope::string &nick, const Anope::string &reason)
 {
 	User *sender = source.GetUser();
 	User *target = User::Find(nick);
@@ -737,8 +738,7 @@ bool Channel::Kick(BotInfo *bi, User *u, const char *reason, ...)
 	if (MOD_RESULT == EVENT_STOP)
 		return false;
 	IRCD->SendKick(bi, this, u, "%s", buf);
-	MessageSource ms(bi);
-	this->KickInternal(ms, u->nick, buf);
+	this->KickInternal(bi, u->nick, buf);
 	return true;
 }
 

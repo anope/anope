@@ -91,7 +91,7 @@ class MyXMLRPCEvent : public XMLRPCEvent
 
 					XMLRPCommandReply(Anope::string &s) : str(s) { }
 
-					void SendMessage(const BotInfo *source, const Anope::string &msg) anope_override
+					void SendMessage(BotInfo *, const Anope::string &msg) anope_override
 					{
 						str += msg + "\n";
 					};

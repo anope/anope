@@ -105,7 +105,7 @@ class ChanServCore : public Module, public ChanServService
 			defaults.push_back("SIGNKICK");
 		}
 		else if (defaults[0].equals_ci("none"))
-			defaults.erase(defaults.begin());
+			defaults.clear();
 	}
 
 	void OnBotDelete(BotInfo *bi) anope_override

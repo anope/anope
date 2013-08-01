@@ -247,7 +247,7 @@ namespace WebPanel
 
 			MyComandReply(TemplateFileServer::Replacements &_r, const Anope::string &_k) : re(_r), k(_k) { }
 
-			void SendMessage(const BotInfo *source, const Anope::string &msg) anope_override
+			void SendMessage(BotInfo *source, const Anope::string &msg) anope_override
 			{
 				re[k] = msg;
 			}

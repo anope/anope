@@ -56,6 +56,11 @@ class CoreExport Mode : public Base
 	 */
 	Mode(const Anope::string &mname, ModeClass mclass, char mc, ModeType type);
 	virtual ~Mode();
+
+	/** Can a user set this mode, used for mlock
+	 * @param u The user
+	 */
+	virtual bool CanSet(User *u) const;
 };
 
 /** This class is a user mode, all user modes use this/inherit from this
@@ -68,7 +73,6 @@ class CoreExport UserMode : public Mode
 	 * @param mc The mode char
 	 */
 	UserMode(const Anope::string &name, char mc);
-	virtual ~UserMode();
 };
 
 class CoreExport UserModeParam : public UserMode
@@ -97,15 +101,9 @@ class CoreExport ChannelMode : public Mode
 	 * @param mc The mode char
 	 */
 	ChannelMode(const Anope::string &name, char mc);
-	virtual ~ChannelMode();
 
-	/** Can a user set this mode, used for mlock
-	 * NOTE: User CAN be NULL, this is for checking if it can be locked with defcon
-	 * @param u The user, or NULL
-	 */
-	virtual bool CanSet(User *u) const;
+	bool CanSet(User *u) const anope_override;
 };
-
 
 /** This is a mode for lists, eg b/e/I. These modes should inherit from this
  */
@@ -117,10 +115,6 @@ class CoreExport ChannelModeList : public ChannelMode
 	 * @param mc The mode char
 	 */
 	ChannelModeList(const Anope::string &name, char mc);
-
-	/** destructor
-	 */
-	virtual ~ChannelModeList();
 
 	/** Is the mask valid
 	 * @param mask The mask
@@ -161,10 +155,6 @@ class CoreExport ChannelModeParam : public ChannelMode
 	 */
 	ChannelModeParam(const Anope::string &name, char mc, bool minus_no_arg = false);
 
-	/** destructor
-	 */
-	virtual ~ChannelModeParam();
-
 	/* Should we send an arg when unsetting this mode? */
 	bool minus_no_arg;
 
@@ -194,10 +184,6 @@ class CoreExport ChannelModeStatus : public ChannelMode
 	 * @param mlevel A level for the mode, which is usually determined by the PREFIX capab
 	 */
 	ChannelModeStatus(const Anope::string &name, char mc, char msymbol, short mlevel);
-
-	/** destructor
-	 */
-	virtual ~ChannelModeStatus();
 };
 
 /* The status a user has on a channel (+v, +h, +o) etc */
@@ -216,6 +202,22 @@ class CoreExport ChannelStatus
 	Anope::string BuildModePrefixList() const;
 };
 
+class CoreExport UserModeOperOnly : public UserMode
+{
+ public:
+	UserModeOperOnly(const Anope::string &mname, char um) : UserMode(mname, um) { }
+
+	bool CanSet(User *u) const anope_override;
+};
+
+class CoreExport UserModeNoone : public UserMode
+{
+ public:
+	UserModeNoone(const Anope::string &mname, char um) : UserMode(mname, um) { }
+
+	bool CanSet(User *u) const anope_override;
+};
+
 /** Channel mode +k (key)
  */
 class CoreExport ChannelModeKey : public ChannelModeParam
@@ -226,39 +228,24 @@ class CoreExport ChannelModeKey : public ChannelModeParam
 	bool IsValid(const Anope::string &value) const anope_override;
 };
 
-/** This class is used for channel mode +A (Admin only)
- * Only opers can mlock it
+/** This class is used for oper only channel modes
  */
-class CoreExport ChannelModeAdmin : public ChannelMode
+class CoreExport ChannelModeOperOnly : public ChannelMode
 {
  public:
-	ChannelModeAdmin(char mc) : ChannelMode("ADMINONLY", mc) { }
+	ChannelModeOperOnly(const Anope::string &mname, char mc) : ChannelMode(mname, mc) { }
 
 	/* Opers only */
 	bool CanSet(User *u) const anope_override;
 };
 
-/** This class is used for channel mode +O (Opers only)
- * Only opers can mlock it
+/** This class is used for channel modes only servers may set
  */
-class CoreExport ChannelModeOper : public ChannelMode
+class CoreExport ChannelModeNoone : public ChannelMode
 {
  public:
-	ChannelModeOper(char mc) : ChannelMode("OPERONLY", mc) { }
+	ChannelModeNoone(const Anope::string &mname, char mc) : ChannelMode(mname, mc) { }
 
-	/* Opers only */
-	bool CanSet(User *u) const anope_override;
-};
-
-/** This class is used for channel mode +r (registered channel)
- * No one may mlock r
- */
-class CoreExport ChannelModeRegistered : public ChannelMode
-{
- public:
-	ChannelModeRegistered(char mc) : ChannelMode("REGISTERED", mc) { }
-
-	/* No one mlocks +r */
 	bool CanSet(User *u) const anope_override;
 };
 
@@ -347,7 +334,7 @@ class CoreExport ModeManager
 	 * @param set true for setting, false for removing
 	 * @param param The param, if there is one
 	 */
-	static void StackerAdd(const BotInfo *bi, Channel *c, ChannelMode *cm, bool set, const Anope::string &param = "");
+	static void StackerAdd(BotInfo *bi, Channel *c, ChannelMode *cm, bool set, const Anope::string &param = "");
 
 	/** Add a mode to the stacker to be set on a user
 	 * @param bi The client to set the modes from
@@ -356,7 +343,7 @@ class CoreExport ModeManager
 	 * @param set true for setting, false for removing
 	 * @param param The param, if there is one
 	 */
-	static void StackerAdd(const BotInfo *bi, User *u, UserMode *um, bool set, const Anope::string &param = "");
+	static void StackerAdd(BotInfo *bi, User *u, UserMode *um, bool set, const Anope::string &param = "");
 
 	/** Process all of the modes in the stacker and send them to the IRCd to be set on channels/users
 	 */

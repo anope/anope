@@ -27,16 +27,16 @@ class CoreExport IRCDProto : public Service
  public:
 	virtual ~IRCDProto();
 
-	virtual void SendSVSKillInternal(const BotInfo *, User *, const Anope::string &);
-	virtual void SendModeInternal(const BotInfo *, const Channel *, const Anope::string &);
-	virtual void SendModeInternal(const BotInfo *, const User *, const Anope::string &);
-	virtual void SendKickInternal(const BotInfo *, const Channel *, const User *, const Anope::string &);
-	virtual void SendNoticeInternal(const BotInfo *bi, const Anope::string &dest, const Anope::string &msg);
-	virtual void SendPrivmsgInternal(const BotInfo *bi, const Anope::string &dest, const Anope::string &buf);
-	virtual void SendQuitInternal(const User *u, const Anope::string &buf);
-	virtual void SendPartInternal(const BotInfo *bi, const Channel *chan, const Anope::string &buf);
-	virtual void SendGlobopsInternal(const BotInfo *source, const Anope::string &buf);
-	virtual void SendCTCPInternal(const BotInfo *bi, const Anope::string &dest, const Anope::string &buf);
+	virtual void SendSVSKillInternal(const MessageSource &, User *, const Anope::string &);
+	virtual void SendModeInternal(const MessageSource &, const Channel *, const Anope::string &);
+	virtual void SendModeInternal(const MessageSource &, User *, const Anope::string &);
+	virtual void SendKickInternal(const MessageSource &, const Channel *, User *, const Anope::string &);
+	virtual void SendNoticeInternal(const MessageSource &, const Anope::string &dest, const Anope::string &msg);
+	virtual void SendPrivmsgInternal(const MessageSource &, const Anope::string &dest, const Anope::string &buf);
+	virtual void SendQuitInternal(User *, const Anope::string &buf);
+	virtual void SendPartInternal(User *, const Channel *chan, const Anope::string &buf);
+	virtual void SendGlobopsInternal(const MessageSource &, const Anope::string &buf);
+	virtual void SendCTCPInternal(const MessageSource &, const Anope::string &dest, const Anope::string &buf);
 	virtual void SendNumericInternal(int numeric, const Anope::string &dest, const Anope::string &buf);
 
 	const Anope::string &GetProtocolName();
@@ -78,7 +78,7 @@ class CoreExport IRCDProto : public Service
 	 * @param bi The bot to set the topic from
 	 * @param c The channel to set the topic on. The topic being set is Channel::topic
 	 */
-	virtual void SendTopic(BotInfo *, Channel *);
+	virtual void SendTopic(const MessageSource &, Channel *);
 
 	/** Sets a vhost on a user.
 	 * @param u The user
@@ -110,31 +110,31 @@ class CoreExport IRCDProto : public Service
 	virtual void SendSQLineDel(const XLine *x) { }
 
 	/** Kills a user
-	 * @param source The client used to kill the user, if any
+	 * @param source Who is doing the kill
 	 * @param user The user to be killed
 	 * @param fmt Kill reason
 	 */
-	virtual void SendSVSKill(const BotInfo *source, User *user, const char *fmt, ...);
+	virtual void SendSVSKill(const MessageSource &source, User *user, const char *fmt, ...);
 
-	virtual void SendMode(const BotInfo *bi, const Channel *dest, const char *fmt, ...);
-	virtual void SendMode(const BotInfo *bi, const User *u, const char *fmt, ...);
+	virtual void SendMode(const MessageSource &source, const Channel *dest, const char *fmt, ...);
+	virtual void SendMode(const MessageSource &source, User *u, const char *fmt, ...);
 
 	/** Introduces a client to the rest of the network
 	 * @param u The client to introduce
 	 */
-	virtual void SendClientIntroduction(const User *u) = 0;
+	virtual void SendClientIntroduction(User *u) = 0;
 
-	virtual void SendKick(const BotInfo *bi, const Channel *chan, const User *user, const char *fmt, ...);
+	virtual void SendKick(const MessageSource &source, const Channel *chan, User *user, const char *fmt, ...);
 
-	virtual void SendNotice(const BotInfo *bi, const Anope::string &dest, const char *fmt, ...);
-	virtual void SendPrivmsg(const BotInfo *bi, const Anope::string &dest, const char *fmt, ...);
-	virtual void SendAction(const BotInfo *bi, const Anope::string &dest, const char *fmt, ...);
-	virtual void SendCTCP(const BotInfo *bi, const Anope::string &dest, const char *fmt, ...);
+	virtual void SendNotice(const MessageSource &source, const Anope::string &dest, const char *fmt, ...);
+	virtual void SendPrivmsg(const MessageSource &source, const Anope::string &dest, const char *fmt, ...);
+	virtual void SendAction(const MessageSource &source, const Anope::string &dest, const char *fmt, ...);
+	virtual void SendCTCP(const MessageSource &source, const Anope::string &dest, const char *fmt, ...);
 
-	virtual void SendGlobalNotice(const BotInfo *bi, const Server *dest, const Anope::string &msg) = 0;
-	virtual void SendGlobalPrivmsg(const BotInfo *bi, const Server *desc, const Anope::string &msg) = 0;
+	virtual void SendGlobalNotice(BotInfo *bi, const Server *dest, const Anope::string &msg) = 0;
+	virtual void SendGlobalPrivmsg(BotInfo *bi, const Server *desc, const Anope::string &msg) = 0;
 
-	virtual void SendQuit(const User *u, const char *fmt, ...);
+	virtual void SendQuit(User *u, const char *fmt, ...);
 	virtual void SendPing(const Anope::string &servname, const Anope::string &who);
 	virtual void SendPong(const Anope::string &servname, const Anope::string &who);
 
@@ -146,7 +146,7 @@ class CoreExport IRCDProto : public Service
 	 * stacker to be set "soon".
 	 */
 	virtual void SendJoin(User *u, Channel *c, const ChannelStatus *status) = 0;
-	virtual void SendPart(const BotInfo *bi, const Channel *chan, const char *fmt, ...);
+	virtual void SendPart(User *u, const Channel *chan, const char *fmt, ...);
 
 	/** Force joins a user that isn't ours to a channel.
 	 * @param bi The source of the message
@@ -154,30 +154,30 @@ class CoreExport IRCDProto : public Service
 	 * @param chan The channel to join the user to
 	 * @param param Channel key?
 	 */
-	virtual void SendSVSJoin(const BotInfo *bi, const User *u, const Anope::string &chan, const Anope::string &param) { }
+	virtual void SendSVSJoin(const MessageSource &source, User *u, const Anope::string &chan, const Anope::string &param) { }
 
 	/** Force parts a user that isn't ours from a channel.
-	 * @param bi The source of the message
+	 * @param source The source of the message
 	 * @param u The user to part
 	 * @param chan The channel to part the user from
 	 * @param param part reason, some IRCds don't support this
 	 */
-	virtual void SendSVSPart(const BotInfo *bi, const User *u, const Anope::string &chan, const Anope::string &param) { }
+	virtual void SendSVSPart(const MessageSource &source, User *u, const Anope::string &chan, const Anope::string &param) { }
 
-	virtual void SendInvite(const BotInfo *bi, const Channel *c, const User *u);
-	virtual void SendGlobops(const BotInfo *source, const char *fmt, ...);
+	virtual void SendInvite(const MessageSource &source, const Channel *c, User *u);
+	virtual void SendGlobops(const MessageSource &source, const char *fmt, ...);
 
 	/** Sets oper flags on a user, currently only supported by Unreal
 	 */
-	virtual void SendSVSO(const BotInfo *, const Anope::string &, const Anope::string &) { }
+	virtual void SendSVSO(BotInfo *, const Anope::string &, const Anope::string &) { }
 
 	/** Sends a nick change of one of our clients.
 	 */
-	virtual void SendNickChange(const User *u, const Anope::string &newnick);
+	virtual void SendNickChange(User *u, const Anope::string &newnick);
 
 	/** Forces a nick change of a user that isn't ours (SVSNICK)
 	 */
-	virtual void SendForceNickChange(const User *u, const Anope::string &newnick, time_t when);
+	virtual void SendForceNickChange(User *u, const Anope::string &newnick, time_t when);
 
 	/** Used to introduce ourselves to our uplink. Usually will SendServer(Me) and any other
 	 * initial handshake requirements.
@@ -193,7 +193,7 @@ class CoreExport IRCDProto : public Service
 	virtual void SendSVSHold(const Anope::string &, time_t) { }
 	virtual void SendSVSHoldDel(const Anope::string &) { }
 
-	virtual void SendSWhois(const BotInfo *bi, const Anope::string &, const Anope::string &) { }
+	virtual void SendSWhois(const MessageSource &, const Anope::string &, const Anope::string &) { }
 
 	/** Introduces a server to the uplink
 	 */
@@ -237,10 +237,11 @@ class CoreExport MessageSource
 	MessageSource(const Anope::string &);
 	MessageSource(User *u);
 	MessageSource(Server *s);
-	const Anope::string GetName();
-	const Anope::string &GetSource();
-	User *GetUser();
-	Server *GetServer();
+	const Anope::string &GetName() const;
+	const Anope::string &GetSource() const;
+	User *GetUser() const;
+	BotInfo *GetBot() const;
+	Server *GetServer() const;
 };
 
 enum IRCDMessageFlag

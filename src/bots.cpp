@@ -38,7 +38,7 @@ BotInfo::BotInfo(const Anope::string &nnick, const Anope::string &nuser, const A
 	{
 		Anope::string tmodes = !this->botmodes.empty() ? ("+" + this->botmodes) : (IRCD ? IRCD->DefaultPseudoclientModes : "");
 		if (!tmodes.empty())
-			this->SetModesInternal(tmodes.c_str());
+			this->SetModesInternal(this, tmodes.c_str());
 
 		XLine x(this->nick, "Reserved for services");
 		IRCD->SendSQLine(NULL, &x);

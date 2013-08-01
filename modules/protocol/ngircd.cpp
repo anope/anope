@@ -45,7 +45,7 @@ class ngIRCdProto : public IRCDProto
 	}
 
 	// Received: :dev.anope.de NICK DukeP 1 ~DukePyro p57ABF9C9.dip.t-dialin.net 1 +i :DukePyrolator
-	void SendClientIntroduction(const User *u) anope_override
+	void SendClientIntroduction(User *u) anope_override
 	{
 		Anope::string modes = "+" + u->GetModes();
 		UplinkSocket::Message(Me) << "NICK " << u->nick << " 1 " << u->GetIdent() << " " << u->host << " 1 " << modes << " :" << u->realname;
@@ -60,27 +60,24 @@ class ngIRCdProto : public IRCDProto
 		this->SendNumeric(376, "*", ":End of MOTD command");
 	}
 
-	void SendForceNickChange(const User *u, const Anope::string &newnick, time_t when) anope_override
+	void SendForceNickChange(User *u, const Anope::string &newnick, time_t when) anope_override
 	{
 		UplinkSocket::Message(Me) << "SVSNICK " << u->nick << " " << newnick;
 	}
 
-	void SendGlobalNotice(const BotInfo *bi, const Server *dest, const Anope::string &msg) anope_override
+	void SendGlobalNotice(BotInfo *bi, const Server *dest, const Anope::string &msg) anope_override
 	{
 		UplinkSocket::Message(bi) << "NOTICE $" << dest->GetName() << " :" << msg;
 	}
 
-	void SendGlobalPrivmsg(const BotInfo *bi, const Server *dest, const Anope::string &msg) anope_override
+	void SendGlobalPrivmsg(BotInfo *bi, const Server *dest, const Anope::string &msg) anope_override
 	{
 		UplinkSocket::Message(bi) << "PRIVMSG $" << dest->GetName() << " :" << msg;
 	}
 
-	void SendGlobopsInternal(const BotInfo *source, const Anope::string &buf) anope_override
+	void SendGlobopsInternal(const MessageSource &source, const Anope::string &buf) anope_override
 	{
-		if (source)
-			UplinkSocket::Message(source) << "WALLOPS :" << buf;
-		else
-			UplinkSocket::Message(Me) << "WALLOPS :" << buf;
+		UplinkSocket::Message(source) << "WALLOPS :" << buf;
 	}
 
 	void SendJoin(User *user, Channel *c, const ChannelStatus *status) anope_override
@@ -103,32 +100,29 @@ class ngIRCdProto : public IRCDProto
 		}
 	}
 
-	void SendKickInternal(const BotInfo *bi, const Channel *chan, const User *user, const Anope::string &buf) anope_override
+	void SendKickInternal(const MessageSource &source, const Channel *chan, User *user, const Anope::string &buf) anope_override
 	{
 		if (!buf.empty())
-			UplinkSocket::Message(bi) << "KICK " << chan->name << " " << user->nick << " :" << buf;
+			UplinkSocket::Message(source) << "KICK " << chan->name << " " << user->nick << " :" << buf;
 		else
-			UplinkSocket::Message(bi) << "KICK " << chan->name << " " << user->nick;
+			UplinkSocket::Message(source) << "KICK " << chan->name << " " << user->nick;
 	}
 
 	void SendLogin(User *u) anope_override { }
 
 	void SendLogout(User *u) anope_override { } 
 
-	void SendModeInternal(const BotInfo *bi, const Channel *dest, const Anope::string &buf) anope_override
+	void SendModeInternal(const MessageSource &source, const Channel *dest, const Anope::string &buf) anope_override
 	{
-		if (bi)
-			UplinkSocket::Message(bi) << "MODE " << dest->name << " " << buf;
-		else
-			UplinkSocket::Message(Me) << "MODE " << dest->name << " " << buf;
+		UplinkSocket::Message(source) << "MODE " << dest->name << " " << buf;
 	}
 
-	void SendPartInternal(const BotInfo *bi, const Channel *chan, const Anope::string &buf) anope_override
+	void SendPartInternal(User *u, const Channel *chan, const Anope::string &buf) anope_override
 	{
 		if (!buf.empty())
-			UplinkSocket::Message(bi) << "PART " << chan->name << " :" << buf;
+			UplinkSocket::Message(u) << "PART " << chan->name << " :" << buf;
 		else
-			UplinkSocket::Message(bi) << "PART " << chan->name;
+			UplinkSocket::Message(u) << "PART " << chan->name;
 	}
 
 	/* SERVER name hop descript */
@@ -137,9 +131,9 @@ class ngIRCdProto : public IRCDProto
 		UplinkSocket::Message() << "SERVER " << server->GetName() << " " << server->GetHops() << " :" << server->GetDescription();
 	}
 
-	void SendTopic(BotInfo *bi, Channel *c) anope_override
+	void SendTopic(const MessageSource &source, Channel *c) anope_override
 	{
-		UplinkSocket::Message(bi) << "TOPIC " << c->name << " :" << c->topic;
+		UplinkSocket::Message(source) << "TOPIC " << c->name << " :" << c->topic;
 	}
 
 	void SendVhost(User *u, const Anope::string &vIdent, const Anope::string &vhost) anope_override
@@ -382,7 +376,7 @@ struct IRCDMessageMode : IRCDMessage
 			User *u = User::Find(params[0]);
 
 			if (u)
-				u->SetModesInternal("%s", params[1].c_str());
+				u->SetModesInternal(source, "%s", params[1].c_str());
 		}
 	}
 };
@@ -604,11 +598,11 @@ class ProtongIRCd : public Module
 		ModeManager::AddUserMode(new UserMode("BOT", 'B'));
 		ModeManager::AddUserMode(new UserMode("COMMONCHANS", 'C'));
 		ModeManager::AddUserMode(new UserMode("INVIS", 'i'));
-		ModeManager::AddUserMode(new UserMode("OPER", 'o'));
-		ModeManager::AddUserMode(new UserMode("PROTECTED", 'q'));
-		ModeManager::AddUserMode(new UserMode("RESTRICTED", 'r'));
-		ModeManager::AddUserMode(new UserMode("REGISTERED", 'R'));
-		ModeManager::AddUserMode(new UserMode("SNOMASK", 's'));
+		ModeManager::AddUserMode(new UserModeOperOnly("OPER", 'o'));
+		ModeManager::AddUserMode(new UserModeOperOnly("PROTECTED", 'q'));
+		ModeManager::AddUserMode(new UserModeOperOnly("RESTRICTED", 'r'));
+		ModeManager::AddUserMode(new UserModeNoone("REGISTERED", 'R'));
+		ModeManager::AddUserMode(new UserModeOperOnly("SNOMASK", 's'));
 		ModeManager::AddUserMode(new UserMode("WALLOPS", 'w'));
 		ModeManager::AddUserMode(new UserMode("CLOAK", 'x'));
 
@@ -634,7 +628,7 @@ class ProtongIRCd : public Module
 		ModeManager::AddChannelMode(new ChannelMode("OPERONLY", 'O'));
 		ModeManager::AddChannelMode(new ChannelMode("PERM", 'P'));
 		ModeManager::AddChannelMode(new ChannelMode("NOKICK", 'Q'));
-		ModeManager::AddChannelMode(new ChannelModeRegistered('r'));
+		ModeManager::AddChannelMode(new ChannelModeNoone("REGISTERED", 'r'));
 		ModeManager::AddChannelMode(new ChannelMode("REGISTEREDONLY", 'R'));
 		ModeManager::AddChannelMode(new ChannelMode("SECRET", 's'));
 		ModeManager::AddChannelMode(new ChannelMode("TOPIC", 't'));
@@ -663,7 +657,7 @@ class ProtongIRCd : public Module
 
 	void OnUserNickChange(User *u, const Anope::string &) anope_override
 	{
-		u->RemoveModeInternal(ModeManager::FindUserModeByName("REGISTERED"));
+		u->RemoveModeInternal(Me, ModeManager::FindUserModeByName("REGISTERED"));
 	}
 };
 

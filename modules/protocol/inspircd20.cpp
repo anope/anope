@@ -42,16 +42,16 @@ class InspIRCd20Proto : public IRCDProto
 		insp12->SendConnect();
 	}
 
-	void SendSVSKillInternal(const BotInfo *source, User *user, const Anope::string &buf) anope_override { insp12->SendSVSKillInternal(source, user, buf); }
-	void SendGlobalNotice(const BotInfo *bi, const Server *dest, const Anope::string &msg) anope_override { insp12->SendGlobalNotice(bi, dest, msg); }
-	void SendGlobalPrivmsg(const BotInfo *bi, const Server *dest, const Anope::string &msg) anope_override { insp12->SendGlobalPrivmsg(bi, dest, msg); }
+	void SendSVSKillInternal(const MessageSource &source, User *user, const Anope::string &buf) anope_override { insp12->SendSVSKillInternal(source, user, buf); }
+	void SendGlobalNotice(BotInfo *bi, const Server *dest, const Anope::string &msg) anope_override { insp12->SendGlobalNotice(bi, dest, msg); }
+	void SendGlobalPrivmsg(BotInfo *bi, const Server *dest, const Anope::string &msg) anope_override { insp12->SendGlobalPrivmsg(bi, dest, msg); }
 	void SendAkillDel(const XLine *x) anope_override { insp12->SendAkillDel(x); }
-	void SendTopic(BotInfo *whosets, Channel *c) anope_override { insp12->SendTopic(whosets, c); };
+	void SendTopic(const MessageSource &whosets, Channel *c) anope_override { insp12->SendTopic(whosets, c); };
 	void SendVhostDel(User *u) anope_override { insp12->SendVhostDel(u); }
 	void SendAkill(User *u, XLine *x) anope_override { insp12->SendAkill(u, x); }
 	void SendNumericInternal(int numeric, const Anope::string &dest, const Anope::string &buf) anope_override { insp12->SendNumericInternal(numeric, dest, buf); }
-	void SendModeInternal(const BotInfo *source, const Channel *dest, const Anope::string &buf) anope_override { insp12->SendModeInternal(source, dest, buf); }
-	void SendClientIntroduction(const User *u) anope_override { insp12->SendClientIntroduction(u); }
+	void SendModeInternal(const MessageSource &source, const Channel *dest, const Anope::string &buf) anope_override { insp12->SendModeInternal(source, dest, buf); }
+	void SendClientIntroduction(User *u) anope_override { insp12->SendClientIntroduction(u); }
 	void SendServer(const Server *server) anope_override { insp12->SendServer(server); }
 	void SendSquit(Server *s, const Anope::string &message) anope_override { insp12->SendSquit(s, message); }
 	void SendJoin(User *user, Channel *c, const ChannelStatus *status) anope_override { insp12->SendJoin(user, c, status); }
@@ -62,12 +62,12 @@ class InspIRCd20Proto : public IRCDProto
 	void SendSVSHoldDel(const Anope::string &nick) anope_override { insp12->SendSVSHoldDel(nick); }
 	void SendSZLineDel(const XLine *x) anope_override { insp12->SendSZLineDel(x); }
 	void SendSZLine(User *u, const XLine *x) anope_override { insp12->SendSZLine(u, x); }
-	void SendSVSJoin(const BotInfo *source, const User *u, const Anope::string &chan, const Anope::string &other) anope_override { insp12->SendSVSJoin(source, u, chan, other); }
-	void SendSVSPart(const BotInfo *source, const User *u, const Anope::string &chan, const Anope::string &param) anope_override { insp12->SendSVSPart(source, u, chan, param); }
-	void SendSWhois(const BotInfo *bi, const Anope::string &who, const Anope::string &mask) anope_override { insp12->SendSWhois(bi, who, mask); }
+	void SendSVSJoin(const MessageSource &source, User *u, const Anope::string &chan, const Anope::string &other) anope_override { insp12->SendSVSJoin(source, u, chan, other); }
+	void SendSVSPart(const MessageSource &source, User *u, const Anope::string &chan, const Anope::string &param) anope_override { insp12->SendSVSPart(source, u, chan, param); }
+	void SendSWhois(const MessageSource &bi, const Anope::string &who, const Anope::string &mask) anope_override { insp12->SendSWhois(bi, who, mask); }
 	void SendBOB() anope_override { insp12->SendBOB(); }
 	void SendEOB() anope_override { insp12->SendEOB(); }
-	void SendGlobopsInternal(const BotInfo *source, const Anope::string &buf) { insp12->SendGlobopsInternal(source, buf); }
+	void SendGlobopsInternal(const MessageSource &source, const Anope::string &buf) { insp12->SendGlobopsInternal(source, buf); }
 	void SendLogin(User *u) anope_override { insp12->SendLogin(u); }
 	void SendLogout(User *u) anope_override { insp12->SendLogout(u); }
 	void SendChannel(Channel *c) anope_override { insp12->SendChannel(c); }
@@ -313,7 +313,7 @@ struct IRCDMessageCapab : Message::Capab
 				else if (modename.equals_cs("blockcolor"))
 					cm = new ChannelMode("BLOCKCOLOR", modechar[0]);
 				else if (modename.equals_cs("c_registered"))
-					cm = new ChannelModeRegistered(modechar[0]);
+					cm = new ChannelModeNoone("REGISTERED", modechar[0]);
 				else if (modename.equals_cs("censor"))
 					cm = new ChannelMode("FILTER", modechar[0]);
 				else if (modename.equals_cs("delayjoin"))
@@ -361,7 +361,7 @@ struct IRCDMessageCapab : Message::Capab
 				else if (modename.equals_cs("op"))
 					cm = new ChannelModeStatus("OP", modechar.length() > 1 ? modechar[1] : modechar[0], modechar.length() > 1 ? modechar[0] : 0, 2);
 				else if (modename.equals_cs("operonly"))
-					cm = new ChannelModeOper(modechar[0]);
+					cm = new ChannelModeOperOnly("OPERONLY", modechar[0]);
 				else if (modename.equals_cs("permanent"))
 					cm = new ChannelMode("PERM", modechar[0]);
 				else if (modename.equals_cs("private"))
@@ -415,30 +415,30 @@ struct IRCDMessageCapab : Message::Capab
 				else if (modename.equals_cs("deaf_commonchan"))
 					um = new UserMode("COMMONCHANS", modechar[0]);
 				else if (modename.equals_cs("helpop"))
-					um = new UserMode("HELPOP", modechar[0]);
+					um = new UserModeOperOnly("HELPOP", modechar[0]);
 				else if (modename.equals_cs("hidechans"))
 					um = new UserMode("PRIV", modechar[0]);
 				else if (modename.equals_cs("hideoper"))
-					um = new UserMode("HIDEOPER", modechar[0]);
+					um = new UserModeOperOnly("HIDEOPER", modechar[0]);
 				else if (modename.equals_cs("invisible"))
 					um = new UserMode("INVIS", modechar[0]);
 				else if (modename.equals_cs("invis-oper"))
-					um = new UserMode("INVISIBLE_OPER", modechar[0]);
+					um = new UserModeOperOnly("INVISIBLE_OPER", modechar[0]);
 				else if (modename.equals_cs("oper"))
-					um = new UserMode("OPER", modechar[0]);
+					um = new UserModeOperOnly("OPER", modechar[0]);
 				else if (modename.equals_cs("regdeaf"))
 					um = new UserMode("REGPRIV", modechar[0]);
 				else if (modename.equals_cs("servprotect"))
 				{
-					um = new UserMode("PROTECTED", modechar[0]);
-					IRCD->DefaultPseudoclientModes += "k";
+					um = new UserModeNoone("PROTECTED", modechar[0]);
+					IRCD->DefaultPseudoclientModes += modechar;
 				}
 				else if (modename.equals_cs("showwhois"))
 					um = new UserMode("WHOIS", modechar[0]);
 				else if (modename.equals_cs("u_censor"))
 					um = new UserMode("FILTER", modechar[0]);
 				else if (modename.equals_cs("u_registered"))
-					um = new UserMode("REGISTERED", modechar[0]);
+					um = new UserModeNoone("REGISTERED", modechar[0]);
 				else if (modename.equals_cs("u_stripcolor"))
 					um = new UserMode("STRIPCOLOR", modechar[0]);
 				else if (modename.equals_cs("wallops"))
@@ -751,7 +751,7 @@ class ProtoInspIRCd : public Module
 
 	void OnUserNickChange(User *u, const Anope::string &) anope_override
 	{
-		u->RemoveModeInternal(ModeManager::FindUserModeByName("REGISTERED"));
+		u->RemoveModeInternal(Me, ModeManager::FindUserModeByName("REGISTERED"));
 	}
 
 	void OnChannelSync(Channel *c) anope_override

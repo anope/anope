@@ -44,40 +44,40 @@ const Anope::string &IRCDProto::GetProtocolName()
 	return this->proto_name;
 }
 
-void IRCDProto::SendSVSKillInternal(const BotInfo *source, User *user, const Anope::string &buf)
+void IRCDProto::SendSVSKillInternal(const MessageSource &source, User *user, const Anope::string &buf)
 {
 	UplinkSocket::Message(source) << "KILL " << user->GetUID() << " :" << buf;
 }
 
-void IRCDProto::SendModeInternal(const BotInfo *bi, const Channel *dest, const Anope::string &buf)
+void IRCDProto::SendModeInternal(const MessageSource &source, const Channel *dest, const Anope::string &buf)
 {
-	UplinkSocket::Message(bi) << "MODE " << dest->name << " " << buf;
+	UplinkSocket::Message(source) << "MODE " << dest->name << " " << buf;
 }
 
-void IRCDProto::SendModeInternal(const BotInfo *bi, const User *dest, const Anope::string &buf)
+void IRCDProto::SendModeInternal(const MessageSource &source, User *dest, const Anope::string &buf)
 {
-	UplinkSocket::Message(bi) << "MODE " << dest->GetUID() << " " << buf;
+	UplinkSocket::Message(source) << "MODE " << dest->GetUID() << " " << buf;
 }
 
-void IRCDProto::SendKickInternal(const BotInfo *bi, const Channel *c, const User *u, const Anope::string &r)
+void IRCDProto::SendKickInternal(const MessageSource &source, const Channel *c, User *u, const Anope::string &r)
 {
 	if (!r.empty())
-		UplinkSocket::Message(bi) << "KICK " << c->name << " " << u->GetUID() << " :" << r;
+		UplinkSocket::Message(source) << "KICK " << c->name << " " << u->GetUID() << " :" << r;
 	else
-		UplinkSocket::Message(bi) << "KICK " << c->name << " " << u->GetUID();
+		UplinkSocket::Message(source) << "KICK " << c->name << " " << u->GetUID();
 }
 
-void IRCDProto::SendNoticeInternal(const BotInfo *bi, const Anope::string &dest, const Anope::string &msg)
+void IRCDProto::SendNoticeInternal(const MessageSource &source, const Anope::string &dest, const Anope::string &msg)
 {
-	UplinkSocket::Message(bi) << "NOTICE " << dest << " :" << msg;
+	UplinkSocket::Message(source) << "NOTICE " << dest << " :" << msg;
 }
 
-void IRCDProto::SendPrivmsgInternal(const BotInfo *bi, const Anope::string &dest, const Anope::string &buf)
+void IRCDProto::SendPrivmsgInternal(const MessageSource &source, const Anope::string &dest, const Anope::string &buf)
 {
-	UplinkSocket::Message(bi) << "PRIVMSG " << dest << " :" << buf;
+	UplinkSocket::Message(source) << "PRIVMSG " << dest << " :" << buf;
 }
 
-void IRCDProto::SendQuitInternal(const User *u, const Anope::string &buf)
+void IRCDProto::SendQuitInternal(User *u, const Anope::string &buf)
 {
 	if (!buf.empty())
 		UplinkSocket::Message(u) << "QUIT :" << buf;
@@ -85,26 +85,23 @@ void IRCDProto::SendQuitInternal(const User *u, const Anope::string &buf)
 		UplinkSocket::Message(u) << "QUIT";
 }
 
-void IRCDProto::SendPartInternal(const BotInfo *bi, const Channel *chan, const Anope::string &buf)
+void IRCDProto::SendPartInternal(User *u, const Channel *chan, const Anope::string &buf)
 {
 	if (!buf.empty())
-		UplinkSocket::Message(bi) << "PART " << chan->name << " :" << buf;
+		UplinkSocket::Message(u) << "PART " << chan->name << " :" << buf;
 	else
-		UplinkSocket::Message(bi) << "PART " << chan->name;
+		UplinkSocket::Message(u) << "PART " << chan->name;
 }
 
-void IRCDProto::SendGlobopsInternal(const BotInfo *source, const Anope::string &buf)
+void IRCDProto::SendGlobopsInternal(const MessageSource &source, const Anope::string &buf)
 {
-	if (source)
-		UplinkSocket::Message(source) << "GLOBOPS :" << buf;
-	else
-		UplinkSocket::Message(Me) << "GLOBOPS :" << buf;
+	UplinkSocket::Message(source) << "GLOBOPS :" << buf;
 }
 
-void IRCDProto::SendCTCPInternal(const BotInfo *bi, const Anope::string &dest, const Anope::string &buf)
+void IRCDProto::SendCTCPInternal(const MessageSource &source, const Anope::string &dest, const Anope::string &buf)
 {
 	Anope::string s = Anope::NormalizeBuffer(buf);
-	this->SendNoticeInternal(bi, dest, "\1" + s + "\1");
+	this->SendNoticeInternal(source, dest, "\1" + s + "\1");
 }
 
 void IRCDProto::SendNumericInternal(int numeric, const Anope::string &dest, const Anope::string &buf)
@@ -117,12 +114,12 @@ void IRCDProto::SendNumericInternal(int numeric, const Anope::string &dest, cons
 	UplinkSocket::Message(Me) << n << " " << dest << " " << buf;
 }
 
-void IRCDProto::SendTopic(BotInfo *bi, Channel *c)
+void IRCDProto::SendTopic(const MessageSource &source, Channel *c)
 {
-	UplinkSocket::Message(bi) << "TOPIC " << c->name << " :" << c->topic;
+	UplinkSocket::Message(source) << "TOPIC " << c->name << " :" << c->topic;
 }
 
-void IRCDProto::SendSVSKill(const BotInfo *source, User *user, const char *fmt, ...)
+void IRCDProto::SendSVSKill(const MessageSource &source, User *user, const char *fmt, ...)
 {
 	if (!user || !fmt)
 		return;
@@ -135,29 +132,29 @@ void IRCDProto::SendSVSKill(const BotInfo *source, User *user, const char *fmt, 
 	SendSVSKillInternal(source, user, buf);
 }
 
-void IRCDProto::SendMode(const BotInfo *bi, const Channel *dest, const char *fmt, ...)
+void IRCDProto::SendMode(const MessageSource &source, const Channel *dest, const char *fmt, ...)
 {
 	va_list args;
 	char buf[BUFSIZE] = "";
 	va_start(args, fmt);
 	vsnprintf(buf, BUFSIZE - 1, fmt, args);
 	va_end(args);
-	SendModeInternal(bi, dest, buf);
+	SendModeInternal(source, dest, buf);
 }
 
-void IRCDProto::SendMode(const BotInfo *bi, const User *u, const char *fmt, ...)
+void IRCDProto::SendMode(const MessageSource &source, User *u, const char *fmt, ...)
 {
 	va_list args;
 	char buf[BUFSIZE] = "";
 	va_start(args, fmt);
 	vsnprintf(buf, BUFSIZE - 1, fmt, args);
 	va_end(args);
-	SendModeInternal(bi, u, buf);
+	SendModeInternal(source, u, buf);
 }
 
-void IRCDProto::SendKick(const BotInfo *bi, const Channel *chan, const User *user, const char *fmt, ...)
+void IRCDProto::SendKick(const MessageSource &source, const Channel *chan, User *user, const char *fmt, ...)
 {
-	if (!bi || !chan || !user)
+	if (!chan || !user)
 		return;
 
 	va_list args;
@@ -165,20 +162,20 @@ void IRCDProto::SendKick(const BotInfo *bi, const Channel *chan, const User *use
 	va_start(args, fmt);
 	vsnprintf(buf, BUFSIZE - 1, fmt, args);
 	va_end(args);
-	SendKickInternal(bi, chan, user, buf);
+	SendKickInternal(source, chan, user, buf);
 }
 
-void IRCDProto::SendNotice(const BotInfo *bi, const Anope::string &dest, const char *fmt, ...)
+void IRCDProto::SendNotice(const MessageSource &source, const Anope::string &dest, const char *fmt, ...)
 {
 	va_list args;
 	char buf[BUFSIZE] = "";
 	va_start(args, fmt);
 	vsnprintf(buf, BUFSIZE - 1, fmt, args);
 	va_end(args);
-	SendNoticeInternal(bi, dest, buf);
+	SendNoticeInternal(source, dest, buf);
 }
 
-void IRCDProto::SendAction(const BotInfo *bi, const Anope::string &dest, const char *fmt, ...)
+void IRCDProto::SendAction(const MessageSource &source, const Anope::string &dest, const char *fmt, ...)
 {
 	va_list args;
 	char buf[BUFSIZE] = "";
@@ -186,20 +183,20 @@ void IRCDProto::SendAction(const BotInfo *bi, const Anope::string &dest, const c
 	vsnprintf(buf, BUFSIZE - 1, fmt, args);
 	va_end(args);
 	Anope::string actionbuf = Anope::string("\1ACTION ") + buf + '\1';
-	SendPrivmsgInternal(bi, dest, actionbuf);
+	SendPrivmsgInternal(source, dest, actionbuf);
 }
 
-void IRCDProto::SendPrivmsg(const BotInfo *bi, const Anope::string &dest, const char *fmt, ...)
+void IRCDProto::SendPrivmsg(const MessageSource &source, const Anope::string &dest, const char *fmt, ...)
 {
 	va_list args;
 	char buf[BUFSIZE] = "";
 	va_start(args, fmt);
 	vsnprintf(buf, BUFSIZE - 1, fmt, args);
 	va_end(args);
-	SendPrivmsgInternal(bi, dest, buf);
+	SendPrivmsgInternal(source, dest, buf);
 }
 
-void IRCDProto::SendQuit(const User *u, const char *fmt, ...)
+void IRCDProto::SendQuit(User *u, const char *fmt, ...)
 {
 	va_list args;
 	char buf[BUFSIZE] = "";
@@ -231,12 +228,12 @@ void IRCDProto::SendPong(const Anope::string &servname, const Anope::string &who
 		UplinkSocket::Message(Me) << "PONG " << servname << " " << who;
 }
 
-void IRCDProto::SendInvite(const BotInfo *bi, const Channel *c, const User *u)
+void IRCDProto::SendInvite(const MessageSource &source, const Channel *c, User *u)
 {
-	UplinkSocket::Message(bi) << "INVITE " << u->GetUID() << " " << c->name;
+	UplinkSocket::Message(source) << "INVITE " << u->GetUID() << " " << c->name;
 }
 
-void IRCDProto::SendPart(const BotInfo *bi, const Channel *chan, const char *fmt, ...)
+void IRCDProto::SendPart(User *user, const Channel *chan, const char *fmt, ...)
 {
 	if (fmt)
 	{
@@ -245,13 +242,13 @@ void IRCDProto::SendPart(const BotInfo *bi, const Channel *chan, const char *fmt
 		va_start(args, fmt);
 		vsnprintf(buf, BUFSIZE - 1, fmt, args);
 		va_end(args);
-		SendPartInternal(bi, chan, buf);
+		SendPartInternal(user, chan, buf);
 	}
 	else
-		SendPartInternal(bi, chan, "");
+		SendPartInternal(user, chan, "");
 }
 
-void IRCDProto::SendGlobops(const BotInfo *source, const char *fmt, ...)
+void IRCDProto::SendGlobops(const MessageSource &source, const char *fmt, ...)
 {
 	va_list args;
 	char buf[BUFSIZE] = "";
@@ -266,24 +263,24 @@ void IRCDProto::SendSquit(Server *s, const Anope::string &message)
 	UplinkSocket::Message() << "SQUIT " << s->GetSID() << " :" << message;
 }
 
-void IRCDProto::SendNickChange(const User *u, const Anope::string &newnick)
+void IRCDProto::SendNickChange(User *u, const Anope::string &newnick)
 {
 	UplinkSocket::Message(u) << "NICK " << newnick << " " << Anope::CurTime;
 }
 
-void IRCDProto::SendForceNickChange(const User *u, const Anope::string &newnick, time_t when)
+void IRCDProto::SendForceNickChange(User *u, const Anope::string &newnick, time_t when)
 {
 	UplinkSocket::Message() << "SVSNICK " << u->nick << " " << newnick << " " << when;
 }
 
-void IRCDProto::SendCTCP(const BotInfo *bi, const Anope::string &dest, const char *fmt, ...)
+void IRCDProto::SendCTCP(const MessageSource &source, const Anope::string &dest, const char *fmt, ...)
 {
 	va_list args;
 	char buf[BUFSIZE] = "";
 	va_start(args, fmt);
 	vsnprintf(buf, BUFSIZE - 1, fmt, args);
 	va_end(args);
-	SendCTCPInternal(bi, dest, buf);
+	SendCTCPInternal(source, dest, buf);
 }
 
 void IRCDProto::SendNumeric(int numeric, const Anope::string &dest, const char *fmt, ...)
@@ -382,6 +379,7 @@ unsigned IRCDProto::GetMaxListFor(Channel *c)
 
 MessageSource::MessageSource(const Anope::string &src) : source(src), u(NULL), s(NULL)
 {
+	/* no source for incoming message is our uplink */
 	if (src.empty())
 		this->s = Servers::GetUplink();
 	else if (IRCD->RequiresID || src.find('.') != Anope::string::npos)
@@ -398,7 +396,7 @@ MessageSource::MessageSource(Server *_s) : source(_s ? _s->GetName() : ""), u(NU
 {
 }
 
-const Anope::string MessageSource::GetName()
+const Anope::string &MessageSource::GetName() const
 {
 	if (this->s)
 		return this->s->GetName();
@@ -408,17 +406,22 @@ const Anope::string MessageSource::GetName()
 		return this->source;
 }
 
-const Anope::string &MessageSource::GetSource()
+const Anope::string &MessageSource::GetSource() const
 {
 	return this->source;
 }
 
-User *MessageSource::GetUser()
+User *MessageSource::GetUser() const
 {
 	return this->u;
 }
 
-Server *MessageSource::GetServer()
+BotInfo *MessageSource::GetBot() const
+{
+	return BotInfo::Find(this->GetName(), true);
+}
+
+Server *MessageSource::GetServer() const
 {
 	return this->s;
 }

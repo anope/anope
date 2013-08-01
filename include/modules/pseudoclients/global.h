@@ -13,7 +13,7 @@ class GlobalService : public Service
 	 * @param source The sender of the global
 	 * @param message The message
 	 */
-	virtual void SendGlobal(const BotInfo *sender, const Anope::string &source, const Anope::string &message) = 0;
+	virtual void SendGlobal(BotInfo *sender, const Anope::string &source, const Anope::string &message) = 0;
 };
 
 #endif // GLOBAL_H

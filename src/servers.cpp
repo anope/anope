@@ -53,7 +53,7 @@ Server::Server(Server *up, const Anope::string &sname, unsigned shops, const Ano
 				BotInfo *bi = it->second;
 				Anope::string modes = !bi->botmodes.empty() ? ("+" + bi->botmodes) : IRCD->DefaultPseudoclientModes;
 
-				bi->SetModesInternal(modes.c_str());
+				bi->SetModesInternal(bi, modes.c_str());
 				for (unsigned i = 0; i < bi->botchannels.size(); ++i)
 				{
 					size_t h = bi->botchannels[i].find('#');
@@ -297,7 +297,7 @@ bool Server::IsJuped() const
 	return juped;
 }
 
-void Server::Notice(const BotInfo *source, const Anope::string &message)
+void Server::Notice(BotInfo *source, const Anope::string &message)
 {
 	if (Config->UsePrivmsg && Config->DefPrivmsg)
 		IRCD->SendGlobalPrivmsg(source, this, message);

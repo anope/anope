@@ -13,6 +13,7 @@
 #include "sockets.h"
 #include "protocol.h"
 #include "channels.h"
+#include "uplink.h"
 
 struct StackerInfo;
 
@@ -40,7 +41,7 @@ struct StackerInfo
 	/* Modes to be deleted */
 	std::list<std::pair<Mode *, Anope::string> > DelModes;
 	/* Bot this is sent from */
-	const BotInfo *bi;
+	BotInfo *bi;
 
 	StackerInfo() : bi(NULL) { }
 
@@ -116,11 +117,12 @@ Mode::~Mode()
 {
 }
 
-UserMode::UserMode(const Anope::string &un, char mch) : Mode(un, MC_USER, mch, MODE_REGULAR)
+bool Mode::CanSet(User *u) const
 {
+	return true;
 }
 
-UserMode::~UserMode()
+UserMode::UserMode(const Anope::string &un, char mch) : Mode(un, MC_USER, mch, MODE_REGULAR)
 {
 }
 
@@ -130,10 +132,6 @@ UserModeParam::UserModeParam(const Anope::string &un, char mch) : UserMode(un, m
 }
 
 ChannelMode::ChannelMode(const Anope::string &cm, char mch) : Mode(cm, MC_CHANNEL, mch, MODE_REGULAR)
-{
-}
-
-ChannelMode::~ChannelMode()
 {
 }
 
@@ -149,17 +147,9 @@ ChannelModeList::ChannelModeList(const Anope::string &cm, char mch) : ChannelMod
 	this->type = MODE_LIST;
 }
 
-ChannelModeList::~ChannelModeList()
-{
-}
-
 ChannelModeParam::ChannelModeParam(const Anope::string &cm, char mch, bool ma) : ChannelMode(cm, mch), minus_no_arg(ma)
 {
 	this->type = MODE_PARAM;
-}
-
-ChannelModeParam::~ChannelModeParam()
-{
 }
 
 ChannelModeStatus::ChannelModeStatus(const Anope::string &mname, char modeChar, char msymbol, short mlevel) : ChannelMode(mname, modeChar), symbol(msymbol), level(mlevel)
@@ -167,8 +157,14 @@ ChannelModeStatus::ChannelModeStatus(const Anope::string &mname, char modeChar, 
 	this->type = MODE_STATUS;
 }
 
-ChannelModeStatus::~ChannelModeStatus()
+bool UserModeOperOnly::CanSet(User *u) const
 {
+	return u && u->HasMode("OPER");
+}
+
+bool UserModeNoone::CanSet(User *u) const
+{
+	return false;
 }
 
 bool ChannelModeKey::IsValid(const Anope::string &value) const
@@ -179,23 +175,12 @@ bool ChannelModeKey::IsValid(const Anope::string &value) const
 	return false;
 }
 
-bool ChannelModeAdmin::CanSet(User *u) const
+bool ChannelModeOperOnly::CanSet(User *u) const
 {
-	if (u && u->HasMode("OPER"))
-		return true;
-
-	return false;
+	return u && u->HasMode("OPER");
 }
 
-bool ChannelModeOper::CanSet(User *u) const
-{
-	if (u && u->HasMode("OPER"))
-		return true;
-
-	return false;
-}
-
-bool ChannelModeRegistered::CanSet(User *u) const
+bool ChannelModeNoone::CanSet(User *u) const
 {
 	return false;
 }
@@ -526,7 +511,7 @@ void ModeManager::RebuildStatusModes()
 	std::sort(ChannelModesByStatus.begin(), ChannelModesByStatus.end(), statuscmp);
 }
 
-void ModeManager::StackerAdd(const BotInfo *bi, Channel *c, ChannelMode *cm, bool Set, const Anope::string &Param)
+void ModeManager::StackerAdd(BotInfo *bi, Channel *c, ChannelMode *cm, bool Set, const Anope::string &Param)
 {
 	StackerInfo *s = GetInfo(ChannelStackerObjects, c);
 	s->AddMode(cm, Set, Param);
@@ -540,7 +525,7 @@ void ModeManager::StackerAdd(const BotInfo *bi, Channel *c, ChannelMode *cm, boo
 	modePipe->Notify();
 }
 
-void ModeManager::StackerAdd(const BotInfo *bi, User *u, UserMode *um, bool Set, const Anope::string &Param)
+void ModeManager::StackerAdd(BotInfo *bi, User *u, UserMode *um, bool Set, const Anope::string &Param)
 {
 	StackerInfo *s = GetInfo(UserStackerObjects, u);
 	s->AddMode(um, Set, Param);

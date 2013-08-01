@@ -58,17 +58,17 @@ class UnrealIRCdProto : public IRCDProto
 		UplinkSocket::Message() << "TKL - G " << x->GetUser() << " " << x->GetHost() << " " << x->by;
 	}
 
-	void SendTopic(BotInfo *whosets, Channel *c) anope_override
+	void SendTopic(const MessageSource &source, Channel *c) anope_override
 	{
-		UplinkSocket::Message(whosets) << "TOPIC " << c->name << " " << c->topic_setter << " " << c->topic_ts << " :" << c->topic;
+		UplinkSocket::Message(source) << "TOPIC " << c->name << " " << c->topic_setter << " " << c->topic_ts << " :" << c->topic;
 	}
 
-	void SendGlobalNotice(const BotInfo *bi, const Server *dest, const Anope::string &msg) anope_override
+	void SendGlobalNotice(BotInfo *bi, const Server *dest, const Anope::string &msg) anope_override
 	{
 		UplinkSocket::Message(bi) << "NOTICE $" << dest->GetName() << " :" << msg;
 	}
 
-	void SendGlobalPrivmsg(const BotInfo *bi, const Server *dest, const Anope::string &msg) anope_override
+	void SendGlobalPrivmsg(BotInfo *bi, const Server *dest, const Anope::string &msg) anope_override
 	{
 		UplinkSocket::Message(bi) << "PRIVMSG $" << dest->GetName() << " :" << msg;
 	}
@@ -126,18 +126,18 @@ class UnrealIRCdProto : public IRCDProto
 		UplinkSocket::Message() << "TKL + G " << x->GetUser() << " " << x->GetHost() << " " << x->by << " " << Anope::CurTime + timeleft << " " << x->created << " :" << x->GetReason();
 	}
 
-	void SendSVSKillInternal(const BotInfo *source, User *user, const Anope::string &buf) anope_override
+	void SendSVSKillInternal(const MessageSource &source, User *user, const Anope::string &buf) anope_override
 	{
 		UplinkSocket::Message(source) << "SVSKILL " << user->nick << " :" << buf;
-		user->KillInternal(source ? source->nick : Me->GetName(), buf);
+		user->KillInternal(source, buf);
 	}
 
-	void SendModeInternal(const BotInfo *bi, const User *u, const Anope::string &buf) anope_override
+	void SendModeInternal(const MessageSource &source, User *u, const Anope::string &buf) anope_override
 	{
-		UplinkSocket::Message(bi) << "SVS2MODE " << u->nick <<" " << buf;
+		UplinkSocket::Message(source) << "SVS2MODE " << u->nick <<" " << buf;
 	}
 
-	void SendClientIntroduction(const User *u) anope_override
+	void SendClientIntroduction(User *u) anope_override
 	{
 		Anope::string modes = "+" + u->GetModes();
 		UplinkSocket::Message() << "NICK " << u->nick << " 1 " << u->timestamp << " " << u->GetIdent() << " " << u->host << " " << u->server->GetName() << " 0 " << modes << " " << u->host << " * :" << u->realname;
@@ -197,7 +197,7 @@ class UnrealIRCdProto : public IRCDProto
 	**	  parv[1] = nick
 	**	  parv[2] = options
 	*/
-	void SendSVSO(const BotInfo *source, const Anope::string &nick, const Anope::string &flag) anope_override
+	void SendSVSO(BotInfo *source, const Anope::string &nick, const Anope::string &flag) anope_override
 	{
 		UplinkSocket::Message(source) << "SVSO " << nick << " " << flag;
 	}
@@ -294,7 +294,7 @@ class UnrealIRCdProto : public IRCDProto
 	/* In older Unreal SVSJOIN and SVSNLINE tokens were mixed so SVSJOIN and SVSNLINE are broken
 	   when coming from a none TOKEN'd server
 	*/
-	void SendSVSJoin(const BotInfo *source, const User *user, const Anope::string &chan, const Anope::string &param) anope_override
+	void SendSVSJoin(const MessageSource &source, User *user, const Anope::string &chan, const Anope::string &param) anope_override
 	{
 		if (!param.empty())
 			UplinkSocket::Message(source) << "SVSJOIN " << user->GetUID() << " " << chan << " :" << param;
@@ -302,7 +302,7 @@ class UnrealIRCdProto : public IRCDProto
 			UplinkSocket::Message(source) << "SVSJOIN " << user->GetUID() << " " << chan;
 	}
 
-	void SendSVSPart(const BotInfo *source, const User *user, const Anope::string &chan, const Anope::string &param) anope_override
+	void SendSVSPart(const MessageSource &source, User *user, const Anope::string &chan, const Anope::string &param) anope_override
 	{
 		if (!param.empty())
 			UplinkSocket::Message(source) << "SVSPART " << user->GetUID() << " " << chan << " :" << param;
@@ -310,7 +310,7 @@ class UnrealIRCdProto : public IRCDProto
 			UplinkSocket::Message(source) << "SVSPART " << user->GetUID() << " " << chan;
 	}
 
-	void SendSWhois(const BotInfo *source, const Anope::string &who, const Anope::string &mask) anope_override
+	void SendSWhois(const MessageSource &source, const Anope::string &who, const Anope::string &mask) anope_override
 	{
 		UplinkSocket::Message(source) << "SWHOIS " << who << " :" << mask;
 	}
@@ -600,7 +600,7 @@ struct IRCDMessageCapab : Message::Capab
 							ModeManager::AddChannelMode(new ChannelMode("INVITE", 'i'));
 							continue;
 						case 'r':
-							ModeManager::AddChannelMode(new ChannelModeRegistered('r'));
+							ModeManager::AddChannelMode(new ChannelModeNoone("REGISTERED", 'r'));
 							continue;
 						case 'R':
 							ModeManager::AddChannelMode(new ChannelMode("REGISTEREDONLY", 'R'));
@@ -609,10 +609,10 @@ struct IRCDMessageCapab : Message::Capab
 							ModeManager::AddChannelMode(new ChannelMode("BLOCKCOLOR", 'c'));
 							continue;
 						case 'O':
-							ModeManager::AddChannelMode(new ChannelModeOper('O'));
+							ModeManager::AddChannelMode(new ChannelModeOperOnly("OPERONLY", 'O'));
 							continue;
 						case 'A':
-							ModeManager::AddChannelMode(new ChannelModeAdmin('A'));
+							ModeManager::AddChannelMode(new ChannelModeOperOnly("ADMINONLY", 'A'));
 							continue;
 						case 'Q':
 							ModeManager::AddChannelMode(new ChannelMode("NOKICK", 'Q'));
@@ -727,7 +727,7 @@ struct IRCDMessageMode : IRCDMessage
 		{
 			User *u = User::Find(params[0]);
 			if (u)
-				u->SetModesInternal("%s", params[1].c_str());
+				u->SetModesInternal(source, "%s", params[1].c_str());
 		}
 	}
 };
@@ -1108,7 +1108,7 @@ struct IRCDMessageUmode2 : IRCDMessage
 
 	void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		source.GetUser()->SetModesInternal("%s", params[0].c_str());
+		source.GetUser()->SetModesInternal(source, "%s", params[0].c_str());
 	}
 };
 
@@ -1166,32 +1166,32 @@ class ProtoUnreal : public Module
 		ModeManager::AddChannelMode(new ChannelModeStatus("OWNER", 'q', '*', 4));
 
 		/* Add user modes */
-		ModeManager::AddUserMode(new UserMode("SERV_ADMIN", 'A'));
+		ModeManager::AddUserMode(new UserModeOperOnly("SERV_ADMIN", 'A'));
 		ModeManager::AddUserMode(new UserMode("BOT", 'B'));
-		ModeManager::AddUserMode(new UserMode("CO_ADMIN", 'C'));
+		ModeManager::AddUserMode(new UserModeOperOnly("CO_ADMIN", 'C'));
 		ModeManager::AddUserMode(new UserMode("FILTER", 'G'));
-		ModeManager::AddUserMode(new UserMode("HIDEOPER", 'H'));
+		ModeManager::AddUserMode(new UserModeOperOnly("HIDEOPER", 'H'));
 		ModeManager::AddUserMode(new UserMode("HIDEIDLE", 'I'));
-		ModeManager::AddUserMode(new UserMode("NETADMIN", 'N'));
+		ModeManager::AddUserMode(new UserModeOperOnly("NETADMIN", 'N'));
 		ModeManager::AddUserMode(new UserMode("REGPRIV", 'R'));
-		ModeManager::AddUserMode(new UserMode("PROTECTED", 'S'));
+		ModeManager::AddUserMode(new UserModeOperOnly("PROTECTED", 'S'));
 		ModeManager::AddUserMode(new UserMode("NOCTCP", 'T'));
 		ModeManager::AddUserMode(new UserMode("WEBTV", 'V'));
-		ModeManager::AddUserMode(new UserMode("WHOIS", 'W'));
-		ModeManager::AddUserMode(new UserMode("ADMIN", 'a'));
+		ModeManager::AddUserMode(new UserModeOperOnly("WHOIS", 'W'));
+		ModeManager::AddUserMode(new UserModeOperOnly("ADMIN", 'a'));
 		ModeManager::AddUserMode(new UserMode("DEAF", 'd'));
-		ModeManager::AddUserMode(new UserMode("GLOBOPS", 'g'));
-		ModeManager::AddUserMode(new UserMode("HELPOP", 'h'));
+		ModeManager::AddUserMode(new UserModeOperOnly("GLOBOPS", 'g'));
+		ModeManager::AddUserMode(new UserModeOperOnly("HELPOP", 'h'));
 		ModeManager::AddUserMode(new UserMode("INVIS", 'i'));
-		ModeManager::AddUserMode(new UserMode("OPER", 'o'));
+		ModeManager::AddUserMode(new UserModeOperOnly("OPER", 'o'));
 		ModeManager::AddUserMode(new UserMode("PRIV", 'p'));
-		ModeManager::AddUserMode(new UserMode("GOD", 'q'));
-		ModeManager::AddUserMode(new UserMode("REGISTERED", 'r'));
-		ModeManager::AddUserMode(new UserMode("SNOMASK", 's'));
-		ModeManager::AddUserMode(new UserMode("VHOST", 't'));
+		ModeManager::AddUserMode(new UserModeOperOnly("GOD", 'q'));
+		ModeManager::AddUserMode(new UserModeNoone("REGISTERED", 'r'));
+		ModeManager::AddUserMode(new UserModeOperOnly("SNOMASK", 's'));
+		ModeManager::AddUserMode(new UserModeNoone("VHOST", 't'));
 		ModeManager::AddUserMode(new UserMode("WALLOPS", 'w'));
 		ModeManager::AddUserMode(new UserMode("CLOAK", 'x'));
-		ModeManager::AddUserMode(new UserMode("SSL", 'z'));
+		ModeManager::AddUserMode(new UserModeNoone("SSL", 'z'));
 	}
 
  public:
@@ -1221,7 +1221,7 @@ class ProtoUnreal : public Module
 
 	void OnUserNickChange(User *u, const Anope::string &) anope_override
 	{
-		u->RemoveModeInternal(ModeManager::FindUserModeByName("REGISTERED"));
+		u->RemoveModeInternal(Me, ModeManager::FindUserModeByName("REGISTERED"));
 		if (Servers::Capab.count("ESVID") == 0)
 			IRCD->SendLogout(u);
 	}

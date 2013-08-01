@@ -15,7 +15,7 @@ class GlobalCore : public Module, public GlobalService
 {
 	Reference<BotInfo> Global;
 
-	void ServerGlobal(const BotInfo *sender, Server *s, const Anope::string &message)
+	void ServerGlobal(BotInfo *sender, Server *s, const Anope::string &message)
 	{
 		if (s != Me && !s->IsJuped())
 			s->Notice(sender, message);
@@ -29,7 +29,7 @@ class GlobalCore : public Module, public GlobalService
 	{
 	}
 
-	void SendGlobal(const BotInfo *sender, const Anope::string &source, const Anope::string &message) anope_override
+	void SendGlobal(BotInfo *sender, const Anope::string &source, const Anope::string &message) anope_override
 	{
 		if (Me->GetLinks().empty())
 			return;

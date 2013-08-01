@@ -545,7 +545,7 @@ class MChanstats : public Module
 	}
 
  public:
-	void OnPreUserKicked(MessageSource &source, ChanUserContainer *cu, const Anope::string &kickmsg) anope_override
+	void OnPreUserKicked(const MessageSource &source, ChanUserContainer *cu, const Anope::string &kickmsg) anope_override
 	{
 		if (!cu->chan->ci || !cs_stats.HasExt(cu->chan->ci))
 			return;

@@ -294,7 +294,7 @@ class CoreExport Module : public Extensible
 	 * @param cu The user, channel, and status of the user being kicked
 	 * @param kickmsg The reason for the kick.
 	 */
-	virtual void OnPreUserKicked(MessageSource &source, ChanUserContainer *cu, const Anope::string &kickmsg) { throw NotImplementedException(); }
+	virtual void OnPreUserKicked(const MessageSource &source, ChanUserContainer *cu, const Anope::string &kickmsg) { throw NotImplementedException(); }
 
 	/** Called when a user has been kicked from a channel.
 	 * @param source The kicker
@@ -303,7 +303,7 @@ class CoreExport Module : public Extensible
 	 * @param status The status the kicked user had on the channel before they were kicked
 	 * @param kickmsg The reason for the kick.
 	 */
-	virtual void OnUserKicked(MessageSource &source, User *target, const Anope::string &channel, ChannelStatus &status, const Anope::string &kickmsg) { throw NotImplementedException(); }
+	virtual void OnUserKicked(const MessageSource &source, User *target, const Anope::string &channel, ChannelStatus &status, const Anope::string &kickmsg) { throw NotImplementedException(); }
 
 	/** Called when Services' configuration is being (re)loaded.
 	 * @param conf The config that is being built now and will replace the global Config object
@@ -908,16 +908,18 @@ class CoreExport Module : public Extensible
 	virtual EventReturn OnChannelModeUnset(Channel *c, MessageSource &setter, ChannelMode *mode, const Anope::string &param) { throw NotImplementedException(); }
 
 	/** Called when a mode is set on a user
+	 * @param setter who/what is setting the mode
 	 * @param u The user
 	 * @param mname The mode name
 	 */
-	virtual void OnUserModeSet(User *u, const Anope::string &mname) { throw NotImplementedException(); }
+	virtual void OnUserModeSet(const MessageSource &setter, User *u, const Anope::string &mname) { throw NotImplementedException(); }
 
 	/** Called when a mode is unset from a user
+	 * @param setter who/what is setting the mode
 	 * @param u The user
 	 * @param mname The mode name
 	 */
-	virtual void OnUserModeUnset(User *u, const Anope::string &mname) { throw NotImplementedException(); }
+	virtual void OnUserModeUnset(const MessageSource &setter, User *u, const Anope::string &mname) { throw NotImplementedException(); }
 
 	/** Called when a channel mode is introducted into Anope
 	 * @param cm The mode

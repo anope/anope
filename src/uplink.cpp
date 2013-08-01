@@ -58,7 +58,6 @@ void Uplink::Connect()
 	UplinkSock->Connect(ip, u.port);
 }
 
-
 UplinkSocket::UplinkSocket() : Socket(-1, Config->Uplinks[Anope::CurrentUplink].ipv6), ConnectionSocket(), BufferedSocket()
 {
 	UplinkSock = this;
@@ -142,50 +141,48 @@ void UplinkSocket::OnError(const Anope::string &error)
 	Log(LOG_TERMINAL) << "Unable to connect to uplink #" << (Anope::CurrentUplink + 1) << " (" << Config->Uplinks[Anope::CurrentUplink].host << ":" << Config->Uplinks[Anope::CurrentUplink].port << ")" << (!error.empty() ? (": " + error) : "");
 }
 
-UplinkSocket::Message::Message() : server(NULL), user(NULL)
+UplinkSocket::Message::Message() : source(Me)
 {
 }
 
-UplinkSocket::Message::Message(const Server *s) : server(s), user(NULL)
+UplinkSocket::Message::Message(const MessageSource &src) : source(src)
 {
-}
-
-UplinkSocket::Message::Message(const User *u) : server(NULL), user(u)
-{
-	if (!u)
-		server = Me;
 }
 
 UplinkSocket::Message::~Message()
 {
-	Anope::string message_source = "";
+	Anope::string message_source;
 
-	if (this->server != NULL)
+	if (this->source.GetServer() != NULL)
 	{
-		if (this->server != Me && !this->server->IsJuped())
+		const Server *s = this->source.GetServer();
+
+		if (s != Me && !s->IsJuped())
 		{
-			Log(LOG_DEBUG) << "Attempted to send \"" << this->buffer.str() << "\" from " << this->server->GetName() << " who is not from me?";
+			Log(LOG_DEBUG) << "Attempted to send \"" << this->buffer.str() << "\" from " << s->GetName() << " who is not from me?";
 			return;
 		}
 
-		message_source = this->server->GetSID();
+		message_source = s->GetSID();
 	}
-	else if (this->user != NULL)
+	else if (this->source.GetUser() != NULL)
 	{
-		if (this->user->server != Me && !this->user->server->IsJuped())
+		const User *u = this->source.GetUser();
+
+		if (u->server != Me && !u->server->IsJuped())
 		{
-			Log(LOG_DEBUG) << "Attempted to send \"" << this->buffer.str() << "\" from " << this->user->nick << " who is not from me?";
+			Log(LOG_DEBUG) << "Attempted to send \"" << this->buffer.str() << "\" from " << u->nick << " who is not from me?";
 			return;
 		}
 
-		const BotInfo *bi = BotInfo::Find(this->user->nick);
+		const BotInfo *bi = this->source.GetBot();
 		if (bi != NULL && bi->introduced == false)
 		{
 			Log(LOG_DEBUG) << "Attempted to send \"" << this->buffer.str() << "\" from " << bi->nick << " when not introduced";
 			return;
 		}
 
-		message_source = this->user->GetUID();
+		message_source = u->GetUID();
 	}
 
 	if (!UplinkSock)

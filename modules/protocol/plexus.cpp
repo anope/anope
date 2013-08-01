@@ -34,9 +34,9 @@ class PlexusProto : public IRCDProto
 		MaxModes = 4;
 	}
 
-	void SendGlobalNotice(const BotInfo *bi, const Server *dest, const Anope::string &msg) anope_override { hybrid->SendGlobalNotice(bi, dest, msg); }
-	void SendGlobalPrivmsg(const BotInfo *bi, const Server *dest, const Anope::string &msg) anope_override { hybrid->SendGlobalPrivmsg(bi, dest, msg); }
-	void SendGlobopsInternal(const BotInfo *source, const Anope::string &buf) anope_override { hybrid->SendGlobopsInternal(source, buf); }
+	void SendGlobalNotice(BotInfo *bi, const Server *dest, const Anope::string &msg) anope_override { hybrid->SendGlobalNotice(bi, dest, msg); }
+	void SendGlobalPrivmsg(BotInfo *bi, const Server *dest, const Anope::string &msg) anope_override { hybrid->SendGlobalPrivmsg(bi, dest, msg); }
+	void SendGlobopsInternal(const MessageSource &source, const Anope::string &buf) anope_override { hybrid->SendGlobopsInternal(source, buf); }
 	void SendSQLine(User *u, const XLine *x) anope_override { hybrid->SendSQLine(u, x); }
 	void SendSQLineDel(const XLine *x) anope_override { hybrid->SendSQLineDel(x); }
 	void SendSGLineDel(const XLine *x) anope_override { hybrid->SendSGLineDel(x); }
@@ -68,7 +68,7 @@ class PlexusProto : public IRCDProto
 		}
 	}
 
-	void SendForceNickChange(const User *u, const Anope::string &newnick, time_t when) anope_override
+	void SendForceNickChange(User *u, const Anope::string &newnick, time_t when) anope_override
 	{
 		UplinkSocket::Message(Me) << "ENCAP " << u->server->GetName() << " SVSNICK " << u->GetUID() << " " << u->timestamp << " " << newnick << " " << when;
 	}
@@ -125,15 +125,15 @@ class PlexusProto : public IRCDProto
 		UplinkSocket::Message() << "SVINFO 6 5 0 :" << Anope::CurTime;
 	}
 
-	void SendClientIntroduction(const User *u) anope_override
+	void SendClientIntroduction(User *u) anope_override
 	{
 		Anope::string modes = "+" + u->GetModes();
 		UplinkSocket::Message(Me) << "UID " << u->nick << " 1 " << u->timestamp << " " << modes << " " << u->GetIdent() << " " << u->host << " 255.255.255.255 " << u->GetUID() << " 0 " << u->host << " :" << u->realname;
 	}
 
-	void SendModeInternal(const BotInfo *bi, const User *u, const Anope::string &buf) anope_override
+	void SendModeInternal(const MessageSource &source, User *u, const Anope::string &buf) anope_override
 	{
-		UplinkSocket::Message(bi) << "ENCAP * SVSMODE " << u->GetUID() << " " << u->timestamp << " " << buf;
+		UplinkSocket::Message(source) << "ENCAP * SVSMODE " << u->GetUID() << " " << u->timestamp << " " << buf;
 	}
 
 	void SendLogin(User *u) anope_override
@@ -149,17 +149,17 @@ class PlexusProto : public IRCDProto
 		UplinkSocket::Message(Me) << "ENCAP * SU " << u->GetUID();
 	}
 
-	void SendTopic(BotInfo *bi, Channel *c) anope_override
+	void SendTopic(const MessageSource &source, Channel *c) anope_override
 	{
-		UplinkSocket::Message(bi) << "ENCAP * TOPIC " << c->name << " " << c->topic_setter << " " << c->topic_ts << " :" << c->topic;
+		UplinkSocket::Message(source) << "ENCAP * TOPIC " << c->name << " " << c->topic_setter << " " << c->topic_ts << " :" << c->topic;
 	}
 
-	void SendSVSJoin(const BotInfo *source, const User *user, const Anope::string &chan, const Anope::string &param) anope_override
+	void SendSVSJoin(const MessageSource &source, User *user, const Anope::string &chan, const Anope::string &param) anope_override
 	{
 		UplinkSocket::Message(source) << "ENCAP " << user->server->GetName() << " SVSJOIN " << user->GetUID() << " " << chan;
 	}
 
-	void SendSVSPart(const BotInfo *source, const User *user, const Anope::string &chan, const Anope::string &param) anope_override
+	void SendSVSPart(const MessageSource &source, User *user, const Anope::string &chan, const Anope::string &param) anope_override
 	{
 		UplinkSocket::Message(source) << "ENCAP " << user->server->GetName() << " SVSPART " << user->GetUID() << " " << chan;
 	}
@@ -325,15 +325,12 @@ class ProtoPlexus : public Module
 		/* Add user modes */
 		ModeManager::RemoveUserMode(ModeManager::FindUserModeByName("HIDEOPER"));
 		ModeManager::AddUserMode(new UserMode("NOCTCP", 'C'));
-		ModeManager::AddUserMode(new UserMode("DEAF", 'D'));
 		ModeManager::AddUserMode(new UserMode("SOFTCALLERID", 'G'));
-		ModeManager::AddUserMode(new UserMode("NETADMIN", 'N'));
-		ModeManager::AddUserMode(new UserMode("SSL", 'S'));
-		ModeManager::AddUserMode(new UserMode("WEBIRC", 'W'));
-		ModeManager::AddUserMode(new UserMode("CALLERID", 'g'));
+		ModeManager::AddUserMode(new UserModeOperOnly("NETADMIN", 'N'));
+		ModeManager::AddUserMode(new UserModeNoone("WEBIRC", 'W'));
 		ModeManager::AddUserMode(new UserMode("PRIV", 'p'));
 		ModeManager::AddUserMode(new UserMode("CLOAK", 'x'));
-		ModeManager::AddUserMode(new UserMode("PROTECTED", 'U'));
+		ModeManager::AddUserMode(new UserModeNoone("PROTECTED", 'U'));
 
 		/* v/h/o/a/q */
 		ModeManager::AddChannelMode(new ChannelModeStatus("PROTECT", 'a', '&', 3));

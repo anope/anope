@@ -14,6 +14,7 @@
 #define UPLINK_H
 
 #include "sockets.h"
+#include "protocol.h"
 
 namespace Uplink
 {
@@ -33,16 +34,12 @@ class UplinkSocket : public ConnectionSocket, public BufferedSocket
 	/* A message sent over the uplink socket */
 	class CoreExport Message
 	{
-	 private:
-	 	/* The source of the message, can be a server (Me), or any user (one of our bots) */
-		const Server *server;
-		const User *user;
+		MessageSource source;
 		std::stringstream buffer;
 
 	 public:
 	 	Message();
-	 	explicit Message(const Server *);
-		explicit Message(const User *);
+	 	Message(const MessageSource &);
 	 	~Message();
 		template<typename T> Message &operator<<(const T &val)
 		{

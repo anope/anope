@@ -20,7 +20,7 @@
 
 namespace Mail
 {
-	extern CoreExport bool Send(User *from, NickCore *to, const BotInfo *service, const Anope::string &subject, const Anope::string &message);
+	extern CoreExport bool Send(User *from, NickCore *to, BotInfo *service, const Anope::string &subject, const Anope::string &message);
 	extern CoreExport bool Send(NickCore *to, const Anope::string &subject, const Anope::string &message);
 	extern CoreExport bool Validate(const Anope::string &email);
 

@@ -216,7 +216,7 @@ void Message::Mode::Run(MessageSource &source, const std::vector<Anope::string> 
 		User *u = User::Find(params[0]);
 
 		if (u)
-			u->SetModesInternal("%s", params[1].c_str());
+			u->SetModesInternal(source, "%s", params[1].c_str());
 	}
 }
 
@@ -318,7 +318,7 @@ void Privmsg::Run(MessageSource &source, const std::vector<Anope::string> &param
 		}
 		else if (!IRCD->RequiresID && Config->UseStrictPrivmsg)
 		{
-			const BotInfo *bi = BotInfo::Find(receiver);
+			BotInfo *bi = BotInfo::Find(receiver);
 			if (!bi)
 				return;
 			Log(LOG_DEBUG) << "Ignored PRIVMSG without @ from " << u->nick;

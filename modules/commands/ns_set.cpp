@@ -367,7 +367,7 @@ class CommandNSSASetDisplay : public CommandNSSetDisplay
 
 class CommandNSSetEmail : public Command
 {
-	static bool SendConfirmMail(User *u, const BotInfo *bi, const Anope::string &new_email)
+	static bool SendConfirmMail(User *u, BotInfo *bi, const Anope::string &new_email)
 	{
 		int chars[] = {
 			' ', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l',

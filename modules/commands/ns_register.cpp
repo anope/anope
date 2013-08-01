@@ -11,7 +11,7 @@
 
 #include "module.h"
 
-static bool SendRegmail(User *u, const NickAlias *na, const BotInfo *bi);
+static bool SendRegmail(User *u, const NickAlias *na, BotInfo *bi);
 
 class CommandNSConfirm : public Command
 {
@@ -381,7 +381,7 @@ class NSRegister : public Module
 	}
 };
 
-static bool SendRegmail(User *u, const NickAlias *na, const BotInfo *bi)
+static bool SendRegmail(User *u, const NickAlias *na, BotInfo *bi)
 {
 	NickCore *nc = na->nc;
 

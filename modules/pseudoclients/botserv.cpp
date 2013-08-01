@@ -204,7 +204,7 @@ class BotServCore : public Module
 			ci->Extend<bool>("BS_" + token.upper());
 	}
 
-	void OnUserKicked(MessageSource &source, User *target, const Anope::string &channel, ChannelStatus &status, const Anope::string &kickmsg) anope_override
+	void OnUserKicked(const MessageSource &source, User *target, const Anope::string &channel, ChannelStatus &status, const Anope::string &kickmsg) anope_override
 	{
 		BotInfo *bi = BotInfo::Find(target->nick);
 		if (bi)

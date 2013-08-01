@@ -28,9 +28,9 @@ class RatboxProto : public IRCDProto
 		MaxModes = 4;
 	}
 
-	void SendGlobalNotice(const BotInfo *bi, const Server *dest, const Anope::string &msg) anope_override { hybrid->SendGlobalNotice(bi, dest, msg); }
-	void SendGlobalPrivmsg(const BotInfo *bi, const Server *dest, const Anope::string &msg) anope_override { hybrid->SendGlobalPrivmsg(bi, dest, msg); }
-	void SendGlobopsInternal(const BotInfo *source, const Anope::string &buf) anope_override { hybrid->SendGlobopsInternal(source, buf); }
+	void SendGlobalNotice(BotInfo *bi, const Server *dest, const Anope::string &msg) anope_override { hybrid->SendGlobalNotice(bi, dest, msg); }
+	void SendGlobalPrivmsg(BotInfo *bi, const Server *dest, const Anope::string &msg) anope_override { hybrid->SendGlobalPrivmsg(bi, dest, msg); }
+	void SendGlobopsInternal(const MessageSource &source, const Anope::string &buf) anope_override { hybrid->SendGlobopsInternal(source, buf); }
 	void SendSQLine(User *u, const XLine *x) anope_override { hybrid->SendSQLine(u, x); }
 	void SendSGLine(User *u, const XLine *x) anope_override { hybrid->SendSGLine(u, x); }
 	void SendSGLineDel(const XLine *x) anope_override { hybrid->SendSGLineDel(x); }
@@ -39,9 +39,9 @@ class RatboxProto : public IRCDProto
 	void SendSQLineDel(const XLine *x) anope_override { hybrid->SendSQLineDel(x); }
 	void SendJoin(User *user, Channel *c, const ChannelStatus *status) anope_override { hybrid->SendJoin(user, c, status); }
 	void SendServer(const Server *server) anope_override { hybrid->SendServer(server); }
-	void SendModeInternal(const BotInfo *bi, const User *u, const Anope::string &buf) anope_override { hybrid->SendModeInternal(bi, u, buf); }
+	void SendModeInternal(const MessageSource &source, User *u, const Anope::string &buf) anope_override { hybrid->SendModeInternal(source, u, buf); }
 	void SendChannel(Channel *c) anope_override { hybrid->SendChannel(c); }
-	void SendTopic(BotInfo *bi, Channel *c) anope_override { hybrid->SendTopic(bi, c); }
+	void SendTopic(const MessageSource &source, Channel *c) anope_override { hybrid->SendTopic(source, c); }
 
 	void SendConnect() anope_override
 	{
@@ -70,7 +70,7 @@ class RatboxProto : public IRCDProto
 		UplinkSocket::Message() << "SVINFO 6 3 0 :" << Anope::CurTime;
 	}
 
-	void SendClientIntroduction(const User *u) anope_override
+	void SendClientIntroduction(User *u) anope_override
 	{
 		Anope::string modes = "+" + u->GetModes();
 		UplinkSocket::Message(Me) << "UID " << u->nick << " 1 " << u->timestamp << " " << modes << " " << u->GetIdent() << " " << u->host << " 0 " << u->GetUID() << " :" << u->realname;
@@ -221,7 +221,7 @@ class ProtoRatbox : public Module
 		ModeManager::RemoveUserMode(ModeManager::FindUserModeByName("HIDEOPER"));
 		ModeManager::RemoveUserMode(ModeManager::FindUserModeByName("REGPRIV"));
 		ModeManager::RemoveUserMode(ModeManager::FindUserModeByName("SSL"));
-		ModeManager::AddUserMode(new UserMode("PROTECTED", 'S'));
+		ModeManager::AddUserMode(new UserModeNoone("PROTECTED", 'S'));
 
 		/* v/h/o/a/q */
 		ModeManager::RemoveChannelMode(ModeManager::FindChannelModeByName("HALFOP"));

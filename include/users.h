@@ -36,6 +36,9 @@ class CoreExport User : public virtual Base, public Extensible, public CommandRe
 	bool quit;
 	/* Users that are in the process of quitting */
 	static std::list<User *> quitting_users;
+
+ public:
+	typedef std::map<Anope::string, Anope::string> ModeList;
  protected:
 	Anope::string vident;
 	Anope::string ident;
@@ -43,7 +46,7 @@ class CoreExport User : public virtual Base, public Extensible, public CommandRe
 	/* If the user is on the access list of the nick theyre on */
 	bool on_access;
 	/* Map of user modes and the params this user has (if any) */
-	std::map<Anope::string, Anope::string> modes;
+	ModeList modes;
 	/* NickCore account the user is currently loggged in as, if they are logged in */
 	Serialize::Reference<NickCore> nc;
 
@@ -185,8 +188,8 @@ class CoreExport User : public virtual Base, public Extensible, public CommandRe
 	 * @param fmt Format of the Message
 	 * @param ... any number of parameters
 	 */
-	void SendMessage(const BotInfo *source, const char *fmt, ...);
-	void SendMessage(const BotInfo *source, const Anope::string &msg) anope_override;
+	void SendMessage(BotInfo *source, const char *fmt, ...);
+	void SendMessage(BotInfo *source, const Anope::string &msg) anope_override;
 
 	/** Identify the user to a nick.
 	 * updates last_seen, logs the user in,
@@ -250,57 +253,62 @@ class CoreExport User : public virtual Base, public Extensible, public CommandRe
 	bool HasMode(const Anope::string &name) const;
 
 	/** Set a mode internally on the user, the IRCd is not informed
+	 * @param setter who/what is setting the mode
 	 * @param um The user mode
 	 * @param Param The param, if there is one
 	 */
-	void SetModeInternal(UserMode *um, const Anope::string &param = "");
+	void SetModeInternal(const MessageSource &setter, UserMode *um, const Anope::string &param = "");
 
 	/** Remove a mode internally on the user, the IRCd is not informed
+	 * @param setter who/what is setting the mode
 	 * @param um The user mode
 	 */
-	void RemoveModeInternal(UserMode *um);
+	void RemoveModeInternal(const MessageSource &setter, UserMode *um);
 
 	/** Set a mode on the user
 	 * @param bi The client setting the mode
 	 * @param um The user mode
 	 * @param Param Optional param for the mode
 	 */
-	void SetMode(const BotInfo *bi, UserMode *um, const Anope::string &param = "");
+	void SetMode(BotInfo *bi, UserMode *um, const Anope::string &param = "");
 
 	/** Set a mode on the user
 	 * @param bi The client setting the mode
 	 * @param name The mode name
 	 * @param Param Optional param for the mode
 	 */
-	void SetMode(const BotInfo *bi, const Anope::string &name, const Anope::string &param = "");
+	void SetMode(BotInfo *bi, const Anope::string &name, const Anope::string &param = "");
 
 	/** Remove a mode on the user
 	 * @param bi The client setting the mode
 	 * @param um The user mode
 	 */
-	void RemoveMode(const BotInfo *bi, UserMode *um);
+	void RemoveMode(BotInfo *bi, UserMode *um);
 
 	/** Remove a mode from the user
 	 * @param bi The client setting the mode
 	 * @param name The mode name
 	 */
-	void RemoveMode(const BotInfo *bi, const Anope::string &name);
+	void RemoveMode(BotInfo *bi, const Anope::string &name);
 
 	/** Set a string of modes on a user
 	 * @param bi The client setting the modes
 	 * @param umodes The modes
 	 */
-	void SetModes(const BotInfo *bi, const char *umodes, ...);
+	void SetModes(BotInfo *bi, const char *umodes, ...);
 
 	/** Set a string of modes on a user internally
+	 * @param setter who/what is setting the mode
 	 * @param umodes The modes
 	 */
-	void SetModesInternal(const char *umodes, ...);
+	void SetModesInternal(const MessageSource &source, const char *umodes, ...);
 
 	/** Get modes set for this user.
 	 * @return A string of modes set on the user
 	 */
 	Anope::string GetModes() const;
+
+	const ModeList &GetModeList() const;
 
 	/** Find the channel container for Channel c that the user is on
 	 * This is preferred over using FindUser in Channel, as there are usually more users in a channel
@@ -319,13 +327,13 @@ class CoreExport User : public virtual Base, public Extensible, public CommandRe
 	 * @param source The user/server doing the kill
 	 * @param reason The reason for the kill
 	 */
-	void Kill(const Anope::string &source, const Anope::string &reason);
+	void Kill(const MessageSource &source, const Anope::string &reason);
 
 	/** Process a kill for a user
 	 * @param source The user/server doing the kill
 	 * @param reason The reason for the kill
 	 */
-	void KillInternal(const Anope::string &source, const Anope::string &reason);
+	void KillInternal(const MessageSource &source, const Anope::string &reason);
 
 	/** Processes a quit for the user, and marks them as quit
 	 * @param reason The reason for the quit

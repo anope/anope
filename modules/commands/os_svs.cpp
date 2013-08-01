@@ -99,7 +99,7 @@ class CommandOSSVSJoin : public Command
 			source.Reply(_("\002%s\002 is already in \002%s\002."), target->nick.c_str(), c->name.c_str());
 		else
 		{
-			IRCD->SendSVSJoin(source.service, target, params[1], "");
+			IRCD->SendSVSJoin(*source.service, target, params[1], "");
 			Log(LOG_ADMIN, source, this) << "to force " << target->nick << " to join " << params[1];
 			source.Reply(_("\002%s\002 has been joined to \002%s\002."), target->nick.c_str(), params[1].c_str());
 		}
@@ -143,7 +143,7 @@ class CommandOSSVSPart : public Command
 			source.Reply(_("\002%s\002 is not in \002%s\002."), target->nick.c_str(), c->name.c_str());
 		else
 		{
-			IRCD->SendSVSPart(source.service, target, params[1], "");
+			IRCD->SendSVSPart(*source.service, target, params[1], "");
 			Log(LOG_ADMIN, source, this) << "to force " << target->nick << " to part " << c->name;
 			source.Reply(_("\002%s\002 has been parted from \002%s\002."), target->nick.c_str(), c->name.c_str());
 		}

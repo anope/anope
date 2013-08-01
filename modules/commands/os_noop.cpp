@@ -85,7 +85,7 @@ class OSNOOP : public Module
 
 	}
 
-	void OnUserModeSet(User *u, const Anope::string &mname) anope_override
+	void OnUserModeSet(const MessageSource &, User *u, const Anope::string &mname) anope_override
 	{
 		Anope::string *setter;
 		if (mname == "OPER" && (setter = noop.Get(u->server)))

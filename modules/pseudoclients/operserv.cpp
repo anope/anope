@@ -209,13 +209,13 @@ class OperServCore : public Module
 			Log(server, "squit", OperServ) << "Received SQUIT for juped server " << server->GetName();
 	}
 
-	void OnUserModeSet(User *u, const Anope::string &mname) anope_override
+	void OnUserModeSet(const MessageSource &setter, User *u, const Anope::string &mname) anope_override
 	{
 		if (mname == "OPER")
 			Log(u, "oper", OperServ) << "is now an IRC operator.";
 	}
 
-	void OnUserModeUnset(User *u, const Anope::string &mname) anope_override
+	void OnUserModeUnset(const MessageSource &setter, User *u, const Anope::string &mname) anope_override
 	{
 		if (mname == "OPER")
 			Log(u, "oper", OperServ) << "is no longer an IRC operator";

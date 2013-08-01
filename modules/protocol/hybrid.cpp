@@ -30,17 +30,17 @@ class HybridProto : public IRCDProto
 		MaxModes = 4;
 	}
 
-	void SendGlobalNotice(const BotInfo *bi, const Server *dest, const Anope::string &msg) anope_override
+	void SendGlobalNotice(BotInfo *bi, const Server *dest, const Anope::string &msg) anope_override
 	{
 		UplinkSocket::Message(bi) << "NOTICE $$" << dest->GetName() << " :" << msg;
 	}
 
-	void SendGlobalPrivmsg(const BotInfo *bi, const Server *dest, const Anope::string &msg) anope_override
+	void SendGlobalPrivmsg(BotInfo *bi, const Server *dest, const Anope::string &msg) anope_override
 	{
 		UplinkSocket::Message(bi) << "PRIVMSG $$" << dest->GetName() << " :" << msg;
 	}
 
-	void SendGlobopsInternal(const BotInfo *source, const Anope::string &buf) anope_override
+	void SendGlobopsInternal(const MessageSource &source, const Anope::string &buf) anope_override
 	{
 		UplinkSocket::Message(source) << "GLOBOPS :" << buf;
 	}
@@ -186,7 +186,7 @@ class HybridProto : public IRCDProto
 		UplinkSocket::Message() << "SVINFO 6 5 0 :" << Anope::CurTime;
 	}
 
-	void SendClientIntroduction(const User *u) anope_override
+	void SendClientIntroduction(User *u) anope_override
 	{
 		Anope::string modes = "+" + u->GetModes();
 
@@ -199,12 +199,9 @@ class HybridProto : public IRCDProto
 		UplinkSocket::Message(Me) << "EOB";
 	}
 
-	void SendModeInternal(const BotInfo *bi, const User *u, const Anope::string &buf) anope_override
+	void SendModeInternal(const MessageSource &source, User *u, const Anope::string &buf) anope_override
 	{
-		if (bi)
-			UplinkSocket::Message(bi) << "SVSMODE " << u->GetUID() << " " << u->timestamp << " " << buf;
-		else
-			UplinkSocket::Message(Me) << "SVSMODE " << u->GetUID() << " " << u->timestamp << " " << buf;
+		UplinkSocket::Message(source) << "SVSMODE " << u->GetUID() << " " << u->timestamp << " " << buf;
 	}
 
 	void SendLogin(User *u) anope_override
@@ -227,8 +224,9 @@ class HybridProto : public IRCDProto
 		UplinkSocket::Message() << "SJOIN " << c->creation_time << " " << c->name << " " << modes << " :";
 	}
 
-	void SendTopic(BotInfo *bi, Channel *c) anope_override
+	void SendTopic(const MessageSource &source, Channel *c) anope_override
 	{
+		BotInfo *bi = source.GetBot();
 		bool needjoin = c->FindUser(bi) == NULL;
 
 		if (needjoin)
@@ -239,13 +237,13 @@ class HybridProto : public IRCDProto
 			bi->Join(c, &status);
 		}
 
-		IRCDProto::SendTopic(bi, c);
+		IRCDProto::SendTopic(source, c);
 
 		if (needjoin)
 			bi->Part(c);
 	}
 
-	void SendForceNickChange(const User *u, const Anope::string &newnick, time_t when) anope_override
+	void SendForceNickChange(User *u, const Anope::string &newnick, time_t when) anope_override
 	{
 		UplinkSocket::Message(Me) << "SVSNICK " << u->nick << " " << newnick << " " << when;
 	}
@@ -440,7 +438,7 @@ struct IRCDMessageSVSMode : IRCDMessage
 		if (!params[1].is_pos_number_only() || convertTo<time_t>(params[1]) != u->timestamp)
 			return;
 
-		u->SetModesInternal("%s", params[2].c_str());
+		u->SetModesInternal(source, "%s", params[2].c_str());
 	}
 };
 
@@ -569,19 +567,19 @@ class ProtoHybrid : public Module
 	void AddModes()
 	{
 		/* Add user modes */
-		ModeManager::AddUserMode(new UserMode("ADMIN", 'a'));
-		ModeManager::AddUserMode(new UserMode("CALLERID", 'g'));
+		ModeManager::AddUserMode(new UserModeOperOnly("ADMIN", 'a'));
+		ModeManager::AddUserMode(new UserModeOperOnly("CALLERID", 'g'));
 		ModeManager::AddUserMode(new UserMode("INVIS", 'i'));
-		ModeManager::AddUserMode(new UserMode("LOCOPS", 'l'));
+		ModeManager::AddUserMode(new UserModeOperOnly("LOCOPS", 'l'));
 		ModeManager::AddUserMode(new UserMode("OPER", 'o'));
-		ModeManager::AddUserMode(new UserMode("REGISTERED", 'r'));
-		ModeManager::AddUserMode(new UserMode("SNOMASK", 's'));
+		ModeManager::AddUserMode(new UserModeNoone("REGISTERED", 'r'));
+		ModeManager::AddUserMode(new UserModeOperOnly("SNOMASK", 's'));
 		ModeManager::AddUserMode(new UserMode("WALLOPS", 'w'));
-		ModeManager::AddUserMode(new UserMode("OPERWALLS", 'z'));
+		ModeManager::AddUserMode(new UserModeOperOnly("OPERWALLS", 'z'));
 		ModeManager::AddUserMode(new UserMode("DEAF", 'D'));
-		ModeManager::AddUserMode(new UserMode("HIDEOPER", 'H'));
+		ModeManager::AddUserMode(new UserModeOperOnly("HIDEOPER", 'H'));
 		ModeManager::AddUserMode(new UserMode("REGPRIV", 'R'));
-		ModeManager::AddUserMode(new UserMode("SSL", 'S'));
+		ModeManager::AddUserMode(new UserModeNoone("SSL", 'S'));
 
 		/* b/e/I */
 		ModeManager::AddChannelMode(new ChannelModeList("BAN", 'b'));
@@ -603,10 +601,10 @@ class ProtoHybrid : public Module
 		ModeManager::AddChannelMode(new ChannelMode("MODERATED", 'm'));
 		ModeManager::AddChannelMode(new ChannelMode("NOEXTERNAL", 'n'));
 		ModeManager::AddChannelMode(new ChannelMode("PRIVATE", 'p'));
-		ModeManager::AddChannelMode(new ChannelModeRegistered('r'));
+		ModeManager::AddChannelMode(new ChannelModeNoone("REGISTERED", 'r'));
 		ModeManager::AddChannelMode(new ChannelMode("SECRET", 's'));
 		ModeManager::AddChannelMode(new ChannelMode("TOPIC", 't'));
-		ModeManager::AddChannelMode(new ChannelModeOper('O'));
+		ModeManager::AddChannelMode(new ChannelModeOperOnly("OPERONLY", 'O'));
 		ModeManager::AddChannelMode(new ChannelMode("REGMODERATED", 'M'));
 		ModeManager::AddChannelMode(new ChannelMode("REGISTEREDONLY", 'R'));
 		ModeManager::AddChannelMode(new ChannelMode("SSL", 'S'));
@@ -629,7 +627,7 @@ public:
 
 	void OnUserNickChange(User *u, const Anope::string &) anope_override
 	{
-		u->RemoveModeInternal(ModeManager::FindUserModeByName("REGISTERED"));
+		u->RemoveModeInternal(Me, ModeManager::FindUserModeByName("REGISTERED"));
 	}
 };
 

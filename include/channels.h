@@ -225,7 +225,7 @@ class CoreExport Channel : public Base, public Extensible
 	 * @param nick The nick being kicked
 	 * @param reason The reason for the kick
 	 */
-	void KickInternal(MessageSource &source, const Anope::string &nick, const Anope::string &reason);
+	void KickInternal(const MessageSource &source, const Anope::string &nick, const Anope::string &reason);
 
 	/** Kick a user from the channel
 	 * @param bi The sender, can be NULL for the service bot for this channel

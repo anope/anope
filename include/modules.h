@@ -994,6 +994,14 @@ class CoreExport Module : public Extensible
 	 */
 	virtual void OnLog(Log *l) { throw NotImplementedException(); }
 
+	/** Called when a log message is actually logged to a given log info
+	 * The message has already passed validation checks by the LogInfo
+	 * @param li The loginfo whee the message is being logged
+	 * @param l The log message
+	 * @param msg The final formatted message, derived from 'l'
+	 */
+	virtual void OnLogMessage(LogInfo *li, const Log *l, const Anope::string &msg) { throw NotImplementedException(); }
+
 	/** Called when a DNS request (question) is recieved.
 	 * @param req The dns request
 	 * @param reply The reply that will be sent

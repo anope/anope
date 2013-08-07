@@ -308,7 +308,7 @@ void LogInfo::OpenLogFiles()
 	{
 		const Anope::string &target = this->targets[i];
 
-		if (target.empty() || target[0] == '#' || target == "globops")
+		if (target.empty() || target[0] == '#' || target == "globops" || target.find(":") != Anope::string::npos)
 			continue;
 
 		LogFile *lf = new LogFile(CreateLogName(target));
@@ -349,6 +349,8 @@ void LogInfo::ProcessMessage(const Log *l)
 	}
 
 	const Anope::string &buffer = l->BuildPrefix() + l->buf.str();
+
+	FOREACH_MOD(OnLogMessage, (this, l, buffer));
 
 	for (unsigned i = 0; i < this->targets.size(); ++i)
 	{
@@ -391,7 +393,7 @@ void LogInfo::ProcessMessage(const Log *l)
 			{
 				const Anope::string &target = this->targets[i];
 
-				if (target.empty() || target[0] == '#' || target == "globops")
+				if (target.empty() || target[0] == '#' || target == "globops" || target.find(":") != Anope::string::npos)
 					continue;
 
 				Anope::string oldlog = CreateLogName(target, Anope::CurTime - 86400 * this->log_age);

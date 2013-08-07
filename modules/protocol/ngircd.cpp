@@ -19,6 +19,7 @@ class ngIRCdProto : public IRCDProto
 	ngIRCdProto(Module *creator) : IRCDProto(creator, "ngIRCd")
 	{
 		DefaultPseudoclientModes = "+oi";
+		CanCertFP = true;
 		CanSVSNick = true;
 		CanSetVHost = true;
 		CanSetVIdent = true;
@@ -315,6 +316,7 @@ struct IRCDMessageMetadata : IRCDMessage
          *  - "cloakhost" : the cloaked hostname of a client
 	 *  - "info": info text ("real name") of a client
 	 *  - "user": the user name (ident) of a client (can't be empty)
+	 *  - "certfp": the certificate fingerprint of a client
 	 */
 
 	void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
@@ -341,6 +343,11 @@ struct IRCDMessageMetadata : IRCDMessage
 		else if (params[1].equals_cs("user"))
 		{
 			u->SetVIdent(params[2]);
+		}
+		else if (params[1].equals_cs("certfp"))
+		{
+			u->fingerprint = params[2];
+			FOREACH_MOD(OnFingerprint, (u));
 		}
 	}
 };

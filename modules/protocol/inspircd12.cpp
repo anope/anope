@@ -21,6 +21,8 @@ struct SASLUser
 static bool sasl = true;
 static std::list<SASLUser> saslusers;
 
+static Anope::string rsquit_server, rsquit_id;
+
 class ChannelModeFlood : public ChannelModeParam
 {
  public:
@@ -220,14 +222,19 @@ class InspIRCd12Proto : public IRCDProto
 	/* SERVER services-dev.chatspike.net password 0 :Description here */
 	void SendServer(const Server *server) anope_override
 	{
-		if (!server->IsJuped())
+		/* if rsquit is set then we are waiting on a squit */
+		if (rsquit_id.empty() && rsquit_server.empty())
 			UplinkSocket::Message() << "SERVER " << server->GetName() << " " << Config->Uplinks[Anope::CurrentUplink].password << " " << server->GetHops() << " " << server->GetSID() << " :" << server->GetDescription();
 	}
 
 	void SendSquit(Server *s, const Anope::string &message) anope_override
 	{
 		if (s != Me)
+		{
+			rsquit_id = s->GetSID();
+			rsquit_server = s->GetName();
 			UplinkSocket::Message() << "RSQUIT " << s->GetName() << " :" << message;
+		}
 		else
 			UplinkSocket::Message() << "SQUIT " << s->GetName() << " :" << message;
 	}
@@ -1176,18 +1183,16 @@ struct IRCDMessageOperType : IRCDMessage
 
 struct IRCDMessageRSQuit : IRCDMessage
 {
-	IRCDMessageRSQuit(Module *creator) : IRCDMessage(creator, "RSQUIT", 1) { }
+	IRCDMessageRSQuit(Module *creator) : IRCDMessage(creator, "RSQUIT", 1) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
 
 	void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		Server *s = Server::Find(params[0]);
+		const Anope::string &reason = params.size() > 1 ? params[1] : "";
 		if (!s)
 			return;
 
-		/* On InspIRCd we must send a SQUIT when we recieve RSQUIT for a server we have juped */
-		if (s->IsJuped())
-			UplinkSocket::Message(Me) << "SQUIT " << s->GetSID() << " :" << (params.size() > 1 ? params[1].c_str() : "");
-
+		UplinkSocket::Message(Me) << "SQUIT " << s->GetSID() << " :" << reason;
 		s->Delete(s->GetName() + " " + s->GetUplink()->GetName());
 	}
 };
@@ -1227,17 +1232,16 @@ struct IRCDMessageSQuit : Message::SQuit
 	
 	void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		Server *server = Server::Find(params[0]);
-		if (server && server->IsJuped())
+		if (params[0] == rsquit_id || params[0] == rsquit_server)
 		{
-			/* It is not possible to recieve a SQUIT for a server we have juped
-			 * unless we have recently sent a RSQUIT. So, this SQUIT is a response
-			 * to the server we just SQUIT off and is not meant for our juped server.
-			 *
-			 * Send the juped server now.
-			 */
+			/* squit for a recently squit server, introduce the juped server now */
+			Server *s = Server::Find(rsquit_server);
 
-			UplinkSocket::Message() << "SERVER " << server->GetName() << " jupe " << server->GetHops() << " " << server->GetSID() << " :" << server->GetDescription();
+			rsquit_id.clear();
+			rsquit_server.clear();
+
+			if (s && s->IsJuped())
+				IRCD->SendServer(s);
 		}
 		else
 			Message::SQuit::Run(source, params);

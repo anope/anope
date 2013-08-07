@@ -28,8 +28,10 @@ class CommandOSJupe : public Command
 
 		if (!IRCD->IsHostValid(jserver) || jserver.find('.') == Anope::string::npos)
 			source.Reply(_("Please use a valid server name when juping."));
-		else if (server && (server == Me || server == Me->GetLinks().front()))
+		else if (server == Me || server == Servers::GetUplink())
 			source.Reply(_("You can not jupe your Services' pseudoserver or your uplink server."));
+		else if (server && server->IsJuped())
+			source.Reply(_("You can not jupe an already juped server."));
 		else
 		{
 			Anope::string rbuf = "Juped by " + source.GetNick() + (!reason.empty() ? ": " + reason : "");
@@ -45,7 +47,6 @@ class CommandOSJupe : public Command
 
 			Log(LOG_ADMIN, source, this) << "on " << jserver << " (" << rbuf << ")";
 		}
-		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override

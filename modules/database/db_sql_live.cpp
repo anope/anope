@@ -126,6 +126,11 @@ class DBMySQL : public Module, public Pipe
 		init = false;
 	}
 
+	void OnRestart() anope_override
+	{
+		init = false;
+	}
+
 	void OnReload(Configuration::Conf *conf) anope_override
 	{
 		Configuration::Block *block = conf->GetModule(this);

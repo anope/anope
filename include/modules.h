@@ -63,6 +63,7 @@
 if (true) \
 { \
 	static std::vector<Module *> &_modules = ModuleManager::GetEventHandlers(#ename); \
+	bool _shrink = false; \
 	for (std::vector<Module *>::iterator _i = _modules.begin(); _i != _modules.end();) \
 	{ \
 		try \
@@ -76,10 +77,13 @@ if (true) \
 		catch (const NotImplementedException &) \
 		{ \
 			_i = _modules.erase(_i); \
+			_shrink = true; \
 			continue; \
 		} \
 		++_i; \
 	} \
+	if (_shrink) \
+		std::vector<Module *>(_modules).swap(_modules); \
 } \
 else \
 	static_cast<void>(0)
@@ -97,6 +101,7 @@ if (true) \
 { \
 	ret = EVENT_CONTINUE; \
 	static std::vector<Module *> &_modules = ModuleManager::GetEventHandlers(#ename); \
+	bool _shrink = false; \
 	for (std::vector<Module *>::iterator _i = _modules.begin(); _i != _modules.end();) \
 	{ \
 		try \
@@ -115,10 +120,13 @@ if (true) \
 		catch (const NotImplementedException &) \
 		{ \
 			_i = _modules.erase(_i); \
+			_shrink = true; \
 			continue; \
 		} \
 		++_i; \
 	} \
+	if (_shrink) \
+		std::vector<Module *>(_modules).swap(_modules); \
 } \
 else \
 	static_cast<void>(0)

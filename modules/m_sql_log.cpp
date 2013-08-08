@@ -91,6 +91,7 @@ class SQLLog : public Module
 				break;
 			case LOG_NORMAL:
 				insert.SetValue("type", "NORMAL");
+				break;
 			default:
 				return;
 		}

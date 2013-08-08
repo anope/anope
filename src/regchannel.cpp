@@ -294,8 +294,8 @@ Serializable* ChannelInfo::Unserialize(Serializable *obj, Serialize::Data &data)
 	data["extensible:SECURE"] >> b;
 	if (b)
 		ci->Extend<bool>("CS_SECURE");
-	data["extensible:PRIVATE"] >> b;
 	b = false;
+	data["extensible:PRIVATE"] >> b;
 	if (b)
 		ci->Extend<bool>("CS_PRIVATE");
 	b = false;
@@ -318,6 +318,22 @@ Serializable* ChannelInfo::Unserialize(Serializable *obj, Serialize::Data &data)
 	data["extensible:SECUREFOUNDER"] >> b;
 	if (b)
 		ci->Extend<bool>("SECUREFOUNDER");
+	b = false;
+	data["extensible:RESTRICTED"] >> b;
+	if (b)
+		ci->Extend<bool>("RESTRICTED");
+	b = false;
+	data["extensible:KEEPTOPIC"] >> b;
+	if (b)
+		ci->Extend<bool>("KEEPTOPIC");
+	b = false;
+	data["extensible:SIGNKICK"] >> b;
+	if (b)
+		ci->Extend<bool>("SIGNKICK");
+	b = false;
+	data["extensible:SIGNKICK_LEVEL"] >> b;
+	if (b)
+		ci->Extend<bool>("SIGNKICK_LEVEL");
 	/* end compat */
 
 	return ci;

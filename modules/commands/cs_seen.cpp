@@ -17,6 +17,7 @@ enum TypeInfo
 	NEW, NICK_TO, NICK_FROM, JOIN, PART, QUIT, KICK
 };
 
+static bool simple;
 struct SeenInfo;
 static SeenInfo *FindInfo(const Anope::string &nick);
 typedef Anope::hash_map<SeenInfo *> database_map;
@@ -182,6 +183,74 @@ class CommandOSSeen : public Command
 
 class CommandSeen : public Command
 {
+	void SimpleSeen(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	{
+		if (!source.c || !source.c->ci)
+		{
+			if (source.IsOper())
+				source.Reply("Seen in simple mode is designed as a fantasy command only!");
+			return;
+		}
+
+		BotInfo *bi = BotInfo::Find(params[0], true);
+		if (bi)
+		{
+			if (bi == source.c->ci->bi)
+				source.Reply(_("You found me, %s!"), source.GetNick().c_str());
+			else
+				source.Reply(_("%s is a network service."), bi->nick.c_str());
+			return;
+		}
+
+		NickAlias *na = NickAlias::Find(params[0]);
+		if (!na)
+		{
+			source.Reply(_("I don't know who %s is."), params[0].c_str());
+			return;
+		}
+
+		if (source.GetAccount() == na->nc)
+		{
+			source.Reply(_("Looking for yourself, eh %s?"), source.GetNick().c_str());
+			return;
+		}
+
+		User *target = User::Find(params[0], true);
+
+		if (target && source.c->FindUser(target))
+		{
+			source.Reply(_("%s is on the channel right now!"), target->nick.c_str());
+			return;
+		}
+
+		for (Channel::ChanUserList::const_iterator it = source.c->users.begin(), it_end = source.c->users.end(); it != it_end; ++it)
+		{
+			ChanUserContainer *uc = it->second;
+			User *u = uc->user;
+
+			if (u->Account() == na->nc)
+			{
+				source.Reply(_("%s is on the channel right now (as %s)!"), params[0].c_str(), u->nick.c_str());
+				return;
+			}
+		}
+
+		AccessGroup ag = source.c->ci->AccessFor(na->nc);
+		time_t last = 0;
+		for (unsigned i = 0; i < ag.size(); ++i)
+		{
+			ChanAccess *a = ag[i];
+
+			if (*a->nc == na->nc && a->last_seen > last)
+				last = a->last_seen;
+		}
+
+		if (last > Anope::CurTime || !last)
+			source.Reply(_("I've never seen %s on this channel."), na->nick.c_str());
+		else
+			source.Reply(_("%s was last seen here %s ago."), na->nick.c_str(), Anope::Duration(Anope::CurTime - last, source.GetAccount()).c_str());
+	}
+
  public:
 	CommandSeen(Module *creator) : Command(creator, "chanserv/seen", 1, 2)
 	{
@@ -192,6 +261,9 @@ class CommandSeen : public Command
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		const Anope::string &target = params[0];
+
+		if (simple)
+			return this->SimpleSeen(source, params);
 
 		if (target.length() > Config->GetBlock("networkinfo")->Get<unsigned>("nicklen"))
 		{
@@ -304,6 +376,11 @@ class CSSeen : public Module
 	{
 	}
 
+	void OnReload(Configuration::Conf *conf) anope_override
+	{
+		simple = conf->GetModule(this)->Get<bool>("simple");
+	}
+
 	void OnExpireTick() anope_override
 	{
 		size_t previous_size = database.size();
@@ -359,7 +436,7 @@ class CSSeen : public Module
  private:
 	void UpdateUser(const User *u, const TypeInfo Type, const Anope::string &nick, const Anope::string &nick2, const Anope::string &channel, const Anope::string &message)
 	{
-		if (!u->server->IsSynced())
+		if (simple || !u->server->IsSynced())
 			return;
 
 		SeenInfo* &info = database[nick];

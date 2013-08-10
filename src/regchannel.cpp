@@ -467,12 +467,9 @@ AccessGroup ChannelInfo::AccessFor(const NickCore *nc)
 	}
 
 	if (group.founder || !group.empty())
-	{
 		this->last_used = Anope::CurTime;
 
-		for (unsigned i = 0; i < group.size(); ++i)
-			group[i]->last_seen = Anope::CurTime;
-	}
+		/* don't update access last seen here, this isn't the user requesting access */
 
 	return group;
 }

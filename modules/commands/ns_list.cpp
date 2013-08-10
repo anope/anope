@@ -29,7 +29,7 @@ class CommandNSList : public Command
 		bool is_servadmin = source.HasCommand("nickserv/list");
 		int count = 0, from = 0, to = 0;
 		bool suspended, nsnoexpire, unconfirmed;
-		unsigned listmax = Config->GetModule(this->owner)->Get<unsigned>("listmax");
+		unsigned listmax = Config->GetModule(this->owner)->Get<unsigned>("listmax", "50");
 
 		suspended = nsnoexpire = unconfirmed = false;
 

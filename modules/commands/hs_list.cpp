@@ -53,7 +53,7 @@ class CommandHSList : public Command
 			}
 		}
 
-		unsigned display_counter = 0, listmax = Config->GetModule(this->owner)->Get<unsigned>("listmax");
+		unsigned display_counter = 0, listmax = Config->GetModule(this->owner)->Get<unsigned>("listmax", "50");
 		ListFormatter list;
 		list.AddColumn("Number").AddColumn("Nick").AddColumn("Vhost").AddColumn("Creator").AddColumn("Created");
 

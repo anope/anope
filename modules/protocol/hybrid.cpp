@@ -622,7 +622,8 @@ public:
 		message_sjoin(this), message_svsmode(this), message_tburst(this), message_tmode(this), message_uid(this),
 		message_certfp(this)
 	{
-		this->AddModes();
+		if (Config->GetModule(this))
+			this->AddModes();
 	}
 
 	void OnUserNickChange(User *u, const Anope::string &) anope_override

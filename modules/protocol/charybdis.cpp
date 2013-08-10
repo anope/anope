@@ -362,17 +362,10 @@ class ProtoCharybdis : public Module
 	void AddModes()
 	{
 		/* Add user modes */
-		ModeManager::AddUserMode(new UserModeOperOnly("DEAF", 'D'));
-		ModeManager::AddUserMode(new UserMode("CALLERID", 'g'));
-		ModeManager::AddUserMode(new UserMode("REGPRIV", 'R'));
-		ModeManager::AddUserMode(new UserModeNoone("SSL", 'Z')); 
-		ModeManager::AddUserMode(new UserModeOperOnly("LOCOPS", 'l'));
-		ModeManager::AddUserMode(new UserModeOperOnly("OPERWALLS", 'z'));
-		ModeManager::AddUserMode(new UserModeNoone("PROTECTED", 'S'));
 		ModeManager::AddUserMode(new UserMode("NOFORWARD", 'Q'));
-
-		// charybdis has no usermode for registered users
-		ModeManager::RemoveUserMode(ModeManager::FindUserModeByName("REGISTERED"));
+		ModeManager::AddUserMode(new UserMode("REGPRIV", 'R'));
+		ModeManager::AddUserMode(new UserModeOperOnly("OPERWALLS", 'z'));
+		ModeManager::AddUserMode(new UserModeNoone("SSL", 'Z')); 
 
 		/* b/e/I */
 		ModeManager::AddChannelMode(new ChannelModeList("QUIET", 'q'));
@@ -387,7 +380,6 @@ class ProtoCharybdis : public Module
 		ModeManager::AddChannelMode(new ChannelModeLargeBan("LBAN", 'L'));
 		ModeManager::AddChannelMode(new ChannelMode("PERM", 'P'));
 		ModeManager::AddChannelMode(new ChannelMode("NOFORWARD", 'Q'));
-		ModeManager::AddChannelMode(new ChannelMode("REGISTEREDONLY", 'r'));
 		ModeManager::AddChannelMode(new ChannelMode("OPMODERATED", 'z'));
 	}
 

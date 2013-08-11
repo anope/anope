@@ -116,7 +116,7 @@ class ChanServCore : public Module, public ChanServService
 
 	EventReturn OnBotPrivmsg(User *u, BotInfo *bi, Anope::string &message) anope_override
 	{
-		if (bi == ChanServ && Config->GetModule(this)->Get<bool>("operonly") && !u->HasMode("OPER"))
+		if (bi == ChanServ && Config->GetModule(this)->Get<bool>("opersonly") && !u->HasMode("OPER"))
 		{
 			u->SendMessage(bi, ACCESS_DENIED);
 			return EVENT_STOP;

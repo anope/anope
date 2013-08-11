@@ -199,6 +199,32 @@ class ChanServCore : public Module, public ChanServService
 		}
 	}
 
+	void OnDelChan(ChannelInfo *ci) anope_override
+	{
+		/* remove access entries that are this channel */
+
+		std::deque<Anope::string> chans;
+		ci->GetChannelReferences(chans);
+
+		for (unsigned i = 0; i < chans.size(); ++i)
+		{
+			ChannelInfo *c = ChannelInfo::Find(chans[i]);
+			if (!c)
+				continue;
+
+			for (unsigned j = 0; j < c->GetAccessCount(); ++j)
+			{
+				ChanAccess *a = c->GetAccess(j);
+
+				if (a->mask.equals_ci(ci->name))
+				{
+					delete a;
+					break;
+				}
+			}
+		}
+	}
+
 	EventReturn OnPreHelp(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		if (!params.empty() || source.c || source.service != *ChanServ)

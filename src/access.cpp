@@ -154,6 +154,12 @@ ChanAccess::~ChanAccess()
 		const NickAlias *na = NickAlias::Find(this->mask);
 		if (na != NULL)
 			na->nc->RemoveChannelReference(this->ci);
+		else
+		{
+			ChannelInfo *c = ChannelInfo::Find(this->mask);
+			if (c)
+				c->RemoveChannelReference(this->ci->name);
+		}
 	}
 }
 

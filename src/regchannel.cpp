@@ -401,6 +401,12 @@ void ChannelInfo::AddAccess(ChanAccess *taccess)
 		na->nc->AddChannelReference(this);
 		taccess->nc = na->nc;
 	}
+	else
+	{
+		ChannelInfo *ci = ChannelInfo::Find(taccess->mask);
+		if (ci != NULL)
+			ci->AddChannelReference(this->name);
+	}
 }
 
 ChanAccess *ChannelInfo::GetAccess(unsigned index) const
@@ -656,3 +662,22 @@ bool IsFounder(const User *user, const ChannelInfo *ci)
 	return false;
 }
 
+
+void ChannelInfo::AddChannelReference(const Anope::string &what)
+{
+	++references[what];
+}
+
+void ChannelInfo::RemoveChannelReference(const Anope::string &what)
+{
+	int &i = references[what];
+	if (--i <= 0)
+		references.erase(what);
+}
+
+void ChannelInfo::GetChannelReferences(std::deque<Anope::string> &chans)
+{
+	chans.clear();
+	for (Anope::map<int>::iterator it = references.begin(); it != references.end(); ++it)
+		chans.push_back(it->first);
+}

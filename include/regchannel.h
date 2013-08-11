@@ -47,6 +47,8 @@ class CoreExport AutoKick : public Serializable
  */
 class CoreExport ChannelInfo : public Serializable, public Extensible
 {
+	/* channels who reference this one */
+	Anope::map<int> references;
  private:
 	Serialize::Reference<NickCore> founder;					/* Channel founder */
 	Serialize::Reference<NickCore> successor;                               /* Who gets the channel if the founder nick is dropped or expires */
@@ -230,6 +232,10 @@ class CoreExport ChannelInfo : public Serializable, public Extensible
 	 * @return the ChannelInfo associated with the channel
 	 */
 	static ChannelInfo* Find(const Anope::string &name);
+
+	void AddChannelReference(const Anope::string &what);
+	void RemoveChannelReference(const Anope::string &what);
+	void GetChannelReferences(std::deque<Anope::string> &chans);
 };
 
 /** Is the user the real founder?

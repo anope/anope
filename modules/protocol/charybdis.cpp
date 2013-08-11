@@ -142,7 +142,7 @@ class CharybdisProto : public IRCDProto
 
 	void SendVhost(User *u, const Anope::string &ident, const Anope::string &host) anope_override
 	{
-		UplinkSocket::Message(Me) << "ENCAP * CHGHOST " << u->GetUID() << ": " << host;
+		UplinkSocket::Message(Me) << "ENCAP * CHGHOST " << u->GetUID() << " :" << host;
 	}
 
 	void SendVhostDel(User *u) anope_override

@@ -34,7 +34,9 @@ namespace DNS
 		/* IPv6 AAAA lookup */
 		QUERY_AAAA = 28,
 		/* Zone transfer */
-		QUERY_AXFR = 252
+		QUERY_AXFR = 252,
+		/* A lookup for any record */
+		QUERY_ANY = 255
 	};
 	
 	/** Flags that can be AND'd into DNSPacket::flags to receive certain values

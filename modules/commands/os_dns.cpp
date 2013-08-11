@@ -774,7 +774,7 @@ class ModuleDNS : public Module
 			return;
 		/* Currently we reply to any QR for A/AAAA */
 		const DNS::Question& q = req.questions[0];
-		if (q.type != DNS::QUERY_A && q.type != DNS::QUERY_AAAA && q.type != DNS::QUERY_AXFR)
+		if (q.type != DNS::QUERY_A && q.type != DNS::QUERY_AAAA && q.type != DNS::QUERY_AXFR && q.type != DNS::QUERY_ANY)
 			return;
 
 		DNSZone *zone = DNSZone::Find(q.name);
@@ -791,7 +791,7 @@ class ModuleDNS : public Module
 				{
 					DNS::QueryType q_type = s->GetIPs()[j].find(':') != Anope::string::npos ? DNS::QUERY_AAAA : DNS::QUERY_A;
 
-					if (q.type == DNS::QUERY_AXFR || q_type == q.type)
+					if (q.type == DNS::QUERY_AXFR || q.type == DNS::QUERY_ANY || q_type == q.type)
 					{
 						DNS::ResourceRecord rr(q.name, q_type);
 						rr.ttl = this->ttl;
@@ -815,7 +815,7 @@ class ModuleDNS : public Module
 				{
 					DNS::QueryType q_type = s->GetIPs()[j].find(':') != Anope::string::npos ? DNS::QUERY_AAAA : DNS::QUERY_A;
 
-					if (q.type == DNS::QUERY_AXFR || q_type == q.type)
+					if (q.type == DNS::QUERY_AXFR || q.type == DNS::QUERY_ANY || q_type == q.type)
 					{
 						DNS::ResourceRecord rr(q.name, q_type);
 						rr.ttl = this->ttl;
@@ -844,7 +844,7 @@ class ModuleDNS : public Module
 				{
 					DNS::QueryType q_type = s->GetIPs()[j].find(':') != Anope::string::npos ? DNS::QUERY_AAAA : DNS::QUERY_A;
 
-					if (q.type == DNS::QUERY_AXFR || q_type == q.type)
+					if (q.type == DNS::QUERY_AXFR || q.type == DNS::QUERY_ANY || q_type == q.type)
 					{
 						DNS::ResourceRecord rr(q.name, q_type);
 						rr.ttl = this->ttl;
@@ -856,7 +856,7 @@ class ModuleDNS : public Module
 
 			if (packet->answers.size() == answer_size)
 			{
-				Log(this) << "Error! There are no servers with any IPs. At all.";
+				Log(this) << "Error! There are no servers with any IPs of type " << q.type;
 				/* Send back an empty answer anyway */
 			}
 		}

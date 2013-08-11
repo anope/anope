@@ -612,6 +612,39 @@ class UDPSocket : public ReplySocket
 	}
 };
 
+class NotifySocket : public Socket
+{
+	Packet *packet;
+ public:
+	NotifySocket(bool v6, Packet *p) : Socket(-1, v6, SOCK_DGRAM), packet(p)
+	{
+		SocketEngine::Change(this, false, SF_READABLE);
+		SocketEngine::Change(this, true, SF_WRITABLE);
+	}
+
+	bool ProcessWrite() anope_override
+	{
+		if (!packet)
+			return false;
+
+		Log(LOG_DEBUG_2) << "Resolver: Notifying slave " << packet->addr.addr();
+
+		try
+		{
+			unsigned char buffer[524];
+			unsigned short len = packet->Pack(buffer, sizeof(buffer));
+
+			sendto(this->GetFD(), reinterpret_cast<char *>(buffer), len, 0, &packet->addr.sa, packet->addr.size());
+		}
+		catch (const SocketException &) { }
+
+		delete packet;
+		packet = NULL;
+
+		return false;
+	}
+};
+
 class MyManager : public Manager, public Timer
 {
 	uint32_t serial;
@@ -624,6 +657,8 @@ class MyManager : public Manager, public Timer
 
 	bool listen;
 	sockaddrs addrs;
+
+	std::vector<std::pair<Anope::string, short> > notify;
  public:
 	std::map<unsigned short, Request *> requests;
 
@@ -652,7 +687,7 @@ class MyManager : public Manager, public Timer
 		this->cache.clear();
 	}
 
-	void SetIPPort(const Anope::string &nameserver, const Anope::string &ip, unsigned short port)
+	void SetIPPort(const Anope::string &nameserver, const Anope::string &ip, unsigned short port, std::vector<std::pair<Anope::string, short> > n)
 	{
 		delete udpsock;
 		delete tcpsock;
@@ -677,8 +712,26 @@ class MyManager : public Manager, public Timer
 		{
 			Log() << "Unable to bind dns to " << ip << ":" << port << ": " << ex.GetReason();
 		}
+
+		notify = n;
 	}
 
+ private:
+	unsigned short GetID()
+	{
+		if (this->udpsock->GetPackets().size() == 65535)
+			throw SocketException("DNS queue full");
+
+		static unsigned short cur_id = rand();
+
+		do
+			cur_id = (cur_id + 1) & 0xFFFF;
+		while (!cur_id || this->requests.count(cur_id));
+
+		return cur_id;
+	}
+
+ public:
 	void Process(Request *req) anope_override
 	{
 		Log(LOG_DEBUG_2) << "Resolver: Processing request to lookup " << req->name << ", of type " << req->type;
@@ -693,16 +746,7 @@ class MyManager : public Manager, public Timer
 		if (!this->udpsock)
 			throw SocketException("No dns socket");
 
-		if (this->udpsock->GetPackets().size() == 65535)
-			throw SocketException("DNS queue full");
-
-		do
-		{
-			static unsigned short cur_id = rand();
-			cur_id = req->id = (cur_id + 1) & 0xFFFF;
-		}
-		while (!req->id || this->requests.count(req->id));
-
+		req->id = GetID();
 		this->requests[req->id] = req;
 
 		req->SetSecs(timeout);
@@ -877,6 +921,37 @@ class MyManager : public Manager, public Timer
 		serial = Anope::CurTime;
 	}
 
+	void Notify(const Anope::string &zone) anope_override
+	{
+		/* notify slaves of the update */
+		for (unsigned i = 0; i < notify.size(); ++i)
+		{
+			const Anope::string &ip = notify[i].first;
+			short port = notify[i].second;
+
+			sockaddrs addr;
+			addr.pton(ip.find(':') != Anope::string::npos ? AF_INET6 : AF_INET, ip, port);
+			if (!addr.valid())
+				return;
+
+			Packet *packet = new Packet(this, &addr);
+			packet->flags = QUERYFLAGS_AA | QUERYFLAGS_OPCODE_NOTIFY;
+			try
+			{
+				packet->id = GetID();
+			}
+			catch (const SocketException &)
+			{
+				delete packet;
+				continue;
+			}
+
+			packet->questions.push_back(Question(zone, QUERY_SOA));
+
+			new NotifySocket(ip.find(':') != Anope::string::npos ? AF_INET6 : AF_INET, packet);
+		}
+	}
+
 	uint32_t GetSerial() const anope_override
 	{
 		return serial;
@@ -936,6 +1011,8 @@ class ModuleDNS : public Module
 	Anope::string ip;
 	int port;
 
+	std::vector<std::pair<Anope::string, short> > notify;
+
  public:
 	ModuleDNS(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, EXTRA | VENDOR), manager(this)
 	{
@@ -953,6 +1030,15 @@ class ModuleDNS : public Module
 		admin = block->Get<const Anope::string>("admin", "admin@example.com");
 		nameservers = block->Get<const Anope::string>("nameservers", "ns1.example.com");
 		refresh = block->Get<int>("refresh", "3600");
+
+		for (int i = 0; i < block->CountBlock("notify"); ++i)
+		{
+			Configuration::Block *n = block->GetBlock("notify", i);
+			Anope::string nip = n->Get<Anope::string>("ip");
+			short nport = n->Get<short>("port");
+
+			notify.push_back(std::make_pair(nip, nport));
+		}
 
 		if (Anope::IsFile(nameserver))
 		{
@@ -991,7 +1077,7 @@ class ModuleDNS : public Module
 
 		try
 		{
-			this->manager.SetIPPort(nameserver, ip, port);
+			this->manager.SetIPPort(nameserver, ip, port, notify);
 		}
 		catch (const SocketException &ex)
 		{

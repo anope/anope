@@ -38,13 +38,14 @@ namespace DNS
 		/* A lookup for any record */
 		QUERY_ANY = 255
 	};
-	
+
 	/** Flags that can be AND'd into DNSPacket::flags to receive certain values
 	 */
 	enum
 	{
 		QUERYFLAGS_QR = 0x8000,
 		QUERYFLAGS_OPCODE = 0x7800,
+		QUERYFLAGS_OPCODE_NOTIFY = 0x2000,
 		QUERYFLAGS_AA = 0x400,
 		QUERYFLAGS_TC = 0x200,
 		QUERYFLAGS_RD = 0x100,
@@ -126,6 +127,7 @@ namespace DNS
 		virtual bool HandlePacket(ReplySocket *s, const unsigned char *const data, int len, sockaddrs *from) = 0;
 	
 		virtual void UpdateSerial() = 0;
+		virtual void Notify(const Anope::string &zone) = 0;
 		virtual uint32_t GetSerial() const = 0;
 	};
 	

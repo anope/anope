@@ -131,7 +131,11 @@ class DNSServer : public Serializable
 		active = p;
 
 		if (dnsmanager)
+		{
 			dnsmanager->UpdateSerial();
+			for (std::set<Anope::string, ci::less>::iterator it = zones.begin(), it_end = zones.end(); it != it_end; ++it)
+				dnsmanager->Notify(*it);
+		}
 	}
 
 	void Serialize(Serialize::Data &data) const anope_override
@@ -458,7 +462,11 @@ class CommandOSDNS : public Command
 		Log(LOG_ADMIN, source, this) << "to add IP " << params[2] << " to " << s->GetName();
 
 		if (s->Active() && dnsmanager)
+		{
 			dnsmanager->UpdateSerial();
+			for (std::set<Anope::string, ci::less>::iterator it = s->zones.begin(), it_end = s->zones.end(); it != it_end; ++it)
+				dnsmanager->Notify(*it);
+		}
 	}
 	
 	void DelIP(CommandSource &source, const std::vector<Anope::string> &params)
@@ -485,7 +493,11 @@ class CommandOSDNS : public Command
 				}
 
 				if (s->Active() && dnsmanager)
+				{
 					dnsmanager->UpdateSerial();
+					for (std::set<Anope::string, ci::less>::iterator it = s->zones.begin(), it_end = s->zones.end(); it != it_end; ++it)
+						dnsmanager->Notify(*it);
+				}
 
 				return;
 			}

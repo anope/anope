@@ -1039,6 +1039,12 @@ struct IRCDMessageIdle : IRCDMessage
 		BotInfo *bi = BotInfo::Find(params[0]);
 		if (bi)
 			UplinkSocket::Message(bi) << "IDLE " << source.GetSource() << " " << Anope::StartTime << " " << (Anope::CurTime - bi->lastmsg);
+		else
+		{
+			User *u = User::Find(params[0]);
+			if (u && u->server == Me)
+				UplinkSocket::Message(u) <<  "IDLE " << source.GetSource() << " " << Anope::StartTime << " 0";
+		}
 	}
 };
 

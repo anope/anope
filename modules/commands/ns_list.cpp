@@ -62,7 +62,7 @@ class CommandNSList : public Command
 			{
 				if (keyword.equals_ci("NOEXPIRE"))
 					nsnoexpire = true;
-				if (keyword.equals_ci("SUSPENDED"))
+				if (keyword.equals_ci("NS_SUSPENDED"))
 					suspended = true;
 				if (keyword.equals_ci("UNCONFIRMED"))
 					unconfirmed = true;
@@ -87,7 +87,7 @@ class CommandNSList : public Command
 				continue;
 			else if (nsnoexpire && !na->HasExt("NS_NO_EXPIRE"))
 				continue;
-			else if (suspended && !na->nc->HasExt("SUSPENDED"))
+			else if (suspended && !na->nc->HasExt("NS_SUSPENDED"))
 				continue;
 			else if (unconfirmed && !na->nc->HasExt("UNCONFIRMED"))
 				continue;
@@ -108,7 +108,7 @@ class CommandNSList : public Command
 					entry["Nick"] = (isnoexpire ? "!" : "") + na->nick;
 					if (na->nc->HasExt("HIDE_MASK") && !is_servadmin && na->nc != mync)
 						entry["Last usermask"] = "[Hostname hidden]";
-					else if (na->nc->HasExt("SUSPENDED"))
+					else if (na->nc->HasExt("NS_SUSPENDED"))
 						entry["Last usermask"] = "[Suspended]";
 					else if (na->nc->HasExt("UNCONFIRMED"))
 						entry["Last usermask"] = "[Unconfirmed]";

@@ -14,6 +14,7 @@ struct NSSuspendInfo
 	Anope::string nick, by, reason;
 	time_t when, expires;
 
+	virtual ~NSSuspendInfo() { }
  protected:
 	NSSuspendInfo() { }
 };

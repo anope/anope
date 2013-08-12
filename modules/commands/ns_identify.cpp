@@ -75,7 +75,7 @@ class CommandNSIdentify : public Command
 		Anope::string pass = params[params.size() - 1];
 
 		NickAlias *na = NickAlias::Find(nick);
-		if (na && na->nc->HasExt("SUSPENDED"))
+		if (na && na->nc->HasExt("NS_SUSPENDED"))
 			source.Reply(NICK_X_SUSPENDED, na->nick.c_str());
 		else if (u->Account() && na && u->Account() == na->nc)
 			source.Reply(_("You are already identified."));

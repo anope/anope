@@ -471,7 +471,7 @@ class NickServCore : public Module, public NickServService
 
 		/* Update last quit and last seen for the user */
 		NickAlias *na = NickAlias::Find(u->nick);
-		if (na && !na->nc->HasExt("SUSPENDED") && (u->IsRecognized() || u->IsIdentified(true)))
+		if (na && !na->nc->HasExt("NS_SUSPENDED") && (u->IsRecognized() || u->IsIdentified(true)))
 		{
 			na->last_seen = Anope::CurTime;
 			na->last_quit = msg;

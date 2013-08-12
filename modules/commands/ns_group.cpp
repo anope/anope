@@ -117,7 +117,7 @@ class CommandNSGroup : public Command
 			source.Reply(NICK_X_NOT_REGISTERED, nick.c_str());
 		else if (Anope::CurTime < u->lastnickreg + reg_delay)
 			source.Reply(_("Please wait %d seconds before using the GROUP command again."), (reg_delay + u->lastnickreg) - Anope::CurTime);
-		else if (target->nc->HasExt("SUSPENDED"))
+		else if (target->nc->HasExt("NS_SUSPENDED"))
 		{
 			Log(LOG_COMMAND, source, this) << "tried to use GROUP for SUSPENDED nick " << target->nick;
 			source.Reply(NICK_X_SUSPENDED, target->nick.c_str());

@@ -58,7 +58,7 @@ class CommandCSList : public Command
 			spacesepstream keywords(params[1]);
 			while (keywords.GetToken(keyword))
 			{
-				if (keyword.equals_ci("SUSPENDED"))
+				if (keyword.equals_ci("CS_SUSPENDED"))
 					suspended = true;
 				if (keyword.equals_ci("NOEXPIRE"))
 					channoexpire = true;
@@ -81,9 +81,9 @@ class CommandCSList : public Command
 		{
 			const ChannelInfo *ci = it->second;
 
-			if (!is_servadmin && (ci->HasExt("CS_PRIVATE") || ci->HasExt("SUSPENDED")))
+			if (!is_servadmin && (ci->HasExt("CS_PRIVATE") || ci->HasExt("CS_SUSPENDED")))
 				continue;
-			else if (suspended && !ci->HasExt("SUSPENDED"))
+			else if (suspended && !ci->HasExt("CS_SUSPENDED"))
 				continue;
 			else if (channoexpire && !ci->HasExt("CS_NO_EXPIRE"))
 				continue;
@@ -98,7 +98,7 @@ class CommandCSList : public Command
 
 					ListFormatter::ListEntry entry;
 					entry["Name"] = (isnoexpire ? "!" : "") + ci->name;
-					if (ci->HasExt("SUSPENDED"))
+					if (ci->HasExt("CS_SUSPENDED"))
 						entry["Description"] = "[Suspended]";
 					else
 						entry["Description"] = ci->desc;

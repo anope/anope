@@ -265,7 +265,7 @@ class NSAJoin : public Module
 			
 			if (ci != NULL)
 			{
-				if (ci->HasExt("SUSPENDED"))
+				if (ci->HasExt("CS_SUSPENDED"))
 					continue;
 			}
 			if (c != NULL)

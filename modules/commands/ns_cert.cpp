@@ -144,7 +144,7 @@ class CommandNSCert : public Command
 			return;
 		}
 
-		if (nc->HasExt("SUSPENDED"))
+		if (nc->HasExt("NS_SUSPENDED"))
 		{
 			source.Reply(NICK_X_SUSPENDED, nc->display.c_str());
 			return;
@@ -277,7 +277,7 @@ class CommandNSCert : public Command
 
 		NickCore *nc = source.nc;
 
-		if (source.nc->HasExt("SUSPENDED"))
+		if (source.nc->HasExt("NS_SUSPENDED"))
 			source.Reply(NICK_X_SUSPENDED, source.nc->display.c_str());
 		else if (cmd.equals_ci("ADD"))
 			return this->DoAdd(source, nc, mask);
@@ -335,7 +335,7 @@ class NSCert : public Module
 			return;
 		if (u->IsIdentified() && u->Account() == na->nc)
 			return;
-		if (na->nc->HasExt("SUSPENDED"))
+		if (na->nc->HasExt("NS_SUSPENDED"))
 			return;
 
 		NSCertList *cl = certs.Get(na->nc);

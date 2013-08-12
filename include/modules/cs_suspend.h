@@ -14,6 +14,7 @@ struct CSSuspendInfo
 	Anope::string chan, by, reason;
 	time_t time, expires;
 
+	virtual ~CSSuspendInfo() { }
  protected:
 	CSSuspendInfo() { }
 };

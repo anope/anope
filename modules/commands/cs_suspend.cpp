@@ -38,11 +38,11 @@ struct CSSuspendInfoImpl : CSSuspendInfo, Serializable
 			ChannelInfo *ci = ChannelInfo::Find(schan);
 			if (!ci)
 				return NULL;
-			si = ci->Extend<CSSuspendInfoImpl>("cs_suspend");
+			si = ci->Extend<CSSuspendInfoImpl>("CS_SUSPENDED");
 			data["chan"] >> si->chan;
 		}
 
-		data["bi"] >> si->by;
+		data["by"] >> si->by;
 		data["reason"] >> si->reason;
 		data["time"] >> si->time;
 		data["expires"] >> si->expires;
@@ -53,7 +53,7 @@ struct CSSuspendInfoImpl : CSSuspendInfo, Serializable
 class CommandCSSuspend : public Command
 {
  public:
-	CommandCSSuspend(Module *creator) : Command(creator, "chanserv/suspend", 1, 3)
+	CommandCSSuspend(Module *creator) : Command(creator, "chanserv/suspend", 2, 3)
 	{ 
 		this->SetDesc(_("Prevent a channel from being used preserving channel data and settings"));
 		this->SetSyntax(_("\037channel\037 [+\037expiry\037] \037reason\037"));
@@ -62,7 +62,7 @@ class CommandCSSuspend : public Command
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		const Anope::string &chan = params[0];
-		Anope::string expiry = params.size() > 1 ? params[1] : "";
+		Anope::string expiry = params[1];
 		Anope::string reason = params.size() > 2 ? params[2] : "";
 		time_t expiry_secs = Config->GetModule(this->owner)->Get<time_t>("expire");
 
@@ -85,7 +85,13 @@ class CommandCSSuspend : public Command
 			return;
 		}
 
-		CSSuspendInfo *si = ci->Extend<CSSuspendInfo>("cs_suspend");
+		if (ci->HasExt("CS_SUSPENDED"))
+		{
+			source.Reply(_("\2%s\2 is already suspended."), ci->name.c_str());
+			return;
+		}
+
+		CSSuspendInfo *si = ci->Extend<CSSuspendInfo>("CS_SUSPENDED");
 		si->chan = ci->name;
 		si->by = source.GetNick();
 		si->reason = reason;
@@ -153,7 +159,7 @@ class CommandCSUnSuspend : public Command
 		}
 
 		/* Only UNSUSPEND already suspended channels */
-		CSSuspendInfo *si = ci->GetExt<CSSuspendInfo>("cs_suspend");
+		CSSuspendInfo *si = ci->GetExt<CSSuspendInfo>("CS_SUSPENDED");
 		if (!si)
 		{
 			source.Reply(_("Channel \002%s\002 isn't suspended."), ci->name.c_str());
@@ -162,7 +168,7 @@ class CommandCSUnSuspend : public Command
 
 		Log(LOG_ADMIN, source, this, ci) << " which was suspended by " << si->by << " for: " << (!si->reason.empty() ? si->reason : "No reason");
 
-		ci->Shrink<CSSuspendInfo>("cs_suspend");
+		ci->Shrink<CSSuspendInfo>("CS_SUSPENDED");
 
 		source.Reply(_("Channel \002%s\002 is now released."), ci->name.c_str());
 
@@ -190,7 +196,7 @@ class CSSuspend : public Module
 
  public:
 	CSSuspend(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		commandcssuspend(this), commandcsunsuspend(this), suspend(this, "cs_suspend"),
+		commandcssuspend(this), commandcsunsuspend(this), suspend(this, "CS_SUSPENDED"),
 		suspend_type("CSSuspendInfo", CSSuspendInfoImpl::Unserialize)
 	{
 	}

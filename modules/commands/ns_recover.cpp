@@ -151,7 +151,7 @@ class CommandNSRecover : public Command
 			source.Reply(NICK_X_NOT_REGISTERED, nick.c_str());
 			return;
 		}
-		else if (na->nc->HasExt("SUSPENDED"))
+		else if (na->nc->HasExt("NS_SUSPENDED"))
 		{
 			source.Reply(NICK_X_SUSPENDED, na->nick.c_str());
 			return;

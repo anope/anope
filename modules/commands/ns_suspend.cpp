@@ -40,11 +40,11 @@ struct NSSuspendInfoImpl : NSSuspendInfo, Serializable
 			NickAlias *na = NickAlias::Find(snick);
 			if (!na)
 				return NULL;
-			si = na->Extend<NSSuspendInfoImpl>("SUSPENDED");
+			si = na->nc->Extend<NSSuspendInfoImpl>("NS_SUSPENDED");
 			data["nick"] >> si->nick;
 		}
 
-		data["bi"] >> si->by;
+		data["by"] >> si->by;
 		data["reason"] >> si->reason;
 		data["time"] >> si->when;
 		data["expires"] >> si->expires;
@@ -97,9 +97,15 @@ class CommandNSSuspend : public Command
 			return;
 		}
 
+		if (na->nc->HasExt("NS_SUSPENDED"))
+		{
+			source.Reply(_("\2%s\2 is already suspended."), na->nc->display.c_str());
+			return;
+		}
+
 		NickCore *nc = na->nc;
 
-		NSSuspendInfo *si = nc->Extend<NSSuspendInfo>("SUSPENDED");
+		NSSuspendInfo *si = nc->Extend<NSSuspendInfo>("NS_SUSPENDED");
 		si->nick = nc->display;
 		si->by = source.GetNick();
 		si->reason = reason;
@@ -168,13 +174,13 @@ class CommandNSUnSuspend : public Command
 			return;
 		}
 
-		if (!na->nc->HasExt("SUSPENDED"))
+		if (!na->nc->HasExt("NS_SUSPENDED"))
 		{
 			source.Reply(_("Nick %s is not suspended."), na->nick.c_str());
 			return;
 		}
 
-		na->nc->Shrink<NSSuspendInfo>("SUSPENDED");
+		na->nc->Shrink<NSSuspendInfo>("NS_SUSPENDED");
 
 		Log(LOG_ADMIN, source, this) << "for " << na->nick;
 		source.Reply(_("Nick %s is now released."), nick.c_str());
@@ -200,7 +206,7 @@ class NSSuspend : public Module
 
  public:
 	NSSuspend(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		commandnssuspend(this), commandnsunsuspend(this), suspend(this, "SUSPENDED"),
+		commandnssuspend(this), commandnsunsuspend(this), suspend(this, "NS_SUSPENDED"),
 		suspend_type("NSSuspendInfo", NSSuspendInfoImpl::Unserialize)
 	{
 	}

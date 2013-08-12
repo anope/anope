@@ -326,16 +326,17 @@ bool IRCDProto::IsChannelValid(const Anope::string &chan)
 
 bool IRCDProto::IsIdentValid(const Anope::string &ident)
 {
-	if (ident.empty() || ident.length() > Config->GetBlock("networkinfo")->Get<unsigned>("chanlen"))
+	if (ident.empty() || ident.length() > Config->GetBlock("networkinfo")->Get<unsigned>("userlen"))
 		return false;
 
 	for (unsigned i = 0; i < ident.length(); ++i)
 	{
 		const char &c = ident[i];
+
 		if ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || (c >= '0' && c <= '9') || c == '.' || c == '-')
-			;
-		else
-			return false;
+			continue;
+
+		return false;
 	}
 
 	return true;

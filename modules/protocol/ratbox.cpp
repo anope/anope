@@ -42,6 +42,7 @@ class RatboxProto : public IRCDProto
 	void SendModeInternal(const MessageSource &source, User *u, const Anope::string &buf) anope_override { hybrid->SendModeInternal(source, u, buf); }
 	void SendChannel(Channel *c) anope_override { hybrid->SendChannel(c); }
 	void SendTopic(const MessageSource &source, Channel *c) anope_override { hybrid->SendTopic(source, c); }
+	bool IsIdentValid(const Anope::string &ident) anope_override { return hybrid->IsIdentValid(ident); }
 
 	void SendConnect() anope_override
 	{

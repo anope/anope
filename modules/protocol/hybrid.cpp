@@ -259,6 +259,29 @@ class HybridProto : public IRCDProto
 		XLine x(nick);
 		this->SendSQLineDel(&x);
 	}
+
+	bool IsIdentValid(const Anope::string &ident) anope_override
+	{
+		if (ident.empty() || ident.length() > Config->GetBlock("networkinfo")->Get<unsigned>("userlen"))
+			return false;
+
+		Anope::string chars = "~}|{ `_^]\\[ .-$";
+
+		for (unsigned i = 0; i < ident.length(); ++i)
+		{
+			const char &c = ident[i];
+
+			if ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || (c >= '0' && c <= '9'))
+				continue;
+
+			if (chars.find(c) != Anope::string::npos)
+				continue;
+
+			return false;
+		}
+
+		return true;
+	}
 };
 
 struct IRCDMessageBMask : IRCDMessage

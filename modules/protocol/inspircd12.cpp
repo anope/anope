@@ -390,6 +390,27 @@ class InspIRCd12Proto : public IRCDProto
 	{
 		return mask.length() >= 3 && mask[1] == ':';
 	}
+
+	bool IsIdentValid(const Anope::string &ident) anope_override
+	{
+		if (ident.empty() || ident.length() > Config->GetBlock("networkinfo")->Get<unsigned>("userlen"))
+			return false;
+
+		for (unsigned i = 0; i < ident.length(); ++i)
+		{
+			const char &c = ident[i];
+
+			if (c >= 'A' && c <= '}')
+				continue;
+
+			if ((c >= '0' && c <= '9') || c == '-' || c == '.')
+				continue;
+
+			return false;
+		}
+
+		return true;
+	}
 };
 
 class InspIRCdExtBan : public ChannelModeList

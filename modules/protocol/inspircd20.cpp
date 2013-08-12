@@ -72,6 +72,7 @@ class InspIRCd20Proto : public IRCDProto
 	void SendLogout(User *u) anope_override { insp12->SendLogout(u); }
 	void SendChannel(Channel *c) anope_override { insp12->SendChannel(c); }
 	bool IsExtbanValid(const Anope::string &mask) anope_override { return insp12->IsExtbanValid(mask); }
+	bool IsIdentValid(const Anope::string &ident) anope_override { return insp12->IsIdentValid(ident); }
 };
 
 class InspIRCdExtBan : public ChannelModeList

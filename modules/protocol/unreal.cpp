@@ -376,6 +376,27 @@ class UnrealIRCdProto : public IRCDProto
 			bi->Join(c);
 		}
 	}
+
+	bool IsIdentValid(const Anope::string &ident) anope_override
+	{
+		if (ident.empty() || ident.length() > Config->GetBlock("networkinfo")->Get<unsigned>("userlen"))
+			return false;
+
+		for (unsigned i = 0; i < ident.length(); ++i)
+		{
+			const char &c = ident[i];
+
+			if ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || (c >= '0' && c <= '9') || c == '.' || c == '-')
+				continue;
+
+			if (c == '-' || c == '.' || c == '_')
+				continue;
+
+			return false;
+		}
+
+		return true;
+	}
 };
 
 class UnrealExtBan : public ChannelModeList

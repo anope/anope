@@ -100,11 +100,11 @@ class CommandCSTopic : public Command
 	{
 		const Anope::string &topic = params.size() > 2 ? params[2] : "";
 
-		bool *has_topiclock = topiclock->Get(ci);
+		bool has_topiclock = topiclock->HasExt(ci);
 		topiclock->Unset(ci);
 		ci->c->ChangeTopic(source.GetNick(), topic, Anope::CurTime);
 		if (has_topiclock)
-			topiclock->Set(ci, *has_topiclock);
+			topiclock->Set(ci);
 	
 		bool override = !source.AccessFor(ci).HasPriv("TOPIC");
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << (!topic.empty() ? "to change the topic to: " : "to unset the topic") << (!topic.empty() ? topic : "");

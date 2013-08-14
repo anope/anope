@@ -18,7 +18,7 @@ class BotServCore : public Module
 
  public:
 	BotServCore(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PSEUDOCLIENT | VENDOR),
-		persist("persist"), inhabit("inhabit")
+		persist("PERSIST"), inhabit("inhabit")
 	{
 	}
 
@@ -114,7 +114,7 @@ class BotServCore : public Module
 	void OnLeaveChannel(User *u, Channel *c) anope_override
 	{
 		/* Channel is persistent, it shouldn't be deleted and the service bot should stay */
-		if (c->ci && persist && persist->Get(c->ci))
+		if (c->ci && persist && persist->HasExt(c->ci))
 			return;
 	
 		/* Channel is syncing from a netburst, don't destroy it as more users are probably wanting to join immediatly
@@ -124,7 +124,7 @@ class BotServCore : public Module
 			return;
 
 		/* Additionally, do not delete this channel if ChanServ/a BotServ bot is inhabiting it */
-		if (inhabit && inhabit->Get(c))
+		if (inhabit && inhabit->HasExt(c))
 			return;
 
 		/* This is called prior to removing the user from the channnel, so c->users.size() - 1 should be safe */

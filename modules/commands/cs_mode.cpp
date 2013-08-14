@@ -947,7 +947,7 @@ class CSMode : public Module
 	{
 		ModeLocks *ml = modelocks.Require(ci);
 		Anope::string mlock;
-		spacesepstream sep(Config->GetModule(this)->Get<const Anope::string>("mlock", "+nrt"));
+		spacesepstream sep(Config->GetModule(this)->Get<const Anope::string>("mlock", "+nt"));
 		if (sep.GetToken(mlock))
 		{
 			bool add = true;

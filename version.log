@@ -8,9 +8,10 @@ VERSION_MAJOR="1"
 VERSION_MINOR="8"
 VERSION_PATCH="9"
 VERSION_EXTRA="-git"
-VERSION_BUILD="3123"
+VERSION_BUILD="3124"
 
 # Changes since 1.8.8 Release
+#Revision 3124 - hs_request: Improve logging of new vhost requests
 #Revision 3120 - Fix many memory leaks and valgrind warnings, see pull request #15
 #Revision 3119 - Fix not deleting the old server entry when juping existing servers on Unreal
 #Revision 3118 - Fix fd leak in mail.c with ForkForMail enabled

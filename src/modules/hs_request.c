@@ -68,7 +68,7 @@ static void my_add_host_request(char *nick, char *vIdent, char *vhost,
                          char *creator, int32 tmp_time);
 static int my_isvalidchar(const char c);
 static void my_memo_lang(User * u, char *name, int z, char *source, int number, ...);
-static void req_send_memos(User * u, char *vHost);
+static void req_send_memos(User * u, char *vIdent, char *vHost);
 static void show_list(User * u);
 static int hs_do_waiting(User * u);
 static int hsreqevt_nick_dropped(int argc, char **argv);
@@ -242,8 +242,12 @@ static int hs_do_request(User * u)
         my_add_host_request(nick, vIdent, hostmask, u->nick, tmp_time);
 
         moduleNoticeLang(s_HostServ, u, LNG_REQUESTED);
-        req_send_memos(u, hostmask);
-        alog("New vHost Requested by %s", nick);
+        req_send_memos(u, vIdent, hostmask);
+
+	if (vIdent)
+	        alog("New vHost Requested by %s: %s@%s", nick, vIdent, hostmask);
+	else
+		alog("New vHost Requested by %s: %s", nick, hostmask);
     } else {
         notice_lang(s_HostServ, u, HOST_NOREG, nick);
     }
@@ -306,30 +310,36 @@ static void my_memo_lang(User * u, char *name, int z, char *source, int number, 
 }
 
 
-static void req_send_memos(User * u, char *vHost)
+static void req_send_memos(User * u, char *vIdent, char *vHost)
 {
     int i;
     int z = 2;
+    char vbuf[BUFSIZE];
 
     if (checkDefCon(DEFCON_NO_NEW_MEMOS))
         return;
 
+    if (vIdent)
+	    snprintf(vbuf, sizeof(vbuf), "%s@%s", vIdent, vHost);
+    else
+	    snprintf(vbuf, sizeof(vbuf), "%s", vHost);
+
     if (HSRequestMemoOper == 1) {
         for (i = 0; i < servopers.count; i++) {
             my_memo_lang(u, (((NickCore *) servopers.list[i])->display), z,
-                         u->na->nick, LNG_REQUEST_MEMO, vHost);
+                         u->na->nick, LNG_REQUEST_MEMO, vbuf);
         }
         for (i = 0; i < servadmins.count; i++) {
             my_memo_lang(u, (((NickCore *) servadmins.list[i])->display),
-                         z, u->na->nick, LNG_REQUEST_MEMO, vHost);
+                         z, u->na->nick, LNG_REQUEST_MEMO, vbuf);
         }
         for (i = 0; i < RootNumber; i++) {
-            my_memo_lang(u, ServicesRoots[i], z, u->na->nick, LNG_REQUEST_MEMO, vHost);
+            my_memo_lang(u, ServicesRoots[i], z, u->na->nick, LNG_REQUEST_MEMO, vbuf);
         }
     }
     if (HSRequestMemoSetters == 1) {
         for (i = 0; i < HostNumber; i++) {
-            my_memo_lang(u, HostSetters[i], z, u->na->nick, LNG_REQUEST_MEMO, vHost);
+            my_memo_lang(u, HostSetters[i], z, u->na->nick, LNG_REQUEST_MEMO, vbuf);
         }
     }
 }

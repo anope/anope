@@ -137,7 +137,7 @@ static int do_forbid(User * u)
 
                 av[0] = c->name;
                 av[1] = cu->user->nick;
-                av[2] = reason ? reason : "CHAN_FORBID_REASON";
+                av[2] = reason ? reason : getstring(cu->user->na, CHAN_FORBID_REASON);
                 anope_cmd_kick(s_ChanServ, av[0], av[1], av[2]);
                 do_kick(s_ChanServ, 3, av);
             }

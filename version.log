@@ -8,9 +8,10 @@ VERSION_MAJOR="1"
 VERSION_MINOR="8"
 VERSION_PATCH="9"
 VERSION_EXTRA="-git"
-VERSION_BUILD="3124"
+VERSION_BUILD="3125"
 
 # Changes since 1.8.8 Release
+#Revision 3125 - Fix kick reason in cs_suspend and cs_forbid if no reason is given
 #Revision 3124 - hs_request: Improve logging of new vhost requests
 #Revision 3120 - Fix many memory leaks and valgrind warnings, see pull request #15
 #Revision 3119 - Fix not deleting the old server entry when juping existing servers on Unreal

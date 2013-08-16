@@ -2,6 +2,7 @@ Anope Version 1.8 - GIT
 -------------------
 06/05  F Fixed modules being loaded regardless of the load abort signal. [#1527]
 08/16  F Fixed hs_request to show requested ident in memos               [#1545]
+08/16  F Fix kick reason in cs_suspend/cs_forbid if no reason is given   [#1544]
 
 Provided by Michael Wobst - 2013
 05/25  U Update Hybrid protocol module to support Hybrid 8.1

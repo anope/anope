@@ -68,7 +68,7 @@ class HostServCore : public Module
 
 	void OnNickUpdate(User *u) anope_override
 	{
-		this->OnNickIdentify(u);
+		this->OnUserLogin(u);
 	}
 
 	EventReturn OnPreHelp(CommandSource &source, const std::vector<Anope::string> &params) anope_override

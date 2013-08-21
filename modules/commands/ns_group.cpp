@@ -113,6 +113,7 @@ class CommandNSGroup : public Command
 		NickAlias *target, *na = NickAlias::Find(u->nick);
 		const Anope::string &guestnick = Config->GetBlock("options")->Get<const Anope::string>("guestnickprefix");
 		time_t reg_delay = Config->GetModule("nickserv")->Get<time_t>("regdelay");
+		unsigned maxaliases = Config->GetModule(this->owner)->Get<unsigned>("maxaliases");
 		if (!(target = NickAlias::Find(nick)))
 			source.Reply(NICK_X_NOT_REGISTERED, nick.c_str());
 		else if (Anope::CurTime < u->lastnickreg + reg_delay)
@@ -128,7 +129,7 @@ class CommandNSGroup : public Command
 			source.Reply(NICK_IDENTIFY_REQUIRED);
 		else if (na && Config->GetModule(this->owner)->Get<bool>("nogroupchange"))
 			source.Reply(_("Your nick is already registered."));
-		else if (target->nc->aliases->size() >= Config->GetModule(this->owner)->Get<unsigned>("maxaliases") && !target->nc->IsServicesOper())
+		else if (maxaliases && target->nc->aliases->size() >= maxaliases && !target->nc->IsServicesOper())
 			source.Reply(_("There are too many nicks in your group."));
 		else if (u->nick.length() <= guestnick.length() + 7 &&
 			u->nick.length() >= guestnick.length() + 1 &&

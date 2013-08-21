@@ -259,13 +259,15 @@ class ChanServCore : public Module, public ChanServService
 
 	void OnCheckModes(Channel *c) anope_override
 	{
+		if (c->ci)
+			c->SetMode(c->ci->WhoSends(), "REGISTERED", "", false);
 		const Anope::string &require = Config->GetModule(this)->Get<const Anope::string>("require", "r");
 		if (!require.empty())
 		{
 			if (c->ci)
-				c->SetModes(NULL, false, "+%s", require.c_str());
+				c->SetModes(c->ci->WhoSends(), false, "+%s", require.c_str());
 			else
-				c->SetModes(NULL, false, "-%s", require.c_str());
+				c->SetModes(c->ci->WhoSends(), false, "-%s", require.c_str());
 		}
 	}
 

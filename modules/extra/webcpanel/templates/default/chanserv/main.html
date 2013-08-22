@@ -1,0 +1,8 @@
+{INCLUDE header.html}
+			<h2>Channels you have access in</h2>
+			<div class="cinfo">
+			{FOR CH,ECH IN CHANNEL_NAMES,ESCAPED_CHANNEL_NAMES}
+				<a href="/chanserv/set?channel={ECH}">{CH}</a></br>
+			{END FOR}
+			</div>
+{INCLUDE footer.html}

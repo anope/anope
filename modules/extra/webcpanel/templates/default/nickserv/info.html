@@ -1,0 +1,74 @@
+{INCLUDE header.html}
+		{IF EXISTS ERRORS}
+			{FOR M IN ERRORS}
+			<div class="alert alert-danger">
+				{M}<br>
+			</div>
+			{END FOR}
+		{END IF}
+
+		{IF EXISTS MESSAGES}
+		<div class="alert alert-info">
+			{FOR M IN MESSAGES}
+				{M}<br>
+			{END FOR}
+		</div>
+		{END IF}
+
+		<h2>Your account information:</h2>
+		<form method="post" action="/nickserv/info">
+			<table id="tableInfo" class="table table-hover">
+				<tbody>
+					<tr>
+						<td>Account:</td>
+						<td>{DISPLAY}</td>
+					</tr>
+					{IF EXISTS EMAIL}
+					<tr>
+						<td>E-mail:</td>
+						<td>{EMAIL}</td>
+					</tr>
+					{END IF}
+					<tr>
+						<td>Time registered:</td>
+						<td>{TIME_REGISTERED}</td>
+					</tr>
+					{IF EXISTS VHOST}
+					<tr>
+						<td>Vhost:</td>
+						<td>{VHOST}</td>
+					</tr>
+					{END IF}
+					<tr>
+						<td>Greet:</td>
+						<td><input name="greet" value="{GREET}" class="form-control input-sm"></td>
+					</tr>
+					<tr>
+						<td>Auto op:</td>
+						<td><input type="checkbox" name="autoop" value="on" {IF EXISTS AUTOOP}checked{END IF}></td>
+					</tr>
+					<tr>
+						<td>Private:</td>
+						<td><input type="checkbox" name="private" value="on" {IF EXISTS PRIVATE}checked{END IF}></td>
+					</tr>
+					<tr>
+						<td>Secure:</td>
+						<td><input type="checkbox" name="secure" value="on" {IF EXISTS SECURE}checked{END IF}></td>
+					</tr>
+					<tr>
+						<td>Kill:</td>
+						<td>
+							<select name="kill" class="form-control input-sm">
+								<option value="on" {IF EXISTS KILL_ON}selected{END IF}>On</option>
+								<option value="quick" {IF EXISTS KILL_QUICK}selected{END IF}>Quick</option>
+								<option value="off" {IF EXISTS KILL_OFF}selected{END IF}>Off</option>
+							</select>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+			<div class="text-center">
+				<button type="submit" class="btn btn-lg btn-primary">Save</button>
+			</div>
+		</form>
+{INCLUDE footer.html}

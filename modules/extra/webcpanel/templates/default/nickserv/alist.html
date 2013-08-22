@@ -1,0 +1,21 @@
+{INCLUDE header.html}
+		<h2>Channel access list</h2>
+		<table id="tableInfoNorm" class="table table-hover">
+			<thead>
+				<tr>
+					<th>Number</th>
+					<th>Channel</th>
+					<th>Access</th>
+				</tr>
+			</thead>
+			<tbody>
+				{FOR N,C,A IN NUMBERS,CHANNELS,ACCESSES}
+					<tr>
+						<td>{N}</td>
+						<td>{C}</td>
+						<td>{A}</td>
+					</tr>
+				{END FOR}
+			</tbody>
+		</table>
+{INCLUDE footer.html}

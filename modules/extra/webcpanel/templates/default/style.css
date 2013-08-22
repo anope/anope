@@ -1,0 +1,133 @@
+@import url(http://fonts.googleapis.com/css?family=Open+Sans:300,400);
+
+*, html, body, h1, h2, h3, h4, div, p, span, a, button {
+	font-family: 'Open Sans', sans-serif;
+}
+body {
+	background-color: #eee;
+	background-image: url('http://politeia.in/assets/img/bg/cubes.png');
+}
+
+/* RANDOM STUFF */
+#frontPages {
+	padding-top: 20px;
+}
+
+h2 {
+	margin: 0 0 10px 0;
+}
+h4 {
+	margin-top: 30px;
+}
+.popover {
+	max-width: 450px;
+	-webkit-box-shadow: 0 1px 10px rgba(0, 0, 0, 0.8);
+	box-shadow: 0 1px 10px rgba(0, 0, 0, 0.8);
+}
+
+/* LOGIN FORM */
+.form-signin .form-signin-heading, .form-signin .checkbox {
+	margin-bottom: 10px;
+}
+.form-signin .checkbox {
+	font-weight: normal;
+}
+.form-signin .form-control {
+	position: relative;
+	font-size: 16px;
+	height: auto;
+	padding: 10px;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+}
+.form-signin .form-control:focus {
+	z-index: 2;
+}
+/* FOOTER */
+.footer {
+	margin-top: 20px;
+}
+
+/* Control Panel */
+#loggedIn {
+	margin: 15px 15px 0 0;
+}
+
+#navPanel {
+	margin: 0;
+	padding: 0;
+}
+.table thead > tr:first-child > th, .table tbody > tr:first-child > th, .table tfoot > tr:first-child > th, .table thead > tr:first-child > td, .table tbody > tr:first-child > td, .table tfoot > tr:first-child > td {
+	vertical-align: top;
+	border-top: 0;
+}
+#tableInfo td {
+	vertical-align: middle;
+}
+#tableInfo td:first-child {
+	font-weight: bold;
+	padding-right: 10px;
+	text-align: right;
+}
+
+#tableInfoNorm td {
+	vertical-align: middle;
+}
+#tableInfoNorm td:first-child {
+	font-weight: bold;
+	padding-right: 10px;
+}
+
+#tableInfoMemos td {
+	vertical-align: top;
+}
+#tableInfoMemos td:first-child {
+	font-weight: bold;
+	padding-right: 10px;
+}
+#tableInfoMemos th small {
+	font-weight: normal;
+}
+
+#tableNSAccess td {
+	vertical-align: middle;
+}
+#tableNSAccess td:first-child {
+	padding-right: 10px;
+	text-align: left;
+}
+#tableNSAccess td:last-child {
+	padding-right: 10px;
+	text-align: right;
+}
+#tableNSAccess th small {
+	font-weight: normal;
+}
+
+/* NAVBAR */
+.navbar, .well {
+	background-color: white;
+}
+
+.navbar {
+	-webkit-box-shadow: 0 8px 6px -8px black;
+	-moz-box-shadow: 0 8px 6px -8px black;
+	box-shadow: 0 8px 6px -8px black;
+}
+
+.navbar-default .navbar-nav > li > a {
+	color: #777777;
+	-webkit-transition: background-color .5s ease-out;
+	-moz-transition: background-color .5s ease-out;
+	-o-transition: background-color .5s ease-out;
+	transition: background-color .5s ease-out;
+}
+
+.navbar-default .navbar-nav > li > a:hover, .navbar-default .navbar-nav > li > a:focus {
+	color: #333333;
+	background-color: #4796DA;
+	background-color: rgba(66, 139, 202, 0.05);
+	border-bottom: 3px solid #0082D9;
+	margin-bottom: -3px;
+}

@@ -677,7 +677,7 @@ class ProtongIRCd : public Module
 
 	void OnUserNickChange(User *u, const Anope::string &) anope_override
 	{
-		u->RemoveModeInternal(Me, ModeManager::FindUserModeByName("REGISTERED"));
+		u->RemoveMode(Config->GetClient("NickServ"), "REGISTERED");
 	}
 };
 

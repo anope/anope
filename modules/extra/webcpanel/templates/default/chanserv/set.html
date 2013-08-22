@@ -1,9 +1,13 @@
 {INCLUDE header.html}
 		{FOR M IN MESSAGES}
-			{M}<br/>
+		<div class="alert alert-info">
+			{M}<br>
+		</div>
 		{END FOR}
+
+		<h2>Channel Information</h2>
 		<form method="post" action="/chanserv/set?channel={CHANNEL_ESCAPED}">
-			<table width="100%" height="100%">
+			<table id="tableInfo" class="table table-hover">
 				<tr>
 					<td>Channel Name</td>
 					<td>{CHANNEL}</td>
@@ -40,59 +44,31 @@
 				{END IF}
 				<tr>
 					<td>Keep topic</td>
-					{IF EXISTS KEEPTOPIC}
-					<td><input type="checkbox" name="keeptopic" value="on" checked></td>
-					{ELSE}
-					<td><input type="checkbox" name="keeptopic" value="on"></td>
-					{END IF}
+					<td><input type="checkbox" name="keeptopic" value="on" {IF EXISTS KEEPTOPIC}checked{END IF}></td>
 				</tr>
 				<tr>
 					<td>Peace</td>
-					{IF EXISTS PEACE}
-					<td><input type="checkbox" name="peace" value="on" checked></td>
-					{ELSE}
-					<td><input type="checkbox" name="peace" value="on"></td>
-					{END IF}
+					<td><input type="checkbox" name="peace" value="on" {IF EXISTS PEACE}checked{END IF}></td>
 				</tr>
 				<tr>
 					<td>Private</td>
-					{IF EXISTS PRIVATE}
-					<td><input type="checkbox" name="private" value="on" checked></td>
-					{ELSE}
-					<td><input type="checkbox" name="private" value="on"></td>
-					{END IF}
+					<td><input type="checkbox" name="private" value="on" {IF EXISTS PRIVATE}checked{END IF}></td>
 				</tr>
 				<tr>
 					<td>Restricted</td>
-					{IF EXISTS RESTRICTED}
-					<td><input type="checkbox" name="restricted" value="on" checked></td>
-					{ELSE}
-					<td><input type="checkbox" name="restricted" value="on"></td>
-					{END IF}
+					<td><input type="checkbox" name="restricted" value="on" {IF EXISTS RESTRICTED}checked{END IF}></td>
 				</tr>
 				<tr>
 					<td>Secure</td>
-					{IF EXISTS SECURE}
-					<td><input type="checkbox" name="secure" value="on" checked></td>
-					{ELSE}
-					<td><input type="checkbox" name="secure" value="on"></td>
-					{END IF}
+					<td><input type="checkbox" name="secure" value="on" {IF EXISTS SECURE}checked{END IF}></td>
 				</tr>
 				<tr>
 					<td>Secure Ops</td>
-					{IF EXISTS SECUREOPS}
-					<td><input type="checkbox" name="secureops" value="on" checked></td>
-					{ELSE}
-					<td><input type="checkbox" name="secureops" value="on"></td>
-					{END IF}
+					<td><input type="checkbox" name="secureops" value="on" {IF EXISTS SECUREOPS}checked{END IF}></td>
 				</tr>
 				<tr>
 					<td>Topic Lock</td>
-					{IF EXISTS TOPICLOCK}
-					<td><input type="checkbox" name="topiclock" value="on" checked></td>
-					{ELSE}
-					<td><input type="checkbox" name="topiclock" value="on"></td>
-					{END IF}
+					<td><input type="checkbox" name="topiclock" value="on" {IF EXISTS TOPICLOCK}checked{END IF}></td>
 				</tr>
 		</table>
 	<input type="submit" value="Save">

@@ -1,30 +1,47 @@
-<!DOCTYPE html> 
-<html>
-<head>
-	<link href="/static/style.css" media="screen" rel="stylesheet" type="text/css" />
-	<title>{TITLE}</title>
-</head>
-<body>
-	<div class="master">
-		<div class="header">
-			<div class="loggedinas"><a href="/">Home</a></div>
-		</div>
-		<table width="100%" height="100%">
-			<tr>
-				<td>
-					<center>
-						<img src="static/logo.png"/>
-						<br/>
+<!DOCTYPE html>
+<!--[if IE 7]> <html lang="en" class="ie7"> <![endif]-->
+<!--[if IE 8]> <html lang="en" class="ie8"> <![endif]-->
+<!--[if IE 9]> <html lang="en" class="ie9"> <![endif]-->
+<!--[if !IE]><!-->
+<html lang="en">
+	<!--<![endif]-->
+	<head>
+		<link href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" rel="stylesheet">
+		<link href="/static/style.css" media="screen" rel="stylesheet" type="text/css" />
+		<!--[if lt IE 9]><script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+		<title>{TITLE}</title>
+	</head>
+	<body>
+		<div id="frontPages" class="container">
+			<div class="row">
+				<div class="col-lg-offset-4 col-lg-4">
+					<a href="/"><img src="http://www.geniusdex.net/anope/anope.svg" class="img-responsive" width="370"></a>
+					<a href="/" class="btn btn-lg btn-default btn-block">Back Home</a>
+
+					<h1 class="form-signin-heading">Register</h1>
+
+					{IF EXISTS MESSAGES}
+					<div class="alert alert-info">
 						{FOR M IN MESSAGES}
 							{M}<br/>
 						{END FOR}
-					</center>
-				</td>
-			</tr>
-		</table>
-	</div>
-	<div class="footer">
-		Anope IRC Services - &copy; 2012 Anope Team - <a href="http://anope.org">http://anope.org</a>
-	</div>
-</body>
+					</div>
+					{END IF}
+				</div>
+			</div>
+
+			<br>
+			<div class="row">
+				<div class="col-lg-offset-3 col-lg-6">
+					<div class="footer text-center">
+						Anope IRC Services - &copy; 2013 Anope Team - <a href="http://anope.org">http://anope.org</a>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+		<script src="//netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
+	</body>
 </html>

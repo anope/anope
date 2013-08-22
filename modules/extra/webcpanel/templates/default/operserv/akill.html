@@ -1,49 +1,71 @@
 {INCLUDE header.html}
-	{IF EXISTS NOACCESS}
-		<b>Access denied.</b>
-	{ELSE}
+		{IF EXISTS NOACCESS}
+		<h2>Access denied.</h2>
+		{ELSE}
+
 		{FOR M IN MESSAGES}
-			{M}</br>
+		<div class="alert alert-info">
+			{M}<br>
+		</div>
 		{END FOR}
-		</br><b>AKILL List:</b>
-		<table width="100%" height="100%">
-			<tr>
-				<td class="akillR1">Number</td>
-				<td class="akillR2">Hostmask</td>
-				<td class="akillR2">Expires</td>
-				<td class="akillR2">Setter</td>
-				<td class="akillR3"/>
-			</tr>
-		</table>
-		<div class="scroll">
-			<table>
+
+		<script>
+			$(function () \{
+				$('.table tbody tr td abbr').popover();
+			\});
+		</script>
+
+		<h2>AKILL List</h2>
+		<table id="tableNSAccess" class="table table-hover">
+			<thead>
+				<tr>
+					<th>Number</th>
+					<th>Hostmask <small>(hover: Reason)</small></th>
+					<th>Expires <small>(hover: Set Date)</small></th>
+					<th>Setter</th>
+					<th></th>
+				</tr>
+			</thead>
+			<tbody>
 				{FOR N,H,S,T,E,R IN NUMBER,HOST,SETTER,TIME,EXPIRE,REASON}
 				<tr>
-					<td class="akillR1">{N}</td>
-					<td class="akillR2"><abbr class="akillR2" title="{R}">{H}</abbr></td>
-					<td class="akillR2"><abbr class="akillR2" title="{T}">{E}</abbr></td>
-					<td class="akillR2">{S}</td>
-					<td class="akillR3"><a href="/operserv/akill?&number={N}&del=1">Delete</a></td>
+					<td>{N}</td>
+					<td><abbr data-container="body" data-trigger="hover" data-placement="top" data-content="{R}">{H}</abbr></td>
+					<td><abbr data-container="body" data-trigger="hover" data-placement="top" data-content="{T}">{E}</abbr></td>
+					<td>{S}</td>
+					<td><a href="/operserv/akill?&number={N}&del=1" class="btn btn-sm btn-danger">Delete</a></td>
 				</tr>
 				{END FOR}
-			</table></br>
-		</div>
-		<b>Add a new AKILL</b>
-		<form method="post" action="/operserv/akill">
-			<table width="100%" height="100%" align="left">
-				<tr>
-					<th align="left">HostMask</th>
-					<th align="left">Expiry</th>
-					<th align="left">Reason</th>
-				</tr>
-				<tr>
-					<td><input type="text" name="mask"></td>
-					<td><input type="text" name="expiry"></td>
-					<td><input type="text" name="reason"></td>
-				</tr>
-			</table>
-			<input type="submit" value="send">
-		</form>
-	{END IF}
+			</tbody>
+		</table>
 
+		<hr>
+
+		<h4>Add a new AKILL</h4>
+		<form class="form-horizontal" method="post" action="/operserv/akill">
+			<div class="form-group">
+				<label class="control-label col-lg-2" for="mask">HostMask:</label>
+				<div class="col-lg-6">
+					<input class="form-control" type="text" name="mask" id="mask" placeholder="Valid HostMask">
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="control-label col-lg-2" for="expiry">Expiry:</label>
+				<div class="col-lg-6">
+					<input class="form-control" type="text" name="expiry" id="expiry" placeholder="Expire time">
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="control-label col-lg-2" for="reason">Message:</label>
+				<div class="col-lg-6">
+					<input class="form-control" type="text" name="reason" id="reason" placeholder="Reason for AKILL">
+				</div>
+			</div>
+			<div class="form-group">
+				<div class="col-lg-offset-2 col-lg-6">
+					<button type="submit" class="btn btn-primary">Send</button>
+				</div>
+			</div>
+		</form>
+		{END IF}
 {INCLUDE footer.html}

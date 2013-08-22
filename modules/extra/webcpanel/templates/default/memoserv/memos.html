@@ -1,69 +1,103 @@
 {INCLUDE header.html}
-		<b>Channels you have access in:</b><br/>
-		{FOR CH,ECH IN CHANNEL_NAMES,ESCAPED_CHANNEL_NAMES}
-			<a href="/memoserv/memos?channel={ECH}" class="channel">{CH}</a> 
-		{END FOR}
-		<br/><br/>
 		{FOR M IN MESSAGES}
-			{M}</br>
+		<div class="alert alert-info">
+			{M}<br>
+		</div>
 		{END FOR}
-		<br/>
+
 		{IF EXISTS NUMBER}
-			<script type="text/javascript">
-				$("#memoTable").ready(function() \{
+			<script>
+				$("#tableInfoMemos").ready(function() \{
 					$(".reply").click(function(e) \{
 						e.preventDefault();
 						var recv = $(this).attr('href');
 						$("#receiver").val(recv);
+						$("#message").focus();
 					\});
 				\});
 			</script>
-			<b>Memos List:</b>
-			<table width="100%" height="100%" id="memoTable">
-				<tr>
-					<th class="akillR1">Number</th>
-					<th class="akillR3">Sender</th>
-					<th class="akillR2">Time/Message</th>
-				</tr>
-				{FOR I,S,T,TXT,U IN NUMBER,SENDER,TIME,TEXT,UNREAD}
-				{IF EQ U YES}
-				<tr class="read">
-				{ELSE}
-				<tr class="unread">
-				{END IF}
-					<td class="akillR1">{I}</td>
-					<td class="akillR3">{S}</td>
-					<td class="akillR2"><abbr title="{T}">{TXT}</abbr></td>
-				</tr>
-				{IF EQ U YES}
-				<tr class="read">
-					<td></td>
-					<td></td>
-					<td class="right"><a href="/memoserv/memos?channel={ESCAPED_CHANNEL_NAME}&number={I}&read=1">Mark as Read</a> &nbsp;
-					<a href="{S}" class="reply" id="memo{I}">Reply</a>&nbsp;
-					<a href="/memoserv/memos?channel={ESCAPED_CHANNEL_NAME}&number={I}&del=1">Delete</a></td>
-				{ELSE}
-				<tr class="unread">
-					<td></td>
-					<td></td>
-					<td class="right"><a href="/memoserv/memos?channel={ESCAPED_CHANNEL_NAME}&number={I}&read=2">Mark as Unread</a> &nbsp;
-					<a href="{S}" class="reply" id="memo{I}">Reply</a> &nbsp;
-					<a href="/memoserv/memos?channel={ESCAPED_CHANNEL_NAME}&number={I}&del=1">Delete</a></td>
-				{END IF}
 
-				</tr>
+			<script>
+				$(function () \{
+					$('.table tbody tr td abbr').popover();
+				\});
+			</script>
+
+			<h2>Memos List</h2>
+			<table id="tableInfoMemos" class="table table-hover">
+				<thead>
+					<th>Number</th>
+					<th>Sender</th>
+					<th>Message <small>(hover: Time)</small></th>
+					<th></th>
+				</thead>
+				<tbody>
+				{FOR I,S,T,TXT,U IN NUMBER,SENDER,TIME,TEXT,UNREAD}
+					{IF EQ U YES}
+					<tr class="read">
+					{ELSE}
+					<tr class="unread">
+					{END IF}
+						<td>{I}</td>
+						<td>{S}</td>
+						<td><abbr data-container="body" data-trigger="hover" data-placement="top" data-content="{T}">{TXT}</abbr></td>
+						<td style="text-align: right;" nowrap="nowrap">
+						{IF EQ U YES}
+							<a class="label label-success reply" href="{S}" id="memo{I}">Reply</a>
+							<a class="label label-warning" href="/memoserv/memos?channel={ESCAPED_CHANNEL_NAME}&number={I}&read=1">Mark as Read</a>
+							<a class="label label-danger" href="/memoserv/memos?channel={ESCAPED_CHANNEL_NAME}&number={I}&del=1">Delete</a>
+						{ELSE}
+							<a class="label label-success reply" href="{S}" id="memo{I}">Reply</a>
+							<a class="label label-warning" href="/memoserv/memos?channel={ESCAPED_CHANNEL_NAME}&number={I}&read=2">Mark as Unread</a>
+							<a class="label label-danger" href="/memoserv/memos?channel={ESCAPED_CHANNEL_NAME}&number={I}&del=1">Delete</a>
+						{END IF}
+						</td>
+					</tr>
 				{END FOR}
+				</tbody>
 			</table>
 		{ELSE}
-			<b>No memos to show.</b>
+			<em>No memos to show.</em>
 		{END IF}
 
-		<br/><br/>
+		<hr>
 
-		<b>Send a new Memo</b>
-		<form method="post" action="/memoserv/memos?channel={ESCAPED_CHANNEL}">
-		Receiver: <input type="text" name="receiver" id="receiver" value="">
-		Message: <input type="text" name="message">
-		<input type="submit" value="Send">
-		</form>
+		<div class="row">
+			<div class="col-lg-5">
+				<h4>Memos for channel</h4>
+				<ul>
+				{FOR CH,ECH IN CHANNEL_NAMES,ESCAPED_CHANNEL_NAMES}
+					<li><a href="/memoserv/memos?channel={ECH}" class="channel">{CH}</a></li>
+				{END FOR}
+				</ul>
+			</div>
+			<div class="col-lg-7">
+				<h4>Send a new Memo</h4>
+				<form class="form-horizontal" method="post" action="/memoserv/memos?channel={ESCAPED_CHANNEL}">
+					<div class="form-group">
+						<label class="control-label col-lg-2" for="receiver">Receiver:</label>
+						<div class="col-lg-10">
+							<input class="form-control" type="text" name="receiver" id="receiver" placeholder="Nick or Channel" value="">
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="control-label col-lg-2" for="message">Message:</label>
+						<div class="col-lg-10">
+							<input class="form-control" type="text" name="message" id="message" placeholder="Your message here">
+						</div>
+					</div>
+					<div class="form-group">
+						<div class="col-lg-offset-2 col-lg-10">
+							<button type="submit" class="btn btn-primary">Send</button>
+						</div>
+					</div>
+				</form>
+			</div>
+		</div>
+
+		{IF EXISTS CMDR}
+		<div class="alert alert-info">
+			{CMDR}
+		</div>
+		{END IF}
 {INCLUDE footer.html}

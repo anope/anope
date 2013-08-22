@@ -1,47 +1,54 @@
-<!DOCTYPE html> 
-<html>
-<head>
-	<link href="/static/style.css" media="screen" rel="stylesheet" type="text/css" />
-	<title>{TITLE}</title>
-</head>
-<body>
-	<div class="master">
-		<div class="header">
-			<div class="loggedinas"><a href="/register">Register</a></div>
+<!DOCTYPE html>
+<!--[if IE 7]> <html lang="en" class="ie7"> <![endif]-->
+<!--[if IE 8]> <html lang="en" class="ie8"> <![endif]-->
+<!--[if IE 9]> <html lang="en" class="ie9"> <![endif]-->
+<!--[if !IE]><!-->
+<html lang="en">
+	<!--<![endif]-->
+	<head>
+		<link href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" rel="stylesheet">
+		<link href="/static/style.css" media="screen" rel="stylesheet" type="text/css" />
+		<!--[if lt IE 9]><script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+		<title>{TITLE}</title>
+	</head>
+	<body>
+		<div id="frontPages" class="container">
+			<div class="row">
+				<div class="col-lg-offset-4 col-lg-4">
+					<a href="/">
+						<img src="http://www.geniusdex.net/anope/anope.svg" class="img-responsive" width="370">
+					</a>
+					<h1 class="form-signin-heading">Login <small>to continue</small></h1>
+
+					{IF EXISTS INVALID_LOGIN}
+					<div class="alert alert-danger">
+						{INVALID_LOGIN}
+					</div>
+					{END IF}
+
+					<form class="form-horizontal form-signin" action="/" method="post">
+						<input type="text" name="username" class="form-control" placeholder="Username" required="required" autofocus
+							style="margin-bottom: -1px; border-bottom-left-radius: 0; border-bottom-right-radius: 0;">
+						<input type="password" name="password" class="form-control" placeholder="Password" required="required"
+							style="margin-bottom: 10px; border-top-left-radius: 0; border-top-right-radius: 0;">
+						<button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
+						<a class="btn btn-lg btn-warning btn-block" href="/register">Register</a>
+					</form>
+				</div>
+			</div>
+
+			<br>
+			<div class="row">
+				<div class="col-lg-offset-3 col-lg-6">
+					<div class="footer text-center">
+						Anope IRC Services - &copy; 2013 Anope Team - <a href="http://anope.org">http://anope.org</a>
+					</div>
+				</div>
+			</div>
 		</div>
-		<table width="100%" height="100%">
-			<tr>
-				<td>
-					<center>
-						<img src="static/logo.png"/>
-						<br>
-						<h2>Login</h2>
-						{INVALID_LOGIN}<br>
-						Login to continue.
-						<br>
-						<form action="/" method="post">
-							<table>
-								<tr>
-									<td><div align="right">Username:</div></td>
-									<td><div align="left"><input name="username"/></div></td>
-								</tr>
-								<tr>
-									<td><div align="right">Password:</div></td>
-									<td><div align="left"><input name="password" type="password"/></div></td>
-								</tr>
-								<tr>
-									<td></td>
-									<td><div align="left"><input type="submit" value="Login"/></div></td>
-								</tr>
-							</table>
-						</form>
-					</center>
-				</td>
-			</tr>
-		</table>
-	</div>
-	<div class="footer">
-		Anope IRC Services - &copy; 2012 Anope Team - <a href="http://anope.org">http://anope.org</a>
-	</div>
-</body>
+
+		<script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+		<script src="//netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
+	</body>
 </html>

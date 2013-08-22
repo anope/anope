@@ -118,16 +118,10 @@ h4 {
 
 .navbar-default .navbar-nav > li > a {
 	color: #777777;
-	-webkit-transition: background-color .5s ease-out;
-	-moz-transition: background-color .5s ease-out;
-	-o-transition: background-color .5s ease-out;
-	transition: background-color .5s ease-out;
 }
 
 .navbar-default .navbar-nav > li > a:hover, .navbar-default .navbar-nav > li > a:focus {
 	color: #333333;
-	background-color: #4796DA;
-	background-color: rgba(66, 139, 202, 0.05);
 	border-bottom: 3px solid #0082D9;
 	margin-bottom: -3px;
 }

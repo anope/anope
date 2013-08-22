@@ -800,6 +800,8 @@ void Channel::SetCorrectModes(User *user, bool give_modes)
 
 	/* whether or not we are giving modes */
 	bool giving = give_modes;
+	/* whether or not we have given a mode */
+	bool given = false;
 	for (unsigned i = 0; i < ModeManager::GetStatusChannelModesByRank().size(); ++i)
 	{
 		ChannelModeStatus *cm = ModeManager::GetStatusChannelModesByRank()[i];
@@ -808,12 +810,13 @@ void Channel::SetCorrectModes(User *user, bool give_modes)
 		if (give_modes && has_priv)
 		{
 			/* Always give op. If we have already given one mode, don't give more until it has a symbol */
-			if (cm->name != "OP" && (!giving || !cm->symbol))
-				continue;
-
-			this->SetMode(NULL, cm, user->GetUID());
-			/* Now if this contains a symbol don't give any more modes, to prevent setting +qaohv etc on users */
-			giving = !cm->symbol;
+			if (cm->name == "OP" || !given || (giving && cm->symbol))
+			{
+				this->SetMode(NULL, cm, user->GetUID());
+				/* Now if this contains a symbol don't give any more modes, to prevent setting +qaohv etc on users */
+				giving = !cm->symbol;
+				given = true;
+			}
 		}
 		else if (take_modes && !has_priv)
 		{

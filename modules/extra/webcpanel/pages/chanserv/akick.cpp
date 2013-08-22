@@ -49,7 +49,7 @@ bool WebCPanel::ChanServ::Akick::OnRequest(HTTPProvider *server, const Anope::st
 		params.push_back("ADD");
 		params.push_back(message.post_data["mask"]);
 		if (message.post_data["reason"].empty() == false)
-			params.push_back(message.get_data["reason"]);
+			params.push_back(message.post_data["reason"]);
 
 		WebPanel::RunCommand(na->nc->display, na->nc, "ChanServ", "chanserv/akick", params, replacements);
 	}

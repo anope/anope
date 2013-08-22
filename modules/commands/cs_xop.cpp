@@ -315,7 +315,7 @@ class CommandCSXOP : public Command
 
 					ChanAccess *caccess = ci->GetAccess(number - 1);
 
-					if (this->source.command.upper() != XOPChanAccess::DetermineLevel(caccess))
+					if (caccess->provider->name != "access/xop" || this->source.command.upper() != caccess->AccessSerialize())
 						return;
 
 					++deleted;
@@ -338,7 +338,10 @@ class CommandCSXOP : public Command
 			{
 				ChanAccess *a = ci->GetAccess(i);
 
-				if (a->mask.equals_ci(mask) && XOPChanAccess::DetermineLevel(a) == source.command.upper())
+				if (a->provider->name != "access/xop" || source.command.upper() != a->AccessSerialize())
+					continue;
+
+				if (a->mask.equals_ci(mask))
 				{
 					Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to delete " << a->mask;
 
@@ -397,7 +400,7 @@ class CommandCSXOP : public Command
 
 					const ChanAccess *a = ci->GetAccess(Number - 1);
 
-					if (this->source.command.upper() != XOPChanAccess::DetermineLevel(a))
+					if (a->provider->name != "access/xop" || this->source.command.upper() != a->AccessSerialize())
 						return;
 
 					ListFormatter::ListEntry entry;
@@ -414,7 +417,7 @@ class CommandCSXOP : public Command
 			{
 				const ChanAccess *a = ci->GetAccess(i);
 
-				if (XOPChanAccess::DetermineLevel(a) != source.command.upper())
+				if (a->provider->name != "access/xop" || source.command.upper() != a->AccessSerialize())
 					continue;
 				else if (!nick.empty() && !Anope::Match(a->mask, nick))
 					continue;
@@ -465,8 +468,11 @@ class CommandCSXOP : public Command
 		for (unsigned i = ci->GetAccessCount(); i > 0; --i)
 		{
 			const ChanAccess *access = ci->GetAccess(i - 1);
-			if (XOPChanAccess::DetermineLevel(access) == source.command.upper())
-				delete ci->EraseAccess(i - 1);
+
+			if (access->provider->name != "access/xop" || source.command.upper() != access->AccessSerialize())
+				continue;
+	
+			delete ci->EraseAccess(i - 1);
 		}
 
 		FOREACH_MOD(OnAccessClear, (ci, source));

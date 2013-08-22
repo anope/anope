@@ -1,29 +1,43 @@
 {INCLUDE header.html}
-	{FOR M IN MESSAGES}
-		{M}<br/>
-	{END FOR}
-	<table width="100%" height="100%">
-		<tr>
-			<td>Your <b>current</b> vHost:
-		{IF EXISTS VHOST}
-			{VHOST}
-		{ELSE}
-			<b>None</b>
-		{END IF}
-			</td>
-		</tr>
-	</table>
-	{IF EXISTS CAN_REQUEST}
-		{IF EXISTS VHOST}		
-			<b>Request a new vHost</b>
-		{ELSE}
-			<b>Request a vHost</b>
-		{END IF}
-		<form method="post" action="/hostserv/request">
-			<input name="req">
-			<input type="submit" value="Request">
-		</form>
-	{ELSE}
-		vHost requests are disabled on this network.
-	{END IF}
+		{FOR M IN MESSAGES}
+		<div class="alert alert-info">
+			{M}<br>
+		</div>
+		{END FOR}
+
+		<h2>vHost Information</h2>
+		<table id="tableInfo" class="table table-hover">
+			<tbody>
+				<tr>
+					<td>Your current vHost:</td>
+					<td>
+				{IF EXISTS VHOST}
+					{VHOST}
+				{ELSE}
+					<em>None</em>
+				{END IF}
+					</td>
+					<td></td>
+				</tr>
+				{IF EXISTS CAN_REQUEST}
+				<tr>
+					<td>
+					{IF EXISTS VHOST}
+						Request a new vHost
+					{ELSE}
+						Request a vHost
+					{END IF}
+					</td>
+					<form method="post" action="/hostserv/request">
+					<td><input class="form-control" name="req"></td>
+					<td><button type="submit" class="btn btn-primary">Request</button></td>
+					</form>
+				</tr>
+				{ELSE}
+				<tr>
+					<td colspan="2" class="text-center"><strong>vHost requests are disabled on this network.</strong></td>
+				</tr>
+				{END IF}
+			</tbody>
+		</table>
 {INCLUDE footer.html}

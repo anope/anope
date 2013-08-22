@@ -315,15 +315,15 @@ struct IRCDMessageMetadata : IRCDMessage
 	 *
 	 * params[0] = nick of the user
 	 * params[1] = command
-	 * params[3] = data
+	 * params[2] = data
 	 *
 	 * following commands are supported:
 	 *  - "accountname": the account name of a client (can't be empty)
+	 *  - "certfp": the certificate fingerprint of a client (can't be empty)
+	 *  - "cloakhost" : the cloaked hostname of a client
 	 *  - "host": the hostname of a client (can't be empty)
-         *  - "cloakhost" : the cloaked hostname of a client
 	 *  - "info": info text ("real name") of a client
 	 *  - "user": the user name (ident) of a client (can't be empty)
-	 *  - "certfp": the certificate fingerprint of a client
 	 */
 
 	void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
@@ -340,14 +340,19 @@ struct IRCDMessageMetadata : IRCDMessage
 			if (nc)
 				u->Login(nc);
 		}
-		else if (params[1].equals_cs("host"))
+		else if (params[1].equals_cs("certfp"))
 		{
-			u->SetCloakedHost(params[2]);
+			u->fingerprint = params[2];
+			FOREACH_MOD(OnFingerprint, (u));
 		}
 		else if (params[1].equals_cs("cloakhost"))
 		{
 			if (!params[2].empty())
 				u->SetDisplayedHost(params[2]);
+		}
+		else if (params[1].equals_cs("host"))
+		{
+			u->SetCloakedHost(params[2]);
 		}
 		else if (params[1].equals_cs("info"))
 		{
@@ -356,11 +361,6 @@ struct IRCDMessageMetadata : IRCDMessage
 		else if (params[1].equals_cs("user"))
 		{
 			u->SetVIdent(params[2]);
-		}
-		else if (params[1].equals_cs("certfp"))
-		{
-			u->fingerprint = params[2];
-			FOREACH_MOD(OnFingerprint, (u));
 		}
 	}
 };

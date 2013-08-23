@@ -254,7 +254,7 @@ class CommandCSFlags : public Command
 				source.Reply(_("Privilege \2%s\2 removed from \2%s\2 on \2%s\2, new flags are +\2%s\2"), p->name.c_str(), access->mask.c_str(), ci->name.c_str(), access->AccessSerialize().c_str());
 		}
 		else
-			source.Reply(_("Access for \002%s\002 on %s set to +\002%s\002"), access->mask.c_str(), ci->name.c_str(), access->AccessSerialize().c_str());
+			source.Reply(_("Flags for \002%s\002 on %s set to +\002%s\002"), access->mask.c_str(), ci->name.c_str(), access->AccessSerialize().c_str());
 	}
 
 	void DoList(CommandSource &source, ChannelInfo *ci, const std::vector<Anope::string> &params)
@@ -275,11 +275,10 @@ class CommandCSFlags : public Command
 		for (unsigned i = 0, end = ci->GetAccessCount(); i < end; ++i)
 		{
 			const ChanAccess *access = ci->GetAccess(i);
+			const Anope::string &flags = FlagsChanAccess::DetermineFlags(access);
 
 			if (!arg.empty())
 			{
-				const Anope::string &flags = FlagsChanAccess::DetermineFlags(access);
-
 				if (arg[0] == '+')
 				{
 					bool pass = true;
@@ -297,7 +296,7 @@ class CommandCSFlags : public Command
 			++count;
 			entry["Number"] = stringify(i + 1);
 			entry["Mask"] = access->mask;
-			entry["Flags"] = FlagsChanAccess::DetermineFlags(access);
+			entry["Flags"] = flags;
 			entry["Creator"] = access->creator;
 			entry["Created"] = Anope::strftime(access->created, source.nc, true);
 			list.AddEntry(entry);
@@ -340,7 +339,7 @@ class CommandCSFlags : public Command
 	}
 
  public:
-	CommandCSFlags(Module *creator) : Command(creator, "chanserv/flags", 2, 4)
+	CommandCSFlags(Module *creator) : Command(creator, "chanserv/flags", 1, 4)
 	{
 		this->SetDesc(_("Modify the list of privileged users"));
 		this->SetSyntax(_("\037channel\037 MODIFY \037mask\037 \037changes\037"));
@@ -351,7 +350,7 @@ class CommandCSFlags : public Command
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		const Anope::string &chan = params[0];
-		const Anope::string &cmd = params[1];
+		const Anope::string &cmd = params.size() > 1 ? params[1] : "";
 
 		ChannelInfo *ci = ChannelInfo::Find(chan);
 		if (ci == NULL)
@@ -360,7 +359,7 @@ class CommandCSFlags : public Command
 			return;
 		}
 
-		bool is_list = cmd.equals_ci("LIST");
+		bool is_list = cmd.empty() || cmd.equals_ci("LIST");
 		bool has_access = false;
 		if (source.HasPriv("chanserv/access/modify"))
 			has_access = true;
@@ -375,7 +374,7 @@ class CommandCSFlags : public Command
 			source.Reply(_("Sorry, channel access list modification is temporarily disabled."));
 		else if (cmd.equals_ci("MODIFY"))
 			this->DoModify(source, ci, params);
-		else if (cmd.equals_ci("LIST"))
+		else if (is_list)
 			this->DoList(source, ci, params);
 		else if (cmd.equals_ci("CLEAR"))
 			this->DoClear(source, ci);

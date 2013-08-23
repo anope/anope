@@ -795,21 +795,28 @@ void Channel::SetCorrectModes(User *user, bool give_modes)
 	FOREACH_MOD(OnSetCorrectModes, (user, this, u_access, give_modes, take_modes));
 
 	/* Never take modes from ulines */
-	take_modes &= !user->server->IsULined();
+	if (user->server->IsULined())
+		take_modes = false;
 
+	/* whether or not we are giving modes */
+	bool giving = give_modes;
+	/* whether or not we have given a mode */
 	bool given = false;
 	for (unsigned i = 0; i < ModeManager::GetStatusChannelModesByRank().size(); ++i)
 	{
 		ChannelModeStatus *cm = ModeManager::GetStatusChannelModesByRank()[i];
 		bool has_priv = u_access.HasPriv("AUTO" + cm->name);
 
-		/* If we have already given one mode, don't give more until it has a symbol */
-		if (give_modes && has_priv && (!given || cm->symbol))
+		if (give_modes && has_priv)
 		{
-			this->SetMode(NULL, cm, user->GetUID());
-			/* Now if this contains a symbol don't give any more modes, to prevent setting +qaohv etc on users */
-			give_modes = !cm->symbol;
-			given = true;
+			/* Always give op. If we have already given one mode, don't give more until it has a symbol */
+			if (cm->name == "OP" || !given || (giving && cm->symbol))
+			{
+				this->SetMode(NULL, cm, user->GetUID());
+				/* Now if this contains a symbol don't give any more modes, to prevent setting +qaohv etc on users */
+				giving = !cm->symbol;
+				given = true;
+			}
 		}
 		else if (take_modes && !has_priv)
 		{

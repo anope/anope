@@ -43,32 +43,6 @@ class AccessChanAccess : public ChanAccess
 	{
 		this->level = convertTo<int>(data);
 	}
-
-	static int DetermineLevel(const ChanAccess *access)
-	{
-		if (access->provider->name == "access/access")
-		{
-			const AccessChanAccess *aaccess = anope_dynamic_static_cast<const AccessChanAccess *>(access);
-			return aaccess->level;
-		}
-		else
-		{
-			int highest = 1;
-			const std::vector<Privilege> &privs = PrivilegeManager::GetPrivileges();
-
-			for (unsigned i = 0; i < privs.size(); ++i)
-			{
-				const Privilege &p = privs[i];
-				if (access->ci->GetLevel(p.name) > highest && access->HasPriv(p.name))
-					highest = access->ci->GetLevel(p.name);
-			}
-
-			if (highest >= ACCESS_FOUNDER)
-				highest = ACCESS_FOUNDER - 1;
-
-			return highest;
-		}
-	}
 };
 
 class AccessAccessProvider : public AccessProvider
@@ -380,7 +354,7 @@ class CommandCSAccess : public Command
 
 					ListFormatter::ListEntry entry;
 					entry["Number"] = stringify(number);
-					entry["Level"] = stringify(AccessChanAccess::DetermineLevel(access));
+					entry["Level"] = access->AccessSerialize();
 					entry["Mask"] = access->mask;
 					entry["By"] = access->creator;
 					entry["Last seen"] = timebuf;
@@ -417,7 +391,7 @@ class CommandCSAccess : public Command
 
 				ListFormatter::ListEntry entry;
 				entry["Number"] = stringify(i + 1);
-				entry["Level"] = stringify(AccessChanAccess::DetermineLevel(access));
+				entry["Level"] = access->AccessSerialize();
 				entry["Mask"] = access->mask;
 				entry["By"] = access->creator;
 				entry["Last seen"] = timebuf;

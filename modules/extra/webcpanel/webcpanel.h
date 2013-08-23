@@ -14,7 +14,6 @@
 extern Module *me;
 
 extern Anope::string provider_name, template_name, template_base, page_title;
-extern bool use_ssl;
 
 struct SubSection
 {
@@ -89,7 +88,7 @@ class WebPanelProtectedPage : public WebPanelPage
 		if (!panel || !(na = panel->GetNickFromSession(client, message)))
 		{
 			reply.error = HTTP_FOUND;
-			reply.headers["Location"] = Anope::string("http") + (use_ssl ? "s" : "") + "://" + message.headers["Host"] + "/";
+			reply.headers["Location"] = Anope::string("http") + (provider->IsSSL() ? "s" : "") + "://" + message.headers["Host"] + "/";
 			return true; // Access denied
 		}
 

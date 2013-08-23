@@ -291,9 +291,7 @@ class MyHTTPProvider : public HTTPProvider, public Timer
 	std::list<Reference<MyHTTPClient> > clients;
 
  public:
-	bool ssl;
-
-	MyHTTPProvider(Module *c, const Anope::string &n, const Anope::string &i, const unsigned short p, const int t, bool s) : Socket(-1, i.find(':') != Anope::string::npos), HTTPProvider(c, n, i, p), Timer(c, 10, Anope::CurTime, true), timeout(t), ssl(s) { }
+	MyHTTPProvider(Module *c, const Anope::string &n, const Anope::string &i, const unsigned short p, const int t, bool s) : Socket(-1, i.find(':') != Anope::string::npos), HTTPProvider(c, n, i, p, s), Timer(c, 10, Anope::CurTime, true), timeout(t) { }
 
 	void Tick(time_t) anope_override
 	{
@@ -461,7 +459,7 @@ class HTTPD : public Module
 		{
 			MyHTTPProvider *p = it->second;
 
-			if (p->ssl && sslref)
+			if (p->IsSSL() && sslref)
 				try
 				{
 					sslref->Init(p);

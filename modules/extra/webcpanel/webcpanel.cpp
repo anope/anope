@@ -9,7 +9,6 @@
 
 Module *me;
 Anope::string provider_name, template_name, template_base, page_title;
-bool use_ssl = false;
 
 class ModuleWebCPanel : public Module
 {
@@ -59,7 +58,6 @@ class ModuleWebCPanel : public Module
 		template_name = block->Get<const Anope::string>("template", "default");
 		template_base = Anope::DataDir + "/modules/webcpanel/templates/" + template_name;
 		page_title = block->Get<const Anope::string>("title", "Anope IRC Services");
-		use_ssl = block->Get<bool>("ssl", "no"); // This is dumb, is there a better way to do this?
 
 		provider = ServiceReference<HTTPProvider>("HTTPProvider", provider_name);
 		if (!provider)

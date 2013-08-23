@@ -21,7 +21,7 @@ class WebpanelRequest : public IdentifyRequest
 
 	void OnSuccess() anope_override
 	{
-		if (!client)
+		if (!client || !server)
 			return;
 		NickAlias *na = NickAlias::Find(this->GetAccount());
 		if (!na)
@@ -58,14 +58,14 @@ class WebpanelRequest : public IdentifyRequest
 		}
 
 		reply.error = HTTP_FOUND;
-		reply.headers["Location"] = Anope::string("http") + (use_ssl ? "s" : "") + "://" + message.headers["Host"] + "/nickserv/info";
+		reply.headers["Location"] = Anope::string("http") + (server->IsSSL() ? "s" : "") + "://" + message.headers["Host"] + "/nickserv/info";
 
 		client->SendReply(&reply);
 	}
 
 	void OnFail() anope_override
 	{
-		if (!client)
+		if (!client || !server)
 			return;
 		replacements["INVALID_LOGIN"] = "Invalid username or password";
 		TemplateFileServer page("login.html");

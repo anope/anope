@@ -286,7 +286,9 @@ class MyHTTPProvider : public HTTPProvider, public Timer
 	std::list<Reference<MyHTTPClient> > clients;
 
  public:
-	MyHTTPProvider(Module *c, const Anope::string &n, const Anope::string &i, const unsigned short p, const int t) : Socket(-1, i.find(':') != Anope::string::npos), HTTPProvider(c, n, i, p), Timer(c, 10, Anope::CurTime, true), timeout(t) { }
+	bool ssl;
+
+	MyHTTPProvider(Module *c, const Anope::string &n, const Anope::string &i, const unsigned short p, const int t, bool s) : Socket(-1, i.find(':') != Anope::string::npos), HTTPProvider(c, n, i, p), Timer(c, 10, Anope::CurTime, true), timeout(t), ssl(s) { }
 
 	void Tick(time_t) anope_override
 	{
@@ -329,7 +331,7 @@ class MyHTTPProvider : public HTTPProvider, public Timer
 class HTTPD : public Module
 {
 	ServiceReference<SSLService> sslref;
-	std::map<Anope::string, HTTPProvider *> providers;
+	std::map<Anope::string, MyHTTPProvider *> providers;
  public:
 	HTTPD(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, EXTRA | VENDOR), sslref("SSLService", "ssl")
 	{
@@ -381,19 +383,13 @@ class HTTPD : public Module
 				continue;
 			}
 
-			if (ssl && !sslref)
-			{
-				Log(this) << "Could not enable SSL, is m_ssl loaded?";
-				ssl = false;
-			}
-
-			HTTPProvider *p;
+			MyHTTPProvider *p;
 			if (this->providers.count(hname) == 0)
 			{
 				try
 				{
-					p = new MyHTTPProvider(this, hname, ip, port, timeout);
-					if (ssl)
+					p = new MyHTTPProvider(this, hname, ip, port, timeout, ssl);
+					if (ssl && sslref)
 						sslref->Init(p);
 				}
 				catch (const SocketException &ex)
@@ -418,8 +414,8 @@ class HTTPD : public Module
 
 					try
 					{
-						p = new MyHTTPProvider(this, hname, ip, port, timeout);
-						if (ssl)
+						p = new MyHTTPProvider(this, hname, ip, port, timeout, ssl);
+						if (ssl && sslref)
 							sslref->Init(p);
 					}
 					catch (const SocketException &ex)
@@ -437,7 +433,7 @@ class HTTPD : public Module
 			spacesepstream(ext_header).GetTokens(p->ext_headers);
 		}
 
-		for (std::map<Anope::string, HTTPProvider *>::iterator it = this->providers.begin(), it_end = this->providers.end(); it != it_end;)
+		for (std::map<Anope::string, MyHTTPProvider *>::iterator it = this->providers.begin(), it_end = this->providers.end(); it != it_end;)
 		{
 			HTTPProvider *p = it->second;
 			++it;
@@ -448,6 +444,24 @@ class HTTPD : public Module
 				this->providers.erase(p->name);
 				delete p;
 			}
+		}
+	}
+
+	void OnModuleLoad(User *u, Module *m) anope_override
+	{
+		if (m->name != "m_ssl")
+			return;
+
+		for (std::map<Anope::string, MyHTTPProvider *>::iterator it = this->providers.begin(), it_end = this->providers.end(); it != it_end; ++it)
+		{
+			MyHTTPProvider *p = it->second;
+
+			if (p->ssl && sslref)
+				try
+				{
+					sslref->Init(p);
+				}
+				catch (const CoreException &) { } // Throws on reinitialization
 		}
 	}
 };

@@ -1,11 +1,12 @@
-@import url(http://fonts.googleapis.com/css?family=Open+Sans:300,400);
+@import url(//fonts.googleapis.com/css?family=Open+Sans:300,400);
+@import url(//fonts.googleapis.com/css?family=Port+Lligat+Slab);
 
 *, html, body, h1, h2, h3, h4, div, p, span, a, button {
 	font-family: 'Open Sans', sans-serif;
 }
 body {
 	background-color: #eee;
-	background-image: url('http://politeia.in/assets/img/bg/cubes.png');
+	background-image: url('/static/cubes.png');
 }
 
 /* RANDOM STUFF */
@@ -23,6 +24,19 @@ h4 {
 	max-width: 450px;
 	-webkit-box-shadow: 0 1px 10px rgba(0, 0, 0, 0.8);
 	box-shadow: 0 1px 10px rgba(0, 0, 0, 0.8);
+}
+
+.label {
+	font-size: 13px;
+	font-weight: normal;
+}
+
+.label-info {
+	background-color: #4EA4EE;
+}
+
+.label-info[href]:hover, .label-info[href]:focus {
+	background-color: #428BCA;
 }
 
 /* LOGIN FORM */
@@ -50,6 +64,9 @@ h4 {
 }
 
 /* Control Panel */
+.panel-default .panel-heading {
+	font-size: 24px;
+}
 #loggedIn {
 	margin: 15px 15px 0 0;
 }
@@ -69,6 +86,7 @@ h4 {
 	font-weight: bold;
 	padding-right: 10px;
 	text-align: right;
+	width: 25%;
 }
 
 #tableInfoNorm td {
@@ -105,6 +123,10 @@ h4 {
 	font-weight: normal;
 }
 
+#channelList li {
+	margin-top: 10px;
+}
+
 /* NAVBAR */
 .navbar, .well {
 	background-color: white;
@@ -115,13 +137,30 @@ h4 {
 	-moz-box-shadow: 0 8px 6px -8px black;
 	box-shadow: 0 8px 6px -8px black;
 }
-
-.navbar-default .navbar-nav > li > a {
-	color: #777777;
+.navbar-brand {
+	font-size: 25px;
+}
+.navbar-brand, .navbar-brand small {
+	font-family: 'Port Lligat Slab', serif;
 }
 
-.navbar-default .navbar-nav > li > a:hover, .navbar-default .navbar-nav > li > a:focus {
-	color: #333333;
-	border-bottom: 3px solid #0082D9;
-	margin-bottom: -3px;
+.navbar-default .nav {
+	margin-bottom: -1px;
+}
+
+.navbar-default .nav > li > a {
+	color: #428BCA;
+}
+
+.navbar-default .nav > li > a:hover, .navbar-default .nav > li > a:focus {
+	color: #428BCA;
+	border-top: 3px solid #0082D9;
+	margin-top: -3px;
+}
+
+.navbar-default .nav > li.active > a, .navbar-default .nav > li.active > a:hover, .navbar-default .nav > li.active > a:focus {
+	color: #428BCA;
+	background-color: transparent;
+	background-color: rgba(66, 139, 202, 0.1);
+	border-bottom-color: transparent;
 }

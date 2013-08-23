@@ -1,12 +1,13 @@
 {INCLUDE header.html}
-		{FOR M IN MESSAGES}
-		<div class="alert alert-info">
-			{M}<br>
-		</div>
-		{END FOR}
+		<div class="panel-heading">Akick List</div>
+		<div class="panel-body">
+			{FOR M IN MESSAGES}
+			<div class="alert alert-info">
+				{M}<br>
+			</div>
+			{END FOR}
 
-		<h2>Akick List</h2>
-		{IF EXISTS MASKS}
+			{IF EXISTS MASKS}
 			<table id="tableNSAccess" class="table table-hover">
 				<thead>
 					<tr>
@@ -27,32 +28,31 @@
 				{END FOR}
 				</tbody>
 			</table>
-		{ELSE}
+			{ELSE}
 			<em>Akick list is empty.</em>
-		{END IF}
+			{END IF}
 
-		<hr>
+			<hr>
 
-		<h4>Add an akick entry</h4>
-		<form class="form-horizontal" method="post" action="/chanserv/akick?channel={ESCAPED_CHANNEL}">
-			<div class="form-group">
-				<label class="control-label col-lg-2" for="mask">Mask:</label>
-				<div class="col-lg-6">
-					<input class="form-control" type="text" name="mask" id="mask" placeholder="Valid HostMask">
+			<h4>Add an akick entry</h4>
+			<form class="form-horizontal" method="post" action="/chanserv/akick?channel={ESCAPED_CHANNEL}">
+				<div class="form-group">
+					<label class="control-label col-lg-2" for="mask">Mask:</label>
+					<div class="col-lg-6">
+						<input class="form-control" type="text" name="mask" id="mask" placeholder="Valid HostMask">
+					</div>
 				</div>
-			</div>
-			<div class="form-group">
-				<label class="control-label col-lg-2" for="reason">Reason:</label>
-				<div class="col-lg-6">
-					<input class="form-control" type="text" name="reason" id="reason" placeholder="Reason for AKICK">
+				<div class="form-group">
+					<label class="control-label col-lg-2" for="reason">Reason:</label>
+					<div class="col-lg-6">
+						<input class="form-control" type="text" name="reason" id="reason" placeholder="Reason for AKICK">
+					</div>
 				</div>
-			</div>
-			<div class="form-group">
-				<div class="col-lg-offset-2 col-lg-6">
-					<button type="submit" class="btn btn-primary">Send</button>
+				<div class="form-group">
+					<div class="col-lg-offset-2 col-lg-6">
+						<button type="submit" class="btn btn-primary">Send</button>
+					</div>
 				</div>
-			</div>
-		</form>
-
-
+			</form>
+		</div>
 {INCLUDE footer.html}

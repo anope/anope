@@ -116,7 +116,6 @@ class SSLModule : public Module
 		Anope::string context_name = "Anope";
 		SSL_CTX_set_session_id_context(client_ctx, reinterpret_cast<const unsigned char *>(context_name.c_str()), context_name.length());
 		SSL_CTX_set_session_id_context(server_ctx, reinterpret_cast<const unsigned char *>(context_name.c_str()), context_name.length());
-
 	}
 
 	~SSLModule()
@@ -144,11 +143,7 @@ class SSLModule : public Module
 		if (Anope::IsFile(this->certfile.c_str()))
 		{
 			if (!SSL_CTX_use_certificate_file(client_ctx, this->certfile.c_str(), SSL_FILETYPE_PEM) || !SSL_CTX_use_certificate_file(server_ctx, this->certfile.c_str(), SSL_FILETYPE_PEM))
-			{
-				SSL_CTX_free(client_ctx);
-				SSL_CTX_free(server_ctx);
 				throw ConfigException("Error loading certificate");
-			}
 			else
 				Log(LOG_DEBUG) << "m_ssl: Successfully loaded certificate " << this->certfile;
 		}
@@ -158,22 +153,14 @@ class SSLModule : public Module
 		if (Anope::IsFile(this->keyfile.c_str()))
 		{
 			if (!SSL_CTX_use_PrivateKey_file(client_ctx, this->keyfile.c_str(), SSL_FILETYPE_PEM) || !SSL_CTX_use_PrivateKey_file(server_ctx, this->keyfile.c_str(), SSL_FILETYPE_PEM))
-			{
-				SSL_CTX_free(client_ctx);
-				SSL_CTX_free(server_ctx);
 				throw ConfigException("Error loading private key");
-			}
 			else
 				Log(LOG_DEBUG) << "m_ssl: Successfully loaded private key " << this->keyfile;
 		}
 		else
 		{
 			if (Anope::IsFile(this->certfile.c_str()))
-			{
-				SSL_CTX_free(client_ctx);
-				SSL_CTX_free(server_ctx);
 				throw ConfigException("Error loading private key " + this->keyfile + " - file not found");
-			}
 			else
 				Log() << "Unable to open private key " << this->keyfile;
 		}

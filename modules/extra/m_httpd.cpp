@@ -45,6 +45,7 @@ class MyHTTPClient : public HTTPClient
 	Reference<HTTPPage> page;
 	Anope::string ip;
 
+	Anope::string inbuf;
 	unsigned content_length;
 	Anope::string post_data;
 
@@ -111,19 +112,23 @@ class MyHTTPClient : public HTTPClient
 
 	bool Read(const char *buffer, size_t l) anope_override
 	{
-		Anope::string buf(buffer, l);
+		inbuf.append(buffer, l);
 
-		if (!this->header_done)
+		for (size_t nl; !this->header_done && (nl = inbuf.find('\n')) != Anope::string::npos;)
 		{
-			Anope::string token;
-			sepstream sep(buf, '\n');
-			while (sep.GetToken(token) && !token.trim().empty())
+			Anope::string token = inbuf.substr(0, nl).trim();
+			inbuf = inbuf.substr(nl + 1);
+
+			if (token.empty())
+				this->header_done = true;
+			else
 				this->Read(token);
-			this->header_done = true;
-			buf = sep.GetRemaining();
 		}
 
-		this->post_data += buf;
+		if (!this->header_done)
+			return true;
+
+		this->post_data += inbuf;
 
 		if (this->post_data.length() >= this->content_length)
 		{

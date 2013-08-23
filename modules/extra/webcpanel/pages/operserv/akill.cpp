@@ -23,7 +23,7 @@ bool WebCPanel::OperServ::Akill::OnRequest(HTTPProvider *server, const Anope::st
 	else
 	{
 		if (akills->GetCount() == 0)
-			replacements["MESSAGES"] = "No Akills to display.";
+			replacements["AKILLS"] = "No Akills to display.";
 
 		if (message.post_data.count("mask") > 0 && message.post_data.count("expiry") > 0 && message.post_data.count("reason") > 0)
 		{

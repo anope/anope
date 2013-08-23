@@ -97,6 +97,8 @@ class WebPanelProtectedPage : public WebPanelPage
 
 		replacements["TITLE"] = page_title;
 		replacements["ACCOUNT"] = na->nc->display;
+		replacements["PAGE_NAME"] = page_name;
+		replacements["CATEGORY"] = category;
 
 		Anope::string sections, get;
 

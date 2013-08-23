@@ -1,36 +1,38 @@
 {INCLUDE header.html}
-		{FOR M IN MESSAGES}
-		<div class="alert alert-info">
-			{M}<br>
-		</div>
-		{END FOR}
-
-		<b>Your certificate finrgerprints</b>
-		<table id="tableNSAccess" class="table table-hover">
-			<tbody>
-			{FOR CERT IN CERTS}
-				<tr>
-					<td>{CERT}</td>
-					<td><a href="/nickserv/cert?mask={CERT}&del=1" class="btn btn-sm btn-danger">Delete</a></td>
-				</tr>
+		<div class="panel-heading">Your certificate fingerprints</div>
+		<div class="panel-body">
+			{FOR M IN MESSAGES}
+			<div class="alert alert-info">
+				{M}<br>
+			</div>
 			{END FOR}
-			</tbody>
-		</table>
 
-		<hr>
+			<table id="tableNSAccess" class="table table-hover">
+				<tbody>
+					{FOR CERT IN CERTS}
+					<tr>
+						<td>{CERT}</td>
+						<td><a href="/nickserv/cert?mask={CERT}&del=1" class="btn btn-sm btn-danger">Delete</a></td>
+					</tr>
+					{END FOR}
+				</tbody>
+			</table>
 
-		<h4>Add an certificate fingerprint</h4>
-		<form class="form-horizontal" method="post" action="/nickserv/cert">
-			<div class="form-group">
-				<label class="control-label col-lg-2" for="certfp">Certificate:</label>
-				<div class="col-lg-5">
-					<input class="form-control" type="text" name="certfp" id="certfp" placeholder="Your certificate">
+			<hr>
+
+			<h4>Add a certificate fingerprint</h4>
+			<form class="form-horizontal" method="post" action="/nickserv/cert">
+				<div class="form-group">
+					<label class="control-label col-lg-2" for="certfp">Certificate:</label>
+					<div class="col-lg-5">
+						<input class="form-control" type="text" name="certfp" id="certfp" placeholder="Your certificate">
+					</div>
 				</div>
-			</div>
-			<div class="form-group">
-				<div class="col-lg-offset-2 col-lg-5">
-					<button type="submit" class="btn btn-primary">Add</button>
+				<div class="form-group">
+					<div class="col-lg-offset-2 col-lg-5">
+						<button type="submit" class="btn btn-primary">Add</button>
+					</div>
 				</div>
-			</div>
-		</form>
+			</form>
+		</div>
 {INCLUDE footer.html}

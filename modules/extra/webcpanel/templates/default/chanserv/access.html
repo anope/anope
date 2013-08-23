@@ -1,12 +1,13 @@
 {INCLUDE header.html}
-		{FOR M IN MESSAGES}
-		<div class="alert alert-info">
-			{M}<br>
-		</div>
-		{END FOR}
+		<div class="panel-heading">Access List</div>
+		<div class="panel-body">
+			{FOR M IN MESSAGES}
+			<div class="alert alert-info">
+				{M}<br>
+			</div>
+			{END FOR}
 
-		<h2>Access List</h2>
-		{IF EXISTS ACCESSES}
+			{IF EXISTS ACCESSES}
 			<table id="tableNSAccess" class="table table-hover">
 				<thead>
 					<tr>
@@ -29,41 +30,41 @@
 				{END FOR}
 				</tbody>
 			</table>
-		{ELSE}
+			{ELSE}
 			<em>Access list is empty.</em>
-		{END IF}
+			{END IF}
 
-		<hr>
+			<hr>
 
-		<h4>Add an access entry</h4>
-		<form class="form-horizontal" method="post" action="/chanserv/access?channel={ESCAPED_CHANNEL}">
-			<div class="form-group">
-				<label class="control-label col-lg-2" for="mask">Mask:</label>
-				<div class="col-lg-6">
-					<input class="form-control" type="text" name="mask" id="mask" placeholder="Valid HostMask">
+			<h4>Add an access entry</h4>
+			<form class="form-horizontal" method="post" action="/chanserv/access?channel={ESCAPED_CHANNEL}">
+				<div class="form-group">
+					<label class="control-label col-lg-2" for="mask">Mask:</label>
+					<div class="col-lg-6">
+						<input class="form-control" type="text" name="mask" id="mask" placeholder="Valid HostMask">
+					</div>
 				</div>
-			</div>
-			<div class="form-group">
-				<label class="control-label col-lg-2" for="access">Access:</label>
-				<div class="col-lg-6">
-					<input class="form-control" type="text" name="access" id="access" placeholder="Access level">
+				<div class="form-group">
+					<label class="control-label col-lg-2" for="access">Access:</label>
+					<div class="col-lg-6">
+						<input class="form-control" type="text" name="access" id="access" placeholder="Access level">
+					</div>
 				</div>
-			</div>
-			<div class="form-group">
-				<label class="control-label col-lg-2" for="reason">Provider:</label>
-				<div class="col-lg-6">
-					<select name="provider" class="form-control">
-						{FOR PROVIDER IN PROVIDERS}
-							<option value="{PROVIDER}">{PROVIDER}</option>
-						{END FOR}
-					</select>
+				<div class="form-group">
+					<label class="control-label col-lg-2" for="reason">Provider:</label>
+					<div class="col-lg-6">
+						<select name="provider" class="form-control">
+							{FOR PROVIDER IN PROVIDERS}
+								<option value="{PROVIDER}">{PROVIDER}</option>
+							{END FOR}
+						</select>
+					</div>
 				</div>
-			</div>
-			<div class="form-group">
-				<div class="col-lg-offset-2 col-lg-6">
-					<button type="submit" class="btn btn-primary">Send</button>
+				<div class="form-group">
+					<div class="col-lg-offset-2 col-lg-6">
+						<button type="submit" class="btn btn-primary">Send</button>
+					</div>
 				</div>
-			</div>
-		</form>
-
+			</form>
+		</div>
 {INCLUDE footer.html}

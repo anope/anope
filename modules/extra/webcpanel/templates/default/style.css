@@ -6,7 +6,7 @@
 }
 body {
 	background-color: #eee;
-	background-image: url('http://politeia.in/assets/img/bg/cubes.png');
+	background-image: url('/static/cubes.png');
 }
 
 /* RANDOM STUFF */

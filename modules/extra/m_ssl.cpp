@@ -82,11 +82,6 @@ class SSLModule;
 static SSLModule *me;
 class SSLModule : public Module
 {
-	static int AlwaysAccept(int, X509_STORE_CTX *)
-	{
-		return 1;
-	}
-
 	Anope::string certfile, keyfile;
 
  public:
@@ -109,9 +104,6 @@ class SSLModule : public Module
 
 		SSL_CTX_set_mode(client_ctx, SSL_MODE_ENABLE_PARTIAL_WRITE | SSL_MODE_ACCEPT_MOVING_WRITE_BUFFER);
 		SSL_CTX_set_mode(server_ctx, SSL_MODE_ENABLE_PARTIAL_WRITE | SSL_MODE_ACCEPT_MOVING_WRITE_BUFFER);
-
-		SSL_CTX_set_verify(client_ctx, SSL_VERIFY_PEER | SSL_VERIFY_CLIENT_ONCE, SSLModule::AlwaysAccept);
-		SSL_CTX_set_verify(server_ctx, SSL_VERIFY_PEER | SSL_VERIFY_CLIENT_ONCE, SSLModule::AlwaysAccept);
 
 		Anope::string context_name = "Anope";
 		SSL_CTX_set_session_id_context(client_ctx, reinterpret_cast<const unsigned char *>(context_name.c_str()), context_name.length());

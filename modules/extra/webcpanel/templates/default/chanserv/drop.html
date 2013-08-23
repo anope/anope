@@ -15,7 +15,7 @@
 			{IF EXISTS CHANNEL_DROP}
 				<div class="alert alert-danger" style="margin-top: 15px; margin-bottom: 0; padding-bottom: 0;">
 					<h4>Drop Channel <strong>{CHANNEL_DROP}</strong>?</h4>
-					<form class="form-horizontal" method="post" action="/operserv/akill">
+					<form class="form-horizontal" method="post" action="/chanserv/drop">
 						<input type="hidden" value="{CHANNEL_DROP}" name="channel">
 						<input type="hidden" value="yes" name="drop">
 						<div class="form-group">

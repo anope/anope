@@ -22,25 +22,23 @@
 	</head>
 	<body>
 		<div id="frontPages" class="container">
-			<div class="row">
-				<div class="navbar navbar-default">
-					<span class="navbar-brand" style="margin-top: -1px">Anope Web <small>Control Panel</small></span>
-					<ul class="nav navbar-nav">
-						{FOR CATEGORY_URL,CATEGORY_NAME IN CATEGORY_URLS,CATEGORY_NAMES}
-						<li
-							{IF EQ CATEGORY NickServ}{IF EQ CATEGORY_NAME NickServ}class="active"{END IF}{END IF}
-							{IF EQ CATEGORY ChanServ}{IF EQ CATEGORY_NAME ChanServ}class="active"{END IF}{END IF}
-							{IF EQ CATEGORY MemoServ}{IF EQ CATEGORY_NAME MemoServ}class="active"{END IF}{END IF}
-							{IF EQ CATEGORY HostServ}{IF EQ CATEGORY_NAME HostServ}class="active"{END IF}{END IF}
-							{IF EQ CATEGORY OperServ}{IF EQ CATEGORY_NAME OperServ}class="active"{END IF}{END IF}>
-							<a href="{CATEGORY_URL}">{CATEGORY_NAME}</a>
-						</li>
-						{END FOR}
-					</ul>
-					<span id="loggedIn" class="pull-right">
-						<span>Logged in as {ACCOUNT}</span> <a href="/logout">(Logout)</a>
-					</span>
-				</div>
+			<div class="navbar navbar-default">
+				<span class="navbar-brand" style="margin-top: -1px">Anope Web <small>Control Panel</small></span>
+				<ul class="nav navbar-nav">
+					{FOR CATEGORY_URL,CATEGORY_NAME IN CATEGORY_URLS,CATEGORY_NAMES}
+					<li
+						{IF EQ CATEGORY NickServ}{IF EQ CATEGORY_NAME NickServ}class="active"{END IF}{END IF}
+						{IF EQ CATEGORY ChanServ}{IF EQ CATEGORY_NAME ChanServ}class="active"{END IF}{END IF}
+						{IF EQ CATEGORY MemoServ}{IF EQ CATEGORY_NAME MemoServ}class="active"{END IF}{END IF}
+						{IF EQ CATEGORY HostServ}{IF EQ CATEGORY_NAME HostServ}class="active"{END IF}{END IF}
+						{IF EQ CATEGORY OperServ}{IF EQ CATEGORY_NAME OperServ}class="active"{END IF}{END IF}>
+						<a href="{CATEGORY_URL}">{CATEGORY_NAME}</a>
+					</li>
+					{END FOR}
+				</ul>
+				<span id="loggedIn" class="pull-right">
+					<span>Logged in as {ACCOUNT}</span> <a href="/logout">(Logout)</a>
+				</span>
 			</div>
 
 			<div class="row">

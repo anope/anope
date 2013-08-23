@@ -1,34 +1,36 @@
 {INCLUDE header.html}
-		{FOR M IN MESSAGES}
-		<div class="alert alert-info">
-			{M}<br>
-		</div>
-		{END FOR}
-
-		<h2>Channels you can drop</h2>
-		<div class="scroll">
-		{FOR CH,ECH IN CHANNEL_NAMES,ESCAPED_CHANNEL_NAMES}
-			<a href="/chanserv/drop?channel={ECH}">{CH}</a></br>
-		{END FOR}
-		</div>
-		{IF EXISTS CHANNEL_DROP}
-			<div class="alert alert-danger" style="margin-top: 15px; margin-bottom: 0; padding-bottom: 0;">
-				<h4>Drop Channel <strong>{CHANNEL_DROP}</strong>?</h4>
-				<form class="form-horizontal" method="post" action="/operserv/akill">
-					<input type="hidden" value="{CHANNEL_DROP}" name="channel">
-					<input type="hidden" value="yes" name="drop">
-					<div class="form-group">
-						<label class="control-label col-lg-3" for="confChan">Confirm channel name:</label>
-						<div class="col-lg-4">
-							<input class="form-control" type="text" name="confChan" id="confChan" placeholder="This cannot be undone!">
-						</div>
-					</div>
-					<div class="form-group">
-						<div class="col-lg-offset-3 col-lg-4">
-							<button type="submit" class="btn btn-danger">Drop</button>
-						</div>
-					</div>
-				</form>
+		<div class="panel-heading">Channels you can drop</div>
+		<div class="panel-body">
+			{FOR M IN MESSAGES}
+			<div class="alert alert-info">
+				{M}<br>
 			</div>
-		{END IF}
+			{END FOR}
+
+			<div class="scroll">
+			{FOR CH,ECH IN CHANNEL_NAMES,ESCAPED_CHANNEL_NAMES}
+				<a href="/chanserv/drop?channel={ECH}">{CH}</a></br>
+			{END FOR}
+			</div>
+			{IF EXISTS CHANNEL_DROP}
+				<div class="alert alert-danger" style="margin-top: 15px; margin-bottom: 0; padding-bottom: 0;">
+					<h4>Drop Channel <strong>{CHANNEL_DROP}</strong>?</h4>
+					<form class="form-horizontal" method="post" action="/chanserv/drop">
+						<input type="hidden" value="{CHANNEL_DROP}" name="channel">
+						<input type="hidden" value="yes" name="drop">
+						<div class="form-group">
+							<label class="control-label col-lg-3" for="confChan">Confirm channel name:</label>
+							<div class="col-lg-4">
+								<input class="form-control" type="text" name="confChan" id="confChan" placeholder="This cannot be undone!">
+							</div>
+						</div>
+						<div class="form-group">
+							<div class="col-lg-offset-3 col-lg-4">
+								<button type="submit" class="btn btn-danger">Drop</button>
+							</div>
+						</div>
+					</form>
+				</div>
+			{END IF}
+		</div>
 {INCLUDE footer.html}

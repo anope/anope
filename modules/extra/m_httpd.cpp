@@ -47,7 +47,6 @@ class MyHTTPClient : public HTTPClient
 
 	Anope::string inbuf;
 	unsigned content_length;
-	Anope::string post_data;
 
 	enum
 	{
@@ -128,11 +127,9 @@ class MyHTTPClient : public HTTPClient
 		if (!this->header_done)
 			return true;
 
-		this->post_data += inbuf;
-
-		if (this->post_data.length() >= this->content_length)
+		if (this->inbuf.length() >= this->content_length)
 		{
-			sepstream sep(this->post_data, '&');
+			sepstream sep(this->inbuf, '&');
 			Anope::string token;
 
 			while (sep.GetToken(token))

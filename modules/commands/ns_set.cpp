@@ -1198,7 +1198,11 @@ class NSSet : public Module
 		if (!show_hidden)
 			return;
 
-		if (killprotect.HasExt(na->nc))
+		if (kill_immed.HasExt(na->nc))
+			info.AddOption(_("Immediate protection"));
+		else if (kill_quick.HasExt(na->nc))
+			info.AddOption(_("Quick protection"));
+		else if (killprotect.HasExt(na->nc))
 			info.AddOption(_("Protection"));
 		if (secure.HasExt(na->nc))
 			info.AddOption(_("Security"));

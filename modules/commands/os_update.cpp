@@ -21,6 +21,7 @@ class CommandOSUpdate : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
+		Log(LOG_ADMIN, source, this);
 		source.Reply(_("Updating databases."));
 		Anope::SaveDatabases();
 		return;

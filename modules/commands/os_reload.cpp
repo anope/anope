@@ -23,6 +23,8 @@ class CommandOSReload : public Command
 	{
 		try
 		{
+			Log(LOG_ADMIN, source, this);
+
 			Configuration::Conf *new_config = new Configuration::Conf();
 			delete Config;
 			Config = new_config;

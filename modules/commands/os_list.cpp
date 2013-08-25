@@ -27,6 +27,11 @@ class CommandOSChanList : public Command
 		std::set<Anope::string> modes;
 		User *u2;
 
+		if (!pattern.empty())
+			Log(LOG_ADMIN, source, this) << "for " << pattern;
+		else
+			Log(LOG_ADMIN, source, this);
+
 		if (!opt.empty() && opt.equals_ci("SECRET"))
 		{
 			modes.insert("SECRET");
@@ -128,6 +133,11 @@ class CommandOSUserList : public Command
 		const Anope::string &opt = params.size() > 1 ? params[1] : "";
 		Channel *c;
 		std::set<Anope::string> modes;
+
+		if (!pattern.empty())
+			Log(LOG_ADMIN, source, this) << "for " << pattern;
+		else
+			Log(LOG_ADMIN, source, this);
 
 		if (!opt.empty() && opt.equals_ci("INVISIBLE"))
 			modes.insert("INVIS");

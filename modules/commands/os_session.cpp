@@ -244,6 +244,8 @@ class CommandOSSession : public Command
 	{
 		const Anope::string &cmd = params[0];
 
+		Log(LOG_ADMIN, source, this) << cmd << " " << params[1];
+
 		if (!session_limit)
 			source.Reply(_("Session limiting is disabled."));
 		else if (cmd.equals_ci("LIST"))
@@ -365,6 +367,7 @@ class CommandOSException : public Command
 				delete exception;
 			else
 			{
+				Log(LOG_ADMIN, source, this) << "to set the session limit for " << mask << " to " << limit;
 				session_service->AddException(exception);
 				source.Reply(_("Session limit for \002%s\002 set to \002%d\002."), mask.c_str(), limit);
 				if (Anope::ReadOnly)
@@ -396,6 +399,7 @@ class CommandOSException : public Command
 			for (; i < end; ++i)
 				if (mask.equals_ci(session_service->GetExceptions()[i]->mask))
 				{
+					Log(LOG_ADMIN, source, this) << "to remove session limit exception for " << mask;
 					ExceptionDelCallback::DoDel(source, i);
 					source.Reply(_("\002%s\002 deleted from session-limit exception list."), mask.c_str());
 					break;
@@ -436,6 +440,7 @@ class CommandOSException : public Command
 			session_service->GetExceptions()[n1] = session_service->GetExceptions()[n2];
 			session_service->GetExceptions()[n2] = temp;
 
+			Log(LOG_ADMIN, source, this) << "to move exception " << session_service->GetExceptions()[n1]->mask << " from position " << n1 + 1 << " to position " << n2 + 1;
 			source.Reply(_("Exception for \002%s\002 (#%d) moved to position \002%d\002."), session_service->GetExceptions()[n1]->mask.c_str(), n1 + 1, n2 + 1);
 
 			if (Anope::ReadOnly)

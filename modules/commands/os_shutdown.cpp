@@ -21,6 +21,7 @@ class CommandOSQuit : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
+		Log(LOG_ADMIN, source, this);
 		Anope::QuitReason = source.command + " command received from " + source.GetNick();
 		Anope::Quitting = true;
 		return;
@@ -48,6 +49,7 @@ class CommandOSRestart : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
+		Log(LOG_ADMIN, source, this);
 		Anope::QuitReason = source.command + " command received from " + source.GetNick();
 		Anope::Quitting = Anope::Restarting = true;
 		Anope::SaveDatabases();
@@ -73,6 +75,7 @@ class CommandOSShutdown : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
+		Log(LOG_ADMIN, source, this);
 		Anope::QuitReason = source.command + " command received from " + source.GetNick();
 		Anope::Quitting = true;
 		Anope::SaveDatabases();

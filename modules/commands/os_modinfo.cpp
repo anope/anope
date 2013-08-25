@@ -24,6 +24,8 @@ class CommandOSModInfo : public Command
 	{
 		const Anope::string &file = params[0];
 
+		Log(LOG_ADMIN, source, this) << "on " << file;
+
 		Module *m = ModuleManager::FindModule(file);
 		if (m)
 		{
@@ -80,6 +82,11 @@ class CommandOSModList : public Command
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		const Anope::string &param = !params.empty() ? params[0] : "";
+
+		if (!param.empty())
+			Log(LOG_ADMIN, source, this) << "for " << param;
+		else
+			Log(LOG_ADMIN, source, this);
 
 		bool third = false, extra = false, vendor = false, database = false, encryption = false, pseudoclient = false, protocol = false;
 

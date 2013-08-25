@@ -201,6 +201,8 @@ class CommandOSStats : public Command
 	{
 		Anope::string extra = !params.empty() ? params[0] : "";
 
+		Log(LOG_ADMIN, source, this) << extra;
+
 		if (extra.equals_ci("RESET"))
 			return this->DoStatsReset(source);
 

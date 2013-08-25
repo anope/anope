@@ -112,9 +112,15 @@ class ngIRCdProto : public IRCDProto
 			UplinkSocket::Message(source) << "KICK " << chan->name << " " << user->nick;
 	}
 
-	void SendLogin(User *u) anope_override { }
+	void SendLogin(User *u) anope_override
+	{
+		UplinkSocket::Message(Me) << "METADATA " << u->GetUID() << " accountname :" << u->Account()->display;
+	}
 
-	void SendLogout(User *u) anope_override { } 
+	void SendLogout(User *u) anope_override
+	{
+		UplinkSocket::Message(Me) << "METADATA " << u->GetUID() << " accountname :";
+	} 
 
 	void SendModeInternal(const MessageSource &source, const Channel *dest, const Anope::string &buf) anope_override
 	{
@@ -312,14 +318,15 @@ struct IRCDMessageMetadata : IRCDMessage
 	 *
 	 * params[0] = nick of the user
 	 * params[1] = command
-	 * params[3] = data
+	 * params[2] = data
 	 *
 	 * following commands are supported:
+	 *  - "accountname": the account name of a client (can't be empty)
+	 *  - "certfp": the certificate fingerprint of a client (can't be empty)
+	 *  - "cloakhost" : the cloaked hostname of a client
 	 *  - "host": the hostname of a client (can't be empty)
-         *  - "cloakhost" : the cloaked hostname of a client
 	 *  - "info": info text ("real name") of a client
 	 *  - "user": the user name (ident) of a client (can't be empty)
-	 *  - "certfp": the certificate fingerprint of a client
 	 */
 
 	void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
@@ -330,14 +337,25 @@ struct IRCDMessageMetadata : IRCDMessage
 			Log() << "received METADATA for non-existent user " << params[0];
 			return;
 		}
-		if (params[1].equals_cs("host"))
+		if (params[1].equals_cs("accountname"))
 		{
-			u->SetCloakedHost(params[2]);
+			NickCore *nc = NickCore::Find(params[2]);
+			if (nc)
+				u->Login(nc);
+		}
+		else if (params[1].equals_cs("certfp"))
+		{
+			u->fingerprint = params[2];
+			FOREACH_MOD(OnFingerprint, (u));
 		}
 		else if (params[1].equals_cs("cloakhost"))
 		{
 			if (!params[2].empty())
 				u->SetDisplayedHost(params[2]);
+		}
+		else if (params[1].equals_cs("host"))
+		{
+			u->SetCloakedHost(params[2]);
 		}
 		else if (params[1].equals_cs("info"))
 		{
@@ -346,11 +364,6 @@ struct IRCDMessageMetadata : IRCDMessage
 		else if (params[1].equals_cs("user"))
 		{
 			u->SetVIdent(params[2]);
-		}
-		else if (params[1].equals_cs("certfp"))
-		{
-			u->fingerprint = params[2];
-			FOREACH_MOD(OnFingerprint, (u));
 		}
 	}
 };
@@ -667,7 +680,7 @@ class ProtongIRCd : public Module
 
 	void OnUserNickChange(User *u, const Anope::string &) anope_override
 	{
-		u->RemoveModeInternal(Me, ModeManager::FindUserModeByName("REGISTERED"));
+		u->RemoveMode(Config->GetClient("NickServ"), "REGISTERED");
 	}
 };
 

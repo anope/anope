@@ -36,7 +36,6 @@ class PlexusProto : public IRCDProto
 
 	void SendGlobalNotice(BotInfo *bi, const Server *dest, const Anope::string &msg) anope_override { hybrid->SendGlobalNotice(bi, dest, msg); }
 	void SendGlobalPrivmsg(BotInfo *bi, const Server *dest, const Anope::string &msg) anope_override { hybrid->SendGlobalPrivmsg(bi, dest, msg); }
-	void SendGlobopsInternal(const MessageSource &source, const Anope::string &buf) anope_override { hybrid->SendGlobopsInternal(source, buf); }
 	void SendSQLine(User *u, const XLine *x) anope_override { hybrid->SendSQLine(u, x); }
 	void SendSQLineDel(const XLine *x) anope_override { hybrid->SendSQLineDel(x); }
 	void SendSGLineDel(const XLine *x) anope_override { hybrid->SendSGLineDel(x); }
@@ -47,6 +46,11 @@ class PlexusProto : public IRCDProto
 	void SendChannel(Channel *c) anope_override { hybrid->SendChannel(c); }
 	void SendSVSHold(const Anope::string &nick, time_t t) anope_override { hybrid->SendSVSHold(nick, t); }
 	void SendSVSHoldDel(const Anope::string &nick) anope_override { hybrid->SendSVSHoldDel(nick); }
+
+	void SendGlobopsInternal(const MessageSource &source, const Anope::string &buf) anope_override
+	{
+		UplinkSocket::Message(source) << "OPERWALL :" << buf;
+	}
 
 	void SendJoin(User *user, Channel *c, const ChannelStatus *status) anope_override
 	{
@@ -65,6 +69,9 @@ class PlexusProto : public IRCDProto
 			BotInfo *setter = BotInfo::Find(user->nick);
 			for (size_t i = 0; i < cs.Modes().length(); ++i)
 				c->SetMode(setter, ModeManager::FindChannelModeByChar(cs.Modes()[i]), user->GetUID(), false);
+
+			if (uc != NULL)
+				uc->status = cs;
 		}
 	}
 

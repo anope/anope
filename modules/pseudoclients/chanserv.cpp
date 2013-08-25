@@ -288,7 +288,7 @@ class ChanServCore : public Module, public ChanServService
 
 	void OnChannelSync(Channel *c) anope_override
 	{
-		bool perm = c->HasMode("PERM") || (c->ci && persist && persist->Get(c->ci));
+		bool perm = c->HasMode("PERM") || (c->ci && persist && persist->HasExt(c->ci));
 		if (!perm && !c->botchannel && (c->users.empty() || (c->users.size() == 1 && c->users.begin()->second->user->server == Me)))
 		{
 			this->Hold(c);

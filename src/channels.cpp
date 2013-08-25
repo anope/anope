@@ -812,7 +812,7 @@ void Channel::SetCorrectModes(User *user, bool give_modes)
 			/* Always give op. If we have already given one mode, don't give more until it has a symbol */
 			if (cm->name == "OP" || !given || (giving && cm->symbol))
 			{
-				this->SetMode(NULL, cm, user->GetUID());
+				this->SetMode(NULL, cm, user->GetUID(), false);
 				/* Now if this contains a symbol don't give any more modes, to prevent setting +qaohv etc on users */
 				giving = !cm->symbol;
 				given = true;
@@ -824,7 +824,7 @@ void Channel::SetCorrectModes(User *user, bool give_modes)
 			if (cm->name == "VOICE")
 				take_modes = false;
 			else
-				this->RemoveMode(NULL, cm, user->GetUID());
+				this->RemoveMode(NULL, cm, user->GetUID(), false);
 		}
 	}
 }

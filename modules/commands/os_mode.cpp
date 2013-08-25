@@ -48,8 +48,8 @@ class CommandOSMode : public Command
 					if (uc->user->HasMode("OPER"))
 						continue;
 
-					for (size_t i = 0; i < uc->status.Modes().length(); ++i)
-						c->RemoveMode(c->ci->WhoSends(), ModeManager::FindChannelModeByChar(uc->status.Modes()[i]), uc->user->GetUID(), false);
+					for (size_t i = uc->status.Modes().length(); i > 0; --i)
+						c->RemoveMode(c->ci->WhoSends(), ModeManager::FindChannelModeByChar(uc->status.Modes()[i - 1]), uc->user->GetUID(), false);
 				}
 
 				source.Reply(_("All modes cleared on %s."), c->name.c_str());

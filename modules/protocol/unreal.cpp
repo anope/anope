@@ -171,6 +171,9 @@ class UnrealIRCdProto : public IRCDProto
 			BotInfo *setter = BotInfo::Find(user->nick);
 			for (size_t i = 0; i < cs.Modes().length(); ++i)
 				c->SetMode(setter, ModeManager::FindChannelModeByChar(cs.Modes()[i]), user->GetUID(), false);
+
+			if (uc != NULL)
+				uc->status = cs;
 		}
 	}
 

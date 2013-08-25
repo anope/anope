@@ -109,11 +109,20 @@ Server::Server(Server *up, const Anope::string &sname, unsigned shops, const Ano
 			for (channel_map::const_iterator it = ChannelList.begin(), it_end = ChannelList.end(); it != it_end; ++it)
 			{
 				Channel *c = it->second;
+
 				if (c->users.empty())
 					IRCD->SendChannel(c);
 				else
 					for (Channel::ChanUserList::const_iterator cit = c->users.begin(), cit_end = c->users.end(); cit != cit_end; ++cit)
 						IRCD->SendJoin(cit->second->user, c, &cit->second->status);
+
+				for (Channel::ModeList::const_iterator it2 = c->GetModes().begin(); it2 != c->GetModes().end(); ++it2)
+				{
+					ChannelMode *cm = ModeManager::FindChannelModeByName(it2->first);
+					if (!cm || cm->type != MODE_LIST)
+						continue;
+					ModeManager::StackerAdd(c->ci->WhoSends(), c, cm, true, it2->second);
+				}
 			}
 		}
 	}

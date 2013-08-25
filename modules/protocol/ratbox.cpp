@@ -30,7 +30,6 @@ class RatboxProto : public IRCDProto
 
 	void SendGlobalNotice(BotInfo *bi, const Server *dest, const Anope::string &msg) anope_override { hybrid->SendGlobalNotice(bi, dest, msg); }
 	void SendGlobalPrivmsg(BotInfo *bi, const Server *dest, const Anope::string &msg) anope_override { hybrid->SendGlobalPrivmsg(bi, dest, msg); }
-	void SendGlobopsInternal(const MessageSource &source, const Anope::string &buf) anope_override { hybrid->SendGlobopsInternal(source, buf); }
 	void SendSQLine(User *u, const XLine *x) anope_override { hybrid->SendSQLine(u, x); }
 	void SendSGLine(User *u, const XLine *x) anope_override { hybrid->SendSGLine(u, x); }
 	void SendSGLineDel(const XLine *x) anope_override { hybrid->SendSGLineDel(x); }
@@ -43,6 +42,11 @@ class RatboxProto : public IRCDProto
 	void SendChannel(Channel *c) anope_override { hybrid->SendChannel(c); }
 	void SendTopic(const MessageSource &source, Channel *c) anope_override { hybrid->SendTopic(source, c); }
 	bool IsIdentValid(const Anope::string &ident) anope_override { return hybrid->IsIdentValid(ident); }
+
+	void SendGlobopsInternal(const MessageSource &source, const Anope::string &buf) anope_override
+	{
+		UplinkSocket::Message(source) << "OPERWALL :" << buf;
+	}
 
 	void SendConnect() anope_override
 	{

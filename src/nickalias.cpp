@@ -140,7 +140,6 @@ void NickAlias::Serialize(Serialize::Data &data) const
 	data.SetType("time_registered", Serialize::Data::DT_INT); data["time_registered"] << this->time_registered;
 	data.SetType("time_registered", Serialize::Data::DT_INT); data["last_seen"] << this->last_seen;
 	data["nc"] << this->nc->display;
-	Extensible::ExtensibleSerialize(this, this, data);
 
 	if (this->HasVhost())
 	{
@@ -149,6 +148,8 @@ void NickAlias::Serialize(Serialize::Data &data) const
 		data["vhost_creator"] << this->GetVhostCreator();
 		data["vhost_time"] << this->GetVhostCreated();
 	}
+
+	Extensible::ExtensibleSerialize(this, this, data);
 }
 
 Serializable* NickAlias::Unserialize(Serializable *obj, Serialize::Data &data)
@@ -189,7 +190,6 @@ Serializable* NickAlias::Unserialize(Serializable *obj, Serialize::Data &data)
 	data["last_realhost"] >> na->last_realhost;
 	data["time_registered"] >> na->time_registered;
 	data["last_seen"] >> na->last_seen;
-	Extensible::ExtensibleUnserialize(na, na, data);
 
 	Anope::string vhost_ident, vhost_host, vhost_creator;
 	time_t vhost_time;
@@ -200,6 +200,8 @@ Serializable* NickAlias::Unserialize(Serializable *obj, Serialize::Data &data)
 	data["vhost_time"] >> vhost_time;
 
 	na->SetVhost(vhost_ident, vhost_host, vhost_creator, vhost_time);
+
+	Extensible::ExtensibleUnserialize(na, na, data);
 
 	/* compat */
 	bool b;

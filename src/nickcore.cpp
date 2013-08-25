@@ -68,12 +68,12 @@ void NickCore::Serialize(Serialize::Data &data) const
 	data["pass"] << this->pass;
 	data["email"] << this->email;
 	data["language"] << this->language;
-	Extensible::ExtensibleSerialize(this, this, data);
 	for (unsigned i = 0; i < this->access.size(); ++i)
 		data["access"] << this->access[i] << " ";
 	data["memomax"] << this->memos.memomax;
 	for (unsigned i = 0; i < this->memos.ignores.size(); ++i)
 		data["memoignores"] << this->memos.ignores[i] << " ";
+	Extensible::ExtensibleSerialize(this, this, data);
 }
 
 Serializable* NickCore::Unserialize(Serializable *obj, Serialize::Data &data)
@@ -92,7 +92,6 @@ Serializable* NickCore::Unserialize(Serializable *obj, Serialize::Data &data)
 	data["pass"] >> nc->pass;
 	data["email"] >> nc->email;
 	data["language"] >> nc->language;
-	Extensible::ExtensibleUnserialize(nc, nc, data);
 	{
 		Anope::string buf;
 		data["access"] >> buf;
@@ -110,6 +109,8 @@ Serializable* NickCore::Unserialize(Serializable *obj, Serialize::Data &data)
 		while (sep.GetToken(buf))
 			nc->memos.ignores.push_back(buf);
 	}
+
+	Extensible::ExtensibleUnserialize(nc, nc, data);
 
 	/* compat */
 	bool b;

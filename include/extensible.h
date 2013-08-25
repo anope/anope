@@ -220,7 +220,8 @@ template<typename T>
 T* Extensible::Extend(const Anope::string &name, const T &what)
 {
 	T* t = Extend<T>(name);
-	*t = what;
+	if (t)
+		*t = what;
 	return t;
 }
 

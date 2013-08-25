@@ -395,6 +395,13 @@ class CommandCSSetPeace : public Command
 	}
 };
 
+inline static Anope::string BotModes()
+{
+	return Config->GetModule("botserv")->Get<Anope::string>("botmodes",
+		Config->GetModule("chanserv")->Get<Anope::string>("botmodes", "o")
+	);
+}
+
 class CommandCSSetPersist : public Command
 {
  public:
@@ -439,28 +446,8 @@ class CommandCSSetPersist : public Command
 					Channel *c = Channel::FindOrCreate(ci->name, created);
 					if (ci->bi)
 					{
-						ChannelStatus status(Config->GetModule("botserv")->Get<const Anope::string>("botmodes"));
+						ChannelStatus status(BotModes());
 						ci->bi->Join(c, &status);
-					}
-				}
-
-				/* No botserv bot, no channel mode, give them ChanServ.
-				 * Yes, this works fine with no BotServ.
-				 */
-				if (!ci->bi && !cm)
-				{
-					BotInfo *ChanServ = Config->GetClient("ChanServ");
-					if (!ChanServ)
-					{
-						source.Reply(_("ChanServ is required to enable persist on this network."));
-						return;
-					}
-
-					ChanServ->Assign(NULL, ci);
-					if (!ci->c->FindUser(ChanServ))
-					{
-						ChannelStatus status(Config->GetModule("botserv")->Get<const Anope::string>("botmodes"));
-						ChanServ->Join(ci->c, &status);
 					}
 				}
 
@@ -474,6 +461,25 @@ class CommandCSSetPersist : public Command
 					if (ml)
 						ml->SetMLock(cm, true);
 				}
+				/* No botserv bot, no channel mode, give them ChanServ.
+				 * Yes, this works fine with no BotServ.
+				 */
+				else if (!ci->bi)
+				{
+					BotInfo *ChanServ = Config->GetClient("ChanServ");
+					if (!ChanServ)
+					{
+						source.Reply(_("ChanServ is required to enable persist on this network."));
+						return;
+					}
+
+					ChanServ->Assign(NULL, ci);
+					if (!ci->c->FindUser(ChanServ))
+					{
+						ChannelStatus status(BotModes());
+						ChanServ->Join(ci->c, &status);
+					}
+				}
 			}
 
 			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to enable persist";
@@ -485,6 +491,9 @@ class CommandCSSetPersist : public Command
 			{
 				ci->Shrink<bool>("PERSIST");
 
+				BotInfo *ChanServ = Config->GetClient("ChanServ"),
+					*BotServ = Config->GetClient("BotServ");
+
 				/* Unset perm mode */
 				if (cm)
 				{
@@ -495,19 +504,17 @@ class CommandCSSetPersist : public Command
 					if (ml)
 						ml->RemoveMLock(cm, true);
 				}
-
 				/* No channel mode, no BotServ, but using ChanServ as the botserv bot
 				 * which was assigned when persist was set on
 				 */
-				BotInfo *ChanServ = Config->GetClient("ChanServ"),
-					*BotServ = Config->GetClient("BotServ");
-				if (!cm && !BotServ && ci->bi)
+				else if (!cm && !BotServ && ci->bi)
 				{
 					if (!ChanServ)
 					{
 						source.Reply(_("ChanServ is required to enable persist on this network."));
 						return;
 					}
+
 					/* Unassign bot */
 					ChanServ->UnAssign(NULL, ci);
 				}
@@ -980,7 +987,7 @@ class CommandCSSetNoexpire : public Command
 
 class CSSet : public Module
 {
-	SerializableExtensibleItem<bool> persist, noautoop, peace, securefounder,
+	SerializableExtensibleItem<bool> noautoop, peace, securefounder,
 		restricted, secure, secureops, signkick, signkick_level, noexpire;
 
 	struct KeepModes : SerializableExtensibleItem<bool>
@@ -1028,6 +1035,40 @@ class CSSet : public Module
 		}
 	} keep_modes;
 
+	struct Persist : SerializableExtensibleItem<bool>
+	{
+		Persist(Module *m, const Anope::string &n) : SerializableExtensibleItem<bool>(m, n) { }
+
+		void ExtensibleUnserialize(Extensible *e, Serializable *s, Serialize::Data &data) anope_override
+		{
+			SerializableExtensibleItem<bool>::ExtensibleUnserialize(e, s, data);
+
+			if (s->GetSerializableType()->GetName() != "ChannelInfo" || !this->HasExt(e))
+				return;
+
+			ChannelInfo *ci = anope_dynamic_static_cast<ChannelInfo *>(s);
+			if (ci->c)
+				return;
+
+			bool created;
+			Channel *c = Channel::FindOrCreate(ci->name, created, ci->time_registered);
+			if (!ci->bi)
+			{
+				BotInfo *ChanServ = Config->GetClient("ChanServ");
+				if (ChanServ)
+					ChanServ->Assign(NULL, ci);
+			}
+			if (!ci->bi)
+				return;
+
+			if (!c->FindUser(ci->bi))
+			{
+				ChannelStatus status(BotModes());
+				ci->bi->Join(c, &status);
+			}
+		}
+	} persist;
+
 	CommandCSSet commandcsset;
 	CommandCSSetAutoOp commandcssetautoop;
 	CommandCSSetBanType commandcssetbantype;
@@ -1046,11 +1087,11 @@ class CSSet : public Module
 
  public:
 	CSSet(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		persist(this, "PERSIST"), noautoop(this, "NOAUTOOP"), peace(this, "PEACE"),
+		noautoop(this, "NOAUTOOP"), peace(this, "PEACE"),
 		securefounder(this, "SECUREFOUNDER"), restricted(this, "RESTRICTED"),
 		secure(this, "CS_SECURE"), secureops(this, "SECUREOPS"), signkick(this, "SIGNKICK"),
 		signkick_level(this, "SIGNKICK_LEVEL"), noexpire(this, "CS_NO_EXPIRE"),
-		keep_modes(this, "CS_KEEP_MODES"),
+		keep_modes(this, "CS_KEEP_MODES"), persist(this, "PERSIST"),
 
 		commandcsset(this), commandcssetautoop(this), commandcssetbantype(this),
 		commandcssetdescription(this), commandcssetfounder(this), commandcssetkeepmodes(this),
@@ -1073,6 +1114,11 @@ class CSSet : public Module
 			for (Channel::ModeList::iterator it = ml.begin(); it != ml.end(); ++it)
 				c->SetMode(c->ci->WhoSends(), it->first, it->second);
 		}
+	}
+
+	void OnChannelSync(Channel *c) anope_override
+	{
+		OnChannelCreate(c);
 	}
 
 	EventReturn OnCheckKick(User *u, Channel *c, Anope::string &mask, Anope::string &reason) anope_override
@@ -1101,7 +1147,7 @@ class CSSet : public Module
 			if (mode->name == "PERM")
 				persist.Set(c->ci, true);
 
-			if (mode->type != MODE_STATUS)
+			if (mode->type != MODE_STATUS && !c->syncing && Me->IsSynced())
 				c->ci->last_modes = c->GetModes();
 		}
 
@@ -1122,7 +1168,7 @@ class CSSet : public Module
 			}
 		}
 
-		if (c->ci && mode->type != MODE_STATUS)
+		if (c->ci && mode->type != MODE_STATUS && !c->syncing && Me->IsSynced())
 			c->ci->last_modes = c->GetModes();
 
 		return EVENT_CONTINUE;

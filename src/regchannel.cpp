@@ -220,7 +220,6 @@ void ChannelInfo::Serialize(Serialize::Data &data) const
 	data["last_topic_setter"] << this->last_topic_setter;
 	data.SetType("last_topic_time", Serialize::Data::DT_INT); data["last_topic_time"] << this->last_topic_time;
 	data.SetType("bantype", Serialize::Data::DT_INT); data["bantype"] << this->bantype;
-	Extensible::ExtensibleSerialize(this, this, data);
 	{
 		Anope::string levels_buffer;
 		for (Anope::map<int16_t>::const_iterator it = this->levels.begin(), it_end = this->levels.end(); it != it_end; ++it)
@@ -233,6 +232,8 @@ void ChannelInfo::Serialize(Serialize::Data &data) const
 	data["memomax"] << this->memos.memomax;
 	for (unsigned i = 0; i < this->memos.ignores.size(); ++i)
 		data["memoignores"] << this->memos.ignores[i] << " ";
+
+	Extensible::ExtensibleSerialize(this, this, data);
 }
 
 Serializable* ChannelInfo::Unserialize(Serializable *obj, Serialize::Data &data)
@@ -250,8 +251,6 @@ Serializable* ChannelInfo::Unserialize(Serializable *obj, Serialize::Data &data)
 		ci = anope_dynamic_static_cast<ChannelInfo *>(obj);
 	else
 		ci = new ChannelInfo(sname);
-
-	Extensible::ExtensibleUnserialize(ci, ci, data);
 
 	ci->SetFounder(NickCore::Find(sfounder));
 	ci->SetSuccessor(NickCore::Find(ssuccessor));
@@ -287,6 +286,8 @@ Serializable* ChannelInfo::Unserialize(Serializable *obj, Serialize::Data &data)
 		while (sep.GetToken(buf))
 			ci->memos.ignores.push_back(buf);
 	}
+
+	Extensible::ExtensibleUnserialize(ci, ci, data);
 
 	/* compat */
 	bool b;

@@ -340,8 +340,8 @@ class NSRegister : public Module
 	CommandNSConfirm commandnsconfirm;
 	CommandNSResend commandnsrsend;
 
-	PrimitiveExtensibleItem<bool> unconfirmed;
-	PrimitiveExtensibleItem<Anope::string> passcode;
+	SerializableExtensibleItem<bool> unconfirmed;
+	SerializableExtensibleItem<Anope::string> passcode;
 
  public:
 	NSRegister(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),

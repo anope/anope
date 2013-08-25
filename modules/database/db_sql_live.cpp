@@ -216,11 +216,13 @@ class DBMySQL : public Module, public Pipe
 						new_s->id = id;
 						obj->objects[id] = new_s;
 
+						/* The Unserialize operation is destructive so rebuild the data for UpdateCache.
+						 * Also the old data may contain columns that we don't use, so we reserialize the
+						 * object to know for sure our cache is consistent
+						 */
+
 						Data data2;
-						/* The Unserialize operation is destructive so rebuild the data for UpdateCache */
-						for (std::map<Anope::string, Anope::string>::const_iterator rit = row.begin(), rit_end = row.end(); rit != rit_end; ++rit)
-							if (rit->first != "id" && rit->first != "timestamp")
-								data2[rit->first] << rit->second;
+						new_s->Serialize(data2);
 						new_s->UpdateCache(data2); /* We know this is the most up to date copy */
 					}
 				}

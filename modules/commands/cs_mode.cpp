@@ -454,7 +454,7 @@ class CommandCSMode : public Command
 		Anope::string modes = params[2], param;
 
 		bool override = !source.AccessFor(ci).HasPriv("MODE") && source.HasPriv("chanserv/administration");
-		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to set " << params[2];
+		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to set " << params[2] << (params.size() > 3 ? " " + params[3] : "");
 
 		int adding = -1;
 		for (size_t i = 0; i < modes.length(); ++i)

@@ -170,9 +170,15 @@ class CommandOSIgnore : public Command
 
 			ignore_service->AddIgnore(nick, source.GetNick(), reason, t);
 			if (!t)
+			{
 				source.Reply(_("\002%s\002 will now permanently be ignored."), nick.c_str());
+				Log(LOG_ADMIN, source, this) << "to add a permanent ignore for " << nick;
+			}
 			else
+			{
 				source.Reply(_("\002%s\002 will now be ignored for \002%s\002."), nick.c_str(), time.c_str());
+				Log(LOG_ADMIN, source, this) << "to add an ignore on " << nick << " for " << time;
+			}
 		}
 
 		return;
@@ -235,7 +241,10 @@ class CommandOSIgnore : public Command
 		if (nick.empty())
 			this->OnSyntaxError(source, "DEL");
 		else if (ignore_service->DelIgnore(nick))
+		{
+			Log(LOG_ADMIN, source, this) << "to remove an ignore on " << nick;
 			source.Reply(_("\002%s\002 will no longer be ignored."), nick.c_str());
+		}
 		else
 			source.Reply(_("Nick \002%s\002 not found on ignore list."), nick.c_str());
 

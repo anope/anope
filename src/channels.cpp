@@ -76,9 +76,10 @@ void Channel::Reset()
 		ChannelStatus f = uc->status;
 		uc->status.Clear();
 
-		if (BotInfo::Find(uc->user->nick))
+		/* reset modes for my clients */
+		if (uc->user->server == Me)
 			for (size_t i = 0; i < f.Modes().length(); ++i)
-				this->SetMode(NULL, ModeManager::FindChannelModeByName(f.Modes()[i]), uc->user->GetUID(), false);
+				this->SetMode(NULL, ModeManager::FindChannelModeByChar(f.Modes()[i]), uc->user->GetUID(), false);
 	}
 
 	for (ChanUserList::const_iterator it = this->users.begin(), it_end = this->users.end(); it != it_end; ++it)

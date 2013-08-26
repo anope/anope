@@ -347,8 +347,8 @@ class CommandCSMode : public Command
 				neg.clear();
 			Anope::string reply = pos + neg + pos_params + neg_params;
 
-			source.Reply(_("%s locked on %s."), modelocks->GetMLockAsString(true).c_str(), ci->name.c_str());
-			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to lock " << modelocks->GetMLockAsString(true);
+			source.Reply(_("%s locked on %s."), reply.c_str(), ci->name.c_str());
+			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to lock " << reply;
 
 			if (ci->c)
 				ci->c->CheckModes();
@@ -903,7 +903,7 @@ class CSMode : public Module
 					}
 		
 				}
-				else if (cm->type == MODE_LIST)
+				else if (cm->type == MODE_LIST || cm->type == MODE_STATUS)
 				{
 					if (ml->set)
 						c->SetMode(NULL, cm, ml->param);

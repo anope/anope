@@ -367,7 +367,7 @@ bool User::IsIdentified(bool check_nick) const
 {
 	if (check_nick && this->nc)
 	{
-		NickAlias *na = NickAlias::Find(this->nc->display);
+		NickAlias *na = NickAlias::Find(this->nick);
 		return na && *na->nc == *this->nc;
 	}
 

@@ -378,8 +378,14 @@ class NickServCore : public Module, public NickServService
 		for (user_map::const_iterator it = UserListByNick.begin(); it != UserListByNick.end(); ++it)
 		{
 			User *u = it->second;
-			if (u->server == s && !u->IsIdentified())
-				this->Validate(u);
+
+			if (u->server == s)
+			{
+				if (u->HasMode("REGISTERED") && !u->IsIdentified(true))
+					u->RemoveMode(NickServ, "REGISTERED");
+				if (!u->IsIdentified())
+					this->Validate(u);
+			}
 		}
 	}
 
@@ -409,7 +415,7 @@ class NickServCore : public Module, public NickServService
 
 	void OnUserModeSet(const MessageSource &setter, User *u, const Anope::string &mname) anope_override
 	{
-		if (mname == "REGISTERED" && !u->IsIdentified())
+		if (u->server->IsSynced() && mname == "REGISTERED" && !u->IsIdentified(true))
 			u->RemoveMode(NickServ, mname);
 	}
 

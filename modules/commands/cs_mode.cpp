@@ -913,36 +913,6 @@ class CSMode : public Module
 			}
 	}
 
-	EventReturn OnChannelModeSet(Channel *c, MessageSource &setter, ChannelMode *mode, const Anope::string &param) anope_override
-	{
-		if (!c->ci)
-			return EVENT_CONTINUE;
-
-		ModeLocks *ml = modelocks.Get(c->ci);
-		if (!ml)
-			return EVENT_CONTINUE;
-
-		if (ml->HasMLock(mode, param, false))
-			c->RemoveMode(c->ci->WhoSends(), mode, param);
-
-		return EVENT_CONTINUE;
-	}
-
-	EventReturn OnChannelModeUnset(Channel *c, MessageSource &setter, ChannelMode *mode, const Anope::string &param) anope_override
-	{
-		if (!c->ci)
-			return EVENT_CONTINUE;
-
-		ModeLocks *ml = modelocks.Get(c->ci);
-		if (!ml)
-			return EVENT_CONTINUE;
-
-		if (ml->HasMLock(mode, param, true))
-			c->SetMode(c->ci->WhoSends(), mode, param);
-
-		return EVENT_CONTINUE;
-	}
-
 	void OnCreateChan(ChannelInfo *ci) anope_override
 	{
 		ModeLocks *ml = modelocks.Require(ci);

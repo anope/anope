@@ -178,13 +178,13 @@ class BotServCore : public Module
 		const Anope::string &fantasycharacters = Config->GetModule(this)->Get<const Anope::string>("fantasycharacter", "!");
 		if (!fantasycharacters.empty())
 			source.Reply(_("Additionally, if fantasy is enabled fantasy commands\n"
-				"can be executed by  prefixing the command name with\n"
+				"can be executed by prefixing the command name with\n"
 				"one of the following characters: %s"), fantasycharacters.c_str());
 	}
 
-	EventReturn OnChannelModeSet(Channel *c, MessageSource &, ChannelMode *mode, const Anope::string &param) anope_override
+	EventReturn OnChannelModeSet(Channel *c, MessageSource &source, ChannelMode *mode, const Anope::string &param) anope_override
 	{
-		if (Config->GetModule(this)->Get<bool>("smartjoin") && mode->name == "BAN" && c->ci && c->ci->bi && c->FindUser(c->ci->bi))
+		if (source.GetUser() && !source.GetBot() && Config->GetModule(this)->Get<bool>("smartjoin") && mode->name == "BAN" && c->ci && c->ci->bi && c->FindUser(c->ci->bi))
 		{
 			BotInfo *bi = c->ci->bi;
 

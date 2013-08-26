@@ -407,9 +407,9 @@ class OSDefcon : public Module
 		this->ParseModeString();
 	}
 
-	EventReturn OnChannelModeSet(Channel *c, MessageSource &, ChannelMode *mode, const Anope::string &param) anope_override
+	EventReturn OnChannelModeSet(Channel *c, MessageSource &source, ChannelMode *mode, const Anope::string &param) anope_override
 	{
-		if (DConfig.Check(DEFCON_FORCE_CHAN_MODES) && DConfig.DefConModesOff.count(mode->name))
+		if (DConfig.Check(DEFCON_FORCE_CHAN_MODES) && DConfig.DefConModesOff.count(mode->name) && source.GetUser() && !source.GetBot())
 		{
 			c->RemoveMode(Config->GetClient("OperServ"), mode, param);
 
@@ -419,9 +419,9 @@ class OSDefcon : public Module
 		return EVENT_CONTINUE;
 	}
 
-	EventReturn OnChannelModeUnset(Channel *c, MessageSource &, ChannelMode *mode, const Anope::string &) anope_override
+	EventReturn OnChannelModeUnset(Channel *c, MessageSource &source, ChannelMode *mode, const Anope::string &) anope_override
 	{
-		if (DConfig.Check(DEFCON_FORCE_CHAN_MODES) && DConfig.DefConModesOn.count(mode->name))
+		if (DConfig.Check(DEFCON_FORCE_CHAN_MODES) && DConfig.DefConModesOn.count(mode->name) && source.GetUser() && !source.GetBot())
 		{
 			Anope::string param;
 

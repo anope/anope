@@ -828,14 +828,14 @@ class CSMode : public Module
 {
 	CommandCSMode commandcsmode;
 	CommandCSModes commandcsmodes;
-	Serialize::Type modelocks_type;
 	ExtensibleItem<ModeLocksImpl> modelocks;
+	Serialize::Type modelocks_type;
 
  public:
 	CSMode(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandcsmode(this), commandcsmodes(this),
-		modelocks_type("ModeLock", ModeLockImpl::Unserialize),
-		modelocks(this, "modelocks")
+		modelocks(this, "modelocks"),
+		modelocks_type("ModeLock", ModeLockImpl::Unserialize)
 	{
 
 	}

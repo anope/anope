@@ -252,14 +252,13 @@ class CommandEntryMessage : public Command
 class CSEntryMessage : public Module
 {
 	CommandEntryMessage commandentrymsg;
-	Serialize::Type entrymsg_type;
 	ExtensibleItem<EntryMessageList> eml;
+	Serialize::Type entrymsg_type;
 
  public:
 	CSEntryMessage(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 	commandentrymsg(this),
-	entrymsg_type("EntryMsg", EntryMsg::Unserialize),
-	eml(this, "entrymsg")
+	eml(this, "entrymsg"), entrymsg_type("EntryMsg", EntryMsg::Unserialize)
 	{
 	}
 

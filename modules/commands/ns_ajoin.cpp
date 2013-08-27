@@ -225,13 +225,13 @@ class CommandNSAJoin : public Command
 class NSAJoin : public Module
 {
 	CommandNSAJoin commandnsajoin;
-	Serialize::Type ajoinentry_type;
 	ExtensibleItem<AJoinList> ajoinlist;
+	Serialize::Type ajoinentry_type;
 
  public:
 	NSAJoin(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		commandnsajoin(this),
-		ajoinentry_type("AJoinEntry", AJoinEntry::Unserialize), ajoinlist(this, "ajoinlist")
+		commandnsajoin(this), ajoinlist(this, "ajoinlist"),
+		ajoinentry_type("AJoinEntry", AJoinEntry::Unserialize)
 	{
 
 		if (!IRCD->CanSVSJoin)

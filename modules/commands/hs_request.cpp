@@ -328,17 +328,17 @@ class CommandHSWaiting : public Command
 
 class HSRequest : public Module
 {
-	Serialize::Type request_type;
 	CommandHSRequest commandhsrequest;
 	CommandHSActivate commandhsactive;
 	CommandHSReject commandhsreject;
 	CommandHSWaiting commandhswaiting;
 	ExtensibleItem<HostRequest> hostrequest;
+	Serialize::Type request_type;
 
  public:
 	HSRequest(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		request_type("HostRequest", HostRequest::Unserialize), commandhsrequest(this), commandhsactive(this),
-		commandhsreject(this), commandhswaiting(this), hostrequest(this, "hostrequest")
+		commandhsrequest(this), commandhsactive(this),
+		commandhsreject(this), commandhswaiting(this), hostrequest(this, "hostrequest"), request_type("HostRequest", HostRequest::Unserialize)
 	{
 
 		if (!IRCD || !IRCD->CanSetVHost)

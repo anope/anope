@@ -241,8 +241,8 @@ class CommandOSInfo : public Command
 class OSInfo : public Module
 {
 	CommandOSInfo commandosinfo;
-	Serialize::Type oinfo_type;
 	ExtensibleItem<OperInfos> oinfo;
+	Serialize::Type oinfo_type;
 
 	void OnInfo(CommandSource &source, Extensible *e, InfoFormatter &info)
 	{
@@ -262,7 +262,7 @@ class OSInfo : public Module
 
  public:
 	OSInfo(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		commandosinfo(this), oinfo_type("OperInfo", OperInfo::Unserialize), oinfo(this, "operinfo")
+		commandosinfo(this), oinfo(this, "operinfo"), oinfo_type("OperInfo", OperInfo::Unserialize)
 	{
 
 	}

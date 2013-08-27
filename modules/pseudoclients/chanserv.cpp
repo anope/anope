@@ -261,7 +261,7 @@ class ChanServCore : public Module, public ChanServService
 	{
 		if (c->ci)
 			c->SetMode(c->ci->WhoSends(), "REGISTERED", "", false);
-		const Anope::string &require = Config->GetModule(this)->Get<const Anope::string>("require", "r");
+		const Anope::string &require = Config->GetModule(this)->Get<const Anope::string>("require");
 		if (!require.empty())
 		{
 			if (c->ci)
@@ -281,7 +281,7 @@ class ChanServCore : public Module, public ChanServService
 	EventReturn OnCanSet(User *u, const ChannelMode *cm) anope_override
 	{
 		if (Config->GetModule(this)->Get<const Anope::string>("nomlock").find(cm->mchar) != Anope::string::npos
-			|| Config->GetModule(this)->Get<const Anope::string>("require", "r").find(cm->mchar) != Anope::string::npos)
+			|| Config->GetModule(this)->Get<const Anope::string>("require").find(cm->mchar) != Anope::string::npos)
 			return EVENT_STOP;
 		return EVENT_CONTINUE;
 	}

@@ -262,11 +262,13 @@ class NSAJoin : public Module
 
 			bool need_invite = false;
 			Anope::string key = entry->key;
+			AccessGroup u_access;
 			
 			if (ci != NULL)
 			{
 				if (ci->HasExt("CS_SUSPENDED"))
 					continue;
+				u_access = ci->AccessFor(u);
 			}
 			if (c != NULL)
 			{
@@ -288,7 +290,7 @@ class NSAJoin : public Module
 					Anope::string k;
 					if (c->GetParam("KEY", k))
 					{
-						if (ci->AccessFor(u).HasPriv("GETKEY"))
+						if (u_access.HasPriv("GETKEY"))
 							key = k;
 						else if (key != k)
 							need_invite = true;
@@ -312,7 +314,7 @@ class NSAJoin : public Module
 
 			if (need_invite && c != NULL)
 			{
-				if (!ci->AccessFor(u).HasPriv("INVITE"))
+				if (!u_access.HasPriv("INVITE"))
 					continue;
 				IRCD->SendInvite(NickServ, c, u);
 			}

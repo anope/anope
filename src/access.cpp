@@ -372,7 +372,7 @@ bool AccessGroup::HasPriv(const Anope::string &name) const
 {
 	if (this->super_admin)
 		return true;
-	else if (ci->GetLevel(name) == ACCESS_INVALID)
+	else if (!ci || ci->GetLevel(name) == ACCESS_INVALID)
 		return false;
 	else if (this->founder)
 		return true;

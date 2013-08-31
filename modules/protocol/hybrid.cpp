@@ -26,6 +26,7 @@ class HybridProto : public IRCDProto
 		CanSZLine = true;
 		CanSVSHold = true;
 		CanCertFP = true;
+		CanSetVHost = true;
 		RequiresID = true;
 		MaxModes = 4;
 	}
@@ -258,6 +259,16 @@ class HybridProto : public IRCDProto
 	{
 		XLine x(nick);
 		this->SendSQLineDel(&x);
+	}
+
+	void SendVhost(User *u, const Anope::string &ident, const Anope::string &host) anope_override
+	{
+		u->SetMode(Config->GetClient("HostServ"), "CLOAK", host);
+	}
+
+	void SendVhostDel(User *u) anope_override
+	{
+		u->RemoveMode(Config->GetClient("HostServ"), "CLOAK", u->host);
 	}
 
 	bool IsIdentValid(const Anope::string &ident) anope_override
@@ -603,6 +614,7 @@ class ProtoHybrid : public Module
 		ModeManager::AddUserMode(new UserModeOperOnly("HIDEOPER", 'H'));
 		ModeManager::AddUserMode(new UserMode("REGPRIV", 'R'));
 		ModeManager::AddUserMode(new UserModeNoone("SSL", 'S'));
+		ModeManager::AddUserMode(new UserMode("CLOAK", 'x'));
 
 		/* b/e/I */
 		ModeManager::AddChannelMode(new ChannelModeList("BAN", 'b'));

@@ -282,14 +282,16 @@ class CoreExport User : public virtual Base, public Extensible, public CommandRe
 	/** Remove a mode on the user
 	 * @param bi The client setting the mode
 	 * @param um The user mode
+	 * @param param Optional param for the mode
 	 */
-	void RemoveMode(BotInfo *bi, UserMode *um);
+	void RemoveMode(BotInfo *bi, UserMode *um, const Anope::string &param = "");
 
 	/** Remove a mode from the user
 	 * @param bi The client setting the mode
 	 * @param name The mode name
+	 * @param param Optional param for the mode
 	 */
-	void RemoveMode(BotInfo *bi, const Anope::string &name);
+	void RemoveMode(BotInfo *bi, const Anope::string &name, const Anope::string &param = "");
 
 	/** Set a string of modes on a user
 	 * @param bi The client setting the modes

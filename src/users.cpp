@@ -488,18 +488,18 @@ void User::SetMode(BotInfo *bi, const Anope::string &uname, const Anope::string 
 	SetMode(bi, ModeManager::FindUserModeByName(uname), param);
 }
 
-void User::RemoveMode(BotInfo *bi, UserMode *um)
+void User::RemoveMode(BotInfo *bi, UserMode *um, const Anope::string &param)
 {
 	if (!um || !HasMode(um->name))
 		return;
 
-	ModeManager::StackerAdd(bi, this, um, false);
+	ModeManager::StackerAdd(bi, this, um, false, param);
 	RemoveModeInternal(bi, um);
 }
 
-void User::RemoveMode(BotInfo *bi, const Anope::string &name)
+void User::RemoveMode(BotInfo *bi, const Anope::string &name, const Anope::string &param)
 {
-	RemoveMode(bi, ModeManager::FindUserModeByName(name));
+	RemoveMode(bi, ModeManager::FindUserModeByName(name), param);
 }
 
 void User::SetModes(BotInfo *bi, const char *umodes, ...)

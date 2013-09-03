@@ -32,6 +32,7 @@ class ModuleWebCPanel : public Module
 	WebCPanel::ChanServ::Set chanserv_set;
 	WebCPanel::ChanServ::Access chanserv_access;
 	WebCPanel::ChanServ::Akick chanserv_akick;
+	WebCPanel::ChanServ::Modes chanserv_modes;
 	WebCPanel::ChanServ::Drop chanserv_drop;
 
 	WebCPanel::MemoServ::Memos memoserv_memos;
@@ -48,7 +49,8 @@ class ModuleWebCPanel : public Module
 		index("/"), logout("/logout"), _register("/register"), confirm("/confirm"),
 		nickserv_info("NickServ", "/nickserv/info"), nickserv_cert("NickServ", "/nickserv/cert"), nickserv_access("NickServ", "/nickserv/access"), nickserv_alist("NickServ", "/nickserv/alist"),
 		chanserv_info("ChanServ", "/chanserv/info"), chanserv_set("ChanServ", "/chanserv/set"), chanserv_access("ChanServ", "/chanserv/access"), chanserv_akick("ChanServ", "/chanserv/akick"),
-		chanserv_drop("ChanServ", "/chanserv/drop"), memoserv_memos("MemoServ", "/memoserv/memos"), hostserv_request("HostServ", "/hostserv/request"), operserv_akill("OperServ", "/operserv/akill")
+		chanserv_modes("ChanServ", "/chanserv/modes"), chanserv_drop("ChanServ", "/chanserv/drop"), memoserv_memos("MemoServ", "/memoserv/memos"), hostserv_request("HostServ", "/hostserv/request"),
+		operserv_akill("OperServ", "/operserv/akill")
 	{
 
 		me = this;
@@ -133,6 +135,11 @@ class ModuleWebCPanel : public Module
 			s.subsections.push_back(ss);
 			provider->RegisterPage(&this->chanserv_akick);
 
+			ss.name = "Modes";
+			ss.url = "/chanserv/modes";
+			s.subsections.push_back(ss);
+			provider->RegisterPage(&this->chanserv_modes);
+
 			ss.name = "Drop";
 			ss.url = "/chanserv/drop";
 			s.subsections.push_back(ss);
@@ -210,6 +217,7 @@ class ModuleWebCPanel : public Module
 			provider->UnregisterPage(&this->chanserv_set);
 			provider->UnregisterPage(&this->chanserv_access);
 			provider->UnregisterPage(&this->chanserv_akick);
+			provider->UnregisterPage(&this->chanserv_modes);
 			provider->UnregisterPage(&this->chanserv_drop);
 
 			provider->UnregisterPage(&this->memoserv_memos);

@@ -6,6 +6,7 @@
  */
 
 #include "../../webcpanel.h"
+#include "utils.h"
 
 WebCPanel::ChanServ::Drop::Drop(const Anope::string &cat, const Anope::string &u) : WebPanelProtectedPage (cat, u)
 {
@@ -37,11 +38,11 @@ bool WebCPanel::ChanServ::Drop::OnRequest(HTTPProvider *server, const Anope::str
 			replacements["ESCAPED_CHANNEL_NAMES"] = HTTPUtils::URLEncode(ci->name);
 		}
 	}
+	replacements["PAGE"] = page_name;
 
 	if (message.get_data.count("channel") > 0)
 		replacements["CHANNEL_DROP"] = message.get_data["channel"];
 
-	TemplateFileServer page("chanserv/drop.html");
-	page.Serve(server, page_name, client, message, reply, replacements);
-	return true;
+	return ServePage("chanserv/drop.html", server, page_name, client, message, reply, replacements);
+
 }

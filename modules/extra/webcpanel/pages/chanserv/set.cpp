@@ -6,6 +6,7 @@
  */
 
 #include "../../webcpanel.h"
+#include "utils.h"
 
 WebCPanel::ChanServ::Set::Set(const Anope::string &cat, const Anope::string &u) : WebPanelProtectedPage(cat, u)
 {
@@ -14,20 +15,32 @@ WebCPanel::ChanServ::Set::Set(const Anope::string &cat, const Anope::string &u) 
 bool WebCPanel::ChanServ::Set::OnRequest(HTTPProvider *server, const Anope::string &page_name, HTTPClient *client, HTTPMessage &message, HTTPReply &reply, NickAlias *na, TemplateFileServer::Replacements &replacements)
 {
 	const Anope::string &chname = message.get_data["channel"];
+	bool can_set = false;
+
+	BuildChanlist(page_name, na, replacements);
 
 	if (chname.empty())
 	{
-		reply.error = HTTP_FOUND;
-		reply.headers["Location"] = Anope::string("http") + (server->IsSSL() ? "s" : "") + "://" + message.headers["Host"] + "/chanserv/info";
-		return true;
+		replacements["STOP"];
+		return ServePage("chanserv/set.html", server, page_name, client, message, reply, replacements);
 	}
 
 	ChannelInfo *ci = ChannelInfo::Find(chname);
 
-	if (!ci || !ci->AccessFor(na->nc).HasPriv("SET"))
-		return true;
+	if (!ci)
+	{
+		replacements["STOP"];
+		return ServePage("chanserv/set.html", server, page_name, client, message, reply, replacements);
+	}
 
-	if (message.post_data.empty() == false)
+
+	if (ci->AccessFor(na->nc).HasPriv("SET"))
+	{
+		replacements["CAN_SET"];
+		can_set = true;
+	}
+
+	if (can_set && message.post_data.empty() == false)
 	{
 		if (ci->HasExt("KEEPTOPIC") != message.post_data.count("keeptopic"))
 		{
@@ -102,30 +115,32 @@ bool WebCPanel::ChanServ::Set::OnRequest(HTTPProvider *server, const Anope::stri
 		replacements["LAST_TOPIC_SETTER"] = HTTPUtils::Escape(ci->last_topic_setter);
 	}
 
-	if (ci->HasExt("KEEPTOPIC"))
-		replacements["KEEPTOPIC"];
-	
-	if (ci->HasExt("PEACE"))
-		replacements["PEACE"];
-	
-	if (ci->HasExt("CS_PRIVATE"))
-		replacements["PRIVATE"];
+	if (can_set)
+	{
+		if (ci->HasExt("KEEPTOPIC"))
+			replacements["KEEPTOPIC"];
 
-	if (ci->HasExt("RESTRICTED"))
-		replacements["RESTRICTED"];
-	
-	if (ci->HasExt("CS_SECURE"))
-		replacements["SECURE"];
-	
-	if (ci->HasExt("SECUREOPS"))
-		replacements["SECUREOPS"];
-	
-	if (ci->HasExt("TOPICLOCK"))
-		replacements["TOPICLOCK"];
+		if (ci->HasExt("PEACE"))
+			replacements["PEACE"];
 
-	TemplateFileServer page("chanserv/set.html");
-	page.Serve(server, page_name, client, message, reply, replacements);
-	return true;
+		if (ci->HasExt("CS_PRIVATE"))
+			replacements["PRIVATE"];
+
+		if (ci->HasExt("RESTRICTED"))
+			replacements["RESTRICTED"];
+
+		if (ci->HasExt("CS_SECURE"))
+			replacements["SECURE"];
+
+		if (ci->HasExt("SECUREOPS"))
+			replacements["SECUREOPS"];
+
+		if (ci->HasExt("TOPICLOCK"))
+			replacements["TOPICLOCK"];
+	}
+
+	return ServePage("chanserv/set.html", server, page_name, client, message, reply, replacements);
+
 }
 
 std::set<Anope::string> WebCPanel::ChanServ::Set::GetData()

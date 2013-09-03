@@ -6,6 +6,7 @@
  */
 
 #include "../../webcpanel.h"
+#include "utils.h"
 
 WebCPanel::ChanServ::Access::Access(const Anope::string &cat, const Anope::string &u) : WebPanelProtectedPage(cat, u)
 {
@@ -15,23 +16,30 @@ bool WebCPanel::ChanServ::Access::OnRequest(HTTPProvider *server, const Anope::s
 {
 	const Anope::string &chname = message.get_data["channel"];
 
+	BuildChanlist(page_name, na, replacements);
+
 	if (chname.empty())
 	{
-		reply.error = HTTP_FOUND;
-		reply.headers["Location"] = Anope::string("http") + (server->IsSSL() ? "s" : "") + "://" + message.headers["Host"] + "/chanserv/info";
-		return true;
+		replacements["STOP"];
+		return ServePage("chanserv/access.html", server, page_name, client, message, reply, replacements);
 	}
 
 	ChannelInfo *ci = ChannelInfo::Find(chname);
 
 	if (!ci)
-		return true;
+	{
+		replacements["STOP"];
+		replacements["MESSAGES"] = "Channel not registered.";
+		return ServePage("chanserv/access.html", server, page_name, client, message, reply, replacements);
+	}
 
 	AccessGroup u_access = ci->AccessFor(na->nc);
 	bool has_priv = na->nc->IsServicesOper() && na->nc->o->ot->HasPriv("chanserv/access/modify");
 
 	if (!u_access.HasPriv("ACCESS_LIST") && !has_priv)
-		return true;
+	{	replacements["STOP"];
+		replacements["MESSAGES"] = "Access denied.";
+	}
 
 	const ChanAccess *highest = u_access.Highest();
 	
@@ -119,6 +127,7 @@ bool WebCPanel::ChanServ::Access::OnRequest(HTTPProvider *server, const Anope::s
 	}
 
 	replacements["ESCAPED_CHANNEL"] = HTTPUtils::URLEncode(chname);
+	replacements["ACCESS_CHANGE"] = ci->AccessFor(na->nc).HasPriv("ACCESS_CHANGE") ? "YES" : "NO";
 
 	for (unsigned i = 0; i < ci->GetAccessCount(); ++i)
 	{
@@ -127,7 +136,6 @@ bool WebCPanel::ChanServ::Access::OnRequest(HTTPProvider *server, const Anope::s
 		replacements["MASKS"] = HTTPUtils::Escape(access->mask);
 		replacements["ACCESSES"] = HTTPUtils::Escape(access->AccessSerialize());
 		replacements["CREATORS"] = HTTPUtils::Escape(access->creator);
-		replacements["ACCESS_CHANGES"] = ci->AccessFor(na->nc).HasPriv("ACCESS_CHANGE") ? "YES" : "NO";
 	}
 
 	for (std::list<AccessProvider *>::const_iterator it = AccessProvider::GetProviders().begin(); it != AccessProvider::GetProviders().end(); ++it)
@@ -136,9 +144,7 @@ bool WebCPanel::ChanServ::Access::OnRequest(HTTPProvider *server, const Anope::s
 		replacements["PROVIDERS"] = a->name;
 	}
 
-	TemplateFileServer page("chanserv/access.html");
-	page.Serve(server, page_name, client, message, reply, replacements);
-	return true;
+	return ServePage("chanserv/access.html", server, page_name, client, message, reply, replacements);
 }
 
 std::set<Anope::string> WebCPanel::ChanServ::Access::GetData()

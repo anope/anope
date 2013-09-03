@@ -6,6 +6,7 @@
  */
 
 #include "../../webcpanel.h"
+#include "utils.h"
 
 WebCPanel::ChanServ::Akick::Akick(const Anope::string &cat, const Anope::string &u) : WebPanelProtectedPage(cat, u)
 {
@@ -15,23 +16,31 @@ bool WebCPanel::ChanServ::Akick::OnRequest(HTTPProvider *server, const Anope::st
 {
 	const Anope::string &chname = message.get_data["channel"];
 
+	BuildChanlist(page_name, na, replacements);
 	if (chname.empty())
 	{
-		reply.error = HTTP_FOUND;
-		reply.headers["Location"] = Anope::string("http") + (server->IsSSL() ? "s" : "") + "://" + message.headers["Host"] + "/chanserv/info";
-		return true;
+		replacements["STOP"];
+		return ServePage("chanserv/akick.html", server, page_name, client, message, reply, replacements);
 	}
 
 	ChannelInfo *ci = ChannelInfo::Find(chname);
 
 	if (!ci)
-		return true;
+	{
+		replacements["STOP"];
+		replacements["MESSAGES"] = "Channel not registered";
+		return ServePage("chanserv/akick.html", server, page_name, client, message, reply, replacements);
+	}
 
 	AccessGroup u_access = ci->AccessFor(na->nc);
 	bool has_priv = na->nc->IsServicesOper() && na->nc->o->ot->HasPriv("chanserv/access/modify");
 
 	if (!u_access.HasPriv("akick") && !has_priv)
-		return true;
+	{
+		replacements["STOP"];
+		replacements["MESSAGES"] = "Permission denied.";
+		return ServePage("chanserv/akick.html", server, page_name, client, message, reply, replacements);
+	}
 
 	if (message.get_data["del"].empty() == false && message.get_data["mask"].empty() == false)
 	{
@@ -68,9 +77,7 @@ bool WebCPanel::ChanServ::Akick::OnRequest(HTTPProvider *server, const Anope::st
 		replacements["REASONS"] = HTTPUtils::Escape(akick->reason);
 	}
 
-	TemplateFileServer page("chanserv/akick.html");
-	page.Serve(server, page_name, client, message, reply, replacements);
-	return true;
+	return ServePage("chanserv/akick.html", server, page_name, client, message, reply, replacements);
 }
 
 std::set<Anope::string> WebCPanel::ChanServ::Akick::GetData()

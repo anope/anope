@@ -1,17 +1,3 @@
 {INCLUDE header.html}
-		<div class="panel-heading">Channels you have access in</div>
-		<div class="panel-body">
-			{IF EXISTS CHANNEL_NAMES}
-			<div>
-				<h3 style="margin: -12px 0 20px 0;"><small>Choose a channel to access it's Settings, Access or Akick pages.</small></h3>
-				<ul id="channelList">
-				{FOR CH,ECH IN CHANNEL_NAMES,ESCAPED_CHANNEL_NAMES}
-					<li><a href="/chanserv/set?channel={ECH}">{CH}</a></li>
-				{END FOR}
-				</ul>
-			</div>
-			{ELSE}
-			<em>You don't have access in any channel</em><br>
-			{END IF}
-		</div>
+{INCLUDE chanserv/chanlist.html}
 {INCLUDE footer.html}

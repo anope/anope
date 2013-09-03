@@ -1,4 +1,5 @@
 {INCLUDE header.html}
+{INCLUDE chanserv/chanlist.html}
 		<div class="panel-heading">Channels you can drop</div>
 		<div class="panel-body">
 			{FOR M IN MESSAGES}
@@ -7,11 +8,6 @@
 			</div>
 			{END FOR}
 
-			<div class="scroll">
-			{FOR CH,ECH IN CHANNEL_NAMES,ESCAPED_CHANNEL_NAMES}
-				<a href="/chanserv/drop?channel={ECH}">{CH}</a></br>
-			{END FOR}
-			</div>
 			{IF EXISTS CHANNEL_DROP}
 				<div class="alert alert-danger" style="margin-top: 15px; margin-bottom: 0; padding-bottom: 0;">
 					<h4>Drop Channel <strong>{CHANNEL_DROP}</strong>?</h4>

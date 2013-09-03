@@ -166,6 +166,7 @@ namespace WebPanel
 #include "pages/chanserv/set.h"
 #include "pages/chanserv/access.h"
 #include "pages/chanserv/akick.h"
+#include "pages/chanserv/modes.h"
 #include "pages/chanserv/drop.h"
 
 #include "pages/memoserv/memos.h"

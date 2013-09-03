@@ -194,7 +194,7 @@ size_t Channel::HasMode(const Anope::string &mname, const Anope::string &param)
 		return modes.count(mname);
 	std::pair<Channel::ModeList::iterator, Channel::ModeList::iterator> its = this->GetModeList(mname);
 	for (; its.first != its.second; ++its.first)
-		if (its.first->second == param)
+		if (its.first->second.equals_ci(param))
 			return 1;
 	return 0;
 }
@@ -279,6 +279,9 @@ void Channel::SetModeInternal(MessageSource &setter, ChannelMode *cm, const Anop
 
 	if (cm->type != MODE_LIST)
 		this->modes.erase(cm->name);
+	else if (this->HasMode(cm->name, param))
+		return;
+
 	this->modes.insert(std::make_pair(cm->name, param));
 
 	if (param.empty() && cm->type != MODE_REGULAR)
@@ -342,11 +345,11 @@ void Channel::RemoveModeInternal(MessageSource &setter, ChannelMode *cm, const A
 		return;
 	}
 
-	if (cm->type == MODE_LIST && !param.empty())
+	if (cm->type == MODE_LIST)
 	{
 		std::pair<Channel::ModeList::iterator, Channel::ModeList::iterator> its = this->GetModeList(cm->name);
 		for (; its.first != its.second; ++its.first)
-			if (Anope::Match(param, its.first->second))
+			if (param.equals_ci(its.first->second))
 			{
 				this->modes.erase(its.first);
 				break;

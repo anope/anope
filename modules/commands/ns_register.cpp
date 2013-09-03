@@ -197,6 +197,8 @@ class CommandNSRegister : public Command
 				na->last_usermask = u->GetIdent() + "@" + u->GetDisplayedHost();
 				na->last_realname = u->realname;
 			}
+			else
+				na->last_realname = source.GetNick();
 
 			Log(LOG_COMMAND, source, this) << "to register " << na->nick << " (email: " << (!na->nc->email.empty() ? na->nc->email : "none") << ")";
 

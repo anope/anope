@@ -8,8 +8,7 @@
 			</div>
 			{END FOR}
 
-			{IF EXISTS STOP}
-			{ELSE}
+			{IF EQ ACCESS_LIST YES}
 				{IF EXISTS ACCESSES}
 				<table id="tableNSAccess" class="table table-hover">
 					<thead>

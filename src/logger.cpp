@@ -148,7 +148,7 @@ Anope::string Log::BuildPrefix() const
 			if (!this->c && !(this->u || this->nc))
 				break;
 			buffer += "ADMIN: ";
-			Anope::string cname = source != NULL ? source->command : this->c->name;
+			Anope::string cname = source != NULL && !source->command.empty() ? source->command : this->c->name;
 			if (this->u)
 				buffer += this->u->GetMask() + " used " + cname + " ";
 			else if (this->nc)
@@ -162,7 +162,7 @@ Anope::string Log::BuildPrefix() const
 			if (!this->c && !(this->u || this->nc))
 				break;
 			buffer += "OVERRIDE: ";
-			Anope::string cname = source != NULL ? source->command : this->c->name;
+			Anope::string cname = source != NULL && !source->command.empty() ? source->command : this->c->name;
 			if (this->u)
 				buffer += this->u->GetMask() + " used " + cname + " ";
 			else if (this->nc)
@@ -176,7 +176,7 @@ Anope::string Log::BuildPrefix() const
 			if (!this->c)
 				break;
 			buffer += "COMMAND: ";
-			Anope::string cname = source != NULL ? source->command : this->c->name;
+			Anope::string cname = source != NULL && !source->command.empty() ? source->command : this->c->name;
 			if (this->u)
 				buffer += this->u->GetMask() + " used " + cname + " ";
 			else if (this->source)

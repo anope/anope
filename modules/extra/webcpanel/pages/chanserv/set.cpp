@@ -16,23 +16,25 @@ bool WebCPanel::ChanServ::Set::OnRequest(HTTPProvider *server, const Anope::stri
 {
 	const Anope::string &chname = message.get_data["channel"];
 	bool can_set = false;
+	TemplateFileServer page("chanserv/set.html");
 
-	BuildChanlist(page_name, na, replacements);
+	BuildChanList(na, replacements);
 
 	if (chname.empty())
 	{
-		replacements["STOP"];
-		return ServePage("chanserv/set.html", server, page_name, client, message, reply, replacements);
+		page.Serve(server, page_name, client, message, reply, replacements);
+		return true;
 	}
 
 	ChannelInfo *ci = ChannelInfo::Find(chname);
 
 	if (!ci)
 	{
-		replacements["STOP"];
-		return ServePage("chanserv/set.html", server, page_name, client, message, reply, replacements);
+		page.Serve(server, page_name, client, message, reply, replacements);
+		return true;
 	}
 
+	replacements["OKAY"];
 
 	if (ci->AccessFor(na->nc).HasPriv("SET"))
 	{
@@ -139,8 +141,8 @@ bool WebCPanel::ChanServ::Set::OnRequest(HTTPProvider *server, const Anope::stri
 			replacements["TOPICLOCK"];
 	}
 
-	return ServePage("chanserv/set.html", server, page_name, client, message, reply, replacements);
-
+	page.Serve(server, page_name, client, message, reply, replacements);
+	return true;
 }
 
 std::set<Anope::string> WebCPanel::ChanServ::Set::GetData()

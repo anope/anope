@@ -19,8 +19,10 @@ bool WebCPanel::ChanServ::Info::OnRequest(HTTPProvider *server, const Anope::str
 	if (!chname.empty())
 		replacements["ESCAPED_CHANNEL"] = HTTPUtils::URLEncode(chname);
 
-	BuildChanlist("/chanserv/set", na, replacements);
+	BuildChanList(na, replacements);
 
-	return ServePage("chanserv/main.html", server, page_name, client, message, reply, replacements);
+	TemplateFileServer page("chanserv/main.html");
+	page.Serve(server, page_name, client, message, reply, replacements);
+	return true;
 }
 

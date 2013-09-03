@@ -15,32 +15,36 @@ WebCPanel::ChanServ::Akick::Akick(const Anope::string &cat, const Anope::string 
 bool WebCPanel::ChanServ::Akick::OnRequest(HTTPProvider *server, const Anope::string &page_name, HTTPClient *client, HTTPMessage &message, HTTPReply &reply, NickAlias *na, TemplateFileServer::Replacements &replacements)
 {
 	const Anope::string &chname = message.get_data["channel"];
+	TemplateFileServer Page("chanserv/akick.html");
 
-	BuildChanlist(page_name, na, replacements);
+	BuildChanList(na, replacements);
+
 	if (chname.empty())
 	{
-		replacements["STOP"];
-		return ServePage("chanserv/akick.html", server, page_name, client, message, reply, replacements);
+		Page.Serve(server, page_name, client, message, reply, replacements);
+		return true;
 	}
 
 	ChannelInfo *ci = ChannelInfo::Find(chname);
 
 	if (!ci)
 	{
-		replacements["STOP"];
 		replacements["MESSAGES"] = "Channel not registered";
-		return ServePage("chanserv/akick.html", server, page_name, client, message, reply, replacements);
+		Page.Serve(server, page_name, client, message, reply, replacements);
+		return true;
 	}
 
 	AccessGroup u_access = ci->AccessFor(na->nc);
 	bool has_priv = na->nc->IsServicesOper() && na->nc->o->ot->HasPriv("chanserv/access/modify");
 
-	if (!u_access.HasPriv("akick") && !has_priv)
+	if (!u_access.HasPriv("AKICK") && !has_priv)
 	{
-		replacements["STOP"];
 		replacements["MESSAGES"] = "Permission denied.";
-		return ServePage("chanserv/akick.html", server, page_name, client, message, reply, replacements);
+		Page.Serve(server, page_name, client, message, reply, replacements);
+		return true;
 	}
+
+	replacements["AKICK"] = "YES";
 
 	if (message.get_data["del"].empty() == false && message.get_data["mask"].empty() == false)
 	{
@@ -77,7 +81,8 @@ bool WebCPanel::ChanServ::Akick::OnRequest(HTTPProvider *server, const Anope::st
 		replacements["REASONS"] = HTTPUtils::Escape(akick->reason);
 	}
 
-	return ServePage("chanserv/akick.html", server, page_name, client, message, reply, replacements);
+	Page.Serve(server, page_name, client, message, reply, replacements);
+	return true;
 }
 
 std::set<Anope::string> WebCPanel::ChanServ::Akick::GetData()

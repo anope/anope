@@ -8,8 +8,7 @@
 			</div>
 			{END FOR}
 
-			{IF EXISTS STOP}
-			{ELSE}
+			{IF EQ MODE YES}
 				{FOR LM IN LISTMODES}
 						<td><a href="/chanserv/modes?channel={ESCAPED_CHANNEL}&m={LM}" class="btn btn-sm btn-primary {IF EQ LM ESCAPED_MODE}disabled{END IF}">{LM}</a></td>
 				{END FOR}

@@ -32,7 +32,13 @@
 						{IF EQ CATEGORY MemoServ}{IF EQ CATEGORY_NAME MemoServ}class="active"{END IF}{END IF}
 						{IF EQ CATEGORY HostServ}{IF EQ CATEGORY_NAME HostServ}class="active"{END IF}{END IF}
 						{IF EQ CATEGORY OperServ}{IF EQ CATEGORY_NAME OperServ}class="active"{END IF}{END IF}>
-						<a href="{CATEGORY_URL}">{CATEGORY_NAME}</a>
+						{IF EQ CATEGORY_NAME OperServ}
+							{IF EXISTS IS_OPER}
+								<a href="{CATEGORY_URL}">{CATEGORY_NAME}</a>
+							{END IF}
+						{ELSE}
+							<a href="{CATEGORY_URL}">{CATEGORY_NAME}</a>
+						{END IF}
 					</li>
 					{END FOR}
 				</ul>

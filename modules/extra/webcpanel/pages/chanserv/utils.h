@@ -5,6 +5,15 @@
  * Please read COPYING and README for further details.
  */
 
-void BuildChanlist(const Anope::string &, NickAlias *, TemplateFileServer::Replacements &);
+namespace WebCPanel
+{
 
-bool ServePage(const Anope::string &, HTTPProvider *, const Anope::string &, HTTPClient *, HTTPMessage &, HTTPReply &, TemplateFileServer::Replacements &);
+namespace ChanServ
+{
+
+extern void BuildChanList(NickAlias *, TemplateFileServer::Replacements &);
+
+}
+
+}
+

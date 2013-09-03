@@ -98,6 +98,8 @@ class WebPanelProtectedPage : public WebPanelPage
 		replacements["ACCOUNT"] = na->nc->display;
 		replacements["PAGE_NAME"] = page_name;
 		replacements["CATEGORY"] = category;
+		if (na->nc->IsServicesOper())
+			replacements["IS_OPER"];
 
 		Anope::string sections, get;
 

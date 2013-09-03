@@ -8,8 +8,7 @@
 			</div>
 			{END FOR}
 
-			{IF EXISTS STOP}
-			{ELSE}
+			{IF EXISTS OKAY}
 			{IF EXISTS CAN_SET}<form method="post" action="/chanserv/set?channel={CHANNEL_ESCAPED}">{END IF}
 				<table id="tableInfo" class="table table-hover">
 					<tr>

@@ -18,13 +18,15 @@ bool WebCPanel::ChanServ::Drop::OnRequest(HTTPProvider *server, const Anope::str
 
 	if (message.post_data.count("channel") > 0 && message.post_data.count("confChan") > 0)
 	{
-		if (message.post_data["channel"] == message.post_data["confChan"]) {
+		if (message.post_data["channel"] == message.post_data["confChan"])
+		{
 			std::vector<Anope::string> params;
 			params.push_back(HTTPUtils::URLDecode(message.post_data["channel"]));
 
 			WebPanel::RunCommand(na->nc->display, na->nc, "ChanServ", "chanserv/drop", params, replacements);
 		}
-		else replacements["MESSAGES"] = "Invalid Confirmation";
+		else
+			replacements["MESSAGES"] = "Invalid Confirmation";
 	}
 
 	std::deque<ChannelInfo *> queue;
@@ -38,11 +40,12 @@ bool WebCPanel::ChanServ::Drop::OnRequest(HTTPProvider *server, const Anope::str
 			replacements["ESCAPED_CHANNEL_NAMES"] = HTTPUtils::URLEncode(ci->name);
 		}
 	}
-	replacements["PAGE"] = page_name;
 
 	if (message.get_data.count("channel") > 0)
 		replacements["CHANNEL_DROP"] = message.get_data["channel"];
 
-	return ServePage("chanserv/drop.html", server, page_name, client, message, reply, replacements);
+	TemplateFileServer page("chanserv/drop.html");
+	page.Serve(server, page_name, client, message, reply, replacements);
+	return true;
 
 }

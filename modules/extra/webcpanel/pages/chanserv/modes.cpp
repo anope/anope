@@ -16,30 +16,31 @@ bool WebCPanel::ChanServ::Modes::OnRequest(HTTPProvider *server, const Anope::st
 {
 	const Anope::string &chname = message.get_data["channel"];
 	const Anope::string &mode = message.get_data["m"];
+	TemplateFileServer Page("chanserv/modes.html");
 
-	BuildChanlist(page_name, na, replacements);
+	BuildChanList(na, replacements);
 
 	if (chname.empty())
 	{
-		replacements["STOP"];
-		return ServePage("chanserv/modes.html", server, page_name, client, message, reply, replacements);
+		Page.Serve(server, page_name, client, message, reply, replacements);
+		return true;
 	}
 
 	ChannelInfo *ci = ChannelInfo::Find(chname);
 
 	if (!ci)
 	{
-		replacements["STOP"];
-		return ServePage("chanserv/modes.html", server, page_name, client, message, reply, replacements);
+		Page.Serve(server, page_name, client, message, reply, replacements);
+		return true;
 	}
 
 	Channel *c = Channel::Find(chname);
 
 	if (!c)
 	{
-		replacements["MESSAGES"] = "Channel is empty / does not exist on the network.";
-		replacements["STOP"];
-		return ServePage("chanserv/modes.html", server, page_name, client, message, reply, replacements);
+		replacements["MESSAGES"] = Anope::printf(CHAN_X_NOT_IN_USE, chname.c_str());
+		Page.Serve(server, page_name, client, message, reply, replacements);
+		return true;
 	}
 
 	AccessGroup u_access = ci->AccessFor(na->nc);
@@ -48,9 +49,11 @@ bool WebCPanel::ChanServ::Modes::OnRequest(HTTPProvider *server, const Anope::st
 	if (!u_access.HasPriv("MODE") && !has_priv)
 	{
 		replacements["MESSAGES"] = "Access denied.";
-		replacements["STOP"];
-		return ServePage("chanserv/modes.html", server, page_name, client, message, reply, replacements);
+		Page.Serve(server, page_name, client, message, reply, replacements);
+		return true;
 	}
+
+	replacements["MODE"] = "YES";
 
 	/* build a list with the names of all listmodes */
 	for (std::vector<ChannelMode *>::const_iterator it = ModeManager::GetChannelModes().begin(); it != ModeManager::GetChannelModes().end(); ++it)
@@ -92,7 +95,8 @@ bool WebCPanel::ChanServ::Modes::OnRequest(HTTPProvider *server, const Anope::st
 	replacements["ESCAPED_CHANNEL"] = HTTPUtils::URLEncode(chname);
 	replacements["ESCAPED_MODE"] = HTTPUtils::URLEncode(mode);
 
-	return ServePage("chanserv/modes.html", server, page_name, client, message, reply, replacements);
+	Page.Serve(server, page_name, client, message, reply, replacements);
+	return true;
 }
 
 std::set<Anope::string> WebCPanel::ChanServ::Modes::GetData()

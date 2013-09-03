@@ -274,7 +274,7 @@ static std::list<Anope::string> BuildModeStrings(StackerInfo *info)
 
 	for (it = info->AddModes.begin(), it_end = info->AddModes.end(); it != it_end; ++it)
 	{
-		if (++NModes > IRCD->MaxModes)
+		if (++NModes > IRCD->MaxModes || (buf.length() + parambuf.length() > IRCD->MaxLine - 100)) // Leave room for command, channel, etc
 		{
 			ret.push_back(buf + parambuf);
 			buf = "+";
@@ -294,7 +294,7 @@ static std::list<Anope::string> BuildModeStrings(StackerInfo *info)
 	buf += "-";
 	for (it = info->DelModes.begin(), it_end = info->DelModes.end(); it != it_end; ++it)
 	{
-		if (++NModes > IRCD->MaxModes)
+		if (++NModes > IRCD->MaxModes || (buf.length() + parambuf.length() > IRCD->MaxLine - 100)) // Leave room for command, channel, etc
 		{
 			ret.push_back(buf + parambuf);
 			buf = "-";

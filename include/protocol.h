@@ -66,6 +66,8 @@ class CoreExport IRCDProto : public Service
 	bool RequiresID;
 	/* The maximum number of modes we are allowed to set with one MODE command */
 	unsigned MaxModes;
+	/* The maximum number of bytes a line may have */
+	unsigned MaxLine;
 
 	/** Sets the server in NOOP mode. If NOOP mode is enabled, no users
 	 * will be able to oper on the server.

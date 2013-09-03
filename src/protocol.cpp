@@ -28,6 +28,7 @@ IRCDProto::IRCDProto(Module *creator, const Anope::string &p) : Service(creator,
 	CanSVSNick = CanSVSJoin = CanSetVHost = CanSetVIdent = CanSNLine = CanSQLine = CanSQLineChannel
 		= CanSZLine = CanSVSHold = CanSVSO = CanCertFP = RequiresID = false;
 	MaxModes = 3;
+	MaxLine = 512;
 
 	if (IRCD == NULL)
 		IRCD = this;

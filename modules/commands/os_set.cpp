@@ -16,7 +16,7 @@ class CommandOSSet : public Command
  private:
 	void DoList(CommandSource &source)
 	{
-		Log(LOG_ADMIN, source, this);
+		Log(LOG_ADMIN, source, this) << "LIST";
 
 		Anope::string index;
 

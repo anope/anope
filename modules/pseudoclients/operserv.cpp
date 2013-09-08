@@ -132,12 +132,16 @@ class SNLineManager : public XLineManager
 
 	void Send(User *u, XLine *x) anope_override
 	{
-		IRCD->SendSGLine(u, x);
+		if (IRCD->CanSNLine)
+			IRCD->SendSGLine(u, x);
+		else
+			u->Kill(Config->GetClient("OperServ"), "SNLined: " + x->reason);
 	}
 
 	void SendDel(XLine *x) anope_override
 	{
-		IRCD->SendSGLineDel(x);
+		if (IRCD->CanSNLine)
+			IRCD->SendSGLineDel(x);
 	}
 
 	bool Check(User *u, const XLine *x) anope_override

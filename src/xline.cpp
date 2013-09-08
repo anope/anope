@@ -213,13 +213,8 @@ void XLineManager::CheckAll(User *u)
 	{
 		XLineManager *xlm = *it;
 
-		XLine *x = xlm->CheckAllXLines(u);
-
-		if (x)
-		{
-			xlm->OnMatch(u, x);
+		if (xlm->CheckAllXLines(u))
 			break;
-		}
 	}
 }
 

@@ -126,9 +126,7 @@ Anope::string XLine::GetReason() const
 
 bool XLine::HasNickOrReal() const
 {
-	bool r = this->GetNick().find_first_not_of("?*") != Anope::string::npos;
-	r = r || this->GetReal().find_first_not_of("?*") != Anope::string::npos;
-	return r;
+	return !this->GetNick().empty() || !this->GetReal().empty();
 }
 
 bool XLine::IsRegex() const

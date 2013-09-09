@@ -333,6 +333,13 @@ class CommandOSSNLine : public CommandOSSXLineBase
 			}
 		}
 
+		/* Clean up the last character of the mask if it is a space
+		 * See bug #761
+		 */
+		unsigned masklen = mask.length();
+		if (mask[masklen - 1] == ' ')
+			mask.erase(masklen - 1);
+
 		if (!this->xlm()->CanAdd(source, mask, expires, reason))
 			return;
 		else if (mask.find_first_not_of("/.*?") == Anope::string::npos)
@@ -340,13 +347,6 @@ class CommandOSSNLine : public CommandOSSXLineBase
 			source.Reply(USERHOST_MASK_TOO_WIDE, mask.c_str());
 			return;
 		}
-
-		/* Clean up the last character of the mask if it is a space
-		 * See bug #761
-		 */
-		unsigned masklen = mask.length();
-		if (mask[masklen - 1] == ' ')
-			mask.erase(masklen - 1);
 
 		if (Config->GetModule("operserv")->Get<bool>("addakiller", "yes") && !source.GetNick().empty())
 			reason = "[" + source.GetNick() + "] " + reason;
@@ -391,7 +391,7 @@ class CommandOSSNLine : public CommandOSSXLineBase
 					user->Kill(Me->GetName(), rreason);
 			}
 
-			this->xlm()->Send(source.GetUser(), x);
+			this->xlm()->Send(NULL, x);
 		}
 
 		source.Reply(_("\002%s\002 added to the %s list."), mask.c_str(), source.command.c_str());
@@ -623,7 +623,7 @@ class CommandOSSQLine : public CommandOSSXLineBase
 				}
 			}
 
-			this->xlm()->Send(source.GetUser(), x);
+			this->xlm()->Send(NULL, x);
 		}
 
 		source.Reply(_("\002%s\002 added to the SQLINE list."), mask.c_str());

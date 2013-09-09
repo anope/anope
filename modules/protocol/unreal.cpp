@@ -47,7 +47,7 @@ class UnrealIRCdProto : public IRCDProto
 		/* ZLine if we can instead */
 		if (x->GetUser() == "*")
 		{
-			sockaddrs a(x->GetHost());
+			cidr a(x->GetHost());
 			if (a.valid())
 			{
 				IRCD->SendSZLineDel(x);
@@ -111,7 +111,7 @@ class UnrealIRCdProto : public IRCDProto
 		/* ZLine if we can instead */
 		if (x->GetUser() == "*")
 		{
-			sockaddrs a(x->GetHost());
+			cidr a(x->GetHost());
 			if (a.valid())
 			{
 				IRCD->SendSZLine(u, x);

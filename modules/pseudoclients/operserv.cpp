@@ -134,7 +134,7 @@ class SNLineManager : public XLineManager
 	{
 		if (IRCD->CanSNLine)
 			IRCD->SendSGLine(u, x);
-		else
+		else if (u)
 			u->Kill(Config->GetClient("OperServ"), "SNLined: " + x->reason);
 	}
 

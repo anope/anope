@@ -118,7 +118,18 @@ class InspIRCd12Proto : public IRCDProto
 		else if (x->IsRegex() || x->HasNickOrReal())
 			return;
 
-		SendDelLine("G", x->mask);
+		/* ZLine if we can instead */
+		if (x->GetUser() == "*")
+		{
+			cidr addr(x->GetHost());
+			if (addr.valid())
+			{
+				IRCD->SendSZLineDel(x);
+				return;
+			}
+		}
+
+		SendDelLine("G", x->GetUser() + "@" + x->GetHost());
 	}
 
 	void SendTopic(const MessageSource &source, Channel *c) anope_override
@@ -192,7 +203,7 @@ class InspIRCd12Proto : public IRCDProto
 		/* ZLine if we can instead */
 		if (x->GetUser() == "*")
 		{
-			sockaddrs addr(x->GetHost());
+			cidr addr(x->GetHost());
 			if (addr.valid())
 			{
 				IRCD->SendSZLine(u, x);

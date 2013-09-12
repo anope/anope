@@ -329,12 +329,15 @@ static unsigned cur_rand_news = 0;
 
 class OSNews : public Module
 {
-	Serialize::Type newsitem_type;
 	MyNewsService newsservice;
+	Serialize::Type newsitem_type;
 
 	CommandOSLogonNews commandoslogonnews;
 	CommandOSOperNews commandosopernews;
 	CommandOSRandomNews commandosrandomnews;
+
+	Anope::string oper_announcer, announcer;
+	unsigned news_count;
 
 	void DisplayNews(User *u, NewsType Type)
 	{
@@ -358,13 +361,13 @@ class OSNews : public Module
 		else if (Type == NEWS_RANDOM)
 			msg = _("[\002Random News\002 - %s] %s");
 
-		unsigned displayed = 0, news_count = Config->GetModule(this)->Get<unsigned>("newscount", "3");
+		unsigned displayed = 0;
 		for (unsigned i = 0, end = newsList.size(); i < end; ++i)
 		{
 			if (Type == NEWS_RANDOM && i != cur_rand_news)
 				continue;
 
-			u->SendMessage(bi, msg.c_str(), Anope::strftime(newsList[i]->time).c_str(), newsList[i]->text.c_str());
+			u->SendMessage(bi, msg.c_str(), Anope::strftime(newsList[i]->time, u->Account(), true).c_str(), newsList[i]->text.c_str());
 
 			++displayed;
 
@@ -384,8 +387,16 @@ class OSNews : public Module
 
  public:
 	OSNews(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		newsitem_type("NewsItem", NewsItem::Unserialize), newsservice(this), commandoslogonnews(this), commandosopernews(this), commandosrandomnews(this)
+		newsservice(this), newsitem_type("NewsItem", NewsItem::Unserialize),
+		commandoslogonnews(this), commandosopernews(this), commandosrandomnews(this)
 	{
+	}
+
+	void OnReload(Configuration::Conf *conf) anope_override
+	{
+		oper_announcer = conf->GetModule(this)->Get<const Anope::string>("oper_announcer", "OperServ");
+		announcer = conf->GetModule(this)->Get<const Anope::string>("announcer", "Global");
+		news_count = conf->GetModule(this)->Get<unsigned>("newscount", "3");
 	}
 
 	void OnUserModeSet(const MessageSource &setter, User *u, const Anope::string &mname) anope_override

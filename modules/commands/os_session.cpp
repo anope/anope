@@ -742,7 +742,7 @@ class OSSession : public Module
 
 	void OnExpireTick() anope_override
 	{
-		if (!Anope::NoExpire)
+		if (Anope::NoExpire)
 			return;
 		for (unsigned i = this->ss.GetExceptions().size(); i > 0; --i)
 		{

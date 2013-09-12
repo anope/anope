@@ -30,6 +30,8 @@ class CommandOSModInfo : public Command
 		if (m)
 		{
 			source.Reply(_("Module: \002%s\002 Version: \002%s\002 Author: \002%s\002 loaded: \002%s\002"), m->name.c_str(), !m->version.empty() ? m->version.c_str() : "?", !m->author.empty() ? m->author.c_str() : "Unknown", Anope::strftime(m->created).c_str());
+			if (Anope::Debug)
+				source.Reply(_(" Loaded at: %p"), m->handle);
 
 			std::vector<Anope::string> servicekeys = Service::GetServiceKeys("Command");
 			for (unsigned i = 0; i < servicekeys.size(); ++i)

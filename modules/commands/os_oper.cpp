@@ -48,6 +48,21 @@ struct MyOper : Oper, Serializable
 
 class CommandOSOper : public Command
 {
+	bool HasPrivs(CommandSource &source, OperType *ot) const
+	{
+		std::list<Anope::string> commands = ot->GetCommands(), privs = ot->GetPrivs();
+
+		for (std::list<Anope::string>::iterator it = commands.begin(); it != commands.end(); ++it)
+			if (!source.HasCommand(*it))
+				return false;
+
+		for (std::list<Anope::string>::iterator it = privs.begin(); it != privs.end(); ++it)
+			if (!source.HasPriv(*it))
+				return false;
+
+		return true;
+	}
+
  public:
 	CommandOSOper(Module *creator) : Command(creator, "operserv/oper", 1, 3)
 	{
@@ -76,14 +91,21 @@ class CommandOSOper : public Command
 			{
 				OperType *ot = OperType::Find(otype);
 				if (ot == NULL)
-					source.Reply(_("Oper type \002%s\002 has not been configured."), otype.c_str());
-				else
 				{
-					na->nc->o = new MyOper(na->nc->display, ot);
-
-					Log(LOG_ADMIN, source, this) << "ADD " << na->nick << " as type " << ot->GetName();
-					source.Reply("%s (%s) added to the \002%s\002 list.", na->nick.c_str(), na->nc->display.c_str(), ot->GetName().c_str());
+					source.Reply(_("Oper type \002%s\002 has not been configured."), otype.c_str());
+					return;
 				}
+
+				if (!HasPrivs(source, ot))
+				{
+					source.Reply(ACCESS_DENIED);
+					return;
+				}
+
+				na->nc->o = new MyOper(na->nc->display, ot);
+
+				Log(LOG_ADMIN, source, this) << "ADD " << na->nick << " as type " << ot->GetName();
+				source.Reply("%s (%s) added to the \002%s\002 list.", na->nick.c_str(), na->nc->display.c_str(), ot->GetName().c_str());
 			}
 		}
 		else if (subcommand.equals_ci("DEL") && params.size() > 1)
@@ -95,6 +117,8 @@ class CommandOSOper : public Command
 				source.Reply(NICK_X_NOT_REGISTERED, oper.c_str());
 			else if (!na->nc || !na->nc->o)
 				source.Reply(_("Nick \002%s\002 is not a Services Operator."), oper.c_str());
+			else if (!HasPrivs(source, na->nc->o->ot))
+				source.Reply(ACCESS_DENIED);
 			else
 			{
 				delete na->nc->o;

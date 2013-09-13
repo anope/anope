@@ -266,7 +266,11 @@ Serializable* ChannelInfo::Unserialize(Serializable *obj, Serialize::Data &data)
 		std::vector<Anope::string> v;
 		spacesepstream(slevels).GetTokens(v);
 		for (unsigned i = 0; i + 1 < v.size(); i += 2)
-			ci->levels[v[i]] = convertTo<int16_t>(v[i + 1]);
+			try
+			{
+				ci->levels[v[i]] = convertTo<int16_t>(v[i + 1]);
+			}
+			catch (const ConvertException &) { }
 	}
 	BotInfo *bi = BotInfo::Find(sbi);
 	if (*ci->bi != bi)

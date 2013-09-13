@@ -23,6 +23,13 @@ class MyForbidService : public ForbidService
  public:
 	MyForbidService(Module *m) : ForbidService(m), forbid_data("ForbidData") { }
 
+	~MyForbidService()
+	{
+		std::vector<ForbidData *> f = GetForbids();
+		for (unsigned i = 0; i < f.size(); ++i)
+			delete f[i];
+	}
+
 	void AddForbid(ForbidData *d) anope_override
 	{
 		this->forbids(d->type).push_back(d);
@@ -154,6 +161,58 @@ class CommandOSForbid : public Command
 
 			Log(LOG_ADMIN, source, this) << "to add a forbid on " << entry << " of type " << subcommand;
 			source.Reply(_("Added a forbid on %s to expire on %s."), entry.c_str(), d->expires ? Anope::strftime(d->expires).c_str() : "never");
+
+			/* apply forbid */
+			switch (ftype)
+			{
+				case FT_NICK:
+					for (user_map::const_iterator it = UserListByNick.begin(); it != UserListByNick.end(); ++it)
+						module->OnUserNickChange(it->second, "");
+					break;
+				case FT_CHAN:
+					for (channel_map::const_iterator it = ChannelList.begin(), it_end = ChannelList.end(); it != it_end;)
+					{
+						Channel *c = it->second;
+						++it;
+
+						d = this->fs->FindForbid(c->name, FT_CHAN);
+						if (d == NULL)
+							continue;
+
+						ServiceReference<ChanServService> chanserv("ChanServService", "ChanServ");
+						BotInfo *OperServ = Config->GetClient("OperServ");
+						if (IRCD->CanSQLineChannel && OperServ)
+						{
+							time_t inhabit = Config->GetModule("chanserv")->Get<time_t>("inhabit", "15s");
+							XLine x(c->name, OperServ->nick, Anope::CurTime + inhabit, d->reason);
+							IRCD->SendSQLine(NULL, &x);
+						}
+						else if (chanserv)
+						{
+							chanserv->Hold(c);
+						}
+
+						for (Channel::ChanUserList::const_iterator cit = c->users.begin(), cit_end = c->users.end(); cit != cit_end;)
+						{
+							User *u = cit->first;
+							++cit;
+
+							if (u->server == Me || u->HasMode("OPER"))
+								continue;
+
+							if (d->reason.empty())
+								reason = Language::Translate(u, _("This channel has been forbidden."));
+							else
+								reason = Anope::printf(Language::Translate(u, _("This channel has been forbidden: %s")), d->reason.c_str());
+
+							c->Kick(source.service, u, "%s", reason.c_str());
+						}
+					}
+					break;
+				default:
+					break;
+			}
+
 		}
 		else if (command.equals_ci("DEL") && params.size() > 2 && ftype != FT_SIZE)
 		{
@@ -242,13 +301,13 @@ class CommandOSForbid : public Command
 
 class OSForbid : public Module
 {
-	Serialize::Type forbiddata_type;
 	MyForbidService forbidService;
+	Serialize::Type forbiddata_type;
 	CommandOSForbid commandosforbid;
 
  public:
 	OSForbid(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		forbiddata_type("ForbidData", ForbidData::Unserialize), forbidService(this), commandosforbid(this)
+		forbidService(this), forbiddata_type("ForbidData", ForbidData::Unserialize), commandosforbid(this)
 	{
 
 	}

@@ -42,6 +42,7 @@ class CommandCSUnban : public Command
 					++count;
 			}
 
+			Log(LOG_COMMAND, source, this, NULL) << "on all channels";
 			source.Reply(_("You have been unbanned from %d channels."), count);
 
 			return;
@@ -60,7 +61,7 @@ class CommandCSUnban : public Command
 			return;
 		}
 
-		if (!source.AccessFor(ci).HasPriv("UNBAN"))
+		if (!source.AccessFor(ci).HasPriv("UNBAN") && !source.HasPriv("chanserv/kick"))
 		{
 			source.Reply(ACCESS_DENIED);
 			return;
@@ -76,7 +77,8 @@ class CommandCSUnban : public Command
 			return;
 		}
 
-		Log(LOG_COMMAND, source, this, ci) << "to unban " << u2->nick;
+		bool override = !source.AccessFor(ci).HasPriv("UNBAN") && source.HasPriv("chanserv/kick");
+		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to unban " << u2->nick;
 
 		ci->c->Unban(u2, source.GetUser() == u2);
 		if (u2 == source.GetUser())

@@ -28,11 +28,12 @@ class CommandCSSync : public Command
 			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
 		else if (ci->c == NULL)
 			source.Reply(CHAN_X_NOT_IN_USE, params[0].c_str());
-		else if (!source.AccessFor(ci).HasPriv("ACCESS_CHANGE"))
+		else if (!source.AccessFor(ci).HasPriv("ACCESS_CHANGE") && !source.HasPriv("chanserv/administration"))
 			source.Reply(ACCESS_DENIED);
 		else
 		{
-			Log(LOG_COMMAND, source, this, ci);
+			bool override = !source.AccessFor(ci).HasPriv("ACCESS_CHANGE") && source.HasPriv("chanserv/kick");
+			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci);
 
 			for (Channel::ChanUserList::iterator it = ci->c->users.begin(), it_end = ci->c->users.end(); it != it_end; ++it)
 				ci->c->SetCorrectModes(it->second->user, true);

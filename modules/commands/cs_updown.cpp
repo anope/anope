@@ -31,6 +31,7 @@ class CommandCSUp : public Command
 				Channel *c = it->second->chan;
 				c->SetCorrectModes(source.GetUser(), true);
 			}
+			Log(LOG_COMMAND, source, this, NULL) << "on all channels to update their status modes";
 		}
 		else
 		{
@@ -51,6 +52,8 @@ class CommandCSUp : public Command
 			}
 
 			User *u = User::Find(nick, true);
+			bool override = false;
+
 			if (u == NULL)
 			{
 				source.Reply(NICK_X_NOT_IN_USE, nick.c_str());
@@ -65,11 +68,17 @@ class CommandCSUp : public Command
 			{
 				if (c->ci->AccessFor(u) > c->ci->AccessFor(source.GetUser()))
 				{
-					source.Reply(ACCESS_DENIED);
-					return;
+					if (source.HasPriv("chanserv/administration"))
+						override = true;
+					else
+					{
+						source.Reply(ACCESS_DENIED);
+						return;
+					}
 				}
 			}
 
+			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, c->ci) << "to update the status modes of " << u->nick;
 			c->SetCorrectModes(u, true);
 		}
 
@@ -114,6 +123,7 @@ class CommandCSDown : public Command
 				Channel *c = it->second->chan;
 				RemoveAll(source.GetUser(), c);
 			}
+			Log(LOG_COMMAND, source, this, NULL) << "on all channels to remove their status modes";
 		}
 		else
 		{
@@ -134,6 +144,8 @@ class CommandCSDown : public Command
 			}
 
 			User *u = User::Find(nick, true);
+			bool override = false;
+
 			if (u == NULL)
 			{
 				source.Reply(NICK_X_NOT_IN_USE, nick.c_str());
@@ -148,11 +160,17 @@ class CommandCSDown : public Command
 			{
 				if (c->ci->AccessFor(u) > c->ci->AccessFor(source.GetUser()))
 				{
-					source.Reply(ACCESS_DENIED);
-					return;
+					if (source.HasPriv("chanserv/administration"))
+						override = true;
+					else
+					{
+						source.Reply(ACCESS_DENIED);
+						return;
+					}
 				}
 			}
 
+			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, c->ci) << "to remove the status modes from " << u->nick;
 			RemoveAll(u, c);
 		}
 	}

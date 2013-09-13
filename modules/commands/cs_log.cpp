@@ -216,15 +216,15 @@ public:
 				{
 					if (log->extra == extra)
 					{
-						Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to remove logging for " << (!log->command_name.empty() ? log->command_name : log->service_name) << " with method " << method << (extra == "" ? "" : " ") << extra;
+						Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to remove logging for " << command << " with method " << method << (extra == "" ? "" : " ") << extra;
 						source.Reply(_("Logging for command %s on %s with log method %s%s%s has been removed."), !log->command_name.empty() ? log->command_name.c_str() : log->service_name.c_str(), !log->command_service.empty() ? log->command_service.c_str() : "any service", method.c_str(), extra.empty() ? "" : " ", extra.empty() ? "" : extra.c_str());
 						delete log;
 					}
 					else
 					{
 						log->extra = extra;
-						Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to change logging for " << (!log->command_name.empty() ? log->command_name : log->service_name) << " to method " << method << (extra == "" ? "" : " ") << extra;
-						source.Reply(_("Logging changed for command %s on %s, now using log method %s%s%s has been removed."), !log->command_name.empty() ? log->command_name.c_str() : log->service_name.c_str(), !log->command_service.empty() ? log->command_service.c_str() : "any service", method.c_str(), extra.empty() ? "" : " ", extra.empty() ? "" : extra.c_str());
+						Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to change logging for " << command << " to method " << method << (extra == "" ? "" : " ") << extra;
+						source.Reply(_("Logging changed for command %s on %s, now using log method %s%s%s."), !log->command_name.empty() ? log->command_name.c_str() : log->service_name.c_str(), !log->command_service.empty() ? log->command_service.c_str() : "any service", method.c_str(), extra.empty() ? "" : " ", extra.empty() ? "" : extra.c_str());
 					}
 					return;
 				}

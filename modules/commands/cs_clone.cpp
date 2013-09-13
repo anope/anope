@@ -35,15 +35,11 @@ public:
 
 		User *u = source.GetUser();
 		ChannelInfo *ci = ChannelInfo::Find(params[0]);
+		bool override = false;
+
 		if (ci == NULL)
 		{
 			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
-			return;
-		}
-
-		if (!source.AccessFor(ci).HasPriv("SET"))
-		{
-			source.Reply(ACCESS_DENIED);
 			return;
 		}
 
@@ -55,8 +51,13 @@ public:
 		}
 		if (!source.IsFounder(ci) || !source.IsFounder(target_ci))
 		{
-			source.Reply(ACCESS_DENIED);
-			return;
+			if (!source.HasPriv("chanserv/administration"))
+			{
+				source.Reply(ACCESS_DENIED);
+				return;
+			}
+			else
+				override = true;
 		}
 
 		if (what.equals_ci("ALL"))
@@ -151,7 +152,7 @@ public:
 			return;
 		}
 
-		Log(LOG_COMMAND, source, this, ci) << "to clone " << (what.empty() ? "everything from it" : what) << " to " << target_ci->name;
+		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to clone " << (what.empty() ? "everything from it" : what) << " to " << target_ci->name;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override

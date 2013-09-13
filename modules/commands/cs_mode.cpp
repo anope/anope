@@ -295,7 +295,7 @@ class CommandCSMode : public Command
 			sep.GetToken(modes);
 
 			Anope::string pos = "+", neg = "-", pos_params, neg_params;
-			
+
 			int adding = -1;
 			for (size_t i = 0; i < modes.length(); ++i)
 			{
@@ -761,25 +761,35 @@ class CommandCSModes : public Command
 		AccessGroup u_access = source.AccessFor(ci), targ_access = ci->AccessFor(targ);
 		const std::pair<bool, Anope::string> &m = modes[source.command];
 
+		bool can_override = source.HasPriv("chanserv/administration");
+		bool override = false;
+
 		if (m.second.empty())
 		{
 			source.Reply(ACCESS_DENIED);
 			return;
 		}
 		
-		if (!source.HasPriv("chanserv/administration"))
+		if (u == targ ? !u_access.HasPriv(m.second + "ME") : !u_access.HasPriv(m.second))
 		{
-			if (u == targ ? !u_access.HasPriv(m.second + "ME") : !u_access.HasPriv(m.second))
+			if (!can_override)
 			{
 				source.Reply(ACCESS_DENIED);
 				return;
 			}
+			else
+				override = true;
+		}
 
-			if (!m.first && u != targ && (targ->IsProtected() || (ci->HasExt("PEACE") && targ_access >= u_access)))
+		if (!override && !m.first && u != targ && (targ->IsProtected() || (ci->HasExt("PEACE") && targ_access >= u_access)))
+		{
+			if (!can_override)
 			{
 				source.Reply(ACCESS_DENIED);
 				return;
 			}
+			else
+				override = true;
 		}
 
 		if (!ci->c->FindUser(targ))
@@ -793,7 +803,7 @@ class CommandCSModes : public Command
 		else
 			ci->c->RemoveMode(NULL, m.second, targ->GetUID());
 
-		Log(LOG_COMMAND, source, this, ci) << "on " << targ->nick;
+		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "on " << targ->nick;
 	}
 
  	const Anope::string GetDesc(CommandSource &source) const anope_override

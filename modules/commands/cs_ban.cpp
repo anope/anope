@@ -144,7 +144,9 @@ class CommandCSBan : public Command
 		}
 		else
 		{
-			Log(LOG_COMMAND, source, this, ci) << "for " << target;
+			bool founder = u_access.HasPriv("FOUNDER");
+			bool override = !founder && !u_access.HasPriv("BAN");
+			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "for " << target;
 
 			if (!c->HasMode("BAN", target))
 			{
@@ -156,7 +158,6 @@ class CommandCSBan : public Command
 				}
 			}
 
-			bool founder = u_access.HasPriv("FOUNDER");
 			int matched = 0, kicked = 0;
 			for (Channel::ChanUserList::iterator it = c->users.begin(), it_end = c->users.end(); it != it_end;)
 			{

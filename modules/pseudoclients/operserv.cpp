@@ -68,8 +68,10 @@ class SGLineManager : public XLineManager
 
 class SQLineManager : public XLineManager
 {
+	ServiceReference<NickServService> nickserv;
+
  public:
-	SQLineManager(Module *creator) : XLineManager(creator, "xlinemanager/sqline", 'Q') { }
+	SQLineManager(Module *creator) : XLineManager(creator, "xlinemanager/sqline", 'Q'), nickserv("NickServService", "NickServ") { }
 
 	void OnMatch(User *u, XLine *x) anope_override
 	{
@@ -248,7 +250,7 @@ class OperServCore : public Module
 
 	void OnUserNickChange(User *u, const Anope::string &oldnick) anope_override
 	{
-		if (IRCD->CanSQLine && !u->HasMode("OPER"))
+		if (!u->HasMode("OPER"))
 			this->sqlines.CheckAllXLines(u);
 	}
 

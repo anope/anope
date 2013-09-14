@@ -126,6 +126,12 @@ class CommandOSForbid : public Command
 				reason += params[4];
 			reason.trim();
 
+			if (entry.replace_all_cs("?*", "").empty())
+			{
+				source.Reply(_("The mask must contain at least one non wildcard character."));
+				return;
+			}
+
 			time_t expiryt = 0;
 
 			if (!expiry.empty())
@@ -170,6 +176,9 @@ class CommandOSForbid : public Command
 						module->OnUserNickChange(it->second, "");
 					break;
 				case FT_CHAN:
+				{
+					int chan_matches = 0, ci_matches = 0;
+
 					for (channel_map::const_iterator it = ChannelList.begin(), it_end = ChannelList.end(); it != it_end;)
 					{
 						Channel *c = it->second;
@@ -192,6 +201,8 @@ class CommandOSForbid : public Command
 							chanserv->Hold(c);
 						}
 
+						++chan_matches;
+
 						for (Channel::ChanUserList::const_iterator cit = c->users.begin(), cit_end = c->users.end(); cit != cit_end;)
 						{
 							User *u = cit->first;
@@ -208,7 +219,25 @@ class CommandOSForbid : public Command
 							c->Kick(source.service, u, "%s", reason.c_str());
 						}
 					}
+
+					for (registered_channel_map::const_iterator it = RegisteredChannelList->begin(); it != RegisteredChannelList->end();)
+					{
+						ChannelInfo *ci = it->second;
+						++it;
+
+						d = this->fs->FindForbid(ci->name, FT_CHAN);
+						if (d == NULL)
+							continue;
+
+						++ci_matches;
+
+						delete ci;
+					}
+
+					source.Reply(_("\2%d\2 channels cleared, and \2%d\2 channels dropped."), chan_matches, ci_matches);
+
 					break;
+				}
 				default:
 					break;
 			}

@@ -241,8 +241,7 @@ class CommandOSStats : public Command
 				" \n"
 				"The \002HASH\002 option displays information about the hash maps.\n"
 				" \n"
-				"The \002ALL\002 displays the user and uptime statistics, and\n"
-				"everything you'd see with the \002UPLINK\002 option."));
+				"The \002ALL\002 option displays all of the above statistics."));
 		return true;
 	}
 };

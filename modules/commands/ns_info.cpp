@@ -209,7 +209,7 @@ class CommandNSSetHide : public Command
 				"being displayed when someone does a %s \002INFO\002 on your\n"
 				"nick.  You can hide your E-mail address (\002EMAIL\002), last seen\n"
 				"user@host mask (\002USERMASK\002), your services access status\n"
-				"(\002STATUS\002) and  last quit message (\002QUIT\002).\n"
+				"(\002STATUS\002) and last quit message (\002QUIT\002).\n"
 				"The second parameter specifies whether the information should\n"
 				"be displayed (\002OFF\002) or hidden (\002ON\002)."), source.service->nick.c_str());
 		return true;
@@ -238,7 +238,7 @@ class CommandNSSASetHide : public CommandNSSetHide
 				"being displayed when someone does a %s \002INFO\002 on the\n"
 				"nick.  You can hide the E-mail address (\002EMAIL\002), last seen\n"
 				"user@host mask (\002USERMASK\002), the services access status\n"
-				"(\002STATUS\002) and  last quit message (\002QUIT\002).\n"
+				"(\002STATUS\002) and last quit message (\002QUIT\002).\n"
 				"The second parameter specifies whether the information should\n"
 				"be displayed (\002OFF\002) or hidden (\002ON\002)."), source.service->nick.c_str());
 		return true;

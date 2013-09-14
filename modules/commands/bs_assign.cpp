@@ -75,7 +75,7 @@ class CommandBSAssign : public Command
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Assigns a bot pointed out by nick to the channel chan. You\n"
+		source.Reply(_("Assigns a bot pointed out by nick to a channel. You\n"
 				"can then configure the bot for the channel so it fits\n"
 				"your needs."));
 		return true;
@@ -139,7 +139,7 @@ class CommandBSUnassign : public Command
 		source.Reply(_("Unassigns a bot from a channel. When you use this command,\n"
 				"the bot won't join the channel anymore. However, bot\n"
 				"configuration for the channel is kept, so you will always\n"
-				"be able to reassign a bot later without have to reconfigure\n"
+				"be able to reassign a bot later without having to reconfigure\n"
 				"it entirely."));
 		return true;
 	}

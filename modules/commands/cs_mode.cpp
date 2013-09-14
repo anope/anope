@@ -812,9 +812,9 @@ class CommandCSModes : public Command
 		if (!m.second.empty())
 		{
 			if (m.first)
-				return Anope::printf(_("Gives you or the specific nick %s status on a channel"), m.second.c_str());
+				return Anope::printf(_("Gives you or the specified nick %s status on a channel"), m.second.c_str());
 			else
-				return Anope::printf(_("Removes %s status from you or the specific on a channel"), m.second.c_str());
+				return Anope::printf(_("Removes %s status from you or the specified nick on a channel"), m.second.c_str());
 		}
 		else
 			return "";

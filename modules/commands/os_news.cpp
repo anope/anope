@@ -266,7 +266,7 @@ class CommandOSLogonNews : public NewsBase
 		source.Reply(" ");
 		source.Reply(_("Edits or displays the list of logon news messages.  When a\n"
 			"user connects to the network, these messages will be sent\n"
-			"to them.  (However, no more than \002%d\002 messages will be\n"
+			"to them.  However, no more than \002%d\002 messages will be\n"
 			"sent in order to avoid flooding the user.  If there are\n"
 			"more news messages, only the most recent will be sent."),
 			Config->GetModule(this->owner)->Get<unsigned>("newscount", "3"));
@@ -293,7 +293,7 @@ class CommandOSOperNews : public NewsBase
 		source.Reply(" ");
 		source.Reply(_("Edits or displays the list of oper news messages.  When a\n"
 				"user opers up (with the /OPER command), these messages will\n"
-				"be sent to them.  (However, no more than \002%d\002 messages will\n"
+				"be sent to them.  However, no more than \002%d\002 messages will\n"
 				"be sent in order to avoid flooding the user.  If there are\n"
 				"more news messages, only the most recent will be sent."),
 				Config->GetModule(this->owner)->Get<unsigned>("newscount", "3"));
@@ -320,7 +320,7 @@ class CommandOSRandomNews : public NewsBase
 		source.Reply(" ");
 		source.Reply(_("Edits or displays the list of random news messages.  When a\n"
 				"user connects to the network, one (and only one) of the\n"
-				"random news will be randomly chosen and sent to them.\n"));
+				"random news will be randomly chosen and sent to them."));
 		return true;
 	}
 };

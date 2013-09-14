@@ -550,7 +550,7 @@ class CommandCSAccess : public Command
 				"highest level entry in the access list."));
 		if (!Config->GetModule("chanserv")->Get<bool>("disallow_channel_access"))
 			source.Reply(_("The given mask may also be a channel, which will use the\n"
-					"access list from the other channel up to the given \037level\037"));
+					"access list from the other channel up to the given \037level\037."));
 		source.Reply(" ");
 		source.Reply(_("The \002ACCESS DEL\002 command removes the given nick from the\n"
 				"access list.  If a list of entry numbers is given, those\n"

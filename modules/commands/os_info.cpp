@@ -256,7 +256,7 @@ class OSInfo : public Module
 		for (unsigned i = 0; i < (*oi)->size(); ++i)
 		{
 			OperInfo *o = (*oi)->at(i);
-			info[_("Oper Info")] = Anope::printf(_("(By %s on %s) %s"), o->adder.c_str(), Anope::strftime(o->created, source.GetAccount(), true).c_str(), o->info.c_str());
+			info[_("Oper Info")] = Anope::printf(_("(by %s on %s) %s"), o->adder.c_str(), Anope::strftime(o->created, source.GetAccount(), true).c_str(), o->info.c_str());
 		}
 	}
 

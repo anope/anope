@@ -128,7 +128,7 @@ class CommandMSList : public Command
 			std::vector<Anope::string> replies;
 			list.Process(replies);
 
-			source.Reply(_("Memos for %s."), ci ? ci->name.c_str() : source.GetNick().c_str());
+			source.Reply(_("Memos for %s:"), ci ? ci->name.c_str() : source.GetNick().c_str());
 			for (unsigned i = 0; i < replies.size(); ++i)
 				source.Reply(replies[i]);
 		}

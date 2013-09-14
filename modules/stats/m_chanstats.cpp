@@ -6,7 +6,7 @@ class CommandCSSetChanstats : public Command
  public:
 	CommandCSSetChanstats(Module *creator) : Command(creator, "chanserv/set/chanstats", 2, 2)
 	{
-		this->SetDesc(_("Turn chanstat statistics on or off"));
+		this->SetDesc(_("Turn chanstats statistics on or off"));
 		this->SetSyntax(_("\037channel\037 {ON | OFF}"));
 	}
 
@@ -60,7 +60,7 @@ class CommandNSSetChanstats : public Command
  public:
 	CommandNSSetChanstats(Module *creator, const Anope::string &sname = "nickserv/set/chanstats", size_t min = 1 ) : Command(creator, sname, min, min + 1)
 	{
-		this->SetDesc(_("Turn chanstat statistic on or off"));
+		this->SetDesc(_("Turn chanstats statistics on or off"));
 		this->SetSyntax(_("{ON | OFF}"));
 	}
 	void Run(CommandSource &source, const Anope::string &user, const Anope::string &param)
@@ -81,13 +81,13 @@ class CommandNSSetChanstats : public Command
 		{
 			Log(na->nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to enable chanstats for " << na->nc->display;
 			na->nc->Extend<bool>("NS_STATS");
-			source.Reply(_("Chanstat statistics are now enabled for your nick."));
+			source.Reply(_("Chanstats statistics are now enabled for your nick."));
 		}
 		else if (param.equals_ci("OFF"))
 		{
 			Log(na->nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to disable chanstats for " << na->nc->display;
 			na->nc->Shrink<bool>("NS_STATS");
-			source.Reply(_("Chanstat statistics are now disabled for your nick."));
+			source.Reply(_("Chanstats statistics are now disabled for your nick."));
 		}
 		else
 			this->OnSyntaxError(source, "CHANSTATS");

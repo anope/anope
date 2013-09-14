@@ -101,6 +101,7 @@ class CommandOSChanList : public Command
 		source.Reply(" ");
 		source.Reply(_("Lists all channels currently in use on the IRC network, whether they\n"
 				"are registered or not.\n"
+				" \n"
 				"If \002pattern\002 is given, lists only channels that match it. If a nickname\n"
 				"is given, lists only the channels the user using it is on. If SECRET is\n"
 				"specified, lists only channels matching \002pattern\002 that have the +s or\n"

@@ -128,7 +128,7 @@ class CommandCSSuspend : public Command
 				"May be cancelled by using the \002UNSUSPEND\002\n"
 				"command to preserve all previous channel data/settings.\n"
 				"If an expiry is given the channel will be unsuspended after\n"
-				"that period of time, else the default expiry from the"
+				"that period of time, else the default expiry from the\n"
 				"configuration is used.\n"
 				" \n"
 				"Reason may be required on certain networks."));

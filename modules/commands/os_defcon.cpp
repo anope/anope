@@ -133,7 +133,7 @@ class DefConTimeout : public Timer
 				if (!DConfig.offmessage.empty())
 					GlobalService->SendGlobal(NULL, "", DConfig.offmessage);
 				else
-					GlobalService->SendGlobal(NULL, "", Anope::printf(Language::Translate(_("The Defcon Level is now at Level: \002%d\002")), DConfig.defaultlevel));
+					GlobalService->SendGlobal(NULL, "", Anope::printf(Language::Translate(_("The Defcon level is now at: \002%d\002")), DConfig.defaultlevel));
 
 				if (!DConfig.message.empty())
 					GlobalService->SendGlobal(NULL, "", DConfig.message);
@@ -155,13 +155,13 @@ class CommandOSDefcon : public Command
 		if (DConfig.Check(DEFCON_NO_MLOCK_CHANGE))
 			source.Reply(_("* No mode lock changes"));
 		if (DConfig.Check(DEFCON_FORCE_CHAN_MODES) && !DConfig.chanmodes.empty())
-			source.Reply(_("* Force Chan Modes (%s) to be set on all channels"), DConfig.chanmodes.c_str());
+			source.Reply(_("* Force channel modes (%s) to be set on all channels"), DConfig.chanmodes.c_str());
 		if (DConfig.Check(DEFCON_REDUCE_SESSION))
 			source.Reply(_("* Use the reduced session limit of %d"), DConfig.sessionlimit);
 		if (DConfig.Check(DEFCON_NO_NEW_CLIENTS))
-			source.Reply(_("* Kill any NEW clients connecting"));
+			source.Reply(_("* Kill any new clients connecting"));
 		if (DConfig.Check(DEFCON_OPER_ONLY))
-			source.Reply(_("* Ignore any non-opers with message"));
+			source.Reply(_("* Ignore non-opers with a message"));
 		if (DConfig.Check(DEFCON_SILENT_OPER_ONLY))
 			source.Reply(_("* Silently ignore non-opers"));
 		if (DConfig.Check(DEFCON_AKILL_NEW_CLIENTS))

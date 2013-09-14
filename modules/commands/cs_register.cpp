@@ -98,7 +98,8 @@ class CommandCSRegister : public Command
 		BotInfo *bi;
 		Anope::string cmd;
 		if (Command::FindCommandFromService("chanserv/access", bi, cmd))
-			source.Reply(_("See the \002%s002 command (\002%s%s HELP ACCESS\002) for\n"
+			source.Reply(_(" \n"
+				"See the \002%s\002 command (\002%s%s HELP ACCESS\002) for\n"
 				"information on giving a subset of these privileges to\n"
 				"other channel users.\n"), cmd.c_str(), Config->StrictPrivmsg.c_str(), bi->nick.c_str());
 		source.Reply(_(" \n"

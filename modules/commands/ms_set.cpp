@@ -244,6 +244,7 @@ class CommandMSSet : public Command
 		}
 		else if (subcommand.equals_ci("NOTIFY"))
 			source.Reply(_("Syntax: \002NOTIFY {ON | LOGON | NEW | MAIL | NOMAIL | OFF}\002\n"
+					" \n"
 					"Changes when you will be notified about new memos:\n"
 					" \n"
 					"    ON      You will be notified of memos when you log on,\n"
@@ -276,8 +277,9 @@ class CommandMSSet : public Command
 						"adding \002HARD\002 has the opposite effect, allowing the user to\n"
 						"change the limit (even if a previous limit was set with\n"
 						"\002HARD\002).\n"
+						" \n"
 						"This use of the \002SET LIMIT\002 command is limited to \002Services\002\n"
-						"\002Admins\002.  Other users may only enter a limit for themselves\n"
+						"\002Operators\002.  Other users may only enter a limit for themselves\n"
 						"or a channel on which they have such privileges, may not\n"
 						"remove their limit, may not set a limit above %d, and may\n"
 						"not set a hard limit."), max_memos);

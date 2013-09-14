@@ -270,6 +270,7 @@ class CommandBSKickAMSG : public CommandBSKickBase
 		source.Reply(_("Sets the AMSG kicker on or off. When enabled, the bot will\n"
 				"kick users who send the same message to multiple channels\n"
 				"where BotServ bots are.\n"
+				" \n"
 				"\037ttb\037 is the number of times a user can be kicked\n"
 				"before they get banned. Don't give ttb to disable\n"
 				"the ban system once activated."));
@@ -306,8 +307,9 @@ class CommandBSKickBadwords : public CommandBSKickBase
 				"You can define bad words for your channel using the\n"
 				"\002BADWORDS\002 command. Type \002%s%s HELP BADWORDS\002 for\n"
 				"more information.\n"
-				"ttb is the number of times a user can be kicked\n"
-				"before it get banned. Don't give ttb to disable\n"
+				" \n"
+				"\037ttb\037 is the number of times a user can be kicked\n"
+				"before it gets banned. Don't give ttb to disable\n"
 				"the ban system once activated."), Config->StrictPrivmsg.c_str(), source.service->nick.c_str());
 		return true;
 	}
@@ -337,8 +339,9 @@ class CommandBSKickBolds : public CommandBSKickBase
 	{
 		source.Reply(_("Sets the bolds kicker on or off. When enabled, this\n"
 				"option tells the bot to kick users who use bolds.\n"
-				"ttb is the number of times a user can be kicked\n"
-				"before it get banned. Don't give ttb to disable\n"
+				" \n"
+				"\037ttb\037 is the number of times a user can be kicked\n"
+				"before it gets banned. Don't give ttb to disable\n"
 				"the ban system once activated."));
 		return true;
 	}
@@ -430,8 +433,9 @@ class CommandBSKickCaps : public CommandBSKickBase
 				"and they constitute at least \002percent\002%% of the total\n"
 				"text line (if not given, it defaults to 10 characters\n"
 				"and 25%%).\n"
-				"ttb is the number of times a user can be kicked\n"
-				"before it get banned. Don't give ttb to disable\n"
+				" \n"
+				"\037ttb\037 is the number of times a user can be kicked\n"
+				"before it gets banned. Don't give ttb to disable\n"
 				"the ban system once activated."));
 		return true;
 	}
@@ -461,8 +465,9 @@ class CommandBSKickColors : public CommandBSKickBase
 	{
 		source.Reply(_("Sets the colors kicker on or off. When enabled, this\n"
 				"option tells the bot to kick users who use colors.\n"
-				"ttb is the number of times a user can be kicked\n"
-				"before it get banned. Don't give ttb to disable\n"
+				" \n"
+				"\037ttb\037 is the number of times a user can be kicked\n"
+				"before it gets banned. Don't give ttb to disable\n"
 				"the ban system once activated."));
 		return true;
 	}
@@ -557,8 +562,8 @@ class CommandBSKickFlood : public CommandBSKickBase
 				"the channel using at least \002ln\002 lines in \002secs\002 seconds\n"
 				"(if not given, it defaults to 6 lines in 10 seconds).\n"
 				" \n"
-				"ttb is the number of times a user can be kicked\n"
-				"before it get banned. Don't give ttb to disable\n"
+				"\037ttb\037 is the number of times a user can be kicked\n"
+				"before it gets banned. Don't give ttb to disable\n"
 				"the ban system once activated."));
 		return true;
 	}
@@ -588,8 +593,9 @@ class CommandBSKickItalics : public CommandBSKickBase
 	{
 		source.Reply(_("Sets the italics kicker on or off. When enabled, this\n"
 				"option tells the bot to kick users who use italics.\n"
-				"ttb is the number of times a user can be kicked\n"
-				"before it get banned. Don't give ttb to disable\n"
+				" \n"
+				"\037ttb\037 is the number of times a user can be kicked\n"
+				"before it gets banned. Don't give ttb to disable\n"
 				"the ban system once activated."));
 		return true;
 	}
@@ -673,8 +679,9 @@ class CommandBSKickRepeat : public CommandBSKickBase
 				"option tells the bot to kick users who are repeating\n"
 				"themselves \002num\002 times (if num is not given, it\n"
 				"defaults to 3).\n"
-				"ttb is the number of times a user can be kicked\n"
-				"before it get banned. Don't give ttb to disable\n"
+				" \n"
+				"\037ttb\037 is the number of times a user can be kicked\n"
+				"before it gets banned. Don't give ttb to disable\n"
 				"the ban system once activated."));
 		return true;
 	}
@@ -704,8 +711,9 @@ class CommandBSKickReverses : public CommandBSKickBase
 	{
 		source.Reply(_("Sets the reverses kicker on or off. When enabled, this\n"
 				"option tells the bot to kick users who use reverses.\n"
-				"ttb is the number of times a user can be kicked\n"
-				"before it get banned. Don't give ttb to disable\n"
+				" \n"
+				"\037ttb\037 is the number of times a user can be kicked\n"
+				"before it gets banned. Don't give ttb to disable\n"
 				"the ban system once activated."));
 		return true;
 	}
@@ -735,8 +743,9 @@ class CommandBSKickUnderlines : public CommandBSKickBase
 	{
 		source.Reply(_("Sets the underlines kicker on or off. When enabled, this\n"
 			"option tells the bot to kick users who use underlines.\n"
-			"ttb is the number of times a user can be kicked\n"
-			"before it get banned. Don't give ttb to disable\n"
+			" \n"
+			"\037ttb\037 is the number of times a user can be kicked\n"
+			"before it gets banned. Don't give ttb to disable\n"
 			"the ban system once activated."));
 		return true;
 	}

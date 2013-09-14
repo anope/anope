@@ -44,7 +44,7 @@ class CommandOSReload : public Command
 		source.Reply(_("Causes Services to reload the configuration file. Note that\n"
 				"some directives still need the restart of the Services to\n"
 				"take effect (such as Services' nicknames, activation of the\n"
-				"session limitation, etc.)"));
+				"session limitation, etc.)."));
 		return true;
 	}
 };

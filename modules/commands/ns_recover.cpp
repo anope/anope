@@ -68,7 +68,7 @@ class NSRecoverRequest : public IdentifyRequest
 			}
 
 			u->SendMessage(source.service, _("This nickname has been recovered by %s. If you did not do\n"
-							"this then %s may have your password, and you should change it.\n"),
+							"this then %s may have your password, and you should change it."),
 							source.GetNick().c_str(), source.GetNick().c_str());
 
 			Anope::string buf = source.command.upper() + " command used by " + source.GetNick();

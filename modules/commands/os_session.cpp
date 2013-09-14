@@ -583,7 +583,7 @@ class CommandOSException : public Command
 				"all clients attempting to connect from that host will be\n"
 				"killed. Before the user is killed, they are notified, of a\n"
 				"source of help regarding session limiting. The content of\n"
-				"this notice is a config setting.\n"));
+				"this notice is a config setting."));
 		source.Reply(" ");
 		source.Reply(_("\002EXCEPTION ADD\002 adds the given host mask to the exception list.\n"
 				"Note that \002nick!user@host\002 and \002user@host\002 masks are invalid!\n"

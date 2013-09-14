@@ -94,7 +94,7 @@ class CommandOSChanKill : public Command
 		this->SendSyntax(source);
 		source.Reply(" ");
 		source.Reply(_("Puts an AKILL for every nick on the specified channel. It\n"
-				"uses the entire and complete real ident@host for every nick,\n"
+				"uses the entire real ident@host for every nick, and\n"
 				"then enforces the AKILL."));
 		return true;
 	}

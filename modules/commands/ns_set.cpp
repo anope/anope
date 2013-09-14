@@ -702,14 +702,14 @@ class CommandNSSetKill : public Command
 		this->SendSyntax(source);
 		source.Reply(" ");
 		source.Reply(_("Turns the automatic protection option for your nick\n"
-				"on or off.  With protection on, if another user\n"
+				"on or off. With protection on, if another user\n"
 				"tries to take your nick, they will be given one minute to\n"
 				"change to another nick, after which %s will forcibly change\n"
 				"their nick.\n"
 				" \n"
 				"If you select \002QUICK\002, the user will be given only 20 seconds\n"
-				"to change nicks instead of the usual 60.  If you select\n"
-				"\002IMMED\002, user's nick will be changed immediately \037without\037 being\n"
+				"to change nicks instead of the usual 60. If you select\n"
+				"\002IMMED\002, the user's nick will be changed immediately \037without\037 being\n"
 				"warned first or given a chance to change their nick; please\n"
 				"do not use this option unless necessary. Also, your\n"
 				"network's administrators may have disabled this option."), source.service->nick.c_str());

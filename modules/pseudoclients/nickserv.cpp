@@ -429,13 +429,13 @@ class NickServCore : public Module, public NickServService
 				"commands allow for registration and maintenance of\n"
 				"nicknames; to use them, type \002%s%s \037command\037\002.\n"
 				"For more information on a specific command, type\n"
-				"\002%s%s %s \037command\037\002.\n "), NickServ->nick.c_str(), Config->StrictPrivmsg.c_str(), NickServ->nick.c_str(), Config->StrictPrivmsg.c_str(), NickServ->nick.c_str(), source.command.c_str());
+				"\002%s%s %s \037command\037\002.\n"), NickServ->nick.c_str(), Config->StrictPrivmsg.c_str(), NickServ->nick.c_str(), Config->StrictPrivmsg.c_str(), NickServ->nick.c_str(), source.command.c_str());
 		else
 			source.Reply(_("\002%s\002 allows you to register an account.\n"
 				"The following commands allow for registration and maintenance of\n"
 				"accounts; to use them, type \002%s%s \037command\037\002.\n"
 				"For more information on a specific command, type\n"
-				"\002%s%s %s \037command\037\002.\n "), NickServ->nick.c_str(), Config->StrictPrivmsg.c_str(), NickServ->nick.c_str(), Config->StrictPrivmsg.c_str(), NickServ->nick.c_str(), source.command.c_str());
+				"\002%s%s %s \037command\037\002.\n"), NickServ->nick.c_str(), Config->StrictPrivmsg.c_str(), NickServ->nick.c_str(), Config->StrictPrivmsg.c_str(), NickServ->nick.c_str(), source.command.c_str());
 		return EVENT_CONTINUE;
 	}
 
@@ -451,7 +451,7 @@ class NickServCore : public Module, public NickServService
 		time_t nickserv_expire = Config->GetModule(this)->Get<time_t>("expire");
 		if (nickserv_expire >= 86400)
 			source.Reply(_(" \n"
-				"Accounts that are not used anymore are subject to \n"
+				"Accounts that are not used anymore are subject to\n"
 				"the automatic expiration, i.e. they will be deleted\n"
 				"after %d days if not used."), nickserv_expire / 86400);
 		source.Reply(_(" \n"

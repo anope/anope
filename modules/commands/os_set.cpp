@@ -178,12 +178,12 @@ class CommandOSSet : public Command
 			return this->DoList(source);
 		else if (option.equals_ci("READONLY"))
 			return this->DoSetReadOnly(source, params);
-		else if (option.equals_ci("SUPERADMIN"))
-			return this->DoSetSuperAdmin(source, params);
 		else if (option.equals_ci("DEBUG"))
 			return this->DoSetDebug(source, params);
 		else if (option.equals_ci("NOEXPIRE"))
 			return this->DoSetNoExpire(source, params);
+		else if (option.equals_ci("SUPERADMIN"))
+			return this->DoSetSuperAdmin(source, params);
 		else
 			this->OnSyntaxError(source, "");
 
@@ -205,8 +205,9 @@ class CommandOSSet : public Command
 					"    LIST       List the options"));
 		}
 		else if (subcommand.equals_ci("LIST"))
-			source.Reply(_("Syntax: \002LIST\n"
-					"Display the various %s settings"), source.service->nick.c_str());
+			source.Reply(_("Syntax: \002LIST\002\n"
+					" \n"
+					"Display the various %s settings."), source.service->nick.c_str());
 		else if (subcommand.equals_ci("READONLY"))
 			source.Reply(_("Syntax: \002READONLY {ON | OFF}\002\n"
 					" \n"
@@ -220,18 +221,29 @@ class CommandOSSet : public Command
 					"or restarted.\n"
 					" \n"
 					"This option is equivalent to the command-line option\n"
-					"\002-readonly\002."));
+					"\002--readonly\002."));
+		else if (subcommand.equals_ci("DEBUG"))
+			source.Reply(_("Syntax: \002DEBUG {ON | OFF}\002\n"
+					" \n"
+					"Sets debug mode on or off.\n"
+					" \n"
+					"This option is equivalent to the command-line option\n"
+					"\002--debug\002."));
 		else if (subcommand.equals_ci("NOEXPIRE"))
 			source.Reply(_("Syntax: \002NOEXPIRE {ON | OFF}\002\n"
+					" \n"
 					"Sets no expire mode on or off. In no expire mode, nicks,\n"
 					"channels, akills and exceptions won't expire until the\n"
 					"option is unset.\n"
+					" \n"
 					"This option is equivalent to the command-line option\n"
-					"\002-noexpire\002."));
+					"\002--noexpire\002."));
 		else if (subcommand.equals_ci("SUPERADMIN"))
 			source.Reply(_("Syntax: \002SUPERADMIN {ON | OFF}\002\n"
+					" \n"
 					"Setting this will grant you extra privileges such as the\n"
 					"ability to be \"founder\" on all channel's etc...\n"
+					" \n"
 					"This option is \002not\002 persistent, and should only be used when\n"
 					"needed, and set back to OFF when no longer needed."));
 		else

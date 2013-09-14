@@ -76,7 +76,7 @@ class CommandOSStats : public Command
 			else
 				source.Reply(_("Default AKILL expiry time: \002No expiration\002"));
 		}
-		if (IRCD->CanSNLine && snlines)
+		if (snlines)
 		{
 			/* SNLINEs */
 			source.Reply(_("Current number of SNLINEs: \002%d\002"), snlines->GetCount());
@@ -96,7 +96,7 @@ class CommandOSStats : public Command
 			else
 				source.Reply(_("Default SNLINE expiry time: \002No expiration\002"));
 		}
-		if (IRCD->CanSQLine && sqlines)
+		if (sqlines)
 		{
 			/* SQLINEs */
 			source.Reply(_("Current number of SQLINEs: \002%d\002"), sqlines->GetCount());

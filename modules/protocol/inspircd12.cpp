@@ -294,8 +294,6 @@ class InspIRCd12Proto : public IRCDProto
 		SendAddLine("Q", x->mask, timeleft, x->by, x->GetReason());
 	}
 
-	/* Functions that use serval cmd functions */
-
 	void SendVhost(User *u, const Anope::string &vIdent, const Anope::string &vhost) anope_override
 	{
 		if (!vIdent.empty())
@@ -307,9 +305,6 @@ class InspIRCd12Proto : public IRCDProto
 	void SendConnect() anope_override
 	{
 		SendServer(Me);
-		UplinkSocket::Message(Me) << "BURST";
-		Module *enc = ModuleManager::FindFirstOf(ENCRYPTION);
-		UplinkSocket::Message(Me) << "VERSION :Anope-" << Anope::Version() << " " << Me->GetName() << " :" << IRCD->GetProtocolName() << " - (" << (enc ? enc->name : "none") << ") -- " << Anope::VersionBuildString();
 	}
 
 	/* SVSHOLD - set */
@@ -363,6 +358,8 @@ class InspIRCd12Proto : public IRCDProto
 	void SendBOB() anope_override
 	{
 		UplinkSocket::Message(Me) << "BURST " << Anope::CurTime;
+		Module *enc = ModuleManager::FindFirstOf(ENCRYPTION);
+		UplinkSocket::Message(Me) << "VERSION :Anope-" << Anope::Version() << " " << Me->GetName() << " :" << IRCD->GetProtocolName() << " - (" << (enc ? enc->name : "none") << ") -- " << Anope::VersionBuildString();
 	}
 
 	void SendEOB() anope_override

@@ -172,9 +172,29 @@ class CommandOSForbid : public Command
 			switch (ftype)
 			{
 				case FT_NICK:
+				{
+					int na_matches = 0;
+
 					for (user_map::const_iterator it = UserListByNick.begin(); it != UserListByNick.end(); ++it)
 						module->OnUserNickChange(it->second, "");
+
+					for (nickalias_map::const_iterator it = NickAliasList->begin(), it_end = NickAliasList->end(); it != it_end;)
+					{
+						NickAlias *na = it->second;
+						++it;
+
+						d = this->fs->FindForbid(na->nick, FT_NICK);
+						if (d == NULL)
+							continue;
+
+						++na_matches;
+
+						delete na;
+					}
+
+					source.Reply(_("\2%d\2 nicknames dropped."), na_matches);
 					break;
+				}
 				case FT_CHAN:
 				{
 					int chan_matches = 0, ci_matches = 0;

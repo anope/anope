@@ -83,12 +83,27 @@ class SQLineManager : public XLineManager
 
 	void Send(User *u, XLine *x) anope_override
 	{
-		IRCD->SendSQLine(u, x);
+		if (!IRCD->CanSQLine)
+		{
+			if (!u)
+				;
+			else if (nickserv)
+				nickserv->Collide(u, NULL);
+			else
+				u->Kill(Config->GetClient("OperServ"), "Q-Lined: " + x->reason);
+		}
+		else if (x->IsRegex())
+			;
+		else if (x->mask[0] != '#' || IRCD->CanSQLineChannel)
+			IRCD->SendSQLine(u, x);
 	}
 
 	void SendDel(XLine *x) anope_override
 	{
-		IRCD->SendSQLineDel(x);
+		if (!IRCD->CanSQLine)
+			;
+		else if (x->mask[0] != '#' || IRCD->CanSQLineChannel)
+			IRCD->SendSQLineDel(x);
 	}
 
 	bool Check(User *u, const XLine *x) anope_override

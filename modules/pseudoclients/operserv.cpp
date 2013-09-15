@@ -102,7 +102,7 @@ class SQLineManager : public XLineManager
 
 	void SendDel(XLine *x) anope_override
 	{
-		if (!IRCD->CanSQLine)
+		if (!IRCD->CanSQLine || x->IsRegex())
 			;
 		else if (x->mask[0] != '#' || IRCD->CanSQLineChannel)
 			IRCD->SendSQLineDel(x);
@@ -149,15 +149,16 @@ class SNLineManager : public XLineManager
 
 	void Send(User *u, XLine *x) anope_override
 	{
-		if (IRCD->CanSNLine)
+		if (IRCD->CanSNLine && !x->IsRegex())
 			IRCD->SendSGLine(u, x);
-		else if (u)
+
+		if (u)
 			u->Kill(Config->GetClient("OperServ"), "SNLined: " + x->reason);
 	}
 
 	void SendDel(XLine *x) anope_override
 	{
-		if (IRCD->CanSNLine)
+		if (IRCD->CanSNLine && !x->IsRegex())
 			IRCD->SendSGLineDel(x);
 	}
 

@@ -281,7 +281,7 @@ class Packet : public Query
 
 				if (q.name.find(':') != Anope::string::npos)
 				{
-					static const char *const hex = "0123456789abcdef";
+					const char *const hex = "0123456789abcdef";
 					char reverse_ip[128];
 					unsigned reverse_ip_count = 0;
 					for (int j = 15; j >= 0; --j)
@@ -662,7 +662,8 @@ class MyManager : public Manager, public Timer
  public:
 	std::map<unsigned short, Request *> requests;
 
-	MyManager(Module *creator) : Manager(creator), Timer(300, Anope::CurTime, true), serial(Anope::CurTime), tcpsock(NULL), udpsock(NULL), listen(false)
+	MyManager(Module *creator) : Manager(creator), Timer(300, Anope::CurTime, true), serial(Anope::CurTime), tcpsock(NULL), udpsock(NULL),
+		listen(false), cur_id(rand())
 	{
 	}
 
@@ -717,12 +718,12 @@ class MyManager : public Manager, public Timer
 	}
 
  private:
+	unsigned short cur_id;
+
 	unsigned short GetID()
 	{
 		if (this->udpsock->GetPackets().size() == 65535)
 			throw SocketException("DNS queue full");
-
-		static unsigned short cur_id = rand();
 
 		do
 			cur_id = (cur_id + 1) & 0xFFFF;

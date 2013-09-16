@@ -3,6 +3,28 @@
 #include "modules/xmlrpc.h"
 #include "modules/httpd.h"
 
+static struct special_chars
+{
+	Anope::string character;
+	Anope::string replace;
+
+	special_chars(const Anope::string &c, const Anope::string &r) : character(c), replace(r) { }
+}
+special[] = {
+	special_chars("&", "&amp;"),
+	special_chars("\"", "&quot;"),
+	special_chars("<", "&lt;"),
+	special_chars(">", "&qt;"),
+	special_chars("'", "&#39;"),
+	special_chars("\n", "&#xA;"),
+	special_chars("\002", ""), // bold
+	special_chars("\003", ""), // color
+	special_chars("\035", ""), // italics
+	special_chars("\037", ""), // underline
+	special_chars("\026", ""), // reverses
+	special_chars("", "")
+};
+
 class MyXMLRPCServiceInterface : public XMLRPCServiceInterface, public HTTPPage
 {
 	std::deque<XMLRPCEvent *> events;
@@ -25,28 +47,6 @@ class MyXMLRPCServiceInterface : public XMLRPCServiceInterface, public HTTPPage
 
 	Anope::string Sanitize(const Anope::string &string) anope_override
 	{
-		static struct special_chars
-		{
-			Anope::string character;
-			Anope::string replace;
-
-			special_chars(const Anope::string &c, const Anope::string &r) : character(c), replace(r) { }
-		}
-		special[] = {
-			special_chars("&", "&amp;"),
-			special_chars("\"", "&quot;"),
-			special_chars("<", "&lt;"),
-			special_chars(">", "&qt;"),
-			special_chars("'", "&#39;"),
-			special_chars("\n", "&#xA;"),
-			special_chars("\002", ""), // bold
-			special_chars("\003", ""), // color
-			special_chars("\035", ""), // italics
-			special_chars("\037", ""), // underline
-			special_chars("\026", ""), // reverses
-			special_chars("", "")
-		};
-
 		Anope::string ret = string;
 		for (int i = 0; special[i].character.empty() == false; ++i)
 			ret = ret.replace_all_cs(special[i].character, special[i].replace);

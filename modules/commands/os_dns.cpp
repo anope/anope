@@ -663,9 +663,12 @@ class ModuleDNS : public Module
 	bool remove_split_servers;
 	bool readd_connected_servers;
 
+	time_t last_warn;
+
  public:
 	ModuleDNS(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, EXTRA | VENDOR),
-		zone_type("DNSZone", DNSZone::Unserialize), dns_type("DNSServer", DNSServer::Unserialize), commandosdns(this)
+		zone_type("DNSZone", DNSZone::Unserialize), dns_type("DNSServer", DNSServer::Unserialize), commandosdns(this),
+		last_warn(0)
 	{
 
 
@@ -840,7 +843,6 @@ class ModuleDNS : public Module
 
 		if (packet->answers.size() == answer_size)
 		{
-			static time_t last_warn = 0;
 			if (last_warn + 60 < Anope::CurTime)
 			{
 				last_warn = Anope::CurTime;

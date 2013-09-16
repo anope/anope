@@ -62,7 +62,7 @@
 #define FOREACH_MOD(ename, args) \
 if (true) \
 { \
-	static std::vector<Module *> &_modules = ModuleManager::GetEventHandlers(#ename); \
+	std::vector<Module *> &_modules = ModuleManager::EventHandlers[I_ ## ename]; \
 	for (std::vector<Module *>::iterator _i = _modules.begin(); _i != _modules.end();) \
 	{ \
 		try \
@@ -96,7 +96,7 @@ else \
 if (true) \
 { \
 	ret = EVENT_CONTINUE; \
-	static std::vector<Module *> &_modules = ModuleManager::GetEventHandlers(#ename); \
+	std::vector<Module *> &_modules = ModuleManager::EventHandlers[I_ ## ename]; \
 	for (std::vector<Module *>::iterator _i = _modules.begin(); _i != _modules.end();) \
 	{ \
 		try \
@@ -1084,15 +1084,41 @@ class CoreExport Module : public Extensible
 	virtual EventReturn OnNickValidate(User *u, NickAlias *na) { throw NotImplementedException(); }
 };
 
+enum Implementation
+{
+	I_OnPreUserKicked, I_OnUserKicked, I_OnReload, I_OnPreBotAssign, I_OnBotAssign, I_OnBotUnAssign, I_OnUserConnect,
+	I_OnNewServer, I_OnUserNickChange, I_OnPreHelp, I_OnPostHelp, I_OnPreCommand, I_OnPostCommand, I_OnSaveDatabase,
+	I_OnLoadDatabase, I_OnEncrypt, I_OnDecrypt, I_OnBotFantasy, I_OnBotNoFantasyAccess, I_OnBotBan, I_OnBadWordAdd,
+	I_OnBadWordDel, I_OnCreateBot, I_OnDelBot, I_OnBotKick, I_OnPrePartChannel, I_OnPartChannel, I_OnLeaveChannel,
+	I_OnJoinChannel, I_OnTopicUpdated, I_OnPreChanExpire, I_OnChanExpire, I_OnPreServerConnect, I_OnServerConnect,
+	I_OnPreUplinkSync, I_OnServerDisconnect, I_OnRestart, I_OnShutdown, I_OnPreNickExpire, I_OnNickExpire, I_OnDefconLevel,
+	I_OnExceptionAdd, I_OnExceptionDel, I_OnAddXLine, I_OnDelXLine, I_IsServicesOper, I_OnServerQuit, I_OnUserQuit,
+	I_OnPreUserLogoff, I_OnPostUserLogoff, I_OnBotCreate, I_OnBotChange, I_OnBotDelete, I_OnAccessDel, I_OnAccessAdd,
+	I_OnAccessClear, I_OnLevelChange, I_OnChanDrop, I_OnChanRegistered, I_OnChanSuspend, I_OnChanUnsuspend,
+	I_OnCreateChan, I_OnDelChan, I_OnChannelCreate, I_OnChannelDelete, I_OnAkickAdd, I_OnAkickDel, I_OnCheckKick,
+	I_OnChanInfo, I_OnCheckPriv, I_OnGroupCheckPriv, I_OnNickDrop, I_OnNickForbidden, I_OnNickGroup, I_OnNickIdentify,
+	I_OnUserLogin, I_OnNickLogout, I_OnNickRegister, I_OnNickSuspend, I_OnNickUnsuspended, I_OnDelNick, I_OnNickCoreCreate,
+	I_OnDelCore, I_OnChangeCoreDisplay, I_OnNickClearAccess, I_OnNickAddAccess, I_OnNickEraseAccess, I_OnNickClearCert,
+	I_OnNickAddCert, I_OnNickEraseCert, I_OnNickInfo, I_OnBotInfo, I_OnCheckAuthentication, I_OnNickUpdate,
+	I_OnFingerprint, I_OnUserAway, I_OnInvite, I_OnDeleteVhost, I_OnSetVhost, I_OnMemoSend, I_OnMemoDel,
+	I_OnChannelModeSet, I_OnChannelModeUnset, I_OnUserModeSet, I_OnUserModeUnset, I_OnChannelModeAdd, I_OnUserModeAdd,
+	I_OnMLock, I_OnUnMLock, I_OnModuleLoad, I_OnModuleUnload, I_OnServerSync, I_OnUplinkSync, I_OnBotPrivmsg, I_OnBotNotice,
+	I_OnPrivmsg, I_OnLog, I_OnLogMessage, I_OnDnsRequest, I_OnCheckModes, I_OnChannelSync, I_OnSetCorrectModes,
+	I_OnSerializeCheck, I_OnSerializableConstruct, I_OnSerializableDestruct, I_OnSerializableUpdate,
+	I_OnSerializeTypeCreate, I_OnSetChannelOption, I_OnSetNickOption, I_OnMessage, I_OnCanSet, I_OnCheckDelete,
+	I_OnExpireTick, I_OnNickValidate,
+	I_SIZE
+};
+
 /** Used to manage modules.
  */
 class CoreExport ModuleManager
 {
+ public:
 	/** Event handler hooks.
 	 */
-	static std::map<Anope::string, std::vector<Module *> > EventHandlers;
+	static std::vector<Module *> EventHandlers[I_SIZE];
 
- public:
  	/** List of all modules loaded in Anope
 	 */
 	static std::list<Module *> Modules;
@@ -1102,8 +1128,6 @@ class CoreExport ModuleManager
 	 */
 	static void CleanupRuntimeDirectory();
 #endif
-
-	static std::vector<Module *> &GetEventHandlers(const Anope::string &name);
 
 	/** Loads a given module.
 	 * @param m the module to load
@@ -1154,7 +1178,7 @@ class CoreExport ModuleManager
 	 * @param sz The number of modules being passed for PRIO_BEFORE and PRIO_AFTER. Defaults to 1, as most of the time you will only want to prioritize your module
 	 * to be before or after one other module.
 	 */
-	static bool SetPriority(Module *mod, const Anope::string &event, Priority s, Module **modules = NULL, size_t sz = 1);
+	static bool SetPriority(Module *mod, Implementation i, Priority s, Module **modules = NULL, size_t sz = 1);
 
 	/** Change the priority of all events in a module.
 	 * @param mod The module to set the priority of

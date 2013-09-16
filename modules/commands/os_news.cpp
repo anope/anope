@@ -325,6 +325,8 @@ class CommandOSRandomNews : public NewsBase
 	}
 };
 
+static unsigned cur_rand_news = 0;
+
 class OSNews : public Module
 {
 	Serialize::Type newsitem_type;
@@ -356,7 +358,6 @@ class OSNews : public Module
 		else if (Type == NEWS_RANDOM)
 			msg = _("[\002Random News\002 - %s] %s");
 
-		static unsigned cur_rand_news = 0;
 		unsigned displayed = 0, news_count = Config->GetModule(this)->Get<unsigned>("newscount", "3");
 		for (unsigned i = 0, end = newsList.size(); i < end; ++i)
 		{

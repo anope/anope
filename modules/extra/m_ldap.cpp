@@ -80,7 +80,7 @@ class LDAPService : public LDAPProvider, public Thread, public Condition
 		int i = ldap_initialize(&this->con, this->server.c_str());
 		if (i != LDAP_SUCCESS)
 			throw LDAPException("Unable to connect to LDAP service " + this->name + ": " + ldap_err2string(i));
-		static const int version = LDAP_VERSION3;
+		const int version = LDAP_VERSION3;
 		i = ldap_set_option(this->con, LDAP_OPT_PROTOCOL_VERSION, &version);
 		if (i != LDAP_OPT_SUCCESS)
 			throw LDAPException("Unable to set protocol version for " + this->name + ": " + ldap_err2string(i));
@@ -269,7 +269,7 @@ class LDAPService : public LDAPProvider, public Thread, public Condition
 					break;
 			}
 
-			static struct timeval tv = { 1, 0 };
+			struct timeval tv = { 1, 0 };
 			LDAPMessage *result;
 			int rtype = ldap_result(this->con, LDAP_RES_ANY, 1, &tv, &result);
 			if (rtype <= 0 || this->GetExitState())

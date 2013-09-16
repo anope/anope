@@ -22,7 +22,7 @@
 #endif
 
 std::list<Module *> ModuleManager::Modules;
-std::map<Anope::string, std::vector<Module *> > ModuleManager::EventHandlers;
+std::vector<Module *> ModuleManager::EventHandlers[I_SIZE];
 
 #ifdef _WIN32
 void ModuleManager::CleanupRuntimeDirectory()
@@ -111,19 +111,6 @@ static ModuleReturn moduleCopyFile(const Anope::string &name, Anope::string &out
 	return !source.fail() && !target.fail() ? MOD_ERR_OK : MOD_ERR_FILE_IO;
 }
 #endif
-
-std::vector<Module *> &ModuleManager::GetEventHandlers(const Anope::string &name)
-{
-	std::map<Anope::string, std::vector<Module *> >::iterator it = EventHandlers.find(name);
-	if (it != EventHandlers.end())
-		return it->second;
-
-	std::vector<Module *> &modules = EventHandlers[name];
-	/* Populate initial vector */
-	std::copy(Modules.begin(), Modules.end(), std::back_inserter(modules));
-
-	return modules;
-}
 
 /* This code was found online at http://www.linuxjournal.com/article/3687#comment-26593
  *
@@ -263,8 +250,8 @@ ModuleReturn ModuleManager::LoadModule(const Anope::string &modname, User *u)
 	Log(LOG_DEBUG) << "Module " << modname << " loaded.";
 
 	/* Attach module to all events */
-	for (std::map<Anope::string, std::vector<Module *> >::iterator it = EventHandlers.begin(); it != EventHandlers.end(); ++it)
-		it->second.push_back(m);
+	for (unsigned i = 0; i < I_SIZE; ++i)
+		EventHandlers[i].push_back(m);
 
 	FOREACH_MOD(OnModuleLoad, (u, m));
 
@@ -365,9 +352,9 @@ ModuleReturn ModuleManager::DeleteModule(Module *m)
 
 void ModuleManager::DetachAll(Module *mod)
 {
-	for (std::map<Anope::string, std::vector<Module *> >::iterator it = EventHandlers.begin(); it != EventHandlers.end(); ++it)
+	for (unsigned i = 0; i < I_SIZE; ++i)
 	{
-		std::vector<Module *> &mods = it->second;
+		std::vector<Module *> &mods = EventHandlers[i];
 		std::vector<Module *>::iterator it2 = std::find(mods.begin(), mods.end(), mod);
 		if (it2 != mods.end())
 			mods.erase(it2);
@@ -376,13 +363,13 @@ void ModuleManager::DetachAll(Module *mod)
 
 bool ModuleManager::SetPriority(Module *mod, Priority s)
 {
-	for (std::map<Anope::string, std::vector<Module *> >::iterator it = EventHandlers.begin(); it != EventHandlers.end(); ++it)
-		SetPriority(mod, it->first, s);
+	for (unsigned i = 0; i < I_SIZE; ++i)
+		SetPriority(mod, static_cast<Implementation>(i), s);
 
 	return true;
 }
 
-bool ModuleManager::SetPriority(Module *mod, const Anope::string &i, Priority s, Module **modules, size_t sz)
+bool ModuleManager::SetPriority(Module *mod, Implementation i, Priority s, Module **modules, size_t sz)
 {
 	/** To change the priority of a module, we first find its position in the vector,
 	 * then we find the position of the other modules in the vector that this module

@@ -14,10 +14,10 @@
 class CommandCSDrop : public Command
 {
  public:
-	CommandCSDrop(Module *creator) : Command(creator, "chanserv/drop", 1, 1)
+	CommandCSDrop(Module *creator) : Command(creator, "chanserv/drop", 1, 2)
 	{
 		this->SetDesc(_("Cancel the registration of a channel"));
-		this->SetSyntax(_("\037channel\037"));
+		this->SetSyntax(_("\037channel\037 \037channel\037"));
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
@@ -34,6 +34,12 @@ class CommandCSDrop : public Command
 		if (ci == NULL)
 		{
 			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
+			return;
+		}
+
+		if (params.size() < 2 || !chan.equals_ci(params[1]))
+		{
+			source.Reply(_("You must enter the channel name twice as a confirmation that you wish to drop \2%s\2."), chan.c_str());
 			return;
 		}
 

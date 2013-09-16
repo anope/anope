@@ -1106,7 +1106,7 @@ class BSKick : public Module
 		if (kd && kd->caps)
 		{
 			if (kd->ttb[TTB_CAPS])
-				info[_("Caps kicker")] = Anope::printf(_("%s (%d kick(s) to ban; minimum %d/%d%%"), enabled.c_str(), kd->ttb[TTB_CAPS], kd->capsmin, kd->capspercent);
+				info[_("Caps kicker")] = Anope::printf(_("%s (%d kick(s) to ban; minimum %d/%d%%)"), enabled.c_str(), kd->ttb[TTB_CAPS], kd->capsmin, kd->capspercent);
 			else
 				info[_("Caps kicker")] = Anope::printf(_("%s (minimum %d/%d%%)"), enabled.c_str(), kd->capsmin, kd->capspercent);
 		}
@@ -1126,7 +1126,7 @@ class BSKick : public Module
 		if (kd && kd->flood)
 		{
 			if (kd->ttb[TTB_FLOOD])
-				info[_("Flood kicker")] = Anope::printf(_("%s (%d kick(s) to ban; %d lines in %ds"), enabled.c_str(), kd->ttb[TTB_FLOOD], kd->floodlines, kd->floodsecs);
+				info[_("Flood kicker")] = Anope::printf(_("%s (%d kick(s) to ban; %d lines in %ds)"), enabled.c_str(), kd->ttb[TTB_FLOOD], kd->floodlines, kd->floodsecs);
 			else
 				info[_("Flood kicker")] = Anope::printf(_("%s (%d lines in %ds)"), enabled.c_str(), kd->floodlines, kd->floodsecs);
 		}

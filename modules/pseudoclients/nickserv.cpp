@@ -497,7 +497,7 @@ class NickServCore : public Module, public NickServService
 			++it;
 
 			User *u = User::Find(na->nick);
-			if (u && (na->nc->HasExt("NS_SECURE") ? u->IsIdentified(true) : u->IsRecognized()))
+			if (u && (u->IsIdentified(true) || u->IsRecognized()))
 				na->last_seen = Anope::CurTime;
 
 			bool expire = false;
@@ -521,7 +521,7 @@ class NickServCore : public Module, public NickServService
 		if (!na->nc->HasExt("UNCONFIRMED"))
 		{
 			time_t nickserv_expire = Config->GetModule(this)->Get<time_t>("expire");
-			if (!na->HasExt("NS_NO_EXPIRE") && nickserv_expire && !Anope::NoExpire)
+			if (!na->HasExt("NS_NO_EXPIRE") && nickserv_expire && !Anope::NoExpire && na->last_seen != Anope::CurTime)
 				info[_("Expires")] = Anope::strftime(na->last_seen + nickserv_expire);
 		}
 		else

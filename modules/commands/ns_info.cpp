@@ -42,7 +42,10 @@ class CommandNSInfo : public Command
 			/* Is the real owner of the nick we're looking up online? -TheShadow */
 			User *u2 = User::Find(na->nick);
 			if (u2 && u2->Account() == na->nc)
+			{
 				nick_online = true;
+				na->last_seen = Anope::CurTime;
+			}
 
 			if (has_auspex || na->nc == source.GetAccount())
 				show_hidden = true;

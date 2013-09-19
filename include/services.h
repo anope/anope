@@ -496,6 +496,8 @@ struct memo_ {
     ModuleData *moduleData; 	/* Module saved data attached to the Memo */
 #ifdef USE_MYSQL
 	uint32 id;		/* Database ID; see mysql.c */
+#else
+	uint32 notused;		/* ABI compat with no mysql */
 #endif
 };
 

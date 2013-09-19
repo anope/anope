@@ -8,7 +8,7 @@ VERSION_MAJOR="1"
 VERSION_MINOR="8"
 VERSION_PATCH="9"
 VERSION_EXTRA="-git"
-VERSION_BUILD="3125"
+VERSION_BUILD="3126"
 
 # Changes since 1.8.8 Release
 #Revision 3125 - Fix kick reason in cs_suspend and cs_forbid if no reason is given

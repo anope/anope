@@ -54,6 +54,9 @@ union CoreExport sockaddrs
 	 */
 	Anope::string addr() const;
 
+	/* Is this address ipv6? */
+	bool ipv6() const;
+
 	/** Check if this sockaddr has data in it
 	 */
 	bool operator()() const;

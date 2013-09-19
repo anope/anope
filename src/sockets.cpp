@@ -91,6 +91,11 @@ Anope::string sockaddrs::addr() const
 	return "";
 }
 
+bool sockaddrs::ipv6() const
+{
+	return sa.sa_family == AF_INET6;
+}
+
 bool sockaddrs::operator()() const
 {
 	return valid();
@@ -218,7 +223,10 @@ cidr::cidr(const Anope::string &ip, unsigned char len)
 
 Anope::string cidr::mask() const
 {
-	return Anope::printf("%s/%d", this->cidr_ip.c_str(), this->cidr_len);
+	if ((this->addr.ipv6() && this->cidr_len == 128) || (!this->addr.ipv6() && this->cidr_len == 32))
+		return this->cidr_ip;
+	else
+		return Anope::printf("%s/%d", this->cidr_ip.c_str(), this->cidr_len);
 }
 
 bool cidr::match(const sockaddrs &other)

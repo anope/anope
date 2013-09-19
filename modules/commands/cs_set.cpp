@@ -1305,7 +1305,7 @@ class CSSet : public Module
 		if (restricted.HasExt(ci))
 			info.AddOption(_("Restricted Access"));
 		if (secure.HasExt(ci))
-			info.AddOption(_("Secure"));
+			info.AddOption(_("Security"));
 		if (securefounder.HasExt(ci))
 			info.AddOption(_("Secure Founder"));
 		if (secureops.HasExt(ci))

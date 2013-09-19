@@ -345,7 +345,7 @@ class NSCert : public Module
 			return;
 
 		u->Identify(na);
-		u->SendMessage(NickServ, _("SSL Fingerprint accepted. You are now identified."));
+		u->SendMessage(NickServ, _("SSL certificate fingerprint accepted, you are now identified."));
 		Log(u) << "automatically identified for account " << na->nc->display << " via SSL certificate fingerprint";
 	}
 
@@ -355,8 +355,8 @@ class NSCert : public Module
 		if (!u->fingerprint.empty() && cl && cl->FindCert(u->fingerprint))
 		{
 			u->Identify(na);
-			u->SendMessage(Config->GetClient("NickServ"), _("SSL fingerprint accepted, you are now identified."));
-			Log(u) << "automatically identified for account " << na->nc->display << " via SSL fingerprint.";
+			u->SendMessage(Config->GetClient("NickServ"), _("SSL certificate fingerprint accepted, you are now identified."));
+			Log(u) << "automatically identified for account " << na->nc->display << " via SSL certificate fingerprint";
 			return EVENT_ALLOW;
 		}
 

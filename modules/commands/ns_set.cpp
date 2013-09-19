@@ -30,7 +30,7 @@ class CommandNSSet : public Command
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Sets various nickname options.  \037option\037 can be one of:"));
+		source.Reply(_("Sets various nickname options. \037option\037 can be one of:"));
 
 		Anope::string this_name = source.command;
 		for (CommandInfo::map::const_iterator it = source.service->commands.begin(), it_end = source.service->commands.end(); it != it_end; ++it)

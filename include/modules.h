@@ -876,18 +876,11 @@ class CoreExport Module : public Extensible
 	virtual void OnMemoSend(const Anope::string &source, const Anope::string &target, MemoInfo *mi, Memo *m) { throw NotImplementedException(); }
 
 	/** Called when a memo is deleted
-	 * @param nc The nickcore of the memo being deleted
+	 * @param target The target the memo is being deleted from (nick or channel)
 	 * @param mi The memo info
 	 * @param m The memo
 	 */
-	virtual void OnMemoDel(NickCore *nc, MemoInfo *mi, const Memo *m) { throw NotImplementedException(); }
-
-	/** Called when a memo is deleted
-	 * @param ci The channel of the memo being deleted
-	 * @param mi The memo info
-	 * @param m The memo
-	 */
-	virtual void OnMemoDel(ChannelInfo *ci, MemoInfo *mi, const Memo *m) { throw NotImplementedException(); }
+	virtual void OnMemoDel(const Anope::string &target, MemoInfo *mi, const Memo *m) { throw NotImplementedException(); }
 
 	/** Called when a mode is set on a channel
 	 * @param c The channel

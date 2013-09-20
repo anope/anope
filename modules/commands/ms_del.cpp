@@ -26,10 +26,7 @@ class MemoDelCallback : public NumberList
 		if (!number || number > mi->memos->size())
 			return;
 
-		if (ci)
-			FOREACH_MOD(OnMemoDel, (ci, mi, mi->GetMemo(number - 1)));
-		else
-			FOREACH_MOD(OnMemoDel, (source.nc, mi, mi->GetMemo(number - 1)));
+		FOREACH_MOD(OnMemoDel, (ci ? ci->name : source.nc->display, mi, mi->GetMemo(number - 1)));
 
 		mi->Del(number - 1);
 		source.Reply(_("Memo %d has been deleted."), number);
@@ -96,10 +93,7 @@ class CommandMSDel : public Command
 			else if (numstr.equals_ci("LAST"))
 			{
 				/* Delete last memo. */
-				if (ci)
-					FOREACH_MOD(OnMemoDel, (ci, mi, mi->GetMemo(mi->memos->size() - 1)));
-				else
-					FOREACH_MOD(OnMemoDel, (source.nc, mi, mi->GetMemo(mi->memos->size() - 1)));
+				FOREACH_MOD(OnMemoDel, (ci ? ci->name : source.nc->display, mi, mi->GetMemo(mi->memos->size() - 1)));
 				mi->Del(mi->memos->size() - 1);
 				source.Reply(_("Memo %d has been deleted."), mi->memos->size() + 1);
 			}
@@ -108,10 +102,7 @@ class CommandMSDel : public Command
 				/* Delete all memos. */
 				for (unsigned i = 0, end = mi->memos->size(); i < end; ++i)
 				{
-					if (ci)
-						FOREACH_MOD(OnMemoDel, (ci, mi, mi->GetMemo(i)));
-					else
-						FOREACH_MOD(OnMemoDel, (source.nc, mi, mi->GetMemo(i)));
+					FOREACH_MOD(OnMemoDel, (ci ? ci->name : source.nc->display, mi, mi->GetMemo(i)));
 					delete mi->GetMemo(i);
 				}
 				mi->memos->clear();

@@ -164,7 +164,7 @@ class CommandOSIgnore : public Command
 
 			if (t <= -1)
 			{
-				source.Reply(_("You have to enter a valid number as time."));
+				source.Reply(BAD_EXPIRY_TIME);
 				return;
 			}
 
@@ -176,8 +176,8 @@ class CommandOSIgnore : public Command
 			}
 			else
 			{
-				source.Reply(_("\002%s\002 will now be ignored for \002%s\002."), nick.c_str(), time.c_str());
-				Log(LOG_ADMIN, source, this) << "to add an ignore on " << nick << " for " << time;
+				source.Reply(_("\002%s\002 will now be ignored for \002%s\002."), nick.c_str(), Anope::Duration(t, source.GetAccount()).c_str());
+				Log(LOG_ADMIN, source, this) << "to add an ignore on " << nick << " for " << Anope::Duration(t, source.GetAccount());
 			}
 		}
 

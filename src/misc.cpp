@@ -294,7 +294,10 @@ time_t Anope::DoTime(const Anope::string &s)
 			}
 		}
 	}
-	catch (const ConvertException &) { }
+	catch (const ConvertException &)
+	{
+		amount = -1;
+	}
 
 	return amount;
 }

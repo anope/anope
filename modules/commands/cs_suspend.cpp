@@ -73,7 +73,14 @@ class CommandCSSuspend : public Command
 			expiry.clear();
 		}
 		else
+		{
 			expiry_secs = Anope::DoTime(expiry);
+			if (expiry_secs == -1)
+			{
+				source.Reply(BAD_EXPIRY_TIME);
+				return;
+			}
+		}
 
 		if (Anope::ReadOnly)
 			source.Reply(READ_ONLY_MODE);

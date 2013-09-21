@@ -69,6 +69,11 @@ class CommandCSBan : public Command
 		if (params[1][0] == '+')
 		{
 			ban_time = Anope::DoTime(params[1]);
+			if (ban_time == -1)
+			{
+				source.Reply(BAD_EXPIRY_TIME);
+				return;
+			}
 			if (params.size() < 3)
 			{
 				this->SendSyntax(source);

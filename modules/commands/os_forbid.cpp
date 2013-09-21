@@ -137,7 +137,12 @@ class CommandOSForbid : public Command
 			if (!expiry.empty())
 			{
 				expiryt = Anope::DoTime(expiry);
-				if (expiryt)
+				if (expiryt == -1)
+				{
+					source.Reply(BAD_EXPIRY_TIME);
+					return;
+				}
+				else if (expiryt)
 					expiryt += Anope::CurTime;
 			}
 

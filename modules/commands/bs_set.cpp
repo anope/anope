@@ -104,7 +104,21 @@ class CommandBSSetBanExpire : public Command
 			return;
 		}
 
-		ci->banexpire = Anope::DoTime(arg);
+		time_t t = Anope::DoTime(arg);
+		if (t == -1)
+		{
+			source.Reply(BAD_EXPIRY_TIME);
+			return;
+		}
+
+		/* cap at 1 day */
+		if (t > 86400)
+		{
+			source.Reply(_("Ban expiry may not be longer than 1 day."));
+			return;
+		}
+
+		ci->banexpire = t;
 
 		bool override = !access.HasPriv("SET");
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to change banexpire to " << ci->banexpire;

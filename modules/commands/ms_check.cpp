@@ -34,7 +34,7 @@ class CommandMSCheck : public Command
 			return;
 		}
 
-		MemoInfo *mi = const_cast<MemoInfo *>(&na->nc->memos);
+		MemoInfo *mi = &na->nc->memos;
 
 		/* Okay, I know this looks strange but we wanna get the LAST memo, so we
 			have to loop backwards */

@@ -141,6 +141,12 @@ class CommandBSSetPrivate : public Command
 		BotInfo *bi = BotInfo::Find(params[0], true);
 		const Anope::string &value = params[1];
 
+		if (Anope::ReadOnly)
+		{
+			source.Reply(READ_ONLY_MODE);
+			return;
+		}
+
 		if (bi == NULL)
 		{
 			source.Reply(BOT_DOES_NOT_EXIST, params[0].c_str());

@@ -202,6 +202,8 @@ class CommandNSAJoin : public Command
 			this->DoList(source, nc);
 		else if (param.empty())
 			this->OnSyntaxError(source, "");
+		else if (Anope::ReadOnly)
+			source.Reply(READ_ONLY_MODE);
 		else if (params[0].equals_ci("ADD"))
 			this->DoAdd(source, nc, param, param2);
 		else if (params[0].equals_ci("DEL"))

@@ -76,6 +76,12 @@ class NSResetPass : public Module
 	{
 		if (command->name == "nickserv/confirm" && params.size() > 1)
 		{
+			if (Anope::ReadOnly)
+			{
+				source.Reply(READ_ONLY_MODE);
+				return EVENT_STOP;
+			}
+
 			NickAlias *na = NickAlias::Find(params[0]);
 
 			ResetInfo *ri = na ? reset.Get(na->nc) : NULL;

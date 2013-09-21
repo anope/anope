@@ -22,6 +22,12 @@ class CommandMSCancel : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
+		if (Anope::ReadOnly)
+		{
+			source.Reply(READ_ONLY_MODE);
+			return;
+		}
+
 		const Anope::string &nname = params[0];
 
 		bool ischan;

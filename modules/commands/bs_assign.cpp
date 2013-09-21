@@ -27,7 +27,7 @@ class CommandBSAssign : public Command
 
 		if (Anope::ReadOnly)
 		{
-			source.Reply(BOT_ASSIGN_READONLY);
+			source.Reply(_("Sorry, bot assignment is temporarily disabled."));
 			return;
 		}
 
@@ -95,7 +95,7 @@ class CommandBSUnassign : public Command
 	{
 		if (Anope::ReadOnly)
 		{
-			source.Reply(BOT_ASSIGN_READONLY);
+			source.Reply(_("Sorry, bot assignment is temporarily disabled."));
 			return;
 		}
 
@@ -158,6 +158,12 @@ class CommandBSSetNoBot : public Command
 	{
 		ChannelInfo *ci = ChannelInfo::Find(params[0]);
 		const Anope::string &value = params[1];
+
+		if (Anope::ReadOnly)
+		{
+			source.Reply(_("Sorry, bot modification is temporarily disabled."));
+			return;
+		}
 
 		if (ci == NULL)
 		{

@@ -150,6 +150,12 @@ public:
 		}
 		else if (params.size() > 2)
 		{
+			if (Anope::ReadOnly)
+			{
+				source.Reply(READ_ONLY_MODE);
+				return;
+			}
+
 			LogSettings *ls = ci->Require<LogSettings>("logsettings");
 			const Anope::string &command = params[1];
 			const Anope::string &method = params[2];

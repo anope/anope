@@ -22,6 +22,11 @@ class CommandHSSet : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
+		if (Anope::ReadOnly)
+		{
+			source.Reply(READ_ONLY_MODE);
+			return;
+		}
 
 		const Anope::string &nick = params[0];
 
@@ -123,6 +128,11 @@ class CommandHSSetAll : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
+		if (Anope::ReadOnly)
+		{
+			source.Reply(READ_ONLY_MODE);
+			return;
+		}
 
 		Anope::string nick = params[0];
 

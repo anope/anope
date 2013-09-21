@@ -32,12 +32,6 @@ class CommandMSStaff : public Command
 
 		const Anope::string &text = params[0];
 
-		if (Anope::ReadOnly)
-		{
-			source.Reply(MEMO_SEND_DISABLED);
-			return;
-		}
-
 		for (nickcore_map::const_iterator it = NickCoreList->begin(), it_end = NickCoreList->end(); it != it_end; ++it)
 		{
 			const NickCore *nc = it->second;

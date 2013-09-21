@@ -23,6 +23,12 @@ class CommandCSSetKeepTopic : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
+		if (Anope::ReadOnly)
+		{
+			source.Reply(READ_ONLY_MODE);
+			return;
+		}
+
 		ChannelInfo *ci = ChannelInfo::Find(params[0]);
 		if (ci == NULL)
 		{
@@ -76,6 +82,12 @@ class CommandCSTopic : public Command
 
 	void Lock(CommandSource &source, ChannelInfo *ci, const std::vector<Anope::string> &params)
 	{
+		if (Anope::ReadOnly)
+		{
+			source.Reply(READ_ONLY_MODE);
+			return;
+		}
+
 		EventReturn MOD_RESULT;
 		FOREACH_RESULT(OnSetChannelOption, MOD_RESULT, (source, this, ci, "topiclock on"));
 		if (MOD_RESULT == EVENT_STOP)
@@ -87,6 +99,12 @@ class CommandCSTopic : public Command
 
 	void Unlock(CommandSource &source, ChannelInfo *ci, const std::vector<Anope::string> &params)
 	{
+		if (Anope::ReadOnly)
+		{
+			source.Reply(READ_ONLY_MODE);
+			return;
+		}
+
 		EventReturn MOD_RESULT;
 		FOREACH_RESULT(OnSetChannelOption, MOD_RESULT, (source, this, ci, "topiclock off"));
 		if (MOD_RESULT == EVENT_STOP)

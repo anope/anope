@@ -24,6 +24,12 @@ class CommandMSIgnore : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
+		if (Anope::ReadOnly)
+		{
+			source.Reply(READ_ONLY_MODE);
+			return;
+		}
+
 		Anope::string channel = params[0];
 		Anope::string command = (params.size() > 1 ? params[1] : "");
 		Anope::string param = (params.size() > 2 ? params[2] : "");

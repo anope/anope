@@ -279,12 +279,14 @@ class CommandNSCert : public Command
 
 		if (source.nc->HasExt("NS_SUSPENDED"))
 			source.Reply(NICK_X_SUSPENDED, source.nc->display.c_str());
+		else if (cmd.equals_ci("LIST"))
+			return this->DoList(source, nc);
+		else if (Anope::ReadOnly)
+			source.Reply(READ_ONLY_MODE);
 		else if (cmd.equals_ci("ADD"))
 			return this->DoAdd(source, nc, mask);
 		else if (cmd.equals_ci("DEL"))
 			return this->DoDel(source, nc, mask);
-		else if (cmd.equals_ci("LIST"))
-			return this->DoList(source, nc);
 		else
 			this->OnSyntaxError(source, cmd);
 	}

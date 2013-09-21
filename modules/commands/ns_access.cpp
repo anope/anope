@@ -22,6 +22,12 @@ class CommandNSAccess : public Command
 			return;
 		}
 
+		if (Anope::ReadOnly)
+		{
+			source.Reply(READ_ONLY_MODE);
+			return;
+		}
+
 		if (nc->access.size() >= Config->GetModule(this->owner)->Get<unsigned>("accessmax"))
 		{
 			source.Reply(_("Sorry, you can only have %d access entries for a nickname."), Config->GetModule(this->owner)->Get<unsigned>("accessmax"));
@@ -45,6 +51,12 @@ class CommandNSAccess : public Command
 		if (mask.empty())
 		{
 			this->OnSyntaxError(source, "DEL");
+			return;
+		}
+
+		if (Anope::ReadOnly)
+		{
+			source.Reply(READ_ONLY_MODE);
 			return;
 		}
 

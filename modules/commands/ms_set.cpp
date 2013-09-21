@@ -110,7 +110,7 @@ class CommandMSSet : public Command
 					return;
 				}
 				user = p1;
-				mi = const_cast<MemoInfo *>(&na->nc->memos);
+				mi = &na->nc->memos;
 				nc = na->nc;
 				p1 = p2;
 				p2 = p3;
@@ -210,7 +210,7 @@ class CommandMSSet : public Command
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		const Anope::string &cmd = params[0];
-		MemoInfo *mi = const_cast<MemoInfo *>(&source.nc->memos);
+		MemoInfo *mi = &source.nc->memos;
 
 		if (Anope::ReadOnly)
 			source.Reply(_("Sorry, memo option setting is temporarily disabled."));

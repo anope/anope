@@ -268,6 +268,12 @@ class CommandCSMode : public Command
 		bool override = !source.AccessFor(ci).HasPriv("MODE");
 		ModeLocks *modelocks = ci->Require<ModeLocks>("modelocks");
 
+		if (Anope::ReadOnly && !subcommand.equals_ci("LIST"))
+		{
+			source.Reply(READ_ONLY_MODE);
+			return;
+		}
+
 		if ((subcommand.equals_ci("ADD") || subcommand.equals_ci("SET")) && !param.empty())
 		{
 			/* If setting, remove the existing locks */

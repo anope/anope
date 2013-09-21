@@ -70,10 +70,7 @@ class CommandNSSuspend : public Command
 		time_t expiry_secs = Config->GetModule(this->owner)->Get<time_t>("suspendexpire");
 
 		if (Anope::ReadOnly)
-		{
 			source.Reply(READ_ONLY_MODE);
-			return;
-		}
 
 		if (expiry[0] != '+')
 		{
@@ -162,10 +159,7 @@ class CommandNSUnSuspend : public Command
 		const Anope::string &nick = params[0];
 
 		if (Anope::ReadOnly)
-		{
 			source.Reply(READ_ONLY_MODE);
-			return;
-		}
 
 		NickAlias *na = NickAlias::Find(nick);
 		if (!na)

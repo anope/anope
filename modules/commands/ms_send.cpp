@@ -33,6 +33,12 @@ class CommandMSSend : public Command
 		const Anope::string &nick = params[0];
 		const Anope::string &text = params[1];
 
+		if (Anope::ReadOnly && !source.IsOper())
+		{
+			source.Reply(MEMO_SEND_DISABLED);
+			return;
+		}
+
 		MemoServService::MemoResult result = memoserv->Send(source.GetNick(), nick, text);
 		if (result == MemoServService::MEMO_SUCCESS)
 			source.Reply(_("Memo sent to \002%s\002."), nick.c_str());

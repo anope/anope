@@ -82,6 +82,12 @@ class CommandHSRequest : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
+		if (Anope::ReadOnly)
+		{
+			source.Reply(READ_ONLY_MODE);
+			return;
+		}
+
 		User *u = source.GetUser();
 		NickAlias *na = NickAlias::Find(source.GetNick());
 		if (!na || na->nc != source.GetAccount())
@@ -183,6 +189,11 @@ class CommandHSActivate : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
+		if (Anope::ReadOnly)
+		{
+			source.Reply(READ_ONLY_MODE);
+			return;
+		}
 
 		const Anope::string &nick = params[0];
 
@@ -227,6 +238,11 @@ class CommandHSReject : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
+		if (Anope::ReadOnly)
+		{
+			source.Reply(READ_ONLY_MODE);
+			return;
+		}
 
 		const Anope::string &nick = params[0];
 		const Anope::string &reason = params.size() > 1 ? params[1] : "";

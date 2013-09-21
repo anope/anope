@@ -27,6 +27,12 @@ public:
 		const Anope::string &target = params[1];
 		Anope::string what = params.size() > 2 ? params[2] : "";
 
+		if (Anope::ReadOnly)
+		{
+			source.Reply(READ_ONLY_MODE);
+			return;
+		}
+
 		User *u = source.GetUser();
 		ChannelInfo *ci = ChannelInfo::Find(params[0]);
 		if (ci == NULL)

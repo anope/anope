@@ -103,6 +103,12 @@ class CommandNSSetMisc : public Command
 
 	void Run(CommandSource &source, const Anope::string &user, const Anope::string &param)
 	{
+		if (Anope::ReadOnly)
+		{
+			source.Reply(READ_ONLY_MODE);
+			return;
+		}
+
 		const NickAlias *na = NickAlias::Find(user);
 		if (!na)
 		{

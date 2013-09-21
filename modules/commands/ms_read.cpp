@@ -130,7 +130,7 @@ class CommandMSRead : public Command
 			mi = &ci->memos;
 		}
 		else
-			mi = const_cast<MemoInfo *>(&source.nc->memos);
+			mi = &source.nc->memos;
 
 		if (numstr.empty() || (!numstr.equals_ci("LAST") && !numstr.equals_ci("NEW") && !numstr.is_number_only()))
 			this->OnSyntaxError(source, numstr);

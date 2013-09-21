@@ -39,7 +39,7 @@ class CommandBSSetGreet : public Command
 
 		if (Anope::ReadOnly)
 		{
-			source.Reply(_("Sorry, bot option setting is temporarily disabled."));
+			source.Reply(READ_ONLY_MODE);
 			return;
 		}
 
@@ -86,6 +86,12 @@ class CommandNSSetGreet : public Command
 
 	void Run(CommandSource &source, const Anope::string &user, const Anope::string &param)
 	{
+		if (Anope::ReadOnly)
+		{
+			source.Reply(READ_ONLY_MODE);
+			return;
+		}
+
 		const NickAlias *na = NickAlias::Find(user);
 		if (!na)
 		{

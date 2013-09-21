@@ -115,6 +115,12 @@ class CommandNSSetPassword : public Command
 		const Anope::string &param = params[1];
 		unsigned len = param.length();
 
+		if (Anope::ReadOnly)
+		{
+			source.Reply(READ_ONLY_MODE);
+			return;
+		}
+
 		if (source.GetNick().equals_ci(param) || (Config->GetBlock("options")->Get<bool>("strictpasswords") && len < 5))
 		{
 			source.Reply(MORE_OBSCURE_PASSWORD);
@@ -213,6 +219,12 @@ class CommandNSSetAutoOp : public Command
 
 	void Run(CommandSource &source, const Anope::string &user, const Anope::string &param)
 	{
+		if (Anope::ReadOnly)
+		{
+			source.Reply(READ_ONLY_MODE);
+			return;
+		}
+
 		const NickAlias *na = NickAlias::Find(user);
 		if (na == NULL)
 		{
@@ -297,6 +309,12 @@ class CommandNSSetDisplay : public Command
 
 	void Run(CommandSource &source, const Anope::string &user, const Anope::string &param)
 	{
+		if (Anope::ReadOnly)
+		{
+			source.Reply(READ_ONLY_MODE);
+			return;
+		}
+
 		const NickAlias *user_na = NickAlias::Find(user), *na = NickAlias::Find(param);
 
 		if (Config->GetBlock("options")->Get<bool>("nonicknameownership"))
@@ -412,6 +430,12 @@ class CommandNSSetEmail : public Command
 
 	void Run(CommandSource &source, const Anope::string &user, const Anope::string &param)
 	{
+		if (Anope::ReadOnly)
+		{
+			source.Reply(READ_ONLY_MODE);
+			return;
+		}
+
 		const NickAlias *na = NickAlias::Find(user);
 		if (!na)
 		{
@@ -513,6 +537,12 @@ class CommandNSSetKeepModes : public Command
 
 	void Run(CommandSource &source, const Anope::string &user, const Anope::string &param)
 	{
+		if (Anope::ReadOnly)
+		{
+			source.Reply(READ_ONLY_MODE);
+			return;
+		}
+
 		const NickAlias *na = NickAlias::Find(user);
 		if (!na)
 		{
@@ -594,6 +624,12 @@ class CommandNSSetKill : public Command
 
 	void Run(CommandSource &source, const Anope::string &user, const Anope::string &param)
 	{
+		if (Anope::ReadOnly)
+		{
+			source.Reply(READ_ONLY_MODE);
+			return;
+		}
+
 		if (Config->GetBlock("options")->Get<bool>("nonicknameownership"))
 		{
 			source.Reply(_("This command may not be used on this network because nickname ownership is disabled."));
@@ -726,6 +762,12 @@ class CommandNSSetLanguage : public Command
 
 	void Run(CommandSource &source, const Anope::string &user, const Anope::string &param)
 	{
+		if (Anope::ReadOnly)
+		{
+			source.Reply(READ_ONLY_MODE);
+			return;
+		}
+
 		const NickAlias *na = NickAlias::Find(user);
 		if (!na)
 		{
@@ -829,6 +871,12 @@ class CommandNSSetMessage : public Command
 
 	void Run(CommandSource &source, const Anope::string &user, const Anope::string &param)
 	{
+		if (Anope::ReadOnly)
+		{
+			source.Reply(READ_ONLY_MODE);
+			return;
+		}
+
 		const NickAlias *na = NickAlias::Find(user);
 		if (!na)
 		{
@@ -922,6 +970,12 @@ class CommandNSSetSecure : public Command
 
 	void Run(CommandSource &source, const Anope::string &user, const Anope::string &param)
 	{
+		if (Anope::ReadOnly)
+		{
+			source.Reply(READ_ONLY_MODE);
+			return;
+		}
+
 		const NickAlias *na = NickAlias::Find(user);
 		if (!na)
 		{

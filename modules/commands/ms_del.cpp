@@ -44,6 +44,11 @@ class CommandMSDel : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
+		if (Anope::ReadOnly)
+		{
+			source.Reply(READ_ONLY_MODE);
+			return;
+		}
 
 		MemoInfo *mi;
 		ChannelInfo *ci = NULL;
@@ -60,11 +65,6 @@ class CommandMSDel : public Command
 				source.Reply(CHAN_X_NOT_REGISTERED, chan.c_str());
 				return;
 			}
-			else if (Anope::ReadOnly)
-			{
-				source.Reply(READ_ONLY_MODE);
-				return;
-			}
 			else if (!source.AccessFor(ci).HasPriv("MEMO"))
 			{
 				source.Reply(ACCESS_DENIED);
@@ -73,7 +73,7 @@ class CommandMSDel : public Command
 			mi = &ci->memos;
 		}
 		else
-			mi = const_cast<MemoInfo *>(&source.nc->memos);
+			mi = &source.nc->memos;
 		if (numstr.empty() || (!isdigit(numstr[0]) && !numstr.equals_ci("ALL") && !numstr.equals_ci("LAST")))
 			this->OnSyntaxError(source, numstr);
 		else if (mi->memos->empty())

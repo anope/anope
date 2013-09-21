@@ -30,6 +30,12 @@ class CommandMSRSend : public Command
 		if (!memoserv)
 			return;
 
+		if (Anope::ReadOnly && !source.IsOper())
+		{
+			source.Reply(MEMO_SEND_DISABLED);
+			return;
+		}
+
 		const Anope::string &nick = params[0];
 		const Anope::string &text = params[1];
 		const NickAlias *na = NULL;

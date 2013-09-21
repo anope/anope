@@ -203,25 +203,30 @@ class CommandEntryMessage : public Command
 			return;
 		}
 
-		if (source.IsFounder(ci) || source.HasCommand("chanserv/set"))
+		if (Anope::ReadOnly && !params[1].equals_ci("LIST"))
 		{
-			if (params[1].equals_ci("LIST"))
-				this->DoList(source, ci);
-			else if (params[1].equals_ci("CLEAR"))
-				this->DoClear(source, ci);
-			else if (params.size() < 3)
-				this->OnSyntaxError(source, "");
-			else if (params[1].equals_ci("ADD"))
-				this->DoAdd(source, ci, params[2]);
-			else if (params[1].equals_ci("DEL"))
-				this->DoDel(source, ci, params[2]);
-			else
-				this->OnSyntaxError(source, "");
+			source.Reply(READ_ONLY_MODE);
+			return;
 		}
-		else
-			source.Reply(ACCESS_DENIED);
 
-		return;
+		if (!source.IsFounder(ci) && !source.HasCommand("chanserv/set"))
+		{
+			source.Reply(ACCESS_DENIED);
+			return;
+		}
+
+		if (params[1].equals_ci("LIST"))
+			this->DoList(source, ci);
+		else if (params[1].equals_ci("CLEAR"))
+			this->DoClear(source, ci);
+		else if (params.size() < 3)
+			this->OnSyntaxError(source, "");
+		else if (params[1].equals_ci("ADD"))
+			this->DoAdd(source, ci, params[2]);
+		else if (params[1].equals_ci("DEL"))
+			this->DoDel(source, ci, params[2]);
+		else
+			this->OnSyntaxError(source, "");
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override

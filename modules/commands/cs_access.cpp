@@ -732,6 +732,8 @@ class CommandCSLevels : public Command
 			this->OnSyntaxError(source, cmd);
 		else if (!source.AccessFor(ci).HasPriv("FOUNDER") && !source.HasPriv("chanserv/access/modify"))
 			source.Reply(ACCESS_DENIED);
+		else if (Anope::ReadOnly && !cmd.equals_ci("LIST"))
+			source.Reply(READ_ONLY_MODE);
 		else if (cmd.equals_ci("SET"))
 			this->DoSet(source, ci, params);
 		else if (cmd.equals_ci("DIS") || cmd.equals_ci("DISABLE"))

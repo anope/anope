@@ -22,6 +22,12 @@ class CommandHSDel : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
+		if (Anope::ReadOnly)
+		{
+			source.Reply(READ_ONLY_MODE);
+			return;
+		}
+
 		const Anope::string &nick = params[0];
 		NickAlias *na = NickAlias::Find(nick);
 		if (na)
@@ -56,6 +62,12 @@ class CommandHSDelAll : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
+		if (Anope::ReadOnly)
+		{
+			source.Reply(READ_ONLY_MODE);
+			return;
+		}
+
 		const Anope::string &nick = params[0];
 		NickAlias *na = NickAlias::Find(nick);
 		if (na)

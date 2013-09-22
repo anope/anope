@@ -327,7 +327,7 @@ class CommandOSAKill : public Command
 			return;
 		}
 
-		ListFormatter list;
+		ListFormatter list(source.GetAccount());
 		list.AddColumn("Number").AddColumn("Mask").AddColumn("Reason");
 
 		this->ProcessList(source, params, list);
@@ -341,7 +341,7 @@ class CommandOSAKill : public Command
 			return;
 		}
 
-		ListFormatter list;
+		ListFormatter list(source.GetAccount());
 		list.AddColumn("Number").AddColumn("Mask").AddColumn("Creator").AddColumn("Created").AddColumn("Expires").AddColumn("Reason");
 
 		this->ProcessList(source, params, list);

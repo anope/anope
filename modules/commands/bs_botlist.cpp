@@ -22,7 +22,7 @@ class CommandBSBotList : public Command
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		unsigned count = 0;
-		ListFormatter list;
+		ListFormatter list(source.GetAccount());
 
 		list.AddColumn("Nick").AddColumn("Mask");
 

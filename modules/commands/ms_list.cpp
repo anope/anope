@@ -59,7 +59,7 @@ class CommandMSList : public Command
 		}
 		else
 		{
-			ListFormatter list;
+			ListFormatter list(source.GetAccount());
 
 			list.AddColumn("Number").AddColumn("Sender").AddColumn("Date/Time");
 

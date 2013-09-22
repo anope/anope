@@ -150,7 +150,7 @@ class CommandNSCert : public Command
 			return;
 		}
 
-		ListFormatter list;
+		ListFormatter list(source.GetAccount());
 		list.AddColumn("Certificate");
 
 		for (unsigned i = 0; i < cl->GetCertCount(); ++i)
@@ -240,7 +240,7 @@ class CommandNSCert : public Command
 			return;
 		}
 
-		ListFormatter list;
+		ListFormatter list(source.GetAccount());
 		list.AddColumn("Certificate");
 
 		for (unsigned i = 0; i < cl->GetCertCount(); ++i)

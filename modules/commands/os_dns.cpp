@@ -213,7 +213,7 @@ class CommandOSDNS : public Command
 			return;
 		}
 
-		ListFormatter lf;
+		ListFormatter lf(source.GetAccount());
 		lf.AddColumn("Server").AddColumn("IP").AddColumn("Limit").AddColumn("State");
 		for (unsigned i = 0; i < dns_servers->size(); ++i)
 		{
@@ -249,7 +249,7 @@ class CommandOSDNS : public Command
 
 		if (!zones->empty())
 		{
-			ListFormatter lf2;
+			ListFormatter lf2(source.GetAccount());
 			lf2.AddColumn("Zone").AddColumn("Servers");
 
 			for (unsigned i = 0; i < zones->size(); ++i)

@@ -425,7 +425,7 @@ class CommandCSAccess : public Command
 			return;
 		}
 
-		ListFormatter list;
+		ListFormatter list(source.GetAccount());
 		list.AddColumn("Number").AddColumn("Level").AddColumn("Mask");
 		this->ProcessList(source, ci, params, list);
 	}
@@ -438,7 +438,7 @@ class CommandCSAccess : public Command
 			return;
 		}
 
-		ListFormatter list;
+		ListFormatter list(source.GetAccount());
 		list.AddColumn("Number").AddColumn("Level").AddColumn("Mask").AddColumn("By").AddColumn("Last seen");
 		this->ProcessList(source, ci, params, list);
 	}
@@ -660,7 +660,7 @@ class CommandCSLevels : public Command
 	{
 		source.Reply(_("Access level settings for channel %s:"), ci->name.c_str());
 
-		ListFormatter list;
+		ListFormatter list(source.GetAccount());
 		list.AddColumn("Name").AddColumn("Level");
 
 		const std::vector<Privilege> &privs = PrivilegeManager::GetPrivileges();
@@ -754,7 +754,7 @@ class CommandCSLevels : public Command
 		{
 			source.Reply(_("The following feature/function names are available:"));
 
-			ListFormatter list;
+			ListFormatter list(source.GetAccount());
 			list.AddColumn("Name").AddColumn("Description");
 
 			const std::vector<Privilege> &privs = PrivilegeManager::GetPrivileges();

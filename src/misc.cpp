@@ -121,6 +121,10 @@ bool NumberList::InvalidRange(const Anope::string &)
 	return true;
 }
 
+ListFormatter::ListFormatter(NickCore *acc) : nc(acc)
+{
+}
+
 ListFormatter &ListFormatter::AddColumn(const Anope::string &name)
 {
 	this->columns.push_back(name);
@@ -139,10 +143,14 @@ bool ListFormatter::IsEmpty() const
 
 void ListFormatter::Process(std::vector<Anope::string> &buffer)
 {
+	std::vector<Anope::string> tcolumns;
 	std::map<Anope::string, size_t> lenghts;
 	std::set<Anope::string> breaks;
 	for (unsigned i = 0; i < this->columns.size(); ++i)
-		lenghts[this->columns[i]] = this->columns[i].length();
+	{
+		tcolumns.push_back(Language::Translate(this->nc, this->columns[i].c_str()));
+		lenghts[this->columns[i]] = tcolumns[i].length();
+	}
 	for (unsigned i = 0; i < this->entries.size(); ++i)
 	{
 		ListEntry &e = this->entries[i];
@@ -176,9 +184,9 @@ void ListFormatter::Process(std::vector<Anope::string> &buffer)
 			}
 			else if (!s.empty())
 				s += "  ";
-			s += this->columns[i];
-			if (i + 1  != this->columns.size())
-				for (unsigned j = this->columns[i].length(); j < lenghts[this->columns[i]]; ++j)
+			s += tcolumns[i];
+			if (i + 1 != this->columns.size())
+				for (unsigned j = tcolumns[i].length(); j < lenghts[this->columns[i]]; ++j)
 					s += " ";
 		}
 		buffer.push_back(s);

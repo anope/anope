@@ -109,7 +109,7 @@ class CommandEntryMessage : public Command
 
 		source.Reply(_("Entry message list for \002%s\002:"), ci->name.c_str());
 
-		ListFormatter list;
+		ListFormatter list(source.GetAccount());
 		list.AddColumn("Number").AddColumn("Creator").AddColumn("Created").AddColumn("Message");
 		for (unsigned i = 0; i < (*messages)->size(); ++i)
 		{

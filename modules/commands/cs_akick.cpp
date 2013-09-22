@@ -360,7 +360,7 @@ class CommandCSAKick : public Command
 			return;
 		}
 
-		ListFormatter list;
+		ListFormatter list(source.GetAccount());
 		list.AddColumn("Number").AddColumn("Mask").AddColumn("Reason");
 		this->ProcessList(source, ci, params, list);
 	}
@@ -373,7 +373,7 @@ class CommandCSAKick : public Command
 			return;
 		}
 
-		ListFormatter list;
+		ListFormatter list(source.GetAccount());
 		list.AddColumn("Number").AddColumn("Mask").AddColumn("Creator").AddColumn("Created").AddColumn("Last used").AddColumn("Reason");
 		this->ProcessList(source, ci, params, list);
 	}

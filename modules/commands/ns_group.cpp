@@ -295,7 +295,7 @@ class CommandNSGList : public Command
 		else
 			nc = source.GetAccount();
 
-		ListFormatter list;
+		ListFormatter list(source.GetAccount());
 		list.AddColumn("Nick").AddColumn("Expires");
 		time_t nickserv_expire = Config->GetModule("nickserv")->Get<time_t>("expire");
 		for (unsigned i = 0; i < nc->aliases->size(); ++i)

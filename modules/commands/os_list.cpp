@@ -38,7 +38,7 @@ class CommandOSChanList : public Command
 			modes.insert("PRIVATE");
 		}
 
-		ListFormatter list;
+		ListFormatter list(source.GetAccount());
 		list.AddColumn("Name").AddColumn("Users").AddColumn("Modes").AddColumn("Topic");
 
 		if (!pattern.empty() && (u2 = User::Find(pattern, true)))
@@ -143,7 +143,7 @@ class CommandOSUserList : public Command
 		if (!opt.empty() && opt.equals_ci("INVISIBLE"))
 			modes.insert("INVIS");
 
-		ListFormatter list;
+		ListFormatter list(source.GetAccount());
 		list.AddColumn("Name").AddColumn("Mask");
 
 		if (!pattern.empty() && (c = Channel::Find(pattern)))

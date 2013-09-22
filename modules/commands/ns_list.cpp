@@ -70,7 +70,7 @@ class CommandNSList : public Command
 		}
 
 		mync = source.nc;
-		ListFormatter list;
+		ListFormatter list(source.GetAccount());
 
 		list.AddColumn("Nick").AddColumn("Last usermask");
 

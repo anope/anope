@@ -113,7 +113,7 @@ class NewsBase : public Command
 			source.Reply(msgs[MSG_LIST_NONE]);
 		else
 		{
-			ListFormatter lflist;
+			ListFormatter lflist(source.GetAccount());
 			lflist.AddColumn("Number").AddColumn("Creator").AddColumn("Created").AddColumn("Text");
 
 			for (unsigned i = 0, end = list.size(); i < end; ++i)

@@ -42,7 +42,7 @@ class CommandNSAList : public Command
 			nc = na->nc;
 		}
 
-		ListFormatter list;
+		ListFormatter list(source.GetAccount());
 		int chan_count = 0;
 
 		list.AddColumn("Number").AddColumn("Channel").AddColumn("Access");

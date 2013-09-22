@@ -67,9 +67,11 @@ class CoreExport ListFormatter
  public:
  	typedef std::map<Anope::string, Anope::string> ListEntry;
  private:
+	NickCore *nc;
 	std::vector<Anope::string> columns;
 	std::vector<ListEntry> entries;
  public:
+	ListFormatter(NickCore *nc);
 	ListFormatter &AddColumn(const Anope::string &name);
 	void AddEntry(const ListEntry &entry);
 	bool IsEmpty() const;

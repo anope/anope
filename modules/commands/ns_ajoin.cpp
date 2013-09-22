@@ -96,7 +96,7 @@ class CommandNSAJoin : public Command
 			source.Reply(_("%s's auto join list is empty."), nc->display.c_str());
 		else
 		{
-			ListFormatter list;
+			ListFormatter list(source.GetAccount());
 			list.AddColumn("Number").AddColumn("Channel").AddColumn("Key");
 			for (unsigned i = 0; i < (*channels)->size(); ++i)
 			{

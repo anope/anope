@@ -267,7 +267,7 @@ class CommandCSFlags : public Command
 			return;
 		}
 
-		ListFormatter list;
+		ListFormatter list(source.GetAccount());
 
 		list.AddColumn("Number").AddColumn("Mask").AddColumn("Flags").AddColumn("Creator").AddColumn("Created");
 

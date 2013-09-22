@@ -70,7 +70,7 @@ class CommandCSList : public Command
 
 		source.Reply(_("List of entries matching \002%s\002:"), pattern.c_str());
 
-		ListFormatter list;
+		ListFormatter list(source.GetAccount());
 		list.AddColumn("Name").AddColumn("Description");
 
 		Anope::map<ChannelInfo *> ordered_map;

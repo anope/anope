@@ -208,7 +208,7 @@ class CommandOSIgnore : public Command
 			source.Reply(_("Ignore list is empty."));
 		else
 		{
-			ListFormatter list;
+			ListFormatter list(source.GetAccount());
 			list.AddColumn("Mask").AddColumn("Creator").AddColumn("Reason").AddColumn("Expires");
 			for (std::list<IgnoreData>::const_iterator ign = ignores.begin(), ign_end = ignores.end(); ign != ign_end; ++ign)
 			{

@@ -181,7 +181,7 @@ class CommandOSSession : public Command
 			source.Reply(_("Invalid threshold value. It must be a valid integer greater than 1."));
 		else
 		{
-			ListFormatter list;
+			ListFormatter list(source.GetAccount());
 			list.AddColumn("Session").AddColumn("Host");
 
 			for (SessionService::SessionMap::iterator it = session_service->GetSessions().begin(), it_end = session_service->GetSessions().end(); it != it_end; ++it)
@@ -527,7 +527,7 @@ class CommandOSException : public Command
 
 	void DoList(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		ListFormatter list;
+		ListFormatter list(source.GetAccount());
 		list.AddColumn("Number").AddColumn("Limit").AddColumn("Mask");
 
 		this->ProcessList(source, params, list);
@@ -535,7 +535,7 @@ class CommandOSException : public Command
 
 	void DoView(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		ListFormatter list;
+		ListFormatter list(source.GetAccount());
 		list.AddColumn("Number").AddColumn("Mask").AddColumn("By").AddColumn("Created").AddColumn("Limit").AddColumn("Reason");
 
 		this->ProcessList(source, params, list);

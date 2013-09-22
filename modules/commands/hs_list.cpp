@@ -54,7 +54,7 @@ class CommandHSList : public Command
 		}
 
 		unsigned display_counter = 0, listmax = Config->GetModule(this->owner)->Get<unsigned>("listmax", "50");
-		ListFormatter list;
+		ListFormatter list(source.GetAccount());
 		list.AddColumn("Number").AddColumn("Nick").AddColumn("Vhost").AddColumn("Creator").AddColumn("Created");
 
 		for (nickalias_map::const_iterator it = NickAliasList->begin(), it_end = NickAliasList->end(); it != it_end; ++it)

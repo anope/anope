@@ -289,7 +289,7 @@ class CommandOSForbid : public Command
 				source.Reply(_("Forbid list is empty."));
 			else
 			{
-				ListFormatter list;
+				ListFormatter list(source.GetAccount());
 				list.AddColumn("Mask").AddColumn("Type").AddColumn("Reason");
 
 				for (unsigned i = 0; i < forbids.size(); ++i)

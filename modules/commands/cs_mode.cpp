@@ -422,7 +422,7 @@ class CommandCSMode : public Command
 			}
 			else
 			{
-				ListFormatter list;
+				ListFormatter list(source.GetAccount());
 				list.AddColumn("Mode").AddColumn("Param").AddColumn("Creator").AddColumn("Created");
 
 				for (ModeLocks::ModeList::const_iterator it = mlocks.begin(), it_end = mlocks.end(); it != it_end; ++it)

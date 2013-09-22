@@ -295,7 +295,7 @@ class CommandHSWaiting : public Command
 	{
 		unsigned counter = 0;
 		unsigned display_counter = 0, listmax = Config->GetModule(this->owner)->Get<unsigned>("listmax");
-		ListFormatter list;
+		ListFormatter list(source.GetAccount());
 
 		list.AddColumn("Number").AddColumn("Nick").AddColumn("Vhost").AddColumn("Created");
 

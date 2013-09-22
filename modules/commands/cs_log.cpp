@@ -123,7 +123,7 @@ public:
 				source.Reply(_("There currently are no logging configurations for %s."), ci->name.c_str());
 			else
 			{
-				ListFormatter list;
+				ListFormatter list(source.GetAccount());
 				list.AddColumn("Number").AddColumn("Service").AddColumn("Command").AddColumn("Method").AddColumn("");
 
 				for (unsigned i = 0; i < (*ls)->size(); ++i)

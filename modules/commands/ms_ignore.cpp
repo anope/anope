@@ -76,7 +76,7 @@ class CommandMSIgnore : public Command
 				source.Reply(_("Memo ignore list is empty."));
 			else
 			{
-				ListFormatter list;
+				ListFormatter list(source.GetAccount());
 				list.AddColumn("Mask");
 				for (unsigned i = 0; i < mi->ignores.size(); ++i)
 				{

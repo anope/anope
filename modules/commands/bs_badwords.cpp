@@ -187,7 +187,7 @@ class CommandBSBadwords : public Command
 	{
 		bool override = !source.AccessFor(ci).HasPriv("BADWORDS");
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "LIST";
-		ListFormatter list;
+		ListFormatter list(source.GetAccount());
 		BadWords *bw = ci->GetExt<BadWords>("badwords");
 
 		list.AddColumn("Number").AddColumn("Word").AddColumn("Type");

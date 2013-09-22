@@ -378,7 +378,7 @@ class CommandCSXOP : public Command
 			return;
 		}
 
-		ListFormatter list;
+		ListFormatter list(source.GetAccount());
 		list.AddColumn("Number").AddColumn("Mask");
 
 		if (!nick.empty() && nick.find_first_not_of("1234567890,-") == Anope::string::npos)

@@ -228,7 +228,7 @@ void InfoFormatter::Process(std::vector<Anope::string> &buffer)
 		Anope::string s;
 		for (unsigned i = it->first.length(); i < this->longest; ++i)
 			s += " ";
-		s += Anope::string(Language::Translate(this->nc, it->first.c_str())) + ": " + Language::Translate(this->nc, it->second.c_str());
+		s += it->first + ": " + Language::Translate(this->nc, it->second.c_str());
 
 		buffer.push_back(s);
 	}
@@ -236,25 +236,27 @@ void InfoFormatter::Process(std::vector<Anope::string> &buffer)
 
 Anope::string& InfoFormatter::operator[](const Anope::string &key)
 {
-	if (key.length() > this->longest)
-		this->longest = key.length();
-	this->replies.push_back(std::make_pair(key, ""));
+	Anope::string tkey = Language::Translate(this->nc, key.c_str());
+	if (tkey.length() > this->longest)
+		this->longest = tkey.length();
+	this->replies.push_back(std::make_pair(tkey, ""));
 	return this->replies.back().second;
 }
 
 void InfoFormatter::AddOption(const Anope::string &opt)
 {
+	Anope::string options = Language::Translate(this->nc, "Options");
 	Anope::string *optstr = NULL;
 	for (std::vector<std::pair<Anope::string, Anope::string> >::iterator it = this->replies.begin(), it_end = this->replies.end(); it != it_end; ++it)
 	{
-		if (it->first == "Options")
+		if (it->first == options)
 		{
 			optstr = &it->second;
 			break;
 		}
 	}
 	if (!optstr)
-		optstr = &(*this)["Options"];
+		optstr = &(*this)[_("Options")];
 
 	if (!optstr->empty())
 		*optstr += ", ";

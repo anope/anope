@@ -144,14 +144,16 @@ void Command::SetSyntax(const Anope::string &s)
 
 void Command::SendSyntax(CommandSource &source)
 {
+	Anope::string s = Language::Translate(source.GetAccount(), _("Syntax"));
 	if (!this->syntax.empty())
 	{
-		source.Reply(_("Syntax: \002%s %s\002"), source.command.c_str(), this->syntax[0].c_str());
+		source.Reply("%s: \002%s %s\002", s.c_str(), source.command.c_str(), Language::Translate(source.GetAccount(), this->syntax[0].c_str()));
+		Anope::string spaces(s.length(), ' ');
 		for (unsigned i = 1, j = this->syntax.size(); i < j; ++i)
-			source.Reply("        \002%s %s\002", source.command.c_str(), this->syntax[i].c_str());
+			source.Reply("%s  \002%s %s\002", spaces.c_str(), source.command.c_str(), Language::Translate(source.GetAccount(), this->syntax[i].c_str()));
 	}
 	else
-		source.Reply(_("Syntax: \002%s\002"), source.command.c_str());
+		source.Reply("%s: \002%s\002", s.c_str(), source.command.c_str());
 }
 
 bool Command::AllowUnregistered() const

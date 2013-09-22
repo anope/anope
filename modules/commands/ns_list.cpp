@@ -72,7 +72,7 @@ class CommandNSList : public Command
 		mync = source.nc;
 		ListFormatter list(source.GetAccount());
 
-		list.AddColumn("Nick").AddColumn("Last usermask");
+		list.AddColumn(_("Nick")).AddColumn(_("Last usermask"));
 
 		Anope::map<NickAlias *> ordered_map;
 		for (nickalias_map::const_iterator it = NickAliasList->begin(), it_end = NickAliasList->end(); it != it_end; ++it)
@@ -107,11 +107,11 @@ class CommandNSList : public Command
 					ListFormatter::ListEntry entry;
 					entry["Nick"] = (isnoexpire ? "!" : "") + na->nick;
 					if (na->nc->HasExt("HIDE_MASK") && !is_servadmin && na->nc != mync)
-						entry["Last usermask"] = "[Hostname hidden]";
+						entry["Last usermask"] = Language::Translate(source.GetAccount(), _("[Hostname hidden]"));
 					else if (na->nc->HasExt("NS_SUSPENDED"))
-						entry["Last usermask"] = "[Suspended]";
+						entry["Last usermask"] = Language::Translate(source.GetAccount(), _("[Suspended]"));
 					else if (na->nc->HasExt("UNCONFIRMED"))
-						entry["Last usermask"] = "[Unconfirmed]";
+						entry["Last usermask"] = Language::Translate(source.GetAccount(), _("[Unconfirmed]"));
 					else
 						entry["Last usermask"] = na->last_usermask;
 					list.AddEntry(entry);

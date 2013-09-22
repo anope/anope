@@ -127,7 +127,7 @@ class CommandNSRecover : public Command
 	CommandNSRecover(Module *creator) : Command(creator, "nickserv/recover", 1, 2)
 	{
 		this->SetDesc(_("Regains control of your nick"));
-		this->SetSyntax("\037nickname\037 [\037password\037]");
+		this->SetSyntax(_("\037nickname\037 [\037password\037]"));
 		this->AllowUnregistered(true);
 	}
 

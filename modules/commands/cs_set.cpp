@@ -1303,13 +1303,13 @@ class CSSet : public Module
 		if (peace.HasExt(ci))
 			info.AddOption(_("Peace"));
 		if (restricted.HasExt(ci))
-			info.AddOption(_("Restricted Access"));
+			info.AddOption(_("Restricted access"));
 		if (secure.HasExt(ci))
 			info.AddOption(_("Security"));
 		if (securefounder.HasExt(ci))
-			info.AddOption(_("Secure Founder"));
+			info.AddOption(_("Secure founder"));
 		if (secureops.HasExt(ci))
-			info.AddOption(_("Secure Ops"));
+			info.AddOption(_("Secure ops"));
 		if (signkick.HasExt(ci) || signkick_level.HasExt(ci))
 			info.AddOption(_("Signed kicks"));
 		if (persist.HasExt(ci))
@@ -1318,10 +1318,12 @@ class CSSet : public Module
 			info.AddOption(_("No expire"));
 		if (keep_modes.HasExt(ci))
 			info.AddOption(_("Keep modes"));
+		if (noautoop.HasExt(ci))
+			info.AddOption(_("No auto-op"));
 
 		time_t chanserv_expire = Config->GetModule(this)->Get<time_t>("expire", "14d");
 		if (!noexpire.HasExt(ci) && chanserv_expire && !Anope::NoExpire)
-			info["Expires on"] = Anope::strftime(ci->last_used + chanserv_expire);
+			info[_("Expires")] = Anope::strftime(ci->last_used + chanserv_expire, source.GetAccount());
 	}
 };
 

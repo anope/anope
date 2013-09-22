@@ -97,7 +97,7 @@ class CommandNSAJoin : public Command
 		else
 		{
 			ListFormatter list(source.GetAccount());
-			list.AddColumn("Number").AddColumn("Channel").AddColumn("Key");
+			list.AddColumn(_("Number")).AddColumn(_("Channel")).AddColumn(_("Key"));
 			for (unsigned i = 0; i < (*channels)->size(); ++i)
 			{
 				AJoinEntry *aj = (*channels)->at(i);

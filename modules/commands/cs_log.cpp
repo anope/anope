@@ -124,7 +124,7 @@ public:
 			else
 			{
 				ListFormatter list(source.GetAccount());
-				list.AddColumn("Number").AddColumn("Service").AddColumn("Command").AddColumn("Method").AddColumn("");
+				list.AddColumn(_("Number")).AddColumn(_("Service")).AddColumn(_("Command")).AddColumn(_("Method")).AddColumn("");
 
 				for (unsigned i = 0; i < (*ls)->size(); ++i)
 				{

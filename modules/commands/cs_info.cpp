@@ -44,20 +44,20 @@ class CommandCSInfo : public Command
 
 		source.Reply(CHAN_INFO_HEADER, chan.c_str());
 		if (ci->GetFounder())
-			info["Founder"] = ci->GetFounder()->display;
+			info[_("Founder")] = ci->GetFounder()->display;
 
 		if (show_all && ci->GetSuccessor())
-			info["Successor"] = ci->GetSuccessor()->display;
+			info[_("Successor")] = ci->GetSuccessor()->display;
 
 		if (!ci->desc.empty())
-			info["Description"] = ci->desc;
+			info[_("Description")] = ci->desc;
 
-		info["Registered"] = Anope::strftime(ci->time_registered);
-		info["Last used"] = Anope::strftime(ci->last_used);
+		info[_("Registered")] = Anope::strftime(ci->time_registered, source.GetAccount());
+		info[_("Last used")] = Anope::strftime(ci->last_used, source.GetAccount());
 
 		if (show_all)
 		{
-			info["Ban type"] = stringify(ci->bantype);
+			info[_("Ban type")] = stringify(ci->bantype);
 		}
 
 		FOREACH_MOD(OnChanInfo, (source, ci, info, show_all));

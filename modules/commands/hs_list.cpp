@@ -55,7 +55,7 @@ class CommandHSList : public Command
 
 		unsigned display_counter = 0, listmax = Config->GetModule(this->owner)->Get<unsigned>("listmax", "50");
 		ListFormatter list(source.GetAccount());
-		list.AddColumn("Number").AddColumn("Nick").AddColumn("Vhost").AddColumn("Creator").AddColumn("Created");
+		list.AddColumn(_("Number")).AddColumn(_("Nick")).AddColumn(_("Vhost")).AddColumn(_("Creator")).AddColumn(_("Created"));
 
 		for (nickalias_map::const_iterator it = NickAliasList->begin(), it_end = NickAliasList->end(); it != it_end; ++it)
 		{
@@ -78,7 +78,7 @@ class CommandHSList : public Command
 					else
 						entry["Vhost"] = na->GetVhostHost();
 					entry["Creator"] = na->GetVhostCreator();
-					entry["Created"] = Anope::strftime(na->GetVhostCreated());
+					entry["Created"] = Anope::strftime(na->GetVhostCreated(), source.GetAccount());
 					list.AddEntry(entry);
 				}
 			}
@@ -99,7 +99,7 @@ class CommandHSList : public Command
 					else
 						entry["Vhost"] = na->GetVhostHost();
 					entry["Creator"] = na->GetVhostCreator();
-					entry["Created"] = Anope::strftime(na->GetVhostCreated());
+					entry["Created"] = Anope::strftime(na->GetVhostCreated(), source.GetAccount());
 					list.AddEntry(entry);
 				}
 			}

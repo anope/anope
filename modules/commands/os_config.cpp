@@ -54,7 +54,7 @@ class CommandOSConfig : public Command
 					continue;
 
 				ListFormatter lflist(source.GetAccount());
-				lflist.AddColumn("Name").AddColumn("Value");
+				lflist.AddColumn(_("Name")).AddColumn(_("Value"));
 
 				for (Configuration::Block::item_map::const_iterator it = items->begin(), it_end = items->end(); it != it_end; ++it)
 				{

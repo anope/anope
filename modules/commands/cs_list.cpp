@@ -71,7 +71,7 @@ class CommandCSList : public Command
 		source.Reply(_("List of entries matching \002%s\002:"), pattern.c_str());
 
 		ListFormatter list(source.GetAccount());
-		list.AddColumn("Name").AddColumn("Description");
+		list.AddColumn(_("Name")).AddColumn(_("Description"));
 
 		Anope::map<ChannelInfo *> ordered_map;
 		for (registered_channel_map::const_iterator it = RegisteredChannelList->begin(), it_end = RegisteredChannelList->end(); it != it_end; ++it)
@@ -99,7 +99,7 @@ class CommandCSList : public Command
 					ListFormatter::ListEntry entry;
 					entry["Name"] = (isnoexpire ? "!" : "") + ci->name;
 					if (ci->HasExt("CS_SUSPENDED"))
-						entry["Description"] = "[Suspended]";
+						entry["Description"] = Language::Translate(source.GetAccount(), _("[Suspended]"));
 					else
 						entry["Description"] = ci->desc;
 					list.AddEntry(entry);

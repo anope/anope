@@ -24,7 +24,7 @@ class CommandBSBotList : public Command
 		unsigned count = 0;
 		ListFormatter list(source.GetAccount());
 
-		list.AddColumn("Nick").AddColumn("Mask");
+		list.AddColumn(_("Nick")).AddColumn(_("Mask"));
 
 		for (botinfo_map::const_iterator it = BotListByNick->begin(), it_end = BotListByNick->end(); it != it_end; ++it)
 		{

@@ -426,7 +426,7 @@ class CommandCSAccess : public Command
 		}
 
 		ListFormatter list(source.GetAccount());
-		list.AddColumn("Number").AddColumn("Level").AddColumn("Mask");
+		list.AddColumn(_("Number")).AddColumn(_("Level")).AddColumn(_("Mask"));
 		this->ProcessList(source, ci, params, list);
 	}
 
@@ -439,7 +439,7 @@ class CommandCSAccess : public Command
 		}
 
 		ListFormatter list(source.GetAccount());
-		list.AddColumn("Number").AddColumn("Level").AddColumn("Mask").AddColumn("By").AddColumn("Last seen");
+		list.AddColumn(_("Number")).AddColumn(_("Level")).AddColumn(_("Mask")).AddColumn(_("By")).AddColumn(_("Last seen"));
 		this->ProcessList(source, ci, params, list);
 	}
 
@@ -661,7 +661,7 @@ class CommandCSLevels : public Command
 		source.Reply(_("Access level settings for channel %s:"), ci->name.c_str());
 
 		ListFormatter list(source.GetAccount());
-		list.AddColumn("Name").AddColumn("Level");
+		list.AddColumn(_("Name")).AddColumn(_("Level"));
 
 		const std::vector<Privilege> &privs = PrivilegeManager::GetPrivileges();
 
@@ -674,9 +674,9 @@ class CommandCSLevels : public Command
 			entry["Name"] = p.name;
 
 			if (j == ACCESS_INVALID)
-				entry["Level"] = "(disabled)";
+				entry["Level"] = Language::Translate(source.GetAccount(), _("(disabled)"));
 			else if (j == ACCESS_FOUNDER)
-				entry["Level"] = "(founder only)";
+				entry["Level"] = Language::Translate(source.GetAccount(), _("(founder only)"));
 			else
 				entry["Level"] = stringify(j);
 
@@ -755,7 +755,7 @@ class CommandCSLevels : public Command
 			source.Reply(_("The following feature/function names are available:"));
 
 			ListFormatter list(source.GetAccount());
-			list.AddColumn("Name").AddColumn("Description");
+			list.AddColumn(_("Name")).AddColumn(_("Description"));
 
 			const std::vector<Privilege> &privs = PrivilegeManager::GetPrivileges();
 			for (unsigned i = 0; i < privs.size(); ++i)

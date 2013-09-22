@@ -77,10 +77,10 @@ class CommandNSInfo : public Command
 					info[_("Last seen address")] = na->last_realhost;
 			}
 
-			info[_("Time registered")] = Anope::strftime(na->time_registered);
+			info[_("Registered")] = Anope::strftime(na->time_registered, source.GetAccount());
 
 			if (!nick_online)
-				info[_("Last seen")] = Anope::strftime(na->last_seen);
+				info[_("Last seen")] = Anope::strftime(na->last_seen, source.GetAccount());
 
 			if (!na->last_quit.empty() && (show_hidden || !na->nc->HasExt("HIDE_QUIT")))
 				info[_("Last quit message")] = na->last_quit;
@@ -221,7 +221,7 @@ class CommandNSSASetHide : public CommandNSSetHide
  public:
 	CommandNSSASetHide(Module *creator) : CommandNSSetHide(creator, "nickserv/saset/hide", 3)
 	{
-		this->SetSyntax("\037nickname\037 {EMAIL | STATUS | USERMASK | QUIT} {ON | OFF}");
+		this->SetSyntax(_("\037nickname\037 {EMAIL | STATUS | USERMASK | QUIT} {ON | OFF}"));
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override

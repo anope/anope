@@ -103,7 +103,7 @@ class CommandNSSuspend : public Command
 
 		if (na->nc->HasExt("NS_SUSPENDED"))
 		{
-			source.Reply(_("\2%s\2 is already suspended."), na->nc->display.c_str());
+			source.Reply(_("\002%s\002 is already suspended."), na->nc->display.c_str());
 			return;
 		}
 
@@ -217,15 +217,15 @@ class NSSuspend : public Module
 		NSSuspendInfo *s = suspend.Get(na->nc);
 		if (s)
 		{
-			info["Suspended"] = "This nickname is \2suspended\2.";
+			info[_("Suspended")] = _("This nickname is \002suspended\002.");
 			if (!s->by.empty())
-				info["Suspended by"] = s->by;
+				info[_("Suspended by")] = s->by;
 			if (!s->reason.empty())
-				info["Suspend reason"] = s->reason;
+				info[_("Suspend reason")] = s->reason;
 			if (s->when)
-				info["Suspended on"] = Anope::strftime(s->when, source.GetAccount(), true);
+				info[_("Suspended on")] = Anope::strftime(s->when, source.GetAccount(), true);
 			if (s->expires)
-				info["Suspended expires"] = Anope::strftime(s->expires, source.GetAccount(), true);
+				info[_("Suspension expires")] = Anope::strftime(s->expires, source.GetAccount(), true);
 		}
 	}
 

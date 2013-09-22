@@ -129,8 +129,8 @@ class CommandOSStats : public Command
 	{
 		time_t uptime = Anope::CurTime - Anope::StartTime;
 		source.Reply(_("Current users: \002%d\002 (\002%d\002 ops)"), UserListByNick.size(), OperCount);
-		source.Reply(_("Maximum users: \002%d\002 (%s)"), MaxUserCount, Anope::strftime(MaxUserTime).c_str());
-		source.Reply(_("Services up %s."), Anope::Duration(uptime).c_str());
+		source.Reply(_("Maximum users: \002%d\002 (%s)"), MaxUserCount, Anope::strftime(MaxUserTime, source.GetAccount()).c_str());
+		source.Reply(_("Services up %s."), Anope::Duration(uptime, source.GetAccount()).c_str());
 
 		return;
 	}

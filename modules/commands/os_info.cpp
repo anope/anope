@@ -144,7 +144,7 @@ class CommandOSInfo : public Command
 
 			if ((*oi)->size() >= Config->GetModule(this->module)->Get<unsigned>("max", "10"))
 			{
-				source.Reply(_("The oper info list for \2%s\2 is full."), target.c_str());
+				source.Reply(_("The oper info list for \002%s\002 is full."), target.c_str());
 				return;
 			}
 
@@ -154,14 +154,14 @@ class CommandOSInfo : public Command
 
 				if (o->info.equals_ci(info))
 				{
-					source.Reply(_("The oper info already exists on \2%s\2."), target.c_str());
+					source.Reply(_("The oper info already exists on \002%s\002."), target.c_str());
 					return;
 				}
 			}
 
 			(*oi)->push_back(new OperInfo(target, info, source.GetNick(), Anope::CurTime));
 
-			source.Reply(_("Added info to \2%s\2."), target.c_str());
+			source.Reply(_("Added info to \002%s\002."), target.c_str());
 			Log(LOG_ADMIN, source, this) << "to add information to " << target;
 		}
 		else if (cmd.equals_ci("DEL"))
@@ -176,7 +176,7 @@ class CommandOSInfo : public Command
 
 			if (!oi)
 			{
-				source.Reply(_("Oper info list for \2%s\2 is empty."), target.c_str());
+				source.Reply(_("Oper info list for \002%s\002 is empty."), target.c_str());
 				return;
 			}
 
@@ -195,14 +195,14 @@ class CommandOSInfo : public Command
 
 			if (!found)
 			{
-				source.Reply(_("No such info \"%s\" on \2%s\2."), info.c_str(), target.c_str());
+				source.Reply(_("No such info \"%s\" on \002%s\002."), info.c_str(), target.c_str());
 			}
 			else
 			{
 				if ((*oi)->empty())
 					e->Shrink<OperInfos>("operinfo");
 
-				source.Reply(_("Deleted info from \2%s\2."), target.c_str());
+				source.Reply(_("Deleted info from \002%s\002."), target.c_str());
 				Log(LOG_ADMIN, source, this) << "to remove information from " << target;
 			}
 		}
@@ -212,13 +212,13 @@ class CommandOSInfo : public Command
 
 			if (!oi)
 			{
-				source.Reply(_("Oper info list for \2%s\2 is empty."), target.c_str());
+				source.Reply(_("Oper info list for \002%s\002 is empty."), target.c_str());
 				return;
 			}
 
 			e->Shrink<OperInfos>("operinfo");
 
-			source.Reply(_("Cleared info from \2%s\2"), target.c_str());
+			source.Reply(_("Cleared info from \002%s\002."), target.c_str());
 			Log(LOG_ADMIN, source, this) << "to clear information for " << target;
 		}
 		else

@@ -94,7 +94,7 @@ class CommandOSForbid : public Command
 		this->SetDesc(_("Forbid usage of nicknames, channels, and emails"));
 		this->SetSyntax(_("ADD {NICK|CHAN|EMAIL|REGISTER} [+\037expiry\037] \037entry\037\002 \037reason\037"));
 		this->SetSyntax(_("DEL {NICK|CHAN|EMAIL|REGISTER} \037entry\037"));
-		this->SetSyntax(_("LIST (NICK|CHAN|EMAIL|REGISTER)"));
+		this->SetSyntax("LIST (NICK|CHAN|EMAIL|REGISTER)");
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
@@ -171,7 +171,7 @@ class CommandOSForbid : public Command
 				this->fs->AddForbid(d);
 
 			Log(LOG_ADMIN, source, this) << "to add a forbid on " << entry << " of type " << subcommand;
-			source.Reply(_("Added a forbid on %s to expire on %s."), entry.c_str(), d->expires ? Anope::strftime(d->expires).c_str() : "never");
+			source.Reply(_("Added a forbid on %s to expire on %s."), entry.c_str(), d->expires ? Anope::strftime(d->expires, source.GetAccount()).c_str() : "never");
 
 			/* apply forbid */
 			switch (ftype)
@@ -197,7 +197,7 @@ class CommandOSForbid : public Command
 						delete na;
 					}
 
-					source.Reply(_("\2%d\2 nicknames dropped."), na_matches);
+					source.Reply(_("\002%d\002 nicknames dropped."), na_matches);
 					break;
 				}
 				case FT_CHAN:
@@ -259,7 +259,7 @@ class CommandOSForbid : public Command
 						delete ci;
 					}
 
-					source.Reply(_("\2%d\2 channels cleared, and \2%d\2 channels dropped."), chan_matches, ci_matches);
+					source.Reply(_("\002%d\002 channels cleared, and \002%d\002 channels dropped."), chan_matches, ci_matches);
 
 					break;
 				}
@@ -290,7 +290,7 @@ class CommandOSForbid : public Command
 			else
 			{
 				ListFormatter list(source.GetAccount());
-				list.AddColumn("Mask").AddColumn("Type").AddColumn("Reason");
+				list.AddColumn(_("Mask")).AddColumn(_("Type")).AddColumn(_("Reason"));
 
 				for (unsigned i = 0; i < forbids.size(); ++i)
 				{
@@ -312,7 +312,7 @@ class CommandOSForbid : public Command
 					entry["Mask"] = d->mask;
 					entry["Type"] = stype;
 					entry["Creator"] = d->creator;
-					entry["Expires"] = d->expires ? Anope::strftime(d->expires).c_str() : "never";
+					entry["Expires"] = d->expires ? Anope::strftime(d->expires, source.GetAccount()).c_str() : "never";
 					entry["Reason"] = d->reason;
 					list.AddEntry(entry);
 				}

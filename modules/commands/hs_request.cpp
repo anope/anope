@@ -297,7 +297,7 @@ class CommandHSWaiting : public Command
 		unsigned display_counter = 0, listmax = Config->GetModule(this->owner)->Get<unsigned>("listmax");
 		ListFormatter list(source.GetAccount());
 
-		list.AddColumn("Number").AddColumn("Nick").AddColumn("Vhost").AddColumn("Created");
+		list.AddColumn(_("Number")).AddColumn(_("Nick")).AddColumn(_("Vhost")).AddColumn(_("Created"));
 
 		for (nickalias_map::const_iterator it = NickAliasList->begin(), it_end = NickAliasList->end(); it != it_end; ++it)
 		{
@@ -317,7 +317,7 @@ class CommandHSWaiting : public Command
 					entry["Vhost"] = hr->ident + "@" + hr->host;
 				else
 					entry["Vhost"] = hr->host;
-				entry["Created"] = Anope::strftime(hr->time);
+				entry["Created"] = Anope::strftime(hr->time, source.GetAccount());
 				list.AddEntry(entry);
 			}
 			++counter;
@@ -329,7 +329,7 @@ class CommandHSWaiting : public Command
 		for (unsigned i = 0; i < replies.size(); ++i)
 			source.Reply(replies[i]);
 
-		source.Reply(_("Displayed \2%d\2 records (\2%d\2 total)."), display_counter, counter);
+		source.Reply(_("Displayed \002%d\002 records (\002%d\002 total)."), display_counter, counter);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override

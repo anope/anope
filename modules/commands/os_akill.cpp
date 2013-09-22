@@ -328,7 +328,7 @@ class CommandOSAKill : public Command
 		}
 
 		ListFormatter list(source.GetAccount());
-		list.AddColumn("Number").AddColumn("Mask").AddColumn("Reason");
+		list.AddColumn(_("Number")).AddColumn(_("Mask")).AddColumn(_("Reason"));
 
 		this->ProcessList(source, params, list);
 	}
@@ -342,7 +342,7 @@ class CommandOSAKill : public Command
 		}
 
 		ListFormatter list(source.GetAccount());
-		list.AddColumn("Number").AddColumn("Mask").AddColumn("Creator").AddColumn("Created").AddColumn("Expires").AddColumn("Reason");
+		list.AddColumn(_("Number")).AddColumn(_("Mask")).AddColumn(_("Creator")).AddColumn(_("Created")).AddColumn(_("Expires")).AddColumn(_("Reason"));
 
 		this->ProcessList(source, params, list);
 	}
@@ -367,7 +367,7 @@ class CommandOSAKill : public Command
 		this->SetSyntax(_("DEL {\037mask\037 | \037entry-num\037 | \037list\037 | \037id\037}"));
 		this->SetSyntax(_("LIST [\037mask\037 | \037list\037 | \037id\037]"));
 		this->SetSyntax(_("VIEW [\037mask\037 | \037list\037 | \037id\037]"));
-		this->SetSyntax(_("CLEAR"));
+		this->SetSyntax("CLEAR");
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override

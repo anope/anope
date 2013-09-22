@@ -61,7 +61,7 @@ class CommandMSList : public Command
 		{
 			ListFormatter list(source.GetAccount());
 
-			list.AddColumn("Number").AddColumn("Sender").AddColumn("Date/Time");
+			list.AddColumn(_("Number")).AddColumn(_("Sender")).AddColumn(_("Date/Time"));
 
 			if (!param.empty() && isdigit(param[0]))
 			{
@@ -85,7 +85,7 @@ class CommandMSList : public Command
 						ListFormatter::ListEntry entry;
 						entry["Number"] = (m->unread ? "* " : "  ") + stringify(number + 1);
 						entry["Sender"] = m->sender;
-						entry["Date/Time"] = Anope::strftime(m->time);
+						entry["Date/Time"] = Anope::strftime(m->time, source.GetAccount());
 						this->list.AddEntry(entry);
 					}
 				}
@@ -120,7 +120,7 @@ class CommandMSList : public Command
 					ListFormatter::ListEntry entry;
 					entry["Number"] = (m->unread ? "* " : "  ") + stringify(i + 1);
 					entry["Sender"] = m->sender;
-					entry["Date/Time"] = Anope::strftime(m->time);
+					entry["Date/Time"] = Anope::strftime(m->time, source.GetAccount());
 					list.AddEntry(entry);
 				}
 			}

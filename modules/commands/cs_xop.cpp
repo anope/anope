@@ -379,7 +379,7 @@ class CommandCSXOP : public Command
 		}
 
 		ListFormatter list(source.GetAccount());
-		list.AddColumn("Number").AddColumn("Mask");
+		list.AddColumn(_("Number")).AddColumn(_("Mask"));
 
 		if (!nick.empty() && nick.find_first_not_of("1234567890,-") == Anope::string::npos)
 		{
@@ -483,15 +483,15 @@ class CommandCSXOP : public Command
  public:
 	CommandCSXOP(Module *modname) : Command(modname, "chanserv/xop", 2, 4)
 	{
-		this->SetSyntax("\037channel\037 ADD \037mask\037");
-		this->SetSyntax("\037channel\037 DEL {\037mask\037 | \037entry-num\037 | \037list\037}");
-		this->SetSyntax("\037channel\037 LIST [\037mask\037 | \037list\037]");
-		this->SetSyntax("\037channel\037 CLEAR");
+		this->SetSyntax(_("\037channel\037 ADD \037mask\037"));
+		this->SetSyntax(_("\037channel\037 DEL {\037mask\037 | \037entry-num\037 | \037list\037}"));
+		this->SetSyntax(_("\037channel\037 LIST [\037mask\037 | \037list\037]"));
+		this->SetSyntax(_("\037channel\037 CLEAR"));
 	}
 
  	const Anope::string GetDesc(CommandSource &source) const anope_override
 	{
-		return Anope::printf(_("Modify the list of %s users"), source.command.upper().c_str());
+		return Anope::printf(Language::Translate(source.GetAccount(), _("Modify the list of %s users")), source.command.upper().c_str());
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -524,7 +524,7 @@ class CommandCSXOP : public Command
 
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Maintains the \2%s list\2 for a channel. Users who match an access entry\n"
+		source.Reply(_("Maintains the \002%s list\002 for a channel. Users who match an access entry\n"
 				"on the %s list receive the following privileges:\n"
 				" "), cmd.c_str(), cmd.c_str());
 

@@ -77,7 +77,7 @@ class CommandMSIgnore : public Command
 			else
 			{
 				ListFormatter list(source.GetAccount());
-				list.AddColumn("Mask");
+				list.AddColumn(_("Mask"));
 				for (unsigned i = 0; i < mi->ignores.size(); ++i)
 				{
 					ListFormatter::ListEntry entry;

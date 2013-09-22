@@ -184,7 +184,7 @@ class CommandOSSXLineBase : public Command
 	void OnList(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		ListFormatter list(source.GetAccount());
-		list.AddColumn("Number").AddColumn("Mask").AddColumn("Reason");
+		list.AddColumn(_("Number")).AddColumn(_("Mask")).AddColumn(_("Reason"));
 
 		this->ProcessList(source, params, list);
 	}
@@ -192,7 +192,7 @@ class CommandOSSXLineBase : public Command
 	void OnView(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		ListFormatter list(source.GetAccount());
-		list.AddColumn("Number").AddColumn("Mask").AddColumn("By").AddColumn("Created").AddColumn("Expires").AddColumn("Reason");
+		list.AddColumn(_("Number")).AddColumn(_("Mask")).AddColumn(_("By")).AddColumn(_("Created")).AddColumn(_("Expires")).AddColumn(_("Reason"));
 		this->ProcessList(source, params, list);
 	}
 
@@ -213,7 +213,11 @@ class CommandOSSXLineBase : public Command
  public:
 	CommandOSSXLineBase(Module *creator, const Anope::string &cmd) : Command(creator, cmd, 1, 4)
 	{
-		this->SetDesc(Anope::printf(_("Manipulate the %s list"), cmd.c_str()));
+	}
+
+	const Anope::string GetDesc(CommandSource &source) const anope_override
+	{
+		return Anope::printf(Language::Translate(source.GetAccount(), _("Manipulate the %s list")), source.command.upper().c_str());
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
@@ -408,7 +412,7 @@ class CommandOSSNLine : public CommandOSSXLineBase
 		this->SetSyntax(_("DEL {\037mask\037 | \037entry-num\037 | \037list\037 | \037id\037}"));
 		this->SetSyntax(_("LIST [\037mask\037 | \037list\037 | \037id\037]"));
 		this->SetSyntax(_("VIEW [\037mask\037 | \037list\037 | \037id\037]"));
-		this->SetSyntax(_("CLEAR"));
+		this->SetSyntax("CLEAR");
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
@@ -641,7 +645,7 @@ class CommandOSSQLine : public CommandOSSXLineBase
 		this->SetSyntax(_("DEL {\037mask\037 | \037entry-num\037 | \037list\037 | \037id\037}"));
 		this->SetSyntax(_("LIST [\037mask\037 | \037list\037 | \037id\037]"));
 		this->SetSyntax(_("VIEW [\037mask\037 | \037list\037 | \037id\037]"));
-		this->SetSyntax(_("CLEAR"));
+		this->SetSyntax("CLEAR");
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override

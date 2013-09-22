@@ -1184,9 +1184,9 @@ class BSKick : public Module
 			info[_("AMSG kicker")] = disabled;
 
 		if (kd && kd->dontkickops)
-			info.AddOption(_("Ops Protection"));
+			info.AddOption(_("Ops protection"));
 		if (kd && kd->dontkickvoices)
-			info.AddOption(_("Voices Protection"));
+			info.AddOption(_("Voices protection"));
 	}
 
 	void OnPrivmsg(User *u, Channel *c, Anope::string &msg) anope_override

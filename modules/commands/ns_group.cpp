@@ -296,7 +296,7 @@ class CommandNSGList : public Command
 			nc = source.GetAccount();
 
 		ListFormatter list(source.GetAccount());
-		list.AddColumn("Nick").AddColumn("Expires");
+		list.AddColumn(_("Nick")).AddColumn(_("Expires"));
 		time_t nickserv_expire = Config->GetModule("nickserv")->Get<time_t>("expire");
 		for (unsigned i = 0; i < nc->aliases->size(); ++i)
 		{
@@ -304,7 +304,7 @@ class CommandNSGList : public Command
 
 			ListFormatter::ListEntry entry;
 			entry["Nick"] = na2->nick;
-			entry["Expires"] = (na2->HasExt("NS_NO_EXPIRE") || !nickserv_expire || Anope::NoExpire) ? "Does not expire" : ("expires in " + Anope::strftime(na2->last_seen + nickserv_expire));
+			entry["Expires"] = (na2->HasExt("NS_NO_EXPIRE") || !nickserv_expire || Anope::NoExpire) ? "Does not expire" : Anope::strftime(na2->last_seen + nickserv_expire, source.GetAccount());
 			list.AddEntry(entry);
 		}
 
@@ -315,7 +315,7 @@ class CommandNSGList : public Command
 		for (unsigned i = 0; i < replies.size(); ++i)
 			source.Reply(replies[i]);
 
-		source.Reply(_("%d nicknames in the group."), nc->aliases->size());
+		source.Reply(_("%d nickname(s) in the group."), nc->aliases->size());
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override

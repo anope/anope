@@ -182,7 +182,7 @@ class CommandOSSession : public Command
 		else
 		{
 			ListFormatter list(source.GetAccount());
-			list.AddColumn("Session").AddColumn("Host");
+			list.AddColumn(_("Session")).AddColumn(_("Host"));
 
 			for (SessionService::SessionMap::iterator it = session_service->GetSessions().begin(), it_end = session_service->GetSessions().end(); it != it_end; ++it)
 			{
@@ -228,9 +228,9 @@ class CommandOSSession : public Command
 		}
 
 		if (!session)
-			source.Reply(_("\002%s\002 not found on session list, but has a limit of \002%d\002 because it matches entry: \2%s\2."), param.c_str(), limit, entry.c_str());
+			source.Reply(_("\002%s\002 not found on session list, but has a limit of \002%d\002 because it matches entry: \002%s\002."), param.c_str(), limit, entry.c_str());
 		else
-			source.Reply(_("The host \002%s\002 currently has \002%d\002 sessions with a limit of \002%d\002 because it matches entry: \2%s\2."), session->addr.mask().c_str(), session->count, limit, entry.c_str());
+			source.Reply(_("The host \002%s\002 currently has \002%d\002 sessions with a limit of \002%d\002 because it matches entry: \002%s\002."), session->addr.mask().c_str(), session->count, limit, entry.c_str());
 	}
  public:
 	CommandOSSession(Module *creator) : Command(creator, "operserv/session", 2, 2)
@@ -466,9 +466,10 @@ class CommandOSException : public Command
 		{
 			class ExceptionListCallback : public NumberList
 			{
+				CommandSource &source;
 				ListFormatter &list;
 			 public:
-				ExceptionListCallback(ListFormatter &_list, const Anope::string &numlist) : NumberList(numlist, false), list(_list)
+				ExceptionListCallback(CommandSource &_source, ListFormatter &_list, const Anope::string &numlist) : NumberList(numlist, false), source(_source), list(_list)
 				{
 				}
 
@@ -483,13 +484,13 @@ class CommandOSException : public Command
 					entry["Number"] = stringify(Number);
 					entry["Mask"] = e->mask;
 					entry["By"] = e->who;
-					entry["Created"] = Anope::strftime(e->time);
+					entry["Created"] = Anope::strftime(e->time, source.GetAccount());
 					entry["Limit"] = stringify(e->limit);
 					entry["Reason"] = e->reason;
 					this->list.AddEntry(entry);
 				}
 			}
-			nl_list(list, mask);
+			nl_list(source, list, mask);
 			nl_list.Process();
 		}
 		else
@@ -503,7 +504,7 @@ class CommandOSException : public Command
 					entry["Number"] = stringify(i + 1);
 					entry["Mask"] = e->mask;
 					entry["By"] = e->who;
-					entry["Created"] = Anope::strftime(e->time);
+					entry["Created"] = Anope::strftime(e->time, source.GetAccount());
 					entry["Limit"] = stringify(e->limit);
 					entry["Reason"] = e->reason;
 					list.AddEntry(entry);
@@ -528,7 +529,7 @@ class CommandOSException : public Command
 	void DoList(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		ListFormatter list(source.GetAccount());
-		list.AddColumn("Number").AddColumn("Limit").AddColumn("Mask");
+		list.AddColumn(_("Number")).AddColumn(_("Limit")).AddColumn(_("Mask"));
 
 		this->ProcessList(source, params, list);
 	}
@@ -536,7 +537,7 @@ class CommandOSException : public Command
 	void DoView(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		ListFormatter list(source.GetAccount());
-		list.AddColumn("Number").AddColumn("Mask").AddColumn("By").AddColumn("Created").AddColumn("Limit").AddColumn("Reason");
+		list.AddColumn(_("Number")).AddColumn(_("Mask")).AddColumn(_("By")).AddColumn(_("Created")).AddColumn(_("Limit")).AddColumn(_("Reason"));
 
 		this->ProcessList(source, params, list);
 	}
@@ -546,7 +547,7 @@ class CommandOSException : public Command
 	{
 		this->SetDesc(_("Modify the session-limit exception list"));
 		this->SetSyntax(_("ADD [\037+expiry\037] \037mask\037 \037limit\037 \037reason\037"));
-		this->SetSyntax(_("DEL {\037mask\037 | \037list\037}"));
+		this->SetSyntax(_("DEL {\037mask\037 | \037entry-num\037 | \037list\037}"));
 		this->SetSyntax(_("MOVE \037num\037 \037position\037"));
 		this->SetSyntax(_("LIST [\037mask\037 | \037list\037]"));
 		this->SetSyntax(_("VIEW [\037mask\037 | \037list\037]"));

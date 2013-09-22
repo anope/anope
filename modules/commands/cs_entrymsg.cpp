@@ -110,7 +110,7 @@ class CommandEntryMessage : public Command
 		source.Reply(_("Entry message list for \002%s\002:"), ci->name.c_str());
 
 		ListFormatter list(source.GetAccount());
-		list.AddColumn("Number").AddColumn("Creator").AddColumn("Created").AddColumn("Message");
+		list.AddColumn(_("Number")).AddColumn(_("Creator")).AddColumn(_("Created")).AddColumn(_("Message"));
 		for (unsigned i = 0; i < (*messages)->size(); ++i)
 		{
 			EntryMsg *msg = (*messages)->at(i);
@@ -118,7 +118,7 @@ class CommandEntryMessage : public Command
 			ListFormatter::ListEntry entry;
 			entry["Number"] = stringify(i + 1);
 			entry["Creator"] = msg->creator;
-			entry["Created"] = Anope::strftime(msg->when);
+			entry["Created"] = Anope::strftime(msg->when, source.GetAccount());
 			entry["Message"] = msg->message;
 			list.AddEntry(entry);
 		}

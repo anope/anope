@@ -45,7 +45,7 @@ class CommandNSAList : public Command
 		ListFormatter list(source.GetAccount());
 		int chan_count = 0;
 
-		list.AddColumn("Number").AddColumn("Channel").AddColumn("Access");
+		list.AddColumn(_("Number")).AddColumn(_("Channel")).AddColumn(_("Access"));
 
 		source.Reply(_("Channels that \002%s\002 has access on:"), nc->display.c_str());
 
@@ -55,7 +55,7 @@ class CommandNSAList : public Command
 
 		if (queue.empty())
 		{
-			source.Reply(_("\2%s\2 has no access in any channels."), nc->display.c_str());
+			source.Reply(_("\002%s\002 has no access in any channels."), nc->display.c_str());
 			return;
 		}
 
@@ -69,7 +69,7 @@ class CommandNSAList : public Command
 				++chan_count;
 				entry["Number"] = stringify(chan_count);
 				entry["Channel"] = (ci->HasExt("CS_NO_EXPIRE") ? "!" : "") + ci->name;
-				entry["Access"] = "Founder";
+				entry["Access"] = Language::Translate(source.GetAccount(), _("Founder"));
 				list.AddEntry(entry);
 				continue;
 			}
@@ -79,7 +79,7 @@ class CommandNSAList : public Command
 				++chan_count;
 				entry["Number"] = stringify(chan_count);
 				entry["Channel"] = (ci->HasExt("CS_NO_EXPIRE") ? "!" : "") + ci->name;
-				entry["Access"] = "Successor";
+				entry["Access"] = Language::Translate(source.GetAccount(), _("Successor"));
 				list.AddEntry(entry);
 				continue;
 			}

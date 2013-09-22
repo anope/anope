@@ -94,7 +94,7 @@ class CommandCSSuspend : public Command
 
 		if (ci->HasExt("CS_SUSPENDED"))
 		{
-			source.Reply(_("\2%s\2 is already suspended."), ci->name.c_str());
+			source.Reply(_("\002%s\002 is already suspended."), ci->name.c_str());
 			return;
 		}
 
@@ -213,15 +213,15 @@ class CSSuspend : public Module
 		CSSuspendInfo *si = suspend.Get(ci);
 		if (si)
 		{
-			info["Suspended"] = "This channel is \2suspended\2.";
+			info[_("Suspended")] = _("This channel is \002suspended\002.");
 			if (!si->by.empty())
-				info["Suspended by"] = si->by;
+				info[_("Suspended by")] = si->by;
 			if (!si->reason.empty())
-				info["Suspend reason"] = si->reason;
+				info[_("Suspend reason")] = si->reason;
 			if (si->time)
-				info["Suspended on"] = Anope::strftime(si->time, source.GetAccount(), true);
+				info[_("Suspended on")] = Anope::strftime(si->time, source.GetAccount(), true);
 			if (si->expires)
-				info["Suspended expires"] = Anope::strftime(si->expires, source.GetAccount(), true);
+				info[_("Suspension expires")] = Anope::strftime(si->expires, source.GetAccount(), true);
 		}
 	}
 

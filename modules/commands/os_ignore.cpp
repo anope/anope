@@ -177,7 +177,7 @@ class CommandOSIgnore : public Command
 			else
 			{
 				source.Reply(_("\002%s\002 will now be ignored for \002%s\002."), nick.c_str(), Anope::Duration(t, source.GetAccount()).c_str());
-				Log(LOG_ADMIN, source, this) << "to add an ignore on " << nick << " for " << Anope::Duration(t, source.GetAccount());
+				Log(LOG_ADMIN, source, this) << "to add an ignore on " << nick << " for " << Anope::Duration(t);
 			}
 		}
 
@@ -209,7 +209,7 @@ class CommandOSIgnore : public Command
 		else
 		{
 			ListFormatter list(source.GetAccount());
-			list.AddColumn("Mask").AddColumn("Creator").AddColumn("Reason").AddColumn("Expires");
+			list.AddColumn(_("Mask")).AddColumn(_("Creator")).AddColumn(_("Reason")).AddColumn(_("Expires"));
 			for (std::list<IgnoreData>::const_iterator ign = ignores.begin(), ign_end = ignores.end(); ign != ign_end; ++ign)
 			{
 				const IgnoreData &ignore = *ign;
@@ -218,7 +218,7 @@ class CommandOSIgnore : public Command
 				entry["Mask"] = ignore.mask;
 				entry["Creator"] = ignore.creator;
 				entry["Reason"] = ignore.reason;
-				entry["Expires"] = Anope::strftime(ignore.time);
+				entry["Expires"] = Anope::strftime(ignore.time, source.GetAccount());
 				list.AddEntry(entry);
 			}
 
@@ -268,8 +268,8 @@ class CommandOSIgnore : public Command
 		this->SetDesc(_("Modify the Services ignore list"));
 		this->SetSyntax(_("ADD \037time\037 {\037nick\037|\037mask\037} [\037reason\037]"));
 		this->SetSyntax(_("DEL {\037nick\037|\037mask\037}"));
-		this->SetSyntax(_("LIST"));
-		this->SetSyntax(_("CLEAR"));
+		this->SetSyntax("LIST");
+		this->SetSyntax("CLEAR");
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override

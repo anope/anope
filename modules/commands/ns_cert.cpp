@@ -151,7 +151,7 @@ class CommandNSCert : public Command
 		}
 
 		ListFormatter list(source.GetAccount());
-		list.AddColumn("Certificate");
+		list.AddColumn(_("Certificate"));
 
 		for (unsigned i = 0; i < cl->GetCertCount(); ++i)
 		{
@@ -241,7 +241,7 @@ class CommandNSCert : public Command
 		}
 
 		ListFormatter list(source.GetAccount());
-		list.AddColumn("Certificate");
+		list.AddColumn(_("Certificate"));
 
 		for (unsigned i = 0; i < cl->GetCertCount(); ++i)
 		{
@@ -260,9 +260,9 @@ class CommandNSCert : public Command
  public:
 	CommandNSCert(Module *creator) : Command(creator, "nickserv/cert", 1, 2)
 	{
-		this->SetDesc("Modify the nickname client certificate list");
-		this->SetSyntax("ADD \037fingerprint\037");
-		this->SetSyntax("DEL \037fingerprint\037");
+		this->SetDesc(_("Modify the nickname client certificate list"));
+		this->SetSyntax(_("ADD \037fingerprint\037"));
+		this->SetSyntax(_("DEL \037fingerprint\037"));
 		this->SetSyntax("LIST");
 	}
 

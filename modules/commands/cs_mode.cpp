@@ -423,7 +423,7 @@ class CommandCSMode : public Command
 			else
 			{
 				ListFormatter list(source.GetAccount());
-				list.AddColumn("Mode").AddColumn("Param").AddColumn("Creator").AddColumn("Created");
+				list.AddColumn(_("Mode")).AddColumn(_("Param")).AddColumn(_("Creator")).AddColumn(_("Created"));
 
 				for (ModeLocks::ModeList::const_iterator it = mlocks.begin(), it_end = mlocks.end(); it != it_end; ++it)
 				{
@@ -701,8 +701,8 @@ class CommandCSMode : public Command
 			"on a channel.\n"
 			" \n"
 			"The \002%s LOCK\002 command allows you to add, delete, and view mode locks on a channel.\n"
-			"If a mode is locked on or off, services will not allow that mode to be changed. The \2SET\2\n"
-			"command will clear all existing mode locks and set the new one given, while \2ADD\2 and \2DEL\2\n"
+			"If a mode is locked on or off, services will not allow that mode to be changed. The \002SET\002\n"
+			"command will clear all existing mode locks and set the new one given, while \002ADD\002 and \002DEL\002\n"
 			"modify the existing mode lock.\n"
 			"Example:\n"
 			"     \002MODE #channel LOCK ADD +bmnt *!*@*aol*\002\n"
@@ -812,9 +812,9 @@ class CommandCSModes : public Command
 		if (!m.second.empty())
 		{
 			if (m.first)
-				return Anope::printf(_("Gives you or the specified nick %s status on a channel"), m.second.c_str());
+				return Anope::printf(Language::Translate(source.GetAccount(), _("Gives you or the specified nick %s status on a channel")), m.second.c_str());
 			else
-				return Anope::printf(_("Removes %s status from you or the specified nick on a channel"), m.second.c_str());
+				return Anope::printf(Language::Translate(source.GetAccount(), _("Removes %s status from you or the specified nick on a channel")), m.second.c_str());
 		}
 		else
 			return "";

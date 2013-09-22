@@ -39,7 +39,7 @@ class CommandCSDrop : public Command
 
 		if (params.size() < 2 || !chan.equals_ci(params[1]))
 		{
-			source.Reply(_("You must enter the channel name twice as a confirmation that you wish to drop \2%s\2."), chan.c_str());
+			source.Reply(_("You must enter the channel name twice as a confirmation that you wish to drop \002%s\002."), chan.c_str());
 			return;
 		}
 

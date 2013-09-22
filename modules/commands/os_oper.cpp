@@ -70,7 +70,7 @@ class CommandOSOper : public Command
 		this->SetSyntax(_("ADD \037oper\037 \037type\037"));
 		this->SetSyntax(_("DEL \037oper\037"));
 		this->SetSyntax(_("INFO \037type\037"));
-		this->SetSyntax(_("LIST"));
+		this->SetSyntax("LIST");
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override

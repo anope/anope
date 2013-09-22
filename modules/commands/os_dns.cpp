@@ -214,7 +214,7 @@ class CommandOSDNS : public Command
 		}
 
 		ListFormatter lf(source.GetAccount());
-		lf.AddColumn("Server").AddColumn("IP").AddColumn("Limit").AddColumn("State");
+		lf.AddColumn(_("Server")).AddColumn(_("IP")).AddColumn(_("Limit")).AddColumn(_("State"));
 		for (unsigned i = 0; i < dns_servers->size(); ++i)
 		{
 			DNSServer *s = dns_servers->at(i);
@@ -222,7 +222,7 @@ class CommandOSDNS : public Command
 
 			ListFormatter::ListEntry entry;
 			entry["Server"] = s->GetName();
-			entry["Limit"] = s->GetLimit() ? stringify(s->GetLimit()) : "None";
+			entry["Limit"] = s->GetLimit() ? stringify(s->GetLimit()) : Language::Translate(source.GetAccount(), _("None"));
 
 			Anope::string ip_str;
 			for (unsigned j = 0; j < s->GetIPs().size(); ++j)
@@ -233,13 +233,13 @@ class CommandOSDNS : public Command
 			entry["IP"] = ip_str;
 
 			if (!srv)
-				entry["State"] = "Split";
+				entry["State"] = Language::Translate(source.GetAccount(), _("Split"));
 			else if (s->Active())
-				entry["State"] = "Pooled/Active";
+				entry["State"] = Language::Translate(source.GetAccount(), _("Pooled/Active"));
 			else if (s->Pooled())
-				entry["State"] = "Pooled/Not Active";
+				entry["State"] = Language::Translate(source.GetAccount(), _("Pooled/Not Active"));
 			else
-				entry["State"] = "Unpooled";
+				entry["State"] = Language::Translate(source.GetAccount(), _("Unpooled"));
 
 			lf.AddEntry(entry);
 		}
@@ -250,7 +250,7 @@ class CommandOSDNS : public Command
 		if (!zones->empty())
 		{
 			ListFormatter lf2(source.GetAccount());
-			lf2.AddColumn("Zone").AddColumn("Servers");
+			lf2.AddColumn(_("Zone")).AddColumn(_("Servers"));
 
 			for (unsigned i = 0; i < zones->size(); ++i)
 			{

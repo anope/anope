@@ -114,14 +114,14 @@ class NewsBase : public Command
 		else
 		{
 			ListFormatter lflist(source.GetAccount());
-			lflist.AddColumn("Number").AddColumn("Creator").AddColumn("Created").AddColumn("Text");
+			lflist.AddColumn(_("Number")).AddColumn(_("Creator")).AddColumn(_("Created")).AddColumn(_("Text"));
 
 			for (unsigned i = 0, end = list.size(); i < end; ++i)
 			{
 				ListFormatter::ListEntry entry;
 				entry["Number"] = stringify(i + 1);
 				entry["Creator"] = list[i]->who;
-				entry["Created"] = Anope::strftime(list[i]->time);
+				entry["Created"] = Anope::strftime(list[i]->time, source.GetAccount());
 				entry["Text"] = list[i]->text;
 				lflist.AddEntry(entry);
 			}
@@ -235,7 +235,7 @@ class NewsBase : public Command
 	{
 		this->SetSyntax(_("ADD \037text\037"));
 		this->SetSyntax(_("DEL {\037num\037 | ALL}"));
-		this->SetSyntax(_("LIST"));
+		this->SetSyntax("LIST");
 	}
 
 	virtual ~NewsBase()

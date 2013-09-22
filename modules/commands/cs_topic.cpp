@@ -248,16 +248,16 @@ class CSTopic : public Module
 	void OnChanInfo(CommandSource &source, ChannelInfo *ci, InfoFormatter &info, bool show_all) anope_override
 	{
 		if (keeptopic.HasExt(ci))
-			info.AddOption(_("Topic Retention"));
+			info.AddOption(_("Topic retention"));
 		if (topiclock.HasExt(ci))
-			info.AddOption(_("Topic Lock"));
+			info.AddOption(_("Topic lock"));
 
 		ModeLocks *ml = ci->GetExt<ModeLocks>("modelocks");
 		const ModeLock *secret = ml ? ml->GetMLock("SECRET") : NULL;
 		if (!ci->last_topic.empty() && (show_all || ((!secret || secret->set == false) && (!ci->c || !ci->c->HasMode("SECRET")))))
 		{
-			info["Last topic"] = ci->last_topic;
-			info["Topic set by"] = ci->last_topic_setter;
+			info[_("Last topic")] = ci->last_topic;
+			info[_("Topic set by")] = ci->last_topic_setter;
 		}
 	}
 };

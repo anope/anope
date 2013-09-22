@@ -56,7 +56,7 @@ class CommandBSInfo : public Command
 			source.Reply(_("Information for bot \002%s\002:"), bi->nick.c_str());
 			info[_("Mask")] = bi->GetIdent() + "@" + bi->host;
 			info[_("Real name")] = bi->realname;
-			info[_("Created")] = Anope::strftime(bi->created);
+			info[_("Created")] = Anope::strftime(bi->created, source.GetAccount());
 			info[_("Options")] = bi->oper_only ? _("Private") : _("None");
 			info[_("Used on")] = stringify(bi->GetChannelCount()) + " channel(s)";
 

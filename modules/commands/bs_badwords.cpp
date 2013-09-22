@@ -190,7 +190,7 @@ class CommandBSBadwords : public Command
 		ListFormatter list(source.GetAccount());
 		BadWords *bw = ci->GetExt<BadWords>("badwords");
 
-		list.AddColumn("Number").AddColumn("Word").AddColumn("Type");
+		list.AddColumn(_("Number")).AddColumn(_("Word")).AddColumn(_("Type"));
 
 		if (!bw || !bw->GetBadWordCount())
 		{

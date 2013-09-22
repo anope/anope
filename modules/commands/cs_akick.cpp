@@ -257,11 +257,12 @@ class CommandCSAKick : public Command
 		{
 			class AkickListCallback : public NumberList
 			{
+				CommandSource &source;
 				ListFormatter &list;
 				ChannelInfo *ci;
 
 			 public:
-				AkickListCallback(ListFormatter &_list, ChannelInfo *_ci, const Anope::string &numlist) : NumberList(numlist, false), list(_list), ci(_ci)
+				AkickListCallback(CommandSource &_source, ListFormatter &_list, ChannelInfo *_ci, const Anope::string &numlist) : NumberList(numlist, false), source(_source), list(_list), ci(_ci)
 				{
 				}
 
@@ -274,11 +275,11 @@ class CommandCSAKick : public Command
 
 					Anope::string timebuf, lastused;
 					if (akick->addtime)
-						timebuf = Anope::strftime(akick->addtime, NULL, false);
+						timebuf = Anope::strftime(akick->addtime, source.GetAccount(), false);
 					else
 						timebuf = UNKNOWN;
 					if (akick->last_used)
-						lastused = Anope::strftime(akick->last_used, NULL, false);
+						lastused = Anope::strftime(akick->last_used, source.GetAccount(), false);
 					else
 						lastused = UNKNOWN;
 
@@ -295,7 +296,7 @@ class CommandCSAKick : public Command
 					this->list.AddEntry(entry);
 				}
 			}
-			nl_list(list, ci, mask);
+			nl_list(source, list, ci, mask);
 			nl_list.Process();
 		}
 		else
@@ -314,11 +315,11 @@ class CommandCSAKick : public Command
 
 				Anope::string timebuf, lastused;
 				if (akick->addtime)
-					timebuf = Anope::strftime(akick->addtime);
+					timebuf = Anope::strftime(akick->addtime, source.GetAccount());
 				else
 					timebuf = UNKNOWN;
 				if (akick->last_used)
-					lastused = Anope::strftime(akick->last_used);
+					lastused = Anope::strftime(akick->last_used, source.GetAccount());
 				else
 					lastused = UNKNOWN;
 
@@ -361,7 +362,7 @@ class CommandCSAKick : public Command
 		}
 
 		ListFormatter list(source.GetAccount());
-		list.AddColumn("Number").AddColumn("Mask").AddColumn("Reason");
+		list.AddColumn(_("Number")).AddColumn(_("Mask")).AddColumn(_("Reason"));
 		this->ProcessList(source, ci, params, list);
 	}
 
@@ -374,7 +375,7 @@ class CommandCSAKick : public Command
 		}
 
 		ListFormatter list(source.GetAccount());
-		list.AddColumn("Number").AddColumn("Mask").AddColumn("Creator").AddColumn("Created").AddColumn("Last used").AddColumn("Reason");
+		list.AddColumn(_("Number")).AddColumn(_("Mask")).AddColumn(_("Creator")).AddColumn(_("Created")).AddColumn(_("Last used")).AddColumn(_("Reason"));
 		this->ProcessList(source, ci, params, list);
 	}
 

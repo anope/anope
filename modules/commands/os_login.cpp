@@ -58,7 +58,7 @@ class CommandOSLogin : public Command
 
  	const Anope::string GetDesc(CommandSource &source) const anope_override
 	{
-		return Anope::printf(_("Login to %s"), source.service->nick.c_str());
+		return Anope::printf(Language::Translate(source.GetAccount(), _("Login to %s")), source.service->nick.c_str());
 	}
 };
 
@@ -100,7 +100,7 @@ class CommandOSLogout : public Command
 
  	const Anope::string GetDesc(CommandSource &source) const anope_override
 	{
-		return Anope::printf(_("Logout from %s"), source.service->nick.c_str());
+		return Anope::printf(Language::Translate(source.GetAccount(), _("Logout from %s")), source.service->nick.c_str());
 	}
 };
 

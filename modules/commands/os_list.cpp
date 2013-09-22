@@ -39,7 +39,7 @@ class CommandOSChanList : public Command
 		}
 
 		ListFormatter list(source.GetAccount());
-		list.AddColumn("Name").AddColumn("Users").AddColumn("Modes").AddColumn("Topic");
+		list.AddColumn(_("Name")).AddColumn(_("Users")).AddColumn(_("Modes")).AddColumn(_("Topic"));
 
 		if (!pattern.empty() && (u2 = User::Find(pattern, true)))
 		{
@@ -144,7 +144,7 @@ class CommandOSUserList : public Command
 			modes.insert("INVIS");
 
 		ListFormatter list(source.GetAccount());
-		list.AddColumn("Name").AddColumn("Mask");
+		list.AddColumn(_("Name")).AddColumn(_("Mask"));
 
 		if (!pattern.empty() && (c = Channel::Find(pattern)))
 		{

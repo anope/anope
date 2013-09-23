@@ -80,7 +80,7 @@ class CommandMSList : public Command
 						if (!number || number > mi->memos->size())
 							return;
 
-						const Memo *m = mi->GetMemo(number);
+						const Memo *m = mi->GetMemo(number - 1);
 
 						ListFormatter::ListEntry entry;
 						entry["Number"] = (m->unread ? "* " : "  ") + stringify(number + 1);

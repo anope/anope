@@ -160,7 +160,7 @@ class CommandNSRegister : public Command
 			return;
 		}
 
-		if (Config->GetBlock("nickserv")->Get<bool>("restrictopernicks"))
+		if (Config->GetModule("nickserv")->Get<bool>("restrictopernicks"))
 			for (unsigned i = 0; i < Config->Opers.size(); ++i)
 			{
 				Oper *o = Config->Opers[i];

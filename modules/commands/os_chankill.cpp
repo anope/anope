@@ -62,7 +62,7 @@ class CommandOSChanKill : public Command
 		if (!reason.empty())
 		{
 			Anope::string realreason;
-			if (Config->GetBlock("operserv")->Get<bool>("addakiller") && !source.GetNick().empty())
+			if (Config->GetModule("operserv")->Get<bool>("addakiller") && !source.GetNick().empty())
 				realreason = "[" + source.GetNick() + "] " + reason;
 			else
 				realreason = reason;

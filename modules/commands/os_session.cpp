@@ -484,7 +484,8 @@ class CommandOSException : public Command
 					entry["Number"] = stringify(Number);
 					entry["Mask"] = e->mask;
 					entry["By"] = e->who;
-					entry["Created"] = Anope::strftime(e->time, source.GetAccount());
+					entry["Created"] = Anope::strftime(e->time, NULL, true);
+					entry["Expires"] = Anope::Expires(e->expires, source.GetAccount());
 					entry["Limit"] = stringify(e->limit);
 					entry["Reason"] = e->reason;
 					this->list.AddEntry(entry);
@@ -504,7 +505,8 @@ class CommandOSException : public Command
 					entry["Number"] = stringify(i + 1);
 					entry["Mask"] = e->mask;
 					entry["By"] = e->who;
-					entry["Created"] = Anope::strftime(e->time, source.GetAccount());
+					entry["Created"] = Anope::strftime(e->time, NULL, true);
+					entry["Expires"] = Anope::Expires(e->expires, source.GetAccount());
 					entry["Limit"] = stringify(e->limit);
 					entry["Reason"] = e->reason;
 					list.AddEntry(entry);
@@ -537,7 +539,7 @@ class CommandOSException : public Command
 	void DoView(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		ListFormatter list(source.GetAccount());
-		list.AddColumn(_("Number")).AddColumn(_("Mask")).AddColumn(_("By")).AddColumn(_("Created")).AddColumn(_("Limit")).AddColumn(_("Reason"));
+		list.AddColumn(_("Number")).AddColumn(_("Mask")).AddColumn(_("By")).AddColumn(_("Created")).AddColumn(_("Expires")).AddColumn(_("Limit")).AddColumn(_("Reason"));
 
 		this->ProcessList(source, params, list);
 	}
@@ -595,9 +597,12 @@ class CommandOSException : public Command
 				"may carry at a time. A value of zero means the host has an\n"
 				"unlimited session limit. See the \002AKILL\002 help for details about\n"
 				"the format of the optional \037expiry\037 parameter.\n"
+				" \n"
 				"\002EXCEPTION DEL\002 removes the given mask from the exception list.\n"
+				" \n"
 				"\002EXCEPTION MOVE\002 moves exception \037num\037 to \037position\037. The\n"
 				"sessions inbetween will be shifted up or down to fill the gap.\n"
+				" \n"
 				"\002EXCEPTION LIST\002 and \002EXCEPTION VIEW\002 show all current\n"
 				"sessions if the optional mask is given, the list is limited\n"
 				"to those sessions matching the mask. The difference is that\n"

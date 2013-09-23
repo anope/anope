@@ -162,7 +162,7 @@ class CommandOSAKill : public Command
 			reason = "[" + source.GetNick() + "] " + reason;
 
 		XLine *x = new XLine(mask, source.GetNick(), expires, reason);
-		if (Config->GetBlock("operserv")->Get<bool>("akilids"))
+		if (Config->GetModule("operserv")->Get<bool>("akillids"))
 			x->id = XLineManager::GenerateUID();
 
 		unsigned int affected = 0;

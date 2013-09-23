@@ -100,12 +100,11 @@ class CommandMSDel : public Command
 			else
 			{
 				/* Delete all memos. */
-				for (unsigned i = 0, end = mi->memos->size(); i < end; ++i)
+				for (unsigned i = mi->memos->size(); i > 0; --i)
 				{
 					FOREACH_MOD(OnMemoDel, (ci ? ci->name : source.nc->display, mi, mi->GetMemo(i)));
-					delete mi->GetMemo(i);
+					mi->Del(i - 1);
 				}
-				mi->memos->clear();
 				if (!chan.empty())
 					source.Reply(_("All memos for channel %s have been deleted."), chan.c_str());
 				else

@@ -83,7 +83,7 @@ class CommandMSList : public Command
 						const Memo *m = mi->GetMemo(number - 1);
 
 						ListFormatter::ListEntry entry;
-						entry["Number"] = (m->unread ? "* " : "  ") + stringify(number + 1);
+						entry["Number"] = (m->unread ? "* " : "  ") + stringify(number);
 						entry["Sender"] = m->sender;
 						entry["Date/Time"] = Anope::strftime(m->time, source.GetAccount());
 						this->list.AddEntry(entry);

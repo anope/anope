@@ -118,7 +118,7 @@ class CommandEntryMessage : public Command
 			ListFormatter::ListEntry entry;
 			entry["Number"] = stringify(i + 1);
 			entry["Creator"] = msg->creator;
-			entry["Created"] = Anope::strftime(msg->when, source.GetAccount());
+			entry["Created"] = Anope::strftime(msg->when, NULL, true);
 			entry["Message"] = msg->message;
 			list.AddEntry(entry);
 		}

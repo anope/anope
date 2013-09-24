@@ -78,7 +78,7 @@ class CommandHSList : public Command
 					else
 						entry["Vhost"] = na->GetVhostHost();
 					entry["Creator"] = na->GetVhostCreator();
-					entry["Created"] = Anope::strftime(na->GetVhostCreated(), source.GetAccount());
+					entry["Created"] = Anope::strftime(na->GetVhostCreated(), NULL, true);
 					list.AddEntry(entry);
 				}
 			}
@@ -99,7 +99,7 @@ class CommandHSList : public Command
 					else
 						entry["Vhost"] = na->GetVhostHost();
 					entry["Creator"] = na->GetVhostCreator();
-					entry["Created"] = Anope::strftime(na->GetVhostCreated(), source.GetAccount());
+					entry["Created"] = Anope::strftime(na->GetVhostCreated(), NULL, true);
 					list.AddEntry(entry);
 				}
 			}

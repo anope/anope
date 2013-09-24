@@ -254,9 +254,10 @@ class CommandOSAKill : public Command
 		{
 			class ListCallback : public NumberList
 			{
+				CommandSource &source;
 				ListFormatter &list;
 			 public:
-				ListCallback(ListFormatter &_list, const Anope::string &numstr) : NumberList(numstr, false), list(_list)
+				ListCallback(CommandSource &_source, ListFormatter &_list, const Anope::string &numstr) : NumberList(numstr, false), source(_source), list(_list)
 				{
 				}
 
@@ -275,12 +276,12 @@ class CommandOSAKill : public Command
 					entry["Mask"] = x->mask;
 					entry["Creator"] = x->by;
 					entry["Created"] = Anope::strftime(x->created, NULL, true);
-					entry["Expires"] = Anope::Expires(x->expires);
+					entry["Expires"] = Anope::Expires(x->expires, source.nc);
 					entry["Reason"] = x->reason;
 					this->list.AddEntry(entry);
 				}
 			}
-			nl_list(list, mask);
+			nl_list(source, list, mask);
 			nl_list.Process();
 		}
 		else

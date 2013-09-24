@@ -218,7 +218,7 @@ class CommandOSIgnore : public Command
 				entry["Mask"] = ignore.mask;
 				entry["Creator"] = ignore.creator;
 				entry["Reason"] = ignore.reason;
-				entry["Expires"] = Anope::strftime(ignore.time, source.GetAccount());
+				entry["Expires"] = Anope::Expires(ignore.time, source.GetAccount());
 				list.AddEntry(entry);
 			}
 
@@ -266,7 +266,7 @@ class CommandOSIgnore : public Command
 	CommandOSIgnore(Module *creator) : Command(creator, "operserv/ignore", 1, 4)
 	{
 		this->SetDesc(_("Modify the Services ignore list"));
-		this->SetSyntax(_("ADD \037time\037 {\037nick\037|\037mask\037} [\037reason\037]"));
+		this->SetSyntax(_("ADD \037expiry\037 {\037nick\037|\037mask\037} [\037reason\037]"));
 		this->SetSyntax(_("DEL {\037nick\037|\037mask\037}"));
 		this->SetSyntax("LIST");
 		this->SetSyntax("CLEAR");

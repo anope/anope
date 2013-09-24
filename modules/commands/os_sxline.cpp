@@ -118,9 +118,10 @@ class CommandOSSXLineBase : public Command
 			class SXLineListCallback : public NumberList
 			{
 				XLineManager *xlm;
+				CommandSource &source;
 				ListFormatter &list;
 			 public:
-				SXLineListCallback(XLineManager *x, ListFormatter &_list, const Anope::string &numlist) : NumberList(numlist, false), xlm(x), list(_list)
+				SXLineListCallback(XLineManager *x, CommandSource &_source, ListFormatter &_list, const Anope::string &numlist) : NumberList(numlist, false), xlm(x), source(_source), list(_list)
 				{
 				}
 
@@ -139,12 +140,12 @@ class CommandOSSXLineBase : public Command
 					entry["Mask"] = x->mask;
 					entry["By"] = x->by;
 					entry["Created"] = Anope::strftime(x->created, NULL, true);
-					entry["Expires"] = Anope::Expires(x->expires);
+					entry["Expires"] = Anope::Expires(x->expires, source.nc);
 					entry["Reason"] = x->reason;
 					list.AddEntry(entry);
 				}
 			}
-			sl_list(this->xlm(), list, mask);
+			sl_list(this->xlm(), source, list, mask);
 			sl_list.Process();
 		}
 		else

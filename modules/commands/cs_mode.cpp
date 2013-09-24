@@ -436,7 +436,7 @@ class CommandCSMode : public Command
 					entry["Mode"] = Anope::printf("%c%c", ml->set ? '+' : '-', cm->mchar);
 					entry["Param"] = ml->param;
 					entry["Creator"] = ml->setter;
-					entry["Created"] = Anope::strftime(ml->created, source.nc, false);
+					entry["Created"] = Anope::strftime(ml->created, NULL, true);
 					list.AddEntry(entry);
 				}
 

@@ -92,9 +92,9 @@ class CommandOSForbid : public Command
 	CommandOSForbid(Module *creator) : Command(creator, "operserv/forbid", 1, 5), fs("ForbidService", "forbid")
 	{
 		this->SetDesc(_("Forbid usage of nicknames, channels, and emails"));
-		this->SetSyntax(_("ADD {NICK|CHAN|EMAIL|REGISTER} [+\037expiry\037] \037entry\037\002 \037reason\037"));
+		this->SetSyntax(_("ADD {NICK|CHAN|EMAIL|REGISTER} [+\037expiry\037] \037entry\037 [\037reason\037]"));
 		this->SetSyntax(_("DEL {NICK|CHAN|EMAIL|REGISTER} \037entry\037"));
-		this->SetSyntax("LIST (NICK|CHAN|EMAIL|REGISTER)");
+		this->SetSyntax("LIST [NICK|CHAN|EMAIL|REGISTER]");
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
@@ -275,7 +275,7 @@ class CommandOSForbid : public Command
 			ForbidData *d = this->fs->FindForbid(entry, ftype);
 			if (d != NULL)
 			{
-				Log(LOG_ADMIN, source, this) << "to remove forbid " << d->mask << " of type " << subcommand;
+				Log(LOG_ADMIN, source, this) << "to remove forbid on " << d->mask << " of type " << subcommand;
 				source.Reply(_("%s deleted from the %s forbid list."), d->mask.c_str(), subcommand.c_str());
 				this->fs->RemoveForbid(d);
 			}
@@ -290,7 +290,7 @@ class CommandOSForbid : public Command
 			else
 			{
 				ListFormatter list(source.GetAccount());
-				list.AddColumn(_("Mask")).AddColumn(_("Type")).AddColumn(_("Reason"));
+				list.AddColumn(_("Mask")).AddColumn(_("Type")).AddColumn(_("Creator")).AddColumn(_("Expires")).AddColumn(_("Reason"));
 
 				for (unsigned i = 0; i < forbids.size(); ++i)
 				{
@@ -312,7 +312,7 @@ class CommandOSForbid : public Command
 					entry["Mask"] = d->mask;
 					entry["Type"] = stype;
 					entry["Creator"] = d->creator;
-					entry["Expires"] = d->expires ? Anope::strftime(d->expires, source.GetAccount()).c_str() : "never";
+					entry["Expires"] = d->expires ? Anope::strftime(d->expires, NULL, true).c_str() : Language::Translate(source.GetAccount(), _("Never"));
 					entry["Reason"] = d->reason;
 					list.AddEntry(entry);
 				}
@@ -467,7 +467,7 @@ class OSForbid : public Module
 			d = this->forbidService.FindForbid(params[1], FT_EMAIL);
 			if (d != NULL)
 			{
-				source.Reply("Your email address is not allowed, choose a different one.");
+				source.Reply(_("Your email address is not allowed, choose a different one."));
 				return EVENT_STOP;
 			}
 		}
@@ -476,7 +476,7 @@ class OSForbid : public Module
 			ForbidData *d = this->forbidService.FindForbid(params[0], FT_EMAIL);
 			if (d != NULL)
 			{
-				source.Reply("Your email address is not allowed, choose a different one.");
+				source.Reply(_("Your email address is not allowed, choose a different one."));
 				return EVENT_STOP;
 			}
 		}

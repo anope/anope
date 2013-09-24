@@ -121,7 +121,7 @@ class NewsBase : public Command
 				ListFormatter::ListEntry entry;
 				entry["Number"] = stringify(i + 1);
 				entry["Creator"] = list[i]->who;
-				entry["Created"] = Anope::strftime(list[i]->time, source.GetAccount());
+				entry["Created"] = Anope::strftime(list[i]->time, NULL, true);
 				entry["Text"] = list[i]->text;
 				lflist.AddEntry(entry);
 			}

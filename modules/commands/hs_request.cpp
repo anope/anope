@@ -317,7 +317,7 @@ class CommandHSWaiting : public Command
 					entry["Vhost"] = hr->ident + "@" + hr->host;
 				else
 					entry["Vhost"] = hr->host;
-				entry["Created"] = Anope::strftime(hr->time, source.GetAccount());
+				entry["Created"] = Anope::strftime(hr->time, NULL, true);
 				list.AddEntry(entry);
 			}
 			++counter;

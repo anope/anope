@@ -257,12 +257,11 @@ class CommandCSAKick : public Command
 		{
 			class AkickListCallback : public NumberList
 			{
-				CommandSource &source;
 				ListFormatter &list;
 				ChannelInfo *ci;
 
 			 public:
-				AkickListCallback(CommandSource &_source, ListFormatter &_list, ChannelInfo *_ci, const Anope::string &numlist) : NumberList(numlist, false), source(_source), list(_list), ci(_ci)
+				AkickListCallback(ListFormatter &_list, ChannelInfo *_ci, const Anope::string &numlist) : NumberList(numlist, false), list(_list), ci(_ci)
 				{
 				}
 
@@ -275,11 +274,11 @@ class CommandCSAKick : public Command
 
 					Anope::string timebuf, lastused;
 					if (akick->addtime)
-						timebuf = Anope::strftime(akick->addtime, source.GetAccount(), false);
+						timebuf = Anope::strftime(akick->addtime, NULL, true);
 					else
 						timebuf = UNKNOWN;
 					if (akick->last_used)
-						lastused = Anope::strftime(akick->last_used, source.GetAccount(), false);
+						lastused = Anope::strftime(akick->last_used, NULL, true);
 					else
 						lastused = UNKNOWN;
 
@@ -296,7 +295,7 @@ class CommandCSAKick : public Command
 					this->list.AddEntry(entry);
 				}
 			}
-			nl_list(source, list, ci, mask);
+			nl_list(list, ci, mask);
 			nl_list.Process();
 		}
 		else
@@ -315,11 +314,11 @@ class CommandCSAKick : public Command
 
 				Anope::string timebuf, lastused;
 				if (akick->addtime)
-					timebuf = Anope::strftime(akick->addtime, source.GetAccount());
+					timebuf = Anope::strftime(akick->addtime, NULL, true);
 				else
 					timebuf = UNKNOWN;
 				if (akick->last_used)
-					lastused = Anope::strftime(akick->last_used, source.GetAccount());
+					lastused = Anope::strftime(akick->last_used, NULL, true);
 				else
 					lastused = UNKNOWN;
 

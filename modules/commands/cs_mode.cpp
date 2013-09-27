@@ -671,8 +671,8 @@ class CommandCSMode : public Command
 
 		ChannelInfo *ci = ChannelInfo::Find(params[0]);
 
-		if (!ci || !ci->c)
-			source.Reply(CHAN_X_NOT_IN_USE, params[0].c_str());
+		if (!ci)
+			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
 		else if (subcommand.equals_ci("LOCK") && params.size() > 2)
 		{
 			if (!source.AccessFor(ci).HasPriv("MODE") && !source.HasPriv("chanserv/administration"))
@@ -680,6 +680,8 @@ class CommandCSMode : public Command
 			else
 				this->DoLock(source, ci, params);
 		}
+		else if (!ci->c)
+			source.Reply(CHAN_X_NOT_IN_USE, params[0].c_str());
 		else if (subcommand.equals_ci("SET") && params.size() > 2)
 			this->DoSet(source, ci, params);
 		else if (subcommand.equals_ci("CLEAR"))

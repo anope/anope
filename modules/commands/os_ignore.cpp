@@ -19,33 +19,8 @@ class OSIgnoreService : public IgnoreService
 
 	IgnoreData* AddIgnore(const Anope::string &mask, const Anope::string &creator, const Anope::string &reason, time_t delta = Anope::CurTime) anope_override
 	{
-		/* If it s an existing user, we ignore the hostmask. */
-		Anope::string realmask = mask;
-		size_t user, host;
-
-		User *u = User::Find(mask, true);
-		if (u)
-			realmask = "*!*@" + u->host;
-		/* Determine whether we get a nick or a mask. */
-		else if ((host = mask.find('@')) != Anope::string::npos)
-		{
-			/* Check whether we have a nick too.. */
-			if ((user = mask.find('!')) != Anope::string::npos)
-			{
-				/* this should never happen */
-				if (user > host)
-					return NULL;
-			}
-			else
-				/* We have user@host. Add nick wildcard. */
-				realmask = "*!" + mask;
-		}
-		/* We only got a nick.. */
-		else
-			realmask = mask + "!*@*";
-
 		/* Check if we already got an identical entry. */
-		IgnoreData *ign = this->Find(realmask);
+		IgnoreData *ign = this->Find(mask);
 		if (ign != NULL)
 		{
 			if (!delta)
@@ -58,7 +33,7 @@ class OSIgnoreService : public IgnoreService
 		else
 		{
 			IgnoreData newign;
-			newign.mask = realmask;
+			newign.mask = mask;
 			newign.creator = creator;
 			newign.reason = reason;
 			newign.time = delta ? Anope::CurTime + delta : 0;
@@ -144,6 +119,36 @@ class OSIgnoreService : public IgnoreService
 class CommandOSIgnore : public Command
 {
  private:
+	Anope::string RealMask(const Anope::string &mask)
+	{
+		/* If it s an existing user, we ignore the hostmask. */
+		User *u = User::Find(mask, true);
+		if (u)
+			return "*!*@" + u->host;
+		
+		size_t host = mask.find('@');
+		/* Determine whether we get a nick or a mask. */
+		if (host != Anope::string::npos)
+		{
+			size_t user = mask.find('!');
+			/* Check whether we have a nick too.. */
+			if (user != Anope::string::npos)
+			{
+				if (user > host)
+					/* this should never happen */
+					return "";
+				else
+					return mask;
+			}
+			else
+				/* We have user@host. Add nick wildcard. */
+				return "*!" + mask;
+		}
+
+		/* We only got a nick.. */
+		return mask + "!*@*";
+	}
+
 	void DoAdd(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		if (!ignore_service)
@@ -168,20 +173,25 @@ class CommandOSIgnore : public Command
 				return;
 			}
 
-			ignore_service->AddIgnore(nick, source.GetNick(), reason, t);
+			Anope::string mask = RealMask(nick);
+			if (mask.empty())
+			{
+				source.Reply(BAD_USERHOST_MASK);
+				return;
+			}
+
+			ignore_service->AddIgnore(mask, source.GetNick(), reason, t);
 			if (!t)
 			{
-				source.Reply(_("\002%s\002 will now permanently be ignored."), nick.c_str());
-				Log(LOG_ADMIN, source, this) << "to add a permanent ignore for " << nick;
+				source.Reply(_("\002%s\002 will now permanently be ignored."), mask.c_str());
+				Log(LOG_ADMIN, source, this) << "to add a permanent ignore for " << mask;
 			}
 			else
 			{
-				source.Reply(_("\002%s\002 will now be ignored for \002%s\002."), nick.c_str(), Anope::Duration(t, source.GetAccount()).c_str());
-				Log(LOG_ADMIN, source, this) << "to add an ignore on " << nick << " for " << Anope::Duration(t);
+				source.Reply(_("\002%s\002 will now be ignored for \002%s\002."), mask.c_str(), Anope::Duration(t, source.GetAccount()).c_str());
+				Log(LOG_ADMIN, source, this) << "to add an ignore on " << mask << " for " << Anope::Duration(t);
 			}
 		}
-
-		return;
 	}
 
 	void DoList(CommandSource &source)
@@ -239,16 +249,25 @@ class CommandOSIgnore : public Command
 
 		const Anope::string nick = params.size() > 1 ? params[1] : "";
 		if (nick.empty())
-			this->OnSyntaxError(source, "DEL");
-		else if (ignore_service->DelIgnore(nick))
 		{
-			Log(LOG_ADMIN, source, this) << "to remove an ignore on " << nick;
-			source.Reply(_("\002%s\002 will no longer be ignored."), nick.c_str());
+			this->OnSyntaxError(source, "DEL");
+			return;
+		}
+
+		Anope::string mask = RealMask(nick);
+		if (mask.empty())
+		{
+			source.Reply(BAD_USERHOST_MASK);
+			return;
+		}
+
+		if (ignore_service->DelIgnore(mask))
+		{
+			Log(LOG_ADMIN, source, this) << "to remove an ignore on " << mask;
+			source.Reply(_("\002%s\002 will no longer be ignored."), mask.c_str());
 		}
 		else
-			source.Reply(_("Nick \002%s\002 not found on ignore list."), nick.c_str());
-
-		return;
+			source.Reply(_("Nick \002%s\002 not found on ignore list."), mask.c_str());
 	}
 
 	void DoClear(CommandSource &source)

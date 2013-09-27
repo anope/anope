@@ -292,9 +292,13 @@ class CommandOSForbid : public Command
 				ListFormatter list(source.GetAccount());
 				list.AddColumn(_("Mask")).AddColumn(_("Type")).AddColumn(_("Creator")).AddColumn(_("Expires")).AddColumn(_("Reason"));
 
+				unsigned shown = 0;
 				for (unsigned i = 0; i < forbids.size(); ++i)
 				{
 					ForbidData *d = forbids[i];
+
+					if (ftype != FT_SIZE && ftype != d->type)
+						continue;
 
 					Anope::string stype;
 					if (d->type == FT_NICK)
@@ -315,17 +319,28 @@ class CommandOSForbid : public Command
 					entry["Expires"] = d->expires ? Anope::strftime(d->expires, NULL, true).c_str() : Language::Translate(source.GetAccount(), _("Never"));
 					entry["Reason"] = d->reason;
 					list.AddEntry(entry);
+					++shown;
 				}
 
-				source.Reply(_("Forbid list:"));
+				if (!shown)
+				{
+					source.Reply(_("There are no forbids of type %s."), subcommand.upper().c_str());
+				}
+				else
+				{
+					source.Reply(_("Forbid list:"));
 
-				std::vector<Anope::string> replies;
-				list.Process(replies);
+					std::vector<Anope::string> replies;
+					list.Process(replies);
 
-				for (unsigned i = 0; i < replies.size(); ++i)
-					source.Reply(replies[i]);
+					for (unsigned i = 0; i < replies.size(); ++i)
+						source.Reply(replies[i]);
 
-				source.Reply(_("End of forbid list."));
+					if (shown >= forbids.size())
+						source.Reply(_("End of forbid list."));
+					else
+						source.Reply(_("End of forbid list - %d/%d entries shown."), shown, forbids.size());
+				}
 			}
 		}
 		else

@@ -464,14 +464,13 @@ class TCPSocket : public ListenSocket
 	class Client : public ClientSocket, public Timer, public ReplySocket
 	{
 		Manager *manager;
-		TCPSocket *tcpsock;
  		Packet *packet;
 		unsigned char packet_buffer[524];
 		int length;
 	
 	 public:
 		Client(Manager *m, TCPSocket *l, int fd, const sockaddrs &addr) : Socket(fd, l->IsIPv6()), ClientSocket(l, addr), Timer(5),
-			manager(m), tcpsock(l), packet(NULL), length(0)
+			manager(m), packet(NULL), length(0)
 		{
 			Log(LOG_DEBUG_2) << "Resolver: New client from " << addr.addr();
 		}
@@ -649,7 +648,7 @@ class MyManager : public Manager, public Timer
 {
 	uint32_t serial;
 
-	typedef std::tr1::unordered_map<Question, Query, Question::hash> cache_map;
+	typedef TR1NS::unordered_map<Question, Query, Question::hash> cache_map;
 	cache_map cache;
 
 	TCPSocket *tcpsock;

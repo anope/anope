@@ -202,10 +202,9 @@ class CommandBSBadwords : public Command
 			class BadwordsListCallback : public NumberList
 			{
 				ListFormatter &list;
-				ChannelInfo *ci;
 				BadWords *bw;
 			 public:
-				BadwordsListCallback(ListFormatter &_list, ChannelInfo *_ci, BadWords *_bw, const Anope::string &numlist) : NumberList(numlist, false), list(_list), ci(_ci), bw(_bw)
+				BadwordsListCallback(ListFormatter &_list, BadWords *_bw, const Anope::string &numlist) : NumberList(numlist, false), list(_list), bw(_bw)
 				{
 				}
 
@@ -222,7 +221,7 @@ class CommandBSBadwords : public Command
 					this->list.AddEntry(entry);
 				}
 			}
-			nl_list(list, ci, bw, word);
+			nl_list(list, bw, word);
 			nl_list.Process();
 		}
 		else

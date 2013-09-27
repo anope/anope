@@ -367,7 +367,7 @@ class InspIRCd12Proto : public IRCDProto
 		UplinkSocket::Message(Me) << "ENDBURST";
 	}
 
-	void SendGlobopsInternal(BotInfo *source, const Anope::string &buf)
+	void SendGlobopsInternal(const MessageSource &source, const Anope::string &buf) anope_override
 	{
 		if (Servers::Capab.count("GLOBOPS"))
 			UplinkSocket::Message(source) << "SNONOTICE g :" << buf;

@@ -183,7 +183,7 @@ class CommandOSSeen : public Command
 
 class CommandSeen : public Command
 {
-	void SimpleSeen(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void SimpleSeen(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		if (!source.c || !source.c->ci)
 		{

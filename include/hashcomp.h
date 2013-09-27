@@ -13,10 +13,12 @@
 #include <string>
 #include <locale>
 
-#ifndef _WIN32
-#include <tr1/unordered_map>
-#else
+#if defined _LIBCPP_VERSION || defined _WIN32
 #include <unordered_map>
+#define TR1NS std
+#else
+#include <tr1/unordered_map>
+#define TR1NS std::tr1
 #endif
 
 #include "services.h"

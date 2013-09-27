@@ -312,7 +312,7 @@ namespace Anope
 	{
 		inline size_t operator()(const string &s) const
 		{
-			return std::tr1::hash<std::string>()(s.lower().str());
+			return TR1NS::hash<std::string>()(s.lower().str());
 		}
 	};
 
@@ -320,7 +320,7 @@ namespace Anope
 	{
 		inline size_t operator()(const string &s) const
 		{
-			return std::tr1::hash<std::string>()(s.str());
+			return TR1NS::hash<std::string>()(s.str());
 		}
 	};
 
@@ -334,7 +334,7 @@ namespace Anope
 
 	template<typename T> class map : public std::map<string, T, ci::less> { };
 	template<typename T> class multimap : public std::multimap<string, T, ci::less> { };
-	template<typename T> class hash_map : public std::tr1::unordered_map<string, T, hash_ci, compare> { };
+	template<typename T> class hash_map : public TR1NS::unordered_map<string, T, hash_ci, compare> { };
 
 	static const char *const compiled = __TIME__ " " __DATE__;
 
@@ -716,8 +716,7 @@ template<typename T> inline void convert(const Anope::string &s, T &x, Anope::st
 	leftover.clear();
 	std::istringstream i(s.str());
 	char c;
-	bool res = i >> x;
-	if (!res)
+	if (!(i >> x))
 		throw ConvertException("Convert fail");
 	if (failIfLeftoverChars)
 	{

@@ -65,7 +65,7 @@ class NSGetPass : public Module
 	{
 
 		Anope::string tmp_pass = "plain:tmp";
-		if (Anope::Decrypt(tmp_pass, tmp_pass) == -1)
+		if (!Anope::Decrypt(tmp_pass, tmp_pass))
 			throw ModuleException("Incompatible with the encryption module being used");
 
 	}

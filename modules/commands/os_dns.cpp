@@ -10,7 +10,7 @@
 
 static ServiceReference<DNS::Manager> dnsmanager("DNS::Manager", "dns/manager");
 
-class DNSZone;
+struct DNSZone;
 class DNSServer;
 
 static Serialize::Checker<std::vector<DNSZone *> > zones("DNSZone");

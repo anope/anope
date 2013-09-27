@@ -104,13 +104,13 @@ struct NSCertListImpl : NSCertList
 			if (s->GetSerializableType()->GetName() != "NickCore")
 				return;
 
-			const NickCore *nc = anope_dynamic_static_cast<const NickCore *>(e);
-			NSCertList *certs = this->Get(nc);
-			if (certs == NULL || !certs->GetCertCount())
+			const NickCore *n = anope_dynamic_static_cast<const NickCore *>(e);
+			NSCertList *c = this->Get(n);
+			if (c == NULL || !c->GetCertCount())
 				return;
 
-			for (unsigned i = 0; i < certs->GetCertCount(); ++i)
-				data["cert"] << certs->GetCert(i) << " ";
+			for (unsigned i = 0; i < c->GetCertCount(); ++i)
+				data["cert"] << c->GetCert(i) << " ";
 		}
 
 		void ExtensibleUnserialize(Extensible *e, Serializable *s, Serialize::Data &data) anope_override
@@ -118,15 +118,15 @@ struct NSCertListImpl : NSCertList
 			if (s->GetSerializableType()->GetName() != "NickCore")
 				return;
 
-			NickCore *nc = anope_dynamic_static_cast<NickCore *>(e);
-			NSCertListImpl *certs = this->Require(nc);
+			NickCore *n = anope_dynamic_static_cast<NickCore *>(e);
+			NSCertListImpl *c = this->Require(n);
 
 			Anope::string buf;
 			data["cert"] >> buf;
 			spacesepstream sep(buf);
-			certs->certs.clear();
+			c->certs.clear();
 			while (sep.GetToken(buf))
-				certs->certs.push_back(buf);
+				c->certs.push_back(buf);
 		}
 	};
 };

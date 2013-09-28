@@ -32,7 +32,7 @@ class CommandCSSync : public Command
 			source.Reply(ACCESS_DENIED);
 		else
 		{
-			bool override = !source.AccessFor(ci).HasPriv("ACCESS_CHANGE") && source.HasPriv("chanserv/kick");
+			bool override = !source.AccessFor(ci).HasPriv("ACCESS_CHANGE") && source.HasPriv("chanserv/administration");
 			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci);
 
 			for (Channel::ChanUserList::iterator it = ci->c->users.begin(), it_end = ci->c->users.end(); it != it_end; ++it)

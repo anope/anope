@@ -464,6 +464,7 @@ class CommandCSAKick : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
 	{
+		BotInfo *bi = Config->GetClient("NickServ");
 		this->SendSyntax(source);
 		source.Reply(" ");
 		source.Reply(_("Maintains the \002AutoKick list\002 for a channel.  If a user\n"
@@ -474,12 +475,12 @@ class CommandCSAKick : public Command
 				"The \002AKICK ADD\002 command adds the given nick or usermask\n"
 				"to the AutoKick list.  If a \037reason\037 is given with\n"
 				"the command, that reason will be used when the user is\n"
-				"kicked; if not, the default reason is \"You have been\n"
+				"kicked; if not, the default reason is \"User has been\n"
 				"banned from the channel\".\n"
-				"When akicking a \037registered nick\037 the nickserv account\n"
+				"When akicking a \037registered nick\037 the %s account\n"
 				"will be added to the akick list instead of the mask.\n"
 				"All users within that nickgroup will then be akicked.\n"),
-				source.service->nick.c_str());
+				source.service->nick.c_str(), bi ? bi->nick.c_str() : "NickServ");
 		source.Reply(_(
 				" \n"
 				"The \002AKICK DEL\002 command removes the given nick or mask\n"
@@ -542,9 +543,9 @@ class CSAKick : public Module
 					mask = autokick->mask;
 				reason = autokick->reason;
 				if (reason.empty())
-					reason = Config->GetModule(this)->Get<const Anope::string>("autokickreason");
+					reason = Language::Translate(u, Config->GetModule(this)->Get<const Anope::string>("autokickreason").c_str());
 				if (reason.empty())
-					reason = "User has been banned from the channel";
+					reason = Language::Translate(u, _("User has been banned from the channel"));
 				return EVENT_STOP;
 			}
 		}

@@ -92,7 +92,7 @@ class CommandOSForbid : public Command
 	CommandOSForbid(Module *creator) : Command(creator, "operserv/forbid", 1, 5), fs("ForbidService", "forbid")
 	{
 		this->SetDesc(_("Forbid usage of nicknames, channels, and emails"));
-		this->SetSyntax(_("ADD {NICK|CHAN|EMAIL|REGISTER} [+\037expiry\037] \037entry\037 [\037reason\037]"));
+		this->SetSyntax(_("ADD {NICK|CHAN|EMAIL|REGISTER} [+\037expiry\037] \037entry\037 \037reason\037"));
 		this->SetSyntax(_("DEL {NICK|CHAN|EMAIL|REGISTER} \037entry\037"));
 		this->SetSyntax("LIST [NICK|CHAN|EMAIL|REGISTER]");
 	}
@@ -236,10 +236,7 @@ class CommandOSForbid : public Command
 							if (u->server == Me || u->HasMode("OPER"))
 								continue;
 
-							if (d->reason.empty())
-								reason = Language::Translate(u, _("This channel has been forbidden."));
-							else
-								reason = Anope::printf(Language::Translate(u, _("This channel has been forbidden: %s")), d->reason.c_str());
+							reason = Anope::printf(Language::Translate(u, _("This channel has been forbidden: %s")), d->reason.c_str());
 
 							c->Kick(source.service, u, "%s", reason.c_str());
 						}
@@ -400,10 +397,7 @@ class OSForbid : public Module
 			BotInfo *OperServ = Config->GetClient("OperServ");
 			if (OperServ)
 			{
-				if (d->reason.empty())
-					u->SendMessage(OperServ, _("This nickname has been forbidden."));
-				else
-					u->SendMessage(OperServ, _("This nickname has been forbidden: %s"), d->reason.c_str());
+				u->SendMessage(OperServ, _("This nickname has been forbidden: %s"), d->reason.c_str());
 			}
 			if (nickserv)
 				nickserv->Collide(u, NULL);
@@ -431,10 +425,7 @@ class OSForbid : public Module
 				chanserv->Hold(c);
 			}
 
-			if (d->reason.empty())
-				reason = Language::Translate(u, _("This channel has been forbidden."));
-			else
-				reason = Anope::printf(Language::Translate(u, _("This channel has been forbidden: %s")), d->reason.c_str());
+			reason = Anope::printf(Language::Translate(u, _("This channel has been forbidden: %s")), d->reason.c_str());
 
 			return EVENT_STOP;
 		}

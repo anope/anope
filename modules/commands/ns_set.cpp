@@ -387,17 +387,7 @@ class CommandNSSetEmail : public Command
 {
 	static bool SendConfirmMail(User *u, BotInfo *bi, const Anope::string &new_email)
 	{
-		int chars[] = {
-			' ', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l',
-			'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y',
-			'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L',
-			'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y',
-			'Z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'
-		};
-		int idx, min = 1, max = 62;
-		Anope::string code;
-		for (idx = 0; idx < 9; ++idx)
-			code += chars[1 + static_cast<int>((static_cast<float>(max - min)) * static_cast<uint16_t>(rand()) / 65536.0) + min];
+		Anope::string code = Anope::Random(9);
 	
 		std::pair<Anope::string, Anope::string> *n = u->Account()->Extend<std::pair<Anope::string, Anope::string> >("ns_set_email");
 		n->first = new_email;

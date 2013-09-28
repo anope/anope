@@ -267,7 +267,7 @@ class CommandOSIgnore : public Command
 			source.Reply(_("\002%s\002 will no longer be ignored."), mask.c_str());
 		}
 		else
-			source.Reply(_("Nick \002%s\002 not found on ignore list."), mask.c_str());
+			source.Reply(_("\002%s\002 not found on ignore list."), mask.c_str());
 	}
 
 	void DoClear(CommandSource &source)

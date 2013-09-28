@@ -250,12 +250,12 @@ class ChanServCore : public Module, public ChanServService
 	{
 		if (!params.empty() || source.c || source.service != *ChanServ)
 			return;
-		time_t expire = Config->GetModule(this)->Get<time_t>("expire", "14d");
-		if (expire >= 86400)
+		time_t chanserv_expire = Config->GetModule(this)->Get<time_t>("expire", "14d");
+		if (chanserv_expire >= 86400)
 			source.Reply(_(" \n"
 				"Note that any channel which is not used for %d days\n"
 				"(i.e. which no user on the channel's access list enters\n"
-				"for that period of time) will be automatically dropped."), expire / 86400);
+				"for that period of time) will be automatically dropped."), chanserv_expire / 86400);
 		if (source.IsServicesOper())
 			source.Reply(_(" \n"
 				"Services Operators can also, depending on their access drop\n"

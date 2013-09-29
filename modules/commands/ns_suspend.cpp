@@ -58,7 +58,7 @@ class CommandNSSuspend : public Command
 	CommandNSSuspend(Module *creator) : Command(creator, "nickserv/suspend", 2, 3)
 	{
 		this->SetDesc(_("Suspend a given nick"));
-		this->SetSyntax(_("\037nickname\037 [+\037expiry\037] \037reason\037"));
+		this->SetSyntax(_("\037nickname\037 [+\037expiry\037] [\037reason\037]"));
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
@@ -134,7 +134,7 @@ class CommandNSSuspend : public Command
 			}
 		}
 
-		Log(LOG_ADMIN, source, this) << "for " << nick << " (" << (!reason.empty() ? reason : "No reason") << "), expires in " << (expiry_secs ? Anope::strftime(Anope::CurTime + expiry_secs) : "never");
+		Log(LOG_ADMIN, source, this) << "for " << nick << " (" << (!reason.empty() ? reason : "No reason") << "), expires on " << (expiry_secs ? Anope::strftime(Anope::CurTime + expiry_secs) : "never");
 		source.Reply(_("Nick %s is now suspended."), nick.c_str());
 
 		FOREACH_MOD(OnNickSuspend, (na));

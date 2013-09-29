@@ -134,7 +134,7 @@ struct NSCertListImpl : NSCertList
 class CommandNSCert : public Command
 {
  private:
-	void DoAdd(CommandSource &source, NickCore *nc, const Anope::string &mask)
+	void DoAdd(CommandSource &source, NickCore *nc, const Anope::string &certfp)
 	{
 		NSCertList *cl = nc->Require<NSCertList>("certificates");
 
@@ -144,11 +144,12 @@ class CommandNSCert : public Command
 			return;
 		}
 
-		if (mask.empty())
+		if (certfp.empty())
 		{
 			if (source.GetUser() && !source.GetUser()->fingerprint.empty() && !cl->FindCert(source.GetUser()->fingerprint))
 			{
 				cl->AddCert(source.GetUser()->fingerprint);
+				Log(LOG_COMMAND, source, this) << "to ADD its current certificate fingerprint " << source.GetUser()->fingerprint;
 				source.Reply(_("\002%s\002 added to your certificate list."), source.GetUser()->fingerprint.c_str());
 			}
 			else
@@ -157,25 +158,27 @@ class CommandNSCert : public Command
 			return;
 		}
 
-		if (cl->FindCert(mask))
+		if (cl->FindCert(certfp))
 		{
-			source.Reply(_("Fingerprint \002%s\002 already present on %s's certificate list."), mask.c_str(), nc->display.c_str());
+			source.Reply(_("Fingerprint \002%s\002 already present on %s's certificate list."), certfp.c_str(), nc->display.c_str());
 			return;
 		}
 
-		cl->AddCert(mask);
-		source.Reply(_("\002%s\002 added to %s's certificate list."), mask.c_str(), nc->display.c_str());
+		cl->AddCert(certfp);
+		Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to ADD certificate fingerprint " << certfp << " to " << nc->display;
+		source.Reply(_("\002%s\002 added to %s's certificate list."), certfp.c_str(), nc->display.c_str());
 	}
 
-	void DoDel(CommandSource &source, NickCore *nc, const Anope::string &mask)
+	void DoDel(CommandSource &source, NickCore *nc, const Anope::string &certfp)
 	{
 		NSCertList *cl = nc->Require<NSCertList>("certificates");
 
-		if (mask.empty())
+		if (certfp.empty())
 		{
 			if (source.GetUser() && !source.GetUser()->fingerprint.empty() && cl->FindCert(source.GetUser()->fingerprint))
 			{
 				cl->EraseCert(source.GetUser()->fingerprint);
+				Log(LOG_COMMAND, source, this) << "to DELETE its current certificate fingerprint " << source.GetUser()->fingerprint;
 				source.Reply(_("\002%s\002 deleted from your certificate list."), source.GetUser()->fingerprint.c_str());
 			}
 			else
@@ -184,20 +187,23 @@ class CommandNSCert : public Command
 			return;
 		}
 
-		if (!cl->FindCert(mask))
+		if (!cl->FindCert(certfp))
 		{
-			source.Reply(_("\002%s\002 not found on %s's certificate list."), mask.c_str(), nc->display.c_str());
+			source.Reply(_("\002%s\002 not found on %s's certificate list."), certfp.c_str(), nc->display.c_str());
 			return;
 		}
 
-		source.Reply(_("\002%s\002 deleted from %s's certificate list."), mask.c_str(), nc->display.c_str());
-		cl->EraseCert(mask);
+		cl->EraseCert(certfp);
 		cl->Check();
+		Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to DELETE certificate fingerprint " << certfp << " from " << nc->display;
+		source.Reply(_("\002%s\002 deleted from %s's certificate list."), certfp.c_str(), nc->display.c_str());
 	}
 
 	void DoList(CommandSource &source, const NickCore *nc)
 	{
 		NSCertList *cl = nc->GetExt<NSCertList>("certificates");
+
+		Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to view the certificate fingerprint list for " << nc->display;
 
 		if (!cl || !cl->GetCertCount())
 		{
@@ -225,14 +231,14 @@ class CommandNSCert : public Command
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		const Anope::string &cmd = params[0];
-		Anope::string nick, mask;
+		Anope::string nick, certfp;
 
 		if (cmd.equals_ci("LIST"))
 			nick = params.size() > 1 ? params[1] : "";
 		else
 		{
 			nick = params.size() == 3 ? params[1] : "";
-			mask = params.size() > 1 ? params[params.size() - 1] : "";
+			certfp = params.size() > 1 ? params[params.size() - 1] : "";
 		}
 
 		NickCore *nc;
@@ -267,9 +273,9 @@ class CommandNSCert : public Command
 		else if (Anope::ReadOnly)
 			source.Reply(READ_ONLY_MODE);
 		else if (cmd.equals_ci("ADD"))
-			return this->DoAdd(source, nc, mask);
+			return this->DoAdd(source, nc, certfp);
 		else if (cmd.equals_ci("DEL"))
-			return this->DoDel(source, nc, mask);
+			return this->DoDel(source, nc, certfp);
 		else
 			this->OnSyntaxError(source, "");
 	}

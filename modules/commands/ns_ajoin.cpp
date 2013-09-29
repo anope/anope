@@ -92,6 +92,8 @@ class CommandNSAJoin : public Command
 	{
 		AJoinList *channels = nc->Require<AJoinList>("ajoinlist");
 
+		Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to view the auto join list for " << nc->display;
+
 		if ((*channels)->empty())
 			source.Reply(_("%s's auto join list is empty."), nc->display.c_str());
 		else
@@ -140,6 +142,7 @@ class CommandNSAJoin : public Command
 			entry->channel = chan;
 			entry->key = key;
 			(*channels)->push_back(entry);
+			Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to ADD channel " << chan << " to " << nc->display;
 			source.Reply(_("%s added to %s's auto join list."), chan.c_str(), nc->display.c_str());
 		}
 	}
@@ -158,6 +161,7 @@ class CommandNSAJoin : public Command
 		else
 		{
 			delete (*channels)->at(i);
+			Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to DELETE channel " << chan << " from " << nc->display;
 			source.Reply(_("%s was removed from %s's auto join list."), chan.c_str(), nc->display.c_str());
 		}
 

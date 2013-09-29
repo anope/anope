@@ -46,7 +46,7 @@ class NSGroupRequest : public IdentifyRequest
 		u->Login(target->nc);
 		FOREACH_MOD(OnNickGroup, (u, target));
 
-		Log(LOG_COMMAND, source, cmd) << "makes " << nick << " join group of " << target->nick << " (" << target->nc->display << ") (email: " << (!target->nc->email.empty() ? target->nc->email : "none") << ")";
+		Log(LOG_COMMAND, source, cmd) << "to make " << nick << " join group of " << target->nick << " (" << target->nc->display << ") (email: " << (!target->nc->email.empty() ? target->nc->email : "none") << ")";
 		source.Reply(_("You are now in the group of \002%s\002."), target->nick.c_str());
 
 		u->lastnickreg = Anope::CurTime;
@@ -120,7 +120,7 @@ class CommandNSGroup : public Command
 			source.Reply(_("Please wait %d seconds before using the GROUP command again."), (reg_delay + u->lastnickreg) - Anope::CurTime);
 		else if (target->nc->HasExt("NS_SUSPENDED"))
 		{
-			Log(LOG_COMMAND, source, this) << "tried to use GROUP for SUSPENDED nick " << target->nick;
+			Log(LOG_COMMAND, source, this) << "and tried to group to SUSPENDED nick " << target->nick;
 			source.Reply(NICK_X_SUSPENDED, target->nick.c_str());
 		}
 		else if (na && *target->nc == *na->nc)

@@ -116,7 +116,7 @@ class CommandOSSeen : public Command
 	CommandOSSeen(Module *creator) : Command(creator, "operserv/seen", 1, 2)
 	{
 		this->SetDesc(_("Statistics and maintenance for seen data"));
-		this->SetSyntax(_("STATS"));
+		this->SetSyntax("STATS");
 		this->SetSyntax(_("CLEAR \037time\037"));
 	}
 

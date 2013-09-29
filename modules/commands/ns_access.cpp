@@ -41,6 +41,7 @@ class CommandNSAccess : public Command
 		}
 
 		nc->AddAccess(mask);
+		Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to ADD mask " << mask << " to " << nc->display;
 		source.Reply(_("\002%s\002 added to %s's access list."), mask.c_str(), nc->display.c_str());
 
 		return;
@@ -66,8 +67,9 @@ class CommandNSAccess : public Command
 			return;
 		}
 
-		source.Reply(_("\002%s\002 deleted from %s's access list."), mask.c_str(), nc->display.c_str());
 		nc->EraseAccess(mask);
+		Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to DELETE mask " << mask << " from " << nc->display;
+		source.Reply(_("\002%s\002 deleted from %s's access list."), mask.c_str(), nc->display.c_str());
 
 		return;
 	}
@@ -75,6 +77,8 @@ class CommandNSAccess : public Command
 	void DoList(CommandSource &source, NickCore *nc, const Anope::string &mask)
 	{
 		unsigned i, end;
+
+		Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to view the access list for " << nc->display;
 
 		if (nc->access.empty())
 		{

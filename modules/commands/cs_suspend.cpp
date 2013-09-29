@@ -56,7 +56,7 @@ class CommandCSSuspend : public Command
 	CommandCSSuspend(Module *creator) : Command(creator, "chanserv/suspend", 2, 3)
 	{ 
 		this->SetDesc(_("Prevent a channel from being used preserving channel data and settings"));
-		this->SetSyntax(_("\037channel\037 [+\037expiry\037] \037reason\037"));
+		this->SetSyntax(_("\037channel\037 [+\037expiry\037] [\037reason\037]"));
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
@@ -121,7 +121,7 @@ class CommandCSSuspend : public Command
 				ci->c->Kick(NULL, users[i], "%s", !reason.empty() ? reason.c_str() : Language::Translate(users[i], _("This channel has been suspended.")));
 		}
 
-		Log(LOG_ADMIN, source, this, ci) << (!reason.empty() ? reason : "No reason") << ", expires in " << (expiry_secs ? Anope::strftime(Anope::CurTime + expiry_secs) : "never");
+		Log(LOG_ADMIN, source, this, ci) << " (" << (!reason.empty() ? reason : "No reason") << "), expires on " << (expiry_secs ? Anope::strftime(Anope::CurTime + expiry_secs) : "never");
 		source.Reply(_("Channel \002%s\002 is now suspended."), ci->name.c_str());
 
 		FOREACH_MOD(OnChanSuspend, (ci));

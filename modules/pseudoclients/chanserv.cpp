@@ -438,7 +438,7 @@ class ChanServCore : public Module, public ChanServService
 
 	EventReturn OnChannelModeSet(Channel *c, MessageSource &setter, ChannelMode *mode, const Anope::string &param) anope_override
 	{
-		if (!always_lower && Anope::CurTime == c->creation_time && c->ci && setter.GetUser())
+		if (!always_lower && Anope::CurTime == c->creation_time && c->ci && setter.GetUser() && !setter.GetUser()->server->IsULined())
 		{
 			ChanUserContainer *cu = c->FindUser(setter.GetUser());
 			ChannelMode *cm = ModeManager::FindChannelModeByName("OP");

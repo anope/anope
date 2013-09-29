@@ -60,7 +60,7 @@ bool WebCPanel::ChanServ::Modes::OnRequest(HTTPProvider *server, const Anope::st
 	{
 		/* "NAMEBASE" is a special mode from InspIRCds m_namedmodes, we dont want this here*/
 		if ((*it) && (*it)->type == MODE_LIST && (*it)->name != "NAMEBASE")
-			replacements["LISTMODES"] = (*it)->name;
+			replacements["LISTMODES"] = (*it)->mchar;
 	}
 
 	ChannelMode *cm = ModeManager::FindChannelModeByName(mode);

@@ -199,6 +199,8 @@ void chan_set_modes(const char *source, Channel * chan, int ac, char **av,
         /* Set the resulting mode buffer */
         anope_cmd_mode(whosends(chan->ci), chan->name, merge_args(ac, av));
 
+        chan_set_modes(whosends(chan->ci), chan, ac, av, check);
+
         return;
     }
 

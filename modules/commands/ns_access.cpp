@@ -30,7 +30,7 @@ class CommandNSAccess : public Command
 
 		if (nc->access.size() >= Config->GetModule(this->owner)->Get<unsigned>("accessmax"))
 		{
-			source.Reply(_("Sorry, you can only have %d access entries for a nickname."), Config->GetModule(this->owner)->Get<unsigned>("accessmax"));
+			source.Reply(_("Sorry, the maximum of %d access entries has been reached."), Config->GetModule(this->owner)->Get<unsigned>("accessmax"));
 			return;
 		}
 
@@ -97,9 +97,9 @@ class CommandNSAccess : public Command
 	CommandNSAccess(Module *creator) : Command(creator, "nickserv/access", 1, 3)
 	{
 		this->SetDesc(_("Modify the list of authorized addresses"));
-		this->SetSyntax(_("ADD [\037user\037] \037mask\037"));
-		this->SetSyntax(_("DEL [\037user\037] \037mask\037"));
-		this->SetSyntax(_("LIST [\037user\037]"));
+		this->SetSyntax(_("ADD [\037nickname\037] \037mask\037"));
+		this->SetSyntax(_("DEL [\037nickname\037] \037mask\037"));
+		this->SetSyntax(_("LIST [\037nickname\037]"));
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
@@ -145,14 +145,14 @@ class CommandNSAccess : public Command
 			source.Reply(BAD_USERHOST_MASK);
 			source.Reply(MORE_INFO, Config->StrictPrivmsg.c_str(), source.service->nick.c_str(), source.command.c_str());
 		}
+		else if (cmd.equals_ci("LIST"))
+			return this->DoList(source, nc, mask);
 		else if (nc->HasExt("NS_SUSPENDED"))
 			source.Reply(NICK_X_SUSPENDED, nc->display.c_str());
 		else if (cmd.equals_ci("ADD"))
 			return this->DoAdd(source, nc, mask);
 		else if (cmd.equals_ci("DEL"))
 			return this->DoDel(source, nc, mask);
-		else if (cmd.equals_ci("LIST"))
-			return this->DoList(source, nc, mask);
 		else
 			this->OnSyntaxError(source, "");
 	}

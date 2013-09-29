@@ -127,8 +127,8 @@ class CommandNSAJoin : public Command
 			if ((*channels)->at(i)->channel.equals_ci(chan))
 				break;
 
-		if (*source.nc == nc && (*channels)->size() >= Config->GetModule(this->owner)->Get<unsigned>("ajoinmax"))
-			source.Reply(_("Your auto join list is full."));
+		if ((*channels)->size() >= Config->GetModule(this->owner)->Get<unsigned>("ajoinmax"))
+			source.Reply(_("Sorry, the maximum of %d auto join entries has been reached."), Config->GetModule(this->owner)->Get<unsigned>("ajoinmax"));
 		else if (i != (*channels)->size())
 			source.Reply(_("%s is already on %s's auto join list."), chan.c_str(), nc->display.c_str());
 		else if (IRCD->IsChannelValid(chan) == false)
@@ -140,7 +140,7 @@ class CommandNSAJoin : public Command
 			entry->channel = chan;
 			entry->key = key;
 			(*channels)->push_back(entry);
-			source.Reply(_("Added %s to %s's auto join list."), chan.c_str(), nc->display.c_str());
+			source.Reply(_("%s added to %s's auto join list."), chan.c_str(), nc->display.c_str());
 		}
 	}
 
@@ -166,25 +166,36 @@ class CommandNSAJoin : public Command
 	}
 
  public:
-	CommandNSAJoin(Module *creator) : Command(creator, "nickserv/ajoin", 1, 3)
+	CommandNSAJoin(Module *creator) : Command(creator, "nickserv/ajoin", 1, 4)
 	{
 		this->SetDesc(_("Manage your auto join list"));
-		this->SetSyntax(_("ADD [\037user\037] \037channel\037 [\037key\037]"));
-		this->SetSyntax(_("DEL [\037user\037] \037channel\037"));
-		this->SetSyntax(_("LIST [\037user\037]"));
+		this->SetSyntax(_("ADD [\037nickname\037] \037channel\037 [\037key\037]"));
+		this->SetSyntax(_("DEL [\037nickname\037] \037channel\037"));
+		this->SetSyntax(_("LIST [\037nickname\037]"));
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		NickCore *nc = source.GetAccount();
-		Anope::string param, param2;
+		const Anope::string &cmd = params[0];
+		Anope::string nick, param, param2;
 
-		if (params.size() > 1 && source.IsServicesOper() && IRCD->IsNickValid(params[1]))
+		if (cmd.equals_ci("LIST"))
+			nick = params.size() > 1 ? params[1] : "";
+		else
+			nick = (params.size() > 2 && IRCD->IsChannelValid(params[2])) ? params[1] : "";
+
+		NickCore *nc;
+		if (!nick.empty())
 		{
-			NickAlias *na = NickAlias::Find(params[1]);
-			if (!na)
+			const NickAlias *na = NickAlias::Find(nick);
+			if (na == NULL)
 			{
-				source.Reply(NICK_X_NOT_REGISTERED, params[1].c_str());
+				source.Reply(NICK_X_NOT_REGISTERED, nick.c_str());
+				return;
+			}
+			else if (na->nc != source.GetAccount() && !source.HasCommand("nickserv/ajoin"))
+			{
+				source.Reply(ACCESS_DENIED);
 				return;
 			}
 
@@ -194,20 +205,23 @@ class CommandNSAJoin : public Command
 		}
 		else
 		{
+			nc = source.nc;
 			param = params.size() > 1 ? params[1] : "";
 			param2 = params.size() > 2 ? params[2] : "";
 		}
 
-		if (params[0].equals_ci("LIST"))
-			this->DoList(source, nc);
+		if (cmd.equals_ci("LIST"))
+			return this->DoList(source, nc);
+		else if (nc->HasExt("NS_SUSPENDED"))
+			source.Reply(NICK_X_SUSPENDED, nc->display.c_str());
 		else if (param.empty())
 			this->OnSyntaxError(source, "");
 		else if (Anope::ReadOnly)
 			source.Reply(READ_ONLY_MODE);
-		else if (params[0].equals_ci("ADD"))
-			this->DoAdd(source, nc, param, param2);
-		else if (params[0].equals_ci("DEL"))
-			this->DoDel(source, nc, param);
+		else if (cmd.equals_ci("ADD"))
+			return this->DoAdd(source, nc, param, param2);
+		else if (cmd.equals_ci("DEL"))
+			return this->DoDel(source, nc, param);
 		else
 			this->OnSyntaxError(source, "");
 	}

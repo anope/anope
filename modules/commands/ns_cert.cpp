@@ -134,48 +134,13 @@ struct NSCertListImpl : NSCertList
 class CommandNSCert : public Command
 {
  private:
-	void DoServAdminList(CommandSource &source, const NickCore *nc)
-	{
-		NSCertList *cl = nc->GetExt<NSCertList>("certificates");
-		
-		if (!cl || !cl->GetCertCount())
-		{
-			source.Reply(_("Certificate list for \002%s\002 is empty."), nc->display.c_str());
-			return;
-		}
-
-		if (nc->HasExt("NS_SUSPENDED"))
-		{
-			source.Reply(NICK_X_SUSPENDED, nc->display.c_str());
-			return;
-		}
-
-		ListFormatter list(source.GetAccount());
-		list.AddColumn(_("Certificate"));
-
-		for (unsigned i = 0; i < cl->GetCertCount(); ++i)
-		{
-			const Anope::string &fingerprint = cl->GetCert(i);
-			ListFormatter::ListEntry entry;
-			entry["Certificate"] = fingerprint;
-			list.AddEntry(entry);
-		}
-
-		source.Reply(_("Certificate list for \002%s\002:"), nc->display.c_str());
-
-		std::vector<Anope::string> replies;
-		list.Process(replies);
-		for (unsigned i = 0; i < replies.size(); ++i)
-			source.Reply(replies[i]);
-	}
-
 	void DoAdd(CommandSource &source, NickCore *nc, const Anope::string &mask)
 	{
 		NSCertList *cl = nc->Require<NSCertList>("certificates");
 
 		if (cl->GetCertCount() >= Config->GetModule(this->owner)->Get<unsigned>("accessmax"))
 		{
-			source.Reply(_("Sorry, you can only have %d certificate entries for a nickname."), Config->GetModule(this->owner)->Get<unsigned>("accessmax"));
+			source.Reply(_("Sorry, the maximum of %d certificate entries has been reached."), Config->GetModule(this->owner)->Get<unsigned>("accessmax"));
 			return;
 		}
 
@@ -194,12 +159,12 @@ class CommandNSCert : public Command
 
 		if (cl->FindCert(mask))
 		{
-			source.Reply(_("Fingerprint \002%s\002 already present on your certificate list."), mask.c_str());
+			source.Reply(_("Fingerprint \002%s\002 already present on %s's certificate list."), mask.c_str(), nc->display.c_str());
 			return;
 		}
 
 		cl->AddCert(mask);
-		source.Reply(_("\002%s\002 added to your certificate list."), mask.c_str());
+		source.Reply(_("\002%s\002 added to %s's certificate list."), mask.c_str(), nc->display.c_str());
 	}
 
 	void DoDel(CommandSource &source, NickCore *nc, const Anope::string &mask)
@@ -221,11 +186,11 @@ class CommandNSCert : public Command
 
 		if (!cl->FindCert(mask))
 		{
-			source.Reply(_("\002%s\002 not found on your certificate list."), mask.c_str());
+			source.Reply(_("\002%s\002 not found on %s's certificate list."), mask.c_str(), nc->display.c_str());
 			return;
 		}
 
-		source.Reply(_("\002%s\002 deleted from your certificate list."), mask.c_str());
+		source.Reply(_("\002%s\002 deleted from %s's certificate list."), mask.c_str(), nc->display.c_str());
 		cl->EraseCert(mask);
 		cl->Check();
 	}
@@ -236,51 +201,69 @@ class CommandNSCert : public Command
 
 		if (!cl || !cl->GetCertCount())
 		{
-			source.Reply(_("Your certificate list is empty."));
+			source.Reply(_("%s's certificate list is empty."), nc->display.c_str());
 			return;
 		}
 
-		ListFormatter list(source.GetAccount());
-		list.AddColumn(_("Certificate"));
-
+		source.Reply(_("Certificate list for %s:"), nc->display.c_str());
 		for (unsigned i = 0; i < cl->GetCertCount(); ++i)
 		{
-			ListFormatter::ListEntry entry;
-			entry["Certificate"] = cl->GetCert(i);
-			list.AddEntry(entry);
+			Anope::string fingerprint = cl->GetCert(i);
+			source.Reply("    %s", fingerprint.c_str());
 		}
-
-		source.Reply(_("Certificate list:"));
-		std::vector<Anope::string> replies;
-		list.Process(replies);
-		for (unsigned i = 0; i < replies.size(); ++i)
-			source.Reply(replies[i]);
 	}
 
  public:
-	CommandNSCert(Module *creator) : Command(creator, "nickserv/cert", 1, 2)
+	CommandNSCert(Module *creator) : Command(creator, "nickserv/cert", 1, 3)
 	{
 		this->SetDesc(_("Modify the nickname client certificate list"));
-		this->SetSyntax(_("ADD \037fingerprint\037"));
-		this->SetSyntax(_("DEL \037fingerprint\037"));
-		this->SetSyntax("LIST");
+		this->SetSyntax(_("ADD [\037nickname\037] \037fingerprint\037"));
+		this->SetSyntax(_("DEL [\037nickname\037] \037fingerprint\037"));
+		this->SetSyntax(_("LIST [\037nickname\037]"));
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		const Anope::string &cmd = params[0];
-		const Anope::string &mask = params.size() > 1 ? params[1] : "";
+		Anope::string nick, mask;
 
-		const NickAlias *na;
-		if (cmd.equals_ci("LIST") && source.IsServicesOper() && !mask.empty() && (na = NickAlias::Find(mask)))
-			return this->DoServAdminList(source, na->nc);
+		if (cmd.equals_ci("LIST"))
+			nick = params.size() > 1 ? params[1] : "";
+		else
+		{
+			nick = params.size() == 3 ? params[1] : "";
+			mask = params.size() > 1 ? params[params.size() - 1] : "";
+		}
 
-		NickCore *nc = source.nc;
+		NickCore *nc;
+		if (!nick.empty())
+		{
+			const NickAlias *na = NickAlias::Find(nick);
+			if (na == NULL)
+			{
+				source.Reply(NICK_X_NOT_REGISTERED, nick.c_str());
+				return;
+			}
+			else if (na->nc != source.GetAccount() && !source.HasPriv("nickserv/access"))
+			{
+				source.Reply(ACCESS_DENIED);
+				return;
+			}
+			else if (Config->GetModule("nickserv")->Get<bool>("secureadmins", "yes") && source.GetAccount() != na->nc && na->nc->IsServicesOper() && !cmd.equals_ci("LIST"))
+			{
+				source.Reply(_("You may view but not modify the certificate list of other Services Operators."));
+				return;
+			}
 
-		if (source.nc->HasExt("NS_SUSPENDED"))
-			source.Reply(NICK_X_SUSPENDED, source.nc->display.c_str());
-		else if (cmd.equals_ci("LIST"))
+			nc = na->nc;
+		}
+		else
+			nc = source.nc;
+
+		if (cmd.equals_ci("LIST"))
 			return this->DoList(source, nc);
+		else if (nc->HasExt("NS_SUSPENDED"))
+			source.Reply(NICK_X_SUSPENDED, nc->display.c_str());
 		else if (Anope::ReadOnly)
 			source.Reply(READ_ONLY_MODE);
 		else if (cmd.equals_ci("ADD"))
@@ -288,7 +271,7 @@ class CommandNSCert : public Command
 		else if (cmd.equals_ci("DEL"))
 			return this->DoDel(source, nc, mask);
 		else
-			this->OnSyntaxError(source, cmd);
+			this->OnSyntaxError(source, "");
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
@@ -298,7 +281,8 @@ class CommandNSCert : public Command
 		source.Reply(_("Modifies or displays the certificate list for your nick.\n"
 				"If you connect to IRC and provide a client certificate with a\n"
 				"matching fingerprint in the cert list, your nick will be\n"
-				"automatically identified to services.\n"
+				"automatically identified to services. Services Operators\n"
+				"may provide a nick to modify other users' certificate lists.\n"
 				" \n"));
 		source.Reply(_("Examples:\n"
 				" \n"

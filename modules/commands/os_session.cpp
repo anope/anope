@@ -261,13 +261,16 @@ class CommandOSSession : public Command
 		this->SendSyntax(source);
 		source.Reply(" ");
 		source.Reply(_("Allows Services Operators to view the session list.\n"
+				" \n"
 				"\002SESSION LIST\002 lists hosts with at least \037threshold\037 sessions.\n"
 				"The threshold must be a number greater than 1. This is to\n"
 				"prevent accidental listing of the large number of single\n"
 				"session hosts.\n"
+				" \n"
 				"\002SESSION VIEW\002 displays detailed information about a specific\n"
 				"host - including the current session count and session limit.\n"
 				"The \037host\037 value may not include wildcards.\n"
+				" \n"
 				"See the \002EXCEPTION\002 help for more information about session\n"
 				"limiting and how to set session limits specific to certain\n"
 				"hosts and groups thereof."));

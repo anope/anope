@@ -18,10 +18,11 @@ class ChanServCore : public Module, public ChanServService
 	std::vector<Anope::string> defaults;
 	ExtensibleItem<bool> inhabit;
 	ExtensibleRef<bool> persist;
+	bool always_lower;
 
  public:
 	ChanServCore(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PSEUDOCLIENT | VENDOR),
-		ChanServService(this), inhabit(this, "inhabit"), persist("PERSIST")
+		ChanServService(this), inhabit(this, "inhabit"), persist("PERSIST"), always_lower(false)
 	{
 	}
 
@@ -106,6 +107,8 @@ class ChanServCore : public Module, public ChanServService
 		}
 		else if (defaults[0].equals_ci("none"))
 			defaults.clear();
+
+		always_lower = conf->GetModule(this)->Get<bool>("always_lower_ts");
 	}
 
 	void OnBotDelete(BotInfo *bi) anope_override
@@ -420,6 +423,36 @@ class ChanServCore : public Module, public ChanServService
 		/* Persist may be in def cflags, set it here */
 		else if (persist->Get(ci))
 			ci->c->SetMode(NULL, "PERM");
+	}
+
+	void OnJoinChannel(User *u, Channel *c) anope_override
+	{
+		if (always_lower && c->ci && c->creation_time > c->ci->time_registered)
+		{
+			Log(LOG_DEBUG) << "Changing TS of " << c->name << " from " << c->creation_time << " to " << c->ci->time_registered;
+			c->creation_time = c->ci->time_registered;
+			IRCD->SendChannel(c);
+			c->Reset();
+		}
+	}
+
+	EventReturn OnChannelModeSet(Channel *c, MessageSource &setter, ChannelMode *mode, const Anope::string &param) anope_override
+	{
+		if (!always_lower && Anope::CurTime == c->creation_time && c->ci && setter.GetUser())
+		{
+			ChanUserContainer *cu = c->FindUser(setter.GetUser());
+			ChannelMode *cm = ModeManager::FindChannelModeByName("OP");
+			if (cu && cm && !cu->status.HasMode(cm->mchar))
+			{
+				/* Our -o and their mode change crossing, bounce their mode */
+				c->RemoveMode(c->ci->WhoSends(), mode, param);
+				/* We don't set mlocks until after the join has finished processing, it will stack with this change,
+				 * so there isn't much for the user to remove except -nt etc which is likely locked anyway.
+				 */
+			}
+		}
+
+		return EVENT_CONTINUE;
 	}
 };
 

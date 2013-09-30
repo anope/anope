@@ -197,7 +197,7 @@ class CommandOSForbid : public Command
 						delete na;
 					}
 
-					source.Reply(_("\002%d\002 nicknames dropped."), na_matches);
+					source.Reply(_("\002%d\002 nickname(s) dropped."), na_matches);
 					break;
 				}
 				case FT_CHAN:
@@ -256,7 +256,7 @@ class CommandOSForbid : public Command
 						delete ci;
 					}
 
-					source.Reply(_("\002%d\002 channels cleared, and \002%d\002 channels dropped."), chan_matches, ci_matches);
+					source.Reply(_("\002%d\002 channel(s) cleared, and \002%d\002 channel(s) dropped."), chan_matches, ci_matches);
 
 					break;
 				}
@@ -394,11 +394,11 @@ class OSForbid : public Module
 		ForbidData *d = this->forbidService.FindForbid(u->nick, FT_NICK);
 		if (d != NULL)
 		{
-			BotInfo *OperServ = Config->GetClient("OperServ");
-			if (OperServ)
-			{
-				u->SendMessage(OperServ, _("This nickname has been forbidden: %s"), d->reason.c_str());
-			}
+			BotInfo *bi = Config->GetClient("NickServ");
+			if (!bi)
+				bi = Config->GetClient("OperServ");
+			if (bi)
+				u->SendMessage(bi, _("This nickname has been forbidden: %s"), d->reason.c_str());
 			if (nickserv)
 				nickserv->Collide(u, NULL);
 		}

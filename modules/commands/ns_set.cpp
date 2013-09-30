@@ -261,12 +261,13 @@ class CommandNSSetAutoOp : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &) anope_override
 	{
+		BotInfo *bi = Config->GetClient("ChanServ");
 		this->SendSyntax(source);
 		source.Reply(" ");
 		source.Reply(_("Sets whether you will be given your channel status modes automatically.\n"
-					"Set to \002ON\002 to allow ChanServ to set status modes on you automatically\n"
-					"when entering channels. Note that depending on channel settings some modes\n"
-					"may not get set automatically."));
+				"Set to \002ON\002 to allow %s to set status modes on you automatically\n"
+				"when entering channels. Note that depending on channel settings some modes\n"
+				"may not get set automatically."), bi ? bi->nick.c_str() : "ChanServ");
 		return true;
 	}
 };
@@ -287,13 +288,14 @@ class CommandNSSASetAutoOp : public CommandNSSetAutoOp
 
 	bool OnHelp(CommandSource &source, const Anope::string &) anope_override
 	{
+		BotInfo *bi = Config->GetClient("ChanServ");
 		this->SendSyntax(source);
 		source.Reply(" ");
 		source.Reply(_("Sets whether the given nickname will be given its status modes\n"
-				"in channels automatically. Set to \002ON\002 to allow ChanServ\n"
+				"in channels automatically. Set to \002ON\002 to allow %s\n"
 				"to set status modes on the given nickname automatically when it\n"
 				"is entering channels. Note that depending on channel settings\n"
-				"some modes may not get set automatically."));
+				"some modes may not get set automatically."), bi ? bi->nick.c_str() : "ChanServ");
 		return true;
 	}
 };

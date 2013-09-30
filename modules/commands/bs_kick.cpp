@@ -267,13 +267,14 @@ class CommandBSKickAMSG : public CommandBSKickBase
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
 	{
+		BotInfo *bi = Config->GetClient("BotServ");
 		source.Reply(_("Sets the AMSG kicker on or off. When enabled, the bot will\n"
 				"kick users who send the same message to multiple channels\n"
-				"where BotServ bots are.\n"
+				"where %s bots are.\n"
 				" \n"
 				"\037ttb\037 is the number of times a user can be kicked\n"
 				"before they get banned. Don't give ttb to disable\n"
-				"the ban system once activated."));
+				"the ban system once activated."), bi ? bi->nick.c_str() : "BotServ");
 		return true;
 	}
 };

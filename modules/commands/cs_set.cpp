@@ -573,6 +573,8 @@ class CommandCSSetPersist : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &) anope_override
 	{
+		BotInfo *BotServ = Config->GetClient("BotServ");
+		BotInfo *ChanServ = Config->GetClient("ChanServ");
 		this->SendSyntax(source);
 		source.Reply(" ");
 		source.Reply(_("Enables or disables the persistent channel setting.\n"
@@ -584,8 +586,8 @@ class CommandCSSetPersist : public Command
 				"set persist on, and it can not be unassigned while persist\n"
 				"is on.\n"
 				" \n"
-				"If this network does not have BotServ enabled and does\n"
-				"not have a permanent channel mode, ChanServ will\n"
+				"If this network does not have %s enabled and does\n"
+				"not have a permanent channel mode, %s will\n"
 				"join your channel when you set persist on (and leave when\n"
 				"it has been set off).\n"
 				" \n"
@@ -593,7 +595,8 @@ class CommandCSSetPersist : public Command
 				"and it is set or unset (for any reason, including MODE LOCK),\n"
 				"persist is automatically set and unset for the channel aswell.\n"
 				"Additionally, services will set or unset this mode when you\n"
-				"set persist on or off."));
+				"set persist on or off."), BotServ ? BotServ->nick.c_str() : "BotServ",
+				ChanServ ? ChanServ->nick.c_str() : "ChanServ");
 		return true;
 	}
 };

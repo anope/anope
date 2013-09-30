@@ -39,8 +39,7 @@ class CommandBSInfo : public Command
  public:
 	CommandBSInfo(Module *creator) : Command(creator, "botserv/info", 1, 1)
 	{
-		this->SetDesc(_("Allows you to see BotServ information about a channel or a bot"));
-		this->SetSyntax(_("{\037chan\037|\037nick\037}"));
+		this->SetSyntax(_("{\037channel\037 | \037nickname\037}"));
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
@@ -86,7 +85,7 @@ class CommandBSInfo : public Command
 			}
 
 			source.Reply(CHAN_INFO_HEADER, ci->name.c_str());
-			info[_("Bot nick")] = ci->bi ? ci->bi->nick : "not assigned yet";
+			info[_("Bot nick")] = ci->bi ? ci->bi->nick : _("not assigned yet");
 
 			Anope::string enabled = Language::Translate(source.nc, _("Enabled"));
 			Anope::string disabled = Language::Translate(source.nc, _("Disabled"));
@@ -113,6 +112,11 @@ class CommandBSInfo : public Command
 				"you'll get information about a bot, such as creation\n"
 				"time or number of channels it is on."), source.service->nick.c_str());
 		return true;
+	}
+
+	const Anope::string GetDesc(CommandSource &source) const anope_override
+	{
+		return Anope::printf(Language::Translate(source.GetAccount(), _("Allows you to see %s information about a channel or a bot")), source.service->nick.c_str());
 	}
 };
 

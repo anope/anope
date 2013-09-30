@@ -274,7 +274,7 @@ public:
 				" %s #anope chanserv/access MESSAGE @%\n"
 				" Would message any channel operators whenever someone used the\n"
 				" ACCESS command on ChanServ on the channel."),
-				source.command.c_str(), source.command.c_str());
+				source.command.upper().c_str(), source.command.upper().c_str());
 		return true;
 	}
 };

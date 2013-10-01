@@ -42,8 +42,6 @@ class CommandNSAList : public Command
 			nc = na->nc;
 		}
 
-		Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to view the channel access list for " << nc->display;
-
 		ListFormatter list(source.GetAccount());
 		int chan_count = 0;
 

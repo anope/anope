@@ -180,6 +180,9 @@ class CommandOSIgnore : public Command
 				return;
 			}
 
+			if (Anope::ReadOnly)
+				source.Reply(READ_ONLY_MODE);
+
 			ignore_service->AddIgnore(mask, source.GetNick(), reason, t);
 			if (!t)
 			{
@@ -263,6 +266,9 @@ class CommandOSIgnore : public Command
 
 		if (ignore_service->DelIgnore(mask))
 		{
+			if (Anope::ReadOnly)
+				source.Reply(READ_ONLY_MODE);
+
 			Log(LOG_ADMIN, source, this) << "to remove an ignore on " << mask;
 			source.Reply(_("\002%s\002 will no longer be ignored."), mask.c_str());
 		}
@@ -275,7 +281,11 @@ class CommandOSIgnore : public Command
 		if (!ignore_service)
 			return;
 
+		if (Anope::ReadOnly)
+			source.Reply(READ_ONLY_MODE);
+
 		ignore_service->ClearIgnores();
+		Log(LOG_ADMIN, source, this) << "to CLEAR the list";
 		source.Reply(_("Ignore list has been cleared."));
 
 		return;

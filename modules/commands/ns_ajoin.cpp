@@ -92,8 +92,6 @@ class CommandNSAJoin : public Command
 	{
 		AJoinList *channels = nc->Require<AJoinList>("ajoinlist");
 
-		Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to view the auto join list for " << nc->display;
-
 		if ((*channels)->empty())
 			source.Reply(_("%s's auto join list is empty."), nc->display.c_str());
 		else

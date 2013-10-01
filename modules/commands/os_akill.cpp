@@ -193,7 +193,7 @@ class CommandOSAKill : public Command
 
 		source.Reply(_("\002%s\002 added to the AKILL list."), mask.c_str());
 
-		Log(LOG_ADMIN, source, this) << "on " << mask << " (" << x->reason << ") expires in " << (expires ? Anope::Duration(expires - Anope::CurTime) : "never") << " [affects " << affected << " user(s) (" << percent << "%)]";
+		Log(LOG_ADMIN, source, this) << "on " << mask << " (" << x->reason << "), expires in " << (expires ? Anope::Duration(expires - Anope::CurTime) : "never") << " [affects " << affected << " user(s) (" << percent << "%)]";
 		if (Anope::ReadOnly)
 			source.Reply(READ_ONLY_MODE);
 	}
@@ -233,6 +233,7 @@ class CommandOSAKill : public Command
 			{
 				FOREACH_MOD(OnDelXLine, (source, x, akills));
 
+				Log(LOG_ADMIN, source, this) << "to remove " << x->mask << " from the list";
 				source.Reply(_("\002%s\002 deleted from the AKILL list."), x->mask.c_str());
 				AkillDelCallback::DoDel(source, x);
 			}
@@ -358,7 +359,11 @@ class CommandOSAKill : public Command
 			akills->DelXLine(x);
 		}
 
+		Log(LOG_ADMIN, source, this) << "to CLEAR the list";
 		source.Reply(_("The AKILL list has been cleared."));
+
+		if (Anope::ReadOnly)
+			source.Reply(READ_ONLY_MODE);
 	}
  public:
 	CommandOSAKill(Module *creator) : Command(creator, "operserv/akill", 1, 2)

@@ -289,6 +289,9 @@ class CommandOSDNS : public Command
 			return;
 		}
 
+		if (Anope::ReadOnly)
+			source.Reply(READ_ONLY_MODE);
+
 		Log(LOG_ADMIN, source, this) << "to add zone " << zone;
 
 		new DNSZone(zone);
@@ -305,6 +308,9 @@ class CommandOSDNS : public Command
 			source.Reply(_("Zone %s does not exist."), zone.c_str());
 			return;
 		}
+
+		if (Anope::ReadOnly)
+			source.Reply(READ_ONLY_MODE);
 
 		Log(LOG_ADMIN, source, this) << "to delete zone " << z->name;
 
@@ -344,6 +350,9 @@ class CommandOSDNS : public Command
 					return;
 				}
 
+				if (Anope::ReadOnly)
+					source.Reply(READ_ONLY_MODE);
+
 				z->servers.insert(s->GetName());
 				s->zones.insert(zone);
 
@@ -365,6 +374,9 @@ class CommandOSDNS : public Command
 		s = new DNSServer(params[1]);
 		if (zone.empty())
 		{
+			if (Anope::ReadOnly)
+				source.Reply(READ_ONLY_MODE);
+
 			Log(LOG_ADMIN, source, this) << "to add server " << s->GetName();
 			source.Reply(_("Added server %s."), s->GetName().c_str());
 		}
@@ -377,6 +389,9 @@ class CommandOSDNS : public Command
 				delete s;
 				return;
 			}
+
+			if (Anope::ReadOnly)
+				source.Reply(READ_ONLY_MODE);
 
 			Log(LOG_ADMIN, source, this) << "to add server " << s->GetName() << " to zone " << zone;
 
@@ -409,6 +424,9 @@ class CommandOSDNS : public Command
 				return;
 			}
 
+			if (Anope::ReadOnly)
+				source.Reply(READ_ONLY_MODE);
+
 			Log(LOG_ADMIN, source, this) << "to remove server " << s->GetName() << " from zone " << z->name;
 
 			z->servers.erase(s->GetName());
@@ -427,6 +445,9 @@ class CommandOSDNS : public Command
 			if (z)
 				z->servers.erase(s->GetName());
 		}
+
+		if (Anope::ReadOnly)
+			source.Reply(READ_ONLY_MODE);
 
 		Log(LOG_ADMIN, source, this) << "to delete server " << s->GetName();
 		source.Reply(_("Removed server %s."), s->GetName().c_str());
@@ -457,6 +478,9 @@ class CommandOSDNS : public Command
 			return;
 		}
 
+		if (Anope::ReadOnly)
+			source.Reply(READ_ONLY_MODE);
+
 		s->GetIPs().push_back(params[2]);
 		source.Reply(_("Added IP %s to %s."), params[2].c_str(), s->GetName().c_str());
 		Log(LOG_ADMIN, source, this) << "to add IP " << params[2] << " to " << s->GetName();
@@ -478,6 +502,9 @@ class CommandOSDNS : public Command
 			source.Reply(_("Server %s does not exist."), params[1].c_str());
 			return;
 		}
+
+		if (Anope::ReadOnly)
+			source.Reply(READ_ONLY_MODE);
 
 		for (unsigned i = 0; i < s->GetIPs().size(); ++i)
 			if (params[2].equals_ci(s->GetIPs()[i]))
@@ -514,6 +541,9 @@ class CommandOSDNS : public Command
 			source.Reply(_("Server %s does not exist."), params[1].c_str());
 			return;
 		}
+
+		if (Anope::ReadOnly)
+			source.Reply(READ_ONLY_MODE);
 
 		if (params[2].equals_ci("LIMIT"))
 		{
@@ -560,6 +590,9 @@ class CommandOSDNS : public Command
 			return;
 		}
 
+		if (Anope::ReadOnly)
+			source.Reply(READ_ONLY_MODE);
+
 		s->SetActive(true);
 
 		source.Reply(_("Pooled %s."), s->GetName().c_str());
@@ -581,6 +614,9 @@ class CommandOSDNS : public Command
 			source.Reply(_("Server %s is not pooled."), s->GetName().c_str());
 			return;
 		}
+
+		if (Anope::ReadOnly)
+			source.Reply(READ_ONLY_MODE);
 
 		s->Pool(false);
 

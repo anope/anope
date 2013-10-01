@@ -170,6 +170,12 @@ class CommandCSSetPrivate : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
+		if (Anope::ReadOnly)
+		{
+			source.Reply(READ_ONLY_MODE);
+			return;
+		}
+
 		ChannelInfo *ci = ChannelInfo::Find(params[0]);
 		if (ci == NULL)
 		{

@@ -78,8 +78,6 @@ class CommandNSAccess : public Command
 	{
 		unsigned i, end;
 
-		Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to view the access list for " << nc->display;
-
 		if (nc->access.empty())
 		{
 			source.Reply(_("%s's access list is empty."), nc->display.c_str());

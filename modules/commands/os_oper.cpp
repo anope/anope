@@ -104,6 +104,9 @@ class CommandOSOper : public Command
 
 				na->nc->o = new MyOper(na->nc->display, ot);
 
+				if (Anope::ReadOnly)
+					source.Reply(READ_ONLY_MODE);
+
 				Log(LOG_ADMIN, source, this) << "ADD " << na->nick << " as type " << ot->GetName();
 				source.Reply("%s (%s) added to the \002%s\002 list.", na->nick.c_str(), na->nc->display.c_str(), ot->GetName().c_str());
 			}
@@ -123,6 +126,9 @@ class CommandOSOper : public Command
 			{
 				delete na->nc->o;
 				na->nc->o = NULL;
+
+				if (Anope::ReadOnly)
+					source.Reply(READ_ONLY_MODE);
 
 				Log(LOG_ADMIN, source, this) << "DEL " << na->nick;
 				source.Reply(_("Oper privileges removed from %s (%s)."), na->nick.c_str(), na->nc->display.c_str());

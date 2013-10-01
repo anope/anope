@@ -265,11 +265,11 @@ class CommandOSLogonNews : public NewsBase
 		this->SendSyntax(source);
 		source.Reply(" ");
 		source.Reply(_("Edits or displays the list of logon news messages.  When a\n"
-			"user connects to the network, these messages will be sent\n"
-			"to them.  However, no more than \002%d\002 messages will be\n"
-			"sent in order to avoid flooding the user.  If there are\n"
-			"more news messages, only the most recent will be sent."),
-			Config->GetModule(this->owner)->Get<unsigned>("newscount", "3"));
+				"user connects to the network, these messages will be sent\n"
+				"to them.  However, no more than \002%d\002 messages will be\n"
+				"sent in order to avoid flooding the user.  If there are\n"
+				"more news messages, only the most recent will be sent."),
+				Config->GetModule(this->owner)->Get<unsigned>("newscount", "3"));
 		return true;
 	}
 };

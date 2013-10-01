@@ -203,8 +203,6 @@ class CommandNSCert : public Command
 	{
 		NSCertList *cl = nc->GetExt<NSCertList>("certificates");
 
-		Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to view the certificate fingerprint list for " << nc->display;
-
 		if (!cl || !cl->GetCertCount())
 		{
 			source.Reply(_("%s's certificate list is empty."), nc->display.c_str());

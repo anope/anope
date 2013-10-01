@@ -163,6 +163,9 @@ class CommandOSInfo : public Command
 
 			source.Reply(_("Added info to \002%s\002."), target.c_str());
 			Log(LOG_ADMIN, source, this) << "to add information to " << target;
+
+                	if (Anope::ReadOnly)
+				source.Reply(READ_ONLY_MODE);
 		}
 		else if (cmd.equals_ci("DEL"))
 		{
@@ -204,6 +207,9 @@ class CommandOSInfo : public Command
 
 				source.Reply(_("Deleted info from \002%s\002."), target.c_str());
 				Log(LOG_ADMIN, source, this) << "to remove information from " << target;
+
+	                	if (Anope::ReadOnly)
+					source.Reply(READ_ONLY_MODE);
 			}
 		}
 		else if (cmd.equals_ci("CLEAR"))
@@ -220,6 +226,9 @@ class CommandOSInfo : public Command
 
 			source.Reply(_("Cleared info from \002%s\002."), target.c_str());
 			Log(LOG_ADMIN, source, this) << "to clear information for " << target;
+
+                	if (Anope::ReadOnly)
+				source.Reply(READ_ONLY_MODE);
 		}
 		else
 		{

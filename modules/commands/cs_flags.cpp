@@ -222,7 +222,7 @@ class CommandCSFlags : public Command
 			}
 			else
 			{
-				source.Reply(_("Insufficient flags given."));
+				source.Reply(_("\002%s\002 not found on %s access list."), mask.c_str(), ci->name.c_str());
 			}
 			return;
 		}

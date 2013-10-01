@@ -135,6 +135,12 @@ class CommandNSSetHide : public Command
 
 	void Run(CommandSource &source, const Anope::string &user, const Anope::string &param, const Anope::string &arg)
 	{
+		if (Anope::ReadOnly)
+		{
+			source.Reply(READ_ONLY_MODE);
+			return;
+		}
+
 		const NickAlias *na = NickAlias::Find(user);
 		if (!na)
 		{

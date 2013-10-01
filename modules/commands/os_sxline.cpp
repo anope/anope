@@ -95,6 +95,7 @@ class CommandOSSXLineBase : public Command
 
 			SXLineDelCallback::DoDel(this->xlm(), source, x);
 			source.Reply(_("\002%s\002 deleted from the %s list."), mask.c_str(), source.command.c_str());
+			Log(LOG_ADMIN, source, this) << "to remove " << mask << " from the list";
 		}
 
 		if (Anope::ReadOnly)
@@ -207,7 +208,10 @@ class CommandOSSXLineBase : public Command
 			this->xlm()->DelXLine(x);
 		}
 
+		Log(LOG_ADMIN, source, this) << "to CLEAR the list";
 		source.Reply(_("The %s list has been cleared."), source.command.c_str());
+		if (Anope::ReadOnly)
+			source.Reply(READ_ONLY_MODE);
 
 		return;
 	}
@@ -400,7 +404,7 @@ class CommandOSSNLine : public CommandOSSXLineBase
 		}
 
 		source.Reply(_("\002%s\002 added to the %s list."), mask.c_str(), source.command.c_str());
-		Log(LOG_ADMIN, source, this) << "on " << mask << " (" << reason << ") expires in " << (expires ? Anope::Duration(expires - Anope::CurTime) : "never") << " [affects " << affected << " user(s) (" << percent << "%)]";
+		Log(LOG_ADMIN, source, this) << "on " << mask << " (" << reason << "), expires in " << (expires ? Anope::Duration(expires - Anope::CurTime) : "never") << " [affects " << affected << " user(s) (" << percent << "%)]";
 		if (Anope::ReadOnly)
 			source.Reply(READ_ONLY_MODE);
 	}
@@ -428,15 +432,16 @@ class CommandOSSNLine : public CommandOSSXLineBase
 				"\002SNLINE ADD\002 adds the given realname mask to the SNLINE\n"
 				"list for the given reason (which \002must\002 be given).\n"
 				"\037expiry\037 is specified as an integer followed by one of \037d\037\n"
-				"(days), \037h\037 (hours), or \037m\037 (minutes).  Combinations (such as\n"
-				"\0371h30m\037) are not permitted.  If a unit specifier is not\n"
+				"(days), \037h\037 (hours), or \037m\037 (minutes). Combinations (such as\n"
+				"\0371h30m\037) are not permitted. If a unit specifier is not\n"
 				"included, the default is days (so \037+30\037 by itself means 30\n"
-				"days).  To add an SNLINE which does not expire, use \037+0\037.  If the\n"
+				"days). To add an SNLINE which does not expire, use \037+0\037.  If the\n"
 				"realname mask to be added starts with a \037+\037, an expiry time must\n"
 				"be given, even if it is the same as the default.  The\n"
 				"current SNLINE default expiry time can be found with the\n"
 				"\002STATS AKILL\002 command.\n"
-				"Note: because the realname mask may contain spaces, the\n"
+				" \n"
+				"\002Note\002: because the realname mask may contain spaces, the\n"
 				"separator between it and the reason is a colon."));
 		const Anope::string &regexengine = Config->GetBlock("options")->Get<const Anope::string>("regexengine");
 		if (!regexengine.empty())
@@ -631,9 +636,8 @@ class CommandOSSQLine : public CommandOSSXLineBase
 			this->xlm()->Send(NULL, x);
 		}
 
-		source.Reply(_("\002%s\002 added to the SQLINE list."), mask.c_str());
-		Log(LOG_ADMIN, source, this) << "on " << mask << " (" << reason << ") expires in " << (expires ? Anope::Duration(expires - Anope::CurTime) : "never") << " [affects " << affected << " user(s) (" << percent << "%)]";
-
+		source.Reply(_("\002%s\002 added to the %s list."), mask.c_str(), source.command.c_str());
+		Log(LOG_ADMIN, source, this) << "on " << mask << " (" << reason << "), expires in " << (expires ? Anope::Duration(expires - Anope::CurTime) : "never") << " [affects " << affected << " user(s) (" << percent << "%)]";
 		if (Anope::ReadOnly)
 			source.Reply(READ_ONLY_MODE);
 	}

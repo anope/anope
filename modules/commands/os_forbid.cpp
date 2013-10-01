@@ -170,6 +170,9 @@ class CommandOSForbid : public Command
 			if (created)
 				this->fs->AddForbid(d);
 
+			if (Anope::ReadOnly)
+				source.Reply(READ_ONLY_MODE);
+
 			Log(LOG_ADMIN, source, this) << "to add a forbid on " << entry << " of type " << subcommand;
 			source.Reply(_("Added a forbid on %s to expire on %s."), entry.c_str(), d->expires ? Anope::strftime(d->expires, source.GetAccount()).c_str() : "never");
 
@@ -272,6 +275,9 @@ class CommandOSForbid : public Command
 			ForbidData *d = this->fs->FindForbid(entry, ftype);
 			if (d != NULL)
 			{
+				if (Anope::ReadOnly)
+					source.Reply(READ_ONLY_MODE);
+
 				Log(LOG_ADMIN, source, this) << "to remove forbid on " << d->mask << " of type " << subcommand;
 				source.Reply(_("%s deleted from the %s forbid list."), d->mask.c_str(), subcommand.c_str());
 				this->fs->RemoveForbid(d);

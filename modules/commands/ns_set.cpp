@@ -163,6 +163,12 @@ class CommandNSSASetPassword : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
+		if (Anope::ReadOnly)
+		{
+			source.Reply(READ_ONLY_MODE);
+			return;
+		}
+
 		const NickAlias *setter_na = NickAlias::Find(params[0]);
 		if (setter_na == NULL)
 		{
@@ -1057,6 +1063,12 @@ class CommandNSSASetNoexpire : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
+		if (Anope::ReadOnly)
+		{
+			source.Reply(READ_ONLY_MODE);
+			return;
+		}
+
 		NickAlias *na = NickAlias::Find(params[0]);
 		if (na == NULL)
 		{

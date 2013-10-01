@@ -209,7 +209,7 @@ class CommandEntryMessage : public Command
 			return;
 		}
 
-		if (!source.IsFounder(ci) && !source.HasCommand("chanserv/set"))
+		if (!source.IsFounder(ci) && !source.HasPriv("chanserv/administration"))
 		{
 			source.Reply(ACCESS_DENIED);
 			return;

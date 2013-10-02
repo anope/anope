@@ -35,18 +35,26 @@ class CommandCSSet : public Command
 			" \n"
 			"Available options:"));
 		Anope::string this_name = source.command;
+		bool hide_privileged_commands = Config->GetBlock("options")->Get<bool>("hideprivilegedcommands");
 		for (CommandInfo::map::const_iterator it = source.service->commands.begin(), it_end = source.service->commands.end(); it != it_end; ++it)
 		{
 			const Anope::string &c_name = it->first;
 			const CommandInfo &info = it->second;
 			if (c_name.find_ci(this_name + " ") == 0)
 			{
-				ServiceReference<Command> command("Command", info.name);
-				if (command)
-				{
-					source.command = it->first;
-					command->OnServHelp(source);
-				}
+				ServiceReference<Command> c("Command", info.name);
+
+				if (!c)
+					continue;
+				else if (!hide_privileged_commands)
+					; // Always show with hide_privileged_commands disabled
+				else if (!c->AllowUnregistered() && !source.GetAccount())
+					continue;
+				else if (!info.permission.empty() && !source.HasCommand(info.permission))
+					continue;
+
+				source.command = it->first;
+				c->OnServHelp(source);
 			}
 		}
 		source.Reply(_("Type \002%s%s HELP %s \037option\037\002 for more information on a\n"

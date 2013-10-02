@@ -33,6 +33,7 @@ class CommandNSSet : public Command
 		source.Reply(_("Sets various nickname options. \037option\037 can be one of:"));
 
 		Anope::string this_name = source.command;
+		bool hide_privileged_commands = Config->GetBlock("options")->Get<bool>("hideprivilegedcommands");
 		for (CommandInfo::map::const_iterator it = source.service->commands.begin(), it_end = source.service->commands.end(); it != it_end; ++it)
 		{
 			const Anope::string &c_name = it->first;
@@ -40,12 +41,18 @@ class CommandNSSet : public Command
 
 			if (c_name.find_ci(this_name + " ") == 0)
 			{
-				ServiceReference<Command> command("Command", info.name);
-				if (command)
-				{
-					source.command = c_name;
-					command->OnServHelp(source);
-				}
+				ServiceReference<Command> c("Command", info.name);
+				if (!c)
+					continue;
+				else if (!hide_privileged_commands)
+					; // Always show with hide_privileged_commands disabled
+				else if (!c->AllowUnregistered() && !source.GetAccount())
+					continue;
+				else if (!info.permission.empty() && !source.HasCommand(info.permission))
+					continue;
+
+				source.command = c_name;
+				c->OnServHelp(source);
 			}
 		}
 

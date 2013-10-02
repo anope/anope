@@ -17,8 +17,9 @@ class AkillDelCallback : public NumberList
 {
 	CommandSource &source;
 	unsigned deleted;
+	Command *cmd;
  public:
-	AkillDelCallback(CommandSource &_source, const Anope::string &numlist) : NumberList(numlist, true), source(_source), deleted(0)
+	AkillDelCallback(CommandSource &_source, const Anope::string &numlist, Command *c) : NumberList(numlist, true), source(_source), deleted(0), cmd(c)
 	{
 	}
 
@@ -41,6 +42,8 @@ class AkillDelCallback : public NumberList
 
 		if (!x)
 			return;
+
+		Log(LOG_ADMIN, source, cmd) << "to remove " << x->mask << " from the list";
 
 		++deleted;
 		DoDel(source, x);
@@ -216,7 +219,7 @@ class CommandOSAKill : public Command
 
 		if (isdigit(mask[0]) && mask.find_first_not_of("1234567890,-") == Anope::string::npos)
 		{
-			AkillDelCallback list(source, mask);
+			AkillDelCallback list(source, mask, this);
 			list.Process();
 		}
 		else

@@ -228,7 +228,13 @@ class ChanServCore : public Module, public ChanServService
 		}
 
 		if (ci->c)
-			OnCheckModes(ci->c);
+		{
+			ci->c->RemoveMode(ci->WhoSends(), "REGISTERED", "", false);
+
+			const Anope::string &require = Config->GetModule(this)->Get<const Anope::string>("require");
+			if (!require.empty())
+				ci->c->SetModes(ci->WhoSends(), false, "-%s", require.c_str());
+		}
 	}
 
 	EventReturn OnPreHelp(CommandSource &source, const std::vector<Anope::string> &params) anope_override

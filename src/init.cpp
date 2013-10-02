@@ -447,7 +447,7 @@ void Anope::Init(int ac, char **av)
 
 	/* Initialize random number generator */
 	block = Config->GetBlock("options");
-	srand(block->Get<unsigned>("seed"));
+	srand(block->Get<unsigned>("seed") ^ time(NULL));
 
 	/* load modules */
 	Log() << "Loading modules...";

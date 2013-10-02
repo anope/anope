@@ -220,11 +220,12 @@ Anope::string XLineManager::GenerateUID()
 {
 	Anope::string id;
 	int count = 0;
-	while (id.empty() || XLinesByUID->count(id) > 0)
+	do
 	{
+		id.clear();
+
 		if (++count > 10)
 		{
-			id.clear();
 			Log(LOG_DEBUG) << "Unable to generate XLine UID";
 			break;
 		}
@@ -238,6 +239,7 @@ Anope::string XLineManager::GenerateUID()
 			id += c;
 		}
 	}
+	while (XLinesByUID->count(id) > 0);
 
 	return id;
 }

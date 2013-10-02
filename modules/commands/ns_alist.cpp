@@ -47,17 +47,9 @@ class CommandNSAList : public Command
 
 		list.AddColumn(_("Number")).AddColumn(_("Channel")).AddColumn(_("Access"));
 
-		source.Reply(_("Channels that \002%s\002 has access on:"), nc->display.c_str());
-
 		std::deque<ChannelInfo *> queue;
 		nc->GetChannelReferences(queue);
 		std::sort(queue.begin(), queue.end(), ChannelSort);
-
-		if (queue.empty())
-		{
-			source.Reply(_("\002%s\002 has no access in any channels."), nc->display.c_str());
-			return;
-		}
 
 		for (unsigned i = 0; i < queue.size(); ++i)
 		{
@@ -100,10 +92,20 @@ class CommandNSAList : public Command
 
 		std::vector<Anope::string> replies;
 		list.Process(replies);
-		for (unsigned i = 0; i < replies.size(); ++i)
-			source.Reply(replies[i]);
 
-		source.Reply(_("End of list - %d channels shown."), chan_count);
+		if (!chan_count)
+		{
+			source.Reply(_("\002%s\002 has no access in any channels."), nc->display.c_str());
+		}
+		else
+		{
+			source.Reply(_("Channels that \002%s\002 has access on:"), nc->display.c_str());
+
+			for (unsigned i = 0; i < replies.size(); ++i)
+				source.Reply(replies[i]);
+
+			source.Reply(_("End of list - %d channels shown."), chan_count);
+		}
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override

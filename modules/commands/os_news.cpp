@@ -160,6 +160,7 @@ class NewsBase : public Command
 			this->ns->AddNewsItem(news);
 
 			source.Reply(msgs[MSG_ADDED]);
+			Log(LOG_ADMIN, source, this) << "to add a news item";
 		}
 
 		return;
@@ -189,6 +190,7 @@ class NewsBase : public Command
 						{
 							this->ns->DelNewsItem(list[num - 1]);
 							source.Reply(msgs[MSG_DELETED], num);
+							Log(LOG_ADMIN, source, this) << "to delete a news item";
 							return;
 						}
 					}
@@ -201,6 +203,7 @@ class NewsBase : public Command
 					for (unsigned i = list.size(); i > 0; --i)
 						this->ns->DelNewsItem(list[i - 1]);
 					source.Reply(msgs[MSG_DELETED_ALL]);
+					Log(LOG_ADMIN, source, this) << "to delete all news items";
 				}
 			}
 		}

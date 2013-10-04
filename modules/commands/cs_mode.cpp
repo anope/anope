@@ -458,6 +458,7 @@ class CommandCSMode : public Command
 		User *u = source.GetUser();
 
 		bool has_access = source.AccessFor(ci).HasPriv("MODE") || source.HasPriv("chanserv/administration");
+		bool can_override = source.HasPriv("chanserv/administration");
 
 		spacesepstream sep(params.size() > 3 ? params[3] : "");
 		Anope::string modes = params[2], param;
@@ -484,7 +485,7 @@ class CommandCSMode : public Command
 						ChannelMode *cm = ModeManager::GetChannelModes()[j];
 						if (!cm)
 							continue;
-						if (!u || cm->CanSet(u))
+						if (!u || cm->CanSet(u) || can_override)
 						{
 							if (cm->type == MODE_REGULAR || (!adding && cm->type == MODE_PARAM))
 							{
@@ -500,7 +501,7 @@ class CommandCSMode : public Command
 					if (adding == -1)
 						break;
 					ChannelMode *cm = ModeManager::FindChannelModeByChar(modes[i]);
-					if (!cm || (u && !cm->CanSet(u)))
+					if (!cm || (u && !cm->CanSet(u) && !can_override))
 						continue;
 					switch (cm->type)
 					{
@@ -531,7 +532,7 @@ class CommandCSMode : public Command
 
 							if (param.find_first_of("*?") != Anope::string::npos)
 							{
-								if (!this->CanSet(source, ci, cm, false))
+								if (!this->CanSet(source, ci, cm, false) && !can_override)
 								{
 									source.Reply(_("You do not have access to set mode %c."), cm->mchar);
 									break;
@@ -544,7 +545,7 @@ class CommandCSMode : public Command
 
 									AccessGroup targ_access = ci->AccessFor(uc->user);
 
-									if (uc->user->IsProtected() || (ci->HasExt("PEACE") && targ_access >= u_access))
+									if (uc->user->IsProtected() || (ci->HasExt("PEACE") && targ_access >= u_access && !can_override))
 									{
 										source.Reply(_("You do not have the access to change %s's modes."), uc->user->nick.c_str());
 										continue;
@@ -568,7 +569,7 @@ class CommandCSMode : public Command
 									break;
 								}
 
-								if (!this->CanSet(source, ci, cm, source.GetUser() == target))
+								if (!this->CanSet(source, ci, cm, source.GetUser() == target) && !can_override)
 								{
 									source.Reply(_("You do not have access to set mode %c."), cm->mchar);
 									break;
@@ -577,7 +578,7 @@ class CommandCSMode : public Command
 								if (source.GetUser() != target)
 								{
 									AccessGroup targ_access = ci->AccessFor(target);
-									if (ci->HasExt("PEACE") && targ_access >= u_access)
+									if (ci->HasExt("PEACE") && targ_access >= u_access && !can_override)
 									{
 										source.Reply(_("You do not have the access to change %s's modes."), target->nick.c_str());
 										break;

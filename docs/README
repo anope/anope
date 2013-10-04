@@ -107,14 +107,14 @@ Table of Contents
 
     Anope Translations:
 
-        * GeniusDex <geniusdex@anope.org> (nl.l)
-        * Kein <kein-of@yandex.ru> (ru.l)
-        * Maik Funke <Han@mefalcon.org> (de.l)
-        * Gabriel Acevedo H. <drstein@anope.org> (es.l)
-        * Janos Kapitany <sarkanyka@cjbchat.hu>  (hun.l)
-        * Szymon S'wierkosz <szymek@adres.pl> (pl.l)
-        * Christopher N. <saka@epiknet.org> (fr.l)
-        * Yusuf Kurekci <ysfm.20@gmail.com> (tr.l)
+        * Robby <robby@chat.be> (nl_NL)
+        * Kein <kein-of@yandex.ru> (ru_RU)
+        * Maik Funke <Han@mefalcon.org> (de_DE)
+        * Isaac Fontal <i_fontal@hotmail.com> (es_ES)
+        * Janos Kapitany <sarkanyka@cjbchat.hu>  (hu_HU)
+        * Szymon S'wierkosz <szymek@adres.pl> (pl_PL)
+        * Christopher N. <saka@epiknet.org> (fr_FR)
+        * Yusuf Kurekci <ysfm.20@gmail.com> (tr_TR)
 
     Anope Web panel:
 
@@ -202,10 +202,10 @@ Table of Contents
         --version       Display the version of Anope
         --nothird       Do not load the non-core modules specified
         --protocoldebug Debug each incoming message after protocol parsing
-        --support       Used for support, same as -debug -nofork -nothird
+        --support       Used for support, same as --debug --nofork --nothird
 
     Upon starting, Anope will parse its command-line parameters then
-    (assuming the -nofork option is not given) detach itself and run in the
+    (assuming the --nofork option is not given) detach itself and run in the
     background. If Anope encounters a problem reading the database files or
     cannot connect to its uplink server, it will terminate immediately;
     otherwise, it will run until the connection is terminated (or a QUIT,

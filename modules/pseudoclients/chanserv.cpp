@@ -162,13 +162,13 @@ class ChanServCore : public Module, public ChanServService
 
 				if (newowner)
 				{
-					Log(LOG_NORMAL, "chanserv/expire") << "Transferring foundership of " << ci->name << " from deleted nick " << nc->display << " to " << newowner->display;
+					Log(LOG_NORMAL, "chanserv/drop", ChanServ) << "Transferring foundership of " << ci->name << " from deleted nick " << nc->display << " to " << newowner->display;
 					ci->SetFounder(newowner);
 					ci->SetSuccessor(NULL);
 				}
 				else
 				{
-					Log(LOG_NORMAL, "chanserv/expire") << "Deleting channel " << ci->name << " owned by deleted nick " << nc->display;
+					Log(LOG_NORMAL, "chanserv/drop", ChanServ) << "Deleting channel " << ci->name << " owned by deleted nick " << nc->display;
 
 					delete ci;
 					continue;
@@ -365,7 +365,7 @@ class ChanServCore : public Module, public ChanServService
 
 			if (expire)
 			{
-				Log(LOG_NORMAL, "chanserv/expire") << "Expiring channel " << ci->name << " (founder: " << (ci->GetFounder() ? ci->GetFounder()->display : "(none)") << ")";
+				Log(LOG_NORMAL, "chanserv/expire", ChanServ) << "Expiring channel " << ci->name << " (founder: " << (ci->GetFounder() ? ci->GetFounder()->display : "(none)") << ")";
 				FOREACH_MOD(OnChanExpire, (ci));
 				delete ci;
 			}

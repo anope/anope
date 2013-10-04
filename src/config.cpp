@@ -420,7 +420,7 @@ Conf::Conf() : Block("")
 		spacesepstream(log->Get<const Anope::string>("servers")).GetTokens(l.servers);
 		spacesepstream(log->Get<const Anope::string>("channels")).GetTokens(l.channels);
 		spacesepstream(log->Get<const Anope::string>("users")).GetTokens(l.users);
-		spacesepstream(log->Get<const Anope::string>("normal")).GetTokens(l.normal);
+		spacesepstream(log->Get<const Anope::string>("other")).GetTokens(l.normal);
 
 		this->LogInfos.push_back(l);
 	}

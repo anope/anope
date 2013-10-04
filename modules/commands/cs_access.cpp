@@ -222,10 +222,11 @@ class CommandCSAccess : public Command
 				Command *c;
 				unsigned deleted;
 				Anope::string Nicks;
-				bool Denied;
+				bool denied;
 				bool override;
+				AccessGroup ag;
 			 public:
-				AccessDelCallback(CommandSource &_source, ChannelInfo *_ci, Command *_c, const Anope::string &numlist) : NumberList(numlist, true), source(_source), ci(_ci), c(_c), deleted(0), Denied(false), override(false)
+				AccessDelCallback(CommandSource &_source, ChannelInfo *_ci, Command *_c, const Anope::string &numlist) : NumberList(numlist, true), source(_source), ci(_ci), c(_c), deleted(0), denied(false), override(false), ag(source.AccessFor(ci))
 				{
 					if (!source.AccessFor(ci).HasPriv("ACCESS_CHANGE") && source.HasPriv("chanserv/access/modify"))
 						this->override = true;
@@ -233,7 +234,7 @@ class CommandCSAccess : public Command
 
 				~AccessDelCallback()
 				{
-					if (Denied && !deleted)
+					if (denied && !deleted)
 						source.Reply(ACCESS_DENIED);
 					else if (!deleted)
 						source.Reply(_("No matching entries on %s access list."), ci->name.c_str());
@@ -255,12 +256,11 @@ class CommandCSAccess : public Command
 
 					ChanAccess *access = ci->GetAccess(Number - 1);
 
-					AccessGroup u_access = source.AccessFor(ci);
-					const ChanAccess *u_highest = u_access.Highest();
+					const ChanAccess *u_highest = ag.Highest();
 
-					if ((!u_highest || *u_highest <= *access) && !u_access.founder && !this->override && !access->mask.equals_ci(source.nc->display))
+					if ((!u_highest || *u_highest <= *access) && !ag.founder && !this->override && !access->mask.equals_ci(source.nc->display))
 					{
-						Denied = true;
+						denied = true;
 						return;
 					}
 

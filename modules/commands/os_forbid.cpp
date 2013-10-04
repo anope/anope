@@ -73,7 +73,7 @@ class MyForbidService : public ForbidService
 					else if (d->type == FT_EMAIL)
 						ftype = "email";
 
-					Log(LOG_NORMAL, "expire/forbid") << "Expiring forbid for " << d->mask << " type " << ftype;
+					Log(LOG_NORMAL, "expire/forbid", Config->GetClient("OperServ")) << "Expiring forbid for " << d->mask << " type " << ftype;
 					this->forbids(j).erase(this->forbids(j).begin() + i - 1);
 					delete d;
 				}
@@ -174,7 +174,7 @@ class CommandOSForbid : public Command
 				source.Reply(READ_ONLY_MODE);
 
 			Log(LOG_ADMIN, source, this) << "to add a forbid on " << entry << " of type " << subcommand;
-			source.Reply(_("Added a forbid on %s to expire on %s."), entry.c_str(), d->expires ? Anope::strftime(d->expires, source.GetAccount()).c_str() : "never");
+			source.Reply(_("Added a forbid on %s of type %s to expire on %s."), entry.c_str(), type.c_str(), d->expires ? Anope::strftime(d->expires, source.GetAccount()).c_str() : "never");
 
 			/* apply forbid */
 			switch (ftype)

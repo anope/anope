@@ -105,7 +105,7 @@ class OSIgnoreService : public IgnoreService
 
 			if (id.time && id.time <= Anope::CurTime)
 			{
-				Log(LOG_DEBUG) << "Expiring ignore entry " << id.mask;
+				Log(LOG_NORMAL, "expire/ignore", Config->GetClient("OperServ")) << "Expiring ignore entry " << id.mask;
 				this->ignores.erase(ign);
 			}
 			else
@@ -212,7 +212,7 @@ class CommandOSIgnore : public Command
 
 			if (id.time && id.time <= Anope::CurTime)
 			{
-				Log(LOG_DEBUG) << "Expiring ignore entry " << id.mask;
+				Log(LOG_NORMAL, "expire/ignore", Config->GetClient("OperServ")) << "Expiring ignore entry " << id.mask;
 				ignores.erase(it);
 			}
 		}

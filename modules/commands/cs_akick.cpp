@@ -187,16 +187,14 @@ class CommandCSAKick : public Command
 				ChannelInfo *ci;
 				Command *c;
 				unsigned deleted;
+				AccessGroup ag;
 			 public:
-				AkickDelCallback(CommandSource &_source, ChannelInfo *_ci, Command *_c, const Anope::string &list) : NumberList(list, true), source(_source), ci(_ci), c(_c), deleted(0)
+				AkickDelCallback(CommandSource &_source, ChannelInfo *_ci, Command *_c, const Anope::string &list) : NumberList(list, true), source(_source), ci(_ci), c(_c), deleted(0), ag(source.AccessFor(ci))
 				{
 				}
 
 				~AkickDelCallback()
 				{
-					bool override = !source.AccessFor(ci).HasPriv("AKICK");
-					Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, c, ci) << "to delete " << deleted << (deleted == 1 ? " entry" : " entries");
-
 					if (!deleted)
 						source.Reply(_("No matching entries on %s autokick list."), ci->name.c_str());
 					else if (deleted == 1)
@@ -210,7 +208,12 @@ class CommandCSAKick : public Command
 					if (!number || number > ci->GetAkickCount())
 						return;
 
-					FOREACH_MOD(OnAkickDel, (source, ci, ci->GetAkick(number - 1)));
+					const AutoKick *akick = ci->GetAkick(number - 1);
+
+					FOREACH_MOD(OnAkickDel, (source, ci, akick));
+
+					bool override = !ag.HasPriv("AKICK");
+					Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, c, ci) << "to delete " << (akick->nc ? akick->nc->display : akick->mask);
 
 					++deleted;
 					ci->EraseAkick(number - 1);

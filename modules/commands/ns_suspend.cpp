@@ -245,7 +245,7 @@ class NSSuspend : public Module
 			na->last_seen = Anope::CurTime;
 			suspend.Unset(na->nc);
 
-			Log(LOG_NORMAL, "expire", Config->GetClient("NickServ")) << "Expiring suspend for " << na->nick;
+			Log(LOG_NORMAL, "nickserv/expire", Config->GetClient("NickServ")) << "Expiring suspend for " << na->nick;
 		}
 	}
 

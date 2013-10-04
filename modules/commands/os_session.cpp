@@ -128,8 +128,9 @@ class ExceptionDelCallback : public NumberList
  protected:
 	CommandSource &source;
 	unsigned deleted;
+	Command *cmd;
  public:
-	ExceptionDelCallback(CommandSource &_source, const Anope::string &numlist) : NumberList(numlist, true), source(_source), deleted(0)
+	ExceptionDelCallback(CommandSource &_source, const Anope::string &numlist, Command *c) : NumberList(numlist, true), source(_source), deleted(0), cmd(c)
 	{
 	}
 
@@ -148,8 +149,9 @@ class ExceptionDelCallback : public NumberList
 		if (!number || number > session_service->GetExceptions().size())
 			return;
 
-		++deleted;
+		Log(LOG_ADMIN, source, cmd) << "to remove the session limit exception for " << session_service->GetExceptions()[number - 1]->mask;
 
+		++deleted;
 		DoDel(source, number - 1);
 	}
 
@@ -393,7 +395,7 @@ class CommandOSException : public Command
 
 		if (isdigit(mask[0]) && mask.find_first_not_of("1234567890,-") == Anope::string::npos)
 		{
-			ExceptionDelCallback list(source, mask);
+			ExceptionDelCallback list(source, mask, this);
 			list.Process();
 		}
 		else
@@ -402,7 +404,7 @@ class CommandOSException : public Command
 			for (; i < end; ++i)
 				if (mask.equals_ci(session_service->GetExceptions()[i]->mask))
 				{
-					Log(LOG_ADMIN, source, this) << "to remove session limit exception for " << mask;
+					Log(LOG_ADMIN, source, this) << "to remove the session limit exception for " << mask;
 					ExceptionDelCallback::DoDel(source, i);
 					source.Reply(_("\002%s\002 deleted from session-limit exception list."), mask.c_str());
 					break;

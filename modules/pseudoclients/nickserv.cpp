@@ -287,7 +287,7 @@ class NickServCore : public Module, public NickServService
 
 	void OnDelCore(NickCore *nc) anope_override
 	{
-		Log(NickServ, "nick") << "deleting nickname group " << nc->display;
+		Log(NickServ, "nick") << "Deleting nickname group " << nc->display;
 
 		/* Clean up this nick core from any users online */
 		for (std::list<User *>::iterator it = nc->users.begin(); it != nc->users.end();)
@@ -509,7 +509,7 @@ class NickServCore : public Module, public NickServService
 		
 			if (expire)
 			{
-				Log(LOG_NORMAL, "expire") << "Expiring nickname " << na->nick << " (group: " << na->nc->display << ") (e-mail: " << (na->nc->email.empty() ? "none" : na->nc->email) << ")";
+				Log(LOG_NORMAL, "nickserv/expire", NickServ) << "Expiring nickname " << na->nick << " (group: " << na->nc->display << ") (e-mail: " << (na->nc->email.empty() ? "none" : na->nc->email) << ")";
 				FOREACH_MOD(OnNickExpire, (na));
 				delete na;
 			}

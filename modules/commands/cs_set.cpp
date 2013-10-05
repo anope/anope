@@ -1331,10 +1331,6 @@ class CSSet : public Module
 			info.AddOption(_("Keep modes"));
 		if (noautoop.HasExt(ci))
 			info.AddOption(_("No auto-op"));
-
-		time_t chanserv_expire = Config->GetModule("chanserv")->Get<time_t>("expire", "14d");
-		if (!noexpire.HasExt(ci) && chanserv_expire && !Anope::NoExpire)
-			info[_("Expires")] = Anope::strftime(ci->last_used + chanserv_expire, source.GetAccount());
 	}
 };
 

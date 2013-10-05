@@ -460,6 +460,16 @@ class ChanServCore : public Module, public ChanServService
 
 		return EVENT_CONTINUE;
 	}
+
+	void OnChanInfo(CommandSource &source, ChannelInfo *ci, InfoFormatter &info, bool show_all) anope_override
+	{
+		if (!show_all)
+			return;
+
+		time_t chanserv_expire = Config->GetModule(this)->Get<time_t>("expire", "14d");
+		if (!ci->HasExt("CS_NO_EXPIRE") && chanserv_expire && !Anope::NoExpire && ci->last_used != Anope::CurTime)
+			info[_("Expires")] = Anope::strftime(ci->last_used + chanserv_expire, source.GetAccount());
+	}
 };
 
 MODULE_INIT(ChanServCore)

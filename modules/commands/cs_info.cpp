@@ -37,7 +37,7 @@ class CommandCSInfo : public Command
 		bool show_all = false;
 
 		/* Should we show all fields? Only for sadmins and identified users */
-		if (has_auspex || source.AccessFor(ci).HasPriv("INFO"))
+		if (source.AccessFor(ci).HasPriv("INFO") || has_auspex)
 			show_all = true;
 
 		InfoFormatter info(nc);

@@ -138,7 +138,7 @@ void NickAlias::Serialize(Serialize::Data &data) const
 	data["last_usermask"] << this->last_usermask;
 	data["last_realhost"] << this->last_realhost;
 	data.SetType("time_registered", Serialize::Data::DT_INT); data["time_registered"] << this->time_registered;
-	data.SetType("time_registered", Serialize::Data::DT_INT); data["last_seen"] << this->last_seen;
+	data.SetType("last_seen", Serialize::Data::DT_INT); data["last_seen"] << this->last_seen;
 	data["nc"] << this->nc->display;
 
 	if (this->HasVhost())

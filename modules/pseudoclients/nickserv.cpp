@@ -521,7 +521,7 @@ class NickServCore : public Module, public NickServService
 		if (!na->nc->HasExt("UNCONFIRMED"))
 		{
 			time_t nickserv_expire = Config->GetModule(this)->Get<time_t>("expire", "21d");
-			if (!na->HasExt("NS_NO_EXPIRE") && nickserv_expire && !Anope::NoExpire && na->last_seen != Anope::CurTime)
+			if (!na->HasExt("NS_NO_EXPIRE") && nickserv_expire && !Anope::NoExpire && (source.HasPriv("nickserv/auspex") || na->last_seen != Anope::CurTime))
 				info[_("Expires")] = Anope::strftime(na->last_seen + nickserv_expire, source.GetAccount());
 		}
 		else

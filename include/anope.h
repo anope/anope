@@ -539,7 +539,7 @@ namespace Anope
 	/** Generate a string of random letters and numbers
 	 * @param len The length of the string returned
 	 */
-	extern Anope::string Random(size_t len);
+	extern CoreExport Anope::string Random(size_t len);
 }
 
 /** sepstream allows for splitting token seperated lists.

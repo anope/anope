@@ -330,11 +330,6 @@ void Privmsg::Run(MessageSource &source, const std::vector<Anope::string> &param
 
 		if (bi)
 		{
-			EventReturn MOD_RESULT;
-			FOREACH_RESULT(OnBotPrivmsg, MOD_RESULT, (u, bi, message));
-			if (MOD_RESULT == EVENT_STOP)
-				return;
-
 			if (message[0] == '\1' && message[message.length() - 1] == '\1')
 			{
 				if (message.substr(0, 6).equals_ci("\1PING "))
@@ -351,6 +346,11 @@ void Privmsg::Run(MessageSource &source, const std::vector<Anope::string> &param
 				}
 				return;
 			}
+
+			EventReturn MOD_RESULT;
+			FOREACH_RESULT(OnBotPrivmsg, MOD_RESULT, (u, bi, message));
+			if (MOD_RESULT == EVENT_STOP)
+				return;
 			
 			bi->OnMessage(u, message);
 		}

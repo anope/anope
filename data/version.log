@@ -1,3 +1,752 @@
+Revision e3e0da3 - Sat, 12 Oct 2013 15:11:09 -0400 - Update language files
+Revision 7167cff - Sat, 12 Oct 2013 15:05:42 -0400 - Update changes and changes.conf sort of
+Revision b844154 - Thu, 10 Oct 2013 18:12:48 +0200 - fixed a typo in the last commit, reported by Robby
+Revision 5e56dfd - Thu, 10 Oct 2013 07:51:35 +0200 - replaced the country name in the Language header in the language files by four letter codes
+Revision e1d460e - Wed, 9 Oct 2013 16:27:16 -0400 - Call OnBotPrivmsg after checking if the message is a ctcp, not before. fix typo in opersrev.example.conf
+Revision 9ea6fb2 - Wed, 9 Oct 2013 22:10:08 +0200 - set the Language header in the language files so msgfmt doesnt complain
+Revision 7755668 - Sun, 6 Oct 2013 22:07:01 +0200 - updated docs/EVENTS
+Revision 569efbb - Sat, 5 Oct 2013 13:29:34 -0400 - Fix Windows build
+Revision 6968014 - Sat, 5 Oct 2013 13:22:56 -0400 - anope.nl_NL.po: Translate newly added string, and fix some spelling/grammar.
+Revision 1b08ba8 - Sat, 5 Oct 2013 13:21:28 -0400 - Always show expire time for nicks in /ns info to opers, even if the user is online Make Anope::strftime show "now" if the time is now Fix typo in nickalias.cpp for the type of the last_seen field, spotted by grawity
+Revision 277f735 - Sat, 5 Oct 2013 01:07:51 -0400 - Hide expires in /cs info if the channel is actively in use as it confuses people
+Revision f63a2bd - Sat, 5 Oct 2013 00:49:12 -0400 - Big update of the Dutch language file. cs_ban: Merge the syntaxes into one.
+Revision feb412b - Sat, 5 Oct 2013 00:33:03 -0400 - cs_mode: Fix override in /cs mode set.
+Revision ab85668 - Sat, 5 Oct 2013 00:33:03 -0400 - os_news: Add some logging.
+Revision 97d7c21 - Sat, 5 Oct 2013 00:33:03 -0400 - Fix logging for log type 'other'. os_ignore: Log expired ignores to the normal log level. cs_drop: Allow Services Operators to actually drop channels in Read-Only mode. os_akill, os_sxline, cs_akick: Log deletions by number.
+Revision e5b8435 - Sat, 5 Oct 2013 00:33:03 -0400 - Fix not setting -r when channels are deleted
+Revision e589080 - Sat, 5 Oct 2013 00:33:03 -0400 - Fix /ns alist showing a header/column header if the user has no access
+Revision 257b10e - Sat, 5 Oct 2013 00:33:03 -0400 - Hide privileged commands in ns help set and cs help set if configured
+Revision 353ee5c - Sat, 5 Oct 2013 00:33:03 -0400 - Fix xline uid generation when the one chosen already exists
+Revision b094132 - Sat, 5 Oct 2013 00:33:03 -0400 - Log akill deleteions by number
+Revision 82006b8 - Sat, 5 Oct 2013 00:33:03 -0400 - cs_entrymsg: Check for the correct override privilege. Make some more commands check if Read-Only mode is active. cs_flags: Show a meaningful message when a user is not found on the access list. os_set: Add missing capabilities to the readonly help output. OperServ: Add logging to certain commands. NickServ: Undo logging for listings.
+Revision ba5a3f5 - Sat, 5 Oct 2013 00:33:02 -0400 - Don't explicitly reference services nicks. os_forbid: If NickServ is available, have it send the forbid reason instead of OperServ.
+Revision 7b6c08b - Sun, 29 Sep 2013 17:22:25 -0400 - Exempt ulines/myself from bounce mode check
+Revision 47b692f - Sun, 29 Sep 2013 15:42:22 -0400 - os_session: Add some empty lines to the session help command to improve readability.
+Revision ed06609 - Sun, 29 Sep 2013 15:42:22 -0400 - NickServ: Change a few log wordings and add missing log calls to some commands. ns_suspend and cs_suspend: Fix log wording, and correct syntax to show the reason is optional.
+Revision 32a5715 - Sun, 29 Sep 2013 15:42:22 -0400 - ns_access: Allow LIST by Services Operators on suspended nicks. Change wording. ns_ajoin: Fix the number of command parameters. Check for nick suspension. Do not allow just any Services Operator to access other users' AJOIN, require nickserv/ajoin. Change wording. ns_cert: Add ability for Services Operators to modify other users' certificate lists.
+Revision 2a5e8f1 - Sun, 29 Sep 2013 15:42:22 -0400 - cs_akick: Make the default autokick reason translatable. os_forbid: It is required to specify a reason.
+Revision a04c320 - Sun, 29 Sep 2013 15:42:22 -0400 - cs_set: Fix showing expiry time in INFO output. cs_sync: Check for the correct override privilege.
+Revision 4221a50 - Sun, 29 Sep 2013 15:42:22 -0400 - Fix NickServ default nick expiry time.
+Revision 44dd8d0 - Sun, 29 Sep 2013 15:41:32 -0400 - Add chanserv:always_lower_ts config option to always lower registered channels timestamps to the creation time which fixes some race conditions regarding users joining empty registered channels and doing things prior to the -o from services coming through.
+Revision f7aa69b - Sun, 29 Sep 2013 13:04:12 -0400 - Correct expiretmeout and updatetimeout descriptions in example.conf, it is no longer triggerd by /os update
+Revision d5ecc39 - Sun, 29 Sep 2013 04:23:33 +0200 - display modechars instead of modenames in cpanel channelmodes
+Revision 84a02d2 - Fri, 27 Sep 2013 20:11:51 -0400 - Remove "Nick" reference from the /os ignore del message, as it can only contain hostmasks
+Revision 4b059be - Fri, 27 Sep 2013 20:07:07 -0400 - Replace this silly random code generation code with something more sane looking
+Revision b319fb0 - Fri, 27 Sep 2013 19:11:02 -0400 - Fix compile warnings and errors found by clang
+Revision 1719688 - Fri, 27 Sep 2013 19:11:02 -0400 - Allow modifying mlock on nonexistant (but registered) channels
+Revision 02d67f6 - Fri, 27 Sep 2013 19:11:02 -0400 - Allow /os forbid list <type>
+Revision b306108 - Fri, 27 Sep 2013 19:11:02 -0400 - Fix /os ignore del on nicks
+Revision 12a0311 - Fri, 27 Sep 2013 19:11:02 -0400 - Add missing columns to os_forbid. Make most lists with dates use the shorter output format.
+Revision cf653fc - Fri, 27 Sep 2013 19:11:02 -0400 - Fix ms del all not actually deleting some memos Fix numbering of memos in ms list
+Revision 5cc7fc0 - Fri, 27 Sep 2013 19:11:02 -0400 - Fix ms list crash
+Revision 832bc35 - Fri, 27 Sep 2013 19:11:02 -0400 - Fix a few more modules to look in the right places for certain settings.
+Revision 06c5914 - Fri, 27 Sep 2013 19:11:02 -0400 - Fix akillids to work again. os_session: Add missing num to del syntax and add missing expiry column.
+Revision bf67b9e - Fri, 27 Sep 2013 19:11:02 -0400 - Make column titles in listings translatable.
+Revision 829c169 - Fri, 27 Sep 2013 19:11:02 -0400 - Translate strftime correctly
+Revision 4948120 - Fri, 27 Sep 2013 19:11:02 -0400 - Translate SendSyntax() and spacify it properly
+Revision 994471f - Fri, 27 Sep 2013 19:11:02 -0400 - Align info formatters with translated keys?
+Revision 80c0274 - Fri, 27 Sep 2013 19:11:02 -0400 - Translate listformatter properly
+Revision df3c0b7 - Fri, 27 Sep 2013 19:11:02 -0400 - Fix various commands to properly report a given expiry time is invalid
+Revision 4570299 - Fri, 27 Sep 2013 19:11:02 -0400 - ns_cert, ns_set: Make strings equal for one translation instance
+Revision 9756f96 - Fri, 27 Sep 2013 19:11:02 -0400 - example.conf: nickserv:emailregistration -> nickserv:registration
+Revision 6ac0364 - Fri, 27 Sep 2013 19:11:02 -0400 - Fix os_stats to display SQLINEs and SNLINEs on non-supporting IRCds
+Revision 4f820a7 - Fri, 27 Sep 2013 19:11:02 -0400 - Fix typos, remove dead language defines. os_set: Add missing debug text in help output.
+Revision 5f7127d - Fri, 27 Sep 2013 19:11:01 -0400 - Don't send regex qlines and nlines to the IRCd
+Revision dcb3ff7 - Fri, 27 Sep 2013 19:10:49 -0400 - Dont send BURST twice on inspircd Drop matching nicks on forbid.
+Revision 1107b92 - Fri, 27 Sep 2013 18:02:26 -0400 - Drop matching channels on forbid, and enforce nick forbids even on IRCds with no qlines
+Revision 3b0b1bc - Fri, 27 Sep 2013 18:02:26 -0400 - Don't send SQLines unless the IRCd supports it
+Revision b60b23f - Fri, 27 Sep 2013 17:21:46 -0400 - Only allow using os_oper add and del if you have the privileges for what you are giving or taking.
+Revision 5aac637 - Fri, 27 Sep 2013 17:21:31 -0400 - Correctly detect override in cs_ban on masks
+Revision 20856fb - Fri, 27 Sep 2013 17:21:20 -0400 - Remove +r etc when channels are deleted
+Revision 7545763 - Fri, 27 Sep 2013 17:21:20 -0400 - Added missing override capabilities and log calls to some ChanServ commands
+Revision 1818b19 - Fri, 27 Sep 2013 16:33:56 -0400 - Fix cs_mode lock reply if nothing is done Fix not clearing forbids when os_forbid is unloaded Apply nick and chan forbids when added Fix loading forbids until after the service is constructed
+Revision abc7e4b - Fri, 27 Sep 2013 16:33:03 -0400 - Fix os_news to not load items until the news service is constructed Fix session exceptions not expirigin
+Revision e5ece18 - Fri, 20 Sep 2013 21:09:35 -0400 - Readonlyize many commands
+Revision 8641b99 - Fri, 20 Sep 2013 15:21:32 -0400 - Merge the two memo del events into one. Since they had the same name it was confusing the event system
+Revision b880240 - Thu, 19 Sep 2013 13:35:52 -0400 - Make os_session akill ip ranges and not individual user's ips
+Revision 5ce90ba - Thu, 19 Sep 2013 12:38:28 -0400 - Fix not updating last_seen on expire nick for nicks with secure off. Don't show Expires in /ns info if the nick is online currently as it confuses people
+Revision 98bae82 - Mon, 16 Sep 2013 15:54:09 -0400 - Require confirmation in /cs drop by requesting the channel name twice
+Revision e3c05ef - Mon, 16 Sep 2013 06:47:42 -0400 - Remove static variables from functions in modules which causes them to be marked as gnu unique objects, which breaks dlclose()/dlopen() on g++ 4.5+
+Revision 8cbaf7e - Thu, 12 Sep 2013 07:20:26 -0400 - Update Spanish translation, from Isaac Fontal <i_fontal@hotmail.com>
+Revision 339f41a - Sun, 8 Sep 2013 21:53:06 -0400 - Fix allowing duplicate entries on the snline list Have proto mods recognize cidr ranges as zlineable IPs Remove operserv/global from global.conf because its dumb Fix example config ~botserv/set example to work as expected
+Revision 55e4ef9 - Sun, 8 Sep 2013 06:02:35 -0400 - Fix logging /os set list. Enforce snlines on ircds that can't have snlines set by just killing the user. Fix double call to OnMatch() when a user matches an xline
+Revision f63e4ce - Sun, 8 Sep 2013 04:55:03 -0400 - Alpabetize channels in /ns alist and on webcpanels chanserv page
+Revision b005089 - Tue, 3 Sep 2013 19:58:40 -0400 - Dont allow multiple list modes with the same param on the mode list at once
+Revision 1b42e26 - Tue, 3 Sep 2013 19:40:03 -0400 - Cap mode stacker max line length
+Revision 4691351 - Tue, 3 Sep 2013 18:51:18 -0400 - Cleanup previous commit Fix log messages from commands send through webpanel Don't show OperServ section to non opers
+Revision 404debf - Tue, 3 Sep 2013 04:37:09 +0200 - updated the chanserv section in webcpanel
+Revision 752a5ca - Sat, 31 Aug 2013 08:46:56 +0200 - add vhost support for hybrid
+Revision e1a1cf0 - Thu, 29 Aug 2013 23:22:48 -0400 - Dont crash on HasPriv() on an empty access group
+Revision 3fabc2f - Thu, 29 Aug 2013 23:13:29 -0400 - Fix ns_ajoin on unregisterd +i channels
+Revision 59ea36c - Tue, 27 Aug 2013 03:18:43 -0400 - Move Serialize::Types to construct after the corresponding extensible items they require when unserializing
+Revision fac8806 - Tue, 27 Aug 2013 02:56:54 -0400 - Make chanserv:require not default to r
+Revision 7f890ce - Mon, 26 Aug 2013 02:05:41 -0400 - Log parameters given to /cs mode set. Add logging to /os ignore.
+Revision 50e1a3e - Mon, 26 Aug 2013 02:00:25 -0400 - Fix status mlocks. Fix reply from lock add.
+Revision 6b79349 - Sun, 25 Aug 2013 23:26:45 -0400 - Fix User::IsIdentified with check_nick, do not remove +r on bursting clients until after server sync
+Revision 678f549 - Sun, 25 Aug 2013 22:57:26 -0400 - Fix not resetting channel status modes on our clients when a channel ts lowers
+Revision 714a4a3 - Sun, 25 Aug 2013 21:33:52 -0400 - Remove unnecesary mlock code in cs_mode, change mode set events to never bounce modes set by bots or servers, as it was possible to get modules to fight with each other
+Revision 34826f7 - Sun, 25 Aug 2013 01:49:42 -0700 - Merge pull request #22 from fgsch/misc
+Revision 847ccea - Sun, 25 Aug 2013 04:48:43 -0400 - Create persistent channels on startup, which used to work and got lost somewhere Fix some oddities with using persistent channels with no botserv Send list modes to uplink when bursting Fix issues with persist + keepmodes Fix /os modes clear all not clearing all status modes Fix operwall on ratbox/plexus Dont apply mlock in SetCorrectModes since that just recursively calls itself unncessarially Change command logging to show the command name and not the service name
+Revision 09046e3 - Sun, 25 Aug 2013 04:48:43 -0400 - Show what kind of nick protection is enabled in /ns info
+Revision 00a1952 - Sun, 25 Aug 2013 04:48:43 -0400 - Add logging to several operserv commands
+Revision 446b3a9 - Sun, 25 Aug 2013 04:48:43 -0400 - Save unconfirmed status and passcodes in the database. Fix db_sql_live to not reinsert all records if there are extra columns. Plexus has no chmode +r
+Revision 76f5d4b - Sun, 25 Aug 2013 04:54:35 +0100 - Sort parameters and correct comments
+Revision 9b59925 - Sun, 25 Aug 2013 04:54:32 +0100 - For ngIRCd, on nick change set mode -R
+Revision 243d781 - Sat, 24 Aug 2013 17:56:46 +0100 - Add login support for ngIRCd
+Revision 8be5f53 - Fri, 23 Aug 2013 09:59:28 -0700 - Merge pull request #21 from Phr33d0m/1.9
+Revision cd49bb4 - Fri, 23 Aug 2013 11:57:32 +0200 - Use CDN for the rest of the .js files
+Revision ef3d115 - Fri, 23 Aug 2013 04:42:24 -0400 - Merge branch '1.9' of github.com:anope/anope into 1.9
+Revision 9f1178e - Fri, 23 Aug 2013 04:36:02 -0400 - Remove SSL cert verification because we dont use it
+Revision 3bc2db5 - Fri, 23 Aug 2013 04:13:08 -0400 - Fix reading post data in m_httpd
+Revision fad603e - Fri, 23 Aug 2013 00:03:58 -0700 - Merge pull request #20 from Phr33d0m/1.9
+Revision 5f006bf - Fri, 23 Aug 2013 08:42:45 +0200 - Fixed an incorrect layout, a couple of typos and a wrong form action
+Revision aaa12cc - Fri, 23 Aug 2013 08:11:24 +0200 - Use a local copy of the background image
+Revision 2238db8 - Fri, 23 Aug 2013 08:06:47 +0200 - Make the navbar brand a different font to distinguish it from the rest of the navbar links.
+Revision 4d1492d - Fri, 23 Aug 2013 01:14:00 -0400 - Remove webpanel:ssl configuration option because its dumb
+Revision 5c4414e - Fri, 23 Aug 2013 07:05:57 +0200 - Removed innecessary logo width, the img-responsive will take care of that.
+Revision 6f9b77e - Fri, 23 Aug 2013 07:04:09 +0200 - Don't use an external svg logo anymore, but a local png one.
+Revision 154fa25 - Fri, 23 Aug 2013 00:57:36 -0400 - Fix m_httpd handling fragmented http requests
+Revision 9793062 - Fri, 23 Aug 2013 06:43:57 +0200 - Merge branch '1.9' of github.com:anope/anope into 1.9
+Revision f86dc24 - Fri, 23 Aug 2013 06:39:23 +0200 - Redesign body of the pages. Now they have a distiguished panel heading and panel body. Also added background colour to currently selected section.
+Revision 2b1f75a - Thu, 22 Aug 2013 22:45:20 -0400 - Fix m_httpd enabling ssl if m_ssl is loaded after it
+Revision 5ac0c9a - Thu, 22 Aug 2013 17:33:16 -0400 - Fix previous commit
+Revision e8763d5 - Thu, 22 Aug 2013 01:48:17 -0400 - Always set +o on users who have access for it, even if higher modes have a prefix
+Revision ce7a32a - Thu, 22 Aug 2013 01:13:28 -0400 - Do not have cs_access try to represent non levels access entries as levels access entries. Sometimes it cant accurately be done and it confuses people.
+Revision 0c1cc08 - Wed, 21 Aug 2013 23:22:27 -0400 - Update readme more
+Revision e12e4e6 - Wed, 21 Aug 2013 23:20:05 -0400 - Update readme
+Revision 52535cf - Wed, 21 Aug 2013 20:17:20 -0700 - Merge pull request #19 from Phr33d0m/1.9
+Revision 121d0a6 - Thu, 22 Aug 2013 03:27:29 +0200 - Fix a typo and remove unnecessary 'effects'
+Revision 3453581 - Thu, 22 Aug 2013 02:37:43 +0200 - A completely rewritten Control Panel using some bootstrapping, jquery and lots of CSS
+Revision 8bcc684 - Thu, 22 Aug 2013 02:36:01 +0200 - Nuking the old design with fire
+Revision 08d1133 - Thu, 22 Aug 2013 02:32:04 +0200 - Fix incorrect GET method as we are submitting POST data
+Revision 7659430 - Wed, 21 Aug 2013 01:35:57 -0400 - Always require the registered channel mode is set. Comment out default config requiring "r" as some ircds use it for registered users only
+Revision 17cca42 - Wed, 21 Aug 2013 01:27:14 -0400 - Make maxaliases=0 really mean no limit
+Revision 760fdc4 - Sun, 18 Aug 2013 14:42:59 -0400 - Fix not setting vhost on nickserv update
+Revision ead4aa7 - Sat, 17 Aug 2013 14:05:01 -0400 - Fix 318 raw being sent for uids on ts6 ircds
+Revision 65911dd - Wed, 14 Aug 2013 19:50:08 -0400 - Replace some get calls on <bool> extenisble types with hasext
+Revision 4abfdcb - Wed, 14 Aug 2013 18:24:04 -0400 - Do not default mlock +r, it is unnecessray and only clutters up the mlock list
+Revision de5c8c0 - Mon, 12 Aug 2013 15:45:50 -0400 - Fix some issues with suspend
+Revision 8e011bb - Mon, 12 Aug 2013 15:44:28 -0400 - Respond to remote whois on inspircd for users on us that aren't service bots
+Revision f15a974 - Mon, 12 Aug 2013 14:36:49 -0400 - Use less strict valid ident checks on hybrid, unreal, and inspircd
+Revision f1956b0 - Sun, 11 Aug 2013 17:14:39 -0400 - Remove channels from accesss lists when they expire/drop
+Revision 53d5b7c - Sun, 11 Aug 2013 16:04:10 -0400 - Fix chanserv opersonly setting
+Revision 812cb04 - Sun, 11 Aug 2013 15:48:46 -0400 - Add DNS Notify support
+Revision 1314d5b - Sun, 11 Aug 2013 15:38:09 -0400 - Fix cs_kee_pmodes default
+Revision 490601d - Sun, 11 Aug 2013 12:25:58 -0400 - Fix chghost on charybdis
+Revision c7aab50 - Sat, 10 Aug 2013 23:28:58 -0400 - Support DNS ANY query type
+Revision c507c78 - Sat, 10 Aug 2013 17:59:31 -0400 - Do not have ratbox or plexus pull modes from hybrid, it is entirely too confusing. Also fix cs_mode config
+Revision 58c0568 - Sat, 10 Aug 2013 17:43:13 -0400 - Add "simple seen" mode to cs_seen
+Revision f8cdcc6 - Sat, 10 Aug 2013 14:26:27 -0700 - Merge pull request #18 from fgsch/1.9
+Revision 10a918f - Sat, 10 Aug 2013 12:33:27 -0400 - Default some listmax config settings to 50
+Revision e4d1769 - Sat, 10 Aug 2013 12:29:12 -0400 - Add os_info
+Revision 7cd80a2 - Thu, 8 Aug 2013 03:03:57 +0000 - Fix logging LOG_NORMAL logs in m_sqllog. Fix/add more compat extensible items to ChannelInfo::Unserialize
+Revision 9d6f88d - Wed, 7 Aug 2013 23:44:58 +0100 - Add certificate fingerprint support for ngIRCd
+Revision b93d650 - Wed, 7 Aug 2013 21:19:49 +0000 - Revert "Shrink to fit module event vectors when modules are removed from them" Sometimes the events call the function the event is in, which causes a resize while the original function is iterating.
+Revision c480695 - Wed, 7 Aug 2013 19:40:05 +0000 - Fix db_sql to not remove objects when shutting down, as some modules that unload before it when shutting down remove their items then
+Revision 7f1b555 - Wed, 7 Aug 2013 17:27:18 +0000 - Shrink to fit module event vectors when modules are removed from them
+Revision 4865a8c - Wed, 7 Aug 2013 16:44:35 +0000 - Add m_sql_log
+Revision 1efd289 - Wed, 7 Aug 2013 15:03:11 +0000 - Fix inspircd jupe mess again, it wasn't working when juping servers that didn't already exist
+Revision 83e4b18 - Thu, 1 Aug 2013 14:07:56 +0000 - Add keepmodes setting
+Revision 1e625b6 - Thu, 1 Aug 2013 13:39:35 +0000 - Use MessageSource as the source for many IRCDProto funcs Keep track of what user modes are oper only/server only/etc
+Revision 402c624 - Mon, 29 Jul 2013 12:02:40 +0000 - Move chanstats stuff to stats/
+Revision fde83f6 - Fri, 26 Jul 2013 21:40:16 -0400 - Rethink jupe/squit thing somewhat. Workaround for the inspircd rsquit/squit mess
+Revision f0f43cf - Fri, 26 Jul 2013 12:57:36 -0400 - Fix build on late versions of cmake 2.4
+Revision 3dc64ba - Fri, 26 Jul 2013 08:45:44 -0400 - Fix issues with 'Me' related to previous commit
+Revision 2450a64 - Fri, 26 Jul 2013 07:38:42 -0400 - Interally quit servers when juped
+Revision b48293a - Tue, 23 Jul 2013 10:04:44 -0700 - Merge pull request #17 from fgsch/1.9
+Revision e908dc0 - Tue, 23 Jul 2013 18:03:32 +0100 - Make ChannelModeStatus level mandatory
+Revision 378c920 - Mon, 22 Jul 2013 23:45:08 -0400 - Squashed commit of the following from Federico G. Schwindt <fgsch@lodoss.net>: Date:   Mon Jul 22 22:40:07 2013 +0100
+Revision 779f378 - Sun, 21 Jul 2013 18:29:35 -0400 - More validation stuff from fgs
+Revision 604da89 - Sun, 21 Jul 2013 03:59:59 -0400 - More basic config validation, and fix crash when no uplinks are configured. spotted by fgs
+Revision e11abdc - Sun, 21 Jul 2013 00:37:21 -0400 - Fix m_ldap service names from defaulting ldap/ldap/main
+Revision 5aac04d - Sun, 21 Jul 2013 00:23:24 -0400 - Move SendLogin() back to User::Identify, it was moved at some point? but doesn't as intended in ::Login
+Revision 7480fbd - Sat, 20 Jul 2013 23:36:20 -0400 - Fix removing old connections in m_ldap and m_mysql
+Revision 9629ccb - Sat, 20 Jul 2013 19:46:13 -0400 - Fix more compile warnings found on newer g++ versions
+Revision cb70d97 - Sat, 20 Jul 2013 09:19:52 -0400 - Change cs_xop access check to use command order
+Revision 6db0186 - Sat, 20 Jul 2013 03:06:20 -0400 - Fix not setting the correct compile flags on modules and fix the resulting warnings
+Revision 492eac2 - Sat, 20 Jul 2013 03:06:20 -0400 - Fix restoring topics on uplink sync
+Revision c8511a6 - Sat, 20 Jul 2013 03:06:20 -0400 - Fix unserializaing seeninfos
+Revision f6b915a - Fri, 19 Jul 2013 22:28:33 +0200 - added whois support to the ngircd protocol module, thanks to fgs for sending the patch
+Revision 02c1724 - Fri, 19 Jul 2013 22:11:40 +0200 - some updates to the german langfile, thanks to kaylee for translating
+Revision 7e87bb6 - Mon, 15 Jul 2013 23:59:19 -0400 - Default xlines to be set by me
+Revision aae522d - Mon, 15 Jul 2013 23:23:54 -0400 - Fix ModeManager::GetStatusChar
+Revision 0a82164 - Sun, 14 Jul 2013 20:37:42 -0400 - Fix deleting seeninfos
+Revision 37733de - Sun, 14 Jul 2013 03:16:23 -0400 - Fix Extensible<bool>::Set with a value (which is redundant due to the bool specailization)
+Revision eabb9c0 - Mon, 8 Jul 2013 20:35:04 -0400 - Fix deleting badwords/modes/logs etc
+Revision b103d16 - Mon, 8 Jul 2013 15:48:37 -0400 - Fix loading some older compat flags and showing noexpire on /ns info
+Revision e3b6ae3 - Mon, 8 Jul 2013 07:42:35 +0200 - added missing NOTICE support to hybrid. sorry
+Revision 0ff48e1 - Sun, 7 Jul 2013 23:13:29 -0400 - Move op/deop/etc back to an actual command, its too hard to use cs_log with it as rewrites. Allow cs_log to work with either command names or service names.
+Revision 53038d8 - Sun, 7 Jul 2013 23:13:16 -0400 - Wipe services's module dir prior to make install
+Revision 2ea594d - Mon, 8 Jul 2013 05:05:13 +0200 - added protocol support for incoming NOTICEs
+Revision e957c7b - Mon, 8 Jul 2013 05:04:04 +0200 - m_dnsbl: updated the url to DroneBL in modules.example.conf
+Revision 9a4f27e - Fri, 5 Jul 2013 02:19:06 -0400 - Only set stuff in ExtensibleUnserialize if there is something to set
+Revision fccc4a4 - Fri, 5 Jul 2013 02:09:43 -0400 - Fix sometimes not unloading all modules on shutdown
+Revision 4325073 - Fri, 5 Jul 2013 02:09:27 -0400 - Fix ns_set_misc and cs_set_misc
+Revision 55199f0 - Thu, 4 Jul 2013 23:05:30 -0400 - Read most of the old common flags for compat
+Revision 7edc76f - Thu, 4 Jul 2013 23:05:30 -0400 - Fix deleting mode locks
+Revision 3fbdde5 - Thu, 4 Jul 2013 20:04:51 -0400 - Fix Extensible dtor
+Revision 9f8b4ac - Thu, 4 Jul 2013 01:21:14 -0400 - Allow access and flags to take privilege names
+Revision 998925c - Thu, 4 Jul 2013 01:19:40 -0400 - Fix rehashing via SIGHUP and m_mysql
+Revision 7f97104 - Wed, 3 Jul 2013 22:45:00 -0400 - Allow channels on access lists
+Revision c2e1a8a - Wed, 3 Jul 2013 19:44:13 -0400 - Fix some warnings and errors reported by valgrind
+Revision c62b3cb - Tue, 2 Jul 2013 01:56:13 -0400 - Fix a few issues found by Attila (invalid array access in channel set events, os_chankill inf loop)
+Revision 1a3d9a0 - Mon, 1 Jul 2013 22:17:52 -0400 - Change extensible keys to require explicitly having a type defined for it. Completely modularize more features like bs_kick, entrymsg, log, mode, etc. Move fantasy to its own module. Move greet to its own module.
+Revision 518182a - Sun, 30 Jun 2013 05:28:01 +0200 - m_mysql: handle multiple result sets returned from multiple statements or procedure calls
+Revision 7d0e063 - Sat, 22 Jun 2013 17:06:48 +0200 - added the missing accessmax option to the ns_cert configuration block
+Revision 5e36d84 - Sat, 22 Jun 2013 13:41:05 +0200 - pseudoclients now trigger OnJoinChannel and OnPartChannel
+Revision fee461f - Sat, 22 Jun 2013 13:40:19 +0200 - added support for CertFP on hybrid
+Revision 1773eef - Wed, 19 Jun 2013 20:53:40 -0400 - Don't enforce usestrictprivmsg on TS6 IRCds and cache the value of usestrictprivmsg
+Revision 7704ee7 - Wed, 19 Jun 2013 20:07:15 -0400 - Removed inspircd 1.1 reference from conf. Corrected a few spelling issues.
+Revision 5ac1e91 - Wed, 19 Jun 2013 19:03:56 -0400 - Set vhosts when users id to an account (and not a nick), add account arg to user ctor to ease handling users who connect already identified
+Revision 5695c9e - Tue, 18 Jun 2013 08:01:36 +0200 - fixed a typo in the last commit. sorry.
+Revision f92b0d6 - Tue, 18 Jun 2013 07:48:07 +0200 - added support for hybrids new umode +S (client is connected via SSL/TLS)
+Revision fc527b4 - Tue, 18 Jun 2013 07:35:47 +0200 - checking for ssl users when ajoining ssl only channels on inspircd, fixes 1466
+Revision a93b315 - Sat, 15 Jun 2013 23:27:01 -0400 - Fix cidr::match with odd cidr ranges
+Revision 5246424 - Sat, 15 Jun 2013 07:11:50 +0200 - added an 'extras' script to enable/disable extra modules before compile
+Revision 1316147 - Sat, 15 Jun 2013 00:09:25 +0000 - Update Spanish translation, courtesy of Isaac Fontal
+Revision 70319ab - Thu, 13 Jun 2013 20:50:59 -0400 - Fix usestrictprivmsg /msg vs / logic
+Revision 7dd3589 - Wed, 12 Jun 2013 02:33:30 +0000 - Fix possible crash in Extensible::ExtensibleUnserialize if a null entry is in it
+Revision d463ae3 - Wed, 12 Jun 2013 02:30:21 +0000 - Allow users to change their language to english when the default language is not
+Revision ebda113 - Thu, 6 Jun 2013 17:28:59 +0100 - Made the message for unconfirmed nicks relevant to the ns_register registration setting
+Revision 6ab6eca - Wed, 5 Jun 2013 20:56:16 +0100 - fixed typo, though I doubt it affects anyone/anything
+Revision b1ba1ec - Sat, 1 Jun 2013 21:58:08 -0400 - Made sepstream::GetToken less recursiveish
+Revision 9956da1 - Sat, 1 Jun 2013 21:56:52 -0400 - Move OnJoinChannel event to trigger after the user has completely joined and document it more about what you should and shouldnt do in it
+Revision b56e71a - Sat, 1 Jun 2013 14:55:45 -0400 - Move CheckKick event to Channel and make os_forbid use it instead of kicking users in the join event, which does bad things
+Revision 6f45d72 - Fri, 31 May 2013 18:34:21 -0400 - Made m_mysql's Escape() function safe against escaping strings > BUFSIZE
+Revision f5c01bf - Fri, 31 May 2013 01:44:32 -0400 - Fix /hs waiting
+Revision 06bad31 - Tue, 28 May 2013 22:17:22 -0400 - Fix Channel::SetCorrectModes to never remove modes <= voice (currently secureops enforces everything, inclurding voice)
+Revision 576aaff - Tue, 28 May 2013 21:07:07 -0400 - Don't compare system time to a users timestamp to determine when to collide with a user, if the time on services vs the ircd are different it does weird things
+Revision c5bc8fa - Tue, 28 May 2013 13:51:23 -0400 - Include <iterator> in services.h as now more than one file uses it
+Revision f6e2ebe - Tue, 28 May 2013 13:43:45 -0400 - Fixup last commit. We have events in log's destructor so we cant log messages from it, and this check in modulemanager is bogus/has a typo
+Revision 37b3535 - Mon, 27 May 2013 19:36:37 -0400 - Initially attach all modules to all events, and detach them as the events are run if they are not implemented per module
+Revision c21e8d9 - Sun, 26 May 2013 19:34:58 -0400 - Fix webcpanel build
+Revision 22658d6 - Sun, 26 May 2013 17:13:11 -0400 - Get rid of the remaining references in the core to specific services. Move more stuff out of the core to the proper modules.
+Revision f2dee1e - Sun, 26 May 2013 15:27:28 -0400 - Update INSTALL and place some example link configurations in example.conf
+Revision 968ef34 - Sat, 25 May 2013 15:47:56 -0400 - Update Hybrid protocol module for Hybrid 8.1
+Revision d6640ed - Sat, 25 May 2013 14:08:50 -0400 - Give an error message when the configuration file ends with an unterminated block
+Revision aabc217 - Mon, 20 May 2013 23:45:41 -0400 - Fix /join 0
+Revision d82391e - Mon, 20 May 2013 06:42:38 +0200 - made our database backup filenames more readable
+Revision 7aa0286 - Sun, 19 May 2013 01:11:55 -0400 - Mark service:channels as a "botchannel" and don't try to hold them on sync, as the client should always be in the channel
+Revision 2a8202c - Sat, 18 May 2013 23:45:10 -0400 - Give botserv bots assigned by persist the same botmodes as normal bots, fix some typos, remove unused variable
+Revision be4a39c - Sat, 18 May 2013 15:47:26 -0400 - Fix desync when empty permanent channels are dropped on ircds that no have permanent channel mode
+Revision a3dc75c - Sat, 18 May 2013 14:46:42 -0400 - Ignore define{} blocks defining directives to itself
+Revision 14dc142 - Sat, 18 May 2013 14:26:18 -0400 - Add botserv bot usermode config option
+Revision 51b7d53 - Sat, 18 May 2013 13:08:26 -0400 - Add a config option for the default log bot
+Revision 3253455 - Sat, 18 May 2013 12:25:26 -0400 - Tabify some stuff in config.cpp
+Revision 879b310 - Sat, 18 May 2013 00:27:03 -0400 - Fix Windows build
+Revision 5ff3aa7 - Fri, 17 May 2013 23:45:02 -0400 - Yet another variable shadowing error which only show on newer gcc versions
+Revision ca93122 - Fri, 17 May 2013 23:20:24 -0400 - You would think my compiler would at least warn me about this. but no.
+Revision 2428264 - Fri, 17 May 2013 23:04:18 -0400 - Add Redis database support
+Revision cc4a14b - Fri, 17 May 2013 22:53:55 -0400 - Removed some hard coded command names in help output
+Revision 934b584 - Wed, 15 May 2013 03:23:20 +0200 - do not validate nicks from ulined servers. this also fixes bug #1521
+Revision 4237d49 - Sun, 12 May 2013 11:09:34 +0200 - improved handling of mlocks and topiclocks on inspircd
+Revision 1c36de5 - Sat, 11 May 2013 17:13:01 +0100 - Fix config to default prepend_channel true for fantasy
+Revision da948be - Sat, 11 May 2013 17:06:16 +0100 - Update botserv.example.conf for xop fantasy commands
+Revision 9384a4f - Fri, 10 May 2013 16:17:24 -0400 - Fix ChannelMode::CanSet
+Revision 4d62c67 - Fri, 10 May 2013 20:18:48 +0100 - Fix typo in example.conf - thx rodr1go
+Revision 7426b3b - Wed, 8 May 2013 20:53:28 -0400 - Readd check for users.size() == 1 before holding channels
+Revision 735e234 - Wed, 8 May 2013 20:26:45 -0400 - Fixed some issues and desyncs with creating empty permanent channels on startup & dropping empty channels
+Revision 735f0ba - Wed, 8 May 2013 18:26:23 -0400 - Fix crash when we kill users because of a double free
+Revision 9ee7c82 - Wed, 8 May 2013 18:15:39 -0400 - Check for peace being on before denying a mode change in cs_mode
+Revision 912103e - Wed, 8 May 2013 11:31:20 -0400 - Allow using sxlines on ircds that do not support them, since we always enforce them anyway
+Revision f843e7b - Wed, 8 May 2013 11:13:48 -0400 - Fix suspend info output in info and improved it
+Revision d7e2ab6 - Wed, 8 May 2013 10:40:46 -0400 - Add activate_on_set option for hostserv
+Revision 5e70851 - Wed, 8 May 2013 10:12:31 -0400 - Fix reading multi line quotes from the conf with blank lines or lines with only whitespace
+Revision 9b07e16 - Wed, 8 May 2013 09:50:43 -0400 - Make sockaddrs/cidr not throw on invalid ips to give us an easier/cheaper way to test for a valid IP
+Revision 6859dec - Tue, 7 May 2013 00:24:37 -0400 - Fix setting some default flags, reading fantasy blocks, and minusers setting being off by 1
+Revision e23baf4 - Tue, 7 May 2013 00:06:02 -0400 - Allow /os exception to contain CIDR masks
+Revision c7f77b3 - Mon, 6 May 2013 23:48:18 -0400 - Fix a few issues with the poll socketengine
+Revision 6578829 - Mon, 6 May 2013 22:18:38 -0400 - Use I_OnUserQuit for os_session because I_OnPreUserLogoff gets called too late, after the users server can be gone. Fix a couple other small things
+Revision ef06226 - Mon, 6 May 2013 07:40:43 -0400 - Update the rest of modules.example.conf, default inspircd status modes to a sane rank incase they are prefixless, and 50 other things
+Revision 4c669b9 - Sun, 5 May 2013 22:49:29 -0700 - Merge pull request #14 from attilamolnar/1.9+inspmodes
+Revision 3fbb493 - Mon, 6 May 2013 01:38:27 -0400 - Fix extras build
+Revision 223aa65 - Mon, 6 May 2013 07:28:23 +0200 - removed an unused variable
+Revision fe54dfb - Sun, 5 May 2013 23:47:45 -0400 - Don't forget to CloseHandle threads on win32, spotted by Attila
+Revision 3f5f84c - Sun, 5 May 2013 21:18:47 -0400 - The const char* specialization of this no longer works
+Revision 5b3f81e - Sun, 5 May 2013 21:05:43 -0400 - That doesn't work either, just don't use references. find ./ -name '*.cpp' -exec sed -i 's/Get<const Anope::string\&>/Get<const Anope::string>/g' {} \;
+Revision 3e8752f - Sun, 5 May 2013 20:38:57 -0400 - The default arguments are references to temporaries which fall out of scope once the function returns, so we can't use them. gcc is just nice. cronus sucks. also validate a few more config options
+Revision 57c2b65 - Sun, 5 May 2013 03:30:08 -0400 - Move module header files to include/modules to fix naming conflicts with system headers
+Revision a118946 - Sun, 5 May 2013 03:04:01 -0400 - Fix Windows
+Revision ee2dcf1 - Sun, 5 May 2013 02:49:32 -0400 - Cache timeoutcheck and fix a typo in example.conf
+Revision e91de41 - Sun, 5 May 2013 02:00:33 -0400 - Add an option to sepstream to allow it to return empty tokens if multiple separators are found in a row
+Revision 10b5b00 - Sun, 5 May 2013 01:58:45 -0400 - Dont check for noquit/quitstorm, check and be sure all users are gone regardless
+Revision 2044b4d - Sun, 5 May 2013 01:57:24 -0400 - Cleanup of dns stuff based on stuff found making inspircd's module
+Revision 1d0bb9b - Sun, 5 May 2013 01:55:04 -0400 - Rework the config file reader to be much more flexible and move many configuration directives to the actual modules they are used in.
+Revision 781defb - Tue, 16 Apr 2013 01:58:29 -0500 - Move extras header files out of extras so when users copy modules out they dont need the headers too
+Revision 16c124d - Mon, 15 Apr 2013 01:00:45 -0500 - Rewrote modules/CMakeLists.txt and do not build the 'extras' modules, if users want them built they should copy or symlink them out of extras
+Revision f08dbce - Sun, 14 Apr 2013 17:39:01 -0500 - Allow assigning service bots via /invite
+Revision baabc91 - Sat, 13 Apr 2013 16:36:39 -0500 - Fix a few of the earlier changes to os_forbid
+Revision 81483ae - Sat, 13 Apr 2013 06:05:17 +0000 - Fix build on Solaris
+Revision 003140b - Fri, 12 Apr 2013 16:20:51 -0500 - Fix Windows build
+Revision b405484 - Fri, 12 Apr 2013 17:19:29 -0400 - Fix OSX buld and a warning in modulemanager.cpp
+Revision 9a45626 - Fri, 12 Apr 2013 15:45:52 -0500 - Hack around calculate_depends not able to find libintl.h, since we deal with that later
+Revision 10d10d0 - Fri, 12 Apr 2013 15:44:54 -0500 - Update Win32 build instructions slightly
+Revision aa2844a - Fri, 12 Apr 2013 02:48:24 -0500 - Fix not attaching cs_xop to I_OnReload
+Revision 42c640a - Fri, 12 Apr 2013 01:32:53 -0500 - /ns drop help was pretty much a complete lie, so fixed it. Also require a nick param to /ns drop
+Revision 066fc58 - Fri, 12 Apr 2013 01:14:56 -0500 - Fix m_ssl
+Revision 416eaa1 - Thu, 11 Apr 2013 15:58:59 -0500 - Explain how privileges associate themselves with modes
+Revision ac19a5c - Thu, 11 Apr 2013 15:35:39 -0500 - Fix memoserv/rsend reply
+Revision 6f9dd28 - Thu, 11 Apr 2013 15:28:53 -0500 - Use SetCorrectModes to set the inital modes on a founder once they register a channel
+Revision c56d72b - Thu, 11 Apr 2013 02:28:36 -0500 - Remove more OPDEOP references
+Revision db4ed1c - Thu, 11 Apr 2013 00:51:08 -0500 - Merge chanserv saset and set back into one command since it no longer needs to be separated... replace chanserv/set privilege with chanserv/administration. Dont tell users to use 'help' for more help if there is no help.
+Revision cb64d80 - Thu, 11 Apr 2013 00:20:24 -0500 - Remove the need for having to set syntax to "" for commands with no syntax
+Revision 4f9b787 - Thu, 11 Apr 2013 00:08:28 -0500 - Pass new config and the new config reader to the OnReload event, aswell as call it on module load on modules that hook to it
+Revision 207c46c - Wed, 10 Apr 2013 22:26:40 -0500 - Move some of the modules in extras/ that arent really extra out of extras. Mark our modules as VENDOR and allow modules to have multple types.
+Revision 957cb2b - Tue, 9 Apr 2013 16:27:25 -0500 - Use the mode names inspircd gives us to add modes if we don't recognize it
+Revision b244c74 - Tue, 9 Apr 2013 14:51:39 -0500 - Allow privilege descs to be read from the config to override the defaults
+Revision b76b2e1 - Tue, 9 Apr 2013 14:48:24 -0500 - Made privilege names case insensitive
+Revision b35665b - Tue, 9 Apr 2013 14:33:54 -0500 - Rename OPDEOP and OPDEOPME privileges to be similar to the other status privileges
+Revision c3eb5b8 - Tue, 9 Apr 2013 04:23:29 -0500 - And my bots initially start with no server..
+Revision 6faf4e3 - Tue, 9 Apr 2013 04:13:49 -0500 - 'Me' can not exist when channels are created
+Revision 325b018 - Tue, 9 Apr 2013 00:00:52 -0500 - Add a default method for user's SendModeInternal
+Revision 0a3d27a - Mon, 8 Apr 2013 23:37:42 -0500 - Made XOP privileges configurable
+Revision bcd85ca - Mon, 8 Apr 2013 01:05:25 -0500 - Fix OperType::GetCommands
+Revision ac40c53 - Mon, 8 Apr 2013 01:02:45 -0500 - Fix /ns set display
+Revision 2eae82d - Mon, 8 Apr 2013 01:01:27 -0500 - Check the channel secure option isn't set in ChannelInfo::AccessFor too
+Revision 72493b7 - Mon, 8 Apr 2013 00:42:07 -0500 - Fix secureops
+Revision 1a37e1c - Mon, 8 Apr 2013 00:19:07 -0500 - Made auto* chanserv privileges not hard coded. Made cs_statusupdate not remove status on users if they still match other entries. Move privilege descriptions out of the config
+Revision fb7fef7 - Sun, 7 Apr 2013 23:46:44 -0500 - Optimizations of much of the more commonly used code
+Revision 3660222 - Sat, 6 Apr 2013 19:34:35 -0500 - Remove the runtime module directory on non-windows because we no longer overwrite modules on install without deleting them first
+Revision ccecfdf - Sat, 6 Apr 2013 19:03:07 -0500 - Made the missing dependencies message from cmake more descriptive for modules
+Revision 32d1184 - Sat, 6 Apr 2013 17:08:25 -0500 - Use the return from BufferedSocket::ProcessRead() and don't just assume its true
+Revision 6a46a08 - Sat, 6 Apr 2013 16:58:04 -0500 - This worked before but is a little weird
+Revision 7a2e6aa - Sat, 6 Apr 2013 16:43:56 -0500 - Add more logging to bs_set, cs_set, and ns_set
+Revision 34b5f9c - Sat, 6 Apr 2013 23:10:26 +0200 - InspIRCd: Recognize a few more channel modes that weren't recognized
+Revision f77eb0a - Sat, 6 Apr 2013 15:59:38 -0500 - Let non founders still /cs ban by wildcard mask, but limit the number of people it will kick
+Revision 302a409 - Sat, 6 Apr 2013 15:44:03 -0500 - Unset +P from perm channels when expiring
+Revision 0b3b9fe - Sat, 6 Apr 2013 15:26:52 -0500 - Fix toggling topiclock when the channel setting is changed
+Revision f71c786 - Sat, 6 Apr 2013 15:06:39 -0500 - Fix generic mode support
+Revision 4ecf20b - Fri, 5 Apr 2013 16:59:27 -0500 - Fix ns_lists command group
+Revision a5b8788 - Fri, 5 Apr 2013 16:27:12 -0500 - Made the securefounder checks in cs_set more consistent
+Revision 3cc7950 - Fri, 5 Apr 2013 15:45:03 -0500 - Fix not constructing the /bs set greet command
+Revision 854bc4d - Thu, 4 Apr 2013 22:12:48 -0500 - Move around some of Init() to fork() before initing the socket engine, as some engines cant survive a fork()
+Revision dbc7727 - Thu, 4 Apr 2013 18:52:35 -0500 - Fix applying some sxlines to users on add
+Revision c4ef566 - Thu, 4 Apr 2013 18:45:45 -0500 - Fix /hs reject syntax
+Revision 6637633 - Thu, 4 Apr 2013 15:14:17 -0500 - Fix defcon taking action on new clients
+Revision 823bc01 - Tue, 2 Apr 2013 07:02:38 +0200 - mentioned the charybdis protocol support in the readme and example config
+Revision 947ad6f - Mon, 1 Apr 2013 10:26:19 +0200 - fixed using language files for third party modules
+Revision 06c8a1e - Mon, 1 Apr 2013 09:46:55 +0200 - Revert "added include/version.h to .gitignore"
+Revision b3fd861 - Mon, 1 Apr 2013 09:42:59 +0200 - added include/version.h to .gitignore
+Revision 62262f4 - Sun, 31 Mar 2013 00:43:11 -0500 - Fix typo in Mode message handler
+Revision 6e0dc0e - Sun, 31 Mar 2013 00:43:11 -0500 - Add networkinfo:modelistsize config option to set the max size of b/e/I lists
+Revision 7e7556f - Sat, 30 Mar 2013 23:39:43 -0500 - Merge usefulness of Timer and CallBack classes into Timer, and fix it to really work
+Revision 111d6a9 - Sat, 30 Mar 2013 22:40:20 -0500 - Fix loading ttb from databases
+Revision d238176 - Sat, 30 Mar 2013 22:08:51 -0500 - Add /bs set banexpire command to configure if/when botserv bans expire
+Revision 4694c7a - Sat, 30 Mar 2013 19:08:07 -0500 - Split up bs_kick subcommands into real subcommands
+Revision a522933 - Fri, 29 Mar 2013 23:51:45 -0500 - This reference to see if nickcores go away during command execution is no longer necessary
+Revision f24e17f - Fri, 29 Mar 2013 23:50:51 -0500 - Fix /bs set private
+Revision 2b208de - Fri, 29 Mar 2013 23:50:51 -0500 - Fix detecting module langauge files
+Revision 4eb5d15 - Sat, 30 Mar 2013 05:42:17 +0100 - uuups, we already have the year 2013
+Revision 0451dd3 - Sat, 30 Mar 2013 05:21:54 +0100 - added charybdis protocol support
+Revision c3e4f1b - Fri, 22 Mar 2013 18:41:23 -0500 - Fix build from earlier merge
+Revision f122f10 - Fri, 22 Mar 2013 11:52:42 -0500 - Merge remote branch 'attila/1.9+timermanager' into 1.9
+Revision deedb3b - Fri, 22 Mar 2013 11:46:30 -0500 - Dont call SetCloakedHost in users constructor, just set chost, because SetCloakedHost logs a message like the user just changed their host
+Revision d27aa03 - Thu, 21 Mar 2013 23:40:16 -0500 - Merge branch '1.9' of github.com:anope/anope into 1.9
+Revision dcffa5d - Thu, 21 Mar 2013 23:39:39 -0500 - Properly cleanup after entrymsglists and ajoinlists when destructed
+Revision 221e79f - Thu, 21 Mar 2013 23:33:40 -0500 - Check for null pointers in HasMLock/SetMLock/RemoveMLock, cs_register can pass it some sometimes/possibly other places
+Revision d5a453b - Wed, 20 Mar 2013 19:42:50 +0100 - Improve TimerManager
+Revision a2d69fa - Wed, 20 Mar 2013 09:45:40 -0700 - Merge pull request #13 from attilamolnar/1.9+inspversionfix
+Revision 6a0e441 - Wed, 20 Mar 2013 11:39:16 -0500 - Check that channels still exist before nulling their ci pointer in channelinfos destructor Change the persist setting on a channel to mean only that it is being enforced ircd-side
+Revision 68eeac6 - Tue, 19 Mar 2013 19:16:13 +0100 - InspIRCd: Don't reply to VERSION
+Revision 731912f - Mon, 18 Mar 2013 12:16:51 -0500 - Add db_sql:import config option so we can know for sure whether or not we want a database import
+Revision 5196391 - Sat, 16 Mar 2013 21:53:03 -0500 - Remove remaining disable_ns_register references in example config
+Revision 810685c - Sat, 16 Mar 2013 20:08:39 -0500 - Have db_flatfile store object ids if they are set, even though it doesn't use them, so that if other database modules that use them are loaded they can keep track of objects properly
+Revision 1a0e6b0 - Fri, 15 Mar 2013 12:27:08 -0500 - Allow autokicking real names, extbans, and channels
+Revision 81c89bb - Fri, 15 Mar 2013 07:43:17 -0500 - Fix missing dependencies message to include the source folder, there is no specific source file on modules with multiple source files
+Revision 01620e8 - Thu, 14 Mar 2013 20:51:28 -0500 - Update nickserv defult names for kill/killquick, hide email, usermask, and quit
+Revision 4c74020 - Thu, 14 Mar 2013 09:03:48 -0500 - Add group and hide setings to fantasy{} blocks
+Revision b95b8f0 - Thu, 14 Mar 2013 09:03:48 -0500 - Fix setting BSDefFlags from the config
+Revision 1ff7a7c - Wed, 13 Mar 2013 14:40:49 -0500 - Refactor mask/entry code, allow full matching (against users real host/ip) if their displayed host is their real real host. Also match against cloaked host even if full matching is not being done
+Revision 1d16629 - Wed, 13 Mar 2013 09:45:15 -0500 - Allow opers to override chanserv kick/ban, botserv say/act, and akick's peace setting
+Revision 72aa27e - Wed, 13 Mar 2013 09:02:31 -0500 - Allow m_ldap_authentication to block email changes if emails are controlled by ldap, don't tell users they must change their email during initial user registration
+Revision 05223db - Sun, 10 Mar 2013 03:23:00 -0500 - Identify requests hold command sources and users can disconnect between the request being dispatched and when it returns, so don't assume the source user pointer is always valid
+Revision 06d43ba - Sun, 3 Mar 2013 10:58:39 +0100 - update the users password after a successful ldap authentication
+Revision 5f74662 - Sun, 3 Mar 2013 10:57:53 +0100 - improved the operserv mode command
+Revision 2c68312 - Sun, 3 Mar 2013 02:04:33 -0500 - Bump for Anope 1.9.9-git
+Revision ce094f4 - Sat, 2 Mar 2013 23:42:01 -0500 - Anope 1.9.8 Release
+Revision 1780560 - Sat, 2 Mar 2013 23:42:00 -0500 - Regenerate language files
+Revision a32c897 - Sat, 2 Mar 2013 23:42:00 -0500 - Update Changes and Changes.conf
+Revision 367b662 - Sat, 2 Mar 2013 23:42:00 -0500 - Fix compile warning in webcpanel/memos
+Revision 75999e0 - Sat, 2 Mar 2013 23:42:00 -0500 - Fix Anope::Duration showing years failing
+Revision 45c02f8 - Sat, 2 Mar 2013 23:42:00 -0500 - Fix build with -std=c++11
+Revision ae4421b - Sat, 2 Mar 2013 23:42:00 -0500 - Unset founder/successors when channels are deleted
+Revision 2d309da - Sat, 2 Mar 2013 18:52:15 -0500 - Fix /ns drop nick showing "your nick" and not the nick you specified if the nick isn't registered
+Revision b9bbb37 - Sat, 2 Mar 2013 18:46:56 -0500 - Fixed logic fail in /ns resend
+Revision 0b05eaa - Fri, 1 Mar 2013 01:40:14 -0500 - Only shrink extensible items that are metadata in ExtensibleUnserialize
+Revision 91ad9d2 - Fri, 1 Mar 2013 00:57:24 -0500 - Fix Windows build
+Revision 6aa9ad9 - Fri, 1 Mar 2013 00:56:47 -0500 - Don't have cs_seen update data for users on syncing servers
+Revision 6808498 - Thu, 28 Feb 2013 23:09:03 -0500 - Fix entrymsg's creation time being reset from restarts
+Revision 8561941 - Mon, 25 Feb 2013 00:26:49 -0500 - Don't enforce session limit on clients with no IP on Unreal, fix typo in /cs down syntax, fix os_session messages to reference ip
+Revision 5d4db2b - Sun, 24 Feb 2013 20:15:49 -0500 - Allow /cs up and /cs down to take an optional nick arg
+Revision 501503b - Sun, 24 Feb 2013 20:14:15 -0500 - On startup check all object types
+Revision a980e32 - Sun, 24 Feb 2013 21:07:10 +0100 - fixed wrong parameter count in cs_updown
+Revision da2fea3 - Sun, 24 Feb 2013 09:48:20 +0100 - fixed some stupid typos in the german language file
+Revision 7cb70f5 - Sun, 24 Feb 2013 08:14:13 +0100 - some updates to the german langfile
+Revision d04db3d - Sat, 23 Feb 2013 17:41:52 -0500 - Add SVSNICK and SVSHOLD to hybrid
+Revision 35c2608 - Sat, 23 Feb 2013 11:20:31 +0100 - Revert "do not send RESV from operserv when its not introduced"
+Revision 8cf7ec9 - Sat, 23 Feb 2013 04:32:41 -0500 - Add missing SVSHold funcs to plexus protocol module
+Revision c67087d - Sat, 23 Feb 2013 04:32:41 -0500 - Fix akick list/view not showing masks sometimes
+Revision 2336b47 - Sat, 23 Feb 2013 09:54:03 +0100 - do not send RESV from operserv when its not introduced
+Revision da61734 - Fri, 22 Feb 2013 04:42:08 -0500 - Made FindService less dumb and able to do aliases to aliases
+Revision a911354 - Fri, 22 Feb 2013 00:39:13 -0500 - Fix "leave" channel log level
+Revision ae90244 - Fri, 22 Feb 2013 00:30:22 -0500 - Merge branch '1.9' of github.com:anope/anope into 1.9
+Revision 5547c3e - Fri, 22 Feb 2013 00:29:00 -0500 - This OnServerSync event hook in inspircd20 can go away (it does nothing currently)
+Revision e844cdf - Thu, 21 Feb 2013 07:38:42 +0000 - Update COPYING
+Revision 2fa5cfa - Wed, 20 Feb 2013 18:00:46 -0500 - Add Matthew to webpanel credits, fix alignment of akill list
+Revision 5979217 - Wed, 20 Feb 2013 14:58:59 -0800 - Merge pull request #12 from MatthewM/webcpanel
+Revision ed68482 - Wed, 20 Feb 2013 15:51:40 -0500 - Add /cs mode clear command that behaves like the old /cs clear modes/bans/etc
+Revision 3259298 - Tue, 19 Feb 2013 04:07:53 -0500 - Allow /os mode clear [all] to unset modes, similar to old clearmodes
+Revision a1f9263 - Tue, 19 Feb 2013 01:28:27 -0500 - Merge branch '1.9' of github.com:anope/anope into 1.9
+Revision 7d50818 - Tue, 19 Feb 2013 00:48:21 -0500 - Fix some OpenBSD build issues, and bugs #1485 #1486 #1487
+Revision d0e1f3b - Tue, 19 Feb 2013 05:21:01 +0100 - fixed a typo in the last SASL commit
+Revision cb91f99 - Mon, 18 Feb 2013 22:10:57 -0500 - Made the mode bouncing detector harder to hit and ignore syncing channels
+Revision a49d7b1 - Sun, 17 Feb 2013 05:31:04 -0800 - Merge pull request #11 from grawity/mailmap
+Revision eda7b55 - Sun, 17 Feb 2013 15:19:11 +0200 - Add mailmap for Git
+Revision bcf99d5 - Sun, 17 Feb 2013 12:26:51 +0100 - SASL sends AUTHFAIL on unsupported mechanisms, fixes bug #1482
+Revision 3ab6706 - Sat, 16 Feb 2013 03:59:28 -0500 - InsIRCd only sends QUIT on KILL for users 1 hop from us, so always internally kill users that we kill. Bug #1481
+Revision c40e9c3 - Sat, 16 Feb 2013 00:31:42 -0500 - Fix missing CheckInit check in db_sql_live
+Revision 7be23b7 - Fri, 15 Feb 2013 23:18:34 -0500 - Fix setting modes on botserv bots in channels that have other bots in them on startup
+Revision d9c18a6 - Fri, 15 Feb 2013 19:01:46 -0500 - Store hashes of the last commit instead of the last commit
+Revision 73099b8 - Fri, 15 Feb 2013 18:32:06 -0500 - Fixed unserializing servers in dns zones
+Revision fc1d7ea - Thu, 14 Feb 2013 20:58:01 -0500 - Switch Destroy methods to delete
+Revision 391f282 - Thu, 14 Feb 2013 20:57:40 -0500 - This Serialize::Destroy method isn't actually needed anymore. Fixes weirdness from a few Serializable items we had on the stack. Added a comment about why operator< in Reference fails.
+Revision f0875c5 - Thu, 14 Feb 2013 20:11:52 -0500 - Iterators suck
+Revision f6ef706 - Thu, 14 Feb 2013 01:24:29 -0500 - Magiobiwan is silly
+Revision 7656c25 - Thu, 14 Feb 2013 01:20:18 -0500 - Made chanserv/unban with no parameters unban you in every channel you have access in
+Revision 5cf1ede - Thu, 14 Feb 2013 01:20:18 -0500 - Fix CommandCSMode::CanSet letting everyone set voice
+Revision 9e544a6 - Thu, 14 Feb 2013 01:20:18 -0500 - Store what channels have references to accounts in NickCore to prevent having to iterate over all channels and then all access entries when nicks expire or from nickserv/alist
+Revision 225b7c3 - Thu, 14 Feb 2013 01:20:18 -0500 - Make NickCore::aliases a vector
+Revision 9948664 - Thu, 14 Feb 2013 01:20:18 -0500 - Update obj ts when constructed in db_sql
+Revision fc4b884 - Sun, 10 Feb 2013 12:31:37 -0500 - Sort output in ns_list and cs_list
+Revision 9b3ecfe - Sat, 9 Feb 2013 22:48:05 -0500 - Fixed sepstream::GetToken logic fail
+Revision 2079498 - Sat, 9 Feb 2013 00:24:15 -0500 - (re?)add mlock set as a simple way to clear all mlocks and add new ones at once
+Revision 01413dd - Thu, 7 Feb 2013 21:49:49 -0500 - Use channel mode +r to determine if a channel has either been newly created or created while we were offline (eg, during the inital burst to the uplink). Fixes not knowing whether or not channels ops in non-secureop non-persistent channels obtained op while we were offline by creating the channel or legitimately by being set op by another channel op.
+Revision 9d1fe61 - Thu, 7 Feb 2013 21:49:49 -0500 - Made DNSServer::Find case insensitive
+Revision 2472a41 - Tue, 5 Feb 2013 08:04:45 -0800 - Merge pull request #9 from Robby-/1.9-ns_set_misc
+Revision 65fbdcf - Tue, 5 Feb 2013 16:31:14 +0100 - Fixed ns_set_misc not showing help for its SASET commands. Added descriptions and SASETs for the remaining commented ns_set_misc examples, without a description they won't show up in HELP if someone actually enabled those.
+Revision 25cec01 - Tue, 5 Feb 2013 09:45:48 -0500 - Made access del by nick and other functions from 326f1a really delete objects
+Revision 62e3c8c - Sat, 2 Feb 2013 10:53:05 -0800 - Merge pull request #7 from artemiiav/patch-2
+Revision 8902c1f - Sat, 2 Feb 2013 10:51:08 -0800 - Merge pull request #8 from Robby-/1.9
+Revision 6c43bcc - Sat, 2 Feb 2013 07:32:32 +0100 - cs_enforce: Make the logging also show the channel it was used on, added 2 missing log calls, can now handle overrides by services operators.
+Revision 15b37c1 - Sat, 2 Feb 2013 07:30:53 +0100 - Some more typo and help text fixes, proper formatting of control codes, missing privileges, and settings corrections.
+Revision 29fcdc5 - Thu, 31 Jan 2013 21:24:48 -0500 - Updated jquery API to v1.9.0
+Revision 1075bb1 - Thu, 31 Jan 2013 22:33:14 +0300 - Update src/config.cpp
+Revision dccb0ee - Wed, 30 Jan 2013 22:50:11 -0800 - Merge pull request #5 from Robby-/1.9
+Revision aea8690 - Thu, 31 Jan 2013 06:19:14 +0100 - Some configuration file updates: Removed now non-existing settings. Redid some existing settings to look more consistent/uniform. Added some missing commands/permissions. Merged operserv/modlist permission into operserv/modinfo. Fixed ChanServ INFO privilege to actually work for /BotServ INFO too for those users who have it, instead of only for founders. Fixed some typos aswell as removed whitespaces along the way.
+Revision a62698a - Wed, 30 Jan 2013 17:44:07 -0500 - Remove sendpass from the configs and the config reader since it no longer exists
+Revision 47af43c - Wed, 30 Jan 2013 11:24:57 -0500 - Made Anope::Duration also show years
+Revision ae2c82a - Wed, 30 Jan 2013 10:39:52 -0500 - Don't expire session exceptions if in noexpire mode
+Revision 594b1a1 - Wed, 30 Jan 2013 10:39:52 -0500 - Evidently Persistant is not a word
+Revision ae46cc7 - Wed, 30 Jan 2013 09:18:56 +0100 - fixed an infinite loop in ns_recover, caused by a very small typo.
+Revision 6b2aad7 - Sun, 27 Jan 2013 13:55:42 -0500 - Fixed SQL::Data::IsEqual to really only return if the two are completely equal. Fixes oddities with caching objects that are actually updated.
+Revision 98ccbe2 - Sun, 27 Jan 2013 10:50:55 -0500 - Old botserv flags need BS_ prepended to them
+Revision 5ae100f - Sun, 27 Jan 2013 05:00:00 -0500 - Add nickserv/alist priv, merge botserv/botlist and botserev/assign/private to botserv/administration
+Revision 0052dd2 - Sun, 27 Jan 2013 01:59:38 -0500 - Fix db_flatfile not clearing databases on save if there are no objects left of that type (it will leave the old database with old objects currently)
+Revision 50a42d2 - Sat, 26 Jan 2013 22:17:25 -0500 - Fix os_session to work with sql properly
+Revision 49cb6a0 - Sat, 26 Jan 2013 20:52:49 -0500 - Fixed db_sql etc being confused on empty vs not set metadata
+Revision ed7c4dc - Fri, 25 Jan 2013 04:05:38 -0500 - Made Anope::DoTime default to seconds to fix os_akill etc defaulting expiries to days
+Revision c376fb0 - Fri, 25 Jan 2013 03:31:35 -0500 - I forgot to add this change to a634c7be65113c74736be0fb98f31b0c83ec2882
+Revision 76d9e58 - Fri, 25 Jan 2013 03:09:51 -0500 - mysql_insert_id doesn't return an id if one isnt generated, so check that it really returns a value before using it. Also fix memos to cleanup after themselves when deleted.
+Revision 3769cc1 - Thu, 24 Jan 2013 08:53:35 -0500 - Fix memo signon and memo receive default flag names
+Revision 74ace7d - Thu, 24 Jan 2013 00:34:41 -0500 - Channel::HasUserStatus: Don't just return false if cms is NULL.
+Revision 647245a - Wed, 23 Jan 2013 22:16:01 -0500 - Add missing KeySet() func to SQL::Data
+Revision a634c7b - Tue, 22 Jan 2013 21:20:05 -0500 - Fix some compile errors
+Revision f656e31 - Tue, 22 Jan 2013 19:47:16 -0500 - Add hidenetsplitquit config option to not show splits in /ns info's last quit field
+Revision 8811545 - Tue, 22 Jan 2013 17:32:23 +0000 - Fixed few minor typos
+Revision cad3850 - Tue, 22 Jan 2013 01:23:55 -0500 - Move channel mode set and unset events to be after the action has been done internally to allow easially canceling it
+Revision 7de058b - Tue, 22 Jan 2013 00:24:58 -0500 - Fix crash trying to unset the permanent channel mode during channel syncs of empty channels
+Revision ddaa001 - Mon, 21 Jan 2013 22:31:16 -0500 - Merge usefulness of Flags and Extensible classes into Extensible, made most flags we have juse strings instead of defines/enums
+Revision 51c049e - Mon, 21 Jan 2013 18:03:31 -0500 - Really fix Channel::GetModes
+Revision 93472f8 - Mon, 21 Jan 2013 17:59:22 -0500 - Revert "Fix Channel::GetModes, we can never have a negative mode set on a channel so this check is unnecessary"
+Revision 678d27f - Mon, 21 Jan 2013 17:55:27 -0500 - Fix Channel::GetModes, we can never have a negative mode set on a channel so this check is unnecessary
+Revision 369ca89 - Mon, 21 Jan 2013 06:46:28 -0500 - Allow channels that have users in them that are not the access list to expire while in use.
+Revision 421db75 - Mon, 21 Jan 2013 06:38:13 -0500 - Fix not logging debug info to the logfile when debug mode is enabled
+Revision 846b56c - Mon, 21 Jan 2013 02:31:28 -0500 - Fix defcon timeout timer
+Revision e62d2fe - Mon, 21 Jan 2013 07:15:16 +0100 - removed old cs_modes fantasy{} command blocks
+Revision bb3abab - Sun, 20 Jan 2013 15:03:15 +0100 - removed loading of ns_set_chanstats and cs_set_chanstats from the chanstats.example.conf, this functionality is now part of ns_set/cs_set
+Revision da6543d - Sun, 13 Jan 2013 22:07:27 -0500 - Allow grouping commands to make help output easier to comprehend
+Revision 29a0180 - Sun, 13 Jan 2013 22:07:27 -0500 - Add svsjoin and svspart commands
+Revision 7e7fc75 - Sun, 13 Jan 2013 22:07:27 -0500 - Allow ns_set_misc/cs_set_misc to have configurable help descriptions
+Revision d3a6bdc - Sun, 13 Jan 2013 22:07:27 -0500 - Allow the config parser to skip over gettext's _() to allow translating config values
+Revision 402e42f - Sat, 12 Jan 2013 09:01:44 +0100 - check if the database exists before we try to backup it
+Revision 5007b72 - Wed, 9 Jan 2013 04:20:55 -0500 - Update copyright to 2013. This was done with: find include/ src/ lang/ docs/ modules/ *.* Config -exec sed -i 's/-2012 Anope Team/-2013 Anope Team/i' {} \;
+Revision 9931ec2 - Tue, 8 Jan 2013 20:25:01 -0500 - Use m_rewrite to rewrite op, deop, halfop, ... etc
+Revision 5f3dfc2 - Mon, 7 Jan 2013 21:30:07 -0500 - Track +g on inspircd, fix saving/loading mode locks for generic modes
+Revision dc9e81a - Sun, 6 Jan 2013 18:38:04 -0500 - Fix deleting access by number
+Revision ed719c8 - Sun, 6 Jan 2013 16:13:35 -0500 - Buggy compilers are buggy
+Revision 77dc2e4 - Sun, 6 Jan 2013 01:46:53 -0500 - And really check for them using ssl...
+Revision c5f4c8d - Sun, 6 Jan 2013 01:19:25 -0500 - Fixed enforce ssl to not ban users if the channel is ssl only
+Revision 6ba4964 - Sun, 6 Jan 2013 00:48:50 -0500 - Fix fmode handling on inspircd20
+Revision 9a2ef9d - Sat, 5 Jan 2013 22:42:07 -0500 - Add sslonly, bans, and limit to /cs enforce
+Revision 6ccf0a3 - Thu, 3 Jan 2013 13:39:50 -0500 - Fixed os_dns not readding connected servers if configured
+Revision 23e303a - Thu, 3 Jan 2013 13:20:10 -0500 - Move enforcer checks on nick and logout to nickserv.cpp
+Revision 098157d - Thu, 3 Jan 2013 12:34:01 -0500 - Don't delete users immediately when quit or killed, instead wait until message processing is done
+Revision 8274696 - Wed, 2 Jan 2013 13:59:33 -0500 - Move nickserv validate stuff to an event in nickserv.cpp
+Revision bf718e8 - Sun, 30 Dec 2012 10:30:29 -0500 - Evidently not specifying NOT NULL is not enough to allow null timestamps
+Revision 326f1a9 - Sat, 29 Dec 2012 20:29:41 -0500 - Cleanup after mode locks, badwords, akick, access, if destructed
+Revision 793c438 - Sat, 29 Dec 2012 11:09:54 -0500 - Remove clearuser references from configs
+Revision 6b1f323 - Fri, 28 Dec 2012 15:59:33 -0500 - Move some of CheckKick to the respective modules
+Revision 7618490 - Fri, 28 Dec 2012 13:00:36 -0500 - Dumb iterators
+Revision ae6ddf2 - Fri, 28 Dec 2012 11:17:01 -0500 - fixup part of 379b2c, dont use iterators after theyre erased
+Revision b591e8c - Fri, 28 Dec 2012 10:43:30 -0500 - Use the same object for chanusercontainer and userchancontainer
+Revision 379b2cc - Fri, 28 Dec 2012 10:43:30 -0500 - The timestamp column in SQL should actually be null sometimes, and fixed some valgrind errors with db_sql_live
+Revision 3fb4cf5 - Thu, 27 Dec 2012 13:25:33 -0800 - Merge pull request #4 from alexbarton/ngircd-fix-NJOIN
+Revision fdc62da - Thu, 27 Dec 2012 22:15:33 +0100 - ngircd protocol module: Fix NJOIN, actually join users to the channel
+Revision 05094b0 - Thu, 27 Dec 2012 15:03:38 -0500 - When processing many modes don't enforce mlock until all are set
+Revision 4ab8a70 - Thu, 27 Dec 2012 11:06:00 -0500 - Add an expiry option to /cs ban
+Revision c88a3ff - Thu, 27 Dec 2012 09:50:44 -0500 - Remove clearusers. There is still kick * for this.
+Revision 7b1ae96 - Thu, 27 Dec 2012 09:43:19 -0500 - Put appendtopic and topiclock into /cs topic
+Revision c7a22df - Wed, 26 Dec 2012 19:42:37 -0500 - Add register type to os_forbid to prevent users from registering nicks or channels
+Revision 45ee7c1 - Tue, 25 Dec 2012 17:10:43 -0500 - Clean up the logic in adding extra library directories, adding to LDFLAGS isn't needed.
+Revision 392b591 - Tue, 25 Dec 2012 15:52:58 -0500 - Allow modules loaded after startup to magically reobtain their database objects. Fix os_dns for sql(live)
+Revision 556a437 - Tue, 25 Dec 2012 12:40:09 -0500 - Cleanup after os_dns on unload
+Revision eab5833 - Tue, 25 Dec 2012 12:36:58 -0500 - Don't check userlimit when servers first connect, servers wont have any users at that point anyway
+Revision 077ae27 - Tue, 25 Dec 2012 02:20:00 -0500 - Fix linking libraries so their rpath is set correctly and isn't stripped on install.
+Revision d4e1c95 - Tue, 25 Dec 2012 01:09:03 -0500 - packet->answers isnt always empty initially, like with axfrs
+Revision 33ae442 - Mon, 24 Dec 2012 18:15:38 -0500 - We can svsjoin on plexus
+Revision 1285c7f - Sun, 23 Dec 2012 15:30:08 -0500 - Allow os_dns to manage multiple zones
+Revision 8c72892 - Sun, 23 Dec 2012 14:56:02 -0500 - Made the overlay resize and the alert box reposition when the window is resized
+Revision dc751bd - Sat, 22 Dec 2012 14:49:48 -0500 - Combine all of the set modules now that having them split apart is almost completely pointless
+Revision 0cde0ae - Sat, 22 Dec 2012 09:10:32 -0500 - Fixed memo mail messages, and allow %N to be in them. Bug #1462
+Revision 503bda5 - Thu, 20 Dec 2012 23:48:20 -0500 - Move the var to set the time out into the same javascript tag that is used for the modal as it's related
+Revision a4d5c40 - Thu, 20 Dec 2012 16:22:58 -0500 - Added the overlay to the vHost request function
+Revision 8e219bd - Thu, 20 Dec 2012 16:12:16 -0500 - Moved the javascript to header.html from memos.html to make it easier to intergrate the overlay feedback and do tweaks
+Revision 5acc93d - Thu, 20 Dec 2012 01:19:04 -0500 - Made the table cells for the memo table have no spacing and color the read and unread memos different colors
+Revision 276247b - Wed, 19 Dec 2012 16:03:53 -0500 - Add a command flag to require that a user is executing the command
+Revision d277f49 - Wed, 19 Dec 2012 13:17:44 -0500 - Minor style tweaks to make the links look more like a button
+Revision 67bd2c6 - Wed, 19 Dec 2012 09:21:25 -0500 - Add version flags for debug, git, and Windows
+Revision 784683a - Wed, 19 Dec 2012 08:48:23 -0500 - Having these references to bots bugged out older compilers, so simplify this by just moving pointers to the core
+Revision 3b20943 - Tue, 18 Dec 2012 10:35:11 -0500 - Fixed typo in b6407afa06917910732966ea3c49ac4bd7850fe4
+Revision 6572754 - Tue, 18 Dec 2012 10:34:33 -0500 - Cleaned up the overlay layout, added some minor visual and js fixes
+Revision f157ea3 - Tue, 18 Dec 2012 10:04:26 -0500 - Added a click reply function to the MemoServ memos page that autofills the senders name
+Revision ddd7fe6 - Mon, 17 Dec 2012 22:03:21 -0500 - Bug that was experinced seems to be somewhat related to Windows 8 and maybe an extension on chrome. Reverting to previous commit
+Revision 47a351a - Mon, 17 Dec 2012 19:26:07 -0500 - Fixed a minor bug that overlapped the nav links and the content from .content in Chrome on Windows
+Revision ff9f670 - Mon, 17 Dec 2012 18:28:15 -0500 - Give the overlay window a rounded edge to make it look a bit nicer and fade the main content a little less
+Revision f33f7d9 - Mon, 17 Dec 2012 14:32:28 -0500 - Added a modal window interface to MemoServs page that will automaticly fade out after a give time (currently 5s)
+Revision c49f03f - Sat, 15 Dec 2012 23:51:25 -0500 - Allow escaping brackets in webpanel templates and redirect users to the homepage when their session is not found
+Revision 6b5f583 - Sat, 15 Dec 2012 21:46:14 -0500 - Merge Adams commit to allow escaping of brackets
+Revision 8e3ab0d - Sat, 15 Dec 2012 21:35:38 -0500 - Made all langauges default to the UTF-8 charset
+Revision a049092 - Sat, 15 Dec 2012 21:05:05 -0500 - Merge branch '1.9' into webcpanel
+Revision b6407af - Sat, 15 Dec 2012 05:13:09 -0500 - Fix chghost/chgident/etc on inspircd20
+Revision fbd3cda - Sat, 15 Dec 2012 01:15:03 -0800 - Merge pull request #2 from czaks/conv-languages-to-utf-8/1.9
+Revision 0534182 - Sat, 15 Dec 2012 09:39:12 +0100 - Convert the language files to utf-8 encoding.
+Revision 280ba89 - Sat, 15 Dec 2012 09:28:19 +0100 - Fix the language files to state the correct charset.
+Revision fe7fcc2 - Sat, 15 Dec 2012 02:44:53 -0500 - Check for NOJOIN being < 0 but restricted on in db_old
+Revision dcd34d3 - Sat, 15 Dec 2012 01:33:31 -0500 - Move DNS handling to a module
+Revision dced01f - Sat, 15 Dec 2012 01:14:52 -0500 - Added a large scroll box for the chanserv main page
+Revision cdec0a3 - Fri, 14 Dec 2012 16:47:45 -0500 - Fixed some html errors in the last commit
+Revision 1075f3b - Fri, 14 Dec 2012 16:44:14 -0500 - Allow opers to drop channels Added chanserv drop to web panel Allow long lists of akills to scroll
+Revision c1077fa - Thu, 13 Dec 2012 06:12:56 -0500 - Optimize much of the database code and serialize code.
+Revision 76ba147 - Wed, 12 Dec 2012 02:28:19 -0500 - Unregister operserv_akill page on unload in cpanel
+Revision 1c1a216 - Wed, 12 Dec 2012 01:33:58 -0500 - Only allow non-user sources to register nonexistant channels
+Revision 04f96a5 - Wed, 12 Dec 2012 01:30:50 -0500 - Some small improvements to last few commits, and fixed some problems with the template engine
+Revision 5f72d1f - Wed, 12 Dec 2012 01:04:08 -0500 - Squashed commit of the following:
+Revision dfff544 - Wed, 12 Dec 2012 00:49:16 -0500 - Fixed webpanel fail on nondebug builds
+Revision 0edd264 - Tue, 11 Dec 2012 05:27:56 +0100 - IsNickValid() now accepts '[' and  ']' in the nickname
+Revision e71c890 - Sun, 9 Dec 2012 14:32:16 +0100 - added a missing permission for operserv/global to the Services Administrator block in example.conf
+Revision eada35d - Sun, 9 Dec 2012 14:21:42 +0100 - fixed a problem with the webcpanel logout when using apache + mod_proxy
+Revision 8d4a08c - Sun, 9 Dec 2012 14:19:30 +0100 - fixed a log message showing the wrong IP
+Revision 9dec093 - Fri, 7 Dec 2012 03:02:15 -0500 - Modified the Config scripts to ask the user explicitly for additional include and library directories.
+Revision f711dd3 - Wed, 5 Dec 2012 06:18:36 +0100 - ngircd protocol module: improved vhost support
+Revision 7a865b6 - Sun, 2 Dec 2012 04:31:50 -0500 - Only bad-password users when the account theyre trying to identify for actually exists
+Revision faaaae3 - Sun, 2 Dec 2012 09:16:40 +0100 - enc_sha256: the length of the digest is SHA256_DIGEST_SIZE, not SHA256_BLOCK_SIZE. also removed an unneeded trailing NULL byte.
+Revision 705d1ef - Fri, 30 Nov 2012 20:49:59 -0500 - Allow services to return more than one NS record
+Revision c0f60d5 - Fri, 30 Nov 2012 20:44:21 -0500 - Change /os reload to not unnecessarially rebuild httpd servers. Change m_httpds Log methods to the module version.
+Revision a4468dd - Fri, 30 Nov 2012 02:53:03 -0500 - Allow modules to use the encryption modules to encrypt arbitrary things. Made enc_old depend on enc_md5. Allow not loading any encryption modules if you want to only use an external mechanism. Removed ns_sendpass since it's just a bad idea.
+Revision 337f361 - Thu, 29 Nov 2012 17:03:53 -0500 - Fix warnings from classes with virtual functions not having virtual destructors
+Revision 26a048e - Wed, 28 Nov 2012 22:54:26 -0500 - Rewrite/simplify some of m_httpd
+Revision ccd41e7 - Wed, 28 Nov 2012 00:42:07 -0500 - Use signon for svid on bahamut, not timestamp
+Revision a1a5ba0 - Tue, 27 Nov 2012 21:43:17 -0500 - Use signon for svid on unreal, not timestamp
+Revision 8a6962f - Mon, 26 Nov 2012 23:09:26 -0500 - Keep track on what ircds we can svsjoin, add an svspart method
+Revision f23bad1 - Mon, 26 Nov 2012 19:50:29 -0500 - Revert a small part of 90930619bc124e94bac5048c0b13c3f4748b559d, evidently this was important
+Revision 1bfafd9 - Mon, 26 Nov 2012 04:30:30 -0500 - Fixed rehasing doing weird things to botmodes due to trying to set on nick not uid
+Revision 1bdb756 - Sun, 25 Nov 2012 22:37:54 -0500 - Restrict the length of kick reasons in cs_kick, cs_ban, and cs_akick
+Revision 80c573e - Sun, 25 Nov 2012 21:47:10 -0500 - Merge remote branch 'cronus/1.9+unrealtokens' into 1.9
+Revision 78607ea - Sun, 25 Nov 2012 20:35:45 -0600 - Remove UnrealIRCd's TOKENS, they are kinda useless
+Revision 0110214 - Sun, 25 Nov 2012 20:58:35 -0500 - Fix build the last arg on fantasy commands to chanserv
+Revision 54d8695 - Sun, 25 Nov 2012 20:36:57 -0500 - Add commented command{} blocks for how 1.8 worked, don't show saset in the help list to registered users.
+Revision a2441fd - Sun, 25 Nov 2012 19:47:09 -0500 - Rename restoreonghost in nickserv.conf
+Revision 831a1d1 - Sun, 25 Nov 2012 19:41:36 -0500 - Merge ns_ghost, ns_recover, and ns_release. Fix svskilling users on Unreal.
+Revision 6b5df8e - Sun, 25 Nov 2012 05:44:31 +0100 - added a config block for cs_seen in chanserv.example.conf
+Revision 0210cf2 - Sat, 24 Nov 2012 21:22:32 -0500 - Make the actual clients into services too
+Revision f070834 - Sat, 24 Nov 2012 19:10:07 -0500 - Fix parsing fjoin on inspircd
+Revision a44bf31 - Sat, 24 Nov 2012 17:19:08 -0500 - Helps to name ping right
+Revision 002f00d - Sat, 24 Nov 2012 02:15:19 -0500 - Add IP.Board m_sql_authentication query to modules.example.conf, from Genesis2001
+Revision ded89b0 - Fri, 23 Nov 2012 23:10:41 -0500 - Made IRCDProto a Service
+Revision 36b1166 - Fri, 23 Nov 2012 16:56:06 -0500 - Change the return type of ircdmessage to void now that we don't use it, add an ircd message module event, and a few more fixups
+Revision 0e7bd9f - Thu, 22 Nov 2012 20:27:42 -0500 - Fix compile/pch generation
+Revision 7963534 - Thu, 22 Nov 2012 21:44:51 +0100 - fixed some compile errors
+Revision d33a0f7 - Thu, 22 Nov 2012 00:50:33 -0500 - Pretty large coding style cleanup, in source doc cleanup, and allow protocol mods to depend on each other
+Revision 368d469 - Sun, 18 Nov 2012 10:34:35 +0100 - added METADATA and vhost support to the ngircd protocol module
+Revision efd3c04 - Sun, 18 Nov 2012 09:50:23 +0100 - fixed a typo in IRCDMessageSetName in the unreal protocol module
+Revision 5fe6f0b - Fri, 16 Nov 2012 00:06:07 -0500 - This should be find, not find_first_of
+Revision 5d6fb24 - Fri, 16 Nov 2012 00:03:15 -0500 - Fixed some stuff spotted by Cronus, made db_old convert ACCESS_INVALID levels to ACCESS_FOUNDER, fix cs_enforce +R from an earlier commit, fixed ChangeModeInternal TS checking when IRCds don't send TS on mode
+Revision ad3d1d3 - Sat, 10 Nov 2012 13:57:06 -0500 - Never log debug levels >= 2 using a log block
+Revision b51f60c - Sat, 10 Nov 2012 13:57:06 -0500 - Fix user account logout message
+Revision 504232b - Sat, 10 Nov 2012 18:29:35 +0100 - added support for the ngircd SQUERY command
+Revision 8f36f65 - Fri, 9 Nov 2012 19:20:17 -0500 - Made access del and xop del behave like access add/xop add by using a users mask if given an unregistered nick
+Revision ff3e396 - Fri, 9 Nov 2012 19:13:33 -0500 - Add a config option to disable sasl
+Revision 2fe387b - Wed, 7 Nov 2012 23:23:02 -0500 - Update bi->lastmsg in cs_log when something is logged via privmsg
+Revision 9ec482b - Wed, 7 Nov 2012 22:20:48 -0500 - I haven't a clue why this was here but its not even remotely right.. fixes #1448
+Revision 53e8cd1 - Wed, 7 Nov 2012 21:57:31 -0500 - Duplicate check some of these larger hashmaps on insert, just incase
+Revision ac57f41 - Wed, 7 Nov 2012 19:36:59 -0500 - We no longer have to use the rungroup provided at build time, it is specified in the config now
+Revision 8b78b6b - Wed, 7 Nov 2012 15:41:49 -0500 - Fix crash on suspend etc if kicking a user causes the service bot to part when the service bot is next in the userlist (as we have an iterator to it)
+Revision 52fa668 - Wed, 7 Nov 2012 15:17:58 -0500 - Give suspend the correct permission in botserv.conf, fix pch build
+Revision 72eb2cc - Tue, 6 Nov 2012 11:02:12 -0500 - Sometimes capab is sent as one parameter
+Revision 4cfd468 - Tue, 6 Nov 2012 11:02:12 -0500 - Made os_noop more useful
+Revision 0cf8d73 - Tue, 6 Nov 2012 11:02:12 -0500 - Added log messages for all of the other chanserv commands that should be logged
+Revision 53b2bdf - Tue, 6 Nov 2012 11:02:12 -0500 - Use std::tr1::unordered_map for a few of the larger maps
+Revision 27ab6a6 - Tue, 6 Nov 2012 11:02:12 -0500 - Windows fixes
+Revision 22c8297 - Tue, 6 Nov 2012 15:19:56 +0000 - Added chanserv/status to fantasy commands
+Revision d22e863 - Mon, 5 Nov 2012 15:59:11 -0500 - Catch the exception from /os session view invalidip
+Revision fb56b3a - Sat, 3 Nov 2012 22:04:19 -0400 - Made m_xmlrpc use m_httpd
+Revision 0c47017 - Sat, 3 Nov 2012 09:40:01 +0100 - added support for SVSNICK in the ngircd protocol module
+Revision 792091b - Fri, 2 Nov 2012 18:35:33 +0100 - cs_seen: do not read duplicate SeenInfo entries from the database
+Revision b917361 - Thu, 1 Nov 2012 16:26:59 -0400 - Fix pch generation
+Revision a0a54fd - Thu, 1 Nov 2012 16:15:44 -0400 - Expand options:hideprivilegedcommands to not show commands requiring authentication to unidentified users
+Revision d90d5d5 - Thu, 1 Nov 2012 14:54:14 -0400 - Fixed operserv/umode serv help entry
+Revision c2ae762 - Thu, 1 Nov 2012 14:47:23 -0400 - Made db_old load exceptions.db
+Revision 9aa71af - Thu, 1 Nov 2012 14:47:23 -0400 - Accept 1.8s svid ts on plexus too
+Revision b64abeb - Thu, 1 Nov 2012 14:47:23 -0400 - Made os_logsearch search oldest logs first so the newest entries are at the bottom of the list
+Revision 9093061 - Thu, 1 Nov 2012 14:47:23 -0400 - Fixed quite a bit of dumbness with m_ssl. Had to modify socketengines to allow polling for write & no read, but is it cleaner now. Made m_httpd able to listen using SSL.
+Revision 5b1c823 - Thu, 1 Nov 2012 05:28:57 +0100 - fixed importing mode locks in db_old
+Revision b2b4f21 - Wed, 31 Oct 2012 23:11:06 -0400 - Clarify the path given to Config isnt actually the bin path, but the path Anope is installed to
+Revision 22e5516 - Wed, 31 Oct 2012 22:57:11 -0400 - Fixed anopesmtp logging
+Revision 35c2256 - Wed, 31 Oct 2012 17:37:19 -0400 - Apparently sending this all at once didn't work that great, so wait for the events before sending the joins/modes etc
+Revision 3a10fca - Wed, 31 Oct 2012 12:37:43 -0400 - Fix ns_ghost and ns_recover, add nicksev:restoreonghost
+Revision a39947c - Tue, 30 Oct 2012 22:07:15 -0400 - Made os_forbid honor nssecureadmins
+Revision 1730bfb - Tue, 30 Oct 2012 21:22:10 -0400 - Send uids everywhere when setting modes on clients
+Revision 26a4a13 - Tue, 30 Oct 2012 20:40:42 -0400 - Made os_mode a bit smarter
+Revision 36f357c - Tue, 30 Oct 2012 17:10:31 -0400 - Fixed build errors and warnings with -std=c++11
+Revision b07928e - Tue, 30 Oct 2012 15:50:39 -0400 - Clean up ngircd proto mod slightly, and send sqlines before introducing clients
+Revision 1ef7480 - Tue, 30 Oct 2012 15:21:47 -0400 - Fix inspircd mode message for channel modes. It never actually uses this, but other pseudoservers may send modes using this and not fmode (it has no timestamp)
+Revision e4c2dcc - Mon, 29 Oct 2012 21:51:34 -0400 - Made db_old load up most of the old mode locks
+Revision 7bdad85 - Mon, 29 Oct 2012 21:28:43 -0400 - Only show mode lock in /cs info if there really is a mode lock
+Revision c2a8ad2 - Mon, 29 Oct 2012 17:47:26 -0400 - Fix formatting fail in cs_status
+Revision fedf235 - Mon, 29 Oct 2012 17:07:10 -0400 - Update Config.cs for VS 2012 and fix it failing if the source directory path has spaces in it
+Revision e88d2c2 - Mon, 29 Oct 2012 16:40:19 -0400 - Make it so CMake doesn't complain if packing on a system using Visual Studio Express.
+Revision 20e4685 - Mon, 29 Oct 2012 14:54:49 -0400 - Readd cs_status
+Revision ca55e15 - Mon, 29 Oct 2012 14:06:42 -0400 - Fix building under Mac OS X via Makefiles if not using an Xcode project.  This is a hack but CMake currently provides no other way to determine if the detected C++ compiler was identified as Clang.
+Revision bb5e412 - Mon, 29 Oct 2012 13:51:38 -0400 - Made MailThread completely threadsafe, currently theres a race condition with config reload + sending mail at once
+Revision 30028a2 - Mon, 29 Oct 2012 13:46:21 -0400 - This include is unncessary
+Revision 6883309 - Mon, 29 Oct 2012 13:46:21 -0400 - Made anopesmtp less hard to debug
+Revision 9c8570a - Mon, 29 Oct 2012 04:17:24 +0100 - readded ngircd protocol support
+Revision 4dfc0f9 - Sat, 27 Oct 2012 12:09:07 -0400 - Fix cmake generation due to this if not being updated.
+Revision d6e1b92 - Sat, 27 Oct 2012 08:12:04 -0400 - Add a module log type
+Revision bb5f455 - Sat, 27 Oct 2012 05:34:36 -0400 - Ues timestamp for dns serial not yyyymmddnn.. there are too many problems with this (restarts, >99 zone updates/day, etc)
+Revision 32d33ca - Sat, 27 Oct 2012 04:44:10 -0400 - Expand single digit serial revisions to match nn
+Revision e1dcf24 - Fri, 26 Oct 2012 17:30:41 -0400 - Add nickserv:modesonid config option to set what modes users get on identify
+Revision 3b24311 - Fri, 26 Oct 2012 12:57:25 -0400 - Sometimes zone transfers can be really big
+Revision 8fd3fc7 - Fri, 26 Oct 2012 10:46:19 -0400 - Add sasl support to unreal, inspircd
+Revision 8d27b25 - Fri, 26 Oct 2012 00:55:04 -0400 - Don't attempt to process any query packets if we aren't explicitly given permission to bind to a port (we do anyway currently for m_dnsbl to get replies)
+Revision 727b355 - Thu, 25 Oct 2012 23:44:34 -0400 - This code isn't used
+Revision bbe667d - Thu, 25 Oct 2012 22:29:10 -0400 - Fixed two memory leaks in cs_seen
+Revision 3608d42 - Thu, 25 Oct 2012 22:26:59 -0400 - This version needs a better tag than "-git", so there.
+Revision 8f33933 - Thu, 25 Oct 2012 21:31:58 -0400 - Default xlines to be set by OperServ
+Revision e5efe42 - Thu, 25 Oct 2012 04:30:22 -0400 - Fixed showing users from the right server on unreal/bahamut
+Revision 10e21bf - Thu, 25 Oct 2012 01:30:41 -0400 - Fix handling clients on unreal that have no ip (it sends a *)
+Revision 00256fd - Wed, 24 Oct 2012 23:30:21 -0400 - Made access provider modules permanent. They don't cleanup their access entries currently and if they did it would delete them.
+Revision 3b8fb7b - Wed, 24 Oct 2012 22:48:12 -0400 - When db_sql_live gets new objects immediately update cache on them to prevent rewriting later if they aren't changed
+Revision 1057fa8 - Wed, 24 Oct 2012 19:32:26 -0400 - BIND's forward ability did not work as I expected because it will not forward non recursive queries. So, added support for SOA, NS, and AXFR requests.
+Revision fca9ec0 - Wed, 24 Oct 2012 07:40:16 -0400 - InspIRCd: Add handler for FIDENT to 2.0 protocol, so we know when someone changes ident on the network
+Revision ef5c668 - Wed, 24 Oct 2012 05:12:47 +0200 - Merge branch '1.9' of ssh://anope.git.sourceforge.net/gitroot/anope/anope into 1.9
+Revision e0438e3 - Wed, 24 Oct 2012 05:12:13 +0200 - fixed calculating the correct channelcount for an user when loading the db. fixes bug #1450
+Revision 04632bd - Mon, 22 Oct 2012 17:02:01 -0400 - Cleanup of last few commits/warning fix
+Revision 0b9db15 - Mon, 22 Oct 2012 00:54:30 -0400 - Add os_dns, a way to control your DNS zone via services
+Revision d5b2f9c - Sun, 21 Oct 2012 18:29:10 +0200 - Base has to destruct before Extensible does because objects that destruct due to Extensible destructing don't have their references to the already destroyed object for Base invalidated. (fixed for NickAlias and NickCore)
+Revision 727c3d5 - Thu, 18 Oct 2012 20:06:02 -0400 - Base has to destruct before Extensible does because objects that destruct due to Extensible destructing don't have their references to the already destroyed object for Base invalidated
+Revision eddb768 - Wed, 17 Oct 2012 20:22:44 -0400 - Fixed protoctl parsing on Unreal + fix SendLogout now the usage has changed
+Revision 484baba - Mon, 15 Oct 2012 03:54:26 -0400 - Actually show the correct number of entries on /os logsearch output
+Revision 88f10a2 - Sun, 14 Oct 2012 20:13:41 +0200 - Updated the hybrid protocol module, patch provided by Michael - Change mode handler to use UIDs within SVSMODE messages - The IP can be 0 in UID messages depending whether or not a client is spoofed - Removed SendGlobopsInternal handler. Anope is using GLOBOPS by default - Set user's services timestamp/account to 0 instead of 1 on /ns logout, otherwise the UID message handler will
+Revision ffa1c97 - Sun, 14 Oct 2012 01:50:14 -0400 - Use account name for svid on hybrid
+Revision 4fdc157 - Sun, 14 Oct 2012 01:05:24 -0400 - Better clarify signon vs timestamp and allow updating users timestamp to an ircd given value from NICK
+Revision 0a95066 - Sat, 13 Oct 2012 23:49:15 -0400 - Add a hybrid 8 protocol module courtesy of Michael <michael@wobst.at>
+Revision 1232018 - Sat, 13 Oct 2012 06:21:53 -0400 - Allow services operators to modify/view other users autojoin lists
+Revision 6237613 - Sat, 13 Oct 2012 00:40:44 -0400 - And update modules.example.conf
+Revision 4424abd - Sat, 13 Oct 2012 00:37:10 -0400 - Add m_sql_oper
+Revision 76a0471 - Sat, 13 Oct 2012 00:37:10 -0400 - Simplify the db_sql_live code since this isn't actually necessary. Fixes a problem internally ovwrwriting data on objects that we have modified and are queued because of assigning something to a serialize_obj reference
+Revision e08422a - Fri, 12 Oct 2012 22:47:35 +0200 - fixed MODE handling in the ratbox protocol module
+Revision 757ff06 - Wed, 10 Oct 2012 23:08:00 -0400 - Fix m_ldap to reconnect automatically if the ldap server goes away
+Revision 06defe0 - Tue, 9 Oct 2012 19:34:24 -0400 - Merge remote branch 'attila/1.9+topiclockmsg' into 1.9
+Revision 63bf134 - Tue, 9 Oct 2012 19:34:11 -0400 - Merge remote branch 'attila/1.9+msgfix' into 1.9
+Revision 2113494 - Tue, 9 Oct 2012 19:33:24 -0400 - Send privmsgs and notices to uids if applicable
+Revision 912f068 - Tue, 9 Oct 2012 23:31:20 +0200 - Fix wrong error message when --dbdir has no argument
+Revision 8f5d786 - Tue, 9 Oct 2012 05:22:02 -0400 - Cleanup ok if modules with pending identify requests are unloaded
+Revision 1dacc64 - Tue, 9 Oct 2012 04:13:04 -0400 - Made the warnings given by cmake for not having the dependencies for modules look less scary as they confuse dumb people currently
+Revision 3af786d - Mon, 8 Oct 2012 20:58:47 -0400 - Fix fantasy !help & give it its own help header, not ChanServ's
+Revision e57b470 - Mon, 8 Oct 2012 04:16:23 -0400 - Made fantasy commands configurable
+Revision b8b63ff - Sun, 7 Oct 2012 22:39:58 -0400 - Remove the asynchronous identifing hack and replace it with something better. Fixes m_*_authentication only being able to properly work when people identify normally using nickserv/identify
+Revision 959a3f3 - Sun, 7 Oct 2012 11:49:38 +0200 - InspIRCd: Log when server-side topiclocking is enabled in the config but the module is not loaded
+Revision 0a111c1 - Sun, 7 Oct 2012 02:13:14 -0400 - Fix compile from bda3b1fa3a396e19fb04eda2f66d246e49572c20
+Revision 4b68f04 - Sun, 7 Oct 2012 08:00:31 +0200 - updated docs/LANGUAGE to point to the right directory where users should put module language files
+Revision 31914b2 - Sun, 7 Oct 2012 01:46:44 -0400 - Merge remote branch 'remotes/attila/1.9+addline' into 1.9
+Revision ebb3fca - Sun, 7 Oct 2012 01:45:43 -0400 - Release holds on a nick on identify, if there is one
+Revision 7f72b46 - Sun, 7 Oct 2012 01:29:49 -0400 - Set sane default last_topic_setter and last_topic_time in the event an empty topic is locked right after registering a channel without previously being set
+Revision 4751c73 - Sat, 6 Oct 2012 22:54:52 -0400 - Fixed module language file path
+Revision bda3b1f - Sun, 7 Oct 2012 03:15:42 +0200 - InspIRCd: Make functions that send ADDLINE and DELLINE, call them from the rest of the module
+Revision 4ec10d7 - Sat, 6 Oct 2012 20:11:47 -0400 - Fixups and cleanup for the last few commits
+Revision 3dd21e4 - Sun, 7 Oct 2012 01:35:14 +0200 - InspIRCd: Add support for server side topic locks using METADATA topiclock
+Revision 682d768 - Sun, 7 Oct 2012 01:33:49 +0200 - InspIRCd: Add support for sending detecting m_topiclock and sending SVSTOPIC when it is available
+Revision 42aa367 - Sun, 7 Oct 2012 01:32:31 +0200 - InspIRCd: Send channel METADATA using a dedicated function
+Revision ec8a1bc - Sun, 7 Oct 2012 00:59:49 +0200 - Add a config option for server side topic locks
+Revision 2d9541c - Sat, 6 Oct 2012 02:18:48 -0400 - Parse and store the spanningtree protocol version for InspIRCd
+Revision e747ba6 - Sat, 6 Oct 2012 02:06:23 -0400 - InspIRCd: Add metadata handler to recognize when a module is loaded or unloaded on the ircd side and adjust our behavior accordingly
+Revision 4431a34 - Sat, 6 Oct 2012 02:06:23 -0400 - InspIRCd: Allow METADATA handler to differentiate between user, channel and other/server metadata
+Revision 14d7de0 - Sat, 6 Oct 2012 02:06:18 -0400 - InspIRCd: Remove has_svshold, use IRCDProto::CanSVSHold
+Revision cd28fdc - Sat, 6 Oct 2012 01:01:45 -0400 - Show the correct reciever nick when use strict privmsg is enabled
+Revision 25fe9c7 - Fri, 5 Oct 2012 16:23:40 -0400 - Do not process() socket engine on shutdown
+Revision 94fc2ba - Fri, 5 Oct 2012 15:15:50 +0100 - Merge branch '1.9' of ssh://anope.git.sf.net/gitroot/anope/anope into 1.9
+Revision 2f87b8e - Fri, 5 Oct 2012 15:14:19 +0100 - Revert this strangeness I created ;)
+Revision eff61c7 - Fri, 5 Oct 2012 05:03:55 -0400 - Add an event for when nick or channel options are set
+Revision 7c96227 - Fri, 5 Oct 2012 01:20:32 -0400 - Use memcpy for Anope::Unhex not strcpy
+Revision dcfae63 - Wed, 3 Oct 2012 21:22:03 +0100 - Some minor fixes/typos
+Revision 69437bb - Wed, 3 Oct 2012 05:17:32 -0400 - Fixed parsing squit (it has a reason)
+Revision 7551245 - Tue, 2 Oct 2012 23:30:31 -0400 - Attempt #2 at silly topic ts thing, this is actually must cleaner
+Revision 47bc551 - Tue, 2 Oct 2012 22:59:20 -0400 - Revert "Fix topiclock on inspircd"
+Revision 8747818 - Tue, 2 Oct 2012 22:16:35 -0400 - Fix topiclock on inspircd
+Revision 7042223 - Tue, 2 Oct 2012 21:21:37 -0400 - Somehow the kick handler got lost in the confusion. Send the topic time with ftopic on inspircd not the current time. Removed some unneeded protocol functions
+Revision 93698f0 - Tue, 2 Oct 2012 05:18:42 -0400 - Added operserv/logsearch
+Revision f7aa837 - Tue, 2 Oct 2012 01:30:35 -0400 - Don't unassociate accounts with users on nick changes
+Revision e1d1d18 - Tue, 2 Oct 2012 05:36:31 +0200 - added an operserv/akill page to webcpanel
+Revision 20a6f82 - Tue, 2 Oct 2012 05:35:44 +0200 - modified the nickserv alist command to return nc->display instead of the parameter provided by the user
+Revision aec6cac - Tue, 2 Oct 2012 04:14:50 +0200 - Merge branch '1.9' of ssh://anope.git.sourceforge.net/gitroot/anope/anope into 1.9
+Revision ffca6a7 - Tue, 2 Oct 2012 04:11:52 +0200 - fixed a small bug in the inspircd protocol modules
+Revision 2d2ab4f - Mon, 1 Oct 2012 21:26:41 -0400 - Fixed handling TOPIC on unreal, dont set topics in Channel::Reset unless we are synced, and fixed ts checking in Channel::SetModesInternal
+Revision a434bae - Mon, 1 Oct 2012 18:50:29 -0400 - Allow modules to store data in their own databases.
+Revision f14a3df - Mon, 1 Oct 2012 04:35:36 -0400 - Fix a few problems found by Cronusa and KindOne
+Revision b19a3af - Mon, 1 Oct 2012 02:29:31 -0400 - Add networkinfo:chanlen config directive
+Revision 89428a9 - Mon, 1 Oct 2012 01:56:57 -0400 - Cleanup of all of the protocol modules, rewrote message handling system to be a bit more C++ ish
+Revision b937d63 - Sun, 30 Sep 2012 21:36:49 -0400 - timestamp column is a special case too
+Revision ad37bc9 - Sun, 30 Sep 2012 20:30:27 -0400 - Bug #1445 - Empty out columns in SQL we have no data for on insert. This is caused from serialize() only setting a key on certain conditions and otherwise doing nothing at all.
+Revision 56df1ab - Sun, 30 Sep 2012 20:30:27 -0400 - Place runtime module binaries in data/runtime instead of lib/ incase of a system wide install where lib/ is not writable
+Revision 0ea5e57 - Sun, 30 Sep 2012 20:30:27 -0400 - Use RTLD_NOW when loading modules to resolve all symbols immediately. This prevents modules with unresolved symbols from loading instead of loading and crashing later.
+Revision 3838eb1 - Sun, 30 Sep 2012 20:30:27 -0400 - Add webpanel contributors to readme and remove todo since its way out of date and has nothing more in it we want
+Revision 9ba7196 - Sun, 30 Sep 2012 20:30:27 -0400 - Make CommandSource use references, sometimes we hold them for awhile
+Revision 1e71303 - Sun, 30 Sep 2012 13:58:17 +0200 - fixed nickserv alist
+Revision 74117a1 - Sat, 29 Sep 2012 23:55:55 +0100 - added some example sql queries
+Revision 38ad523 - Mon, 24 Sep 2012 15:54:49 -0400 - Fix a few oddball warnings that came up from clang, and also make it so webcpanel.so can be compiled under Mac OS X.
+Revision a71e2fb - Sun, 23 Sep 2012 20:57:35 +0200 - make nickserv glist check if the given nickname is in the group of the user before checking for services oper
+Revision 1b20ec8 - Sat, 22 Sep 2012 04:18:41 -0400 - Forgot to delete a line in the last commit.
+Revision d30e53e - Sat, 22 Sep 2012 03:45:51 -0400 - OK, so the FIND sub-command of string() in CMake was only added with 2.8.5, change this to use the REGEX sub-commands instead.  Also while I'm at it, make -pthread only get added when not on Mac OS X, it's auto-included there.
+Revision aa57ad6 - Sat, 22 Sep 2012 02:10:49 -0400 - Fix issues with CMake trying to add /System/Library/Frameworks/Kernel.framework/Headers/sys to the include paths.
+Revision 097893b - Thu, 13 Sep 2012 15:29:04 +0100 - Updated example query to include a valid value
+Revision 16019c9 - Wed, 12 Sep 2012 21:10:02 -0400 - Add m_sql_authentication to allow authenticating users against an external SQL database
+Revision f391100 - Mon, 10 Sep 2012 21:39:04 -0400 - Fixed gettext on freebsd/any other system that uses LANG not LANGUAGE
+Revision c4a1e1b - Sat, 8 Sep 2012 04:51:44 -0400 - Fixed os_defcon too
+Revision 7e3b5be - Fri, 7 Sep 2012 23:44:15 -0400 - Add chanserv/set/autoop, like nickserv/set/autoop but for channels
+Revision c9c477f - Fri, 7 Sep 2012 22:27:28 -0400 - These saset command stubs can go away
+Revision 4eb7db8 - Fri, 7 Sep 2012 21:22:19 -0400 - Fix os_session to really use ips for quits, don't enforce session for spoofed users/other users who have no ip, clean up warnings
+Revision 9d6626f - Fri, 7 Sep 2012 12:04:25 -0400 - Made session tracking ip based, not host based, and allow using CIDR to group multiple ips from one subnet to one session
+Revision 5c07863 - Fri, 7 Sep 2012 08:46:28 -0400 - Allow configuring killquick and kill delays
+Revision 3060375 - Fri, 7 Sep 2012 06:52:56 -0400 - Fixed m_ldap_authentication not returning anything if the search for an account game back empty
+Revision 3c63e44 - Fri, 7 Sep 2012 05:59:28 -0400 - Allow ; and } in quoted strings
+Revision 02d943b - Wed, 5 Sep 2012 02:56:59 -0400 - Not quite sure what I was thinking here
+Revision 4c8fef2 - Mon, 3 Sep 2012 11:05:17 +0200 - updated example.conf
+Revision 082cf8a - Sun, 2 Sep 2012 22:56:17 -0400 - Windows cares this is escaped + chmod too
+Revision 1fd1938 - Sun, 2 Sep 2012 22:39:05 -0400 - Fix CMake to actually make directories on install .....
+Revision b1f8e91 - Sun, 2 Sep 2012 09:48:13 -0400 - Version bump for 1.9.8-git
+Revision 81cf9f0 - Sun, 2 Sep 2012 08:31:43 -0400 - Anope 1.9.7 Release
+Revision 3264669 - Sun, 2 Sep 2012 08:31:34 -0400 - Update version.log
 Revision 271d723 - Sun, 2 Sep 2012 08:31:11 -0400 - Update Changes
 Revision a0c4575 - Sun, 2 Sep 2012 08:31:04 -0400 - Regenerate language files
 Revision 1af64a9 - Sun, 2 Sep 2012 08:30:54 -0400 - Fix Windows

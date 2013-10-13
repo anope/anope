@@ -42,7 +42,12 @@ bool WebCPanel::ChanServ::Drop::OnRequest(HTTPProvider *server, const Anope::str
 	}
 
 	if (message.get_data.count("channel") > 0)
-		replacements["CHANNEL_DROP"] = message.get_data["channel"];
+	{
+		const Anope::string &chname = message.get_data["channel"];
+
+		replacements["CHANNEL_DROP"] = chname;
+		replacements["ESCAPED_CHANNEL"] = HTTPUtils::URLEncode(chname);
+	}
 
 	TemplateFileServer page("chanserv/drop.html");
 	page.Serve(server, page_name, client, message, reply, replacements);

@@ -24,12 +24,14 @@
 					<h1 class="form-signin-heading">Register</h1>
 
 					{IF EXISTS MESSAGES}
-					<div class="alert alert-info">
+					<div class="alert alert-warning">
 						{FOR M IN MESSAGES}
 							{M}<br/>
 						{END FOR}
 					</div>
 					{END IF}
+
+					<a href="/register" class="btn btn-lg btn-default btn-block">Retry</a>
 				</div>
 			</div>
 

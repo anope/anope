@@ -867,6 +867,11 @@ class CoreExport Module : public Extensible
 	 */
 	virtual void OnSetVhost(NickAlias *na) { throw NotImplementedException(); }
 
+	/** Called when a users host changes
+	 * @param u The user
+	 */
+	virtual void OnSetDisplayedHost(User *) { throw NotImplementedException(); }
+
 	/** Called when a memo is sent
 	 * @param source The source of the memo
 	 * @param target The target of the memo
@@ -1093,7 +1098,7 @@ enum Implementation
 	I_OnUserLogin, I_OnNickLogout, I_OnNickRegister, I_OnNickSuspend, I_OnNickUnsuspended, I_OnDelNick, I_OnNickCoreCreate,
 	I_OnDelCore, I_OnChangeCoreDisplay, I_OnNickClearAccess, I_OnNickAddAccess, I_OnNickEraseAccess, I_OnNickClearCert,
 	I_OnNickAddCert, I_OnNickEraseCert, I_OnNickInfo, I_OnBotInfo, I_OnCheckAuthentication, I_OnNickUpdate,
-	I_OnFingerprint, I_OnUserAway, I_OnInvite, I_OnDeleteVhost, I_OnSetVhost, I_OnMemoSend, I_OnMemoDel,
+	I_OnFingerprint, I_OnUserAway, I_OnInvite, I_OnDeleteVhost, I_OnSetVhost, I_OnSetDisplayedHost, I_OnMemoSend, I_OnMemoDel,
 	I_OnChannelModeSet, I_OnChannelModeUnset, I_OnUserModeSet, I_OnUserModeUnset, I_OnChannelModeAdd, I_OnUserModeAdd,
 	I_OnMLock, I_OnUnMLock, I_OnModuleLoad, I_OnModuleUnload, I_OnServerSync, I_OnUplinkSync, I_OnBotPrivmsg, I_OnBotNotice,
 	I_OnPrivmsg, I_OnLog, I_OnLogMessage, I_OnDnsRequest, I_OnCheckModes, I_OnChannelSync, I_OnSetCorrectModes,

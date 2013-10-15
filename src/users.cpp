@@ -136,6 +136,8 @@ void User::SetDisplayedHost(const Anope::string &shost)
 
 	Log(this, "host") << "changed vhost to " << shost;
 
+	FOREACH_MOD(OnSetDisplayedHost, (this));
+
 	this->UpdateHost();
 }
 

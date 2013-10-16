@@ -56,7 +56,7 @@ class CommandNSConfirm : public Command
 				{
 					IRCD->SendLogin(source.GetUser());
 					const NickAlias *na = NickAlias::Find(source.GetNick());
-					if (!Config->GetBlock("options")->Get<bool>("nonicknameownership") && na != NULL && na->nc == source.GetAccount() && !na->nc->HasExt("UNCONFIRMED"))
+					if (!Config->GetModule("nickserv")->Get<bool>("nonicknameownership") && na != NULL && na->nc == source.GetAccount() && !na->nc->HasExt("UNCONFIRMED"))
 						source.GetUser()->SetMode(source.service, "REGISTERED");
 				}
 			}
@@ -147,7 +147,7 @@ class CommandNSRegister : public Command
 		/* Guest nick can now have a series of between 1 and 7 digits.
 		 *   --lara
 		 */
-		const Anope::string &guestnick = Config->GetBlock("options")->Get<const Anope::string>("guestnickprefix");
+		const Anope::string &guestnick = Config->GetModule("nickserv")->Get<const Anope::string>("guestnickprefix", "Guest");
 		if (nicklen <= guestnick.length() + 7 && nicklen >= guestnick.length() + 1 && !u_nick.find_ci(guestnick) && u_nick.substr(guestnick.length()).find_first_not_of("1234567890") == Anope::string::npos)
 		{
 			source.Reply(NICK_CANNOT_BE_REGISTERED, u_nick.c_str());
@@ -180,7 +180,7 @@ class CommandNSRegister : public Command
 			source.Reply(NICK_ALREADY_REGISTERED, u_nick.c_str());
 		else if (pass.equals_ci(u_nick) || (Config->GetBlock("options")->Get<bool>("strictpasswords") && pass.length() < 5))
 			source.Reply(MORE_OBSCURE_PASSWORD);
-		else if (pass.length() > Config->GetBlock("options")->Get<unsigned>("passlen"))
+		else if (pass.length() > Config->GetModule("nickserv")->Get<unsigned>("passlen", "32"))
 			source.Reply(PASSWORD_TOO_LONG);
 		else if (!email.empty() && !Mail::Validate(email))
 			source.Reply(MAIL_X_INVALID, email.c_str());

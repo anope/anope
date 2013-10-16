@@ -64,8 +64,8 @@ class NickServRelease : public User, public Timer
 	Anope::string nick;
 
  public:
-	NickServRelease(NickAlias *na, time_t delay) : User(na->nick, Config->GetBlock("options")->Get<const Anope::string>("enforceruser"),
-		Config->GetBlock("options")->Get<const Anope::string>("enforcerhost"), "", "", Me, "Services Enforcer", Anope::CurTime, "", Servers::TS6_UID_Retrieve(), NULL), Timer(delay), nick(na->nick)
+	NickServRelease(NickAlias *na, time_t delay) : User(na->nick, Config->GetModule("nickserv")->Get<const Anope::string>("enforceruser"),
+		Config->GetModule("nickserv")->Get<const Anope::string>("enforcerhost"), "", "", Me, "Services Enforcer", Anope::CurTime, "", Servers::TS6_UID_Retrieve(), NULL), Timer(delay), nick(na->nick)
 	{
 		/* Erase the current release timer and use the new one */
 		std::map<Anope::string, NickServRelease *>::iterator nit = NickServReleases.find(this->nick);
@@ -104,12 +104,12 @@ class NickServCore : public Module, public NickServService
 		{
 			collided.Unset(na);
 
-			new NickServHeld(na, Config->GetBlock("options")->Get<time_t>("releasetimeout"));
+			new NickServHeld(na, Config->GetModule("nickserv")->Get<time_t>("releasetimeout", "1m"));
 
 			if (IRCD->CanSVSHold)
-				IRCD->SendSVSHold(na->nick, Config->GetBlock("options")->Get<time_t>("releasetimeout"));
+				IRCD->SendSVSHold(na->nick, Config->GetModule("nickserv")->Get<time_t>("releasetimeout", "1m"));
 			else
-				new NickServRelease(na, Config->GetBlock("options")->Get<time_t>("releasetimeout"));
+				new NickServRelease(na, Config->GetModule("nickserv")->Get<time_t>("releasetimeout", "1m"));
 		}
 	}
 
@@ -160,7 +160,7 @@ class NickServCore : public Module, public NickServService
 			return;
 		}
 
-		if (Config->GetBlock("options")->Get<bool>("nonicknameownership"))
+		if (Config->GetModule("nickserv")->Get<bool>("nonicknameownership"))
 			return;
 
 		bool on_access = u->IsRecognized(false);
@@ -198,7 +198,7 @@ class NickServCore : public Module, public NickServService
 	void OnUserLogin(User *u) anope_override
 	{
 		NickAlias *na = NickAlias::Find(u->nick);
-		if (na && *na->nc == u->Account() && !Config->GetBlock("options")->Get<bool>("nonicknameownership") && !na->nc->HasExt("UNCONFIRMED"))
+		if (na && *na->nc == u->Account() && !Config->GetModule("nickserv")->Get<bool>("nonicknameownership") && !na->nc->HasExt("UNCONFIRMED"))
 			u->SetMode(NickServ, "REGISTERED");
 	}
 
@@ -209,8 +209,8 @@ class NickServCore : public Module, public NickServService
 
 		if (IRCD->CanSVSNick)
 		{
-			const Anope::string &guestprefix = Config->GetBlock("options")->Get<const Anope::string>("guestnickprefix");
-	
+			const Anope::string &guestprefix = Config->GetModule("nickserv")->Get<const Anope::string>("guestnickprefix", "Guest");
+
 			Anope::string guestnick;
 
 			int i = 0;
@@ -360,7 +360,7 @@ class NickServCore : public Module, public NickServService
 		const NickAlias *na = NickAlias::Find(u->nick);
 
 		const Anope::string &unregistered_notice = Config->GetModule(this)->Get<const Anope::string>("unregistered_notice");
-		if (!Config->GetBlock("options")->Get<bool>("nonicknameownership") && !unregistered_notice.empty() && !na)
+		if (!Config->GetModule("nickserv")->Get<bool>("nonicknameownership") && !unregistered_notice.empty() && !na)
 			u->SendMessage(NickServ, unregistered_notice);
 		else if (na && !u->IsIdentified(true))
 			this->Validate(u);
@@ -404,7 +404,7 @@ class NickServCore : public Module, public NickServService
 		{
 			/* Reset +r and re-send account (even though it really should be set at this point) */
 			IRCD->SendLogin(u);
-			if (!Config->GetBlock("options")->Get<bool>("nonicknameownership") && na->nc == u->Account() && !na->nc->HasExt("UNCONFIRMED"))
+			if (!Config->GetModule("nickserv")->Get<bool>("nonicknameownership") && na->nc == u->Account() && !na->nc->HasExt("UNCONFIRMED"))
 				u->SetMode(NickServ, "REGISTERED");
 			Log(NickServ) << u->GetMask() << " automatically identified for group " << u->Account()->display;
 		}
@@ -423,7 +423,7 @@ class NickServCore : public Module, public NickServService
 	{
 		if (!params.empty() || source.c || source.service != *NickServ)
 			return EVENT_CONTINUE;
-		if (!Config->GetBlock("options")->Get<bool>("nonicknameownership"))
+		if (!Config->GetModule("nickserv")->Get<bool>("nonicknameownership"))
 			source.Reply(_("\002%s\002 allows you to register a nickname and\n"
 				"prevent others from using it. The following\n"
 				"commands allow for registration and maintenance of\n"

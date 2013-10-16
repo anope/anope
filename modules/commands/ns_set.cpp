@@ -133,7 +133,7 @@ class CommandNSSetPassword : public Command
 			source.Reply(MORE_OBSCURE_PASSWORD);
 			return;
 		}
-		else if (len > Config->GetBlock("options")->Get<unsigned>("passlen"))
+		else if (len > Config->GetModule("nickserv")->Get<unsigned>("passlen", "32"))
 		{
 			source.Reply(PASSWORD_TOO_LONG);
 			return;
@@ -196,7 +196,7 @@ class CommandNSSASetPassword : public Command
 			source.Reply(MORE_OBSCURE_PASSWORD);
 			return;
 		}
-		else if (len > Config->GetBlock("options")->Get<unsigned>("passlen"))
+		else if (len > Config->GetModule("nickserv")->Get<unsigned>("passlen", "32"))
 		{
 			source.Reply(PASSWORD_TOO_LONG);
 			return;
@@ -332,7 +332,7 @@ class CommandNSSetDisplay : public Command
 
 		const NickAlias *user_na = NickAlias::Find(user), *na = NickAlias::Find(param);
 
-		if (Config->GetBlock("options")->Get<bool>("nonicknameownership"))
+		if (Config->GetModule("nickserv")->Get<bool>("nonicknameownership"))
 		{
 			source.Reply(_("This command may not be used on this network because nickname ownership is disabled."));
 			return;
@@ -635,7 +635,7 @@ class CommandNSSetKill : public Command
 			return;
 		}
 
-		if (Config->GetBlock("options")->Get<bool>("nonicknameownership"))
+		if (Config->GetModule("nickserv")->Get<bool>("nonicknameownership"))
 		{
 			source.Reply(_("This command may not be used on this network because nickname ownership is disabled."));
 			return;

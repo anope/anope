@@ -111,7 +111,7 @@ class CommandNSGroup : public Command
 			}
 
 		NickAlias *target, *na = NickAlias::Find(u->nick);
-		const Anope::string &guestnick = Config->GetBlock("options")->Get<const Anope::string>("guestnickprefix");
+		const Anope::string &guestnick = Config->GetModule("nickserv")->Get<const Anope::string>("guestnickprefix", "Guest");
 		time_t reg_delay = Config->GetModule("nickserv")->Get<time_t>("regdelay");
 		unsigned maxaliases = Config->GetModule(this->owner)->Get<unsigned>("maxaliases");
 		if (!(target = NickAlias::Find(nick)))
@@ -349,7 +349,7 @@ class NSGroup : public Module
 	NSGroup(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandnsgroup(this), commandnsungroup(this), commandnsglist(this)
 	{
-		if (Config->GetBlock("options")->Get<bool>("nonicknameownership"))
+		if (Config->GetModule("nickserv")->Get<bool>("nonicknameownership"))
 			throw ModuleException(modname + " can not be used with options:nonicknameownership enabled");
 	}
 };

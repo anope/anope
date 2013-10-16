@@ -27,7 +27,7 @@ class DBMySQL : public Module, public Pipe
 		}
 		else
 		{
-			if (Anope::CurTime - Config->GetBlock("options")->Get<time_t>("updatetimeout") > lastwarn)
+			if (Anope::CurTime - Config->GetBlock("options")->Get<time_t>("updatetimeout", "5m") > lastwarn)
 			{
 				Log() << "Unable to locate SQL reference, going to readonly...";
 				Anope::ReadOnly = this->ro = true;

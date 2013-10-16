@@ -155,7 +155,6 @@ Conf::Conf() : Block("")
 			{"networkinfo", "userlen"},
 			{"networkinfo", "hostlen"},
 			{"networkinfo", "chanlen"},
-			{"options", "passlen"},
 		};
 
 		for (unsigned i = 0; i < sizeof(noreload) / sizeof(noreload[0]); ++i)
@@ -171,16 +170,8 @@ Conf::Conf() : Block("")
 	ValidateNotEmpty("serverinfo", "pid", serverinfo->Get<const Anope::string>("pid"));
 	ValidateNotEmpty("serverinfo", "motd", serverinfo->Get<const Anope::string>("motd"));
 
-	ValidateNotZero("options", "releasetimeout", options->Get<time_t>("releasetimeout"));
-	ValidateNotZero("options", "updatetimeout", options->Get<time_t>("updatetimeout"));
-	ValidateNotZero("options", "expiretimeout", options->Get<time_t>("expiretimeout"));
 	ValidateNotZero("options", "readtimeout", options->Get<time_t>("readtimeout"));
 	ValidateNotZero("options", "warningtimeout", options->Get<time_t>("warningtimeout"));
-	ValidateNotZero("options", "passlen", options->Get<time_t>("passlen"));
-
-	ValidateNotEmpty("options", "enforceruser", options->Get<const Anope::string>("enforceruser"));
-	ValidateNotEmpty("options", "enforcerhost", options->Get<const Anope::string>("enforcerhost"));
-	ValidateNotEmpty("options", "guestnickprefix", options->Get<const Anope::string>("guestnickprefix"));
 
 	ValidateNotZero("networkinfo", "nicklen", networkinfo->Get<unsigned>("nicklen"));
 	ValidateNotZero("networkinfo", "userlen", networkinfo->Get<unsigned>("userlen"));

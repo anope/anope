@@ -208,7 +208,7 @@ class NSRecover : public Module
 		commandnsrecover(this), recover(this, "recover")
 	{
 
-		if (Config->GetBlock("options")->Get<bool>("nonicknameownership"))
+		if (Config->GetModule("nickserv")->Get<bool>("nonicknameownership"))
 			throw ModuleException(modname + " can not be used with options:nonicknameownership enabled");
 
 	}

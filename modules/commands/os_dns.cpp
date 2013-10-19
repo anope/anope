@@ -232,14 +232,15 @@ class CommandOSDNS : public Command
 				ip_str = "None";
 			entry["IP"] = ip_str;
 
-			if (!srv)
-				entry["State"] = Language::Translate(source.GetAccount(), _("Split"));
-			else if (s->Active())
+			if (s->Active())
 				entry["State"] = Language::Translate(source.GetAccount(), _("Pooled/Active"));
 			else if (s->Pooled())
 				entry["State"] = Language::Translate(source.GetAccount(), _("Pooled/Not Active"));
 			else
 				entry["State"] = Language::Translate(source.GetAccount(), _("Unpooled"));
+
+			if (!srv)
+				entry["State"] += Anope::string(" ") + Language::Translate(source.GetAccount(), _("(Split)"));
 
 			lf.AddEntry(entry);
 		}
@@ -753,9 +754,12 @@ class ModuleDNS : public Module
 	void OnServerQuit(Server *s) anope_override
 	{
 		DNSServer *dns = DNSServer::Find(s->GetName());
-		if (dns && dns->Pooled() && dns->Active())
+		if (remove_split_servers && dns && dns->Pooled() && dns->Active())
 		{
-			dns->SetActive(false);
+			if (readd_connected_servers)
+				dns->SetActive(false); // Will be reactivated when it comes back
+			else
+				dns->Pool(false); // Otherwise permanently pull this
 			Log(this) << "Depooling delinked server " << s->GetName();
 		}
 	}

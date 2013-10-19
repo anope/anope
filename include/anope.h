@@ -499,21 +499,21 @@ namespace Anope
 
 	/** Retrieves a human readable string representing the time in seconds
 	 * @param seconds The time on seconds, eg 60
-	 * @param nc The account to use langauge settings for to translate this string, if applicable
+	 * @param nc The account to use language settings for to translate this string, if applicable
 	 * @return A human readable string, eg "1 minute"
 	 */
 	extern CoreExport Anope::string Duration(time_t seconds, const NickCore *nc = NULL);
 
 	/** Generates a human readable string of type "expires in ..."
 	 * @param expires time in seconds
-	 * @param nc The account to use langauge settings for to translate this string, if applicable
+	 * @param nc The account to use language settings for to translate this string, if applicable
 	 * @return A human readable string, eg "expires in 5 days"
 	 */
 	extern CoreExport Anope::string Expires(time_t seconds, const NickCore *nc = NULL);
 
 	/** Converts a time in seconds (epoch) to a human readable format.
 	 * @param t The time
-	 * @param nc The account to use langauge settings for to translate this string, if applicable
+	 * @param nc The account to use language settings for to translate this string, if applicable
 	 * @param short_output If true, the output is just a date (eg, "Apr 12 20:18:22 2009 MSD"), else it includes the date and how long ago/from now that date is, (eg "Apr 12 20:18:22 2009 MSD (1313 days, 9 hours, 32 minutes ago)"
 	 */
 	extern CoreExport Anope::string strftime(time_t t, const NickCore *nc = NULL, bool short_output = false);

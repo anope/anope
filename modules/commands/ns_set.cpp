@@ -798,7 +798,7 @@ class CommandNSSetLanguage : public Command
 				}
 			}
 
-		Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to change the langauge of " << nc->display << " to " << param;
+		Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to change the language of " << nc->display << " to " << param;
 
 		nc->language = param;
 		source.Reply(_("Language changed to \002English\002."));

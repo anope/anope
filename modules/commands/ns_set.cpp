@@ -470,7 +470,7 @@ class CommandNSSetEmail : public Command
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
-		if (!param.empty() && Config->GetModule("nickserv")->Get<bool>("forceemail", "yes") && !source.IsServicesOper())
+		if (!param.empty() && Config->GetModule("nickserv")->Get<bool>("confirmemailchanges") && !source.IsServicesOper())
 		{
 			if (SendConfirmMail(source.GetUser(), source.service, param))
 				source.Reply(_("A confirmation e-mail has been sent to \002%s\002. Follow the instructions in it to change your e-mail address."), param.c_str());

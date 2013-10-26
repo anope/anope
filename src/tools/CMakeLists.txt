@@ -41,6 +41,9 @@ if(NOT WIN32)
   install (PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/anoperc
     DESTINATION ${BIN_DIR}
   )
+  install (PROGRAMS geoipupdate.sh
+    DESTINATION ${BIN_DIR}
+  )
 endif(NOT WIN32)
 
 # On non-Windows platforms, if RUNGROUP is set, change the permissions of the tools directory

@@ -39,13 +39,12 @@ static Anope::string GetStatusFromCode(HTTPError err)
 class MyHTTPClient : public HTTPClient
 {
 	HTTPProvider *provider;
-	HTTPMessage header;
+	HTTPMessage message;
 	bool header_done, served;
 	Anope::string page_name;
 	Reference<HTTPPage> page;
 	Anope::string ip;
 
-	Anope::string inbuf;
 	unsigned content_length;
 
 	enum
@@ -73,9 +72,9 @@ class MyHTTPClient : public HTTPClient
 			{
 				const Anope::string &token = this->provider->ext_headers[i];
 
-				if (this->header.headers.count(token))
+				if (this->message.headers.count(token))
 				{
-					this->ip = this->header.headers[token];
+					this->ip = this->message.headers[token];
 					Log(LOG_DEBUG, "httpd") << "m_httpd: IP for connection " << this->GetFD() << " changed to " << this->ip;
 					break;
 				}
@@ -87,7 +86,7 @@ class MyHTTPClient : public HTTPClient
 		HTTPReply reply;
 		reply.content_type = this->page->GetContentType();
 
-		if (this->page->OnRequest(this->provider, this->page_name, this, this->header, reply))
+		if (this->page->OnRequest(this->provider, this->page_name, this, this->message, reply))
 			this->SendReply(&reply);
 	}
 
@@ -104,6 +103,12 @@ class MyHTTPClient : public HTTPClient
 		Log(LOG_DEBUG, "httpd") << "Closing connection " << this->GetFD() << " from " << this->ip;
 	}
 
+	/* Close connection once all data is written */
+	bool ProcessWrite() anope_override
+	{
+		return !BinarySocket::ProcessWrite() || this->write_buffer.empty() ? false : true;
+	}
+
 	const Anope::string GetIP() anope_override
 	{
 		return this->ip;
@@ -111,12 +116,12 @@ class MyHTTPClient : public HTTPClient
 
 	bool Read(const char *buffer, size_t l) anope_override
 	{
-		inbuf.append(buffer, l);
+		message.content.append(buffer, l);
 
-		for (size_t nl; !this->header_done && (nl = inbuf.find('\n')) != Anope::string::npos;)
+		for (size_t nl; !this->header_done && (nl = message.content.find('\n')) != Anope::string::npos;)
 		{
-			Anope::string token = inbuf.substr(0, nl).trim();
-			inbuf = inbuf.substr(nl + 1);
+			Anope::string token = message.content.substr(0, nl).trim();
+			message.content = message.content.substr(nl + 1);
 
 			if (token.empty())
 				this->header_done = true;
@@ -127,9 +132,9 @@ class MyHTTPClient : public HTTPClient
 		if (!this->header_done)
 			return true;
 
-		if (this->inbuf.length() >= this->content_length)
+		if (this->message.content.length() >= this->content_length)
 		{
-			sepstream sep(this->inbuf, '&');
+			sepstream sep(this->message.content, '&');
 			Anope::string token;
 
 			while (sep.GetToken(token))
@@ -137,8 +142,8 @@ class MyHTTPClient : public HTTPClient
 				size_t sz = token.find('=');
 				if (sz == Anope::string::npos || !sz || sz + 1 >= token.length())
 					continue;
-				this->header.post_data[token.substr(0, sz)] = HTTPUtils::URLDecode(token.substr(sz + 1));
-				Log(LOG_DEBUG_2) << "HTTP POST from " << this->clientaddr.addr() << ": " << token.substr(0, sz) << ": " << this->header.post_data[token.substr(0, sz)];
+				this->message.post_data[token.substr(0, sz)] = HTTPUtils::URLDecode(token.substr(sz + 1));
+				Log(LOG_DEBUG_2) << "HTTP POST from " << this->clientaddr.addr() << ": " << token.substr(0, sz) << ": " << this->message.post_data[token.substr(0, sz)];
 			}
 
 			this->Serve();
@@ -186,7 +191,7 @@ class MyHTTPClient : public HTTPClient
 					size_t sz = token.find('=');
 					if (sz == Anope::string::npos || !sz || sz + 1 >= token.length())
 						continue;
-					this->header.get_data[token.substr(0, sz)] = HTTPUtils::URLDecode(token.substr(sz + 1));
+					this->message.get_data[token.substr(0, sz)] = HTTPUtils::URLDecode(token.substr(sz + 1));
 				}
 			}
 
@@ -206,7 +211,7 @@ class MyHTTPClient : public HTTPClient
 				size_t end = token.length() - (sz + 1);
 				if (!sep.StreamEnd())
 					--end; // Remove trailing ;
-				this->header.cookies[token.substr(0, sz)] = token.substr(sz + 1, end);
+				this->message.cookies[token.substr(0, sz)] = token.substr(sz + 1, end);
 			}
 		}
 		else if (buf.find("Content-Length: ") == 0)
@@ -221,7 +226,7 @@ class MyHTTPClient : public HTTPClient
 		{
 			size_t sz = buf.find(':');
 			if (sz + 2 < buf.length())
-				this->header.headers[buf.substr(0, sz)] = buf.substr(sz + 2);
+				this->message.headers[buf.substr(0, sz)] = buf.substr(sz + 2);
 		}
 
 		return true;
@@ -238,22 +243,22 @@ class MyHTTPClient : public HTTPClient
 		this->SendReply(&h);
 	}
 
-	void SendReply(HTTPReply *message) anope_override
+	void SendReply(HTTPReply *msg) anope_override
 	{
-		this->WriteClient("HTTP/1.1 " + GetStatusFromCode(message->error));
+		this->WriteClient("HTTP/1.1 " + GetStatusFromCode(msg->error));
 		this->WriteClient("Date: " + BuildDate());
 		this->WriteClient("Server: Anope-" + Anope::VersionShort());
-		if (message->content_type.empty())
+		if (msg->content_type.empty())
 			this->WriteClient("Content-Type: text/html");
 		else
-			this->WriteClient("Content-Type: " + message->content_type);
-		this->WriteClient("Content-Length: " + stringify(message->length));
+			this->WriteClient("Content-Type: " + msg->content_type);
+		this->WriteClient("Content-Length: " + stringify(msg->length));
 
-		for (unsigned i = 0; i < message->cookies.size(); ++i)
+		for (unsigned i = 0; i < msg->cookies.size(); ++i)
 		{
 			Anope::string buf = "Set-Cookie:";
 
-			for (HTTPReply::cookie::iterator it = message->cookies[i].begin(), it_end = message->cookies[i].end(); it != it_end; ++it)
+			for (HTTPReply::cookie::iterator it = msg->cookies[i].begin(), it_end = msg->cookies[i].end(); it != it_end; ++it)
 				buf += " " + it->first + "=" + it->second + ";";
 
 			buf.erase(buf.length() - 1);
@@ -262,22 +267,22 @@ class MyHTTPClient : public HTTPClient
 		}
 
 		typedef std::map<Anope::string, Anope::string> map;
-		for (map::iterator it = message->headers.begin(), it_end = message->headers.end(); it != it_end; ++it)
+		for (map::iterator it = msg->headers.begin(), it_end = msg->headers.end(); it != it_end; ++it)
 			this->WriteClient(it->first + ": " + it->second);
 
 		this->WriteClient("Connection: Close");
 		this->WriteClient("");
 
-		for (unsigned i = 0; i < message->out.size(); ++i)
+		for (unsigned i = 0; i < msg->out.size(); ++i)
 		{
-			HTTPReply::Data* d = message->out[i];
+			HTTPReply::Data* d = msg->out[i];
 
 			this->Write(d->buf, d->len);
 
 			delete d;
 		}
 
-		message->out.clear();
+		msg->out.clear();
 	}
 };
 

@@ -138,7 +138,7 @@ class CommandNSCert : public Command
 	{
 		NSCertList *cl = nc->Require<NSCertList>("certificates");
 
-		if (cl->GetCertCount() >= Config->GetModule(this->owner)->Get<unsigned>("accessmax"))
+		if (cl->GetCertCount() >= Config->GetModule(this->owner)->Get<unsigned>("accessmax", "5"))
 		{
 			source.Reply(_("Sorry, the maximum of %d certificate entries has been reached."), Config->GetModule(this->owner)->Get<unsigned>("accessmax"));
 			return;

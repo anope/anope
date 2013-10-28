@@ -28,7 +28,7 @@ class CommandNSAccess : public Command
 			return;
 		}
 
-		if (nc->access.size() >= Config->GetModule(this->owner)->Get<unsigned>("accessmax"))
+		if (nc->access.size() >= Config->GetModule(this->owner)->Get<unsigned>("accessmax", "32"))
 		{
 			source.Reply(_("Sorry, the maximum of %d access entries has been reached."), Config->GetModule(this->owner)->Get<unsigned>("accessmax"));
 			return;

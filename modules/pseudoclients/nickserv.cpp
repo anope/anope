@@ -181,13 +181,13 @@ class NickServCore : public Module, public NickServService
 			}
 			else if (na->nc->HasExt("KILL_QUICK"))
 			{
-				time_t killquick = Config->GetModule("nickserv")->Get<time_t>("killquick", "60s");
+				time_t killquick = Config->GetModule("nickserv")->Get<time_t>("killquick", "20s");
 				u->SendMessage(NickServ, _("If you do not change within %s, I will change your nick."), Anope::Duration(killquick, u->Account()).c_str());
 				new NickServCollide(this, u, na, killquick);
 			}
 			else
 			{
-				time_t kill = Config->GetModule("nickserv")->Get<time_t>("kill", "20s");
+				time_t kill = Config->GetModule("nickserv")->Get<time_t>("kill", "60s");
 				u->SendMessage(NickServ, _("If you do not change within %s, I will change your nick."), Anope::Duration(kill, u->Account()).c_str());
 				new NickServCollide(this, u, na, kill);
 			}

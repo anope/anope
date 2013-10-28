@@ -151,6 +151,8 @@ class NickServCore : public Module, public NickServService
 			this->Collide(u, na);
 			return;
 		}
+		else if (MOD_RESULT == EVENT_ALLOW)
+			return;
 
 		if (!na->nc->HasExt("NS_SECURE") && u->IsRecognized())
 		{

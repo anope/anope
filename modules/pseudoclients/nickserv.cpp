@@ -392,7 +392,7 @@ class NickServCore : public Module, public NickServService
 	void OnUserNickChange(User *u, const Anope::string &oldnick) anope_override
 	{
 		NickAlias *old_na = NickAlias::Find(oldnick), *na = NickAlias::Find(u->nick);
-		/* If the new nick isnt registerd or its registerd and not yours */
+		/* If the new nick isn't registered or it's registered and not yours */
 		if (!na || na->nc != u->Account())
 		{
 			/* Remove +r, but keep an account associated with the user */

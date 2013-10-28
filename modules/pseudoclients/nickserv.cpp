@@ -151,6 +151,8 @@ class NickServCore : public Module, public NickServService
 			this->Collide(u, na);
 			return;
 		}
+		else if (MOD_RESULT == EVENT_ALLOW)
+			return;
 
 		if (!na->nc->HasExt("NS_SECURE") && u->IsRecognized())
 		{
@@ -181,13 +183,13 @@ class NickServCore : public Module, public NickServService
 			}
 			else if (na->nc->HasExt("KILL_QUICK"))
 			{
-				time_t killquick = Config->GetModule("nickserv")->Get<time_t>("killquick", "60s");
+				time_t killquick = Config->GetModule("nickserv")->Get<time_t>("killquick", "20s");
 				u->SendMessage(NickServ, _("If you do not change within %s, I will change your nick."), Anope::Duration(killquick, u->Account()).c_str());
 				new NickServCollide(this, u, na, killquick);
 			}
 			else
 			{
-				time_t kill = Config->GetModule("nickserv")->Get<time_t>("kill", "20s");
+				time_t kill = Config->GetModule("nickserv")->Get<time_t>("kill", "60s");
 				u->SendMessage(NickServ, _("If you do not change within %s, I will change your nick."), Anope::Duration(kill, u->Account()).c_str());
 				new NickServCollide(this, u, na, kill);
 			}
@@ -392,7 +394,7 @@ class NickServCore : public Module, public NickServService
 	void OnUserNickChange(User *u, const Anope::string &oldnick) anope_override
 	{
 		NickAlias *old_na = NickAlias::Find(oldnick), *na = NickAlias::Find(u->nick);
-		/* If the new nick isnt registerd or its registerd and not yours */
+		/* If the new nick isn't registered or it's registered and not yours */
 		if (!na || na->nc != u->Account())
 		{
 			/* Remove +r, but keep an account associated with the user */

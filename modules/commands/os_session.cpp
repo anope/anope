@@ -692,7 +692,7 @@ class OSSession : public Module
 			 * decremented when the user is killed or quits - Adam
 			 */
 			++session->count;
-	
+
 			if (kill && !exempt)
 			{
 				BotInfo *OperServ = Config->GetClient("OperServ");

@@ -185,9 +185,9 @@ class ModuleVersion
 
  public:
 	/** Constructor
-	 * @param major The major version numbber
-	 * @param minor The minor version numbber
-	 * @param patch The patch version numbber
+	 * @param major The major version number
+	 * @param minor The minor version number
+	 * @param patch The patch version number
 	 */
 	ModuleVersion(int major, int minor, int patch);
 

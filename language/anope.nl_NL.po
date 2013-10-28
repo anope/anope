@@ -7260,7 +7260,7 @@ msgstr "SET server.naam optie waarde"
 
 #: modules/commands/ns_cert.cpp:336 modules/commands/ns_cert.cpp:346
 msgid "SSL certificate fingerprint accepted, you are now identified."
-msgstr "SSL certificaat vingerafdruk aanvaard, je bent nu geïdentificeerd."
+msgstr "SSL certificaatvingerafdruk aanvaard, je bent nu geïdentificeerd."
 
 #: modules/commands/cs_enforce.cpp:137
 #, c-format

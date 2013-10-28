@@ -334,7 +334,7 @@ class NSCert : public Module
 
 		u->Identify(na);
 		u->SendMessage(NickServ, _("SSL certificate fingerprint accepted, you are now identified."));
-		Log(u) << "automatically identified for account " << na->nc->display << " via SSL certificate fingerprint";
+		Log(NickServ) << u->GetMask() << " automatically identified for account " << na->nc->display << " via SSL certificate fingerprint";
 	}
 
 	EventReturn OnNickValidate(User *u, NickAlias *na) anope_override
@@ -342,9 +342,10 @@ class NSCert : public Module
 		NSCertList *cl = certs.Get(na->nc);
 		if (!u->fingerprint.empty() && cl && cl->FindCert(u->fingerprint))
 		{
+			BotInfo *NickServ = Config->GetClient("NickServ");
 			u->Identify(na);
-			u->SendMessage(Config->GetClient("NickServ"), _("SSL certificate fingerprint accepted, you are now identified."));
-			Log(u) << "automatically identified for account " << na->nc->display << " via SSL certificate fingerprint";
+			u->SendMessage(NickServ, _("SSL certificate fingerprint accepted, you are now identified."));
+			Log(NickServ) << u->GetMask() << " automatically identified for account " << na->nc->display << " via SSL certificate fingerprint";
 			return EVENT_ALLOW;
 		}
 

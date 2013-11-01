@@ -433,7 +433,7 @@ Conf::Conf() : Block("")
 		ValidateNotEmpty("command", "name", nname);
 		ValidateNotEmpty("command", "command", cmd);
 
-		BotInfo *bi = BotInfo::Find(service, true);
+		BotInfo *bi = this->GetClient(service);
 		if (!bi)
 			continue;
 

@@ -123,8 +123,8 @@ class CoreExport ChanAccess : public Serializable
 	virtual void AccessUnserialize(const Anope::string &data) = 0;
 
 	/* Comparison operators to other Access entries */
-	bool operator>(const ChanAccess &other) const;
-	bool operator<(const ChanAccess &other) const;
+	virtual bool operator>(const ChanAccess &other) const;
+	virtual bool operator<(const ChanAccess &other) const;
 	bool operator>=(const ChanAccess &other) const;
 	bool operator<=(const ChanAccess &other) const;
 };

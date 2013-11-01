@@ -363,12 +363,11 @@ bool AccessGroup::HasPriv(const Anope::string &name) const
 
 const ChanAccess *AccessGroup::Highest() const
 {
-	const std::vector<Privilege> &privs = PrivilegeManager::GetPrivileges();
-	for (unsigned i = privs.size(); i > 0; --i)
-		for (unsigned j = this->size(); j > 0; --j)
-			if (this->at(j - 1)->HasPriv(privs[i - 1].name))
-				return this->at(j - 1);
-	return NULL;
+	ChanAccess *highest = NULL;
+	for (unsigned i = 0; i < this->size(); ++i)
+		if (highest == NULL || *this->at(i) > *highest)
+			highest = this->at(i);
+	return highest;
 }
 
 bool AccessGroup::operator>(const AccessGroup &other) const

@@ -762,17 +762,31 @@ template<typename T> inline T convertTo(const Anope::string &s, bool failIfLefto
  */
 #ifdef DEBUG_BUILD
 # include <typeinfo>
-#endif
-template<typename T, typename O> inline T anope_dynamic_static_cast(O ptr)
+
+template<typename T, typename O> inline T anope_dynamic_static_cast(O* ptr)
 {
-#ifdef DEBUG_BUILD
 	T ret = dynamic_cast<T>(ptr);
 	if (ptr != NULL && ret == NULL)
-		throw CoreException(Anope::string("anope_dynamic_static_cast<") + typeid(T).name() + ">(" + typeid(O).name() + ") fail");
+		throw CoreException(Anope::string("anope_dynamic_static_cast<") + typeid(T).name() + ">(" + typeid(O*).name() + ") fail");
 	return ret;
-#else
-	return static_cast<T>(ptr);
-#endif
 }
+
+template<typename T, typename O> inline T anope_dynamic_static_cast(O& ref)
+{
+	try
+	{
+		return dynamic_cast<T>(ref);
+	}
+	catch (const std::bad_cast &ex)
+	{
+		throw CoreException(Anope::string("std::bad_cast from anope_dynamic_static_cast<") + typeid(T).name() + ">(" + typeid(O&).name() + "): " + ex.what());
+	}
+}
+#else
+template<typename T, typename O> inline T anope_dynamic_static_cast(O ptr)
+{
+	return static_cast<T>(ptr);
+}
+#endif
 
 #endif // ANOPE_H

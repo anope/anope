@@ -43,13 +43,32 @@ class AccessChanAccess : public ChanAccess
 	{
 		this->level = convertTo<int>(data);
 	}
+
+	bool operator>(const ChanAccess &other) const anope_override
+	{
+		if (this->provider != other.provider)
+			return ChanAccess::operator>(other);
+		else
+			return this->level > anope_dynamic_static_cast<const AccessChanAccess &>(other).level;
+	}
+
+	bool operator<(const ChanAccess &other) const anope_override
+	{
+		if (this->provider != other.provider)
+			return ChanAccess::operator<(other);
+		else
+			return this->level < anope_dynamic_static_cast<const AccessChanAccess &>(other).level;
+	}
 };
 
 class AccessAccessProvider : public AccessProvider
 {
  public:
+	static AccessAccessProvider *me;
+
 	AccessAccessProvider(Module *o) : AccessProvider(o, "access/access")
 	{
+		me = this;
 	}
 
 	ChanAccess *Create() anope_override
@@ -57,6 +76,7 @@ class AccessAccessProvider : public AccessProvider
 		return new AccessChanAccess(this);
 	}
 };
+AccessAccessProvider* AccessAccessProvider::me;
 
 class CommandCSAccess : public Command
 {
@@ -91,7 +111,7 @@ class CommandCSAccess : public Command
 		AccessGroup u_access = source.AccessFor(ci);
 		const ChanAccess *highest = u_access.Highest();
 
-		AccessChanAccess tmp_access(NULL);
+		AccessChanAccess tmp_access(AccessAccessProvider::me);
 		tmp_access.ci = ci;
 		tmp_access.level = level;
 

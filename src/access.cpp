@@ -269,10 +269,8 @@ bool ChanAccess::operator>(const ChanAccess &other) const
 
 		if (!this_p && !other_p)
 			continue;
-		else if (this_p && !other_p)
-			return true;
-		else
-			return false;
+
+		return this_p && !other_p;
 	}
 
 	return false;
@@ -288,10 +286,8 @@ bool ChanAccess::operator<(const ChanAccess &other) const
 
 		if (!this_p && !other_p)
 			continue;
-		else if (!this_p && other_p)
-			return true;
-		else
-			return false;
+
+		return !this_p && other_p;
 	}	
 
 	return false;
@@ -299,40 +295,12 @@ bool ChanAccess::operator<(const ChanAccess &other) const
 
 bool ChanAccess::operator>=(const ChanAccess &other) const
 {
-	const std::vector<Privilege> &privs = PrivilegeManager::GetPrivileges();
-	for (unsigned i = privs.size(); i > 0; --i)
-	{
-		bool this_p = this->HasPriv(privs[i - 1].name),
-			other_p = other.HasPriv(privs[i - 1].name);
-
-		if (!this_p && !other_p)
-			continue;
-		else if (!this_p && other_p)
-			return false;
-		else
-			return true;
-	}
-
-	return true;
+	return !(*this < other);
 }
 
 bool ChanAccess::operator<=(const ChanAccess &other) const
 {
-	const std::vector<Privilege> &privs = PrivilegeManager::GetPrivileges();
-	for (unsigned i = privs.size(); i > 0; --i)
-	{
-		bool this_p = this->HasPriv(privs[i - 1].name),
-			other_p = other.HasPriv(privs[i - 1].name);
-
-		if (!this_p && !other_p)
-			continue;
-		else if (this_p && !other_p)
-			return false;
-		else
-			return true;
-	}
-
-	return true;
+	return !(*this > other);
 }
 
 AccessGroup::AccessGroup() : std::vector<ChanAccess *>()
@@ -381,7 +349,7 @@ bool AccessGroup::HasPriv(const Anope::string &name) const
 	FOREACH_RESULT(OnGroupCheckPriv, MOD_RESULT, (this, name));
 	if (MOD_RESULT != EVENT_CONTINUE)
 		return MOD_RESULT == EVENT_ALLOW;
-	
+
 	for (unsigned i = this->size(); i > 0; --i)
 	{
 		ChanAccess *access = this->at(i - 1);
@@ -405,14 +373,15 @@ const ChanAccess *AccessGroup::Highest() const
 
 bool AccessGroup::operator>(const AccessGroup &other) const
 {
-	if (this->super_admin)
-		return true;
-	else if (other.super_admin)
+	if (other.super_admin)
 		return false;
-	else if (this->founder && !other.founder)
+	else if (this->super_admin)
 		return true;
-	else if (!this->founder && other.founder)
+	else if (other.founder)
 		return false;
+	else if (this->founder)
+		return true;
+
 	const std::vector<Privilege> &privs = PrivilegeManager::GetPrivileges();
 	for (unsigned i = privs.size(); i > 0; --i)
 	{
@@ -421,10 +390,8 @@ bool AccessGroup::operator>(const AccessGroup &other) const
 
 		if (!this_p && !other_p)
 			continue;
-		else if (this_p && !other_p)
-			return true;
-		else
-			return false;
+
+		return this_p && !other_p;
 	}
 
 	return false;
@@ -432,14 +399,15 @@ bool AccessGroup::operator>(const AccessGroup &other) const
 
 bool AccessGroup::operator<(const AccessGroup &other) const
 {
-	if (other.super_admin)
-		return true;
-	else if (this->super_admin)
+	if (this->super_admin)
 		return false;
-	else if (other.founder && !this->founder)
+	else if (other.super_admin)
 		return true;
-	else if (this->founder && !other.founder)
+	else if (this->founder)
 		return false;
+	else if (other.founder)
+		return true;
+
 	const std::vector<Privilege> &privs = PrivilegeManager::GetPrivileges();
 	for (unsigned i = privs.size(); i > 0; --i)
 	{
@@ -448,10 +416,8 @@ bool AccessGroup::operator<(const AccessGroup &other) const
 
 		if (!this_p && !other_p)
 			continue;
-		else if (!this_p && other_p)
-			return true;
-		else
-			return false;
+
+		return !this_p && other_p;
 	}
 
 	return false;
@@ -459,55 +425,11 @@ bool AccessGroup::operator<(const AccessGroup &other) const
 
 bool AccessGroup::operator>=(const AccessGroup &other) const
 {
-	if (this->super_admin)
-		return true;
-	else if (other.super_admin)
-		return false;
-	else if (this->founder)
-		return true;
-	else if (other.founder)
-		return false;
-	const std::vector<Privilege> &privs = PrivilegeManager::GetPrivileges();
-	for (unsigned i = privs.size(); i > 0; --i)
-	{
-		bool this_p = this->HasPriv(privs[i - 1].name),
-			other_p = other.HasPriv(privs[i - 1].name);
-
-		if (!this_p && !other_p)
-			continue;
-		else if (other_p && !this_p)
-			return false;
-		else
-			return true;
-	}
-
-	return true;
+	return !(*this < other);
 }
 
 bool AccessGroup::operator<=(const AccessGroup &other) const
 {
-	if (other.super_admin)
-		return true;
-	else if (this->super_admin)
-		return false;
-	else if (other.founder)
-		return true;
-	else if (this->founder)
-		return false;
-	const std::vector<Privilege> &privs = PrivilegeManager::GetPrivileges();
-	for (unsigned i = privs.size(); i > 0; --i)
-	{
-		bool this_p = this->HasPriv(privs[i - 1].name),
-			other_p = other.HasPriv(privs[i - 1].name);
-
-		if (!this_p && !other_p)
-			continue;
-		else if (this_p && !other_p)
-			return false;
-		else
-			return true;
-	}
-
-	return true;
+	return !(*this > other);
 }
 

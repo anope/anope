@@ -822,7 +822,7 @@ void Channel::SetCorrectModes(User *user, bool give_modes)
 				given = true;
 			}
 		}
-		else if (take_modes && !has_priv)
+		else if (take_modes && !has_priv && !u_access.HasPriv(cm->name + "ME"))
 		{
 			/* Only remove modes if they are > voice */
 			if (cm->name == "VOICE")

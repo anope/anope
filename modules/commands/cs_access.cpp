@@ -49,7 +49,7 @@ class AccessChanAccess : public ChanAccess
 		if (this->provider != other.provider)
 			return ChanAccess::operator>(other);
 		else
-			return this->level > anope_dynamic_static_cast<const AccessChanAccess &>(other).level;
+			return this->level > anope_dynamic_static_cast<const AccessChanAccess &, const ChanAccess &>(other).level;
 	}
 
 	bool operator<(const ChanAccess &other) const anope_override
@@ -57,7 +57,7 @@ class AccessChanAccess : public ChanAccess
 		if (this->provider != other.provider)
 			return ChanAccess::operator<(other);
 		else
-			return this->level < anope_dynamic_static_cast<const AccessChanAccess &>(other).level;
+			return this->level < anope_dynamic_static_cast<const AccessChanAccess &, const ChanAccess &>(other).level;
 	}
 };
 

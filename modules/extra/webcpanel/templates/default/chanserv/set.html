@@ -9,7 +9,9 @@
 			{END FOR}
 
 			{IF EXISTS OKAY}
-			{IF EXISTS CAN_SET}<form method="post" action="/chanserv/set?channel={CHANNEL_ESCAPED}">{END IF}
+				{IF EXISTS CAN_SET}
+				<form method="post" action="/chanserv/set?channel={CHANNEL_ESCAPED}">
+				{END IF}
 				<table id="tableInfo" class="table table-hover">
 					<tr>
 						<td>Channel Name</td>
@@ -74,13 +76,18 @@
 						<td>Topic Lock</td>
 						<td><input type="checkbox" name="topiclock" value="on" {IF EXISTS TOPICLOCK}checked{END IF}></td>
 					</tr>
+					{IF EXISTS CAN_SET}
 					<tr>
 						<td></td>
 						<td><button type="submit" class="btn btn-primary">Save</button></td>
 					</tr>
 					{END IF}
+					{END IF}
 				</table>
-			{IF EXISTS CAN_SET}</form>{END IF}
+
+				{IF EXISTS CAN_SET}
+				</form>
+				{END IF}
 			{END IF}
 		</div>
 {INCLUDE footer.html}

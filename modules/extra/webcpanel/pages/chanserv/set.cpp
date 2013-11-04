@@ -110,6 +110,7 @@ bool WebCPanel::ChanServ::Set::OnRequest(HTTPProvider *server, const Anope::stri
 		replacements["SUCCESSOR"] = ci->GetSuccessor()->display;
 	replacements["TIME_REGISTERED"] = Anope::strftime(ci->time_registered, na->nc);
 	replacements["LAST_USED"] = Anope::strftime(ci->last_used, na->nc);
+	replacements["ESCAPED_CHANNEL"] = HTTPUtils::URLEncode(chname);
 
 	if (!ci->last_topic.empty())
 	{

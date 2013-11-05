@@ -439,7 +439,7 @@ class MChanstats : public Module
 			this->RunQuery(query);
 		}
 		query = "CREATE EVENT `chanstats_event_cleanup_weekly` "
-			"ON SCHEDULE EVERY 1 WEEK STARTS (DATE(CURRENT_TIMESTAMP)-WEEKDAY(CURRENT_TIMESTAMP)) "
+			"ON SCHEDULE EVERY 1 WEEK STARTS ADDDATE(CURDATE(), INTERVAL 1-DAYOFWEEK(CURDATE()) DAY) "
 			"DO UPDATE `" + prefix + "chanstats` SET letters=0, words=0, line=0, actions=0, smileys_happy=0,"
 				"smileys_sad=0, smileys_other=0, kicks=0, modes=0, topics=0, time0=0, time1=0, time2=0,"
 				"time3=0, time4=0, time5=0, time6=0, time7=0, time8=0, time9=0, time10=0, time11=0,"

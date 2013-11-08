@@ -59,8 +59,11 @@ class FlagsChanAccess : public ChanAccess
 class FlagsAccessProvider : public AccessProvider
 {
  public:
+	static FlagsAccessProvider *ap;
+
 	FlagsAccessProvider(Module *o) : AccessProvider(o, "access/flags")
 	{
+		ap = this;
 	}
 
 	ChanAccess *Create() anope_override
@@ -68,6 +71,7 @@ class FlagsAccessProvider : public AccessProvider
 		return new FlagsChanAccess(this);
 	}
 };
+FlagsAccessProvider* FlagsAccessProvider::ap;
 
 class CommandCSFlags : public Command
 {
@@ -83,6 +87,9 @@ class CommandCSFlags : public Command
 		}
 
 		AccessGroup u_access = source.AccessFor(ci);
+		const ChanAccess *highest = u_access.Highest();
+		if (!highest)
+			return;
 
 		if (IRCD->IsChannelValid(mask))
 		{
@@ -135,6 +142,16 @@ class CommandCSFlags : public Command
 			ChanAccess *access = ci->GetAccess(current_idx - 1);
 			if (mask.equals_ci(access->mask))
 			{
+				// Flags allows removing others that have the same access as you,
+				// but no other access system does.
+				if (highest->provider != FlagsAccessProvider::ap)
+					// operator<= on the non-me entry!
+					if (*highest <= *access)
+					{
+						source.Reply(ACCESS_DENIED);
+						return;
+					}
+
 				current = access;
 				Anope::string cur_flags = FlagsChanAccess::DetermineFlags(access);
 				for (unsigned j = cur_flags.length(); j > 0; --j)

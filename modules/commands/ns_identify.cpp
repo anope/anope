@@ -44,8 +44,9 @@ class NSIdentifyRequest : public IdentifyRequest
 	{
 		if (source.GetUser())
 		{
-			Log(LOG_COMMAND, source, cmd) << "and failed to identify";
-			if (NickAlias::Find(GetAccount()) != NULL)
+			bool accountexists = NickAlias::Find(GetAccount()) != NULL;
+			Log(LOG_COMMAND, source, cmd) << "and failed to identify to" << (accountexists ? " " : " nonexistent ") << "account " << GetAccount();
+			if (accountexists)
 			{
 				source.Reply(PASSWORD_INCORRECT);
 				source.GetUser()->BadPassword();

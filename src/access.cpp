@@ -342,7 +342,14 @@ bool AccessGroup::HasPriv(const Anope::string &name) const
 		return true;
 	else if (!ci || ci->GetLevel(name) == ACCESS_INVALID)
 		return false;
-	else if (this->founder)
+
+	/* Privileges prefixed with auto are understood to be given
+	 * automatically. Sometimes founders want to not automatically
+	 * obtain privileges, so we will let them */
+	bool auto_mode = !name.find("AUTO");
+
+	/* Only grant founder privilege if this isn't an auto mode or if they don't match any entries in this group */
+	if ((!auto_mode || this->empty()) && this->founder)
 		return true;
 
 	EventReturn MOD_RESULT;

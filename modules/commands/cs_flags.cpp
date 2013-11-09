@@ -52,7 +52,10 @@ class FlagsChanAccess : public ChanAccess
 			if (access->HasPriv(it->first))
 				buffer.insert(it->second);
 
-		return Anope::string(buffer.begin(), buffer.end());
+		if (buffer.empty())
+			return "(none)";
+		else
+			return Anope::string(buffer.begin(), buffer.end());
 	}
 };
 

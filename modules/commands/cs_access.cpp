@@ -25,7 +25,7 @@ class AccessChanAccess : public ChanAccess
  public:
 	int level;
 
- 	AccessChanAccess(AccessProvider *p) : ChanAccess(p)
+ 	AccessChanAccess(AccessProvider *p) : ChanAccess(p), level(0)
 	{
 	}
 
@@ -41,7 +41,13 @@ class AccessChanAccess : public ChanAccess
 
 	void AccessUnserialize(const Anope::string &data) anope_override
 	{
-		this->level = convertTo<int>(data);
+		try
+		{
+			this->level = convertTo<int>(data);
+		}
+		catch (const ConvertException &)
+		{
+		}
 	}
 
 	bool operator>(const ChanAccess &other) const anope_override

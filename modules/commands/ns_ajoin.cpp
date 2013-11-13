@@ -252,7 +252,7 @@ class NSAJoin : public Module
 		ajoinentry_type("AJoinEntry", AJoinEntry::Unserialize)
 	{
 
-		if (!IRCD->CanSVSJoin)
+		if (!IRCD || !IRCD->CanSVSJoin)
 			throw ModuleException("Your IRCd does not support SVSJOIN");
 
 	}

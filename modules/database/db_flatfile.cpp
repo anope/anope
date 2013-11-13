@@ -191,7 +191,7 @@ class DBFlatFile : public Module, public Pipe
 		const std::vector<Anope::string> &type_order = Serialize::Type::GetTypeOrder();
 		std::set<Anope::string> tried_dbs;
 
-		const Anope::string &db_name = Anope::DataDir + "/" + Config->GetModule(this)->Get<const Anope::string>("database");
+		const Anope::string &db_name = Anope::DataDir + "/" + Config->GetModule(this)->Get<const Anope::string>("database", "anope.db");
 
 		std::fstream fd(db_name.c_str(), std::ios_base::in);
 		if (!fd.is_open())
@@ -268,7 +268,7 @@ class DBFlatFile : public Module, public Pipe
 				if (s_type->GetOwner())
 					db_name = Anope::DataDir + "/module_" + s_type->GetOwner()->name + ".db";
 				else
-					db_name = Anope::DataDir + "/" + Config->GetModule(this)->Get<const Anope::string>("database");
+					db_name = Anope::DataDir + "/" + Config->GetModule(this)->Get<const Anope::string>("database", "anope.db");
 
 				if (Anope::IsFile(db_name))
 					rename(db_name.c_str(), (db_name + ".tmp").c_str());
@@ -343,7 +343,7 @@ class DBFlatFile : public Module, public Pipe
 		if (stype->GetOwner())
 			db_name = Anope::DataDir + "/module_" + stype->GetOwner()->name + ".db";
 		else
-			db_name = Anope::DataDir + "/" + Config->GetModule(this)->Get<const Anope::string>("database");
+			db_name = Anope::DataDir + "/" + Config->GetModule(this)->Get<const Anope::string>("database", "anope.db");
 
 		std::fstream fd(db_name.c_str(), std::ios_base::in);
 		if (!fd.is_open())

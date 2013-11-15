@@ -263,7 +263,7 @@ class ProtoRatbox : public Module
 		ModeManager::AddChannelMode(new ChannelMode("MODERATED", 'm'));
 		ModeManager::AddChannelMode(new ChannelMode("NOEXTERNAL", 'n'));
 		ModeManager::AddChannelMode(new ChannelMode("PRIVATE", 'p'));
-		ModeManager::AddChannelMode(new ChannelModeNoone("REGISTEREDONLY", 'r'));
+		ModeManager::AddChannelMode(new ChannelMode("REGISTEREDONLY", 'r'));
 		ModeManager::AddChannelMode(new ChannelMode("SECRET", 's'));
 		ModeManager::AddChannelMode(new ChannelMode("TOPIC", 't'));
 		ModeManager::AddChannelMode(new ChannelMode("SSL", 'S'));

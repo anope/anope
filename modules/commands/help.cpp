@@ -44,7 +44,8 @@ class CommandHelp : public Command
 		Anope::string source_command = source.command;
 		const BotInfo *bi = source.service;
 		const CommandInfo::map &map = source.c ? Config->Fantasy : bi->commands;
-		bool hide_privileged_commands = Config->GetBlock("options")->Get<bool>("hideprivilegedcommands");
+		bool hide_privileged_commands = Config->GetBlock("options")->Get<bool>("hideprivilegedcommands"),
+		     hide_registered_commands = Config->GetBlock("options")->Get<bool>("hideregisteredcommands");
 
 		if (params.empty() || params[0].equals_ci("ALL"))
 		{
@@ -72,11 +73,11 @@ class CommandHelp : public Command
 				ServiceReference<Command> c("Command", info.name);
 				if (!c)
 					continue;
-				else if (!hide_privileged_commands)
-					; // Always show with hide_privileged_commands disabled
-				else if (!c->AllowUnregistered() && !source.GetAccount())
+
+				if (hide_registered_commands && !c->AllowUnregistered() && !source.GetAccount())
 					continue;
-				else if (!info.permission.empty() && !source.HasCommand(info.permission))
+
+				if (hide_privileged_commands && !info.permission.empty() && !source.HasCommand(info.permission))
 					continue;
 
 				if (!info.group.empty() && !all)
@@ -145,9 +146,8 @@ class CommandHelp : public Command
 				ServiceReference<Command> c("Command", info.name);
 				if (!c)
 					continue;
-				else if (!hide_privileged_commands)
-					; // Always show with hide_privileged_commands disabled
-				else if (!info.permission.empty() && !source.HasCommand(info.permission))
+
+				if (hide_privileged_commands && !info.permission.empty() && !source.HasCommand(info.permission))
 					continue;
 				
 				// Allow unregistered users to see help for commands that they explicitly request help for

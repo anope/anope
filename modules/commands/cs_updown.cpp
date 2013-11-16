@@ -13,6 +13,35 @@
 
 class CommandCSUp : public Command
 {
+	void SetModes(User *u, Channel *c)
+	{
+		if (!c->ci)
+			return;
+
+		/* whether or not we are giving modes */
+		bool giving = true;
+		/* whether or not we have given a mode */
+		bool given = false;
+		AccessGroup u_access = c->ci->AccessFor(u);
+
+		for (unsigned i = 0; i < ModeManager::GetStatusChannelModesByRank().size(); ++i)
+		{
+			ChannelModeStatus *cm = ModeManager::GetStatusChannelModesByRank()[i];
+			bool has_priv = u_access.HasPriv("AUTO" + cm->name) || u_access.HasPriv(cm->name);
+
+			if (has_priv)
+			{
+				/* Always give op. If we have already given one mode, don't give more until it has a symbol */
+				if (cm->name == "OP" || !given || (giving && cm->symbol))
+				{
+					c->SetMode(NULL, cm, u->GetUID(), false);
+					/* Now if this contains a symbol don't give any more modes, to prevent setting +qaohv etc on users */
+					giving = !cm->symbol;
+					given = true;
+				}
+			}
+		}
+	}
  public:
 	CommandCSUp(Module *creator) : Command(creator, "chanserv/up", 0, 2)
 	{
@@ -29,7 +58,7 @@ class CommandCSUp : public Command
 			for (User::ChanUserList::iterator it = source.GetUser()->chans.begin(); it != source.GetUser()->chans.end(); ++it)
 			{
 				Channel *c = it->second->chan;
-				c->SetCorrectModes(source.GetUser(), true);
+				SetModes(source.GetUser(), c);
 			}
 			Log(LOG_COMMAND, source, this, NULL) << "on all channels to update their status modes";
 		}
@@ -79,7 +108,7 @@ class CommandCSUp : public Command
 			}
 
 			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, c->ci) << "to update the status modes of " << u->nick;
-			c->SetCorrectModes(u, true);
+			SetModes(u, c);
 		}
 
 	}

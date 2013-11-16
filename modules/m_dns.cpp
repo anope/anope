@@ -460,6 +460,9 @@ namespace DNS
 /* Listens for TCP requests */
 class TCPSocket : public ListenSocket
 {
+	Manager *manager;
+	
+ public:
 	/* A TCP client */
 	class Client : public ClientSocket, public Timer, public ReplySocket
 	{
@@ -539,9 +542,6 @@ class TCPSocket : public ListenSocket
 		}
 	};
 
-	Manager *manager;
-	
- public:
 	TCPSocket(Manager *m, const Anope::string &ip, int port) : Socket(-1, ip.find(':') != Anope::string::npos), ListenSocket(ip, port, ip.find(':') != Anope::string::npos), manager(m) { }
 	
 	ClientSocket *OnAccept(int fd, const sockaddrs &addr) anope_override
@@ -1017,6 +1017,18 @@ class ModuleDNS : public Module
 	ModuleDNS(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, EXTRA | VENDOR), manager(this)
 	{
 
+	}
+
+	~ModuleDNS()
+	{
+		for (std::map<int, Socket *>::const_iterator it = SocketEngine::Sockets.begin(), it_end = SocketEngine::Sockets.end(); it != it_end;)
+		{
+			Socket *s = it->second;
+			++it;
+
+			if (dynamic_cast<NotifySocket *>(s) || dynamic_cast<TCPSocket::Client *>(s))
+				delete s;
+		}
 	}
 
 	void OnReload(Configuration::Conf *conf) anope_override

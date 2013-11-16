@@ -663,23 +663,24 @@ class CommandCSLevels : public Command
 		/* Don't allow disabling of the founder level. It would be hard to change it back if you dont have access to use this command */
 		if (!what.equals_ci("FOUNDER"))
 		{
-			Privilege *p = PrivilegeManager::FindPrivilege(what);
-			if (p != NULL)
-			{
-				ci->SetLevel(p->name, ACCESS_INVALID);
-				FOREACH_MOD(OnLevelChange, (source, ci, p->name, ACCESS_INVALID));
+			source.Reply(_("You can not disable the founder privilege because it would be impossible to reenable it at a later time."));
+			return;
+		}
 
-				bool override = !source.AccessFor(ci).HasPriv("FOUNDER");
-				Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to disable " << p->name;
+		Privilege *p = PrivilegeManager::FindPrivilege(what);
+		if (p != NULL)
+		{
+			ci->SetLevel(p->name, ACCESS_INVALID);
+			FOREACH_MOD(OnLevelChange, (source, ci, p->name, ACCESS_INVALID));
 
-				source.Reply(_("\002%s\002 disabled on channel %s."), p->name.c_str(), ci->name.c_str());
-				return;
-			}
+			bool override = !source.AccessFor(ci).HasPriv("FOUNDER");
+			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to disable " << p->name;
+
+			source.Reply(_("\002%s\002 disabled on channel %s."), p->name.c_str(), ci->name.c_str());
+			return;
 		}
 
 		source.Reply(_("Setting \002%s\002 not known.  Type \002%s%s HELP LEVELS\002 for a list of valid settings."), what.c_str(), Config->StrictPrivmsg.c_str(), source.service->nick.c_str());
-
-		return;
 	}
 
 	void DoList(CommandSource &source, ChannelInfo *ci)

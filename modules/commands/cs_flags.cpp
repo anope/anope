@@ -185,7 +185,7 @@ class CommandCSFlags : public Command
 				case '*':
 					for (std::map<Anope::string, char>::iterator it = defaultFlags.begin(), it_end = defaultFlags.end(); it != it_end; ++it)
 					{
-						if (!u_access.HasPriv(it->first))
+						if (!u_access.HasPriv(it->first) && !u_access.founder)
 						{
 							if (source.HasPriv("chanserv/access/modify"))
 								override = true;
@@ -210,7 +210,7 @@ class CommandCSFlags : public Command
 					{
 						if (f != it->second)
 							continue;
-						else if (!u_access.HasPriv(it->first))
+						else if (!u_access.HasPriv(it->first) && !u_access.founder)
 						{
 							if (source.HasPriv("chanserv/access/modify"))
 								override = true;

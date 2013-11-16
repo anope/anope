@@ -90,6 +90,7 @@ void Channel::Reset()
 
 void Channel::Sync()
 {
+	syncing = false;
 	FOREACH_MOD(OnChannelSync, (this));
 }
 

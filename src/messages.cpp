@@ -145,10 +145,10 @@ void Join::SJoin(MessageSource &source, const Anope::string &chan, time_t ts, co
 	/* Channel is done syncing */
 	if (c->syncing)
 	{
-		c->syncing = false;
 		/* Sync the channel (mode lock, topic, etc) */
 		/* the channel is synced when the netmerge is complete */
-		if (Me && Me->IsSynced())
+		Server *src = source.GetServer() ? source.GetServer() : Me;
+		if (src && src->IsSynced())
 			c->Sync();
 	}
 }

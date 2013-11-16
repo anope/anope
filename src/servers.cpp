@@ -257,16 +257,22 @@ void Server::Sync(bool sync_links)
 			this->links[i]->Sync(true);
 	}
 
-	if (this->GetUplink() && this->GetUplink() == Me)
+	bool me = this->GetUplink() && this->GetUplink() == Me;
+
+	if (me)
 	{
 		FOREACH_MOD(OnPreUplinkSync, (this));
+	}
 
-		for (channel_map::const_iterator it = ChannelList.begin(), it_end = ChannelList.end(); it != it_end; ++it)
-		{
-			Channel *c = it->second;
+	for (channel_map::const_iterator it = ChannelList.begin(), it_end = ChannelList.end(); it != it_end; ++it)
+	{
+		Channel *c = it->second;
+		if (c->syncing)
 			c->Sync();
-		}
+	}
 
+	if (me)
+	{
 		IRCD->SendEOB();
 		Me->Sync(false);
 

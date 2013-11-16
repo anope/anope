@@ -374,6 +374,16 @@ class CommandCSSetKeepModes : public Command
 		else
 			this->OnSyntaxError(source, "PEACE");
 	}
+
+	bool OnHelp(CommandSource &source, const Anope::string &) anope_override
+	{
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_("Enables or disables keepmodes for the given channel. If keep\n"
+				"modes is enabled, services will remember modes set on the channel\n"
+				"and attempt to re-set them the next time the channel is created."));
+		return true;
+	}
 };
 
 class CommandCSSetPeace : public Command

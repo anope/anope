@@ -180,7 +180,7 @@ public:
 				/* Get service name from command */
 				service_name = bi->commands[command_name].name;
 			}
-			else if (ServiceReference<Command>("Command", command))
+			else if (ServiceReference<Command>("Command", command.lower()))
 			{
 				/* This is the service name, don't use any specific command */
 				service_name = command;
@@ -212,7 +212,7 @@ public:
 			{
 				LogSetting *log = (*ls)->at(i - 1);
 
-				if (log->service_name == service_name && log->method.equals_ci(method))
+				if (log->service_name == service_name && log->method.equals_ci(method) && command_name.equals_ci(log->command_name))
 				{
 					if (log->extra == extra)
 					{

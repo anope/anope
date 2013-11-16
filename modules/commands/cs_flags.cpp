@@ -91,8 +91,6 @@ class CommandCSFlags : public Command
 
 		AccessGroup u_access = source.AccessFor(ci);
 		const ChanAccess *highest = u_access.Highest();
-		if (!highest)
-			return;
 
 		if (IRCD->IsChannelValid(mask))
 		{
@@ -147,7 +145,7 @@ class CommandCSFlags : public Command
 			{
 				// Flags allows removing others that have the same access as you,
 				// but no other access system does.
-				if (highest->provider != FlagsAccessProvider::ap)
+				if (highest && highest->provider != FlagsAccessProvider::ap && !u_access.founder)
 					// operator<= on the non-me entry!
 					if (*highest <= *access)
 					{

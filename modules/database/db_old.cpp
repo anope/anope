@@ -219,13 +219,13 @@ static Anope::string GetLevelName(int level)
 		case 7:
 			return "OP";
 		case 8:
-			return "LIST";
+			return "ACCESS_LIST";
 		case 9:
 			return "CLEAR";
 		case 10:
 			return "NOJOIN";
 		case 11:
-			return "CHANGE";
+			return "ACCESS_CHANGE";
 		case 12:
 			return "MEMO";
 		case 13:

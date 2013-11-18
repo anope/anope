@@ -924,11 +924,16 @@ class CommandNSSetMessage : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &) anope_override
 	{
+		Anope::string cmd = source.command;
+		size_t i = cmd.find_last_of(' ');
+		if (i != Anope::string::npos)
+			cmd = cmd.substr(i + 1);
+
 		this->SendSyntax(source);
 		source.Reply(" ");
 		source.Reply(_("Allows you to choose the way Services are communicating with\n"
-				"you. With \002MSG\002 set, Services will use messages, else they'll\n"
-				"use notices."));
+				"you. With \002%s\002 set, Services will use messages, else they'll\n"
+				"use notices."), cmd.upper().c_str());
 		return true;
 	}
 

@@ -39,16 +39,19 @@ class CommandMSCheck : public Command
 		/* Okay, I know this looks strange but we wanna get the LAST memo, so we
 			have to loop backwards */
 
-		for (int i = mi->memos->size() - 1; i >= 0; --i)
+		for (unsigned i = mi->memos->size(); i > 0; --i)
 		{
-			if (source.nc->display.equals_ci(mi->GetMemo(i)->sender))
+			Memo *m = mi->GetMemo(i - 1);
+			NickAlias *na2 = NickAlias::Find(m->sender);
+
+			if (na2 != NULL && na2->nc == source.GetAccount())
 			{
 				found = true; /* Yes, we've found the memo */
 
-				if (mi->GetMemo(i)->unread)
-					source.Reply(_("The last memo you sent to %s (sent on %s) has not yet been read."), na->nick.c_str(), Anope::strftime(mi->GetMemo(i)->time, source.GetAccount()).c_str());
+				if (m->unread)
+					source.Reply(_("The last memo you sent to %s (sent on %s) has not yet been read."), na->nick.c_str(), Anope::strftime(m->time, source.GetAccount()).c_str());
 				else
-					source.Reply(_("The last memo you sent to %s (sent on %s) has been read."), na->nick.c_str(), Anope::strftime(mi->GetMemo(i)->time, source.GetAccount()).c_str());
+					source.Reply(_("The last memo you sent to %s (sent on %s) has been read."), na->nick.c_str(), Anope::strftime(m->time, source.GetAccount()).c_str());
 				break;
 			}
 		}

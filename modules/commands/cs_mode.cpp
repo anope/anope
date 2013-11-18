@@ -296,7 +296,8 @@ class CommandCSMode : public Command
 
 			Anope::string pos = "+", neg = "-", pos_params, neg_params;
 
-			int adding = -1;
+			int adding = 1;
+			bool needreply = true;
 			for (size_t i = 0; i < modes.length(); ++i)
 			{
 				switch (modes[i])
@@ -308,8 +309,7 @@ class CommandCSMode : public Command
 						adding = 0;
 						break;
 					default:
-						if (adding == -1)
-							break;
+						needreply = false;
 						ChannelMode *cm = ModeManager::FindChannelModeByChar(modes[i]);
 						if (!cm)
 						{
@@ -358,6 +358,8 @@ class CommandCSMode : public Command
 				source.Reply(_("%s locked on %s."), reply.c_str(), ci->name.c_str());
 				Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to lock " << reply;
 			}
+			else if (needreply)
+				source.Reply(_("Nothing to do."));
 
 			if (ci->c)
 				ci->c->CheckModes();
@@ -369,7 +371,8 @@ class CommandCSMode : public Command
 
 			sep.GetToken(modes);
 
-			int adding = -1;
+			int adding = 1;
+			bool needreply = true;
 			for (size_t i = 0; i < modes.length(); ++i)
 			{
 				switch (modes[i])
@@ -381,8 +384,7 @@ class CommandCSMode : public Command
 						adding = 0;
 						break;
 					default:
-						if (adding == -1)
-							break;
+						needreply = false;
 						ChannelMode *cm = ModeManager::FindChannelModeByChar(modes[i]);
 						if (!cm)
 						{
@@ -412,6 +414,9 @@ class CommandCSMode : public Command
 						}
 				}
 			}
+
+			if (needreply)
+				source.Reply(_("Nothing to do."));
 		}
 		else if (subcommand.equals_ci("LIST"))
 		{

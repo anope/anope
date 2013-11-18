@@ -107,12 +107,6 @@ class CommandCSEnforce : public Command
 
 	void DoSSLOnly(CommandSource &source, ChannelInfo *ci)
 	{
-		if (!ModeManager::FindUserModeByName("SSL"))
-		{
-			source.Reply(_("Your IRCD has no SSL usermode, so this can't be done."));
-			return;
-		}
-
 		bool override = !source.AccessFor(ci).HasPriv("AKICK") && source.HasPriv("chanserv/access/modify");
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to enforce SSL only";
 
@@ -125,7 +119,7 @@ class CommandCSEnforce : public Command
 			if (user->IsProtected())
 				continue;
 
-			if (!user->HasMode("SSL"))
+			if (!user->HasMode("SSL") && !user->HasExt("ssl"))
 				users.push_back(user);
 		}
 

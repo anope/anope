@@ -642,11 +642,11 @@ class CommandCSLevels : public Command
 				source.Reply(_("Setting \002%s\002 not known.  Type \002%s%s HELP LEVELS\002 for a list of valid settings."), what.c_str(), Config->StrictPrivmsg.c_str(), source.service->nick.c_str());
 			else
 			{
-				ci->SetLevel(p->name, level);
-				FOREACH_MOD(OnLevelChange, (source, ci, p->name, level));
-
 				bool override = !source.AccessFor(ci).HasPriv("FOUNDER");
 				Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to set " << p->name << " to level " << level;
+
+				ci->SetLevel(p->name, level);
+				FOREACH_MOD(OnLevelChange, (source, ci, p->name, level));
 
 				if (level == ACCESS_FOUNDER)
 					source.Reply(_("Level for %s on channel %s changed to founder only."), p->name.c_str(), ci->name.c_str());
@@ -661,7 +661,7 @@ class CommandCSLevels : public Command
 		const Anope::string &what = params[2];
 
 		/* Don't allow disabling of the founder level. It would be hard to change it back if you dont have access to use this command */
-		if (!what.equals_ci("FOUNDER"))
+		if (what.equals_ci("FOUNDER"))
 		{
 			source.Reply(_("You can not disable the founder privilege because it would be impossible to reenable it at a later time."));
 			return;
@@ -670,11 +670,11 @@ class CommandCSLevels : public Command
 		Privilege *p = PrivilegeManager::FindPrivilege(what);
 		if (p != NULL)
 		{
-			ci->SetLevel(p->name, ACCESS_INVALID);
-			FOREACH_MOD(OnLevelChange, (source, ci, p->name, ACCESS_INVALID));
-
 			bool override = !source.AccessFor(ci).HasPriv("FOUNDER");
 			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to disable " << p->name;
+
+			ci->SetLevel(p->name, ACCESS_INVALID);
+			FOREACH_MOD(OnLevelChange, (source, ci, p->name, ACCESS_INVALID));
 
 			source.Reply(_("\002%s\002 disabled on channel %s."), p->name.c_str(), ci->name.c_str());
 			return;
@@ -719,11 +719,11 @@ class CommandCSLevels : public Command
 
 	void DoReset(CommandSource &source, ChannelInfo *ci)
 	{
-		reset_levels(ci);
-		FOREACH_MOD(OnLevelChange, (source, ci, "ALL", 0));
-
 		bool override = !source.AccessFor(ci).HasPriv("FOUNDER");
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to reset all levels";
+
+		reset_levels(ci);
+		FOREACH_MOD(OnLevelChange, (source, ci, "ALL", 0));
 
 		source.Reply(_("Access levels for \002%s\002 reset to defaults."), ci->name.c_str());
 		return;

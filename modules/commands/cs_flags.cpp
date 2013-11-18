@@ -138,6 +138,7 @@ class CommandCSFlags : public Command
 		ChanAccess *current = NULL;
 		unsigned current_idx;
 		std::set<char> current_flags;
+		bool override = false;
 		for (current_idx = ci->GetAccessCount(); current_idx > 0; --current_idx)
 		{
 			ChanAccess *access = ci->GetAccess(current_idx - 1);
@@ -149,8 +150,13 @@ class CommandCSFlags : public Command
 					// operator<= on the non-me entry!
 					if (*highest <= *access)
 					{
-						source.Reply(ACCESS_DENIED);
-						return;
+						if (source.HasPriv("chanserv/access/modify"))
+							override = true;
+						else
+						{
+							source.Reply(ACCESS_DENIED);
+							return;
+						}
 					}
 
 				current = access;
@@ -169,7 +175,6 @@ class CommandCSFlags : public Command
 		}
 
 		Privilege *p = NULL;
-		bool override = false;
 		int add = 1;
 		for (size_t i = 0; i < flags.length(); ++i)
 		{

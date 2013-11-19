@@ -91,7 +91,7 @@ class CharybdisProto : public IRCDProto
 		 * UNKLN    - Can do UNKLINE (encap only)
 		 * QS       - Can handle quit storm removal
 		*/
-		UplinkSocket::Message() << "CAPAB :BAN CHW CLUSTER ENCAP EOPMOD EUID EX IE KLN KNOCK MLOCK QS RSFNC SAVE SERVICES TB UNKLN";
+		UplinkSocket::Message() << "CAPAB :BAN CHW CLUSTER ENCAP EOPMOD EUID EX IE KLN KNOCK MLOCK QS RSFNC SERVICES TB UNKLN";
 
 		/* Make myself known to myself in the serverlist */
 		SendServer(Me);

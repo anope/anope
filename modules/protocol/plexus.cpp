@@ -415,6 +415,7 @@ class ProtoPlexus : public Module
 
 	~ProtoPlexus()
 	{
+		m_hybrid = ModuleManager::FindModule("hybrid");
 		ModuleManager::UnloadModule(m_hybrid, NULL);
 	}
 };

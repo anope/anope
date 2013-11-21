@@ -298,6 +298,7 @@ class ProtoRatbox : public Module
 
 	~ProtoRatbox()
 	{
+		m_hybrid = ModuleManager::FindModule("hybrid");
 		ModuleManager::UnloadModule(m_hybrid, NULL);
 	}
 };

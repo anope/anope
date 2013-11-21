@@ -419,6 +419,7 @@ class ProtoCharybdis : public Module
 
 	~ProtoCharybdis()
 	{
+		m_ratbox = ModuleManager::FindModule("ratbox");
 		ModuleManager::UnloadModule(m_ratbox, NULL);
 	}
 

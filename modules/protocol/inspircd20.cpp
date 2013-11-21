@@ -741,6 +741,7 @@ class ProtoInspIRCd : public Module
 
 	~ProtoInspIRCd()
 	{
+		m_insp12 = ModuleManager::FindModule("inspircd12");
 		ModuleManager::UnloadModule(m_insp12, NULL);
 	}
 

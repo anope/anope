@@ -1148,6 +1148,7 @@ class DBOld : public Module
 			}
 
 			u = mlock_off.Get(ci);
+			if (u)
 			{
 				process_mlock(ci, *u, false);
 				mlock_off.Unset(ci);

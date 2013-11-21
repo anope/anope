@@ -274,6 +274,8 @@ class NickServCore : public Module, public NickServService
 			defaults.push_back("MEMO_SIGNON");
 			defaults.push_back("MEMO_RECEIVE");
 		}
+		else if (defaults[0].equals_ci("none"))
+			defaults.clear();
 	}
 
 	void OnDelNick(NickAlias *na) anope_override

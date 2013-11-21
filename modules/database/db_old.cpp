@@ -429,6 +429,11 @@ static void LoadNicks()
 			READ(read_string(buffer, f));
 			NickCore *nc = new NickCore(buffer);
 
+			const Anope::string settings[] = { "killprotect", "kill_quick", "ns_secure", "ns_private", "hide_email",
+				"hide_mask", "hide_quit", "memo_signon", "memo_receive", "autoop", "msg", "ns_keepmodes" };
+			for (unsigned j = 0; j < sizeof(settings) / sizeof(Anope::string); ++j)
+				nc->Shrink<bool>(settings[j].upper());
+
 			char pwbuf[32];
 			READ(read_buffer(pwbuf, f));
 			if (hashm == "plain")
@@ -691,6 +696,11 @@ static void LoadChannels()
 			char namebuf[64];
 			READ(read_buffer(namebuf, f));
 			ChannelInfo *ci = new ChannelInfo(namebuf);
+
+			const Anope::string settings[] = { "keeptopic", "peace", "cs_private", "restricted", "cs_secure", "secureops", "securefounder",
+				"signkick", "signkick_level", "topiclock", "persist", "noautoop", "cs_keepmodes" };
+			for (unsigned j = 0; j < sizeof(settings) / sizeof(Anope::string); ++j)
+				ci->Shrink<bool>(settings[j].upper());
 
 			READ(read_string(buffer, f));
 			ci->SetFounder(NickCore::Find(buffer));

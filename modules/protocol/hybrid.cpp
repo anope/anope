@@ -16,6 +16,12 @@ static Anope::string UplinkSID;
 
 class HybridProto : public IRCDProto
 {
+	void SendSVSKillInternal(const MessageSource &source, User *user, const Anope::string &buf) anope_override
+	{
+		IRCDProto::SendSVSKillInternal(source, user, buf);
+		user->KillInternal(source, buf);
+	}
+
   public:
 	HybridProto(Module *creator) : IRCDProto(creator, "Hybrid 8.1.x")
 	{

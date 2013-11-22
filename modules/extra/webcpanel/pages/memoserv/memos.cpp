@@ -101,7 +101,7 @@ bool WebCPanel::MemoServ::Memos::OnRequest(HTTPProvider *server, const Anope::st
 		replacements["NUMBER"] = stringify(i+1);
 		replacements["SENDER"] = m->sender;
 		replacements["TIME"] = Anope::strftime(m->time);
-		replacements["TEXT"] = m->text;
+		replacements["TEXT"] = HTTPUtils::Escape(m->text);
 		if (m->unread)
 			replacements["UNREAD"] = "YES";
 		else

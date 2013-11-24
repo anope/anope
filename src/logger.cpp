@@ -145,7 +145,7 @@ Anope::string Log::BuildPrefix() const
 	{
 		case LOG_ADMIN:
 		{
-			if (!this->c && !(this->u || this->nc))
+			if (!this->c)
 				break;
 			buffer += "ADMIN: ";
 			Anope::string cname = source != NULL && !source->command.empty() ? source->command : this->c->name;
@@ -159,7 +159,7 @@ Anope::string Log::BuildPrefix() const
 		}
 		case LOG_OVERRIDE:
 		{
-			if (!this->c && !(this->u || this->nc))
+			if (!this->c)
 				break;
 			buffer += "OVERRIDE: ";
 			Anope::string cname = source != NULL && !source->command.empty() ? source->command : this->c->name;

@@ -88,7 +88,7 @@ const char *Language::Translate(const char *lang, const char *string)
 		lang = Config->DefLanguage.c_str();
 	
 	if (Anope::string(lang) == "en")
-		return string != NULL ? string : "";
+		return string;
 
 	++_nl_msg_cat_cntr;
 #ifdef _WIN32

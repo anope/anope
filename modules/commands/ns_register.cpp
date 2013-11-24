@@ -108,7 +108,6 @@ class CommandNSRegister : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		NickAlias *na;
 		User *u = source.GetUser();
 		Anope::string u_nick = source.GetNick();
 		size_t nicklen = u_nick.length();
@@ -176,7 +175,7 @@ class CommandNSRegister : public Command
 			this->OnSyntaxError(source, "");
 		else if (u && Anope::CurTime < u->lastnickreg + reg_delay)
 			source.Reply(_("Please wait %d seconds before using the REGISTER command again."), (u->lastnickreg + reg_delay) - Anope::CurTime);
-		else if ((na = NickAlias::Find(u_nick)))
+		else if (NickAlias::Find(u_nick) != NULL)
 			source.Reply(NICK_ALREADY_REGISTERED, u_nick.c_str());
 		else if (pass.equals_ci(u_nick) || (Config->GetBlock("options")->Get<bool>("strictpasswords") && pass.length() < 5))
 			source.Reply(MORE_OBSCURE_PASSWORD);
@@ -187,7 +186,7 @@ class CommandNSRegister : public Command
 		else
 		{
 			NickCore *nc = new NickCore(u_nick);
-			na = new NickAlias(u_nick, nc);
+			NickAlias *na = new NickAlias(u_nick, nc);
 			Anope::Encrypt(pass, nc->pass);
 			if (!email.empty())
 				nc->email = email;

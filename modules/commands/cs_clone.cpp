@@ -133,16 +133,24 @@ public:
 		}
 		else if (what.equals_ci("BADWORDS"))
 		{
-			BadWords *target_badwords = target_ci->GetExt<BadWords>("badwords"),
+			BadWords *target_badwords = target_ci->Require<BadWords>("badwords"),
 				*badwords = ci->Require<BadWords>("badwords");
-			if (target_badwords)
+
+			if (target_badwords && badwords)
+			{
 				target_badwords->ClearBadWords();
-			if (badwords)
+
 				for (unsigned i = 0; i < badwords->GetBadWordCount(); ++i)
 				{
 					const BadWord *bw = badwords->GetBadWord(i);
 					target_badwords->AddBadWord(bw->word, bw->type);
 				}
+			}
+
+			if (badwords)
+				badwords->Check();
+			if (target_badwords)
+				target_badwords->Check();
 
 			source.Reply(_("All badword entries from \002%s\002 have been cloned to \002%s\002."), channel.c_str(), target.c_str());
 		}

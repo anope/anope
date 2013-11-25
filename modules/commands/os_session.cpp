@@ -728,7 +728,7 @@ class OSSession : public Module
 		}
 	}
 
-	void OnPreUserLogoff(User *u) anope_override
+	void OnUserQuit(User *u, const Anope::string &msg) anope_override
 	{
 		if (!session_limit || !u->server || u->server->IsULined())
 			return;

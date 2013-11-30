@@ -16,10 +16,10 @@ static bool SendResetEmail(User *u, const NickAlias *na, BotInfo *bi);
 class CommandNSResetPass : public Command
 {
  public:
-	CommandNSResetPass(Module *creator) : Command(creator, "nickserv/resetpass", 1, 1)
+	CommandNSResetPass(Module *creator) : Command(creator, "nickserv/resetpass", 2, 2)
 	{
 		this->SetDesc(_("Helps you reset lost passwords"));
-		this->SetSyntax(_("\037nickname\037"));
+		this->SetSyntax(_("\037nickname\037 \037email\037"));
 		this->AllowUnregistered(true);
 	}
 
@@ -31,6 +31,8 @@ class CommandNSResetPass : public Command
 			source.Reply(ACCESS_DENIED);
 		else if (!(na = NickAlias::Find(params[0])))
 			source.Reply(NICK_X_NOT_REGISTERED, params[0].c_str());
+		else if (!na->nc->email.equals_ci(params[1]))
+			source.Reply(_("Incorrect email address."));
 		else
 		{
 			if (SendResetEmail(source.GetUser(), na, source.service))
@@ -48,7 +50,8 @@ class CommandNSResetPass : public Command
 		this->SendSyntax(source);
 		source.Reply(" ");
 		source.Reply(_("Sends a passcode to the nickname with instructions on how to\n"
-				"reset their password."));
+				"reset their password.  Email must be the email address associated\n"
+				"to the nickname."));
 		return true;
 	}
 };

@@ -34,6 +34,7 @@ class PlexusProto : public IRCDProto
 		MaxModes = 4;
 	}
 
+	void SendSVSKillInternal(const MessageSource &source, User *targ, const Anope::string &reason) anope_override { hybrid->SendSVSKillInternal(source, targ, reason); }
 	void SendGlobalNotice(BotInfo *bi, const Server *dest, const Anope::string &msg) anope_override { hybrid->SendGlobalNotice(bi, dest, msg); }
 	void SendGlobalPrivmsg(BotInfo *bi, const Server *dest, const Anope::string &msg) anope_override { hybrid->SendGlobalPrivmsg(bi, dest, msg); }
 	void SendSQLine(User *u, const XLine *x) anope_override { hybrid->SendSQLine(u, x); }

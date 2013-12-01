@@ -100,10 +100,10 @@ class CSTop : public Module
 
 	void OnReload(Configuration::Conf *conf) anope_override
 	{
-		prefix = conf->GetModule(this)->Get<const Anope::string>("prefix");
+		prefix = conf->GetModule("m_chanstats")->Get<const Anope::string>("prefix");
 		if (prefix.empty())
 			prefix = "anope_";
-		this->sql = ServiceReference<SQL::Provider>("SQL::Provider", conf->GetModule(this)->Get<const Anope::string>("engine"));
+		this->sql = ServiceReference<SQL::Provider>("SQL::Provider", conf->GetModule("m_chanstats")->Get<const Anope::string>("engine"));
 	}
 
 	SQL::Result RunQuery(const SQL::Query &query)
@@ -119,19 +119,15 @@ class CSTop : public Module
 
 	void DoTop(CommandSource &source, const std::vector<Anope::string> &params, bool is_global, int limit = 1)
 	{
-		if (!source.c || !source.c->ci)
-			return;
 
 		Anope::string channel;
-		if (is_global || params.empty())
-			channel = source.c->ci->name;
-		else if (!params.empty())
+		if (!params.empty())
 			channel = params[0];
-		else
-		{
-			source.Reply(_("%s not found."), params[0].c_str());
-			return;
-		}
+		else if (source.c && source.c->ci)
+			channel = source.c->ci->name;
+
+		if (!is_global && channel.empty())
+			is_global = true;
 
 		try
 		{

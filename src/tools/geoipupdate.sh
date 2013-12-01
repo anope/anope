@@ -5,6 +5,9 @@
 # them into existing mysql tables. The tables are created
 # by the irc2sql module on the first load.
 
+# Dont forget to rename this file or your changes
+# will be overwritte on the next 'make install'
+
 ############################
 # Config
 ############################
@@ -16,7 +19,7 @@ mysql_user="anope"
 mysql_password="anope"
 mysql_database="anope"
 prefix="anope_"
-die="no"
+die="yes"
 
 ###########################
 

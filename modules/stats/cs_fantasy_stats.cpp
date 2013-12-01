@@ -37,7 +37,7 @@ class CommandCSStats : public Command
 	CommandCSStats(Module *creator) : Command (creator, "chanserv/stats", 0, 2)
 	{
 		this->SetDesc(_("Displays your Channel Stats"));
-		this->SetSyntax(_("\037nick\037"));
+		this->SetSyntax(_("[\037channel\037] [\037nick\037]"));
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params);
@@ -75,10 +75,10 @@ class CSStats : public Module
 
 	void OnReload(Configuration::Conf *conf) anope_override
 	{
-		prefix = conf->GetModule(this)->Get<const Anope::string>("prefix");
+		prefix = conf->GetModule("m_chanstats")->Get<const Anope::string>("prefix");
 		if (prefix.empty())
 			prefix = "anope_";
-		this->sql = ServiceReference<SQL::Provider>("SQL::Provider", conf->GetModule(this)->Get<const Anope::string>("engine"));
+		this->sql = ServiceReference<SQL::Provider>("SQL::Provider", conf->GetModule("m_chanstats")->Get<const Anope::string>("engine"));
 	}
 
 	SQL::Result RunQuery(const SQL::Query &query)
@@ -94,19 +94,40 @@ class CSStats : public Module
 
 	void DoStats(CommandSource &source, const bool is_global, const std::vector<Anope::string> &params)
 	{
-		if (!source.c)
-			return;
+		Anope::string display, channel;
 
-		Anope::string display;
-		if (params.empty())
-			display = source.nc->display;
-		else if (const NickAlias *na = NickAlias::Find(params[0]))
-			display = na->nc->display;
-		else
+		/*
+		 * possible parameters are:
+		 *   stats [channel] [nick]
+		 *   stats [channel]
+		 *   stats [nick]
+		 *   stats
+		 */
+
+		switch (params.size())
 		{
-			source.Reply(_("%s not found."), params[0].c_str());
-			return;
+			case 2:
+				channel = params[0];
+				display = params[1];
+				break;
+			case 1:
+				if (params[0][0] == '#')
+					channel = params[0];
+				else
+				{
+					if (NickAlias *na = NickAlias::Find(params[0]))
+						display = na->nc->display;
+					else
+					{
+						source.Reply(_("%s not found."), params[0].c_str());
+						return;
+					}
+				}
+				break;
 		}
+
+		if (display.empty())
+			display = source.nc->display;
 
 		try
 		{
@@ -114,10 +135,10 @@ class CSStats : public Module
 			query = "SELECT letters, words, line, smileys_happy+smileys_sad+smileys_other as smileys,"
 				"actions FROM `" + prefix + "chanstats` "
 				"WHERE `nick` = @nick@ AND `chan` = @channel@ AND `type` = 'total';";
-			if (is_global)
+			if (is_global || channel.empty())
 				query.SetValue("channel", "");
 			else
-				query.SetValue("channel", source.c->ci->name);
+				query.SetValue("channel", channel);
 			query.SetValue("nick", display);
 			SQL::Result res = this->RunQuery(query);
 
@@ -126,7 +147,7 @@ class CSStats : public Module
 				if (is_global)
 					source.Reply(_("Network stats for %s:"), display.c_str());
 				else
-					source.Reply(_("Channel stats for %s on %s:"), display.c_str(), source.c->name.c_str());
+					source.Reply(_("Channel stats for %s on %s:"), display.c_str(), channel.c_str());
 
 				source.Reply(_("letters: %s, words: %s, lines: %s, smileys %s, actions: %s"),
 						res.Get(0, "letters").c_str(), res.Get(0, "words").c_str(),

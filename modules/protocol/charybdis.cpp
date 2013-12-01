@@ -46,6 +46,7 @@ class CharybdisProto : public IRCDProto
 		MaxModes = 4;
 	}
 
+	void SendSVSKillInternal(const MessageSource &source, User *targ, const Anope::string &reason) anope_override { ratbox->SendSVSKillInternal(source, targ, reason); }
 	void SendGlobalNotice(BotInfo *bi, const Server *dest, const Anope::string &msg) anope_override { ratbox->SendGlobalNotice(bi, dest, msg); }
 	void SendGlobalPrivmsg(BotInfo *bi, const Server *dest, const Anope::string &msg) anope_override { ratbox->SendGlobalPrivmsg(bi, dest, msg); }
 	void SendGlobopsInternal(const MessageSource &source, const Anope::string &buf) anope_override { ratbox->SendGlobopsInternal(source, buf); }

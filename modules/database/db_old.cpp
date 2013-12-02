@@ -1070,6 +1070,9 @@ static void LoadOper()
 
 static void LoadExceptions()
 {
+	if (!session_service)
+		return;
+
 	dbFILE *f = open_db_read("OperServ", "exception.db", 9);
 	if (f == NULL)
 		return;
@@ -1090,17 +1093,14 @@ static void LoadExceptions()
 		READ(read_int32(&time, f));
 		READ(read_int32(&expires, f));
 
-		Exception *exception = new Exception();
+		Exception *exception = session_service->CreateException();
 		exception->mask = mask;
 		exception->limit = limit;
 		exception->who = who;
 		exception->time = time;
 		exception->expires = expires;
 		exception->reason = reason;
-		if (session_service)
-			session_service->AddException(exception);
-		else
-			delete exception;
+		session_service->AddException(exception);
 	}
 
 	close_db(f);

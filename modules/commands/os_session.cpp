@@ -42,6 +42,11 @@ class MySessionService : public SessionService
  public:
 	MySessionService(Module *m) : SessionService(m), Exceptions("Exception") { }
 
+	Exception *CreateException() anope_override
+	{
+		return new Exception();
+	}
+
 	void AddException(Exception *e) anope_override
 	{
 		this->Exceptions->push_back(e);

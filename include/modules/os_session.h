@@ -32,6 +32,8 @@ class SessionService : public Service
 
 	SessionService(Module *m) : Service(m, "SessionService", "session") { }
 
+	virtual Exception *CreateException() = 0;
+
 	virtual void AddException(Exception *e) = 0;
 
 	virtual void DelException(Exception *e) = 0;

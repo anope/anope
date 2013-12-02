@@ -511,6 +511,8 @@ class CommandCSSetPersist : public Command
 						ChannelStatus status(BotModes());
 						ci->bi->Join(c, &status);
 					}
+					if (created)
+						c->Sync();
 				}
 
 				/* Set the perm mode */
@@ -1165,14 +1167,15 @@ class CSSet : public Module
 				if (ChanServ)
 					ChanServ->Assign(NULL, ci);
 			}
-			if (!ci->bi)
-				return;
 
-			if (!c->FindUser(ci->bi))
+			if (ci->bi && !c->FindUser(ci->bi))
 			{
 				ChannelStatus status(BotModes());
 				ci->bi->Join(c, &status);
 			}
+
+			if (created)
+				c->Sync();
 		}
 	} persist;
 

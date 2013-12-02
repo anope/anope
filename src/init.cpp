@@ -477,6 +477,9 @@ void Anope::Init(int ac, char **av)
 	static_cast<void>(MOD_RESULT);
 	Log() << "Databases loaded";
 
+	for (channel_map::const_iterator it = ChannelList.begin(), it_end = ChannelList.end(); it != it_end; ++it)
+		it->second->Sync();
+
 	Serialize::CheckTypes();
 }
 

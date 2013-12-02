@@ -123,6 +123,8 @@ Server::Server(Server *up, const Anope::string &sname, unsigned shops, const Ano
 						continue;
 					ModeManager::StackerAdd(c->ci->WhoSends(), c, cm, true, it2->second);
 				}
+
+				IRCD->SendTopic(c->ci->WhoSends(), c);
 			}
 		}
 	}

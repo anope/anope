@@ -29,6 +29,33 @@ void IRC2SQL::OnReload(Configuration::Conf *conf) anope_override
 	StatServ = BotInfo::Find(snick, true);
 	if (!StatServ)
 		throw ConfigException(Module::name + ": no bot named " + snick);
+
+	if (firstrun)
+	{
+		firstrun = false;
+
+		for (Anope::map<Server *>::const_iterator it = Servers::ByName.begin(); it != Servers::ByName.end(); ++it)
+		{
+			this->OnNewServer(it->second);
+		}
+
+		for (channel_map::const_iterator it = ChannelList.begin(), it_end = ChannelList.end(); it != it_end; ++it)
+		{
+			this->OnChannelCreate(it->second);
+		}
+
+		for (user_map::const_iterator it = UserListByNick.begin(); it != UserListByNick.end(); ++it)
+		{
+			User *u = it->second;
+			bool exempt = false;
+			this->OnUserConnect(u, exempt);
+			for (User::ChanUserList::const_iterator cit = u->chans.begin(), cit_end = u->chans.end(); cit != cit_end; ++cit)
+			{
+				this->OnJoinChannel(u, cit->second->chan);
+			}
+		}
+	}
+
 }
 
 void IRC2SQL::OnNewServer(Server *server) anope_override
@@ -50,7 +77,8 @@ void IRC2SQL::OnServerQuit(Server *server) anope_override
 		return;
 
 	query = "UPDATE `" + prefix + "server` "
-		"SET currentusers = 0, online = 'N', split_time = now()";
+		"SET currentusers = 0, online = 'N', split_time = now() "
+		"WHERE name = @name@";
 	query.SetValue("name", server->GetName());
 	this->RunQuery(query);
 }
@@ -83,7 +111,7 @@ void IRC2SQL::OnUserConnect(User *u, bool &exempt) anope_override
 	query.SetValue("oper", u->HasMode("OPER") ? "Y" : "N");
 	this->RunQuery(query);
 
-	if (ctcpuser && (Me->IsSynced() || ctcpeob))
+	if (ctcpuser && (Me->IsSynced() || ctcpeob) && u->server != Me)
 		IRCD->SendPrivmsg(StatServ, u->GetUID(), "\1VERSION\1");
 
 }
@@ -187,9 +215,30 @@ void IRC2SQL::OnJoinChannel(User *u, Channel *c) anope_override
 	this->RunQuery(query);
 }
 
+EventReturn IRC2SQL::OnChannelModeSet(Channel *c, MessageSource &setter, ChannelMode *mode, const Anope::string &param) anope_override
+{
+	query = "UPDATE `" + prefix + "chan` SET modes=@modes@ WHERE channel=@channel@";
+	query.SetValue("channel", c->name);
+	query.SetValue("modes", c->GetModes(true,true));
+	this->RunQuery(query);
+	return EVENT_CONTINUE;
+}
+
+EventReturn IRC2SQL::OnChannelModeUnset(Channel *c, MessageSource &setter, ChannelMode *mode, const Anope::string &param) anope_override
+{
+	this->OnChannelModeSet(c, setter, mode, param);
+	return EVENT_CONTINUE;
+}
+
 void IRC2SQL::OnLeaveChannel(User *u, Channel *c) anope_override
 {
 	if (quitting)
+		return;
+	/*
+	 * user is quitting, we already received a OnUserQuit()
+	 * at this point the user is already removed from SQL and all channels
+	 */
+	if (u->Quitting());
 		return;
 
 	query = "CALL " + prefix + "PartUser(@nick@,@channel@)";

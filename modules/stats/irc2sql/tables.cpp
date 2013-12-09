@@ -4,15 +4,16 @@ void IRC2SQL::CheckTables()
 {
 	Anope::string geoquery("");
 
-	/* TODO: remove the DropTable commands when the table layout is done
-	 *       perhaps we should drop/recreate some tables by default in case anope crashed
-	 *       and was unable to clear the content (ison)
-	 *       TRUNCATE could perform better for this?
-	 */
-	SQL::Result r;
-	r = this->sql->RunQuery(SQL::Query("DROP TABLE " + prefix + "user"));
-	r = this->sql->RunQuery(SQL::Query("DROP TABLE " + prefix + "chan"));
-	r = this->sql->RunQuery(SQL::Query("DROP TABLE " + prefix + "ison"));
+	if (firstrun)
+	{
+		/*
+		 * drop/recreate some tables in case anope crashed
+		 * and was unable to clear the content (ison)
+		 */
+		this->sql->RunQuery(SQL::Query("DROP TABLE " + prefix + "user"));
+		this->sql->RunQuery(SQL::Query("DROP TABLE " + prefix + "chan"));
+		this->sql->RunQuery(SQL::Query("DROP TABLE " + prefix + "ison"));
+	}
 
 	this->GetTables();
 

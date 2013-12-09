@@ -26,7 +26,7 @@ class IRC2SQL : public Module
 	SQL::Query query;
 	std::vector<Anope::string> TableList, ProcedureList, EventList;
 	Anope::string prefix, GeoIPDB;
-	bool quitting, introduced_myself, UseGeoIP, ctcpuser, ctcpeob;
+	bool quitting, introduced_myself, UseGeoIP, ctcpuser, ctcpeob, firstrun;
 	BotInfo *StatServ;
 	PrimitiveExtensibleItem<bool> versionreply;
 
@@ -41,8 +41,9 @@ class IRC2SQL : public Module
 
  public:
 	IRC2SQL(const Anope::string &modname, const Anope::string &creator) :
-		Module(modname, creator, EXTRA | THIRD), sql("", ""), sqlinterface(this), versionreply(this, "CTCPVERSION")
+		Module(modname, creator, EXTRA | VENDOR), sql("", ""), sqlinterface(this), versionreply(this, "CTCPVERSION")
 	{
+		firstrun = true;
 		quitting = false;
 		introduced_myself = false;
 	}
@@ -65,6 +66,8 @@ class IRC2SQL : public Module
 	void OnChannelDelete(Channel *c) anope_override;
 	void OnLeaveChannel(User *u, Channel *c) anope_override;
 	void OnJoinChannel(User *u, Channel *c) anope_override;
+	EventReturn OnChannelModeSet(Channel *c, MessageSource &setter, ChannelMode *mode, const Anope::string &param) anope_override;
+	EventReturn OnChannelModeUnset(Channel *c, MessageSource &setter, ChannelMode *mode, const Anope::string &param) anope_override;
 
 	void OnTopicUpdated(Channel *c, const Anope::string &user, const Anope::string &topic) anope_override;
 

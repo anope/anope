@@ -10,7 +10,7 @@ MAKEARGS = 'CFLAGS=${CFLAGS}' 'CC=${CC}' 'ANOPELIBS=${ANOPELIBS}' \
    	   'RUNGROUP=${RUNGROUP}' 
 
 .c.o:
-	$(CC) $(CFLAGS) -I../include/ $< -o $*
+	$(CC) $(CFLAGS)  $(ANOPELIBS) -I../include/ $< -o $*
 
 all: ${OBJS}
 

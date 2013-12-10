@@ -8,9 +8,10 @@ VERSION_MAJOR="1"
 VERSION_MINOR="8"
 VERSION_PATCH="9"
 VERSION_EXTRA="-git"
-VERSION_BUILD="3127"
+VERSION_BUILD="3128"
 
 # Changes since 1.8.8 Release
+#Revision 3128 - Fix undefined symbol error on Solaris11 when building anopesmtp
 #Revision 3125 - Fix kick reason in cs_suspend and cs_forbid if no reason is given
 #Revision 3124 - hs_request: Improve logging of new vhost requests
 #Revision 3120 - Fix many memory leaks and valgrind warnings, see pull request #15

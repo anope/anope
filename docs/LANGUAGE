@@ -8,8 +8,15 @@ Anope Mutli Language Support
 1) Building Anope with gettext support
 
     To build Anope with gettext support, gettext and its development libraries must be installed on the system.
-    Anope does not require locales to be installed or enabled on the system, but does require the locales-all
-    package on Debian and Debian based systems.
+
+    On Debian install the locales-all package.
+
+    On Ubuntu run locale-gen for each language you want to enable.
+        For example:
+        locale-gen es_ES.UTF-8
+
+        Then execute:
+        dpkg-reconfigure locales
 
     Building Anope on Windows with gettext support is explained in docs/WIN32.txt
 

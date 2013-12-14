@@ -62,7 +62,8 @@ class CoreExport Server : public Extensible
 	bool syncing;
 	/* The server is juped */
 	bool juped;
-
+	/* The server is about to quit */
+	bool quitting;
 	/* Reason this server was quit */
 	Anope::string quit_reason;
 
@@ -168,6 +169,11 @@ class CoreExport Server : public Extensible
 	 * @return true if this server is a juped server
 	 */
 	bool IsJuped() const;
+
+	/** Check if the server is quitting
+	 * @return true if this server is quitting.
+	 */
+	bool IsQuitting() const;
 
 	/** Send a message to alll users on this server
 	 * @param source The source of the message

@@ -32,6 +32,7 @@ Server::Server(Server *up, const Anope::string &sname, unsigned shops, const Ano
 {
 	syncing = true;
 	juped = jupe;
+	quitting = false;
 
 	Servers::ByName[sname] = this;
 	if (!ssid.empty())
@@ -164,6 +165,7 @@ Server::~Server()
 void Server::Delete(const Anope::string &reason)
 {
 	this->quit_reason = reason;
+	this->quitting = true;
 	FOREACH_MOD(OnServerQuit, (this));
 	delete this;
 }
@@ -313,6 +315,11 @@ bool Server::IsULined() const
 bool Server::IsJuped() const
 {
 	return juped;
+}
+
+bool Server::IsQuitting() const
+{
+	return quitting;
 }
 
 void Server::Notice(BotInfo *source, const Anope::string &message)

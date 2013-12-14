@@ -76,9 +76,7 @@ void IRC2SQL::OnServerQuit(Server *server) anope_override
 	if (quitting)
 		return;
 
-	query = "UPDATE `" + prefix + "server` "
-		"SET currentusers = 0, online = 'N', split_time = now() "
-		"WHERE name = @name@";
+	query = "CALL " + prefix + "ServerQuit(@name@)";
 	query.SetValue("name", server->GetName());
 	this->RunQuery(query);
 }
@@ -118,7 +116,7 @@ void IRC2SQL::OnUserConnect(User *u, bool &exempt) anope_override
 
 void IRC2SQL::OnUserQuit(User *u, const Anope::string &msg) anope_override
 {
-	if (quitting)
+	if (quitting || u->server->IsQuitting())
 		return;
 
 	query = "CALL " + prefix + "UserQuit(@nick@)";
@@ -238,9 +236,8 @@ void IRC2SQL::OnLeaveChannel(User *u, Channel *c) anope_override
 	 * user is quitting, we already received a OnUserQuit()
 	 * at this point the user is already removed from SQL and all channels
 	 */
-	if (u->Quitting());
+	if (u->Quitting())
 		return;
-
 	query = "CALL " + prefix + "PartUser(@nick@,@channel@)";
 	query.SetValue("nick", u->nick);
 	query.SetValue("channel", c->name);

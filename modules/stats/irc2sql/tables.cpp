@@ -7,12 +7,12 @@ void IRC2SQL::CheckTables()
 	if (firstrun)
 	{
 		/*
-		 * drop/recreate some tables in case anope crashed
-		 * and was unable to clear the content (ison)
+		 * reset some tables to make sure they are really empty
 		 */
-		this->sql->RunQuery(SQL::Query("DROP TABLE " + prefix + "user"));
-		this->sql->RunQuery(SQL::Query("DROP TABLE " + prefix + "chan"));
-		this->sql->RunQuery(SQL::Query("DROP TABLE " + prefix + "ison"));
+		this->sql->RunQuery("TRUNCATE TABLE " + prefix + "user");
+		this->sql->RunQuery("TRUNCATE TABLE " + prefix + "chan");
+		this->sql->RunQuery("TRUNCATE TABLE " + prefix + "ison");
+		this->sql->RunQuery("UPDATE `" + prefix + "server` SET currentusers=0, online='N'");
 	}
 
 	this->GetTables();
@@ -227,8 +227,80 @@ void IRC2SQL::CheckTables()
 		"END";
 	this->RunQuery(query);
 
+	if (this->HasProcedure(prefix + "ServerQuit"))
+		this->RunQuery(SQL::Query("DROP PROCEDURE " + prefix + "ServerQuit"));
+	query = "CREATE PROCEDURE " + prefix + "ServerQuit(sname_ varchar(255)) "
+		"BEGIN "
+			/* 1.
+			 * loop through all channels and decrease the user count
+			 * by the number of users that are on this channel AND
+			 * on the splitting server
+			 *
+			 * we dont have to care about channels that get empty, there will be
+			 * an extra OnChannelDelete event triggered from anope.
+			 */
+			"DECLARE no_more_rows BOOLEAN DEFAULT FALSE;"
+			"DECLARE channel_ varchar(255);"
+			"DECLARE ucount_ int;"
+			"DECLARE channel_cursor CURSOR FOR "
+				"SELECT c.channel "
+				"FROM `" + prefix + "chan` as c, `" + prefix + "ison` as i, "
+					"`" + prefix + "user` as u, `" + prefix + "server` as s "
+				"WHERE c.chanid = i.chanid "
+				  "AND i.nickid = u.nickid "
+				  "AND u.servid = s.id "
+				  "AND s.name = sname_;"
+			"DECLARE CONTINUE HANDLER FOR NOT FOUND "
+				"SET no_more_rows = TRUE;"
+			"OPEN channel_cursor;"
+			"the_loop: LOOP "
+				"FETCH channel_cursor INTO channel_;"
+				"IF no_more_rows THEN "
+					"CLOSE channel_cursor;"
+					"LEAVE the_loop;"
+				"END IF;"
+				"SELECT COUNT(*) INTO ucount_ "
+				"FROM `" + prefix + "ison` AS i, `" + prefix + "chan` AS c,"
+					"`" + prefix + "user` AS u, `" + prefix + "server` AS s "
+				"WHERE i.nickid = u.nickid "
+				  "AND u.servid = s.id "
+				  "AND i.chanid = c.chanid "
+				  "AND c.channel = channel_ "
+				  "AND s.name = sname_; "
+				"UPDATE `" + prefix + "chan` "
+				"SET currentusers = currentusers - ucount_ "
+				"WHERE channel = channel_;"
+			"END LOOP;"
+
+			/* 2.
+			 * remove all users on the splitting server from the ison table
+			 */
+			"DELETE i FROM `" + prefix + "ison` AS i "
+				"INNER JOIN `" + prefix + "server` AS s "
+				"INNER JOIN `" + prefix + "user` AS u "
+				"WHERE i.nickid = u.nickid "
+				  "AND u.servid = s.id "
+				  "AND s.name = sname_;"
+
+			/* 3.
+			 * remove all users on the splitting server from the user table
+			 */
+			"DELETE u FROM `" + prefix + "user` AS u "
+				"INNER JOIN `" + prefix + "server` AS s "
+				"WHERE s.id = u.servid "
+				  "AND s.name = sname_;"
+
+			/* 4.
+			 * on the splitting server, set usercount = 0, split_time = now(), online = 'N'
+			 */
+			"UPDATE `" + prefix + "server` SET currentusers = 0, split_time = now(), online = 'N' "
+				"WHERE name = sname_;"
+		"END;"; // end of the procedure
+	this->RunQuery(query);
+
+
 	if (this->HasProcedure(prefix + "UserQuit"))
-		this->RunQuery(SQL::Query("DROP PROCEDURE " +prefix + "UserQuit"));
+		this->RunQuery(SQL::Query("DROP PROCEDURE " + prefix + "UserQuit"));
 	query = "CREATE PROCEDURE `" + prefix + "UserQuit`"
 		"(nick_ varchar(255)) "
 		"BEGIN "
@@ -245,10 +317,8 @@ void IRC2SQL::CheckTables()
 			/* remove from all channels where the user was on */
 			"DELETE i FROM `" + prefix + "ison` AS i "
 				"INNER JOIN `" + prefix + "user` as u "
-				"INNER JOIN `" + prefix + "chan` as c "
 			"WHERE u.nick = nick_ "
 				"AND i.nickid = u.nickid "
-				"AND i.chanid = c.chanid;"
 			/* remove the user from the user table */
 			"DELETE FROM `" + prefix + "user` WHERE nick = nick_; "
 		"END";
@@ -298,13 +368,13 @@ void IRC2SQL::CheckTables()
 	query = "CREATE PROCEDURE `" + prefix + "PartUser`"
 		"(nick_ varchar(255), channel_ varchar(255)) "
 		"BEGIN "
-			"DELETE FROM `" + prefix + "ison` "
-				"USING `" + prefix + "ison`, `" + prefix + "user` , `"
-					  + prefix + "chan` "
-				"WHERE " + prefix + "ison.nickid = " + prefix + "user.nickid "
-					"AND " + prefix + "user.nick = nick_ "
-					"AND " + prefix + "ison.chanid = " + prefix + "chan.chanid "
-					"AND " + prefix + "chan.channel = channel_; "
+			"DELETE i FROM `" + prefix + "ison` AS i "
+				"INNER JOIN `" + prefix + "user` AS u "
+				"INNER JOIN `" + prefix + "chan` AS c "
+				"WHERE i.nickid = u.nickid "
+					"AND u.nick = nick_ "
+					"AND i.chanid = c.chanid "
+					"AND c.channel = channel_;"
 			"UPDATE `" + prefix + "chan` SET currentusers=currentusers-1 "
 				"WHERE channel=channel_;"
 		"END";

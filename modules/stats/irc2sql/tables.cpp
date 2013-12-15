@@ -318,7 +318,7 @@ void IRC2SQL::CheckTables()
 			"DELETE i FROM `" + prefix + "ison` AS i "
 				"INNER JOIN `" + prefix + "user` as u "
 			"WHERE u.nick = nick_ "
-				"AND i.nickid = u.nickid "
+				"AND i.nickid = u.nickid;"
 			/* remove the user from the user table */
 			"DELETE FROM `" + prefix + "user` WHERE nick = nick_; "
 		"END";

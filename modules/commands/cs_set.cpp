@@ -523,7 +523,7 @@ class CommandCSSetPersist : public Command
 					/* Add it to the channels mlock */
 					ModeLocks *ml = ci->Require<ModeLocks>("modelocks");
 					if (ml)
-						ml->SetMLock(cm, true);
+						ml->SetMLock(cm, true, "", source.GetNick());
 				}
 				/* No botserv bot, no channel mode, give them ChanServ.
 				 * Yes, this works fine with no BotServ.

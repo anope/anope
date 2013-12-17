@@ -570,14 +570,30 @@ void ModeManager::ProcessModes()
 	}
 }
 
+template<typename T>
+static void StackerDel(std::map<T *, StackerInfo *> &map, T *obj)
+{
+	typename std::map<T *, StackerInfo *>::iterator it = map.find(obj);
+	if (it != map.end())
+	{
+		StackerInfo *si = it->second;
+		std::list<Anope::string> ModeStrings = BuildModeStrings(si);
+		for (std::list<Anope::string>::iterator lit = ModeStrings.begin(), lit_end = ModeStrings.end(); lit != lit_end; ++lit)
+			IRCD->SendMode(si->bi, obj, lit->c_str());
+
+		delete si;
+		map.erase(it);
+	}
+}
+
 void ModeManager::StackerDel(User *u)
 {
-	UserStackerObjects.erase(u);
+	::StackerDel(UserStackerObjects, u);
 }
 
 void ModeManager::StackerDel(Channel *c)
 {
-	ChannelStackerObjects.erase(c);
+	::StackerDel(ChannelStackerObjects, c);
 }
 
 void ModeManager::StackerDel(Mode *m)

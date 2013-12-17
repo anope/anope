@@ -364,15 +364,18 @@ class CommandCSSetKeepModes : public Command
 			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to enable keep modes";
 			ci->Extend<bool>("CS_KEEP_MODES");
 			source.Reply(_("Keep modes for %s is now \002on\002."), ci->name.c_str());
+			if (ci->c)
+				ci->last_modes = ci->c->GetModes();
 		}
 		else if (params[1].equals_ci("OFF"))
 		{
 			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to disable keep modes";
 			ci->Shrink<bool>("CS_KEEP_MODES");
 			source.Reply(_("Keep modes for %s is now \002off\002."), ci->name.c_str());
+			ci->last_modes.clear();
 		}
 		else
-			this->OnSyntaxError(source, "PEACE");
+			this->OnSyntaxError(source, "KEEPMODES");
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &) anope_override

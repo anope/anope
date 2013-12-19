@@ -1098,8 +1098,8 @@ struct IRCDMessageMetadata : IRCDMessage
 				if ((pos2 - pos1) >= 32) // inspircd supports md5 and sha1 fingerprint hashes -> size 32 or 40 bytes.
 				{
 					u->fingerprint = data.substr(pos1, pos2 - pos1);
-					FOREACH_MOD(OnFingerprint, (u));
 				}
+				FOREACH_MOD(OnFingerprint, (u));
 			}
 		}
 		else if (params[0][0] == '#')

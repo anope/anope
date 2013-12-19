@@ -99,7 +99,7 @@ void IRC2SQL::OnUserConnect(User *u, bool &exempt) anope_override
 	query.SetValue("ip", u->ip);
 	query.SetValue("ident", u->GetIdent());
 	query.SetValue("vident", u->GetVIdent());
-	query.SetValue("secure", u->HasMode("SSL") || u->HasExt("SSL") ? "Y" : "N");
+	query.SetValue("secure", u->HasMode("SSL") || u->HasExt("ssl") ? "Y" : "N");
 	query.SetValue("account", u->Account() ? u->Account()->display : "");
 	query.SetValue("fingerprint", u->fingerprint);
 	query.SetValue("signon", u->signon);
@@ -135,7 +135,7 @@ void IRC2SQL::OnUserNickChange(User *u, const Anope::string &oldnick) anope_over
 void IRC2SQL::OnFingerprint(User *u) anope_override
 {
 	query = "UPDATE `" + prefix + "user` SET secure=@secure@, fingerprint=@fingerprint@ WHERE nick=@nick@";
-	query.SetValue("secure", u->HasMode("SSL") || u->HasExt("SSL") ? "Y" : "N");
+	query.SetValue("secure", u->HasMode("SSL") || u->HasExt("ssl") ? "Y" : "N");
 	query.SetValue("fingerprint", u->fingerprint);
 	query.SetValue("nick", u->nick);
 	this->RunQuery(query);

@@ -450,7 +450,8 @@ static void LoadNicks()
 			nc->email = buffer;
 
 			READ(read_string(buffer, f));
-			nc->Extend<Anope::string>("greet", buffer);
+			if (!buffer.empty())
+				nc->Extend<Anope::string>("greet", buffer);
 
 			uint32_t u32;
 			READ(read_uint32(&u32, f));

@@ -287,6 +287,8 @@ class NSAJoin : public Module
 				if (ci->HasExt("CS_SUSPENDED"))
 					continue;
 				u_access = ci->AccessFor(u);
+				if (ci->HasExt("RESTRICTED") && u_access.empty())
+					continue;
 			}
 			if (c != NULL)
 			{

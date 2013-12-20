@@ -25,8 +25,6 @@ struct CoreExport Oper
 	bool require_oper;
 	Anope::string password;
 	Anope::string certfp;
-	/* True if this operator is set in the config */
-	bool config;
 	/* Hosts allowed to use this operator block */
 	std::vector<Anope::string> hosts;
 	Anope::string vhost;

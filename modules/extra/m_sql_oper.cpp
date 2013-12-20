@@ -49,7 +49,7 @@ class SQLOperResult : public SQL::Interface
 		BotInfo *OperServ = Config->GetClient("OperServ");
 		if (opertype.empty())
 		{
-			if (user->Account() && user->Account()->o && !user->Account()->o->config && dynamic_cast<SQLOper *>(user->Account()->o))
+			if (user->Account() && user->Account()->o && dynamic_cast<SQLOper *>(user->Account()->o))
 			{
 				delete user->Account()->o;
 				user->Account()->o = NULL;

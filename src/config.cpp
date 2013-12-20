@@ -295,7 +295,6 @@ Conf::Conf() : Block("")
 
 		Oper *o = new Oper(nname, ot);
 		o->require_oper = require_oper;
-		o->config = true;
 		o->password = password;
 		o->certfp = certfp;
 		spacesepstream(host).GetTokens(o->hosts);
@@ -492,12 +491,15 @@ Conf::Conf() : Block("")
 
 	/* Below here can't throw */
 
-	for (nickcore_map::const_iterator it = NickCoreList->begin(), it_end = NickCoreList->end(); it != it_end; ++it)
-	{
-		NickCore *nc = it->second;
-		if (nc->o && nc->o->config)
-			nc->o = NULL;
-	}
+	if (Config)
+		/* Clear existing conf opers */
+		for (nickcore_map::const_iterator it = NickCoreList->begin(), it_end = NickCoreList->end(); it != it_end; ++it)
+		{
+			NickCore *nc = it->second;
+			if (nc->o && std::find(Config->Opers.begin(), Config->Opers.end(), nc->o) != Config->Opers.end())
+				nc->o = NULL;
+		}
+	/* Apply new opers */
 	for (unsigned i = 0; i < this->Opers.size(); ++i)
 	{
 		Oper *o = this->Opers[i];
@@ -556,16 +558,44 @@ Conf::Conf() : Block("")
 	}
 #endif
 
-	/* Apply module chnages */
 	if (Config)
 	{
+		/* Apply module chnages */
 		for (unsigned i = 0; i < Config->ModulesAutoLoad.size(); ++i)
 			if (std::find(this->ModulesAutoLoad.begin(), this->ModulesAutoLoad.end(), Config->ModulesAutoLoad[i]) == this->ModulesAutoLoad.end())
 				ModuleManager::UnloadModule(ModuleManager::FindModule(Config->ModulesAutoLoad[i]), NULL);
 		for (unsigned i = 0; i < this->ModulesAutoLoad.size(); ++i)
 			if (std::find(Config->ModulesAutoLoad.begin(), Config->ModulesAutoLoad.end(), this->ModulesAutoLoad[i]) == Config->ModulesAutoLoad.end())
 				ModuleManager::LoadModule(this->ModulesAutoLoad[i], NULL);
+
+		/* Apply opertype changes, as non-conf opers still point to the old oper types */
+		for (unsigned i = Oper::opers.size(); i > 0; --i)
+		{
+			Oper *o = Oper::opers[i - 1];
+
+			/* Oper's type is in the old config, so update it */
+			if (std::find(Config->MyOperTypes.begin(), Config->MyOperTypes.end(), o->ot) != Config->MyOperTypes.end())
+			{
+				OperType *ot = o->ot;
+				o->ot = NULL;
+
+				for (unsigned j = 0; j < MyOperTypes.size(); ++j)
+					if (ot->GetName() == MyOperTypes[j]->GetName())
+						o->ot = MyOperTypes[j];
+
+				if (o->ot == NULL)
+					delete o; /* Oper block has lost type */
+			}
+		}
 	}
+}
+
+Conf::~Conf()
+{
+	for (unsigned i = 0; i < MyOperTypes.size(); ++i)
+		delete MyOperTypes[i];
+	for (unsigned i = 0; i < Opers.size(); ++i)
+		delete Opers[i];
 }
 
 Block *Conf::GetModule(Module *m)

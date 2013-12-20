@@ -145,7 +145,7 @@ class CommandOSOper : public Command
 					continue;
 
 				source.Reply(_("%-8s %s"), nc->o->name.c_str(), nc->o->ot->GetName().c_str());
-				if (nc->o->config)
+				if (std::find(Config->Opers.begin(), Config->Opers.end(), nc->o) != Config->Opers.end())
 					source.Reply(_("   This oper is configured in the configuration file."));
 				for (std::list<User *>::const_iterator uit = nc->users.begin(); uit != nc->users.end(); ++uit)
 				{

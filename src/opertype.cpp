@@ -14,7 +14,7 @@
 
 std::vector<Oper *> Oper::opers;
 
-Oper::Oper(const Anope::string &n, OperType *o) : name(n), ot(o), require_oper(false), config(false)
+Oper::Oper(const Anope::string &n, OperType *o) : name(n), ot(o), require_oper(false)
 {
 	opers.push_back(this);
 }

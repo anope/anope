@@ -129,6 +129,7 @@ namespace Configuration
 		Anope::map<Anope::string> bots;
 
 		Conf();
+		~Conf();
 
 		void LoadConf(File &file);
 

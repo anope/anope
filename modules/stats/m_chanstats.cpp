@@ -259,8 +259,8 @@ class MChanstats : public Module
 		{
 			query = "CREATE TABLE `" + prefix + "chanstats` ("
 				"`id` int(11) NOT NULL AUTO_INCREMENT,"
-				"`chan` varchar(255) DEFAULT NULL,"
-				"`nick` varchar(255) DEFAULT NULL,"
+				"`chan` varchar(255) NOT NULL DEFAULT '',"
+				"`nick` varchar(255) NOT NULL DEFAULT '',"
 				"`type` ENUM('total', 'monthly', 'weekly', 'daily') NOT NULL,"
 				"`letters` int(10) unsigned NOT NULL DEFAULT '0',"
 				"`words` int(10) unsigned NOT NULL DEFAULT '0',"

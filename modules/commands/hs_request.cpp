@@ -233,7 +233,7 @@ class CommandHSReject : public Command
 	CommandHSReject(Module *creator) : Command(creator, "hostserv/reject", 1, 2)
 	{
 		this->SetDesc(_("Reject the requested vHost of a user"));
-		this->SetSyntax(_("\037nick\037"));
+		this->SetSyntax(_("\037nick\037 [\037reason\037]"));
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
@@ -265,7 +265,7 @@ class CommandHSReject : public Command
 			}
 
 			source.Reply(_("vHost for %s has been rejected."), nick.c_str());
-			Log(LOG_COMMAND, source, this, NULL) << "to reject vhost for " << nick << " (" << (!reason.empty() ? reason : "") << ")";
+			Log(LOG_COMMAND, source, this) << "to reject vhost for " << nick << " (" << (!reason.empty() ? reason : "no reason") << ")";
 		}
 		else
 			source.Reply(_("No request for nick %s found."), nick.c_str());
@@ -277,7 +277,7 @@ class CommandHSReject : public Command
 		source.Reply(" ");
 		source.Reply(_("Reject the requested vHost for the given nick."));
 		if (Config->GetModule(this->owner)->Get<bool>("memouser"))
-			source.Reply(_("A memo informing the user will also be sent."));
+			source.Reply(_("A memo informing the user will also be sent, which includes the reason for the rejection if supplied."));
 
 		return true;
 	}

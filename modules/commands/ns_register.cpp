@@ -160,9 +160,9 @@ class CommandNSRegister : public Command
 		}
 
 		if (Config->GetModule("nickserv")->Get<bool>("restrictopernicks"))
-			for (unsigned i = 0; i < Config->Opers.size(); ++i)
+			for (unsigned i = 0; i < Oper::opers.size(); ++i)
 			{
-				Oper *o = Config->Opers[i];
+				Oper *o = Oper::opers[i];
 
 				if (!source.IsOper() && u_nick.find_ci(o->name) != Anope::string::npos)
 				{

@@ -1,6 +1,11 @@
 #include "module.h"
 #include "modules/sql.h"
 
+struct SQLOper : Oper
+{
+	SQLOper(const Anope::string &n, OperType *o) : Oper(n, o) { }
+};
+
 class SQLOperResult : public SQL::Interface
 {
 	Reference<User> user;
@@ -44,13 +49,11 @@ class SQLOperResult : public SQL::Interface
 		BotInfo *OperServ = Config->GetClient("OperServ");
 		if (opertype.empty())
 		{
-			if (user->Account() && user->Account()->o && !user->Account()->o->config)
+			if (user->Account() && user->Account()->o && !user->Account()->o->config && dynamic_cast<SQLOper *>(user->Account()->o))
 			{
-				std::vector<Oper *>::iterator it = std::find(Config->Opers.begin(), Config->Opers.end(), user->Account()->o);
-				if (it != Config->Opers.end())
-					Config->Opers.erase(it);
 				delete user->Account()->o;
 				user->Account()->o = NULL;
+
 				Log(this->owner) << "m_sql_oper: Removed services operator from " << user->nick << " (" << user->Account()->display << ")";
 				user->RemoveMode(OperServ, "OPER"); // Probably not set, just incase
 			}
@@ -67,8 +70,7 @@ class SQLOperResult : public SQL::Interface
 		if (!user->Account()->o || user->Account()->o->ot != ot)
 		{
 			Log(this->owner) << "m_sql_oper: Tieing oper " << user->nick << " to type " << opertype;
-			user->Account()->o = new Oper(user->Account()->display, ot);
-			Config->Opers.push_back(user->Account()->o);
+			user->Account()->o = new SQLOper(user->Account()->display, ot);
 		}
 
 		if (!user->HasMode("OPER"))
@@ -97,7 +99,20 @@ class ModuleSQLOper : public Module
  public:
 	ModuleSQLOper(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, EXTRA | VENDOR)
 	{
+	}
 
+	~ModuleSQLOper()
+	{
+		for (nickcore_map::const_iterator it = NickCoreList->begin(), it_end = NickCoreList->end(); it != it_end; ++it)
+		{
+			NickCore *nc = it->second;
+
+			if (nc->o && dynamic_cast<SQLOper *>(nc->o))
+			{
+				delete nc->o;
+				nc->o = NULL;
+			}
+		}
 	}
 
 	void OnReload(Configuration::Conf *conf) anope_override

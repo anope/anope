@@ -244,10 +244,13 @@ class OSOper : public Module
 	{
 		for (nickcore_map::const_iterator it = NickCoreList->begin(), it_end = NickCoreList->end(); it != it_end; ++it)
 		{
-			const NickCore *nc = it->second;
+			NickCore *nc = it->second;
 
-			if (nc->o && !nc->o->config)
+			if (nc->o && dynamic_cast<MyOper *>(nc->o))
+			{
 				delete nc->o;
+				nc->o = NULL;
+			}
 		}
 	}
 };

@@ -31,9 +31,10 @@ struct CoreExport Oper
 	std::vector<Anope::string> hosts;
 	Anope::string vhost;
 
-	Oper(const Anope::string &n, OperType *o) : name(n), ot(o), require_oper(false), config(false) { }
+	Oper(const Anope::string &n, OperType *o);
+	virtual ~Oper();
 
-	virtual ~Oper() { }
+	static std::vector<Oper *> opers;
 	
 	/** Find an oper block by name
 	 * @param name The name

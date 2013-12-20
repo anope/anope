@@ -405,9 +405,9 @@ void Stats::Run(MessageSource &source, const std::vector<Anope::string> &params)
 				IRCD->SendNumeric(219, source.GetSource(), "%c :End of /STATS report.", params[0][0]);
 			else
 			{
-				for (unsigned i = 0; i < Config->Opers.size(); ++i)
+				for (unsigned i = 0; i < Oper::opers.size(); ++i)
 				{
-					Oper *o = Config->Opers[i];
+					Oper *o = Oper::opers[i];
 
 					const NickAlias *na = NickAlias::Find(o->name);
 					if (na)

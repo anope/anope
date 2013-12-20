@@ -12,11 +12,25 @@
 #include "opertype.h"
 #include "config.h"
 
+std::vector<Oper *> Oper::opers;
+
+Oper::Oper(const Anope::string &n, OperType *o) : name(n), ot(o), require_oper(false), config(false)
+{
+	opers.push_back(this);
+}
+
+Oper::~Oper()
+{
+	std::vector<Oper *>::iterator it = std::find(opers.begin(), opers.end(), this);
+	if (it != opers.end())
+		opers.erase(it);
+}
+
 Oper *Oper::Find(const Anope::string &name)
 {
-	for (unsigned i = 0; i < Config->Opers.size(); ++i)
+	for (unsigned i = 0; i < opers.size(); ++i)
 	{
-		Oper *o = Config->Opers[i];
+		Oper *o = opers[i];
 
 		if (o->name.equals_ci(name))
 			return o;

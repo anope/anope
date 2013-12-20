@@ -373,9 +373,9 @@ static void req_send_memos(Module *me, CommandSource &source, const Anope::strin
 		host = vHost;
 
 	if (Config->GetModule(me)->Get<bool>("memooper") && memoserv)
-		for (unsigned i = 0; i < Config->Opers.size(); ++i)
+		for (unsigned i = 0; i < Oper::opers.size(); ++i)
 		{
-			Oper *o = Config->Opers[i];
+			Oper *o = Oper::opers[i];
 			
 			const NickAlias *na = NickAlias::Find(o->name);
 			if (!na)

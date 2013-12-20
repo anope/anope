@@ -267,6 +267,8 @@ class CommandBSKickAMSG : public CommandBSKickBase
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
 	{
+		this->SendSyntax(source);
+		source.Reply(" ");
 		BotInfo *bi = Config->GetClient("BotServ");
 		source.Reply(_("Sets the AMSG kicker on or off. When enabled, the bot will\n"
 				"kick users who send the same message to multiple channels\n"
@@ -302,6 +304,8 @@ class CommandBSKickBadwords : public CommandBSKickBase
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
 	{
+		this->SendSyntax(source);
+		source.Reply(" ");
 		source.Reply(_("Sets the bad words kicker on or off. When enabled, this\n"
 				"option tells the bot to kick users who say certain words\n"
 				"on the channels.\n"
@@ -338,6 +342,8 @@ class CommandBSKickBolds : public CommandBSKickBase
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
 	{
+		this->SendSyntax(source);
+		source.Reply(" ");
 		source.Reply(_("Sets the bolds kicker on or off. When enabled, this\n"
 				"option tells the bot to kick users who use bolds.\n"
 				" \n"
@@ -427,6 +433,8 @@ class CommandBSKickCaps : public CommandBSKickBase
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
 	{
+		this->SendSyntax(source);
+		source.Reply(" ");
 		source.Reply(_("Sets the caps kicker on or off. When enabled, this\n"
 				"option tells the bot to kick users who are talking in\n"
 				"CAPS.\n"
@@ -464,6 +472,8 @@ class CommandBSKickColors : public CommandBSKickBase
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
 	{
+		this->SendSyntax(source);
+		source.Reply(" ");
 		source.Reply(_("Sets the colors kicker on or off. When enabled, this\n"
 				"option tells the bot to kick users who use colors.\n"
 				" \n"
@@ -558,6 +568,8 @@ class CommandBSKickFlood : public CommandBSKickBase
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
 	{
+		this->SendSyntax(source);
+		source.Reply(" ");
 		source.Reply(_("Sets the flood kicker on or off. When enabled, this\n"
 				"option tells the bot to kick users who are flooding\n"
 				"the channel using at least \002ln\002 lines in \002secs\002 seconds\n"
@@ -592,6 +604,8 @@ class CommandBSKickItalics : public CommandBSKickBase
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
 	{
+		this->SendSyntax(source);
+		source.Reply(" ");
 		source.Reply(_("Sets the italics kicker on or off. When enabled, this\n"
 				"option tells the bot to kick users who use italics.\n"
 				" \n"
@@ -676,6 +690,8 @@ class CommandBSKickRepeat : public CommandBSKickBase
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
 	{
+		this->SendSyntax(source);
+		source.Reply(" ");
 		source.Reply(_("Sets the repeat kicker on or off. When enabled, this\n"
 				"option tells the bot to kick users who are repeating\n"
 				"themselves \002num\002 times (if num is not given, it\n"
@@ -710,6 +726,8 @@ class CommandBSKickReverses : public CommandBSKickBase
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
 	{
+		this->SendSyntax(source);
+		source.Reply(" ");
 		source.Reply(_("Sets the reverses kicker on or off. When enabled, this\n"
 				"option tells the bot to kick users who use reverses.\n"
 				" \n"
@@ -742,6 +760,8 @@ class CommandBSKickUnderlines : public CommandBSKickBase
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
 	{
+		this->SendSyntax(source);
+		source.Reply(" ");
 		source.Reply(_("Sets the underlines kicker on or off. When enabled, this\n"
 			"option tells the bot to kick users who use underlines.\n"
 			" \n"

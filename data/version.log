@@ -1,4 +1,109 @@
-Revision e3e0da3 - Sat, 12 Oct 2013 15:11:09 -0400 - Update language files
+Revision d9a1c1f - Fri, 20 Dec 2013 22:56:38 -0500 - Update version.log
+Revision 4bc4b98 - Fri, 20 Dec 2013 22:56:38 -0500 - Regenerate language files
+Revision e8b4260 - Fri, 20 Dec 2013 22:56:34 -0500 - Update Changes and Changes.conf
+Revision e792865 - Fri, 20 Dec 2013 20:24:40 -0500 - Fix reading unconfirmed expire config value when register type is set to mail
+Revision 2b5a1d8 - Fri, 20 Dec 2013 19:48:20 -0500 - Fix deleting multiple access entries when one of them matches your access group
+Revision 7cf2134 - Fri, 20 Dec 2013 12:18:44 -0800 - Merge pull request #33 from Robby-/1.9-nllangupdate
+Revision ba8a646 - Fri, 20 Dec 2013 14:57:06 -0500 - Add missing syntax to botserv kicker help
+Revision fa50252 - Fri, 20 Dec 2013 20:15:30 +0100 - Update the dutch language file for new and modified strings, and fix some more typos while we're at it.
+Revision 46bb2de - Fri, 20 Dec 2013 02:28:35 -0500 - Document hs reject's reason
+Revision c2e9b80 - Fri, 20 Dec 2013 07:34:49 +0100 - Revert "m_chanstats: changed the default value of some fields to NULL instead of ''"
+Revision c0cd76a - Thu, 19 Dec 2013 21:34:21 -0500 - Don't leak opers and opertypes on /os reload, fix not updating opertypes on non conf opers on rehash
+Revision ab6cd3b - Thu, 19 Dec 2013 20:35:09 -0500 - Fix a few commands not being able to find non conf opers
+Revision 275f2fd - Thu, 19 Dec 2013 08:24:21 -0500 - Fix db_old assigning empty greets to users who did not have a greet. Fix debug log message in extensible.cpp
+Revision c4d4107 - Thu, 19 Dec 2013 07:32:46 -0500 - Channel::Sync can delete the channel, so safely iterate them when syncing from a server burst
+Revision ae5da11 - Thu, 19 Dec 2013 07:16:17 +0100 - irc2sql: fixed not storing ssl information on inspircd
+Revision e6544a0 - Tue, 17 Dec 2013 11:02:06 -0500 - Update last_modes when keepmodes is set on or off
+Revision 1ab7d53 - Tue, 17 Dec 2013 10:58:02 -0500 - Set pending mode changes immediately when an object is removed from the mode stacker. And fix mlock creator from cs set persist on.
+Revision d709c81 - Mon, 16 Dec 2013 12:50:49 -0500 - Default build type to release
+Revision 2ad4a86 - Sun, 15 Dec 2013 16:52:08 +0100 - irc2sql: fixed small typo
+Revision 6ff83c3 - Sun, 15 Dec 2013 16:24:22 +0100 - m_chanstats: changed the default value of some fields to NULL instead of ''
+Revision adbc5a0 - Sat, 14 Dec 2013 09:56:51 +0100 - irc2sql: improved handling of netsplits
+Revision f9a4a0f - Fri, 13 Dec 2013 18:41:01 -0500 - Log all admin commands by default. I was trying to give an example of log settings, but people seem to leave the default and then get confused when it only logs operserv commands
+Revision a282a5c - Tue, 10 Dec 2013 20:17:29 -0500 - Fix 96af354ad55e439be71b82077dd6a411b4746bbb to not burst topics if they are not set
+Revision 3ddfa2f - Tue, 10 Dec 2013 20:15:34 -0500 - Explain how to setup the locales on Ubuntu
+Revision 50f430f - Mon, 9 Dec 2013 21:18:01 -0500 - Document which modules are extra and how to enable them
+Revision 1b4d62e - Mon, 9 Dec 2013 05:57:36 +0100 - irc2sql: fixed incorrect usercount for channels and servers after netsplit, fixed not displaying the channelmodes
+Revision 43f608f - Tue, 3 Dec 2013 23:58:57 -0800 - Merge pull request #32 from Harak/1.9
+Revision f0313a4 - Tue, 3 Dec 2013 22:09:06 +0100 - Updated french installation instructions.
+Revision 96af354 - Mon, 2 Dec 2013 02:01:39 -0500 - Send channel topics on initial burst, sync chanels after db load, and try to after unserializing persist on
+Revision b5966cf - Sun, 1 Dec 2013 21:16:50 -0500 - Fix crash from loading exceptions with db_old and then unloading db_old
+Revision faab2c6 - Sun, 1 Dec 2013 18:58:20 -0500 - Fix 5e4d52ad4717fb07dde629902beb70c252c8c8b4 more
+Revision c6f85b9 - Sun, 1 Dec 2013 12:09:34 +0100 - made the chanstats fantasy modules work again.
+Revision 5e4d52a - Sun, 1 Dec 2013 05:00:28 -0500 - Fix 1542937d64860243dcf410738ee73f433a661a94
+Revision 6628e71 - Sat, 30 Nov 2013 02:18:20 -0500 - Require email address to be passed to resetpass
+Revision 0f9e931 - Sun, 24 Nov 2013 22:00:01 -0500 - Revert "Fix session user logoff hook"
+Revision 1f6385c - Sun, 24 Nov 2013 14:11:52 -0800 - Merge pull request #29 from Robby-/1.9-nllangupdate
+Revision be044c9 - Sun, 24 Nov 2013 22:04:27 +0100 - Update the dutch language file for new and modified strings, and fix some typos while we're at it.
+Revision 90aa576 - Sat, 23 Nov 2013 22:12:33 -0500 - Fix/clean/clarify some stuff found by coverity scan
+Revision 77e5744 - Fri, 22 Nov 2013 01:22:24 +0100 - fixed webcpanel not html escaping displayed memos, bug reported by Mietzie
+Revision e1264a5 - Thu, 21 Nov 2013 18:06:38 -0500 - Re-find dependant protocol modules on unload, they can be reloaded from under us while we are running
+Revision 18f4232 - Thu, 21 Nov 2013 17:38:54 -0500 - This actually can't happen, but this is what was meant
+Revision c967a4c - Thu, 21 Nov 2013 17:31:18 -0500 - Shrink nick and channel default flags in db_old, otherwise converted nicks/channels always end up with the defaults enabled, even if they explicitly have them set off. Fix setting nickserv defaults to none.
+Revision 1542937 - Thu, 21 Nov 2013 11:34:42 -0500 - Hybrid has no quit on kill, so internally kill users when killed
+Revision 3b8f1cd - Thu, 21 Nov 2013 11:20:10 -0500 - Fix session user logoff hook
+Revision fbbdedf - Wed, 20 Nov 2013 18:10:26 -0500 - OnJoinChannel can modify the ts for a channel, so update keep_their_modes in the sjoin handler before processing a user. Otherwise we can desync and think users have a channel status when they really don't.
+Revision b75faef - Tue, 19 Nov 2013 10:06:22 -0500 - Don't claim to support SAVE on charybdis...
+Revision 676db0b - Mon, 18 Nov 2013 18:36:37 -0500 - Actually we can use this ssl ext type which apparently does exist
+Revision b2802d0 - Mon, 18 Nov 2013 17:18:00 -0500 - Give a reason why we cant clear nonssl users on ircds with no ssl usermode
+Revision 826ae9b - Mon, 18 Nov 2013 17:18:00 -0500 - Make /ms check better able to tell if youve recently sent a memo to someone
+Revision 2c3e8a7 - Mon, 18 Nov 2013 17:18:00 -0500 - Check override permission in cs_flags for modifying existing entries too
+Revision 0bb23f3 - Mon, 18 Nov 2013 07:53:45 -0800 - Merge pull request #27 from Cronus89/patch-1
+Revision b364981 - Mon, 18 Nov 2013 07:53:36 -0800 - Merge pull request #28 from Robby-/1.9+cslevels
+Revision f6cf978 - Mon, 18 Nov 2013 10:52:28 -0500 - Show the correct setting name in /ns help set message
+Revision aeebaed - Mon, 18 Nov 2013 10:49:54 -0500 - Default adding to 1 in mlock add/del, always reply with something even if the input is invalid
+Revision faabff0 - Mon, 18 Nov 2013 07:17:40 +0100 - cs_access: Fixed disabling channel levels. Also, correctly log /cs levels commands as an override or a normal command at the time it is executed, so, right before levels actually get modified.
+Revision cba811b - Sun, 17 Nov 2013 23:35:57 -0500 - Default nogroupchange to on, update comment to make sense
+Revision dcae3d7 - Sun, 17 Nov 2013 19:37:19 -0600 - Fix placeholder for akill.html
+Revision fc69b68 - Sat, 16 Nov 2013 16:38:10 -0500 - Don't default /cs list or /ns list to require oper privs
+Revision 15e527f - Sat, 16 Nov 2013 15:14:15 -0500 - Add missing .founder checks to cs_flags
+Revision 3ccf26f - Sat, 16 Nov 2013 14:55:03 -0500 - Delete notify/client sockets when m_dns is unloaded
+Revision c0b0ee1 - Sat, 16 Nov 2013 13:33:20 -0500 - Make /cs up set modes you have the priv for, but not the auto priv, because Robby says so
+Revision b353e1d - Sat, 16 Nov 2013 12:05:20 -0500 - Also check command names in cs_log when seeing if a newly added entry already exists. Also force command names lowercase when looking them up.
+Revision 3edce88 - Sat, 16 Nov 2013 10:39:25 -0500 - Fix default level names for access change/list in db_old
+Revision 9e1fb11 - Sat, 16 Nov 2013 10:22:18 -0500 - Tell people why they cant disable the founder level instead of claiming it doesn't exist
+Revision 316c280 - Sat, 16 Nov 2013 10:20:35 -0500 - Add help for /cs set keepmodes
+Revision cc2a999 - Sat, 16 Nov 2013 10:04:26 -0500 - Allow founders to change flags even if they don't have any matching access entries on the channel
+Revision 51a9f64 - Sat, 16 Nov 2013 09:38:13 -0500 - Use the source's sync state and not mine when processing sjoins to determine whether or not to sync the channel on creation, instead sync it when the server syncs.
+Revision 332fd23 - Fri, 15 Nov 2013 15:10:23 -0500 - Add general:hideregisteredcommands to hide commands that require you to be identified to use. This changes the behavior of hideprivilegedcommands to only hide commands users don't have the oper privileges to execute.
+Revision 1aca292 - Fri, 15 Nov 2013 14:24:33 -0500 - Allow mlocking +r on ratbox/whatever else
+Revision b65fd34 - Tue, 12 Nov 2013 20:12:56 -0500 - Set the default db name to anope.db
+Revision c9f4c2d - Tue, 12 Nov 2013 19:19:21 -0500 - try/catch cs_access AccessUnserialize just incase, don't crash if ns_ajoin is loaded before the protocol module
+Revision d1248d1 - Sat, 9 Nov 2013 05:40:58 -0800 - Merge pull request #25 from Robby-/1.9-nsidfaillogacctnames
+Revision afc5c91 - Sat, 9 Nov 2013 05:51:38 -0500 - Do not grant auto privileges to founders if they match other access entries. This allows channel founders to disable auto +qo without having to globally disable autoop or the levels.
+Revision aa6c3f3 - Sat, 9 Nov 2013 05:47:14 -0500 - Show (none) on flags list if a user is on the access list but has no flags
+Revision 2a35151 - Sat, 9 Nov 2013 05:41:10 -0500 - Remove db_plain
+Revision fa7cee9 - Fri, 8 Nov 2013 17:47:13 -0500 - Don't allow users to remove non-flags access entries that are >= them with /cs flags, also spotted by TGS
+Revision 431b2e6 - Mon, 4 Nov 2013 21:44:08 -0800 - Merge pull request #26 from Cronus89/patch-1
+Revision 853e926 - Mon, 4 Nov 2013 15:05:10 -0800 - Merge pull request #23 from Phr33d0m/1.9
+Revision 8267407 - Mon, 4 Nov 2013 23:59:55 +0100 - Add a couple of usability and aesthetic changes, fix the half-broken chanlist functionality, add a couple of missing ESCAPED_CHANNEL vars
+Revision a831e5d - Sun, 3 Nov 2013 21:41:01 -0600 - CREATE EVENT chanstats_event_cleanup_weekly failed due to calculating improper start of week.
+Revision b901dfe - Mon, 4 Nov 2013 02:59:16 +0100 - ns_identify: When logging failures, also show the account name, and that it exists or not.
+Revision 6e8d2bf - Fri, 1 Nov 2013 05:19:48 -0400 - Attempt #3
+Revision 70e9b20 - Fri, 1 Nov 2013 05:12:30 -0400 - Fix release build, not too sure why this is, compiler seems to infer this as a copy of ChanAccess
+Revision 4ee9021 - Fri, 1 Nov 2013 04:58:38 -0400 - Compare access entries created with the levels access system by access level and not by privilege set, as two entries can have the same privset but different levels, but still represent two different levels of access. This prevented users from adding other users at a lower access level when that level had the same privset as them. Spotted by TSG.
+Revision c8db362 - Fri, 1 Nov 2013 04:56:17 -0400 - Cleanup some access(group) comparison logic in access.cpp
+Revision c710625 - Fri, 1 Nov 2013 02:07:35 -0400 - Use Config::GetClient for looking up services for command{} blocks which lessens the insanity of renaming services
+Revision ac2f8bf - Fri, 1 Nov 2013 02:04:21 -0400 - People often seem to get tripped up by this, so document more clearly
+Revision 04e7fa4 - Fri, 1 Nov 2013 02:04:21 -0400 - Don't take modes in SetCorrectModes if the user has the ME privilege
+Revision f7692ec - Mon, 28 Oct 2013 01:37:47 -0700 - Merge pull request #24 from Robby-/1.9+fixes
+Revision 4a1d32c - Mon, 28 Oct 2013 09:30:56 +0100 - Fix logging when identifying with an SSL certificate fingerprint.
+Revision 498da95 - Mon, 28 Oct 2013 09:30:20 +0100 - Stop requesting identification when changing nicks to a registered nick, and the current client certificate fingerprint matches one on the nickname's list.
+Revision 710d484 - Mon, 28 Oct 2013 09:25:17 +0100 - Fix kill and killquick default expiry times. ns_access and ns_cert: Fix accessmax defaults, also state in the config that 0 is not a valid value.
+Revision bd3bed2 - Mon, 28 Oct 2013 09:13:53 +0100 - Fix some typos and touch up the configs a little.
+Revision fe31b0a - Sun, 27 Oct 2013 20:33:37 -0400 - Fix m_httpd not passing non post data to other modules correctly & close connections immediately when we are done flushing data
+Revision 1f97d6d - Sun, 27 Oct 2013 18:10:15 +0100 - fixed a small error that causes irc2sql to not compile
+Revision 4bd5649 - Sun, 27 Oct 2013 04:53:57 +0100 - fixed make install not installing the new example config files
+Revision b5af310 - Sat, 26 Oct 2013 18:42:58 +0200 - added the irc2sql gateway module
+Revision 2cfc970 - Sat, 26 Oct 2013 18:33:07 +0200 - moved some config options from example.conf to nickserv.example.conf
+Revision 6cde65a - Sat, 26 Oct 2013 18:33:07 +0200 - new event OnSetDisplayedHost
+Revision 7cb35ee - Tue, 22 Oct 2013 03:44:06 -0400 - Make nickserv's confirmemailchanges option work
+Revision f0318fd - Sat, 19 Oct 2013 03:43:04 -0400 - Fix some typos of language
+Revision 93a83da - Sat, 19 Oct 2013 03:42:12 -0400 - Fix os_dns not using remove_split_servers and fix remove_split_servers=true readd_connected_servers=false causing delinked servers to remaing in pooled+not active state
+Revision 0ff1bb9 - Mon, 14 Oct 2013 01:19:42 -0400 - Bump for 1.9.10-git
+Revision c0dea5e - Sat, 12 Oct 2013 15:28:49 -0400 - Anope 1.9.9 Release
+Revision fd4ac7f - Sat, 12 Oct 2013 15:28:49 -0400 - Update version.log
+Revision e635f54 - Sat, 12 Oct 2013 15:28:48 -0400 - Update language files
 Revision 7167cff - Sat, 12 Oct 2013 15:05:42 -0400 - Update changes and changes.conf sort of
 Revision b844154 - Thu, 10 Oct 2013 18:12:48 +0200 - fixed a typo in the last commit, reported by Robby
 Revision 5e56dfd - Thu, 10 Oct 2013 07:51:35 +0200 - replaced the country name in the Language header in the language files by four letter codes

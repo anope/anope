@@ -153,7 +153,8 @@ void operserv(User * u, char *buf)
 /* Load old AKILL data. */
 
 #define SAFE(x) do {					\
-    if ((x) < 0) {					\
+	int y = (x); \
+    if (y < 0) {					\
 	if (!forceload)					\
 	    fatal("Read error on %s", AutokillDBName);	\
 	break;						\

@@ -31,6 +31,7 @@
 
 E void ModuleRunTimeDirCleanUp(void);
 
+#define USE_VAR(var) static char sizeof##var = sizeof(sizeof##var) + sizeof(var)
 
 E char *uplink;
 

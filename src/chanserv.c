@@ -412,7 +412,8 @@ void chanserv(User * u, char *buf)
 
 
 #define SAFE(x) do {					\
-    if ((x) < 0) {					\
+	int y = (x); \
+    if (y < 0) {					\
 	if (!forceload)					\
 	    fatal("Read error on %s", ChanDBName);	\
 	failed = 1;					\

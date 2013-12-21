@@ -266,9 +266,10 @@ void nickserv(User * u, char *buf)
 
 /* Load/save data files. */
 
-
+/* Fixed : ignoring return value of ‘fread’, declared with attribute warn_unused_result [-Wunused-result] */
 #define SAFE(x) do {					\
-    if ((x) < 0) {					\
+	int y = (x); \
+    if (y < 0) {					\
 	if (!forceload)					\
 	    fatal("Read error on %s", NickDBName);	\
 	failed = 1;					\

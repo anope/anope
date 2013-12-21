@@ -41,7 +41,10 @@ void db_mysql_error(int severity, char *msg)
                  severity == MYSQL_WARNING ? "warning" : "error");
     }
 
-    log_perror(buf);
+	/* Fixes 
+		format not a string literal and no format arguments [-Wformat-security]
+	*/
+    log_perror("%s", buf);
 
     if (severity == MYSQL_ERROR) {
         log_perror("MySQL FATAL error... aborting.");

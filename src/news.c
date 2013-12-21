@@ -142,7 +142,8 @@ void get_news_stats(long *nrec, long *memuse)
 /*************************************************************************/
 
 #define SAFE(x) do {					\
-    if ((x) < 0) {					\
+	int y = (x); \
+    if (y < 0) {					\
 	if (!forceload)					\
 	    fatal("Read error on %s", NewsDBName);	\
 	nnews = i;					\

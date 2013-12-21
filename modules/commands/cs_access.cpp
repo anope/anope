@@ -250,9 +250,8 @@ class CommandCSAccess : public Command
 				Anope::string Nicks;
 				bool denied;
 				bool override;
-				AccessGroup ag;
 			 public:
-				AccessDelCallback(CommandSource &_source, ChannelInfo *_ci, Command *_c, const Anope::string &numlist) : NumberList(numlist, true), source(_source), ci(_ci), c(_c), deleted(0), denied(false), override(false), ag(source.AccessFor(ci))
+				AccessDelCallback(CommandSource &_source, ChannelInfo *_ci, Command *_c, const Anope::string &numlist) : NumberList(numlist, true), source(_source), ci(_ci), c(_c), deleted(0), denied(false), override(false)
 				{
 					if (!source.AccessFor(ci).HasPriv("ACCESS_CHANGE") && source.HasPriv("chanserv/access/modify"))
 						this->override = true;
@@ -282,6 +281,7 @@ class CommandCSAccess : public Command
 
 					ChanAccess *access = ci->GetAccess(Number - 1);
 
+					AccessGroup ag = source.AccessFor(ci);
 					const ChanAccess *u_highest = ag.Highest();
 
 					if ((!u_highest || *u_highest <= *access) && !ag.founder && !this->override && !access->mask.equals_ci(source.nc->display))

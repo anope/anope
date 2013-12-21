@@ -215,14 +215,14 @@ class CommandNSRegister : public Command
 			if (nsregister.equals_ci("admin"))
 			{
 				nc->Extend<bool>("UNCONFIRMED");
-				source.Reply(_("All new accounts must be validated by an administrator. Please wait for your registration to be confirmed."));
+				// User::Identify() called below will notify the user that their registration is pending
 			}
 			else if (nsregister.equals_ci("mail"))
 			{
 				nc->Extend<bool>("UNCONFIRMED");
 				if (SendRegmail(u, na, source.service))
 				{
-					time_t unconfirmed_expire = Config->GetModule("nickserv")->Get<time_t>("unconfirmedexpire", "1d");
+					time_t unconfirmed_expire = Config->GetModule("ns_register")->Get<time_t>("unconfirmedexpire", "1d");
 					BotInfo *bi;
 					Anope::string cmd;
 					if (Command::FindCommandFromService("nickserv/confirm", bi, cmd))

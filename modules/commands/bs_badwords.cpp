@@ -286,7 +286,7 @@ class CommandBSBadwords : public Command
 			return;
 		}
 
-		bool casesensitive = Config->GetModule("botserv")->Get<bool>("casesensitive");
+		bool casesensitive = Config->GetModule(this->module)->Get<bool>("casesensitive");
 
 		for (unsigned i = 0, end = badwords->GetBadWordCount(); i < end; ++i)
 		{

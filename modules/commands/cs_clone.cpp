@@ -99,10 +99,24 @@ public:
 		}
 		else if (what.equals_ci("ACCESS"))
 		{
+			std::set<Anope::string> masks;
+			unsigned access_max = Config->GetModule("chanserv")->Get<unsigned>("accessmax", "1024");
+			unsigned count = 0;
+
+			for (unsigned i = 0; i < target_ci->GetAccessCount(); ++i)
+				masks.insert(target_ci->GetAccess(i)->mask);
+
 			for (unsigned i = 0; i < ci->GetAccessCount(); ++i)
 			{
 				const ChanAccess *taccess = ci->GetAccess(i);
 				AccessProvider *provider = taccess->provider;
+
+				if (access_max && target_ci->GetDeepAccessCount() >= access_max)
+					break;
+
+				if (masks.count(taccess->mask))
+					continue;
+				masks.insert(taccess->mask);
 
 				ChanAccess *newaccess = provider->Create();
 				newaccess->ci = target_ci;
@@ -113,9 +127,11 @@ public:
 				newaccess->AccessUnserialize(taccess->AccessSerialize());
 
 				target_ci->AddAccess(newaccess);
+
+				++count;
 			}
 
-			source.Reply(_("All access entries from \002%s\002 have been cloned to \002%s\002."), channel.c_str(), target.c_str());
+			source.Reply(_("%d access entries from \002%s\002 have been cloned to \002%s\002."), count, channel.c_str(), target.c_str());
 		}
 		else if (what.equals_ci("AKICK"))
 		{
@@ -136,21 +152,22 @@ public:
 			BadWords *target_badwords = target_ci->Require<BadWords>("badwords"),
 				*badwords = ci->Require<BadWords>("badwords");
 
-			if (target_badwords && badwords)
+			if (!target_badwords || !badwords)
 			{
-				target_badwords->ClearBadWords();
-
-				for (unsigned i = 0; i < badwords->GetBadWordCount(); ++i)
-				{
-					const BadWord *bw = badwords->GetBadWord(i);
-					target_badwords->AddBadWord(bw->word, bw->type);
-				}
+				source.Reply(ACCESS_DENIED); // BotServ doesn't exist/badwords isn't loaded
+				return;
 			}
 
-			if (badwords)
-				badwords->Check();
-			if (target_badwords)
-				target_badwords->Check();
+			target_badwords->ClearBadWords();
+
+			for (unsigned i = 0; i < badwords->GetBadWordCount(); ++i)
+			{
+				const BadWord *bw = badwords->GetBadWord(i);
+				target_badwords->AddBadWord(bw->word, bw->type);
+			}
+
+			badwords->Check();
+			target_badwords->Check();
 
 			source.Reply(_("All badword entries from \002%s\002 have been cloned to \002%s\002."), channel.c_str(), target.c_str());
 		}

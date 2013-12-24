@@ -71,9 +71,14 @@ class CommandNSInfo : public Command
 			}
 			else
 			{
+				Anope::string shown;
 				if (show_hidden || !na->nc->HasExt("HIDE_MASK"))
+				{
 					info[_("Last seen address")] = na->last_usermask;
-				if (show_hidden && !na->last_realhost.empty())
+					shown = na->last_usermask;
+				}
+
+				if (show_hidden && !na->last_realhost.empty() && na->last_realhost != shown)
 					info[_("Last seen address")] = na->last_realhost;
 			}
 

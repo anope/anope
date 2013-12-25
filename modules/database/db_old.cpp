@@ -539,7 +539,7 @@ static void LoadNicks()
 				case LANG_JA_EUC:
 				case LANG_JA_SJIS: // these seem to be unused
 				default:
-					nc->language = "en_US";
+					nc->language = "en";
 			}
 
 			READ(read_uint16(&u16, f));

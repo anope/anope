@@ -286,12 +286,16 @@ class CommandNSResend : public Command
  public:
 	CommandNSResend(Module *creator) : Command(creator, "nickserv/resend", 0, 0)
 	{
+		this->SetDesc(_("Resend registration confirmation email"));
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		if (!Config->GetModule(this->owner)->Get<const Anope::string>("registration").equals_ci("mail"))
+		{
+			source.Reply(ACCESS_DENIED);
 			return;
+		}
 
 		const NickAlias *na = NickAlias::Find(source.GetNick());
 
@@ -323,8 +327,7 @@ class CommandNSResend : public Command
 
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("This command will re-send the auth code (also called passcode)\n"
-				"to the e-mail address of the nickname in the database."));
+		source.Reply(_("This command will resend you the registration confirmation email."));
 		return true;
 	}
 

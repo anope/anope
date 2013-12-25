@@ -7,19 +7,28 @@
 
 #include "../../webcpanel.h"
 
+static bool ChannelSort(ChannelInfo *ci1, ChannelInfo *ci2)
+{
+	return ci::less()(ci1->name, ci2->name);
+}
+
 WebCPanel::NickServ::Alist::Alist(const Anope::string &cat, const Anope::string &u) : WebPanelProtectedPage(cat, u)
 {
 }
 
 bool WebCPanel::NickServ::Alist::OnRequest(HTTPProvider *server, const Anope::string &page_name, HTTPClient *client, HTTPMessage &message, HTTPReply &reply, NickAlias *na, TemplateFileServer::Replacements &replacements)
 {
+	std::deque<ChannelInfo *> queue;
+	na->nc->GetChannelReferences(queue);
+	std::sort(queue.begin(), queue.end(), ChannelSort);
+
 	int chan_count = 0;
 
-	for (registered_channel_map::const_iterator it = RegisteredChannelList->begin(), it_end = RegisteredChannelList->end(); it != it_end; ++it)
+	for (unsigned q = 0; q < queue.size(); ++q)
 	{
-		ChannelInfo *ci = it->second;
+		ChannelInfo *ci = queue[q];
 
-		if (ci->GetFounder() && ci->GetFounder() == na->nc)
+		if (ci->GetFounder() == na->nc)
 		{
 			++chan_count;
 

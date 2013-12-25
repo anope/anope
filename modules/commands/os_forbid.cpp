@@ -63,7 +63,7 @@ class MyForbidService : public ForbidService
 			{
 				ForbidData *d = this->forbids(j).at(i - 1);
 
-				if (d->expires && Anope::CurTime >= d->expires)
+				if (d->expires && !Anope::NoExpire && Anope::CurTime >= d->expires)
 				{
 					Anope::string ftype = "none";
 					if (d->type == FT_NICK)

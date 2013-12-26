@@ -425,7 +425,7 @@ class ChanServCore : public Module, public ChanServService
 			return;
 		/* Mark the channel as persistent */
 		if (ci->c->HasMode("PERM"))
-			persist->Unset(ci);
+			persist->Set(ci);
 		/* Persist may be in def cflags, set it here */
 		else if (persist->Get(ci))
 			ci->c->SetMode(NULL, "PERM");

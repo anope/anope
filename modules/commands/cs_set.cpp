@@ -1198,6 +1198,8 @@ class CSSet : public Module
 	CommandCSSetSuccessor commandcssetsuccessor;
 	CommandCSSetNoexpire commandcssetnoexpire;
 
+	bool persist_lower_ts;
+
  public:
 	CSSet(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		noautoop(this, "NOAUTOOP"), peace(this, "PEACE"),
@@ -1212,6 +1214,11 @@ class CSSet : public Module
 		commandcssetsecure(this), commandcssetsecurefounder(this), commandcssetsecureops(this), commandcssetsignkick(this),
 		commandcssetsuccessor(this), commandcssetnoexpire(this)
 	{
+	}
+
+	void OnReload(Configuration::Conf *conf) anope_override
+	{
+		persist_lower_ts = conf->GetModule(this)->Get<bool>("persist_lower_ts");
 	}
 
 	void OnCreateChan(ChannelInfo *ci) anope_override
@@ -1296,7 +1303,7 @@ class CSSet : public Module
 
 	void OnJoinChannel(User *u, Channel *c) anope_override
 	{
-		if (c->ci && persist.HasExt(c->ci) && c->creation_time > c->ci->time_registered)
+		if (persist_lower_ts && c->ci && persist.HasExt(c->ci) && c->creation_time > c->ci->time_registered)
 		{
 			Log(LOG_DEBUG) << "Changing TS of " << c->name << " from " << c->creation_time << " to " << c->ci->time_registered;
 			c->creation_time = c->ci->time_registered;

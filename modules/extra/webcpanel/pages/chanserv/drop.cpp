@@ -21,7 +21,9 @@ bool WebCPanel::ChanServ::Drop::OnRequest(HTTPProvider *server, const Anope::str
 		if (message.post_data["channel"] == message.post_data["confChan"])
 		{
 			std::vector<Anope::string> params;
-			params.push_back(HTTPUtils::URLDecode(message.post_data["channel"]));
+			const Anope::string &channel = HTTPUtils::URLDecode(message.post_data["channel"]);
+			params.push_back(channel);
+			params.push_back(channel);
 
 			WebPanel::RunCommand(na->nc->display, na->nc, "ChanServ", "chanserv/drop", params, replacements);
 		}

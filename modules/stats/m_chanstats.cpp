@@ -63,7 +63,7 @@ class CommandNSSetChanstats : public Command
 		this->SetDesc(_("Turn chanstats statistics on or off"));
 		this->SetSyntax(_("{ON | OFF}"));
 	}
-	void Run(CommandSource &source, const Anope::string &user, const Anope::string &param)
+	void Run(CommandSource &source, const Anope::string &user, const Anope::string &param, bool saset = false)
 	{
 		NickAlias *na = NickAlias::Find(user);
 		if (!na)
@@ -81,13 +81,19 @@ class CommandNSSetChanstats : public Command
 		{
 			Log(na->nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to enable chanstats for " << na->nc->display;
 			na->nc->Extend<bool>("NS_STATS");
-			source.Reply(_("Chanstats statistics are now enabled for your nick."));
+			if (saset)
+				source.Reply(_("Chanstats statistics are now enabled for %s"), na->nc->display.c_str());
+			else
+				source.Reply(_("Chanstats statistics are now enabled for your nick."));
 		}
 		else if (param.equals_ci("OFF"))
 		{
 			Log(na->nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to disable chanstats for " << na->nc->display;
 			na->nc->Shrink<bool>("NS_STATS");
-			source.Reply(_("Chanstats statistics are now disabled for your nick."));
+			if (saset)
+				source.Reply(_("Chanstats statistics are now disabled for %s"), na->nc->display.c_str());
+			else
+				source.Reply(_("Chanstats statistics are now disabled for your nick."));
 		}
 		else
 			this->OnSyntaxError(source, "CHANSTATS");
@@ -118,7 +124,7 @@ class CommandNSSASetChanstats : public CommandNSSetChanstats
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		this->Run(source, params[0], params[1]);
+		this->Run(source, params[0], params[1], true);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &) anope_override
@@ -259,8 +265,8 @@ class MChanstats : public Module
 		{
 			query = "CREATE TABLE `" + prefix + "chanstats` ("
 				"`id` int(11) NOT NULL AUTO_INCREMENT,"
-				"`chan` varchar(255) NOT NULL DEFAULT '',"
-				"`nick` varchar(255) NOT NULL DEFAULT '',"
+				"`chan` varchar(64) NOT NULL DEFAULT '',"
+				"`nick` varchar(64) NOT NULL DEFAULT '',"
 				"`type` ENUM('total', 'monthly', 'weekly', 'daily') NOT NULL,"
 				"`letters` int(10) unsigned NOT NULL DEFAULT '0',"
 				"`words` int(10) unsigned NOT NULL DEFAULT '0',"

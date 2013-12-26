@@ -139,8 +139,8 @@ void Anope::HandleSignal()
 			Log() << "Received signal " << Signal << ", exiting.";
 			Anope::QuitReason = Anope::string("Services terminating via signal ") + stringify(Signal);
 #endif
-			Anope::SaveDatabases();
 			Anope::Quitting = true;
+			Anope::SaveDatabases();
 			break;
 	}
 

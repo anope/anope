@@ -10,6 +10,10 @@
 
 #include "module.h"
 
+#ifndef _WIN32
+#include <sys/wait.h>
+#endif
+
 class SaveData : public Serialize::Data
 {
  public:
@@ -106,6 +110,8 @@ class DBFlatFile : public Module, public Pipe
 	std::map<Anope::string, std::list<Anope::string> > backups;
 	bool loaded;
 
+	int child_pid;
+
 	void BackupDatabase()
 	{
 		tm *tm = localtime(&Anope::CurTime);
@@ -161,10 +167,30 @@ class DBFlatFile : public Module, public Pipe
 	}
 
  public:
-	DBFlatFile(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, DATABASE | VENDOR), last_day(0), loaded(false)
+	DBFlatFile(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, DATABASE | VENDOR), last_day(0), loaded(false), child_pid(-1)
 	{
 
 	}
+
+#ifndef _WIN32
+	void OnRestart() anope_override
+	{
+		OnShutdown();
+	}
+
+	void OnShutdown() anope_override
+	{
+		if (child_pid > -1)
+		{
+			Log(this) << "Waiting for child to exit...";
+
+			int status;
+			waitpid(child_pid, &status, 0);
+
+			Log(this) << "Done";
+		}
+	}
+#endif
 
 	void OnNotify() anope_override
 	{
@@ -173,6 +199,8 @@ class DBFlatFile : public Module, public Pipe
 		if (i <= 0)
 			return;
 		buf[i] = 0;
+
+		child_pid = -1;
 
 		if (!*buf)
 		{
@@ -238,15 +266,24 @@ class DBFlatFile : public Module, public Pipe
 
 	void OnSaveDatabase() anope_override
 	{
+		if (child_pid > -1)
+		{
+			Log(this) << "Database save is already in progress!";
+			return;
+		}
+
 		BackupDatabase();
 
 		int i = -1;
 #ifndef _WIN32
-		if (Config->GetModule(this)->Get<bool>("fork"))
+		if (!Anope::Quitting && Config->GetModule(this)->Get<bool>("fork"))
 		{
 			i = fork();
 			if (i > 0)
+			{
+				child_pid = i;
 				return;
+			}
 			else if (i < 0)
 				Log(this) << "Unable to fork for database save";
 		}

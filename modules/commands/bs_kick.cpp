@@ -1324,73 +1324,81 @@ class BSKick : public Module
 			Anope::string nbuf = Anope::NormalizeBuffer(realbuf);
 			bool casesensitive = Config->GetModule("botserv")->Get<bool>("casesensitive");
 
-			for (unsigned i = 0; badwords && i < badwords->GetBadWordCount(); ++i)
-			{
-				const BadWord *bw = badwords->GetBadWord(i);
-
-				if (bw->type == BW_ANY && ((casesensitive && nbuf.find(bw->word) != Anope::string::npos) || (!casesensitive && nbuf.find_ci(bw->word) != Anope::string::npos)))
-					mustkick = true;
-				else if (bw->type == BW_SINGLE)
+			/* Normalize can return an empty string if this only conains control codes etc */
+			if (badwords && !nbuf.empty())
+				for (unsigned i = 0; i < badwords->GetBadWordCount(); ++i)
 				{
-					size_t len = bw->word.length();
+					const BadWord *bw = badwords->GetBadWord(i);
 
-					if ((casesensitive && bw->word.equals_cs(nbuf)) || (!casesensitive && bw->word.equals_ci(nbuf)))
+					if (bw->word.empty())
+						continue; // Shouldn't happen
+
+					if (bw->word.length() > nbuf.length())
+						continue; // This can't ever match
+
+					if (bw->type == BW_ANY && ((casesensitive && nbuf.find(bw->word) != Anope::string::npos) || (!casesensitive && nbuf.find_ci(bw->word) != Anope::string::npos)))
 						mustkick = true;
-					else if (nbuf.find(' ') == len && ((casesensitive && bw->word.equals_cs(nbuf)) || (!casesensitive && bw->word.equals_ci(nbuf))))
-						mustkick = true;
-					else
+					else if (bw->type == BW_SINGLE)
 					{
-						if (nbuf.rfind(' ') == nbuf.length() - len - 1 && ((casesensitive && nbuf.find(bw->word) == nbuf.length() - len) || (!casesensitive && nbuf.find_ci(bw->word) == nbuf.length() - len)))
+						size_t len = bw->word.length();
+
+						if ((casesensitive && bw->word.equals_cs(nbuf)) || (!casesensitive && bw->word.equals_ci(nbuf)))
+							mustkick = true;
+						else if (nbuf.find(' ') == len && ((casesensitive && bw->word.equals_cs(nbuf.substr(0, len))) || (!casesensitive && bw->word.equals_ci(nbuf.substr(0, len)))))
 							mustkick = true;
 						else
 						{
-							Anope::string wordbuf = " " + bw->word + " ";
+							if (len < nbuf.length() && nbuf.rfind(' ') == nbuf.length() - len - 1 && ((casesensitive && nbuf.find(bw->word) == nbuf.length() - len) || (!casesensitive && nbuf.find_ci(bw->word) == nbuf.length() - len)))
+								mustkick = true;
+							else
+							{
+								Anope::string wordbuf = " " + bw->word + " ";
+	
+								if ((casesensitive && nbuf.find(wordbuf) != Anope::string::npos) || (!casesensitive && nbuf.find_ci(wordbuf) != Anope::string::npos))
+									mustkick = true;
+							}
+						}
+					}
+					else if (bw->type == BW_START)
+					{
+						size_t len = bw->word.length();
+
+						if ((casesensitive && nbuf.substr(0, len).equals_cs(bw->word)) || (!casesensitive && nbuf.substr(0, len).equals_ci(bw->word)))
+							mustkick = true;
+						else
+						{
+							Anope::string wordbuf = " " + bw->word;
 
 							if ((casesensitive && nbuf.find(wordbuf) != Anope::string::npos) || (!casesensitive && nbuf.find_ci(wordbuf) != Anope::string::npos))
 								mustkick = true;
 						}
 					}
-				}
-				else if (bw->type == BW_START)
-				{
-					size_t len = bw->word.length();
-
-					if ((casesensitive && nbuf.substr(0, len).equals_cs(bw->word)) || (!casesensitive && nbuf.substr(0, len).equals_ci(bw->word)))
-						mustkick = true;
-					else
+					else if (bw->type == BW_END)
 					{
-						Anope::string wordbuf = " " + bw->word;
+						size_t len = bw->word.length();
 
-						if ((casesensitive && nbuf.find(wordbuf) != Anope::string::npos) || (!casesensitive && nbuf.find_ci(wordbuf) != Anope::string::npos))
+						if ((casesensitive && nbuf.substr(nbuf.length() - len).equals_cs(bw->word)) || (!casesensitive && nbuf.substr(nbuf.length() - len).equals_ci(bw->word)))
 							mustkick = true;
-					}
-				}
-				else if (bw->type == BW_END)
-				{
-					size_t len = bw->word.length();
+						else
+						{
+							Anope::string wordbuf = bw->word + " ";
 
-					if ((casesensitive && nbuf.substr(nbuf.length() - len).equals_cs(bw->word)) || (!casesensitive && nbuf.substr(nbuf.length() - len).equals_ci(bw->word)))
-						mustkick = true;
-					else
+							if ((casesensitive && nbuf.find(wordbuf) != Anope::string::npos) || (!casesensitive && nbuf.find_ci(wordbuf) != Anope::string::npos))
+								mustkick = true;
+						}
+					}
+
+					if (mustkick)
 					{
-						Anope::string wordbuf = bw->word + " ";
+						check_ban(ci, u, kd, TTB_BADWORDS);
+						if (Config->GetModule(me)->Get<bool>("gentlebadwordreason"))
+							bot_kick(ci, u, _("Watch your language!"));
+						else
+							bot_kick(ci, u, _("Don't use the word \"%s\" on this channel!"), bw->word.c_str());
 
-						if ((casesensitive && nbuf.find(wordbuf) != Anope::string::npos) || (!casesensitive && nbuf.find_ci(wordbuf) != Anope::string::npos))
-							mustkick = true;
+						return;
 					}
-				}
-
-				if (mustkick)
-				{
-					check_ban(ci, u, kd, TTB_BADWORDS);
-					if (Config->GetModule(me)->Get<bool>("gentlebadwordreason"))
-						bot_kick(ci, u, _("Watch your language!"));
-					else
-						bot_kick(ci, u, _("Don't use the word \"%s\" on this channel!"), bw->word.c_str());
-
-					return;
-				}
-			} /* for */
+				} /* for */
 		} /* if badwords */
 
 		UserData *ud = GetUserData(u, c);

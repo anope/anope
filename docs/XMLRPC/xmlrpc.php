@@ -74,7 +74,7 @@ class AnopeXMLRPC
 	 */
 	function DoChannel($Channel)
 	{
-		return $this->RunXMLRPC("channel", NULL);
+		return $this->RunXMLRPC("channel", array($Channel));
 	}
 
 	/* Like DoChannel(), but different.

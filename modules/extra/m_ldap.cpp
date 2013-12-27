@@ -497,8 +497,13 @@ class ModuleLDAP : public Module, public Pipe
 			for (unsigned i = s->results.size(); i > 0; --i)
 			{
 				LDAPInterface *li = s->results[i - 1].first;
+				LDAPResult *r = s->results[i - 1].second;
+
 				if (li->owner == m)
+				{
 					s->results.erase(s->results.begin() + i - 1);
+					delete r;
+				}
 			}
 			s->Unlock();
 		} 
@@ -524,6 +529,8 @@ class ModuleLDAP : public Module, public Pipe
 					li->OnError(*r);
 				else
 					li->OnResult(*r);
+
+				delete r;
 			}
 		} 
 	}

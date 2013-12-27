@@ -45,7 +45,7 @@ class CommandNSAList : public Command
 		ListFormatter list(source.GetAccount());
 		int chan_count = 0;
 
-		list.AddColumn(_("Number")).AddColumn(_("Channel")).AddColumn(_("Access"));
+		list.AddColumn(_("Number")).AddColumn(_("Channel")).AddColumn(_("Access")).AddColumn(_("Description"));
 
 		std::deque<ChannelInfo *> queue;
 		nc->GetChannelReferences(queue);
@@ -62,6 +62,7 @@ class CommandNSAList : public Command
 				entry["Number"] = stringify(chan_count);
 				entry["Channel"] = (ci->HasExt("CS_NO_EXPIRE") ? "!" : "") + ci->name;
 				entry["Access"] = Language::Translate(source.GetAccount(), _("Founder"));
+				entry["Description"] = ci->desc;
 				list.AddEntry(entry);
 				continue;
 			}
@@ -72,6 +73,7 @@ class CommandNSAList : public Command
 				entry["Number"] = stringify(chan_count);
 				entry["Channel"] = (ci->HasExt("CS_NO_EXPIRE") ? "!" : "") + ci->name;
 				entry["Access"] = Language::Translate(source.GetAccount(), _("Successor"));
+				entry["Description"] = ci->desc;
 				list.AddEntry(entry);
 				continue;
 			}
@@ -87,6 +89,7 @@ class CommandNSAList : public Command
 			for (unsigned j = 0; j < access.size(); ++j)
 				entry["Access"] = entry["Access"] + ", " + access[j]->AccessSerialize();
 			entry["Access"] = entry["Access"].substr(2);
+			entry["Description"] = ci->desc;
 			list.AddEntry(entry);
 		}
 

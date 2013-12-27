@@ -421,7 +421,7 @@ class ChanServCore : public Module, public ChanServService
 	
 	void OnChanRegistered(ChannelInfo *ci) anope_override
 	{
-		if (!persist)
+		if (!persist || !ci->c)
 			return;
 		/* Mark the channel as persistent */
 		if (ci->c->HasMode("PERM"))

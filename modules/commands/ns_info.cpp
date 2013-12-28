@@ -135,7 +135,7 @@ class CommandNSSetHide : public Command
 	CommandNSSetHide(Module *creator, const Anope::string &sname = "nickserv/set/hide", size_t min = 2) : Command(creator, sname, min, min + 1)
 	{
 		this->SetDesc(_("Hide certain pieces of nickname information"));
-		this->SetSyntax(_("{EMAIL | STATUS | USERMASK | QUIT} {ON | OFF}"));
+		this->SetSyntax("{EMAIL | STATUS | USERMASK | QUIT} {ON | OFF}");
 	}
 
 	void Run(CommandSource &source, const Anope::string &user, const Anope::string &param, const Anope::string &arg)

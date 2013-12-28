@@ -194,7 +194,7 @@ class CommandOSStats : public Command
 		akills("XLineManager", "xlinemanager/sgline"), snlines("XLineManager", "xlinemanager/snline"), sqlines("XLineManager", "xlinemanager/sqline")
 	{
 		this->SetDesc(_("Show status of Services and network"));
-		this->SetSyntax(_("[AKILL | HASH | UPLINK | UPTIME | ALL | RESET]"));
+		this->SetSyntax("[AKILL | HASH | UPLINK | UPTIME | ALL | RESET]");
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override

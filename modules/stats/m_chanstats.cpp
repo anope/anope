@@ -61,7 +61,7 @@ class CommandNSSetChanstats : public Command
 	CommandNSSetChanstats(Module *creator, const Anope::string &sname = "nickserv/set/chanstats", size_t min = 1 ) : Command(creator, sname, min, min + 1)
 	{
 		this->SetDesc(_("Turn chanstats statistics on or off"));
-		this->SetSyntax(_("{ON | OFF}"));
+		this->SetSyntax("{ON | OFF}");
 	}
 	void Run(CommandSource &source, const Anope::string &user, const Anope::string &param, bool saset = false)
 	{

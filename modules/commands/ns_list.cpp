@@ -184,7 +184,7 @@ class CommandNSSetPrivate : public Command
 	CommandNSSetPrivate(Module *creator, const Anope::string &sname = "nickserv/set/private", size_t min = 1) : Command(creator, sname, min, min + 1)
 	{
 		this->SetDesc(_("Prevent the nickname from appearing in the LIST command"));
-		this->SetSyntax(_("{ON | OFF}"));
+		this->SetSyntax("{ON | OFF}");
 	}
 
 	void Run(CommandSource &source, const Anope::string &user, const Anope::string &param)

@@ -604,7 +604,7 @@ struct IRCDMessageCapab : Message::Capab
 								ModeManager::AddChannelMode(new ChannelMode("DELAYEDJOIN", 'D'));
 								continue;
 							case 'G':
-								ModeManager::AddChannelMode(new ChannelMode("FILTER", 'G'));
+								ModeManager::AddChannelMode(new ChannelMode("CENSOR", 'G'));
 								continue;
 							case 'K':
 								ModeManager::AddChannelMode(new ChannelMode("NOKNOCK", 'K'));
@@ -687,7 +687,7 @@ struct IRCDMessageCapab : Message::Capab
 									ModeManager::AddUserMode(new UserMode("BOT", 'B'));
 									continue;
 								case 'G':
-									ModeManager::AddUserMode(new UserMode("FILTER", 'G'));
+									ModeManager::AddUserMode(new UserMode("CENSOR", 'G'));
 									continue;
 								case 'H':
 									ModeManager::AddUserMode(new UserModeOperOnly("HIDEOPER", 'H'));

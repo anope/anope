@@ -316,7 +316,7 @@ struct IRCDMessageCapab : Message::Capab
 				else if (modename.equals_cs("c_registered"))
 					cm = new ChannelModeNoone("REGISTERED", modechar[0]);
 				else if (modename.equals_cs("censor"))
-					cm = new ChannelMode("FILTER", modechar[0]);
+					cm = new ChannelMode("CENSOR", modechar[0]);
 				else if (modename.equals_cs("delayjoin"))
 					cm = new ChannelMode("DELAYEDJOIN", modechar[0]);
 				else if (modename.equals_cs("delaymsg"))
@@ -437,7 +437,7 @@ struct IRCDMessageCapab : Message::Capab
 				else if (modename.equals_cs("showwhois"))
 					um = new UserMode("WHOIS", modechar[0]);
 				else if (modename.equals_cs("u_censor"))
-					um = new UserMode("FILTER", modechar[0]);
+					um = new UserMode("CENSOR", modechar[0]);
 				else if (modename.equals_cs("u_registered"))
 					um = new UserModeNoone("REGISTERED", modechar[0]);
 				else if (modename.equals_cs("u_stripcolor"))

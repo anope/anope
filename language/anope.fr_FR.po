@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: Anope\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-12-20 20:25-0500\n"
-"PO-Revision-Date: 2013-12-27 19:53+0100\n"
+"PO-Revision-Date: 2013-12-29 23:48+0100\n"
 "Last-Translator: Harakiri <harakiri@overstack.fr>\n"
 "Language-Team: French\n"
 "MIME-Version: 1.0\n"
@@ -262,7 +262,7 @@ msgstr "Le niveau %s est maintenant désactivé sur le canal %s."
 #: modules/commands/cs_invite.cpp:75
 #, c-format
 msgid "%s has been invited to %s."
-msgstr "%s has been invited to %s."
+msgstr "%s a été invité sur %s."
 
 #: modules/commands/os_svs.cpp:104
 #, c-format
@@ -277,7 +277,7 @@ msgstr "%s a été PART %s."
 #: modules/commands/cs_unban.cpp:87
 #, c-format
 msgid "%s has been unbanned from %s."
-msgstr "%s has been unbanned from %s."
+msgstr "%s a été débanni de %s."
 
 #: modules/commands/ns_alist.cpp:98
 #, c-format
@@ -4371,7 +4371,7 @@ msgstr "N'utilisez pas de couleurs sur ce canal!"
 
 #: modules/commands/bs_kick.cpp:1279
 msgid "Don't use italics on this channel!"
-msgstr "Don't use italics on this channel!"
+msgstr "N'utilisez pas d'italique sur le canal !"
 
 #: modules/commands/bs_kick.cpp:1271
 msgid "Don't use reverses on this channel!"
@@ -6314,7 +6314,7 @@ msgstr "Le pseudo %s n'est plus identifié."
 #: modules/commands/ns_group.cpp:244
 #, c-format
 msgid "Nick %s has been ungrouped from %s."
-msgstr "Nick %s has been ungrouped from %s."
+msgstr "Le pseudo %s a été retiré du groupe %s."
 
 #: include/language.h:82
 #, c-format
@@ -6659,7 +6659,7 @@ msgstr "Mot de passe incorrect."
 #: modules/commands/ns_resetpass.cpp:41
 #, c-format
 msgid "Password reset email for %s has been sent."
-msgstr "Password reset email for %s has been sent."
+msgstr "Un email de réinitialisation de mot de passe pour %s a été envoyé."
 
 #: modules/commands/cs_set.cpp:1331
 msgid "Peace"
@@ -7599,7 +7599,7 @@ msgstr "Les Services sont maintenant en mode lecture-seule."
 #: modules/commands/os_defcon.cpp:186 modules/commands/os_defcon.cpp:213
 #, c-format
 msgid "Services are now at DEFCON %d."
-msgstr "Les services sont maintenant sur DEFCON %d."
+msgstr "Les Services sont maintenant sur DEFCON %d."
 
 #: modules/commands/os_set.cpp:128
 #, c-format
@@ -7632,7 +7632,7 @@ msgstr "Les Services sont maintenant en mode lecture-écriture."
 
 #: src/mail.cpp:76
 msgid "Services have been configured to not send mail."
-msgstr "Les services ont été configurés pour ne pas envoyer de mail."
+msgstr "Les Services ont été configurés pour ne pas envoyer de mail."
 
 #: modules/commands/os_ignore.cpp:238
 msgid "Services ignore list:"
@@ -10799,7 +10799,9 @@ msgstr "Votre pseudo est déjà enregistré."
 
 #: modules/commands/ns_group.cpp:219
 msgid "Your nick is not grouped to anything, you can't ungroup it."
-msgstr "Your nick is not grouped to anything, you can't ungroup it."
+msgstr ""
+"Votre pseudo n'est pas groupé à quoi que ce soit, vous ne pouvez pas le "
+"dégrouper."
 
 #: include/language.h:78
 msgid "Your nick isn't registered."
@@ -10830,7 +10832,7 @@ msgstr "Votre mot de passe est trop long. Merci d'en choisir un plus court."
 
 #: modules/commands/ns_resetpass.cpp:98
 msgid "Your password reset request has expired."
-msgstr "Your password reset request has expired."
+msgstr "Votre demande de réinitialisation de mot de passe a expiré."
 
 #: modules/commands/hs_request.cpp:165
 msgid "Your vHost has been requested."
@@ -10850,7 +10852,7 @@ msgstr "Votre vhost %s@%s est activé."
 
 #: modules/commands/hs_off.cpp:34
 msgid "Your vhost was removed and the normal cloaking restored."
-msgstr "Your vhost was removed and the normal cloaking restored."
+msgstr "Votre vhost a été supprimé et le masquage normal a été réstauré."
 
 #: modules/commands/os_dns.cpp:254
 msgid "Zone"

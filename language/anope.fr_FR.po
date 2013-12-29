@@ -10746,7 +10746,7 @@ msgstr ""
 #: modules/commands/ns_register.cpp:52
 #, c-format
 msgid "Your email address of %s has been confirmed."
-msgstr "Votre adresse e-mail pour %s a été confirée."
+msgstr "Votre adresse e-mail pour %s a été confirmée."
 
 #: modules/extra/m_ldap_authentication.cpp:170
 #, c-format

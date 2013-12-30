@@ -104,7 +104,7 @@ struct KickerDataImpl : KickerData
 			for (int i = 0; sep.GetToken(tok) && i < TTB_SIZE; ++i)
 				try
 				{
-					ttb[i] = convertTo<int16_t>(tok);
+					kd->ttb[i] = convertTo<int16_t>(tok);
 				}
 				catch (const ConvertException &) { }
 

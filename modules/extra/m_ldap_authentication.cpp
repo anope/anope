@@ -103,6 +103,7 @@ class IdentifyInterface : public LDAPInterface
 					if (na == NULL)
 					{
 						na = new NickAlias(ii->req->GetAccount(), new NickCore(ii->req->GetAccount()));
+						na->last_realname = ii->user ? ii->user->realname : ii->req->GetAccount();
 						FOREACH_MOD(OnNickRegister, (ii->user, na));
 						BotInfo *NickServ = Config->GetClient("NickServ");
 						if (ii->user && NickServ)

@@ -68,12 +68,17 @@ class ChanServCore : public Module, public ChanServService
 
 				inhabit.Unset(c);
 
+				/* In the event we don't part */
+				c->RemoveMode(NULL, "SECRET");
+				c->RemoveMode(NULL, "INVITE");
+
 				if (!c->ci || !c->ci->bi)
 				{
 					if (ChanServ)
 						ChanServ->Part(c);
 				}
-				else
+				/* If someone has rejoined this channel in the meantime, don't part the bot */
+				else if (c->users.size() <= 1)
 					c->ci->bi->Part(c);
 			}
 		};
@@ -308,24 +313,6 @@ class ChanServCore : public Module, public ChanServService
 		{
 			this->Hold(c);
 		}
-
-		c->CheckModes();
-	}
-
-	EventReturn OnBotKick(BotInfo *bi, Channel *c, User *u, const Anope::string &reason)
-	{
-		/* If the channel isn't syncing and doesn't have any users, join ChanServ
-		 * Note that the user AND POSSIBLY the botserv bot exist here
-		 * ChanServ always enforces channels like this to keep people from deleting bots etc
-		 * that are holding channels.
-		 */
-		if (c->ci && c->users.size() == (c->ci->bi && c->FindUser(c->ci->bi) ? 2 : 1) && !inhabit.HasExt(c) && !c->syncing)
-		{
-			/* Join ChanServ and set a timer for this channel to part ChanServ later */
-			this->Hold(c);
-		}
-
-		return EVENT_CONTINUE;
 	}
 
 	void OnLog(Log *l) anope_override

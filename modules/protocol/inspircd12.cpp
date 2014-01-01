@@ -1342,7 +1342,7 @@ struct IRCDMessageUID : IRCDMessage
 	}
 };
 
-class ProtoInspIRCd : public Module
+class ProtoInspIRCd12 : public Module
 {
 	InspIRCd12Proto ircd_proto;
 	ExtensibleItem<bool> ssl;
@@ -1386,7 +1386,7 @@ class ProtoInspIRCd : public Module
 	IRCDMessageUID message_uid;
 
  public:
-	ProtoInspIRCd(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PROTOCOL | VENDOR),
+	ProtoInspIRCd12(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PROTOCOL | VENDOR),
 		ircd_proto(this), ssl(this, "ssl"),
 		message_away(this), message_error(this), message_invite(this), message_join(this), message_kick(this), message_kill(this),
 		message_motd(this), message_notice(this), message_part(this), message_ping(this), message_privmsg(this), message_quit(this),
@@ -1419,4 +1419,4 @@ class ProtoInspIRCd : public Module
 	}
 };
 
-MODULE_INIT(ProtoInspIRCd)
+MODULE_INIT(ProtoInspIRCd12)

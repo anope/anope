@@ -662,7 +662,7 @@ struct IRCDMessageFIdent : IRCDMessage
 	}
 };
 
-class ProtoInspIRCd : public Module
+class ProtoInspIRCd20 : public Module
 {
 	Module *m_insp12;
 
@@ -703,7 +703,7 @@ class ProtoInspIRCd : public Module
 	}
 
  public:
-	ProtoInspIRCd(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PROTOCOL | VENDOR),
+	ProtoInspIRCd20(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PROTOCOL | VENDOR),
 		ircd_proto(this),
 		message_away(this), message_error(this), message_invite(this), message_join(this), message_kick(this),
 		message_kill(this), message_motd(this), message_notice(this), message_part(this), message_ping(this),
@@ -739,7 +739,7 @@ class ProtoInspIRCd : public Module
 
 	}
 
-	~ProtoInspIRCd()
+	~ProtoInspIRCd20()
 	{
 		m_insp12 = ModuleManager::FindModule("inspircd12");
 		ModuleManager::UnloadModule(m_insp12, NULL);
@@ -827,4 +827,4 @@ class ProtoInspIRCd : public Module
 	}
 };
 
-MODULE_INIT(ProtoInspIRCd)
+MODULE_INIT(ProtoInspIRCd20)

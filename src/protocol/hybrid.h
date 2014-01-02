@@ -1,6 +1,6 @@
 /* Hybrid IRCD functions
  *
- * (C) 2003-2013 Anope Team
+ * (C) 2003-2014 Anope Team
  * (C) 2012-2013 by the Hybrid Development Team
  *
  * Please read COPYING and README for further details.

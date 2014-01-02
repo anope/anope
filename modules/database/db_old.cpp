@@ -13,6 +13,7 @@
 #include "modules/bs_kick.h"
 #include "modules/cs_mode.h"
 #include "modules/bs_badwords.h"
+#include "modules/os_news.h"
 
 #define READ(x) \
 if (true) \
@@ -83,6 +84,10 @@ else \
 #define OLD_BS_KICK_CAPS		0x04000000
 #define OLD_BS_KICK_FLOOD		0x02000000
 #define OLD_BS_KICK_REPEAT		0x01000000
+
+#define OLD_NEWS_LOGON	0
+#define OLD_NEWS_OPER	1
+#define OLD_NEWS_RANDOM	2
 
 static struct mlock_info
 {
@@ -1107,6 +1112,58 @@ static void LoadExceptions()
 	close_db(f);
 }
 
+static void LoadNews()
+{
+	if (!news_service)
+		return;
+
+	dbFILE *f = open_db_read("OperServ", "news.db", 9);
+
+	if (f == NULL)
+		return;
+
+	int16_t n;
+	READ(read_int16(&n, f));
+
+	for (int16_t i = 0; i < n; i++)
+	{
+		int16_t type;
+		NewsItem *ni = news_service->CreateNewsItem();
+
+		READ(read_int16(&type, f));
+
+		switch (type)
+		{
+			case OLD_NEWS_LOGON:
+				ni->type = NEWS_LOGON;
+				break;
+			case OLD_NEWS_OPER:
+				ni->type = NEWS_OPER;
+				break;
+			case OLD_NEWS_RANDOM:
+				ni->type = NEWS_RANDOM;
+				break;
+		}
+
+		int32_t unused;
+		READ(read_int32(&unused, f));
+
+		READ(read_string(ni->text, f));
+
+		char who[32];
+		READ(read_buffer(who, f));
+		ni->who = who;
+
+		int32_t tmp;
+		READ(read_int32(&tmp, f));
+		ni->time = tmp;
+
+		news_service->AddNewsItem(ni);
+	}
+
+	close_db(f);
+}
+
 class DBOld : public Module
 {
 	PrimitiveExtensibleItem<uint32_t> mlock_on, mlock_off;
@@ -1131,6 +1188,7 @@ class DBOld : public Module
 		LoadChannels();
 		LoadOper();
 		LoadExceptions();
+		LoadNews();
 
 		return EVENT_STOP;
 	}

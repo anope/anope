@@ -59,6 +59,40 @@ struct NewsMessages msgarray[] = {
 	 }
 };
 
+struct MyNewsItem : NewsItem
+{
+	void Serialize(Serialize::Data &data) const anope_override
+	{
+		data["type"] << this->type;
+		data["text"] << this->text;
+		data["who"] << this->who;
+		data["time"] << this->time;
+	}
+
+	static Serializable* Unserialize(Serializable *obj, Serialize::Data &data) anope_override
+	{
+		if (!news_service)
+			return NULL;
+
+		NewsItem *ni;
+		if (obj)
+			ni = anope_dynamic_static_cast<NewsItem *>(obj);
+		else
+			ni = new MyNewsItem();
+
+		unsigned int t;
+		data["type"] >> t;
+		ni->type = static_cast<NewsType>(t);
+		data["text"] >> ni->text;
+		data["who"] >> ni->who;
+		data["time"] >> ni->time;
+
+		if (!obj)
+			news_service->AddNewsItem(ni);
+		return ni;
+	}
+};
+
 class MyNewsService : public NewsService
 {
 	std::vector<NewsItem *> newsItems[3];
@@ -70,6 +104,11 @@ class MyNewsService : public NewsService
 		for (unsigned i = 0; i < 3; ++i)
 			for (unsigned j = 0; j < newsItems[i].size(); ++j)
 				delete newsItems[i][j];
+	}
+
+	NewsItem *CreateNewsItem() anope_override
+	{
+		return new MyNewsItem();
 	}
 
 	void AddNewsItem(NewsItem *n)
@@ -151,7 +190,7 @@ class NewsBase : public Command
 			if (Anope::ReadOnly)
 				source.Reply(READ_ONLY_MODE);
 
-			NewsItem *news = new NewsItem();
+			NewsItem *news = new MyNewsItem();
 			news->type = ntype;
 			news->text = text;
 			news->time = Anope::CurTime;
@@ -390,7 +429,7 @@ class OSNews : public Module
 
  public:
 	OSNews(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		newsservice(this), newsitem_type("NewsItem", NewsItem::Unserialize),
+		newsservice(this), newsitem_type("NewsItem", MyNewsItem::Unserialize),
 		commandoslogonnews(this), commandosopernews(this), commandosrandomnews(this)
 	{
 	}

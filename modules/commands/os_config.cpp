@@ -26,6 +26,12 @@ class CommandOSConfig : public Command
 
 		if (what.equals_ci("MODIFY") && params.size() > 3)
 		{
+			if (!source.HasPriv("operserv/config"))
+			{
+				source.Reply(ACCESS_DENIED);
+				return;
+			}
+
 			Configuration::Block *block = Config->GetBlock(params[1]);
 			if (!block)
 				block = Config->GetModule(params[1]);

@@ -92,7 +92,7 @@ class ModuleSQLAuthentication : public Module
 
 	EventReturn OnPreCommand(CommandSource &source, Command *command, std::vector<Anope::string> &params) anope_override
 	{
-		if (!this->disable_reason.empty() && command->name == "nickserv/register")
+		if (!this->disable_reason.empty() && (command->name == "nickserv/register" || command->name == "nickserv/group"))
 		{
 			source.Reply(this->disable_reason);
 			return EVENT_STOP;

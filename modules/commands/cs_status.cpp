@@ -27,7 +27,7 @@ public:
 		ChannelInfo *ci = ChannelInfo::Find(channel);
 		if (ci == NULL)
 			source.Reply(CHAN_X_NOT_REGISTERED, channel.c_str());
-		else if (!source.AccessFor(ci).HasPriv("ACCESS_CHANGE") && !source.HasPriv("chanserv/access/modify"))
+		else if (!source.AccessFor(ci).HasPriv("ACCESS_CHANGE") && !source.HasPriv("chanserv/auspex"))
 			source.Reply(ACCESS_DENIED);
 		else
 		{

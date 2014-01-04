@@ -69,7 +69,7 @@ class ModuleSQLAuthentication : public Module
 {
 	Anope::string engine;
 	Anope::string query;
-	Anope::string disable_reason;
+	Anope::string disable_reason, disable_email_reason;
 
 	ServiceReference<SQL::Provider> SQL;
 
@@ -86,6 +86,7 @@ class ModuleSQLAuthentication : public Module
 		this->engine = config->Get<const Anope::string>("engine");
 		this->query =  config->Get<const Anope::string>("query");
 		this->disable_reason = config->Get<const Anope::string>("disable_reason");
+		this->disable_email_reason = config->Get<Anope::string>("disable_email_reason");
 
 		this->SQL = ServiceReference<SQL::Provider>("SQL::Provider", this->engine);
 	}
@@ -95,6 +96,12 @@ class ModuleSQLAuthentication : public Module
 		if (!this->disable_reason.empty() && (command->name == "nickserv/register" || command->name == "nickserv/group"))
 		{
 			source.Reply(this->disable_reason);
+			return EVENT_STOP;
+		}
+
+		if (!this->disable_email_reason.empty() && command->name == "nickserv/set/email")
+		{
+			source.Reply(this->disable_email_reason);
 			return EVENT_STOP;
 		}
 

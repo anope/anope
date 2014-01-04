@@ -56,11 +56,13 @@ class NickServHeld : public Timer
 	}
 };
 
+class NickServRelease;
+static Anope::map<NickServRelease *> NickServReleases;
+
 /** Timer for releasing nicks to be available for use
  */
 class NickServRelease : public User, public Timer
 {
-	static std::map<Anope::string, NickServRelease *> NickServReleases;
 	Anope::string nick;
 
  public:
@@ -68,7 +70,7 @@ class NickServRelease : public User, public Timer
 		Config->GetModule("nickserv")->Get<const Anope::string>("enforcerhost"), "", "", Me, "Services Enforcer", Anope::CurTime, "", Servers::TS6_UID_Retrieve(), NULL), Timer(delay), nick(na->nick)
 	{
 		/* Erase the current release timer and use the new one */
-		std::map<Anope::string, NickServRelease *>::iterator nit = NickServReleases.find(this->nick);
+		Anope::map<NickServRelease *>::iterator nit = NickServReleases.find(this->nick);
 		if (nit != NickServReleases.end())
 		{
 			IRCD->SendQuit(nit->second, "");
@@ -82,15 +84,12 @@ class NickServRelease : public User, public Timer
 
 	~NickServRelease()
 	{
+		IRCD->SendQuit(this, "");
 		NickServReleases.erase(this->nick);
 	}
 
-	void Tick(time_t t)
-	{
-		IRCD->SendQuit(this, "");
-	}
+	void Tick(time_t t) anope_override { }
 };
-std::map<Anope::string, NickServRelease *> NickServRelease::NickServReleases;
 
 class NickServCore : public Module, public NickServService
 {

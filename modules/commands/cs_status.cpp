@@ -50,7 +50,7 @@ public:
 			if (ag.super_admin)
 				source.Reply(_("\002%s\002 is a super administrator."), nick.c_str());
 			else if (ag.founder)
-				source.Reply(_("\002%s\002 is the channel founder."), nick.c_str());
+				source.Reply(_("\002%s\002 is the founder of \002%s\002."), nick.c_str(), ci->name.c_str());
 			else  if (ag.empty())
 				source.Reply(_("\002%s\002 has no access on \002%s\002."), nick.c_str(), ci->name.c_str());
 			else
@@ -72,13 +72,13 @@ public:
 				if (autokick->nc)
 				{
 					if (na && *autokick->nc == na->nc)
-						source.Reply(_("\002%s\002 is on the auto kick list (%s)."), na->nc->display.c_str(), autokick->reason.c_str());
+						source.Reply(_("\002%s\002 is on the auto kick list of \002%s\002 (%s)."), na->nc->display.c_str(), ci->name.c_str(), autokick->reason.c_str());
 				}
 				else if (u != NULL)
 				{
 					Entry akick_mask("", autokick->mask);
 					if (akick_mask.Matches(u))
-						source.Reply(_("\002%s\002 matches auto kick entry %s (%s)."), u->nick.c_str(), autokick->mask.c_str(), autokick->reason.c_str());
+						source.Reply(_("\002%s\002 matches auto kick entry %s on \002%s\002 (%s)."), u->nick.c_str(), autokick->mask.c_str(), ci->name.c_str(), autokick->reason.c_str());
 				}
 			}
 		}

@@ -44,6 +44,10 @@ Note: You should also read the README and FAQ files!
     Next, unpack the package in your home directory, and go into the created
     directory.
 
+    If there are any extra modules you want to enable, such as m_mysql, run
+    the 'extras' script to enable them. If you do not know you can come back
+    later and enable them.
+
     Now type ./Config to start the configuration script. It will ask you a
     few questions, and figure out how to compile Anope on your system. If
     you are unsure about the answer to a question, use the default value.

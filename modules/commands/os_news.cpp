@@ -69,7 +69,7 @@ struct MyNewsItem : NewsItem
 		data["time"] << this->time;
 	}
 
-	static Serializable* Unserialize(Serializable *obj, Serialize::Data &data) anope_override
+	static Serializable* Unserialize(Serializable *obj, Serialize::Data &data)
 	{
 		if (!news_service)
 			return NULL;

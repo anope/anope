@@ -56,8 +56,8 @@ class IRC2SQL : public Module
 	void OnUserQuit(User *u, const Anope::string &msg) anope_override;
 	void OnUserNickChange(User *u, const Anope::string &oldnick) anope_override;
 	void OnFingerprint(User *u) anope_override;
-	void OnUserModeSet(User *u, const Anope::string &mname) anope_override;
-	void OnUserModeUnset(User *u, const Anope::string &mname) anope_override;
+	void OnUserModeSet(const MessageSource &setter, User *u, const Anope::string &mname) anope_override;
+	void OnUserModeUnset(const MessageSource &setter, User *u, const Anope::string &mname) anope_override;
 	void OnUserLogin(User *u) anope_override;
 	void OnNickLogout(User *u) anope_override;
 	void OnSetDisplayedHost(User *u) anope_override;

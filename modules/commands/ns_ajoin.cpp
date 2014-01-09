@@ -257,7 +257,7 @@ class NSAJoin : public Module
 
 	}
 
-	void OnNickIdentify(User *u) anope_override
+	void OnUserLogin(User *u) anope_override
 	{
 		BotInfo *NickServ = Config->GetClient("NickServ");
 		if (!NickServ)

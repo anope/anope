@@ -635,7 +635,7 @@ class CommandBSKickRepeat : public CommandBSKickBase
 
 		if (params[1].equals_ci("ON"))
 		{
-			const Anope::string &ttb = params[2],
+			const Anope::string &ttb = params.size() > 2 ? params[2] : "",
 						&times = params.size() > 3 ? params[3] : "";
 
 			if (!ttb.empty())

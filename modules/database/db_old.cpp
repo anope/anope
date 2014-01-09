@@ -441,7 +441,7 @@ static void LoadNicks()
 
 			char pwbuf[32];
 			READ(read_buffer(pwbuf, f));
-			if (hashm == "plain")
+			if (hashm == "none")
 				my_b64_encode(pwbuf, nc->pass);
 			else if (hashm == "md5" || hashm == "oldmd5")
 				nc->pass = Hex(pwbuf, 16);
@@ -1176,7 +1176,7 @@ class DBOld : public Module
 
 		hashm = Config->GetModule(this)->Get<const Anope::string>("hash");
 
-		if (hashm != "md5" && hashm != "oldmd5" && hashm != "sha1" && hashm != "plain" && hashm != "sha256")
+		if (hashm != "md5" && hashm != "oldmd5" && hashm != "sha1" && hashm != "none" && hashm != "sha256")
 			throw ModuleException("Invalid hash method");
 	}
 

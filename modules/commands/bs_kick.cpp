@@ -672,10 +672,10 @@ class CommandBSKickRepeat : public CommandBSKickBase
 			if (kd->ttb[TTB_REPEAT])
 				source.Reply(_("Bot will now kick for \002repeats\002 (users that say the\n"
 						"same thing %d times), and will place a ban after %d\n"
-						"kicks for the same user."), kd->repeattimes, kd->ttb[TTB_REPEAT]);
+						"kicks for the same user."), kd->repeattimes + 1, kd->ttb[TTB_REPEAT]);
 			else
 				source.Reply(_("Bot will now kick for \002repeats\002 (users that say the\n"
-					"same thing %d times)."), kd->repeattimes);
+					"same thing %d times)."), kd->repeattimes + 1);
 		}
 		else if (params[1].equals_ci("OFF"))
 		{

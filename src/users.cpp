@@ -463,6 +463,12 @@ void User::SetModeInternal(const MessageSource &source, UserMode *um, const Anop
 
 	this->modes[um->name] = param;
 
+	if (um->name == "OPER")
+		++OperCount;
+
+	if (um->name == "CLOAK" || um->name == "VHOST")
+		this->UpdateHost();
+
 	FOREACH_MOD(OnUserModeSet, (source, this, um->name));
 }
 
@@ -472,6 +478,15 @@ void User::RemoveModeInternal(const MessageSource &source, UserMode *um)
 		return;
 
 	this->modes.erase(um->name);
+
+	if (um->name == "OPER")
+		--OperCount;
+
+	if (um->name == "CLOAK" || um->name == "VHOST")
+	{
+		this->vhost.clear();
+		this->UpdateHost();
+	}
 
 	FOREACH_MOD(OnUserModeUnset, (source, this, um->name));
 }
@@ -592,20 +607,6 @@ void User::SetModesInternal(const MessageSource &source, const char *umodes, ...
 		}
 		else
 			this->RemoveModeInternal(source, um);
-
-		if (um->name == "OPER")
-		{
-			if (add)
-				++OperCount;
-			else
-				--OperCount;
-		}
-		else if (um->name == "CLOAK" || um->name == "VHOST")
-		{
-			if (!add && !this->vhost.empty())
-				this->vhost.clear();
-			this->UpdateHost();
-		}
 	}
 }
 

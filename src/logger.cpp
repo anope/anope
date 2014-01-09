@@ -116,7 +116,7 @@ Log::Log(BotInfo *b, const Anope::string &cat) : bi(b), u(NULL), nc(NULL), c(NUL
 {
 }
 
-Log::Log(Module *mod, const Anope::string &cat) : bi(NULL), u(NULL), nc(NULL), c(NULL), source(NULL), chan(NULL), ci(NULL), s(NULL), m(mod), type(LOG_MODULE), category(cat)
+Log::Log(Module *mod, const Anope::string &cat, BotInfo *_bi) : bi(_bi), u(NULL), nc(NULL), c(NULL), source(NULL), chan(NULL), ci(NULL), s(NULL), m(mod), type(LOG_MODULE), category(cat)
 {
 }
 

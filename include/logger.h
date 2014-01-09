@@ -92,7 +92,7 @@ class CoreExport Log
 
 	Log(BotInfo *b, const Anope::string &category = "");
 
-	Log(Module *m, const Anope::string &category = "");
+	Log(Module *m, const Anope::string &category = "", BotInfo *bi = NULL);
 
 	~Log();
 

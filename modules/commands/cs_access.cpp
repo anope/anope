@@ -819,8 +819,7 @@ class CommandCSLevels : public Command
 					" \n"
 					"\002LEVELS LIST\002 shows the current levels for each function or\n"
 					"group of functions. \002LEVELS RESET\002 resets the levels to the\n"
-					"default levels of a newly-created channel (see\n"
-					"\002HELP ACCESS LEVELS\002).\n"
+					"default levels of a newly-created channel.\n"
 					" \n"
 					"For a list of the features and functions whose levels can be\n"
 					"set, see \002HELP LEVELS DESC\002."), source.service->nick.c_str());

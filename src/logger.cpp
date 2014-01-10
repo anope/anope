@@ -75,7 +75,7 @@ const Anope::string &LogFile::GetName() const
 	return this->filename;
 }
 
-Log::Log(LogType t, const Anope::string &cat, BotInfo *b) : bi(b), u(NULL), nc(NULL), c(NULL), source(NULL), chan(NULL), ci(NULL), s(NULL), type(t), category(cat)
+Log::Log(LogType t, const Anope::string &cat, BotInfo *b) : bi(b), u(NULL), nc(NULL), c(NULL), source(NULL), chan(NULL), ci(NULL), s(NULL), m(NULL), type(t), category(cat)
 {
 }
 

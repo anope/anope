@@ -1,7 +1,7 @@
 /*
  *
  * Copyright (C) 2008-2011 Robin Burchell <w00t@inspircd.org>
- * Copyright (C) 2008-2013 Anope Team <team@anope.org>
+ * Copyright (C) 2008-2014 Anope Team <team@anope.org>
  *
  * Please read COPYING and README for further details.
  *
@@ -60,7 +60,11 @@ bool OperType::HasCommand(const Anope::string &cmdstr) const
 {
 	for (std::list<Anope::string>::const_iterator it = this->commands.begin(), it_end = this->commands.end(); it != it_end; ++it)
 	{
-		if (Anope::Match(cmdstr, *it))
+		const Anope::string &s = *it;
+
+		if (!s.find('~') && Anope::Match(cmdstr, s.substr(1)))
+			return false;
+		else if (Anope::Match(cmdstr, s))
 			return true;
 	}
 	for (std::set<OperType *>::const_iterator iit = this->inheritances.begin(), iit_end = this->inheritances.end(); iit != iit_end; ++iit)
@@ -78,7 +82,11 @@ bool OperType::HasPriv(const Anope::string &privstr) const
 {
 	for (std::list<Anope::string>::const_iterator it = this->privs.begin(), it_end = this->privs.end(); it != it_end; ++it)
 	{
-		if (Anope::Match(privstr, *it))
+		const Anope::string &s = *it;
+
+		if (!s.find('~') && Anope::Match(privstr, s.substr(1)))
+			return false;
+		else if (Anope::Match(privstr, s))
 			return true;
 	}
 	for (std::set<OperType *>::const_iterator iit = this->inheritances.begin(), iit_end = this->inheritances.end(); iit != iit_end; ++iit)

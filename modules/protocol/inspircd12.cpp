@@ -1,6 +1,6 @@
 /* inspircd 1.2 functions
  *
- * (C) 2003-2013 Anope Team
+ * (C) 2003-2014 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -604,7 +604,7 @@ struct IRCDMessageCapab : Message::Capab
 								ModeManager::AddChannelMode(new ChannelMode("DELAYEDJOIN", 'D'));
 								continue;
 							case 'G':
-								ModeManager::AddChannelMode(new ChannelMode("FILTER", 'G'));
+								ModeManager::AddChannelMode(new ChannelMode("CENSOR", 'G'));
 								continue;
 							case 'K':
 								ModeManager::AddChannelMode(new ChannelMode("NOKNOCK", 'K'));
@@ -687,7 +687,7 @@ struct IRCDMessageCapab : Message::Capab
 									ModeManager::AddUserMode(new UserMode("BOT", 'B'));
 									continue;
 								case 'G':
-									ModeManager::AddUserMode(new UserMode("FILTER", 'G'));
+									ModeManager::AddUserMode(new UserMode("CENSOR", 'G'));
 									continue;
 								case 'H':
 									ModeManager::AddUserMode(new UserModeOperOnly("HIDEOPER", 'H'));
@@ -1342,7 +1342,7 @@ struct IRCDMessageUID : IRCDMessage
 	}
 };
 
-class ProtoInspIRCd : public Module
+class ProtoInspIRCd12 : public Module
 {
 	InspIRCd12Proto ircd_proto;
 	ExtensibleItem<bool> ssl;
@@ -1386,7 +1386,7 @@ class ProtoInspIRCd : public Module
 	IRCDMessageUID message_uid;
 
  public:
-	ProtoInspIRCd(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PROTOCOL | VENDOR),
+	ProtoInspIRCd12(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PROTOCOL | VENDOR),
 		ircd_proto(this), ssl(this, "ssl"),
 		message_away(this), message_error(this), message_invite(this), message_join(this), message_kick(this), message_kill(this),
 		message_motd(this), message_notice(this), message_part(this), message_ping(this), message_privmsg(this), message_quit(this),
@@ -1419,4 +1419,4 @@ class ProtoInspIRCd : public Module
 	}
 };
 
-MODULE_INIT(ProtoInspIRCd)
+MODULE_INIT(ProtoInspIRCd12)

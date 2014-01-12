@@ -1,6 +1,6 @@
 /* NickServ core functions
  *
- * (C) 2003-2013 Anope Team
+ * (C) 2003-2014 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -32,18 +32,18 @@ class CommandNSStatus : public Command
 		{
 			User *u2 = User::Find(nickbuf, true);
 			if (!u2) /* Nick is not online */
-				source.Reply(_("STATUS %s %d %s"), nickbuf.c_str(), 0, "");
+				source.Reply("STATUS %s %d %s", nickbuf.c_str(), 0, "");
 			else if (u2->IsIdentified() && na && na->nc == u2->Account()) /* Nick is identified */
-				source.Reply(_("STATUS %s %d %s"), nickbuf.c_str(), 3, u2->Account()->display.c_str());
+				source.Reply("STATUS %s %d %s", nickbuf.c_str(), 3, u2->Account()->display.c_str());
 			else if (u2->IsRecognized()) /* Nick is recognised, but NOT identified */
-				source.Reply(_("STATUS %s %d %s"), nickbuf.c_str(), 2, u2->Account() ? u2->Account()->display.c_str() : "");
+				source.Reply("STATUS %s %d %s", nickbuf.c_str(), 2, u2->Account() ? u2->Account()->display.c_str() : "");
 			else if (!na) /* Nick is online, but NOT a registered */
-				source.Reply(_("STATUS %s %d %s"), nickbuf.c_str(), 0, "");
+				source.Reply("STATUS %s %d %s", nickbuf.c_str(), 0, "");
 			else
 				/* Nick is not identified for the nick, but they could be logged into an account,
 				 * so we tell the user about it
 				 */
-				source.Reply(_("STATUS %s %d %s"), nickbuf.c_str(), 1, u2->Account() ? u2->Account()->display.c_str() : "");
+				source.Reply("STATUS %s %d %s", nickbuf.c_str(), 1, u2->Account() ? u2->Account()->display.c_str() : "");
 		}
 		return;
 	}

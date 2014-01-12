@@ -1,6 +1,6 @@
 /*
  *
- * (C) 2003-2013 Anope Team
+ * (C) 2003-2014 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -92,7 +92,7 @@ class CoreExport Log
 
 	Log(BotInfo *b, const Anope::string &category = "");
 
-	Log(Module *m, const Anope::string &category = "");
+	Log(Module *m, const Anope::string &category = "", BotInfo *bi = NULL);
 
 	~Log();
 

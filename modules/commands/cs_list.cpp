@@ -1,6 +1,6 @@
 /* ChanServ core functions
  *
- * (C) 2003-2013 Anope Team
+ * (C) 2003-2014 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -81,11 +81,18 @@ class CommandCSList : public Command
 		{
 			const ChannelInfo *ci = it->second;
 
-			if (!is_servadmin && (ci->HasExt("CS_PRIVATE") || ci->HasExt("CS_SUSPENDED")))
+			if (!is_servadmin)
+			{
+				if (ci->HasExt("CS_PRIVATE") || ci->HasExt("CS_SUSPENDED"))
+					continue;
+				if (ci->c && ci->c->HasMode("SECRET"))
+					continue;
+			}
+
+			if (suspended && !ci->HasExt("CS_SUSPENDED"))
 				continue;
-			else if (suspended && !ci->HasExt("CS_SUSPENDED"))
-				continue;
-			else if (channoexpire && !ci->HasExt("CS_NO_EXPIRE"))
+
+			if (channoexpire && !ci->HasExt("CS_NO_EXPIRE"))
 				continue;
 
 			if (pattern.equals_ci(ci->name) || ci->name.equals_ci(spattern) || Anope::Match(ci->name, pattern, false, true) || Anope::Match(ci->name, spattern, false, true))

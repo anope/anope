@@ -1,6 +1,6 @@
 /* Logging routines.
  *
- * (C) 2003-2013 Anope Team
+ * (C) 2003-2014 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -75,7 +75,7 @@ const Anope::string &LogFile::GetName() const
 	return this->filename;
 }
 
-Log::Log(LogType t, const Anope::string &cat, BotInfo *b) : bi(b), u(NULL), nc(NULL), c(NULL), source(NULL), chan(NULL), ci(NULL), s(NULL), type(t), category(cat)
+Log::Log(LogType t, const Anope::string &cat, BotInfo *b) : bi(b), u(NULL), nc(NULL), c(NULL), source(NULL), chan(NULL), ci(NULL), s(NULL), m(NULL), type(t), category(cat)
 {
 }
 
@@ -116,7 +116,7 @@ Log::Log(BotInfo *b, const Anope::string &cat) : bi(b), u(NULL), nc(NULL), c(NUL
 {
 }
 
-Log::Log(Module *mod, const Anope::string &cat) : bi(NULL), u(NULL), nc(NULL), c(NULL), source(NULL), chan(NULL), ci(NULL), s(NULL), m(mod), type(LOG_MODULE), category(cat)
+Log::Log(Module *mod, const Anope::string &cat, BotInfo *_bi) : bi(_bi), u(NULL), nc(NULL), c(NULL), source(NULL), chan(NULL), ci(NULL), s(NULL), m(mod), type(LOG_MODULE), category(cat)
 {
 }
 

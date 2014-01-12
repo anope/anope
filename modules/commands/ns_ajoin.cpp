@@ -1,6 +1,6 @@
 /* NickServ core functions
  *
- * (C) 2003-2013 Anope Team
+ * (C) 2003-2014 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -257,7 +257,7 @@ class NSAJoin : public Module
 
 	}
 
-	void OnNickIdentify(User *u) anope_override
+	void OnUserLogin(User *u) anope_override
 	{
 		BotInfo *NickServ = Config->GetClient("NickServ");
 		if (!NickServ)

@@ -1,6 +1,6 @@
 /* Unreal IRCD 3.2.x functions
  *
- * (C) 2003-2013 Anope Team
+ * (C) 2003-2014 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -669,7 +669,7 @@ struct IRCDMessageCapab : Message::Capab
 							ModeManager::AddChannelMode(new ChannelMode("NONOTICE", 'T'));
 							continue;
 						case 'G':
-							ModeManager::AddChannelMode(new ChannelMode("FILTER", 'G'));
+							ModeManager::AddChannelMode(new ChannelMode("CENSOR", 'G'));
 							continue;
 						case 'Z':
 							ModeManager::AddChannelMode(new ChannelModeUnrealSSL("", 'Z'));
@@ -1193,7 +1193,7 @@ class ProtoUnreal : public Module
 		ModeManager::AddUserMode(new UserModeOperOnly("SERV_ADMIN", 'A'));
 		ModeManager::AddUserMode(new UserMode("BOT", 'B'));
 		ModeManager::AddUserMode(new UserModeOperOnly("CO_ADMIN", 'C'));
-		ModeManager::AddUserMode(new UserMode("FILTER", 'G'));
+		ModeManager::AddUserMode(new UserMode("CENSOR", 'G'));
 		ModeManager::AddUserMode(new UserModeOperOnly("HIDEOPER", 'H'));
 		ModeManager::AddUserMode(new UserMode("HIDEIDLE", 'I'));
 		ModeManager::AddUserMode(new UserModeOperOnly("NETADMIN", 'N'));

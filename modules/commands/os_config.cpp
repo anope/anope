@@ -1,6 +1,6 @@
 /* OperServ core functions
  *
- * (C) 2003-2013 Anope Team
+ * (C) 2003-2014 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -26,7 +26,16 @@ class CommandOSConfig : public Command
 
 		if (what.equals_ci("MODIFY") && params.size() > 3)
 		{
+			if (!source.HasPriv("operserv/config"))
+			{
+				source.Reply(ACCESS_DENIED);
+				return;
+			}
+
 			Configuration::Block *block = Config->GetBlock(params[1]);
+			if (!block)
+				block = Config->GetModule(params[1]);
+
 			if (!block)
 			{
 				source.Reply(_("There is no such configuration block %s."), params[1].c_str());
@@ -41,7 +50,7 @@ class CommandOSConfig : public Command
 		else if (what.equals_ci("VIEW"))
 		{
 			/* Blocks we should show */
-			const Anope::string show_blocks[] = { "botserv", "chanserv", "defcon", "global", "memoserv", "nickserv", "networkinfo", "operserv", "options", "" };
+			const Anope::string show_blocks[] = { "serverinfo", "networkinfo", "options", "" };
 
 			Log(LOG_ADMIN, source, this) << "VIEW";
 			
@@ -71,7 +80,39 @@ class CommandOSConfig : public Command
 
 				for (unsigned j = 0; j < replies.size(); ++j)
 					source.Reply(replies[j]);
+
+				source.Reply(" ");
 			}
+
+			ListFormatter lflist(source.GetAccount());
+			lflist.AddColumn(_("Module Name")).AddColumn(_("Name")).AddColumn(_("Value"));
+
+			for (int i = 0; i < Config->CountBlock("module"); ++i)
+			{
+				Configuration::Block *block = Config->GetBlock("module", i);
+				const Configuration::Block::item_map *items = block->GetItems();
+
+				if (!items || items->size() <= 1)
+					continue;
+
+				ListFormatter::ListEntry entry;
+				entry["Module Name"] = block->Get<Anope::string>("name");
+
+				for (Configuration::Block::item_map::const_iterator it = items->begin(), it_end = items->end(); it != it_end; ++it)
+				{
+					entry["Name"] = it->first;
+					entry["Value"] = it->second;
+					lflist.AddEntry(entry);
+				}
+			}
+
+			std::vector<Anope::string> replies;
+			lflist.Process(replies);
+
+			source.Reply(_("Module settings:"));
+
+			for (unsigned j = 0; j < replies.size(); ++j)
+				source.Reply(replies[j]);
 
 			source.Reply(_("End of configuration."));
 		}
@@ -86,7 +127,7 @@ class CommandOSConfig : public Command
 		source.Reply(_("Allows you to change and view configuration settings.\n"
 				"Settings changed by this command are temporary and will not be reflected\n"
 				"back into the configuration file, and will be lost if Anope is shut down,\n"
-				"restarted, or the RELOAD command is used.\n"
+				"restarted, or the configuration is reloaded.\n"
 				" \n"
 				"Example:\n"
 				"     \002MODIFY nickserv forcemail no\002"));

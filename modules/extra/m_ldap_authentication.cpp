@@ -103,6 +103,7 @@ class IdentifyInterface : public LDAPInterface
 					if (na == NULL)
 					{
 						na = new NickAlias(ii->req->GetAccount(), new NickCore(ii->req->GetAccount()));
+						na->last_realname = ii->user ? ii->user->realname : ii->req->GetAccount();
 						FOREACH_MOD(OnNickRegister, (ii->user, na));
 						BotInfo *NickServ = Config->GetClient("NickServ");
 						if (ii->user && NickServ)
@@ -243,12 +244,16 @@ class NSIdentifyLDAP : public Module
 
 	EventReturn OnPreCommand(CommandSource &source, Command *command, std::vector<Anope::string> &params) anope_override
 	{
-		if (!this->disable_register_reason.empty() && command->name == "nickserv/register")
+		if (!this->disable_register_reason.empty())
 		{
-			source.Reply(this->disable_register_reason);
-			return EVENT_STOP;
+			if (command->name == "nickserv/register" || command->name == "nickserv/group")
+			{
+				source.Reply(this->disable_register_reason);
+				return EVENT_STOP;
+			}
 		}
-		else if (!email_attribute.empty() && !this->disable_email_reason.empty() && command->name == "nickserv/set/email")
+
+		if (!email_attribute.empty() && !this->disable_email_reason.empty() && command->name == "nickserv/set/email")
 		{
 			source.Reply(this->disable_email_reason);
 			return EVENT_STOP;

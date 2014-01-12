@@ -1,7 +1,7 @@
 /*
  *
  * Copyright (C) 2008-2011 Robin Burchell <w00t@inspircd.org>
- * Copyright (C) 2008-2013 Anope Team <team@anope.org>
+ * Copyright (C) 2008-2014 Anope Team <team@anope.org>
  *
  * Please read COPYING and README for further details.
  *
@@ -244,7 +244,7 @@ void Command::Run(CommandSource &source, const Anope::string &message)
 	{
 		source.Reply(NICK_IDENTIFY_REQUIRED);
 		if (source.GetUser())
-			Log(LOG_NORMAL, "access_denied", source.service) << "Access denied for unregistered user " << source.GetUser()->GetMask() << " with command " << c->name;
+			Log(LOG_NORMAL, "access_denied_unreg", source.service) << "Access denied for unregistered user " << source.GetUser()->GetMask() << " with command " << it->first;
 		return;
 	}
 
@@ -276,7 +276,7 @@ void Command::Run(CommandSource &source, const Anope::string &message)
 	{
 		source.Reply(ACCESS_DENIED);
 		if (source.GetUser())
-			Log(LOG_NORMAL, "access_denied", source.service) << "Access denied for user " << source.GetUser()->GetMask() << " with command " << c->name;
+			Log(LOG_NORMAL, "access_denied", source.service) << "Access denied for user " << source.GetUser()->GetMask() << " with command " << it->first;
 		return;
 	}
 

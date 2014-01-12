@@ -1,6 +1,6 @@
 /* NickServ core functions
  *
- * (C) 2003-2013 Anope Team
+ * (C) 2003-2014 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -227,7 +227,7 @@ class CommandNSSetAutoOp : public Command
 	CommandNSSetAutoOp(Module *creator, const Anope::string &sname = "nickserv/set/autoop", size_t min = 1) : Command(creator, sname, min, min + 1)
 	{
 		this->SetDesc(_("Sets whether services should set channel status modes on you automatically."));
-		this->SetSyntax(_("{ON | OFF}"));
+		this->SetSyntax("{ON | OFF}");
 	}
 
 	void Run(CommandSource &source, const Anope::string &user, const Anope::string &param)
@@ -537,7 +537,7 @@ class CommandNSSetKeepModes : public Command
 	CommandNSSetKeepModes(Module *creator, const Anope::string &sname = "nickserv/set/keepmodes", size_t min = 1) : Command(creator, sname, min, min + 1)
 	{
 		this->SetDesc(_("Enable or disable keep modes"));
-		this->SetSyntax(_("{ON | OFF}"));
+		this->SetSyntax("{ON | OFF}");
 	}
 
 	void Run(CommandSource &source, const Anope::string &user, const Anope::string &param)
@@ -624,7 +624,7 @@ class CommandNSSetKill : public Command
 	CommandNSSetKill(Module *creator, const Anope::string &sname = "nickserv/set/kill", size_t min = 1) : Command(creator, sname, min, min + 1)
 	{
 		this->SetDesc(_("Turn protection on or off"));
-		this->SetSyntax(_("{ON | QUICK | IMMED | OFF}"));
+		this->SetSyntax("{ON | QUICK | IMMED | OFF}");
 	}
 
 	void Run(CommandSource &source, const Anope::string &user, const Anope::string &param)
@@ -871,7 +871,7 @@ class CommandNSSetMessage : public Command
 	CommandNSSetMessage(Module *creator, const Anope::string &sname = "nickserv/set/message", size_t min = 1) : Command(creator, sname, min, min + 1)
 	{
 		this->SetDesc(_("Change the communication method of Services"));
-		this->SetSyntax(_("{ON | OFF}"));
+		this->SetSyntax("{ON | OFF}");
 	}
 
 	void Run(CommandSource &source, const Anope::string &user, const Anope::string &param)
@@ -975,7 +975,7 @@ class CommandNSSetSecure : public Command
 	CommandNSSetSecure(Module *creator, const Anope::string &sname = "nickserv/set/secure", size_t min = 1) : Command(creator, sname, min, min + 1)
 	{
 		this->SetDesc(_("Turn nickname security on or off"));
-		this->SetSyntax(_("{ON | OFF}"));
+		this->SetSyntax("{ON | OFF}");
 	}
 
 	void Run(CommandSource &source, const Anope::string &user, const Anope::string &param)

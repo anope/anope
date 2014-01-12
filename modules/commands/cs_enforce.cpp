@@ -1,6 +1,6 @@
 /* ChanServ core functions
  *
- * (C) 2003-2013 Anope Team
+ * (C) 2003-2014 Anope Team
  * Contact us at team@anope.org
  *
  * Original Coder: GeniusDex <geniusdex@anope.org>

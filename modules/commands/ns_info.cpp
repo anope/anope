@@ -1,6 +1,6 @@
 /* NickServ core functions
  *
- * (C) 2003-2013 Anope Team
+ * (C) 2003-2014 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -135,7 +135,7 @@ class CommandNSSetHide : public Command
 	CommandNSSetHide(Module *creator, const Anope::string &sname = "nickserv/set/hide", size_t min = 2) : Command(creator, sname, min, min + 1)
 	{
 		this->SetDesc(_("Hide certain pieces of nickname information"));
-		this->SetSyntax(_("{EMAIL | STATUS | USERMASK | QUIT} {ON | OFF}"));
+		this->SetSyntax("{EMAIL | STATUS | USERMASK | QUIT} {ON | OFF}");
 	}
 
 	void Run(CommandSource &source, const Anope::string &user, const Anope::string &param, const Anope::string &arg)

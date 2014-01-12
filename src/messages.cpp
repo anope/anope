@@ -1,6 +1,6 @@
 /* Common message handlers
  *
- * (C) 2003-2013 Anope Team
+ * (C) 2003-2014 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -150,7 +150,14 @@ void Join::SJoin(MessageSource &source, const Anope::string &chan, time_t ts, co
 		/* the channel is synced when the netmerge is complete */
 		Server *src = source.GetServer() ? source.GetServer() : Me;
 		if (src && src->IsSynced())
+		{
 			c->Sync();
+
+			if (c->CheckDelete())
+				delete c;
+			else
+				c->CheckModes();
+		}
 	}
 }
 

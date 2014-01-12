@@ -1,6 +1,6 @@
 /* BotServ core functions
  *
- * (C) 2003-2013 Anope Team
+ * (C) 2003-2014 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -104,7 +104,7 @@ struct KickerDataImpl : KickerData
 			for (int i = 0; sep.GetToken(tok) && i < TTB_SIZE; ++i)
 				try
 				{
-					ttb[i] = convertTo<int16_t>(tok);
+					kd->ttb[i] = convertTo<int16_t>(tok);
 				}
 				catch (const ConvertException &) { }
 
@@ -635,7 +635,7 @@ class CommandBSKickRepeat : public CommandBSKickBase
 
 		if (params[1].equals_ci("ON"))
 		{
-			const Anope::string &ttb = params[2],
+			const Anope::string &ttb = params.size() > 2 ? params[2] : "",
 						&times = params.size() > 3 ? params[3] : "";
 
 			if (!ttb.empty())
@@ -672,10 +672,10 @@ class CommandBSKickRepeat : public CommandBSKickBase
 			if (kd->ttb[TTB_REPEAT])
 				source.Reply(_("Bot will now kick for \002repeats\002 (users that say the\n"
 						"same thing %d times), and will place a ban after %d\n"
-						"kicks for the same user."), kd->repeattimes, kd->ttb[TTB_REPEAT]);
+						"kicks for the same user."), kd->repeattimes + 1, kd->ttb[TTB_REPEAT]);
 			else
 				source.Reply(_("Bot will now kick for \002repeats\002 (users that say the\n"
-					"same thing %d times)."), kd->repeattimes);
+					"same thing %d times)."), kd->repeattimes + 1);
 		}
 		else if (params[1].equals_ci("OFF"))
 		{

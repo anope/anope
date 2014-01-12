@@ -1,6 +1,6 @@
 /* Routines to maintain a list of connected servers
  *
- * (C) 2003-2013 Anope Team
+ * (C) 2003-2014 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -368,11 +368,12 @@ const Anope::string Servers::TS6_UID_Retrieve()
 
 	static Anope::string current_uid = "AAAAAA";
 
-	while (User::Find(Me->GetSID() + current_uid) != NULL)
+	do
 	{
 		int current_len = current_uid.length() - 1;
 		while (current_len >= 0 && nextID(current_uid[current_len--]) == 'A');
 	}
+	while (User::Find(Me->GetSID() + current_uid) != NULL);
 
 	return Me->GetSID() + current_uid;
 }
@@ -386,11 +387,12 @@ const Anope::string Servers::TS6_SID_Retrieve()
 	if (current_sid.empty())
 		current_sid = "00A";
 
-	while (Server::Find(current_sid) != NULL)
+	do
 	{
 		int current_len = current_sid.length() - 1;
 		while (current_len >= 0 && nextID(current_sid[current_len--]) == 'A');
 	}
+	while (Server::Find(current_sid) != NULL);
 
 	return current_sid;
 }

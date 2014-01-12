@@ -1,6 +1,6 @@
 /* OperServ core functions
  *
- * (C) 2003-2013 Anope Team
+ * (C) 2003-2014 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -174,7 +174,7 @@ class CommandOSForbid : public Command
 				source.Reply(READ_ONLY_MODE);
 
 			Log(LOG_ADMIN, source, this) << "to add a forbid on " << entry << " of type " << subcommand;
-			source.Reply(_("Added a forbid on %s of type %s to expire on %s."), entry.c_str(), type.c_str(), d->expires ? Anope::strftime(d->expires, source.GetAccount()).c_str() : "never");
+			source.Reply(_("Added a forbid on %s of type %s to expire on %s."), entry.c_str(), subcommand.lower().c_str(), d->expires ? Anope::strftime(d->expires, source.GetAccount()).c_str() : "never");
 
 			/* apply forbid */
 			switch (ftype)

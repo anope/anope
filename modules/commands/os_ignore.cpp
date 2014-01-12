@@ -1,6 +1,6 @@
 /* OperServ core functions
  *
- * (C) 2003-2013 Anope Team
+ * (C) 2003-2014 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -103,7 +103,7 @@ class OSIgnoreService : public IgnoreService
 		{
 			IgnoreData &id = *ign;
 
-			if (id.time && id.time <= Anope::CurTime)
+			if (id.time && !Anope::NoExpire && id.time <= Anope::CurTime)
 			{
 				Log(LOG_NORMAL, "expire/ignore", Config->GetClient("OperServ")) << "Expiring ignore entry " << id.mask;
 				this->ignores.erase(ign);
@@ -210,7 +210,7 @@ class CommandOSIgnore : public Command
 			next_it = it;
 			++next_it;
 
-			if (id.time && id.time <= Anope::CurTime)
+			if (id.time && !Anope::NoExpire && id.time <= Anope::CurTime)
 			{
 				Log(LOG_NORMAL, "expire/ignore", Config->GetClient("OperServ")) << "Expiring ignore entry " << id.mask;
 				ignores.erase(it);

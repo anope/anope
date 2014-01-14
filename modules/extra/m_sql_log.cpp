@@ -16,7 +16,7 @@ class SQLLog : public Module
 	Anope::string table;
 
  public:
-	SQLLog(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
+	SQLLog(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR | EXTRA)
 	{
 	}
 

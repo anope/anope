@@ -87,7 +87,7 @@ class ModuleDNSBL : public Module
 	bool add_to_akill;
 
  public:
-	ModuleDNSBL(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
+	ModuleDNSBL(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR | EXTRA)
 	{
 
 	}

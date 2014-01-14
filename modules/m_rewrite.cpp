@@ -153,7 +153,7 @@ class ModuleRewrite : public Module
 	RewriteCommand cmdrewrite;
 
  public:
-	ModuleRewrite(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR), cmdrewrite(this)
+	ModuleRewrite(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR | EXTRA), cmdrewrite(this)
 	{
 	}
 

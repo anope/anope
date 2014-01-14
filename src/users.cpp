@@ -303,9 +303,9 @@ void User::Identify(NickAlias *na)
 		na->last_seen = Anope::CurTime;
 	}
 
-	this->Login(na->nc);
-
 	IRCD->SendLogin(this);
+
+	this->Login(na->nc);
 
 	FOREACH_MOD(OnNickIdentify, (this));
 

@@ -26,6 +26,7 @@ bool WebCPanel::ChanServ::Modes::OnRequest(HTTPProvider *server, const Anope::st
 		return true;
 	}
 
+	replacements["ESCAPED_CHANNEL"] = HTTPUtils::URLEncode(chname);
 	ChannelInfo *ci = ChannelInfo::Find(chname);
 
 	if (!ci)
@@ -56,14 +57,22 @@ bool WebCPanel::ChanServ::Modes::OnRequest(HTTPProvider *server, const Anope::st
 	replacements["MODE"] = "YES";
 
 	/* build a list with the names of all listmodes */
-	for (std::vector<ChannelMode *>::const_iterator it = ModeManager::GetChannelModes().begin(); it != ModeManager::GetChannelModes().end(); ++it)
+	for (unsigned i = 0; i < ModeManager::GetChannelModes().size(); ++i)
 	{
-		/* "NAMEBASE" is a special mode from InspIRCds m_namedmodes, we dont want this here*/
-		if ((*it) && (*it)->type == MODE_LIST && (*it)->name != "NAMEBASE")
-			replacements["LISTMODES"] = (*it)->mchar;
+		ChannelMode *cm = ModeManager::GetChannelModes()[i];
+
+		if (cm && cm->type == MODE_LIST)
+			replacements["LISTMODES"] = cm->mchar;
 	}
 
-	ChannelMode *cm = ModeManager::FindChannelModeByName(mode);
+	if (mode.empty())
+	{
+		Page.Serve(server, page_name, client, message, reply, replacements);
+		return true;
+	}
+	replacements["ESCAPED_MODE"] = HTTPUtils::URLEncode(mode);
+
+	ChannelMode *cm = ModeManager::FindChannelModeByChar(mode[0]);
 	if (cm)
 	{
 		if (message.get_data["del"].empty() == false && message.get_data["mask"].empty() == false)
@@ -85,15 +94,10 @@ bool WebCPanel::ChanServ::Modes::OnRequest(HTTPProvider *server, const Anope::st
 			WebPanel::RunCommand(na->nc->display, na->nc, "ChanServ", "chanserv/mode", params, replacements);
 		}
 
-		for (Channel::ModeList::const_iterator it = c->GetModes().begin(); it != c->GetModes().end(); ++it)
-		{
-			if (it->first == mode)
-				replacements["MASKS"] = HTTPUtils::Escape(it->second);
-		}
+		std::pair<Channel::ModeList::iterator, Channel::ModeList::iterator> ml = c->GetModeList(cm->name);
+		for (; ml.first != ml.second; ++ml.first)
+			replacements["MASKS"] = HTTPUtils::Escape(ml.first->second);
 	}
-
-	replacements["ESCAPED_CHANNEL"] = HTTPUtils::URLEncode(chname);
-	replacements["ESCAPED_MODE"] = HTTPUtils::URLEncode(mode);
 
 	Page.Serve(server, page_name, client, message, reply, replacements);
 	return true;

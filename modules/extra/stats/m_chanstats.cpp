@@ -589,7 +589,12 @@ class MChanstats : public Module
 		size_t smileys_other = CountSmileys(msg, SmileysOther);
 
 		// do not count smileys as words
-		words = words - smileys_happy - smileys_sad - smileys_other;
+		size_t smileys = smileys_happy + smileys_sad + smileys_other;
+		if (smileys > words)
+			words = 0;
+		else
+			words = words - smileys;
+
 		query = "CALL " + prefix + "chanstats_proc_update(@channel@, @nick@, 1, @letters@, @words@, @action@, "
 		"@smileys_happy@, @smileys_sad@, @smileys_other@, '0', '0', '0', '0');";
 		query.SetValue("channel", c->name);

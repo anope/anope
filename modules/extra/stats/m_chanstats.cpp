@@ -168,6 +168,7 @@ class MChanstats : public Module
 	SQL::Query query;
 	Anope::string SmileysHappy, SmileysSad, SmileysOther, prefix;
 	std::vector<Anope::string> TableList, ProcedureList, EventList;
+	bool NSDefChanstats, CSDefChanstats;
 
 	void RunQuery(const SQL::Query &q)
 	{
@@ -490,7 +491,8 @@ class MChanstats : public Module
 		SmileysHappy = block->Get<const Anope::string>("SmileysHappy");
 		SmileysSad = block->Get<const Anope::string>("SmileysSad");
 		SmileysOther = block->Get<const Anope::string>("SmileysOther");
-
+		NSDefChanstats = block->Get<bool>("NSDefChanstats", "no");
+		CSDefChanstats = block->Get<bool>("CSDefChanstats", "no");
 		Anope::string engine = block->Get<const Anope::string>("engine");
 		this->sql = ServiceReference<SQL::Provider>("SQL::Provider", engine);
 		if (sql)
@@ -628,6 +630,18 @@ class MChanstats : public Module
 		query = "DELETE FROM `" + prefix + "chanstats` WHERE `chan` = @channel@;";
 		query.SetValue("channel", ci->name);
 		this->RunQuery(query);
+	}
+
+	void OnChanRegistered(ChannelInfo *ci)
+	{
+		if (CSDefChanstats)
+			ci->Extend<bool>("CS_STATS");
+	}
+
+	void OnNickRegister(User *user, NickAlias *na)
+	{
+		if (NSDefChanstats)
+			na->nc->Extend<bool>("NS_STATS");
 	}
 };
 

@@ -351,7 +351,7 @@ class ProtoCharybdis : public Module
 
 	/* Ratbox Message Handlers */
 	ServiceAlias message_bmask, message_join, message_nick, message_pong, message_sid, message_sjoin,
-		message_tb, message_tmode;
+		message_tb, message_tmode, message_uid;
 
 	/* Our message handlers */
 	IRCDMessageEncap message_encap;
@@ -401,6 +401,7 @@ class ProtoCharybdis : public Module
 		message_sjoin("IRCDMessage", "charybdis/sjoin", "ratbox/sjoin"),
 		message_tb("IRCDMessage", "charybdis/tb", "ratbox/tb"),
 		message_tmode("IRCDMessage", "charybdis/tmode", "ratbox/tmode"),
+		message_uid("IRCDMessage", "charybdis/uid", "ratbox/uid"),
 
 		message_encap(this), message_euid(this), message_pass(this), message_server(this)
 

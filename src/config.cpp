@@ -97,7 +97,7 @@ template<> time_t Block::Get(const Anope::string &tag, const Anope::string &def)
 template<> bool Block::Get(const Anope::string &tag, const Anope::string &def) const
 {
 	const Anope::string &str = Get<const Anope::string>(tag, def);
-	return str.equals_ci("yes") || str.equals_ci("on") || str.equals_ci("true");
+	return !str.empty() && !str.equals_ci("no") && !str.equals_ci("off") && !str.equals_ci("false") && !str.equals_ci("0");
 }
 
 static void ValidateNotEmpty(const Anope::string &block, const Anope::string &name, const Anope::string &value)

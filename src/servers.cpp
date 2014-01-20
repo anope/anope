@@ -38,7 +38,7 @@ Server::Server(Server *up, const Anope::string &sname, unsigned shops, const Ano
 	if (!ssid.empty())
 		Servers::ByID[ssid] = this;
 
-	Log(this, "connect") << "uplinked to " << (this->uplink ? this->uplink->GetName() : "no uplink") << " connected to the network";
+	Log(this, "connect") << "has connected to the network (uplinked to " << (this->uplink ? this->uplink->GetName() : "no uplink") << ")";
 
 	/* Add this server to our uplinks leaf list */
 	if (this->uplink)

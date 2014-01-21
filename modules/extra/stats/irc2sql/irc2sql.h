@@ -26,7 +26,7 @@ class IRC2SQL : public Module
 	SQL::Query query;
 	std::vector<Anope::string> TableList, ProcedureList, EventList;
 	Anope::string prefix, GeoIPDB;
-	bool quitting, introduced_myself, UseGeoIP, ctcpuser, ctcpeob, firstrun;
+	bool quitting, introduced_myself, ctcpuser, ctcpeob, firstrun;
 	BotInfo *StatServ;
 	PrimitiveExtensibleItem<bool> versionreply;
 

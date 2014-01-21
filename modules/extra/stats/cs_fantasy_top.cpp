@@ -100,9 +100,7 @@ class CSTop : public Module
 
 	void OnReload(Configuration::Conf *conf) anope_override
 	{
-		prefix = conf->GetModule("m_chanstats")->Get<const Anope::string>("prefix");
-		if (prefix.empty())
-			prefix = "anope_";
+		prefix = conf->GetModule("m_chanstats")->Get<const Anope::string>("prefix", "anope_");
 		this->sql = ServiceReference<SQL::Provider>("SQL::Provider", conf->GetModule("m_chanstats")->Get<const Anope::string>("engine"));
 	}
 

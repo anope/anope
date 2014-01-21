@@ -17,7 +17,7 @@ void IRC2SQL::CheckTables()
 
 	this->GetTables();
 
-	if (UseGeoIP && GeoIPDB.equals_ci("country") && !this->HasTable(prefix + "geoip_country"))
+	if (GeoIPDB.equals_ci("country") && !this->HasTable(prefix + "geoip_country"))
 	{
 		query = "CREATE TABLE `" + prefix + "geoip_country` ("
 			"`start` INT UNSIGNED NOT NULL,"
@@ -29,7 +29,7 @@ void IRC2SQL::CheckTables()
 			") ENGINE=MyISAM DEFAULT CHARSET=utf8;";
 		this->RunQuery(query);
 	}
-	if (UseGeoIP && GeoIPDB.equals_ci("city") && !this->HasTable(prefix + "geoip_city_blocks"))
+	if (GeoIPDB.equals_ci("city") && !this->HasTable(prefix + "geoip_city_blocks"))
 	{
 		query = "CREATE TABLE `" + prefix + "geoip_city_blocks` ("
 			"`start` INT UNSIGNED NOT NULL,"
@@ -41,7 +41,7 @@ void IRC2SQL::CheckTables()
 		this->RunQuery(query);
 
 	}
-	if (UseGeoIP && GeoIPDB.equals_ci("city") && !this->HasTable(prefix + "geoip_city_location"))
+	if (GeoIPDB.equals_ci("city") && !this->HasTable(prefix + "geoip_city_location"))
 	{
 		query = "CREATE TABLE `" + prefix + "geoip_city_location` ("
 			"`locId` INT UNSIGNED NOT NULL,"
@@ -55,7 +55,7 @@ void IRC2SQL::CheckTables()
 			") ENGINE=MyISAM DEFAULT CHARSET=utf8;";
 		this->RunQuery(query);
 	}
-	if (UseGeoIP && GeoIPDB.equals_ci("city") && !this->HasTable(prefix + "geoip_city_region"))
+	if (GeoIPDB.equals_ci("city") && !this->HasTable(prefix + "geoip_city_region"))
 	{	query = "CREATE TABLE `" + prefix + "geoip_city_region` ("
 			"`country` CHAR(2) NOT NULL,"
 			"`region` CHAR(2) NOT NULL,"
@@ -157,10 +157,8 @@ void IRC2SQL::CheckTables()
 	if (this->HasProcedure(prefix + "UserConnect"))
 		this->RunQuery(SQL::Query("DROP PROCEDURE " + prefix + "UserConnect"));
 
-	if (UseGeoIP)
-	{
-		if (GeoIPDB.equals_ci("country"))
-			geoquery = "UPDATE `" + prefix + "user` AS u "
+	if (GeoIPDB.equals_ci("country"))
+		geoquery = "UPDATE `" + prefix + "user` AS u "
 					"JOIN ( SELECT `countrycode`, `countryname` "
 						"FROM `" + prefix + "geoip_country` "
 						"WHERE INET_ATON(ip_) <= `end` "
@@ -168,8 +166,8 @@ void IRC2SQL::CheckTables()
 						"ORDER BY `end` ASC LIMIT 1 ) as c "
 					"SET u.geocode = c.countrycode, u.geocountry = c.countryname "
 					"WHERE u.nick = nick_; ";
-		else if (GeoIPDB.equals_ci("city"))
-			geoquery = "UPDATE `" + prefix + "user` as u "
+	else if (GeoIPDB.equals_ci("city"))
+		geoquery = "UPDATE `" + prefix + "user` as u "
 					"JOIN ( SELECT * FROM `" + prefix + "geoip_city_location` "
 						"WHERE `locID` = ( SELECT `locID` "
 								"FROM `" + prefix + "geoip_city_blocks` "
@@ -185,7 +183,7 @@ void IRC2SQL::CheckTables()
 								"WHERE `country` = l.country "
 								"AND `region` = l.region )"
 					"WHERE u.nick = nick_;";
-	}
+
 	query = "CREATE PROCEDURE `" + prefix + "UserConnect`"
 		"(nick_ varchar(255), host_ varchar(255), vhost_ varchar(255), "
 		"chost_ varchar(255), realname_ varchar(255), ip_ varchar(255), "

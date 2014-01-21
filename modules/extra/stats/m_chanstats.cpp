@@ -491,8 +491,8 @@ class MChanstats : public Module
 		SmileysHappy = block->Get<const Anope::string>("SmileysHappy");
 		SmileysSad = block->Get<const Anope::string>("SmileysSad");
 		SmileysOther = block->Get<const Anope::string>("SmileysOther");
-		NSDefChanstats = block->Get<bool>("NSDefChanstats", "no");
-		CSDefChanstats = block->Get<bool>("CSDefChanstats", "no");
+		NSDefChanstats = block->Get<bool>("ns_def_chanstats");
+		CSDefChanstats = block->Get<bool>("cs_def_chanstats");
 		Anope::string engine = block->Get<const Anope::string>("engine");
 		this->sql = ServiceReference<SQL::Provider>("SQL::Provider", engine);
 		if (sql)

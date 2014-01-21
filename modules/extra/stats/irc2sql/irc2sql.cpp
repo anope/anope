@@ -12,8 +12,7 @@ void IRC2SQL::OnReload(Configuration::Conf *conf)
 {
 	Configuration::Block *block = Config->GetModule(this);
 	prefix = block->Get<const Anope::string>("prefix", "anope_");
-	UseGeoIP = block->Get<bool>("GeoIPLookup", "no");
-	GeoIPDB = block->Get<const Anope::string>("GeoIPDatabase", "country");
+	GeoIPDB = block->Get<const Anope::string>("geoip_database");
 	ctcpuser = block->Get<bool>("ctcpuser", "no");
 	ctcpeob = block->Get<bool>("ctcpeob", "yes");
 	Anope::string engine = block->Get<const Anope::string>("engine");

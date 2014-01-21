@@ -211,9 +211,9 @@ class HybridProto : public IRCDProto
 		UplinkSocket::Message(source) << "SVSMODE " << u->GetUID() << " " << u->timestamp << " " << buf;
 	}
 
-	void SendLogin(User *u) anope_override
+	void SendLogin(User *u, NickAlias *na) anope_override
 	{
-		IRCD->SendMode(Config->GetClient("NickServ"), u, "+d %s", u->Account()->display.c_str());
+		IRCD->SendMode(Config->GetClient("NickServ"), u, "+d %s", na->nc->display.c_str());
 	}
 
 	void SendLogout(User *u) anope_override

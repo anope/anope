@@ -406,7 +406,7 @@ class NickServCore : public Module, public NickServService
 		else
 		{
 			/* Reset +r and re-send account (even though it really should be set at this point) */
-			IRCD->SendLogin(u);
+			IRCD->SendLogin(u, na);
 			if (!Config->GetModule("nickserv")->Get<bool>("nonicknameownership") && na->nc == u->Account() && !na->nc->HasExt("UNCONFIRMED"))
 				u->SetMode(NickServ, "REGISTERED");
 			Log(NickServ) << u->GetMask() << " automatically identified for group " << u->Account()->display;

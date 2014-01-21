@@ -60,6 +60,8 @@ class CharybdisProto : public IRCDProto
 	void SendChannel(Channel *c) anope_override { ratbox->SendChannel(c); }
 	void SendTopic(const MessageSource &source, Channel *c) anope_override { ratbox->SendTopic(source, c); }
 	bool IsIdentValid(const Anope::string &ident) anope_override { return ratbox->IsIdentValid(ident); }
+	void SendLogin(User *u, NickAlias *na) anope_override { ratbox->SendLogin(u, na); }
+	void SendLogout(User *u) anope_override { ratbox->SendLogout(u); }
 
 	void SendSQLine(User *, const XLine *x) anope_override
 	{
@@ -111,19 +113,6 @@ class CharybdisProto : public IRCDProto
 	{
 		Anope::string modes = "+" + u->GetModes();
 		UplinkSocket::Message(Me) << "EUID " << u->nick << " 1 " << u->timestamp << " " << modes << " " << u->GetIdent() << " " << u->host << " 0 " << u->GetUID() << " * * :" << u->realname;
-	}
-
-	void SendLogin(User *u) anope_override
-	{
-		if (!u->Account())
-			return;
-
-		UplinkSocket::Message(Me) << "ENCAP * SU " << u->GetUID() << " " << u->Account()->display;
-	}
-
-	void SendLogout(User *u) anope_override
-	{
-		UplinkSocket::Message(Me) << "ENCAP * SU " << u->GetUID();
 	}
 
 	void SendForceNickChange(User *u, const Anope::string &newnick, time_t when) anope_override

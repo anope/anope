@@ -54,10 +54,13 @@ class CommandNSConfirm : public Command
 
 				if (source.GetUser())
 				{
-					IRCD->SendLogin(source.GetUser());
-					const NickAlias *na = NickAlias::Find(source.GetNick());
-					if (!Config->GetModule("nickserv")->Get<bool>("nonicknameownership") && na != NULL && na->nc == source.GetAccount() && !na->nc->HasExt("UNCONFIRMED"))
-						source.GetUser()->SetMode(source.service, "REGISTERED");
+					NickAlias *na = NickAlias::Find(source.GetNick());
+					if (na)
+					{
+						IRCD->SendLogin(source.GetUser(), na);
+						if (!Config->GetModule("nickserv")->Get<bool>("nonicknameownership") && na->nc == source.GetAccount() && !na->nc->HasExt("UNCONFIRMED"))
+							source.GetUser()->SetMode(source.service, "REGISTERED");
+					}
 				}
 			}
 			else

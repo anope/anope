@@ -282,7 +282,7 @@ class BahamutIRCdProto : public IRCDProto
 		UplinkSocket::Message() << "SJOIN " << c->creation_time << " " << c->name << " " << modes << " :";
 	}
 
-	void SendLogin(User *u) anope_override
+	void SendLogin(User *u, NickAlias *) anope_override
 	{
 		IRCD->SendMode(Config->GetClient("NickServ"), u, "+d %d", u->signon);
 	}

@@ -112,9 +112,9 @@ class ngIRCdProto : public IRCDProto
 			UplinkSocket::Message(source) << "KICK " << chan->name << " " << user->nick;
 	}
 
-	void SendLogin(User *u) anope_override
+	void SendLogin(User *u, NickAlias *na) anope_override
 	{
-		UplinkSocket::Message(Me) << "METADATA " << u->GetUID() << " accountname :" << u->Account()->display;
+		UplinkSocket::Message(Me) << "METADATA " << u->GetUID() << " accountname :" << na->nc->display;
 	}
 
 	void SendLogout(User *u) anope_override

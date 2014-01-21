@@ -204,7 +204,7 @@ class CoreExport IRCDProto : public Service
 
 	virtual void SendNumeric(int numeric, const Anope::string &dest, const char *fmt, ...);
 
-	virtual void SendLogin(User *u) = 0;
+	virtual void SendLogin(User *u, NickAlias *na) = 0;
 	virtual void SendLogout(User *u) = 0;
 
 	/** Send a channel creation message to the uplink.

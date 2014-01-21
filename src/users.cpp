@@ -303,7 +303,7 @@ void User::Identify(NickAlias *na)
 		na->last_seen = Anope::CurTime;
 	}
 
-	IRCD->SendLogin(this);
+	IRCD->SendLogin(this, na);
 
 	this->Login(na->nc);
 

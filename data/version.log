@@ -1,4 +1,75 @@
-Revision d9a1c1f - Fri, 20 Dec 2013 22:56:38 -0500 - Update version.log
+Revision 1cc85f4 - Tue, 21 Jan 2014 21:18:21 -0500 - Update version.log
+Revision 68b87b4 - Tue, 21 Jan 2014 21:18:19 -0500 - Update language files
+Revision 81b01bb - Tue, 21 Jan 2014 21:10:06 -0500 - Fix missing colon in stats and top, fix smileys and actions count. Patch by bush.
+Revision 1027ec6 - Tue, 21 Jan 2014 17:33:57 -0500 - Made the chanstats confs try and look similar to every other configuration file
+Revision 4d9273e - Tue, 21 Jan 2014 17:20:15 -0500 - Unbreak account stuff from commit ccae59430ab50393f43ccc38a6a6c0c24191b601.
+Revision 67c13b4 - Tue, 21 Jan 2014 00:29:59 +0100 - Update and fix some more typos in the dutch language file.
+Revision 10386a3 - Tue, 21 Jan 2014 00:28:40 +0100 - Make the server connected (uplink) message more sane.
+Revision dc19ea3 - Mon, 20 Jan 2014 02:19:06 -0500 - Alias charybdis/uid -> ratbox/uid because grawity is weird
+Revision 2261fa3 - Mon, 20 Jan 2014 00:05:53 -0500 - Fix example config for bs_autoassign
+Revision fab9f0f - Sun, 19 Jan 2014 19:03:19 -0500 - Change config readers bool logic to accept unrecognized values as yes
+Revision df8d85d - Sun, 19 Jan 2014 08:11:19 +0100 - m_chanstats: fixed the config options NSDefChanstats and CSDefChanstats
+Revision 4b192ad - Fri, 17 Jan 2014 06:49:49 +0100 - m_chanstats: do not count negative words if you have more smileys in a line than words
+Revision d27594f - Wed, 15 Jan 2014 16:59:32 -0500 - Fix webcpanels chanserv/modes page
+Revision 43aaaea - Tue, 14 Jan 2014 03:50:08 -0500 - Mark m_sql_log, m_rewrite, and m_dnsbl as extra so they show up in modlist with no parameters, as they are "unusual"
+Revision ccae594 - Tue, 14 Jan 2014 03:49:22 -0500 - Call User::Login after sending the login event, in case a module wants to act on the fact that the ircd sees  the user as logged in
+Revision 974adb7 - Sun, 12 Jan 2014 17:44:14 -0500 - Update French language file
+Revision f3531e7 - Fri, 10 Jan 2014 01:41:03 -0500 - Fix not initializing module in the main log constructor
+Revision 15a27c6 - Thu, 9 Jan 2014 17:01:18 -0500 - Move oper count and vhost stuff to set/remove mode internal
+Revision 0b0db75 - Thu, 9 Jan 2014 16:45:07 -0500 - Fix repeat kicker message to show the correct number of times a user can say the same thing before being kicked
+Revision b90a9a3 - Thu, 9 Jan 2014 16:09:38 -0500 - Fix empty ttb in bs kick repeat on
+Revision 64f9aed - Thu, 9 Jan 2014 15:46:04 -0500 - Hook to OnUserLogin instead of OnNickIdentify in ns_ajoin
+Revision 56f2cbe - Thu, 9 Jan 2014 15:44:58 -0500 - Remove help access levels from help output because it no longer exists
+Revision 9a9ca41 - Thu, 9 Jan 2014 15:42:31 -0500 - Rename db_old hash plain -> none which is what 1.8 calls it
+Revision e19661e - Thu, 9 Jan 2014 15:41:49 -0500 - Make DNSBL log message use the module type and give it a category too
+Revision 09879c5 - Mon, 6 Jan 2014 13:59:14 -0500 - Fix compile with -std=c++11
+Revision 12f55e4 - Mon, 6 Jan 2014 12:54:29 -0500 - Hide +s channels from /cs list output to non opers
+Revision 43c5654 - Mon, 6 Jan 2014 00:19:19 -0500 - Add a small note about the extras script in docs/INSTALL
+Revision d307885 - Sun, 5 Jan 2014 15:39:09 -0800 - Merge pull request #39 from DanielOaks/cs-status-channelname
+Revision d4f7db1 - Mon, 6 Jan 2014 09:37:08 +1000 - Add the channel name to reply of cs-status, useful for applications
+Revision 201ad9c - Sat, 4 Jan 2014 17:54:04 -0500 - Always run uid/sid generation loop at least once to not reuse older ids immediately
+Revision 45c0bf8 - Sat, 4 Jan 2014 17:45:58 -0500 - Fix recovering enforcers not properly quitting them
+Revision d64855b - Sat, 4 Jan 2014 13:44:47 -0500 - Allow m_sql_authentication to disable email changing similar to m_ldap_authentication
+Revision 4617fdb - Sat, 4 Jan 2014 13:41:08 -0500 - Make /cs status use the chanserv/auspex privilege instead of chanserv/access/modify, as it only views channel access
+Revision ac20474 - Sat, 4 Jan 2014 12:24:04 -0500 - Also make m_sql_authentication block nick grouping if it is disabling registration
+Revision e1ce617 - Fri, 3 Jan 2014 19:54:14 -0500 - Move modules/stats under extras because it depends on m_mysql, update its config a bit to look similar to all of the other config files
+Revision 2781b69 - Thu, 2 Jan 2014 11:44:18 -0500 - Add an explicit privilege for os_config's modify
+Revision 1e502c8 - Thu, 2 Jan 2014 11:41:49 -0500 - Update os_config
+Revision 004c4cb - Thu, 2 Jan 2014 11:03:33 -0500 - Move modules out of extras that dont have external dependencies
+Revision 072202c - Thu, 2 Jan 2014 10:56:57 -0500 - Have db_old load news.db too
+Revision 595dad4 - Wed, 1 Jan 2014 20:48:38 -0500 - Update copyright to 2014. This was done with: find include/ src/ lang/ docs/ modules/ *.* Config -exec sed -i 's/-20.. Anope Team/-2014 Anope Team/i' {} \;
+Revision a374e24 - Wed, 1 Jan 2014 16:21:38 -0500 - Make inspircds module class names not conflict because it confuses OSX
+Revision 6e6543d - Tue, 31 Dec 2013 16:12:21 -0500 - I don't think this OnBotKick to hold channels is necessary anymore as Sync should cover everything now, and this causes weird things when the last user in a channel kicks themselves out using the bot. Also handle users rejoining a channel while its held better.
+Revision 6124af6 - Tue, 31 Dec 2013 15:31:56 -0500 - Show the command name and not service name in the access denied log messages
+Revision f21b40b - Mon, 30 Dec 2013 10:50:15 -0500 - Set last_realname in m_ldap_authentication when new nicks are registered
+Revision 567700b - Mon, 30 Dec 2013 10:42:07 -0500 - Also have m_ldap_authentication disable nick grouping if registration is disabled
+Revision 3b80da9 - Mon, 30 Dec 2013 10:34:57 -0500 - Fix loading kicker ttb data
+Revision c519119 - Sun, 29 Dec 2013 05:27:36 +0100 - Don't expire ignores when NoExpire is enabled.
+Revision 780bc7c - Sat, 28 Dec 2013 23:28:30 +0100 - Do not translate command parameters that do not have translatable strings in them, or are not meant to be translated in the first place.
+Revision 3d12752 - Sat, 28 Dec 2013 09:39:16 -0500 - Fix naming collision between modes +g and +G on inspircd, rename the common badwords censor mode to censor
+Revision 9c0ceed - Fri, 27 Dec 2013 17:24:52 -0500 - Readd channel description to ns alist output
+Revision 187973c - Fri, 27 Dec 2013 17:20:47 -0500 - Allow inverting opertype privs and commands, to make them behave like the log settings
+Revision 072631a - Fri, 27 Dec 2013 17:15:07 -0500 - Fix forbid add message to show the correct type
+Revision b638b65 - Fri, 27 Dec 2013 17:12:01 -0500 - Fix crash when channels are registered that do not exist by non users
+Revision 0fb2b60 - Thu, 26 Dec 2013 21:06:26 -0500 - Fix xmlrpc dochannel example
+Revision 16f3f0c - Thu, 26 Dec 2013 21:06:07 -0500 - Don't leak ldap results
+Revision b28db7b - Thu, 26 Dec 2013 17:33:06 -0500 - Fix crash with badwords of type 'end' and possibly when messages contain only control codes. Also fix matching single words at the beginning of lines.
+Revision 9bf9cfc - Thu, 26 Dec 2013 16:08:56 -0500 - If using db_flatfile:fork, don't allow multiple saves to happen at one time on shutdown/restart wait for any pending saves to finish
+Revision 0c9750a - Thu, 26 Dec 2013 15:19:48 -0500 - Default the founder privilege to level 10000 as I had originally intended. Document set fonder usage in cs_levels help.
+Revision 69c5aec - Thu, 26 Dec 2013 19:44:41 +0100 - updated the extras script to find the cmake binary installed by ./Config
+Revision 59c3c13 - Thu, 26 Dec 2013 18:46:20 +0100 - m_chanstats: 1) fixed the SASET message 2) decreased the size of some VARCHAR fields, this hopefully fixes the 'key too long' error on some systems.
+Revision 5829d7d - Thu, 26 Dec 2013 12:06:39 -0500 - Add a config option for whether or not to reset the TS of persistent channels to their registration date
+Revision 2f29c13 - Thu, 26 Dec 2013 11:39:35 -0500 - Fix not setting the persist flag on newly registered channels when the permanent channel mode is set prior to registering or during registration
+Revision fc0e826 - Thu, 26 Dec 2013 08:02:19 -0500 - Fix dropping channels in the webpanel
+Revision 19eccf0 - Wed, 25 Dec 2013 15:16:04 -0500 - Fix setting english language in db_old, document how not setting defaultlanguage really works
+Revision dbf5106 - Wed, 25 Dec 2013 14:29:41 -0500 - Fix sqline on hybrid
+Revision 3029a2d - Tue, 24 Dec 2013 20:58:06 -0500 - Don't epxire forbids when noexpire mode is on
+Revision 53df61b - Tue, 24 Dec 2013 20:48:09 -0500 - Make webcpanel's nickserv alist behave more like /ns alist
+Revision 7d27689 - Tue, 24 Dec 2013 20:20:47 -0500 - Set a description for the resend command
+Revision 421e194 - Tue, 24 Dec 2013 18:19:44 -0500 - If last usermask and last realhost are the same, don't show both because duh
+Revision c442bc1 - Sun, 22 Dec 2013 08:37:49 -0500 - Do not allow /cs clone access to add duplicate masks to the access list or allow growing the list pass accessmax. Fix reading botservs case sensitive config option. Give a better error message when trying to clone badwords if there is no botserv.
+Revision 1c02961 - Fri, 20 Dec 2013 22:57:58 -0500 - Anope 2.0.0-rc1 Release
+Revision 268d529 - Fri, 20 Dec 2013 22:57:56 -0500 - Update version.log
 Revision 4bc4b98 - Fri, 20 Dec 2013 22:56:38 -0500 - Regenerate language files
 Revision e8b4260 - Fri, 20 Dec 2013 22:56:34 -0500 - Update Changes and Changes.conf
 Revision e792865 - Fri, 20 Dec 2013 20:24:40 -0500 - Fix reading unconfirmed expire config value when register type is set to mail

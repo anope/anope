@@ -147,7 +147,7 @@ class CSStats : public Module
 				else
 					source.Reply(_("Channel stats for %s on %s:"), display.c_str(), channel.c_str());
 
-				source.Reply(_("letters: %s, words: %s, lines: %s, smileys %s, actions: %s"),
+				source.Reply(_("letters: %s, words: %s, lines: %s, smileys: %s, actions: %s"),
 						res.Get(0, "letters").c_str(), res.Get(0, "words").c_str(),
 						res.Get(0, "line").c_str(), res.Get(0, "smileys").c_str(),
 						res.Get(0, "actions").c_str());

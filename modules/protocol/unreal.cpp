@@ -984,13 +984,12 @@ struct IRCDMessageSetIdent : IRCDMessage
 
 struct IRCDMessageSetName : IRCDMessage
 {
-	IRCDMessageSetName(Module *creator) : IRCDMessage(creator, "SETNAME", 1) { }
+	IRCDMessageSetName(Module *creator) : IRCDMessage(creator, "SETNAME", 1) { SetFlag(IRCDMESSAGE_REQUIRE_USER); }
 
 	void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		User *u = User::Find(params[0]);
-		if (u)
-			u->SetRealname(params[1]);
+		User *u = source.GetUser();
+		u->SetRealname(params[0]);
 	}
 };
 

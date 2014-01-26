@@ -218,7 +218,7 @@ void Command::Run(CommandSource &source, const Anope::string &message)
 	if (it == source.service->commands.end())
 	{
 		if (has_help)
-			source.Reply(_("Unknown command \002%s\002. \"%s %s HELP\" for help."), message.c_str(), Config->StrictPrivmsg.c_str(), source.service->nick.c_str());
+			source.Reply(_("Unknown command \002%s\002. \"%s%s HELP\" for help."), message.c_str(), Config->StrictPrivmsg.c_str(), source.service->nick.c_str());
 		else
 			source.Reply(_("Unknown command \002%s\002."), message.c_str());
 		return;

@@ -261,6 +261,7 @@ class OperServCore : public Module
 		if (x)
 		{
 			this->sqlines.OnMatch(u, x);
+			reason = x->reason;
 			return EVENT_STOP;
 		}
 

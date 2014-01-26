@@ -147,7 +147,7 @@ while (1)
 	chop($input); # remove the trailing \n from the user input
 
 	if ($input eq "q") {
-		if (-e "build") {
+		if (-e "build/CMakeFiles") {
 			if (-e "cmake-bin") {
 				my $cmake_path = `find cmake-bin -name cmake -print0`;
 				system($cmake_path, "build/.");

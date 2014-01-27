@@ -49,6 +49,13 @@ public:
 			source.Reply(CHAN_X_NOT_REGISTERED, target.c_str());
 			return;
 		}
+
+		if (ci == target_ci)
+		{
+			source.Reply(_("Cannot clone channel \002%s\002 to itself!"), target.c_str());
+			return;
+		}
+
 		if (!source.IsFounder(ci) || !source.IsFounder(target_ci))
 		{
 			if (!source.HasPriv("chanserv/administration"))

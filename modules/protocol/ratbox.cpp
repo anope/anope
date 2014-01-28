@@ -41,7 +41,6 @@ class RatboxProto : public IRCDProto
 	void SendServer(const Server *server) anope_override { hybrid->SendServer(server); }
 	void SendModeInternal(const MessageSource &source, User *u, const Anope::string &buf) anope_override { hybrid->SendModeInternal(source, u, buf); }
 	void SendChannel(Channel *c) anope_override { hybrid->SendChannel(c); }
-	void SendTopic(const MessageSource &source, Channel *c) anope_override { hybrid->SendTopic(source, c); }
 	bool IsIdentValid(const Anope::string &ident) anope_override { return hybrid->IsIdentValid(ident); }
 
 	void SendGlobopsInternal(const MessageSource &source, const Anope::string &buf) anope_override
@@ -93,6 +92,25 @@ class RatboxProto : public IRCDProto
 	void SendLogout(User *u) anope_override
 	{
 		UplinkSocket::Message(Me) << "ENCAP * SU " << u->GetUID();
+	}
+
+	void SendTopic(const MessageSource &source, Channel *c) anope_override
+	{
+		BotInfo *bi = source.GetBot();
+		bool needjoin = c->FindUser(bi) == NULL;
+
+		if (needjoin)
+		{
+			ChannelStatus status;
+
+			status.AddMode('o');
+			bi->Join(c, &status);
+		}
+
+		IRCDProto::SendTopic(source, c);
+
+		if (needjoin)
+			bi->Part(c);
 	}
 };
 

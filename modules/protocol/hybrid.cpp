@@ -233,21 +233,7 @@ class HybridProto : public IRCDProto
 
 	void SendTopic(const MessageSource &source, Channel *c) anope_override
 	{
-		BotInfo *bi = source.GetBot();
-		bool needjoin = c->FindUser(bi) == NULL;
-
-		if (needjoin)
-		{
-			ChannelStatus status;
-
-			status.AddMode('o');
-			bi->Join(c, &status);
-		}
-
-		IRCDProto::SendTopic(source, c);
-
-		if (needjoin)
-			bi->Part(c);
+		UplinkSocket::Message(source) << "TBURST " << c->creation_time << " " << c->name << " " << c->topic_ts << " " << c->topic_setter << " :" << c->topic;
 	}
 
 	void SendForceNickChange(User *u, const Anope::string &newnick, time_t when) anope_override

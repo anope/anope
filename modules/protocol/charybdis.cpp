@@ -192,6 +192,11 @@ struct IRCDMessageEncap : IRCDMessage
 					if (!NickServ)
 						return;
 
+					Anope::string accountname = GetAccount();
+					NickAlias *na = NickAlias::Find(accountname);
+					if (na)
+						accountname = na->nc->display;
+
 					/* SVSLOGIN
 					 * parameters: target, new nick, new username, new visible hostname, new login name
 					 * Sent after successful SASL authentication.
@@ -202,7 +207,7 @@ struct IRCDMessageEncap : IRCDMessage
 					 * broadcast, otherwise the changes will be stored, to be used when registration
 					 * completes.
 					 */
-					UplinkSocket::Message(Me) << "ENCAP " << msource.GetName() << " SVSLOGIN " << this->uid << " * * * " << this->GetAccount();
+					UplinkSocket::Message(Me) << "ENCAP " << msource.GetName() << " SVSLOGIN " << this->uid << " * * * " << accountname;
 					UplinkSocket::Message(Me) << "ENCAP " << msource.GetName() << " SASL " << NickServ->GetUID() << " " << this->uid << " D S";
 				}
 

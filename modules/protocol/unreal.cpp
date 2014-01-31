@@ -881,7 +881,12 @@ struct IRCDMessageSASL : IRCDMessage
 			if (p == Anope::string::npos)
 				return;
 
-			UplinkSocket::Message(Me) << "SVSLOGIN " << this->uid.substr(0, p) << " " << this->uid << " " << this->GetAccount();
+			Anope::string accountname = GetAccount();
+			NickAlias *na = NickAlias::Find(accountname);
+			if (na)
+				accountname = na->nc->display;
+
+			UplinkSocket::Message(Me) << "SVSLOGIN " << this->uid.substr(0, p) << " " << this->uid << " " << accountname;
 			UplinkSocket::Message() << "SASL " << this->uid.substr(0, p) << " " << this->uid << " D S";
 		}
 

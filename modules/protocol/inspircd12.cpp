@@ -857,7 +857,12 @@ struct IRCDMessageEncap : IRCDMessage
 
 				void OnSuccess() anope_override
 				{
-					UplinkSocket::Message(Me) << "METADATA " << this->uid << " accountname :" << this->GetAccount();
+					Anope::string accountname = GetAccount();
+					NickAlias *na = NickAlias::Find(accountname);
+					if (na)
+						accountname = na->nc->display;
+
+					UplinkSocket::Message(Me) << "METADATA " << this->uid << " accountname :" << accountname;
 					UplinkSocket::Message(Me) << "ENCAP " << this->uid.substr(0, 3) << " SASL " << Me->GetSID() << " " << this->uid << " D S";
 
 					SASLUser su;

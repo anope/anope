@@ -621,7 +621,7 @@ class commasepstream : public sepstream
  public:
 	/** Initialize with comma seperator
 	 */
-	commasepstream(const Anope::string &source) : sepstream(source, ',') { }
+	commasepstream(const Anope::string &source, bool allowempty = false) : sepstream(source, ',', allowempty) { }
 };
 
 /** A derived form of sepstream, which seperates on spaces

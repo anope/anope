@@ -62,7 +62,7 @@ class CommandNSList : public Command
 			{
 				if (keyword.equals_ci("NOEXPIRE"))
 					nsnoexpire = true;
-				if (keyword.equals_ci("NS_SUSPENDED"))
+				if (keyword.equals_ci("SUSPENDED"))
 					suspended = true;
 				if (keyword.equals_ci("UNCONFIRMED"))
 					unconfirmed = true;

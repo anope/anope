@@ -118,50 +118,107 @@ class CommandNSAJoin : public Command
 		}
 	}
 
-	void DoAdd(CommandSource &source, NickCore *nc, const Anope::string &chan, const Anope::string &key)
+	void DoAdd(CommandSource &source, NickCore *nc, const Anope::string &chans, const Anope::string &keys)
 	{
 		AJoinList *channels = nc->Require<AJoinList>("ajoinlist");
 
-		unsigned i = 0;
-		for (; i < (*channels)->size(); ++i)
-			if ((*channels)->at(i)->channel.equals_ci(chan))
-				break;
-
-		if ((*channels)->size() >= Config->GetModule(this->owner)->Get<unsigned>("ajoinmax"))
-			source.Reply(_("Sorry, the maximum of %d auto join entries has been reached."), Config->GetModule(this->owner)->Get<unsigned>("ajoinmax"));
-		else if (i != (*channels)->size())
-			source.Reply(_("%s is already on %s's auto join list."), chan.c_str(), nc->display.c_str());
-		else if (IRCD->IsChannelValid(chan) == false)
- 			source.Reply(CHAN_X_INVALID, chan.c_str());
-		else
+		Anope::string addedchans;
+		Anope::string alreadyadded;
+		Anope::string invalidkey;
+		commasepstream ksep(keys, true);
+		commasepstream csep(chans);
+		for (Anope::string chan, key; csep.GetToken(chan);)
 		{
-			AJoinEntry *entry = new AJoinEntry(nc);
-			entry->owner = nc;
-			entry->channel = chan;
-			entry->key = key;
-			(*channels)->push_back(entry);
-			Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to ADD channel " << chan << " to " << nc->display;
-			source.Reply(_("%s added to %s's auto join list."), chan.c_str(), nc->display.c_str());
+			ksep.GetToken(key);
+
+			unsigned i = 0;
+			for (; i < (*channels)->size(); ++i)
+				if ((*channels)->at(i)->channel.equals_ci(chan))
+					break;
+
+			if ((*channels)->size() >= Config->GetModule(this->owner)->Get<unsigned>("ajoinmax"))
+			{
+				source.Reply(_("Sorry, the maximum of %d auto join entries has been reached."), Config->GetModule(this->owner)->Get<unsigned>("ajoinmax"));
+				return;
+			}
+			else if (i != (*channels)->size())
+				alreadyadded += chan + ", ";
+			else if (IRCD->IsChannelValid(chan) == false)
+	 			source.Reply(CHAN_X_INVALID, chan.c_str());
+			else
+			{
+				Channel *c = Channel::Find(chan);
+				Anope::string k;
+				if (c && c->GetParam("KEY", k) && key != k)
+				{
+					invalidkey += chan + ", ";
+					continue;
+				}
+
+				AJoinEntry *entry = new AJoinEntry(nc);
+				entry->owner = nc;
+				entry->channel = chan;
+				entry->key = key;
+				(*channels)->push_back(entry);
+				addedchans += chan + ", ";
+			}
 		}
+
+		if (!alreadyadded.empty())
+		{
+			alreadyadded = alreadyadded.substr(0, alreadyadded.length() - 2);
+			source.Reply(_("%s is already on %s's auto join list."), alreadyadded.c_str(), nc->display.c_str());
+		}
+
+		if (!invalidkey.empty())
+		{
+			invalidkey = invalidkey.substr(0, invalidkey.length() - 2);
+			source.Reply(_("%s had an invalid key specified, and was thus ignored."), invalidkey.c_str());
+		}
+
+		if (addedchans.empty())
+			return;
+
+		addedchans = addedchans.substr(0, addedchans.length() - 2);
+		Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to ADD channel " << addedchans << " to " << nc->display;
+		source.Reply(_("%s added to %s's auto join list."), addedchans.c_str(), nc->display.c_str());
 	}
 
-	void DoDel(CommandSource &source, NickCore *nc, const Anope::string &chan)
+	void DoDel(CommandSource &source, NickCore *nc, const Anope::string &chans)
 	{
 		AJoinList *channels = nc->Require<AJoinList>("ajoinlist");
+		Anope::string delchans;
+		Anope::string notfoundchans;
+		commasepstream sep(chans);
 
-		unsigned i = 0;
-		for (; i < (*channels)->size(); ++i)
-			if ((*channels)->at(i)->channel.equals_ci(chan))
-				break;
-		
-		if (i == (*channels)->size())
-			source.Reply(_("%s was not found on %s's auto join list."), chan.c_str(), nc->display.c_str());
-		else
+		for (Anope::string chan; sep.GetToken(chan);)
 		{
-			delete (*channels)->at(i);
-			Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to DELETE channel " << chan << " from " << nc->display;
-			source.Reply(_("%s was removed from %s's auto join list."), chan.c_str(), nc->display.c_str());
+			unsigned i = 0;
+			for (; i < (*channels)->size(); ++i)
+				if ((*channels)->at(i)->channel.equals_ci(chan))
+					break;
+		
+			if (i == (*channels)->size())
+				notfoundchans += chan + ", ";
+			else
+			{
+				delete (*channels)->at(i);
+				delchans += chan + ", ";
+			}
 		}
+
+		if (!notfoundchans.empty())
+		{
+			notfoundchans = notfoundchans.substr(0, notfoundchans.length() - 2);
+			source.Reply(_("%s was not found on %s's auto join list."), notfoundchans.c_str(), nc->display.c_str());
+		}
+
+		if (delchans.empty())
+			return;
+
+		delchans = delchans.substr(0, delchans.length() - 2);
+		Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to DELETE channel " << delchans << " from " << nc->display;
+		source.Reply(_("%s was removed from %s's auto join list."), delchans.c_str(), nc->display.c_str());
 
 		if ((*channels)->empty())
 			nc->Shrink<AJoinList>("ajoinlist");

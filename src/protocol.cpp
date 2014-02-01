@@ -322,6 +322,9 @@ bool IRCDProto::IsChannelValid(const Anope::string &chan)
 	if (chan.empty() || chan[0] != '#' || chan.length() > Config->GetBlock("networkinfo")->Get<unsigned>("chanlen"))
 		return false;
 
+	if (chan.find_first_of(" ,") != Anope::string::npos)
+		return false;
+
 	return true;
 }
 

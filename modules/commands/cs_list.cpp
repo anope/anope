@@ -58,7 +58,7 @@ class CommandCSList : public Command
 			spacesepstream keywords(params[1]);
 			while (keywords.GetToken(keyword))
 			{
-				if (keyword.equals_ci("CS_SUSPENDED"))
+				if (keyword.equals_ci("SUSPENDED"))
 					suspended = true;
 				if (keyword.equals_ci("NOEXPIRE"))
 					channoexpire = true;

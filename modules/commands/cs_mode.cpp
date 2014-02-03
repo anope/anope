@@ -641,7 +641,7 @@ class CommandCSMode : public Command
 			new_params.push_back("-*");
 			this->DoSet(source, ci, new_params);
 		}
-		else if (param.equals_ci("BANS") || param.equals_ci("EXEMPTS") || param.equals_ci("INVITEOVERRIDES") || param.equals_ci("VOICES") || param.equals_ci("HALFOPS") || param.equals_ci("OPS"))
+		else if (param.equals_ci("BANS") || param.equals_ci("EXCEPTS") || param.equals_ci("INVITEOVERRIDES") || param.equals_ci("VOICES") || param.equals_ci("HALFOPS") || param.equals_ci("OPS"))
 		{
 			const Anope::string &mname = param.upper().substr(0, param.length() - 1);
 			ChannelMode *cm = ModeManager::FindChannelModeByName(mname);
@@ -725,7 +725,7 @@ class CommandCSMode : public Command
 			"       Clears all extended bans that start with ~c:\n"
 			" \n"
 			"The \002%s CLEAR\002 command is an easy way to clear modes on a channel. \037what\037 may be\n"
-			"one of bans, exempts, inviteoverrides, ops, halfops, or voices. If \037what\037 is not given then all\n"
+			"one of bans, excepts, inviteoverrides, ops, halfops, or voices. If \037what\037 is not given then all\n"
 			"basic modes are removed."),
 			source.command.upper().c_str(), source.command.upper().c_str(), source.command.upper().c_str());
 		return true;

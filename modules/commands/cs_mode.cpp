@@ -640,26 +640,37 @@ class CommandCSMode : public Command
 			new_params.push_back("SET");
 			new_params.push_back("-*");
 			this->DoSet(source, ci, new_params);
+			return;
 		}
-		else if (param.equals_ci("BANS") || param.equals_ci("EXCEPTS") || param.equals_ci("INVITEOVERRIDES") || param.equals_ci("VOICES") || param.equals_ci("HALFOPS") || param.equals_ci("OPS"))
-		{
-			const Anope::string &mname = param.upper().substr(0, param.length() - 1);
-			ChannelMode *cm = ModeManager::FindChannelModeByName(mname);
-			if (cm == NULL)
-			{
-				source.Reply(_("Your IRCD does not support %s."), mname.upper().c_str());
-				return;
-			}
 
-			std::vector<Anope::string> new_params;
-			new_params.push_back(params[0]);
-			new_params.push_back("SET");
-			new_params.push_back("-" + stringify(cm->mchar));
-			new_params.push_back("*");
-			this->DoSet(source, ci, new_params);
-		}
+		ChannelMode *cm;
+		if (param.length() == 1)
+			cm = ModeManager::FindChannelModeByChar(param[0]);
 		else
-			this->SendSyntax(source);
+		{
+			cm = ModeManager::FindChannelModeByName(param.upper());
+			if (!cm)
+				cm = ModeManager::FindChannelModeByName(param.substr(0, param.length() - 1).upper());
+		}
+
+		if (!cm)
+		{
+			source.Reply(_("There is no such mode %s."), param.c_str());
+			return;
+		}
+
+		if (cm->type != MODE_STATUS && cm->type != MODE_LIST)
+		{
+			source.Reply(_("Mode %s is not a status or list mode."), param.c_str());
+			return;
+		}
+
+		std::vector<Anope::string> new_params;
+		new_params.push_back(params[0]);
+		new_params.push_back("SET");
+		new_params.push_back("-" + stringify(cm->mchar));
+		new_params.push_back("*");
+		this->DoSet(source, ci, new_params);
 	}
 
  public:
@@ -725,8 +736,8 @@ class CommandCSMode : public Command
 			"       Clears all extended bans that start with ~c:\n"
 			" \n"
 			"The \002%s CLEAR\002 command is an easy way to clear modes on a channel. \037what\037 may be\n"
-			"one of bans, excepts, inviteoverrides, ops, halfops, or voices. If \037what\037 is not given then all\n"
-			"basic modes are removed."),
+			"any mode name. Examples include bans, excepts, inviteoverrides, ops, halfops, and voices. If \037what\037\n"
+			"is not given then all basic modes are removed."),
 			source.command.upper().c_str(), source.command.upper().c_str(), source.command.upper().c_str());
 		return true;
 	}

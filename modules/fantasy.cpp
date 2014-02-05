@@ -97,7 +97,7 @@ class Fantasy : public Module
 		if (!u || !c || !c->ci || !c->ci->bi || msg.empty() || msg[0] == '\1')
 			return;
 
-		if (!fantasy.HasExt(c->ci))
+		if (Config->GetClient("BotServ") && !fantasy.HasExt(c->ci))
 			return;
 
 		std::vector<Anope::string> params;

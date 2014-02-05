@@ -25,15 +25,7 @@ class BotServCore : public Module
 	void OnReload(Configuration::Conf *conf) anope_override
 	{
 		const Anope::string &bsnick = conf->GetModule(this)->Get<const Anope::string>("client");
-
-		if (bsnick.empty())
-			throw ConfigException(Module::name + ": <client> must be defined");
-
-		BotInfo *bi = BotInfo::Find(bsnick, true);
-		if (!bi)
-			throw ConfigException(Module::name + ": no bot named " + bsnick);
-
-		BotServ = bi;
+		BotServ = BotInfo::Find(bsnick, true);
 	}
 
 	void OnSetCorrectModes(User *user, Channel *chan, AccessGroup &access, bool &give_modes, bool &take_modes) anope_override

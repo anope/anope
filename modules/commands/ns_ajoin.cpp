@@ -322,7 +322,10 @@ class NSAJoin : public Module
 
 		AJoinList *channels = u->Account()->GetExt<AJoinList>("ajoinlist");
 		if (channels == NULL)
-			channels = u->Account()->Extend<AJoinList>("ajoinlist");
+			return;
+
+		/* Set +r now, so we can ajoin users into +R channels */
+		ModeManager::ProcessModes();
 
 		for (unsigned i = 0; i < (*channels)->size(); ++i)
 		{

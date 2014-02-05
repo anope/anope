@@ -41,6 +41,11 @@ class CoreExport SocketEngine
 	/** Read from sockets and do things
 	 */
 	static void Process();
+
+	static int GetLastError();
+	static void SetLastError(int);
+
+	static bool IgnoreErrno();
 };
 
 #endif // SOCKETENGINE_H

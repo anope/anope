@@ -29,8 +29,10 @@ bool BufferedSocket::ProcessRead()
 	this->recv_len = 0;
 
 	int len = this->io->Recv(this, tbuffer, sizeof(tbuffer) - 1);
-	if (len <= 0)
+	if (len == 0)
 		return false;
+	if (len < 0)
+		return SocketEngine::IgnoreErrno();
 	
 	tbuffer[len] = 0;
 	this->read_buffer.append(tbuffer);
@@ -42,8 +44,11 @@ bool BufferedSocket::ProcessRead()
 bool BufferedSocket::ProcessWrite()
 {
 	int count = this->io->Send(this, this->write_buffer);
-	if (count <= -1)
+	if (count == 0)
 		return false;
+	if (count < 0)
+		return SocketEngine::IgnoreErrno();
+
 	this->write_buffer = this->write_buffer.substr(count);
 	if (this->write_buffer.empty())
 		SocketEngine::Change(this, false, SF_WRITABLE);

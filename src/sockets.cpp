@@ -348,15 +348,17 @@ size_t cidr::hash::operator()(const cidr &s) const
 
 int SocketIO::Recv(Socket *s, char *buf, size_t sz)
 {
-	size_t i = recv(s->GetFD(), buf, sz, 0);
-	TotalRead += i;
+	int i = recv(s->GetFD(), buf, sz, 0);
+	if (i > 0)
+		TotalRead += i;
 	return i;
 }
 
 int SocketIO::Send(Socket *s, const char *buf, size_t sz)
 {
-	size_t i = send(s->GetFD(), buf, sz, 0);
-	TotalWritten += i;
+	int i = send(s->GetFD(), buf, sz, 0);
+	if (i > 0)
+		TotalWritten += i;
 	return i;
 }
 
@@ -402,7 +404,7 @@ void SocketIO::Connect(ConnectionSocket *s, const Anope::string &target, int por
 	int c = connect(s->GetFD(), &s->conaddr.sa, s->conaddr.size());
 	if (c == -1)
 	{
-		if (Anope::LastErrorCode() != EINPROGRESS)
+		if (!SocketEngine::IgnoreErrno())
 			s->OnError(Anope::LastError());
 		else
 		{
@@ -540,5 +542,31 @@ bool ListenSocket::ProcessRead()
 		Log() << ex.GetReason();
 	}
 	return true;
+}
+
+int SocketEngine::GetLastError()
+{
+#ifndef _WIN32
+	return errno;
+#else
+	return WSAGetLastError();
+#endif
+}
+
+void SocketEngine::SetLastError(int err)
+{
+#ifndef _WIN32
+	errno = err;
+#else
+	WSASetLastError(err);
+#endif
+}
+
+bool SocketEngine::IgnoreErrno()
+{
+	return GetLastError() == EAGAIN
+		|| GetLastError() == EWOULDBLOCK
+		|| GetLastError() == EINTR
+		|| GetLastError() == EINPROGRESS;
 }
 

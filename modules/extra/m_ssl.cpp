@@ -190,14 +190,37 @@ SSLSocketIO::SSLSocketIO()
 int SSLSocketIO::Recv(Socket *s, char *buf, size_t sz)
 {
 	int i = SSL_read(this->sslsock, buf, sz);
-	TotalRead += i;
+	if (i > 0)
+		TotalRead += i;
+	else if (i < 0)
+	{
+		int err = SSL_get_error(this->sslsock, i);
+		switch (err)
+		{
+			case SSL_ERROR_WANT_READ:
+			case SSL_ERROR_WANT_WRITE:
+				SocketEngine::SetLastError(EAGAIN);
+		}
+	}
+
 	return i;
 }
 
 int SSLSocketIO::Send(Socket *s, const char *buf, size_t sz)
 {
 	int i = SSL_write(this->sslsock, buf, sz);
-	TotalWritten += i;
+	if (i > 0)
+		TotalWritten += i;
+	else if (i < 0)
+	{
+		int err = SSL_get_error(this->sslsock, i);
+		switch (err)
+		{
+			case SSL_ERROR_WANT_READ:
+			case SSL_ERROR_WANT_WRITE:
+				SocketEngine::SetLastError(EAGAIN);
+		}
+	}
 	return i;
 }
 

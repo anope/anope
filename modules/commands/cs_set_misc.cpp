@@ -9,6 +9,7 @@
  */
 
 #include "module.h"
+#include "modules/set_misc.h"
 
 static Module *me;
 
@@ -16,25 +17,33 @@ static std::map<Anope::string, Anope::string> descriptions;
 
 struct CSMiscData;
 static Anope::map<ExtensibleItem<CSMiscData> *> items;
-static ExtensibleItem<CSMiscData> *GetItem(const Anope::string &name);
 
-struct CSMiscData : Serializable
+static ExtensibleItem<CSMiscData> *GetItem(const Anope::string &name) anope_override
 {
-	Serialize::Reference<ChannelInfo> ci;
-	Anope::string name;
-	Anope::string data;
+	ExtensibleItem<CSMiscData>* &it = items[name];
+	if (!it)
+		try
+		{
+			it = new ExtensibleItem<CSMiscData>(me, name);
+		}
+		catch (const ModuleException &) { }
+	return it;
+}
 
-	CSMiscData(Extensible *obj) : Serializable("CSMiscData"), ci(anope_dynamic_static_cast<ChannelInfo *>(obj))
-	{
-	}
+struct CSMiscData : MiscData, Serializable
+{
+	CSMiscData(Extensible *obj) : Serializable("CSMiscData") { }
 
-	CSMiscData(ChannelInfo *c, const Anope::string &n, const Anope::string &d) : Serializable("CSMiscData"), ci(c), name(n), data(d)
+	CSMiscData(ChannelInfo *c, const Anope::string &n, const Anope::string &d) : Serializable("CSMiscData")
 	{
+		object = c->name;
+		name = n;
+		data = d;
 	}
 
 	void Serialize(Serialize::Data &sdata) const anope_override
 	{
-		sdata["ci"] << this->ci->name;
+		sdata["ci"] << this->object;
 		sdata["name"] << this->name;
 		sdata["data"] << this->data;
 	}
@@ -55,7 +64,7 @@ struct CSMiscData : Serializable
 		if (obj)
 		{
 			d = anope_dynamic_static_cast<CSMiscData *>(obj);
-			d->ci = ci;
+			d->object = ci->name;
 			data["name"] >> d->name;
 			data["data"] >> d->data;
 		}
@@ -69,18 +78,6 @@ struct CSMiscData : Serializable
 		return d;
 	}
 };
-
-static ExtensibleItem<CSMiscData> *GetItem(const Anope::string &name)
-{
-	ExtensibleItem<CSMiscData>* &it = items[name];
-	if (!it)
-		try
-		{
-			it = new ExtensibleItem<CSMiscData>(me, name);
-		}
-		catch (const ModuleException &) { }
-	return it;
-}
 
 static Anope::string GetAttribute(const Anope::string &command)
 {
@@ -165,14 +162,20 @@ class CommandCSSetMisc : public Command
 
 class CSSetMisc : public Module
 {
-	Serialize::Type csmiscdata_type;
 	CommandCSSetMisc commandcssetmisc;
+	Serialize::Type csmiscdata_type;
 
  public:
 	CSSetMisc(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		csmiscdata_type("CSMiscData", CSMiscData::Unserialize), commandcssetmisc(this)
+		commandcssetmisc(this), csmiscdata_type("CSMiscData", CSMiscData::Unserialize)
 	{
 		me = this;
+	}
+
+	~CSSetMisc()
+	{
+		for (Anope::map<ExtensibleItem<CSMiscData> *>::iterator it = items.begin(); it != items.end(); ++it)
+			delete it->second;
 	}
 
 	void OnReload(Configuration::Conf *conf) anope_override
@@ -201,7 +204,7 @@ class CSSetMisc : public Module
 		for (Anope::map<ExtensibleItem<CSMiscData> *>::iterator it = items.begin(); it != items.end(); ++it)
 		{
 			ExtensibleItem<CSMiscData> *e = it->second;
-			CSMiscData *data = e->Get(ci);
+			MiscData *data = e->Get(ci);
 
 			if (data != NULL)
 				info[e->name.substr(12).replace_all_cs("_", " ")] = data->data;

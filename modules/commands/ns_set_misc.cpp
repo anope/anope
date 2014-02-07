@@ -10,6 +10,7 @@
  */
 
 #include "module.h"
+#include "modules/set_misc.h"
 
 static Module *me;
 
@@ -17,25 +18,33 @@ static std::map<Anope::string, Anope::string> descriptions;
 
 struct NSMiscData;
 static Anope::map<ExtensibleItem<NSMiscData> *> items;
-static ExtensibleItem<NSMiscData> *GetItem(const Anope::string &name);
 
-struct NSMiscData : Serializable
+static ExtensibleItem<NSMiscData> *GetItem(const Anope::string &name)
 {
-	Serialize::Reference<NickCore> nc;
-	Anope::string name;
-	Anope::string data;
+	ExtensibleItem<NSMiscData>* &it = items[name];
+	if (!it)
+		try
+		{
+			it = new ExtensibleItem<NSMiscData>(me, name);
+		}
+		catch (const ModuleException &) { }
+	return it;
+}
 
-	NSMiscData(Extensible *obj) : Serializable("NSMiscData"), nc(anope_dynamic_static_cast<NickCore *>(obj))
-	{
-	}
+struct NSMiscData : MiscData, Serializable
+{
+	NSMiscData(Extensible *) : Serializable("NSMiscData") { }
 
-	NSMiscData(NickCore *ncore, const Anope::string &n, const Anope::string &d) : Serializable("NSMiscData"), nc(ncore), name(n), data(d)
+	NSMiscData(NickCore *ncore, const Anope::string &n, const Anope::string &d) : Serializable("NSMiscData")
 	{
+		object = ncore->display;
+		name = n;
+		data = d;
 	}
 
 	void Serialize(Serialize::Data &sdata) const anope_override
 	{
-		sdata["nc"] << this->nc->display;
+		sdata["nc"] << this->object;
 		sdata["name"] << this->name;
 		sdata["data"] << this->data;
 	}
@@ -52,11 +61,11 @@ struct NSMiscData : Serializable
 		if (nc == NULL)
 			return NULL;
 
-		NSMiscData *d;
+		NSMiscData *d = NULL;
 		if (obj)
 		{
 			d = anope_dynamic_static_cast<NSMiscData *>(obj);
-			d->nc = nc;
+			d->object = nc->display;
 			data["name"] >> d->name;
 			data["data"] >> d->data;
 		}
@@ -65,25 +74,11 @@ struct NSMiscData : Serializable
 			ExtensibleItem<NSMiscData> *item = GetItem(sname);
 			if (item)
 				d = item->Set(nc, NSMiscData(nc, sname, sdata));
-			else
-				d = NULL;
 		}
 
 		return d;
 	}
 };
-
-static ExtensibleItem<NSMiscData> *GetItem(const Anope::string &name)
-{
-	ExtensibleItem<NSMiscData>* &it = items[name];
-	if (!it)
-		try
-		{
-			it = new ExtensibleItem<NSMiscData>(me, name);
-		}
-		catch (const ModuleException &) { }
-	return it;
-}
 
 static Anope::string GetAttribute(const Anope::string &command)
 {
@@ -182,15 +177,21 @@ class CommandNSSASetMisc : public CommandNSSetMisc
 
 class NSSetMisc : public Module
 {
-	Serialize::Type nsmiscdata_type;
 	CommandNSSetMisc commandnssetmisc;
 	CommandNSSASetMisc commandnssasetmisc;
+	Serialize::Type nsmiscdata_type;
 
  public:
 	NSSetMisc(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		nsmiscdata_type("NSMiscData", NSMiscData::Unserialize), commandnssetmisc(this), commandnssasetmisc(this)
+		commandnssetmisc(this), commandnssasetmisc(this), nsmiscdata_type("NSMiscData", NSMiscData::Unserialize)
 	{
 		me = this;
+	}
+
+	~NSSetMisc()
+	{
+		for (Anope::map<ExtensibleItem<NSMiscData> *>::iterator it = items.begin(); it != items.end(); ++it)
+			delete it->second;
 	}
 
 	void OnReload(Configuration::Conf *conf) anope_override

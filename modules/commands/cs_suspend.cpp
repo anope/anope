@@ -10,18 +10,18 @@
  */
 
 #include "module.h"
-#include "modules/cs_suspend.h"
+#include "modules/suspend.h"
 
-struct CSSuspendInfoImpl : CSSuspendInfo, Serializable
+struct CSSuspendInfo : SuspendInfo, Serializable
 {
-	CSSuspendInfoImpl(Extensible *) : Serializable("CSSuspendInfo") { }
+	CSSuspendInfo(Extensible *) : Serializable("CSSuspendInfo") { }
 
 	void Serialize(Serialize::Data &data) const anope_override
 	{
-		data["chan"] << chan;
+		data["chan"] << what;
 		data["by"] << by;
 		data["reason"] << reason;
-		data["time"] << time;
+		data["time"] << when;
 		data["expires"] << expires;
 	}
 
@@ -30,21 +30,21 @@ struct CSSuspendInfoImpl : CSSuspendInfo, Serializable
 		Anope::string schan;
 		data["chan"] >> schan;
 
-		CSSuspendInfoImpl *si;
+		CSSuspendInfo *si;
 		if (obj)
-			si = anope_dynamic_static_cast<CSSuspendInfoImpl *>(obj);
+			si = anope_dynamic_static_cast<CSSuspendInfo *>(obj);
 		else
 		{
 			ChannelInfo *ci = ChannelInfo::Find(schan);
 			if (!ci)
 				return NULL;
-			si = ci->Extend<CSSuspendInfoImpl>("CS_SUSPENDED");
-			data["chan"] >> si->chan;
+			si = ci->Extend<CSSuspendInfo>("CS_SUSPENDED");
+			data["chan"] >> si->what;
 		}
 
 		data["by"] >> si->by;
 		data["reason"] >> si->reason;
-		data["time"] >> si->time;
+		data["time"] >> si->when;
 		data["expires"] >> si->expires;
 		return si;
 	}
@@ -99,10 +99,10 @@ class CommandCSSuspend : public Command
 		}
 
 		CSSuspendInfo *si = ci->Extend<CSSuspendInfo>("CS_SUSPENDED");
-		si->chan = ci->name;
+		si->what = ci->name;
 		si->by = source.GetNick();
 		si->reason = reason;
-		si->time = Anope::CurTime;
+		si->when = Anope::CurTime;
 		si->expires = expiry_secs ? expiry_secs + Anope::CurTime : 0;
 
 		if (ci->c)
@@ -198,13 +198,13 @@ class CSSuspend : public Module
 {
 	CommandCSSuspend commandcssuspend;
 	CommandCSUnSuspend commandcsunsuspend;
-	ExtensibleItem<CSSuspendInfoImpl> suspend;
+	ExtensibleItem<CSSuspendInfo> suspend;
 	Serialize::Type suspend_type;
 
  public:
 	CSSuspend(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandcssuspend(this), commandcsunsuspend(this), suspend(this, "CS_SUSPENDED"),
-		suspend_type("CSSuspendInfo", CSSuspendInfoImpl::Unserialize)
+		suspend_type("CSSuspendInfo", CSSuspendInfo::Unserialize)
 	{
 	}
 
@@ -218,8 +218,8 @@ class CSSuspend : public Module
 				info[_("Suspended by")] = si->by;
 			if (!si->reason.empty())
 				info[_("Suspend reason")] = si->reason;
-			if (si->time)
-				info[_("Suspended on")] = Anope::strftime(si->time, source.GetAccount(), true);
+			if (si->when)
+				info[_("Suspended on")] = Anope::strftime(si->when, source.GetAccount(), true);
 			if (si->expires)
 				info[_("Suspension expires")] = Anope::strftime(si->expires, source.GetAccount(), true);
 		}

@@ -10,17 +10,17 @@
  */
 
 #include "module.h"
-#include "modules/ns_suspend.h"
+#include "modules/suspend.h"
 
 static ServiceReference<NickServService> nickserv("NickServService", "NickServ");
 
-struct NSSuspendInfoImpl : NSSuspendInfo, Serializable
+struct NSSuspendInfo : SuspendInfo, Serializable
 {
-	NSSuspendInfoImpl(Extensible *) : Serializable("NSSuspendInfo") { }
+	NSSuspendInfo(Extensible *) : Serializable("NSSuspendInfo") { }
 
 	void Serialize(Serialize::Data &data) const anope_override
 	{
-		data["nick"] << nick;
+		data["nick"] << what;
 		data["by"] << by;
 		data["reason"] << reason;
 		data["time"] << when;
@@ -32,16 +32,16 @@ struct NSSuspendInfoImpl : NSSuspendInfo, Serializable
 		Anope::string snick;
 		data["nick"] >> snick;
 
-		NSSuspendInfoImpl *si;
+		NSSuspendInfo *si;
 		if (obj)
-			si = anope_dynamic_static_cast<NSSuspendInfoImpl *>(obj);
+			si = anope_dynamic_static_cast<NSSuspendInfo *>(obj);
 		else
 		{
 			NickAlias *na = NickAlias::Find(snick);
 			if (!na)
 				return NULL;
-			si = na->nc->Extend<NSSuspendInfoImpl>("NS_SUSPENDED");
-			data["nick"] >> si->nick;
+			si = na->nc->Extend<NSSuspendInfo>("NS_SUSPENDED");
+			data["nick"] >> si->what;
 		}
 
 		data["by"] >> si->by;
@@ -110,7 +110,7 @@ class CommandNSSuspend : public Command
 		NickCore *nc = na->nc;
 
 		NSSuspendInfo *si = nc->Extend<NSSuspendInfo>("NS_SUSPENDED");
-		si->nick = nc->display;
+		si->what = nc->display;
 		si->by = source.GetNick();
 		si->reason = reason;
 		si->when = Anope::CurTime;
@@ -202,13 +202,13 @@ class NSSuspend : public Module
 {
 	CommandNSSuspend commandnssuspend;
 	CommandNSUnSuspend commandnsunsuspend;
-	ExtensibleItem<NSSuspendInfoImpl> suspend;
+	ExtensibleItem<NSSuspendInfo> suspend;
 	Serialize::Type suspend_type;
 
  public:
 	NSSuspend(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandnssuspend(this), commandnsunsuspend(this), suspend(this, "NS_SUSPENDED"),
-		suspend_type("NSSuspendInfo", NSSuspendInfoImpl::Unserialize)
+		suspend_type("NSSuspendInfo", NSSuspendInfo::Unserialize)
 	{
 	}
 

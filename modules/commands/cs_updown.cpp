@@ -130,8 +130,8 @@ class CommandCSDown : public Command
 	{
 		ChanUserContainer *cu = c->FindUser(u);
 		if (cu != NULL)
-			for (size_t i = 0; i < cu->status.Modes().length(); ++i)
-				c->RemoveMode(NULL, ModeManager::FindChannelModeByChar(cu->status.Modes()[i]), u->GetUID());
+			for (size_t i = cu->status.Modes().length(); i > 0;)
+				c->RemoveMode(NULL, ModeManager::FindChannelModeByChar(cu->status.Modes()[--i]), u->GetUID());
 	}
 
  public:

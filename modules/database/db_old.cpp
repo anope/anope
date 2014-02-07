@@ -14,6 +14,7 @@
 #include "modules/cs_mode.h"
 #include "modules/bs_badwords.h"
 #include "modules/os_news.h"
+#include "modules/suspend.h"
 
 #define READ(x) \
 if (true) \
@@ -495,7 +496,12 @@ static void LoadNicks()
 			if (u32 & OLD_NI_HIDE_STATUS)
 				nc->Extend<bool>("HIDE_STATUS");
 			if (u32 & OLD_NI_SUSPENDED)
-				nc->Extend<bool>("NS_SUSPENDED");
+			{
+				SuspendInfo si;
+				si.what = nc->display;
+				si.when = si.expires = 0;
+				nc->Extend("NS_SUSPENDED", si);
+			}
 			if (!(u32 & OLD_NI_AUTOOP))
 				nc->Extend<bool>("AUTOOP");
 
@@ -764,11 +770,19 @@ static void LoadChannels()
 				ci->Extend<bool>("SIGNKICK");
 			if (tmpu32 & OLD_CI_SIGNKICK_LEVEL)
 				ci->Extend<bool>("SIGNKICK_LEVEL");
-			if (tmpu32 & OLD_CI_SUSPENDED)
-				ci->Extend<bool>("CS_SUSPENDED");
 
-			READ(read_string(buffer, f));
-			READ(read_string(buffer, f));
+			Anope::string forbidby, forbidreason;
+			READ(read_string(forbidby, f));
+			READ(read_string(forbidreason, f));
+			if (tmpu32 & OLD_CI_SUSPENDED)
+			{
+				SuspendInfo si;
+				si.what = ci->name;
+				si.by = forbidby;
+				si.reason = forbidreason;
+				si.when = si.expires = 0;
+				ci->Extend("CS_SUSPENDED", si);
+			}
 
 			int16_t tmp16;
 			READ(read_int16(&tmp16, f));

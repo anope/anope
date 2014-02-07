@@ -2541,7 +2541,7 @@ msgstr "Autorizzato ad usare il comando MODE"
 
 #: src/access.cpp:26
 msgid "Allowed to view the access list"
-msgstr "Autorizato alla visualizzazione della lista di accesso"
+msgstr "Autorizzato alla visualizzazione della lista di accesso"
 
 #: modules/commands/gl_global.cpp:42
 #, c-format
@@ -8714,7 +8714,7 @@ msgid ""
 "The CLEAR command clears the channel access list, which requires channel "
 "founder."
 msgstr ""
-"Il comando CLEAR svuota la lista di accesso del canale, richiede di essere "
+"Il comando CLEAR svuota la lista di accesso del canale, richiede di essere "
 "founder."
 
 #: modules/commands/cs_seen.cpp:174
@@ -8869,9 +8869,9 @@ msgstr ""
 "presenti nella lista di accesso del canale.\n"
 "Se specifacata una mask, la mask viene confrontata con tutti i records "
 "esistenti nella\n"
-"lista di accesso, e solamente i records corrispondenti vengono mostrati. Se specificato "
-"un set di flags,\n"
-"vengono mostrati solo quelli presenti nella lista di accesso con il flag specificato."
+"lista di accesso, e solamente i records corrispondenti vengono mostrati.\n"
+"Se specificato un set di flags, vengono mostrati solo quelli presenti nella lista di accesso\n"
+"con il flag specificato."
 
 #: modules/commands/cs_flags.cpp:415
 msgid ""
@@ -8890,10 +8890,10 @@ msgstr ""
 "non è già presente nella lista di accesso viene aggiunta, e quindi le modifiche "
 "applicate.\n"
 "Se una mask non ha più nessuna flag, la mask viene rimossa dalla lista di accesso.\n"
-"Inoltre, è possibile usare +* o -* per aggiungere o rimuovere rispettivamente tutte le flags. "
-"E' possibile modificare la lista di accesso esclusivamente se hai i privilegi necessari "
-"nel canale.\n"
-"Non è possibile dare livello di accesso superiore a quanto si possiede ad altri utenti."
+"Inoltre, è possibile usare +* o -* per aggiungere o rimuovere rispettivamente tutte le flags.\n"
+"E' possibile modificare la lista di accesso esclusivamente se in possesso dei\n"
+"privilegi necessari nel canale.\n"
+"Non è possibile dare livello di accesso superiore di quello posseduto ad altri utenti."
 
 #: modules/commands/cs_seen.cpp:173
 msgid ""

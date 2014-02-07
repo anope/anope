@@ -1836,7 +1836,7 @@ msgid ""
 "%s is another way to modify the channel access list, similar to\n"
 "the XOP and ACCESS methods."
 msgstr ""
-"%s è un altro modo di modificare la lista di accesso del canale, simile\n"
+"%s è un altro metodo di gestione della lista di accesso del canale, simile\n"
 "ai metodi XOP e ACCESS."
 
 #: modules/commands/ns_info.cpp:70

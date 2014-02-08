@@ -1206,8 +1206,8 @@ msgid ""
 msgstr ""
 " \n"
 "Consulta il comando %s (%s%s HELP ACCESS) per\n"
-"informazioni su come assegnare alcuni di questi privilegi\n"
-"ad altri utenti del canale.\n"
+"informazioni su come assegnare alcuni di questi privilegi ad\n"
+"altri utenti del canale.\n"
 
 #: modules/pseudoclients/nickserv.cpp:451
 msgid ""
@@ -2125,16 +2125,16 @@ msgid ""
 "A passcode has been sent to %s, please type %s%s %s <passcode> to confirm "
 "your email address."
 msgstr ""
-"Un passcode è stato inviato a %s. Digita %s%s %s <passcode> per confermare "
+"Un codice di attivazione è stato inviato a %s. Digita %s%s %s <codice> per confermare "
 "il tuo indirizzo email."
 
 #: include/language.h:124
 msgid "A vHost ident must be in the format of a valid ident."
-msgstr ""
+msgstr "L' ident di un vHost deve essere nel formato di una ident valida."
 
 #: include/language.h:123
 msgid "A vHost must be in the format of a valid hostname."
-msgstr ""
+msgstr "Un vHost deve essere nel formato di un hostname valido."
 
 #: modules/commands/os_ignore.cpp:298
 msgid "ADD expiry {nick|mask} [reason]"
@@ -3424,7 +3424,7 @@ msgstr ""
 
 #: modules/commands/os_mode.cpp:19
 msgid "Change channel modes"
-msgstr "Cambia i modi del canale."
+msgstr "Cambia i modi del canale."
 
 #: modules/commands/ns_set.cpp:873
 msgid "Change the communication method of Services"
@@ -3771,7 +3771,7 @@ msgstr "Configura i kick in caso di underline"
 
 #: modules/commands/ns_register.cpp:21
 msgid "Confirm a passcode"
-msgstr "Conferma un \"passcode\" di nickserv"
+msgstr "Conferma un codice.di.attivazione (passcode) di nickserv"
 
 #: modules/commands/cs_mode.cpp:668
 msgid "Control modes and mode locks on a channel"
@@ -5117,11 +5117,11 @@ msgstr "Limite non valido %s, usato %d."
 msgid ""
 "Invalid passcode has been entered, please check the e-mail again, and retry."
 msgstr ""
-"E' stato inserito un passcode non valido, controlla di nuovo l' email ricevuta e riprova."
+"E' stato inserito un codice di attivazione non valido, controlla di nuovo l' email ricevuta e riprova."
 
 #: modules/commands/ns_register.cpp:64 modules/commands/ns_register.cpp:67
 msgid "Invalid passcode."
-msgstr "Passcode non valido."
+msgstr "Codice di attivazione non valido."
 
 #: modules/commands/os_session.cpp:339
 #, c-format
@@ -5623,7 +5623,7 @@ msgstr "Lista delle Logon News:"
 #: modules/commands/os_login.cpp:103
 #, c-format
 msgid "Logout from %s"
-msgstr "Logout da %s"
+msgstr "Logout da %s"
 
 #: modules/commands/os_login.cpp:53
 #, c-format
@@ -6928,16 +6928,16 @@ msgid ""
 "%s will also automatically give the founder\n"
 "channel-operator privileges when s/he enters the channel."
 msgstr ""
-"Registra un canale nel database di %s.  Per poter usare\n"
-"to use this command,  devi essere operatore di canale (op) sul\n"
-"canale che intendi registrare. La descrizione, che deve.\n"
-"essere specificata, è una descrizione generica dello\n"
-"scopo del canale.\n"
-"Quando registri un canale, vieni registrato come\n"
-"\"founder\" del canale.  Il founder di un canale puo'\n"
-"modificare tutte le impostazioni del canale e riceverà\n"
-"automaticamente da %s i privilegi di operatore del canale\n"
-"quando vi accede."
+"Registra un canale nel database di %s. Per poter usare\n"
+"questo commando, prima di tutto, devi essere operatore (op)\n"
+"del canale che intendi registrare. La descrizione, che deve\n"
+"essere specificata, è una descrizione generica dello scopo\n"
+"del canale.\n"
+" \n"
+"Quando registri un canale, vieni registrato come \"founder\"\n"
+"del canale.  Il founder di un canale puo modificare tutte le'\n"
+"impostazioni del canale e riceverà automaticamente da %s\n"
+"i privilegi di operatore del canale quando vi accede."
 
 #: modules/commands/ns_register.cpp:246
 #, c-format
@@ -7361,8 +7361,8 @@ msgid ""
 "reset their password.  Email must be the email address associated\n"
 "to the nickname."
 msgstr ""
-"Invia un messaggio contenente un passcode e le istruzioni necessarie\n"
-"per procedere al reset della password per il nickname specificato.\n"
+"Invia un messaggio contenente un codice di attivazione e le istruzioni\n"
+"necessarie per procedere al reset della password per il nickname specificato.\n"
 "L' indirizzo email deve corrispondere all' indirizzo email associato\n"
 "al nickname."
 
@@ -8309,7 +8309,7 @@ msgstr "Scadenza sospensione"
 
 #: modules/commands/cs_sync.cpp:19
 msgid "Sync users channel modes"
-msgstr "Sincronizza i modi utente nel canale."
+msgstr "Sincronizza i modi utente nel canale."
 
 #: modules/commands/cs_sync.cpp:49
 msgid ""

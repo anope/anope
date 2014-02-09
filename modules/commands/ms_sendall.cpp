@@ -32,6 +32,8 @@ class CommandMSSendAll : public Command
 
 		const Anope::string &text = params[0];
 
+		Log(LOG_ADMIN, source, this) << "to send " << text;
+
 		for (nickcore_map::const_iterator it = NickCoreList->begin(), it_end = NickCoreList->end(); it != it_end; ++it)
 		{
 			const NickCore *nc = it->second;

@@ -323,7 +323,7 @@ class CoreExport User : public virtual Base, public Extensible, public CommandRe
 	/** Check if the user is protected from kicks and negative mode changes
 	 * @return true or false
 	 */
-	bool IsProtected() const;
+	bool IsProtected();
 
 	/** Kill a user
 	 * @param source The user/server doing the kill

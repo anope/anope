@@ -1038,8 +1038,8 @@ class BSKick : public Module
 
 	void check_ban(ChannelInfo *ci, User *u, KickerData *kd, int ttbtype)
 	{
-		/* Don't ban ulines */
-		if (u->server->IsULined())
+		/* Don't ban ulines or protected users */
+		if (u->IsProtected())
 			return;
 
 		BanData::Data &bd = this->GetBanData(u, ci->c);
@@ -1065,7 +1065,7 @@ class BSKick : public Module
 		va_list args;
 		char buf[1024];
 
-		if (!ci || !ci->bi || !ci->c || !u || u->server->IsULined() || !ci->c->FindUser(u))
+		if (!ci || !ci->bi || !ci->c || !u || u->IsProtected() || !ci->c->FindUser(u))
 			return;
 
 		Anope::string fmt = Language::Translate(u, message);

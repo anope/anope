@@ -642,12 +642,9 @@ ChanUserContainer *User::FindChannel(Channel *c) const
 	return NULL;
 }
 
-bool User::IsProtected() const
+bool User::IsProtected()
 {
-	if (this->HasMode("PROTECTED") || this->HasMode("GOD"))
-		return true;
-
-	return false;
+	return this->HasMode("PROTECTED") || this->HasMode("GOD") || this->HasPriv("protected") || (this->server && this->server->IsULined());
 }
 
 void User::Kill(const MessageSource &source, const Anope::string &reason)

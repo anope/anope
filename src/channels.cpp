@@ -727,11 +727,7 @@ bool Channel::Kick(BotInfo *bi, User *u, const char *reason, ...)
 	vsnprintf(buf, BUFSIZE - 1, reason, args);
 	va_end(args);
 
-	/* May not kick ulines */
-	if (u->server->IsULined())
-		return false;
-
-	/* Do not kick protected clients */
+	/* Do not kick protected clients or Ulines */
 	if (u->IsProtected())
 		return false;
 	
@@ -863,9 +859,6 @@ bool Channel::CheckKick(User *user)
 
 	/* We don't enforce services restrictions on clients on ulined services
 	 * as this will likely lead to kick/rejoin floods. ~ Viper */
-	if (user->server->IsULined())
-		return false;
-
 	if (user->IsProtected())
 		return false;
 

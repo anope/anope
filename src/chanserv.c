@@ -276,7 +276,7 @@ void listchans(int count_only, const char *chan)
             }
             if (ci->flags & CI_SUSPENDED) {
                 printf
-                    ("This nickname is currently suspended by %s, reason: %s\n",
+                    ("This channel is currently suspended by %s, reason: %s\n",
                      ci->forbidby,
                      (ci->forbidreason ? ci->forbidreason : "No reason"));
             }

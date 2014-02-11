@@ -175,21 +175,26 @@ class CommandCSFlags : public Command
 		}
 
 		Privilege *p = NULL;
-		int add = 1;
+		bool add = true;
 		for (size_t i = 0; i < flags.length(); ++i)
 		{
 			char f = flags[i];
 			switch (f)
 			{
 				case '+':
-					add = 1;
+					add = true;
 					break;
 				case '-':
-					add = 0;
+					add = false;
 					break;
 				case '*':
 					for (std::map<Anope::string, char>::iterator it = defaultFlags.begin(), it_end = defaultFlags.end(); it != it_end; ++it)
 					{
+						bool has = current_flags.count(it->second);
+						// If we are adding a flag they already have or removing one they don't have, don't bother
+						if (add == has)
+							continue;
+
 						if (!u_access.HasPriv(it->first) && !u_access.founder)
 						{
 							if (source.HasPriv("chanserv/access/modify"))
@@ -197,9 +202,10 @@ class CommandCSFlags : public Command
 							else
 								continue;
 						}
-						if (add == 1)
+
+						if (add)
 							current_flags.insert(it->second);
-						else if (add == 0)
+						else
 							current_flags.erase(it->second);
 					}
 					break;
@@ -225,9 +231,9 @@ class CommandCSFlags : public Command
 								break;
 							}
 						}
-						if (add == 1)
+						if (add)
 							current_flags.insert(f);
-						else if (add == 0)
+						else
 							current_flags.erase(f);
 						break;
 					}

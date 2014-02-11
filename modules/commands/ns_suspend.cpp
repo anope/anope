@@ -181,9 +181,12 @@ class CommandNSUnSuspend : public Command
 			return;
 		}
 
+		NSSuspendInfo *si = na->nc->GetExt<NSSuspendInfo>("NS_SUSPENDED");
+
+		Log(LOG_ADMIN, source, this) << "for " << na->nick << " which was suspended by " << (!si->by.empty() ? si->by : "(none)") << " for: " << (!si->reason.empty() ? si->reason : "No reason");
+
 		na->nc->Shrink<NSSuspendInfo>("NS_SUSPENDED");
 
-		Log(LOG_ADMIN, source, this) << "for " << na->nick;
 		source.Reply(_("Nick %s is now released."), nick.c_str());
 
 		FOREACH_MOD(OnNickUnsuspended, (na));

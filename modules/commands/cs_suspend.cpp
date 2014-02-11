@@ -121,7 +121,7 @@ class CommandCSSuspend : public Command
 				ci->c->Kick(NULL, users[i], "%s", !reason.empty() ? reason.c_str() : Language::Translate(users[i], _("This channel has been suspended.")));
 		}
 
-		Log(LOG_ADMIN, source, this, ci) << " (" << (!reason.empty() ? reason : "No reason") << "), expires on " << (expiry_secs ? Anope::strftime(Anope::CurTime + expiry_secs) : "never");
+		Log(LOG_ADMIN, source, this, ci) << "(" << (!reason.empty() ? reason : "No reason") << "), expires on " << (expiry_secs ? Anope::strftime(Anope::CurTime + expiry_secs) : "never");
 		source.Reply(_("Channel \002%s\002 is now suspended."), ci->name.c_str());
 
 		FOREACH_MOD(OnChanSuspend, (ci));
@@ -173,7 +173,7 @@ class CommandCSUnSuspend : public Command
 			return;
 		}
 
-		Log(LOG_ADMIN, source, this, ci) << " which was suspended by " << si->by << " for: " << (!si->reason.empty() ? si->reason : "No reason");
+		Log(LOG_ADMIN, source, this, ci) << "which was suspended by " << si->by << " for: " << (!si->reason.empty() ? si->reason : "No reason");
 
 		ci->Shrink<CSSuspendInfo>("CS_SUSPENDED");
 

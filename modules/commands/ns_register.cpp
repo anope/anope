@@ -223,15 +223,7 @@ class CommandNSRegister : public Command
 			else if (nsregister.equals_ci("mail"))
 			{
 				nc->Extend<bool>("UNCONFIRMED");
-				if (SendRegmail(u, na, source.service))
-				{
-					time_t unconfirmed_expire = Config->GetModule("ns_register")->Get<time_t>("unconfirmedexpire", "1d");
-					BotInfo *bi;
-					Anope::string cmd;
-					if (Command::FindCommandFromService("nickserv/confirm", bi, cmd))
-						source.Reply(_("A passcode has been sent to %s, please type \002%s%s %s <passcode>\002 to confirm your email address."), email.c_str(), Config->StrictPrivmsg.c_str(), bi->nick.c_str(), cmd.c_str());
-					source.Reply(_("If you do not confirm your email address within %s your account will expire."), Anope::Duration(unconfirmed_expire, source.GetAccount()).c_str());
-				}
+				SendRegmail(NULL, na, source.service);
 			}
 
 			if (u)
@@ -368,12 +360,12 @@ class NSRegister : public Module
 			if (nsregister.equals_ci("admin"))
 				u->SendMessage(NickServ, _("All new accounts must be validated by an administrator. Please wait for your registration to be confirmed."));
 			else
-				u->SendMessage(NickServ, _("Your email address is not confirmed. To confirm it, follow the instructions that were emailed to you when you registered."));
+				u->SendMessage(NickServ, _("Your email address is not confirmed. To confirm it, follow the instructions that were emailed to you."));
 			const NickAlias *this_na = NickAlias::Find(u->Account()->display);
 			time_t time_registered = Anope::CurTime - this_na->time_registered;
 			time_t unconfirmed_expire = Config->GetModule(this)->Get<time_t>("unconfirmedexpire", "1d");
 			if (unconfirmed_expire > time_registered)
-				u->SendMessage(NickServ, _("Your account will expire, if not confirmed, in %s"), Anope::Duration(unconfirmed_expire - time_registered, u->Account()).c_str());
+				u->SendMessage(NickServ, _("Your account will expire, if not confirmed, in %s."), Anope::Duration(unconfirmed_expire - time_registered, u->Account()).c_str());
 		}
 	}
 

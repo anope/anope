@@ -78,7 +78,7 @@ class CommandOSModList : public Command
 	CommandOSModList(Module *creator) : Command(creator, "operserv/modlist", 0, 1)
 	{
 		this->SetDesc(_("List loaded modules"));
-		this->SetSyntax(_("[all|third|vendor|database|encryption|pseudoclient|protocol]"));
+		this->SetSyntax("[all|third|vendor|extra|database|encryption|pseudoclient|protocol]");
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
@@ -90,14 +90,16 @@ class CommandOSModList : public Command
 		else
 			Log(LOG_ADMIN, source, this);
 
-		bool third = false, extra = false, vendor = false, database = false, encryption = false, pseudoclient = false, protocol = false;
+		bool third = false, vendor = false, extra = false, database = false, encryption = false, pseudoclient = false, protocol = false;
 
 		if (param.equals_ci("all"))
-			third = extra = vendor = database = encryption = pseudoclient = protocol = true;
+			third = vendor = extra = database = encryption = pseudoclient = protocol = true;
 		else if (param.equals_ci("third"))
 			third = true;
 		else if (param.equals_ci("vendor"))
 			vendor = true;
+		else if (param.equals_ci("extra"))
+			extra = true;
 		else if (param.equals_ci("database"))
 			database = true;
 		else if (param.equals_ci("encryption"))
@@ -108,7 +110,7 @@ class CommandOSModList : public Command
 			protocol = true;
 		else
 			third = extra = database = encryption = protocol = true;
-				
+
 		Module *protomod = ModuleManager::FindFirstOf(PROTOCOL);
 
 		source.Reply(_("Current module list:"));
@@ -149,19 +151,19 @@ class CommandOSModList : public Command
 					mtype += ", ";
 				mtype += "Database";
 			}
-			if (m->type & VENDOR)
-			{
-				show |= vendor;
-				if (!mtype.empty())
-					mtype += ", ";
-				mtype += "Vendor";
-			}
 			if (m->type & EXTRA)
 			{
 				show |= extra;
 				if (!mtype.empty())
 					mtype += ", ";
 				mtype += "Extra";
+			}
+			if (m->type & VENDOR)
+			{
+				show |= vendor;
+				if (!mtype.empty())
+					mtype += ", ";
+				mtype += "Vendor";
 			}
 			if (m->type & THIRD)
 			{

@@ -63,8 +63,8 @@ const Anope::string BufferedSocket::GetLine()
 		return "";
 	Anope::string str = this->read_buffer.substr(0, s + 1);
 	this->read_buffer.erase(0, s + 1);
-	this->read_buffer.ltrim();
-	return str.trim();
+	this->read_buffer.ltrim("\r\n");
+	return str.trim("\r\n");
 }
 
 void BufferedSocket::Write(const char *buffer, size_t l)

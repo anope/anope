@@ -159,24 +159,24 @@ namespace Anope
 		 * Trim leading and trailing white spaces from the string.
 		 */
 
-		inline string& ltrim()
+		inline string& ltrim(const Anope::string &what = " \t\r\n")
 		{
-			while (!this->_string.empty() && isspace(this->_string[0]))
+			while (!this->_string.empty() && what.find(this->_string[0]) != Anope::string::npos)
 				this->_string.erase(this->_string.begin());
 			return *this;
 		}
 
-		inline string& rtrim()
+		inline string& rtrim(const Anope::string &what = " \t\r\n")
 		{
-			while (!this->_string.empty() && isspace(this->_string[this->_string.length() - 1]))
+			while (!this->_string.empty() && what.find(this->_string[this->_string.length() - 1]) != Anope::string::npos)
 				this->_string.erase(this->_string.length() - 1);
 			return *this;
 		}
 
-		inline string& trim()
+		inline string& trim(const Anope::string &what = " \t\r\n")
 		{
-			this->ltrim();
-			this->rtrim();
+			this->ltrim(what);
+			this->rtrim(what);
 			return *this;
 		}
 

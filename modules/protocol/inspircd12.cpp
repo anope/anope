@@ -10,6 +10,7 @@
  */
 
 #include "module.h"
+#include "modules/sasl.h"
 
 struct SASLUser
 {
@@ -18,7 +19,6 @@ struct SASLUser
 	time_t created;
 };
 
-static bool sasl = true;
 static std::list<SASLUser> saslusers;
 
 static Anope::string rsquit_server, rsquit_id;
@@ -396,6 +396,33 @@ class InspIRCd12Proto : public IRCDProto
 
 	void SendOper(User *u) anope_override
 	{
+	}
+
+	void SendSASLMessage(const SASL::Message &message) anope_override
+	{
+		UplinkSocket::Message(Me) << "ENCAP " << message.target.substr(0, 3) << " SASL " << message.source << " " << message.target << " " << message.type << " " << message.data << (message.ext.empty() ? "" : (" " + message.ext));
+	}
+
+	void SendSVSLogin(const Anope::string &uid, const Anope::string &acc) anope_override
+	{
+		UplinkSocket::Message(Me) << "METADATA " << uid << " accountname :" << acc;
+
+		SASLUser su;
+		su.uid = uid;
+		su.acc = acc;
+		su.created = Anope::CurTime;
+
+		for (std::list<SASLUser>::iterator it = saslusers.begin(); it != saslusers.end();)
+		{
+			SASLUser &u = *it;
+
+			if (u.created + 30 < Anope::CurTime || u.uid == uid)
+				it = saslusers.erase(it);
+			else
+				++it;
+		}
+
+		saslusers.push_back(su);
 	}
 
 	bool IsExtbanValid(const Anope::string &mask) anope_override
@@ -846,88 +873,16 @@ struct IRCDMessageEncap : IRCDMessage
 		if (Anope::Match(Me->GetSID(), params[0]) == false)
 			return;
 
-		if (sasl && params[1] == "SASL" && params.size() == 6)
+		if (sasl && params[1] == "SASL" && params.size() >= 6)
 		{
-			class InspIRCDSASLIdentifyRequest : public IdentifyRequest
-			{
-				Anope::string uid;
+			SASL::Message m;
+			m.source = params[2];
+			m.target = params[3];
+			m.type = params[4];
+			m.data = params[5];
+			m.ext = params.size() > 6 ? params[6] : "";
 
-			 public:
-				InspIRCDSASLIdentifyRequest(Module *m, const Anope::string &id, const Anope::string &acc, const Anope::string &pass) : IdentifyRequest(m, acc, pass), uid(id) { }
-
-				void OnSuccess() anope_override
-				{
-					Anope::string accountname = GetAccount();
-					NickAlias *na = NickAlias::Find(accountname);
-					if (na)
-						accountname = na->nc->display;
-
-					UplinkSocket::Message(Me) << "METADATA " << this->uid << " accountname :" << accountname;
-					UplinkSocket::Message(Me) << "ENCAP " << this->uid.substr(0, 3) << " SASL " << Me->GetSID() << " " << this->uid << " D S";
-
-					SASLUser su;
-					su.uid = this->uid;
-					su.acc = this->GetAccount();
-					su.created = Anope::CurTime;
-
-					for (std::list<SASLUser>::iterator it = saslusers.begin(); it != saslusers.end();)
-					{
-						SASLUser &u = *it;
-
-						if (u.created + 30 < Anope::CurTime || u.uid == this->uid)
-							it = saslusers.erase(it);
-						else
-							++it;
-					}
-
-					saslusers.push_back(su);
-				}
-
-				void OnFail() anope_override
-				{
-					UplinkSocket::Message(Me) << "ENCAP " << this->uid.substr(0, 3) << " SASL " << Me->GetSID() << " " << this->uid << " " << " D F";
-
-					Log(Config->GetClient("NickServ")) << "A user failed to identify for account " << this->GetAccount() << " using SASL";
-				}
-			};
-
-			/*
-			Received: :869 ENCAP * SASL 869AAAAAH * S PLAIN
-			Sent: :00B ENCAP 869 SASL 00B 869AAAAAH C +
-			Received: :869 ENCAP * SASL 869AAAAAH 00B C QWRhbQBBZGFtAG1vbw==
-			                                            base64(account\0account\0pass)
-			*/
-			if (params[4] == "S")
-			{
-				if (params[5] == "PLAIN")
-					UplinkSocket::Message(Me) << "ENCAP " << params[2].substr(0, 3) << " SASL " << Me->GetSID() << " " << params[2] << " C +";
-				else
-					UplinkSocket::Message(Me) << "ENCAP " << params[2].substr(0, 3) << " SASL " << Me->GetSID() << " " << params[2] << " D F";
-			}
-			else if (params[4] == "C")
-			{
-				Anope::string decoded;
-				Anope::B64Decode(params[5], decoded);
-
-				size_t p = decoded.find('\0');
-				if (p == Anope::string::npos)
-					return;
-				decoded = decoded.substr(p + 1);
-
-				p = decoded.find('\0');
-				if (p == Anope::string::npos)
-					return;
-
-				Anope::string acc = decoded.substr(0, p),
-					pass = decoded.substr(p + 1);
-
-				if (acc.empty() || pass.empty())
-					return;
-
-				IdentifyRequest *req = new InspIRCDSASLIdentifyRequest(this->owner, params[2], acc, pass);
-				FOREACH_MOD(OnCheckAuthentication, (NULL, req));
-				req->Dispatch();
-			}
+			sasl->ProcessMessage(m);
 		}
 	}
 };
@@ -1405,11 +1360,6 @@ class ProtoInspIRCd12 : public Module
 		message_setident(this), message_server(this), message_squit(this), message_time(this), message_uid(this)
 	{
 		Servers::Capab.insert("NOQUIT");
-	}
-
-	void OnReload(Configuration::Conf *conf) anope_override
-	{
-		sasl = conf->GetModule(this)->Get<bool>("sasl") || conf->GetModule("inspircd20")->Get<bool>("sasl");
 	}
 
 	void OnUserNickChange(User *u, const Anope::string &) anope_override

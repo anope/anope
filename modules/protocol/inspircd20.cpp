@@ -71,6 +71,8 @@ class InspIRCd20Proto : public IRCDProto
 	void SendLogin(User *u, NickAlias *na) anope_override { insp12->SendLogin(u, na); }
 	void SendLogout(User *u) anope_override { insp12->SendLogout(u); }
 	void SendChannel(Channel *c) anope_override { insp12->SendChannel(c); }
+	void SendSASLMessage(const SASL::Message &message) anope_override { insp12->SendSASLMessage(message); }
+	void SendSVSLogin(const Anope::string &uid, const Anope::string &acc) anope_override { insp12->SendSVSLogin(uid, acc); }
 	bool IsExtbanValid(const Anope::string &mask) anope_override { return insp12->IsExtbanValid(mask); }
 	bool IsIdentValid(const Anope::string &ident) anope_override { return insp12->IsIdentValid(ident); }
 };

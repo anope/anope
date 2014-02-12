@@ -52,4 +52,5 @@ struct Exception;
 struct MemoInfo;
 struct ModeLock;
 struct Oper;
+namespace SASL { struct Message; }
 

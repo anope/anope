@@ -11,8 +11,7 @@
 
 #include "module.h"
 #include "modules/cs_mode.h"
-
-static bool sasl = true;
+#include "modules/sasl.h"
 
 class UnrealIRCdProto : public IRCDProto
 {
@@ -375,6 +374,23 @@ class UnrealIRCdProto : public IRCDProto
 			bi->Part(c);
 			bi->Join(c);
 		}
+	}
+
+	void SendSASLMessage(const SASL::Message &message) anope_override
+	{
+		size_t p = message.target.find('!');
+		if (p == Anope::string::npos)
+			return;
+
+		UplinkSocket::Message(BotInfo::Find(message.source)) << "SASL " << message.target.substr(0, p) << " " << message.target << " " << message.type << " " << message.data << (message.ext.empty() ? "" : " " + message.ext);
+	}
+
+	void SendSVSLogin(const Anope::string &uid, const Anope::string &acc) anope_override
+	{
+		size_t p = uid.find('!');
+		if (p == Anope::string::npos)
+			return;
+		UplinkSocket::Message(Me) << "SVSLOGIN " << uid.substr(0, p) << " " << uid << " " << acc;
 	}
 
 	bool IsIdentValid(const Anope::string &ident) anope_override
@@ -868,85 +884,22 @@ struct IRCDMessagePong : IRCDMessage
 
 struct IRCDMessageSASL : IRCDMessage
 {
-	class UnrealSASLIdentifyRequest : public IdentifyRequest
-	{
-		Anope::string uid;
+	IRCDMessageSASL(Module *creator) : IRCDMessage(creator, "SASL", 4) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
 
-	 public:
-		UnrealSASLIdentifyRequest(Module *m, const Anope::string &id, const Anope::string &acc, const Anope::string &pass) : IdentifyRequest(m, acc, pass), uid(id) { }
-
-		void OnSuccess() anope_override
-		{
-			size_t p = this->uid.find('!');
-			if (p == Anope::string::npos)
-				return;
-
-			Anope::string accountname = GetAccount();
-			NickAlias *na = NickAlias::Find(accountname);
-			if (na)
-				accountname = na->nc->display;
-
-			UplinkSocket::Message(Me) << "SVSLOGIN " << this->uid.substr(0, p) << " " << this->uid << " " << accountname;
-			UplinkSocket::Message() << "SASL " << this->uid.substr(0, p) << " " << this->uid << " D S";
-		}
-
-		void OnFail() anope_override
-		{
-			size_t p = this->uid.find('!');
-			if (p == Anope::string::npos)
-				return;
-
-			UplinkSocket::Message() << "SASL " << this->uid.substr(0, p) << " " << this->uid << " D F";
-
-			Log(Config->GetClient("NickServ")) << "A user failed to identify for account " << this->GetAccount() << " using SASL";
-		}
-	};
-	
-	IRCDMessageSASL(Module *creator) : IRCDMessage(creator, "SASL", 4) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
-
-	/* Received: :irc.foonet.com SASL services.localhost.net irc.foonet.com!1.57290 S PLAIN
-	 *                                                       uid
-	 *
-	 * Received: :irc.foonet.com SASL services.localhost.net irc.foonet.com!3.56270 C QWRhbQBBZGFtAHF3ZXJ0eQ==
-	 *                                                       uid                      base64(account\0account\0pass)
-	 */
 	void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		size_t p = params[1].find('!');
 		if (!sasl || p == Anope::string::npos)	
 			return;
 
-		if (params[2] == "S")
-		{
-			if (params[3] == "PLAIN")
-				UplinkSocket::Message() << "SASL " << params[1].substr(0, p) << " " << params[1] << " C +";
-			else
-				UplinkSocket::Message() << "SASL " << params[1].substr(0, p) << " " << params[1] << " D F";
-		}
-		else if (params[2] == "C")
-		{
-			Anope::string decoded;
-			Anope::B64Decode(params[3], decoded);
+		SASL::Message m;
+		m.source = params[1];
+		m.target = params[0];
+		m.type = params[2];
+		m.data = params[3];
+		m.ext = params.size() > 4 ? params[4] : "";
 
-			p = decoded.find('\0');
-			if (p == Anope::string::npos)
-				return;
-			decoded = decoded.substr(p + 1);
-
-			p = decoded.find('\0');
-			if (p == Anope::string::npos)
-				return;
-
-			Anope::string acc = decoded.substr(0, p),
-				pass = decoded.substr(p + 1);
-
-			if (acc.empty() || pass.empty())
-				return;
-
-			IdentifyRequest *req = new UnrealSASLIdentifyRequest(this->owner, params[1], acc, pass);
-			FOREACH_MOD(OnCheckAuthentication, (NULL, req));
-			req->Dispatch();
-		}
+		sasl->ProcessMessage(m);
 	}
 };
 
@@ -1241,7 +1194,6 @@ class ProtoUnreal : public Module
 	void OnReload(Configuration::Conf *conf) anope_override
 	{
 		use_server_side_mlock = conf->GetModule(this)->Get<bool>("use_server_side_mlock");
-		sasl = conf->GetModule(this)->Get<bool>("sasl");
 	}
 
 	void OnUserNickChange(User *u, const Anope::string &) anope_override

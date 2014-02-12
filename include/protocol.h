@@ -217,6 +217,9 @@ class CoreExport IRCDProto : public Service
 	 */
 	virtual void SendOper(User *u);
 
+	virtual void SendSASLMessage(const SASL::Message &) { }
+	virtual void SendSVSLogin(const Anope::string &uid, const Anope::string &acc) { }
+
 	virtual bool IsNickValid(const Anope::string &);
 	virtual bool IsChannelValid(const Anope::string &);
 	virtual bool IsIdentValid(const Anope::string &);

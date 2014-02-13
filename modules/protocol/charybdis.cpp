@@ -188,7 +188,7 @@ struct IRCDMessageEncap : IRCDMessage
 		 *
 		 * Charybdis only accepts messages from SASL agents; these must have umode +S
 		 */
-		if (params[1] == "SASL" && sasl && params.size() >= 6)
+		if (params[1] == "SASL" && SASL::sasl && params.size() >= 6)
 		{
 			SASL::Message m;
 			m.source = params[2];
@@ -197,7 +197,7 @@ struct IRCDMessageEncap : IRCDMessage
 			m.data = params[5];
 			m.ext = params.size() > 6 ? params[6] : "";
 
-			sasl->ProcessMessage(m);
+			SASL::sasl->ProcessMessage(m);
 		}
 	}
 };

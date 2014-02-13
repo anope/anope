@@ -18,27 +18,7 @@ namespace SASL
 	};
 
 	class Mechanism;
-
-	struct Session
-	{
-		time_t created;
-		Anope::string uid;
-		Reference<Mechanism> mech;
-
-		Session(Mechanism *m, const Anope::string &u) : created(Anope::CurTime), uid(u), mech(m) { }
-		virtual ~Session() { }
-	};
-
-	/* PLAIN, EXTERNAL, etc */
-	class Mechanism : public Service
-	{
-	 public:
-		Mechanism(Module *o, const Anope::string &sname) : Service(o, "SASL::Mechanism", sname) { }
-
-		virtual Session* CreateSession(const Anope::string &uid) { return new Session(this, uid); }
-
-		virtual void ProcessMessage(Session *session, const Message &) = 0;
-	};
+	struct Session;
 
 	class Service : public ::Service
 	{
@@ -56,8 +36,40 @@ namespace SASL
 		virtual void Succeed(Session *, NickCore *) = 0;
 		virtual void Fail(Session *) = 0;
 		virtual void SendMechs(Session *) = 0;
+		virtual void DeleteSessions(Mechanism *, bool = false) = 0;
+		virtual void RemoveSession(Session *) = 0;
+	};
+
+	static ServiceReference<SASL::Service> sasl("SASL::Service", "sasl");
+
+	struct Session
+	{
+		time_t created;
+		Anope::string uid;
+		Reference<Mechanism> mech;
+
+		Session(Mechanism *m, const Anope::string &u) : created(Anope::CurTime), uid(u), mech(m) { }
+		virtual ~Session()
+		{
+			if (sasl)
+				sasl->RemoveSession(this);
+		}
+	};
+
+	/* PLAIN, EXTERNAL, etc */
+	class Mechanism : public ::Service
+	{
+	 public:
+		Mechanism(Module *o, const Anope::string &sname) : Service(o, "SASL::Mechanism", sname) { }
+
+		virtual Session* CreateSession(const Anope::string &uid) { return new Session(this, uid); }
+
+		virtual void ProcessMessage(Session *session, const Message &) = 0;
+
+		virtual ~Mechanism()
+		{
+			if (sasl)
+				sasl->DeleteSessions(this, true);
+		}
 	};
 }
-
-static ServiceReference<SASL::Service> sasl("SASL::Service", "sasl");
-

@@ -889,7 +889,7 @@ struct IRCDMessageSASL : IRCDMessage
 	void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		size_t p = params[1].find('!');
-		if (!sasl || p == Anope::string::npos)	
+		if (!SASL::sasl || p == Anope::string::npos)	
 			return;
 
 		SASL::Message m;
@@ -899,7 +899,7 @@ struct IRCDMessageSASL : IRCDMessage
 		m.data = params[3];
 		m.ext = params.size() > 4 ? params[4] : "";
 
-		sasl->ProcessMessage(m);
+		SASL::sasl->ProcessMessage(m);
 	}
 };
 

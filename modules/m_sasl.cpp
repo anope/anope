@@ -10,7 +10,9 @@
 #include "modules/sasl.h"
 #include "modules/ns_cert.h"
 
-class Plain : public SASL::Mechanism
+using namespace SASL;
+
+class Plain : public Mechanism
 {
 	class IdentifyRequest : public ::IdentifyRequest
 	{
@@ -28,9 +30,12 @@ class Plain : public SASL::Mechanism
 			if (!na)
 				return OnFail();
 
-			SASL::Session *s = sasl->GetSession(uid);
+			Session *s = sasl->GetSession(uid);
 			if (s)
+			{
 				sasl->Succeed(s, na->nc);
+				delete s;
+			}
 		}
 
 		void OnFail() anope_override
@@ -38,18 +43,21 @@ class Plain : public SASL::Mechanism
 			if (!sasl)
 				return;
 
-			SASL::Session *s = sasl->GetSession(uid);
+			Session *s = sasl->GetSession(uid);
 			if (s)
+			{
 				sasl->Fail(s);
+				delete s;
+			}
 
 			Log(Config->GetClient("NickServ")) << "A user failed to identify for account " << this->GetAccount() << " using SASL";
 		}
 	};
 
  public:
-	Plain(Module *o) : SASL::Mechanism(o, "PLAIN") { }
+	Plain(Module *o) : Mechanism(o, "PLAIN") { }
 
-	void ProcessMessage(SASL::Session *sess, const SASL::Message &m) anope_override
+	void ProcessMessage(Session *sess, const SASL::Message &m) anope_override
 	{
 		if (m.type == "S")
 		{
@@ -82,7 +90,7 @@ class Plain : public SASL::Mechanism
 	}
 };
 
-class External : public SASL::Mechanism
+class External : public Mechanism
 {
 	struct Session : SASL::Session
 	{
@@ -92,13 +100,13 @@ class External : public SASL::Mechanism
 	};
 
  public:
-	External(Module *o) : SASL::Mechanism(o, "EXTERNAL")
+	External(Module *o) : Mechanism(o, "EXTERNAL")
 	{
 		if (!IRCD || !IRCD->CanCertFP)
 			throw ModuleException("No CertFP");
 	}
 
-	SASL::Session* CreateSession(const Anope::string &uid) anope_override
+	Session* CreateSession(const Anope::string &uid) anope_override
 	{
 		return new Session(this, uid);
 	}
@@ -122,6 +130,7 @@ class External : public SASL::Mechanism
 			if (!na)
 			{
 				sasl->Fail(sess);
+				delete sess;
 				return;
 			}
 
@@ -129,10 +138,12 @@ class External : public SASL::Mechanism
 			if (cl == NULL || !cl->FindCert(mysess->cert))
 			{
 				sasl->Fail(sess);
+				delete sess;
 				return;
 			}
 
 			sasl->Succeed(sess, na->nc);
+			delete sess;
 		}
 	}
 };
@@ -146,7 +157,7 @@ class SASLService : public SASL::Service, public Timer
 
 	~SASLService()
 	{
-		for (std::map<Anope::string, SASL::Session *>::iterator it = sessions.begin(); it != sessions.end();)
+		for (std::map<Anope::string, Session *>::iterator it = sessions.begin(); it != sessions.end(); it++)
 			delete it->second;
 	}
 
@@ -163,14 +174,14 @@ class SASLService : public SASL::Service, public Timer
 			}
 		}
 
-		SASL::Session* &session = sessions[m.source];
+		Session* &session = sessions[m.source];
 
 		if (m.type == "S")
 		{
-			ServiceReference<SASL::Mechanism> mech("SASL::Mechanism", m.data);
+			ServiceReference<Mechanism> mech("SASL::Mechanism", m.data);
 			if (!mech)
 			{
-				SASL::Session tmp(NULL, m.source);
+				Session tmp(NULL, m.source);
 
 				sasl->SendMechs(&tmp);
 				sasl->Fail(&tmp);
@@ -200,15 +211,34 @@ class SASLService : public SASL::Service, public Timer
 		return agent;
 	}
 
-	SASL::Session* GetSession(const Anope::string &uid) anope_override
+	Session* GetSession(const Anope::string &uid) anope_override
 	{
-		std::map<Anope::string, SASL::Session *>::iterator it = sessions.find(uid);
+		std::map<Anope::string, Session *>::iterator it = sessions.find(uid);
 		if (it != sessions.end())
 			return it->second;
 		return NULL;
 	}
 
-	void SendMessage(SASL::Session *session, const Anope::string &mtype, const Anope::string &data) anope_override
+	void RemoveSession(Session *sess) anope_override
+	{
+		sessions.erase(sess->uid);
+	}
+
+	void DeleteSessions(Mechanism *mech, bool da) anope_override
+	{
+		for (std::map<Anope::string, Session *>::iterator it = sessions.begin(); it != sessions.end();)
+		{
+			std::map<Anope::string, Session *>::iterator del = it++;
+			if (*del->second->mech == mech)
+			{
+				if (da)
+					this->SendMessage(del->second, "D", "A");
+				delete del->second;
+			}
+		}
+	}
+
+	void SendMessage(Session *session, const Anope::string &mtype, const Anope::string &data) anope_override
 	{
 		SASL::Message msg;
 		msg.source = this->GetAgent();
@@ -219,18 +249,18 @@ class SASLService : public SASL::Service, public Timer
 		IRCD->SendSASLMessage(msg);
 	}
 
-	void Succeed(SASL::Session *session, NickCore *nc) anope_override
+	void Succeed(Session *session, NickCore *nc) anope_override
 	{
 		IRCD->SendSVSLogin(session->uid, nc->display);
 		this->SendMessage(session, "D", "S");
 	}
 
-	void Fail(SASL::Session *session) anope_override
+	void Fail(Session *session) anope_override
 	{
 		this->SendMessage(session, "D", "F");
 	}
 
-	void SendMechs(SASL::Session *session) anope_override
+	void SendMechs(Session *session) anope_override
 	{
 		std::vector<Anope::string> mechs = Service::GetServiceKeys("SASL::Mechanism");
 		Anope::string buf;
@@ -242,10 +272,10 @@ class SASLService : public SASL::Service, public Timer
 
 	void Tick(time_t) anope_override
 	{
-		for (std::map<Anope::string, SASL::Session *>::iterator it = sessions.begin(); it != sessions.end();)
+		for (std::map<Anope::string, Session *>::iterator it = sessions.begin(); it != sessions.end();)
 		{
 			Anope::string key = it->first;
-			SASL::Session *s = it->second;
+			Session *s = it->second;
 			++it;
 
 			if (!s || !s->mech || s->created + 60 < Anope::CurTime)

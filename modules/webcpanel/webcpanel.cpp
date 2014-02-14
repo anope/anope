@@ -240,6 +240,9 @@ namespace WebPanel
 			return;
 		}
 
+		if (params.size() < cmd->min_params)
+			return;
+
 		BotInfo *bi = Config->GetClient(service);
 		if (!bi)
 		{
@@ -263,6 +266,13 @@ namespace WebPanel
 		my_reply(r, key);
 
 		CommandSource source(user, NULL, nc, &my_reply, bi);
+
+		if (!cmd->AllowUnregistered() && !source.nc)
+		{
+			r[key] = "Access denied.";
+			return;
+		}
+
 		cmd->Execute(source, params);
 	}
 }

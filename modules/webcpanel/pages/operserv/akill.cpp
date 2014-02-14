@@ -16,7 +16,7 @@ bool WebCPanel::OperServ::Akill::OnRequest(HTTPProvider *server, const Anope::st
 
 	static ServiceReference<XLineManager> akills("XLineManager","xlinemanager/sgline");
 
-	if (!na->nc->IsServicesOper() && !(na->nc->o && na->nc->o->ot && na->nc->o->ot->HasPriv("operserv/akill")))
+	if (!na->nc->o || !na->nc->o->ot->HasCommand("operserv/akill"))
 	{
 		replacements["NOACCESS"];
 	}

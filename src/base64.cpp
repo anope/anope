@@ -159,7 +159,7 @@ void Anope::B64Decode(const Anope::string &src, Anope::string &target)
 				state = 0;
 		}
 	}
-	if (!target[target.length() - 1])
+	if (!target.empty() && !target[target.length() - 1])
 		target.erase(target.length() - 1);
 }
 

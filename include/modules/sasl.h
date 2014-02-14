@@ -72,4 +72,44 @@ namespace SASL
 				sasl->DeleteSessions(this, true);
 		}
 	};
+
+	class IdentifyRequest : public ::IdentifyRequest
+	{
+		Anope::string uid;
+
+	 public:
+		IdentifyRequest(Module *m, const Anope::string &id, const Anope::string &acc, const Anope::string &pass) : ::IdentifyRequest(m, acc, pass), uid(id) { }
+
+		void OnSuccess() anope_override
+		{
+			if (!sasl)
+				return;
+
+			NickAlias *na = NickAlias::Find(GetAccount());
+			if (!na)
+				return OnFail();
+
+			Session *s = sasl->GetSession(uid);
+			if (s)
+			{
+				sasl->Succeed(s, na->nc);
+				delete s;
+			}
+		}
+
+		void OnFail() anope_override
+		{
+			if (!sasl)
+				return;
+
+			Session *s = sasl->GetSession(uid);
+			if (s)
+			{
+				sasl->Fail(s);
+				delete s;
+			}
+
+			Log(Config->GetClient("NickServ")) << "A user failed to identify for account " << this->GetAccount() << " using SASL";
+		}
+	};
 }

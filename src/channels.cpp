@@ -85,13 +85,17 @@ void Channel::Reset()
 	for (ChanUserList::const_iterator it = this->users.begin(), it_end = this->users.end(); it != it_end; ++it)
 		this->SetCorrectModes(it->second->user, true);
 	
-	this->Sync();
+	// If the channel is syncing now, do not force a sync due to Reset(), as we are probably iterating over users in Message::SJoin
+	// A sync will come soon
+	if (!syncing)
+		this->Sync();
 }
 
 void Channel::Sync()
 {
 	syncing = false;
 	FOREACH_MOD(OnChannelSync, (this));
+	CheckModes();
 }
 
 void Channel::CheckModes()

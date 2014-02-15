@@ -148,7 +148,7 @@ class ServiceReference : public Reference<T>
 			 * creates its own service type (that other modules must include the header file
 			 * for), as the core is not compiled with it so there is no RTTI for it.
 			 */
-			this->ref = static_cast<T *>(Service::FindService(this->type, this->name));
+			this->ref = static_cast<T *>(::Service::FindService(this->type, this->name));
 			if (this->ref)
 				this->ref->AddReference(this);
 		}
@@ -162,12 +162,12 @@ class ServiceAlias
  public:
 	ServiceAlias(const Anope::string &type, const Anope::string &from, const Anope::string &to) : t(type), f(from)
 	{
-		Service::AddAlias(type, from, to);
+		::Service::AddAlias(type, from, to);
 	}
 
 	~ServiceAlias()
 	{
-		Service::DelAlias(t, f);
+		::Service::DelAlias(t, f);
 	}
 };
 

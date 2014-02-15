@@ -115,6 +115,7 @@ namespace Anope
 		 * The following functions return the various types of strings.
 		 */
 		inline const char *c_str() const { return this->_string.c_str(); }
+		inline const char *data() const { return this->_string.data(); }
 		inline std::string &str() { return this->_string; }
 		inline const std::string &str() const { return this->_string; }
 		inline ci::string ci_str() const { return ci::string(this->_string.c_str()); }

@@ -873,7 +873,7 @@ struct IRCDMessageEncap : IRCDMessage
 		if (Anope::Match(Me->GetSID(), params[0]) == false)
 			return;
 
-		if (sasl && params[1] == "SASL" && params.size() >= 6)
+		if (SASL::sasl && params[1] == "SASL" && params.size() >= 6)
 		{
 			SASL::Message m;
 			m.source = params[2];
@@ -882,7 +882,7 @@ struct IRCDMessageEncap : IRCDMessage
 			m.data = params[5];
 			m.ext = params.size() > 6 ? params[6] : "";
 
-			sasl->ProcessMessage(m);
+			SASL::sasl->ProcessMessage(m);
 		}
 	}
 };
@@ -1283,7 +1283,7 @@ struct IRCDMessageUID : IRCDMessage
 			modes += " " + params[i];
 
 		NickAlias *na = NULL;
-		if (sasl)
+		if (SASL::sasl)
 			for (std::list<SASLUser>::iterator it = saslusers.begin(); it != saslusers.end();)
 			{
 				SASLUser &u = *it;

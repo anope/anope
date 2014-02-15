@@ -18,27 +18,7 @@ namespace SASL
 	};
 
 	class Mechanism;
-
-	struct Session
-	{
-		time_t created;
-		Anope::string uid;
-		Reference<Mechanism> mech;
-
-		Session(Mechanism *m, const Anope::string &u) : created(Anope::CurTime), uid(u), mech(m) { }
-		virtual ~Session() { }
-	};
-
-	/* PLAIN, EXTERNAL, etc */
-	class Mechanism : public Service
-	{
-	 public:
-		Mechanism(Module *o, const Anope::string &sname) : Service(o, "SASL::Mechanism", sname) { }
-
-		virtual Session* CreateSession(const Anope::string &uid) { return new Session(this, uid); }
-
-		virtual void ProcessMessage(Session *session, const Message &) = 0;
-	};
+	struct Session;
 
 	class Service : public ::Service
 	{
@@ -56,8 +36,80 @@ namespace SASL
 		virtual void Succeed(Session *, NickCore *) = 0;
 		virtual void Fail(Session *) = 0;
 		virtual void SendMechs(Session *) = 0;
+		virtual void DeleteSessions(Mechanism *, bool = false) = 0;
+		virtual void RemoveSession(Session *) = 0;
+	};
+
+	static ServiceReference<SASL::Service> sasl("SASL::Service", "sasl");
+
+	struct Session
+	{
+		time_t created;
+		Anope::string uid;
+		Reference<Mechanism> mech;
+
+		Session(Mechanism *m, const Anope::string &u) : created(Anope::CurTime), uid(u), mech(m) { }
+		virtual ~Session()
+		{
+			if (sasl)
+				sasl->RemoveSession(this);
+		}
+	};
+
+	/* PLAIN, EXTERNAL, etc */
+	class Mechanism : public ::Service
+	{
+	 public:
+		Mechanism(Module *o, const Anope::string &sname) : Service(o, "SASL::Mechanism", sname) { }
+
+		virtual Session* CreateSession(const Anope::string &uid) { return new Session(this, uid); }
+
+		virtual void ProcessMessage(Session *session, const Message &) = 0;
+
+		virtual ~Mechanism()
+		{
+			if (sasl)
+				sasl->DeleteSessions(this, true);
+		}
+	};
+
+	class IdentifyRequest : public ::IdentifyRequest
+	{
+		Anope::string uid;
+
+	 public:
+		IdentifyRequest(Module *m, const Anope::string &id, const Anope::string &acc, const Anope::string &pass) : ::IdentifyRequest(m, acc, pass), uid(id) { }
+
+		void OnSuccess() anope_override
+		{
+			if (!sasl)
+				return;
+
+			NickAlias *na = NickAlias::Find(GetAccount());
+			if (!na)
+				return OnFail();
+
+			Session *s = sasl->GetSession(uid);
+			if (s)
+			{
+				sasl->Succeed(s, na->nc);
+				delete s;
+			}
+		}
+
+		void OnFail() anope_override
+		{
+			if (!sasl)
+				return;
+
+			Session *s = sasl->GetSession(uid);
+			if (s)
+			{
+				sasl->Fail(s);
+				delete s;
+			}
+
+			Log(Config->GetClient("NickServ")) << "A user failed to identify for account " << this->GetAccount() << " using SASL";
+		}
 	};
 }
-
-static ServiceReference<SASL::Service> sasl("SASL::Service", "sasl");
-

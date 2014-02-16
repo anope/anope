@@ -162,12 +162,12 @@ class ServiceAlias
  public:
 	ServiceAlias(const Anope::string &type, const Anope::string &from, const Anope::string &to) : t(type), f(from)
 	{
-		Service::AddAlias(type, from, to);
+		::Service::AddAlias(type, from, to);
 	}
 
 	~ServiceAlias()
 	{
-		Service::DelAlias(t, f);
+		::Service::DelAlias(t, f);
 	}
 };
 

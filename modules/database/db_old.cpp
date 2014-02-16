@@ -15,6 +15,7 @@
 #include "modules/bs_badwords.h"
 #include "modules/os_news.h"
 #include "modules/suspend.h"
+#include "modules/os_forbid.h"
 
 #define READ(x) \
 if (true) \
@@ -49,6 +50,7 @@ else \
 #define OLD_NI_AUTOOP		0x00080000 /* Autoop nickname in channels */
 
 #define OLD_NS_NO_EXPIRE		0x0004     /* nick won't expire */
+#define OLD_NS_VERBOTEN			0x0002
 
 #define OLD_CI_KEEPTOPIC		0x00000001
 #define OLD_CI_SECUREOPS		0x00000002
@@ -57,7 +59,7 @@ else \
 #define OLD_CI_RESTRICTED		0x00000010
 #define OLD_CI_PEACE			0x00000020
 #define OLD_CI_SECURE			0x00000040
-#define OLD_CI_FORBIDDEN		0x00000080
+#define OLD_CI_VERBOTEN			0x00000080
 #define OLD_CI_ENCRYPTEDPW		0x00000100
 #define OLD_CI_NO_EXPIRE		0x00000200
 #define OLD_CI_MEMO_HARDMAX		0x00000400
@@ -424,6 +426,7 @@ int read_int32(int32_t *ret, dbFILE *f)
 
 static void LoadNicks()
 {
+	ServiceReference<ForbidService> forbid("ForbidService", "forbid");
 	dbFILE *f = open_db_read("NickServ", "nick.db", 14);
 	if (f == NULL)
 		return;
@@ -613,6 +616,24 @@ static void LoadNicks()
 				Log() << "Skipping coreless nick " << nick << " with core " << core;
 				continue;
 			}
+
+			if (tmpu16 & OLD_NS_VERBOTEN)
+			{
+				if (!forbid)
+					continue;
+
+				ForbidData *d = new ForbidData();
+				d->mask = nc->display;
+				d->creator = last_usermask;
+				d->reason = last_realname;
+				d->expires = 0;
+				d->created = 0;
+				d->type = FT_NICK;
+				delete nc;
+				forbid->AddForbid(d);
+				continue;
+			}
+
 			NickAlias *na = new NickAlias(nick, nc);
 			na->last_usermask = last_usermask;
 			na->last_realname = last_realname;
@@ -697,6 +718,7 @@ static void LoadBots()
 
 static void LoadChannels()
 {
+	ServiceReference<ForbidService> forbid("ForbidService", "forbid");
 	dbFILE *f = open_db_read("ChanServ", "chan.db", 16);
 	if (f == NULL)
 		return;
@@ -783,6 +805,7 @@ static void LoadChannels()
 				si.when = si.expires = 0;
 				ci->Extend("CS_SUSPENDED", si);
 			}
+			bool forbid_chan = tmpu32 & OLD_CI_VERBOTEN;
 
 			int16_t tmp16;
 			READ(read_int16(&tmp16, f));
@@ -1001,6 +1024,23 @@ static void LoadChannels()
 					if (bw)
 						bw->AddBadWord(buffer, bwtype);
 				}
+			}
+
+			if (forbid_chan)
+			{
+				if (!forbid)
+					continue;
+
+				ForbidData *d = new ForbidData();
+				d->mask = ci->name;
+				d->creator = forbidby;
+				d->reason = forbidreason;
+				d->expires = 0;
+				d->created = 0;
+				d->type = FT_CHAN;
+				delete ci;
+				forbid->AddForbid(d);
+				continue;
 			}
 
 			Log(LOG_DEBUG) << "Loaded channel " << ci->name;

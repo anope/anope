@@ -71,9 +71,10 @@ Anope for Windows
        our IRC Support channel for assistance.
 
        Some Anope modules require third party libraries, such as m_mysql and
-       m_ssl. If these libraries are installed in nonstandard locations, cmake
-       will probably not find them and should be told where they are by passing
-       additional search paths to the last question in Config, such as:
+       the SSL modules. If these libraries are installed in nonstandard
+       locations, cmake will probably not find them and should be told where
+       they are by passing additional search paths to the last question in
+       Config, such as:
 
        -DEXTRA_INCLUDE:STRING=c:/openssl/include;c:/mysql/include
        -DEXTRA_LIBS:STRING=c:/openssl/lib;c:/mysql/lib

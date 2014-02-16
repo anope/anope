@@ -20,7 +20,7 @@
 /** Anything that inherits from this class can be referred to
  * using ServiceReference. Any interfaces provided by modules,
  * such as commands, use this. This is also used for modules
- * that publish a service (m_ssl, etc).
+ * that publish a service (m_ssl_openssl, etc).
  */
 class CoreExport Service : public virtual Base
 {

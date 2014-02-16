@@ -17,7 +17,7 @@ class DHAES : public Mechanism
 			BN_free(key);
 
 		sasl->Fail(sess);
-		return delete sess;
+		delete sess;
 	}
 
  public:

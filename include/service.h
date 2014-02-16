@@ -148,7 +148,7 @@ class ServiceReference : public Reference<T>
 			 * creates its own service type (that other modules must include the header file
 			 * for), as the core is not compiled with it so there is no RTTI for it.
 			 */
-			this->ref = static_cast<T *>(Service::FindService(this->type, this->name));
+			this->ref = static_cast<T *>(::Service::FindService(this->type, this->name));
 			if (this->ref)
 				this->ref->AddReference(this);
 		}

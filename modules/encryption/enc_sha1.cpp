@@ -15,7 +15,7 @@ A million repetitions of "a"
 /* #define LITTLE_ENDIAN * This should be #define'd if true. */
 
 #include "module.h"
-#include "encryption.h"
+#include "modules/encryption.h"
 
 union CHAR64LONG16
 {

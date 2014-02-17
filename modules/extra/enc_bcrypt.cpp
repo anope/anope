@@ -1,7 +1,7 @@
 /* RequiredLibraries: xcrypt */
 
 #include "module.h"
-#include "encryption.h"
+#include "modules/encryption.h"
 #include <xcrypt.h>
 
 class EBCRYPT : public Module

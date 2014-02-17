@@ -10,7 +10,7 @@
  */
 
 #include "module.h"
-#include "encryption.h"
+#include "modules/encryption.h"
 
 static ServiceReference<Encryption::Provider> md5("Encryption::Provider", "md5");
 

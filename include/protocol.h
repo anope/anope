@@ -69,6 +69,10 @@ class CoreExport IRCDProto : public Service
 	/* The maximum number of bytes a line may have */
 	unsigned MaxLine;
 
+	/* Retrieves the next free UID or SID */
+	virtual const Anope::string UID_Retrieve();
+	virtual const Anope::string SID_Retrieve();
+
 	/** Sets the server in NOOP mode. If NOOP mode is enabled, no users
 	 * will be able to oper on the server.
 	 * @param s The server

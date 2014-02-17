@@ -387,6 +387,53 @@ unsigned IRCDProto::GetMaxListFor(Channel *c)
 	return c->HasMode("LBAN") ? 0 : Config->GetBlock("networkinfo")->Get<int>("modelistsize");
 }
 
+static inline char& nextID(char &c)
+{
+	if (c == 'Z')
+		c = '0';
+	else if (c != '9')
+		++c;
+	else
+		c = 'A';
+	return c;
+}
+
+const Anope::string IRCDProto::UID_Retrieve()
+{
+	if (!RequiresID)
+		return "";
+
+	static Anope::string current_uid = "AAAAAA";
+
+	do
+	{
+		int current_len = current_uid.length() - 1;
+		while (current_len >= 0 && nextID(current_uid[current_len--]) == 'A');
+	}
+	while (User::Find(Me->GetSID() + current_uid) != NULL);
+
+	return Me->GetSID() + current_uid;
+}
+
+const Anope::string IRCDProto::SID_Retrieve()
+{
+	if (!RequiresID)
+		return "";
+
+	static Anope::string current_sid = Config->GetBlock("options")->Get<const Anope::string>("id");
+	if (current_sid.empty())
+		current_sid = "00A";
+
+	do
+	{
+		int current_len = current_sid.length() - 1;
+		while (current_len >= 0 && nextID(current_sid[current_len--]) == 'A');
+	}
+	while (Server::Find(current_sid) != NULL);
+
+	return current_sid;
+}
+
 MessageSource::MessageSource(const Anope::string &src) : source(src), u(NULL), s(NULL)
 {
 	/* no source for incoming message is our uplink */

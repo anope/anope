@@ -454,9 +454,6 @@ class HTTPD : public Module
 
 	void OnModuleLoad(User *u, Module *m) anope_override
 	{
-		if (m->name != "m_ssl")
-			return;
-
 		for (std::map<Anope::string, MyHTTPProvider *>::iterator it = this->providers.begin(), it_end = this->providers.end(); it != it_end; ++it)
 		{
 			MyHTTPProvider *p = it->second;

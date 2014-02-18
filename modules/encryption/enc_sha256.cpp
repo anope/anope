@@ -48,7 +48,7 @@
  */
 
 #include "module.h"
-#include "encryption.h"
+#include "modules/encryption.h"
 
 static const unsigned SHA256_DIGEST_SIZE = 256 / 8;
 static const unsigned SHA256_BLOCK_SIZE = 512 / 8;

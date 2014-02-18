@@ -14,6 +14,51 @@
 
 static ServiceReference<NickServService> nickserv("NickServService", "NickServ");
 
+struct ForbidDataImpl : ForbidData, Serializable
+{
+	ForbidDataImpl() : Serializable("ForbidData") { }
+	void Serialize(Serialize::Data &data) const anope_override;
+	static Serializable* Unserialize(Serializable *obj, Serialize::Data &data);
+};
+
+void ForbidDataImpl::Serialize(Serialize::Data &data) const
+{
+	data["mask"] << this->mask;
+	data["creator"] << this->creator;
+	data["reason"] << this->reason;
+	data["created"] << this->created;
+	data["expires"] << this->expires;
+	data["type"] << this->type;
+}
+
+Serializable* ForbidDataImpl::Unserialize(Serializable *obj, Serialize::Data &data)
+{
+	if (!forbid_service)
+		return NULL;
+
+	ForbidDataImpl *fb;
+	if (obj)
+		fb = anope_dynamic_static_cast<ForbidDataImpl *>(obj);
+	else
+		fb = new ForbidDataImpl();
+
+	data["mask"] >> fb->mask;
+	data["creator"] >> fb->creator;
+	data["reason"] >> fb->reason;
+	data["created"] >> fb->created;
+	data["expires"] >> fb->expires;
+	unsigned int t;
+	data["type"] >> t;
+	fb->type = static_cast<ForbidType>(t);
+
+	if (t > FT_SIZE - 1)
+		return NULL;
+
+	if (!obj)
+		forbid_service->AddForbid(fb);
+	return fb;
+}
+
 class MyForbidService : public ForbidService
 {
 	Serialize::Checker<std::vector<ForbidData *>[FT_SIZE - 1]> forbid_data;
@@ -41,6 +86,11 @@ class MyForbidService : public ForbidService
 		if (it != this->forbids(d->type).end())
 			this->forbids(d->type).erase(it);
 		delete d;
+	}
+
+	ForbidData *CreateForbid() anope_override
+	{
+		return new ForbidDataImpl();
 	}
 
 	ForbidData *FindForbid(const Anope::string &mask, ForbidType ftype) anope_override
@@ -157,7 +207,7 @@ class CommandOSForbid : public Command
 			bool created = false;
 			if (d == NULL)
 			{
-				d = new ForbidData();
+				d = new ForbidDataImpl();
 				created = true;
 			}
 
@@ -379,7 +429,7 @@ class OSForbid : public Module
 
  public:
 	OSForbid(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		forbidService(this), forbiddata_type("ForbidData", ForbidData::Unserialize), commandosforbid(this)
+		forbidService(this), forbiddata_type("ForbidData", ForbidDataImpl::Unserialize), commandosforbid(this)
 	{
 
 	}

@@ -167,6 +167,8 @@ bool BinarySocket::ProcessWrite()
 
 void BinarySocket::Write(const char *buffer, size_t l)
 {
+	if (l == 0)
+		return;
 	this->write_buffer.push_back(new DataBlock(buffer, l));
 	SocketEngine::Change(this, true, SF_WRITABLE);
 }

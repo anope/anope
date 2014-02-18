@@ -620,9 +620,18 @@ static void LoadNicks()
 			if (tmpu16 & OLD_NS_VERBOTEN)
 			{
 				if (!forbid)
+				{
+					delete nc;
 					continue;
+				}
 
-				ForbidData *d = new ForbidData();
+				if (nc->display.find_first_of("?*") != Anope::string::npos)
+				{
+					delete nc;
+					continue;
+				}
+
+				ForbidData *d = forbid->CreateForbid();
 				d->mask = nc->display;
 				d->creator = last_usermask;
 				d->reason = last_realname;
@@ -783,7 +792,7 @@ static void LoadChannels()
 			if (tmpu32 & OLD_CI_SECURE)
 				ci->Extend<bool>("CS_SECURE");
 			if (tmpu32 & OLD_CI_NO_EXPIRE)
-				ci->Extend<bool>("CI_NO_EXPIRE");
+				ci->Extend<bool>("CS_NO_EXPIRE");
 			if (tmpu32 & OLD_CI_MEMO_HARDMAX)
 				ci->Extend<bool>("MEMO_HARDMAX");
 			if (tmpu32 & OLD_CI_SECUREFOUNDER)
@@ -1029,9 +1038,18 @@ static void LoadChannels()
 			if (forbid_chan)
 			{
 				if (!forbid)
+				{
+					delete ci;
 					continue;
+				}
 
-				ForbidData *d = new ForbidData();
+				if (ci->name.find_first_of("?*") != Anope::string::npos)
+				{
+					delete ci;
+					continue;
+				}
+
+				ForbidData *d = forbid->CreateForbid();
 				d->mask = ci->name;
 				d->creator = forbidby;
 				d->reason = forbidreason;

@@ -668,7 +668,7 @@ class OSSession : public Module
 		if (u->Quitting() || !session_limit || exempt || !u->server || u->server->IsULined())
 			return;
 
-		cidr u_ip(u->ip);
+		cidr u_ip(u->ip, u->ip.find(':') != Anope::string::npos ? ipv6_cidr : ipv4_cidr);
 		if (!u_ip.valid())
 			return;
 

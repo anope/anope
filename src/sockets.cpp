@@ -517,7 +517,7 @@ ListenSocket::ListenSocket(const Anope::string &bindip, int port, bool i)
 {
 	this->SetBlocking(false);
 
-	const char op = 1;
+	int op = 1;
 	setsockopt(this->GetFD(), SOL_SOCKET, SO_REUSEADDR, &op, sizeof(op));
 
 	this->bindaddr.pton(i ? AF_INET6 : AF_INET, bindip, port);

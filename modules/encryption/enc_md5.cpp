@@ -12,7 +12,7 @@
  */
 
 #include "module.h"
-#include "encryption.h"
+#include "modules/encryption.h"
 
 /* Copyright (C) 1991-2, RSA Data Security, Inc. Created 1991. All
 rights reserved.

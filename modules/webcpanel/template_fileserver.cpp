@@ -220,8 +220,11 @@ void TemplateFileServer::Serve(HTTPProvider *server, const Anope::string &page_n
 					Log() << "Invalid INCLUDE in web template " << this->file_name;
 				else
 				{
-					reply.Write(finished); // Write out what we have currently so we insert this files contents here
-					finished.clear();
+					if (!finished.empty())
+					{
+						reply.Write(finished); // Write out what we have currently so we insert this files contents here
+						finished.clear();
+					}
 
 					TemplateFileServer tfs(tokens[1]);
 					tfs.Serve(server, page_name, client, message, reply, r);
@@ -255,7 +258,7 @@ void TemplateFileServer::Serve(HTTPProvider *server, const Anope::string &page_n
 		}
 	}
 
-	reply.Write(finished);
-	return;
+	if (!finished.empty())
+		reply.Write(finished);
 }
 

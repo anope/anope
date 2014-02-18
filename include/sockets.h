@@ -347,7 +347,7 @@ class CoreExport BinarySocket : public virtual Socket
 
 	/** Write data to the socket
 	 * @param buffer The data to write
-	 * @param l The length of the data
+	 * @param l The length of the data; if 0 then this function returns without doing anything
 	 */
 	virtual void Write(const char *buffer, size_t l);
 	void Write(const char *message, ...);

@@ -622,7 +622,7 @@ static void LoadNicks()
 				if (!forbid)
 					continue;
 
-				ForbidData *d = new ForbidData();
+				ForbidData *d = forbid->CreateForbid();
 				d->mask = nc->display;
 				d->creator = last_usermask;
 				d->reason = last_realname;
@@ -1031,7 +1031,7 @@ static void LoadChannels()
 				if (!forbid)
 					continue;
 
-				ForbidData *d = new ForbidData();
+				ForbidData *d = forbid->CreateForbid();
 				d->mask = ci->name;
 				d->creator = forbidby;
 				d->reason = forbidreason;

@@ -783,7 +783,7 @@ static void LoadChannels()
 			if (tmpu32 & OLD_CI_SECURE)
 				ci->Extend<bool>("CS_SECURE");
 			if (tmpu32 & OLD_CI_NO_EXPIRE)
-				ci->Extend<bool>("CI_NO_EXPIRE");
+				ci->Extend<bool>("CS_NO_EXPIRE");
 			if (tmpu32 & OLD_CI_MEMO_HARDMAX)
 				ci->Extend<bool>("MEMO_HARDMAX");
 			if (tmpu32 & OLD_CI_SECUREFOUNDER)

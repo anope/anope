@@ -620,7 +620,16 @@ static void LoadNicks()
 			if (tmpu16 & OLD_NS_VERBOTEN)
 			{
 				if (!forbid)
+				{
+					delete nc;
 					continue;
+				}
+
+				if (nc->display.find_first_of("?*") != Anope::string::npos)
+				{
+					delete nc;
+					continue;
+				}
 
 				ForbidData *d = forbid->CreateForbid();
 				d->mask = nc->display;
@@ -1029,7 +1038,16 @@ static void LoadChannels()
 			if (forbid_chan)
 			{
 				if (!forbid)
+				{
+					delete ci;
 					continue;
+				}
+
+				if (ci->name.find_first_of("?*") != Anope::string::npos)
+				{
+					delete ci;
+					continue;
+				}
 
 				ForbidData *d = forbid->CreateForbid();
 				d->mask = ci->name;

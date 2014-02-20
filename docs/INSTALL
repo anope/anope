@@ -67,10 +67,6 @@ Note: You should also read the README and FAQ files!
     cause trouble on your network if passwords are not encrypted, or read
     the memos of any user.
 
-    If you see errors during this process, please mail us with the *complete*
-    error output, and don't forget to mention your OS, compiler and C++ library
-    versions.
-
     Now go into the conf directory (by default, ~/services/conf). Copy the example
     configuration file (example.conf) to services.conf, and open the latter
     with your favorite text editor. It contains all the configuration
@@ -78,9 +74,10 @@ Note: You should also read the README and FAQ files!
     the file carefully. Using the default values is NOT a good idea, and will
     most likely not work!
 
-    If you need help, you should subscribe to the Anope mailing list and mail
-    there to get help from other users. See the README file for more
-    information.
+    If you need help, you should visit http://forum.anope.org/ or #anope on
+    irc.anope.org. Provide *complete* error output, along with other relevant 
+    information eg. OS, compiler and C++ library versions.
+    See the README file for more information.
 
 2) Upgrading Anope
 

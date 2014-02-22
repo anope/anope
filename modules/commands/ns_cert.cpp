@@ -12,6 +12,21 @@
 #include "module.h"
 #include "modules/ns_cert.h"
 
+static Anope::hash_map<NickCore *> certmap;
+
+struct CertServiceImpl : CertService
+{
+	CertServiceImpl(Module *o) : CertService(o) { }
+
+	NickCore* FindAccountFromCert(const Anope::string &cert) anope_override
+	{
+		Anope::hash_map<NickCore *>::iterator it = certmap.find(cert);
+		if (it != certmap.end())
+			return it->second;
+		return NULL;
+	}
+};
+
 struct NSCertListImpl : NSCertList
 {
 	Serialize::Reference<NickCore> nc;
@@ -19,6 +34,11 @@ struct NSCertListImpl : NSCertList
 
  public:
  	NSCertListImpl(Extensible *obj) : nc(anope_dynamic_static_cast<NickCore *>(obj)) { }
+
+	~NSCertListImpl()
+	{
+		ClearCert();
+	}
 
 	/** Add an entry to the nick's certificate list
 	 *
@@ -29,6 +49,7 @@ struct NSCertListImpl : NSCertList
 	void AddCert(const Anope::string &entry) anope_override
 	{
 		this->certs.push_back(entry);
+		certmap[entry] = nc;
 		FOREACH_MOD(OnNickAddCert, (this->nc, entry));
 	}
 
@@ -75,6 +96,7 @@ struct NSCertListImpl : NSCertList
 		if (it != this->certs.end())
 		{
 			FOREACH_MOD(OnNickEraseCert, (this->nc, entry));
+			certmap.erase(entry);
 			this->certs.erase(it);
 		}
 	}
@@ -86,6 +108,8 @@ struct NSCertListImpl : NSCertList
 	void ClearCert() anope_override
 	{
 		FOREACH_MOD(OnNickClearCert, (this->nc));
+		for (unsigned i = 0; i < certs.size(); ++i)
+			certmap.erase(certs[i]);
 		this->certs.clear();
 	}
 
@@ -124,9 +148,12 @@ struct NSCertListImpl : NSCertList
 			Anope::string buf;
 			data["cert"] >> buf;
 			spacesepstream sep(buf);
-			c->certs.clear();
+			c->ClearCert();
 			while (sep.GetToken(buf))
+			{
 				c->certs.push_back(buf);
+				certmap[buf] = n;
+			}
 		}
 	};
 };
@@ -308,10 +335,11 @@ class NSCert : public Module
 {
 	CommandNSCert commandnscert;
 	NSCertListImpl::ExtensibleItem certs;
+	CertServiceImpl cs;
 
  public:
 	NSCert(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		commandnscert(this), certs(this, "certificates")
+		commandnscert(this), certs(this, "certificates"), cs(this)
 	{
 		if (!IRCD || !IRCD->CanCertFP)
 			throw ModuleException("Your IRCd does not support ssl client certificates");
@@ -319,22 +347,22 @@ class NSCert : public Module
 
 	void OnFingerprint(User *u) anope_override
 	{
-		NickAlias *na = NickAlias::Find(u->nick);
 		BotInfo *NickServ = Config->GetClient("NickServ");
-		if (!NickServ || !na)
-			return;
-		if (u->IsIdentified() && u->Account() == na->nc)
-			return;
-		if (na->nc->HasExt("NS_SUSPENDED"))
+		if (!NickServ || u->IsIdentified())
 			return;
 
-		NSCertList *cl = certs.Get(na->nc);
-		if (!cl || !cl->FindCert(u->fingerprint))
+		NickCore *nc = cs.FindAccountFromCert(u->fingerprint);
+		if (!nc || nc->HasExt("NS_SUSPENDED"))
 			return;
 
-		u->Identify(na);
-		u->SendMessage(NickServ, _("SSL certificate fingerprint accepted, you are now identified."));
-		Log(NickServ) << u->GetMask() << " automatically identified for account " << na->nc->display << " via SSL certificate fingerprint";
+		NickAlias *na = NickAlias::Find(u->nick);
+		if (na && na->nc == nc)
+			u->Identify(na);
+		else
+			u->Login(nc);
+
+		u->SendMessage(NickServ, _("SSL certificate fingerprint accepted, you are now identified to \2%s\2."), nc->display.c_str());
+		Log(NickServ) << u->GetMask() << " automatically identified for account " << nc->display << " via SSL certificate fingerprint";
 	}
 
 	EventReturn OnNickValidate(User *u, NickAlias *na) anope_override

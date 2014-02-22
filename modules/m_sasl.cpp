@@ -52,6 +52,8 @@ class Plain : public Mechanism
 
 class External : public Mechanism
 {
+	ServiceReference<CertService> certs;
+
 	struct Session : SASL::Session
 	{
 		Anope::string cert;
@@ -60,7 +62,7 @@ class External : public Mechanism
 	};
 
  public:
-	External(Module *o) : Mechanism(o, "EXTERNAL")
+	External(Module *o) : Mechanism(o, "EXTERNAL"), certs("CertService", "certs")
 	{
 		if (!IRCD || !IRCD->CanCertFP)
 			throw ModuleException("No CertFP");
@@ -83,26 +85,22 @@ class External : public Mechanism
 		}
 		else if (m.type == "C")
 		{
-			Anope::string account;
-			Anope::B64Decode(m.data, account);
-
-			NickAlias *na = NickAlias::Find(account);
-			if (!na)
+			if (!certs)
 			{
 				sasl->Fail(sess);
 				delete sess;
 				return;
 			}
 
-			NSCertList *cl = na->nc->GetExt<NSCertList>("certificates");
-			if (cl == NULL || !cl->FindCert(mysess->cert))
+			NickCore *nc = certs->FindAccountFromCert(mysess->cert);
+			if (!nc)
 			{
 				sasl->Fail(sess);
 				delete sess;
 				return;
 			}
 
-			sasl->Succeed(sess, na->nc);
+			sasl->Succeed(sess, nc);
 			delete sess;
 		}
 	}

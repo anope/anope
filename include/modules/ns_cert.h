@@ -60,3 +60,12 @@ struct NSCertList
 
 	virtual void Check() = 0;
 };
+
+class CertService : public Service
+{
+ public:
+	CertService(Module *c) : Service(c, "CertService", "certs") { }
+
+	virtual NickCore* FindAccountFromCert(const Anope::string &cert) = 0;
+};
+

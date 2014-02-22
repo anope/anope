@@ -59,6 +59,8 @@
 #include "pthread/pthread.h"
 #include "sigaction/sigaction.h"
 
+typedef int ssize_t;
+
 namespace Anope
 {
 	class string;

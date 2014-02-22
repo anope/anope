@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Anope\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-01-26 16:13+0100\n"
-"PO-Revision-Date: 2014-01-26 16:32+0100\n"
+"POT-Creation-Date: 2014-02-22 15:24+0100\n"
+"PO-Revision-Date: 2014-02-22 15:28+0100\n"
 "Last-Translator: Robby <robby@chat.be>\n"
 "Language-Team: Dutch\n"
 "Language: nl_NL\n"
@@ -16,12 +16,12 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: modules/commands/os_forbid.cpp:262
+#: modules/commands/os_forbid.cpp:312
 #, c-format
 msgid "%d channel(s) cleared, and %d channel(s) dropped."
 msgstr "%d kana(a)l(en) opgekuist, en %d kanaalregistratie(s) verwijderd."
 
-#: modules/commands/os_forbid.cpp:203
+#: modules/commands/os_forbid.cpp:253
 #, c-format
 msgid "%d nickname(s) dropped."
 msgstr "%d nickregistratie(s) verwijderd."
@@ -81,7 +81,7 @@ msgstr "%s toegevoegd aan de AKILL lijst."
 msgid "%s added to your certificate list."
 msgstr "%s toegevoegd aan je certificaatlijst."
 
-#: modules/pseudoclients/botserv.cpp:142
+#: modules/pseudoclients/botserv.cpp:134
 #, c-format
 msgid ""
 "%s allows you to execute \"fantasy\" commands in the channel.\n"
@@ -97,7 +97,7 @@ msgstr ""
 "commando's uit te voeren. Commando's die een kanaal als parameter vereisen\n"
 "zullen dit automatisch gegeven worden.\n"
 
-#: modules/pseudoclients/botserv.cpp:156
+#: modules/pseudoclients/botserv.cpp:148
 #, c-format
 msgid ""
 "%s allows you to have a bot on your own channel.\n"
@@ -399,7 +399,7 @@ msgstr "%s stemt overeen met autokick %s op %s (%s)."
 msgid "%s not found on %s %s list."
 msgstr "%s niet gevonden op %s %s lijst."
 
-#: modules/commands/cs_flags.cpp:248 modules/commands/cs_access.cpp:334
+#: modules/commands/cs_flags.cpp:254 modules/commands/cs_access.cpp:334
 #, c-format
 msgid "%s not found on %s access list."
 msgstr "%s niet gevonden op %s toegangslijst."
@@ -424,7 +424,7 @@ msgstr "%s niet gevonden op %s's toegangslijst."
 msgid "%s not found on %s's certificate list."
 msgstr "%s niet gevonden op %s's certificaatlijst."
 
-#: modules/commands/os_ignore.cpp:276
+#: modules/commands/os_ignore.cpp:320
 #, c-format
 msgid "%s not found on ignore list."
 msgstr "%s niet gevonden op de negeerlijst."
@@ -453,7 +453,7 @@ msgstr "%s niet gevonden op de %s lijst."
 msgid "%s not found on the AKILL list."
 msgstr "%s niet gevonden op de AKILL lijst."
 
-#: modules/commands/cs_flags.cpp:244
+#: modules/commands/cs_flags.cpp:250
 #, c-format
 msgid "%s removed from the %s access list."
 msgstr "%s verwijderd van %s toegangslijst."
@@ -468,17 +468,17 @@ msgstr "%s verwijderd van de negeerlijst."
 msgid "%s users list:"
 msgstr "%s gebruikerslijst:"
 
-#: modules/commands/os_ignore.cpp:273
+#: modules/commands/os_ignore.cpp:316
 #, c-format
 msgid "%s will no longer be ignored."
 msgstr "%s zal niet langer genegeerd worden."
 
-#: modules/commands/os_ignore.cpp:194
+#: modules/commands/os_ignore.cpp:238
 #, c-format
 msgid "%s will now be ignored for %s."
 msgstr "%s zal nu genegeerd worden voor %s."
 
-#: modules/commands/os_ignore.cpp:189
+#: modules/commands/os_ignore.cpp:233
 #, c-format
 msgid "%s will now permanently be ignored."
 msgstr "%s zal nu permanent genegeerd worden."
@@ -674,12 +674,12 @@ msgid "channel APPEND topic"
 msgstr "kanaal APPEND topic"
 
 #: modules/commands/cs_entrymsg.cpp:194 modules/commands/cs_xop.cpp:489
-#: modules/commands/cs_flags.cpp:370 modules/commands/cs_access.cpp:499
+#: modules/commands/cs_flags.cpp:376 modules/commands/cs_access.cpp:499
 #: modules/commands/bs_badwords.cpp:373 modules/commands/cs_akick.cpp:428
 msgid "channel CLEAR"
 msgstr "kanaal CLEAR"
 
-#: modules/commands/cs_mode.cpp:671
+#: modules/commands/cs_mode.cpp:682
 msgid "channel CLEAR [what]"
 msgstr "kanaal CLEAR [wat]"
 
@@ -720,15 +720,15 @@ msgstr "kanaal LIST [masker | nr | lijst]"
 msgid "channel LIST [mask | list]"
 msgstr "kanaal LIST [masker | lijst]"
 
-#: modules/commands/cs_flags.cpp:369
+#: modules/commands/cs_flags.cpp:375
 msgid "channel LIST [mask | +flags]"
 msgstr "kanaal LIST [masker | +vlaggen]"
 
-#: modules/commands/cs_mode.cpp:669
+#: modules/commands/cs_mode.cpp:680
 msgid "channel LOCK {ADD|DEL|SET|LIST} [what]"
 msgstr "kanaal LOCK {ADD|DEL|SET|LIST} [wat]"
 
-#: modules/commands/cs_flags.cpp:368
+#: modules/commands/cs_flags.cpp:374
 msgid "channel MODIFY mask changes"
 msgstr "kanaal MODIFY masker wijzigingen"
 
@@ -736,7 +736,7 @@ msgstr "kanaal MODIFY masker wijzigingen"
 msgid "channel RESET"
 msgstr "kanaal RESET"
 
-#: modules/commands/cs_mode.cpp:670
+#: modules/commands/cs_mode.cpp:681
 msgid "channel SET modes"
 msgstr "kanaal SET modes"
 
@@ -764,11 +764,11 @@ msgstr "kanaal [beschrijving]"
 msgid "channel [nick]"
 msgstr "kanaal [nick]"
 
-#: modules/commands/cs_set_misc.cpp:98
+#: modules/commands/cs_set_misc.cpp:95
 msgid "channel [parameters]"
 msgstr "kanaal [parameters]"
 
-#: modules/commands/cs_status.cpp:20 modules/commands/cs_mode.cpp:742
+#: modules/commands/cs_status.cpp:20 modules/commands/cs_mode.cpp:753
 msgid "channel [user]"
 msgstr "kanaal [nick]"
 
@@ -911,7 +911,7 @@ msgstr "nickname nieuwe-weergave"
 msgid "nickname new-password"
 msgstr "nickname nieuw-wachtwoord"
 
-#: modules/commands/ns_set_misc.cpp:174
+#: modules/commands/ns_set_misc.cpp:169
 msgid "nickname [parameter]"
 msgstr "nickname [parameter]"
 
@@ -1095,7 +1095,7 @@ msgstr ""
 "automatisch verlopen, oftewel: ze zullen verwijderd worden na\n"
 "%d dagen van onbruik."
 
-#: modules/pseudoclients/botserv.cpp:151
+#: modules/pseudoclients/botserv.cpp:143
 msgid ""
 " \n"
 "Available commands are:"
@@ -1103,7 +1103,7 @@ msgstr ""
 " \n"
 "Beschikbare commando's zijn:"
 
-#: modules/pseudoclients/botserv.cpp:175
+#: modules/pseudoclients/botserv.cpp:167
 #, c-format
 msgid ""
 " \n"
@@ -1177,7 +1177,7 @@ msgstr ""
 "gekickt worden, zelfs wanneer deze niet overeen komen\n"
 "met het NOKICK niveau."
 
-#: modules/pseudoclients/botserv.cpp:149
+#: modules/pseudoclients/botserv.cpp:141
 #, c-format
 msgid ""
 " \n"
@@ -1588,7 +1588,7 @@ msgstr "%c%c is niet vergrendeld op %s."
 msgid "%c%c%s has been unlocked from %s."
 msgstr "%c%c%s werd ontgrendeld op %s."
 
-#: modules/commands/cs_clone.cpp:134
+#: modules/commands/cs_clone.cpp:141
 #, c-format
 msgid "%d access entries from %s have been cloned to %s."
 msgstr "%d toegangsvermeldingen van %s zijn gekopiëerd naar %s."
@@ -1598,7 +1598,7 @@ msgstr "%d toegangsvermeldingen van %s zijn gekopiëerd naar %s."
 msgid "%d bots available."
 msgstr "%d bots beschikbaar."
 
-#: modules/commands/os_modinfo.cpp:187
+#: modules/commands/os_modinfo.cpp:189
 #, c-format
 msgid "%d modules loaded."
 msgstr "%d modules geladen."
@@ -1715,14 +1715,14 @@ msgstr "%s (%s) werd het laatst gezien bij het quitten (%s) %s geleden (%s)."
 msgid "%s (minimum %d/%d%%)"
 msgstr "%s (minimaal %d/%d%%)"
 
-#: modules/commands/cs_flags.cpp:289 modules/commands/cs_access.cpp:241
+#: modules/commands/cs_flags.cpp:295 modules/commands/cs_access.cpp:241
 #: modules/commands/cs_access.cpp:345 modules/commands/cs_access.cpp:450
 #: modules/commands/cs_access.cpp:463
 #, c-format
 msgid "%s access list is empty."
 msgstr "%s toegangslijst is leeg."
 
-#: modules/commands/ns_ajoin.cpp:144
+#: modules/commands/ns_ajoin.cpp:184
 #, c-format
 msgid "%s added to %s's auto join list."
 msgstr "%s toegevoegd aan %s's autojoinlijst."
@@ -1795,7 +1795,7 @@ msgstr "%s heeft momenteel 1 memo."
 msgid "%s currently has no memos."
 msgstr "%s heeft momenteel geen memo's."
 
-#: modules/commands/os_forbid.cpp:282
+#: modules/commands/os_forbid.cpp:332
 #, c-format
 msgid "%s deleted from the %s forbid list."
 msgstr "%s verwijderd van de verboden %s lijst."
@@ -1809,6 +1809,11 @@ msgstr "%s voor %s gewijzigd naar %s."
 #, c-format
 msgid "%s for %s unset."
 msgstr "%s voor %s verwijderd."
+
+#: modules/commands/ns_ajoin.cpp:176
+#, c-format
+msgid "%s had an invalid key specified, and was thus ignored."
+msgstr "%s had een ongeldige opgegeven sleutel, en werd dus genegeerd."
 
 #: modules/commands/ms_info.cpp:111
 #, c-format
@@ -1850,7 +1855,7 @@ msgstr "%s is een netwerkdienst."
 msgid "%s is already covered by %s."
 msgstr "%s is al gedekt door %s."
 
-#: modules/commands/ns_ajoin.cpp:133
+#: modules/commands/ns_ajoin.cpp:170
 #, c-format
 msgid "%s is already on %s's auto join list."
 msgstr "%s staat al op %s's autojoinlijst."
@@ -1860,7 +1865,7 @@ msgstr "%s staat al op %s's autojoinlijst."
 msgid "%s is an unconfirmed nickname."
 msgstr "%s is een onbevestigde nickname."
 
-#: modules/commands/cs_flags.cpp:412
+#: modules/commands/cs_flags.cpp:418
 #, c-format
 msgid ""
 "%s is another way to modify the channel access list, similar to\n"
@@ -1886,7 +1891,7 @@ msgstr "%s is uitgeschakeld"
 msgid "%s is enabled"
 msgstr "%s is ingeschakeld"
 
-#: modules/commands/os_dns.cpp:478
+#: modules/commands/os_dns.cpp:505
 #, c-format
 msgid "%s is not a valid IP address."
 msgstr "%s is geen geldig IP-adres."
@@ -1963,12 +1968,12 @@ msgstr "%s instellingen:"
 msgid "%s was last seen here %s ago."
 msgstr "%s werd hier het laatst %s geleden gezien."
 
-#: modules/commands/ns_ajoin.cpp:158
+#: modules/commands/ns_ajoin.cpp:213
 #, c-format
 msgid "%s was not found on %s's auto join list."
 msgstr "%s werd niet gevonden op %s's autojoinlijst."
 
-#: modules/commands/ns_ajoin.cpp:163
+#: modules/commands/ns_ajoin.cpp:221
 #, c-format
 msgid "%s was removed from %s's auto join list."
 msgstr "%s werd verwijderd van %s's autojoinlijst."
@@ -2130,7 +2135,7 @@ msgstr ""
 "Een bevestigings-e-mail werd verstuurd naar %s. Volg de instructies om je e-"
 "mail adres te wijzigen."
 
-#: modules/commands/ms_sendall.cpp:43
+#: modules/commands/ms_sendall.cpp:45
 msgid "A massmemo has been sent to all registered users."
 msgstr "Een memo werd gestuurd naar alle geregistreerde gebruikers."
 
@@ -2155,15 +2160,6 @@ msgstr ""
 "Een notificatie-memo is naar %s verstuurd om hem/haar te\n"
 "informeren dat je zijn/haar memo gelezen hebt."
 
-#: modules/commands/ns_register.cpp:232
-#, c-format
-msgid ""
-"A passcode has been sent to %s, please type %s%s %s <passcode> to confirm "
-"your email address."
-msgstr ""
-"Een bevestigingscode is verstuurd naar %s, gelieve %s%s %s "
-"<bevestigingscode> te typen om je e-mail adres te bevestigen."
-
 #: include/language.h:124
 msgid "A vHost ident must be in the format of a valid ident."
 msgstr "Een vHost ident moet in het formaat van een geldige ident zijn."
@@ -2172,7 +2168,7 @@ msgstr "Een vHost ident moet in het formaat van een geldige ident zijn."
 msgid "A vHost must be in the format of a valid hostname."
 msgstr "Een vHost moet in het formaat van een geldige host zijn."
 
-#: modules/commands/os_ignore.cpp:298
+#: modules/commands/os_ignore.cpp:342
 msgid "ADD expiry {nick|mask} [reason]"
 msgstr "ADD verlooptijd {nick|masker} [reden]"
 
@@ -2192,7 +2188,7 @@ msgstr "ADD tekst"
 msgid "ADD [+expiry] mask limit reason"
 msgstr "ADD [+verlooptijd] masker limiet reden"
 
-#: modules/commands/ns_ajoin.cpp:174
+#: modules/commands/ns_ajoin.cpp:231
 msgid "ADD [nickname] channel [key]"
 msgstr "ADD [nick] kanaal [sleutel]"
 
@@ -2212,19 +2208,19 @@ msgstr "ADD [+verlooptijd] masker reden"
 msgid "ADD [+expiry] mask:reason"
 msgstr "ADD [+verlooptijd] masker:reden"
 
-#: modules/commands/os_forbid.cpp:95
+#: modules/commands/os_forbid.cpp:145
 msgid "ADD {NICK|CHAN|EMAIL|REGISTER} [+expiry] entry reason"
 msgstr "ADD {NICK|CHAN|EMAIL|REGISTER} [+verlooptijd] vermelding reden"
 
-#: modules/commands/os_dns.cpp:636
+#: modules/commands/os_dns.cpp:663
 msgid "ADDIP server.name ip"
 msgstr "ADDIP server.naam ip"
 
-#: modules/commands/os_dns.cpp:634
+#: modules/commands/os_dns.cpp:661
 msgid "ADDSERVER server.name [zone.name]"
 msgstr "ADDSERVER server.naam [domein.naam]"
 
-#: modules/commands/os_dns.cpp:632
+#: modules/commands/os_dns.cpp:659
 msgid "ADDZONE zone.name"
 msgstr "ADDZONE domein.naam"
 
@@ -2328,12 +2324,12 @@ msgstr ""
 "voor\n"
 "de nick of het kanaal."
 
-#: modules/commands/os_dns.cpp:486
+#: modules/commands/os_dns.cpp:513
 #, c-format
 msgid "Added IP %s to %s."
 msgstr "IP-adres %s toegevoegd aan %s."
 
-#: modules/commands/os_forbid.cpp:177
+#: modules/commands/os_forbid.cpp:227
 #, c-format
 msgid "Added a forbid on %s of type %s to expire on %s."
 msgstr "Verbod toegevoegd op %s van het type %s, verloopt op %s."
@@ -2355,7 +2351,7 @@ msgstr "Nieuw operator nieuwsbericht toegevoegd."
 msgid "Added new random news item."
 msgstr "Nieuw willekeurig nieuwsbericht toegevoegd."
 
-#: modules/commands/os_dns.cpp:382
+#: modules/commands/os_dns.cpp:394
 #, c-format
 msgid "Added server %s."
 msgstr "Server %s toegevoegd."
@@ -2373,7 +2369,7 @@ msgstr ""
 "Bovendien kunnen Services Operators met het nickserv/confirm recht\n"
 "een nick opgeven in de plaats van bevestigingscode om hen te valideren."
 
-#: modules/pseudoclients/botserv.cpp:180
+#: modules/pseudoclients/botserv.cpp:172
 #, c-format
 msgid ""
 "Additionally, if fantasy is enabled fantasy commands\n"
@@ -2389,7 +2385,7 @@ msgstr ""
 msgid "All O:lines of %s have been reset."
 msgstr "Alle O:lines van %s zijn hersteld."
 
-#: modules/commands/cs_clone.cpp:148
+#: modules/commands/cs_clone.cpp:155
 #, c-format
 msgid "All akick entries from %s have been cloned to %s."
 msgstr "Alle autokicks van %s zijn gekopiëerd naar %s."
@@ -2399,7 +2395,7 @@ msgstr "Alle autokicks van %s zijn gekopiëerd naar %s."
 msgid "All available commands for %s:"
 msgstr "Alle beschikbare commando's voor %s:"
 
-#: modules/commands/cs_clone.cpp:172
+#: modules/commands/cs_clone.cpp:179
 #, c-format
 msgid "All badword entries from %s have been cloned to %s."
 msgstr "Alle slechte woorden van %s zijn gekopiëerd naar %s."
@@ -2418,7 +2414,7 @@ msgstr "Alle memo's voor kanaal %s zijn verwijderd."
 msgid "All modes cleared on %s."
 msgstr "Alle modes verwijderd op %s."
 
-#: modules/commands/ns_register.cpp:369
+#: modules/commands/ns_register.cpp:361
 msgid ""
 "All new accounts must be validated by an administrator. Please wait for your "
 "registration to be confirmed."
@@ -2443,7 +2439,7 @@ msgstr "Alle operators van %s zijn verwijderd."
 msgid "All random news items deleted."
 msgstr "Alle willekeurige nieuwsberichten zijn verwijderd."
 
-#: modules/commands/cs_clone.cpp:98
+#: modules/commands/cs_clone.cpp:105
 #, c-format
 msgid "All settings from %s have been cloned to %s."
 msgstr "Alle instellingen van %s zijn gekopiëerd naar %s."
@@ -2658,7 +2654,7 @@ msgstr ""
 "gegaan door een \"+\" of een \"-\". Om alle vlaggen te verwijderen\n"
 "kun je simpelweg een \"-\" typen in de plaats van de vlaggen."
 
-#: modules/commands/os_ignore.cpp:326
+#: modules/commands/os_ignore.cpp:370
 msgid ""
 "Allows Services Operators to make Services ignore a nick or mask\n"
 "for a certain time or until the next restart. The default\n"
@@ -3024,7 +3020,7 @@ msgstr ""
 msgid "Assigns a bot to a channel"
 msgstr "Wijs een bot toe aan een kanaal"
 
-#: data/chanserv.example.conf:1169
+#: data/chanserv.example.conf:1180
 msgid "Associate a URL with the channel"
 msgstr "Koppel een URL aan het kanaal"
 
@@ -3040,7 +3036,7 @@ msgstr "Koppel een URL aan jouw account"
 msgid "Associate a greet message with your nickname"
 msgstr "Koppel een begroeting aan je nick"
 
-#: data/chanserv.example.conf:1170
+#: data/chanserv.example.conf:1181
 msgid "Associate an E-mail address with the channel"
 msgstr "Koppel een e-mail adres aan het kanaal"
 
@@ -3400,7 +3396,12 @@ msgstr ""
 "nick of kanaal, indien deze nog niet gelezen is op het moment\n"
 "dat je dit commando gebruikt."
 
-#: modules/commands/ns_register.cpp:312
+#: modules/commands/cs_clone.cpp:55
+#, c-format
+msgid "Cannot clone channel %s to itself!"
+msgstr "Kan kanaal %s niet naar zichzelf clonen!"
+
+#: modules/commands/ns_register.cpp:304
 msgid "Cannot send mail now; please retry a little later."
 msgstr "Onmogelijk e-mail te sturen; probeer later opnieuw."
 
@@ -3578,12 +3579,12 @@ msgstr "Kanaal %s heeft geen sleutel."
 msgid "Channel %s is already registered!"
 msgstr "Kanaal %s is al geregistreerd!"
 
-#: modules/commands/os_forbid.cpp:462
+#: modules/commands/os_forbid.cpp:512
 #, c-format
 msgid "Channel %s is forbidden by %s: %s"
 msgstr "Kanaal %s is verboden door %s: %s"
 
-#: modules/commands/os_forbid.cpp:464
+#: modules/commands/os_forbid.cpp:514
 #, c-format
 msgid "Channel %s is forbidden."
 msgstr "Kanaal %s is verboden."
@@ -3638,7 +3639,7 @@ msgstr "Kanaal %s zal niet verlopen."
 msgid "Channel %s %s list has been cleared."
 msgstr "Kanaal %s %s lijst is leeggemaakt."
 
-#: modules/commands/cs_flags.cpp:355 modules/commands/cs_access.cpp:482
+#: modules/commands/cs_flags.cpp:361 modules/commands/cs_access.cpp:482
 #, c-format
 msgid "Channel %s access list has been cleared."
 msgstr "Kanaal %s toegangslijst is leeggemaakt."
@@ -3826,7 +3827,7 @@ msgstr "Configureert onderlijningskicker"
 msgid "Confirm a passcode"
 msgstr "Gebruik een bevestigingscode"
 
-#: modules/commands/cs_mode.cpp:668
+#: modules/commands/cs_mode.cpp:679
 msgid "Control modes and mode locks on a channel"
 msgstr "Beheer modes en vergrendelde modes op een kanaal"
 
@@ -3837,7 +3838,7 @@ msgstr ""
 "Beheer welke berichten verstuurd worden naar gebruikers wanneer ze het "
 "kanaal betreden."
 
-#: modules/commands/cs_clone.cpp:187
+#: modules/commands/cs_clone.cpp:194
 msgid ""
 "Copies all settings, access, akicks, etc from channel to the\n"
 "target channel. If what is ACCESS, AKICK, or BADWORDS\n"
@@ -3855,18 +3856,18 @@ msgstr "Kopiëer alle instellingen van het ene kanaal naar het andere"
 
 #: modules/commands/bs_info.cpp:58 modules/commands/os_sxline.cpp:199
 #: modules/commands/cs_entrymsg.cpp:113 modules/commands/hs_list.cpp:58
-#: modules/commands/cs_flags.cpp:295 modules/commands/os_akill.cpp:350
+#: modules/commands/cs_flags.cpp:301 modules/commands/os_akill.cpp:350
 #: modules/commands/hs_request.cpp:300 modules/commands/cs_akick.cpp:380
 #: modules/commands/cs_mode.cpp:431 modules/commands/os_news.cpp:156
 #: modules/commands/os_session.cpp:552
 msgid "Created"
 msgstr "Gemaakt"
 
-#: modules/commands/cs_entrymsg.cpp:113 modules/commands/os_forbid.cpp:296
-#: modules/commands/hs_list.cpp:58 modules/commands/cs_flags.cpp:295
+#: modules/commands/cs_entrymsg.cpp:113 modules/commands/os_forbid.cpp:346
+#: modules/commands/hs_list.cpp:58 modules/commands/cs_flags.cpp:301
 #: modules/commands/os_akill.cpp:350 modules/commands/cs_akick.cpp:380
 #: modules/commands/cs_mode.cpp:431 modules/commands/os_news.cpp:156
-#: modules/commands/os_ignore.cpp:225
+#: modules/commands/os_ignore.cpp:266
 msgid "Creator"
 msgstr "Door"
 
@@ -3883,7 +3884,7 @@ msgstr "Huidige AKILL lijst:"
 msgid "Current Session Limit Exception list:"
 msgstr "Huidige uitzonderingenlijst voor sessielimieten:"
 
-#: modules/commands/os_modinfo.cpp:114
+#: modules/commands/os_modinfo.cpp:116
 msgid "Current module list:"
 msgstr "Huidige modulelijst:"
 
@@ -3915,7 +3916,7 @@ msgstr "DEL oper"
 msgid "DEL target info"
 msgstr "DEL doel info"
 
-#: modules/commands/ns_ajoin.cpp:175
+#: modules/commands/ns_ajoin.cpp:232
 msgid "DEL [nickname] channel"
 msgstr "DEL [nick] kanaal"
 
@@ -3936,7 +3937,7 @@ msgstr "DEL {masker | nr | lijst | id}"
 msgid "DEL {mask | entry-num | list}"
 msgstr "DEL {masker | nr | lijst}"
 
-#: modules/commands/os_ignore.cpp:299
+#: modules/commands/os_ignore.cpp:343
 msgid "DEL {nick|mask}"
 msgstr "DEL {nick|masker}"
 
@@ -3944,23 +3945,23 @@ msgstr "DEL {nick|masker}"
 msgid "DEL {num | ALL}"
 msgstr "DEL {nr | ALL}"
 
-#: modules/commands/os_forbid.cpp:96
+#: modules/commands/os_forbid.cpp:146
 msgid "DEL {NICK|CHAN|EMAIL|REGISTER} entry"
 msgstr "DEL {NICK|CHAN|EMAIL|REGISTER} vermelding"
 
-#: modules/commands/os_dns.cpp:637
+#: modules/commands/os_dns.cpp:664
 msgid "DELIP server.name ip"
 msgstr "DELIP server.naam ip"
 
-#: modules/commands/os_dns.cpp:635
+#: modules/commands/os_dns.cpp:662
 msgid "DELSERVER server.name [zone.name]"
 msgstr "DELSERVER server.naam [domein.naam]"
 
-#: modules/commands/os_dns.cpp:633
+#: modules/commands/os_dns.cpp:660
 msgid "DELZONE zone.name"
 msgstr "DELZONE domein.naam"
 
-#: modules/commands/os_dns.cpp:640
+#: modules/commands/os_dns.cpp:667
 msgid "DEPOOL server.name"
 msgstr "DEPOOL server.naam"
 
@@ -4230,7 +4231,7 @@ msgstr ""
 "Verwijdert de vHost voor alle nicks in dezelfde groep\n"
 "als de opgegeven nick."
 
-#: modules/commands/os_dns.cpp:624
+#: modules/commands/os_dns.cpp:651
 #, c-format
 msgid "Depooled %s."
 msgstr "Depooled %s."
@@ -4672,12 +4673,12 @@ msgstr "Einde van AKILL lijst."
 msgid "End of access list"
 msgstr "Einde van de toegangslijst."
 
-#: modules/commands/cs_flags.cpp:341
+#: modules/commands/cs_flags.cpp:347
 #, c-format
 msgid "End of access list - %d/%d entries shown."
 msgstr "Einde van de toegangslijst - %d/%d resultaten weergegeven."
 
-#: modules/commands/cs_flags.cpp:339
+#: modules/commands/cs_flags.cpp:345
 msgid "End of access list."
 msgstr "Einde van de toegangslijst."
 
@@ -4701,12 +4702,12 @@ msgstr "Einde van configuratie."
 msgid "End of entry message list."
 msgstr "Einde van berichtenlijst."
 
-#: modules/commands/os_forbid.cpp:345
+#: modules/commands/os_forbid.cpp:395
 #, c-format
 msgid "End of forbid list - %d/%d entries shown."
 msgstr "Einde van verbodslijst - %d/%d resultaten weergegeven."
 
-#: modules/commands/os_forbid.cpp:343
+#: modules/commands/os_forbid.cpp:393
 msgid "End of forbid list."
 msgstr "Einde van verbodslijst."
 
@@ -4864,9 +4865,9 @@ msgstr "Uitzondering voor %s is geüpdatet naar %d."
 #: modules/pseudoclients/nickserv.cpp:528
 #: modules/pseudoclients/nickserv.cpp:533
 #: modules/pseudoclients/chanserv.cpp:458 modules/commands/os_sxline.cpp:199
-#: modules/commands/os_forbid.cpp:296 modules/commands/os_akill.cpp:350
+#: modules/commands/os_forbid.cpp:346 modules/commands/os_akill.cpp:350
 #: modules/commands/ns_group.cpp:299 modules/commands/os_session.cpp:552
-#: modules/commands/os_ignore.cpp:225
+#: modules/commands/os_ignore.cpp:266
 msgid "Expires"
 msgstr "Verloopt"
 
@@ -4903,16 +4904,16 @@ msgstr "Vind een gebruiker's status op een kanaal"
 msgid "Fingerprint %s already present on %s's certificate list."
 msgstr "Vingerafdruk %s is al aanwezig op %s's certificaatlist."
 
-#: modules/commands/cs_flags.cpp:295
+#: modules/commands/cs_flags.cpp:301
 msgid "Flags"
 msgstr "Vlaggen"
 
-#: modules/commands/cs_flags.cpp:280
+#: modules/commands/cs_flags.cpp:286
 #, c-format
 msgid "Flags for %s on %s set to +%s"
 msgstr "Vlaggen voor %s op %s gewijzigd naar +%s"
 
-#: modules/commands/cs_flags.cpp:335
+#: modules/commands/cs_flags.cpp:341
 #, c-format
 msgid "Flags list for %s"
 msgstr "Vlaggenlijst voor %s"
@@ -4922,7 +4923,7 @@ msgstr "Vlaggenlijst voor %s"
 msgid "Flood kicker"
 msgstr "Floodkicker"
 
-#: modules/commands/os_forbid.cpp:359
+#: modules/commands/os_forbid.cpp:409
 msgid ""
 "Forbid allows you to forbid usage of certain nicknames, channels,\n"
 "and email addresses. Wildcards are accepted for all entries."
@@ -4930,20 +4931,20 @@ msgstr ""
 "Stelt je in staat bepaalde nicks, kanalen of e-mail adressen te\n"
 "verbieden. Jokertekens worden aanvaard voor alle vermeldingen."
 
-#: modules/commands/os_forbid.cpp:292
+#: modules/commands/os_forbid.cpp:342
 msgid "Forbid list is empty."
 msgstr "Verbodslijst is leeg."
 
-#: modules/commands/os_forbid.cpp:334
+#: modules/commands/os_forbid.cpp:384
 msgid "Forbid list:"
 msgstr "Verbodsijst:"
 
-#: modules/commands/os_forbid.cpp:286
+#: modules/commands/os_forbid.cpp:336
 #, c-format
 msgid "Forbid on %s was not found."
 msgstr "Verbod op %s werd niet gevonden."
 
-#: modules/commands/os_forbid.cpp:94
+#: modules/commands/os_forbid.cpp:144
 msgid "Forbid usage of nicknames, channels, and emails"
 msgstr "Verbied gebruik van nicks, kanalen en e-mails"
 
@@ -4996,7 +4997,7 @@ msgstr "Ghost met jouw nick is gekilld."
 msgid "Give Operflags to a certain user"
 msgstr "Geef Operflags aan een bepaalde gebruiker"
 
-#: modules/commands/cs_mode.cpp:840
+#: modules/commands/cs_mode.cpp:851
 #, c-format
 msgid ""
 "Gives %s status to the selected nick on a channel. If nick is\n"
@@ -5005,7 +5006,7 @@ msgstr ""
 "Geeft %s status aan de gegeven nick op een kanaal. Als nick\n"
 "niet gegeven, zal het jou %s status geven of afnemen."
 
-#: modules/commands/cs_mode.cpp:823
+#: modules/commands/cs_mode.cpp:834
 #, c-format
 msgid "Gives you or the specified nick %s status on a channel"
 msgstr "Geeft jou of een gegeven nick %s status op een kanaal"
@@ -5088,12 +5089,12 @@ msgstr "INFO type"
 msgid "IP"
 msgstr "IP"
 
-#: modules/commands/os_dns.cpp:471
+#: modules/commands/os_dns.cpp:498
 #, c-format
 msgid "IP %s already exists for %s."
 msgstr "IP %s bestaat al voor %s."
 
-#: modules/commands/os_dns.cpp:533
+#: modules/commands/os_dns.cpp:560
 #, c-format
 msgid "IP %s does not exist for %s."
 msgstr "IP %s bestaat niet voor %s."
@@ -5108,18 +5109,11 @@ msgstr "Identificeer jezelf met je wachtwoord"
 msgid "If you do not change within %s, I will change your nick."
 msgstr "Als je niet binnen %s je nick verandert, verander ik je nick."
 
-#: modules/commands/ns_register.cpp:233
-#, c-format
-msgid ""
-"If you do not confirm your email address within %s your account will expire."
-msgstr ""
-"Indien u uw e-mail adres niet bevestigd in %s, dan zal uw account verlopen."
-
-#: modules/commands/os_ignore.cpp:289
+#: modules/commands/os_ignore.cpp:333
 msgid "Ignore list has been cleared."
 msgstr "Negeerlijst is leeggemaakt."
 
-#: modules/commands/os_ignore.cpp:221
+#: modules/commands/os_ignore.cpp:262
 msgid "Ignore list is empty."
 msgstr "Negeerlijst is leeg."
 
@@ -5199,7 +5193,7 @@ msgstr ""
 msgid "Invalid threshold value. It must be a valid integer greater than 1."
 msgstr "Ongeldige drempel waarde. Het moet een geldig getal groter dan 1 zijn."
 
-#: modules/commands/os_dns.cpp:562
+#: modules/commands/os_dns.cpp:589
 msgid "Invalid value for LIMIT. Must be numerical."
 msgstr "Ongeldige waarde voor LIMIT. Moet numeriek zijn."
 
@@ -5291,7 +5285,7 @@ msgstr "LIST [masker | lijst | id]"
 msgid "LIST [mask | list]"
 msgstr "LIST [masker | lijst]"
 
-#: modules/commands/ns_access.cpp:104 modules/commands/ns_ajoin.cpp:176
+#: modules/commands/ns_access.cpp:104 modules/commands/ns_ajoin.cpp:233
 #: modules/commands/ns_cert.cpp:226
 msgid "LIST [nickname]"
 msgstr "LIST [nick]"
@@ -5615,7 +5609,7 @@ msgstr ""
 msgid "Lists available bots"
 msgstr "Geef beschikbare bots weer"
 
-#: modules/commands/os_modinfo.cpp:194
+#: modules/commands/os_modinfo.cpp:196
 msgid "Lists currently loaded modules."
 msgstr "Geef geladen modules weer"
 
@@ -5727,7 +5721,7 @@ msgstr "Zoek je jezelf, %s?"
 msgid "MOVE num position"
 msgstr "MOVE nr positie"
 
-#: modules/commands/cs_mode.cpp:708
+#: modules/commands/cs_mode.cpp:719
 #, c-format
 msgid ""
 "Mainly controls mode locks and mode access (which is different from channel "
@@ -5756,9 +5750,9 @@ msgid ""
 " \n"
 "The %s CLEAR command is an easy way to clear modes on a channel. what may "
 "be\n"
-"one of bans, exempts, inviteoverrides, ops, halfops, or voices. If what is "
-"not given then all\n"
-"basic modes are removed."
+"any mode name. Examples include bans, excepts, inviteoverrides, ops, "
+"halfops, and voices. If what\n"
+"is not given then all basic modes are removed."
 msgstr ""
 "Controleert voornamelijk de mode-vergrendelingen en mode-toegang (welke "
 "verschillend\n"
@@ -5786,10 +5780,10 @@ msgstr ""
 "       Verwijdert alle extended bans die beginnen met ~c:\n"
 " \n"
 "Het %s CLEAR commando is een gemakkelijke manier om modes te verwijderen op\n"
-"een kanaal. wat mag één van de volgende zijn: bans, exempts, "
-"inviteoverrides, ops,\n"
-"halfops, of voices. Als wat niet is gegeven, dan worden alle basismodes "
-"verwijderd."
+"een kanaal. wat kan eender welke mode-naam zijn. Voorbeelden zijn: bans,\n"
+"excepts, inviteoverrides, ops, halfops, en voices. Als wat niet is gegeven, "
+"dan\n"
+"worden alle basismodes verwijderd."
 
 #: modules/commands/cs_akick.cpp:422
 msgid "Maintain the AutoKick list"
@@ -5941,7 +5935,7 @@ msgstr ""
 "waar de GREET optie aan staat, en als je daarop voldoende\n"
 "toegang tot hebt."
 
-#: modules/commands/os_dns.cpp:631
+#: modules/commands/os_dns.cpp:658
 msgid "Manage DNS zones for this network"
 msgstr "Beheer DNS domeinnamen voor dit netwerk"
 
@@ -5953,7 +5947,7 @@ msgstr "Beheer de welkomstberichten van het kanaal"
 msgid "Manage the memo ignore list"
 msgstr "Beheer de memo-negeerlijst"
 
-#: modules/commands/ns_ajoin.cpp:173
+#: modules/commands/ns_ajoin.cpp:230
 msgid "Manage your auto join list"
 msgstr "Beheer je autojoinlijst"
 
@@ -5976,13 +5970,13 @@ msgstr "Pas de topic van het gegeven kanaal aan"
 
 #: modules/commands/bs_botlist.cpp:27 modules/commands/bs_info.cpp:56
 #: modules/commands/os_sxline.cpp:191 modules/commands/os_sxline.cpp:199
-#: modules/commands/os_forbid.cpp:296 modules/commands/os_list.cpp:147
-#: modules/commands/cs_xop.cpp:382 modules/commands/cs_flags.cpp:295
+#: modules/commands/os_forbid.cpp:346 modules/commands/os_list.cpp:147
+#: modules/commands/cs_xop.cpp:382 modules/commands/cs_flags.cpp:301
 #: modules/commands/os_akill.cpp:336 modules/commands/os_akill.cpp:350
 #: modules/commands/cs_access.cpp:455 modules/commands/cs_access.cpp:468
 #: modules/commands/cs_akick.cpp:367 modules/commands/cs_akick.cpp:380
 #: modules/commands/ms_ignore.cpp:80 modules/commands/os_session.cpp:544
-#: modules/commands/os_session.cpp:552 modules/commands/os_ignore.cpp:225
+#: modules/commands/os_session.cpp:552 modules/commands/os_ignore.cpp:266
 msgid "Mask"
 msgstr "Masker"
 
@@ -6075,7 +6069,12 @@ msgstr "Ontbrekende parameter voor mode %c."
 msgid "Mode"
 msgstr "Mode"
 
-#: modules/commands/cs_mode.cpp:976
+#: modules/commands/cs_mode.cpp:664
+#, c-format
+msgid "Mode %s is not a status or list mode."
+msgstr "Mode %s is geen status- of lijst-mode."
+
+#: modules/commands/cs_mode.cpp:987
 msgid "Mode lock"
 msgstr "Mode-vergrendeling"
 
@@ -6147,7 +6146,7 @@ msgstr ""
 "anderen hun certificaatlijst aan te passen.\n"
 " \n"
 
-#: modules/commands/os_ignore.cpp:297
+#: modules/commands/os_ignore.cpp:341
 msgid "Modify the Services ignore list"
 msgstr "Wijzig de Services negeerlijst"
 
@@ -6160,7 +6159,7 @@ msgstr "Wijzig de lijst van %s's"
 msgid "Modify the list of authorized addresses"
 msgstr "Wijzig de lijst met toegestane adressen"
 
-#: modules/commands/cs_flags.cpp:367 modules/commands/cs_access.cpp:494
+#: modules/commands/cs_flags.cpp:373 modules/commands/cs_access.cpp:494
 msgid "Modify the list of privileged users"
 msgstr "Wijzig de lijst van gebruikers met privileges"
 
@@ -6210,7 +6209,7 @@ msgstr "Module-instellingen:"
 msgid "Module: %s Version: %s Author: %s Loaded: %s"
 msgstr "Module: %s Versie: %s Auteur: %s Geladen: %s"
 
-#: modules/commands/os_modinfo.cpp:181
+#: modules/commands/os_modinfo.cpp:183
 #, c-format
 msgid "Module: %s [%s] [%s]"
 msgstr "Module: %s [%s] [%s]"
@@ -6231,7 +6230,7 @@ msgstr "Naam     Type"
 msgid "Network stats for %s:"
 msgstr "Netwerkstatistieken voor %s:"
 
-#: modules/commands/os_forbid.cpp:322
+#: modules/commands/os_forbid.cpp:372
 msgid "Never"
 msgstr "Nooit"
 
@@ -6266,12 +6265,12 @@ msgstr "Nick %s is een illegale nick en mag niet worden gebruikt."
 msgid "Nick %s is currently in use."
 msgstr "Nick %s is momenteel in gebruik."
 
-#: modules/commands/os_forbid.cpp:450
+#: modules/commands/os_forbid.cpp:500
 #, c-format
 msgid "Nick %s is forbidden by %s: %s"
 msgstr "Nick %s is verboden door %s: %s"
 
-#: modules/commands/os_forbid.cpp:452
+#: modules/commands/os_forbid.cpp:502
 #, c-format
 msgid "Nick %s is forbidden."
 msgstr "Nick %s is verboden."
@@ -6341,7 +6340,7 @@ msgstr "Nick %s is niet in je groep."
 msgid "Nick %s is not suspended."
 msgstr "Nick %s is niet geschorst."
 
-#: modules/commands/ns_suspend.cpp:187
+#: modules/commands/ns_suspend.cpp:190
 #, c-format
 msgid "Nick %s is now released."
 msgstr "Nick %s is nu vrijgegeven."
@@ -6422,7 +6421,7 @@ msgstr "Geen overeenkomsten voor %s gevonden."
 msgid "No matching entries on %s %s list."
 msgstr "Geen overeenkomsten op %s %s lijst."
 
-#: modules/commands/cs_xop.cpp:433 modules/commands/cs_flags.cpp:329
+#: modules/commands/cs_xop.cpp:433 modules/commands/cs_flags.cpp:335
 #: modules/commands/cs_access.cpp:265 modules/commands/cs_access.cpp:429
 #, c-format
 msgid "No matching entries on %s access list."
@@ -6455,7 +6454,7 @@ msgstr "Geen overeenkomsten op de AKILL lijst."
 msgid "No memo was cancelable."
 msgstr "Geen annuleerbare memo's gevonden."
 
-#: modules/commands/os_modinfo.cpp:185
+#: modules/commands/os_modinfo.cpp:187
 msgid "No modules currently loaded matching that criteria."
 msgstr "Geen modules geladen die overeenkomen met die criteria."
 
@@ -6537,7 +6536,7 @@ msgstr "Niets te doen."
 #: modules/commands/ms_list.cpp:64 modules/commands/cs_entrymsg.cpp:113
 #: modules/commands/ns_alist.cpp:48 modules/commands/hs_list.cpp:58
 #: modules/commands/ns_ajoin.cpp:100 modules/commands/cs_xop.cpp:382
-#: modules/commands/cs_flags.cpp:295 modules/commands/os_akill.cpp:336
+#: modules/commands/cs_flags.cpp:301 modules/commands/os_akill.cpp:336
 #: modules/commands/os_akill.cpp:350 modules/commands/hs_request.cpp:300
 #: modules/commands/cs_access.cpp:455 modules/commands/cs_access.cpp:468
 #: modules/commands/bs_badwords.cpp:193 modules/commands/cs_akick.cpp:367
@@ -6625,7 +6624,7 @@ msgstr "Ops bescherming"
 msgid "Options"
 msgstr "Opties"
 
-#: modules/commands/os_dns.cpp:639
+#: modules/commands/os_dns.cpp:666
 msgid "POOL server.name"
 msgstr "POOL server.naam"
 
@@ -6745,7 +6744,7 @@ msgstr ""
 "Gelieve %d seconden te wachten alvorens het REGISTER commando opnieuw te "
 "gebruiken."
 
-#: modules/commands/os_dns.cpp:599
+#: modules/commands/os_dns.cpp:626
 #, c-format
 msgid "Pooled %s."
 msgstr "Pooled %s."
@@ -6823,12 +6822,12 @@ msgstr "Privé-optie voor %s staat nu uit."
 msgid "Private option is now on for %s."
 msgstr "Privé-optie voor %s staat nu aan."
 
-#: modules/commands/cs_flags.cpp:275
+#: modules/commands/cs_flags.cpp:281
 #, c-format
 msgid "Privilege %s added to %s on %s, new flags are +%s"
 msgstr "Privilege %s toegevoegd bij %s op %s, nieuwe vlaggen zijn +%s"
 
-#: modules/commands/cs_flags.cpp:277
+#: modules/commands/cs_flags.cpp:283
 #, c-format
 msgid "Privilege %s removed from %s on %s, new flags are +%s"
 msgstr "Privilege %s verwijderd van %s op %s, nieuwe vlaggen zijn +%s"
@@ -6910,10 +6909,10 @@ msgid "Real name"
 msgstr "Echte naam"
 
 #: modules/commands/os_sxline.cpp:191 modules/commands/os_sxline.cpp:199
-#: modules/commands/os_forbid.cpp:296 modules/commands/os_akill.cpp:336
+#: modules/commands/os_forbid.cpp:346 modules/commands/os_akill.cpp:336
 #: modules/commands/os_akill.cpp:350 modules/commands/cs_akick.cpp:367
 #: modules/commands/cs_akick.cpp:380 modules/commands/os_session.cpp:552
-#: modules/commands/os_ignore.cpp:225
+#: modules/commands/os_ignore.cpp:266
 msgid "Reason"
 msgstr "Reden"
 
@@ -6961,9 +6960,9 @@ msgstr ""
 "Regex overeenkomsten worden ook ondersteund via de %s engine.\n"
 "Omsluit het masker met // indien dit gewenst is."
 
-#: modules/commands/os_forbid.cpp:366 modules/commands/os_list.cpp:114
+#: modules/commands/os_forbid.cpp:416 modules/commands/os_list.cpp:114
 #: modules/commands/os_list.cpp:225 modules/commands/cs_list.cpp:161
-#: modules/commands/ns_list.cpp:172 modules/commands/os_ignore.cpp:342
+#: modules/commands/ns_list.cpp:172 modules/commands/os_ignore.cpp:386
 #, c-format
 msgid ""
 "Regex matches are also supported using the %s engine.\n"
@@ -7035,7 +7034,7 @@ msgstr ""
 "%s zal ook automatisch de stichter kanaaloperator\n"
 "status geven wanneer deze het kanaal binnenkomt."
 
-#: modules/commands/ns_register.cpp:249
+#: modules/commands/ns_register.cpp:241
 #, c-format
 msgid ""
 "Registers your nickname in the %s database. Once\n"
@@ -7123,22 +7122,22 @@ msgstr "Haal alle bans weg die een gebruiker voorkomen een kanaal te betreden"
 msgid "Remove all operators from a server remotely"
 msgstr "Verwijder op afstand alle operators van een server"
 
-#: modules/commands/os_dns.cpp:514
+#: modules/commands/os_dns.cpp:541
 #, c-format
 msgid "Removed IP %s from %s."
 msgstr "IP %s verwijderd van %s."
 
-#: modules/commands/os_dns.cpp:434
+#: modules/commands/os_dns.cpp:458
 #, c-format
 msgid "Removed server %s from zone %s."
 msgstr "Server %s verwijderd van domein %s."
 
-#: modules/commands/os_dns.cpp:454
+#: modules/commands/os_dns.cpp:481
 #, c-format
 msgid "Removed server %s."
 msgstr "Server %s verwijderd."
 
-#: modules/commands/cs_mode.cpp:844
+#: modules/commands/cs_mode.cpp:855
 #, c-format
 msgid ""
 "Removes %s status from the selected nick on a channel. If nick is\n"
@@ -7147,7 +7146,7 @@ msgstr ""
 "Verwijdert %s status van de gegeven nick op een channel. Als nick\n"
 "niet gegeven is, dan zal het bij jou de %s status weghalen."
 
-#: modules/commands/cs_mode.cpp:825
+#: modules/commands/cs_mode.cpp:836
 #, c-format
 msgid "Removes %s status from you or the specified nick on a channel"
 msgstr "Verwijdert %s status van jou of de gegeven nick op een kanaal"
@@ -7191,7 +7190,7 @@ msgstr ""
 "netwerkbeheerders. Gelieve geduldig te wachten terwijl\n"
 "uw aanvraag lopende is."
 
-#: modules/commands/ns_register.cpp:292
+#: modules/commands/ns_register.cpp:284
 msgid "Resend registration confirmation email"
 msgstr "Registratiebevestigings-e-mail opnieuw verzenden"
 
@@ -7320,7 +7319,7 @@ msgstr "Doet het omgekeerde van het IDENTIFY commando"
 msgid "SET server"
 msgstr "SET server"
 
-#: modules/commands/os_dns.cpp:638
+#: modules/commands/os_dns.cpp:665
 msgid "SET server.name option value"
 msgstr "SET server.naam optie waarde"
 
@@ -7454,7 +7453,7 @@ msgstr ""
 "wachtwoord te resetten. E-mail moet het e-mail adres zijn die bij\n"
 "deze nick hoort."
 
-#: modules/commands/ms_sendall.cpp:50
+#: modules/commands/ms_sendall.cpp:52
 msgid "Sends all registered users a memo containing memo-text."
 msgstr "Stuurt alle geregistreerde gebruikers een memo die memo-tekst bevat."
 
@@ -7516,60 +7515,60 @@ msgstr ""
 msgid "Server"
 msgstr "Server"
 
-#: modules/commands/os_dns.cpp:362
+#: modules/commands/os_dns.cpp:374
 #, c-format
 msgid "Server %s added to zone %s."
 msgstr "Server %s toegevoegd aan domein %s."
 
-#: modules/commands/os_dns.cpp:338
+#: modules/commands/os_dns.cpp:344
 #, c-format
 msgid "Server %s already exists."
 msgstr "Server %s bestaat reeds."
 
-#: modules/commands/os_noop.cpp:31 modules/commands/os_dns.cpp:411
-#: modules/commands/os_dns.cpp:464 modules/commands/os_dns.cpp:503
-#: modules/commands/os_dns.cpp:542 modules/commands/os_dns.cpp:575
-#: modules/commands/os_dns.cpp:610
+#: modules/commands/os_noop.cpp:31 modules/commands/os_dns.cpp:429
+#: modules/commands/os_dns.cpp:491 modules/commands/os_dns.cpp:530
+#: modules/commands/os_dns.cpp:569 modules/commands/os_dns.cpp:602
+#: modules/commands/os_dns.cpp:637
 #, c-format
 msgid "Server %s does not exist."
 msgstr "Server %s bestaat niet."
 
-#: modules/commands/os_dns.cpp:590
+#: modules/commands/os_dns.cpp:617
 #, c-format
 msgid "Server %s has no configured IPs."
 msgstr "Server %s heeft geen geconfigureerde IP-adressen."
 
-#: modules/commands/os_dns.cpp:350
+#: modules/commands/os_dns.cpp:356
 #, c-format
 msgid "Server %s is already in zone %s."
 msgstr "Server %s is reeds in domein %s."
 
-#: modules/commands/os_dns.cpp:585
+#: modules/commands/os_dns.cpp:612
 #, c-format
 msgid "Server %s is already pooled."
 msgstr "Server %s is reeds pooled."
 
-#: modules/commands/os_dns.cpp:580
+#: modules/commands/os_dns.cpp:607
 #, c-format
 msgid "Server %s is not currently linked."
 msgstr "Server %s is momenteel niet gelinkt."
 
-#: modules/commands/os_dns.cpp:424
+#: modules/commands/os_dns.cpp:442
 #, c-format
 msgid "Server %s is not in zone %s."
 msgstr "Server %s is niet in domein %s."
 
-#: modules/commands/os_dns.cpp:371
+#: modules/commands/os_dns.cpp:383
 #, c-format
 msgid "Server %s is not linked to the network."
 msgstr "Server %s is niet gelinkt aan het netwerk."
 
-#: modules/commands/os_dns.cpp:615
+#: modules/commands/os_dns.cpp:642
 #, c-format
 msgid "Server %s is not pooled."
 msgstr "Server %s is niet pooled."
 
-#: modules/commands/os_dns.cpp:439
+#: modules/commands/os_dns.cpp:463
 #, c-format
 msgid "Server %s must be quit before it can be deleted."
 msgstr "Server %s moet gequit zijn alvorens het verwijderd kan worden."
@@ -7639,7 +7638,7 @@ msgstr "Services zijn nu in lezen-schrijven modus."
 msgid "Services have been configured to not send mail."
 msgstr "Services zijn geconfigureerd om geen e-mails te versturen."
 
-#: modules/commands/os_ignore.cpp:238
+#: modules/commands/os_ignore.cpp:280
 msgid "Services ignore list:"
 msgstr "Services negeerlijst:"
 
@@ -8214,7 +8213,7 @@ msgstr "Sorry, bot opties instellen is tijdelijk uitgeschakeld."
 msgid "Sorry, channel %s list modification is temporarily disabled."
 msgstr "Sorry, kanaal %s lijst wijzigingen zijn tijdelijk uitgeschakeld."
 
-#: modules/commands/cs_flags.cpp:397 modules/commands/cs_access.cpp:541
+#: modules/commands/cs_flags.cpp:403 modules/commands/cs_access.cpp:541
 msgid "Sorry, channel access list modification is temporarily disabled."
 msgstr "Sorry, kanaal toegangslijst wijzigingen zijn tijdelijk uitgeschakeld."
 
@@ -8265,7 +8264,7 @@ msgstr "Sorry, nickname registratie is tijdelijk uitgeschakeld."
 msgid "Sorry, the maximum of %d access entries has been reached."
 msgstr "Sorry, de maximum van %d toegangsvermeldingen is bereikt."
 
-#: modules/commands/ns_ajoin.cpp:131
+#: modules/commands/ns_ajoin.cpp:141
 #, c-format
 msgid "Sorry, the maximum of %d auto join entries has been reached."
 msgstr "Sorry, de maximum van %d autojoinvermeldingen is bereikt."
@@ -8362,19 +8361,19 @@ msgstr ""
 msgid "Suspend a given nick"
 msgstr "Schors een opgegeven nick"
 
-#: modules/commands/cs_suspend.cpp:220 modules/commands/ns_suspend.cpp:224
+#: modules/commands/cs_suspend.cpp:220 modules/commands/ns_suspend.cpp:227
 msgid "Suspend reason"
 msgstr "Schorsingsreden"
 
-#: modules/commands/cs_suspend.cpp:216 modules/commands/ns_suspend.cpp:220
+#: modules/commands/cs_suspend.cpp:216 modules/commands/ns_suspend.cpp:223
 msgid "Suspended"
 msgstr "Geschorst"
 
-#: modules/commands/cs_suspend.cpp:218 modules/commands/ns_suspend.cpp:222
+#: modules/commands/cs_suspend.cpp:218 modules/commands/ns_suspend.cpp:225
 msgid "Suspended by"
 msgstr "Geschorst door"
 
-#: modules/commands/cs_suspend.cpp:222 modules/commands/ns_suspend.cpp:226
+#: modules/commands/cs_suspend.cpp:222 modules/commands/ns_suspend.cpp:229
 msgid "Suspended on"
 msgstr "Geschorst op"
 
@@ -8390,7 +8389,7 @@ msgstr ""
 "verlooptijd is opgegeven, dan zal de schorsing na die periode weer\n"
 "vervallen, anders zal de standaard verlooptijd gebruikt worden."
 
-#: modules/commands/cs_suspend.cpp:224 modules/commands/ns_suspend.cpp:228
+#: modules/commands/cs_suspend.cpp:224 modules/commands/ns_suspend.cpp:231
 msgid "Suspension expires"
 msgstr "Schorsing verloopt"
 
@@ -8788,7 +8787,7 @@ msgstr ""
 "Het ACCESS CLEAR commando maakt de toegangslijst\n"
 "leeg."
 
-#: modules/commands/cs_flags.cpp:427
+#: modules/commands/cs_flags.cpp:433
 msgid ""
 "The CLEAR command clears the channel access list, which requires channel "
 "founder."
@@ -8936,7 +8935,7 @@ msgstr ""
 "Voor een lijst van de opties en functies waar de niveaus van\n"
 "ingesteld kunnen worden, zie HELP LEVELS DESC."
 
-#: modules/commands/cs_flags.cpp:422
+#: modules/commands/cs_flags.cpp:428
 msgid ""
 "The LIST command allows you to list existing entries on the channel access "
 "list.\n"
@@ -8954,7 +8953,7 @@ msgstr ""
 "given, only those\n"
 "on the access list with the specified flags are returned."
 
-#: modules/commands/cs_flags.cpp:415
+#: modules/commands/cs_flags.cpp:421
 msgid ""
 "The MODIFY command allows you to modify the access list. If mask is\n"
 "not already on the access list is it added, then the changes are applied.\n"
@@ -8985,7 +8984,7 @@ msgstr ""
 "Het STATS commando toont statistieken over opgeslagen nicks en "
 "geheugenverbruik."
 
-#: modules/commands/ns_register.cpp:271
+#: modules/commands/ns_register.cpp:263
 msgid ""
 "The email parameter is optional and will set the email\n"
 "for your nick immediately.\n"
@@ -9069,7 +9068,7 @@ msgid "The E-mail address of %s will now be shown in %s INFO displays."
 msgstr ""
 "Het e-mail adres van %s zal vanaf nu getoond worden in %s INFO opvragingen."
 
-#: modules/commands/cs_flags.cpp:429
+#: modules/commands/cs_flags.cpp:435
 msgid "The available flags are:"
 msgstr "De beschikbare vlaggen zijn:"
 
@@ -9170,7 +9169,7 @@ msgstr ""
 msgid "The limit on %s is not valid."
 msgstr "De limiet op %s is ongeldig."
 
-#: modules/commands/os_forbid.cpp:131
+#: modules/commands/os_forbid.cpp:181
 msgid "The mask must contain at least one non wildcard character."
 msgstr "Het masker moet tenminste één niet-jokerteken bevatten."
 
@@ -9248,7 +9247,7 @@ msgstr ""
 msgid "There are no configured servers."
 msgstr "Er zijn geen servers ingesteld."
 
-#: modules/commands/os_forbid.cpp:330
+#: modules/commands/os_forbid.cpp:380
 #, c-format
 msgid "There are no forbids of type %s."
 msgstr "Er is geen verbod van het type %s."
@@ -9298,11 +9297,16 @@ msgstr "Er is geen willekeurig nieuws."
 msgid "There is no such configuration block %s."
 msgstr "Onbestaand configuratie blok %s."
 
+#: modules/commands/cs_mode.cpp:658
+#, c-format
+msgid "There is no such mode %s."
+msgstr "Mode %s bestaat niet."
+
 #: modules/commands/ms_set.cpp:52
 msgid "There's no email address set for your nick."
 msgstr "Er is geen e-mail adres ingesteld voor jouw nick."
 
-#: modules/commands/os_forbid.cpp:242 modules/commands/os_forbid.cpp:434
+#: modules/commands/os_forbid.cpp:292 modules/commands/os_forbid.cpp:484
 #, c-format
 msgid "This channel has been forbidden: %s"
 msgstr "Dit kanaal is verboden: %s"
@@ -9319,7 +9323,7 @@ msgstr "Dit kanaal is geschorst."
 msgid "This channel may not be used."
 msgstr "Dit kanaal mag niet gebruikt worden."
 
-#: modules/commands/os_dns.cpp:673
+#: modules/commands/os_dns.cpp:700
 msgid ""
 "This command allows managing DNS zones used for controlling what servers "
 "users\n"
@@ -9368,7 +9372,7 @@ msgstr ""
 "HUIDIGE nick de vHost van alle nicks in dezelfde groep te\n"
 "laten zijn."
 
-#: modules/commands/ns_register.cpp:279
+#: modules/commands/ns_register.cpp:271
 msgid ""
 "This command also creates a new group for your nickname,\n"
 "that will allow you to register other nicks later sharing\n"
@@ -9489,7 +9493,7 @@ msgstr ""
 " \n"
 "Let op: alle nicknames in een groep hebben hetzelfde wachtwoord."
 
-#: modules/commands/ns_ajoin.cpp:235
+#: modules/commands/ns_ajoin.cpp:292
 msgid ""
 "This command manages your auto join list. When you identify\n"
 "you will automatically join the channels on your auto join list.\n"
@@ -9573,7 +9577,7 @@ msgstr ""
 msgid "This command unloads the module named modname."
 msgstr "Dit commando ontlaadt de module genaamd modnaam."
 
-#: modules/commands/ns_register.cpp:333
+#: modules/commands/ns_register.cpp:325
 msgid "This command will resend you the registration confirmation email."
 msgstr ""
 "Dit commando zal je de registratiebevestigings-e-mail opnieuw toezenden."
@@ -9587,7 +9591,7 @@ msgstr ""
 "Deze nick is eigendom van iemand anders. Gelieve een andere te kiezen.\n"
 "(Indien dit uw nick is, typ %s%s IDENTIFY wachtwoord.)"
 
-#: modules/commands/os_forbid.cpp:407
+#: modules/commands/os_forbid.cpp:457
 #, c-format
 msgid "This nickname has been forbidden: %s"
 msgstr "Deze nickname is verboden: %s"
@@ -9610,7 +9614,7 @@ msgstr ""
 msgid "This nickname has been registered; you may not use it."
 msgstr "Deze nickname is geregistreerd; je mag het niet gebruiken."
 
-#: modules/commands/ns_suspend.cpp:220
+#: modules/commands/ns_suspend.cpp:223
 msgid "This nickname is suspended."
 msgstr "Deze nick is geschorst."
 
@@ -9827,7 +9831,7 @@ msgstr ""
 "Deze optie kan ook uitgeschakeld zijn door de netwerk\n"
 "beheerders."
 
-#: modules/commands/os_forbid.cpp:296 modules/commands/bs_badwords.cpp:193
+#: modules/commands/os_forbid.cpp:346 modules/commands/bs_badwords.cpp:193
 msgid "Type"
 msgstr "Type"
 
@@ -9930,7 +9934,7 @@ msgstr ""
 msgid "Underlines kicker"
 msgstr "Onderlijningskicker"
 
-#: modules/commands/os_dns.cpp:566
+#: modules/commands/os_dns.cpp:593
 msgid "Unknown SET option."
 msgstr "Onbekende SET optie."
 
@@ -9984,7 +9988,7 @@ msgstr ""
 msgid "Unsuspend a given nick"
 msgstr "Schorsing op gegeven nick opheffen"
 
-#: modules/commands/ns_suspend.cpp:196
+#: modules/commands/ns_suspend.cpp:199
 msgid "Unsuspends a nickname which allows it to be used again."
 msgstr "Heft de schorsing op een nick op zodat deze weer kan gebruikt worden."
 
@@ -10046,12 +10050,12 @@ msgstr "Gebruikt op"
 msgid "User has been banned from the channel"
 msgstr "Gebruiker werd verbannen van het kanaal"
 
-#: modules/commands/os_dns.cpp:558
+#: modules/commands/os_dns.cpp:585
 #, c-format
 msgid "User limit for %s removed."
 msgstr "Gebruikerslimiet voor %s verwijderd."
 
-#: modules/commands/os_dns.cpp:556
+#: modules/commands/os_dns.cpp:583
 #, c-format
 msgid "User limit for %s set to %d."
 msgstr "Gebruikerslimiet voor %s gewijzigd naar %d."
@@ -10331,7 +10335,7 @@ msgstr ""
 "Je kan geen ontvangstbevestiging aanvragen voor een memo die je naar jezelf "
 "stuurt."
 
-#: modules/commands/cs_flags.cpp:224
+#: modules/commands/cs_flags.cpp:230
 #, c-format
 msgid "You can not set the %c flag."
 msgstr "Je kan de %c vlag niet zetten."
@@ -10450,7 +10454,7 @@ msgstr ""
 msgid "You have been invited to %s."
 msgstr "Je bent uitgenodigd naar %s."
 
-#: modules/protocol/ratbox.cpp:119
+#: modules/protocol/ratbox.cpp:137
 #, c-format
 msgid "You have been logged in as %s."
 msgstr "Je bent ingelogd als %s."
@@ -10566,7 +10570,7 @@ msgstr ""
 msgid "You must have been using this nick for at least %d seconds to register."
 msgstr "Je moet deze nick tenminste %d seconden gebruiken om te registreren."
 
-#: modules/commands/cs_mode.cpp:848
+#: modules/commands/cs_mode.cpp:859
 #, c-format
 msgid "You must have the %s(ME) privilege on the channel to use this command."
 msgstr ""
@@ -10622,11 +10626,6 @@ msgid "You will now be informed about new memos via email."
 msgstr ""
 "Je zal zal nu op de hoogte worden gehouden van nieuwe memo's via e-mail."
 
-#: modules/commands/cs_mode.cpp:650
-#, c-format
-msgid "Your IRCD does not support %s."
-msgstr "Je IRCd ondersteunt geen %s."
-
 #: modules/commands/os_svs.cpp:86
 msgid "Your IRCd does not support SVSJOIN."
 msgstr "Je IRCd ondersteunt geen SVSJOIN."
@@ -10653,31 +10652,31 @@ msgstr ""
 msgid "Your account %s has been successfully created."
 msgstr "Je account %s is succesvol aangemaakt."
 
-#: modules/commands/ns_register.cpp:308
+#: modules/commands/ns_register.cpp:300
 msgid "Your account is already confirmed."
 msgstr "Je account is reeds bevestigd."
 
-#: modules/commands/ns_register.cpp:376
+#: modules/commands/ns_register.cpp:368
 #, c-format
-msgid "Your account will expire, if not confirmed, in %s"
-msgstr "Je account verloopt, indien niet bevestigd, over  %s"
+msgid "Your account will expire, if not confirmed, in %s."
+msgstr "Je account verloopt, indien niet bevestigd, over %s."
 
 #: modules/commands/ns_set.cpp:1241
 #, c-format
 msgid "Your email address has been changed to %s."
 msgstr "Je e-mail adres werd gewijzigd naar %s."
 
-#: modules/commands/os_forbid.cpp:482 modules/commands/os_forbid.cpp:491
+#: modules/commands/os_forbid.cpp:532 modules/commands/os_forbid.cpp:541
 msgid "Your email address is not allowed, choose a different one."
 msgstr "Je e-mail adres is niet toegelaten, kies een andere."
 
-#: modules/commands/ns_register.cpp:371
+#: modules/commands/ns_register.cpp:363
 msgid ""
 "Your email address is not confirmed. To confirm it, follow the instructions "
-"that were emailed to you when you registered."
+"that were emailed to you."
 msgstr ""
 "Je e-mail adres is niet bevestigd. Om deze te bevestigen dien je de "
-"instructies te volgen in de verzonden e-mail toen je je registreerde."
+"instructies te volgen in de toegezonden e-mail."
 
 #: modules/commands/ns_register.cpp:52
 #, c-format
@@ -10750,7 +10749,7 @@ msgstr "Je nickname wordt nu veranderd in %s"
 msgid "Your oper block doesn't require logging in."
 msgstr "Je oper blok vereist geen aanmelding."
 
-#: modules/commands/ns_register.cpp:316
+#: modules/commands/ns_register.cpp:308
 #, c-format
 msgid "Your passcode has been re-sent to %s."
 msgstr "Je bevestingscode is opnieuw gestuurd naar %s."
@@ -10799,13 +10798,13 @@ msgstr "Domein"
 msgid "Zone %s already exists."
 msgstr "Domein %s bestaat al."
 
-#: modules/commands/os_dns.cpp:309 modules/commands/os_dns.cpp:345
-#: modules/commands/os_dns.cpp:389 modules/commands/os_dns.cpp:419
+#: modules/commands/os_dns.cpp:309 modules/commands/os_dns.cpp:351
+#: modules/commands/os_dns.cpp:401 modules/commands/os_dns.cpp:437
 #, c-format
 msgid "Zone %s does not exist."
 msgstr "Domein %s bestaat niet."
 
-#: modules/commands/os_dns.cpp:325
+#: modules/commands/os_dns.cpp:331
 #, c-format
 msgid "Zone %s removed."
 msgstr "Domein %s verwijderd."
@@ -10886,7 +10885,7 @@ msgstr "[nickname [REVALIDATE]]"
 msgid "[nickname]"
 msgstr "[nick]"
 
-#: modules/commands/ns_set_misc.cpp:101
+#: modules/commands/ns_set_misc.cpp:96
 msgid "[parameter]"
 msgstr "[parameter]"
 
@@ -10909,10 +10908,6 @@ msgstr "[geschorst]"
 #: modules/commands/ns_list.cpp:114
 msgid "[Unconfirmed]"
 msgstr "[onbevestigd]"
-
-#: modules/commands/os_modinfo.cpp:81
-msgid "[all|third|vendor|database|encryption|pseudoclient|protocol]"
-msgstr "[all|third|vendor|database|encryption|pseudoclient|protocol]"
 
 #: modules/commands/hs_request.cpp:208
 msgid "[auto memo] Your requested vHost has been approved."

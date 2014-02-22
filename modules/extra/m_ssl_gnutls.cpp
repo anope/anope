@@ -349,7 +349,7 @@ ClientSocket *SSLSocketIO::Accept(ListenSocket *s)
 		throw SocketException("Unable to initialize SSL socket");
 
 	me->cred.SetupSession(io->sess);
-	gnutls_transport_set_int(io->sess, newsock);
+	gnutls_transport_set_ptr(io->sess, reinterpret_cast<gnutls_transport_ptr_t>(newsock));
 
 	newsocket->flags[SF_ACCEPTING] = true;
 	this->FinishAccept(newsocket);
@@ -453,7 +453,7 @@ SocketFlag SSLSocketIO::FinishConnect(ConnectionSocket *s)
 		if (gnutls_init(&io->sess, GNUTLS_CLIENT) != GNUTLS_E_SUCCESS)
 			throw SocketException("Unable to initialize SSL socket");
 		me->cred.SetupSession(io->sess);
-		gnutls_transport_set_int(io->sess, s->GetFD());
+		gnutls_transport_set_ptr(io->sess, reinterpret_cast<gnutls_transport_ptr_t>(s->GetFD()));
 	}
 
 	int ret = gnutls_handshake(io->sess);

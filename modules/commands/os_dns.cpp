@@ -322,6 +322,12 @@ class CommandOSDNS : public Command
 				s->zones.erase(z->name);
 		}
 
+		if (dnsmanager)
+		{
+			dnsmanager->UpdateSerial();
+			dnsmanager->Notify(z->name);
+		}
+
 		source.Reply(_("Zone %s removed."), z->name.c_str());
 		delete z;
 	}
@@ -356,6 +362,12 @@ class CommandOSDNS : public Command
 
 				z->servers.insert(s->GetName());
 				s->zones.insert(zone);
+
+				if (dnsmanager)
+				{
+					dnsmanager->UpdateSerial();
+					dnsmanager->Notify(zone);
+				}
 
 				Log(LOG_ADMIN, source, this) << "to add server " << s->GetName() << " to zone " << z->name;
 
@@ -398,6 +410,12 @@ class CommandOSDNS : public Command
 
 			z->servers.insert(s->GetName());
 			s->zones.insert(z->name);
+
+			if (dnsmanager)
+			{
+				dnsmanager->UpdateSerial();
+				dnsmanager->Notify(z->name);
+			}
 		}
 	}
 
@@ -430,6 +448,12 @@ class CommandOSDNS : public Command
 
 			Log(LOG_ADMIN, source, this) << "to remove server " << s->GetName() << " from zone " << z->name;
 
+			if (dnsmanager)
+			{
+				dnsmanager->UpdateSerial();
+				dnsmanager->Notify(z->name);
+			}
+
 			z->servers.erase(s->GetName());
 			source.Reply(_("Removed server %s from zone %s."), s->GetName().c_str(), z->name.c_str());
 			return;
@@ -449,6 +473,9 @@ class CommandOSDNS : public Command
 
 		if (Anope::ReadOnly)
 			source.Reply(READ_ONLY_MODE);
+
+		if (dnsmanager)
+			dnsmanager->UpdateSerial();
 
 		Log(LOG_ADMIN, source, this) << "to delete server " << s->GetName();
 		source.Reply(_("Removed server %s."), s->GetName().c_str());

@@ -363,19 +363,19 @@ msgid "%s is not on the ignore list."
 msgstr "%s non trovato nella lista ignore."
 
 #: modules/commands/cs_status.cpp:75
-#, fuzzy, c-format
+#, c-format
 msgid "%s is on the auto kick list of %s (%s)."
-msgstr "%s è presente nella lista auto kick (%s)."
+msgstr "%s è presente nella lista auto kick di %s (%s)."
 
 #: modules/commands/cs_status.cpp:53
-#, fuzzy, c-format
+#, c-format
 msgid "%s is the founder of %s."
-msgstr "%s è il founder del canale."
+msgstr "%s è il founder del canale %s."
 
 #: modules/commands/cs_status.cpp:64
 #, c-format
 msgid "%s matches access entry %s, which has privilege %s."
-msgstr ""
+msgstr "%s corrisponde al record %s presente lista di accesso, livello %s."
 
 #: include/language.h:110
 #, c-format
@@ -383,11 +383,13 @@ msgid ""
 "%s matches an except on %s and cannot be banned until the except have been "
 "removed."
 msgstr ""
+"%s corrisponde a un exception su %s e non può essere bannato fino a quando "
+"non viene rimossa."
 
 #: modules/commands/cs_status.cpp:81
-#, fuzzy, c-format
+#, c-format
 msgid "%s matches auto kick entry %s on %s (%s)."
-msgstr "%s aggiunto alla lista autokick di %s."
+msgstr "%s corrisponde al record %s presente nealla lista auto kick di %s (%s)."
 
 #: modules/commands/cs_xop.cpp:358
 #, c-format
@@ -1583,9 +1585,9 @@ msgid "%c%c%s has been unlocked from %s."
 msgstr "%c%c%s è stato sbloccato da %s."
 
 #: modules/commands/cs_clone.cpp:141
-#, fuzzy, c-format
+#, c-format
 msgid "%d access entries from %s have been cloned to %s."
-msgstr "Tutti i vhost nel gruppo %s sono stati impostati a %s"
+msgstr "%d records della lista di %s sono stati clonati su %s."
 
 #: modules/commands/bs_botlist.cpp:56
 #, c-format
@@ -2673,7 +2675,6 @@ msgstr ""
 "Gli Ignore non saranno forzati sugli IRC Operators."
 
 #: modules/commands/os_akill.cpp:409
-#, fuzzy
 msgid ""
 "Allows Services Operators to manipulate the AKILL list. If\n"
 "a user matching an AKILL mask attempts to connect, Services\n"
@@ -2712,7 +2713,7 @@ msgstr ""
 "senza scadenza, bisogna usare +0. Se la usermask indicata\n"
 "inizia con un +, la durata deve essere indicata esplicitamente,\n"
 "anche se è la stessa di default. La durata di default per le\n"
-"AKILL può essere trovata con il comando STATS AKILL.\n"
+"AKILL può essere trovata con il comando STATS AKILL."
 
 #: modules/commands/os_sxline.cpp:429
 msgid ""
@@ -3387,9 +3388,9 @@ msgstr ""
 "comando."
 
 #: modules/commands/cs_clone.cpp:55
-#, fuzzy, c-format
+#, c-format
 msgid "Cannot clone channel %s to itself!"
-msgstr "Il bot non è presente nel canale %s."
+msgstr "Non puoi clonare il canale %s su se stesso!"
 
 #: modules/commands/ns_register.cpp:312
 msgid "Cannot send mail now; please retry a little later."
@@ -3686,30 +3687,30 @@ msgid "Chanstats"
 msgstr "Chanstats"
 
 #: modules/extra/stats/m_chanstats.cpp:94
-#, fuzzy, c-format
+#, c-format
 msgid "Chanstats statistics are now disabled for %s"
-msgstr "    SECURE     Attiva o disattiva la sicurezza"
+msgstr "Le statistiche di Chanstats sono ora disabilitate per %s"
 
 #: modules/extra/stats/m_chanstats.cpp:43
 msgid "Chanstats statistics are now disabled for this channel."
-msgstr "Le statistiche di Chanstas sono state disabilitate per questo canale."
+msgstr "Le statistiche di Chanstats sono state disabilitate per questo canale."
 
 #: modules/extra/stats/m_chanstats.cpp:96
 msgid "Chanstats statistics are now disabled for your nick."
-msgstr "Le statistiche di Chanstas sono state disabilitate per il tuo nick."
+msgstr "Le statistiche di Chanstats sono state disabilitate per il tuo nick."
 
 #: modules/extra/stats/m_chanstats.cpp:85
-#, fuzzy, c-format
+#, c-format
 msgid "Chanstats statistics are now enabled for %s"
-msgstr "    SECURE     Attiva o disattiva la sicurezza"
+msgstr "Le statistiche di Chanstats sono ora abilitate per %s"
 
 #: modules/extra/stats/m_chanstats.cpp:36
 msgid "Chanstats statistics are now enabled for this channel."
-msgstr "Le statistiche di Chanstas sono state abilitate per questo canale."
+msgstr "Le statistiche di Chanstats sono state abilitate per questo canale."
 
 #: modules/extra/stats/m_chanstats.cpp:87
 msgid "Chanstats statistics are now enabled for your nick."
-msgstr "Le statistiche di Chanstas sono state abilitate per il tuo nick."
+msgstr "Le statistiche di Chanstats sono state abilitate per il tuo nick."
 
 #: modules/commands/cs_seen.cpp:362
 msgid ""
@@ -4098,9 +4099,9 @@ msgid "Delete the vhost of another user"
 msgstr "Rimuove il vhost di un altro utente"
 
 #: modules/commands/cs_xop.cpp:307
-#, fuzzy, c-format
+#, c-format
 msgid "Deleted %d entries from %s %s list."
-msgstr "Eliminati %d record dalla lista %2$s di %1$s."
+msgstr "Eliminati %1$d record dalla lista %3$s di %2$s."
 
 #: modules/commands/cs_access.cpp:273
 #, c-format
@@ -5711,7 +5712,7 @@ msgid "MOVE num position"
 msgstr ""
 
 #: modules/commands/cs_mode.cpp:719
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "Mainly controls mode locks and mode access (which is different from channel "
 "access)\n"
@@ -5749,12 +5750,12 @@ msgstr ""
 " \n"
 "Il comando %s LOCK permette di aggiungere, rimuovere, e vedere il blocco dei "
 "modi in un canale.\n"
-"Se un mode è bloccato o disattivati, i services non permetteranno a quel "
-"mode di essere cambiato.\n"
-"Il comando SET rimuovera tutti i modi bloccati e imposterà i nuovi modi "
+"Se un modo è bloccato o disattivato, i services non permetteranno a quel "
+"modo di essere cambiato.\n"
+"Il comando SET rimuoverà tutti i modi bloccati e imposterà i nuovi modi "
 "specificati, mentre ADD e DEL\n"
 "apportano modifiche ai modi bloccati esistenti.\n"
-"Esempi:\n"
+"Esempio:\n"
 "     MODE #channel LOCK ADD +bmnt *!*@*aol*\n"
 " \n"
 "Il comando %s SET permetti di impostare i modi utilizzando i services. Le "
@@ -5768,9 +5769,9 @@ msgstr ""
 "       Rimuove tutti i ban estesi che iniziano con c:\n"
 " \n"
 "Il comando %s CLEAR è un modo semplice per rimuovere tutti i modi in un "
-"canale. \"what\" può essere\n"
-"uno tra bans, exempts, inviteoverrides, ops, halfops, or voices. Se il "
-"parametro \"what\" è omesso, allora\n"
+"canale. what può essere\n"
+"uno tra ban, exempt, inviteoverride, op, halfop, o voice. Se il "
+"parametro what è omesso,\n"
 "tutti i modi saranno rimossi dal canale."
 
 #: modules/commands/cs_akick.cpp:422
@@ -6061,9 +6062,9 @@ msgid "Mode"
 msgstr ""
 
 #: modules/commands/cs_mode.cpp:664
-#, fuzzy, c-format
+#, c-format
 msgid "Mode %s is not a status or list mode."
-msgstr "%s non trovato nella lista ignore."
+msgstr "Il modo %s non è modo di stato o di lista."
 
 #: modules/commands/cs_mode.cpp:987
 msgid "Mode lock"
@@ -6188,13 +6189,12 @@ msgid "Module %s unloaded."
 msgstr "Modulo %s rimosso."
 
 #: modules/commands/os_config.cpp:88
-#, fuzzy
 msgid "Module Name"
-msgstr "Modulo %s caricato"
+msgstr "Nome Modulo"
 
 #: modules/commands/os_config.cpp:112
 msgid "Module settings:"
-msgstr ""
+msgstr "Impostazioni Modulo:"
 
 #: modules/commands/os_modinfo.cpp:32
 #, c-format
@@ -6522,7 +6522,7 @@ msgstr "Nessuna"
 
 #: modules/commands/cs_mode.cpp:362 modules/commands/cs_mode.cpp:419
 msgid "Nothing to do."
-msgstr ""
+msgstr "Niente da eseguire."
 
 #: modules/commands/os_news.cpp:156 modules/commands/cs_access.cpp:455
 #: modules/commands/cs_access.cpp:468 modules/commands/bs_badwords.cpp:193
@@ -6536,7 +6536,7 @@ msgstr ""
 #: modules/commands/cs_entrymsg.cpp:113 modules/commands/hs_request.cpp:300
 #: modules/commands/ns_alist.cpp:48
 msgid "Number"
-msgstr ""
+msgstr "Numero"
 
 #: modules/commands/os_news.cpp:41
 msgid "OPERNEWS {ADD|DEL|LIST} [text|num]"
@@ -6552,7 +6552,7 @@ msgstr "Connesso da"
 
 #: modules/commands/os_info.cpp:268
 msgid "Oper Info"
-msgstr ""
+msgstr "Informazioni Operatore"
 
 #: modules/commands/os_info.cpp:182 modules/commands/os_info.cpp:221
 #, c-format
@@ -6596,17 +6596,17 @@ msgstr "Le operflags %s sono state rimosse a %s."
 #: modules/commands/os_oper.cpp:168
 #, c-format
 msgid "Opertype %s has no allowed commands."
-msgstr ""
+msgstr "L' opertype %s non ha comandi permessi."
 
 #: modules/commands/os_oper.cpp:190
 #, c-format
 msgid "Opertype %s has no allowed privileges."
-msgstr ""
+msgstr "L' opertype %s non ha privilegi permessi."
 
 #: modules/commands/os_oper.cpp:212
 #, c-format
 msgid "Opertype %s receives modes %s once identified."
-msgstr ""
+msgstr "L' opertype %s riceve i modi %s quando si identifica."
 
 #: modules/commands/bs_kick.cpp:1208
 msgid "Ops protection"
@@ -9304,9 +9304,9 @@ msgid "There is no such configuration block %s."
 msgstr "Non c'e' nessun blocco di configurazione %s."
 
 #: modules/commands/cs_mode.cpp:658
-#, fuzzy, c-format
+#, c-format
 msgid "There is no such mode %s."
-msgstr "Non c'è nessuna Oper News."
+msgstr "Non esiste alcun modo %s."
 
 #: modules/commands/ms_set.cpp:52
 msgid "There's no email address set for your nick."
@@ -10997,7 +10997,7 @@ msgid "hours"
 msgstr "ore"
 
 #: modules/extra/stats/cs_fantasy_stats.cpp:150
-#, fuzzy, c-format
+#, c-format
 msgid "letters: %s, words: %s, lines: %s, smileys: %s, actions: %s"
 msgstr "lettere: %s, parole: %s, linee: %s, smileys %s, azioni: %s"
 

@@ -361,7 +361,7 @@ class NSCert : public Module
 		else
 			u->Login(nc);
 
-		u->SendMessage(NickServ, _("SSL certificate fingerprint accepted, you are now identified to \2%s\2."), nc->display.c_str());
+		u->SendMessage(NickServ, _("SSL certificate fingerprint accepted, you are now identified to \002%s\002."), nc->display.c_str());
 		Log(NickServ) << u->GetMask() << " automatically identified for account " << nc->display << " via SSL certificate fingerprint";
 	}
 

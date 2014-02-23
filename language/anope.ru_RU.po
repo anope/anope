@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Anope\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-02-22 15:40+0100\n"
+"POT-Creation-Date: 2014-02-23 05:09+0100\n"
 "PO-Revision-Date: 2010-09-19 21:10-0400\n"
 "Last-Translator: Adam <adam@anope.org>\n"
 "Language-Team: Russian\n"
@@ -58,7 +58,7 @@ msgstr "Запись вида %s успешно добавлена в спис
 msgid "%s added to %s's access list."
 msgstr "Маска вида %s успешно добавлена в ваш список доступа."
 
-#: modules/commands/ns_cert.cpp:169
+#: modules/commands/ns_cert.cpp:196
 #, fuzzy, c-format
 msgid "%s added to %s's certificate list."
 msgstr "Маска вида %s успешно добавлена в ваш список доступа."
@@ -78,7 +78,7 @@ msgstr "Запись вида %s успешно добавлена в спис
 msgid "%s added to the AKILL list."
 msgstr "Запись вида %s успешно добавлена в список AKILL'ов."
 
-#: modules/commands/ns_cert.cpp:153
+#: modules/commands/ns_cert.cpp:180
 #, fuzzy, c-format
 msgid "%s added to your certificate list."
 msgstr "Маска вида %s успешно добавлена в ваш список доступа."
@@ -227,7 +227,7 @@ msgstr "Запись вида %s успешно удалена из списк
 msgid "%s deleted from %s's access list."
 msgstr "Ник %s успешно удален из списка доступа канала %s."
 
-#: modules/commands/ns_cert.cpp:199
+#: modules/commands/ns_cert.cpp:226
 #, fuzzy, c-format
 msgid "%s deleted from %s's certificate list."
 msgstr "Маска вида %s успешно удалена из вашего списка доступа."
@@ -247,7 +247,7 @@ msgstr "%s успешно удален из AOP'ов канала %s."
 msgid "%s deleted from the AKILL list."
 msgstr "Запись вида %s успешно удалена из списка AKILL'ов."
 
-#: modules/commands/ns_cert.cpp:182
+#: modules/commands/ns_cert.cpp:209
 #, fuzzy, c-format
 msgid "%s deleted from your certificate list."
 msgstr "Маска вида %s успешно удалена из вашего списка доступа."
@@ -427,7 +427,7 @@ msgstr "Запись вида %s в списке плохих слов кан�
 msgid "%s not found on %s's access list."
 msgstr "Ник %s в списке доступа канала %s не обнаружен."
 
-#: modules/commands/ns_cert.cpp:192
+#: modules/commands/ns_cert.cpp:219
 #, fuzzy, c-format
 msgid "%s not found on %s's certificate list."
 msgstr "Маска вида %s не найдена в вашем списке доступа."
@@ -2282,7 +2282,7 @@ msgstr "Список автокиков канала %s пуст."
 msgid "%s's auto join list:"
 msgstr "    AKICK      Управление списком автокиков канала"
 
-#: modules/commands/ns_cert.cpp:208
+#: modules/commands/ns_cert.cpp:235
 #, fuzzy, c-format
 msgid "%s's certificate list is empty."
 msgstr "Ваш список доступа пуст."
@@ -2457,7 +2457,7 @@ msgstr "CHANKILL [+срок_истечения] {#канал} [причин
 msgid "ADD [nickname] channel [key]"
 msgstr "CHANKILL [+срок_истечения] {#канал} [причина]"
 
-#: modules/commands/ns_cert.cpp:224
+#: modules/commands/ns_cert.cpp:251
 #, fuzzy
 msgid "ADD [nickname] fingerprint"
 msgstr "FORBID ник причина"
@@ -3813,7 +3813,7 @@ msgstr ""
 "\n"
 "Заставляет сервисы немедленно сохранить все базы данных на диск."
 
-#: modules/commands/ns_cert.cpp:212
+#: modules/commands/ns_cert.cpp:239
 #, fuzzy, c-format
 msgid "Certificate list for %s:"
 msgstr "Список доступа для %s:"
@@ -4347,7 +4347,7 @@ msgstr "GROUP главный_ник пароль"
 msgid "DEL [nickname] channel"
 msgstr "MODE #канал режимы"
 
-#: modules/commands/ns_cert.cpp:225
+#: modules/commands/ns_cert.cpp:252
 #, fuzzy
 msgid "DEL [nickname] fingerprint"
 msgstr "FORBID ник причина"
@@ -5334,7 +5334,7 @@ msgid ""
 "characters."
 msgstr ""
 
-#: modules/commands/ns_cert.cpp:291
+#: modules/commands/ns_cert.cpp:318
 msgid ""
 "Examples:\n"
 " \n"
@@ -5399,7 +5399,7 @@ msgstr "FANTASY-режим для канала %s активирован."
 msgid "Find a user's status on a channel"
 msgstr "    DEOWNER    Снимает с вас статус владельца канала"
 
-#: modules/commands/ns_cert.cpp:163
+#: modules/commands/ns_cert.cpp:190
 #, fuzzy, c-format
 msgid "Fingerprint %s already present on %s's certificate list."
 msgstr "Маска вида %s уже присутствует в вашем списке доступа."
@@ -5817,7 +5817,7 @@ msgid "LIST [mask | list]"
 msgstr "LIST [#канал] [список_записей | NEW]"
 
 #: modules/commands/ns_access.cpp:104 modules/commands/ns_ajoin.cpp:233
-#: modules/commands/ns_cert.cpp:226
+#: modules/commands/ns_cert.cpp:253
 #, fuzzy
 msgid "LIST [nickname]"
 msgstr "CHECK ник"
@@ -6678,7 +6678,7 @@ msgstr ""
 "    ACCESS LIST\n"
 "        выводит текущий список \"доверенных\" хостмасок."
 
-#: modules/commands/ns_cert.cpp:285
+#: modules/commands/ns_cert.cpp:312
 msgid ""
 "Modifies or displays the certificate list for your nick.\n"
 "If you connect to IRC and provide a client certificate with a\n"
@@ -6708,7 +6708,7 @@ msgstr "    ACCESS     Управление ACCESS-списком ника (сп
 msgid "Modify the list of privileged users"
 msgstr "    ACCESS     Управление ACCESS-списком привилегий канала"
 
-#: modules/commands/ns_cert.cpp:223
+#: modules/commands/ns_cert.cpp:250
 #, fuzzy
 msgid "Modify the nickname client certificate list"
 msgstr "    IGNORE      Управление игнор-списком сервисов"
@@ -7934,7 +7934,12 @@ msgstr "NOOP {SET|REVOKE} сервер"
 msgid "SET server.name option value"
 msgstr ""
 
-#: modules/commands/ns_cert.cpp:336 modules/commands/ns_cert.cpp:347
+#: modules/commands/ns_cert.cpp:364
+#, fuzzy, c-format
+msgid "SSL certificate fingerprint accepted, you are now identified to %s."
+msgstr "Пароль принят - вы признаны как владелец ника."
+
+#: modules/commands/ns_cert.cpp:375
 #, fuzzy
 msgid "SSL certificate fingerprint accepted, you are now identified."
 msgstr "Пароль принят - вы признаны как владелец ника."
@@ -9055,7 +9060,7 @@ msgstr "Извините, в списке доступа канала может
 msgid "Sorry, the maximum of %d auto join entries has been reached."
 msgstr ""
 
-#: modules/commands/ns_cert.cpp:143
+#: modules/commands/ns_cert.cpp:170
 #, fuzzy, c-format
 msgid "Sorry, the maximum of %d certificate entries has been reached."
 msgstr "Извините, но количество записей в списке доступа не может превышать %d"
@@ -11371,7 +11376,7 @@ msgid ""
 "You may view but not modify the access list of other Services Operators."
 msgstr "Невозможно деидентифицировать %s так как он Администратор сервисов."
 
-#: modules/commands/ns_cert.cpp:258
+#: modules/commands/ns_cert.cpp:285
 #, fuzzy
 msgid ""
 "You may view but not modify the certificate list of other Services Operators."

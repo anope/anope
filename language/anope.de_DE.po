@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Anope\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-02-22 15:40+0100\n"
+"POT-Creation-Date: 2014-02-23 05:09+0100\n"
 "PO-Revision-Date: 2013-06-30 13:05+0100\n"
 "Last-Translator: DukePyrolator <DukePyrolator@anope.org>\n"
 "Language-Team: German\n"
@@ -58,7 +58,7 @@ msgstr "%s zur Bad Words-Liste von %s hinzugefügt."
 msgid "%s added to %s's access list."
 msgstr "%s wurde zu %s' Access-Liste hinzugefügt."
 
-#: modules/commands/ns_cert.cpp:169
+#: modules/commands/ns_cert.cpp:196
 #, fuzzy, c-format
 msgid "%s added to %s's certificate list."
 msgstr "%s wurde zu Deiner Zertifikat-Liste hinzugefügt."
@@ -78,7 +78,7 @@ msgstr "%s wurde zur %s-Liste hinzugefügt."
 msgid "%s added to the AKILL list."
 msgstr "%s wurde zur AKILL-Liste hinzugefügt."
 
-#: modules/commands/ns_cert.cpp:153
+#: modules/commands/ns_cert.cpp:180
 #, c-format
 msgid "%s added to your certificate list."
 msgstr "%s wurde zu Deiner Zertifikat-Liste hinzugefügt."
@@ -226,7 +226,7 @@ msgstr "%s wurde aus der Bad Words-Liste von %s entfernt."
 msgid "%s deleted from %s's access list."
 msgstr "%s wurde von der Access-Liste von %s entfernt."
 
-#: modules/commands/ns_cert.cpp:199
+#: modules/commands/ns_cert.cpp:226
 #, fuzzy, c-format
 msgid "%s deleted from %s's certificate list."
 msgstr "%s wurde von Deiner Zertifikat-Liste entfernt."
@@ -248,7 +248,7 @@ msgstr "%s wurde von der %s Liste entfernt."
 msgid "%s deleted from the AKILL list."
 msgstr "%s wurde von der AKILL-Liste entfernt."
 
-#: modules/commands/ns_cert.cpp:182
+#: modules/commands/ns_cert.cpp:209
 #, c-format
 msgid "%s deleted from your certificate list."
 msgstr "%s wurde von Deiner Zertifikat-Liste entfernt."
@@ -427,7 +427,7 @@ msgstr "%s nicht in der Bad Words-Liste von %s gefunden."
 msgid "%s not found on %s's access list."
 msgstr "%s wurde auf der Access-Liste von %s nicht gefunden."
 
-#: modules/commands/ns_cert.cpp:192
+#: modules/commands/ns_cert.cpp:219
 #, fuzzy, c-format
 msgid "%s not found on %s's certificate list."
 msgstr "%s wurde nicht auf Deiner Zertifikat-Liste gefunden."
@@ -2085,7 +2085,7 @@ msgstr "Deine Autojoin-Liste ist leer."
 msgid "%s's auto join list:"
 msgstr "Deine Autojoin Liste:"
 
-#: modules/commands/ns_cert.cpp:208
+#: modules/commands/ns_cert.cpp:235
 #, fuzzy, c-format
 msgid "%s's certificate list is empty."
 msgstr "Deine Zertifikat-Liste ist leer."
@@ -2259,7 +2259,7 @@ msgstr "ADDL [+Zeit] Maske Limit Grund"
 msgid "ADD [nickname] channel [key]"
 msgstr "ADD [Benutzer] Maske"
 
-#: modules/commands/ns_cert.cpp:224
+#: modules/commands/ns_cert.cpp:251
 #, fuzzy
 msgid "ADD [nickname] fingerprint"
 msgstr "Nickname Sprache"
@@ -3518,7 +3518,7 @@ msgid ""
 "send the command."
 msgstr "Lässt die Services sofort die Datenbanken speichern."
 
-#: modules/commands/ns_cert.cpp:212
+#: modules/commands/ns_cert.cpp:239
 #, fuzzy, c-format
 msgid "Certificate list for %s:"
 msgstr "Zertifikat-Liste von %s:"
@@ -4023,7 +4023,7 @@ msgstr "Ziel Passwort"
 msgid "DEL [nickname] channel"
 msgstr "DEL [Benutzer] Maske"
 
-#: modules/commands/ns_cert.cpp:225
+#: modules/commands/ns_cert.cpp:252
 #, fuzzy
 msgid "DEL [nickname] fingerprint"
 msgstr "Nickname Sprache"
@@ -4918,7 +4918,7 @@ msgid ""
 "characters."
 msgstr "Fehler! Der Vhost ist zu lang, er darf maximal %d Zeichen lang sein."
 
-#: modules/commands/ns_cert.cpp:291
+#: modules/commands/ns_cert.cpp:318
 msgid ""
 "Examples:\n"
 " \n"
@@ -4982,7 +4982,7 @@ msgstr "Fantasy Modus ist jetzt ON im %s."
 msgid "Find a user's status on a channel"
 msgstr "    DEOWNER    Entfernt Dein Gründer Status in einen Channel"
 
-#: modules/commands/ns_cert.cpp:163
+#: modules/commands/ns_cert.cpp:190
 #, fuzzy, c-format
 msgid "Fingerprint %s already present on %s's certificate list."
 msgstr "%s ist bereits auf der Zertifikat-Liste."
@@ -5382,7 +5382,7 @@ msgid "LIST [mask | list]"
 msgstr "LIST [Channel | [Liste]"
 
 #: modules/commands/ns_access.cpp:104 modules/commands/ns_ajoin.cpp:233
-#: modules/commands/ns_cert.cpp:226
+#: modules/commands/ns_cert.cpp:253
 #, fuzzy
 msgid "LIST [nickname]"
 msgstr "[Nickname]"
@@ -6224,7 +6224,7 @@ msgstr ""
 "    ACCESS LIST\n"
 "    Zeigt die aktuelle Zugriffsliste an."
 
-#: modules/commands/ns_cert.cpp:285
+#: modules/commands/ns_cert.cpp:312
 msgid ""
 "Modifies or displays the certificate list for your nick.\n"
 "If you connect to IRC and provide a client certificate with a\n"
@@ -6256,7 +6256,7 @@ msgstr ""
 "    ACCESS     Die Liste der priviligierten User\n"
 "               bearbeiten"
 
-#: modules/commands/ns_cert.cpp:223
+#: modules/commands/ns_cert.cpp:250
 #, fuzzy
 msgid "Modify the nickname client certificate list"
 msgstr "    IGNORE        Die \"Services Ignore Liste\" bearbeiten"
@@ -7509,7 +7509,12 @@ msgstr "NOOP {SET|REVOKE} Server"
 msgid "SET server.name option value"
 msgstr ""
 
-#: modules/commands/ns_cert.cpp:336 modules/commands/ns_cert.cpp:347
+#: modules/commands/ns_cert.cpp:364
+#, fuzzy, c-format
+msgid "SSL certificate fingerprint accepted, you are now identified to %s."
+msgstr "Passwort akzeptiert - Du bist jetzt angemeldet."
+
+#: modules/commands/ns_cert.cpp:375
 #, fuzzy
 msgid "SSL certificate fingerprint accepted, you are now identified."
 msgstr "Passwort akzeptiert - Du bist jetzt angemeldet."
@@ -8607,7 +8612,7 @@ msgstr "Die Access-Liste ist auf %d Einträge beschränkt."
 msgid "Sorry, the maximum of %d auto join entries has been reached."
 msgstr ""
 
-#: modules/commands/ns_cert.cpp:143
+#: modules/commands/ns_cert.cpp:170
 #, fuzzy, c-format
 msgid "Sorry, the maximum of %d certificate entries has been reached."
 msgstr "Du kannst nur %d Einträge auf der Access-Liste speichern."
@@ -10920,7 +10925,7 @@ msgstr ""
 "Ausloggen von %s nicht möglich, da es sich um einen Services Administrator "
 "handelt."
 
-#: modules/commands/ns_cert.cpp:258
+#: modules/commands/ns_cert.cpp:285
 #, fuzzy
 msgid ""
 "You may view but not modify the certificate list of other Services Operators."

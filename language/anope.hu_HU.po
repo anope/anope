@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Anope\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-02-22 15:40+0100\n"
+"POT-Creation-Date: 2014-02-23 05:09+0100\n"
 "PO-Revision-Date: 2010-09-19 20:37-0400\n"
 "Last-Translator: Adam <adam@anope.org>\n"
 "Language-Team: Hungarian\n"
@@ -61,7 +61,7 @@ msgstr "A %s szó hozzáadva a %s tiltott szavak listájához."
 msgid "%s added to %s's access list."
 msgstr "%s hozzáadva a hozzáférési listádhoz."
 
-#: modules/commands/ns_cert.cpp:169
+#: modules/commands/ns_cert.cpp:196
 #, fuzzy, c-format
 msgid "%s added to %s's certificate list."
 msgstr "%s hozzáadva a hozzáférési listádhoz."
@@ -81,7 +81,7 @@ msgstr "%s hozzáadva az AKILL listához."
 msgid "%s added to the AKILL list."
 msgstr "%s hozzáadva az AKILL listához."
 
-#: modules/commands/ns_cert.cpp:153
+#: modules/commands/ns_cert.cpp:180
 #, fuzzy, c-format
 msgid "%s added to your certificate list."
 msgstr "%s hozzáadva a hozzáférési listádhoz."
@@ -225,7 +225,7 @@ msgstr "A %s szó törölve %s tiltott szavak listájából."
 msgid "%s deleted from %s's access list."
 msgstr "%s törölve lett a (%s) csatorna hozzáférési listájáról."
 
-#: modules/commands/ns_cert.cpp:199
+#: modules/commands/ns_cert.cpp:226
 #, fuzzy, c-format
 msgid "%s deleted from %s's certificate list."
 msgstr "%s törölve a hozzáférési listádról."
@@ -245,7 +245,7 @@ msgstr "%s törölve lett a %s AOP listáról."
 msgid "%s deleted from the AKILL list."
 msgstr "%s törölve az AKILL listáról."
 
-#: modules/commands/ns_cert.cpp:182
+#: modules/commands/ns_cert.cpp:209
 #, fuzzy, c-format
 msgid "%s deleted from your certificate list."
 msgstr "%s törölve a hozzáférési listádról."
@@ -420,7 +420,7 @@ msgstr "A %s szó nem található a %s tiltott szavak listáján."
 msgid "%s not found on %s's access list."
 msgstr "%s nem található a (%s) csatorna hozzáférési listáján."
 
-#: modules/commands/ns_cert.cpp:192
+#: modules/commands/ns_cert.cpp:219
 #, fuzzy, c-format
 msgid "%s not found on %s's certificate list."
 msgstr "%s nem található a hozzáférési listádon."
@@ -2226,7 +2226,7 @@ msgstr "%s autokick listája üres."
 msgid "%s's auto join list:"
 msgstr "    AKICK      AutoKirúgás listára teheted a \"rossz\" usereket"
 
-#: modules/commands/ns_cert.cpp:208
+#: modules/commands/ns_cert.cpp:235
 #, fuzzy, c-format
 msgid "%s's certificate list is empty."
 msgstr "Your access list is empty."
@@ -2400,7 +2400,7 @@ msgstr "CHANKILL [+lejárat] {#szoba} [indok]"
 msgid "ADD [nickname] channel [key]"
 msgstr "CHANKILL [+lejárat] {#szoba} [indok]"
 
-#: modules/commands/ns_cert.cpp:224
+#: modules/commands/ns_cert.cpp:251
 #, fuzzy
 msgid "ADD [nickname] fingerprint"
 msgstr "FORBID nicknév indok"
@@ -3748,7 +3748,7 @@ msgstr ""
 "\n"
 "Korlátozva Szervíz adminoknak."
 
-#: modules/commands/ns_cert.cpp:212
+#: modules/commands/ns_cert.cpp:239
 #, fuzzy, c-format
 msgid "Certificate list for %s:"
 msgstr "%s hozzáférési listája:"
@@ -4270,7 +4270,7 @@ msgstr "GROUP célnick jelszó"
 msgid "DEL [nickname] channel"
 msgstr "MODE szoba mód"
 
-#: modules/commands/ns_cert.cpp:225
+#: modules/commands/ns_cert.cpp:252
 #, fuzzy
 msgid "DEL [nickname] fingerprint"
 msgstr "FORBID nicknév indok"
@@ -5224,7 +5224,7 @@ msgid ""
 "characters."
 msgstr ""
 
-#: modules/commands/ns_cert.cpp:291
+#: modules/commands/ns_cert.cpp:318
 msgid ""
 "Examples:\n"
 " \n"
@@ -5289,7 +5289,7 @@ msgstr "Fantasy mód most ON a %s csatornán."
 msgid "Find a user's status on a channel"
 msgstr "    DEOWNER    Removes your owner status on a channel"
 
-#: modules/commands/ns_cert.cpp:163
+#: modules/commands/ns_cert.cpp:190
 #, fuzzy, c-format
 msgid "Fingerprint %s already present on %s's certificate list."
 msgstr "Ez a maszk: %s már szerepel a hozzáférési listádon."
@@ -5707,7 +5707,7 @@ msgid "LIST [mask | list]"
 msgstr "LIST [#szoba] [list | NEW ]"
 
 #: modules/commands/ns_access.cpp:104 modules/commands/ns_ajoin.cpp:233
-#: modules/commands/ns_cert.cpp:226
+#: modules/commands/ns_cert.cpp:253
 #, fuzzy
 msgid "LIST [nickname]"
 msgstr "CHECK nicknév "
@@ -6567,7 +6567,7 @@ msgstr ""
 "    ACCESS LIST\n"
 "          Megmutatja a hozzáférési listát."
 
-#: modules/commands/ns_cert.cpp:285
+#: modules/commands/ns_cert.cpp:312
 msgid ""
 "Modifies or displays the certificate list for your nick.\n"
 "If you connect to IRC and provide a client certificate with a\n"
@@ -6597,7 +6597,7 @@ msgstr "    ACCESS     A hozzáférési lista módosítása"
 msgid "Modify the list of privileged users"
 msgstr "    ACCESS     A szoba hozzáférési listájának beállítása"
 
-#: modules/commands/ns_cert.cpp:223
+#: modules/commands/ns_cert.cpp:250
 #, fuzzy
 msgid "Modify the nickname client certificate list"
 msgstr "    IGNORE      Módosítja a Szervíz mellőzési listáját"
@@ -7822,7 +7822,12 @@ msgstr "NOOP {SET|REVOKE} szerver"
 msgid "SET server.name option value"
 msgstr ""
 
-#: modules/commands/ns_cert.cpp:336 modules/commands/ns_cert.cpp:347
+#: modules/commands/ns_cert.cpp:364
+#, fuzzy, c-format
+msgid "SSL certificate fingerprint accepted, you are now identified to %s."
+msgstr "Jelszavad elfogadva - azonosítás sikeres."
+
+#: modules/commands/ns_cert.cpp:375
 #, fuzzy
 msgid "SSL certificate fingerprint accepted, you are now identified."
 msgstr "Jelszavad elfogadva - azonosítás sikeres."
@@ -8882,7 +8887,7 @@ msgstr "Neked csak %d  helyed van a csatorna listáján."
 msgid "Sorry, the maximum of %d auto join entries has been reached."
 msgstr ""
 
-#: modules/commands/ns_cert.cpp:143
+#: modules/commands/ns_cert.cpp:170
 #, fuzzy, c-format
 msgid "Sorry, the maximum of %d certificate entries has been reached."
 msgstr "Neked csak %d bejegyzésed lehet a hozzáférési listán."
@@ -11131,7 +11136,7 @@ msgid ""
 "You may view but not modify the access list of other Services Operators."
 msgstr "%s nem tud kijelentkezni, mert ő egy Services Operator."
 
-#: modules/commands/ns_cert.cpp:258
+#: modules/commands/ns_cert.cpp:285
 #, fuzzy
 msgid ""
 "You may view but not modify the certificate list of other Services Operators."

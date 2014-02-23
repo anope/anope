@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Anope\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-02-22 16:28+0100\n"
+"POT-Creation-Date: 2014-02-23 05:09+0100\n"
 "PO-Revision-Date: 2010-09-19 20:40-0400\n"
 "Last-Translator: Simos <simos@simosnap.org>\n"
 "Language-Team: Italian\n"
@@ -58,7 +58,7 @@ msgstr "%s aggiunto alla lista delle bad words di %s."
 msgid "%s added to %s's access list."
 msgstr "%s aggiunto alla lista di accesso di %s."
 
-#: modules/commands/ns_cert.cpp:169
+#: modules/commands/ns_cert.cpp:196
 #, c-format
 msgid "%s added to %s's certificate list."
 msgstr "%s aggiunto alla lista dei certificati di %s."
@@ -78,7 +78,7 @@ msgstr "%s aggiunto alla lista  %s."
 msgid "%s added to the AKILL list."
 msgstr "%s aggiunto alla lista AKILL."
 
-#: modules/commands/ns_cert.cpp:153
+#: modules/commands/ns_cert.cpp:180
 #, c-format
 msgid "%s added to your certificate list."
 msgstr "%s aggiunto alla tua lista dei certificati."
@@ -219,7 +219,7 @@ msgstr "%s eliminato dalla lista delle bad words di %s."
 msgid "%s deleted from %s's access list."
 msgstr "%s eliminato dalla lista di accesso di %s."
 
-#: modules/commands/ns_cert.cpp:199
+#: modules/commands/ns_cert.cpp:226
 #, c-format
 msgid "%s deleted from %s's certificate list."
 msgstr "%s eliminato dalla tua lista dei certificati di %s."
@@ -239,7 +239,7 @@ msgstr "%s eliminato dalla lista %s"
 msgid "%s deleted from the AKILL list."
 msgstr "%s eliminato dalla lista AKILL."
 
-#: modules/commands/ns_cert.cpp:182
+#: modules/commands/ns_cert.cpp:209
 #, c-format
 msgid "%s deleted from your certificate list."
 msgstr "%s eliminato dalla tua lista dei certificati."
@@ -417,7 +417,7 @@ msgstr "%s non trovato nella lista bad words di %s."
 msgid "%s not found on %s's access list."
 msgstr "%s non trovato nella lista di accesso di %s."
 
-#: modules/commands/ns_cert.cpp:192
+#: modules/commands/ns_cert.cpp:219
 #, c-format
 msgid "%s not found on %s's certificate list."
 msgstr "%s non trovato nella lista dei certificati di %s."
@@ -2010,7 +2010,7 @@ msgstr "La lista auto join di %s è vuota."
 msgid "%s's auto join list:"
 msgstr "Lista auto join di %s:"
 
-#: modules/commands/ns_cert.cpp:208
+#: modules/commands/ns_cert.cpp:235
 #, c-format
 msgid "%s's certificate list is empty."
 msgstr "La tua lista dei certificati di %s è vuota."
@@ -2176,7 +2176,7 @@ msgstr "ADD [+expiry] mask limit reason"
 msgid "ADD [nickname] channel [key]"
 msgstr "ADD [nickname] channel [key]"
 
-#: modules/commands/ns_cert.cpp:224
+#: modules/commands/ns_cert.cpp:251
 msgid "ADD [nickname] fingerprint"
 msgstr "ADD [nickname] fingerprint"
 
@@ -3438,7 +3438,7 @@ msgstr ""
 "Services nello stesso istante in cui il comando viene\n"
 "inviato."
 
-#: modules/commands/ns_cert.cpp:212
+#: modules/commands/ns_cert.cpp:239
 #, c-format
 msgid "Certificate list for %s:"
 msgstr "Lista dei certificati di %s:"
@@ -3903,7 +3903,7 @@ msgstr "DEL target info"
 msgid "DEL [nickname] channel"
 msgstr "DEL [nickname] channel"
 
-#: modules/commands/ns_cert.cpp:225
+#: modules/commands/ns_cert.cpp:252
 msgid "DEL [nickname] fingerprint"
 msgstr "DEL [nickname] fingerprint"
 
@@ -4801,7 +4801,7 @@ msgid ""
 msgstr ""
 "Errore! Il vHost è troppo lungo, usa un hostname più corto di %d caratteri."
 
-#: modules/commands/ns_cert.cpp:291
+#: modules/commands/ns_cert.cpp:318
 msgid ""
 "Examples:\n"
 " \n"
@@ -4877,7 +4877,7 @@ msgstr "La modalità fantasy ora è ATTIVA sul canale %s."
 msgid "Find a user's status on a channel"
 msgstr "Trova lo stato di un utente in un canale"
 
-#: modules/commands/ns_cert.cpp:163
+#: modules/commands/ns_cert.cpp:190
 #, c-format
 msgid "Fingerprint %s already present on %s's certificate list."
 msgstr "La firma digitale %s è già present nella lista dei certificati di %s."
@@ -5267,7 +5267,7 @@ msgid "LIST [mask | list]"
 msgstr "LIST [mask | list]"
 
 #: modules/commands/ns_access.cpp:104 modules/commands/ns_ajoin.cpp:233
-#: modules/commands/ns_cert.cpp:226
+#: modules/commands/ns_cert.cpp:253
 msgid "LIST [nickname]"
 msgstr "LIST [nickname]"
 
@@ -6107,7 +6107,7 @@ msgstr ""
 "    ACCESS LIST\n"
 "        Visualizza la lista di accesso attuale."
 
-#: modules/commands/ns_cert.cpp:285
+#: modules/commands/ns_cert.cpp:312
 msgid ""
 "Modifies or displays the certificate list for your nick.\n"
 "If you connect to IRC and provide a client certificate with a\n"
@@ -6141,7 +6141,7 @@ msgstr "Modifica la lista degli indirizzi autorizzati"
 msgid "Modify the list of privileged users"
 msgstr "Modifica la lista degli utenti con privilegi"
 
-#: modules/commands/ns_cert.cpp:223
+#: modules/commands/ns_cert.cpp:250
 msgid "Modify the nickname client certificate list"
 msgstr "Modifica la lista dei certificati del client per il nickname"
 
@@ -7295,7 +7295,13 @@ msgstr "SET server"
 msgid "SET server.name option value"
 msgstr "SET server.name option value"
 
-#: modules/commands/ns_cert.cpp:336 modules/commands/ns_cert.cpp:347
+#: modules/commands/ns_cert.cpp:364
+#, fuzzy, c-format
+msgid "SSL certificate fingerprint accepted, you are now identified to %s."
+msgstr ""
+"Firma digitale del certificato SSL accettata - adesso sei riconosciuto."
+
+#: modules/commands/ns_cert.cpp:375
 msgid "SSL certificate fingerprint accepted, you are now identified."
 msgstr ""
 "Firma digitale del certificato SSL accettata - adesso sei riconosciuto."
@@ -8260,7 +8266,7 @@ msgstr ""
 msgid "Sorry, the maximum of %d auto join entries has been reached."
 msgstr "Spiacente, il limite massimo di %d auto join è stato raggiunto."
 
-#: modules/commands/ns_cert.cpp:143
+#: modules/commands/ns_cert.cpp:170
 #, c-format
 msgid "Sorry, the maximum of %d certificate entries has been reached."
 msgstr "Spiacente, il limite massimo di %d certificati è stato raggiunto."
@@ -10508,7 +10514,7 @@ msgstr ""
 "Puoi consultare la lista di accesso degli altri Services Operators, ma non "
 "modificarla."
 
-#: modules/commands/ns_cert.cpp:258
+#: modules/commands/ns_cert.cpp:285
 msgid ""
 "You may view but not modify the certificate list of other Services Operators."
 msgstr ""

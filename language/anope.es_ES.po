@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Anope\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-02-22 15:40+0100\n"
+"POT-Creation-Date: 2014-02-23 05:09+0100\n"
 "PO-Revision-Date: 2013-09-02 23:37+0100\n"
 "Last-Translator: Isaac Fontal <i_fontal@hotmail.com>\n"
 "Language-Team: Spanish\n"
@@ -59,7 +59,7 @@ msgstr "%s añadido a la lista de bad words de %s."
 msgid "%s added to %s's access list."
 msgstr "%s añadido a la lista de acceso de %s."
 
-#: modules/commands/ns_cert.cpp:169
+#: modules/commands/ns_cert.cpp:196
 #, fuzzy, c-format
 msgid "%s added to %s's certificate list."
 msgstr "%s añadido a tu lista de certificados."
@@ -79,7 +79,7 @@ msgstr "%s añadido a la lista %s."
 msgid "%s added to the AKILL list."
 msgstr "%s añadido a la lista de AKILLs."
 
-#: modules/commands/ns_cert.cpp:153
+#: modules/commands/ns_cert.cpp:180
 #, c-format
 msgid "%s added to your certificate list."
 msgstr "%s añadido a tu lista de certificados."
@@ -233,7 +233,7 @@ msgstr "%s borrado de la lista de bad words de %s."
 msgid "%s deleted from %s's access list."
 msgstr "%s borrado de la lista de acceso de %s."
 
-#: modules/commands/ns_cert.cpp:199
+#: modules/commands/ns_cert.cpp:226
 #, fuzzy, c-format
 msgid "%s deleted from %s's certificate list."
 msgstr "%s borrado de tu lista de certificados."
@@ -253,7 +253,7 @@ msgstr "%s borrado de la lista %s."
 msgid "%s deleted from the AKILL list."
 msgstr "%s borrado de la lista de AKILLs."
 
-#: modules/commands/ns_cert.cpp:182
+#: modules/commands/ns_cert.cpp:209
 #, c-format
 msgid "%s deleted from your certificate list."
 msgstr "%s borrado de tu lista de certificados."
@@ -429,7 +429,7 @@ msgstr "%s no encontrado en la lista de bad words de %s."
 msgid "%s not found on %s's access list."
 msgstr "%s no encontrado en la lista de acceso de %s."
 
-#: modules/commands/ns_cert.cpp:192
+#: modules/commands/ns_cert.cpp:219
 #, fuzzy, c-format
 msgid "%s not found on %s's certificate list."
 msgstr "%s no encontrado en tu lista de certificados."
@@ -2022,7 +2022,7 @@ msgstr "La lista de auto join de %s está vacía."
 msgid "%s's auto join list:"
 msgstr "Lista de auto join de %s:"
 
-#: modules/commands/ns_cert.cpp:208
+#: modules/commands/ns_cert.cpp:235
 #, fuzzy, c-format
 msgid "%s's certificate list is empty."
 msgstr "Tu lista de certificados está vacía."
@@ -2196,7 +2196,7 @@ msgstr "ADD [+expiración] máscara límite razón"
 msgid "ADD [nickname] channel [key]"
 msgstr "ADD [usuario] canal [clave]"
 
-#: modules/commands/ns_cert.cpp:224
+#: modules/commands/ns_cert.cpp:251
 #, fuzzy
 msgid "ADD [nickname] fingerprint"
 msgstr "nick idioma"
@@ -3452,7 +3452,7 @@ msgstr ""
 "Hace que los Servicios actualicen la base de datos en\n"
 "cuanto envíes el comando."
 
-#: modules/commands/ns_cert.cpp:212
+#: modules/commands/ns_cert.cpp:239
 #, fuzzy, c-format
 msgid "Certificate list for %s:"
 msgstr "Lista de certificados para %s:"
@@ -3919,7 +3919,7 @@ msgstr "DEL objetivo info"
 msgid "DEL [nickname] channel"
 msgstr "DEL [usuario] canal"
 
-#: modules/commands/ns_cert.cpp:225
+#: modules/commands/ns_cert.cpp:252
 #, fuzzy
 msgid "DEL [nickname] fingerprint"
 msgstr "nick idioma"
@@ -4821,7 +4821,7 @@ msgstr ""
 "¡Error! El vhost es demasiado largo, por favor, usa un host más corto de %d "
 "caracteres."
 
-#: modules/commands/ns_cert.cpp:291
+#: modules/commands/ns_cert.cpp:318
 msgid ""
 "Examples:\n"
 " \n"
@@ -4896,7 +4896,7 @@ msgstr "Modo fantasía ahora Activado en el canal %s."
 msgid "Find a user's status on a channel"
 msgstr "Encontrar el status de un usuario en un canal"
 
-#: modules/commands/ns_cert.cpp:163
+#: modules/commands/ns_cert.cpp:190
 #, fuzzy, c-format
 msgid "Fingerprint %s already present on %s's certificate list."
 msgstr "La huella %s ya está presente en tu lista de certificados."
@@ -5287,7 +5287,7 @@ msgid "LIST [mask | list]"
 msgstr "LIST [máscara | lista]"
 
 #: modules/commands/ns_access.cpp:104 modules/commands/ns_ajoin.cpp:233
-#: modules/commands/ns_cert.cpp:226
+#: modules/commands/ns_cert.cpp:253
 #, fuzzy
 msgid "LIST [nickname]"
 msgstr "[nick]"
@@ -6121,7 +6121,7 @@ msgstr ""
 "    ACCESS LIST\n"
 "        Muestra la lista de acceso actual."
 
-#: modules/commands/ns_cert.cpp:285
+#: modules/commands/ns_cert.cpp:312
 #, fuzzy
 msgid ""
 "Modifies or displays the certificate list for your nick.\n"
@@ -6154,7 +6154,7 @@ msgstr "Modificar la lista de direcciones autorizadas"
 msgid "Modify the list of privileged users"
 msgstr "Modificar la lista de usuarios privilegiados"
 
-#: modules/commands/ns_cert.cpp:223
+#: modules/commands/ns_cert.cpp:250
 #, fuzzy
 msgid "Modify the nickname client certificate list"
 msgstr "Modificar la lista de ignorados por los Servicios"
@@ -7319,7 +7319,12 @@ msgstr "SET servidor"
 msgid "SET server.name option value"
 msgstr "SET nombre-servidor opción valor"
 
-#: modules/commands/ns_cert.cpp:336 modules/commands/ns_cert.cpp:347
+#: modules/commands/ns_cert.cpp:364
+#, fuzzy, c-format
+msgid "SSL certificate fingerprint accepted, you are now identified to %s."
+msgstr "Huella SSL aceptada, ahora estás identificado."
+
+#: modules/commands/ns_cert.cpp:375
 #, fuzzy
 msgid "SSL certificate fingerprint accepted, you are now identified."
 msgstr "Huella SSL aceptada, ahora estás identificado."
@@ -8287,7 +8292,7 @@ msgstr ""
 msgid "Sorry, the maximum of %d auto join entries has been reached."
 msgstr ""
 
-#: modules/commands/ns_cert.cpp:143
+#: modules/commands/ns_cert.cpp:170
 #, fuzzy, c-format
 msgid "Sorry, the maximum of %d certificate entries has been reached."
 msgstr ""
@@ -10547,7 +10552,7 @@ msgstr ""
 "Puedes ver pero no modificar la lista de acceso de otro Operador de "
 "Servicios."
 
-#: modules/commands/ns_cert.cpp:258
+#: modules/commands/ns_cert.cpp:285
 #, fuzzy
 msgid ""
 "You may view but not modify the certificate list of other Services Operators."

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Anope\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-02-22 15:40+0100\n"
+"POT-Creation-Date: 2014-02-23 05:09+0100\n"
 "PO-Revision-Date: 2010-09-19 20:34-0400\n"
 "Last-Translator: VisioN <vision@myirc.us>\n"
 "Language-Team: Greek\n"
@@ -57,7 +57,7 @@ msgstr "#%s# προσθέθηκε στην λίστα των κακών λέξε
 msgid "%s added to %s's access list."
 msgstr "#%s# έγινε προσθήκη στην λίστα πρόσβασής σου."
 
-#: modules/commands/ns_cert.cpp:169
+#: modules/commands/ns_cert.cpp:196
 #, fuzzy, c-format
 msgid "%s added to %s's certificate list."
 msgstr "#%s# έγινε προσθήκη στην λίστα πρόσβασής σου."
@@ -77,7 +77,7 @@ msgstr "#%s# προσθέθηκε στην λίστα AKILL."
 msgid "%s added to the AKILL list."
 msgstr "#%s# προσθέθηκε στην λίστα AKILL."
 
-#: modules/commands/ns_cert.cpp:153
+#: modules/commands/ns_cert.cpp:180
 #, c-format
 msgid "%s added to your certificate list."
 msgstr "#%s# έγινε προσθήκη στην λίστα πρόσβασής σου."
@@ -223,7 +223,7 @@ msgstr "#%s# διαγράφτηκε από την λίστα των κακών �
 msgid "%s deleted from %s's access list."
 msgstr "#%s# διαγράφηκε από το access list του %s."
 
-#: modules/commands/ns_cert.cpp:199
+#: modules/commands/ns_cert.cpp:226
 #, fuzzy, c-format
 msgid "%s deleted from %s's certificate list."
 msgstr "#%s# διαγράφτηκε από την λίστα πρόσβασής σου."
@@ -243,7 +243,7 @@ msgstr "Ο/η #%s# διαγράφηκε επιτυχώς από την AOP λί�
 msgid "%s deleted from the AKILL list."
 msgstr "#%s# διαγράφηκε από την λίστα AKILL."
 
-#: modules/commands/ns_cert.cpp:182
+#: modules/commands/ns_cert.cpp:209
 #, c-format
 msgid "%s deleted from your certificate list."
 msgstr "#%s# διαγράφτηκε από την λίστα πρόσβασής σου."
@@ -419,7 +419,7 @@ msgstr "#%s# δεν βρέθηκε στη λίστα των κακών λέξε�
 msgid "%s not found on %s's access list."
 msgstr "Ο/η #%s# δεν βρέθηκε στην access list του %s"
 
-#: modules/commands/ns_cert.cpp:192
+#: modules/commands/ns_cert.cpp:219
 #, fuzzy, c-format
 msgid "%s not found on %s's certificate list."
 msgstr "#%s# δεν βρέθηκε στη λίστα πρόσβασής σου."
@@ -2119,7 +2119,7 @@ msgid "%s's auto join list:"
 msgstr "Η λίστα αυτόματης εισόδου σας είναι γεμάτη."
 
 #
-#: modules/commands/ns_cert.cpp:208
+#: modules/commands/ns_cert.cpp:235
 #, fuzzy, c-format
 msgid "%s's certificate list is empty."
 msgstr "Η access λίστα σας είναι άδεια."
@@ -2294,7 +2294,7 @@ msgid "ADD [nickname] channel [key]"
 msgstr "CHANKILL [+#expiry#] {##channel#} [#reason#]"
 
 #
-#: modules/commands/ns_cert.cpp:224
+#: modules/commands/ns_cert.cpp:251
 #, fuzzy
 msgid "ADD [nickname] fingerprint"
 msgstr "Ρυθμίζει τον κωδικό του ψευδονύμου."
@@ -3679,7 +3679,7 @@ msgstr ""
 "    \n"
 "Μόνο για τους #Services Operators#."
 
-#: modules/commands/ns_cert.cpp:212
+#: modules/commands/ns_cert.cpp:239
 #, fuzzy, c-format
 msgid "Certificate list for %s:"
 msgstr "Λίστα πρόσβασης για #%s#:"
@@ -4228,7 +4228,7 @@ msgid "DEL [nickname] channel"
 msgstr "RSEND {#nick# | #channel#} #memo-text#"
 
 #
-#: modules/commands/ns_cert.cpp:225
+#: modules/commands/ns_cert.cpp:252
 #, fuzzy
 msgid "DEL [nickname] fingerprint"
 msgstr "Ρυθμίζει τον κωδικό του ψευδονύμου."
@@ -5174,7 +5174,7 @@ msgid ""
 "characters."
 msgstr ""
 
-#: modules/commands/ns_cert.cpp:291
+#: modules/commands/ns_cert.cpp:318
 msgid ""
 "Examples:\n"
 " \n"
@@ -5252,7 +5252,7 @@ msgstr "Η Fantasy επιλογή είναι τώρα #ON# στο κανάλι %
 msgid "Find a user's status on a channel"
 msgstr "Αφαιρεί το owner status σε ένα κανάλι."
 
-#: modules/commands/ns_cert.cpp:163
+#: modules/commands/ns_cert.cpp:190
 #, fuzzy, c-format
 msgid "Fingerprint %s already present on %s's certificate list."
 msgstr "Η μάσκα #%s# είναι ήδη μέσα στην λίστα πρόσβασης."
@@ -5674,7 +5674,7 @@ msgid "LIST [mask | list]"
 msgstr ""
 
 #: modules/commands/ns_access.cpp:104 modules/commands/ns_ajoin.cpp:233
-#: modules/commands/ns_cert.cpp:226
+#: modules/commands/ns_cert.cpp:253
 #, fuzzy
 msgid "LIST [nickname]"
 msgstr "CHECK #nickname#"
@@ -6550,7 +6550,7 @@ msgstr ""
 "        Εμφανίζει την τρέχουσα λίστα πρόσβασης.\n"
 "    "
 
-#: modules/commands/ns_cert.cpp:285
+#: modules/commands/ns_cert.cpp:312
 msgid ""
 "Modifies or displays the certificate list for your nick.\n"
 "If you connect to IRC and provide a client certificate with a\n"
@@ -6582,7 +6582,7 @@ msgid "Modify the list of privileged users"
 msgstr "Αλλάζει τη λίστα των εξουσιοδοτημένων χρηστών"
 
 #
-#: modules/commands/ns_cert.cpp:223
+#: modules/commands/ns_cert.cpp:250
 #, fuzzy
 msgid "Modify the nickname client certificate list"
 msgstr "Τροποποιεί την Services Ignore List"
@@ -7815,7 +7815,13 @@ msgid "SET server.name option value"
 msgstr ""
 
 #
-#: modules/commands/ns_cert.cpp:336 modules/commands/ns_cert.cpp:347
+#: modules/commands/ns_cert.cpp:364
+#, fuzzy, c-format
+msgid "SSL certificate fingerprint accepted, you are now identified to %s."
+msgstr "Ο κωδικός έγινε δεκτός - τώρα είσαι αναγνωρισμένος."
+
+#
+#: modules/commands/ns_cert.cpp:375
 #, fuzzy
 msgid "SSL certificate fingerprint accepted, you are now identified."
 msgstr "Ο κωδικός έγινε δεκτός - τώρα είσαι αναγνωρισμένος."
@@ -8872,7 +8878,7 @@ msgstr "Συγνώμη, μπορείς μόνο να έχεις %d access στο
 msgid "Sorry, the maximum of %d auto join entries has been reached."
 msgstr ""
 
-#: modules/commands/ns_cert.cpp:143
+#: modules/commands/ns_cert.cpp:170
 #, fuzzy, c-format
 msgid "Sorry, the maximum of %d certificate entries has been reached."
 msgstr "Συγνώμη, μπορείς μόνο να έχεις %d πρόσβαση σε κατάταξη του ψευδώνυμου."
@@ -11136,7 +11142,7 @@ msgid ""
 "You may view but not modify the access list of other Services Operators."
 msgstr "Δεν μπορείτε να κάνετε Logout τον %s επειδή είναι Services Operator."
 
-#: modules/commands/ns_cert.cpp:258
+#: modules/commands/ns_cert.cpp:285
 #, fuzzy
 msgid ""
 "You may view but not modify the certificate list of other Services Operators."

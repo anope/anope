@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Anope\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-02-22 15:40+0100\n"
+"POT-Creation-Date: 2014-02-23 05:09+0100\n"
 "PO-Revision-Date: 2010-09-19 20:12-0400\n"
 "Last-Translator: Adam <adam@anope.org>\n"
 "Language-Team: Catalan\n"
@@ -56,7 +56,7 @@ msgstr "%s afegida a  la llista de paraules malsonants de  %s."
 msgid "%s added to %s's access list."
 msgstr "%s afegit a la teva lllista d'accés."
 
-#: modules/commands/ns_cert.cpp:169
+#: modules/commands/ns_cert.cpp:196
 #, fuzzy, c-format
 msgid "%s added to %s's certificate list."
 msgstr "%s afegit a la teva lllista d'accés."
@@ -76,7 +76,7 @@ msgstr "%s afegit a la llista de AKILLs."
 msgid "%s added to the AKILL list."
 msgstr "%s afegit a la llista de AKILLs."
 
-#: modules/commands/ns_cert.cpp:153
+#: modules/commands/ns_cert.cpp:180
 #, fuzzy, c-format
 msgid "%s added to your certificate list."
 msgstr "%s afegit a la teva lllista d'accés."
@@ -222,7 +222,7 @@ msgstr "%s esborrada de la llista de paraules malsonants de %s."
 msgid "%s deleted from %s's access list."
 msgstr "%s esborrat de la llista d'accés de %s."
 
-#: modules/commands/ns_cert.cpp:199
+#: modules/commands/ns_cert.cpp:226
 #, fuzzy, c-format
 msgid "%s deleted from %s's certificate list."
 msgstr "%s esborrat de la teva lllista d'accés."
@@ -243,7 +243,7 @@ msgstr "%s esborrat de la llista AOP de %s."
 msgid "%s deleted from the AKILL list."
 msgstr "%s esborrat de la llista de AKILLs."
 
-#: modules/commands/ns_cert.cpp:182
+#: modules/commands/ns_cert.cpp:209
 #, fuzzy, c-format
 msgid "%s deleted from your certificate list."
 msgstr "%s esborrat de la teva lllista d'accés."
@@ -418,7 +418,7 @@ msgstr "%s no trobada a la llista de paraules malsonants de %s."
 msgid "%s not found on %s's access list."
 msgstr "%s no trobat a la llista d'accés de %s."
 
-#: modules/commands/ns_cert.cpp:192
+#: modules/commands/ns_cert.cpp:219
 #, fuzzy, c-format
 msgid "%s not found on %s's certificate list."
 msgstr "%s no trobat a la teva lllista d'accés."
@@ -2247,7 +2247,7 @@ msgstr "La llista de kicks automàtics del canal %s esta buida."
 msgid "%s's auto join list:"
 msgstr "    AKICK      Manté la llista d'AutoKick"
 
-#: modules/commands/ns_cert.cpp:208
+#: modules/commands/ns_cert.cpp:235
 #, fuzzy, c-format
 msgid "%s's certificate list is empty."
 msgstr "Your access list is empty."
@@ -2421,7 +2421,7 @@ msgstr "CHANKILL [+expiry] {#channel} [reason]"
 msgid "ADD [nickname] channel [key]"
 msgstr "CHANKILL [+expiry] {#channel} [reason]"
 
-#: modules/commands/ns_cert.cpp:224
+#: modules/commands/ns_cert.cpp:251
 #, fuzzy
 msgid "ADD [nickname] fingerprint"
 msgstr "FORBID nickname rao"
@@ -3775,7 +3775,7 @@ msgstr ""
 "\n"
 "Limitat a administradors de serveis."
 
-#: modules/commands/ns_cert.cpp:212
+#: modules/commands/ns_cert.cpp:239
 #, fuzzy, c-format
 msgid "Certificate list for %s:"
 msgstr "Lllista d'accés per %s:"
@@ -4305,7 +4305,7 @@ msgstr "GROUP grup clau"
 msgid "DEL [nickname] channel"
 msgstr "MODE canal Modes"
 
-#: modules/commands/ns_cert.cpp:225
+#: modules/commands/ns_cert.cpp:252
 #, fuzzy
 msgid "DEL [nickname] fingerprint"
 msgstr "FORBID nickname rao"
@@ -5268,7 +5268,7 @@ msgid ""
 "characters."
 msgstr ""
 
-#: modules/commands/ns_cert.cpp:291
+#: modules/commands/ns_cert.cpp:318
 msgid ""
 "Examples:\n"
 " \n"
@@ -5333,7 +5333,7 @@ msgstr "Mode fantasia ara activada en el canal %s."
 msgid "Find a user's status on a channel"
 msgstr "    DEOWNER    Removes your owner status on a channel"
 
-#: modules/commands/ns_cert.cpp:163
+#: modules/commands/ns_cert.cpp:190
 #, fuzzy, c-format
 msgid "Fingerprint %s already present on %s's certificate list."
 msgstr "La mascara %s ja esta present a la teva lllista d'accés."
@@ -5748,7 +5748,7 @@ msgid "LIST [mask | list]"
 msgstr "LIST [canal] [llista | NEW]"
 
 #: modules/commands/ns_access.cpp:104 modules/commands/ns_ajoin.cpp:233
-#: modules/commands/ns_cert.cpp:226
+#: modules/commands/ns_cert.cpp:253
 #, fuzzy
 msgid "LIST [nickname]"
 msgstr "CHECK nickname"
@@ -6614,7 +6614,7 @@ msgstr ""
 "    ACCESS LIST\n"
 "        Mostra la llista d'accés actual."
 
-#: modules/commands/ns_cert.cpp:285
+#: modules/commands/ns_cert.cpp:312
 msgid ""
 "Modifies or displays the certificate list for your nick.\n"
 "If you connect to IRC and provide a client certificate with a\n"
@@ -6644,7 +6644,7 @@ msgstr "    ACCESS     Modifica la llista d'adreçes autoritzades"
 msgid "Modify the list of privileged users"
 msgstr "    ACCESS     Modifica la llista d'usuaris privilegiats"
 
-#: modules/commands/ns_cert.cpp:223
+#: modules/commands/ns_cert.cpp:250
 #, fuzzy
 msgid "Modify the nickname client certificate list"
 msgstr "    IGNORE      Modify the Services ignore list"
@@ -7882,7 +7882,12 @@ msgstr "NOOP {SET|REVOKE} servidor"
 msgid "SET server.name option value"
 msgstr ""
 
-#: modules/commands/ns_cert.cpp:336 modules/commands/ns_cert.cpp:347
+#: modules/commands/ns_cert.cpp:364
+#, fuzzy, c-format
+msgid "SSL certificate fingerprint accepted, you are now identified to %s."
+msgstr "Clau aceptada - Has estat reconegut."
+
+#: modules/commands/ns_cert.cpp:375
 #, fuzzy
 msgid "SSL certificate fingerprint accepted, you are now identified."
 msgstr "Clau aceptada - Has estat reconegut."
@@ -8961,7 +8966,7 @@ msgstr ""
 msgid "Sorry, the maximum of %d auto join entries has been reached."
 msgstr ""
 
-#: modules/commands/ns_cert.cpp:143
+#: modules/commands/ns_cert.cpp:170
 #, fuzzy, c-format
 msgid "Sorry, the maximum of %d certificate entries has been reached."
 msgstr ""
@@ -11215,7 +11220,7 @@ msgid ""
 "You may view but not modify the access list of other Services Operators."
 msgstr "Can't logout %s because he's a services operator."
 
-#: modules/commands/ns_cert.cpp:258
+#: modules/commands/ns_cert.cpp:285
 #, fuzzy
 msgid ""
 "You may view but not modify the certificate list of other Services Operators."

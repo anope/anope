@@ -1,4 +1,5 @@
 /*
+ * (C) 2014 Attila Molnar <attilamolnar@hush.com>
  * (C) 2014 Anope Team
  * Contact us at team@anope.org
  *
@@ -12,9 +13,12 @@
 
 #include <errno.h>
 #include <gnutls/gnutls.h>
+#include <gnutls/x509.h>
 
 class GnuTLSModule;
 static GnuTLSModule *me;
+
+namespace GnuTLS { class X509CertCredentials; }
 
 class MySSLService : public SSLService
 {
@@ -31,10 +35,11 @@ class SSLSocketIO : public SocketIO
 {
  public:
 	gnutls_session_t sess;
+	GnuTLS::X509CertCredentials* mycreds;
 
 	/** Constructor
 	 */
-	SSLSocketIO() : sess(NULL) { }
+	SSLSocketIO();
 
 	/** Really receive something from the buffer
  	 * @param s The socket
@@ -143,16 +148,112 @@ namespace GnuTLS
 		gnutls_dh_params_t get() const { return dh_params; }
 	};
 
+	class X509Key
+	{
+		/** Ensure that the key is deinited in case the constructor of X509Key throws
+		 */
+		class RAIIKey
+		{
+		 public:
+			gnutls_x509_privkey_t key;
+
+			RAIIKey()
+			{
+				int ret = gnutls_x509_privkey_init(&key);
+				if (ret < 0)
+					throw ConfigException("gnutls_x509_privkey_init() failed");
+			}
+
+			~RAIIKey()
+			{
+				gnutls_x509_privkey_deinit(key);
+			}
+		} key;
+
+	 public:
+		/** Import */
+		X509Key(const Anope::string &keystr)
+		{
+			int ret = gnutls_x509_privkey_import(key.key, Datum(keystr).get(), GNUTLS_X509_FMT_PEM);
+			if (ret < 0)
+				throw ConfigException("Error loading private key: " + Anope::string(gnutls_strerror(ret)));
+		}
+
+		gnutls_x509_privkey_t& get() { return key.key; }
+	};
+
+	class X509CertList
+	{
+		std::vector<gnutls_x509_crt_t> certs;
+
+	 public:
+		/** Import */
+		X509CertList(const Anope::string &certstr)
+		{
+			unsigned int certcount = 3;
+			certs.resize(certcount);
+			Datum datum(certstr);
+
+			int ret = gnutls_x509_crt_list_import(raw(), &certcount, datum.get(), GNUTLS_X509_FMT_PEM, GNUTLS_X509_CRT_LIST_IMPORT_FAIL_IF_EXCEED);
+			if (ret == GNUTLS_E_SHORT_MEMORY_BUFFER)
+			{
+				// the buffer wasn't big enough to hold all certs but gnutls changed certcount to the number of available certs,
+				// try again with a bigger buffer
+				certs.resize(certcount);
+				ret = gnutls_x509_crt_list_import(raw(), &certcount, datum.get(), GNUTLS_X509_FMT_PEM, GNUTLS_X509_CRT_LIST_IMPORT_FAIL_IF_EXCEED);
+			}
+
+			if (ret < 0)
+				throw ConfigException("Unable to load certificates" + Anope::string(gnutls_strerror(ret)));
+
+			// Resize the vector to the actual number of certs because we rely on its size being correct
+			// when deallocating the certs
+			certs.resize(certcount);
+		}
+
+		~X509CertList()
+		{
+			for (std::vector<gnutls_x509_crt_t>::iterator i = certs.begin(); i != certs.end(); ++i)
+				gnutls_x509_crt_deinit(*i);
+		}
+
+		gnutls_x509_crt_t* raw() { return &certs[0]; }
+		unsigned int size() const { return certs.size(); }
+	};
+
 	class X509CertCredentials
 	{
+		unsigned int refcount;
 		gnutls_certificate_credentials_t cred;
 		DHParams dh;
 
+		static Anope::string LoadFile(const Anope::string &filename)
+		{
+			std::ifstream ifs(filename.c_str());
+			const Anope::string ret((std::istreambuf_iterator<char>(ifs)), std::istreambuf_iterator<char>());
+			return ret;
+		}
+
+		static int cert_callback(gnutls_session_t sess, const gnutls_datum_t* req_ca_rdn, int nreqs, const gnutls_pk_algorithm_t* sign_algos, int sign_algos_length, gnutls_retr_st* st);
+
 	 public:
-		X509CertCredentials()
+		X509CertList certs;
+		X509Key key;
+
+		X509CertCredentials(const Anope::string &certfile, const Anope::string &keyfile)
+			: refcount(0), certs(LoadFile(certfile)), key(LoadFile(keyfile))
 		{
 			if (gnutls_certificate_allocate_credentials(&cred) < 0)
 				throw ConfigException("Cannot allocate certificate credentials");
+
+			int ret = gnutls_certificate_set_x509_key(cred, certs.raw(), certs.size(), key.get());
+			if (ret < 0)
+			{
+				gnutls_certificate_free_credentials(cred);
+				throw ConfigException("Unable to set cert/key pair");
+			}
+
+			gnutls_certificate_client_set_retrieve_function(cred, cert_callback);
 		}
 
 		~X509CertCredentials()
@@ -166,18 +267,9 @@ namespace GnuTLS
 			gnutls_set_default_priority(sess);
 		}
 
-		void SetCertAndKey(const Anope::string &certfile, const Anope::string &keyfile)
-		{
-			int ret = gnutls_certificate_set_x509_key_file(cred, certfile.c_str(), keyfile.c_str(), GNUTLS_X509_FMT_PEM);
-			if (ret < 0)
-				throw ConfigException("Unable to load certificate/private key: " + Anope::string(gnutls_strerror(ret)));
-		}
-
 		void SetDH(const Anope::string &dhfile)
 		{
-			std::ifstream ifs(dhfile.c_str());
-			const Anope::string dhdata((std::istreambuf_iterator<char>(ifs)), std::istreambuf_iterator<char>());
-
+			const Anope::string dhdata = LoadFile(dhfile);
 			dh.Import(dhdata);
 			gnutls_certificate_set_dh_params(cred, dh.get());
 		}
@@ -186,6 +278,9 @@ namespace GnuTLS
 		{
 			return (dh.get() != NULL);
 		}
+
+		void incrref() { refcount++; }
+		void decrref() { if (!--refcount) delete this; }
 	};
 }
 
@@ -194,10 +289,10 @@ class GnuTLSModule : public Module
 	GnuTLS::Init libinit;
 
  public:
-	GnuTLS::X509CertCredentials cred;
+	GnuTLS::X509CertCredentials *cred;
 	MySSLService service;
 
-	GnuTLSModule(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, EXTRA | VENDOR), service(this, "ssl")
+	GnuTLSModule(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, EXTRA | VENDOR), cred(NULL), service(this, "ssl")
 	{
 		me = this;
 		this->SetPermanent(true);
@@ -213,6 +308,9 @@ class GnuTLSModule : public Module
 			if (dynamic_cast<SSLSocketIO *>(s->io))
 				delete s;
 		}
+
+		if (cred)
+			cred->decrref();
 	}
 
 	static void CheckFile(const Anope::string &filename)
@@ -235,14 +333,28 @@ class GnuTLSModule : public Module
 		CheckFile(certfile);
 		CheckFile(keyfile);
 
+		GnuTLS::X509CertCredentials *newcred = new GnuTLS::X509CertCredentials(certfile, keyfile);
+
 		// DH params is not mandatory
 		if (Anope::IsFile(dhfile.c_str()))
 		{
-			cred.SetDH(dhfile);
+			try
+			{
+				newcred->SetDH(dhfile);
+			}
+			catch (...)
+			{
+				delete newcred;
+				throw;
+			}
 			Log(LOG_DEBUG) << "m_ssl_gnutls: Successfully loaded DH parameters from " << dhfile;
 		}
 
-		cred.SetCertAndKey(certfile, keyfile);
+		if (cred)
+			cred->decrref();
+		cred = newcred;
+		cred->incrref();
+
 		Log(LOG_DEBUG) << "m_ssl_gnutls: Successfully loaded certificate " << certfile << " and private key " << keyfile;
 	}
 
@@ -348,7 +460,7 @@ ClientSocket *SSLSocketIO::Accept(ListenSocket *s)
 	if (gnutls_init(&io->sess, GNUTLS_SERVER) != GNUTLS_E_SUCCESS)
 		throw SocketException("Unable to initialize SSL socket");
 
-	me->cred.SetupSession(io->sess);
+	me->cred->SetupSession(io->sess);
 	gnutls_transport_set_ptr(io->sess, reinterpret_cast<gnutls_transport_ptr_t>(newsock));
 
 	newsocket->flags[SF_ACCEPTING] = true;
@@ -452,7 +564,7 @@ SocketFlag SSLSocketIO::FinishConnect(ConnectionSocket *s)
 	{
 		if (gnutls_init(&io->sess, GNUTLS_CLIENT) != GNUTLS_E_SUCCESS)
 			throw SocketException("Unable to initialize SSL socket");
-		me->cred.SetupSession(io->sess);
+		me->cred->SetupSession(io->sess);
 		gnutls_transport_set_ptr(io->sess, reinterpret_cast<gnutls_transport_ptr_t>(s->GetFD()));
 	}
 
@@ -503,7 +615,25 @@ void SSLSocketIO::Destroy()
 		gnutls_deinit(this->sess);
 	}
 
+	mycreds->decrref();
+
 	delete this;
+}
+
+SSLSocketIO::SSLSocketIO() : sess(NULL), mycreds(me->cred)
+{
+	mycreds->incrref();
+}
+
+int GnuTLS::X509CertCredentials::cert_callback(gnutls_session_t sess, const gnutls_datum_t* req_ca_rdn, int nreqs, const gnutls_pk_algorithm_t* sign_algos, int sign_algos_length, gnutls_retr_st* st)
+{
+	st->type = GNUTLS_CRT_X509;
+	st->ncerts = me->cred->certs.size();
+	st->cert.x509 = me->cred->certs.raw();
+	st->key.x509 = me->cred->key.get();
+	st->deinit_all = 0;
+
+	return 0;
 }
 
 MODULE_INIT(GnuTLSModule)

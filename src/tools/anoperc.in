@@ -17,7 +17,7 @@
 ANOPEPID="@INSTDIR@/data/services.pid"
 ANOPROG="@INSTDIR@/bin/services"
 LOG="@INSTDIR@/data/logs/"
-ARCVERSION="1.4"
+ARCVERSION="2"
 
 isAnopeRunning () {
 	if [ ! -f $ANOPEPID ] ; then
@@ -26,8 +26,8 @@ isAnopeRunning () {
 	fi
 
 	PID=`cat $ANOPEPID`
-
-	if [ ! `ps auxw | grep $ANOPROG | grep $PID | grep -v -c grep` ] ; then
+	kill -0 $PID 2>/dev/null
+	if [ $? -ne 0 ] ; then
 		echo "Warning: Anope is not currently running"
 		exit 1
 	fi
@@ -48,7 +48,8 @@ fi
 if [ "$1" = "start" ] ; then
 	if [ -f $ANOPEPID ] ; then
 		PID=`cat $ANOPEPID`
-		if [ `ps auxw | grep $ANOPROG | grep $PID | grep -v -c grep` = 1 ] ; then
+		kill -0 $PID 2>/dev/null
+		if [ $? -eq 0 ] ; then
 			echo "Warning! Anope is already running"
 			exit 1
 		fi
@@ -76,7 +77,8 @@ elif [ "$1" = "stop" ] ; then
 elif [ "$1" = "status" ] ; then
 	if [ -f $ANOPEPID ] ; then
 		PID=`cat $ANOPEPID`
-        	if [ `ps auxw | grep $PID | grep -v -c grep` = 1 ] ; then
+		kill -0 $PID 2>/dev/null
+		if [ $? -eq 0 ] ; then
 		        echo "Anope is currently running"
 		        exit 0
 	        fi

@@ -1,5 +1,104 @@
-Revision 1cc85f4 - Tue, 21 Jan 2014 21:18:21 -0500 - Update version.log
-Revision 68b87b4 - Tue, 21 Jan 2014 21:18:19 -0500 - Update language files
+Revision f830884 - Mon, 24 Feb 2014 00:30:47 -0500 - Package dlls in src/win32 on Windows
+Revision 1dfdf36 - Mon, 24 Feb 2014 00:06:38 -0500 - Fix m_ssl_gnutls to send its cert. Most of this is from Attila.
+Revision 4ac3ade - Sun, 23 Feb 2014 23:08:35 -0500 - Use a more reliable way to detect if services are running in anoperc
+Revision 212abeb - Sun, 23 Feb 2014 23:42:43 +0100 - webcpanel: Update copyright year. ns_cert: Bold code 2 -> 002.
+Revision 7d4427c - Sun, 23 Feb 2014 05:24:06 +0100 - Regenerated language files.
+Revision e836be4 - Sat, 22 Feb 2014 17:46:00 -0500 - Store a cert->account map and use it for SASL EXTERNAL and certfp auth
+Revision 1db5c55 - Sat, 22 Feb 2014 13:46:36 -0500 - Merge pull request #58 from attilamolnar/2.0+gnutlsdep
+Revision bb1b015 - Sat, 22 Feb 2014 16:59:10 +0100 - Make m_ssl_gnutls work with at least GnuTLS v2.8
+Revision e42684a - Sat, 22 Feb 2014 16:40:56 +0100 - Update italian translation, from Simos.
+Revision d7de7ee - Sat, 22 Feb 2014 15:58:36 +0100 - Italian language completed translation, first release
+Revision 0a390ad - Sat, 22 Feb 2014 15:56:34 +0100 - Regenerated language files, and updated dutch language file.
+Revision aa6b12c - Fri, 21 Feb 2014 21:54:01 -0500 - Fix Windows build
+Revision e2bd08f - Fri, 21 Feb 2014 20:50:23 -0500 - Add some missing serial updates in os_dns
+Revision 2047934 - Fri, 21 Feb 2014 19:57:31 -0500 - Regenerate Italian language file
+Revision e07dcbf - Fri, 21 Feb 2014 19:57:31 -0500 - Update italian translation, from Simos
+Revision e3a8a45 - Fri, 21 Feb 2014 19:49:29 -0500 - Merge pull request #56 from ShutterQuick/2.0+noxcrypt
+Revision f1ad7fd - Fri, 21 Feb 2014 20:41:41 +0000 - fix comment, activate not active
+Revision 43f2645 - Thu, 20 Feb 2014 20:07:38 +0000 - update help info
+Revision b6935e7 - Thu, 20 Feb 2014 11:42:20 -0800 - enc_bcrypt.cpp: Get rid of the libxcrypt dependency by including code from libxcrypt, and move enc_bcrypt out of extras
+Revision a3c8458 - Thu, 20 Feb 2014 17:11:11 +0000 - Updated services crontab location
+Revision 5933a5e - Tue, 18 Feb 2014 22:24:24 +0000 - Merge remote branch 'upstream/2.0' into 2.0
+Revision 109d8f4 - Tue, 18 Feb 2014 13:04:16 -0500 - Do not import forbids with wildcards in their names, how 1.8 treats wildcaded forbids depends on the IRCd
+Revision 1edb7e7 - Tue, 18 Feb 2014 12:59:37 -0500 - Merge pull request #54 from attilamolnar/2.0+webcpanelfix
+Revision 928e2e1 - Tue, 18 Feb 2014 12:57:31 -0500 - Fix loading noexpire channels in db_old
+Revision 5a140e4 - Tue, 18 Feb 2014 12:54:22 -0500 - Merge pull request #55 from attilamolnar/2.0+alphabet
+Revision f643939 - Tue, 18 Feb 2014 13:00:46 +0100 - Alphabetically order modules in modules.example.conf ('r' < 's' and 'w' < 'x')
+Revision 0db81ca - Mon, 17 Feb 2014 22:21:08 -0500 - Merge pull request #52 from attilamolnar/2.0+gnutls
+Revision 7f7144d - Mon, 17 Feb 2014 22:20:38 -0500 - Merge pull request #53 from attilamolnar/2.0+reuseaddrfix
+Revision 3883716 - Tue, 18 Feb 2014 03:28:02 +0100 - Turn BinarySocket::Write() into a no-op when called with l == 0
+Revision 5beea4e - Tue, 18 Feb 2014 03:27:12 +0100 - Fix TemplateFileServer writing empty messages resulting in zero length DataBlocks being created and later passed to SocketIO::Send()
+Revision 2d0fdb7 - Tue, 18 Feb 2014 02:31:01 +0100 - Fix setsockopt() with SO_REUSEADDR not working due to wrong argument type
+Revision 80588fb - Mon, 17 Feb 2014 19:43:19 -0500 - Fix os_ignore to work correctly with SQL
+Revision ef7dc94 - Mon, 17 Feb 2014 19:39:25 -0500 - Move most of the implementation details out of os_forbid.h, fixes crashing if a module adding a forbid is unloaded without removing the forbid
+Revision 7b4eec9 - Mon, 17 Feb 2014 13:53:45 -0500 - Remove docs/IRCD, it is very outdated and no longer correct at all
+Revision baff417 - Mon, 17 Feb 2014 13:53:04 -0500 - Move encryption.h to include/modules
+Revision 7074944 - Mon, 17 Feb 2014 13:39:49 -0500 - Fix not applying ipv[46]_cidr to connecting clients in os_session, #1573
+Revision 1c39d25 - Mon, 17 Feb 2014 01:12:01 +0100 - Add m_ssl_gnutls
+Revision f1c5c27 - Sun, 16 Feb 2014 23:49:57 +0000 - Merge branch '2.0', remote branch 'upstream/2.0' into 2.0
+Revision 9c0134e - Mon, 17 Feb 2014 00:41:36 +0100 - Rename m_ssl to m_ssl_openssl and update docs
+Revision 959fee5 - Sun, 16 Feb 2014 18:28:39 -0500 - Fix Windows build
+Revision 3854a55 - Sun, 16 Feb 2014 16:07:36 -0500 - Merge pull request #51 from ShutterQuick/2.0+oldforbid
+Revision ab1e0eb - Sun, 16 Feb 2014 12:56:27 -0800 - db_old.cpp: Correctly import forbidden nicks and chans
+Revision cffe864 - Sun, 16 Feb 2014 14:10:25 -0500 - Merge pull request #50 from ShutterQuick/bcrypt
+Revision bc15753 - Sun, 16 Feb 2014 11:07:37 -0800 - modules.example.conf: Update examples for bcrypt - also clearify that m_sasl_dh* requires openssl
+Revision a71d0f6 - Sun, 16 Feb 2014 11:07:36 -0800 - enc_bcrypt: Add module
+Revision 50d7bf7 - Fri, 14 Feb 2014 19:15:43 -0500 - Merge pull request #48 from ShutterQuick/2.0+nnghsasl
+Revision d44bcef - Fri, 14 Feb 2014 16:06:24 -0800 - modules.example.conf: Add info about m_sasl_dh-aes and m_sasl_dh-blowfish
+Revision c0ce71e - Fri, 14 Feb 2014 15:12:25 -0800 - m_sasl_dh-blowfish: Add module
+Revision 0eeb0ca - Fri, 14 Feb 2014 15:12:25 -0800 - m_sasl_dh-aes: Add module
+Revision b13bded - Fri, 14 Feb 2014 15:03:42 -0800 - sasl.h, m_sasl.cpp: Move IdentifyRequest to the header
+Revision 1b1180f - Fri, 14 Feb 2014 13:42:21 -0800 - base64.cpp: B64Decode(): Don't crash on "="
+Revision a4ecfa5 - Fri, 14 Feb 2014 13:05:01 -0800 - Anope::string: Add .data()
+Revision 3c8009b - Fri, 14 Feb 2014 13:05:01 -0800 - sasl.h, m_sasl.cpp: Add RemoveSession(), DeleteSessions(), and have active sessions closed when a Mechanism is unloaded
+Revision ca85df2 - Fri, 14 Feb 2014 11:10:20 -0500 - Don't convert XOP access entries to levels in db_old
+Revision 5dfa659 - Fri, 14 Feb 2014 11:09:53 -0500 - Do not sync channels in Channel::Reset if they are in the middle of syncing, and checkmodes in Channel::Sync. Fixes channel modes sometimes not being set if always_lower_ts is on
+Revision f428d61 - Thu, 13 Feb 2014 19:42:02 -0500 - Use better command access checking in webpanel for operserv/akill
+Revision fc50edf - Wed, 12 Feb 2014 14:49:22 -0500 - Disable m_sasl by default
+Revision 269c278 - Wed, 12 Feb 2014 14:39:41 -0500 - Add SASL EXTERNAL support. Thanks to ShutterQuick for fixing and testing.
+Revision 96fc940 - Tue, 11 Feb 2014 19:25:44 -0500 - Only trim newlines and carriage returns in BufferedSocket::GetLine
+Revision 8c8e6d4 - Tue, 11 Feb 2014 18:08:09 -0500 - Make initial registration notices with mail less repetitive
+Revision 22976b8 - Tue, 11 Feb 2014 17:33:28 -0500 - Fix flags +* or -* sometimes incorrectly reporting opers as overriding when they are not
+Revision 4dff710 - Tue, 11 Feb 2014 03:57:15 +0100 - ns_suspend: Show the setter of the suspension and the reason when manually unsuspending.
+Revision fe80d2c - Tue, 11 Feb 2014 02:26:00 +0100 - os_modinfo: Add ability to list only extra modules.
+Revision 16dac87 - Mon, 10 Feb 2014 10:03:38 -0500 - Regenerate anope.it_IT.po
+Revision 30c5956 - Mon, 10 Feb 2014 09:57:24 -0500 - Update Italian language translation
+Revision 6d61a84 - Sun, 9 Feb 2014 18:51:52 -0500 - Add an opertype priv "protected" to not allow services to kick a user. Also classify ulines as protected
+Revision f6b8596 - Sun, 9 Feb 2014 10:59:36 -0500 - Log memoserv/sendall
+Revision da6760f - Fri, 7 Feb 2014 13:28:07 -0500 - Properly convert suspended nicks and channels in db_old
+Revision ad962ad - Fri, 7 Feb 2014 13:12:57 -0500 - Allow other modules to suspend nicknames and channels without having to subclass suspendinfo
+Revision 5327bec - Fri, 7 Feb 2014 13:02:20 -0500 - Allow other modules to be able to view and modify cs and ns set_misc data
+Revision f43c99c - Fri, 7 Feb 2014 12:12:52 -0500 - Merge pull request #46 from ShutterQuick/patch-1
+Revision c0a491c - Fri, 7 Feb 2014 18:04:16 +0100 - Update cs_updown.cpp
+Revision 66cc965 - Wed, 5 Feb 2014 15:26:03 -0500 - Ignore nonblocking errnors on socket operations
+Revision 2440514 - Wed, 5 Feb 2014 08:46:56 -0500 - Document a little more accurrately the privilege stuff and document why the access lists behave as they do
+Revision fad1da8 - Wed, 5 Feb 2014 08:46:56 -0500 - Process mode changes in ns_ajoin before joining users, fixes not being able to ajoin users to +R channels on Unreal
+Revision bb0e2a9 - Wed, 5 Feb 2014 08:46:51 -0500 - Make it easier to use fantasy without botserv, and document it
+Revision 4f8c4f8 - Mon, 3 Feb 2014 10:05:13 -0500 - Actually just allow mode clear to take any mode name
+Revision 2595711 - Mon, 3 Feb 2014 08:41:27 -0500 - Fix typo in mode clear, exempts -> excepts
+Revision 9a88953 - Sun, 2 Feb 2014 03:21:02 -0500 - Apply the last commit to cs_list
+Revision 53f8db0 - Sat, 1 Feb 2014 11:42:08 -0800 - Merge pull request #44 from ShutterQuick/2.0+listfix
+Revision f94cb7f - Sat, 1 Feb 2014 11:24:52 -0800 - ns_list: Fix typo (NS_SUSPENDED -> SUSPENDED)
+Revision c30fb13 - Sat, 1 Feb 2014 11:12:39 -0800 - Merge pull request #43 from ShutterQuick/2.0+ajoinfix
+Revision 7926238 - Sat, 1 Feb 2014 10:55:12 -0800 - Improve IsChannelValid()
+Revision 211a944 - Sat, 1 Feb 2014 10:35:10 -0800 - ns_ajoin: Treat ',' as a separator.
+Revision cff6161 - Sat, 1 Feb 2014 10:31:17 -0800 - commasepstream: Add a allowempty param
+Revision 4455d43 - Fri, 31 Jan 2014 02:43:26 -0800 - Merge pull request #42 from ShutterQuick/2.0+saslfix
+Revision 405b41e - Fri, 31 Jan 2014 01:41:27 -0800 - protocol/(inspircd12/unreal/charybdis): Have SASL login in on the account name instead of nick alias
+Revision bacb276 - Tue, 28 Jan 2014 14:45:21 -0500 - Use TBURST on hybrid to set topics
+Revision 4c1f6b4 - Sun, 26 Jan 2014 16:08:23 -0800 - Merge pull request #40 from attilamolnar/2.0+csclonefix
+Revision 53a78c2 - Sun, 26 Jan 2014 20:06:36 +0100 - Fix cs_clone allowing users to clone a channel to itself
+Revision e61a283 - Sun, 26 Jan 2014 16:33:28 +0100 - Update language files.
+Revision c330219 - Sun, 26 Jan 2014 01:18:38 -0500 - Anope 2.0.0-rc3 Release
+Revision cd18459 - Sun, 26 Jan 2014 01:17:58 -0500 - Only have extras rerun config if it was successfully run before. Config can create the build directory even if cmake isn't found.
+Revision f28b114 - Sun, 26 Jan 2014 01:15:19 -0500 - Correct error message in gl_global to reference the right module
+Revision 87230c1 - Sun, 26 Jan 2014 01:14:58 -0500 - Fix extra space in the unknown command error message
+Revision a29b789 - Sun, 26 Jan 2014 01:14:28 -0500 - Use the SQLine reason in the kick reason for sqlined channels
+Revision e965bc3 - Sun, 26 Jan 2014 01:03:43 -0500 - Revert "Rename db_old hash plain -> none which is what 1.8 calls it"
+Revision 01780c9 - Sat, 25 Jan 2014 17:58:20 -0500 - Fix setname handler on unreal
+Revision 4d3363f - Tue, 21 Jan 2014 21:55:59 -0500 - Anope 2.0.0-rc2 Release
+Revision 75e27b6 - Tue, 21 Jan 2014 21:55:59 -0500 - Update version.log
+Revision fbaca3f - Tue, 21 Jan 2014 21:55:56 -0500 - Update language files
 Revision 81b01bb - Tue, 21 Jan 2014 21:10:06 -0500 - Fix missing colon in stats and top, fix smileys and actions count. Patch by bush.
 Revision 1027ec6 - Tue, 21 Jan 2014 17:33:57 -0500 - Made the chanstats confs try and look similar to every other configuration file
 Revision 4d9273e - Tue, 21 Jan 2014 17:20:15 -0500 - Unbreak account stuff from commit ccae59430ab50393f43ccc38a6a6c0c24191b601.

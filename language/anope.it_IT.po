@@ -20,12 +20,12 @@ msgstr ""
 #: modules/commands/os_forbid.cpp:312
 #, c-format
 msgid "%d channel(s) cleared, and %d channel(s) dropped."
-msgstr "%d canale(i) eliminato(i), e %d canale(s) deregistrato."
+msgstr "%d canale(i) eliminato(i), e %d canale(i) deregistrato(i)."
 
 #: modules/commands/os_forbid.cpp:253
 #, c-format
 msgid "%d nickname(s) dropped."
-msgstr "%d nickname(s) deregistrati."
+msgstr "%d nickname(s) deregistrato(i)."
 
 #: modules/commands/cs_xop.cpp:220
 #, c-format
@@ -7296,10 +7296,10 @@ msgid "SET server.name option value"
 msgstr "SET server.name option value"
 
 #: modules/commands/ns_cert.cpp:364
-#, fuzzy, c-format
+#, c-format
 msgid "SSL certificate fingerprint accepted, you are now identified to %s."
 msgstr ""
-"Firma digitale del certificato SSL accettata - adesso sei riconosciuto."
+"Firma digitale del certificato SSL accettata - adesso  sei identificato come %s."
 
 #: modules/commands/ns_cert.cpp:375
 msgid "SSL certificate fingerprint accepted, you are now identified."
@@ -10640,9 +10640,9 @@ msgid "Your account is already confirmed."
 msgstr "Il tuo account è già stato confermato."
 
 #: modules/commands/ns_register.cpp:368
-#, fuzzy, c-format
+#, c-format
 msgid "Your account will expire, if not confirmed, in %s."
-msgstr "Se non confermato, il tuo account scadra in %s"
+msgstr "Se non confermato, il tuo account scadra in %s."
 
 #: modules/commands/ns_set.cpp:1241
 #, c-format

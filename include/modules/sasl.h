@@ -92,6 +92,7 @@ namespace SASL
 			Session *s = sasl->GetSession(uid);
 			if (s)
 			{
+				Log(Config->GetClient("NickServ")) << "A user identified to account " << this->GetAccount() << " using SASL";
 				sasl->Succeed(s, na->nc);
 				delete s;
 			}

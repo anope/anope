@@ -100,6 +100,7 @@ class External : public Mechanism
 				return;
 			}
 
+			Log(Config->GetClient("NickServ")) << "A user identified to account " << nc->display << " using SASL EXTERNAL";
 			sasl->Succeed(sess, nc);
 			delete sess;
 		}

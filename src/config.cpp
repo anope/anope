@@ -876,12 +876,6 @@ void Conf::LoadConf(File &file)
 					if (b)
 						Log(LOG_DEBUG) << "ln " << linenumber << " EOL: s='" << b->name << "' '" << itemname << "' set to '" << wordbuffer << "'";
 
-					if (itemname.empty())
-					{
-						file.Close();
-						throw ConfigException("Item without a name: " + file.GetName() + ":" + stringify(linenumber));
-					}
-
 					/* Check defines */
 					for (int i = 0; i < this->CountBlock("define"); ++i)
 					{

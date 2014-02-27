@@ -788,14 +788,9 @@ void Channel::SetCorrectModes(User *user, bool give_modes)
 	Log(LOG_DEBUG) << "Setting correct user modes for " << user->nick << " on " << this->name << " (" << (give_modes ? "" : "not ") << "giving modes)";
 
 	AccessGroup u_access = ci->AccessFor(user);
-	ChannelMode *registered = ModeManager::FindChannelModeByName("REGISTERED");
 
-	/* If this channel has secureops, or the registered channel mode exists and the channel does not have +r set (aka the channel
-	 * was created just now or while we were off), or the registered channel mode does not exist and channel is syncing (aka just
-	 * created *to us*) and the user's server is synced (aka this isn't us doing our initial uplink - without this we would be deopping all
-	 * users with no access on a non-secureops channel on startup), and the user's server isn't ulined, then set negative modes.
-	 */
-	bool take_modes = (registered && !this->HasMode("REGISTERED")) || (!registered && this->syncing && user->server->IsSynced());
+	/* Initially only take modes if the channel is being created by a non netmerge */
+	bool take_modes = this->syncing && user->server->IsSynced();
 
 	FOREACH_MOD(OnSetCorrectModes, (user, this, u_access, give_modes, take_modes));
 

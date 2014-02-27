@@ -1319,6 +1319,7 @@ class CSSet : public Module
 			if (noautoop.HasExt(chan->ci))	
 				give_modes = false;
 			if (secureops.HasExt(chan->ci))
+				// This overrides what chanserv does because it is loaded after chanserv
 				take_modes = true;
 		}
 	}

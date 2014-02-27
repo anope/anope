@@ -457,6 +457,17 @@ class ChanServCore : public Module, public ChanServService
 		if (!ci->HasExt("CS_NO_EXPIRE") && chanserv_expire && !Anope::NoExpire && ci->last_used != Anope::CurTime)
 			info[_("Expires")] = Anope::strftime(ci->last_used + chanserv_expire, source.GetAccount());
 	}
+
+	void OnSetCorrectModes(User *user, Channel *chan, AccessGroup &access, bool &give_modes, bool &take_modes) anope_override
+	{
+		if (always_lower)
+			// Since we always lower the TS, the other side will remove the modes if the channel ts lowers, so we don't
+			// have to worry about it
+			take_modes = false;
+		else if (ModeManager::FindChannelModeByName("REGISTERED"))
+			// Otherwise if the registered channel mode exists, we should remove modes if the channel is not +r
+			take_modes = !chan->HasMode("REGISTERED");
+	}
 };
 
 MODULE_INIT(ChanServCore)

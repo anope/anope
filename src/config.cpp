@@ -18,13 +18,6 @@
 #include "channels.h"
 #include "hashcomp.h"
 
-#ifndef _WIN32
-#include <errno.h>
-#include <sys/types.h>
-#include <pwd.h>
-#include <grp.h>
-#endif
-
 using namespace Configuration;
 
 File ServicesConf("services.conf", false); // Services configuration file name
@@ -532,31 +525,6 @@ Conf::Conf() : Block("")
 	/* Check the user keys */
 	if (!options->Get<unsigned>("seed"))
 		Log() << "Configuration option options:seed should be set. It's for YOUR safety! Remember that!";
-
-#ifndef _WIN32
-	if (!options->Get<const Anope::string>("user").empty())
-	{
-		errno = 0;
-		struct passwd *u = getpwnam(options->Get<const Anope::string>("user").c_str());
-		if (u == NULL)
-			Log() << "Unable to setuid to " << options->Get<const Anope::string>("user") << ": " << Anope::LastError();
-		else if (setuid(u->pw_uid) == -1)
-			Log() << "Unable to setuid to " << options->Get<const Anope::string>("user") << ": " << Anope::LastError();
-		else
-			Log() << "Successfully set user to " << options->Get<const Anope::string>("user");
-	}
-	if (!options->Get<const Anope::string>("group").empty())
-	{
-		errno = 0;
-		struct group *g = getgrnam(options->Get<const Anope::string>("group").c_str());
-		if (g == NULL)
-			Log() << "Unable to setgid to " << options->Get<const Anope::string>("group") << ": " << Anope::LastError();
-		else if (setuid(g->gr_gid) == -1)
-			Log() << "Unable to setgid to " << options->Get<const Anope::string>("group") << ": " << Anope::LastError();
-		else
-			Log() << "Successfully set group to " << options->Get<const Anope::string>("group");
-	}
-#endif
 
 	if (Config)
 	{

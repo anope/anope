@@ -23,6 +23,11 @@
 #ifndef _WIN32
 #include <sys/wait.h>
 #include <sys/stat.h>
+
+#include <errno.h>
+#include <sys/types.h>
+#include <pwd.h>
+#include <grp.h>
 #endif
 
 Anope::string Anope::ConfigDir = "conf", Anope::DataDir = "data", Anope::ModuleDir = "lib", Anope::LocaleDir = "locale", Anope::LogDir = "logs";
@@ -217,6 +222,61 @@ static void write_pidfile()
 	}
 	else
 		throw CoreException("Can not write to PID file " + Config->GetBlock("serverinfo")->Get<const Anope::string>("pid"));
+}
+
+static void setuidgid()
+{
+#ifndef _WIN32
+	Configuration::Block *options = Config->GetBlock("options");
+	uid_t uid = -1;
+	gid_t gid = -1;
+
+	if (!options->Get<const Anope::string>("user").empty())
+	{
+		errno = 0;
+		struct passwd *u = getpwnam(options->Get<const Anope::string>("user").c_str());
+		if (u == NULL)
+			Log() << "Unable to setuid to " << options->Get<const Anope::string>("user") << ": " << Anope::LastError();
+		else
+			uid = u->pw_uid;
+	}
+	if (!options->Get<const Anope::string>("group").empty())
+	{
+		errno = 0;
+		struct group *g = getgrnam(options->Get<const Anope::string>("group").c_str());
+		if (g == NULL)
+			Log() << "Unable to setgid to " << options->Get<const Anope::string>("group") << ": " << Anope::LastError();
+		else
+			gid = g->gr_gid;
+	}
+
+	for (unsigned i = 0; i < Config->LogInfos.size(); ++i)
+	{
+		LogInfo& li = Config->LogInfos[i];
+
+		for (unsigned j = 0; j < li.logfiles.size(); ++j)
+		{
+			LogFile* lf = li.logfiles[j];
+
+			chown(lf->filename.c_str(), uid, gid);
+		}
+	}
+
+	if (static_cast<int>(gid) != -1)
+	{
+		if (setgid(gid) == -1)
+			Log() << "Unable to setgid to " << options->Get<const Anope::string>("group") << ": " << Anope::LastError();
+		else
+			Log() << "Successfully set group to " << options->Get<const Anope::string>("group");
+	}
+	if (static_cast<int>(uid) != -1)
+	{
+		if (setuid(uid) == -1)
+			Log() << "Unable to setuid to " << options->Get<const Anope::string>("user") << ": " << Anope::LastError();
+		else
+			Log() << "Successfully set user to " << options->Get<const Anope::string>("user");
+	}
+#endif
 }
 
 void Anope::Init(int ac, char **av)
@@ -425,9 +485,6 @@ void Anope::Init(int ac, char **av)
 		throw CoreException("Configuration file failed to validate");
 	}
 
-	/* Write our PID to the PID file. */
-	write_pidfile();
-
 	/* Create me */
 	Configuration::Block *block = Config->GetBlock("serverinfo");
 	Me = new Server(NULL, block->Get<const Anope::string>("name"), 0, block->Get<const Anope::string>("description"), block->Get<const Anope::string>("id"));
@@ -454,9 +511,14 @@ void Anope::Init(int ac, char **av)
 	for (int i = 0; i < Config->CountBlock("module"); ++i)
 		ModuleManager::LoadModule(Config->GetBlock("module", i)->Get<const Anope::string>("name"), NULL);
 
+	setuidgid();
+
 	Module *protocol = ModuleManager::FindFirstOf(PROTOCOL);
 	if (protocol == NULL)
 		throw CoreException("You must load a protocol module!");
+
+	/* Write our PID to the PID file. */
+	write_pidfile();
 
 	Log() << "Using IRCd protocol " << protocol->name;
 

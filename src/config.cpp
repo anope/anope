@@ -722,8 +722,10 @@ void Conf::LoadConf(File &file)
 				{
 					in_comment = false;
 					++c;
+					// We might be at an eol, so continue on and process it
 				}
-				continue;
+				else
+					continue;
 			}
 			else if (ch == '#' || (ch == '/' && c + 1 < len && line[c + 1] == '/'))
 				c = len - 1; // Line comment, ignore the rest of the line (much like this one!)

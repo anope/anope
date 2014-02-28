@@ -91,7 +91,7 @@ class CommandOSSVSJoin : public Command
 		Channel *c = Channel::Find(params[1]);
 		if (target == NULL)
 			source.Reply(NICK_X_NOT_IN_USE, params[0].c_str());
-		else if (target->IsProtected() || target->server == Me)
+		else if (source.GetUser() != target && (target->IsProtected() || target->server == Me))
 			source.Reply(ACCESS_DENIED);
 		else if (!IRCD->IsChannelValid(params[1]))
 			source.Reply(CHAN_X_INVALID, params[1].c_str());
@@ -135,7 +135,7 @@ class CommandOSSVSPart : public Command
 		Channel *c = Channel::Find(params[1]);
 		if (target == NULL)
 			source.Reply(NICK_X_NOT_IN_USE, params[0].c_str());
-		else if (target->IsProtected() || target->server == Me)
+		else if (source.GetUser() != target && (target->IsProtected() || target->server == Me))
 			source.Reply(ACCESS_DENIED);
 		else if (!c)
 			source.Reply(CHAN_X_NOT_IN_USE, params[1].c_str());

@@ -92,6 +92,7 @@ class CoreExport User : public virtual Base, public Extensible, public CommandRe
 	/* Last time this user sent an email */
 	time_t lastmail;
 
+ protected:
 	/** Create a new user object, initialising necessary fields and
 	 * adds it to the hash
 	 *
@@ -102,19 +103,20 @@ class CoreExport User : public virtual Base, public Extensible, public CommandRe
 	 * @param sip The ip of the user
 	 * @param sserver The server of the user
 	 * @param srealname The realname/gecos of teh user
-	 * @param ssignon User's timestamp
+	 * @param ts User's timestamp
 	 * @param smodes User's modes
 	 * @param suid The unique identifier of the user.
 	 * @param nc The account the user is identified as, if any
 	 */
-	User(const Anope::string &snick, const Anope::string &sident, const Anope::string &shost, const Anope::string &svhost, const Anope::string &sip, Server *sserver, const Anope::string &srealname, time_t ssignon, const Anope::string &smodes, const Anope::string &suid, NickCore *nc);
+	User(const Anope::string &snick, const Anope::string &sident, const Anope::string &shost, const Anope::string &svhost, const Anope::string &sip, Server *sserver, const Anope::string &srealname, time_t ts, const Anope::string &smodes, const Anope::string &suid, NickCore *nc);
 
- protected:
 	/** Destroy a user.
 	 */
 	virtual ~User();
 
  public:
+	static User* OnIntroduce(const Anope::string &snick, const Anope::string &sident, const Anope::string &shost, const Anope::string &svhost, const Anope::string &sip, Server *sserver, const Anope::string &srealname, time_t ts, const Anope::string &smodes, const Anope::string &suid, NickCore *nc);
+
 	/** Update the nickname of a user record accordingly, should be
 	 * called from ircd protocol.
 	 * @param newnick The new username

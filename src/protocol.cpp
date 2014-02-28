@@ -45,6 +45,11 @@ const Anope::string &IRCDProto::GetProtocolName()
 	return this->proto_name;
 }
 
+void IRCDProto::SendKill(const MessageSource &source, const Anope::string &target, const Anope::string &reason)
+{
+	UplinkSocket::Message(source) << "KILL " << target << " :" << reason;
+}
+
 void IRCDProto::SendSVSKillInternal(const MessageSource &source, User *user, const Anope::string &buf)
 {
 	UplinkSocket::Message(source) << "KILL " << user->GetUID() << " :" << buf;

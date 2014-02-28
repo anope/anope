@@ -379,7 +379,7 @@ struct IRCDMessageNick : IRCDMessage
 			if (signon && signon == stamp)
 				na = NickAlias::Find(params[0]);
 
-			new User(params[0], params[4], params[5], "", params[8], s, params[9], signon, params[3], "", na ? *na->nc : NULL);
+			User::OnIntroduce(params[0], params[4], params[5], "", params[8], s, params[9], signon, params[3], "", na ? *na->nc : NULL);
 		}
 		else
 			source.GetUser()->ChangeNick(params[0]);

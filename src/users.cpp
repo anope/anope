@@ -33,7 +33,7 @@ time_t MaxUserTime = 0;
 
 std::list<User *> User::quitting_users;
 
-User::User(const Anope::string &snick, const Anope::string &sident, const Anope::string &shost, const Anope::string &svhost, const Anope::string &sip, Server *sserver, const Anope::string &srealname, time_t ssignon, const Anope::string &smodes, const Anope::string &suid, NickCore *account)
+User::User(const Anope::string &snick, const Anope::string &sident, const Anope::string &shost, const Anope::string &svhost, const Anope::string &sip, Server *sserver, const Anope::string &srealname, time_t ts, const Anope::string &smodes, const Anope::string &suid, NickCore *account)
 {
 	if (snick.empty() || sident.empty() || shost.empty())
 		throw CoreException("Bad args passed to User::User");
@@ -52,7 +52,7 @@ User::User(const Anope::string &snick, const Anope::string &sident, const Anope:
 	this->ip = sip;
 	this->server = sserver;
 	this->realname = srealname;
-	this->timestamp = this->signon = ssignon;
+	this->timestamp = this->signon = ts;
 	this->SetModesInternal(sserver, "%s", smodes.c_str());
 	this->uid = suid;
 	this->super_admin = false;
@@ -88,6 +88,56 @@ User::User(const Anope::string &snick, const Anope::string &sident, const Anope:
 	FOREACH_MOD(OnUserConnect, (this, exempt));
 }
 
+static void CollideKill(User *target, const Anope::string &reason)
+{
+	if (target->server != Me)
+		target->Kill(Me, reason);
+	else
+	{
+		// Be sure my user is really dead
+		IRCD->SendQuit(target, "%s", reason.c_str());
+
+		// Reintroduce my client
+		if (BotInfo *bi = dynamic_cast<BotInfo *>(target))
+			bi->OnKill();
+		else
+			target->Quit(reason);
+	}
+}
+
+static void Collide(User *u, const Anope::string &id, const Anope::string &type)
+{
+	// Kill incoming user
+	IRCD->SendKill(Me, id, type);
+	// Quit colliding user
+	CollideKill(u, type);
+}
+
+User* User::OnIntroduce(const Anope::string &snick, const Anope::string &sident, const Anope::string &shost, const Anope::string &svhost, const Anope::string &sip, Server *sserver, const Anope::string &srealname, time_t ts, const Anope::string &smodes, const Anope::string &suid, NickCore *nc)
+{
+	// How IRCds handle collisions varies a lot, for safety well just always kill both sides
+	// With properly set qlines, this can almost never happen anyway
+
+	User *u = User::Find(snick);
+	if (u)
+	{
+		Collide(u, !suid.empty() ? suid : snick, "Nick collision");
+		return NULL;
+	}
+
+	if (!suid.empty())
+	{
+		u = User::Find(suid);
+		if (u)
+		{
+			Collide(u, suid, "ID collision");
+			return NULL;
+		}
+	}
+
+	return new User(snick, sident, shost, svhost, sip, sserver, srealname, ts, smodes, suid, nc);
+}
+
 void User::ChangeNick(const Anope::string &newnick, time_t ts)
 {
 	/* Sanity check to make sure we don't segfault */
@@ -109,8 +159,17 @@ void User::ChangeNick(const Anope::string &newnick, time_t ts)
 			old_na->last_seen = Anope::CurTime;
 		
 		UserListByNick.erase(this->nick);
+
 		this->nick = newnick;
-		UserListByNick[this->nick] = this;
+
+		User* &other = UserListByNick[this->nick];
+		if (other)
+		{
+			CollideKill(this, "Nick collision");
+			CollideKill(other, "Nick collision");
+			return;
+		}
+		other = this;
 
 		on_access = false;
 		NickAlias *na = NickAlias::Find(this->nick);

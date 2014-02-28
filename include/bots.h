@@ -60,6 +60,8 @@ class CoreExport BotInfo : public User, public Serializable
 
 	void GenerateUID();
 
+	void OnKill();
+
 	/** Change the nickname for the bot.
 	 * @param newnick The nick to change to
 	 */

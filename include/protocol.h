@@ -111,6 +111,8 @@ class CoreExport IRCDProto : public Service
 	virtual void SendSQLine(User *, const XLine *x) { }
 	virtual void SendSQLineDel(const XLine *x) { }
 
+	virtual void SendKill(const MessageSource &source, const Anope::string &target, const Anope::string &reason);
+
 	/** Kills a user
 	 * @param source Who is doing the kill
 	 * @param user The user to be killed

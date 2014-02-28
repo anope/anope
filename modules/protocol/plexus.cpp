@@ -284,7 +284,7 @@ struct IRCDMessageUID : IRCDMessage
 		if (params[8] != "0" && !na)
 			na = NickAlias::Find(params[8]);
 
-		new User(params[0], params[4], params[9], params[5], ip, source.GetServer(), params[10], ts, params[3], params[7], na ? *na->nc : NULL);
+		User::OnIntroduce(params[0], params[4], params[9], params[5], ip, source.GetServer(), params[10], ts, params[3], params[7], na ? *na->nc : NULL);
 	}
 };
 

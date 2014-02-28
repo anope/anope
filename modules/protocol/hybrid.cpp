@@ -527,7 +527,7 @@ struct IRCDMessageUID : IRCDMessage
 			na = NickAlias::Find(params[8]);
 
 		/* Source is always the server */
-		new User(params[0], params[4], params[5], "",
+		User::OnIntroduce(params[0], params[4], params[5], "",
 				ip, source.GetServer(),
 				params[9], params[2].is_pos_number_only() ? convertTo<time_t>(params[2]) : 0,
 				params[3], params[7], na ? *na->nc : NULL);

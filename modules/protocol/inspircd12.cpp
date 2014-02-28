@@ -1299,7 +1299,9 @@ struct IRCDMessageUID : IRCDMessage
 					++it;
 			}
 
-		new User(params[2], params[5], params[3], params[4], params[6], source.GetServer(), params[params.size() - 1], ts, modes, params[0], na ? *na->nc : NULL);
+		User *u = User::OnIntroduce(params[2], params[5], params[3], params[4], params[6], source.GetServer(), params[params.size() - 1], ts, modes, params[0], na ? *na->nc : NULL);
+		if (u)
+			u->signon = convertTo<time_t>(params[7]);
 	}
 };
 

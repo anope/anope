@@ -199,12 +199,7 @@ void Kill::Run(MessageSource &source, const std::vector<Anope::string> &params)
 		}
 		last_time = Anope::CurTime;
 
-		bi->introduced = false;
-		IRCD->SendClientIntroduction(bi);
-		bi->introduced = true;
-
-		for (User::ChanUserList::const_iterator cit = bi->chans.begin(), cit_end = bi->chans.end(); cit != cit_end; ++cit)
-			IRCD->SendJoin(bi, cit->second->chan, &cit->second->status);
+		bi->OnKill();
 	}
 	else
 		u->KillInternal(source.GetSource(), params[1]);

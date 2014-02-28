@@ -855,7 +855,7 @@ struct IRCDMessageNick : IRCDMessage
 				na = NickAlias::Find(params[6]);
 			}
 
-			new User(params[0], params[3], params[4], vhost, ip, s, params[10], user_ts, params[7], "", na ? *na->nc : NULL);
+			User::OnIntroduce(params[0], params[3], params[4], vhost, ip, s, params[10], user_ts, params[7], "", na ? *na->nc : NULL);
 		}
 		else
 			source.GetUser()->ChangeNick(params[0]);

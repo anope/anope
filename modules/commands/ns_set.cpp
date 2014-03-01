@@ -449,6 +449,12 @@ class CommandNSSetEmail : public Command
 		}
 		NickCore *nc = na->nc;
 
+		if (nc->HasExt("UNCONFIRMED"))
+		{
+			source.Reply(_("You may not change the email of an unconfirmed account."));
+			return;
+		}
+
 		if (param.empty() && Config->GetModule("nickserv")->Get<bool>("forceemail", "yes"))
 		{
 			source.Reply(_("You cannot unset the e-mail on this network."));

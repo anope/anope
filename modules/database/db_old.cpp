@@ -1316,6 +1316,9 @@ class DBOld : public Module
 				process_mlock(ci, *u, false);
 				mlock_off.Unset(ci);
 			}
+
+			if (ci->c)
+				ci->c->CheckModes();
 		}
 	}
 };

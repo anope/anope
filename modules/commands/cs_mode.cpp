@@ -919,9 +919,9 @@ class CSMode : public Module
 				if (cm->type == MODE_REGULAR)
 				{
 					if (!c->HasMode(cm->name) && ml->set)
-						c->SetMode(NULL, cm);
+						c->SetMode(NULL, cm, "", false);
 					else if (c->HasMode(cm->name) && !ml->set)
-						c->RemoveMode(NULL, cm);
+						c->RemoveMode(NULL, cm, "", false);
 				}
 				else if (cm->type == MODE_PARAM)
 				{
@@ -932,21 +932,21 @@ class CSMode : public Module
 						c->GetParam(cm->name, param);
 
 						if (!c->HasMode(cm->name) || (!param.empty() && !ml->param.empty() && !param.equals_cs(ml->param)))
-							c->SetMode(NULL, cm, ml->param);
+							c->SetMode(NULL, cm, ml->param, false);
 					}
 					else
 					{
 						if (c->HasMode(cm->name))
-							c->RemoveMode(NULL, cm);
+							c->RemoveMode(NULL, cm, "", false);
 					}
 		
 				}
 				else if (cm->type == MODE_LIST || cm->type == MODE_STATUS)
 				{
 					if (ml->set)
-						c->SetMode(NULL, cm, ml->param);
+						c->SetMode(NULL, cm, ml->param, false);
 					else
-						c->RemoveMode(NULL, cm, ml->param);
+						c->RemoveMode(NULL, cm, ml->param, false);
 				}
 			}
 	}

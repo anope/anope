@@ -73,13 +73,14 @@ class CommandCSInvite : public Command
 			if (u2 != u)
 			{
 				source.Reply(_("\002%s\002 has been invited to \002%s\002."), u2->nick.c_str(), c->name.c_str());
+				u2->SendMessage(ci->WhoSends(), _("You have been invited to \002%s\002 by \002%s\002."), c->name.c_str(), source.GetNick().c_str());
 				Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "for " << u2->nick;
 			}
 			else
 			{
+				u2->SendMessage(ci->WhoSends(), _("You have been invited to \002%s\002."), c->name.c_str());
 				Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci);
 			}
-			u2->SendMessage(ci->WhoSends(), _("You have been invited to \002%s\002."), c->name.c_str());
 		}
 	}
 

@@ -86,14 +86,12 @@ class PlexusProto : public IRCDProto
 		if (!ident.empty())
 			UplinkSocket::Message(Me) << "ENCAP * CHGIDENT " << u->GetUID() << " " << ident;
 		UplinkSocket::Message(Me) << "ENCAP * CHGHOST " << u->GetUID() << " " << host;
+		u->SetMode(Config->GetClient("HostServ"), "CLOAK");
 	}
 
 	void SendVhostDel(User *u) anope_override
 	{
-		if (u->HasMode("CLOAK"))
-			u->RemoveMode(Config->GetClient("HostServ"), "CLOAK");
-		else
-			this->SendVhost(u, u->GetIdent(), u->chost);
+		u->RemoveMode(Config->GetClient("HostServ"), "CLOAK");
 	}
 
 	void SendConnect() anope_override

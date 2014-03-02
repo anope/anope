@@ -1164,17 +1164,26 @@ class CSSet : public Module
 
 			bool created;
 			Channel *c = Channel::FindOrCreate(ci->name, created, ci->time_registered);
-			if (!ci->bi)
-			{
-				BotInfo *ChanServ = Config->GetClient("ChanServ");
-				if (ChanServ)
-					ChanServ->Assign(NULL, ci);
-			}
 
-			if (ci->bi && !c->FindUser(ci->bi))
+			ChannelMode *cm = ModeManager::FindChannelModeByName("PERM");
+			if (cm)
 			{
-				ChannelStatus status(BotModes());
-				ci->bi->Join(c, &status);
+				c->SetMode(NULL, cm);
+			}
+			else
+			{
+				if (!ci->bi)
+				{
+					BotInfo *ChanServ = Config->GetClient("ChanServ");
+					if (ChanServ)
+						ChanServ->Assign(NULL, ci);
+				}
+
+				if (ci->bi && !c->FindUser(ci->bi))
+				{
+					ChannelStatus status(BotModes());
+					ci->bi->Join(c, &status);
+				}
 			}
 
 			if (created)

@@ -142,7 +142,7 @@ enum
 	LANG_PL /* Polish */
 };
 
-static void process_mlock(ChannelInfo *ci, uint32_t lock, bool status)
+static void process_mlock(ChannelInfo *ci, uint32_t lock, bool status, uint32_t *limit, Anope::string *key)
 {
 	ModeLocks *ml = ci->Require<ModeLocks>("modelocks");
 	for (unsigned i = 0; i < (sizeof(mlock_infos) / sizeof(mlock_info)); ++i)
@@ -150,7 +150,14 @@ static void process_mlock(ChannelInfo *ci, uint32_t lock, bool status)
 		{
 			ChannelMode *cm = ModeManager::FindChannelModeByChar(mlock_infos[i].c);
 			if (cm && ml)
-				ml->SetMLock(cm, status);
+			{
+				if (limit && mlock_infos[i].c == 'l')
+					ml->SetMLock(cm, status, stringify(*limit));
+				else if (key && mlock_infos[i].c == 'k')
+					ml->SetMLock(cm, status, *key);
+				else
+					ml->SetMLock(cm, status);
+			}
 		}
 }
 
@@ -927,9 +934,11 @@ static void LoadChannels()
 			READ(read_uint32(&tmpu32, f)); // mlock off
 			ci->Extend<uint32_t>("mlock_off", tmpu32);
 			READ(read_uint32(&tmpu32, f)); // mlock limit
-			READ(read_string(buffer, f));
-			READ(read_string(buffer, f));
-			READ(read_string(buffer, f));
+			ci->Extend<uint32_t>("mlock_limit", tmpu32);
+			READ(read_string(buffer, f)); // key
+			ci->Extend<Anope::string>("mlock_key", buffer);
+			READ(read_string(buffer, f)); // +f
+			READ(read_string(buffer, f)); // +L
 
 			READ(read_int16(&tmp16, f));
 			READ(read_int16(&ci->memos.memomax, f));
@@ -1286,11 +1295,12 @@ static void LoadNews()
 
 class DBOld : public Module
 {
-	PrimitiveExtensibleItem<uint32_t> mlock_on, mlock_off;
+	PrimitiveExtensibleItem<uint32_t> mlock_on, mlock_off, mlock_limit;
+	PrimitiveExtensibleItem<Anope::string> mlock_key;
 
  public:
 	DBOld(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, DATABASE | VENDOR),
-		mlock_on(this, "mlock_on"), mlock_off(this, "mlock_off")
+		mlock_on(this, "mlock_on"), mlock_off(this, "mlock_off"), mlock_limit(this, "mlock_limit"), mlock_key(this, "mlock_key")
 	{
 
 
@@ -1318,20 +1328,25 @@ class DBOld : public Module
 		for (registered_channel_map::iterator it = RegisteredChannelList->begin(), it_end = RegisteredChannelList->end(); it != it_end; ++it)
 		{
 			ChannelInfo *ci = it->second;
+			uint32_t *limit = mlock_limit.Get(ci);
+			Anope::string *key = mlock_key.Get(ci);
 
 			uint32_t *u = mlock_on.Get(ci);
 			if (u)
 			{
-				process_mlock(ci, *u, true);
+				process_mlock(ci, *u, true, limit, key);
 				mlock_on.Unset(ci);
 			}
 
 			u = mlock_off.Get(ci);
 			if (u)
 			{
-				process_mlock(ci, *u, false);
+				process_mlock(ci, *u, false, limit, key);
 				mlock_off.Unset(ci);
 			}
+
+			mlock_limit.Unset(ci);
+			mlock_key.Unset(ci);
 
 			if (ci->c)
 				ci->c->CheckModes();

@@ -10,27 +10,27 @@
  */
 
 #include "module.h"
+#include "modules/cs_entrymsg.h"
 
-struct EntryMsg : Serializable
+struct EntryMsgImpl : EntryMsg, Serializable
 {
-	Serialize::Reference<ChannelInfo> ci;
-	Anope::string creator;
-	Anope::string message;
-	time_t when;
-
-	EntryMsg(ChannelInfo *c, const Anope::string &cname, const Anope::string &cmessage, time_t ct = Anope::CurTime) : Serializable("EntryMsg")
+	EntryMsgImpl() : Serializable("EntryMsg")
 	{
-		this->ci = c;
+	}
+
+	EntryMsgImpl(ChannelInfo *c, const Anope::string &cname, const Anope::string &cmessage, time_t ct = Anope::CurTime) : Serializable("EntryMsg")
+	{
+		this->chan = c->name;
 		this->creator = cname;
 		this->message = cmessage;
 		this->when = ct;
 	}
 
-	~EntryMsg();
+	~EntryMsgImpl();
 
 	void Serialize(Serialize::Data &data) const anope_override
 	{
-		data["ci"] << this->ci->name;
+		data["ci"] << this->chan;
 		data["creator"] << this->creator;
 		data["message"] << this->message;
 		data.SetType("when", Serialize::Data::DT_INT); data["when"] << this->when;
@@ -39,30 +39,33 @@ struct EntryMsg : Serializable
 	static Serializable* Unserialize(Serializable *obj, Serialize::Data &data);
 };
 
-struct EntryMessageList : Serialize::Checker<std::vector<EntryMsg *> >
+struct EntryMessageListImpl : EntryMessageList
 {
-	EntryMessageList(Extensible *) : Serialize::Checker<std::vector<EntryMsg *> >("EntryMsg") { }
+	EntryMessageListImpl(Extensible *) { }
 
-	~EntryMessageList()
+	EntryMsg* Create() anope_override
 	{
-		for (unsigned i = (*this)->size(); i > 0; --i)
-			delete (*this)->at(i - 1);
+		return new EntryMsgImpl();
 	}
 };
 
-EntryMsg::~EntryMsg()
+EntryMsgImpl::~EntryMsgImpl()
 {
+	ChannelInfo *ci = ChannelInfo::Find(this->chan);
+	if (!ci)
+		return;
+
 	EntryMessageList *messages = ci->GetExt<EntryMessageList>("entrymsg");
-	if (messages)
-	{
-		std::vector<EntryMsg *>::iterator it = std::find((*messages)->begin(), (*messages)->end(), this);
-		if (it != (*messages)->end())
-			(*messages)->erase(it);
-	}
+	if (!messages)
+		return;
+
+	std::vector<EntryMsg *>::iterator it = std::find((*messages)->begin(), (*messages)->end(), this);
+	if (it != (*messages)->end())
+		(*messages)->erase(it);
 }
 
 
-Serializable* EntryMsg::Unserialize(Serializable *obj, Serialize::Data &data)
+Serializable* EntryMsgImpl::Unserialize(Serializable *obj, Serialize::Data &data)
 {
 	Anope::string sci, screator, smessage;
 	time_t swhen;
@@ -77,8 +80,8 @@ Serializable* EntryMsg::Unserialize(Serializable *obj, Serialize::Data &data)
 
 	if (obj)
 	{
-		EntryMsg *msg = anope_dynamic_static_cast<EntryMsg *>(obj);
-		msg->ci = ci;
+		EntryMsgImpl *msg = anope_dynamic_static_cast<EntryMsgImpl *>(obj);
+		msg->chan = ci->name;
 		data["creator"] >> msg->creator;
 		data["message"] >> msg->message;
 		data["when"] >> msg->when;
@@ -89,7 +92,7 @@ Serializable* EntryMsg::Unserialize(Serializable *obj, Serialize::Data &data)
 
 	data["when"] >> swhen;
 
-	EntryMsg *m = new EntryMsg(ci, screator, smessage, swhen);
+	EntryMsgImpl *m = new EntryMsgImpl(ci, screator, smessage, swhen);
 	(*messages)->push_back(m);
 	return m;
 }
@@ -139,7 +142,7 @@ class CommandEntryMessage : public Command
 			source.Reply(_("The entry message list for \002%s\002 is full."), ci->name.c_str());
 		else
 		{
-			(*messages)->push_back(new EntryMsg(ci, source.GetNick(), message));
+			(*messages)->push_back(new EntryMsgImpl(ci, source.GetNick(), message));
 			Log(source.IsFounder(ci) ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to add a message";
 			source.Reply(_("Entry message added to \002%s\002"), ci->name.c_str());
 		}
@@ -257,13 +260,13 @@ class CommandEntryMessage : public Command
 class CSEntryMessage : public Module
 {
 	CommandEntryMessage commandentrymsg;
-	ExtensibleItem<EntryMessageList> eml;
+	ExtensibleItem<EntryMessageListImpl> eml;
 	Serialize::Type entrymsg_type;
 
  public:
 	CSEntryMessage(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 	commandentrymsg(this),
-	eml(this, "entrymsg"), entrymsg_type("EntryMsg", EntryMsg::Unserialize)
+	eml(this, "entrymsg"), entrymsg_type("EntryMsg", EntryMsgImpl::Unserialize)
 	{
 	}
 

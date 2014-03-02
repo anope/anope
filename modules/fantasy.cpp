@@ -162,8 +162,11 @@ class Fantasy : public Module
 		source.command = it->first;
 		source.permission = info.permission;
 
+		AccessGroup ag = c->ci->AccessFor(u);
+		bool has_fantasia = ag.HasPriv("FANTASIA") || source.HasPriv("chanserv/administration");
+
 		EventReturn MOD_RESULT;
-		if (c->ci->AccessFor(u).HasPriv("FANTASIA"))
+		if (has_fantasia)
 		{
 			FOREACH_RESULT(OnBotFantasy, MOD_RESULT, (source, cmd, c->ci, params));
 		}
@@ -172,7 +175,7 @@ class Fantasy : public Module
 			FOREACH_RESULT(OnBotNoFantasyAccess, MOD_RESULT, (source, cmd, c->ci, params));
 		}
 
-		if (MOD_RESULT == EVENT_STOP || !c->ci->AccessFor(u).HasPriv("FANTASIA"))
+		if (MOD_RESULT == EVENT_STOP || !has_fantasia)
 			return;
 
 		if (MOD_RESULT != EVENT_ALLOW && !info.permission.empty() && !source.HasCommand(info.permission))

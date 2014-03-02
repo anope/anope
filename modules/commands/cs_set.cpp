@@ -1163,7 +1163,7 @@ class CSSet : public Module
 				return;
 
 			bool created;
-			Channel *c = Channel::FindOrCreate(ci->name, created, ci->time_registered);
+			Channel *c = Channel::FindOrCreate(ci->name, created);
 
 			ChannelMode *cm = ModeManager::FindChannelModeByName("PERM");
 			if (cm)

@@ -16,6 +16,7 @@
 #include "modules/os_news.h"
 #include "modules/suspend.h"
 #include "modules/os_forbid.h"
+#include "modules/cs_entrymsg.h"
 
 #define READ(x) \
 if (true) \
@@ -948,6 +949,21 @@ static void LoadChannels()
 			}
 
 			READ(read_string(buffer, f));
+			if (!buffer.empty())
+			{
+				EntryMessageList *eml = ci->Require<EntryMessageList>("entrymsg");
+				if (eml)
+				{
+					EntryMsg *e = eml->Create();
+
+					e->chan = ci->name;
+					e->creator = "Unknown";
+					e->message = buffer;
+					e->when = Anope::CurTime;
+
+					(*eml)->push_back(e);
+				}
+			}
 
 			READ(read_string(buffer, f));
 			ci->bi = BotInfo::Find(buffer);

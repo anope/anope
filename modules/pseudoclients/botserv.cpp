@@ -136,7 +136,7 @@ class BotServCore : public Module
 					"channel, and provide a more convenient way to execute commands. Commands that\n"
 					"require a channel as a parameter will automatically have that parameter\n"
 					"given.\n"), source.service->nick.c_str());
-			const Anope::string &fantasycharacters = Config->GetModule(this)->Get<const Anope::string>("fantasycharacter", "!");
+			const Anope::string &fantasycharacters = Config->GetModule("fantasy")->Get<const Anope::string>("fantasycharacter", "!");
 			if (!fantasycharacters.empty())
 				source.Reply(_(" \n"
 						"Fantasy commands may be prefixed with one of the following characters: %s\n"), fantasycharacters.c_str());
@@ -167,7 +167,7 @@ class BotServCore : public Module
 		source.Reply(_(" \n"
 			"Bot will join a channel whenever there is at least\n"
 			"\002%d\002 user(s) on it."), Config->GetModule(this)->Get<unsigned>("minusers"));
-		const Anope::string &fantasycharacters = Config->GetModule(this)->Get<const Anope::string>("fantasycharacter", "!");
+		const Anope::string &fantasycharacters = Config->GetModule("fantasy")->Get<const Anope::string>("fantasycharacter", "!");
 		if (!fantasycharacters.empty())
 			source.Reply(_("Additionally, if fantasy is enabled fantasy commands\n"
 				"can be executed by prefixing the command name with\n"

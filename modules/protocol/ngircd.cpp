@@ -2,7 +2,7 @@
  * ngIRCd Protocol module for Anope IRC Services
  *
  * (C) 2012 Anope Team <team@anope.org>
- * (C) 2011-2012 Alexander Barton <alex@barton.de>
+ * (C) 2011-2012, 2014 Alexander Barton <alex@barton.de>
  * (C) 2011 Anope Team <team@anope.org>
  *
  * Please read COPYING and README for further details.
@@ -15,6 +15,12 @@
 
 class ngIRCdProto : public IRCDProto
 {
+	void SendSVSKillInternal(const MessageSource &source, User *user, const Anope::string &buf) anope_override
+	{
+		IRCDProto::SendSVSKillInternal(source, user, buf);
+		user->KillInternal(source, buf);
+	}
+
  public:
 	ngIRCdProto(Module *creator) : IRCDProto(creator, "ngIRCd")
 	{

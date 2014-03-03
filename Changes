@@ -1,4 +1,4 @@
-Anope Version 1.8 - GIT
+Anope Version 1.8.9
 -------------------
 06/05  F Fixed modules being loaded regardless of the load abort signal. [#1527]
 08/16  F Fixed hs_request to show requested ident in memos               [#1545]

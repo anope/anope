@@ -111,7 +111,8 @@ void Channel::CheckModes()
 		return;
 	}
 
-	FOREACH_MOD(OnCheckModes, (this));
+	Reference<Channel> ref = this;
+	FOREACH_MOD(OnCheckModes, (ref));
 }
 
 bool Channel::CheckDelete()
@@ -371,6 +372,15 @@ void Channel::RemoveModeInternal(MessageSource &setter, ChannelMode *cm, const A
 
 	FOREACH_RESULT(OnChannelModeUnset, MOD_RESULT, (this, setter, cm, param));
 
+	if (cm->name == "PERM")
+	{
+		if (this->CheckDelete())
+		{
+			delete this;
+			return;
+		}
+	}
+
 	/* Check for mlock */
 	if (!enforce_mlock || MOD_RESULT == EVENT_STOP)
 		return;
@@ -505,9 +515,11 @@ void Channel::SetModes(BotInfo *bi, bool enforce_mlock, const char *cmodes, ...)
 	vsnprintf(buf, BUFSIZE - 1, cmodes, args);
 	va_end(args);
 
+	Reference<Channel> this_reference(this);
+
 	spacesepstream sep(buf);
 	sep.GetToken(modebuf);
-	for (unsigned i = 0, end = modebuf.length(); i < end; ++i)
+	for (unsigned i = 0, end = modebuf.length(); this_reference && i < end; ++i)
 	{
 		ChannelMode *cm;
 

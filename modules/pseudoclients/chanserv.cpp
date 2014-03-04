@@ -274,8 +274,11 @@ class ChanServCore : public Module, public ChanServService
 				"lists and settings for any channel."));
 	}
 
-	void OnCheckModes(Channel *c) anope_override
+	void OnCheckModes(Reference<Channel> &c) anope_override
 	{
+		if (!c)
+			return;
+
 		if (c->ci)
 			c->SetMode(c->ci->WhoSends(), "REGISTERED", "", false);
 		else

@@ -902,9 +902,9 @@ class CSMode : public Module
 		}
 	}
 
-	void OnCheckModes(Channel *c) anope_override
+	void OnCheckModes(Reference<Channel> &c) anope_override
 	{
-		if (!c->ci)
+		if (!c || !c->ci)
 			return;
 
 		ModeLocks *locks = modelocks.Get(c->ci);

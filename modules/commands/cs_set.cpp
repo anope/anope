@@ -1289,12 +1289,6 @@ class CSSet : public Module
 		{
 			if (c->ci)
 				persist.Unset(c->ci);
-
-			if (c->CheckDelete())
-			{
-				delete c;
-				return EVENT_STOP;
-			}
 		}
 
 		if (c->ci && mode->type != MODE_STATUS && !c->syncing && Me->IsSynced())

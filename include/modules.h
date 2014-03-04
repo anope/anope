@@ -1010,7 +1010,7 @@ class CoreExport Module : public Extensible
 	 * mostly to ensure mlock/+r are set.
 	 * @param c The channel
 	 */
-	virtual void OnCheckModes(Channel *c) { throw NotImplementedException(); }
+	virtual void OnCheckModes(Reference<Channel> &c) { throw NotImplementedException(); }
 
 	/** Called when a channel is synced.
 	 * Channels are synced after a sjoin is finished processing

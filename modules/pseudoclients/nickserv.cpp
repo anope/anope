@@ -66,8 +66,8 @@ class NickServRelease : public User, public Timer
 	Anope::string nick;
 
  public:
-	NickServRelease(NickAlias *na, time_t delay) : User(na->nick, Config->GetModule("nickserv")->Get<const Anope::string>("enforceruser"),
-		Config->GetModule("nickserv")->Get<const Anope::string>("enforcerhost"), "", "", Me, "Services Enforcer", Anope::CurTime, "", Servers::TS6_UID_Retrieve(), NULL), Timer(delay), nick(na->nick)
+	NickServRelease(NickAlias *na, time_t delay) : User(na->nick, Config->GetModule("nickserv")->Get<const Anope::string>("enforceruser", "user"),
+		Config->GetModule("nickserv")->Get<const Anope::string>("enforcerhost", "services.localhost.net"), "", "", Me, "Services Enforcer", Anope::CurTime, "", Servers::TS6_UID_Retrieve(), NULL), Timer(delay), nick(na->nick)
 	{
 		/* Erase the current release timer and use the new one */
 		Anope::map<NickServRelease *>::iterator nit = NickServReleases.find(this->nick);
@@ -210,6 +210,7 @@ class NickServCore : public Module, public NickServService
 
 		if (IRCD->CanSVSNick)
 		{
+			unsigned nicklen = Config->GetBlock("networkinfo")->Get<unsigned>("nicklen");
 			const Anope::string &guestprefix = Config->GetModule("nickserv")->Get<const Anope::string>("guestnickprefix", "Guest");
 
 			Anope::string guestnick;
@@ -218,6 +219,8 @@ class NickServCore : public Module, public NickServService
 			do
 			{
 				guestnick = guestprefix + stringify(static_cast<uint16_t>(rand()));
+				if (guestnick.length() > nicklen)
+					guestnick = guestnick.substr(0, nicklen);
 			}
 			while (User::Find(guestnick) && i++ < 10);
 

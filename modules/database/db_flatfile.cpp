@@ -221,7 +221,7 @@ class DBFlatFile : public Module, public Pipe
 
 		const Anope::string &db_name = Anope::DataDir + "/" + Config->GetModule(this)->Get<const Anope::string>("database", "anope.db");
 
-		std::fstream fd(db_name.c_str(), std::ios_base::in);
+		std::fstream fd(db_name.c_str(), std::ios_base::in | std::ios_base::binary);
 		if (!fd.is_open())
 		{
 			Log(this) << "Unable to open " << db_name << " for reading!";
@@ -310,7 +310,7 @@ class DBFlatFile : public Module, public Pipe
 				if (Anope::IsFile(db_name))
 					rename(db_name.c_str(), (db_name + ".tmp").c_str());
 
-				std::fstream *fs = databases[s_type->GetOwner()] = new std::fstream(db_name.c_str(), std::ios_base::out | std::ios_base::trunc);
+				std::fstream *fs = databases[s_type->GetOwner()] = new std::fstream(db_name.c_str(), std::ios_base::out | std::ios_base::trunc | std::ios_base::binary);
 
 				if (!fs->is_open())
 					Log(this) << "Unable to open " << db_name << " for writing";
@@ -382,7 +382,7 @@ class DBFlatFile : public Module, public Pipe
 		else
 			db_name = Anope::DataDir + "/" + Config->GetModule(this)->Get<const Anope::string>("database", "anope.db");
 
-		std::fstream fd(db_name.c_str(), std::ios_base::in);
+		std::fstream fd(db_name.c_str(), std::ios_base::in | std::ios_base::binary);
 		if (!fd.is_open())
 		{
 			Log(this) << "Unable to open " << db_name << " for reading!";

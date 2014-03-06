@@ -365,9 +365,11 @@ class NickServCore : public Module, public NickServService
 
 		const NickAlias *na = NickAlias::Find(u->nick);
 
-		const Anope::string &unregistered_notice = Config->GetModule(this)->Get<const Anope::string>("unregistered_notice");
-		if (!Config->GetModule("nickserv")->Get<bool>("nonicknameownership") && !unregistered_notice.empty() && !na)
-			u->SendMessage(NickServ, unregistered_notice);
+		const Anope::string &unreg_line = u->IsIdentified()
+			? Config->GetModule(this)->Get<const Anope::string>("unregistered_loggedin")
+			: Config->GetModule(this)->Get<const Anope::string>("unregistered_notice");
+		if (!Config->GetModule("nickserv")->Get<bool>("nonicknameownership") && !unreg_line.empty() && !na)
+			u->SendMessage(NickServ, unreg_line);
 		else if (na && !u->IsIdentified(true))
 			this->Validate(u);
 	}

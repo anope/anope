@@ -27,9 +27,7 @@ class CommandNSResetPass : public Command
 	{
 		const NickAlias *na;
 
-		if (Config->GetBlock("mail")->Get<bool>("restrict") && !source.HasCommand("nickserv/resetpass"))
-			source.Reply(ACCESS_DENIED);
-		else if (!(na = NickAlias::Find(params[0])))
+		if (!(na = NickAlias::Find(params[0])))
 			source.Reply(NICK_X_NOT_REGISTERED, params[0].c_str());
 		else if (!na->nc->email.equals_ci(params[1]))
 			source.Reply(_("Incorrect email address."));

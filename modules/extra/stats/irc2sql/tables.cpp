@@ -87,7 +87,6 @@ void IRC2SQL::CheckTables()
 		query = "CREATE TABLE `" + prefix + "chan` ("
 			"`chanid` int(11) UNSIGNED NOT NULL AUTO_INCREMENT,"
 			"`channel` varchar(255) NOT NULL,"
-			"`currentusers` int(15) NOT NULL DEFAULT 0,"
 			"`topic` varchar(255) DEFAULT NULL,"
 			"`topicauthor` varchar(255) DEFAULT NULL,"
 			"`topictime` datetime DEFAULT NULL,"
@@ -230,47 +229,6 @@ void IRC2SQL::CheckTables()
 	query = "CREATE PROCEDURE " + prefix + "ServerQuit(sname_ varchar(255)) "
 		"BEGIN "
 			/* 1.
-			 * loop through all channels and decrease the user count
-			 * by the number of users that are on this channel AND
-			 * on the splitting server
-			 *
-			 * we dont have to care about channels that get empty, there will be
-			 * an extra OnChannelDelete event triggered from anope.
-			 */
-			"DECLARE no_more_rows BOOLEAN DEFAULT FALSE;"
-			"DECLARE channel_ varchar(255);"
-			"DECLARE ucount_ int;"
-			"DECLARE channel_cursor CURSOR FOR "
-				"SELECT c.channel "
-				"FROM `" + prefix + "chan` as c, `" + prefix + "ison` as i, "
-					"`" + prefix + "user` as u, `" + prefix + "server` as s "
-				"WHERE c.chanid = i.chanid "
-				  "AND i.nickid = u.nickid "
-				  "AND u.servid = s.id "
-				  "AND s.name = sname_;"
-			"DECLARE CONTINUE HANDLER FOR NOT FOUND "
-				"SET no_more_rows = TRUE;"
-			"OPEN channel_cursor;"
-			"the_loop: LOOP "
-				"FETCH channel_cursor INTO channel_;"
-				"IF no_more_rows THEN "
-					"CLOSE channel_cursor;"
-					"LEAVE the_loop;"
-				"END IF;"
-				"SELECT COUNT(*) INTO ucount_ "
-				"FROM `" + prefix + "ison` AS i, `" + prefix + "chan` AS c,"
-					"`" + prefix + "user` AS u, `" + prefix + "server` AS s "
-				"WHERE i.nickid = u.nickid "
-				  "AND u.servid = s.id "
-				  "AND i.chanid = c.chanid "
-				  "AND c.channel = channel_ "
-				  "AND s.name = sname_; "
-				"UPDATE `" + prefix + "chan` "
-				"SET currentusers = currentusers - ucount_ "
-				"WHERE channel = channel_;"
-			"END LOOP;"
-
-			/* 2.
 			 * remove all users on the splitting server from the ison table
 			 */
 			"DELETE i FROM `" + prefix + "ison` AS i "
@@ -280,7 +238,7 @@ void IRC2SQL::CheckTables()
 				  "AND u.servid = s.id "
 				  "AND s.name = sname_;"
 
-			/* 3.
+			/* 2.
 			 * remove all users on the splitting server from the user table
 			 */
 			"DELETE u FROM `" + prefix + "user` AS u "
@@ -288,7 +246,7 @@ void IRC2SQL::CheckTables()
 				"WHERE s.id = u.servid "
 				  "AND s.name = sname_;"
 
-			/* 4.
+			/* 3.
 			 * on the splitting server, set usercount = 0, split_time = now(), online = 'N'
 			 */
 			"UPDATE `" + prefix + "server` SET currentusers = 0, split_time = now(), online = 'N' "
@@ -306,12 +264,6 @@ void IRC2SQL::CheckTables()
 			"UPDATE `" + prefix + "user` AS `u`, `" + prefix + "server` AS `s` "
 				"SET s.currentusers = s.currentusers - 1 "
 				"WHERE u.nick=nick_ AND u.servid = s.id; "
-			/* decrease the usercount on all channels where the user was on */
-			"UPDATE `" + prefix + "user` AS u, `" + prefix + "ison` AS i, "
-				"`" + prefix + "chan` AS c "
-				"SET c.currentusers = c.currentusers - 1 "
-				"WHERE u.nick=nick_ AND u.nickid = i.nickid "
-				"AND i.chanid = c.chanid; "
 			/* remove from all channels where the user was on */
 			"DELETE i FROM `" + prefix + "ison` AS i "
 				"INNER JOIN `" + prefix + "user` as u "
@@ -345,9 +297,9 @@ void IRC2SQL::CheckTables()
 				"SELECT u.nickid, c.chanid, modes_ "
 				"FROM " + prefix + "user AS u, " + prefix + "chan AS c "
 				"WHERE u.nick=nick_ AND c.channel=channel_;"
-			"UPDATE `" + prefix + "chan` SET currentusers=currentusers+1 "
-				"WHERE channel=channel_;"
-			"SELECT `currentusers` INTO cur FROM `" + prefix + "chan` WHERE channel=channel_;"
+			"SELECT count(i.chanid) INTO cur "
+				"FROM `" + prefix + "chan` AS c, " +  prefix + "ison AS i "
+				"WHERE i.chanid = c.chanid AND c.channel=channel_;"
 			"SELECT `maxusers` INTO max FROM `" + prefix + "maxusers` WHERE name=channel_;"
 			"IF found_rows() AND cur <= max THEN "
 				"UPDATE `" + prefix + "maxusers` SET lastused=now() WHERE name=channel_;"
@@ -373,8 +325,6 @@ void IRC2SQL::CheckTables()
 					"AND u.nick = nick_ "
 					"AND i.chanid = c.chanid "
 					"AND c.channel = channel_;"
-			"UPDATE `" + prefix + "chan` SET currentusers=currentusers-1 "
-				"WHERE channel=channel_;"
 		"END";
 	this->RunQuery(query);
 }

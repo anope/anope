@@ -767,7 +767,7 @@ class OSSession : public Module
 			if (!e->expires || e->expires > Anope::CurTime)
 				continue;
 			BotInfo *OperServ = Config->GetClient("OperServ");
-			Log(OperServ, "expire/exception") << "Session exception for " << e->mask << "has expired.";
+			Log(OperServ, "expire/exception") << "Session exception for " << e->mask << " has expired.";
 			this->ss.DelException(e);
 			delete e;
 		}

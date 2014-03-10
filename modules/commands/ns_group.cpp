@@ -297,14 +297,25 @@ class CommandNSGList : public Command
 
 		ListFormatter list(source.GetAccount());
 		list.AddColumn(_("Nick")).AddColumn(_("Expires"));
-		time_t nickserv_expire = Config->GetModule("nickserv")->Get<time_t>("expire");
+		time_t nickserv_expire = Config->GetModule("nickserv")->Get<time_t>("expire", "21d"),
+		       unconfirmed_expire = Config->GetModule("nickserv")->Get<time_t>("unconfirmedexpire", "1d");
 		for (unsigned i = 0; i < nc->aliases->size(); ++i)
 		{
 			const NickAlias *na2 = nc->aliases->at(i);
 
+			Anope::string expires;
+			if (na2->HasExt("NS_NO_EXPIRE"))
+				expires = "Does not expire";
+			else if (!nickserv_expire || Anope::NoExpire)
+				;
+			else if (na2->nc->HasExt("UNCONFIRMED") && unconfirmed_expire)
+				expires = Anope::strftime(na2->time_registered + unconfirmed_expire, source.GetAccount());
+			else
+				expires = Anope::strftime(na2->last_seen + nickserv_expire, source.GetAccount());
+
 			ListFormatter::ListEntry entry;
 			entry["Nick"] = na2->nick;
-			entry["Expires"] = (na2->HasExt("NS_NO_EXPIRE") || !nickserv_expire || Anope::NoExpire) ? "Does not expire" : Anope::strftime(na2->last_seen + nickserv_expire, source.GetAccount());
+			entry["Expires"] = expires;
 			list.AddEntry(entry);
 		}
 

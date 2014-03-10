@@ -25,9 +25,9 @@ class NSMaxEmail : public Module
 			return false;
 
 		if (NSEmailMax == 1)
-			source.Reply(_("The given email address has reached its usage limit of 1 user."));
+			source.Reply(_("The email address \2%s\2 has reached its usage limit of 1 user."), email.c_str());
 		else
-			source.Reply(_("The given email address has reached its usage limit of %d users."), NSEmailMax);
+			source.Reply(_("The email address \2%s\2 has reached its usage limit of %d users."), email.c_str(), NSEmailMax);
 
 		return true;
 	}
@@ -57,6 +57,9 @@ class NSMaxEmail : public Module
 
 	EventReturn OnPreCommand(CommandSource &source, Command *command, std::vector<Anope::string> &params) anope_override
 	{
+		if (source.IsOper())
+			return EVENT_CONTINUE;
+
 		if (command->name == "nickserv/register")
 		{
 			if (this->CheckLimitReached(source, params.size() > 1 ? params[1] : ""))
@@ -65,6 +68,11 @@ class NSMaxEmail : public Module
 		else if (command->name == "nickserv/set/email")
 		{
 			if (this->CheckLimitReached(source, params.size() > 0 ? params[0] : ""))
+				return EVENT_STOP;
+		}
+		else if (command->name == "nickserv/ungroup" && source.GetAccount())
+		{
+			if (this->CheckLimitReached(source, source.GetAccount()->email))
 				return EVENT_STOP;
 		}
 

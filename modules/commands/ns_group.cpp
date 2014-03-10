@@ -72,10 +72,10 @@ class NSGroupRequest : public IdentifyRequest
 class CommandNSGroup : public Command
 {
  public:
-	CommandNSGroup(Module *creator) : Command(creator, "nickserv/group", 1, 2)
+	CommandNSGroup(Module *creator) : Command(creator, "nickserv/group", 0, 2)
 	{
 		this->SetDesc(_("Join a group"));
-		this->SetSyntax(_("\037target\037 \037password\037"));
+		this->SetSyntax(_("\037[target]\037 \037[password]\037"));
 		this->AllowUnregistered(true);
 		this->RequireUser(true);
 	}
@@ -83,7 +83,23 @@ class CommandNSGroup : public Command
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		User *u = source.GetUser();
-		const Anope::string &nick = params[0];
+
+		Anope::string nick;
+		if (params.empty())
+		{
+			NickCore* core = u->Account();
+			if (core)
+				nick = core->display;
+		}
+		else
+			nick = params[0];
+
+		if (nick.empty())
+		{
+			this->SendSyntax(source);
+			return;
+		}
+
 		const Anope::string &pass = params.size() > 1 ? params[1] : "";
 
 		if (Anope::ReadOnly)

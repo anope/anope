@@ -201,6 +201,10 @@ class NickServCore : public Module, public NickServService
 		NickAlias *na = NickAlias::Find(u->nick);
 		if (na && *na->nc == u->Account() && !Config->GetModule("nickserv")->Get<bool>("nonicknameownership") && !na->nc->HasExt("UNCONFIRMED"))
 			u->SetMode(NickServ, "REGISTERED");
+
+		const Anope::string &modesonid = Config->GetModule(this)->Get<Anope::string>("modesonid");
+		if (!modesonid.empty())
+			u->SetModes(NickServ, "%s", modesonid.c_str());
 	}
 
 	void Collide(User *u, NickAlias *na) anope_override

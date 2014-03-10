@@ -21,10 +21,10 @@ class DHAES : public Mechanism
 	}
 
  public:
-	struct Session : SASL::Session
+	struct DHAESSession : SASL::Session
 	{
 		DH* dh;
-		Session(Mechanism *m, const Anope::string &u, DH* dh_params) : SASL::Session(m, u)
+		DHAESSession(Mechanism *m, const Anope::string &u, DH* dh_params) : SASL::Session(m, u)
 		{
 			if (!(dh = DH_new()))
 				return;
@@ -39,7 +39,7 @@ class DHAES : public Mechanism
 			}
 		}
 
-		~Session()
+		~DHAESSession()
 		{
 			if (dh)
 				DH_free(dh);
@@ -50,7 +50,7 @@ class DHAES : public Mechanism
 	const size_t keysize;
 	SASL::Session* CreateSession(const Anope::string &uid) anope_override
 	{
-		return new Session(this, uid, dh_params);
+		return new DHAESSession(this, uid, dh_params);
 	}
 
 	DHAES(Module *o) : Mechanism(o, "DH-AES"), keysize(256 / 8)
@@ -72,7 +72,7 @@ class DHAES : public Mechanism
 
 	void ProcessMessage(SASL::Session *session, const SASL::Message &m) anope_override
 	{
-		Session *sess = anope_dynamic_static_cast<Session *>(session);
+		DHAESSession *sess = anope_dynamic_static_cast<DHAESSession *>(session);
 
 		if (!sess->dh)
 		{

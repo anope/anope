@@ -25,9 +25,9 @@ class NSMaxEmail : public Module
 			return false;
 
 		if (NSEmailMax == 1)
-			source.Reply(_("The email address \2%s\2 has reached its usage limit of 1 user."), email.c_str());
+			source.Reply(_("The email address \002%s\002 has reached its usage limit of 1 user."), email.c_str());
 		else
-			source.Reply(_("The email address \2%s\2 has reached its usage limit of %d users."), email.c_str(), NSEmailMax);
+			source.Reply(_("The email address \002%s\002 has reached its usage limit of %d users."), email.c_str(), NSEmailMax);
 
 		return true;
 	}

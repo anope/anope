@@ -12,6 +12,7 @@ class LDAPService : public LDAPProvider, public Thread, public Condition
 	int port;
 	Anope::string admin_binddn;
 	Anope::string admin_pass;
+	time_t timeout;
 
 	LDAP *con;
 
@@ -70,20 +71,26 @@ class LDAPService : public LDAPProvider, public Thread, public Condition
 	}
 
  public:
-	typedef std::map<int, LDAPInterface *> query_queue;
+	typedef std::map<LDAPQuery, std::pair<time_t, LDAPInterface *> > query_queue;
 	typedef std::vector<std::pair<LDAPInterface *, LDAPResult *> > result_queue;
 	query_queue queries;
 	result_queue results;
 
-	LDAPService(Module *o, const Anope::string &n, const Anope::string &s, int po, const Anope::string &b, const Anope::string &p) : LDAPProvider(o, n), server(s), port(po), admin_binddn(b), admin_pass(p), last_connect(0)
+	LDAPService(Module *o, const Anope::string &n, const Anope::string &s, int po, const Anope::string &b, const Anope::string &p, time_t t) : LDAPProvider(o, n), server(s), port(po), admin_binddn(b), admin_pass(p), timeout(t), last_connect(0)
 	{
 		int i = ldap_initialize(&this->con, this->server.c_str());
 		if (i != LDAP_SUCCESS)
 			throw LDAPException("Unable to connect to LDAP service " + this->name + ": " + ldap_err2string(i));
+
 		const int version = LDAP_VERSION3;
 		i = ldap_set_option(this->con, LDAP_OPT_PROTOCOL_VERSION, &version);
 		if (i != LDAP_OPT_SUCCESS)
 			throw LDAPException("Unable to set protocol version for " + this->name + ": " + ldap_err2string(i));
+
+		const struct timeval tv = { 0, 0 };
+		i = ldap_set_option(this->con, LDAP_OPT_NETWORK_TIMEOUT, &tv);
+		if (i != LDAP_OPT_SUCCESS)
+			throw LDAPException("Unable to set timeout for " + this->name + ": " + ldap_err2string(i));
 	}
 
 	~LDAPService()
@@ -92,15 +99,25 @@ class LDAPService : public LDAPProvider, public Thread, public Condition
 
 		for (query_queue::iterator it = this->queries.begin(), it_end = this->queries.end(); it != it_end; ++it)
 		{
-			ldap_abandon_ext(this->con, it->first, NULL, NULL);
-			it->second->OnDelete();
+			LDAPQuery msgid = it->first;
+			LDAPInterface *i = it->second.second;
+
+			ldap_abandon_ext(this->con, msgid, NULL, NULL);
+			if (i)
+				i->OnDelete();
 		}
 		this->queries.clear();
 
 		for (result_queue::iterator it = this->results.begin(), it_end = this->results.end(); it != it_end; ++it)
 		{
-			it->second->error = "LDAP Interface is going away";
-			it->first->OnError(*it->second);
+			LDAPInterface *i = it->first;
+			LDAPResult *r = it->second;
+
+			r->error = "LDAP Interface is going away";
+			if (i)
+				i->OnError(*r);
+
+			delete r;
 		}
 		this->results.clear();
 
@@ -137,7 +154,7 @@ class LDAPService : public LDAPProvider, public Thread, public Condition
 		if (i != NULL)
 		{
 			this->Lock();
-			this->queries[msgid] = i;
+			this->queries[msgid] = std::make_pair(Anope::CurTime, i);
 			this->Unlock();
 		}
 		this->Wakeup();
@@ -164,7 +181,7 @@ class LDAPService : public LDAPProvider, public Thread, public Condition
 		}
 
 		this->Lock();
-		this->queries[msgid] = i;
+		this->queries[msgid] = std::make_pair(Anope::CurTime, i);
 		this->Unlock();
 		this->Wakeup();
 
@@ -192,7 +209,7 @@ class LDAPService : public LDAPProvider, public Thread, public Condition
 		if (i != NULL)
 		{
 			this->Lock();
-			this->queries[msgid] = i;
+			this->queries[msgid] = std::make_pair(Anope::CurTime, i);
 			this->Unlock();
 		}
 		this->Wakeup();
@@ -219,7 +236,7 @@ class LDAPService : public LDAPProvider, public Thread, public Condition
 		if (i != NULL)
 		{
 			this->Lock();
-			this->queries[msgid] = i;
+			this->queries[msgid] = std::make_pair(Anope::CurTime, i);
 			this->Unlock();
 		}
 		this->Wakeup();
@@ -248,7 +265,7 @@ class LDAPService : public LDAPProvider, public Thread, public Condition
 		if (i != NULL)
 		{
 			this->Lock();
-			this->queries[msgid] = i;
+			this->queries[msgid] = std::make_pair(Anope::CurTime, i);
 			this->Unlock();
 		}
 		this->Wakeup();
@@ -256,6 +273,33 @@ class LDAPService : public LDAPProvider, public Thread, public Condition
 		return msgid;
 	}
 
+ private:
+	void Timeout()
+	{
+		this->Lock();
+		for (query_queue::iterator it = this->queries.begin(), it_end = this->queries.end(); it != it_end;)
+		{
+			LDAPQuery msgid = it->first;
+			time_t created = it->second.first;
+			LDAPInterface *i = it->second.second;
+			++it;
+
+			if (Anope::CurTime > created + timeout)
+			{
+				LDAPResult *ldap_result = new LDAPResult();
+				ldap_result->id = msgid;
+				ldap_result->error = "Query timed out";
+
+				this->queries.erase(msgid);
+				this->results.push_back(std::make_pair(i, ldap_result));
+
+				me->Notify();
+			}
+		}
+		this->Unlock();
+	}
+
+ public:
 	void Run() anope_override
 	{
 		while (!this->GetExitState())
@@ -265,14 +309,15 @@ class LDAPService : public LDAPProvider, public Thread, public Condition
 				this->Lock();
 				this->Wait();
 				this->Unlock();
-				if (this->GetExitState())
-					break;
+				continue;
 			}
+			else
+				this->Timeout();
 
 			struct timeval tv = { 1, 0 };
 			LDAPMessage *result;
 			int rtype = ldap_result(this->con, LDAP_RES_ANY, 1, &tv, &result);
-			if (rtype <= 0 || this->GetExitState())
+			if (rtype <= 0)
 				continue;
 
 			int cur_id = ldap_msgid(result);
@@ -286,7 +331,7 @@ class LDAPService : public LDAPProvider, public Thread, public Condition
 				ldap_msgfree(result);
 				continue;
 			}
-			LDAPInterface *i = it->second;
+			LDAPInterface *i = it->second.second;
 			this->queries.erase(it);
 
 			this->Unlock();
@@ -459,10 +504,11 @@ class ModuleLDAP : public Module, public Pipe
 				int port = ldap->Get<int>("port", "389");
 				const Anope::string &admin_binddn = ldap->Get<const Anope::string>("admin_binddn");
 				const Anope::string &admin_password = ldap->Get<const Anope::string>("admin_password");
+				time_t timeout = ldap->Get<time_t>("timeout", "5");
 
 				try
 				{
-					LDAPService *ss = new LDAPService(this, connname, server, port, admin_binddn, admin_password);
+					LDAPService *ss = new LDAPService(this, connname, server, port, admin_binddn, admin_password, timeout);
 					ss->Start();
 					this->LDAPServices.insert(std::make_pair(connname, ss));
 
@@ -484,11 +530,11 @@ class ModuleLDAP : public Module, public Pipe
 			s->Lock();
 			for (LDAPService::query_queue::iterator it2 = s->queries.begin(); it2 != s->queries.end();)
 			{
-				int msgid = it2->first;
-				LDAPInterface *i = it2->second;
+				LDAPQuery msgid = it2->first;
+				LDAPInterface *i = it2->second.second;
 				++it2;
 
-				if (i->owner == m)
+				if (i && i->owner == m)
 				{
 					i->OnDelete();
 					s->queries.erase(msgid);
@@ -499,7 +545,7 @@ class ModuleLDAP : public Module, public Pipe
 				LDAPInterface *li = s->results[i - 1].first;
 				LDAPResult *r = s->results[i - 1].second;
 
-				if (li->owner == m)
+				if (li && li->owner == m)
 				{
 					s->results.erase(s->results.begin() + i - 1);
 					delete r;
@@ -515,9 +561,9 @@ class ModuleLDAP : public Module, public Pipe
 		{
 			LDAPService *s = it->second;
 
+			LDAPService::result_queue results;
 			s->Lock();
-			LDAPService::result_queue results = s->results;
-			s->results.clear();
+			results.swap(s->results);
 			s->Unlock();
 
 			for (unsigned i = 0; i < results.size(); ++i)
@@ -525,10 +571,16 @@ class ModuleLDAP : public Module, public Pipe
 				LDAPInterface *li = results[i].first;
 				LDAPResult *r = results[i].second;
 
-				if (!r->error.empty())
-					li->OnError(*r);
-				else
-					li->OnResult(*r);
+				if (li != NULL)
+				{
+					if (!r->getError().empty())
+					{
+						Log(this) << "Error running LDAP query: " << r->getError();
+						li->OnError(*r);
+					}
+					else
+						li->OnResult(*r);
+				}
 
 				delete r;
 			}

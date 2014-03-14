@@ -148,7 +148,9 @@ struct NSCertListImpl : NSCertList
 			Anope::string buf;
 			data["cert"] >> buf;
 			spacesepstream sep(buf);
-			c->ClearCert();
+			for (unsigned i = 0; i < c->certs.size(); ++i)
+				certmap.erase(c->certs[i]);
+			c->certs.clear();
 			while (sep.GetToken(buf))
 			{
 				c->certs.push_back(buf);
@@ -161,28 +163,28 @@ struct NSCertListImpl : NSCertList
 class CommandNSCert : public Command
 {
  private:
-	void DoAdd(CommandSource &source, NickCore *nc, const Anope::string &certfp)
+	void DoAdd(CommandSource &source, NickCore *nc, Anope::string certfp)
 	{
 		NSCertList *cl = nc->Require<NSCertList>("certificates");
+		unsigned max = Config->GetModule(this->owner)->Get<unsigned>("max", "5");
 
-		if (cl->GetCertCount() >= Config->GetModule(this->owner)->Get<unsigned>("accessmax", "5"))
+		if (cl->GetCertCount() >= max)
 		{
-			source.Reply(_("Sorry, the maximum of %d certificate entries has been reached."), Config->GetModule(this->owner)->Get<unsigned>("accessmax"));
+			source.Reply(_("Sorry, the maximum of %d certificate entries has been reached."), max);
 			return;
 		}
 
-		if (certfp.empty())
+		if (source.GetAccount() == nc)
 		{
-			if (source.GetUser() && !source.GetUser()->fingerprint.empty() && !cl->FindCert(source.GetUser()->fingerprint))
-			{
-				cl->AddCert(source.GetUser()->fingerprint);
-				Log(LOG_COMMAND, source, this) << "to ADD its current certificate fingerprint " << source.GetUser()->fingerprint;
-				source.Reply(_("\002%s\002 added to your certificate list."), source.GetUser()->fingerprint.c_str());
-			}
-			else
-				this->OnSyntaxError(source, "ADD");
+			User *u = source.GetUser();
 
-			return;
+			if (!u || u->fingerprint.empty())
+			{
+				source.Reply(_("You are not using a client certificate."));
+				return;
+			}
+
+			certfp = u->fingerprint;
 		}
 
 		if (cl->FindCert(certfp))
@@ -191,26 +193,31 @@ class CommandNSCert : public Command
 			return;
 		}
 
+		if (certmap.find(certfp) != certmap.end())
+		{
+			source.Reply(_("Fingerprint \002%s\002 is already in use."), certfp.c_str());
+			return;
+		}
+
 		cl->AddCert(certfp);
 		Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to ADD certificate fingerprint " << certfp << " to " << nc->display;
 		source.Reply(_("\002%s\002 added to %s's certificate list."), certfp.c_str(), nc->display.c_str());
 	}
 
-	void DoDel(CommandSource &source, NickCore *nc, const Anope::string &certfp)
+	void DoDel(CommandSource &source, NickCore *nc, Anope::string certfp)
 	{
 		NSCertList *cl = nc->Require<NSCertList>("certificates");
 
 		if (certfp.empty())
 		{
-			if (source.GetUser() && !source.GetUser()->fingerprint.empty() && cl->FindCert(source.GetUser()->fingerprint))
-			{
-				cl->EraseCert(source.GetUser()->fingerprint);
-				Log(LOG_COMMAND, source, this) << "to DELETE its current certificate fingerprint " << source.GetUser()->fingerprint;
-				source.Reply(_("\002%s\002 deleted from your certificate list."), source.GetUser()->fingerprint.c_str());
-			}
-			else
-				this->OnSyntaxError(source, "DEL");
+			User *u = source.GetUser();
+			if (u)
+				certfp = u->fingerprint;
+		}
 
+		if (certfp.empty())
+		{
+			this->OnSyntaxError(source, "DEL");
 			return;
 		}
 
@@ -248,7 +255,7 @@ class CommandNSCert : public Command
 	CommandNSCert(Module *creator) : Command(creator, "nickserv/cert", 1, 3)
 	{
 		this->SetDesc(_("Modify the nickname client certificate list"));
-		this->SetSyntax(_("ADD [\037nickname\037] \037fingerprint\037"));
+		this->SetSyntax(_("ADD [\037nickname\037] [\037fingerprint\037]"));
 		this->SetSyntax(_("DEL [\037nickname\037] \037fingerprint\037"));
 		this->SetSyntax(_("LIST [\037nickname\037]"));
 	}

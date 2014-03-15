@@ -78,8 +78,12 @@ void Channel::Reset()
 
 		/* reset modes for my clients */
 		if (uc->user->server == Me)
+		{
 			for (size_t i = 0; i < f.Modes().length(); ++i)
 				this->SetMode(NULL, ModeManager::FindChannelModeByChar(f.Modes()[i]), uc->user->GetUID(), false);
+			/* Modes might not exist yet, so be sure the status is really reset */
+			uc->status = f;
+		}
 	}
 
 	for (ChanUserList::const_iterator it = this->users.begin(), it_end = this->users.end(); it != it_end; ++it)

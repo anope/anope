@@ -127,6 +127,8 @@ Server::Server(Server *up, const Anope::string &sname, unsigned shops, const Ano
 
 				if (!c->topic.empty() && !c->topic_setter.empty())
 					IRCD->SendTopic(c->ci->WhoSends(), c);
+
+				c->syncing = true;
 			}
 		}
 	}

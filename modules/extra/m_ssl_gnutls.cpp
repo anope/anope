@@ -234,7 +234,11 @@ namespace GnuTLS
 			return ret;
 		}
 
+		#if (GNUTLS_VERSION_MAJOR < 2 || (GNUTLS_VERSION_MAJOR == 2 && GNUTLS_VERSION_MINOR < 12))
 		static int cert_callback(gnutls_session_t sess, const gnutls_datum_t* req_ca_rdn, int nreqs, const gnutls_pk_algorithm_t* sign_algos, int sign_algos_length, gnutls_retr_st* st);
+		#else
+		static int cert_callback(gnutls_session_t sess, const gnutls_datum_t* req_ca_rdn, int nreqs, const gnutls_pk_algorithm_t* sign_algos, int sign_algos_length, gnutls_retr2_st* st);
+		#endif
 
 	 public:
 		X509CertList certs;
@@ -253,7 +257,11 @@ namespace GnuTLS
 				throw ConfigException("Unable to set cert/key pair");
 			}
 
+			#if (GNUTLS_VERSION_MAJOR < 2 || (GNUTLS_VERSION_MAJOR == 2 && GNUTLS_VERSION_MINOR < 12))
 			gnutls_certificate_client_set_retrieve_function(cred, cert_callback);
+			#else
+			gnutls_certificate_set_retrieve_function(cred, cert_callback);
+			#endif
 		}
 
 		~X509CertCredentials()
@@ -625,9 +633,16 @@ SSLSocketIO::SSLSocketIO() : sess(NULL), mycreds(me->cred)
 	mycreds->incrref();
 }
 
+#if (GNUTLS_VERSION_MAJOR < 2 || (GNUTLS_VERSION_MAJOR == 2 && GNUTLS_VERSION_MINOR < 12))
 int GnuTLS::X509CertCredentials::cert_callback(gnutls_session_t sess, const gnutls_datum_t* req_ca_rdn, int nreqs, const gnutls_pk_algorithm_t* sign_algos, int sign_algos_length, gnutls_retr_st* st)
 {
 	st->type = GNUTLS_CRT_X509;
+#else
+int GnuTLS::X509CertCredentials::cert_callback(gnutls_session_t sess, const gnutls_datum_t* req_ca_rdn, int nreqs, const gnutls_pk_algorithm_t* sign_algos, int sign_algos_length, gnutls_retr2_st* st)
+{
+	st->cert_type = GNUTLS_CRT_X509;
+	st->key_type = GNUTLS_PRIVKEY_X509;
+#endif
 	st->ncerts = me->cred->certs.size();
 	st->cert.x509 = me->cred->certs.raw();
 	st->key.x509 = me->cred->key.get();

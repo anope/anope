@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Anope\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-03-10 22:17+0100\n"
-"PO-Revision-Date: 2014-03-10 22:21+0100\n"
+"POT-Creation-Date: 2014-03-17 01:00+0100\n"
+"PO-Revision-Date: 2014-03-17 01:11+0100\n"
 "Last-Translator: Robby <robby@chat.be>\n"
 "Language-Team: Dutch\n"
 "Language: nl_NL\n"
@@ -56,7 +56,7 @@ msgstr "%s toegevoegd aan %s slechtewoordenlijst."
 msgid "%s added to %s's access list."
 msgstr "%s toegevoegd aan %s's toegangslijst."
 
-#: modules/commands/ns_cert.cpp:196
+#: modules/commands/ns_cert.cpp:204
 #, c-format
 msgid "%s added to %s's certificate list."
 msgstr "%s toegevoegd aan %s's certificaatlijst."
@@ -75,11 +75,6 @@ msgstr "%s toegevoegd aan de %s lijst."
 #, c-format
 msgid "%s added to the AKILL list."
 msgstr "%s toegevoegd aan de AKILL lijst."
-
-#: modules/commands/ns_cert.cpp:180
-#, c-format
-msgid "%s added to your certificate list."
-msgstr "%s toegevoegd aan je certificaatlijst."
 
 #: modules/pseudoclients/botserv.cpp:134
 #, c-format
@@ -223,7 +218,7 @@ msgstr "%s verwijderd van %s slechtewoordenlijst."
 msgid "%s deleted from %s's access list."
 msgstr "%s verwijderd van %s's toegangslijst."
 
-#: modules/commands/ns_cert.cpp:226
+#: modules/commands/ns_cert.cpp:233
 #, c-format
 msgid "%s deleted from %s's certificate list."
 msgstr "%s verwijderd van %s's certificaatlijst."
@@ -242,11 +237,6 @@ msgstr "%s verwijderd van de %s lijst."
 #, c-format
 msgid "%s deleted from the AKILL list."
 msgstr "%s verwijderd van de AKILL lijst."
-
-#: modules/commands/ns_cert.cpp:209
-#, c-format
-msgid "%s deleted from your certificate list."
-msgstr "%s verwijderd van je certificaatlijst."
 
 #: modules/commands/cs_access.cpp:679
 #, c-format
@@ -419,7 +409,7 @@ msgstr "%s niet gevonden op %s slechtewoordenlijst."
 msgid "%s not found on %s's access list."
 msgstr "%s niet gevonden op %s's toegangslijst."
 
-#: modules/commands/ns_cert.cpp:219
+#: modules/commands/ns_cert.cpp:226
 #, c-format
 msgid "%s not found on %s's certificate list."
 msgstr "%s niet gevonden op %s's certificaatlijst."
@@ -2024,7 +2014,7 @@ msgstr "%s's autojoinlijst is leeg."
 msgid "%s's auto join list:"
 msgstr "%s's autojoinlijst:"
 
-#: modules/commands/ns_cert.cpp:235
+#: modules/commands/ns_cert.cpp:242
 #, c-format
 msgid "%s's certificate list is empty."
 msgstr "%s's certificaatlijst is leeg."
@@ -2192,13 +2182,13 @@ msgstr "ADD [+verlooptijd] masker limiet reden"
 msgid "ADD [nickname] channel [key]"
 msgstr "ADD [nick] kanaal [sleutel]"
 
-#: modules/commands/ns_cert.cpp:251
-msgid "ADD [nickname] fingerprint"
-msgstr "ADD [nick] vingerafdruk"
-
 #: modules/commands/ns_access.cpp:102
 msgid "ADD [nickname] mask"
 msgstr "ADD [nick] masker"
+
+#: modules/commands/ns_cert.cpp:258
+msgid "ADD [nickname] [fingerprint]"
+msgstr "ADD [nick] [vingerafdruk]"
 
 #: modules/commands/os_sxline.cpp:651 modules/commands/os_akill.cpp:375
 msgid "ADD [+expiry] mask reason"
@@ -3454,7 +3444,7 @@ msgstr ""
 "Zorgt ervoor dat Services de databases bijwerken zodra je\n"
 "dit commando verstuurt."
 
-#: modules/commands/ns_cert.cpp:239
+#: modules/commands/ns_cert.cpp:246
 #, c-format
 msgid "Certificate list for %s:"
 msgstr "Certificaatlijst voor %s:"
@@ -3920,7 +3910,7 @@ msgstr "DEL doel info"
 msgid "DEL [nickname] channel"
 msgstr "DEL [nick] kanaal"
 
-#: modules/commands/ns_cert.cpp:252
+#: modules/commands/ns_cert.cpp:259
 msgid "DEL [nickname] fingerprint"
 msgstr "DEL [nick] vingerafdruk"
 
@@ -4824,7 +4814,7 @@ msgstr ""
 "Fout! De vHost is te lang, gelieve een host korter dan %d karakters op te "
 "geven."
 
-#: modules/commands/ns_cert.cpp:318
+#: modules/commands/ns_cert.cpp:325
 msgid ""
 "Examples:\n"
 " \n"
@@ -4899,10 +4889,15 @@ msgstr "Fantasie modus staat nu aan op kanaal %s."
 msgid "Find a user's status on a channel"
 msgstr "Vind een gebruiker's status op een kanaal"
 
-#: modules/commands/ns_cert.cpp:190
+#: modules/commands/ns_cert.cpp:192
 #, c-format
 msgid "Fingerprint %s already present on %s's certificate list."
 msgstr "Vingerafdruk %s is al aanwezig op %s's certificaatlist."
+
+#: modules/commands/ns_cert.cpp:198
+#, c-format
+msgid "Fingerprint %s is already in use."
+msgstr "Vingerafdruk %s is al in gebruik."
 
 #: modules/commands/cs_flags.cpp:301
 msgid "Flags"
@@ -5286,7 +5281,7 @@ msgid "LIST [mask | list]"
 msgstr "LIST [masker | lijst]"
 
 #: modules/commands/ns_access.cpp:104 modules/commands/ns_ajoin.cpp:233
-#: modules/commands/ns_cert.cpp:253
+#: modules/commands/ns_cert.cpp:260
 msgid "LIST [nickname]"
 msgstr "LIST [nick]"
 
@@ -6129,7 +6124,7 @@ msgstr ""
 "    ACCESS LIST\n"
 "        Geeft de huidige toegangslijst weer."
 
-#: modules/commands/ns_cert.cpp:312
+#: modules/commands/ns_cert.cpp:319
 msgid ""
 "Modifies or displays the certificate list for your nick.\n"
 "If you connect to IRC and provide a client certificate with a\n"
@@ -6163,7 +6158,7 @@ msgstr "Wijzig de lijst met toegestane adressen"
 msgid "Modify the list of privileged users"
 msgstr "Wijzig de lijst van gebruikers met privileges"
 
-#: modules/commands/ns_cert.cpp:250
+#: modules/commands/ns_cert.cpp:257
 msgid "Modify the nickname client certificate list"
 msgstr "Wijzig de certificaatlijst"
 
@@ -7323,13 +7318,13 @@ msgstr "SET server"
 msgid "SET server.name option value"
 msgstr "SET server.naam optie waarde"
 
-#: modules/commands/ns_cert.cpp:364
+#: modules/commands/ns_cert.cpp:371
 #, c-format
 msgid "SSL certificate fingerprint accepted, you are now identified to %s."
 msgstr ""
 "SSL certificaatvingerafdruk aanvaard, je bent nu geïdentificeerd voor %s."
 
-#: modules/commands/ns_cert.cpp:375
+#: modules/commands/ns_cert.cpp:382
 msgid "SSL certificate fingerprint accepted, you are now identified."
 msgstr "SSL certificaatvingerafdruk aanvaard, je bent nu geïdentificeerd."
 
@@ -8275,7 +8270,7 @@ msgstr "Sorry, de maximum van %d toegangsvermeldingen is bereikt."
 msgid "Sorry, the maximum of %d auto join entries has been reached."
 msgstr "Sorry, de maximum van %d autojoinvermeldingen is bereikt."
 
-#: modules/commands/ns_cert.cpp:170
+#: modules/commands/ns_cert.cpp:173
 #, c-format
 msgid "Sorry, the maximum of %d certificate entries has been reached."
 msgstr "Sorry, de maximum van %d certificaten is bereikt."
@@ -10283,6 +10278,10 @@ msgstr "Je hebt geen toestemming om op dit kanaal aanwezig te zijn."
 msgid "You are not permitted to change your memo limit."
 msgstr "Je hebt geen toegang om je memolimiet te veranderen."
 
+#: modules/commands/ns_cert.cpp:183
+msgid "You are not using a client certificate."
+msgstr "Je gebruikt geen certificaat."
+
 #: modules/commands/os_set.cpp:85
 msgid "You are now a super admin."
 msgstr "Je bent nu een super administrator."
@@ -10546,7 +10545,7 @@ msgstr ""
 "Je kan de toegangslijst van andere Services Operators bekijken, maar niet "
 "aanpassen."
 
-#: modules/commands/ns_cert.cpp:285
+#: modules/commands/ns_cert.cpp:292
 msgid ""
 "You may view but not modify the certificate list of other Services Operators."
 msgstr ""

@@ -116,7 +116,7 @@ class CommandCSSetMisc : public Command
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
-		if (MOD_RESULT != EVENT_ALLOW && source.permission.empty() && !source.AccessFor(ci).HasPriv("SET"))
+		if (MOD_RESULT != EVENT_ALLOW && !source.AccessFor(ci).HasPriv("SET") && source.permission.empty() && !source.HasPriv("chanserv/administration"))
 		{
 			source.Reply(ACCESS_DENIED);
 			return;
@@ -131,11 +131,13 @@ class CommandCSSetMisc : public Command
 		if (!param.empty())
 		{
 			item->Set(ci, CSMiscData(ci, key, param));
+			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to change it to " << param;
 			source.Reply(CHAN_SETTING_CHANGED, scommand.c_str(), ci->name.c_str(), params[1].c_str());
 		}
 		else
 		{
 			item->Unset(ci);
+			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to unset it";
 			source.Reply(CHAN_SETTING_UNSET, scommand.c_str(), ci->name.c_str());
 		}
 	}

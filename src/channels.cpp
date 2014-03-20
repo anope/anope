@@ -578,17 +578,6 @@ void Channel::SetModes(BotInfo *bi, bool enforce_mlock, const char *cmodes, ...)
 
 void Channel::SetModesInternal(MessageSource &source, const Anope::string &mode, time_t ts, bool enforce_mlock)
 {
-	if (source.GetServer() && source.GetServer()->IsSynced())
-	{
-		if (Anope::CurTime != this->server_modetime)
-		{
-			this->server_modecount = 0;
-			this->server_modetime = Anope::CurTime;
-		}
-
-		++this->server_modecount;
-	}
-
 	if (!ts)
 		;
 	else if (ts > this->creation_time)
@@ -615,6 +604,7 @@ void Channel::SetModesInternal(MessageSource &source, const Anope::string &mode,
 	Anope::string modestring;
 	Anope::string paramstring;
 	int add = -1;
+	bool changed = false;
 	for (unsigned int i = 0, end = m.length(); i < end && this_reference; ++i)
 	{
 		ChannelMode *cm;
@@ -643,6 +633,8 @@ void Channel::SetModesInternal(MessageSource &source, const Anope::string &mode,
 
 		if (cm->type == MODE_REGULAR)
 		{
+			/* something changed if we are adding a mode we dont have, or removing one we have */
+			changed |= !!add != this->HasMode(cm->name);
 			if (add)
 				this->SetModeInternal(source, cm, "", false);
 			else
@@ -668,6 +660,7 @@ void Channel::SetModesInternal(MessageSource &source, const Anope::string &mode,
 			else
 				paramstring += " " + token;
 
+			changed |= !!add != this->HasMode(cm->name, token);
 			/* CheckModes below doesn't check secureops (+ the module event) */
 			if (add)
 				this->SetModeInternal(source, cm, token, enforce_mlock);
@@ -680,6 +673,17 @@ void Channel::SetModesInternal(MessageSource &source, const Anope::string &mode,
 
 	if (!this_reference)
 		return;
+
+	if (changed && source.GetServer() && source.GetServer()->IsSynced())
+	{
+		if (Anope::CurTime != this->server_modetime)
+		{
+			this->server_modecount = 0;
+			this->server_modetime = Anope::CurTime;
+		}
+
+		++this->server_modecount;
+	}
 
 	if (setter)
 		Log(setter, this, "mode") << modestring << paramstring;

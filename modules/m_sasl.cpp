@@ -93,7 +93,7 @@ class External : public Mechanism
 			}
 
 			NickCore *nc = certs->FindAccountFromCert(mysess->cert);
-			if (!nc)
+			if (!nc || nc->HasExt("NS_SUSPENDED"))
 			{
 				sasl->Fail(sess);
 				delete sess;

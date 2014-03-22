@@ -110,7 +110,14 @@ namespace SASL
 				delete s;
 			}
 
-			Log(Config->GetClient("NickServ")) << "A user failed to identify for account " << this->GetAccount() << " using SASL";
+			Anope::string accountstatus;
+			NickAlias *na = NickAlias::Find(GetAccount());
+			if (!na)
+				accountstatus = "nonexistent ";
+			else if (na->nc->HasExt("NS_SUSPENDED"))
+				accountstatus = "suspended ";
+
+			Log(Config->GetClient("NickServ")) << "A user failed to identify for " << accountstatus << "account " << this->GetAccount() << " using SASL";
 		}
 	};
 }

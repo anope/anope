@@ -86,7 +86,7 @@ namespace SASL
 				return;
 
 			NickAlias *na = NickAlias::Find(GetAccount());
-			if (!na)
+			if (!na || na->nc->HasExt("NS_SUSPENDED"))
 				return OnFail();
 
 			Session *s = sasl->GetSession(uid);

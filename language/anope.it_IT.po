@@ -567,9 +567,8 @@ msgid "[auto-memo] The memo you sent to %s has been viewed."
 msgstr "[auto-memo] Il memo che hai inviato a %s è stato letto."
 
 #: modules/commands/ns_group.cpp:78
-#, fuzzy
 msgid "[target] [password]"
-msgstr "target password"
+msgstr "[target] [password]"
 
 #: modules/commands/ns_set.cpp:433
 msgid "address"
@@ -2024,7 +2023,7 @@ msgstr ""
 #: src/misc.cpp:366
 #, c-format
 msgid "(%s from now)"
-msgstr ""
+msgstr "(%s da adesso)"
 
 #: modules/commands/os_dns.cpp:243
 msgid "(Split)"
@@ -2172,9 +2171,8 @@ msgid "ADD [nickname] mask"
 msgstr "ADD [nickname] mask"
 
 #: modules/commands/ns_cert.cpp:258
-#, fuzzy
 msgid "ADD [nickname] [fingerprint]"
-msgstr "ADD [nickname] fingerprint"
+msgstr "ADD [nickname] [fingerprint]"
 
 #: modules/commands/os_akill.cpp:375 modules/commands/os_sxline.cpp:651
 msgid "ADD [+expiry] mask reason"
@@ -3799,7 +3797,7 @@ msgstr "Configura i kick in caso di underline"
 
 #: modules/commands/ns_register.cpp:21
 msgid "Confirm a passcode"
-msgstr "Conferma un codice.di.attivazione (passcode) di nickserv"
+msgstr "Conferma un codice di attivazione (passcode) di nickserv"
 
 #: modules/commands/cs_mode.cpp:679
 msgid "Control modes and mode locks on a channel"
@@ -4173,7 +4171,7 @@ msgid ""
 "      Deletes memos numbered 2 through 5 and 7 through 9."
 msgstr ""
 "Elimina il memo o i memo specificati. Si possono indicare\n"
-"numei multipli di memo o intervalli di numeri invece di\n"
+"numeri multipli di memo o intervalli di numeri invece di\n"
 "un numero singolo, come nel secondo esempio.\n"
 " \n"
 "Se viene usato LAST elimina l'ultimo memo.\n"
@@ -4872,12 +4870,12 @@ msgstr "Trova lo stato di un utente in un canale"
 #: modules/commands/ns_cert.cpp:192
 #, c-format
 msgid "Fingerprint %s already present on %s's certificate list."
-msgstr "La firma digitale %s è già present nella lista dei certificati di %s."
+msgstr "La firma digitale %s è già presente nella lista dei certificati di %s."
 
 #: modules/commands/ns_cert.cpp:198
-#, fuzzy, c-format
+#, c-format
 msgid "Fingerprint %s is already in use."
-msgstr "%s è già presente in %s."
+msgstr "La firma digitale %s è già in uso."
 
 #: modules/commands/cs_flags.cpp:301
 msgid "Flags"
@@ -5741,7 +5739,7 @@ msgstr ""
 "Esempi:\n"
 "     MODE #channel LOCK ADD +bmnt *!*@*aol*\n"
 " \n"
-"Il comando %s SET permetti di impostare i modi utilizzando i services. Le "
+"Il comando %s SET permette di impostare i modi utilizzando i services. Le "
 "wildcards * e ? possono\n"
 "essere specificate come parametri per le liste e gli status modes.\n"
 "Esempi:\n"
@@ -5802,7 +5800,7 @@ msgstr ""
 "verrà utilizzata la frase standard \"You have been banned\n"
 "from the channel\".\n"
 "Quando viene usato un AKICK su un nick registrato\n"
-"l' AKICK sarà aggiunto sull account %s anzichè sulla mask.\n"
+"l' AKICK sarà aggiunto sull' account %s anzichè sulla mask.\n"
 "Tutti i nickname presenti nel gruppo dell'account saranno in AKICK.\n"
 
 #: modules/commands/cs_access.cpp:562
@@ -8742,7 +8740,7 @@ msgstr ""
 "Il comando ACCESS ADD aggiunge il nick specificato alla\n"
 "lista di accesso con il livello specificato, se il nick è\n"
 "già presente nella lista, il suo livello viene modificato,\n"
-"mpostandolo a quello specificato nel comando. Il livello\n"
+"impostandolo a quello specificato nel comando. Il livello\n"
 "specificato può essere un livello numerico o il nome di un\n"
 "privilegio (es. AUTOOP)."
 
@@ -8889,7 +8887,7 @@ msgid ""
 "The ENTRYMSG LIST command displays a listing of messages\n"
 "to be shown to users when they join the channel."
 msgstr ""
-"Il comando ENTRYMSG LISTmosta la lista dei messaggi da mostrareagli utenti "
+"Il comando ENTRYMSG LIST mosta la lista dei messaggi da mostrare agli utenti "
 "al momento dell' ingresso nel canale."
 
 #: modules/commands/ns_set.cpp:690
@@ -9037,7 +9035,7 @@ msgstr ""
 " \n"
 " MESSAGE [status], NOTICE [status], MEMO\n"
 " \n"
-"Che sono rispettivamente usati per iviare un messaggio, un notice e un memo "
+"Che sono rispettivamente usati per inviare un messaggio, un notice e un memo "
 "al canale.\n"
 "Con MESSAGE o NOTICE è necessario avere un bot dei services assegnato e "
 "presente nel\n"
@@ -9096,14 +9094,14 @@ msgstr ""
 "d'attacco sul network."
 
 #: modules/ns_maxemail.cpp:30
-#, fuzzy, c-format
+#, c-format
 msgid "The email address %s has reached its usage limit of %d users."
-msgstr "L' indirizzo email specificato ha raggiunto il limite di %d utenti."
+msgstr "L' indirizzo email %s ha raggiunto il limite di %d utenti."
 
 #: modules/ns_maxemail.cpp:28
-#, fuzzy, c-format
+#, c-format
 msgid "The email address %s has reached its usage limit of 1 user."
-msgstr "L' indirizzo email specificato ha raggiunto il limite di 1 utente."
+msgstr "L' indirizzo email %s ha raggiunto il limite di 1 utente."
 
 #: modules/commands/cs_entrymsg.cpp:142
 #, c-format
@@ -10262,9 +10260,8 @@ msgid "You are not permitted to change your memo limit."
 msgstr "Non puoi modificare limite dei tuoi memo."
 
 #: modules/commands/ns_cert.cpp:183
-#, fuzzy
 msgid "You are not using a client certificate."
-msgstr "Non sei identificato."
+msgstr "Non stai usando un certificato del client."
 
 #: modules/commands/os_set.cpp:85
 msgid "You are now a super admin."
@@ -10438,9 +10435,9 @@ msgstr ""
 "Digita %s%s READ %d per leggerlo."
 
 #: modules/commands/cs_invite.cpp:76
-#, fuzzy, c-format
+#, c-format
 msgid "You have been invited to %s by %s."
-msgstr "Sei stato invitato in %s."
+msgstr "Sei stato invitato in %s da %s."
 
 #: modules/commands/cs_invite.cpp:81
 #, c-format
@@ -10501,9 +10498,8 @@ msgid "You may not change the e-mail of other Services Operators."
 msgstr "Non puoi cambiare l'e-mail di altri Services Operators."
 
 #: modules/commands/ns_set.cpp:454
-#, fuzzy
 msgid "You may not change the email of an unconfirmed account."
-msgstr "Non puoi cambiare l'e-mail di altri Services Operators."
+msgstr "Non puoi cambiare l'e-mail di un account non confermato."
 
 #: modules/commands/ns_set.cpp:191
 msgid "You may not change the password of other Services Operators."
@@ -10664,7 +10660,6 @@ msgid "Your email address is not allowed, choose a different one."
 msgstr "Il tuo indirizzo email non è consentito, scegline un altro diverso."
 
 #: modules/commands/ns_register.cpp:360
-#, fuzzy
 msgid ""
 "Your email address is not confirmed. To confirm it, follow the instructions "
 "that were emailed to you."

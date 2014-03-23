@@ -1,3 +1,58 @@
+Revision cdf636e - Sun, 23 Mar 2014 08:57:08 -0400 - Regen langauge files
+Revision 45878bf - Sat, 22 Mar 2014 21:14:02 +0100 - SASL: Also disallow suspended nicks to login using EXTERNAL mechanism. Improve the log message for failed logins.
+Revision f1bec39 - Sat, 22 Mar 2014 07:21:22 -0400 - Do not allow SASL login to suspended nicks
+Revision a259244 - Thu, 20 Mar 2014 10:53:27 -0400 - Make bouncymodes harder to trigger by only bumping server modcount when something changes
+Revision c1da009 - Wed, 19 Mar 2014 02:40:48 -0400 - Show a better log message when disconnecting from the uplink
+Revision 4f412bc - Wed, 19 Mar 2014 03:05:54 +0100 - cs_set_misc: Add missing override capability for services operators, and logging.
+Revision 1882916 - Mon, 17 Mar 2014 01:15:28 +0100 - Update the dutch language file.
+Revision f436ce9 - Mon, 17 Mar 2014 00:58:51 +0100 - m_ssl_gnutls: Fix deprecation warnings when using newer GnuTLS versions.
+Revision ef9729f - Fri, 14 Mar 2014 22:13:04 -0400 - Mark all channels as syncing when we connect to our uplink. They will finish syncing later when the uplink syncs. Normally the channel state is fully synced here anyway, except if we do not know the modes the uplink has yet.
+Revision 296a75f - Thu, 13 Mar 2014 20:07:50 -0400 - Do not allow users to add certs that other users are using. Only allow adding certfps if the user is using it.
+Revision bce7237 - Tue, 11 Mar 2014 09:45:34 -0400 - Set LDAP_OPT_NETWORK_TIMEOUT to 0 in m_ldap to prevent the asynchronous library cals from blocking...
+Revision 85834e1 - Mon, 10 Mar 2014 22:30:41 +0100 - Update the dutch language file. ns_maxemail: Bold code 2 -> 002.
+Revision ca6b372 - Mon, 10 Mar 2014 07:32:24 -0400 - Merge pull request #64 from ShutterQuick/2.0+hsgroupsync
+Revision 23b1086 - Mon, 10 Mar 2014 07:31:34 -0400 - Merge pull request #63 from alexbarton/ngircd-fix-KILL
+Revision 860deb1 - Mon, 10 Mar 2014 07:26:09 -0400 - Do not send unregistered notice to users who are logged in, even if their nick isn't registered
+Revision 62885fa - Mon, 10 Mar 2014 05:04:25 -0400 - Set nickserv's modesonid on login too
+Revision 3fef01e - Mon, 10 Mar 2014 04:56:17 -0400 - Fix compile error in m_sasl_dh-aes and m_sasl_dh-blowfish on unusually old g++ versions
+Revision b0597e3 - Mon, 10 Mar 2014 04:31:08 -0400 - Do not allow nickserv/ungroup to bypass ns_maxemail, and allow opers to bypass ns_maxemail
+Revision 8d1ad6f - Sun, 9 Mar 2014 22:59:16 -0400 - Make nickserv/glist show the correct expire time for unconfirmed nicks
+Revision 7505692 - Sun, 9 Mar 2014 22:56:25 -0400 - Add missing space to session exception expiration message
+Revision 1a1a781 - Sun, 9 Mar 2014 10:07:13 -0400 - Remove mail:restrict as it is no longer useful. Changes nickserv/resetpass default to allow normal users to use it.
+Revision 4b5ce8a - Sun, 9 Mar 2014 04:55:35 +0100 - irc2sql: removed the currentusers field from the chan table, keeping it updated on each join/part eats too many ressources
+Revision 98cfdd2 - Thu, 6 Mar 2014 04:55:30 -0800 - ns_group: Don't require a nick param when logged in
+Revision 051a42b - Thu, 6 Mar 2014 04:55:30 -0800 - hs_group: Allow automatic HS GROUP-ing on NS GROUP, and allow vhosts to be per account rather than nick.
+Revision 220e278 - Wed, 5 Mar 2014 20:23:44 -0500 - Open database files using std::ios_base::binary in db_flatfile, which Windows can require
+Revision 547fe0d - Wed, 5 Mar 2014 10:26:54 +0100 - ngircd protocol module: really kill users
+Revision 09bec79 - Tue, 4 Mar 2014 04:15:32 -0500 - Fix 2 crashes from removing the permanent channel mode from channels which do not exist
+Revision 55a5aff - Tue, 4 Mar 2014 04:15:32 -0500 - Do not allow guest nicks to exceed nicklen, and use a default enforcer ident/host if none is provided
+Revision a8b4297 - Mon, 3 Mar 2014 19:20:56 +0100 - Update the dutch language file.
+Revision 5969362 - Sat, 1 Mar 2014 22:41:45 -0500 - When unserializing channels with persist, set their ts=now. If we are supposed to lower it later we will then.
+Revision 3ceae33 - Sat, 1 Mar 2014 21:56:26 -0500 - Convert limit and key mlocks in db_old
+Revision 5de4c1f - Sat, 1 Mar 2014 21:40:47 -0500 - Set +x on plexus when vhosts are activated, fix desync from /hs off
+Revision fd10904 - Sat, 1 Mar 2014 21:20:32 -0500 - Make db_old load entrymsg
+Revision a074751 - Sat, 1 Mar 2014 21:20:18 -0500 - Export interface for cs_entrymsg
+Revision 605e1f2 - Sat, 1 Mar 2014 21:12:27 -0500 - Make chanserv/invite show who invited you
+Revision dc23c58 - Sat, 1 Mar 2014 21:11:58 -0500 - Fix botserv help to show the correct fantasy characters
+Revision b7e646e - Sat, 1 Mar 2014 20:02:17 -0500 - Allow opers with chanserv/administration to use fantasy, even if they don't have the access for it
+Revision 4d54358 - Sat, 1 Mar 2014 19:59:40 -0500 - When unserializating channels and persist is set, only assign chanserv if the perm channel mode doesnt exist
+Revision ed0882e - Sat, 1 Mar 2014 18:39:10 -0500 - Do not enforce mlock when enforcing mlock
+Revision 526c4e4 - Sat, 1 Mar 2014 18:38:14 -0500 - Check modes after applying mlocks in db_old
+Revision b70f72b - Sat, 1 Mar 2014 04:31:52 -0500 - Do not allow changing the email of unconfirmed accounts
+Revision 2ad4c19 - Sat, 1 Mar 2014 04:27:45 -0500 - Fix incorrect comment in modules.example.conf
+Revision 049760c - Fri, 28 Feb 2014 00:30:35 -0500 - Allow svsjoin/svspart on yourself
+Revision e2ecec3 - Thu, 27 Feb 2014 23:21:50 -0500 - Hybrid does not let us add resvs as a server, but the core expects to be able to qline bot nicks before introducing the bots as a way to prevent collisions, so try harder to find a valid bot to send resvs on startup
+Revision fee016b - Thu, 27 Feb 2014 22:42:54 -0500 - Handle nick collisions somewhat instead of blindly overwriting the nicks in memory, which does weird things.
+Revision d24fb03 - Thu, 27 Feb 2014 04:49:28 -0500 - Allow registration=mail forceemail=false to work, and simply give fully registered accounts to people who do not provide an email to nickserv/register
+Revision 5adc8bf - Thu, 27 Feb 2014 04:48:48 -0500 - Do not take modes from users in channels with secureops off if we are always lowering channels timestamps to their creations
+Revision abcf0cd - Wed, 26 Feb 2014 19:32:25 -0500 - Remove unreachable code in config.cpp, this error is caught earlier
+Revision 8f3bd31 - Wed, 26 Feb 2014 19:26:50 -0500 - Fix not detecting eols in the config reader when the end of the line is the end of a multiline comment
+Revision e2d456d - Wed, 26 Feb 2014 19:24:32 -0500 - Do not setuid/gid down until after modules are loaded
+Revision 96202ae - Mon, 24 Feb 2014 22:23:12 -0500 - Log successful SASL auths
+Revision 2b0229d - Tue, 25 Feb 2014 03:22:55 +0100 - Update the italian language file
+Revision beaa319 - Mon, 24 Feb 2014 16:14:40 -0500 - Update Spanish translation, from Isaac Fontal <i_fontal@hotmail.com>
+Revision b6d771a - Mon, 24 Feb 2014 00:31:07 -0500 - Anope 2.0.0-rc4 Release
+Revision d3ed756 - Mon, 24 Feb 2014 00:30:57 -0500 - Update version.log (why do we keep this around?)
 Revision f830884 - Mon, 24 Feb 2014 00:30:47 -0500 - Package dlls in src/win32 on Windows
 Revision 1dfdf36 - Mon, 24 Feb 2014 00:06:38 -0500 - Fix m_ssl_gnutls to send its cert. Most of this is from Attila.
 Revision 4ac3ade - Sun, 23 Feb 2014 23:08:35 -0500 - Use a more reliable way to detect if services are running in anoperc

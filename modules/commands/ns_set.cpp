@@ -119,7 +119,7 @@ class CommandNSSetPassword : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		const Anope::string &param = params[1];
+		const Anope::string &param = params[0];
 		unsigned len = param.length();
 
 		if (Anope::ReadOnly)

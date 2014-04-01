@@ -18,7 +18,7 @@ static std::map<Anope::string, Anope::string> descriptions;
 struct CSMiscData;
 static Anope::map<ExtensibleItem<CSMiscData> *> items;
 
-static ExtensibleItem<CSMiscData> *GetItem(const Anope::string &name) anope_override
+static ExtensibleItem<CSMiscData> *GetItem(const Anope::string &name)
 {
 	ExtensibleItem<CSMiscData>* &it = items[name];
 	if (!it)

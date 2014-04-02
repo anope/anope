@@ -89,7 +89,7 @@ Anope Modules
 
     You can download more useful modules from http://modules.anope.org/. Just
     grab the module file (usually with a .cpp extension). Place the module
-    file in your modules (anope-1.9.x/modules/third) folder; although any of
+    file in your modules (anope-x.x.x/modules/third) folder; although any of
     the other folders within the modules directory will work.
 
     The new modules need to be compiled and installed before you can make

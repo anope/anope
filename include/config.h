@@ -103,6 +103,8 @@ namespace Configuration
 		time_t TimeoutCheck;
 		/* options:usestrictprivmsg */
 		bool UseStrictPrivmsg;
+		/* flag for options:regexengine */
+		std::regex::flag_type regex_flags;
 
 		/* either "/msg " or "/" */
 		Anope::string StrictPrivmsg;

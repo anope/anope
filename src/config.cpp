@@ -115,6 +115,7 @@ Conf::Conf() : Block("")
 {
 	ReadTimeout = 0;
 	UsePrivmsg = DefPrivmsg = false;
+	regex_flags = 0;
 
 	this->LoadConf(ServicesConf);
 
@@ -526,6 +527,25 @@ Conf::Conf() : Block("")
 	if (!options->Get<unsigned>("seed"))
 		Log() << "Configuration option options:seed should be set. It's for YOUR safety! Remember that!";
 
+	/* check regexengine */
+	const Anope::string &regex_engine = options->Get<Anope::string>("regexengine");
+	if (regex_engine == "ecmascript")
+		regex_flags = std::regex::ECMAScript;
+	else if (regex_engine == "basic")
+		regex_flags = std::regex::basic;
+	else if (regex_engine == "extended")
+		regex_flags = std::regex::extended;
+	else if (regex_engine == "awk")
+		regex_flags = std::regex::awk;
+	else if (regex_engine == "grep")
+		regex_flags = std::regex::grep;
+	else if (regex_engine == "egrep")
+		regex_flags = std::regex::egrep;
+	/* always enable icase and optimize */
+	if (regex_flags)
+		regex_flags |= std::regex::icase | std::regex::optimize;
+
+	/* apply changes from an older config? */
 	if (Config)
 	{
 		/* Apply module chnages */

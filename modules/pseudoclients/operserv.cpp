@@ -41,7 +41,7 @@ class SGLineManager : public XLineManager
 		if (x->regex)
 		{
 			Anope::string uh = u->GetIdent() + "@" + u->host, nuhr = u->nick + "!" + uh + "#" + u->realname;
-			return x->regex->Matches(uh) || x->regex->Matches(nuhr);
+			return std::regex_match(uh.str(), *x->regex) || std::regex_match(nuhr.str(), *x->regex);
 		}
 
 		if (!x->GetNick().empty() && !Anope::Match(u->nick, x->GetNick()))
@@ -111,7 +111,7 @@ class SQLineManager : public XLineManager
 	bool Check(User *u, const XLine *x) override
 	{
 		if (x->regex)
-			return x->regex->Matches(u->nick);
+			return std::regex_match(u->nick.c_str(), *x->regex);
 		return Anope::Match(u->nick, x->mask);
 	}
 
@@ -122,7 +122,7 @@ class SQLineManager : public XLineManager
 			XLine *x = *it;
 			if (x->regex)
 			{
-				if (x->regex->Matches(c->name))
+				if (std::regex_match(c->name.str(), *x->regex))
 					return x;
 			}
 			else if (Anope::Match(c->name, x->mask, false, true))
@@ -165,7 +165,7 @@ class SNLineManager : public XLineManager
 	bool Check(User *u, const XLine *x) override
 	{
 		if (x->regex)
-			return x->regex->Matches(u->realname);
+			return std::regex_match(u->realname.str(), *x->regex);
 		return Anope::Match(u->realname, x->mask, false, true);
 	}
 };

@@ -17,7 +17,6 @@
 #include "config.h"
 #include "bots.h"
 #include "language.h"
-#include "regexpr.h"
 #include "sockets.h"
 
 #include <errno.h>
@@ -408,38 +407,29 @@ bool Anope::Match(const Anope::string &str, const Anope::string &mask, bool case
 {
 	size_t s = 0, m = 0, str_len = str.length(), mask_len = mask.length();
 
-	if (use_regex && mask_len >= 2 && mask[0] == '/' && mask[mask.length() - 1] == '/')
+	if (use_regex && Config->regex_flags && mask_len >= 2 && mask[0] == '/' && mask[mask.length() - 1] == '/')
 	{
 		Anope::string stripped_mask = mask.substr(1, mask_len - 2);
 		// This is often called with the same mask multiple times in a row, so cache it
-		static Regex *r = NULL;
+		static Anope::string pattern;
+		static std::regex r;
 
-		if (r == NULL || r->GetExpression() != stripped_mask)
+		if (pattern != stripped_mask)
 		{
-			ServiceReference<RegexProvider> provider("Regex", Config->GetBlock("options")->Get<const Anope::string>("regexengine"));
-			if (provider)
+			try
 			{
-				try
-				{
-					delete r;
-					r = NULL;
-					// This may throw
-					r = provider->Compile(stripped_mask);
-				}
-				catch (const RegexException &ex)
-				{
-					Log(LOG_DEBUG) << ex.GetReason();
-				}
+				r.assign(stripped_mask.str(), Config->regex_flags);
+				pattern = stripped_mask;
 			}
-			else
+			catch (const std::regex_error &error)
 			{
-				delete r;
-				r = NULL;
+				Log(LOG_DEBUG) << error.what();
 			}
 		}
 
-		if (r != NULL && r->Matches(str))
-			return true;
+		if (pattern == stripped_mask)
+			if (std::regex_search(str.str(), r))
+				return true;
 
 		// Fall through to non regex match
 	}

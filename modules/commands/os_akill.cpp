@@ -122,29 +122,20 @@ class CommandOSAKill : public Command
 
 		if (mask[0] == '/' && mask[mask.length() - 1] == '/')
 		{
-			const Anope::string &regexengine = Config->GetBlock("options")->Get<const Anope::string>("regexengine");
-
-			if (regexengine.empty())
+			if (!Config->regex_flags)
 			{
 				source.Reply(_("Regex is disabled."));
 				return;
 			}
 
-			ServiceReference<RegexProvider> provider("Regex", regexengine);
-			if (!provider)
-			{
-				source.Reply(_("Unable to find regex engine %s."), regexengine.c_str());
-				return;
-			}
-
+			Anope::string stripped_mask = mask.substr(1, mask.length() - 2);
 			try
 			{
-				Anope::string stripped_mask = mask.substr(1, mask.length() - 2);
-				delete provider->Compile(stripped_mask);
+				std::regex(stripped_mask.str(), Config->regex_flags);
 			}
-			catch (const RegexException &ex)
+			catch (const std::regex_error &ex)
 			{
-				source.Reply("%s", ex.GetReason().c_str());
+				source.Reply("%s", ex.what());
 				return;
 			}
 		}

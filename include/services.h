@@ -41,6 +41,7 @@
 #include <set>
 #include <algorithm>
 #include <iterator>
+#include <regex>
 
 #include "defs.h"
 

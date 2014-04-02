@@ -31,7 +31,6 @@
 #include "modules.h"
 #include "opertype.h"
 #include "protocol.h"
-#include "regexpr.h"
 #include "regchannel.h"
 #include "serialize.h"
 #include "servers.h"

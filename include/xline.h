@@ -18,7 +18,7 @@ class CoreExport XLine : public Serializable
 	void InitRegex();
  public:
 	Anope::string mask;
-	Regex *regex;
+	std::regex *regex;
 	Anope::string by;
 	time_t created;
 	time_t expires;

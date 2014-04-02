@@ -28,27 +28,27 @@ class RatboxProto : public IRCDProto
 		MaxModes = 4;
 	}
 
-	void SendSVSKillInternal(const MessageSource &source, User *targ, const Anope::string &reason) anope_override { hybrid->SendSVSKillInternal(source, targ, reason); }
-	void SendGlobalNotice(BotInfo *bi, const Server *dest, const Anope::string &msg) anope_override { hybrid->SendGlobalNotice(bi, dest, msg); }
-	void SendGlobalPrivmsg(BotInfo *bi, const Server *dest, const Anope::string &msg) anope_override { hybrid->SendGlobalPrivmsg(bi, dest, msg); }
-	void SendSQLine(User *u, const XLine *x) anope_override { hybrid->SendSQLine(u, x); }
-	void SendSGLine(User *u, const XLine *x) anope_override { hybrid->SendSGLine(u, x); }
-	void SendSGLineDel(const XLine *x) anope_override { hybrid->SendSGLineDel(x); }
-	void SendAkill(User *u, XLine *x) anope_override { hybrid->SendAkill(u, x); }
-	void SendAkillDel(const XLine *x) anope_override { hybrid->SendAkillDel(x); }
-	void SendSQLineDel(const XLine *x) anope_override { hybrid->SendSQLineDel(x); }
-	void SendJoin(User *user, Channel *c, const ChannelStatus *status) anope_override { hybrid->SendJoin(user, c, status); }
-	void SendServer(const Server *server) anope_override { hybrid->SendServer(server); }
-	void SendModeInternal(const MessageSource &source, User *u, const Anope::string &buf) anope_override { hybrid->SendModeInternal(source, u, buf); }
-	void SendChannel(Channel *c) anope_override { hybrid->SendChannel(c); }
-	bool IsIdentValid(const Anope::string &ident) anope_override { return hybrid->IsIdentValid(ident); }
+	void SendSVSKillInternal(const MessageSource &source, User *targ, const Anope::string &reason) override { hybrid->SendSVSKillInternal(source, targ, reason); }
+	void SendGlobalNotice(BotInfo *bi, const Server *dest, const Anope::string &msg) override { hybrid->SendGlobalNotice(bi, dest, msg); }
+	void SendGlobalPrivmsg(BotInfo *bi, const Server *dest, const Anope::string &msg) override { hybrid->SendGlobalPrivmsg(bi, dest, msg); }
+	void SendSQLine(User *u, const XLine *x) override { hybrid->SendSQLine(u, x); }
+	void SendSGLine(User *u, const XLine *x) override { hybrid->SendSGLine(u, x); }
+	void SendSGLineDel(const XLine *x) override { hybrid->SendSGLineDel(x); }
+	void SendAkill(User *u, XLine *x) override { hybrid->SendAkill(u, x); }
+	void SendAkillDel(const XLine *x) override { hybrid->SendAkillDel(x); }
+	void SendSQLineDel(const XLine *x) override { hybrid->SendSQLineDel(x); }
+	void SendJoin(User *user, Channel *c, const ChannelStatus *status) override { hybrid->SendJoin(user, c, status); }
+	void SendServer(const Server *server) override { hybrid->SendServer(server); }
+	void SendModeInternal(const MessageSource &source, User *u, const Anope::string &buf) override { hybrid->SendModeInternal(source, u, buf); }
+	void SendChannel(Channel *c) override { hybrid->SendChannel(c); }
+	bool IsIdentValid(const Anope::string &ident) override { return hybrid->IsIdentValid(ident); }
 
-	void SendGlobopsInternal(const MessageSource &source, const Anope::string &buf) anope_override
+	void SendGlobopsInternal(const MessageSource &source, const Anope::string &buf) override
 	{
 		UplinkSocket::Message(source) << "OPERWALL :" << buf;
 	}
 
-	void SendConnect() anope_override
+	void SendConnect() override
 	{
 		UplinkSocket::Message() << "PASS " << Config->Uplinks[Anope::CurrentUplink].password << " TS 6 :" << Me->GetSID();
 		/*
@@ -75,13 +75,13 @@ class RatboxProto : public IRCDProto
 		UplinkSocket::Message() << "SVINFO 6 3 0 :" << Anope::CurTime;
 	}
 
-	void SendClientIntroduction(User *u) anope_override
+	void SendClientIntroduction(User *u) override
 	{
 		Anope::string modes = "+" + u->GetModes();
 		UplinkSocket::Message(Me) << "UID " << u->nick << " 1 " << u->timestamp << " " << modes << " " << u->GetIdent() << " " << u->host << " 0 " << u->GetUID() << " :" << u->realname;
 	}
 
-	void SendLogin(User *u, NickAlias *na) anope_override
+	void SendLogin(User *u, NickAlias *na) override
 	{
 		if (na->nc->HasExt("UNCONFIRMED"))
 			return;
@@ -89,12 +89,12 @@ class RatboxProto : public IRCDProto
 		UplinkSocket::Message(Me) << "ENCAP * SU " << u->GetUID() << " " << na->nc->display;
 	}
 
-	void SendLogout(User *u) anope_override
+	void SendLogout(User *u) override
 	{
 		UplinkSocket::Message(Me) << "ENCAP * SU " << u->GetUID();
 	}
 
-	void SendTopic(const MessageSource &source, Channel *c) anope_override
+	void SendTopic(const MessageSource &source, Channel *c) override
 	{
 		BotInfo *bi = source.GetBot();
 		bool needjoin = c->FindUser(bi) == NULL;
@@ -119,7 +119,7 @@ struct IRCDMessageEncap : IRCDMessage
 	IRCDMessageEncap(Module *creator) : IRCDMessage(creator, "ENCAP", 3) { SetFlag(IRCDMESSAGE_REQUIRE_USER); }
 
 	// Debug: Received: :00BAAAAAB ENCAP * LOGIN Adam
-	void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
+	void Run(MessageSource &source, const std::vector<Anope::string> &params) override
 	{
 		if (params[1] == "LOGIN" || params[1] == "SU")
 		{
@@ -143,7 +143,7 @@ struct IRCDMessagePass : IRCDMessage
 {
 	IRCDMessagePass(Module *creator) : IRCDMessage(creator, "PASS", 4) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
 
-	void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
+	void Run(MessageSource &source, const std::vector<Anope::string> &params) override
 	{
 		UplinkSID = params[3];
 	}
@@ -154,7 +154,7 @@ struct IRCDMessageServer : IRCDMessage
 	IRCDMessageServer(Module *creator) : IRCDMessage(creator, "SERVER", 3) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
 
 	// SERVER hades.arpa 1 :ircd-ratbox test server
-	void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
+	void Run(MessageSource &source, const std::vector<Anope::string> &params) override
 	{
 		// Servers other then our immediate uplink are introduced via SID
 		if (params[1] != "1")
@@ -174,7 +174,7 @@ struct IRCDMessageTBurst : IRCDMessage
 	 * params[2] = topic OR who set the topic
 	 * params[3] = topic if params[2] isnt the topic
 	 */
-	void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
+	void Run(MessageSource &source, const std::vector<Anope::string> &params) override
 	{
 		time_t topic_time = Anope::string(params[1]).is_pos_number_only() ? convertTo<time_t>(params[1]) : Anope::CurTime;
 		Channel *c = Channel::Find(params[0]);
@@ -194,7 +194,7 @@ struct IRCDMessageUID : IRCDMessage
 	IRCDMessageUID(Module *creator) : IRCDMessage(creator, "UID", 9) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
 
 	// :42X UID Adam 1 1348535644 +aow Adam 192.168.0.5 192.168.0.5 42XAAAAAB :Adam
-	void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
+	void Run(MessageSource &source, const std::vector<Anope::string> &params) override
 	{
 		/* Source is always the server */
 		User::OnIntroduce(params[0], params[4], params[5], "", params[6], source.GetServer(), params[8], params[2].is_pos_number_only() ? convertTo<time_t>(params[2]) : 0, params[3], params[7], NULL);

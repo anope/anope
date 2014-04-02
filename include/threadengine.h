@@ -10,8 +10,7 @@
  *
  */
 
-#ifndef THREADENGINE_H
-#define THREADENGINE_H
+#pragma once
 
 #include "sockets.h"
 #include "extensible.h"
@@ -118,4 +117,3 @@ class CoreExport Condition : public Mutex
 	void Wait();
 };
 
-#endif // THREADENGINE_H

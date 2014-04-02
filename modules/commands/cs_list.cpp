@@ -20,7 +20,7 @@ class CommandCSList : public Command
 		this->SetSyntax(_("\037pattern\037 [SUSPENDED] [NOEXPIRE]"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		Anope::string pattern = params[0];
 		unsigned nchans;
@@ -124,7 +124,7 @@ class CommandCSList : public Command
 		source.Reply(_("End of list - %d/%d matches shown."), nchans > listmax ? listmax : nchans, nchans);
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -175,7 +175,7 @@ class CommandCSSetPrivate : public Command
 		this->SetSyntax(_("\037channel\037 {ON | OFF}"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		if (Anope::ReadOnly)
 		{
@@ -219,7 +219,7 @@ class CommandCSSetPrivate : public Command
 		return;
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -247,7 +247,7 @@ class CSList : public Module
 	{
 	}
 
-	void OnChanInfo(CommandSource &source, ChannelInfo *ci, InfoFormatter &info, bool show_all) anope_override
+	void OnChanInfo(CommandSource &source, ChannelInfo *ci, InfoFormatter &info, bool show_all) override
 	{
 		if (!show_all)
 			return;

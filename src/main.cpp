@@ -47,7 +47,7 @@ class UpdateTimer : public Timer
  public:
 	UpdateTimer(time_t timeout) : Timer(timeout, Anope::CurTime, true) { }
 
-	void Tick(time_t) anope_override
+	void Tick(time_t) override
 	{
 		Anope::SaveDatabases();
 	}
@@ -58,7 +58,7 @@ class ExpireTimer : public Timer
  public:
 	ExpireTimer(time_t timeout) : Timer(timeout, Anope::CurTime, true) { }
 
-	void Tick(time_t) anope_override
+	void Tick(time_t) override
 	{
 		FOREACH_MOD(OnExpireTick, ());
 	}

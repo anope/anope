@@ -24,7 +24,7 @@ class CommandNSGetEMail : public Command
 		this->SetSyntax(_("\037email\037"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		const Anope::string &email = params[0];
 		int j = 0;
@@ -51,7 +51,7 @@ class CommandNSGetEMail : public Command
 		return;
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");

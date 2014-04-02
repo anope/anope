@@ -20,14 +20,14 @@ struct Exception : Serializable
 	time_t expires;			/* Time when it expires. 0 == no expiry */
 
 	Exception() : Serializable("Exception") { }
-	void Serialize(Serialize::Data &data) const anope_override;
+	void Serialize(Serialize::Data &data) const override;
 	static Serializable* Unserialize(Serializable *obj, Serialize::Data &data);
 };
 
 class SessionService : public Service
 {
  public:
- 	typedef TR1NS::unordered_map<cidr, Session *, cidr::hash> SessionMap;
+ 	typedef std::unordered_map<cidr, Session *, cidr::hash> SessionMap;
 	typedef std::vector<Exception *> ExceptionVector;
 
 	SessionService(Module *m) : Service(m, "SessionService", "session") { }

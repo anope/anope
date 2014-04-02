@@ -10,8 +10,7 @@
  *
  */
 
-#ifndef SERVICE_H
-#define SERVICE_H
+#pragma once
 
 #include "services.h"
 #include "anope.h"
@@ -135,7 +134,7 @@ class ServiceReference : public Reference<T>
 		this->invalid = true;
 	}
 
-	operator bool() anope_override
+	operator bool() override
 	{
 		if (this->invalid)
 		{
@@ -170,6 +169,4 @@ class ServiceAlias
 		Service::DelAlias(t, f);
 	}
 };
-
-#endif // SERVICE_H
 

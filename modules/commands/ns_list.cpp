@@ -20,7 +20,7 @@ class CommandNSList : public Command
 		this->SetSyntax(_("\037pattern\037 [SUSPENDED] [NOEXPIRE] [UNCONFIRMED]"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 
 		Anope::string pattern = params[0];
@@ -132,7 +132,7 @@ class CommandNSList : public Command
 		return;
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -224,12 +224,12 @@ class CommandNSSetPrivate : public Command
 			this->OnSyntaxError(source, "PRIVATE");
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		this->Run(source, source.nc->display, params[0]);
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -252,12 +252,12 @@ class CommandNSSASetPrivate : public CommandNSSetPrivate
 		this->SetSyntax(_("\037nickname\037 {ON | OFF}"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		this->Run(source, params[0], params[1]);
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -288,7 +288,7 @@ class NSList : public Module
 	{
 	}
 
-	void OnNickInfo(CommandSource &source, NickAlias *na, InfoFormatter &info, bool show_all) anope_override
+	void OnNickInfo(CommandSource &source, NickAlias *na, InfoFormatter &info, bool show_all) override
 	{
 		if (!show_all)
 			return;

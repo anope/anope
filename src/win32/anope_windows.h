@@ -42,6 +42,13 @@
 /* VS2008 hates having this define before its own */
 #define vsnprintf _vsnprintf
 
+#define popen _popen
+#define pclose _pclose
+
+#define PATH_MAX MAX_PATH
+
+#define sleep(x) Sleep(x * 1000)
+
 #define anope_close windows_close
 
 #define stat _stat

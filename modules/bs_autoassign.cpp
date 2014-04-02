@@ -16,7 +16,7 @@ class BSAutoAssign : public Module
 	{
 	}
 
-	void OnChanRegistered(ChannelInfo *ci) anope_override
+	void OnChanRegistered(ChannelInfo *ci) override
 	{
 		const Anope::string &bot = Config->GetModule(this)->Get<const Anope::string>("bot");
 		if (bot.empty())

@@ -38,7 +38,7 @@ struct AJoinEntry : Serializable
 		}
 	}
 
-	void Serialize(Serialize::Data &sd) const anope_override
+	void Serialize(Serialize::Data &sd) const override
 	{
 		if (!this->owner)
 			return;
@@ -233,7 +233,7 @@ class CommandNSAJoin : public Command
 		this->SetSyntax(_("LIST [\037nickname\037]"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		const Anope::string &cmd = params[0];
 		Anope::string nick, param, param2;
@@ -285,7 +285,7 @@ class CommandNSAJoin : public Command
 			this->OnSyntaxError(source, "");
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -314,7 +314,7 @@ class NSAJoin : public Module
 
 	}
 
-	void OnUserLogin(User *u) anope_override
+	void OnUserLogin(User *u) override
 	{
 		BotInfo *NickServ = Config->GetClient("NickServ");
 		if (!NickServ)

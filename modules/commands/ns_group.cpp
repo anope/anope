@@ -22,7 +22,7 @@ class NSGroupRequest : public IdentifyRequest
  public:
 	NSGroupRequest(Module *o, CommandSource &src, Command *c, const Anope::string &n, NickAlias *targ, const Anope::string &pass) : IdentifyRequest(o, targ->nc->display, pass), source(src), cmd(c), nick(n), target(targ) { }
 
-	void OnSuccess() anope_override
+	void OnSuccess() override
 	{
 		if (!source.GetUser() || source.GetUser()->nick != nick || !target || !target->nc)
 			return;
@@ -53,7 +53,7 @@ class NSGroupRequest : public IdentifyRequest
 
 	}
 
-	void OnFail() anope_override
+	void OnFail() override
 	{
 		if (!source.GetUser())
 			return;
@@ -80,7 +80,7 @@ class CommandNSGroup : public Command
 		this->RequireUser(true);
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		User *u = source.GetUser();
 
@@ -181,7 +181,7 @@ class CommandNSGroup : public Command
 		}
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -225,7 +225,7 @@ class CommandNSUngroup : public Command
 		this->RequireUser(true);
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		User *u = source.GetUser();
 		Anope::string nick = !params.empty() ? params[0] : "";
@@ -266,7 +266,7 @@ class CommandNSUngroup : public Command
 		}
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -287,7 +287,7 @@ class CommandNSGList : public Command
 		this->SetDesc(_("Lists all nicknames in your group"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		const Anope::string &nick = !params.empty() ? params[0] : "";
 		const NickCore *nc;
@@ -345,7 +345,7 @@ class CommandNSGList : public Command
 		source.Reply(_("%d nickname(s) in the group."), nc->aliases->size());
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		if (source.IsServicesOper())
 			source.Reply(_("Syntax: \002%s [\037nickname\037]\002\n"

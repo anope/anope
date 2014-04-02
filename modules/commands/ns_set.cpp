@@ -20,13 +20,13 @@ class CommandNSSet : public Command
 		this->SetSyntax(_("\037option\037 \037parameters\037"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		this->OnSyntaxError(source, "");
 		return;
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -72,13 +72,13 @@ class CommandNSSASet : public Command
 		this->SetSyntax(_("\037option\037 \037nickname\037 \037parameters\037"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		this->OnSyntaxError(source, "");
 		return;
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -117,7 +117,7 @@ class CommandNSSetPassword : public Command
 		this->SetSyntax(_("\037new-password\037"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		const Anope::string &param = params[1];
 		unsigned len = param.length();
@@ -149,7 +149,7 @@ class CommandNSSetPassword : public Command
 			source.Reply(_("Password for \002%s\002 changed."), source.nc->display.c_str());
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -168,7 +168,7 @@ class CommandNSSASetPassword : public Command
 		this->SetSyntax(_("\037nickname\037 \037new-password\037"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		if (Anope::ReadOnly)
 		{
@@ -212,7 +212,7 @@ class CommandNSSASetPassword : public Command
 			source.Reply(_("Password for \002%s\002 changed."), nc->display.c_str());
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -267,12 +267,12 @@ class CommandNSSetAutoOp : public Command
 			this->OnSyntaxError(source, "AUTOOP");
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		this->Run(source, source.nc->display, params[0]);
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
 		BotInfo *bi = Config->GetClient("ChanServ");
 		this->SendSyntax(source);
@@ -294,12 +294,12 @@ class CommandNSSASetAutoOp : public CommandNSSetAutoOp
 		this->SetSyntax(_("\037nickname\037 {ON | OFF}"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		this->Run(source, params[0], params[1]);
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
 		BotInfo *bi = Config->GetClient("ChanServ");
 		this->SendSyntax(source);
@@ -359,12 +359,12 @@ class CommandNSSetDisplay : public Command
 		source.Reply(NICK_SET_DISPLAY_CHANGED, user_na->nc->display.c_str());
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		this->Run(source, source.nc->display, params[0]);
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -383,12 +383,12 @@ class CommandNSSASetDisplay : public CommandNSSetDisplay
 		this->SetSyntax(_("\037nickname\037 \037new-display\037"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		this->Run(source, params[0], params[1]);
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -498,12 +498,12 @@ class CommandNSSetEmail : public Command
 		}
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		this->Run(source, source.nc->display, params.size() ? params[0] : "");
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -523,12 +523,12 @@ class CommandNSSASetEmail : public CommandNSSetEmail
 		this->SetSyntax(_("\037nickname\037 \037address\037"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		this->Run(source, params[0], params.size() > 1 ? params[1] : "");
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -583,12 +583,12 @@ class CommandNSSetKeepModes : public Command
 			this->OnSyntaxError(source, "");
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		this->Run(source, source.nc->display, params[0]);
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -608,12 +608,12 @@ class CommandNSSASetKeepModes : public CommandNSSetKeepModes
 		this->SetSyntax(_("\037nickname\037 {ON | OFF}"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		this->Run(source, params[0], params[1]);
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -703,12 +703,12 @@ class CommandNSSetKill : public Command
 		return;
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		this->Run(source, source.nc->display, params[0]);
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -737,12 +737,12 @@ class CommandNSSASetKill : public CommandNSSetKill
 		this->SetSyntax(_("\037nickname\037 {ON | QUICK | IMMED | OFF}"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		this->Run(source, params[0], params[1]);
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -810,12 +810,12 @@ class CommandNSSetLanguage : public Command
 		source.Reply(_("Language changed to \002English\002."));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &param) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &param) override
 	{
 		this->Run(source, source.nc->display, param[0]);
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -846,12 +846,12 @@ class CommandNSSASetLanguage : public CommandNSSetLanguage
 		this->SetSyntax(_("\037nickname\037 \037language\037"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		this->Run(source, params[0], params[1]);
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -923,12 +923,12 @@ class CommandNSSetMessage : public Command
 			this->OnSyntaxError(source, "MSG");
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		this->Run(source, source.nc->display, params[0]);
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
 		Anope::string cmd = source.command;
 		size_t i = cmd.find_last_of(' ');
@@ -943,7 +943,7 @@ class CommandNSSetMessage : public Command
 		return true;
 	}
 
-	void OnServHelp(CommandSource &source) anope_override
+	void OnServHelp(CommandSource &source) override
 	{
 		if (!Config->GetBlock("options")->Get<bool>("useprivmsg"))
 			Command::OnServHelp(source);
@@ -959,7 +959,7 @@ class CommandNSSASetMessage : public CommandNSSetMessage
 		this->SetSyntax(_("\037nickname\037 {ON | OFF}"));
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -969,7 +969,7 @@ class CommandNSSASetMessage : public CommandNSSetMessage
 		return true;
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		this->Run(source, params[0], params[1]);
 	}
@@ -1021,12 +1021,12 @@ class CommandNSSetSecure : public Command
 			this->OnSyntaxError(source, "SECURE");
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		this->Run(source, source.nc->display, params[0]);
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -1050,12 +1050,12 @@ class CommandNSSASetSecure : public CommandNSSetSecure
 		this->SetSyntax(_("\037nickname\037 {ON | OFF}"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		this->Run(source, params[0], params[1]);
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -1079,7 +1079,7 @@ class CommandNSSASetNoexpire : public Command
 		this->SetSyntax(_("\037nickname\037 {ON | OFF}"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		if (Anope::ReadOnly)
 		{
@@ -1112,7 +1112,7 @@ class CommandNSSASetNoexpire : public Command
 			this->OnSyntaxError(source, "NOEXPIRE");
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -1163,7 +1163,7 @@ class NSSet : public Module
 	{
 		KeepModes(Module *m, const Anope::string &n) : SerializableExtensibleItem<bool>(m, n) { }
 
-		void ExtensibleSerialize(const Extensible *e, const Serializable *s, Serialize::Data &data) const anope_override
+		void ExtensibleSerialize(const Extensible *e, const Serializable *s, Serialize::Data &data) const override
 		{
 			SerializableExtensibleItem<bool>::ExtensibleSerialize(e, s, data);
 
@@ -1183,7 +1183,7 @@ class NSSet : public Module
 			data["last_modes"] << modes;
 		}
 
-		void ExtensibleUnserialize(Extensible *e, Serializable *s, Serialize::Data &data) anope_override
+		void ExtensibleUnserialize(Extensible *e, Serializable *s, Serialize::Data &data) override
 		{
 			SerializableExtensibleItem<bool>::ExtensibleUnserialize(e, s, data);
 
@@ -1231,7 +1231,7 @@ class NSSet : public Module
 
 	}
 
-	EventReturn OnPreCommand(CommandSource &source, Command *command, std::vector<Anope::string> &params) anope_override
+	EventReturn OnPreCommand(CommandSource &source, Command *command, std::vector<Anope::string> &params) override
 	{
 		NickCore *uac = source.nc;
 
@@ -1254,7 +1254,7 @@ class NSSet : public Module
 		return EVENT_CONTINUE;
 	}
 
-	void OnSetCorrectModes(User *user, Channel *chan, AccessGroup &access, bool &give_modes, bool &take_modes) anope_override
+	void OnSetCorrectModes(User *user, Channel *chan, AccessGroup &access, bool &give_modes, bool &take_modes) override
 	{
 		if (chan->ci)
 		{
@@ -1263,13 +1263,13 @@ class NSSet : public Module
 		}
 	}
 
-	void OnPreNickExpire(NickAlias *na, bool &expire) anope_override
+	void OnPreNickExpire(NickAlias *na, bool &expire) override
 	{
 		if (noexpire.HasExt(na))
 			expire = false;
 	}
 
-	void OnNickInfo(CommandSource &source, NickAlias *na, InfoFormatter &info, bool show_hidden) anope_override
+	void OnNickInfo(CommandSource &source, NickAlias *na, InfoFormatter &info, bool show_hidden) override
 	{
 		if (!show_hidden)
 			return;
@@ -1292,19 +1292,19 @@ class NSSet : public Module
 			info.AddOption(_("Keep modes"));
 	}
 
-	void OnUserModeSet(const MessageSource &setter, User *u, const Anope::string &mname) anope_override
+	void OnUserModeSet(const MessageSource &setter, User *u, const Anope::string &mname) override
 	{
 		if (u->Account() && setter.GetUser() == u)
 			u->Account()->last_modes = u->GetModeList();
 	}
 
-	void OnUserModeUnset(const MessageSource &setter, User *u, const Anope::string &mname) anope_override
+	void OnUserModeUnset(const MessageSource &setter, User *u, const Anope::string &mname) override
 	{
 		if (u->Account() && setter.GetUser() == u)
 			u->Account()->last_modes = u->GetModeList();
 	}
 
-	void OnUserLogin(User *u) anope_override
+	void OnUserLogin(User *u) override
 	{
 		if (keep_modes.HasExt(u->Account()))
 		{

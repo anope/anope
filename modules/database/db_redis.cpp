@@ -27,7 +27,7 @@ class Data : public Serialize::Data
 			delete it->second;
 	}
 
-	std::iostream& operator[](const Anope::string &key) anope_override
+	std::iostream& operator[](const Anope::string &key) override
 	{
 		std::stringstream* &stream = data[key];
 		if (!stream)
@@ -35,7 +35,7 @@ class Data : public Serialize::Data
 		return *stream;
 	}
 
-	std::set<Anope::string> KeySet() const anope_override
+	std::set<Anope::string> KeySet() const override
 	{
 		std::set<Anope::string> keys;
 		for (std::map<Anope::string, std::stringstream *>::const_iterator it = this->data.begin(), it_end = this->data.end(); it != it_end; ++it)
@@ -43,7 +43,7 @@ class Data : public Serialize::Data
 		return keys;
 	}
 
-	size_t Hash() const anope_override
+	size_t Hash() const override
 	{
 		size_t hash = 0;
 		for (std::map<Anope::string, std::stringstream *>::const_iterator it = this->data.begin(), it_end = this->data.end(); it != it_end; ++it)
@@ -59,7 +59,7 @@ class TypeLoader : public Interface
  public:
 	TypeLoader(Module *creator, const Anope::string &t) : Interface(creator), type(t) { }
 
-	void OnResult(const Reply &r) anope_override;
+	void OnResult(const Reply &r) override;
 };
 
 class ObjectLoader : public Interface
@@ -70,7 +70,7 @@ class ObjectLoader : public Interface
  public:
 	ObjectLoader(Module *creator, const Anope::string &t, int64_t i) : Interface(creator), type(t), id(i) { }
 
-	void OnResult(const Reply &r) anope_override;
+	void OnResult(const Reply &r) override;
 };
 
 class IDInterface : public Interface
@@ -79,7 +79,7 @@ class IDInterface : public Interface
  public:
 	IDInterface(Module *creator, Serializable *obj) : Interface(creator), o(obj) { }
 
-	void OnResult(const Reply &r) anope_override;
+	void OnResult(const Reply &r) override;
 };
 
 class Deleter : public Interface
@@ -89,7 +89,7 @@ class Deleter : public Interface
  public:
 	Deleter(Module *creator, const Anope::string &t, int64_t i) : Interface(creator), type(t), id(i) { }
 
-	void OnResult(const Reply &r) anope_override;
+	void OnResult(const Reply &r) override;
 };
 
 class Updater : public Interface
@@ -99,7 +99,7 @@ class Updater : public Interface
  public:
 	Updater(Module *creator, const Anope::string &t, int64_t i) : Interface(creator), type(t), id(i) { }
 
-	void OnResult(const Reply &r) anope_override;
+	void OnResult(const Reply &r) override;
 };
 
 class ModifiedObject : public Interface
@@ -109,7 +109,7 @@ class ModifiedObject : public Interface
  public:
 	ModifiedObject(Module *creator, const Anope::string &t, int64_t i) : Interface(creator), type(t), id(i) { }
 
-	void OnResult(const Reply &r) anope_override;
+	void OnResult(const Reply &r) override;
 };
 
 class SubscriptionListener : public Interface
@@ -117,7 +117,7 @@ class SubscriptionListener : public Interface
  public:
 	SubscriptionListener(Module *creator) : Interface(creator) { }
 
-	void OnResult(const Reply &r) anope_override;
+	void OnResult(const Reply &r) override;
 };
 
 class DatabaseRedis : public Module, public Pipe
@@ -161,7 +161,7 @@ class DatabaseRedis : public Module, public Pipe
 		}
 	}
 
-	void OnNotify() anope_override
+	void OnNotify() override
 	{
 		for (std::set<Serializable *>::iterator it = this->updated_items.begin(), it_end = this->updated_items.end(); it != it_end; ++it)
 		{
@@ -173,13 +173,13 @@ class DatabaseRedis : public Module, public Pipe
 		this->updated_items.clear();
 	}
 
-	void OnReload(Configuration::Conf *conf) anope_override
+	void OnReload(Configuration::Conf *conf) override
 	{
 		Configuration::Block *block = conf->GetModule(this);
 		this->redis = ServiceReference<Provider>("Redis::Provider", block->Get<const Anope::string>("engine", "redis/main"));
 	}
 
-	EventReturn OnLoadDatabase() anope_override
+	EventReturn OnLoadDatabase() override
 	{
 		const std::vector<Anope::string> type_order = Serialize::Type::GetTypeOrder();
 		for (unsigned i = 0; i < type_order.size(); ++i)
@@ -195,7 +195,7 @@ class DatabaseRedis : public Module, public Pipe
 		return EVENT_STOP;
 	}
 
-	void OnSerializeTypeCreate(Serialize::Type *sb) anope_override
+	void OnSerializeTypeCreate(Serialize::Type *sb) override
 	{
 		if (!redis)
 			return;
@@ -207,13 +207,13 @@ class DatabaseRedis : public Module, public Pipe
 		redis->SendCommand(new TypeLoader(this, sb->GetName()), args);
 	}
 
-	void OnSerializableConstruct(Serializable *obj) anope_override
+	void OnSerializableConstruct(Serializable *obj) override
 	{
 		this->updated_items.insert(obj);
 		this->Notify();
 	}
 
-	void OnSerializableDestruct(Serializable *obj) anope_override
+	void OnSerializableDestruct(Serializable *obj) override
 	{
 		Serialize::Type *t = obj->GetSerializableType();
 
@@ -229,7 +229,7 @@ class DatabaseRedis : public Module, public Pipe
 		this->Notify();
 	}
 
-	void OnSerializableUpdate(Serializable *obj) anope_override
+	void OnSerializableUpdate(Serializable *obj) override
 	{
 		this->updated_items.insert(obj);
 		this->Notify();

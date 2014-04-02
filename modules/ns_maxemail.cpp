@@ -55,7 +55,7 @@ class NSMaxEmail : public Module
 	{
 	}
 
-	EventReturn OnPreCommand(CommandSource &source, Command *command, std::vector<Anope::string> &params) anope_override
+	EventReturn OnPreCommand(CommandSource &source, Command *command, std::vector<Anope::string> &params) override
 	{
 		if (source.IsOper())
 			return EVENT_CONTINUE;

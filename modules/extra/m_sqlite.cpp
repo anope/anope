@@ -44,11 +44,11 @@ class SQLiteService : public Provider
 
 	~SQLiteService();
 
-	void Run(Interface *i, const Query &query) anope_override;
+	void Run(Interface *i, const Query &query) override;
 
 	Result RunQuery(const Query &query);
 
-	std::vector<Query> CreateTable(const Anope::string &table, const Data &data) anope_override;
+	std::vector<Query> CreateTable(const Anope::string &table, const Data &data) override;
 
 	Query BuildInsert(const Anope::string &table, unsigned int id, Data &data);
 
@@ -75,7 +75,7 @@ class ModuleSQLite : public Module
 		SQLiteServices.clear();
 	}
 
-	void OnReload(Configuration::Conf *conf) anope_override
+	void OnReload(Configuration::Conf *conf) override
 	{
 		Configuration::Block *config = conf->GetModule(this);
 

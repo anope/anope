@@ -23,7 +23,7 @@ class CommandNSConfirm : public Command
 		this->AllowUnregistered(true);
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		const Anope::string &passcode = params[0];
 
@@ -72,7 +72,7 @@ class CommandNSConfirm : public Command
 		return;
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -90,7 +90,7 @@ class CommandNSConfirm : public Command
 		return true;
 	}
 
-	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand) anope_override
+	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand) override
 	{
 		source.Reply(NICK_CONFIRM_INVALID);
 	}
@@ -109,7 +109,7 @@ class CommandNSRegister : public Command
 		this->AllowUnregistered(true);
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		User *u = source.GetUser();
 		Anope::string u_nick = source.GetNick();
@@ -231,7 +231,7 @@ class CommandNSRegister : public Command
 		}
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -281,7 +281,7 @@ class CommandNSResend : public Command
 		this->SetDesc(_("Resend registration confirmation email"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		if (!Config->GetModule(this->owner)->Get<const Anope::string>("registration").equals_ci("mail"))
 		{
@@ -312,7 +312,7 @@ class CommandNSResend : public Command
 		return;
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		if (!Config->GetModule(this->owner)->Get<const Anope::string>("registration").equals_ci("mail"))
 			return false;
@@ -323,7 +323,7 @@ class CommandNSResend : public Command
 		return true;
 	}
 
-	void OnServHelp(CommandSource &source) anope_override
+	void OnServHelp(CommandSource &source) override
 	{
 		if (Config->GetModule(this->owner)->Get<const Anope::string>("registration").equals_ci("mail"))
 			Command::OnServHelp(source);
@@ -348,7 +348,7 @@ class NSRegister : public Module
 			throw ModuleException("Module " + this->name + " will not load with registration disabled.");
 	}
 
-	void OnNickIdentify(User *u) anope_override
+	void OnNickIdentify(User *u) override
 	{
 		BotInfo *NickServ;
 		if (unconfirmed.HasExt(u->Account()) && (NickServ = Config->GetClient("NickServ")))
@@ -366,7 +366,7 @@ class NSRegister : public Module
 		}
 	}
 
-	void OnPreNickExpire(NickAlias *na, bool &expire) anope_override
+	void OnPreNickExpire(NickAlias *na, bool &expire) override
 	{
 		if (unconfirmed.HasExt(na->nc))
 		{

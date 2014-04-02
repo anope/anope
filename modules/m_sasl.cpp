@@ -17,7 +17,7 @@ class Plain : public Mechanism
  public:
 	Plain(Module *o) : Mechanism(o, "PLAIN") { }
 
-	void ProcessMessage(Session *sess, const SASL::Message &m) anope_override
+	void ProcessMessage(Session *sess, const SASL::Message &m) override
 	{
 		if (m.type == "S")
 		{
@@ -68,12 +68,12 @@ class External : public Mechanism
 			throw ModuleException("No CertFP");
 	}
 
-	Session* CreateSession(const Anope::string &uid) anope_override
+	Session* CreateSession(const Anope::string &uid) override
 	{
 		return new Session(this, uid);
 	}
 
-	void ProcessMessage(SASL::Session *sess, const SASL::Message &m) anope_override
+	void ProcessMessage(SASL::Session *sess, const SASL::Message &m) override
 	{
 		Session *mysess = anope_dynamic_static_cast<Session *>(sess);
 
@@ -120,7 +120,7 @@ class SASLService : public SASL::Service, public Timer
 			delete it->second;
 	}
 
-	void ProcessMessage(const SASL::Message &m) anope_override
+	void ProcessMessage(const SASL::Message &m) override
 	{
 		if (m.target != "*")
 		{
@@ -161,7 +161,7 @@ class SASLService : public SASL::Service, public Timer
 			session->mech->ProcessMessage(session, m);
 	}
 
-	Anope::string GetAgent() anope_override
+	Anope::string GetAgent() override
 	{
 		Anope::string agent = Config->GetModule(Service::owner)->Get<Anope::string>("agent", "NickServ");
 		BotInfo *bi = Config->GetClient(agent);
@@ -170,7 +170,7 @@ class SASLService : public SASL::Service, public Timer
 		return agent;
 	}
 
-	Session* GetSession(const Anope::string &uid) anope_override
+	Session* GetSession(const Anope::string &uid) override
 	{
 		std::map<Anope::string, Session *>::iterator it = sessions.find(uid);
 		if (it != sessions.end())
@@ -178,12 +178,12 @@ class SASLService : public SASL::Service, public Timer
 		return NULL;
 	}
 
-	void RemoveSession(Session *sess) anope_override
+	void RemoveSession(Session *sess) override
 	{
 		sessions.erase(sess->uid);
 	}
 
-	void DeleteSessions(Mechanism *mech, bool da) anope_override
+	void DeleteSessions(Mechanism *mech, bool da) override
 	{
 		for (std::map<Anope::string, Session *>::iterator it = sessions.begin(); it != sessions.end();)
 		{
@@ -197,7 +197,7 @@ class SASLService : public SASL::Service, public Timer
 		}
 	}
 
-	void SendMessage(Session *session, const Anope::string &mtype, const Anope::string &data) anope_override
+	void SendMessage(Session *session, const Anope::string &mtype, const Anope::string &data) override
 	{
 		SASL::Message msg;
 		msg.source = this->GetAgent();
@@ -208,18 +208,18 @@ class SASLService : public SASL::Service, public Timer
 		IRCD->SendSASLMessage(msg);
 	}
 
-	void Succeed(Session *session, NickCore *nc) anope_override
+	void Succeed(Session *session, NickCore *nc) override
 	{
 		IRCD->SendSVSLogin(session->uid, nc->display);
 		this->SendMessage(session, "D", "S");
 	}
 
-	void Fail(Session *session) anope_override
+	void Fail(Session *session) override
 	{
 		this->SendMessage(session, "D", "F");
 	}
 
-	void SendMechs(Session *session) anope_override
+	void SendMechs(Session *session) override
 	{
 		std::vector<Anope::string> mechs = Service::GetServiceKeys("SASL::Mechanism");
 		Anope::string buf;
@@ -229,7 +229,7 @@ class SASLService : public SASL::Service, public Timer
 		this->SendMessage(session, "M", buf.empty() ? "" : buf.substr(1));
 	}
 
-	void Tick(time_t) anope_override
+	void Tick(time_t) override
 	{
 		for (std::map<Anope::string, Session *>::iterator it = sessions.begin(); it != sessions.end();)
 		{

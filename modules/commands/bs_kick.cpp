@@ -31,7 +31,7 @@ struct KickerDataImpl : KickerData
 		dontkickops = dontkickvoices = false;
 	}
 
-	void Check(ChannelInfo *ci) anope_override
+	void Check(ChannelInfo *ci) override
 	{
 		if (amsgs || badwords || bolds || caps || colors || flood || italics || repeat || reverses || underlines)
 			return;
@@ -43,7 +43,7 @@ struct KickerDataImpl : KickerData
 	{
 		ExtensibleItem(Module *m, const Anope::string &ename) : ::ExtensibleItem<KickerDataImpl>(m, ename) { }
 
-		void ExtensibleSerialize(const Extensible *e, const Serializable *s, Serialize::Data &data) const anope_override
+		void ExtensibleSerialize(const Extensible *e, const Serializable *s, Serialize::Data &data) const override
 		{
 			if (s->GetSerializableType()->GetName() != "ChannelInfo")
 				return;
@@ -73,7 +73,7 @@ struct KickerDataImpl : KickerData
 				data["ttb"] << kd->ttb[i] << " ";
 		}
 
-		void ExtensibleUnserialize(Extensible *e, Serializable *s, Serialize::Data &data) anope_override
+		void ExtensibleUnserialize(Extensible *e, Serializable *s, Serialize::Data &data) override
 		{
 			if (s->GetSerializableType()->GetName() != "ChannelInfo")
 				return;
@@ -122,12 +122,12 @@ class CommandBSKick : public Command
 		this->SetSyntax(_("\037option\037 \037channel\037 {\037ON|OFF\037} [\037settings\037]"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		this->OnSyntaxError(source, "");
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -167,9 +167,9 @@ class CommandBSKickBase : public Command
 	{
 	}
 
-	virtual void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override = 0;
+	virtual void Execute(CommandSource &source, const std::vector<Anope::string> &params) override = 0;
 
-	virtual bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override = 0;
+	virtual bool OnHelp(CommandSource &source, const Anope::string &subcommand) override = 0;
 
  protected:
 	bool CheckArguments(CommandSource &source, const std::vector<Anope::string> &params, ChannelInfo* &ci)
@@ -254,7 +254,7 @@ class CommandBSKickAMSG : public CommandBSKickBase
 		this->SetSyntax(_("\037channel\037 {\037ON|OFF\037} [\037ttb\037]"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		ChannelInfo *ci;
 		if (CheckArguments(source, params, ci))
@@ -265,7 +265,7 @@ class CommandBSKickAMSG : public CommandBSKickBase
 		}
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -290,7 +290,7 @@ class CommandBSKickBadwords : public CommandBSKickBase
 		this->SetSyntax(_("\037channel\037 {\037ON|OFF\037} [\037ttb\037]"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		ChannelInfo *ci;
 		if (CheckArguments(source, params, ci))
@@ -302,7 +302,7 @@ class CommandBSKickBadwords : public CommandBSKickBase
 		
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -329,7 +329,7 @@ class CommandBSKickBolds : public CommandBSKickBase
 		this->SetSyntax(_("\037channel\037 {\037ON|OFF\037} [\037ttb\037]"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		ChannelInfo *ci;
 		if (CheckArguments(source, params, ci))
@@ -340,7 +340,7 @@ class CommandBSKickBolds : public CommandBSKickBase
 		}
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -363,7 +363,7 @@ class CommandBSKickCaps : public CommandBSKickBase
 		this->SetSyntax(_("\037channel\037 {\037ON|OFF\037} [\037ttb\037 [\037min\037 [\037percent\037]]]\002"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		ChannelInfo *ci;
 		if (!CheckArguments(source, params, ci))
@@ -431,7 +431,7 @@ class CommandBSKickCaps : public CommandBSKickBase
 		kd->Check(ci);
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -459,7 +459,7 @@ class CommandBSKickColors : public CommandBSKickBase
 		this->SetSyntax(_("\037channel\037 {\037ON|OFF\037} [\037ttb\037]"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		ChannelInfo *ci;
 		if (CheckArguments(source, params, ci))
@@ -470,7 +470,7 @@ class CommandBSKickColors : public CommandBSKickBase
 		}
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -493,7 +493,7 @@ class CommandBSKickFlood : public CommandBSKickBase
 		this->SetSyntax(_("\037channel\037 {\037ON|OFF\037} [\037ttb\037 [\037ln\037 [\037secs\037]]]\002"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		ChannelInfo *ci;
 		if (!CheckArguments(source, params, ci))
@@ -566,7 +566,7 @@ class CommandBSKickFlood : public CommandBSKickBase
 		kd->Check(ci);
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -591,7 +591,7 @@ class CommandBSKickItalics : public CommandBSKickBase
 		this->SetSyntax(_("\037channel\037 {\037ON|OFF\037} [\037ttb\037]"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		ChannelInfo *ci;
 		if (CheckArguments(source, params, ci))
@@ -602,7 +602,7 @@ class CommandBSKickItalics : public CommandBSKickBase
 		}
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -625,7 +625,7 @@ class CommandBSKickRepeat : public CommandBSKickBase
 		this->SetSyntax(_("\037channel\037 {\037ON|OFF\037} [\037ttb\037 [\037num\037]]\002"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		ChannelInfo *ci;
 		if (!CheckArguments(source, params, ci))
@@ -688,7 +688,7 @@ class CommandBSKickRepeat : public CommandBSKickBase
 		kd->Check(ci);
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -713,7 +713,7 @@ class CommandBSKickReverses : public CommandBSKickBase
 		this->SetSyntax(_("\037channel\037 {\037ON|OFF\037} [\037ttb\037]"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		ChannelInfo *ci;
 		if (CheckArguments(source, params, ci))
@@ -724,7 +724,7 @@ class CommandBSKickReverses : public CommandBSKickBase
 		}
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -747,7 +747,7 @@ class CommandBSKickUnderlines : public CommandBSKickBase
 		this->SetSyntax(_("\037channel\037 {\037ON|OFF\037} [\037ttb\037]"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		ChannelInfo *ci;
 		if (CheckArguments(source, params, ci))
@@ -758,7 +758,7 @@ class CommandBSKickUnderlines : public CommandBSKickBase
 		}
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -781,7 +781,7 @@ class CommandBSSetDontKickOps : public Command
 		this->SetSyntax(_("\037channel\037 {ON | OFF}"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		ChannelInfo *ci = ChannelInfo::Find(params[0]);
 		if (ci == NULL)
@@ -826,7 +826,7 @@ class CommandBSSetDontKickOps : public Command
 		kd->Check(ci);
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
 		this->SendSyntax(source);
 		source.Reply(_(" \n"
@@ -846,7 +846,7 @@ class CommandBSSetDontKickVoices : public Command
 		this->SetSyntax(_("\037channel\037 {ON | OFF}"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		ChannelInfo *ci = ChannelInfo::Find(params[0]);
 		if (ci == NULL)
@@ -891,7 +891,7 @@ class CommandBSSetDontKickVoices : public Command
 		kd->Check(ci);
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
 		this->SendSyntax(source);
 		source.Reply(_(" \n"
@@ -978,7 +978,7 @@ class BanDataPurger : public Timer
  public:
 	BanDataPurger(Module *o) : Timer(o, 300, Anope::CurTime, true) { }
 
-	void Tick(time_t) anope_override
+	void Tick(time_t) override
 	{
 		Log(LOG_DEBUG) << "bs_main: Running bandata purger";
 
@@ -1095,7 +1095,7 @@ class BSKick : public Module
 
 	}
 
-	void OnBotInfo(CommandSource &source, BotInfo *bi, ChannelInfo *ci, InfoFormatter &info) anope_override
+	void OnBotInfo(CommandSource &source, BotInfo *bi, ChannelInfo *ci, InfoFormatter &info) override
 	{
 		if (!ci)
 			return;
@@ -1210,7 +1210,7 @@ class BSKick : public Module
 			info.AddOption(_("Voices protection"));
 	}
 
-	void OnPrivmsg(User *u, Channel *c, Anope::string &msg) anope_override
+	void OnPrivmsg(User *u, Channel *c, Anope::string &msg) override
 	{
 		/* Now we can make kicker stuff. We try to order the checks
 		 * from the fastest one to the slowest one, since there's

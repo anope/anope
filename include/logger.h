@@ -10,8 +10,7 @@
  *
  */
 
-#ifndef LOGGER_H
-#define LOGGER_H
+#pragma once
 
 #include "anope.h"
 #include "defs.h"
@@ -136,6 +135,4 @@ class CoreExport LogInfo
 	/* Logs the message l if configured to */
 	void ProcessMessage(const Log *l);
 };
-
-#endif // LOGGER_H
 

@@ -32,7 +32,7 @@ class SXLineDelCallback : public NumberList
 			source.Reply(_("Deleted %d entries from the %s list."), deleted, source.command.c_str());
 	}
 
-	void HandleNumber(unsigned number) anope_override
+	void HandleNumber(unsigned number) override
 	{
 		if (!number)
 			return;
@@ -128,7 +128,7 @@ class CommandOSSXLineBase : public Command
 				{
 				}
 
-				void HandleNumber(unsigned number) anope_override
+				void HandleNumber(unsigned number) override
 				{
 					if (!number)
 						return;
@@ -222,12 +222,12 @@ class CommandOSSXLineBase : public Command
 	{
 	}
 
-	const Anope::string GetDesc(CommandSource &source) const anope_override
+	const Anope::string GetDesc(CommandSource &source) const override
 	{
 		return Anope::printf(Language::Translate(source.GetAccount(), _("Manipulate the %s list")), source.command.upper().c_str());
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		const Anope::string &cmd = params[0];
 
@@ -257,7 +257,7 @@ class CommandOSSNLine : public CommandOSSXLineBase
 		return this->snlines;
 	}
 
-	void OnAdd(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void OnAdd(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		if (!this->xlm())
 			return;
@@ -422,7 +422,7 @@ class CommandOSSNLine : public CommandOSSXLineBase
 		this->SetSyntax("CLEAR");
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -482,7 +482,7 @@ class CommandOSSQLine : public CommandOSSXLineBase
 		return this->sqlines;
 	}
 
-	void OnAdd(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void OnAdd(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		if (!this->xlm())
 			return;
@@ -655,7 +655,7 @@ class CommandOSSQLine : public CommandOSSXLineBase
 		this->SetSyntax("CLEAR");
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");

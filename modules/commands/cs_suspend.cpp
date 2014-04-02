@@ -16,7 +16,7 @@ struct CSSuspendInfo : SuspendInfo, Serializable
 {
 	CSSuspendInfo(Extensible *) : Serializable("CSSuspendInfo") { }
 
-	void Serialize(Serialize::Data &data) const anope_override
+	void Serialize(Serialize::Data &data) const override
 	{
 		data["chan"] << what;
 		data["by"] << by;
@@ -59,7 +59,7 @@ class CommandCSSuspend : public Command
 		this->SetSyntax(_("\037channel\037 [+\037expiry\037] [\037reason\037]"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		const Anope::string &chan = params[0];
 		Anope::string expiry = params[1];
@@ -127,7 +127,7 @@ class CommandCSSuspend : public Command
 		FOREACH_MOD(OnChanSuspend, (ci));
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -152,7 +152,7 @@ class CommandCSUnSuspend : public Command
 		this->SetSyntax(_("\037channel\037"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 
 		if (Anope::ReadOnly)
@@ -184,7 +184,7 @@ class CommandCSUnSuspend : public Command
 		return;
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -208,7 +208,7 @@ class CSSuspend : public Module
 	{
 	}
 
-	void OnChanInfo(CommandSource &source, ChannelInfo *ci, InfoFormatter &info, bool show_hidden) anope_override
+	void OnChanInfo(CommandSource &source, ChannelInfo *ci, InfoFormatter &info, bool show_hidden) override
 	{
 		CSSuspendInfo *si = suspend.Get(ci);
 		if (si)
@@ -225,7 +225,7 @@ class CSSuspend : public Module
 		}
 	}
 
-	void OnPreChanExpire(ChannelInfo *ci, bool &expire) anope_override
+	void OnPreChanExpire(ChannelInfo *ci, bool &expire) override
 	{
 		CSSuspendInfo *si = suspend.Get(ci);
 		if (!si)
@@ -245,7 +245,7 @@ class CSSuspend : public Module
 		}
 	}
 
-	EventReturn OnCheckKick(User *u, Channel *c, Anope::string &mask, Anope::string &reason) anope_override
+	EventReturn OnCheckKick(User *u, Channel *c, Anope::string &mask, Anope::string &reason) override
 	{
 		if (u->HasMode("OPER") || !c->ci || !suspend.HasExt(c->ci))
 			return EVENT_CONTINUE;
@@ -254,7 +254,7 @@ class CSSuspend : public Module
 		return EVENT_STOP;
 	}
 
-	EventReturn OnChanDrop(CommandSource &source, ChannelInfo *ci) anope_override
+	EventReturn OnChanDrop(CommandSource &source, ChannelInfo *ci) override
 	{
 		CSSuspendInfo *si = suspend.Get(ci);
 		if (si && !source.HasCommand("chanserv/drop"))

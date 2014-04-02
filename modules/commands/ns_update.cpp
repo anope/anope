@@ -20,7 +20,7 @@ class CommandNSUpdate : public Command
 		this->RequireUser(true);
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		User *u = source.GetUser();
 		NickAlias *na = NickAlias::Find(u->nick);
@@ -36,7 +36,7 @@ class CommandNSUpdate : public Command
 		source.Reply(_("Status updated (memos, vhost, chmodes, flags)."));
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");

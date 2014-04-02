@@ -28,7 +28,7 @@ struct EntryMsgImpl : EntryMsg, Serializable
 
 	~EntryMsgImpl();
 
-	void Serialize(Serialize::Data &data) const anope_override
+	void Serialize(Serialize::Data &data) const override
 	{
 		data["ci"] << this->chan;
 		data["creator"] << this->creator;
@@ -43,7 +43,7 @@ struct EntryMessageListImpl : EntryMessageList
 {
 	EntryMessageListImpl(Extensible *) { }
 
-	EntryMsg* Create() anope_override
+	EntryMsg* Create() override
 	{
 		return new EntryMsgImpl();
 	}
@@ -197,7 +197,7 @@ class CommandEntryMessage : public Command
 		this->SetSyntax(_("\037channel\037 CLEAR"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		ChannelInfo *ci = ChannelInfo::Find(params[0]);
 		if (ci == NULL)
@@ -232,7 +232,7 @@ class CommandEntryMessage : public Command
 			this->OnSyntaxError(source, "");
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -270,7 +270,7 @@ class CSEntryMessage : public Module
 	{
 	}
 
-	void OnJoinChannel(User *u, Channel *c) anope_override
+	void OnJoinChannel(User *u, Channel *c) override
 	{
 		if (u && c && c->ci && u->server->IsSynced())
 		{

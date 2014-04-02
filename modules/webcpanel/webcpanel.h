@@ -80,7 +80,7 @@ class WebPanelProtectedPage : public WebPanelPage
 	{
 	}
 
-	bool OnRequest(HTTPProvider *provider, const Anope::string &page_name, HTTPClient *client, HTTPMessage &message, HTTPReply &reply) anope_override anope_final
+	bool OnRequest(HTTPProvider *provider, const Anope::string &page_name, HTTPClient *client, HTTPMessage &message, HTTPReply &reply) override final
 	{
 		ServiceReference<Panel> panel("Panel", "webcpanel");
 		NickAlias *na;

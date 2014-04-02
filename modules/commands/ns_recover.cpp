@@ -25,7 +25,7 @@ class NSRecoverRequest : public IdentifyRequest
  public:
 	NSRecoverRequest(Module *o, CommandSource &src, Command *c, const Anope::string &nick, const Anope::string &pass) : IdentifyRequest(o, nick, pass), source(src), cmd(c), user(nick) { }
 
-	void OnSuccess() anope_override
+	void OnSuccess() override
 	{
 		User *u = User::Find(user, true);
 		if (!source.GetUser() || !source.service)
@@ -104,7 +104,7 @@ class NSRecoverRequest : public IdentifyRequest
 		}
 	}
 
-	void OnFail() anope_override
+	void OnFail() override
 	{
 		if (NickAlias::Find(GetAccount()) != NULL)
 		{
@@ -131,7 +131,7 @@ class CommandNSRecover : public Command
 		this->AllowUnregistered(true);
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		const Anope::string &nick = params[0];
 		const Anope::string &pass = params.size() > 1 ? params[1] : "";
@@ -184,7 +184,7 @@ class CommandNSRecover : public Command
 		}
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -213,7 +213,7 @@ class NSRecover : public Module
 
 	}
 
-	void OnUserNickChange(User *u, const Anope::string &oldnick) anope_override
+	void OnUserNickChange(User *u, const Anope::string &oldnick) override
 	{
 		if (Config->GetModule(this)->Get<bool>("restoreonrecover"))
 		{
@@ -236,7 +236,7 @@ class NSRecover : public Module
 		}
 	}
 
-	void OnJoinChannel(User *u, Channel *c) anope_override
+	void OnJoinChannel(User *u, Channel *c) override
 	{
 		if (Config->GetModule(this)->Get<bool>("restoreonrecover"))
 		{

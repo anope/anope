@@ -20,7 +20,7 @@ class CommandHSSet : public Command
 		this->SetSyntax(_("\037nick\037 \037hostmask\037"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		if (Anope::ReadOnly)
 		{
@@ -92,7 +92,7 @@ class CommandHSSet : public Command
 			source.Reply(_("VHost for \002%s\002 set to \002%s\002."), nick.c_str(), host.c_str());
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -126,7 +126,7 @@ class CommandHSSetAll : public Command
 		this->SetSyntax(_("\037nick\037 \037hostmask\037"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		if (Anope::ReadOnly)
 		{
@@ -199,7 +199,7 @@ class CommandHSSetAll : public Command
 			source.Reply(_("VHost for group \002%s\002 set to \002%s\002."), nick.c_str(), host.c_str());
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");

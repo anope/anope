@@ -21,7 +21,7 @@ class CommandNSStatus : public Command
 		this->AllowUnregistered(true);
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		const Anope::string &nick = !params.empty() ? params[0] : source.GetNick();
 		const NickAlias *na = NickAlias::Find(nick);
@@ -48,7 +48,7 @@ class CommandNSStatus : public Command
 		return;
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");

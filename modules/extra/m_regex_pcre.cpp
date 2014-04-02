@@ -33,7 +33,7 @@ class PCRERegexProvider : public RegexProvider
  public:
 	PCRERegexProvider(Module *creator) : RegexProvider(creator, "regex/pcre") { }
 
-	Regex *Compile(const Anope::string &expression) anope_override
+	Regex *Compile(const Anope::string &expression) override
 	{
 		return new PCRERegex(expression);
 	}

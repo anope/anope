@@ -22,13 +22,13 @@ class BotServCore : public Module
 	{
 	}
 
-	void OnReload(Configuration::Conf *conf) anope_override
+	void OnReload(Configuration::Conf *conf) override
 	{
 		const Anope::string &bsnick = conf->GetModule(this)->Get<const Anope::string>("client");
 		BotServ = BotInfo::Find(bsnick, true);
 	}
 
-	void OnSetCorrectModes(User *user, Channel *chan, AccessGroup &access, bool &give_modes, bool &take_modes) anope_override
+	void OnSetCorrectModes(User *user, Channel *chan, AccessGroup &access, bool &give_modes, bool &take_modes) override
 	{
 		/* Do not allow removing bot modes on our service bots */
 		if (chan->ci && chan->ci->bi == user)
@@ -39,7 +39,7 @@ class BotServCore : public Module
 		}
 	}
 
-	void OnBotAssign(User *sender, ChannelInfo *ci, BotInfo *bi) anope_override
+	void OnBotAssign(User *sender, ChannelInfo *ci, BotInfo *bi) override
 	{
 		if (ci->c && ci->c->users.size() >= Config->GetModule(this)->Get<unsigned>("minusers"))
 		{
@@ -48,7 +48,7 @@ class BotServCore : public Module
 		}
 	}
 
-	void OnJoinChannel(User *user, Channel *c) anope_override
+	void OnJoinChannel(User *user, Channel *c) override
 	{
 		if (!Config || !IRCD)
 			return;
@@ -103,7 +103,7 @@ class BotServCore : public Module
 		}
 	}
 
-	void OnLeaveChannel(User *u, Channel *c) anope_override
+	void OnLeaveChannel(User *u, Channel *c) override
 	{
 		/* Channel is persistent, it shouldn't be deleted and the service bot should stay */
 		if (c->ci && persist && persist->HasExt(c->ci))
@@ -124,7 +124,7 @@ class BotServCore : public Module
 			c->ci->bi->Part(c->ci->c);
 	}
 
-	EventReturn OnPreHelp(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	EventReturn OnPreHelp(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		if (!params.empty())
 			return EVENT_CONTINUE;
@@ -159,7 +159,7 @@ class BotServCore : public Module
 		return EVENT_CONTINUE;
 	}
 
-	void OnPostHelp(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void OnPostHelp(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		if (!params.empty() || source.c || source.service != *BotServ)
 			return;
@@ -174,7 +174,7 @@ class BotServCore : public Module
 				"one of the following characters: %s"), fantasycharacters.c_str());
 	}
 
-	EventReturn OnChannelModeSet(Channel *c, MessageSource &source, ChannelMode *mode, const Anope::string &param) anope_override
+	EventReturn OnChannelModeSet(Channel *c, MessageSource &source, ChannelMode *mode, const Anope::string &param) override
 	{
 		if (source.GetUser() && !source.GetBot() && Config->GetModule(this)->Get<bool>("smartjoin") && mode->name == "BAN" && c->ci && c->ci->bi && c->FindUser(c->ci->bi))
 		{
@@ -188,7 +188,7 @@ class BotServCore : public Module
 		return EVENT_CONTINUE;
 	}
 
-	void OnCreateChan(ChannelInfo *ci) anope_override
+	void OnCreateChan(ChannelInfo *ci) override
 	{
 		/* Set default bot flags */
 		spacesepstream sep(Config->GetModule(this)->Get<const Anope::string>("defaults", "greet fantasy"));
@@ -196,7 +196,7 @@ class BotServCore : public Module
 			ci->Extend<bool>("BS_" + token.upper());
 	}
 
-	void OnUserKicked(const MessageSource &source, User *target, const Anope::string &channel, ChannelStatus &status, const Anope::string &kickmsg) anope_override
+	void OnUserKicked(const MessageSource &source, User *target, const Anope::string &channel, ChannelStatus &status, const Anope::string &kickmsg) override
 	{
 		BotInfo *bi = BotInfo::Find(target->nick);
 		if (bi)
@@ -204,7 +204,7 @@ class BotServCore : public Module
 			bi->Join(channel, &status);
 	}
 
-	void OnCreateBot(BotInfo *bi) anope_override
+	void OnCreateBot(BotInfo *bi) override
 	{
 		if (bi->botmodes.empty())
 			bi->botmodes = Config->GetModule(this)->Get<const Anope::string>("botumodes");

@@ -11,8 +11,7 @@
  *
  */
 
-#ifndef MAIL_H
-#define MAIL_H
+#pragma once
 
 #include "anope.h"
 #include "threadengine.h"
@@ -50,9 +49,8 @@ namespace Mail
 		~Message();
 
 		/* Called from within the thread to actually send the mail */
-		void Run() anope_override;
+		void Run() override;
 	};
 
 } // namespace Mail
 
-#endif // MAIL_H

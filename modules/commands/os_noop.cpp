@@ -21,7 +21,7 @@ class CommandOSNOOP : public Command
 		this->SetSyntax(_("REVOKE \037server\037"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		const Anope::string &cmd = params[0];
 		const Anope::string &server = params[1];
@@ -61,7 +61,7 @@ class CommandOSNOOP : public Command
 			this->OnSyntaxError(source, "");
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -85,7 +85,7 @@ class OSNOOP : public Module
 
 	}
 
-	void OnUserModeSet(const MessageSource &, User *u, const Anope::string &mname) anope_override
+	void OnUserModeSet(const MessageSource &, User *u, const Anope::string &mname) override
 	{
 		Anope::string *setter;
 		if (mname == "OPER" && (setter = noop.Get(u->server)))

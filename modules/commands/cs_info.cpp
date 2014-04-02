@@ -21,7 +21,7 @@ class CommandCSInfo : public Command
 		this->AllowUnregistered(true);
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		const Anope::string &chan = params[0];
 
@@ -69,7 +69,7 @@ class CommandCSInfo : public Command
 			source.Reply(replies[i]);
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");

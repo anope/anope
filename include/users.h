@@ -11,8 +11,7 @@
  *
  */
 
-#ifndef USERS_H
-#define USERS_H
+#pragma once
 
 #include "anope.h"
 #include "modes.h"
@@ -191,7 +190,7 @@ class CoreExport User : public virtual Base, public Extensible, public CommandRe
 	 * @param ... any number of parameters
 	 */
 	void SendMessage(BotInfo *source, const char *fmt, ...);
-	void SendMessage(BotInfo *source, const Anope::string &msg) anope_override;
+	void SendMessage(BotInfo *source, const Anope::string &msg) override;
 
 	/** Identify the user to a nick.
 	 * updates last_seen, logs the user in,
@@ -373,4 +372,3 @@ class CoreExport User : public virtual Base, public Extensible, public CommandRe
 	static void QuitUsers();
 };
 
-#endif // USERS_H

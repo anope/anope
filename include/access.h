@@ -10,8 +10,7 @@
  *
  */
 
-#ifndef ACCESS_H
-#define ACCESS_H
+#pragma once
 
 #include "services.h"
 #include "anope.h"
@@ -96,7 +95,7 @@ class CoreExport ChanAccess : public Serializable
 	ChanAccess(AccessProvider *p);
 	virtual ~ChanAccess();
 
-	void Serialize(Serialize::Data &data) const anope_override;
+	void Serialize(Serialize::Data &data) const override;
 	static Serializable* Unserialize(Serializable *obj, Serialize::Data &);
 
 	/** Check if this access entry matches the given user or account
@@ -167,6 +166,4 @@ class CoreExport AccessGroup : public std::vector<ChanAccess *>
 	bool operator>=(const AccessGroup &other) const;
 	bool operator<=(const AccessGroup &other) const;
 };
-
-#endif
 

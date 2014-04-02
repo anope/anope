@@ -42,7 +42,7 @@ class CommandBSInfo : public Command
 		this->SetSyntax(_("{\037channel\037 | \037nickname\037}"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		const Anope::string &query = params[0];
 
@@ -102,7 +102,7 @@ class CommandBSInfo : public Command
 			source.Reply(_("\002%s\002 is not a valid bot or registered channel."), query.c_str());
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -114,7 +114,7 @@ class CommandBSInfo : public Command
 		return true;
 	}
 
-	const Anope::string GetDesc(CommandSource &source) const anope_override
+	const Anope::string GetDesc(CommandSource &source) const override
 	{
 		return Anope::printf(Language::Translate(source.GetAccount(), _("Allows you to see %s information about a channel or a bot")), source.service->nick.c_str());
 	}

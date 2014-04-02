@@ -10,8 +10,7 @@
  *
  */
 
-#ifndef SERIALIZE_H
-#define SERIALIZE_H
+#pragma once
 
 #include <sstream>
 
@@ -333,4 +332,3 @@ class Serialize::Reference : public ReferenceBase
 	}
 };
 
-#endif // SERIALIZE_H

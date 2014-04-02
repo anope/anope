@@ -250,7 +250,7 @@ class MD5Context : public Encryption::Context
 	 * operation, processing another message block, and updating the
 	 * context.
 	 */
-	void Update(const unsigned char *input, size_t len) anope_override
+	void Update(const unsigned char *input, size_t len) override
 	{
 		unsigned i, index, partLen;
 
@@ -285,7 +285,7 @@ class MD5Context : public Encryption::Context
 	/* MD5 finalization. Ends an MD5 message-digest opera
 	 * the message digest and zeroizing the context.
 	 */  
-	void Finalize() anope_override
+	void Finalize() override
 	{
 		unsigned char bits[8];
 		unsigned index, padLen;
@@ -309,7 +309,7 @@ class MD5Context : public Encryption::Context
 		memset(this->buffer, 0, sizeof(this->buffer));
 	}
 
-	Encryption::Hash GetFinalizedHash() anope_override
+	Encryption::Hash GetFinalizedHash() override
 	{
 		Encryption::Hash hash;
 		hash.first = this->digest;
@@ -323,12 +323,12 @@ class MD5Provider : public Encryption::Provider
  public:
  	MD5Provider(Module *creator) : Encryption::Provider(creator, "md5") { }
 
-	Encryption::Context *CreateContext(Encryption::IV *iv) anope_override
+	Encryption::Context *CreateContext(Encryption::IV *iv) override
 	{
 		return new MD5Context(iv);
 	}
 
-	Encryption::IV GetDefaultIV() anope_override
+	Encryption::IV GetDefaultIV() override
 	{
 		Encryption::IV iv;
 		iv.first = md5_iv;
@@ -348,7 +348,7 @@ class EMD5 : public Module
 
 	}
 
-	EventReturn OnEncrypt(const Anope::string &src, Anope::string &dest) anope_override
+	EventReturn OnEncrypt(const Anope::string &src, Anope::string &dest) override
 	{
 		MD5Context context;
 
@@ -364,7 +364,7 @@ class EMD5 : public Module
 		return EVENT_ALLOW;
 	}
 
-	void OnCheckAuthentication(User *, IdentifyRequest *req) anope_override
+	void OnCheckAuthentication(User *, IdentifyRequest *req) override
 	{
 		const NickAlias *na = NickAlias::Find(req->GetAccount());
 		if (na == NULL)

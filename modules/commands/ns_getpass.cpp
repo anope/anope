@@ -20,7 +20,7 @@ class CommandNSGetPass : public Command
 		this->SetSyntax(_("\037nickname\037"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		const Anope::string &nick = params[0];
 		Anope::string tmp_pass;
@@ -43,7 +43,7 @@ class CommandNSGetPass : public Command
 		return;
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");

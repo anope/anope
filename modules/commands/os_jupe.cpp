@@ -20,7 +20,7 @@ class CommandOSJupe : public Command
 		this->SetSyntax(_("\037server\037 [\037reason\037]"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		const Anope::string &jserver = params[0];
 		const Anope::string &reason = params.size() > 1 ? params[1] : "";
@@ -49,7 +49,7 @@ class CommandOSJupe : public Command
 		}
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");

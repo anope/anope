@@ -19,7 +19,7 @@ class NSIdentifyRequest : public IdentifyRequest
  public:
 	NSIdentifyRequest(Module *o, CommandSource &s, Command *c, const Anope::string &acc, const Anope::string &pass) : IdentifyRequest(o, acc, pass), source(s), cmd(c) { }
 
-	void OnSuccess() anope_override
+	void OnSuccess() override
 	{
 		if (!source.GetUser())
 			return;
@@ -40,7 +40,7 @@ class NSIdentifyRequest : public IdentifyRequest
 		}
 	}
 
-	void OnFail() anope_override
+	void OnFail() override
 	{
 		if (source.GetUser())
 		{
@@ -68,7 +68,7 @@ class CommandNSIdentify : public Command
 		this->RequireUser(true);
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		User *u = source.GetUser();
 
@@ -89,7 +89,7 @@ class CommandNSIdentify : public Command
 		return;
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");

@@ -20,7 +20,7 @@ class MySSLService : public SSLService
 	/** Initialize a socket to use SSL
 	 * @param s The socket
 	 */
-	void Init(Socket *s) anope_override;
+	void Init(Socket *s) override;
 };
 
 class SSLSocketIO : public SocketIO
@@ -39,43 +39,43 @@ class SSLSocketIO : public SocketIO
 	 * @param sz How much to read
 	 * @return Number of bytes received
 	 */
-	int Recv(Socket *s, char *buf, size_t sz) anope_override;
+	int Recv(Socket *s, char *buf, size_t sz) override;
 
 	/** Write something to the socket
 	 * @param s The socket
 	 * @param buf The data to write
 	 * @param size The length of the data
 	 */
-	int Send(Socket *s, const char *buf, size_t sz) anope_override;
+	int Send(Socket *s, const char *buf, size_t sz) override;
 
 	/** Accept a connection from a socket
 	 * @param s The socket
 	 * @return The new socket
 	 */
-	ClientSocket *Accept(ListenSocket *s) anope_override;
+	ClientSocket *Accept(ListenSocket *s) override;
 
 	/** Finished accepting a connection from a socket
 	 * @param s The socket
 	 * @return SF_ACCEPTED if accepted, SF_ACCEPTING if still in process, SF_DEAD on error
 	 */
-	SocketFlag FinishAccept(ClientSocket *cs) anope_override;
+	SocketFlag FinishAccept(ClientSocket *cs) override;
 
 	/** Connect the socket
 	 * @param s THe socket
 	 * @param target IP to connect to
 	 * @param port to connect to
 	 */
-	void Connect(ConnectionSocket *s, const Anope::string &target, int port) anope_override;
+	void Connect(ConnectionSocket *s, const Anope::string &target, int port) override;
 
 	/** Called to potentially finish a pending connection
 	 * @param s The socket
 	 * @return SF_CONNECTED on success, SF_CONNECTING if still pending, and SF_DEAD on error.
 	 */
-	SocketFlag FinishConnect(ConnectionSocket *s) anope_override;
+	SocketFlag FinishConnect(ConnectionSocket *s) override;
 
 	/** Called when the socket is destructing
 	 */
-	void Destroy() anope_override;
+	void Destroy() override;
 };
 
 class SSLModule;
@@ -125,7 +125,7 @@ class SSLModule : public Module
 		SSL_CTX_free(server_ctx);
 	}
 
-	void OnReload(Configuration::Conf *conf) anope_override
+	void OnReload(Configuration::Conf *conf) override
 	{
 		Configuration::Block *config = conf->GetModule(this);
 
@@ -159,7 +159,7 @@ class SSLModule : public Module
 
 	}
 
-	void OnPreServerConnect() anope_override
+	void OnPreServerConnect() override
 	{
 		Configuration::Block *config = Config->GetBlock("uplink", Anope::CurrentUplink);
 

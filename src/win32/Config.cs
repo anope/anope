@@ -27,14 +27,12 @@ namespace Config
 {
 	class Config
 	{
-		static string ExecutablePath, InstallDirectory, VSVersion, VSShortVer, ExtraIncludeDirs, ExtraLibDirs, ExtraArguments;
+		static string ExecutablePath, InstallDirectory, ExtraIncludeDirs, ExtraLibDirs, ExtraArguments;
 		static bool UseNMake = true, BuildDebug = false;
 
 		static bool CheckResponse(string InstallerResponse)
 		{
-			if (string.Compare(InstallerResponse, "yes", true) == 0 || string.Compare(InstallerResponse, "y", true) == 0)
-				return true;
-			return false;
+			return string.Compare(InstallerResponse, "yes", true) == 0 || string.Compare(InstallerResponse, "y", true) == 0;
 		}
 
 		static bool LoadCache()
@@ -62,10 +60,6 @@ namespace Config
 						ExtraLibDirs = value;
 					else if (name == "EXTRAARGS")
 						ExtraArguments = value;
-					else if (name == "VSVERSION")
-						VSVersion = value;
-					else if (name == "VSSHORTVER")
-						VSShortVer = value;
 				}
 
 				return true;
@@ -87,8 +81,6 @@ namespace Config
 				tw.WriteLine("EXTRAINCLUDE={0}", ExtraIncludeDirs);
 				tw.WriteLine("EXTRALIBS={0}", ExtraLibDirs);
 				tw.WriteLine("EXTRAARGS={0}", ExtraArguments);
-				tw.WriteLine("VSVERSION={0}", VSVersion);
-				tw.WriteLine("VSSHORTVER={0}", VSShortVer);
 			}
 		}
 
@@ -103,18 +95,15 @@ namespace Config
 					Console.Write("[{0}] ", UseNMake ? "yes" : "no");
 					return UseNMake ? "yes" : "no";
 				case 2:
-					Console.Write("[{0}] ", VSShortVer);
-					return VSShortVer;
-				case 3:
 					Console.Write("[{0}] ", BuildDebug ? "yes" : "no");
 					return BuildDebug ? "yes" : "no";
-				case 4:
+				case 3:
 					Console.Write("[{0}] ", ExtraIncludeDirs);
 					return ExtraIncludeDirs;
-				case 5:
+				case 4:
 					Console.Write("[{0}] ", ExtraLibDirs);
 					return ExtraLibDirs;
-				case 6:
+				case 5:
 					Console.Write("[{0}] ", ExtraArguments);
 					return ExtraArguments;
 				default:
@@ -247,15 +236,14 @@ namespace Config
 			if (!DoQuick)
 			{
 				List<string> InstallerQuestions = new List<string>()
-			{
-				"Where do you want Anope to be installed?",
-				"Would you like to build using NMake instead of using Visual Studio?\r\nNOTE: If you decide to use NMake, you must be in an environment where\r\nNMake can function, such as the Visual Studio command line. If you say\r\nyes to this while not in an environment that can run NMake, it can\r\ncause the CMake configuration to enter an endless loop. [y/n]",
-				"Are you using Visual Studio 2008, 2010, or 2012? You can leave this blank\nand have CMake try and auto detect it, but this usually doesn't\nwork correctly. [2008/2010/2012]",
-				"Would you like to build a debug version of Anope? [y/n]",
-				"Are there any extra include directories you wish to use?\nYou may only need to do this if CMake is unable to locate missing dependencies without hints.\nSeparate directories with semicolons and use slashes (aka /) instead of backslashes (aka \\).\nIf you need no extra include directories, enter NONE in all caps.",
-				"Are there any extra library directories you wish to use?\nYou may only need to do this if CMake is unable to locate missing dependencies without hints.\nSeparate directories with semicolons and use slashes (aka /) instead of backslashes (aka \\).\nIf you need no extra library directories, enter NONE in all caps.",
-				"Are there any extra arguments you wish to pass to CMake?\nIf you need no extra arguments to CMake, enter NONE in all caps."
-			};
+				{
+					"Where do you want Anope to be installed?",
+					"Would you like to build using NMake instead of using Visual Studio? [y/n]",
+					"Would you like to build a debug version of Anope? [y/n]",
+					"Are there any extra include directories you wish to use?\nYou may only need to do this if CMake is unable to locate missing dependencies without hints.\nSeparate directories with semicolons and use slashes (aka /) instead of backslashes (aka \\).\nIf you need no extra include directories, enter NONE in all caps.",
+					"Are there any extra library directories you wish to use?\nYou may only need to do this if CMake is unable to locate missing dependencies without hints.\nSeparate directories with semicolons and use slashes (aka /) instead of backslashes (aka \\).\nIf you need no extra library directories, enter NONE in all caps.",
+					"Are there any extra arguments you wish to pass to CMake?\nIf you need no extra arguments to CMake, enter NONE in all caps."
+				};
 
 				for (int i = 0; i < InstallerQuestions.Count; ++i)
 				{
@@ -269,8 +257,8 @@ namespace Config
 					if (!string.IsNullOrWhiteSpace(CacheResponse) && string.IsNullOrWhiteSpace(InstallerResponse))
 						InstallerResponse = CacheResponse;
 
-					// Question 5-7 are optional
-					if (i < 4 && string.IsNullOrWhiteSpace(InstallerResponse))
+					// Question 4-6 are optional
+					if (i < 3 && string.IsNullOrWhiteSpace(InstallerResponse))
 					{
 						Console.WriteLine("Invalid option");
 						--i;
@@ -305,42 +293,23 @@ namespace Config
 							break;
 						case 1:
 							UseNMake = CheckResponse(InstallerResponse);
-							if (UseNMake)
-								++i;
 							break;
 						case 2:
-							if (InstallerResponse == "2012")
-							{
-								VSVersion = "-G\"Visual Studio 11\" ";
-								VSShortVer = "2012";
-							}
-							else if (InstallerResponse == "2010")
-							{
-								VSVersion = "-G\"Visual Studio 10\" ";
-								VSShortVer = "2010";
-							}
-							else if (InstallerResponse == "2008")
-							{
-								VSVersion = "-G\"Visual Studio 9 2008\" ";
-								VSShortVer = "2008";
-							}
-							break;
-						case 3:
 							BuildDebug = CheckResponse(InstallerResponse);
 							break;
-						case 4:
+						case 3:
 							if (InstallerResponse == "NONE")
 								ExtraIncludeDirs = null;
 							else
 								ExtraIncludeDirs = InstallerResponse;
 							break;
-						case 5:
+						case 4:
 							if (InstallerResponse == "NONE")
 								ExtraLibDirs = null;
 							else
 								ExtraLibDirs = InstallerResponse;
 							break;
-						case 6:
+						case 5:
 							if (InstallerResponse == "NONE")
 								ExtraArguments = null;
 							else
@@ -354,11 +323,7 @@ namespace Config
 
 			Console.WriteLine("Anope will be compiled with the following options:");
 			Console.WriteLine("Install directory: {0}", InstallDirectory);
-			Console.WriteLine("Use NMake: {0}", UseNMake ? "Yes" : "No");
-			if (!string.IsNullOrWhiteSpace(VSShortVer))
-				Console.WriteLine("Using Visual Studio: {0}", VSShortVer);
-			else
-				Console.WriteLine("Using Visual Studio: No");
+			Console.WriteLine("Generator: {0}", UseNMake ? "nmake" : "Visual Studio");
 			Console.WriteLine("Build debug: {0}", BuildDebug ? "Yes" : "No");
 			Console.WriteLine("Anope Version: {0}", AnopeVersion);
 			Console.WriteLine("Extra Include Directories: {0}", ExtraIncludeDirs);
@@ -383,9 +348,9 @@ namespace Config
 				ExtraArguments = "";
 
 			InstallDirectory = "-DINSTDIR:STRING=\"" + InstallDirectory.Replace('\\', '/') + "\" ";
-			string NMake = UseNMake ? "-G\"NMake Makefiles\" " : "";
-			string Debug = BuildDebug ? "-DCMAKE_BUILD_TYPE:STRING=DEBUG " : "-DCMAKE_BUILD_TYPE:STRING=RELEASE ";
-			string cMake = InstallDirectory + NMake + Debug + VSVersion + ExtraIncludeDirs + ExtraLibDirs + ExtraArguments + "\"" + ExecutablePath.Replace('\\', '/') + "\"";
+			string Generator = UseNMake ? "-G\"NMake Makefiles\" " : "-G \"Visual Studio 11\" ";
+			string Debug = "-DCMAKE_BUILD_TYPE:STRING=" + (BuildDebug ? "DEBUG" : "RELEASE") + " ";
+			string cMake = InstallDirectory + Generator + Debug + ExtraIncludeDirs + ExtraLibDirs + ExtraArguments + "\"" + ExecutablePath.Replace('\\', '/') + "\"";
 			RunCMake(cMake);
 
 			return 0;

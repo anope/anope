@@ -26,7 +26,7 @@ class XOPChanAccess : public ChanAccess
 	{
 	}
 
-	bool HasPriv(const Anope::string &priv) const anope_override
+	bool HasPriv(const Anope::string &priv) const override
 	{
 		for (std::vector<Anope::string>::iterator it = std::find(order.begin(), order.end(), this->type); it != order.end(); ++it)
 		{
@@ -42,7 +42,7 @@ class XOPChanAccess : public ChanAccess
 		return this->type;
 	}
 
-	void AccessUnserialize(const Anope::string &data) anope_override
+	void AccessUnserialize(const Anope::string &data) override
 	{
 		this->type = data;
 	}
@@ -88,7 +88,7 @@ class XOPAccessProvider : public AccessProvider
 	{
 	}
 
-	ChanAccess *Create() anope_override
+	ChanAccess *Create() override
 	{
 		return new XOPChanAccess(this);
 	}
@@ -308,7 +308,7 @@ class CommandCSXOP : public Command
 					}
 				}
 
-				void HandleNumber(unsigned number) anope_override
+				void HandleNumber(unsigned number) override
 				{
 					if (!number || number > ci->GetAccessCount())
 						return;
@@ -393,7 +393,7 @@ class CommandCSXOP : public Command
 				{
 				}
 
-				void HandleNumber(unsigned Number) anope_override
+				void HandleNumber(unsigned Number) override
 				{
 					if (!Number || Number > ci->GetAccessCount())
 						return;
@@ -489,7 +489,7 @@ class CommandCSXOP : public Command
 		this->SetSyntax(_("\037channel\037 CLEAR"));
 	}
 
- 	const Anope::string GetDesc(CommandSource &source) const anope_override
+ 	const Anope::string GetDesc(CommandSource &source) const override
 	{
 		return Anope::printf(Language::Translate(source.GetAccount(), _("Modify the list of %s users")), source.command.upper().c_str());
 	}
@@ -518,7 +518,7 @@ class CommandCSXOP : public Command
 	}
 
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		const Anope::string &cmd = source.command.upper();
 
@@ -600,7 +600,7 @@ class CSXOP : public Module
 
 	}
 
-	void OnReload(Configuration::Conf *conf) anope_override
+	void OnReload(Configuration::Conf *conf) override
 	{
 		order.clear();
 		permissions.clear();

@@ -30,7 +30,7 @@ struct HostRequest : Serializable
 
 	HostRequest(Extensible *) : Serializable("HostRequest") { }
 
-	void Serialize(Serialize::Data &data) const anope_override
+	void Serialize(Serialize::Data &data) const override
 	{
 		data["nick"] << this->nick;
 		data["ident"] << this->ident;
@@ -80,7 +80,7 @@ class CommandHSRequest : public Command
 		this->SetSyntax(_("vhost"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		if (Anope::ReadOnly)
 		{
@@ -167,7 +167,7 @@ class CommandHSRequest : public Command
 		Log(LOG_COMMAND, source, this) << "to request new vhost " << (!user.empty() ? user + "@" : "") << host;
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -187,7 +187,7 @@ class CommandHSActivate : public Command
 		this->SetSyntax(_("\037nick\037"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		if (Anope::ReadOnly)
 		{
@@ -215,7 +215,7 @@ class CommandHSActivate : public Command
 			source.Reply(_("No request for nick %s found."), nick.c_str());
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -236,7 +236,7 @@ class CommandHSReject : public Command
 		this->SetSyntax(_("\037nick\037 [\037reason\037]"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		if (Anope::ReadOnly)
 		{
@@ -271,7 +271,7 @@ class CommandHSReject : public Command
 			source.Reply(_("No request for nick %s found."), nick.c_str());
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -291,7 +291,7 @@ class CommandHSWaiting : public Command
 		this->SetDesc(_("Retrieves the vhost requests"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		unsigned counter = 0;
 		unsigned display_counter = 0, listmax = Config->GetModule(this->owner)->Get<unsigned>("listmax");
@@ -332,7 +332,7 @@ class CommandHSWaiting : public Command
 		source.Reply(_("Displayed \002%d\002 records (\002%d\002 total)."), display_counter, counter);
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");

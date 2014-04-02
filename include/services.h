@@ -10,8 +10,7 @@
  *
  */
 
-#ifndef SERVICES_H
-#define SERVICES_H
+#pragma once
 
 #include "sysconf.h"
 
@@ -20,12 +19,10 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstdarg>
+#include <cstdint>
 #include <stdexcept>
 
 #include <string.h>
-#if HAVE_STRINGS_H
-# include <strings.h>
-#endif
 
 #ifndef _WIN32
 #include <unistd.h>
@@ -49,14 +46,6 @@
 
 #define _(x) x
 
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
-# define anope_override override
-# define anope_final final
-#else
-# define anope_override
-# define anope_final
-#endif
-
 #ifndef _WIN32
 # define DllExport
 # define CoreExport
@@ -66,4 +55,3 @@
 # include "anope_windows.h"
 #endif
 
-#endif // SERVICES_H

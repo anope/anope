@@ -14,7 +14,7 @@ class XMLRPCIdentifyRequest : public IdentifyRequest
  public:
 	XMLRPCIdentifyRequest(Module *m, XMLRPCRequest& req, HTTPClient *c, XMLRPCServiceInterface* iface, const Anope::string &acc, const Anope::string &pass) : IdentifyRequest(m, acc, pass), request(req), repl(request.r), client(c), xinterface(iface) { }
 
-	void OnSuccess() anope_override
+	void OnSuccess() override
 	{
 		if (!xinterface || !client)
 			return;
@@ -28,7 +28,7 @@ class XMLRPCIdentifyRequest : public IdentifyRequest
 		client->SendReply(&request.r);
 	}
 
-	void OnFail() anope_override
+	void OnFail() override
 	{
 		if (!xinterface || !client)
 			return;
@@ -45,7 +45,7 @@ class XMLRPCIdentifyRequest : public IdentifyRequest
 class MyXMLRPCEvent : public XMLRPCEvent
 {
  public:
-	bool Run(XMLRPCServiceInterface *iface, HTTPClient *client, XMLRPCRequest &request) anope_override
+	bool Run(XMLRPCServiceInterface *iface, HTTPClient *client, XMLRPCRequest &request) override
 	{
 		if (request.name == "command")
 			this->DoCommand(iface, client, request);
@@ -91,7 +91,7 @@ class MyXMLRPCEvent : public XMLRPCEvent
 
 					XMLRPCommandReply(Anope::string &s) : str(s) { }
 
-					void SendMessage(BotInfo *, const Anope::string &msg) anope_override
+					void SendMessage(BotInfo *, const Anope::string &msg) override
 					{
 						str += msg + "\n";
 					};

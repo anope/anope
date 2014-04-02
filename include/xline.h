@@ -7,8 +7,7 @@
  *
  */
 
-#ifndef XLINE_H
-#define XLINE_H
+#pragma once
 
 #include "serialize.h"
 #include "service.h"
@@ -42,7 +41,7 @@ class CoreExport XLine : public Serializable
 	bool HasNickOrReal() const;
 	bool IsRegex() const;
 
-	void Serialize(Serialize::Data &data) const anope_override;
+	void Serialize(Serialize::Data &data) const override;
 	static Serializable* Unserialize(Serializable *obj, Serialize::Data &data);
 };
 
@@ -177,4 +176,3 @@ class CoreExport XLineManager : public Service
 	virtual void SendDel(XLine *x) = 0;
 };
 
-#endif // XLINE_H

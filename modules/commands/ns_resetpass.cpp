@@ -23,7 +23,7 @@ class CommandNSResetPass : public Command
 		this->AllowUnregistered(true);
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		const NickAlias *na;
 
@@ -43,7 +43,7 @@ class CommandNSResetPass : public Command
 		return;
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -73,7 +73,7 @@ class NSResetPass : public Module
 			throw ModuleException("Not using mail.");
 	}
 
-	EventReturn OnPreCommand(CommandSource &source, Command *command, std::vector<Anope::string> &params) anope_override
+	EventReturn OnPreCommand(CommandSource &source, Command *command, std::vector<Anope::string> &params) override
 	{
 		if (command->name == "nickserv/confirm" && params.size() > 1)
 		{

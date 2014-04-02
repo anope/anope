@@ -10,8 +10,7 @@
  *
  */
 
-#ifndef TIMERS_H
-#define TIMERS_H
+#pragma once
 
 #include "anope.h"
 
@@ -129,4 +128,3 @@ class CoreExport TimerManager
 	static void DeleteTimersFor(Module *m);
 };
 
-#endif // TIMERS_H

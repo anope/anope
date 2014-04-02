@@ -20,7 +20,7 @@ class CommandCSDrop : public Command
 		this->SetSyntax(_("\037channel\037 \037channel\037"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		const Anope::string &chan = params[0];
 
@@ -66,7 +66,7 @@ class CommandCSDrop : public Command
 			c->CheckModes();
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");

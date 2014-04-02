@@ -48,7 +48,7 @@ class DHBS : public Mechanism
 
 	DH* dh_params;
 	const size_t keysize;
-	SASL::Session* CreateSession(const Anope::string &uid) anope_override
+	SASL::Session* CreateSession(const Anope::string &uid) override
 	{
 		return new DHBSSession(this, uid, dh_params);
 	}
@@ -70,7 +70,7 @@ class DHBS : public Mechanism
 		DH_free(dh_params);
 	}
 
-	void ProcessMessage(SASL::Session *session, const SASL::Message &m) anope_override
+	void ProcessMessage(SASL::Session *session, const SASL::Message &m) override
 	{
 		DHBSSession *sess = anope_dynamic_static_cast<DHBSSession *>(session);
 

@@ -42,7 +42,7 @@ struct NSMiscData : MiscData, Serializable
 		data = d;
 	}
 
-	void Serialize(Serialize::Data &sdata) const anope_override
+	void Serialize(Serialize::Data &sdata) const override
 	{
 		sdata["nc"] << this->object;
 		sdata["name"] << this->name;
@@ -135,12 +135,12 @@ class CommandNSSetMisc : public Command
 		}
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		this->Run(source, source.nc->display, !params.empty() ? params[0] : "");
 	}
 
-	void OnServHelp(CommandSource &source) anope_override
+	void OnServHelp(CommandSource &source) override
 	{
 		if (descriptions.count(source.command))
 		{
@@ -149,7 +149,7 @@ class CommandNSSetMisc : public Command
 		}
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		if (descriptions.count(source.command))
 		{
@@ -169,7 +169,7 @@ class CommandNSSASetMisc : public CommandNSSetMisc
 		this->SetSyntax(_("\037nickname\037 [\037parameter\037]"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		this->Run(source, params[0], params.size() > 1 ? params[1] : "");
 	}
@@ -194,7 +194,7 @@ class NSSetMisc : public Module
 			delete it->second;
 	}
 
-	void OnReload(Configuration::Conf *conf) anope_override
+	void OnReload(Configuration::Conf *conf) override
 	{
 		descriptions.clear();
 
@@ -217,7 +217,7 @@ class NSSetMisc : public Module
 		}
 	}
 
-	void OnNickInfo(CommandSource &source, NickAlias *na, InfoFormatter &info, bool) anope_override
+	void OnNickInfo(CommandSource &source, NickAlias *na, InfoFormatter &info, bool) override
 	{
 		for (Anope::map<ExtensibleItem<NSMiscData> *>::iterator it = items.begin(); it != items.end(); ++it)
 		{

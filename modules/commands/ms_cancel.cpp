@@ -20,7 +20,7 @@ class CommandMSCancel : public Command
 		this->SetSyntax(_("{\037nick\037 | \037channel\037}"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		if (Anope::ReadOnly)
 		{
@@ -57,7 +57,7 @@ class CommandMSCancel : public Command
 		return;
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");

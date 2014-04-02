@@ -7,8 +7,7 @@
  *
  */
 
-#ifndef CHANNELS_H
-#define CHANNELS_H
+#pragma once
 
 #include "anope.h"
 #include "extensible.h"
@@ -301,4 +300,3 @@ class CoreExport Channel : public Base, public Extensible
 	static Channel *FindOrCreate(const Anope::string &name, bool &created, time_t ts = Anope::CurTime);
 };
 
-#endif // CHANNELS_H

@@ -203,7 +203,7 @@ class CommandCSAKick : public Command
 						source.Reply(_("Deleted %d entries from %s autokick list."), deleted, ci->name.c_str());
 				}
 
-				void HandleNumber(unsigned number) anope_override
+				void HandleNumber(unsigned number) override
 				{
 					if (!number || number > ci->GetAkickCount())
 						return;
@@ -268,7 +268,7 @@ class CommandCSAKick : public Command
 				{
 				}
 
-				void HandleNumber(unsigned number) anope_override
+				void HandleNumber(unsigned number) override
 				{
 					if (!number || number > ci->GetAkickCount())
 						return;
@@ -428,7 +428,7 @@ class CommandCSAKick : public Command
 		this->SetSyntax(_("\037channel\037 CLEAR"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		Anope::string chan = params[0];
 		Anope::string cmd = params[1];
@@ -465,7 +465,7 @@ class CommandCSAKick : public Command
 		return;
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		BotInfo *bi = Config->GetClient("NickServ");
 		this->SendSyntax(source);
@@ -518,7 +518,7 @@ class CSAKick : public Module
 	{
 	}
 
-	EventReturn OnCheckKick(User *u, Channel *c, Anope::string &mask, Anope::string &reason) anope_override
+	EventReturn OnCheckKick(User *u, Channel *c, Anope::string &mask, Anope::string &reason) override
 	{
 		if (!c->ci || c->MatchesList(u, "EXCEPT"))
 			return EVENT_CONTINUE;

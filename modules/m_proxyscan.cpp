@@ -29,12 +29,12 @@ class ProxyCallbackListener : public ListenSocket
 		{
 		}
 
-		void OnAccept() anope_override
+		void OnAccept() override
 		{
 			this->Write(ProxyCheckString);
 		}
 
-		bool ProcessWrite() anope_override
+		bool ProcessWrite() override
 		{
 			return !BufferedSocket::ProcessWrite() || this->write_buffer.empty() ? false : true;
 		}
@@ -45,7 +45,7 @@ class ProxyCallbackListener : public ListenSocket
 	{
 	}
 
-	ClientSocket *OnAccept(int fd, const sockaddrs &addr) anope_override
+	ClientSocket *OnAccept(int fd, const sockaddrs &addr) override
 	{
 		return new ProxyCallbackClient(this, fd, addr);
 	}
@@ -73,7 +73,7 @@ class ProxyConnect : public ConnectionSocket
 		proxies.erase(this);
 	}
 
-	virtual void OnConnect() anope_override = 0;
+	virtual void OnConnect() override = 0;
 	virtual const Anope::string GetType() const = 0;
 
  protected:
@@ -113,7 +113,7 @@ class HTTPProxyConnect : public ProxyConnect, public BufferedSocket
 	{
 	}
 
-	void OnConnect() anope_override
+	void OnConnect() override
 	{
 		this->Write("CONNECT %s:%d HTTP/1.0", target_ip.c_str(), target_port);
 		this->Write("Content-length: 0");
@@ -121,12 +121,12 @@ class HTTPProxyConnect : public ProxyConnect, public BufferedSocket
 		this->Write("");
 	}
 
-	const Anope::string GetType() const anope_override
+	const Anope::string GetType() const override
 	{
 		return "HTTP";
 	}
 
-	bool ProcessRead() anope_override
+	bool ProcessRead() override
 	{
 		bool b = BufferedSocket::ProcessRead();
 		if (this->GetLine() == ProxyCheckString)
@@ -145,7 +145,7 @@ class SOCKS5ProxyConnect : public ProxyConnect, public BinarySocket
 	{
 	}
 
-	void OnConnect() anope_override
+	void OnConnect() override
 	{
 		sockaddrs target_addr;
 		char buf[4 + sizeof(target_addr.sa4.sin_addr.s_addr) + sizeof(target_addr.sa4.sin_port)];
@@ -172,12 +172,12 @@ class SOCKS5ProxyConnect : public ProxyConnect, public BinarySocket
 		this->Write(buf, ptr);
 	}
 
-	const Anope::string GetType() const anope_override
+	const Anope::string GetType() const override
 	{
 		return "SOCKS5";
 	}
 
-	bool Read(const char *buffer, size_t l) anope_override
+	bool Read(const char *buffer, size_t l) override
 	{
 		if (l >= ProxyCheckString.length() && !strncmp(buffer, ProxyCheckString.c_str(), ProxyCheckString.length()))
 		{
@@ -204,7 +204,7 @@ class ModuleProxyScan : public Module
 		{
 		}
 
-		void Tick(time_t) anope_override
+		void Tick(time_t) override
 		{
 			for (std::set<ProxyConnect *>::iterator it = ProxyConnect::proxies.begin(), it_end = ProxyConnect::proxies.end(); it != it_end; ++it)
 			{
@@ -247,7 +247,7 @@ class ModuleProxyScan : public Module
 		delete this->listener;
 	}
 
-	void OnReload(Configuration::Conf *conf) anope_override
+	void OnReload(Configuration::Conf *conf) override
 	{
 		Configuration::Block *config = Config->GetModule(this);
 
@@ -327,7 +327,7 @@ class ModuleProxyScan : public Module
 		}
 	}
 
-	void OnUserConnect(User *user, bool &exempt) anope_override
+	void OnUserConnect(User *user, bool &exempt) override
 	{
 		if (exempt || user->Quitting() || !Me->IsSynced() || !user->server->IsSynced())
 			return;

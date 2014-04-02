@@ -25,7 +25,7 @@ class CommandMSSend : public Command
 		this->SetSyntax(_("{\037nick\037 | \037channel\037} \037memo-text\037"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		if (!memoserv)
 			return;
@@ -50,7 +50,7 @@ class CommandMSSend : public Command
 			source.Reply(_("Sorry, %s currently has too many memos and cannot receive more."), nick.c_str());
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");

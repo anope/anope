@@ -61,7 +61,7 @@ struct NewsMessages msgarray[] = {
 
 struct MyNewsItem : NewsItem
 {
-	void Serialize(Serialize::Data &data) const anope_override
+	void Serialize(Serialize::Data &data) const override
 	{
 		data["type"] << this->type;
 		data["text"] << this->text;
@@ -106,7 +106,7 @@ class MyNewsService : public NewsService
 				delete newsItems[i][j];
 	}
 
-	NewsItem *CreateNewsItem() anope_override
+	NewsItem *CreateNewsItem() override
 	{
 		return new MyNewsItem();
 	}
@@ -297,12 +297,12 @@ class CommandOSLogonNews : public NewsBase
 		this->SetDesc(_("Define messages to be shown to users at logon"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		return this->DoNews(source, params, NEWS_LOGON);
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -324,12 +324,12 @@ class CommandOSOperNews : public NewsBase
 		this->SetDesc(_("Define messages to be shown to users who oper"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		return this->DoNews(source, params, NEWS_OPER);
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -351,12 +351,12 @@ class CommandOSRandomNews : public NewsBase
 		this->SetDesc(_("Define messages to be randomly shown to users at logon"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		return this->DoNews(source, params, NEWS_RANDOM);
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -434,20 +434,20 @@ class OSNews : public Module
 	{
 	}
 
-	void OnReload(Configuration::Conf *conf) anope_override
+	void OnReload(Configuration::Conf *conf) override
 	{
 		oper_announcer = conf->GetModule(this)->Get<const Anope::string>("oper_announcer", "OperServ");
 		announcer = conf->GetModule(this)->Get<const Anope::string>("announcer", "Global");
 		news_count = conf->GetModule(this)->Get<unsigned>("newscount", "3");
 	}
 
-	void OnUserModeSet(const MessageSource &setter, User *u, const Anope::string &mname) anope_override
+	void OnUserModeSet(const MessageSource &setter, User *u, const Anope::string &mname) override
 	{
 		if (mname == "OPER")
 			DisplayNews(u, NEWS_OPER);
 	}
 
-	void OnUserConnect(User *user, bool &) anope_override
+	void OnUserConnect(User *user, bool &) override
 	{
 		if (user->Quitting() || !user->server->IsSynced())
 			return;

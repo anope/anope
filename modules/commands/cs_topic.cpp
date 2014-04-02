@@ -21,7 +21,7 @@ class CommandCSSetKeepTopic : public Command
 		this->SetSyntax(_("\037channel\037 {ON | OFF}"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		if (Anope::ReadOnly)
 		{
@@ -63,7 +63,7 @@ class CommandCSSetKeepTopic : public Command
 			this->OnSyntaxError(source, "KEEPTOPIC");
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -159,7 +159,7 @@ class CommandCSTopic : public Command
 		this->SetSyntax(_("\037channel\037 [UNLOCK|LOCK]"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		const Anope::string &subcmd = params[1];
 
@@ -182,7 +182,7 @@ class CommandCSTopic : public Command
 			this->SendSyntax(source);
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -211,7 +211,7 @@ class CSTopic : public Module
 
 	}
 
-	void OnChannelSync(Channel *c) anope_override
+	void OnChannelSync(Channel *c) override
 	{
 		if (c->ci)
 		{
@@ -223,7 +223,7 @@ class CSTopic : public Module
 		}
 	}
 
-	void OnTopicUpdated(Channel *c, const Anope::string &user, const Anope::string &topic) anope_override
+	void OnTopicUpdated(Channel *c, const Anope::string &user, const Anope::string &topic) override
 	{
 		if (!c->ci)
 			return;
@@ -245,7 +245,7 @@ class CSTopic : public Module
 		}
 	}
 
-	void OnChanInfo(CommandSource &source, ChannelInfo *ci, InfoFormatter &info, bool show_all) anope_override
+	void OnChanInfo(CommandSource &source, ChannelInfo *ci, InfoFormatter &info, bool show_all) override
 	{
 		if (keeptopic.HasExt(ci))
 			info.AddOption(_("Topic retention"));

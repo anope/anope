@@ -17,7 +17,7 @@ static ServiceReference<NickServService> nickserv("NickServService", "NickServ")
 struct ForbidDataImpl : ForbidData, Serializable
 {
 	ForbidDataImpl() : Serializable("ForbidData") { }
-	void Serialize(Serialize::Data &data) const anope_override;
+	void Serialize(Serialize::Data &data) const override;
 	static Serializable* Unserialize(Serializable *obj, Serialize::Data &data);
 };
 
@@ -75,12 +75,12 @@ class MyForbidService : public ForbidService
 			delete f[i];
 	}
 
-	void AddForbid(ForbidData *d) anope_override
+	void AddForbid(ForbidData *d) override
 	{
 		this->forbids(d->type).push_back(d);
 	}
 
-	void RemoveForbid(ForbidData *d) anope_override
+	void RemoveForbid(ForbidData *d) override
 	{
 		std::vector<ForbidData *>::iterator it = std::find(this->forbids(d->type).begin(), this->forbids(d->type).end(), d);
 		if (it != this->forbids(d->type).end())
@@ -88,12 +88,12 @@ class MyForbidService : public ForbidService
 		delete d;
 	}
 
-	ForbidData *CreateForbid() anope_override
+	ForbidData *CreateForbid() override
 	{
 		return new ForbidDataImpl();
 	}
 
-	ForbidData *FindForbid(const Anope::string &mask, ForbidType ftype) anope_override
+	ForbidData *FindForbid(const Anope::string &mask, ForbidType ftype) override
 	{
 		for (unsigned i = this->forbids(ftype).size(); i > 0; --i)
 		{
@@ -105,7 +105,7 @@ class MyForbidService : public ForbidService
 		return NULL;
 	}
 
-	std::vector<ForbidData *> GetForbids() anope_override
+	std::vector<ForbidData *> GetForbids() override
 	{
 		std::vector<ForbidData *> f;
 		for (unsigned j = FT_NICK; j < FT_SIZE; ++j)
@@ -147,7 +147,7 @@ class CommandOSForbid : public Command
 		this->SetSyntax("LIST [NICK|CHAN|EMAIL|REGISTER]");
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		if (!this->fs)
 			return;
@@ -402,7 +402,7 @@ class CommandOSForbid : public Command
 		return;
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -434,7 +434,7 @@ class OSForbid : public Module
 
 	}
 
-	void OnUserConnect(User *u, bool &exempt) anope_override
+	void OnUserConnect(User *u, bool &exempt) override
 	{
 		if (u->Quitting() || exempt)
 			return;
@@ -442,7 +442,7 @@ class OSForbid : public Module
 		this->OnUserNickChange(u, "");
 	}
 
-	void OnUserNickChange(User *u, const Anope::string &) anope_override
+	void OnUserNickChange(User *u, const Anope::string &) override
 	{
 		if (u->HasMode("OPER"))
 			return;
@@ -460,7 +460,7 @@ class OSForbid : public Module
 		}
 	}
 
-	EventReturn OnCheckKick(User *u, Channel *c, Anope::string &mask, Anope::string &reason) anope_override
+	EventReturn OnCheckKick(User *u, Channel *c, Anope::string &mask, Anope::string &reason) override
 	{
 		BotInfo *OperServ = Config->GetClient("OperServ");
 		if (u->HasMode("OPER") || !OperServ)
@@ -489,7 +489,7 @@ class OSForbid : public Module
 		return EVENT_CONTINUE;
 	}
 
-	EventReturn OnPreCommand(CommandSource &source, Command *command, std::vector<Anope::string> &params) anope_override
+	EventReturn OnPreCommand(CommandSource &source, Command *command, std::vector<Anope::string> &params) override
 	{
 		if (command->name == "nickserv/info" && params.size() > 0)
 		{

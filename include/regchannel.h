@@ -7,8 +7,7 @@
  *
  */
 
-#ifndef REGCHANNEL_H
-#define REGCHANNEL_H
+#pragma once
 
 #include "memo.h"
 #include "modes.h"
@@ -39,7 +38,7 @@ class CoreExport AutoKick : public Serializable
 
  	AutoKick();
 	~AutoKick();
-	void Serialize(Serialize::Data &data) const anope_override;
+	void Serialize(Serialize::Data &data) const override;
 	static Serializable* Unserialize(Serializable *obj, Serialize::Data &);
 };
 
@@ -95,7 +94,7 @@ class CoreExport ChannelInfo : public Serializable, public Extensible
 
 	~ChannelInfo();
 
-	void Serialize(Serialize::Data &data) const anope_override;
+	void Serialize(Serialize::Data &data) const override;
 	static Serializable* Unserialize(Serializable *obj, Serialize::Data &);
 
 	/** Change the founder of the channek
@@ -245,4 +244,3 @@ class CoreExport ChannelInfo : public Serializable, public Extensible
  */
 extern CoreExport bool IsFounder(const User *user, const ChannelInfo *ci);
 
-#endif // REGCHANNEL_H

@@ -16,7 +16,7 @@ struct Stats : Serializable
 {
 	Stats() : Serializable("Stats") { }
 
-	void Serialize(Serialize::Data &data) const anope_override
+	void Serialize(Serialize::Data &data) const override
 	{
 		data["maxusercnt"] << MaxUserCount;
 		data["maxusertime"] << MaxUserTime;
@@ -197,7 +197,7 @@ class CommandOSStats : public Command
 		this->SetSyntax("[AKILL | HASH | UPLINK | UPTIME | ALL | RESET]");
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		Anope::string extra = !params.empty() ? params[0] : "";
 
@@ -222,7 +222,7 @@ class CommandOSStats : public Command
 			source.Reply(_("Unknown STATS option: \002%s\002"), extra.c_str());
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");

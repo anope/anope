@@ -10,8 +10,7 @@
  *
  */
 
-#ifndef ANOPE_H
-#define ANOPE_H
+#pragma once
 
 #include <signal.h>
 
@@ -313,7 +312,7 @@ namespace Anope
 	{
 		inline size_t operator()(const string &s) const
 		{
-			return TR1NS::hash<std::string>()(s.lower().str());
+			return std::hash<std::string>()(s.lower().str());
 		}
 	};
 
@@ -321,7 +320,7 @@ namespace Anope
 	{
 		inline size_t operator()(const string &s) const
 		{
-			return TR1NS::hash<std::string>()(s.str());
+			return std::hash<std::string>()(s.str());
 		}
 	};
 
@@ -335,7 +334,7 @@ namespace Anope
 
 	template<typename T> class map : public std::map<string, T, ci::less> { };
 	template<typename T> class multimap : public std::multimap<string, T, ci::less> { };
-	template<typename T> class hash_map : public TR1NS::unordered_map<string, T, hash_ci, compare> { };
+	template<typename T> class hash_map : public std::unordered_map<string, T, hash_ci, compare> { };
 
 	static const char *const compiled = __TIME__ " " __DATE__;
 
@@ -776,5 +775,3 @@ template<typename T, typename O> inline T anope_dynamic_static_cast(O ptr)
 	return static_cast<T>(ptr);
 }
 #endif
-
-#endif // ANOPE_H

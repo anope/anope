@@ -80,7 +80,7 @@ namespace SASL
 	 public:
 		IdentifyRequest(Module *m, const Anope::string &id, const Anope::string &acc, const Anope::string &pass) : ::IdentifyRequest(m, acc, pass), uid(id) { }
 
-		void OnSuccess() anope_override
+		void OnSuccess() override
 		{
 			if (!sasl)
 				return;
@@ -98,7 +98,7 @@ namespace SASL
 			}
 		}
 
-		void OnFail() anope_override
+		void OnFail() override
 		{
 			if (!sasl)
 				return;

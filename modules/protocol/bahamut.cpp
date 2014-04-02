@@ -16,7 +16,7 @@ class ChannelModeFlood : public ChannelModeParam
  public:
 	ChannelModeFlood(char modeChar, bool minusNoArg) : ChannelModeParam("FLOOD", modeChar, minusNoArg) { }
 
-	bool IsValid(const Anope::string &value) const anope_override
+	bool IsValid(const Anope::string &value) const override
 	{
 		try
 		{
@@ -45,7 +45,7 @@ class BahamutIRCdProto : public IRCDProto
 		MaxModes = 60;
 	}
 
-	void SendModeInternal(const MessageSource &source, const Channel *dest, const Anope::string &buf) anope_override
+	void SendModeInternal(const MessageSource &source, const Channel *dest, const Anope::string &buf) override
 	{
 		if (Servers::Capab.count("TSMODE") > 0)
 		{
@@ -55,47 +55,47 @@ class BahamutIRCdProto : public IRCDProto
 			IRCDProto::SendModeInternal(source, dest, buf);
 	}
 
-	void SendModeInternal(const MessageSource &source, User *u, const Anope::string &buf) anope_override
+	void SendModeInternal(const MessageSource &source, User *u, const Anope::string &buf) override
 	{
 		UplinkSocket::Message(source) << "SVSMODE " << u->nick << " " << u->timestamp << " " << buf;
 	}
 
-	void SendGlobalNotice(BotInfo *bi, const Server *dest, const Anope::string &msg) anope_override
+	void SendGlobalNotice(BotInfo *bi, const Server *dest, const Anope::string &msg) override
 	{
 		UplinkSocket::Message(bi) << "NOTICE $" << dest->GetName() << " :" << msg;
 	}
 
-	void SendGlobalPrivmsg(BotInfo *bi, const Server *dest, const Anope::string &msg) anope_override
+	void SendGlobalPrivmsg(BotInfo *bi, const Server *dest, const Anope::string &msg) override
 	{
 		UplinkSocket::Message(bi) << "PRIVMSG $" << dest->GetName() << " :" << msg;
 	}
 
 	/* SVSHOLD - set */
-	void SendSVSHold(const Anope::string &nick, time_t time) anope_override
+	void SendSVSHold(const Anope::string &nick, time_t time) override
 	{
 		UplinkSocket::Message(Me) << "SVSHOLD " << nick << " " << time << " :Being held for registered user";
 	}
 
 	/* SVSHOLD - release */
-	void SendSVSHoldDel(const Anope::string &nick) anope_override
+	void SendSVSHoldDel(const Anope::string &nick) override
 	{
 		UplinkSocket::Message(Me) << "SVSHOLD " << nick << " 0";
 	}
 
 	/* SQLINE */
-	void SendSQLine(User *, const XLine *x) anope_override
+	void SendSQLine(User *, const XLine *x) override
 	{
 		UplinkSocket::Message() << "SQLINE " << x->mask << " :" << x->GetReason();
 	}
 
 	/* UNSLINE */
-	void SendSGLineDel(const XLine *x) anope_override
+	void SendSGLineDel(const XLine *x) override
 	{
 		UplinkSocket::Message() << "UNSGLINE 0 :" << x->mask;
 	}
 
 	/* UNSZLINE */
-	void SendSZLineDel(const XLine *x) anope_override
+	void SendSZLineDel(const XLine *x) override
 	{
 		/* this will likely fail so its only here for legacy */
 		UplinkSocket::Message() << "UNSZLINE 0 " << x->GetHost();
@@ -104,7 +104,7 @@ class BahamutIRCdProto : public IRCDProto
 	}
 
 	/* SZLINE */
-	void SendSZLine(User *, const XLine *x) anope_override
+	void SendSZLine(User *, const XLine *x) override
 	{
 		// Calculate the time left before this would expire, capping it at 2 days
 		time_t timeleft = x->expires - Anope::CurTime;
@@ -117,19 +117,19 @@ class BahamutIRCdProto : public IRCDProto
 	}
 
 	/* SVSNOOP */
-	void SendSVSNOOP(const Server *server, bool set) anope_override
+	void SendSVSNOOP(const Server *server, bool set) override
 	{
 		UplinkSocket::Message() << "SVSNOOP " << server->GetName() << " " << (set ? "+" : "-");
 	}
 
 	/* SGLINE */
-	void SendSGLine(User *, const XLine *x) anope_override
+	void SendSGLine(User *, const XLine *x) override
 	{
 		UplinkSocket::Message() << "SGLINE " << x->mask.length() << " :" << x->mask << ":" << x->GetReason();
 	}
 
 	/* RAKILL */
-	void SendAkillDel(const XLine *x) anope_override
+	void SendAkillDel(const XLine *x) override
 	{
 		if (x->IsRegex() || x->HasNickOrReal())
 			return;
@@ -149,19 +149,19 @@ class BahamutIRCdProto : public IRCDProto
 	}
 
 	/* TOPIC */
-	void SendTopic(const MessageSource &source, Channel *c) anope_override
+	void SendTopic(const MessageSource &source, Channel *c) override
 	{
 		UplinkSocket::Message(source) << "TOPIC " << c->name << " " << c->topic_setter << " " << c->topic_ts << " :" << c->topic;
 	}
 
 	/* UNSQLINE */
-	void SendSQLineDel(const XLine *x) anope_override
+	void SendSQLineDel(const XLine *x) override
 	{
 		UplinkSocket::Message() << "UNSQLINE " << x->mask;
 	}
 
 	/* JOIN - SJOIN */
-	void SendJoin(User *user, Channel *c, const ChannelStatus *status) anope_override
+	void SendJoin(User *user, Channel *c, const ChannelStatus *status) override
 	{
 		UplinkSocket::Message(user) << "SJOIN " << c->creation_time << " " << c->name;
 		if (status)
@@ -184,7 +184,7 @@ class BahamutIRCdProto : public IRCDProto
 		}
 	}
 
-	void SendAkill(User *u, XLine *x) anope_override
+	void SendAkill(User *u, XLine *x) override
 	{
 		if (x->IsRegex() || x->HasNickOrReal())
 		{
@@ -230,34 +230,34 @@ class BahamutIRCdProto : public IRCDProto
 	/*
 	  Note: if the stamp is null 0, the below usage is correct of Bahamut
 	*/
-	void SendSVSKillInternal(const MessageSource &source, User *user, const Anope::string &buf) anope_override
+	void SendSVSKillInternal(const MessageSource &source, User *user, const Anope::string &buf) override
 	{
 		UplinkSocket::Message(source) << "SVSKILL " << user->nick << " :" << buf;
 	}
 
-	void SendBOB() anope_override
+	void SendBOB() override
 	{
 		UplinkSocket::Message() << "BURST";
 	}
 
-	void SendEOB() anope_override
+	void SendEOB() override
 	{
 		UplinkSocket::Message() << "BURST 0";
 	}
 
-	void SendClientIntroduction(User *u) anope_override
+	void SendClientIntroduction(User *u) override
 	{
 		Anope::string modes = "+" + u->GetModes();
 		UplinkSocket::Message() << "NICK " << u->nick << " 1 " << u->timestamp << " " << modes << " " << u->GetIdent() << " " << u->host << " " << u->server->GetName() << " 0 0 :" << u->realname;
 	}
 
 	/* SERVER */
-	void SendServer(const Server *server) anope_override
+	void SendServer(const Server *server) override
 	{
 		UplinkSocket::Message() << "SERVER " << server->GetName() << " " << server->GetHops() << " :" << server->GetDescription();
 	}
 
-	void SendConnect() anope_override
+	void SendConnect() override
 	{
 		UplinkSocket::Message() << "PASS " << Config->Uplinks[Anope::CurrentUplink].password << " :TS";
 		UplinkSocket::Message() << "CAPAB SSJOIN NOQUIT BURST UNCONNECT NICKIP TSMODE TS3";
@@ -274,7 +274,7 @@ class BahamutIRCdProto : public IRCDProto
 		this->SendBOB();
 	}
 
-	void SendChannel(Channel *c) anope_override
+	void SendChannel(Channel *c) override
 	{
 		Anope::string modes = c->GetModes(true, true);
 		if (modes.empty())
@@ -282,12 +282,12 @@ class BahamutIRCdProto : public IRCDProto
 		UplinkSocket::Message() << "SJOIN " << c->creation_time << " " << c->name << " " << modes << " :";
 	}
 
-	void SendLogin(User *u, NickAlias *) anope_override
+	void SendLogin(User *u, NickAlias *) override
 	{
 		IRCD->SendMode(Config->GetClient("NickServ"), u, "+d %d", u->signon);
 	}
 
-	void SendLogout(User *u) anope_override
+	void SendLogout(User *u) override
 	{
 		IRCD->SendMode(Config->GetClient("NickServ"), u, "+d 1");
 	}
@@ -297,7 +297,7 @@ struct IRCDMessageBurst : IRCDMessage
 {
 	IRCDMessageBurst(Module *creator) : IRCDMessage(creator, "BURST", 0) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
 
-	void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
+	void Run(MessageSource &source, const std::vector<Anope::string> &params) override
 	{
 		/* If we found a server with the given source, that one just
 		 * finished bursting. If there was no source, then our uplink
@@ -315,7 +315,7 @@ struct IRCDMessageMode : IRCDMessage
 {
 	IRCDMessageMode(Module *creator, const Anope::string &sname) : IRCDMessage(creator, sname, 2) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
 
-	void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
+	void Run(MessageSource &source, const std::vector<Anope::string> &params) override
 	{
 		if (params.size() > 2 && IRCD->IsChannelValid(params[0]))
 		{
@@ -362,7 +362,7 @@ struct IRCDMessageNick : IRCDMessage
 {
 	IRCDMessageNick(Module *creator) : IRCDMessage(creator, "NICK", 2) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
 
-	void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
+	void Run(MessageSource &source, const std::vector<Anope::string> &params) override
 	{
 		if (params.size() == 10)
 		{
@@ -390,7 +390,7 @@ struct IRCDMessageServer : IRCDMessage
 {
 	IRCDMessageServer(Module *creator) : IRCDMessage(creator, "SERVER", 3) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
 
-	void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
+	void Run(MessageSource &source, const std::vector<Anope::string> &params) override
 	{
 		unsigned int hops = Anope::string(params[1]).is_pos_number_only() ? convertTo<unsigned>(params[1]) : 0;
 		new Server(source.GetServer() == NULL ? Me : source.GetServer(), params[0], hops, params[2]);
@@ -401,7 +401,7 @@ struct IRCDMessageSJoin : IRCDMessage
 {
 	IRCDMessageSJoin(Module *creator) : IRCDMessage(creator, "SJOIN", 2) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
 
-	void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
+	void Run(MessageSource &source, const std::vector<Anope::string> &params) override
 	{
 		Anope::string modes;
 		if (params.size() >= 4)
@@ -457,7 +457,7 @@ struct IRCDMessageTopic : IRCDMessage
 {
 	IRCDMessageTopic(Module *creator) : IRCDMessage(creator, "TOPIC", 4) { }
 
-	void Run(MessageSource &, const std::vector<Anope::string> &params) anope_override
+	void Run(MessageSource &, const std::vector<Anope::string> &params) override
 	{
 		Channel *c = Channel::Find(params[0]);
 		if (c)
@@ -550,7 +550,7 @@ class ProtoBahamut : public Module
 
 	}
 
-	void OnUserNickChange(User *u, const Anope::string &) anope_override
+	void OnUserNickChange(User *u, const Anope::string &) override
 	{
 		u->RemoveModeInternal(Me, ModeManager::FindUserModeByName("REGISTERED"));
 		IRCD->SendLogout(u);

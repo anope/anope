@@ -10,8 +10,7 @@
  *
  */
 
-#ifndef UPLINK_H
-#define UPLINK_H
+#pragma once
 
 #include "sockets.h"
 #include "protocol.h"
@@ -27,9 +26,9 @@ class UplinkSocket : public ConnectionSocket, public BufferedSocket
  public:
 	UplinkSocket();
 	~UplinkSocket();
-	bool ProcessRead() anope_override;
-	void OnConnect() anope_override;
-	void OnError(const Anope::string &) anope_override;
+	bool ProcessRead() override;
+	void OnConnect() override;
+	void OnError(const Anope::string &) override;
 
 	/* A message sent over the uplink socket */
 	class CoreExport Message
@@ -49,6 +48,4 @@ class UplinkSocket : public ConnectionSocket, public BufferedSocket
 	};
 };
 extern CoreExport UplinkSocket *UplinkSock;
-
-#endif // UPLINK_H
 

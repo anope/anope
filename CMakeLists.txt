@@ -1,8 +1,5 @@
-# This usage of CMake requires at least version 2.4 (checks are made to determine what to use when certain versions lack functions)
-cmake_minimum_required(VERSION 2.4 FATAL_ERROR)
-if(COMMAND cmake_policy)
-  cmake_policy(SET CMP0003 NEW)
-endif(COMMAND cmake_policy)
+# This usage of CMake requires at least version 2.8
+cmake_minimum_required(VERSION 2.8 FATAL_ERROR)
 
 # If the Source dir and the Binary dir are the same, we are building in-source, which we will disallow due to Autotools being there (but only on non-Windows)
 if(${CMAKE_CURRENT_SOURCE_DIR} STREQUAL ${CMAKE_CURRENT_BINARY_DIR} AND NOT WIN32)
@@ -13,60 +10,6 @@ endif(${CMAKE_CURRENT_SOURCE_DIR} STREQUAL ${CMAKE_CURRENT_BINARY_DIR} AND NOT W
 project(Anope CXX)
 enable_language(C)
 
-# Detect the version of CMake for the later conditional checks
-execute_process(COMMAND ${CMAKE_COMMAND} --version OUTPUT_VARIABLE VERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
-string(REGEX REPLACE "cmake version 2\\.(.*)" "\\1" ONLY_VERSION "${VERSION}")
-string(REGEX MATCH "-patch .*$" HAS_PATCH "${ONLY_VERSION}")
-if(HAS_PATCH)
-  string(REGEX REPLACE "(.*)-patch .*" "\\1" MINOR_VERSION "${ONLY_VERSION}")
-  string(REGEX REPLACE ".*-patch (.*)" "\\1" PATCH_VERSION "${ONLY_VERSION}")
-else(HAS_PATCH)
-  string(REGEX MATCH "\\." HAS_DOT "${ONLY_VERSION}")
-  if(HAS_DOT)
-    string(REGEX REPLACE "(.*)\\..*" "\\1" MINOR_VERSION "${ONLY_VERSION}")
-    string(REGEX REPLACE ".*\\.(.*)" "\\1" PATCH_VERSION "${ONLY_VERSION}")
-  else(HAS_DOT)
-    string(REGEX REPLACE "(.*)-beta" "\\1" MINOR_VERSION "${ONLY_VERSION}")
-    if(MINOR_VERSION STREQUAL "4-1\n")
-      set(PATCH_VERSION 1)
-    else(MINOR_VERSION STREQUAL "4-1\n")
-      set(PATCH_VERSION 0)
-    endif(MINOR_VERSION STREQUAL "4-1\n")
-    set(MINOR_VERSION 4)
-  endif(HAS_DOT)
-endif(HAS_PATCH)
-
-# Detect is we are using CMake 2.6 or better, these versions include functions that require less work than CMake 2.4 does
-if(MINOR_VERSION GREATER 5)
-  set(CMAKE26_OR_BETTER TRUE)
-  set(CMAKE248_OR_BETTER TRUE)
-  set(CMAKE244_OR_BETTER TRUE)
-  set(CMAKE242_OR_BETTER TRUE)
-else(MINOR_VERSION GREATER 5)
-  set(CMAKE26_OR_BETTER FALSE)
-  # Also detect if we are using CMake 2.4.8 or better, the FIND sub-command of list() is non-existant in earlier versions
-  if(PATCH_VERSION GREATER 7)
-    set(CMAKE248_OR_BETTER TRUE)
-    set(CMAKE244_OR_BETTER TRUE)
-    set(CMAKE242_OR_BETTER TRUE)
-  else(PATCH_VERSION GREATER 7)
-    set(CMAKE248_OR_BETTER FALSE)
-    # Also detect if we are using CMake 2.4.4 or better, the CheckCXXCompilerFlag module and SORT sub-command of list() are non-existant in earlier versions
-    if(PATCH_VERSION GREATER 3)
-      set(CMAKE244_OR_BETTER TRUE)
-      set(CMAKE242_OR_BETTER TRUE)
-    else(PATCH_VERSION GREATER 3)
-      set(CMAKE244_OR_BETTER FALSE)
-      # ALSO detect if we are using CMake 2.4.2 or better, the APPEND sub-command of list() is non-existant in earlier versions
-      if(PATCH_VERSION GREATER 1)
-        set(CMAKE242_OR_BETTER TRUE)
-      else(PATCH_VERSION GREATER 1)
-        set(CMAKE242_OR_BETTER FALSE)
-      endif(PATCH_VERSION GREATER 1)
-    endif(PATCH_VERSION GREATER 3)
-  endif(PATCH_VERSION GREATER 7)
-endif(MINOR_VERSION GREATER 5)
-
 # Override the module include path to include our directory, for our Anope.cmake, as well as we are using our own version of the NSIS template
 set(CMAKE_MODULE_PATH ${Anope_SOURCE_DIR}/cmake)
 
@@ -74,110 +17,6 @@ include(Anope)
 
 # Force the locale to C for later uses of things like gcc so the messages come up in English, not the user's default language
 set(ENV{LC_ALL} C)
-
-# Start with empty defaults for library and include directories, to be used by GNU compilers only
-set(DEFAULT_LIBRARY_DIRS)
-set(DEFAULT_INCLUDE_DIRS)
-
-# If we are using a GNU compiler (have to use CXX because it seems to fail on C), we will be able to determine it's default paths for libraries and includes
-if(CMAKE_COMPILER_IS_GNUCXX OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-  # First look for the compiler's default library directories
-  execute_process(COMMAND ${CMAKE_C_COMPILER} -print-search-dirs OUTPUT_VARIABLE LINES OUTPUT_STRIP_TRAILING_WHITESPACE)
-  # Find only the part after "libraries: "
-  string(REGEX REPLACE ".*\nlibraries: (.*)$" "\\1" LINE "${LINES}")
-  # Replace the colons in the list with semicolons (only when not on MinGW, which uses semicolons already), and if on MinGW, just copy the line
-  if(NOT MINGW)
-    string(REGEX REPLACE ":" ";" LIBRARIES ${LINE})
-  else(NOT MINGW)
-    set(LIBRARIES "${LINE}")
-  endif(NOT MINGW)
-  # Iterate through the libraries
-  foreach(LIBRARY ${LIBRARIES})
-    # Check if the first character is an equal sign, and skip that library directory as it is (I believe) the primary default and shows up later in the list anyways
-    string(SUBSTRING ${LIBRARY} 0 1 FIRST_CHAR)
-    if(NOT FIRST_CHAR STREQUAL "=")
-      # If the directory had no = in front of it, make sure it's absolute and add it to the list of default library directories
-      get_filename_component(LIBRARY ${LIBRARY} ABSOLUTE)
-      append_to_list(DEFAULT_LIBRARY_DIRS ${LIBRARY})
-    endif(NOT FIRST_CHAR STREQUAL "=")
-  endforeach(LIBRARY)
-  # Remove duplicate entries from the list
-  if(DEFAULT_LIBRARY_DIRS)
-    remove_list_duplicates(DEFAULT_LIBRARY_DIRS)
-  endif(DEFAULT_LIBRARY_DIRS)
-  # Create a temporary file to test for the default include directories
-  FILE(WRITE empty.cpp "")
-  # Next, we look for the compiler's default include directories
-  # Run the command to find the default include directories
-  execute_process(COMMAND ${CMAKE_C_COMPILER} -v -x c++ -E ${CMAKE_CURRENT_SOURCE_DIR}/empty.cpp ERROR_VARIABLE LINES OUTPUT_QUIET ERROR_STRIP_TRAILING_WHITESPACE)
-  # Remove the empty file, it is no longer needed
-  FILE(REMOVE empty.cpp)
-  # Convert the new lines to semicolons
-  string(REGEX REPLACE "\n" ";" LINES ${LINES})
-  # Temporary variable saying if we are in the search list or not
-  set(IN_SEARCH_LIST FALSE)
-  # Iterate through the lines
-  foreach(LINE ${LINES})
-    # If the line has the following on it, the next lines will contain directory names
-    if(LINE STREQUAL "#include <...> search starts here:")
-      set(IN_SEARCH TRUE)
-    else(LINE STREQUAL "#include <...> search starts here:")
-      # If the line has the following on it, we hit the end of the list
-      if(LINE STREQUAL "End of search list.")
-        set(IN_SEARCH FALSE)
-      else(LINE STREQUAL "End of search list.")
-        # If we are within the block between the above two lines...
-        if(IN_SEARCH)
-          # Get everything but the first character of the line
-          string(LENGTH ${LINE} LINE_LENGTH)
-          math(EXPR LINE_LENGTH "${LINE_LENGTH} - 1")
-          string(SUBSTRING ${LINE} 1 ${LINE_LENGTH} INCLUDE)
-          # For systems like Mac OS X, look for include paths that say " (framework directory)" at the end of them and strip that off
-          string(REGEX REPLACE " \\(framework directory\\)$" "" INCLUDE ${INCLUDE})
-          # Convert the path to an absolute one, just in case it wasn't
-          get_filename_component(INCLUDE ${INCLUDE} ABSOLUTE)
-          # Add that directory to the list of default include directories
-          append_to_list(DEFAULT_INCLUDE_DIRS ${INCLUDE})
-        endif(IN_SEARCH)
-      endif(LINE STREQUAL "End of search list.")
-    endif(LINE STREQUAL "#include <...> search starts here:")
-  endforeach(LINE)
-  # Remove duplicate entries from the list
-  if(DEFAULT_INCLUDE_DIRS)
-    remove_list_duplicates(DEFAULT_INCLUDE_DIRS)
-  endif(DEFAULT_INCLUDE_DIRS)
-endif(CMAKE_COMPILER_IS_GNUCXX OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-
-# If we are using Visual Studio, locate the path of the Windows Server 2008 SDK or Windows Server 2003 Platform SDK, depending on which is installed
-if(MSVC)
-  # If the path comes up as "/registry" from any of these, the path wasn't found, otherwise, we'll set WSDK_PATH to the corresponding path
-  # Look for the 2008 SDK under HKLM first
-  get_filename_component(WSDK2008_PATH "[HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Microsoft SDKs\\Windows;CurrentInstallFolder]" ABSOLUTE CACHE)
-  if(WSDK2008_PATH STREQUAL "/registry")
-    # If not found, look for the 2003 SDK under HKLM
-    get_filename_component(WSDK2003_PATH "[HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\MicrosoftSDK\\InstalledSDKs\\D2FF9F89-8AA2-4373-8A31-C838BF4DBBE1;Install Dir]" ABSOLUTE CACHE)
-    if(WSDK2003_PATH STREQUAL "/registry")
-      # If not found, look for the 2008 SDK under HKCU
-      get_filename_component(WSDK2008_PATH "[HKEY_CURRENT_USER\\SOFTWARE\\Microsoft\\Microsoft SDKs\\Windows;CurrentInstallFolder]" ABSOLUTE CACHE)
-      if(WSDK2008_PATH STREQUAL "/registry")
-        # If not found, look for the 2003 SDK under HKCU
-        get_filename_component(WSDK2003_PATH "[HKEY_CURRENT_USER\\SOFTWARE\\Microsoft\\MicrosoftSDK\\InstalledSDKs\\D2FF9F89-8AA2-4373-8A31-C838BF4DBBE1;Install Dir]" ABSOLUTE CACHE)
-        if(WSDK2003_PATH STREQUAL "/registry")
-          # The SDK was never found, set the path to nothing
-          set(WSDK_PATH "")
-        else(WSDK2003_PATH STREQUAL "/registry")
-          set(WSDK_PATH "${WSDK2003_PATH}")
-        endif(WSDK2003_PATH STREQUAL "/registry")
-      else(WSDK2008_PATH STREQUAL "/registry")
-        set(WSDK_PATH "${WSDK2008_PATH}")
-      endif(WSDK2008_PATH STREQUAL "/registry")
-    else(WSDK2003_PATH STREQUAL "/registry")
-      set(WSDK_PATH "${WSDK2003_PATH}")
-    endif(WSDK2003_PATH STREQUAL "/registry")
-  else(WSDK2008_PATH STREQUAL "/registry")
-    set(WSDK_PATH "${WSDK2008_PATH}")
-  endif(WSDK2008_PATH STREQUAL "/registry")
-endif(MSVC)
 
 # If the user specifies -DCMAKE_BUILD_TYPE on the command line, take their definition
 # and dump it in the cache along with proper documentation, otherwise set CMAKE_BUILD_TYPE
@@ -191,23 +30,20 @@ if(NOT MSVC)
   endif(CMAKE_BUILD_TYPE)
 endif(NOT MSVC)
 
-# If running under MinGW, we have to force the resource compiler settings (hopefully this will be fixed in a later version of CMake)
-if(MINGW)
-  set(CMAKE_RC_COMPILER_INIT windres)
-  enable_language(RC)
-  set(CMAKE_RC_COMPILE_OBJECT "<CMAKE_RC_COMPILER> <FLAGS> <DEFINES> -o <OBJECT> <SOURCE>")
-endif(MINGW)
-
 # Include the checking functions used later in this CMakeLists.txt
 include(CheckFunctionExists)
 include(CheckIncludeFile)
 include(CheckTypeSize)
 include(CheckLibraryExists)
-if(CMAKE244_OR_BETTER)
-  include(CheckCXXCompilerFlag)
-else(CMAKE244_OR_BETTER)
-  include(TestCXXAcceptsFlag)
-endif(CMAKE244_OR_BETTER)
+include(CheckCXXCompilerFlag)
+
+if(NOT MSVC)
+  CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
+  if(NOT COMPILER_SUPPORTS_CXX11)
+    message(FATAL_ERROR "The compiler ${CMAKE_CXX_COMPILER} has no C++11 support. Please use a newer compiler.")
+  endif(NOT COMPILER_SUPPORTS_CXX11)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+endif(NOT MSVC)
 
 # If extra include directories were specified, tell cmake about them.
 if(EXTRA_INCLUDE)
@@ -224,7 +60,6 @@ find_package(Gettext)
 
 # Add an optional variable for using run-cc.pl for building, Perl will be checked later regardless of this setting
 option(USE_RUN_CC_PL "Use run-cc.pl for building" OFF)
-option(USE_PCH "Use precompiled headers" OFF)
 
 # Use the following directories as includes
 # Note that it is important the binary include directory comes before the
@@ -257,24 +92,13 @@ else(MSVC)
     if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
       set(CXXFLAGS "${CXXFLAGS} -Wno-long-long -fno-leading-underscore")
     endif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-  # If we aren't on a *nix system, we are using MinGW
-  else(UNIX)
-    # Also, if we are building under MinGW, add another define for MinGW
-    if(MINGW)
-      add_definitions(-DMINGW)
-    endif(MINGW)
   endif(UNIX)
 endif(MSVC)
 
 # If CMake has found that the given system requires a special library for dl* calls, include it with the linker flags
 if(CMAKE_DL_LIBS)
-  append_to_list(LINK_LIBS ${CMAKE_DL_LIBS})
+  list(APPEND LINK_LIBS ${CMAKE_DL_LIBS})
 endif(CMAKE_DL_LIBS)
-
-# Under MinGW, the -shared flag isn't properly set in the module-specific linker flags, add it from the C flags for shared libraries
-if(MINGW)
-  set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} ${CMAKE_SHARED_LIBRARY_CREATE_C_FLAGS}")
-endif(MINGW)
 
 # Under Windows, we set the executable name for Anope to be anope
 if(WIN32)
@@ -287,13 +111,7 @@ endif(WIN32)
 # If we are not using Visual Studio, we'll run the following checks
 if(NOT MSVC)
   # Check if the C++ compiler can accept the -pipe flag, and add it to the compile flags if it works
-  if(CMAKE244_OR_BETTER)
-    # If using CMake 2.4.4 or better, we can use check_cxx_compiler_flag
-    check_cxx_compiler_flag(-pipe HAVE_PIPE_FLAG)
-  else(CMAKE244_OR_BETTER)
-    # If using CMake 2.4.3 or older, we will use check_cxx_accepts_flags instead
-    check_cxx_accepts_flag(-pipe HAVE_PIPE_FLAG)
-  endif(CMAKE244_OR_BETTER)
+  check_cxx_compiler_flag(-pipe HAVE_PIPE_FLAG)
   # If the flag was accepted, add it to the list of flags
   if(HAVE_PIPE_FLAG)
     set(CXXFLAGS "${CXXFLAGS} -pipe")
@@ -304,12 +122,12 @@ if(NOT MSVC)
     # Check if socket is within the socket library (if the library exists), and add it to the linker flags if needed
     check_library_exists(socket socket "" HAVE_SOCKET_LIB)
     if(HAVE_SOCKET_LIB)
-      append_to_list(LINK_LIBS socket)
+      list(APPEND LINK_LIBS socket)
     endif(HAVE_SOCKET_LIB)
     # Check if inet_addr is within the nsl library (if the library exists), and add it to the linker flags if needed
     check_library_exists(nsl inet_addr "" HAVE_NSL_LIB)
     if(HAVE_NSL_LIB)
-      append_to_list(LINK_LIBS nsl)
+      list(APPEND LINK_LIBS nsl)
     endif(HAVE_NSL_LIB)
     # Check if pthread_create is within the pthread library (if the library exists), and add it to the linker flags if needed
     check_library_exists(pthread pthread_create "" HAVE_PTHREAD)
@@ -337,14 +155,7 @@ if(CMAKE_BUILD_TYPE STREQUAL "DEBUG" OR CMAKE_BUILD_TYPE STREQUAL "RELWITHDEBINF
   set(DEBUG_BUILD TRUE)
 endif(CMAKE_BUILD_TYPE STREQUAL "DEBUG" OR CMAKE_BUILD_TYPE STREQUAL "RELWITHDEBINFO")
 
-# Check for the existance of the following include files
-check_include_file(cstdint HAVE_CSTDINT)
-check_include_file(stdint.h HAVE_STDINT_H)
-check_include_file(strings.h HAVE_STRINGS_H)
-
 # Check for the existance of the following functions
-check_function_exists(strcasecmp HAVE_STRCASECMP)
-check_function_exists(stricmp HAVE_STRICMP)
 check_function_exists(umask HAVE_UMASK)
 check_function_exists(epoll_wait HAVE_EPOLL)
 check_function_exists(poll HAVE_POLL)
@@ -352,25 +163,23 @@ check_function_exists(kqueue HAVE_KQUEUE)
 
 # Strip the leading and trailing spaces from the compile flags
 if(CXXFLAGS)
-  strip_string(${CXXFLAGS} CXXFLAGS)
+  string(STRIP ${CXXFLAGS} CXXFLAGS)
 endif(CXXFLAGS)
 # Strip the leading and trailing spaces from the linker flags
 if(LDFLAGS)
-  strip_string(${LDFLAGS} LDFLAGS)
+  string(STRIP ${LDFLAGS} LDFLAGS)
 endif(LDFLAGS)
 
 # Search for the following programs
-find_program(GREP grep)
-find_program(SH sh)
 find_program(CHGRP chgrp)
 find_program(CHMOD chmod)
 find_program(PERL perl)
 
 # If perl is included on the system and the user wants to use run-cc.pl, change the commands for compiling and linking
 if(PERL AND USE_RUN_CC_PL)
-  set(CMAKE_CXX_COMPILE_OBJECT "${PERL} ${Anope_SOURCE_DIR}/run-cc.pl -q ${CMAKE_CXX_COMPILE_OBJECT}")
-  set(CMAKE_CXX_LINK_EXECUTABLE "${PERL} ${Anope_SOURCE_DIR}/run-cc.pl -q ${CMAKE_CXX_LINK_EXECUTABLE}")
-  set(CMAKE_CXX_CREATE_SHARED_MODULE "${PERL} ${Anope_SOURCE_DIR}/run-cc.pl -q ${CMAKE_CXX_CREATE_SHARED_MODULE}")
+  set(CMAKE_CXX_COMPILE_OBJECT "${PERL} ${Anope_SOURCE_DIR}/cmake/run-cc.pl -q ${CMAKE_CXX_COMPILE_OBJECT}")
+  set(CMAKE_CXX_LINK_EXECUTABLE "${PERL} ${Anope_SOURCE_DIR}/cmake/run-cc.pl -q ${CMAKE_CXX_LINK_EXECUTABLE}")
+  set(CMAKE_CXX_CREATE_SHARED_MODULE "${PERL} ${Anope_SOURCE_DIR}/cmake/run-cc.pl -q ${CMAKE_CXX_CREATE_SHARED_MODULE}")
 endif(PERL AND USE_RUN_CC_PL)
 
 # If a INSTDIR was passed in to CMake, use it as the install prefix, otherwise set the default install prefix to the services directory under the user's home directory
@@ -405,7 +214,7 @@ endif(NOT LOGS_DIR)
 
 # Version number processing
 # Find all lines in src/version.sh that start with VERSION_
-read_from_file(${Anope_SOURCE_DIR}/src/version.sh "^VERSION_" VERSIONS)
+file(STRINGS ${Anope_SOURCE_DIR}/src/version.sh VERSIONS REGEX "^VERSION_")
 # Iterate through the strings found
 foreach(VERSION_STR ${VERSIONS})
   # Get the length of the string
@@ -426,7 +235,7 @@ set(VERSION_BUILD 0)
 # Only change the build number if version.h exists
 if(EXISTS "${Anope_SOURCE_DIR}/include/version.h")
   # Attempt to read the build number from include/version.h
-  read_from_file(${Anope_SOURCE_DIR}/include/version.h "^#define VERSION_BUILD" VERSIONS)
+  file(STRINGS ${Anope_SOURCE_DIR}/include/version.h VERSIONS REGEX "^#defineVERSION_BUILD")
   foreach(VERSION_STR ${VERSIONS})
     # Get the length of the string
     string(LENGTH ${VERSION_STR} VERSION_LEN)

@@ -33,7 +33,7 @@ struct LogSettingImpl : LogSetting, Serializable
 		}
 	}
 
-	void Serialize(Serialize::Data &data) const anope_override
+	void Serialize(Serialize::Data &data) const override
 	{
 		data["ci"] << chan;
 		data["service_name"] << service_name;
@@ -91,7 +91,7 @@ struct LogSettingsImpl : LogSettings
 		}
 	}
 
-	LogSetting *Create() anope_override
+	LogSetting *Create() override
 	{
 		return new LogSettingImpl();
 	}
@@ -107,7 +107,7 @@ public:
 		this->SetSyntax(_("\037channel\037 \037command\037 \037method\037 [\037status\037]"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		const Anope::string &channel = params[0];
 
@@ -251,7 +251,7 @@ public:
 			this->OnSyntaxError(source, "");
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -301,7 +301,7 @@ class CSLog : public Module
 
 	}
 
-	void OnReload(Configuration::Conf *conf) anope_override
+	void OnReload(Configuration::Conf *conf) override
 	{
 		Configuration::Block *block = conf->GetModule(this);
 		defaults.clear();
@@ -320,7 +320,7 @@ class CSLog : public Module
 		}
 	}
 
-	void OnChanRegistered(ChannelInfo *ci) anope_override
+	void OnChanRegistered(ChannelInfo *ci) override
 	{
 		if (defaults.empty())
 			return;
@@ -353,7 +353,7 @@ class CSLog : public Module
 		}
 	}
 
-	void OnLog(Log *l) anope_override
+	void OnLog(Log *l) override
 	{
 		if (l->type != LOG_COMMAND || l->u == NULL || l->c == NULL || l->ci == NULL || !Me || !Me->IsSynced())
 			return;

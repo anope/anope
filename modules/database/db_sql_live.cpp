@@ -75,7 +75,7 @@ class DBMySQL : public Module, public Pipe
 			throw ModuleException("If db_sql_live is loaded it must be the first database module loaded.");
 	}
 
-	void OnNotify() anope_override
+	void OnNotify() override
 	{
 		if (!this->CheckInit())
 			return;
@@ -115,30 +115,30 @@ class DBMySQL : public Module, public Pipe
 		this->updated_items.clear();
 	}
 
-	EventReturn OnLoadDatabase() anope_override
+	EventReturn OnLoadDatabase() override
 	{
 		init = true;
 		return EVENT_STOP;
 	}
 
-	void OnShutdown() anope_override
+	void OnShutdown() override
 	{
 		init = false;
 	}
 
-	void OnRestart() anope_override
+	void OnRestart() override
 	{
 		init = false;
 	}
 
-	void OnReload(Configuration::Conf *conf) anope_override
+	void OnReload(Configuration::Conf *conf) override
 	{
 		Configuration::Block *block = conf->GetModule(this);
 		this->SQL = ServiceReference<Provider>("SQL::Provider", block->Get<const Anope::string>("engine"));
 		this->prefix = block->Get<const Anope::string>("prefix", "anope_db_");
 	}
 
-	void OnSerializableConstruct(Serializable *obj) anope_override
+	void OnSerializableConstruct(Serializable *obj) override
 	{
 		if (!this->CheckInit())
 			return;
@@ -147,7 +147,7 @@ class DBMySQL : public Module, public Pipe
 		this->Notify();
 	}
 
-	void OnSerializableDestruct(Serializable *obj) anope_override
+	void OnSerializableDestruct(Serializable *obj) override
 	{
 		if (!this->CheckInit())	
 			return;
@@ -161,7 +161,7 @@ class DBMySQL : public Module, public Pipe
 		this->updated_items.erase(obj);
 	}
 
-	void OnSerializeCheck(Serialize::Type *obj) anope_override
+	void OnSerializeCheck(Serialize::Type *obj) override
 	{
 		if (!this->CheckInit() || obj->GetTimestamp() == Anope::CurTime)
 			return;
@@ -240,7 +240,7 @@ class DBMySQL : public Module, public Pipe
 		}
 	}
 
-	void OnSerializableUpdate(Serializable *obj) anope_override
+	void OnSerializableUpdate(Serializable *obj) override
 	{
 		if (!this->CheckInit() || obj->IsTSCached())
 			return;

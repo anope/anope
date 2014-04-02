@@ -21,7 +21,7 @@ class CommandOSLogin : public Command
 		this->RequireUser(true);
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		const Anope::string &password = params[0];
 
@@ -46,7 +46,7 @@ class CommandOSLogin : public Command
 		}
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -56,7 +56,7 @@ class CommandOSLogin : public Command
 		return true;
 	}
 
- 	const Anope::string GetDesc(CommandSource &source) const anope_override
+ 	const Anope::string GetDesc(CommandSource &source) const override
 	{
 		return Anope::printf(Language::Translate(source.GetAccount(), _("Login to %s")), source.service->nick.c_str());
 	}
@@ -70,7 +70,7 @@ class CommandOSLogout : public Command
 		this->RequireUser(true);
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		User *u = source.GetUser();
 		Oper *o = source.nc->o;
@@ -88,7 +88,7 @@ class CommandOSLogout : public Command
 		}
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -98,7 +98,7 @@ class CommandOSLogout : public Command
 		return true;
 	}
 
- 	const Anope::string GetDesc(CommandSource &source) const anope_override
+ 	const Anope::string GetDesc(CommandSource &source) const override
 	{
 		return Anope::printf(Language::Translate(source.GetAccount(), _("Logout from %s")), source.service->nick.c_str());
 	}
@@ -117,7 +117,7 @@ class OSLogin : public Module
 
 	}
 
-	EventReturn IsServicesOper(User *u) anope_override
+	EventReturn IsServicesOper(User *u) override
 	{
 		if (!u->Account()->o->password.empty())
 		{

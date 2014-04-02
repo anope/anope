@@ -15,7 +15,7 @@ class StatusUpdate : public Module
 
 	}
 
-	void OnAccessAdd(ChannelInfo *ci, CommandSource &, ChanAccess *access) anope_override
+	void OnAccessAdd(ChannelInfo *ci, CommandSource &, ChanAccess *access) override
 	{
 		if (ci->c)
 			for (Channel::ChanUserList::iterator it = ci->c->users.begin(), it_end = ci->c->users.end(); it != it_end; ++it)
@@ -38,7 +38,7 @@ class StatusUpdate : public Module
 			}
 	}
 
-	void OnAccessDel(ChannelInfo *ci, CommandSource &, ChanAccess *access) anope_override
+	void OnAccessDel(ChannelInfo *ci, CommandSource &, ChanAccess *access) override
 	{
 		if (ci->c)
 			for (Channel::ChanUserList::iterator it = ci->c->users.begin(), it_end = ci->c->users.end(); it != it_end; ++it)

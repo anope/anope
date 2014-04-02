@@ -21,7 +21,7 @@ class CommandNSInfo : public Command
 		this->AllowUnregistered(true);
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 
 		const Anope::string &nick = params.size() ? params[0] : (source.nc ? source.nc->display : source.GetNick());
@@ -114,7 +114,7 @@ class CommandNSInfo : public Command
 		}
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -207,12 +207,12 @@ class CommandNSSetHide : public Command
 			this->OnSyntaxError(source, "HIDE");
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		this->Run(source, source.nc->display, params[0], params[1]);
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -235,13 +235,13 @@ class CommandNSSASetHide : public CommandNSSetHide
 		this->SetSyntax(_("\037nickname\037 {EMAIL | STATUS | USERMASK | QUIT} {ON | OFF}"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		this->ClearSyntax();
 		this->Run(source, params[0], params[1], params[2]);
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");

@@ -19,14 +19,14 @@ class OldMD5Provider : public Encryption::Provider
  public:
  	OldMD5Provider(Module *creator) : Encryption::Provider(creator, "oldmd5") { }
 
-	Encryption::Context *CreateContext(Encryption::IV *iv) anope_override
+	Encryption::Context *CreateContext(Encryption::IV *iv) override
 	{
 		if (md5)
 			return md5->CreateContext(iv);
 		return NULL;
 	}
 
-	Encryption::IV GetDefaultIV() anope_override
+	Encryption::IV GetDefaultIV() override
 	{
 		if (md5)
 			return md5->GetDefaultIV();
@@ -51,7 +51,7 @@ class EOld : public Module
 
 	}
 
-	EventReturn OnEncrypt(const Anope::string &src, Anope::string &dest) anope_override
+	EventReturn OnEncrypt(const Anope::string &src, Anope::string &dest) override
 	{
 		if (!md5)
 			return EVENT_CONTINUE;
@@ -79,7 +79,7 @@ class EOld : public Module
 		return EVENT_ALLOW;
 	}
 
-	void OnCheckAuthentication(User *, IdentifyRequest *req) anope_override
+	void OnCheckAuthentication(User *, IdentifyRequest *req) override
 	{
 		const NickAlias *na = NickAlias::Find(req->GetAccount());
 		if (na == NULL)

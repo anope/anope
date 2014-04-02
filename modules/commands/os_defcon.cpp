@@ -120,7 +120,7 @@ class DefConTimeout : public Timer
 		timeout = NULL;
 	}
 
-	void Tick(time_t) anope_override
+	void Tick(time_t) override
 	{
 		if (DConfig.defaultlevel != level)
 		{
@@ -177,7 +177,7 @@ class CommandOSDefcon : public Command
 		this->SetSyntax(_("[\0021\002|\0022\002|\0023\002|\0024\002|\0025\002]"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		const Anope::string &lvl = params[0];
 
@@ -233,7 +233,7 @@ class CommandOSDefcon : public Command
 		return;
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -335,7 +335,7 @@ class OSDefcon : public Module
 
 	}
 
-	void OnReload(Configuration::Conf *conf) anope_override
+	void OnReload(Configuration::Conf *conf) override
 	{
 		Configuration::Block *block = conf->GetModule(this);
 		DefconConfig dconfig;
@@ -407,7 +407,7 @@ class OSDefcon : public Module
 		this->ParseModeString();
 	}
 
-	EventReturn OnChannelModeSet(Channel *c, MessageSource &source, ChannelMode *mode, const Anope::string &param) anope_override
+	EventReturn OnChannelModeSet(Channel *c, MessageSource &source, ChannelMode *mode, const Anope::string &param) override
 	{
 		if (DConfig.Check(DEFCON_FORCE_CHAN_MODES) && DConfig.DefConModesOff.count(mode->name) && source.GetUser() && !source.GetBot())
 		{
@@ -419,7 +419,7 @@ class OSDefcon : public Module
 		return EVENT_CONTINUE;
 	}
 
-	EventReturn OnChannelModeUnset(Channel *c, MessageSource &source, ChannelMode *mode, const Anope::string &) anope_override
+	EventReturn OnChannelModeUnset(Channel *c, MessageSource &source, ChannelMode *mode, const Anope::string &) override
 	{
 		if (DConfig.Check(DEFCON_FORCE_CHAN_MODES) && DConfig.DefConModesOn.count(mode->name) && source.GetUser() && !source.GetBot())
 		{
@@ -437,7 +437,7 @@ class OSDefcon : public Module
 		return EVENT_CONTINUE;
 	}
 
-	EventReturn OnPreCommand(CommandSource &source, Command *command, std::vector<Anope::string> &params) anope_override
+	EventReturn OnPreCommand(CommandSource &source, Command *command, std::vector<Anope::string> &params) override
 	{
 		if (command->name == "nickserv/register" || command->name == "nickserv/group")
 		{
@@ -475,7 +475,7 @@ class OSDefcon : public Module
 		return EVENT_CONTINUE;
 	}
 
-	void OnUserConnect(User *u, bool &exempt) anope_override
+	void OnUserConnect(User *u, bool &exempt) override
 	{
 		if (exempt || u->Quitting() || !u->server->IsSynced() || u->server->IsULined())
 			return;
@@ -532,13 +532,13 @@ class OSDefcon : public Module
 		}
 	}
 
-	void OnChannelModeAdd(ChannelMode *cm) anope_override
+	void OnChannelModeAdd(ChannelMode *cm) override
 	{
 		if (DConfig.chanmodes.find(cm->mchar) != Anope::string::npos)
 			this->ParseModeString();
 	}
 
-	void OnChannelSync(Channel *c) anope_override
+	void OnChannelSync(Channel *c) override
 	{
 		if (DConfig.Check(DEFCON_FORCE_CHAN_MODES))
 			c->SetModes(Config->GetClient("OperServ"), false, "%s", DConfig.chanmodes.c_str());

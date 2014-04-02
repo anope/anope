@@ -20,13 +20,13 @@ class SQLLog : public Module
 	{
 	}
 
-	void OnReload(Configuration::Conf *conf) anope_override
+	void OnReload(Configuration::Conf *conf) override
 	{
 		Configuration::Block *config = conf->GetModule(this);
 		this->table = config->Get<const Anope::string>("table", "logs");
 	}
 
-	void OnLogMessage(LogInfo *li, const Log *l, const Anope::string &msg) anope_override
+	void OnLogMessage(LogInfo *li, const Log *l, const Anope::string &msg) override
 	{
 		Anope::string ref_name;
 		ServiceReference<SQL::Provider> SQL;

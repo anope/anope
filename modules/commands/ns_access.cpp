@@ -104,7 +104,7 @@ class CommandNSAccess : public Command
 		this->SetSyntax(_("LIST [\037nickname\037]"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		const Anope::string &cmd = params[0];
 		Anope::string nick, mask;
@@ -159,7 +159,7 @@ class CommandNSAccess : public Command
 			this->OnSyntaxError(source, "");
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -196,7 +196,7 @@ class NSAccess : public Module
 	{
 	}
 
-	void OnNickRegister(User *u, NickAlias *na) anope_override
+	void OnNickRegister(User *u, NickAlias *na) override
 	{
 		if (u && Config->GetModule(this)->Get<bool>("addaccessonreg"))
 			na->nc->AddAccess(u->Mask());

@@ -25,7 +25,7 @@ class CommandNSAList : public Command
 		this->SetSyntax(_("[\037nickname\037]"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		Anope::string nick = source.GetNick();
 		NickCore *nc = source.nc;
@@ -111,7 +111,7 @@ class CommandNSAList : public Command
 		}
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");

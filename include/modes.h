@@ -6,8 +6,7 @@
  * Please read COPYING and README for further details.
  */
 
-#ifndef MODES_H
-#define MODES_H
+#pragma once
 
 #include "anope.h"
 #include "base.h"
@@ -102,7 +101,7 @@ class CoreExport ChannelMode : public Mode
 	 */
 	ChannelMode(const Anope::string &name, char mc);
 
-	bool CanSet(User *u) const anope_override;
+	bool CanSet(User *u) const override;
 };
 
 /** This is a mode for lists, eg b/e/I. These modes should inherit from this
@@ -207,7 +206,7 @@ class CoreExport UserModeOperOnly : public UserMode
  public:
 	UserModeOperOnly(const Anope::string &mname, char um) : UserMode(mname, um) { }
 
-	bool CanSet(User *u) const anope_override;
+	bool CanSet(User *u) const override;
 };
 
 class CoreExport UserModeNoone : public UserMode
@@ -215,7 +214,7 @@ class CoreExport UserModeNoone : public UserMode
  public:
 	UserModeNoone(const Anope::string &mname, char um) : UserMode(mname, um) { }
 
-	bool CanSet(User *u) const anope_override;
+	bool CanSet(User *u) const override;
 };
 
 /** Channel mode +k (key)
@@ -225,7 +224,7 @@ class CoreExport ChannelModeKey : public ChannelModeParam
  public:
 	ChannelModeKey(char mc) : ChannelModeParam("KEY", mc) { }
 
-	bool IsValid(const Anope::string &value) const anope_override;
+	bool IsValid(const Anope::string &value) const override;
 };
 
 /** This class is used for oper only channel modes
@@ -236,7 +235,7 @@ class CoreExport ChannelModeOperOnly : public ChannelMode
 	ChannelModeOperOnly(const Anope::string &mname, char mc) : ChannelMode(mname, mc) { }
 
 	/* Opers only */
-	bool CanSet(User *u) const anope_override;
+	bool CanSet(User *u) const override;
 };
 
 /** This class is used for channel modes only servers may set
@@ -246,7 +245,7 @@ class CoreExport ChannelModeNoone : public ChannelMode
  public:
 	ChannelModeNoone(const Anope::string &mname, char mc) : ChannelMode(mname, mc) { }
 
-	bool CanSet(User *u) const anope_override;
+	bool CanSet(User *u) const override;
 };
 
 /** This is the mode manager
@@ -384,5 +383,3 @@ class CoreExport Entry
 	 */
 	bool Matches(User *u, bool full = false) const;
 };
-
-#endif // MODES_H

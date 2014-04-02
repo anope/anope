@@ -29,7 +29,7 @@ class AccessChanAccess : public ChanAccess
 	{
 	}
 
-	bool HasPriv(const Anope::string &name) const anope_override
+	bool HasPriv(const Anope::string &name) const override
 	{
 		return this->ci->GetLevel(name) != ACCESS_INVALID && this->level >= this->ci->GetLevel(name);
 	}
@@ -39,7 +39,7 @@ class AccessChanAccess : public ChanAccess
 		return stringify(this->level);
 	}
 
-	void AccessUnserialize(const Anope::string &data) anope_override
+	void AccessUnserialize(const Anope::string &data) override
 	{
 		try
 		{
@@ -50,7 +50,7 @@ class AccessChanAccess : public ChanAccess
 		}
 	}
 
-	bool operator>(const ChanAccess &other) const anope_override
+	bool operator>(const ChanAccess &other) const override
 	{
 		if (this->provider != other.provider)
 			return ChanAccess::operator>(other);
@@ -58,7 +58,7 @@ class AccessChanAccess : public ChanAccess
 			return this->level > anope_dynamic_static_cast<const AccessChanAccess *>(&other)->level;
 	}
 
-	bool operator<(const ChanAccess &other) const anope_override
+	bool operator<(const ChanAccess &other) const override
 	{
 		if (this->provider != other.provider)
 			return ChanAccess::operator<(other);
@@ -77,7 +77,7 @@ class AccessAccessProvider : public AccessProvider
 		me = this;
 	}
 
-	ChanAccess *Create() anope_override
+	ChanAccess *Create() override
 	{
 		return new AccessChanAccess(this);
 	}
@@ -274,7 +274,7 @@ class CommandCSAccess : public Command
 					}
 				}
 
-				void HandleNumber(unsigned Number) anope_override
+				void HandleNumber(unsigned Number) override
 				{
 					if (!Number || Number > ci->GetAccessCount())
 						return;
@@ -355,7 +355,7 @@ class CommandCSAccess : public Command
 				{
 				}
 
-				void HandleNumber(unsigned number) anope_override
+				void HandleNumber(unsigned number) override
 				{
 					if (!number || number > ci->GetAccessCount())
 						return;
@@ -499,7 +499,7 @@ class CommandCSAccess : public Command
 		this->SetSyntax(_("\037channel\037 CLEAR"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		const Anope::string &cmd = params[1];
 		const Anope::string &nick = params.size() > 2 ? params[2] : "";
@@ -555,7 +555,7 @@ class CommandCSAccess : public Command
 		return;
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -739,7 +739,7 @@ class CommandCSLevels : public Command
 		this->SetSyntax(_("\037channel\037 RESET"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		const Anope::string &cmd = params[1];
 		const Anope::string &what = params.size() > 2 ? params[2] : "";
@@ -775,7 +775,7 @@ class CommandCSLevels : public Command
 		return;
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		if (subcommand.equals_ci("DESC"))
 		{
@@ -842,7 +842,7 @@ class CSAccess : public Module
 
 	}
 
-	void OnReload(Configuration::Conf *conf) anope_override
+	void OnReload(Configuration::Conf *conf) override
 	{
 		defaultLevels.clear();
 
@@ -868,12 +868,12 @@ class CSAccess : public Module
 		}
 	}
 
-	void OnCreateChan(ChannelInfo *ci) anope_override
+	void OnCreateChan(ChannelInfo *ci) override
 	{
 		reset_levels(ci);
 	}
 
-	EventReturn OnGroupCheckPriv(const AccessGroup *group, const Anope::string &priv) anope_override
+	EventReturn OnGroupCheckPriv(const AccessGroup *group, const Anope::string &priv) override
 	{
 		if (group->ci == NULL)
 			return EVENT_CONTINUE;

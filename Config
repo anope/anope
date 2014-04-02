@@ -42,7 +42,6 @@ Run_Build_System () {
 	WITH_PERM=""
 	EXTRA_INCLUDE=""
 	EXTRA_LIBS=""
-	GEN_TYPE=""
 
 	if [ "$INSTDIR" != "" ] ; then
 		WITH_INST="-DINSTDIR:STRING=$INSTDIR"
@@ -68,12 +67,6 @@ Run_Build_System () {
 		RUN_CC_PL="-DUSE_RUN_CC_PL:BOOLEAN=OFF"
 	fi
 
-	if [ "$USE_PCH" = "yes" ] ; then
-		PCH="-DUSE_PCH:BOOLEAN=ON"
-	else
-		PCH="-DUSE_PCH:BOOLEAN=OFF"
-	fi
-
 	if [ "$EXTRA_INCLUDE_DIRS" != "" ] ; then
 		EXTRA_INCLUDE="-DEXTRA_INCLUDE:STRING=$EXTRA_INCLUDE_DIRS"
 	fi
@@ -81,12 +74,6 @@ Run_Build_System () {
 	if [ "$EXTRA_LIB_DIRS" != "" ] ; then
 		EXTRA_LIBS="-DEXTRA_LIBS:STRING=$EXTRA_LIB_DIRS"
 	fi
-
-	case `uname -s` in
-		MINGW*)
-			GEN_TYPE="-G\"MSYS Makefiles\""
-			;;
-	esac
 
 	if [ "$SOURCE_DIR" = "." ] ; then
 		pwdsave=`pwd`
@@ -97,9 +84,9 @@ Run_Build_System () {
 		REAL_SOURCE_DIR="$SOURCE_DIR"
 	fi
 
-	echo "cmake $GEN_TYPE $WITH_INST $WITH_RUN $WITH_PERM $BUILD_TYPE $RUN_CC_PL $PCH $EXTRA_INCLUDE $EXTRA_LIBS $EXTRA_CONFIG_ARGS $REAL_SOURCE_DIR"
+	echo "cmake $WITH_INST $WITH_RUN $WITH_PERM $BUILD_TYPE $RUN_CC_PL $EXTRA_INCLUDE $EXTRA_LIBS $EXTRA_CONFIG_ARGS $REAL_SOURCE_DIR"
 
-	cmake $GEN_TYPE $WITH_INST $WITH_RUN $WITH_PERM $BUILD_TYPE $RUN_CC_PL $PCH $EXTRA_INCLUDE $EXTRA_LIBS $EXTRA_CONFIG_ARGS $REAL_SOURCE_DIR
+	cmake $WITH_INST $WITH_RUN $WITH_PERM $BUILD_TYPE $RUN_CC_PL $EXTRA_INCLUDE $EXTRA_LIBS $EXTRA_CONFIG_ARGS $REAL_SOURCE_DIR
 
 	echo ""
 	if [ "$SOURCE_DIR" = "." ] ; then
@@ -132,7 +119,6 @@ RUNGROUP=
 UMASK=
 DEBUG="no"
 USE_RUN_CC_PL="no"
-USE_PCH="no"
 EXTRA_INCLUDE_DIRS=
 EXTRA_LIB_DIRS=
 EXTRA_CONFIG_ARGS=
@@ -378,25 +364,6 @@ echo ""
 
 ####
 
-TEMP_YN="n"
-if [ "$USE_PCH" = "yes" ] ; then
-	TEMP_YN="y"
-fi
-echo "Do you want to build using precompiled headers? This can speed up"
-echo "the build, but uses more disk space."
-echo2 "[$TEMP_YN] "
-read YN
-if [ "$YN" ] ; then
-	if [ "$YN" = "y" ] ; then
-		USE_PCH="yes"
-	else
-		USE_PCH="no"
-	fi
-fi
-echo ""
-
-####
-
 echo "Are there any extra include directories you wish to use?"
 echo "You may only need to do this if CMake is unable to locate"
 echo "missing dependencies without hints."
@@ -460,7 +427,6 @@ RUNGROUP="$RUNGROUP"
 UMASK=$UMASK
 DEBUG="$DEBUG"
 USE_RUN_CC_PL="$USE_RUN_CC_PL"
-USE_PCH="$USE_PCH"
 EXTRA_INCLUDE_DIRS="$EXTRA_INCLUDE_DIRS"
 EXTRA_LIB_DIRS="$EXTRA_LIB_DIRS"
 EXTRA_CONFIG_ARGS="$EXTRA_CONFIG_ARGS"

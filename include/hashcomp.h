@@ -7,19 +7,11 @@
  *
  */
 
-#ifndef HASHCOMP_H
-#define HASHCOMP_H
+#pragma once
 
 #include <string>
 #include <locale>
-
-#if defined _LIBCPP_VERSION || defined _WIN32
 #include <unordered_map>
-#define TR1NS std
-#else
-#include <tr1/unordered_map>
-#define TR1NS std::tr1
-#endif
 
 #include "services.h"
 
@@ -39,7 +31,7 @@ namespace Anope
 	class ascii_ctype : public std::ctype<char_type>
 	{
 	 public:
-		char_type do_toupper(char_type c) const anope_override
+		char_type do_toupper(char_type c) const override
 		{
 			if (c >= 'a' && c <= 'z')
 				return c - 32;
@@ -47,7 +39,7 @@ namespace Anope
 				return c;
 		}
 
-		char_type do_tolower(char_type c) const anope_override
+		char_type do_tolower(char_type c) const override
 		{
 			if (c >= 'A' && c <= 'Z')
 				return c + 32;
@@ -61,7 +53,7 @@ namespace Anope
 	class rfc1459_ctype : public ascii_ctype<char_type>
 	{
 	 public:
-		char_type do_toupper(char_type c) const anope_override
+		char_type do_toupper(char_type c) const override
 		{
 			if (c == '{' || c == '}' || c == '|')
 				return c - 32;
@@ -69,7 +61,7 @@ namespace Anope
 				return ascii_ctype<char_type>::do_toupper(c);
 		}
 
-		char_type do_tolower(char_type c) const anope_override
+		char_type do_tolower(char_type c) const override
 		{
 			if (c == '[' || c == ']' || c == '\\')
 				return c + 32;
@@ -197,4 +189,3 @@ inline bool operator!=(const std::string &leftval, const ci::string &rightval)
 	return !(leftval.c_str() == rightval);
 }
 
-#endif // HASHCOMP_H

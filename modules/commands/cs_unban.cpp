@@ -20,7 +20,7 @@ class CommandCSUnban : public Command
 		this->SetSyntax(_("\037channel\037 [\037nick\037]"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		if (params.empty())
 		{
@@ -87,7 +87,7 @@ class CommandCSUnban : public Command
 			source.Reply(_("\002%s\002 has been unbanned from \002%s\002."), u2->nick.c_str(), ci->c->name.c_str());
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");

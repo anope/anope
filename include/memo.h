@@ -10,8 +10,7 @@
  *
  */
 
-#ifndef MEMO_H
-#define MEMO_H
+#pragma once
 
 #include "anope.h"
 #include "serialize.h"
@@ -24,7 +23,7 @@ class CoreExport Memo : public Serializable
  	Memo();
 	~Memo();
 
-	void Serialize(Serialize::Data &data) const anope_override;
+	void Serialize(Serialize::Data &data) const override;
 	static Serializable* Unserialize(Serializable *obj, Serialize::Data &);
 
 	Anope::string owner;
@@ -52,4 +51,3 @@ struct CoreExport MemoInfo
 	static MemoInfo *GetMemoInfo(const Anope::string &targ, bool &is_chan);
 };
 
-#endif // MEMO_H

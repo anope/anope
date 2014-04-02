@@ -10,8 +10,7 @@
  *
  */
 
-#ifndef PROTOCOL_H
-#define PROTOCOL_H
+#pragma once
 
 #include "services.h"
 #include "anope.h"
@@ -274,4 +273,3 @@ class CoreExport IRCDMessage : public Service
 
 extern CoreExport IRCDProto *IRCD;
 
-#endif // PROTOCOL_H

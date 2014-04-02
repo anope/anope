@@ -20,7 +20,7 @@ class CommandOSChanList : public Command
 		this->SetSyntax(_("[{\037pattern\037 | \037nick\037} [\037SECRET\037]]"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		const Anope::string &pattern = !params.empty() ? params[0] : "";
 		const Anope::string &opt = params.size() > 1 ? params[1] : "";
@@ -95,7 +95,7 @@ class CommandOSChanList : public Command
 		source.Reply(_("End of channel list."));
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -128,7 +128,7 @@ class CommandOSUserList : public Command
 		this->SetSyntax(_("[{\037pattern\037 | \037channel\037} [\037INVISIBLE\037]]"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		const Anope::string &pattern = !params.empty() ? params[0] : "";
 		const Anope::string &opt = params.size() > 1 ? params[1] : "";
@@ -206,7 +206,7 @@ class CommandOSUserList : public Command
 		return;
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");

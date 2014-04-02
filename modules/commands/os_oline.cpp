@@ -20,7 +20,7 @@ class CommandOSOLine : public Command
 		this->SetSyntax(_("\037nick\037 \037flags\037"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		const Anope::string &nick = params[0];
 		const Anope::string &flag = params[1];
@@ -49,7 +49,7 @@ class CommandOSOLine : public Command
 		return;
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");

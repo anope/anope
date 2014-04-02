@@ -9,8 +9,7 @@
  * Based on the original code of Services by Andy Church.
  */
 
-#ifndef COMMAND_H
-#define COMMAND_H
+#pragma once
 
 #include "service.h"
 #include "anope.h"
@@ -180,4 +179,3 @@ class CoreExport Command : public Service
 	static bool FindCommandFromService(const Anope::string &command_service, BotInfo* &bi, Anope::string &name);
 };
 
-#endif // COMMANDS_H

@@ -16,7 +16,7 @@ struct IgnoreDataImpl : IgnoreData, Serializable
 {
 	IgnoreDataImpl() : Serializable("IgnoreData") { }
 	~IgnoreDataImpl();
-	void Serialize(Serialize::Data &data) const anope_override;
+	void Serialize(Serialize::Data &data) const override;
 	static Serializable* Unserialize(Serializable *obj, Serialize::Data &data);
 };
 
@@ -64,19 +64,19 @@ class OSIgnoreService : public IgnoreService
  public:
 	OSIgnoreService(Module *o) : IgnoreService(o), ignores("IgnoreData") { }
 
-	void AddIgnore(IgnoreData *ign) anope_override
+	void AddIgnore(IgnoreData *ign) override
 	{
 		ignores->push_back(ign);
 	}
 
-	void DelIgnore(IgnoreData *ign) anope_override
+	void DelIgnore(IgnoreData *ign) override
 	{
 		std::vector<IgnoreData *>::iterator it = std::find(ignores->begin(), ignores->end(), ign);
 		if (it != ignores->end())
 			ignores->erase(it);
 	}
 
-	void ClearIgnores() anope_override
+	void ClearIgnores() override
 	{
 		for (unsigned i = ignores->size(); i > 0; --i)
 		{
@@ -85,12 +85,12 @@ class OSIgnoreService : public IgnoreService
 		}
 	}
 
-	IgnoreData *Create() anope_override
+	IgnoreData *Create() override
 	{
 		return new IgnoreDataImpl();
 	}
 
-	IgnoreData *Find(const Anope::string &mask) anope_override
+	IgnoreData *Find(const Anope::string &mask) override
 	{
 		User *u = User::Find(mask, true);
 		std::vector<IgnoreData *>::iterator ign = this->ignores->begin(), ign_end = this->ignores->end();
@@ -148,7 +148,7 @@ class OSIgnoreService : public IgnoreService
 		return NULL;
 	}
 
-	std::vector<IgnoreData *> &GetIgnores() anope_override
+	std::vector<IgnoreData *> &GetIgnores() override
 	{
 		return *ignores;
 	}
@@ -345,7 +345,7 @@ class CommandOSIgnore : public Command
 		this->SetSyntax("CLEAR");
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		const Anope::string &cmd = params[0];
 
@@ -363,7 +363,7 @@ class CommandOSIgnore : public Command
 		return;
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -404,7 +404,7 @@ class OSIgnore : public Module
 
 	}
 
-	EventReturn OnBotPrivmsg(User *u, BotInfo *bi, Anope::string &message) anope_override
+	EventReturn OnBotPrivmsg(User *u, BotInfo *bi, Anope::string &message) override
 	{
 		if (!u->HasMode("OPER") && this->osignoreservice.Find(u->nick))
 			return EVENT_STOP;

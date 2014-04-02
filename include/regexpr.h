@@ -10,8 +10,7 @@
  *
  */
 
-#ifndef REGEXPR_H
-#define REGEXPR_H
+#pragma once
 
 #include "services.h"
 #include "anope.h"
@@ -42,6 +41,4 @@ class CoreExport RegexProvider : public Service
 	RegexProvider(Module *o, const Anope::string &n) : Service(o, "Regex", n) { }
 	virtual Regex *Compile(const Anope::string &) = 0;
 };
-
-#endif // REGEXPR_H
 

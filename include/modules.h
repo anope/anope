@@ -10,11 +10,9 @@
  *
  */
 
+#pragma once
+
 #include "serialize.h"
-
-#ifndef MODULES_H
-#define MODULES_H
-
 #include "base.h"
 #include "modes.h"
 #include "timers.h"
@@ -1203,4 +1201,3 @@ class CoreExport ModuleManager
 	static ModuleReturn DeleteModule(Module *m);
 };
 
-#endif // MODULES_H

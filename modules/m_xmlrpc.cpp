@@ -45,7 +45,7 @@ class MyXMLRPCServiceInterface : public XMLRPCServiceInterface, public HTTPPage
 			this->events.erase(it);
 	}
 
-	Anope::string Sanitize(const Anope::string &string) anope_override
+	Anope::string Sanitize(const Anope::string &string) override
 	{
 		Anope::string ret = string;
 		for (int i = 0; special[i].character.empty() == false; ++i)
@@ -104,7 +104,7 @@ class MyXMLRPCServiceInterface : public XMLRPCServiceInterface, public HTTPPage
 	}
 
  public:
-	bool OnRequest(HTTPProvider *provider, const Anope::string &page_name, HTTPClient *client, HTTPMessage &message, HTTPReply &reply) anope_override
+	bool OnRequest(HTTPProvider *provider, const Anope::string &page_name, HTTPClient *client, HTTPMessage &message, HTTPReply &reply) override
 	{
 		Anope::string content = message.content, tname, data;
 		XMLRPCRequest request(reply);
@@ -176,7 +176,7 @@ class ModuleXMLRPC : public Module
 			httpref->UnregisterPage(&xmlrpcinterface);
 	}
 
-	void OnReload(Configuration::Conf *conf) anope_override
+	void OnReload(Configuration::Conf *conf) override
 	{
 		this->httpref = ServiceReference<HTTPProvider>("HTTPProvider", conf->GetModule(this)->Get<const Anope::string>("server", "httpd/main"));
 	}

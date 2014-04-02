@@ -32,7 +32,7 @@ class DNSBLResolver : public Request
  public:
 	DNSBLResolver(Module *c, User *u, const Blacklist &b, const Anope::string &host, bool add_akill) : Request(dnsmanager, c, host, QUERY_A, true), user(u), blacklist(b), add_to_akill(add_akill) { }
 
-	void OnLookupComplete(const Query *record) anope_override
+	void OnLookupComplete(const Query *record) override
 	{
 		if (!user || user->Quitting())
 			return;
@@ -92,7 +92,7 @@ class ModuleDNSBL : public Module
 
 	}
 
-	void OnReload(Configuration::Conf *conf) anope_override
+	void OnReload(Configuration::Conf *conf) override
 	{
 		Configuration::Block *block = conf->GetModule(this);
 		this->check_on_connect = block->Get<bool>("check_on_connect");
@@ -121,7 +121,7 @@ class ModuleDNSBL : public Module
 		}
 	}
 
-	void OnUserConnect(User *user, bool &exempt) anope_override
+	void OnUserConnect(User *user, bool &exempt) override
 	{
 		if (exempt || user->Quitting() || (!this->check_on_connect && !Me->IsSynced()) || !dnsmanager)
 			return;

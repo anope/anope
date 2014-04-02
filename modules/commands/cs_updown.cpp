@@ -49,7 +49,7 @@ class CommandCSUp : public Command
 		this->SetSyntax(_("[\037channel\037 [\037nick\037]]"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		if (params.empty())
 		{
@@ -113,7 +113,7 @@ class CommandCSUp : public Command
 
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -141,7 +141,7 @@ class CommandCSDown : public Command
 		this->SetSyntax(_("[\037channel\037 [\037nick\037]]"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		if (params.empty())
 		{
@@ -204,7 +204,7 @@ class CommandCSDown : public Command
 		}
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");

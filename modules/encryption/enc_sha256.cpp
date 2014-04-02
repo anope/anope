@@ -173,7 +173,7 @@ class SHA256Context : public Encryption::Context
 		memset(this->digest, 0, sizeof(this->digest));
 	}
 
-	void Update(const unsigned char *message, size_t mlen) anope_override
+	void Update(const unsigned char *message, size_t mlen) override
 	{
 		unsigned tmp_len = SHA256_BLOCK_SIZE - this->len, rem_len = mlen < tmp_len ? mlen : tmp_len;
 
@@ -195,7 +195,7 @@ class SHA256Context : public Encryption::Context
 		this->tot_len += (block_nb + 1) << 6;
 	}
 
-	void Finalize() anope_override
+	void Finalize() override
 	{
 		unsigned block_nb = 1 + ((SHA256_BLOCK_SIZE - 9) < (this->len % SHA256_BLOCK_SIZE));
 		unsigned len_b = (this->tot_len + this->len) << 3;
@@ -208,7 +208,7 @@ class SHA256Context : public Encryption::Context
 			UNPACK32(this->h[i], &this->digest[i << 2]);
 	}
 
-	Encryption::Hash GetFinalizedHash() anope_override
+	Encryption::Hash GetFinalizedHash() override
 	{
 		Encryption::Hash hash;
 		hash.first = this->digest;
@@ -222,12 +222,12 @@ class SHA256Provider : public Encryption::Provider
  public:
  	SHA256Provider(Module *creator) : Encryption::Provider(creator, "sha256") { }
 
-	Encryption::Context *CreateContext(Encryption::IV *iv) anope_override
+	Encryption::Context *CreateContext(Encryption::IV *iv) override
 	{
 		return new SHA256Context(iv);
 	}
 
-	Encryption::IV GetDefaultIV() anope_override
+	Encryption::IV GetDefaultIV() override
 	{
 		Encryption::IV iv;
 		iv.first = sha256_h0;
@@ -281,7 +281,7 @@ class ESHA256 : public Module
 		use_iv = false;
 	}
 
-	EventReturn OnEncrypt(const Anope::string &src, Anope::string &dest) anope_override
+	EventReturn OnEncrypt(const Anope::string &src, Anope::string &dest) override
 	{
 		if (!use_iv)
 			NewRandomIV();
@@ -302,7 +302,7 @@ class ESHA256 : public Module
 		return EVENT_ALLOW;
 	}
 
-	void OnCheckAuthentication(User *, IdentifyRequest *req) anope_override
+	void OnCheckAuthentication(User *, IdentifyRequest *req) override
 	{
 		const NickAlias *na = NickAlias::Find(req->GetAccount());
 		if (na == NULL)

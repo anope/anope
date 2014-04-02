@@ -13,37 +13,7 @@
 #include "services.h"
 #include "threadengine.h"
 #include "anope.h"
-
-#ifndef _WIN32
-#include <pthread.h>
-#endif
-
-static inline pthread_attr_t *get_engine_attr()
-{
-	/* Threadengine attributes used by this thread engine */
-	static pthread_attr_t attr;
-	static bool inited = false;
-
-	if (inited == false)
-	{
-		if (pthread_attr_init(&attr))
-			throw CoreException("Error calling pthread_attr_init");
-		if (pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE))
-			throw CoreException("Unable to mark threads as joinable");
-		inited = true;
-	}
-
-	return &attr;
-}
-
-static void *entry_point(void *parameter)
-{
-	Thread *thread = static_cast<Thread *>(parameter);
-	thread->Run();
-	thread->SetExitState();
-	pthread_exit(0);
-	return NULL;
-}
+#include <system_error>
 
 Thread::Thread() : exit(false)
 {
@@ -56,7 +26,15 @@ Thread::~Thread()
 void Thread::Join()
 {
 	this->SetExitState();
-	pthread_join(handle, NULL);
+	try
+	{
+		if (this->handle.joinable())
+			this->handle.join();
+	}
+	catch (const std::system_error &error)
+	{
+		throw CoreException("Unable to join thread: " + Anope::string(error.what()));
+	}
 }
 
 void Thread::SetExitState()
@@ -65,18 +43,28 @@ void Thread::SetExitState()
 	exit = true;
 }
 
-void Thread::Exit()
-{
-	this->SetExitState();
-	pthread_exit(0);
-}
-
 void Thread::Start()
 {
-	if (pthread_create(&this->handle, get_engine_attr(), entry_point, this))
+	try
+	{
+		this->handle = std::thread([this]()
+		{
+			try
+			{
+				this->Run();
+			}
+			catch (...)
+			{
+				this->SetExitState();
+				throw;
+			}
+			this->SetExitState();
+		});
+	}
+	catch (const std::system_error &error)
 	{
 		this->flags[SF_DEAD] = true;
-		throw CoreException("Unable to create thread: " + Anope::LastError());
+		throw CoreException("Unable to create thread: " + Anope::string(error.what()));
 	}
 }
 
@@ -91,47 +79,28 @@ void Thread::OnNotify()
 	this->flags[SF_DEAD] = true;
 }
 
-Mutex::Mutex()
-{
-	pthread_mutex_init(&mutex, NULL);
-}
-
-Mutex::~Mutex()
-{
-	pthread_mutex_destroy(&mutex);
-}
-
 void Mutex::Lock()
 {
-	pthread_mutex_lock(&mutex);
-}
-
-void Mutex::Unlock()
-{
-	pthread_mutex_unlock(&mutex);
+	this->m.lock();
 }
 
 bool Mutex::TryLock()
 {
-	return pthread_mutex_trylock(&mutex) == 0;
+	return this->m.try_lock();
 }
 
-Condition::Condition() : Mutex()
+void Mutex::Unlock()
 {
-	pthread_cond_init(&cond, NULL);
-}
-
-Condition::~Condition()
-{
-	pthread_cond_destroy(&cond);
-}
-
-void Condition::Wakeup()
-{
-	pthread_cond_signal(&cond);
+	this->m.unlock();
 }
 
 void Condition::Wait()
 {
-	pthread_cond_wait(&cond, &mutex);
+	this->cv.wait(this->m);
 }
+
+void Condition::Wakeup()
+{
+	this->cv.notify_one();
+}
+

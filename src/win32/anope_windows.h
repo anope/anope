@@ -63,7 +63,6 @@
 #include "dir/dir.h"
 #include "dl/dl.h"
 #include "pipe/pipe.h"
-#include "pthread/pthread.h"
 #include "sigaction/sigaction.h"
 
 typedef int ssize_t;

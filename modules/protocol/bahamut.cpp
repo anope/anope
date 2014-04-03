@@ -522,7 +522,7 @@ class ProtoBahamut : public Module
 		ModeManager::AddChannelMode(new ChannelMode("INVITE", 'i'));
 		ModeManager::AddChannelMode(new ChannelModeFlood('f', false));
 		ModeManager::AddChannelMode(new ChannelModeKey('k'));
-		ModeManager::AddChannelMode(new ChannelModeParam("LIMIT", 'l'));
+		ModeManager::AddChannelMode(new ChannelModeParam("LIMIT", 'l', true));
 		ModeManager::AddChannelMode(new ChannelMode("MODERATED", 'm'));
 		ModeManager::AddChannelMode(new ChannelMode("NOEXTERNAL", 'n'));
 		ModeManager::AddChannelMode(new ChannelMode("PRIVATE", 'p'));

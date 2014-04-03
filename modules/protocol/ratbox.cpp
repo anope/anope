@@ -274,7 +274,7 @@ class ProtoRatbox : public Module
 		ModeManager::AddChannelMode(new ChannelModeStatus("OP", 'o', '@', 1));
 
 		/* l/k */
-		ModeManager::AddChannelMode(new ChannelModeParam("LIMIT", 'l'));
+		ModeManager::AddChannelMode(new ChannelModeParam("LIMIT", 'l', true));
 		ModeManager::AddChannelMode(new ChannelModeKey('k'));
 
 		/* channel modes */

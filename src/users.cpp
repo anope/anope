@@ -523,7 +523,27 @@ void User::SetModeInternal(const MessageSource &source, UserMode *um, const Anop
 	this->modes[um->name] = param;
 
 	if (um->name == "OPER")
+	{
 		++OperCount;
+
+		if (this->IsServicesOper())
+		{
+			if (!this->nc->o->ot->modes.empty())
+			{
+				this->SetModes(NULL, "%s", this->nc->o->ot->modes.c_str());
+				this->SendMessage(NULL, "Changing your usermodes to \002%s\002", this->nc->o->ot->modes.c_str());
+				UserMode *oper = ModeManager::FindUserModeByName("OPER");
+				if (oper && !this->HasMode("OPER") && this->nc->o->ot->modes.find(oper->mchar) != Anope::string::npos)
+					IRCD->SendOper(this);
+			}
+			if (IRCD->CanSetVHost && !this->nc->o->vhost.empty())
+			{
+				this->SendMessage(NULL, "Changing your vhost to \002%s\002", this->nc->o->vhost.c_str());
+ 				this->SetDisplayedHost(this->nc->o->vhost);
+				IRCD->SendVhost(this, "", this->nc->o->vhost);
+			}
+		}
+	}
 
 	if (um->name == "CLOAK" || um->name == "VHOST")
 		this->UpdateHost();

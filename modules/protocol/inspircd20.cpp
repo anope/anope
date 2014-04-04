@@ -968,9 +968,7 @@ struct IRCDMessageCapab : Message::Capab
 
 struct IRCDMessageEncap : IRCDMessage
 {
-	ServiceReference<IRCDMessage> insp12_encap;
-
-	IRCDMessageEncap(Module *creator) : IRCDMessage(creator, "ENCAP", 4), insp12_encap("IRCDMessage", "inspircd12/encap") { SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
+	IRCDMessageEncap(Module *creator) : IRCDMessage(creator, "ENCAP", 4) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
 
 	void Run(MessageSource &source, const std::vector<Anope::string> &params) override
 	{
@@ -1004,31 +1002,6 @@ struct IRCDMessageEncap : IRCDMessage
 			u->SetRealname(params[3]);
 			UplinkSocket::Message(u) << "FNAME " << params[3];
 		}
-
-		if (insp12_encap)
-			insp12_encap->Run(source, params);
-	}
-};
-
-struct IRCDMessageChgIdent : IRCDMessage
-{
-	IRCDMessageChgIdent(Module *creator) : IRCDMessage(creator, "CHGIDENT", 2) { }
-
-	void Run(MessageSource &source, const std::vector<Anope::string> &params) override
-	{
-		User *u = User::Find(params[0]);
-		if (u)
-			u->SetIdent(params[1]);
-	}
-};
-
-struct IRCDMessageChgName : IRCDMessage
-{
-	IRCDMessageChgName(Module *creator, const Anope::string &n) : IRCDMessage(creator, n, 1) { SetFlag(IRCDMESSAGE_REQUIRE_USER); }
-
-	void Run(MessageSource &source, const std::vector<Anope::string> &params) override
-	{
-		source.GetUser()->SetRealname(params[0]);
 	}
 };
 
@@ -1048,11 +1021,21 @@ struct IRCDMessageEndburst : IRCDMessage
 
 struct IRCDMessageFHost : IRCDMessage
 {
-	IRCDMessageFHost(Module *creator, const Anope::string &n) : IRCDMessage(creator, n, 1) { SetFlag(IRCDMESSAGE_REQUIRE_USER); }
+	IRCDMessageFHost(Module *creator) : IRCDMessage(creator, "FHOST", 1) { SetFlag(IRCDMESSAGE_REQUIRE_USER); }
 
 	void Run(MessageSource &source, const std::vector<Anope::string> &params) override
 	{
 		source.GetUser()->SetDisplayedHost(params[0]);
+	}
+};
+
+struct IRCDMessageFIdent : IRCDMessage
+{
+	IRCDMessageFIdent(Module *creator) : IRCDMessage(creator, "FIDENT", 1) { SetFlag(IRCDMESSAGE_REQUIRE_USER); }
+
+	void Run(MessageSource &source, const std::vector<Anope::string> &params) override
+	{
+		source.GetUser()->SetIdent(params[0]);
 	}
 };
 
@@ -1341,16 +1324,6 @@ struct IRCDMessageRSQuit : IRCDMessage
 	}
 };
 
-struct IRCDMessageSetIdent : IRCDMessage
-{
-	IRCDMessageSetIdent(Module *creator) : IRCDMessage(creator, "SETIDENT", 0) { SetFlag(IRCDMESSAGE_REQUIRE_USER); }
-
-	void Run(MessageSource &source, const std::vector<Anope::string> &params) override
-	{
-		source.GetUser()->SetIdent(params[0]);
-	}
-};
-
 struct IRCDMessageServer : IRCDMessage
 {
 	IRCDMessageServer(Module *creator) : IRCDMessage(creator, "SERVER", 5) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
@@ -1450,16 +1423,6 @@ struct IRCDMessageUID : IRCDMessage
 	}
 };
 
-struct IRCDMessageFIdent : IRCDMessage
-{
-	IRCDMessageFIdent(Module *creator) : IRCDMessage(creator, "FIDENT", 1) { SetFlag(IRCDMESSAGE_REQUIRE_USER); }
-
-	void Run(MessageSource &source, const std::vector<Anope::string> &params) override
-	{
-		source.GetUser()->SetIdent(params[0]);
-	}
-};
-
 class ProtoInspIRCd20 : public Module
 {
 	InspIRCd20Proto ircd_proto;
@@ -1483,11 +1446,9 @@ class ProtoInspIRCd20 : public Module
 
 	/* Our message handlers */
 	IRCDMessageCapab message_capab;
-	IRCDMessageChgIdent message_chgident;
-	IRCDMessageChgName message_setname, message_chgname;
 	IRCDMessageEncap message_encap;
 	IRCDMessageEndburst message_endburst;
-	IRCDMessageFHost message_fhost, message_sethost;
+	IRCDMessageFHost message_fhost;
 	IRCDMessageFIdent message_fident;
 	IRCDMessageFJoin message_fjoin;
 	IRCDMessageFMode message_fmode;
@@ -1498,7 +1459,6 @@ class ProtoInspIRCd20 : public Module
 	IRCDMessageNick message_nick;
 	IRCDMessageOperType message_opertype;
 	IRCDMessageRSQuit message_rsquit;
-	IRCDMessageSetIdent message_setident;
 	IRCDMessageServer message_server;
 	IRCDMessageSQuit message_squit;
 	IRCDMessageTime message_time;
@@ -1518,11 +1478,10 @@ class ProtoInspIRCd20 : public Module
 		message_kill(this), message_motd(this), message_notice(this), message_part(this), message_ping(this),
 		message_privmsg(this), message_quit(this), message_stats(this), message_topic(this),
 
-		message_capab(this), message_chgident(this), message_setname(this, "SETNAME"),
-		message_chgname(this, "FNAME"), message_encap(this), message_endburst(this),
-		message_fhost(this, "FHOST"), message_sethost(this, "SETHOST"), message_fident(this), message_fjoin(this), message_fmode(this), message_ftopic(this),
+		message_capab(this), message_encap(this), message_endburst(this),
+		message_fhost(this), message_fident(this), message_fjoin(this), message_fmode(this), message_ftopic(this),
 		message_idle(this), message_metadata(this), message_mode(this), message_nick(this), message_opertype(this), message_rsquit(this),
-		message_setident(this), message_server(this), message_squit(this), message_time(this), message_uid(this)
+		message_server(this), message_squit(this), message_time(this), message_uid(this)
 	{
 	}
 

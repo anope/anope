@@ -89,7 +89,9 @@ class CommandOSMode : public Command
 				Anope::string param, param_log;
 				if (cm->type != MODE_REGULAR)
 				{
-					if (!sep.GetToken(param))
+					if (cm->type == MODE_PARAM && !add && anope_dynamic_static_cast<ChannelModeParam *>(cm)->minus_no_arg)
+						;
+					else if (!sep.GetToken(param))
 						continue;
 
 					param_log = param;

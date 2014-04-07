@@ -176,6 +176,8 @@ class SerializableExtensibleItem : public PrimitiveExtensibleItem<T>
 		T t;
 		if (data[this->name] >> t)
 			this->Set(e, t);
+		else
+			this->Unset(e);
 	}
 };
 
@@ -196,6 +198,8 @@ class SerializableExtensibleItem<bool> : public PrimitiveExtensibleItem<bool>
 		data[this->name] >> b;
 		if (b)
 			this->Set(e);
+		else
+			this->Unset(e);
 	}
 };
 

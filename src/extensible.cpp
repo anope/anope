@@ -49,9 +49,6 @@ void Extensible::ExtensibleSerialize(const Extensible *e, const Serializable *s,
 
 void Extensible::ExtensibleUnserialize(Extensible *e, Serializable *s, Serialize::Data &data)
 {
-	while (!e->extension_items.empty())
-		(*e->extension_items.begin())->Unset(e);
-
 	for (std::set<ExtensibleBase *>::iterator it = extensible_items.begin(); it != extensible_items.end(); ++it)
 	{
 		ExtensibleBase *eb = *it;

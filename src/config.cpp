@@ -525,37 +525,6 @@ Conf::Conf() : Block("")
 	/* Check the user keys */
 	if (!options->Get<unsigned>("seed"))
 		Log() << "Configuration option options:seed should be set. It's for YOUR safety! Remember that!";
-
-	if (Config)
-	{
-		/* Apply module chnages */
-		for (unsigned i = 0; i < Config->ModulesAutoLoad.size(); ++i)
-			if (std::find(this->ModulesAutoLoad.begin(), this->ModulesAutoLoad.end(), Config->ModulesAutoLoad[i]) == this->ModulesAutoLoad.end())
-				ModuleManager::UnloadModule(ModuleManager::FindModule(Config->ModulesAutoLoad[i]), NULL);
-		for (unsigned i = 0; i < this->ModulesAutoLoad.size(); ++i)
-			if (std::find(Config->ModulesAutoLoad.begin(), Config->ModulesAutoLoad.end(), this->ModulesAutoLoad[i]) == Config->ModulesAutoLoad.end())
-				ModuleManager::LoadModule(this->ModulesAutoLoad[i], NULL);
-
-		/* Apply opertype changes, as non-conf opers still point to the old oper types */
-		for (unsigned i = Oper::opers.size(); i > 0; --i)
-		{
-			Oper *o = Oper::opers[i - 1];
-
-			/* Oper's type is in the old config, so update it */
-			if (std::find(Config->MyOperTypes.begin(), Config->MyOperTypes.end(), o->ot) != Config->MyOperTypes.end())
-			{
-				OperType *ot = o->ot;
-				o->ot = NULL;
-
-				for (unsigned j = 0; j < MyOperTypes.size(); ++j)
-					if (ot->GetName() == MyOperTypes[j]->GetName())
-						o->ot = MyOperTypes[j];
-
-				if (o->ot == NULL)
-					delete o; /* Oper block has lost type */
-			}
-		}
-	}
 }
 
 Conf::~Conf()
@@ -564,6 +533,48 @@ Conf::~Conf()
 		delete MyOperTypes[i];
 	for (unsigned i = 0; i < Opers.size(); ++i)
 		delete Opers[i];
+}
+
+void Conf::Post(Conf *old)
+{
+	/* Apply module changes */
+	for (unsigned i = 0; i < old->ModulesAutoLoad.size(); ++i)
+		if (std::find(this->ModulesAutoLoad.begin(), this->ModulesAutoLoad.end(), old->ModulesAutoLoad[i]) == this->ModulesAutoLoad.end())
+			ModuleManager::UnloadModule(ModuleManager::FindModule(old->ModulesAutoLoad[i]), NULL);
+	for (unsigned i = 0; i < this->ModulesAutoLoad.size(); ++i)
+		if (std::find(old->ModulesAutoLoad.begin(), old->ModulesAutoLoad.end(), this->ModulesAutoLoad[i]) == old->ModulesAutoLoad.end())
+			ModuleManager::LoadModule(this->ModulesAutoLoad[i], NULL);
+
+	/* Apply opertype changes, as non-conf opers still point to the old oper types */
+	for (unsigned i = Oper::opers.size(); i > 0; --i)
+	{
+		Oper *o = Oper::opers[i - 1];
+
+		/* Oper's type is in the old config, so update it */
+		if (std::find(old->MyOperTypes.begin(), old->MyOperTypes.end(), o->ot) != old->MyOperTypes.end())
+		{
+			OperType *ot = o->ot;
+			o->ot = NULL;
+
+			for (unsigned j = 0; j < MyOperTypes.size(); ++j)
+				if (ot->GetName() == MyOperTypes[j]->GetName())
+					o->ot = MyOperTypes[j];
+
+			if (o->ot == NULL)
+			{
+				/* Oper block has lost type */
+				std::vector<Oper *>::iterator it = std::find(old->Opers.begin(), old->Opers.end(), o);
+				if (it != old->Opers.end())
+					old->Opers.erase(it);
+
+				it = std::find(this->Opers.begin(), this->Opers.end(), o);
+				if (it != this->Opers.end())
+					this->Opers.erase(it);
+
+				delete o;
+			}
+		}
+	}
 }
 
 Block *Conf::GetModule(Module *m)

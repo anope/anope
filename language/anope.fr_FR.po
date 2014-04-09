@@ -8,15 +8,15 @@ msgstr ""
 "Project-Id-Version: Anope\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-03-23 08:55-0400\n"
-"PO-Revision-Date: 2013-12-29 23:48+0100\n"
-"Last-Translator: Harakiri <harakiri@overstack.fr>\n"
+"PO-Revision-Date: 2014-04-09 07:45+0100\n"
+"Last-Translator: Jyzee <jyzee.git@gmail.com>\n"
 "Language-Team: French\n"
 "Language: fr_FR\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
-"X-Generator: Poedit 1.5.7\n"
+"X-Generator: Poedit 1.5.5\n"
 
 #: modules/commands/os_forbid.cpp:312
 #, c-format
@@ -26,7 +26,7 @@ msgstr "%d canaux vidés et %d canaux supprimés."
 #: modules/commands/os_forbid.cpp:253
 #, c-format
 msgid "%d nickname(s) dropped."
-msgstr " %d pseudos effacé(s)."
+msgstr "%d pseudo(s) effacé(s)."
 
 #: modules/commands/cs_xop.cpp:220
 #, c-format
@@ -363,14 +363,14 @@ msgid "%s is not on the ignore list."
 msgstr "%s n'a pas été trouvé dans la liste des ignorés."
 
 #: modules/commands/cs_status.cpp:75
-#, fuzzy, c-format
+#, c-format
 msgid "%s is on the auto kick list of %s (%s)."
-msgstr "%s ajouté à la liste de kicks automatiques (%s)."
+msgstr "%s est dans la liste de kicks automatiques de %s (%s)."
 
 #: modules/commands/cs_status.cpp:53
-#, fuzzy, c-format
+#, c-format
 msgid "%s is the founder of %s."
-msgstr "%s est le propriétaire du canal."
+msgstr "%s est le propriétaire de %s."
 
 #: modules/commands/cs_status.cpp:64
 #, c-format
@@ -387,9 +387,9 @@ msgstr ""
 "l'exception n'a pas été supprimée."
 
 #: modules/commands/cs_status.cpp:81
-#, fuzzy, c-format
+#, c-format
 msgid "%s matches auto kick entry %s on %s (%s)."
-msgstr "%s correspond à l'entrée d'auto kick %s (%s)"
+msgstr "%s correspond à l'entrée d'auto kick %s sur %s (%s)."
 
 #: modules/commands/cs_xop.cpp:358
 #, c-format
@@ -575,9 +575,8 @@ msgid "[auto-memo] The memo you sent to %s has been viewed."
 msgstr "[auto-memo] Le mémo que vous avez envoyé a %s a été vu."
 
 #: modules/commands/ns_group.cpp:78
-#, fuzzy
 msgid "[target] [password]"
-msgstr "cible motdepasse"
+msgstr "[cible] [motdepasse]"
 
 #: modules/commands/ns_set.cpp:433
 msgid "address"
@@ -1585,9 +1584,9 @@ msgid "%c%c%s has been unlocked from %s."
 msgstr "%c%c%s n'est plus forcé par %s."
 
 #: modules/commands/cs_clone.cpp:141
-#, fuzzy, c-format
+#, c-format
 msgid "%d access entries from %s have been cloned to %s."
-msgstr "Tous les accès de %s ont été clonées pour %s."
+msgstr "%d accès de %s ont été clonés sur %s."
 
 #: modules/commands/bs_botlist.cpp:56
 #, c-format
@@ -1813,7 +1812,7 @@ msgstr "%s pour %s retiré"
 #: modules/commands/ns_ajoin.cpp:176
 #, c-format
 msgid "%s had an invalid key specified, and was thus ignored."
-msgstr ""
+msgstr "%s avait une clé de canal invalide spécifiée, et a été ignoré."
 
 #: modules/commands/ms_info.cpp:111
 #, c-format
@@ -2197,9 +2196,8 @@ msgid "ADD [nickname] mask"
 msgstr "ADD [pseudo] masque"
 
 #: modules/commands/ns_cert.cpp:258
-#, fuzzy
 msgid "ADD [nickname] [fingerprint]"
-msgstr "ADD [pseudo] fingerprint"
+msgstr "ADD [pseudo] [fingerprint]"
 
 #: modules/commands/os_akill.cpp:375 modules/commands/os_sxline.cpp:651
 msgid "ADD [+expiry] mask reason"
@@ -2867,7 +2865,6 @@ msgstr ""
 "par cela de manière permanente."
 
 #: modules/commands/os_config.cpp:127
-#, fuzzy
 msgid ""
 "Allows you to change and view configuration settings.\n"
 "Settings changed by this command are temporary and will not be reflected\n"
@@ -2878,12 +2875,13 @@ msgid ""
 "     MODIFY nickserv forcemail no"
 msgstr ""
 "Vous autorise à modifier et voir les paramètres de configuration.\n"
-"Les paramètres modifiés par cette commande, le sont temporairement\n"
+"Les paramètres modifiés par cette commande le sont temporairement\n"
 "et ne seront pas répercutés dans le fichier de configuration, ils seront "
 "perdus\n"
-"si Anope est arrêté, redémarré ou que la commande RELOAD est utilisée.\n"
+"si Anope est arrêté, redémarré ou que la configuration est rechargée.\n"
 "\n"
-"Exemple :      MODIFY nickserv forcemail no"
+"Exemple :\n"
+"     MODIFY nickserv forcemail no"
 
 #: modules/commands/ns_set.cpp:966
 msgid ""
@@ -3402,9 +3400,9 @@ msgstr ""
 "utilisez la commande."
 
 #: modules/commands/cs_clone.cpp:55
-#, fuzzy, c-format
+#, c-format
 msgid "Cannot clone channel %s to itself!"
-msgstr "Le bot n'est pas sur le canal %s."
+msgstr "Impossible de cloner le canal %s sur lui-même !"
 
 #: modules/commands/ns_register.cpp:301
 msgid "Cannot send mail now; please retry a little later."
@@ -3706,10 +3704,9 @@ msgid "Chanstats"
 msgstr "Chanstats"
 
 #: modules/extra/stats/m_chanstats.cpp:94
-#, fuzzy, c-format
+#, c-format
 msgid "Chanstats statistics are now disabled for %s"
-msgstr ""
-"Les statistiques chanstats sont maintenant desactivées pour votre nick."
+msgstr "Les statistiques chanstats sont maintenant désactivées pour %s."
 
 #: modules/extra/stats/m_chanstats.cpp:43
 msgid "Chanstats statistics are now disabled for this channel."
@@ -3721,9 +3718,9 @@ msgstr ""
 "Les statistiques chanstats sont maintenant desactivées pour votre nick."
 
 #: modules/extra/stats/m_chanstats.cpp:85
-#, fuzzy, c-format
+#, c-format
 msgid "Chanstats statistics are now enabled for %s"
-msgstr "Les statistiques chanstats sont maintenant activées pour votre nick."
+msgstr "Les statistiques chanstats sont maintenant activées pour %s."
 
 #: modules/extra/stats/m_chanstats.cpp:36
 msgid "Chanstats statistics are now enabled for this channel."
@@ -4914,9 +4911,9 @@ msgid "Fingerprint %s already present on %s's certificate list."
 msgstr "Le fingerprint %s existe déjà dans la liste de certificats de %s."
 
 #: modules/commands/ns_cert.cpp:198
-#, fuzzy, c-format
+#, c-format
 msgid "Fingerprint %s is already in use."
-msgstr "%s est déjà dans %s."
+msgstr "L'empreinte %s est déjà utilisée."
 
 #: modules/commands/cs_flags.cpp:301
 msgid "Flags"
@@ -5732,7 +5729,7 @@ msgid "MOVE num position"
 msgstr "MOVE num position"
 
 #: modules/commands/cs_mode.cpp:719
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "Mainly controls mode locks and mode access (which is different from channel "
 "access)\n"
@@ -5772,9 +5769,9 @@ msgstr ""
 "bloqués\n"
 "d'un canal. Si un mode est activé ou désactivé, les services n'autoriseront "
 "pas la modification de\n"
-"ce mode. La commande SET videra tous les modes existants et définira le "
-"nouveau mode donné\n"
-"tandis que ADD et DEL modifient le mode bloqué existant.\n"
+"ce mode. La commande SET videra tous les modes existants et définira le(s) "
+"nouveau(x) mode(s) donné(s)\n"
+"tandis que ADD et DEL modifient les modes bloqués existants.\n"
 "Exemple :\n"
 "     MODE #canal LOCK ADD +bmnt *!*@*aol*\n"
 " \n"
@@ -5787,13 +5784,14 @@ msgstr ""
 "       Donne le statut voice à tous les utilisateurs du canal.\n"
 " \n"
 "     MODE #canal SET -b ~c:*\n"
-"       Vide tous les bans étendus qui commencent par ~c:\n"
+"       Supprime tous les bans étendus qui commencent par ~c:\n"
 " \n"
 "La commande %s CLEAR est une façon simple de vider les modes d'un canal. "
 "quoi\n"
 "peut être un ban, une exception, les statuts d'opérateurs, halfop, voice, ou "
 "un outrepassement\n"
-"d'invite. Si quoi n'est pas donné, alors tous les modes sont vidés."
+"d'invite. Si quoi n'est pas donné, alors tous les modes basiques sont "
+"supprimés."
 
 #: modules/commands/cs_akick.cpp:422
 msgid "Maintain the AutoKick list"
@@ -6081,9 +6079,9 @@ msgid "Mode"
 msgstr "Mode"
 
 #: modules/commands/cs_mode.cpp:664
-#, fuzzy, c-format
+#, c-format
 msgid "Mode %s is not a status or list mode."
-msgstr "%s n'a pas été trouvé dans la liste des ignorés."
+msgstr "Le mode %s n'est pas un mode de statut ou de liste."
 
 #: modules/commands/cs_mode.cpp:987
 msgid "Mode lock"
@@ -6207,14 +6205,12 @@ msgid "Module %s unloaded."
 msgstr "Module %s déchargé."
 
 #: modules/commands/os_config.cpp:88
-#, fuzzy
 msgid "Module Name"
-msgstr "Module %s chargé."
+msgstr "Nom du module"
 
 #: modules/commands/os_config.cpp:112
-#, fuzzy
 msgid "Module settings:"
-msgstr "paramètres %s :"
+msgstr "Paramètres du module :"
 
 #: modules/commands/os_modinfo.cpp:32
 #, c-format
@@ -7204,9 +7200,8 @@ msgstr ""
 "requête est prise en compte."
 
 #: modules/commands/ns_register.cpp:281
-#, fuzzy
 msgid "Resend registration confirmation email"
-msgstr "Recharge le fichier de configuration des Services"
+msgstr "Renvoyer l'e-mail de confirmation d'enregistrement"
 
 #: modules/commands/cs_set.cpp:632
 msgid "Restrict access to the channel"
@@ -7340,10 +7335,11 @@ msgid "SET server.name option value"
 msgstr "SET nom.du.serveur option valeur"
 
 #: modules/commands/ns_cert.cpp:371
-#, fuzzy, c-format
+#, c-format
 msgid "SSL certificate fingerprint accepted, you are now identified to %s."
 msgstr ""
-"Fingerprint de certificat SSL accepté - vous êtes maintenant identifié."
+"Empreinte de certificat SSL acceptée, vous êtes maintenant identifié(e) en "
+"tant que %s."
 
 #: modules/commands/ns_cert.cpp:382
 msgid "SSL certificate fingerprint accepted, you are now identified."
@@ -7680,7 +7676,7 @@ msgstr "Services actifs : %s"
 #: modules/commands/ns_set.cpp:258
 #, c-format
 msgid "Services will from now on set status modes on %s in channels."
-msgstr "Les services ne définiront plus de statuts sur les canaux pour %s."
+msgstr "Les services définiront désormais des statuts pour %s sur les canaux."
 
 #: modules/commands/cs_set.cpp:111
 #, c-format
@@ -7692,7 +7688,9 @@ msgstr ""
 #: modules/commands/ns_set.cpp:264
 #, c-format
 msgid "Services will no longer set status modes on %s in channels."
-msgstr "Les services ne donneront plus de statuts utilisateurs sur %s."
+msgstr ""
+"Les services ne définiront plus des statuts utilisateurs pour %s sur les "
+"canaux."
 
 #: modules/commands/cs_set.cpp:105
 #, c-format
@@ -7730,7 +7728,7 @@ msgstr "La limitation de sessions est désactivée."
 #: modules/commands/os_stats.cpp:188
 #, c-format
 msgid "Sessions: %lu entries, %lu buckets, longest chain is %d"
-msgstr "Sessions : %lu entrrées, %lu seaux, la plus longue chaine est %d"
+msgstr "Sessions : %lu entrées, %lu seaux, la plus longue chaine est %d"
 
 #: modules/commands/ns_set.cpp:71
 msgid "Set SET-options on another nickname"
@@ -8956,7 +8954,7 @@ msgid "The IMMED option is not available on this network."
 msgstr "L'option IMMED n'est pas disponible sur ce réseau."
 
 #: modules/commands/cs_access.cpp:807
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "The LEVELS command allows fine control over the meaning of\n"
 "the numeric access levels used for channels.  With this\n"
@@ -8985,7 +8983,7 @@ msgstr ""
 "SET FOUNDER, ainsi que cette commande,\n"
 "sont toujours réservées au propriétaire du canal.)\n"
 "\n"
-"LEVELS SET permet au niveaux d'accès pour une fonction ou un\n"
+"LEVELS SET permet au niveau d'accès pour une fonction ou un\n"
 "groupe de fonctions d'être changé. LEVELS DISABLE (ou DIS\n"
 "en abrégé) désactive une fonction automatique ou empêche l'accès\n"
 "à une fonction par quiconque incluant le propriétaire du canal (même si "
@@ -8994,10 +8992,9 @@ msgstr ""
 "\n"
 "LEVELS LIST montre les niveaux actuels pour chaque fonction\n"
 "ou groupe de fonctions. LEVELS RESET réinitialise les niveaux\n"
-"avec les valeurs par défaut d'un canal fraichement créé \n"
-"(consultez HELP ACCESS LEVELS).\n"
+"avec les valeurs par défaut d'un canal fraichement créé.\n"
 "\n"
-"Pour une liste de caractéristiques et fonctions pour lesquels\n"
+"Pour une liste de caractéristiques et fonctions pour lesquelles\n"
 "des niveaux peuvent être définis, consultez HELP LEVELS DESC."
 
 #: modules/commands/cs_flags.cpp:428
@@ -9152,14 +9149,16 @@ msgstr ""
 "pré-definies pour protéger durant une attaque sur le réseau."
 
 #: modules/ns_maxemail.cpp:30
-#, fuzzy, c-format
+#, c-format
 msgid "The email address %s has reached its usage limit of %d users."
-msgstr "L'adresse e-mail donnée a atteint la limite de %d utilisateurs."
+msgstr ""
+"L'adresse e-mail %s a atteint sa limite d'utilisation de %d utilisateurs."
 
 #: modules/ns_maxemail.cpp:28
-#, fuzzy, c-format
+#, c-format
 msgid "The email address %s has reached its usage limit of 1 user."
-msgstr "L'adresse e-mail donnée a atteint la limite d'un seul utilisateur."
+msgstr ""
+"L'adresse e-mail %s a atteint sa limite d'utilisation d'un utilisateur."
 
 #: modules/commands/cs_entrymsg.cpp:142
 #, c-format
@@ -9364,9 +9363,9 @@ msgid "There is no such configuration block %s."
 msgstr "Il n'y a pas de bloc de configuration %s."
 
 #: modules/commands/cs_mode.cpp:658
-#, fuzzy, c-format
+#, c-format
 msgid "There is no such mode %s."
-msgstr "Il n'y a pas d'OPER news."
+msgstr "Il n'y a pas de mode %s."
 
 #: modules/commands/ms_set.cpp:52
 msgid "There's no email address set for your nick."
@@ -9375,7 +9374,7 @@ msgstr "Vous n'avez configuré aucune adresse email pour votre pseudo."
 #: modules/commands/os_forbid.cpp:292 modules/commands/os_forbid.cpp:484
 #, c-format
 msgid "This channel has been forbidden: %s"
-msgstr "Ce canal a été interdit, : %s"
+msgstr "Ce canal a été interdit : %s"
 
 #: modules/commands/cs_suspend.cpp:121
 msgid "This channel has been suspended."
@@ -9633,6 +9632,7 @@ msgstr ""
 "de modifier les accès du canal."
 
 #: modules/commands/ns_group.cpp:273
+#, c-format
 msgid ""
 "This command ungroups your nick, or if given, the specificed nick,\n"
 "from the group it is in. The ungrouped nick keeps its registration\n"
@@ -9641,10 +9641,10 @@ msgid ""
 "your group."
 msgstr ""
 "Cette commande dé-groupe votre pseudo, ou si fourni, le pseudo spécifié,\n"
-"du groupe dans lequel il est. Le pseudo non groupé garde son temps\n"
+"du groupe dans lequel il est. Le pseudo dé-groupé garde sa date\n"
 "d'enregistrement, son mot de passe, e-mail, message d'accueil, sa langue\n"
 "Tout le reste est réinitialisé. Vous ne pouvez pas vous dé-grouper\n"
-"vous-même s'il n'y a qu'un nick dans votre groupe."
+"vous-même s'il n'y a qu'un pseudo dans votre groupe."
 
 #: modules/commands/os_module.cpp:168
 msgid "This command unloads the module named modname."
@@ -9653,6 +9653,7 @@ msgstr "Cette commande dé-charge le module nommé nom-module."
 #: modules/commands/ns_register.cpp:322
 msgid "This command will resend you the registration confirmation email."
 msgstr ""
+"Cette commande vous renverra l'e-mail de confirmation d'enregistrement."
 
 #: include/language.h:91
 #, c-format
@@ -10350,9 +10351,8 @@ msgid "You are not permitted to change your memo limit."
 msgstr "Vous n'êtes pas autorisé à changer votre limite de mémos."
 
 #: modules/commands/ns_cert.cpp:183
-#, fuzzy
 msgid "You are not using a client certificate."
-msgstr "Vous n'êtes pas identifié."
+msgstr "Vous n'utilisez pas de certificat client."
 
 #: modules/commands/os_set.cpp:85
 msgid "You are now a super admin."
@@ -10531,9 +10531,9 @@ msgstr ""
 "Tapez %s%s READ %d pour le lire."
 
 #: modules/commands/cs_invite.cpp:76
-#, fuzzy, c-format
+#, c-format
 msgid "You have been invited to %s by %s."
-msgstr "Vous avez été invité à rejoindre %s."
+msgstr "Vous avez été invité à rejoindre %s par %s."
 
 #: modules/commands/cs_invite.cpp:81
 #, c-format
@@ -10597,10 +10597,8 @@ msgstr ""
 "Vous ne pouvez pas changer l'adresse e-mail d'autres Services Operators."
 
 #: modules/commands/ns_set.cpp:454
-#, fuzzy
 msgid "You may not change the email of an unconfirmed account."
-msgstr ""
-"Vous ne pouvez pas changer l'adresse e-mail d'autres Services Operators."
+msgstr "Vous ne pouvez pas changer l'adresse e-mail d'un compte non confirmé."
 
 #: modules/commands/ns_set.cpp:191
 msgid "You may not change the password of other Services Operators."
@@ -10752,9 +10750,9 @@ msgid "Your account is already confirmed."
 msgstr "Votre compte est déjà confirmé."
 
 #: modules/commands/ns_register.cpp:365
-#, fuzzy, c-format
+#, c-format
 msgid "Your account will expire, if not confirmed, in %s."
-msgstr "En cas de non confirmation, votre compte expirera dans %s"
+msgstr "En cas de non confirmation, votre compte expirera dans %s."
 
 #: modules/commands/ns_set.cpp:1247
 #, c-format
@@ -10766,7 +10764,6 @@ msgid "Your email address is not allowed, choose a different one."
 msgstr "Votre adress e-mail n'est pas autorisée, merci d'en choisir une autre."
 
 #: modules/commands/ns_register.cpp:360
-#, fuzzy
 msgid ""
 "Your email address is not confirmed. To confirm it, follow the instructions "
 "that were emailed to you."

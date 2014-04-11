@@ -951,7 +951,7 @@ class CSMode : public Module
 			}
 	}
 
-	void OnCreateChan(ChannelInfo *ci) anope_override
+	void OnChanRegistered(ChannelInfo *ci) anope_override
 	{
 		ModeLocks *ml = modelocks.Require(ci);
 		Anope::string mlock;

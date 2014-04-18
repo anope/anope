@@ -253,7 +253,7 @@ class ProtoRatbox : public Module
 		// k = skill?
 		ModeManager::AddUserMode(new UserModeOperOnly("LOCOPS", 'l'));
 		// n = nchange
-		ModeManager::AddUserMode(new UserMode("OPER", 'o'));
+		ModeManager::AddUserMode(new UserModeOperOnly("OPER", 'o'));
 		// r = rej
 		ModeManager::AddUserMode(new UserModeOperOnly("SNOMASK", 's'));
 		ModeManager::AddUserMode(new UserModeNoone("PROTECTED", 'S'));

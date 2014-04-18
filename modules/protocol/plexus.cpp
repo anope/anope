@@ -333,10 +333,10 @@ class ProtoPlexus : public Module
 		ModeManager::AddUserMode(new UserMode("CALLERID", 'g'));
 		ModeManager::AddUserMode(new UserMode("INVIS", 'i'));
 		ModeManager::AddUserMode(new UserModeOperOnly("LOCOPS", 'l'));
-		ModeManager::AddUserMode(new UserMode("OPER", 'o'));
+		ModeManager::AddUserMode(new UserModeOperOnly("OPER", 'o'));
 		ModeManager::AddUserMode(new UserModeOperOnly("NETADMIN", 'N'));
 		ModeManager::AddUserMode(new UserMode("PRIV", 'p'));
-		ModeManager::AddUserMode(new UserMode("ROUTING", 'q'));
+		ModeManager::AddUserMode(new UserModeOperOnly("ROUTING", 'q'));
 		ModeManager::AddUserMode(new UserModeNoone("REGISTERED", 'r'));
 		ModeManager::AddUserMode(new UserMode("REGPRIV", 'R'));
 		ModeManager::AddUserMode(new UserModeOperOnly("SNOMASK", 's'));

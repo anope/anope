@@ -719,11 +719,6 @@ class CoreExport Module : public Extensible
 	 */
 	virtual void OnNickDrop(CommandSource &source, NickAlias *na) { throw NotImplementedException(); }
 
-	/** Called when a nick is forbidden
-	 * @param na The nick alias of the forbidden nick
-	 */
-	virtual void OnNickForbidden(NickAlias *na) { throw NotImplementedException(); }
-
 	/** Called when a user groups their nick
 	 * @param u The user grouping
 	 * @param target The target they're grouping to
@@ -1094,7 +1089,7 @@ enum Implementation
 	I_OnPreUserLogoff, I_OnPostUserLogoff, I_OnBotCreate, I_OnBotChange, I_OnBotDelete, I_OnAccessDel, I_OnAccessAdd,
 	I_OnAccessClear, I_OnLevelChange, I_OnChanDrop, I_OnChanRegistered, I_OnChanSuspend, I_OnChanUnsuspend,
 	I_OnCreateChan, I_OnDelChan, I_OnChannelCreate, I_OnChannelDelete, I_OnAkickAdd, I_OnAkickDel, I_OnCheckKick,
-	I_OnChanInfo, I_OnCheckPriv, I_OnGroupCheckPriv, I_OnNickDrop, I_OnNickForbidden, I_OnNickGroup, I_OnNickIdentify,
+	I_OnChanInfo, I_OnCheckPriv, I_OnGroupCheckPriv, I_OnNickDrop, I_OnNickGroup, I_OnNickIdentify,
 	I_OnUserLogin, I_OnNickLogout, I_OnNickRegister, I_OnNickSuspend, I_OnNickUnsuspended, I_OnDelNick, I_OnNickCoreCreate,
 	I_OnDelCore, I_OnChangeCoreDisplay, I_OnNickClearAccess, I_OnNickAddAccess, I_OnNickEraseAccess, I_OnNickClearCert,
 	I_OnNickAddCert, I_OnNickEraseCert, I_OnNickInfo, I_OnBotInfo, I_OnCheckAuthentication, I_OnNickUpdate,

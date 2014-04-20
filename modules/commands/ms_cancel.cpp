@@ -10,6 +10,7 @@
  */
 
 #include "module.h"
+#include "modules/memoserv.h"
 
 class CommandMSCancel : public Command
 {
@@ -46,7 +47,8 @@ class CommandMSCancel : public Command
 			for (int i = mi->memos->size() - 1; i >= 0; --i)
 				if (mi->GetMemo(i)->unread && source.nc->display.equals_ci(mi->GetMemo(i)->sender))
 				{
-					FOREACH_MOD(OnMemoDel, (ischan ? ci->name : na->nc->display, mi, mi->GetMemo(i)));
+					if (MemoServ::Event::OnMemoDel)
+						MemoServ::Event::OnMemoDel(&MemoServ::Event::MemoDel::OnMemoDel, ischan ? ci->name : na->nc->display, mi, mi->GetMemo(i));
 					mi->Del(i);
 					source.Reply(_("Last memo to \002%s\002 has been cancelled."), nname.c_str());
 					return;
@@ -72,8 +74,8 @@ class MSCancel : public Module
 	CommandMSCancel commandmscancel;
 
  public:
-	MSCancel(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		commandmscancel(this)
+	MSCancel(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
+		, commandmscancel(this)
 	{
 	}
 };

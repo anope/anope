@@ -32,13 +32,14 @@ class CoreExport Base
 
 class ReferenceBase
 {
- protected:
-	bool invalid;
+	static std::set<ReferenceBase *> *references;
  public:
-	ReferenceBase() : invalid(false) { }
-	ReferenceBase(const ReferenceBase &other) : invalid(other.invalid) { }
-	virtual ~ReferenceBase() { }
-	inline void Invalidate() { this->invalid = true; }
+	static void ResetAll();
+
+	ReferenceBase();
+	virtual ~ReferenceBase();
+	virtual void Invalidate() anope_abstract;
+	virtual void Reset() { }
 };
 
 /** Used to hold pointers to objects that may be deleted. A Reference will
@@ -49,8 +50,11 @@ class Reference : public ReferenceBase
 {
  protected:
 	T *ref;
+
+	virtual void Check() { }
+
  public:
- 	Reference() : ref(NULL)
+ 	Reference() : ref(nullptr)
 	{
 	}
 
@@ -60,19 +64,24 @@ class Reference : public ReferenceBase
 			ref->AddReference(this);
 	}
 
-	Reference(const Reference<T> &other) : ReferenceBase(other), ref(other.ref)
+	Reference(const Reference<T> &other) : ref(other.ref)
 	{
-		if (operator bool())
+		if (ref)
 			ref->AddReference(this);
 	}
 
 	virtual ~Reference()
 	{
-		if (operator bool())
-			ref->DelReference(this);
+		if (*this)
+			this->ref->DelReference(this);
 	}
 
-	inline Reference<T>& operator=(const Reference<T> &other)
+	void Invalidate() override
+	{
+		ref = nullptr;
+	}
+
+	Reference<T>& operator=(const Reference<T> &other)
 	{
 		if (this != &other)
 		{
@@ -80,7 +89,6 @@ class Reference : public ReferenceBase
 				this->ref->DelReference(this);
 
 			this->ref = other.ref;
-			this->invalid = other.invalid;
 
 			if (*this)
 				this->ref->AddReference(this);
@@ -88,36 +96,31 @@ class Reference : public ReferenceBase
 		return *this;
 	}
 
-	/* We explicitly call operator bool here in several places to prevent other
-	 * operators, such operator T*, from being called instead, which will mess
-	 * with any class inheriting from this that overloads this operator.
-	 */
-	virtual operator bool()
+	explicit operator bool()
 	{
-		if (!this->invalid)
-			return this->ref != NULL;
-		return false;
+		Check();
+		return this->ref != nullptr;
 	}
 
-	inline operator T*()
+	operator T*()
 	{
-		if (operator bool())
+		if (*this)
 			return this->ref;
-		return NULL;
+		return nullptr;
 	}
 
-	inline T* operator->()
+	T* operator->()
 	{
-		if (operator bool())
+		if (*this)
 			return this->ref;
-		return NULL;
+		return nullptr;
 	}
 
-	inline T* operator*()
+	T* operator*()
 	{
-		if (operator bool())
+		if (*this)
 			return this->ref;
-		return NULL;
+		return nullptr;
 	}
 
 	/** Note that we can't have an operator< that returns this->ref < other.ref
@@ -132,9 +135,9 @@ class Reference : public ReferenceBase
 	 * actually referred to.
 	 */
 
-	inline bool operator==(const Reference<T> &other)
+	bool operator==(const Reference<T> &other)
 	{
-		if (!this->invalid)
+		if (*this)
 			return this->ref == other;
 		return false;
 	}

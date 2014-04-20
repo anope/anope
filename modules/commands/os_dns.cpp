@@ -716,6 +716,11 @@ class CommandOSDNS : public Command
 };
 
 class ModuleDNS : public Module
+	, public EventHook<Event::NewServer>
+	, public EventHook<Event::ServerQuit>
+	, public EventHook<Event::UserConnect>
+	, public EventHook<Event::PreUserLogoff>
+	, public EventHook<Event::DnsRequest>
 {
 	Serialize::Type zone_type, dns_type;
 	CommandOSDNS commandosdns;
@@ -730,9 +735,16 @@ class ModuleDNS : public Module
 	time_t last_warn;
 
  public:
-	ModuleDNS(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, EXTRA | VENDOR),
-		zone_type("DNSZone", DNSZone::Unserialize), dns_type("DNSServer", DNSServer::Unserialize), commandosdns(this),
-		last_warn(0)
+	ModuleDNS(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, EXTRA | VENDOR)
+		, EventHook<Event::NewServer>("OnNewServer")
+		, EventHook<Event::ServerQuit>("OnServerQuit")
+		, EventHook<Event::UserConnect>("OnUserConnect")
+		, EventHook<Event::PreUserLogoff>("OnPreUserLogoff")
+		, EventHook<Event::DnsRequest>("OnDnsRequest")
+		, zone_type("DNSZone", DNSZone::Unserialize)
+		, dns_type("DNSServer", DNSServer::Unserialize)
+		, commandosdns(this)
+		, last_warn(0)
 	{
 
 

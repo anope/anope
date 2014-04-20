@@ -10,9 +10,11 @@
 #include "module.h"
 
 class BSAutoAssign : public Module
+	, public EventHook<Event::ChanRegistered>
 {
  public:
 	BSAutoAssign(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
+		, EventHook<Event::ChanRegistered>("OnChanRegistered") 
 	{
 	}
 

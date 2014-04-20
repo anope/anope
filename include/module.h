@@ -19,6 +19,7 @@
 #include "channels.h"
 #include "commands.h"
 #include "config.h"
+#include "event.h"
 #include "extensible.h"
 #include "hashcomp.h"
 #include "language.h"
@@ -43,9 +44,3 @@
 #include "uplink.h"
 #include "users.h"
 #include "xline.h"
-
-#include "modules/pseudoclients/chanserv.h"
-#include "modules/pseudoclients/global.h"
-#include "modules/pseudoclients/memoserv.h"
-#include "modules/pseudoclients/nickserv.h"
-

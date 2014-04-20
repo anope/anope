@@ -10,11 +10,7 @@
  */
 
 #include "module.h"
-
-namespace
-{
-	ServiceReference<MemoServService> memoserv("MemoServService", "MemoServ");
-}
+#include "modules/memoserv.h"
 
 class CommandMSSend : public Command
 {
@@ -27,7 +23,7 @@ class CommandMSSend : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
-		if (!memoserv)
+		if (!MemoServ::service)
 			return;
 
 		const Anope::string &nick = params[0];
@@ -39,14 +35,14 @@ class CommandMSSend : public Command
 			return;
 		}
 
-		MemoServService::MemoResult result = memoserv->Send(source.GetNick(), nick, text);
-		if (result == MemoServService::MEMO_SUCCESS)
+		MemoServ::MemoServService::MemoResult result = MemoServ::service->Send(source.GetNick(), nick, text);
+		if (result == MemoServ::MemoServService::MEMO_SUCCESS)
 			source.Reply(_("Memo sent to \002%s\002."), nick.c_str());
-		else if (result == MemoServService::MEMO_INVALID_TARGET)
+		else if (result == MemoServ::MemoServService::MEMO_INVALID_TARGET)
 			source.Reply(_("\002%s\002 is not a registered unforbidden nick or channel."), nick.c_str());
-		else if (result == MemoServService::MEMO_TOO_FAST)
+		else if (result == MemoServ::MemoServService::MEMO_TOO_FAST)
 			source.Reply(_("Please wait %d seconds before using the %s command again."), Config->GetModule("memoserv")->Get<time_t>("senddelay"), source.command.c_str());
-		else if (result == MemoServService::MEMO_TARGET_FULL)
+		else if (result == MemoServ::MemoServService::MEMO_TARGET_FULL)
 			source.Reply(_("Sorry, %s currently has too many memos and cannot receive more."), nick.c_str());
 	}
 
@@ -67,11 +63,11 @@ class MSSend : public Module
 	CommandMSSend commandmssend;
 
  public:
-	MSSend(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		commandmssend(this)
+	MSSend(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
+		, commandmssend(this)
 	{
 
-		if (!memoserv)
+		if (!MemoServ::service)
 			throw ModuleException("No MemoServ!");
 	}
 };

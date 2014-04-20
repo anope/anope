@@ -33,6 +33,8 @@ namespace
 	/* Number of bits to use when comparing session IPs */
 	unsigned ipv4_cidr;
 	unsigned ipv6_cidr;
+
+	EventHandlers<Event::Exception> *events;
 }
 
 class MySessionService : public SessionService
@@ -163,7 +165,7 @@ class ExceptionDelCallback : public NumberList
 	static void DoDel(CommandSource &source, unsigned index)
 	{
 		Exception *e = session_service->GetExceptions()[index];
-		FOREACH_MOD(OnExceptionDel, (source, e));
+		(*events)(&Event::Exception::OnExceptionDel, source, e);
 
 		session_service->DelException(e);
 		delete e;
@@ -372,7 +374,7 @@ class CommandOSException : public Command
 			exception->expires = expires;
 
 			EventReturn MOD_RESULT;
-			FOREACH_RESULT(OnExceptionAdd, MOD_RESULT, (exception));
+			MOD_RESULT = (*events)(&Event::Exception::OnExceptionAdd, exception);
 			if (MOD_RESULT == EVENT_STOP)
 				delete exception;
 			else
@@ -627,20 +629,32 @@ class CommandOSException : public Command
 };
 
 class OSSession : public Module
+	, public EventHook<Event::UserConnect>
+	, public EventHook<Event::UserQuit>
+	, public EventHook<Event::ExpireTick>
 {
 	Serialize::Type exception_type;
 	MySessionService ss;
 	CommandOSSession commandossession;
 	CommandOSException commandosexception;
 	ServiceReference<XLineManager> akills;
+	EventHandlers<Event::Exception> exceptionevents;
 
  public:
-	OSSession(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		exception_type("Exception", Exception::Unserialize), ss(this), commandossession(this), commandosexception(this), akills("XLineManager", "xlinemanager/sgline")
+	OSSession(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
+		, EventHook<Event::UserConnect>("OnUserConnect", EventHook<Event::UserConnect>::Priority::FIRST)
+		, EventHook<Event::UserQuit>("OnUserQuit", EventHook<Event::UserQuit>::Priority::FIRST)
+		, EventHook<Event::ExpireTick>("OnExpireTick", EventHook<Event::ExpireTick>::Priority::FIRST)
+		, exception_type("Exception", Exception::Unserialize)
+		, ss(this)
+		, commandossession(this)
+		, commandosexception(this)
+		, akills("XLineManager", "xlinemanager/sgline")
+		, exceptionevents(this, "Exception")
 	{
 		this->SetPermanent(true);
 
-		ModuleManager::SetPriority(this, PRIORITY_FIRST);
+		events = &exceptionevents;
 	}
 
 	void OnReload(Configuration::Conf *conf) override

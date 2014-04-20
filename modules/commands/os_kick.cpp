@@ -68,8 +68,8 @@ class OSKick : public Module
 	CommandOSKick commandoskick;
 
  public:
-	OSKick(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		commandoskick(this)
+	OSKick(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
+		, commandoskick(this)
 	{
 
 	}

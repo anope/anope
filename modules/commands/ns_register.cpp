@@ -10,6 +10,7 @@
  */
 
 #include "module.h"
+#include "modules/nickserv.h"
 
 static bool SendRegmail(User *u, const NickAlias *na, BotInfo *bi);
 
@@ -198,7 +199,8 @@ class CommandNSRegister : public Command
 
 			Log(LOG_COMMAND, source, this) << "to register " << na->nick << " (email: " << (!na->nc->email.empty() ? na->nc->email : "none") << ")";
 
-			FOREACH_MOD(OnNickRegister, (source.GetUser(), na));
+			if (NickServ::Event::OnNickRegister)
+				NickServ::Event::OnNickRegister(&NickServ::Event::NickRegister::OnNickRegister, source.GetUser(), na);
 
 			if (na->nc->GetAccessCount())
 				source.Reply(_("Nickname \002%s\002 registered under your user@host-mask: %s"), u_nick.c_str(), na->nc->GetAccess(0).c_str());
@@ -331,6 +333,8 @@ class CommandNSResend : public Command
 };
 
 class NSRegister : public Module
+	, public EventHook<Event::NickIdentify>
+	, public EventHook<NickServ::Event::PreNickExpire>
 {
 	CommandNSRegister commandnsregister;
 	CommandNSConfirm commandnsconfirm;
@@ -340,9 +344,14 @@ class NSRegister : public Module
 	SerializableExtensibleItem<Anope::string> passcode;
 
  public:
-	NSRegister(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		commandnsregister(this), commandnsconfirm(this), commandnsrsend(this), unconfirmed(this, "UNCONFIRMED"),
-		passcode(this, "passcode")
+	NSRegister(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
+		, EventHook<Event::NickIdentify>("OnNickIdentify")
+		, EventHook<NickServ::Event::PreNickExpire>("OnPreNickExpire")
+		, commandnsregister(this)
+		, commandnsconfirm(this)
+		, commandnsrsend(this)
+		, unconfirmed(this, "UNCONFIRMED")
+		, passcode(this, "passcode")
 	{
 		if (Config->GetModule(this)->Get<const Anope::string>("registration").equals_ci("disable"))
 			throw ModuleException("Module " + this->name + " will not load with registration disabled.");

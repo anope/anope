@@ -392,14 +392,18 @@ class CommandOSIgnore : public Command
 };
 
 class OSIgnore : public Module
+	, public EventHook<Event::BotPrivmsg>
 {
 	Serialize::Type ignoredata_type;
 	OSIgnoreService osignoreservice;
 	CommandOSIgnore commandosignore;
 
  public:
-	OSIgnore(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		ignoredata_type("IgnoreData", IgnoreDataImpl::Unserialize), osignoreservice(this), commandosignore(this)
+	OSIgnore(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
+		, EventHook<Event::BotPrivmsg>("OnBotPrivmsg")
+		, ignoredata_type("IgnoreData", IgnoreDataImpl::Unserialize)
+		, osignoreservice(this)
+		, commandosignore(this)
 	{
 
 	}

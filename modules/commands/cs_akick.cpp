@@ -10,6 +10,7 @@
  */
 
 #include "module.h"
+#include "modules/cs_akick.h"
 
 class CommandCSAKick : public Command
 {
@@ -160,7 +161,7 @@ class CommandCSAKick : public Command
 
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to add " << mask << (reason == "" ? "" : ": ") << reason;
 
-		FOREACH_MOD(OnAkickAdd, (source, ci, akick));
+		this->akickevents(&Event::Akick::OnAkickAdd, source, ci, akick);
 
 		source.Reply(_("\002%s\002 added to %s autokick list."), mask.c_str(), ci->name.c_str());
 
@@ -185,11 +186,11 @@ class CommandCSAKick : public Command
 			{
 				CommandSource &source;
 				ChannelInfo *ci;
-				Command *c;
+				CommandCSAKick *c;
 				unsigned deleted;
 				AccessGroup ag;
 			 public:
-				AkickDelCallback(CommandSource &_source, ChannelInfo *_ci, Command *_c, const Anope::string &list) : NumberList(list, true), source(_source), ci(_ci), c(_c), deleted(0), ag(source.AccessFor(ci))
+				AkickDelCallback(CommandSource &_source, ChannelInfo *_ci, CommandCSAKick *_c, const Anope::string &list) : NumberList(list, true), source(_source), ci(_ci), c(_c), deleted(0), ag(source.AccessFor(ci))
 				{
 				}
 
@@ -210,7 +211,7 @@ class CommandCSAKick : public Command
 
 					const AutoKick *akick = ci->GetAkick(number - 1);
 
-					FOREACH_MOD(OnAkickDel, (source, ci, akick));
+					c->akickevents(&Event::Akick::OnAkickDel, source, ci, akick);
 
 					bool override = !ag.HasPriv("AKICK");
 					Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, c, ci) << "to delete " << (akick->nc ? akick->nc->display : akick->mask);
@@ -244,7 +245,7 @@ class CommandCSAKick : public Command
 			bool override = !source.AccessFor(ci).HasPriv("AKICK");
 			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to delete " << mask;
 
-			FOREACH_MOD(OnAkickDel, (source, ci, ci->GetAkick(i)));
+			this->akickevents(&Event::Akick::OnAkickDel, source, ci, ci->GetAkick(i));
 
 			ci->EraseAkick(i);
 
@@ -416,8 +417,10 @@ class CommandCSAKick : public Command
 		source.Reply(_("Channel %s akick list has been cleared."), ci->name.c_str());
 	}
 
+	EventHandlers<Event::Akick> &akickevents;
+
  public:
-	CommandCSAKick(Module *creator) : Command(creator, "chanserv/akick", 2, 4)
+	CommandCSAKick(Module *creator, EventHandlers<Event::Akick> &events) : Command(creator, "chanserv/akick", 2, 4), akickevents(events)
 	{
 		this->SetDesc(_("Maintain the AutoKick list"));
 		this->SetSyntax(_("\037channel\037 ADD {\037nick\037 | \037mask\037} [\037reason\037]"));
@@ -509,12 +512,16 @@ class CommandCSAKick : public Command
 };
 
 class CSAKick : public Module
+	, public EventHook<Event::CheckKick>
 {
 	CommandCSAKick commandcsakick;
+	EventHandlers<Event::Akick> akickevents;
 
  public:
-	CSAKick(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		commandcsakick(this)
+	CSAKick(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
+		, EventHook<Event::CheckKick>("OnCheckKick")
+		, commandcsakick(this, akickevents)
+		, akickevents(this, "Akick")
 	{
 	}
 

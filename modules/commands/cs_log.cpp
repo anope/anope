@@ -11,6 +11,7 @@
 
 #include "module.h"
 #include "modules/cs_log.h"
+#include "modules/memoserv.h"
 
 struct LogSettingImpl : LogSetting, Serializable
 {
@@ -280,8 +281,9 @@ public:
 };
 
 class CSLog : public Module
+	, public EventHook<Event::ChanRegistered>
+	, public EventHook<Event::Log>
 {
-	ServiceReference<MemoServService> MSService;
 	CommandCSLog commandcslog;
 	ExtensibleItem<LogSettingsImpl> logsettings;
 	Serialize::Type logsetting_type;
@@ -294,9 +296,12 @@ class CSLog : public Module
 	std::vector<LogDefault> defaults;
 
  public:
-	CSLog(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		MSService("MemoServService", "MemoServ"), commandcslog(this),
-		logsettings(this, "logsettings"), logsetting_type("LogSetting", LogSettingImpl::Unserialize)
+	CSLog(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
+		, EventHook<Event::ChanRegistered>("OnChanRegistered")
+		, EventHook<Event::Log>("OnLog")
+		, commandcslog(this)
+		, logsettings(this, "logsettings")
+		, logsetting_type("LogSetting", LogSettingImpl::Unserialize)
 	{
 
 	}
@@ -353,7 +358,7 @@ class CSLog : public Module
 		}
 	}
 
-	void OnLog(Log *l) override
+	void OnLog(::Log *l) override
 	{
 		if (l->type != LOG_COMMAND || l->u == NULL || l->c == NULL || l->ci == NULL || !Me || !Me->IsSynced())
 			return;
@@ -381,8 +386,8 @@ class CSLog : public Module
 
 				Anope::string buffer = l->u->nick + " used " + l->source->command.upper() + " " + l->buf.str();
 
-				if (log->method.equals_ci("MEMO") && MSService && l->ci->WhoSends() != NULL)
-					MSService->Send(l->ci->WhoSends()->nick, l->ci->name, buffer, true);
+				if (log->method.equals_ci("MEMO") && MemoServ::service && l->ci->WhoSends() != NULL)
+					MemoServ::service->Send(l->ci->WhoSends()->nick, l->ci->name, buffer, true);
 				else if (l->source->c)
 					/* Sending a channel message or notice in response to a fantasy command */;
 				else if (log->method.equals_ci("MESSAGE") && l->ci->c)

@@ -352,7 +352,7 @@ struct IRCDMessageMetadata : IRCDMessage
 		else if (params[1].equals_cs("certfp"))
 		{
 			u->fingerprint = params[2];
-			FOREACH_MOD(OnFingerprint, (u));
+			Event::OnFingerprint(&Event::Fingerprint::OnFingerprint, u);
 		}
 		else if (params[1].equals_cs("cloakhost"))
 		{
@@ -586,6 +586,7 @@ struct IRCDMessageTopic : IRCDMessage
 
 
 class ProtongIRCd : public Module
+	, public EventHook<Event::UserNickChange>
 {
 	ngIRCdProto ircd_proto;
 
@@ -666,16 +667,38 @@ class ProtongIRCd : public Module
 	}
 
  public:
-	ProtongIRCd(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PROTOCOL | VENDOR),
-		ircd_proto(this),
-		message_capab(this), message_error(this), message_invite(this), message_kick(this), message_kill(this),
-		message_motd(this), message_notice(this), message_part(this), message_ping(this), message_privmsg(this),
-		message_squery(this, "SQUERY"), message_quit(this), message_squit(this), message_stats(this), message_time(this),
-		message_version(this), message_whois(this),
+	ProtongIRCd(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PROTOCOL | VENDOR)
+		, EventHook<Event::UserNickChange>("OnUserNickChange")
+		, ircd_proto(this)
+		, message_capab(this)
+		, message_error(this)
+		, message_invite(this)
+		, message_kick(this)
+		, message_kill(this)
+		, message_motd(this)
+		, message_notice(this)
+		, message_part(this)
+		, message_ping(this)
+		, message_privmsg(this)
+		, message_squery(this, "SQUERY")
+		, message_quit(this)
+		, message_squit(this)
+		, message_stats(this)
+		, message_time(this)
+		, message_version(this)
+		, message_whois(this)
 
-		message_005(this), message_376(this), message_chaninfo(this), message_join(this), message_metadata(this),
-		message_mode(this), message_nick(this), message_njoin(this), message_pong(this), message_server(this),
-		message_topic(this)
+		, message_005(this)
+		, message_376(this)
+		, message_chaninfo(this)
+		, message_join(this)
+		, message_metadata(this)
+		, message_mode(this)
+		, message_nick(this)
+		, message_njoin(this)
+		, message_pong(this)
+		, message_server(this)
+		, message_topic(this)
 	{
 
 		Servers::Capab.insert("QS");

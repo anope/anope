@@ -11,6 +11,8 @@
 
 #include "module.h"
 #include "modules/os_session.h"
+#include "modules/os_defcon.h"
+#include "modules/global.h"
 
 enum DefconLevel
 {
@@ -101,16 +103,15 @@ static DefconConfig DConfig;
 static void runDefCon();
 static Anope::string defconReverseModes(const Anope::string &modes);
 
-static ServiceReference<GlobalService> GlobalService("GlobalService", "Global");
-
 static Timer *timeout;
 
 class DefConTimeout : public Timer
 {
+	EventHandlers<Event::DefconLevel> &eventdefcon;
 	int level;
 
  public:
-	DefConTimeout(Module *mod, int newlevel) : Timer(mod, DConfig.timeout), level(newlevel)
+	DefConTimeout(EventHandlers<Event::DefconLevel> &ev, Module *mod, int newlevel) : Timer(mod, DConfig.timeout), eventdefcon(ev), level(newlevel)
 	{
 		timeout = this;
 	}
@@ -125,18 +126,18 @@ class DefConTimeout : public Timer
 		if (DConfig.defaultlevel != level)
 		{
 			DConfig.defaultlevel = level;
-			FOREACH_MOD(OnDefconLevel, (level));
+			this->eventdefcon(&Event::DefconLevel::OnDefconLevel, level);
 			Log(Config->GetClient("OperServ"), "operserv/defcon") << "Defcon level timeout, returning to level " << level;
 
-			if (DConfig.globalondefcon)
+			if (DConfig.globalondefcon && Global::service)
 			{
 				if (!DConfig.offmessage.empty())
-					GlobalService->SendGlobal(NULL, "", DConfig.offmessage);
+					Global::service->SendGlobal(NULL, "", DConfig.offmessage);
 				else
-					GlobalService->SendGlobal(NULL, "", Anope::printf(Language::Translate(_("The Defcon level is now at: \002%d\002")), DConfig.defaultlevel));
+					Global::service->SendGlobal(NULL, "", Anope::printf(Language::Translate(_("The Defcon level is now at: \002%d\002")), DConfig.defaultlevel));
 
 				if (!DConfig.message.empty())
-					GlobalService->SendGlobal(NULL, "", DConfig.message);
+					Global::service->SendGlobal(NULL, "", DConfig.message);
 			}
 
 			runDefCon();
@@ -170,8 +171,10 @@ class CommandOSDefcon : public Command
 			source.Reply(_("* No new memos sent"));
 	}
 
+	EventHandlers<Event::DefconLevel> &ondefconlevel;
+
  public:
-	CommandOSDefcon(Module *creator) : Command(creator, "operserv/defcon", 1, 1)
+	CommandOSDefcon(Module *creator, EventHandlers<Event::DefconLevel> &event) : Command(creator, "operserv/defcon", 1, 1), ondefconlevel(event)
 	{
 		this->SetDesc(_("Manipulate the DefCon system"));
 		this->SetSyntax(_("[\0021\002|\0022\002|\0023\002|\0024\002|\0025\002]"));
@@ -203,12 +206,12 @@ class CommandOSDefcon : public Command
 
 		DConfig.defaultlevel = newLevel;
 
-		FOREACH_MOD(OnDefconLevel, (newLevel));
+		this->ondefconlevel(&Event::DefconLevel::OnDefconLevel, newLevel);
 
 		delete timeout;
 
 		if (DConfig.timeout)
-			timeout = new DefConTimeout(this->module, 5);
+			timeout = new DefConTimeout(this->ondefconlevel, this->module, 5);
 
 		source.Reply(_("Services are now at DEFCON \002%d\002."), DConfig.defaultlevel);
 		this->SendLevels(source);
@@ -216,15 +219,15 @@ class CommandOSDefcon : public Command
 
 		/* Global notice the user what is happening. Also any Message that
 		   the Admin would like to add. Set in config file. */
-		if (DConfig.globalondefcon)
+		if (DConfig.globalondefcon && Global::service)
 		{
 			if (DConfig.defaultlevel == 5 && !DConfig.offmessage.empty())
-				GlobalService->SendGlobal(NULL, "", DConfig.offmessage);
+				Global::service->SendGlobal(NULL, "", DConfig.offmessage);
 			else if (DConfig.defaultlevel != 5)
 			{
-				GlobalService->SendGlobal(NULL, "", Anope::printf(_("The Defcon level is now at: \002%d\002"), DConfig.defaultlevel));
+				Global::service->SendGlobal(NULL, "", Anope::printf(_("The Defcon level is now at: \002%d\002"), DConfig.defaultlevel));
 				if (!DConfig.message.empty())
-					GlobalService->SendGlobal(NULL, "", DConfig.message);
+					Global::service->SendGlobal(NULL, "", DConfig.message);
 			}
 		}
 
@@ -245,10 +248,17 @@ class CommandOSDefcon : public Command
 };
 
 class OSDefcon : public Module
+	, public EventHook<Event::ChannelModeSet>
+	, public EventHook<Event::ChannelModeUnset>
+	, public EventHook<Event::PreCommand>
+	, public EventHook<Event::UserConnect>
+	, public EventHook<Event::ChannelModeAdd>
+	, public EventHook<Event::ChannelSync>
 {
 	ServiceReference<SessionService> session_service;
 	ServiceReference<XLineManager> akills;
 	CommandOSDefcon commandosdefcon;
+	EventHandlers<Event::DefconLevel> ondefconlevel;
 
 	void ParseModeString()
 	{
@@ -330,9 +340,24 @@ class OSDefcon : public Module
 	}
 
  public:
-	OSDefcon(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR), session_service("SessionService", "session"), akills("XLineManager", "xlinemanager/sgline"), commandosdefcon(this)
+	OSDefcon(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
+		, EventHook<Event::ChannelModeSet>("OnChannelModeSet")
+		, EventHook<Event::ChannelModeUnset>("OnChannelModeUnset")
+		, EventHook<Event::PreCommand>("OnPreCommand")
+		, EventHook<Event::UserConnect>("OnUserConnect")
+		, EventHook<Event::ChannelModeAdd>("OnChannelModeAdd")
+		, EventHook<Event::ChannelSync>("OnChannelSync")
+		, session_service("SessionService", "session")
+		, akills("XLineManager", "xlinemanager/sgline")
+		, commandosdefcon(this, ondefconlevel)
+		, ondefconlevel(this, "OnDefconLevel")
 	{
 
+	}
+
+	~OSDefcon()
+	{
+		delete timeout;
 	}
 
 	void OnReload(Configuration::Conf *conf) override

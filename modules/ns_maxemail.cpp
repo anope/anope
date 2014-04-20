@@ -13,6 +13,7 @@
 #include "module.h"
 
 class NSMaxEmail : public Module
+	, public EventHook<Event::PreCommand>
 {
 	bool CheckLimitReached(CommandSource &source, const Anope::string &email)
 	{
@@ -52,6 +53,7 @@ class NSMaxEmail : public Module
 
  public:
 	NSMaxEmail(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
+		, EventHook<Event::PreCommand>("OnPreCommand")
 	{
 	}
 

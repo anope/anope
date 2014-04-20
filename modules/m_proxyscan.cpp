@@ -189,6 +189,7 @@ class SOCKS5ProxyConnect : public ProxyConnect, public BinarySocket
 };
 
 class ModuleProxyScan : public Module
+	, public EventHook<Event::UserConnect>
 {
 	Anope::string listen_ip;
 	unsigned short listen_port;
@@ -217,8 +218,9 @@ class ModuleProxyScan : public Module
 	} connectionTimeout;
 
  public:
-	ModuleProxyScan(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, EXTRA | VENDOR),
-		connectionTimeout(this, 5)
+	ModuleProxyScan(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, EXTRA | VENDOR)
+		, EventHook<Event::UserConnect>("OnUserConnect")
+		, connectionTimeout(this, 5)
 	{
 
 

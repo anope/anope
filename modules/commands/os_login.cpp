@@ -105,14 +105,18 @@ class CommandOSLogout : public Command
 };
 
 class OSLogin : public Module
+	, public EventHook<Event::IsServicesOperEvent>
 {
 	CommandOSLogin commandoslogin;
 	CommandOSLogout commandoslogout;
 	ExtensibleItem<bool> os_login;
 
  public:
-	OSLogin(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		commandoslogin(this), commandoslogout(this), os_login(this, "os_login")
+	OSLogin(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
+		, EventHook<Event::IsServicesOperEvent>("OnIsServicesOperEvent")
+		, commandoslogin(this)
+		, commandoslogout(this)
+		, os_login(this, "os_login")
 	{
 
 	}

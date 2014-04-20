@@ -21,6 +21,7 @@
 #include "servers.h"
 #include "uplink.h"
 #include "protocol.h"
+#include "event.h"
 
 #ifndef _WIN32
 #include <sys/time.h>
@@ -129,7 +130,7 @@ Log::~Log()
 	else if (this->type == LOG_TERMINAL)
 		std::cout << this->BuildPrefix() << this->buf.str() << std::endl;
 
-	FOREACH_MOD(OnLog, (this));
+	Event::OnLog(&Event::Log::OnLog, this);
 	
 	if (Config)
 		for (unsigned i = 0; i < Config->LogInfos.size(); ++i)
@@ -347,7 +348,7 @@ void LogInfo::ProcessMessage(const Log *l)
 
 	const Anope::string &buffer = l->BuildPrefix() + l->buf.str();
 
-	FOREACH_MOD(OnLogMessage, (this, l, buffer));
+	Event::OnLogMessage(&Event::LogMessage::OnLogMessage, this, l, buffer);
 
 	for (unsigned i = 0; i < this->targets.size(); ++i)
 	{

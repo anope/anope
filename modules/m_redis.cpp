@@ -521,11 +521,13 @@ bool RedisSocket::Read(const char *buffer, size_t l)
 
 
 class ModuleRedis : public Module
+	, public EventHook<Event::ModuleUnload>
 {
 	std::map<Anope::string, MyRedisService *> services;
 
  public:
 	ModuleRedis(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, EXTRA | VENDOR)
+		, EventHook<Event::ModuleUnload>("OnModuleUnload")
 	{
 	}
 

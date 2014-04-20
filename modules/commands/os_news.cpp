@@ -370,6 +370,8 @@ class CommandOSRandomNews : public NewsBase
 static unsigned cur_rand_news = 0;
 
 class OSNews : public Module
+	, public EventHook<Event::UserModeSet>
+	, public EventHook<Event::UserConnect>
 {
 	MyNewsService newsservice;
 	Serialize::Type newsitem_type;
@@ -428,9 +430,14 @@ class OSNews : public Module
 	}
 
  public:
-	OSNews(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		newsservice(this), newsitem_type("NewsItem", MyNewsItem::Unserialize),
-		commandoslogonnews(this), commandosopernews(this), commandosrandomnews(this)
+	OSNews(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
+		, EventHook<Event::UserModeSet>("OnUserModeSet")
+		, EventHook<Event::UserConnect>("OnUserConnect")
+		, newsservice(this)
+		, newsitem_type("NewsItem", MyNewsItem::Unserialize)
+		, commandoslogonnews(this)
+		, commandosopernews(this)
+		, commandosrandomnews(this)
 	{
 	}
 

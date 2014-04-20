@@ -44,7 +44,7 @@ class Plain : public Mechanism
 				return;
 
 			SASL::IdentifyRequest *req = new SASL::IdentifyRequest(this->owner, m.source, acc, pass);
-			FOREACH_MOD(OnCheckAuthentication, (NULL, req));
+			Event::OnCheckAuthentication(&Event::CheckAuthentication::OnCheckAuthentication, nullptr, req);
 			req->Dispatch();
 		}
 	}
@@ -254,8 +254,10 @@ class ModuleSASL : public Module
 	External *external;
 
  public:
-	ModuleSASL(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		sasl(this), plain(this), external(NULL)
+	ModuleSASL(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
+		, sasl(this)
+		, plain(this)
+		, external(NULL)
 	{
 		try
 		{

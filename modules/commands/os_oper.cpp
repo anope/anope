@@ -235,8 +235,9 @@ class OSOper : public Module
 	CommandOSOper commandosoper;
 
  public:
-	OSOper(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		myoper_type("Oper", MyOper::Unserialize), commandosoper(this)
+	OSOper(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
+		, myoper_type("Oper", MyOper::Unserialize)
+		, commandosoper(this)
 	{
 	}
 

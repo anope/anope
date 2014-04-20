@@ -1294,16 +1294,21 @@ static void LoadNews()
 }
 
 class DBOld : public Module
+	, public EventHook<Event::LoadDatabase>
+	, public EventHook<Event::UplinkSync>
 {
 	PrimitiveExtensibleItem<uint32_t> mlock_on, mlock_off, mlock_limit;
 	PrimitiveExtensibleItem<Anope::string> mlock_key;
 
  public:
-	DBOld(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, DATABASE | VENDOR),
-		mlock_on(this, "mlock_on"), mlock_off(this, "mlock_off"), mlock_limit(this, "mlock_limit"), mlock_key(this, "mlock_key")
+	DBOld(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, DATABASE | VENDOR)
+		, EventHook<Event::LoadDatabase>("OnLoadDatabase")
+		, EventHook<Event::UplinkSync>("OnUplinkSync")
+		, mlock_on(this, "mlock_on")
+		, mlock_off(this, "mlock_off")
+		, mlock_limit(this, "mlock_limit")
+		, mlock_key(this, "mlock_key")
 	{
-
-
 		hashm = Config->GetModule(this)->Get<const Anope::string>("hash");
 
 		if (hashm != "md5" && hashm != "oldmd5" && hashm != "sha1" && hashm != "plain" && hashm != "sha256")

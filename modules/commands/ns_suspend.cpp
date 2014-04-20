@@ -11,8 +11,8 @@
 
 #include "module.h"
 #include "modules/suspend.h"
-
-static ServiceReference<NickServService> nickserv("NickServService", "NickServ");
+#include "modules/ns_info.h"
+#include "modules/nickserv.h"
 
 struct NSSuspendInfo : SuspendInfo, Serializable
 {
@@ -54,8 +54,10 @@ struct NSSuspendInfo : SuspendInfo, Serializable
 
 class CommandNSSuspend : public Command
 {
+	EventHandlers<Event::NickSuspend> &onnicksuspend;
+
  public:
-	CommandNSSuspend(Module *creator) : Command(creator, "nickserv/suspend", 2, 3)
+	CommandNSSuspend(Module *creator, EventHandlers<Event::NickSuspend> &event) : Command(creator, "nickserv/suspend", 2, 3), onnicksuspend(event)
 	{
 		this->SetDesc(_("Suspend a given nick"));
 		this->SetSyntax(_("\037nickname\037 [+\037expiry\037] [\037reason\037]"));
@@ -128,8 +130,8 @@ class CommandNSSuspend : public Command
 				if (u2)
 				{
 					u2->Logout();
-					if (nickserv)
-						nickserv->Collide(u2, na2);
+					if (NickServ::service)
+						NickServ::service->Collide(u2, na2);
 				}
 			}
 		}
@@ -137,7 +139,7 @@ class CommandNSSuspend : public Command
 		Log(LOG_ADMIN, source, this) << "for " << nick << " (" << (!reason.empty() ? reason : "No reason") << "), expires on " << (expiry_secs ? Anope::strftime(Anope::CurTime + expiry_secs) : "never");
 		source.Reply(_("Nick %s is now suspended."), nick.c_str());
 
-		FOREACH_MOD(OnNickSuspend, (na));
+		this->onnicksuspend(&Event::NickSuspend::OnNickSuspend, na);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
@@ -154,8 +156,10 @@ class CommandNSSuspend : public Command
 
 class CommandNSUnSuspend : public Command
 {
+	EventHandlers<Event::NickUnsuspended> &onnickunsuspend;
+
  public:
-	CommandNSUnSuspend(Module *creator) : Command(creator, "nickserv/unsuspend", 1, 1)
+	CommandNSUnSuspend(Module *creator, EventHandlers<Event::NickUnsuspended> &event) : Command(creator, "nickserv/unsuspend", 1, 1), onnickunsuspend(event)
 	{
 		this->SetDesc(_("Unsuspend a given nick"));
 		this->SetSyntax(_("\037nickname\037"));
@@ -189,7 +193,7 @@ class CommandNSUnSuspend : public Command
 
 		source.Reply(_("Nick %s is now released."), nick.c_str());
 
-		FOREACH_MOD(OnNickUnsuspended, (na));
+		this->onnickunsuspend(&Event::NickUnsuspended::OnNickUnsuspended, na);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
@@ -202,16 +206,28 @@ class CommandNSUnSuspend : public Command
 };
 
 class NSSuspend : public Module
+	, public EventHook<Event::NickInfo>
+	, public EventHook<NickServ::Event::PreNickExpire>
+	, public EventHook<NickServ::Event::NickValidate>
 {
 	CommandNSSuspend commandnssuspend;
 	CommandNSUnSuspend commandnsunsuspend;
 	ExtensibleItem<NSSuspendInfo> suspend;
 	Serialize::Type suspend_type;
+	EventHandlers<Event::NickSuspend> onnicksuspend;
+	EventHandlers<Event::NickUnsuspended> onnickunsuspend;
 
  public:
-	NSSuspend(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		commandnssuspend(this), commandnsunsuspend(this), suspend(this, "NS_SUSPENDED"),
-		suspend_type("NSSuspendInfo", NSSuspendInfo::Unserialize)
+	NSSuspend(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
+		, EventHook<Event::NickInfo>("OnNickInfo")
+		, EventHook<NickServ::Event::PreNickExpire>("OnPreNickExpire")
+		, EventHook<NickServ::Event::NickValidate>("OnNickValidate")
+		, commandnssuspend(this, onnicksuspend)
+		, commandnsunsuspend(this, onnickunsuspend)
+		, suspend(this, "NS_SUSPENDED")
+		, suspend_type("NSSuspendInfo", NSSuspendInfo::Unserialize)
+		, onnicksuspend(this, "OnNickSuspend")
+		, onnickunsuspend(this, "OnNickUnsuspended")
 	{
 	}
 

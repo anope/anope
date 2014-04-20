@@ -14,7 +14,6 @@
 class AccessGroup;
 class AutoKick;
 class BotInfo;
-class CallBack;
 class ChanAccess;
 class Channel;
 class ChannelInfo;
@@ -25,7 +24,6 @@ class Command;
 class CommandSource;
 namespace Configuration { struct Conf; }
 class ConnectionSocket;
-namespace DNS { struct Query; }
 class Entry;
 class IdentifyRequest;
 class InfoFormatter;

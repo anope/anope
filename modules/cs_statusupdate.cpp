@@ -8,9 +8,13 @@
 #include "module.h"
 
 class StatusUpdate : public Module
+	, public EventHook<Event::AccessAdd>
+	, public EventHook<Event::AccessDel>
 {
  public:
 	StatusUpdate(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
+		, EventHook<Event::AccessAdd>("OnAccessAdd")
+		, EventHook<Event::AccessDel>("OnAccessDel")
 	{
 
 	}

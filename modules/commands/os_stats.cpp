@@ -253,8 +253,9 @@ class OSStats : public Module
 	Stats stats_saver;
 
  public:
-	OSStats(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		commandosstats(this), stats_type("Stats", Stats::Unserialize)
+	OSStats(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
+		, commandosstats(this)
+		, stats_type("Stats", Stats::Unserialize)
 	{
 
 	}

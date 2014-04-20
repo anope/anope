@@ -65,8 +65,8 @@ class OSOLine : public Module
 	CommandOSOLine commandosoline;
 
  public:
-	OSOLine(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		commandosoline(this)
+	OSOLine(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
+		, commandosoline(this)
 	{
 
 		if (!IRCD || !IRCD->CanSVSO)

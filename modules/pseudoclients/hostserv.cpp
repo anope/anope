@@ -10,12 +10,26 @@
  */
 
 #include "module.h"
+#include "modules/ns_update.h"
+#include "modules/hs_del.h"
+#include "modules/help.h"
 
 class HostServCore : public Module
+	, public EventHook<Event::UserLogin>
+	, public EventHook<Event::NickUpdate>
+	, public EventHook<Event::Help>
+	, public EventHook<Event::SetVhost>
+	, public EventHook<Event::DeleteVhost>
 {
 	Reference<BotInfo> HostServ;
+	
  public:
 	HostServCore(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PSEUDOCLIENT | VENDOR)
+		, EventHook<Event::UserLogin>("OnUserLogin")
+		, EventHook<Event::NickUpdate>("OnNickUpdate")
+		, EventHook<Event::Help>("OnHelp")
+		, EventHook<Event::SetVhost>("OnSetVhost")
+		, EventHook<Event::DeleteVhost>("OnDeleteVhost")
 	{
 		if (!IRCD || !IRCD->CanSetVHost)
 			throw ModuleException("Your IRCd does not support vhosts");
@@ -77,6 +91,10 @@ class HostServCore : public Module
 			return EVENT_CONTINUE;
 		source.Reply(_("%s commands:"), HostServ->nick.c_str());
 		return EVENT_CONTINUE;
+	}
+
+	void OnPostHelp(CommandSource &source, const std::vector<Anope::string> &params) override
+	{
 	}
 
 	void OnSetVhost(NickAlias *na) override

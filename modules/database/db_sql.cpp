@@ -55,6 +55,13 @@ public:
 };
 
 class DBSQL : public Module, public Pipe
+	, public EventHook<Event::Shutdown>
+	, public EventHook<Event::Restart>
+	, public EventHook<Event::LoadDatabase>
+	, public EventHook<Event::SerializableConstruct>
+	, public EventHook<Event::SerializableDestruct>
+	, public EventHook<Event::SerializableUpdate>
+	, public EventHook<Event::SerializeTypeCreate>
 {
 	ServiceReference<Provider> sql;
 	SQLSQLInterface sqlinterface;
@@ -89,7 +96,19 @@ class DBSQL : public Module, public Pipe
 	}
 
  public:
-	DBSQL(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, DATABASE | VENDOR), sql("", ""), sqlinterface(this), shutting_down(false), loading_databases(false), loaded(false), imported(false)
+	DBSQL(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, DATABASE | VENDOR)
+		, EventHook<Event::Shutdown>("OnShutdown")
+		, EventHook<Event::Restart>("OnRestart")
+		, EventHook<Event::LoadDatabase>("OnLoadDatabase")
+		, EventHook<Event::SerializableConstruct>("OnSerializableConstruct")
+		, EventHook<Event::SerializableDestruct>("OnSerializableDestruct")
+		, EventHook<Event::SerializableUpdate>("OnSerializableUpdate")
+		, EventHook<Event::SerializeTypeCreate>("OnSerializeTypeCreate")
+		, sqlinterface(this)
+		, shutting_down(false)
+		, loading_databases(false)
+		, loaded(false)
+		, imported(false)
 	{
 
 

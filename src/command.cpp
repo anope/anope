@@ -17,6 +17,7 @@
 #include "access.h"
 #include "regchannel.h"
 #include "channels.h"
+#include "event.h"
 
 CommandSource::CommandSource(const Anope::string &n, User *user, NickCore *core, CommandReply *r, BotInfo *bi) : nick(n), u(user), nc(core), reply(r),
 	c(NULL), service(bi)
@@ -261,7 +262,7 @@ void Command::Run(CommandSource &source, const Anope::string &message)
 	source.permission = info.permission;
 
 	EventReturn MOD_RESULT;
-	FOREACH_RESULT(OnPreCommand, MOD_RESULT, (source, c, params));
+	MOD_RESULT = Event::OnPreCommand(&Event::PreCommand::OnPreCommand, source, c, params);
 	if (MOD_RESULT == EVENT_STOP)
 		return;
 
@@ -281,7 +282,7 @@ void Command::Run(CommandSource &source, const Anope::string &message)
 	}
 
 	c->Execute(source, params);
-	FOREACH_MOD(OnPostCommand, (source, c, params));
+	Event::OnPostCommand(&Event::PostCommand::OnPostCommand, source, c, params);
 }
 
 bool Command::FindCommandFromService(const Anope::string &command_service, BotInfo* &bot, Anope::string &name)

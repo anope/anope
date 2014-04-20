@@ -11,16 +11,18 @@
 
 #include "module.h"
 #include "modules/ns_cert.h"
+#include "modules/ns_group.h"
 
 class NSGroupRequest : public IdentifyRequest
 {
+	EventHandlers<Event::NickGroup> &onnickgroup;
 	CommandSource source;
 	Command *cmd;
 	Anope::string nick;
 	Reference<NickAlias> target;
  
  public:
-	NSGroupRequest(Module *o, CommandSource &src, Command *c, const Anope::string &n, NickAlias *targ, const Anope::string &pass) : IdentifyRequest(o, targ->nc->display, pass), source(src), cmd(c), nick(n), target(targ) { }
+	NSGroupRequest(Module *o, EventHandlers<Event::NickGroup> &event, CommandSource &src, Command *c, const Anope::string &n, NickAlias *targ, const Anope::string &pass) : IdentifyRequest(o, targ->nc->display, pass), onnickgroup(event), source(src), cmd(c), nick(n), target(targ) { }
 
 	void OnSuccess() override
 	{
@@ -32,7 +34,7 @@ class NSGroupRequest : public IdentifyRequest
 		/* If the nick is already registered, drop it. */
 		if (na)
 		{
-			FOREACH_MOD(OnChangeCoreDisplay, (na->nc, u->nick));
+			Event::OnChangeCoreDisplay(&Event::ChangeCoreDisplay::OnChangeCoreDisplay, na->nc, u->nick);
 			delete na;
 		}
 
@@ -44,7 +46,7 @@ class NSGroupRequest : public IdentifyRequest
 		na->time_registered = na->last_seen = Anope::CurTime;
 
 		u->Login(target->nc);
-		FOREACH_MOD(OnNickGroup, (u, target));
+		this->onnickgroup(&Event::NickGroup::OnNickGroup, u, target);
 
 		Log(LOG_COMMAND, source, cmd) << "to make " << nick << " join group of " << target->nick << " (" << target->nc->display << ") (email: " << (!target->nc->email.empty() ? target->nc->email : "none") << ")";
 		source.Reply(_("You are now in the group of \002%s\002."), target->nick.c_str());
@@ -71,8 +73,10 @@ class NSGroupRequest : public IdentifyRequest
 
 class CommandNSGroup : public Command
 {
+	EventHandlers<Event::NickGroup> &onnickgroup;
+
  public:
-	CommandNSGroup(Module *creator) : Command(creator, "nickserv/group", 0, 2)
+	CommandNSGroup(Module *creator, EventHandlers<Event::NickGroup> &event) : Command(creator, "nickserv/group", 0, 2), onnickgroup(event)
 	{
 		this->SetDesc(_("Join a group"));
 		this->SetSyntax(_("\037[target]\037 \037[password]\037"));
@@ -165,13 +169,13 @@ class CommandNSGroup : public Command
 
 			if (ok == false && !pass.empty())
 			{
-				NSGroupRequest *req = new NSGroupRequest(owner, source, this, u->nick, target, pass);
-				FOREACH_MOD(OnCheckAuthentication, (source.GetUser(), req));
+				NSGroupRequest *req = new NSGroupRequest(owner, this->onnickgroup, source, this, u->nick, target, pass);
+				Event::OnCheckAuthentication(&Event::CheckAuthentication::OnCheckAuthentication, source.GetUser(), req);
 				req->Dispatch();
 			}
 			else
 			{
-				NSGroupRequest req(owner, source, this, u->nick, target, pass);
+				NSGroupRequest req(owner, this->onnickgroup, source, this, u->nick, target, pass);
 
 				if (ok)
 					req.OnSuccess();
@@ -372,9 +376,14 @@ class NSGroup : public Module
 	CommandNSUngroup commandnsungroup;
 	CommandNSGList commandnsglist;
 
+	EventHandlers<Event::NickGroup> onnickgroup;
+
  public:
-	NSGroup(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		commandnsgroup(this), commandnsungroup(this), commandnsglist(this)
+	NSGroup(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
+		, commandnsgroup(this, onnickgroup)
+		, commandnsungroup(this)
+		, commandnsglist(this)
+		, onnickgroup(this, "OnNickGroup")
 	{
 		if (Config->GetModule("nickserv")->Get<bool>("nonicknameownership"))
 			throw ModuleException(modname + " can not be used with options:nonicknameownership enabled");

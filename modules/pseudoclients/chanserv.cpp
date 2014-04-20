@@ -11,18 +11,66 @@
 
 #include "module.h"
 #include "modules/cs_mode.h"
+#include "modules/help.h"
+#include "modules/bs_bot.h"
+#include "modules/chanserv.h"
+#include "modules/cs_info.h"
 
-class ChanServCore : public Module, public ChanServService
+class ChanServCore : public Module
+	, public ChanServ::ChanServService
+	, public EventHook<Event::BotDelete>
+	, public EventHook<Event::BotPrivmsg>
+	, public EventHook<Event::DelCore>
+	, public EventHook<Event::DelChan>
+	, public EventHook<Event::Help>
+	, public EventHook<Event::CheckModes>
+	, public EventHook<Event::CreateChan>
+	, public EventHook<Event::CanSet>
+	, public EventHook<Event::ChannelSync>
+	, public EventHook<Event::Log>
+	, public EventHook<Event::ExpireTick>
+	, public EventHook<Event::CheckDelete>
+	, public EventHook<Event::PreUplinkSync>
+	, public EventHook<Event::ChanRegistered>
+	, public EventHook<Event::JoinChannel>
+	, public EventHook<Event::ChannelModeSet>
+	, public EventHook<Event::ChanInfo>
+	, public EventHook<Event::SetCorrectModes>
 {
 	Reference<BotInfo> ChanServ;
 	std::vector<Anope::string> defaults;
 	ExtensibleItem<bool> inhabit;
 	ExtensibleRef<bool> persist;
 	bool always_lower;
+	EventHandlers<ChanServ::Event::PreChanExpire> OnPreChanExpire;
+	EventHandlers<ChanServ::Event::ChanExpire> OnChanExpire;
 
  public:
-	ChanServCore(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PSEUDOCLIENT | VENDOR),
-		ChanServService(this), inhabit(this, "inhabit"), persist("PERSIST"), always_lower(false)
+	ChanServCore(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PSEUDOCLIENT | VENDOR)
+		, ChanServService(this)
+		, EventHook<Event::BotDelete>("OnBotDelete")
+		, EventHook<Event::BotPrivmsg>("OnBotPrivmsg")
+		, EventHook<Event::DelCore>("OnDelCore")
+		, EventHook<Event::DelChan>("OnDelChan")
+		, EventHook<Event::Help>("OnHelp")
+		, EventHook<Event::CheckModes>("OnCheckModes")
+		, EventHook<Event::CreateChan>("OnCreateChan")
+		, EventHook<Event::CanSet>("OnCanSet")
+		, EventHook<Event::ChannelSync>("OnChannelSync")
+		, EventHook<Event::Log>("OnLog")
+		, EventHook<Event::ExpireTick>("OnExpireTick")
+		, EventHook<Event::CheckDelete>("OnCheckDelete")
+		, EventHook<Event::PreUplinkSync>("OnPreUplinkSync")
+		, EventHook<Event::ChanRegistered>("OnChanRegistered")
+		, EventHook<Event::JoinChannel>("OnJoinChannel")
+		, EventHook<Event::ChannelModeSet>("OnChannelModeSet")
+		, EventHook<Event::ChanInfo>("OnChanInfo")
+		, EventHook<Event::SetCorrectModes>("OnSetCorrectModes")
+		, inhabit(this, "inhabit")
+		, persist("PERSIST")
+		, always_lower(false)
+		, OnPreChanExpire(this, "OnPreChanExpire")
+		, OnChanExpire(this, "OnChanExpire")
 	{
 	}
 
@@ -167,13 +215,13 @@ class ChanServCore : public Module, public ChanServService
 
 				if (newowner)
 				{
-					Log(LOG_NORMAL, "chanserv/drop", ChanServ) << "Transferring foundership of " << ci->name << " from deleted nick " << nc->display << " to " << newowner->display;
+					::Log(LOG_NORMAL, "chanserv/drop", ChanServ) << "Transferring foundership of " << ci->name << " from deleted nick " << nc->display << " to " << newowner->display;
 					ci->SetFounder(newowner);
 					ci->SetSuccessor(NULL);
 				}
 				else
 				{
-					Log(LOG_NORMAL, "chanserv/drop", ChanServ) << "Deleting channel " << ci->name << " owned by deleted nick " << nc->display;
+					::Log(LOG_NORMAL, "chanserv/drop", ChanServ) << "Deleting channel " << ci->name << " owned by deleted nick " << nc->display;
 
 					delete ci;
 					continue;
@@ -318,7 +366,7 @@ class ChanServCore : public Module, public ChanServService
 		}
 	}
 
-	void OnLog(Log *l) override
+	void OnLog(::Log *l) override
 	{
 		if (l->type == LOG_CHANNEL)
 			l->bi = ChanServ;
@@ -351,12 +399,12 @@ class ChanServCore : public Module, public ChanServService
 					expire = true;
 			}
 
-			FOREACH_MOD(OnPreChanExpire, (ci, expire));
+			this->OnPreChanExpire(&ChanServ::Event::PreChanExpire::OnPreChanExpire, ci, expire);
 
 			if (expire)
 			{
-				Log(LOG_NORMAL, "chanserv/expire", ChanServ) << "Expiring channel " << ci->name << " (founder: " << (ci->GetFounder() ? ci->GetFounder()->display : "(none)") << ")";
-				FOREACH_MOD(OnChanExpire, (ci));
+				::Log(LOG_NORMAL, "chanserv/expire", ChanServ) << "Expiring channel " << ci->name << " (founder: " << (ci->GetFounder() ? ci->GetFounder()->display : "(none)") << ")";
+				this->OnChanExpire(&ChanServ::Event::ChanExpire::OnChanExpire, ci);
 				delete ci;
 			}
 		}
@@ -425,7 +473,7 @@ class ChanServCore : public Module, public ChanServService
 	{
 		if (always_lower && c->ci && c->creation_time > c->ci->time_registered)
 		{
-			Log(LOG_DEBUG) << "Changing TS of " << c->name << " from " << c->creation_time << " to " << c->ci->time_registered;
+			::Log(LOG_DEBUG) << "Changing TS of " << c->name << " from " << c->creation_time << " to " << c->ci->time_registered;
 			c->creation_time = c->ci->time_registered;
 			IRCD->SendChannel(c);
 			c->Reset();

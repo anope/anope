@@ -10,6 +10,7 @@
  */
 
 #include "module.h"
+#include "modules/bs_kick.h"
 
 class CommandBSSet : public Command
 {
@@ -192,15 +193,18 @@ class CommandBSSetPrivate : public Command
 };
 
 class BSSet : public Module
+	, public EventHook<Event::BotBan>
 {
 	CommandBSSet commandbsset;
 	CommandBSSetBanExpire commandbssetbanexpire;
 	CommandBSSetPrivate commandbssetprivate;
 
  public:
-	BSSet(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		commandbsset(this), commandbssetbanexpire(this),
-		commandbssetprivate(this)
+	BSSet(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
+		, EventHook<Event::BotBan>("OnBotBan")
+		, commandbsset(this)
+		, commandbssetbanexpire(this)
+		, commandbssetprivate(this)
 	{
 	}
 

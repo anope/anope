@@ -14,6 +14,7 @@
 #include "protocol.h"
 #include "channels.h"
 #include "uplink.h"
+#include "event.h"
 
 struct StackerInfo;
 
@@ -138,7 +139,7 @@ ChannelMode::ChannelMode(const Anope::string &cm, char mch) : Mode(cm, MC_CHANNE
 bool ChannelMode::CanSet(User *u) const
 {
 	EventReturn MOD_RESULT;
-	FOREACH_RESULT(OnCanSet, MOD_RESULT, (u, this));
+	MOD_RESULT = Event::OnCanSet(&Event::CanSet::OnCanSet, u, this);
 	return MOD_RESULT != EVENT_STOP;
 }
 
@@ -335,7 +336,7 @@ bool ModeManager::AddUserMode(UserMode *um)
 
 	UserModesByName[um->name] = um;
 
-	FOREACH_MOD(OnUserModeAdd, (um));
+	Event::OnUserModeAdd(&Event::UserModeAdd::OnUserModeAdd, um);
 
 	return true;
 }
@@ -369,7 +370,7 @@ bool ModeManager::AddChannelMode(ChannelMode *cm)
 
 	ChannelModesByName[cm->name] = cm;
 
-	FOREACH_MOD(OnChannelModeAdd, (cm));
+	Event::OnChannelModeAdd(&Event::ChannelModeAdd::OnChannelModeAdd, cm);
 
 	return true;
 }

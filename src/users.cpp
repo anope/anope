@@ -24,6 +24,7 @@
 #include "language.h"
 #include "sockets.h"
 #include "uplink.h"
+#include "event.h"
 
 user_map UserListByNick, UserListByUID;
 
@@ -85,7 +86,7 @@ User::User(const Anope::string &snick, const Anope::string &sident, const Anope:
 	bool exempt = false;
 	if (server && server->IsULined())
 		exempt = true;
-	FOREACH_MOD(OnUserConnect, (this, exempt));
+	Event::OnUserConnect(&Event::UserConnect::OnUserConnect, this, exempt);
 }
 
 static void CollideKill(User *target, const Anope::string &reason)
@@ -183,7 +184,7 @@ void User::ChangeNick(const Anope::string &newnick, time_t ts)
 		}
 	}
 
-	FOREACH_MOD(OnUserNickChange, (this, old));
+	Event::OnUserNickChange(&Event::UserNickChange::OnUserNickChange, this, old);
 }
 
 void User::SetDisplayedHost(const Anope::string &shost)
@@ -195,7 +196,7 @@ void User::SetDisplayedHost(const Anope::string &shost)
 
 	Log(this, "host") << "changed vhost to " << shost;
 
-	FOREACH_MOD(OnSetDisplayedHost, (this));
+	Event::OnSetDisplayedHost(&Event::SetDisplayedHost::OnSetDisplayedHost, this);
 
 	this->UpdateHost();
 }
@@ -299,7 +300,7 @@ User::~User()
 		--this->server->users;
 	}
 
-	FOREACH_MOD(OnPreUserLogoff, (this));
+	Event::OnPreUserLogoff(&Event::PreUserLogoff::OnPreUserLogoff, this);
 
 	ModeManager::StackerDel(this);
 	this->Logout();
@@ -314,7 +315,7 @@ User::~User()
 	if (!this->uid.empty())
 		UserListByUID.erase(this->uid);
 
-	FOREACH_MOD(OnPostUserLogoff, (this));
+	Event::OnPostUserLogoff(&Event::PostUserLogoff::OnPostUserLogoff, this);
 }
 
 void User::SendMessage(BotInfo *source, const char *fmt, ...)
@@ -366,7 +367,7 @@ void User::Identify(NickAlias *na)
 
 	this->Login(na->nc);
 
-	FOREACH_MOD(OnNickIdentify, (this));
+	Event::OnNickIdentify(&Event::NickIdentify::OnNickIdentify, this);
 
 	if (this->IsServicesOper())
 	{
@@ -402,7 +403,7 @@ void User::Login(NickCore *core)
 	if (this->server->IsSynced())
 		Log(this, "account") << "is now identified as " << this->nc->display;
 	
-	FOREACH_MOD(OnUserLogin, (this));
+	Event::OnUserLogin(&Event::UserLogin::OnUserLogin, this);
 }
 
 void User::Logout()
@@ -470,7 +471,7 @@ bool User::IsServicesOper()
 	}
 
 	EventReturn MOD_RESULT;
-	FOREACH_RESULT(IsServicesOper, MOD_RESULT, (this));
+	MOD_RESULT = Event::OnIsServicesOper(&Event::IsServicesOperEvent::IsServicesOper, this);
 	if (MOD_RESULT == EVENT_STOP)
 		return false;
 
@@ -528,7 +529,7 @@ void User::SetModeInternal(const MessageSource &source, UserMode *um, const Anop
 	if (um->name == "CLOAK" || um->name == "VHOST")
 		this->UpdateHost();
 
-	FOREACH_MOD(OnUserModeSet, (source, this, um->name));
+	Event::OnUserModeSet(&Event::UserModeSet::OnUserModeSet, source, this, um->name);
 }
 
 void User::RemoveModeInternal(const MessageSource &source, UserMode *um)
@@ -547,7 +548,7 @@ void User::RemoveModeInternal(const MessageSource &source, UserMode *um)
 		this->UpdateHost();
 	}
 
-	FOREACH_MOD(OnUserModeUnset, (source, this, um->name));
+	Event::OnUserModeUnset(&Event::UserModeUnset::OnUserModeUnset, source, this, um->name);
 }
 
 void User::SetMode(BotInfo *bi, UserMode *um, const Anope::string &param)
@@ -734,7 +735,7 @@ void User::Quit(const Anope::string &reason)
 		return;
 	}
 
-	FOREACH_MOD(OnUserQuit, (this, reason));
+	Event::OnUserQuit(&Event::UserQuit::OnUserQuit, this, reason);
 
 	this->quit = true;
 	quitting_users.push_back(this);

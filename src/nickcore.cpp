@@ -14,6 +14,7 @@
 #include "modules.h"
 #include "account.h"
 #include "config.h"
+#include "event.h"
 
 Serialize::Checker<nickcore_map> NickCoreList("NickCore");
 
@@ -33,12 +34,12 @@ NickCore::NickCore(const Anope::string &coredisplay) : Serializable("NickCore"),
 	if (old == NickCoreList->size())
 		Log(LOG_DEBUG) << "Duplicate account " << coredisplay << " in nickcore table?";
 	
-	FOREACH_MOD(OnNickCoreCreate, (this));
+	Event::OnNickCoreCreate(&Event::NickCoreCreate::OnNickCoreCreate, this);
 }
 
 NickCore::~NickCore()
 {
-	FOREACH_MOD(OnDelCore, (this));
+	Event::OnDelCore(&Event::DelCore::OnDelCore, this);
 
 	if (!this->chanaccess->empty())
 		Log(LOG_DEBUG) << "Non-empty chanaccess list in destructor!";
@@ -156,7 +157,7 @@ void NickCore::SetDisplay(const NickAlias *na)
 	if (na->nc != this || na->nick == this->display)
 		return;
 
-	FOREACH_MOD(OnChangeCoreDisplay, (this, na->nick));
+	Event::OnChangeCoreDisplay(&Event::ChangeCoreDisplay::OnChangeCoreDisplay, this, na->nick);
 
 	/* Remove the core from the list */
 	NickCoreList->erase(this->display);
@@ -174,7 +175,7 @@ bool NickCore::IsServicesOper() const
 void NickCore::AddAccess(const Anope::string &entry)
 {
 	this->access.push_back(entry);
-	FOREACH_MOD(OnNickAddAccess, (this, entry));
+	Event::OnNickAddAccess(&Event::NickAddAccess::OnNickAddAccess, this, entry);
 }
 
 Anope::string NickCore::GetAccess(unsigned entry) const
@@ -203,7 +204,7 @@ void NickCore::EraseAccess(const Anope::string &entry)
 	for (unsigned i = 0, end = this->access.size(); i < end; ++i)
 		if (this->access[i] == entry)
 		{
-			FOREACH_MOD(OnNickEraseAccess, (this, entry));
+			Event::OnNickEraseAccess(&Event::NickEraseAccess::OnNickEraseAccess, this, entry);
 			this->access.erase(this->access.begin() + i);
 			break;
 		}
@@ -211,7 +212,7 @@ void NickCore::EraseAccess(const Anope::string &entry)
 
 void NickCore::ClearAccess()
 {
-	FOREACH_MOD(OnNickClearAccess, (this));
+	Event::OnNickClearAccess(&Event::NickClearAccess::OnNickClearAccess, this);
 	this->access.clear();
 }
 

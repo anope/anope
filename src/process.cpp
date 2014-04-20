@@ -15,6 +15,7 @@
 #include "servers.h"
 #include "users.h"
 #include "regchannel.h"
+#include "event.h"
 
 void Anope::Process(const Anope::string &buffer)
 {
@@ -70,7 +71,7 @@ void Anope::Process(const Anope::string &buffer)
 	MessageSource src(source);
 	
 	EventReturn MOD_RESULT;
-	FOREACH_RESULT(OnMessage, MOD_RESULT, (src, command, params));
+	MOD_RESULT = Event::OnMessage(&Event::Message::OnMessage, src, command, params);
 	if (MOD_RESULT == EVENT_STOP)
 		return;
 

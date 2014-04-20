@@ -444,11 +444,13 @@ class LDAPService : public LDAPProvider, public Thread, public Condition
 };
 
 class ModuleLDAP : public Module, public Pipe
+	, public EventHook<Event::ModuleUnload>
 {
 	std::map<Anope::string, LDAPService *> LDAPServices;
  public:
 
 	ModuleLDAP(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, EXTRA | VENDOR)
+		, EventHook<Event::ModuleUnload>("OnModuleUnload")
 	{
 		me = this;
 

@@ -193,12 +193,16 @@ class SHA1Provider : public Encryption::Provider
 };
 
 class ESHA1 : public Module
+	, public EventHook<Event::Encrypt>
+	, public EventHook<Event::CheckAuthentication>
 {
 	SHA1Provider sha1provider;
 
  public:
-	ESHA1(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, ENCRYPTION | VENDOR),
-		sha1provider(this)
+	ESHA1(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, ENCRYPTION | VENDOR)
+		, EventHook<Event::Encrypt>("OnEncrypt")
+		, EventHook<Event::CheckAuthentication>("OnCheckAuthentication")
+		, sha1provider(this)
 	{
 
 	}

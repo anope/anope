@@ -244,7 +244,7 @@ class CommandCSFlags : public Command
 			if (current != NULL)
 			{
 				ci->EraseAccess(current_idx - 1);
-				FOREACH_MOD(OnAccessDel, (ci, source, current));
+				Event::OnAccessDel(&Event::AccessDel::OnAccessDel, ci, source, current);
 				delete current;
 				Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to delete " << mask;
 				source.Reply(_("\002%s\002 removed from the %s access list."), mask.c_str(), ci->name.c_str());
@@ -272,7 +272,7 @@ class CommandCSFlags : public Command
 
 		ci->AddAccess(access);
 
-		FOREACH_MOD(OnAccessAdd, (ci, source, access));
+		Event::OnAccessAdd(&Event::AccessAdd::OnAccessAdd, ci, source, access);
 
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to modify " << mask << "'s flags to " << access->AccessSerialize();
 		if (p != NULL)
@@ -356,7 +356,7 @@ class CommandCSFlags : public Command
 		{
 			ci->ClearAccess();
 
-			FOREACH_MOD(OnAccessClear, (ci, source));
+			Event::OnAccessClear(&Event::AccessClear::OnAccessClear, ci, source);
 
 			source.Reply(_("Channel %s access list has been cleared."), ci->name.c_str());
 
@@ -457,8 +457,9 @@ class CSFlags : public Module
 	CommandCSFlags commandcsflags;
 
  public:
-	CSFlags(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		accessprovider(this), commandcsflags(this)
+	CSFlags(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
+		, accessprovider(this)
+		, commandcsflags(this)
 	{
 		this->SetPermanent(true);
 

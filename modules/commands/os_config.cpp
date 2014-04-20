@@ -140,8 +140,8 @@ class OSConfig : public Module
 	CommandOSConfig commandosconfig;
 
  public:
-	OSConfig(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		commandosconfig(this)
+	OSConfig(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
+		, commandosconfig(this)
 	{
 
 	}

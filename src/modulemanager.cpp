@@ -12,6 +12,7 @@
 #include "users.h"
 #include "regchannel.h"
 #include "config.h"
+#include "event.h"
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -22,7 +23,6 @@
 #endif
 
 std::list<Module *> ModuleManager::Modules;
-std::vector<Module *> ModuleManager::EventHandlers[I_SIZE];
 
 #ifdef _WIN32
 void ModuleManager::CleanupRuntimeDirectory()
@@ -243,17 +243,10 @@ ModuleReturn ModuleManager::LoadModule(const Anope::string &modname, User *u)
 		DeleteModule(m);
 		return MOD_ERR_EXCEPTION;
 	}
-	catch (const NotImplementedException &ex)
-	{
-	}
 
 	Log(LOG_DEBUG) << "Module " << modname << " loaded.";
 
-	/* Attach module to all events */
-	for (unsigned i = 0; i < I_SIZE; ++i)
-		EventHandlers[i].push_back(m);
-
-	FOREACH_MOD(OnModuleLoad, (u, m));
+	Event::OnModuleLoad(&Event::ModuleLoad::OnModuleLoad, u, m);
 
 	return MOD_ERR_OK;
 }
@@ -263,7 +256,7 @@ ModuleReturn ModuleManager::UnloadModule(Module *m, User *u)
 	if (!m)
 		return MOD_ERR_PARAMS;
 
-	FOREACH_MOD(OnModuleUnload, (u, m));
+	Event::OnModuleUnload(&Event::ModuleUnload::OnModuleUnload, u, m);
 
 	return DeleteModule(m);
 }
@@ -348,119 +341,6 @@ ModuleReturn ModuleManager::DeleteModule(Module *m)
 #endif
 	
 	return MOD_ERR_OK;
-}
-
-void ModuleManager::DetachAll(Module *mod)
-{
-	for (unsigned i = 0; i < I_SIZE; ++i)
-	{
-		std::vector<Module *> &mods = EventHandlers[i];
-		std::vector<Module *>::iterator it2 = std::find(mods.begin(), mods.end(), mod);
-		if (it2 != mods.end())
-			mods.erase(it2);
-	}
-}
-
-bool ModuleManager::SetPriority(Module *mod, Priority s)
-{
-	for (unsigned i = 0; i < I_SIZE; ++i)
-		SetPriority(mod, static_cast<Implementation>(i), s);
-
-	return true;
-}
-
-bool ModuleManager::SetPriority(Module *mod, Implementation i, Priority s, Module **modules, size_t sz)
-{
-	/** To change the priority of a module, we first find its position in the vector,
-	 * then we find the position of the other modules in the vector that this module
-	 * wants to be before/after. We pick off either the first or last of these depending
-	 * on which they want, and we make sure our module is *at least* before or after
-	 * the first or last of this subset, depending again on the type of priority.
-	 */
-
-	/* Locate our module. This is O(n) but it only occurs on module load so we're
-	 * not too bothered about it
-	 */
-	size_t source = 0;
-	bool found = false;
-	for (size_t x = 0, end = EventHandlers[i].size(); x != end; ++x)
-		if (EventHandlers[i][x] == mod)
-		{
-			source = x;
-			found = true;
-			break;
-		}
-
-	/* Eh? this module doesnt exist, probably trying to set priority on an event
-	 * theyre not attached to.
-	 */
-	if (!found)
-		return false;
-
-	size_t swap_pos = 0;
-	bool swap = true;
-	switch (s)
-	{
-		/* Dummy value */
-		case PRIORITY_DONTCARE:
-			swap = false;
-			break;
-		/* Module wants to be first, sod everything else */
-		case PRIORITY_FIRST:
-			swap_pos = 0;
-			break;
-		/* Module is submissive and wants to be last... awww. */
-		case PRIORITY_LAST:
-			if (EventHandlers[i].empty())
-				swap_pos = 0;
-			else
-				swap_pos = EventHandlers[i].size() - 1;
-			break;
-		/* Place this module after a set of other modules */
-		case PRIORITY_AFTER:
-			/* Find the latest possible position */
-			swap_pos = 0;
-			swap = false;
-			for (size_t x = 0, end = EventHandlers[i].size(); x != end; ++x)
-				for (size_t n = 0; n < sz; ++n)
-					if (modules[n] && EventHandlers[i][x] == modules[n] && x >= swap_pos && source <= swap_pos)
-					{
-						swap_pos = x;
-						swap = true;
-					}
-			break;
-		/* Place this module before a set of other modules */
-		case PRIORITY_BEFORE:
-			swap_pos = EventHandlers[i].size() - 1;
-			swap = false;
-			for (size_t x = 0, end = EventHandlers[i].size(); x != end; ++x)
-				for (size_t n = 0; n < sz; ++n)
-					if (modules[n] && EventHandlers[i][x] == modules[n] && x <= swap_pos && source >= swap_pos)
-					{
-						swap = true;
-						swap_pos = x;
-					}
-	}
-
-	/* Do we need to swap? */
-	if (swap && swap_pos != source)
-	{
-		/* Suggestion from Phoenix, "shuffle" the modules to better retain call order */
-		int incrmnt = 1;
-
-		if (source > swap_pos)
-			incrmnt = -1;
-
-		for (unsigned j = source; j != swap_pos; j += incrmnt)
-		{
-			if (j + incrmnt > EventHandlers[i].size() - 1 || (!j && incrmnt == -1))
-				continue;
-
-			std::swap(EventHandlers[i][j], EventHandlers[i][j + incrmnt]);
-		}
-	}
-
-	return true;
 }
 
 void ModuleManager::UnloadAll()

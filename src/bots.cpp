@@ -18,6 +18,7 @@
 #include "config.h"
 #include "language.h"
 #include "serialize.h"
+#include "event.h"
 
 Serialize::Checker<botinfo_map> BotListByNick("BotInfo"), BotListByUID("BotInfo");
 
@@ -31,7 +32,7 @@ BotInfo::BotInfo(const Anope::string &nnick, const Anope::string &nuser, const A
 	if (!this->uid.empty())
 		(*BotListByUID)[this->uid] = this;
 	
-	FOREACH_MOD(OnCreateBot, (this));
+	Event::OnCreateBot(&Event::CreateBot::OnCreateBot, this);
 
 	// If we're synchronised with the uplink already, send the bot.
 	if (Me && Me->IsSynced())
@@ -49,7 +50,7 @@ BotInfo::BotInfo(const Anope::string &nnick, const Anope::string &nuser, const A
 
 BotInfo::~BotInfo()
 {
-	FOREACH_MOD(OnDelBot, (this));
+	Event::OnDelBot(&Event::DelBot::OnDelBot, this);
 
 	// If we're synchronised with the uplink already, send the bot.
 	if (Me && Me->IsSynced())
@@ -152,7 +153,7 @@ const std::set<ChannelInfo *> &BotInfo::GetChannels() const
 void BotInfo::Assign(User *u, ChannelInfo *ci)
 {
 	EventReturn MOD_RESULT;
-	FOREACH_RESULT(OnPreBotAssign, MOD_RESULT, (u, ci, this));
+	MOD_RESULT = Event::OnPreBotAssign(&Event::PreBotAssign::OnPreBotAssign, u, ci, this);
 	if (MOD_RESULT == EVENT_STOP)
 		return;
 
@@ -162,13 +163,13 @@ void BotInfo::Assign(User *u, ChannelInfo *ci)
 	ci->bi = this;
 	this->channels->insert(ci);
 
-	FOREACH_MOD(OnBotAssign, (u, ci, this));
+	Event::OnBotAssign(&Event::BotAssign::OnBotAssign, u, ci, this);
 }
 
 void BotInfo::UnAssign(User *u, ChannelInfo *ci)
 {
 	EventReturn MOD_RESULT;
-	FOREACH_RESULT(OnBotUnAssign, MOD_RESULT, (u, ci));
+	MOD_RESULT = Event::OnBotUnAssign(&Event::BotUnAssign::OnBotUnAssign, u, ci);
 	if (MOD_RESULT == EVENT_STOP)
 		return;
 
@@ -198,7 +199,7 @@ void BotInfo::Join(Channel *c, ChannelStatus *status)
 	if (IRCD)
 		IRCD->SendJoin(this, c, status);
 
-	FOREACH_MOD(OnJoinChannel, (this, c));
+	Event::OnJoinChannel(&Event::JoinChannel::OnJoinChannel, this, c);
 }
 
 void BotInfo::Join(const Anope::string &chname, ChannelStatus *status)
@@ -214,7 +215,7 @@ void BotInfo::Part(Channel *c, const Anope::string &reason)
 
 	IRCD->SendPart(this, c, "%s", !reason.empty() ? reason.c_str() : "");
 
-	FOREACH_MOD(OnPartChannel, (this, c, c->name, reason));
+	Event::OnPartChannel(&Event::PartChannel::OnPartChannel, this, c, c->name, reason);
 
 	c->DeleteUser(this);
 }

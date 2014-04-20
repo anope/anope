@@ -11,8 +11,7 @@
 
 #include "module.h"
 #include "modules/ns_cert.h"
-
-static ServiceReference<NickServService> nickserv("NickServService", "NickServ");
+#include "modules/nickserv.h"
 
 typedef std::map<Anope::string, ChannelStatus> NSRecoverInfo;
 
@@ -40,7 +39,7 @@ class NSRecoverRequest : public IdentifyRequest
 		/* Nick is being held by us, release it */
 		if (na->HasExt("HELD"))
 		{
-			nickserv->Release(na);
+			NickServ::service->Release(na);
 			source.Reply(_("Service's hold on \002%s\002 has been released."), na->nick.c_str());
 		}
 		else if (!u)
@@ -89,13 +88,13 @@ class NSRecoverRequest : public IdentifyRequest
 			}
 
 			u->SendMessage(source.service, _("This nickname has been recovered by %s."), source.GetNick().c_str());
-			if (nickserv)
-				nickserv->Collide(u, na);
+			if (NickServ::service)
+				NickServ::service->Collide(u, na);
 
 			if (IRCD->CanSVSNick)
 			{
 				/* If we can svsnick then release our hold and svsnick the user using the command */
-				nickserv->Release(na);
+				NickServ::service->Release(na);
 				IRCD->SendForceNickChange(source.GetUser(), GetAccount(), Anope::CurTime);
 			}
 			else
@@ -170,7 +169,7 @@ class CommandNSRecover : public Command
 		if (ok == false && !pass.empty())
 		{
 			NSRecoverRequest *req = new NSRecoverRequest(owner, source, this, na->nick, pass);
-			FOREACH_MOD(OnCheckAuthentication, (source.GetUser(), req));
+			Event::OnCheckAuthentication(&Event::CheckAuthentication::OnCheckAuthentication, source.GetUser(), req);
 			req->Dispatch();
 		}
 		else
@@ -199,13 +198,18 @@ class CommandNSRecover : public Command
 };
 
 class NSRecover : public Module
+	, public EventHook<Event::UserNickChange>
+	, public EventHook<Event::JoinChannel>
 {
 	CommandNSRecover commandnsrecover;
 	PrimitiveExtensibleItem<NSRecoverInfo> recover;
 
  public:
-	NSRecover(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		commandnsrecover(this), recover(this, "recover")
+	NSRecover(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
+		, EventHook<Event::UserNickChange>("OnUserNickChange")
+		, EventHook<Event::JoinChannel>("OnJoinChannel")
+		, commandnsrecover(this)
+		, recover(this, "recover")
 	{
 
 		if (Config->GetModule("nickserv")->Get<bool>("nonicknameownership"))

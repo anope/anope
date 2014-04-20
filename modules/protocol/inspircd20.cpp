@@ -12,6 +12,7 @@
 #include "module.h"
 #include "modules/sasl.h"
 #include "modules/cs_mode.h"
+#include "modules/cs_set.h"
 
 struct SASLUser
 {
@@ -1188,7 +1189,7 @@ struct IRCDMessageMetadata : IRCDMessage
 				{
 					u->fingerprint = data.substr(pos1, pos2 - pos1);
 				}
-				FOREACH_MOD(OnFingerprint, (u));
+				Event::OnFingerprint(&Event::Fingerprint::OnFingerprint, u);
 			}
 		}
 		else if (params[0][0] == '#')
@@ -1424,6 +1425,12 @@ struct IRCDMessageUID : IRCDMessage
 };
 
 class ProtoInspIRCd20 : public Module
+	, public EventHook<Event::UserNickChange>
+	, public EventHook<Event::ChannelSync>
+	, public EventHook<Event::ChanRegistered>
+	, public EventHook<Event::DelChan>
+	, public EventHook<Event::MLockEvents>
+	, public EventHook<Event::SetChannelOption>
 {
 	InspIRCd20Proto ircd_proto;
 	ExtensibleItem<bool> ssl;
@@ -1472,16 +1479,48 @@ class ProtoInspIRCd20 : public Module
 	}
 
  public:
-	ProtoInspIRCd20(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PROTOCOL | VENDOR),
-		ircd_proto(this), ssl(this, "ssl"),
-		message_away(this), message_error(this), message_invite(this), message_join(this), message_kick(this),
-		message_kill(this), message_motd(this), message_notice(this), message_part(this), message_ping(this),
-		message_privmsg(this), message_quit(this), message_stats(this), message_topic(this),
+	ProtoInspIRCd20(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PROTOCOL | VENDOR)
+		, EventHook<Event::UserNickChange>("OnUserNickChange")
+		, EventHook<Event::ChannelSync>("OnChannelSync")
+		, EventHook<Event::ChanRegistered>("OnChanRegistered")
+		, EventHook<Event::DelChan>("OnDelChan")
+		, EventHook<Event::MLockEvents>("MLock")
+		, EventHook<Event::SetChannelOption>("OnSetChannelOption")
+		, ircd_proto(this)
+		, ssl(this, "ssl")
+		, message_away(this)
+		, message_error(this)
+		, message_invite(this)
+		, message_join(this)
+		, message_kick(this)
+		, message_kill(this)
+		, message_motd(this)
+		, message_notice(this)
+		, message_part(this)
+		, message_ping(this)
+		, message_privmsg(this)
+		, message_quit(this)
+		, message_stats(this)
+		, message_topic(this)
 
-		message_capab(this), message_encap(this), message_endburst(this),
-		message_fhost(this), message_fident(this), message_fjoin(this), message_fmode(this), message_ftopic(this),
-		message_idle(this), message_metadata(this), message_mode(this), message_nick(this), message_opertype(this), message_rsquit(this),
-		message_server(this), message_squit(this), message_time(this), message_uid(this)
+		, message_capab(this)
+		, message_encap(this)
+		, message_endburst(this)
+		, message_fhost(this)
+		, message_fident(this)
+		, message_fjoin(this)
+		, message_fmode(this)
+		, message_ftopic(this)
+		, message_idle(this)
+		, message_metadata(this)
+		, message_mode(this)
+		, message_nick(this)
+		, message_opertype(this)
+		, message_rsquit(this)
+		, message_server(this)
+		, message_squit(this)
+		, message_time(this)
+		, message_uid(this)
 	{
 	}
 

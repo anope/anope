@@ -161,8 +161,9 @@ class ModuleXMLRPC : public Module
  public:
 	MyXMLRPCServiceInterface xmlrpcinterface;
 
-	ModuleXMLRPC(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, EXTRA | VENDOR),
-		httpref("HTTPProvider", "httpd/main"), xmlrpcinterface(this, "xmlrpc")
+	ModuleXMLRPC(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, EXTRA | VENDOR)
+		, httpref("HTTPProvider", "httpd/main")
+		, xmlrpcinterface(this, "xmlrpc")
 	{
 		if (!httpref)
 			throw ModuleException("Unable to find http reference, is m_httpd loaded?");

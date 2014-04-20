@@ -10,6 +10,7 @@
  */
 
 #include "module.h"
+#include "modules/ns_group.h"
 
 class CommandHSGroup : public Command
 {
@@ -31,7 +32,7 @@ class CommandHSGroup : public Command
 			if (nick)
 			{
 				nick->SetVhost(na->GetVhostIdent(), na->GetVhostHost(), na->GetVhostCreator());
-				FOREACH_MOD(OnSetVhost, (nick));
+				Event::OnSetVhost(&Event::SetVhost::OnSetVhost, nick);
 			}
 		}
 		setting = false;
@@ -77,14 +78,18 @@ class CommandHSGroup : public Command
 };
 
 class HSGroup : public Module
+	, public EventHook<Event::SetVhost>
+	, public EventHook<Event::NickGroup>
 {
 	CommandHSGroup commandhsgroup;
 	bool syncongroup;
 	bool synconset;
 
  public:
-	HSGroup(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		commandhsgroup(this)
+	HSGroup(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
+		, EventHook<Event::SetVhost>("OnSetVhost")
+		, EventHook<Event::NickGroup>("OnNickGroup")
+		, commandhsgroup(this)
 	{
 	}
 

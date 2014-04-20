@@ -10,8 +10,7 @@
  */
 
 #include "module.h"
-
-static ServiceReference<NickServService> NickServService("NickServService", "NickServ");
+#include "modules/nickserv.h"
 
 class CommandNSLogout : public Command
 {
@@ -37,8 +36,8 @@ class CommandNSLogout : public Command
 			source.Reply(_("You can't logout %s, they are a Services Operator."), nick.c_str());
 		else
 		{
-			if (!nick.empty() && !param.empty() && param.equals_ci("REVALIDATE") && NickServService)
-				NickServService->Validate(u2);
+			if (!nick.empty() && !param.empty() && param.equals_ci("REVALIDATE") && NickServ::service)
+				NickServ::service->Validate(u2);
 
 			u2->super_admin = false; /* Dont let people logout and remain a SuperAdmin */
 			Log(LOG_COMMAND, source, this) << "to logout " << u2->nick;
@@ -54,7 +53,7 @@ class CommandNSLogout : public Command
 			u2->Logout();
 
 			/* Send out an event */
-			FOREACH_MOD(OnNickLogout, (u2));
+			Event::OnNickLogout(&Event::NickLogout::OnNickLogout, u2);
 		}
 		return;
 	}
@@ -81,8 +80,8 @@ class NSLogout : public Module
 	CommandNSLogout commandnslogout;
 
  public:
-	NSLogout(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		commandnslogout(this)
+	NSLogout(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
+		, commandnslogout(this)
 	{
 
 	}

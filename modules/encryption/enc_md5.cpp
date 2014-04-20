@@ -338,12 +338,16 @@ class MD5Provider : public Encryption::Provider
 };
 
 class EMD5 : public Module
+	, public EventHook<Event::Encrypt>
+	, public EventHook<Event::CheckAuthentication>
 {
 	MD5Provider md5provider;
 
  public:
-	EMD5(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, ENCRYPTION | VENDOR),
-		md5provider(this)
+	EMD5(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, ENCRYPTION | VENDOR)
+		, EventHook<Event::Encrypt>("OnEncrypt")
+		, EventHook<Event::CheckAuthentication>("OnCheckAuthentication")
+		, md5provider(this)
 	{
 
 	}

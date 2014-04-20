@@ -10,6 +10,9 @@
  */
 
 #include "module.h"
+#include "modules/ns_info.h"
+#include "modules/bs_info.h"
+#include "modules/ns_set.h"
 
 class CommandBSSetGreet : public Command
 {
@@ -100,8 +103,7 @@ class CommandNSSetGreet : public Command
 		}
 		NickCore *nc = na->nc;
 
-		EventReturn MOD_RESULT;
-		FOREACH_RESULT(OnSetNickOption, MOD_RESULT, (source, this, nc, param));
+		EventReturn MOD_RESULT = Event::OnSetNickOption(&Event::SetNickOption::OnSetNickOption, source, this, nc, param);
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
@@ -163,6 +165,9 @@ class CommandNSSASetGreet : public CommandNSSetGreet
 };
 
 class Greet : public Module
+	, public EventHook<Event::JoinChannel>
+	, public EventHook<Event::NickInfo>
+	, public EventHook<Event::BotInfoEvent>
 {
 	/* channel setting for whether or not greet should be shown */
 	SerializableExtensibleItem<bool> bs_greet;
@@ -174,11 +179,15 @@ class Greet : public Module
 	CommandNSSASetGreet commandnssasetgreet;
 
  public:
-	Greet(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		bs_greet(this, "BS_GREET"),
-		ns_greet(this, "greet"),
-		commandbssetgreet(this),
-		commandnssetgreet(this), commandnssasetgreet(this)
+	Greet(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
+		, EventHook<Event::JoinChannel>("OnJoinChannel")
+		, EventHook<Event::NickInfo>("OnNickInfo")
+		, EventHook<Event::BotInfoEvent>("OnBotInfoEvent")
+		, bs_greet(this, "BS_GREET")
+		, ns_greet(this, "greet")
+		, commandbssetgreet(this)
+		, commandnssetgreet(this)
+		, commandnssasetgreet(this)
 	{
 	}
 

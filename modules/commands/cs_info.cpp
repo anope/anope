@@ -10,11 +10,14 @@
  */
 
 #include "module.h"
+#include "modules/cs_info.h"
 
 class CommandCSInfo : public Command
 {
+	EventHandlers<Event::ChanInfo> &eventonchaninfo;
+
  public:
-	CommandCSInfo(Module *creator) : Command(creator, "chanserv/info", 1, 2)
+	CommandCSInfo(Module *creator, EventHandlers<Event::ChanInfo> &event) : Command(creator, "chanserv/info", 1, 2), eventonchaninfo(event)
 	{
 		this->SetDesc(_("Lists information about the named registered channel"));
 		this->SetSyntax(_("\037channel\037"));
@@ -60,7 +63,7 @@ class CommandCSInfo : public Command
 			info[_("Ban type")] = stringify(ci->bantype);
 		}
 
-		FOREACH_MOD(OnChanInfo, (source, ci, info, show_all));
+		this->eventonchaninfo(&Event::ChanInfo::OnChanInfo, source, ci, info, show_all);
 
 		std::vector<Anope::string> replies;
 		info.Process(replies);
@@ -86,10 +89,12 @@ class CommandCSInfo : public Command
 class CSInfo : public Module
 {
 	CommandCSInfo commandcsinfo;
+	EventHandlers<Event::ChanInfo> eventonchaninfo;
 
  public:
-	CSInfo(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		commandcsinfo(this)
+	CSInfo(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
+		, commandcsinfo(this, eventonchaninfo)
+		, eventonchaninfo(this, "OnChanInfo")
 	{
 
 	}

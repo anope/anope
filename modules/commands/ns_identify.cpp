@@ -83,7 +83,7 @@ class CommandNSIdentify : public Command
 		else
 		{
 			NSIdentifyRequest *req = new NSIdentifyRequest(owner, source, this, na ? na->nc->display : nick, pass);
-			FOREACH_MOD(OnCheckAuthentication, (u, req));
+			Event::OnCheckAuthentication(&Event::CheckAuthentication::OnCheckAuthentication, u, req);
 			req->Dispatch();
 		}
 		return;

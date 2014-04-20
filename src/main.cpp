@@ -16,6 +16,7 @@
 #include "bots.h"
 #include "socketengine.h"
 #include "uplink.h"
+#include "event.h"
 
 #ifndef _WIN32
 #include <limits.h>
@@ -60,7 +61,7 @@ class ExpireTimer : public Timer
 
 	void Tick(time_t) override
 	{
-		FOREACH_MOD(OnExpireTick, ());
+		Event::OnExpireTick(&Event::ExpireTick::OnExpireTick);
 	}
 };
 
@@ -70,7 +71,7 @@ void Anope::SaveDatabases()
 		return;
 
 	Log(LOG_DEBUG) << "Saving databases";
-	FOREACH_MOD(OnSaveDatabase, ());
+	Event::OnSaveDatabase(&Event::SaveDatabase::OnSaveDatabase);
 }
 
 /** The following comes from InspIRCd to get the full path of the Anope executable
@@ -181,11 +182,11 @@ int main(int ac, char **av, char **envp)
 
 	if (Anope::Restarting)
 	{
-		FOREACH_MOD(OnRestart, ());
+		Event::OnRestart(&Event::Restart::OnRestart);
 	}
 	else
 	{
-		FOREACH_MOD(OnShutdown, ());
+		Event::OnShutdown(&Event::Shutdown::OnShutdown);
 	}
 
 	if (Anope::QuitReason.empty())

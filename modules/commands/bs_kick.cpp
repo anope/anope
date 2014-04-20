@@ -14,6 +14,7 @@
 #include "module.h"
 #include "modules/bs_kick.h"
 #include "modules/bs_badwords.h"
+#include "modules/bs_info.h"
 
 static Module *me;
 
@@ -998,6 +999,8 @@ class BanDataPurger : public Timer
 };
 
 class BSKick : public Module
+	, public EventHook<Event::BotInfoEvent>
+	, public EventHook<Event::Privmsg>
 {
 	ExtensibleItem<BanData> bandata;
 	ExtensibleItem<UserData> userdata;
@@ -1019,6 +1022,8 @@ class BSKick : public Module
 	CommandBSSetDontKickVoices commandbssetdontkickvoices;
 
 	BanDataPurger purger;
+
+	EventHandlers<Event::BotBan> onbotban;
 
 	BanData::Data &GetBanData(User *u, Channel *c)
 	{
@@ -1056,7 +1061,7 @@ class BSKick : public Module
 			Anope::string mask = ci->GetIdealBan(u);
 
 			ci->c->SetMode(NULL, "BAN", mask);
-			FOREACH_MOD(OnBotBan, (u, ci, mask));
+			this->onbotban(&Event::BotBan::OnBotBan, u, ci, mask);
 		}
 	}
 
@@ -1077,19 +1082,31 @@ class BSKick : public Module
 	}
 
  public:
-	BSKick(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		bandata(this, "bandata"),
-		userdata(this, "userdata"),
-		kickerdata(this, "kickerdata"),
+	BSKick(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
+		, EventHook<Event::BotInfoEvent>("OnBotInfoEvent")
+		, EventHook<Event::Privmsg>("OnPrivmsg")
+		, bandata(this, "bandata")
+		, userdata(this, "userdata")
+		, kickerdata(this, "kickerdata")
 
-		commandbskick(this),
-		commandbskickamsg(this), commandbskickbadwords(this), commandbskickbolds(this), commandbskickcaps(this),
-		commandbskickcolors(this), commandbskickflood(this), commandbskickitalics(this), commandbskickrepeat(this),
-		commandbskickreverse(this), commandbskickunderlines(this),
+		, commandbskick(this)
+		, commandbskickamsg(this)
+		, commandbskickbadwords(this)
+		, commandbskickbolds(this)
+		, commandbskickcaps(this)
+		, commandbskickcolors(this)
+		, commandbskickflood(this)
+		, commandbskickitalics(this)
+		, commandbskickrepeat(this)
+		, commandbskickreverse(this)
+		, commandbskickunderlines(this)
 
-		commandbssetdontkickops(this), commandbssetdontkickvoices(this),
+		, commandbssetdontkickops(this)
+		, commandbssetdontkickvoices(this)
 
-		purger(this)
+		, purger(this)
+
+		, onbotban(this, "OnBotBan")
 	{
 		me = this;
 

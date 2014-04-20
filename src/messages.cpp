@@ -20,12 +20,13 @@
 #include "messages.h"
 #include "servers.h"
 #include "channels.h"
+#include "event.h"
 
 using namespace Message;
 
 void Away::Run(MessageSource &source, const std::vector<Anope::string> &params)
 {
-	FOREACH_MOD(OnUserAway, (source.GetUser(), params.empty() ? "" : params[0]));
+	Event::OnUserAway(&Event::UserAway::OnUserAway, source.GetUser(), params.empty() ? "" : params[0]);
 }
 
 void Capab::Run(MessageSource &source, const std::vector<Anope::string> &params)
@@ -57,7 +58,7 @@ void Invite::Run(MessageSource &source, const std::vector<Anope::string> &params
 	if (!targ || targ->server != Me || !c || c->FindUser(targ))
 		return;
 	
-	FOREACH_MOD(OnInvite, (source.GetUser(), c, targ));
+	Event::OnInvite(&Event::Invite::OnInvite, source.GetUser(), c, targ);
 }
 
 void Join::Run(MessageSource &source, const std::vector<Anope::string> &params)
@@ -79,9 +80,9 @@ void Join::Run(MessageSource &source, const std::vector<Anope::string> &params)
 				++it;
 
 				Anope::string channame = cc->chan->name;
-				FOREACH_MOD(OnPrePartChannel, (user, cc->chan));
+				Event::OnPrePartChannel(&Event::PrePartChannel::OnPrePartChannel, user, cc->chan);
 				cc->chan->DeleteUser(user);
-				FOREACH_MOD(OnPartChannel, (user, Channel::Find(channame), channame, ""));
+				Event::OnPartChannel(&Event::PartChannel::OnPartChannel, user, Channel::Find(channame), channame, "");
 			}
 			continue;
 		}
@@ -140,7 +141,7 @@ void Join::SJoin(MessageSource &source, const Anope::string &chan, time_t ts, co
 		 */
 		c->SetCorrectModes(u, true);
 		
-		FOREACH_MOD(OnJoinChannel, (u, c));
+		Event::OnJoinChannel(&Event::JoinChannel::OnJoinChannel, u, c);
 	}
 
 	/* Channel is done syncing */
@@ -259,7 +260,7 @@ void Notice::Run(MessageSource &source, const std::vector<Anope::string> &params
 		BotInfo *bi = BotInfo::Find(params[0]);
 		if (!bi)
 			return;
-		FOREACH_MOD(OnBotNotice, (u, bi, message));
+		Event::OnBotNotice(&Event::BotNotice::OnBotNotice, u, bi, message);
 	}
 }
 
@@ -279,10 +280,10 @@ void Part::Run(MessageSource &source, const std::vector<Anope::string> &params)
 			continue;
 
 		Log(u, c, "part") << "Reason: " << (!reason.empty() ? reason : "No reason");
-		FOREACH_MOD(OnPrePartChannel, (u, c));
+		Event::OnPrePartChannel(&Event::PrePartChannel::OnPrePartChannel, u, c);
 		Anope::string ChannelName = c->name;
 		c->DeleteUser(u);
-		FOREACH_MOD(OnPartChannel, (u, c, ChannelName, !reason.empty() ? reason : ""));
+		Event::OnPartChannel(&Event::PartChannel::OnPartChannel, u, c, ChannelName, !reason.empty() ? reason : "");
 	}
 }
 
@@ -303,7 +304,7 @@ void Privmsg::Run(MessageSource &source, const std::vector<Anope::string> &param
 		Channel *c = Channel::Find(receiver);
 		if (c)
 		{
-			FOREACH_MOD(OnPrivmsg, (u, c, message));
+			Event::OnPrivmsg(&Event::Privmsg::OnPrivmsg, u, c, message);
 		}
 	}
 	else
@@ -351,7 +352,7 @@ void Privmsg::Run(MessageSource &source, const std::vector<Anope::string> &param
 			}
 
 			EventReturn MOD_RESULT;
-			FOREACH_RESULT(OnBotPrivmsg, MOD_RESULT, (u, bi, message));
+			MOD_RESULT = Event::OnBotPrivmsg(&Event::BotPrivmsg::OnBotPrivmsg, u, bi, message);
 			if (MOD_RESULT == EVENT_STOP)
 				return;
 			

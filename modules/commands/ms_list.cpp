@@ -154,8 +154,8 @@ class MSList : public Module
 	CommandMSList commandmslist;
 
  public:
-	MSList(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		commandmslist(this)
+	MSList(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
+		, commandmslist(this)
 	{
 
 	}

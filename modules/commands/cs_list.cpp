@@ -10,6 +10,8 @@
  */
 
 #include "module.h"
+#include "modules/cs_info.h"
+#include "modules/cs_set.h"
 
 class CommandCSList : public Command
 {
@@ -190,8 +192,7 @@ class CommandCSSetPrivate : public Command
 			return;
 		}
 
-		EventReturn MOD_RESULT;
-		FOREACH_RESULT(OnSetChannelOption, MOD_RESULT, (source, this, ci, params[1]));
+		EventReturn MOD_RESULT = Event::OnSetChannelOption(&Event::SetChannelOption::OnSetChannelOption, source, this, ci, params[1]);
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
@@ -235,6 +236,7 @@ class CommandCSSetPrivate : public Command
 };
 
 class CSList : public Module
+	, public EventHook<Event::ChanInfo>
 {
 	CommandCSList commandcslist;
 	CommandCSSetPrivate commandcssetprivate;
@@ -242,8 +244,11 @@ class CSList : public Module
 	SerializableExtensibleItem<bool> priv;
 
  public:
-	CSList(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		commandcslist(this), commandcssetprivate(this), priv(this, "CS_PRIVATE")
+	CSList(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
+		, EventHook<Event::ChanInfo>("OnChanInfo")
+		, commandcslist(this)
+		, commandcssetprivate(this)
+		, priv(this, "CS_PRIVATE")
 	{
 	}
 

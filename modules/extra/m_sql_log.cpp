@@ -11,12 +11,14 @@
 #include "modules/sql.h"
 
 class SQLLog : public Module
+	, public EventHook<Event::LogMessage>
 {
 	std::set<Anope::string> inited;
 	Anope::string table;
 
  public:
 	SQLLog(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR | EXTRA)
+		, EventHook<Event::LogMessage>("OnLogMessage")
 	{
 	}
 

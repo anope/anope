@@ -42,8 +42,8 @@ class OSUpdate : public Module
 	CommandOSUpdate commandosupdate;
 
  public:
-	OSUpdate(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		commandosupdate(this)
+	OSUpdate(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
+		, commandosupdate(this)
 	{
 
 	}

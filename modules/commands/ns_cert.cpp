@@ -11,8 +11,10 @@
 
 #include "module.h"
 #include "modules/ns_cert.h"
+#include "modules/nickserv.h"
 
 static Anope::hash_map<NickCore *> certmap;
+static EventHandlers<Event::NickCertEvents> *events;
 
 struct CertServiceImpl : CertService
 {
@@ -50,7 +52,7 @@ struct NSCertListImpl : NSCertList
 	{
 		this->certs.push_back(entry);
 		certmap[entry] = nc;
-		FOREACH_MOD(OnNickAddCert, (this->nc, entry));
+		(*events)(&Event::NickCertEvents::OnNickAddCert, this->nc, entry);
 	}
 
 	/** Get an entry from the nick's cert list by index
@@ -95,7 +97,7 @@ struct NSCertListImpl : NSCertList
 		std::vector<Anope::string>::iterator it = std::find(this->certs.begin(), this->certs.end(), entry);
 		if (it != this->certs.end())
 		{
-			FOREACH_MOD(OnNickEraseCert, (this->nc, entry));
+			(*events)(&Event::NickCertEvents::OnNickEraseCert, this->nc, entry);
 			certmap.erase(entry);
 			this->certs.erase(it);
 		}
@@ -107,7 +109,7 @@ struct NSCertListImpl : NSCertList
 	 */
 	void ClearCert() override
 	{
-		FOREACH_MOD(OnNickClearCert, (this->nc));
+		(*events)(&Event::NickCertEvents::OnNickClearCert, this->nc);
 		for (unsigned i = 0; i < certs.size(); ++i)
 			certmap.erase(certs[i]);
 		this->certs.clear();
@@ -339,17 +341,28 @@ class CommandNSCert : public Command
 };
 
 class NSCert : public Module
+	, public EventHook<Event::Fingerprint>
+	, public EventHook<NickServ::Event::NickValidate>
 {
 	CommandNSCert commandnscert;
 	NSCertListImpl::ExtensibleItem certs;
 	CertServiceImpl cs;
 
+	EventHandlers<Event::NickCertEvents> onnickservevents;
+
  public:
-	NSCert(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		commandnscert(this), certs(this, "certificates"), cs(this)
+	NSCert(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
+		, EventHook<Event::Fingerprint>("OnFingerprint")
+		, EventHook<NickServ::Event::NickValidate>("OnNickValidate")
+		, commandnscert(this)
+		, certs(this, "certificates")
+		, cs(this)
+		, onnickservevents(this, "OnNickCert")
 	{
 		if (!IRCD || !IRCD->CanCertFP)
 			throw ModuleException("Your IRCd does not support ssl client certificates");
+
+		events = &onnickservevents;
 	}
 
 	void OnFingerprint(User *u) override

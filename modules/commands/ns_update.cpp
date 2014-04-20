@@ -10,11 +10,14 @@
  */
 
 #include "module.h"
+#include "modules/ns_update.h"
 
 class CommandNSUpdate : public Command
 {
+	EventHandlers<Event::NickUpdate> &onnickupdate;
+
  public:
-	CommandNSUpdate(Module *creator) : Command(creator, "nickserv/update", 0, 0)
+	CommandNSUpdate(Module *creator, EventHandlers<Event::NickUpdate> &event) : Command(creator, "nickserv/update", 0, 0), onnickupdate(event)
 	{
 		this->SetDesc(_("Updates your current status, i.e. it checks for new memos"));
 		this->RequireUser(true);
@@ -31,7 +34,7 @@ class CommandNSUpdate : public Command
 			na->last_seen = Anope::CurTime;
 		}
 
-		FOREACH_MOD(OnNickUpdate, (u));
+		this->onnickupdate(&Event::NickUpdate::OnNickUpdate, u);
 
 		source.Reply(_("Status updated (memos, vhost, chmodes, flags)."));
 	}
@@ -50,10 +53,12 @@ class CommandNSUpdate : public Command
 class NSUpdate : public Module
 {
 	CommandNSUpdate commandnsupdate;
+	EventHandlers<Event::NickUpdate> onnickupdate;
 
  public:
-	NSUpdate(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		commandnsupdate(this)
+	NSUpdate(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
+		, commandnsupdate(this, onnickupdate)
+		, onnickupdate(this, "OnNickUpdate")
 	{
 
 	}

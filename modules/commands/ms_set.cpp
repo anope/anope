@@ -304,9 +304,12 @@ class MSSet : public Module
 	SerializableExtensibleItem<bool> memo_signon, memo_receive, memo_mail, memo_hardmax;
 
  public:
-	MSSet(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		commandmsset(this), memo_signon(this, "MEMO_SIGNON"), memo_receive(this, "MEMO_RECEIVE"), memo_mail(this, "MEMO_MAIL"),
-		memo_hardmax(this, "MEMO_HARDMAX")
+	MSSet(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
+		, commandmsset(this)
+		, memo_signon(this, "MEMO_SIGNON")
+		, memo_receive(this, "MEMO_RECEIVE")
+		, memo_mail(this, "MEMO_MAIL")
+		, memo_hardmax(this, "MEMO_HARDMAX")
 	{
 
 	}

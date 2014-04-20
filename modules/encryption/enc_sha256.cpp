@@ -237,6 +237,8 @@ class SHA256Provider : public Encryption::Provider
 };
 
 class ESHA256 : public Module
+	, public EventHook<Event::Encrypt>
+	, public EventHook<Event::CheckAuthentication>
 {
 	SHA256Provider sha256provider;
 
@@ -273,8 +275,10 @@ class ESHA256 : public Module
 	}
 
  public:
-	ESHA256(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, ENCRYPTION | VENDOR),
-		sha256provider(this)
+	ESHA256(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, ENCRYPTION | VENDOR)
+		, EventHook<Event::Encrypt>("OnEncrypt")
+		, EventHook<Event::CheckAuthentication>("OnCheckAuthentication")
+		, sha256provider(this)
 	{
 
 

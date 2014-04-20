@@ -63,6 +63,7 @@ class ModuleSQLite : public Module
 {
 	/* SQL connections */
 	std::map<Anope::string, SQLiteService *> SQLiteServices;
+
  public:
 	ModuleSQLite(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, EXTRA | VENDOR)
 	{

@@ -10,6 +10,7 @@
  */
 
 #include "module.h"
+#include "modules/memoserv.h"
 
 class MemoDelCallback : public NumberList
 {
@@ -26,7 +27,8 @@ class MemoDelCallback : public NumberList
 		if (!number || number > mi->memos->size())
 			return;
 
-		FOREACH_MOD(OnMemoDel, (ci ? ci->name : source.nc->display, mi, mi->GetMemo(number - 1)));
+		if (MemoServ::Event::OnMemoDel)
+			MemoServ::Event::OnMemoDel(&MemoServ::Event::MemoDel::OnMemoDel, ci ? ci->name : source.nc->display, mi, mi->GetMemo(number - 1));
 
 		mi->Del(number - 1);
 		source.Reply(_("Memo %d has been deleted."), number);
@@ -93,7 +95,8 @@ class CommandMSDel : public Command
 			else if (numstr.equals_ci("LAST"))
 			{
 				/* Delete last memo. */
-				FOREACH_MOD(OnMemoDel, (ci ? ci->name : source.nc->display, mi, mi->GetMemo(mi->memos->size() - 1)));
+				if (MemoServ::Event::OnMemoDel)
+					MemoServ::Event::OnMemoDel(&MemoServ::Event::MemoDel::OnMemoDel, ci ? ci->name : source.nc->display, mi, mi->GetMemo(mi->memos->size() - 1));
 				mi->Del(mi->memos->size() - 1);
 				source.Reply(_("Memo %d has been deleted."), mi->memos->size() + 1);
 			}
@@ -102,7 +105,8 @@ class CommandMSDel : public Command
 				/* Delete all memos. */
 				for (unsigned i = mi->memos->size(); i > 0; --i)
 				{
-					FOREACH_MOD(OnMemoDel, (ci ? ci->name : source.nc->display, mi, mi->GetMemo(i)));
+					if (MemoServ::Event::OnMemoDel)
+						MemoServ::Event::OnMemoDel(&MemoServ::Event::MemoDel::OnMemoDel, ci ? ci->name : source.nc->display, mi, mi->GetMemo(i));
 					mi->Del(i - 1);
 				}
 				if (!chan.empty())
@@ -141,8 +145,8 @@ class MSDel : public Module
 	CommandMSDel commandmsdel;
 
  public:
-	MSDel(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		commandmsdel(this)
+	MSDel(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
+		, commandmsdel(this)
 	{
 
 	}

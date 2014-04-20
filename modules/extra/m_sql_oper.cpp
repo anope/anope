@@ -90,6 +90,7 @@ class SQLOperResult : public SQL::Interface
 };
 
 class ModuleSQLOper : public Module
+       , public EventHook<Event::NickIdentify>
 {
 	Anope::string engine;
 	Anope::string query;
@@ -97,7 +98,8 @@ class ModuleSQLOper : public Module
 	ServiceReference<SQL::Provider> SQL;
 
  public:
-	ModuleSQLOper(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, EXTRA | VENDOR)
+	ModuleSQLOper(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, EXTRA | VENDOR),
+	       EventHook<Event::NickIdentify>("OnNickIdentify")
 	{
 	}
 

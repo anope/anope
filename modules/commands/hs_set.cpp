@@ -85,7 +85,7 @@ class CommandHSSet : public Command
 		Log(LOG_ADMIN, source, this) << "to set the vhost of " << na->nick << " to " << (!user.empty() ? user + "@" : "") << host;
 
 		na->SetVhost(user, host, source.GetNick());
-		FOREACH_MOD(OnSetVhost, (na));
+		Event::OnSetVhost(&Event::SetVhost::OnSetVhost, na);
 		if (!user.empty())
 			source.Reply(_("VHost for \002%s\002 set to \002%s\002@\002%s\002."), nick.c_str(), user.c_str(), host.c_str());
 		else
@@ -192,7 +192,7 @@ class CommandHSSetAll : public Command
 
 		na->SetVhost(user, host, source.GetNick());
 		this->Sync(na);
-		FOREACH_MOD(OnSetVhost, (na));
+		Event::OnSetVhost(&Event::SetVhost::OnSetVhost, na);
 		if (!user.empty())
 			source.Reply(_("VHost for group \002%s\002 set to \002%s\002@\002%s\002."), nick.c_str(), user.c_str(), host.c_str());
 		else
@@ -219,7 +219,9 @@ class HSSet : public Module
 	CommandHSSetAll commandhssetall;
 
  public:
-	HSSet(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR), commandhsset(this), commandhssetall(this)
+	HSSet(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
+		, commandhsset(this)
+		, commandhssetall(this)
 	{
 
 	}

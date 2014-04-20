@@ -100,7 +100,7 @@ public:
 			else
 				target_ci->last_topic_setter = source.service->nick;
 
-			FOREACH_MOD(OnChanRegistered, (target_ci));
+			Event::OnChanRegistered(&Event::ChanRegistered::OnChanRegistered, target_ci);
 
 			source.Reply(_("All settings from \002%s\002 have been cloned to \002%s\002."), channel.c_str(), target.c_str());
 		}
@@ -204,7 +204,8 @@ class CSClone : public Module
 	CommandCSClone commandcsclone;
 
  public:
-	CSClone(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR), commandcsclone(this)
+	CSClone(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
+		, commandcsclone(this)
 	{
 
 	}

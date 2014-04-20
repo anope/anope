@@ -10,11 +10,14 @@
  */
 
 #include "module.h"
+#include "modules/ns_drop.h"
 
 class CommandNSDrop : public Command
 {
+	EventHandlers<Event::NickDrop> &onnickdrop;
+
  public:
-	CommandNSDrop(Module *creator) : Command(creator, "nickserv/drop", 1, 1)
+	CommandNSDrop(Module *creator, EventHandlers<Event::NickDrop> &event) : Command(creator, "nickserv/drop", 1, 1), onnickdrop(event)
 	{
 		this->SetSyntax(_("\037nickname\037"));
 		this->SetDesc(_("Cancel the registration of a nickname"));
@@ -45,7 +48,7 @@ class CommandNSDrop : public Command
 			source.Reply(_("You may not drop other Services Operators' nicknames."));
 		else
 		{
-			FOREACH_MOD(OnNickDrop, (source, na));
+			this->onnickdrop(&Event::NickDrop::OnNickDrop, source, na);
 
 			Log(!is_mine ? LOG_ADMIN : LOG_COMMAND, source, this) << "to drop nickname " << na->nick << " (group: " << na->nc->display << ") (email: " << (!na->nc->email.empty() ? na->nc->email : "none") << ")";
 			delete na;
@@ -74,10 +77,12 @@ class CommandNSDrop : public Command
 class NSDrop : public Module
 {
 	CommandNSDrop commandnsdrop;
+	EventHandlers<Event::NickDrop> onnickdrop;
 
  public:
-	NSDrop(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		commandnsdrop(this)
+	NSDrop(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
+		, commandnsdrop(this, onnickdrop)
+		, onnickdrop(this, "OnNickDrop")
 	{
 
 	}

@@ -175,7 +175,7 @@ struct IRCDMessageEncap : IRCDMessage
 		if (params[1] == "CERTFP")
 		{
 			u->fingerprint = params[2];
-			FOREACH_MOD(OnFingerprint, (u));
+			Event::OnFingerprint(&Event::Fingerprint::OnFingerprint, u);
 		}
 		/*
 		 * Received: :42X ENCAP * SASL 42XAAAAAH * S PLAIN
@@ -258,6 +258,8 @@ struct IRCDMessagePass : IRCDMessage
 };
 
 class ProtoCharybdis : public Module
+	, public EventHook<Event::ChannelSync>
+	, public EventHook<Event::MLockEvents>
 {
 	Module *m_ratbox;
 
@@ -321,24 +323,44 @@ class ProtoCharybdis : public Module
 	}
 
  public:
-	ProtoCharybdis(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PROTOCOL | VENDOR),
-		ircd_proto(this),
-		message_away(this), message_capab(this), message_error(this), message_invite(this), message_kick(this),
-		message_kill(this), message_mode(this), message_motd(this), message_notice(this), message_part(this),
-		message_ping(this), message_privmsg(this), message_quit(this), message_squit(this), message_stats(this),
-		message_time(this), message_topic(this), message_version(this), message_whois(this),
+	ProtoCharybdis(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PROTOCOL | VENDOR)
+		, EventHook<Event::ChannelSync>("OnChannelSync")
+		, EventHook<Event::MLockEvents>("MLock")
+		, ircd_proto(this)
+		, message_away(this)
+		, message_capab(this)
+		, message_error(this)
+		, message_invite(this)
+		, message_kick(this)
+		, message_kill(this)
+		, message_mode(this)
+		, message_motd(this)
+		, message_notice(this)
+		, message_part(this)
+		, message_ping(this)
+		, message_privmsg(this)
+		, message_quit(this)
+		, message_squit(this)
+		, message_stats(this)
+		, message_time(this)
+		, message_topic(this)
+		, message_version(this)
+		, message_whois(this)
 
-		message_bmask("IRCDMessage", "charybdis/bmask", "ratbox/bmask"),
-		message_join("IRCDMessage", "charybdis/join", "ratbox/join"),
-		message_nick("IRCDMessage", "charybdis/nick", "ratbox/nick"),
-		message_pong("IRCDMessage", "charybdis/pong", "ratbox/pong"),
-		message_sid("IRCDMessage", "charybdis/sid", "ratbox/sid"),
-		message_sjoin("IRCDMessage", "charybdis/sjoin", "ratbox/sjoin"),
-		message_tb("IRCDMessage", "charybdis/tb", "ratbox/tb"),
-		message_tmode("IRCDMessage", "charybdis/tmode", "ratbox/tmode"),
-		message_uid("IRCDMessage", "charybdis/uid", "ratbox/uid"),
+		, message_bmask("IRCDMessage", "charybdis/bmask", "ratbox/bmask")
+		, message_join("IRCDMessage", "charybdis/join", "ratbox/join")
+		, message_nick("IRCDMessage", "charybdis/nick", "ratbox/nick")
+		, message_pong("IRCDMessage", "charybdis/pong", "ratbox/pong")
+		, message_sid("IRCDMessage", "charybdis/sid", "ratbox/sid")
+		, message_sjoin("IRCDMessage", "charybdis/sjoin", "ratbox/sjoin")
+		, message_tb("IRCDMessage", "charybdis/tb", "ratbox/tb")
+		, message_tmode("IRCDMessage", "charybdis/tmode", "ratbox/tmode")
+		, message_uid("IRCDMessage", "charybdis/uid", "ratbox/uid")
 
-		message_encap(this), message_euid(this), message_pass(this), message_server(this)
+		, message_encap(this)
+		, message_euid(this)
+		, message_pass(this)
+		, message_server(this)
 
 	{
 

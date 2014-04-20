@@ -10,11 +10,14 @@
  */
 
 #include "module.h"
+#include "modules/cs_drop.h"
 
 class CommandCSDrop : public Command
 {
+	EventHandlers<Event::ChanDrop> &onchandrop;
+
  public:
-	CommandCSDrop(Module *creator) : Command(creator, "chanserv/drop", 1, 2)
+	CommandCSDrop(Module *creator, EventHandlers<Event::ChanDrop> &event) : Command(creator, "chanserv/drop", 1, 2), onchandrop(event)
 	{
 		this->SetDesc(_("Cancel the registration of a channel"));
 		this->SetSyntax(_("\037channel\037 \037channel\037"));
@@ -49,8 +52,7 @@ class CommandCSDrop : public Command
 			return;
 		}
 
-		EventReturn MOD_RESULT;
-		FOREACH_RESULT(OnChanDrop, MOD_RESULT, (source, ci));
+		EventReturn MOD_RESULT = this->onchandrop(&Event::ChanDrop::OnChanDrop, source, ci);
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
@@ -84,9 +86,12 @@ class CommandCSDrop : public Command
 class CSDrop : public Module
 {
 	CommandCSDrop commandcsdrop;
+	EventHandlers<Event::ChanDrop> onchandrop;
 
  public:
-	CSDrop(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR), commandcsdrop(this)
+	CSDrop(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
+		, commandcsdrop(this, onchandrop)
+		, onchandrop(this, "OnChanDrop")
 	{
 
 	}

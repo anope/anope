@@ -11,8 +11,28 @@
 #include "anope.h"
 #include "service.h"
 
-std::map<Anope::string, std::map<Anope::string, Service *> > Service::Services;
-std::map<Anope::string, std::map<Anope::string, Anope::string> > Service::Aliases;
+std::map<Anope::string, std::map<Anope::string, Service *> > *Service::Services = NULL;
+std::map<Anope::string, std::map<Anope::string, Anope::string> > *Service::Aliases = NULL;
+std::set<ReferenceBase *> *ReferenceBase::references = NULL;
+
+ReferenceBase::ReferenceBase()
+{
+	if (references == NULL)
+		references = new std::set<ReferenceBase *>();
+	references->insert(this);
+}
+
+ReferenceBase::~ReferenceBase()
+{
+	references->erase(this);
+}
+
+void ReferenceBase::ResetAll()
+{
+	if (references)
+		for (ReferenceBase *b : *references)
+			b->Reset();
+}
 
 Base::Base() : references(NULL)
 {

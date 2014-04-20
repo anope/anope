@@ -823,7 +823,7 @@ class MyManager : public Manager, public Timer
 				}
 			}
 
-			FOREACH_MOD(OnDnsRequest, (recv_packet, packet));
+			Event::OnDnsRequest(&Event::DnsRequest::OnDnsRequest, recv_packet, packet);
 
 			for (unsigned i = 0; i < recv_packet.questions.size(); ++i)
 			{
@@ -1004,6 +1004,7 @@ class MyManager : public Manager, public Timer
 };
 
 class ModuleDNS : public Module
+	, public EventHook<Event::ModuleUnload>
 {
 	MyManager manager;
 
@@ -1014,7 +1015,9 @@ class ModuleDNS : public Module
 	std::vector<std::pair<Anope::string, short> > notify;
 
  public:
-	ModuleDNS(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, EXTRA | VENDOR), manager(this)
+	ModuleDNS(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, EXTRA | VENDOR)
+		, EventHook<Event::ModuleUnload>("OnModuleUnload")
+		, manager(this)
 	{
 
 	}

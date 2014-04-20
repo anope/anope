@@ -10,13 +10,12 @@
  */
 
 #include "module.h"
+#include "modules/global.h"
 
 class CommandGLGlobal : public Command
 {
-	ServiceReference<GlobalService> GService;
-
  public:
-	CommandGLGlobal(Module *creator) : Command(creator, "global/global", 1, 1), GService("GlobalService", "Global")
+	CommandGLGlobal(Module *creator) : Command(creator, "global/global", 1, 1)
 	{
 		this->SetDesc(_("Send a message to all users"));
 		this->SetSyntax(_("\037message\037"));
@@ -26,13 +25,14 @@ class CommandGLGlobal : public Command
 	{
 		const Anope::string &msg = params[0];
 
-		if (!GService)
-			source.Reply("No global reference, is global loaded?");
-		else
+		if (!Global::service)
 		{
-			Log(LOG_ADMIN, source, this);
-			GService->SendGlobal(NULL, source.GetNick(), msg);
+			source.Reply("No global reference, is global loaded?");
+			return;
 		}
+
+		Log(LOG_ADMIN, source, this);
+		Global::service->SendGlobal(NULL, source.GetNick(), msg);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
@@ -50,8 +50,8 @@ class GLGlobal : public Module
 	CommandGLGlobal commandglglobal;
 
  public:
-	GLGlobal(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		commandglglobal(this)
+	GLGlobal(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
+		, commandglglobal(this)
 	{
 
 	}

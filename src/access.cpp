@@ -16,6 +16,7 @@
 #include "users.h"
 #include "account.h"
 #include "protocol.h"
+#include "event.h"
 
 static struct
 {
@@ -312,8 +313,7 @@ AccessGroup::AccessGroup() : std::vector<ChanAccess *>()
 
 static bool HasPriv(const AccessGroup &ag, const ChanAccess *access, const Anope::string &name)
 {
-	EventReturn MOD_RESULT;
-	FOREACH_RESULT(OnCheckPriv, MOD_RESULT, (access, name));
+	EventReturn MOD_RESULT = Event::OnCheckPriv(&Event::CheckPriv::OnCheckPriv, access, name);
 	if (MOD_RESULT == EVENT_ALLOW || access->HasPriv(name))
 	{
 		typedef std::multimap<const ChanAccess *, const ChanAccess *> path;
@@ -353,7 +353,7 @@ bool AccessGroup::HasPriv(const Anope::string &name) const
 		return true;
 
 	EventReturn MOD_RESULT;
-	FOREACH_RESULT(OnGroupCheckPriv, MOD_RESULT, (this, name));
+	MOD_RESULT = Event::OnGroupCheckPriv(&Event::GroupCheckPriv::OnGroupCheckPriv, this, name);
 	if (MOD_RESULT != EVENT_CONTINUE)
 		return MOD_RESULT == EVENT_ALLOW;
 

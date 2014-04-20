@@ -175,6 +175,20 @@ namespace DNS
 	};
 	
 } // namespace DNS
+
+namespace Event
+{
+	struct CoreExport DnsRequest : Events
+	{
+		/** Called when a DNS request (question) is recieved.
+		 * @param req The dns request
+		 * @param reply The reply that will be sent
+		 */
+		virtual void OnDnsRequest(DNS::Query &req, DNS::Query *reply) anope_abstract;
+	};
+	static EventHandlersReference<DnsRequest> OnDnsRequest("OnDnsRequest");
+}
+
 	
 #endif // DNS_H
 	

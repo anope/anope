@@ -70,8 +70,8 @@ class OSJupe : public Module
 	CommandOSJupe commandosjupe;
 
  public:
-	OSJupe(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		commandosjupe(this)
+	OSJupe(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
+		, commandosjupe(this)
 	{
 
 	}

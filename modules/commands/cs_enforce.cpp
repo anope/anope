@@ -282,8 +282,8 @@ class CSEnforce : public Module
 	CommandCSEnforce commandcsenforce;
 
  public:
-	CSEnforce(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		commandcsenforce(this)
+	CSEnforce(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
+		, commandcsenforce(this)
 	{
 
 	}

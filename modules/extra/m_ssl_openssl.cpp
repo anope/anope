@@ -81,13 +81,16 @@ class SSLSocketIO : public SocketIO
 class SSLModule;
 static SSLModule *me;
 class SSLModule : public Module
+	, public EventHook<Event::PreServerConnect>
 {
 	Anope::string certfile, keyfile;
 
  public:
 	MySSLService service;
 
-	SSLModule(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, EXTRA | VENDOR), service(this, "ssl")
+	SSLModule(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, EXTRA | VENDOR)
+		, EventHook<Event::PreServerConnect>("OnPreServerConnect")
+		, service(this, "ssl")
 	{
 		me = this;
 

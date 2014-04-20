@@ -10,6 +10,7 @@
  */
 
 #include "module.h"
+#include "modules/cs_access.h"
 
 static std::map<Anope::string, int16_t, ci::less> defaultLevels;
 
@@ -212,7 +213,7 @@ class CommandCSAccess : public Command
 		access->created = Anope::CurTime;
 		ci->AddAccess(access);
 
-		FOREACH_MOD(OnAccessAdd, (ci, source, access));
+		Event::OnAccessAdd(&Event::AccessAdd::OnAccessAdd, ci, source, access);
 
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to add " << mask << " with level " << level;
 		if (p != NULL)
@@ -298,7 +299,7 @@ class CommandCSAccess : public Command
 
 					ci->EraseAccess(Number - 1);
 
-					FOREACH_MOD(OnAccessDel, (ci, source, access));
+					Event::OnAccessDel(&Event::AccessDel::OnAccessDel, ci, source, access);
 					delete access;
 				}
 			}
@@ -324,7 +325,7 @@ class CommandCSAccess : public Command
 						Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to delete " << access->mask;
 
 						ci->EraseAccess(i - 1);
-						FOREACH_MOD(OnAccessDel, (ci, source, access));
+						Event::OnAccessDel(&Event::AccessDel::OnAccessDel, ci, source, access);
 						delete access;
 					}
 					return;
@@ -475,7 +476,7 @@ class CommandCSAccess : public Command
 			source.Reply(ACCESS_DENIED);
 		else
 		{
-			FOREACH_MOD(OnAccessClear, (ci, source));
+			Event::OnAccessClear(&Event::AccessClear::OnAccessClear, ci, source);
 
 			ci->ClearAccess();
 
@@ -646,7 +647,7 @@ class CommandCSLevels : public Command
 				Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to set " << p->name << " to level " << level;
 
 				ci->SetLevel(p->name, level);
-				FOREACH_MOD(OnLevelChange, (source, ci, p->name, level));
+				this->onlevelchange(&Event::LevelChange::OnLevelChange, source, ci, p->name, level);
 
 				if (level == ACCESS_FOUNDER)
 					source.Reply(_("Level for %s on channel %s changed to founder only."), p->name.c_str(), ci->name.c_str());
@@ -674,7 +675,7 @@ class CommandCSLevels : public Command
 			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to disable " << p->name;
 
 			ci->SetLevel(p->name, ACCESS_INVALID);
-			FOREACH_MOD(OnLevelChange, (source, ci, p->name, ACCESS_INVALID));
+			this->onlevelchange(&Event::LevelChange::OnLevelChange, source, ci, p->name, ACCESS_INVALID);
 
 			source.Reply(_("\002%s\002 disabled on channel %s."), p->name.c_str(), ci->name.c_str());
 			return;
@@ -723,14 +724,15 @@ class CommandCSLevels : public Command
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to reset all levels";
 
 		reset_levels(ci);
-		FOREACH_MOD(OnLevelChange, (source, ci, "ALL", 0));
+		this->onlevelchange(&Event::LevelChange::OnLevelChange, source, ci, "ALL", 0);
 
 		source.Reply(_("Access levels for \002%s\002 reset to defaults."), ci->name.c_str());
-		return;
 	}
 
+	EventHandlers<Event::LevelChange> &onlevelchange;
+
  public:
-	CommandCSLevels(Module *creator) : Command(creator, "chanserv/levels", 2, 4)
+	CommandCSLevels(Module *creator, EventHandlers<Event::LevelChange> &event) : Command(creator, "chanserv/levels", 2, 4), onlevelchange(event)
 	{
 		this->SetDesc(_("Redefine the meanings of access levels"));
 		this->SetSyntax(_("\037channel\037 SET \037type\037 \037level\037"));
@@ -829,14 +831,22 @@ class CommandCSLevels : public Command
 };
 
 class CSAccess : public Module
+	, public EventHook<Event::CreateChan>
+	, public EventHook<Event::GroupCheckPriv>
 {
 	AccessAccessProvider accessprovider;
 	CommandCSAccess commandcsaccess;
 	CommandCSLevels commandcslevels;
+	EventHandlers<Event::LevelChange> onlevelchange;
 
  public:
-	CSAccess(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		accessprovider(this), commandcsaccess(this), commandcslevels(this)
+	CSAccess(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
+		, EventHook<Event::CreateChan>("OnCreateChan")
+		, EventHook<Event::GroupCheckPriv>("OnGroupCheckPriv")
+		, accessprovider(this)
+		, commandcsaccess(this)
+		, commandcslevels(this, onlevelchange)
+		, onlevelchange(this, "OnLevelChange")
 	{
 		this->SetPermanent(true);
 

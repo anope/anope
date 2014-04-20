@@ -56,3 +56,5 @@
 # include "anope_windows.h"
 #endif
 
+#define anope_abstract = 0
+

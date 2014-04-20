@@ -69,3 +69,26 @@ class CertService : public Service
 	virtual NickCore* FindAccountFromCert(const Anope::string &cert) = 0;
 };
 
+namespace Event
+{
+	struct CoreExport NickCertEvents : Events
+	{
+		/** Called when a user adds an entry to their cert list
+		 * @param nc The nick
+		 * @param entry The entry
+		 */
+		virtual void OnNickAddCert(NickCore *nc, const Anope::string &entry) anope_abstract;
+
+		/** Called from NickCore::EraseCert()
+		 * @param nc pointer to the NickCore
+		 * @param entry The fingerprint
+		 */
+		virtual void OnNickEraseCert(NickCore *nc, const Anope::string &entry) anope_abstract;
+
+		/** called from NickCore::ClearCert()
+		 * @param nc pointer to the NickCore
+		 */
+		virtual void OnNickClearCert(NickCore *nc) anope_abstract;
+	};
+}
+

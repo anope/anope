@@ -35,14 +35,18 @@ class OldMD5Provider : public Encryption::Provider
 };
 
 class EOld : public Module
+	, public EventHook<Event::Encrypt>
+	, public EventHook<Event::CheckAuthentication>
 {
 	OldMD5Provider oldmd5provider;
 
 	inline static char XTOI(char c) { return c > 9 ? c - 'A' + 10 : c - '0'; }
 
  public:
-	EOld(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, ENCRYPTION | VENDOR),
-		oldmd5provider(this)
+	EOld(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, ENCRYPTION | VENDOR)
+		, EventHook<Event::Encrypt>("OnEncrypt")
+		, EventHook<Event::CheckAuthentication>("OnCheckAuthentication")
+		, oldmd5provider(this)
 	{
 
 		ModuleManager::LoadModule("enc_md5", User::Find(creator));

@@ -11,6 +11,9 @@
 
 #include "module.h"
 #include "modules/suspend.h"
+#include "modules/cs_drop.h"
+#include "modules/chanserv.h"
+#include "modules/cs_info.h"
 
 struct CSSuspendInfo : SuspendInfo, Serializable
 {
@@ -52,8 +55,9 @@ struct CSSuspendInfo : SuspendInfo, Serializable
 
 class CommandCSSuspend : public Command
 {
+	EventHandlers<Event::ChanSuspend> &onchansuspend;
  public:
-	CommandCSSuspend(Module *creator) : Command(creator, "chanserv/suspend", 2, 3)
+	CommandCSSuspend(Module *creator, EventHandlers<Event::ChanSuspend> &event) : Command(creator, "chanserv/suspend", 2, 3), onchansuspend(event)
 	{ 
 		this->SetDesc(_("Prevent a channel from being used preserving channel data and settings"));
 		this->SetSyntax(_("\037channel\037 [+\037expiry\037] [\037reason\037]"));
@@ -124,7 +128,7 @@ class CommandCSSuspend : public Command
 		Log(LOG_ADMIN, source, this, ci) << "(" << (!reason.empty() ? reason : "No reason") << "), expires on " << (expiry_secs ? Anope::strftime(Anope::CurTime + expiry_secs) : "never");
 		source.Reply(_("Channel \002%s\002 is now suspended."), ci->name.c_str());
 
-		FOREACH_MOD(OnChanSuspend, (ci));
+		this->onchansuspend(&Event::ChanSuspend::OnChanSuspend, ci);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
@@ -145,8 +149,10 @@ class CommandCSSuspend : public Command
 
 class CommandCSUnSuspend : public Command
 {
+	EventHandlers<Event::ChanUnsuspend> &onchanunsuspend;
+
  public:
-	CommandCSUnSuspend(Module *creator) : Command(creator, "chanserv/unsuspend", 1, 1)
+	CommandCSUnSuspend(Module *creator, EventHandlers<Event::ChanUnsuspend> &event) : Command(creator, "chanserv/unsuspend", 1, 1), onchanunsuspend(event)
 	{
 		this->SetDesc(_("Releases a suspended channel"));
 		this->SetSyntax(_("\037channel\037"));
@@ -179,9 +185,7 @@ class CommandCSUnSuspend : public Command
 
 		source.Reply(_("Channel \002%s\002 is now released."), ci->name.c_str());
 
-		FOREACH_MOD(OnChanUnsuspend, (ci));
-
-		return;
+		this->onchanunsuspend(&Event::ChanUnsuspend::OnChanUnsuspend, ci);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
@@ -195,16 +199,30 @@ class CommandCSUnSuspend : public Command
 };
 
 class CSSuspend : public Module
+	, public EventHook<Event::ChanInfo>
+	, public EventHook<ChanServ::Event::PreChanExpire>
+	, public EventHook<Event::CheckKick>
+	, public EventHook<Event::ChanDrop>
 {
 	CommandCSSuspend commandcssuspend;
 	CommandCSUnSuspend commandcsunsuspend;
 	ExtensibleItem<CSSuspendInfo> suspend;
 	Serialize::Type suspend_type;
+	EventHandlers<Event::ChanSuspend> onchansuspend;
+	EventHandlers<Event::ChanUnsuspend> onchanunsuspend;
 
  public:
-	CSSuspend(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		commandcssuspend(this), commandcsunsuspend(this), suspend(this, "CS_SUSPENDED"),
-		suspend_type("CSSuspendInfo", CSSuspendInfo::Unserialize)
+	CSSuspend(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
+		, EventHook<Event::ChanInfo>("OnChanInfo")
+		, EventHook<ChanServ::Event::PreChanExpire>("OnPreChanExpire")
+		, EventHook<Event::CheckKick>("OnCheckKick")
+		, EventHook<Event::ChanDrop>("OnChanDrop")
+		, commandcssuspend(this, onchansuspend)
+		, commandcsunsuspend(this, onchanunsuspend)
+		, suspend(this, "CS_SUSPENDED")
+		, suspend_type("CSSuspendInfo", CSSuspendInfo::Unserialize)
+		, onchansuspend(this, "OnChanSuspend")
+		, onchanunsuspend(this, "OnChanUnsuspend")
 	{
 	}
 

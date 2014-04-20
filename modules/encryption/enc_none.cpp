@@ -10,9 +10,15 @@
 #include "module.h"
 
 class ENone : public Module
+	, public EventHook<Event::Encrypt>
+	, public EventHook<Event::Decrypt>
+	, public EventHook<Event::CheckAuthentication>
 {
  public:
 	ENone(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, ENCRYPTION | VENDOR)
+		, EventHook<Event::Encrypt>("OnEncrypt")
+		, EventHook<Event::Decrypt>("OnDecrypt")
+		, EventHook<Event::CheckAuthentication>("OnCheckAuthentication")
 	{
 
 	}

@@ -334,11 +334,14 @@ class MyHTTPProvider : public HTTPProvider, public Timer
 };
 
 class HTTPD : public Module
+	, public EventHook<Event::ModuleLoad>
 {
 	ServiceReference<SSLService> sslref;
 	std::map<Anope::string, MyHTTPProvider *> providers;
  public:
-	HTTPD(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, EXTRA | VENDOR), sslref("SSLService", "ssl")
+	HTTPD(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, EXTRA | VENDOR)
+	, EventHook<Event::ModuleLoad>("OnModuleLoad")
+	, sslref("SSLService", "ssl")
 	{
 
 	}

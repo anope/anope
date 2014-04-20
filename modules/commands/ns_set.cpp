@@ -10,6 +10,9 @@
  */
 
 #include "module.h"
+#include "modules/ns_info.h"
+#include "modules/ns_set.h"
+#include "modules/nickserv.h"
 
 class CommandNSSet : public Command
 {
@@ -247,7 +250,7 @@ class CommandNSSetAutoOp : public Command
 		NickCore *nc = na->nc;
 
 		EventReturn MOD_RESULT;
-		FOREACH_RESULT(OnSetNickOption, MOD_RESULT, (source, this, nc, param));
+		MOD_RESULT = Event::OnSetNickOption(&Event::SetNickOption::OnSetNickOption, source, this, nc, param);
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
@@ -349,7 +352,7 @@ class CommandNSSetDisplay : public Command
 		}
 
 		EventReturn MOD_RESULT;
-		FOREACH_RESULT(OnSetNickOption, MOD_RESULT, (source, this, user_na->nc, param));
+		MOD_RESULT = Event::OnSetNickOption(&Event::SetNickOption::OnSetNickOption, source, this, user_na->nc, param);
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
@@ -472,7 +475,7 @@ class CommandNSSetEmail : public Command
 		}
 
 		EventReturn MOD_RESULT;
-		FOREACH_RESULT(OnSetNickOption, MOD_RESULT, (source, this, nc, param));
+		MOD_RESULT = Event::OnSetNickOption(&Event::SetNickOption::OnSetNickOption, source, this, nc, param);
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
@@ -563,7 +566,7 @@ class CommandNSSetKeepModes : public Command
 		NickCore *nc = na->nc;
 
 		EventReturn MOD_RESULT;
-		FOREACH_RESULT(OnSetNickOption, MOD_RESULT, (source, this, nc, param));
+		MOD_RESULT = Event::OnSetNickOption(&Event::SetNickOption::OnSetNickOption, source, this, nc, param);
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
@@ -656,7 +659,7 @@ class CommandNSSetKill : public Command
 		NickCore *nc = na->nc;
 
 		EventReturn MOD_RESULT;
-		FOREACH_RESULT(OnSetNickOption, MOD_RESULT, (source, this, nc, param));
+		MOD_RESULT = Event::OnSetNickOption(&Event::SetNickOption::OnSetNickOption, source, this, nc, param);
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
@@ -788,7 +791,7 @@ class CommandNSSetLanguage : public Command
 		NickCore *nc = na->nc;
 
 		EventReturn MOD_RESULT;
-		FOREACH_RESULT(OnSetNickOption, MOD_RESULT, (source, this, nc, param));
+		MOD_RESULT = Event::OnSetNickOption(&Event::SetNickOption::OnSetNickOption, source, this, nc, param);
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
@@ -903,7 +906,7 @@ class CommandNSSetMessage : public Command
 		}
 
 		EventReturn MOD_RESULT;
-		FOREACH_RESULT(OnSetNickOption, MOD_RESULT, (source, this, nc, param));
+		MOD_RESULT = Event::OnSetNickOption(&Event::SetNickOption::OnSetNickOption, source, this, nc, param);
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
@@ -1001,7 +1004,7 @@ class CommandNSSetSecure : public Command
 		NickCore *nc = na->nc;
 
 		EventReturn MOD_RESULT;
-		FOREACH_RESULT(OnSetNickOption, MOD_RESULT, (source, this, nc, param));
+		MOD_RESULT = Event::OnSetNickOption(&Event::SetNickOption::OnSetNickOption, source, this, nc, param);
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
@@ -1123,6 +1126,13 @@ class CommandNSSASetNoexpire : public Command
 };
 
 class NSSet : public Module
+	, public EventHook<Event::PreCommand>
+	, public EventHook<Event::SetCorrectModes>
+	, public EventHook<NickServ::Event::PreNickExpire>
+	, public EventHook<Event::NickInfo>
+	, public EventHook<Event::UserModeSet>
+	, public EventHook<Event::UserModeUnset>
+	, public EventHook<Event::UserLogin>
 {
 	CommandNSSet commandnsset;
 	CommandNSSASet commandnssaset;
@@ -1208,25 +1218,46 @@ class NSSet : public Module
 	PrimitiveExtensibleItem<std::pair<Anope::string, Anope::string > > ns_set_email;
 
  public:
-	NSSet(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		commandnsset(this), commandnssaset(this),
-		commandnssetautoop(this), commandnssasetautoop(this),
-		commandnssetdisplay(this), commandnssasetdisplay(this),
-		commandnssetemail(this), commandnssasetemail(this),
-		commandnssetkeepmodes(this), commandnssasetkeepmodes(this),
-		commandnssetkill(this), commandnssasetkill(this),
-		commandnssetlanguage(this), commandnssasetlanguage(this),
-		commandnssetmessage(this), commandnssasetmessage(this),
-		commandnssetpassword(this), commandnssasetpassword(this),
-		commandnssetsecure(this), commandnssasetsecure(this),
-		commandnssasetnoexpire(this),
+	NSSet(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
+		, EventHook<Event::PreCommand>("OnPreCommand")
+		, EventHook<Event::SetCorrectModes>("OnSetCorrectModes")
+		, EventHook<NickServ::Event::PreNickExpire>("OnPreNickExpire")
+		, EventHook<Event::NickInfo>("OnNickInfo")
+		, EventHook<Event::UserModeSet>("OnUserModeSet")
+		, EventHook<Event::UserModeUnset>("OnUserModeUnset")
+		, EventHook<Event::UserLogin>("OnUserLogin")
+		, commandnsset(this)
+		, commandnssaset(this)
+		, commandnssetautoop(this)
+		, commandnssasetautoop(this)
+		, commandnssetdisplay(this)
+		, commandnssasetdisplay(this)
+		, commandnssetemail(this)
+		, commandnssasetemail(this)
+		, commandnssetkeepmodes(this)
+		, commandnssasetkeepmodes(this)
+		, commandnssetkill(this)
+		, commandnssasetkill(this)
+		, commandnssetlanguage(this)
+		, commandnssasetlanguage(this)
+		, commandnssetmessage(this)
+		, commandnssasetmessage(this)
+		, commandnssetpassword(this)
+		, commandnssasetpassword(this)
+		, commandnssetsecure(this)
+		, commandnssasetsecure(this)
+		, commandnssasetnoexpire(this)
 
-		autoop(this, "AUTOOP"),
-		killprotect(this, "KILLPROTECT"), kill_quick(this, "KILL_QUICK"),
-		kill_immed(this, "KILL_IMMED"), message(this, "MSG"),
-		secure(this, "NS_SECURE"), noexpire(this, "NS_NO_EXPIRE"),
+		, autoop(this, "AUTOOP")
+		, killprotect(this, "KILLPROTECT")
+		, kill_quick(this, "KILL_QUICK")
+		, kill_immed(this, "KILL_IMMED")
+		, message(this, "MSG")
+		, secure(this, "NS_SECURE")
+		, noexpire(this, "NS_NO_EXPIRE")
 
-		keep_modes(this, "NS_KEEP_MODES"), ns_set_email(this, "ns_set_email")
+		, keep_modes(this, "NS_KEEP_MODES")
+		, ns_set_email(this, "ns_set_email")
 	{
 
 	}

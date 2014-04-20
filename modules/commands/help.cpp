@@ -10,6 +10,7 @@
  */
 
 #include "module.h"
+#include "modules/help.h"
 
 class CommandHelp : public Command
 {
@@ -27,8 +28,10 @@ class CommandHelp : public Command
 		return NULL;
 	}
 
+	EventHandlers<Event::Help> &onhelp;
+
  public:
-	CommandHelp(Module *creator) : Command(creator, "generic/help", 0)
+	CommandHelp(Module *creator, EventHandlers<Event::Help> &event) : Command(creator, "generic/help", 0), onhelp(event)
 	{
 		this->SetDesc(_("Displays this list and give information about commands"));
 		this->AllowUnregistered(true);
@@ -36,8 +39,7 @@ class CommandHelp : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
-		EventReturn MOD_RESULT;
-		FOREACH_RESULT(OnPreHelp, MOD_RESULT, (source, params));
+		EventReturn MOD_RESULT = this->onhelp(&Event::Help::OnPreHelp, source, params);
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 	
@@ -184,19 +186,19 @@ class CommandHelp : public Command
 				source.Reply(_("No help available for \002%s\002."), params[0].c_str());
 		}
 	
-		FOREACH_MOD(OnPostHelp, (source, params));
-
-		return;
+		this->onhelp(&Event::Help::OnPostHelp, source, params);
 	}
 };
 
 class Help : public Module
 {
 	CommandHelp commandhelp;
+	EventHandlers<Event::Help> onhelp;
 
  public:
-	Help(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		commandhelp(this)
+	Help(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
+		, commandhelp(this, onhelp)
+		, onhelp(this, "Help")
 	{
 
 	}

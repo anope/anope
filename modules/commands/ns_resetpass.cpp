@@ -61,13 +61,15 @@ struct ResetInfo
 };
 
 class NSResetPass : public Module
+	, public EventHook<Event::PreCommand>
 {
 	CommandNSResetPass commandnsresetpass;
 	PrimitiveExtensibleItem<ResetInfo> reset;
 
  public:
-	NSResetPass(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		commandnsresetpass(this), reset(this, "reset")
+	NSResetPass(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
+		, EventHook<Event::PreCommand>("OnPreCommand")
+		, commandnsresetpass(this), reset(this, "reset")
 	{
 		if (!Config->GetBlock("mail")->Get<bool>("usemail"))
 			throw ModuleException("Not using mail.");

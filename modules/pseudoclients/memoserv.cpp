@@ -10,10 +10,24 @@
  */
 
 #include "module.h"
+#include "modules/ns_update.h"
+#include "modules/help.h"
+#include "modules/bs_bot.h"
+#include "modules/memoserv.h"
 
-class MemoServCore : public Module, public MemoServService
+class MemoServCore : public Module, public MemoServ::MemoServService
+	, public EventHook<Event::NickCoreCreate>
+	, public EventHook<Event::CreateChan>
+	, public EventHook<Event::BotDelete>
+	, public EventHook<Event::NickIdentify>
+	, public EventHook<Event::JoinChannel>
+	, public EventHook<Event::UserAway>
+	, public EventHook<Event::NickUpdate>
+	, public EventHook<Event::Help>
 {
 	Reference<BotInfo> MemoServ;
+	EventHandlers<MemoServ::Event::MemoSend> onmemosend;
+	EventHandlers<MemoServ::Event::MemoDel> onmemodel;
 
 	bool SendMemoMail(NickCore *nc, MemoInfo *mi, Memo *m)
 	{
@@ -36,8 +50,18 @@ class MemoServCore : public Module, public MemoServService
 	}
 
  public:
-	MemoServCore(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PSEUDOCLIENT | VENDOR),
-		MemoServService(this)
+	MemoServCore(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PSEUDOCLIENT | VENDOR)
+		, MemoServ::MemoServService(this)
+		, EventHook<Event::NickCoreCreate>("OnNickCoreCreate")
+		, EventHook<Event::CreateChan>("OnCreateChan")
+		, EventHook<Event::BotDelete>("OnBotDelete")
+		, EventHook<Event::NickIdentify>("OnNickIdentify")
+		, EventHook<Event::JoinChannel>("OnJoinChannel")
+		, EventHook<Event::UserAway>("OnUserAway")
+		, EventHook<Event::NickUpdate>("OnNickUpdate")
+		, EventHook<Event::Help>("OnHelp")
+		, onmemosend(this, "OnMemoSend")
+		, onmemodel(this, "OnMemoDel")
 	{
 	}
 
@@ -74,7 +98,7 @@ class MemoServCore : public Module, public MemoServService
 		m->text = message;
 		m->unread = true;
 
-		FOREACH_MOD(OnMemoSend, (source, target, mi, m));
+		this->onmemosend(&MemoServ::Event::MemoSend::OnMemoSend, source, target, mi, m);
 
 		if (ischan)
 		{

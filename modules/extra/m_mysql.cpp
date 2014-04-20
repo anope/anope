@@ -153,7 +153,9 @@ class DispatcherThread : public Thread, public Condition
 
 class ModuleSQL;
 static ModuleSQL *me;
-class ModuleSQL : public Module, public Pipe
+class ModuleSQL : public Module
+	, public Pipe
+	, public EventHook<Event::ModuleUnload>
 {
 	/* SQL connections */
 	std::map<Anope::string, MySQLService *> MySQLServices;
@@ -166,6 +168,7 @@ class ModuleSQL : public Module, public Pipe
 	DispatcherThread *DThread;
 
 	ModuleSQL(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, EXTRA | VENDOR)
+		, EventHook<Event::ModuleUnload>("OnModuleUnload")
 	{
 		me = this;
 

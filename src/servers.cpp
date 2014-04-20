@@ -19,6 +19,7 @@
 #include "protocol.h"
 #include "config.h"
 #include "channels.h"
+#include "event.h"
 
 /* Anope */
 Server *Me = NULL;
@@ -133,7 +134,7 @@ Server::Server(Server *up, const Anope::string &sname, unsigned shops, const Ano
 		}
 	}
 
-	FOREACH_MOD(OnNewServer, (this));
+	Event::OnNewServer(&Event::NewServer::OnNewServer, this);
 }
 
 Server::~Server()
@@ -168,7 +169,7 @@ void Server::Delete(const Anope::string &reason)
 {
 	this->quit_reason = reason;
 	this->quitting = true;
-	FOREACH_MOD(OnServerQuit, (this));
+	Event::OnServerQuit(&Event::ServerQuit::OnServerQuit, this);
 	delete this;
 }
 
@@ -256,7 +257,7 @@ void Server::Sync(bool sync_links)
 
 	Log(this, "sync") << "is done syncing";
 
-	FOREACH_MOD(OnServerSync, (this));
+	Event::OnServerSync(&Event::ServerSync::OnServerSync, this);
 
 	if (sync_links && !this->links.empty())
 	{
@@ -268,7 +269,7 @@ void Server::Sync(bool sync_links)
 
 	if (me)
 	{
-		FOREACH_MOD(OnPreUplinkSync, (this));
+		Event::OnPreUplinkSync(&Event::PreUplinkSync::OnPreUplinkSync, this);
 	}
 
 	for (channel_map::const_iterator it = ChannelList.begin(), it_end = ChannelList.end(); it != it_end;)
@@ -285,7 +286,7 @@ void Server::Sync(bool sync_links)
 		IRCD->SendEOB();
 		Me->Sync(false);
 
-		FOREACH_MOD(OnUplinkSync, (this));
+		Event::OnUplinkSync(&Event::UplinkSync::OnUplinkSync, this);
 
 		if (!Anope::NoFork && Anope::AtTerm())
 		{

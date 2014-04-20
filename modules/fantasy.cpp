@@ -10,6 +10,7 @@
  */
 
 #include "module.h"
+#include "modules/fantasy.h"
 
 class CommandBSSetFantasy : public Command
 {
@@ -81,14 +82,22 @@ class CommandBSSetFantasy : public Command
 };
 
 class Fantasy : public Module
+	, public EventHook<Event::Privmsg>
 {
 	SerializableExtensibleItem<bool> fantasy;
 
 	CommandBSSetFantasy commandbssetfantasy;
 
+	EventHandlers<Event::BotFantasy> OnBotFantasy;
+	EventHandlers<Event::BotNoFantasyAccess> OnBotNoFantasyAccess;
+
  public:
-	Fantasy(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		fantasy(this, "BS_FANTASY"), commandbssetfantasy(this)
+	Fantasy(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
+		, EventHook<Event::Privmsg>("OnPrivmsg")
+		, fantasy(this, "BS_FANTASY")
+		, commandbssetfantasy(this)
+		, OnBotFantasy(this, "OnBotFantasy")
+		, OnBotNoFantasyAccess(this, "OnBotNoFantasyAccess")
 	{
 	}
 
@@ -168,11 +177,11 @@ class Fantasy : public Module
 		EventReturn MOD_RESULT;
 		if (has_fantasia)
 		{
-			FOREACH_RESULT(OnBotFantasy, MOD_RESULT, (source, cmd, c->ci, params));
+			MOD_RESULT = this->OnBotFantasy(&Event::BotFantasy::OnBotFantasy, source, cmd, c->ci, params);
 		}
 		else
 		{
-			FOREACH_RESULT(OnBotNoFantasyAccess, MOD_RESULT, (source, cmd, c->ci, params));
+			MOD_RESULT = this->OnBotNoFantasyAccess(&Event::BotNoFantasyAccess::OnBotNoFantasyAccess, source, cmd, c->ci, params);
 		}
 
 		if (MOD_RESULT == EVENT_STOP || !has_fantasia)
@@ -181,7 +190,7 @@ class Fantasy : public Module
 		if (MOD_RESULT != EVENT_ALLOW && !info.permission.empty() && !source.HasCommand(info.permission))
 			return;
 
-		FOREACH_RESULT(OnPreCommand, MOD_RESULT, (source, cmd, params));
+		MOD_RESULT = Event::OnPreCommand(&Event::PreCommand::OnPreCommand, source, cmd, params);
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
@@ -189,7 +198,7 @@ class Fantasy : public Module
 		cmd->Execute(source, params);
 		if (!nc_reference)
 			source.nc = NULL;
-		FOREACH_MOD(OnPostCommand, (source, cmd, params));
+		Event::OnPostCommand(&Event::PostCommand::OnPostCommand, source, cmd, params);
 	}
 
 	void OnBotInfo(CommandSource &source, BotInfo *bi, ChannelInfo *ci, InfoFormatter &info)

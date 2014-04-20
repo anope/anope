@@ -10,6 +10,8 @@
  */
 
 #include "module.h"
+#include "modules/ns_info.h"
+#include "modules/ns_set.h"
 
 class CommandNSList : public Command
 {
@@ -203,8 +205,7 @@ class CommandNSSetPrivate : public Command
 		}
 		NickCore *nc = na->nc;
 
-		EventReturn MOD_RESULT;
-		FOREACH_RESULT(OnSetNickOption, MOD_RESULT, (source, this, nc, param));
+		EventReturn MOD_RESULT = Event::OnSetNickOption(&Event::SetNickOption::OnSetNickOption, source, this, nc, param);
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
@@ -273,6 +274,7 @@ class CommandNSSASetPrivate : public CommandNSSetPrivate
 
 
 class NSList : public Module
+	, public EventHook<Event::NickInfo>
 {
 	CommandNSList commandnslist;
 
@@ -282,9 +284,12 @@ class NSList : public Module
 	SerializableExtensibleItem<bool> priv;
 
  public:
-	NSList(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		commandnslist(this), commandnssetprivate(this), commandnssasetprivate(this),
-		priv(this, "NS_PRIVATE")
+	NSList(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
+		, EventHook<Event::NickInfo>("OnNickInfo")
+		, commandnslist(this)
+		, commandnssetprivate(this)
+		, commandnssasetprivate(this)
+		, priv(this, "NS_PRIVATE")
 	{
 	}
 

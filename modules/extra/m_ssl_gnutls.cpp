@@ -293,6 +293,7 @@ namespace GnuTLS
 }
 
 class GnuTLSModule : public Module
+	, public EventHook<Event::PreServerConnect>
 {
 	GnuTLS::Init libinit;
 
@@ -300,7 +301,10 @@ class GnuTLSModule : public Module
 	GnuTLS::X509CertCredentials *cred;
 	MySSLService service;
 
-	GnuTLSModule(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, EXTRA | VENDOR), cred(NULL), service(this, "ssl")
+	GnuTLSModule(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, EXTRA | VENDOR)
+		, EventHook<Event::PreServerConnect>("OnPreServerConnect")
+		, cred(NULL)
+		, service(this, "ssl")
 	{
 		me = this;
 		this->SetPermanent(true);

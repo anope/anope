@@ -10,6 +10,7 @@
  */
 
 #include "module.h"
+#include "modules/nickserv.h"
 
 class CommandNSAccess : public Command
 {
@@ -187,12 +188,14 @@ class CommandNSAccess : public Command
 };
 
 class NSAccess : public Module
+	, public EventHook<NickServ::Event::NickRegister>
 {
 	CommandNSAccess commandnsaccess;
 
  public:
-	NSAccess(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		commandnsaccess(this)
+	NSAccess(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
+		, EventHook<NickServ::Event::NickRegister>("OnNickRegister")
+		, commandnsaccess(this)
 	{
 	}
 

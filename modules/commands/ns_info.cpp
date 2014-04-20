@@ -10,11 +10,15 @@
  */
 
 #include "module.h"
+#include "modules/ns_info.h"
+#include "modules/ns_set.h"
 
 class CommandNSInfo : public Command
 {
+	EventHandlers<Event::NickInfo> &onnickinfo;
+
  public:
-	CommandNSInfo(Module *creator) : Command(creator, "nickserv/info", 0, 2)
+	CommandNSInfo(Module *creator, EventHandlers<Event::NickInfo> &event) : Command(creator, "nickserv/info", 0, 2), onnickinfo(event)
 	{
 		this->SetDesc(_("Displays information about a given nickname"));
 		this->SetSyntax(_("[\037nickname\037]"));
@@ -104,7 +108,7 @@ class CommandNSInfo : public Command
 				}
 			}
 
-			FOREACH_MOD(OnNickInfo, (source, na, info, show_hidden));
+			this->onnickinfo(&Event::NickInfo::OnNickInfo, source, na, info, show_hidden);
 
 			std::vector<Anope::string> replies;
 			info.Process(replies);
@@ -154,8 +158,7 @@ class CommandNSSetHide : public Command
 		}
 		NickCore *nc = na->nc;
 
-		EventReturn MOD_RESULT;
-		FOREACH_RESULT(OnSetNickOption, MOD_RESULT, (source, this, nc, param));
+		EventReturn MOD_RESULT = Event::OnSetNickOption(&Event::SetNickOption::OnSetNickOption, source, this, nc, param);
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
@@ -263,13 +266,20 @@ class NSInfo : public Module
 	CommandNSSetHide commandnssethide;
 	CommandNSSASetHide commandnssasethide;
 
+	EventHandlers<Event::NickInfo> onnickinfo;
+
 	SerializableExtensibleItem<bool> hide_email, hide_usermask, hide_status, hide_quit;
 
  public:
-	NSInfo(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		commandnsinfo(this), commandnssethide(this), commandnssasethide(this),
-		 hide_email(this, "HIDE_EMAIL"), hide_usermask(this, "HIDE_MASK"), hide_status(this, "HIDE_STATUS"),
-		 hide_quit(this, "HIDE_QUIT")
+	NSInfo(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
+		, commandnsinfo(this, onnickinfo)
+		, commandnssethide(this)
+		, commandnssasethide(this)
+		, onnickinfo(this, "OnNickInfo")
+		, hide_email(this, "HIDE_EMAIL")
+		, hide_usermask(this, "HIDE_MASK")
+		, hide_status(this, "HIDE_STATUS")
+		, hide_quit(this, "HIDE_QUIT")
 	{
 
 	}

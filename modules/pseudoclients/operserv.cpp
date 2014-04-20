@@ -10,6 +10,8 @@
  */
 
 #include "module.h"
+#include "modules/help.h"
+#include "modules/nickserv.h"
 
 class SGLineManager : public XLineManager
 {
@@ -23,7 +25,7 @@ class SGLineManager : public XLineManager
 
 	void OnExpire(const XLine *x) override
 	{
-		Log(Config->GetClient("OperServ"), "expire/akill") << "AKILL on \002" << x->mask << "\002 has expired";
+		::Log(Config->GetClient("OperServ"), "expire/akill") << "AKILL on \002" << x->mask << "\002 has expired";
 	}
 	
 	void Send(User *u, XLine *x) override
@@ -68,10 +70,8 @@ class SGLineManager : public XLineManager
 
 class SQLineManager : public XLineManager
 {
-	ServiceReference<NickServService> nickserv;
-
  public:
-	SQLineManager(Module *creator) : XLineManager(creator, "xlinemanager/sqline", 'Q'), nickserv("NickServService", "NickServ") { }
+	SQLineManager(Module *creator) : XLineManager(creator, "xlinemanager/sqline", 'Q') { }
 
 	void OnMatch(User *u, XLine *x) override
 	{
@@ -80,7 +80,7 @@ class SQLineManager : public XLineManager
 
 	void OnExpire(const XLine *x) override
 	{
-		Log(Config->GetClient("OperServ"), "expire/sqline") << "SQLINE on \002" << x->mask << "\002 has expired";
+		::Log(Config->GetClient("OperServ"), "expire/sqline") << "SQLINE on \002" << x->mask << "\002 has expired";
 	}
 
 	void Send(User *u, XLine *x) override
@@ -89,8 +89,8 @@ class SQLineManager : public XLineManager
 		{
 			if (!u)
 				;
-			else if (nickserv)
-				nickserv->Collide(u, NULL);
+			else if (NickServ::service)
+				NickServ::service->Collide(u, NULL);
 			else
 				u->Kill(Config->GetClient("OperServ"), "Q-Lined: " + x->reason);
 		}
@@ -144,7 +144,7 @@ class SNLineManager : public XLineManager
 
 	void OnExpire(const XLine *x) override
 	{
-		Log(Config->GetClient("OperServ"), "expire/snline") << "SNLINE on \002" << x->mask << "\002 has expired";
+		::Log(Config->GetClient("OperServ"), "expire/snline") << "SNLINE on \002" << x->mask << "\002 has expired";
 	}
 
 	void Send(User *u, XLine *x) override
@@ -171,6 +171,15 @@ class SNLineManager : public XLineManager
 };
 
 class OperServCore : public Module
+	, public EventHook<Event::BotPrivmsg>
+	, public EventHook<Event::ServerQuit>
+	, public EventHook<Event::UserModeSet>
+	, public EventHook<Event::UserModeUnset>
+	, public EventHook<Event::UserConnect>
+	, public EventHook<Event::UserNickChange>
+	, public EventHook<Event::CheckKick>
+	, public EventHook<Event::Help>
+	, public EventHook<Event::Log>
 {
 	Reference<BotInfo> OperServ;
 	SGLineManager sglines;
@@ -178,8 +187,19 @@ class OperServCore : public Module
 	SNLineManager snlines;
 
  public:
-	OperServCore(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PSEUDOCLIENT | VENDOR),
-		sglines(this), sqlines(this), snlines(this)
+	OperServCore(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PSEUDOCLIENT | VENDOR)
+		, EventHook<Event::BotPrivmsg>("OnBotPrivmsg")
+		, EventHook<Event::ServerQuit>("OnServerQuit")
+		, EventHook<Event::UserModeSet>("OnUserModeSet")
+		, EventHook<Event::UserModeUnset>("OnUserModeUnset")
+		, EventHook<Event::UserConnect>("OnUserConnect")
+		, EventHook<Event::UserNickChange>("OnUserNickChange")
+		, EventHook<Event::CheckKick>("OnCheckKick")
+		, EventHook<Event::Help>("OnHelp")
+		, EventHook<Event::Log>("OnLog")
+		, sglines(this)
+		, sqlines(this)
+		, snlines(this)
 	{
 
 		/* Yes, these are in this order for a reason. Most violent->least violent. */
@@ -218,7 +238,7 @@ class OperServCore : public Module
 		if (bi == OperServ && !u->HasMode("OPER") && Config->GetModule(this)->Get<bool>("opersonly"))
 		{
 			u->SendMessage(bi, ACCESS_DENIED);
-			Log(bi, "bados") << "Denied access to " << bi->nick << " from " << u->GetMask() << " (non-oper)";
+			::Log(bi, "bados") << "Denied access to " << bi->nick << " from " << u->GetMask() << " (non-oper)";
 			return EVENT_STOP;
 		}
 
@@ -228,19 +248,19 @@ class OperServCore : public Module
 	void OnServerQuit(Server *server) override
 	{
 		if (server->IsJuped())
-			Log(server, "squit", OperServ) << "Received SQUIT for juped server " << server->GetName();
+			::Log(server, "squit", OperServ) << "Received SQUIT for juped server " << server->GetName();
 	}
 
 	void OnUserModeSet(const MessageSource &setter, User *u, const Anope::string &mname) override
 	{
 		if (mname == "OPER")
-			Log(u, "oper", OperServ) << "is now an IRC operator.";
+			::Log(u, "oper", OperServ) << "is now an IRC operator.";
 	}
 
 	void OnUserModeUnset(const MessageSource &setter, User *u, const Anope::string &mname) override
 	{
 		if (mname == "OPER")
-			Log(u, "oper", OperServ) << "is no longer an IRC operator";
+			::Log(u, "oper", OperServ) << "is no longer an IRC operator";
 	}
 
 	void OnUserConnect(User *u, bool &exempt) override
@@ -276,7 +296,11 @@ class OperServCore : public Module
 		return EVENT_CONTINUE;
 	}
 
-	void OnLog(Log *l) override
+	void OnPostHelp(CommandSource &source, const std::vector<Anope::string> &params) override
+	{
+	}
+
+	void OnLog(::Log *l) override
 	{
 		if (l->type == LOG_SERVER)
 			l->bi = OperServ;

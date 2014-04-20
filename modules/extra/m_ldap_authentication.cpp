@@ -1,5 +1,6 @@
 #include "module.h"
 #include "modules/ldap.h"
+#include "modules/nickserv.h"
 
 static Module *me;
 
@@ -104,7 +105,7 @@ class IdentifyInterface : public LDAPInterface
 					{
 						na = new NickAlias(ii->req->GetAccount(), new NickCore(ii->req->GetAccount()));
 						na->last_realname = ii->user ? ii->user->realname : ii->req->GetAccount();
-						FOREACH_MOD(OnNickRegister, (ii->user, na));
+						NickServ::Event::OnNickRegister(&NickServ::Event::NickRegister::OnNickRegister, ii->user, na);
 						BotInfo *NickServ = Config->GetClient("NickServ");
 						if (ii->user && NickServ)
 							ii->user->SendMessage(NickServ, _("Your account \002%s\002 has been successfully created."), na->nick.c_str());
@@ -202,6 +203,10 @@ class OnRegisterInterface : public LDAPInterface
 };
 
 class NSIdentifyLDAP : public Module
+	, public EventHook<Event::PreCommand>
+	, public EventHook<Event::CheckAuthentication>
+	, public EventHook<Event::NickIdentify>
+	, public EventHook<NickServ::Event::NickRegister>
 {
 	ServiceReference<LDAPProvider> ldap;
 	IdentifyInterface iinterface;
@@ -214,14 +219,20 @@ class NSIdentifyLDAP : public Module
 	Anope::string disable_register_reason;
 	Anope::string disable_email_reason;
  public:
-	NSIdentifyLDAP(const Anope::string &modname, const Anope::string &creator) :
-		Module(modname, creator, EXTRA | VENDOR), ldap("LDAPProvider", "ldap/main"), iinterface(this), oninterface(this), orinterface(this),
-		dn(this, "m_ldap_authentication_dn")
+
+	NSIdentifyLDAP(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, EXTRA | VENDOR)
+		, EventHook<Event::PreCommand>("OnPreCommand", EventHook<Event::PreCommand>::Priority::FIRST)
+		, EventHook<Event::CheckAuthentication>("OnCheckAuthentication", EventHook<Event::CheckAuthentication>::Priority::FIRST)
+		, EventHook<Event::NickIdentify>("OnNickIdentify", EventHook<Event::NickIdentify>::Priority::FIRST)
+		, EventHook<NickServ::Event::NickRegister>("OnNickRegister", EventHook<NickServ::Event::NickRegister>::Priority::FIRST)
+		, ldap("LDAPProvider", "ldap/main")
+		, iinterface(this)
+		, oninterface(this)
+		, orinterface(this)
+		, dn(this, "m_ldap_authentication_dn")
 	{
 
 		me = this;
-
-		ModuleManager::SetPriority(this, PRIORITY_FIRST);
 	}
 
 	void OnReload(Configuration::Conf *config) override

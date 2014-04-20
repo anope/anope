@@ -11,8 +11,8 @@
 
 #include "module.h"
 #include "modules/os_forbid.h"
-
-static ServiceReference<NickServService> nickserv("NickServService", "NickServ");
+#include "modules/nickserv.h"
+#include "modules/chanserv.h"
 
 struct ForbidDataImpl : ForbidData, Serializable
 {
@@ -147,6 +147,24 @@ class CommandOSForbid : public Command
 		this->SetSyntax("LIST [NICK|CHAN|EMAIL|REGISTER]");
 	}
 
+	void OnUserNickChange(User *u)
+	{
+		if (u->HasMode("OPER"))
+			return;
+
+		ForbidData *d = fs->FindForbid(u->nick, FT_NICK);
+		if (d != NULL)
+		{
+			BotInfo *bi = Config->GetClient("NickServ");
+			if (!bi)
+				bi = Config->GetClient("OperServ");
+			if (bi)
+				u->SendMessage(bi, _("This nickname has been forbidden: %s"), d->reason.c_str());
+			if (NickServ::service)
+				NickServ::service->Collide(u, NULL);
+		}
+	}
+
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		if (!this->fs)
@@ -234,7 +252,7 @@ class CommandOSForbid : public Command
 					int na_matches = 0;
 
 					for (user_map::const_iterator it = UserListByNick.begin(); it != UserListByNick.end(); ++it)
-						module->OnUserNickChange(it->second, "");
+						this->OnUserNickChange(it->second);
 
 					for (nickalias_map::const_iterator it = NickAliasList->begin(), it_end = NickAliasList->end(); it != it_end;)
 					{
@@ -266,7 +284,6 @@ class CommandOSForbid : public Command
 						if (d == NULL)
 							continue;
 
-						ServiceReference<ChanServService> chanserv("ChanServService", "ChanServ");
 						BotInfo *OperServ = Config->GetClient("OperServ");
 						if (IRCD->CanSQLineChannel && OperServ)
 						{
@@ -274,9 +291,9 @@ class CommandOSForbid : public Command
 							XLine x(c->name, OperServ->nick, Anope::CurTime + inhabit, d->reason);
 							IRCD->SendSQLine(NULL, &x);
 						}
-						else if (chanserv)
+						else if (ChanServ::service)
 						{
-							chanserv->Hold(c);
+							ChanServ::service->Hold(c);
 						}
 
 						++chan_matches;
@@ -422,14 +439,24 @@ class CommandOSForbid : public Command
 };
 
 class OSForbid : public Module
+	, public EventHook<Event::UserConnect>
+	, public EventHook<Event::UserNickChange>
+	, public EventHook<Event::CheckKick>
+	, public EventHook<Event::PreCommand>
 {
 	MyForbidService forbidService;
 	Serialize::Type forbiddata_type;
 	CommandOSForbid commandosforbid;
 
  public:
-	OSForbid(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		forbidService(this), forbiddata_type("ForbidData", ForbidDataImpl::Unserialize), commandosforbid(this)
+	OSForbid(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
+		, EventHook<Event::UserConnect>("OnUserConnect")
+		, EventHook<Event::UserNickChange>("OnUserNickChange")
+		, EventHook<Event::CheckKick>("OnCheckKick")
+		, EventHook<Event::PreCommand>("OnPreCommand")
+		, forbidService(this)
+		, forbiddata_type("ForbidData", ForbidDataImpl::Unserialize)
+		, commandosforbid(this)
 	{
 
 	}
@@ -439,25 +466,12 @@ class OSForbid : public Module
 		if (u->Quitting() || exempt)
 			return;
 
-		this->OnUserNickChange(u, "");
+		commandosforbid.OnUserNickChange(u);
 	}
 
 	void OnUserNickChange(User *u, const Anope::string &) override
 	{
-		if (u->HasMode("OPER"))
-			return;
-
-		ForbidData *d = this->forbidService.FindForbid(u->nick, FT_NICK);
-		if (d != NULL)
-		{
-			BotInfo *bi = Config->GetClient("NickServ");
-			if (!bi)
-				bi = Config->GetClient("OperServ");
-			if (bi)
-				u->SendMessage(bi, _("This nickname has been forbidden: %s"), d->reason.c_str());
-			if (nickserv)
-				nickserv->Collide(u, NULL);
-		}
+		commandosforbid.OnUserNickChange(u);
 	}
 
 	EventReturn OnCheckKick(User *u, Channel *c, Anope::string &mask, Anope::string &reason) override
@@ -469,16 +483,15 @@ class OSForbid : public Module
 		ForbidData *d = this->forbidService.FindForbid(c->name, FT_CHAN);
 		if (d != NULL)
 		{
-			ServiceReference<ChanServService> chanserv("ChanServService", "ChanServ");
 			if (IRCD->CanSQLineChannel)
 			{
 				time_t inhabit = Config->GetModule("chanserv")->Get<time_t>("inhabit", "15s");
 				XLine x(c->name, OperServ->nick, Anope::CurTime + inhabit, d->reason);
 				IRCD->SendSQLine(NULL, &x);
 			}
-			else if (chanserv)
+			else if (ChanServ::service)
 			{
-				chanserv->Hold(c);
+				ChanServ::service->Hold(c);
 			}
 
 			reason = Anope::printf(Language::Translate(u, _("This channel has been forbidden: %s")), d->reason.c_str());

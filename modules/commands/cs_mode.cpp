@@ -11,6 +11,9 @@
 
 #include "module.h"
 #include "modules/cs_mode.h"
+#include "modules/cs_info.h"
+
+static EventHandlers<Event::MLockEvents> *events;
 
 struct ModeLockImpl : ModeLock, Serializable
 {
@@ -87,7 +90,7 @@ struct ModeLocksImpl : ModeLocks
 		ml->created = created;
 
 		EventReturn MOD_RESULT;
-		FOREACH_RESULT(OnMLock, MOD_RESULT, (this->ci, ml));
+		MOD_RESULT = (*events)(&Event::MLockEvents::OnMLock, this->ci, ml);
 		if (MOD_RESULT == EVENT_STOP)
 		{
 			delete ml;
@@ -115,7 +118,7 @@ struct ModeLocksImpl : ModeLocks
 						continue;
 
 				EventReturn MOD_RESULT;
-				FOREACH_RESULT(OnUnMLock, MOD_RESULT, (this->ci, m));
+				MOD_RESULT = (*events)(&Event::MLockEvents::OnUnMLock, this->ci, m);
 				if (MOD_RESULT == EVENT_STOP)
 					break;
 
@@ -863,19 +866,29 @@ class CommandCSModes : public Command
 };
 
 class CSMode : public Module
+	, public EventHook<Event::CheckModes>
+	, public EventHook<Event::CreateChan>
+	, public EventHook<Event::ChanInfo>
 {
 	CommandCSMode commandcsmode;
 	CommandCSModes commandcsmodes;
 	ExtensibleItem<ModeLocksImpl> modelocks;
 	Serialize::Type modelocks_type;
 
- public:
-	CSMode(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		commandcsmode(this), commandcsmodes(this),
-		modelocks(this, "modelocks"),
-		modelocks_type("ModeLock", ModeLockImpl::Unserialize)
-	{
+	EventHandlers<Event::MLockEvents> modelockevents;
 
+ public:
+	CSMode(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
+		, EventHook<Event::CheckModes>("OnCheckModes")
+		, EventHook<Event::CreateChan>("OnCreateChan")
+		, EventHook<Event::ChanInfo>("OnChanInfo")
+		, commandcsmode(this)
+		, commandcsmodes(this)
+		, modelocks(this, "modelocks")
+		, modelocks_type("ModeLock", ModeLockImpl::Unserialize)
+		, modelockevents(this, "MLock")
+	{
+		events = &modelockevents;
 	}
 
 	void OnReload(Configuration::Conf *conf) override

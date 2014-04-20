@@ -4,6 +4,13 @@
 using namespace SQL;
 
 class DBMySQL : public Module, public Pipe
+	, public EventHook<Event::LoadDatabase>
+	, public EventHook<Event::Shutdown>
+	, public EventHook<Event::Restart>
+	, public EventHook<Event::SerializableConstruct>
+	, public EventHook<Event::SerializableDestruct>
+	, public EventHook<Event::SerializeCheck>
+	, public EventHook<Event::SerializableUpdate>
 {
  private:
 	Anope::string prefix;
@@ -64,7 +71,14 @@ class DBMySQL : public Module, public Pipe
 	}
 
  public:
-	DBMySQL(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, DATABASE | VENDOR), SQL("", "")
+	DBMySQL(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, DATABASE | VENDOR)
+		, EventHook<Event::LoadDatabase>("OnLoadDatabase")
+		, EventHook<Event::Shutdown>("OnShutdown")
+		, EventHook<Event::Restart>("OnRestart")
+		, EventHook<Event::SerializableConstruct>("OnSerializableConstruct")
+		, EventHook<Event::SerializableDestruct>("OnSerializableDestruct")
+		, EventHook<Event::SerializeCheck>("OnSerializeCheck")
+		, EventHook<Event::SerializableUpdate>("OnSerializableUpdate")
 	{
 		this->lastwarn = 0;
 		this->ro = false;

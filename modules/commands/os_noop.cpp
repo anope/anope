@@ -74,13 +74,16 @@ class CommandOSNOOP : public Command
 };
 
 class OSNOOP : public Module
+	, public EventHook<Event::UserModeSet>
 {
 	CommandOSNOOP commandosnoop;
 	PrimitiveExtensibleItem<Anope::string> noop;
 
  public:
-	OSNOOP(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		commandosnoop(this), noop(this, "noop")
+	OSNOOP(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
+		, EventHook<Event::UserModeSet>("OnUserModeSet")
+		, commandosnoop(this)
+		, noop(this, "noop")
 	{
 
 	}

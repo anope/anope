@@ -174,8 +174,9 @@ class OSMode : public Module
 	CommandOSUMode commandosumode;
 
  public:
-	OSMode(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		commandosmode(this), commandosumode(this)
+	OSMode(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
+		, commandosmode(this)
+		, commandosumode(this)
 	{
 
 	}

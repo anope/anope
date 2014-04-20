@@ -77,8 +77,8 @@ class NSStatus : public Module
 	CommandNSStatus commandnsstatus;
 
  public:
-	NSStatus(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		commandnsstatus(this)
+	NSStatus(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
+		, commandnsstatus(this)
 	{
 
 	}

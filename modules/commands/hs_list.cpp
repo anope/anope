@@ -149,8 +149,8 @@ class HSList : public Module
 	CommandHSList commandhslist;
 
  public:
-	HSList(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		commandhslist(this)
+	HSList(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
+		, commandhslist(this)
 	{
 	}
 };

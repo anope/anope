@@ -367,12 +367,30 @@ class CommandSeen : public Command
 };
 
 class CSSeen : public Module
+	, public EventHook<Event::ExpireTick>
+	, public EventHook<Event::UserConnect>
+	, public EventHook<Event::UserNickChange>
+	, public EventHook<Event::UserQuit>
+	, public EventHook<Event::JoinChannel>
+	, public EventHook<Event::PartChannel>
+	, public EventHook<Event::PreUserKicked>
 {
 	Serialize::Type seeninfo_type;
 	CommandSeen commandseen;
 	CommandOSSeen commandosseen;
+	
  public:
-	CSSeen(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR), seeninfo_type("SeenInfo", SeenInfo::Unserialize), commandseen(this), commandosseen(this)
+	CSSeen(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
+		, EventHook<Event::ExpireTick>("OnExpireTick")
+		, EventHook<Event::UserConnect>("OnUserConnect")
+		, EventHook<Event::UserNickChange>("OnUserNickChange")
+		, EventHook<Event::UserQuit>("OnUserQuit")
+		, EventHook<Event::JoinChannel>("OnJoinChannel")
+		, EventHook<Event::PartChannel>("OnPartChannel")
+		, EventHook<Event::PreUserKicked>("OnPreUserKicked")
+		, seeninfo_type("SeenInfo", SeenInfo::Unserialize)
+		, commandseen(this)
+		, commandosseen(this)
 	{
 	}
 

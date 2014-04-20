@@ -7,6 +7,8 @@
  */
 
 #include "module.h"
+#include "modules/ns_info.h"
+#include "modules/cs_info.h"
 
 struct OperInfo : Serializable
 {
@@ -248,6 +250,8 @@ class CommandOSInfo : public Command
 };
 
 class OSInfo : public Module
+	, public EventHook<Event::NickInfo>
+	, public EventHook<Event::ChanInfo>
 {
 	CommandOSInfo commandosinfo;
 	ExtensibleItem<OperInfos> oinfo;
@@ -270,8 +274,12 @@ class OSInfo : public Module
 	}
 
  public:
-	OSInfo(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		commandosinfo(this), oinfo(this, "operinfo"), oinfo_type("OperInfo", OperInfo::Unserialize)
+	OSInfo(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
+		, EventHook<Event::NickInfo>("OnNickInfo")
+		, EventHook<Event::ChanInfo>("OnChanInfo")
+		, commandosinfo(this)
+		, oinfo(this, "operinfo")
+		, oinfo_type("OperInfo", OperInfo::Unserialize)
 	{
 
 	}

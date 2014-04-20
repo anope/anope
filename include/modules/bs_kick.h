@@ -44,3 +44,17 @@ struct KickerData
 	virtual ~KickerData() { }
 	virtual void Check(ChannelInfo *ci) = 0;
 };
+
+namespace Event
+{
+	struct CoreExport BotBan : Events
+	{
+		/** Called when a bot places a ban
+		 * @param u User being banned
+		 * @param ci Channel the ban is placed on
+		 * @param mask The mask being banned
+		 */
+		virtual void OnBotBan(User *u, ChannelInfo *ci, const Anope::string &mask) anope_abstract;
+	};
+}
+

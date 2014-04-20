@@ -247,7 +247,7 @@ class Serialize::Reference : public ReferenceBase
 	T *ref;
 
  public:
- 	Reference() : ref(NULL)
+ 	Reference() : ref(nullptr)
 	{
 	}
 
@@ -257,78 +257,55 @@ class Serialize::Reference : public ReferenceBase
 			obj->AddReference(this);
 	}
 
-	Reference(const Reference<T> &other) : ReferenceBase(other), ref(other.ref)
+	Reference(const Reference<T> &other) : ref(other)
 	{
-		if (ref && !invalid)
+		if (this->ref)
 			this->ref->AddReference(this);
 	}
 
 	~Reference()
 	{
-		if (ref && !invalid)
+		if (this->ref)
 			this->ref->DelReference(this);
 	}
 
-	inline Reference<T>& operator=(const Reference<T> &other)
+	void Invalidate() override
+	{
+		this->ref = nullptr;
+	}
+
+	Reference<T>& operator=(const Reference<T> &other)
 	{
 		if (this != &other)
 		{
-			if (ref && !invalid)
+			if (ref)
 				this->ref->DelReference(this);
 
 			this->ref = other.ref;
-			this->invalid = other.invalid;
 
-			if (ref && !invalid)
+			if (ref)
 				this->ref->AddReference(this);
 		}
 		return *this;
 	}
 
-	inline operator bool() const
+	explicit operator bool() const
 	{
-		if (!this->invalid)
-			return this->ref != NULL;
-		return false;
+		return this->ref != nullptr;
 	}
 
-	inline operator T*() const
-	{
-		if (!this->invalid)
-		{
-			if (this->ref)
-				// This can invalidate me
-				this->ref->QueueUpdate();
-			if (!this->invalid)
-				return this->ref;
-		}
-		return NULL;
-	}
+	operator T*() const { return Dereference(); }
 
-	inline T* operator*() const
-	{
-		if (!this->invalid)
-		{
-			if (this->ref)
-				// This can invalidate me
-				this->ref->QueueUpdate();
-			if (!this->invalid)
-				return this->ref;
-		}
-		return NULL;
-	}
+	T* operator*() const { return Dereference(); }
+	T* operator->() const { return Dereference(); }
 
-	inline T* operator->() const
+ private:
+	T* Dereference() const
 	{
-		if (!this->invalid)
-		{
-			if (this->ref)
-				// This can invalidate me
-				this->ref->QueueUpdate();
-			if (!this->invalid)
-				return this->ref;
-		}
-		return NULL;
+		if (this->ref)
+			// This can invalidate me
+			this->ref->QueueUpdate();
+		return this->ref;
 	}
 };
 

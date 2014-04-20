@@ -10,18 +10,23 @@
  */
 
 #include "module.h"
+#include "modules/ns_info.h"
+#include "modules/ns_group.h"
+#include "modules/ns_update.h"
+#include "modules/help.h"
+#include "modules/nickserv.h"
 
 /** Timer for colliding nicks to force people off of nicknames
  */
 class NickServCollide : public Timer
 {
-	NickServService *service;
+	NickServ::NickServService *service;
 	Reference<User> u;
 	time_t ts;
 	Reference<NickAlias> na;
 
  public:
-	NickServCollide(NickServService *nss, User *user, NickAlias *nick, time_t delay) : Timer(delay), service(nss), u(user), ts(user->timestamp), na(nick)
+	NickServCollide(NickServ::NickServService *nss, User *user, NickAlias *nick, time_t delay) : Timer(delay), service(nss), u(user), ts(user->timestamp), na(nick)
 	{
 	}
 
@@ -91,11 +96,32 @@ class NickServRelease : public User, public Timer
 	void Tick(time_t t) override { }
 };
 
-class NickServCore : public Module, public NickServService
+class NickServCore : public Module, public NickServ::NickServService
+	, public EventHook<Event::Shutdown>
+	, public EventHook<Event::Restart>
+	, public EventHook<Event::UserLogin>
+	, public EventHook<Event::DelNick>
+	, public EventHook<Event::DelCore>
+	, public EventHook<Event::ChangeCoreDisplay>
+	, public EventHook<Event::NickIdentify>
+	, public EventHook<Event::NickGroup>
+	, public EventHook<Event::NickUpdate>
+	, public EventHook<Event::UserConnect>
+	, public EventHook<Event::PostUserLogoff>
+	, public EventHook<Event::ServerSync>
+	, public EventHook<Event::UserNickChange>
+	, public EventHook<Event::UserModeSet>
+	, public EventHook<Event::Help>
+	, public EventHook<Event::ExpireTick>
+	, public EventHook<Event::NickInfo>
 {
 	Reference<BotInfo> NickServ;
 	std::vector<Anope::string> defaults;
 	ExtensibleItem<bool> held, collided;
+	EventHandlers<NickServ::Event::PreNickExpire> onprenickexpire;
+	EventHandlers<NickServ::Event::NickExpire> onnickexpire;
+	EventHandlers<NickServ::Event::NickRegister> onnickregister;
+	EventHandlers<NickServ::Event::NickValidate> onnickvalidate;
 
 	void OnCancel(User *u, NickAlias *na)
 	{
@@ -113,8 +139,31 @@ class NickServCore : public Module, public NickServService
 	}
 
  public:
-	NickServCore(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PSEUDOCLIENT | VENDOR),
-		NickServService(this), held(this, "HELD"), collided(this, "COLLIDED")
+	NickServCore(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PSEUDOCLIENT | VENDOR)
+		, NickServ::NickServService(this)
+		, EventHook<Event::Shutdown>("OnShutdown")
+		, EventHook<Event::Restart>("OnRestart")
+		, EventHook<Event::UserLogin>("OnUserLogin")
+		, EventHook<Event::DelNick>("OnDelNick")
+		, EventHook<Event::DelCore>("OnDelCore")
+		, EventHook<Event::ChangeCoreDisplay>("OnChangeCoreDisplay")
+		, EventHook<Event::NickIdentify>("OnNickIdentify")
+		, EventHook<Event::NickGroup>("OnNickGroup")
+		, EventHook<Event::NickUpdate>("OnNickUpdate")
+		, EventHook<Event::UserConnect>("OnUserConnect")
+		, EventHook<Event::PostUserLogoff>("OnPostUserLogoff")
+		, EventHook<Event::ServerSync>("OnServerSync")
+		, EventHook<Event::UserNickChange>("OnUserNickChange")
+		, EventHook<Event::UserModeSet>("OnUserModeSet")
+		, EventHook<Event::Help>("OnHelp")
+		, EventHook<Event::ExpireTick>("OnExpireTick")
+		, EventHook<Event::NickInfo>("OnNickInfo")
+		, held(this, "HELD")
+		, collided(this, "COLLIDED")
+		, onprenickexpire(this, "OnPreNickExpire")
+		, onnickexpire(this, "OnNickExpire")
+		, onnickregister(this, "OnNickRegister")
+		, onnickvalidate(this, "OnNickValidate")
 	{
 	}
 
@@ -143,8 +192,7 @@ class NickServCore : public Module, public NickServService
 		if (!na)
 			return;
 
-		EventReturn MOD_RESULT;
-		FOREACH_RESULT(OnNickValidate, MOD_RESULT, (u, na));
+		EventReturn MOD_RESULT = this->onnickvalidate(&NickServ::Event::NickValidate::OnNickValidate, u, na);
 		if (MOD_RESULT == EVENT_STOP)
 		{
 			this->Collide(u, na);
@@ -306,7 +354,7 @@ class NickServCore : public Module, public NickServService
 			IRCD->SendLogout(user);
 			user->RemoveMode(NickServ, "REGISTERED");
 			user->Logout();
-			FOREACH_MOD(OnNickLogout, (user));
+			Event::OnNickLogout(&Event::NickLogout::OnNickLogout, user);
 		}
 		nc->users.clear();
 	}
@@ -515,12 +563,12 @@ class NickServCore : public Module, public NickServService
 			if (nickserv_expire && Anope::CurTime - na->last_seen >= nickserv_expire)
 				expire = true;
 
-			FOREACH_MOD(OnPreNickExpire, (na, expire));
+			this->onprenickexpire(&NickServ::Event::PreNickExpire::OnPreNickExpire, na, expire);
 		
 			if (expire)
 			{
 				Log(LOG_NORMAL, "nickserv/expire", NickServ) << "Expiring nickname " << na->nick << " (group: " << na->nc->display << ") (e-mail: " << (na->nc->email.empty() ? "none" : na->nc->email) << ")";
-				FOREACH_MOD(OnNickExpire, (na));
+				this->onnickexpire(&NickServ::Event::NickExpire::OnNickExpire, na);
 				delete na;
 			}
 		}

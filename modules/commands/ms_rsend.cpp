@@ -10,11 +10,7 @@
  */
 
 #include "module.h"
-
-namespace
-{
-	ServiceReference<MemoServService> memoserv("MemoServService", "MemoServ");
-}
+#include "modules/memoserv.h"
 
 class CommandMSRSend : public Command
 {
@@ -27,7 +23,7 @@ class CommandMSRSend : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
-		if (!memoserv)
+		if (!MemoServ::service)
 			return;
 
 		if (Anope::ReadOnly && !source.IsOper())
@@ -51,12 +47,12 @@ class CommandMSRSend : public Command
 			source.Reply(ACCESS_DENIED);
 		else
 		{
-			MemoServService::MemoResult result = memoserv->Send(source.GetNick(), nick, text);
-			if (result == MemoServService::MEMO_INVALID_TARGET)
+			MemoServ::MemoServService::MemoResult result = MemoServ::service->Send(source.GetNick(), nick, text);
+			if (result == MemoServ::MemoServService::MEMO_INVALID_TARGET)
 				source.Reply(_("\002%s\002 is not a registered unforbidden nick or channel."), nick.c_str());
-			else if (result == MemoServService::MEMO_TOO_FAST)
+			else if (result == MemoServ::MemoServService::MEMO_TOO_FAST)
 				source.Reply(_("Please wait %d seconds before using the %s command again."), Config->GetModule("memoserv")->Get<time_t>("senddelay"), source.command.c_str());
-			else if (result == MemoServService::MEMO_TARGET_FULL)
+			else if (result == MemoServ::MemoServService::MEMO_TARGET_FULL)
 				source.Reply(_("Sorry, %s currently has too many memos and cannot receive more."), nick.c_str());
 			else	
 			{
@@ -93,10 +89,10 @@ class MSRSend : public Module
 	CommandMSRSend commandmsrsend;
 
  public:
-	MSRSend(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		commandmsrsend(this)
+	MSRSend(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
+		, commandmsrsend(this)
 	{
-		if (!memoserv)
+		if (!MemoServ::service)
 			throw ModuleException("No MemoServ!");
 	}
 };

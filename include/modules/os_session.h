@@ -51,6 +51,24 @@ class SessionService : public Service
 
 static ServiceReference<SessionService> session_service("SessionService", "session");
 
+namespace Event
+{
+	struct CoreExport Exception : Events
+	{
+		/** Called after an exception has been added
+		 * @param ex The exception
+		 * @return EVENT_CONTINUE to let other modules decide, EVENT_STOP to halt the command and not process it
+		 */
+		virtual EventReturn OnExceptionAdd(::Exception *ex) anope_abstract;
+
+		/** Called before an exception is deleted
+		 * @param source The source deleting it
+		 * @param ex The exceotion
+		 */
+		virtual void OnExceptionDel(CommandSource &source, ::Exception *ex) anope_abstract;
+	};
+}
+
 void Exception::Serialize(Serialize::Data &data) const
 {
 	data["mask"] << this->mask;

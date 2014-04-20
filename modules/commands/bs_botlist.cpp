@@ -72,8 +72,8 @@ class BSBotList : public Module
 	CommandBSBotList commandbsbotlist;
 
  public:
-	BSBotList(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		commandbsbotlist(this)
+	BSBotList(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
+		, commandbsbotlist(this)
 	{
 
 	}

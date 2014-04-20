@@ -20,6 +20,7 @@
 #include "regchannel.h"
 #include "xline.h"
 #include "access.h"
+#include "event.h"
 
 using namespace Serialize;
 
@@ -54,7 +55,7 @@ Serializable::Serializable(const Anope::string &serialize_type) : last_commit(0)
 	this->s_iter = SerializableItems->end();
 	--this->s_iter;
 
-	FOREACH_MOD(OnSerializableConstruct, (this));
+	Event::OnSerializableConstruct(&Event::SerializableConstruct::OnSerializableConstruct, this);
 }
 
 Serializable::Serializable(const Serializable &other) : last_commit(0), last_commit_time(0), id(0), redis_ignore(0)
@@ -65,12 +66,12 @@ Serializable::Serializable(const Serializable &other) : last_commit(0), last_com
 
 	this->s_type = other.s_type;
 
-	FOREACH_MOD(OnSerializableConstruct, (this));
+	Event::OnSerializableConstruct(&Event::SerializableConstruct::OnSerializableConstruct, this);
 }
 
 Serializable::~Serializable()
 {
-	FOREACH_MOD(OnSerializableDestruct, (this));
+	Event::OnSerializableDestruct(&Event::SerializableDestruct::OnSerializableDestruct, this);
 
 	SerializableItems->erase(this->s_iter);
 }
@@ -83,10 +84,10 @@ Serializable &Serializable::operator=(const Serializable &)
 void Serializable::QueueUpdate()
 {
 	/* Schedule updater */
-	FOREACH_MOD(OnSerializableUpdate, (this));
+	Event::OnSerializableUpdate(&Event::SerializableUpdate::OnSerializableUpdate, this);
 
 	/* Check for modifications now - this can delete this object! */
-	FOREACH_MOD(OnSerializeCheck, (this->GetSerializableType()));
+	Event::OnSerializeCheck(&Event::SerializeCheck::OnSerializeCheck, this->GetSerializableType());
 }
 
 bool Serializable::IsCached(Serialize::Data &data)
@@ -119,7 +120,7 @@ Type::Type(const Anope::string &n, unserialize_func f, Module *o)  : name(n), un
 	TypeOrder.push_back(this->name);
 	Types[this->name] = this;
 
-	FOREACH_MOD(OnSerializeTypeCreate, (this));
+	Event::OnSerializeTypeCreate(&Event::SerializeTypeCreate::OnSerializeTypeCreate, this);
 }
 
 Type::~Type()
@@ -137,7 +138,7 @@ Serializable *Type::Unserialize(Serializable *obj, Serialize::Data &data)
 
 void Type::Check()
 {
-	FOREACH_MOD(OnSerializeCheck, (this));
+	Event::OnSerializeCheck(&Event::SerializeCheck::OnSerializeCheck, this);
 }
 
 time_t Type::GetTimestamp() const

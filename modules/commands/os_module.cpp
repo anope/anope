@@ -177,8 +177,10 @@ class OSModule : public Module
 	CommandOSModUnLoad commandosmodunload;
 
  public:
-	OSModule(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		commandosmodload(this), commandosmodreload(this), commandosmodunload(this)
+	OSModule(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
+		, commandosmodload(this)
+		, commandosmodreload(this)
+		, commandosmodunload(this)
 	{
 		this->SetPermanent(true);
 

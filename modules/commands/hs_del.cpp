@@ -10,11 +10,14 @@
  */
 
 #include "module.h"
+#include "modules/hs_del.h"
 
 class CommandHSDel : public Command
 {
+	EventHandlers<Event::DeleteVhost> &OnDeleteVhost;
+
  public:
-	CommandHSDel(Module *creator) : Command(creator, "hostserv/del", 1, 1)
+	CommandHSDel(Module *creator, EventHandlers<Event::DeleteVhost> &onDeleteVhost) : Command(creator, "hostserv/del", 1, 1), OnDeleteVhost(onDeleteVhost)
 	{
 		this->SetDesc(_("Delete the vhost of another user"));
 		this->SetSyntax(_("\037nick\037"));
@@ -33,7 +36,7 @@ class CommandHSDel : public Command
 		if (na)
 		{
 			Log(LOG_ADMIN, source, this) << "for user " << na->nick;
-			FOREACH_MOD(OnDeleteVhost, (na));
+			this->OnDeleteVhost(&Event::DeleteVhost::OnDeleteVhost, na);
 			na->RemoveVhost();
 			source.Reply(_("Vhost for \002%s\002 removed."), nick.c_str());
 		}
@@ -53,8 +56,10 @@ class CommandHSDel : public Command
 
 class CommandHSDelAll : public Command
 {
+	EventHandlers<Event::DeleteVhost> &ondeletevhost;
+
  public:
-	CommandHSDelAll(Module *creator) : Command(creator, "hostserv/delall", 1, 1)
+	CommandHSDelAll(Module *creator, EventHandlers<Event::DeleteVhost> &event) : Command(creator, "hostserv/delall", 1, 1), ondeletevhost(event)
 	{
 		this->SetDesc(_("Delete the vhost for all nicks in a group"));
 		this->SetSyntax(_("\037nick\037"));
@@ -72,7 +77,7 @@ class CommandHSDelAll : public Command
 		NickAlias *na = NickAlias::Find(nick);
 		if (na)
 		{
-			FOREACH_MOD(OnDeleteVhost, (na));
+			this->ondeletevhost(&Event::DeleteVhost::OnDeleteVhost, na);
 			const NickCore *nc = na->nc;
 			for (unsigned i = 0; i < nc->aliases->size(); ++i)
 			{
@@ -100,10 +105,13 @@ class HSDel : public Module
 {
 	CommandHSDel commandhsdel;
 	CommandHSDelAll commandhsdelall;
+	EventHandlers<Event::DeleteVhost> ondeletevhost;
 
  public:
-	HSDel(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		commandhsdel(this), commandhsdelall(this)
+	HSDel(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
+		, commandhsdel(this, ondeletevhost)
+		, commandhsdelall(this, ondeletevhost)
+		, ondeletevhost(this, "OnDeleteVhost")
 	{
 
 	}

@@ -76,6 +76,8 @@ class IdentifyInterface : public LDAPInterface
 };
 
 class LDAPOper : public Module
+	, public EventHook<Event::NickIdentify>
+	, public EventHook<Event::DelCore>
 {
 	ServiceReference<LDAPProvider> ldap;
 	IdentifyInterface iinterface;
@@ -85,8 +87,11 @@ class LDAPOper : public Module
 	Anope::string basedn;
 	Anope::string filter;
  public:
-	LDAPOper(const Anope::string &modname, const Anope::string &creator) :
-		Module(modname, creator, EXTRA | VENDOR), ldap("LDAPProvider", "ldap/main"), iinterface(this)
+	LDAPOper(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, EXTRA | VENDOR)
+		, EventHook<Event::NickIdentify>("OnNickIdentify")
+		, EventHook<Event::DelCore>("OnDelCore")
+		, ldap("LDAPProvider", "ldap/main")
+		, iinterface(this)
 	{
 
 	}

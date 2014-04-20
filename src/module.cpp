@@ -64,8 +64,6 @@ Module::Module(const Anope::string &modname, const Anope::string &, ModType modt
 
 Module::~Module()
 {
-	/* Detach all event hooks for this module */
-	ModuleManager::DetachAll(this);
 	IdentifyRequest::ModuleUnload(this);
 	/* Clear any active timers this module has */
 	TimerManager::DeleteTimersFor(this);

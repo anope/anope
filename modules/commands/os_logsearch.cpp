@@ -147,8 +147,8 @@ class OSLogSearch : public Module
 	CommandOSLogSearch commandoslogsearch;
 
  public:
-	OSLogSearch(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		commandoslogsearch(this)
+	OSLogSearch(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
+		, commandoslogsearch(this)
 	{
 	}
 };

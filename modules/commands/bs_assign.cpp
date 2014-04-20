@@ -10,6 +10,7 @@
  */
 
 #include "module.h"
+#include "modules/bs_info.h"
 
 class CommandBSAssign : public Command
 {
@@ -203,6 +204,8 @@ class CommandBSSetNoBot : public Command
 };
 
 class BSAssign : public Module
+	, public EventHook<Event::Invite>
+	, public EventHook<Event::BotInfoEvent>
 {
 	ExtensibleItem<bool> nobot;
 
@@ -211,9 +214,13 @@ class BSAssign : public Module
 	CommandBSSetNoBot commandbssetnobot;
 
  public:
-	BSAssign(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		nobot(this, "BS_NOBOT"),
-		commandbsassign(this), commandbsunassign(this), commandbssetnobot(this)
+	BSAssign(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
+		, EventHook<Event::Invite>("OnInvite")
+		, EventHook<Event::BotInfoEvent>("OnBotInfoEvent")
+		, nobot(this, "BS_NOBOT")
+		, commandbsassign(this)
+		, commandbsunassign(this)
+		, commandbssetnobot(this)
 	{
 	}
 

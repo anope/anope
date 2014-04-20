@@ -298,15 +298,17 @@ class CommandNSAJoin : public Command
 };
 
 class NSAJoin : public Module
+	, public EventHook<Event::UserLogin>
 {
 	CommandNSAJoin commandnsajoin;
 	ExtensibleItem<AJoinList> ajoinlist;
 	Serialize::Type ajoinentry_type;
 
  public:
-	NSAJoin(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		commandnsajoin(this), ajoinlist(this, "ajoinlist"),
-		ajoinentry_type("AJoinEntry", AJoinEntry::Unserialize)
+	NSAJoin(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
+		, EventHook<Event::UserLogin>("OnUserLogin")
+		, commandnsajoin(this), ajoinlist(this, "ajoinlist")
+		, ajoinentry_type("AJoinEntry", AJoinEntry::Unserialize)
 	{
 
 		if (!IRCD || !IRCD->CanSVSJoin)

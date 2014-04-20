@@ -19,6 +19,7 @@
 #include "socketengine.h"
 #include "servers.h"
 #include "language.h"
+#include "event.h"
 
 #ifndef _WIN32
 #include <sys/wait.h>
@@ -535,7 +536,7 @@ void Anope::Init(int ac, char **av)
 	/* Load up databases */
 	Log() << "Loading databases...";
 	EventReturn MOD_RESULT;
-	FOREACH_RESULT(OnLoadDatabase, MOD_RESULT, ());
+	MOD_RESULT = Event::OnLoadDatabase(&Event::LoadDatabase::OnLoadDatabase);
 	static_cast<void>(MOD_RESULT);
 	Log() << "Databases loaded";
 

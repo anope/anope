@@ -160,7 +160,7 @@ class DHAES : public Mechanism
 				return Err(sess, pubkey);
 
 			SASL::IdentifyRequest* req = new SASL::IdentifyRequest(this->owner, m.source, username, password);
-			FOREACH_MOD(OnCheckAuthentication, (NULL, req));
+			Event::OnCheckAuthentication(&Event::CheckAuthentication::OnCheckAuthentication, nullptr, req);
 			req->Dispatch();
 
 			BN_free(pubkey);
@@ -174,8 +174,8 @@ class ModuleSASLDHAES : public Module
 	DHAES dhaes;
 
  public:
-	ModuleSASLDHAES(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR | EXTRA),
-		dhaes(this)
+	ModuleSASLDHAES(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR | EXTRA)
+		, dhaes(this)
 	{
 	}
 };

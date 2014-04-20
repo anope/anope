@@ -204,8 +204,9 @@ class OSModInfo : public Module
 	CommandOSModList commandosmodlist;
 
  public:
-	OSModInfo(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		commandosmodinfo(this), commandosmodlist(this)
+	OSModInfo(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
+		, commandosmodinfo(this)
+		, commandosmodlist(this)
 	{
 
 	}

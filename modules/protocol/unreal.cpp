@@ -1091,6 +1091,11 @@ struct IRCDMessageUmode2 : IRCDMessage
 };
 
 class ProtoUnreal : public Module
+	, public EventHook<Event::UserNickChange>
+	, public EventHook<Event::ChannelSync>
+	, public EventHook<Event::ChanRegistered>
+	, public EventHook<Event::DelChan>
+	, public EventHook<Event::MLockEvents>
 {
 	UnrealIRCdProto ircd_proto;
 
@@ -1173,22 +1178,53 @@ class ProtoUnreal : public Module
 	}
 
  public:
-	ProtoUnreal(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PROTOCOL | VENDOR),
-		ircd_proto(this),
-		message_away(this), message_error(this), message_invite(this), message_join(this), message_kick(this),
-		message_kill(this), message_motd(this), message_notice(this), message_part(this), message_ping(this),
-		message_privmsg(this), message_quit(this), message_squit(this), message_stats(this), message_time(this),
-		message_version(this), message_whois(this),
+	ProtoUnreal(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PROTOCOL | VENDOR)
+		, EventHook<Event::UserNickChange>("OnUserNickChange", EventHook<Event::UserNickChange>::Priority::FIRST)
+		, EventHook<Event::ChannelSync>("OnChannelSync", EventHook<Event::ChannelSync>::Priority::FIRST)
+		, EventHook<Event::ChanRegistered>("OnChanRegistered", EventHook<Event::ChanRegistered>::Priority::FIRST)
+		, EventHook<Event::DelChan>("OnDelChan", EventHook<Event::DelChan>::Priority::FIRST)
+		, EventHook<Event::MLockEvents>("MLock", EventHook<Event::MLockEvents>::Priority::FIRST)
+		, ircd_proto(this)
+		, message_away(this)
+		, message_error(this)
+		, message_invite(this)
+		, message_join(this)
+		, message_kick(this)
+		, message_kill(this)
+		, message_motd(this)
+		, message_notice(this)
+		, message_part(this)
+		, message_ping(this)
+		, message_privmsg(this)
+		, message_quit(this)
+		, message_squit(this)
+		, message_stats(this)
+		, message_time(this)
+		, message_version(this)
+		, message_whois(this)
 
-		message_capab(this), message_chghost(this), message_chgident(this), message_chgname(this), message_mode(this, "MODE"),
-		message_svsmode(this, "SVSMODE"), message_svs2mode(this, "SVS2MODE"), message_netinfo(this), message_nick(this), message_pong(this),
-		message_sasl(this), message_sdesc(this), message_sethost(this), message_setident(this), message_setname(this), message_server(this),
-		message_sjoin(this), message_topic(this), message_umode2(this)
+		, message_capab(this)
+		, message_chghost(this)
+		, message_chgident(this)
+		, message_chgname(this)
+		, message_mode(this, "MODE")
+		, message_svsmode(this, "SVSMODE")
+		, message_svs2mode(this, "SVS2MODE")
+		, message_netinfo(this)
+		, message_nick(this)
+		, message_pong(this)
+		, message_sasl(this)
+		, message_sdesc(this)
+		, message_sethost(this)
+		, message_setident(this)
+		, message_setname(this)
+		, message_server(this)
+		, message_sjoin(this)
+		, message_topic(this)
+		, message_umode2(this)
 	{
 
 		this->AddModes();
-
-		ModuleManager::SetPriority(this, PRIORITY_FIRST);
 	}
 
 	void OnReload(Configuration::Conf *conf) override

@@ -204,7 +204,7 @@ struct IRCDMessageEncap : IRCDMessage
 			if (u)
 			{
 				u->fingerprint = params[3];
-				FOREACH_MOD(OnFingerprint, (u));
+				Event::OnFingerprint(&Event::Fingerprint::OnFingerprint, u);
 			}
 		}
 		return;
@@ -382,20 +382,41 @@ class ProtoPlexus : public Module
 	}
 
  public:
-	ProtoPlexus(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PROTOCOL | VENDOR),
-		ircd_proto(this),
-		message_away(this), message_capab(this), message_error(this), message_invite(this), message_kick(this), message_kill(this),
-		message_mode(this), message_motd(this), message_notice(this), message_part(this), message_ping(this), message_privmsg(this),
-		message_quit(this), message_squit(this), message_stats(this), message_time(this), message_topic(this), message_version(this),
-		message_whois(this),
+	ProtoPlexus(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PROTOCOL | VENDOR)
+		, ircd_proto(this)
+		, message_away(this)
+		, message_capab(this)
+		, message_error(this)
+		, message_invite(this)
+		, message_kick(this)
+		, message_kill(this)
+		, message_mode(this)
+		, message_motd(this)
+		, message_notice(this)
+		, message_part(this)
+		, message_ping(this)
+		, message_privmsg(this)
+		, message_quit(this)
+		, message_squit(this)
+		, message_stats(this)
+		, message_time(this)
+		, message_topic(this)
+		, message_version(this)
+		, message_whois(this)
 
-		message_bmask("IRCDMessage", "plexus/bmask", "hybrid/bmask"), message_eob("IRCDMessage", "plexus/eob", "hybrid/eob"),
-		message_join("IRCDMessage", "plexus/join", "hybrid/join"), message_nick("IRCDMessage", "plexus/nick", "hybrid/nick"),
-		message_sid("IRCDMessage", "plexus/sid", "hybrid/sid"),
-		message_sjoin("IRCDMessage", "plexus/sjoin", "hybrid/sjoin"), message_tburst("IRCDMessage", "plexus/tburst", "hybrid/tburst"),
-		message_tmode("IRCDMessage", "plexus/tmode", "hybrid/tmode"),
+		, message_bmask("IRCDMessage", "plexus/bmask", "hybrid/bmask")
+		, message_eob("IRCDMessage", "plexus/eob", "hybrid/eob")
+		, message_join("IRCDMessage", "plexus/join", "hybrid/join")
+		, message_nick("IRCDMessage", "plexus/nick", "hybrid/nick")
+		, message_sid("IRCDMessage", "plexus/sid", "hybrid/sid")
+		, message_sjoin("IRCDMessage", "plexus/sjoin", "hybrid/sjoin")
+		, message_tburst("IRCDMessage", "plexus/tburst", "hybrid/tburst")
+		, message_tmode("IRCDMessage", "plexus/tmode", "hybrid/tmode")
 
-		message_encap(this), message_pass(this), message_server(this), message_uid(this)
+		, message_encap(this)
+		, message_pass(this)
+		, message_server(this)
+		, message_uid(this)
 	{
 
 		if (ModuleManager::LoadModule("hybrid", User::Find(creator)) != MOD_ERR_OK)

@@ -117,8 +117,8 @@ class MSIgnore : public Module
 	CommandMSIgnore commandmsignore;
 
  public:
-	MSIgnore(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		commandmsignore(this)
+	MSIgnore(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
+		, commandmsignore(this)
 	{
 	}
 };

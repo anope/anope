@@ -71,3 +71,21 @@ struct BadWords
 	virtual void Check() = 0;
 };
 
+namespace Event
+{
+	struct CoreExport BadWordEvents : Events
+	{
+		/** Called before a badword is added to the badword list
+		 * @param ci The channel
+		 * @param bw The badword
+		 */
+		virtual void OnBadWordAdd(ChannelInfo *ci, const BadWord *bw) anope_abstract;
+
+		/** Called before a badword is deleted from a channel
+		 * @param ci The channel
+		 * @param bw The badword
+		 */
+		virtual void OnBadWordDel(ChannelInfo *ci, const BadWord *bw) anope_abstract;
+	};
+}
+

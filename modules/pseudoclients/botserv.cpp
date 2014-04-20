@@ -10,15 +10,35 @@
  */
 
 #include "module.h"
+#include "modules/help.h"
 
 class BotServCore : public Module
+	, public EventHook<Event::SetCorrectModes>
+	, public EventHook<Event::BotAssign>
+	, public EventHook<Event::JoinChannel>
+	, public EventHook<Event::LeaveChannel>
+	, public EventHook<Event::Help>
+	, public EventHook<Event::ChannelModeSet>
+	, public EventHook<Event::CreateChan>
+	, public EventHook<Event::UserKicked>
+	, public EventHook<Event::CreateBot>
 {
 	Reference<BotInfo> BotServ;
 	ExtensibleRef<bool> persist, inhabit;
 
  public:
-	BotServCore(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PSEUDOCLIENT | VENDOR),
-		persist("PERSIST"), inhabit("inhabit")
+	BotServCore(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PSEUDOCLIENT | VENDOR)
+		, EventHook<Event::SetCorrectModes>("OnSetCorrectModes")
+		, EventHook<Event::BotAssign>("OnBotAssign")
+		, EventHook<Event::JoinChannel>("OnJoinChannel")
+		, EventHook<Event::LeaveChannel>("OnLeaveChannel")
+		, EventHook<Event::Help>("Help")
+		, EventHook<Event::ChannelModeSet>("OnChannelModeSet")
+		, EventHook<Event::CreateChan>("OnCreateChan")
+		, EventHook<Event::UserKicked>("OnUserKicked")
+		, EventHook<Event::CreateBot>("OnCreateBot")
+		, persist("PERSIST")
+		, inhabit("inhabit")
 	{
 	}
 

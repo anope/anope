@@ -170,7 +170,7 @@ class DHBS : public Mechanism
 				return Err(sess, pubkey);
 
 			SASL::IdentifyRequest* req = new SASL::IdentifyRequest(this->owner, m.source, username, password);
-			FOREACH_MOD(OnCheckAuthentication, (NULL, req));
+			Event::OnCheckAuthentication(&Event::CheckAuthentication::OnCheckAuthentication, nullptr, req);
 			req->Dispatch();
 
 			BN_free(pubkey);
@@ -184,8 +184,8 @@ class ModuleSASLDHBS : public Module
 	DHBS dhbs;
 
  public:
-	ModuleSASLDHBS(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR | EXTRA),
-		dhbs(this)
+	ModuleSASLDHBS(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR | EXTRA)
+		, dhbs(this)
 	{
 	}
 };

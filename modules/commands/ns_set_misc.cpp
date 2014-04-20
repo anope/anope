@@ -11,6 +11,8 @@
 
 #include "module.h"
 #include "modules/set_misc.h"
+#include "modules/ns_info.h"
+#include "modules/ns_set.h"
 
 static Module *me;
 
@@ -112,8 +114,7 @@ class CommandNSSetMisc : public Command
 		}
 		NickCore *nc = na->nc;
 
-		EventReturn MOD_RESULT;
-		FOREACH_RESULT(OnSetNickOption, MOD_RESULT, (source, this, nc, param));
+		EventReturn MOD_RESULT = Event::OnSetNickOption(&Event::SetNickOption::OnSetNickOption, source, this, nc, param);
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
@@ -176,14 +177,18 @@ class CommandNSSASetMisc : public CommandNSSetMisc
 };
 
 class NSSetMisc : public Module
+	, public EventHook<Event::NickInfo>
 {
 	CommandNSSetMisc commandnssetmisc;
 	CommandNSSASetMisc commandnssasetmisc;
 	Serialize::Type nsmiscdata_type;
 
  public:
-	NSSetMisc(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		commandnssetmisc(this), commandnssasetmisc(this), nsmiscdata_type("NSMiscData", NSMiscData::Unserialize)
+	NSSetMisc(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
+		, EventHook<Event::NickInfo>("OnNickInfo")
+		, commandnssetmisc(this)
+		, commandnssasetmisc(this)
+		, nsmiscdata_type("NSMiscData", NSMiscData::Unserialize)
 	{
 		me = this;
 	}

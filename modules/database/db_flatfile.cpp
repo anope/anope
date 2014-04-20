@@ -103,6 +103,11 @@ class LoadData : public Serialize::Data
 };
 
 class DBFlatFile : public Module, public Pipe
+	, public EventHook<Event::Restart>
+	, public EventHook<Event::Shutdown>
+	, public EventHook<Event::LoadDatabase>
+	, public EventHook<Event::SaveDatabase>
+	, public EventHook<Event::SerializeTypeCreate>
 {
 	/* Day the last backup was on */
 	int last_day;
@@ -167,7 +172,15 @@ class DBFlatFile : public Module, public Pipe
 	}
 
  public:
-	DBFlatFile(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, DATABASE | VENDOR), last_day(0), loaded(false), child_pid(-1)
+	DBFlatFile(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, DATABASE | VENDOR)
+		, EventHook<Event::Restart>("OnRestart")
+		, EventHook<Event::Shutdown>("OnShutdown")
+		, EventHook<Event::LoadDatabase>("OnLoadDatabase")
+		, EventHook<Event::SaveDatabase>("OnSaveDatabase")
+		, EventHook<Event::SerializeTypeCreate>("OnSerializeTypeCreate")
+		, last_day(0)
+		, loaded(false)
+		, child_pid(-1)
 	{
 
 	}

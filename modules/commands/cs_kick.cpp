@@ -125,7 +125,8 @@ class CSKick : public Module
 	CommandCSKick commandcskick;
 
  public:
-	CSKick(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR), commandcskick(this)
+	CSKick(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
+		, commandcskick(this)
 	{
 
 	}

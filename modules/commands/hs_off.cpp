@@ -53,8 +53,8 @@ class HSOff : public Module
 	CommandHSOff commandhsoff;
 
  public:
-	HSOff(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		commandhsoff(this)
+	HSOff(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
+		, commandhsoff(this)
 	{
 
 	}

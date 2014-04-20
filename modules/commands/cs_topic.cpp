@@ -11,6 +11,8 @@
 
 #include "module.h"
 #include "modules/cs_mode.h"
+#include "modules/cs_info.h"
+#include "modules/cs_set.h"
 
 class CommandCSSetKeepTopic : public Command
 {
@@ -37,7 +39,7 @@ class CommandCSSetKeepTopic : public Command
 		}
 
 		EventReturn MOD_RESULT;
-		FOREACH_RESULT(OnSetChannelOption, MOD_RESULT, (source, this, ci, params[1]));
+		MOD_RESULT = Event::OnSetChannelOption(&Event::SetChannelOption::OnSetChannelOption, source, this, ci, params[1]);
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
@@ -89,7 +91,7 @@ class CommandCSTopic : public Command
 		}
 
 		EventReturn MOD_RESULT;
-		FOREACH_RESULT(OnSetChannelOption, MOD_RESULT, (source, this, ci, "topiclock on"));
+		MOD_RESULT = Event::OnSetChannelOption(&Event::SetChannelOption::OnSetChannelOption, source, this, ci, "topiclock on");
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
@@ -106,7 +108,7 @@ class CommandCSTopic : public Command
 		}
 
 		EventReturn MOD_RESULT;
-		FOREACH_RESULT(OnSetChannelOption, MOD_RESULT, (source, this, ci, "topiclock off"));
+		MOD_RESULT = Event::OnSetChannelOption(&Event::SetChannelOption::OnSetChannelOption, source, this, ci, "topiclock off");
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
@@ -198,6 +200,9 @@ class CommandCSTopic : public Command
 };
 
 class CSTopic : public Module
+	, public EventHook<Event::ChannelSync>
+	, public EventHook<Event::TopicUpdated>
+	, public EventHook<Event::ChanInfo>
 {
 	CommandCSTopic commandcstopic;
 	CommandCSSetKeepTopic commandcssetkeeptopic;
@@ -205,8 +210,14 @@ class CSTopic : public Module
 	SerializableExtensibleItem<bool> topiclock, keeptopic;
 
  public:
-	CSTopic(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		commandcstopic(this), commandcssetkeeptopic(this), topiclock(this, "TOPICLOCK"), keeptopic(this, "KEEPTOPIC")
+	CSTopic(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
+		, EventHook<Event::ChannelSync>("OnChannelSync")
+		, EventHook<Event::TopicUpdated>("OnTopicUpdated")
+		, EventHook<Event::ChanInfo>("OnChanInfo")
+		, commandcstopic(this)
+		, commandcssetkeeptopic(this)
+		, topiclock(this, "TOPICLOCK")
+		, keeptopic(this, "KEEPTOPIC")
 	{
 
 	}

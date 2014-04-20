@@ -10,10 +10,14 @@
  */
 
 #include "module.h"
+#include "modules/bs_bot.h"
 
 class CommandBSBot : public Command
 {
- private:
+	EventHandlers<Event::BotCreate> OnBotCreate;
+	EventHandlers<Event::BotChange> OnBotChange;
+	EventHandlers<Event::BotDelete> OnBotDelete;
+
 	void DoAdd(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		const Anope::string &nick = params[1];
@@ -81,8 +85,7 @@ class CommandBSBot : public Command
 
 		source.Reply(_("%s!%s@%s (%s) added to the bot list."), bi->nick.c_str(), bi->GetIdent().c_str(), bi->host.c_str(), bi->realname.c_str());
 
-		FOREACH_MOD(OnBotCreate, (bi));
-		return;
+		this->OnBotCreate(&Event::BotCreate::OnBotCreate, bi);
 	}
 
 	void DoChange(CommandSource &source, const std::vector<Anope::string> &params)
@@ -220,8 +223,7 @@ class CommandBSBot : public Command
 		source.Reply(_("Bot \002%s\002 has been changed to %s!%s@%s (%s)."), oldnick.c_str(), bi->nick.c_str(), bi->GetIdent().c_str(), bi->host.c_str(), bi->realname.c_str());
 		Log(LOG_ADMIN, source, this) << "CHANGE " << oldnick << " to " << bi->GetMask() << " " << bi->realname;
 
-		FOREACH_MOD(OnBotChange, (bi));
-		return;
+		this->OnBotChange(&Event::BotChange::OnBotChange, bi);
 	}
 
 	void DoDel(CommandSource &source, const std::vector<Anope::string> &params)
@@ -247,16 +249,16 @@ class CommandBSBot : public Command
 			return;
 		}
 
-		FOREACH_MOD(OnBotDelete, (bi));
+		this->OnBotDelete(&Event::BotDelete::OnBotDelete, bi);
 
 		Log(LOG_ADMIN, source, this) << "DEL " << bi->nick;
 
 		source.Reply(_("Bot \002%s\002 has been deleted."), nick.c_str());
 		delete bi;
-		return;
 	}
+
  public:
-	CommandBSBot(Module *creator) : Command(creator, "botserv/bot", 1, 6)
+	CommandBSBot(Module *creator) : Command(creator, "botserv/bot", 1, 6), OnBotCreate(creator, "OnBotCreate"), OnBotChange(creator, "OnBotChange"), OnBotDelete(creator, "OnBotDelete")
 	{
 		this->SetDesc(_("Maintains network bot list"));
 		this->SetSyntax(_("\002ADD \037nick\037 \037user\037 \037host\037 \037real\037\002"));
@@ -367,8 +369,8 @@ class BSBot : public Module
 	CommandBSBot commandbsbot;
 
  public:
-	BSBot(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		commandbsbot(this)
+	BSBot(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
+		, commandbsbot(this)
 	{
 
 	}

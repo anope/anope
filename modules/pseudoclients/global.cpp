@@ -10,8 +10,15 @@
  */
 
 #include "module.h"
+#include "modules/help.h"
+#include "modules/global.h"
 
-class GlobalCore : public Module, public GlobalService
+class GlobalCore : public Module
+	, public Global::GlobalService
+	, public EventHook<Event::Restart>
+	, public EventHook<Event::Shutdown>
+	, public EventHook<Event::NewServer>
+	, public EventHook<Event::Help>
 {
 	Reference<BotInfo> Global;
 
@@ -24,8 +31,12 @@ class GlobalCore : public Module, public GlobalService
 	}
 
  public:
-	GlobalCore(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PSEUDOCLIENT | VENDOR),
-		GlobalService(this)
+	GlobalCore(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PSEUDOCLIENT | VENDOR)
+		, GlobalService(this)
+		, EventHook<Event::Restart>("OnRestart")
+		, EventHook<Event::Shutdown>("OnShutdown")
+		, EventHook<Event::NewServer>("OnNewServer")
+		, EventHook<Event::Help>("OnHelp")
 	{
 	}
 
@@ -89,6 +100,10 @@ class GlobalCore : public Module, public GlobalService
 			return EVENT_CONTINUE;
 		source.Reply(_("%s commands:"), Global->nick.c_str());
 		return EVENT_CONTINUE;
+	}
+
+	void OnPostHelp(CommandSource &source, const std::vector<Anope::string> &params) override
+	{
 	}
 };
 

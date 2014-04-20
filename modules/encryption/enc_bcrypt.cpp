@@ -841,6 +841,8 @@ char *_crypt_gensalt_blowfish_rn(const char *prefix, unsigned long count,
 #include "modules/encryption.h"
 
 class EBCRYPT : public Module
+	, public EventHook<Event::Encrypt>
+	, public EventHook<Event::CheckAuthentication>
 {
 	unsigned int rounds;
 
@@ -873,8 +875,10 @@ class EBCRYPT : public Module
 	}
 
  public:
-	EBCRYPT(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, ENCRYPTION | VENDOR | EXTRA),
-		rounds(10)
+	EBCRYPT(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, ENCRYPTION | VENDOR | EXTRA)
+		, EventHook<Event::Encrypt>("OnEncrypt")
+		, EventHook<Event::CheckAuthentication>("OnCheckAuthentication")
+		, rounds(10)
 	{
 		// Test a pre-calculated hash
 		bool test = Compare("Test!", "$2a$10$x9AQFAQScY0v9KF2suqkEOepsHFrG.CXHbIXI.1F28SfSUb56A/7K");

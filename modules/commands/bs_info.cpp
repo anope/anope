@@ -10,7 +10,9 @@
  *
  *
  */
+
 #include "module.h"
+#include "modules/bs_info.h"
 
 class CommandBSInfo : public Command
 {
@@ -36,8 +38,10 @@ class CommandBSInfo : public Command
 			buffers.push_back(buf);
 	}
 
+	EventHandlers<Event::BotInfoEvent> &onbotinfo;
+
  public:
-	CommandBSInfo(Module *creator) : Command(creator, "botserv/info", 1, 1)
+	CommandBSInfo(Module *creator, EventHandlers<Event::BotInfoEvent> &event) : Command(creator, "botserv/info", 1, 1), onbotinfo(event)
 	{
 		this->SetSyntax(_("{\037channel\037 | \037nickname\037}"));
 	}
@@ -59,7 +63,7 @@ class CommandBSInfo : public Command
 			info[_("Options")] = bi->oper_only ? _("Private") : _("None");
 			info[_("Used on")] = stringify(bi->GetChannelCount()) + " channel(s)";
 
-			FOREACH_MOD(OnBotInfo, (source, bi, ci, info));
+			this->onbotinfo(&Event::BotInfoEvent::OnBotInfo, source, bi, ci, info);
 
 			std::vector<Anope::string> replies;
 			info.Process(replies);
@@ -90,7 +94,7 @@ class CommandBSInfo : public Command
 			Anope::string enabled = Language::Translate(source.nc, _("Enabled"));
 			Anope::string disabled = Language::Translate(source.nc, _("Disabled"));
 
-			FOREACH_MOD(OnBotInfo, (source, bi, ci, info));
+			this->onbotinfo(&Event::BotInfoEvent::OnBotInfo, source, bi, ci, info);
 
 			std::vector<Anope::string> replies;
 			info.Process(replies);
@@ -123,10 +127,11 @@ class CommandBSInfo : public Command
 class BSInfo : public Module
 {
 	CommandBSInfo commandbsinfo;
+	EventHandlers<Event::BotInfoEvent> onbotinfo;
 
  public:
-	BSInfo(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		commandbsinfo(this)
+	BSInfo(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
+		, commandbsinfo(this, onbotinfo), onbotinfo(this, "OnBotInfo")
 	{
 
 	}

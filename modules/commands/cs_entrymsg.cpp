@@ -258,15 +258,18 @@ class CommandEntryMessage : public Command
 };
 
 class CSEntryMessage : public Module
+	, public EventHook<Event::JoinChannel>
 {
 	CommandEntryMessage commandentrymsg;
 	ExtensibleItem<EntryMessageListImpl> eml;
 	Serialize::Type entrymsg_type;
 
  public:
-	CSEntryMessage(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-	commandentrymsg(this),
-	eml(this, "entrymsg"), entrymsg_type("EntryMsg", EntryMsgImpl::Unserialize)
+	CSEntryMessage(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
+		, EventHook<Event::JoinChannel>("OnJoinChannel")
+		, commandentrymsg(this)
+		, eml(this, "entrymsg")
+		, entrymsg_type("EntryMsg", EntryMsgImpl::Unserialize)
 	{
 	}
 

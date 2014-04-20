@@ -62,8 +62,8 @@ class HSOn : public Module
 	CommandHSOn commandhson;
 
  public:
-	HSOn(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		commandhson(this)
+	HSOn(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
+		, commandhson(this)
 	{
 
 	}

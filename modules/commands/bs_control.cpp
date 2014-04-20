@@ -136,8 +136,8 @@ class BSControl : public Module
 	CommandBSAct commandbsact;
 
  public:
-	BSControl(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		commandbssay(this), commandbsact(this)
+	BSControl(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
+		, commandbssay(this), commandbsact(this)
 	{
 
 	}

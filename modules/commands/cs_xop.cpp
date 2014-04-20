@@ -216,7 +216,7 @@ class CommandCSXOP : public Command
 
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to add " << mask;
 
-		FOREACH_MOD(OnAccessAdd, (ci, source, acc));
+		Event::OnAccessAdd(&Event::AccessAdd::OnAccessAdd, ci, source, acc);
 		source.Reply(_("\002%s\002 added to %s %s list."), acc->mask.c_str(), ci->name.c_str(), source.command.c_str());
 	}
 
@@ -325,7 +325,7 @@ class CommandCSXOP : public Command
 						nicks = caccess->mask;
 
 					ci->EraseAccess(number - 1);
-					FOREACH_MOD(OnAccessDel, (ci, source, caccess));
+					Event::OnAccessDel(&Event::AccessDel::OnAccessDel, ci, source, caccess);
 					delete caccess;
 				}
 			}
@@ -348,7 +348,7 @@ class CommandCSXOP : public Command
 					source.Reply(_("\002%s\002 deleted from %s %s list."), a->mask.c_str(), ci->name.c_str(), source.command.c_str());
 
 					ci->EraseAccess(i);
-					FOREACH_MOD(OnAccessDel, (ci, source, a));
+					Event::OnAccessDel(&Event::AccessDel::OnAccessDel, ci, source, a);
 					delete a;
 
 					return;
@@ -475,7 +475,7 @@ class CommandCSXOP : public Command
 			delete ci->EraseAccess(i - 1);
 		}
 
-		FOREACH_MOD(OnAccessClear, (ci, source));
+		Event::OnAccessClear(&Event::AccessClear::OnAccessClear, ci, source);
 
 		source.Reply(_("Channel %s %s list has been cleared."), ci->name.c_str(), source.command.c_str());
 	}
@@ -593,8 +593,9 @@ class CSXOP : public Module
 	CommandCSXOP commandcsxop;
 
  public:
-	CSXOP(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		accessprovider(this), commandcsxop(this)
+	CSXOP(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
+		, accessprovider(this)
+		, commandcsxop(this)
 	{
 		this->SetPermanent(true);
 

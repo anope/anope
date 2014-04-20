@@ -18,6 +18,7 @@
 #include "bots.h"
 #include "language.h"
 #include "sockets.h"
+#include "event.h"
 
 #include <errno.h>
 #include <sys/types.h>
@@ -501,7 +502,7 @@ bool Anope::Match(const Anope::string &str, const Anope::string &mask, bool case
 void Anope::Encrypt(const Anope::string &src, Anope::string &dest)
 {
 	EventReturn MOD_RESULT;
-	FOREACH_RESULT(OnEncrypt, MOD_RESULT, (src, dest));
+	MOD_RESULT = Event::OnEncrypt(&Event::Encrypt::OnEncrypt, src, dest);
 	static_cast<void>(MOD_RESULT);
 }
 
@@ -516,7 +517,7 @@ bool Anope::Decrypt(const Anope::string &src, Anope::string &dest)
 	Anope::string hashm(src.begin(), src.begin() + pos);
 
 	EventReturn MOD_RESULT;
-	FOREACH_RESULT(OnDecrypt, MOD_RESULT, (hashm, src, dest));
+	MOD_RESULT = Event::OnDecrypt(&Event::Decrypt::OnDecrypt, hashm, src, dest);
 	if (MOD_RESULT == EVENT_ALLOW)
 		return true;
 

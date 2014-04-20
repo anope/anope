@@ -121,6 +121,11 @@ class SubscriptionListener : public Interface
 };
 
 class DatabaseRedis : public Module, public Pipe
+	, public EventHook<Event::LoadDatabase>
+	, public EventHook<Event::SerializeTypeCreate>
+	, public EventHook<Event::SerializableConstruct>
+	, public EventHook<Event::SerializableDestruct>
+	, public EventHook<Event::SerializableUpdate>
 {
 	SubscriptionListener sl;
 	std::set<Serializable *> updated_items;
@@ -128,7 +133,13 @@ class DatabaseRedis : public Module, public Pipe
  public:
 	ServiceReference<Provider> redis;
 
-	DatabaseRedis(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, DATABASE | VENDOR), sl(this)
+	DatabaseRedis(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, DATABASE | VENDOR)
+		, EventHook<Event::LoadDatabase>("OnLoadDatabase")
+		, EventHook<Event::SerializeTypeCreate>("OnSerializeTypeCreate")
+		, EventHook<Event::SerializableConstruct>("OnSerializableConstruct")
+		, EventHook<Event::SerializableDestruct>("OnSerializableDestruct")
+		, EventHook<Event::SerializableUpdate>("OnSerializableUpdate")
+		, sl(this)
 	{
 		me = this;
 

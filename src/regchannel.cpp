@@ -19,6 +19,7 @@
 #include "config.h"
 #include "bots.h"
 #include "servers.h"
+#include "event.h"
 
 Serialize::Checker<registered_channel_map> RegisteredChannelList("ChannelInfo");
 
@@ -123,7 +124,7 @@ ChannelInfo::ChannelInfo(const Anope::string &chname) : Serializable("ChannelInf
 	if (old == RegisteredChannelList->size())
 		Log(LOG_DEBUG) << "Duplicate channel " << this->name << " in registered channel table?";
 
-	FOREACH_MOD(OnCreateChan, (this));
+	Event::OnCreateChan(&Event::CreateChan::OnCreateChan, this);
 }
 
 ChannelInfo::ChannelInfo(const ChannelInfo &ci) : Serializable("ChannelInfo"),
@@ -162,12 +163,12 @@ ChannelInfo::ChannelInfo(const ChannelInfo &ci) : Serializable("ChannelInfo"),
 			this->AddAkick(takick->creator, takick->mask, takick->reason, takick->addtime, takick->last_used);
 	}
 
-	FOREACH_MOD(OnCreateChan, (this));
+	Event::OnCreateChan(&Event::CreateChan::OnCreateChan, this);
 }
 
 ChannelInfo::~ChannelInfo()
 {
-	FOREACH_MOD(OnDelChan, (this));
+	Event::OnDelChan(&Event::DelChan::OnDelChan, this);
 
 	Log(LOG_DEBUG) << "Deleting channel " << this->name;
 

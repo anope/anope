@@ -18,6 +18,7 @@
 #include "users.h"
 #include "servers.h"
 #include "config.h"
+#include "event.h"
 
 Serialize::Checker<nickalias_map> NickAliasList("NickAlias");
 
@@ -51,7 +52,7 @@ NickAlias::NickAlias(const Anope::string &nickname, NickCore* nickcore) : Serial
 
 NickAlias::~NickAlias()
 {
-	FOREACH_MOD(OnDelNick, (this));
+	Event::OnDelNick(&Event::DelNick::OnDelNick, this);
 
 	/* Accept nicks that have no core, because of database load functions */
 	if (this->nc)

@@ -10,6 +10,8 @@
 
 #include "module.h"
 #include "modules/set_misc.h"
+#include "modules/cs_info.h"
+#include "modules/cs_set.h"
 
 static Module *me;
 
@@ -112,7 +114,7 @@ class CommandCSSetMisc : public Command
 		}
 
 		EventReturn MOD_RESULT;
-		FOREACH_RESULT(OnSetChannelOption, MOD_RESULT, (source, this, ci, param));
+		MOD_RESULT = Event::OnSetChannelOption(&Event::SetChannelOption::OnSetChannelOption, source, this, ci, param);
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
@@ -163,13 +165,16 @@ class CommandCSSetMisc : public Command
 };
 
 class CSSetMisc : public Module
+	, public EventHook<Event::ChanInfo>
 {
 	CommandCSSetMisc commandcssetmisc;
 	Serialize::Type csmiscdata_type;
 
  public:
-	CSSetMisc(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		commandcssetmisc(this), csmiscdata_type("CSMiscData", CSMiscData::Unserialize)
+	CSSetMisc(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
+		, EventHook<Event::ChanInfo>("OnChanInfo")
+		, commandcssetmisc(this)
+		, csmiscdata_type("CSMiscData", CSMiscData::Unserialize)
 	{
 		me = this;
 	}

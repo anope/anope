@@ -54,8 +54,8 @@ class OSReload : public Module
 	CommandOSReload commandosreload;
 
  public:
-	OSReload(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		commandosreload(this)
+	OSReload(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
+		, commandosreload(this)
 	{
 
 	}

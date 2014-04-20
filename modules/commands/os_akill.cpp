@@ -174,7 +174,7 @@ class CommandOSAKill : public Command
 		}
 
 		EventReturn MOD_RESULT;
-		FOREACH_RESULT(OnAddXLine, MOD_RESULT, (source, x, akills));
+		MOD_RESULT = Event::OnAddXLine(&Event::AddXLine::OnAddXLine, source, x, akills);
 		if (MOD_RESULT == EVENT_STOP)
 		{
 			delete x;
@@ -225,7 +225,7 @@ class CommandOSAKill : public Command
 
 			do
 			{
-				FOREACH_MOD(OnDelXLine, (source, x, akills));
+				Event::OnDelXLine(&Event::DelXLine::OnDelXLine, source, x, akills);
 
 				Log(LOG_ADMIN, source, this) << "to remove " << x->mask << " from the list";
 				source.Reply(_("\002%s\002 deleted from the AKILL list."), x->mask.c_str());
@@ -349,7 +349,7 @@ class CommandOSAKill : public Command
 		for (unsigned i = akills->GetCount(); i > 0; --i)
 		{
 			XLine *x = akills->GetEntry(i - 1);
-			FOREACH_MOD(OnDelXLine, (source, x, akills));
+			Event::OnDelXLine(&Event::DelXLine::OnDelXLine, source, x, akills);
 			akills->DelXLine(x);
 		}
 
@@ -453,8 +453,8 @@ class OSAKill : public Module
 	CommandOSAKill commandosakill;
 
  public:
-	OSAKill(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		commandosakill(this)
+	OSAKill(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
+		, commandosakill(this)
 	{
 
 	}

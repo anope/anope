@@ -221,8 +221,9 @@ class CSUpDown : public Module
 	CommandCSDown commandcsdown;
 
  public:
-	CSUpDown(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		commandcsup(this), commandcsdown(this)
+	CSUpDown(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
+		, commandcsup(this)
+		, commandcsdown(this)
 	{
 
 	}

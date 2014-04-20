@@ -289,19 +289,41 @@ class ProtoRatbox : public Module
 	}
 
  public:
-	ProtoRatbox(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PROTOCOL | VENDOR),
-		ircd_proto(this),
-		message_away(this), message_capab(this), message_error(this), message_invite(this), message_kick(this),
-		message_kill(this), message_mode(this), message_motd(this), message_notice(this), message_part(this),
-		message_ping(this), message_privmsg(this), message_quit(this), message_squit(this), message_stats(this),
-		message_time(this), message_topic(this), message_version(this), message_whois(this),
+	ProtoRatbox(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PROTOCOL | VENDOR)
+		, ircd_proto(this)
+		, message_away(this)
+		, message_capab(this)
+		, message_error(this)
+		, message_invite(this)
+		, message_kick(this)
+		, message_kill(this)
+		, message_mode(this)
+		, message_motd(this)
+		, message_notice(this)
+		, message_part(this)
+		, message_ping(this)
+		, message_privmsg(this)
+		, message_quit(this)
+		, message_squit(this)
+		, message_stats(this)
+		, message_time(this)
+		, message_topic(this)
+		, message_version(this)
+		, message_whois(this)
 
-		message_bmask("IRCDMessage", "ratbox/bmask", "hybrid/bmask"), message_join("IRCDMessage", "ratbox/join", "hybrid/join"),
-		message_nick("IRCDMessage", "ratbox/nick", "hybrid/nick"), message_pong("IRCDMessage", "ratbox/pong", "hybrid/pong"),
-		message_sid("IRCDMessage", "ratbox/sid", "hybrid/sid"), message_sjoin("IRCDMessage", "ratbox/sjoin", "hybrid/sjoin"),
-		message_tmode("IRCDMessage", "ratbox/tmode", "hybrid/tmode"),
+		, message_bmask("IRCDMessage", "ratbox/bmask", "hybrid/bmask")
+		, message_join("IRCDMessage", "ratbox/join", "hybrid/join")
+		, message_nick("IRCDMessage", "ratbox/nick", "hybrid/nick")
+		, message_pong("IRCDMessage", "ratbox/pong", "hybrid/pong")
+		, message_sid("IRCDMessage", "ratbox/sid", "hybrid/sid")
+		, message_sjoin("IRCDMessage", "ratbox/sjoin", "hybrid/sjoin")
+		, message_tmode("IRCDMessage", "ratbox/tmode", "hybrid/tmode")
 
-		message_encap(this), message_pass(this), message_server(this), message_tburst(this), message_uid(this)
+		, message_encap(this)
+		, message_pass(this)
+		, message_server(this)
+		, message_tburst(this)
+		, message_uid(this)
 	{
 
 		if (ModuleManager::LoadModule("hybrid", User::Find(creator)) != MOD_ERR_OK)

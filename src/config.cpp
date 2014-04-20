@@ -17,6 +17,7 @@
 #include "opertype.h"
 #include "channels.h"
 #include "hashcomp.h"
+#include "event.h"
 
 using namespace Configuration;
 
@@ -130,7 +131,8 @@ Conf::Conf() : Block("")
 		this->LoadConf(f);
 	}
 
-	FOREACH_MOD(OnReload, (this));
+	for (Module *m : ModuleManager::Modules)
+		m->OnReload(this);
 
 	/* Check for modified values that aren't allowed to be modified */
 	if (Config)

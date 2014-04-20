@@ -60,8 +60,8 @@ class NSGetPass : public Module
 	CommandNSGetPass commandnsgetpass;
 
  public:
-	NSGetPass(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		commandnsgetpass(this)
+	NSGetPass(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
+		, commandnsgetpass(this)
 	{
 
 		Anope::string tmp_pass = "plain:tmp";

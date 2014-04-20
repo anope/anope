@@ -12,6 +12,8 @@
 #include "module.h"
 #include "modules/bs_badwords.h"
 
+static EventHandlers<Event::BadWordEvents> *bwevents;
+
 struct BadWordImpl : BadWord, Serializable
 {
 	BadWordImpl() : Serializable("BadWord") { }
@@ -46,7 +48,7 @@ struct BadWordsImpl : BadWords
 
 		this->badwords->push_back(bw);
 
-		FOREACH_MOD(OnBadWordAdd, (ci, bw));
+		(*bwevents)(&Event::BadWordEvents::OnBadWordAdd, ci, bw);
 
 		return bw;
 	}
@@ -71,7 +73,7 @@ struct BadWordsImpl : BadWords
 		if (this->badwords->empty() || index >= this->badwords->size())
 			return;
 	
-		FOREACH_MOD(OnBadWordDel, (ci, (*this->badwords)[index]));
+		(*bwevents)(&Event::BadWordEvents::OnBadWordDel, ci, (*this->badwords)[index]);
 
 		delete this->badwords->at(index);
 	}
@@ -457,11 +459,16 @@ class BSBadwords : public Module
 	CommandBSBadwords commandbsbadwords;
 	ExtensibleItem<BadWordsImpl> badwords;
 	Serialize::Type badword_type;
+	EventHandlers<Event::BadWordEvents> events;
 
  public:
-	BSBadwords(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		commandbsbadwords(this), badwords(this, "badwords"), badword_type("BadWord", BadWordImpl::Unserialize)
+	BSBadwords(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
+		, commandbsbadwords(this)
+		, badwords(this, "badwords")
+		, badword_type("BadWord", BadWordImpl::Unserialize)
+		, events(this, "Badwords")
 	{
+		bwevents = &events;
 	}
 };
 

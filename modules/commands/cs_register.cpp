@@ -75,7 +75,7 @@ class CommandCSRegister : public Command
 					c->SetCorrectModes(u, true);
 			}
 
-			FOREACH_MOD(OnChanRegistered, (ci));
+			Event::OnChanRegistered(&Event::ChanRegistered::OnChanRegistered, ci);
 		}
 	}
 
@@ -115,8 +115,8 @@ class CSRegister : public Module
 	CommandCSRegister commandcsregister;
 
  public:
-	CSRegister(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		commandcsregister(this)
+	CSRegister(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
+		, commandcsregister(this)
 	{
 	}
 };

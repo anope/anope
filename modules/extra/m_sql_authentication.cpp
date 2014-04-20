@@ -1,5 +1,6 @@
 #include "module.h"
 #include "modules/sql.h"
+#include "modules/nickserv.h"
 
 static Module *me;
 
@@ -42,7 +43,7 @@ class SQLAuthenticationResult : public SQL::Interface
 		if (na == NULL)
 		{
 			na = new NickAlias(req->GetAccount(), new NickCore(req->GetAccount()));
-			FOREACH_MOD(OnNickRegister, (user, na));
+			NickServ::Event::OnNickRegister(&NickServ::Event::NickRegister::OnNickRegister, user, na);
 			if (user && NickServ)
 				user->SendMessage(NickServ, _("Your account \002%s\002 has been successfully created."), na->nick.c_str());
 		}
@@ -66,6 +67,8 @@ class SQLAuthenticationResult : public SQL::Interface
 };
 
 class ModuleSQLAuthentication : public Module
+	, public EventHook<Event::PreCommand>
+	, public EventHook<Event::CheckAuthentication>
 {
 	Anope::string engine;
 	Anope::string query;
@@ -75,6 +78,8 @@ class ModuleSQLAuthentication : public Module
 
  public:
 	ModuleSQLAuthentication(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, EXTRA | VENDOR)
+		, EventHook<Event::PreCommand>("OnPreCommand")
+		, EventHook<Event::CheckAuthentication>("OnCheckAuthentication")
 	{
 		me = this;
 

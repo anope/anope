@@ -204,7 +204,8 @@ class ESHA1 : public Module
 		, EventHook<Event::CheckAuthentication>("OnCheckAuthentication")
 		, sha1provider(this)
 	{
-
+		if (ModuleManager::FindFirstOf(ENCRYPTION) == this)
+			throw ModuleException("enc_sha1 is deprecated and can not be used as a primary encryption method");
 	}
 
 	EventReturn OnEncrypt(const Anope::string &src, Anope::string &dest) override

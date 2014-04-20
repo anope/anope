@@ -48,6 +48,8 @@ class EOld : public Module
 		, EventHook<Event::CheckAuthentication>("OnCheckAuthentication")
 		, oldmd5provider(this)
 	{
+		if (ModuleManager::FindFirstOf(ENCRYPTION) == this)
+			throw ModuleException("enc_old is deprecated and can not be used as a primary encryption method");
 
 		ModuleManager::LoadModule("enc_md5", User::Find(creator));
 		if (!md5)

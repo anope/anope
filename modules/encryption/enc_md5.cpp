@@ -349,7 +349,8 @@ class EMD5 : public Module
 		, EventHook<Event::CheckAuthentication>("OnCheckAuthentication")
 		, md5provider(this)
 	{
-
+		if (ModuleManager::FindFirstOf(ENCRYPTION) == this)
+			throw ModuleException("enc_md5 is deprecated and can not be used as a primary encryption method");
 	}
 
 	EventReturn OnEncrypt(const Anope::string &src, Anope::string &dest) override

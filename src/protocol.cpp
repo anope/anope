@@ -276,7 +276,7 @@ void IRCDProto::SendNickChange(User *u, const Anope::string &newnick)
 
 void IRCDProto::SendForceNickChange(User *u, const Anope::string &newnick, time_t when)
 {
-	UplinkSocket::Message() << "SVSNICK " << u->nick << " " << newnick << " " << when;
+	UplinkSocket::Message() << "SVSNICK " << u->GetUID() << " " << newnick << " " << when;
 }
 
 void IRCDProto::SendCTCP(const MessageSource &source, const Anope::string &dest, const char *fmt, ...)

@@ -480,7 +480,7 @@ class ChanServCore : public Module
 		}
 	}
 
-	EventReturn OnChannelModeSet(Channel *c, MessageSource &setter, ChannelMode *mode, const Anope::string &param) override
+	EventReturn OnChannelModeSet(Channel *c, const MessageSource &setter, ChannelMode *mode, const Anope::string &param) override
 	{
 		if (!always_lower && Anope::CurTime == c->creation_time && c->ci && setter.GetUser() && !setter.GetUser()->server->IsULined())
 		{

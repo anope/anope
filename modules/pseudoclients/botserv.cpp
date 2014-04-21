@@ -194,7 +194,7 @@ class BotServCore : public Module
 				"one of the following characters: %s"), fantasycharacters.c_str());
 	}
 
-	EventReturn OnChannelModeSet(Channel *c, MessageSource &source, ChannelMode *mode, const Anope::string &param) override
+	EventReturn OnChannelModeSet(Channel *c, const MessageSource &source, ChannelMode *mode, const Anope::string &param) override
 	{
 		if (source.GetUser() && !source.GetBot() && Config->GetModule(this)->Get<bool>("smartjoin") && mode->name == "BAN" && c->ci && c->ci->bi && c->FindUser(c->ci->bi))
 		{

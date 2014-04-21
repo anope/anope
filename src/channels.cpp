@@ -249,7 +249,7 @@ std::pair<Channel::ModeList::iterator, Channel::ModeList::iterator> Channel::Get
 	return std::make_pair(it, it_end);
 }
 
-void Channel::SetModeInternal(MessageSource &setter, ChannelMode *cm, const Anope::string &param, bool enforce_mlock)
+void Channel::SetModeInternal(const MessageSource &setter, ChannelMode *cm, const Anope::string &param, bool enforce_mlock)
 {
 	if (!cm)
 		return;
@@ -316,7 +316,7 @@ void Channel::SetModeInternal(MessageSource &setter, ChannelMode *cm, const Anop
 	this->CheckModes();
 }
 
-void Channel::RemoveModeInternal(MessageSource &setter, ChannelMode *cm, const Anope::string &param, bool enforce_mlock)
+void Channel::RemoveModeInternal(const MessageSource &setter, ChannelMode *cm, const Anope::string &param, bool enforce_mlock)
 {
 	if (!cm)
 		return;
@@ -435,8 +435,7 @@ void Channel::SetMode(BotInfo *bi, ChannelMode *cm, const Anope::string &param, 
 	}
 
 	ModeManager::StackerAdd(bi, this, cm, true, param);
-	MessageSource ms(bi);
-	SetModeInternal(ms, cm, param, enforce_mlock);
+	SetModeInternal(bi, cm, param, enforce_mlock);
 }
 
 void Channel::SetMode(BotInfo *bi, const Anope::string &mname, const Anope::string &param, bool enforce_mlock)
@@ -486,8 +485,7 @@ void Channel::RemoveMode(BotInfo *bi, ChannelMode *cm, const Anope::string &para
 	}
 
 	ModeManager::StackerAdd(bi, this, cm, false, realparam);
-	MessageSource ms(bi);
-	RemoveModeInternal(ms, cm, realparam, enforce_mlock);
+	RemoveModeInternal(bi, cm, realparam, enforce_mlock);
 }
 
 void Channel::RemoveMode(BotInfo *bi, const Anope::string &mname, const Anope::string &param, bool enforce_mlock)

@@ -763,7 +763,7 @@ namespace Event
 		 * @param param The mode param, if there is one
 		 * @return EVENT_STOP to make mlock/secureops etc checks not happen
 		 */
-		virtual EventReturn OnChannelModeSet(Channel *c, MessageSource &setter, ChannelMode *mode, const Anope::string &param) anope_abstract;
+		virtual EventReturn OnChannelModeSet(Channel *c, const MessageSource &setter, ChannelMode *mode, const Anope::string &param) anope_abstract;
 	};
 	extern CoreExport EventHandlers<ChannelModeSet> OnChannelModeSet;
 
@@ -776,7 +776,7 @@ namespace Event
 		 * @param param The mode param, if there is one
 		 * @return EVENT_STOP to make mlock/secureops etc checks not happen
 		 */
-		virtual EventReturn OnChannelModeUnset(Channel *c, MessageSource &setter, ChannelMode *mode, const Anope::string &param) anope_abstract;
+		virtual EventReturn OnChannelModeUnset(Channel *c, const MessageSource &setter, ChannelMode *mode, const Anope::string &param) anope_abstract;
 	};
 	extern CoreExport EventHandlers<ChannelModeUnset> OnChannelModeUnset;
 

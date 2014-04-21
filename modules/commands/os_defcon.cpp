@@ -432,7 +432,7 @@ class OSDefcon : public Module
 		this->ParseModeString();
 	}
 
-	EventReturn OnChannelModeSet(Channel *c, MessageSource &source, ChannelMode *mode, const Anope::string &param) override
+	EventReturn OnChannelModeSet(Channel *c, const MessageSource &source, ChannelMode *mode, const Anope::string &param) override
 	{
 		if (DConfig.Check(DEFCON_FORCE_CHAN_MODES) && DConfig.DefConModesOff.count(mode->name) && source.GetUser() && !source.GetBot())
 		{
@@ -444,7 +444,7 @@ class OSDefcon : public Module
 		return EVENT_CONTINUE;
 	}
 
-	EventReturn OnChannelModeUnset(Channel *c, MessageSource &source, ChannelMode *mode, const Anope::string &) override
+	EventReturn OnChannelModeUnset(Channel *c, const MessageSource &source, ChannelMode *mode, const Anope::string &) override
 	{
 		if (DConfig.Check(DEFCON_FORCE_CHAN_MODES) && DConfig.DefConModesOn.count(mode->name) && source.GetUser() && !source.GetBot())
 		{

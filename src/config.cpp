@@ -116,7 +116,6 @@ Conf::Conf() : Block("")
 {
 	ReadTimeout = 0;
 	UsePrivmsg = DefPrivmsg = false;
-	regex_flags = 0;
 
 	this->LoadConf(ServicesConf);
 

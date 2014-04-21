@@ -1310,7 +1310,7 @@ class CSSet : public Module
 		persist.Unset(ci);
 	}
 
-	EventReturn OnChannelModeSet(Channel *c, MessageSource &setter, ChannelMode *mode, const Anope::string &param) override
+	EventReturn OnChannelModeSet(Channel *c, const MessageSource &setter, ChannelMode *mode, const Anope::string &param) override
 	{
 		if (c->ci)
 		{
@@ -1325,7 +1325,7 @@ class CSSet : public Module
 		return EVENT_CONTINUE;
 	}
 
-	EventReturn OnChannelModeUnset(Channel *c, MessageSource &setter, ChannelMode *mode, const Anope::string &param) override
+	EventReturn OnChannelModeUnset(Channel *c, const MessageSource &setter, ChannelMode *mode, const Anope::string &param) override
 	{
 		if (mode->name == "PERM")
 		{

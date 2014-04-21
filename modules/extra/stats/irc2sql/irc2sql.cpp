@@ -212,7 +212,7 @@ void IRC2SQL::OnJoinChannel(User *u, Channel *c)
 	this->RunQuery(query);
 }
 
-EventReturn IRC2SQL::OnChannelModeSet(Channel *c, MessageSource &setter, ChannelMode *mode, const Anope::string &param)
+EventReturn IRC2SQL::OnChannelModeSet(Channel *c, const MessageSource &setter, ChannelMode *mode, const Anope::string &param)
 {
 	query = "UPDATE `" + prefix + "chan` SET modes=@modes@ WHERE channel=@channel@";
 	query.SetValue("channel", c->name);
@@ -221,7 +221,7 @@ EventReturn IRC2SQL::OnChannelModeSet(Channel *c, MessageSource &setter, Channel
 	return EVENT_CONTINUE;
 }
 
-EventReturn IRC2SQL::OnChannelModeUnset(Channel *c, MessageSource &setter, ChannelMode *mode, const Anope::string &param)
+EventReturn IRC2SQL::OnChannelModeUnset(Channel *c, const MessageSource &setter, ChannelMode *mode, const Anope::string &param)
 {
 	this->OnChannelModeSet(c, setter, mode, param);
 	return EVENT_CONTINUE;

@@ -66,8 +66,8 @@ class IRC2SQL : public Module
 	void OnChannelDelete(Channel *c) override;
 	void OnLeaveChannel(User *u, Channel *c) override;
 	void OnJoinChannel(User *u, Channel *c) override;
-	EventReturn OnChannelModeSet(Channel *c, MessageSource &setter, ChannelMode *mode, const Anope::string &param) override;
-	EventReturn OnChannelModeUnset(Channel *c, MessageSource &setter, ChannelMode *mode, const Anope::string &param) override;
+	EventReturn OnChannelModeSet(Channel *c, const MessageSource &setter, ChannelMode *mode, const Anope::string &param) override;
+	EventReturn OnChannelModeUnset(Channel *c, const MessageSource &setter, ChannelMode *mode, const Anope::string &param) override;
 
 	void OnTopicUpdated(Channel *c, const Anope::string &user, const Anope::string &topic) override;
 

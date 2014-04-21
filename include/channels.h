@@ -147,7 +147,7 @@ class CoreExport Channel : public Base, public Extensible
 	 * @param param The param
 	 * @param enforce_mlock true if mlocks should be enforced, false to override mlock
 	 */
-	void SetModeInternal(MessageSource &source, ChannelMode *cm, const Anope::string &param = "", bool enforce_mlock = true);
+	void SetModeInternal(const MessageSource &source, ChannelMode *cm, const Anope::string &param = "", bool enforce_mlock = true);
 
 	/** Remove a mode internally on a channel, this is not sent out to the IRCd
 	 * @param setter The Setter
@@ -155,7 +155,7 @@ class CoreExport Channel : public Base, public Extensible
 	 * @param param The param
 	 * @param enforce_mlock true if mlocks should be enforced, false to override mlock
 	 */
-	void RemoveModeInternal(MessageSource &source, ChannelMode *cm, const Anope::string &param = "", bool enforce_mlock = true);
+	void RemoveModeInternal(const MessageSource &source, ChannelMode *cm, const Anope::string &param = "", bool enforce_mlock = true);
 
 	/** Set a mode on a channel
 	 * @param bi The client setting the modes

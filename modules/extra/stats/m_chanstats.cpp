@@ -528,13 +528,13 @@ class MChanstats : public Module
 		this->RunQuery(query);
 	}
 
-	EventReturn OnChannelModeSet(Channel *c, MessageSource &setter, ChannelMode *mode, const Anope::string &param) override
+	EventReturn OnChannelModeSet(Channel *c, const MessageSource &setter, ChannelMode *mode, const Anope::string &param) override
 	{
 		this->OnModeChange(c, setter.GetUser());
 		return EVENT_CONTINUE;
 	}
 
-	EventReturn OnChannelModeUnset(Channel *c, MessageSource &setter, ChannelMode *, const Anope::string &param) override
+	EventReturn OnChannelModeUnset(Channel *c, const MessageSource &setter, ChannelMode *, const Anope::string &param) override
 	{
 		this->OnModeChange(c, setter.GetUser());
 		return EVENT_CONTINUE;

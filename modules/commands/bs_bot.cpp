@@ -189,7 +189,10 @@ class CommandBSBot : public Command
 		}
 
 		if (!user.empty())
+		{
 			IRCD->SendQuit(bi, "Quit: Be right back");
+			bi->introduced = false;
+		}
 		else
 			IRCD->SendNickChange(bi, nick);
 
@@ -204,18 +207,7 @@ class CommandBSBot : public Command
 			bi->realname = real;
 
 		if (!user.empty())
-		{
-			IRCD->SendClientIntroduction(bi);
-			unsigned minusers = Config->GetBlock("botserv")->Get<unsigned>("minusers");
-			const std::set<ChannelInfo *> &channels = bi->GetChannels();
-			for (std::set<ChannelInfo *>::const_iterator it = channels.begin(), it_end = channels.end(); it != it_end; ++it)
-			{
-				const ChannelInfo *ci = *it;
-
-				if (ci->c && ci->c->users.size() >= minusers)
-					bi->Join(ci->c);
-			}
-		}
+			bi->OnKill();
 
 		source.Reply(_("Bot \002%s\002 has been changed to %s!%s@%s (%s)."), oldnick.c_str(), bi->nick.c_str(), bi->GetIdent().c_str(), bi->host.c_str(), bi->realname.c_str());
 		Log(LOG_ADMIN, source, this) << "CHANGE " << oldnick << " to " << bi->GetMask() << " " << bi->realname;

@@ -103,7 +103,12 @@ Anope::string XLine::GetHost() const
 			return this->mask.substr(host_t + 1);
 	}
 	else
-		return "";
+	{
+		if (real_t != Anope::string::npos)
+			return this->mask.substr(0, real_t);
+		else
+			return this->mask;
+	}
 }
 
 Anope::string XLine::GetReal() const

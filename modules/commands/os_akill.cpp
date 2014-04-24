@@ -160,6 +160,11 @@ class CommandOSAKill : public Command
 			source.Reply(USERHOST_MASK_TOO_WIDE, mask.c_str());
 			return;
 		}
+		else if (mask.find('@') == Anope::string::npos)
+		{
+			source.Reply(BAD_USERHOST_MASK);
+			return;
+		}
 
 		if (Config->GetModule("operserv")->Get<bool>("addakiller", "yes") && !source.GetNick().empty())
 			reason = "[" + source.GetNick() + "] " + reason;

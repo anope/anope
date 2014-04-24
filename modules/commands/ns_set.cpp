@@ -330,7 +330,7 @@ class CommandNSSetDisplay : public Command
 			return;
 		}
 
-		const NickAlias *user_na = NickAlias::Find(user), *na = NickAlias::Find(param);
+		NickAlias *user_na = NickAlias::Find(user), *na = NickAlias::Find(param);
 
 		if (Config->GetModule("nickserv")->Get<bool>("nonicknameownership"))
 		{
@@ -356,6 +356,8 @@ class CommandNSSetDisplay : public Command
 		Log(user_na->nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to change the display of " << user_na->nc->display << " to " << na->nick;
 
 		user_na->nc->SetDisplay(na);
+		if (source.GetUser())
+			IRCD->SendLogin(source.GetUser(), na);
 		source.Reply(NICK_SET_DISPLAY_CHANGED, user_na->nc->display.c_str());
 	}
 

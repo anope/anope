@@ -258,6 +258,12 @@ class OSStats : public Module
 	{
 
 	}
+
+	void OnUserConnect(User *u, bool &exempt) anope_override
+	{
+		if (UserListByNick.size() == MaxUserCount && Anope::CurTime == MaxUserTime)
+			stats_saver.QueueUpdate();
+	}
 };
 
 MODULE_INIT(OSStats)

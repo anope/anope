@@ -128,6 +128,9 @@ void Join::SJoin(MessageSource &source, const Anope::string &chan, time_t ts, co
 		User *u = it->second;
 		keep_their_modes = ts <= c->creation_time; // OnJoinChannel can call modules which can modify this channel's ts
 
+		if (c->FindUser(u))
+			continue;
+
 		/* Add the user to the channel */
 		c->JoinUser(u, keep_their_modes ? &status : NULL);
 

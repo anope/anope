@@ -206,12 +206,13 @@ class ModuleProxyScan : public Module
 
 		void Tick(time_t) anope_override
 		{
-			for (std::set<ProxyConnect *>::iterator it = ProxyConnect::proxies.begin(), it_end = ProxyConnect::proxies.end(); it != it_end; ++it)
+			for (std::set<ProxyConnect *>::iterator it = ProxyConnect::proxies.begin(), it_end = ProxyConnect::proxies.end(); it != it_end;)
 			{
 				ProxyConnect *p = *it;
+				++it;
 
 				if (p->created + this->GetSecs() < Anope::CurTime)
-					p->flags[SF_DEAD] = true;
+					delete p;
 			}
 		}
 	} connectionTimeout;

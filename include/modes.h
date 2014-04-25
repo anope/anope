@@ -96,6 +96,9 @@ class CoreExport UserModeParam : public UserMode
 class CoreExport ChannelMode : public Mode
 {
  public:
+	/* channel modes that can posssibly unwrap this mode */
+	std::vector<ChannelMode *> listeners;
+
 	/** constructor
 	 * @param name The mode name
 	 * @param mc The mode char
@@ -103,6 +106,18 @@ class CoreExport ChannelMode : public Mode
 	ChannelMode(const Anope::string &name, char mc);
 
 	bool CanSet(User *u) const anope_override;
+
+	/** 'wrap' this channel mode and param to the underlying mode and param
+	 */
+	virtual ChannelMode *Wrap(Anope::string &param);
+
+	/** 'unwrap' this mode to our internal representation
+	 */
+	ChannelMode *Unwrap(Anope::string &param);
+
+	/** called when a mode is being unwrapped, and is asking us if we can unwrap it
+	 */
+	virtual ChannelMode *Unwrap(ChannelMode *, Anope::string &param);
 };
 
 /** This is a mode for lists, eg b/e/I. These modes should inherit from this
@@ -186,6 +201,25 @@ class CoreExport ChannelModeStatus : public ChannelMode
 	ChannelModeStatus(const Anope::string &name, char mc, char msymbol, short mlevel);
 };
 
+/** A virtual mode. This mode doesn't natively exist on the IRCd (like extbans),
+ * but we still have a representation for it.
+ */
+template<typename T>
+class ChannelModeVirtual : public T
+{
+	Anope::string base;
+	ChannelMode *basech;
+
+ public:
+	ChannelModeVirtual(const Anope::string &mname, const Anope::string &basename);
+
+	~ChannelModeVirtual();
+
+	ChannelMode *Wrap(Anope::string &param) anope_override;
+
+	ChannelMode *Unwrap(ChannelMode *cm, Anope::string &param) = 0;
+};
+
 /* The status a user has on a channel (+v, +h, +o) etc */
 class CoreExport ChannelStatus
 {
@@ -257,13 +291,6 @@ class CoreExport ChannelModeNoone : public ChannelMode
  */
 class CoreExport ModeManager
 {
- protected:
-	/* Array of all modes Anope knows about. Modes are in this array at position
-	 * modechar. Additionally, status modes are in this array (again) at statuschar.
-	 */
-	static std::vector<ChannelMode *> ChannelModes;
-	static std::vector<UserMode *> UserModes;
-
  public:
 
 	/* Number of generic channel and user modes we are tracking */

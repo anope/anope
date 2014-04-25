@@ -248,10 +248,13 @@ std::pair<Channel::ModeList::iterator, Channel::ModeList::iterator> Channel::Get
 	return std::make_pair(it, it_end);
 }
 
-void Channel::SetModeInternal(MessageSource &setter, ChannelMode *cm, const Anope::string &param, bool enforce_mlock)
+void Channel::SetModeInternal(MessageSource &setter, ChannelMode *ocm, const Anope::string &oparam, bool enforce_mlock)
 {
-	if (!cm)
+	if (!ocm)
 		return;
+
+	Anope::string param = oparam;
+	ChannelMode *cm = ocm->Unwrap(param);
 
 	EventReturn MOD_RESULT;
 
@@ -315,10 +318,13 @@ void Channel::SetModeInternal(MessageSource &setter, ChannelMode *cm, const Anop
 	this->CheckModes();
 }
 
-void Channel::RemoveModeInternal(MessageSource &setter, ChannelMode *cm, const Anope::string &param, bool enforce_mlock)
+void Channel::RemoveModeInternal(MessageSource &setter, ChannelMode *ocm, const Anope::string &oparam, bool enforce_mlock)
 {
-	if (!cm)
+	if (!ocm)
 		return;
+
+	Anope::string param = oparam;
+	ChannelMode *cm = ocm->Unwrap(param);
 
 	EventReturn MOD_RESULT;
 
@@ -433,9 +439,12 @@ void Channel::SetMode(BotInfo *bi, ChannelMode *cm, const Anope::string &param, 
 		this->chanserv_modecount++;
 	}
 
-	ModeManager::StackerAdd(bi, this, cm, true, param);
+	Anope::string wparam = param;
+	ChannelMode *wcm = cm->Wrap(wparam);
+
+	ModeManager::StackerAdd(bi, this, wcm, true, wparam);
 	MessageSource ms(bi);
-	SetModeInternal(ms, cm, param, enforce_mlock);
+	SetModeInternal(ms, wcm, wparam, enforce_mlock);
 }
 
 void Channel::SetMode(BotInfo *bi, const Anope::string &mname, const Anope::string &param, bool enforce_mlock)
@@ -484,9 +493,12 @@ void Channel::RemoveMode(BotInfo *bi, ChannelMode *cm, const Anope::string &para
 		this->chanserv_modecount++;
 	}
 
-	ModeManager::StackerAdd(bi, this, cm, false, realparam);
+	Anope::string wparam = realparam;
+	ChannelMode *wcm = cm->Wrap(wparam);
+
+	ModeManager::StackerAdd(bi, this, wcm, false, wparam);
 	MessageSource ms(bi);
-	RemoveModeInternal(ms, cm, realparam, enforce_mlock);
+	RemoveModeInternal(ms, wcm, wparam, enforce_mlock);
 }
 
 void Channel::RemoveMode(BotInfo *bi, const Anope::string &mname, const Anope::string &param, bool enforce_mlock)
@@ -849,21 +861,21 @@ void Channel::SetCorrectModes(User *user, bool give_modes)
 	}
 }
 
-bool Channel::Unban(User *u, bool full)
+bool Channel::Unban(User *u, const Anope::string &mode, bool full)
 {
-	if (!this->HasMode("BAN"))
+	if (!this->HasMode(mode))
 		return false;
 
 	bool ret = false;
 
-	std::pair<Channel::ModeList::iterator, Channel::ModeList::iterator> bans = this->GetModeList("BAN");
+	std::pair<Channel::ModeList::iterator, Channel::ModeList::iterator> bans = this->GetModeList(mode);
 	for (; bans.first != bans.second;)
 	{
-		Entry ban("BAN", bans.first->second);
+		Entry ban(mode, bans.first->second);
 		++bans.first;
 		if (ban.Matches(u, full))
 		{
-			this->RemoveMode(NULL, "BAN", ban.GetMask());
+			this->RemoveMode(NULL, mode, ban.GetMask());
 			ret = true;
 		}
 	}

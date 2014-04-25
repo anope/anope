@@ -138,6 +138,8 @@ namespace Configuration
 		Block *GetModule(const Anope::string &name);
 
 		BotInfo *GetClient(const Anope::string &name);
+
+		Block *GetCommand(CommandSource &);
 	};
 
 	struct Uplink

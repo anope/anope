@@ -620,6 +620,21 @@ BotInfo *Conf::GetClient(const Anope::string &cname)
 	return GetClient(cname);
 }
 
+Block *Conf::GetCommand(CommandSource &source)
+{
+	const Anope::string &block_name = source.c ? "fantasy" : "command";
+
+	for (std::pair<block_map::iterator, block_map::iterator> iters = blocks.equal_range(block_name); iters.first != iters.second; ++iters.first)
+	{
+		Block *b = &iters.first->second;
+
+		if (b->Get<Anope::string>("name") == source.command)
+			return b;
+	}
+
+	return NULL;
+}
+
 File::File(const Anope::string &n, bool e) : name(n), executable(e), fp(NULL)
 {
 }

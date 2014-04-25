@@ -14,7 +14,12 @@
 
 struct Stats : Serializable
 {
-	Stats() : Serializable("Stats") { }
+	static Stats *me;
+
+	Stats() : Serializable("Stats")
+	{
+		me = this;
+	}
 
 	void Serialize(Serialize::Data &data) const anope_override
 	{
@@ -26,7 +31,7 @@ struct Stats : Serializable
 	{
 		data["maxusercnt"] >> MaxUserCount;
 		data["maxusertime"] >> MaxUserTime;
-		return NULL;
+		return me;
 	}
 };
 

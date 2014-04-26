@@ -587,11 +587,11 @@ static struct StatusSort
 void ModeManager::RebuildStatusModes()
 {
 	ChannelModesByStatus.clear();
-	for (unsigned j = 0; j < ModeManager::GetChannelModes().size(); ++j)
+	for (unsigned j = 0; j < ChannelModesIdx.size(); ++j)
 	{
-		ChannelMode *cm = ModeManager::GetChannelModes()[j];
+		ChannelMode *cm = ChannelModesIdx[j];
 
-		if (cm->type == MODE_STATUS && std::find(ChannelModesByStatus.begin(), ChannelModesByStatus.end(), cm) == ChannelModesByStatus.end())
+		if (cm && cm->type == MODE_STATUS && std::find(ChannelModesByStatus.begin(), ChannelModesByStatus.end(), cm) == ChannelModesByStatus.end())
 			ChannelModesByStatus.push_back(anope_dynamic_static_cast<ChannelModeStatus *>(cm));
 	}
 	std::sort(ChannelModesByStatus.begin(), ChannelModesByStatus.end(), statuscmp);

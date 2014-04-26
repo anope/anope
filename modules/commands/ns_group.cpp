@@ -321,7 +321,7 @@ class CommandNSGList : public Command
 
 			Anope::string expires;
 			if (na2->HasExt("NS_NO_EXPIRE"))
-				expires = "Does not expire";
+				expires = NO_EXPIRE;
 			else if (!nickserv_expire || Anope::NoExpire)
 				;
 			else if (na2->nc->HasExt("UNCONFIRMED") && unconfirmed_expire)

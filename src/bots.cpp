@@ -55,6 +55,7 @@ BotInfo::~BotInfo()
 	if (Me && Me->IsSynced())
 	{
 		IRCD->SendQuit(this, "");
+		FOREACH_MOD(OnUserQuit, (this, ""));
 		this->introduced = false;
 		XLine x(this->nick);
 		IRCD->SendSQLineDel(&x);

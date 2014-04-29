@@ -35,6 +35,8 @@ struct Stats : Serializable
 	}
 };
 
+Stats *Stats::me;
+
 /**
  * Count servers connected to server s
  * @param s The server to start counting from

@@ -702,6 +702,8 @@ struct IRCDMessageCapab : Message::Capab
 
 					ModeManager::RebuildStatusModes();
 				}
+				else if (capab == "GLOBOPS=1")
+					Servers::Capab.insert("GLOBOPS");
 			}
 		}
 		else if (params[0].equals_cs("END"))

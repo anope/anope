@@ -743,8 +743,9 @@ class CoreExport Module : public Extensible
 	/** Called when a nick is registered
 	 * @param user The user registering the nick, of any
 	 * @param The nick
+	 * @param pass The password of the newly registered nick
 	 */
-	virtual void OnNickRegister(User *user, NickAlias *na) { throw NotImplementedException(); }
+	virtual void OnNickRegister(User *user, NickAlias *na, const Anope::string &pass) { throw NotImplementedException(); }
 
 	/** Called when a nick is suspended
 	 * @param na The nick alias

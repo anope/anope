@@ -104,7 +104,7 @@ class IdentifyInterface : public LDAPInterface
 					{
 						na = new NickAlias(ii->req->GetAccount(), new NickCore(ii->req->GetAccount()));
 						na->last_realname = ii->user ? ii->user->realname : ii->req->GetAccount();
-						FOREACH_MOD(OnNickRegister, (ii->user, na));
+						FOREACH_MOD(OnNickRegister, (ii->user, na, ii->req->GetPassword()));
 						BotInfo *NickServ = Config->GetClient("NickServ");
 						if (ii->user && NickServ)
 							ii->user->SendMessage(NickServ, _("Your account \002%s\002 has been successfully created."), na->nick.c_str());
@@ -300,7 +300,7 @@ class NSIdentifyLDAP : public Module
 		}
 	}
 
-	void OnNickRegister(User *, NickAlias *na) anope_override
+	void OnNickRegister(User *, NickAlias *na, const Anope::string &pass) anope_override
 	{
 		if (!this->disable_register_reason.empty() || !this->ldap)
 			return;
@@ -326,7 +326,7 @@ class NSIdentifyLDAP : public Module
 			}
 
 			attributes[3].name = this->password_attribute;
-			attributes[3].values.push_back(na->nc->pass);
+			attributes[3].values.push_back(pass);
 
 			Anope::string new_dn = username_attribute + "=" + na->nick + "," + basedn;
 			this->ldap->Add(&this->orinterface, new_dn, attributes);

@@ -207,6 +207,20 @@ class NSSuspend : public Module
 	CommandNSUnSuspend commandnsunsuspend;
 	ExtensibleItem<NSSuspendInfo> suspend;
 	Serialize::Type suspend_type;
+	std::vector<Anope::string> show;
+
+	struct trim
+	{
+		Anope::string operator()(Anope::string s) const
+		{
+			return s.trim();
+		}
+	};
+
+	bool Show(CommandSource &source, const Anope::string &what) const
+	{
+		return source.IsOper() || std::find(show.begin(), show.end(), what) != show.end();
+	}
 
  public:
 	NSSuspend(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
@@ -215,21 +229,29 @@ class NSSuspend : public Module
 	{
 	}
 
+	void OnReload(Configuration::Conf *conf) anope_override
+	{
+		Anope::string s = conf->GetModule(this)->Get<Anope::string>("show");
+		commasepstream(s).GetTokens(show);
+		std::transform(show.begin(), show.end(), show.begin(), trim());
+	}
+
 	void OnNickInfo(CommandSource &source, NickAlias *na, InfoFormatter &info, bool show_hidden) anope_override
 	{
 		NSSuspendInfo *s = suspend.Get(na->nc);
-		if (s)
-		{
+		if (!s)
+			return;
+
+		if (show_hidden || Show(source, "suspended"))
 			info[_("Suspended")] = _("This nickname is \002suspended\002.");
-			if (!s->by.empty())
-				info[_("Suspended by")] = s->by;
-			if (!s->reason.empty())
-				info[_("Suspend reason")] = s->reason;
-			if (s->when)
-				info[_("Suspended on")] = Anope::strftime(s->when, source.GetAccount(), true);
-			if (s->expires)
-				info[_("Suspension expires")] = Anope::strftime(s->expires, source.GetAccount(), true);
-		}
+		if (!s->by.empty() && (show_hidden || Show(source, "by")))
+			info[_("Suspended by")] = s->by;
+		if (!s->reason.empty() && (show_hidden || Show(source, "reason")))
+			info[_("Suspend reason")] = s->reason;
+		if (s->when && (show_hidden || Show(source, "on")))
+			info[_("Suspended on")] = Anope::strftime(s->when, source.GetAccount(), true);
+		if (s->expires && (show_hidden || Show(source, "expires")))
+			info[_("Suspension expires")] = Anope::strftime(s->expires, source.GetAccount(), true);
 	}
 
 	void OnPreNickExpire(NickAlias *na, bool &expire) anope_override

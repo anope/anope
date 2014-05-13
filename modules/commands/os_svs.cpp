@@ -117,10 +117,10 @@ class CommandOSSVSJoin : public Command
 class CommandOSSVSPart : public Command
 {
  public:
-	CommandOSSVSPart(Module *creator) : Command(creator, "operserv/svspart", 2, 2)
+	CommandOSSVSPart(Module *creator) : Command(creator, "operserv/svspart", 2, 3)
 	{
 		this->SetDesc(_("Forcefully part a user from a channel"));
-		this->SetSyntax(_("\037nick\037 \037channel\037"));
+		this->SetSyntax(_("\037nick\037 \037channel\037 [\037reason\037]"));
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
@@ -133,6 +133,7 @@ class CommandOSSVSPart : public Command
 
 		User *target = User::Find(params[0], true);
 		Channel *c = Channel::Find(params[1]);
+		const Anope::string &reason = params.size() > 2 ? params[2] : "";
 		if (target == NULL)
 			source.Reply(NICK_X_NOT_IN_USE, params[0].c_str());
 		else if (source.GetUser() != target && (target->IsProtected() || target->server == Me))
@@ -143,8 +144,11 @@ class CommandOSSVSPart : public Command
 			source.Reply(_("\002%s\002 is not in \002%s\002."), target->nick.c_str(), c->name.c_str());
 		else
 		{
-			IRCD->SendSVSPart(*source.service, target, params[1], "");
-			Log(LOG_ADMIN, source, this) << "to force " << target->nick << " to part " << c->name;
+			IRCD->SendSVSPart(*source.service, target, params[1], reason);
+			if (!reason.empty())
+				Log(LOG_ADMIN, source, this) << "to force " << target->nick << " to part " << c->name << " with reason " << reason;
+			else
+				Log(LOG_ADMIN, source, this) << "to force " << target->nick << " to part " << c->name;
 			source.Reply(_("\002%s\002 has been parted from \002%s\002."), target->nick.c_str(), c->name.c_str());
 		}
 	}

@@ -82,7 +82,7 @@ static const char Pad64 = '=';
 void Anope::B64Encode(const Anope::string &src, Anope::string &target)
 {
 	size_t src_pos = 0, src_len = src.length();
-	unsigned char input[3];
+	unsigned char input[3] = { '\0', '\0', '\0' };
 
 	target.clear();
 

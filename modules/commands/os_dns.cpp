@@ -653,7 +653,7 @@ class CommandOSDNS : public Command
 	}
 
  public:
-	CommandOSDNS(Module *creator) : Command(creator, "operserv/dns", 0, 3)
+	CommandOSDNS(Module *creator) : Command(creator, "operserv/dns", 0, 4)
 	{
 		this->SetDesc(_("Manage DNS zones for this network"));
 		this->SetSyntax(_("ADDZONE \037zone.name\037"));

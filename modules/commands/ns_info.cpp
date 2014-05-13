@@ -62,9 +62,13 @@ class CommandNSInfo : public Command
 
 			if (nick_online)
 			{
+				bool shown = false;
 				if (show_hidden && !na->last_realhost.empty())
+				{
 					info[_("Online from")] = na->last_realhost;
-				if (show_hidden || !na->nc->HasExt("HIDE_MASK"))
+					shown = true;
+				}
+				if ((show_hidden || !na->nc->HasExt("HIDE_MASK")) && (!shown || na->last_usermask != na->last_realhost))
 					info[_("Online from")] = na->last_usermask;
 				else
 					source.Reply(_("%s is currently online."), na->nick.c_str());

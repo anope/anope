@@ -547,7 +547,7 @@ class ChannelModeFlood : public ChannelModeParam
 	ChannelModeFlood(char modeChar, bool minusNoArg) : ChannelModeParam("FLOOD", modeChar, minusNoArg) { }
 
 	/* Borrowed part of this check from UnrealIRCd */
-	bool IsValid(const Anope::string &value) const anope_override
+	bool IsValid(Anope::string &value) const anope_override
 	{
 		if (value.empty())
 			return false;

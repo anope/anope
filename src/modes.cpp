@@ -175,6 +175,13 @@ ChannelModeList::ChannelModeList(const Anope::string &cm, char mch) : ChannelMod
 	this->type = MODE_LIST;
 }
 
+bool ChannelModeList::IsValid(Anope::string &mask) const
+{
+	if (name == "BAN" || name == "EXCEPT" || name == "INVITEOVERRIDE")
+		mask = IRCD->NormalizeMask(mask);
+	return true;
+}
+
 ChannelModeParam::ChannelModeParam(const Anope::string &cm, char mch, bool ma) : ChannelMode(cm, mch), minus_no_arg(ma)
 {
 	this->type = MODE_PARAM;
@@ -231,7 +238,7 @@ bool UserModeNoone::CanSet(User *u) const
 	return false;
 }
 
-bool ChannelModeKey::IsValid(const Anope::string &value) const
+bool ChannelModeKey::IsValid(Anope::string &value) const
 {
 	if (!value.empty() && value.find(':') == Anope::string::npos && value.find(',') == Anope::string::npos)
 		return true;
@@ -796,7 +803,7 @@ Entry::Entry(const Anope::string &m, const Anope::string &fh) : name(m), mask(fh
 
 					this->host = cidr_ip;
 
-					Log(LOG_DEBUG) << "Ban " << this->mask << " has cidr " << this->cidr_len;
+					Log(LOG_DEBUG) << "Ban " << m << " has cidr " << this->cidr_len;
 				}
 			}
 			catch (const ConvertException &) { }
@@ -810,6 +817,14 @@ Entry::Entry(const Anope::string &m, const Anope::string &fh) : name(m), mask(fh
 const Anope::string Entry::GetMask() const
 {
 	return this->mask;
+}
+
+const Anope::string Entry::GetNUHMask() const
+{
+	Anope::string n = nick.empty() ? "*" : nick,
+			u = user.empty() ? "*" : user,
+			h = host.empty() ? "*" : host;
+	return n + "!" + u + "@" + h;
 }
 
 bool Entry::Matches(User *u, bool full) const

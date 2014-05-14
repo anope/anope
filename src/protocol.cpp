@@ -387,6 +387,11 @@ unsigned IRCDProto::GetMaxListFor(Channel *c)
 	return c->HasMode("LBAN") ? 0 : Config->GetBlock("networkinfo")->Get<int>("modelistsize");
 }
 
+Anope::string IRCDProto::NormalizeMask(const Anope::string &mask)
+{
+	return Entry("", mask).GetNUHMask();
+}
+
 MessageSource::MessageSource(const Anope::string &src) : source(src), u(NULL), s(NULL)
 {
 	/* no source for incoming message is our uplink */

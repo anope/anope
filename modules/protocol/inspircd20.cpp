@@ -239,7 +239,7 @@ class ColonDelimitedParamMode : public ChannelModeParam
  public:
 	ColonDelimitedParamMode(const Anope::string &modename, char modeChar) : ChannelModeParam(modename, modeChar, true) { }
 
-	bool IsValid(const Anope::string &value) const anope_override
+	bool IsValid(Anope::string &value) const anope_override
 	{
 		return IsValid(value, false);
 	}
@@ -288,7 +288,7 @@ class SimpleNumberParamMode : public ChannelModeParam
  public:
 	SimpleNumberParamMode(const Anope::string &modename, char modeChar) : ChannelModeParam(modename, modeChar, true) { }
 
-	bool IsValid(const Anope::string &value) const anope_override
+	bool IsValid(Anope::string &value) const anope_override
 	{
 		if (value.empty())
 			return false; // empty param is never valid
@@ -313,11 +313,12 @@ class ChannelModeFlood : public ColonDelimitedParamMode
  public:
 	ChannelModeFlood(char modeChar) : ColonDelimitedParamMode("FLOOD", modeChar) { }
 
-	bool IsValid(const Anope::string &value) const anope_override
+	bool IsValid(Anope::string &value) const anope_override
 	{
 		// The parameter of this mode is a bit different, it may begin with a '*',
 		// ignore it if that's the case
-		return ((!value.empty()) && (ColonDelimitedParamMode::IsValid(value[0] == '*' ? value.substr(1) : value)));
+		Anope::string v = value[0] == '*' ? value.substr(1) : value;
+		return ((!value.empty()) && (ColonDelimitedParamMode::IsValid(v)));
 	}
 };
 
@@ -326,7 +327,7 @@ class ChannelModeHistory : public ColonDelimitedParamMode
  public:
 	ChannelModeHistory(char modeChar) : ColonDelimitedParamMode("HISTORY", modeChar) { }
 
-	bool IsValid(const Anope::string &value) const anope_override
+	bool IsValid(Anope::string &value) const anope_override
 	{
 		return (ColonDelimitedParamMode::IsValid(value, true));
 	}
@@ -337,7 +338,7 @@ class ChannelModeRedirect : public ChannelModeParam
  public:
 	ChannelModeRedirect(char modeChar) : ChannelModeParam("REDIRECT", modeChar, true) { }
 
-	bool IsValid(const Anope::string &value) const anope_override
+	bool IsValid(Anope::string &value) const anope_override
 	{
 		// The parameter of this mode is a channel, and channel names start with '#'
 		return ((!value.empty()) && (value[0] == '#'));

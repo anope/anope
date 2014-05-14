@@ -88,7 +88,7 @@ class CoreExport UserModeParam : public UserMode
 	 * @param value The param
 	 * @return true or false
 	 */
-	virtual bool IsValid(const Anope::string &value) const { return true; }
+	virtual bool IsValid(Anope::string &value) const { return true; }
 };
 
 /** This class is a channel mode, all channel modes use this/inherit from this
@@ -135,7 +135,7 @@ class CoreExport ChannelModeList : public ChannelMode
 	 * @param mask The mask
 	 * @return true for yes, false for no
 	 */
-	virtual bool IsValid(const Anope::string &mask) const { return true; }
+	virtual bool IsValid(Anope::string &mask) const;
 
 	/** Checks if mask affects user
 	 * Should only be used for extbans or other weird ircd-specific things.
@@ -177,7 +177,7 @@ class CoreExport ChannelModeParam : public ChannelMode
 	 * @param value The param
 	 * @return true for yes, false for no
 	 */
-	virtual bool IsValid(const Anope::string &value) const { return true; }
+	virtual bool IsValid(Anope::string &value) const { return true; }
 };
 
 /** This is a mode that is a channel status, eg +v/h/o/a/q.
@@ -259,7 +259,7 @@ class CoreExport ChannelModeKey : public ChannelModeParam
  public:
 	ChannelModeKey(char mc) : ChannelModeParam("KEY", mc) { }
 
-	bool IsValid(const Anope::string &value) const anope_override;
+	bool IsValid(Anope::string &value) const anope_override;
 };
 
 /** This class is used for oper only channel modes
@@ -403,6 +403,8 @@ class CoreExport Entry
 	 * @return The mask
 	 */
 	const Anope::string GetMask() const;
+
+	const Anope::string GetNUHMask() const;
 
 	/** Check if this entry matches a user
 	 * @param u The user

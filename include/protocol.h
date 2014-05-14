@@ -232,6 +232,8 @@ class CoreExport IRCDProto : public Service
 	 * Defaults to Config->ListSize
 	 */
 	virtual unsigned GetMaxListFor(Channel *c);
+
+	virtual Anope::string NormalizeMask(const Anope::string &mask);
 };
 
 class CoreExport MessageSource

@@ -400,6 +400,7 @@ void Channel::RemoveModeInternal(MessageSource &setter, ChannelMode *ocm, const 
 
 void Channel::SetMode(BotInfo *bi, ChannelMode *cm, const Anope::string &param, bool enforce_mlock)
 {
+	Anope::string wparam = param;
 	if (!cm)
 		return;
 	/* Don't set modes already set */
@@ -408,11 +409,11 @@ void Channel::SetMode(BotInfo *bi, ChannelMode *cm, const Anope::string &param, 
 	else if (cm->type == MODE_PARAM)
 	{
 		ChannelModeParam *cmp = anope_dynamic_static_cast<ChannelModeParam *>(cm);
-		if (!cmp->IsValid(param))
+		if (!cmp->IsValid(wparam))
 			return;
 
 		Anope::string cparam;
-		if (GetParam(cm->name, cparam) && cparam.equals_cs(param))
+		if (GetParam(cm->name, cparam) && cparam.equals_cs(wparam))
 			return;
 	}
 	else if (cm->type == MODE_STATUS)
@@ -424,7 +425,11 @@ void Channel::SetMode(BotInfo *bi, ChannelMode *cm, const Anope::string &param, 
 	else if (cm->type == MODE_LIST)
 	{
 		ChannelModeList *cml = anope_dynamic_static_cast<ChannelModeList *>(cm);
-		if (this->HasMode(cm->name, param) || !cml->IsValid(param))
+
+		if (!cml->IsValid(wparam))
+			return;
+
+		if (this->HasMode(cm->name, wparam))
 			return;
 	}
 
@@ -439,7 +444,6 @@ void Channel::SetMode(BotInfo *bi, ChannelMode *cm, const Anope::string &param, 
 		this->chanserv_modecount++;
 	}
 
-	Anope::string wparam = param;
 	ChannelMode *wcm = cm->Wrap(wparam);
 
 	ModeManager::StackerAdd(bi, this, wcm, true, wparam);

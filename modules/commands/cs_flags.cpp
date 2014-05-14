@@ -142,7 +142,7 @@ class CommandCSFlags : public Command
 		for (current_idx = ci->GetAccessCount(); current_idx > 0; --current_idx)
 		{
 			ChanAccess *access = ci->GetAccess(current_idx - 1);
-			if (mask.equals_ci(access->mask))
+			if (mask.equals_ci(access->Mask()))
 			{
 				// Flags allows removing others that have the same access as you,
 				// but no other access system does.
@@ -260,8 +260,7 @@ class CommandCSFlags : public Command
 		if (!provider)
 			return;
 		FlagsChanAccess *access = anope_dynamic_static_cast<FlagsChanAccess *>(provider->Create());
-		access->ci = ci;
-		access->mask = mask;
+		access->SetMask(mask, ci);
 		access->creator = source.GetNick();
 		access->last_seen = current ? current->last_seen : 0;
 		access->created = Anope::CurTime;
@@ -278,12 +277,12 @@ class CommandCSFlags : public Command
 		if (p != NULL)
 		{
 			if (add)
-				source.Reply(_("Privilege \002%s\002 added to \002%s\002 on \002%s\002, new flags are +\002%s\002"), p->name.c_str(), access->mask.c_str(), ci->name.c_str(), access->AccessSerialize().c_str());
+				source.Reply(_("Privilege \002%s\002 added to \002%s\002 on \002%s\002, new flags are +\002%s\002"), p->name.c_str(), access->Mask().c_str(), ci->name.c_str(), access->AccessSerialize().c_str());
 			else
-				source.Reply(_("Privilege \002%s\002 removed from \002%s\002 on \002%s\002, new flags are +\002%s\002"), p->name.c_str(), access->mask.c_str(), ci->name.c_str(), access->AccessSerialize().c_str());
+				source.Reply(_("Privilege \002%s\002 removed from \002%s\002 on \002%s\002, new flags are +\002%s\002"), p->name.c_str(), access->Mask().c_str(), ci->name.c_str(), access->AccessSerialize().c_str());
 		}
 		else
-			source.Reply(_("Flags for \002%s\002 on %s set to +\002%s\002"), access->mask.c_str(), ci->name.c_str(), access->AccessSerialize().c_str());
+			source.Reply(_("Flags for \002%s\002 on %s set to +\002%s\002"), access->Mask().c_str(), ci->name.c_str(), access->AccessSerialize().c_str());
 	}
 
 	void DoList(CommandSource &source, ChannelInfo *ci, const std::vector<Anope::string> &params)
@@ -317,14 +316,14 @@ class CommandCSFlags : public Command
 					if (pass == false)
 						continue;
 				}
-				else if (!Anope::Match(access->mask, arg))
+				else if (!Anope::Match(access->Mask(), arg))
 					continue;
 			}
 
 			ListFormatter::ListEntry entry;
 			++count;
 			entry["Number"] = stringify(i + 1);
-			entry["Mask"] = access->mask;
+			entry["Mask"] = access->Mask();
 			entry["Flags"] = flags;
 			entry["Creator"] = access->creator;
 			entry["Created"] = Anope::strftime(access->created, source.nc, true);

@@ -143,8 +143,7 @@ ChannelInfo::ChannelInfo(const ChannelInfo &ci) : Serializable("ChannelInfo"),
 		AccessProvider *provider = taccess->provider;
 
 		ChanAccess *newaccess = provider->Create();
-		newaccess->ci = this;
-		newaccess->mask = taccess->mask;
+		newaccess->SetMask(taccess->Mask(), this);
 		newaccess->creator = taccess->creator;
 		newaccess->last_seen = taccess->last_seen;
 		newaccess->created = taccess->created;
@@ -399,19 +398,6 @@ BotInfo *ChannelInfo::WhoSends() const
 void ChannelInfo::AddAccess(ChanAccess *taccess)
 {
 	this->access->push_back(taccess);
-
-	const NickAlias *na = NickAlias::Find(taccess->mask);
-	if (na != NULL)
-	{
-		na->nc->AddChannelReference(this);
-		taccess->nc = na->nc;
-	}
-	else
-	{
-		ChannelInfo *ci = ChannelInfo::Find(taccess->mask);
-		if (ci != NULL)
-			ci->AddChannelReference(this->name);
-	}
 }
 
 ChanAccess *ChannelInfo::GetAccess(unsigned index) const

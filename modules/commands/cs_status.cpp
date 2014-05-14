@@ -61,7 +61,7 @@ public:
 				{
 					ChanAccess *acc = ag[i];
 
-					source.Reply(_("\002%s\002 matches access entry %s, which has privilege %s."), nick.c_str(), acc->mask.c_str(), acc->AccessSerialize().c_str());
+					source.Reply(_("\002%s\002 matches access entry %s, which has privilege %s."), nick.c_str(), acc->Mask().c_str(), acc->AccessSerialize().c_str());
 				}
 			}
 

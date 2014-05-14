@@ -151,9 +151,8 @@ ChanAccess::~ChanAccess()
 		if (it != this->ci->access->end())
 			this->ci->access->erase(it);
 
-		const NickAlias *na = NickAlias::Find(this->mask);
-		if (na != NULL)
-			na->nc->RemoveChannelReference(this->ci);
+		if (nc != NULL)
+			nc->RemoveChannelReference(this->ci);
 		else
 		{
 			ChannelInfo *c = ChannelInfo::Find(this->mask);
@@ -161,6 +160,50 @@ ChanAccess::~ChanAccess()
 				c->RemoveChannelReference(this->ci->name);
 		}
 	}
+}
+
+void ChanAccess::SetMask(const Anope::string &m, ChannelInfo *c)
+{
+	if (nc != NULL)
+		nc->RemoveChannelReference(this->ci);
+	else if (!this->mask.empty())
+	{
+		ChannelInfo *targc = ChannelInfo::Find(this->mask);
+		if (targc)
+			targc->RemoveChannelReference(this->ci->name);
+	}
+
+	ci = c;
+	mask.clear();
+	nc = NULL;
+
+	const NickAlias *na = NickAlias::Find(m);
+	if (na != NULL)
+	{
+		nc = na->nc;
+		nc->AddChannelReference(ci);
+	}
+	else
+	{
+		mask = m;
+
+		ChannelInfo *targci = ChannelInfo::Find(mask);
+		if (targci != NULL)
+			targci->AddChannelReference(ci->name);
+	}
+}
+
+const Anope::string &ChanAccess::Mask() const
+{
+	if (nc)
+		return nc->display;
+	else
+		return mask;
+}
+
+NickCore *ChanAccess::GetAccount() const
+{
+	return nc;
 }
 
 void ChanAccess::Serialize(Serialize::Data &data) const
@@ -192,7 +235,9 @@ Serializable* ChanAccess::Unserialize(Serializable *obj, Serialize::Data &data)
 	else
 		access = aprovider->Create();
 	access->ci = ci;
-	data["mask"] >> access->mask;
+	Anope::string m;
+	data["mask"] >> m;
+	access->SetMask(m, ci);
 	data["creator"] >> access->creator;
 	data["last_seen"] >> access->last_seen;
 	data["created"] >> access->created;

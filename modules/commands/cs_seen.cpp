@@ -241,7 +241,7 @@ class CommandSeen : public Command
 		{
 			ChanAccess *a = ag[i];
 
-			if (*a->nc == na->nc && a->last_seen > last)
+			if (a->GetAccount() == na->nc && a->last_seen > last)
 				last = a->last_seen;
 		}
 

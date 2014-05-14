@@ -898,7 +898,7 @@ static void LoadChannels()
 					Anope::string mask;
 					READ(read_string(mask, f));
 					if (access)
-						access->mask = mask;
+						access->SetMask(mask, ci);
 
 					READ(read_int32(&tmp32, f));
 					if (access)

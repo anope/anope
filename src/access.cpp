@@ -210,7 +210,7 @@ void ChanAccess::Serialize(Serialize::Data &data) const
 {
 	data["provider"] << this->provider->name;
 	data["ci"] << this->ci->name;
-	data["mask"] << this->mask;
+	data["mask"] << this->Mask();
 	data["creator"] << this->creator;
 	data.SetType("last_seen", Serialize::Data::DT_INT); data["last_seen"] << this->last_seen;
 	data.SetType("created", Serialize::Data::DT_INT); data["created"] << this->created;

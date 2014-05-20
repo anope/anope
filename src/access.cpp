@@ -151,7 +151,7 @@ ChanAccess::~ChanAccess()
 		if (it != this->ci->access->end())
 			this->ci->access->erase(it);
 
-		if (nc != NULL)
+		if (*nc != NULL)
 			nc->RemoveChannelReference(this->ci);
 		else
 		{
@@ -164,7 +164,7 @@ ChanAccess::~ChanAccess()
 
 void ChanAccess::SetMask(const Anope::string &m, ChannelInfo *c)
 {
-	if (nc != NULL)
+	if (*nc != NULL)
 		nc->RemoveChannelReference(this->ci);
 	else if (!this->mask.empty())
 	{

@@ -68,10 +68,11 @@ User::User(const Anope::string &snick, const Anope::string &sident, const Anope:
 	this->Login(account);
 	this->UpdateHost();
 
-	if (sserver && sserver->IsSynced()) // Our bots are introduced on startup with no server
+	if (sserver) // Our bots are introduced on startup with no server
 	{
 		++sserver->users;
-		Log(this, "connect") << (!vhost.empty() && vhost != host ? "(" + vhost + ") " : "") << "(" << srealname << ") " << (!sip.empty() && sip != host ? "[" + sip + "] " : "") << "connected to the network (" << sserver->GetName() << ")";
+		if (server->IsSynced())
+			Log(this, "connect") << (!vhost.empty() && vhost != host ? "(" + vhost + ") " : "") << "(" << srealname << ") " << (!sip.empty() && sip != host ? "[" + sip + "] " : "") << "connected to the network (" << sserver->GetName() << ")";
 	}
 
 	if (UserListByNick.size() > MaxUserCount)

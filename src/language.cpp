@@ -76,19 +76,12 @@ const char *Language::Translate(const NickCore *nc, const char *string)
 
 #if GETTEXT_FOUND
 
-/* Used by gettext to make it always dynamically load language strings (so we can drop them in while Anope is running) */
 extern "C" int _nl_msg_cat_cntr;
 
 const char *Language::Translate(const char *lang, const char *string)
 {
 	if (!string || !*string)
 		return "";
-	
-	if (!lang || !*lang)
-		lang = Config->DefLanguage.c_str();
-	
-	if (Anope::string(lang) == "en")
-		return string;
 
 	++_nl_msg_cat_cntr;
 #ifdef _WIN32

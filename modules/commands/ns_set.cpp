@@ -794,7 +794,7 @@ class CommandNSSetLanguage : public Command
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
-		if (param != "en")
+		if (param != "en_US")
 			for (unsigned j = 0; j < Language::Languages.size(); ++j)
 			{
 				if (Language::Languages[j] == param)
@@ -826,7 +826,7 @@ class CommandNSSetLanguage : public Command
 				"\037language\037 should be chosen from the following list of\n"
 				"supported languages:"));
 
-		source.Reply("         en (English)");
+		source.Reply("         en_US (English)");
 		for (unsigned j = 0; j < Language::Languages.size(); ++j)
 		{
 			const Anope::string &langname = Language::Translate(Language::Languages[j].c_str(), _("English"));

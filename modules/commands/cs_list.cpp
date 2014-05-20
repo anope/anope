@@ -10,6 +10,7 @@
  */
 
 #include "module.h"
+#include "modules/cs_mode.h"
 
 class CommandCSList : public Command
 {
@@ -87,6 +88,11 @@ class CommandCSList : public Command
 					continue;
 				if (ci->c && ci->c->HasMode("SECRET"))
 					continue;
+
+				ModeLocks *ml = ci->GetExt<ModeLocks>("modelocks");
+				const ModeLock *secret = ml ? ml->GetMLock("SECRET") : NULL;
+				if (secret && secret->set)
+					continue;
 			}
 
 			if (suspended && !ci->HasExt("CS_SUSPENDED"))
@@ -95,7 +101,7 @@ class CommandCSList : public Command
 			if (channoexpire && !ci->HasExt("CS_NO_EXPIRE"))
 				continue;
 
-			if (pattern.equals_ci(ci->name) || ci->name.equals_ci(spattern) || Anope::Match(ci->name, pattern, false, true) || Anope::Match(ci->name, spattern, false, true))
+			if (pattern.equals_ci(ci->name) || ci->name.equals_ci(spattern) || Anope::Match(ci->name, pattern, false, true) || Anope::Match(ci->name, spattern, false, true) || Anope::Match(ci->desc, pattern, false, true) || Anope::Match(ci->last_topic, pattern, false, true))
 			{
 				if (((count + 1 >= from && count + 1 <= to) || (!from && !to)) && ++nchans <= listmax)
 				{

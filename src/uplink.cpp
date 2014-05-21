@@ -77,7 +77,7 @@ UplinkSocket::~UplinkSocket()
 			{
 				/* Don't use quitmsg here, it may contain information you don't want people to see */
 				IRCD->SendQuit(u, "Shutting down");
-				BotInfo* bi = BotInfo::Find(u->nick);
+				BotInfo* bi = BotInfo::Find(u->GetUID());
 				if (bi != NULL)
 					bi->introduced = false;
 			}
@@ -195,14 +195,7 @@ UplinkSocket::Message::~Message()
 		return;
 	}
 
-	if (!message_source.empty())
-	{
-		UplinkSock->Write(":" + message_source + " " + this->buffer.str());
-		Log(LOG_RAWIO) << "Sent: :" << message_source << " " << this->buffer.str();
-	}
-	else
-	{
-		UplinkSock->Write(this->buffer.str());
-		Log(LOG_RAWIO) << "Sent: " << this->buffer.str();
-	}
+	Anope::string sent = IRCD->Format(message_source, this->buffer.str());
+	UplinkSock->Write(sent);
+	Log(LOG_RAWIO) << "Sent: " << sent;
 }

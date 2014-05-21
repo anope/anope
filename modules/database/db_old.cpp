@@ -719,7 +719,7 @@ static void LoadBots()
 		READ(read_int32(&created, f));
 		READ(read_int16(&chancount, f));
 
-		BotInfo *bi = BotInfo::Find(nick);
+		BotInfo *bi = BotInfo::Find(nick, true);
 		if (!bi)
 			bi = new BotInfo(nick, user, host, real);
 		bi->created = created;
@@ -975,7 +975,7 @@ static void LoadChannels()
 			}
 
 			READ(read_string(buffer, f));
-			ci->bi = BotInfo::Find(buffer);
+			ci->bi = BotInfo::Find(buffer, true);
 
 			READ(read_int32(&tmp32, f));
 			if (tmp32 & OLD_BS_DONTKICKOPS)

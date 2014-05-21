@@ -23,10 +23,6 @@ extern CoreExport Server *Me;
 
 namespace Servers
 {
-	/* Retrieves the next free TS6 UID or SID */
-	extern CoreExport const Anope::string TS6_UID_Retrieve();
-	extern CoreExport const Anope::string TS6_SID_Retrieve();
-
 	/* Gets our uplink. Note we don't actually have an "uplink", this is just
 	 * the only server whose uplink *is* Me that is not a juped server.
 	 * @return Our uplink, or NULL if not uplinked to anything

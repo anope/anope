@@ -340,7 +340,7 @@ class ModuleProxyScan : public Module
 
 		if (!this->con_notice.empty() && !this->con_source.empty())
 		{
-			BotInfo *bi = BotInfo::Find(this->con_source);
+			BotInfo *bi = BotInfo::Find(this->con_source, true);
 			if (bi)
 				user->SendMessage(bi, this->con_notice);
 		}

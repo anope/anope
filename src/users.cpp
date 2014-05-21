@@ -118,7 +118,7 @@ User* User::OnIntroduce(const Anope::string &snick, const Anope::string &sident,
 	// How IRCds handle collisions varies a lot, for safety well just always kill both sides
 	// With properly set qlines, this can almost never happen anyway
 
-	User *u = User::Find(snick);
+	User *u = User::Find(snick, true);
 	if (u)
 	{
 		Collide(u, !suid.empty() ? suid : snick, "Nick collision");
@@ -814,18 +814,19 @@ bool User::BadPassword()
 
 User* User::Find(const Anope::string &name, bool nick_only)
 {
-	if (!nick_only && isdigit(name[0]) && IRCD->RequiresID)
+	if (!nick_only && IRCD->RequiresID)
 	{
 		user_map::iterator it = UserListByUID.find(name);
 		if (it != UserListByUID.end())
 			return it->second;
+
+		if (IRCD->AmbiguousID)
+			return NULL;
 	}
-	else
-	{
-		user_map::iterator it = UserListByNick.find(name);
-		if (it != UserListByNick.end())
-			return it->second;
-	}
+
+	user_map::iterator it = UserListByNick.find(name);
+	if (it != UserListByNick.end())
+		return it->second;
 
 	return NULL;
 }

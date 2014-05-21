@@ -527,7 +527,7 @@ void Anope::Init(int ac, char **av)
 	/* Auto assign sid if applicable */
 	if (IRCD->RequiresID)
 	{
-		Anope::string sid = Servers::TS6_SID_Retrieve();
+		Anope::string sid = IRCD->SID_Retrieve();
 		if (Me->GetSID() == Me->GetName())
 			Me->SetSID(sid);
 		for (botinfo_map::iterator it = BotListByNick->begin(), it_end = BotListByNick->end(); it != it_end; ++it)

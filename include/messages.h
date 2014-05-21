@@ -82,7 +82,7 @@ namespace Message
 
 	struct CoreExport Mode : IRCDMessage
 	{
-		Mode(Module *creator, const Anope::string &mname = "MODE") : IRCDMessage(creator, mname, 2) { }
+		Mode(Module *creator, const Anope::string &mname = "MODE") : IRCDMessage(creator, mname, 2) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
 
 		void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override;
 	};

@@ -74,7 +74,7 @@ class MyXMLRPCEvent : public XMLRPCEvent
 			request.reply("error", "Invalid parameters");
 		else
 		{
-			BotInfo *bi = BotInfo::Find(service);
+			BotInfo *bi = BotInfo::Find(service, true);
 			if (!bi)
 				request.reply("error", "Invalid service");
 			else

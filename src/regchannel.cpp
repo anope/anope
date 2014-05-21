@@ -271,7 +271,7 @@ Serializable* ChannelInfo::Unserialize(Serializable *obj, Serialize::Data &data)
 			}
 			catch (const ConvertException &) { }
 	}
-	BotInfo *bi = BotInfo::Find(sbi);
+	BotInfo *bi = BotInfo::Find(sbi, true);
 	if (*ci->bi != bi)
 	{
 		if (bi)

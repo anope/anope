@@ -567,9 +567,8 @@ msgid "[auto-memo] The memo you sent to %s has been viewed."
 msgstr "[auto-memo] Il memo che hai inviato a %s è stato letto."
 
 #: modules/commands/ns_group.cpp:78
-#, fuzzy
 msgid "[target] [password]"
-msgstr "target password"
+msgstr "[target] [password]"
 
 #: modules/commands/ns_set.cpp:433
 msgid "address"
@@ -2172,9 +2171,8 @@ msgid "ADD [nickname] mask"
 msgstr "ADD [nickname] mask"
 
 #: modules/commands/ns_cert.cpp:258
-#, fuzzy
 msgid "ADD [nickname] [fingerprint]"
-msgstr "ADD [nickname] fingerprint"
+msgstr "ADD [nickname] [fingerprint]"
 
 #: modules/commands/os_akill.cpp:375 modules/commands/os_sxline.cpp:651
 msgid "ADD [+expiry] mask reason"
@@ -4872,12 +4870,12 @@ msgstr "Trova lo stato di un utente in un canale"
 #: modules/commands/ns_cert.cpp:192
 #, c-format
 msgid "Fingerprint %s already present on %s's certificate list."
-msgstr "La firma digitale %s è già present nella lista dei certificati di %s."
+msgstr "La firma digitale %s è già presente nella lista dei certificati di %s."
 
 #: modules/commands/ns_cert.cpp:198
-#, fuzzy, c-format
+#, c-format
 msgid "Fingerprint %s is already in use."
-msgstr "%s è già presente in %s."
+msgstr "La firma digitale %s è già in uso."
 
 #: modules/commands/cs_flags.cpp:301
 msgid "Flags"
@@ -9096,14 +9094,14 @@ msgstr ""
 "d'attacco sul network."
 
 #: modules/ns_maxemail.cpp:30
-#, fuzzy, c-format
+#, c-format
 msgid "The email address %s has reached its usage limit of %d users."
-msgstr "L' indirizzo email specificato ha raggiunto il limite di %d utenti."
+msgstr "L' indirizzo email %s ha raggiunto il limite di %d utenti."
 
 #: modules/ns_maxemail.cpp:28
-#, fuzzy, c-format
+#, c-format
 msgid "The email address %s has reached its usage limit of 1 user."
-msgstr "L' indirizzo email specificato ha raggiunto il limite di 1 utente."
+msgstr "L' indirizzo email %s ha raggiunto il limite di 1 utente."
 
 #: modules/commands/cs_entrymsg.cpp:142
 #, c-format
@@ -10262,9 +10260,8 @@ msgid "You are not permitted to change your memo limit."
 msgstr "Non puoi modificare limite dei tuoi memo."
 
 #: modules/commands/ns_cert.cpp:183
-#, fuzzy
 msgid "You are not using a client certificate."
-msgstr "Non sei identificato."
+msgstr "Non stai usando un certificato del client."
 
 #: modules/commands/os_set.cpp:85
 msgid "You are now a super admin."
@@ -10438,9 +10435,9 @@ msgstr ""
 "Digita %s%s READ %d per leggerlo."
 
 #: modules/commands/cs_invite.cpp:76
-#, fuzzy, c-format
+#, c-format
 msgid "You have been invited to %s by %s."
-msgstr "Sei stato invitato in %s."
+msgstr "Sei stato invitato in %s da %s."
 
 #: modules/commands/cs_invite.cpp:81
 #, c-format
@@ -10501,9 +10498,8 @@ msgid "You may not change the e-mail of other Services Operators."
 msgstr "Non puoi cambiare l'e-mail di altri Services Operators."
 
 #: modules/commands/ns_set.cpp:454
-#, fuzzy
 msgid "You may not change the email of an unconfirmed account."
-msgstr "Non puoi cambiare l'e-mail di altri Services Operators."
+msgstr "Non puoi cambiare l'e-mail di un account non confermato."
 
 #: modules/commands/ns_set.cpp:191
 msgid "You may not change the password of other Services Operators."
@@ -10664,7 +10660,6 @@ msgid "Your email address is not allowed, choose a different one."
 msgstr "Il tuo indirizzo email non è consentito, scegline un altro diverso."
 
 #: modules/commands/ns_register.cpp:360
-#, fuzzy
 msgid ""
 "Your email address is not confirmed. To confirm it, follow the instructions "
 "that were emailed to you."

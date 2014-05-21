@@ -867,7 +867,7 @@ bool Entry::Matches(User *u, bool full) const
 		}
 	}
 	else if (!this->host.empty() && !Anope::Match(u->GetDisplayedHost(), this->host) && !Anope::Match(u->GetCloakedHost(), this->host) &&
-		(!full || (!Anope::Match(u->host, this->host) && !Anope::Match(u->ip, this->host))))
+		(!full || (!Anope::Match(u->host, this->host) && !Anope::Match(u->ip.addr(), this->host))))
 		ret = false;
 	
 	if (!this->real.empty() && !Anope::Match(u->realname, this->real))

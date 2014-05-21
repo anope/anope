@@ -212,8 +212,7 @@ class MyXMLRPCEvent : public XMLRPCEvent
 				request.reply("vhost", iface->Sanitize(u->vhost));
 			if (!u->chost.empty())
 				request.reply("chost", iface->Sanitize(u->chost));
-			if (!u->ip.empty())
-				request.reply("ip", u->ip);
+			request.reply("ip", u->ip.addr());
 			request.reply("timestamp", stringify(u->timestamp));
 			request.reply("signon", stringify(u->signon));
 			if (u->Account())

@@ -135,7 +135,7 @@ class ModuleSQLOper : public Module
 
 		SQL::Query q(this->query);
 		q.SetValue("a", u->Account()->display);
-		q.SetValue("i", u->ip);
+		q.SetValue("i", u->ip.addr());
 
 		this->SQL->Run(new SQLOperResult(this, u), q);
 

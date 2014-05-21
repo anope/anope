@@ -24,7 +24,7 @@
 std::list<XLineManager *> XLineManager::XLineManagers;
 Serialize::Checker<std::multimap<Anope::string, XLine *, ci::less> > XLineManager::XLinesByUID("XLine");
 
-void XLine::InitRegex()
+void XLine::Init()
 {
 	if (this->mask.length() >= 2 && this->mask[0] == '/' && this->mask[this->mask.length() - 1] == '/' && !Config->GetBlock("options")->Get<const Anope::string>("regexengine").empty())
 	{
@@ -43,82 +43,92 @@ void XLine::InitRegex()
 			}
 		}
 	}
+
+	size_t nick_t = this->mask.find('!');
+	if (nick_t != Anope::string::npos)
+		nick = this->mask.substr(0, nick_t);
+
+	size_t user_t = this->mask.find('!'), host_t = this->mask.find('@');
+	if (host_t != Anope::string::npos)
+	{
+		if (user_t != Anope::string::npos && host_t > user_t)
+			user = this->mask.substr(user_t + 1, host_t - user_t - 1);
+		else
+			user = this->mask.substr(0, host_t);
+	}
+
+	size_t real_t = this->mask.find('#');
+	if (host_t != Anope::string::npos)
+	{
+		if (real_t != Anope::string::npos && real_t > host_t)
+			host = this->mask.substr(host_t + 1, real_t - host_t - 1);
+		else
+			host = this->mask.substr(host_t + 1);
+	}
+	else
+	{
+		if (real_t != Anope::string::npos)
+			host = this->mask.substr(0, real_t);
+		else
+			host = this->mask;
+	}
+
+	if (real_t != Anope::string::npos)
+		real = this->mask.substr(real_t + 1);
+
+	if (host.find('/') != Anope::string::npos)
+	{
+		c = new cidr(host);
+		if (!c->valid())
+		{
+			delete c;
+			c = NULL;
+		}
+	}
 }
 
 XLine::XLine(const Anope::string &ma, const Anope::string &r, const Anope::string &uid) : Serializable("XLine"), mask(ma), by(Me->GetName()), created(0), expires(0), reason(r), id(uid)
 {
 	regex = NULL;
 	manager = NULL;
+	c = NULL;
 
-	this->InitRegex();
+	this->Init();
 }
 
 XLine::XLine(const Anope::string &ma, const Anope::string &b, const time_t ex, const Anope::string &r, const Anope::string &uid) : Serializable("XLine"), mask(ma), by(b), created(Anope::CurTime), expires(ex), reason(r), id(uid)
 {
 	regex = NULL;
 	manager = NULL;
+	c = NULL;
 
-	this->InitRegex();
+	this->Init();
 }
 
 XLine::~XLine()
 {
 	delete regex;
+	delete c;
 }
 
-Anope::string XLine::GetNick() const
+const Anope::string &XLine::GetNick() const
 {
-	size_t nick_t = this->mask.find('!');
-
-	if (nick_t == Anope::string::npos)
-		return "";
-
-	return this->mask.substr(0, nick_t);
+	return nick;
 }
 
-Anope::string XLine::GetUser() const
+const Anope::string &XLine::GetUser() const
 {
-	size_t user_t = this->mask.find('!'), host_t = this->mask.find('@');
-
-	if (host_t != Anope::string::npos)
-	{
-		if (user_t != Anope::string::npos && host_t > user_t)
-			return this->mask.substr(user_t + 1, host_t - user_t - 1);
-		else
-			return this->mask.substr(0, host_t);
-	}
-	else
-		return "";
+	return user;
 }
 
-Anope::string XLine::GetHost() const
+const Anope::string &XLine::GetHost() const
 {
-	size_t host_t = this->mask.find('@'), real_t = this->mask.find('#');
-
-	if (host_t != Anope::string::npos)
-	{
-		if (real_t != Anope::string::npos && real_t > host_t)
-			return this->mask.substr(host_t + 1, real_t - host_t - 1);
-		else
-			return this->mask.substr(host_t + 1);
-	}
-	else
-	{
-		if (real_t != Anope::string::npos)
-			return this->mask.substr(0, real_t);
-		else
-			return this->mask;
-	}
+	return host;
 }
 
-Anope::string XLine::GetReal() const
+const Anope::string &XLine::GetReal() const
 {
-	size_t real_t = this->mask.find('#');
-
-	if (real_t != Anope::string::npos)
-		return this->mask.substr(real_t + 1);
-	else
-		return "";
+	return real;
 }
 
 Anope::string XLine::GetReason() const

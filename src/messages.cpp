@@ -158,8 +158,6 @@ void Join::SJoin(MessageSource &source, const Anope::string &chan, time_t ts, co
 
 			if (c->CheckDelete())
 				delete c;
-			else
-				c->CheckModes();
 		}
 	}
 }

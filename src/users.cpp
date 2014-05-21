@@ -33,7 +33,7 @@ time_t MaxUserTime = 0;
 
 std::list<User *> User::quitting_users;
 
-User::User(const Anope::string &snick, const Anope::string &sident, const Anope::string &shost, const Anope::string &svhost, const Anope::string &sip, Server *sserver, const Anope::string &srealname, time_t ts, const Anope::string &smodes, const Anope::string &suid, NickCore *account)
+User::User(const Anope::string &snick, const Anope::string &sident, const Anope::string &shost, const Anope::string &svhost, const Anope::string &uip, Server *sserver, const Anope::string &srealname, time_t ts, const Anope::string &smodes, const Anope::string &suid, NickCore *account) : ip(uip)
 {
 	if (snick.empty() || sident.empty() || shost.empty())
 		throw CoreException("Bad args passed to User::User");
@@ -49,7 +49,6 @@ User::User(const Anope::string &snick, const Anope::string &sident, const Anope:
 	this->host = shost;
 	this->vhost = svhost;
 	this->chost = svhost;
-	this->ip = sip;
 	this->server = sserver;
 	this->realname = srealname;
 	this->timestamp = this->signon = ts;
@@ -72,7 +71,7 @@ User::User(const Anope::string &snick, const Anope::string &sident, const Anope:
 	{
 		++sserver->users;
 		if (server->IsSynced())
-			Log(this, "connect") << (!vhost.empty() && vhost != host ? "(" + vhost + ") " : "") << "(" << srealname << ") " << (!sip.empty() && sip != host ? "[" + sip + "] " : "") << "connected to the network (" << sserver->GetName() << ")";
+			Log(this, "connect") << (!vhost.empty() && vhost != host ? "(" + vhost + ") " : "") << "(" << srealname << ") " << (!uip.empty() && uip != host ? "[" + uip + "] " : "") << "connected to the network (" << sserver->GetName() << ")";
 	}
 
 	if (UserListByNick.size() > MaxUserCount)

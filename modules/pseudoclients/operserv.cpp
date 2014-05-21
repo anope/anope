@@ -53,13 +53,10 @@ class SGLineManager : public XLineManager
 		if (!x->GetReal().empty() && !Anope::Match(u->realname, x->GetReal()))
 			return false;
 
-		if (x->GetHost().find('/') != Anope::string::npos)
-		{
-			if (cidr(x->GetHost()).match(sockaddrs(u->ip)))
-				return true;
-		}
+		if (x->c && x->c->match(u->ip))
+			return true;
 
-		if (x->GetHost().empty() || Anope::Match(u->host, x->GetHost()) || Anope::Match(u->ip, x->GetHost()))
+		if (x->GetHost().empty() || Anope::Match(u->host, x->GetHost()) || Anope::Match(u->ip.addr(), x->GetHost()))
 			return true;
 
 		return false;

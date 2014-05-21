@@ -122,7 +122,7 @@ class ModuleSQLAuthentication : public Module
 		if (u)
 		{
 			q.SetValue("n", u->nick);
-			q.SetValue("i", u->ip);
+			q.SetValue("i", u->ip.addr());
 		}
 		else
 		{

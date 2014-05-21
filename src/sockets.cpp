@@ -96,9 +96,9 @@ bool sockaddrs::ipv6() const
 	return sa.sa_family == AF_INET6;
 }
 
-bool sockaddrs::operator()() const
+bool sockaddrs::valid() const
 {
-	return valid();
+	return size() != 0;
 }
 
 bool sockaddrs::operator==(const sockaddrs &other) const
@@ -180,11 +180,6 @@ void sockaddrs::ntop(int type, const void *src)
 	this->clear();
 }
 
-bool sockaddrs::valid() const
-{
-	return size() != 0;
-}
-
 cidr::cidr(const Anope::string &ip)
 {
 	bool ipv6 = ip.find(':') != Anope::string::npos;
@@ -218,6 +213,12 @@ cidr::cidr(const Anope::string &ip, unsigned char len)
 	bool ipv6 = ip.find(':') != Anope::string::npos;
 	this->addr.pton(ipv6 ? AF_INET6 : AF_INET, ip);
 	this->cidr_ip = ip;
+	this->cidr_len = len;
+}
+
+cidr::cidr(const sockaddrs &a, unsigned char len) : addr(a)
+{
+	this->cidr_ip = a.addr();
 	this->cidr_len = len;
 }
 

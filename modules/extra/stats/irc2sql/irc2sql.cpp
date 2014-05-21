@@ -95,7 +95,7 @@ void IRC2SQL::OnUserConnect(User *u, bool &exempt)
 	query.SetValue("vhost", u->vhost);
 	query.SetValue("chost", u->chost);
 	query.SetValue("realname", u->realname);
-	query.SetValue("ip", u->ip);
+	query.SetValue("ip", u->ip.addr());
 	query.SetValue("ident", u->GetIdent());
 	query.SetValue("vident", u->GetVIdent());
 	query.SetValue("secure", u->HasMode("SSL") || u->HasExt("ssl") ? "Y" : "N");

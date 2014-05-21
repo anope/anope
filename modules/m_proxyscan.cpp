@@ -334,9 +334,7 @@ class ModuleProxyScan : public Module
 			return;
 
 		/* At this time we only support IPv4 */
-		sockaddrs user_ip;
-		user_ip.pton(AF_INET, user->ip);
-		if (!user_ip.valid())
+		if (!user->ip.valid() || user->ip.sa.sa_family != AF_INET)
 			/* User doesn't have a valid IPv4 IP (ipv6/spoof/etc) */
 			return;
 
@@ -364,7 +362,7 @@ class ModuleProxyScan : public Module
 							con = new SOCKS5ProxyConnect(p, p.ports[k]);
 						else
 							continue;
-						con->Connect(user->ip, p.ports[k]);
+						con->Connect(user->ip.addr(), p.ports[k]);
 					}
 					catch (const SocketException &ex)
 					{

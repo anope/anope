@@ -59,7 +59,7 @@ union CoreExport sockaddrs
 
 	/** Check if this sockaddr has data in it
 	 */
-	bool operator()() const;
+	bool valid() const;
 
 	/** Compares with sockaddr with another. Compares address type, port, and address
 	 * @return true if they are the same
@@ -82,8 +82,6 @@ union CoreExport sockaddrs
 	 * @throws A socket exception if given an invalid structure
 	 */
 	void ntop(int type, const void *src);
-
-	bool valid() const;
 };
 
 class CoreExport cidr
@@ -94,6 +92,7 @@ class CoreExport cidr
  public:
  	cidr(const Anope::string &ip);
 	cidr(const Anope::string &ip, unsigned char len);
+	cidr(const sockaddrs &ip, unsigned char len);
 	Anope::string mask() const;
 	bool match(const sockaddrs &other);
 	bool valid() const;

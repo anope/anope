@@ -189,7 +189,11 @@ Anope::string Log::BuildPrefix() const
 		{
 			if (!this->chan)
 				break;
-			buffer += "CHANNEL: " + FormatSource() + " " + this->category + " " + this->chan->name + " ";
+			buffer += "CHANNEL: ";
+			Anope::string src = FormatSource();
+			if (!src.empty())
+				buffer += src + " ";
+			buffer += this->category + " " + this->chan->name + " ";
 			break;
 		}
 		case LOG_USER:

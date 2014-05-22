@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: Anope\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-05-22 19:04+0200\n"
-"PO-Revision-Date: 2014-04-09 07:45+0100\n"
+"PO-Revision-Date: 2014-05-22 18:20+0100\n"
 "Last-Translator: Jyzee <jyzee.git@gmail.com>\n"
 "Language-Team: French\n"
 "Language: fr_FR\n"
@@ -378,12 +378,12 @@ msgid "%s matches access entry %s, which has privilege %s."
 msgstr "%s correspond à l'entrée d'accès %s, qui a le privilège %s."
 
 #: include/language.h:110
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "%s matches an except on %s and cannot be banned until the except has been "
 "removed."
 msgstr ""
-"%s correspond à une exception sur %s et ne peuvent pas être bannis tant que "
+"%s correspond à une exception sur %s et ne peut pas être banni tant que "
 "l'exception n'a pas été supprimée."
 
 #: modules/commands/cs_status.cpp:81
@@ -861,9 +861,8 @@ msgid "nick channel"
 msgstr "pseudo canal"
 
 #: modules/commands/os_svs.cpp:123
-#, fuzzy
 msgid "nick channel [reason]"
-msgstr "pseudo [raison]"
+msgstr "pseudo canal [raison]"
 
 #: modules/commands/os_oline.cpp:20
 msgid "nick flags"
@@ -3782,9 +3781,8 @@ msgid "Configures badwords kicker"
 msgstr "Configure les kickers pour les badwords"
 
 #: modules/commands/bs_kick.cpp:328
-#, fuzzy
 msgid "Configures bolds kicker"
-msgstr "Configure les kickers pour les badwords"
+msgstr "Configure les kickers pour le gras"
 
 #: modules/commands/bs_kick.cpp:134
 msgid "Configures bot kickers.  option can be one of:"
@@ -4107,8 +4105,7 @@ msgstr "Temps d'échéance des SQLINEs par défaut: Pas d'échéance"
 #: modules/commands/os_news.cpp:351
 msgid "Define messages to be randomly shown to users at logon"
 msgstr ""
-"Définit que les messages seront affichés aléatoirement aux utilisateurs à la "
-"connexion"
+"Définit les messages affichés aléatoirement aux utilisateurs à la connexion"
 
 #: modules/commands/os_news.cpp:297
 msgid "Define messages to be shown to users at logon"
@@ -7619,9 +7616,8 @@ msgid "Service's hold on %s has been released."
 msgstr "La tutelle des Services sur %s a été enlevée."
 
 #: data/chanserv.example.conf:820 data/nickserv.example.conf:234
-#, fuzzy
 msgid "Services Operator commands"
-msgstr "%s est un opérateur services du type %s."
+msgstr "Commandes Opérateur des Services"
 
 #: modules/commands/os_defcon.cpp:446 modules/commands/os_defcon.cpp:454
 #: modules/commands/os_defcon.cpp:462 modules/commands/os_defcon.cpp:470
@@ -9121,9 +9117,9 @@ msgstr ""
 " utilise la commande ACCESS sur ChanServ sur le canal."
 
 #: modules/commands/cs_ban.cpp:65
-#, fuzzy, c-format
+#, c-format
 msgid "The %s list for %s is full."
-msgstr "La liste de ban pour %s est pleine."
+msgstr "La liste de %s pour %s est pleine."
 
 #: modules/commands/os_sxline.cpp:214
 #, c-format
@@ -10124,25 +10120,24 @@ msgstr "Connecté à: %s"
 #, c-format
 msgid "Use the %s ALL command to list all commands and their descriptions."
 msgstr ""
-"Utilise la commande %s ALL pour lister les commandes et leur description."
+"Utilisez la commande %s ALL pour lister les commandes et leur description."
 
 #: modules/commands/bs_info.cpp:60
 msgid "Used on"
 msgstr "Utilisé sur"
 
 #: data/chanserv.example.conf:814
-#, fuzzy
 msgid "Used to manage channels"
-msgstr "Autorisation de changer le sujet du canal."
+msgstr "Permet de gérer les canaux"
 
 #: data/chanserv.example.conf:802
-#, fuzzy
 msgid "Used to manage the list of privileged users"
-msgstr "Modifie la liste des utilisateurs privilégiés"
+msgstr "Permet de modifier la liste des utilisateurs privilégiés"
 
 #: data/chanserv.example.conf:808
 msgid "Used to modify the channel status of you or other users"
 msgstr ""
+"Permet de modifier votre statut sur le canal ou celui des autres utilisateurs"
 
 #: modules/commands/cs_akick.cpp:551
 msgid "User has been banned from the channel"

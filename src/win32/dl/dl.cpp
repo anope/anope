@@ -15,7 +15,8 @@ void *dlopen(const char *filename, int)
 
 char *dlerror(void)
 {
-	static Anope::string err = Anope::LastError();
+	static Anope::string err;
+	err = Anope::LastError();
 	SetLastError(0);
 	return err.empty() ? NULL : const_cast<char *>(err.c_str());
 }

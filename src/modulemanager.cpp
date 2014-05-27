@@ -159,25 +159,25 @@ ModuleReturn ModuleManager::LoadModule(const Anope::string &modname, User *u)
 	dlerror();
 	void *handle = dlopen(pbuf.c_str(), RTLD_NOW);
 	const char *err = dlerror();
-	if (!handle && err && *err)
+	if (!handle)
 	{
-		Log() << err;
+		if (err && *err)
+			Log() << err;
 		return MOD_ERR_NOLOAD;
 	}
 
 	dlerror();
 	Module *(*func)(const Anope::string &, const Anope::string &) = function_cast<Module *(*)(const Anope::string &, const Anope::string &)>(dlsym(handle, "AnopeInit"));
 	err = dlerror();
-	if (!func && err && *err)
+	if (!func)
 	{
 		Log() << "No init function found, not an Anope module";
+		if (err && *err)
+			Log(LOG_DEBUG) << err;
 		dlclose(handle);
 		return MOD_ERR_NOLOAD;
 	}
-
-	if (!func)
-		throw CoreException("Couldn't find constructor, yet moderror wasn't set?");
-
+	
 	/* Create module. */
 	Anope::string nick;
 	if (u)
@@ -192,6 +192,8 @@ ModuleReturn ModuleManager::LoadModule(const Anope::string &modname, User *u)
 	catch (const ModuleException &ex)
 	{
 		Log() << "Error while loading " << modname << ": " << ex.GetReason();
+		/*if (dlclose(handle))
+			Log() << dlerror();*/
 		return MOD_ERR_EXCEPTION;
 	}
 

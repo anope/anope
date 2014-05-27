@@ -436,6 +436,8 @@ unsigned IRCDProto::GetMaxListFor(Channel *c)
 
 Anope::string IRCDProto::NormalizeMask(const Anope::string &mask)
 {
+	if (IsExtbanValid(mask))
+		return mask;
 	return Entry("", mask).GetNUHMask();
 }
 

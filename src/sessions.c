@@ -383,7 +383,8 @@ Exception *find_hostip_exception(const char *host, const char *hostip)
 /*************************************************************************/
 
 #define SAFE(x) do {                                    \
-    if ((x) < 0) {                                      \
+	int y = (x); \
+    if (y < 0) {                                      \
         if (!forceload)                                 \
             fatal("Read error on %s", ExceptionDBName); \
         nexceptions = i;                                \

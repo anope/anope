@@ -91,7 +91,8 @@
     } \
 } while (0)
 #define READ(x) do { \
-    if ((x) < 0) { \
+	int y = (x); \
+    if (y < 0) { \
 	    printf("Error, the database is broken, trying to continue... no guarantee.\n"); \
         exit(0); \
     } \

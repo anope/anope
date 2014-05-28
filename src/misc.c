@@ -978,6 +978,7 @@ void rand_init(void)
 {
 #ifndef _WIN32
     int fd;
+	int x_var;
 #endif
     struct {
 #ifdef USE_MYSQL
@@ -1006,7 +1007,8 @@ void rand_init(void)
     /* unix/bsd: /dev/urandom */
     fd = open("/dev/urandom", O_RDONLY);
     if (fd) {
-        read(fd, &rdat.rnd, sizeof(rdat.rnd));
+        x_var = read(fd, &rdat.rnd, sizeof(rdat.rnd));
+		USE_VAR(x_var);
         close(fd);
     }
 #else

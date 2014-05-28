@@ -96,6 +96,7 @@
 #define C_NONE ""
 #endif
 
+#define USE_VAR(var) static char sizeof##var = sizeof(sizeof##var) + sizeof(var)
 #define getc_db(f)		(fgetc((f)->fp))
 #define HASH(nick)	((tolower((nick)[0])&31)<<5 | (tolower((nick)[1])&31))
 #define HASH2(chan)	((chan)[1] ? ((chan)[1]&31)<<5 | ((chan)[2]&31) : 0)
@@ -111,7 +112,8 @@
     } \
 } while (0)
 #define READ(x) do { \
-    if ((x) < 0) { \
+	int y = (x); \
+    if (y < 0) { \
         printf("Error, the database is broken, trying to continue... no guarantee.\n"); \
         exit(0); \
     } \
@@ -308,6 +310,7 @@ int main(int argc, char *argv[])
     int i;
     NickCore *nc, *ncnext;
     HostCore *firsthc = NULL;
+	int x_var;
 
     printf("\n"C_LBLUE"DB Merger for Anope IRC Services"C_NONE"\n");
 
@@ -561,7 +564,8 @@ int main(int argc, char *argv[])
                                 input[0] = '2';
                             } else {
                                 waiting_for_input:
-                                scanf("%s", input);
+                                x_var = scanf("%s", input);
+								USE_VAR(x_var);
                             }
                             if (input[0] == '1') { /* #2 isn't in the list yet, #1 is. free #2 alias. */
                                 printf("Deleting nick alias %s (#2).\n", na->nick);
@@ -1096,7 +1100,8 @@ int main(int argc, char *argv[])
                             input[0] = '2';
                         } else {
                             waiting_for_input4:
-                            scanf("%s", input);
+                            x_var = scanf("%s", input);
+							USE_VAR(x_var);
                         }
                         if (input[0] == '1') { /* #2 isn't in the list yet, #1 is. -> free() #2 [ci] */
                             NickCore *nc = NULL;
@@ -1435,7 +1440,8 @@ int main(int argc, char *argv[])
                         input[0] = '1';
                     } else {
                         waiting_for_input3:
-                        scanf("%s", input);
+                        x_var = scanf("%s", input);
+						USE_VAR(x_var);
                     }
                     if (input[0] == '1') { /* free() bot #2 (bi) */
                         printf("Deleting Bot %s!%s@%s (%s) (#2).\n", bi->nick, bi->user, bi->host, bi->real);
@@ -1566,7 +1572,8 @@ int main(int argc, char *argv[])
                             input[0] = '2';
                         } else {
                             waiting_for_input2:
-                            scanf("%s", input);
+                            x_var = scanf("%s", input);
+							USE_VAR(x_var);
                         }
                         if (input[0] == '2') { /* free() hcptr and get it out of the list, put hc into the list */
                             printf("Deleting vHost %s (vIdent: %s) for nick %s (#1).\n", hcptr->vHost, (hcptr->vIdent) ? hcptr->vIdent : "none", hcptr->nick);

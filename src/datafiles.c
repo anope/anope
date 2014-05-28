@@ -318,6 +318,7 @@ dbFILE *open_db(const char *service, const char *filename,
 void restore_db(dbFILE * f)
 {
     int errno_save = errno;
+	int un_used;
 
     if (f->mode == 'w') {
         int ok = 0;             /* Did we manage to restore the old file? */
@@ -338,7 +339,11 @@ void restore_db(dbFILE * f)
             }
             if (ok) {
                 fflush(f->fp);
-                ftruncate(fileno(f->fp), ftell(f->fp));
+				/* fixes 
+					 warning: ignoring return value of ‘ftruncate’, declared with attribute warn_unused_result [-Wunused-result]
+				*/
+                un_used = ftruncate(fileno(f->fp), ftell(f->fp));
+				USE_VAR(un_used);
             }
         }
 #ifndef NOT_MAIN

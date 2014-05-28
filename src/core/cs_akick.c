@@ -150,7 +150,10 @@ static int akick_view(User * u, int index, ChannelInfo * ci, int *sent_header)
         strftime_lang(timebuf, sizeof(timebuf), u,
                       STRFTIME_SHORT_DATE_FORMAT, &tm);
     } else {
-        snprintf(timebuf, sizeof(timebuf), getstring(u->na, UNKNOWN));
+		/* Fixes
+			warning: format not a string literal and no format arguments [-Wformat-security]
+		*/
+        snprintf(timebuf, sizeof(timebuf), "%s", getstring(u->na, UNKNOWN));
     }
 
     notice_lang(s_ChanServ, u,

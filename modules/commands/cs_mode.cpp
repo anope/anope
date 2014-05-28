@@ -23,7 +23,7 @@ struct ModeLockImpl : ModeLock, Serializable
 
 	~ModeLockImpl()
 	{
-		ChannelInfo *chan = ChannelInfo::Find(ci);
+		ChanServ::Channel *chan = ChanServ::Find(ci);
 		if (chan)
 		{
 			ModeLocks *ml = chan->GetExt<ModeLocks>("modelocks");
@@ -38,10 +38,10 @@ struct ModeLockImpl : ModeLock, Serializable
 
 struct ModeLocksImpl : ModeLocks
 {
-	Serialize::Reference<ChannelInfo> ci;
+	Serialize::Reference<ChanServ::Channel> ci;
 	Serialize::Checker<ModeList> mlocks;
 
-	ModeLocksImpl(Extensible *obj) : ci(anope_dynamic_static_cast<ChannelInfo *>(obj)), mlocks("ModeLock")
+	ModeLocksImpl(Extensible *obj) : ci(anope_dynamic_static_cast<ChanServ::Channel *>(obj)), mlocks("ModeLock")
 	{
 	}
 
@@ -224,13 +224,13 @@ void ModeLockImpl::Serialize(Serialize::Data &data) const
 Serializable* ModeLockImpl::Unserialize(Serializable *obj, Serialize::Data &data)
 {
 	Anope::string sci;
-	
+
 	data["ci"] >> sci;
 
-	ChannelInfo *ci = ChannelInfo::Find(sci);
+	ChanServ::Channel *ci = ChanServ::Find(sci);
 	if (!ci)
 		return NULL;
-	
+
 	ModeLockImpl *ml;
 	if (obj)
 		ml = anope_dynamic_static_cast<ModeLockImpl *>(obj);
@@ -254,7 +254,7 @@ Serializable* ModeLockImpl::Unserialize(Serializable *obj, Serialize::Data &data
 
 class CommandCSMode : public Command
 {
-	bool CanSet(CommandSource &source, ChannelInfo *ci, ChannelMode *cm, bool self)
+	bool CanSet(CommandSource &source, ChanServ::Channel *ci, ChannelMode *cm, bool self)
 	{
 		if (!ci || !cm || cm->type != MODE_STATUS)
 			return false;
@@ -262,7 +262,7 @@ class CommandCSMode : public Command
 		return source.AccessFor(ci).HasPriv(cm->name + (self ? "ME" : ""));
 	}
 
-	void DoLock(CommandSource &source, ChannelInfo *ci, const std::vector<Anope::string> &params)
+	void DoLock(CommandSource &source, ChanServ::Channel *ci, const std::vector<Anope::string> &params)
 	{
 		User *u = source.GetUser();
 		const Anope::string &subcommand = params[2];
@@ -332,7 +332,7 @@ class CommandCSMode : public Command
 							source.Reply(_("List for mode %c is full."), cm->mchar);
 						else
 						{
-							modelocks->SetMLock(cm, adding, mode_param, source.GetNick()); 
+							modelocks->SetMLock(cm, adding, mode_param, source.GetNick());
 
 							if (adding)
 							{
@@ -460,8 +460,8 @@ class CommandCSMode : public Command
 		else
 			this->OnSyntaxError(source, subcommand);
 	}
-	
-	void DoSet(CommandSource &source, ChannelInfo *ci, const std::vector<Anope::string> &params)
+
+	void DoSet(CommandSource &source, ChanServ::Channel *ci, const std::vector<Anope::string> &params)
 	{
 		User *u = source.GetUser();
 
@@ -536,7 +536,7 @@ class CommandCSMode : public Command
 							if (!sep.GetToken(param))
 								param = source.GetNick();
 
-							AccessGroup u_access = source.AccessFor(ci);
+							ChanServ::AccessGroup u_access = source.AccessFor(ci);
 
 							if (param.find_first_of("*?") != Anope::string::npos)
 							{
@@ -551,7 +551,7 @@ class CommandCSMode : public Command
 									ChanUserContainer *uc = it->second;
 									++it;
 
-									AccessGroup targ_access = ci->AccessFor(uc->user);
+									ChanServ::AccessGroup targ_access = ci->AccessFor(uc->user);
 
 									if (uc->user->IsProtected() || (ci->HasExt("PEACE") && targ_access >= u_access && !can_override))
 									{
@@ -585,7 +585,7 @@ class CommandCSMode : public Command
 
 								if (source.GetUser() != target)
 								{
-									AccessGroup targ_access = ci->AccessFor(target);
+									ChanServ::AccessGroup targ_access = ci->AccessFor(target);
 									if (ci->HasExt("PEACE") && targ_access >= u_access && !can_override)
 									{
 										source.Reply(_("You do not have the access to change %s's modes."), target->nick.c_str());
@@ -632,7 +632,7 @@ class CommandCSMode : public Command
 		}
 	}
 
-	void DoClear(CommandSource &source, ChannelInfo *ci, const std::vector<Anope::string> &params)
+	void DoClear(CommandSource &source, ChanServ::Channel *ci, const std::vector<Anope::string> &params)
 	{
 		const Anope::string &param = params.size() > 2 ? params[2] : "";
 
@@ -689,7 +689,7 @@ class CommandCSMode : public Command
 	{
 		const Anope::string &subcommand = params[1];
 
-		ChannelInfo *ci = ChannelInfo::Find(params[0]);
+		ChanServ::Channel *ci = ChanServ::Find(params[0]);
 
 		if (!ci)
 			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
@@ -760,7 +760,7 @@ class CommandCSModes : public Command
 	{
 		User *u = source.GetUser(),
 			*targ = params.size() > 1 ? User::Find(params[1], true) : u;
-		ChannelInfo *ci = ChannelInfo::Find(params[0]);
+		ChanServ::Channel *ci = ChanServ::Find(params[0]);
 
 		if (!targ)
 		{
@@ -780,7 +780,7 @@ class CommandCSModes : public Command
 			return;
 		}
 
-		AccessGroup u_access = source.AccessFor(ci), targ_access = ci->AccessFor(targ);
+		ChanServ::AccessGroup u_access = source.AccessFor(ci), targ_access = ci->AccessFor(targ);
 		const std::pair<bool, Anope::string> &m = modes[source.command];
 
 		bool can_override = source.HasPriv("chanserv/administration");
@@ -791,7 +791,7 @@ class CommandCSModes : public Command
 			source.Reply(ACCESS_DENIED);
 			return;
 		}
-		
+
 		if (u == targ ? !u_access.HasPriv(m.second + "ME") : !u_access.HasPriv(m.second))
 		{
 			if (!can_override)
@@ -898,7 +898,7 @@ class CSMode : public Module
 		for (int i = 0; i < conf->CountBlock("command"); ++i)
 		{
 			Configuration::Block *block = conf->GetBlock("command", i);
-			
+
 			const Anope::string &cname = block->Get<const Anope::string>("name"),
 					&cmd = block->Get<const Anope::string>("command");
 
@@ -907,7 +907,7 @@ class CSMode : public Module
 
 			const Anope::string &set = block->Get<const Anope::string>("set"),
 					&unset = block->Get<const Anope::string>("unset");
-			
+
 			if (set.empty() && unset.empty())
 				continue;
 
@@ -952,7 +952,7 @@ class CSMode : public Module
 						if (c->HasMode(cm->name))
 							c->RemoveMode(NULL, cm, "", false);
 					}
-		
+
 				}
 				else if (cm->type == MODE_LIST || cm->type == MODE_STATUS)
 				{
@@ -964,7 +964,7 @@ class CSMode : public Module
 			}
 	}
 
-	void OnCreateChan(ChannelInfo *ci) override
+	void OnCreateChan(ChanServ::Channel *ci) override
 	{
 		ModeLocks *ml = modelocks.Require(ci);
 		Anope::string mlock;
@@ -990,7 +990,7 @@ class CSMode : public Module
 		ml->Check();
 	}
 
-	void OnChanInfo(CommandSource &source, ChannelInfo *ci, InfoFormatter &info, bool show_hidden) override
+	void OnChanInfo(CommandSource &source, ChanServ::Channel *ci, InfoFormatter &info, bool show_hidden) override
 	{
 		if (!show_hidden)
 			return;

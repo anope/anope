@@ -73,7 +73,7 @@ class CommandBSBot : public Command
 		* if so. You need to drop the nick manually before you can use
 		* it as a bot nick from now on -GD
 		*/
-		if (NickAlias::Find(nick))
+		if (NickServ::FindNick(nick))
 		{
 			source.Reply(NICK_ALREADY_REGISTERED, nick.c_str());
 			return;
@@ -176,7 +176,7 @@ class CommandBSBot : public Command
 			* if so. You need to drop the nick manually before you can use
 			* it as a bot nick from now on -GD
 			*/
-			if (NickAlias::Find(nick))
+			if (NickServ::FindNick(nick))
 			{
 				source.Reply(NICK_ALREADY_REGISTERED, nick.c_str());
 				return;
@@ -210,10 +210,10 @@ class CommandBSBot : public Command
 		{
 			IRCD->SendClientIntroduction(bi);
 			unsigned minusers = Config->GetBlock("botserv")->Get<unsigned>("minusers");
-			const std::set<ChannelInfo *> &channels = bi->GetChannels();
-			for (std::set<ChannelInfo *>::const_iterator it = channels.begin(), it_end = channels.end(); it != it_end; ++it)
+			const std::set<ChanServ::Channel *> &channels = bi->GetChannels();
+			for (std::set<ChanServ::Channel *>::const_iterator it = channels.begin(), it_end = channels.end(); it != it_end; ++it)
 			{
-				const ChannelInfo *ci = *it;
+				const ChanServ::Channel *ci = *it;
 
 				if (ci->c && ci->c->users.size() >= minusers)
 					bi->Join(ci->c);

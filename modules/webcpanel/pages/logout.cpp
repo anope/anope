@@ -11,7 +11,7 @@ WebCPanel::Logout::Logout(const Anope::string &u) : WebPanelProtectedPage("", u)
 {
 }
 
-bool WebCPanel::Logout::OnRequest(HTTPProvider *server, const Anope::string &page_name, HTTPClient *client, HTTPMessage &message, HTTPReply &reply, NickAlias *na, TemplateFileServer::Replacements &replacements)
+bool WebCPanel::Logout::OnRequest(HTTPProvider *server, const Anope::string &page_name, HTTPClient *client, HTTPMessage &message, HTTPReply &reply, ::NickServ::Nick *na, TemplateFileServer::Replacements &replacements)
 {
 	na->Shrink<Anope::string>("webcpanel_id");
 	na->Shrink<Anope::string>("webcpanel_ip");

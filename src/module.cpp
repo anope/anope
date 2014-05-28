@@ -10,7 +10,6 @@
 #include "services.h"
 #include "modules.h"
 #include "language.h"
-#include "account.h"
 
 #ifdef GETTEXT_FOUND
 # include <libintl.h>
@@ -34,7 +33,7 @@ Module::Module(const Anope::string &modname, const Anope::string &, ModType modt
 
 	if (ModuleManager::FindModule(this->name))
 		throw CoreException("Module already exists!");
-	
+
 	if (Anope::NoThird && type & THIRD)
 		throw ModuleException("Third party modules may not be loaded");
 
@@ -64,7 +63,6 @@ Module::Module(const Anope::string &modname, const Anope::string &, ModType modt
 
 Module::~Module()
 {
-	IdentifyRequest::ModuleUnload(this);
 	/* Clear any active timers this module has */
 	TimerManager::DeleteTimersFor(this);
 

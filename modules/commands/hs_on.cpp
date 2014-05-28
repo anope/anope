@@ -26,7 +26,7 @@ class CommandHSOn : public Command
 			return; // HostServ wouldn't even be loaded at this point
 
 		User *u = source.GetUser();
-		const NickAlias *na = NickAlias::Find(u->nick);
+		const NickServ::Nick *na = NickServ::FindNick(u->nick);
 		if (na && u->Account() == na->nc && na->HasVhost())
 		{
 			if (!na->GetVhostIdent().empty())

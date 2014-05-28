@@ -18,7 +18,7 @@ namespace Event
 		 * @param params The params
 		 * @return EVENT_STOP to halt processing and not run the command, EVENT_ALLOW to allow the command to be executed
 		 */
-		virtual EventReturn OnBotFantasy(CommandSource &source, Command *c, ChannelInfo *ci, const std::vector<Anope::string> &params) anope_abstract;
+		virtual EventReturn OnBotFantasy(CommandSource &source, Command *c, ChanServ::Channel *ci, const std::vector<Anope::string> &params) anope_abstract;
 	};
 
 	struct CoreExport BotNoFantasyAccess : Events
@@ -30,6 +30,6 @@ namespace Event
 		 * @param params The params
 		 * @return EVENT_STOP to halt processing and not run the command, EVENT_ALLOW to allow the command to be executed
 		 */
-		virtual EventReturn OnBotNoFantasyAccess(CommandSource &source, Command *c, ChannelInfo *ci, const std::vector<Anope::string> &params) anope_abstract;
+		virtual EventReturn OnBotNoFantasyAccess(CommandSource &source, Command *c, ChanServ::Channel *ci, const std::vector<Anope::string> &params) anope_abstract;
 	};
 }

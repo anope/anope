@@ -11,8 +11,6 @@
 
 #pragma once
 
-#include "access.h"
-#include "account.h"
 #include "anope.h"
 #include "base.h"
 #include "bots.h"
@@ -26,13 +24,11 @@
 #include "lists.h"
 #include "logger.h"
 #include "mail.h"
-#include "memo.h"
 #include "messages.h"
 #include "modes.h"
 #include "modules.h"
 #include "opertype.h"
 #include "protocol.h"
-#include "regchannel.h"
 #include "serialize.h"
 #include "servers.h"
 #include "service.h"
@@ -44,3 +40,8 @@
 #include "uplink.h"
 #include "users.h"
 #include "xline.h"
+
+#include "modules/chanserv.h"
+#include "modules/nickserv.h"
+#include "modules/botserv.h"
+#include "modules/memoserv.h"

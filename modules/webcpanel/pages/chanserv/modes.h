@@ -16,7 +16,7 @@ class Modes : public WebPanelProtectedPage
  public:
 	Modes(const Anope::string &cat, const Anope::string &u);
 
-	bool OnRequest(HTTPProvider *, const Anope::string &, HTTPClient *, HTTPMessage &, HTTPReply &, NickAlias *, TemplateFileServer::Replacements &) override;
+	bool OnRequest(HTTPProvider *, const Anope::string &, HTTPClient *, HTTPMessage &, HTTPReply &, ::NickServ::Nick *, TemplateFileServer::Replacements &) override;
 
 	std::set<Anope::string> GetData() override;
 };

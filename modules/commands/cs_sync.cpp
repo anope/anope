@@ -22,7 +22,7 @@ class CommandCSSync : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
-		ChannelInfo *ci = ChannelInfo::Find(params[0]);
+		ChanServ::Channel *ci = ChanServ::Find(params[0]);
 
 		if (ci == NULL)
 			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
@@ -55,7 +55,7 @@ class CommandCSSync : public Command
 class CSSync : public Module
 {
 	CommandCSSync commandcssync;
-	
+
  public:
 	CSSync(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
 		, commandcssync(this)

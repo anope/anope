@@ -32,7 +32,7 @@ class CommandBSAssign : public Command
 			return;
 		}
 
-		ChannelInfo *ci = ChannelInfo::Find(params[0]);
+		ChanServ::Channel *ci = ChanServ::Find(params[0]);
 		if (ci == NULL)
 		{
 			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
@@ -46,7 +46,7 @@ class CommandBSAssign : public Command
 			return;
 		}
 
-		AccessGroup access = source.AccessFor(ci);
+		ChanServ::AccessGroup access = source.AccessFor(ci);
  		if (ci->HasExt("BS_NOBOT") || (!access.HasPriv("ASSIGN") && !source.HasPriv("botserv/administration")))
 		{
 			source.Reply(ACCESS_DENIED);
@@ -100,14 +100,14 @@ class CommandBSUnassign : public Command
 			return;
 		}
 
-		ChannelInfo *ci = ChannelInfo::Find(params[0]);
+		ChanServ::Channel *ci = ChanServ::Find(params[0]);
 		if (ci == NULL)
 		{
 			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
 			return;
 		}
 
-		AccessGroup access = source.AccessFor(ci);
+		ChanServ::AccessGroup access = source.AccessFor(ci);
 		if (!source.HasPriv("botserv/administration") && !access.HasPriv("ASSIGN"))
 		{
 			source.Reply(ACCESS_DENIED);
@@ -157,7 +157,7 @@ class CommandBSSetNoBot : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
-		ChannelInfo *ci = ChannelInfo::Find(params[0]);
+		ChanServ::Channel *ci = ChanServ::Find(params[0]);
 		const Anope::string &value = params[1];
 
 		if (Anope::ReadOnly)
@@ -174,7 +174,7 @@ class CommandBSSetNoBot : public Command
 
 		if (value.equals_ci("ON"))
 		{
-			Log(LOG_ADMIN, source, this, ci) << "to enable nobot"; 
+			Log(LOG_ADMIN, source, this, ci) << "to enable nobot";
 
 			ci->Extend<bool>("BS_NOBOT");
 			if (ci->bi)
@@ -183,7 +183,7 @@ class CommandBSSetNoBot : public Command
 		}
 		else if (value.equals_ci("OFF"))
 		{
-			Log(LOG_ADMIN, source, this, ci) << "to disable nobot"; 
+			Log(LOG_ADMIN, source, this, ci) << "to disable nobot";
 
 			ci->Shrink<bool>("BS_NOBOT");
 			source.Reply(_("No-bot mode is now \002off\002 on channel %s."), ci->name.c_str());
@@ -230,7 +230,7 @@ class BSAssign : public Module
 		if (Anope::ReadOnly || !c->ci || targ->server != Me || !(bi = dynamic_cast<BotInfo *>(targ)))
 			return;
 
-		AccessGroup access = c->ci->AccessFor(source);
+		ChanServ::AccessGroup access = c->ci->AccessFor(source);
 		if (nobot.HasExt(c->ci) || (!access.HasPriv("ASSIGN") && !source->HasPriv("botserv/administration")))
 		{
 			targ->SendMessage(bi, ACCESS_DENIED);
@@ -253,7 +253,7 @@ class BSAssign : public Module
 		targ->SendMessage(bi, _("Bot \002%s\002 has been assigned to %s."), bi->nick.c_str(), c->name.c_str());
 	}
 
-	void OnBotInfo(CommandSource &source, BotInfo *bi, ChannelInfo *ci, InfoFormatter &info) override
+	void OnBotInfo(CommandSource &source, BotInfo *bi, ChanServ::Channel *ci, InfoFormatter &info) override
 	{
 		if (nobot.HasExt(ci))
 			info.AddOption(_("No bot"));

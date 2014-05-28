@@ -12,12 +12,12 @@
 
 #include "services.h"
 #include "config.h"
-#include "bots.h"
-#include "access.h"
 #include "opertype.h"
 #include "channels.h"
 #include "hashcomp.h"
 #include "event.h"
+#include "bots.h"
+#include "modules/nickserv.h"
 
 using namespace Configuration;
 
@@ -37,7 +37,7 @@ int Block::CountBlock(const Anope::string &bname)
 {
 	if (!this)
 		return 0;
-	
+
 	return blocks.count(bname);
 }
 
@@ -45,7 +45,7 @@ Block* Block::GetBlock(const Anope::string &bname, int num)
 {
 	if (!this)
 		return NULL;
-	
+
 	std::pair<block_map::iterator, block_map::iterator> it = blocks.equal_range(bname);
 
 	for (int i = 0; it.first != it.second; ++it.first, ++i)
@@ -280,7 +280,7 @@ Conf::Conf() : Block("")
 
 		ValidateNotEmpty("oper", "name", nname);
 		ValidateNotEmpty("oper", "type", type);
-		
+
 		OperType *ot = NULL;
 		for (unsigned j = 0; j < this->MyOperTypes.size(); ++j)
 			if (this->MyOperTypes[j]->GetName() == type)
@@ -436,18 +436,6 @@ Conf::Conf() : Block("")
 		ci.hide = hide;
 	}
 
-	PrivilegeManager::ClearPrivileges();
-	for (int i = 0; i < this->CountBlock("privilege"); ++i)
-	{
-		Block *privilege = this->GetBlock("privilege", i);
-
-		const Anope::string &nname = privilege->Get<const Anope::string>("name"),
-					&desc = privilege->Get<const Anope::string>("desc");
-		int rank = privilege->Get<int>("rank");
-
-		PrivilegeManager::AddPrivilege(Privilege(nname, desc, rank));
-	}
-
 	for (int i = 0; i < this->CountBlock("fantasy"); ++i)
 	{
 		Block *fantasy = this->GetBlock("fantasy", i);
@@ -488,24 +476,29 @@ Conf::Conf() : Block("")
 
 	if (Config)
 		/* Clear existing conf opers */
-		for (nickcore_map::const_iterator it = NickCoreList->begin(), it_end = NickCoreList->end(); it != it_end; ++it)
+		if (NickServ::service)
 		{
-			NickCore *nc = it->second;
-			if (nc->o && std::find(Config->Opers.begin(), Config->Opers.end(), nc->o) != Config->Opers.end())
-				nc->o = NULL;
+			NickServ::nickcore_map& ncmap = NickServ::service->GetAccountList();
+			for (auto& it : ncmap)
+			{
+				NickServ::Account *nc = it.second;
+				if (nc->o && std::find(Config->Opers.begin(), Config->Opers.end(), nc->o) != Config->Opers.end())
+					nc->o = NULL;
+			}
 		}
 	/* Apply new opers */
-	for (unsigned i = 0; i < this->Opers.size(); ++i)
-	{
-		Oper *o = this->Opers[i];
+	if (NickServ::service)
+		for (unsigned i = 0; i < this->Opers.size(); ++i)
+		{
+			Oper *o = this->Opers[i];
 
-		NickAlias *na = NickAlias::Find(o->name);
-		if (!na)
-			continue;
+			NickServ::Nick *na = NickServ::service->FindNick(o->name);
+			if (!na)
+				continue;
 
-		na->nc->o = o;
-		Log() << "Tied oper " << na->nc->display << " to type " << o->ot->GetName();
-	}
+			na->nc->o = o;
+			Log() << "Tied oper " << na->nc->display << " to type " << o->ot->GetName();
+		}
 
 	if (options->Get<const Anope::string>("casemap", "ascii") == "ascii")
 		Anope::casemap = std::locale(std::locale(), new Anope::ascii_ctype<char>());
@@ -591,7 +584,7 @@ Block *Conf::GetModule(Module *m)
 {
 	if (!m)
 		return NULL;
-	
+
 	return GetModule(m->name);
 }
 
@@ -602,7 +595,7 @@ Block *Conf::GetModule(const Anope::string &mname)
 		return it->second;
 
 	Block* &block = modules[mname];
-	
+
 	/* Search for the block */
 	for (std::pair<block_map::iterator, block_map::iterator> iters = blocks.equal_range("module"); iters.first != iters.second; ++iters.first)
 	{
@@ -708,10 +701,10 @@ void Conf::LoadConf(File &file)
 	Log(LOG_DEBUG) << "Start to read conf " << file.GetName();
 	// Start reading characters...
 	while (!file.End())
-	{	
+	{
 		Anope::string line = file.Read();
 		++linenumber;
-		
+
 		/* If this line is completely empty and we are in a quote, just append a newline */
 		if (line.empty() && in_quote)
 			wordbuffer += "\n";

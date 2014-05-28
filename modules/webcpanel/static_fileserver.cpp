@@ -35,7 +35,7 @@ bool StaticFileServer::OnRequest(HTTPProvider *server, const Anope::string &page
 	char buffer[BUFSIZE];
 	while ((i = read(fd, buffer, sizeof(buffer))) > 0)
 		reply.Write(buffer, i);
-	
+
 	close(fd);
 	return true;
 }

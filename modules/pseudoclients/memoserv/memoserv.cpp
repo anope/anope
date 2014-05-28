@@ -14,6 +14,8 @@
 #include "modules/help.h"
 #include "modules/bs_bot.h"
 #include "modules/memoserv.h"
+#include "memoinfo.h"
+#include "memo.h"
 
 class MemoServCore : public Module, public MemoServ::MemoServService
 	, public EventHook<Event::NickCoreCreate>
@@ -28,8 +30,9 @@ class MemoServCore : public Module, public MemoServ::MemoServService
 	Reference<BotInfo> MemoServ;
 	EventHandlers<MemoServ::Event::MemoSend> onmemosend;
 	EventHandlers<MemoServ::Event::MemoDel> onmemodel;
+	Serialize::Type memo_type;
 
-	bool SendMemoMail(NickCore *nc, MemoInfo *mi, Memo *m)
+	bool SendMemoMail(NickServ::Account *nc, MemoServ::MemoInfo *mi, MemoServ::Memo *m)
 	{
 		Anope::string subject = Language::Translate(nc, Config->GetBlock("mail")->Get<const Anope::string>("memo_subject").c_str()),
 			message = Language::Translate(Config->GetBlock("mail")->Get<const Anope::string>("memo_message").c_str());
@@ -62,13 +65,14 @@ class MemoServCore : public Module, public MemoServ::MemoServService
 		, EventHook<Event::Help>("OnHelp")
 		, onmemosend(this, "OnMemoSend")
 		, onmemodel(this, "OnMemoDel")
+		, memo_type("Memo", MemoImpl::Unserialize)
 	{
 	}
 
 	MemoResult Send(const Anope::string &source, const Anope::string &target, const Anope::string &message, bool force) override
 	{
-		bool ischan;
-		MemoInfo *mi = MemoInfo::GetMemoInfo(target, ischan);
+		bool ischan, isregistered;
+		MemoServ::MemoInfo *mi = GetMemoInfo(target, ischan, isregistered, true);
 
 		if (mi == NULL)
 			return MEMO_INVALID_TARGET;
@@ -90,7 +94,7 @@ class MemoServCore : public Module, public MemoServ::MemoServService
 		if (sender != NULL)
 			sender->lastmemosend = Anope::CurTime;
 
-		Memo *m = new Memo();
+		MemoServ::Memo *m = new MemoImpl();
 		mi->memos->push_back(m);
 		m->owner = target;
 		m->sender = source;
@@ -102,7 +106,7 @@ class MemoServCore : public Module, public MemoServ::MemoServService
 
 		if (ischan)
 		{
-			ChannelInfo *ci = ChannelInfo::Find(target);
+			ChanServ::Channel *ci = ChanServ::Find(target);
 
 			if (ci->c)
 			{
@@ -113,23 +117,23 @@ class MemoServCore : public Module, public MemoServ::MemoServService
 					if (ci->AccessFor(cu->user).HasPriv("MEMO"))
 					{
 						if (cu->user->Account() && cu->user->Account()->HasExt("MEMO_RECEIVE"))
-							cu->user->SendMessage(MemoServ, MEMO_NEW_X_MEMO_ARRIVED, ci->name.c_str(), Config->StrictPrivmsg.c_str(), MemoServ->nick.c_str(), ci->name.c_str(), mi->memos->size());
+							cu->user->SendMessage(*MemoServ, MEMO_NEW_X_MEMO_ARRIVED, ci->name.c_str(), Config->StrictPrivmsg.c_str(), MemoServ->nick.c_str(), ci->name.c_str(), mi->memos->size());
 					}
 				}
 			}
 		}
 		else
 		{
-			NickCore *nc = NickAlias::Find(target)->nc;
+			NickServ::Account *nc = NickServ::FindNick(target)->nc;
 
 			if (nc->HasExt("MEMO_RECEIVE"))
 			{
 				for (unsigned i = 0; i < nc->aliases->size(); ++i)
 				{
-					const NickAlias *na = nc->aliases->at(i);
+					const NickServ::Nick *na = nc->aliases->at(i);
 					User *user = User::Find(na->nick);
 					if (user && user->IsIdentified())
-						user->SendMessage(MemoServ, MEMO_NEW_MEMO_ARRIVED, source.c_str(), Config->StrictPrivmsg.c_str(), MemoServ->nick.c_str(), mi->memos->size());
+						user->SendMessage(*MemoServ, MEMO_NEW_MEMO_ARRIVED, source.c_str(), Config->StrictPrivmsg.c_str(), MemoServ->nick.c_str(), mi->memos->size());
 				}
 			}
 
@@ -141,25 +145,64 @@ class MemoServCore : public Module, public MemoServ::MemoServService
 		return MEMO_SUCCESS;
 	}
 
-	void Check(User *u)
+	void Check(User *u) override
 	{
-		const NickCore *nc = u->Account();
-		if (!nc)
+		const NickServ::Account *nc = u->Account();
+		if (!nc || !nc->memos)
 			return;
 
-		unsigned i = 0, end = nc->memos.memos->size(), newcnt = 0;
+		unsigned i = 0, end = nc->memos->memos->size(), newcnt = 0;
 		for (; i < end; ++i)
-			if (nc->memos.GetMemo(i)->unread)
+			if (nc->memos->GetMemo(i)->unread)
 				++newcnt;
 		if (newcnt > 0)
-			u->SendMessage(MemoServ, newcnt == 1 ? _("You have 1 new memo.") : _("You have %d new memos."), newcnt);
-		if (nc->memos.memomax > 0 && nc->memos.memos->size() >= static_cast<unsigned>(nc->memos.memomax))
+			u->SendMessage(*MemoServ, newcnt == 1 ? _("You have 1 new memo.") : _("You have %d new memos."), newcnt);
+		if (nc->memos->memomax > 0 && nc->memos->memos->size() >= static_cast<unsigned>(nc->memos->memomax))
 		{
-			if (nc->memos.memos->size() > static_cast<unsigned>(nc->memos.memomax))
-				u->SendMessage(MemoServ, _("You are over your maximum number of memos (%d). You will be unable to receive any new memos until you delete some of your current ones."), nc->memos.memomax);
+			if (nc->memos->memos->size() > static_cast<unsigned>(nc->memos->memomax))
+				u->SendMessage(*MemoServ, _("You are over your maximum number of memos (%d). You will be unable to receive any new memos until you delete some of your current ones."), nc->memos->memomax);
 			else
-				u->SendMessage(MemoServ, _("You have reached your maximum number of memos (%d). You will be unable to receive any new memos until you delete some of your current ones."), nc->memos.memomax);
+				u->SendMessage(*MemoServ, _("You have reached your maximum number of memos (%d). You will be unable to receive any new memos until you delete some of your current ones."), nc->memos->memomax);
 		}
+	}
+
+	MemoServ::Memo *CreateMemo() override
+	{
+		return new MemoImpl();
+	}
+
+	MemoServ::MemoInfo *GetMemoInfo(const Anope::string &target, bool &is_registered, bool &ischan, bool create) override
+	{
+		if (!target.empty() && target[0] == '#')
+		{
+			ischan = true;
+			ChanServ::Channel *ci = ChanServ::Find(target);
+			if (ci != NULL)
+			{
+				is_registered = true;
+				if (create && !ci->memos)
+					ci->memos = new MemoInfoImpl();
+				return ci->memos;
+			}
+			else
+				is_registered = false;
+		}
+		else
+		{
+			ischan = false;
+			NickServ::Nick *na = NickServ::FindNick(target);
+			if (na != NULL)
+			{
+				is_registered = true;
+				if (create && !na->nc->memos)
+					na->nc->memos = new MemoInfoImpl();
+				return na->nc->memos;
+			}
+			else
+				is_registered = false;
+		}
+
+		return NULL;
 	}
 
 	void OnReload(Configuration::Conf *conf) override
@@ -176,14 +219,16 @@ class MemoServCore : public Module, public MemoServ::MemoServService
 		MemoServ = bi;
 	}
 
-	void OnNickCoreCreate(NickCore *nc) override
+	void OnNickCoreCreate(NickServ::Account *nc) override
 	{
-		nc->memos.memomax = Config->GetModule(this)->Get<int>("maxmemos");
+		nc->memos = new MemoInfoImpl();
+		nc->memos->memomax = Config->GetModule(this)->Get<int>("maxmemos");
 	}
 
-	void OnCreateChan(ChannelInfo *ci) override
+	void OnCreateChan(ChanServ::Channel *ci) override
 	{
-		ci->memos.memomax = Config->GetModule(this)->Get<int>("maxmemos");
+		ci->memos = new MemoInfoImpl();
+		ci->memos->memomax = Config->GetModule(this)->Get<int>("maxmemos");
 	}
 
 	void OnBotDelete(BotInfo *bi) override
@@ -199,12 +244,12 @@ class MemoServCore : public Module, public MemoServ::MemoServService
 
 	void OnJoinChannel(User *u, Channel *c) override
 	{
-		if (c->ci && !c->ci->memos.memos->empty() && c->ci->AccessFor(u).HasPriv("MEMO"))
+		if (c->ci && c->ci->memos && !c->ci->memos->memos->empty() && c->ci->AccessFor(u).HasPriv("MEMO"))
 		{
-			if (c->ci->memos.memos->size() == 1)
-				u->SendMessage(MemoServ, _("There is \002%d\002 memo on channel %s."), c->ci->memos.memos->size(), c->ci->name.c_str());
+			if (c->ci->memos->memos->size() == 1)
+				u->SendMessage(*MemoServ, _("There is \002%d\002 memo on channel %s."), c->ci->memos->memos->size(), c->ci->name.c_str());
 			else
-				u->SendMessage(MemoServ, _("There are \002%d\002 memos on channel %s."), c->ci->memos.memos->size(), c->ci->name.c_str());
+				u->SendMessage(*MemoServ, _("There are \002%d\002 memos on channel %s."), c->ci->memos->memos->size(), c->ci->name.c_str());
 		}
 	}
 

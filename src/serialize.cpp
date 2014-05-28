@@ -15,11 +15,8 @@
 #include "anope.h"
 #include "serialize.h"
 #include "modules.h"
-#include "account.h"
 #include "bots.h"
-#include "regchannel.h"
 #include "xline.h"
-#include "access.h"
 #include "event.h"
 
 using namespace Serialize;
@@ -30,9 +27,8 @@ std::list<Serializable *> *Serializable::SerializableItems;
 
 void Serialize::RegisterTypes()
 {
-	static Type nc("NickCore", NickCore::Unserialize), na("NickAlias", NickAlias::Unserialize), bi("BotInfo", BotInfo::Unserialize),
-		ci("ChannelInfo", ChannelInfo::Unserialize), access("ChanAccess", ChanAccess::Unserialize),
-		akick("AutoKick", AutoKick::Unserialize), memo("Memo", Memo::Unserialize), xline("XLine", XLine::Unserialize);
+	static Type bi("BotInfo", BotInfo::Unserialize),
+		xline("XLine", XLine::Unserialize);
 }
 
 void Serialize::CheckTypes()

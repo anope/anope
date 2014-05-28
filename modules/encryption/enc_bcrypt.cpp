@@ -839,6 +839,7 @@ char *_crypt_gensalt_blowfish_rn(const char *prefix, unsigned long count,
 
 #include "module.h"
 #include "modules/encryption.h"
+#include "modules/nickserv.h"
 
 class EBCRYPT : public Module
 	, public EventHook<Event::Encrypt>
@@ -897,12 +898,12 @@ class EBCRYPT : public Module
 		return EVENT_ALLOW;
 	}
 
-	void OnCheckAuthentication(User *, IdentifyRequest *req) override
+	void OnCheckAuthentication(User *, NickServ::IdentifyRequest *req) override
 	{
-		const NickAlias *na = NickAlias::Find(req->GetAccount());
+		const NickServ::Nick *na = NickServ::FindNick(req->GetAccount());
 		if (na == NULL)
 			return;
-		NickCore *nc = na->nc;
+		NickServ::Account *nc = na->nc;
 
 		size_t pos = nc->pass.find(':');
 		if (pos == Anope::string::npos)

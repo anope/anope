@@ -34,10 +34,10 @@ class CommandMSRSend : public Command
 
 		const Anope::string &nick = params[0];
 		const Anope::string &text = params[1];
-		const NickAlias *na = NULL;
+		const NickServ::Nick *na = NULL;
 
 		/* prevent user from rsend to themselves */
-		if ((na = NickAlias::Find(nick)) && na->nc == source.GetAccount())
+		if ((na = NickServ::FindNick(nick)) && na->nc == source.GetAccount())
 		{
 			source.Reply(_("You can not request a receipt when sending a memo to yourself."));
 			return;
@@ -54,15 +54,15 @@ class CommandMSRSend : public Command
 				source.Reply(_("Please wait %d seconds before using the %s command again."), Config->GetModule("memoserv")->Get<time_t>("senddelay"), source.command.c_str());
 			else if (result == MemoServ::MemoServService::MEMO_TARGET_FULL)
 				source.Reply(_("Sorry, %s currently has too many memos and cannot receive more."), nick.c_str());
-			else	
+			else
 			{
 				source.Reply(_("Memo sent to \002%s\002."), nick.c_str());
 
-				bool ischan;
-				MemoInfo *mi = MemoInfo::GetMemoInfo(nick, ischan);
+				bool ischan, isregistered;
+				MemoServ::MemoInfo *mi = MemoServ::service->GetMemoInfo(nick, ischan, isregistered, false);
 				if (mi == NULL)
 					throw CoreException("NULL mi in ms_rsend");
-				Memo *m = (mi->memos->size() ? mi->GetMemo(mi->memos->size() - 1) : NULL);
+				MemoServ::Memo *m = (mi->memos->size() ? mi->GetMemo(mi->memos->size() - 1) : NULL);
 				if (m != NULL)
 					m->receipt = true;
 			}

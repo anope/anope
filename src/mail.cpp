@@ -13,6 +13,9 @@
 #include "services.h"
 #include "mail.h"
 #include "config.h"
+#include "bots.h"
+#include "protocol.h"
+#include "modules/nickserv.h"
 
 Mail::Message::Message(const Anope::string &sf, const Anope::string &mailto, const Anope::string &a, const Anope::string &s, const Anope::string &m) : Thread(), sendmail_path(Config->GetBlock("mail")->Get<const Anope::string>("sendmailpath")), send_from(sf), mail_to(mailto), addr(a), subject(s), message(m), dont_quote_addresses(Config->GetBlock("mail")->Get<bool>("dontquoteaddresses")), success(false)
 {
@@ -51,13 +54,13 @@ void Mail::Message::Run()
 	SetExitState();
 }
 
-bool Mail::Send(User *u, NickCore *nc, BotInfo *service, const Anope::string &subject, const Anope::string &message)
+bool Mail::Send(User *u, NickServ::Account *nc, BotInfo *service, const Anope::string &subject, const Anope::string &message)
 {
 	if (!nc || !service || subject.empty() || message.empty())
 		return false;
 
 	Configuration::Block *b = Config->GetBlock("mail");
-	
+
 	if (!u)
 	{
 		if (!b->Get<bool>("usemail") || b->Get<const Anope::string>("sendfrom").empty())
@@ -90,7 +93,7 @@ bool Mail::Send(User *u, NickCore *nc, BotInfo *service, const Anope::string &su
 	}
 }
 
-bool Mail::Send(NickCore *nc, const Anope::string &subject, const Anope::string &message)
+bool Mail::Send(NickServ::Account *nc, const Anope::string &subject, const Anope::string &message)
 {
 	Configuration::Block *b = Config->GetBlock("mail");
 	if (!b->Get<bool>("usemail") || b->Get<const Anope::string>("sendfrom").empty() || !nc || nc->email.empty() || subject.empty() || message.empty())

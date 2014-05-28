@@ -26,7 +26,7 @@ class CommandNSUpdate : public Command
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		User *u = source.GetUser();
-		NickAlias *na = NickAlias::Find(u->nick);
+		NickServ::Nick *na = NickServ::FindNick(u->nick);
 
 		if (na && na->nc == source.GetAccount())
 		{

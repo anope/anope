@@ -15,10 +15,10 @@
 class MemoDelCallback : public NumberList
 {
 	CommandSource &source;
-	ChannelInfo *ci;
-	MemoInfo *mi;
+	ChanServ::Channel *ci;
+	MemoServ::MemoInfo *mi;
  public:
-	MemoDelCallback(CommandSource &_source, ChannelInfo *_ci, MemoInfo *_mi, const Anope::string &list) : NumberList(list, true), source(_source), ci(_ci), mi(_mi)
+	MemoDelCallback(CommandSource &_source, ChanServ::Channel *_ci, MemoServ::MemoInfo *_mi, const Anope::string &list) : NumberList(list, true), source(_source), ci(_ci), mi(_mi)
 	{
 	}
 
@@ -52,8 +52,8 @@ class CommandMSDel : public Command
 			return;
 		}
 
-		MemoInfo *mi;
-		ChannelInfo *ci = NULL;
+		MemoServ::MemoInfo *mi;
+		ChanServ::Channel *ci = NULL;
 		Anope::string numstr = !params.empty() ? params[0] : "", chan;
 
 		if (!numstr.empty() && numstr[0] == '#')
@@ -61,7 +61,7 @@ class CommandMSDel : public Command
 			chan = numstr;
 			numstr = params.size() > 1 ? params[1] : "";
 
-			ci = ChannelInfo::Find(chan);
+			ci = ChanServ::Find(chan);
 			if (!ci)
 			{
 				source.Reply(CHAN_X_NOT_REGISTERED, chan.c_str());
@@ -72,13 +72,13 @@ class CommandMSDel : public Command
 				source.Reply(ACCESS_DENIED);
 				return;
 			}
-			mi = &ci->memos;
+			mi = ci->memos;
 		}
 		else
-			mi = &source.nc->memos;
+			mi = source.nc->memos;
 		if (numstr.empty() || (!isdigit(numstr[0]) && !numstr.equals_ci("ALL") && !numstr.equals_ci("LAST")))
 			this->OnSyntaxError(source, numstr);
-		else if (mi->memos->empty())
+		else if (!mi || mi->memos->empty())
 		{
 			if (!chan.empty())
 				source.Reply(MEMO_X_HAS_NO_MEMOS, chan.c_str());

@@ -27,9 +27,9 @@ class CommandCSRegister : public Command
 		unsigned maxregistered = Config->GetModule("chanserv")->Get<unsigned>("maxregistered");
 
 		User *u = source.GetUser();
-		NickCore *nc = source.nc;
+		NickServ::Account *nc = source.nc;
 		Channel *c = Channel::Find(params[0]);
-		ChannelInfo *ci = ChannelInfo::Find(params[0]);
+		ChanServ::Channel *ci = ChanServ::Find(params[0]);
 
 		if (Anope::ReadOnly)
 			source.Reply(_("Sorry, channel registration is temporarily disabled."));
@@ -51,7 +51,9 @@ class CommandCSRegister : public Command
 			source.Reply(nc->channelcount > maxregistered ? CHAN_EXCEEDED_CHANNEL_LIMIT : CHAN_REACHED_CHANNEL_LIMIT, maxregistered);
 		else
 		{
-			ci = new ChannelInfo(chan);
+			if (!ChanServ::service)
+				return;
+			ci = ChanServ::service->Create(chan);
 			ci->SetFounder(nc);
 			ci->desc = chdesc;
 

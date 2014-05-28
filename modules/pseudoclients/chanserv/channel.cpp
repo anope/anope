@@ -10,103 +10,18 @@
  *
  */
 
-#include "services.h"
-#include "modules.h"
-#include "regchannel.h"
-#include "account.h"
-#include "access.h"
-#include "channels.h"
-#include "config.h"
-#include "bots.h"
-#include "servers.h"
-#include "event.h"
+#include "module.h"
+#include "channel.h"
+#include "modules/cs_akick.h"
 
-Serialize::Checker<registered_channel_map> RegisteredChannelList("ChannelInfo");
-
-AutoKick::AutoKick() : Serializable("AutoKick")
-{
-}
-
-AutoKick::~AutoKick()
-{
-	if (this->ci)
-	{
-		std::vector<AutoKick *>::iterator it = std::find(this->ci->akick->begin(), this->ci->akick->end(), this);
-		if (it != this->ci->akick->end())
-			this->ci->akick->erase(it);
-
-		const NickAlias *na = NickAlias::Find(this->mask);
-		if (na != NULL)
-			na->nc->RemoveChannelReference(this->ci);
-	}
-}
-
-void AutoKick::Serialize(Serialize::Data &data) const
-{
-	data["ci"] << this->ci->name;
-	if (this->nc)
-		data["nc"] << this->nc->display;
-	else
-		data["mask"] << this->mask;
-	data["reason"] << this->reason;
-	data["creator"] << this->creator;
-	data.SetType("addtime", Serialize::Data::DT_INT); data["addtime"] << this->addtime;
-	data.SetType("last_used", Serialize::Data::DT_INT); data["last_used"] << this->last_used;
-}
-
-Serializable* AutoKick::Unserialize(Serializable *obj, Serialize::Data &data)
-{
-	Anope::string sci, snc;
-
-	data["ci"] >> sci;
-	data["nc"] >> snc;
-
-	ChannelInfo *ci = ChannelInfo::Find(sci);
-	if (!ci)
-		return NULL;
-	
-	AutoKick *ak;
-	NickCore *nc = NickCore::Find(snc);
-	if (obj)
-	{
-		ak = anope_dynamic_static_cast<AutoKick *>(obj);
-		data["creator"] >> ak->creator;
-		data["reason"] >> ak->reason;
-		ak->nc = NickCore::Find(snc);
-		data["mask"] >> ak->mask;
-		data["addtime"] >> ak->addtime;
-		data["last_used"] >> ak->last_used;
-	}
-	else
-	{
-		time_t addtime, lastused;
-		data["addtime"] >> addtime;
-		data["last_used"] >> lastused;
-
-		Anope::string screator, sreason, smask;
-
-		data["creator"] >> screator;
-		data["reason"] >> sreason;
-		data["mask"] >> smask;
-
-		if (nc)	
-			ak = ci->AddAkick(screator, nc, sreason, addtime, lastused);
-		else
-			ak = ci->AddAkick(screator, smask, sreason, addtime, lastused);
-	}
-
-	return ak;
-}
-
-ChannelInfo::ChannelInfo(const Anope::string &chname) : Serializable("ChannelInfo"),
-	access("ChanAccess"), akick("AutoKick")
+ChannelImpl::ChannelImpl(const Anope::string &chname)
 {
 	if (chname.empty())
-		throw CoreException("Empty channel passed to ChannelInfo constructor");
+		throw CoreException("Empty channel passed to ChanServ::Channel constructor");
 
 	this->founder = NULL;
 	this->successor = NULL;
-	this->c = Channel::Find(chname);
+	this->c = ::Channel::Find(chname);
 	if (this->c)
 		this->c->ci = this;
 	this->banexpire = 0;
@@ -116,19 +31,18 @@ ChannelInfo::ChannelInfo(const Anope::string &chname) : Serializable("ChannelInf
 	this->name = chname;
 
 	this->bantype = 2;
-	this->memos.memomax = 0;
 	this->last_used = this->time_registered = Anope::CurTime;
 
-	size_t old = RegisteredChannelList->size();
-	(*RegisteredChannelList)[this->name] = this;
-	if (old == RegisteredChannelList->size())
+	ChanServ::registered_channel_map& map = ChanServ::service->GetChannels();
+	Channel* &ci = map[chname];
+	if (ci)
 		Log(LOG_DEBUG) << "Duplicate channel " << this->name << " in registered channel table?";
+	ci = this;
 
 	Event::OnCreateChan(&Event::CreateChan::OnCreateChan, this);
 }
 
-ChannelInfo::ChannelInfo(const ChannelInfo &ci) : Serializable("ChannelInfo"),
-	access("ChanAccess"), akick("AutoKick")
+ChannelImpl::ChannelImpl(const ChanServ::Channel &ci)
 {
 	*this = ci;
 
@@ -140,10 +54,10 @@ ChannelInfo::ChannelInfo(const ChannelInfo &ci) : Serializable("ChannelInfo"),
 
 	for (unsigned i = 0; i < ci.GetAccessCount(); ++i)
 	{
-		const ChanAccess *taccess = ci.GetAccess(i);
-		AccessProvider *provider = taccess->provider;
+		const ChanServ::ChanAccess *taccess = ci.GetAccess(i);
+		ChanServ::AccessProvider *provider = taccess->provider;
 
-		ChanAccess *newaccess = provider->Create();
+		ChanServ::ChanAccess *newaccess = provider->Create();
 		newaccess->ci = this;
 		newaccess->mask = taccess->mask;
 		newaccess->creator = taccess->creator;
@@ -166,7 +80,7 @@ ChannelInfo::ChannelInfo(const ChannelInfo &ci) : Serializable("ChannelInfo"),
 	Event::OnCreateChan(&Event::CreateChan::OnCreateChan, this);
 }
 
-ChannelInfo::~ChannelInfo()
+ChannelImpl::~ChannelImpl()
 {
 	Event::OnDelChan(&Event::DelChan::OnDelChan, this);
 
@@ -188,7 +102,8 @@ ChannelInfo::~ChannelInfo()
 		}
 	}
 
-	RegisteredChannelList->erase(this->name);
+	ChanServ::registered_channel_map& map = ChanServ::service->GetChannels();
+	map.erase(this->name);
 
 	this->SetFounder(NULL);
 	this->SetSuccessor(NULL);
@@ -196,18 +111,19 @@ ChannelInfo::~ChannelInfo()
 	this->ClearAccess();
 	this->ClearAkick();
 
-	if (!this->memos.memos->empty())
+	if (this->memos)
 	{
-		for (unsigned i = 0, end = this->memos.memos->size(); i < end; ++i)
-			delete this->memos.GetMemo(i);
-		this->memos.memos->clear();
+		for (unsigned i = 0, end = this->memos->memos->size(); i < end; ++i)
+			delete this->memos->GetMemo(i);
+		this->memos->memos->clear();
+		delete memos;
 	}
 
 	if (this->founder)
 		--this->founder->channelcount;
 }
 
-void ChannelInfo::Serialize(Serialize::Data &data) const
+void ChannelImpl::Serialize(Serialize::Data &data) const
 {
 	data["name"] << this->name;
 	if (this->founder)
@@ -230,14 +146,17 @@ void ChannelInfo::Serialize(Serialize::Data &data) const
 	if (this->bi)
 		data["bi"] << this->bi->nick;
 	data.SetType("banexpire", Serialize::Data::DT_INT); data["banexpire"] << this->banexpire;
-	data["memomax"] << this->memos.memomax;
-	for (unsigned i = 0; i < this->memos.ignores.size(); ++i)
-		data["memoignores"] << this->memos.ignores[i] << " ";
+	if (memos)
+	{
+		data["memomax"] << this->memos->memomax;
+		for (unsigned i = 0; i < this->memos->ignores.size(); ++i)
+			data["memoignores"] << this->memos->ignores[i] << " ";
+	}
 
 	Extensible::ExtensibleSerialize(this, this, data);
 }
 
-Serializable* ChannelInfo::Unserialize(Serializable *obj, Serialize::Data &data)
+Serializable* ChannelImpl::Unserialize(Serializable *obj, Serialize::Data &data)
 {
 	Anope::string sname, sfounder, ssuccessor, slevels, sbi;
 
@@ -247,14 +166,14 @@ Serializable* ChannelInfo::Unserialize(Serializable *obj, Serialize::Data &data)
 	data["levels"] >> slevels;
 	data["bi"] >> sbi;
 
-	ChannelInfo *ci;
+	ChannelImpl *ci;
 	if (obj)
-		ci = anope_dynamic_static_cast<ChannelInfo *>(obj);
+		ci = anope_dynamic_static_cast<ChannelImpl *>(obj);
 	else
-		ci = new ChannelInfo(sname);
+		ci = new ChannelImpl(sname);
 
-	ci->SetFounder(NickCore::Find(sfounder));
-	ci->SetSuccessor(NickCore::Find(ssuccessor));
+	ci->SetFounder(NickServ::FindAccount(sfounder));
+	ci->SetSuccessor(NickServ::FindAccount(ssuccessor));
 
 	data["description"] >> ci->desc;
 	data["time_registered"] >> ci->time_registered;
@@ -282,14 +201,17 @@ Serializable* ChannelInfo::Unserialize(Serializable *obj, Serialize::Data &data)
 			ci->bi->UnAssign(NULL, ci);
 	}
 	data["banexpire"] >> ci->banexpire;
-	data["memomax"] >> ci->memos.memomax;
+	if (ci->memos)
 	{
-		Anope::string buf;
-		data["memoignores"] >> buf;
-		spacesepstream sep(buf);
-		ci->memos.ignores.clear();
-		while (sep.GetToken(buf))
-			ci->memos.ignores.push_back(buf);
+		data["memomax"] >> ci->memos->memomax;
+		{
+			Anope::string buf;
+			data["memoignores"] >> buf;
+			spacesepstream sep(buf);
+			ci->memos->ignores.clear();
+			while (sep.GetToken(buf))
+				ci->memos->ignores.push_back(buf);
+		}
 	}
 
 	Extensible::ExtensibleUnserialize(ci, ci, data);
@@ -346,7 +268,7 @@ Serializable* ChannelInfo::Unserialize(Serializable *obj, Serialize::Data &data)
 }
 
 
-void ChannelInfo::SetFounder(NickCore *nc)
+void ChannelImpl::SetFounder(NickServ::Account *nc)
 {
 	if (this->founder)
 	{
@@ -363,12 +285,12 @@ void ChannelInfo::SetFounder(NickCore *nc)
 	}
 }
 
-NickCore *ChannelInfo::GetFounder() const
+NickServ::Account *ChannelImpl::GetFounder() const
 {
 	return this->founder;
 }
 
-void ChannelInfo::SetSuccessor(NickCore *nc)
+void ChannelImpl::SetSuccessor(NickServ::Account *nc)
 {
 	if (this->successor)
 		this->successor->RemoveChannelReference(this);
@@ -377,16 +299,16 @@ void ChannelInfo::SetSuccessor(NickCore *nc)
 		this->successor->AddChannelReference(this);
 }
 
-NickCore *ChannelInfo::GetSuccessor() const
+NickServ::Account *ChannelImpl::GetSuccessor() const
 {
 	return this->successor;
 }
 
-BotInfo *ChannelInfo::WhoSends() const
+BotInfo *ChannelImpl::WhoSends() const
 {
 	if (this && this->bi)
 		return this->bi;
-	
+
 	BotInfo *ChanServ = Config->GetClient("ChanServ");
 	if (ChanServ)
 		return ChanServ;
@@ -397,11 +319,11 @@ BotInfo *ChannelInfo::WhoSends() const
 	return NULL;
 }
 
-void ChannelInfo::AddAccess(ChanAccess *taccess)
+void ChannelImpl::AddAccess(ChanServ::ChanAccess *taccess)
 {
 	this->access->push_back(taccess);
 
-	const NickAlias *na = NickAlias::Find(taccess->mask);
+	const NickServ::Nick *na = NickServ::FindNick(taccess->mask);
 	if (na != NULL)
 	{
 		na->nc->AddChannelReference(this);
@@ -409,45 +331,45 @@ void ChannelInfo::AddAccess(ChanAccess *taccess)
 	}
 	else
 	{
-		ChannelInfo *ci = ChannelInfo::Find(taccess->mask);
+		ChanServ::Channel *ci = ChanServ::Find(taccess->mask);
 		if (ci != NULL)
 			ci->AddChannelReference(this->name);
 	}
 }
 
-ChanAccess *ChannelInfo::GetAccess(unsigned index) const
+ChanServ::ChanAccess *ChannelImpl::GetAccess(unsigned index) const
 {
 	if (this->access->empty() || index >= this->access->size())
 		return NULL;
 
-	ChanAccess *acc = (*this->access)[index];
+	ChanServ::ChanAccess *acc = (*this->access)[index];
 	acc->QueueUpdate();
 	return acc;
 }
 
-AccessGroup ChannelInfo::AccessFor(const User *u)
+ChanServ::AccessGroup ChannelImpl::AccessFor(const User *u)
 {
-	AccessGroup group;
+	ChanServ::AccessGroup group;
 
 	if (u == NULL)
 		return group;
 
-	const NickCore *nc = u->Account();
+	const NickServ::Account *nc = u->Account();
 	if (nc == NULL && !this->HasExt("NS_SECURE") && u->IsRecognized())
 	{
-		const NickAlias *na = NickAlias::Find(u->nick);
+		const NickServ::Nick *na = NickServ::FindNick(u->nick);
 		if (na != NULL)
 			nc = na->nc;
 	}
 
 	group.super_admin = u->super_admin;
-	group.founder = IsFounder(u, this);
+	group.founder = IsFounder(u);
 	group.ci = this;
 	group.nc = nc;
 
 	for (unsigned i = 0, end = this->GetAccessCount(); i < end; ++i)
 	{
-		ChanAccess *a = this->GetAccess(i);
+		ChanServ::ChanAccess *a = this->GetAccess(i);
 		if (a->Matches(u, u->Account(), group.path))
 			group.push_back(a);
 	}
@@ -463,9 +385,9 @@ AccessGroup ChannelInfo::AccessFor(const User *u)
 	return group;
 }
 
-AccessGroup ChannelInfo::AccessFor(const NickCore *nc)
+ChanServ::AccessGroup ChannelImpl::AccessFor(const NickServ::Account *nc)
 {
-	AccessGroup group;
+	ChanServ::AccessGroup group;
 
 	group.founder = (this->founder && this->founder == nc);
 	group.ci = this;
@@ -473,7 +395,7 @@ AccessGroup ChannelInfo::AccessFor(const NickCore *nc)
 
 	for (unsigned i = 0, end = this->GetAccessCount(); i < end; ++i)
 	{
-		ChanAccess *a = this->GetAccess(i);
+		ChanServ::ChanAccess *a = this->GetAccess(i);
 		if (a->Matches(NULL, nc, group.path))
 			group.push_back(a);
 	}
@@ -486,26 +408,26 @@ AccessGroup ChannelInfo::AccessFor(const NickCore *nc)
 	return group;
 }
 
-unsigned ChannelInfo::GetAccessCount() const
+unsigned ChannelImpl::GetAccessCount() const
 {
 	return this->access->size();
 }
 
-unsigned ChannelInfo::GetDeepAccessCount() const
+unsigned ChannelImpl::GetDeepAccessCount() const
 {
-	ChanAccess::Path path;
+	ChanServ::ChanAccess::Path path;
 	for (unsigned i = 0, end = this->GetAccessCount(); i < end; ++i)
 	{
-		ChanAccess *a = this->GetAccess(i);
+		ChanServ::ChanAccess *a = this->GetAccess(i);
 		a->Matches(NULL, NULL, path);
 	}
 
 	unsigned count = this->GetAccessCount();
-	std::set<const ChannelInfo *> channels;
+	std::set<const ChanServ::Channel *> channels;
 	channels.insert(this);
-	for (ChanAccess::Set::iterator it = path.first.begin(); it != path.first.end(); ++it)
+	for (ChanServ::ChanAccess::Set::iterator it = path.first.begin(); it != path.first.end(); ++it)
 	{
-		const ChannelInfo *ci = it->first->ci;
+		const ChanServ::Channel *ci = it->first->ci;
 		if (!channels.count(ci))
 		{
 			channels.count(ci);
@@ -515,25 +437,28 @@ unsigned ChannelInfo::GetDeepAccessCount() const
 	return count;
 }
 
-ChanAccess *ChannelInfo::EraseAccess(unsigned index)
+ChanServ::ChanAccess *ChannelImpl::EraseAccess(unsigned index)
 {
 	if (this->access->empty() || index >= this->access->size())
 		return NULL;
 
-	ChanAccess *ca = this->access->at(index);
+	ChanServ::ChanAccess *ca = this->access->at(index);
 	this->access->erase(this->access->begin() + index);
 	return ca;
 }
 
-void ChannelInfo::ClearAccess()
+void ChannelImpl::ClearAccess()
 {
 	for (unsigned i = this->access->size(); i > 0; --i)
 		delete this->GetAccess(i - 1);
 }
 
-AutoKick *ChannelInfo::AddAkick(const Anope::string &user, NickCore *akicknc, const Anope::string &reason, time_t t, time_t lu)
+AutoKick *ChannelImpl::AddAkick(const Anope::string &user, NickServ::Account *akicknc, const Anope::string &reason, time_t t, time_t lu)
 {
-	AutoKick *autokick = new AutoKick();
+	if (!::akick)
+		return nullptr;
+
+	AutoKick *autokick = ::akick->Create();
 	autokick->ci = this;
 	autokick->nc = akicknc;
 	autokick->reason = reason;
@@ -548,9 +473,12 @@ AutoKick *ChannelInfo::AddAkick(const Anope::string &user, NickCore *akicknc, co
 	return autokick;
 }
 
-AutoKick *ChannelInfo::AddAkick(const Anope::string &user, const Anope::string &mask, const Anope::string &reason, time_t t, time_t lu)
+AutoKick *ChannelImpl::AddAkick(const Anope::string &user, const Anope::string &mask, const Anope::string &reason, time_t t, time_t lu)
 {
-	AutoKick *autokick = new AutoKick();
+	if (!::akick)
+		return nullptr;
+
+	AutoKick *autokick = ::akick->Create();
 	autokick->ci = this;
 	autokick->mask = mask;
 	autokick->nc = NULL;
@@ -564,7 +492,7 @@ AutoKick *ChannelInfo::AddAkick(const Anope::string &user, const Anope::string &
 	return autokick;
 }
 
-AutoKick *ChannelInfo::GetAkick(unsigned index) const
+AutoKick *ChannelImpl::GetAkick(unsigned index) const
 {
 	if (this->akick->empty() || index >= this->akick->size())
 		return NULL;
@@ -574,31 +502,31 @@ AutoKick *ChannelInfo::GetAkick(unsigned index) const
 	return ak;
 }
 
-unsigned ChannelInfo::GetAkickCount() const
+unsigned ChannelImpl::GetAkickCount() const
 {
 	return this->akick->size();
 }
 
-void ChannelInfo::EraseAkick(unsigned index)
+void ChannelImpl::EraseAkick(unsigned index)
 {
 	if (this->akick->empty() || index >= this->akick->size())
 		return;
-	
+
 	delete this->GetAkick(index);
 }
 
-void ChannelInfo::ClearAkick()
+void ChannelImpl::ClearAkick()
 {
 	while (!this->akick->empty())
 		delete this->akick->back();
 }
 
-int16_t ChannelInfo::GetLevel(const Anope::string &priv) const
+int16_t ChannelImpl::GetLevel(const Anope::string &priv) const
 {
-	if (PrivilegeManager::FindPrivilege(priv) == NULL)
+	if (!ChanServ::service || !ChanServ::service->FindPrivilege(priv))
 	{
 		Log(LOG_DEBUG) << "Unknown privilege " + priv;
-		return ACCESS_INVALID;
+		return ChanServ::ACCESS_INVALID;
 	}
 
 	Anope::map<int16_t>::const_iterator it = this->levels.find(priv);
@@ -607,22 +535,22 @@ int16_t ChannelInfo::GetLevel(const Anope::string &priv) const
 	return it->second;
 }
 
-void ChannelInfo::SetLevel(const Anope::string &priv, int16_t level)
+void ChannelImpl::SetLevel(const Anope::string &priv, int16_t level)
 {
 	this->levels[priv] = level;
 }
 
-void ChannelInfo::RemoveLevel(const Anope::string &priv)
+void ChannelImpl::RemoveLevel(const Anope::string &priv)
 {
 	this->levels.erase(priv);
 }
 
-void ChannelInfo::ClearLevels()
+void ChannelImpl::ClearLevels()
 {
 	this->levels.clear();
 }
 
-Anope::string ChannelInfo::GetIdealBan(User *u) const
+Anope::string ChannelImpl::GetIdealBan(User *u) const
 {
 	int bt = this ? this->bantype : -1;
 	switch (bt)
@@ -642,46 +570,34 @@ Anope::string ChannelInfo::GetIdealBan(User *u) const
 	}
 }
 
-ChannelInfo* ChannelInfo::Find(const Anope::string &name)
+bool ChannelImpl::IsFounder(const User *user)
 {
-	registered_channel_map::const_iterator it = RegisteredChannelList->find(name);
-	if (it != RegisteredChannelList->end())
-	{
-		it->second->QueueUpdate();
-		return it->second;
-	}
-
-	return NULL;
-}
-
-bool IsFounder(const User *user, const ChannelInfo *ci)
-{
-	if (!user || !ci)
+	if (!user)
 		return false;
 
 	if (user->super_admin)
 		return true;
 
-	if (user->Account() && user->Account() == ci->GetFounder())
+	if (user->Account() && user->Account() == this->GetFounder())
 		return true;
 
 	return false;
 }
 
 
-void ChannelInfo::AddChannelReference(const Anope::string &what)
+void ChannelImpl::AddChannelReference(const Anope::string &what)
 {
 	++references[what];
 }
 
-void ChannelInfo::RemoveChannelReference(const Anope::string &what)
+void ChannelImpl::RemoveChannelReference(const Anope::string &what)
 {
 	int &i = references[what];
 	if (--i <= 0)
 		references.erase(what);
 }
 
-void ChannelInfo::GetChannelReferences(std::deque<Anope::string> &chans)
+void ChannelImpl::GetChannelReferences(std::deque<Anope::string> &chans)
 {
 	chans.clear();
 	for (Anope::map<int>::iterator it = references.begin(); it != references.end(); ++it)

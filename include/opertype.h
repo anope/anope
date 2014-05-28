@@ -9,10 +9,9 @@
 #pragma once
 
 #include "services.h"
-#include "account.h"
 
 /* A services operator. Usually made by the configuration file, but not always.
- * NickAlias::Find(name)->nc->o == this
+ * NickServ::FindNick(name)->nc->o == this
  */
 struct CoreExport Oper
 {
@@ -32,7 +31,7 @@ struct CoreExport Oper
 	virtual ~Oper();
 
 	static std::vector<Oper *> opers;
-	
+
 	/** Find an oper block by name
 	 * @param name The name
 	 * @return the oper block

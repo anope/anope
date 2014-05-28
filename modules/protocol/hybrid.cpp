@@ -224,7 +224,7 @@ class HybridProto : public IRCDProto
 		UplinkSocket::Message(source) << "SVSMODE " << u->GetUID() << " " << u->timestamp << " " << buf;
 	}
 
-	void SendLogin(User *u, NickAlias *na) override
+	void SendLogin(User *u, NickServ::Nick *na) override
 	{
 		IRCD->SendMode(Config->GetClient("NickServ"), u, "+d %s", na->nc->display.c_str());
 	}
@@ -535,9 +535,9 @@ struct IRCDMessageUID : IRCDMessage
 		if (ip == "0") /* Can be 0 for spoofed clients */
 			ip.clear();
 
-		NickAlias *na = NULL;
+		NickServ::Nick *na = NULL;
 		if (params[8] != "0")
-			na = NickAlias::Find(params[8]);
+			na = NickServ::FindNick(params[8]);
 
 		/* Source is always the server */
 		User::OnIntroduce(params[0], params[4], params[5], "",

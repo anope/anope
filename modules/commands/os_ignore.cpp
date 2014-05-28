@@ -38,7 +38,7 @@ Serializable* IgnoreDataImpl::Unserialize(Serializable *obj, Serialize::Data &da
 {
 	if (!ignore_service)
 		return NULL;
-	
+
 	IgnoreDataImpl *ign;
 	if (obj)
 		ign = anope_dynamic_static_cast<IgnoreDataImpl *>(obj);
@@ -94,7 +94,7 @@ class OSIgnoreService : public IgnoreService
 	{
 		User *u = User::Find(mask, true);
 		std::vector<IgnoreData *>::iterator ign = this->ignores->begin(), ign_end = this->ignores->end();
-		
+
 		if (u)
 		{
 			for (; ign != ign_end; ++ign)
@@ -163,7 +163,7 @@ class CommandOSIgnore : public Command
 		User *u = User::Find(mask, true);
 		if (u)
 			return "*!*@" + u->host;
-		
+
 		size_t host = mask.find('@');
 		/* Determine whether we get a nick or a mask. */
 		if (host != Anope::string::npos)

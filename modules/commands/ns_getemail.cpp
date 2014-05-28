@@ -31,9 +31,9 @@ class CommandNSGetEMail : public Command
 
 		Log(LOG_ADMIN, source, this) << "on " << email;
 
-		for (nickcore_map::const_iterator it = NickCoreList->begin(), it_end = NickCoreList->end(); it != it_end; ++it)
+		for (auto& it : NickServ::service->GetAccountList())
 		{
-			const NickCore *nc = it->second;
+			const NickServ::Account *nc = it.second;
 
 			if (!nc->email.empty() && nc->email.equals_ci(email))
 			{
@@ -66,7 +66,7 @@ class CommandNSGetEMail : public Command
 class NSGetEMail : public Module
 {
 	CommandNSGetEMail commandnsgetemail;
-	
+
  public:
 	NSGetEMail(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
 		, commandnsgetemail(this)

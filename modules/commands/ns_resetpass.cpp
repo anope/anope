@@ -11,7 +11,7 @@
 
 #include "module.h"
 
-static bool SendResetEmail(User *u, const NickAlias *na, BotInfo *bi);
+static bool SendResetEmail(User *u, const NickServ::Nick *na, BotInfo *bi);
 
 class CommandNSResetPass : public Command
 {
@@ -25,9 +25,9 @@ class CommandNSResetPass : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
-		const NickAlias *na;
+		const NickServ::Nick *na;
 
-		if (!(na = NickAlias::Find(params[0])))
+		if (!(na = NickServ::FindNick(params[0])))
 			source.Reply(NICK_X_NOT_REGISTERED, params[0].c_str());
 		else if (!na->nc->email.equals_ci(params[1]))
 			source.Reply(_("Incorrect email address."));
@@ -85,12 +85,12 @@ class NSResetPass : public Module
 				return EVENT_STOP;
 			}
 
-			NickAlias *na = NickAlias::Find(params[0]);
+			NickServ::Nick *na = NickServ::FindNick(params[0]);
 
 			ResetInfo *ri = na ? reset.Get(na->nc) : NULL;
 			if (na && ri)
 			{
-				NickCore *nc = na->nc;
+				NickServ::Account *nc = na->nc;
 				const Anope::string &passcode = params[1];
 				if (ri->time < Anope::CurTime - 3600)
 				{
@@ -121,7 +121,7 @@ class NSResetPass : public Module
 	}
 };
 
-static bool SendResetEmail(User *u, const NickAlias *na, BotInfo *bi)
+static bool SendResetEmail(User *u, const NickServ::Nick *na, BotInfo *bi)
 {
 	Anope::string subject = Language::Translate(na->nc, Config->GetBlock("mail")->Get<const Anope::string>("reset_subject").c_str()),
 		message = Language::Translate(na->nc, Config->GetBlock("mail")->Get<const Anope::string>("reset_message").c_str()),

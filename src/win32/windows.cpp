@@ -68,10 +68,10 @@ int gettimeofday(timeval *tv, void *)
 {
 	SYSTEMTIME st;
 	GetSystemTime(&st);
-	
+
 	tv->tv_sec = Anope::CurTime;
 	tv->tv_usec = st.wMilliseconds;
-	
+
 	return 0;
 }
 
@@ -243,7 +243,7 @@ int mkstemp(char *input)
 		errno = EEXIST;
 		return -1;
 	}
-	
+
 	int fd = open(input, O_WRONLY | O_CREAT, S_IREAD | S_IWRITE);
 	return fd;
 }

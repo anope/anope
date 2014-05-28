@@ -181,7 +181,7 @@ void MySSLService::Init(Socket *s)
 {
 	if (s->io != &NormalSocketIO)
 		throw CoreException("Socket initializing SSL twice");
-	
+
 	s->io = new SSLSocketIO();
 }
 
@@ -259,7 +259,7 @@ ClientSocket *SSLSocketIO::Accept(ListenSocket *s)
 
 	newsocket->flags[SF_ACCEPTING] = true;
 	this->FinishAccept(newsocket);
-	
+
 	return newsocket;
 }
 
@@ -273,7 +273,7 @@ SocketFlag SSLSocketIO::FinishAccept(ClientSocket *cs)
 		throw SocketException("SSLSocketIO::FinishAccept called for a socket not accepted nor accepting?");
 
 	SSLSocketIO *io = anope_dynamic_static_cast<SSLSocketIO *>(cs->io);
-	
+
 	int ret = SSL_accept(io->sslsock);
 	if (ret <= 0)
 	{
@@ -354,7 +354,7 @@ SocketFlag SSLSocketIO::FinishConnect(ConnectionSocket *s)
 		if (!SSL_set_fd(io->sslsock, s->GetFD()))
 			throw SocketException("Unable to set SSL fd");
 	}
-	
+
 	int ret = SSL_connect(io->sslsock);
 	if (ret <= 0)
 	{

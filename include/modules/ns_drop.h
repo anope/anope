@@ -14,7 +14,7 @@ namespace Event
 		 * @param source The source of the command
 		 * @param na The nick
 		 */
-		virtual void OnNickDrop(CommandSource &source, NickAlias *na) anope_abstract;
+		virtual void OnNickDrop(CommandSource &source, NickServ::Nick *na) anope_abstract;
 	};
 	extern CoreExport EventHandlers<NickDrop> OnNickDrop;
 }

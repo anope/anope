@@ -45,7 +45,7 @@ struct CommandInfo
 struct CoreExport CommandReply
 {
 	virtual ~CommandReply() { }
-	virtual void SendMessage(BotInfo *source, const Anope::string &msg) = 0;
+	virtual void SendMessage(const MessageSource &, const Anope::string &msg) anope_abstract;
 };
 
 /* The source for a command */
@@ -57,7 +57,7 @@ class CoreExport CommandSource
 	Reference<User> u;
  public:
 	/* The account executing the command */
-	Reference<NickCore> nc;
+	Reference<NickServ::Account> nc;
 	/* Where the reply should go */
 	CommandReply *reply;
 	/* Channel the command was executed on (fantasy) */
@@ -69,13 +69,13 @@ class CoreExport CommandSource
 	/* The permission of the command being executed */
 	Anope::string permission;
 
-	CommandSource(const Anope::string &n, User *user, NickCore *core, CommandReply *reply, BotInfo *bi);
+	CommandSource(const Anope::string &n, User *user, NickServ::Account *core, CommandReply *reply, BotInfo *bi);
 
 	const Anope::string &GetNick() const;
 	User *GetUser();
-	NickCore *GetAccount();
-	AccessGroup AccessFor(ChannelInfo *ci);
-	bool IsFounder(ChannelInfo *ci);
+	NickServ::Account *GetAccount();
+	ChanServ::AccessGroup AccessFor(ChanServ::Channel *ci);
+	bool IsFounder(ChanServ::Channel *ci);
 
 	void Reply(const char *message, ...);
 	void Reply(const Anope::string &message);

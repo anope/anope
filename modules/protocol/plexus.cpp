@@ -142,7 +142,7 @@ class PlexusProto : public IRCDProto
 		UplinkSocket::Message(source) << "ENCAP * SVSMODE " << u->GetUID() << " " << u->timestamp << " " << buf;
 	}
 
-	void SendLogin(User *u, NickAlias *na) override
+	void SendLogin(User *u, NickServ::Nick *na) override
 	{
 		UplinkSocket::Message(Me) << "ENCAP * SU " << u->GetUID() << " " << na->nc->display;
 	}
@@ -184,7 +184,7 @@ struct IRCDMessageEncap : IRCDMessage
 		if (params[1].equals_cs("SU"))
 		{
 			User *u = User::Find(params[2]);
-			NickCore *nc = NickCore::Find(params[3]);
+			NickServ::Account *nc = NickServ::FindAccount(params[3]);
 			if (u && nc)
 			{
 				u->Login(nc);
@@ -272,15 +272,15 @@ struct IRCDMessageUID : IRCDMessage
 			ts = Anope::CurTime;
 		}
 
-		NickAlias *na = NULL;
+		NickServ::Nick *na = NULL;
 		try
 		{
 			if (params[8].is_pos_number_only() && convertTo<time_t>(params[8]) == ts)
-				na = NickAlias::Find(params[0]);
+				na = NickServ::FindNick(params[0]);
 		}
 		catch (const ConvertException &) { }
 		if (params[8] != "0" && !na)
-			na = NickAlias::Find(params[8]);
+			na = NickServ::FindNick(params[8]);
 
 		User::OnIntroduce(params[0], params[4], params[9], params[5], ip, source.GetServer(), params[10], ts, params[3], params[7], na ? *na->nc : NULL);
 	}
@@ -312,7 +312,7 @@ class ProtoPlexus : public Module
 	Message::Topic message_topic;
 	Message::Version message_version;
 	Message::Whois message_whois;
-	
+
 	/* Hybrid message handlers */
 	ServiceAlias message_bmask, message_eob, message_join, message_nick, message_sid, message_sjoin,
 			message_tburst, message_tmode;

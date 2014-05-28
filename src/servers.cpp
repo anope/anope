@@ -15,11 +15,11 @@
 #include "xline.h"
 #include "servers.h"
 #include "bots.h"
-#include "regchannel.h"
 #include "protocol.h"
 #include "config.h"
 #include "channels.h"
 #include "event.h"
+#include "modules/chanserv.h"
 
 /* Anope */
 Server *Me = NULL;
@@ -82,7 +82,7 @@ Server::Server(Server *up, const Anope::string &sname, unsigned shops, const Ano
 			}
 
 			IRCD->SendBOB();
-	
+
 			for (unsigned i = 0; i < Me->GetLinks().size(); ++i)
 			{
 				Server *s = Me->GetLinks()[i];
@@ -159,7 +159,7 @@ Server::~Server()
 
 	for (unsigned i = this->links.size(); i > 0; --i)
 		this->links[i - 1]->Delete(this->quit_reason);
-	
+
 	Servers::ByName.erase(this->name);
 	if (!this->sid.empty())
 		Servers::ByID.erase(this->sid);
@@ -338,18 +338,18 @@ void Server::Notice(BotInfo *source, const Anope::string &message)
 Server *Server::Find(const Anope::string &name, bool name_only)
 {
 	Anope::map<Server *>::iterator it;
-	
+
 	if (!name_only)
 	{
 		it = Servers::ByID.find(name);
 		if (it != Servers::ByID.end())
 			return it->second;
 	}
-	
+
 	it = Servers::ByName.find(name);
 	if (it != Servers::ByName.end())
 		return it->second;
-	
+
 	return NULL;
 }
 

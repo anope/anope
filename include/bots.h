@@ -15,7 +15,7 @@
 #include "commands.h"
 
 
-typedef Anope::map<BotInfo *> botinfo_map;
+typedef Anope::hash_map<BotInfo *> botinfo_map;
 
 extern CoreExport Serialize::Checker<botinfo_map> BotListByNick, BotListByUID;
 
@@ -23,7 +23,7 @@ extern CoreExport Serialize::Checker<botinfo_map> BotListByNick, BotListByUID;
 class CoreExport BotInfo : public User, public Serializable
 {
 	/* Channels this bot is assigned to */
-	Serialize::Checker<std::set<ChannelInfo *> > channels;
+	Serialize::Checker<std::set<ChanServ::Channel *> > channels;
  public:
 	time_t created;
 	/* Last time this bot said something (via privmsg) */
@@ -68,19 +68,19 @@ class CoreExport BotInfo : public User, public Serializable
 
 	/** Return the channels this bot is assigned to
 	 */
-	const std::set<ChannelInfo *> &GetChannels() const;
+	const std::set<ChanServ::Channel *> &GetChannels() const;
 
 	/** Assign this bot to a given channel, removing the existing assigned bot if one exists.
 	 * @param u The user assigning the bot, or NULL
 	 * @param ci The channel registration to assign the bot to.
 	 */
-	void Assign(User *u, ChannelInfo *ci);
+	void Assign(User *u, ChanServ::Channel *ci);
 
 	/** Remove this bot from a given channel.
 	 * @param u The user requesting the unassign, or NULL.
 	 * @param ci The channel registration to remove the bot from.
 	 */
-	void UnAssign(User *u, ChannelInfo *ci);
+	void UnAssign(User *u, ChanServ::Channel *ci);
 
 	/** Get the number of channels this bot is assigned to
 	 */

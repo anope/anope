@@ -15,6 +15,6 @@ namespace Event
 		 * @param source The user dropping the channel
 		 * @param ci The channel
 		 */
-		virtual EventReturn OnChanDrop(CommandSource &source, ChannelInfo *ci) anope_abstract;
+		virtual EventReturn OnChanDrop(CommandSource &source, ChanServ::Channel *ci) anope_abstract;
 	};
 }

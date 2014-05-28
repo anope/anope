@@ -16,7 +16,7 @@
 class CommandCSEnforce : public Command
 {
  private:
-	void DoSecureOps(CommandSource &source, ChannelInfo *ci)
+	void DoSecureOps(CommandSource &source, ChanServ::Channel *ci)
 	{
 		bool override = !source.AccessFor(ci).HasPriv("AKICK") && source.HasPriv("chanserv/access/modify");
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to enforce secureops";
@@ -42,7 +42,7 @@ class CommandCSEnforce : public Command
 		source.Reply(_("Secureops enforced on %s."), ci->name.c_str());
 	}
 
-	void DoRestricted(CommandSource &source, ChannelInfo *ci)
+	void DoRestricted(CommandSource &source, ChanServ::Channel *ci)
 	{
 		bool override = !source.AccessFor(ci).HasPriv("AKICK") && source.HasPriv("chanserv/access/modify");
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to enforce restricted";
@@ -61,7 +61,7 @@ class CommandCSEnforce : public Command
 		}
 
 		for (unsigned i = 0; i < users.size(); ++i)
-		{	
+		{
 			User *user = users[i];
 
 			Anope::string mask = ci->GetIdealBan(user);
@@ -73,7 +73,7 @@ class CommandCSEnforce : public Command
 		source.Reply(_("Restricted enforced on %s."), ci->name.c_str());
 	}
 
-	void DoRegOnly(CommandSource &source, ChannelInfo *ci)
+	void DoRegOnly(CommandSource &source, ChanServ::Channel *ci)
 	{
 		bool override = !source.AccessFor(ci).HasPriv("AKICK") && source.HasPriv("chanserv/access/modify");
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to enforce registered only";
@@ -105,7 +105,7 @@ class CommandCSEnforce : public Command
 		source.Reply(_("Registered only enforced on %s."), ci->name.c_str());
 	}
 
-	void DoSSLOnly(CommandSource &source, ChannelInfo *ci)
+	void DoSSLOnly(CommandSource &source, ChanServ::Channel *ci)
 	{
 		bool override = !source.AccessFor(ci).HasPriv("AKICK") && source.HasPriv("chanserv/access/modify");
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to enforce SSL only";
@@ -137,7 +137,7 @@ class CommandCSEnforce : public Command
 		source.Reply(_("SSL only enforced on %s."), ci->name.c_str());
 	}
 
-	void DoBans(CommandSource &source, ChannelInfo *ci)
+	void DoBans(CommandSource &source, ChanServ::Channel *ci)
 	{
 		bool override = !source.AccessFor(ci).HasPriv("AKICK") && source.HasPriv("chanserv/access/modify");
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to enforce bans";
@@ -158,7 +158,7 @@ class CommandCSEnforce : public Command
 		for (unsigned i = 0; i < users.size(); ++i)
 		{
 			User *user = users[i];
-	
+
 			Anope::string reason = Language::Translate(user, _("BANS enforced by ")) + source.GetNick();
 			ci->c->Kick(NULL, user, "%s", reason.c_str());
 		}
@@ -166,7 +166,7 @@ class CommandCSEnforce : public Command
 		source.Reply(_("Bans enforced on %s."), ci->name.c_str());
 	}
 
-	void DoLimit(CommandSource &source, ChannelInfo *ci)
+	void DoLimit(CommandSource &source, ChanServ::Channel *ci)
 	{
 		bool override = !source.AccessFor(ci).HasPriv("AKICK") && source.HasPriv("chanserv/access/modify");
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to enforce limit";
@@ -213,7 +213,7 @@ class CommandCSEnforce : public Command
 		for (unsigned i = 0; i < users.size(); ++i)
 		{
 			User *user = users[i];
-	
+
 			Anope::string reason = Language::Translate(user, _("LIMIT enforced by ")) + source.GetNick();
 			ci->c->Kick(NULL, user, "%s", reason.c_str());
 		}
@@ -232,7 +232,7 @@ class CommandCSEnforce : public Command
 	{
 		const Anope::string &what = params.size() > 1 ? params[1] : "";
 
-		ChannelInfo *ci = ChannelInfo::Find(params[0]);
+		ChanServ::Channel *ci = ChanServ::Find(params[0]);
 
 		if (!ci)
 			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());

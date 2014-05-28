@@ -24,15 +24,15 @@ class CommandMSList : public Command
 	{
 
 		Anope::string param = !params.empty() ? params[0] : "", chan;
-		ChannelInfo *ci = NULL;
-		const MemoInfo *mi;
+		ChanServ::Channel *ci = NULL;
+		const MemoServ::MemoInfo *mi;
 
 		if (!param.empty() && param[0] == '#')
 		{
 			chan = param;
 			param = params.size() > 1 ? params[1] : "";
 
-			ci = ChannelInfo::Find(chan);
+			ci = ChanServ::Find(chan);
 			if (!ci)
 			{
 				source.Reply(CHAN_X_NOT_REGISTERED, chan.c_str());
@@ -43,10 +43,10 @@ class CommandMSList : public Command
 				source.Reply(ACCESS_DENIED);
 				return;
 			}
-			mi = &ci->memos;
+			mi = ci->memos;
 		}
 		else
-			mi = &source.nc->memos;
+			mi = source.nc->memos;
 
 		if (!param.empty() && !isdigit(param[0]) && !param.equals_ci("NEW"))
 			this->OnSyntaxError(source, param);
@@ -69,9 +69,9 @@ class CommandMSList : public Command
 				{
 					ListFormatter &list;
 					CommandSource &source;
-					const MemoInfo *mi;
+					const MemoServ::MemoInfo *mi;
 				 public:
-					MemoListCallback(ListFormatter &_list, CommandSource &_source, const MemoInfo *_mi, const Anope::string &numlist) : NumberList(numlist, false), list(_list), source(_source), mi(_mi)
+					MemoListCallback(ListFormatter &_list, CommandSource &_source, const MemoServ::MemoInfo *_mi, const Anope::string &numlist) : NumberList(numlist, false), list(_list), source(_source), mi(_mi)
 					{
 					}
 
@@ -80,7 +80,7 @@ class CommandMSList : public Command
 						if (!number || number > mi->memos->size())
 							return;
 
-						const Memo *m = mi->GetMemo(number - 1);
+						const MemoServ::Memo *m = mi->GetMemo(number - 1);
 
 						ListFormatter::ListEntry entry;
 						entry["Number"] = (m->unread ? "* " : "  ") + stringify(number);
@@ -115,7 +115,7 @@ class CommandMSList : public Command
 					if (!param.empty() && !mi->GetMemo(i)->unread)
 						continue;
 
-					const Memo *m = mi->GetMemo(i);
+					const MemoServ::Memo *m = mi->GetMemo(i);
 
 					ListFormatter::ListEntry entry;
 					entry["Number"] = (m->unread ? "* " : "  ") + stringify(i + 1);

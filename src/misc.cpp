@@ -121,7 +121,7 @@ bool NumberList::InvalidRange(const Anope::string &)
 	return true;
 }
 
-ListFormatter::ListFormatter(NickCore *acc) : nc(acc)
+ListFormatter::ListFormatter(NickServ::Account *acc) : nc(acc)
 {
 }
 
@@ -215,7 +215,7 @@ void ListFormatter::Process(std::vector<Anope::string> &buffer)
 	}
 }
 
-InfoFormatter::InfoFormatter(NickCore *acc) : nc(acc), longest(0)
+InfoFormatter::InfoFormatter(NickServ::Account *acc) : nc(acc), longest(0)
 {
 }
 
@@ -312,7 +312,7 @@ time_t Anope::DoTime(const Anope::string &s)
 	return amount;
 }
 
-Anope::string Anope::Duration(time_t t, const NickCore *nc)
+Anope::string Anope::Duration(time_t t, const NickServ::Account *nc)
 {
 	/* We first calculate everything */
 	time_t years = t / 31536000;
@@ -353,7 +353,7 @@ Anope::string Anope::Duration(time_t t, const NickCore *nc)
 	}
 }
 
-Anope::string Anope::strftime(time_t t, const NickCore *nc, bool short_output)
+Anope::string Anope::strftime(time_t t, const NickServ::Account *nc, bool short_output)
 {
 	tm tm = *localtime(&t);
 	char buf[BUFSIZE];
@@ -368,7 +368,7 @@ Anope::string Anope::strftime(time_t t, const NickCore *nc, bool short_output)
 		return Anope::string(buf) + " " + Language::Translate(nc, _("(now)"));
 }
 
-Anope::string Anope::Expires(time_t expires, const NickCore *nc)
+Anope::string Anope::Expires(time_t expires, const NickServ::Account *nc)
 {
 	if (!expires)
 		return Language::Translate(nc, NO_EXPIRE);
@@ -644,7 +644,7 @@ Anope::string Anope::VersionBuildString()
 
 	if (!flags.empty())
 		s += ", flags " + flags;
-	
+
 	return s;
 }
 

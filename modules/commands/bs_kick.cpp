@@ -28,15 +28,15 @@ struct KickerDataImpl : KickerData
 		capsmin = capspercent = 0;
 		floodlines = floodsecs = 0;
 		repeattimes = 0;
-		
+
 		dontkickops = dontkickvoices = false;
 	}
 
-	void Check(ChannelInfo *ci) override
+	void Check(ChanServ::Channel *ci) override
 	{
 		if (amsgs || badwords || bolds || caps || colors || flood || italics || repeat || reverses || underlines)
 			return;
-		
+
 		ci->Shrink<KickerData>("kickerdata");
 	}
 
@@ -46,10 +46,10 @@ struct KickerDataImpl : KickerData
 
 		void ExtensibleSerialize(const Extensible *e, const Serializable *s, Serialize::Data &data) const override
 		{
-			if (s->GetSerializableType()->GetName() != "ChannelInfo")
+			if (s->GetSerializableType()->GetName() != "ChanServ::Channel")
 				return;
 
-			const ChannelInfo *ci = anope_dynamic_static_cast<const ChannelInfo *>(e);
+			const ChanServ::Channel *ci = anope_dynamic_static_cast<const ChanServ::Channel *>(e);
 			KickerData *kd = this->Get(ci);
 			if (kd == NULL)
 				return;
@@ -76,10 +76,10 @@ struct KickerDataImpl : KickerData
 
 		void ExtensibleUnserialize(Extensible *e, Serializable *s, Serialize::Data &data) override
 		{
-			if (s->GetSerializableType()->GetName() != "ChannelInfo")
+			if (s->GetSerializableType()->GetName() != "ChanServ::Channel")
 				return;
 
-			ChannelInfo *ci = anope_dynamic_static_cast<ChannelInfo *>(e);
+			ChanServ::Channel *ci = anope_dynamic_static_cast<ChanServ::Channel *>(e);
 			KickerData *kd = ci->Require<KickerData>("kickerdata");
 
 			data["kickerdata:amsgs"] >> kd->amsgs;
@@ -173,12 +173,12 @@ class CommandBSKickBase : public Command
 	virtual bool OnHelp(CommandSource &source, const Anope::string &subcommand) override = 0;
 
  protected:
-	bool CheckArguments(CommandSource &source, const std::vector<Anope::string> &params, ChannelInfo* &ci)
+	bool CheckArguments(CommandSource &source, const std::vector<Anope::string> &params, ChanServ::Channel* &ci)
 	{
 		const Anope::string &chan = params[0];
 		const Anope::string &option = params[1];
 
-		ci = ChannelInfo::Find(chan);
+		ci = ChanServ::Find(chan);
 
 		if (Anope::ReadOnly)
 			source.Reply(_("Sorry, kicker configuration is temporarily disabled."));
@@ -198,7 +198,7 @@ class CommandBSKickBase : public Command
 		return false;
 	}
 
-	void Process(CommandSource &source, ChannelInfo *ci, const Anope::string &param, const Anope::string &ttb, size_t ttb_idx, const Anope::string &optname, KickerData *kd, bool &val)
+	void Process(CommandSource &source, ChanServ::Channel *ci, const Anope::string &param, const Anope::string &ttb, size_t ttb_idx, const Anope::string &optname, KickerData *kd, bool &val)
 	{
 		if (param.equals_ci("ON"))
 		{
@@ -257,7 +257,7 @@ class CommandBSKickAMSG : public CommandBSKickBase
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
-		ChannelInfo *ci;
+		ChanServ::Channel *ci;
 		if (CheckArguments(source, params, ci))
 		{
 			KickerData *kd = ci->Require<KickerData>("kickerdata");
@@ -293,14 +293,14 @@ class CommandBSKickBadwords : public CommandBSKickBase
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
-		ChannelInfo *ci;
+		ChanServ::Channel *ci;
 		if (CheckArguments(source, params, ci))
 		{
 			KickerData *kd = ci->Require<KickerData>("kickerdata");
 			Process(source, ci, params[1], params.size() > 2 ? params[2] : "", TTB_BADWORDS, "badwords", kd, kd->badwords);
 			kd->Check(ci);
 		}
-		
+
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
@@ -332,7 +332,7 @@ class CommandBSKickBolds : public CommandBSKickBase
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
-		ChannelInfo *ci;
+		ChanServ::Channel *ci;
 		if (CheckArguments(source, params, ci))
 		{
 			KickerData *kd = ci->Require<KickerData>("kickerdata");
@@ -366,7 +366,7 @@ class CommandBSKickCaps : public CommandBSKickBase
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
-		ChannelInfo *ci;
+		ChanServ::Channel *ci;
 		if (!CheckArguments(source, params, ci))
 			return;
 
@@ -462,7 +462,7 @@ class CommandBSKickColors : public CommandBSKickBase
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
-		ChannelInfo *ci;
+		ChanServ::Channel *ci;
 		if (CheckArguments(source, params, ci))
 		{
 			KickerData *kd = ci->Require<KickerData>("kickerdata");
@@ -496,7 +496,7 @@ class CommandBSKickFlood : public CommandBSKickBase
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
-		ChannelInfo *ci;
+		ChanServ::Channel *ci;
 		if (!CheckArguments(source, params, ci))
 			return;
 
@@ -594,7 +594,7 @@ class CommandBSKickItalics : public CommandBSKickBase
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
-		ChannelInfo *ci;
+		ChanServ::Channel *ci;
 		if (CheckArguments(source, params, ci))
 		{
 			KickerData *kd = ci->Require<KickerData>("kickerdata");
@@ -628,7 +628,7 @@ class CommandBSKickRepeat : public CommandBSKickBase
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
-		ChannelInfo *ci;
+		ChanServ::Channel *ci;
 		if (!CheckArguments(source, params, ci))
 			return;
 
@@ -716,7 +716,7 @@ class CommandBSKickReverses : public CommandBSKickBase
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
-		ChannelInfo *ci;
+		ChanServ::Channel *ci;
 		if (CheckArguments(source, params, ci))
 		{
 			KickerData *kd = ci->Require<KickerData>("kickerdata");
@@ -750,7 +750,7 @@ class CommandBSKickUnderlines : public CommandBSKickBase
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
-		ChannelInfo *ci;
+		ChanServ::Channel *ci;
 		if (CheckArguments(source, params, ci))
 		{
 			KickerData *kd = ci->Require<KickerData>("kickerdata");
@@ -784,14 +784,14 @@ class CommandBSSetDontKickOps : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
-		ChannelInfo *ci = ChannelInfo::Find(params[0]);
+		ChanServ::Channel *ci = ChanServ::Find(params[0]);
 		if (ci == NULL)
 		{
 			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
 			return;
 		}
 
-		AccessGroup access = source.AccessFor(ci);
+		ChanServ::AccessGroup access = source.AccessFor(ci);
 		if (!source.HasPriv("botserv/administration") && !access.HasPriv("SET"))
 		{
 			source.Reply(ACCESS_DENIED);
@@ -808,7 +808,7 @@ class CommandBSSetDontKickOps : public Command
 		if (params[1].equals_ci("ON"))
 		{
 			bool override = !access.HasPriv("SET");
-			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to enable dontkickops"; 
+			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to enable dontkickops";
 
 			kd->dontkickops = true;
 			source.Reply(_("Bot \002won't kick ops\002 on channel %s."), ci->name.c_str());
@@ -816,7 +816,7 @@ class CommandBSSetDontKickOps : public Command
 		else if (params[1].equals_ci("OFF"))
 		{
 			bool override = !access.HasPriv("SET");
-			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to disable dontkickops"; 
+			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to disable dontkickops";
 
 			kd->dontkickops = false;
 			source.Reply(_("Bot \002will kick ops\002 on channel %s."), ci->name.c_str());
@@ -849,14 +849,14 @@ class CommandBSSetDontKickVoices : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
-		ChannelInfo *ci = ChannelInfo::Find(params[0]);
+		ChanServ::Channel *ci = ChanServ::Find(params[0]);
 		if (ci == NULL)
 		{
 			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
 			return;
 		}
 
-		AccessGroup access = source.AccessFor(ci);
+		ChanServ::AccessGroup access = source.AccessFor(ci);
 		if (!source.HasPriv("botserv/administration") && !access.HasPriv("SET"))
 		{
 			source.Reply(ACCESS_DENIED);
@@ -873,7 +873,7 @@ class CommandBSSetDontKickVoices : public Command
 		if (params[1].equals_ci("ON"))
 		{
 			bool override = !access.HasPriv("SET");
-			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to enable dontkickvoices"; 
+			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to enable dontkickvoices";
 
 			kd->dontkickvoices = true;
 			source.Reply(_("Bot \002won't kick voices\002 on channel %s."), ci->name.c_str());
@@ -881,7 +881,7 @@ class CommandBSSetDontKickVoices : public Command
 		else if (params[1].equals_ci("OFF"))
 		{
 			bool override = !access.HasPriv("SET");
-			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to disable dontkickvoices"; 
+			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to disable dontkickvoices";
 
 			kd->dontkickvoices = false;
 			source.Reply(_("Bot \002will kick voices\002 on channel %s."), ci->name.c_str());
@@ -1041,7 +1041,7 @@ class BSKick : public Module
 		return ud;
        }
 
-	void check_ban(ChannelInfo *ci, User *u, KickerData *kd, int ttbtype)
+	void check_ban(ChanServ::Channel *ci, User *u, KickerData *kd, int ttbtype)
 	{
 		/* Don't ban ulines or protected users */
 		if (u->IsProtected())
@@ -1065,7 +1065,7 @@ class BSKick : public Module
 		}
 	}
 
-	void bot_kick(ChannelInfo *ci, User *u, const char *message, ...)
+	void bot_kick(ChanServ::Channel *ci, User *u, const char *message, ...)
 	{
 		va_list args;
 		char buf[1024];
@@ -1112,7 +1112,7 @@ class BSKick : public Module
 
 	}
 
-	void OnBotInfo(CommandSource &source, BotInfo *bi, ChannelInfo *ci, InfoFormatter &info) override
+	void OnBotInfo(CommandSource &source, BotInfo *bi, ChanServ::Channel *ci, InfoFormatter &info) override
 	{
 		if (!ci)
 			return;
@@ -1237,7 +1237,7 @@ class BSKick : public Module
 		 * But FIRST we check whether the user is protected in any
 		 * way.
 		 */
-		ChannelInfo *ci = c->ci;
+		ChanServ::Channel *ci = c->ci;
 		if (ci == NULL)
 			return;
 		KickerData *kd = kickerdata.Get(ci);
@@ -1370,7 +1370,7 @@ class BSKick : public Module
 							else
 							{
 								Anope::string wordbuf = " " + bw->word + " ";
-	
+
 								if ((casesensitive && nbuf.find(wordbuf) != Anope::string::npos) || (!casesensitive && nbuf.find_ci(wordbuf) != Anope::string::npos))
 									mustkick = true;
 							}

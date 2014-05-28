@@ -57,9 +57,9 @@ class CommandHSList : public Command
 		ListFormatter list(source.GetAccount());
 		list.AddColumn(_("Number")).AddColumn(_("Nick")).AddColumn(_("Vhost")).AddColumn(_("Creator")).AddColumn(_("Created"));
 
-		for (nickalias_map::const_iterator it = NickAliasList->begin(), it_end = NickAliasList->end(); it != it_end; ++it)
+		for (auto& it : NickServ::service->GetNickList())
 		{
-			const NickAlias *na = it->second;
+			const NickServ::Nick *na = it.second;
 
 			if (!na->HasVhost())
 				continue;

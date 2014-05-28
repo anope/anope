@@ -81,7 +81,7 @@ class RatboxProto : public IRCDProto
 		UplinkSocket::Message(Me) << "UID " << u->nick << " 1 " << u->timestamp << " " << modes << " " << u->GetIdent() << " " << u->host << " 0 " << u->GetUID() << " :" << u->realname;
 	}
 
-	void SendLogin(User *u, NickAlias *na) override
+	void SendLogin(User *u, NickServ::Nick *na) override
 	{
 		if (na->nc->HasExt("UNCONFIRMED"))
 			return;
@@ -125,7 +125,7 @@ struct IRCDMessageEncap : IRCDMessage
 		{
 			User *u = source.GetUser();
 
-			NickCore *nc = NickCore::Find(params[2]);
+			NickServ::Account *nc = NickServ::FindAccount(params[2]);
 			if (!nc)
 				return;
 			u->Login(nc);

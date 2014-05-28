@@ -284,7 +284,7 @@ class MD5Context : public Encryption::Context
 
 	/* MD5 finalization. Ends an MD5 message-digest opera
 	 * the message digest and zeroizing the context.
-	 */  
+	 */
 	void Finalize() override
 	{
 		unsigned char bits[8];
@@ -369,12 +369,12 @@ class EMD5 : public Module
 		return EVENT_ALLOW;
 	}
 
-	void OnCheckAuthentication(User *, IdentifyRequest *req) override
+	void OnCheckAuthentication(User *, NickServ::IdentifyRequest *req) override
 	{
-		const NickAlias *na = NickAlias::Find(req->GetAccount());
+		const NickServ::Nick *na = NickServ::FindNick(req->GetAccount());
 		if (na == NULL)
 			return;
-		NickCore *nc = na->nc;
+		NickServ::Account *nc = na->nc;
 
 		size_t pos = nc->pass.find(':');
 		if (pos == Anope::string::npos)

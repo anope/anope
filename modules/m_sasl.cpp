@@ -40,10 +40,10 @@ class Plain : public Mechanism
 			Anope::string acc = decoded.substr(0, p),
 				pass = decoded.substr(p + 1);
 
-			if (acc.empty() || pass.empty())
+			if (acc.empty() || pass.empty() || !NickServ::service)
 				return;
 
-			SASL::IdentifyRequest *req = new SASL::IdentifyRequest(this->owner, m.source, acc, pass);
+			NickServ::IdentifyRequest *req = NickServ::service->CreateIdentifyRequest(new IdentifyRequestListener(m.source), this->owner, acc, pass);
 			Event::OnCheckAuthentication(&Event::CheckAuthentication::OnCheckAuthentication, nullptr, req);
 			req->Dispatch();
 		}
@@ -92,7 +92,7 @@ class External : public Mechanism
 				return;
 			}
 
-			NickCore *nc = certs->FindAccountFromCert(mysess->cert);
+			NickServ::Account *nc = certs->FindAccountFromCert(mysess->cert);
 			if (!nc || nc->HasExt("NS_SUSPENDED"))
 			{
 				sasl->Fail(sess);
@@ -208,7 +208,7 @@ class SASLService : public SASL::Service, public Timer
 		IRCD->SendSASLMessage(msg);
 	}
 
-	void Succeed(Session *session, NickCore *nc) override
+	void Succeed(Session *session, NickServ::Account *nc) override
 	{
 		IRCD->SendSVSLogin(session->uid, nc->display);
 		this->SendMessage(session, "D", "S");

@@ -22,7 +22,7 @@ class HostServCore : public Module
 	, public EventHook<Event::DeleteVhost>
 {
 	Reference<BotInfo> HostServ;
-	
+
  public:
 	HostServCore(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PSEUDOCLIENT | VENDOR)
 		, EventHook<Event::UserLogin>("OnUserLogin")
@@ -54,9 +54,9 @@ class HostServCore : public Module
 		if (!IRCD->CanSetVHost)
 			return;
 
-		const NickAlias *na = NickAlias::Find(u->nick);
+		const NickServ::Nick *na = NickServ::FindNick(u->nick);
 		if (!na || na->nc != u->Account() || !na->HasVhost())
-			na = NickAlias::Find(u->Account()->display);
+			na = NickServ::FindNick(u->Account()->display);
 		if (!na || !na->HasVhost())
 			return;
 
@@ -73,9 +73,9 @@ class HostServCore : public Module
 			if (HostServ)
 			{
 				if (!na->GetVhostIdent().empty())
-					u->SendMessage(HostServ, _("Your vhost of \002%s\002@\002%s\002 is now activated."), na->GetVhostIdent().c_str(), na->GetVhostHost().c_str());
+					u->SendMessage(*HostServ, _("Your vhost of \002%s\002@\002%s\002 is now activated."), na->GetVhostIdent().c_str(), na->GetVhostHost().c_str());
 				else
-					u->SendMessage(HostServ, _("Your vhost of \002%s\002 is now activated."), na->GetVhostHost().c_str());
+					u->SendMessage(*HostServ, _("Your vhost of \002%s\002 is now activated."), na->GetVhostHost().c_str());
 			}
 		}
 	}
@@ -97,7 +97,7 @@ class HostServCore : public Module
 	{
 	}
 
-	void OnSetVhost(NickAlias *na) override
+	void OnSetVhost(NickServ::Nick *na) override
 	{
 		if (Config->GetModule(this)->Get<bool>("activate_on_set"))
 		{
@@ -116,15 +116,15 @@ class HostServCore : public Module
 				if (HostServ)
 				{
 					if (!na->GetVhostIdent().empty())
-						u->SendMessage(HostServ, _("Your vhost of \002%s\002@\002%s\002 is now activated."), na->GetVhostIdent().c_str(), na->GetVhostHost().c_str());
+						u->SendMessage(*HostServ, _("Your vhost of \002%s\002@\002%s\002 is now activated."), na->GetVhostIdent().c_str(), na->GetVhostHost().c_str());
 					else
-						u->SendMessage(HostServ, _("Your vhost of \002%s\002 is now activated."), na->GetVhostHost().c_str());
+						u->SendMessage(*HostServ, _("Your vhost of \002%s\002 is now activated."), na->GetVhostHost().c_str());
 				}
 			}
 		}
 	}
 
-	void OnDeleteVhost(NickAlias *na) override
+	void OnDeleteVhost(NickServ::Nick *na) override
 	{
 		if (Config->GetModule(this)->Get<bool>("activate_on_set"))
 		{

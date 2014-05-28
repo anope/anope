@@ -12,7 +12,7 @@ class CommandCSSetChanstats : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
-		ChannelInfo *ci = ChannelInfo::Find(params[0]);
+		ChanServ::Channel *ci = ChanServ::Find(params[0]);
 		if (!ci)
 		{
 			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
@@ -65,7 +65,7 @@ class CommandNSSetChanstats : public Command
 	}
 	void Run(CommandSource &source, const Anope::string &user, const Anope::string &param, bool saset = false)
 	{
-		NickAlias *na = NickAlias::Find(user);
+		NickServ::Nick *na = NickServ::FindNick(user);
 		if (!na)
 		{
 			source.Reply(NICK_X_NOT_REGISTERED, user.c_str());
@@ -103,7 +103,7 @@ class CommandNSSetChanstats : public Command
 	{
 		this->Run(source, source.nc->display, params[0]);
 	}
-	
+
 	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
 		this->SendSyntax(source);
@@ -501,7 +501,7 @@ class MChanstats : public Module
 			Log(this) << "no database connection to " << engine;
 	}
 
-	void OnChanInfo(CommandSource &source, ChannelInfo *ci, InfoFormatter &info, bool show_all) override
+	void OnChanInfo(CommandSource &source, ChanServ::Channel *ci, InfoFormatter &info, bool show_all) override
 	{
 		if (!show_all)
 			return;
@@ -509,7 +509,7 @@ class MChanstats : public Module
 			info.AddOption(_("Chanstats"));
 	}
 
-	void OnNickInfo(CommandSource &source, NickAlias *na, InfoFormatter &info, bool show_hidden) override
+	void OnNickInfo(CommandSource &source, NickServ::Nick *na, InfoFormatter &info, bool show_hidden) override
 	{
 		if (!show_hidden)
 			return;
@@ -610,14 +610,14 @@ class MChanstats : public Module
 		this->RunQuery(query);
 	}
 
-	void OnDelCore(NickCore *nc) override
+	void OnDelCore(NickServ::Account *nc) override
 	{
 		query = "DELETE FROM `" + prefix + "chanstats` WHERE `nick` = @nick@;";
 		query.SetValue("nick", nc->display);
 		this->RunQuery(query);
 	}
 
-	void OnChangeCoreDisplay(NickCore *nc, const Anope::string &newdisplay) override
+	void OnChangeCoreDisplay(NickServ::Account *nc, const Anope::string &newdisplay) override
 	{
 		query = "CALL " + prefix + "chanstats_proc_chgdisplay(@old_display@, @new_display@);";
 		query.SetValue("old_display", nc->display);
@@ -625,20 +625,20 @@ class MChanstats : public Module
 		this->RunQuery(query);
 	}
 
-	void OnDelChan(ChannelInfo *ci) override
+	void OnDelChan(ChanServ::Channel *ci) override
 	{
 		query = "DELETE FROM `" + prefix + "chanstats` WHERE `chan` = @channel@;";
 		query.SetValue("channel", ci->name);
 		this->RunQuery(query);
 	}
 
-	void OnChanRegistered(ChannelInfo *ci)
+	void OnChanRegistered(ChanServ::Channel *ci)
 	{
 		if (CSDefChanstats)
 			ci->Extend<bool>("CS_STATS");
 	}
 
-	void OnNickRegister(User *user, NickAlias *na)
+	void OnNickRegister(User *user, NickServ::Nick *na)
 	{
 		if (NSDefChanstats)
 			na->nc->Extend<bool>("NS_STATS");

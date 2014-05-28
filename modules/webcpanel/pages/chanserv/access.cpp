@@ -12,7 +12,7 @@ WebCPanel::ChanServ::Access::Access(const Anope::string &cat, const Anope::strin
 {
 }
 
-bool WebCPanel::ChanServ::Access::OnRequest(HTTPProvider *server, const Anope::string &page_name, HTTPClient *client, HTTPMessage &message, HTTPReply &reply, NickAlias *na, TemplateFileServer::Replacements &replacements)
+bool WebCPanel::ChanServ::Access::OnRequest(HTTPProvider *server, const Anope::string &page_name, HTTPClient *client, HTTPMessage &message, HTTPReply &reply, ::NickServ::Nick *na, TemplateFileServer::Replacements &replacements)
 {
 	TemplateFileServer Page("chanserv/access.html");
 	const Anope::string &chname = message.get_data["channel"];
@@ -25,7 +25,7 @@ bool WebCPanel::ChanServ::Access::OnRequest(HTTPProvider *server, const Anope::s
 		return true;
 	}
 
-	ChannelInfo *ci = ChannelInfo::Find(chname);
+	::ChanServ::Channel *ci = ::ChanServ::Find(chname);
 
 	if (!ci)
 	{
@@ -34,7 +34,7 @@ bool WebCPanel::ChanServ::Access::OnRequest(HTTPProvider *server, const Anope::s
 		return true;
 	}
 
-	AccessGroup u_access = ci->AccessFor(na->nc);
+	::ChanServ::AccessGroup u_access = ci->AccessFor(na->nc);
 	bool has_priv = na->nc->IsServicesOper() && na->nc->o->ot->HasPriv("chanserv/access/modify");
 
 	if (!u_access.HasPriv("ACCESS_LIST") && !has_priv)
@@ -46,8 +46,8 @@ bool WebCPanel::ChanServ::Access::OnRequest(HTTPProvider *server, const Anope::s
 
 	replacements["ACCESS_LIST"] = "YES";
 
-	const ChanAccess *highest = u_access.Highest();
-	
+	const ::ChanServ::ChanAccess *highest = u_access.Highest();
+
 	if (u_access.HasPriv("ACCESS_CHANGE") || has_priv)
 	{
 		if (message.get_data["del"].empty() == false && message.get_data["mask"].empty() == false)
@@ -62,10 +62,7 @@ bool WebCPanel::ChanServ::Access::OnRequest(HTTPProvider *server, const Anope::s
 		else if (message.post_data["mask"].empty() == false && message.post_data["access"].empty() == false && message.post_data["provider"].empty() == false)
 		{
 			// Generic access add code here, works with any provider (so we can't call a command exactly)
-			AccessProvider *a = NULL;
-			for (std::list<AccessProvider *>::const_iterator it = AccessProvider::GetProviders().begin(); it != AccessProvider::GetProviders().end(); ++it)
-				if ((*it)->name == message.post_data["provider"])
-					a = *it;
+			ServiceReference<::ChanServ::AccessProvider> a("AccessProvider", "access/" + message.post_data["provider"]);
 
 			if (a)
 			{
@@ -73,7 +70,7 @@ bool WebCPanel::ChanServ::Access::OnRequest(HTTPProvider *server, const Anope::s
 
 				for (unsigned i = 0, end = ci->GetAccessCount(); i < end; ++i)
 				{
-					ChanAccess *acc = ci->GetAccess(i);
+					::ChanServ::ChanAccess *acc = ci->GetAccess(i);
 
 					if (acc->mask == message.post_data["mask"])
 					{
@@ -94,7 +91,7 @@ bool WebCPanel::ChanServ::Access::OnRequest(HTTPProvider *server, const Anope::s
 					replacements["MESSAGES"] = "Sorry, you can only have " + stringify(access_max) + " access entries on a channel.";
 				else if (!denied)
 				{
-					ChanAccess *new_acc = a->Create();
+					::ChanServ::ChanAccess *new_acc = a->Create();
 					new_acc->ci = ci;
 					new_acc->mask = message.post_data["mask"];
 					new_acc->creator = na->nc->display;
@@ -136,18 +133,16 @@ bool WebCPanel::ChanServ::Access::OnRequest(HTTPProvider *server, const Anope::s
 
 	for (unsigned i = 0; i < ci->GetAccessCount(); ++i)
 	{
-		ChanAccess *access = ci->GetAccess(i);
+		::ChanServ::ChanAccess *access = ci->GetAccess(i);
 
 		replacements["MASKS"] = HTTPUtils::Escape(access->mask);
 		replacements["ACCESSES"] = HTTPUtils::Escape(access->AccessSerialize());
 		replacements["CREATORS"] = HTTPUtils::Escape(access->creator);
 	}
 
-	for (std::list<AccessProvider *>::const_iterator it = AccessProvider::GetProviders().begin(); it != AccessProvider::GetProviders().end(); ++it)
-	{
-		const AccessProvider *a = *it;
-		replacements["PROVIDERS"] = a->name;
-	}
+	if (::ChanServ::service)
+		for (::ChanServ::AccessProvider *p : ::ChanServ::service->GetProviders())
+			replacements["PROVIDERS"] = p->name;
 
 	Page.Serve(server, page_name, client, message, reply, replacements);
 	return true;

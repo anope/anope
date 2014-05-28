@@ -7,11 +7,11 @@
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
  */
- 
+
  #include <windows.h>
  #include "sigaction.h"
  #include <signal.h>
- 
+
  int sigaction(int sig, struct sigaction *action, struct sigaction *old)
  {
 	if (sig == -1)
@@ -28,4 +28,3 @@
 	}
 	return 0;
  }
- 

@@ -15,6 +15,7 @@
 #include "channels.h"
 #include "uplink.h"
 #include "event.h"
+#include "modules/chanserv.h"
 
 struct StackerInfo;
 
@@ -42,7 +43,7 @@ struct StackerInfo
 	/* Modes to be deleted */
 	std::list<std::pair<Mode *, Anope::string> > DelModes;
 	/* Bot this is sent from */
-	BotInfo *bi;
+	User *bi;
 
 	StackerInfo() : bi(NULL) { }
 
@@ -322,7 +323,7 @@ bool ModeManager::AddUserMode(UserMode *um)
 {
 	if (ModeManager::FindUserModeByChar(um->mchar) != NULL)
 		return false;
-	
+
 	if (um->name.empty())
 	{
 		um->name = stringify(++GenericUserModes);
@@ -379,14 +380,14 @@ void ModeManager::RemoveUserMode(UserMode *um)
 {
 	if (!um)
 		return;
-	
+
 	unsigned want = um->mchar;
 	if (want >= ModeManager::UserModes.size())
 		return;
-	
+
 	if (ModeManager::UserModes[want] != um)
 		return;
-	
+
 	ModeManager::UserModes[want] = NULL;
 
 	UserModesByName.erase(um->name);
@@ -398,14 +399,14 @@ void ModeManager::RemoveChannelMode(ChannelMode *cm)
 {
 	if (!cm)
 		return;
-	
+
 	unsigned want = cm->mchar;
 	if (want >= ModeManager::ChannelModes.size())
 		return;
-	
+
 	if (ModeManager::ChannelModes[want] != cm)
 		return;
-	
+
 	ModeManager::ChannelModes[want] = NULL;
 
 	if (cm->type == MODE_STATUS)
@@ -434,7 +435,7 @@ ChannelMode *ModeManager::FindChannelModeByChar(char mode)
 	unsigned want = mode;
 	if (want >= ModeManager::ChannelModes.size())
 		return NULL;
-	
+
 	return ModeManager::ChannelModes[want];
 }
 
@@ -443,7 +444,7 @@ UserMode *ModeManager::FindUserModeByChar(char mode)
 	unsigned want = mode;
 	if (want >= ModeManager::UserModes.size())
 		return NULL;
-	
+
 	return ModeManager::UserModes[want];
 }
 
@@ -468,11 +469,11 @@ char ModeManager::GetStatusChar(char value)
 	unsigned want = value;
 	if (want >= ModeManager::ChannelModes.size())
 		return 0;
-	
+
 	ChannelMode *cm = ModeManager::ChannelModes[want];
 	if (cm == NULL || cm->type != MODE_STATUS || cm->mchar == value)
 		return 0;
-	
+
 	return cm->mchar;
 }
 
@@ -512,7 +513,7 @@ void ModeManager::RebuildStatusModes()
 	std::sort(ChannelModesByStatus.begin(), ChannelModesByStatus.end(), statuscmp);
 }
 
-void ModeManager::StackerAdd(BotInfo *bi, Channel *c, ChannelMode *cm, bool Set, const Anope::string &Param)
+void ModeManager::StackerAdd(User *bi, Channel *c, ChannelMode *cm, bool Set, const Anope::string &Param)
 {
 	StackerInfo *s = GetInfo(ChannelStackerObjects, c);
 	s->AddMode(cm, Set, Param);
@@ -526,7 +527,7 @@ void ModeManager::StackerAdd(BotInfo *bi, Channel *c, ChannelMode *cm, bool Set,
 	modePipe->Notify();
 }
 
-void ModeManager::StackerAdd(BotInfo *bi, User *u, UserMode *um, bool Set, const Anope::string &Param)
+void ModeManager::StackerAdd(User *bi, User *u, UserMode *um, bool Set, const Anope::string &Param)
 {
 	StackerInfo *s = GetInfo(UserStackerObjects, u);
 	s->AddMode(um, Set, Param);
@@ -671,21 +672,21 @@ Entry::Entry(const Anope::string &m, const Anope::string &fh) : name(m), mask(fh
 		else
 			this->nick = fh;
 	}
-	
+
 	at = this->host.find('#');
 	if (at != Anope::string::npos)
 	{
 		this->real = this->host.substr(at + 1);
 		this->host = this->host.substr(0, at);
 	}
-	
+
 	/* If the mask is all *'s it will match anything, so just clear it */
 	if (this->nick.find_first_not_of("*") == Anope::string::npos)
 		this->nick.clear();
-	
+
 	if (this->user.find_first_not_of("*") == Anope::string::npos)
 		this->user.clear();
-	
+
 	if (this->host.find_first_not_of("*") == Anope::string::npos)
 		this->host.clear();
 	else
@@ -769,10 +770,10 @@ bool Entry::Matches(User *u, bool full) const
 	else if (!this->host.empty() && !Anope::Match(u->GetDisplayedHost(), this->host) && !Anope::Match(u->GetCloakedHost(), this->host) &&
 		(!full || (!Anope::Match(u->host, this->host) && !Anope::Match(u->ip, this->host))))
 		ret = false;
-	
+
 	if (!this->real.empty() && !Anope::Match(u->realname, this->real))
 		ret = false;
-	
+
 	return ret;
 }
 

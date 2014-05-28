@@ -23,7 +23,7 @@ class CommandMSCancel : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
-		if (Anope::ReadOnly)
+		if (Anope::ReadOnly || !MemoServ::service)
 		{
 			source.Reply(READ_ONLY_MODE);
 			return;
@@ -31,32 +31,32 @@ class CommandMSCancel : public Command
 
 		const Anope::string &nname = params[0];
 
-		bool ischan;
-		MemoInfo *mi = MemoInfo::GetMemoInfo(nname, ischan);
+		bool ischan, isregistered;
+		MemoServ::MemoInfo *mi = MemoServ::service->GetMemoInfo(name, ischan, isregistered, false);
 
-		if (mi == NULL)
+		if (!isregistered)
 			source.Reply(ischan ? CHAN_X_NOT_REGISTERED : _(NICK_X_NOT_REGISTERED), nname.c_str());
 		else
 		{
-			ChannelInfo *ci = NULL;
-			NickAlias *na = NULL;
+			ChanServ::Channel *ci = NULL;
+			NickServ::Nick *na = NULL;
 			if (ischan)
-				ci = ChannelInfo::Find(nname);
+				ci = ChanServ::Find(nname);
 			else
-				na = NickAlias::Find(nname);
-			for (int i = mi->memos->size() - 1; i >= 0; --i)
-				if (mi->GetMemo(i)->unread && source.nc->display.equals_ci(mi->GetMemo(i)->sender))
-				{
-					if (MemoServ::Event::OnMemoDel)
-						MemoServ::Event::OnMemoDel(&MemoServ::Event::MemoDel::OnMemoDel, ischan ? ci->name : na->nc->display, mi, mi->GetMemo(i));
-					mi->Del(i);
-					source.Reply(_("Last memo to \002%s\002 has been cancelled."), nname.c_str());
-					return;
-				}
+				na = NickServ::FindNick(nname);
+			if (mi)
+				for (int i = mi->memos->size() - 1; i >= 0; --i)
+					if (mi->GetMemo(i)->unread && source.nc->display.equals_ci(mi->GetMemo(i)->sender))
+					{
+						if (MemoServ::Event::OnMemoDel)
+							MemoServ::Event::OnMemoDel(&MemoServ::Event::MemoDel::OnMemoDel, ischan ? ci->name : na->nc->display, mi, mi->GetMemo(i));
+						mi->Del(i);
+						source.Reply(_("Last memo to \002%s\002 has been cancelled."), nname.c_str());
+						return;
+					}
 
 			source.Reply(_("No memo was cancelable."));
 		}
-		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override

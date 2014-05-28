@@ -33,7 +33,7 @@ class CommandCSDrop : public Command
 			return;
 		}
 
-		ChannelInfo *ci = ChannelInfo::Find(chan);
+		ChanServ::Channel *ci = ChanServ::Find(chan);
 		if (ci == NULL)
 		{
 			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());

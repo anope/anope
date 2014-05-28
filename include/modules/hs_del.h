@@ -13,6 +13,6 @@ namespace Event
 		/** Called when a vhost is deleted
 		 * @param na The nickalias of the vhost
 		 */
-		virtual void OnDeleteVhost(NickAlias *na) anope_abstract;
+		virtual void OnDeleteVhost(NickServ::Nick *na) anope_abstract;
 	};
 }

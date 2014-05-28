@@ -17,6 +17,6 @@ namespace Event
 		 * @param info Data to show the user requesting information
 		 * @param show_hidden true if we should show the user everything
 		 */
-		virtual void OnNickInfo(CommandSource &source, NickAlias *na, InfoFormatter &info, bool show_hidden) anope_abstract;
+		virtual void OnNickInfo(CommandSource &source, NickServ::Nick *na, InfoFormatter &info, bool show_hidden) anope_abstract;
 	};
 }

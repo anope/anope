@@ -37,7 +37,7 @@ struct NSMiscData : MiscData, Serializable
 {
 	NSMiscData(Extensible *) : Serializable("NSMiscData") { }
 
-	NSMiscData(NickCore *ncore, const Anope::string &n, const Anope::string &d) : Serializable("NSMiscData")
+	NSMiscData(NickServ::Account *ncore, const Anope::string &n, const Anope::string &d) : Serializable("NSMiscData")
 	{
 		object = ncore->display;
 		name = n;
@@ -59,7 +59,7 @@ struct NSMiscData : MiscData, Serializable
 		data["name"] >> sname;
 		data["data"] >> sdata;
 
-		NickCore *nc = NickCore::Find(snc);
+		NickServ::Account *nc = NickServ::FindAccount(snc);
 		if (nc == NULL)
 			return NULL;
 
@@ -106,13 +106,13 @@ class CommandNSSetMisc : public Command
 			return;
 		}
 
-		const NickAlias *na = NickAlias::Find(user);
+		const NickServ::Nick *na = NickServ::FindNick(user);
 		if (!na)
 		{
 			source.Reply(NICK_X_NOT_REGISTERED, user.c_str());
 			return;
 		}
-		NickCore *nc = na->nc;
+		NickServ::Account *nc = na->nc;
 
 		EventReturn MOD_RESULT = Event::OnSetNickOption(&Event::SetNickOption::OnSetNickOption, source, this, nc, param);
 		if (MOD_RESULT == EVENT_STOP)
@@ -206,7 +206,7 @@ class NSSetMisc : public Module
 		for (int i = 0; i < conf->CountBlock("command"); ++i)
 		{
 			Configuration::Block *block = conf->GetBlock("command", i);
-			
+
 			const Anope::string &cmd = block->Get<const Anope::string>("command");
 
 			if (cmd != "nickserv/set/misc" && cmd != "nickserv/saset/misc")
@@ -222,7 +222,7 @@ class NSSetMisc : public Module
 		}
 	}
 
-	void OnNickInfo(CommandSource &source, NickAlias *na, InfoFormatter &info, bool) override
+	void OnNickInfo(CommandSource &source, NickServ::Nick *na, InfoFormatter &info, bool) override
 	{
 		for (Anope::map<ExtensibleItem<NSMiscData> *>::iterator it = items.begin(); it != items.end(); ++it)
 		{

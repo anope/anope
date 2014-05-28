@@ -28,7 +28,6 @@ EventHandlers<Encrypt> Event::OnEncrypt(nullptr, "OnEncrypt");
 EventHandlers<Decrypt> Event::OnDecrypt(nullptr, "OnDecrypt");
 EventHandlers<CreateBot> Event::OnCreateBot(nullptr, "OnCreateBot");
 EventHandlers<DelBot> Event::OnDelBot(nullptr, "OnDelBot");
-EventHandlers<BotKick> Event::OnBotKick(nullptr, "OnBotKick");
 EventHandlers<PrePartChannel> Event::OnPrePartChannel(nullptr, "OnPrePartChannel");
 EventHandlers<PartChannel> Event::OnPartChannel(nullptr, "OnPartChannel");
 EventHandlers<LeaveChannel> Event::OnLeaveChannel(nullptr, "OnLeaveChannel");

@@ -27,13 +27,13 @@ class CommandCSUnban : public Command
 			if (!source.GetUser())
 				return;
 
-			std::deque<ChannelInfo *> queue;
+			std::deque<ChanServ::Channel *> queue;
 			source.GetAccount()->GetChannelReferences(queue);
 
 			unsigned count = 0;
 			for (unsigned i = 0; i < queue.size(); ++i)
 			{
-				ChannelInfo *ci = queue[i];
+				ChanServ::Channel *ci = queue[i];
 
 				if (!ci->c || !source.AccessFor(ci).HasPriv("UNBAN"))
 					continue;
@@ -48,7 +48,7 @@ class CommandCSUnban : public Command
 			return;
 		}
 
-		ChannelInfo *ci = ChannelInfo::Find(params[0]);
+		ChanServ::Channel *ci = ChanServ::Find(params[0]);
 		if (ci == NULL)
 		{
 			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());

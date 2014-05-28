@@ -22,7 +22,7 @@ class CommandCSUp : public Command
 		bool giving = true;
 		/* whether or not we have given a mode */
 		bool given = false;
-		AccessGroup u_access = c->ci->AccessFor(u);
+		ChanServ::AccessGroup u_access = c->ci->AccessFor(u);
 
 		for (unsigned i = 0; i < ModeManager::GetStatusChannelModesByRank().size(); ++i)
 		{
@@ -160,7 +160,7 @@ class CommandCSDown : public Command
 			const Anope::string &nick = params.size() > 1 ? params[1] : source.GetNick();
 
 			Channel *c = Channel::Find(channel);
-			
+
 			if (c == NULL)
 			{
 				source.Reply(CHAN_X_NOT_IN_USE, channel.c_str());

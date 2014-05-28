@@ -33,7 +33,7 @@ class CommandCSInvite : public Command
 			return;
 		}
 
-		ChannelInfo *ci = c->ci;
+		ChanServ::Channel *ci = c->ci;
 		if (!ci)
 		{
 			source.Reply(CHAN_X_NOT_REGISTERED, chan.c_str());

@@ -214,7 +214,7 @@ class DatabaseRedis : public Module, public Pipe
 		std::vector<Anope::string> args;
 		args.push_back("SMEMBERS");
 		args.push_back("ids:" + sb->GetName());
-		
+
 		redis->SendCommand(new TypeLoader(this, sb->GetName()), args);
 	}
 
@@ -469,14 +469,14 @@ void SubscriptionListener::OnResult(const Reply &r)
 	 */
 	if (r.multi_bulk.size() != 4)
 		return;
-	
+
 	size_t sz = r.multi_bulk[2]->bulk.find(':');
 	if (sz == Anope::string::npos)
 		return;
-	
+
 	const Anope::string &key = r.multi_bulk[2]->bulk.substr(sz + 1),
 				&op = r.multi_bulk[3]->bulk;
-	
+
 	sz = key.rfind(':');
 	if (sz == Anope::string::npos)
 		return;
@@ -492,7 +492,7 @@ void SubscriptionListener::OnResult(const Reply &r)
 
 	if (s_type == NULL)
 		return;
-	
+
 	uint64_t obj_id;
 	try
 	{

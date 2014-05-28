@@ -20,18 +20,13 @@ class CommandBSInfo : public Command
 	void send_bot_channels(std::vector<Anope::string> &buffers, const BotInfo *bi)
 	{
 		Anope::string buf;
-		for (registered_channel_map::const_iterator it = RegisteredChannelList->begin(), it_end = RegisteredChannelList->end(); it != it_end; ++it)
+		for (ChanServ::Channel *ci : bi->GetChannels())
 		{
-			const ChannelInfo *ci = it->second;
-
-			if (ci->bi == bi)
+			buf += " " + ci->name + " ";
+			if (buf.length() > 300)
 			{
-				buf += " " + ci->name + " ";
-				if (buf.length() > 300)
-				{
-					buffers.push_back(buf);
-					buf.clear();
-				}
+				buffers.push_back(buf);
+				buf.clear();
 			}
 		}
 		if (!buf.empty())
@@ -51,7 +46,7 @@ class CommandBSInfo : public Command
 		const Anope::string &query = params[0];
 
 		BotInfo *bi = BotInfo::Find(query, true);
-		ChannelInfo *ci = ChannelInfo::Find(query);
+		ChanServ::Channel *ci = ChanServ::Find(query);
 		InfoFormatter info(source.nc);
 
 		if (bi)

@@ -22,27 +22,27 @@ class CommandMSInfo : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
-		NickCore *nc = source.nc;
-		const MemoInfo *mi;
-		const NickAlias *na = NULL;
-		ChannelInfo *ci = NULL;
+		NickServ::Account *nc = source.nc;
+		const MemoServ::MemoInfo *mi;
+		const NickServ::Nick *na = NULL;
+		ChanServ::Channel *ci = NULL;
 		const Anope::string &nname = !params.empty() ? params[0] : "";
 		bool hardmax;
 
 		if (!nname.empty() && nname[0] != '#' && source.HasPriv("memoserv/info"))
 		{
-			na = NickAlias::Find(nname);
+			na = NickServ::FindNick(nname);
 			if (!na)
 			{
 				source.Reply(NICK_X_NOT_REGISTERED, nname.c_str());
 				return;
 			}
-			mi = &na->nc->memos;
+			mi = na->nc->memos;
 			hardmax = na->nc->HasExt("MEMO_HARDMAX");
 		}
 		else if (!nname.empty() && nname[0] == '#')
 		{
-			ci = ChannelInfo::Find(nname);
+			ci = ChanServ::Find(nname);
 			if (!ci)
 			{
 				source.Reply(CHAN_X_NOT_REGISTERED, nname.c_str());
@@ -53,7 +53,7 @@ class CommandMSInfo : public Command
 				source.Reply(ACCESS_DENIED);
 				return;
 			}
-			mi = &ci->memos;
+			mi = ci->memos;
 			hardmax = ci->HasExt("MEMO_HARDMAX");
 		}
 		else if (!nname.empty()) /* It's not a chan and we aren't services admin */
@@ -63,9 +63,11 @@ class CommandMSInfo : public Command
 		}
 		else
 		{
-			mi = &nc->memos;
+			mi = nc->memos;
 			hardmax = nc->HasExt("MEMO_HARDMAX");
 		}
+		if (!mi)
+			return;
 
 		if (!nname.empty() && (ci || na->nc != nc))
 		{

@@ -361,7 +361,7 @@ class InspIRCd20Proto : public IRCDProto
 			UplinkSocket::Message(source) << "SNONOTICE A :" << buf;
 	}
 
-	void SendLogin(User *u, NickAlias *na) override
+	void SendLogin(User *u, NickServ::Nick *na) override
 	{
 		/* InspIRCd uses an account to bypass chmode +R, not umode +r, so we can't send this here */
 		if (na->nc->HasExt("UNCONFIRMED"))
@@ -1166,7 +1166,7 @@ struct IRCDMessageMetadata : IRCDMessage
 			if (params[1].equals_cs("accountname"))
 			{
 				User *u = User::Find(params[0]);
-				NickCore *nc = NickCore::Find(params[2]);
+				NickServ::Account *nc = NickServ::FindAccount(params[2]);
 				if (u && nc)
 					u->Login(nc);
 			}
@@ -1347,7 +1347,7 @@ struct IRCDMessageServer : IRCDMessage
 struct IRCDMessageSQuit : Message::SQuit
 {
 	IRCDMessageSQuit(Module *creator) : Message::SQuit(creator) { }
-	
+
 	void Run(MessageSource &source, const std::vector<Anope::string> &params) override
 	{
 		if (params[0] == rsquit_id || params[0] == rsquit_server)
@@ -1401,7 +1401,7 @@ struct IRCDMessageUID : IRCDMessage
 		for (unsigned i = 9; i < params.size() - 1; ++i)
 			modes += " " + params[i];
 
-		NickAlias *na = NULL;
+		NickServ::Nick *na = NULL;
 		if (SASL::sasl)
 			for (std::list<SASLUser>::iterator it = saslusers.begin(); it != saslusers.end();)
 			{
@@ -1411,7 +1411,7 @@ struct IRCDMessageUID : IRCDMessage
 					it = saslusers.erase(it);
 				else if (u.uid == params[0])
 				{
-					na = NickAlias::Find(u.acc);
+					na = NickServ::FindNick(u.acc);
 					it = saslusers.erase(it);
 				}
 				else
@@ -1541,7 +1541,7 @@ class ProtoInspIRCd20 : public Module
 			this->OnChanRegistered(c->ci);
 	}
 
-	void OnChanRegistered(ChannelInfo *ci) override
+	void OnChanRegistered(ChanServ::Channel *ci) override
 	{
 		ModeLocks *modelocks = ci->GetExt<ModeLocks>("modelocks");
 		if (use_server_side_mlock && ci->c && modelocks && !modelocks->GetMLockAsString(false).empty())
@@ -1557,7 +1557,7 @@ class ProtoInspIRCd20 : public Module
 		}
 	}
 
-	void OnDelChan(ChannelInfo *ci) override
+	void OnDelChan(ChanServ::Channel *ci) override
 	{
 		if (use_server_side_mlock && ci->c)
 			SendChannelMetadata(ci->c, "mlock", "");
@@ -1566,7 +1566,7 @@ class ProtoInspIRCd20 : public Module
 			SendChannelMetadata(ci->c, "topiclock", "");
 	}
 
-	EventReturn OnMLock(ChannelInfo *ci, ModeLock *lock) override
+	EventReturn OnMLock(ChanServ::Channel *ci, ModeLock *lock) override
 	{
 		ModeLocks *modelocks = ci->GetExt<ModeLocks>("modelocks");
 		ChannelMode *cm = ModeManager::FindChannelModeByName(lock->name);
@@ -1579,7 +1579,7 @@ class ProtoInspIRCd20 : public Module
 		return EVENT_CONTINUE;
 	}
 
-	EventReturn OnUnMLock(ChannelInfo *ci, ModeLock *lock) override
+	EventReturn OnUnMLock(ChanServ::Channel *ci, ModeLock *lock) override
 	{
 		ModeLocks *modelocks = ci->GetExt<ModeLocks>("modelocks");
 		ChannelMode *cm = ModeManager::FindChannelModeByName(lock->name);
@@ -1592,7 +1592,7 @@ class ProtoInspIRCd20 : public Module
 		return EVENT_CONTINUE;
 	}
 
-	EventReturn OnSetChannelOption(CommandSource &source, Command *cmd, ChannelInfo *ci, const Anope::string &setting) override
+	EventReturn OnSetChannelOption(CommandSource &source, Command *cmd, ChanServ::Channel *ci, const Anope::string &setting) override
 	{
 		if (cmd->name == "chanserv/topic" && ci->c)
 		{

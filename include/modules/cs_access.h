@@ -17,6 +17,6 @@ namespace Event
 		 * @param priv The privilege changed
 		 * @param what The new level
 		 */
-		virtual void OnLevelChange(CommandSource &source, ChannelInfo *ci, const Anope::string &priv, int16_t what) anope_abstract;
+		virtual void OnLevelChange(CommandSource &source, ChanServ::Channel *ci, const Anope::string &priv, int16_t what) anope_abstract;
 	};
 }

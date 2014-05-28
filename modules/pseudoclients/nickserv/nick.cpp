@@ -10,34 +10,26 @@
  *
  */
 
-#include "services.h"
-#include "account.h"
-#include "modules.h"
-#include "opertype.h"
-#include "protocol.h"
-#include "users.h"
-#include "servers.h"
-#include "config.h"
-#include "event.h"
+#include "module.h"
+#include "nick.h"
 
-Serialize::Checker<nickalias_map> NickAliasList("NickAlias");
-
-NickAlias::NickAlias(const Anope::string &nickname, NickCore* nickcore) : Serializable("NickAlias")
+NickImpl::NickImpl(const Anope::string &nickname, NickServ::Account* nickcore)
 {
 	if (nickname.empty())
-		throw CoreException("Empty nick passed to NickAlias constructor");
+		throw CoreException("Empty nick passed to NickServ::Nick constructor");
 	else if (!nickcore)
-		throw CoreException("Empty nickcore passed to NickAlias constructor");
+		throw CoreException("Empty nickcore passed to NickServ::Nick constructor");
 
 	this->time_registered = this->last_seen = Anope::CurTime;
 	this->nick = nickname;
 	this->nc = nickcore;
 	nickcore->aliases->push_back(this);
 
-	size_t old = NickAliasList->size();
-	(*NickAliasList)[this->nick] = this;
-	if (old == NickAliasList->size())
+	NickServ::nickalias_map &map = NickServ::service->GetNickList();
+	NickServ::Nick* &na = map[this->nick];
+	if (na)
 		Log(LOG_DEBUG) << "Duplicate nick " << nickname << " in nickalias table";
+	na = this;
 
 	if (this->nc->o == NULL)
 	{
@@ -50,7 +42,7 @@ NickAlias::NickAlias(const Anope::string &nickname, NickCore* nickcore) : Serial
 	}
 }
 
-NickAlias::~NickAlias()
+NickImpl::~NickImpl()
 {
 	Event::OnDelNick(&Event::DelNick::OnDelNick, this);
 
@@ -58,7 +50,7 @@ NickAlias::~NickAlias()
 	if (this->nc)
 	{
 		/* Next: see if our core is still useful. */
-		std::vector<NickAlias *>::iterator it = std::find(this->nc->aliases->begin(), this->nc->aliases->end(), this);
+		std::vector<NickServ::Nick *>::iterator it = std::find(this->nc->aliases->begin(), this->nc->aliases->end(), this);
 		if (it != this->nc->aliases->end())
 			this->nc->aliases->erase(it);
 		if (this->nc->aliases->empty())
@@ -75,10 +67,11 @@ NickAlias::~NickAlias()
 	}
 
 	/* Remove us from the aliases list */
-	NickAliasList->erase(this->nick);
+	NickServ::nickalias_map &map = NickServ::service->GetNickList();
+	map.erase(this->nick);
 }
 
-void NickAlias::SetVhost(const Anope::string &ident, const Anope::string &host, const Anope::string &creator, time_t created)
+void NickImpl::SetVhost(const Anope::string &ident, const Anope::string &host, const Anope::string &creator, time_t created)
 {
 	this->vhost_ident = ident;
 	this->vhost_host = host;
@@ -86,7 +79,7 @@ void NickAlias::SetVhost(const Anope::string &ident, const Anope::string &host, 
 	this->vhost_created = created;
 }
 
-void NickAlias::RemoveVhost()
+void NickImpl::RemoveVhost()
 {
 	this->vhost_ident.clear();
 	this->vhost_host.clear();
@@ -94,44 +87,32 @@ void NickAlias::RemoveVhost()
 	this->vhost_created = 0;
 }
 
-bool NickAlias::HasVhost() const
+bool NickImpl::HasVhost() const
 {
 	return !this->vhost_host.empty();
 }
 
-const Anope::string &NickAlias::GetVhostIdent() const
+const Anope::string &NickImpl::GetVhostIdent() const
 {
 	return this->vhost_ident;
 }
 
-const Anope::string &NickAlias::GetVhostHost() const
+const Anope::string &NickImpl::GetVhostHost() const
 {
 	return this->vhost_host;
 }
 
-const Anope::string &NickAlias::GetVhostCreator() const
+const Anope::string &NickImpl::GetVhostCreator() const
 {
 	return this->vhost_creator;
 }
 
-time_t NickAlias::GetVhostCreated() const
+time_t NickImpl::GetVhostCreated() const
 {
 	return this->vhost_created;
 }
 
-NickAlias *NickAlias::Find(const Anope::string &nick)
-{
-	nickalias_map::const_iterator it = NickAliasList->find(nick);
-	if (it != NickAliasList->end())
-	{
-		it->second->QueueUpdate();
-		return it->second;
-	}
-
-	return NULL;
-}
-
-void NickAlias::Serialize(Serialize::Data &data) const
+void NickImpl::Serialize(Serialize::Data &data) const
 {
 	data["nick"] << this->nick;
 	data["last_quit"] << this->last_quit;
@@ -153,26 +134,26 @@ void NickAlias::Serialize(Serialize::Data &data) const
 	Extensible::ExtensibleSerialize(this, this, data);
 }
 
-Serializable* NickAlias::Unserialize(Serializable *obj, Serialize::Data &data)
+Serializable* NickImpl::Unserialize(Serializable *obj, Serialize::Data &data)
 {
 	Anope::string snc, snick;
 
 	data["nc"] >> snc;
 	data["nick"] >> snick;
 
-	NickCore *core = NickCore::Find(snc);
+	NickServ::Account *core = NickServ::FindAccount(snc);
 	if (core == NULL)
 		return NULL;
 
-	NickAlias *na;
+	NickServ::Nick *na;
 	if (obj)
-		na = anope_dynamic_static_cast<NickAlias *>(obj);
+		na = anope_dynamic_static_cast<NickServ::Nick *>(obj);
 	else
-		na = new NickAlias(snick, core);
+		na = new NickImpl(snick, core);
 
 	if (na->nc != core)
 	{
-		std::vector<NickAlias *>::iterator it = std::find(na->nc->aliases->begin(), na->nc->aliases->end(), na);
+		std::vector<NickServ::Nick *>::iterator it = std::find(na->nc->aliases->begin(), na->nc->aliases->end(), na);
 		if (it != na->nc->aliases->end())
 			na->nc->aliases->erase(it);
 

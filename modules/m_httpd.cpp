@@ -148,7 +148,7 @@ class MyHTTPClient : public HTTPClient
 
 			this->Serve();
 		}
-		
+
 		return true;
 	}
 

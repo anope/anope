@@ -3,7 +3,7 @@
 
 static Module *me;
 
-class XMLRPCIdentifyRequest : public IdentifyRequest
+class XMLRPCIdentifyRequest : public NickServ::IdentifyRequestListener
 {
 	XMLRPCRequest request;
 	HTTPReply repl; /* Request holds a reference to the HTTPReply, because we might exist long enough to invalidate it
@@ -12,9 +12,9 @@ class XMLRPCIdentifyRequest : public IdentifyRequest
 	Reference<XMLRPCServiceInterface> xinterface;
 
  public:
-	XMLRPCIdentifyRequest(Module *m, XMLRPCRequest& req, HTTPClient *c, XMLRPCServiceInterface* iface, const Anope::string &acc, const Anope::string &pass) : IdentifyRequest(m, acc, pass), request(req), repl(request.r), client(c), xinterface(iface) { }
+	XMLRPCIdentifyRequest(XMLRPCRequest& req, HTTPClient *c, XMLRPCServiceInterface* iface) : request(req), repl(request.r), client(c), xinterface(iface) { }
 
-	void OnSuccess() override
+	void OnSuccess(NickServ::IdentifyRequest *req) override
 	{
 		if (!xinterface || !client)
 			return;
@@ -22,13 +22,13 @@ class XMLRPCIdentifyRequest : public IdentifyRequest
 		request.r = this->repl;
 
 		request.reply("result", "Success");
-		request.reply("account", GetAccount());
+		request.reply("account", req->GetAccount());
 
 		xinterface->Reply(request);
 		client->SendReply(&request.r);
 	}
 
-	void OnFail() override
+	void OnFail(NickServ::IdentifyRequest *req) override
 	{
 		if (!xinterface || !client)
 			return;
@@ -81,7 +81,7 @@ class MyXMLRPCEvent : public XMLRPCEvent
 			{
 				request.reply("result", "Success");
 
-				NickAlias *na = NickAlias::Find(user);
+				NickServ::Nick *na = NickServ::FindNick(user);
 
 				Anope::string out;
 
@@ -91,7 +91,7 @@ class MyXMLRPCEvent : public XMLRPCEvent
 
 					XMLRPCommandReply(Anope::string &s) : str(s) { }
 
-					void SendMessage(BotInfo *, const Anope::string &msg) override
+					void SendMessage(const MessageSource &, const Anope::string &msg) override
 					{
 						str += msg + "\n";
 					};
@@ -112,16 +112,16 @@ class MyXMLRPCEvent : public XMLRPCEvent
 		Anope::string username = request.data.size() > 0 ? request.data[0] : "";
 		Anope::string password = request.data.size() > 1 ? request.data[1] : "";
 
-		if (username.empty() || password.empty())
+		if (username.empty() || password.empty() || !NickServ::service)
 			request.reply("error", "Invalid parameters");
 		else
 		{
-			XMLRPCIdentifyRequest *req = new XMLRPCIdentifyRequest(me, request, client, iface, username, password);
+			NickServ::IdentifyRequest *req = NickServ::service->CreateIdentifyRequest(new XMLRPCIdentifyRequest(request, client, iface), me, username, password);
 			Event::OnCheckAuthentication(&Event::CheckAuthentication::OnCheckAuthentication, nullptr, req);
 			req->Dispatch();
 			return false;
 		}
-		
+
 		return true;
 	}
 

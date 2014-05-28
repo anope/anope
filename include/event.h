@@ -147,8 +147,9 @@ namespace Event
 		 * @param source The kicker
 		 * @param cu The user, channel, and status of the user being kicked
 		 * @param kickmsg The reason for the kick.
+		 * @return EVENT_STOP to stop the kick, which can only be done if source is 'Me' or from me
 		 */
-		virtual void OnPreUserKicked(const MessageSource &source, ChanUserContainer *cu, const Anope::string &kickmsg) anope_abstract;
+		virtual EventReturn OnPreUserKicked(const MessageSource &source, ChanUserContainer *cu, const Anope::string &kickmsg) anope_abstract;
 	};
 	extern CoreExport EventHandlers<PreUserKicked> OnPreUserKicked;
 
@@ -173,7 +174,7 @@ namespace Event
 		 * @param bi The bot being assigned.
 		 * @return EVENT_CONTINUE to let other modules decide, EVENT_STOP to deny the assign.
 		 */
-		virtual EventReturn OnPreBotAssign(User *sender, ChannelInfo *ci, BotInfo *bi) anope_abstract;
+		virtual EventReturn OnPreBotAssign(User *sender, ChanServ::Channel *ci, BotInfo *bi) anope_abstract;
 	};
 	extern CoreExport EventHandlers<PreBotAssign> OnPreBotAssign;
 
@@ -181,7 +182,7 @@ namespace Event
 	{
 		/** Called when a bot is assigned ot a channel
 		 */
-		virtual void OnBotAssign(User *sender, ChannelInfo *ci, BotInfo *bi) anope_abstract;
+		virtual void OnBotAssign(User *sender, ChanServ::Channel *ci, BotInfo *bi) anope_abstract;
 	};
 	extern CoreExport EventHandlers<BotAssign> OnBotAssign;
 
@@ -192,7 +193,7 @@ namespace Event
 		 * @param ci The channel the bot is being removed from
 		 * @return EVENT_CONTINUE to let other modules decide, EVENT_STOP to deny the unassign.
 		 */
-		virtual EventReturn OnBotUnAssign(User *sender, ChannelInfo *ci) anope_abstract;
+		virtual EventReturn OnBotUnAssign(User *sender, ChanServ::Channel *ci) anope_abstract;
 	};
 	extern CoreExport EventHandlers<BotUnAssign> OnBotUnAssign;
 
@@ -296,19 +297,6 @@ namespace Event
 		virtual void OnDelBot(BotInfo *bi) anope_abstract;
 	};
 	extern CoreExport EventHandlers<DelBot> OnDelBot;
-
-	struct CoreExport BotKick : Events
-	{
-		/** Called before a bot kicks a user
-		 * @param bi The bot sending the kick
-		 * @param c The channel the user is being kicked on
-		 * @param u The user being kicked
-		 * @param reason The reason
-		 * @return EVENT_CONTINUE to let other modules decide, EVENT_STOP to halt the command and not process it
-		 */
-		virtual EventReturn OnBotKick(BotInfo *bi, Channel *c, User *u, const Anope::string &reason) anope_abstract;
-	};
-	extern CoreExport EventHandlers<BotKick> OnBotKick;
 
 	struct CoreExport PrePartChannel : Events
 	{
@@ -492,7 +480,7 @@ namespace Event
 		 * @param source The source of the command
 		 * @param access The access entry that was removed
 		 */
-		virtual void OnAccessDel(ChannelInfo *ci, CommandSource &source, ChanAccess *access) anope_abstract;
+		virtual void OnAccessDel(ChanServ::Channel *ci, CommandSource &source, ChanServ::ChanAccess *access) anope_abstract;
 	};
 	extern CoreExport EventHandlers<AccessDel> OnAccessDel;
 
@@ -503,7 +491,7 @@ namespace Event
 		 * @param source The source of the command
 		 * @param access The access changed
 		 */
-		virtual void OnAccessAdd(ChannelInfo *ci, CommandSource &source, ChanAccess *access) anope_abstract;
+		virtual void OnAccessAdd(ChanServ::Channel *ci, CommandSource &source, ChanServ::ChanAccess *access) anope_abstract;
 	};
 	extern CoreExport EventHandlers<AccessAdd> OnAccessAdd;
 
@@ -513,7 +501,7 @@ namespace Event
 		 * @param ci The channel
 		 * @param u The user who cleared the access
 		 */
-		virtual void OnAccessClear(ChannelInfo *ci, CommandSource &source) anope_abstract;
+		virtual void OnAccessClear(ChanServ::Channel *ci, CommandSource &source) anope_abstract;
 	};
 	extern CoreExport EventHandlers<AccessClear> OnAccessClear;
 
@@ -522,7 +510,7 @@ namespace Event
 		/** Called when a channel is registered
 		 * @param ci The channel
 		 */
-		virtual void OnChanRegistered(ChannelInfo *ci) anope_abstract;
+		virtual void OnChanRegistered(ChanServ::Channel *ci) anope_abstract;
 	};
 	extern CoreExport EventHandlers<ChanRegistered> OnChanRegistered;
 
@@ -532,7 +520,7 @@ namespace Event
 		/** Called when a channel is being created, for any reason
 		 * @param ci The channel
 		 */
-		virtual void OnCreateChan(ChannelInfo *ci) anope_abstract;
+		virtual void OnCreateChan(ChanServ::Channel *ci) anope_abstract;
 	};
 	extern CoreExport EventHandlers<CreateChan> OnCreateChan;
 
@@ -541,7 +529,7 @@ namespace Event
 		/** Called when a channel is being deleted, for any reason
 		 * @param ci The channel
 		 */
-		virtual void OnDelChan(ChannelInfo *ci) anope_abstract;
+		virtual void OnDelChan(ChanServ::Channel *ci) anope_abstract;
 	};
 	extern CoreExport EventHandlers<DelChan> OnDelChan;
 
@@ -586,7 +574,7 @@ namespace Event
 		 * @param priv The privilege being checked for
 		 * @return EVENT_ALLOW for yes, EVENT_STOP to stop all processing
 		 */
-		virtual EventReturn OnCheckPriv(const ChanAccess *access, const Anope::string &priv) anope_abstract;
+		virtual EventReturn OnCheckPriv(const ChanServ::ChanAccess *access, const Anope::string &priv) anope_abstract;
 	};
 	extern CoreExport EventHandlers<CheckPriv> OnCheckPriv;
 
@@ -597,7 +585,7 @@ namespace Event
 		 * @param priv The privilege
 		 * @return MOD_ALLOW to allow, MOD_STOP to stop
 		 */
-		virtual EventReturn OnGroupCheckPriv(const AccessGroup *group, const Anope::string &priv) anope_abstract;
+		virtual EventReturn OnGroupCheckPriv(const ChanServ::AccessGroup *group, const Anope::string &priv) anope_abstract;
 	};
 	extern CoreExport EventHandlers<GroupCheckPriv> OnGroupCheckPriv;
 
@@ -633,7 +621,7 @@ namespace Event
 		/** Called on delnick()
 		 * @ param na pointer to the nickalias
 		 */
-		virtual void OnDelNick(NickAlias *na) anope_abstract;
+		virtual void OnDelNick(NickServ::Nick *na) anope_abstract;
 	};
 	extern CoreExport EventHandlers<DelNick> OnDelNick;
 
@@ -642,35 +630,35 @@ namespace Event
 		/** Called when a nickcore is created
 		 * @param nc The nickcore
 		 */
-		virtual void OnNickCoreCreate(NickCore *nc) anope_abstract;
+		virtual void OnNickCoreCreate(NickServ::Account *nc) anope_abstract;
 	};
 	extern CoreExport EventHandlers<NickCoreCreate> OnNickCoreCreate;
 
 	struct CoreExport DelCore : Events
 	{
 		/** Called on delcore()
-		 * @param nc pointer to the NickCore
+		 * @param nc pointer to the NickServ::Account
 		 */
-		virtual void OnDelCore(NickCore *nc) anope_abstract;
+		virtual void OnDelCore(NickServ::Account *nc) anope_abstract;
 	};
 	extern CoreExport EventHandlers<DelCore> OnDelCore;
 
 	struct CoreExport ChangeCoreDisplay : Events
 	{
 		/** Called on change_core_display()
-		 * @param nc pointer to the NickCore
+		 * @param nc pointer to the NickServ::Account
 		 * @param newdisplay the new display
 		 */
-		virtual void OnChangeCoreDisplay(NickCore *nc, const Anope::string &newdisplay) anope_abstract;
+		virtual void OnChangeCoreDisplay(NickServ::Account *nc, const Anope::string &newdisplay) anope_abstract;
 	};
 	extern CoreExport EventHandlers<ChangeCoreDisplay> OnChangeCoreDisplay;
 
 	struct CoreExport NickClearAccess : Events
 	{
-		/** called from NickCore::ClearAccess()
-		 * @param nc pointer to the NickCore
+		/** called from NickServ::Account::ClearAccess()
+		 * @param nc pointer to the NickServ::Account
 		 */
-		virtual void OnNickClearAccess(NickCore *nc) anope_abstract;
+		virtual void OnNickClearAccess(NickServ::Account *nc) anope_abstract;
 	};
 	extern CoreExport EventHandlers<NickClearAccess> OnNickClearAccess;
 
@@ -680,17 +668,17 @@ namespace Event
 		 * @param nc The nick
 		 * @param entry The entry
 		 */
-		virtual void OnNickAddAccess(NickCore *nc, const Anope::string &entry) anope_abstract;
+		virtual void OnNickAddAccess(NickServ::Account *nc, const Anope::string &entry) anope_abstract;
 	};
 	extern CoreExport EventHandlers<NickAddAccess> OnNickAddAccess;
 
 	struct CoreExport NickEraseAccess : Events
 	{
-		/** Called from NickCore::EraseAccess()
-		 * @param nc pointer to the NickCore
+		/** Called from NickServ::Account::EraseAccess()
+		 * @param nc pointer to the NickServ::Account
 		 * @param entry The access mask
 		 */
-		virtual void OnNickEraseAccess(NickCore *nc, const Anope::string &entry) anope_abstract;
+		virtual void OnNickEraseAccess(NickServ::Account *nc, const Anope::string &entry) anope_abstract;
 	};
 	extern CoreExport EventHandlers<NickEraseAccess> OnNickEraseAccess;
 
@@ -702,7 +690,7 @@ namespace Event
 		 * @param u The user trying to identify, if applicable.
 		 * @param req The login request
 		 */
-		virtual void OnCheckAuthentication(User *u, IdentifyRequest *req) anope_abstract;
+		virtual void OnCheckAuthentication(User *u, NickServ::IdentifyRequest *req) anope_abstract;
 	};
 	extern CoreExport EventHandlers<CheckAuthentication> OnCheckAuthentication;
 
@@ -741,7 +729,7 @@ namespace Event
 		/** Called when a vhost is set
 		 * @param na The nickalias of the vhost
 		 */
-		virtual void OnSetVhost(NickAlias *na) anope_abstract;
+		virtual void OnSetVhost(NickServ::Nick *na) anope_abstract;
 	};
 	extern CoreExport EventHandlers<SetVhost> OnSetVhost;
 
@@ -943,7 +931,7 @@ namespace Event
 		 * @param give_modes If giving modes is desired
 		 * @param take_modes If taking modes is desired
 		 */
-		virtual void OnSetCorrectModes(User *user, Channel *chan, AccessGroup &access, bool &give_modes, bool &take_modes) anope_abstract;
+		virtual void OnSetCorrectModes(User *user, Channel *chan, ChanServ::AccessGroup &access, bool &give_modes, bool &take_modes) anope_abstract;
 	};
 	extern CoreExport EventHandlers<SetCorrectModes> OnSetCorrectModes;
 

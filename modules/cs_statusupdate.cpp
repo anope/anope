@@ -19,17 +19,17 @@ class StatusUpdate : public Module
 
 	}
 
-	void OnAccessAdd(ChannelInfo *ci, CommandSource &, ChanAccess *access) override
+	void OnAccessAdd(ChanServ::Channel *ci, CommandSource &, ChanServ::ChanAccess *access) override
 	{
 		if (ci->c)
 			for (Channel::ChanUserList::iterator it = ci->c->users.begin(), it_end = ci->c->users.end(); it != it_end; ++it)
 			{
 				User *user = it->second->user;
 
-				ChanAccess::Path p;
+				ChanServ::ChanAccess::Path p;
 				if (user->server != Me && access->Matches(user, user->Account(), p))
 				{
-					AccessGroup ag = ci->AccessFor(user);
+					ChanServ::AccessGroup ag = ci->AccessFor(user);
 
 					for (unsigned i = 0; i < ModeManager::GetStatusChannelModesByRank().size(); ++i)
 					{
@@ -42,17 +42,17 @@ class StatusUpdate : public Module
 			}
 	}
 
-	void OnAccessDel(ChannelInfo *ci, CommandSource &, ChanAccess *access) override
+	void OnAccessDel(ChanServ::Channel *ci, CommandSource &, ChanServ::ChanAccess *access) override
 	{
 		if (ci->c)
 			for (Channel::ChanUserList::iterator it = ci->c->users.begin(), it_end = ci->c->users.end(); it != it_end; ++it)
 			{
 				User *user = it->second->user;
 
-				ChanAccess::Path p;
+				ChanServ::ChanAccess::Path p;
 				if (user->server != Me && access->Matches(user, user->Account(), p))
 				{
-					AccessGroup ag = ci->AccessFor(user);
+					ChanServ::AccessGroup ag = ci->AccessFor(user);
 
 					for (unsigned i = 0; i < ModeManager::GetStatusChannelModesByRank().size(); ++i)
 					{

@@ -11,13 +11,16 @@
  */
 
 
-class AccessGroup;
 class AutoKick;
 class BotInfo;
-class ChanAccess;
 class Channel;
-class ChannelInfo;
 class ChannelStatus;
+namespace ChanServ
+{
+	class AccessGroup;
+	class ChanAccess;
+	class Channel;
+}
 struct ChanUserContainer;
 class ClientSocket;
 class Command;
@@ -25,16 +28,24 @@ class CommandSource;
 namespace Configuration { struct Conf; }
 class ConnectionSocket;
 class Entry;
-class IdentifyRequest;
 class InfoFormatter;
 class IRCDProto;
 class ListenSocket;
 class Log;
-class Memo;
+class LogInfo;
+namespace NickServ
+{
+	class Account;
+	class Nick;
+	class IdentifyRequest;
+}
+namespace MemoServ
+{
+	class Memo;
+	struct MemoInfo;
+}
 class MessageSource;
 class Module;
-class NickAlias;
-class NickCore;
 class OperType;
 class ReferenceBase;
 class Regex;
@@ -47,7 +58,6 @@ class XLine;
 class XLineManager;
 struct BadWord;
 struct Exception;
-struct MemoInfo;
 struct ModeLock;
 struct Oper;
 namespace SASL { struct Message; }

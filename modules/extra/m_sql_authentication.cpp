@@ -38,11 +38,11 @@ class SQLAuthenticationResult : public SQL::Interface
 		}
 		catch (const SQL::Exception &) { }
 
-		NickAlias *na = NickAlias::Find(req->GetAccount());
+		NickServ::Nick *na = NickServ::FindNick(req->GetAccount());
 		BotInfo *NickServ = Config->GetClient("NickServ");
 		if (na == NULL)
 		{
-			na = new NickAlias(req->GetAccount(), new NickCore(req->GetAccount()));
+			na = new NickServ::Nick(req->GetAccount(), new NickServ::Account(req->GetAccount()));
 			NickServ::Event::OnNickRegister(&NickServ::Event::NickRegister::OnNickRegister, user, na);
 			if (user && NickServ)
 				user->SendMessage(NickServ, _("Your account \002%s\002 has been successfully created."), na->nick.c_str());

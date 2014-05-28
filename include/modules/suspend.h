@@ -22,14 +22,14 @@ namespace Event
 		/** Called when a channel is suspended
 		 * @param ci The channel
 		 */
-		virtual void OnChanSuspend(ChannelInfo *ci) anope_abstract;
+		virtual void OnChanSuspend(ChanServ::Channel *ci) anope_abstract;
 	};
 	struct CoreExport ChanUnsuspend : Events
 	{
 		/** Called when a channel is unsuspended
 		 * @param ci The channel
 		 */
-		virtual void OnChanUnsuspend(ChannelInfo *ci) anope_abstract;
+		virtual void OnChanUnsuspend(ChanServ::Channel *ci) anope_abstract;
 	};
 	extern CoreExport EventHandlers<ChanUnsuspend> OnChanUnsuspend;
 
@@ -38,7 +38,7 @@ namespace Event
 		/** Called when a nick is suspended
 		 * @param na The nick alias
 		 */
-		virtual void OnNickSuspend(NickAlias *na) anope_abstract;
+		virtual void OnNickSuspend(NickServ::Nick *na) anope_abstract;
 	};
 
 	struct CoreExport NickUnsuspended : Events
@@ -46,7 +46,7 @@ namespace Event
 		/** Called when a nick is unsuspneded
 		 * @param na The nick alias
 		 */
-		virtual void OnNickUnsuspended(NickAlias *na) anope_abstract;
+		virtual void OnNickUnsuspended(NickServ::Nick *na) anope_abstract;
 	};
 }
 

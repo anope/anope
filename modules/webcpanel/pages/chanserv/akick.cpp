@@ -7,12 +7,13 @@
 
 #include "../../webcpanel.h"
 #include "utils.h"
+#include "modules/cs_akick.h"
 
 WebCPanel::ChanServ::Akick::Akick(const Anope::string &cat, const Anope::string &u) : WebPanelProtectedPage(cat, u)
 {
 }
 
-bool WebCPanel::ChanServ::Akick::OnRequest(HTTPProvider *server, const Anope::string &page_name, HTTPClient *client, HTTPMessage &message, HTTPReply &reply, NickAlias *na, TemplateFileServer::Replacements &replacements)
+bool WebCPanel::ChanServ::Akick::OnRequest(HTTPProvider *server, const Anope::string &page_name, HTTPClient *client, HTTPMessage &message, HTTPReply &reply, ::NickServ::Nick *na, TemplateFileServer::Replacements &replacements)
 {
 	const Anope::string &chname = message.get_data["channel"];
 	TemplateFileServer Page("chanserv/akick.html");
@@ -25,7 +26,7 @@ bool WebCPanel::ChanServ::Akick::OnRequest(HTTPProvider *server, const Anope::st
 		return true;
 	}
 
-	ChannelInfo *ci = ChannelInfo::Find(chname);
+	::ChanServ::Channel *ci = ::ChanServ::Find(chname);
 
 	if (!ci)
 	{
@@ -34,7 +35,7 @@ bool WebCPanel::ChanServ::Akick::OnRequest(HTTPProvider *server, const Anope::st
 		return true;
 	}
 
-	AccessGroup u_access = ci->AccessFor(na->nc);
+	::ChanServ::AccessGroup u_access = ci->AccessFor(na->nc);
 	bool has_priv = na->nc->IsServicesOper() && na->nc->o->ot->HasPriv("chanserv/access/modify");
 
 	if (!u_access.HasPriv("AKICK") && !has_priv)
@@ -71,14 +72,14 @@ bool WebCPanel::ChanServ::Akick::OnRequest(HTTPProvider *server, const Anope::st
 
 	for (unsigned i = 0; i < ci->GetAkickCount(); ++i)
 	{
-		AutoKick *akick = ci->GetAkick(i);
+		AutoKick *ak = ci->GetAkick(i);
 
-		if (akick->nc)
-			replacements["MASKS"] = HTTPUtils::Escape(akick->nc->display);
+		if (ak->nc)
+			replacements["MASKS"] = HTTPUtils::Escape(ak->nc->display);
 		else
-			replacements["MASKS"] = HTTPUtils::Escape(akick->mask);
-		replacements["CREATORS"] = HTTPUtils::Escape(akick->creator);
-		replacements["REASONS"] = HTTPUtils::Escape(akick->reason);
+			replacements["MASKS"] = HTTPUtils::Escape(ak->mask);
+		replacements["CREATORS"] = HTTPUtils::Escape(ak->creator);
+		replacements["REASONS"] = HTTPUtils::Escape(ak->reason);
 	}
 
 	Page.Serve(server, page_name, client, message, reply, replacements);

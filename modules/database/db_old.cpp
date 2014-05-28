@@ -142,7 +142,7 @@ enum
 	LANG_PL /* Polish */
 };
 
-static void process_mlock(ChannelInfo *ci, uint32_t lock, bool status, uint32_t *limit, Anope::string *key)
+static void process_mlock(ChanServ::Channel *ci, uint32_t lock, bool status, uint32_t *limit, Anope::string *key)
 {
 	ModeLocks *ml = ci->Require<ModeLocks>("modelocks");
 	for (unsigned i = 0; i < (sizeof(mlock_infos) / sizeof(mlock_info)); ++i)
@@ -434,6 +434,8 @@ int read_int32(int32_t *ret, dbFILE *f)
 
 static void LoadNicks()
 {
+	if (!NickServ::service)
+		return;
 	ServiceReference<ForbidService> forbid("ForbidService", "forbid");
 	dbFILE *f = open_db_read("NickServ", "nick.db", 14);
 	if (f == NULL)
@@ -444,7 +446,7 @@ static void LoadNicks()
 			Anope::string buffer;
 
 			READ(read_string(buffer, f));
-			NickCore *nc = new NickCore(buffer);
+			NickServ::Account *nc = NickServ::service->CreateAccount(buffer);
 
 			const Anope::string settings[] = { "killprotect", "kill_quick", "ns_secure", "ns_private", "hide_email",
 				"hide_mask", "hide_quit", "memo_signon", "memo_receive", "autoop", "msg", "ns_keepmodes" };
@@ -573,27 +575,38 @@ static void LoadNicks()
 
 			int16_t i16;
 			READ(read_int16(&i16, f));
-			READ(read_int16(&nc->memos.memomax, f));
+			READ(read_int16(&i16, f));
+			if (nc->memos)
+				nc->memos->memomax = i16;
 			for (int16_t j = 0; j < i16; ++j)
 			{
-				Memo *m = new Memo;
+				MemoServ::Memo *m = MemoServ::service ? MemoServ::service->CreateMemo() : nullptr;
 				READ(read_uint32(&u32, f));
 				uint16_t flags;
 				READ(read_uint16(&flags, f));
 				int32_t tmp32;
 				READ(read_int32(&tmp32, f));
-				m->time = tmp32;
+				if (m)
+					m->time = tmp32;
 				char sbuf[32];
 				READ(read_buffer(sbuf, f));
-				m->sender = sbuf;
-				READ(read_string(m->text, f));
-				m->owner = nc->display;
-				nc->memos.memos->push_back(m);
+				if (m)
+					m->sender = sbuf;
+				Anope::string text;
+				READ(read_string(text, f));
+				if (m)
+					m->text = text;
+				if (m)
+					m->owner = nc->display;
+				if (nc->memos && m)
+					nc->memos->memos->push_back(m);
+				else
+					delete m;
 			}
 			READ(read_uint16(&u16, f));
 			READ(read_int16(&i16, f));
 
-			Log(LOG_DEBUG) << "Loaded NickCore " << nc->display;
+			Log(LOG_DEBUG) << "Loaded NickServ::Account " << nc->display;
 		}
 
 	for (int i = 0; i < 1024; ++i)
@@ -618,7 +631,7 @@ static void LoadNicks()
 
 			Anope::string core;
 			READ(read_string(core, f));
-			NickCore *nc = NickCore::Find(core);
+			NickServ::Account *nc = NickServ::FindAccount(core);
 			if (nc == NULL)
 			{
 				Log() << "Skipping coreless nick " << nick << " with core " << core;
@@ -651,7 +664,7 @@ static void LoadNicks()
 				continue;
 			}
 
-			NickAlias *na = new NickAlias(nick, nc);
+			NickServ::Nick *na = NickServ::service->CreateNick(nick, nc);
 			na->last_usermask = last_usermask;
 			na->last_realname = last_realname;
 			na->last_quit = last_quit;
@@ -661,7 +674,7 @@ static void LoadNicks()
 			if (tmpu16 & OLD_NS_NO_EXPIRE)
 				na->Extend<bool>("NS_NO_EXPIRE");
 
-			Log(LOG_DEBUG) << "Loaded NickAlias " << na->nick;
+			Log(LOG_DEBUG) << "Loaded NickServ::Nick " << na->nick;
 		}
 
 	close_db(f); /* End of section Ia */
@@ -684,7 +697,7 @@ static void LoadVHosts()
 		READ(read_string(creator, f));
 		READ(read_int32(&vtime, f));
 
-		NickAlias *na = NickAlias::Find(nick);
+		NickServ::Nick *na = NickServ::FindNick(nick);
 		if (na == NULL)
 		{
 			Log() << "Removing vhost for nonexistant nick " << nick;
@@ -735,6 +748,9 @@ static void LoadBots()
 
 static void LoadChannels()
 {
+	if (!ChanServ::service)
+		return;
+
 	ServiceReference<ForbidService> forbid("ForbidService", "forbid");
 	dbFILE *f = open_db_read("ChanServ", "chan.db", 16);
 	if (f == NULL)
@@ -746,7 +762,7 @@ static void LoadChannels()
 			Anope::string buffer;
 			char namebuf[64];
 			READ(read_buffer(namebuf, f));
-			ChannelInfo *ci = new ChannelInfo(namebuf);
+			ChanServ::Channel *ci = ChanServ::service->Create(namebuf);
 
 			const Anope::string settings[] = { "keeptopic", "peace", "cs_private", "restricted", "cs_secure", "secureops", "securefounder",
 				"signkick", "signkick_level", "topiclock", "persist", "noautoop", "cs_keepmodes" };
@@ -754,10 +770,10 @@ static void LoadChannels()
 				ci->Shrink<bool>(settings[j].upper());
 
 			READ(read_string(buffer, f));
-			ci->SetFounder(NickCore::Find(buffer));
+			ci->SetFounder(NickServ::FindAccount(buffer));
 
 			READ(read_string(buffer, f));
-			ci->SetSuccessor(NickCore::Find(buffer));
+			ci->SetSuccessor(NickServ::FindAccount(buffer));
 
 			char pwbuf[32];
 			READ(read_buffer(pwbuf, f));
@@ -836,8 +852,8 @@ static void LoadChannels()
 				int16_t level;
 				READ(read_int16(&level, f));
 
-				if (level == ACCESS_INVALID)
-					level = ACCESS_FOUNDER;
+				if (level == ChanServ::ACCESS_INVALID)
+					level = ChanServ::ACCESS_FOUNDER;
 
 				if (j == 10 && level < 0) // NOJOIN
 					ci->Shrink<bool>("RESTRICTED"); // If CSDefRestricted was enabled this can happen
@@ -846,7 +862,7 @@ static void LoadChannels()
 			}
 
 			bool xop = tmpu32 & OLD_CI_XOP;
-			ServiceReference<AccessProvider> provider_access("AccessProvider", "access/access"), provider_xop("AccessProvider", "access/xop");
+			ServiceReference<ChanServ::AccessProvider> provider_access("AccessProvider", "access/access"), provider_xop("AccessProvider", "access/xop");
 			uint16_t tmpu16;
 			READ(read_uint16(&tmpu16, f));
 			for (uint16_t j = 0; j < tmpu16; ++j)
@@ -855,8 +871,8 @@ static void LoadChannels()
 				READ(read_uint16(&in_use, f));
 				if (in_use)
 				{
-					ChanAccess *access = NULL;
-					
+					ChanServ::ChanAccess *access = NULL;
+
 					if (xop)
 					{
 						if (provider_xop)
@@ -941,20 +957,31 @@ static void LoadChannels()
 			READ(read_string(buffer, f)); // +L
 
 			READ(read_int16(&tmp16, f));
-			READ(read_int16(&ci->memos.memomax, f));
+			READ(read_int16(&tmp16, f));
+			if (ci->memos)
+				ci->memos->memomax = tmp16;
 			for (int16_t j = 0; j < tmp16; ++j)
 			{
 				READ(read_uint32(&tmpu32, f));
 				READ(read_uint16(&tmpu16, f));
-				Memo *m = new Memo;
+				MemoServ::Memo *m = MemoServ::service ? MemoServ::service->CreateMemo() : nullptr;
 				READ(read_int32(&tmp32, f));
-				m->time = tmp32;
+				if (m)
+					m->time = tmp32;
 				char sbuf[32];
 				READ(read_buffer(sbuf, f));
-				m->sender = sbuf;
-				READ(read_string(m->text, f));
-				m->owner = ci->name;
-				ci->memos.memos->push_back(m);
+				if (m)
+					m->sender = sbuf;
+				Anope::string text;
+				READ(read_string(text, f));
+				if (m)
+					m->text = text;
+				if (m)
+					m->owner = ci->name;
+				if (ci->memos && m)
+					ci->memos->memos->push_back(m);
+				else
+					delete m;
 			}
 
 			READ(read_string(buffer, f));
@@ -1211,7 +1238,7 @@ static void LoadExceptions()
 	dbFILE *f = open_db_read("OperServ", "exception.db", 9);
 	if (f == NULL)
 		return;
-	
+
 	int16_t num;
 	READ(read_int16(&num, f));
 	for (int i = 0; i < num; ++i)
@@ -1330,9 +1357,11 @@ class DBOld : public Module
 
 	void OnUplinkSync(Server *s) override
 	{
-		for (registered_channel_map::iterator it = RegisteredChannelList->begin(), it_end = RegisteredChannelList->end(); it != it_end; ++it)
+		if (!ChanServ::service)
+			return;
+		for (auto& it : ChanServ::service->GetChannels())
 		{
-			ChannelInfo *ci = it->second;
+			ChanServ::Channel *ci = it.second;
 			uint32_t *limit = mlock_limit.Get(ci);
 			Anope::string *key = mlock_key.Get(ci);
 

@@ -11,6 +11,7 @@
 
 #include "module.h"
 #include "modules/bs_badwords.h"
+#include "modules/cs_akick.h"
 
 class CommandCSClone : public Command
 {
@@ -34,7 +35,7 @@ public:
 		}
 
 		User *u = source.GetUser();
-		ChannelInfo *ci = ChannelInfo::Find(params[0]);
+		ChanServ::Channel *ci = ChanServ::Find(params[0]);
 		bool override = false;
 
 		if (ci == NULL)
@@ -43,7 +44,7 @@ public:
 			return;
 		}
 
-		ChannelInfo *target_ci = ChannelInfo::Find(target);
+		ChanServ::Channel *target_ci = ChanServ::Find(target);
 		if (!target_ci)
 		{
 			source.Reply(CHAN_X_NOT_REGISTERED, target.c_str());
@@ -73,9 +74,10 @@ public:
 		if (what.empty())
 		{
 			delete target_ci;
-			target_ci = new ChannelInfo(*ci);
+			target_ci = ChanServ::service->Create(*ci);
 			target_ci->name = target;
-			(*RegisteredChannelList)[target_ci->name] = target_ci;
+			ChanServ::registered_channel_map& map = ChanServ::service->GetChannels();
+			map[target_ci->name] = target_ci;
 			target_ci->c = Channel::Find(target_ci->name);
 
 			target_ci->bi = NULL;
@@ -115,8 +117,8 @@ public:
 
 			for (unsigned i = 0; i < ci->GetAccessCount(); ++i)
 			{
-				const ChanAccess *taccess = ci->GetAccess(i);
-				AccessProvider *provider = taccess->provider;
+				const ChanServ::ChanAccess *taccess = ci->GetAccess(i);
+				ChanServ::AccessProvider *provider = taccess->provider;
 
 				if (access_max && target_ci->GetDeepAccessCount() >= access_max)
 					break;
@@ -125,7 +127,7 @@ public:
 					continue;
 				masks.insert(taccess->mask);
 
-				ChanAccess *newaccess = provider->Create();
+				ChanServ::ChanAccess *newaccess = provider->Create();
 				newaccess->ci = target_ci;
 				newaccess->mask = taccess->mask;
 				newaccess->creator = taccess->creator;
@@ -145,11 +147,11 @@ public:
 			target_ci->ClearAkick();
 			for (unsigned i = 0; i < ci->GetAkickCount(); ++i)
 			{
-				const AutoKick *akick = ci->GetAkick(i);
-				if (akick->nc)
-					target_ci->AddAkick(akick->creator, akick->nc, akick->reason, akick->addtime, akick->last_used);
+				const AutoKick *ak = ci->GetAkick(i);
+				if (ak->nc)
+					target_ci->AddAkick(ak->creator, ak->nc, ak->reason, ak->addtime, ak->last_used);
 				else
-					target_ci->AddAkick(akick->creator, akick->mask, akick->reason, akick->addtime, akick->last_used);
+					target_ci->AddAkick(ak->creator, ak->mask, ak->reason, ak->addtime, ak->last_used);
 			}
 
 			source.Reply(_("All akick entries from \002%s\002 have been cloned to \002%s\002."), channel.c_str(), target.c_str());

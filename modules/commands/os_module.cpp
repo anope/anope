@@ -139,7 +139,7 @@ class CommandOSModUnLoad : public Command
 			source.Reply(_("Module \002%s\002 isn't loaded."), mname.c_str());
 			return;
 		}
-		
+
 		if (!m->handle || m->GetPermanent() || m->type == PROTOCOL)
 		{
 			source.Reply(_("Unable to remove module \002%s\002."), m->name.c_str());

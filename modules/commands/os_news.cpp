@@ -115,7 +115,7 @@ class MyNewsService : public NewsService
 	{
 		this->newsItems[n->type].push_back(n);
 	}
-	
+
 	void DelNewsItem(NewsItem *n)
 	{
 		std::vector<NewsItem *> &list = this->GetNewsList(n->type);

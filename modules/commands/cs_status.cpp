@@ -10,6 +10,7 @@
  */
 
 #include "module.h"
+#include "modules/cs_akick.h"
 
 class CommandCSStatus : public Command
 {
@@ -24,7 +25,7 @@ public:
 	{
 		const Anope::string &channel = params[0];
 
-		ChannelInfo *ci = ChannelInfo::Find(channel);
+		ChanServ::Channel *ci = ChanServ::Find(channel);
 		if (ci == NULL)
 			source.Reply(CHAN_X_NOT_REGISTERED, channel.c_str());
 		else if (!source.AccessFor(ci).HasPriv("ACCESS_CHANGE") && !source.HasPriv("chanserv/auspex"))
@@ -35,14 +36,14 @@ public:
 			if (params.size() > 1)
 				nick = params[1];
 
-			AccessGroup ag;
+			ChanServ::AccessGroup ag;
 			User *u = User::Find(nick, true);
-			NickAlias *na = NULL;
+			NickServ::Nick *na = NULL;
 			if (u != NULL)
 				ag = ci->AccessFor(u);
 			else
 			{
-				na = NickAlias::Find(nick);
+				na = NickServ::FindNick(nick);
 				if (na != NULL)
 					ag = ci->AccessFor(na->nc);
 			}
@@ -59,7 +60,7 @@ public:
 
 				for (unsigned i = 0; i < ag.size(); ++i)
 				{
-					ChanAccess *acc = ag[i];
+					ChanServ::ChanAccess *acc = ag[i];
 
 					source.Reply(_("\002%s\002 matches access entry %s, which has privilege %s."), nick.c_str(), acc->mask.c_str(), acc->AccessSerialize().c_str());
 				}

@@ -18,7 +18,7 @@ namespace Event
 		 * @param setting The setting passed to the command. Probably ON/OFF.
 		 * @return EVENT_ALLOW to bypass access checks, EVENT_STOP to halt immediately.
 		 */
-		virtual EventReturn OnSetChannelOption(CommandSource &source, Command *cmd, ChannelInfo *ci, const Anope::string &setting) anope_abstract;
+		virtual EventReturn OnSetChannelOption(CommandSource &source, Command *cmd, ChanServ::Channel *ci, const Anope::string &setting) anope_abstract;
 	};
 	static EventHandlersReference<SetChannelOption> OnSetChannelOption("OnSetChannelOption");
 }

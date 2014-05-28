@@ -238,7 +238,7 @@ class ModuleWebCPanel : public Module
 			provider->UnregisterPage(&this->chanserv_drop);
 
 			provider->UnregisterPage(&this->memoserv_memos);
-			
+
 			provider->UnregisterPage(&this->hostserv_request);
 
 			provider->UnregisterPage(&this->operserv_akill);
@@ -248,7 +248,7 @@ class ModuleWebCPanel : public Module
 
 namespace WebPanel
 {
-	void RunCommand(const Anope::string &user, NickCore *nc, const Anope::string &service, const Anope::string &c, const std::vector<Anope::string> &params, TemplateFileServer::Replacements &r, const Anope::string &key)
+	void RunCommand(const Anope::string &user, NickServ::Account *nc, const Anope::string &service, const Anope::string &c, const std::vector<Anope::string> &params, TemplateFileServer::Replacements &r, const Anope::string &key)
 	{
 		ServiceReference<Command> cmd("Command", c);
 		if (!cmd)
@@ -275,7 +275,7 @@ namespace WebPanel
 
 			MyComandReply(TemplateFileServer::Replacements &_r, const Anope::string &_k) : re(_r), k(_k) { }
 
-			void SendMessage(BotInfo *source, const Anope::string &msg) override
+			void SendMessage(const MessageSource &, const Anope::string &msg) override
 			{
 				re[k] = msg;
 			}

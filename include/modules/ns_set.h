@@ -18,7 +18,7 @@ namespace Event
 		 * @param setting The setting passed to the command. Probably ON/OFF.
 		 * @return EVENT_STOP to halt immediately
 		 */
-		virtual EventReturn OnSetNickOption(CommandSource &source, Command *cmd, NickCore *nc, const Anope::string &setting) anope_abstract;
+		virtual EventReturn OnSetNickOption(CommandSource &source, Command *cmd, NickServ::Account *nc, const Anope::string &setting) anope_abstract;
 	};
 	static EventHandlersReference<SetNickOption> OnSetNickOption("OnSetNickOption");
 }

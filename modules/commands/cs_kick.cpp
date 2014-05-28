@@ -28,7 +28,7 @@ class CommandCSKick : public Command
 		Anope::string reason = params.size() > 2 ? params[2] : "Requested";
 
 		User *u = source.GetUser();
-		ChannelInfo *ci = ChannelInfo::Find(params[0]);
+		ChanServ::Channel *ci = ChanServ::Find(params[0]);
 		Channel *c = Channel::Find(params[0]);
 		User *u2 = User::Find(target, true);
 
@@ -47,13 +47,13 @@ class CommandCSKick : public Command
 		if (reason.length() > reasonmax)
 			reason = reason.substr(0, reasonmax);
 
-		AccessGroup u_access = source.AccessFor(ci);
+		ChanServ::AccessGroup u_access = source.AccessFor(ci);
 
 		if (!u_access.HasPriv("KICK") && !source.HasPriv("chanserv/kick"))
 			source.Reply(ACCESS_DENIED);
 		else if (u2)
 		{
-			AccessGroup u2_access = ci->AccessFor(u2);
+			ChanServ::AccessGroup u2_access = ci->AccessFor(u2);
 			if (u != u2 && ci->HasExt("PEACE") && u2_access >= u_access && !source.HasPriv("chanserv/kick"))
 				source.Reply(ACCESS_DENIED);
 			else if (u2->IsProtected())
@@ -85,7 +85,7 @@ class CommandCSKick : public Command
 				{
 					++matched;
 
-					AccessGroup u2_access = ci->AccessFor(uc->user);
+					ChanServ::AccessGroup u2_access = ci->AccessFor(uc->user);
 					if (u != uc->user && ci->HasExt("PEACE") && u2_access >= u_access)
 						continue;
 					else if (uc->user->IsProtected())

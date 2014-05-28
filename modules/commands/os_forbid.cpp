@@ -214,7 +214,7 @@ class CommandOSForbid : public Command
 					expiryt += Anope::CurTime;
 			}
 
-			NickAlias *target = NickAlias::Find(entry);
+			NickServ::Nick *target = NickServ::FindNick(entry);
 			if (target != NULL && Config->GetModule("nickserv")->Get<bool>("secureadmins", "yes") && target->nc->IsServicesOper())
 			{
 				source.Reply(ACCESS_DENIED);
@@ -254,9 +254,9 @@ class CommandOSForbid : public Command
 					for (user_map::const_iterator it = UserListByNick.begin(); it != UserListByNick.end(); ++it)
 						this->OnUserNickChange(it->second);
 
-					for (nickalias_map::const_iterator it = NickAliasList->begin(), it_end = NickAliasList->end(); it != it_end;)
+					for (auto it = NickServ::service->GetNickList().begin(); it != NickServ::service->GetNickList().end();)
 					{
-						NickAlias *na = it->second;
+						NickServ::Nick *na = it->second;
 						++it;
 
 						d = this->fs->FindForbid(na->nick, FT_NICK);
@@ -312,9 +312,9 @@ class CommandOSForbid : public Command
 						}
 					}
 
-					for (registered_channel_map::const_iterator it = RegisteredChannelList->begin(); it != RegisteredChannelList->end();)
+					for (auto it = ChanServ::service->GetChannels().begin(); it != ChanServ::service->GetChannels().end();)
 					{
-						ChannelInfo *ci = it->second;
+						ChanServ::Channel *ci = it->second;
 						++it;
 
 						d = this->fs->FindForbid(ci->name, FT_CHAN);

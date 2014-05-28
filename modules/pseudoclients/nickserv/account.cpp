@@ -10,18 +10,13 @@
  *
  */
 
-#include "services.h"
-#include "modules.h"
+#include "module.h"
 #include "account.h"
-#include "config.h"
-#include "event.h"
 
-Serialize::Checker<nickcore_map> NickCoreList("NickCore");
-
-NickCore::NickCore(const Anope::string &coredisplay) : Serializable("NickCore"), chanaccess("ChannelInfo"), aliases("NickAlias")
+AccountImpl::AccountImpl(const Anope::string &coredisplay)
 {
 	if (coredisplay.empty())
-		throw CoreException("Empty display passed to NickCore constructor");
+		throw CoreException("Empty display passed to NickServ::Account constructor");
 
 	this->o = NULL;
 	this->channelcount = 0;
@@ -29,15 +24,16 @@ NickCore::NickCore(const Anope::string &coredisplay) : Serializable("NickCore"),
 
 	this->display = coredisplay;
 
-	size_t old = NickCoreList->size();
-	(*NickCoreList)[this->display] = this;
-	if (old == NickCoreList->size())
+	NickServ::nickcore_map& map = NickServ::service->GetAccountList();
+	NickServ::Account* &nc = map[this->display];
+	if (nc)
 		Log(LOG_DEBUG) << "Duplicate account " << coredisplay << " in nickcore table?";
-	
+	nc = this;
+
 	Event::OnNickCoreCreate(&Event::NickCoreCreate::OnNickCoreCreate, this);
 }
 
-NickCore::~NickCore()
+AccountImpl::~AccountImpl()
 {
 	Event::OnDelCore(&Event::DelCore::OnDelCore, this);
 
@@ -51,19 +47,21 @@ NickCore::~NickCore()
 	}
 	this->users.clear();
 
-	NickCoreList->erase(this->display);
+	NickServ::nickcore_map& map = NickServ::service->GetAccountList();
+	map.erase(this->display);
 
 	this->ClearAccess();
 
-	if (!this->memos.memos->empty())
+	if (memos)
 	{
-		for (unsigned i = 0, end = this->memos.memos->size(); i < end; ++i)
-			delete this->memos.GetMemo(i);
-		this->memos.memos->clear();
+		for (unsigned i = 0, end = this->memos->memos->size(); i < end; ++i)
+			delete this->memos->GetMemo(i);
+		this->memos->memos->clear();
+		delete memos;
 	}
 }
 
-void NickCore::Serialize(Serialize::Data &data) const
+void AccountImpl::Serialize(Serialize::Data &data) const
 {
 	data["display"] << this->display;
 	data["pass"] << this->pass;
@@ -71,24 +69,27 @@ void NickCore::Serialize(Serialize::Data &data) const
 	data["language"] << this->language;
 	for (unsigned i = 0; i < this->access.size(); ++i)
 		data["access"] << this->access[i] << " ";
-	data["memomax"] << this->memos.memomax;
-	for (unsigned i = 0; i < this->memos.ignores.size(); ++i)
-		data["memoignores"] << this->memos.ignores[i] << " ";
+	if (memos)
+	{
+		data["memomax"] << this->memos->memomax;
+		for (unsigned i = 0; i < this->memos->ignores.size(); ++i)
+			data["memoignores"] << this->memos->ignores[i] << " ";
+	}
 	Extensible::ExtensibleSerialize(this, this, data);
 }
 
-Serializable* NickCore::Unserialize(Serializable *obj, Serialize::Data &data)
+Serializable* AccountImpl::Unserialize(Serializable *obj, Serialize::Data &data)
 {
-	NickCore *nc;
+	NickServ::Account *nc;
 
 	Anope::string sdisplay;
 
 	data["display"] >> sdisplay;
 
 	if (obj)
-		nc = anope_dynamic_static_cast<NickCore *>(obj);
+		nc = anope_dynamic_static_cast<NickServ::Account *>(obj);
 	else
-		nc = new NickCore(sdisplay);
+		nc = new AccountImpl(sdisplay);
 
 	data["pass"] >> nc->pass;
 	data["email"] >> nc->email;
@@ -101,14 +102,17 @@ Serializable* NickCore::Unserialize(Serializable *obj, Serialize::Data &data)
 		while (sep.GetToken(buf))
 			nc->access.push_back(buf);
 	}
-	data["memomax"] >> nc->memos.memomax;
+	if (nc->memos)
 	{
-		Anope::string buf;
-		data["memoignores"] >> buf;
-		spacesepstream sep(buf);
-		nc->memos.ignores.clear();
-		while (sep.GetToken(buf))
-			nc->memos.ignores.push_back(buf);
+		data["memomax"] >> nc->memos->memomax;
+		{
+			Anope::string buf;
+			data["memoignores"] >> buf;
+			spacesepstream sep(buf);
+			nc->memos->ignores.clear();
+			while (sep.GetToken(buf))
+				nc->memos->ignores.push_back(buf);
+		}
 	}
 
 	Extensible::ExtensibleUnserialize(nc, nc, data);
@@ -152,45 +156,51 @@ Serializable* NickCore::Unserialize(Serializable *obj, Serialize::Data &data)
 	return nc;
 }
 
-void NickCore::SetDisplay(const NickAlias *na)
+void AccountImpl::SetDisplay(const NickServ::Nick *na)
 {
 	if (na->nc != this || na->nick == this->display)
 		return;
 
 	Event::OnChangeCoreDisplay(&Event::ChangeCoreDisplay::OnChangeCoreDisplay, this, na->nick);
 
+	NickServ::nickcore_map& map = NickServ::service->GetAccountList();
+
 	/* Remove the core from the list */
-	NickCoreList->erase(this->display);
+	map.erase(this->display);
 
 	this->display = na->nick;
 
-	(*NickCoreList)[this->display] = this;
+	NickServ::Account* &nc = map[this->display];
+	if (nc)
+		Log(LOG_DEBUG) << "Duplicate account " << display << " in nickcore table?";
+
+	nc = this;
 }
 
-bool NickCore::IsServicesOper() const
+bool AccountImpl::IsServicesOper() const
 {
 	return this->o != NULL;
 }
 
-void NickCore::AddAccess(const Anope::string &entry)
+void AccountImpl::AddAccess(const Anope::string &entry)
 {
 	this->access.push_back(entry);
 	Event::OnNickAddAccess(&Event::NickAddAccess::OnNickAddAccess, this, entry);
 }
 
-Anope::string NickCore::GetAccess(unsigned entry) const
+Anope::string AccountImpl::GetAccess(unsigned entry) const
 {
 	if (this->access.empty() || entry >= this->access.size())
 		return "";
 	return this->access[entry];
 }
 
-unsigned NickCore::GetAccessCount() const
+unsigned AccountImpl::GetAccessCount() const
 {
 	return this->access.size();
 }
 
-bool NickCore::FindAccess(const Anope::string &entry)
+bool AccountImpl::FindAccess(const Anope::string &entry)
 {
 	for (unsigned i = 0, end = this->access.size(); i < end; ++i)
 		if (this->access[i] == entry)
@@ -199,7 +209,7 @@ bool NickCore::FindAccess(const Anope::string &entry)
 	return false;
 }
 
-void NickCore::EraseAccess(const Anope::string &entry)
+void AccountImpl::EraseAccess(const Anope::string &entry)
 {
 	for (unsigned i = 0, end = this->access.size(); i < end; ++i)
 		if (this->access[i] == entry)
@@ -210,13 +220,13 @@ void NickCore::EraseAccess(const Anope::string &entry)
 		}
 }
 
-void NickCore::ClearAccess()
+void AccountImpl::ClearAccess()
 {
 	Event::OnNickClearAccess(&Event::NickClearAccess::OnNickClearAccess, this);
 	this->access.clear();
 }
 
-bool NickCore::IsOnAccess(const User *u) const
+bool AccountImpl::IsOnAccess(const User *u) const
 {
 	Anope::string buf = u->GetIdent() + "@" + u->host, buf2, buf3;
 	if (!u->vhost.empty())
@@ -233,34 +243,22 @@ bool NickCore::IsOnAccess(const User *u) const
 	return false;
 }
 
-void NickCore::AddChannelReference(ChannelInfo *ci)
+void AccountImpl::AddChannelReference(ChanServ::Channel *ci)
 {
 	++(*this->chanaccess)[ci];
 }
 
-void NickCore::RemoveChannelReference(ChannelInfo *ci)
+void AccountImpl::RemoveChannelReference(ChanServ::Channel *ci)
 {
 	int& i = (*this->chanaccess)[ci];
 	if (--i <= 0)
 		this->chanaccess->erase(ci);
 }
 
-void NickCore::GetChannelReferences(std::deque<ChannelInfo *> &queue)
+void AccountImpl::GetChannelReferences(std::deque<ChanServ::Channel *> &queue)
 {
 	queue.clear();
-	for (std::map<ChannelInfo *, int>::iterator it = this->chanaccess->begin(), it_end = this->chanaccess->end(); it != it_end; ++it)
+	for (std::map<ChanServ::Channel *, int>::iterator it = this->chanaccess->begin(), it_end = this->chanaccess->end(); it != it_end; ++it)
 		queue.push_back(it->first);
-}
-
-NickCore* NickCore::Find(const Anope::string &nick)
-{
-	nickcore_map::const_iterator it = NickCoreList->find(nick);
-	if (it != NickCoreList->end())
-	{
-		it->second->QueueUpdate();
-		return it->second;
-	}
-
-	return NULL;
 }
 

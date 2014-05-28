@@ -24,7 +24,7 @@ namespace Language
 	 * and we detect a language file exists for at least one of the supported
 	 * languages for the module, then we add the module's domain (its name)
 	 * here.
-	 * 
+	 *
 	 * When strings are translated they are checked against all domains.
 	 */
 	extern std::vector<Anope::string> Domains;
@@ -52,7 +52,7 @@ namespace Language
 	 * @param string A string to translate
 	 * @return The translated string if count, else the original string
 	 */
-	extern CoreExport const char *Translate(const NickCore *nc, const char *string);
+	extern CoreExport const char *Translate(const NickServ::Account *nc, const char *string);
 
 	/** Translatesa string to the given language.
 	 * @param lang The language to translate to

@@ -21,6 +21,7 @@
 #include "servers.h"
 #include "channels.h"
 #include "event.h"
+#include "bots.h"
 
 using namespace Message;
 
@@ -57,7 +58,7 @@ void Invite::Run(MessageSource &source, const std::vector<Anope::string> &params
 
 	if (!targ || targ->server != Me || !c || c->FindUser(targ))
 		return;
-	
+
 	Event::OnInvite(&Event::Invite::OnInvite, source.GetUser(), c, targ);
 }
 
@@ -115,14 +116,14 @@ void Join::SJoin(MessageSource &source, const Anope::string &chan, time_t ts, co
 	/* Their TS is newer, don't accept any modes from them */
 	else if (ts > c->creation_time)
 		keep_their_modes = false;
-	
+
 	/* Update the modes for the channel */
 	if (keep_their_modes && !modes.empty())
 		/* If we are syncing, mlock is checked later in Channel::Sync. It is important to not check it here
 		 * so that Channel::SetCorrectModes can correctly detect the presence of channel mode +r.
 		 */
 		c->SetModesInternal(source, modes, ts, !c->syncing);
-	
+
 	for (std::list<SJoinUser>::const_iterator it = users.begin(), it_end = users.end(); it != it_end; ++it)
 	{
 		const ChannelStatus &status = it->first;
@@ -140,7 +141,7 @@ void Join::SJoin(MessageSource &source, const Anope::string &chan, time_t ts, co
 		 * they aren't allowed to have (secureops etc).
 		 */
 		c->SetCorrectModes(u, true);
-		
+
 		Event::OnJoinChannel(&Event::JoinChannel::OnJoinChannel, u, c);
 	}
 
@@ -355,7 +356,7 @@ void Privmsg::Run(MessageSource &source, const std::vector<Anope::string> &param
 			MOD_RESULT = Event::OnBotPrivmsg(&Event::BotPrivmsg::OnBotPrivmsg, u, bi, message);
 			if (MOD_RESULT == EVENT_STOP)
 				return;
-			
+
 			bi->OnMessage(u, message);
 		}
 	}
@@ -412,9 +413,7 @@ void Stats::Run(MessageSource &source, const std::vector<Anope::string> &params)
 				{
 					Oper *o = Oper::opers[i];
 
-					const NickAlias *na = NickAlias::Find(o->name);
-					if (na)
-						IRCD->SendNumeric(243, source.GetSource(), "O * * %s %s 0", o->name.c_str(), o->ot->GetName().c_str());
+					IRCD->SendNumeric(243, source.GetSource(), "O * * %s %s 0", o->name.c_str(), o->ot->GetName().c_str());
 				}
 
 				IRCD->SendNumeric(219, source.GetSource(), "%c :End of /STATS report.", params[0][0]);

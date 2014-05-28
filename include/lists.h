@@ -66,11 +66,11 @@ class CoreExport ListFormatter
  public:
  	typedef std::map<Anope::string, Anope::string> ListEntry;
  private:
-	NickCore *nc;
+	NickServ::Account *nc;
 	std::vector<Anope::string> columns;
 	std::vector<ListEntry> entries;
  public:
-	ListFormatter(NickCore *nc);
+	ListFormatter(NickServ::Account *nc);
 	ListFormatter &AddColumn(const Anope::string &name);
 	void AddEntry(const ListEntry &entry);
 	bool IsEmpty() const;
@@ -81,11 +81,11 @@ class CoreExport ListFormatter
  */
 class CoreExport InfoFormatter
 {
-	NickCore *nc;
+	NickServ::Account *nc;
 	std::vector<std::pair<Anope::string, Anope::string> > replies;
 	unsigned longest;
  public:
-	InfoFormatter(NickCore *nc);
+	InfoFormatter(NickServ::Account *nc);
 	void Process(std::vector<Anope::string> &);
 	Anope::string &operator[](const Anope::string &key);
 	void AddOption(const Anope::string &opt);

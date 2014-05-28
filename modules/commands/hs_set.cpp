@@ -30,7 +30,7 @@ class CommandHSSet : public Command
 
 		const Anope::string &nick = params[0];
 
-		NickAlias *na = NickAlias::Find(nick);
+		NickServ::Nick *na = NickServ::FindNick(nick);
 		if (na == NULL)
 		{
 			source.Reply(NICK_X_NOT_REGISTERED, nick.c_str());
@@ -106,14 +106,14 @@ class CommandHSSet : public Command
 
 class CommandHSSetAll : public Command
 {
-	void Sync(const NickAlias *na)
+	void Sync(const NickServ::Nick *na)
 	{
 		if (!na || !na->HasVhost())
 			return;
-	
+
 		for (unsigned i = 0; i < na->nc->aliases->size(); ++i)
 		{
-			NickAlias *nick = na->nc->aliases->at(i);
+			NickServ::Nick *nick = na->nc->aliases->at(i);
 			if (nick)
 				nick->SetVhost(na->GetVhostIdent(), na->GetVhostHost(), na->GetVhostCreator());
 		}
@@ -136,7 +136,7 @@ class CommandHSSetAll : public Command
 
 		Anope::string nick = params[0];
 
-		NickAlias *na = NickAlias::Find(nick);
+		NickServ::Nick *na = NickServ::FindNick(nick);
 		if (na == NULL)
 		{
 			source.Reply(NICK_X_NOT_REGISTERED, nick.c_str());

@@ -16,7 +16,7 @@ namespace WebCPanel
 		 public:
 			Drop(const Anope::string &cat, const Anope::string &u);
 
-			bool OnRequest(HTTPProvider *, const Anope::string &, HTTPClient *, HTTPMessage &, HTTPReply &, NickAlias *, TemplateFileServer::Replacements &) override;
+			bool OnRequest(HTTPProvider *, const Anope::string &, HTTPClient *, HTTPMessage &, HTTPReply &, ::NickServ::Nick *, TemplateFileServer::Replacements &) override;
 
 		};
 

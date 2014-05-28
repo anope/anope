@@ -7,7 +7,7 @@
 
 #include "../../webcpanel.h"
 
-static bool ChannelSort(ChannelInfo *ci1, ChannelInfo *ci2)
+static bool ChannelSort(ChanServ::Channel *ci1, ChanServ::Channel *ci2)
 {
 	return ci::less()(ci1->name, ci2->name);
 }
@@ -16,9 +16,9 @@ WebCPanel::NickServ::Alist::Alist(const Anope::string &cat, const Anope::string 
 {
 }
 
-bool WebCPanel::NickServ::Alist::OnRequest(HTTPProvider *server, const Anope::string &page_name, HTTPClient *client, HTTPMessage &message, HTTPReply &reply, NickAlias *na, TemplateFileServer::Replacements &replacements)
+bool WebCPanel::NickServ::Alist::OnRequest(HTTPProvider *server, const Anope::string &page_name, HTTPClient *client, HTTPMessage &message, HTTPReply &reply, ::NickServ::Nick *na, TemplateFileServer::Replacements &replacements)
 {
-	std::deque<ChannelInfo *> queue;
+	std::deque<::ChanServ::Channel *> queue;
 	na->nc->GetChannelReferences(queue);
 	std::sort(queue.begin(), queue.end(), ChannelSort);
 
@@ -26,7 +26,7 @@ bool WebCPanel::NickServ::Alist::OnRequest(HTTPProvider *server, const Anope::st
 
 	for (unsigned q = 0; q < queue.size(); ++q)
 	{
-		ChannelInfo *ci = queue[q];
+		::ChanServ::Channel *ci = queue[q];
 
 		if (ci->GetFounder() == na->nc)
 		{
@@ -38,10 +38,10 @@ bool WebCPanel::NickServ::Alist::OnRequest(HTTPProvider *server, const Anope::st
 			continue;
 		}
 
-		AccessGroup access = ci->AccessFor(na->nc);
+		::ChanServ::AccessGroup access = ci->AccessFor(na->nc);
 		if (access.empty())
 			continue;
-				
+
 		++chan_count;
 
 		replacements["NUMBERS"] = stringify(chan_count);

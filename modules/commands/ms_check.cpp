@@ -27,34 +27,35 @@ class CommandMSCheck : public Command
 
 		bool found = false;
 
-		const NickAlias *na = NickAlias::Find(recipient);
+		const NickServ::Nick *na = NickServ::FindNick(recipient);
 		if (!na)
 		{
 			source.Reply(NICK_X_NOT_REGISTERED, recipient.c_str());
 			return;
 		}
 
-		MemoInfo *mi = &na->nc->memos;
+		MemoServ::MemoInfo *mi = na->nc->memos;
 
 		/* Okay, I know this looks strange but we wanna get the LAST memo, so we
 			have to loop backwards */
 
-		for (unsigned i = mi->memos->size(); i > 0; --i)
-		{
-			Memo *m = mi->GetMemo(i - 1);
-			NickAlias *na2 = NickAlias::Find(m->sender);
-
-			if (na2 != NULL && na2->nc == source.GetAccount())
+		if (mi)
+			for (unsigned i = mi->memos->size(); i > 0; --i)
 			{
-				found = true; /* Yes, we've found the memo */
+				MemoServ::Memo *m = mi->GetMemo(i - 1);
+				NickServ::Nick *na2 = NickServ::FindNick(m->sender);
 
-				if (m->unread)
-					source.Reply(_("The last memo you sent to %s (sent on %s) has not yet been read."), na->nick.c_str(), Anope::strftime(m->time, source.GetAccount()).c_str());
-				else
-					source.Reply(_("The last memo you sent to %s (sent on %s) has been read."), na->nick.c_str(), Anope::strftime(m->time, source.GetAccount()).c_str());
-				break;
+				if (na2 != NULL && na2->nc == source.GetAccount())
+				{
+					found = true; /* Yes, we've found the memo */
+
+					if (m->unread)
+						source.Reply(_("The last memo you sent to %s (sent on %s) has not yet been read."), na->nick.c_str(), Anope::strftime(m->time, source.GetAccount()).c_str());
+					else
+						source.Reply(_("The last memo you sent to %s (sent on %s) has been read."), na->nick.c_str(), Anope::strftime(m->time, source.GetAccount()).c_str());
+					break;
+				}
 			}
-		}
 
 		if (!found)
 			source.Reply(_("Nick %s doesn't have a memo from you."), na->nick.c_str());

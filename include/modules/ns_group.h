@@ -15,6 +15,6 @@ namespace Event
 		 * @param u The user grouping
 		 * @param target The target they're grouping to
 		 */
-		virtual void OnNickGroup(User *u, NickAlias *target) anope_abstract;
+		virtual void OnNickGroup(User *u, NickServ::Nick *target) anope_abstract;
 	};
 }

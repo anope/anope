@@ -33,7 +33,7 @@ class CommandNSDrop : public Command
 			return;
 		}
 
-		NickAlias *na = NickAlias::Find(nick);
+		NickServ::Nick *na = NickServ::FindNick(nick);
 		if (!na)
 		{
 			source.Reply(NICK_X_NOT_REGISTERED, nick.c_str());

@@ -12,7 +12,7 @@
 #include "module.h"
 #include "modules/nickserv.h"
 
-static bool SendRegmail(User *u, const NickAlias *na, BotInfo *bi);
+static bool SendRegmail(User *u, const NickServ::Nick *na, BotInfo *bi);
 
 class CommandNSConfirm : public Command
 {
@@ -30,7 +30,7 @@ class CommandNSConfirm : public Command
 
 		if (source.nc && !source.nc->HasExt("UNCONFIRMED") && source.HasPriv("nickserv/confirm"))
 		{
-			NickAlias *na = NickAlias::Find(passcode);
+			NickServ::Nick *na = NickServ::FindNick(passcode);
 			if (na == NULL)
 				source.Reply(NICK_X_NOT_REGISTERED, passcode.c_str());
 			else if (na->nc->HasExt("UNCONFIRMED") == false)
@@ -47,7 +47,7 @@ class CommandNSConfirm : public Command
 			Anope::string *code = source.nc->GetExt<Anope::string>("passcode");
 			if (code != NULL && *code == passcode)
 			{
-				NickCore *nc = source.nc;
+				NickServ::Account *nc = source.nc;
 				nc->Shrink<Anope::string>("passcode");
 				Log(LOG_COMMAND, source, this) << "to confirm their email";
 				source.Reply(_("Your email address of \002%s\002 has been confirmed."), source.nc->email.c_str());
@@ -55,7 +55,7 @@ class CommandNSConfirm : public Command
 
 				if (source.GetUser())
 				{
-					NickAlias *na = NickAlias::Find(source.GetNick());
+					NickServ::Nick *na = NickServ::FindNick(source.GetNick());
 					if (na)
 					{
 						IRCD->SendLogin(source.GetUser(), na);
@@ -173,7 +173,7 @@ class CommandNSRegister : public Command
 			this->OnSyntaxError(source, "");
 		else if (u && Anope::CurTime < u->lastnickreg + reg_delay)
 			source.Reply(_("Please wait %d seconds before using the REGISTER command again."), (u->lastnickreg + reg_delay) - Anope::CurTime);
-		else if (NickAlias::Find(u_nick) != NULL)
+		else if (NickServ::FindNick(u_nick) != NULL)
 			source.Reply(NICK_ALREADY_REGISTERED, u_nick.c_str());
 		else if (pass.equals_ci(u_nick) || (Config->GetBlock("options")->Get<bool>("strictpasswords") && pass.length() < 5))
 			source.Reply(MORE_OBSCURE_PASSWORD);
@@ -183,8 +183,8 @@ class CommandNSRegister : public Command
 			source.Reply(MAIL_X_INVALID, email.c_str());
 		else
 		{
-			NickCore *nc = new NickCore(u_nick);
-			NickAlias *na = new NickAlias(u_nick, nc);
+			NickServ::Account *nc = NickServ::service->CreateAccount(u_nick);
+			NickServ::Nick *na = NickServ::service->CreateNick(u_nick, nc);
 			Anope::Encrypt(pass, nc->pass);
 			if (!email.empty())
 				nc->email = email;
@@ -291,7 +291,7 @@ class CommandNSResend : public Command
 			return;
 		}
 
-		const NickAlias *na = NickAlias::Find(source.GetNick());
+		const NickServ::Nick *na = NickServ::FindNick(source.GetNick());
 
 		if (na == NULL)
 			source.Reply(NICK_NOT_REGISTERED);
@@ -367,7 +367,7 @@ class NSRegister : public Module
 				u->SendMessage(NickServ, _("All new accounts must be validated by an administrator. Please wait for your registration to be confirmed."));
 			else
 				u->SendMessage(NickServ, _("Your email address is not confirmed. To confirm it, follow the instructions that were emailed to you."));
-			const NickAlias *this_na = NickAlias::Find(u->Account()->display);
+			const NickServ::Nick *this_na = NickServ::FindNick(u->Account()->display);
 			time_t time_registered = Anope::CurTime - this_na->time_registered;
 			time_t unconfirmed_expire = Config->GetModule(this)->Get<time_t>("unconfirmedexpire", "1d");
 			if (unconfirmed_expire > time_registered)
@@ -375,7 +375,7 @@ class NSRegister : public Module
 		}
 	}
 
-	void OnPreNickExpire(NickAlias *na, bool &expire) override
+	void OnPreNickExpire(NickServ::Nick *na, bool &expire) override
 	{
 		if (unconfirmed.HasExt(na->nc))
 		{
@@ -386,9 +386,9 @@ class NSRegister : public Module
 	}
 };
 
-static bool SendRegmail(User *u, const NickAlias *na, BotInfo *bi)
+static bool SendRegmail(User *u, const NickServ::Nick *na, BotInfo *bi)
 {
-	NickCore *nc = na->nc;
+	NickServ::Account *nc = na->nc;
 
 	Anope::string *code = na->nc->GetExt<Anope::string>("passcode");
 	if (code == NULL)

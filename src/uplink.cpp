@@ -16,6 +16,7 @@
 #include "protocol.h"
 #include "servers.h"
 #include "event.h"
+#include "bots.h"
 
 UplinkSocket *UplinkSock = NULL;
 

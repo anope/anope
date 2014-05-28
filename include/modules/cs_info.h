@@ -17,7 +17,7 @@ namespace Event
 		 * @param info Data to show the user requesting information
 		 * @param show_hidden true if we should show the user everything
 		 */
-		virtual void OnChanInfo(CommandSource &source, ChannelInfo *ci, InfoFormatter &info, bool show_hidden) anope_abstract;
+		virtual void OnChanInfo(CommandSource &source, ChanServ::Channel *ci, InfoFormatter &info, bool show_hidden) anope_abstract;
 	};
 }
 

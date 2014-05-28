@@ -14,7 +14,6 @@
 #include "services.h"
 #include "modules.h"
 #include "users.h"
-#include "account.h"
 #include "protocol.h"
 #include "servers.h"
 #include "channels.h"
@@ -25,6 +24,7 @@
 #include "sockets.h"
 #include "uplink.h"
 #include "event.h"
+#include "modules/nickserv.h"
 
 user_map UserListByNick, UserListByUID;
 
@@ -34,7 +34,7 @@ time_t MaxUserTime = 0;
 
 std::list<User *> User::quitting_users;
 
-User::User(const Anope::string &snick, const Anope::string &sident, const Anope::string &shost, const Anope::string &svhost, const Anope::string &sip, Server *sserver, const Anope::string &srealname, time_t ts, const Anope::string &smodes, const Anope::string &suid, NickCore *account)
+User::User(const Anope::string &snick, const Anope::string &sident, const Anope::string &shost, const Anope::string &svhost, const Anope::string &sip, Server *sserver, const Anope::string &srealname, time_t ts, const Anope::string &smodes, const Anope::string &suid, NickServ::Account *account)
 {
 	if (snick.empty() || sident.empty() || shost.empty())
 		throw CoreException("Bad args passed to User::User");
@@ -114,7 +114,7 @@ static void Collide(User *u, const Anope::string &id, const Anope::string &type)
 	CollideKill(u, type);
 }
 
-User* User::OnIntroduce(const Anope::string &snick, const Anope::string &sident, const Anope::string &shost, const Anope::string &svhost, const Anope::string &sip, Server *sserver, const Anope::string &srealname, time_t ts, const Anope::string &smodes, const Anope::string &suid, NickCore *nc)
+User* User::OnIntroduce(const Anope::string &snick, const Anope::string &sident, const Anope::string &shost, const Anope::string &svhost, const Anope::string &sip, Server *sserver, const Anope::string &srealname, time_t ts, const Anope::string &smodes, const Anope::string &suid, NickServ::Account *nc)
 {
 	// How IRCds handle collisions varies a lot, for safety well just always kill both sides
 	// With properly set qlines, this can almost never happen anyway
@@ -144,7 +144,7 @@ void User::ChangeNick(const Anope::string &newnick, time_t ts)
 	/* Sanity check to make sure we don't segfault */
 	if (newnick.empty())
 		throw CoreException("User::ChangeNick() got a bad argument");
-	
+
 	this->super_admin = false;
 	Log(this, "nick") << "(" << this->realname << ") changed nick to " << newnick;
 
@@ -155,10 +155,13 @@ void User::ChangeNick(const Anope::string &newnick, time_t ts)
 		this->nick = newnick;
 	else
 	{
-		NickAlias *old_na = NickAlias::Find(this->nick);
-		if (old_na && (this->IsIdentified(true) || this->IsRecognized()))
-			old_na->last_seen = Anope::CurTime;
-		
+		if (NickServ::service)
+		{
+			NickServ::Nick *old_na = NickServ::service->FindNick(this->nick);
+			if (old_na && (this->IsIdentified(true) || this->IsRecognized()))
+				old_na->last_seen = Anope::CurTime;
+		}
+
 		UserListByNick.erase(this->nick);
 
 		this->nick = newnick;
@@ -173,14 +176,19 @@ void User::ChangeNick(const Anope::string &newnick, time_t ts)
 		other = this;
 
 		on_access = false;
-		NickAlias *na = NickAlias::Find(this->nick);
-		if (na)
-			on_access = na->nc->IsOnAccess(this);
-
-		if (na && na->nc == this->Account())
+		if (NickServ::service)
 		{
-			na->last_seen = Anope::CurTime;
-			this->UpdateHost();
+			NickServ::Nick *na = NickServ::service->FindNick(this->nick);
+			if (na)
+			{
+				on_access = na->nc->IsOnAccess(this);
+
+				if (na->nc == this->Account())
+				{
+					na->last_seen = Anope::CurTime;
+					this->UpdateHost();
+				}
+			}
 		}
 	}
 
@@ -283,10 +291,14 @@ void User::SetRealname(const Anope::string &srealname)
 		throw CoreException("realname empty in SetRealname");
 
 	this->realname = srealname;
-	NickAlias *na = NickAlias::Find(this->nick);
+	if (NickServ::service)
+	{
+		//XXX event
+		NickServ::Nick *na = NickServ::service->FindNick(this->nick);
 
-	if (na && (this->IsIdentified(true) || this->IsRecognized()))
-		na->last_realname = srealname;
+		if (na && (this->IsIdentified(true) || this->IsRecognized()))
+			na->last_realname = srealname;
+	}
 
 	Log(this, "realname") << "changed realname to " << srealname;
 }
@@ -318,7 +330,7 @@ User::~User()
 	Event::OnPostUserLogoff(&Event::PostUserLogoff::OnPostUserLogoff, this);
 }
 
-void User::SendMessage(BotInfo *source, const char *fmt, ...)
+void User::SendMessage(const MessageSource &source, const char *fmt, ...)
 {
 	va_list args;
 	char buf[BUFSIZE] = "";
@@ -333,7 +345,7 @@ void User::SendMessage(BotInfo *source, const char *fmt, ...)
 	va_end(args);
 }
 
-void User::SendMessage(BotInfo *source, const Anope::string &msg)
+void User::SendMessage(const MessageSource &source, const Anope::string &msg)
 {
 	const char *translated_message = Language::Translate(this, msg.c_str());
 
@@ -353,7 +365,7 @@ void User::SendMessage(BotInfo *source, const Anope::string &msg)
 	}
 }
 
-void User::Identify(NickAlias *na)
+void User::Identify(NickServ::Nick *na)
 {
 	if (this->nick.equals_ci(na->nick))
 	{
@@ -374,14 +386,14 @@ void User::Identify(NickAlias *na)
 		if (!this->nc->o->ot->modes.empty())
 		{
 			this->SetModes(NULL, "%s", this->nc->o->ot->modes.c_str());
-			this->SendMessage(NULL, "Changing your usermodes to \002%s\002", this->nc->o->ot->modes.c_str());
+			this->SendMessage(Me, "Changing your usermodes to \002%s\002", this->nc->o->ot->modes.c_str());
 			UserMode *um = ModeManager::FindUserModeByName("OPER");
 			if (um && !this->HasMode("OPER") && this->nc->o->ot->modes.find(um->mchar) != Anope::string::npos)
 				IRCD->SendOper(this);
 		}
 		if (IRCD->CanSetVHost && !this->nc->o->vhost.empty())
 		{
-			this->SendMessage(NULL, "Changing your vhost to \002%s\002", this->nc->o->vhost.c_str());
+			this->SendMessage(Me, "Changing your vhost to \002%s\002", this->nc->o->vhost.c_str());
  			this->SetDisplayedHost(this->nc->o->vhost);
 			IRCD->SendVhost(this, "", this->nc->o->vhost);
 		}
@@ -389,7 +401,7 @@ void User::Identify(NickAlias *na)
 }
 
 
-void User::Login(NickCore *core)
+void User::Login(NickServ::Account *core)
 {
 	if (!core || core == this->nc)
 		return;
@@ -402,7 +414,7 @@ void User::Login(NickCore *core)
 
 	if (this->server->IsSynced())
 		Log(this, "account") << "is now identified as " << this->nc->display;
-	
+
 	Event::OnUserLogin(&Event::UserLogin::OnUserLogin, this);
 }
 
@@ -410,7 +422,7 @@ void User::Logout()
 {
 	if (!this->nc)
 		return;
-	
+
 	Log(this, "account") << "is no longer identified as " << this->nc->display;
 
 	std::list<User *>::iterator it = std::find(this->nc->users.begin(), this->nc->users.end(), this);
@@ -420,7 +432,7 @@ void User::Logout()
 	this->nc = NULL;
 }
 
-NickCore *User::Account() const
+NickServ::Account *User::Account() const
 {
 	return this->nc;
 }
@@ -429,7 +441,7 @@ bool User::IsIdentified(bool check_nick) const
 {
 	if (check_nick && this->nc)
 	{
-		NickAlias *na = NickAlias::Find(this->nick);
+		NickServ::Nick *na = NickServ::service ? NickServ::service->FindNick(this->nick) : nullptr;
 		return na && *na->nc == *this->nc;
 	}
 
@@ -440,7 +452,7 @@ bool User::IsRecognized(bool check_secure) const
 {
 	if (check_secure && on_access)
 	{
-		const NickAlias *na = NickAlias::Find(this->nick);
+		const NickServ::Nick *na = NickServ::service ? NickServ::service->FindNick(this->nick) : nullptr;
 
 		if (!na || na->nc->HasExt("NS_SECURE"))
 			return false;
@@ -497,7 +509,8 @@ void User::UpdateHost()
 	if (this->host.empty())
 		return;
 
-	NickAlias *na = NickAlias::Find(this->nick);
+	//XXX event
+	NickServ::Nick *na = NickServ::service ? NickServ::service->FindNick(this->nick) : nullptr;
 	on_access = false;
 	if (na)
 		on_access = na->nc->IsOnAccess(this);

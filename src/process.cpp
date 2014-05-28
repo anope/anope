@@ -14,7 +14,6 @@
 #include "protocol.h"
 #include "servers.h"
 #include "users.h"
-#include "regchannel.h"
 #include "event.h"
 
 void Anope::Process(const Anope::string &buffer)
@@ -37,7 +36,7 @@ void Anope::Process(const Anope::string &buffer)
 	Anope::string command;
 	if (!buf_sep.GetToken(command))
 		return;
-	
+
 	Anope::string buf_token;
 	std::vector<Anope::string> params;
 	while (buf_sep.GetToken(buf_token))
@@ -69,7 +68,7 @@ void Anope::Process(const Anope::string &buffer)
 	static const Anope::string proto_name = ModuleManager::FindFirstOf(PROTOCOL) ? ModuleManager::FindFirstOf(PROTOCOL)->name : "";
 
 	MessageSource src(source);
-	
+
 	EventReturn MOD_RESULT;
 	MOD_RESULT = Event::OnMessage(&Event::Message::OnMessage, src, command, params);
 	if (MOD_RESULT == EVENT_STOP)

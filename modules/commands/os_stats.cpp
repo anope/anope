@@ -173,13 +173,13 @@ class CommandOSStats : public Command
 		GetHashStats(ChannelList, entries, buckets, max_chain);
 		source.Reply(_("Channels: %lu entries, %lu buckets, longest chain is %d"), entries, buckets, max_chain);
 
-		GetHashStats(*RegisteredChannelList, entries, buckets, max_chain);
+		GetHashStats(ChanServ::service->GetChannels(), entries, buckets, max_chain);
 		source.Reply(_("Registered channels: %lu entries, %lu buckets, longest chain is %d"), entries, buckets, max_chain);
 
-		GetHashStats(*NickAliasList, entries, buckets, max_chain);
+		GetHashStats(NickServ::service->GetNickList(), entries, buckets, max_chain);
 		source.Reply(_("Registered nicknames: %lu entries, %lu buckets, longest chain is %d"), entries, buckets, max_chain);
 
-		GetHashStats(*NickCoreList, entries, buckets, max_chain);
+		GetHashStats(NickServ::service->GetAccountList(), entries, buckets, max_chain);
 		source.Reply(_("Registered nick groups: %lu entries, %lu buckets, longest chain is %d"), entries, buckets, max_chain);
 
 		if (session_service)

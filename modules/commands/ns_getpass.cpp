@@ -24,9 +24,9 @@ class CommandNSGetPass : public Command
 	{
 		const Anope::string &nick = params[0];
 		Anope::string tmp_pass;
-		const NickAlias *na;
+		const NickServ::Nick *na;
 
-		if (!(na = NickAlias::Find(nick)))
+		if (!(na = NickServ::FindNick(nick)))
 			source.Reply(NICK_X_NOT_REGISTERED, nick.c_str());
 		else if (Config->GetModule("nickserv")->Get<bool>("secureadmins", "yes") && na->nc->IsServicesOper())
 			source.Reply(_("You may not get the password of other Services Operators."));

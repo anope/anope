@@ -42,7 +42,7 @@ struct KickerData
 
  public:
 	virtual ~KickerData() { }
-	virtual void Check(ChannelInfo *ci) = 0;
+	virtual void Check(ChanServ::Channel *ci) = 0;
 };
 
 namespace Event
@@ -54,7 +54,7 @@ namespace Event
 		 * @param ci Channel the ban is placed on
 		 * @param mask The mask being banned
 		 */
-		virtual void OnBotBan(User *u, ChannelInfo *ci, const Anope::string &mask) anope_abstract;
+		virtual void OnBotBan(User *u, ChanServ::Channel *ci, const Anope::string &mask) anope_abstract;
 	};
 }
 

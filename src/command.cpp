@@ -12,14 +12,15 @@
 #include "users.h"
 #include "language.h"
 #include "config.h"
-#include "bots.h"
 #include "opertype.h"
-#include "access.h"
-#include "regchannel.h"
 #include "channels.h"
 #include "event.h"
+#include "bots.h"
+#include "protocol.h"
+#include "modules/botserv.h"
+#include "modules/chanserv.h"
 
-CommandSource::CommandSource(const Anope::string &n, User *user, NickCore *core, CommandReply *r, BotInfo *bi) : nick(n), u(user), nc(core), reply(r),
+CommandSource::CommandSource(const Anope::string &n, User *user, NickServ::Account *core, CommandReply *r, BotInfo *bi) : nick(n), u(user), nc(core), reply(r),
 	c(NULL), service(bi)
 {
 }
@@ -34,25 +35,25 @@ User *CommandSource::GetUser()
 	return this->u;
 }
 
-NickCore *CommandSource::GetAccount()
+NickServ::Account *CommandSource::GetAccount()
 {
 	return this->nc;
 }
 
-AccessGroup CommandSource::AccessFor(ChannelInfo *ci)
+ChanServ::AccessGroup CommandSource::AccessFor(ChanServ::Channel *ci)
 {
 	if (this->u)
 		return ci->AccessFor(this->u);
 	else if (this->nc)
 		return ci->AccessFor(this->nc);
 	else
-		return AccessGroup();
+		return ChanServ::AccessGroup();
 }
 
-bool CommandSource::IsFounder(ChannelInfo *ci)
+bool CommandSource::IsFounder(ChanServ::Channel *ci)
 {
 	if (this->u)
-		return ::IsFounder(this->u, ci);
+		return ci->IsFounder(this->u);
 	else if (this->nc)
 		return *this->nc == ci->GetFounder();
 	return false;
@@ -116,7 +117,7 @@ void CommandSource::Reply(const Anope::string &message)
 	sepstream sep(translated_message, '\n', true);
 	Anope::string tok;
 	while (sep.GetToken(tok))
-		this->reply->SendMessage(this->service, tok);
+		this->reply->SendMessage(*this->service, tok);
 }
 
 Command::Command(Module *o, const Anope::string &sname, size_t minparams, size_t maxparams) : Service(o, "Command", sname), max_params(maxparams), min_params(minparams), module(owner)
@@ -306,7 +307,7 @@ bool Command::FindCommandFromService(const Anope::string &command_service, BotIn
 			return true;
 		}
 	}
-	
+
 	return false;
 }
 

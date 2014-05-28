@@ -11,24 +11,24 @@
 
 #include "module.h"
 
-class NSIdentifyRequest : public IdentifyRequest
+class NSIdentifyRequestListener : public NickServ::IdentifyRequestListener
 {
 	CommandSource source;
 	Command *cmd;
 
  public:
-	NSIdentifyRequest(Module *o, CommandSource &s, Command *c, const Anope::string &acc, const Anope::string &pass) : IdentifyRequest(o, acc, pass), source(s), cmd(c) { }
+	NSIdentifyRequestListener(CommandSource &s, Command *c) : source(s), cmd(c) { }
 
-	void OnSuccess() override
+	void OnSuccess(NickServ::IdentifyRequest *req) override
 	{
 		if (!source.GetUser())
 			return;
 
 		User *u = source.GetUser();
-		NickAlias *na = NickAlias::Find(GetAccount());
+		NickServ::Nick *na = NickServ::FindNick(req->GetAccount());
 
 		if (!na)
-			source.Reply(NICK_X_NOT_REGISTERED, GetAccount().c_str());
+			source.Reply(NICK_X_NOT_REGISTERED, req->GetAccount().c_str());
 		else
 		{
 			if (u->IsIdentified())
@@ -40,19 +40,19 @@ class NSIdentifyRequest : public IdentifyRequest
 		}
 	}
 
-	void OnFail() override
+	void OnFail(NickServ::IdentifyRequest *req) override
 	{
 		if (source.GetUser())
 		{
-			bool accountexists = NickAlias::Find(GetAccount()) != NULL;
-			Log(LOG_COMMAND, source, cmd) << "and failed to identify to" << (accountexists ? " " : " nonexistent ") << "account " << GetAccount();
+			bool accountexists = NickServ::FindNick(req->GetAccount()) != NULL;
+			Log(LOG_COMMAND, source, cmd) << "and failed to identify to" << (accountexists ? " " : " nonexistent ") << "account " << req->GetAccount();
 			if (accountexists)
 			{
 				source.Reply(PASSWORD_INCORRECT);
 				source.GetUser()->BadPassword();
 			}
 			else
-				source.Reply(NICK_X_NOT_REGISTERED, GetAccount().c_str());
+				source.Reply(NICK_X_NOT_REGISTERED, req->GetAccount().c_str());
 		}
 	}
 };
@@ -75,14 +75,14 @@ class CommandNSIdentify : public Command
 		const Anope::string &nick = params.size() == 2 ? params[0] : u->nick;
 		Anope::string pass = params[params.size() - 1];
 
-		NickAlias *na = NickAlias::Find(nick);
+		NickServ::Nick *na = NickServ::FindNick(nick);
 		if (na && na->nc->HasExt("NS_SUSPENDED"))
 			source.Reply(NICK_X_SUSPENDED, na->nick.c_str());
 		else if (u->Account() && na && u->Account() == na->nc)
 			source.Reply(_("You are already identified."));
 		else
 		{
-			NSIdentifyRequest *req = new NSIdentifyRequest(owner, source, this, na ? na->nc->display : nick, pass);
+			NickServ::IdentifyRequest *req = NickServ::service->CreateIdentifyRequest(new NSIdentifyRequestListener(source, this), owner, na ? na->nc->display : nick, pass);
 			Event::OnCheckAuthentication(&Event::CheckAuthentication::OnCheckAuthentication, u, req);
 			req->Dispatch();
 		}

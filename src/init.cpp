@@ -105,7 +105,7 @@ void Anope::Fork()
 {
 #ifndef _WIN32
 	kill(getppid(), SIGUSR2);
-	
+
 	freopen("/dev/null", "r", stdin);
 	freopen("/dev/null", "w", stdout);
 	freopen("/dev/null", "w", stderr);

@@ -44,12 +44,12 @@ class ENone : public Module
 		return EVENT_ALLOW;
 	}
 
-	void OnCheckAuthentication(User *, IdentifyRequest *req) override
+	void OnCheckAuthentication(User *, NickServ::IdentifyRequest *req) override
 	{
-		const NickAlias *na = NickAlias::Find(req->GetAccount());
+		const NickServ::Nick *na = NickServ::FindNick(req->GetAccount());
 		if (na == NULL)
 			return;
-		NickCore *nc = na->nc;
+		NickServ::Account *nc = na->nc;
 
 		size_t pos = nc->pass.find(':');
 		if (pos == Anope::string::npos)

@@ -18,7 +18,7 @@ struct EntryMsgImpl : EntryMsg, Serializable
 	{
 	}
 
-	EntryMsgImpl(ChannelInfo *c, const Anope::string &cname, const Anope::string &cmessage, time_t ct = Anope::CurTime) : Serializable("EntryMsg")
+	EntryMsgImpl(ChanServ::Channel *c, const Anope::string &cname, const Anope::string &cmessage, time_t ct = Anope::CurTime) : Serializable("EntryMsg")
 	{
 		this->chan = c->name;
 		this->creator = cname;
@@ -51,7 +51,7 @@ struct EntryMessageListImpl : EntryMessageList
 
 EntryMsgImpl::~EntryMsgImpl()
 {
-	ChannelInfo *ci = ChannelInfo::Find(this->chan);
+	ChanServ::Channel *ci = ChanServ::Find(this->chan);
 	if (!ci)
 		return;
 
@@ -74,7 +74,7 @@ Serializable* EntryMsgImpl::Unserialize(Serializable *obj, Serialize::Data &data
 	data["creator"] >> screator;
 	data["message"] >> smessage;
 
-	ChannelInfo *ci = ChannelInfo::Find(sci);
+	ChanServ::Channel *ci = ChanServ::Find(sci);
 	if (!ci)
 		return NULL;
 
@@ -100,7 +100,7 @@ Serializable* EntryMsgImpl::Unserialize(Serializable *obj, Serialize::Data &data
 class CommandEntryMessage : public Command
 {
  private:
-	void DoList(CommandSource &source, ChannelInfo *ci)
+	void DoList(CommandSource &source, ChanServ::Channel *ci)
 	{
 		EntryMessageList *messages = ci->Require<EntryMessageList>("entrymsg");
 
@@ -133,8 +133,8 @@ class CommandEntryMessage : public Command
 
 		source.Reply(_("End of entry message list."));
 	}
-		
-	void DoAdd(CommandSource &source, ChannelInfo *ci, const Anope::string &message)
+
+	void DoAdd(CommandSource &source, ChanServ::Channel *ci, const Anope::string &message)
 	{
 		EntryMessageList *messages = ci->Require<EntryMessageList>("entrymsg");
 
@@ -148,7 +148,7 @@ class CommandEntryMessage : public Command
 		}
 	}
 
-	void DoDel(CommandSource &source, ChannelInfo *ci, const Anope::string &message)
+	void DoDel(CommandSource &source, ChanServ::Channel *ci, const Anope::string &message)
 	{
 		EntryMessageList *messages = ci->Require<EntryMessageList>("entrymsg");
 
@@ -179,7 +179,7 @@ class CommandEntryMessage : public Command
 		}
 	}
 
-	void DoClear(CommandSource &source, ChannelInfo *ci)
+	void DoClear(CommandSource &source, ChanServ::Channel *ci)
 	{
 		ci->Shrink<EntryMessageList>("entrymsg");
 
@@ -199,7 +199,7 @@ class CommandEntryMessage : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
-		ChannelInfo *ci = ChannelInfo::Find(params[0]);
+		ChanServ::Channel *ci = ChanServ::Find(params[0]);
 		if (ci == NULL)
 		{
 			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());

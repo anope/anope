@@ -85,14 +85,14 @@ class CommandBSSetBanExpire : public Command
 		const Anope::string &chan = params[0];
 		const Anope::string &arg = params[1];
 
-		ChannelInfo *ci = ChannelInfo::Find(chan);
+		ChanServ::Channel *ci = ChanServ::Find(chan);
 		if (ci == NULL)
 		{
 			source.Reply(CHAN_X_NOT_REGISTERED, chan.c_str());
 			return;
 		}
 
-		AccessGroup access = source.AccessFor(ci);
+		ChanServ::AccessGroup access = source.AccessFor(ci);
 		if (!source.HasPriv("botserv/administration") && !access.HasPriv("SET"))
 		{
 			source.Reply(ACCESS_DENIED);
@@ -208,7 +208,7 @@ class BSSet : public Module
 	{
 	}
 
-	void OnBotBan(User *u, ChannelInfo *ci, const Anope::string &mask) override
+	void OnBotBan(User *u, ChanServ::Channel *ci, const Anope::string &mask) override
 	{
 		if (!ci->banexpire)
 			return;

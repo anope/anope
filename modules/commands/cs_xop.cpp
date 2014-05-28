@@ -17,12 +17,12 @@ namespace
 	std::map<Anope::string, std::vector<Anope::string> > permissions;
 }
 
-class XOPChanAccess : public ChanAccess
+class XOPChanAccess : public ChanServ::ChanAccess
 {
  public:
 	Anope::string type;
 
- 	XOPChanAccess(AccessProvider *p) : ChanAccess(p)
+	XOPChanAccess(ChanServ::AccessProvider *p) : ChanAccess(p)
 	{
 	}
 
@@ -47,7 +47,7 @@ class XOPChanAccess : public ChanAccess
 		this->type = data;
 	}
 
-	static Anope::string DetermineLevel(const ChanAccess *access)
+	static Anope::string DetermineLevel(const ChanServ::ChanAccess *access)
 	{
 		if (access->provider->name == "access/xop")
 		{
@@ -81,14 +81,14 @@ class XOPChanAccess : public ChanAccess
 	}
 };
 
-class XOPAccessProvider : public AccessProvider
+class XOPAccessProvider : public ChanServ::AccessProvider
 {
  public:
 	XOPAccessProvider(Module *o) : AccessProvider(o, "access/xop")
 	{
 	}
 
-	ChanAccess *Create() override
+	ChanServ::ChanAccess *Create() override
 	{
 		return new XOPChanAccess(this);
 	}
@@ -97,7 +97,7 @@ class XOPAccessProvider : public AccessProvider
 class CommandCSXOP : public Command
 {
  private:
-	void DoAdd(CommandSource &source, ChannelInfo *ci, const std::vector<Anope::string> &params)
+	void DoAdd(CommandSource &source, ChanServ::Channel *ci, const std::vector<Anope::string> &params)
 	{
 		Anope::string mask = params.size() > 2 ? params[2] : "";
 
@@ -117,8 +117,8 @@ class CommandCSXOP : public Command
 		tmp_access.ci = ci;
 		tmp_access.type = source.command.upper();
 
-		AccessGroup access = source.AccessFor(ci);
-		const ChanAccess *highest = access.Highest();
+		ChanServ::AccessGroup access = source.AccessFor(ci);
+		const ChanServ::ChanAccess *highest = access.Highest();
 		bool override = false;
 
 		std::vector<Anope::string>::iterator cmd_it = std::find(order.begin(), order.end(), source.command.upper()),
@@ -143,7 +143,7 @@ class CommandCSXOP : public Command
 				return;
 			}
 
-			ChannelInfo *targ_ci = ChannelInfo::Find(mask);
+			ChanServ::Channel *targ_ci = ChanServ::Find(mask);
 			if (targ_ci == NULL)
 			{
 				source.Reply(CHAN_X_NOT_REGISTERED, mask.c_str());
@@ -159,7 +159,7 @@ class CommandCSXOP : public Command
 		}
 		else
 		{
-			const NickAlias *na = NickAlias::Find(mask);
+			const NickServ::Nick *na = NickServ::FindNick(mask);
 			if (!na && Config->GetModule("chanserv")->Get<bool>("disallow_hostmask_access"))
 			{
 				source.Reply(_("Masks and unregistered users may not be on access lists."));
@@ -180,7 +180,7 @@ class CommandCSXOP : public Command
 
 		for (unsigned i = 0; i < ci->GetAccessCount(); ++i)
 		{
-			const ChanAccess *a = ci->GetAccess(i);
+			const ChanServ::ChanAccess *a = ci->GetAccess(i);
 
 			if (a->mask.equals_ci(mask))
 			{
@@ -202,7 +202,7 @@ class CommandCSXOP : public Command
 			return;
 		}
 
-		ServiceReference<AccessProvider> provider("AccessProvider", "access/xop");
+		ServiceReference<ChanServ::AccessProvider> provider("AccessProvider", "access/xop");
 		if (!provider)
 			return;
 		XOPChanAccess *acc = anope_dynamic_static_cast<XOPChanAccess *>(provider->Create());
@@ -220,9 +220,9 @@ class CommandCSXOP : public Command
 		source.Reply(_("\002%s\002 added to %s %s list."), acc->mask.c_str(), ci->name.c_str(), source.command.c_str());
 	}
 
-	void DoDel(CommandSource &source, ChannelInfo *ci, const std::vector<Anope::string> &params)
+	void DoDel(CommandSource &source, ChanServ::Channel *ci, const std::vector<Anope::string> &params)
 	{
-		NickCore *nc = source.nc;
+		NickServ::Account *nc = source.nc;
 		Anope::string mask = params.size() > 2 ? params[2] : "";
 
 		if (mask.empty())
@@ -247,11 +247,11 @@ class CommandCSXOP : public Command
 		tmp_access.ci = ci;
 		tmp_access.type = source.command.upper();
 
-		AccessGroup access = source.AccessFor(ci);
-		const ChanAccess *highest = access.Highest();
+		ChanServ::AccessGroup access = source.AccessFor(ci);
+		const ChanServ::ChanAccess *highest = access.Highest();
 		bool override = false;
 
-		if (!isdigit(mask[0]) && mask.find_first_of("#!*@") == Anope::string::npos && !NickAlias::Find(mask))
+		if (!isdigit(mask[0]) && mask.find_first_of("#!*@") == Anope::string::npos && !NickServ::FindNick(mask))
 		{
 			User *targ = User::Find(mask, true);
 			if (targ != NULL)
@@ -283,13 +283,13 @@ class CommandCSXOP : public Command
 			class XOPDelCallback : public NumberList
 			{
 				CommandSource &source;
-				ChannelInfo *ci;
+				ChanServ::Channel *ci;
 				Command *c;
 				unsigned deleted;
 				Anope::string nicks;
 				bool override;
 			 public:
-				XOPDelCallback(CommandSource &_source, ChannelInfo *_ci, Command *_c, bool _override, const Anope::string &numlist) : NumberList(numlist, true), source(_source), ci(_ci), c(_c), deleted(0), override(_override)
+				XOPDelCallback(CommandSource &_source, ChanServ::Channel *_ci, Command *_c, bool _override, const Anope::string &numlist) : NumberList(numlist, true), source(_source), ci(_ci), c(_c), deleted(0), override(_override)
 				{
 				}
 
@@ -313,7 +313,7 @@ class CommandCSXOP : public Command
 					if (!number || number > ci->GetAccessCount())
 						return;
 
-					ChanAccess *caccess = ci->GetAccess(number - 1);
+					ChanServ::ChanAccess *caccess = ci->GetAccess(number - 1);
 
 					if (caccess->provider->name != "access/xop" || this->source.command.upper() != caccess->AccessSerialize())
 						return;
@@ -336,7 +336,7 @@ class CommandCSXOP : public Command
 		{
 			for (unsigned i = 0; i < ci->GetAccessCount(); ++i)
 			{
-				ChanAccess *a = ci->GetAccess(i);
+				ChanServ::ChanAccess *a = ci->GetAccess(i);
 
 				if (a->provider->name != "access/xop" || source.command.upper() != a->AccessSerialize())
 					continue;
@@ -354,17 +354,17 @@ class CommandCSXOP : public Command
 					return;
 				}
 			}
-			
+
 			source.Reply(_("\002%s\002 not found on %s %s list."), mask.c_str(), ci->name.c_str(), source.command.c_str());
 		}
 	}
 
-	void DoList(CommandSource &source, ChannelInfo *ci, const std::vector<Anope::string> &params)
+	void DoList(CommandSource &source, ChanServ::Channel *ci, const std::vector<Anope::string> &params)
 	{
 
 		const Anope::string &nick = params.size() > 2 ? params[2] : "";
 
-		AccessGroup access = source.AccessFor(ci);
+		ChanServ::AccessGroup access = source.AccessFor(ci);
 
 		if (!access.HasPriv("ACCESS_LIST") && !source.HasCommand("chanserv/access/list"))
 		{
@@ -386,10 +386,10 @@ class CommandCSXOP : public Command
 			class XOPListCallback : public NumberList
 			{
 				ListFormatter &list;
-				ChannelInfo *ci;
+				ChanServ::Channel *ci;
 				CommandSource &source;
 			 public:
-				XOPListCallback(ListFormatter &_list, ChannelInfo *_ci, const Anope::string &numlist, CommandSource &src) : NumberList(numlist, false), list(_list), ci(_ci), source(src)
+				XOPListCallback(ListFormatter &_list, ChanServ::Channel *_ci, const Anope::string &numlist, CommandSource &src) : NumberList(numlist, false), list(_list), ci(_ci), source(src)
 				{
 				}
 
@@ -398,7 +398,7 @@ class CommandCSXOP : public Command
 					if (!Number || Number > ci->GetAccessCount())
 						return;
 
-					const ChanAccess *a = ci->GetAccess(Number - 1);
+					const ChanServ::ChanAccess *a = ci->GetAccess(Number - 1);
 
 					if (a->provider->name != "access/xop" || this->source.command.upper() != a->AccessSerialize())
 						return;
@@ -415,7 +415,7 @@ class CommandCSXOP : public Command
 		{
 			for (unsigned i = 0, end = ci->GetAccessCount(); i < end; ++i)
 			{
-				const ChanAccess *a = ci->GetAccess(i);
+				const ChanServ::ChanAccess *a = ci->GetAccess(i);
 
 				if (a->provider->name != "access/xop" || source.command.upper() != a->AccessSerialize())
 					continue;
@@ -442,7 +442,7 @@ class CommandCSXOP : public Command
 		}
 	}
 
-	void DoClear(CommandSource &source, ChannelInfo *ci)
+	void DoClear(CommandSource &source, ChanServ::Channel *ci)
 	{
 		if (Anope::ReadOnly)
 		{
@@ -467,11 +467,11 @@ class CommandCSXOP : public Command
 
 		for (unsigned i = ci->GetAccessCount(); i > 0; --i)
 		{
-			const ChanAccess *access = ci->GetAccess(i - 1);
+			const ChanServ::ChanAccess *access = ci->GetAccess(i - 1);
 
 			if (access->provider->name != "access/xop" || source.command.upper() != access->AccessSerialize())
 				continue;
-	
+
 			delete ci->EraseAccess(i - 1);
 		}
 
@@ -496,7 +496,7 @@ class CommandCSXOP : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		ChannelInfo *ci = ChannelInfo::Find(params[0]);
+		ChanServ::Channel *ci = ChanServ::Find(params[0]);
 		if (ci == NULL)
 		{
 			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
@@ -611,7 +611,7 @@ class CSXOP : public Module
 			Configuration::Block *block = conf->GetBlock("privilege", i);
 			const Anope::string &pname = block->Get<const Anope::string>("name");
 
-			Privilege *p = PrivilegeManager::FindPrivilege(pname);
+			ChanServ::Privilege *p = ChanServ::service ? ChanServ::service->FindPrivilege(pname) : nullptr;
 			if (p == NULL)
 				continue;
 

@@ -15,6 +15,7 @@
 #include "commands.h"
 #include "config.h"
 #include "language.h"
+#include "modules/nickserv.h"
 
 #if GETTEXT_FOUND
 # include <libintl.h>
@@ -69,7 +70,7 @@ const char *Language::Translate(User *u, const char *string)
 		return Translate("", string);
 }
 
-const char *Language::Translate(const NickCore *nc, const char *string)
+const char *Language::Translate(const NickServ::Account *nc, const char *string)
 {
 	return Translate(nc ? nc->language.c_str() : "", string);
 }
@@ -83,10 +84,10 @@ const char *Language::Translate(const char *lang, const char *string)
 {
 	if (!string || !*string)
 		return "";
-	
+
 	if (!lang || !*lang)
 		lang = Config->DefLanguage.c_str();
-	
+
 	if (Anope::string(lang) == "en")
 		return string;
 

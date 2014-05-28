@@ -38,7 +38,7 @@ struct CSSuspendInfo : SuspendInfo, Serializable
 			si = anope_dynamic_static_cast<CSSuspendInfo *>(obj);
 		else
 		{
-			ChannelInfo *ci = ChannelInfo::Find(schan);
+			ChanServ::Channel *ci = ChanServ::Find(schan);
 			if (!ci)
 				return NULL;
 			si = ci->Extend<CSSuspendInfo>("CS_SUSPENDED");
@@ -58,7 +58,7 @@ class CommandCSSuspend : public Command
 	EventHandlers<Event::ChanSuspend> &onchansuspend;
  public:
 	CommandCSSuspend(Module *creator, EventHandlers<Event::ChanSuspend> &event) : Command(creator, "chanserv/suspend", 2, 3), onchansuspend(event)
-	{ 
+	{
 		this->SetDesc(_("Prevent a channel from being used preserving channel data and settings"));
 		this->SetSyntax(_("\037channel\037 [+\037expiry\037] [\037reason\037]"));
 	}
@@ -89,7 +89,7 @@ class CommandCSSuspend : public Command
 		if (Anope::ReadOnly)
 			source.Reply(READ_ONLY_MODE);
 
-		ChannelInfo *ci = ChannelInfo::Find(chan);
+		ChanServ::Channel *ci = ChanServ::Find(chan);
 		if (ci == NULL)
 		{
 			source.Reply(CHAN_X_NOT_REGISTERED, chan.c_str());
@@ -164,7 +164,7 @@ class CommandCSUnSuspend : public Command
 		if (Anope::ReadOnly)
 			source.Reply(READ_ONLY_MODE);
 
-		ChannelInfo *ci = ChannelInfo::Find(params[0]);
+		ChanServ::Channel *ci = ChanServ::Find(params[0]);
 		if (ci == NULL)
 		{
 			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
@@ -226,7 +226,7 @@ class CSSuspend : public Module
 	{
 	}
 
-	void OnChanInfo(CommandSource &source, ChannelInfo *ci, InfoFormatter &info, bool show_hidden) override
+	void OnChanInfo(CommandSource &source, ChanServ::Channel *ci, InfoFormatter &info, bool show_hidden) override
 	{
 		CSSuspendInfo *si = suspend.Get(ci);
 		if (si)
@@ -243,7 +243,7 @@ class CSSuspend : public Module
 		}
 	}
 
-	void OnPreChanExpire(ChannelInfo *ci, bool &expire) override
+	void OnPreChanExpire(ChanServ::Channel *ci, bool &expire) override
 	{
 		CSSuspendInfo *si = suspend.Get(ci);
 		if (!si)
@@ -272,7 +272,7 @@ class CSSuspend : public Module
 		return EVENT_STOP;
 	}
 
-	EventReturn OnChanDrop(CommandSource &source, ChannelInfo *ci) override
+	EventReturn OnChanDrop(CommandSource &source, ChanServ::Channel *ci) override
 	{
 		CSSuspendInfo *si = suspend.Get(ci);
 		if (si && !source.HasCommand("chanserv/drop"))

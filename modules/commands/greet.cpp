@@ -25,7 +25,7 @@ class CommandBSSetGreet : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
-		ChannelInfo *ci = ChannelInfo::Find(params[0]);
+		ChanServ::Channel *ci = ChanServ::Find(params[0]);
 		const Anope::string &value = params[1];
 
 		if (ci == NULL)
@@ -49,7 +49,7 @@ class CommandBSSetGreet : public Command
 		if (value.equals_ci("ON"))
 		{
 			bool override = !source.AccessFor(ci).HasPriv("SET");
-			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to enable greets"; 
+			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to enable greets";
 
 			ci->Extend<bool>("BS_GREET");
 			source.Reply(_("Greet mode is now \002on\002 on channel %s."), ci->name.c_str());
@@ -57,7 +57,7 @@ class CommandBSSetGreet : public Command
 		else if (value.equals_ci("OFF"))
 		{
 			bool override = !source.AccessFor(ci).HasPriv("SET");
-			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to disable greets"; 
+			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to disable greets";
 
 			ci->Shrink<bool>("BS_GREET");
 			source.Reply(_("Greet mode is now \002off\002 on channel %s."), ci->name.c_str());
@@ -95,13 +95,13 @@ class CommandNSSetGreet : public Command
 			return;
 		}
 
-		const NickAlias *na = NickAlias::Find(user);
+		const NickServ::Nick *na = NickServ::FindNick(user);
 		if (!na)
 		{
 			source.Reply(NICK_X_NOT_REGISTERED, user.c_str());
 			return;
 		}
-		NickCore *nc = na->nc;
+		NickServ::Account *nc = na->nc;
 
 		EventReturn MOD_RESULT = Event::OnSetNickOption(&Event::SetNickOption::OnSetNickOption, source, this, nc, param);
 		if (MOD_RESULT == EVENT_STOP)
@@ -208,14 +208,14 @@ class Greet : public Module
 		}
 	}
 
-	void OnNickInfo(CommandSource &source, NickAlias *na, InfoFormatter &info, bool show_hidden) override
+	void OnNickInfo(CommandSource &source, NickServ::Nick *na, InfoFormatter &info, bool show_hidden) override
 	{
 		Anope::string *greet = ns_greet.Get(na->nc);
 		if (greet != NULL)
 			info[_("Greet")] = *greet;
 	}
 
-	void OnBotInfo(CommandSource &source, BotInfo *bi, ChannelInfo *ci, InfoFormatter &info) override
+	void OnBotInfo(CommandSource &source, BotInfo *bi, ChanServ::Channel *ci, InfoFormatter &info) override
 	{
 		if (bs_greet.HasExt(ci))
 			info.AddOption(_("Greet"));

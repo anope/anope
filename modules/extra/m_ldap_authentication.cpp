@@ -22,7 +22,7 @@ struct IdentifyInfo
 	{
 		req->Hold(me);
 	}
-	
+
 	~IdentifyInfo()
 	{
 		req->Release(me);
@@ -100,10 +100,10 @@ class IdentifyInterface : public LDAPInterface
 				}
 				else
 				{
-					NickAlias *na = NickAlias::Find(ii->req->GetAccount());
+					NickServ::Nick *na = NickServ::FindNick(ii->req->GetAccount());
 					if (na == NULL)
 					{
-						na = new NickAlias(ii->req->GetAccount(), new NickCore(ii->req->GetAccount()));
+						na = new NickServ::Nick(ii->req->GetAccount(), new NickServ::Account(ii->req->GetAccount()));
 						na->last_realname = ii->user ? ii->user->realname : ii->req->GetAccount();
 						NickServ::Event::OnNickRegister(&NickServ::Event::NickRegister::OnNickRegister, ii->user, na);
 						BotInfo *NickServ = Config->GetClient("NickServ");
@@ -311,7 +311,7 @@ class NSIdentifyLDAP : public Module
 		}
 	}
 
-	void OnNickRegister(User *, NickAlias *na) override
+	void OnNickRegister(User *, NickServ::Nick *na) override
 	{
 		if (!this->disable_register_reason.empty() || !this->ldap)
 			return;

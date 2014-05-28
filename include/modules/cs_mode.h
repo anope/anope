@@ -97,14 +97,14 @@ namespace Event
 		 * @param lock The mode lock
 		 * @return EVENT_CONTINUE to let other modules decide, EVENT_STOP to deny the mlock.
 		 */
-		virtual EventReturn OnMLock(ChannelInfo *ci, ModeLock *lock) anope_abstract;
+		virtual EventReturn OnMLock(ChanServ::Channel *ci, ModeLock *lock) anope_abstract;
 
 		/** Called when a mode is about to be unlocked
 		 * @param ci The channel the mode is being unlocked from
 		 * @param lock The mode lock
 		 * @return EVENT_CONTINUE to let other modules decide, EVENT_STOP to deny the mlock.
 		 */
-		virtual EventReturn OnUnMLock(ChannelInfo *ci, ModeLock *lock) anope_abstract;
+		virtual EventReturn OnUnMLock(ChanServ::Channel *ci, ModeLock *lock) anope_abstract;
 	};
 }
 

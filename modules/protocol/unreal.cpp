@@ -343,7 +343,7 @@ class UnrealIRCdProto : public IRCDProto
 		return mask.length() >= 4 && mask[0] == '~' && mask[2] == ':';
 	}
 
-	void SendLogin(User *u, NickAlias *na) override
+	void SendLogin(User *u, NickServ::Nick *na) override
 	{
 		if (Servers::Capab.count("ESVID") > 0)
 			IRCD->SendMode(Config->GetClient("NickServ"), u, "+d %s", na->nc->display.c_str());
@@ -474,7 +474,7 @@ class UnrealExtBan : public ChannelModeList
 			if (u->Account() && Anope::Match(u->Account()->display, real_mask))
 				return true;
 		}
-	
+
 		return false;
 	}
 };
@@ -496,7 +496,7 @@ class ChannelModeFlood : public ChannelModeParam
 				return true;
 		}
 		catch (const ConvertException &) { }
-	
+
 		/* '['<number><1 letter>[optional: '#'+1 letter],[next..]']'':'<number> */
 		size_t end_bracket = value.find(']', 1);
 		if (end_bracket == Anope::string::npos)
@@ -840,19 +840,19 @@ struct IRCDMessageNick : IRCDMessage
 				Log(LOG_DEBUG) << "User " << params[0] << " introduced from nonexistant server " << params[5] << "?";
 				return;
 			}
-		
-			NickAlias *na = NULL;
+
+			NickServ::Nick *na = NULL;
 
 			if (params[6] == "0")
 				;
 			else if (params[6].is_pos_number_only())
 			{
 				if (convertTo<time_t>(params[6]) == user_ts)
-					na = NickAlias::Find(params[0]);
+					na = NickServ::FindNick(params[0]);
 			}
 			else
 			{
-				na = NickAlias::Find(params[6]);
+				na = NickServ::FindNick(params[6]);
 			}
 
 			User::OnIntroduce(params[0], params[3], params[4], vhost, ip, s, params[10], user_ts, params[7], "", na ? *na->nc : NULL);
@@ -889,7 +889,7 @@ struct IRCDMessageSASL : IRCDMessage
 	void Run(MessageSource &source, const std::vector<Anope::string> &params) override
 	{
 		size_t p = params[1].find('!');
-		if (!SASL::sasl || p == Anope::string::npos)	
+		if (!SASL::sasl || p == Anope::string::npos)
 			return;
 
 		SASL::Message m;
@@ -1032,7 +1032,7 @@ struct IRCDMessageSJoin : IRCDMessage
 				users.push_back(sju);
 			}
 		}
-		
+
 		time_t ts = Anope::string(params[0]).is_pos_number_only() ? convertTo<time_t>(params[0]) : Anope::CurTime;
 		Message::Join::SJoin(source, params[1], ts, modes, users);
 
@@ -1252,7 +1252,7 @@ class ProtoUnreal : public Module
 		}
 	}
 
-	void OnChanRegistered(ChannelInfo *ci) override
+	void OnChanRegistered(ChanServ::Channel *ci) override
 	{
 		ModeLocks *modelocks = ci->GetExt<ModeLocks>("modelocks");
 		if (!ci->c || !use_server_side_mlock || !modelocks || !Servers::Capab.count("MLOCK"))
@@ -1261,14 +1261,14 @@ class ProtoUnreal : public Module
 		UplinkSocket::Message(Me) << "MLOCK " << static_cast<long>(ci->c->creation_time) << " " << ci->name << " " << modes;
 	}
 
-	void OnDelChan(ChannelInfo *ci) override
+	void OnDelChan(ChanServ::Channel *ci) override
 	{
 		if (!ci->c || !use_server_side_mlock || !Servers::Capab.count("MLOCK"))
 			return;
 		UplinkSocket::Message(Me) << "MLOCK " << static_cast<long>(ci->c->creation_time) << " " << ci->name << " :";
 	}
 
-	EventReturn OnMLock(ChannelInfo *ci, ModeLock *lock) override
+	EventReturn OnMLock(ChanServ::Channel *ci, ModeLock *lock) override
 	{
 		ModeLocks *modelocks = ci->GetExt<ModeLocks>("modelocks");
 		ChannelMode *cm = ModeManager::FindChannelModeByName(lock->name);
@@ -1281,7 +1281,7 @@ class ProtoUnreal : public Module
 		return EVENT_CONTINUE;
 	}
 
-	EventReturn OnUnMLock(ChannelInfo *ci, ModeLock *lock) override
+	EventReturn OnUnMLock(ChanServ::Channel *ci, ModeLock *lock) override
 	{
 		ModeLocks *modelocks = ci->GetExt<ModeLocks>("modelocks");
 		ChannelMode *cm = ModeManager::FindChannelModeByName(lock->name);

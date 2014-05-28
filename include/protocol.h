@@ -186,7 +186,7 @@ class CoreExport IRCDProto : public Service
 	 * initial handshake requirements.
 	 */
 	virtual void SendConnect() = 0;
-	
+
 	/** Called right before we begin our burst, after we have handshaked successfully with the uplink/
 	 * At this point none of our servesr, users, or channels exist on the uplink
 	 */
@@ -205,7 +205,7 @@ class CoreExport IRCDProto : public Service
 
 	virtual void SendNumeric(int numeric, const Anope::string &dest, const char *fmt, ...);
 
-	virtual void SendLogin(User *u, NickAlias *na) = 0;
+	virtual void SendLogin(User *u, NickServ::Nick *na) = 0;
 	virtual void SendLogout(User *u) = 0;
 
 	/** Send a channel creation message to the uplink.

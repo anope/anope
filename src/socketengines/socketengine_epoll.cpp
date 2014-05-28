@@ -28,7 +28,7 @@ void SocketEngine::Init()
 
 	if (EngineHandle == -1)
 		throw SocketException("Could not initialize epoll socket engine: " + Anope::LastError());
-	
+
 	events.resize(DefaultSize);
 }
 
@@ -46,7 +46,7 @@ void SocketEngine::Change(Socket *s, bool set, SocketFlag flag)
 	bool before_registered = s->flags[SF_READABLE] || s->flags[SF_WRITABLE];
 
 	s->flags[flag] = set;
-	
+
 	bool now_registered = s->flags[SF_READABLE] || s->flags[SF_WRITABLE];
 
 	epoll_event ev;
@@ -65,7 +65,7 @@ void SocketEngine::Change(Socket *s, bool set, SocketFlag flag)
 		mod = EPOLL_CTL_MOD;
 	else
 		return;
-	
+
 	if (epoll_ctl(EngineHandle, mod, ev.data.fd, &ev) == -1)
 		 throw SocketException("Unable to epoll_ctl() fd " + stringify(ev.data.fd) + " to epoll: " + Anope::LastError());
 }

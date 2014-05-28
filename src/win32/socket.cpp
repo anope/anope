@@ -85,7 +85,7 @@ int windows_inet_pton(int af, const char *src, void *dst)
 		}
 		return 1;
 	}
-	
+
 	return 0;
 }
 

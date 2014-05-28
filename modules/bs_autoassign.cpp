@@ -14,11 +14,11 @@ class BSAutoAssign : public Module
 {
  public:
 	BSAutoAssign(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
-		, EventHook<Event::ChanRegistered>("OnChanRegistered") 
+		, EventHook<Event::ChanRegistered>("OnChanRegistered")
 	{
 	}
 
-	void OnChanRegistered(ChannelInfo *ci) override
+	void OnChanRegistered(ChanServ::Channel *ci) override
 	{
 		const Anope::string &bot = Config->GetModule(this)->Get<const Anope::string>("bot");
 		if (bot.empty())

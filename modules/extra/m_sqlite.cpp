@@ -282,7 +282,7 @@ Query SQLiteService::BuildInsert(const Anope::string &table, unsigned int id, Da
 		*it->second >> buf;
 		query.SetValue(it->first, buf);
 	}
-	
+
 	return query;
 }
 

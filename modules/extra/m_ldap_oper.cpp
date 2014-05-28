@@ -30,7 +30,7 @@ class IdentifyInterface : public LDAPInterface
 		if (!u || !u->Account())
 			return;
 
-		NickCore *nc = u->Account();
+		NickServ::Account *nc = u->Account();
 
 		try
 		{
@@ -131,7 +131,7 @@ class LDAPOper : public Module
 		}
 	}
 
-	void OnDelCore(NickCore *nc) override
+	void OnDelCore(NickServ::Account *nc) override
 	{
 		if (nc->o != NULL && my_opers.count(nc->o) > 0)
 		{

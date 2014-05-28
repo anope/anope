@@ -60,7 +60,7 @@ class CharybdisProto : public IRCDProto
 	void SendChannel(Channel *c) override { ratbox->SendChannel(c); }
 	void SendTopic(const MessageSource &source, Channel *c) override { ratbox->SendTopic(source, c); }
 	bool IsIdentValid(const Anope::string &ident) override { return ratbox->IsIdentValid(ident); }
-	void SendLogin(User *u, NickAlias *na) override { ratbox->SendLogin(u, na); }
+	void SendLogin(User *u, NickServ::Nick *na) override { ratbox->SendLogin(u, na); }
 	void SendLogout(User *u) override { ratbox->SendLogout(u); }
 
 	void SendSQLine(User *, const XLine *x) override
@@ -166,7 +166,7 @@ struct IRCDMessageEncap : IRCDMessage
 		// In a burst, states that the source user is logged in as the account.
 		if (params[1] == "LOGIN" || params[1] == "SU")
 		{
-			NickCore *nc = NickCore::Find(params[2]);
+			NickServ::Account *nc = NickServ::FindAccount(params[2]);
 			if (!nc)
 				return;
 			u->Login(nc);
@@ -221,9 +221,9 @@ struct IRCDMessageEUID : IRCDMessage
 	 */
 	void Run(MessageSource &source, const std::vector<Anope::string> &params) override
 	{
-		NickAlias *na = NULL;
+		NickServ::Nick *na = NULL;
 		if (params[9] != "*")
-			na = NickAlias::Find(params[9]);
+			na = NickServ::FindNick(params[9]);
 
 		User::OnIntroduce(params[0], params[4], params[8], params[5], params[6], source.GetServer(), params[10], params[2].is_pos_number_only() ? convertTo<time_t>(params[2]) : Anope::CurTime, params[3], params[7], na ? *na->nc : NULL);
 	}
@@ -304,7 +304,7 @@ class ProtoCharybdis : public Module
 		ModeManager::AddUserMode(new UserMode("NOFORWARD", 'Q'));
 		ModeManager::AddUserMode(new UserMode("REGPRIV", 'R'));
 		ModeManager::AddUserMode(new UserModeOperOnly("OPERWALLS", 'z'));
-		ModeManager::AddUserMode(new UserModeNoone("SSL", 'Z')); 
+		ModeManager::AddUserMode(new UserModeNoone("SSL", 'Z'));
 
 		/* b/e/I */
 		ModeManager::AddChannelMode(new ChannelModeList("QUIET", 'q'));
@@ -400,7 +400,7 @@ class ProtoCharybdis : public Module
 		}
 	}
 
-	EventReturn OnMLock(ChannelInfo *ci, ModeLock *lock) override
+	EventReturn OnMLock(ChanServ::Channel *ci, ModeLock *lock) override
 	{
 		ModeLocks *modelocks = ci->GetExt<ModeLocks>("modelocks");
 		ChannelMode *cm = ModeManager::FindChannelModeByName(lock->name);
@@ -413,7 +413,7 @@ class ProtoCharybdis : public Module
 		return EVENT_CONTINUE;
 	}
 
-	EventReturn OnUnMLock(ChannelInfo *ci, ModeLock *lock) override
+	EventReturn OnUnMLock(ChanServ::Channel *ci, ModeLock *lock) override
 	{
 		ModeLocks *modelocks = ci->GetExt<ModeLocks>("modelocks");
 		ChannelMode *cm = ModeManager::FindChannelModeByName(lock->name);

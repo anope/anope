@@ -36,7 +36,7 @@ struct CSMiscData : MiscData, Serializable
 {
 	CSMiscData(Extensible *obj) : Serializable("CSMiscData") { }
 
-	CSMiscData(ChannelInfo *c, const Anope::string &n, const Anope::string &d) : Serializable("CSMiscData")
+	CSMiscData(ChanServ::Channel *c, const Anope::string &n, const Anope::string &d) : Serializable("CSMiscData")
 	{
 		object = c->name;
 		name = n;
@@ -58,7 +58,7 @@ struct CSMiscData : MiscData, Serializable
 		data["name"] >> sname;
 		data["data"] >> sdata;
 
-		ChannelInfo *ci = ChannelInfo::Find(sci);
+		ChanServ::Channel *ci = ChanServ::Find(sci);
 		if (ci == NULL)
 			return NULL;
 
@@ -105,7 +105,7 @@ class CommandCSSetMisc : public Command
 			return;
 		}
 
-		ChannelInfo *ci = ChannelInfo::Find(params[0]);
+		ChanServ::Channel *ci = ChanServ::Find(params[0]);
 		const Anope::string &param = params.size() > 1 ? params[1] : "";
 		if (ci == NULL)
 		{
@@ -206,7 +206,7 @@ class CSSetMisc : public Module
 		}
 	}
 
-	void OnChanInfo(CommandSource &source, ChannelInfo *ci, InfoFormatter &info, bool) override
+	void OnChanInfo(CommandSource &source, ChanServ::Channel *ci, InfoFormatter &info, bool) override
 	{
 		for (Anope::map<ExtensibleItem<CSMiscData> *>::iterator it = items.begin(); it != items.end(); ++it)
 		{

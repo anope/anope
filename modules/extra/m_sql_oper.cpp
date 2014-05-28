@@ -105,9 +105,9 @@ class ModuleSQLOper : public Module
 
 	~ModuleSQLOper()
 	{
-		for (nickcore_map::const_iterator it = NickCoreList->begin(), it_end = NickCoreList->end(); it != it_end; ++it)
+		for (nickcore_map::const_iterator it = NickServ::AccountList->begin(), it_end = NickServ::AccountList->end(); it != it_end; ++it)
 		{
-			NickCore *nc = it->second;
+			NickServ::Account *nc = it->second;
 
 			if (nc->o && dynamic_cast<SQLOper *>(nc->o))
 			{

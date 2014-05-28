@@ -12,7 +12,7 @@ WebCPanel::ChanServ::Modes::Modes(const Anope::string &cat, const Anope::string 
 {
 }
 
-bool WebCPanel::ChanServ::Modes::OnRequest(HTTPProvider *server, const Anope::string &page_name, HTTPClient *client, HTTPMessage &message, HTTPReply &reply, NickAlias *na, TemplateFileServer::Replacements &replacements)
+bool WebCPanel::ChanServ::Modes::OnRequest(HTTPProvider *server, const Anope::string &page_name, HTTPClient *client, HTTPMessage &message, HTTPReply &reply, ::NickServ::Nick *na, TemplateFileServer::Replacements &replacements)
 {
 	const Anope::string &chname = message.get_data["channel"];
 	const Anope::string &mode = message.get_data["m"];
@@ -27,7 +27,7 @@ bool WebCPanel::ChanServ::Modes::OnRequest(HTTPProvider *server, const Anope::st
 	}
 
 	replacements["ESCAPED_CHANNEL"] = HTTPUtils::URLEncode(chname);
-	ChannelInfo *ci = ChannelInfo::Find(chname);
+	::ChanServ::Channel *ci = ::ChanServ::Find(chname);
 
 	if (!ci)
 	{
@@ -44,7 +44,7 @@ bool WebCPanel::ChanServ::Modes::OnRequest(HTTPProvider *server, const Anope::st
 		return true;
 	}
 
-	AccessGroup u_access = ci->AccessFor(na->nc);
+	::ChanServ::AccessGroup u_access = ci->AccessFor(na->nc);
 	bool has_priv = na->nc->IsServicesOper() && na->nc->o->ot->HasPriv("chanserv/administration");
 
 	if (!u_access.HasPriv("MODE") && !has_priv)

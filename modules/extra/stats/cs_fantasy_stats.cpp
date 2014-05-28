@@ -113,7 +113,7 @@ class CSStats : public Module
 					channel = params[0];
 				else
 				{
-					if (NickAlias *na = NickAlias::Find(params[0]))
+					if (NickServ::Nick *na = NickServ::FindNick(params[0]))
 						display = na->nc->display;
 					else
 					{

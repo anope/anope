@@ -32,7 +32,7 @@ class CommandHSDel : public Command
 		}
 
 		const Anope::string &nick = params[0];
-		NickAlias *na = NickAlias::Find(nick);
+		NickServ::Nick *na = NickServ::FindNick(nick);
 		if (na)
 		{
 			Log(LOG_ADMIN, source, this) << "for user " << na->nick;
@@ -74,11 +74,11 @@ class CommandHSDelAll : public Command
 		}
 
 		const Anope::string &nick = params[0];
-		NickAlias *na = NickAlias::Find(nick);
+		NickServ::Nick *na = NickServ::FindNick(nick);
 		if (na)
 		{
 			this->ondeletevhost(&Event::DeleteVhost::OnDeleteVhost, na);
-			const NickCore *nc = na->nc;
+			const NickServ::Account *nc = na->nc;
 			for (unsigned i = 0; i < nc->aliases->size(); ++i)
 			{
 				na = nc->aliases->at(i);

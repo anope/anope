@@ -79,13 +79,13 @@ namespace Event
 		 * @param ci The channel
 		 * @param bw The badword
 		 */
-		virtual void OnBadWordAdd(ChannelInfo *ci, const BadWord *bw) anope_abstract;
+		virtual void OnBadWordAdd(ChanServ::Channel *ci, const BadWord *bw) anope_abstract;
 
 		/** Called before a badword is deleted from a channel
 		 * @param ci The channel
 		 * @param bw The badword
 		 */
-		virtual void OnBadWordDel(ChannelInfo *ci, const BadWord *bw) anope_abstract;
+		virtual void OnBadWordDel(ChanServ::Channel *ci, const BadWord *bw) anope_abstract;
 	};
 }
 

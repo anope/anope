@@ -15,7 +15,7 @@
 class CommandNSAccess : public Command
 {
  private:
-	void DoAdd(CommandSource &source, NickCore *nc, const Anope::string &mask)
+	void DoAdd(CommandSource &source, NickServ::Account *nc, const Anope::string &mask)
 	{
 		if (mask.empty())
 		{
@@ -48,7 +48,7 @@ class CommandNSAccess : public Command
 		return;
 	}
 
-	void DoDel(CommandSource &source, NickCore *nc, const Anope::string &mask)
+	void DoDel(CommandSource &source, NickServ::Account *nc, const Anope::string &mask)
 	{
 		if (mask.empty())
 		{
@@ -75,7 +75,7 @@ class CommandNSAccess : public Command
 		return;
 	}
 
-	void DoList(CommandSource &source, NickCore *nc, const Anope::string &mask)
+	void DoList(CommandSource &source, NickServ::Account *nc, const Anope::string &mask)
 	{
 		unsigned i, end;
 
@@ -118,10 +118,10 @@ class CommandNSAccess : public Command
 			mask = params.size() > 1 ? params[params.size() - 1] : "";
 		}
 
-		NickCore *nc;
+		NickServ::Account *nc;
 		if (!nick.empty())
 		{
-			const NickAlias *na = NickAlias::Find(nick);
+			const NickServ::Nick *na = NickServ::FindNick(nick);
 			if (na == NULL)
 			{
 				source.Reply(NICK_X_NOT_REGISTERED, nick.c_str());
@@ -199,7 +199,7 @@ class NSAccess : public Module
 	{
 	}
 
-	void OnNickRegister(User *u, NickAlias *na) override
+	void OnNickRegister(User *u, NickServ::Nick *na) override
 	{
 		if (u && Config->GetModule(this)->Get<bool>("addaccessonreg"))
 			na->nc->AddAccess(u->Mask());

@@ -58,7 +58,7 @@ struct SeenInfo : Serializable
 	static Serializable* Unserialize(Serializable *obj, Serialize::Data &data)
 	{
 		Anope::string snick;
-		
+
 		data["nick"] >> snick;
 
 		SeenInfo *s;
@@ -99,7 +99,7 @@ static SeenInfo *FindInfo(const Anope::string &nick)
 static bool ShouldHide(const Anope::string &channel, User *u)
 {
 	Channel *targetchan = Channel::Find(channel);
-	const ChannelInfo *targetchan_ci = targetchan ? *targetchan->ci : ChannelInfo::Find(channel);
+	const ChanServ::Channel *targetchan_ci = targetchan ? *targetchan->ci : ChanServ::Find(channel);
 
 	if (targetchan && targetchan->HasMode("SECRET"))
 		return true;
@@ -202,7 +202,7 @@ class CommandSeen : public Command
 			return;
 		}
 
-		NickAlias *na = NickAlias::Find(params[0]);
+		NickServ::Nick *na = NickServ::FindNick(params[0]);
 		if (!na)
 		{
 			source.Reply(_("I don't know who %s is."), params[0].c_str());
@@ -235,11 +235,11 @@ class CommandSeen : public Command
 			}
 		}
 
-		AccessGroup ag = source.c->ci->AccessFor(na->nc);
+		ChanServ::AccessGroup ag = source.c->ci->AccessFor(na->nc);
 		time_t last = 0;
 		for (unsigned i = 0; i < ag.size(); ++i)
 		{
-			ChanAccess *a = ag[i];
+			ChanServ::ChanAccess *a = ag[i];
 
 			if (*a->nc == na->nc && a->last_seen > last)
 				last = a->last_seen;
@@ -378,7 +378,7 @@ class CSSeen : public Module
 	Serialize::Type seeninfo_type;
 	CommandSeen commandseen;
 	CommandOSSeen commandosseen;
-	
+
  public:
 	CSSeen(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
 		, EventHook<Event::ExpireTick>("OnExpireTick")
@@ -446,9 +446,10 @@ class CSSeen : public Module
 		UpdateUser(u, PART, u->nick, "", channel, msg);
 	}
 
-	void OnPreUserKicked(const MessageSource &source, ChanUserContainer *cu, const Anope::string &msg) override
+	EventReturn OnPreUserKicked(const MessageSource &source, ChanUserContainer *cu, const Anope::string &msg) override
 	{
 		UpdateUser(cu->user, KICK, cu->user->nick, source.GetSource(), cu->chan->name, msg);
+		return EVENT_CONTINUE;
 	}
 
  private:

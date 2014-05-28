@@ -42,7 +42,7 @@ struct HostRequest : Serializable
 		Anope::string snick;
 		data["nick"] >> snick;
 
-		NickAlias *na = NickAlias::Find(snick);
+		NickServ::Nick *na = NickServ::FindNick(snick);
 		if (na == NULL)
 			return NULL;
 
@@ -88,7 +88,7 @@ class CommandHSRequest : public Command
 		}
 
 		User *u = source.GetUser();
-		NickAlias *na = NickAlias::Find(source.GetNick());
+		NickServ::Nick *na = NickServ::FindNick(source.GetNick());
 		if (!na || na->nc != source.GetAccount())
 		{
 			source.Reply(ACCESS_DENIED);
@@ -96,7 +96,7 @@ class CommandHSRequest : public Command
 		}
 
 		Anope::string rawhostmask = params[0];
-		
+
 		Anope::string user, host;
 		size_t a = rawhostmask.find('@');
 
@@ -196,7 +196,7 @@ class CommandHSActivate : public Command
 
 		const Anope::string &nick = params[0];
 
-		NickAlias *na = NickAlias::Find(nick);
+		NickServ::Nick *na = NickServ::FindNick(nick);
 		HostRequest *req = na ? na->GetExt<HostRequest>("hostrequest") : NULL;
 		if (req)
 		{
@@ -246,7 +246,7 @@ class CommandHSReject : public Command
 		const Anope::string &nick = params[0];
 		const Anope::string &reason = params.size() > 1 ? params[1] : "";
 
-		NickAlias *na = NickAlias::Find(nick);
+		NickServ::Nick *na = NickServ::FindNick(nick);
 		HostRequest *req = na ? na->GetExt<HostRequest>("hostrequest") : NULL;
 		if (req)
 		{
@@ -298,9 +298,9 @@ class CommandHSWaiting : public Command
 
 		list.AddColumn(_("Number")).AddColumn(_("Nick")).AddColumn(_("Vhost")).AddColumn(_("Created"));
 
-		for (nickalias_map::const_iterator it = NickAliasList->begin(), it_end = NickAliasList->end(); it != it_end; ++it)
+		for (auto& it : NickServ::service->GetNickList())
 		{
-			const NickAlias *na = it->second;
+			const NickServ::Nick *na = it.second;
 			HostRequest *hr = na->GetExt<HostRequest>("hostrequest");
 			if (!hr)
 				continue;
@@ -311,7 +311,7 @@ class CommandHSWaiting : public Command
 
 				ListFormatter::ListEntry entry;
 				entry["Number"] = stringify(display_counter);
-				entry["Nick"] = it->first;
+				entry["Nick"] = na->nick;
 				if (!hr->ident.empty())
 					entry["Vhost"] = hr->ident + "@" + hr->host;
 				else
@@ -379,8 +379,8 @@ static void req_send_memos(Module *me, CommandSource &source, const Anope::strin
 		for (unsigned i = 0; i < Oper::opers.size(); ++i)
 		{
 			Oper *o = Oper::opers[i];
-			
-			const NickAlias *na = NickAlias::Find(o->name);
+
+			const NickServ::Nick *na = NickServ::FindNick(o->name);
 			if (!na)
 				continue;
 

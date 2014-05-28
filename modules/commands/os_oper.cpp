@@ -31,7 +31,7 @@ struct MyOper : Oper, Serializable
 		OperType *ot = OperType::Find(stype);
 		if (ot == NULL)
 			return NULL;
-		NickCore *nc = NickCore::Find(sname);
+		NickServ::Account *nc = NickServ::FindAccount(sname);
 		if (nc == NULL)
 			return NULL;
 
@@ -82,7 +82,7 @@ class CommandOSOper : public Command
 			const Anope::string &oper = params[1];
 			const Anope::string &otype = params[2];
 
-			const NickAlias *na = NickAlias::Find(oper);
+			const NickServ::Nick *na = NickServ::FindNick(oper);
 			if (na == NULL)
 				source.Reply(NICK_X_NOT_REGISTERED, oper.c_str());
 			else if (na->nc->o)
@@ -115,7 +115,7 @@ class CommandOSOper : public Command
 		{
 			const Anope::string &oper = params[1];
 
-			const NickAlias *na = NickAlias::Find(oper);
+			const NickServ::Nick *na = NickServ::FindNick(oper);
 			if (na == NULL)
 				source.Reply(NICK_X_NOT_REGISTERED, oper.c_str());
 			else if (!na->nc || !na->nc->o)
@@ -137,9 +137,9 @@ class CommandOSOper : public Command
 		else if (subcommand.equals_ci("LIST"))
 		{
 			source.Reply(_("Name     Type"));
-			for (nickcore_map::const_iterator it = NickCoreList->begin(), it_end = NickCoreList->end(); it != it_end; ++it)
+			for (auto& it : NickServ::service->GetAccountList())
 			{
-				const NickCore *nc = it->second;
+				const NickServ::Account *nc = it.second;
 
 				if (!nc->o)
 					continue;
@@ -160,7 +160,7 @@ class CommandOSOper : public Command
 			if (params.size() > 2)
 				fulltype += " " + params[2];
 			OperType *ot = OperType::Find(fulltype);
-			if (ot == NULL)	
+			if (ot == NULL)
 				source.Reply(_("Oper type \002%s\002 has not been configured."), fulltype.c_str());
 			else
 			{
@@ -243,9 +243,9 @@ class OSOper : public Module
 
 	~OSOper()
 	{
-		for (nickcore_map::const_iterator it = NickCoreList->begin(), it_end = NickCoreList->end(); it != it_end; ++it)
+		for (auto& it : NickServ::service->GetAccountList())
 		{
-			NickCore *nc = it->second;
+			NickServ::Account *nc = it.second;
 
 			if (nc->o && dynamic_cast<MyOper *>(nc->o))
 			{

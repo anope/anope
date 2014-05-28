@@ -33,16 +33,16 @@ class NSMaxEmail : public Module
 		return true;
 	}
 
-	int CountEmail(const Anope::string &email, NickCore *unc)
+	int CountEmail(const Anope::string &email, NickServ::Account *unc)
 	{
 		int count = 0;
 
 		if (email.empty())
 			return 0;
 
-		for (nickcore_map::const_iterator it = NickCoreList->begin(), it_end = NickCoreList->end(); it != it_end; ++it)
+		for (auto& it : NickServ::service->GetAccountList())
 		{
-			const NickCore *nc = it->second;
+			const NickServ::Account *nc = it.second;
 
 			if (unc != nc && !nc->email.empty() && nc->email.equals_ci(email))
 				++count;

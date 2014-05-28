@@ -282,7 +282,7 @@ class BahamutIRCdProto : public IRCDProto
 		UplinkSocket::Message() << "SJOIN " << c->creation_time << " " << c->name << " " << modes << " :";
 	}
 
-	void SendLogin(User *u, NickAlias *) override
+	void SendLogin(User *u, NickServ::Nick *) override
 	{
 		IRCD->SendMode(Config->GetClient("NickServ"), u, "+d %d", u->signon);
 	}
@@ -373,11 +373,11 @@ struct IRCDMessageNick : IRCDMessage
 				return;
 			}
 
-			NickAlias *na = NULL;
+			NickServ::Nick *na = NULL;
 			time_t signon = params[2].is_pos_number_only() ? convertTo<time_t>(params[2]) : 0,
 				stamp = params[7].is_pos_number_only() ? convertTo<time_t>(params[7]) : 0;
-			if (signon && signon == stamp)
-				na = NickAlias::Find(params[0]);
+			if (signon && signon == stamp && NickServ::service)
+				na = NickServ::service->FindNick(params[0]);
 
 			User::OnIntroduce(params[0], params[4], params[5], "", params[8], s, params[9], signon, params[3], "", na ? *na->nc : NULL);
 		}

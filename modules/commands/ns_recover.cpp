@@ -15,22 +15,23 @@
 
 typedef std::map<Anope::string, ChannelStatus> NSRecoverInfo;
 
-class NSRecoverRequest : public IdentifyRequest
+class NSRecoverRequestListener : public NickServ::IdentifyRequestListener
 {
 	CommandSource source;
 	Command *cmd;
 	Anope::string user;
- 
- public:
-	NSRecoverRequest(Module *o, CommandSource &src, Command *c, const Anope::string &nick, const Anope::string &pass) : IdentifyRequest(o, nick, pass), source(src), cmd(c), user(nick) { }
+	Anope::string pass;
 
-	void OnSuccess() override
+ public:
+	NSRecoverRequestListener(CommandSource &src, Command *c, const Anope::string &nick, const Anope::string &p) : source(src), cmd(c), user(nick), pass(p) { }
+
+	void OnSuccess(NickServ::IdentifyRequest *) override
 	{
 		User *u = User::Find(user, true);
 		if (!source.GetUser() || !source.service)
 			return;
 
-		NickAlias *na = NickAlias::Find(user);
+		NickServ::Nick *na = NickServ::FindNick(user);
 		if (!na)
 			return;
 
@@ -66,7 +67,7 @@ class NSRecoverRequest : public IdentifyRequest
 				}
 			}
 
-			u->SendMessage(source.service, _("This nickname has been recovered by %s. If you did not do\n"
+			u->SendMessage(*source.service, _("This nickname has been recovered by %s. If you did not do\n"
 							"this then %s may have your password, and you should change it."),
 							source.GetNick().c_str(), source.GetNick().c_str());
 
@@ -76,7 +77,7 @@ class NSRecoverRequest : public IdentifyRequest
 			source.Reply(_("Ghost with your nick has been killed."));
 
 			if (IRCD->CanSVSNick)
-				IRCD->SendForceNickChange(source.GetUser(), GetAccount(), Anope::CurTime);
+				IRCD->SendForceNickChange(source.GetUser(), user, Anope::CurTime);
 		}
 		/* User is not identified or not identified to the same account as the person using this command */
 		else
@@ -87,7 +88,7 @@ class NSRecoverRequest : public IdentifyRequest
 				Log(LOG_COMMAND, source, cmd) << "and was automatically identified to " << na->nick << " (" << na->nc->display << ")";
 			}
 
-			u->SendMessage(source.service, _("This nickname has been recovered by %s."), source.GetNick().c_str());
+			u->SendMessage(*source.service, _("This nickname has been recovered by %s."), source.GetNick().c_str());
 			if (NickServ::service)
 				NickServ::service->Collide(u, na);
 
@@ -95,7 +96,7 @@ class NSRecoverRequest : public IdentifyRequest
 			{
 				/* If we can svsnick then release our hold and svsnick the user using the command */
 				NickServ::service->Release(na);
-				IRCD->SendForceNickChange(source.GetUser(), GetAccount(), Anope::CurTime);
+				IRCD->SendForceNickChange(source.GetUser(), user, Anope::CurTime);
 			}
 			else
 				source.Reply(_("The user with your nick has been removed. Use this command again\n"
@@ -103,20 +104,20 @@ class NSRecoverRequest : public IdentifyRequest
 		}
 	}
 
-	void OnFail() override
+	void OnFail(NickServ::IdentifyRequest *) override
 	{
-		if (NickAlias::Find(GetAccount()) != NULL)
+		if (NickServ::FindNick(user) != NULL)
 		{
 			source.Reply(ACCESS_DENIED);
-			if (!GetPassword().empty())
+			if (!pass.empty())
 			{
-				Log(LOG_COMMAND, source, cmd) << "with an invalid password for " << GetAccount();
+				Log(LOG_COMMAND, source, cmd) << "with an invalid password for " << user;
 				if (source.GetUser())
 					source.GetUser()->BadPassword();
 			}
 		}
 		else
-			source.Reply(NICK_X_NOT_REGISTERED, GetAccount().c_str());
+			source.Reply(NICK_X_NOT_REGISTERED, user.c_str());
 	}
 };
 
@@ -143,7 +144,7 @@ class CommandNSRecover : public Command
 			return;
 		}
 
-		const NickAlias *na = NickAlias::Find(nick);
+		const NickServ::Nick *na = NickServ::FindNick(nick);
 
 		if (!na)
 		{
@@ -168,18 +169,18 @@ class CommandNSRecover : public Command
 
 		if (ok == false && !pass.empty())
 		{
-			NSRecoverRequest *req = new NSRecoverRequest(owner, source, this, na->nick, pass);
+			NickServ::IdentifyRequest *req = NickServ::service->CreateIdentifyRequest(new NSRecoverRequestListener(source, this, na->nick, pass), owner, na->nick, pass);
 			Event::OnCheckAuthentication(&Event::CheckAuthentication::OnCheckAuthentication, source.GetUser(), req);
 			req->Dispatch();
 		}
 		else
 		{
-			NSRecoverRequest req(owner, source, this, na->nick, pass);
+			NSRecoverRequestListener req(source, this, na->nick, pass);
 
 			if (ok)
-				req.OnSuccess();
+				req.OnSuccess(nullptr);
 			else
-				req.OnFail();
+				req.OnFail(nullptr);
 		}
 	}
 

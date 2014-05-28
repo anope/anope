@@ -29,6 +29,8 @@ class CommandMSIgnore : public Command
 			source.Reply(READ_ONLY_MODE);
 			return;
 		}
+		if (!MemoServ::service)
+			return;
 
 		Anope::string channel = params[0];
 		Anope::string command = (params.size() > 1 ? params[1] : "");
@@ -41,10 +43,10 @@ class CommandMSIgnore : public Command
 			channel = source.GetNick();
 		}
 
-		bool ischan;
-		MemoInfo *mi = MemoInfo::GetMemoInfo(channel, ischan);
-		ChannelInfo *ci = ChannelInfo::Find(channel);
-		if (!mi)
+		bool ischan, isregistered;
+		MemoServ::MemoInfo *mi = MemoServ::service->GetMemoInfo(channel, ischan, isregistered, true);
+		ChanServ::Channel *ci = ChanServ::Find(channel);
+		if (!isregistered)
 			source.Reply(ischan ? CHAN_X_NOT_REGISTERED : _(NICK_X_NOT_REGISTERED), channel.c_str());
 		else if (ischan && !source.AccessFor(ci).HasPriv("MEMO"))
 			source.Reply(ACCESS_DENIED);

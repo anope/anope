@@ -20,7 +20,7 @@ struct OperInfo : Serializable
 	OperInfo() : Serializable("OperInfo"), created(0) { }
 	OperInfo(const Anope::string &t, const Anope::string &i, const Anope::string &a, time_t c) :
 		Serializable("OperInfo"), target(t), info(i), adder(a), created(c) { }
-	
+
 	~OperInfo();
 
 	void Serialize(Serialize::Data &data) const override
@@ -46,10 +46,10 @@ struct OperInfos : Serialize::Checker<std::vector<OperInfo *> >
 
 	static Extensible *Find(const Anope::string &target)
 	{
-		NickAlias *na = NickAlias::Find(target);
+		NickServ::Nick *na = NickServ::FindNick(target);
 		if (na)
 			return na->nc;
-		return ChannelInfo::Find(target);
+		return ChanServ::Find(target);
 	}
 };
 
@@ -76,7 +76,7 @@ Serializable *OperInfo::Unserialize(Serializable *obj, Serialize::Data &data)
 	Extensible *e = OperInfos::Find(starget);
 	if (!e)
 		return NULL;
-	
+
 	OperInfos *oi = e->Require<OperInfos>("operinfo");
 	OperInfo *o;
 	if (obj)
@@ -113,7 +113,7 @@ class CommandOSInfo : public Command
 		Extensible *e;
 		if (IRCD->IsChannelValid(target))
 		{
-			ChannelInfo *ci = ChannelInfo::Find(target);
+			ChanServ::Channel *ci = ChanServ::Find(target);
 			if (!ci)
 			{
 				source.Reply(CHAN_X_NOT_REGISTERED, target.c_str());
@@ -124,7 +124,7 @@ class CommandOSInfo : public Command
 		}
 		else
 		{
-			NickAlias *na = NickAlias::Find(target);
+			NickServ::Nick *na = NickServ::FindNick(target);
 			if (!na)
 			{
 				source.Reply(NICK_X_NOT_REGISTERED, target.c_str());
@@ -284,12 +284,12 @@ class OSInfo : public Module
 
 	}
 
-	void OnNickInfo(CommandSource &source, NickAlias *na, InfoFormatter &info, bool show_hidden) override
+	void OnNickInfo(CommandSource &source, NickServ::Nick *na, InfoFormatter &info, bool show_hidden) override
 	{
 		OnInfo(source, na->nc, info);
 	}
 
-	void OnChanInfo(CommandSource &source, ChannelInfo *ci, InfoFormatter &info, bool show_hidden) override
+	void OnChanInfo(CommandSource &source, ChanServ::Channel *ci, InfoFormatter &info, bool show_hidden) override
 	{
 		OnInfo(source, ci, info);
 	}

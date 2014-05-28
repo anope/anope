@@ -31,11 +31,11 @@ struct BadWordImpl : BadWord, Serializable
 
 struct BadWordsImpl : BadWords
 {
-	Serialize::Reference<ChannelInfo> ci;
+	Serialize::Reference<ChanServ::Channel> ci;
 	typedef std::vector<BadWordImpl *> list;
 	Serialize::Checker<list> badwords;
 
-	BadWordsImpl(Extensible *obj) : ci(anope_dynamic_static_cast<ChannelInfo *>(obj)), badwords("BadWord") { }
+	BadWordsImpl(Extensible *obj) : ci(anope_dynamic_static_cast<ChanServ::Channel *>(obj)), badwords("BadWord") { }
 
 	~BadWordsImpl();
 
@@ -72,7 +72,7 @@ struct BadWordsImpl : BadWords
 	{
 		if (this->badwords->empty() || index >= this->badwords->size())
 			return;
-	
+
 		(*bwevents)(&Event::BadWordEvents::OnBadWordDel, ci, (*this->badwords)[index]);
 
 		delete this->badwords->at(index);
@@ -103,7 +103,7 @@ BadWordsImpl::~BadWordsImpl()
 
 BadWordImpl::~BadWordImpl()
 {
-	ChannelInfo *ci = ChannelInfo::Find(chan);
+	ChanServ::Channel *ci = ChanServ::Find(chan);
 	if (ci)
 	{
 		BadWordsImpl *badwords = ci->GetExt<BadWordsImpl>("badwords");
@@ -123,13 +123,13 @@ Serializable* BadWordImpl::Unserialize(Serializable *obj, Serialize::Data &data)
 	data["ci"] >> sci;
 	data["word"] >> sword;
 
-	ChannelInfo *ci = ChannelInfo::Find(sci);
+	ChanServ::Channel *ci = ChanServ::Find(sci);
 	if (!ci)
 		return NULL;
 
 	unsigned int n;
 	data["type"] >> n;
-	
+
 	BadWordImpl *bw;
 	if (obj)
 		bw = anope_dynamic_static_cast<BadWordImpl *>(obj);
@@ -141,20 +141,20 @@ Serializable* BadWordImpl::Unserialize(Serializable *obj, Serialize::Data &data)
 
 	BadWordsImpl *bws = ci->Require<BadWordsImpl>("badwords");
 	bws->badwords->push_back(bw);
-	
+
 	return bw;
 }
 
 class BadwordsDelCallback : public NumberList
 {
 	CommandSource &source;
-	ChannelInfo *ci;
+	ChanServ::Channel *ci;
 	BadWords *bw;
 	Command *c;
 	unsigned deleted;
 	bool override;
  public:
-	BadwordsDelCallback(CommandSource &_source, ChannelInfo *_ci, Command *_c, const Anope::string &list) : NumberList(list, true), source(_source), ci(_ci), c(_c), deleted(0), override(false)
+	BadwordsDelCallback(CommandSource &_source, ChanServ::Channel *_ci, Command *_c, const Anope::string &list) : NumberList(list, true), source(_source), ci(_ci), c(_c), deleted(0), override(false)
 	{
 		if (!source.AccessFor(ci).HasPriv("BADWORDS") && source.HasPriv("botserv/administration"))
 			this->override = true;
@@ -185,7 +185,7 @@ class BadwordsDelCallback : public NumberList
 class CommandBSBadwords : public Command
 {
  private:
-	void DoList(CommandSource &source, ChannelInfo *ci, const Anope::string &word)
+	void DoList(CommandSource &source, ChanServ::Channel *ci, const Anope::string &word)
 	{
 		bool override = !source.AccessFor(ci).HasPriv("BADWORDS");
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "LIST";
@@ -259,7 +259,7 @@ class CommandBSBadwords : public Command
 		}
 	}
 
-	void DoAdd(CommandSource &source, ChannelInfo *ci, const Anope::string &word)
+	void DoAdd(CommandSource &source, ChanServ::Channel *ci, const Anope::string &word)
 	{
 		size_t pos = word.rfind(' ');
 		BadWordType bwtype = BW_ANY;
@@ -308,7 +308,7 @@ class CommandBSBadwords : public Command
 		source.Reply(_("\002%s\002 added to %s bad words list."), realword.c_str(), ci->name.c_str());
 	}
 
-	void DoDelete(CommandSource &source, ChannelInfo *ci, const Anope::string &word)
+	void DoDelete(CommandSource &source, ChanServ::Channel *ci, const Anope::string &word)
 	{
 		BadWords *badwords = ci->GetExt<BadWords>("badwords");
 
@@ -354,7 +354,7 @@ class CommandBSBadwords : public Command
 		badwords->Check();
 	}
 
-	void DoClear(CommandSource &source, ChannelInfo *ci)
+	void DoClear(CommandSource &source, ChanServ::Channel *ci)
 	{
 		bool override = !source.AccessFor(ci).HasPriv("BADWORDS");
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "CLEAR";
@@ -387,7 +387,7 @@ class CommandBSBadwords : public Command
 			return;
 		}
 
-		ChannelInfo *ci = ChannelInfo::Find(params[0]);
+		ChanServ::Channel *ci = ChanServ::Find(params[0]);
 		if (ci == NULL)
 		{
 			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());

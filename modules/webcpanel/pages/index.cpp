@@ -6,8 +6,9 @@
  */
 
 #include "../webcpanel.h"
+#include "modules/nickserv.h"
 
-class WebpanelRequest : public IdentifyRequest
+class WebpanelRequest : public NickServ::IdentifyRequestListener
 {
 	HTTPReply reply;
 	HTTPMessage message;
@@ -17,16 +18,16 @@ class WebpanelRequest : public IdentifyRequest
 	TemplateFileServer::Replacements replacements;
 
  public:
-	WebpanelRequest(Module *o, HTTPReply &r, HTTPMessage &m, HTTPProvider *s, const Anope::string &p_n, HTTPClient *c, TemplateFileServer::Replacements &re, const Anope::string &user, const Anope::string &pass) : IdentifyRequest(o, user, pass), reply(r), message(m), server(s), page_name(p_n), client(c), replacements(re) { }
+	WebpanelRequest(HTTPReply &r, HTTPMessage &m, HTTPProvider *s, const Anope::string &p_n, HTTPClient *c, TemplateFileServer::Replacements &re) : reply(r), message(m), server(s), page_name(p_n), client(c), replacements(re) { }
 
-	void OnSuccess() override
+	void OnSuccess(NickServ::IdentifyRequest *req) override
 	{
 		if (!client || !server)
 			return;
-		NickAlias *na = NickAlias::Find(this->GetAccount());
+		::NickServ::Nick *na = ::NickServ::FindNick(req->GetAccount());
 		if (!na)
 		{
-			this->OnFail();
+			this->OnFail(req);
 			return;
 		}
 
@@ -50,7 +51,7 @@ class WebpanelRequest : public IdentifyRequest
 			reply.cookies.push_back(c);
 		}
 
-		{			
+		{
 			HTTPReply::cookie c;
 			c.push_back(std::make_pair("id", id));
 			c.push_back(std::make_pair("Path", "/"));
@@ -63,7 +64,7 @@ class WebpanelRequest : public IdentifyRequest
 		client->SendReply(&reply);
 	}
 
-	void OnFail() override
+	void OnFail(NickServ::IdentifyRequest *req) override
 	{
 		if (!client || !server)
 			return;
@@ -82,11 +83,11 @@ bool WebCPanel::Index::OnRequest(HTTPProvider *server, const Anope::string &page
 
 	replacements["TITLE"] = page_title;
 
-	if (!user.empty() && !pass.empty())
+	if (!user.empty() && !pass.empty() && ::NickServ::service)
 	{
-		// Rate limit check.
+		// XXX Rate limit check.
 
-		WebpanelRequest *req = new WebpanelRequest(me, reply, message, server, page_name, client, replacements, user, pass);
+		::NickServ::IdentifyRequest *req = ::NickServ::service->CreateIdentifyRequest(new WebpanelRequest(reply, message, server, page_name, client, replacements), me, user, pass);
 		Event::OnCheckAuthentication(&Event::CheckAuthentication::OnCheckAuthentication, nullptr, req);
 		req->Dispatch();
 		return false;

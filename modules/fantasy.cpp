@@ -23,7 +23,7 @@ class CommandBSSetFantasy : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
-		ChannelInfo *ci = ChannelInfo::Find(params[0]);
+		ChanServ::Channel *ci = ChanServ::Find(params[0]);
 		const Anope::string &value = params[1];
 
 		if (ci == NULL)
@@ -47,7 +47,7 @@ class CommandBSSetFantasy : public Command
 		if (value.equals_ci("ON"))
 		{
 			bool override = !source.AccessFor(ci).HasPriv("SET");
-			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to enable fantasy"; 
+			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to enable fantasy";
 
 			ci->Extend<bool>("BS_FANTASY");
 			source.Reply(_("Fantasy mode is now \002on\002 on channel %s."), ci->name.c_str());
@@ -55,7 +55,7 @@ class CommandBSSetFantasy : public Command
 		else if (value.equals_ci("OFF"))
 		{
 			bool override = !source.AccessFor(ci).HasPriv("SET");
-			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to disable fantasy"; 
+			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to disable fantasy";
 
 			ci->Shrink<bool>("BS_FANTASY");
 			source.Reply(_("Fantasy mode is now \002off\002 on channel %s."), ci->name.c_str());
@@ -118,7 +118,7 @@ class Fantasy : public Module
 			params[0].erase(params[0].begin());
 		else
 			return;
-		
+
 		if (params.empty())
 			return;
 
@@ -171,7 +171,7 @@ class Fantasy : public Module
 		source.command = it->first;
 		source.permission = info.permission;
 
-		AccessGroup ag = c->ci->AccessFor(u);
+		ChanServ::AccessGroup ag = c->ci->AccessFor(u);
 		bool has_fantasia = ag.HasPriv("FANTASIA") || source.HasPriv("chanserv/administration");
 
 		EventReturn MOD_RESULT;
@@ -194,14 +194,14 @@ class Fantasy : public Module
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
-		Reference<NickCore> nc_reference(u->Account());
+		Reference<NickServ::Account> nc_reference(u->Account());
 		cmd->Execute(source, params);
 		if (!nc_reference)
 			source.nc = NULL;
 		Event::OnPostCommand(&Event::PostCommand::OnPostCommand, source, cmd, params);
 	}
 
-	void OnBotInfo(CommandSource &source, BotInfo *bi, ChannelInfo *ci, InfoFormatter &info)
+	void OnBotInfo(CommandSource &source, BotInfo *bi, ChanServ::Channel *ci, InfoFormatter &info)
 	{
 		if (fantasy.HasExt(ci))
 			info.AddOption(_("Fantasy"));

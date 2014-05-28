@@ -37,7 +37,7 @@ struct NSSuspendInfo : SuspendInfo, Serializable
 			si = anope_dynamic_static_cast<NSSuspendInfo *>(obj);
 		else
 		{
-			NickAlias *na = NickAlias::Find(snick);
+			NickServ::Nick *na = NickServ::FindNick(snick);
 			if (!na)
 				return NULL;
 			si = na->nc->Extend<NSSuspendInfo>("NS_SUSPENDED");
@@ -90,7 +90,7 @@ class CommandNSSuspend : public Command
 			}
 		}
 
-		NickAlias *na = NickAlias::Find(nick);
+		NickServ::Nick *na = NickServ::FindNick(nick);
 		if (!na)
 		{
 			source.Reply(NICK_X_NOT_REGISTERED, nick.c_str());
@@ -109,7 +109,7 @@ class CommandNSSuspend : public Command
 			return;
 		}
 
-		NickCore *nc = na->nc;
+		NickServ::Account *nc = na->nc;
 
 		NSSuspendInfo *si = nc->Extend<NSSuspendInfo>("NS_SUSPENDED");
 		si->what = nc->display;
@@ -120,7 +120,7 @@ class CommandNSSuspend : public Command
 
 		for (unsigned i = 0; i < nc->aliases->size(); ++i)
 		{
-			NickAlias *na2 = nc->aliases->at(i);
+			NickServ::Nick *na2 = nc->aliases->at(i);
 
 			if (na2 && *na2->nc == *na->nc)
 			{
@@ -172,7 +172,7 @@ class CommandNSUnSuspend : public Command
 		if (Anope::ReadOnly)
 			source.Reply(READ_ONLY_MODE);
 
-		NickAlias *na = NickAlias::Find(nick);
+		NickServ::Nick *na = NickServ::FindNick(nick);
 		if (!na)
 		{
 			source.Reply(NICK_X_NOT_REGISTERED, nick.c_str());
@@ -231,7 +231,7 @@ class NSSuspend : public Module
 	{
 	}
 
-	void OnNickInfo(CommandSource &source, NickAlias *na, InfoFormatter &info, bool show_hidden) override
+	void OnNickInfo(CommandSource &source, NickServ::Nick *na, InfoFormatter &info, bool show_hidden) override
 	{
 		NSSuspendInfo *s = suspend.Get(na->nc);
 		if (s)
@@ -248,7 +248,7 @@ class NSSuspend : public Module
 		}
 	}
 
-	void OnPreNickExpire(NickAlias *na, bool &expire) override
+	void OnPreNickExpire(NickServ::Nick *na, bool &expire) override
 	{
 		NSSuspendInfo *s = suspend.Get(na->nc);
 		if (!s)
@@ -268,7 +268,7 @@ class NSSuspend : public Module
 		}
 	}
 
-	EventReturn OnNickValidate(User *u, NickAlias *na) override
+	EventReturn OnNickValidate(User *u, NickServ::Nick *na) override
 	{
 		NSSuspendInfo *s = suspend.Get(na->nc);
 		if (!s)

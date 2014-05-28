@@ -11,7 +11,7 @@ namespace WebCPanel
 namespace ChanServ
 {
 
-extern void BuildChanList(NickAlias *, TemplateFileServer::Replacements &);
+extern void BuildChanList(::NickServ::Nick *, TemplateFileServer::Replacements &);
 
 }
 

@@ -83,7 +83,7 @@ class CommandCSSetAutoOp : public Command
 			return;
 		}
 
-		ChannelInfo *ci = ChannelInfo::Find(params[0]);
+		ChanServ::Channel *ci = ChanServ::Find(params[0]);
 		if (ci == NULL)
 		{
 			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
@@ -145,7 +145,7 @@ class CommandCSSetBanType : public Command
 			return;
 		}
 
-		ChannelInfo *ci = ChannelInfo::Find(params[0]);
+		ChanServ::Channel *ci = ChanServ::Find(params[0]);
 		if (ci == NULL)
 		{
 			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
@@ -212,7 +212,7 @@ class CommandCSSetDescription : public Command
 			return;
 		}
 
-		ChannelInfo *ci = ChannelInfo::Find(params[0]);
+		ChanServ::Channel *ci = ChanServ::Find(params[0]);
 		const Anope::string &param = params.size() > 1 ? params[1] : "";
 		if (ci == NULL)
 		{
@@ -274,7 +274,7 @@ class CommandCSSetFounder : public Command
 			return;
 		}
 
-		ChannelInfo *ci = ChannelInfo::Find(params[0]);
+		ChanServ::Channel *ci = ChanServ::Find(params[0]);
 		if (ci == NULL)
 		{
 			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
@@ -292,14 +292,14 @@ class CommandCSSetFounder : public Command
 			return;
 		}
 
-		const NickAlias *na = NickAlias::Find(params[1]);
+		const NickServ::Nick *na = NickServ::FindNick(params[1]);
 		if (!na)
 		{
 			source.Reply(NICK_X_NOT_REGISTERED, params[1].c_str());
 			return;
 		}
 
-		NickCore *nc = na->nc;
+		NickServ::Account *nc = na->nc;
 		unsigned max_reg = Config->GetModule("chanserv")->Get<unsigned>("maxregistered");
 		if (max_reg && nc->channelcount >= max_reg && !source.HasPriv("chanserv/no-register-limit"))
 		{
@@ -343,7 +343,7 @@ class CommandCSSetKeepModes : public Command
 			return;
 		}
 
-		ChannelInfo *ci = ChannelInfo::Find(params[0]);
+		ChanServ::Channel *ci = ChanServ::Find(params[0]);
 		if (ci == NULL)
 		{
 			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
@@ -408,7 +408,7 @@ class CommandCSSetPeace : public Command
 			return;
 		}
 
-		ChannelInfo *ci = ChannelInfo::Find(params[0]);
+		ChanServ::Channel *ci = ChanServ::Find(params[0]);
 		if (ci == NULL)
 		{
 			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
@@ -480,7 +480,7 @@ class CommandCSSetPersist : public Command
 			return;
 		}
 
-		ChannelInfo *ci = ChannelInfo::Find(params[0]);
+		ChanServ::Channel *ci = ChanServ::Find(params[0]);
 		if (ci == NULL)
 		{
 			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
@@ -643,7 +643,7 @@ class CommandCSSetRestricted : public Command
 			return;
 		}
 
-		ChannelInfo *ci = ChannelInfo::Find(params[0]);
+		ChanServ::Channel *ci = ChanServ::Find(params[0]);
 		if (ci == NULL)
 		{
 			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
@@ -705,7 +705,7 @@ class CommandCSSetSecure : public Command
 			return;
 		}
 
-		ChannelInfo *ci = ChannelInfo::Find(params[0]);
+		ChanServ::Channel *ci = ChanServ::Find(params[0]);
 		if (ci == NULL)
 		{
 			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
@@ -769,7 +769,7 @@ class CommandCSSetSecureFounder : public Command
 			return;
 		}
 
-		ChannelInfo *ci = ChannelInfo::Find(params[0]);
+		ChanServ::Channel *ci = ChanServ::Find(params[0]);
 		if (ci == NULL)
 		{
 			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
@@ -833,7 +833,7 @@ class CommandCSSetSecureOps : public Command
 			return;
 		}
 
-		ChannelInfo *ci = ChannelInfo::Find(params[0]);
+		ChanServ::Channel *ci = ChanServ::Find(params[0]);
 		if (ci == NULL)
 		{
 			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
@@ -895,7 +895,7 @@ class CommandCSSetSignKick : public Command
 			return;
 		}
 
-		ChannelInfo *ci = ChannelInfo::Find(params[0]);
+		ChanServ::Channel *ci = ChanServ::Find(params[0]);
 		if (ci == NULL)
 		{
 			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
@@ -972,7 +972,7 @@ class CommandCSSetSuccessor : public Command
 			return;
 		}
 
-		ChannelInfo *ci = ChannelInfo::Find(params[0]);
+		ChanServ::Channel *ci = ChanServ::Find(params[0]);
 		const Anope::string &param = params.size() > 1 ? params[1] : "";
 		if (ci == NULL)
 		{
@@ -991,11 +991,11 @@ class CommandCSSetSuccessor : public Command
 			return;
 		}
 
-		NickCore *nc;
+		NickServ::Account *nc;
 
 		if (!param.empty())
 		{
-			const NickAlias *na = NickAlias::Find(param);
+			const NickServ::Nick *na = NickServ::FindNick(param);
 
 			if (!na)
 			{
@@ -1058,7 +1058,7 @@ class CommandCSSetNoexpire : public Command
 			return;
 		}
 
-		ChannelInfo *ci = ChannelInfo::Find(params[0]);
+		ChanServ::Channel *ci = ChanServ::Find(params[0]);
 		if (ci == NULL)
 		{
 			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
@@ -1124,10 +1124,10 @@ class CSSet : public Module
 		{
 			SerializableExtensibleItem<bool>::ExtensibleSerialize(e, s, data);
 
-			if (s->GetSerializableType()->GetName() != "ChannelInfo")
+			if (s->GetSerializableType()->GetName() != "ChanServ::Channel")
 				return;
 
-			const ChannelInfo *ci = anope_dynamic_static_cast<const ChannelInfo *>(s);
+			const ChanServ::Channel *ci = anope_dynamic_static_cast<const ChanServ::Channel *>(s);
 			Anope::string modes;
 			for (Channel::ModeList::const_iterator it = ci->last_modes.begin(); it != ci->last_modes.end(); ++it)
 			{
@@ -1144,10 +1144,10 @@ class CSSet : public Module
 		{
 			SerializableExtensibleItem<bool>::ExtensibleUnserialize(e, s, data);
 
-			if (s->GetSerializableType()->GetName() != "ChannelInfo")
+			if (s->GetSerializableType()->GetName() != "ChanServ::Channel")
 				return;
 
-			ChannelInfo *ci = anope_dynamic_static_cast<ChannelInfo *>(s);
+			ChanServ::Channel *ci = anope_dynamic_static_cast<ChanServ::Channel *>(s);
 			Anope::string modes;
 			data["last_modes"] >> modes;
 			for (spacesepstream sep(modes); sep.GetToken(modes);)
@@ -1169,10 +1169,10 @@ class CSSet : public Module
 		{
 			SerializableExtensibleItem<bool>::ExtensibleUnserialize(e, s, data);
 
-			if (s->GetSerializableType()->GetName() != "ChannelInfo" || !this->HasExt(e))
+			if (s->GetSerializableType()->GetName() != "ChanServ::Channel" || !this->HasExt(e))
 				return;
 
-			ChannelInfo *ci = anope_dynamic_static_cast<ChannelInfo *>(s);
+			ChanServ::Channel *ci = anope_dynamic_static_cast<ChanServ::Channel *>(s);
 			if (ci->c)
 				return;
 
@@ -1272,7 +1272,7 @@ class CSSet : public Module
 		persist_lower_ts = conf->GetModule(this)->Get<bool>("persist_lower_ts");
 	}
 
-	void OnCreateChan(ChannelInfo *ci) override
+	void OnCreateChan(ChanServ::Channel *ci) override
 	{
 		ci->bantype = Config->GetModule(this)->Get<int>("defbantype", "2");
 	}
@@ -1303,7 +1303,7 @@ class CSSet : public Module
 		return EVENT_CONTINUE;
 	}
 
-	void OnDelChan(ChannelInfo *ci) override
+	void OnDelChan(ChanServ::Channel *ci) override
 	{
 		if (ci->c && persist.HasExt(ci))
 			ci->c->RemoveMode(ci->WhoSends(), "PERM", "", false);
@@ -1357,11 +1357,11 @@ class CSSet : public Module
 		}
 	}
 
-	void OnSetCorrectModes(User *user, Channel *chan, AccessGroup &access, bool &give_modes, bool &take_modes) override
+	void OnSetCorrectModes(User *user, Channel *chan, ChanServ::AccessGroup &access, bool &give_modes, bool &take_modes) override
 	{
 		if (chan->ci)
 		{
-			if (noautoop.HasExt(chan->ci))	
+			if (noautoop.HasExt(chan->ci))
 				give_modes = false;
 			if (secureops.HasExt(chan->ci))
 				// This overrides what chanserv does because it is loaded after chanserv
@@ -1369,13 +1369,13 @@ class CSSet : public Module
 		}
 	}
 
-	void OnPreChanExpire(ChannelInfo *ci, bool &expire) override
+	void OnPreChanExpire(ChanServ::Channel *ci, bool &expire) override
 	{
 		if (noexpire.HasExt(ci))
 			expire = false;
 	}
 
-	void OnChanInfo(CommandSource &source, ChannelInfo *ci, InfoFormatter &info, bool show_all) override
+	void OnChanInfo(CommandSource &source, ChanServ::Channel *ci, InfoFormatter &info, bool show_all) override
 	{
 		if (!show_all)
 			return;

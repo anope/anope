@@ -13,7 +13,7 @@ namespace Event
 	{
 		/** Called when a user uses botserv/info on a bot or channel.
 		 */
-		virtual void OnBotInfo(CommandSource &source, BotInfo *bi, ChannelInfo *ci, InfoFormatter &info) anope_abstract;
+		virtual void OnBotInfo(CommandSource &source, BotInfo *bi, ChanServ::Channel *ci, InfoFormatter &info) anope_abstract;
 	};
 	extern CoreExport EventHandlers<BotInfoEvent> OnBotInfo;
 }

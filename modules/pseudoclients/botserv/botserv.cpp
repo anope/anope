@@ -10,9 +10,10 @@
  */
 
 #include "module.h"
+#include "modules/botserv.h"
 #include "modules/help.h"
 
-class BotServCore : public Module
+class BotServCore : public Module, public BotServ::BotServService
 	, public EventHook<Event::SetCorrectModes>
 	, public EventHook<Event::BotAssign>
 	, public EventHook<Event::JoinChannel>
@@ -28,6 +29,7 @@ class BotServCore : public Module
 
  public:
 	BotServCore(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PSEUDOCLIENT | VENDOR)
+		, BotServ::BotServService(this)
 		, EventHook<Event::SetCorrectModes>("OnSetCorrectModes")
 		, EventHook<Event::BotAssign>("OnBotAssign")
 		, EventHook<Event::JoinChannel>("OnJoinChannel")
@@ -48,7 +50,7 @@ class BotServCore : public Module
 		BotServ = BotInfo::Find(bsnick, true);
 	}
 
-	void OnSetCorrectModes(User *user, Channel *chan, AccessGroup &access, bool &give_modes, bool &take_modes) override
+	void OnSetCorrectModes(User *user, Channel *chan, ChanServ::AccessGroup &access, bool &give_modes, bool &take_modes) override
 	{
 		/* Do not allow removing bot modes on our service bots */
 		if (chan->ci && chan->ci->bi == user)
@@ -59,7 +61,7 @@ class BotServCore : public Module
 		}
 	}
 
-	void OnBotAssign(User *sender, ChannelInfo *ci, BotInfo *bi) override
+	void OnBotAssign(User *sender, ChanServ::Channel *ci, BotInfo *bi) override
 	{
 		if (ci->c && ci->c->users.size() >= Config->GetModule(this)->Get<unsigned>("minusers"))
 		{
@@ -128,7 +130,7 @@ class BotServCore : public Module
 		/* Channel is persistent, it shouldn't be deleted and the service bot should stay */
 		if (c->ci && persist && persist->HasExt(c->ci))
 			return;
-	
+
 		/* Channel is syncing from a netburst, don't destroy it as more users are probably wanting to join immediatly
 		 * We also don't part the bot here either, if necessary we will part it after the sync
 		 */
@@ -208,7 +210,7 @@ class BotServCore : public Module
 		return EVENT_CONTINUE;
 	}
 
-	void OnCreateChan(ChannelInfo *ci) override
+	void OnCreateChan(ChanServ::Channel *ci) override
 	{
 		/* Set default bot flags */
 		spacesepstream sep(Config->GetModule(this)->Get<const Anope::string>("defaults", "greet fantasy"));

@@ -81,19 +81,19 @@ struct DefconConfig
 	{
 		DefConModesOnParams.erase(name);
 	}
-	
+
 	bool GetDefConParam(const Anope::string &name, Anope::string &buf)
 	{
 	       std::map<Anope::string, Anope::string>::iterator it = DefConModesOnParams.find(name);
-	
+
 	       buf.clear();
-	
+
 	       if (it != DefConModesOnParams.end())
 	       {
 	               buf = it->second;
 	               return true;
 	       }
-	
+
 	       return false;
 	}
 };
@@ -334,7 +334,7 @@ class OSDefcon : public Module
 		if ((cm = ModeManager::FindChannelModeByName("REDIRECT")) && DConfig.DefConModesOn.count(cm->name) && !DConfig.DefConModesOn.count("LIMIT"))
 		{
 			DConfig.DefConModesOn.erase("REDIRECT");
-	
+
 			Log(this) << "DefConChanModes must lock mode +l as well to lock mode +L";
 		}
 	}

@@ -39,7 +39,7 @@ void SocketEngine::Init()
 
 	if (kq_fd < 0)
 		throw SocketException("Unable to create kqueue engine: " + Anope::LastError());
-	
+
 	change_events.resize(DefaultSize);
 	event_events.resize(DefaultSize);
 }
@@ -56,7 +56,7 @@ void SocketEngine::Change(Socket *s, bool set, SocketFlag flag)
 		return;
 
 	s->flags[flag] = set;
-	
+
 	int mod;
 	if (flag == SF_READABLE)
 		mod = EVFILT_READ;

@@ -42,7 +42,7 @@ class CommandHelp : public Command
 		EventReturn MOD_RESULT = this->onhelp(&Event::Help::OnPreHelp, source, params);
 		if (MOD_RESULT == EVENT_STOP)
 			return;
-	
+
 		Anope::string source_command = source.command;
 		const BotInfo *bi = source.service;
 		const CommandInfo::map &map = source.c ? Config->Fantasy : bi->commands;
@@ -151,7 +151,7 @@ class CommandHelp : public Command
 
 				if (hide_privileged_commands && !info.permission.empty() && !source.HasCommand(info.permission))
 					continue;
-				
+
 				// Allow unregistered users to see help for commands that they explicitly request help for
 
 				const Anope::string &subcommand = params.size() > max ? params[max] : "";
@@ -185,7 +185,7 @@ class CommandHelp : public Command
 			if (helped == false)
 				source.Reply(_("No help available for \002%s\002."), params[0].c_str());
 		}
-	
+
 		this->onhelp(&Event::Help::OnPostHelp, source, params);
 	}
 };

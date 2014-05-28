@@ -35,7 +35,7 @@ class Panel : public Section, public Service
 
 	std::vector<Section> sections;
 
-	NickAlias *GetNickFromSession(HTTPClient *client, HTTPMessage &msg)
+	NickServ::Nick *GetNickFromSession(HTTPClient *client, HTTPMessage &msg)
 	{
 		if (!client)
 			return NULL;
@@ -45,7 +45,7 @@ class Panel : public Section, public Service
 		if (acc.empty() || id.empty())
 			return NULL;
 
-		NickAlias *na = NickAlias::Find(acc);
+		NickServ::Nick *na = NickServ::FindNick(acc);
 		if (na == NULL)
 			return NULL;
 
@@ -83,7 +83,7 @@ class WebPanelProtectedPage : public WebPanelPage
 	bool OnRequest(HTTPProvider *provider, const Anope::string &page_name, HTTPClient *client, HTTPMessage &message, HTTPReply &reply) override final
 	{
 		ServiceReference<Panel> panel("Panel", "webcpanel");
-		NickAlias *na;
+		NickServ::Nick *na;
 
 		if (!panel || !(na = panel->GetNickFromSession(client, message)))
 		{
@@ -134,7 +134,7 @@ class WebPanelProtectedPage : public WebPanelPage
 		return this->OnRequest(provider, page_name, client, message, reply, na, replacements);
 	}
 
-	virtual bool OnRequest(HTTPProvider *, const Anope::string &, HTTPClient *, HTTPMessage &, HTTPReply &, NickAlias *, TemplateFileServer::Replacements &) = 0;
+	virtual bool OnRequest(HTTPProvider *, const Anope::string &, HTTPClient *, HTTPMessage &, HTTPReply &, NickServ::Nick *, TemplateFileServer::Replacements &) = 0;
 
 	/* What get data should be appended to links in the navbar */
 	virtual std::set<Anope::string> GetData() { return std::set<Anope::string>(); }
@@ -151,7 +151,7 @@ namespace WebPanel
 	 * @param r Replacements, reply from command goes back here into key
 	 * @param key The key to put the replies into r
 	 */
-	extern void RunCommand(const Anope::string &user, NickCore *nc, const Anope::string &service, const Anope::string &c, const std::vector<Anope::string> &params, TemplateFileServer::Replacements &r, const Anope::string &key = "MESSAGES");
+	extern void RunCommand(const Anope::string &user, NickServ::Account *nc, const Anope::string &service, const Anope::string &c, const std::vector<Anope::string> &params, TemplateFileServer::Replacements &r, const Anope::string &key = "MESSAGES");
 }
 
 #include "pages/index.h"

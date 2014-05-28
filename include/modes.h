@@ -179,7 +179,7 @@ class CoreExport ChannelModeStatus : public ChannelMode
 	/** constructor
 	 * @param name The mode name
 	 * @param mc The mode char
-	 * @param msymbol The symbol for the mode, eg @ % 
+	 * @param msymbol The symbol for the mode, eg @ %
 	 * @param mlevel A level for the mode, which is usually determined by the PREFIX capab
 	 */
 	ChannelModeStatus(const Anope::string &name, char mc, char msymbol, short mlevel);
@@ -333,7 +333,7 @@ class CoreExport ModeManager
 	 * @param set true for setting, false for removing
 	 * @param param The param, if there is one
 	 */
-	static void StackerAdd(BotInfo *bi, Channel *c, ChannelMode *cm, bool set, const Anope::string &param = "");
+	static void StackerAdd(User *bi, Channel *c, ChannelMode *cm, bool set, const Anope::string &param = "");
 
 	/** Add a mode to the stacker to be set on a user
 	 * @param bi The client to set the modes from
@@ -342,7 +342,7 @@ class CoreExport ModeManager
 	 * @param set true for setting, false for removing
 	 * @param param The param, if there is one
 	 */
-	static void StackerAdd(BotInfo *bi, User *u, UserMode *um, bool set, const Anope::string &param = "");
+	static void StackerAdd(User *bi, User *u, UserMode *um, bool set, const Anope::string &param = "");
 
 	/** Process all of the modes in the stacker and send them to the IRCd to be set on channels/users
 	 */

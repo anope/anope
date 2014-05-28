@@ -12,8 +12,6 @@
 
 #pragma once
 
-#include "account.h"
-#include "regchannel.h"
 #include "users.h"
 #include "opertype.h"
 #include <stack>

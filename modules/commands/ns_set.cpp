@@ -179,13 +179,13 @@ class CommandNSSASetPassword : public Command
 			return;
 		}
 
-		const NickAlias *setter_na = NickAlias::Find(params[0]);
+		const NickServ::Nick *setter_na = NickServ::FindNick(params[0]);
 		if (setter_na == NULL)
 		{
 			source.Reply(NICK_X_NOT_REGISTERED, params[0].c_str());
 			return;
 		}
-		NickCore *nc = setter_na->nc;
+		NickServ::Account *nc = setter_na->nc;
 
 		size_t len = params[1].length();
 
@@ -241,13 +241,13 @@ class CommandNSSetAutoOp : public Command
 			return;
 		}
 
-		const NickAlias *na = NickAlias::Find(user);
+		const NickServ::Nick *na = NickServ::FindNick(user);
 		if (na == NULL)
 		{
 			source.Reply(NICK_X_NOT_REGISTERED, user.c_str());
 			return;
 		}
-		NickCore *nc = na->nc;
+		NickServ::Account *nc = na->nc;
 
 		EventReturn MOD_RESULT;
 		MOD_RESULT = Event::OnSetNickOption(&Event::SetNickOption::OnSetNickOption, source, this, nc, param);
@@ -333,7 +333,7 @@ class CommandNSSetDisplay : public Command
 			return;
 		}
 
-		const NickAlias *user_na = NickAlias::Find(user), *na = NickAlias::Find(param);
+		const NickServ::Nick *user_na = NickServ::FindNick(user), *na = NickServ::FindNick(param);
 
 		if (Config->GetModule("nickserv")->Get<bool>("nonicknameownership"))
 		{
@@ -406,7 +406,7 @@ class CommandNSSetEmail : public Command
 	static bool SendConfirmMail(User *u, BotInfo *bi, const Anope::string &new_email)
 	{
 		Anope::string code = Anope::Random(9);
-	
+
 		std::pair<Anope::string, Anope::string> *n = u->Account()->Extend<std::pair<Anope::string, Anope::string> >("ns_set_email");
 		n->first = new_email;
 		n->second = code;
@@ -444,13 +444,13 @@ class CommandNSSetEmail : public Command
 			return;
 		}
 
-		const NickAlias *na = NickAlias::Find(user);
+		const NickServ::Nick *na = NickServ::FindNick(user);
 		if (!na)
 		{
 			source.Reply(NICK_X_NOT_REGISTERED, user.c_str());
 			return;
 		}
-		NickCore *nc = na->nc;
+		NickServ::Account *nc = na->nc;
 
 		if (nc->HasExt("UNCONFIRMED"))
 		{
@@ -557,13 +557,13 @@ class CommandNSSetKeepModes : public Command
 			return;
 		}
 
-		const NickAlias *na = NickAlias::Find(user);
+		const NickServ::Nick *na = NickServ::FindNick(user);
 		if (!na)
 		{
 			source.Reply(NICK_X_NOT_REGISTERED, user.c_str());
 			return;
 		}
-		NickCore *nc = na->nc;
+		NickServ::Account *nc = na->nc;
 
 		EventReturn MOD_RESULT;
 		MOD_RESULT = Event::OnSetNickOption(&Event::SetNickOption::OnSetNickOption, source, this, nc, param);
@@ -650,13 +650,13 @@ class CommandNSSetKill : public Command
 			return;
 		}
 
-		const NickAlias *na = NickAlias::Find(user);
+		const NickServ::Nick *na = NickServ::FindNick(user);
 		if (!na)
 		{
 			source.Reply(NICK_X_NOT_REGISTERED, user.c_str());
 			return;
 		}
-		NickCore *nc = na->nc;
+		NickServ::Account *nc = na->nc;
 
 		EventReturn MOD_RESULT;
 		MOD_RESULT = Event::OnSetNickOption(&Event::SetNickOption::OnSetNickOption, source, this, nc, param);
@@ -782,13 +782,13 @@ class CommandNSSetLanguage : public Command
 			return;
 		}
 
-		const NickAlias *na = NickAlias::Find(user);
+		const NickServ::Nick *na = NickServ::FindNick(user);
 		if (!na)
 		{
 			source.Reply(NICK_X_NOT_REGISTERED, user.c_str());
 			return;
 		}
-		NickCore *nc = na->nc;
+		NickServ::Account *nc = na->nc;
 
 		EventReturn MOD_RESULT;
 		MOD_RESULT = Event::OnSetNickOption(&Event::SetNickOption::OnSetNickOption, source, this, nc, param);
@@ -891,13 +891,13 @@ class CommandNSSetMessage : public Command
 			return;
 		}
 
-		const NickAlias *na = NickAlias::Find(user);
+		const NickServ::Nick *na = NickServ::FindNick(user);
 		if (!na)
 		{
 			source.Reply(NICK_X_NOT_REGISTERED, user.c_str());
 			return;
 		}
-		NickCore *nc = na->nc;
+		NickServ::Account *nc = na->nc;
 
 		if (!Config->GetBlock("options")->Get<bool>("useprivmsg"))
 		{
@@ -995,13 +995,13 @@ class CommandNSSetSecure : public Command
 			return;
 		}
 
-		const NickAlias *na = NickAlias::Find(user);
+		const NickServ::Nick *na = NickServ::FindNick(user);
 		if (!na)
 		{
 			source.Reply(NICK_X_NOT_REGISTERED, user.c_str());
 			return;
 		}
-		NickCore *nc = na->nc;
+		NickServ::Account *nc = na->nc;
 
 		EventReturn MOD_RESULT;
 		MOD_RESULT = Event::OnSetNickOption(&Event::SetNickOption::OnSetNickOption, source, this, nc, param);
@@ -1090,7 +1090,7 @@ class CommandNSSASetNoexpire : public Command
 			return;
 		}
 
-		NickAlias *na = NickAlias::Find(params[0]);
+		NickServ::Nick *na = NickServ::FindNick(params[0]);
 		if (na == NULL)
 		{
 			source.Reply(NICK_X_NOT_REGISTERED, params[0].c_str());
@@ -1168,7 +1168,7 @@ class NSSet : public Module
 
 	SerializableExtensibleItem<bool> autoop, killprotect, kill_quick, kill_immed,
 		message, secure, noexpire;
-	
+
 	struct KeepModes : SerializableExtensibleItem<bool>
 	{
 		KeepModes(Module *m, const Anope::string &n) : SerializableExtensibleItem<bool>(m, n) { }
@@ -1177,10 +1177,10 @@ class NSSet : public Module
 		{
 			SerializableExtensibleItem<bool>::ExtensibleSerialize(e, s, data);
 
-			if (s->GetSerializableType()->GetName() != "NickCore")
+			if (s->GetSerializableType()->GetName() != "NickServ::Account")
 				return;
 
-			const NickCore *nc = anope_dynamic_static_cast<const NickCore *>(s);
+			const NickServ::Account *nc = anope_dynamic_static_cast<const NickServ::Account *>(s);
 			Anope::string modes;
 			for (User::ModeList::const_iterator it = nc->last_modes.begin(); it != nc->last_modes.end(); ++it)
 			{
@@ -1197,10 +1197,10 @@ class NSSet : public Module
 		{
 			SerializableExtensibleItem<bool>::ExtensibleUnserialize(e, s, data);
 
-			if (s->GetSerializableType()->GetName() != "NickCore")
+			if (s->GetSerializableType()->GetName() != "NickServ::Account")
 				return;
 
-			NickCore *nc = anope_dynamic_static_cast<NickCore *>(s);
+			NickServ::Account *nc = anope_dynamic_static_cast<NickServ::Account *>(s);
 			Anope::string modes;
 			data["last_modes"] >> modes;
 			for (spacesepstream sep(modes); sep.GetToken(modes);)
@@ -1264,7 +1264,7 @@ class NSSet : public Module
 
 	EventReturn OnPreCommand(CommandSource &source, Command *command, std::vector<Anope::string> &params) override
 	{
-		NickCore *uac = source.nc;
+		NickServ::Account *uac = source.nc;
 
 		if (command->name == "nickserv/confirm" && !params.empty() && uac)
 		{
@@ -1285,7 +1285,7 @@ class NSSet : public Module
 		return EVENT_CONTINUE;
 	}
 
-	void OnSetCorrectModes(User *user, Channel *chan, AccessGroup &access, bool &give_modes, bool &take_modes) override
+	void OnSetCorrectModes(User *user, Channel *chan, ChanServ::AccessGroup &access, bool &give_modes, bool &take_modes) override
 	{
 		if (chan->ci)
 		{
@@ -1294,13 +1294,13 @@ class NSSet : public Module
 		}
 	}
 
-	void OnPreNickExpire(NickAlias *na, bool &expire) override
+	void OnPreNickExpire(NickServ::Nick *na, bool &expire) override
 	{
 		if (noexpire.HasExt(na))
 			expire = false;
 	}
 
-	void OnNickInfo(CommandSource &source, NickAlias *na, InfoFormatter &info, bool show_hidden) override
+	void OnNickInfo(CommandSource &source, NickServ::Nick *na, InfoFormatter &info, bool show_hidden) override
 	{
 		if (!show_hidden)
 			return;

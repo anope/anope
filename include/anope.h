@@ -441,13 +441,13 @@ namespace Anope
 	 */
 	extern CoreExport void Unhex(const string &src, string &dest);
 	extern CoreExport void Unhex(const string &src, char *dest, size_t sz);
-	
+
 	/** Base 64 encode a string
 	 * @param src The string to encode
 	 * @param target Where the encoded string is placed
 	 */
 	extern CoreExport void B64Encode(const string &src, string &target);
-	
+
 	/** Base 64 decode a string
 	 * @param src The base64 encoded string
 	 * @param target The plain text result
@@ -502,21 +502,21 @@ namespace Anope
 	 * @param nc The account to use language settings for to translate this string, if applicable
 	 * @return A human readable string, eg "1 minute"
 	 */
-	extern CoreExport Anope::string Duration(time_t seconds, const NickCore *nc = NULL);
+	extern CoreExport Anope::string Duration(time_t seconds, const NickServ::Account *nc = NULL);
 
 	/** Generates a human readable string of type "expires in ..."
 	 * @param expires time in seconds
 	 * @param nc The account to use language settings for to translate this string, if applicable
 	 * @return A human readable string, eg "expires in 5 days"
 	 */
-	extern CoreExport Anope::string Expires(time_t seconds, const NickCore *nc = NULL);
+	extern CoreExport Anope::string Expires(time_t seconds, const NickServ::Account *nc = NULL);
 
 	/** Converts a time in seconds (epoch) to a human readable format.
 	 * @param t The time
 	 * @param nc The account to use language settings for to translate this string, if applicable
 	 * @param short_output If true, the output is just a date (eg, "Apr 12 20:18:22 2009 MSD"), else it includes the date and how long ago/from now that date is, (eg "Apr 12 20:18:22 2009 MSD (1313 days, 9 hours, 32 minutes ago)"
 	 */
-	extern CoreExport Anope::string strftime(time_t t, const NickCore *nc = NULL, bool short_output = false);
+	extern CoreExport Anope::string strftime(time_t t, const NickServ::Account *nc = NULL, bool short_output = false);
 
 	/** Normalize buffer, stripping control characters and colors
 	 * @param A string to be parsed for control and color codes

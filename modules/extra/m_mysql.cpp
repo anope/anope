@@ -438,7 +438,7 @@ Query MySQLService::BuildInsert(const Anope::string &table, unsigned int id, Dat
 		*it->second >> buf;
 		query.SetValue(it->first, buf);
 	}
-	
+
 	return query;
 }
 
@@ -458,7 +458,7 @@ void MySQLService::Connect()
 
 	if (!connect)
 		throw SQL::Exception("Unable to connect to MySQL service " + this->name + ": " + mysql_error(this->sql));
-	
+
 	Log(LOG_DEBUG) << "Successfully connected to MySQL service " << this->name << " at " << this->server << ":" << this->port;
 }
 

@@ -75,13 +75,14 @@ class CommandCSList : public Command
 		ListFormatter list(source.GetAccount());
 		list.AddColumn(_("Name")).AddColumn(_("Description"));
 
-		Anope::map<ChannelInfo *> ordered_map;
-		for (registered_channel_map::const_iterator it = RegisteredChannelList->begin(), it_end = RegisteredChannelList->end(); it != it_end; ++it)
-			ordered_map[it->first] = it->second;
+		Anope::map<ChanServ::Channel *> ordered_map;
+		if (ChanServ::service)
+			for (auto& it : ChanServ::service->GetChannels())
+				ordered_map[it.first] = it.second;
 
-		for (Anope::map<ChannelInfo *>::const_iterator it = ordered_map.begin(), it_end = ordered_map.end(); it != it_end; ++it)
+		for (Anope::map<ChanServ::Channel *>::const_iterator it = ordered_map.begin(), it_end = ordered_map.end(); it != it_end; ++it)
 		{
-			const ChannelInfo *ci = it->second;
+			const ChanServ::Channel *ci = it->second;
 
 			if (!is_servadmin)
 			{
@@ -185,7 +186,7 @@ class CommandCSSetPrivate : public Command
 			return;
 		}
 
-		ChannelInfo *ci = ChannelInfo::Find(params[0]);
+		ChanServ::Channel *ci = ChanServ::Find(params[0]);
 		if (ci == NULL)
 		{
 			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
@@ -225,7 +226,7 @@ class CommandCSSetPrivate : public Command
 		this->SendSyntax(source);
 		source.Reply(" ");
 		source.Reply(_("Enables or disables the \002private\002 option for a channel."));
-		
+
 		BotInfo *bi;
 		Anope::string cmd;
 		if (Command::FindCommandFromService("chanserv/list", bi, cmd))
@@ -252,7 +253,7 @@ class CSList : public Module
 	{
 	}
 
-	void OnChanInfo(CommandSource &source, ChannelInfo *ci, InfoFormatter &info, bool show_all) override
+	void OnChanInfo(CommandSource &source, ChanServ::Channel *ci, InfoFormatter &info, bool show_all) override
 	{
 		if (!show_all)
 			return;

@@ -7,7 +7,7 @@
 
 #include "dir.h"
 #include <stdio.h>
- 
+
 DIR *opendir(const char *path)
 {
 	char real_path[MAX_PATH];

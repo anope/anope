@@ -66,7 +66,7 @@ class CertService : public Service
  public:
 	CertService(Module *c) : Service(c, "CertService", "certs") { }
 
-	virtual NickCore* FindAccountFromCert(const Anope::string &cert) = 0;
+	virtual NickServ::Account* FindAccountFromCert(const Anope::string &cert) = 0;
 };
 
 namespace Event
@@ -77,18 +77,18 @@ namespace Event
 		 * @param nc The nick
 		 * @param entry The entry
 		 */
-		virtual void OnNickAddCert(NickCore *nc, const Anope::string &entry) anope_abstract;
+		virtual void OnNickAddCert(NickServ::Account *nc, const Anope::string &entry) anope_abstract;
 
-		/** Called from NickCore::EraseCert()
-		 * @param nc pointer to the NickCore
+		/** Called from NickServ::Account::EraseCert()
+		 * @param nc pointer to the NickServ::Account
 		 * @param entry The fingerprint
 		 */
-		virtual void OnNickEraseCert(NickCore *nc, const Anope::string &entry) anope_abstract;
+		virtual void OnNickEraseCert(NickServ::Account *nc, const Anope::string &entry) anope_abstract;
 
-		/** called from NickCore::ClearCert()
-		 * @param nc pointer to the NickCore
+		/** called from NickServ::Account::ClearCert()
+		 * @param nc pointer to the NickServ::Account
 		 */
-		virtual void OnNickClearCert(NickCore *nc) anope_abstract;
+		virtual void OnNickClearCert(NickServ::Account *nc) anope_abstract;
 	};
 }
 

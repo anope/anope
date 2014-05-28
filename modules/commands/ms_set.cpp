@@ -14,10 +14,10 @@
 class CommandMSSet : public Command
 {
  private:
-	void DoNotify(CommandSource &source, const std::vector<Anope::string> &params, MemoInfo *mi)
+	void DoNotify(CommandSource &source, const std::vector<Anope::string> &params, MemoServ::MemoInfo *mi)
 	{
 		const Anope::string &param = params[1];
-		NickCore *nc = source.nc;
+		NickServ::Account *nc = source.nc;
 		BotInfo *MemoServ = Config->GetClient("MemoServ");
 
 		if (!MemoServ)
@@ -67,7 +67,7 @@ class CommandMSSet : public Command
 			this->OnSyntaxError(source, "");
 	}
 
-	void DoLimit(CommandSource &source, const std::vector<Anope::string> &params, MemoInfo *mi)
+	void DoLimit(CommandSource &source, const std::vector<Anope::string> &params, MemoServ::MemoInfo *mi)
 	{
 
 		Anope::string p1 = params[1];
@@ -75,8 +75,8 @@ class CommandMSSet : public Command
 		Anope::string p3 = params.size() > 3 ? params[3] : "";
 		Anope::string user, chan;
 		int16_t limit;
-		NickCore *nc = source.nc;
-		ChannelInfo *ci = NULL;
+		NickServ::Account *nc = source.nc;
+		ChanServ::Channel *ci = NULL;
 		bool is_servadmin = source.HasPriv("memoserv/set-limit");
 
 		if (p1[0] == '#')
@@ -86,7 +86,7 @@ class CommandMSSet : public Command
 			p2 = p3;
 			p3 = params.size() > 4 ? params[4] : "";
 
-			ci = ChannelInfo::Find(chan);
+			ci = ChanServ::Find(chan);
 			if (!ci)
 			{
 				source.Reply(CHAN_X_NOT_REGISTERED, chan.c_str());
@@ -97,20 +97,20 @@ class CommandMSSet : public Command
 				source.Reply(ACCESS_DENIED);
 				return;
 			}
-			mi = &ci->memos;
+			mi = ci->memos;
 		}
 		if (is_servadmin)
 		{
 			if (!p2.empty() && !p2.equals_ci("HARD") && chan.empty())
 			{
-				const NickAlias *na;
-				if (!(na = NickAlias::Find(p1)))
+				const NickServ::Nick *na;
+				if (!(na = NickServ::FindNick(p1)))
 				{
 					source.Reply(NICK_X_NOT_REGISTERED, p1.c_str());
 					return;
 				}
 				user = p1;
-				mi = &na->nc->memos;
+				mi = na->nc->memos;
 				nc = na->nc;
 				p1 = p2;
 				p2 = p3;
@@ -210,7 +210,7 @@ class CommandMSSet : public Command
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		const Anope::string &cmd = params[0];
-		MemoInfo *mi = &source.nc->memos;
+		MemoServ::MemoInfo *mi = source.nc->memos;
 
 		if (Anope::ReadOnly)
 			source.Reply(_("Sorry, memo option setting is temporarily disabled."));
@@ -219,11 +219,7 @@ class CommandMSSet : public Command
 		else if (cmd.equals_ci("LIMIT"))
 			return this->DoLimit(source, params, mi);
 		else
-		{
 			this->OnSyntaxError(source, "");
-		}
-
-		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override

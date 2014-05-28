@@ -12,19 +12,19 @@
 #include "module.h"
 #include "modules/memoserv.h"
 
-static void rsend_notify(CommandSource &source, MemoInfo *mi, Memo *m, const Anope::string &targ)
+static void rsend_notify(CommandSource &source, MemoServ::MemoInfo *mi, MemoServ::Memo *m, const Anope::string &targ)
 {
 	/* Only send receipt if memos are allowed */
 	if (MemoServ::service && !Anope::ReadOnly)
 	{
 		/* Get nick alias for sender */
-		const NickAlias *na = NickAlias::Find(m->sender);
+		const NickServ::Nick *na = NickServ::FindNick(m->sender);
 
 		if (!na)
 			return;
 
 		/* Get nick core for sender */
-		const NickCore *nc = na->nc;
+		const NickServ::Account *nc = na->nc;
 
 		if (!nc)
 			return;
@@ -49,10 +49,10 @@ static void rsend_notify(CommandSource &source, MemoInfo *mi, Memo *m, const Ano
 class MemoListCallback : public NumberList
 {
 	CommandSource &source;
-	MemoInfo *mi;
-	const ChannelInfo *ci;
+	MemoServ::MemoInfo *mi;
+	const ChanServ::Channel *ci;
  public:
-	MemoListCallback(CommandSource &_source, MemoInfo *_mi, const ChannelInfo *_ci, const Anope::string &numlist) : NumberList(numlist, false), source(_source), mi(_mi), ci(_ci)
+	MemoListCallback(CommandSource &_source, MemoServ::MemoInfo *_mi, const ChanServ::Channel *_ci, const Anope::string &numlist) : NumberList(numlist, false), source(_source), mi(_mi), ci(_ci)
 	{
 	}
 
@@ -64,12 +64,12 @@ class MemoListCallback : public NumberList
 		MemoListCallback::DoRead(source, mi, ci, number - 1);
 	}
 
-	static void DoRead(CommandSource &source, MemoInfo *mi, const ChannelInfo *ci, unsigned index)
+	static void DoRead(CommandSource &source, MemoServ::MemoInfo *mi, const ChanServ::Channel *ci, unsigned index)
 	{
-		Memo *m = mi->GetMemo(index);
+		MemoServ::Memo *m = mi->GetMemo(index);
 		if (!m)
 			return;
-			
+
 		if (ci)
 			source.Reply(_("Memo %d from %s (%s)."), index + 1, m->sender.c_str(), Anope::strftime(m->time, source.GetAccount()).c_str());
 		else
@@ -106,8 +106,8 @@ class CommandMSRead : public Command
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 
-		MemoInfo *mi;
-		ChannelInfo *ci = NULL;
+		MemoServ::MemoInfo *mi;
+		ChanServ::Channel *ci = NULL;
 		Anope::string numstr = params[0], chan;
 
 		if (!numstr.empty() && numstr[0] == '#')
@@ -115,7 +115,7 @@ class CommandMSRead : public Command
 			chan = numstr;
 			numstr = params.size() > 1 ? params[1] : "";
 
-			ci = ChannelInfo::Find(chan);
+			ci = ChanServ::Find(chan);
 			if (!ci)
 			{
 				source.Reply(CHAN_X_NOT_REGISTERED, chan.c_str());
@@ -126,10 +126,10 @@ class CommandMSRead : public Command
 				source.Reply(ACCESS_DENIED);
 				return;
 			}
-			mi = &ci->memos;
+			mi = ci->memos;
 		}
 		else
-			mi = &source.nc->memos;
+			mi = source.nc->memos;
 
 		if (numstr.empty() || (!numstr.equals_ci("LAST") && !numstr.equals_ci("NEW") && !numstr.is_number_only()))
 			this->OnSyntaxError(source, numstr);

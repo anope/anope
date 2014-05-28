@@ -8,7 +8,7 @@
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
  */
- 
+
 #ifndef WINDOWS_H
 #define WINDOWS_H
 #ifdef _WIN32
@@ -71,7 +71,7 @@ namespace Anope
 {
 	class string;
 }
- 
+
 extern CoreExport void OnStartup();
 extern CoreExport void OnShutdown();
 extern CoreExport USHORT WindowsGetLanguage(const char *lang);

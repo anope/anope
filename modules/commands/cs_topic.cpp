@@ -31,7 +31,7 @@ class CommandCSSetKeepTopic : public Command
 			return;
 		}
 
-		ChannelInfo *ci = ChannelInfo::Find(params[0]);
+		ChanServ::Channel *ci = ChanServ::Find(params[0]);
 		if (ci == NULL)
 		{
 			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
@@ -82,7 +82,7 @@ class CommandCSTopic : public Command
 {
 	ExtensibleRef<bool> topiclock;
 
-	void Lock(CommandSource &source, ChannelInfo *ci, const std::vector<Anope::string> &params)
+	void Lock(CommandSource &source, ChanServ::Channel *ci, const std::vector<Anope::string> &params)
 	{
 		if (Anope::ReadOnly)
 		{
@@ -99,7 +99,7 @@ class CommandCSTopic : public Command
 		source.Reply(_("Topic lock option for %s is now \002on\002."), ci->name.c_str());
 	}
 
-	void Unlock(CommandSource &source, ChannelInfo *ci, const std::vector<Anope::string> &params)
+	void Unlock(CommandSource &source, ChanServ::Channel *ci, const std::vector<Anope::string> &params)
 	{
 		if (Anope::ReadOnly)
 		{
@@ -116,7 +116,7 @@ class CommandCSTopic : public Command
 		source.Reply(_("Topic lock option for %s is now \002off\002."), ci->name.c_str());
 	}
 
-	void Set(CommandSource &source, ChannelInfo *ci, const std::vector<Anope::string> &params)
+	void Set(CommandSource &source, ChanServ::Channel *ci, const std::vector<Anope::string> &params)
 	{
 		const Anope::string &topic = params.size() > 2 ? params[2] : "";
 
@@ -125,12 +125,12 @@ class CommandCSTopic : public Command
 		ci->c->ChangeTopic(source.GetNick(), topic, Anope::CurTime);
 		if (has_topiclock)
 			topiclock->Set(ci);
-	
+
 		bool override = !source.AccessFor(ci).HasPriv("TOPIC");
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << (!topic.empty() ? "to change the topic to: " : "to unset the topic") << (!topic.empty() ? topic : "");
 	}
 
-	void Append(CommandSource &source, ChannelInfo *ci, const std::vector<Anope::string> &params)
+	void Append(CommandSource &source, ChanServ::Channel *ci, const std::vector<Anope::string> &params)
 	{
 		const Anope::string &topic = params[2];
 
@@ -165,7 +165,7 @@ class CommandCSTopic : public Command
 	{
 		const Anope::string &subcmd = params[1];
 
-		ChannelInfo *ci = ChannelInfo::Find(params[0]);
+		ChanServ::Channel *ci = ChanServ::Find(params[0]);
 		if (ci == NULL)
 			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
 		else if (!source.AccessFor(ci).HasPriv("TOPIC") && !source.HasCommand("chanserv/topic"))
@@ -256,7 +256,7 @@ class CSTopic : public Module
 		}
 	}
 
-	void OnChanInfo(CommandSource &source, ChannelInfo *ci, InfoFormatter &info, bool show_all) override
+	void OnChanInfo(CommandSource &source, ChanServ::Channel *ci, InfoFormatter &info, bool show_all) override
 	{
 		if (keeptopic.HasExt(ci))
 			info.AddOption(_("Topic retention"));

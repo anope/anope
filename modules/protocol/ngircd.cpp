@@ -118,7 +118,7 @@ class ngIRCdProto : public IRCDProto
 			UplinkSocket::Message(source) << "KICK " << chan->name << " " << user->nick;
 	}
 
-	void SendLogin(User *u, NickAlias *na) override
+	void SendLogin(User *u, NickServ::Nick *na) override
 	{
 		UplinkSocket::Message(Me) << "METADATA " << u->GetUID() << " accountname :" << na->nc->display;
 	}
@@ -126,7 +126,7 @@ class ngIRCdProto : public IRCDProto
 	void SendLogout(User *u) override
 	{
 		UplinkSocket::Message(Me) << "METADATA " << u->GetUID() << " accountname :";
-	} 
+	}
 
 	void SendModeInternal(const MessageSource &source, const Channel *dest, const Anope::string &buf) override
 	{
@@ -345,7 +345,7 @@ struct IRCDMessageMetadata : IRCDMessage
 		}
 		if (params[1].equals_cs("accountname"))
 		{
-			NickCore *nc = NickCore::Find(params[2]);
+			NickServ::Account *nc = NickServ::FindAccount(params[2]);
 			if (nc)
 				u->Login(nc);
 		}
@@ -492,7 +492,7 @@ struct IRCDMessageNJoin : IRCDMessage
 				continue;
 			}
 			users.push_back(sju);
-		} 
+		}
 
 		Message::Join::SJoin(source, params[0], 0, "", users);
 	}

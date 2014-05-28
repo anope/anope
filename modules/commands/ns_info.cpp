@@ -29,7 +29,7 @@ class CommandNSInfo : public Command
 	{
 
 		const Anope::string &nick = params.size() ? params[0] : (source.nc ? source.nc->display : source.GetNick());
-		NickAlias *na = NickAlias::Find(nick);
+		NickServ::Nick *na = NickServ::FindNick(nick);
 		bool has_auspex = source.HasPriv("nickserv/auspex");
 
 		if (!na)
@@ -150,13 +150,13 @@ class CommandNSSetHide : public Command
 			return;
 		}
 
-		const NickAlias *na = NickAlias::Find(user);
+		const NickServ::Nick *na = NickServ::FindNick(user);
 		if (!na)
 		{
 			source.Reply(NICK_X_NOT_REGISTERED, user.c_str());
 			return;
 		}
-		NickCore *nc = na->nc;
+		NickServ::Account *nc = na->nc;
 
 		EventReturn MOD_RESULT = Event::OnSetNickOption(&Event::SetNickOption::OnSetNickOption, source, this, nc, param);
 		if (MOD_RESULT == EVENT_STOP)

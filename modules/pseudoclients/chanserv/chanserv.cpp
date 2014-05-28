@@ -10,14 +10,17 @@
  */
 
 #include "module.h"
+#include "channel.h"
 #include "modules/cs_mode.h"
 #include "modules/help.h"
 #include "modules/bs_bot.h"
 #include "modules/chanserv.h"
 #include "modules/cs_info.h"
+#include "modules/cs_akick.h"
 
 class ChanServCore : public Module
 	, public ChanServ::ChanServService
+	, public EventHook<Event::ChannelCreate>
 	, public EventHook<Event::BotDelete>
 	, public EventHook<Event::BotPrivmsg>
 	, public EventHook<Event::DelCore>
@@ -44,10 +47,15 @@ class ChanServCore : public Module
 	bool always_lower;
 	EventHandlers<ChanServ::Event::PreChanExpire> OnPreChanExpire;
 	EventHandlers<ChanServ::Event::ChanExpire> OnChanExpire;
+	std::vector<ChanServ::Privilege> Privileges;
+	std::vector<ChanServ::AccessProvider *> Providers;
+	Serialize::Checker<ChanServ::registered_channel_map> registered_channels;
+	Serialize::Type channel_type, access_type;
 
  public:
 	ChanServCore(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PSEUDOCLIENT | VENDOR)
 		, ChanServService(this)
+		, EventHook<Event::ChannelCreate>("OnChannelCreate")
 		, EventHook<Event::BotDelete>("OnBotDelete")
 		, EventHook<Event::BotPrivmsg>("OnBotPrivmsg")
 		, EventHook<Event::DelCore>("OnDelCore")
@@ -71,7 +79,31 @@ class ChanServCore : public Module
 		, always_lower(false)
 		, OnPreChanExpire(this, "OnPreChanExpire")
 		, OnChanExpire(this, "OnChanExpire")
+		, registered_channels("ChannelInfo")
+		, channel_type("ChannelInfo", ChannelImpl::Unserialize)
+		, access_type("ChanAccess", Unserialize)
 	{
+	}
+
+	ChanServ::Channel *Create(const Anope::string &name) override
+	{
+		return new ChannelImpl(name);
+	}
+
+	ChanServ::Channel *Create(const ChanServ::Channel &ci) override
+	{
+		return new ChannelImpl(ci);
+	}
+
+	ChanServ::Channel *Find(const Anope::string &name) override
+	{
+		auto it = registered_channels->find(name);
+		return it != registered_channels->end() ? it->second : nullptr;
+	}
+
+	ChanServ::registered_channel_map& GetChannels() override
+	{
+		return registered_channels;
 	}
 
 	void Hold(Channel *c) override
@@ -86,7 +118,7 @@ class ChanServCore : public Module
 			Reference<Channel> c;
 
 		 public:
-		 	/** Constructor
+			/** Constructor
 			 * @param chan The channel
 			 */
 			ChanServTimer(Reference<BotInfo> &cs, ExtensibleItem<bool> &i, Module *m, Channel *chan) : Timer(m, Config->GetModule(m)->Get<time_t>("inhabit", "15s")), ChanServ(cs), inhabit(i), c(chan)
@@ -137,6 +169,166 @@ class ChanServCore : public Module
 		new ChanServTimer(ChanServ, inhabit, this->owner, c);
 	}
 
+	void AddPrivilege(ChanServ::Privilege p) override
+	{
+		unsigned i;
+		for (i = 0; i < Privileges.size(); ++i)
+		{
+			ChanServ::Privilege &priv = Privileges[i];
+
+			if (priv.rank > p.rank)
+				break;
+		}
+
+		Privileges.insert(Privileges.begin() + i, p);
+	}
+
+	void RemovePrivilege(ChanServ::Privilege &p) override
+	{
+		std::vector<ChanServ::Privilege>::iterator it = std::find(Privileges.begin(), Privileges.end(), p);
+		if (it != Privileges.end())
+			Privileges.erase(it);
+
+		for (auto& cit : GetChannels())
+		{
+			ChanServ::Channel *ci = cit.second;
+			ci->QueueUpdate();
+			ci->RemoveLevel(p.name);
+		}
+	}
+
+	ChanServ::Privilege *FindPrivilege(const Anope::string &name) override
+	{
+		for (unsigned i = Privileges.size(); i > 0; --i)
+			if (Privileges[i - 1].name.equals_ci(name))
+				return &Privileges[i - 1];
+		return NULL;
+	}
+
+	std::vector<ChanServ::Privilege> &GetPrivileges() override
+	{
+		return Privileges;
+	}
+
+	void ClearPrivileges() override
+	{
+		Privileges.clear();
+	}
+
+	std::vector<ChanServ::AccessProvider *>& GetProviders() override
+	{
+		return Providers;
+	}
+
+	void Destruct(ChanServ::ChanAccess *access) override
+	{
+		if (access->ci)
+		{
+			std::vector<ChanServ::ChanAccess *>::iterator it = std::find(access->ci->access->begin(), access->ci->access->end(), access);
+			if (it != access->ci->access->end())
+				access->ci->access->erase(it);
+
+			const NickServ::Nick *na = NickServ::FindNick(access->mask);
+			if (na != NULL)
+				na->nc->RemoveChannelReference(access->ci);
+			else
+			{
+				ChanServ::Channel *c = this->Find(access->mask);
+				if (c)
+					c->RemoveChannelReference(access->ci->name);
+			}
+		}
+	}
+
+	void Serialize(const ChanServ::ChanAccess *, Serialize::Data &data) override
+	{
+	}
+
+	bool Matches(const ChanServ::ChanAccess *access, const User *u, const NickServ::Account *acc, ChanServ::ChanAccess::Path &p) override
+	{
+		if (access->nc)
+			return access->nc == acc;
+
+		if (u)
+		{
+			bool is_mask = access->mask.find_first_of("!@?*") != Anope::string::npos;
+			if (is_mask && Anope::Match(u->nick, access->mask))
+				return true;
+			else if (Anope::Match(u->GetDisplayedMask(), access->mask))
+				return true;
+		}
+
+		if (acc)
+		{
+			for (unsigned i = 0; i < acc->aliases->size(); ++i)
+			{
+				const NickServ::Nick *na = acc->aliases->at(i);
+				if (Anope::Match(na->nick, access->mask))
+					return true;
+			}
+		}
+
+		if (IRCD->IsChannelValid(access->mask))
+		{
+			ChanServ::Channel *tci = Find(access->mask);
+			if (tci)
+			{
+				for (unsigned i = 0; i < tci->GetAccessCount(); ++i)
+				{
+					ChanServ::ChanAccess *a = tci->GetAccess(i);
+					std::pair<const ChanServ::ChanAccess *, const ChanServ::ChanAccess *> pair = std::make_pair(access, a);
+
+					std::pair<Set::iterator, Set::iterator> range = p.first.equal_range(access);
+					for (; range.first != range.second; ++range.first)
+						if (range.first->first == pair.first && range.first->second == pair.second)
+							goto cont;
+
+					p.first.insert(pair);
+					if (a->Matches(u, acc, p))
+						p.second.insert(pair);
+
+					cont:;
+				}
+
+				return p.second.count(access) > 0;
+			}
+		}
+
+		return false;
+	}
+
+	static Serializable* Unserialize(Serializable *obj, Serialize::Data &data)
+	{
+		Anope::string provider, chan;
+
+		data["provider"] >> provider;
+		data["ci"] >> chan;
+
+		ServiceReference<ChanServ::AccessProvider> aprovider("AccessProvider", provider);
+		ChanServ::Channel *ci = ChanServ::service->Find(chan);
+		if (!aprovider || !ci)
+			return NULL;
+
+		ChanServ::ChanAccess *access;
+		if (obj)
+			access = anope_dynamic_static_cast<ChanServ::ChanAccess *>(obj);
+		else
+			access = aprovider->Create();
+		access->ci = ci;
+		data["mask"] >> access->mask;
+		data["creator"] >> access->creator;
+		data["last_seen"] >> access->last_seen;
+		data["created"] >> access->created;
+
+		Anope::string adata;
+		data["data"] >> adata;
+		access->AccessUnserialize(adata);
+
+		if (!obj)
+			ci->AddAccess(access);
+		return access;
+	}
+
 	void OnReload(Configuration::Conf *conf) override
 	{
 		const Anope::string &channick = conf->GetModule(this)->Get<const Anope::string>("client");
@@ -150,6 +342,18 @@ class ChanServCore : public Module
 
 		ChanServ = bi;
 
+		ClearPrivileges();
+		for (int i = 0; i < conf->CountBlock("privilege"); ++i)
+		{
+			Configuration::Block *privilege = conf->GetBlock("privilege", i);
+
+			const Anope::string &nname = privilege->Get<const Anope::string>("name"),
+						&desc = privilege->Get<const Anope::string>("desc");
+			int rank = privilege->Get<int>("rank");
+
+			AddPrivilege(ChanServ::Privilege(nname, desc, rank));
+		}
+
 		spacesepstream(conf->GetModule(this)->Get<const Anope::string>("defaults", "greet fantasy")).GetTokens(defaults);
 		if (defaults.empty())
 		{
@@ -162,6 +366,13 @@ class ChanServCore : public Module
 			defaults.clear();
 
 		always_lower = conf->GetModule(this)->Get<bool>("always_lower_ts");
+	}
+
+	void OnChannelCreate(Channel *c) override
+	{
+		c->ci = Find(c->name);
+		if (c->ci)
+			c->ci->c = c;
 	}
 
 	void OnBotDelete(BotInfo *bi) override
@@ -181,28 +392,28 @@ class ChanServCore : public Module
 		return EVENT_CONTINUE;
 	}
 
-	void OnDelCore(NickCore *nc) override
+	void OnDelCore(NickServ::Account *nc) override
 	{
-		std::deque<ChannelInfo *> chans;
+		std::deque<ChanServ::Channel *> chans;
 		nc->GetChannelReferences(chans);
 		int max_reg = Config->GetModule(this)->Get<int>("maxregistered");
 
 		for (unsigned i = 0; i < chans.size(); ++i)
 		{
-			ChannelInfo *ci = chans[i];
+			ChanServ::Channel *ci = chans[i];
 
 			if (ci->GetFounder() == nc)
 			{
-				NickCore *newowner = NULL;
+				NickServ::Account *newowner = NULL;
 				if (ci->GetSuccessor() && ci->GetSuccessor() != nc && (ci->GetSuccessor()->IsServicesOper() || !max_reg || ci->GetSuccessor()->channelcount < max_reg))
 					newowner = ci->GetSuccessor();
 				else
 				{
-					const ChanAccess *highest = NULL;
+					const ChanServ::ChanAccess *highest = NULL;
 					for (unsigned j = 0; j < ci->GetAccessCount(); ++j)
 					{
-						const ChanAccess *ca = ci->GetAccess(j);
-						const NickCore *anc = NickCore::Find(ca->mask);
+						const ChanServ::ChanAccess *ca = ci->GetAccess(j);
+						const NickServ::Account *anc = NickServ::FindAccount(ca->mask);
 
 						if (!anc || (!anc->IsServicesOper() && max_reg && anc->channelcount >= max_reg) || (anc == nc))
 							continue;
@@ -210,7 +421,7 @@ class ChanServCore : public Module
 							highest = ca;
 					}
 					if (highest)
-						newowner = NickCore::Find(highest->mask);
+						newowner = NickServ::FindAccount(highest->mask);
 				}
 
 				if (newowner)
@@ -233,8 +444,8 @@ class ChanServCore : public Module
 
 			for (unsigned j = 0; j < ci->GetAccessCount(); ++j)
 			{
-				const ChanAccess *ca = ci->GetAccess(j);
-				const NickCore *anc = NickCore::Find(ca->mask);
+				const ChanServ::ChanAccess *ca = ci->GetAccess(j);
+				const NickServ::Account *anc = NickServ::FindAccount(ca->mask);
 
 				if (anc && anc == nc)
 				{
@@ -245,8 +456,8 @@ class ChanServCore : public Module
 
 			for (unsigned j = 0; j < ci->GetAkickCount(); ++j)
 			{
-				const AutoKick *akick = ci->GetAkick(j);
-				if (akick->nc == nc)
+				const AutoKick *ak = ci->GetAkick(j);
+				if (ak->nc == nc)
 				{
 					ci->EraseAkick(j);
 					break;
@@ -255,7 +466,7 @@ class ChanServCore : public Module
 		}
 	}
 
-	void OnDelChan(ChannelInfo *ci) override
+	void OnDelChan(ChanServ::Channel *ci) override
 	{
 		/* remove access entries that are this channel */
 
@@ -264,13 +475,13 @@ class ChanServCore : public Module
 
 		for (unsigned i = 0; i < chans.size(); ++i)
 		{
-			ChannelInfo *c = ChannelInfo::Find(chans[i]);
+			ChanServ::Channel *c = ChanServ::Find(chans[i]);
 			if (!c)
 				continue;
 
 			for (unsigned j = 0; j < c->GetAccessCount(); ++j)
 			{
-				ChanAccess *a = c->GetAccess(j);
+				ChanServ::ChanAccess *a = c->GetAccess(j);
 
 				if (a->mask.equals_ci(ci->name))
 				{
@@ -342,7 +553,7 @@ class ChanServCore : public Module
 		}
 	}
 
-	void OnCreateChan(ChannelInfo *ci) override
+	void OnCreateChan(ChanServ::Channel *ci) override
 	{
 		/* Set default chan flags */
 		for (unsigned i = 0; i < defaults.size(); ++i)
@@ -379,9 +590,9 @@ class ChanServCore : public Module
 		if (!chanserv_expire || Anope::NoExpire || Anope::ReadOnly)
 			return;
 
-		for (registered_channel_map::const_iterator it = RegisteredChannelList->begin(), it_end = RegisteredChannelList->end(); it != it_end; )
+		for (auto it = registered_channels->begin(); it != registered_channels->end();)
 		{
-			ChannelInfo *ci = it->second;
+			ChanServ::Channel *ci = it->second;
 			++it;
 
 			bool expire = false;
@@ -428,9 +639,9 @@ class ChanServCore : public Module
 		if (!persist)
 			return;
 		/* Find all persistent channels and create them, as we are about to finish burst to our uplink */
-		for (registered_channel_map::iterator it = RegisteredChannelList->begin(), it_end = RegisteredChannelList->end(); it != it_end; ++it)
+		for (auto& it : *registered_channels)
 		{
-			ChannelInfo *ci = it->second;
+			ChanServ::Channel *ci = it.second;
 			if (persist->Get(ci))
 			{
 				bool c;
@@ -456,8 +667,8 @@ class ChanServCore : public Module
 		}
 
 	}
-	
-	void OnChanRegistered(ChannelInfo *ci) override
+
+	void OnChanRegistered(ChanServ::Channel *ci) override
 	{
 		if (!persist || !ci->c)
 			return;
@@ -499,7 +710,7 @@ class ChanServCore : public Module
 		return EVENT_CONTINUE;
 	}
 
-	void OnChanInfo(CommandSource &source, ChannelInfo *ci, InfoFormatter &info, bool show_all) override
+	void OnChanInfo(CommandSource &source, ChanServ::Channel *ci, InfoFormatter &info, bool show_all) override
 	{
 		if (!show_all)
 			return;
@@ -509,7 +720,7 @@ class ChanServCore : public Module
 			info[_("Expires")] = Anope::strftime(ci->last_used + chanserv_expire, source.GetAccount());
 	}
 
-	void OnSetCorrectModes(User *user, Channel *chan, AccessGroup &access, bool &give_modes, bool &take_modes) override
+	void OnSetCorrectModes(User *user, Channel *chan, ChanServ::AccessGroup &access, bool &give_modes, bool &take_modes) override
 	{
 		if (always_lower)
 			// Since we always lower the TS, the other side will remove the modes if the channel ts lowers, so we don't

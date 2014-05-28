@@ -44,7 +44,7 @@ unsigned char Anope::toupper(unsigned char c)
  * which is a case-insensitive equivalent to std::string.
  *
  */
- 
+
 bool ci::ci_char_traits::eq(char c1st, char c2nd)
 {
 	return case_map_upper[static_cast<unsigned char>(c1st)] == case_map_upper[static_cast<unsigned char>(c2nd)];

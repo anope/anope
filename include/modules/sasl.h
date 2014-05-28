@@ -33,7 +33,7 @@ namespace SASL
 
 		virtual void SendMessage(SASL::Session *session, const Anope::string &type, const Anope::string &data) = 0;
 
-		virtual void Succeed(Session *, NickCore *) = 0;
+		virtual void Succeed(Session *, NickServ::Account *) = 0;
 		virtual void Fail(Session *) = 0;
 		virtual void SendMechs(Session *) = 0;
 		virtual void DeleteSessions(Mechanism *, bool = false) = 0;
@@ -73,32 +73,32 @@ namespace SASL
 		}
 	};
 
-	class IdentifyRequest : public ::IdentifyRequest
+	class IdentifyRequestListener : public NickServ::IdentifyRequestListener
 	{
 		Anope::string uid;
 
 	 public:
-		IdentifyRequest(Module *m, const Anope::string &id, const Anope::string &acc, const Anope::string &pass) : ::IdentifyRequest(m, acc, pass), uid(id) { }
+		IdentifyRequestListener(const Anope::string &id) : uid(id) { }
 
-		void OnSuccess() override
+		void OnSuccess(NickServ::IdentifyRequest *req) override
 		{
 			if (!sasl)
 				return;
 
-			NickAlias *na = NickAlias::Find(GetAccount());
+			NickServ::Nick *na = NickServ::FindNick(req->GetAccount());
 			if (!na || na->nc->HasExt("NS_SUSPENDED"))
-				return OnFail();
+				return OnFail(req);
 
 			Session *s = sasl->GetSession(uid);
 			if (s)
 			{
-				Log(Config->GetClient("NickServ")) << "A user identified to account " << this->GetAccount() << " using SASL";
+				Log(Config->GetClient("NickServ")) << "A user identified to account " << req->GetAccount() << " using SASL";
 				sasl->Succeed(s, na->nc);
 				delete s;
 			}
 		}
 
-		void OnFail() override
+		void OnFail(NickServ::IdentifyRequest *req) override
 		{
 			if (!sasl)
 				return;
@@ -111,13 +111,13 @@ namespace SASL
 			}
 
 			Anope::string accountstatus;
-			NickAlias *na = NickAlias::Find(GetAccount());
+			NickServ::Nick *na = NickServ::FindNick(req->GetAccount());
 			if (!na)
 				accountstatus = "nonexistent ";
 			else if (na->nc->HasExt("NS_SUSPENDED"))
 				accountstatus = "suspended ";
 
-			Log(Config->GetClient("NickServ")) << "A user failed to identify for " << accountstatus << "account " << this->GetAccount() << " using SASL";
+			Log(Config->GetClient("NickServ")) << "A user failed to identify for " << accountstatus << "account " << req->GetAccount() << " using SASL";
 		}
 	};
 }

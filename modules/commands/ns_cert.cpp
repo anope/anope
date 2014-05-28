@@ -13,16 +13,16 @@
 #include "modules/ns_cert.h"
 #include "modules/nickserv.h"
 
-static Anope::hash_map<NickCore *> certmap;
+static Anope::hash_map<NickServ::Account *> certmap;
 static EventHandlers<Event::NickCertEvents> *events;
 
 struct CertServiceImpl : CertService
 {
 	CertServiceImpl(Module *o) : CertService(o) { }
 
-	NickCore* FindAccountFromCert(const Anope::string &cert) override
+	NickServ::Account* FindAccountFromCert(const Anope::string &cert) override
 	{
-		Anope::hash_map<NickCore *>::iterator it = certmap.find(cert);
+		Anope::hash_map<NickServ::Account *>::iterator it = certmap.find(cert);
 		if (it != certmap.end())
 			return it->second;
 		return NULL;
@@ -31,11 +31,11 @@ struct CertServiceImpl : CertService
 
 struct NSCertListImpl : NSCertList
 {
-	Serialize::Reference<NickCore> nc;
+	Serialize::Reference<NickServ::Account> nc;
 	std::vector<Anope::string> certs;
 
  public:
- 	NSCertListImpl(Extensible *obj) : nc(anope_dynamic_static_cast<NickCore *>(obj)) { }
+	NSCertListImpl(Extensible *obj) : nc(anope_dynamic_static_cast<NickServ::Account *>(obj)) { }
 
 	~NSCertListImpl()
 	{
@@ -127,10 +127,10 @@ struct NSCertListImpl : NSCertList
 
 		void ExtensibleSerialize(const Extensible *e, const Serializable *s, Serialize::Data &data) const override
 		{
-			if (s->GetSerializableType()->GetName() != "NickCore")
+			if (s->GetSerializableType()->GetName() != "NickServ::Account")
 				return;
 
-			const NickCore *n = anope_dynamic_static_cast<const NickCore *>(e);
+			const NickServ::Account *n = anope_dynamic_static_cast<const NickServ::Account *>(e);
 			NSCertList *c = this->Get(n);
 			if (c == NULL || !c->GetCertCount())
 				return;
@@ -141,10 +141,10 @@ struct NSCertListImpl : NSCertList
 
 		void ExtensibleUnserialize(Extensible *e, Serializable *s, Serialize::Data &data) override
 		{
-			if (s->GetSerializableType()->GetName() != "NickCore")
+			if (s->GetSerializableType()->GetName() != "NickServ::Account")
 				return;
 
-			NickCore *n = anope_dynamic_static_cast<NickCore *>(e);
+			NickServ::Account *n = anope_dynamic_static_cast<NickServ::Account *>(e);
 			NSCertListImpl *c = this->Require(n);
 
 			Anope::string buf;
@@ -165,7 +165,7 @@ struct NSCertListImpl : NSCertList
 class CommandNSCert : public Command
 {
  private:
-	void DoAdd(CommandSource &source, NickCore *nc, Anope::string certfp)
+	void DoAdd(CommandSource &source, NickServ::Account *nc, Anope::string certfp)
 	{
 		NSCertList *cl = nc->Require<NSCertList>("certificates");
 		unsigned max = Config->GetModule(this->owner)->Get<unsigned>("max", "5");
@@ -206,7 +206,7 @@ class CommandNSCert : public Command
 		source.Reply(_("\002%s\002 added to %s's certificate list."), certfp.c_str(), nc->display.c_str());
 	}
 
-	void DoDel(CommandSource &source, NickCore *nc, Anope::string certfp)
+	void DoDel(CommandSource &source, NickServ::Account *nc, Anope::string certfp)
 	{
 		NSCertList *cl = nc->Require<NSCertList>("certificates");
 
@@ -235,7 +235,7 @@ class CommandNSCert : public Command
 		source.Reply(_("\002%s\002 deleted from %s's certificate list."), certfp.c_str(), nc->display.c_str());
 	}
 
-	void DoList(CommandSource &source, const NickCore *nc)
+	void DoList(CommandSource &source, const NickServ::Account *nc)
 	{
 		NSCertList *cl = nc->GetExt<NSCertList>("certificates");
 
@@ -275,10 +275,10 @@ class CommandNSCert : public Command
 			certfp = params.size() > 1 ? params[params.size() - 1] : "";
 		}
 
-		NickCore *nc;
+		NickServ::Account *nc;
 		if (!nick.empty())
 		{
-			const NickAlias *na = NickAlias::Find(nick);
+			const NickServ::Nick *na = NickServ::FindNick(nick);
 			if (na == NULL)
 			{
 				source.Reply(NICK_X_NOT_REGISTERED, nick.c_str());
@@ -371,11 +371,11 @@ class NSCert : public Module
 		if (!NickServ || u->IsIdentified())
 			return;
 
-		NickCore *nc = cs.FindAccountFromCert(u->fingerprint);
+		NickServ::Account *nc = cs.FindAccountFromCert(u->fingerprint);
 		if (!nc || nc->HasExt("NS_SUSPENDED"))
 			return;
 
-		NickAlias *na = NickAlias::Find(u->nick);
+		NickServ::Nick *na = NickServ::FindNick(u->nick);
 		if (na && na->nc == nc)
 			u->Identify(na);
 		else
@@ -385,7 +385,7 @@ class NSCert : public Module
 		Log(NickServ) << u->GetMask() << " automatically identified for account " << nc->display << " via SSL certificate fingerprint";
 	}
 
-	EventReturn OnNickValidate(User *u, NickAlias *na) override
+	EventReturn OnNickValidate(User *u, NickServ::Nick *na) override
 	{
 		NSCertList *cl = certs.Get(na->nc);
 		if (!u->fingerprint.empty() && cl && cl->FindCert(u->fingerprint))

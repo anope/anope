@@ -13,12 +13,12 @@
 
 static std::map<Anope::string, char> defaultFlags;
 
-class FlagsChanAccess : public ChanAccess
+class FlagsChanAccess : public ChanServ::ChanAccess
 {
  public:
 	std::set<char> flags;
 
- 	FlagsChanAccess(AccessProvider *p) : ChanAccess(p)
+	FlagsChanAccess(ChanServ::AccessProvider *p) : ChanAccess(p)
 	{
 	}
 
@@ -41,11 +41,11 @@ class FlagsChanAccess : public ChanAccess
 			this->flags.insert(data[i - 1]);
 	}
 
-	static Anope::string DetermineFlags(const ChanAccess *access)
+	static Anope::string DetermineFlags(const ChanServ::ChanAccess *access)
 	{
 		if (access->provider->name == "access/flags")
 			return access->AccessSerialize();
-		
+
 		std::set<char> buffer;
 
 		for (std::map<Anope::string, char>::iterator it = defaultFlags.begin(), it_end = defaultFlags.end(); it != it_end; ++it)
@@ -59,17 +59,17 @@ class FlagsChanAccess : public ChanAccess
 	}
 };
 
-class FlagsAccessProvider : public AccessProvider
+class FlagsAccessProvider : public ChanServ::AccessProvider
 {
  public:
 	static FlagsAccessProvider *ap;
 
-	FlagsAccessProvider(Module *o) : AccessProvider(o, "access/flags")
+	FlagsAccessProvider(Module *o) : ChanServ::AccessProvider(o, "access/flags")
 	{
 		ap = this;
 	}
 
-	ChanAccess *Create() override
+	ChanServ::ChanAccess *Create() override
 	{
 		return new FlagsChanAccess(this);
 	}
@@ -78,7 +78,7 @@ FlagsAccessProvider* FlagsAccessProvider::ap;
 
 class CommandCSFlags : public Command
 {
-	void DoModify(CommandSource &source, ChannelInfo *ci, const std::vector<Anope::string> &params)
+	void DoModify(CommandSource &source, ChanServ::Channel *ci, const std::vector<Anope::string> &params)
 	{
 		Anope::string mask = params.size() > 2 ? params[2] : "";
 		Anope::string flags = params.size() > 3 ? params[3] : "";
@@ -89,8 +89,8 @@ class CommandCSFlags : public Command
 			return;
 		}
 
-		AccessGroup u_access = source.AccessFor(ci);
-		const ChanAccess *highest = u_access.Highest();
+		ChanServ::AccessGroup u_access = source.AccessFor(ci);
+		const ChanServ::ChanAccess *highest = u_access.Highest();
 
 		if (IRCD->IsChannelValid(mask))
 		{
@@ -100,7 +100,7 @@ class CommandCSFlags : public Command
 				return;
 			}
 
-			ChannelInfo *targ_ci = ChannelInfo::Find(mask);
+			ChanServ::Channel *targ_ci = ChanServ::Find(mask);
 			if (targ_ci == NULL)
 			{
 				source.Reply(CHAN_X_NOT_REGISTERED, mask.c_str());
@@ -116,7 +116,7 @@ class CommandCSFlags : public Command
 		}
 		else
 		{
-			const NickAlias *na = NickAlias::Find(mask);
+			const NickServ::Nick *na = NickServ::FindNick(mask);
 			if (!na && Config->GetModule("chanserv")->Get<bool>("disallow_hostmask_access"))
 			{
 				source.Reply(_("Masks and unregistered users may not be on access lists."));
@@ -135,13 +135,13 @@ class CommandCSFlags : public Command
 			}
 		}
 
-		ChanAccess *current = NULL;
+		ChanServ::ChanAccess *current = NULL;
 		unsigned current_idx;
 		std::set<char> current_flags;
 		bool override = false;
 		for (current_idx = ci->GetAccessCount(); current_idx > 0; --current_idx)
 		{
-			ChanAccess *access = ci->GetAccess(current_idx - 1);
+			ChanServ::ChanAccess *access = ci->GetAccess(current_idx - 1);
 			if (mask.equals_ci(access->mask))
 			{
 				// Flags allows removing others that have the same access as you,
@@ -174,7 +174,7 @@ class CommandCSFlags : public Command
 			return;
 		}
 
-		Privilege *p = NULL;
+		ChanServ::Privilege *p = NULL;
 		bool add = true;
 		for (size_t i = 0; i < flags.length(); ++i)
 		{
@@ -210,7 +210,7 @@ class CommandCSFlags : public Command
 					}
 					break;
 				default:
-					p = PrivilegeManager::FindPrivilege(flags.substr(i));
+					p = ChanServ::service ? ChanServ::service->FindPrivilege(flags.substr(i)) : nullptr;
 					if (p != NULL && defaultFlags[p->name])
 					{
 						f = defaultFlags[p->name];
@@ -256,7 +256,7 @@ class CommandCSFlags : public Command
 			return;
 		}
 
-		ServiceReference<AccessProvider> provider("AccessProvider", "access/flags");
+		ServiceReference<ChanServ::AccessProvider> provider("AccessProvider", "access/flags");
 		if (!provider)
 			return;
 		FlagsChanAccess *access = anope_dynamic_static_cast<FlagsChanAccess *>(provider->Create());
@@ -286,7 +286,7 @@ class CommandCSFlags : public Command
 			source.Reply(_("Flags for \002%s\002 on %s set to +\002%s\002"), access->mask.c_str(), ci->name.c_str(), access->AccessSerialize().c_str());
 	}
 
-	void DoList(CommandSource &source, ChannelInfo *ci, const std::vector<Anope::string> &params)
+	void DoList(CommandSource &source, ChanServ::Channel *ci, const std::vector<Anope::string> &params)
 	{
 		const Anope::string &arg = params.size() > 2 ? params[2] : "";
 
@@ -303,7 +303,7 @@ class CommandCSFlags : public Command
 		unsigned count = 0;
 		for (unsigned i = 0, end = ci->GetAccessCount(); i < end; ++i)
 		{
-			const ChanAccess *access = ci->GetAccess(i);
+			const ChanServ::ChanAccess *access = ci->GetAccess(i);
 			const Anope::string &flags = FlagsChanAccess::DetermineFlags(access);
 
 			if (!arg.empty())
@@ -348,7 +348,7 @@ class CommandCSFlags : public Command
 		}
 	}
 
-	void DoClear(CommandSource &source, ChannelInfo *ci)
+	void DoClear(CommandSource &source, ChanServ::Channel *ci)
 	{
 		if (!source.IsFounder(ci) && !source.HasPriv("chanserv/access/modify"))
 			source.Reply(ACCESS_DENIED);
@@ -381,7 +381,7 @@ class CommandCSFlags : public Command
 		const Anope::string &chan = params[0];
 		const Anope::string &cmd = params.size() > 1 ? params[1] : "";
 
-		ChannelInfo *ci = ChannelInfo::Find(chan);
+		ChanServ::Channel *ci = ChanServ::Find(chan);
 		if (ci == NULL)
 		{
 			source.Reply(CHAN_X_NOT_REGISTERED, chan.c_str());
@@ -441,7 +441,7 @@ class CommandCSFlags : public Command
 
 		for (reverse_map::iterator it = reverse.begin(), it_end = reverse.end(); it != it_end; ++it)
 		{
-			Privilege *p = PrivilegeManager::FindPrivilege(it->second);
+			ChanServ::Privilege *p = ChanServ::service ? ChanServ::service->FindPrivilege(it->second) : nullptr;
 			if (p == NULL)
 				continue;
 			source.Reply("  %c - %s", it->first, Language::Translate(source.nc, p->desc.c_str()));
@@ -475,7 +475,7 @@ class CSFlags : public Module
 
 			const Anope::string &pname = priv->Get<const Anope::string>("name");
 
-			Privilege *p = PrivilegeManager::FindPrivilege(pname);
+			ChanServ::Privilege *p = ChanServ::service ? ChanServ::service->FindPrivilege(pname) : nullptr;
 			if (p == NULL)
 				continue;
 

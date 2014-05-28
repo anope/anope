@@ -28,9 +28,9 @@ class CommandMSStaff : public Command
 
 		const Anope::string &text = params[0];
 
-		for (nickcore_map::const_iterator it = NickCoreList->begin(), it_end = NickCoreList->end(); it != it_end; ++it)
+		for (auto& it : NickServ::service->GetAccountList())
 		{
-			const NickCore *nc = it->second;
+			const NickServ::Account *nc = it.second;
 
 			if (source.nc != nc && nc->IsServicesOper())
 				MemoServ::service->Send(source.GetNick(), nc->display, text, true);

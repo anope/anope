@@ -26,7 +26,7 @@ class CommandNSList : public Command
 	{
 
 		Anope::string pattern = params[0];
-		const NickCore *mync;
+		const NickServ::Account *mync;
 		unsigned nnicks;
 		bool is_servadmin = source.HasCommand("nickserv/list");
 		int count = 0, from = 0, to = 0;
@@ -76,13 +76,13 @@ class CommandNSList : public Command
 
 		list.AddColumn(_("Nick")).AddColumn(_("Last usermask"));
 
-		Anope::map<NickAlias *> ordered_map;
-		for (nickalias_map::const_iterator it = NickAliasList->begin(), it_end = NickAliasList->end(); it != it_end; ++it)
-			ordered_map[it->first] = it->second;
+		Anope::map<NickServ::Nick *> ordered_map;
+		for (auto& it : NickServ::service->GetNickList())
+			ordered_map[it.first] = it.second;
 
-		for (Anope::map<NickAlias *>::const_iterator it = ordered_map.begin(), it_end = ordered_map.end(); it != it_end; ++it)
+		for (Anope::map<NickServ::Nick *>::const_iterator it = ordered_map.begin(), it_end = ordered_map.end(); it != it_end; ++it)
 		{
-			const NickAlias *na = it->second;
+			const NickServ::Nick *na = it->second;
 
 			/* Don't show private nicks to non-services admins. */
 			if (na->nc->HasExt("NS_PRIVATE") && !is_servadmin && na->nc != mync)
@@ -121,7 +121,7 @@ class CommandNSList : public Command
 				++count;
 			}
 		}
-			
+
 		source.Reply(_("List of entries matching \002%s\002:"), pattern.c_str());
 
 		std::vector<Anope::string> replies;
@@ -197,13 +197,13 @@ class CommandNSSetPrivate : public Command
 			return;
 		}
 
-		const NickAlias *na = NickAlias::Find(user);
+		const NickServ::Nick *na = NickServ::FindNick(user);
 		if (!na)
 		{
 			source.Reply(NICK_X_NOT_REGISTERED, user.c_str());
 			return;
 		}
-		NickCore *nc = na->nc;
+		NickServ::Account *nc = na->nc;
 
 		EventReturn MOD_RESULT = Event::OnSetNickOption(&Event::SetNickOption::OnSetNickOption, source, this, nc, param);
 		if (MOD_RESULT == EVENT_STOP)
@@ -293,7 +293,7 @@ class NSList : public Module
 	{
 	}
 
-	void OnNickInfo(CommandSource &source, NickAlias *na, InfoFormatter &info, bool show_all) override
+	void OnNickInfo(CommandSource &source, NickServ::Nick *na, InfoFormatter &info, bool show_all) override
 	{
 		if (!show_all)
 			return;

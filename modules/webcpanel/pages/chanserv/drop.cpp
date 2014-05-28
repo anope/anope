@@ -13,7 +13,7 @@ WebCPanel::ChanServ::Drop::Drop(const Anope::string &cat, const Anope::string &u
 }
 
 
-bool WebCPanel::ChanServ::Drop::OnRequest(HTTPProvider *server, const Anope::string &page_name, HTTPClient *client, HTTPMessage &message, HTTPReply &reply, NickAlias *na, TemplateFileServer::Replacements &replacements)
+bool WebCPanel::ChanServ::Drop::OnRequest(HTTPProvider *server, const Anope::string &page_name, HTTPClient *client, HTTPMessage &message, HTTPReply &reply, ::NickServ::Nick *na, TemplateFileServer::Replacements &replacements)
 {
 
 	if (message.post_data.count("channel") > 0 && message.post_data.count("confChan") > 0)
@@ -31,11 +31,11 @@ bool WebCPanel::ChanServ::Drop::OnRequest(HTTPProvider *server, const Anope::str
 			replacements["MESSAGES"] = "Invalid Confirmation";
 	}
 
-	std::deque<ChannelInfo *> queue;
+	std::deque<::ChanServ::Channel *> queue;
 	na->nc->GetChannelReferences(queue);
 	for (unsigned i = 0; i < queue.size(); ++i)
 	{
-		ChannelInfo *ci = queue[i];
+		::ChanServ::Channel *ci = queue[i];
 		if ((ci->HasExt("SECUREFOUNDER") ? ci->AccessFor(na->nc).founder : ci->AccessFor(na->nc).HasPriv("FOUNDER")) || (na->nc->IsServicesOper() && na->nc->o->ot->HasCommand("chanserv/drop")))
 		{
 			replacements["CHANNEL_NAMES"] = ci->name;

@@ -125,7 +125,7 @@ class LDAPService : public LDAPProvider, public Thread, public Condition
 
 		ldap_unbind_ext(this->con, NULL, NULL);
 	}
-	
+
 	LDAPQuery BindAsAdmin(LDAPInterface *i)
 	{
 		return this->Bind(i, this->admin_binddn, this->admin_pass);
@@ -554,7 +554,7 @@ class ModuleLDAP : public Module, public Pipe
 				}
 			}
 			s->Unlock();
-		} 
+		}
 	}
 
 	void OnNotify() override
@@ -586,7 +586,7 @@ class ModuleLDAP : public Module, public Pipe
 
 				delete r;
 			}
-		} 
+		}
 	}
 };
 

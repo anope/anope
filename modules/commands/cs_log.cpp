@@ -21,7 +21,7 @@ struct LogSettingImpl : LogSetting, Serializable
 
 	~LogSettingImpl()
 	{
-		ChannelInfo *ci = ChannelInfo::Find(chan);
+		ChanServ::Channel *ci = ChanServ::Find(chan);
 		if (ci)
 		{
 			LogSettings *ls = ci->GetExt<LogSettings>("logsettings");
@@ -51,10 +51,10 @@ struct LogSettingImpl : LogSetting, Serializable
 		Anope::string sci;
 		data["ci"] >> sci;
 
-		ChannelInfo *ci = ChannelInfo::Find(sci);
+		ChanServ::Channel *ci = ChanServ::Find(sci);
 		if (ci == NULL)
 			return NULL;
-	
+
 		LogSettingImpl *ls;
 		if (obj)
 			ls = anope_dynamic_static_cast<LogSettingImpl *>(obj);
@@ -112,7 +112,7 @@ public:
 	{
 		const Anope::string &channel = params[0];
 
-		ChannelInfo *ci = ChannelInfo::Find(channel);
+		ChanServ::Channel *ci = ChanServ::Find(channel);
 		if (ci == NULL)
 			source.Reply(CHAN_X_NOT_REGISTERED, channel.c_str());
 		else if (!source.AccessFor(ci).HasPriv("SET") && !source.HasPriv("chanserv/administration"))
@@ -325,7 +325,7 @@ class CSLog : public Module
 		}
 	}
 
-	void OnChanRegistered(ChannelInfo *ci) override
+	void OnChanRegistered(ChanServ::Channel *ci) override
 	{
 		if (defaults.empty())
 			return;
@@ -393,7 +393,7 @@ class CSLog : public Module
 				else if (log->method.equals_ci("MESSAGE") && l->ci->c)
 				{
 					IRCD->SendPrivmsg(l->ci->WhoSends(), log->extra + l->ci->c->name, "%s", buffer.c_str());
-					l->ci->WhoSends()->lastmsg = Anope::CurTime;
+					//l->ci->WhoSends()->lastmsg = Anope::CurTime;
 				}
 				else if (log->method.equals_ci("NOTICE") && l->ci->c)
 					IRCD->SendNotice(l->ci->WhoSends(), log->extra + l->ci->c->name, "%s", buffer.c_str());

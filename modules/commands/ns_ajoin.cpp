@@ -21,7 +21,7 @@ struct AJoinList : Serialize::Checker<std::vector<AJoinEntry *> >
 
 struct AJoinEntry : Serializable
 {
-	Serialize::Reference<NickCore> owner;
+	Serialize::Reference<NickServ::Account> owner;
 	Anope::string channel;
 	Anope::string key;
 
@@ -54,7 +54,7 @@ struct AJoinEntry : Serializable
 
 		sd["owner"] >> sowner;
 
-		NickCore *nc = NickCore::Find(sowner);
+		NickServ::Account *nc = NickServ::FindAccount(sowner);
 		if (nc == NULL)
 			return NULL;
 
@@ -88,7 +88,7 @@ AJoinList::~AJoinList()
 
 class CommandNSAJoin : public Command
 {
-	void DoList(CommandSource &source, NickCore *nc)
+	void DoList(CommandSource &source, NickServ::Account *nc)
 	{
 		AJoinList *channels = nc->Require<AJoinList>("ajoinlist");
 
@@ -118,7 +118,7 @@ class CommandNSAJoin : public Command
 		}
 	}
 
-	void DoAdd(CommandSource &source, NickCore *nc, const Anope::string &chans, const Anope::string &keys)
+	void DoAdd(CommandSource &source, NickServ::Account *nc, const Anope::string &chans, const Anope::string &keys)
 	{
 		AJoinList *channels = nc->Require<AJoinList>("ajoinlist");
 
@@ -184,7 +184,7 @@ class CommandNSAJoin : public Command
 		source.Reply(_("%s added to %s's auto join list."), addedchans.c_str(), nc->display.c_str());
 	}
 
-	void DoDel(CommandSource &source, NickCore *nc, const Anope::string &chans)
+	void DoDel(CommandSource &source, NickServ::Account *nc, const Anope::string &chans)
 	{
 		AJoinList *channels = nc->Require<AJoinList>("ajoinlist");
 		Anope::string delchans;
@@ -197,7 +197,7 @@ class CommandNSAJoin : public Command
 			for (; i < (*channels)->size(); ++i)
 				if ((*channels)->at(i)->channel.equals_ci(chan))
 					break;
-		
+
 			if (i == (*channels)->size())
 				notfoundchans += chan + ", ";
 			else
@@ -243,10 +243,10 @@ class CommandNSAJoin : public Command
 		else
 			nick = (params.size() > 2 && IRCD->IsChannelValid(params[2])) ? params[1] : "";
 
-		NickCore *nc;
+		NickServ::Account *nc;
 		if (!nick.empty())
 		{
-			const NickAlias *na = NickAlias::Find(nick);
+			const NickServ::Nick *na = NickServ::FindNick(nick);
 			if (na == NULL)
 			{
 				source.Reply(NICK_X_NOT_REGISTERED, nick.c_str());
@@ -333,17 +333,17 @@ class NSAJoin : public Module
 		{
 			AJoinEntry *entry = (*channels)->at(i);
 			Channel *c = Channel::Find(entry->channel);
-			ChannelInfo *ci;
+			ChanServ::Channel *ci;
 
 			if (c)
 				ci = c->ci;
 			else
-				ci = ChannelInfo::Find(entry->channel);
+				ci = ChanServ::Find(entry->channel);
 
 			bool need_invite = false;
 			Anope::string key = entry->key;
-			AccessGroup u_access;
-			
+			ChanServ::AccessGroup u_access;
+
 			if (ci != NULL)
 			{
 				if (ci->HasExt("CS_SUSPENDED"))
@@ -364,7 +364,7 @@ class NSAJoin : public Module
 					need_invite = true;
 				else if (c->HasMode("INVITE") && c->MatchesList(u, "INVITEOVERRIDE") == false)
 					need_invite = true;
-					
+
 				if (c->HasMode("KEY"))
 				{
 					Anope::string k;

@@ -42,7 +42,7 @@ class CoreExport Channel : public Base, public Extensible
  	/* Channel name */
 	Anope::string name;
 	/* Set if this channel is registered. ci->c == this. Contains information relevant to the registered channel */
-	Serialize::Reference<ChannelInfo> ci;
+	Serialize::Reference<ChanServ::Channel> ci;
 	/* When the channel was created */
 	time_t creation_time;
 	/* If the channel has just been created in a netjoin */
@@ -163,7 +163,7 @@ class CoreExport Channel : public Base, public Extensible
 	 * @param param Optional param arg for the mode
 	 * @param enforce_mlock true if mlocks should be enforced, false to override mlock
 	 */
-	void SetMode(BotInfo *bi, ChannelMode *cm, const Anope::string &param = "", bool enforce_mlock = true);
+	void SetMode(User *bi, ChannelMode *cm, const Anope::string &param = "", bool enforce_mlock = true);
 
 	/**
 	 * Set a mode on a channel
@@ -172,7 +172,7 @@ class CoreExport Channel : public Base, public Extensible
 	 * @param param Optional param arg for the mode
 	 * @param enforce_mlock true if mlocks should be enforced, false to override mlock
 	 */
-	void SetMode(BotInfo *bi, const Anope::string &name, const Anope::string &param = "", bool enforce_mlock = true);
+	void SetMode(User *bi, const Anope::string &name, const Anope::string &param = "", bool enforce_mlock = true);
 
 	/** Remove a mode from a channel
 	 * @param bi The client setting the modes
@@ -180,7 +180,7 @@ class CoreExport Channel : public Base, public Extensible
 	 * @param param Optional param arg for the mode
 	 * @param enforce_mlock true if mlocks should be enforced, false to override mlock
 	 */
-	void RemoveMode(BotInfo *bi, ChannelMode *cm, const Anope::string &param = "", bool enforce_mlock = true);
+	void RemoveMode(User *bi, ChannelMode *cm, const Anope::string &param = "", bool enforce_mlock = true);
 
 	/**
 	 * Remove a mode from a channel
@@ -189,7 +189,7 @@ class CoreExport Channel : public Base, public Extensible
 	 * @param param Optional param arg for the mode
 	 * @param enforce_mlock true if mlocks should be enforced, false to override mlock
 	 */
-	void RemoveMode(BotInfo *bi, const Anope::string &name, const Anope::string &param = "", bool enforce_mlock = true);
+	void RemoveMode(User *bi, const Anope::string &name, const Anope::string &param = "", bool enforce_mlock = true);
 
 	/** Get a modes parameter for the channel
 	 * @param name The mode
@@ -203,7 +203,7 @@ class CoreExport Channel : public Base, public Extensible
 	 * @param enforce_mlock Should mlock be enforced on this mode change
 	 * @param cmodes The modes to set
 	 */
-	void SetModes(BotInfo *bi, bool enforce_mlock, const char *cmodes, ...);
+	void SetModes(User *bi, bool enforce_mlock, const char *cmodes, ...);
 
 	/** Set a string of modes internally on a channel
 	 * @param source The setter
@@ -223,8 +223,9 @@ class CoreExport Channel : public Base, public Extensible
 	 * @param source The sender of the kick
 	 * @param nick The nick being kicked
 	 * @param reason The reason for the kick
+	 * @return true if the kick was scucessful, false if a module blocked the kick or was otherwise unsuccessful
 	 */
-	void KickInternal(const MessageSource &source, const Anope::string &nick, const Anope::string &reason);
+	bool KickInternal(const MessageSource &source, const Anope::string &nick, const Anope::string &reason);
 
 	/** Kick a user from the channel
 	 * @param bi The sender, can be NULL for the service bot for this channel
@@ -232,7 +233,7 @@ class CoreExport Channel : public Base, public Extensible
 	 * @param reason The reason for the kick
 	 * @return true if the kick was scucessful, false if a module blocked the kick
 	 */
-	bool Kick(BotInfo *bi, User *u, const char *reason = NULL, ...);
+	bool Kick(User *bi, User *u, const char *reason = NULL, ...);
 
 	/** Get all modes set on this channel, excluding status modes.
 	 * @return a map of modes and their optional parameters.

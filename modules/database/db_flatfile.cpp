@@ -93,7 +93,7 @@ class LoadData : public Serialize::Data
 				hash ^= Anope::hash_cs()(it->second);
 		return hash;
 	}
-	
+
 	void Reset()
 	{
 		id = 0;
@@ -255,7 +255,7 @@ class DBFlatFile : public Module, public Pipe
 			Serialize::Type *stype = Serialize::Type::Find(type_order[i]);
 			if (!stype || stype->GetOwner())
 				continue;
-				
+
 			std::vector<std::streampos> &pos = positions[stype->GetName()];
 
 			for (unsigned j = 0; j < pos.size(); ++j)

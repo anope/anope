@@ -12,7 +12,7 @@ WebCPanel::ChanServ::Set::Set(const Anope::string &cat, const Anope::string &u) 
 {
 }
 
-bool WebCPanel::ChanServ::Set::OnRequest(HTTPProvider *server, const Anope::string &page_name, HTTPClient *client, HTTPMessage &message, HTTPReply &reply, NickAlias *na, TemplateFileServer::Replacements &replacements)
+bool WebCPanel::ChanServ::Set::OnRequest(HTTPProvider *server, const Anope::string &page_name, HTTPClient *client, HTTPMessage &message, HTTPReply &reply, ::NickServ::Nick *na, TemplateFileServer::Replacements &replacements)
 {
 	const Anope::string &chname = message.get_data["channel"];
 	bool can_set = false;
@@ -26,7 +26,7 @@ bool WebCPanel::ChanServ::Set::OnRequest(HTTPProvider *server, const Anope::stri
 		return true;
 	}
 
-	ChannelInfo *ci = ChannelInfo::Find(chname);
+	::ChanServ::Channel *ci = ::ChanServ::Find(chname);
 
 	if (!ci)
 	{

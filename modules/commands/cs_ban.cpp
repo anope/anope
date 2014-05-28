@@ -44,7 +44,7 @@ class CommandCSBan : public Command
 	{
 		const Anope::string &chan = params[0];
 
-		ChannelInfo *ci = ChannelInfo::Find(chan);
+		ChanServ::Channel *ci = ChanServ::Find(chan);
 		if (ci == NULL)
 		{
 			source.Reply(CHAN_X_NOT_REGISTERED, chan.c_str());
@@ -101,13 +101,13 @@ class CommandCSBan : public Command
 		User *u = source.GetUser();
 		User *u2 = User::Find(target, true);
 
-		AccessGroup u_access = source.AccessFor(ci);
+		ChanServ::AccessGroup u_access = source.AccessFor(ci);
 
 		if (!u_access.HasPriv("BAN") && !source.HasPriv("chanserv/kick"))
 			source.Reply(ACCESS_DENIED);
 		else if (u2)
 		{
-			AccessGroup u2_access = ci->AccessFor(u2);
+			ChanServ::AccessGroup u2_access = ci->AccessFor(u2);
 
 			if (u != u2 && ci->HasExt("PEACE") && u2_access >= u_access && !source.HasPriv("chanserv/kick"))
 				source.Reply(ACCESS_DENIED);
@@ -172,7 +172,7 @@ class CommandCSBan : public Command
 				{
 					++matched;
 
-					AccessGroup u2_access = ci->AccessFor(uc->user);
+					ChanServ::AccessGroup u2_access = ci->AccessFor(uc->user);
 
 					if (matched > 1 && !founder)
 						continue;

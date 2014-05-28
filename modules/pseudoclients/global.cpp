@@ -79,7 +79,7 @@ class GlobalCore : public Module
 		if (!gl.empty())
 			this->SendGlobal(Global, "", gl);
 	}
-	
+
 	void OnShutdown() override
 	{
 		const Anope::string &gl = Config->GetModule(this)->Get<const Anope::string>("globaloncycledown");

@@ -18,7 +18,6 @@
 #include "extensible.h"
 #include "serialize.h"
 #include "commands.h"
-#include "account.h"
 
 typedef Anope::hash_map<User *> user_map;
 
@@ -46,8 +45,8 @@ class CoreExport User : public virtual Base, public Extensible, public CommandRe
 	bool on_access;
 	/* Map of user modes and the params this user has (if any) */
 	ModeList modes;
-	/* NickCore account the user is currently loggged in as, if they are logged in */
-	Serialize::Reference<NickCore> nc;
+	/* NickServ::Account account the user is currently loggged in as, if they are logged in */
+	Serialize::Reference<NickServ::Account> nc;
 
 	/* # of invalid password attempts */
 	unsigned short invalid_pw_count;
@@ -107,14 +106,14 @@ class CoreExport User : public virtual Base, public Extensible, public CommandRe
 	 * @param suid The unique identifier of the user.
 	 * @param nc The account the user is identified as, if any
 	 */
-	User(const Anope::string &snick, const Anope::string &sident, const Anope::string &shost, const Anope::string &svhost, const Anope::string &sip, Server *sserver, const Anope::string &srealname, time_t ts, const Anope::string &smodes, const Anope::string &suid, NickCore *nc);
+	User(const Anope::string &snick, const Anope::string &sident, const Anope::string &shost, const Anope::string &svhost, const Anope::string &sip, Server *sserver, const Anope::string &srealname, time_t ts, const Anope::string &smodes, const Anope::string &suid, NickServ::Account *nc);
 
 	/** Destroy a user.
 	 */
 	virtual ~User();
 
  public:
-	static User* OnIntroduce(const Anope::string &snick, const Anope::string &sident, const Anope::string &shost, const Anope::string &svhost, const Anope::string &sip, Server *sserver, const Anope::string &srealname, time_t ts, const Anope::string &smodes, const Anope::string &suid, NickCore *nc);
+	static User* OnIntroduce(const Anope::string &snick, const Anope::string &sident, const Anope::string &shost, const Anope::string &svhost, const Anope::string &sip, Server *sserver, const Anope::string &srealname, time_t ts, const Anope::string &smodes, const Anope::string &suid, NickServ::Account *nc);
 
 	/** Update the nickname of a user record accordingly, should be
 	 * called from ircd protocol.
@@ -189,8 +188,8 @@ class CoreExport User : public virtual Base, public Extensible, public CommandRe
 	 * @param fmt Format of the Message
 	 * @param ... any number of parameters
 	 */
-	void SendMessage(BotInfo *source, const char *fmt, ...);
-	void SendMessage(BotInfo *source, const Anope::string &msg) override;
+	void SendMessage(const MessageSource &, const char *fmt, ...);
+	void SendMessage(const MessageSource &, const Anope::string &msg) override;
 
 	/** Identify the user to a nick.
 	 * updates last_seen, logs the user in,
@@ -198,12 +197,12 @@ class CoreExport User : public virtual Base, public Extensible, public CommandRe
 	 * @param na the nick to identify to, should be the same as
 	 * the user's current nick
 	 */
-	void Identify(NickAlias *na);
+	void Identify(NickServ::Nick *na);
 
 	/** Login the user to an account
 	 * @param core The account
 	 */
-	void Login(NickCore *core);
+	void Login(NickServ::Account *core);
 
 	/** Logout the user
 	 */
@@ -212,7 +211,7 @@ class CoreExport User : public virtual Base, public Extensible, public CommandRe
 	/** Get the account the user is logged in using
 	 * @return The account or NULL
 	 */
-	NickCore *Account() const;
+	NickServ::Account *Account() const;
 
 	/** Check if the user is identified for their nick
 	 * @param check_nick True to check if the user is identified to the nickname they are on too

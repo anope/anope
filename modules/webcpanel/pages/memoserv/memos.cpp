@@ -11,41 +11,42 @@ WebCPanel::MemoServ::Memos::Memos(const Anope::string &cat, const Anope::string 
 {
 }
 
-bool WebCPanel::MemoServ::Memos::OnRequest(HTTPProvider *server, const Anope::string &page_name, HTTPClient *client, HTTPMessage &message, HTTPReply &reply, NickAlias *na, TemplateFileServer::Replacements &replacements)
+bool WebCPanel::MemoServ::Memos::OnRequest(HTTPProvider *server, const Anope::string &page_name, HTTPClient *client, HTTPMessage &message, HTTPReply &reply, ::NickServ::Nick *na, TemplateFileServer::Replacements &replacements)
 {
 	const Anope::string &chname = message.get_data["channel"];
-	ChannelInfo *ci;
-	const MemoInfo *mi;
-	Memo *m;
+	::ChanServ::Channel *ci;
+	const ::MemoServ::MemoInfo *mi;
+	::MemoServ::Memo *m;
 
-	for (registered_channel_map::const_iterator it = RegisteredChannelList->begin(), it_end = RegisteredChannelList->end(); it != it_end; ++it)
-	{
-		ci = it->second;
-
-		if (ci->AccessFor(na->nc).HasPriv("MEMO"))
+	if (::ChanServ::service)
+		for (auto& it : ::ChanServ::service->GetChannels())
 		{
-			replacements["CHANNEL_NAMES"] = ci->name;
-			replacements["ESCAPED_CHANNEL_NAMES"] = HTTPUtils::URLEncode(ci->name);
+			ci = it.second;
+
+			if (ci->AccessFor(na->nc).HasPriv("MEMO"))
+			{
+				replacements["CHANNEL_NAMES"] = ci->name;
+				replacements["ESCAPED_CHANNEL_NAMES"] = HTTPUtils::URLEncode(ci->name);
+			}
 		}
-	}
 
 	if (chname.empty())
 	{
 		replacements["MESSAGES"] = "No Channel specified, displaying the memos for your Nick";
-		mi = &na->nc->memos;
+		mi = na->nc->memos;
 	}
 	else
 	{
-		ci = ChannelInfo::Find(chname);
+		ci = ::ChanServ::Find(chname);
 		if (ci)
 		{
 			replacements["MESSAGES"] = "Displaying the memos for " + chname + ".";
-			mi = &ci->memos;
+			mi = ci->memos;
 		}
 		else
 		{
 			replacements["MESSAGES"] = "Channel " + chname + " not found, displaying the memos for your nick";
-			mi = &na->nc->memos;
+			mi = na->nc->memos;
 		}
 
 		replacements["CHANNEL_NAME"] = ci->name;
@@ -84,7 +85,7 @@ bool WebCPanel::MemoServ::Memos::OnRequest(HTTPProvider *server, const Anope::st
 
 		if (number > 0)
 		{
-			m = mi->GetMemo(number-1);
+			m = mi ? mi->GetMemo(number-1) : nullptr;
 
 			if (!m)
 				replacements["MESSAGES"] = "ERROR - invalid memo number.";
@@ -95,18 +96,19 @@ bool WebCPanel::MemoServ::Memos::OnRequest(HTTPProvider *server, const Anope::st
 		}
 	}
 
-	for (unsigned i = 0; i < mi->memos->size(); ++i)
-	{
-		m = mi->GetMemo(i);
-		replacements["NUMBER"] = stringify(i+1);
-		replacements["SENDER"] = m->sender;
-		replacements["TIME"] = Anope::strftime(m->time);
-		replacements["TEXT"] = HTTPUtils::Escape(m->text);
-		if (m->unread)
-			replacements["UNREAD"] = "YES";
-		else
-			replacements["UNREAD"] = "NO";
-	}
+	if (mi)
+		for (unsigned i = 0; i < mi->memos->size(); ++i)
+		{
+			m = mi->GetMemo(i);
+			replacements["NUMBER"] = stringify(i+1);
+			replacements["SENDER"] = m->sender;
+			replacements["TIME"] = Anope::strftime(m->time);
+			replacements["TEXT"] = HTTPUtils::Escape(m->text);
+			if (m->unread)
+				replacements["UNREAD"] = "YES";
+			else
+				replacements["UNREAD"] = "NO";
+		}
 
 	TemplateFileServer page("memoserv/memos.html");
 	page.Serve(server, page_name, client, message, reply, replacements);

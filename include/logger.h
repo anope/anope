@@ -57,7 +57,7 @@ class CoreExport Log
 	/* For commands, the user executing the command, but might not always exist */
 	User *u;
 	/* For commands, the account executing the command, but will not always exist */
-	NickCore *nc;
+	NickServ::Account *nc;
 	/* For commands, the command being executed */
 	Command *c;
 	/* For commands, the command source */
@@ -65,7 +65,7 @@ class CoreExport Log
 	/* Used for LOG_CHANNEL */
 	Channel *chan;
 	/* For commands, the channel the command was executed on, will not always exist */
-	const ChannelInfo *ci;
+	const ChanServ::Channel *ci;
 	/* For LOG_SERVER */
 	Server *s;
 	/* For LOG_MODULE */
@@ -78,7 +78,7 @@ class CoreExport Log
 	Log(LogType type = LOG_NORMAL, const Anope::string &category = "", BotInfo *bi = NULL);
 
 	/* LOG_COMMAND/OVERRIDE/ADMIN */
-	Log(LogType type, CommandSource &source, Command *c, ChannelInfo *ci = NULL);
+	Log(LogType type, CommandSource &source, Command *c, ChanServ::Channel *ci = NULL);
 
 	/* LOG_CHANNEL */
 	Log(User *u, Channel *c, const Anope::string &category = "");

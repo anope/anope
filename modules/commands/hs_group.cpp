@@ -17,7 +17,7 @@ class CommandHSGroup : public Command
 	bool setting;
 
  public:
-	void Sync(const NickAlias *na)
+	void Sync(const NickServ::Nick *na)
 	{
 		if (setting)
 			return;
@@ -25,10 +25,10 @@ class CommandHSGroup : public Command
 		if (!na || !na->HasVhost())
 			return;
 
-		setting = true;	
+		setting = true;
 		for (unsigned i = 0; i < na->nc->aliases->size(); ++i)
 		{
-			NickAlias *nick = na->nc->aliases->at(i);
+			NickServ::Nick *nick = na->nc->aliases->at(i);
 			if (nick)
 			{
 				nick->SetVhost(na->GetVhostIdent(), na->GetVhostHost(), na->GetVhostCreator());
@@ -51,7 +51,7 @@ class CommandHSGroup : public Command
 			return;
 		}
 
-		NickAlias *na = NickAlias::Find(source.GetNick());
+		NickServ::Nick *na = NickServ::FindNick(source.GetNick());
 		if (na && source.GetAccount() == na->nc && na->HasVhost())
 		{
 			this->Sync(na);
@@ -93,7 +93,7 @@ class HSGroup : public Module
 	{
 	}
 
-	void OnSetVhost(NickAlias *na) override
+	void OnSetVhost(NickServ::Nick *na) override
 	{
 		if (!synconset)
 			return;
@@ -101,7 +101,7 @@ class HSGroup : public Module
 		commandhsgroup.Sync(na);
 	}
 
-	void OnNickGroup(User *u, NickAlias *na) override
+	void OnNickGroup(User *u, NickServ::Nick *na) override
 	{
 		if (!syncongroup)
 			return;

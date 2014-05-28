@@ -23,7 +23,7 @@ class CommandHSOff : public Command
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		User *u = source.GetUser();
-		const NickAlias *na = NickAlias::Find(u->nick);
+		const NickServ::Nick *na = NickServ::FindNick(u->nick);
 
 		if (!na || !na->HasVhost())
 			source.Reply(HOST_NOT_ASSIGNED);

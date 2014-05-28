@@ -31,11 +31,11 @@ class NewsService : public Service
 	NewsService(Module *m) : Service(m, "NewsService", "news") { }
 
 	virtual NewsItem *CreateNewsItem() = 0;
-	
+
 	virtual void AddNewsItem(NewsItem *n) = 0;
-	
+
 	virtual void DelNewsItem(NewsItem *n) = 0;
-	
+
 	virtual std::vector<NewsItem *> &GetNewsList(NewsType t) = 0;
 };
 

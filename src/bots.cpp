@@ -13,16 +13,16 @@
 #include "servers.h"
 #include "protocol.h"
 #include "xline.h"
-#include "regchannel.h"
 #include "channels.h"
 #include "config.h"
 #include "language.h"
 #include "serialize.h"
 #include "event.h"
+#include "modules/chanserv.h"
 
 Serialize::Checker<botinfo_map> BotListByNick("BotInfo"), BotListByUID("BotInfo");
 
-BotInfo::BotInfo(const Anope::string &nnick, const Anope::string &nuser, const Anope::string &nhost, const Anope::string &nreal, const Anope::string &bmodes) : User(nnick, nuser, nhost, "", "", Me, nreal, Anope::CurTime, "", Servers::TS6_UID_Retrieve(), NULL), Serializable("BotInfo"), channels("ChannelInfo"), botmodes(bmodes)
+BotInfo::BotInfo(const Anope::string &nnick, const Anope::string &nuser, const Anope::string &nhost, const Anope::string &nreal, const Anope::string &bmodes) : User(nnick, nuser, nhost, "", "", Me, nreal, Anope::CurTime, "", Servers::TS6_UID_Retrieve(), NULL), Serializable("BotInfo"), channels("ChanServ::Channel"), botmodes(bmodes)
 {
 	this->lastmsg = this->created = Anope::CurTime;
 	this->introduced = false;
@@ -31,7 +31,7 @@ BotInfo::BotInfo(const Anope::string &nnick, const Anope::string &nuser, const A
 	(*BotListByNick)[this->nick] = this;
 	if (!this->uid.empty())
 		(*BotListByUID)[this->uid] = this;
-	
+
 	Event::OnCreateBot(&Event::CreateBot::OnCreateBot, this);
 
 	// If we're synchronised with the uplink already, send the bot.
@@ -61,9 +61,9 @@ BotInfo::~BotInfo()
 		IRCD->SendSQLineDel(&x);
 	}
 
-	for (std::set<ChannelInfo *>::iterator it = this->channels->begin(), it_end = this->channels->end(); it != it_end; ++it)
+	for (std::set<ChanServ::Channel *>::iterator it = this->channels->begin(), it_end = this->channels->end(); it != it_end; ++it)
 	{
-		ChannelInfo *ci = *it;
+		ChanServ::Channel *ci = *it;
 		this->UnAssign(NULL, ci);
 	}
 
@@ -145,12 +145,12 @@ void BotInfo::SetNewNick(const Anope::string &newnick)
 	(*BotListByNick)[this->nick] = this;
 }
 
-const std::set<ChannelInfo *> &BotInfo::GetChannels() const
+const std::set<ChanServ::Channel *> &BotInfo::GetChannels() const
 {
 	return this->channels;
 }
 
-void BotInfo::Assign(User *u, ChannelInfo *ci)
+void BotInfo::Assign(User *u, ChanServ::Channel *ci)
 {
 	EventReturn MOD_RESULT;
 	MOD_RESULT = Event::OnPreBotAssign(&Event::PreBotAssign::OnPreBotAssign, u, ci, this);
@@ -159,14 +159,14 @@ void BotInfo::Assign(User *u, ChannelInfo *ci)
 
 	if (ci->bi)
 		ci->bi->UnAssign(u, ci);
-	
+
 	ci->bi = this;
 	this->channels->insert(ci);
 
 	Event::OnBotAssign(&Event::BotAssign::OnBotAssign, u, ci, this);
 }
 
-void BotInfo::UnAssign(User *u, ChannelInfo *ci)
+void BotInfo::UnAssign(User *u, ChanServ::Channel *ci)
 {
 	EventReturn MOD_RESULT;
 	MOD_RESULT = Event::OnBotUnAssign(&Event::BotUnAssign::OnBotUnAssign, u, ci);

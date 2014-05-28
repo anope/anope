@@ -13,7 +13,7 @@
 
 class CommandNSAList : public Command
 {
-	static bool ChannelSort(ChannelInfo *ci1, ChannelInfo *ci2)
+	static bool ChannelSort(ChanServ::Channel *ci1, ChanServ::Channel *ci2)
 	{
 		return ci::less()(ci1->name, ci2->name);
 	}
@@ -28,12 +28,12 @@ class CommandNSAList : public Command
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		Anope::string nick = source.GetNick();
-		NickCore *nc = source.nc;
+		NickServ::Account *nc = source.nc;
 
 		if (params.size() && source.HasPriv("nickserv/alist"))
 		{
 			nick = params[0];
-			const NickAlias *na = NickAlias::Find(nick);
+			const NickServ::Nick *na = NickServ::FindNick(nick);
 			if (!na)
 			{
 				source.Reply(NICK_X_NOT_REGISTERED, nick.c_str());
@@ -47,13 +47,13 @@ class CommandNSAList : public Command
 
 		list.AddColumn(_("Number")).AddColumn(_("Channel")).AddColumn(_("Access")).AddColumn(_("Description"));
 
-		std::deque<ChannelInfo *> queue;
+		std::deque<ChanServ::Channel *> queue;
 		nc->GetChannelReferences(queue);
 		std::sort(queue.begin(), queue.end(), ChannelSort);
 
 		for (unsigned i = 0; i < queue.size(); ++i)
 		{
-			ChannelInfo *ci = queue[i];
+			ChanServ::Channel *ci = queue[i];
 			ListFormatter::ListEntry entry;
 
 			if (ci->GetFounder() == nc)
@@ -78,10 +78,10 @@ class CommandNSAList : public Command
 				continue;
 			}
 
-			AccessGroup access = ci->AccessFor(nc);
+			ChanServ::AccessGroup access = ci->AccessFor(nc);
 			if (access.empty())
 				continue;
-				
+
 			++chan_count;
 
 			entry["Number"] = stringify(chan_count);

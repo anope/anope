@@ -163,7 +163,7 @@ class DBMySQL : public Module, public Pipe
 
 	void OnSerializableDestruct(Serializable *obj) override
 	{
-		if (!this->CheckInit())	
+		if (!this->CheckInit())
 			return;
 		Serialize::Type *s_type = obj->GetSerializableType();
 		if (s_type)

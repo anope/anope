@@ -25,7 +25,7 @@ class CoreExport ExtensibleBase : public Service
 	~ExtensibleBase();
 
  public:
-	virtual void Unset(Extensible *obj) = 0;
+	virtual void Unset(Extensible *obj) anope_abstract;
 
 	/* called when an object we are keep track of is serializing */
 	virtual void ExtensibleSerialize(const Extensible *, const Serializable *, Serialize::Data &) const { }
@@ -55,7 +55,7 @@ template<typename T>
 class BaseExtensibleItem : public ExtensibleBase
 {
  protected:
-	virtual T *Create(Extensible *) = 0;
+	virtual T *Create(Extensible *) anope_abstract;
 
  public:
 	BaseExtensibleItem(Module *m, const Anope::string &n) : ExtensibleBase(m, n) { }

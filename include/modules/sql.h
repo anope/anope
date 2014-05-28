@@ -38,7 +38,7 @@ namespace SQL
 
 		size_t Hash() const override
 		{
-			size_t hash = 0;
+			size_t hash anope_abstract;
 			for (Map::const_iterator it = this->data.begin(), it_end = this->data.end(); it != it_end; ++it)
 				if (!it->second->str().empty())
 					hash ^= Anope::hash_cs()(it->second->str());
@@ -188,8 +188,8 @@ namespace SQL
 		Interface(Module *m) : owner(m) { }
 		virtual ~Interface() { }
 
-		virtual void OnResult(const Result &r) = 0;
-		virtual void OnError(const Result &r) = 0;
+		virtual void OnResult(const Result &r) anope_abstract;
+		virtual void OnError(const Result &r) anope_abstract;
 	};
 
 	/** Class providing the SQL service, modules call this to execute queries
@@ -199,17 +199,17 @@ namespace SQL
 	 public:
 		Provider(Module *c, const Anope::string &n) : Service(c, "SQL::Provider", n) { }
 
-		virtual void Run(Interface *i, const Query &query) = 0;
+		virtual void Run(Interface *i, const Query &query) anope_abstract;
 
-		virtual Result RunQuery(const Query &query) = 0;
+		virtual Result RunQuery(const Query &query) anope_abstract;
 
-		virtual std::vector<Query> CreateTable(const Anope::string &table, const Data &data) = 0;
+		virtual std::vector<Query> CreateTable(const Anope::string &table, const Data &data) anope_abstract;
 
-		virtual Query BuildInsert(const Anope::string &table, unsigned int id, Data &data) = 0;
+		virtual Query BuildInsert(const Anope::string &table, unsigned int id, Data &data) anope_abstract;
 
-		virtual Query GetTables(const Anope::string &prefix) = 0;
+		virtual Query GetTables(const Anope::string &prefix) anope_abstract;
 
-		virtual Anope::string FromUnixtime(time_t) = 0;
+		virtual Anope::string FromUnixtime(time_t) anope_abstract;
 	};
 
 }

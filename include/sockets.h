@@ -381,7 +381,7 @@ class CoreExport ListenSocket : public virtual Socket
  	 * @param addr The sockaddr for where the connection came from
 	 * @return The new socket
 	 */
-	virtual ClientSocket *OnAccept(int fd, const sockaddrs &addr) = 0;
+	virtual ClientSocket *OnAccept(int fd, const sockaddrs &addr) anope_abstract;
 };
 
 class CoreExport ConnectionSocket : public virtual Socket
@@ -493,7 +493,7 @@ class CoreExport Pipe : public Socket
 
 	/** Called after ProcessRead comes back from Notify(), overload to do something useful
 	 */
-	virtual void OnNotify() = 0;
+	virtual void OnNotify() anope_abstract;
 };
 
 extern CoreExport uint32_t TotalRead;

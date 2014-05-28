@@ -46,29 +46,29 @@ struct BadWords
 	 * @param type The type (SINGLE START END)
 	 * @return The badword
 	 */
-	virtual BadWord* AddBadWord(const Anope::string &word, BadWordType type) = 0;
+	virtual BadWord* AddBadWord(const Anope::string &word, BadWordType type) anope_abstract;
 
 	/** Get a badword structure by index
 	 * @param index The index
 	 * @return The badword
 	 */
-	virtual BadWord* GetBadWord(unsigned index) const = 0;
+	virtual BadWord* GetBadWord(unsigned index) const anope_abstract;
 
 	/** Get how many badwords are on this channel
 	 * @return The number of badwords in the vector
 	 */
-	virtual unsigned GetBadWordCount() const = 0;
+	virtual unsigned GetBadWordCount() const anope_abstract;
 
 	/** Remove a badword
 	 * @param index The index of the badword
 	 */
-	virtual void EraseBadWord(unsigned index) = 0;
+	virtual void EraseBadWord(unsigned index) anope_abstract;
 
 	/** Clear all badwords from the channel
 	 */
-	virtual void ClearBadWords() = 0;
+	virtual void ClearBadWords() anope_abstract;
 
-	virtual void Check() = 0;
+	virtual void Check() anope_abstract;
 };
 
 namespace Event

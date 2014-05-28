@@ -38,6 +38,6 @@ struct LogSettings : Serialize::Checker<std::vector<LogSetting *> >
 
  public:
  	virtual ~LogSettings() { }
-	virtual LogSetting *Create() = 0;
+	virtual LogSetting *Create() anope_abstract;
 };
 

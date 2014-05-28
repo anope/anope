@@ -121,14 +121,14 @@ namespace DNS
 		Manager(Module *creator) : Service(creator, "DNS::Manager", "dns/manager") { }
 		virtual ~Manager() { }
 
-		virtual void Process(Request *req) = 0;
-		virtual void RemoveRequest(Request *req) = 0;
+		virtual void Process(Request *req) anope_abstract;
+		virtual void RemoveRequest(Request *req) anope_abstract;
 
-		virtual bool HandlePacket(ReplySocket *s, const unsigned char *const data, int len, sockaddrs *from) = 0;
+		virtual bool HandlePacket(ReplySocket *s, const unsigned char *const data, int len, sockaddrs *from) anope_abstract;
 
-		virtual void UpdateSerial() = 0;
-		virtual void Notify(const Anope::string &zone) = 0;
-		virtual uint32_t GetSerial() const = 0;
+		virtual void UpdateSerial() anope_abstract;
+		virtual void Notify(const Anope::string &zone) anope_abstract;
+		virtual uint32_t GetSerial() const anope_abstract;
 	};
 
 	/** A DNS query.
@@ -155,7 +155,7 @@ namespace DNS
 		/** Called when this request succeeds
 		 * @param r The query sent back from the nameserver
 		 */
-		virtual void OnLookupComplete(const Query *r) = 0;
+		virtual void OnLookupComplete(const Query *r) anope_abstract;
 
 		/** Called when this request fails or times out.
 		 * @param r The query sent back from the nameserver, check the error code.

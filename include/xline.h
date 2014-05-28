@@ -151,13 +151,13 @@ class CoreExport XLineManager : public Service
 	 * @param u The user
 	 * @param x The xline
 	 */
-	virtual bool Check(User *u, const XLine *x) = 0;
+	virtual bool Check(User *u, const XLine *x) anope_abstract;
 
 	/** Called when a user matches a xline in this XLineManager
 	 * @param u The user
 	 * @param x The XLine they match
 	 */
-	virtual void OnMatch(User *u, XLine *x) = 0;
+	virtual void OnMatch(User *u, XLine *x) anope_abstract;
 
 	/** Called when an XLine expires
 	 * @param x The xline
@@ -168,11 +168,11 @@ class CoreExport XLineManager : public Service
 	 * @param u The user, if we know it
 	 * @param x The xline
 	 */
-	virtual void Send(User *u, XLine *x) = 0;
+	virtual void Send(User *u, XLine *x) anope_abstract;
 
 	/** Called to remove an XLine from the IRCd
 	 * @param x The XLine
 	 */
-	virtual void SendDel(XLine *x) = 0;
+	virtual void SendDel(XLine *x) anope_abstract;
 };
 

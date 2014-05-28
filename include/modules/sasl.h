@@ -25,19 +25,19 @@ namespace SASL
 	 public:
 		Service(Module *o) : ::Service(o, "SASL::Service", "sasl") { }
 
-		virtual void ProcessMessage(const Message &) = 0;
+		virtual void ProcessMessage(const Message &) anope_abstract;
 
-		virtual Anope::string GetAgent() = 0;
+		virtual Anope::string GetAgent() anope_abstract;
 
-		virtual Session* GetSession(const Anope::string &uid) = 0;
+		virtual Session* GetSession(const Anope::string &uid) anope_abstract;
 
-		virtual void SendMessage(SASL::Session *session, const Anope::string &type, const Anope::string &data) = 0;
+		virtual void SendMessage(SASL::Session *session, const Anope::string &type, const Anope::string &data) anope_abstract;
 
-		virtual void Succeed(Session *, NickServ::Account *) = 0;
-		virtual void Fail(Session *) = 0;
-		virtual void SendMechs(Session *) = 0;
-		virtual void DeleteSessions(Mechanism *, bool = false) = 0;
-		virtual void RemoveSession(Session *) = 0;
+		virtual void Succeed(Session *, NickServ::Account *) anope_abstract;
+		virtual void Fail(Session *) anope_abstract;
+		virtual void SendMechs(Session *) anope_abstract;
+		virtual void DeleteSessions(Mechanism *, bool = false) anope_abstract;
+		virtual void RemoveSession(Session *) anope_abstract;
 	};
 
 	static ServiceReference<SASL::Service> sasl("SASL::Service", "sasl");
@@ -64,7 +64,7 @@ namespace SASL
 
 		virtual Session* CreateSession(const Anope::string &uid) { return new Session(this, uid); }
 
-		virtual void ProcessMessage(Session *session, const Message &) = 0;
+		virtual void ProcessMessage(Session *session, const Message &) anope_abstract;
 
 		virtual ~Mechanism()
 		{

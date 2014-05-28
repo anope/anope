@@ -143,7 +143,7 @@ class CoreExport Command : public Service
 	 * @param source The source
 	 * @param params Command parameters
 	 */
-	virtual void Execute(CommandSource &source, const std::vector<Anope::string> &params) = 0;
+	virtual void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_abstract;
 
 	/** Called when HELP is requsted for the client this command is on.
 	 * @param source The source

@@ -68,7 +68,7 @@ class WebPanelPage : public HTTPPage
 	{
 	}
 
-	virtual bool OnRequest(HTTPProvider *, const Anope::string &, HTTPClient *, HTTPMessage &, HTTPReply &) = 0;
+	virtual bool OnRequest(HTTPProvider *, const Anope::string &, HTTPClient *, HTTPMessage &, HTTPReply &) anope_abstract;
 };
 
 class WebPanelProtectedPage : public WebPanelPage
@@ -134,7 +134,7 @@ class WebPanelProtectedPage : public WebPanelPage
 		return this->OnRequest(provider, page_name, client, message, reply, na, replacements);
 	}
 
-	virtual bool OnRequest(HTTPProvider *, const Anope::string &, HTTPClient *, HTTPMessage &, HTTPReply &, NickServ::Nick *, TemplateFileServer::Replacements &) = 0;
+	virtual bool OnRequest(HTTPProvider *, const Anope::string &, HTTPClient *, HTTPMessage &, HTTPReply &, NickServ::Nick *, TemplateFileServer::Replacements &) anope_abstract;
 
 	/* What get data should be appended to links in the navbar */
 	virtual std::set<Anope::string> GetData() { return std::set<Anope::string>(); }

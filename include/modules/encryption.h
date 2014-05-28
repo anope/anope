@@ -19,9 +19,9 @@ namespace Encryption
 	{
 	 public:
 	 	virtual ~Context() { }
-		virtual void Update(const unsigned char *data, size_t len) = 0;
-		virtual void Finalize() = 0;
-		virtual Hash GetFinalizedHash() = 0;
+		virtual void Update(const unsigned char *data, size_t len) anope_abstract;
+		virtual void Finalize() anope_abstract;
+		virtual Hash GetFinalizedHash() anope_abstract;
 	};
 
 	class Provider : public Service
@@ -30,8 +30,8 @@ namespace Encryption
 		Provider(Module *creator, const Anope::string &sname) : Service(creator, "Encryption::Provider", sname) { }
 		virtual ~Provider() { }
 
-		virtual Context *CreateContext(IV * = NULL) = 0;
-		virtual IV GetDefaultIV() = 0;
+		virtual Context *CreateContext(IV * = NULL) anope_abstract;
+		virtual IV GetDefaultIV() anope_abstract;
 	};
 }
 

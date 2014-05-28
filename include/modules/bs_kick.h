@@ -42,7 +42,7 @@ struct KickerData
 
  public:
 	virtual ~KickerData() { }
-	virtual void Check(ChanServ::Channel *ci) = 0;
+	virtual void Check(ChanServ::Channel *ci) anope_abstract;
 };
 
 namespace Event

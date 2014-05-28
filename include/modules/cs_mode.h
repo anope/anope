@@ -35,7 +35,7 @@ struct ModeLocks
 	 * @param status True to check mlock on, false for mlock off
 	 * @return true on success, false on fail
 	 */
-	virtual bool HasMLock(ChannelMode *mode, const Anope::string &param, bool status) const = 0;
+	virtual bool HasMLock(ChannelMode *mode, const Anope::string &param, bool status) const anope_abstract;
 
 	/** Set a mlock
 	 * @param mode The mode
@@ -45,7 +45,7 @@ struct ModeLocks
 	 * @param created When the mlock was created
 	 * @return true on success, false on failure (module blocking)
 	 */
-	virtual bool SetMLock(ChannelMode *mode, bool status, const Anope::string &param = "", Anope::string setter = "", time_t created = Anope::CurTime) = 0;
+	virtual bool SetMLock(ChannelMode *mode, bool status, const Anope::string &param = "", Anope::string setter = "", time_t created = Anope::CurTime) anope_abstract;
 
 	/** Remove a mlock
 	 * @param mode The mode
@@ -53,39 +53,39 @@ struct ModeLocks
 	 * @param param The param of the mode, required if it is a list or status mode
 	 * @return true on success, false on failure
 	 */
-	virtual bool RemoveMLock(ChannelMode *mode, bool status, const Anope::string &param = "") = 0;
+	virtual bool RemoveMLock(ChannelMode *mode, bool status, const Anope::string &param = "") anope_abstract;
 
-	virtual void RemoveMLock(ModeLock *mlock) = 0;
+	virtual void RemoveMLock(ModeLock *mlock) anope_abstract;
 
 	/** Clear all mlocks on the channel
 	 */
-	virtual void ClearMLock() = 0;
+	virtual void ClearMLock() anope_abstract;
 
 	/** Get all of the mlocks for this channel
 	 * @return The mlocks
 	 */
-	virtual const ModeList &GetMLock() const = 0;
+	virtual const ModeList &GetMLock() const anope_abstract;
 
 	/** Get a list of mode locks on a channel
 	 * @param name The mode name to get a list of
 	 * @return a list of mlocks for the given mode
 	 */
-	virtual std::list<ModeLock *> GetModeLockList(const Anope::string &name) = 0;
+	virtual std::list<ModeLock *> GetModeLockList(const Anope::string &name) anope_abstract;
 
 	/** Get details for a specific mlock
 	 * @param mname The mode name
  	 * @param An optional param to match with
 	 * @return The MLock, if any
 	 */
-	virtual const ModeLock *GetMLock(const Anope::string &mname, const Anope::string &param = "") = 0;
+	virtual const ModeLock *GetMLock(const Anope::string &mname, const Anope::string &param = "") anope_abstract;
 
 	/** Get the current mode locks as a string
 	 * @param complete True to show mlock parameters aswell
 	 * @return A string of mode locks, eg: +nrt
 	 */
-	virtual Anope::string GetMLockAsString(bool complete) const = 0;
+	virtual Anope::string GetMLockAsString(bool complete) const anope_abstract;
 
-	virtual void Check() = 0;
+	virtual void Check() anope_abstract;
 };
 
 namespace Event

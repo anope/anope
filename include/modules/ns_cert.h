@@ -22,7 +22,7 @@ struct NSCertList
 	 *
 	 * Adds a new entry into the cert list.
 	 */
-	virtual void AddCert(const Anope::string &entry) = 0;
+	virtual void AddCert(const Anope::string &entry) anope_abstract;
 
 	/** Get an entry from the nick's cert list by index
 	 *
@@ -31,9 +31,9 @@ struct NSCertList
 	 *
 	 * Retrieves an entry from the certificate list corresponding to the given index.
 	 */
-	virtual Anope::string GetCert(unsigned entry) const = 0;
+	virtual Anope::string GetCert(unsigned entry) const anope_abstract;
 
-	virtual unsigned GetCertCount() const = 0;
+	virtual unsigned GetCertCount() const anope_abstract;
 
 	/** Find an entry in the nick's cert list
 	 *
@@ -42,7 +42,7 @@ struct NSCertList
 	 *
 	 * Search for an fingerprint within the cert list.
 	 */
-	virtual bool FindCert(const Anope::string &entry) const = 0;
+	virtual bool FindCert(const Anope::string &entry) const anope_abstract;
 
 	/** Erase a fingerprint from the nick's certificate list
 	 *
@@ -50,15 +50,15 @@ struct NSCertList
 	 *
 	 * Removes the specified fingerprint from the cert list.
 	 */
-	virtual void EraseCert(const Anope::string &entry) = 0;
+	virtual void EraseCert(const Anope::string &entry) anope_abstract;
 
 	/** Clears the entire nick's cert list
 	 *
 	 * Deletes all the memory allocated in the certificate list vector and then clears the vector.
 	 */
-	virtual void ClearCert() = 0;
+	virtual void ClearCert() anope_abstract;
 
-	virtual void Check() = 0;
+	virtual void Check() anope_abstract;
 };
 
 class CertService : public Service
@@ -66,7 +66,7 @@ class CertService : public Service
  public:
 	CertService(Module *c) : Service(c, "CertService", "certs") { }
 
-	virtual NickServ::Account* FindAccountFromCert(const Anope::string &cert) = 0;
+	virtual NickServ::Account* FindAccountFromCert(const Anope::string &cert) anope_abstract;
 };
 
 namespace Event

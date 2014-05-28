@@ -32,21 +32,21 @@ class SessionService : public Service
 
 	SessionService(Module *m) : Service(m, "SessionService", "session") { }
 
-	virtual Exception *CreateException() = 0;
+	virtual Exception *CreateException() anope_abstract;
 
-	virtual void AddException(Exception *e) = 0;
+	virtual void AddException(Exception *e) anope_abstract;
 
-	virtual void DelException(Exception *e) = 0;
+	virtual void DelException(Exception *e) anope_abstract;
 
-	virtual Exception *FindException(User *u) = 0;
+	virtual Exception *FindException(User *u) anope_abstract;
 
-	virtual Exception *FindException(const Anope::string &host) = 0;
+	virtual Exception *FindException(const Anope::string &host) anope_abstract;
 
-	virtual ExceptionVector &GetExceptions() = 0;
+	virtual ExceptionVector &GetExceptions() anope_abstract;
 
-	virtual Session *FindSession(const Anope::string &ip) = 0;
+	virtual Session *FindSession(const Anope::string &ip) anope_abstract;
 
-	virtual SessionMap &GetSessions() = 0;
+	virtual SessionMap &GetSessions() anope_abstract;
 };
 
 static ServiceReference<SessionService> session_service("SessionService", "session");

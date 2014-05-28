@@ -28,9 +28,9 @@ namespace Redis
 		void Clear()
 		{
 			type = NOT_PARSED;
-			i = 0;
+			i anope_abstract;
 			bulk.clear();
-			multi_bulk_size = 0;
+			multi_bulk_size anope_abstract;
 			for (unsigned j = 0; j < multi_bulk.size(); ++j)
 				delete multi_bulk[j];
 			multi_bulk.clear();
@@ -50,7 +50,7 @@ namespace Redis
 		Interface(Module *m) : owner(m) { }
 		virtual ~Interface() { }
 
-		virtual void OnResult(const Reply &r) = 0;
+		virtual void OnResult(const Reply &r) anope_abstract;
 		virtual void OnError(const Anope::string &error) { Log(owner) << error; }
 	};
 
@@ -59,16 +59,16 @@ namespace Redis
 	 public:
 		Provider(Module *c, const Anope::string &n) : Service(c, "Redis::Provider", n) { }
 
-		virtual void SendCommand(Interface *i, const std::vector<Anope::string> &cmds) = 0;
-		virtual void SendCommand(Interface *i, const Anope::string &str) = 0;
+		virtual void SendCommand(Interface *i, const std::vector<Anope::string> &cmds) anope_abstract;
+		virtual void SendCommand(Interface *i, const Anope::string &str) anope_abstract;
 
-		virtual bool BlockAndProcess() = 0;
+		virtual bool BlockAndProcess() anope_abstract;
 
-		virtual void Subscribe(Interface *i, const Anope::string &pattern) = 0;
-		virtual void Unsubscribe(const Anope::string &pattern) = 0;
+		virtual void Subscribe(Interface *i, const Anope::string &pattern) anope_abstract;
+		virtual void Unsubscribe(const Anope::string &pattern) anope_abstract;
 
-		virtual void StartTransaction() = 0;
-		virtual void CommitTransaction() = 0;
+		virtual void StartTransaction() anope_abstract;
+		virtual void CommitTransaction() anope_abstract;
 	};
 }
 

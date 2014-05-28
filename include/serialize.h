@@ -30,7 +30,7 @@ namespace Serialize
 
 		virtual ~Data() { }
 
-		virtual std::iostream& operator[](const Anope::string &key) = 0;
+		virtual std::iostream& operator[](const Anope::string &key) anope_abstract;
 		virtual std::set<Anope::string> KeySet() const { throw CoreException("Not supported"); }
 		virtual size_t Hash() const { throw CoreException("Not supported"); }
 
@@ -99,7 +99,7 @@ class CoreExport Serializable : public virtual Base
 	 */
 	Serialize::Type* GetSerializableType() const { return this->s_type; }
 
-	virtual void Serialize(Serialize::Data &data) const = 0;
+	virtual void Serialize(Serialize::Data &data) const anope_abstract;
 
 	static const std::list<Serializable *> &GetItems();
 };

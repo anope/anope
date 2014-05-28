@@ -30,13 +30,13 @@ class NewsService : public Service
  public:
 	NewsService(Module *m) : Service(m, "NewsService", "news") { }
 
-	virtual NewsItem *CreateNewsItem() = 0;
+	virtual NewsItem *CreateNewsItem() anope_abstract;
 
-	virtual void AddNewsItem(NewsItem *n) = 0;
+	virtual void AddNewsItem(NewsItem *n) anope_abstract;
 
-	virtual void DelNewsItem(NewsItem *n) = 0;
+	virtual void DelNewsItem(NewsItem *n) anope_abstract;
 
-	virtual std::vector<NewsItem *> &GetNewsList(NewsType t) = 0;
+	virtual std::vector<NewsItem *> &GetNewsList(NewsType t) anope_abstract;
 };
 
 static ServiceReference<NewsService> news_service("NewsService", "news");

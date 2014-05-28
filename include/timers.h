@@ -95,7 +95,7 @@ class CoreExport Timer
 	/** Called when the timer ticks
 	 * This should be overridden with something useful
 	 */
-	virtual void Tick(time_t ctime) = 0;
+	virtual void Tick(time_t ctime) anope_abstract;
 };
 
 /** This class manages sets of Timers, and triggers them at their defined times.

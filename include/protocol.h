@@ -95,8 +95,8 @@ class CoreExport IRCDProto : public Service
 	 * @param u The user affected by the akill, if known
 	 * @param x The akill
 	 */
-	virtual void SendAkill(User *, XLine *) = 0;
-	virtual void SendAkillDel(const XLine *) = 0;
+	virtual void SendAkill(User *, XLine *) anope_abstract;
+	virtual void SendAkillDel(const XLine *) anope_abstract;
 
 	/* Realname ban */
 	virtual void SendSGLine(User *, const XLine *) { }
@@ -125,7 +125,7 @@ class CoreExport IRCDProto : public Service
 	/** Introduces a client to the rest of the network
 	 * @param u The client to introduce
 	 */
-	virtual void SendClientIntroduction(User *u) = 0;
+	virtual void SendClientIntroduction(User *u) anope_abstract;
 
 	virtual void SendKick(const MessageSource &source, const Channel *chan, User *user, const char *fmt, ...);
 
@@ -134,8 +134,8 @@ class CoreExport IRCDProto : public Service
 	virtual void SendAction(const MessageSource &source, const Anope::string &dest, const char *fmt, ...);
 	virtual void SendCTCP(const MessageSource &source, const Anope::string &dest, const char *fmt, ...);
 
-	virtual void SendGlobalNotice(BotInfo *bi, const Server *dest, const Anope::string &msg) = 0;
-	virtual void SendGlobalPrivmsg(BotInfo *bi, const Server *desc, const Anope::string &msg) = 0;
+	virtual void SendGlobalNotice(BotInfo *bi, const Server *dest, const Anope::string &msg) anope_abstract;
+	virtual void SendGlobalPrivmsg(BotInfo *bi, const Server *desc, const Anope::string &msg) anope_abstract;
 
 	virtual void SendQuit(User *u, const char *fmt, ...);
 	virtual void SendPing(const Anope::string &servname, const Anope::string &who);
@@ -148,7 +148,7 @@ class CoreExport IRCDProto : public Service
 	 * be set on the user. This may include the modes in the join, but will usually place them on the mode
 	 * stacker to be set "soon".
 	 */
-	virtual void SendJoin(User *u, Channel *c, const ChannelStatus *status) = 0;
+	virtual void SendJoin(User *u, Channel *c, const ChannelStatus *status) anope_abstract;
 	virtual void SendPart(User *u, const Channel *chan, const char *fmt, ...);
 
 	/** Force joins a user that isn't ours to a channel.
@@ -185,7 +185,7 @@ class CoreExport IRCDProto : public Service
 	/** Used to introduce ourselves to our uplink. Usually will SendServer(Me) and any other
 	 * initial handshake requirements.
 	 */
-	virtual void SendConnect() = 0;
+	virtual void SendConnect() anope_abstract;
 
 	/** Called right before we begin our burst, after we have handshaked successfully with the uplink/
 	 * At this point none of our servesr, users, or channels exist on the uplink
@@ -200,13 +200,13 @@ class CoreExport IRCDProto : public Service
 
 	/** Introduces a server to the uplink
 	 */
-	virtual void SendServer(const Server *) = 0;
+	virtual void SendServer(const Server *) anope_abstract;
 	virtual void SendSquit(Server *, const Anope::string &message);
 
 	virtual void SendNumeric(int numeric, const Anope::string &dest, const char *fmt, ...);
 
-	virtual void SendLogin(User *u, NickServ::Nick *na) = 0;
-	virtual void SendLogout(User *u) = 0;
+	virtual void SendLogin(User *u, NickServ::Nick *na) anope_abstract;
+	virtual void SendLogout(User *u) anope_abstract;
 
 	/** Send a channel creation message to the uplink.
 	 * On most TS6 IRCds this is a SJOIN with no nick
@@ -265,7 +265,7 @@ class CoreExport IRCDMessage : public Service
  public:
 	IRCDMessage(Module *owner, const Anope::string &n, unsigned p = 0);
 	unsigned GetParamCount() const;
-	virtual void Run(MessageSource &, const std::vector<Anope::string> &params) = 0;
+	virtual void Run(MessageSource &, const std::vector<Anope::string> &params) anope_abstract;
 
 	void SetFlag(IRCDMessageFlag f) { flags.insert(f); }
 	bool HasFlag(IRCDMessageFlag f) const { return flags.count(f); }

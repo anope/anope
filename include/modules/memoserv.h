@@ -92,7 +92,7 @@ namespace MemoServ
 	 */
 	struct CoreExport MemoInfo
 	{
-		int16_t memomax = 0;
+		int16_t memomax anope_abstract;
 		Serialize::Checker<std::vector<Memo *> > memos;
 		std::vector<Anope::string> ignores;
 

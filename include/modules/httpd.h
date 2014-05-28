@@ -104,7 +104,7 @@ class HTTPPage : public Base
 	 * @param The HTTP header sent from the client to request the page
 	 * @param The HTTP header that will be sent back to the client
 	 */
-	virtual bool OnRequest(HTTPProvider *, const Anope::string &, HTTPClient *, HTTPMessage &, HTTPReply &) = 0;
+	virtual bool OnRequest(HTTPProvider *, const Anope::string &, HTTPClient *, HTTPMessage &, HTTPReply &) anope_abstract;
 };
 
 class HTTPClient : public ClientSocket, public BinarySocket, public Base
@@ -123,8 +123,8 @@ class HTTPClient : public ClientSocket, public BinarySocket, public Base
 		return this->clientaddr.addr();
 	}
 
-	virtual void SendError(HTTPError err, const Anope::string &msg) = 0;
-	virtual void SendReply(HTTPReply *) = 0;
+	virtual void SendError(HTTPError err, const Anope::string &msg) anope_abstract;
+	virtual void SendReply(HTTPReply *) anope_abstract;
 };
 
 class HTTPProvider : public ListenSocket, public Service
@@ -153,9 +153,9 @@ class HTTPProvider : public ListenSocket, public Service
 		return this->ssl;
 	}
 
-	virtual bool RegisterPage(HTTPPage *page) = 0;
-	virtual void UnregisterPage(HTTPPage *page) = 0;
-	virtual HTTPPage* FindPage(const Anope::string &name) = 0;
+	virtual bool RegisterPage(HTTPPage *page) anope_abstract;
+	virtual void UnregisterPage(HTTPPage *page) anope_abstract;
+	virtual HTTPPage* FindPage(const Anope::string &name) anope_abstract;
 };
 
 namespace HTTPUtils

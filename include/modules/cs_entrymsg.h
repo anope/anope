@@ -30,6 +30,6 @@ struct EntryMessageList : Serialize::Checker<std::vector<EntryMsg *> >
 			delete (*this)->at(i - 1);
 	}
 
-	virtual EntryMsg* Create() = 0;
+	virtual EntryMsg* Create() anope_abstract;
 };
 

@@ -59,7 +59,7 @@ class CoreExport Thread : public Pipe
 
 	/** Called when the thread is run.
 	 */
-	virtual void Run() = 0;
+	virtual void Run() anope_abstract;
 };
 
 class Mutex

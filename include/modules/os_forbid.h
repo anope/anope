@@ -29,15 +29,15 @@ class ForbidService : public Service
  public:
 	ForbidService(Module *m) : Service(m, "ForbidService", "forbid") { }
 
-	virtual void AddForbid(ForbidData *d) = 0;
+	virtual void AddForbid(ForbidData *d) anope_abstract;
 
-	virtual void RemoveForbid(ForbidData *d) = 0;
+	virtual void RemoveForbid(ForbidData *d) anope_abstract;
 
-	virtual ForbidData* CreateForbid() = 0;
+	virtual ForbidData* CreateForbid() anope_abstract;
 
-	virtual ForbidData *FindForbid(const Anope::string &mask, ForbidType type) = 0;
+	virtual ForbidData *FindForbid(const Anope::string &mask, ForbidType type) anope_abstract;
 
-	virtual std::vector<ForbidData *> GetForbids() = 0;
+	virtual std::vector<ForbidData *> GetForbids() anope_abstract;
 };
 
 static ServiceReference<ForbidService> forbid_service("ForbidService", "forbid");

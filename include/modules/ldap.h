@@ -114,8 +114,8 @@ class LDAPInterface
 	LDAPInterface(Module *m) : owner(m) { }
 	virtual ~LDAPInterface() { }
 
-	virtual void OnResult(const LDAPResult &r) = 0;
-	virtual void OnError(const LDAPResult &err) = 0;
+	virtual void OnResult(const LDAPResult &r) anope_abstract;
+	virtual void OnError(const LDAPResult &err) anope_abstract;
 	virtual void OnDelete() { }
 };
 
@@ -128,7 +128,7 @@ class LDAPProvider : public Service
 	 * @param i The LDAPInterface the result is sent to
 	 * @return The query ID
 	 */
-	virtual LDAPQuery BindAsAdmin(LDAPInterface *i) = 0;
+	virtual LDAPQuery BindAsAdmin(LDAPInterface *i) anope_abstract;
 
 	/** Bind to LDAP
 	 * @param i The LDAPInterface the result is sent to
@@ -136,7 +136,7 @@ class LDAPProvider : public Service
 	 * @param pass The password
 	 * @return The query ID
 	 */
-	virtual LDAPQuery Bind(LDAPInterface *i, const Anope::string &who, const Anope::string &pass) = 0;
+	virtual LDAPQuery Bind(LDAPInterface *i, const Anope::string &who, const Anope::string &pass) anope_abstract;
 
 	/** Search ldap for the specified filter
 	 * @param i The LDAPInterface the result is sent to
@@ -144,7 +144,7 @@ class LDAPProvider : public Service
 	 * @param filter The filter to apply
 	 * @return The query ID
 	 */
-	virtual LDAPQuery Search(LDAPInterface *i, const Anope::string &base, const Anope::string &filter) = 0;
+	virtual LDAPQuery Search(LDAPInterface *i, const Anope::string &base, const Anope::string &filter) anope_abstract;
 
 	/** Add an entry to LDAP
 	 * @param i The LDAPInterface the result is sent to
@@ -152,14 +152,14 @@ class LDAPProvider : public Service
 	 * @param attributes The attributes
 	 * @return The query ID
 	 */
-	virtual LDAPQuery Add(LDAPInterface *i, const Anope::string &dn, LDAPMods &attributes) = 0;
+	virtual LDAPQuery Add(LDAPInterface *i, const Anope::string &dn, LDAPMods &attributes) anope_abstract;
 
 	/** Delete an entry from LDAP
 	 * @param i The LDAPInterface the result is sent to
 	 * @param dn The dn of the entry to delete
 	 * @return The query ID
 	 */
-	virtual LDAPQuery Del(LDAPInterface *i, const Anope::string &dn) = 0;
+	virtual LDAPQuery Del(LDAPInterface *i, const Anope::string &dn) anope_abstract;
 
 	/** Modify an existing entry in LDAP
 	 * @param i The LDAPInterface the result is sent to
@@ -167,7 +167,7 @@ class LDAPProvider : public Service
 	 * @param attributes The attributes to modify
 	 * @return The query ID
 	 */
-	virtual LDAPQuery Modify(LDAPInterface *i, const Anope::string &base, LDAPMods &attributes) = 0;
+	virtual LDAPQuery Modify(LDAPInterface *i, const Anope::string &base, LDAPMods &attributes) anope_abstract;
 };
 
 #endif // ANOPE_LDAP_H

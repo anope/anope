@@ -28,17 +28,17 @@ class IgnoreService : public Service
 	IgnoreService(Module *c) : Service(c, "IgnoreService", "ignore") { }
 
  public:
-	virtual void AddIgnore(IgnoreData *) = 0;
+	virtual void AddIgnore(IgnoreData *) anope_abstract;
 
-	virtual void DelIgnore(IgnoreData *) = 0;
+	virtual void DelIgnore(IgnoreData *) anope_abstract;
 
-	virtual void ClearIgnores() = 0;
+	virtual void ClearIgnores() anope_abstract;
 
-	virtual IgnoreData *Create() = 0;
+	virtual IgnoreData *Create() anope_abstract;
 
-	virtual IgnoreData *Find(const Anope::string &mask) = 0;
+	virtual IgnoreData *Find(const Anope::string &mask) anope_abstract;
 
-	virtual std::vector<IgnoreData *> &GetIgnores() = 0;
+	virtual std::vector<IgnoreData *> &GetIgnores() anope_abstract;
 };
 
 static ServiceReference<IgnoreService> ignore_service("IgnoreService", "ignore");

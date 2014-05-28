@@ -21,7 +21,7 @@ class XMLRPCEvent
 {
  public:
  	virtual ~XMLRPCEvent() { }
-	virtual bool Run(XMLRPCServiceInterface *iface, HTTPClient *client, XMLRPCRequest &request) = 0;
+	virtual bool Run(XMLRPCServiceInterface *iface, HTTPClient *client, XMLRPCRequest &request) anope_abstract;
 };
 
 class XMLRPCServiceInterface : public Service
@@ -29,12 +29,12 @@ class XMLRPCServiceInterface : public Service
  public:
 	XMLRPCServiceInterface(Module *creator, const Anope::string &sname) : Service(creator, "XMLRPCServiceInterface", sname) { }
 
-	virtual void Register(XMLRPCEvent *event) = 0;
+	virtual void Register(XMLRPCEvent *event) anope_abstract;
 
-	virtual void Unregister(XMLRPCEvent *event) = 0;
+	virtual void Unregister(XMLRPCEvent *event) anope_abstract;
 
-	virtual Anope::string Sanitize(const Anope::string &string) = 0;
+	virtual Anope::string Sanitize(const Anope::string &string) anope_abstract;
 
-	virtual void Reply(XMLRPCRequest &request) = 0;
+	virtual void Reply(XMLRPCRequest &request) anope_abstract;
 };
 

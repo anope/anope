@@ -26,8 +26,11 @@ class CommandOSReload : public Command
 			Log(LOG_ADMIN, source, this);
 
 			Configuration::Conf *new_config = new Configuration::Conf();
-			delete Config;
+			Configuration::Conf *old = Config;
 			Config = new_config;
+			Config->Post(old);
+			delete old;
+
 			source.Reply(_("Services' configuration has been reloaded."));
 		}
 		catch (const ConfigException &ex)

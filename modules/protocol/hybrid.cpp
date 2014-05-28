@@ -633,7 +633,7 @@ class ProtoHybrid : public Module
 		ModeManager::AddChannelMode(new ChannelModeStatus("OP", 'o', '@', 2));
 
 		/* l/k */
-		ModeManager::AddChannelMode(new ChannelModeParam("LIMIT", 'l'));
+		ModeManager::AddChannelMode(new ChannelModeParam("LIMIT", 'l', true));
 		ModeManager::AddChannelMode(new ChannelModeKey('k'));
 
 		/* Add channel modes */

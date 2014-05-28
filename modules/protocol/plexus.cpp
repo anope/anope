@@ -334,8 +334,9 @@ class ProtoPlexus : public Module
 		ModeManager::AddUserMode(new UserMode("INVIS", 'i'));
 		ModeManager::AddUserMode(new UserModeOperOnly("LOCOPS", 'l'));
 		ModeManager::AddUserMode(new UserMode("OPER", 'o'));
-		ModeManager::AddUserMode(new UserMode("PRIV", 'p'));
 		ModeManager::AddUserMode(new UserModeOperOnly("NETADMIN", 'N'));
+		ModeManager::AddUserMode(new UserMode("PRIV", 'p'));
+		ModeManager::AddUserMode(new UserMode("ROUTING", 'q'));
 		ModeManager::AddUserMode(new UserModeNoone("REGISTERED", 'r'));
 		ModeManager::AddUserMode(new UserMode("REGPRIV", 'R'));
 		ModeManager::AddUserMode(new UserModeOperOnly("SNOMASK", 's'));
@@ -359,7 +360,7 @@ class ProtoPlexus : public Module
 		ModeManager::AddChannelMode(new ChannelModeStatus("OWNER", 'q', '~', 4));
 
 		/* l/k */
-		ModeManager::AddChannelMode(new ChannelModeParam("LIMIT", 'l'));
+		ModeManager::AddChannelMode(new ChannelModeParam("LIMIT", 'l', true));
 		ModeManager::AddChannelMode(new ChannelModeKey('k'));
 
 		/* Add channel modes */

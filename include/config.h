@@ -131,6 +131,7 @@ namespace Configuration
 		~Conf();
 
 		void LoadConf(File &file);
+		void Post(Conf *old);
 
 		Block *GetModule(Module *);
 		Block *GetModule(const Anope::string &name);

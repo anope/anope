@@ -651,7 +651,7 @@ class ProtongIRCd : public Module
 		/* Add channel modes */
 		ModeManager::AddChannelMode(new ChannelMode("INVITE", 'i'));
 		ModeManager::AddChannelMode(new ChannelModeKey('k'));
-		ModeManager::AddChannelMode(new ChannelModeParam("LIMIT", 'l'));
+		ModeManager::AddChannelMode(new ChannelModeParam("LIMIT", 'l', true));
 		ModeManager::AddChannelMode(new ChannelMode("MODERATED", 'm'));
 		ModeManager::AddChannelMode(new ChannelMode("REGMODERATED", 'M'));
 		ModeManager::AddChannelMode(new ChannelMode("NOEXTERNAL", 'n'));

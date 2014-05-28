@@ -127,8 +127,10 @@ void Anope::HandleSignal()
 			try
 			{
 				Configuration::Conf *new_config = new Configuration::Conf();
-				delete Config;
+				Configuration::Conf *old = Config;
 				Config = new_config;
+				Config->Post(old);
+				delete old;
 			}
 			catch (const ConfigException &ex)
 			{

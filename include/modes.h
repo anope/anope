@@ -205,7 +205,7 @@ class CoreExport ChannelModeStatus : public ChannelMode
  * but we still have a representation for it.
  */
 template<typename T>
-class ChannelModeVirtual : public T
+class CoreExport ChannelModeVirtual : public T
 {
 	Anope::string base;
 	ChannelMode *basech;

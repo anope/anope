@@ -1,4 +1,5 @@
 /* RequiredLibraries: pcre */
+/* RequiredWindowsLibraries: libpcre */
 
 #include "module.h"
 #include <pcre.h>

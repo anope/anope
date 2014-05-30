@@ -1,9 +1,14 @@
 /* RequiredLibraries: mysqlclient */
+/* RequiredWindowsLibraries: libmysql */
 
 #include "module.h"
 #include "modules/sql.h"
 #define NO_CLIENT_LONG_LONG
-#include <mysql/mysql.h>
+#ifdef WIN32
+# include <mysql.h>
+#else
+# include <mysql/mysql.h>
+#endif
 
 using namespace SQL;
 

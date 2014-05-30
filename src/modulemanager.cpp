@@ -185,6 +185,7 @@ ModuleReturn ModuleManager::LoadModule(const Anope::string &modname, User *u)
 
 	Module *m;
 
+	ModuleReturn moderr = MOD_ERR_OK;
 	try
 	{
 		m = func(modname, nick);
@@ -192,9 +193,14 @@ ModuleReturn ModuleManager::LoadModule(const Anope::string &modname, User *u)
 	catch (const ModuleException &ex)
 	{
 		Log() << "Error while loading " << modname << ": " << ex.GetReason();
-		/*if (dlclose(handle))
-			Log() << dlerror();*/
-		return MOD_ERR_EXCEPTION;
+		moderr = MOD_ERR_EXCEPTION;
+	}
+	
+	if (moderr != MOD_ERR_OK)
+	{
+		if (dlclose(handle))
+			Log() << dlerror();
+		return moderr;
 	}
 
 	m->filename = pbuf;
@@ -236,17 +242,21 @@ ModuleReturn ModuleManager::LoadModule(const Anope::string &modname, User *u)
 	catch (const ModuleException &ex)
 	{
 		Log() << "Module " << modname << " couldn't load:" << ex.GetReason();
-		DeleteModule(m);
-		return MOD_ERR_EXCEPTION;
+		moderr = MOD_ERR_EXCEPTION;
 	}
 	catch (const ConfigException &ex)
 	{
 		Log() << "Module " << modname << " couldn't load due to configuration problems: " << ex.GetReason();
-		DeleteModule(m);
-		return MOD_ERR_EXCEPTION;
+		moderr = MOD_ERR_EXCEPTION;
 	}
 	catch (const NotImplementedException &ex)
 	{
+	}
+	
+	if (moderr != MOD_ERR_OK)
+	{
+		DeleteModule(m);
+		return moderr;
 	}
 
 	Log(LOG_DEBUG) << "Module " << modname << " loaded.";

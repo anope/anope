@@ -139,12 +139,12 @@ class CommandNSGroup : public Command
 			Log(LOG_COMMAND, source, this) << "and tried to group to SUSPENDED nick " << target->nick;
 			source.Reply(NICK_X_SUSPENDED, target->nick.c_str());
 		}
+		else if (na && Config->GetModule(this->owner)->Get<bool>("nogroupchange"))
+			source.Reply(_("Your nick is already registered."));
 		else if (na && *target->nc == *na->nc)
 			source.Reply(_("You are already a member of the group of \002%s\002."), target->nick.c_str());
 		else if (na && na->nc != u->Account())
 			source.Reply(NICK_IDENTIFY_REQUIRED);
-		else if (na && Config->GetModule(this->owner)->Get<bool>("nogroupchange"))
-			source.Reply(_("Your nick is already registered."));
 		else if (maxaliases && target->nc->aliases->size() >= maxaliases && !target->nc->IsServicesOper())
 			source.Reply(_("There are too many nicks in your group."));
 		else if (u->nick.length() <= guestnick.length() + 7 &&
@@ -156,7 +156,7 @@ class CommandNSGroup : public Command
 		else
 		{
 			bool ok = false;
-			if (!na && u->Account())
+			if (!na && u->Account() == target->nc)
 				ok = true;
 
 			NSCertList *cl = target->nc->GetExt<NSCertList>("certificates");

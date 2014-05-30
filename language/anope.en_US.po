@@ -8,10 +8,11 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Anope\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-05-20 10:09-0400\n"
+"POT-Creation-Date: 2014-05-30 15:56-0400\n"
 "PO-Revision-Date: 2014-05-20 10:11-0400\n"
 "Last-Translator:  <Adam@anope.org>\n"
 "Language-Team: English\n"
+"Language: English\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=ISO-8859-1\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -1538,7 +1539,7 @@ msgstr " Loaded at: %p"
 msgid " but %s mysteriously dematerialized."
 msgstr " but %s mysteriously dematerialized."
 
-#: src/messages.cpp:331
+#: src/messages.cpp:335
 #, c-format
 msgid ""
 "\"/msg %s\" is no longer supported.  Use \"/msg %s@%s\" or \"/%s\" instead."
@@ -1708,7 +1709,7 @@ msgstr "%s access list is empty."
 msgid "%s added to %s's auto join list."
 msgstr "%s added to %s's auto join list."
 
-#: src/xline.cpp:350
+#: src/xline.cpp:360
 #, c-format
 msgid "%s already exists."
 msgstr "%s already exists."
@@ -1729,7 +1730,7 @@ msgstr "%s bad words list is empty."
 msgid "%s cannot be the successor on channel %s as they are the founder."
 msgstr "%s cannot be the successor on channel %s as they are the founder."
 
-#: modules/pseudoclients/operserv.cpp:275
+#: modules/pseudoclients/operserv.cpp:272
 #: modules/pseudoclients/hostserv.cpp:78 modules/pseudoclients/global.cpp:90
 #, c-format
 msgid "%s commands:"
@@ -1830,7 +1831,7 @@ msgstr "%s is a client on services."
 msgid "%s is a network service."
 msgstr "%s is a network service."
 
-#: src/xline.cpp:368
+#: src/xline.cpp:378
 #, c-format
 msgid "%s is already covered by %s."
 msgstr "%s is already covered by %s."
@@ -4808,12 +4809,12 @@ msgstr "Exception for %s has been updated to %d."
 msgid "Expires"
 msgstr "Expires"
 
-#: src/xline.cpp:358
+#: src/xline.cpp:368
 #, c-format
 msgid "Expiry and reason updated for %s."
 msgstr "Expiry and reason updated for %s."
 
-#: src/xline.cpp:361
+#: src/xline.cpp:371
 #, c-format
 msgid "Expiry for %s updated."
 msgstr "Expiry for %s updated."
@@ -5655,8 +5656,8 @@ msgid ""
 "channel.\n"
 "If a mode is locked on or off, services will not allow that mode to be "
 "changed. The SET\n"
-"command will clear all existing mode locks and set the new one given, "
-"while ADD and DEL\n"
+"command will clear all existing mode locks and set the new one given, while "
+"ADD and DEL\n"
 "modify the existing mode lock.\n"
 "Example:\n"
 "     MODE #channel LOCK ADD +bmnt *!*@*aol*\n"
@@ -5685,8 +5686,8 @@ msgstr ""
 "channel.\n"
 "If a mode is locked on or off, services will not allow that mode to be "
 "changed. The SET\n"
-"command will clear all existing mode locks and set the new one given, "
-"while ADD and DEL\n"
+"command will clear all existing mode locks and set the new one given, while "
+"ADD and DEL\n"
 "modify the existing mode lock.\n"
 "Example:\n"
 "     MODE #channel LOCK ADD +bmnt *!*@*aol*\n"
@@ -6825,7 +6826,7 @@ msgstr "Real name"
 msgid "Reason"
 msgstr "Reason"
 
-#: src/xline.cpp:347
+#: src/xline.cpp:357
 #, c-format
 msgid "Reason for %s updated."
 msgstr "Reason for %s updated."
@@ -7069,7 +7070,7 @@ msgstr ""
 "ommited then your status is removed. If channel is ommited then\n"
 "your channel status is removed on every channel you are in."
 
-#: src/xline.cpp:373
+#: src/xline.cpp:383
 #, c-format
 msgid "Removing %s because %s covers it."
 msgstr "Removing %s because %s covers it."
@@ -7497,6 +7498,11 @@ msgstr "Service"
 #, c-format
 msgid "Service's hold on %s has been released."
 msgstr "Service's hold on %s has been released."
+
+#: data/nickserv.example.conf:234 data/chanserv.example.conf:820
+#, fuzzy
+msgid "Services Operator commands"
+msgstr "%s is a Services Operator of type %s."
 
 #: modules/commands/os_defcon.cpp:446 modules/commands/os_defcon.cpp:454
 #: modules/commands/os_defcon.cpp:462 modules/commands/os_defcon.cpp:470
@@ -9929,6 +9935,20 @@ msgstr "Use the %s ALL command to list all commands and their descriptions."
 msgid "Used on"
 msgstr "Used on"
 
+#: data/chanserv.example.conf:814
+#, fuzzy
+msgid "Used to manage channels"
+msgstr "Allowed to change channel topics"
+
+#: data/chanserv.example.conf:802
+#, fuzzy
+msgid "Used to manage the list of privileged users"
+msgstr "Modify the list of privileged users"
+
+#: data/chanserv.example.conf:808
+msgid "Used to modify the channel status of you or other users"
+msgstr ""
+
 #: modules/commands/cs_akick.cpp:551
 msgid "User has been banned from the channel"
 msgstr "User has been banned from the channel"
@@ -10129,7 +10149,7 @@ msgstr ""
 msgid "Word"
 msgstr "Word"
 
-#: modules/commands/ns_group.cpp:143
+#: modules/commands/ns_group.cpp:145
 #, c-format
 msgid "You are already a member of the group of %s."
 msgstr "You are already a member of the group of %s."
@@ -10445,11 +10465,11 @@ msgstr "You must confirm your account before you can register a channel."
 #: modules/commands/cs_drop.cpp:42
 #, c-format
 msgid ""
-"You must enter the channel name twice as a confirmation that you wish to "
-"drop %s."
+"You must enter the channel name twice as a confirmation that you wish to drop"
+" %s."
 msgstr ""
-"You must enter the channel name twice as a confirmation that you wish to "
-"drop %s."
+"You must enter the channel name twice as a confirmation that you wish to drop"
+" %s."
 
 #: modules/commands/ns_register.cpp:137
 #, c-format
@@ -10524,7 +10544,6 @@ msgstr ""
 "Your IRCd does not support vIdent's, if this is incorrect, please report "
 "this as a possible bug"
 
-#: modules/m_ldap_authentication.cpp:110 modules/m_sql_authentication.cpp:47
 #: modules/extra/m_ldap_authentication.cpp:110
 #: modules/extra/m_sql_authentication.cpp:47
 #, c-format
@@ -10562,13 +10581,11 @@ msgstr ""
 msgid "Your email address of %s has been confirmed."
 msgstr "Your email address of %s has been confirmed."
 
-#: modules/m_ldap_authentication.cpp:171
 #: modules/extra/m_ldap_authentication.cpp:171
 #, c-format
 msgid "Your email has been updated to %s"
 msgstr "Your email has been updated to %s"
 
-#: modules/m_sql_authentication.cpp:54
 #: modules/extra/m_sql_authentication.cpp:54
 #, c-format
 msgid "Your email has been updated to %s."
@@ -10609,7 +10626,7 @@ msgstr ""
 msgid "Your nick has been logged out."
 msgstr "Your nick has been logged out."
 
-#: modules/commands/ns_group.cpp:147
+#: modules/commands/ns_group.cpp:143
 msgid "Your nick is already registered."
 msgstr "Your nick is already registered."
 

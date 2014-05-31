@@ -213,11 +213,16 @@ void BotInfo::Part(Channel *c, const Anope::string &reason)
 	if (c->FindUser(this) == NULL)
 		return;
 
+	FOREACH_MOD(OnPrePartChannel, (this, c));
+
 	IRCD->SendPart(this, c, "%s", !reason.empty() ? reason.c_str() : "");
+
+	Anope::string cname = c->name;
+	Reference<Channel> cref = c;
 
 	c->DeleteUser(this);
 
-	FOREACH_MOD(OnPartChannel, (this, c, c->name, reason));
+	FOREACH_MOD(OnPartChannel, (this, cref, cname, reason));
 }
 
 void BotInfo::OnMessage(User *u, const Anope::string &message)

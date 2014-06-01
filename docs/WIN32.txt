@@ -73,18 +73,10 @@ Anope for Windows
        Some Anope modules require third party libraries, such as m_mysql and
        the SSL modules. If these libraries are installed in nonstandard
        locations, cmake will probably not find them and should be told where
-       they are by passing additional search paths to the last question in
-       Config, such as:
+       they are by passing their location to Config.
 
-       -DEXTRA_INCLUDE:STRING=c:/openssl/include;c:/mysql/include
-       -DEXTRA_LIBS:STRING=c:/openssl/lib;c:/mysql/lib
-
-       Building Anope with gettext requires libintl, libiconv, libgcc and
-       libmingex. We have precompiled these libraries for you that you may
-       use if you want. They are avaiable at http://anope.org/downloads/anope-extra.zip
-       The OpenSSL, MySQL, and OpenLDAP header files and libraries are also included in
-       this package. Once downloaded and extracted, you should run install.bat
-       then give Config the path to the new 'installed' directory.
+       The libraries used to build the 'extra' modules are available at
+       https://github.com/Adam-/windows-scripts.
 
     5) You are now ready to compile. If you said you wanted to use NMake in step 4,
        at the prompt type:

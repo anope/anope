@@ -25,6 +25,7 @@ namespace Uplink
 class UplinkSocket : public ConnectionSocket, public BufferedSocket
 {
  public:
+	bool error;
 	UplinkSocket();
 	~UplinkSocket();
 	bool ProcessRead() anope_override;

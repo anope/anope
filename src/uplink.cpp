@@ -60,11 +60,22 @@ void Uplink::Connect()
 
 UplinkSocket::UplinkSocket() : Socket(-1, Config->Uplinks[Anope::CurrentUplink].ipv6), ConnectionSocket(), BufferedSocket()
 {
+	error = false;
 	UplinkSock = this;
 }
 
 UplinkSocket::~UplinkSocket()
 {
+	if (!error)
+	{
+		this->OnError("");
+		Module *protocol = ModuleManager::FindFirstOf(PROTOCOL);
+		if (protocol && !protocol->name.find("inspircd"))
+			Log(LOG_TERMINAL) << "Check that you have loaded m_spanningtree.so on InspIRCd, and are not connecting Anope to an SSL enabled port without configuring SSL in Anope (or vice versa)";
+		else
+			Log(LOG_TERMINAL) << "Check that you are not connecting Anope to an SSL enabled port without configuring SSL in Anope (or vice versa)";
+	}
+
 	if (IRCD && Servers::GetUplink() && Servers::GetUplink()->IsSynced())
 	{
 		FOREACH_MOD(OnServerDisconnect, ());
@@ -136,10 +147,11 @@ void UplinkSocket::OnConnect()
 	FOREACH_MOD(OnServerConnect, ());
 }
 
-void UplinkSocket::OnError(const Anope::string &error)
+void UplinkSocket::OnError(const Anope::string &err)
 {
 	Anope::string what = !this->flags[SF_CONNECTED] ? "Unable to connect to" : "Lost connection from";
-	Log(LOG_TERMINAL) << what << " uplink #" << (Anope::CurrentUplink + 1) << " (" << Config->Uplinks[Anope::CurrentUplink].host << ":" << Config->Uplinks[Anope::CurrentUplink].port << ")" << (!error.empty() ? (": " + error) : "");
+	Log(LOG_TERMINAL) << what << " uplink #" << (Anope::CurrentUplink + 1) << " (" << Config->Uplinks[Anope::CurrentUplink].host << ":" << Config->Uplinks[Anope::CurrentUplink].port << ")" << (!err.empty() ? (": " + err) : "");
+	error |= !err.empty();
 }
 
 UplinkSocket::Message::Message() : source(Me)

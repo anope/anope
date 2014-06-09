@@ -81,11 +81,17 @@ class CommandCSUp : public Command
 			}
 
 			User *u = User::Find(nick, true);
+			User *srcu = source.GetUser();
 			bool override = false;
 
 			if (u == NULL)
 			{
 				source.Reply(NICK_X_NOT_IN_USE, nick.c_str());
+				return;
+			}
+			else if (srcu && !srcu->FindChannel(c))
+			{
+				source.Reply(_("You must be in \002%s\002 to use this command."), c->name.c_str());
 				return;
 			}
 			else if (!u->FindChannel(c))
@@ -173,11 +179,17 @@ class CommandCSDown : public Command
 			}
 
 			User *u = User::Find(nick, true);
+			User *srcu = source.GetUser();
 			bool override = false;
 
 			if (u == NULL)
 			{
 				source.Reply(NICK_X_NOT_IN_USE, nick.c_str());
+				return;
+			}
+			else if (srcu && !srcu->FindChannel(c))
+			{
+				source.Reply(_("You must be in \002%s\002 to use this command."), c->name.c_str());
 				return;
 			}
 			else if (!u->FindChannel(c))

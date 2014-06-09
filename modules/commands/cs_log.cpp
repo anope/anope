@@ -271,7 +271,7 @@ public:
 				"To remove a logging method use the same syntax as you would to add it.\n"
 				" \n"
 				"Example:\n"
-				" %s #anope chanserv/access MESSAGE @%\n"
+				" %s #anope chanserv/access MESSAGE @\n"
 				" Would message any channel operators whenever someone used the\n"
 				" ACCESS command on ChanServ on the channel."),
 				source.command.upper().c_str(), source.command.upper().c_str());

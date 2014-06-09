@@ -1170,7 +1170,7 @@ class ProtoUnreal : public Module
 	Message::Invite message_invite;
 	Message::Join message_join;
 	Message::Kick message_kick;
-	Message::Kill message_kill;
+	Message::Kill message_kill, message_svskill;
 	Message::MOTD message_motd;
 	Message::Notice message_notice;
 	Message::Part message_part;
@@ -1246,7 +1246,7 @@ class ProtoUnreal : public Module
 	ProtoUnreal(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PROTOCOL | VENDOR),
 		ircd_proto(this),
 		message_away(this), message_error(this), message_invite(this), message_join(this), message_kick(this),
-		message_kill(this), message_motd(this), message_notice(this), message_part(this), message_ping(this),
+		message_kill(this), message_svskill(this, "SVSKILL"), message_motd(this), message_notice(this), message_part(this), message_ping(this),
 		message_privmsg(this), message_quit(this), message_squit(this), message_stats(this), message_time(this),
 		message_version(this), message_whois(this),
 

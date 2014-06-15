@@ -146,10 +146,14 @@ class DBFlatFile : public Module, public Pipe
 				Log(LOG_DEBUG) << "db_flatfile: Attempting to rename " << *it << " to " << newname;
 				if (rename(oldname.c_str(), newname.c_str()))
 				{
-					Log(this) << "Unable to back up database " << *it << "!";
+					Anope::string err = Anope::LastError();
+					Log(this) << "Unable to back up database " << *it << " (" << err << ")!";
 
 					if (!Config->GetModule(this)->Get<bool>("nobackupok"))
+					{
 						Anope::Quitting = true;
+						Anope::QuitReason = "Unable to back up database " + *it + " (" + err + ")";
+					}
 
 					continue;
 				}

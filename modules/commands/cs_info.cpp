@@ -74,11 +74,11 @@ class CommandCSInfo : public Command
 		this->SendSyntax(source);
 		source.Reply(" ");
 		source.Reply(_("Lists information about the named registered channel,\n"
-				"including its founder, time of registration, and last\n"
-				"time used. If the user issuing the command has the\n"
-				"appropriate access for it, then the description, successor,\n"
-				"last topic set, settings and expiration time will also\n"
-				"be displayed when applicable."));
+				"including its founder, time of registration, last\n"
+				"time used, and description. If the user issuing the\n"
+				"command has the appropriate access for it, then the"
+				"successor, last topic set, settings and expiration"
+				"time will also be displayed when applicable."));
 		return true;
 	}
 };

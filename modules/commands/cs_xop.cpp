@@ -562,11 +562,6 @@ class CommandCSXOP : public Command
 				"The \002%s CLEAR\002 command clears all entries of the\n"
 				"%s list."), cmd.c_str(), cmd.c_str(), cmd.c_str(), cmd.c_str(),
 				cmd.c_str(), cmd.c_str(), cmd.c_str(), cmd.c_str(), cmd.c_str(), cmd.c_str());
-		source.Reply(_(" \n"
-				"The \002%s\002 commands are limited to founders\n"
-				"(unless SECUREOPS is off). However, any user on the\n"
-				"VOP list or above may use the \002%s LIST\002 command.\n"
-				" \n"), cmd.c_str(), cmd.c_str());
 		BotInfo *access_bi, *flags_bi;
 		Anope::string access_cmd, flags_cmd;
 		Command::FindCommandFromService("chanserv/access", access_bi, access_cmd);

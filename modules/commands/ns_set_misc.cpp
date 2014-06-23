@@ -16,7 +16,7 @@
 
 static Module *me;
 
-static std::map<Anope::string, Anope::string> descriptions;
+static Anope::map<Anope::string> descriptions;
 
 struct NSMiscData;
 static Anope::map<ExtensibleItem<NSMiscData> *> items;

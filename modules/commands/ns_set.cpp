@@ -334,7 +334,7 @@ class CommandNSSetDisplay : public Command
 			return;
 		}
 
-		const NickServ::Nick *user_na = NickServ::FindNick(user), *na = NickServ::FindNick(param);
+		NickServ::Nick *user_na = NickServ::FindNick(user), *na = NickServ::FindNick(param);
 
 		if (Config->GetModule("nickserv")->Get<bool>("nonicknameownership"))
 		{
@@ -362,6 +362,8 @@ class CommandNSSetDisplay : public Command
 		Log(user_na->nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to change the display of " << user_na->nc->display << " to " << na->nick;
 
 		user_na->nc->SetDisplay(na);
+		if (source.GetUser())
+			IRCD->SendLogin(source.GetUser(), na);
 		source.Reply(_("The new display is now \002{0}\002."), user_na->nc->display);
 	}
 
@@ -762,7 +764,7 @@ class CommandNSSetLanguage : public Command
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
-		if (param != "en")
+		if (param != "en_US")
 			for (unsigned j = 0; j < Language::Languages.size(); ++j)
 			{
 				if (Language::Languages[j] == param)
@@ -789,7 +791,7 @@ class CommandNSSetLanguage : public Command
 	{
 		source.Reply(_("Changes the language services will use when sending messages to you (for example, when responding to a command you send). \037language\037 should be chosen from the following list of supported languages:"));
 
-		source.Reply("         en (English)");
+		source.Reply("         en_US (English)");
 		for (unsigned j = 0; j < Language::Languages.size(); ++j)
 		{
 			const Anope::string &langname = Language::Translate(Language::Languages[j].c_str(), _("English"));

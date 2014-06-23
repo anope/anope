@@ -82,7 +82,7 @@ namespace Message
 
 	struct CoreExport Mode : IRCDMessage
 	{
-		Mode(Module *creator, const Anope::string &mname = "MODE") : IRCDMessage(creator, mname, 2) { }
+		Mode(Module *creator, const Anope::string &mname = "MODE") : IRCDMessage(creator, mname, 2) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
 
 		void Run(MessageSource &source, const std::vector<Anope::string> &params) override;
 	};
@@ -131,7 +131,7 @@ namespace Message
 
 	struct CoreExport SQuit : IRCDMessage
 	{
-		SQuit(Module *creator, const Anope::string &mname = "SQUIT") : IRCDMessage(creator, mname, 2) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
+		SQuit(Module *creator, const Anope::string &mname = "SQUIT") : IRCDMessage(creator, mname, 2) { }
 
 		void Run(MessageSource &source, const std::vector<Anope::string> &params) override;
 	};

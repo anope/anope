@@ -43,7 +43,7 @@ class SQLAuthenticationResult : public SQL::Interface
 		if (na == NULL)
 		{
 			na = new NickServ::Nick(req->GetAccount(), new NickServ::Account(req->GetAccount()));
-			NickServ::Event::OnNickRegister(&NickServ::Event::NickRegister::OnNickRegister, user, na);
+			NickServ::Event::OnNickRegister(&NickServ::Event::NickRegister::OnNickRegister, user, na, "");
 			if (user && NickServ)
 				user->SendMessage(NickServ, _("Your account \002%s\002 has been successfully created."), na->nick.c_str());
 		}
@@ -127,7 +127,7 @@ class ModuleSQLAuthentication : public Module
 		if (u)
 		{
 			q.SetValue("n", u->nick);
-			q.SetValue("i", u->ip);
+			q.SetValue("i", u->ip.addr());
 		}
 		else
 		{

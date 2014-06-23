@@ -191,7 +191,7 @@ class CommandNSRegister : public Command
 			Log(LOG_COMMAND, source, this) << "to register " << na->nick << " (email: " << (!na->nc->email.empty() ? na->nc->email : "none") << ")";
 
 			if (NickServ::Event::OnNickRegister)
-				NickServ::Event::OnNickRegister(&NickServ::Event::NickRegister::OnNickRegister, source.GetUser(), na);
+				NickServ::Event::OnNickRegister(&NickServ::Event::NickRegister::OnNickRegister, source.GetUser(), na, pass);
 
 			if (na->nc->GetAccessCount())
 				source.Reply(_("\002{0}\002 has been registered under your hostmask: \002{1}\002"), u_nick, na->nc->GetAccess(0));

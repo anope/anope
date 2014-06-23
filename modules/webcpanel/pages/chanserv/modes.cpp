@@ -61,7 +61,7 @@ bool WebCPanel::ChanServ::Modes::OnRequest(HTTPProvider *server, const Anope::st
 	{
 		ChannelMode *cm = ModeManager::GetChannelModes()[i];
 
-		if (cm && cm->type == MODE_LIST)
+		if (cm->type == MODE_LIST && cm->mchar)
 			replacements["LISTMODES"] = cm->mchar;
 	}
 

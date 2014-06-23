@@ -165,6 +165,10 @@ void AccountImpl::SetDisplay(const NickServ::Nick *na)
 
 	NickServ::nickcore_map& map = NickServ::service->GetAccountList();
 
+	/* this affects the serialized aliases */
+	for (unsigned i = 0; i < aliases->size(); ++i)
+		aliases->at(i)->QueueUpdate();
+
 	/* Remove the core from the list */
 	map.erase(this->display);
 

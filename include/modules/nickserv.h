@@ -82,8 +82,9 @@ namespace NickServ
 			/** Called when a nick is registered
 			 * @param user The user registering the nick, of any
 			 * @param The nick
+			 * @param password The password of the nick
 			 */
-			virtual void OnNickRegister(User *user, Nick *na) anope_abstract;
+			virtual void OnNickRegister(User *user, Nick *na, const Anope::string &password) anope_abstract;
 		};
 		static EventHandlersReference<NickRegister> OnNickRegister("OnNickRegister");
 

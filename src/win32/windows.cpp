@@ -20,12 +20,13 @@
 
 static struct WindowsLanguage
 {
-	const char *languageName;
+	Anope::string languageName;
 	USHORT windowsLanguageName;
 } WindowsLanguages[] = {
 	{"ca_ES", LANG_CATALAN},
 	{"de_DE", LANG_GERMAN},
 	{"el_GR", LANG_GREEK},
+	{"en_US", LANG_ENGLISH},
 	{"es_ES", LANG_SPANISH},
 	{"fr_FR", LANG_FRENCH},
 	{"hu_HU", LANG_HUNGARIAN},
@@ -35,7 +36,6 @@ static struct WindowsLanguage
 	{"pt_PT", LANG_PORTUGUESE},
 	{"ru_RU", LANG_RUSSIAN},
 	{"tr_TR", LANG_TURKISH},
-	{NULL, 0}
 };
 
 static WSADATA wsa;
@@ -51,11 +51,16 @@ void OnShutdown()
 	WSACleanup();
 }
 
-USHORT WindowsGetLanguage(const char *lang)
+USHORT WindowsGetLanguage(const Anope::string &lang)
 {
-	for (int i = 0; WindowsLanguages[i].languageName; ++i)
-		if (!strcmp(lang, WindowsLanguages[i].languageName))
-			return WindowsLanguages[i].windowsLanguageName;
+	for (int i = 0; i < sizeof(WindowsLanguages) / sizeof(WindowsLanguage); ++i)
+	{
+		WindowsLanguage &l = WindowsLanguages[i];
+		
+		if (lang == l.languageName || !lang.find(l.languageName + "."))
+			return l.windowsLanguageName;
+	}
+	
 	return LANG_NEUTRAL;
 }
 

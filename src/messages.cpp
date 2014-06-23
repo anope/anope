@@ -130,6 +130,9 @@ void Join::SJoin(MessageSource &source, const Anope::string &chan, time_t ts, co
 		User *u = it->second;
 		keep_their_modes = ts <= c->creation_time; // OnJoinChannel can call modules which can modify this channel's ts
 
+		if (c->FindUser(u))
+			continue;
+
 		/* Add the user to the channel */
 		c->JoinUser(u, keep_their_modes ? &status : NULL);
 
@@ -157,8 +160,6 @@ void Join::SJoin(MessageSource &source, const Anope::string &chan, time_t ts, co
 
 			if (c->CheckDelete())
 				delete c;
-			else
-				c->CheckModes();
 		}
 	}
 }
@@ -209,19 +210,23 @@ void Kill::Run(MessageSource &source, const std::vector<Anope::string> &params)
 
 void Message::Mode::Run(MessageSource &source, const std::vector<Anope::string> &params)
 {
+	Anope::string buf;
+	for (unsigned i = 1; i < params.size(); ++i)
+		buf += " " + params[i];
+
 	if (IRCD->IsChannelValid(params[0]))
 	{
 		Channel *c = Channel::Find(params[0]);
 
 		if (c)
-			c->SetModesInternal(source, params[1], 0);
+			c->SetModesInternal(source, buf.substr(1), 0);
 	}
 	else
 	{
 		User *u = User::Find(params[0]);
 
 		if (u)
-			u->SetModesInternal(source, "%s", params[1].c_str());
+			u->SetModesInternal(source, "%s", buf.substr(1).c_str());
 	}
 }
 
@@ -314,10 +319,12 @@ void Privmsg::Run(MessageSource &source, const std::vector<Anope::string> &param
 		 * us, and strip it off. */
 		Anope::string botname = receiver;
 		size_t s = receiver.find('@');
+		bool nick_only = false;
 		if (s != Anope::string::npos)
 		{
 			Anope::string servername(receiver.begin() + s + 1, receiver.end());
 			botname = botname.substr(0, s);
+			nick_only = true;
 			if (!servername.equals_ci(Me->GetName()))
 				return;
 		}
@@ -331,7 +338,7 @@ void Privmsg::Run(MessageSource &source, const std::vector<Anope::string> &param
 			return;
 		}
 
-		BotInfo *bi = BotInfo::Find(botname);
+		BotInfo *bi = BotInfo::Find(botname, nick_only);
 
 		if (bi)
 		{
@@ -468,7 +475,7 @@ void Whois::Run(MessageSource &source, const std::vector<Anope::string> &params)
 
 	if (u && u->server == Me)
 	{
-		const BotInfo *bi = BotInfo::Find(u->nick);
+		const BotInfo *bi = BotInfo::Find(u->GetUID());
 		IRCD->SendNumeric(311, source.GetSource(), "%s %s %s * :%s", u->nick.c_str(), u->GetIdent().c_str(), u->host.c_str(), u->realname.c_str());
 		if (bi)
 			IRCD->SendNumeric(307, source.GetSource(), "%s :is a registered nick", bi->nick.c_str());

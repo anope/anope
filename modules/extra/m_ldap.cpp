@@ -1,4 +1,5 @@
 /* RequiredLibraries: ldap,lber */
+/* RequiredWindowsLibraries: libldap,liblber */
 
 #include "module.h"
 #include "modules/ldap.h"
@@ -514,7 +515,7 @@ class ModuleLDAP : public Module, public Pipe
 					ss->Start();
 					this->LDAPServices.insert(std::make_pair(connname, ss));
 
-					Log(LOG_NORMAL, "ldap") << "LDAP: Successfully connected to server " << connname << " (" << server << ")";
+					Log(LOG_NORMAL, "ldap") << "LDAP: Successfully initialized server " << connname << " (" << server << ")";
 				}
 				catch (const LDAPException &ex)
 				{

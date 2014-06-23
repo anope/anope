@@ -36,7 +36,7 @@ macro(build_modules SRC)
           add_library(${SO} MODULE ${MODULE_SRC})
           # Windows requires this because it's weird
           if(WIN32)
-            set(WIN32_NO_LIBS "/nodefaultlib:\"libcmt.lib\"")
+            set(WIN32_NO_LIBS "/nodefaultlib:\"libcmt.lib\" /OPT:NOREF")
           else(WIN32)
             set(WIN32_NO_LIBS)
           endif(WIN32)

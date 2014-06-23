@@ -491,8 +491,7 @@ class CommandCSMode : public Command
 					for (unsigned j = 0; j < ModeManager::GetChannelModes().size(); ++j)
 					{
 						ChannelMode *cm = ModeManager::GetChannelModes()[j];
-						if (!cm)
-							continue;
+
 						if (!u || cm->CanSet(u) || can_override)
 						{
 							if (cm->type == MODE_REGULAR || (!adding && cm->type == MODE_PARAM))
@@ -861,7 +860,7 @@ class CommandCSModes : public Command
 
 class CSMode : public Module
 	, public EventHook<Event::CheckModes>
-	, public EventHook<Event::CreateChan>
+	, public EventHook<Event::ChanRegistered>
 	, public EventHook<Event::ChanInfo>
 {
 	CommandCSMode commandcsmode;
@@ -874,7 +873,7 @@ class CSMode : public Module
  public:
 	CSMode(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
 		, EventHook<Event::CheckModes>("OnCheckModes")
-		, EventHook<Event::CreateChan>("OnCreateChan")
+		, EventHook<Event::ChanRegistered>("OnChanRegistered")
 		, EventHook<Event::ChanInfo>("OnChanInfo")
 		, commandcsmode(this)
 		, commandcsmodes(this)
@@ -958,7 +957,7 @@ class CSMode : public Module
 			}
 	}
 
-	void OnCreateChan(ChanServ::Channel *ci) override
+	void OnChanRegistered(ChanServ::Channel *ci) override
 	{
 		ModeLocks *ml = modelocks.Require(ci);
 		Anope::string mlock;

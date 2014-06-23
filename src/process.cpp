@@ -24,34 +24,10 @@ void Anope::Process(const Anope::string &buffer)
 	if (buffer.empty())
 		return;
 
-	spacesepstream buf_sep(buffer);
-
-	Anope::string source;
-	if (buffer[0] == ':')
-	{
-		buf_sep.GetToken(source);
-		source.erase(0, 1);
-	}
-
-	Anope::string command;
-	if (!buf_sep.GetToken(command))
-		return;
-
-	Anope::string buf_token;
+	Anope::string source, command;
 	std::vector<Anope::string> params;
-	while (buf_sep.GetToken(buf_token))
-	{
-		if (buf_token[0] == ':')
-		{
-			if (!buf_sep.StreamEnd())
-				params.push_back(buf_token.substr(1) + " " + buf_sep.GetRemaining());
-			else
-				params.push_back(buf_token.substr(1));
-			break;
-		}
-		else
-			params.push_back(buf_token);
-	}
+
+	IRCD->Parse(buffer, source, command, params);
 
 	if (Anope::ProtocolDebug)
 	{
@@ -63,6 +39,12 @@ void Anope::Process(const Anope::string &buffer)
 		else
 			for (unsigned i = 0; i < params.size(); ++i)
 				Log() << "params " << i << ": " << params[i];
+	}
+
+	if (command.empty())
+	{
+		Log(LOG_DEBUG) << "No command? " << buffer;
+		return;
 	}
 
 	static const Anope::string proto_name = ModuleManager::FindFirstOf(PROTOCOL) ? ModuleManager::FindFirstOf(PROTOCOL)->name : "";
@@ -89,5 +71,40 @@ void Anope::Process(const Anope::string &buffer)
 		Log(LOG_DEBUG) << "unexpected non-server source " << source << " for " << command;
 	else
 		m->Run(src, params);
+}
+
+void IRCDProto::Parse(const Anope::string &buffer, Anope::string &source, Anope::string &command, std::vector<Anope::string> &params)
+{
+	spacesepstream sep(buffer);
+
+	if (buffer[0] == ':')
+	{
+		sep.GetToken(source);
+		source.erase(0, 1);
+	}
+
+	sep.GetToken(command);
+	
+	for (Anope::string token; sep.GetToken(token);)
+	{
+		if (token[0] == ':')
+		{
+			if (!sep.StreamEnd())
+				params.push_back(token.substr(1) + " " + sep.GetRemaining());
+			else
+				params.push_back(token.substr(1));
+			break;
+		}
+		else
+			params.push_back(token);
+	}
+}
+
+Anope::string IRCDProto::Format(const Anope::string &source, const Anope::string &message)
+{
+	if (!source.empty())
+		return ":" + source + " " + message;
+	else
+		return message;
 }
 

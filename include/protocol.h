@@ -39,6 +39,9 @@ class CoreExport IRCDProto : public Service
 	virtual void SendNumericInternal(int numeric, const Anope::string &dest, const Anope::string &buf);
 
 	const Anope::string &GetProtocolName();
+	virtual void Parse(const Anope::string &, Anope::string &, Anope::string &, std::vector<Anope::string> &);
+	virtual Anope::string Format(const Anope::string &source, const Anope::string &message);
+
 	/* Modes used by default by our clients */
 	Anope::string DefaultPseudoclientModes;
 	/* Can we force change a users's nick? */
@@ -63,10 +66,16 @@ class CoreExport IRCDProto : public Service
 	bool CanCertFP;
 	/* Whether this IRCd requires unique IDs for each user or server. See TS6/P10. */
 	bool RequiresID;
+	/* If this IRCd has unique ids, whether the IDs and nicknames are ambiguous */
+	bool AmbiguousID;
 	/* The maximum number of modes we are allowed to set with one MODE command */
 	unsigned MaxModes;
 	/* The maximum number of bytes a line may have */
 	unsigned MaxLine;
+
+	/* Retrieves the next free UID or SID */
+	virtual Anope::string UID_Retrieve();
+	virtual Anope::string SID_Retrieve();
 
 	/** Sets the server in NOOP mode. If NOOP mode is enabled, no users
 	 * will be able to oper on the server.
@@ -231,6 +240,8 @@ class CoreExport IRCDProto : public Service
 	 * Defaults to Config->ListSize
 	 */
 	virtual unsigned GetMaxListFor(Channel *c);
+
+	virtual Anope::string NormalizeMask(const Anope::string &mask);
 };
 
 class CoreExport MessageSource

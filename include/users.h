@@ -18,6 +18,7 @@
 #include "extensible.h"
 #include "serialize.h"
 #include "commands.h"
+#include "sockets.h"
 
 typedef Anope::hash_map<User *> user_map;
 
@@ -69,7 +70,7 @@ class CoreExport User : public virtual Base, public Extensible, public CommandRe
 	/* SSL Fingerprint */
 	Anope::string fingerprint;
 	/* User's IP */
-	Anope::string ip;
+	sockaddrs ip;
 	/* Server user is connected to */
 	Server *server;
 	/* When the user signed on. Set on connect and never modified. */

@@ -142,7 +142,7 @@ class CommandCSFlags : public Command
 		for (current_idx = ci->GetAccessCount(); current_idx > 0; --current_idx)
 		{
 			ChanServ::ChanAccess *access = ci->GetAccess(current_idx - 1);
-			if (mask.equals_ci(access->mask))
+			if (mask.equals_ci(access->Mask()))
 			{
 				// Flags allows removing others that have the same access as you,
 				// but no other access system does.
@@ -154,7 +154,7 @@ class CommandCSFlags : public Command
 							override = true;
 						else
 						{
-							source.Reply(_("Access denied. You do not have enough privileges on \002{0}\002 to modify the access of \002{1}\002."), ci->name, access->mask);
+							source.Reply(_("Access denied. You do not have enough privileges on \002{0}\002 to modify the access of \002{1}\002."), ci->name, access->Mask());
 							return;
 						}
 					}
@@ -260,8 +260,7 @@ class CommandCSFlags : public Command
 		if (!provider)
 			return;
 		FlagsChanAccess *access = anope_dynamic_static_cast<FlagsChanAccess *>(provider->Create());
-		access->ci = ci;
-		access->mask = mask;
+		access->SetMask(mask, ci);
 		access->creator = source.GetNick();
 		access->last_seen = current ? current->last_seen : 0;
 		access->created = Anope::CurTime;
@@ -278,12 +277,12 @@ class CommandCSFlags : public Command
 		if (p != NULL)
 		{
 			if (add)
-				source.Reply(_("Privilege \002{0}\002 added to \002{1}\002 on \002{2}\002, new flags are +\002{3}\002"), p->name, access->mask, ci->name, access->AccessSerialize());
+				source.Reply(_("Privilege \002{0}\002 added to \002{1}\002 on \002{2}\002, new flags are +\002{3}\002"), p->name, access->Mask(), ci->name, access->AccessSerialize());
 			else
-				source.Reply(_("Privilege \002{0}\002 removed from \002{1}\002 on \002{2}\002, new flags are +\002{3}\002"), p->name, access->mask, ci->name, access->AccessSerialize());
+				source.Reply(_("Privilege \002{0}\002 removed from \002{1}\002 on \002{2}\002, new flags are +\002{3}\002"), p->name, access->Mask(), ci->name, access->AccessSerialize());
 		}
 		else
-			source.Reply(_("Flags for \002{0}\002 on \002{1}\002 set to +\002{2}\002"), access->mask, ci->name, access->AccessSerialize());
+			source.Reply(_("Flags for \002{0}\002 on \002{1}\002 set to +\002{2}\002"), access->Mask(), ci->name, access->AccessSerialize());
 	}
 
 	void DoList(CommandSource &source, ChanServ::Channel *ci, const std::vector<Anope::string> &params)
@@ -317,14 +316,14 @@ class CommandCSFlags : public Command
 					if (pass == false)
 						continue;
 				}
-				else if (!Anope::Match(access->mask, arg))
+				else if (!Anope::Match(access->Mask(), arg))
 					continue;
 			}
 
 			ListFormatter::ListEntry entry;
 			++count;
 			entry["Number"] = stringify(i + 1);
-			entry["Mask"] = access->mask;
+			entry["Mask"] = access->Mask();
 			entry["Flags"] = flags;
 			entry["Creator"] = access->creator;
 			entry["Created"] = Anope::strftime(access->created, source.nc, true);

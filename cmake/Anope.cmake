@@ -14,11 +14,15 @@ macro(calculate_libraries SRC SRC_LDFLAGS EXTRA_DEPENDS)
   # Reset libraries
   set(LIBRARIES)
   # Check to see if there are any lines matching: /* RequiredLibraries: [something] */
-  file(STRINGS ${SRC} REQUIRED_LIBRARIES REGEX "/\\\\*[ \t]*RequiredLibraries:[ \t]*.*[ \t]*\\\\*/")
+  if(WIN32)
+    file(STRINGS ${SRC} REQUIRED_LIBRARIES REGEX "/\\\\*[ \t]*RequiredWindowsLibraries:[ \t]*.*[ \t]*\\\\*/")
+  else(WIN32)
+    file(STRINGS ${SRC} REQUIRED_LIBRARIES REGEX "/\\\\*[ \t]*RequiredLibraries:[ \t]*.*[ \t]*\\\\*/")
+  endif(WIN32)
   # Iterate through those lines
   foreach(REQUIRED_LIBRARY ${REQUIRED_LIBRARIES})
     # Strip off the /* RequiredLibraries: and */ from the line
-    string(REGEX REPLACE "/\\*[ \t]*RequiredLibraries:[ \t]*([^ \t]*)[ \t]*\\*/" "\\1" REQUIRED_LIBRARY ${REQUIRED_LIBRARY})
+    string(REGEX REPLACE "/\\*[ \t]*Required.*Libraries:[ \t]*([^ \t]*)[ \t]*\\*/" "\\1" REQUIRED_LIBRARY ${REQUIRED_LIBRARY})
     # Replace all commas with semicolons
     string(REGEX REPLACE "," ";" REQUIRED_LIBRARY ${REQUIRED_LIBRARY})
     # Iterate through the libraries given

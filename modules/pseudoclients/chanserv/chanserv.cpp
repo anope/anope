@@ -228,33 +228,40 @@ class ChanServCore : public Module
 			if (it != access->ci->access->end())
 				access->ci->access->erase(it);
 
-			const NickServ::Nick *na = NickServ::FindNick(access->mask);
+			const NickServ::Nick *na = NickServ::FindNick(access->Mask());
 			if (na != NULL)
 				na->nc->RemoveChannelReference(access->ci);
 			else
 			{
-				ChanServ::Channel *c = this->Find(access->mask);
+				ChanServ::Channel *c = this->Find(access->Mask());
 				if (c)
 					c->RemoveChannelReference(access->ci->name);
 			}
 		}
 	}
 
-	void Serialize(const ChanServ::ChanAccess *, Serialize::Data &data) override
+	void Serialize(const ChanServ::ChanAccess *access, Serialize::Data &data) override
 	{
+		data["provider"] << access->provider->name;
+		data["ci"] << access->ci->name;
+		data["mask"] << access->Mask();
+		data["creator"] << access->creator;
+		data.SetType("last_seen", Serialize::Data::DT_INT); data["last_seen"] << access->last_seen;
+		data.SetType("created", Serialize::Data::DT_INT); data["created"] << access->created;
+		data["data"] << access->AccessSerialize();
 	}
 
 	bool Matches(const ChanServ::ChanAccess *access, const User *u, const NickServ::Account *acc, ChanServ::ChanAccess::Path &p) override
 	{
-		if (access->nc)
-			return access->nc == acc;
+		if (access->GetAccount())
+			return access->GetAccount() == acc;
 
 		if (u)
 		{
-			bool is_mask = access->mask.find_first_of("!@?*") != Anope::string::npos;
-			if (is_mask && Anope::Match(u->nick, access->mask))
+			bool is_mask = access->Mask().find_first_of("!@?*") != Anope::string::npos;
+			if (is_mask && Anope::Match(u->nick, access->Mask()))
 				return true;
-			else if (Anope::Match(u->GetDisplayedMask(), access->mask))
+			else if (Anope::Match(u->GetDisplayedMask(), access->Mask()))
 				return true;
 		}
 
@@ -263,14 +270,14 @@ class ChanServCore : public Module
 			for (unsigned i = 0; i < acc->aliases->size(); ++i)
 			{
 				const NickServ::Nick *na = acc->aliases->at(i);
-				if (Anope::Match(na->nick, access->mask))
+				if (Anope::Match(na->nick, access->Mask()))
 					return true;
 			}
 		}
 
-		if (IRCD->IsChannelValid(access->mask))
+		if (IRCD->IsChannelValid(access->Mask()))
 		{
-			ChanServ::Channel *tci = Find(access->mask);
+			ChanServ::Channel *tci = Find(access->Mask());
 			if (tci)
 			{
 				for (unsigned i = 0; i < tci->GetAccessCount(); ++i)
@@ -315,7 +322,9 @@ class ChanServCore : public Module
 		else
 			access = aprovider->Create();
 		access->ci = ci;
-		data["mask"] >> access->mask;
+		Anope::string m;
+		data["mask"] >> m;
+		access->SetMask(m, ci);
 		data["creator"] >> access->creator;
 		data["last_seen"] >> access->last_seen;
 		data["created"] >> access->created;
@@ -413,7 +422,7 @@ class ChanServCore : public Module
 					for (unsigned j = 0; j < ci->GetAccessCount(); ++j)
 					{
 						const ChanServ::ChanAccess *ca = ci->GetAccess(j);
-						const NickServ::Account *anc = NickServ::FindAccount(ca->mask);
+						const NickServ::Account *anc = ca->GetAccount();
 
 						if (!anc || (!anc->IsServicesOper() && max_reg && anc->channelcount >= max_reg) || (anc == nc))
 							continue;
@@ -421,7 +430,7 @@ class ChanServCore : public Module
 							highest = ca;
 					}
 					if (highest)
-						newowner = NickServ::FindAccount(highest->mask);
+						newowner = highest->GetAccount();
 				}
 
 				if (newowner)
@@ -445,7 +454,7 @@ class ChanServCore : public Module
 			for (unsigned j = 0; j < ci->GetAccessCount(); ++j)
 			{
 				const ChanServ::ChanAccess *ca = ci->GetAccess(j);
-				const NickServ::Account *anc = NickServ::FindAccount(ca->mask);
+				const NickServ::Account *anc = ca->GetAccount();
 
 				if (anc && anc == nc)
 				{
@@ -483,7 +492,7 @@ class ChanServCore : public Module
 			{
 				ChanServ::ChanAccess *a = c->GetAccess(j);
 
-				if (a->mask.equals_ci(ci->name))
+				if (a->Mask().equals_ci(ci->name))
 				{
 					delete a;
 					break;

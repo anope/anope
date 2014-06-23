@@ -151,6 +151,11 @@ class CommandOSAKill : public Command
 			source.Reply(_("\002{0}\002 coverage is too wide; Please use a more specific mask."), mask);
 			return;
 		}
+		else if (mask.find('@') == Anope::string::npos)
+		{
+			source.Reply(_("Mask must be in the form \037user\037@\037host\037."));
+			return;
+		}
 
 		if (Config->GetModule("operserv")->Get<bool>("addakiller", "yes") && !source.GetNick().empty())
 			reason = "[" + source.GetNick() + "] " + reason;

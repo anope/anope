@@ -128,7 +128,7 @@ class DBFlatFile : public Module, public Pipe
 			const std::vector<Anope::string> &type_order = Serialize::Type::GetTypeOrder();
 
 			std::set<Anope::string> dbs;
-			dbs.insert(Config->GetModule(this)->Get<const Anope::string>("database"));
+			dbs.insert(Config->GetModule(this)->Get<const Anope::string>("database", "anope.db"));
 
 			for (unsigned i = 0; i < type_order.size(); ++i)
 			{
@@ -151,10 +151,14 @@ class DBFlatFile : public Module, public Pipe
 				Log(LOG_DEBUG) << "db_flatfile: Attempting to rename " << *it << " to " << newname;
 				if (rename(oldname.c_str(), newname.c_str()))
 				{
-					Log(this) << "Unable to back up database " << *it << "!";
+					Anope::string err = Anope::LastError();
+					Log(this) << "Unable to back up database " << *it << " (" << err << ")!";
 
 					if (!Config->GetModule(this)->Get<bool>("nobackupok"))
+					{
 						Anope::Quitting = true;
+						Anope::QuitReason = "Unable to back up database " + *it + " (" + err + ")";
+					}
 
 					continue;
 				}
@@ -350,7 +354,7 @@ class DBFlatFile : public Module, public Pipe
 			for (std::map<Module *, std::fstream *>::iterator it = databases.begin(), it_end = databases.end(); it != it_end; ++it)
 			{
 				std::fstream *f = it->second;
-				const Anope::string &db_name = Anope::DataDir + "/" + (it->first ? (it->first->name + ".db") : Config->GetModule(this)->Get<const Anope::string>("database"));
+				const Anope::string &db_name = Anope::DataDir + "/" + (it->first ? (it->first->name + ".db") : Config->GetModule(this)->Get<const Anope::string>("database", "anope.db"));
 
 				if (!f->is_open() || !f->good())
 				{

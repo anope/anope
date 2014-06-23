@@ -22,7 +22,7 @@
 
 Serialize::Checker<botinfo_map> BotListByNick("BotInfo"), BotListByUID("BotInfo");
 
-BotInfo::BotInfo(const Anope::string &nnick, const Anope::string &nuser, const Anope::string &nhost, const Anope::string &nreal, const Anope::string &bmodes) : User(nnick, nuser, nhost, "", "", Me, nreal, Anope::CurTime, "", Servers::TS6_UID_Retrieve(), NULL), Serializable("BotInfo"), channels("ChanServ::Channel"), botmodes(bmodes)
+BotInfo::BotInfo(const Anope::string &nnick, const Anope::string &nuser, const Anope::string &nhost, const Anope::string &nreal, const Anope::string &bmodes) : User(nnick, nuser, nhost, "", "", Me, nreal, Anope::CurTime, "", IRCD ? IRCD->UID_Retrieve() : "", NULL), Serializable("BotInfo"), channels("ChannelInfo"), botmodes(bmodes)
 {
 	this->lastmsg = this->created = Anope::CurTime;
 	this->introduced = false;
@@ -56,6 +56,7 @@ BotInfo::~BotInfo()
 	if (Me && Me->IsSynced())
 	{
 		IRCD->SendQuit(this, "");
+		Event::OnUserQuit(&Event::UserQuit::OnUserQuit, this, "");
 		this->introduced = false;
 		XLine x(this->nick);
 		IRCD->SendSQLineDel(&x);
@@ -96,7 +97,7 @@ Serializable* BotInfo::Unserialize(Serializable *obj, Serialize::Data &data)
 	BotInfo *bi;
 	if (obj)
 		bi = anope_dynamic_static_cast<BotInfo *>(obj);
-	else if (!(bi = BotInfo::Find(nick)))
+	else if (!(bi = BotInfo::Find(nick, true)))
 		bi = new BotInfo(nick, user, host, realname);
 
 	data["created"] >> bi->created;
@@ -118,7 +119,7 @@ void BotInfo::GenerateUID()
 		UserListByUID.erase(this->uid);
 	}
 
-	this->uid = Servers::TS6_UID_Retrieve();
+	this->uid = IRCD->UID_Retrieve();
 	(*BotListByUID)[this->uid] = this;
 	UserListByUID[this->uid] = this;
 }
@@ -213,11 +214,16 @@ void BotInfo::Part(Channel *c, const Anope::string &reason)
 	if (c->FindUser(this) == NULL)
 		return;
 
+	Event::OnPrePartChannel(&Event::PrePartChannel::OnPrePartChannel, this, c);
+
 	IRCD->SendPart(this, c, "%s", !reason.empty() ? reason.c_str() : "");
 
-	Event::OnPartChannel(&Event::PartChannel::OnPartChannel, this, c, c->name, reason);
+	Anope::string cname = c->name;
+	Reference<Channel> cref = c;
 
 	c->DeleteUser(this);
+
+	Event::OnPartChannel(&Event::PartChannel::OnPartChannel, this, cref, cname, reason);
 }
 
 void BotInfo::OnMessage(User *u, const Anope::string &message)
@@ -262,22 +268,28 @@ CommandInfo *BotInfo::FindCommand(const Anope::string &service)
 
 BotInfo* BotInfo::Find(const Anope::string &nick, bool nick_only)
 {
-	BotInfo *bi = NULL;
-	if (!nick_only && isdigit(nick[0]) && IRCD->RequiresID)
+	if (!nick_only && IRCD != NULL && IRCD->RequiresID)
 	{
 		botinfo_map::iterator it = BotListByUID->find(nick);
 		if (it != BotListByUID->end())
-			bi = it->second;
-	}
-	else
-	{
-		botinfo_map::iterator it = BotListByNick->find(nick);
-		if (it != BotListByNick->end())
-			bi = it->second;
+		{
+			BotInfo *bi = it->second;
+			bi->QueueUpdate();
+			return bi;
+		}
+
+		if (IRCD->AmbiguousID)
+			return NULL;
 	}
 
-	if (bi)
+	botinfo_map::iterator it = BotListByNick->find(nick);
+	if (it != BotListByNick->end())
+	{
+		BotInfo *bi = it->second;
 		bi->QueueUpdate();
-	return bi;
+		return bi;
+	}
+
+	return NULL;
 }
 

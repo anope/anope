@@ -87,7 +87,7 @@ class CoreExport UserModeParam : public UserMode
 	 * @param value The param
 	 * @return true or false
 	 */
-	virtual bool IsValid(const Anope::string &value) const { return true; }
+	virtual bool IsValid(Anope::string &value) const { return true; }
 };
 
 /** This class is a channel mode, all channel modes use this/inherit from this
@@ -95,6 +95,9 @@ class CoreExport UserModeParam : public UserMode
 class CoreExport ChannelMode : public Mode
 {
  public:
+	/* channel modes that can posssibly unwrap this mode */
+	std::vector<ChannelMode *> listeners;
+
 	/** constructor
 	 * @param name The mode name
 	 * @param mc The mode char
@@ -102,6 +105,18 @@ class CoreExport ChannelMode : public Mode
 	ChannelMode(const Anope::string &name, char mc);
 
 	bool CanSet(User *u) const override;
+
+	/** 'wrap' this channel mode and param to the underlying mode and param
+	 */
+	virtual ChannelMode *Wrap(Anope::string &param);
+
+	/** 'unwrap' this mode to our internal representation
+	 */
+	ChannelMode *Unwrap(Anope::string &param);
+
+	/** called when a mode is being unwrapped, and is asking us if we can unwrap it
+	 */
+	virtual ChannelMode *Unwrap(ChannelMode *, Anope::string &param);
 };
 
 /** This is a mode for lists, eg b/e/I. These modes should inherit from this
@@ -119,7 +134,7 @@ class CoreExport ChannelModeList : public ChannelMode
 	 * @param mask The mask
 	 * @return true for yes, false for no
 	 */
-	virtual bool IsValid(const Anope::string &mask) const { return true; }
+	virtual bool IsValid(Anope::string &mask) const;
 
 	/** Checks if mask affects user
 	 * Should only be used for extbans or other weird ircd-specific things.
@@ -161,7 +176,7 @@ class CoreExport ChannelModeParam : public ChannelMode
 	 * @param value The param
 	 * @return true for yes, false for no
 	 */
-	virtual bool IsValid(const Anope::string &value) const { return true; }
+	virtual bool IsValid(Anope::string &value) const { return true; }
 };
 
 /** This is a mode that is a channel status, eg +v/h/o/a/q.
@@ -183,6 +198,25 @@ class CoreExport ChannelModeStatus : public ChannelMode
 	 * @param mlevel A level for the mode, which is usually determined by the PREFIX capab
 	 */
 	ChannelModeStatus(const Anope::string &name, char mc, char msymbol, short mlevel);
+};
+
+/** A virtual mode. This mode doesn't natively exist on the IRCd (like extbans),
+ * but we still have a representation for it.
+ */
+template<typename T>
+class CoreExport ChannelModeVirtual : public T
+{
+	Anope::string base;
+	ChannelMode *basech;
+
+ public:
+	ChannelModeVirtual(const Anope::string &mname, const Anope::string &basename);
+
+	~ChannelModeVirtual();
+
+	ChannelMode *Wrap(Anope::string &param) override;
+
+	ChannelMode *Unwrap(ChannelMode *cm, Anope::string &param) = 0;
 };
 
 /* The status a user has on a channel (+v, +h, +o) etc */
@@ -224,7 +258,7 @@ class CoreExport ChannelModeKey : public ChannelModeParam
  public:
 	ChannelModeKey(char mc) : ChannelModeParam("KEY", mc) { }
 
-	bool IsValid(const Anope::string &value) const override;
+	bool IsValid(Anope::string &value) const override;
 };
 
 /** This class is used for oper only channel modes
@@ -256,13 +290,6 @@ class CoreExport ChannelModeNoone : public ChannelMode
  */
 class CoreExport ModeManager
 {
- protected:
-	/* Array of all modes Anope knows about. Modes are in this array at position
-	 * modechar. Additionally, status modes are in this array (again) at statuschar.
-	 */
-	static std::vector<ChannelMode *> ChannelModes;
-	static std::vector<UserMode *> UserModes;
-
  public:
 
 	/* Number of generic channel and user modes we are tracking */
@@ -375,6 +402,8 @@ class CoreExport Entry
 	 * @return The mask
 	 */
 	const Anope::string GetMask() const;
+
+	const Anope::string GetNUHMask() const;
 
 	/** Check if this entry matches a user
 	 * @param u The user

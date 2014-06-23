@@ -74,7 +74,7 @@ namespace Anope
 
 extern CoreExport void OnStartup();
 extern CoreExport void OnShutdown();
-extern CoreExport USHORT WindowsGetLanguage(const char *lang);
+extern CoreExport USHORT WindowsGetLanguage(const Anope::string &lang);
 extern CoreExport int gettimeofday(timeval *tv, void *);
 extern CoreExport Anope::string GetWindowsVersion();
 extern CoreExport bool SupportedWindowsVersion();

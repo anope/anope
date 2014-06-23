@@ -365,6 +365,10 @@ namespace ChanServ
 	/* Represents one entry of an access list on a channel. */
 	class CoreExport ChanAccess : public Serializable
 	{
+		Anope::string mask;
+		/* account this access entry is for, if any */
+		Serialize::Reference<NickServ::Account> nc;
+
 	 public:
 		typedef std::multimap<const ChanAccess *, const ChanAccess *> Set;
 		/* shows the 'path' taken to determine if an access entry matches a user
@@ -377,9 +381,6 @@ namespace ChanServ
 		AccessProvider *provider;
 		/* Channel this access entry is on */
 		Serialize::Reference<Channel> ci;
-		/* account this access entry is for, if any */
-		Serialize::Reference<NickServ::Account> nc;
-		Anope::string mask;
 		Anope::string creator;
 		time_t last_seen;
 		time_t created;
@@ -390,6 +391,47 @@ namespace ChanServ
 		{
 			service->Destruct(this);
 		}
+
+		void SetMask(const Anope::string &mask, Channel *c)
+		{
+			if (nc != NULL)
+				 nc->RemoveChannelReference(this->ci);
+			else if (!this->mask.empty())
+			 {
+				Channel *targc = ChanServ::Find(this->mask);
+				if (targc)
+					targc->RemoveChannelReference(this->ci->name);
+			}
+
+			ci = c;
+			this->mask.clear();
+			nc = NULL;
+
+			const NickServ::Nick *na = NickServ::FindNick(mask);
+			if (na != NULL)
+			{
+				nc = na->nc;
+				nc->AddChannelReference(ci);
+			}
+			else
+			{
+				this->mask = mask;
+
+				Channel *targci = ChanServ::Find(mask);
+				if (targci != NULL)
+					targci->AddChannelReference(ci->name);
+			}
+		}
+
+		const Anope::string &Mask() const
+		{
+			if (nc)
+				return nc->display;
+			else
+				return mask;
+		}
+
+		NickServ::Account *GetAccount() const { return nc; }
 
 		void Serialize(Serialize::Data &data) const override
 		{

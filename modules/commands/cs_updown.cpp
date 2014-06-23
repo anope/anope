@@ -81,8 +81,8 @@ class CommandCSUp : public Command
 			}
 
 			User *u = User::Find(nick, true);
-			Channel *c = ci->c;
 			User *srcu = source.GetUser();
+			Channel *c = ci->c;
 			bool override = false;
 
 			if (u == NULL)
@@ -90,8 +90,12 @@ class CommandCSUp : public Command
 				source.Reply(_("User \002{0}\002 isn't currently online."), nick);
 				return;
 			}
-
 			if (srcu && !srcu->FindChannel(c))
+			{
+				source.Reply(_("You must be in \002%s\002 to use this command."), c->name.c_str());
+				return;
+			}
+			else if (!u->FindChannel(c))
 			{
 				source.Reply(_("You must be on channel \002{0}\002 to use this command."), c->name);
 				return;
@@ -182,6 +186,7 @@ class CommandCSDown : public Command
 
 			User *u = User::Find(nick, true);
 			Channel *c = ci->c;
+
 			User *srcu = source.GetUser();
 			bool override = false;
 
@@ -196,8 +201,12 @@ class CommandCSDown : public Command
 				source.Reply(_("You must be on channel \002{0}\002 to use this command."), c->name);
 				return;
 			}
-
-			if (!u->FindChannel(c))
+			if (srcu && !srcu->FindChannel(c))
+			{
+				source.Reply(_("You must be in \002%s\002 to use this command."), c->name.c_str());
+				return;
+			}
+			else if (!u->FindChannel(c))
 			{
 				source.Reply(_("\002%s\002 is not on channel %s."), u->nick, c->name);
 				return;

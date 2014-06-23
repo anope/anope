@@ -58,8 +58,7 @@ ChannelImpl::ChannelImpl(const ChanServ::Channel &ci)
 		ChanServ::AccessProvider *provider = taccess->provider;
 
 		ChanServ::ChanAccess *newaccess = provider->Create();
-		newaccess->ci = this;
-		newaccess->mask = taccess->mask;
+		newaccess->SetMask(taccess->Mask(), this);
 		newaccess->creator = taccess->creator;
 		newaccess->last_seen = taccess->last_seen;
 		newaccess->created = taccess->created;
@@ -192,7 +191,7 @@ Serializable* ChannelImpl::Unserialize(Serializable *obj, Serialize::Data &data)
 			}
 			catch (const ConvertException &) { }
 	}
-	BotInfo *bi = BotInfo::Find(sbi);
+	BotInfo *bi = BotInfo::Find(sbi, true);
 	if (*ci->bi != bi)
 	{
 		if (bi)
@@ -322,19 +321,6 @@ BotInfo *ChannelImpl::WhoSends() const
 void ChannelImpl::AddAccess(ChanServ::ChanAccess *taccess)
 {
 	this->access->push_back(taccess);
-
-	const NickServ::Nick *na = NickServ::FindNick(taccess->mask);
-	if (na != NULL)
-	{
-		na->nc->AddChannelReference(this);
-		taccess->nc = na->nc;
-	}
-	else
-	{
-		ChanServ::Channel *ci = ChanServ::Find(taccess->mask);
-		if (ci != NULL)
-			ci->AddChannelReference(this->name);
-	}
 }
 
 ChanServ::ChanAccess *ChannelImpl::GetAccess(unsigned index) const

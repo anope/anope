@@ -26,7 +26,7 @@ IRCDProto::IRCDProto(Module *creator, const Anope::string &p) : Service(creator,
 {
 	DefaultPseudoclientModes = "+io";
 	CanSVSNick = CanSVSJoin = CanSetVHost = CanSetVIdent = CanSNLine = CanSQLine = CanSQLineChannel
-		= CanSZLine = CanSVSHold = CanSVSO = CanCertFP = RequiresID = false;
+		= CanSZLine = CanSVSHold = CanSVSO = CanCertFP = RequiresID = AmbiguousID = false;
 	MaxModes = 3;
 	MaxLine = 512;
 
@@ -43,6 +43,53 @@ IRCDProto::~IRCDProto()
 const Anope::string &IRCDProto::GetProtocolName()
 {
 	return this->proto_name;
+}
+
+static inline char& nextID(char &c)
+{
+	if (c == 'Z')
+		c = '0';
+	else if (c != '9')
+		++c;
+	else
+		c = 'A';
+	return c;
+}
+
+Anope::string IRCDProto::UID_Retrieve()
+{
+	if (!IRCD || !IRCD->RequiresID)
+		return "";
+
+	static Anope::string current_uid = "AAAAAA";
+
+	do
+	{
+		int current_len = current_uid.length() - 1;
+		while (current_len >= 0 && nextID(current_uid[current_len--]) == 'A');
+	}
+	while (User::Find(Me->GetSID() + current_uid) != NULL);
+
+	return Me->GetSID() + current_uid;
+}
+
+Anope::string IRCDProto::SID_Retrieve()
+{
+	if (!IRCD || !IRCD->RequiresID)
+		return "";
+
+	static Anope::string current_sid = Config->GetBlock("serverinfo")->Get<const Anope::string>("id");
+	if (current_sid.empty())
+		current_sid = "00A";
+
+	do
+	{
+		int current_len = current_sid.length() - 1;
+		while (current_len >= 0 && nextID(current_sid[current_len--]) == 'A');
+	}
+	while (Server::Find(current_sid) != NULL);
+
+	return current_sid;
 }
 
 void IRCDProto::SendKill(const MessageSource &source, const Anope::string &target, const Anope::string &reason)
@@ -276,7 +323,7 @@ void IRCDProto::SendNickChange(User *u, const Anope::string &newnick)
 
 void IRCDProto::SendForceNickChange(User *u, const Anope::string &newnick, time_t when)
 {
-	UplinkSocket::Message() << "SVSNICK " << u->nick << " " << newnick << " " << when;
+	UplinkSocket::Message() << "SVSNICK " << u->GetUID() << " " << newnick << " " << when;
 }
 
 void IRCDProto::SendCTCP(const MessageSource &source, const Anope::string &dest, const char *fmt, ...)
@@ -385,6 +432,13 @@ void IRCDProto::SendOper(User *u)
 unsigned IRCDProto::GetMaxListFor(Channel *c)
 {
 	return c->HasMode("LBAN") ? 0 : Config->GetBlock("networkinfo")->Get<int>("modelistsize");
+}
+
+Anope::string IRCDProto::NormalizeMask(const Anope::string &mask)
+{
+	if (IsExtbanValid(mask))
+		return mask;
+	return Entry("", mask).GetNUHMask();
 }
 
 MessageSource::MessageSource(const Anope::string &src) : source(src), u(NULL), s(NULL)

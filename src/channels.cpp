@@ -243,10 +243,13 @@ std::pair<Channel::ModeList::iterator, Channel::ModeList::iterator> Channel::Get
 	return std::make_pair(it, it_end);
 }
 
-void Channel::SetModeInternal(const MessageSource &setter, ChannelMode *cm, const Anope::string &param, bool enforce_mlock)
+void Channel::SetModeInternal(const MessageSource &setter, ChannelMode *ocm, const Anope::string &oparam, bool enforce_mlock)
 {
-	if (!cm)
+	if (!ocm)
 		return;
+
+	Anope::string param = oparam;
+	ChannelMode *cm = ocm->Unwrap(param);
 
 	EventReturn MOD_RESULT;
 
@@ -310,10 +313,13 @@ void Channel::SetModeInternal(const MessageSource &setter, ChannelMode *cm, cons
 	this->CheckModes();
 }
 
-void Channel::RemoveModeInternal(const MessageSource &setter, ChannelMode *cm, const Anope::string &param, bool enforce_mlock)
+void Channel::RemoveModeInternal(const MessageSource &setter, ChannelMode *ocm, const Anope::string &oparam, bool enforce_mlock)
 {
-	if (!cm)
+	if (!ocm)
 		return;
+
+	Anope::string param = oparam;
+	ChannelMode *cm = ocm->Unwrap(param);
 
 	EventReturn MOD_RESULT;
 
@@ -388,6 +394,7 @@ void Channel::RemoveModeInternal(const MessageSource &setter, ChannelMode *cm, c
 
 void Channel::SetMode(User *bi, ChannelMode *cm, const Anope::string &param, bool enforce_mlock)
 {
+	Anope::string wparam = param;
 	if (!cm)
 		return;
 	/* Don't set modes already set */
@@ -396,11 +403,11 @@ void Channel::SetMode(User *bi, ChannelMode *cm, const Anope::string &param, boo
 	else if (cm->type == MODE_PARAM)
 	{
 		ChannelModeParam *cmp = anope_dynamic_static_cast<ChannelModeParam *>(cm);
-		if (!cmp->IsValid(param))
+		if (!cmp->IsValid(wparam))
 			return;
 
 		Anope::string cparam;
-		if (GetParam(cm->name, cparam) && cparam.equals_cs(param))
+		if (GetParam(cm->name, cparam) && cparam.equals_cs(wparam))
 			return;
 	}
 	else if (cm->type == MODE_STATUS)
@@ -412,7 +419,11 @@ void Channel::SetMode(User *bi, ChannelMode *cm, const Anope::string &param, boo
 	else if (cm->type == MODE_LIST)
 	{
 		ChannelModeList *cml = anope_dynamic_static_cast<ChannelModeList *>(cm);
-		if (this->HasMode(cm->name, param) || !cml->IsValid(param))
+
+		if (!cml->IsValid(wparam))
+			return;
+
+		if (this->HasMode(cm->name, wparam))
 			return;
 	}
 
@@ -427,8 +438,10 @@ void Channel::SetMode(User *bi, ChannelMode *cm, const Anope::string &param, boo
 		this->chanserv_modecount++;
 	}
 
-	ModeManager::StackerAdd(bi, this, cm, true, param);
-	SetModeInternal(bi, cm, param, enforce_mlock);
+	ChannelMode *wcm = cm->Wrap(wparam);
+
+	ModeManager::StackerAdd(bi, this, wcm, true, wparam);
+	SetModeInternal(bi, wcm, wparam, enforce_mlock);
 }
 
 void Channel::SetMode(User *bi, const Anope::string &mname, const Anope::string &param, bool enforce_mlock)
@@ -477,8 +490,11 @@ void Channel::RemoveMode(User *bi, ChannelMode *cm, const Anope::string &param, 
 		this->chanserv_modecount++;
 	}
 
-	ModeManager::StackerAdd(bi, this, cm, false, realparam);
-	RemoveModeInternal(bi, cm, realparam, enforce_mlock);
+	Anope::string wparam = realparam;
+	ChannelMode *wcm = cm->Wrap(wparam);
+
+	ModeManager::StackerAdd(bi, this, wcm, false, wparam);
+	RemoveModeInternal(bi, wcm, wparam, enforce_mlock);
 }
 
 void Channel::RemoveMode(User *bi, const Anope::string &mname, const Anope::string &param, bool enforce_mlock)
@@ -843,21 +859,21 @@ void Channel::SetCorrectModes(User *user, bool give_modes)
 	}
 }
 
-bool Channel::Unban(User *u, bool full)
+bool Channel::Unban(User *u, const Anope::string &mode, bool full)
 {
-	if (!this->HasMode("BAN"))
+	if (!this->HasMode(mode))
 		return false;
 
 	bool ret = false;
 
-	std::pair<Channel::ModeList::iterator, Channel::ModeList::iterator> bans = this->GetModeList("BAN");
+	std::pair<Channel::ModeList::iterator, Channel::ModeList::iterator> bans = this->GetModeList(mode);
 	for (; bans.first != bans.second;)
 	{
-		Entry ban("BAN", bans.first->second);
+		Entry ban(mode, bans.first->second);
 		++bans.first;
 		if (ban.Matches(u, full))
 		{
-			this->RemoveMode(NULL, "BAN", ban.GetMask());
+			this->RemoveMode(NULL, mode, ban.GetMask());
 			ret = true;
 		}
 	}

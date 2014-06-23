@@ -1,7 +1,7 @@
 /* ircd-hybrid-8 protocol module
  *
  * (C) 2003-2014 Anope Team
- * (C) 2012-2013 by the Hybrid Development Team
+ * (C) 2012-2014 ircd-hybrid development team
  *
  * Please read COPYING and README for further details.
  *
@@ -40,10 +40,11 @@ class HybridProto : public IRCDProto
 	{
 		DefaultPseudoclientModes = "+oi";
 		CanSVSNick = true;
+		CanSVSHold = true;
+		CanSVSJoin = true;
 		CanSNLine = true;
 		CanSQLine = true;
 		CanSZLine = true;
-		CanSVSHold = true;
 		CanCertFP = true;
 		CanSetVHost = true;
 		RequiresID = true;
@@ -174,9 +175,9 @@ class HybridProto : public IRCDProto
 	void SendServer(const Server *server) override
 	{
 		if (server == Me)
-			UplinkSocket::Message() << "SERVER " << server->GetName() << " " << server->GetHops() << " :" << server->GetDescription();
+			UplinkSocket::Message() << "SERVER " << server->GetName() << " " << server->GetHops() + 1 << " :" << server->GetDescription();
 		else
-			UplinkSocket::Message(Me) << "SID " << server->GetName() << " " << server->GetHops() << " " << server->GetSID() << " :" << server->GetDescription();
+			UplinkSocket::Message(Me) << "SID " << server->GetName() << " " << server->GetHops() + 1 << " " << server->GetSID() << " :" << server->GetDescription();
 	}
 
 	void SendConnect() override
@@ -252,6 +253,19 @@ class HybridProto : public IRCDProto
 	void SendForceNickChange(User *u, const Anope::string &newnick, time_t when) override
 	{
 		UplinkSocket::Message(Me) << "SVSNICK " << u->nick << " " << newnick << " " << when;
+	}
+
+	void SendSVSJoin(const MessageSource &source, User *u, const Anope::string &chan, const Anope::string &) override
+	{
+		UplinkSocket::Message(source) << "SVSJOIN " << u->GetUID() << " " << chan;
+	}
+
+	void SendSVSPart(const MessageSource &source, User *u, const Anope::string &chan, const Anope::string &param) override
+	{
+		if (!param.empty())
+			UplinkSocket::Message(source) << "SVSPART " << u->GetUID() << " " << chan << " :" << param;
+		else
+			UplinkSocket::Message(source) << "SVSPART " << u->GetUID() << " " << chan;
 	}
 
 	void SendSVSHold(const Anope::string &nick, time_t t) override
@@ -611,7 +625,7 @@ class ProtoHybrid : public Module
 		ModeManager::AddUserMode(new UserModeOperOnly("CALLERID", 'g'));
 		ModeManager::AddUserMode(new UserMode("INVIS", 'i'));
 		ModeManager::AddUserMode(new UserModeOperOnly("LOCOPS", 'l'));
-		ModeManager::AddUserMode(new UserMode("OPER", 'o'));
+		ModeManager::AddUserMode(new UserModeOperOnly("OPER", 'o'));
 		ModeManager::AddUserMode(new UserModeNoone("REGISTERED", 'r'));
 		ModeManager::AddUserMode(new UserModeOperOnly("SNOMASK", 's'));
 		ModeManager::AddUserMode(new UserMode("WALLOPS", 'w'));

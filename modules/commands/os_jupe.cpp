@@ -36,7 +36,7 @@ class CommandOSJupe : public Command
 		{
 			Anope::string rbuf = "Juped by " + source.GetNick() + (!reason.empty() ? ": " + reason : "");
 			/* Generate the new sid before quitting the old server, so they can't collide */
-			Anope::string sid = Servers::TS6_SID_Retrieve();
+			Anope::string sid = IRCD->SID_Retrieve();
 			if (server)
 			{
 				IRCD->SendSquit(server, rbuf);

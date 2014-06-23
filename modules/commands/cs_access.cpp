@@ -185,12 +185,12 @@ class CommandCSAccess : public Command
 		for (unsigned i = ci->GetAccessCount(); i > 0; --i)
 		{
 			const ChanServ::ChanAccess *access = ci->GetAccess(i - 1);
-			if (mask.equals_ci(access->mask))
+			if (mask.equals_ci(access->Mask()))
 			{
 				/* Don't allow lowering from a level >= u_level */
 				if ((!highest || *access >= *highest) && !u_access.founder && !source.HasPriv("chanserv/access/modify"))
 				{
-					source.Reply(_("Access denied. You do not have enough privileges on \002{0}\002 to lower the access of \002{1}\002."), ci->name, access->mask);
+					source.Reply(_("Access denied. You do not have enough privileges on \002{0}\002 to lower the access of \002{1}\002."), ci->name, access->Mask());
 					return;
 				}
 				delete ci->EraseAccess(i - 1);
@@ -209,8 +209,7 @@ class CommandCSAccess : public Command
 		if (!provider)
 			return;
 		AccessChanAccess *access = anope_dynamic_static_cast<AccessChanAccess *>(provider->Create());
-		access->ci = ci;
-		access->mask = mask;
+		access->SetMask(mask, ci);
 		access->creator = source.GetNick();
 		access->level = level;
 		access->last_seen = 0;
@@ -221,9 +220,9 @@ class CommandCSAccess : public Command
 
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to add " << mask << " with level " << level;
 		if (p != NULL)
-			source.Reply(_("\002{0}\002 added to the access list of \002{1}\002 with privilege \002{2}\002 (level \002{3}\002)."), access->mask, ci->name, p->name, level);
+			source.Reply(_("\002{0}\002 added to the access list of \002{1}\002 with privilege \002{2}\002 (level \002{3}\002)."), access->Mask(), ci->name, p->name, level);
 		else
-			source.Reply(_("\002{0}\002 added to the access list of \002{1}\002 at level \002{2}\002."), access->mask, ci->name, level);
+			source.Reply(_("\002{0}\002 added to the access list of \002{1}\002 at level \002{2}\002."), access->Mask(), ci->name, level);
 	}
 
 	void DoDel(CommandSource &source, ChanServ::Channel *ci, const std::vector<Anope::string> &params)
@@ -294,7 +293,7 @@ class CommandCSAccess : public Command
 					ChanServ::AccessGroup ag = source.AccessFor(ci);
 					const ChanServ::ChanAccess *u_highest = ag.Highest();
 
-					if ((!u_highest || *u_highest <= *access) && !ag.founder && !this->override && !access->mask.equals_ci(source.nc->display))
+					if ((!u_highest || *u_highest <= *access) && !ag.founder && !this->override && access->GetAccount() != source.nc)
 					{
 						denied = true;
 						return;
@@ -302,9 +301,9 @@ class CommandCSAccess : public Command
 
 					++deleted;
 					if (!Nicks.empty())
-						Nicks += ", " + access->mask;
+						Nicks += ", " + access->Mask();
 					else
-						Nicks = access->mask;
+						Nicks = access->Mask();
 
 					ci->EraseAccess(Number - 1);
 
@@ -323,15 +322,15 @@ class CommandCSAccess : public Command
 			for (unsigned i = ci->GetAccessCount(); i > 0; --i)
 			{
 				ChanServ::ChanAccess *access = ci->GetAccess(i - 1);
-				if (mask.equals_ci(access->mask))
+				if (mask.equals_ci(access->Mask()))
 				{
-					if (!access->mask.equals_ci(source.nc->display) && !u_access.founder && (!highest || *highest <= *access) && !source.HasPriv("chanserv/access/modify"))
-						source.Reply(_("Access denied. You do not have enough privileges on \002{0}\002 to remove the access of \002{1}\002."), ci->name, access->mask);
+					if (access->GetAccount() != source.nc && !u_access.founder && (!highest || *highest <= *access) && !source.HasPriv("chanserv/access/modify"))
+						source.Reply(_("Access denied. You do not have enough privileges on \002{0}\002 to remove the access of \002{1}\002."), ci->name, access->Mask());
 					else
 					{
-						source.Reply(_("\002{0}\002 deleted from the access list of \002{1}\002."), access->mask, ci->name);
-						bool override = !u_access.founder && !u_access.HasPriv("ACCESS_CHANGE") && !access->mask.equals_ci(source.nc->display);
-						Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to delete " << access->mask;
+						source.Reply(_("\002{0}\002 deleted from the access list of \002{1}\002."), access->Mask(), ci->name);
+						bool override = !u_access.founder && !u_access.HasPriv("ACCESS_CHANGE") && !access->Mask().equals_ci(source.nc->display);
+						Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to delete " << access->Mask();
 
 						ci->EraseAccess(i - 1);
 						Event::OnAccessDel(&Event::AccessDel::OnAccessDel, ci, source, access);
@@ -393,7 +392,7 @@ class CommandCSAccess : public Command
 					ListFormatter::ListEntry entry;
 					entry["Number"] = stringify(number);
 					entry["Level"] = access->AccessSerialize();
-					entry["Mask"] = access->mask;
+					entry["Mask"] = access->Mask();
 					entry["By"] = access->creator;
 					entry["Last seen"] = timebuf;
 					this->list.AddEntry(entry);
@@ -408,7 +407,7 @@ class CommandCSAccess : public Command
 			{
 				const ChanServ::ChanAccess *access = ci->GetAccess(i);
 
-				if (!nick.empty() && !Anope::Match(access->mask, nick))
+				if (!nick.empty() && !Anope::Match(access->Mask(), nick))
 					continue;
 
 				Anope::string timebuf;
@@ -430,7 +429,7 @@ class CommandCSAccess : public Command
 				ListFormatter::ListEntry entry;
 				entry["Number"] = stringify(i + 1);
 				entry["Level"] = access->AccessSerialize();
-				entry["Mask"] = access->mask;
+				entry["Mask"] = access->Mask();
 				entry["By"] = access->creator;
 				entry["Last seen"] = timebuf;
 				list.AddEntry(entry);

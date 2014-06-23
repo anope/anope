@@ -68,7 +68,7 @@ public:
 			{
 				ChanServ::ChanAccess *acc = ag[i];
 
-				source.Reply(_("\002{0}\002 matches access entry \002{1}\002, which has privilege \002{2}\002."), nick, acc->mask, acc->AccessSerialize());
+				source.Reply(_("\002{0}\002 matches access entry \002{1}\002, which has privilege \002{2}\002."), nick, acc->Mask(), acc->AccessSerialize());
 			}
 		}
 

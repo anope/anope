@@ -37,7 +37,8 @@ cd $ANOPATH
 if [ -f "$ANODATA/$ANOPIDF" ]
 then
 	ANOPID=`cat "$ANODATA/$ANOPIDF"`
-	if [ `ps auwx | grep $ANOPROG | grep $ANOPID | grep -v -c grep` = 1 ]
+	kill -0 $ANOPID 2>/dev/null
+	if [ $? -eq 0 ]
 	then
 		exit
 	fi

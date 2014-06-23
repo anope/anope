@@ -59,18 +59,18 @@ class CommandOSStats : public Command
 		if (akills)
 		{
 			/* AKILLs */
-			source.Reply(_("Current number of AKILLs: \002%d\002"), akills->GetCount());
+			source.Reply(_("Current number of AKILLs: \002{0}\002"), akills->GetCount());
 			timeout = Config->GetModule("operserv")->Get<time_t>("autokillexpiry", "30d") + 59;
 			if (timeout >= 172800)
-				source.Reply(_("Default AKILL expiry time: \002%d days\002"), timeout / 86400);
+				source.Reply(_("Default AKILL expiry time: \002{0} days\002"), timeout / 86400);
 			else if (timeout >= 86400)
 				source.Reply(_("Default AKILL expiry time: \0021 day\002"));
 			else if (timeout >= 7200)
-				source.Reply(_("Default AKILL expiry time: \002%d hours\002"), timeout / 3600);
+				source.Reply(_("Default AKILL expiry time: \002{0} hours\002"), timeout / 3600);
 			else if (timeout >= 3600)
 				source.Reply(_("Default AKILL expiry time: \0021 hour\002"));
 			else if (timeout >= 120)
-				source.Reply(_("Default AKILL expiry time: \002%d minutes\002"), timeout / 60);
+				source.Reply(_("Default AKILL expiry time: \002{0} minutes\002"), timeout / 60);
 			else if (timeout >= 60)
 				source.Reply(_("Default AKILL expiry time: \0021 minute\002"));
 			else
@@ -79,18 +79,18 @@ class CommandOSStats : public Command
 		if (snlines)
 		{
 			/* SNLINEs */
-			source.Reply(_("Current number of SNLINEs: \002%d\002"), snlines->GetCount());
+			source.Reply(_("Current number of SNLINEs: \002{0}\002"), snlines->GetCount());
 			timeout = Config->GetModule("operserv")->Get<time_t>("snlineexpiry", "30d") + 59;
 			if (timeout >= 172800)
-				source.Reply(_("Default SNLINE expiry time: \002%d days\002"), timeout / 86400);
+				source.Reply(_("Default SNLINE expiry time: \002{0} days\002"), timeout / 86400);
 			else if (timeout >= 86400)
 				source.Reply(_("Default SNLINE expiry time: \0021 day\002"));
 			else if (timeout >= 7200)
-				source.Reply(_("Default SNLINE expiry time: \002%d hours\002"), timeout / 3600);
+				source.Reply(_("Default SNLINE expiry time: \002{0} hours\002"), timeout / 3600);
 			else if (timeout >= 3600)
 				source.Reply(_("Default SNLINE expiry time: \0021 hour\002"));
 			else if (timeout >= 120)
-				source.Reply(_("Default SNLINE expiry time: \002%d minutes\002"), timeout / 60);
+				source.Reply(_("Default SNLINE expiry time: \002{0} minutes\002"), timeout / 60);
 			else if (timeout >= 60)
 				source.Reply(_("Default SNLINE expiry time: \0021 minute\002"));
 			else
@@ -99,18 +99,18 @@ class CommandOSStats : public Command
 		if (sqlines)
 		{
 			/* SQLINEs */
-			source.Reply(_("Current number of SQLINEs: \002%d\002"), sqlines->GetCount());
+			source.Reply(_("Current number of SQLINEs: \002{0}\002"), sqlines->GetCount());
 			timeout = Config->GetModule("operserv")->Get<time_t>("sglineexpiry", "30d") + 59;
 			if (timeout >= 172800)
-				source.Reply(_("Default SQLINE expiry time: \002%d days\002"), timeout / 86400);
+				source.Reply(_("Default SQLINE expiry time: \002{0} days\002"), timeout / 86400);
 			else if (timeout >= 86400)
 				source.Reply(_("Default SQLINE expiry time: \0021 day\002"));
 			else if (timeout >= 7200)
-				source.Reply(_("Default SQLINE expiry time: \002%d hours\002"), timeout / 3600);
+				source.Reply(_("Default SQLINE expiry time: \002{0} hours\002"), timeout / 3600);
 			else if (timeout >= 3600)
 				source.Reply(_("Default SQLINE expiry time: \0021 hour\002"));
 			else if (timeout >= 120)
-				source.Reply(_("Default SQLINE expiry time: \002%d minutes\002"), timeout / 60);
+				source.Reply(_("Default SQLINE expiry time: \002{0} minutes\002"), timeout / 60);
 			else if (timeout >= 60)
 				source.Reply(_("Default SQLINE expiry time: \0021 minute\002"));
 			else
@@ -128,11 +128,9 @@ class CommandOSStats : public Command
 	void DoStatsUptime(CommandSource &source)
 	{
 		time_t uptime = Anope::CurTime - Anope::StartTime;
-		source.Reply(_("Current users: \002%d\002 (\002%d\002 ops)"), UserListByNick.size(), OperCount);
-		source.Reply(_("Maximum users: \002%d\002 (%s)"), MaxUserCount, Anope::strftime(MaxUserTime, source.GetAccount()).c_str());
-		source.Reply(_("Services up %s."), Anope::Duration(uptime, source.GetAccount()).c_str());
-
-		return;
+		source.Reply(_("Current users: \002{0}\002 (\002{1}\002 ops)"), UserListByNick.size(), OperCount);
+		source.Reply(_("Maximum users: \002{0}\002 ({1})"), MaxUserCount, Anope::strftime(MaxUserTime, source.GetAccount()));
+		source.Reply(_("Services up \002{0}\002."), Anope::Duration(uptime, source.GetAccount()));
 	}
 
 	void DoStatsUplink(CommandSource &source)
@@ -143,10 +141,9 @@ class CommandOSStats : public Command
 		if (!buf.empty())
 			buf.erase(buf.begin());
 
-		source.Reply(_("Uplink server: %s"), Me->GetLinks().front()->GetName().c_str());
-		source.Reply(_("Uplink capab: %s"), buf.c_str());
-		source.Reply(_("Servers found: %d"), stats_count_servers(Me->GetLinks().front()));
-		return;
+		source.Reply(_("Uplink server: \002{0}\002"), Me->GetLinks().front()->GetName());
+		source.Reply(_("Uplink capab: {0}"), buf);
+		source.Reply(_("Servers found: {0}"), stats_count_servers(Me->GetLinks().front()));
 	}
 
 	template<typename T> void GetHashStats(const T& map, size_t& entries, size_t& buckets, size_t& max_chain)
@@ -162,30 +159,30 @@ class CommandOSStats : public Command
 		size_t entries, buckets, max_chain;
 
 		GetHashStats(UserListByNick, entries, buckets, max_chain);
-		source.Reply(_("Users (nick): %lu entries, %lu buckets, longest chain is %d"), entries, buckets, max_chain);
+		source.Reply(_("Users (nick): {0} entries, {1} buckets, longest chain is {2}"), entries, buckets, max_chain);
 
 		if (!UserListByUID.empty())
 		{
 			GetHashStats(UserListByUID, entries, buckets, max_chain);
-			source.Reply(_("Users (uid): %lu entries, %lu buckets, longest chain is %d"), entries, buckets, max_chain);
+			source.Reply(_("Users (uid): {0} entries, {1} buckets, longest chain is {2}"), entries, buckets, max_chain);
 		}
 
 		GetHashStats(ChannelList, entries, buckets, max_chain);
-		source.Reply(_("Channels: %lu entries, %lu buckets, longest chain is %d"), entries, buckets, max_chain);
+		source.Reply(_("Channels: {0} entries, {1} buckets, longest chain is {2}"), entries, buckets, max_chain);
 
 		GetHashStats(ChanServ::service->GetChannels(), entries, buckets, max_chain);
-		source.Reply(_("Registered channels: %lu entries, %lu buckets, longest chain is %d"), entries, buckets, max_chain);
+		source.Reply(_("Registered channels: {0} entries, {1} buckets, longest chain is {2}"), entries, buckets, max_chain);
 
 		GetHashStats(NickServ::service->GetNickList(), entries, buckets, max_chain);
-		source.Reply(_("Registered nicknames: %lu entries, %lu buckets, longest chain is %d"), entries, buckets, max_chain);
+		source.Reply(_("Registered nicknames: {0} entries, {1} buckets, longest chain is {2}"), entries, buckets, max_chain);
 
 		GetHashStats(NickServ::service->GetAccountList(), entries, buckets, max_chain);
-		source.Reply(_("Registered nick groups: %lu entries, %lu buckets, longest chain is %d"), entries, buckets, max_chain);
+		source.Reply(_("Registered nick groups: {0} entries, {1} buckets, longest chain is {2}"), entries, buckets, max_chain);
 
 		if (session_service)
 		{
 			GetHashStats(session_service->GetSessions(), entries, buckets, max_chain);
-			source.Reply(_("Sessions: %lu entries, %lu buckets, longest chain is %d"), entries, buckets, max_chain);
+			source.Reply(_("Sessions: {0} entries, {1} buckets, longest chain is {2}"), entries, buckets, max_chain);
 		}
 	}
 
@@ -219,29 +216,22 @@ class CommandOSStats : public Command
 			this->DoStatsUptime(source);
 
 		if (!extra.empty() && !extra.equals_ci("ALL") && !extra.equals_ci("AKILL") && !extra.equals_ci("HASH") && !extra.equals_ci("UPLINK") && !extra.equals_ci("UPTIME"))
-			source.Reply(_("Unknown STATS option: \002%s\002"), extra.c_str());
+			source.Reply(_("Unknown STATS option: \002{0}\002"), extra);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("Without any option, shows the current number of users online,\n"
-				"and the highest number of users online since Services was\n"
-				"started, and the length of time Services has been running.\n"
-				" \n"
-				"With the \002AKILL\002 option, displays the current size of the\n"
-				"AKILL list and the current default expiry time.\n"
-				" \n"
-				"The \002RESET\002 option currently resets the maximum user count\n"
-				"to the number of users currently present on the network.\n"
-				" \n"
-				"The \002UPLINK\002 option displays information about the current\n"
-				"server Anope uses as an uplink to the network.\n"
-				" \n"
-				"The \002HASH\002 option displays information about the hash maps.\n"
-				" \n"
-				"The \002ALL\002 option displays all of the above statistics."));
+		source.Reply(_("Without any option, shows the current number of users online, and the highest number of users online since Services was started, and the length of time Services has been running.\n"
+		               "\n"
+		               "With the \002AKILL\002 option, displays the current size of the AKILL list and the current default expiry time.\n"
+		               "\n"
+		               "The \002RESET\002 option currently resets the maximum user count to the number of users currently present on the network.\n"
+		               "\n"
+		               "The \002UPLINK\002 option displays information about the current server Anope uses as an uplink to the network.\n"
+		               "\n"
+		               "The \002HASH\002 option displays information about the hash maps.\n"
+		               "\n"
+		               "The \002ALL\002 option displays all of the above statistics."));
 		return true;
 	}
 };

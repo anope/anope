@@ -130,7 +130,7 @@ class CommandCSXOP : public Command
 				override = true;
 			else
 			{
-				source.Reply(ACCESS_DENIED);
+				source.Reply(_("Access denied. You do not have the \002{0}\002 privilege on \002{1}\002."), "ACCESS_CHANGE", ci->name);
 				return;
 			}
 		}
@@ -146,7 +146,7 @@ class CommandCSXOP : public Command
 			ChanServ::Channel *targ_ci = ChanServ::Find(mask);
 			if (targ_ci == NULL)
 			{
-				source.Reply(CHAN_X_NOT_REGISTERED, mask.c_str());
+				source.Reply(_("Channel \002{0}\002 isn't registered."), mask);
 				return;
 			}
 			else if (ci == targ_ci)
@@ -172,7 +172,7 @@ class CommandCSXOP : public Command
 					mask = "*!*@" + targ->GetDisplayedHost();
 				else
 				{
-					source.Reply(NICK_X_NOT_REGISTERED, mask.c_str());
+					source.Reply(_("\002{0}\002 isn't registered."), mask);
 					return;
 				}
 			}
@@ -186,7 +186,7 @@ class CommandCSXOP : public Command
 			{
 				if ((!highest || *a >= *highest) && !access.founder && !source.HasPriv("chanserv/access/modify"))
 				{
-					source.Reply(ACCESS_DENIED);
+					source.Reply(_("Access denied. You do not have enough privileges on \002{0}\002 to lower the access of \002{1}\002."), ci->name, a->mask);
 					return;
 				}
 
@@ -258,7 +258,7 @@ class CommandCSXOP : public Command
 				mask = "*!*@" + targ->GetDisplayedHost();
 			else
 			{
-				source.Reply(NICK_X_NOT_REGISTERED, mask.c_str());
+				source.Reply(_("\002{0}\002 isn't registered."), mask);
 				return;
 			}
 		}
@@ -272,7 +272,7 @@ class CommandCSXOP : public Command
 				override = true;
 			else
 			{
-				source.Reply(ACCESS_DENIED);
+				source.Reply(_("Access denied. You do not have the \002{0}\002 privilege on \002{1}\002."), "ACCESS_CHANGE", ci->name);
 				return;
 			}
 		}
@@ -368,7 +368,7 @@ class CommandCSXOP : public Command
 
 		if (!access.HasPriv("ACCESS_LIST") && !source.HasCommand("chanserv/access/list"))
 		{
-			source.Reply(ACCESS_DENIED);
+			source.Reply(_("Access denied. You do not have the \002{0}\002 privilege on \002{1}\002."), "ACCESS_LIST", ci->name);
 			return;
 		}
 
@@ -458,7 +458,7 @@ class CommandCSXOP : public Command
 
 		if (!source.AccessFor(ci).HasPriv("FOUNDER") && !source.HasPriv("chanserv/access/modify"))
 		{
-			source.Reply(ACCESS_DENIED);
+			source.Reply(_("Access denied. You do not have the \002{0}\002 privilege on \002{1}\002."), "FOUNDER", ci->name);
 			return;
 		}
 
@@ -499,7 +499,7 @@ class CommandCSXOP : public Command
 		ChanServ::Channel *ci = ChanServ::Find(params[0]);
 		if (ci == NULL)
 		{
-			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
+			source.Reply(_("Channel \002{0}\002 isn't registered."), params[0]);
 			return;
 		}
 
@@ -520,68 +520,92 @@ class CommandCSXOP : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
-		const Anope::string &cmd = source.command.upper();
-
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("Maintains the \002%s list\002 for a channel. Users who match an access entry\n"
-				"on the %s list receive the following privileges:\n"
-				" "), cmd.c_str(), cmd.c_str());
-
-		Anope::string buf;
-		for (unsigned i = 0; i < permissions[cmd].size(); ++i)
+		if (subcommand.equals_ci("ADD"))
 		{
-			buf += ", " + permissions[cmd][i];
-			if (buf.length() > 75)
+			source.Reply(_("The \002{0} ADD\002 command adds \037mask\037 to the {0} list of \037channel\037."
+			               " If you have the privilege to use this command, you may use it if you have more privileges than it grants."),
+			               source.command);
+
+			source.Reply(_("Use of this command requires the \002{0}\002 privilege on \037channel\037.\n"
+			               "Example:\n"
+			               "         {1} #anope ADD Adam"
+			               "         Adds \"Adam\" to the access list of \"#anope\" with the privilege set {1}"),
+			               "ACCESS_CHANGE", source.command);
+		}
+		else if (subcommand.equals_ci("DEL"))
+			source.Reply(_("The \002{0} DEL\002 command removes the given \037mask\037 from the {0} list of \037channel\037."
+			               " If a list of entry numbers is given, those entries are deleted.\n"
+			               "\n"
+			               "Use of this command requires the \002{1}\002 privilege on \037channel\037.\n"
+			               "Example:\n"
+			               "         {0} #anope DEL Cronus"
+			               "         Removes \"Cronus\" from the {0} list of \"#anope\""),
+			               source.command, "ACCESS_CHANGE");
+		else if (subcommand.equals_ci("LIST"))
+			source.Reply(_("The \002{0} LIST\002 command displays the {0} list of \037channel\037."
+			               " If a wildcard mask is given, only those entries matching the mask are displayed."
+			               " If a list of entry numbers is given, only those entries are shown.\n"
+			               "\n"
+			               "Use of this command requires the \002{1}\002 privilege on \037channel\037.\n"
+			               "\n"
+			               "Example:"
+			               "         {0} #anope LIST 2-5,7-9\n"
+			               "         List entries numbered 2 through 5 and 7 through 9 on the {0} of \"#anope\""),
+			               source.command, "ACCESS_LIST");
+		else if (subcommand.equals_ci("CLEAR"))
+			source.Reply(_("The \002{0} CLEAR\002 command clears the {0} list of \037channel\037."
+			               "\n"
+			               "Use of this command requires the \002{1}\002 privilege on \037channel\037."),
+			               source.command, "FOUNDER");
+
+		else
+		{
+			source.Reply(_("Maintains the \002{0} list\002 for a channel."
+			               " Users who match an access entry on the {0} list receive the following privileges:\n"
+			               "\n"),
+			               source.command);
+
+			Anope::string buf;
+			for (unsigned i = 0; i < permissions[source.command].size(); ++i)
+				buf += "," + permissions[source.command][i];
+
+			source.Reply(buf);
+
+			CommandInfo *help = source.service->FindCommand("generic/help");
+			if (help)
 			{
-				source.Reply("  %s\n", buf.substr(2).c_str());
-				buf.clear();
-			}
-		}
-		if (!buf.empty())
-		{
-			source.Reply("  %s\n", buf.substr(2).c_str());
-			buf.clear();
-		}
+				source.Reply(_("\n"
+				               "The \002ADD\002 command adds \037mask\037 to the {0} list.\n"
+				               "Use of this command requires the \002{change}\002 privilege on \037channel\037.\n"
+				               "\002{msg}{service} {help} {command} ADD\002 for more information.\n"
+				               "\n"
+				               "The \002DEL\002 command removes \037mask\037 from the {0} list.\n"
+				               "Use of this command requires the \002{change}\002 privilege on \037channel\037.\n"
+				               "\002{msg}{service} {help} {command} DEL\002 for more information.\n"
+				               "\n"
+				               "The \002LIST\002 command shows the {0} list for \037channel\037.\n"
+				               "Use of this commands requires the \002{list}\002 privilege on \037channel\037.\n"
+				               "\002{msg}{service} {help} {command} LIST\002 for more information.\n"
+				               "\n"
+				               "The \002CLEAR\002 command clears the {0} list."
+				               "Use of this command requires the \002{founder}\002 privilege on \037channel\037.\n"
+				               "\002{msg}{service} {help} {command} CLEAR\002 for more information.)"),
+				               source.command, "change"_kw = "ACCESS_CHANGE", "list"_kw = "ACCESS_LIST", "help"_kw = help->cname);
 
-		source.Reply(_(" \n"
-				"The \002%s ADD\002 command adds the given nickname to the\n"
-				"%s list.\n"
-				" \n"
-				"The \002%s DEL\002 command removes the given nick from the\n"
-				"%s list. If a list of entry numbers is given, those\n"
-				"entries are deleted. (See the example for LIST below.)\n"
-				" \n"
-				"The \002%s LIST\002 command displays the %s list. If\n"
-				"a wildcard mask is given, only those entries matching the\n"
-				"mask are displayed. If a list of entry numbers is given,\n"
-				"only those entries are shown; for example:\n"
-				"   \002%s #channel LIST 2-5,7-9\002\n"
-				"      Lists %s entries numbered 2 through 5 and\n"
-				"      7 through 9.\n"
-				"      \n"
-				"The \002%s CLEAR\002 command clears all entries of the\n"
-				"%s list."), cmd.c_str(), cmd.c_str(), cmd.c_str(), cmd.c_str(),
-				cmd.c_str(), cmd.c_str(), cmd.c_str(), cmd.c_str(), cmd.c_str(), cmd.c_str());
-		source.Reply(_(" \n"
-				"The \002%s\002 commands are limited to founders\n"
-				"(unless SECUREOPS is off). However, any user on the\n"
-				"VOP list or above may use the \002%s LIST\002 command.\n"
-				" \n"), cmd.c_str(), cmd.c_str());
-		BotInfo *access_bi, *flags_bi;
-		Anope::string access_cmd, flags_cmd;
-		Command::FindCommandFromService("chanserv/access", access_bi, access_cmd);
-		Command::FindCommandFromService("chanserv/flags", flags_bi, access_cmd);
-		if (!access_cmd.empty() || !flags_cmd.empty())
-		{
-			source.Reply(_("Alternative methods of modifying channel access lists are\n"
-					"available. "));
-			if (!access_cmd.empty())
-				source.Reply(_("See \002%s%s HELP %s\002 for more information\n"
-						"about the access list."), Config->StrictPrivmsg.c_str(), access_bi->nick.c_str(), access_cmd.c_str());
-			if (!flags_cmd.empty())
-				source.Reply(_("See \002%s%s HELP %s\002 for more information\n"
-						"about the flags system."), Config->StrictPrivmsg.c_str(), flags_bi->nick.c_str(), flags_cmd.c_str());
+				Anope::string access_cmd, flags_cmd;
+				BotInfo *access_bi, *flags_bi;
+				Command::FindCommandFromService("chanserv/access", access_bi, access_cmd);
+				Command::FindCommandFromService("chanserv/flags", flags_bi, access_cmd);
+				if (!access_cmd.empty() || !flags_cmd.empty())
+				{
+					source.Reply(_("\n"
+					                "Alternative methods of modifying channel access lists are available:\n"));
+					if (!access_cmd.empty())
+						source.Reply(_("See \002{0}{1} {2} {3}\002 for more information about the access list."), Config->StrictPrivmsg, access_bi->nick, help->cname, access_cmd);
+					if (!flags_cmd.empty())
+						source.Reply(_("See \002{0}{1} {2} {3}\002 for more information about the flags system."), Config->StrictPrivmsg, flags_bi->nick, help->cname, flags_cmd);
+				}
+			}
 		}
 		return true;
 	}

@@ -47,7 +47,7 @@ class CommandNSList : public Command
 			}
 			catch (const ConvertException &)
 			{
-				source.Reply(LIST_INCORRECT_RANGE);
+				source.Reply(_("Incorrect range specified. The correct syntax is \002#\037from\037-\037to\037\002."));
 				return;
 			}
 
@@ -122,7 +122,7 @@ class CommandNSList : public Command
 			}
 		}
 
-		source.Reply(_("List of entries matching \002%s\002:"), pattern.c_str());
+		source.Reply(_("List of entries matching \002{0}\002:"), pattern);
 
 		std::vector<Anope::string> replies;
 		list.Process(replies);
@@ -130,49 +130,43 @@ class CommandNSList : public Command
 		for (unsigned i = 0; i < replies.size(); ++i)
 			source.Reply(replies[i]);
 
-		source.Reply(_("End of list - %d/%d matches shown."), nnicks > listmax ? listmax : nnicks, nnicks);
+		source.Reply(_("End of list - \002{0}\002/\002{1}\002 matches shown."), nnicks > listmax ? listmax : nnicks, nnicks);
 		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("Lists all registered nicknames which match the given\n"
-				"pattern, in \037nick!user@host\037 format.  Nicks with the \002PRIVATE\002\n"
-				"option set will only be displayed to Services Operators with the\n"
-				"proper access.  Nicks with the \002NOEXPIRE\002 option set will have\n"
-				"a \002!\002 prefixed to the nickname for Services Operators to see.\n"
-				" \n"
-				"Note that a preceding '#' specifies a range.\n"
-				" \n"
-				"If the SUSPENDED, UNCONFIRMED or NOEXPIRE options are given, only\n"
-				"nicks which, respectively, are SUSPENDED, UNCONFIRMED or have the\n"
-				"NOEXPIRE flag set will be displayed. If multiple options are\n"
-				"given, all nicks matching at least one option will be displayed.\n"
-				"Note that these options are limited to \037Services Operators\037.\n"
-				" \n"
-				"Examples:\n"
-				" \n"
-				"    \002LIST *!joeuser@foo.com\002\n"
-				"        Lists all registered nicks owned by joeuser@foo.com.\n"
-				" \n"
-				"    \002LIST *Bot*!*@*\002\n"
-				"        Lists all registered nicks with \002Bot\002 in their\n"
-				"        names (case insensitive).\n"
-				" \n"
-				"    \002LIST * NOEXPIRE\002\n"
-				"        Lists all registered nicks which have been set to not expire.\n"
-				" \n"
-				"    \002LIST #51-100\002\n"
-				"        Lists all registered nicks within the given range (51-100)."));
+		source.Reply(_("Lists all registered nicknames which match the given pattern, in \037nick!user@host\037 format."
+		               " Nicks with the \002PRIVATE\002 option set will only be displayed to Services Operators with the proper access."
+		               " Nicks with the \002NOEXPIRE\002 option set will have a \002!\002 prefixed to the nickname for Services Operators to see.\n"
+		               "\n"
+		               "Note that a preceding '#' specifies a range.\n"
+		               "\n"
+		               "If the SUSPENDED, UNCONFIRMED or NOEXPIRE options are given, only\n"
+		               "nicks which, respectively, are SUSPENDED, UNCONFIRMED or have the\n"
+		               "NOEXPIRE flag set will be displayed. If multiple options are\n"
+		               "given, all nicks matching at least one option will be displayed.\n"
+		               "Note that these options are limited to \037Services Operators\037.\n"
+		               "\n"
+		               "Examples:\n"
+		               "\n"
+		               "         {0} *!joeuser@foo.com\n"
+		               "         Lists all registered nicks owned by joeuser@foo.com.\n"
+		               "\n"
+		               "         {0} *Bot*!*@*\n"
+		               "         Lists all registered nicks with \002Bot\002 in their names (case insensitive).\n"
+		               "\n"
+		               "         {0} * NOEXPIRE\n"
+		               "         Lists all registered nicks which have been set to not expire.\n"
+		               "\n"
+		               "         {0} #51-100\n"
+		               "         Lists all registered nicks within the given range (51-100)."));
 
 		const Anope::string &regexengine = Config->GetBlock("options")->Get<const Anope::string>("regexengine");
 		if (!regexengine.empty())
 		{
 			source.Reply(" ");
-			source.Reply(_("Regex matches are also supported using the %s engine.\n"
-					"Enclose your pattern in // if this is desired."), regexengine.c_str());
+			source.Reply(_("Regex matches are also supported using the {0} engine. Enclose your pattern in // if this is desired."), regexengine);
 		}
 
 		return true;
@@ -185,7 +179,7 @@ class CommandNSSetPrivate : public Command
  public:
 	CommandNSSetPrivate(Module *creator, const Anope::string &sname = "nickserv/set/private", size_t min = 1) : Command(creator, sname, min, min + 1)
 	{
-		this->SetDesc(_("Prevent the nickname from appearing in the LIST command"));
+		this->SetDesc(_("Prevent your account from appearing in the LIST command"));
 		this->SetSyntax("{ON | OFF}");
 	}
 
@@ -193,14 +187,14 @@ class CommandNSSetPrivate : public Command
 	{
 		if (Anope::ReadOnly)
 		{
-			source.Reply(READ_ONLY_MODE);
+			source.Reply(_("Services are in read-only mode."));
 			return;
 		}
 
 		const NickServ::Nick *na = NickServ::FindNick(user);
 		if (!na)
 		{
-			source.Reply(NICK_X_NOT_REGISTERED, user.c_str());
+			source.Reply(_("\002{0}\002 isn't registered."), user);
 			return;
 		}
 		NickServ::Account *nc = na->nc;
@@ -213,13 +207,13 @@ class CommandNSSetPrivate : public Command
 		{
 			Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to enable private for " << nc->display;
 			nc->Extend<bool>("NS_PRIVATE");
-			source.Reply(_("Private option is now \002on\002 for \002%s\002."), nc->display.c_str());
+			source.Reply(_("Private option is now \002on\002 for \002{0}\002."), nc->display);
 		}
 		else if (param.equals_ci("OFF"))
 		{
 			Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to disable private for " << nc->display;
 			nc->Shrink<bool>("NS_PRIVATE");
-			source.Reply(_("Private option is now \002off\002 for \002%s\002."), nc->display.c_str());
+			source.Reply(_("Private option is now \002off\002 for \002{0}\002."), nc->display);
 		}
 		else
 			this->OnSyntaxError(source, "PRIVATE");
@@ -232,14 +226,9 @@ class CommandNSSetPrivate : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("Turns %s's privacy option on or off for your nick.\n"
-				"With \002PRIVATE\002 set, your nickname will not appear in\n"
-				"nickname lists generated with %s's \002LIST\002 command.\n"
-				"(However, anyone who knows your nickname can still get\n"
-				"information on it using the \002INFO\002 command.)"),
-				source.service->nick.c_str(), source.service->nick.c_str());
+		source.Reply(_("Turns the privacy option on or off for your account."
+		               " When \002PRIVATE\002 is set, your account will not appear in the account list."
+		               " However, anyone who knows your account can still request information about it."));
 		return true;
 	}
 };
@@ -250,7 +239,7 @@ class CommandNSSASetPrivate : public CommandNSSetPrivate
 	CommandNSSASetPrivate(Module *creator) : CommandNSSetPrivate(creator, "nickserv/saset/private", 2)
 	{
 		this->ClearSyntax();
-		this->SetSyntax(_("\037nickname\037 {ON | OFF}"));
+		this->SetSyntax(_("\037account\037 {ON | OFF}"));
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
@@ -260,14 +249,9 @@ class CommandNSSASetPrivate : public CommandNSSetPrivate
 
 	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("Turns %s's privacy option on or off for the nick.\n"
-				"With \002PRIVATE\002 set, the nickname will not appear in\n"
-				"nickname lists generated with %s's \002LIST\002 command.\n"
-				"(However, anyone who knows the nickname can still get\n"
-				"information on it using the \002INFO\002 command.)"),
-				source.service->nick.c_str(), source.service->nick.c_str());
+		source.Reply(_("Turns the privacy option on or off for \037account\037."
+		               " When \002PRIVATE\002 is set, the account will not appear in the account list."
+		               " However, anyone who knows your account can still request information about it."));
 		return true;
 	}
 };

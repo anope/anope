@@ -237,7 +237,7 @@ class OperServCore : public Module
 	{
 		if (bi == OperServ && !u->HasMode("OPER") && Config->GetModule(this)->Get<bool>("opersonly"))
 		{
-			u->SendMessage(bi, ACCESS_DENIED);
+			u->SendMessage(bi, "Access denied.");
 			::Log(bi, "bados") << "Denied access to " << bi->nick << " from " << u->GetMask() << " (non-oper)";
 			return EVENT_STOP;
 		}

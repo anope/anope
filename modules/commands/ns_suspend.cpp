@@ -60,7 +60,7 @@ class CommandNSSuspend : public Command
 	CommandNSSuspend(Module *creator, EventHandlers<Event::NickSuspend> &event) : Command(creator, "nickserv/suspend", 2, 3), onnicksuspend(event)
 	{
 		this->SetDesc(_("Suspend a given nick"));
-		this->SetSyntax(_("\037nickname\037 [+\037expiry\037] [\037reason\037]"));
+		this->SetSyntax(_("\037account\037 [+\037expiry\037] [\037reason\037]"));
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
@@ -72,7 +72,7 @@ class CommandNSSuspend : public Command
 		time_t expiry_secs = Config->GetModule(this->owner)->Get<time_t>("suspendexpire");
 
 		if (Anope::ReadOnly)
-			source.Reply(READ_ONLY_MODE);
+			source.Reply(_("Services are in read-only mode. Any changes made may not persist."));
 
 		if (expiry[0] != '+')
 		{
@@ -85,7 +85,7 @@ class CommandNSSuspend : public Command
 			expiry_secs = Anope::DoTime(expiry);
 			if (expiry_secs == -1)
 			{
-				source.Reply(BAD_EXPIRY_TIME);
+				source.Reply(_("Invalid expiry time \002{0}\002."), expiry);
 				return;
 			}
 		}
@@ -93,7 +93,7 @@ class CommandNSSuspend : public Command
 		NickServ::Nick *na = NickServ::FindNick(nick);
 		if (!na)
 		{
-			source.Reply(NICK_X_NOT_REGISTERED, nick.c_str());
+			source.Reply(_("\002{0}\002 isn't registered."), nick);
 			return;
 		}
 
@@ -137,19 +137,15 @@ class CommandNSSuspend : public Command
 		}
 
 		Log(LOG_ADMIN, source, this) << "for " << nick << " (" << (!reason.empty() ? reason : "No reason") << "), expires on " << (expiry_secs ? Anope::strftime(Anope::CurTime + expiry_secs) : "never");
-		source.Reply(_("Nick %s is now suspended."), nick.c_str());
+		source.Reply(_("\002{0}\002 is now suspended."), na->nick);
 
 		this->onnicksuspend(&Event::NickSuspend::OnNickSuspend, na);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("Suspends a registered nickname, which prevents it from being used\n"
-				"while keeping all the data for that nick. If an expiry is given\n"
-				"the nick will be unsuspended after that period of time, else the\n"
-				"default expiry from the configuration is used."));
+		source.Reply(_("Suspends \037account\037, which prevents it from being used while keeping all the data for it."
+		               " If an expiry is given the account will be unsuspended after that period of time, otherwise the default expiry from the configuration is used.")); // XXX
 		return true;
 	}
 };
@@ -162,7 +158,7 @@ class CommandNSUnSuspend : public Command
 	CommandNSUnSuspend(Module *creator, EventHandlers<Event::NickUnsuspended> &event) : Command(creator, "nickserv/unsuspend", 1, 1), onnickunsuspend(event)
 	{
 		this->SetDesc(_("Unsuspend a given nick"));
-		this->SetSyntax(_("\037nickname\037"));
+		this->SetSyntax(_("\037account\037"));
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
@@ -170,18 +166,18 @@ class CommandNSUnSuspend : public Command
 		const Anope::string &nick = params[0];
 
 		if (Anope::ReadOnly)
-			source.Reply(READ_ONLY_MODE);
+			source.Reply(_("Services are in read-only mode. Any changes made may not persist."));
 
 		NickServ::Nick *na = NickServ::FindNick(nick);
 		if (!na)
 		{
-			source.Reply(NICK_X_NOT_REGISTERED, nick.c_str());
+			source.Reply(_("\002{0}\002 isn't registered."), nick);
 			return;
 		}
 
 		if (!na->nc->HasExt("NS_SUSPENDED"))
 		{
-			source.Reply(_("Nick %s is not suspended."), na->nick.c_str());
+			source.Reply(_("\002{0}\002 is not suspended."), na->nick);
 			return;
 		}
 
@@ -191,16 +187,14 @@ class CommandNSUnSuspend : public Command
 
 		na->nc->Shrink<NSSuspendInfo>("NS_SUSPENDED");
 
-		source.Reply(_("Nick %s is now released."), nick.c_str());
+		source.Reply(_("\002{0}\002 is now released."), na->nick);
 
 		this->onnickunsuspend(&Event::NickUnsuspended::OnNickUnsuspended, na);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("Unsuspends a nickname which allows it to be used again."));
+		source.Reply(_("Unsuspends \037account\037, which allows it to be used again."));
 		return true;
 	}
 };
@@ -274,7 +268,7 @@ class NSSuspend : public Module
 		if (!s)
 			return EVENT_CONTINUE;
 
-		u->SendMessage(Config->GetClient("NickServ"), NICK_X_SUSPENDED, u->nick.c_str());
+		u->SendMessage(Config->GetClient("NickServ"), _("\002{0}\002 is suspended."), u->nick);
 		return EVENT_STOP;
 	}
 };

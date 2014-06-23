@@ -38,27 +38,19 @@ class CommandNSGetEMail : public Command
 			if (!nc->email.empty() && nc->email.equals_ci(email))
 			{
 				++j;
-				source.Reply(_("Email matched: \002%s\002 to \002%s\002."), nc->display.c_str(), email.c_str());
+				source.Reply(_("Email matched: \002{0}\002 to \002{1}\002."), nc->display, email);
 			}
 		}
 
 		if (j <= 0)
 		{
-			source.Reply(_("No nick registrations matching \002%s\002 found."), email.c_str());
-			return;
+			source.Reply(_("There are no accounts with an email that matches \002{0}\002."), email);
 		}
-
-		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("Returns the matching nicks that used given email. \002Note\002 that\n"
-				"you can not use wildcards. Whenever this command is used, a message\n"
-				"including the person who issued the command and the email it was used\n"
-				"on will be logged."));
+		source.Reply(_("Returns the matching accounts whose email address is \037email\037."));
 		return true;
 	}
 };

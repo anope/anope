@@ -54,8 +54,6 @@ class CommandOSSet : public Command
 		}
 		else
 			source.Reply(_("Setting for READONLY must be \002ON\002 or \002OFF\002."));
-
-		return;
 	}
 
 	void DoSetSuperAdmin(CommandSource &source, const std::vector<Anope::string> &params)
@@ -93,8 +91,6 @@ class CommandOSSet : public Command
 		}
 		else
 			source.Reply(_("Setting for super admin must be \002ON\002 or \002OFF\002."));
-
-		return;
 	}
 
 	void DoSetDebug(CommandSource &source, const std::vector<Anope::string> &params)
@@ -160,8 +156,6 @@ class CommandOSSet : public Command
 		}
 		else
 			source.Reply(_("Setting for NOEXPIRE must be \002ON\002 or \002OFF\002."));
-
-		return;
 	}
  public:
 	CommandOSSet(Module *creator) : Command(creator, "operserv/set", 1, 2)
@@ -186,18 +180,13 @@ class CommandOSSet : public Command
 			return this->DoSetSuperAdmin(source, params);
 		else
 			this->OnSyntaxError(source, "");
-
-		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		if (subcommand.empty())
 		{
-			this->SendSyntax(source);
-			source.Reply(" ");
-			source.Reply(_("Sets various global Services options.  Option names\n"
-					"currently defined are:\n"
+			source.Reply(_("Sets various global Services options.  Option names currently defined are:\n"
 					"    READONLY   Set read-only or read-write mode\n"
 					"    DEBUG      Activate or deactivate debug mode\n"
 					"    NOEXPIRE   Activate or deactivate no expire mode\n"
@@ -205,50 +194,37 @@ class CommandOSSet : public Command
 					"    LIST       List the options"));
 		}
 		else if (subcommand.equals_ci("LIST"))
-			source.Reply(_("Syntax: \002LIST\002\n"
-					" \n"
-					"Display the various %s settings."), source.service->nick.c_str());
+			//source.Reply(_("Syntax: \002LIST\002\n"
+			//		" \n"
+			source.Reply(("Display the various {0} settings."), source.service->nick);
 		else if (subcommand.equals_ci("READONLY"))
-			source.Reply(_("Syntax: \002READONLY {ON | OFF}\002\n"
-					" \n"
-					"Sets read-only mode on or off.  In read-only mode, normal\n"
-					"users will not be allowed to modify any Services data,\n"
-					"including channel and nickname access lists, etc.  IRCops\n"
-					"with sufficient Services privileges will be able to modify\n"
-					"Services' AKILL, SQLINE, SNLINE and ignore lists, drop,\n"
-					"suspend or forbid nicknames and channels, and manage news,\n"
-					"oper info and DNS, but any such changes will not be saved\n"
-					"unless read-only mode is deactivated before Services are\n"
-					"terminated or restarted.\n"
-					" \n"
-					"This option is equivalent to the command-line option\n"
-					"\002--readonly\002."));
+			//source.Reply(_("Syntax: \002READONLY {ON | OFF}\002\n"
+			//		" \n"
+			source.Reply(_("Sets read-only mode on or off.  In read-only mode, norma users will not be allowed to modify any Services data, including channel and nickname access lists, etc."
+				       "Services Operators will still be able to do most tasks, but should understand any changes they do may not be permanent.\n"
+				       "\n"
+			               "This option is equivalent to the command-line option \002--readonly\002."));
 		else if (subcommand.equals_ci("DEBUG"))
-			source.Reply(_("Syntax: \002DEBUG {ON | OFF}\002\n"
-					" \n"
-					"Sets debug mode on or off.\n"
-					" \n"
-					"This option is equivalent to the command-line option\n"
-					"\002--debug\002."));
+			//source.Reply(_("Syntax: \002DEBUG {ON | OFF}\002\n"
+			//		" \n"
+			source.Reply(_("Sets debug mode on or off.\n"
+			               "\n"
+			               "This option is equivalent to the command-line option \002--debug\002."));
 		else if (subcommand.equals_ci("NOEXPIRE"))
-			source.Reply(_("Syntax: \002NOEXPIRE {ON | OFF}\002\n"
-					" \n"
-					"Sets no expire mode on or off. In no expire mode, nicks,\n"
-					"channels, akills and exceptions won't expire until the\n"
-					"option is unset.\n"
-					" \n"
-					"This option is equivalent to the command-line option\n"
-					"\002--noexpire\002."));
+			//source.Reply(_("Syntax: \002NOEXPIRE {ON | OFF}\002\n"
+			//		" \n"
+			source.Reply(_("Sets no expire mode on or off. In no expire mode, nicks, channels, akills and exceptions won't expire until the option is unset.\n"
+			               "\n"
+			               "This option is equivalent to the command-line option \002--noexpire\002."));
 		else if (subcommand.equals_ci("SUPERADMIN"))
-			source.Reply(_("Syntax: \002SUPERADMIN {ON | OFF}\002\n"
-					" \n"
-					"Setting this will grant you extra privileges such as the\n"
-					"ability to be \"founder\" on all channel's etc...\n"
-					" \n"
-					"This option is \002not\002 persistent, and should only be used when\n"
-					"needed, and set back to OFF when no longer needed."));
+			//source.Reply(_("Syntax: \002SUPERADMIN {ON | OFF}\002\n"
+			//		" \n"
+			source.Reply(_("Setting this will grant you extra privileges, such as the ability to be \"founder\" on all channels."
+			               "\n"
+			               "This option is \002not\002 persistent, and should only be used when needed, and set back to OFF when no longer needed."));
 		else
 			return false;
+		
 		return true;
 	}
 };

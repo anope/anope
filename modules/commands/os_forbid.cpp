@@ -159,7 +159,7 @@ class CommandOSForbid : public Command
 			if (!bi)
 				bi = Config->GetClient("OperServ");
 			if (bi)
-				u->SendMessage(bi, _("This nickname has been forbidden: %s"), d->reason.c_str());
+				u->SendMessage(bi, _("This nickname has been forbidden: \002{0}\002"), d->reason);
 			if (NickServ::service)
 				NickServ::service->Collide(u, NULL);
 		}
@@ -207,7 +207,7 @@ class CommandOSForbid : public Command
 				expiryt = Anope::DoTime(expiry);
 				if (expiryt == -1)
 				{
-					source.Reply(BAD_EXPIRY_TIME);
+					source.Reply(_("Invalid expiry time \002{0}\002."), expiry);
 					return;
 				}
 				else if (expiryt)
@@ -217,7 +217,7 @@ class CommandOSForbid : public Command
 			NickServ::Nick *target = NickServ::FindNick(entry);
 			if (target != NULL && Config->GetModule("nickserv")->Get<bool>("secureadmins", "yes") && target->nc->IsServicesOper())
 			{
-				source.Reply(ACCESS_DENIED);
+				source.Reply(_("Access denied."));
 				return;
 			}
 
@@ -239,10 +239,10 @@ class CommandOSForbid : public Command
 				this->fs->AddForbid(d);
 
 			if (Anope::ReadOnly)
-				source.Reply(READ_ONLY_MODE);
+				source.Reply(_("Services are in read-only mode. Any changes made may not persist."));
 
 			Log(LOG_ADMIN, source, this) << "to add a forbid on " << entry << " of type " << subcommand;
-			source.Reply(_("Added a forbid on %s of type %s to expire on %s."), entry.c_str(), subcommand.lower().c_str(), d->expires ? Anope::strftime(d->expires, source.GetAccount()).c_str() : "never");
+			source.Reply(_("Added a forbid on \002{0}\002 of type \002{1}\002 to expire on \002{2}\002."), entry, subcommand.lower(), d->expires ? Anope::strftime(d->expires, source.GetAccount()) : "never");
 
 			/* apply forbid */
 			switch (ftype)
@@ -268,7 +268,7 @@ class CommandOSForbid : public Command
 						delete na;
 					}
 
-					source.Reply(_("\002%d\002 nickname(s) dropped."), na_matches);
+					source.Reply(_("\002{0}\002 nickname(s) dropped."), na_matches);
 					break;
 				}
 				case FT_CHAN:
@@ -306,7 +306,7 @@ class CommandOSForbid : public Command
 							if (u->server == Me || u->HasMode("OPER"))
 								continue;
 
-							reason = Anope::printf(Language::Translate(u, _("This channel has been forbidden: %s")), d->reason.c_str());
+							reason = Anope::printf(Language::Translate(u, _("This channel has been forbidden: \002%s\002")), d->reason.c_str());
 
 							c->Kick(source.service, u, "%s", reason.c_str());
 						}
@@ -326,7 +326,7 @@ class CommandOSForbid : public Command
 						delete ci;
 					}
 
-					source.Reply(_("\002%d\002 channel(s) cleared, and \002%d\002 channel(s) dropped."), chan_matches, ci_matches);
+					source.Reply(_("\002{0}\002 channel(s) cleared, and \002{1}\002 channel(s) dropped."), chan_matches, ci_matches);
 
 					break;
 				}
@@ -343,14 +343,14 @@ class CommandOSForbid : public Command
 			if (d != NULL)
 			{
 				if (Anope::ReadOnly)
-					source.Reply(READ_ONLY_MODE);
+					source.Reply(_("Services are in read-only mode. Any changes made may not persist."));
 
 				Log(LOG_ADMIN, source, this) << "to remove forbid on " << d->mask << " of type " << subcommand;
-				source.Reply(_("%s deleted from the %s forbid list."), d->mask.c_str(), subcommand.c_str());
+				source.Reply(_("\002{0}\002 deleted from the \002{1}\002 forbid list."), d->mask, subcommand);
 				this->fs->RemoveForbid(d);
 			}
 			else
-				source.Reply(_("Forbid on %s was not found."), entry.c_str());
+				source.Reply(_("Forbid on \002{0}\002 was not found."), entry);
 		}
 		else if (command.equals_ci("LIST"))
 		{
@@ -394,7 +394,7 @@ class CommandOSForbid : public Command
 
 				if (!shown)
 				{
-					source.Reply(_("There are no forbids of type %s."), subcommand.upper().c_str());
+					source.Reply(_("There are no forbids of type \002{0}\002."), subcommand.upper());
 				}
 				else
 				{
@@ -409,29 +409,23 @@ class CommandOSForbid : public Command
 					if (shown >= forbids.size())
 						source.Reply(_("End of forbid list."));
 					else
-						source.Reply(_("End of forbid list - %d/%d entries shown."), shown, forbids.size());
+						source.Reply(_("End of forbid list - \002{0}\002/\002{1}\002 entries shown."), shown, forbids.size());
 				}
 			}
 		}
 		else
 			this->OnSyntaxError(source, command);
-
-		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("Forbid allows you to forbid usage of certain nicknames, channels,\n"
-				"and email addresses. Wildcards are accepted for all entries."));
+		source.Reply(_("Forbid allows you to forbid usage of certain nicknames, channels, and email addresses. Wildcards are accepted for all entries."));
 
 		const Anope::string &regexengine = Config->GetBlock("options")->Get<const Anope::string>("regexengine");
 		if (!regexengine.empty())
 		{
 			source.Reply(" ");
-			source.Reply(_("Regex matches are also supported using the %s engine.\n"
-					"Enclose your pattern in // if this is desired."), regexengine.c_str());
+			source.Reply(_("Regex matches are also supported using the %s engine. Enclose your pattern in // if this is desired."), regexengine);
 		}
 
 		return true;
@@ -535,7 +529,7 @@ class OSForbid : public Module
 			ForbidData *d = this->forbidService.FindForbid(source.GetNick(), FT_REGISTER);
 			if (d != NULL)
 			{
-				source.Reply(NICK_CANNOT_BE_REGISTERED, source.GetNick().c_str());
+				source.Reply(_("\002{0}\002 may not be registered."), source.GetNick());
 				return EVENT_STOP;
 			}
 
@@ -560,7 +554,7 @@ class OSForbid : public Module
 			ForbidData *d = this->forbidService.FindForbid(params[0], FT_REGISTER);
 			if (d != NULL)
 			{
-				source.Reply(CHAN_X_INVALID, params[0].c_str());
+				source.Reply(_("Channel \002{0}\002 is currently suspended."), params[0]);
 				return EVENT_STOP;
 			}
 		}

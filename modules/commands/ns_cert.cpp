@@ -172,7 +172,7 @@ class CommandNSCert : public Command
 
 		if (cl->GetCertCount() >= max)
 		{
-			source.Reply(_("Sorry, the maximum of %d certificate entries has been reached."), max);
+			source.Reply(_("Sorry, the maximum of \002{0}\002 certificate entries has been reached."), max);
 			return;
 		}
 
@@ -191,19 +191,19 @@ class CommandNSCert : public Command
 
 		if (cl->FindCert(certfp))
 		{
-			source.Reply(_("Fingerprint \002%s\002 already present on %s's certificate list."), certfp.c_str(), nc->display.c_str());
+			source.Reply(_("Fingerprint \002{0}\002 already present on the certificate list of \002{0}\002."), certfp, nc->display);
 			return;
 		}
 
 		if (certmap.find(certfp) != certmap.end())
 		{
-			source.Reply(_("Fingerprint \002%s\002 is already in use."), certfp.c_str());
+			source.Reply(_("Fingerprint \002{0}\002 is already in use."), certfp);
 			return;
 		}
 
 		cl->AddCert(certfp);
 		Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to ADD certificate fingerprint " << certfp << " to " << nc->display;
-		source.Reply(_("\002%s\002 added to %s's certificate list."), certfp.c_str(), nc->display.c_str());
+		source.Reply(_("\002{0}\002 added to the certificate list of \002{1}\002."), certfp, nc->display);
 	}
 
 	void DoDel(CommandSource &source, NickServ::Account *nc, Anope::string certfp)
@@ -225,14 +225,14 @@ class CommandNSCert : public Command
 
 		if (!cl->FindCert(certfp))
 		{
-			source.Reply(_("\002%s\002 not found on %s's certificate list."), certfp.c_str(), nc->display.c_str());
+			source.Reply(_("\002{0}\002 not found on the certificate list of \002{1}\002."), certfp, nc->display);
 			return;
 		}
 
 		cl->EraseCert(certfp);
 		cl->Check();
 		Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to DELETE certificate fingerprint " << certfp << " from " << nc->display;
-		source.Reply(_("\002%s\002 deleted from %s's certificate list."), certfp.c_str(), nc->display.c_str());
+		source.Reply(_("\002{0}\002 deleted from the access list of \002{1}\002."), certfp, nc->display);
 	}
 
 	void DoList(CommandSource &source, const NickServ::Account *nc)
@@ -241,15 +241,15 @@ class CommandNSCert : public Command
 
 		if (!cl || !cl->GetCertCount())
 		{
-			source.Reply(_("%s's certificate list is empty."), nc->display.c_str());
+			source.Reply(_("The certificate list of \002{0}\002 is empty."), nc->display);
 			return;
 		}
 
-		source.Reply(_("Certificate list for %s:"), nc->display.c_str());
+		source.Reply(_("Certificate list for \002{0}\002:"), nc->display);
 		for (unsigned i = 0; i < cl->GetCertCount(); ++i)
 		{
 			Anope::string fingerprint = cl->GetCert(i);
-			source.Reply("    %s", fingerprint.c_str());
+			source.Reply("    {0}", fingerprint);
 		}
 	}
 
@@ -276,22 +276,18 @@ class CommandNSCert : public Command
 		}
 
 		NickServ::Account *nc;
-		if (!nick.empty())
+		if (!nick.empty() && source.HasPriv("nickserv/access"))
 		{
 			const NickServ::Nick *na = NickServ::FindNick(nick);
 			if (na == NULL)
 			{
-				source.Reply(NICK_X_NOT_REGISTERED, nick.c_str());
+				source.Reply(_("\002{0}\002 isn't registered."), nick);
 				return;
 			}
-			else if (na->nc != source.GetAccount() && !source.HasPriv("nickserv/access"))
+
+			if (Config->GetModule("nickserv")->Get<bool>("secureadmins", "yes") && source.GetAccount() != na->nc && na->nc->IsServicesOper() && !cmd.equals_ci("LIST"))
 			{
-				source.Reply(ACCESS_DENIED);
-				return;
-			}
-			else if (Config->GetModule("nickserv")->Get<bool>("secureadmins", "yes") && source.GetAccount() != na->nc && na->nc->IsServicesOper() && !cmd.equals_ci("LIST"))
-			{
-				source.Reply(_("You may view but not modify the certificate list of other Services Operators."));
+				source.Reply(_("You may view, but not modify, the certificate list of other Services Operators."));
 				return;
 			}
 
@@ -303,9 +299,9 @@ class CommandNSCert : public Command
 		if (cmd.equals_ci("LIST"))
 			return this->DoList(source, nc);
 		else if (nc->HasExt("NS_SUSPENDED"))
-			source.Reply(NICK_X_SUSPENDED, nc->display.c_str());
+			source.Reply(_("\002{0}\002 is suspended."), nc->display);
 		else if (Anope::ReadOnly)
-			source.Reply(READ_ONLY_MODE);
+			source.Reply(_("Services are in read-only mode."));
 		else if (cmd.equals_ci("ADD"))
 			return this->DoAdd(source, nc, certfp);
 		else if (cmd.equals_ci("DEL"))
@@ -316,26 +312,17 @@ class CommandNSCert : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("Modifies or displays the certificate list for your nick.\n"
-				"If you connect to IRC and provide a client certificate with a\n"
-				"matching fingerprint in the cert list, your nick will be\n"
-				"automatically identified to services. Services Operators\n"
-				"may provide a nick to modify other users' certificate lists.\n"
-				" \n"));
-		source.Reply(_("Examples:\n"
-				" \n"
-				"    \002CERT ADD <fingerprint>\002\n"
-				"        Adds this fingerprint to the certificate list and\n"
-				"        automatically identifies you when you connect to IRC\n"
-				"        using this certificate.\n"
-				" \n"
-				"    \002CERT DEL <fingerprint>\002\n"
-				"        Reverses the previous command.\n"
-				" \n"
-				"    \002CERT LIST\002\n"
-				"        Displays the current certificate list."));
+		source.Reply(_("Modifies or displays the certificate list for your account."
+		               "If you connect to IRC and provide a client certificate with a matching fingerprint in the certificate list, you will be automatically identified to services."
+		               " Services Operators may provide \037nickname\037 to modify other users' certificate lists.\n"
+		               "\n"
+		               "Examples:\n"
+		               "\n"
+		               "         {0} ADD\n"
+		               "         Adds your current fingerprint to the certificate list and automatically identifies you when you connect to IRC using this certificate.\n"
+		               "\n"
+		               "         {0} DEL <fingerprint>\n"
+		               "         Removes \"<fingerprint>\" from your certificate list."));
 		return true;
 	}
 };

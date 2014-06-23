@@ -28,8 +28,8 @@ class CommandOSNOOP : public Command
 
 		Server *s = Server::Find(server, true);
 		if (s == NULL)
-			source.Reply(_("Server %s does not exist."), server.c_str());
-		else if (s == Me || s->IsJuped())
+			source.Reply(_("Server \002{0}\002 does not exist."), server);
+		else if (s == Me || s->IsJuped() || s->IsULined())
 			source.Reply(_("You can not NOOP Services."));
 		else if (cmd.equals_ci("SET"))
 		{
@@ -38,7 +38,7 @@ class CommandOSNOOP : public Command
 			s->Extend<Anope::string>("noop", source.GetNick());
 
 			Log(LOG_ADMIN, source, this) << "SET on " << s->GetName();
-			source.Reply(_("All operators from \002%s\002 have been removed."), s->GetName().c_str());
+			source.Reply(_("All operators from \002{0}\002 have been removed."), s->GetName());
 
 			Anope::string reason = "NOOP command used by " + source.GetNick();
 			/* Kill all the IRCops of the server */
@@ -55,7 +55,7 @@ class CommandOSNOOP : public Command
 			s->Shrink<Anope::string>("noop");
 			IRCD->SendSVSNOOP(s, false);
 			Log(LOG_ADMIN, source, this) << "REVOKE on " << s->GetName();
-			source.Reply(_("All O:lines of \002%s\002 have been reset."), s->GetName().c_str());
+			source.Reply(_("All O:lines of \002{0}\002 have been reset."), s->GetName());
 		}
 		else
 			this->OnSyntaxError(source, "");
@@ -63,12 +63,8 @@ class CommandOSNOOP : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("\002SET\002 kills all operators from the given\n"
-				"\002server\002 and prevents operators from opering\n"
-				"up on the given server. \002REVOKE\002 removes this\n"
-				"restriction."));
+		source.Reply(_("\002{0} SET\002 kills all operators from the given \002server\002 and prevents operators from opering up on the given server."
+		               " \002{0} REVOKE\002 removes this restriction."));
 		return true;
 	}
 };

@@ -14,6 +14,7 @@
 #include "service.h"
 #include "anope.h"
 #include "channels.h"
+#include "language.h"
 
 struct CommandGroup
 {
@@ -29,6 +30,8 @@ struct CommandInfo
 
 	/* Service name of the command */
 	Anope::string name;
+	/* User visible name */
+	Anope::string cname;
 	/* Permission required to execute the command */
 	Anope::string permission;
 	/* Group this command is in */
@@ -77,7 +80,13 @@ class CoreExport CommandSource
 	ChanServ::AccessGroup AccessFor(ChanServ::Channel *ci);
 	bool IsFounder(ChanServ::Channel *ci);
 
-	void Reply(const char *message, ...);
+	template<typename... Args>
+	void Reply(const char *message, Args&&... args)
+	{
+		const char *translated_message = Language::Translate(this->nc, message);
+		Reply(Anope::Format(translated_message, std::forward<Args>(args)...));
+	}
+
 	void Reply(const Anope::string &message);
 
 	bool HasCommand(const Anope::string &cmd);

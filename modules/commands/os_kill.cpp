@@ -27,9 +27,9 @@ class CommandOSKill : public Command
 
 		User *u2 = User::Find(nick, true);
 		if (u2 == NULL)
-			source.Reply(NICK_X_NOT_IN_USE, nick.c_str());
+			source.Reply(_("\002{0}\002 isn't currently online."), nick);
 		else if (u2->IsProtected() || u2->server == Me)
-			source.Reply(ACCESS_DENIED);
+			source.Reply(_("\002{0}\002 is protected and cannot be killed."), u2->nick);
 		else
 		{
 			if (reason.empty())
@@ -43,11 +43,7 @@ class CommandOSKill : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("Allows you to kill a user from the network.\n"
-				"Parameters are the same as for the standard /KILL\n"
-				"command."));
+		source.Reply(_("Allows you to kill a user from the network. Parameters are the same as for the standard /KILL command."));
 		return true;
 	}
 };

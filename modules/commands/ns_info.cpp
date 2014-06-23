@@ -35,9 +35,9 @@ class CommandNSInfo : public Command
 		if (!na)
 		{
 			if (BotInfo::Find(nick, true))
-				source.Reply(_("Nick \002%s\002 is part of this Network's Services."), nick.c_str());
+				source.Reply(_("\002{0}\002 is part of this Network's Services."), nick);
 			else
-				source.Reply(NICK_X_NOT_REGISTERED, nick.c_str());
+				source.Reply(_("\002{0}\002 isn't registered."), nick);
 		}
 		else
 		{
@@ -54,13 +54,13 @@ class CommandNSInfo : public Command
 			if (has_auspex || na->nc == source.GetAccount())
 				show_hidden = true;
 
-			source.Reply(_("%s is %s"), na->nick.c_str(), na->last_realname.c_str());
+			source.Reply(_("\002{0}\002 is \002{1}\002"), na->nick, na->last_realname);
 
 			if (na->nc->HasExt("UNCONFIRMED"))
-				source.Reply(_("%s is an unconfirmed nickname."), na->nick.c_str());
+				source.Reply(_("\002{0}\002 has not confirmed their account."), na->nick);
 
 			if (na->nc->IsServicesOper() && (show_hidden || !na->nc->HasExt("HIDE_STATUS")))
-				source.Reply(_("%s is a Services Operator of type %s."), na->nick.c_str(), na->nc->o->ot->GetName().c_str());
+				source.Reply(_("\002{0}\002 is a Services Operator of type \002{0}\002."), na->nick, na->nc->o->ot->GetName());
 
 			InfoFormatter info(source.nc);
 
@@ -71,7 +71,7 @@ class CommandNSInfo : public Command
 				if (show_hidden || !na->nc->HasExt("HIDE_MASK"))
 					info[_("Online from")] = na->last_usermask;
 				else
-					source.Reply(_("%s is currently online."), na->nick.c_str());
+					source.Reply(_("\002{0}\002 is currently online."), na->nick);
 			}
 			else
 			{
@@ -146,14 +146,14 @@ class CommandNSSetHide : public Command
 	{
 		if (Anope::ReadOnly)
 		{
-			source.Reply(READ_ONLY_MODE);
+			source.Reply(_("Services are in read-only mode."));
 			return;
 		}
 
 		const NickServ::Nick *na = NickServ::FindNick(user);
 		if (!na)
 		{
-			source.Reply(NICK_X_NOT_REGISTERED, user.c_str());
+			source.Reply(_("\002{0}\002 isn't registered."), user);
 			return;
 		}
 		NickServ::Account *nc = na->nc;
@@ -162,31 +162,31 @@ class CommandNSSetHide : public Command
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
-		Anope::string onmsg, offmsg, flag;
+		const char *onmsg, *offmsg, *flag;
 
 		if (param.equals_ci("EMAIL"))
 		{
 			flag = "HIDE_EMAIL";
-			onmsg = _("The E-mail address of \002%s\002 will now be hidden from %s INFO displays.");
-			offmsg = _("The E-mail address of \002%s\002 will now be shown in %s INFO displays.");
+			onmsg = _("The \002e-mail address\002 of \002{0}\002 will now be \002hidden\002.");
+			offmsg = _("The \002e-mail address\002 of \002{0}\002 will now be \002shown\002.");
 		}
 		else if (param.equals_ci("USERMASK"))
 		{
 			flag = "HIDE_MASK";
-			onmsg = _("The last seen user@host mask of \002%s\002 will now be hidden from %s INFO displays.");
-			offmsg = _("The last seen user@host mask of \002%s\002 will now be shown in %s INFO displays.");
+			onmsg = _("The \002last seen host mask\002 of \002{0}\002 will now be \002hidden\002.");
+			offmsg = _("The \002last seen host mask\002 of \002{0}\002 will now be \002shown\002.");
 		}
 		else if (param.equals_ci("STATUS"))
 		{
 			flag = "HIDE_STATUS";
-			onmsg = _("The services access status of \002%s\002 will now be hidden from %s INFO displays.");
-			offmsg = _("The services access status of \002%s\002 will now be shown in %s INFO displays.");
+			onmsg = _("The \002services operator status\002 of \002{0}\002 will now be \002hidden\002.");
+			offmsg = _("The \002services operator status\002 of \002{0}\002 will now be \002shown\002.");
 		}
 		else if (param.equals_ci("QUIT"))
 		{
 			flag = "HIDE_QUIT";
-			onmsg = _("The last quit message of \002%s\002 will now be hidden from %s INFO displays.");
-			offmsg = _("The last quit message of \002%s\002 will now be shown in %s INFO displays.");
+			onmsg = _("The \002last quit message\002 of \002{0}\002 will now be \002hidden\002.");
+			offmsg = _("The \002last quit message\002 of \002{0}\002 will now be \002shown\002.");
 		}
 		else
 		{
@@ -198,13 +198,13 @@ class CommandNSSetHide : public Command
 		{
 			Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to change hide " << param.upper() << " to " << arg.upper() << " for " << nc->display;
 			nc->Extend<bool>(flag);
-			source.Reply(onmsg.c_str(), nc->display.c_str(), source.service->nick.c_str());
+			source.Reply(onmsg, nc->display, source.service->nick);
 		}
 		else if (arg.equals_ci("OFF"))
 		{
 			Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to change hide " << param.upper() << " to " << arg.upper() << " for " << nc->display;
 			nc->Shrink<bool>(flag);
-			source.Reply(offmsg.c_str(), nc->display.c_str(), source.service->nick.c_str());
+			source.Reply(offmsg, nc->display, source.service->nick);
 		}
 		else
 			this->OnSyntaxError(source, "HIDE");
@@ -217,15 +217,10 @@ class CommandNSSetHide : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("Allows you to prevent certain pieces of information from\n"
-				"being displayed when someone does a %s \002INFO\002 on your\n"
-				"nick.  You can hide your E-mail address (\002EMAIL\002), last seen\n"
-				"user@host mask (\002USERMASK\002), your services access status\n"
-				"(\002STATUS\002) and last quit message (\002QUIT\002).\n"
+		source.Reply(_("Allows you to prevent certain pieces of information from being displayed when someone does a %s \002INFO\002 on you." //XXX
+		               " You can hide the e-mail address (\002EMAIL\002), last seen hostmask (\002USERMASK\002), the services access status (\002STATUS\002) and last quit message (\002QUIT\002)."
 				"The second parameter specifies whether the information should\n"
-				"be displayed (\002OFF\002) or hidden (\002ON\002)."), source.service->nick.c_str());
+				"be displayed (\002OFF\002) or hidden (\002ON\002)."), source.service->nick);
 		return true;
 	}
 };
@@ -246,15 +241,10 @@ class CommandNSSASetHide : public CommandNSSetHide
 
 	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("Allows you to prevent certain pieces of information from\n"
-				"being displayed when someone does a %s \002INFO\002 on the\n"
-				"nick.  You can hide the E-mail address (\002EMAIL\002), last seen\n"
-				"user@host mask (\002USERMASK\002), the services access status\n"
-				"(\002STATUS\002) and last quit message (\002QUIT\002).\n"
-				"The second parameter specifies whether the information should\n"
-				"be displayed (\002OFF\002) or hidden (\002ON\002)."), source.service->nick.c_str());
+		source.Reply(_("Allows you to prevent certain pieces of information from being displayed when someone does a %s \002INFO\002 on the \037nickname\037. "
+		               " You can hide the e-mail address (\002EMAIL\002), last seen hostmask (\002USERMASK\002), the services access status (\002STATUS\002) and last quit message (\002QUIT\002)."
+		               " The second parameter specifies whether the information should be displayed (\002OFF\002) or hidden (\002ON\002)."),
+		               source.service->nick);
 		return true;
 	}
 };

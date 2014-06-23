@@ -885,7 +885,7 @@ bool Channel::CheckKick(User *user)
 	if (mask.empty())
 		mask = this->ci->GetIdealBan(user);
 	if (reason.empty())
-		reason = Language::Translate(user->Account(), CHAN_NOT_ALLOWED_TO_JOIN);
+		reason = Language::Translate(user->Account(), _("You are not permitted to be on this channel."));
 
 	Log(LOG_DEBUG) << "Autokicking " << user->nick << " (" << mask << ") from " << this->name;
 

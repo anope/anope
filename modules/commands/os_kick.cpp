@@ -30,35 +30,33 @@ class CommandOSKick : public Command
 
 		if (!(c = Channel::Find(chan)))
 		{
-			source.Reply(CHAN_X_NOT_IN_USE, chan.c_str());
+			source.Reply(_("Channel \002%s\002 doesn't exist."), chan);
 			return;
 		}
-		else if (c->bouncy_modes)
+
+		if (c->bouncy_modes)
 		{
 			source.Reply(_("Services is unable to change modes. Are your servers' U:lines configured correctly?"));
 			return;
 		}
-		else if (!(u2 = User::Find(nick, true)))
+
+		if (!(u2 = User::Find(nick, true)))
 		{
-			source.Reply(NICK_X_NOT_IN_USE, nick.c_str());
+			source.Reply(_("\002{0}\002 isn't currently online."), nick);
 			return;
 		}
 
 		c->Kick(source.service, u2, "%s (%s)", source.GetNick().c_str(), s.c_str());
 		Log(LOG_ADMIN, source, this) << "on " << u2->nick << " in " << c->name << " (" << s << ")";
-		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("Allows staff to kick a user from any channel.\n"
-				"Parameters are the same as for the standard /KICK\n"
-				"command. The kick message will have the nickname of the\n"
-				"IRCop sending the KICK command prepended; for example:\n"
-				" \n"
-				"*** SpamMan has been kicked off channel #my_channel by %s (Alcan (Flood))"), source.service->nick.c_str());
+		source.Reply(_("Allows you to kick a user from any channel. Parameters are the same as for the standard /KICK command."
+		               " The kick message will have the nickname of the IRCop sending the KICK command prepended; for example:\n"
+		               "\n"
+		               "*** SpamMan has been kicked off channel #my_channel by {0} (Alcan (Flood))"),
+		               source.service->nick);
 		return true;
 	}
 };

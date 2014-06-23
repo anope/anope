@@ -99,17 +99,19 @@ class CommandCSSetMisc : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
+		const Anope::string &chan = params[0];
+		const Anope::string &param = params[1];
+
 		if (Anope::ReadOnly)
 		{
-			source.Reply(READ_ONLY_MODE);
+			source.Reply(_("Services are in read-only mode."));
 			return;
 		}
 
-		ChanServ::Channel *ci = ChanServ::Find(params[0]);
-		const Anope::string &param = params.size() > 1 ? params[1] : "";
+		ChanServ::Channel *ci = ChanServ::Find(chan);
 		if (ci == NULL)
 		{
-			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
+			source.Reply(_("Channel \002{0}\002 isn't registered."), chan);
 			return;
 		}
 
@@ -120,7 +122,7 @@ class CommandCSSetMisc : public Command
 
 		if (MOD_RESULT != EVENT_ALLOW && !source.AccessFor(ci).HasPriv("SET") && source.permission.empty() && !source.HasPriv("chanserv/administration"))
 		{
-			source.Reply(ACCESS_DENIED);
+			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "SET", ci->name);
 			return;
 		}
 
@@ -134,13 +136,13 @@ class CommandCSSetMisc : public Command
 		{
 			item->Set(ci, CSMiscData(ci, key, param));
 			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to change it to " << param;
-			source.Reply(CHAN_SETTING_CHANGED, scommand.c_str(), ci->name.c_str(), params[1].c_str());
+			source.Reply(_("\002{0}\002 for \002{1}\002 set to \002{2}\002."), scommand, ci->name, param);
 		}
 		else
 		{
 			item->Unset(ci);
 			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to unset it";
-			source.Reply(CHAN_SETTING_UNSET, scommand.c_str(), ci->name.c_str());
+			source.Reply(_("\002{0}\002 for \002{1}\002 unset."), scommand, ci->name);
 		}
 	}
 

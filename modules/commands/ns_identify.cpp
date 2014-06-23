@@ -28,14 +28,14 @@ class NSIdentifyRequestListener : public NickServ::IdentifyRequestListener
 		NickServ::Nick *na = NickServ::FindNick(req->GetAccount());
 
 		if (!na)
-			source.Reply(NICK_X_NOT_REGISTERED, req->GetAccount().c_str());
+			source.Reply(_("\002{0}\002 isn't registered."), req->GetAccount());
 		else
 		{
 			if (u->IsIdentified())
 				Log(LOG_COMMAND, source, cmd) << "to log out of account " << u->Account()->display;
 
 			Log(LOG_COMMAND, source, cmd) << "and identified for account " << na->nc->display;
-			source.Reply(_("Password accepted - you are now recognized."));
+			source.Reply(_("Password accepted - you are now recognized as \002{0}\002."), na->nc->display);
 			u->Identify(na);
 		}
 	}
@@ -48,11 +48,11 @@ class NSIdentifyRequestListener : public NickServ::IdentifyRequestListener
 			Log(LOG_COMMAND, source, cmd) << "and failed to identify to" << (accountexists ? " " : " nonexistent ") << "account " << req->GetAccount();
 			if (accountexists)
 			{
-				source.Reply(PASSWORD_INCORRECT);
+				source.Reply(_("Password incorrect."));
 				source.GetUser()->BadPassword();
 			}
 			else
-				source.Reply(NICK_X_NOT_REGISTERED, req->GetAccount().c_str());
+				source.Reply("\002{0}\002 isn't registered.", req->GetAccount());
 		}
 	}
 };
@@ -77,7 +77,7 @@ class CommandNSIdentify : public Command
 
 		NickServ::Nick *na = NickServ::FindNick(nick);
 		if (na && na->nc->HasExt("NS_SUSPENDED"))
-			source.Reply(NICK_X_SUSPENDED, na->nick.c_str());
+			source.Reply(_("\002{0}\002 is suspended."), na->nick);
 		else if (u->Account() && na && u->Account() == na->nc)
 			source.Reply(_("You are already identified."));
 		else
@@ -86,18 +86,12 @@ class CommandNSIdentify : public Command
 			Event::OnCheckAuthentication(&Event::CheckAuthentication::OnCheckAuthentication, u, req);
 			req->Dispatch();
 		}
-		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("Tells %s that you are really the owner of this\n"
-				"nick.  Many commands require you to authenticate yourself\n"
-				"with this command before you use them.  The password\n"
-				"should be the same one you sent with the \002REGISTER\002\n"
-				"command."), source.service->nick.c_str());
+		source.Reply(_("Logs you in to account \037account\037. If no \037account\037 is given, your current nickname is used."
+		               " Many commands require you to authenticate with this command before you use them. \037password\037 should be the same one you registered with."));
 		return true;
 	}
 };

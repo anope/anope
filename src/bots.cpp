@@ -233,6 +233,7 @@ CommandInfo& BotInfo::SetCommand(const Anope::string &cname, const Anope::string
 {
 	CommandInfo ci;
 	ci.name = sname;
+	ci.cname = cname;
 	ci.permission = permission;
 	this->commands[cname] = ci;
 	return this->commands[cname];
@@ -244,6 +245,19 @@ CommandInfo *BotInfo::GetCommand(const Anope::string &cname)
 	if (it != this->commands.end())
 		return &it->second;
 	return NULL;
+}
+
+CommandInfo *BotInfo::FindCommand(const Anope::string &service)
+{
+	for (auto& it : commands)
+	{
+		CommandInfo &ci =  it.second;
+
+		if (ci.name == service)
+			return &ci;
+	}
+
+	return nullptr;
 }
 
 BotInfo* BotInfo::Find(const Anope::string &nick, bool nick_only)

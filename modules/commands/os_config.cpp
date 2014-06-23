@@ -28,7 +28,7 @@ class CommandOSConfig : public Command
 		{
 			if (!source.HasPriv("operserv/config"))
 			{
-				source.Reply(ACCESS_DENIED);
+				source.Reply(_("Access denied. You do not have the operator privilege \002{0}\002."), "operserv/config");
 				return;
 			}
 
@@ -38,14 +38,14 @@ class CommandOSConfig : public Command
 
 			if (!block)
 			{
-				source.Reply(_("There is no such configuration block %s."), params[1].c_str());
+				source.Reply(_("There is no such configuration block \002{0}\002."), params[1]);
 				return;
 			}
 
 			block->Set(params[2], params[3]);
 
 			Log(LOG_ADMIN, source, this) << "to change the configuration value of " << params[1] << ":" << params[2] << " to " << params[3];
-			source.Reply(_("Value of %s:%s changed to %s"), params[1].c_str(), params[2].c_str(), params[3].c_str());
+			source.Reply(_("Value of \002{0}:{1}\002 changed to \002{2}\002."), params[1], params[2], params[3]);
 		}
 		else if (what.equals_ci("VIEW"))
 		{
@@ -76,7 +76,7 @@ class CommandOSConfig : public Command
 				std::vector<Anope::string> replies;
 				lflist.Process(replies);
 
-				source.Reply(_("%s settings:"), block->GetName().c_str());
+				source.Reply(_("%s settings:"), block->GetName());
 
 				for (unsigned j = 0; j < replies.size(); ++j)
 					source.Reply(replies[j]);
@@ -122,15 +122,12 @@ class CommandOSConfig : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("Allows you to change and view configuration settings.\n"
-				"Settings changed by this command are temporary and will not be reflected\n"
-				"back into the configuration file, and will be lost if Anope is shut down,\n"
-				"restarted, or the configuration is reloaded.\n"
-				" \n"
-				"Example:\n"
-				"     \002MODIFY nickserv forcemail no\002"));
+		source.Reply(_("Allows you to change and view configuration settings. Settings changed by this command are temporary and will not be reflected back into the configuration file, and will be lost if Anope is shut down, restarted, or the configuration is reloaded.\n"
+		               "Use of the \002MODIFY\002 command requires the \002{0}\002 operator privilege.\n"
+		               "\n"
+		               "Example:\n"
+		               "         {0} MODIFY nickserv forcemail no"
+		               "         Changes the \"forceemail\" setting of the module configuration for \"nickserv\" to \"no\""));
 		return true;
 	}
 };

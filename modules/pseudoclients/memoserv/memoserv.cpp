@@ -117,7 +117,7 @@ class MemoServCore : public Module, public MemoServ::MemoServService
 					if (ci->AccessFor(cu->user).HasPriv("MEMO"))
 					{
 						if (cu->user->Account() && cu->user->Account()->HasExt("MEMO_RECEIVE"))
-							cu->user->SendMessage(*MemoServ, MEMO_NEW_X_MEMO_ARRIVED, ci->name.c_str(), Config->StrictPrivmsg.c_str(), MemoServ->nick.c_str(), ci->name.c_str(), mi->memos->size());
+							cu->user->SendMessage(*MemoServ, _("There is a new memo on channel \002{0}\002. Type \002{1}{2} READ {3} {4}\002 to read it."), ci->name, Config->StrictPrivmsg, MemoServ->nick, ci->name, mi->memos->size()); // XXX
 					}
 				}
 			}
@@ -133,7 +133,7 @@ class MemoServCore : public Module, public MemoServ::MemoServService
 					const NickServ::Nick *na = nc->aliases->at(i);
 					User *user = User::Find(na->nick);
 					if (user && user->IsIdentified())
-						user->SendMessage(*MemoServ, MEMO_NEW_MEMO_ARRIVED, source.c_str(), Config->StrictPrivmsg.c_str(), MemoServ->nick.c_str(), mi->memos->size());
+						user->SendMessage(*MemoServ, _("You have a new memo from \002{0}\002. Type \002{1}{2} READ {3}\002 to read it."), source, Config->StrictPrivmsg, MemoServ->nick, mi->memos->size());//XXX
 				}
 			}
 

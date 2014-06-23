@@ -95,21 +95,6 @@ bool CommandSource::IsOper()
 	return false;
 }
 
-void CommandSource::Reply(const char *message, ...)
-{
-	va_list args;
-	char buf[4096]; // Messages can be really big.
-
-	const char *translated_message = Language::Translate(this->nc, message);
-
-	va_start(args, message);
-	vsnprintf(buf, sizeof(buf), translated_message, args);
-
-	this->Reply(Anope::string(buf));
-
-	va_end(args);
-}
-
 void CommandSource::Reply(const Anope::string &message)
 {
 	const char *translated_message = Language::Translate(this->nc, message.c_str());
@@ -149,13 +134,13 @@ void Command::SendSyntax(CommandSource &source)
 	Anope::string s = Language::Translate(source.GetAccount(), _("Syntax"));
 	if (!this->syntax.empty())
 	{
-		source.Reply("%s: \002%s %s\002", s.c_str(), source.command.c_str(), Language::Translate(source.GetAccount(), this->syntax[0].c_str()));
+		source.Reply("{0}: \002{1} {2}\002", s, source.command, Language::Translate(source.GetAccount(), this->syntax[0].c_str()));
 		Anope::string spaces(s.length(), ' ');
 		for (unsigned i = 1, j = this->syntax.size(); i < j; ++i)
-			source.Reply("%s  \002%s %s\002", spaces.c_str(), source.command.c_str(), Language::Translate(source.GetAccount(), this->syntax[i].c_str()));
+			source.Reply("{0}  \002{1} {2}\002", spaces, source.command, Language::Translate(source.GetAccount(), this->syntax[i].c_str()));
 	}
 	else
-		source.Reply("%s: \002%s\002", s.c_str(), source.command.c_str());
+		source.Reply("{0}: \002{1}\002", s, source.command);
 }
 
 bool Command::AllowUnregistered() const
@@ -185,7 +170,7 @@ const Anope::string Command::GetDesc(CommandSource &) const
 
 void Command::OnServHelp(CommandSource &source)
 {
-	source.Reply("    %-14s %s", source.command.c_str(), Language::Translate(source.nc, this->GetDesc(source).c_str()));
+	source.Reply(Anope::printf("    %-14s %s", source.command.c_str(), Language::Translate(source.nc, this->GetDesc(source).c_str())));
 }
 
 bool Command::OnHelp(CommandSource &source, const Anope::string &subcommand) { return false; }
@@ -195,7 +180,7 @@ void Command::OnSyntaxError(CommandSource &source, const Anope::string &subcomma
 	this->SendSyntax(source);
 	bool has_help = source.service->commands.find("HELP") != source.service->commands.end();
 	if (has_help)
-		source.Reply(MORE_INFO, Config->StrictPrivmsg.c_str(), source.service->nick.c_str(), source.command.c_str());
+		source.Reply(_("\002{0}{1} HELP {2}\002 for more information."), Config->StrictPrivmsg, source.service->nick, source.command);
 }
 
 void Command::Run(CommandSource &source, const Anope::string &message)
@@ -244,7 +229,7 @@ void Command::Run(CommandSource &source, const Anope::string &message)
 	// Command requires registered users only
 	if (!c->AllowUnregistered() && !source.nc)
 	{
-		source.Reply(NICK_IDENTIFY_REQUIRED);
+		source.Reply(_("Password authentication required for that command."));
 		if (source.GetUser())
 			Log(LOG_NORMAL, "access_denied_unreg", source.service) << "Access denied for unregistered user " << source.GetUser()->GetMask() << " with command " << it->first;
 		return;
@@ -276,7 +261,10 @@ void Command::Run(CommandSource &source, const Anope::string &message)
 	// If the command requires a permission, and they aren't registered or don't have the required perm, DENIED
 	if (!info.permission.empty() && !source.HasCommand(info.permission))
 	{
-		source.Reply(ACCESS_DENIED);
+		if (!source.IsOper())
+			source.Reply(_("Access denied. You are not a Services Operator."));
+		else
+			source.Reply(_("Access denied. You do not have access to command \002{0}\002."), info.permission);
 		if (source.GetUser())
 			Log(LOG_NORMAL, "access_denied", source.service) << "Access denied for user " << source.GetUser()->GetMask() << " with command " << it->first;
 		return;

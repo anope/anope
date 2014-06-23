@@ -36,35 +36,32 @@ class CommandOSSVSNick : public Command
 		unsigned nicklen = Config->GetBlock("networkinfo")->Get<unsigned>("nicklen");
 		if (newnick.length() > nicklen)
 		{
-			source.Reply(_("Nick \002%s\002 was truncated to %d characters."), newnick.c_str(), nicklen, newnick.c_str());
+			source.Reply(_("Nick \002{0}\002 was truncated to \002{1}\002 characters."), newnick, nicklen);
 			newnick = params[1].substr(0, nicklen);
 		}
 
 		/* Check for valid characters */
 		if (!IRCD->IsNickValid(newnick))
 		{
-			source.Reply(_("Nick \002%s\002 is an illegal nickname and cannot be used."), newnick.c_str());
+			source.Reply(_("Nick \002{0}\002 is an illegal nickname and cannot be used."), newnick);
 			return;
 		}
 
 		/* Check for a nick in use or a forbidden/suspended nick */
 		if (!(u2 = User::Find(nick, true)))
-			source.Reply(NICK_X_NOT_IN_USE, nick.c_str());
+			source.Reply(_("\002{0}\002 isn't currently online."), nick);
 		else if (!nick.equals_ci(newnick) && User::Find(newnick))
-			source.Reply(_("Nick \002%s\002 is currently in use."), newnick.c_str());
+			source.Reply(_("\002{0}\002 is currently in use."), newnick);
 		else
 		{
-			source.Reply(_("The nick \002%s\002 is now being changed to \002%s\002."), nick.c_str(), newnick.c_str());
+			source.Reply(_("\002{0}\002 is now being changed to \002{1}\002."), nick, newnick);
 			Log(LOG_ADMIN, source, this) << "to change " << nick << " to " << newnick;
 			IRCD->SendForceNickChange(u2, newnick, Anope::CurTime);
 		}
-		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
-		this->SendSyntax(source);
-		source.Reply(" ");
 		source.Reply(_("Forcefully changes a user's nickname from \037nick\037 to \037newnick\037."));
 		return true;
 	}
@@ -76,7 +73,7 @@ class CommandOSSVSJoin : public Command
 	CommandOSSVSJoin(Module *creator) : Command(creator, "operserv/svsjoin", 2, 2)
 	{
 		this->SetDesc(_("Forcefully join a user to a channel"));
-		this->SetSyntax(_("\037nick\037 \037channel\037"));
+		this->SetSyntax(_("\037user\037 \037channel\037"));
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
@@ -90,26 +87,24 @@ class CommandOSSVSJoin : public Command
 		User *target = User::Find(params[0], true);
 		Channel *c = Channel::Find(params[1]);
 		if (target == NULL)
-			source.Reply(NICK_X_NOT_IN_USE, params[0].c_str());
+			source.Reply(_("\002{0}\002 isn't currently online."), params[0]);
 		else if (source.GetUser() != target && (target->IsProtected() || target->server == Me))
-			source.Reply(ACCESS_DENIED);
-		else if (!IRCD->IsChannelValid(params[1]))
-			source.Reply(CHAN_X_INVALID, params[1].c_str());
+			source.Reply(_("Access denied."));
+		else if (!c && !IRCD->IsChannelValid(params[1]))
+			source.Reply(_("\002{0}\002 isn't a valid channel."), params[1]);
 		else if (c && c->FindUser(target))
-			source.Reply(_("\002%s\002 is already in \002%s\002."), target->nick.c_str(), c->name.c_str());
+			source.Reply(_("\002{0}\002 is already in \002{1}\002."), target->nick, c->name);
 		else
 		{
 			IRCD->SendSVSJoin(*source.service, target, params[1], "");
 			Log(LOG_ADMIN, source, this) << "to force " << target->nick << " to join " << params[1];
-			source.Reply(_("\002%s\002 has been joined to \002%s\002."), target->nick.c_str(), params[1].c_str());
+			source.Reply(_("\002{0}\002 has been joined to \002{1}\002."), target->nick, params[1]);
 		}
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("Forcefully join a user to a channel."));
+		source.Reply(_("Forcefully join \037user\037 to \037channel\037."));
 		return true;
 	}
 };
@@ -120,7 +115,7 @@ class CommandOSSVSPart : public Command
 	CommandOSSVSPart(Module *creator) : Command(creator, "operserv/svspart", 2, 2)
 	{
 		this->SetDesc(_("Forcefully part a user from a channel"));
-		this->SetSyntax(_("\037nick\037 \037channel\037"));
+		this->SetSyntax(_("\037user\037 \037channel\037"));
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
@@ -134,26 +129,24 @@ class CommandOSSVSPart : public Command
 		User *target = User::Find(params[0], true);
 		Channel *c = Channel::Find(params[1]);
 		if (target == NULL)
-			source.Reply(NICK_X_NOT_IN_USE, params[0].c_str());
+			source.Reply(_("\002{0}\002 isn't currently online."), params[0]);
 		else if (source.GetUser() != target && (target->IsProtected() || target->server == Me))
-			source.Reply(ACCESS_DENIED);
+			source.Reply(_("Access denied."));
 		else if (!c)
-			source.Reply(CHAN_X_NOT_IN_USE, params[1].c_str());
+			source.Reply(_("Channel \002{0}\002 doesn't exist."), params[1]);
 		else if (!c->FindUser(target))
-			source.Reply(_("\002%s\002 is not in \002%s\002."), target->nick.c_str(), c->name.c_str());
+			source.Reply(_("\002{0}\002 is not in \002{1}\002."), target->nick, c->name);
 		else
 		{
 			IRCD->SendSVSPart(*source.service, target, params[1], "");
 			Log(LOG_ADMIN, source, this) << "to force " << target->nick << " to part " << c->name;
-			source.Reply(_("\002%s\002 has been parted from \002%s\002."), target->nick.c_str(), c->name.c_str());
+			source.Reply(_("\002{0}\002 has been parted from \002{1}\002."), target->nick, c->name);
 		}
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("Forcefully part a user from a channel."));
+		source.Reply(_("Forcefully part \037user\037 from \037channel\037."));
 		return true;
 	}
 };

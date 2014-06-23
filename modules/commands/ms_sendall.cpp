@@ -38,13 +38,11 @@ class CommandMSSendAll : public Command
 				MemoServ::service->Send(source.GetNick(), nc->display, text);
 		}
 
-		source.Reply(_("A massmemo has been sent to all registered users."));
+		source.Reply(_("A mass memo has been sent to all registered users."));
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
-		this->SendSyntax(source);
-		source.Reply(" ");
 		source.Reply(_("Sends all registered users a memo containing \037memo-text\037."));
 		return true;
 	}

@@ -28,14 +28,14 @@ class CommandOSLogin : public Command
 		User *u = source.GetUser();
 		Oper *o = source.nc->o;
 		if (o == NULL)
-			source.Reply(_("No oper block for your nick."));
+			source.Reply(_("No oper block for your nickname."));
 		else if (o->password.empty())
 			source.Reply(_("Your oper block doesn't require logging in."));
 		else if (u->HasExt("os_login"))
-			source.Reply(_("You are already identified."));
+			source.Reply(_("You are already logged in."));
 		else if (o->password != password)
 		{
-			source.Reply(PASSWORD_INCORRECT);
+			source.Reply(_("Password incorrect."));
 			u->BadPassword();
 		}
 		else
@@ -48,11 +48,7 @@ class CommandOSLogin : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("Logs you in to %s so you gain Services Operator privileges.\n"
-				"This command may be unnecessary if your oper block is\n"
-				"configured without a password."), source.service->nick.c_str());
+		source.Reply(_("Logs you in to {0} so you gain Services Operator privileges. This command is unnecessary if your oper block is configured without a password."), source.service->nick);
 		return true;
 	}
 
@@ -90,11 +86,7 @@ class CommandOSLogout : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("Logs you out from %s so you lose Services Operator privileges.\n"
-				"This command is only useful if your oper block is configured\n"
-				"with a password."), source.service->nick.c_str());
+		source.Reply(_("Logs you out from %s so you lose Services Operator privileges. This command is only useful if your oper block is configured with a password."), source.service->nick);
 		return true;
 	}
 

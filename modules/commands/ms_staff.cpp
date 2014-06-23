@@ -39,8 +39,6 @@ class CommandMSStaff : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
-		this->SendSyntax(source);
-		source.Reply(" ");
 		source.Reply(_("Sends all services staff a memo containing \037memo-text\037."));
 
 		return true;

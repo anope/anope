@@ -39,7 +39,7 @@ bool WebCPanel::ChanServ::Modes::OnRequest(HTTPProvider *server, const Anope::st
 
 	if (!c)
 	{
-		replacements["MESSAGES"] = Anope::printf(CHAN_X_NOT_IN_USE, chname.c_str());
+		replacements["MESSAGES"] = Anope::printf(_("Channel \002%s\002 doesn't exist."), chname.c_str());
 		Page.Serve(server, page_name, client, message, reply, replacements);
 		return true;
 	}

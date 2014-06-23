@@ -81,24 +81,24 @@ class CommandCSSuspend : public Command
 			expiry_secs = Anope::DoTime(expiry);
 			if (expiry_secs == -1)
 			{
-				source.Reply(BAD_EXPIRY_TIME);
+				source.Reply(_("Invalid expiry time \002{0}\002."), expiry);
 				return;
 			}
 		}
 
 		if (Anope::ReadOnly)
-			source.Reply(READ_ONLY_MODE);
+			source.Reply(_("Services are in read-only mode. Any changes made may not persist."));
 
 		ChanServ::Channel *ci = ChanServ::Find(chan);
 		if (ci == NULL)
 		{
-			source.Reply(CHAN_X_NOT_REGISTERED, chan.c_str());
+			source.Reply(_("Channel \002{0}\002 isn't registered."), chan);
 			return;
 		}
 
 		if (ci->HasExt("CS_SUSPENDED"))
 		{
-			source.Reply(_("\002%s\002 is already suspended."), ci->name.c_str());
+			source.Reply(_("\002{0}\002 is already suspended."), ci->name);
 			return;
 		}
 
@@ -126,23 +126,16 @@ class CommandCSSuspend : public Command
 		}
 
 		Log(LOG_ADMIN, source, this, ci) << "(" << (!reason.empty() ? reason : "No reason") << "), expires on " << (expiry_secs ? Anope::strftime(Anope::CurTime + expiry_secs) : "never");
-		source.Reply(_("Channel \002%s\002 is now suspended."), ci->name.c_str());
+		source.Reply(_("Channel \002{0}\002 is now suspended."), ci->name);
 
 		this->onchansuspend(&Event::ChanSuspend::OnChanSuspend, ci);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("Disallows anyone from using the given channel.\n"
-				"May be cancelled by using the \002UNSUSPEND\002\n"
-				"command to preserve all previous channel data/settings.\n"
-				"If an expiry is given the channel will be unsuspended after\n"
-				"that period of time, else the default expiry from the\n"
-				"configuration is used.\n"
-				" \n"
-				"Reason may be required on certain networks."));
+		source.Reply(_("Disallows anyone from using the given channel."
+		               " All channel settings are preserved while the channel is suspended."
+		               "If \037expiry\037 is given the channel will be unsuspended after that period of time."));
 		return true;
 	}
 };
@@ -160,14 +153,15 @@ class CommandCSUnSuspend : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
+		const Anope::string &chan = params[0];
 
 		if (Anope::ReadOnly)
-			source.Reply(READ_ONLY_MODE);
+			source.Reply(_("Services are in read-only mode. Any changes made may not persist."));
 
-		ChanServ::Channel *ci = ChanServ::Find(params[0]);
+		ChanServ::Channel *ci = ChanServ::Find(chan);
 		if (ci == NULL)
 		{
-			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
+			source.Reply(_("Channel \002{0}\002 isn't registered."), chan);
 			return;
 		}
 
@@ -175,7 +169,7 @@ class CommandCSUnSuspend : public Command
 		CSSuspendInfo *si = ci->GetExt<CSSuspendInfo>("CS_SUSPENDED");
 		if (!si)
 		{
-			source.Reply(_("Channel \002%s\002 isn't suspended."), ci->name.c_str());
+			source.Reply(_("Channel \002{0}\002 isn't suspended."), ci->name.c_str());
 			return;
 		}
 
@@ -190,10 +184,7 @@ class CommandCSUnSuspend : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("Releases a suspended channel. All data and settings\n"
-				"are preserved from before the suspension."));
+		source.Reply(_("Releases a suspended channel. All data and settings are preserved from before the suspension."));
 		return true;
 	}
 };
@@ -277,7 +268,7 @@ class CSSuspend : public Module
 		CSSuspendInfo *si = suspend.Get(ci);
 		if (si && !source.HasCommand("chanserv/drop"))
 		{
-			source.Reply(CHAN_X_SUSPENDED, ci->name.c_str());
+			source.Reply(_("Channel \002{0}\002 is currently suspended."), ci->name);
 			return EVENT_STOP;
 		}
 

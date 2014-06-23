@@ -31,15 +31,14 @@ static void rsend_notify(CommandSource &source, MemoServ::MemoInfo *mi, MemoServ
 
 		/* Text of the memo varies if the recepient was a
 		   nick or channel */
-		Anope::string text = Anope::printf(Language::Translate(na->nc, _("\002[auto-memo]\002 The memo you sent to %s has been viewed.")), targ.c_str());
+		Anope::string text = Anope::printf(Language::Translate(na->nc, _("\002[auto-memo]\002 The memo you sent to \002%s\002 has been viewed.")), targ.c_str());
 
 		/* Send notification */
 		MemoServ::service->Send(source.GetNick(), m->sender, text, true);
 
 		/* Notify recepient of the memo that a notification has
 		   been sent to the sender */
-		source.Reply(_("A notification memo has been sent to %s informing him/her you have\n"
-				"read his/her memo."), nc->display.c_str());
+		source.Reply(_("A notification memo has been sent to \002{0}\002 informing him/her you have read his/her memo."), nc->display);
 	}
 
 	/* Remove receipt flag from the original memo */
@@ -51,6 +50,7 @@ class MemoListCallback : public NumberList
 	CommandSource &source;
 	MemoServ::MemoInfo *mi;
 	const ChanServ::Channel *ci;
+
  public:
 	MemoListCallback(CommandSource &_source, MemoServ::MemoInfo *_mi, const ChanServ::Channel *_ci, const Anope::string &numlist) : NumberList(numlist, false), source(_source), mi(_mi), ci(_ci)
 	{
@@ -71,21 +71,21 @@ class MemoListCallback : public NumberList
 			return;
 
 		if (ci)
-			source.Reply(_("Memo %d from %s (%s)."), index + 1, m->sender.c_str(), Anope::strftime(m->time, source.GetAccount()).c_str());
+			source.Reply(_("Memo \002{0}\002 from \002{1}\002 (\002{2}\002)."), index + 1, m->sender, Anope::strftime(m->time, source.GetAccount()));
 		else
-			source.Reply(_("Memo %d from %s (%s)."), index + 1, m->sender.c_str(), Anope::strftime(m->time, source.GetAccount()).c_str());
+			source.Reply(_("Memo \002{0}\002 from \002{1}\002 (\002{2}\002)."), index + 1, m->sender, Anope::strftime(m->time, source.GetAccount()));
 
 		BotInfo *bi;
 		Anope::string cmd;
 		if (Command::FindCommandFromService("memoserv/del", bi, cmd))
 		{
 			if (ci)
-				source.Reply(_("To delete, type: \002%s%s %s %s %d\002"), Config->StrictPrivmsg.c_str(), bi->nick.c_str(), cmd.c_str(), ci->name.c_str(), index + 1);
+				source.Reply(_("To delete, use \002{0}{1} {2} {3} {4}\002"), Config->StrictPrivmsg, bi->nick, cmd, ci->name, index + 1);
 			else
-				source.Reply(_("To delete, type: \002%s%s %s %d\002"), Config->StrictPrivmsg.c_str(), bi->nick.c_str(), cmd.c_str(), index + 1);
+				source.Reply(_("To delete, use \002{0}{1} {2} {3}\002"), Config->StrictPrivmsg, bi->nick, cmd, index + 1);
 		}
 
-		source.Reply("%s", m->text.c_str());
+		source.Reply(m->text);
 		m->unread = false;
 
 		/* Check if a receipt notification was requested */
@@ -118,14 +118,16 @@ class CommandMSRead : public Command
 			ci = ChanServ::Find(chan);
 			if (!ci)
 			{
-				source.Reply(CHAN_X_NOT_REGISTERED, chan.c_str());
+				source.Reply(_("Channel \002{0}\002 isn't registered."), chan);
 				return;
 			}
-			else if (!source.AccessFor(ci).HasPriv("MEMO"))
+
+			if (!source.AccessFor(ci).HasPriv("MEMO"))
 			{
-				source.Reply(ACCESS_DENIED);
+				source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "MEMO", ci->name);
 				return;
 			}
+
 			mi = ci->memos;
 		}
 		else
@@ -136,9 +138,9 @@ class CommandMSRead : public Command
 		else if (mi->memos->empty())
 		{
 			if (!chan.empty())
-				source.Reply(MEMO_X_HAS_NO_MEMOS, chan.c_str());
+				source.Reply(_("\002{0}\002 has no memos."), chan);
 			else
-				source.Reply(MEMO_HAVE_NO_MEMOS);
+				source.Reply(_("You have no memos."));
 		}
 		else
 		{
@@ -156,9 +158,9 @@ class CommandMSRead : public Command
 				if (!readcount)
 				{
 					if (!chan.empty())
-						source.Reply(MEMO_X_HAS_NO_NEW_MEMOS, chan.c_str());
+						source.Reply(_("\002{0}\002 has no new memos."), chan);
 					else
-						source.Reply(MEMO_HAVE_NO_NEW_MEMOS);
+						source.Reply(_("You have no new memos."));
 				}
 			}
 			else if (numstr.equals_ci("LAST"))
@@ -172,21 +174,21 @@ class CommandMSRead : public Command
 				list.Process();
 			}
 		}
-		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("Sends you the text of the memos specified. If LAST is\n"
-				"given, sends you the memo you most recently received. If\n"
-				"NEW is given, sends you all of your new memos.  Otherwise,\n"
-				"sends you memo number \037num\037. You can also give a list of\n"
-				"numbers, as in this example:\n"
-				" \n"
-				"   \002READ 2-5,7-9\002\n"
-				"      Displays memos numbered 2 through 5 and 7 through 9."));
+		source.Reply(_("Sends you the text of the memos specified."
+		               " If LAST is given, sends you the memo you most recently received."
+		               " If NEW is given, sends you all of your new memos."
+		               " Otherwise, sends you memo number \037num\037."
+		               " You can also give a list of numbers, as in the example:\n"
+		               "\n"
+		               "Example:\n"
+		               "\n"
+		               "         {0} 2-5,7-9\n"
+		               "         Displays memos numbered 2 through 5 and 7 through 9."),
+		               source.command);
 		return true;
 	}
 };

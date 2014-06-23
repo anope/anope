@@ -273,7 +273,7 @@ class CommandCSMode : public Command
 
 		if (Anope::ReadOnly && !subcommand.equals_ci("LIST"))
 		{
-			source.Reply(READ_ONLY_MODE);
+			source.Reply(_("Services are in read-only mode."));
 			return;
 		}
 
@@ -316,20 +316,20 @@ class CommandCSMode : public Command
 						ChannelMode *cm = ModeManager::FindChannelModeByChar(modes[i]);
 						if (!cm)
 						{
-							source.Reply(_("Unknown mode character %c ignored."), modes[i]);
+							source.Reply(_("Unknown mode character \002{0}\002 ignored."), modes[i]);
 							break;
 						}
 						else if (u && !cm->CanSet(u))
 						{
-							source.Reply(_("You may not (un)lock mode %c."), modes[i]);
+							source.Reply(_("You may not (un)lock mode \002{0}\002."), modes[i]);
 							break;
 						}
 
 						Anope::string mode_param;
 						if (((cm->type == MODE_STATUS || cm->type == MODE_LIST) && !sep.GetToken(mode_param)) || (cm->type == MODE_PARAM && adding && !sep.GetToken(mode_param)))
-							source.Reply(_("Missing parameter for mode %c."), cm->mchar);
+							source.Reply(_("Missing parameter for mode \002{0}\002."), cm->mchar);
 						else if (cm->type == MODE_LIST && ci->c && IRCD->GetMaxListFor(ci->c) && ci->c->HasMode(cm->name) >= IRCD->GetMaxListFor(ci->c))
-							source.Reply(_("List for mode %c is full."), cm->mchar);
+							source.Reply(_("List for mode \002{0}\002 is full."), cm->mchar);
 						else
 						{
 							modelocks->SetMLock(cm, adding, mode_param, source.GetNick());
@@ -358,7 +358,7 @@ class CommandCSMode : public Command
 
 			if (!reply.empty())
 			{
-				source.Reply(_("%s locked on %s."), reply.c_str(), ci->name.c_str());
+				source.Reply(_("\002{0}\002 locked on \002{1}\002."), reply.c_str(), ci->name.c_str());
 				Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to lock " << reply;
 			}
 			else if (needreply)
@@ -391,29 +391,29 @@ class CommandCSMode : public Command
 						ChannelMode *cm = ModeManager::FindChannelModeByChar(modes[i]);
 						if (!cm)
 						{
-							source.Reply(_("Unknown mode character %c ignored."), modes[i]);
+							source.Reply(_("Unknown mode character \002{0}\002 ignored."), modes[i]);
 							break;
 						}
 						else if (u && !cm->CanSet(u))
 						{
-							source.Reply(_("You may not (un)lock mode %c."), modes[i]);
+							source.Reply(_("You may not (un)lock mode \002{0}\002."), modes[i]);
 							break;
 						}
 
 						Anope::string mode_param;
 						if (cm->type != MODE_REGULAR && !sep.GetToken(mode_param))
-							source.Reply(_("Missing parameter for mode %c."), cm->mchar);
+							source.Reply(_("Missing parameter for mode \002{0}\002."), cm->mchar);
 						else
 						{
 							if (modelocks->RemoveMLock(cm, adding, mode_param))
 							{
 								if (!mode_param.empty())
 									mode_param = " " + mode_param;
-								source.Reply(_("%c%c%s has been unlocked from %s."), adding == 1 ? '+' : '-', cm->mchar, mode_param.c_str(), ci->name.c_str());
+								source.Reply(_("\002{0}{1}{2}\002 has been unlocked from \002{3}\002."), adding == 1 ? '+' : '-', cm->mchar, mode_param, ci->name);
 								Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to unlock " << (adding ? '+' : '-') << cm->mchar << mode_param;
 							}
 							else
-								source.Reply(_("%c%c is not locked on %s."), adding == 1 ? '+' : '-', cm->mchar, ci->name.c_str());
+								source.Reply(_("\002{0}{1}\002 is not locked on \002{2}\002."), adding == 1 ? '+' : '-', cm->mchar, ci->name);
 						}
 				}
 			}
@@ -426,7 +426,7 @@ class CommandCSMode : public Command
 			const ModeLocks::ModeList mlocks = modelocks->GetMLock();
 			if (mlocks.empty())
 			{
-				source.Reply(_("Channel %s has no mode locks."), ci->name.c_str());
+				source.Reply(_("Channel \002{0}\002 has no mode locks."), ci->name);
 			}
 			else
 			{
@@ -448,7 +448,7 @@ class CommandCSMode : public Command
 					list.AddEntry(entry);
 				}
 
-				source.Reply(_("Mode locks for %s:"), ci->name.c_str());
+				source.Reply(_("Mode locks for \002{0}\002:"), ci->name);
 
 				std::vector<Anope::string> replies;
 				list.Process(replies);
@@ -542,7 +542,7 @@ class CommandCSMode : public Command
 							{
 								if (!this->CanSet(source, ci, cm, false) && !can_override)
 								{
-									source.Reply(_("You do not have access to set mode %c."), cm->mchar);
+									source.Reply(_("You do not have access to set mode \002{0}\002."), cm->mchar);
 									break;
 								}
 
@@ -555,7 +555,7 @@ class CommandCSMode : public Command
 
 									if (uc->user->IsProtected() || (ci->HasExt("PEACE") && targ_access >= u_access && !can_override))
 									{
-										source.Reply(_("You do not have the access to change %s's modes."), uc->user->nick.c_str());
+										source.Reply(_("You do not have the access to change the modes of \002{0}\002."), uc->user->nick.c_str());
 										continue;
 									}
 
@@ -573,13 +573,13 @@ class CommandCSMode : public Command
 								User *target = User::Find(param, true);
 								if (target == NULL)
 								{
-									source.Reply(NICK_X_NOT_IN_USE, param.c_str());
+									source.Reply(_("User \002{0}\002 isn't currently online."), param);
 									break;
 								}
 
 								if (!this->CanSet(source, ci, cm, source.GetUser() == target) && !can_override)
 								{
-									source.Reply(_("You do not have access to set mode %c."), cm->mchar);
+									source.Reply(_("You do not have access to set mode \002{0}\002."), cm->mchar);
 									break;
 								}
 
@@ -588,12 +588,12 @@ class CommandCSMode : public Command
 									ChanServ::AccessGroup targ_access = ci->AccessFor(target);
 									if (ci->HasExt("PEACE") && targ_access >= u_access && !can_override)
 									{
-										source.Reply(_("You do not have the access to change %s's modes."), target->nick.c_str());
+										source.Reply(_("You do not have the access to change the modes of \002{0}\002"), target->nick);
 										break;
 									}
 									else if (target->IsProtected())
 									{
-										source.Reply(ACCESS_DENIED);
+										source.Reply(_("Access denied. \002{0}\002 is protected and can not have their modes changed."), target->nick);
 										break;
 									}
 								}
@@ -658,13 +658,13 @@ class CommandCSMode : public Command
 
 		if (!cm)
 		{
-			source.Reply(_("There is no such mode %s."), param.c_str());
+			source.Reply(_("There is no such mode \002{0}\002."), param);
 			return;
 		}
 
 		if (cm->type != MODE_STATUS && cm->type != MODE_LIST)
 		{
-			source.Reply(_("Mode %s is not a status or list mode."), param.c_str());
+			source.Reply(_("Mode \002{0}\002 is not a status or list mode."), param);
 			return;
 		}
 
@@ -687,27 +687,31 @@ class CommandCSMode : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
+		const Anope::string &chan = params[0];
 		const Anope::string &subcommand = params[1];
 
-		ChanServ::Channel *ci = ChanServ::Find(params[0]);
-
+		ChanServ::Channel *ci = ChanServ::Find(chan);
 		if (!ci)
-			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
-		else if (subcommand.equals_ci("LOCK") && params.size() > 2)
+		{
+			source.Reply(_("Channel \002{0}\002 isn't registered."), chan);
+			return;
+		}
+
+		if (subcommand.equals_ci("LOCK") && params.size() > 2)
 		{
 			if (!source.AccessFor(ci).HasPriv("MODE") && !source.HasPriv("chanserv/administration"))
-				source.Reply(ACCESS_DENIED);
+				source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "MODE", ci->name);
 			else
 				this->DoLock(source, ci, params);
 		}
 		else if (!ci->c)
-			source.Reply(CHAN_X_NOT_IN_USE, params[0].c_str());
+			source.Reply(_("Channel \002{0}\002 doesn't exist."), ci->name);
 		else if (subcommand.equals_ci("SET") && params.size() > 2)
 			this->DoSet(source, ci, params);
 		else if (subcommand.equals_ci("CLEAR"))
 		{
 			if (!source.AccessFor(ci).HasPriv("MODE") && !source.HasPriv("chanserv/administration"))
-				source.Reply(ACCESS_DENIED);
+				source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "MODE", ci->name);
 			else
 				this->DoClear(source, ci, params);
 		}
@@ -717,31 +721,26 @@ class CommandCSMode : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("Mainly controls mode locks and mode access (which is different from channel access)\n"
-			"on a channel.\n"
-			" \n"
-			"The \002%s LOCK\002 command allows you to add, delete, and view mode locks on a channel.\n"
-			"If a mode is locked on or off, services will not allow that mode to be changed. The \002SET\002\n"
-			"command will clear all existing mode locks and set the new one given, while \002ADD\002 and \002DEL\002\n"
-			"modify the existing mode lock.\n"
-			"Example:\n"
-			"     \002MODE #channel LOCK ADD +bmnt *!*@*aol*\002\n"
-			" \n"
-			"The \002%s SET\002 command allows you to set modes through services. Wildcards * and ? may\n"
-			"be given as parameters for list and status modes.\n"
-			"Example:\n"
-			"     \002MODE #channel SET +v *\002\n"
-			"       Sets voice status to all users in the channel.\n"
-			" \n"
-			"     \002MODE #channel SET -b ~c:*\n"
-			"       Clears all extended bans that start with ~c:\n"
-			" \n"
-			"The \002%s CLEAR\002 command is an easy way to clear modes on a channel. \037what\037 may be\n"
-			"any mode name. Examples include bans, excepts, inviteoverrides, ops, halfops, and voices. If \037what\037\n"
-			"is not given then all basic modes are removed."),
-			source.command.upper().c_str(), source.command.upper().c_str(), source.command.upper().c_str());
+		source.Reply(_("Controls mode locks and allows changing modes on a channel."
+		               "\n"
+		               "The \002{0} LOCK\002 command allows you to add, delete, and view mode locks on a channel."
+		               " If a mode is locked on or off, services will not allow that mode to be changed."
+		               " The \002SET\002 command will clear all existing mode locks and set the new one given, while \002ADD\002 and \002DEL\002 modify the existing mode lock.\n"
+		               "\n"
+		               "Example:\n"
+		               "         {0} #channel LOCK ADD +bmnt *!*@*aol*\n"
+		               "\n"
+		               "The \002{0} SET\002 command allows you to set modes through services. Wildcards * and ? may be given as parameters for list and status modes.\n"
+		               "Example:\n"
+		               "         {0} #channel SET +v *\n"
+			       "         Sets voice status to all users in the channel.\n"
+		               "\n"
+		               "         {0} #channel SET -b ~c:*\n"
+		               "         Clears all extended bans that start with ~c:\n"
+		               "\n"
+		               "The \002{0} CLEAR\002 command is an easy way to clear modes on a channel. \037what\037 may be any mode name. Examples include bans, excepts, inviteoverrides, ops, halfops, and voices."
+		               " If \037what\037 is not given then all basic modes are removed."),
+		               source.command.upper());
 		return true;
 	}
 };
@@ -758,25 +757,26 @@ class CommandCSModes : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
+		const Anope::string &chan = params[0];
 		User *u = source.GetUser(),
 			*targ = params.size() > 1 ? User::Find(params[1], true) : u;
-		ChanServ::Channel *ci = ChanServ::Find(params[0]);
 
 		if (!targ)
 		{
-			if (params.size() > 1)
-				source.Reply(NICK_X_NOT_IN_USE, params[1].c_str());
+			source.Reply(_("User \002{0}\002 isn't currently online."), params.size() > 1 ? params[1] : source.GetNick());
 			return;
 		}
 
+		ChanServ::Channel *ci = ChanServ::Find(chan);
 		if (!ci)
 		{
-			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
+			source.Reply(_("Channel \002{0}\002 isn't registered."), chan);
 			return;
 		}
-		else if (!ci->c)
+
+		if (!ci->c)
 		{
-			source.Reply(CHAN_X_NOT_IN_USE, ci->name.c_str());
+			source.Reply(_("Channel \002%s\002 doesn't exist."), ci->name);
 			return;
 		}
 
@@ -787,16 +787,14 @@ class CommandCSModes : public Command
 		bool override = false;
 
 		if (m.second.empty())
-		{
-			source.Reply(ACCESS_DENIED);
-			return;
-		}
+			return; // Configuration issue
 
-		if (u == targ ? !u_access.HasPriv(m.second + "ME") : !u_access.HasPriv(m.second))
+		const Anope::string &want = u == targ ? m.second + "ME" : m.second;
+		if (!u_access.HasPriv(want))
 		{
 			if (!can_override)
 			{
-				source.Reply(ACCESS_DENIED);
+				source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), want, ci->name);
 				return;
 			}
 			else
@@ -807,7 +805,7 @@ class CommandCSModes : public Command
 		{
 			if (!can_override)
 			{
-				source.Reply(ACCESS_DENIED);
+				source.Reply(_("Access denied. \002{0}\002 has the same or more privileges than you on \002{1}\002."), targ->nick, ci->name);
 				return;
 			}
 			else
@@ -816,7 +814,7 @@ class CommandCSModes : public Command
 
 		if (!ci->c->FindUser(targ))
 		{
-			source.Reply(NICK_X_NOT_ON_CHAN, targ->nick.c_str(), ci->name.c_str());
+			source.Reply(_("User \002{0}\002 is not on channel \002{1}\002."), targ->nick, ci->name);
 			return;
 		}
 
@@ -848,18 +846,14 @@ class CommandCSModes : public Command
 		if (m.second.empty())
 			return false;
 
-		this->SendSyntax(source);
-		source.Reply(" ");
 		if (m.first)
-			source.Reply(_("Gives %s status to the selected nick on a channel. If \037nick\037 is\n"
-					"not given, it will %s you."),
-					m.second.upper().c_str(), m.second.lower().c_str());
+			source.Reply(_("Gives {0} status to the selected \037user\037 on \037channel\037. If \037user\037 is not given, it will give the status to you."),
+					m.second.upper());
 		else
-			source.Reply(_("Removes %s status from the selected nick on a channel. If \037nick\037 is\n"
-					"not given, it will de%s you."),
-					 m.second.upper().c_str(), m.second.lower().c_str());
+			source.Reply(_("Removes {0} status from the selected \037user\037 on \037channel\037. If \037user\037 is not given, it will remove the status from you."),
+					 m.second.upper());
 		source.Reply(" ");
-		source.Reply(_("You must have the %s(ME) privilege on the channel to use this command."), m.second.upper().c_str());
+		source.Reply(_("Use of this command requires the \002{1}(ME)\002 privilege on \037channel\037."), m.second.upper());
 
 		return true;
 	}

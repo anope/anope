@@ -146,9 +146,9 @@ class ExceptionDelCallback : public NumberList
 		if (!deleted)
 			source.Reply(_("No matching entries on session-limit exception list."));
 		else if (deleted == 1)
-			source.Reply(_("Deleted 1 entry from session-limit exception list."));
+			source.Reply(_("Deleted \0021\002 entry from session-limit exception list."));
 		else
-			source.Reply(_("Deleted %d entries from session-limit exception list."), deleted);
+			source.Reply(_("Deleted \002{0}\002 entries from session-limit exception list."), deleted);
 	}
 
 	virtual void HandleNumber(unsigned number) override
@@ -206,7 +206,7 @@ class CommandOSSession : public Command
 				}
 			}
 
-			source.Reply(_("Hosts with at least \002%d\002 sessions:"), mincount);
+			source.Reply(_("Hosts with at least \002{0}\002 sessions:"), mincount);
 
 			std::vector<Anope::string> replies;
 			list.Process(replies);
@@ -215,8 +215,6 @@ class CommandOSSession : public Command
 			for (unsigned i = 0; i < replies.size(); ++i)
 				source.Reply(replies[i]);
 		}
-
-		return;
 	}
 
 	void DoView(CommandSource &source, const std::vector<Anope::string> &params)
@@ -237,9 +235,9 @@ class CommandOSSession : public Command
 		}
 
 		if (!session)
-			source.Reply(_("\002%s\002 not found on session list, but has a limit of \002%d\002 because it matches entry: \002%s\002."), param.c_str(), limit, entry.c_str());
+			source.Reply(_("\002{0}\002 not found on the session list, but has a limit of \002{1}\002 because it matches entry: \002{2}\002."), param, limit, entry);
 		else
-			source.Reply(_("The host \002%s\002 currently has \002%d\002 sessions with a limit of \002%d\002 because it matches entry: \002%s\002."), session->addr.mask().c_str(), session->count, limit, entry.c_str());
+			source.Reply(_("The host \002{0}\002 currently has \002{1}\002 sessions with a limit of \002{2}\002 because it matches entry: \002{3}\002."), session->addr.mask(), session->count, limit, entry);
 	}
  public:
 	CommandOSSession(Module *creator) : Command(creator, "operserv/session", 2, 2)
@@ -267,22 +265,14 @@ class CommandOSSession : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
-		this->SendSyntax(source);
-		source.Reply(" ");
 		source.Reply(_("Allows Services Operators to view the session list.\n"
-				" \n"
-				"\002SESSION LIST\002 lists hosts with at least \037threshold\037 sessions.\n"
-				"The threshold must be a number greater than 1. This is to\n"
-				"prevent accidental listing of the large number of single\n"
-				"session hosts.\n"
-				" \n"
-				"\002SESSION VIEW\002 displays detailed information about a specific\n"
-				"host - including the current session count and session limit.\n"
-				"The \037host\037 value may not include wildcards.\n"
-				" \n"
-				"See the \002EXCEPTION\002 help for more information about session\n"
-				"limiting and how to set session limits specific to certain\n"
-				"hosts and groups thereof."));
+		               "\n"
+		               "\002{0} LIST\002 lists hosts with at least \037threshold\037 sessions. The threshold must be a number greater than 1.\n"
+		               "\n"
+		               "\002{0} VIEW\002 displays detailed information about a specific host - including the current session count and session limit.\n"
+		               "\n"
+		               "See the \002EXCEPTION\002 help for more information about session limiting and how to set session limits specific to certain hosts and groups thereof."), // XXX
+		               source.command);
 		return true;
 	}
 };
@@ -323,7 +313,7 @@ class CommandOSException : public Command
 		time_t expires = !expiry.empty() ? Anope::DoTime(expiry) : exception_expiry;
 		if (expires < 0)
 		{
-			source.Reply(BAD_EXPIRY_TIME);
+			source.Reply(_("Invalid expiry time \002{0}\002."), expiry);
 			return;
 		}
 		else if (expires > 0)
@@ -338,7 +328,7 @@ class CommandOSException : public Command
 
 		if (limit > max_exception_limit)
 		{
-			source.Reply(_("Invalid session limit. It must be a valid integer greater than or equal to zero and less than \002%d\002."), max_exception_limit);
+			source.Reply(_("Invalid session limit. It must be a valid integer greater than or equal to zero and less than \002{0}\002."), max_exception_limit);
 			return;
 		}
 		else
@@ -357,10 +347,10 @@ class CommandOSException : public Command
 					if (e->limit != limit)
 					{
 						e->limit = limit;
-						source.Reply(_("Exception for \002%s\002 has been updated to %d."), mask.c_str(), e->limit);
+						source.Reply(_("Exception for \002{0}\002 has been updated to \002{1}\002."), mask, e->limit);
 					}
 					else
-						source.Reply(_("\002%s\002 already exists on the EXCEPTION list."), mask.c_str());
+						source.Reply(_("\002{0}\002 already exists on the session-limit exception list."), mask);
 					return;
 				}
 			}
@@ -381,13 +371,11 @@ class CommandOSException : public Command
 			{
 				Log(LOG_ADMIN, source, this) << "to set the session limit for " << mask << " to " << limit;
 				session_service->AddException(exception);
-				source.Reply(_("Session limit for \002%s\002 set to \002%d\002."), mask.c_str(), limit);
+				source.Reply(_("Session limit for \002{0}\002 set to \002{1}\002."), mask, limit);
 				if (Anope::ReadOnly)
-					source.Reply(READ_ONLY_MODE);
+					source.Reply(_("Services are in read-only mode. Any changes made may not persist."));
 			}
 		}
-
-		return;
 	}
 
 	void DoDel(CommandSource &source, const std::vector<Anope::string> &params)
@@ -413,17 +401,15 @@ class CommandOSException : public Command
 				{
 					Log(LOG_ADMIN, source, this) << "to remove the session limit exception for " << mask;
 					ExceptionDelCallback::DoDel(source, i);
-					source.Reply(_("\002%s\002 deleted from session-limit exception list."), mask.c_str());
+					source.Reply(_("\002{0}\002 deleted from session-limit exception list."), mask);
 					break;
 				}
 			if (i == end)
-				source.Reply(_("\002%s\002 not found on session-limit exception list."), mask.c_str());
+				source.Reply(_("\002{0}\002 not found on session-limit exception list."), mask);
 		}
 
 		if (Anope::ReadOnly)
-			source.Reply(READ_ONLY_MODE);
-
-		return;
+			source.Reply(_("Services are in read-only mode. Any changes made may not persist."));
 	}
 
 	void DoMove(CommandSource &source, const std::vector<Anope::string> &params)
@@ -453,15 +439,13 @@ class CommandOSException : public Command
 			session_service->GetExceptions()[n2] = temp;
 
 			Log(LOG_ADMIN, source, this) << "to move exception " << session_service->GetExceptions()[n1]->mask << " from position " << n1 + 1 << " to position " << n2 + 1;
-			source.Reply(_("Exception for \002%s\002 (#%d) moved to position \002%d\002."), session_service->GetExceptions()[n1]->mask.c_str(), n1 + 1, n2 + 1);
+			source.Reply(_("Exception for \002{0}\002 (#{1}) moved to position \002{2}\002."), session_service->GetExceptions()[n1]->mask, n1 + 1, n2 + 1);
 
 			if (Anope::ReadOnly)
-				source.Reply(READ_ONLY_MODE);
+				source.Reply(_("Services are in read-only mode. Any changes made may not persist."));
 		}
 		else
 			this->OnSyntaxError(source, "MOVE");
-
-		return;
 	}
 
 	void ProcessList(CommandSource &source, const std::vector<Anope::string> &params, ListFormatter &list)
@@ -530,7 +514,7 @@ class CommandOSException : public Command
 			source.Reply(_("No matching entries on session-limit exception list."));
 		else
 		{
-			source.Reply(_("Current Session Limit Exception list:"));
+			source.Reply(_("Session-limit exception list:"));
 
 			std::vector<Anope::string> replies;
 			list.Process(replies);
@@ -589,41 +573,30 @@ class CommandOSException : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("Allows Services Operators to manipulate the list of hosts that\n"
-				"have specific session limits - allowing certain machines,\n"
-				"such as shell servers, to carry more than the default number\n"
-				"of clients at a time. Once a host reaches its session limit,\n"
-				"all clients attempting to connect from that host will be\n"
-				"killed. Before the user is killed, they are notified, of a\n"
-				"source of help regarding session limiting. The content of\n"
-				"this notice is a config setting."));
-		source.Reply(" ");
-		source.Reply(_("\002EXCEPTION ADD\002 adds the given host mask to the exception list.\n"
-				"Note that \002nick!user@host\002 and \002user@host\002 masks are invalid!\n"
-				"Only real host masks, such as \002box.host.dom\002 and \002*.host.dom\002,\n"
-				"are allowed because sessions limiting does not take nick or\n"
-				"user names into account. \037limit\037 must be a number greater than\n"
-				"or equal to zero. This determines how many sessions this host\n"
-				"may carry at a time. A value of zero means the host has an\n"
-				"unlimited session limit. See the \002AKILL\002 help for details about\n"
-				"the format of the optional \037expiry\037 parameter.\n"
-				" \n"
-				"\002EXCEPTION DEL\002 removes the given mask from the exception list.\n"
-				" \n"
-				"\002EXCEPTION MOVE\002 moves exception \037num\037 to \037position\037. The\n"
-				"sessions inbetween will be shifted up or down to fill the gap.\n"
-				" \n"
-				"\002EXCEPTION LIST\002 and \002EXCEPTION VIEW\002 show all current\n"
-				"sessions if the optional mask is given, the list is limited\n"
-				"to those sessions matching the mask. The difference is that\n"
-				"\002EXCEPTION VIEW\002 is more verbose, displaying the name of the\n"
-				"person who added the exception, its session limit, reason,\n"
-				"host mask and the expiry date and time.\n"
-				" \n"
-				"Note that a connecting client will \"use\" the first exception\n"
-				"their host matches."));
+		if (subcommand.equals_ci("ADD"))
+			source.Reply(_("\002{0} ADD\002 adds the given hostmask to the exception list."
+			               " Note that \002nick!user@host\002 and \002user@host\002 masks are invalid!\n"
+			               " Only real host masks, such as \002box.host.dom\002 and \002*.host.dom\002, are allowed because sessions limiting does not take nickname or user names into account."
+			               " \037limit\037 must be a number greater than or equal to zero."
+			               " This determines how many sessions this host may carry at a time."
+			               " A value of zero means the host has an unlimited session limit."
+			               " If more than one entry matches a client, the first matching enty will be used."),
+			               source.command);
+		else
+			source.Reply(_("Allows you to manipulate the list of hosts that have specific session limits - allowing certain machines, such as shell servers, to carry more than the default number of clients at a time."
+			               " Once a host reaches its session limit, all clients attempting to connect from that host will be killed."
+			               " Before the user is killed, they are notified, of a source of help regarding session limiting. The content of this notice is a config setting.\n"
+			               "\n"
+			               "\002{0} ADD\002 adds the given host mask to the exception list.\n"
+			               "\002{msg}{service} {help} {command} ADD\002 for more information.\n"
+			               "\n"
+			               "\002{0} DEL\002 removes the given mask from the exception list.\n"
+			               "\n"
+			               "\002{0} MOVE\002 moves exception \037num\037 to \037position\037."
+			               " The sessions inbetween will be shifted up or down to fill the gap.\n"
+			               "\n"
+			               "\002{0} LIST\002 and \002{0} VIEW\002 show all current sessions if the optional mask is given, the list is limited to those sessions matching the mask."
+			               " The difference is that \002{0} VIEW\002 is more verbose, displaying the name of the person who added the exception, its session limit, reason, host mask and the expiry date and time.\n"));
 		return true;
 	}
 };
@@ -703,13 +676,6 @@ class OSSession : public Module
 				}
 			}
 
-			/* Previously on IRCds that send a QUIT (InspIRCD) when a user is killed, the session for a host was
-			 * decremented in do_quit, which caused problems and fixed here
-			 *
-			 * Now, we create the user struture before calling this to fix some user tracking issues,
-			 * so we must increment this here no matter what because it will either be
-			 * decremented when the user is killed or quits - Adam
-			 */
 			++session->count;
 
 			if (kill && !exempt)

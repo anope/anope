@@ -17,14 +17,14 @@ class CommandHSSet : public Command
 	CommandHSSet(Module *creator) : Command(creator, "hostserv/set", 2, 2)
 	{
 		this->SetDesc(_("Set the vhost of another user"));
-		this->SetSyntax(_("\037nick\037 \037hostmask\037"));
+		this->SetSyntax(_("\037user\037 \037hostmask\037"));
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		if (Anope::ReadOnly)
 		{
-			source.Reply(READ_ONLY_MODE);
+			source.Reply(_("Services are in read-only mode."));
 			return;
 		}
 
@@ -33,7 +33,7 @@ class CommandHSSet : public Command
 		NickServ::Nick *na = NickServ::FindNick(nick);
 		if (na == NULL)
 		{
-			source.Reply(NICK_X_NOT_REGISTERED, nick.c_str());
+			source.Reply(_("\002{0}\002 isn't registered."), nick);
 			return;
 		}
 
@@ -60,25 +60,26 @@ class CommandHSSet : public Command
 		{
 			if (!IRCD->CanSetVIdent)
 			{
-				source.Reply(HOST_NO_VIDENT);
+				source.Reply(_("Vhosts may not contain a username."));
 				return;
 			}
-			else if (!IRCD->IsIdentValid(user))
+
+			if (!IRCD->IsIdentValid(user))
 			{
-				source.Reply(HOST_SET_IDENT_ERROR);
+				source.Reply(_("The requested username is not valid."));
 				return;
 			}
 		}
 
 		if (host.length() > Config->GetBlock("networkinfo")->Get<unsigned>("hostlen"))
 		{
-			source.Reply(HOST_SET_TOOLONG, Config->GetBlock("networkinfo")->Get<unsigned>("hostlen"));
+			source.Reply(_("The requested vhost is too long, please use a hostname no longer than {0} characters."), Config->GetBlock("networkinfo")->Get<unsigned>("hostlen"));
 			return;
 		}
 
 		if (!IRCD->IsHostValid(host))
 		{
-			source.Reply(HOST_SET_ERROR);
+			source.Reply(_("The requested hostname is not valid."));
 			return;
 		}
 
@@ -87,19 +88,14 @@ class CommandHSSet : public Command
 		na->SetVhost(user, host, source.GetNick());
 		Event::OnSetVhost(&Event::SetVhost::OnSetVhost, na);
 		if (!user.empty())
-			source.Reply(_("VHost for \002%s\002 set to \002%s\002@\002%s\002."), nick.c_str(), user.c_str(), host.c_str());
+			source.Reply(_("Vhost for \002{0}\002 set to \002{0}\002@\002{1}\002."), nick, user, host);
 		else
-			source.Reply(_("VHost for \002%s\002 set to \002%s\002."), nick.c_str(), host.c_str());
+			source.Reply(_("Vhost for \002{0}\002 set to \002{0}\002."), nick, host);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("Sets the vhost for the given nick to that of the given\n"
-				"hostmask.  If your IRCD supports vIdents, then using\n"
-				"SET <nick> <ident>@<hostmask> set idents for users as\n"
-				"well as vhosts."));
+		source.Reply(_("Sets the vhost of the given \037user\037 to the given \037hostmask\037."));
 		return true;
 	}
 };
@@ -123,23 +119,22 @@ class CommandHSSetAll : public Command
 	CommandHSSetAll(Module *creator) : Command(creator, "hostserv/setall", 2, 2)
 	{
 		this->SetDesc(_("Set the vhost for all nicks in a group"));
-		this->SetSyntax(_("\037nick\037 \037hostmask\037"));
+		this->SetSyntax(_("\037user\037 \037hostmask\037"));
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		if (Anope::ReadOnly)
 		{
-			source.Reply(READ_ONLY_MODE);
+			source.Reply(_("Services are in read-only mode."));
 			return;
 		}
 
-		Anope::string nick = params[0];
-
+		const Anope::string &nick = params[0];
 		NickServ::Nick *na = NickServ::FindNick(nick);
 		if (na == NULL)
 		{
-			source.Reply(NICK_X_NOT_REGISTERED, nick.c_str());
+			source.Reply(_("\002{0}\002 isn't registered."), nick);
 			return;
 		}
 
@@ -166,25 +161,26 @@ class CommandHSSetAll : public Command
 		{
 			if (!IRCD->CanSetVIdent)
 			{
-				source.Reply(HOST_NO_VIDENT);
+				source.Reply(_("Vhosts may not contain a username."));
 				return;
 			}
-			else if (!IRCD->IsIdentValid(user))
+
+			if (!IRCD->IsIdentValid(user))
 			{
-				source.Reply(HOST_SET_IDENT_ERROR);
+				source.Reply(_("The requested username is not valid."));
 				return;
 			}
 		}
 
 		if (host.length() > Config->GetBlock("networkinfo")->Get<unsigned>("hostlen"))
 		{
-			source.Reply(HOST_SET_TOOLONG, Config->GetBlock("networkinfo")->Get<unsigned>("hostlen"));
+			source.Reply(_("The requested vhost is too long, please use a hostname no longer than {0} characters."), Config->GetBlock("networkinfo")->Get<unsigned>("hostlen"));
 			return;
 		}
 
 		if (!IRCD->IsHostValid(host))
 		{
-			source.Reply(HOST_SET_ERROR);
+			source.Reply(_("The requested hostname is not valid."));
 			return;
 		}
 
@@ -194,21 +190,14 @@ class CommandHSSetAll : public Command
 		this->Sync(na);
 		Event::OnSetVhost(&Event::SetVhost::OnSetVhost, na);
 		if (!user.empty())
-			source.Reply(_("VHost for group \002%s\002 set to \002%s\002@\002%s\002."), nick.c_str(), user.c_str(), host.c_str());
+			source.Reply(_("Vhost for group \002{0}\002 set to \002{1}\002@\002{2}\002."), nick.c_str(), user.c_str(), host.c_str());
 		else
-			source.Reply(_("VHost for group \002%s\002 set to \002%s\002."), nick.c_str(), host.c_str());
+			source.Reply(_("host for group \002{0}\002 set to \002{1}\002."), nick.c_str(), host.c_str());
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("Sets the vhost for all nicks in the same group as that\n"
-				"of the given nick.  If your IRCD supports vIdents, then\n"
-				"using SETALL <nick> <ident>@<hostmask> will set idents\n"
-				"for users as well as vhosts.\n"
-				"* NOTE, this will not update the vhost for any nicks\n"
-				"added to the group after this command was used."));
+		source.Reply(_("Sets the vhost for all nicknames in the group of \037user\037."));
 		return true;
 	}
 };

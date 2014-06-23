@@ -93,7 +93,7 @@ class CommandNSAJoin : public Command
 		AJoinList *channels = nc->Require<AJoinList>("ajoinlist");
 
 		if ((*channels)->empty())
-			source.Reply(_("%s's auto join list is empty."), nc->display.c_str());
+			source.Reply(_("The auto join list of \002{0}\002 is empty."), nc->display);
 		else
 		{
 			ListFormatter list(source.GetAccount());
@@ -108,7 +108,7 @@ class CommandNSAJoin : public Command
 				list.AddEntry(entry);
 			}
 
-			source.Reply(_("%s's auto join list:"), nc->display.c_str());
+			source.Reply(_("Auto join list of \002{0}\002:"), nc->display);
 
 			std::vector<Anope::string> replies;
 			list.Process(replies);
@@ -138,13 +138,14 @@ class CommandNSAJoin : public Command
 
 			if ((*channels)->size() >= Config->GetModule(this->owner)->Get<unsigned>("ajoinmax"))
 			{
-				source.Reply(_("Sorry, the maximum of %d auto join entries has been reached."), Config->GetModule(this->owner)->Get<unsigned>("ajoinmax"));
+				source.Reply(_("Sorry, the maximum of \002{0}\002 auto join entries has been reached."), Config->GetModule(this->owner)->Get<unsigned>("ajoinmax"));
 				return;
 			}
-			else if (i != (*channels)->size())
+
+			if (i != (*channels)->size())
 				alreadyadded += chan + ", ";
 			else if (IRCD->IsChannelValid(chan) == false)
-	 			source.Reply(CHAN_X_INVALID, chan.c_str());
+	 			source.Reply(_("\002{0}\002 isn't a valid channel."), chan);
 			else
 			{
 				Channel *c = Channel::Find(chan);
@@ -167,13 +168,13 @@ class CommandNSAJoin : public Command
 		if (!alreadyadded.empty())
 		{
 			alreadyadded = alreadyadded.substr(0, alreadyadded.length() - 2);
-			source.Reply(_("%s is already on %s's auto join list."), alreadyadded.c_str(), nc->display.c_str());
+			source.Reply(_("\002{0}\002 is already on the auto join list of \002{1}\002."), alreadyadded, nc->display);
 		}
 
 		if (!invalidkey.empty())
 		{
 			invalidkey = invalidkey.substr(0, invalidkey.length() - 2);
-			source.Reply(_("%s had an invalid key specified, and was thus ignored."), invalidkey.c_str());
+			source.Reply(_("\002{0}\002 had an invalid key specified, and was ignored."), invalidkey);
 		}
 
 		if (addedchans.empty())
@@ -181,7 +182,7 @@ class CommandNSAJoin : public Command
 
 		addedchans = addedchans.substr(0, addedchans.length() - 2);
 		Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to ADD channel " << addedchans << " to " << nc->display;
-		source.Reply(_("%s added to %s's auto join list."), addedchans.c_str(), nc->display.c_str());
+		source.Reply(_("\002{0}\002 added to the auto join list of \002{1}\002."), addedchans, nc->display);
 	}
 
 	void DoDel(CommandSource &source, NickServ::Account *nc, const Anope::string &chans)
@@ -210,7 +211,7 @@ class CommandNSAJoin : public Command
 		if (!notfoundchans.empty())
 		{
 			notfoundchans = notfoundchans.substr(0, notfoundchans.length() - 2);
-			source.Reply(_("%s was not found on %s's auto join list."), notfoundchans.c_str(), nc->display.c_str());
+			source.Reply(_("\002{0}\002 was not found on the auto join list of \002{1}\002."), notfoundchans, nc->display);
 		}
 
 		if (delchans.empty())
@@ -218,7 +219,7 @@ class CommandNSAJoin : public Command
 
 		delchans = delchans.substr(0, delchans.length() - 2);
 		Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to DELETE channel " << delchans << " from " << nc->display;
-		source.Reply(_("%s was removed from %s's auto join list."), delchans.c_str(), nc->display.c_str());
+		source.Reply(_("\002{0}\002 was removed from the auto join list of \002{1}\002."), delchans, nc->display);
 
 		if ((*channels)->empty())
 			nc->Shrink<AJoinList>("ajoinlist");
@@ -244,17 +245,12 @@ class CommandNSAJoin : public Command
 			nick = (params.size() > 2 && IRCD->IsChannelValid(params[2])) ? params[1] : "";
 
 		NickServ::Account *nc;
-		if (!nick.empty())
+		if (!nick.empty() && !source.HasCommand("nickserv/ajoin"))
 		{
 			const NickServ::Nick *na = NickServ::FindNick(nick);
 			if (na == NULL)
 			{
-				source.Reply(NICK_X_NOT_REGISTERED, nick.c_str());
-				return;
-			}
-			else if (na->nc != source.GetAccount() && !source.HasCommand("nickserv/ajoin"))
-			{
-				source.Reply(ACCESS_DENIED);
+				source.Reply(_("\002{0}\002 isn't registered."), nick);
 				return;
 			}
 
@@ -272,11 +268,11 @@ class CommandNSAJoin : public Command
 		if (cmd.equals_ci("LIST"))
 			return this->DoList(source, nc);
 		else if (nc->HasExt("NS_SUSPENDED"))
-			source.Reply(NICK_X_SUSPENDED, nc->display.c_str());
+			source.Reply(_("\002{0}\002 isn't registered."), nc->display);
 		else if (param.empty())
 			this->OnSyntaxError(source, "");
 		else if (Anope::ReadOnly)
-			source.Reply(READ_ONLY_MODE);
+			source.Reply(_("Services are in read-only mode."));
 		else if (cmd.equals_ci("ADD"))
 			return this->DoAdd(source, nc, param, param2);
 		else if (cmd.equals_ci("DEL"))
@@ -287,12 +283,9 @@ class CommandNSAJoin : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("This command manages your auto join list. When you identify\n"
-				"you will automatically join the channels on your auto join list.\n"
-				"Services Operators may provide a nick to modify other users'\n"
-				"auto join lists."));
+		source.Reply(_("This command manages your auto join list."
+		               " When you identify you will automatically join the channels on your auto join list."
+		               " Services Operators may provide \037nickname\037 to modify other users' auto join lists."));
 		return true;
 	}
 };

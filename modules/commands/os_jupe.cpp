@@ -27,9 +27,9 @@ class CommandOSJupe : public Command
 		Server *server = Server::Find(jserver, true);
 
 		if (!IRCD->IsHostValid(jserver) || jserver.find('.') == Anope::string::npos)
-			source.Reply(_("Please use a valid server name when juping."));
-		else if (server == Me || server == Servers::GetUplink())
-			source.Reply(_("You can not jupe your Services' pseudoserver or your uplink server."));
+			source.Reply(_("\002{0}\002 is not a valid server name."), jserver);
+		else if (server == Me || server == Servers::GetUplink() || server->IsULined())
+			source.Reply(_("You can not jupe Servoces or its uplink server."));
 		else if (server && server->IsJuped())
 			source.Reply(_("You can not jupe an already juped server."));
 		else
@@ -51,16 +51,8 @@ class CommandOSJupe : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("Tells Services to jupiter a server -- that is, to create\n"
-				"a fake \"server\" connected to Services which prevents\n"
-				"the real server of that name from connecting.  The jupe\n"
-				"may be removed using a standard \002SQUIT\002. If a reason is\n"
-				"given, it is placed in the server information field;\n"
-				"otherwise, the server information field will contain the\n"
-				"text \"Juped by <nick>\", showing the nickname of the\n"
-				"person who jupitered the server."));
+		source.Reply(_("Tells services to jupiter a server -- that is, to create a fake \"server\" connected to Services which prevents the real server of that name from connecting."
+		               "  The jupe may be removed using a standard \002SQUIT\002. If a reason is given, it is placed in the server information field; otherwise, the server information field will contain the text \"Juped by <nick>\", showing the nickname of the person who jupitered the server."));
 		return true;
 	}
 };

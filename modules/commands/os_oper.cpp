@@ -84,31 +84,31 @@ class CommandOSOper : public Command
 
 			const NickServ::Nick *na = NickServ::FindNick(oper);
 			if (na == NULL)
-				source.Reply(NICK_X_NOT_REGISTERED, oper.c_str());
+				source.Reply(_("\002{0}\002 isn't currently online."), oper);
 			else if (na->nc->o)
-				source.Reply(_("Nick \002%s\002 is already an operator."), na->nick.c_str());
+				source.Reply(_("Nick \002{0}\002 is already an operator."), na->nick);
 			else
 			{
 				OperType *ot = OperType::Find(otype);
 				if (ot == NULL)
 				{
-					source.Reply(_("Oper type \002%s\002 has not been configured."), otype.c_str());
+					source.Reply(_("Oper type \002{0}\002 has not been configured."), otype);
 					return;
 				}
 
 				if (!HasPrivs(source, ot))
 				{
-					source.Reply(ACCESS_DENIED);
+					source.Reply(_("Access denied."));
 					return;
 				}
 
 				na->nc->o = new MyOper(na->nc->display, ot);
 
 				if (Anope::ReadOnly)
-					source.Reply(READ_ONLY_MODE);
+					source.Reply(_("Services are in read-only mode. Any changes made may not persist."));
 
 				Log(LOG_ADMIN, source, this) << "ADD " << na->nick << " as type " << ot->GetName();
-				source.Reply("%s (%s) added to the \002%s\002 list.", na->nick.c_str(), na->nc->display.c_str(), ot->GetName().c_str());
+				source.Reply("\002{0}\002 (\002{1}\002) added to the \002{2}\002 list.", na->nick, na->nc->display, ot->GetName());
 			}
 		}
 		else if (subcommand.equals_ci("DEL") && params.size() > 1)
@@ -117,21 +117,21 @@ class CommandOSOper : public Command
 
 			const NickServ::Nick *na = NickServ::FindNick(oper);
 			if (na == NULL)
-				source.Reply(NICK_X_NOT_REGISTERED, oper.c_str());
+				source.Reply(_("\002{0}\002 isn't registered."), oper);
 			else if (!na->nc || !na->nc->o)
-				source.Reply(_("Nick \002%s\002 is not a Services Operator."), oper.c_str());
+				source.Reply(_("Nick \002{0}\002 is not a Services Operator."), oper);
 			else if (!HasPrivs(source, na->nc->o->ot))
-				source.Reply(ACCESS_DENIED);
+				source.Reply(_("Access denied."));
 			else
 			{
 				delete na->nc->o;
 				na->nc->o = NULL;
 
 				if (Anope::ReadOnly)
-					source.Reply(READ_ONLY_MODE);
+					source.Reply(_("Services are in read-only mode. Any changes made may not persist."));
 
 				Log(LOG_ADMIN, source, this) << "DEL " << na->nick;
-				source.Reply(_("Oper privileges removed from %s (%s)."), na->nick.c_str(), na->nc->display.c_str());
+				source.Reply(_("Oper privileges removed from \002{0}\002 (\002{1}\002)."), na->nick, na->nc->display);
 			}
 		}
 		else if (subcommand.equals_ci("LIST"))
@@ -144,13 +144,13 @@ class CommandOSOper : public Command
 				if (!nc->o)
 					continue;
 
-				source.Reply(_("%-8s %s"), nc->o->name.c_str(), nc->o->ot->GetName().c_str());
+				source.Reply(Anope::printf("%-8s %s", nc->o->name.c_str(), nc->o->ot->GetName().c_str()));
 				if (std::find(Config->Opers.begin(), Config->Opers.end(), nc->o) != Config->Opers.end())
 					source.Reply(_("   This oper is configured in the configuration file."));
 				for (std::list<User *>::const_iterator uit = nc->users.begin(); uit != nc->users.end(); ++uit)
 				{
 					User *u = *uit;
-					source.Reply(_("   %s is online using this oper block."), u->nick.c_str());
+					source.Reply(_("   \002{0}\002 is online using this oper block."), u->nick);
 				}
 			}
 		}
@@ -161,14 +161,14 @@ class CommandOSOper : public Command
 				fulltype += " " + params[2];
 			OperType *ot = OperType::Find(fulltype);
 			if (ot == NULL)
-				source.Reply(_("Oper type \002%s\002 has not been configured."), fulltype.c_str());
+				source.Reply(_("Oper type \002{0}\002 has not been configured."), fulltype);
 			else
 			{
 				if (ot->GetCommands().empty())
-					source.Reply(_("Opertype \002%s\002 has no allowed commands."), ot->GetName().c_str());
+					source.Reply(_("Opertype \002{0}\002 has no allowed commands."), ot->GetName());
 				else
 				{
-					source.Reply(_("Available commands for \002%s\002:"), ot->GetName().c_str());
+					source.Reply(_("Available commands for \002{0}\002:"), ot->GetName());
 					Anope::string buf;
 					std::list<Anope::string> cmds = ot->GetCommands();
 					for (std::list<Anope::string>::const_iterator it = cmds.begin(), it_end = cmds.end(); it != it_end; ++it)
@@ -187,10 +187,10 @@ class CommandOSOper : public Command
 					}
 				}
 				if (ot->GetPrivs().empty())
-					source.Reply(_("Opertype \002%s\002 has no allowed privileges."), ot->GetName().c_str());
+					source.Reply(_("Opertype \002{0}\002 has no allowed privileges."), ot->GetName());
 				else
 				{
-					source.Reply(_("Available privileges for \002%s\002:"), ot->GetName().c_str());
+					source.Reply(_("Available privileges for \002{0}\002:"), ot->GetName());
 					Anope::string buf;
 					std::list<Anope::string> privs = ot->GetPrivs();
 					for (std::list<Anope::string>::const_iterator it = privs.begin(), it_end = privs.end(); it != it_end; ++it)
@@ -209,7 +209,7 @@ class CommandOSOper : public Command
 					}
 				}
 				if (!ot->modes.empty())
-					source.Reply(_("Opertype \002%s\002 receives modes \002%s\002 once identified."), ot->GetName().c_str(), ot->modes.c_str());
+					source.Reply(_("Opertype \002{0}\002 receives modes \002{1}\002 once identified."), ot->GetName(), ot->modes);
 			}
 		}
 		else
@@ -220,11 +220,8 @@ class CommandOSOper : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
-		this->SendSyntax(source);
-		source.Reply(" ");
 		source.Reply(_("Allows you to change and view Services Operators.\n"
-				"Note that operators removed by this command but are still set in\n"
-				"the configuration file are not permanently affected by this."));
+				" Note that operators removed by this command but are still set in the configuration file are not permanently affected by this."));
 		return true;
 	}
 };

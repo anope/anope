@@ -22,32 +22,42 @@ class CommandCSSync : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
-		ChanServ::Channel *ci = ChanServ::Find(params[0]);
+		const Anope::string &chan = params[0];
 
+		ChanServ::Channel *ci = ChanServ::Find(chan);
 		if (ci == NULL)
-			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
-		else if (ci->c == NULL)
-			source.Reply(CHAN_X_NOT_IN_USE, params[0].c_str());
-		else if (!source.AccessFor(ci).HasPriv("ACCESS_CHANGE") && !source.HasPriv("chanserv/administration"))
-			source.Reply(ACCESS_DENIED);
-		else
 		{
-			bool override = !source.AccessFor(ci).HasPriv("ACCESS_CHANGE") && source.HasPriv("chanserv/administration");
-			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci);
-
-			for (Channel::ChanUserList::iterator it = ci->c->users.begin(), it_end = ci->c->users.end(); it != it_end; ++it)
-				ci->c->SetCorrectModes(it->second->user, true);
-
-			source.Reply(_("All user modes on \002%s\002 have been synced."), ci->name.c_str());
+			source.Reply(_("Channel \002{0}\002 isn't registered."), chan);
+			return;
 		}
+
+		if (ci->c == NULL)
+		{
+			source.Reply(_("Channel \002{0}\002 doesn't exist."), ci->name);
+			return;
+		}
+
+		if (!source.AccessFor(ci).HasPriv("ACCESS_CHANGE") && !source.HasPriv("chanserv/administration"))
+		{
+			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "ACCESS_CHANGE", ci->name);
+			return;
+		}
+
+		bool override = !source.AccessFor(ci).HasPriv("ACCESS_CHANGE") && source.HasPriv("chanserv/administration");
+		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci);
+
+		for (Channel::ChanUserList::iterator it = ci->c->users.begin(), it_end = ci->c->users.end(); it != it_end; ++it)
+			ci->c->SetCorrectModes(it->second->user, true);
+
+		source.Reply(_("All user modes on \002{0}\002 have been synced."));
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &params) override
 	{
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("Syncs all modes set on users on the channel with the modes\n"
-				"they should have based on their access."));
+		source.Reply(_("Syncs all channel status modes on all users on \037channel\037 with the modes they should have based on the channel access list.\n"
+		               "\n"
+		               "Use of this command requires the \002{0}\002 privilege on \037channel\037."),
+		               "ACCESS_CHNAGE");
 		return true;
 	}
 };

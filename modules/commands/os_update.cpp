@@ -29,10 +29,7 @@ class CommandOSUpdate : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("Causes Services to update all database files as soon as you\n"
-				"send the command."));
+		source.Reply(_("Causes Services to update all database files."));
 		return true;
 	}
 };

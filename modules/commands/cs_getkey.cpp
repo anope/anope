@@ -24,37 +24,38 @@ class CommandCSGetKey : public Command
 	{
 		const Anope::string &chan = params[0];
 
-		ChanServ::Channel *ci = ChanServ::Find(params[0]);
+		ChanServ::Channel *ci = ChanServ::Find(chan);
 		if (ci == NULL)
 		{
-			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
+			source.Reply(_("Channel \002{0}\002 isn't registered."), chan);
 			return;
 		}
 
 		if (!source.AccessFor(ci).HasPriv("GETKEY") && !source.HasCommand("chanserv/getkey"))
 		{
-			source.Reply(ACCESS_DENIED);
+			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "GETKEY", ci->name);
 			return;
 		}
 
 		Anope::string key;
 		if (!ci->c || !ci->c->GetParam("KEY", key))
 		{
-			source.Reply(_("Channel \002%s\002 has no key."), chan.c_str());
+			source.Reply(_("Channel \002{0}\002 does not have a key."), ci->name);
 			return;
 		}
 
 		bool override = !source.AccessFor(ci).HasPriv("GETKEY");
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci);
 
-		source.Reply(_("Key for channel \002%s\002 is \002%s\002."), chan.c_str(), key.c_str());
+		source.Reply(_("Key for channel \002{0}\002 is \002{1}\002."), ci->name, key);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("Returns the key of the given channel."));
+		source.Reply(_("Returns the key of \037channel\037.\n"
+		               "\n"
+		               "Use of this command requires the \002{0}\002 privilege on \037channel\037."),
+		               "GETKEY");
 		return true;
 	}
 };

@@ -185,10 +185,15 @@ class CoreExport User : public virtual Base, public Extensible, public CommandRe
 	/**
 	 * Send a message (notice or privmsg, depending on settings) to a user
 	 * @param source Sender
-	 * @param fmt Format of the Message
-	 * @param ... any number of parameters
+	 * @param message Format of the Message
+	 * @param args any number of parameters
 	 */
-	void SendMessage(const MessageSource &, const char *fmt, ...);
+	template<typename... Args>
+	void SendMessage(const MessageSource &source, const char *message, Args&&... args)
+	{
+		const char *translated_message = Language::Translate(this->Account(), message);
+		SendMessage(source, Anope::Format(translated_message, std::forward<Args>(args)...));
+	}
 	void SendMessage(const MessageSource &, const Anope::string &msg) override;
 
 	/** Identify the user to a nick.

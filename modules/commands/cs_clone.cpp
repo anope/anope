@@ -30,30 +30,30 @@ public:
 
 		if (Anope::ReadOnly)
 		{
-			source.Reply(READ_ONLY_MODE);
+			source.Reply(_("Services are in read-only mode."));
 			return;
 		}
 
 		User *u = source.GetUser();
-		ChanServ::Channel *ci = ChanServ::Find(params[0]);
+		ChanServ::Channel *ci = ChanServ::Find(channel);
 		bool override = false;
 
 		if (ci == NULL)
 		{
-			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
+			source.Reply(_("Channel \002{0}\002 isn't registered."), channel);
 			return;
 		}
 
 		ChanServ::Channel *target_ci = ChanServ::Find(target);
 		if (!target_ci)
 		{
-			source.Reply(CHAN_X_NOT_REGISTERED, target.c_str());
+			source.Reply(_("Channel \002{0}\002 isn't registered."), target);
 			return;
 		}
 
 		if (ci == target_ci)
 		{
-			source.Reply(_("Cannot clone channel \002%s\002 to itself!"), target.c_str());
+			source.Reply(_("Cannot clone channel \002{0}\002 to itself!"), ci->name);
 			return;
 		}
 
@@ -61,7 +61,7 @@ public:
 		{
 			if (!source.HasPriv("chanserv/administration"))
 			{
-				source.Reply(ACCESS_DENIED);
+				source.Reply(_("Access denied. You do not have the privilege \002{0}\002 on \002{1}\002 and \002{2}\002."), "FOUNDER", ci->name, target_ci->name);
 				return;
 			}
 			else
@@ -104,7 +104,7 @@ public:
 
 			Event::OnChanRegistered(&Event::ChanRegistered::OnChanRegistered, target_ci);
 
-			source.Reply(_("All settings from \002%s\002 have been cloned to \002%s\002."), channel.c_str(), target.c_str());
+			source.Reply(_("All settings from \002{0}\002 have been cloned to \002{0}\002."), channel, target);
 		}
 		else if (what.equals_ci("ACCESS"))
 		{
@@ -140,7 +140,7 @@ public:
 				++count;
 			}
 
-			source.Reply(_("%d access entries from \002%s\002 have been cloned to \002%s\002."), count, channel.c_str(), target.c_str());
+			source.Reply(_("\002{0}\002 access entries from \002{1}\002 have been cloned to \002{2}\002."), count, channel, target);
 		}
 		else if (what.equals_ci("AKICK"))
 		{
@@ -154,7 +154,7 @@ public:
 					target_ci->AddAkick(ak->creator, ak->mask, ak->reason, ak->addtime, ak->last_used);
 			}
 
-			source.Reply(_("All akick entries from \002%s\002 have been cloned to \002%s\002."), channel.c_str(), target.c_str());
+			source.Reply(_("All auto kick entries from \002{0}\002 have been cloned to \002{1}\002."), channel, target);
 		}
 		else if (what.equals_ci("BADWORDS"))
 		{
@@ -163,7 +163,7 @@ public:
 
 			if (!target_badwords || !badwords)
 			{
-				source.Reply(ACCESS_DENIED); // BotServ doesn't exist/badwords isn't loaded
+				source.Reply(_("All badword entries from \002{0}\002 have been cloned to \002{1}\002."), channel, target); // BotServ doesn't exist/badwords isn't loaded
 				return;
 			}
 
@@ -178,7 +178,7 @@ public:
 			badwords->Check();
 			target_badwords->Check();
 
-			source.Reply(_("All badword entries from \002%s\002 have been cloned to \002%s\002."), channel.c_str(), target.c_str());
+			source.Reply(_("All badword entries from \002{0}\002 have been cloned to \002{1}\002."), channel, target);
 		}
 		else
 		{
@@ -191,12 +191,10 @@ public:
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("Copies all settings, access, akicks, etc from \002channel\002 to the\n"
-				"\002target\002 channel. If \037what\037 is \002ACCESS\002, \002AKICK\002, or \002BADWORDS\002\n"
-				"then only the respective settings are cloned.\n"
-				"You must be the founder of \037channel\037 and \037target\037."));
+		source.Reply(_("Copies all settings, access, akicks, etc. from \037channel\037 to the \037target\037 channel."
+		               " If \037what\037 is \002ACCESS\002, \002AKICK\002, or \002BADWORDS\002 then only the respective settings are cloned.\n"
+		               "\n"
+		               "You must be the founder of \037channel\037 and \037target\037."));
 		return true;
 	}
 };

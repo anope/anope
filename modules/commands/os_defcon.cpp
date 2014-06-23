@@ -156,9 +156,9 @@ class CommandOSDefcon : public Command
 		if (DConfig.Check(DEFCON_NO_MLOCK_CHANGE))
 			source.Reply(_("* No mode lock changes"));
 		if (DConfig.Check(DEFCON_FORCE_CHAN_MODES) && !DConfig.chanmodes.empty())
-			source.Reply(_("* Force channel modes (%s) to be set on all channels"), DConfig.chanmodes.c_str());
+			source.Reply(_("* Force channel modes (\002{0}\002) to be set on all channels"), DConfig.chanmodes);
 		if (DConfig.Check(DEFCON_REDUCE_SESSION))
-			source.Reply(_("* Use the reduced session limit of %d"), DConfig.sessionlimit);
+			source.Reply(_("* Use the reduced session limit of \002{0}\002"), DConfig.sessionlimit);
 		if (DConfig.Check(DEFCON_NO_NEW_CLIENTS))
 			source.Reply(_("* Kill any new clients connecting"));
 		if (DConfig.Check(DEFCON_OPER_ONLY))
@@ -186,7 +186,7 @@ class CommandOSDefcon : public Command
 
 		if (lvl.empty())
 		{
-			source.Reply(_("Services are now at DEFCON \002%d\002."), DConfig.defaultlevel);
+			source.Reply(_("Services are now at defcon \002{0}\002."), DConfig.defaultlevel);
 			this->SendLevels(source);
 			return;
 		}
@@ -213,7 +213,7 @@ class CommandOSDefcon : public Command
 		if (DConfig.timeout)
 			timeout = new DefConTimeout(this->ondefconlevel, this->module, 5);
 
-		source.Reply(_("Services are now at DEFCON \002%d\002."), DConfig.defaultlevel);
+		source.Reply(_("Services are now at defcon \002{0}\002."), DConfig.defaultlevel);
 		this->SendLevels(source);
 		Log(LOG_ADMIN, source, this) << "to change defcon level to " << newLevel;
 
@@ -225,7 +225,7 @@ class CommandOSDefcon : public Command
 				Global::service->SendGlobal(NULL, "", DConfig.offmessage);
 			else if (DConfig.defaultlevel != 5)
 			{
-				Global::service->SendGlobal(NULL, "", Anope::printf(_("The Defcon level is now at: \002%d\002"), DConfig.defaultlevel));
+				Global::service->SendGlobal(NULL, "", Anope::printf(_("The defcon level is now at \002%d\002"), DConfig.defaultlevel));
 				if (!DConfig.message.empty())
 					Global::service->SendGlobal(NULL, "", DConfig.message);
 			}
@@ -238,11 +238,8 @@ class CommandOSDefcon : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("The defcon system can be used to implement a pre-defined\n"
-				"set of restrictions to services useful during an attempted\n"
-				"attack on the network."));
+		source.Reply(_("The defcon system can be used to implement a pre-defined set of restrictions to services useful during an attempted attack on the network."));
+		// XXX actually explain what this does
 		return true;
 	}
 };
@@ -468,7 +465,7 @@ class OSDefcon : public Module
 		{
 			if (DConfig.Check(DEFCON_NO_NEW_NICKS))
 			{
-				source.Reply(_("Services are in DefCon mode, please try again later."));
+				source.Reply(_("Services are in defcon mode, please try again later."));
 				return EVENT_STOP;
 			}
 		}
@@ -476,7 +473,7 @@ class OSDefcon : public Module
 		{
 			if (DConfig.Check(DEFCON_NO_MLOCK_CHANGE))
 			{
-				source.Reply(_("Services are in DefCon mode, please try again later."));
+				source.Reply(_("Services are in defcon mode, please try again later."));
 				return EVENT_STOP;
 			}
 		}
@@ -484,7 +481,7 @@ class OSDefcon : public Module
 		{
 			if (DConfig.Check(DEFCON_NO_NEW_CHANNELS))
 			{
-				source.Reply(_("Services are in DefCon mode, please try again later."));
+				source.Reply(_("Services are in defcon mode, please try again later."));
 				return EVENT_STOP;
 			}
 		}
@@ -492,7 +489,7 @@ class OSDefcon : public Module
 		{
 			if (DConfig.Check(DEFCON_NO_NEW_MEMOS))
 			{
-				source.Reply(_("Services are in DefCon mode, please try again later."));
+				source.Reply(_("Services are in defcon mode, please try again later."));
 				return EVENT_STOP;
 			}
 		}

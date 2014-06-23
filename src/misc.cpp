@@ -371,7 +371,7 @@ Anope::string Anope::strftime(time_t t, const NickServ::Account *nc, bool short_
 Anope::string Anope::Expires(time_t expires, const NickServ::Account *nc)
 {
 	if (!expires)
-		return Language::Translate(nc, NO_EXPIRE);
+		return Language::Translate(nc, _("does not expire"));
 	else if (expires <= Anope::CurTime)
 		return Language::Translate(nc, _("expires momentarily"));
 	else

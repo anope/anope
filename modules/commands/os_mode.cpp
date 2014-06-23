@@ -28,7 +28,7 @@ class CommandOSMode : public Command
 
 		Channel *c = Channel::Find(target);
 		if (!c)
-			source.Reply(CHAN_X_NOT_IN_USE, target.c_str());
+			source.Reply(_("Channel \002{0}\002 doesn't exist."), target);
 		else if (c->bouncy_modes)
 			source.Reply(_("Services is unable to change modes. Are your servers' U:lines configured correctly?"));
 		else if (modes.equals_ci("CLEAR"))
@@ -52,10 +52,10 @@ class CommandOSMode : public Command
 						c->RemoveMode(c->ci->WhoSends(), ModeManager::FindChannelModeByChar(uc->status.Modes()[i - 1]), uc->user->GetUID(), false);
 				}
 
-				source.Reply(_("All modes cleared on %s."), c->name.c_str());
+				source.Reply(_("All modes cleared on \002{0}\002."), c->name);
 			}
 			else
-				source.Reply(_("Non-status modes cleared on %s."), c->name.c_str());
+				source.Reply(_("Non-status modes cleared on \002{0}\002."), c->name);
 		}
 		else
 		{
@@ -122,10 +122,7 @@ class CommandOSMode : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("Allows Services Operators to change modes for any channel.\n"
-				"Parameters are the same as for the standard /MODE command.\n"
+		source.Reply(_("Allows Services Operators to change modes for any channel. Parameters are the same as for the standard /MODE command.\n"
 				"Alternatively, CLEAR may be given to clear all modes on the channel.\n"
 				"If CLEAR ALL is given then all modes, including user status, is removed."));
 		return true;
@@ -148,13 +145,13 @@ class CommandOSUMode : public Command
 
 		User *u2 = User::Find(target, true);
 		if (!u2)
-			source.Reply(NICK_X_NOT_IN_USE, target.c_str());
+			source.Reply(_("\002{0}\002 isn't currently online."), target);
 		else
 		{
 			u2->SetModes(source.service, "%s", modes.c_str());
-			source.Reply(_("Changed usermodes of \002%s\002 to %s."), u2->nick.c_str(), modes.c_str());
+			source.Reply(_("Changed usermodes of \002{0}\002 to \002{1}\002."), u2->nick.c_str(), modes.c_str());
 
-			u2->SendMessage(*source.service, _("\002%s\002 changed your usermodes to %s."), source.GetNick().c_str(), modes.c_str());
+			u2->SendMessage(*source.service, _("\002{0}\002 changed your usermodes to \002{1}\002."), source.GetNick(), modes);
 
 			Log(LOG_ADMIN, source, this) << modes << " on " << target;
 		}
@@ -162,10 +159,7 @@ class CommandOSUMode : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("Allows Services Operators to change modes for any user.\n"
-				"Parameters are the same as for the standard /MODE command."));
+		source.Reply(_("Allows Services Operators to change modes for any user. Parameters are the same as for the standard /MODE command."));
 		return true;
 	}
 };

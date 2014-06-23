@@ -26,11 +26,11 @@ class AkillDelCallback : public NumberList
 	~AkillDelCallback()
 	{
 		if (!deleted)
-			source.Reply(_("No matching entries on the AKILL list."));
+			source.Reply(_("No matching entries on the akill list."));
 		else if (deleted == 1)
-			source.Reply(_("Deleted 1 entry from the AKILL list."));
+			source.Reply(_("Deleted \0021\002 entry from the akill list."));
 		else
-			source.Reply(_("Deleted %d entries from the AKILL list."), deleted);
+			source.Reply(_("Deleted \002{0}\002 entries from the akill list."), deleted);
 	}
 
 	void HandleNumber(unsigned number) override
@@ -86,7 +86,7 @@ class CommandOSAKill : public Command
 		/* Do not allow less than a minute expiry time */
 		if (expires && expires < 60)
 		{
-			source.Reply(BAD_EXPIRY_TIME);
+			source.Reply(_("Invalid expiry time \002{0}\002."), expiry);
 			return;
 		}
 		else if (expires > 0)
@@ -148,7 +148,7 @@ class CommandOSAKill : public Command
 			return;
 		else if (mask.find_first_not_of("/~@.*?") == Anope::string::npos)
 		{
-			source.Reply(USERHOST_MASK_TOO_WIDE, mask.c_str());
+			source.Reply(_("\002{0}\002 coverage is too wide; Please use a more specific mask."), mask);
 			return;
 		}
 
@@ -167,7 +167,7 @@ class CommandOSAKill : public Command
 
 		if (percent > 95)
 		{
-			source.Reply(USERHOST_MASK_TOO_WIDE, mask.c_str());
+			source.Reply(_("\002{0}\002 coverage is too wide; Please use a more specific mask."), mask);
 			Log(LOG_ADMIN, source, this) << "tried to akill " << percent << "% of the network (" << affected << " users)";
 			delete x;
 			return;
@@ -185,11 +185,11 @@ class CommandOSAKill : public Command
 		if (Config->GetModule("operserv")->Get<bool>("akillonadd"))
 			akills->Send(NULL, x);
 
-		source.Reply(_("\002%s\002 added to the AKILL list."), mask.c_str());
+		source.Reply(_("\002{0}\002 added to the akill list."), mask);
 
 		Log(LOG_ADMIN, source, this) << "on " << mask << " (" << x->reason << "), expires in " << (expires ? Anope::Duration(expires - Anope::CurTime) : "never") << " [affects " << affected << " user(s) (" << percent << "%)]";
 		if (Anope::ReadOnly)
-			source.Reply(READ_ONLY_MODE);
+			source.Reply(_("Services are in read-only mode. Any changes made may not persist."));
 	}
 
 	void DoDel(CommandSource &source, const std::vector<Anope::string> &params)
@@ -204,7 +204,7 @@ class CommandOSAKill : public Command
 
 		if (akills->GetList().empty())
 		{
-			source.Reply(_("AKILL list is empty."));
+			source.Reply(_("The akill list is empty."));
 			return;
 		}
 
@@ -219,7 +219,7 @@ class CommandOSAKill : public Command
 
 			if (!x)
 			{
-				source.Reply(_("\002%s\002 not found on the AKILL list."), mask.c_str());
+				source.Reply(_("\002{0}\002 was not found on the akill list."), mask);
 				return;
 			}
 
@@ -228,7 +228,7 @@ class CommandOSAKill : public Command
 				Event::OnDelXLine(&Event::DelXLine::OnDelXLine, source, x, akills);
 
 				Log(LOG_ADMIN, source, this) << "to remove " << x->mask << " from the list";
-				source.Reply(_("\002%s\002 deleted from the AKILL list."), x->mask.c_str());
+				source.Reply(_("\002{0}\002 deleted from the akill list."), x->mask);
 				AkillDelCallback::DoDel(source, x);
 			}
 			while ((x = akills->HasEntry(mask)));
@@ -236,9 +236,7 @@ class CommandOSAKill : public Command
 		}
 
 		if (Anope::ReadOnly)
-			source.Reply(READ_ONLY_MODE);
-
-		return;
+			source.Reply(_("Services are in read-only mode. Any changes made may not persist."));
 	}
 
 	void ProcessList(CommandSource &source, const std::vector<Anope::string> &params, ListFormatter &list)
@@ -300,10 +298,10 @@ class CommandOSAKill : public Command
 		}
 
 		if (list.IsEmpty())
-			source.Reply(_("No matching entries on the AKILL list."));
+			source.Reply(_("There are no matching entries on the akill list."));
 		else
 		{
-			source.Reply(_("Current AKILL list:"));
+			source.Reply(_("Current akill list:"));
 
 			std::vector<Anope::string> replies;
 			list.Process(replies);
@@ -311,7 +309,7 @@ class CommandOSAKill : public Command
 			for (unsigned i = 0; i < replies.size(); ++i)
 				source.Reply(replies[i]);
 
-			source.Reply(_("End of AKILL list."));
+			source.Reply(_("End of akill list."));
 		}
 	}
 
@@ -319,7 +317,7 @@ class CommandOSAKill : public Command
 	{
 		if (akills->GetList().empty())
 		{
-			source.Reply(_("AKILL list is empty."));
+			source.Reply(_("The akill list is empty."));
 			return;
 		}
 
@@ -333,7 +331,7 @@ class CommandOSAKill : public Command
 	{
 		if (akills->GetList().empty())
 		{
-			source.Reply(_("AKILL list is empty."));
+			source.Reply(_("The akill list is empty."));
 			return;
 		}
 
@@ -354,10 +352,10 @@ class CommandOSAKill : public Command
 		}
 
 		Log(LOG_ADMIN, source, this) << "to CLEAR the list";
-		source.Reply(_("The AKILL list has been cleared."));
+		source.Reply(_("The akill list has been cleared."));
 
 		if (Anope::ReadOnly)
-			source.Reply(READ_ONLY_MODE);
+			source.Reply(_("Services are in read-only mode. Any changes made may not persist."));
 	}
  public:
 	CommandOSAKill(Module *creator) : Command(creator, "operserv/akill", 1, 2)
@@ -389,61 +387,65 @@ class CommandOSAKill : public Command
 			return this->DoClear(source);
 		else
 			this->OnSyntaxError(source, "");
-
-		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("Allows Services Operators to manipulate the AKILL list. If\n"
-				"a user matching an AKILL mask attempts to connect, Services\n"
-				"will issue a KILL for that user and, on supported server\n"
-				"types, will instruct all servers to add a ban for the mask\n"
-				"which the user matched.\n"
-				" \n"
-				"\002AKILL ADD\002 adds the given mask to the AKILL\n"
-				"list for the given reason, which \002must\002 be given.\n"
-				"Mask should be in the format of nick!user@host#real name,\n"
-				"though all that is required is user@host. If a real name is specified,\n"
-				"the reason must be prepended with a :.\n"
-				"\037expiry\037 is specified as an integer followed by one of \037d\037\n"
-				"(days), \037h\037 (hours), or \037m\037 (minutes). Combinations (such as\n"
-				"\0371h30m\037) are not permitted. If a unit specifier is not\n"
-				"included, the default is days (so \037+30\037 by itself means 30\n"
-				"days). To add an AKILL which does not expire, use \037+0\037. If the\n"
-				"usermask to be added starts with a \037+\037, an expiry time must\n"
-				"be given, even if it is the same as the default. The\n"
-				"current AKILL default expiry time can be found with the\n"
-				"\002STATS AKILL\002 command."));
-		const Anope::string &regexengine = Config->GetBlock("options")->Get<const Anope::string>("regexengine");
-		if (!regexengine.empty())
+		if (subcommand.equals_ci("ADD"))
 		{
-			source.Reply(" ");
-			source.Reply(_("Regex matches are also supported using the %s engine.\n"
-					"Enclose your mask in // if this is desired."), regexengine.c_str());
+			source.Reply(_("The \002{0} ADD\002 command adds \037mask\037 to the auto kill list with the given \037reason\037."
+			               "\037mask\037 can be in the format of nickname!username@hostname#realname."
+			               " If a real name is specified, the reason must be prefixed with a :."
+			               " \037expiry\037 is optional, and if specified must be an integer followed by one of \037d\037 (days), \037h\037 (hours), or \037m\037 (minutes)."
+			               " If a unit specifier is not included, the default is days, so \037+30\037 means 30 days."
+			               " To add an auto kill which does not expire, use \037+0\037. "
+			               " The default auto kill expiry time is \002{1}\002"),
+			               source.command, Anope::Duration(Config->GetModule("operserv")->Get<time_t>("autokillexpiry", "30d"), source.GetAccount()));
+
+			const Anope::string &regexengine = Config->GetBlock("options")->Get<const Anope::string>("regexengine");
+			if (!regexengine.empty())
+			{
+				source.Reply(" ");
+				source.Reply(_("Regex matches are also supported using the %s engine. Enclose your mask in // if this is desired."), regexengine);
+			}
 		}
-		source.Reply(_(
-				" \n"
-				"The \002AKILL DEL\002 command removes the given mask from the\n"
-				"AKILL list if it is present.  If a list of entry numbers is\n"
-				"given, those entries are deleted.  (See the example for LIST\n"
-				"below.)\n"
-				" \n"
-				"The \002AKILL LIST\002 command displays the AKILL list.\n"
-				"If a wildcard mask is given, only those entries matching the\n"
-				"mask are displayed.  If a list of entry numbers is given,\n"
-				"only those entries are shown; for example:\n"
-				"   \002AKILL LIST 2-5,7-9\002\n"
-				"      Lists AKILL entries numbered 2 through 5 and 7\n"
-				"      through 9.\n"
-				"      \n"
-				"\002AKILL VIEW\002 is a more verbose version of \002AKILL LIST\002, and\n"
-				"will show who added an AKILL, the date it was added, and when\n"
-				"it expires, as well as the user@host/ip mask and reason.\n"
-				" \n"
-				"\002AKILL CLEAR\002 clears all entries of the AKILL list."));
+		else if (subcommand.equals_ci("DEL"))
+			source.Reply(_("The \002{0} DEL\002 command removes the given \037mask\037 from the auto kill list, if present."
+			               " If a list of entry numbers is given, those entries are deleted."),
+			               source.command);
+		else if (subcommand.equals_ci("LIST") || subcommand.equals_ci("VIEW"))
+			source.Reply(_("The \002{0} LIST\002 and \002{0} VIEW\002 commands display the auto kill list."
+			               " If a wildcard \037mask\037 is given, only those entries matching the mask are displayed."
+			               " If a list of entry numbers is given, only those entries are shown."
+			               " \002VIEW\002 is similar to \002LIST\002 but also shows who created the auto kill, when it was created, and when it expires.\n"
+			               "\n"
+			               "Example:\n"
+			               "\n"
+			               "         {0} LIST 2-5,7-9\n"
+			               "         Lists auto kill entries numbered 2 through 5 and 7 through 9."),
+			               source.command);
+		else if (subcommand.equals_ci("CLEAR"))
+			source.Reply(_("The \002{0} CLEAR\002 command removes all auto kills from the auto kill list."),
+			               source.command);
+		else
+		{
+			CommandInfo *help = source.service->FindCommand("generic/help");
+			source.Reply(_("Allows manipulating the AKILL list."
+			               " If a user matching an AKILL mask connects, services will issue a kill the user and prevent them from reconnecting.\n"
+			               "\n"
+			               "The \002ADD\002 command adds \037mask\037 to the auto kill list.\n"
+			               "\002{msg}{service} {help} {command} ADD\002 for more information.\n"
+			               "\n"
+			               "The \002DEL\002 command removes \037mask\037 from the auto kill list.\n"
+			               "\002{msg}{service} {help} {command} DEL\002 for more information.\n"
+			               "\n"
+			               "The \002LIST\002 and \002VIEW\002 commands both show the auto kill list, but \002VIEW\002 also shows who created the auto kill entry, when it was created, and when it expires.\n"
+			               "\002{msg}{service} {help} {command} [LIST | VIEW]\002 for more information.\n"
+			               "\n"
+			               "The \002CLEAR\002 command clears th auto kill list."
+			               "\002{msg}{service} {help} {command} CLEAR\002 for more information.\n"),
+			               "msg"_kw = Config->StrictPrivmsg, "service"_kw = source.service->nick, "help"_kw = help->cname, "command"_kw = source.command);
+		}
 		return true;
 	}
 };

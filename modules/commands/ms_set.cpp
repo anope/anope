@@ -27,19 +27,19 @@ class CommandMSSet : public Command
 		{
 			nc->Extend<bool>("MEMO_SIGNON");
 			nc->Extend<bool>("MEMO_RECEIVE");
-			source.Reply(_("%s will now notify you of memos when you log on and when they are sent to you."), MemoServ->nick.c_str());
+			source.Reply(_("\002{0}\002 will now notify you of memos when you log on and when they are sent to you."), MemoServ->nick);
 		}
 		else if (param.equals_ci("LOGON"))
 		{
 			nc->Extend<bool>("MEMO_SIGNON");
 			nc->Shrink<bool>("MEMO_RECEIVE");
-			source.Reply(_("%s will now notify you of memos when you log on or unset /AWAY."), MemoServ->nick.c_str());
+			source.Reply(_("\002{0}\002 will now notify you of memos when you log on or unset /AWAY."), MemoServ->nick);
 		}
 		else if (param.equals_ci("NEW"))
 		{
 			nc->Shrink<bool>("MEMO_SIGNON");
 			nc->Extend<bool>("MEMO_RECEIVE");
-			source.Reply(_("%s will now notify you of memos when they are sent to you."), MemoServ->nick.c_str());
+			source.Reply(_("\002{0}\002 will now notify you of memos when they are sent to you."), MemoServ->nick);
 		}
 		else if (param.equals_ci("MAIL"))
 		{
@@ -61,7 +61,7 @@ class CommandMSSet : public Command
 			nc->Shrink<bool>("MEMO_SIGNON");
 			nc->Shrink<bool>("MEMO_RECEIVE");
 			nc->Shrink<bool>("MEMO_MAIL");
-			source.Reply(_("%s will not send you any notification of memos."), MemoServ->nick.c_str());
+			source.Reply(_("\002{0}\002 will not send you any notification of memos."), MemoServ->nick);
 		}
 		else
 			this->OnSyntaxError(source, "");
@@ -89,12 +89,13 @@ class CommandMSSet : public Command
 			ci = ChanServ::Find(chan);
 			if (!ci)
 			{
-				source.Reply(CHAN_X_NOT_REGISTERED, chan.c_str());
+				source.Reply(_("Channel \002{0}\002 isn't registered."), chan);
 				return;
 			}
-			else if (!is_servadmin && !source.AccessFor(ci).HasPriv("MEMO"))
+
+			if (!is_servadmin && !source.AccessFor(ci).HasPriv("MEMO"))
 			{
-				source.Reply(ACCESS_DENIED);
+				source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "MEMO", ci->name);
 				return;
 			}
 			mi = ci->memos;
@@ -106,7 +107,7 @@ class CommandMSSet : public Command
 				const NickServ::Nick *na;
 				if (!(na = NickServ::FindNick(p1)))
 				{
-					source.Reply(NICK_X_NOT_REGISTERED, p1.c_str());
+					source.Reply(_("\002{0}\002 isn't registered."), p1);
 					return;
 				}
 				user = p1;
@@ -150,7 +151,7 @@ class CommandMSSet : public Command
 			}
 			if (!chan.empty() && ci->HasExt("MEMO_HARDMAX"))
 			{
-				source.Reply(_("The memo limit for %s may not be changed."), chan.c_str());
+				source.Reply(_("The memo limit for \002{0}\002 may not be changed."), chan);
 				return;
 			}
 			else if (chan.empty() && nc->HasExt("MEMO_HARDMAX"))
@@ -170,9 +171,9 @@ class CommandMSSet : public Command
 			if (limit < 0 || (max_memos > 0 && limit > max_memos))
 			{
 				if (!chan.empty())
-					source.Reply(_("You cannot set the memo limit for %s higher than %d."), chan.c_str(), max_memos);
+					source.Reply(_("You cannot set the memo limit for \002{0}\002 higher than \002{1}\002."), chan, max_memos);
 				else
-					source.Reply(_("You cannot set your memo limit higher than %d."), max_memos);
+					source.Reply(_("You cannot set your memo limit higher than \002{0}\002."), max_memos);
 				return;
 			}
 		}
@@ -180,25 +181,24 @@ class CommandMSSet : public Command
 		if (limit > 0)
 		{
 			if (chan.empty() && nc == source.nc)
-				source.Reply(_("Your memo limit has been set to \002%d\002."), limit);
+				source.Reply(_("Your memo limit has been set to \002{0}\002."), limit);
 			else
-				source.Reply(_("Memo limit for %s set to \002%d\002."), !chan.empty() ? chan.c_str() : user.c_str(), limit);
+				source.Reply(_("Memo limit for \002{0}\002 set to \002{1}\002."), !chan.empty() ? chan : user, limit);
 		}
 		else if (!limit)
 		{
 			if (chan.empty() && nc == source.nc)
 				source.Reply(_("You will no longer be able to receive memos."));
 			else
-				source.Reply(_("Memo limit for %s set to \0020\002."), !chan.empty() ? chan.c_str() : user.c_str());
+				source.Reply(_("Memo limit for \002{0}\002 set to \0020\002."), !chan.empty() ? chan : user);
 		}
 		else
 		{
 			if (chan.empty() && nc == source.nc)
 				source.Reply(_("Your memo limit has been disabled."));
 			else
-				source.Reply(_("Memo limit \002disabled\002 for %s."), !chan.empty() ? chan.c_str() : user.c_str());
+				source.Reply(_("Memo limit \002disabled\002 for \002{0}\002."), !chan.empty() ? chan : user);
 		}
-		return;
 	}
  public:
 	CommandMSSet(Module *creator) : Command(creator, "memoserv/set", 2, 5)
@@ -226,66 +226,64 @@ class CommandMSSet : public Command
 	{
 		if (subcommand.empty())
 		{
-			this->SendSyntax(source);
-			source.Reply(" ");
-			source.Reply(_("Sets various memo options.  \037option\037 can be one of:\n"
-					" \n"
-					"    NOTIFY      Changes when you will be notified about\n"
-					"                   new memos (only for nicknames)\n"
-					"    LIMIT       Sets the maximum number of memos you can\n"
-					"                   receive\n"
-					" \n"
-					"Type \002%s%s HELP %s \037option\037\002 for more information\n"
-					"on a specific option."), Config->StrictPrivmsg.c_str(), source.service->nick.c_str(), source.command.c_str());
+			CommandInfo *help = source.service->FindCommand("generic/help");
+			if (!help)
+				return false;
+			source.Reply(_("Sets various memo options. \037option\037 can be one of:\n"
+			               "\n"
+			               "    NOTIFY      Changes when you will be notified about\n"
+			               "                new memos (only for nicknames)\n"
+			               "    LIMIT       Sets the maximum number of memos you can\n"
+			               "                receive\n"
+			               "\n"
+			               "Type \002{0}{1} {2} {3} \037option\037\002 for more information on a specific option."),
+			               Config->StrictPrivmsg, source.service->nick, help->cname, source.command);
 		}
 		else if (subcommand.equals_ci("NOTIFY"))
 			source.Reply(_("Syntax: \002NOTIFY {ON | LOGON | NEW | MAIL | NOMAIL | OFF}\002\n"
-					" \n"
-					"Changes when you will be notified about new memos:\n"
-					" \n"
-					"    ON      You will be notified of memos when you log on,\n"
-					"               when you unset /AWAY, and when they are sent\n"
-					"               to you.\n"
-					"    LOGON   You will only be notified of memos when you log\n"
-					"               on or when you unset /AWAY.\n"
-					"    NEW     You will only be notified of memos when they\n"
-					"               are sent to you.\n"
-					"    MAIL    You will be notified of memos by email aswell as\n"
-					"               any other settings you have.\n"
-					"    NOMAIL  You will not be notified of memos by email.\n"
-					"    OFF     You will not receive any notification of memos.\n"
-					" \n"
-					"\002ON\002 is essentially \002LOGON\002 and \002NEW\002 combined."));
+			               "\n"
+			               "Changes when you will be notified about new memos:\n"
+			               "\n"
+			               "    ON      You will be notified of memos when you log on,\n"
+			               "            when you unset /AWAY, and when they are sent\n"
+			               "            to you.\n"
+			               "\n"
+			               "    LOGON   You will only be notified of memos when you log\n"
+			               "            on or when you unset /AWAY.\n"
+			               "\n"
+			               "    NEW     You will only be notified of memos when they\n"
+			               "            are sent to you.\n"
+			               "\n"
+			               "    MAIL    You will be notified of memos by email aswell as\n"
+			               "            any other settings you have.\n"
+			               "\n"
+			               "    NOMAIL  You will not be notified of memos by email.\n"
+			               "\n"
+			               "    OFF     You will not receive any notification of memos.\n"
+			               "\n"
+			               "\002ON\002 is essentially \002LOGON\002 and \002NEW\002 combined."));
 		else if (subcommand.equals_ci("LIMIT"))
 		{
 			int max_memos = Config->GetModule("memoserv")->Get<int>("maxmemos");
 			if (source.IsServicesOper())
 				source.Reply(_("Syntax: \002LIMIT [\037user\037 | \037channel\037] {\037limit\037 | NONE} [HARD]\002\n"
-						" \n"
-						"Sets the maximum number of memos a user or channel is\n"
-						"allowed to have.  Setting the limit to 0 prevents the user\n"
-						"from receiving any memos; setting it to \002NONE\002 allows the\n"
-						"user to receive and keep as many memos as they want.  If\n"
-						"you do not give a nickname or channel, your own limit is\n"
-						"set.\n"
-						" \n"
-						"Adding \002HARD\002 prevents the user from changing the limit.  Not\n"
-						"adding \002HARD\002 has the opposite effect, allowing the user to\n"
-						"change the limit (even if a previous limit was set with\n"
-						"\002HARD\002).\n"
-						" \n"
-						"This use of the \002SET LIMIT\002 command is limited to \002Services\002\n"
-						"\002Operators\002.  Other users may only enter a limit for themselves\n"
-						"or a channel on which they have such privileges, may not\n"
-						"remove their limit, may not set a limit above %d, and may\n"
-						"not set a hard limit."), max_memos);
+				               "\n"
+				               "Sets the maximum number of memos a user or channel is allowed to have."
+				               "  Setting the limit to 0 prevents the user from receiving any memos; setting it to \002NONE\002 allows the user to receive and keep as many memos as they want."
+				               "  If you do not give a nickname or channel, your own limit is set.\n"
+				               "\n"
+				               "Adding \002HARD\002 prevents the user from changing the limit."
+				               " Not adding \002HARD\002 has the opposite effect, allowing the user to change the limit, even if a previous limit was set.\n"
+				               " \n"
+				               "This use of the \002{0} LIMIT\002 command is limited to \002Services Operators\002."
+				               " Other users may only enter a limit for themselves or a channel on which they have the \002MEMO\002 privilege on, may not remove their limit, may not set a limit above {1}, and may not set a hard limit."),
+				               source.command, max_memos);
 			else
 				source.Reply(_("Syntax: \002LIMIT [\037channel\037] \037limit\037\002\n"
-									" \n"
-									"Sets the maximum number of memos you (or the given channel)\n"
-									"are allowed to have. If you set this to 0, no one will be\n"
-									"able to send any memos to you.  However, you cannot set\n"
-									"this any higher than %d."), max_memos);
+				               "\n"
+				              "Sets the maximum number of memos you, or the given channel, are allowed to have."
+				              " If you set this to 0, no one will be able to send any memos to you."
+				              "However, you cannot set this any higher than {0}."), max_memos);
 		}
 		else
 			return false;

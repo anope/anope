@@ -164,11 +164,11 @@ class BadwordsDelCallback : public NumberList
 	~BadwordsDelCallback()
 	{
 		if (!deleted)
-			source.Reply(_("No matching entries on %s bad words list."), ci->name.c_str());
+			source.Reply(_("No matching entries on the bad word list of \002{0}\002."), ci->name);
 		else if (deleted == 1)
-			source.Reply(_("Deleted 1 entry from %s bad words list."), ci->name.c_str());
+			source.Reply(_("Deleted \0021\002 entry from bad word list of \002{0}\002."), ci->name);
 		else
-			source.Reply(_("Deleted %d entries from %s bad words list."), deleted, ci->name.c_str());
+			source.Reply(_("Deleted \002{0}\002 entries from the bad word list of \002{1}\002."), deleted, ci->name);
 	}
 
 	void HandleNumber(unsigned Number) override
@@ -196,10 +196,11 @@ class CommandBSBadwords : public Command
 
 		if (!bw || !bw->GetBadWordCount())
 		{
-			source.Reply(_("%s bad words list is empty."), ci->name.c_str());
+			source.Reply(_("The bad word list of \002{0}\002 is empty."), ci->name);
 			return;
 		}
-		else if (!word.empty() && word.find_first_not_of("1234567890,-") == Anope::string::npos)
+
+		if (!word.empty() && word.find_first_not_of("1234567890,-") == Anope::string::npos)
 		{
 			class BadwordsListCallback : public NumberList
 			{
@@ -244,13 +245,13 @@ class CommandBSBadwords : public Command
 		}
 
 		if (list.IsEmpty())
-			source.Reply(_("No matching entries on %s bad words list."), ci->name.c_str());
+			source.Reply(_("No matching entries on the bad word list of \002{0}\002."), ci->name);
 		else
 		{
 			std::vector<Anope::string> replies;
 			list.Process(replies);
 
-			source.Reply(_("Bad words list for %s:"), ci->name.c_str());
+			source.Reply(_("Bad words list for \002{0}\002:"), ci->name);
 
 			for (unsigned i = 0; i < replies.size(); ++i)
 				source.Reply(replies[i]);
@@ -284,7 +285,7 @@ class CommandBSBadwords : public Command
 		unsigned badwordsmax = Config->GetModule(this->module)->Get<unsigned>("badwordsmax");
 		if (badwords->GetBadWordCount() >= badwordsmax)
 		{
-			source.Reply(_("Sorry, you can only have %d bad words entries on a channel."), badwordsmax);
+			source.Reply(_("Sorry, you can only have \002{0}\002 bad words entries on a channel."), badwordsmax);
 			return;
 		}
 
@@ -296,7 +297,7 @@ class CommandBSBadwords : public Command
 
 			if ((casesensitive && realword.equals_cs(bw->word)) || (!casesensitive && realword.equals_ci(bw->word)))
 			{
-				source.Reply(_("\002%s\002 already exists in %s bad words list."), bw->word.c_str(), ci->name.c_str());
+				source.Reply(_("\002{0}\002 already exists in \002{1}\002 bad words list."), bw->word, ci->name);
 				return;
 			}
 		}
@@ -305,7 +306,7 @@ class CommandBSBadwords : public Command
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "ADD " << realword;
 		badwords->AddBadWord(realword, bwtype);
 
-		source.Reply(_("\002%s\002 added to %s bad words list."), realword.c_str(), ci->name.c_str());
+		source.Reply(_("\002{0}\002 added to \002{1}\002 bad words list."), realword, ci->name);
 	}
 
 	void DoDelete(CommandSource &source, ChanServ::Channel *ci, const Anope::string &word)
@@ -314,7 +315,7 @@ class CommandBSBadwords : public Command
 
 		if (!badwords || !badwords->GetBadWordCount())
 		{
-			source.Reply(_("%s bad words list is empty."), ci->name.c_str());
+			source.Reply(_("Bad word list for \002{0}\002 is empty."), ci->name);
 			return;
 		}
 
@@ -339,14 +340,14 @@ class CommandBSBadwords : public Command
 
 			if (i == end)
 			{
-				source.Reply(_("\002%s\002 not found on %s bad words list."), word.c_str(), ci->name.c_str());
+				source.Reply(_("\002{0}\002 was not found on the bad word list of \002{1}\002."), word, ci->name);
 				return;
 			}
 
 			bool override = !source.AccessFor(ci).HasPriv("BADWORDS");
 			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "DEL " << badword->word;
 
-			source.Reply(_("\002%s\002 deleted from %s bad words list."), badword->word.c_str(), ci->name.c_str());
+			source.Reply(_("\002{0}\002 deleted from \002{1}\002 bad words list."), badword->word, ci->name);
 
 			badwords->EraseBadWord(i);
 		}
@@ -377,6 +378,7 @@ class CommandBSBadwords : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
+		const Anope::string &chan = params[0];
 		const Anope::string &cmd = params[1];
 		const Anope::string &word = params.size() > 2 ? params[2] : "";
 		bool need_args = cmd.equals_ci("LIST") || cmd.equals_ci("CLEAR");
@@ -387,16 +389,16 @@ class CommandBSBadwords : public Command
 			return;
 		}
 
-		ChanServ::Channel *ci = ChanServ::Find(params[0]);
+		ChanServ::Channel *ci = ChanServ::Find(chan);
 		if (ci == NULL)
 		{
-			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
+			source.Reply(_("Channel \002{0}\002 isn't registered."), chan);
 			return;
 		}
 
 		if (!source.AccessFor(ci).HasPriv("BADWORDS") && (!need_args || !source.HasPriv("botserv/administration")))
 		{
-			source.Reply(ACCESS_DENIED);
+			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "BADWORDS", ci->name);
 			return;
 		}
 
@@ -407,49 +409,91 @@ class CommandBSBadwords : public Command
 		}
 
 		if (cmd.equals_ci("ADD"))
-			return this->DoAdd(source, ci, word);
+			this->DoAdd(source, ci, word);
 		else if (cmd.equals_ci("DEL"))
-			return this->DoDelete(source, ci, word);
+			this->DoDelete(source, ci, word);
 		else if (cmd.equals_ci("LIST"))
-			return this->DoList(source, ci, word);
+			this->DoList(source, ci, word);
 		else if (cmd.equals_ci("CLEAR"))
-			return this->DoClear(source, ci);
+			this->DoClear(source, ci);
 		else
 			this->OnSyntaxError(source, "");
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("Maintains the \002bad words list\002 for a channel. The bad\n"
-				"words list determines which words are to be kicked\n"
-				"when the bad words kicker is enabled. For more information,\n"
-				"type \002%s%s HELP KICK %s\002.\n"
-				" \n"
-				"The \002ADD\002 command adds the given word to the\n"
-				"bad words list. If SINGLE is specified, a kick will be\n"
-				"done only if a user says the entire word. If START is\n"
-				"specified, a kick will be done if a user says a word\n"
-				"that starts with \037word\037. If END is specified, a kick\n"
-				"will be done if a user says a word that ends with\n"
-				"\037word\037. If you don't specify anything, a kick will\n"
-				"be issued every time \037word\037 is said by a user.\n"
-				" \n"), Config->StrictPrivmsg.c_str(), source.service->nick.c_str(), source.command.c_str());
-		source.Reply(_("The \002DEL\002 command removes the given word from the\n"
-				"bad words list.  If a list of entry numbers is given, those\n"
-				"entries are deleted.  (See the example for LIST below.)\n"
-				" \n"
-				"The \002LIST\002 command displays the bad words list.  If\n"
-				"a wildcard mask is given, only those entries matching the\n"
-				"mask are displayed.  If a list of entry numbers is given,\n"
-				"only those entries are shown; for example:\n"
-				"   \002#channel LIST 2-5,7-9\002\n"
-				"      Lists bad words entries numbered 2 through 5 and\n"
-				"      7 through 9.\n"
-				" \n"
-				"The \002CLEAR\002 command clears all entries of the\n"
-				"bad words list."));
+		if (subcommand.equals_ci("ADD"))
+		{
+			source.Reply(_("Adds \037word\037 to the bad words list for \037channel\037. If \002SINGLE\002 is specified then the user must say the enire word for it to be considered a match."
+			               " If \002START\002 is specified then the user only must say a word that starts with \037word\037."
+			               " Likewise if \002END\002 is specified then the user must only say a word that ends with \037word\037."
+			               " If no argument is specified, then any word which contains \037word\037 will be considered a match.\n"
+			               "\n"
+			               "Examples:\n"
+			               "         {command} #anope ADD raw SINGLE\n"
+			               "         Adds the bad word \"raw\" to the bad word list of #anope."),
+			               "command"_kw = source.command);
+		}
+		else if (subcommand.equals_ci("DEL"))
+		{
+			source.Reply(_("Removes \037word\037 from the bad words list for \037channel\037. If a number or list of numbers is given, those entries are deleted.\n"
+			               "\n"
+			               "Examples:\n"
+			               "         {command} #anope DEL raw\n"
+			               "         Removes the bad word \"raw\" from the bad word list of #anope.\n"
+			               "\n"
+			               "         {command} #anope DEL 2-5,7-9\n"
+			               "         Removes bad words entries numbered 2 through 5 and 7 through 9 on #anope."),
+			               "command"_kw = source.command);
+
+		}
+		else if (subcommand.equals_ci("LIST"))
+		{
+			source.Reply(_("Lists the badwords for \037channel\037."
+			               " If a wildcard mask is given, only those entries matching the mask are displayed."
+			               " If a list of entry numbers is given, only those entries are shown.\n"
+			               "\n"
+			               "Examples:\n"
+			               "         {command} #anope LIST\n"
+			               "         Lists the bad words for #anope.\n"
+			               "\n"
+			               "         {command} #anope LIST 2-5,7-9\n"
+			               "         Lists bad words entries numbered 2 thorough 5 and 7 through 9 on #anope."),
+			               "command"_kw = source.command);
+		}
+		else if (subcommand.equals_ci("CLEAR"))
+		{
+			source.Reply(_("Clears the bad words for \037channel\037."
+			               "\n"
+			               "\n"
+			               "Example:\n"
+			               "         {command} #anope CLEAR\n"
+			               "         Clears the bad word list for #anope."),
+			               "command"_kw = source.command);
+		}
+		else
+		{
+			source.Reply(_("Maintains the bad words list for a channel."
+		                       " When a word on the bad words list is said, action may be taken against the offending user.\n"
+		                       "\n"
+		                       "Use of this command requires the \002{0}\002 privilege on \037channel\037."),
+			               "BADWORDS");
+
+			CommandInfo *help = source.service->FindCommand("generic/help");
+			if (help)
+				source.Reply(_("\n"
+				               "For help configuring the bad word kicker use \002{msg}{service} HELP KICK BADWORDS\002.\n"//XXX
+				               "\n"
+				               "The \002ADD\002 command adds \037word\037 to the badwords list.\n"
+				               "\002{msg}{service} {help} {command} ADD\002 for more information.\n"
+				               "\n"
+				               "The \002DEL\002 command removes \037word\037 from the badwords list.\n"
+				               "\002{msg}{service} {help} {command} DEL\002 for more information.\n"
+				               "\n"
+				               "The \002LIST\002 and \002CLEAR\002 commands show and clear the bad words list, respectively.\n"
+				               "\002{msg}{service} {help} {command} LIST\002 and \002{msg}{service} {help} {command} CLEAR\002 for more information.\n"),
+				               "msg"_kw = Config->StrictPrivmsg, "service"_kw = source.service->nick, "command"_kw = source.command, "help"_kw = help->cname);
+		}
 		return true;
 	}
 };

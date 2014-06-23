@@ -31,7 +31,7 @@ class MemoDelCallback : public NumberList
 			MemoServ::Event::OnMemoDel(&MemoServ::Event::MemoDel::OnMemoDel, ci ? ci->name : source.nc->display, mi, mi->GetMemo(number - 1));
 
 		mi->Del(number - 1);
-		source.Reply(_("Memo %d has been deleted."), number);
+		source.Reply(_("Memo \002{0}\002 has been deleted."), number);
 	}
 };
 
@@ -48,7 +48,7 @@ class CommandMSDel : public Command
 	{
 		if (Anope::ReadOnly)
 		{
-			source.Reply(READ_ONLY_MODE);
+			source.Reply(_("Services are in read-only mode."));
 			return;
 		}
 
@@ -64,26 +64,28 @@ class CommandMSDel : public Command
 			ci = ChanServ::Find(chan);
 			if (!ci)
 			{
-				source.Reply(CHAN_X_NOT_REGISTERED, chan.c_str());
+				source.Reply(_("Channel \002{0}\002 isn't registered."), chan);
 				return;
 			}
-			else if (!source.AccessFor(ci).HasPriv("MEMO"))
+
+			if (!source.AccessFor(ci).HasPriv("MEMO"))
 			{
-				source.Reply(ACCESS_DENIED);
+				source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "MEMO", ci->name);
 				return;
 			}
 			mi = ci->memos;
 		}
 		else
 			mi = source.nc->memos;
+
 		if (numstr.empty() || (!isdigit(numstr[0]) && !numstr.equals_ci("ALL") && !numstr.equals_ci("LAST")))
 			this->OnSyntaxError(source, numstr);
 		else if (!mi || mi->memos->empty())
 		{
 			if (!chan.empty())
-				source.Reply(MEMO_X_HAS_NO_MEMOS, chan.c_str());
+				source.Reply(_("\002{0}\002 has no memos."), chan);
 			else
-				source.Reply(MEMO_HAVE_NO_MEMOS);
+				source.Reply(_("You have no memos."));
 		}
 		else
 		{
@@ -98,7 +100,7 @@ class CommandMSDel : public Command
 				if (MemoServ::Event::OnMemoDel)
 					MemoServ::Event::OnMemoDel(&MemoServ::Event::MemoDel::OnMemoDel, ci ? ci->name : source.nc->display, mi, mi->GetMemo(mi->memos->size() - 1));
 				mi->Del(mi->memos->size() - 1);
-				source.Reply(_("Memo %d has been deleted."), mi->memos->size() + 1);
+				source.Reply(_("Memo \002{0}\002 has been deleted."), mi->memos->size() + 1);
 			}
 			else
 			{
@@ -110,32 +112,28 @@ class CommandMSDel : public Command
 					mi->Del(i - 1);
 				}
 				if (!chan.empty())
-					source.Reply(_("All memos for channel %s have been deleted."), chan.c_str());
+					source.Reply(_("All memos for channel \002{0}\002 have been deleted."), chan);
 				else
 					source.Reply(_("All of your memos have been deleted."));
 			}
 		}
-		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("Deletes the specified memo or memos. You can supply\n"
-				"multiple memo numbers or ranges of numbers instead of a\n"
-				"single number, as in the second example below.\n"
-				" \n"
-				"If \002LAST\002 is given, the last memo will be deleted.\n"
-				"If \002ALL\002 is given, deletes all of your memos.\n"
-				" \n"
-				"Examples:\n"
-				" \n"
-				"   \002DEL 1\002\n"
-				"      Deletes your first memo.\n"
-				" \n"
-				"   \002DEL 2-5,7-9\002\n"
-				"      Deletes memos numbered 2 through 5 and 7 through 9."));
+		source.Reply(_("Deletes the specified memo or memos."
+		               " You can supply multiple memo numbers or ranges of numbers instead of a single number, as in the second example below."
+		               " If \002LAST\002 is given, the last memo will be deleted."
+		               " If \002ALL\002 is given, deletes all of your memos.\n"
+		               "\n"
+		               "Examples:\n"
+		               "\n"
+		               "         {0} 1\n"
+		               "         Deletes your first memo.\n"
+		               "\n"
+		               "         {0} 2-5,7-9\n"
+		               "         Deletes memos numbered 2 through 5 and 7 through 9."),
+		               source.command);
 		return true;
 	}
 };

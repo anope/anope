@@ -29,20 +29,20 @@ class CommandCSInvite : public Command
 
 		if (!c)
 		{
-			source.Reply(CHAN_X_NOT_IN_USE, chan.c_str());
+			source.Reply(_("Channel \002{0}\002 doesn't exist."), chan);
 			return;
 		}
 
 		ChanServ::Channel *ci = c->ci;
 		if (!ci)
 		{
-			source.Reply(CHAN_X_NOT_REGISTERED, chan.c_str());
+			source.Reply(_("Channel \002{0}\002 isn't registered."), c->name);
 			return;
 		}
 
 		if (!source.AccessFor(ci).HasPriv("INVITE") && !source.HasCommand("chanserv/invite"))
 		{
-			source.Reply(ACCESS_DENIED);
+			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "INVITE", ci->name);
 			return;
 		}
 
@@ -54,45 +54,42 @@ class CommandCSInvite : public Command
 
 		if (!u2)
 		{
-			source.Reply(NICK_X_NOT_IN_USE, params.size() > 1 ? params[1].c_str() : source.GetNick().c_str());
+			source.Reply(_("\002{0}\002 isn't currently online."), params.size() > 1 ? params[1] : source.GetNick());
 			return;
 		}
 
 		if (c->FindUser(u2))
 		{
 			if (u2 == u)
-				source.Reply(_("You are already in \002%s\002!"), c->name.c_str());
+				source.Reply(_("You are already in \002{0}\002!"), c->name);
 			else
-				source.Reply(_("\002%s\002 is already in \002%s\002!"), u2->nick.c_str(), c->name.c_str());
+				source.Reply(_("\002{0}\002 is already in \002{1}\002!"), u2->nick, c->name);
+
+			return;
+		}
+
+		bool override = !source.AccessFor(ci).HasPriv("INVITE");
+
+		IRCD->SendInvite(ci->WhoSends(), c, u2);
+		if (u2 != u)
+		{
+			source.Reply(_("\002{0}\002 has been invited to \002{1}\002."), u2->nick, c->name);
+			u2->SendMessage(ci->WhoSends(), _("You have been invited to \002{0}\002 by \002{1}\002."), c->name, source.GetNick());
+			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "for " << u2->nick;
 		}
 		else
 		{
-			bool override = !source.AccessFor(ci).HasPriv("INVITE");
-
-			IRCD->SendInvite(ci->WhoSends(), c, u2);
-			if (u2 != u)
-			{
-				source.Reply(_("\002%s\002 has been invited to \002%s\002."), u2->nick.c_str(), c->name.c_str());
-				u2->SendMessage(ci->WhoSends(), _("You have been invited to \002%s\002 by \002%s\002."), c->name.c_str(), source.GetNick().c_str());
-				Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "for " << u2->nick;
-			}
-			else
-			{
-				u2->SendMessage(ci->WhoSends(), _("You have been invited to \002%s\002."), c->name.c_str());
-				Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci);
-			}
+			u2->SendMessage(ci->WhoSends(), _("You have been invited to \002{0}\002."), c->name);
+			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci);
 		}
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("Tells %s to invite you or an optionally specified\n"
-				"nick into the given channel.\n"
-				" \n"
-				"By default, limited to AOPs or those with level 5 and above\n"
-				"on the channel."), source.service->nick.c_str());
+		source.Reply(_("Causes \002{0}\002 to invite you or an optionally specified \037nick\037 to \037channel\037.\n"
+		               "\n"
+		               "Use of this command requires the \002{0}\002 privilege on \037channel\037."),
+		               source.service->nick, "INVITE");
 		return true;
 	}
 };

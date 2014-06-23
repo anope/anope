@@ -286,17 +286,17 @@ class CommandOSDNS : public Command
 
 		if (DNSZone::Find(zone))
 		{
-			source.Reply(_("Zone %s already exists."), zone.c_str());
+			source.Reply(_("Zone \002{0}\002 already exists."), zone);
 			return;
 		}
 
 		if (Anope::ReadOnly)
-			source.Reply(READ_ONLY_MODE);
+			source.Reply(_("Services are in read-only mode. Any changes made may not persist."));
 
 		Log(LOG_ADMIN, source, this) << "to add zone " << zone;
 
 		new DNSZone(zone);
-		source.Reply(_("Added zone %s."), zone.c_str());
+		source.Reply(_("Added zone \002{0}\002."), zone);
 	}
 
 	void DelZone(CommandSource &source, const std::vector<Anope::string> &params)
@@ -306,12 +306,12 @@ class CommandOSDNS : public Command
 		DNSZone *z = DNSZone::Find(zone);
 		if (!z)
 		{
-			source.Reply(_("Zone %s does not exist."), zone.c_str());
+			source.Reply(_("Zone \002{0}\002 does not exist."), zone);
 			return;
 		}
 
 		if (Anope::ReadOnly)
-			source.Reply(READ_ONLY_MODE);
+			source.Reply(_("Services are in read-only mode. Any changes made may not persist."));
 
 		Log(LOG_ADMIN, source, this) << "to delete zone " << z->name;
 
@@ -328,7 +328,7 @@ class CommandOSDNS : public Command
 			dnsmanager->Notify(z->name);
 		}
 
-		source.Reply(_("Zone %s removed."), z->name.c_str());
+		source.Reply(_("Zone \002{0}\002 removed."), z->name);
 		delete z;
 	}
 
@@ -341,24 +341,25 @@ class CommandOSDNS : public Command
 		{
 			if (zone.empty())
 			{
-				source.Reply(_("Server %s already exists."), s->GetName().c_str());
+				source.Reply(_("Server \002{0}\002 already exists."), s->GetName());
 			}
 			else
 			{
 				DNSZone *z = DNSZone::Find(zone);
 				if (!z)
 				{
-					source.Reply(_("Zone %s does not exist."), zone.c_str());
+					source.Reply(_("Zone \002{0}\002 does not exist."), zone);
 					return;
 				}
-				else if (z->servers.count(s->GetName()))
+
+				if (z->servers.count(s->GetName()))
 				{
-					source.Reply(_("Server %s is already in zone %s."), s->GetName().c_str(), z->name.c_str());
+					source.Reply(_("Server \002{0}\002 is already in zone \002{1}\002."), s->GetName(), z->name);
 					return;
 				}
 
 				if (Anope::ReadOnly)
-					source.Reply(READ_ONLY_MODE);
+					source.Reply(_("Services are in read-only mode. Any changes made may not persist."));
 
 				z->servers.insert(s->GetName());
 				s->zones.insert(zone);
@@ -371,7 +372,7 @@ class CommandOSDNS : public Command
 
 				Log(LOG_ADMIN, source, this) << "to add server " << s->GetName() << " to zone " << z->name;
 
-				source.Reply(_("Server %s added to zone %s."), s->GetName().c_str(), z->name.c_str());
+				source.Reply(_("Server \002{0}\002 added to zone \002{1}\002."), s->GetName(), z->name);
 			}
 
 			return;
@@ -380,7 +381,7 @@ class CommandOSDNS : public Command
 		Server *serv = Server::Find(params[1], true);
 		if (!serv || serv == Me || serv->IsJuped())
 		{
-			source.Reply(_("Server %s is not linked to the network."), params[1].c_str());
+			source.Reply(_("Server \002{0}\002 is not linked to the network."), params[1]);
 			return;
 		}
 
@@ -388,23 +389,23 @@ class CommandOSDNS : public Command
 		if (zone.empty())
 		{
 			if (Anope::ReadOnly)
-				source.Reply(READ_ONLY_MODE);
+				source.Reply(_("Services are in read-only mode. Any changes made may not persist."));
 
 			Log(LOG_ADMIN, source, this) << "to add server " << s->GetName();
-			source.Reply(_("Added server %s."), s->GetName().c_str());
+			source.Reply(_("Added server \002{0}\002."), s->GetName());
 		}
 		else
 		{
 			DNSZone *z = DNSZone::Find(zone);
 			if (!z)
 			{
-				source.Reply(_("Zone %s does not exist."), zone.c_str());
+				source.Reply(_("Zone \002{0}\002 does not exist."), zone);
 				delete s;
 				return;
 			}
 
 			if (Anope::ReadOnly)
-				source.Reply(READ_ONLY_MODE);
+				source.Reply(_("Services are in read-only mode. Any changes made may not persist."));
 
 			Log(LOG_ADMIN, source, this) << "to add server " << s->GetName() << " to zone " << zone;
 
@@ -426,25 +427,27 @@ class CommandOSDNS : public Command
 
 		if (!s)
 		{
-			source.Reply(_("Server %s does not exist."), params[1].c_str());
+			source.Reply(_("Server \002{0}\002 does not exist."), params[1]);
 			return;
 		}
-		else if (!zone.empty())
+
+		if (!zone.empty())
 		{
 			DNSZone *z = DNSZone::Find(zone);
 			if (!z)
 			{
-				source.Reply(_("Zone %s does not exist."), zone.c_str());
+				source.Reply(_("Zone \002{0}\002 does not exist."), zone);
 				return;
 			}
-			else if (!z->servers.count(s->GetName()))
+
+			if (!z->servers.count(s->GetName()))
 			{
-				source.Reply(_("Server %s is not in zone %s."), s->GetName().c_str(), z->name.c_str());
+				source.Reply(_("Server \002{0}\002 is not in zone \002{1}\002."), s->GetName(), z->name);
 				return;
 			}
 
 			if (Anope::ReadOnly)
-				source.Reply(READ_ONLY_MODE);
+				source.Reply(_("Services are in read-only mode. Any changes made may not persist."));
 
 			Log(LOG_ADMIN, source, this) << "to remove server " << s->GetName() << " from zone " << z->name;
 
@@ -455,12 +458,13 @@ class CommandOSDNS : public Command
 			}
 
 			z->servers.erase(s->GetName());
-			source.Reply(_("Removed server %s from zone %s."), s->GetName().c_str(), z->name.c_str());
+			source.Reply(_("Removed server \002{0}\002 from zone \002{1}\002."), s->GetName(), z->name);
 			return;
 		}
-		else if (Server::Find(s->GetName(), true))
+
+		if (Server::Find(s->GetName(), true))
 		{
-			source.Reply(_("Server %s must be quit before it can be deleted."), s->GetName().c_str());
+			source.Reply(_("Server \002{0}\002 must be quit before it can be deleted."), s->GetName());
 			return;
 		}
 
@@ -472,13 +476,13 @@ class CommandOSDNS : public Command
 		}
 
 		if (Anope::ReadOnly)
-			source.Reply(READ_ONLY_MODE);
+			source.Reply(_("Services are in read-only mode. Any changes made may not persist."));
 
 		if (dnsmanager)
 			dnsmanager->UpdateSerial();
 
 		Log(LOG_ADMIN, source, this) << "to delete server " << s->GetName();
-		source.Reply(_("Removed server %s."), s->GetName().c_str());
+		source.Reply(_("Removed server \002{0}\002."), s->GetName());
 		delete s;
 	}
 
@@ -488,29 +492,29 @@ class CommandOSDNS : public Command
 
 		if (!s)
 		{
-			source.Reply(_("Server %s does not exist."), params[1].c_str());
+			source.Reply(_("Server \002{0}\002 does not exist."), params[1]);
 			return;
 		}
 
 		for (unsigned i = 0; i < s->GetIPs().size(); ++i)
 			if (params[2].equals_ci(s->GetIPs()[i]))
 			{
-				source.Reply(_("IP %s already exists for %s."), s->GetIPs()[i].c_str(), s->GetName().c_str());
+				source.Reply(_("IP \002{0}\002 already exists for \002{1}\002."), s->GetIPs()[i], s->GetName());
 				return;
 			}
 
 		sockaddrs addr(params[2]);
 		if (!addr.valid())
 		{
-			source.Reply(_("%s is not a valid IP address."), params[2].c_str());
+			source.Reply(_("\002{0}\002 is not a valid IP address."), params[2]);
 			return;
 		}
 
 		if (Anope::ReadOnly)
-			source.Reply(READ_ONLY_MODE);
+			source.Reply(_("Services are in read-only mode. Any changes made may not persist."));
 
 		s->GetIPs().push_back(params[2]);
-		source.Reply(_("Added IP %s to %s."), params[2].c_str(), s->GetName().c_str());
+		source.Reply(_("Added IP \002{0}\002 to \002{1}\002."), params[2], s->GetName());
 		Log(LOG_ADMIN, source, this) << "to add IP " << params[2] << " to " << s->GetName();
 
 		if (s->Active() && dnsmanager)
@@ -527,18 +531,18 @@ class CommandOSDNS : public Command
 
 		if (!s)
 		{
-			source.Reply(_("Server %s does not exist."), params[1].c_str());
+			source.Reply(_("Server \002{0}\002 does not exist."), params[1]);
 			return;
 		}
 
 		if (Anope::ReadOnly)
-			source.Reply(READ_ONLY_MODE);
+			source.Reply(_("Services are in read-only mode. Any changes made may not persist."));
 
 		for (unsigned i = 0; i < s->GetIPs().size(); ++i)
 			if (params[2].equals_ci(s->GetIPs()[i]))
 			{
 				s->GetIPs().erase(s->GetIPs().begin() + i);
-				source.Reply(_("Removed IP %s from %s."), params[2].c_str(), s->GetName().c_str());
+				source.Reply(_("Removed IP \002{0}\002 from \002{1}\002."), params[2], s->GetName());
 				Log(LOG_ADMIN, source, this) << "to remove IP " << params[2] << " from " << s->GetName();
 
 				if (s->GetIPs().empty())
@@ -557,7 +561,7 @@ class CommandOSDNS : public Command
 				return;
 			}
 
-		source.Reply(_("IP %s does not exist for %s."), params[2].c_str(), s->GetName().c_str());
+		source.Reply(_("IP \002{0}\002 does not exist for \002{1}\002."), params[2], s->GetName());
 	}
 
 	void OnSet(CommandSource &source, const std::vector<Anope::string> &params)
@@ -566,12 +570,12 @@ class CommandOSDNS : public Command
 
 		if (!s)
 		{
-			source.Reply(_("Server %s does not exist."), params[1].c_str());
+			source.Reply(_("Server \002{0}\002 does not exist."), params[1]);
 			return;
 		}
 
 		if (Anope::ReadOnly)
-			source.Reply(READ_ONLY_MODE);
+			source.Reply(_("Services are in read-only mode. Any changes made may not persist."));
 
 		if (params[2].equals_ci("LIMIT"))
 		{
@@ -580,13 +584,13 @@ class CommandOSDNS : public Command
 				unsigned l = convertTo<unsigned>(params[3]);
 				s->SetLimit(l);
 				if (l)
-					source.Reply(_("User limit for %s set to %d."), s->GetName().c_str(), l);
+					source.Reply(_("User limit for \002{0}\002 set to \002{1}\002."), s->GetName(), l);
 				else
-					source.Reply(_("User limit for %s removed."), s->GetName().c_str());
+					source.Reply(_("User limit for \002{0}\002 removed."), s->GetName());
 			}
 			catch (const ConvertException &ex)
 			{
-				source.Reply(_("Invalid value for LIMIT. Must be numerical."));
+				source.Reply(_("Invalid value for limit. Must be numerical."));
 			}
 		}
 		else
@@ -599,31 +603,34 @@ class CommandOSDNS : public Command
 
 		if (!s)
 		{
-			source.Reply(_("Server %s does not exist."), params[1].c_str());
+			source.Reply(_("Server \002{0}\002 does not exist."), params[1]);
 			return;
 		}
-		else if (!Server::Find(s->GetName(), true))
+
+		if (!Server::Find(s->GetName(), true))
 		{
-			source.Reply(_("Server %s is not currently linked."), s->GetName().c_str());
+			source.Reply(_("Server \002{0}\002 is not currently linked."), s->GetName());
 			return;
 		}
-		else if (s->Pooled())
+
+		if (s->Pooled())
 		{
-			source.Reply(_("Server %s is already pooled."), s->GetName().c_str());
+			source.Reply(_("Server \002{0}\002 is already pooled."), s->GetName());
 			return;
 		}
-		else if (s->GetIPs().empty())
+
+		if (s->GetIPs().empty())
 		{
-			source.Reply(_("Server %s has no configured IPs."), s->GetName().c_str());
+			source.Reply(_("Server \002{0}\002 has no configured IPs."), s->GetName());
 			return;
 		}
 
 		if (Anope::ReadOnly)
-			source.Reply(READ_ONLY_MODE);
+			source.Reply(_("Services are in read-only mode. Any changes made may not persist."));
 
 		s->SetActive(true);
 
-		source.Reply(_("Pooled %s."), s->GetName().c_str());
+		source.Reply(_("Pooled \002{0}\002."), s->GetName());
 		Log(LOG_ADMIN, source, this) << "to pool " << s->GetName();
 	}
 
@@ -634,21 +641,22 @@ class CommandOSDNS : public Command
 
 		if (!s)
 		{
-			source.Reply(_("Server %s does not exist."), params[1].c_str());
+			source.Reply(_("Server \002{0}\002 does not exist."), params[1]);
 			return;
 		}
-		else if (!s->Pooled())
+
+		if (!s->Pooled())
 		{
-			source.Reply(_("Server %s is not pooled."), s->GetName().c_str());
+			source.Reply(_("Server \002{0}\002 is not pooled."), s->GetName());
 			return;
 		}
 
 		if (Anope::ReadOnly)
-			source.Reply(READ_ONLY_MODE);
+			source.Reply(_("Services are in read-only mode. Any changes made may not persist."));
 
 		s->Pool(false);
 
-		source.Reply(_("Depooled %s."), s->GetName().c_str());
+		source.Reply(_("Depooled \002{0}\002."), s->GetName());
 		Log(LOG_ADMIN, source, this) << "to depool " << s->GetName();
 	}
 
@@ -695,22 +703,19 @@ class CommandOSDNS : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("This command allows managing DNS zones used for controlling what servers users\n"
-				"are directed to when connecting. Omitting all parameters prints out the status of\n"
-				"the DNS zone.\n"
-				" \n"
-				"\002ADDZONE\002 adds a zone, eg us.yournetwork.tld. Servers can then be added to this\n"
-				"zone with the \002ADDSERVER\002 command.\n"
-				" \n"
-				"The \002ADDSERVER\002 command adds a server to the given zone. When a query is done, the\n"
-				"zone in question is served if it exists, else all servers in all zones are served.\n"
-				"A server may be in more than one zone.\n"
-				" \n"
-				"The \002ADDIP\002 command associates an IP with a server.\n"
-				" \n"
-				"The \002POOL\002 and \002DEPOOL\002 commands actually add and remove servers to their given zones."));
+		source.Reply(_("This command allows managing DNS zones used for controlling what servers users are directed to when connecting."
+		               " Omitting all parameters prints out the status of the DNS zone.\n"
+		               "\n"
+		               "\002{0} ADDZONE\002 adds a zone, eg. us.example.com. Servers can then be added to this zone with the \002ADDSERVER\002 command.\n"
+			       "\n"
+		               "The \002{0} ADDSERVER\002 command adds a server to the given zone."
+		               " When a DNS query is done, the zone in question is served if it exists, otherwise all servers in all zones are served."
+		               " A server may be in more than one zone.\n"
+		               "\n"
+		               "The \002{0} ADDIP\002 command associates an IP with a server.\n"
+		               " \n"
+		               "The \002{0} POOL\002 and \002{0} DEPOOL\002 commands actually add and remove servers to their given zones."),
+		               source.command);
 		return true;
 	}
 };

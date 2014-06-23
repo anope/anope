@@ -116,7 +116,7 @@ class CommandOSInfo : public Command
 			ChanServ::Channel *ci = ChanServ::Find(target);
 			if (!ci)
 			{
-				source.Reply(CHAN_X_NOT_REGISTERED, target.c_str());
+				source.Reply(_("Channel \002{0}\002 isn't registered."), target);
 				return;
 			}
 
@@ -127,7 +127,7 @@ class CommandOSInfo : public Command
 			NickServ::Nick *na = NickServ::FindNick(target);
 			if (!na)
 			{
-				source.Reply(NICK_X_NOT_REGISTERED, target.c_str());
+				source.Reply(_("\002{0}\002 isn't registered."), target);
 				return;
 			}
 
@@ -146,7 +146,7 @@ class CommandOSInfo : public Command
 
 			if ((*oi)->size() >= Config->GetModule(this->module)->Get<unsigned>("max", "10"))
 			{
-				source.Reply(_("The oper info list for \002%s\002 is full."), target.c_str());
+				source.Reply(_("The oper info list for \002{0}\002 is full."), target);
 				return;
 			}
 
@@ -156,18 +156,18 @@ class CommandOSInfo : public Command
 
 				if (o->info.equals_ci(info))
 				{
-					source.Reply(_("The oper info already exists on \002%s\002."), target.c_str());
+					source.Reply(_("The oper info already exists on \002{0}\002."), target);
 					return;
 				}
 			}
 
 			(*oi)->push_back(new OperInfo(target, info, source.GetNick(), Anope::CurTime));
 
-			source.Reply(_("Added info to \002%s\002."), target.c_str());
+			source.Reply(_("Added info to \002{0}\002."), target);
 			Log(LOG_ADMIN, source, this) << "to add information to " << target;
 
                 	if (Anope::ReadOnly)
-				source.Reply(READ_ONLY_MODE);
+				source.Reply(_("Services are in read-only mode. Any changes made may not persist."));
 		}
 		else if (cmd.equals_ci("DEL"))
 		{
@@ -181,7 +181,7 @@ class CommandOSInfo : public Command
 
 			if (!oi)
 			{
-				source.Reply(_("Oper info list for \002%s\002 is empty."), target.c_str());
+				source.Reply(_("Oper info list for \002{0}\002 is empty."), target);
 				return;
 			}
 
@@ -200,18 +200,18 @@ class CommandOSInfo : public Command
 
 			if (!found)
 			{
-				source.Reply(_("No such info \"%s\" on \002%s\002."), info.c_str(), target.c_str());
+				source.Reply(_("No such info \002{0}\002 on \002{1}\002."), info, target);
 			}
 			else
 			{
 				if ((*oi)->empty())
 					e->Shrink<OperInfos>("operinfo");
 
-				source.Reply(_("Deleted info from \002%s\002."), target.c_str());
+				source.Reply(_("Deleted info from \002{0}\002."), target);
 				Log(LOG_ADMIN, source, this) << "to remove information from " << target;
 
 	                	if (Anope::ReadOnly)
-					source.Reply(READ_ONLY_MODE);
+					source.Reply(_("Services are in read-only mode. Any changes made may not persist."));
 			}
 		}
 		else if (cmd.equals_ci("CLEAR"))
@@ -220,17 +220,17 @@ class CommandOSInfo : public Command
 
 			if (!oi)
 			{
-				source.Reply(_("Oper info list for \002%s\002 is empty."), target.c_str());
+				source.Reply(_("Oper info list for \002{0}\002 is empty."), target);
 				return;
 			}
 
 			e->Shrink<OperInfos>("operinfo");
 
-			source.Reply(_("Cleared info from \002%s\002."), target.c_str());
+			source.Reply(_("Cleared info from \002{0}\002."), target);
 			Log(LOG_ADMIN, source, this) << "to clear information for " << target;
 
                 	if (Anope::ReadOnly)
-				source.Reply(READ_ONLY_MODE);
+				source.Reply(_("Services are in read-only mode. Any changes made may not persist."));
 		}
 		else
 		{
@@ -240,11 +240,7 @@ class CommandOSInfo : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("Add or delete oper information for a given nick or channel.\n"
-				"This will show to opers in the respective info command for\n"
-				"the nick or channel."));
+		source.Reply(_("Add or delete oper information for a given accpint or channel. This informaition will show to opers in the respective info command for the account or channel."));
 		return true;
 	}
 };

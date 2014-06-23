@@ -36,19 +36,24 @@ class CommandCSRegister : public Command
 		else if (nc->HasExt("UNCONFIRMED"))
 			source.Reply(_("You must confirm your account before you can register a channel."));
 		else if (chan[0] == '&')
-			source.Reply(_("Local channels cannot be registered."));
+			source.Reply(_("Local channels can not be registered."));
 		else if (chan[0] != '#')
-			source.Reply(CHAN_SYMBOL_REQUIRED);
+			source.Reply(_("Please use the symbol of \002#\002 when attempting to register."));
 		else if (!IRCD->IsChannelValid(chan))
-			source.Reply(CHAN_X_INVALID, chan.c_str());
+			source.Reply(_("Channel \002{0}\002 is not a valid channel."), chan);
 		else if (!c && u)
-			source.Reply(CHAN_X_NOT_IN_USE, chan.c_str());
+			source.Reply(_("Channel \002{0}\002 doesn't exist."), chan);
 		else if (ci)
 			source.Reply(_("Channel \002%s\002 is already registered!"), chan.c_str());
 		else if (c && !c->HasUserStatus(u, "OP"))
 			source.Reply(_("You must be a channel operator to register the channel."));
 		else if (maxregistered && nc->channelcount >= maxregistered && !source.HasPriv("chanserv/no-register-limit"))
-			source.Reply(nc->channelcount > maxregistered ? CHAN_EXCEEDED_CHANNEL_LIMIT : CHAN_REACHED_CHANNEL_LIMIT, maxregistered);
+		{
+			if (nc->channelcount > maxregistered)
+				source.Reply(_("Sorry, you have already exceeded your limit of \002{0}\002 channels."), maxregistered);
+			else
+				source.Reply(_("Sorry, you have already reached your limit of \002{0}\002 channels."), maxregistered);
+		}
 		else
 		{
 			if (!ChanServ::service)
@@ -67,7 +72,7 @@ class CommandCSRegister : public Command
 				ci->last_topic_setter = source.service->nick;
 
 			Log(LOG_COMMAND, source, this, ci);
-			source.Reply(_("Channel \002%s\002 registered under your account: %s"), chan.c_str(), nc->display.c_str());
+			source.Reply(_("Channel \002{0}\002 registered under your account: \002{1}\002"), chan, nc->display);
 
 			/* Implement new mode lock */
 			if (c)
@@ -85,28 +90,22 @@ class CommandCSRegister : public Command
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Registers a channel in the %s database.  In order\n"
-			"to use this command, you must first be a channel operator\n"
-			"on the channel you're trying to register.\n"
-			"The description, which is optional, is a\n"
-			"general description of the channel's purpose.\n"
-			" \n"
-			"When you register a channel, you are recorded as the\n"
-			"\"founder\" of the channel. The channel founder is allowed\n"
-			"to change all of the channel settings for the channel;\n"
-			"%s will also automatically give the founder\n"
-			"channel-operator privileges when s/he enters the channel."),
-				source.service->nick.c_str(), source.service->nick.c_str());
+		source.Reply(_("Registers a channel, which sets you as the founder and prevents other users from gaining unauthorized access in the channel."
+		               " To use this command, you must first be a channel operator on \037channel\037."
+		               " The description, which is optional, is a general description of the channel's purpose.\n"
+		               "\n"
+		               "When you register a channel, you are recorded as the founder of the channel."
+		               " The channel founder is allowed to change all of the channel settings for the channel,"
+		               " and will automatically be given channel operator status when entering the channel."));
+
 		BotInfo *bi;
 		Anope::string cmd;
-		if (Command::FindCommandFromService("chanserv/access", bi, cmd))
-			source.Reply(_(" \n"
-				"See the \002%s\002 command (\002%s%s HELP ACCESS\002) for\n"
-				"information on giving a subset of these privileges to\n"
-				"other channel users.\n"), cmd.c_str(), Config->StrictPrivmsg.c_str(), bi->nick.c_str());
-		source.Reply(_(" \n"
-			"NOTICE: In order to register a channel, you must have\n"
-			"first registered your nickname."));
+		CommandInfo *help = source.service->FindCommand("generic/help");
+		if (Command::FindCommandFromService("chanserv/access", bi, cmd) && help)
+			source.Reply(_("\n"
+			               "See the \002{0}\002 command (\002{1}{2} {3} {0}\002) for information on giving a subset of these privileges to other users."),
+			                cmd, Config->StrictPrivmsg, bi->nick, help->cname);
+
 		return true;
 	}
 };

@@ -56,7 +56,7 @@ class CommandHelp : public Command
 			GroupInfo groups;
 
 			if (all)
-				source.Reply(_("All available commands for \002%s\002:"), source.service->nick.c_str());
+				source.Reply(_("All available commands for \002{0}\002:"), source.service->nick);
 
 			for (CommandInfo::map::const_iterator it = map.begin(), it_end = map.end(); it != it_end; ++it)
 			{
@@ -102,7 +102,7 @@ class CommandHelp : public Command
 				CommandGroup *gr = it->first;
 
 				source.Reply(" ");
-				source.Reply("%s", gr->description.c_str());
+				source.Reply("{0}", gr->description);
 
 				Anope::string buf;
 				for (std::list<Anope::string>::iterator it2 = it->second.begin(), it2_end = it->second.end(); it2 != it2_end; ++it2)
@@ -113,20 +113,20 @@ class CommandHelp : public Command
 
 					if (buf.length() > help_wrap_len)
 					{
-						source.Reply("  %s", buf.substr(2).c_str());
+						source.Reply("  {0}", buf.substr(2));
 						buf.clear();
 					}
 				}
 				if (buf.length() > 2)
 				{
-					source.Reply("  %s", buf.substr(2).c_str());
+					source.Reply("  {0}", buf.substr(2));
 					buf.clear();
 				}
 			}
 			if (!groups.empty())
 			{
 				source.Reply(" ");
-				source.Reply(_("Use the \002%s ALL\002 command to list all commands and their descriptions."), source_command.c_str());
+				source.Reply(_("Use the \002{0} ALL\002 command to list all commands and their descriptions."), source_command);
 			}
 		}
 		else
@@ -155,7 +155,7 @@ class CommandHelp : public Command
 				// Allow unregistered users to see help for commands that they explicitly request help for
 
 				const Anope::string &subcommand = params.size() > max ? params[max] : "";
-				source.command = full_command;
+				source.command = it->first;
 				if (!c->OnHelp(source, subcommand))
 					continue;
 
@@ -165,7 +165,7 @@ class CommandHelp : public Command
 				if (!info.permission.empty())
 				{
 					source.Reply(" ");
-					source.Reply(_("Access to this command requires the permission \002%s\002 to be present in your opertype."), info.permission.c_str());
+					source.Reply(_("Access to this command requires the permission \002{0}\002 to be present in your opertype."), info.permission);
 				}
 				if (!c->AllowUnregistered() && !source.nc)
 				{
@@ -183,7 +183,7 @@ class CommandHelp : public Command
 			}
 
 			if (helped == false)
-				source.Reply(_("No help available for \002%s\002."), params[0].c_str());
+				source.Reply(_("No help available for \002{0}\002."), params[0]);
 		}
 
 		this->onhelp(&Event::Help::OnPostHelp, source, params);

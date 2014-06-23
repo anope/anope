@@ -33,10 +33,9 @@ class CommandCSSet : public Command
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Allows the channel founder to set various channel options\n"
-			"and other information.\n"
-			" \n"
-			"Available options:"));
+		source.Reply(_("Allows the channel founder to set various channel options and other information.\n"
+		               "\n"
+		               "Available options:"));
 		Anope::string this_name = source.command;
 		bool hide_privileged_commands = Config->GetBlock("options")->Get<bool>("hideprivilegedcommands");
 		for (CommandInfo::map::const_iterator it = source.service->commands.begin(), it_end = source.service->commands.end(); it != it_end; ++it)
@@ -60,8 +59,12 @@ class CommandCSSet : public Command
 				c->OnServHelp(source);
 			}
 		}
-		source.Reply(_("Type \002%s%s HELP %s \037option\037\002 for more information on a\n"
-				"particular option."), Config->StrictPrivmsg.c_str(), source.service->nick.c_str(), this_name.c_str());
+
+		CommandInfo *help = source.service->FindCommand("generic/help");
+		if (help)
+			source.Reply(_("Type \002{0}{1} {2} {3} \037option\037\002 for more information on a particular option."),
+			               Config->StrictPrivmsg, source.service->nick, help->cname, this_name);
+
 		return true;
 	}
 };
@@ -77,16 +80,18 @@ class CommandCSSetAutoOp : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
+		const Anope::string &chan = params[0];
+
 		if (Anope::ReadOnly)
 		{
-			source.Reply(READ_ONLY_MODE);
+			source.Reply(_("Services are in read-only mode."));
 			return;
 		}
 
-		ChanServ::Channel *ci = ChanServ::Find(params[0]);
+		ChanServ::Channel *ci = ChanServ::Find(chan);
 		if (ci == NULL)
 		{
-			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
+			source.Reply(_("Channel \002{0}\002 isn't registered."), chan);
 			return;
 		}
 
@@ -96,7 +101,7 @@ class CommandCSSetAutoOp : public Command
 
 		if (MOD_RESULT != EVENT_ALLOW && !source.AccessFor(ci).HasPriv("SET") && source.permission.empty() && !source.HasPriv("chanserv/administration"))
 		{
-			source.Reply(ACCESS_DENIED);
+			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "SET", ci->name);
 			return;
 		}
 
@@ -104,13 +109,13 @@ class CommandCSSetAutoOp : public Command
 		{
 			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to enable autoop";
 			ci->Shrink<bool>("NOAUTOOP");
-			source.Reply(_("Services will now automatically give modes to users in \002%s\002."), ci->name.c_str());
+			source.Reply(_("Services will now automatically give modes to users in \002{0}\002."), ci->name);
 		}
 		else if (params[1].equals_ci("OFF"))
 		{
 			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to disable autoop";
 			ci->Extend<bool>("NOAUTOOP");
-			source.Reply(_("Services will no longer automatically give modes to users in \002%s\002."), ci->name.c_str());
+			source.Reply(_("Services will no longer automatically give modes to users in \002{0}\002."), ci->name);
 		}
 		else
 			this->OnSyntaxError(source, "AUTOOP");
@@ -118,12 +123,7 @@ class CommandCSSetAutoOp : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("Enables or disables %s's autoop feature for a\n"
-			"channel. When disabled, users who join the channel will\n"
-			"not automatically gain any status from %s."), source.service->nick.c_str(),
-			source.service->nick.c_str(), this->name.c_str());
+		source.Reply(_("Enables or disables AUTOOP for a \037channel\037. When disabled, users who join \037channel\037 will not automatically gain any status from {0}."), source.service->nick);
 		return true;
 	}
 };
@@ -139,16 +139,18 @@ class CommandCSSetBanType : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
+		const Anope::string &chan = params[0];
+
 		if (Anope::ReadOnly)
 		{
-			source.Reply(READ_ONLY_MODE);
+			source.Reply(_("Services are in read-only mode."));
 			return;
 		}
 
-		ChanServ::Channel *ci = ChanServ::Find(params[0]);
+		ChanServ::Channel *ci = ChanServ::Find(chan);
 		if (ci == NULL)
 		{
-			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
+			source.Reply(_("Channel \002{0}\002 isn't registered."), chan);
 			return;
 		}
 
@@ -159,7 +161,7 @@ class CommandCSSetBanType : public Command
 
 		if (MOD_RESULT != EVENT_ALLOW && !source.AccessFor(ci).HasPriv("SET") && source.permission.empty() && !source.HasPriv("chanserv/administration"))
 		{
-			source.Reply(ACCESS_DENIED);
+			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "SET", ci->name);
 			return;
 		}
 
@@ -170,27 +172,24 @@ class CommandCSSetBanType : public Command
 				throw ConvertException("Invalid range");
 			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to change the ban type to " << new_type;
 			ci->bantype = new_type;
-			source.Reply(_("Ban type for channel %s is now #%d."), ci->name.c_str(), ci->bantype);
+			source.Reply(_("Ban type for channel \002{0}\002 is now \002#{1}\002."), ci->name, ci->bantype);
 		}
 		catch (const ConvertException &)
 		{
-			source.Reply(_("\002%s\002 is not a valid ban type."), params[1].c_str());
+			source.Reply(_("\002{0}\002 is not a valid ban type."), params[1]);
 		}
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("Sets the ban type that will be used by services whenever\n"
-				"they need to ban someone from your channel.\n"
-				" \n"
-				"Bantype is a number between 0 and 3 that means:\n"
-				" \n"
-				"0: ban in the form *!user@host\n"
-				"1: ban in the form *!*user@host\n"
-				"2: ban in the form *!*@host\n"
-				"3: ban in the form *!*user@*.domain"), this->name.c_str());
+		source.Reply(_("Sets the ban type that will be used by services whenever they need to ban someone from your channel.\n"
+		               "\n"
+		               "Bantype is a number between 0 and 3 that means:\n"
+		               "\n"
+		               "0: ban in the form *!user@host\n"
+		               "1: ban in the form *!*user@host\n"
+		               "2: ban in the form *!*@host\n"
+		               "3: ban in the form *!*user@*.domain"));
 		return true;
 	}
 };
@@ -206,17 +205,19 @@ class CommandCSSetDescription : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
+		const Anope::string &chan = params[0];
+		const Anope::string &param = params.size() > 1 ? params[1] : "";
+
 		if (Anope::ReadOnly)
 		{
-			source.Reply(READ_ONLY_MODE);
+			source.Reply(_("Services are in read-only mode."));
 			return;
 		}
 
-		ChanServ::Channel *ci = ChanServ::Find(params[0]);
-		const Anope::string &param = params.size() > 1 ? params[1] : "";
+		ChanServ::Channel *ci = ChanServ::Find(chan);
 		if (ci == NULL)
 		{
-			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
+			source.Reply(_("Channel \002{0}\002 isn't registered."), chan);
 			return;
 		}
 
@@ -227,7 +228,7 @@ class CommandCSSetDescription : public Command
 
 		if (MOD_RESULT != EVENT_ALLOW && !source.AccessFor(ci).HasPriv("SET") && source.permission.empty() && !source.HasPriv("chanserv/administration"))
 		{
-			source.Reply(ACCESS_DENIED);
+			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "SET", ci->name);
 			return;
 		}
 
@@ -235,24 +236,19 @@ class CommandCSSetDescription : public Command
 		{
 			ci->desc = param;
 			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to change the description to " << ci->desc;
-			source.Reply(_("Description of %s changed to \002%s\002."), ci->name.c_str(), ci->desc.c_str());
+			source.Reply(_("Description of \002{0}\002 changed to \002{1}\002."), ci->name, ci->desc);
 		}
 		else
 		{
 			ci->desc.clear();
 			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to unset the description";
-			source.Reply(_("Description of %s unset."), ci->name.c_str());
+			source.Reply(_("Description of \002{0}\002 unset."), ci->name);
 		}
-
-		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("Sets the description for the channel, which shows up with\n"
-				"the \002LIST\002 and \002INFO\002 commands."), this->name.c_str());
+		source.Reply(_("Sets the description for the channel, which shows up with the \002LIST\002 and \002INFO\002 commands."));
 		return true;
 	}
 };
@@ -263,39 +259,42 @@ class CommandCSSetFounder : public Command
 	CommandCSSetFounder(Module *creator, const Anope::string &cname = "chanserv/set/founder") : Command(creator, cname, 2, 2)
 	{
 		this->SetDesc(_("Set the founder of a channel"));
-		this->SetSyntax(_("\037channel\037 \037nick\037"));
+		this->SetSyntax(_("\037channel\037 \037user\037"));
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
+		const Anope::string &chan = params[0];
+		const Anope::string &param = params[1];
+
 		if (Anope::ReadOnly)
 		{
-			source.Reply(READ_ONLY_MODE);
+			source.Reply(_("Services are in read-only mode."));
 			return;
 		}
 
-		ChanServ::Channel *ci = ChanServ::Find(params[0]);
+		ChanServ::Channel *ci = ChanServ::Find(chan);
 		if (ci == NULL)
 		{
-			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
+			source.Reply(_("Channel \002{0}\002 isn't registered."), chan);
 			return;
 		}
 
 		EventReturn MOD_RESULT;
-		MOD_RESULT = Event::OnSetChannelOption(&Event::SetChannelOption::OnSetChannelOption, source, this, ci, params[1]);
+		MOD_RESULT = Event::OnSetChannelOption(&Event::SetChannelOption::OnSetChannelOption, source, this, ci, param);
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
 		if (MOD_RESULT != EVENT_ALLOW && (ci->HasExt("SECUREFOUNDER") ? !source.IsFounder(ci) : !source.AccessFor(ci).HasPriv("FOUNDER")) && source.permission.empty() && !source.HasPriv("chanserv/administration"))
 		{
-			source.Reply(ACCESS_DENIED);
+			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "FOUNDER", ci->name);
 			return;
 		}
 
-		const NickServ::Nick *na = NickServ::FindNick(params[1]);
+		const NickServ::Nick *na = NickServ::FindNick(param);
 		if (!na)
 		{
-			source.Reply(NICK_X_NOT_REGISTERED, params[1].c_str());
+			source.Reply(_("\002{0}\002 isn't registered."), param);
 			return;
 		}
 
@@ -303,7 +302,7 @@ class CommandCSSetFounder : public Command
 		unsigned max_reg = Config->GetModule("chanserv")->Get<unsigned>("maxregistered");
 		if (max_reg && nc->channelcount >= max_reg && !source.HasPriv("chanserv/no-register-limit"))
 		{
-			source.Reply(_("\002%s\002 has too many channels registered."), na->nick.c_str());
+			source.Reply(_("\002{0}\002 has too many channels registered."), na->nick);
 			return;
 		}
 
@@ -311,17 +310,14 @@ class CommandCSSetFounder : public Command
 
 		ci->SetFounder(nc);
 
-		source.Reply(_("Founder of \002%s\002 changed to \002%s\002."), ci->name.c_str(), na->nick.c_str());
-
-		return;
+		source.Reply(_("Founder of \002{0}\002 changed to \002{1}\002."), ci->name, na->nick);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("Changes the founder of a channel. The new nickname must\n"
-				"be a registered one."), this->name.c_str());
+		source.Reply(_("Changes the founder of \037channel\037 to \037user\037. Using this command will cause you to lose your founder access to \037channel\037, and cannot be undone."
+		               "\n"
+		               "Use of this command requires being the founder or \037channel\037 or having the \002{0}\002 privilege, if secure founder is enabled or not, respectively."));
 		return true;
 	}
 };
@@ -337,16 +333,19 @@ class CommandCSSetKeepModes : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
+		const Anope::string &chan = params[0];
+		const Anope::string &param = params[1];
+
 		if (Anope::ReadOnly)
 		{
-			source.Reply(READ_ONLY_MODE);
+			source.Reply(_("Services are in read-only mode."));
 			return;
 		}
 
-		ChanServ::Channel *ci = ChanServ::Find(params[0]);
+		ChanServ::Channel *ci = ChanServ::Find(chan);
 		if (ci == NULL)
 		{
-			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
+			source.Reply(_("Channel \002{0}\002 isn't registered."), chan);
 			return;
 		}
 
@@ -357,7 +356,7 @@ class CommandCSSetKeepModes : public Command
 
 		if (MOD_RESULT != EVENT_ALLOW && !source.AccessFor(ci).HasPriv("SET") && source.permission.empty() && !source.HasPriv("chanserv/administration"))
 		{
-			source.Reply(ACCESS_DENIED);
+			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "SET", ci->name);
 			return;
 		}
 
@@ -365,7 +364,7 @@ class CommandCSSetKeepModes : public Command
 		{
 			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to enable keep modes";
 			ci->Extend<bool>("CS_KEEP_MODES");
-			source.Reply(_("Keep modes for %s is now \002on\002."), ci->name.c_str());
+			source.Reply(_("Keep modes for \002{0}\002 is now \002on\002."), ci->name);
 			if (ci->c)
 				ci->last_modes = ci->c->GetModes();
 		}
@@ -373,7 +372,7 @@ class CommandCSSetKeepModes : public Command
 		{
 			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to disable keep modes";
 			ci->Shrink<bool>("CS_KEEP_MODES");
-			source.Reply(_("Keep modes for %s is now \002off\002."), ci->name.c_str());
+			source.Reply(_("Keep modes for \002{0}\002 is now \002off\002."), ci->name);
 			ci->last_modes.clear();
 		}
 		else
@@ -382,11 +381,7 @@ class CommandCSSetKeepModes : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("Enables or disables keepmodes for the given channel. If keep\n"
-				"modes is enabled, services will remember modes set on the channel\n"
-				"and attempt to re-set them the next time the channel is created."));
+		source.Reply(_("Enables or disables keepmodes for \037channel\037. If keepmodes is enabled, services will remember modes set on the channel and re-set them the next time the channel is created."));
 		return true;
 	}
 };
@@ -402,56 +397,54 @@ class CommandCSSetPeace : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
+		const Anope::string &chan = params[0];
+		const Anope::string &param = params[1];
+
 		if (Anope::ReadOnly)
 		{
-			source.Reply(READ_ONLY_MODE);
+			source.Reply(_("Services are in read-only mode."));
 			return;
 		}
 
-		ChanServ::Channel *ci = ChanServ::Find(params[0]);
+		ChanServ::Channel *ci = ChanServ::Find(chan);
 		if (ci == NULL)
 		{
-			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
+			source.Reply(_("Channel \002{0}\002 isn't registered."), chan);
 			return;
 		}
 
 		EventReturn MOD_RESULT;
-		MOD_RESULT = Event::OnSetChannelOption(&Event::SetChannelOption::OnSetChannelOption, source, this, ci, params[1]);
+		MOD_RESULT = Event::OnSetChannelOption(&Event::SetChannelOption::OnSetChannelOption, source, this, ci, param);
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
 		if (MOD_RESULT != EVENT_ALLOW && !source.AccessFor(ci).HasPriv("SET") && source.permission.empty() && !source.HasPriv("chanserv/administration"))
 		{
-			source.Reply(ACCESS_DENIED);
+			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "SET", ci->name);
 			return;
 		}
 
-		if (params[1].equals_ci("ON"))
+		if (param.equals_ci("ON"))
 		{
 			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to enable peace";
 			ci->Extend<bool>("PEACE");
-			source.Reply(_("Peace option for %s is now \002on\002."), ci->name.c_str());
+			source.Reply(_("Peace option for \002{0}\002 is now \002on\002."), ci->name);
 		}
-		else if (params[1].equals_ci("OFF"))
+		else if (param.equals_ci("OFF"))
 		{
 			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to disable peace";
 			ci->Shrink<bool>("PEACE");
-			source.Reply(_("Peace option for %s is now \002off\002."), ci->name.c_str());
+			source.Reply(_("Peace option for \002{0}\002 is now \002off\002."), ci->name);
 		}
 		else
 			this->OnSyntaxError(source, "PEACE");
-
-		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("Enables or disables the \002peace\002 option for a channel.\n"
-				"When \002peace\002 is set, a user won't be able to kick,\n"
-				"ban or remove a channel status of a user that has\n"
-				"a level superior or equal to his via %s commands."), source.service->nick.c_str());
+		source.Reply(_("Enables or disables the \002peace\002 option for \037channel\037."
+		               " When \002peace\002 is set, a user won't be able to kick, ban or remove a channel status of a user that has a level superior or equal to his via services."),
+		               source.service->nick);
 		return true;
 	}
 };
@@ -474,27 +467,30 @@ class CommandCSSetPersist : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
+		const Anope::string &chan = params[0];
+		const Anope::string &param = params[1];
+
 		if (Anope::ReadOnly)
 		{
-			source.Reply(READ_ONLY_MODE);
+			source.Reply(_("Services are in read-only mode."));
 			return;
 		}
 
-		ChanServ::Channel *ci = ChanServ::Find(params[0]);
+		ChanServ::Channel *ci = ChanServ::Find(chan);
 		if (ci == NULL)
 		{
-			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
+			source.Reply(_("Channel \002{0}\002 isn't registered."), chan);
 			return;
 		}
 
 		EventReturn MOD_RESULT;
-		MOD_RESULT = Event::OnSetChannelOption(&Event::SetChannelOption::OnSetChannelOption, source, this, ci, params[1]);
+		MOD_RESULT = Event::OnSetChannelOption(&Event::SetChannelOption::OnSetChannelOption, source, this, ci, param);
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
 		if (MOD_RESULT != EVENT_ALLOW && !source.AccessFor(ci).HasPriv("SET") && source.permission.empty() && !source.HasPriv("chanserv/administration"))
 		{
-			source.Reply(ACCESS_DENIED);
+			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "SET", ci->name);
 			return;
 		}
 
@@ -552,7 +548,7 @@ class CommandCSSetPersist : public Command
 			}
 
 			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to enable persist";
-			source.Reply(_("Channel \002%s\002 is now persistent."), ci->name.c_str());
+			source.Reply(_("Channel \002{0}\002 is now persistent."), ci->name);
 		}
 		else if (params[1].equals_ci("OFF"))
 		{
@@ -590,7 +586,7 @@ class CommandCSSetPersist : public Command
 			}
 
 			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to disable persist";
-			source.Reply(_("Channel \002%s\002 is no longer persistent."), ci->name.c_str());
+			source.Reply(_("Channel \002{0}\002 is no longer persistent."), ci->name);
 		}
 		else
 			this->OnSyntaxError(source, "PERSIST");
@@ -598,30 +594,8 @@ class CommandCSSetPersist : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
-		BotInfo *BotServ = Config->GetClient("BotServ");
-		BotInfo *ChanServ = Config->GetClient("ChanServ");
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("Enables or disables the persistent channel setting.\n"
-				"When persistent is set, the service bot will remain\n"
-				"in the channel when it has emptied of users.\n"
-				" \n"
-				"If your IRCd does not have a permanent (persistent) channel\n"
-				"mode you must have a service bot in your channel to\n"
-				"set persist on, and it can not be unassigned while persist\n"
-				"is on.\n"
-				" \n"
-				"If this network does not have %s enabled and does\n"
-				"not have a permanent channel mode, %s will\n"
-				"join your channel when you set persist on (and leave when\n"
-				"it has been set off).\n"
-				" \n"
-				"If your IRCd has a permanent (persistent) channel mode\n"
-				"and it is set or unset (for any reason, including MODE LOCK),\n"
-				"persist is automatically set and unset for the channel aswell.\n"
-				"Additionally, services will set or unset this mode when you\n"
-				"set persist on or off."), BotServ ? BotServ->nick.c_str() : "BotServ",
-				ChanServ ? ChanServ->nick.c_str() : "ChanServ");
+		source.Reply(_("Enables or disables the persistent channel setting."
+		               " When persistent is set, the service bot will remain in the channel when it has emptied of users."));
 		return true;
 	}
 };
@@ -637,41 +611,44 @@ class CommandCSSetRestricted : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
+		const Anope::string &chan = params[0];
+		const Anope::string &param = params[1];
+
 		if (Anope::ReadOnly)
 		{
-			source.Reply(READ_ONLY_MODE);
+			source.Reply(_("Services are in read-only mode."));
 			return;
 		}
 
-		ChanServ::Channel *ci = ChanServ::Find(params[0]);
+		ChanServ::Channel *ci = ChanServ::Find(chan);
 		if (ci == NULL)
 		{
-			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
+			source.Reply(_("Channel \002{0}\002 isn't registered."), chan);
 			return;
 		}
 
 		EventReturn MOD_RESULT;
-		MOD_RESULT = Event::OnSetChannelOption(&Event::SetChannelOption::OnSetChannelOption, source, this, ci, params[1]);
+		MOD_RESULT = Event::OnSetChannelOption(&Event::SetChannelOption::OnSetChannelOption, source, this, ci, param);
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
 		if (MOD_RESULT != EVENT_ALLOW && !source.AccessFor(ci).HasPriv("SET") && source.permission.empty() && !source.HasPriv("chanserv/administration"))
 		{
-			source.Reply(ACCESS_DENIED);
+			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "SET", ci->name);
 			return;
 		}
 
-		if (params[1].equals_ci("ON"))
+		if (param.equals_ci("ON"))
 		{
 			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to enable restricted";
 			ci->Extend<bool>("RESTRICTED");
-			source.Reply(_("Restricted access option for %s is now \002on\002."), ci->name.c_str());
+			source.Reply(_("Restricted access option for \002{0}\002 is now \002on\002."), ci->name);
 		}
-		else if (params[1].equals_ci("OFF"))
+		else if (param.equals_ci("OFF"))
 		{
 			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to disable restricted";
 			ci->Shrink<bool>("RESTRICTED");
-			source.Reply(_("Restricted access option for %s is now \002off\002."), ci->name.c_str());
+			source.Reply(_("Restricted access option for \002{0}\002 is now \002off\002."), ci->name);
 		}
 		else
 			this->OnSyntaxError(source, "RESTRICTED");
@@ -679,11 +656,7 @@ class CommandCSSetRestricted : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("Enables or disables the \002restricted access\002 option for a\n"
-				"channel. When \002restricted access\002 is set, users not on the access list will\n"
-				"instead be kicked and banned from the channel."));
+		source.Reply(_("Enables or disables the \002restricted access\002 option for \037channel\037. When \002restricted access\002 is set, users not on the access list will not be permitted to join the channel."));
 		return true;
 	}
 };
@@ -699,41 +672,44 @@ class CommandCSSetSecure : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
+		const Anope::string &chan = params[0];
+		const Anope::string &param = params[1];
+
 		if (Anope::ReadOnly)
 		{
-			source.Reply(READ_ONLY_MODE);
+			source.Reply(_("Services are in read-only mode."));
 			return;
 		}
 
-		ChanServ::Channel *ci = ChanServ::Find(params[0]);
+		ChanServ::Channel *ci = ChanServ::Find(chan);
 		if (ci == NULL)
 		{
-			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
+			source.Reply(_("Channel \002{0}\002 isn't registered."), chan);
 			return;
 		}
 
 		EventReturn MOD_RESULT;
-		MOD_RESULT = Event::OnSetChannelOption(&Event::SetChannelOption::OnSetChannelOption, source, this, ci, params[1]);
+		MOD_RESULT = Event::OnSetChannelOption(&Event::SetChannelOption::OnSetChannelOption, source, this, ci, param);
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
 		if (MOD_RESULT != EVENT_ALLOW && !source.AccessFor(ci).HasPriv("SET") && source.permission.empty() && !source.HasPriv("chanserv/administration"))
 		{
-			source.Reply(ACCESS_DENIED);
+			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "SET", ci->name);
 			return;
 		}
 
-		if (params[1].equals_ci("ON"))
+		if (param.equals_ci("ON"))
 		{
 			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to enable secure";
 			ci->Extend<bool>("CS_SECURE");
-			source.Reply(_("Secure option for %s is now \002on\002."), ci->name.c_str());
+			source.Reply(_("Secure option for \002{0}\002 is now \002on\002."), ci->name);
 		}
-		else if (params[1].equals_ci("OFF"))
+		else if (param.equals_ci("OFF"))
 		{
 			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to disable secure";
 			ci->Shrink<bool>("CS_SECURE");
-			source.Reply(_("Secure option for %s is now \002off\002."), ci->name.c_str());
+			source.Reply(_("Secure option for \002{0}\002 is now \002off\002."), ci->name);
 		}
 		else
 			this->OnSyntaxError(source, "SECURE");
@@ -741,13 +717,8 @@ class CommandCSSetSecure : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("Enables or disables security features for a\n"
-			"channel. When \002%s\002 is set, only users who have\n"
-			"registered their nicknames and IDENTIFY'd\n"
-			"with their password will be given access to the channel\n"
-			"as controlled by the access list."), this->name.c_str());
+		source.Reply(_("Enables or disables security features for a channel."
+		               " When \002secure\002 is set, only users who have logged in (eg. not recognized based on their hostmask) will be given access to the channel as controlled by the access list."));
 		return true;
 	}
 };
@@ -763,41 +734,44 @@ class CommandCSSetSecureFounder : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
+		const Anope::string &chan = params[0];
+		const Anope::string &param = params[1];
+
 		if (Anope::ReadOnly)
 		{
-			source.Reply(READ_ONLY_MODE);
+			source.Reply(_("Services are in read-only mode."));
 			return;
 		}
 
-		ChanServ::Channel *ci = ChanServ::Find(params[0]);
+		ChanServ::Channel *ci = ChanServ::Find(chan);
 		if (ci == NULL)
 		{
-			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
+			source.Reply(_("Channel \002{0}\002 isn't registered."), chan);
 			return;
 		}
 
 		EventReturn MOD_RESULT;
-		MOD_RESULT = Event::OnSetChannelOption(&Event::SetChannelOption::OnSetChannelOption, source, this, ci, params[1]);
+		MOD_RESULT = Event::OnSetChannelOption(&Event::SetChannelOption::OnSetChannelOption, source, this, ci, param);
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
 		if (MOD_RESULT != EVENT_ALLOW && (ci->HasExt("SECUREFOUNDER") ? !source.IsFounder(ci) : !source.AccessFor(ci).HasPriv("FOUNDER")) && source.permission.empty() && !source.HasPriv("chanserv/administration"))
 		{
-			source.Reply(ACCESS_DENIED);
+			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "FOUNDER", ci->name);
 			return;
 		}
 
-		if (params[1].equals_ci("ON"))
+		if (param.equals_ci("ON"))
 		{
 			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to enable secure founder";
 			ci->Extend<bool>("SECUREFOUNDER");
-			source.Reply(_("Secure founder option for %s is now \002on\002."), ci->name.c_str());
+			source.Reply(_("Secure founder option for \002{0}\002 is now \002on\002."), ci->name);
 		}
-		else if (params[1].equals_ci("OFF"))
+		else if (param.equals_ci("OFF"))
 		{
 			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to disable secure founder";
 			ci->Shrink<bool>("SECUREFOUNDER");
-			source.Reply(_("Secure founder option for %s is now \002off\002."), ci->name.c_str());
+			source.Reply(_("Secure founder option for \002{0}\002 is now \002off\002."), ci->name);
 		}
 		else
 			this->OnSyntaxError(source, "SECUREFOUNDER");
@@ -807,11 +781,10 @@ class CommandCSSetSecureFounder : public Command
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Enables or disables the \002secure founder\002 option for a channel.\n"
-			"When \002secure founder\002 is set, only the real founder will be\n"
-			"able to drop the channel, change its founder and its successor,\n"
-			"and not those who have founder level access through\n"
-			"the access/qop command."));
+		source.Reply(_("Enables or disables the \002secure founder\002 option for a channel."
+		               " When \002secure founder\002 is set, only the real founder will be able to drop the channel, change its founder, and change its successor."
+		               " Otherwise, anyone with the \002{0}\002 privilege will be able to use these commands."),
+				"FOUNDER");
 		return true;
 	}
 };
@@ -827,41 +800,44 @@ class CommandCSSetSecureOps : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
+		const Anope::string &chan = params[0];
+		const Anope::string &param = params[1];
+
 		if (Anope::ReadOnly)
 		{
-			source.Reply(READ_ONLY_MODE);
+			source.Reply(_("Services are in read-only mode."));
 			return;
 		}
 
-		ChanServ::Channel *ci = ChanServ::Find(params[0]);
+		ChanServ::Channel *ci = ChanServ::Find(chan);
 		if (ci == NULL)
 		{
-			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
+			source.Reply(_("Channel \002{0}\002 isn't registered."), chan);
 			return;
 		}
 
 		EventReturn MOD_RESULT;
-		MOD_RESULT = Event::OnSetChannelOption(&Event::SetChannelOption::OnSetChannelOption, source, this, ci, params[1]);
+		MOD_RESULT = Event::OnSetChannelOption(&Event::SetChannelOption::OnSetChannelOption, source, this, ci, param);
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
 		if (MOD_RESULT != EVENT_ALLOW && !source.AccessFor(ci).HasPriv("SET") && source.permission.empty() && !source.HasPriv("chanserv/administration"))
 		{
-			source.Reply(ACCESS_DENIED);
+			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "SET", ci->name);
 			return;
 		}
 
-		if (params[1].equals_ci("ON"))
+		if (param.equals_ci("ON"))
 		{
 			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to enable secure ops";
 			ci->Extend<bool>("SECUREOPS");
-			source.Reply(_("Secure ops option for %s is now \002on\002."), ci->name.c_str());
+			source.Reply(_("Secure ops option for \002{0}\002 is now \002on\002."), ci->name);
 		}
-		else if (params[1].equals_ci("OFF"))
+		else if (param.equals_ci("OFF"))
 		{
 			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to disable secure ops";
 			ci->Shrink<bool>("SECUREOPS");
-			source.Reply(_("Secure ops option for %s is now \002off\002."), ci->name.c_str());
+			source.Reply(_("Secure ops option for \002{0}\002 is now \002off\002."), ci->name);
 		}
 		else
 			this->OnSyntaxError(source, "SECUREOPS");
@@ -869,11 +845,8 @@ class CommandCSSetSecureOps : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("Enables or disables the \002secure ops\002 option for a channel.\n"
-				"When \002secure ops\002 is set, users who are not on the userlist\n"
-				"will not be allowed chanop status."));
+		source.Reply(_("Enables or disables the \002secure ops\002 option for \037channel\037."
+		               " When \002secure ops\002 is set, users will not be allowed to have channel operator status if they do not have the privileges to have it."));
 		return true;
 	}
 };
@@ -889,50 +862,52 @@ class CommandCSSetSignKick : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
+		const Anope::string &chan = params[0];
+		const Anope::string &param = params[1];
+
 		if (Anope::ReadOnly)
 		{
-			source.Reply(READ_ONLY_MODE);
+			source.Reply(_("Services are in read-only mode."));
 			return;
 		}
 
-		ChanServ::Channel *ci = ChanServ::Find(params[0]);
+		ChanServ::Channel *ci = ChanServ::Find(chan);
 		if (ci == NULL)
 		{
-			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
+			source.Reply(_("Channel \002{0}\002 isn't registered."), chan);
 			return;
 		}
 
 		EventReturn MOD_RESULT;
-		MOD_RESULT = Event::OnSetChannelOption(&Event::SetChannelOption::OnSetChannelOption, source, this, ci, params[1]);
+		MOD_RESULT = Event::OnSetChannelOption(&Event::SetChannelOption::OnSetChannelOption, source, this, ci, param);
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
 		if (MOD_RESULT != EVENT_ALLOW && !source.AccessFor(ci).HasPriv("SET") && source.permission.empty() && !source.HasPriv("chanserv/administration"))
 		{
-			source.Reply(ACCESS_DENIED);
+			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "SET", ci->name);
 			return;
 		}
 
-		if (params[1].equals_ci("ON"))
+		if (param.equals_ci("ON"))
 		{
 			ci->Extend<bool>("SIGNKICK");
 			ci->Shrink<bool>("SIGNKICK_LEVEL");
-			source.Reply(_("Signed kick option for %s is now \002on\002."), ci->name.c_str());
+			source.Reply(_("Signed kick option for \002{0}\002 is now \002on\002."), ci->name);
 			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to enable sign kick";
 		}
-		else if (params[1].equals_ci("LEVEL"))
+		else if (param.equals_ci("LEVEL"))
 		{
 			ci->Extend<bool>("SIGNKICK_LEVEL");
 			ci->Shrink<bool>("SIGNKICK");
-			source.Reply(_("Signed kick option for %s is now \002on\002, but depends of the\n"
-				"level of the user that is using the command."), ci->name.c_str());
+			source.Reply(_("Signed kick option for \002{0}\002 is now \002on\002, but depends of the privileges of the user that is using the command."), ci->name);
 			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to enable sign kick level";
 		}
-		else if (params[1].equals_ci("OFF"))
+		else if (param.equals_ci("OFF"))
 		{
 			ci->Shrink<bool>("SIGNKICK");
 			ci->Shrink<bool>("SIGNKICK_LEVEL");
-			source.Reply(_("Signed kick option for %s is now \002off\002."), ci->name.c_str());
+			source.Reply(_("Signed kick option for \002{0}\002 is now \002off\002."), ci->name);
 			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to disable sign kick";
 		}
 		else
@@ -941,16 +916,10 @@ class CommandCSSetSignKick : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("Enables or disables signed kicks for a\n"
-				"channel.  When \002SIGNKICK\002 is set, kicks issued with\n"
-				"the \002KICK\002 command will have the nick that used the\n"
-				"command in their reason.\n"
-				" \n"
-				"If you use \002LEVEL\002, those who have a level that is superior\n"
-				"or equal to the SIGNKICK level on the channel won't have their\n"
-				"kicks signed."));
+		source.Reply(_("Enables or disables \002signed kicks\002 for \037channel\037."
+		               " When \002signed kicks\002 is enabled, kicks issued through services will have the nickname of the user who performed the kick included in the kick reason."
+		               " If you use \002LEVEL\002 setting, then only users who do not have the \002{0}\002 privilege will have their kicks signed."),
+		               "SIGNKICK");
 		return true;
 	}
 };
@@ -966,17 +935,19 @@ class CommandCSSetSuccessor : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
+		const Anope::string &chan = params[0];
+		const Anope::string &param = params[1];
+
 		if (Anope::ReadOnly)
 		{
-			source.Reply(READ_ONLY_MODE);
+			source.Reply(_("Services are in read-only mode."));
 			return;
 		}
 
-		ChanServ::Channel *ci = ChanServ::Find(params[0]);
-		const Anope::string &param = params.size() > 1 ? params[1] : "";
+		ChanServ::Channel *ci = ChanServ::Find(chan);
 		if (ci == NULL)
 		{
-			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
+			source.Reply(_("Channel \002{0}\002 isn't registered."), chan);
 			return;
 		}
 
@@ -987,7 +958,7 @@ class CommandCSSetSuccessor : public Command
 
 		if (MOD_RESULT != EVENT_ALLOW && (ci->HasExt("SECUREFOUNDER") ? !source.IsFounder(ci) : !source.AccessFor(ci).HasPriv("FOUNDER")) && source.permission.empty() && !source.HasPriv("chanserv/administration"))
 		{
-			source.Reply(ACCESS_DENIED);
+			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "FOUNDER", ci->name);
 			return;
 		}
 
@@ -999,14 +970,16 @@ class CommandCSSetSuccessor : public Command
 
 			if (!na)
 			{
-				source.Reply(NICK_X_NOT_REGISTERED, param.c_str());
+				source.Reply(_("\002{0}\002 isn't registered."), param);
 				return;
 			}
+
 			if (na->nc == ci->GetFounder())
 			{
-				source.Reply(_("%s cannot be the successor on channel %s as they are the founder."), na->nick.c_str(), ci->name.c_str());
+				source.Reply(_("\002{0}\002 cannot be the successor of channel \002{1}\002 as they are the founder."), na->nick, ci->name);
 				return;
 			}
+
 			nc = na->nc;
 		}
 		else
@@ -1017,26 +990,16 @@ class CommandCSSetSuccessor : public Command
 		ci->SetSuccessor(nc);
 
 		if (nc)
-			source.Reply(_("Successor for \002%s\002 changed to \002%s\002."), ci->name.c_str(), nc->display.c_str());
+			source.Reply(_("Successor for \002{0}\002 changed to \002{1}\002."), ci->name, nc->display);
 		else
-			source.Reply(_("Successor for \002%s\002 unset."), ci->name.c_str());
-
-		return;
+			source.Reply(_("Successor for \002{0}\002 unset."), ci->name);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("Changes the successor of a channel. If the founder's\n"
-				"nickname expires or is dropped while the channel is still\n"
-				"registered, the successor will become the new founder of the\n"
-				"channel. The new nickname must be a registered one."));
-		unsigned max_reg = Config->GetModule("chanserv")->Get<unsigned>("maxregistered");
-		if (max_reg)
-			source.Reply(_("However, if the successor already has too many\n"
-				"channels registered (%d), the channel will be dropped\n"
-				"instead, just as if no successor had been set."), max_reg);
+		source.Reply(_("Changes the successor of \037channel\037."
+		               " The successor of a channel is automatically given ownership of the channel if the founder's account drops of expires."
+		               " If the success has too many registered channels or there is no successor, the channel may instead be given to one of the users on the channel access list with the most privileges."));
 		return true;
 	}
 };
@@ -1052,22 +1015,25 @@ class CommandCSSetNoexpire : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
+		const Anope::string &chan = params[0];
+		const Anope::string &param = params[1];
+
 		if (Anope::ReadOnly)
 		{
-			source.Reply(READ_ONLY_MODE);
+			source.Reply(_("Services are in read-only mode."));
 			return;
 		}
 
-		ChanServ::Channel *ci = ChanServ::Find(params[0]);
+		ChanServ::Channel *ci = ChanServ::Find(chan);
 		if (ci == NULL)
 		{
-			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
+			source.Reply(_("Channel \002{0}\002 isn't registered."), chan);
 			return;
 		}
 
 		if (source.permission.empty() && !source.AccessFor(ci).HasPriv("SET"))
 		{
-			source.Reply(ACCESS_DENIED);
+			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "SET", ci->name);
 			return;
 		}
 
@@ -1075,26 +1041,21 @@ class CommandCSSetNoexpire : public Command
 		{
 			Log(LOG_ADMIN, source, this, ci) << "to enable noexpire";
 			ci->Extend<bool>("CS_NO_EXPIRE");
-			source.Reply(_("Channel %s \002will not\002 expire."), ci->name.c_str());
+			source.Reply(_("Channel \002{0} will not\002 expire."), ci->name);
 		}
 		else if (params[1].equals_ci("OFF"))
 		{
 			Log(LOG_ADMIN, source, this, ci) << "to disable noexpire";
 			ci->Shrink<bool>("CS_NO_EXPIRE");
-			source.Reply(_("Channel %s \002will\002 expire."), ci->name.c_str());
+			source.Reply(_("Channel \002{0} will\002 expire."), ci->name);
 		}
 		else
 			this->OnSyntaxError(source, "NOEXPIRE");
-
-		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("Sets whether the given channel will expire.  Setting this\n"
-				"to ON prevents the channel from expiring."));
+		source.Reply(_("Sets whether the given \037channel\037 will expire. Setting \002 noexpire\002 to \002on\002 prevents the channel from expiring."));
 		return true;
 	}
 };
@@ -1124,7 +1085,7 @@ class CSSet : public Module
 		{
 			SerializableExtensibleItem<bool>::ExtensibleSerialize(e, s, data);
 
-			if (s->GetSerializableType()->GetName() != "ChanServ::Channel")
+			if (s->GetSerializableType()->GetName() != "ChannelInfo")
 				return;
 
 			const ChanServ::Channel *ci = anope_dynamic_static_cast<const ChanServ::Channel *>(s);
@@ -1144,7 +1105,7 @@ class CSSet : public Module
 		{
 			SerializableExtensibleItem<bool>::ExtensibleUnserialize(e, s, data);
 
-			if (s->GetSerializableType()->GetName() != "ChanServ::Channel")
+			if (s->GetSerializableType()->GetName() != "ChannelInfo")
 				return;
 
 			ChanServ::Channel *ci = anope_dynamic_static_cast<ChanServ::Channel *>(s);

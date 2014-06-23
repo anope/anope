@@ -29,9 +29,9 @@ class CommandOSModInfo : public Command
 		Module *m = ModuleManager::FindModule(file);
 		if (m)
 		{
-			source.Reply(_("Module: \002%s\002 Version: \002%s\002 Author: \002%s\002 Loaded: \002%s\002"), m->name.c_str(), !m->version.empty() ? m->version.c_str() : "?", !m->author.empty() ? m->author.c_str() : "Unknown", Anope::strftime(m->created, source.GetAccount()).c_str());
+			source.Reply(_("Module: \002{0}\002 Version: \002{1}\002 Author: \002{2}\002 Loaded: \002{3}\002"), m->name, !m->version.empty() ? m->version : "?", !m->author.empty() ? m->author : "Unknown", Anope::strftime(m->created, source.GetAccount()));
 			if (Anope::Debug)
-				source.Reply(_(" Loaded at: %p"), m->handle);
+				source.Reply(_(" Loaded at: {0}"), Anope::printf("%o", m->handle));
 
 			std::vector<Anope::string> servicekeys = Service::GetServiceKeys("Command");
 			for (unsigned i = 0; i < servicekeys.size(); ++i)
@@ -40,7 +40,7 @@ class CommandOSModInfo : public Command
 				if (!c || c->owner != m)
 					continue;
 
-				source.Reply(_("   Providing service: \002%s\002"), c->name.c_str());
+				source.Reply(_("   Providing service: \002{0}\002"), c->name);
 
 				for (botinfo_map::const_iterator it = BotListByNick->begin(), it_end = BotListByNick->end(); it != it_end; ++it)
 				{
@@ -52,21 +52,17 @@ class CommandOSModInfo : public Command
 						const CommandInfo &info = cit->second;
 						if (info.name != c->name)
 							continue;
-						source.Reply(_("   Command \002%s\002 on \002%s\002 is linked to \002%s\002"), c_name.c_str(), bi->nick.c_str(), c->name.c_str());
+						source.Reply(_("   Command \002{0}\002 on \002{1}\002 is linked to \002{2}\002"), c_name, bi->nick, c->name);
 					}
 				}
 			}
 		}
 		else
-			source.Reply(_("No information about module \002%s\002 is available."), file.c_str());
-
-		return;
+			source.Reply(_("No information about module \002{0}\002 is available."), file);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
-		this->SendSyntax(source);
-		source.Reply(" ");
 		source.Reply(_("This command lists information about the specified loaded module."));
 		return true;
 	}
@@ -180,19 +176,17 @@ class CommandOSModList : public Command
 
 			++count;
 
-			source.Reply(_("Module: \002%s\002 [%s] [%s]"), m->name.c_str(), m->version.c_str(), mtype.c_str());
+			source.Reply(_("Module: \002{0}\002 [{1}] [{2}]"), m->name, m->version, mtype);
 		}
 
 		if (!count)
 			source.Reply(_("No modules currently loaded matching that criteria."));
 		else
-			source.Reply(_("%d modules loaded."), count);
+			source.Reply(_("\002{0}\002 modules loaded."), count);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
-		this->SendSyntax(source);
-		source.Reply(" ");
 		source.Reply(_("Lists currently loaded modules."));
 		return true;
 	}

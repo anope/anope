@@ -18,7 +18,7 @@ class CommandBSAssign : public Command
 	CommandBSAssign(Module *creator) : Command(creator, "botserv/assign", 2, 2)
 	{
 		this->SetDesc(_("Assigns a bot to a channel"));
-		this->SetSyntax(_("\037channel\037 \037nick\037"));
+		this->SetSyntax(_("\037channel\037 \037nickname\037"));
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
@@ -32,36 +32,42 @@ class CommandBSAssign : public Command
 			return;
 		}
 
-		ChanServ::Channel *ci = ChanServ::Find(params[0]);
+		ChanServ::Channel *ci = ChanServ::Find(chan);
 		if (ci == NULL)
 		{
-			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
+			source.Reply(_("Channel \002{0}\002 isn't registered."), chan);
 			return;
 		}
 
 		BotInfo *bi = BotInfo::Find(nick, true);
 		if (!bi)
 		{
-			source.Reply(BOT_DOES_NOT_EXIST, nick.c_str());
+			source.Reply(_("Bot \002{0}\002 does not exist."), nick);
 			return;
 		}
 
 		ChanServ::AccessGroup access = source.AccessFor(ci);
- 		if (ci->HasExt("BS_NOBOT") || (!access.HasPriv("ASSIGN") && !source.HasPriv("botserv/administration")))
+ 		if (!access.HasPriv("ASSIGN") && !source.HasPriv("botserv/administration"))
 		{
-			source.Reply(ACCESS_DENIED);
+			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "ASSIGN", ci->name);
+			return;
+		}
+
+		if (ci->HasExt("BS_NOBOT"))
+		{
+			source.Reply(_("Access denied. \002{0}\002 may not have a bot assigned to it because a Services Operator has disallowed it."), ci->name);
 			return;
 		}
 
 		if (bi->oper_only && !source.HasPriv("botserv/administration"))
 		{
-			source.Reply(ACCESS_DENIED);
+			source.Reply(_("Access denied. Bot \002{0}\002 is for operators only."), bi->nick);
 			return;
 		}
 
 		if (ci->bi == bi)
 		{
-			source.Reply(_("Bot \002%s\002 is already assigned to channel \002%s\002."), ci->bi->nick.c_str(), chan.c_str());
+			source.Reply(_("Bot \002{0}\002 is already assigned to \002{1}\002."), ci->bi->nick, ci->name);
 			return;
 		}
 
@@ -69,16 +75,20 @@ class CommandBSAssign : public Command
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "for " << bi->nick;
 
 		bi->Assign(source.GetUser(), ci);
-		source.Reply(_("Bot \002%s\002 has been assigned to %s."), bi->nick.c_str(), ci->name.c_str());
+		source.Reply(_("Bot \002{0}\002 has been assigned to \002{1}\002."), bi->nick, ci->name);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("Assigns a bot pointed out by nick to a channel. You\n"
-				"can then configure the bot for the channel so it fits\n"
-				"your needs."));
+		source.Reply(_("Assigns the bot \037nickname\037 to \037channel\037."
+		               " You can then configure the bot for the channel so it fits your needs.\n"
+		               "\n"
+		               "Use of this command requires the \002{0}\002 privilege on \037channel\037."
+		               "\n"
+		               "Example:\n"
+			       "         {command} #anope Botox\n"
+			       "         Assigns the bot Botox to #anope.\n"),
+		               "ASSIGN", "command"_kw = source.command);
 		return true;
 	}
 };
@@ -94,29 +104,31 @@ class CommandBSUnassign : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
+		const Anope::string &chan = params[0];
+
 		if (Anope::ReadOnly)
 		{
 			source.Reply(_("Sorry, bot assignment is temporarily disabled."));
 			return;
 		}
 
-		ChanServ::Channel *ci = ChanServ::Find(params[0]);
+		ChanServ::Channel *ci = ChanServ::Find(chan);
 		if (ci == NULL)
 		{
-			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
+			source.Reply(_("Channel \002{0}\002 isn't registered."), chan);
 			return;
 		}
 
 		ChanServ::AccessGroup access = source.AccessFor(ci);
 		if (!source.HasPriv("botserv/administration") && !access.HasPriv("ASSIGN"))
 		{
-			source.Reply(ACCESS_DENIED);
+			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "ASSIGN", ci->name);
 			return;
 		}
 
 		if (!ci->bi)
 		{
-			source.Reply(BOT_NOT_ASSIGNED);
+			source.Reply(_("There is no bot assigned to \002{0}\002."), ci->name);
 			return;
 		}
 
@@ -129,19 +141,22 @@ class CommandBSUnassign : public Command
 		bool override = !access.HasPriv("ASSIGN");
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "for " << ci->bi->nick;
 
+		BotInfo *bi = ci->bi;
 		ci->bi->UnAssign(source.GetUser(), ci);
-		source.Reply(_("There is no bot assigned to %s anymore."), ci->name.c_str());
+		source.Reply(_("Bot \002{0}\002 has been unassigned from \002{1}\002."), bi->nick, ci->name);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("Unassigns a bot from a channel. When you use this command,\n"
-				"the bot won't join the channel anymore. However, bot\n"
-				"configuration for the channel is kept, so you will always\n"
-				"be able to reassign a bot later without having to reconfigure\n"
-				"it entirely."));
+		source.Reply(_("Unassigns a bot from \037channel\037."
+		               "Bot configuration is kept, so you will always be able to reassign a bot later without losing your settings.\n"
+		               "\n"
+		               "Use of this command requires the \002{0}\002 privilege on \037channel\037."
+		               "\n"
+		               "Example:\n"
+			       "         {command} #anope\n"
+			       "         Unassigns the current bot from #anope.\n"),
+		               "ASSIGN", "command"_kw = source.command);
 		return true;
 	}
 };
@@ -157,18 +172,13 @@ class CommandBSSetNoBot : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
-		ChanServ::Channel *ci = ChanServ::Find(params[0]);
+		const Anope::string &chan = params[0];
 		const Anope::string &value = params[1];
 
-		if (Anope::ReadOnly)
-		{
-			source.Reply(_("Sorry, bot modification is temporarily disabled."));
-			return;
-		}
-
+		ChanServ::Channel *ci = ChanServ::Find(chan);
 		if (ci == NULL)
 		{
-			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
+			source.Reply(_("Channel \002{0}\002 isn't registered."), chan);
 			return;
 		}
 
@@ -179,14 +189,14 @@ class CommandBSSetNoBot : public Command
 			ci->Extend<bool>("BS_NOBOT");
 			if (ci->bi)
 				ci->bi->UnAssign(source.GetUser(), ci);
-			source.Reply(_("No-bot mode is now \002on\002 on channel %s."), ci->name.c_str());
+			source.Reply(_("No-bot mode is now \002on\002 for \002{0}\002."), ci->name);
 		}
 		else if (value.equals_ci("OFF"))
 		{
 			Log(LOG_ADMIN, source, this, ci) << "to disable nobot";
 
 			ci->Shrink<bool>("BS_NOBOT");
-			source.Reply(_("No-bot mode is now \002off\002 on channel %s."), ci->name.c_str());
+			source.Reply(_("No-bot mode is now \002off\002 for \002{0}\002."), ci->name);
 		}
 		else
 			this->OnSyntaxError(source, source.command);
@@ -194,11 +204,13 @@ class CommandBSSetNoBot : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
-		this->SendSyntax(source);
-		source.Reply(_(" \n"
-				"This option makes a channel be unassignable. If a bot\n"
-				"is already assigned to the channel, it is unassigned\n"
-				"automatically when you enable the option."));
+		source.Reply(_("If no-bot is set on a channel, then the channel will be unabled to have a bot assigned to it."
+		               " If a bot is already assigned to the channel, it is unassigned automatically when no-bot is enabled."
+		               "\n"
+		               "Example:\n"
+			       "         {command} #anope on\n"
+			       "         Prevents a service bot from being assigned to #anope.\n"),
+		               "command"_kw = source.command);
 		return true;
 	}
 };
@@ -217,7 +229,9 @@ class BSAssign : public Module
 	BSAssign(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
 		, EventHook<Event::Invite>("OnInvite")
 		, EventHook<Event::BotInfoEvent>("OnBotInfoEvent")
+
 		, nobot(this, "BS_NOBOT")
+
 		, commandbsassign(this)
 		, commandbsunassign(this)
 		, commandbssetnobot(this)
@@ -227,30 +241,36 @@ class BSAssign : public Module
 	void OnInvite(User *source, Channel *c, User *targ) override
 	{
 		BotInfo *bi;
-		if (Anope::ReadOnly || !c->ci || targ->server != Me || !(bi = dynamic_cast<BotInfo *>(targ)))
+		if (Anope::ReadOnly || !c->ci || targ->server != Me || !(bi = BotInfo::Find(targ->nick, true)))
 			return;
 
 		ChanServ::AccessGroup access = c->ci->AccessFor(source);
-		if (nobot.HasExt(c->ci) || (!access.HasPriv("ASSIGN") && !source->HasPriv("botserv/administration")))
+		if (!access.HasPriv("ASSIGN") && !source->HasPriv("botserv/administration"))
 		{
-			targ->SendMessage(bi, ACCESS_DENIED);
+			targ->SendMessage(bi, _("Access denied. You do not have privilege \002ASSIGN\002 on \002{0}\002."), c->ci->name);
+			return;
+		}
+
+		if (nobot.HasExt(c->ci))
+		{
+			targ->SendMessage(bi, _("Access denied. \002{0}\002 may not have a bot assigned to it because a Services Operator has disallowed it."), c->ci->name);
 			return;
 		}
 
 		if (bi->oper_only && !source->HasPriv("botserv/administration"))
 		{
-			targ->SendMessage(bi, ACCESS_DENIED);
+			targ->SendMessage(bi, _("Access denied. Bot \002{0}\002 is for operators only."), bi->nick);
 			return;
 		}
 
 		if (c->ci->bi == bi)
 		{
-			targ->SendMessage(bi, _("Bot \002%s\002 is already assigned to channel \002%s\002."), c->ci->bi->nick.c_str(), c->name.c_str());
+			targ->SendMessage(bi, _("Bot \002{0}\002 is already assigned to \002{1}\002."), bi->nick, c->ci->name);
 			return;
 		}
 
 		bi->Assign(source, c->ci);
-		targ->SendMessage(bi, _("Bot \002%s\002 has been assigned to %s."), bi->nick.c_str(), c->name.c_str());
+		targ->SendMessage(bi, _("Bot \002{0}\002 has been assigned to \002{1}\002."), bi->nick, c->ci->name);
 	}
 
 	void OnBotInfo(CommandSource &source, BotInfo *bi, ChanServ::Channel *ci, InfoFormatter &info) override

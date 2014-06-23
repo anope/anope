@@ -39,7 +39,7 @@ class CommandCSEnforce : public Command
 		if (!hadsecureops)
 			ci->Shrink<bool>("SECUREOPS");
 
-		source.Reply(_("Secureops enforced on %s."), ci->name.c_str());
+		source.Reply(_("\002Secureops\002 enforced on \002{0}\002."), ci->name);
 	}
 
 	void DoRestricted(CommandSource &source, ChanServ::Channel *ci)
@@ -70,7 +70,7 @@ class CommandCSEnforce : public Command
 			ci->c->Kick(NULL, user, "%s", reason.c_str());
 		}
 
-		source.Reply(_("Restricted enforced on %s."), ci->name.c_str());
+		source.Reply(_("\002Restricted\002 enforced on \002{0}\002."), ci->name);
 	}
 
 	void DoRegOnly(CommandSource &source, ChanServ::Channel *ci)
@@ -102,7 +102,7 @@ class CommandCSEnforce : public Command
 			ci->c->Kick(NULL, user, "%s", reason.c_str());
 		}
 
-		source.Reply(_("Registered only enforced on %s."), ci->name.c_str());
+		source.Reply(_("\002Registered only\002 enforced on \002{0}\002."), ci->name);
 	}
 
 	void DoSSLOnly(CommandSource &source, ChanServ::Channel *ci)
@@ -134,7 +134,7 @@ class CommandCSEnforce : public Command
 			ci->c->Kick(NULL, user, "%s", reason.c_str());
 		}
 
-		source.Reply(_("SSL only enforced on %s."), ci->name.c_str());
+		source.Reply(_("\002SSL only\002 enforced on %s."), ci->name.c_str());
 	}
 
 	void DoBans(CommandSource &source, ChanServ::Channel *ci)
@@ -163,7 +163,7 @@ class CommandCSEnforce : public Command
 			ci->c->Kick(NULL, user, "%s", reason.c_str());
 		}
 
-		source.Reply(_("Bans enforced on %s."), ci->name.c_str());
+		source.Reply(_("\002Bans\002 enforced on %s."), ci->name.c_str());
 	}
 
 	void DoLimit(CommandSource &source, ChanServ::Channel *ci)
@@ -174,7 +174,7 @@ class CommandCSEnforce : public Command
 		Anope::string l_str;
 		if (!ci->c->GetParam("LIMIT", l_str))
 		{
-			source.Reply(_("No limit is set on %s."), ci->name.c_str());
+			source.Reply(_("There is no limit is set on \002{0}\002."), ci->name);
 			return;
 		}
 
@@ -187,7 +187,7 @@ class CommandCSEnforce : public Command
 		}
 		catch (const ConvertException &)
 		{
-			source.Reply(_("The limit on %s is not valid."), ci->name.c_str());
+			source.Reply(_("The limit on \002{0}\002 is not valid."), ci->name);
 			return;
 		}
 
@@ -218,7 +218,7 @@ class CommandCSEnforce : public Command
 			ci->c->Kick(NULL, user, "%s", reason.c_str());
 		}
 
-		source.Reply(_("LIMIT enforced on %s, %d users removed."), ci->name.c_str(), users.size());
+		source.Reply(_("LIMIT enforced on \002{0}\002, \002{1]\002 users removed."), ci->name, users.size());
 	}
 
  public:
@@ -235,11 +235,11 @@ class CommandCSEnforce : public Command
 		ChanServ::Channel *ci = ChanServ::Find(params[0]);
 
 		if (!ci)
-			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
+			source.Reply(_("Channel \002{0}\002 isn't registered."), params[0]);
 		else if (!ci->c)
-			source.Reply(CHAN_X_NOT_IN_USE, ci->name.c_str());
+			source.Reply(_("Channel \002{0}\002 doesn't exist."), ci->name);
 		else if (!source.AccessFor(ci).HasPriv("AKICK") && !source.HasPriv("chanserv/access/modify"))
-			source.Reply(ACCESS_DENIED);
+			source.Reply("Access denied. You do not have the \002{0}\002 privilege on \002{1}\002.", "AKICK", ci->name);
 		else if (what.equals_ci("SECUREOPS"))
 			this->DoSecureOps(source, ci);
 		else if (what.equals_ci("RESTRICTED"))
@@ -258,21 +258,24 @@ class CommandCSEnforce : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("Enforce various channel modes and set options. The \037channel\037\n"
-			"option indicates what channel to enforce the modes and options\n"
-			"on. The \037what\037 option indicates what modes and options to\n"
-			"enforce, and can be any of \002SECUREOPS\002, \002RESTRICTED\002, \002REGONLY\002, \002SSLONLY\002,\n"
-			"\002BANS\002, or \002LIMIT\002.\n"
-			" \n"
-			"Use \002SECUREOPS\002 to enforce the SECUREOPS option, even if it is not\n"
-			"enabled. Use \002RESTRICTED\002 to enfore the RESTRICTED option, also\n"
-			"if it's not enabled. Use \002REGONLY\002 to kick all unregistered users\n"
-			"from the channel. Use \002SSLONLY\002 to kick all users not using a secure\n"
-			"connection from the channel. \002BANS\002 will enforce bans on the channel by\n"
-			"kicking users affected by them, and \002LIMIT\002 will kick users until the\n"
-			"user count drops below the channel limit, if one is set."));
+		source.Reply(_("Enforce various channel modes and set options on \037channel\037."
+		               "\n"
+		               "The \002SECUREOPS\002 option enforces SECUREOPS, even if it is not enabled.\n"
+		               "See \002/msg ChanServ HELP SET SECUREOPS\002 for information about SECUREOPS.\n" //XXX
+		               "\n"
+		               "The \002RESTRICTED\002 option enforces RESTRICTED, even if it is not enabled.\n"
+		               "See \002/msg ChanServ HELP SET RESTRICTED\002 for information about RESTRICTED.\n" //XXX
+		               "\n"
+		               "The \002REGONLY\002 option removes all unregistered users.\n"
+		               "\n"
+		               "The \002SSLONLY\002 option removes all users not using a secure connection.\n"
+		               "\n"
+		               "The \002BANS\002 option enforces bans on the channel by removing users affected by then.\n"
+		               "\n"
+		               "The \002LIMIT\002 option will remove users until the user count drops below the channel limit, if one is set.\n"
+		               "\n"
+		               "Use of this command requires the \002{0}\002 privilege."),
+		               "AKICK");
 		return true;
 	}
 };

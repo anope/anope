@@ -29,26 +29,26 @@ class CommandCSDrop : public Command
 
 		if (Anope::ReadOnly && !source.HasPriv("chanserv/administration"))
 		{
-			source.Reply(_("Sorry, channel de-registration is temporarily disabled.")); // XXX: READ_ONLY_MODE?
+			source.Reply(_("Sorry, channel de-registration is temporarily disabled."));
 			return;
 		}
 
 		ChanServ::Channel *ci = ChanServ::Find(chan);
 		if (ci == NULL)
 		{
-			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
+			source.Reply(_("Channel \002{0}\002 isn't registered."), chan);
 			return;
 		}
 
 		if (params.size() < 2 || !chan.equals_ci(params[1]))
 		{
-			source.Reply(_("You must enter the channel name twice as a confirmation that you wish to drop \002%s\002."), chan.c_str());
+			source.Reply(_("You must enter the channel name twice as a confirmation that you wish to drop \002{0}\002."), ci->name);
 			return;
 		}
 
 		if ((ci->HasExt("SECUREFOUNDER") ? !source.IsFounder(ci) : !source.AccessFor(ci).HasPriv("FOUNDER")) && !source.HasCommand("chanserv/drop"))
 		{
-			source.Reply(ACCESS_DENIED);
+			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "FOUNDER", ci->name);
 			return;
 		}
 
@@ -62,7 +62,7 @@ class CommandCSDrop : public Command
 		Reference<Channel> c = ci->c;
 		delete ci;
 
-		source.Reply(_("Channel \002%s\002 has been dropped."), chan.c_str());
+		source.Reply(_("Channel \002{0}\002 has been dropped."), chan);
 
 		if (c)
 			c->CheckModes();
@@ -70,14 +70,15 @@ class CommandCSDrop : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
-		this->SendSyntax(source);
-		source.Reply(" ");
-		if (source.IsServicesOper())
-			source.Reply(_("Unregisters the named channel.  Only \002Services Operators\002\n"
-					"can drop a channel of which they are not the founder."));
-		else
-			source.Reply(_("Unregisters the named channel.  Can only be used by\n"
-					"the \002channel founder\002."));
+		source.Reply(_("Unregisters \037channel\037. All channel settings will be deleted. As a precaution, you must give the \037channel\037 name twice.\n"
+		               "\n"
+		               "Use of this command requires the \002{0}\002 privilege on \037channel\037."),
+		               "FOUNDER");
+
+		if (source.HasCommand("chanserv/drop"))
+			source.Reply(_("\n"
+			               "As a Services Operator with the command \002{0}\002, you may drop any channel."),
+			               "chanserv/drop");
 
 		return true;
 	}

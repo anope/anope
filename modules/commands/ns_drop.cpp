@@ -36,14 +36,14 @@ class CommandNSDrop : public Command
 		NickServ::Nick *na = NickServ::FindNick(nick);
 		if (!na)
 		{
-			source.Reply(NICK_X_NOT_REGISTERED, nick.c_str());
+			source.Reply(_("\002{0}\002 isn't registered."), nick);
 			return;
 		}
 
 		bool is_mine = source.GetAccount() == na->nc;
 
 		if (!is_mine && !source.HasPriv("nickserv/drop"))
-			source.Reply(ACCESS_DENIED);
+			source.Reply(_("Access denied. You do not have the correct operator privileges to drop other user's nicknames."));
 		else if (Config->GetModule("nickserv")->Get<bool>("secureadmins", "yes") && !is_mine && na->nc->IsServicesOper())
 			source.Reply(_("You may not drop other Services Operators' nicknames."));
 		else
@@ -53,20 +53,15 @@ class CommandNSDrop : public Command
 			Log(!is_mine ? LOG_ADMIN : LOG_COMMAND, source, this) << "to drop nickname " << na->nick << " (group: " << na->nc->display << ") (email: " << (!na->nc->email.empty() ? na->nc->email : "none") << ")";
 			delete na;
 
-			source.Reply(_("Nickname \002%s\002 has been dropped."), nick.c_str());
+			source.Reply(_("\002{0}\002 has been dropped."), nick);
 		}
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("Drops the given nick from the database. Once your nickname\n"
-				"is dropped you may lose all of your access and channels that\n"
-				"you may own. Any other user will be able to gain control of\n"
-				"this nick."));
+		source.Reply(_("Unregisters \037nickname\037. Once your nickname is dropped you may lose all of your access and channels that you may own. Any other user will be free to register \037nickname\037."));
 		if (!source.HasPriv("nickserv/drop"))
-			source.Reply(_("You may drop any nick within your group."));
+			source.Reply(_("You may drop any nickname within your group."));
 		else
 			 source.Reply(_("As a Services Operator, you may drop any nick."));
 

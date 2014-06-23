@@ -52,7 +52,7 @@ class CommandOSLogSearch : public Command
 						}
 						catch (const ConvertException &)
 						{
-							source.Reply(_("Invalid duration %s, using %d days."), dur.c_str(), days);
+							source.Reply(_("Invalid duration \002{0}\002, using \002{1}\002 days."), dur, days);
 						}
 					}
 					break;
@@ -68,12 +68,12 @@ class CommandOSLogSearch : public Command
 						}
 						catch (const ConvertException &)
 						{
-							source.Reply(_("Invalid limit %s, using %d."), dur.c_str(), replies);
+							source.Reply(_("Invalid limit \002{0}\002, using \002{1}\002."), dur, replies);
 						}
 					}
 					break;
 				default:
-					source.Reply(_("Unknown parameter: %s"), params[i].c_str());
+					source.Reply(_("Unknown parameter: {0}"), params[i]);
 			}
 		}
 
@@ -109,35 +109,30 @@ class CommandOSLogSearch : public Command
 		unsigned found = matches.size();
 		if (!found)
 		{
-			source.Reply(_("No matches for \002%s\002 found."), search_string.c_str());
+			source.Reply(_("No matches for \002{0}\002 found."), search_string);
 			return;
 		}
 
 		while (matches.size() > static_cast<unsigned>(replies))
 			matches.pop_front();
 
-		source.Reply(_("Matches for \002%s\002:"), search_string.c_str());
+		source.Reply(_("Matches for \002{0}\002:"), search_string);
 		unsigned count = 0;
 		for (std::list<Anope::string>::iterator it = matches.begin(), it_end = matches.end(); it != it_end; ++it)
 			source.Reply("#%d: %s", ++count, it->c_str());
-		source.Reply(_("Showed %d/%d matches for \002%s\002."), matches.size(), found, search_string.c_str());
+		source.Reply(_("Showed \002{0}/{1}\002 matches for \002{2}\002."), matches.size(), found, search_string);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("This command searches the Services logfiles for messages\n"
-				"that match the given pattern. The day and limit argument\n"
-				"may be used to specify how many days of logs to search\n"
-				"and the number of replies to limit to. By default this\n"
-				"command searches one week of logs, and limits replies\n"
-				"to 50.\n"
-				" \n"
-				"For example:\n"
-				"    \002LOGSEARCH +21d +500l Anope\002\n"
-				"      Searches the last 21 days worth of logs for messages\n"
-				"      containing Anope and lists the most recent 500 of them."));
+		source.Reply(_("This command searches the Services logfiles for messages that match the given pattern."
+		               " The day and limit argument may be used to specify how many days of logs to search and the number of replies to limit to."
+		               " By default this command searches one week of logs, and limits replies to 50.\n"
+		               "\n"
+		               "Example:\n"
+		               "         {0} +21d +500l Anope\n"
+		               "         Searches the last 21 days worth of logs for messages containing \"Anope\" and lists the most recent 500 of them."),
+		               source.command);
 		return true;
 	}
 };

@@ -44,8 +44,7 @@ class CommandBSBotList : public Command
 		list.Process(replies);
 
 		if (!count)
-			source.Reply(_("There are no bots available at this time.\n"
-					"Ask a Services Operator to create one!"));
+			source.Reply(_("There are no bots available at this time."));
 		else
 		{
 			source.Reply(_("Bot list:"));
@@ -53,16 +52,28 @@ class CommandBSBotList : public Command
 			for (unsigned i = 0; i < replies.size(); ++i)
 				source.Reply(replies[i]);
 
-			source.Reply(_("%d bots available."), count);
+			source.Reply(_("{0} bots available."), count);
 		}
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("Lists all available bots on this network.\n"
-				"Bots prefixed by a * are reserved for IRC Operators."));
+		BotInfo *bi;
+		Anope::string name;
+		Command::FindCommandFromService("botserv/assign", bi, name);
+		if (!bi)
+			return false;
+
+		source.Reply(_("Lists all available bots. You may use the \002{msg}{service} {assign}\002 command to assign a bot to your channel."
+		               "The bot names are vanity; they all proviate the same commands and features."),
+				"msg"_kw = Config->StrictPrivmsg, "service"_kw = bi->nick, "assign"_kw = name);
+		if (source.HasPriv("botserv/administration"))
+			source.Reply(_("Bots prefixed by a * are reserved for Services Operators with the privilege \002{0}\002."),
+		                       "botserv/administration");
+		source.Reply(_("\n"
+		               "Example:\n"
+		               "         {command} BOTLIST"),
+		               "command"_kw = source.command);
 		return true;
 	}
 };

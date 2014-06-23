@@ -124,6 +124,8 @@ class CoreExport BotInfo : public User, public Serializable
 	 */
 	CommandInfo *GetCommand(const Anope::string &cname);
 
+	CommandInfo *FindCommand(const Anope::string &service);
+
 	/** Find a bot by nick
 	 * @param nick The nick
 	 * @param nick_only True to only look by nick, and not by UID

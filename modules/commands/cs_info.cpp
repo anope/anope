@@ -29,10 +29,10 @@ class CommandCSInfo : public Command
 		const Anope::string &chan = params[0];
 
 		NickServ::Account *nc = source.nc;
-		ChanServ::Channel *ci = ChanServ::Find(params[0]);
+		ChanServ::Channel *ci = ChanServ::Find(chan);
 		if (ci == NULL)
 		{
-			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
+			source.Reply(_("Channel \002{0}\002 isn't registered."), chan);
 			return;
 		}
 
@@ -45,7 +45,7 @@ class CommandCSInfo : public Command
 
 		InfoFormatter info(nc);
 
-		source.Reply(CHAN_INFO_HEADER, chan.c_str());
+		source.Reply(_("Information for channel \002{0}\002:"), ci->name);
 		if (ci->GetFounder())
 			info[_("Founder")] = ci->GetFounder()->display;
 
@@ -74,14 +74,8 @@ class CommandCSInfo : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("Lists information about the named registered channel,\n"
-				"including its founder, time of registration, and last\n"
-				"time used. If the user issuing the command has the\n"
-				"appropriate access for it, then the description, successor,\n"
-				"last topic set, settings and expiration time will also\n"
-				"be displayed when applicable."));
+		source.Reply(_("Shows information about \037channel\037, including its founder, description, time of registration, and last time used."
+		               " If the user issuing the command has \002{0}\002 privilege on \037channel\037, then the successor, last topic set, settings and expiration time will also be displayed when applicable."));
 		return true;
 	}
 };

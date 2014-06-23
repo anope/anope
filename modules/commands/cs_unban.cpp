@@ -48,22 +48,23 @@ class CommandCSUnban : public Command
 			return;
 		}
 
-		ChanServ::Channel *ci = ChanServ::Find(params[0]);
+		const Anope::string &chan = params[0];
+		ChanServ::Channel *ci = ChanServ::Find(chan);
 		if (ci == NULL)
 		{
-			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
+			source.Reply(_("Channel \002{0}\002 isn't registered."), chan);
 			return;
 		}
 
 		if (ci->c == NULL)
 		{
-			source.Reply(CHAN_X_NOT_IN_USE, ci->name.c_str());
+			source.Reply(_("Channel \002{0}\002 doesn't exist."), ci->name);
 			return;
 		}
 
 		if (!source.AccessFor(ci).HasPriv("UNBAN") && !source.HasPriv("chanserv/kick"))
 		{
-			source.Reply(ACCESS_DENIED);
+			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "UNBAN", ci->name);
 			return;
 		}
 
@@ -73,7 +74,8 @@ class CommandCSUnban : public Command
 
 		if (!u2)
 		{
-			source.Reply(NICK_X_NOT_IN_USE, params[1].c_str());
+			if (params.size() > 1)
+				source.Reply(_("User \002{0}\002 isn't currently online."), params[1]);
 			return;
 		}
 
@@ -82,22 +84,18 @@ class CommandCSUnban : public Command
 
 		ci->c->Unban(u2, source.GetUser() == u2);
 		if (u2 == source.GetUser())
-			source.Reply(_("You have been unbanned from \002%s\002."), ci->c->name.c_str());
+			source.Reply(_("You have been unbanned from \002{0}\002."), ci->c->name);
 		else
-			source.Reply(_("\002%s\002 has been unbanned from \002%s\002."), u2->nick.c_str(), ci->c->name.c_str());
+			source.Reply(_("\002{0}\002 has been unbanned from \002{1}\002."), u2->nick, ci->c->name);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("Tells %s to remove all bans preventing you or the given\n"
-				"user from entering the given channel. If no channel is\n"
-				"given, all bans affecting you in channels you have access\n"
-				"in are removed.\n"
-				" \n"
-				"By default, limited to AOPs or those with level 5 and above\n"
-				"on the channel."), source.service->nick.c_str());
+		source.Reply(_("Tells {0} to remove all bans preventing you or the given \037user\037 from entering \037channel\037."
+		               " If no channel is given, all bans affecting you in channels you have access in are removed.\n"
+				"\n"
+				"Use of this command requires the \002{1}\002 privilege on \037channel\037."),
+				source.service->nick, "UNBAN");
 		return true;
 	}
 };

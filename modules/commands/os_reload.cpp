@@ -36,18 +36,13 @@ class CommandOSReload : public Command
 		catch (const ConfigException &ex)
 		{
 			Log(this->owner) << "Error reloading configuration file: " << ex.GetReason();
-			source.Reply(_("Error reloading configuration file: %s"), ex.GetReason().c_str());
+			source.Reply(_("Error reloading configuration file: {0}"), ex.GetReason());
 		}
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("Causes Services to reload the configuration file. Note that\n"
-				"some directives still need the restart of the Services to\n"
-				"take effect (such as Services' nicknames, activation of the\n"
-				"session limitation, etc.)."));
+		source.Reply(_("Causes Services to reload the configuration file."));
 		return true;
 	}
 };

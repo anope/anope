@@ -103,7 +103,7 @@ class CommandCSFlags : public Command
 			ChanServ::Channel *targ_ci = ChanServ::Find(mask);
 			if (targ_ci == NULL)
 			{
-				source.Reply(CHAN_X_NOT_REGISTERED, mask.c_str());
+				source.Reply(_("Channel \002{0}\002 isn't registered."), mask);
 				return;
 			}
 			else if (ci == targ_ci)
@@ -129,7 +129,7 @@ class CommandCSFlags : public Command
 					mask = "*!*@" + targ->GetDisplayedHost();
 				else
 				{
-					source.Reply(NICK_X_NOT_REGISTERED, mask.c_str());
+					source.Reply(_("\002{0}\002 isn't registered."), mask);
 					return;
 				}
 			}
@@ -154,7 +154,7 @@ class CommandCSFlags : public Command
 							override = true;
 						else
 						{
-							source.Reply(ACCESS_DENIED);
+							source.Reply(_("Access denied. You do not have enough privileges on \002{0}\002 to modify the access of \002{1}\002."), ci->name, access->mask);
 							return;
 						}
 					}
@@ -170,7 +170,7 @@ class CommandCSFlags : public Command
 		unsigned access_max = Config->GetModule("chanserv")->Get<unsigned>("accessmax", "1024");
 		if (access_max && ci->GetDeepAccessCount() >= access_max)
 		{
-			source.Reply(_("Sorry, you can only have %d access entries on a channel, including access entries from other channels."), access_max);
+			source.Reply(_("Sorry, you can only have \002{0}\002 access entries on a channel, including access entries from other channels."), access_max);
 			return;
 		}
 
@@ -227,7 +227,7 @@ class CommandCSFlags : public Command
 								override = true;
 							else
 							{
-								source.Reply(_("You can not set the \002%c\002 flag."), f);
+								source.Reply(_("You can not set the \002{0}\002 flag."), f);
 								break;
 							}
 						}
@@ -247,11 +247,11 @@ class CommandCSFlags : public Command
 				Event::OnAccessDel(&Event::AccessDel::OnAccessDel, ci, source, current);
 				delete current;
 				Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to delete " << mask;
-				source.Reply(_("\002%s\002 removed from the %s access list."), mask.c_str(), ci->name.c_str());
+				source.Reply(_("\002{0}\002 removed from the access list of \002{1}\002."), mask, ci->name);
 			}
 			else
 			{
-				source.Reply(_("\002%s\002 not found on %s access list."), mask.c_str(), ci->name.c_str());
+				source.Reply(_("\002{0}\002 not found on the access list of \002{1}\002."), mask, ci->name);
 			}
 			return;
 		}
@@ -278,12 +278,12 @@ class CommandCSFlags : public Command
 		if (p != NULL)
 		{
 			if (add)
-				source.Reply(_("Privilege \002%s\002 added to \002%s\002 on \002%s\002, new flags are +\002%s\002"), p->name.c_str(), access->mask.c_str(), ci->name.c_str(), access->AccessSerialize().c_str());
+				source.Reply(_("Privilege \002{0}\002 added to \002{1}\002 on \002{2}\002, new flags are +\002{3}\002"), p->name, access->mask, ci->name, access->AccessSerialize());
 			else
-				source.Reply(_("Privilege \002%s\002 removed from \002%s\002 on \002%s\002, new flags are +\002%s\002"), p->name.c_str(), access->mask.c_str(), ci->name.c_str(), access->AccessSerialize().c_str());
+				source.Reply(_("Privilege \002{0}\002 removed from \002{1}\002 on \002{2}\002, new flags are +\002{3}\002"), p->name, access->mask, ci->name, access->AccessSerialize());
 		}
 		else
-			source.Reply(_("Flags for \002%s\002 on %s set to +\002%s\002"), access->mask.c_str(), ci->name.c_str(), access->AccessSerialize().c_str());
+			source.Reply(_("Flags for \002{0}\002 on \002{1}\002 set to +\002{2}\002"), access->mask, ci->name, access->AccessSerialize());
 	}
 
 	void DoList(CommandSource &source, ChanServ::Channel *ci, const std::vector<Anope::string> &params)
@@ -292,7 +292,7 @@ class CommandCSFlags : public Command
 
 		if (!ci->GetAccessCount())
 		{
-			source.Reply(_("%s access list is empty."), ci->name.c_str());
+			source.Reply(_("The access list of \002{0}\002 is empty."), ci->name);
 			return;
 		}
 
@@ -332,39 +332,38 @@ class CommandCSFlags : public Command
 		}
 
 		if (list.IsEmpty())
-			source.Reply(_("No matching entries on %s access list."), ci->name.c_str());
+			source.Reply(_("No matching entries on the access list of \002{0}\002."), ci->name);
 		else
 		{
 			std::vector<Anope::string> replies;
 			list.Process(replies);
 
-			source.Reply(_("Flags list for %s"), ci->name.c_str());
+			source.Reply(_("Flags list for \002{0}\002:"), ci->name);
 			for (unsigned i = 0; i < replies.size(); ++i)
 				source.Reply(replies[i]);
 			if (count == ci->GetAccessCount())
 				source.Reply(_("End of access list."));
 			else
-				source.Reply(_("End of access list - %d/%d entries shown."), count, ci->GetAccessCount());
+				source.Reply(_("End of access list - \002{0}/{1}\002 entries shown."), count, ci->GetAccessCount());
 		}
 	}
 
 	void DoClear(CommandSource &source, ChanServ::Channel *ci)
 	{
 		if (!source.IsFounder(ci) && !source.HasPriv("chanserv/access/modify"))
-			source.Reply(ACCESS_DENIED);
-		else
 		{
-			ci->ClearAccess();
-
-			Event::OnAccessClear(&Event::AccessClear::OnAccessClear, ci, source);
-
-			source.Reply(_("Channel %s access list has been cleared."), ci->name.c_str());
-
-			bool override = !source.IsFounder(ci);
-			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to clear the access list";
+			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "FOUNDER", ci->name);
+			return;
 		}
 
-		return;
+		ci->ClearAccess();
+
+		Event::OnAccessClear(&Event::AccessClear::OnAccessClear, ci, source);
+
+		source.Reply(_("The access list of \002{0}\002 has been cleared."), ci->name);
+
+		bool override = !source.IsFounder(ci);
+		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to clear the access list";
 	}
 
  public:
@@ -384,7 +383,7 @@ class CommandCSFlags : public Command
 		ChanServ::Channel *ci = ChanServ::Find(chan);
 		if (ci == NULL)
 		{
-			source.Reply(CHAN_X_NOT_REGISTERED, chan.c_str());
+			source.Reply(_("Channel \002{0}\002 isn't registered."), chan);
 			return;
 		}
 
@@ -398,7 +397,7 @@ class CommandCSFlags : public Command
 			has_access = true;
 
 		if (!has_access)
-			source.Reply(ACCESS_DENIED);
+			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), is_list ? "ACCESS_LIST" : "ACCESS_CHANGE", ci->name);
 		else if (Anope::ReadOnly && !is_list)
 			source.Reply(_("Sorry, channel access list modification is temporarily disabled."));
 		else if (cmd.equals_ci("MODIFY"))
@@ -413,24 +412,28 @@ class CommandCSFlags : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
-		this->SendSyntax(source);
+		source.Reply(_("{0} allow granularly granting privileges on channels to users by assigning them flags, which map to one or more privileges.\n"
+		               "\n"
+		               "The \002MODIFY\002 command allows you to modify the access list."
+		               " If \037mask\037 is not already on the access list is it added, then the \037changes\037 are applied."
+		               " If the mask has no more flags, then the mask is removed from the access list."
+		               " Additionally, you may use +* or -* to add or remove all flags, respectively."
+		               " You are only able to modify the access list if you have the \002{1}\002 privilege on the channel, and can only give privileges to up what you have."),
+		               source.command, "ACCESS_CHANGE");
 		source.Reply(" ");
-		source.Reply(_("%s is another way to modify the channel access list, similar to\n"
-				"the XOP and ACCESS methods."), source.command.c_str());
+		source.Reply(_("The \002LIST\002 command allows you to list existing entries on the channel access list."
+		               " If \037mask\037 is given, the \037mask\037 is wildcard matched against all existing entries on the access list, and only those entries are returned."
+		               " If a set of flags is given, only those on the access list with the specified flags are returned."));
 		source.Reply(" ");
-		source.Reply(_("The \002MODIFY\002 command allows you to modify the access list. If mask is\n"
-				"not already on the access list is it added, then the changes are applied.\n"
-				"If the mask has no more flags, then the mask is removed from the access list.\n"
-				"Additionally, you may use +* or -* to add or remove all flags, respectively. You are\n"
-				"only able to modify the access list if you have the proper permission on the channel,\n"
-				"and even then you can only give other people access to up what you already have."));
+		source.Reply(_("The \002CLEAR\002 command clears the channel access list, which requires being the founder of \037channel\037."));
 		source.Reply(" ");
-		source.Reply(_("The \002LIST\002 command allows you to list existing entries on the channel access list.\n"
-				"If a mask is given, the mask is wildcard matched against all existing entries on the\n"
-				"access list, and only those entries are returned. If a set of flags is given, only those\n"
-				"on the access list with the specified flags are returned."));
-		source.Reply(" ");
-		source.Reply(_("The \002CLEAR\002 command clears the channel access list, which requires channel founder."));
+		source.Reply(_("\n"
+		               "Examples:\n"
+		               "         {command} #anope MODIFY Attila +fHhu-i\n"
+		               "          Modifies the flags of \"Attila\" on the access list of \"#anope\" to \"+fHhu-i\".\n"
+		               "\n"
+		               "         {command} #anope MODIFY *!*@anope.org +*\n"
+		               "         Modifies the flags of the host mask \"*!*@anope.org\" on the access list of \"#anope\" to have all flags."));
 		source.Reply(" ");
 		source.Reply(_("The available flags are:"));
 

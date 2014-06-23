@@ -37,10 +37,8 @@ class CommandGLGlobal : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("Allows Administrators to send messages to all users on the\n"
-				"network. The message will be sent from the nick \002%s\002."), source.service->nick.c_str());
+		source.Reply(_("Allows Services Operators to send a message to all users on the network."
+		               " The message will be sent from \002{0}\002."), source.service->nick);
 		return true;
 	}
 };

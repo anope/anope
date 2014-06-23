@@ -16,23 +16,6 @@
 
 class CommandBSInfo : public Command
 {
- private:
-	void send_bot_channels(std::vector<Anope::string> &buffers, const BotInfo *bi)
-	{
-		Anope::string buf;
-		for (ChanServ::Channel *ci : bi->GetChannels())
-		{
-			buf += " " + ci->name + " ";
-			if (buf.length() > 300)
-			{
-				buffers.push_back(buf);
-				buf.clear();
-			}
-		}
-		if (!buf.empty())
-			buffers.push_back(buf);
-	}
-
 	EventHandlers<Event::BotInfoEvent> &onbotinfo;
 
  public:
@@ -68,10 +51,10 @@ class CommandBSInfo : public Command
 
 			if (source.HasPriv("botserv/administration"))
 			{
-				std::vector<Anope::string> buf;
-				this->send_bot_channels(buf, bi);
-				for (unsigned i = 0; i < buf.size(); ++i)
-					source.Reply(buf[i]);
+				Anope::string buf;
+				for (ChanServ::Channel *ci : bi->GetChannels())
+					buf += " " + ci->name;
+				source.Reply(buf);
 			}
 
 		}
@@ -79,11 +62,11 @@ class CommandBSInfo : public Command
 		{
 			if (!source.AccessFor(ci).HasPriv("INFO") && !source.HasPriv("botserv/administration"))
 			{
-				source.Reply(ACCESS_DENIED);
+				source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "INFO", ci->name);
 				return;
 			}
 
-			source.Reply(CHAN_INFO_HEADER, ci->name.c_str());
+			source.Reply(_("Information for channel \002{0}\002:"), ci->name);
 			info[_("Bot nick")] = ci->bi ? ci->bi->nick : _("not assigned yet");
 
 			Anope::string enabled = Language::Translate(source.nc, _("Enabled"));
@@ -98,18 +81,15 @@ class CommandBSInfo : public Command
 				source.Reply(replies[i]);
 		}
 		else
-			source.Reply(_("\002%s\002 is not a valid bot or registered channel."), query.c_str());
+			source.Reply(_("\002{0}\002 is not a valid bot or registered channel."), query.c_str());
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("Allows you to see %s information about a channel or a bot.\n"
-				"If the parameter is a channel, then you'll get information\n"
-				"such as enabled kickers. If the parameter is a nick,\n"
-				"you'll get information about a bot, such as creation\n"
-				"time or number of channels it is on."), source.service->nick.c_str());
+		source.Reply(_("Allows you to see {0} information about a channel or a bot."
+		               " If the parameter is a channel, then you'll get information such as enabled kickers."
+		               " If the parameter is a bot nickname, you'll get information about a bot, such as creation time and number of channels it is on."),
+		               source.service->nick);
 		return true;
 	}
 

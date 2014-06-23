@@ -108,7 +108,7 @@ class CommandCSAKick : public Command
 
 			if (mask.equals_ci(ci->name) && ci->HasExt("PEACE"))
 			{
-				source.Reply(ACCESS_DENIED);
+				source.Reply(_("Access denied."));
 				return;
 			}
 		}
@@ -151,7 +151,7 @@ class CommandCSAKick : public Command
 			{
 				if (Anope::Match(modes.first->second, mask))
 				{
-					source.Reply(CHAN_EXCEPTED, mask.c_str(), ci->name.c_str());
+					source.Reply(_("\002{0}\002 matches an except on \002{1}\002 and cannot be banned until the except has been removed."), mask, ci->name);
 					return;
 				}
 			}
@@ -171,7 +171,7 @@ class CommandCSAKick : public Command
 			ChanServ::AccessGroup nc_access = ci->AccessFor(nc), u_access = source.AccessFor(ci);
 			if (nc == ci->GetFounder() || nc_access >= u_access)
 			{
-				source.Reply(ACCESS_DENIED);
+				source.Reply(_("Access denied. You can not auto kick \002{0}\002 because they have more privileges than you on \002{1}\002 and \002{2}\002 is enabled."), nc->display, ci->name, "PEACE");
 				return;
 			}
 		}
@@ -357,11 +357,11 @@ class CommandCSAKick : public Command
 					if (ak->addtime)
 						timebuf = Anope::strftime(ak->addtime, NULL, true);
 					else
-						timebuf = UNKNOWN;
+						timebuf = _("<unknown>");
 					if (ak->last_used)
 						lastused = Anope::strftime(ak->last_used, NULL, true);
 					else
-						lastused = UNKNOWN;
+						lastused = _("<unknown>");
 
 					ListFormatter::ListEntry entry;
 					entry["Number"] = stringify(number);
@@ -397,11 +397,11 @@ class CommandCSAKick : public Command
 				if (ak->addtime)
 					timebuf = Anope::strftime(ak->addtime, NULL, true);
 				else
-					timebuf = UNKNOWN;
+					timebuf = _("<unknown>");
 				if (ak->last_used)
 					lastused = Anope::strftime(ak->last_used, NULL, true);
 				else
-					lastused = UNKNOWN;
+					lastused = _("<unknown>");
 
 				ListFormatter::ListEntry entry;
 				entry["Number"] = stringify(i + 1);
@@ -466,7 +466,7 @@ class CommandCSAKick : public Command
 
 		if (!c)
 		{
-			source.Reply(CHAN_X_NOT_IN_USE, ci->name.c_str());
+			source.Reply(_("Channel \002{0}\002 doesn't exist."), ci->name);
 			return;
 		}
 
@@ -510,24 +510,36 @@ class CommandCSAKick : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
-		Anope::string chan = params[0];
-		Anope::string cmd = params[1];
-		Anope::string mask = params.size() > 2 ? params[2] : "";
+		const Anope::string &chan = params[0];
+		const Anope::string &cmd = params[1];
+		const Anope::string &mask = params.size() > 2 ? params[2] : "";
 
-		ChanServ::Channel *ci = ChanServ::Find(params[0]);
+		ChanServ::Channel *ci = ChanServ::Find(chan);
 		if (ci == NULL)
 		{
-			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
+			source.Reply(_("Channel \002{0}\002 isn't registered."), chan);
 			return;
 		}
 
 		if (mask.empty() && (cmd.equals_ci("ADD") || cmd.equals_ci("DEL")))
+		{
 			this->OnSyntaxError(source, cmd);
-		else if (!source.AccessFor(ci).HasPriv("AKICK") && !source.HasPriv("chanserv/access/modify"))
-			source.Reply(ACCESS_DENIED);
-		else if (!cmd.equals_ci("LIST") && !cmd.equals_ci("VIEW") && !cmd.equals_ci("ENFORCE") && Anope::ReadOnly)
+			return;
+		}
+
+		if (!source.AccessFor(ci).HasPriv("AKICK") && !source.HasPriv("chanserv/access/modify"))
+		{
+			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "AKICK", ci->name);
+			return;
+		}
+
+		if (Anope::ReadOnly && (cmd.equals_ci("ADD") || cmd.equals_ci("DEL")))
+		{
 			source.Reply(_("Sorry, channel autokick list modification is temporarily disabled."));
-		else if (cmd.equals_ci("ADD"))
+			return;
+		}
+
+		if (cmd.equals_ci("ADD"))
 			this->DoAdd(source, ci, params);
 		else if (cmd.equals_ci("DEL"))
 			this->DoDel(source, ci, params);
@@ -541,49 +553,82 @@ class CommandCSAKick : public Command
 			this->DoClear(source, ci);
 		else
 			this->OnSyntaxError(source, "");
-
-		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
-		BotInfo *bi = Config->GetClient("NickServ");
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("Maintains the \002AutoKick list\002 for a channel.  If a user\n"
-				"on the AutoKick list attempts to join the channel,\n"
-				"%s will ban that user from the channel, then kick\n"
-				"the user.\n"
-				" \n"
-				"The \002AKICK ADD\002 command adds the given nick or usermask\n"
-				"to the AutoKick list.  If a \037reason\037 is given with\n"
-				"the command, that reason will be used when the user is\n"
-				"kicked; if not, the default reason is \"User has been\n"
-				"banned from the channel\".\n"
-				"When akicking a \037registered nick\037 the %s account\n"
-				"will be added to the akick list instead of the mask.\n"
-				"All users within that nickgroup will then be akicked.\n"),
-				source.service->nick.c_str(), bi ? bi->nick.c_str() : "NickServ");
-		source.Reply(_(
-				" \n"
-				"The \002AKICK DEL\002 command removes the given nick or mask\n"
-				"from the AutoKick list.  It does not, however, remove any\n"
-				"bans placed by an AutoKick; those must be removed\n"
-				"manually.\n"
-				" \n"
-				"The \002AKICK LIST\002 command displays the AutoKick list, or\n"
-				"optionally only those AutoKick entries which match the\n"
-				"given mask.\n"
-				" \n"
-				"The \002AKICK VIEW\002 command is a more verbose version of the\n"
-				"\002AKICK LIST\002 command.\n"
-				" \n"
-				"The \002AKICK ENFORCE\002 command causes %s to enforce the\n"
-				"current AKICK list by removing those users who match an\n"
-				"AKICK mask.\n"
-				" \n"
-				"The \002AKICK CLEAR\002 command clears all entries of the\n"
-				"akick list."), source.service->nick.c_str());
+		if (subcommand.equals_ci("ADD"))
+			source.Reply(_("The \002{0} ADD\002 command adds \037mask\037 to the auto kick list list of \037channel\037."
+			               " If \037reason\037 is given, it is used when the user is kicked."
+			               " If \037mask\037 is an account, then all users using the account will be affected.\n"
+			               "\n"
+			               "Examples:\n"
+			               "         {command} #anope ADD Cronus noob!\n"
+			               "         Adds the account \"Cronus\" to the auto kick list of \"#anope\" with the reason \"noob!\".\n"
+			               "\n"
+			               "         {command} #anope ADD Guest*!*@*\n"
+			               "         Adds the mask \"Guest*!*@*\" to the auto kick list of \"#anope\"."),
+			               source.command);
+		else if (subcommand.equals_ci("DEL"))
+			source.Reply(_("The \002{0} DEL\002 command removes \037mask\037 from the auto kick list."
+			               " It does not, however, remove any bans placed by an auto kick; those must be removed manually.\n"
+			               "\n"
+			               "Example:\n"
+			               "         {command} #anope DEL Cronus!\n"
+			               "         Removes the auto kick for \"Cronus\" from the auto kick list of \"#anope\".\n"),
+			               source.command);
+		else if (subcommand.equals_ci("LIST") || subcommand.equals_ci("VIEW"))
+			source.Reply(_("The \002{0} LIST\002 and \002{0} VIEW\002 command displays the auto kick list of \037channel\037."
+			               " If a wildcard mask is given, only those entries matching the mask are displayed."
+			               " If a list of entry numbers is given, only those entries are shown."
+			               " \002VIEW\002 is similar to \002LIST\002 but also shows who created the auto kick entry, when it was created, and when it was last used."
+			               "\n"
+			               "Example:\n"
+			               "         \002{0} #anope LIST 2-5,7-9\002\n"
+			               "         Lists auto kick entries numbered 2 through 5 and 7 through 9 on #anope."),
+			               source.command);
+		else if (subcommand.equals_ci("ENFORCE"))
+			source.Reply(_("The \002{0} ENFORCE\002 command enforces the auto kick list by forcibly removing users who match an entry on the auto kick list."
+			               "This can be useful if someone does not authenticate or change their host mask until after joining.\n"
+			               "\n"
+			               "Example:\n"
+			               "         \002{0} #anope ENFORCE\002\n"
+			               "         Enforces the auto kick list of #anope."),
+			               source.command);
+		else if (subcommand.equals_ci("CLEAR"))
+			source.Reply(_("The \002{0} CLEAR\002 command clears the auto kick list of \037channel\37. As with the \002DEL\002 command, existing bans placed by auto kick will not be removed.\n"
+			               "\n"
+			               "Example:\n"
+			               "         \002{0} #anope CLEAR\002\n"
+			               "         Clears the auto kick list of #anope."),
+			               source.command);
+		else
+		{
+			source.Reply(_("Maintains the auto kick list for \037channel\037."
+			               " If a user matching an entry on the auto kick list joins the channel, {0} will place a ban on the user and kick them.\n"
+			               "\n"
+			               "Use of this command requires the \002{1}\002 privilege on \037channel\037."),
+			               source.service->nick, "AKICK");
+			CommandInfo *help = source.service->FindCommand("generic/help");
+			if (help)
+				source.Reply(_("\n"
+			 	               "The \002ADD\002 command adds \037nick\037 or \037mask\037 to the auto kick list of \037channel\037.\n"
+				               "\002{msg}{service} {help} {command} ADD\002 for more information.\n"
+				               "\n"
+				               "The \002DEL\002 command removes \037mask\037 from the auto kick list of \037channel\037.\n"
+				               "\002{msg}{service} {help} {command} DEL\002 for more information.\n"
+				               "\n"
+				               "The \002LIST\002 and \002VIEW\002 commands both display the auto kick list of \037channel\037, but \002VIEW\002 also displays who created the auto kick entry, when it was created, and when it was last used.\n"
+				               "\002{msg}{service} {help} {command} [LIST | VIEW]\002 for more information.\n"
+				               "\n"
+				               "The \002ENFORCE\002 command enforces the auto kick list by forcibly removing users who match an entry on the auto kick list.\n"
+				               "\002{msg}{service} {help} {command} ENFORCE\002 for more information.\n"
+				               ""
+				               "The \002CLEAR\002 clears the auto kick list of \037channel\037."
+				               "\002{msg}{service} {help} {command} CLEAR\002 for more information.\n"),
+				               "msg"_kw = Config->StrictPrivmsg, "service"_kw = source.service->nick, "help"_kw = help->cname, "command"_kw = source.command);
+		}
+
 		return true;
 	}
 };

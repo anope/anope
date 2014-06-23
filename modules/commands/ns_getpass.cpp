@@ -17,7 +17,7 @@ class CommandNSGetPass : public Command
 	CommandNSGetPass(Module *creator) : Command(creator, "nickserv/getpass", 1, 1)
 	{
 		this->SetDesc(_("Retrieve the password for a nickname"));
-		this->SetSyntax(_("\037nickname\037"));
+		this->SetSyntax(_("\037account\037"));
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
@@ -27,7 +27,7 @@ class CommandNSGetPass : public Command
 		const NickServ::Nick *na;
 
 		if (!(na = NickServ::FindNick(nick)))
-			source.Reply(NICK_X_NOT_REGISTERED, nick.c_str());
+			source.Reply(_("\002{0}\002 isn't registered."), nick);
 		else if (Config->GetModule("nickserv")->Get<bool>("secureadmins", "yes") && na->nc->IsServicesOper())
 			source.Reply(_("You may not get the password of other Services Operators."));
 		else
@@ -35,22 +35,16 @@ class CommandNSGetPass : public Command
 			if (Anope::Decrypt(na->nc->pass, tmp_pass) == 1)
 			{
 				Log(LOG_ADMIN, source, this) << "for " << nick;
-				source.Reply(_("Password for %s is \002%s\002."), nick.c_str(), tmp_pass.c_str());
+				source.Reply(_("Password of \002{0}\02 is \002%s\002."), nick, tmp_pass);
 			}
 			else
-				source.Reply(_("GETPASS command unavailable because encryption is in use."));
+				source.Reply(_("The \002{0}\002 command is unavailable because encryption is in use."), source.command);
 		}
-		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("Returns the password for the given nickname.  \002Note\002 that\n"
-				"whenever this command is used, a message including the\n"
-				"person who issued the command and the nickname it was used\n"
-				"on will be logged and sent out as a WALLOPS/GLOBOPS."));
+		source.Reply(_("Returns the password for the given account. This command may not be available if password encryption is in use."));
 		return true;
 	}
 };

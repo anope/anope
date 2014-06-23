@@ -32,14 +32,14 @@ class CommandNSConfirm : public Command
 		{
 			NickServ::Nick *na = NickServ::FindNick(passcode);
 			if (na == NULL)
-				source.Reply(NICK_X_NOT_REGISTERED, passcode.c_str());
+				source.Reply(_("\002{0}\002 isn't registered."), passcode);
 			else if (na->nc->HasExt("UNCONFIRMED") == false)
-				source.Reply(_("Nick \002%s\002 is already confirmed."), na->nick.c_str());
+				source.Reply(_("\002{0}\002 is already confirmed."), na->nick);
 			else
 			{
 				na->nc->Shrink<bool>("UNCONFIRMED");
 				Log(LOG_ADMIN, source, this) << "to confirm nick " << na->nick << " (" << na->nc->display << ")";
-				source.Reply(_("Nick \002%s\002 has been confirmed."), na->nick.c_str());
+				source.Reply(_("\002{0}\002 has been confirmed."), na->nick);
 			}
 		}
 		else if (source.nc)
@@ -50,7 +50,7 @@ class CommandNSConfirm : public Command
 				NickServ::Account *nc = source.nc;
 				nc->Shrink<Anope::string>("passcode");
 				Log(LOG_COMMAND, source, this) << "to confirm their email";
-				source.Reply(_("Your email address of \002%s\002 has been confirmed."), source.nc->email.c_str());
+				source.Reply(_("Your email address of \002{0}\002 has been confirmed."), source.nc->email);
 				nc->Shrink<bool>("UNCONFIRMED");
 
 				if (source.GetUser())
@@ -75,25 +75,15 @@ class CommandNSConfirm : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("This command is used by several commands as a way to confirm\n"
-				"changes made to your account.\n"
-				" \n"
-				"This is most commonly used to confirm your email address once\n"
-				"you register or change it.\n"
-				" \n"
-				"This is also used after the RESETPASS command has been used to\n"
-				"force identify you to your nick so you may change your password."));
+		source.Reply(_("This command is used by several commands as a way to confirm changes made to your account.\n"
+		               "\n"
+		               "This is most commonly used to confirm your email address once you register or change it.\n"
+		               "\n"
+		               "This is also used after when resetting your password to force identify you to your account so you may change your password."));
 		if (source.HasPriv("nickserv/confirm"))
 			source.Reply(_("Additionally, Services Operators with the \037nickserv/confirm\037 permission can\n"
 				"replace \037passcode\037 with a users nick to force validate them."));
 		return true;
-	}
-
-	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand) override
-	{
-		source.Reply(NICK_CONFIRM_INVALID);
 	}
 };
 
@@ -147,13 +137,13 @@ class CommandNSRegister : public Command
 		const Anope::string &guestnick = Config->GetModule("nickserv")->Get<const Anope::string>("guestnickprefix", "Guest");
 		if (nicklen <= guestnick.length() + 7 && nicklen >= guestnick.length() + 1 && !u_nick.find_ci(guestnick) && u_nick.substr(guestnick.length()).find_first_not_of("1234567890") == Anope::string::npos)
 		{
-			source.Reply(NICK_CANNOT_BE_REGISTERED, u_nick.c_str());
+			source.Reply(_("\002{0}\002 may not be registered."), u_nick);
 			return;
 		}
 
 		if (!IRCD->IsNickValid(u_nick))
 		{
-			source.Reply(NICK_CANNOT_BE_REGISTERED, u_nick.c_str());
+			source.Reply(_("\002{0}\002 may not be registered."), u_nick);
 			return;
 		}
 
@@ -164,7 +154,7 @@ class CommandNSRegister : public Command
 
 				if (!source.IsOper() && u_nick.find_ci(o->name) != Anope::string::npos)
 				{
-					source.Reply(NICK_CANNOT_BE_REGISTERED, u_nick.c_str());
+					source.Reply(_("\002{0}\002 may not be registered."), u_nick);
 					return;
 				}
 			}
@@ -172,15 +162,16 @@ class CommandNSRegister : public Command
 		if (Config->GetModule("nickserv")->Get<bool>("forceemail", "yes") && email.empty())
 			this->OnSyntaxError(source, "");
 		else if (u && Anope::CurTime < u->lastnickreg + reg_delay)
-			source.Reply(_("Please wait %d seconds before using the REGISTER command again."), (u->lastnickreg + reg_delay) - Anope::CurTime);
+			source.Reply(_("Please wait \002{0}\002 seconds before using the {1} command again."), (u->lastnickreg + reg_delay) - Anope::CurTime, source.command);
 		else if (NickServ::FindNick(u_nick) != NULL)
-			source.Reply(NICK_ALREADY_REGISTERED, u_nick.c_str());
+			source.Reply(_("\002{0}\002 is already registered."), u_nick);
 		else if (pass.equals_ci(u_nick) || (Config->GetBlock("options")->Get<bool>("strictpasswords") && pass.length() < 5))
-			source.Reply(MORE_OBSCURE_PASSWORD);
+			source.Reply(_("Please try again with a more obscure password. Passwords should be at least five characters long, should not be something easily guessed"
+			               " (e.g. your real name or your nickname), and cannot contain the space or tab characters."));
 		else if (pass.length() > Config->GetModule("nickserv")->Get<unsigned>("passlen", "32"))
-			source.Reply(PASSWORD_TOO_LONG);
+			source.Reply(_("Your password is too long, it can not contain more than \002{0}\002 characters."), Config->GetModule("nickserv")->Get<unsigned>("passlen", "32"));
 		else if (!email.empty() && !Mail::Validate(email))
-			source.Reply(MAIL_X_INVALID, email.c_str());
+			source.Reply(_("\002{0}\002 is not a valid e-mail address."), email);
 		else
 		{
 			NickServ::Account *nc = NickServ::service->CreateAccount(u_nick);
@@ -203,13 +194,13 @@ class CommandNSRegister : public Command
 				NickServ::Event::OnNickRegister(&NickServ::Event::NickRegister::OnNickRegister, source.GetUser(), na);
 
 			if (na->nc->GetAccessCount())
-				source.Reply(_("Nickname \002%s\002 registered under your user@host-mask: %s"), u_nick.c_str(), na->nc->GetAccess(0).c_str());
+				source.Reply(_("\002{0}\002 has been registered under your hostmask: \002{1}\002"), u_nick, na->nc->GetAccess(0));
 			else
-				source.Reply(_("Nickname \002%s\002 registered."), u_nick.c_str());
+				source.Reply(_("\002{0}\002 has been registered."), u_nick);
 
 			Anope::string tmp_pass;
 			if (Anope::Decrypt(na->nc->pass, tmp_pass) == 1)
-				source.Reply(_("Your password is \002%s\002 - remember this for later use."), tmp_pass.c_str());
+				source.Reply(_("Your password is \002{0}\002 - remember this for later use."), tmp_pass);
 
 			if (nsregister.equals_ci("admin"))
 			{
@@ -235,26 +226,8 @@ class CommandNSRegister : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("Registers your nickname in the %s database. Once\n"
-				"your nick is registered, you can use the \002SET\002 and \002ACCESS\002\n"
-				"commands to configure your nick's settings as you like\n"
-				"them. Make sure you remember the password you use when\n"
-				"registering - you'll need it to make changes to your nick\n"
-				"later. (Note that \002case matters!\002 \037ANOPE\037, \037Anope\037, and\n"
-				"\037anope\037 are all different passwords!)\n"
-				" \n"
-				"Guidelines on choosing passwords:\n"
-				" \n"
-				"Passwords should not be easily guessable. For example,\n"
-				"using your real name as a password is a bad idea. Using\n"
-				"your nickname as a password is a much worse idea ;) and,\n"
-				"in fact, %s will not allow it. Also, short\n"
-				"passwords are vulnerable to trial-and-error searches, so\n"
-				"you should choose a password at least 5 characters long.\n"
-				"Finally, the space character cannot be used in passwords."),
-				source.service->nick.c_str(), source.service->nick.c_str());
+		source.Reply(_("Registers your nickname. Once your nickname is registered, you will be able to use most features of services, including owning and managing channels."
+		               "Make sure you remember the password - you'll need it to identify yourself later. Your email address will only be used if you forget your password."));
 
 		if (!Config->GetModule("nickserv")->Get<bool>("forceemail", "yes"))
 		{
@@ -266,11 +239,11 @@ class CommandNSRegister : public Command
 					"after registering if it isn't the default setting already."));
 		}
 
-		source.Reply(" ");
-		source.Reply(_("This command also creates a new group for your nickname,\n"
-				"that will allow you to register other nicks later sharing\n"
-				"the same configuration, the same set of memos and the\n"
-				"same channel privileges."));
+		if (!Config->GetModule("nickserv")->Get<bool>("nonicknameownership"))
+		{
+			source.Reply(" ");
+			source.Reply(_("This command also creates a new group for your nickname, which will allow you to group other nicknames later, which share the same configuration, the same set of memos and the same channel privileges."));
+		}
 		return true;
 	}
 };
@@ -287,14 +260,14 @@ class CommandNSResend : public Command
 	{
 		if (!Config->GetModule(this->owner)->Get<const Anope::string>("registration").equals_ci("mail"))
 		{
-			source.Reply(ACCESS_DENIED);
+			source.Reply(_("Access denied."));
 			return;
 		}
 
 		const NickServ::Nick *na = NickServ::FindNick(source.GetNick());
 
 		if (na == NULL)
-			source.Reply(NICK_NOT_REGISTERED);
+			source.Reply(_("Your nickname isn't registered."));
 		else if (na->nc != source.GetAccount() || !source.nc->HasExt("UNCONFIRMED"))
 			source.Reply(_("Your account is already confirmed."));
 		else
@@ -304,14 +277,12 @@ class CommandNSResend : public Command
 			else if (SendRegmail(source.GetUser(), na, source.service))
 			{
 				na->nc->lastmail = Anope::CurTime;
-				source.Reply(_("Your passcode has been re-sent to %s."), na->nc->email.c_str());
+				source.Reply(_("Your passcode has been re-sent to \002{0}\002."), na->nc->email);
 				Log(LOG_COMMAND, source, this) << "to resend registration verification code";
 			}
 			else
 				Log(this->owner) << "Unable to resend registration verification code for " << source.GetNick();
 		}
-
-		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
@@ -319,8 +290,6 @@ class CommandNSResend : public Command
 		if (!Config->GetModule(this->owner)->Get<const Anope::string>("registration").equals_ci("mail"))
 			return false;
 
-		this->SendSyntax(source);
-		source.Reply(" ");
 		source.Reply(_("This command will resend you the registration confirmation email."));
 		return true;
 	}

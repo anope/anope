@@ -631,7 +631,7 @@ class spacesepstream : public sepstream
  public:
 	/** Initialize with space seperator
 	 */
-	spacesepstream(const Anope::string &source) : sepstream(source, ' ') { }
+	spacesepstream(const Anope::string &source, bool allowempty = false) : sepstream(source, ' ', allowempty) { }
 };
 
 /** This class can be used on its own to represent an exception, or derived to represent a module-specific exception.
@@ -775,3 +775,67 @@ template<typename T, typename O> inline T anope_dynamic_static_cast(O ptr)
 	return static_cast<T>(ptr);
 }
 #endif
+
+struct kwarg
+{
+	Anope::string name, value;
+
+	template<typename T>
+	kwarg& operator=(const T& rhs)
+	{
+		value = stringify(rhs);
+		return *this;
+	}
+};
+
+inline kwarg operator"" _kw(const char *literal, size_t n)
+{
+	return kwarg{ literal };
+}
+
+struct FormatInfo
+{
+	Anope::string format;
+	std::vector<kwarg> parameters;
+	unsigned int pos = 0;
+
+	FormatInfo(const Anope::string &fmt, size_t size) : format(fmt), parameters(size) { }
+
+	template<typename T>
+	void Add(T& arg)
+	{
+		parameters[pos] = kwarg{ stringify(pos).c_str() } = stringify(arg);
+		++pos;
+	}
+
+	template<typename Arg, typename... Args>
+	void Format(Arg &&arg, Args&&... args)
+	{
+		Add(arg);
+		Format(std::forward<Args>(args)...);
+	}
+
+	void Format()
+	{	
+		for (kwarg& arg : parameters)
+			format = format.replace_all_cs("{" + arg.name + "}", arg.value);
+	}
+};
+
+template<>
+inline void FormatInfo::Add(kwarg &arg)
+{
+	parameters[pos++] = arg;
+}
+
+namespace Anope
+{
+	template<typename... Args>
+	inline Anope::string Format(const Anope::string &format, Args&&... args)
+	{
+		FormatInfo fi(format, sizeof...(Args));
+		fi.Format(std::forward<Args>(args)...);
+		return fi.format;
+	}
+}
+

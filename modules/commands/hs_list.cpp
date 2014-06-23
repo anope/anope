@@ -34,14 +34,14 @@ class CommandHSList : public Command
 			size_t tmp = key.find('-');
 			if (tmp == Anope::string::npos || tmp == key.length() || tmp == 1)
 			{
-				source.Reply(LIST_INCORRECT_RANGE);
+				source.Reply(_("Incorrect range specified. The correct syntax is \002#\037from\037-\037to\037\002."));
 				return;
 			}
 			for (unsigned i = 1, end = key.length(); i < end; ++i)
 			{
 				if (!isdigit(key[i]) && i != tmp)
 				{
-					source.Reply(LIST_INCORRECT_RANGE);
+					source.Reply(_("Incorrect range specified. The correct syntax is \002#\037from\037-\037to\037\002."));
 					return;
 				}
 				try
@@ -113,13 +113,13 @@ class CommandHSList : public Command
 		}
 
 		if (!key.empty())
-			source.Reply(_("Displayed records matching key \002%s\002 (count: \002%d\002)."), key.c_str(), display_counter);
+			source.Reply(_("Displayed records matching key \002{0}\002 (count: \002{1}\002)."), key, display_counter);
 		else
 		{
 			if (from)
-				source.Reply(_("Displayed records from \002%d\002 to \002%d\002."), from, to);
+				source.Reply(_("Displayed records from \002{0}\002 to \002{1}\002."), from, to);
 			else
-				source.Reply(_("Displayed all records (count: \002%d\002)."), display_counter);
+				source.Reply(_("Displayed all records (count: \002{0}\002)."), display_counter);
 		}
 
 		std::vector<Anope::string> replies;
@@ -131,15 +131,16 @@ class CommandHSList : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("This command lists registered vhosts to the operator\n"
-				"if a \037key\037 is specified, only entries whos nick or vhost match\n"
-				"the pattern given in \037key\037 are displayed e.g. Rob* for all\n"
-				"entries beginning with \"Rob\"\n"
-				"If a \037#X-Y\037 style is used, only entries between the range of \002X\002\n"
-				"and \002Y\002 will be displayed, e.g. \002#1-3\002 will display the first 3\n"
-				"nick/vhost entries."));
+		source.Reply(_("Lists all vhosts. If \037key\037 is specified, only entries whose nick or vhost match the pattern given in \037key\037 are displayed."
+		               "If a \037#X-Y\037 style is used, only entries between the range of \002X\002 and \002Y\002 will be displayed.\n"
+		               "\n"
+		               "Examples:\n"
+		               "         {0} Rob*\n"
+		               "         Lists all entries with the nick or vhost beginning with \"Rob\"\n"
+		               "\n"
+		               "         {0} #1-3\n"
+		               "         Lists the first three entries."),
+		               source.command);
 		return true;
 	}
 };

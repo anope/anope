@@ -36,7 +36,7 @@ class CommandNSAList : public Command
 			const NickServ::Nick *na = NickServ::FindNick(nick);
 			if (!na)
 			{
-				source.Reply(NICK_X_NOT_REGISTERED, nick.c_str());
+				source.Reply(_("\002{0}\002 isn't registered."), nick);
 				return;
 			}
 			nc = na->nc;
@@ -98,28 +98,24 @@ class CommandNSAList : public Command
 
 		if (!chan_count)
 		{
-			source.Reply(_("\002%s\002 has no access in any channels."), nc->display.c_str());
+			source.Reply(_("\002{0}\002 has no access in any channels."), nc->display);
 		}
 		else
 		{
-			source.Reply(_("Channels that \002%s\002 has access on:"), nc->display.c_str());
+			source.Reply(_("Channels that \002{0}\002 has access on:"), nc->display);
 
 			for (unsigned i = 0; i < replies.size(); ++i)
 				source.Reply(replies[i]);
 
-			source.Reply(_("End of list - %d channels shown."), chan_count);
+			source.Reply(_("End of list - \002{0}\002 channels shown."), chan_count);
 		}
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
-		this->SendSyntax(source);
-		source.Reply(" ");
 		source.Reply(_("Lists all channels you have access on.\n"
-				" \n"
-				"Channels that have the \037NOEXPIRE\037 option set will be\n"
-				"prefixed by an exclamation mark. The nickname parameter is\n"
-				"limited to Services Operators"));
+		               " \n"
+		               "Channels that have the \037NOEXPIRE\037 option set will be prefixed by an exclamation mark. The nickname parameter is limited to Services Operators"));
 
 		return true;
 	}

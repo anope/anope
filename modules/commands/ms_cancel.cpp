@@ -18,14 +18,14 @@ class CommandMSCancel : public Command
 	CommandMSCancel(Module *creator) : Command(creator, "memoserv/cancel", 1, 1)
 	{
 		this->SetDesc(_("Cancel the last memo you sent"));
-		this->SetSyntax(_("{\037nick\037 | \037channel\037}"));
+		this->SetSyntax(_("{\037user\037 | \037channel\037}"));
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
-		if (Anope::ReadOnly || !MemoServ::service)
+		if (Anope::ReadOnly)
 		{
-			source.Reply(READ_ONLY_MODE);
+			source.Reply(_("Services are in read-only mode."));
 			return;
 		}
 
@@ -35,7 +35,12 @@ class CommandMSCancel : public Command
 		MemoServ::MemoInfo *mi = MemoServ::service->GetMemoInfo(name, ischan, isregistered, false);
 
 		if (!isregistered)
-			source.Reply(ischan ? CHAN_X_NOT_REGISTERED : _(NICK_X_NOT_REGISTERED), nname.c_str());
+		{
+			if (ischan)
+				source.Reply(_("Channel \002{0}\002 isn't registered."), nname);
+			else
+				source.Reply(_("\002{0}\002 isn't registered."), nname);
+		}
 		else
 		{
 			ChanServ::Channel *ci = NULL;
@@ -51,20 +56,17 @@ class CommandMSCancel : public Command
 						if (MemoServ::Event::OnMemoDel)
 							MemoServ::Event::OnMemoDel(&MemoServ::Event::MemoDel::OnMemoDel, ischan ? ci->name : na->nc->display, mi, mi->GetMemo(i));
 						mi->Del(i);
-						source.Reply(_("Last memo to \002%s\002 has been cancelled."), nname.c_str());
+						source.Reply(_("Your last memo to \002{0}\002 has been cancelled."), nname);
 						return;
 					}
 
-			source.Reply(_("No memo was cancelable."));
+			source.Reply(_("No memo to \002{0}\002 was cancelable."), nname);
 		}
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("Cancels the last memo you sent to the given nick or channel,\n"
-				"provided it has not been read at the time you use the command."));
+		source.Reply(_("Cancels the last memo you sent to \037user\037, provided it has not yet been read."));
 		return true;
 	}
 };

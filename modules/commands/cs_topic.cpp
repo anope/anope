@@ -25,41 +25,44 @@ class CommandCSSetKeepTopic : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
+		const Anope::string &chan = params[0];
+		const Anope::string &param = params[1];
+
 		if (Anope::ReadOnly)
 		{
-			source.Reply(READ_ONLY_MODE);
+			source.Reply(_("Services are in read-only mode."));
 			return;
 		}
 
-		ChanServ::Channel *ci = ChanServ::Find(params[0]);
+		ChanServ::Channel *ci = ChanServ::Find(chan);
 		if (ci == NULL)
 		{
-			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
+			source.Reply(_("Channel \002{0}\002 isn't registered."), chan);
 			return;
 		}
 
 		EventReturn MOD_RESULT;
-		MOD_RESULT = Event::OnSetChannelOption(&Event::SetChannelOption::OnSetChannelOption, source, this, ci, params[1]);
+		MOD_RESULT = Event::OnSetChannelOption(&Event::SetChannelOption::OnSetChannelOption, source, this, ci, param);
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
 		if (MOD_RESULT != EVENT_ALLOW && !source.AccessFor(ci).HasPriv("SET") && source.permission.empty() && !source.HasPriv("chanserv/administration"))
 		{
-			source.Reply(ACCESS_DENIED);
+			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "SET", ci->name);
 			return;
 		}
 
-		if (params[1].equals_ci("ON"))
+		if (param.equals_ci("ON"))
 		{
 			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to enable keeptopic";
 			ci->Extend<bool>("KEEPTOPIC");
-			source.Reply(_("Topic retention option for %s is now \002on\002."), ci->name.c_str());
+			source.Reply(_("Topic retention option for \002{0}\002 is now \002on\002."), ci->name);
 		}
-		else if (params[1].equals_ci("OFF"))
+		else if (param.equals_ci("OFF"))
 		{
 			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to disable keeptopic";
 			ci->Shrink<bool>("KEEPTOPIC");
-			source.Reply(_("Topic retention option for %s is now \002off\002."), ci->name.c_str());
+			source.Reply(_("Topic retention option for \002{0}\002 is now \002off\002."), ci->name);
 		}
 		else
 			this->OnSyntaxError(source, "KEEPTOPIC");
@@ -67,13 +70,9 @@ class CommandCSSetKeepTopic : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("Enables or disables the \002topic retention\002 option for a\n"
-				"channel. When \002%s\002 is set, the topic for the\n"
-				"channel will be remembered by %s even after the\n"
-				"last user leaves the channel, and will be restored the\n"
-				"next time the channel is created."), source.command.c_str(), source.service->nick.c_str());
+		source.Reply(_("Enables or disables the \002topic retention\002 option for a \037channel\037."
+		               " When \002topic retention\002 is set, the topic for the channel will be remembered by {0} even after the last user leaves the channel, and will be restored the next time the channel is created."),
+		               source.service->nick);
 		return true;
 	}
 };
@@ -86,7 +85,7 @@ class CommandCSTopic : public Command
 	{
 		if (Anope::ReadOnly)
 		{
-			source.Reply(READ_ONLY_MODE);
+			source.Reply(_("Services are in read-only mode."));
 			return;
 		}
 
@@ -96,14 +95,14 @@ class CommandCSTopic : public Command
 			return;
 
 		topiclock->Set(ci, true);
-		source.Reply(_("Topic lock option for %s is now \002on\002."), ci->name.c_str());
+		source.Reply(_("Topic lock option for \002{0}\002 is now \002on\002."), ci->name);
 	}
 
 	void Unlock(CommandSource &source, ChanServ::Channel *ci, const std::vector<Anope::string> &params)
 	{
 		if (Anope::ReadOnly)
 		{
-			source.Reply(READ_ONLY_MODE);
+			source.Reply(_("Services are in read-only mode."));
 			return;
 		}
 
@@ -113,7 +112,7 @@ class CommandCSTopic : public Command
 			return;
 
 		topiclock->Unset(ci);
-		source.Reply(_("Topic lock option for %s is now \002off\002."), ci->name.c_str());
+		source.Reply(_("Topic lock option for \002{0}\002 is now \002off\002."), ci->name);
 	}
 
 	void Set(CommandSource &source, ChanServ::Channel *ci, const std::vector<Anope::string> &params)
@@ -163,19 +162,20 @@ class CommandCSTopic : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
+		const Anope::string &channel = params[0];
 		const Anope::string &subcmd = params[1];
 
-		ChanServ::Channel *ci = ChanServ::Find(params[0]);
+		ChanServ::Channel *ci = ChanServ::Find(channel);
 		if (ci == NULL)
-			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
+			source.Reply(_("Channel \002{0}\002 isn't registered."), channel);
 		else if (!source.AccessFor(ci).HasPriv("TOPIC") && !source.HasCommand("chanserv/topic"))
-			source.Reply(ACCESS_DENIED);
+			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "TOPIC", ci->name);
 		else if (subcmd.equals_ci("LOCK"))
 			this->Lock(source, ci, params);
 		else if (subcmd.equals_ci("UNLOCK"))
 			this->Unlock(source, ci, params);
 		else if (!ci->c)
-			source.Reply(CHAN_X_NOT_IN_USE, ci->name.c_str());
+			source.Reply(_("Channel \002{0}\002 doesn't exist."), ci->name);
 		else if (subcmd.equals_ci("SET"))
 			this->Set(source, ci, params);
 		else if (subcmd.equals_ci("APPEND") && params.size() > 2)
@@ -186,15 +186,15 @@ class CommandCSTopic : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("Allows manipulating the topic of the specified channel.\n"
-				"The \002SET\002 command changes the topic of the channel to the given topic\n"
-				"or unsets the topic if no topic is given. The \002APPEND\002 command appends\n"
-				"the given topic to the existing topic.\n"
-				" \n"
-				"\002LOCK\002 and \002UNLOCK\002 may be used to enable and disable topic lock. When\n"
-				"topic lock is set, the channel topic will be unchangeable except via this command."));
+		source.Reply(_("Allows manipulating the topic of the specified channel."
+		               " The \002SET\002 command changes the topic of the channel to the given topic or unsets the topic if no topic is given."
+		               " The \002APPEND\002 command appends the given topic to the existing topic.\n"
+		               "\n"
+		               "\002LOCK\002 and \002UNLOCK\002 may be used to enable and disable topic lock."
+		               " When topic lock is set, the channel topic will be unchangeable except via this command.\n"
+		               "\n"
+		               "Use of this command requires the \002{0}\002 privilege on \037channel\037."),
+		               "TOPIC");
 		return true;
 	}
 };

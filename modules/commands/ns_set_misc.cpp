@@ -102,14 +102,14 @@ class CommandNSSetMisc : public Command
 	{
 		if (Anope::ReadOnly)
 		{
-			source.Reply(READ_ONLY_MODE);
+			source.Reply(_("Services are in read-only mode."));
 			return;
 		}
 
 		const NickServ::Nick *na = NickServ::FindNick(user);
 		if (!na)
 		{
-			source.Reply(NICK_X_NOT_REGISTERED, user.c_str());
+			source.Reply(_("\002{0}\002 isn't registered."), user);
 			return;
 		}
 		NickServ::Account *nc = na->nc;
@@ -127,12 +127,12 @@ class CommandNSSetMisc : public Command
 		if (!param.empty())
 		{
 			item->Set(nc, NSMiscData(nc, key, param));
-			source.Reply(CHAN_SETTING_CHANGED, scommand.c_str(), nc->display.c_str(), param.c_str());
+			source.Reply(_("\002{0}\002 for \002{1}\002 set to \002{2}\002."), scommand, nc->display, param);
 		}
 		else
 		{
 			item->Unset(nc);
-			source.Reply(CHAN_SETTING_UNSET, scommand.c_str(), nc->display.c_str());
+			source.Reply(_("\002{0}\002 for \002{1}\002 unset."), scommand, nc->display);
 		}
 	}
 
@@ -154,7 +154,7 @@ class CommandNSSetMisc : public Command
 	{
 		if (descriptions.count(source.command))
 		{
-			source.Reply("%s", Language::Translate(source.nc, descriptions[source.command].c_str()));
+			source.Reply(Language::Translate(source.nc, descriptions[source.command].c_str()));
 			return true;
 		}
 		return false;

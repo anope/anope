@@ -17,7 +17,7 @@ class CommandMSInfo : public Command
 	CommandMSInfo(Module *creator) : Command(creator, "memoserv/info", 0, 1)
 	{
 		this->SetDesc(_("Displays information about your memos"));
-		this->SetSyntax(_("[\037nick\037 | \037channel\037]"));
+		this->SetSyntax(_("[\037user\037 | \037channel\037]"));
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
@@ -34,7 +34,7 @@ class CommandMSInfo : public Command
 			na = NickServ::FindNick(nname);
 			if (!na)
 			{
-				source.Reply(NICK_X_NOT_REGISTERED, nname.c_str());
+				source.Reply(_("\002{0}\002 isn't registered."), nname);
 				return;
 			}
 			mi = na->nc->memos;
@@ -45,20 +45,22 @@ class CommandMSInfo : public Command
 			ci = ChanServ::Find(nname);
 			if (!ci)
 			{
-				source.Reply(CHAN_X_NOT_REGISTERED, nname.c_str());
+				source.Reply(_("Channel \002{0}\002 isn't registered."), nname);
 				return;
 			}
-			else if (!source.AccessFor(ci).HasPriv("MEMO"))
+
+			if (!source.AccessFor(ci).HasPriv("MEMO"))
 			{
-				source.Reply(ACCESS_DENIED);
+				source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "MEMO", ci->name);
 				return;
 			}
+
 			mi = ci->memos;
 			hardmax = ci->HasExt("MEMO_HARDMAX");
 		}
-		else if (!nname.empty()) /* It's not a chan and we aren't services admin */
+		else if (!nname.empty()) /* It's not a chan and we aren't an oper */
 		{
-			source.Reply(ACCESS_DENIED);
+			source.Reply(_("Access denied. You do not have the correct operator privilege to see the memo info of \002{0}\002."), nname);
 			return;
 		}
 		else
@@ -76,9 +78,9 @@ class CommandMSInfo : public Command
 			else if (mi->memos->size() == 1)
 			{
 				if (mi->GetMemo(0)->unread)
-					source.Reply(_("%s currently has \0021\002 memo, and it has not yet been read."), nname.c_str());
+					source.Reply(_("\002{0}\002 currently has \0021\002 memo, and it has not yet been read."), nname);
 				else
-					source.Reply(_("%s currently has \0021\002 memo."), nname.c_str());
+					source.Reply(_("\002{0}\002 currently has \0021\002 memo."), nname);
 			}
 			else
 			{
@@ -87,46 +89,37 @@ class CommandMSInfo : public Command
 					if (mi->GetMemo(i)->unread)
 						++count;
 				if (count == mi->memos->size())
-					source.Reply(_("%s currently has \002%d\002 memos; all of them are unread."), nname.c_str(), count);
+					source.Reply(_("\002{0}\002 currently has \002{1]\002 memos; all of them are unread."), nname, count);
 				else if (!count)
-					source.Reply(_("%s currently has \002%d\002 memos."), nname.c_str(), mi->memos->size());
+					source.Reply(_("\002{0}\002 currently has \002{1}\002 memos."), nname, mi->memos->size());
 				else if (count == 1)
-					source.Reply(_("%s currently has \002%d\002 memos, of which \0021\002 is unread."), nname.c_str(), mi->memos->size());
+					source.Reply(_("\002{0}\002 currently has \002{1}\002 memos, of which \0021\002 is unread."), nname, mi->memos->size());
 				else
-					source.Reply(_("%s currently has \002%d\002 memos, of which \002%d\002 are unread."), nname.c_str(), mi->memos->size(), count);
+					source.Reply(_("\002{0}\002 currently has \002{1]\002 memos, of which \002{2}\002 are unread."), nname, mi->memos->size(), count);
 			}
-			if (!mi->memomax)
+			if (mi->memomax >= 0)
 			{
 				if (hardmax)
-					source.Reply(_("%s's memo limit is \002%d\002, and may not be changed."), nname.c_str(), mi->memomax);
+					source.Reply(_("The memo limit of \002{0}\002 is \002{1}\002, and may not be changed."), nname, mi->memomax);
 				else
-					source.Reply(_("%s's memo limit is \002%d\002."), nname.c_str(), mi->memomax);
-			}
-			else if (mi->memomax > 0)
-			{
-				if (hardmax)
-					source.Reply(_("%s's memo limit is \002%d\002, and may not be changed."), nname.c_str(), mi->memomax);
-				else
-					source.Reply(_("%s's memo limit is \002%d\002."), nname.c_str(), mi->memomax);
+					source.Reply(_("The memo limit of \002{0}\002 is \002{1}\002."), nname, mi->memomax);
 			}
 			else
-				source.Reply(_("%s has no memo limit."), nname.c_str());
+				source.Reply(_("\002{0}\002 has no memo limit."), nname);
 
-			/* I ripped this code out of ircservices 4.4.5, since I didn't want
-			   to rewrite the whole thing (it pisses me off). */
 			if (na)
 			{
 				if (na->nc->HasExt("MEMO_RECEIVE") && na->nc->HasExt("MEMO_SIGNON"))
-					source.Reply(_("%s is notified of new memos at logon and when they arrive."), nname.c_str());
+					source.Reply(_("\002{0}\002 is notified of new memos at logon and when they arrive."), nname);
 				else if (na->nc->HasExt("MEMO_RECEIVE"))
-					source.Reply(_("%s is notified when new memos arrive."), nname.c_str());
+					source.Reply(_("\002{0}\002 is notified when new memos arrive."), nname);
 				else if (na->nc->HasExt("MEMO_SIGNON"))
-					source.Reply(_("%s is notified of news memos at logon."), nname.c_str());
+					source.Reply(_("\002{0}\002 is notified of news memos at logon."), nname);
 				else
-					source.Reply(_("%s is not notified of new memos."), nname.c_str());
+					source.Reply(_("\002{0}\002 is not notified of new memos."), nname);
 			}
 		}
-		else /* !nname || (!ci || na->nc == nc) */
+		else
 		{
 			if (mi->memos->empty())
 				source.Reply(_("You currently have no memos."));
@@ -144,13 +137,13 @@ class CommandMSInfo : public Command
 					if (mi->GetMemo(i)->unread)
 						++count;
 				if (count == mi->memos->size())
-					source.Reply(_("You currently have \002%d\002 memos; all of them are unread."), count);
+					source.Reply(_("You currently have \002{0}\002 memos; all of them are unread."), count);
 				else if (!count)
-					source.Reply(_("You currently have \002%d\002 memos."), mi->memos->size());
+					source.Reply(_("You currently have \002{0}\002 memos."), mi->memos->size());
 				else if (count == 1)
-					source.Reply(_("You currently have \002%d\002 memos, of which \0021\002 is unread."), mi->memos->size());
+					source.Reply(_("You currently have \002{0}\002 memos, of which \0021\002 is unread."), mi->memos->size());
 				else
-					source.Reply(_("You currently have \002%d\002 memos, of which \002%d\002 are unread."), mi->memos->size(), count);
+					source.Reply(_("You currently have \002{0}\002 memos, of which \002{1}\002 are unread."), mi->memos->size(), count);
 			}
 
 			if (!mi->memomax)
@@ -163,14 +156,13 @@ class CommandMSInfo : public Command
 			else if (mi->memomax > 0)
 			{
 				if (!source.IsServicesOper() && hardmax)
-					source.Reply(_("Your memo limit is \002%d\002, and may not be changed."), mi->memomax);
+					source.Reply(_("Your memo limit is \002{0}\002, and may not be changed."), mi->memomax);
 				else
-					source.Reply(_("Your memo limit is \002%d\002."), mi->memomax);
+					source.Reply(_("Your memo limit is \002{0}\002."), mi->memomax);
 			}
 			else
 				source.Reply(_("You have no limit on the number of memos you may keep."));
 
-			/* Ripped too. But differently because of a seg fault (loughs) */
 			if (nc->HasExt("MEMO_RECEIVE") && nc->HasExt("MEMO_SIGNON"))
 				source.Reply(_("You will be notified of new memos at logon and when they arrive."));
 			else if (nc->HasExt("MEMO_RECEIVE"))
@@ -184,18 +176,11 @@ class CommandMSInfo : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("Without a parameter, displays information on the number of\n"
-				"memos you have, how many of them are unread, and how many\n"
-				"total memos you can receive.\n"
-				" \n"
-				"With a channel parameter, displays the same information for\n"
-				"the given channel.\n"
-				" \n"
-				"With a nickname parameter, displays the same information\n"
-				"for the given nickname. This is limited to \002Services\002\n"
-				"\002Operators\002."));
+		source.Reply(_("Without a parameter, displays information on the number of memos you have, how many of them are unread, and how many total memos you can receive."
+		               " With a parameter, displays the same information for the given \037user\037 or \037channel\037, if you have the appropriate privilege.\n"
+			       "\n"
+			       "Use of this command on a channel requires the \002{0}\002 privilege on \037channel\037."),
+		               source.command);
 
 		return true;
 	}

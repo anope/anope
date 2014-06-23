@@ -44,7 +44,7 @@ class CommandOSChanKill : public Command
 			expires *= 86400;
 		if (expires && expires < 60)
 		{
-			source.Reply(BAD_EXPIRY_TIME);
+			source.Reply(_("Invalid expiry time \002{0}\002."), expiry);
 			return;
 		}
 		else if (expires > 0)
@@ -84,18 +84,13 @@ class CommandOSChanKill : public Command
 				Log(LOG_ADMIN, source, this) << "on " << c->name << " (" << realreason << ")";
 			}
 			else
-				source.Reply(CHAN_X_NOT_IN_USE, channel.c_str());
+				source.Reply(_("Channel \002%s\002 doesn't exist."), channel);
 		}
-		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("Puts an AKILL for every nick on the specified channel. It\n"
-				"uses the entire real ident@host for every nick, and\n"
-				"then enforces the AKILL."));
+		source.Reply(_("Adds an auto kill for every user on \037channel\037, except for IRC operators."));
 		return true;
 	}
 };

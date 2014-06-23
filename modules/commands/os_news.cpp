@@ -32,8 +32,8 @@ struct NewsMessages msgarray[] = {
 	  _("Logon news items:"),
 	  _("There is no logon news."),
 	  _("Added new logon news item."),
-	  _("Logon news item #%s not found!"),
-	  _("Logon news item #%d deleted."),
+	  _("Logon news item #{0} not found!"),
+	  _("Logon news item #{0} deleted."),
 	  _("No logon news items to delete!"),
 	  _("All logon news items deleted.")}
 	 },
@@ -42,8 +42,8 @@ struct NewsMessages msgarray[] = {
 	  _("Oper news items:"),
 	  _("There is no oper news."),
 	  _("Added new oper news item."),
-	  _("Oper news item #%s not found!"),
-	  _("Oper news item #%d deleted."),
+	  _("Oper news item #{0} not found!"),
+	  _("Oper news item #{0} deleted."),
 	  _("No oper news items to delete!"),
 	  _("All oper news items deleted.")}
 	 },
@@ -52,8 +52,8 @@ struct NewsMessages msgarray[] = {
 	  _("Random news items:"),
 	  _("There is no random news."),
 	  _("Added new random news item."),
-	  _("Random news item #%s not found!"),
-	  _("Random news item #%d deleted."),
+	  _("Random news item #{0} not found!"),
+	  _("Random news item #{0} deleted."),
 	  _("No random news items to delete!"),
 	  _("All random news items deleted.")}
 	 }
@@ -188,7 +188,7 @@ class NewsBase : public Command
 		else
 		{
 			if (Anope::ReadOnly)
-				source.Reply(READ_ONLY_MODE);
+				source.Reply(_("Services are in read-only mode. Any changes made may not persist."));
 
 			NewsItem *news = new MyNewsItem();
 			news->type = ntype;
@@ -219,7 +219,7 @@ class NewsBase : public Command
 			else
 			{
 				if (Anope::ReadOnly)
-					source.Reply(READ_ONLY_MODE);
+					source.Reply(_("Services are in read-only mode. Any changes made may not persist."));
 				if (!text.equals_ci("ALL"))
 				{
 					try
@@ -304,14 +304,10 @@ class CommandOSLogonNews : public NewsBase
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("Edits or displays the list of logon news messages.  When a\n"
-				"user connects to the network, these messages will be sent\n"
-				"to them.  However, no more than \002%d\002 messages will be\n"
-				"sent in order to avoid flooding the user.  If there are\n"
-				"more news messages, only the most recent will be sent."),
-				Config->GetModule(this->owner)->Get<unsigned>("newscount", "3"));
+		source.Reply(_("Edits or displays the list of logon news messages.  When a user connects to the network, these messages will be sent to them."
+		               " However, no more than \002{0}\002 messages will be sent in order to avoid flooding the user."
+		               " If there are more news messages, only the most recent will be sent."),
+		               Config->GetModule(this->owner)->Get<unsigned>("newscount", "3"));
 		return true;
 	}
 };
@@ -331,14 +327,11 @@ class CommandOSOperNews : public NewsBase
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("Edits or displays the list of oper news messages.  When a\n"
-				"user opers up (with the /OPER command), these messages will\n"
-				"be sent to them.  However, no more than \002%d\002 messages will\n"
-				"be sent in order to avoid flooding the user.  If there are\n"
-				"more news messages, only the most recent will be sent."),
-				Config->GetModule(this->owner)->Get<unsigned>("newscount", "3"));
+		source.Reply(_("Edits or displays the list of oper news messages."
+		               " When a user opers up (with the /OPER command), these messages will be sent to them."
+		               " However, no more than \002{0}\002 messages will be sent in order to avoid flooding the user."
+		               " If there are more news messages, only the most recent will be sent."),
+		               Config->GetModule(this->owner)->Get<unsigned>("newscount", "3"));
 		return true;
 	}
 };
@@ -358,11 +351,7 @@ class CommandOSRandomNews : public NewsBase
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("Edits or displays the list of random news messages.  When a\n"
-				"user connects to the network, one (and only one) of the\n"
-				"random news will be randomly chosen and sent to them."));
+		source.Reply(_("Edits or displays the list of random news messages.  When a user connects to the network, one (and only one) of the random news will be randomly chosen and sent to them."));
 		return true;
 	}
 };

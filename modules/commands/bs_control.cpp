@@ -22,30 +22,38 @@ class CommandBSSay : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
+		const Anope::string &chan = params[0];
 		const Anope::string &text = params[1];
 
-		ChanServ::Channel *ci = ChanServ::Find(params[0]);
+		ChanServ::Channel *ci = ChanServ::Find(chan);
 		if (ci == NULL)
 		{
-			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
+			source.Reply(_("Channel \002{0}\002 isn't registered."), chan);
 			return;
 		}
 
 		if (!source.AccessFor(ci).HasPriv("SAY") && !source.HasPriv("botserv/administration"))
 		{
-			source.Reply(ACCESS_DENIED);
+			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "SAY", ci->name);
 			return;
 		}
 
 		if (!ci->bi)
 		{
-			source.Reply(BOT_NOT_ASSIGNED);
+			source.Reply(_("There is no bot assigned to \002{0}\002. One must be assigned to the channel before this command can be used."), ci->name);
+			BotInfo *bi;
+			Anope::string name;
+			Command::FindCommandFromService("botserv/assign", bi, name);
+			CommandInfo *help = source.service->FindCommand("generic/help");
+			if (bi && help)
+				source.Reply(_("See \002{msg}{service} {help} {command}\002 for information on assigning bots."),
+				                "msg"_kw = Config->StrictPrivmsg, "service"_kw = bi->nick, "help"_kw = help->cname, "command"_kw = name);
 			return;
 		}
 
 		if (!ci->c || !ci->c->FindUser(ci->bi))
 		{
-			source.Reply(BOT_NOT_ON_CHANNEL, ci->name.c_str());
+			source.Reply(_("Bot \002{0}\002 is not on channel \002{1}\002."), ci->bi->nick, ci->name);
 			return;
 		}
 
@@ -66,7 +74,11 @@ class CommandBSSay : public Command
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Makes the bot say the given text on the given channel."));
+		source.Reply(_("Makes the bot say the given \037text\037 on \037channel\037.\n"
+		               "\n"
+		                "Example:\n"
+		                "         {command} #anope mmm pie\n"
+		                "         Makes the assigned service bot say \"mmm pie\"."));
 		return true;
 	}
 };
@@ -82,30 +94,38 @@ class CommandBSAct : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
+		const Anope::string &chan = params[0];
 		Anope::string message = params[1];
 
-		ChanServ::Channel *ci = ChanServ::Find(params[0]);
+		ChanServ::Channel *ci = ChanServ::Find(chan);
 		if (ci == NULL)
 		{
-			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
+			source.Reply(_("Channel \002{0}\002 isn't registered."), chan);
 			return;
 		}
 
 		if (!source.AccessFor(ci).HasPriv("SAY") && !source.HasPriv("botserv/administration"))
 		{
-			source.Reply(ACCESS_DENIED);
+			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "SAY", ci->name);
 			return;
 		}
 
 		if (!ci->bi)
 		{
-			source.Reply(BOT_NOT_ASSIGNED);
+			source.Reply(_("There is no bot assigned to \002{0}\002. One must be assigned to the channel before this command can be used."), ci->name);
+			BotInfo *bi;
+			Anope::string name;
+			Command::FindCommandFromService("botserv/assign", bi, name);
+			CommandInfo *help = source.service->FindCommand("generic/help");
+			if (bi && help)
+				source.Reply(_("See \002{msg}{service} {help} {command}\002 for information on assigning bots."),
+				                "msg"_kw = Config->StrictPrivmsg, "service"_kw = bi->nick, "help"_kw = help->cname, "command"_kw = name);
 			return;
 		}
 
 		if (!ci->c || !ci->c->FindUser(ci->bi))
 		{
-			source.Reply(BOT_NOT_ON_CHANNEL, ci->name.c_str());
+			source.Reply(_("Bot \002{0}\002 is not on channel \002{1}\002."), ci->bi->nick, ci->name);
 			return;
 		}
 
@@ -122,10 +142,12 @@ class CommandBSAct : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("Makes the bot do the equivalent of a \"/me\" command\n"
-				"on the given channel using the given text."));
+		source.Reply(_("Makes the assigned bot do the equivalent of a \"/me\" command on \037channel\037 using the given \037text\037.\n"
+		                "\n"
+		                "Example:\n"
+		                "         {command} #anope slaps Cronus\n"
+		                "         Shows the assigned service bot \"slapping\" Cronus."),
+		                "command"_kw = source.command);
 		return true;
 	}
 };

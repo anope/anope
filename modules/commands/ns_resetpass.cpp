@@ -19,7 +19,7 @@ class CommandNSResetPass : public Command
 	CommandNSResetPass(Module *creator) : Command(creator, "nickserv/resetpass", 2, 2)
 	{
 		this->SetDesc(_("Helps you reset lost passwords"));
-		this->SetSyntax(_("\037nickname\037 \037email\037"));
+		this->SetSyntax(_("\037account\037 \037email\037"));
 		this->AllowUnregistered(true);
 	}
 
@@ -28,7 +28,7 @@ class CommandNSResetPass : public Command
 		const NickServ::Nick *na;
 
 		if (!(na = NickServ::FindNick(params[0])))
-			source.Reply(NICK_X_NOT_REGISTERED, params[0].c_str());
+			source.Reply(_("\002{0}\002 isn't registered."), params[0]);
 		else if (!na->nc->email.equals_ci(params[1]))
 			source.Reply(_("Incorrect email address."));
 		else
@@ -36,20 +36,14 @@ class CommandNSResetPass : public Command
 			if (SendResetEmail(source.GetUser(), na, source.service))
 			{
 				Log(LOG_COMMAND, source, this) << "for " << na->nick << " (group: " << na->nc->display << ")";
-				source.Reply(_("Password reset email for \002%s\002 has been sent."), na->nick.c_str());
+				source.Reply(_("Password reset email for \002{0}\002 has been sent."), na->nick);
 			}
 		}
-
-		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("Sends a passcode to the nickname with instructions on how to\n"
-				"reset their password.  Email must be the email address associated\n"
-				"to the nickname."));
+		source.Reply(_("Sends a passcode to the email address of \037account\037 with instructions on how to reset their password. \037email\037 must be the email address associated to \037account\037."));
 		return true;
 	}
 };
@@ -81,7 +75,7 @@ class NSResetPass : public Module
 		{
 			if (Anope::ReadOnly)
 			{
-				source.Reply(READ_ONLY_MODE);
+				source.Reply(_("Services are in read-only mode."));
 				return EVENT_STOP;
 			}
 
@@ -107,7 +101,7 @@ class NSResetPass : public Module
 					if (source.GetUser())
 					{
 						source.GetUser()->Identify(na);
-						source.Reply(_("You are now identified for your nick. Change your password now."));
+						source.Reply(_("You are now identified for \002{0}\002. Change your password now."), na->nc->display);
 					}
 				}
 				else

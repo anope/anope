@@ -65,13 +65,6 @@ struct HostRequest : Serializable
 
 class CommandHSRequest : public Command
 {
-	bool isvalidchar(char c)
-	{
-		if ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || (c >= '0' && c <= '9') || c == '.' || c == '-')
-			return true;
-		return false;
-	}
-
  public:
 	CommandHSRequest(Module *creator) : Command(creator, "hostserv/request", 1, 1)
 	{
@@ -83,7 +76,7 @@ class CommandHSRequest : public Command
 	{
 		if (Anope::ReadOnly)
 		{
-			source.Reply(READ_ONLY_MODE);
+			source.Reply(_("Services are in read-only mode."));
 			return;
 		}
 
@@ -91,7 +84,7 @@ class CommandHSRequest : public Command
 		NickServ::Nick *na = NickServ::FindNick(source.GetNick());
 		if (!na || na->nc != source.GetAccount())
 		{
-			source.Reply(ACCESS_DENIED);
+			source.Reply(_("Access denied.")); //XXX with nonickownership this should be allowed.
 			return;
 		}
 
@@ -118,31 +111,32 @@ class CommandHSRequest : public Command
 		{
 			if (user.length() > Config->GetBlock("networkinfo")->Get<unsigned>("userlen"))
 			{
-				source.Reply(HOST_SET_IDENTTOOLONG, Config->GetBlock("networkinfo")->Get<unsigned>("userlen"));
+				source.Reply(_("The username \002{0}\002 is too long, please use a username shorter than %d characters."), Config->GetBlock("networkinfo")->Get<unsigned>("userlen"));
 				return;
 			}
-			else if (!IRCD->CanSetVIdent)
+
+			if (!IRCD->CanSetVIdent)
 			{
-				source.Reply(HOST_NO_VIDENT);
+				source.Reply(_("Vhosts may not contain a username."));
 				return;
 			}
-			for (Anope::string::iterator s = user.begin(), s_end = user.end(); s != s_end; ++s)
-				if (!isvalidchar(*s))
-				{
-					source.Reply(HOST_SET_IDENT_ERROR);
-					return;
-				}
+
+			if (!IRCD->IsIdentValid(user))
+			{
+				source.Reply(_("The requested username is not valid."));
+				return;
+			}
 		}
 
 		if (host.length() > Config->GetBlock("networkinfo")->Get<unsigned>("hostlen"))
 		{
-			source.Reply(HOST_SET_TOOLONG, Config->GetBlock("networkinfo")->Get<unsigned>("hostlen"));
+			source.Reply(_("The requested vhost is too long, please use a hostname no longer than {0} characters."), Config->GetBlock("networkinfo")->Get<unsigned>("hostlen"));
 			return;
 		}
 
 		if (!IRCD->IsHostValid(host))
 		{
-			source.Reply(HOST_SET_ERROR);
+			source.Reply(_("The requested hostname is not valid."));
 			return;
 		}
 
@@ -161,18 +155,14 @@ class CommandHSRequest : public Command
 		req.time = Anope::CurTime;
 		na->Extend<HostRequest>("hostrequest", req);
 
-		source.Reply(_("Your vHost has been requested."));
+		source.Reply(_("Your vhost has been requested."));
 		req_send_memos(owner, source, user, host);
 		Log(LOG_COMMAND, source, this) << "to request new vhost " << (!user.empty() ? user + "@" : "") << host;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("Request the given vHost to be actived for your nick by the\n"
-			"network administrators. Please be patient while your request\n"
-			"is being considered."));
+		source.Reply(_("Request the given \036vhost\037 to be actived for your nick by the network administrators. Please be patient while your request is being considered."));
 		return true;
 	}
 };
@@ -183,14 +173,14 @@ class CommandHSActivate : public Command
 	CommandHSActivate(Module *creator) : Command(creator, "hostserv/activate", 1, 1)
 	{
 		this->SetDesc(_("Approve the requested vHost of a user"));
-		this->SetSyntax(_("\037nick\037"));
+		this->SetSyntax(_("\037user\037"));
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		if (Anope::ReadOnly)
 		{
-			source.Reply(READ_ONLY_MODE);
+			source.Reply(_("Services are in read-only mode."));
 			return;
 		}
 
@@ -206,19 +196,17 @@ class CommandHSActivate : public Command
 			if (Config->GetModule(this->owner)->Get<bool>("memouser") && MemoServ::service)
 				MemoServ::service->Send(source.service->nick, na->nick, _("[auto memo] Your requested vHost has been approved."), true);
 
-			source.Reply(_("vHost for %s has been activated."), na->nick.c_str());
+			source.Reply(_("Vhost for \002{0}\002 has been activated."), na->nick);
 			Log(LOG_COMMAND, source, this) << "for " << na->nick << " for vhost " << (!req->ident.empty() ? req->ident + "@" : "") << req->host;
 			na->Shrink<HostRequest>("hostrequest");
 		}
 		else
-			source.Reply(_("No request for nick %s found."), nick.c_str());
+			source.Reply(_("\002{0}\002 does not have a pending vhost request."), nick);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("Activate the requested vHost for the given nick."));
+		source.Reply(_("Activate the requested vhost for the given user."));
 		if (Config->GetModule(this->owner)->Get<bool>("memouser"))
 			source.Reply(_("A memo informing the user will also be sent."));
 
@@ -232,14 +220,14 @@ class CommandHSReject : public Command
 	CommandHSReject(Module *creator) : Command(creator, "hostserv/reject", 1, 2)
 	{
 		this->SetDesc(_("Reject the requested vHost of a user"));
-		this->SetSyntax(_("\037nick\037 [\037reason\037]"));
+		this->SetSyntax(_("\037user\037 [\037reason\037]"));
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		if (Anope::ReadOnly)
 		{
-			source.Reply(READ_ONLY_MODE);
+			source.Reply(_("Services are in read-only mode."));
 			return;
 		}
 
@@ -263,18 +251,16 @@ class CommandHSReject : public Command
 				MemoServ::service->Send(source.service->nick, nick, Language::Translate(source.GetAccount(), message.c_str()), true);
 			}
 
-			source.Reply(_("vHost for %s has been rejected."), nick.c_str());
+			source.Reply(_("Vhost for \002{0}\002 has been rejected."), na->nick);
 			Log(LOG_COMMAND, source, this) << "to reject vhost for " << nick << " (" << (!reason.empty() ? reason : "no reason") << ")";
 		}
 		else
-			source.Reply(_("No request for nick %s found."), nick.c_str());
+			source.Reply(_("\002{0}\002 does not have a pending vhost request."), nick);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("Reject the requested vHost for the given nick."));
+		source.Reply(_("Reject the requested vhost for the given user."));
 		if (Config->GetModule(this->owner)->Get<bool>("memouser"))
 			source.Reply(_("A memo informing the user will also be sent, which includes the reason for the rejection if supplied."));
 
@@ -328,14 +314,12 @@ class CommandHSWaiting : public Command
 		for (unsigned i = 0; i < replies.size(); ++i)
 			source.Reply(replies[i]);
 
-		source.Reply(_("Displayed \002%d\002 records (\002%d\002 total)."), display_counter, counter);
+		source.Reply(_("Displayed \002{0}\002 records (\002{1}\002 total)."), display_counter, counter);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("This command retrieves the vhost requests."));
+		source.Reply(_("Lists the vhost requests."));
 
 		return true;
 	}

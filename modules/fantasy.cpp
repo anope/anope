@@ -11,6 +11,7 @@
 
 #include "module.h"
 #include "modules/fantasy.h"
+#include "modules/bs_info.h"
 
 class CommandBSSetFantasy : public Command
 {
@@ -28,13 +29,13 @@ class CommandBSSetFantasy : public Command
 
 		if (ci == NULL)
 		{
-			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
+			source.Reply(_("Channel \002{0}\002 isn't registered."), params[0]);
 			return;
 		}
 
 		if (!source.HasPriv("botserv/administration") && !source.AccessFor(ci).HasPriv("SET"))
 		{
-			source.Reply(ACCESS_DENIED);
+			source.Reply(_("Access denied. You do not have the \002{0}\002 privilege on \002{1}\002."), "SET", ci->name);
 			return;
 		}
 
@@ -50,7 +51,7 @@ class CommandBSSetFantasy : public Command
 			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to enable fantasy";
 
 			ci->Extend<bool>("BS_FANTASY");
-			source.Reply(_("Fantasy mode is now \002on\002 on channel %s."), ci->name.c_str());
+			source.Reply(_("Fantasy mode is now \002on\002 on channel \002{0}\002."), ci->name);
 		}
 		else if (value.equals_ci("OFF"))
 		{
@@ -58,7 +59,7 @@ class CommandBSSetFantasy : public Command
 			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to disable fantasy";
 
 			ci->Shrink<bool>("BS_FANTASY");
-			source.Reply(_("Fantasy mode is now \002off\002 on channel %s."), ci->name.c_str());
+			source.Reply(_("Fantasy mode is now \002off\002 on channel \002{0}\002."), ci->name);
 		}
 		else
 			this->OnSyntaxError(source, source.command);
@@ -83,6 +84,7 @@ class CommandBSSetFantasy : public Command
 
 class Fantasy : public Module
 	, public EventHook<Event::Privmsg>
+	, public EventHook<Event::BotInfoEvent>
 {
 	SerializableExtensibleItem<bool> fantasy;
 
@@ -94,6 +96,7 @@ class Fantasy : public Module
  public:
 	Fantasy(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
 		, EventHook<Event::Privmsg>("OnPrivmsg")
+		, EventHook<Event::BotInfoEvent>("OnBotInfoEvent")
 		, fantasy(this, "BS_FANTASY")
 		, commandbssetfantasy(this)
 		, OnBotFantasy(this, "OnBotFantasy")
@@ -201,7 +204,7 @@ class Fantasy : public Module
 		Event::OnPostCommand(&Event::PostCommand::OnPostCommand, source, cmd, params);
 	}
 
-	void OnBotInfo(CommandSource &source, BotInfo *bi, ChanServ::Channel *ci, InfoFormatter &info)
+	void OnBotInfo(CommandSource &source, BotInfo *bi, ChanServ::Channel *ci, InfoFormatter &info) override
 	{
 		if (fantasy.HasExt(ci))
 			info.AddOption(_("Fantasy"));

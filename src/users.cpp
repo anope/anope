@@ -330,21 +330,6 @@ User::~User()
 	Event::OnPostUserLogoff(&Event::PostUserLogoff::OnPostUserLogoff, this);
 }
 
-void User::SendMessage(const MessageSource &source, const char *fmt, ...)
-{
-	va_list args;
-	char buf[BUFSIZE] = "";
-
-	const char *translated_message = Language::Translate(this, fmt);
-
-	va_start(args, fmt);
-	vsnprintf(buf, BUFSIZE - 1, translated_message, args);
-
-	this->SendMessage(source, Anope::string(buf));
-
-	va_end(args);
-}
-
 void User::SendMessage(const MessageSource &source, const Anope::string &msg)
 {
 	const char *translated_message = Language::Translate(this, msg.c_str());
@@ -358,10 +343,34 @@ void User::SendMessage(const MessageSource &source, const Anope::string &msg)
 	sepstream sep(translated_message, '\n', true);
 	for (Anope::string tok; sep.GetToken(tok);)
 	{
-		if (send_privmsg)
-			IRCD->SendPrivmsg(source, this->GetUID(), "%s", tok.c_str());
-		else
-			IRCD->SendNotice(source, this->GetUID(), "%s", tok.c_str());
+		if (tok.empty())
+			tok = " ";
+		spacesepstream ssep(tok, true);
+		Anope::string buf;
+		for (Anope::string word; ssep.GetToken(word);)
+		{
+			if (word.empty())
+				word = " ";
+			Anope::string add = buf.empty() ? word : " " + word;
+			if (buf.length() + add.length() > Config->LineWrap)
+			{
+				if (send_privmsg)
+					IRCD->SendPrivmsg(source, this->GetUID(), "%s", buf.c_str());
+				else
+					IRCD->SendNotice(source, this->GetUID(), "%s", buf.c_str());
+				buf.clear();
+				add = word;
+			}
+			buf.append(add);
+		}
+
+		if (!buf.empty())
+		{
+			if (send_privmsg)
+				IRCD->SendPrivmsg(source, this->GetUID(), "%s", buf.c_str());
+			else
+				IRCD->SendNotice(source, this->GetUID(), "%s", buf.c_str());
+		}
 	}
 }
 
@@ -386,14 +395,14 @@ void User::Identify(NickServ::Nick *na)
 		if (!this->nc->o->ot->modes.empty())
 		{
 			this->SetModes(NULL, "%s", this->nc->o->ot->modes.c_str());
-			this->SendMessage(Me, "Changing your usermodes to \002%s\002", this->nc->o->ot->modes.c_str());
+			this->SendMessage(Me, "Changing your usermodes to \002{0}\002", this->nc->o->ot->modes);
 			UserMode *um = ModeManager::FindUserModeByName("OPER");
 			if (um && !this->HasMode("OPER") && this->nc->o->ot->modes.find(um->mchar) != Anope::string::npos)
 				IRCD->SendOper(this);
 		}
 		if (IRCD->CanSetVHost && !this->nc->o->vhost.empty())
 		{
-			this->SendMessage(Me, "Changing your vhost to \002%s\002", this->nc->o->vhost.c_str());
+			this->SendMessage(Me, "Changing your vhost to \002{0}\002", this->nc->o->vhost);
  			this->SetDisplayedHost(this->nc->o->vhost);
 			IRCD->SendVhost(this, "", this->nc->o->vhost);
 		}

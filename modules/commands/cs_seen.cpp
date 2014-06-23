@@ -168,15 +168,13 @@ class CommandOSSeen : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("The \002STATS\002 command prints out statistics about stored nicks and memory usage."));
-		source.Reply(_("The \002CLEAR\002 command lets you clean the database by removing all entries from the\n"
-				"entries from the database that were added within \037time\037.\n"
-				" \n"
-				"Example:\n"
-				" %s CLEAR 30m\n"
-				" Will remove all entries that were added within the last 30 minutes."), source.command.c_str());
+		source.Reply(_("The \002STATS\002 command prints out statistics about stored nicks and memory usage.\n"
+		               "The \002CLEAR\002 command lets you clean the database by removing all entries from the entries from the database that were added within \037time\037.\n"
+		               "\n"
+		               "Example:\n"
+		               "         {0} CLEAR 30m\n"
+		               "         Will remove all entries that were added within the last 30 minutes."),
+		               source.command);
 		return true;
 	}
 };
@@ -267,26 +265,26 @@ class CommandSeen : public Command
 
 		if (target.length() > Config->GetBlock("networkinfo")->Get<unsigned>("nicklen"))
 		{
-			source.Reply(_("Nick too long, max length is %u characters."), Config->GetBlock("networkinfo")->Get<unsigned>("nicklen"));
+			source.Reply(_("Nick too long, max length is \002{0}\002 characters."), Config->GetBlock("networkinfo")->Get<unsigned>("nicklen"));
 			return;
 		}
 
 		if (BotInfo::Find(target, true) != NULL)
 		{
-			source.Reply(_("%s is a client on services."), target.c_str());
+			source.Reply(_("\002{0}\002 is a service bot."), target);
 			return;
 		}
 
 		if (target.equals_ci(source.GetNick()))
 		{
-			source.Reply(_("You might see yourself in the mirror, %s."), source.GetNick().c_str());
+			source.Reply(_("You might see yourself in the mirror, \002{0}\002."), source.GetNick());
 			return;
 		}
 
 		SeenInfo *info = FindInfo(target);
 		if (!info)
 		{
-			source.Reply(_("Sorry, I have not seen %s."), target.c_str());
+			source.Reply(_("Sorry, I have not seen \002{0}\002."), target);
 			return;
 		}
 
@@ -302,8 +300,8 @@ class CommandSeen : public Command
 
 		if (info->type == NEW)
 		{
-			source.Reply(_("%s (%s) was last seen connecting %s ago (%s)%s"),
-				target.c_str(), info->vhost.c_str(), timebuf.c_str(), timebuf2.c_str(), onlinestatus.c_str());
+			source.Reply(_("\002{0}\002 (\002{1}\002) was last seen connecting \002{2}\002 ago (\002{3}\002){4}"),
+				target, info->vhost, timebuf, timebuf2, onlinestatus);
 		}
 		else if (info->type == NICK_TO)
 		{
@@ -313,55 +311,51 @@ class CommandSeen : public Command
 			else
 				onlinestatus = Anope::printf(_(", but %s mysteriously dematerialized."), info->nick2.c_str());
 
-			source.Reply(_("%s (%s) was last seen changing nick to %s %s ago%s"),
-				target.c_str(), info->vhost.c_str(), info->nick2.c_str(), timebuf.c_str(), onlinestatus.c_str());
+			source.Reply(_("\002{0}\002 (\002{1}\002) was last seen changing nick to \002{2}\002 \002{3}\002 ago{4}"),
+				target, info->vhost, info->nick2, timebuf, onlinestatus);
 		}
 		else if (info->type == NICK_FROM)
 		{
-			source.Reply(_("%s (%s) was last seen changing nick from %s to %s %s ago%s"),
-				target.c_str(), info->vhost.c_str(), info->nick2.c_str(), target.c_str(), timebuf.c_str(), onlinestatus.c_str());
+			source.Reply(_("\002{0}\002 (\002{1}\002) was last seen changing nick from \002{2}\002 to \002{3} {4}\002 ago{5}"),
+				target, info->vhost, info->nick2, target, timebuf, onlinestatus);
 		}
 		else if (info->type == JOIN)
 		{
 			if (ShouldHide(info->channel, u2))
-				source.Reply(_("%s (%s) was last seen joining a secret channel %s ago%s"),
-					target.c_str(), info->vhost.c_str(), timebuf.c_str(), onlinestatus.c_str());
+				source.Reply(_("\002{0}\002 (\002{1}\002) was last seen joining a secret channel \002{2}\002 ago{3}"),
+					target, info->vhost, timebuf, onlinestatus);
 			else
-				source.Reply(_("%s (%s) was last seen joining %s %s ago%s"),
-					target.c_str(), info->vhost.c_str(), info->channel.c_str(), timebuf.c_str(), onlinestatus.c_str());
+				source.Reply(_("\002{0}\002 (\002{1}\002) was last seen joining \002{2} {3}\002 ago{4}"),
+					target, info->vhost, info->channel, timebuf, onlinestatus);
 		}
 		else if (info->type == PART)
 		{
 			if (ShouldHide(info->channel, u2))
-				source.Reply(_("%s (%s) was last seen parting a secret channel %s ago%s"),
-					target.c_str(), info->vhost.c_str(), timebuf.c_str(), onlinestatus.c_str());
+				source.Reply(_("\002{0}\002 (\002{1}\002) was last seen parting a secret channel \002{2}\002 ago{3}"),
+					target, info->vhost, timebuf, onlinestatus);
 			else
-				source.Reply(_("%s (%s) was last seen parting %s %s ago%s"),
-					target.c_str(), info->vhost.c_str(), info->channel.c_str(), timebuf.c_str(), onlinestatus.c_str());
+				source.Reply(_("\002{0}\002 (\002{1}\002) was last seen parting \002{2} {3}\002 ago{4}"),
+					target, info->vhost, info->channel, timebuf, onlinestatus);
 		}
 		else if (info->type == QUIT)
 		{
-			source.Reply(_("%s (%s) was last seen quitting (%s) %s ago (%s)."),
-					target.c_str(), info->vhost.c_str(), info->message.c_str(), timebuf.c_str(), timebuf2.c_str());
+			source.Reply(_("\002{0}\002 (\002{1}\002) was last seen quitting (\002{2}\002) \002{3}\002 ago (\002{4}\\2)."),
+					target, info->vhost, info->message, timebuf, timebuf2);
 		}
 		else if (info->type == KICK)
 		{
 			if (ShouldHide(info->channel, u2))
-				source.Reply(_("%s (%s) was kicked from a secret channel %s ago%s"),
-					target.c_str(), info->vhost.c_str(), timebuf.c_str(), onlinestatus.c_str());
+				source.Reply(_("\002{0}\002 (\002{1}\002) was kicked from a secret channel \002{2}\002 ago{3}"),
+					target, info->vhost, timebuf, onlinestatus);
 			else
-				source.Reply(_("%s (%s) was kicked from %s (\"%s\") %s ago%s"),
-					target.c_str(), info->vhost.c_str(), info->channel.c_str(), info->message.c_str(), timebuf.c_str(), onlinestatus.c_str());
+				source.Reply(_("\002{0}\002 (\002{1}\002) was kicked from \002{2}\002 (\"{3}\") {4} ago{5}"),
+					target, info->vhost, info->channel, info->message, timebuf, onlinestatus);
 		}
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("Checks for the last time \037nick\037 was seen joining, leaving,\n"
-				"or changing nick on the network and tells you when and, depending\n"
-				"on channel or user settings, where it was."));
+		source.Reply(_("Checks for the last time \037nick\037 was seen joining, leaving, or changing nick on the network and tells you when and, depending on channel or user settings, where it was."));
 		return true;
 	}
 };

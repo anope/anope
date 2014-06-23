@@ -18,7 +18,7 @@ class CommandMSSend : public Command
 	CommandMSSend(Module *creator) : Command(creator, "memoserv/send", 2, 2)
 	{
 		this->SetDesc(_("Send a memo to a nick or channel"));
-		this->SetSyntax(_("{\037nick\037 | \037channel\037} \037memo-text\037"));
+		this->SetSyntax(_("{\037user\037 | \037channel\037} \037memo-text\037"));
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
@@ -31,29 +31,26 @@ class CommandMSSend : public Command
 
 		if (Anope::ReadOnly && !source.IsOper())
 		{
-			source.Reply(MEMO_SEND_DISABLED);
+			source.Reply(_("Sorry, memo sending is temporarily disabled."));
 			return;
 		}
 
 		MemoServ::MemoServService::MemoResult result = MemoServ::service->Send(source.GetNick(), nick, text);
 		if (result == MemoServ::MemoServService::MEMO_SUCCESS)
-			source.Reply(_("Memo sent to \002%s\002."), nick.c_str());
+			source.Reply(_("\002{0}\002 isn't registered."), nick);
 		else if (result == MemoServ::MemoServService::MEMO_INVALID_TARGET)
 			source.Reply(_("\002%s\002 is not a registered unforbidden nick or channel."), nick.c_str());
 		else if (result == MemoServ::MemoServService::MEMO_TOO_FAST)
-			source.Reply(_("Please wait %d seconds before using the %s command again."), Config->GetModule("memoserv")->Get<time_t>("senddelay"), source.command.c_str());
+			source.Reply(_("Please wait \002{0}\002 seconds before using the \002{1}\002 command again."), Config->GetModule("memoserv")->Get<time_t>("senddelay"), source.command);
 		else if (result == MemoServ::MemoServService::MEMO_TARGET_FULL)
-			source.Reply(_("Sorry, %s currently has too many memos and cannot receive more."), nick.c_str());
+			source.Reply(_("Sorry, \002{0}\002 currently has too many memos and cannot receive more."), nick);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("Sends the named \037nick\037 or \037channel\037 a memo containing\n"
-				"\037memo-text\037. When sending to a nickname, the recipient will\n"
-				"receive a notice that he/she has a new memo. The target\n"
-				"nickname/channel must be registered."));
+		source.Reply(_("Sends the named \037user\037 or \037channel\037 a memo containing \037memo-text\037."
+		               " The recipient will receive a notice that they have a new memo."
+		               " The target user or channel must be registered."));
 		return true;
 	}
 };

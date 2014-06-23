@@ -28,10 +28,8 @@ class CommandBSSet : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
-		this->SendSyntax(source);
-		source.Reply(" ");
 		source.Reply(_("Configures bot options.\n"
-			" \n"
+			"\n"
 			"Available options:"));
 		Anope::string this_name = source.command;
 		for (CommandInfo::map::const_iterator it = source.service->commands.begin(), it_end = source.service->commands.end(); it != it_end; ++it)
@@ -48,8 +46,11 @@ class CommandBSSet : public Command
 				}
 			}
 		}
-		source.Reply(_("Type \002%s%s HELP %s \037option\037\002 for more information on a\n"
-				"particular option."), Config->StrictPrivmsg.c_str(), source.service->nick.c_str(), this_name.c_str());
+
+		CommandInfo *help = source.service->FindCommand("generic/help");
+		if (help)
+			source.Reply(_("Type \002{0}{1} {2} {3} \037option\037\002 for more information on a particular option."),
+			               Config->StrictPrivmsg, source.service->nick, help->cname, this_name);
 
 		return true;
 	}
@@ -88,14 +89,14 @@ class CommandBSSetBanExpire : public Command
 		ChanServ::Channel *ci = ChanServ::Find(chan);
 		if (ci == NULL)
 		{
-			source.Reply(CHAN_X_NOT_REGISTERED, chan.c_str());
+			source.Reply(_("Channel \002{0}\002 isn't registered."), chan);
 			return;
 		}
 
 		ChanServ::AccessGroup access = source.AccessFor(ci);
 		if (!source.HasPriv("botserv/administration") && !access.HasPriv("SET"))
 		{
-			source.Reply(ACCESS_DENIED);
+			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "SET", ci->name);
 			return;
 		}
 
@@ -108,7 +109,7 @@ class CommandBSSetBanExpire : public Command
 		time_t t = Anope::DoTime(arg);
 		if (t == -1)
 		{
-			source.Reply(BAD_EXPIRY_TIME);
+			source.Reply(_("Invalid expiry time \002{0}\002."), arg);
 			return;
 		}
 
@@ -132,12 +133,8 @@ class CommandBSSetBanExpire : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
-		this->SendSyntax(source);
-		source.Reply(_(" \n"
-				"Sets the time bot bans expire in. If enabled, any bans placed by\n"
-				"bots, such as flood kicker, badwords kicker, etc. will automatically\n"
-				"be removed after the given time. Set to 0 to disable bans from\n"
-				"automatically expiring."));
+		source.Reply(_("Sets the time bot bans expire in. If enabled, any bans placed by bots, such as by the flood kicker, badwords kicker, etc. will automatically be removed after the given time."
+		               " Set to 0 to disable bans from automatically expiring."));
 		return true;
 	}
 };
@@ -147,36 +144,34 @@ class CommandBSSetPrivate : public Command
  public:
 	CommandBSSetPrivate(Module *creator, const Anope::string &sname = "botserv/set/private") : Command(creator, sname, 2, 2)
 	{
-		this->SetDesc(_("Prevent a bot from being assigned by non IRC operators"));
+		this->SetDesc(_("Prevent a bot from being assigned by non Services Operators"));
 		this->SetSyntax(_("\037botname\037 {\037ON|OFF\037}"));
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
-		BotInfo *bi = BotInfo::Find(params[0], true);
+		const Anope::string &nick = params[9];
 		const Anope::string &value = params[1];
 
 		if (Anope::ReadOnly)
-		{
-			source.Reply(READ_ONLY_MODE);
-			return;
-		}
+			source.Reply(_("Services are in read-only mode. Any changes made may not persist."));
 
+		BotInfo *bi = BotInfo::Find(nick, true);
 		if (bi == NULL)
 		{
-			source.Reply(BOT_DOES_NOT_EXIST, params[0].c_str());
+			source.Reply(_("Bot \002{0}\002 does not exist."), nick);
 			return;
 		}
 
 		if (value.equals_ci("ON"))
 		{
 			bi->oper_only = true;
-			source.Reply(_("Private mode of bot %s is now \002on\002."), bi->nick.c_str());
+			source.Reply(_("Private mode of bot \002{0}\002 is now \002on\002."), bi->nick);
 		}
 		else if (value.equals_ci("OFF"))
 		{
 			bi->oper_only = false;
-			source.Reply(_("Private mode of bot %s is now \002off\002."), bi->nick.c_str());
+			source.Reply(_("Private mode of bot \002{0}\002 is now \002off\002."), bi->nick);
 		}
 		else
 			this->OnSyntaxError(source, source.command);
@@ -184,10 +179,8 @@ class CommandBSSetPrivate : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
-		this->SendSyntax(source);
-		source.Reply(_(" \n"
-			"This option prevents a bot from being assigned to a\n"
-			"channel by users that aren't IRC Operators."));
+		source.Reply(_("This option prevents a bot from being assigned to channels by users who do not have the \002{0}\002 privilege."),
+		               "botserv/administration");
 		return true;
 	}
 };

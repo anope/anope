@@ -234,15 +234,15 @@ class NickServCore : public Module, public NickServ::NickServService
 		if (on_access || !na->nc->HasExt("KILL_IMMED"))
 		{
 			if (na->nc->HasExt("NS_SECURE"))
-				u->SendMessage(*NickServ, NICK_IS_SECURE, Config->StrictPrivmsg.c_str(), NickServ->nick.c_str());
+				u->SendMessage(*NickServ, _("This nickname is registered and protected. If this is your nickname, type \002{0}{1} IDENTIFY \037password\037\002. Otherwise, please choose a different nickname."), Config->StrictPrivmsg, NickServ->nick); // XXX
 			else
-				u->SendMessage(*NickServ, NICK_IS_REGISTERED, Config->StrictPrivmsg.c_str(), NickServ->nick.c_str());
+				u->SendMessage(*NickServ, _("This nickname is owned by someone else. If this is your nickname, type \002{0}{1} IDENTIFY \037password\037\002. Otherwise, please choose a different nickname."), Config->StrictPrivmsg, NickServ->nick); // XXX
 		}
 		if (na->nc->HasExt("KILLPROTECT") && !on_access)
 		{
 			if (na->nc->HasExt("KILL_IMMED"))
 			{
-				u->SendMessage(*NickServ, FORCENICKCHANGE_NOW);
+				u->SendMessage(*NickServ, _("This nickname has been registered; you may not use it."));
 				this->Collide(u, na);
 			}
 			else if (na->nc->HasExt("KILL_QUICK"))

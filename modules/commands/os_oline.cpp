@@ -28,19 +28,19 @@ class CommandOSOLine : public Command
 
 		/* let's check whether the user is online */
 		if (!(u2 = User::Find(nick, true)))
-			source.Reply(NICK_X_NOT_IN_USE, nick.c_str());
+			source.Reply(_("\002{0}\002 isn't currently online."), nick);
 		else if (u2 && flag[0] == '+')
 		{
 			IRCD->SendSVSO(source.service, nick, flag);
 			u2->SetMode(source.service, "OPER");
 			u2->SendMessage(*source.service, _("You are now an IRC Operator."));
-			source.Reply(_("Operflags \002%s\002 have been added for \002%s\002."), flag.c_str(), nick.c_str());
+			source.Reply(_("Operflags \002{0}\002 have been added for \002{1}\002."), flag, nick);
 			Log(LOG_ADMIN, source, this) << "for " << nick;
 		}
 		else if (u2 && flag[0] == '-')
 		{
 			IRCD->SendSVSO(source.service, nick, flag);
-			source.Reply(_("Operflags \002%s\002 have been removed from \002%s\002."), flag.c_str(), nick.c_str());
+			source.Reply(_("Operflags \002{0}\002 have been removed from \002{1}\002."), flag, nick);
 			Log(LOG_ADMIN, source, this) << "for " << nick;
 		}
 		else
@@ -51,11 +51,7 @@ class CommandOSOLine : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("Allows Services Operators to give Operflags to any user.\n"
-				"Flags have to be prefixed with a \"+\" or a \"-\". To\n"
-				"remove all flags simply type a \"-\" instead of any flags."));
+		source.Reply(_("Allows Services Operators to give Operflags to any user. Flags have to be prefixed with a \"+\" or a \"-\". To remove all flags simply type a \"-\" instead of any flags."));
 		return true;
 	}
 };

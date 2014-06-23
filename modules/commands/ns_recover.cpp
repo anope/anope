@@ -41,7 +41,7 @@ class NSRecoverRequestListener : public NickServ::IdentifyRequestListener
 		if (na->HasExt("HELD"))
 		{
 			NickServ::service->Release(na);
-			source.Reply(_("Service's hold on \002%s\002 has been released."), na->nick.c_str());
+			source.Reply(_("Service's hold on \002{0}\002 has been released."), na->nick);
 		}
 		else if (!u)
 		{
@@ -67,9 +67,8 @@ class NSRecoverRequestListener : public NickServ::IdentifyRequestListener
 				}
 			}
 
-			u->SendMessage(*source.service, _("This nickname has been recovered by %s. If you did not do\n"
-							"this then %s may have your password, and you should change it."),
-							source.GetNick().c_str(), source.GetNick().c_str());
+			u->SendMessage(*source.service, _("This nickname has been recovered by \002{0}\002. If you did not do this, then \002{0}\002 may have your password, and you should change it."),
+							source.GetNick());
 
 			Anope::string buf = source.command.upper() + " command used by " + source.GetNick();
 			u->Kill(source.service->nick, buf);
@@ -88,7 +87,7 @@ class NSRecoverRequestListener : public NickServ::IdentifyRequestListener
 				Log(LOG_COMMAND, source, cmd) << "and was automatically identified to " << na->nick << " (" << na->nc->display << ")";
 			}
 
-			u->SendMessage(*source.service, _("This nickname has been recovered by %s."), source.GetNick().c_str());
+			u->SendMessage(*source.service, _("This nickname has been recovered by \002{0}\002."), source.GetNick());
 			if (NickServ::service)
 				NickServ::service->Collide(u, na);
 
@@ -99,8 +98,7 @@ class NSRecoverRequestListener : public NickServ::IdentifyRequestListener
 				IRCD->SendForceNickChange(source.GetUser(), user, Anope::CurTime);
 			}
 			else
-				source.Reply(_("The user with your nick has been removed. Use this command again\n"
-						"to release services's hold on your nick."));
+				source.Reply(_("The user with your nick has been removed. Use this command again to release services's hold on your nick."));
 		}
 	}
 
@@ -108,7 +106,7 @@ class NSRecoverRequestListener : public NickServ::IdentifyRequestListener
 	{
 		if (NickServ::FindNick(user) != NULL)
 		{
-			source.Reply(ACCESS_DENIED);
+			source.Reply(_("Access denied."));
 			if (!pass.empty())
 			{
 				Log(LOG_COMMAND, source, cmd) << "with an invalid password for " << user;
@@ -117,7 +115,7 @@ class NSRecoverRequestListener : public NickServ::IdentifyRequestListener
 			}
 		}
 		else
-			source.Reply(NICK_X_NOT_REGISTERED, user.c_str());
+			source.Reply(_("\002{0}\002 isn't registered."), user);
 	}
 };
 
@@ -148,12 +146,13 @@ class CommandNSRecover : public Command
 
 		if (!na)
 		{
-			source.Reply(NICK_X_NOT_REGISTERED, nick.c_str());
+			source.Reply(_("\002{0}\002 isn't registered."), nick);
 			return;
 		}
-		else if (na->nc->HasExt("NS_SUSPENDED"))
+
+		if (na->nc->HasExt("NS_SUSPENDED"))
 		{
-			source.Reply(NICK_X_SUSPENDED, na->nick.c_str());
+			source.Reply(_("\002{0}\002 is suspended."), na->nick);
 			return;
 		}
 
@@ -186,14 +185,10 @@ class CommandNSRecover : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("Recovers your nick from another user or from services.\n"
-				"If services are currently holding your nick, the hold\n"
-				"will be released. If another user is holding your nick\n"
-				"and is identified they will be killed (similar to the old\n"
-				"GHOST command). If they are not identified they will be\n"
-				"forced off of the nick."));
+		source.Reply(_("Recovers your nickname from another user or from services."
+		               "If services are currently holding your nickname, the hold will be released."
+		               " If another user is holding your nickname and is identified they will be killed."
+		               " If they are not identified they will be forced off of the nickname."));
 		return true;
 	}
 };

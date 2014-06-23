@@ -33,7 +33,9 @@ class CommandNSSet : public Command
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Sets various nickname options. \037option\037 can be one of:"));
+		source.Reply(_("Sets various options on your account\n"
+		               "\n"
+		               "Available options:"));
 
 		Anope::string this_name = source.command;
 		bool hide_privileged_commands = Config->GetBlock("options")->Get<bool>("hideprivilegedcommands");
@@ -59,8 +61,10 @@ class CommandNSSet : public Command
 			}
 		}
 
-		source.Reply(_("Type \002%s%s HELP %s \037option\037\002 for more information\n"
-			"on a specific option."), Config->StrictPrivmsg.c_str(), source.service->nick.c_str(), this_name.c_str());
+		CommandInfo *help = source.service->FindCommand("generic/help");
+		if (help)
+			source.Reply(_("Type \002{0}{1} {2} {3} \037option\037\002 for more information on a particular option."),
+			               Config->StrictPrivmsg, source.service->nick, help->cname, this_name);
 
 		return true;
 	}
@@ -85,7 +89,9 @@ class CommandNSSASet : public Command
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Sets various nickname options. \037option\037 can be one of:"));
+		source.Reply(_("Sets various options on other users accounts\n"
+		               "\n"
+		               "Available options:"));
 
 		Anope::string this_name = source.command;
 		for (CommandInfo::map::const_iterator it = source.service->commands.begin(), it_end = source.service->commands.end(); it != it_end; ++it)
@@ -104,9 +110,11 @@ class CommandNSSASet : public Command
 			}
 		}
 
-		source.Reply(_("Type \002%s%s HELP %s \037option\037\002 for more information\n"
-				"on a specific option. The options will be set on the given\n"
-				"\037nickname\037."), Config->StrictPrivmsg.c_str(), source.service->nick.c_str(), this_name.c_str());
+		CommandInfo *help = source.service->FindCommand("generic/help");
+		if (help)
+			source.Reply(_("Type \002{0}{1} {2} {3} \037option\037\002 for more information on a particular option."),
+			               Config->StrictPrivmsg, source.service->nick, help->cname, this_name);
+
 		return true;
 	}
 };
@@ -116,7 +124,7 @@ class CommandNSSetPassword : public Command
  public:
 	CommandNSSetPassword(Module *creator) : Command(creator, "nickserv/set/password", 1)
 	{
-		this->SetDesc(_("Set your nickname password"));
+		this->SetDesc(_("Changes your password"));
 		this->SetSyntax(_("\037new-password\037"));
 	}
 
@@ -127,18 +135,19 @@ class CommandNSSetPassword : public Command
 
 		if (Anope::ReadOnly)
 		{
-			source.Reply(READ_ONLY_MODE);
+			source.Reply(_("Services are in read-only mode."));
 			return;
 		}
 
 		if (source.GetNick().equals_ci(param) || (Config->GetBlock("options")->Get<bool>("strictpasswords") && len < 5))
 		{
-			source.Reply(MORE_OBSCURE_PASSWORD);
+			source.Reply(_("Please try again with a more obscure password. Passwords should be at least five characters long, should not be something easily guessed (e.g. your real name or your nick), and cannot contain the space or tab characters."));
 			return;
 		}
-		else if (len > Config->GetModule("nickserv")->Get<unsigned>("passlen", "32"))
+
+		if (len > Config->GetModule("nickserv")->Get<unsigned>("passlen", "32"))
 		{
-			source.Reply(PASSWORD_TOO_LONG);
+			source.Reply(_("Your password is too long, it can not contain more than \002{0}\002 characters."), Config->GetModule("nickserv")->Get<unsigned>("passlen", "32"));
 			return;
 		}
 
@@ -147,17 +156,14 @@ class CommandNSSetPassword : public Command
 		Anope::Encrypt(param, source.nc->pass);
 		Anope::string tmp_pass;
 		if (Anope::Decrypt(source.nc->pass, tmp_pass) == 1)
-			source.Reply(_("Password for \002%s\002 changed to \002%s\002."), source.nc->display.c_str(), tmp_pass.c_str());
+			source.Reply(_("Password for \002{0}\002 changed to \002{1]\002."), source.nc->display, tmp_pass);
 		else
-			source.Reply(_("Password for \002%s\002 changed."), source.nc->display.c_str());
+			source.Reply(_("Password for \002{0}\002 changed."), source.nc->display);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("Changes the password used to identify you as the nick's\n"
-			"owner."));
+		source.Reply(_("Changes your password to \037new-password\037."));
 		return true;
 	}
 };
@@ -167,22 +173,22 @@ class CommandNSSASetPassword : public Command
  public:
 	CommandNSSASetPassword(Module *creator) : Command(creator, "nickserv/saset/password", 2, 2)
 	{
-		this->SetDesc(_("Set the nickname password"));
-		this->SetSyntax(_("\037nickname\037 \037new-password\037"));
+		this->SetDesc(_("Changes the password of another user"));
+		this->SetSyntax(_("\037account\037 \037new-password\037"));
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		if (Anope::ReadOnly)
 		{
-			source.Reply(READ_ONLY_MODE);
+			source.Reply(_("Services are in read-only mode."));
 			return;
 		}
 
 		const NickServ::Nick *setter_na = NickServ::FindNick(params[0]);
 		if (setter_na == NULL)
 		{
-			source.Reply(NICK_X_NOT_REGISTERED, params[0].c_str());
+			source.Reply(_("\002{0}\002 isn't registered."), params[0]);
 			return;
 		}
 		NickServ::Account *nc = setter_na->nc;
@@ -194,14 +200,16 @@ class CommandNSSASetPassword : public Command
 			source.Reply(_("You may not change the password of other Services Operators."));
 			return;
 		}
-		else if (nc->display.equals_ci(params[1]) || (Config->GetBlock("options")->Get<bool>("strictpasswords") && len < 5))
+
+		if (nc->display.equals_ci(params[1]) || (Config->GetBlock("options")->Get<bool>("strictpasswords") && len < 5))
 		{
-			source.Reply(MORE_OBSCURE_PASSWORD);
+			source.Reply(_("Please try again with a more obscure password. Passwords should be at least five characters long, should not be something easily guessed (e.g. your real name or your nick), and cannot contain the space or tab characters."));
 			return;
 		}
-		else if (len > Config->GetModule("nickserv")->Get<unsigned>("passlen", "32"))
+
+		if (len > Config->GetModule("nickserv")->Get<unsigned>("passlen", "32"))
 		{
-			source.Reply(PASSWORD_TOO_LONG);
+			source.Reply(_("Your password is too long, it can not contain more than \002{0}\002 characters."), Config->GetModule("nickserv")->Get<unsigned>("passlen", "32"));
 			return;
 		}
 
@@ -210,16 +218,14 @@ class CommandNSSASetPassword : public Command
 		Anope::Encrypt(params[1], nc->pass);
 		Anope::string tmp_pass;
 		if (Anope::Decrypt(nc->pass, tmp_pass) == 1)
-			source.Reply(_("Password for \002%s\002 changed to \002%s\002."), nc->display.c_str(), tmp_pass.c_str());
+			source.Reply(_("Password for \002{0}\002 changed to \002{1}\002."), nc->display, tmp_pass);
 		else
-			source.Reply(_("Password for \002%s\002 changed."), nc->display.c_str());
+			source.Reply(_("Password for \002{0}\002 changed."), nc->display);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("Changes the password used to identify as the nick's owner."));
+		source.Reply(_("Changes the password of \037account\037 to \037new-password\037."));
 		return true;
 	}
 };
@@ -237,14 +243,14 @@ class CommandNSSetAutoOp : public Command
 	{
 		if (Anope::ReadOnly)
 		{
-			source.Reply(READ_ONLY_MODE);
+			source.Reply(_("Services are in read-only mode."));
 			return;
 		}
 
 		const NickServ::Nick *na = NickServ::FindNick(user);
 		if (na == NULL)
 		{
-			source.Reply(NICK_X_NOT_REGISTERED, user.c_str());
+			source.Reply(_("\002{0}\002 isn't registered."), user);
 			return;
 		}
 		NickServ::Account *nc = na->nc;
@@ -258,13 +264,13 @@ class CommandNSSetAutoOp : public Command
 		{
 			Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to enable autoop for " << na->nc->display;
 			nc->Extend<bool>("AUTOOP");
-			source.Reply(_("Services will from now on set status modes on %s in channels."), nc->display.c_str());
+			source.Reply(_("Services will from now on set status modes on \002{0}\002 in channels."), nc->display);
 		}
 		else if (param.equals_ci("OFF"))
 		{
 			Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to disable autoop for " << na->nc->display;
 			nc->Shrink<bool>("AUTOOP");
-			source.Reply(_("Services will no longer set status modes on %s in channels."), nc->display.c_str());
+			source.Reply(_("Services will no longer set status modes on \002{0}\002 in channels."), nc->display);
 		}
 		else
 			this->OnSyntaxError(source, "AUTOOP");
@@ -277,13 +283,8 @@ class CommandNSSetAutoOp : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
-		BotInfo *bi = Config->GetClient("ChanServ");
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("Sets whether you will be given your channel status modes automatically.\n"
-				"Set to \002ON\002 to allow %s to set status modes on you automatically\n"
-				"when entering channels. Note that depending on channel settings some modes\n"
-				"may not get set automatically."), bi ? bi->nick.c_str() : "ChanServ");
+		source.Reply(_("Sets whether you will be given your channel status modes automatically when you join a channel."
+		                " Note that depending on channel settings some modes may not get set automatically."));
 		return true;
 	}
 };
@@ -329,7 +330,7 @@ class CommandNSSetDisplay : public Command
 	{
 		if (Anope::ReadOnly)
 		{
-			source.Reply(READ_ONLY_MODE);
+			source.Reply(_("Services are in read-only mode."));
 			return;
 		}
 
@@ -340,14 +341,16 @@ class CommandNSSetDisplay : public Command
 			source.Reply(_("This command may not be used on this network because nickname ownership is disabled."));
 			return;
 		}
+
 		if (user_na == NULL)
 		{
-			source.Reply(NICK_X_NOT_REGISTERED, user.c_str());
+			source.Reply(_("\002{0}\002 isn't registered."), user);
 			return;
 		}
-		else if (!na || *na->nc != *user_na->nc)
+
+		if (!na || *na->nc != *user_na->nc)
 		{
-			source.Reply(_("The new display MUST be a nickname of the nickname group %s."), user_na->nc->display.c_str());
+			source.Reply(_("The new display must be a nickname of the nickname group \002{0}\02."), user_na->nc->display);
 			return;
 		}
 
@@ -359,7 +362,7 @@ class CommandNSSetDisplay : public Command
 		Log(user_na->nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to change the display of " << user_na->nc->display << " to " << na->nick;
 
 		user_na->nc->SetDisplay(na);
-		source.Reply(NICK_SET_DISPLAY_CHANGED, user_na->nc->display.c_str());
+		source.Reply(_("The new display is now \002{0}\002."), user_na->nc->display);
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
@@ -369,10 +372,7 @@ class CommandNSSetDisplay : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("Changes the display used to refer to your nickname group in\n"
-				"Services. The new display MUST be a nick of your group."));
+		source.Reply(_("Changes the display used to refer to your nickname group in services. The new display nickname must be a nickname of your group."));
 		return true;
 	}
 };
@@ -383,7 +383,7 @@ class CommandNSSASetDisplay : public CommandNSSetDisplay
 	CommandNSSASetDisplay(Module *creator) : CommandNSSetDisplay(creator, "nickserv/saset/display", 2)
 	{
 		this->ClearSyntax();
-		this->SetSyntax(_("\037nickname\037 \037new-display\037"));
+		this->SetSyntax(_("\037account\037 \037new-display\037"));
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
@@ -393,10 +393,7 @@ class CommandNSSASetDisplay : public CommandNSSetDisplay
 
 	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("Changes the display used to refer to the nickname group in\n"
-				"Services. The new display MUST be a nick of the group."));
+		source.Reply(_("Changes the display used to refer to the nickname group \037account\037 in services. The new display nickname must be a nickname in the group of \037account\037."));
 		return true;
 	}
 };
@@ -440,14 +437,14 @@ class CommandNSSetEmail : public Command
 	{
 		if (Anope::ReadOnly)
 		{
-			source.Reply(READ_ONLY_MODE);
+			source.Reply(_("Services are in read-only mode."));
 			return;
 		}
 
 		const NickServ::Nick *na = NickServ::FindNick(user);
 		if (!na)
 		{
-			source.Reply(NICK_X_NOT_REGISTERED, user.c_str());
+			source.Reply(_("\002{0}\002 isn't registered."), user);
 			return;
 		}
 		NickServ::Account *nc = na->nc;
@@ -463,14 +460,16 @@ class CommandNSSetEmail : public Command
 			source.Reply(_("You cannot unset the e-mail on this network."));
 			return;
 		}
-		else if (Config->GetModule("nickserv")->Get<bool>("secureadmins", "yes") && source.nc != nc && nc->IsServicesOper())
+
+		if (Config->GetModule("nickserv")->Get<bool>("secureadmins", "yes") && source.nc != nc && nc->IsServicesOper())
 		{
 			source.Reply(_("You may not change the e-mail of other Services Operators."));
 			return;
 		}
-		else if (!param.empty() && !Mail::Validate(param))
+
+		if (!param.empty() && !Mail::Validate(param))
 		{
-			source.Reply(MAIL_X_INVALID, param.c_str());
+			source.Reply(_("\002{0}\002 is not a valid e-mail address."), param);
 			return;
 		}
 
@@ -482,7 +481,7 @@ class CommandNSSetEmail : public Command
 		if (!param.empty() && Config->GetModule("nickserv")->Get<bool>("confirmemailchanges") && !source.IsServicesOper())
 		{
 			if (SendConfirmMail(source.GetUser(), source.service, param))
-				source.Reply(_("A confirmation e-mail has been sent to \002%s\002. Follow the instructions in it to change your e-mail address."), param.c_str());
+				source.Reply(_("A confirmation e-mail has been sent to \002{0}\002. Follow the instructions in it to change your e-mail address."), param);
 		}
 		else
 		{
@@ -490,13 +489,13 @@ class CommandNSSetEmail : public Command
 			{
 				Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to change the email of " << nc->display << " to " << param;
 				nc->email = param;
-				source.Reply(_("E-mail address for \002%s\002 changed to \002%s\002."), nc->display.c_str(), param.c_str());
+				source.Reply(_("E-mail address for \002{0}\002 changed to \002{1}\002."), nc->display, param);
 			}
 			else
 			{
 				Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to unset the email of " << nc->display;
 				nc->email.clear();
-				source.Reply(_("E-mail address for \002%s\002 unset."), nc->display.c_str());
+				source.Reply(_("E-mail address for \002{0}\002 unset."), nc->display);
 			}
 		}
 	}
@@ -508,11 +507,7 @@ class CommandNSSetEmail : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("Associates the given E-mail address with your nickname.\n"
-				"This address will be displayed whenever someone requests\n"
-				"information on the nickname with the \002INFO\002 command."));
+		source.Reply(_("Changes your email address to \037address\037."));
 		return true;
 	}
 };
@@ -523,7 +518,7 @@ class CommandNSSASetEmail : public CommandNSSetEmail
 	CommandNSSASetEmail(Module *creator) : CommandNSSetEmail(creator, "nickserv/saset/email", 2)
 	{
 		this->ClearSyntax();
-		this->SetSyntax(_("\037nickname\037 \037address\037"));
+		this->SetSyntax(_("\037account\037 \037address\037"));
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
@@ -533,9 +528,7 @@ class CommandNSSASetEmail : public CommandNSSetEmail
 
 	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("Associates the given E-mail address with the nickname."));
+		source.Reply(_("Changes the email address of \037account\037 to \037address\037."));
 		return true;
 	}
 };
@@ -553,14 +546,14 @@ class CommandNSSetKeepModes : public Command
 	{
 		if (Anope::ReadOnly)
 		{
-			source.Reply(READ_ONLY_MODE);
+			source.Reply(_("Services are in read-only mode."));
 			return;
 		}
 
 		const NickServ::Nick *na = NickServ::FindNick(user);
 		if (!na)
 		{
-			source.Reply(NICK_X_NOT_REGISTERED, user.c_str());
+			source.Reply(_("\002{0}\002 isn't registered."), user);
 			return;
 		}
 		NickServ::Account *nc = na->nc;
@@ -574,13 +567,13 @@ class CommandNSSetKeepModes : public Command
 		{
 			Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to enable keepmodes for " << nc->display;
 			nc->Extend<bool>("NS_KEEP_MODES");
-			source.Reply(_("Keep modes for %s is now \002on\002."), nc->display.c_str());
+			source.Reply(_("Keep modes for \002{0}\002 is now \002on\002."), nc->display);
 		}
 		else if (param.equals_ci("OFF"))
 		{
 			Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to disable keepmodes for " << nc->display;
 			nc->Shrink<bool>("NS_KEEP_MODES");
-			source.Reply(_("Keep modes for %s is now \002off\002."), nc->display.c_str());
+			source.Reply(_("Keep modes for \002{0}\002 is now \002off\002."), nc->display);
 		}
 		else
 			this->OnSyntaxError(source, "");
@@ -593,11 +586,7 @@ class CommandNSSetKeepModes : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("Enables or disables keepmodes for your nick. If keep\n"
-				"modes is enabled, services will remember your usermodes\n"
-				"and attempt to re-set them the next time you authenticate."));
+		source.Reply(_("Enables or disables keepmodes for your account. If keepmodes is enabled, services will remember your usermodes and attempt to re-set them the next time you log on."));
 		return true;
 	}
 };
@@ -608,7 +597,7 @@ class CommandNSSASetKeepModes : public CommandNSSetKeepModes
 	CommandNSSASetKeepModes(Module *creator) : CommandNSSetKeepModes(creator, "nickserv/saset/keepmodes", 2)
 	{
 		this->ClearSyntax();
-		this->SetSyntax(_("\037nickname\037 {ON | OFF}"));
+		this->SetSyntax(_("\037account\037 {ON | OFF}"));
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
@@ -618,11 +607,7 @@ class CommandNSSASetKeepModes : public CommandNSSetKeepModes
 
 	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("Enables or disables keepmodes for the given nick. If keep\n"
-				"modes is enabled, services will remember users' usermodes\n"
-				"and attempt to re-set them the next time they authenticate."));
+		source.Reply(_("Enables or disables keepmodes for \037account\037. If keep modes is enabled, services will remember users' usermodes and attempt to re-set them the next time they log pn."));
 		return true;
 	}
 };
@@ -640,7 +625,7 @@ class CommandNSSetKill : public Command
 	{
 		if (Anope::ReadOnly)
 		{
-			source.Reply(READ_ONLY_MODE);
+			source.Reply(_("Services are in read-only mode."));
 			return;
 		}
 
@@ -653,7 +638,7 @@ class CommandNSSetKill : public Command
 		const NickServ::Nick *na = NickServ::FindNick(user);
 		if (!na)
 		{
-			source.Reply(NICK_X_NOT_REGISTERED, user.c_str());
+			source.Reply(_("\002{0}\002 isn't registered."), user);
 			return;
 		}
 		NickServ::Account *nc = na->nc;
@@ -669,7 +654,7 @@ class CommandNSSetKill : public Command
 			nc->Shrink<bool>("KILL_QUICK");
 			nc->Shrink<bool>("KILL_IMMED");
 			Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to set kill on for " << nc->display;
-			source.Reply(_("Protection is now \002on\002 for \002%s\002."), nc->display.c_str());
+			source.Reply(_("Protection is now \002on\002 for \002{0}\002."), nc->display);
 		}
 		else if (param.equals_ci("QUICK"))
 		{
@@ -677,7 +662,7 @@ class CommandNSSetKill : public Command
 			nc->Extend<bool>("KILL_QUICK");
 			nc->Shrink<bool>("KILL_IMMED");
 			Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to set kill quick for " << nc->display;
-			source.Reply(_("Protection is now \002on\002 for \002%s\002, with a reduced delay."), nc->display.c_str());
+			source.Reply(_("Protection is now \002on\002 for \002{0}\002, with a reduced delay."), nc->display);
 		}
 		else if (param.equals_ci("IMMED"))
 		{
@@ -687,7 +672,7 @@ class CommandNSSetKill : public Command
 				nc->Shrink<bool>("KILL_QUICK");
 				nc->Extend<bool>("KILL_IMMED");
 				Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to set kill immed for " << nc->display;
-				source.Reply(_("Protection is now \002on\002 for \002%s\002, with no delay."), nc->display.c_str());
+				source.Reply(_("Protection is now \002on\002 for \002{0}\002, with no delay."), nc->display);
 			}
 			else
 				source.Reply(_("The \002IMMED\002 option is not available on this network."));
@@ -698,12 +683,10 @@ class CommandNSSetKill : public Command
 			nc->Shrink<bool>("KILL_QUICK");
 			nc->Shrink<bool>("KILL_IMMED");
 			Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to disable kill for " << nc->display;
-			source.Reply(_("Protection is now \002off\002 for \002%s\002."), nc->display.c_str());
+			source.Reply(_("Protection is now \002off\002 for \002{0}\002."), nc->display);
 		}
 		else
 			this->OnSyntaxError(source, "KILL");
-
-		return;
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
@@ -713,20 +696,12 @@ class CommandNSSetKill : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("Turns the automatic protection option for your nick\n"
-				"on or off. With protection on, if another user\n"
-				"tries to take your nick, they will be given one minute to\n"
-				"change to another nick, after which %s will forcibly change\n"
-				"their nick.\n"
-				" \n"
-				"If you select \002QUICK\002, the user will be given only 20 seconds\n"
-				"to change nicks instead of the usual 60. If you select\n"
-				"\002IMMED\002, the user's nick will be changed immediately \037without\037 being\n"
-				"warned first or given a chance to change their nick; please\n"
-				"do not use this option unless necessary. Also, your\n"
-				"network's administrators may have disabled this option."), source.service->nick.c_str());
+		source.Reply(_("Turns the automatic protection option for your account on or off."
+		               " With protection on, if another user tries to use one of your nicknames, they will be given {0} to change to another their nickname, after which {1} will forcibly change their nickname.\n"
+				"\n"
+				"If you select \002QUICK\002, the user will be given only {1} to change their nick instead {0}."
+				" If you select \002IMMED\002, the user's nickname will be changed immediately \037without\037 being warned first or given a chance to change their nick."
+				" With this set, the only way to use the nickname is to match an entry on the account's access list."));
 		return true;
 	}
 };
@@ -737,7 +712,7 @@ class CommandNSSASetKill : public CommandNSSetKill
 	CommandNSSASetKill(Module *creator) : CommandNSSetKill(creator, "nickserv/saset/kill", 2)
 	{
 		this->ClearSyntax();
-		this->SetSyntax(_("\037nickname\037 {ON | QUICK | IMMED | OFF}"));
+		this->SetSyntax(_("\037account\037 {ON | QUICK | IMMED | OFF}"));
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
@@ -747,20 +722,12 @@ class CommandNSSASetKill : public CommandNSSetKill
 
 	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("Turns the automatic protection option for the nick\n"
-				"on or off. With protection on, if another user\n"
-				"tries to take the nick, they will be given one minute to\n"
-				"change to another nick, after which %s will forcibly change\n"
-				"their nick.\n"
-				" \n"
-				"If you select \002QUICK\002, the user will be given only 20 seconds\n"
-				"to change nicks instead of the usual 60. If you select\n"
-				"\002IMMED\002, the user's nick will be changed immediately \037without\037 being\n"
-				"warned first or given a chance to change their nick; please\n"
-				"do not use this option unless necessary. Also, your\n"
-				"network's administrators may have disabled this option."), source.service->nick.c_str());
+		source.Reply(_("Turns the automatic protection option for \037account\037 on or off."
+		               " With protection on, if another user tries to use one of the nicknames in the group, they will be given {0} to change to another their nickname, after which {1} will forcibly change their nickname.\n"
+				"\n"
+				"If you select \002QUICK\002, the user will be given only {1} to change their nick instead {0}."
+				" If you select \002IMMED\002, the user's nickname will be changed immediately \037without\037 being warned first or given a chance to change their nick."
+				" With this set, the only way to use the nickname is to match an entry on the account's access list."));
 		return true;
 	}
 };
@@ -778,14 +745,14 @@ class CommandNSSetLanguage : public Command
 	{
 		if (Anope::ReadOnly)
 		{
-			source.Reply(READ_ONLY_MODE);
+			source.Reply(_("Services are in read-only mode."));
 			return;
 		}
 
 		const NickServ::Nick *na = NickServ::FindNick(user);
 		if (!na)
 		{
-			source.Reply(NICK_X_NOT_REGISTERED, user.c_str());
+			source.Reply(_("\002{0}\002 isn't registered."), user);
 			return;
 		}
 		NickServ::Account *nc = na->nc;
@@ -820,12 +787,7 @@ class CommandNSSetLanguage : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("Changes the language Services uses when sending messages to\n"
-				"you (for example, when responding to a command you send).\n"
-				"\037language\037 should be chosen from the following list of\n"
-				"supported languages:"));
+		source.Reply(_("Changes the language services will use when sending messages to you (for example, when responding to a command you send). \037language\037 should be chosen from the following list of supported languages:"));
 
 		source.Reply("         en (English)");
 		for (unsigned j = 0; j < Language::Languages.size(); ++j)
@@ -846,7 +808,7 @@ class CommandNSSASetLanguage : public CommandNSSetLanguage
 	CommandNSSASetLanguage(Module *creator) : CommandNSSetLanguage(creator, "nickserv/saset/language", 2)
 	{
 		this->ClearSyntax();
-		this->SetSyntax(_("\037nickname\037 \037language\037"));
+		this->SetSyntax(_("\037account\037 \037language\037"));
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
@@ -856,12 +818,7 @@ class CommandNSSASetLanguage : public CommandNSSetLanguage
 
 	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("Changes the language Services uses when sending messages to\n"
-				"the given user (for example, when responding to a command they send).\n"
-				"\037language\037 should be chosen from the following list of\n"
-				"supported languages:"));
+		source.Reply(_("Changes the language services will use when sending messages to the given user (for example, when responding to a command they send). \037language\037 should be chosen from the following list of supported languages:"));
 		source.Reply("         en (English)");
 		for (unsigned j = 0; j < Language::Languages.size(); ++j)
 		{
@@ -887,21 +844,21 @@ class CommandNSSetMessage : public Command
 	{
 		if (Anope::ReadOnly)
 		{
-			source.Reply(READ_ONLY_MODE);
+			source.Reply(_("Services are in read-only mode."));
 			return;
 		}
 
 		const NickServ::Nick *na = NickServ::FindNick(user);
 		if (!na)
 		{
-			source.Reply(NICK_X_NOT_REGISTERED, user.c_str());
+			source.Reply(_("\002{0}\002 isn't registered."), user);
 			return;
 		}
 		NickServ::Account *nc = na->nc;
 
 		if (!Config->GetBlock("options")->Get<bool>("useprivmsg"))
 		{
-			source.Reply(_("You cannot %s on this network."), source.command.c_str());
+			source.Reply(_("You cannot %s on this network."), source.command);
 			return;
 		}
 
@@ -914,13 +871,13 @@ class CommandNSSetMessage : public Command
 		{
 			Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to enable " << source.command << " for " << nc->display;
 			nc->Extend<bool>("MSG");
-			source.Reply(_("Services will now reply to \002%s\002 with \002messages\002."), nc->display.c_str());
+			source.Reply(_("Services will now reply to \002{0}\002 with \002messages\002."), nc->display);
 		}
 		else if (param.equals_ci("OFF"))
 		{
 			Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to disable " << source.command << " for " << nc->display;
 			nc->Shrink<bool>("MSG");
-			source.Reply(_("Services will now reply to \002%s\002 with \002notices\002."), nc->display.c_str());
+			source.Reply(_("Services will now reply to \002{0}\002 with \002notices\002."), nc->display);
 		}
 		else
 			this->OnSyntaxError(source, "MSG");
@@ -938,11 +895,7 @@ class CommandNSSetMessage : public Command
 		if (i != Anope::string::npos)
 			cmd = cmd.substr(i + 1);
 
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("Allows you to choose the way Services are communicating with\n"
-				"you. With \002%s\002 set, Services will use messages, else they'll\n"
-				"use notices."), cmd.upper().c_str());
+		source.Reply(_("Allows you to choose the way services communicate with you. With \002{0}\002 set, services will use messages instead of notices."), cmd);
 		return true;
 	}
 
@@ -959,16 +912,17 @@ class CommandNSSASetMessage : public CommandNSSetMessage
 	CommandNSSASetMessage(Module *creator) : CommandNSSetMessage(creator, "nickserv/saset/message", 2)
 	{
 		this->ClearSyntax();
-		this->SetSyntax(_("\037nickname\037 {ON | OFF}"));
+		this->SetSyntax(_("\037account\037 {ON | OFF}"));
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("Allows you to choose the way Services are communicating with\n"
-				"the given user. With \002MSG\002 set, Services will use messages,\n"
-				"else they'll use notices."));
+		Anope::string cmd = source.command;
+		size_t i = cmd.find_last_of(' ');
+		if (i != Anope::string::npos)
+			cmd = cmd.substr(i + 1);
+
+		source.Reply(_("Allows you to choose the way services communicate with the given user. With \002{0}\002 set, services will use messages instead of notices."), cmd);
 		return true;
 	}
 
@@ -991,14 +945,14 @@ class CommandNSSetSecure : public Command
 	{
 		if (Anope::ReadOnly)
 		{
-			source.Reply(READ_ONLY_MODE);
+			source.Reply(_("Services are in read-only mode."));
 			return;
 		}
 
 		const NickServ::Nick *na = NickServ::FindNick(user);
 		if (!na)
 		{
-			source.Reply(NICK_X_NOT_REGISTERED, user.c_str());
+			source.Reply(_("\002{0}\002 isn't registered."), user);
 			return;
 		}
 		NickServ::Account *nc = na->nc;
@@ -1012,13 +966,13 @@ class CommandNSSetSecure : public Command
 		{
 			Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to enable secure for " << nc->display;
 			nc->Extend<bool>("NS_SECURE");
-			source.Reply(_("Secure option is now \002on\002 for \002%s\002."), nc->display.c_str());
+			source.Reply(_("Secure option is now \002on\002 for \002{0}\002."), nc->display);
 		}
 		else if (param.equals_ci("OFF"))
 		{
 			Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to disable secure for " << nc->display;
 			nc->Shrink<bool>("NS_SECURE");
-			source.Reply(_("Secure option is now \002off\002 for \002%s\002."), nc->display.c_str());
+			source.Reply(_("Secure option is now \002off\002 for \002{0}\002."), nc->display);
 		}
 		else
 			this->OnSyntaxError(source, "SECURE");
@@ -1031,15 +985,10 @@ class CommandNSSetSecure : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("Turns %s's security features on or off for your\n"
-				"nick. With \002SECURE\002 set, you must enter your password\n"
-				"before you will be recognized as the owner of the nick,\n"
-				"regardless of whether your address is on the access\n"
-				"list. However, if you are on the access list, %s\n"
-				"will not auto-kill you regardless of the setting of the\n"
-				"\002KILL\002 option."), source.service->nick.c_str(), source.service->nick.c_str());
+		source.Reply(_("Turns the security feature on or off for your account."
+		               " With \002SECURE\002 set, you must enter your password before you will be recognized as the owner of the account,"
+		               " regardless of whether your address is on the access list or not."
+		               " However, if you are on the access list, services will not force you to change your nickname, regardless of the setting of the \002kill\002 option."));
 		return true;
 	}
 };
@@ -1050,7 +999,7 @@ class CommandNSSASetSecure : public CommandNSSetSecure
 	CommandNSSASetSecure(Module *creator) : CommandNSSetSecure(creator, "nickserv/saset/secure", 2)
 	{
 		this->ClearSyntax();
-		this->SetSyntax(_("\037nickname\037 {ON | OFF}"));
+		this->SetSyntax(_("\037account\037 {ON | OFF}"));
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
@@ -1060,15 +1009,10 @@ class CommandNSSASetSecure : public CommandNSSetSecure
 
 	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("Turns %s's security features on or off for your\n"
-				"nick. With \002SECURE\002 set, you must enter your password\n"
-				"before you will be recognized as the owner of the nick,\n"
-				"regardless of whether your address is on the access\n"
-				"list. However, if you are on the access list, %s\n"
-				"will not auto-kill you regardless of the setting of the\n"
-				"\002KILL\002 option."), source.service->nick.c_str(), source.service->nick.c_str());
+		source.Reply(_("Turns the security feature on or off for \037account\037."
+		               " With \002SECURE\002 set, you the user must enter their password before they will be recognized as the owner of the account,"
+		               " regardless of whether their address address is on the access list or not."
+		               " However, if they are on the access list, services will not force them to change your nickname, regardless of the setting of the \002kill\002 option."));
 		return true;
 	}
 };
@@ -1086,16 +1030,18 @@ class CommandNSSASetNoexpire : public Command
 	{
 		if (Anope::ReadOnly)
 		{
-			source.Reply(READ_ONLY_MODE);
+			source.Reply(_("Services are in read-only mode."));
 			return;
 		}
 
-		NickServ::Nick *na = NickServ::FindNick(params[0]);
-		if (na == NULL)
+		const Anope::string &user = params[0];
+		NickServ::Nick *na = NickServ::FindNick(user);
+		if (!na)
 		{
-			source.Reply(NICK_X_NOT_REGISTERED, params[0].c_str());
+			source.Reply(_("\002{0}\002 isn't registered."), user);
 			return;
 		}
+		NickServ::Account *nc = na->nc;
 
 		Anope::string param = params.size() > 1 ? params[1] : "";
 
@@ -1103,13 +1049,13 @@ class CommandNSSASetNoexpire : public Command
 		{
 			Log(LOG_ADMIN, source, this) << "to enable noexpire for " << na->nc->display;
 			na->Extend<bool>("NS_NO_EXPIRE");
-			source.Reply(_("Nick %s \002will not\002 expire."), na->nick.c_str());
+			source.Reply(_("\002{0}\002 \002will not\002 expire."), na->nick);
 		}
 		else if (param.equals_ci("OFF"))
 		{
 			Log(LOG_ADMIN, source, this) << "to disable noexpire for " << na->nc->display;
 			na->Shrink<bool>("NS_NO_EXPIRE");
-			source.Reply(_("Nick %s \002will\002 expire."), na->nick.c_str());
+			source.Reply(_("\002{0}\002 \002will\002 expire."), na->nick);
 		}
 		else
 			this->OnSyntaxError(source, "NOEXPIRE");
@@ -1117,10 +1063,7 @@ class CommandNSSASetNoexpire : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("Sets whether the given nickname will expire.  Setting this\n"
-				"to \002ON\002 prevents the nickname from expiring."));
+		source.Reply(_("Sets whether the given nickname will expire. Setting this to \002ON\002 prevents the nickname from expiring."));
 		return true;
 	}
 };

@@ -17,7 +17,7 @@ class CommandCSKick : public Command
 	CommandCSKick(Module *creator) : Command(creator, "chanserv/kick", 2, 3)
 	{
 		this->SetDesc(_("Kicks a specified nick from a channel"));
-		this->SetSyntax(_("\037channel\037 \037nick\037 [\037reason\037]"));
+		this->SetSyntax(_("\037channel\037 \037user\037 [\037reason\037]"));
 		this->SetSyntax(_("\037channel\037 \037mask\037 [\037reason\037]"));
 	}
 
@@ -34,12 +34,13 @@ class CommandCSKick : public Command
 
 		if (!c)
 		{
-			source.Reply(CHAN_X_NOT_IN_USE, chan.c_str());
+			source.Reply(_("Channel \002{0}\002 doesn't exist."), chan);
 			return;
 		}
-		else if (!ci)
+
+		if (!ci)
 		{
-			source.Reply(CHAN_X_NOT_REGISTERED, chan.c_str());
+			source.Reply(_("Channel \002{0}\002 isn't registered."), c->name);
 			return;
 		}
 
@@ -50,16 +51,20 @@ class CommandCSKick : public Command
 		ChanServ::AccessGroup u_access = source.AccessFor(ci);
 
 		if (!u_access.HasPriv("KICK") && !source.HasPriv("chanserv/kick"))
-			source.Reply(ACCESS_DENIED);
-		else if (u2)
+		{
+			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "KICK", ci->name);
+			return;
+		}
+
+		if (u2)
 		{
 			ChanServ::AccessGroup u2_access = ci->AccessFor(u2);
 			if (u != u2 && ci->HasExt("PEACE") && u2_access >= u_access && !source.HasPriv("chanserv/kick"))
-				source.Reply(ACCESS_DENIED);
+				source.Reply(_("Access denied. \002{0}\002 has the same or more privileges than you on \002{1}\002."), u2->nick, ci->name);
 			else if (u2->IsProtected())
-				source.Reply(ACCESS_DENIED);
+				source.Reply(_("Access denied. \002{0}\002 is protected and can not be kicked."), u2->nick);
 			else if (!c->FindUser(u2))
-				source.Reply(NICK_X_NOT_ON_CHAN, u2->nick.c_str(), c->name.c_str());
+				source.Reply(_("User \002{0}\002 is not on channel \002{1}\002."), u2->nick, c->name);
 			else
 			{
 				bool override = !u_access.HasPriv("KICK") || (u != u2 && ci->HasExt("PEACE") && u2_access >= u_access);
@@ -100,22 +105,20 @@ class CommandCSKick : public Command
 			}
 
 			if (matched)
-				source.Reply(_("Kicked %d/%d users matching %s from %s."), kicked, matched, target.c_str(), c->name.c_str());
+				source.Reply(_("Kicked \002{0}/{1}\002 users matching \002{2}\002 from \002{3}\002."), kicked, matched, target, c->name);
 			else
-				source.Reply(_("No users on %s match %s."), c->name.c_str(), target.c_str());
+				source.Reply(_("No users on\002{0}\002 match \002{1}\002."), c->name, target);
 		}
 		else
-			source.Reply(NICK_X_NOT_IN_USE, target.c_str());
+			source.Reply(_("\002{0}\002 isn't currently in use."), target);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("Kicks a specified nick from a channel.\n"
-				" \n"
-				"By default, limited to AOPs or those with level 5 access\n"
-				"and above on the channel. Channel founders may use masks too."));
+		source.Reply(_("Kicks \037user\037 from a \037channel\037. Users with the \002{0}\002 privilege on \037channel\037 may give a \037mask\037, which kicks all users who match the wildcard mask.\n"
+		                " \n"
+		                "Use of this command requires the \002{1}\002 privilege on \037channel\037."),
+		                "FOUNDER", "KICK");
 		return true;
 	}
 };

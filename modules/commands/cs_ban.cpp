@@ -47,17 +47,18 @@ class CommandCSBan : public Command
 		ChanServ::Channel *ci = ChanServ::Find(chan);
 		if (ci == NULL)
 		{
-			source.Reply(CHAN_X_NOT_REGISTERED, chan.c_str());
+			source.Reply(_("Channel \002{0}\002 isn't registered."), chan);
 			return;
 		}
 
 		Channel *c = ci->c;
 		if (c == NULL)
 		{
-			source.Reply(CHAN_X_NOT_IN_USE, chan.c_str());
+			source.Reply(_("Channel \002{0}\002 doesn't exist."), ci->name);
 			return;
 		}
-		else if (IRCD->GetMaxListFor(c) && c->HasMode("BAN") >= IRCD->GetMaxListFor(c))
+
+		if (IRCD->GetMaxListFor(c) && c->HasMode("BAN") >= IRCD->GetMaxListFor(c))
 		{
 			source.Reply(_("The ban list for %s is full."), c->name.c_str());
 			return;
@@ -70,7 +71,7 @@ class CommandCSBan : public Command
 			ban_time = Anope::DoTime(params[1]);
 			if (ban_time == -1)
 			{
-				source.Reply(BAD_EXPIRY_TIME);
+				source.Reply(_("Invalid expiry time \002{0}\002."), params[1]);
 				return;
 			}
 			if (params.size() < 3)
@@ -104,47 +105,60 @@ class CommandCSBan : public Command
 		ChanServ::AccessGroup u_access = source.AccessFor(ci);
 
 		if (!u_access.HasPriv("BAN") && !source.HasPriv("chanserv/kick"))
-			source.Reply(ACCESS_DENIED);
-		else if (u2)
+		{
+			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "BAN", ci->name);
+			return;
+		}
+
+		if (u2)
 		{
 			ChanServ::AccessGroup u2_access = ci->AccessFor(u2);
 
 			if (u != u2 && ci->HasExt("PEACE") && u2_access >= u_access && !source.HasPriv("chanserv/kick"))
-				source.Reply(ACCESS_DENIED);
+			{
+				source.Reply(_("Access denied. \002{0}\002 has the same or more privileges than you on \002{1}\002."), u2->nick, ci->name);
+				return;
+			}
+
 			/*
 			 * Dont ban/kick the user on channels where he is excepted
 			 * to prevent services <-> server wars.
 			 */
-			else if (c->MatchesList(u2, "EXCEPT"))
-				source.Reply(CHAN_EXCEPTED, u2->nick.c_str(), ci->name.c_str());
-			else if (u2->IsProtected())
-				source.Reply(ACCESS_DENIED);
-			else
+			if (c->MatchesList(u2, "EXCEPT"))
 			{
-				Anope::string mask = ci->GetIdealBan(u2);
-
-				bool override = !u_access.HasPriv("BAN") || (u != u2 && ci->HasExt("PEACE") && u2_access >= u_access);
-				Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "for " << mask;
-
-				if (!c->HasMode("BAN", mask))
-				{
-					c->SetMode(NULL, "BAN", mask);
-					if (ban_time)
-					{
-						new TempBan(ban_time, c, mask);
-						source.Reply(_("Ban on \002%s\002 expires in %s."), mask.c_str(), Anope::Duration(ban_time, source.GetAccount()).c_str());
-					}
-				}
-
-				/* We still allow host banning while not allowing to kick */
-				if (!c->FindUser(u2))
-					return;
-
-				if (ci->HasExt("SIGNKICK") || (ci->HasExt("SIGNKICK_LEVEL") && !source.AccessFor(ci).HasPriv("SIGNKICK")))
-					c->Kick(ci->WhoSends(), u2, "%s (%s)", reason.c_str(), source.GetNick().c_str());
-				else
-					c->Kick(ci->WhoSends(), u2, "%s", reason.c_str());
+				source.Reply(_("\002{0}\002 matches an except on \002{1}\002 and can not be banned until the except has been removed."), u2->nick, ci->name);
+				return;
 			}
+
+			if (u2->IsProtected())
+			{
+				source.Reply(_("Access denied. \002{0}\002 is protected and can not be kicked."), u2->nick);
+				return;
+			}
+
+			Anope::string mask = ci->GetIdealBan(u2);
+
+			bool override = !u_access.HasPriv("BAN") || (u != u2 && ci->HasExt("PEACE") && u2_access >= u_access);
+			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "for " << mask;
+
+			if (!c->HasMode("BAN", mask))
+			{
+				c->SetMode(NULL, "BAN", mask);
+				if (ban_time)
+				{
+					new TempBan(ban_time, c, mask);
+					source.Reply(_("Ban on \002{0}\002 expires in \002{1}\002."), mask, Anope::Duration(ban_time, source.GetAccount()));
+				}
+			}
+
+			/* We still allow host banning while not allowing to kick */
+			if (!c->FindUser(u2))
+				return;
+
+			if (ci->HasExt("SIGNKICK") || (ci->HasExt("SIGNKICK_LEVEL") && !source.AccessFor(ci).HasPriv("SIGNKICK")))
+				c->Kick(ci->WhoSends(), u2, "%s (%s)", reason.c_str(), source.GetNick().c_str());
+			else
+				c->Kick(ci->WhoSends(), u2, "%s", reason.c_str());
 		}
 		else
 		{
@@ -158,7 +172,7 @@ class CommandCSBan : public Command
 				if (ban_time)
 				{
 					new TempBan(ban_time, c, target);
-					source.Reply(_("Ban on \002%s\002 expires in %s."), target.c_str(), Anope::Duration(ban_time, source.GetAccount()).c_str());
+					source.Reply(_("Ban on \002{0}\002 expires in \002{1}\002."), target, Anope::Duration(ban_time, source.GetAccount()));
 				}
 			}
 
@@ -192,22 +206,25 @@ class CommandCSBan : public Command
 			}
 
 			if (matched)
-				source.Reply(_("Kicked %d/%d users matching %s from %s."), kicked, matched, target.c_str(), c->name.c_str());
+				source.Reply(_("Kicked \002{0}/{1}\002 users matching \002{2}\002 from \002{3}\002."), kicked, matched, target, c->name);
 			else
-				source.Reply(_("No users on %s match %s."), c->name.c_str(), target.c_str());
+				source.Reply(_("No users on \002{0}\002 match \002{1}\002."), c->name, target);
 		}
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("Bans a given nick or mask on a channel. An optional expiry may\n"
-				"be given to cause services to remove the ban after a set amount\n"
-				"of time.\n"
-				" \n"
-				"By default, limited to AOPs or those with level 5 access\n"
-				"and above on the channel. Channel founders may ban masks."));
+		source.Reply(_("Bans a given \037nick\037 or \037mask\037 on \002channel\002. An optional expiry may be given to cause services to remove the ban after a set amount of time.\n"
+		               "\n"
+		               "Use of this command requires the \002{0}\002 privilege on \037channel\037.\n"
+		               "\n"
+		               "Examples:\n"
+			       "         {command} #anope Jobe\n"
+			       "         Bans the user \"Jobe\" from \"#anope\".\n"
+			       "\n"
+			       "         {command} #anope Guest!*@*\n"
+			       "         Bans the mask \"Guest!*@*\" on \"#anope\"."),
+		               "BAN");
 		return true;
 	}
 };

@@ -123,7 +123,7 @@ class EventHook : public EventHandler
 	}
 	priority;
 
-	EventHook(const Anope::string &name, Priority p = Priority::LAST) : handlers(this, name)
+	EventHook(const Anope::string &name, Priority p = Priority::LAST) : handlers(this, name), priority(p)
 	{
 		handlers.Check();
 	}

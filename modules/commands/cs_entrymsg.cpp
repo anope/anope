@@ -106,11 +106,11 @@ class CommandEntryMessage : public Command
 
 		if ((*messages)->empty())
 		{
-			source.Reply(_("Entry message list for \002%s\002 is empty."), ci->name.c_str());
+			source.Reply(_("Entry message list for \002{0}\002 is empty."), ci->name);
 			return;
 		}
 
-		source.Reply(_("Entry message list for \002%s\002:"), ci->name.c_str());
+		source.Reply(_("Entry message list for \002{0}\002:"), ci->name);
 
 		ListFormatter list(source.GetAccount());
 		list.AddColumn(_("Number")).AddColumn(_("Creator")).AddColumn(_("Created")).AddColumn(_("Message"));
@@ -139,12 +139,12 @@ class CommandEntryMessage : public Command
 		EntryMessageList *messages = ci->Require<EntryMessageList>("entrymsg");
 
 		if ((*messages)->size() >= Config->GetModule(this->owner)->Get<unsigned>("maxentries"))
-			source.Reply(_("The entry message list for \002%s\002 is full."), ci->name.c_str());
+			source.Reply(_("The entry message list for \002{0}\002 is full."), ci->name);
 		else
 		{
 			(*messages)->push_back(new EntryMsgImpl(ci, source.GetNick(), message));
 			Log(source.IsFounder(ci) ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to add a message";
-			source.Reply(_("Entry message added to \002%s\002"), ci->name.c_str());
+			source.Reply(_("Entry message added to \002{0}\002"), ci->name);
 		}
 	}
 
@@ -153,9 +153,9 @@ class CommandEntryMessage : public Command
 		EntryMessageList *messages = ci->Require<EntryMessageList>("entrymsg");
 
 		if (!message.is_pos_number_only())
-			source.Reply(("Entry message \002%s\002 not found on channel \002%s\002."), message.c_str(), ci->name.c_str());
+			source.Reply(("Entry message \002{0}\002 not found on channel \002{1}\002."), message, ci->name);
 		else if ((*messages)->empty())
-			source.Reply(_("Entry message list for \002%s\002 is empty."), ci->name.c_str());
+			source.Reply(_("Entry message list for \002{0}\002 is empty."), ci->name);
 		else
 		{
 			try
@@ -167,14 +167,14 @@ class CommandEntryMessage : public Command
 					if ((*messages)->empty())
 						ci->Shrink<EntryMessageList>("entrymsg");
 					Log(source.IsFounder(ci) ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to remove a message";
-					source.Reply(_("Entry message \002%i\002 for \002%s\002 deleted."), i, ci->name.c_str());
+					source.Reply(_("Entry message \002{0}\002 for \002{1]\002 deleted."), i, ci->name);
 				}
 				else
 					throw ConvertException();
 			}
 			catch (const ConvertException &)
 			{
-				source.Reply(_("Entry message \002%s\002 not found on channel \002%s\002."), message.c_str(), ci->name.c_str());
+				source.Reply(_("Entry message \002{0}\002 not found on channel \002{1}\002."), message, ci->name);
 			}
 		}
 	}
@@ -184,7 +184,7 @@ class CommandEntryMessage : public Command
 		ci->Shrink<EntryMessageList>("entrymsg");
 
 		Log(source.IsFounder(ci) ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to remove all messages";
-		source.Reply(_("Entry messages for \002%s\002 have been cleared."), ci->name.c_str());
+		source.Reply(_("Entry messages for \002{0}\002 have been cleared."), ci->name);
 	}
 
  public:
@@ -199,22 +199,24 @@ class CommandEntryMessage : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
-		ChanServ::Channel *ci = ChanServ::Find(params[0]);
+		const Anope::string &chan = params[0];
+
+		ChanServ::Channel *ci = ChanServ::Find(chan);
 		if (ci == NULL)
 		{
-			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
+			source.Reply(_("Channel \002{0}\002 isn't registered."), chan);
 			return;
 		}
 
 		if (Anope::ReadOnly && !params[1].equals_ci("LIST"))
 		{
-			source.Reply(READ_ONLY_MODE);
+			source.Reply(_("Services are in read-only mode."));
 			return;
 		}
 
 		if (!source.IsFounder(ci) && !source.HasPriv("chanserv/administration"))
 		{
-			source.Reply(ACCESS_DENIED);
+			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "FOUNDER", ci->name);
 			return;
 		}
 
@@ -234,25 +236,19 @@ class CommandEntryMessage : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("Controls what messages will be sent to users when they join the channel."));
-		source.Reply(" ");
-		source.Reply(_("The \002ENTRYMSG ADD\002 command adds the given message to\n"
-				"the list of messages to be shown to users when they join\n"
-				"the channel."));
-		source.Reply(" ");
-		source.Reply(_("The \002ENTRYMSG DEL\002 command removes the given message from\n"
-				"the list of messages to be shown to users when they join\n"
-				"the channel. You can remove the message by specifying its number\n"
-				"which you can get by listing the messages as explained below."));
-		source.Reply(" ");
-		source.Reply(_("The \002ENTRYMSG LIST\002 command displays a listing of messages\n"
-				"to be shown to users when they join the channel."));
-		source.Reply(" ");
-		source.Reply(_("The \002ENTRYMSG CLEAR\002 command clears all entries from\n"
-				"the list of messages to be shown to users when they join\n"
-				"the channel, effectively disabling entry messages."));
+		source.Reply(_("Controls what messages will be sent to users when they join \037channel\037.\n"
+		               "\n"
+		               "The \002{0} ADD\002 command adds the given message to the list of messages to be shown to users when they join the channel.\n"
+		               "\n"
+		               "The \002{0} DEL\002 command removes the given message from the entry message list.\n"
+		               " You can remove the message by specifying its number which you can get by listing the messages as explained below.\n"
+		               "\n"
+		               "The \002{0} LIST\002 command displays the list of messages on the entry message list.\n"
+		               "\n"
+		               "The \002{0} CLEAR\002 command clears the entry message list.\n"
+		               "\n"
+		               "Use of this command requires being the founder of \037channel\037."),
+		               source.command);
 		return true;
 	}
 };

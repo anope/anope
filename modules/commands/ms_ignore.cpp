@@ -26,9 +26,10 @@ class CommandMSIgnore : public Command
 	{
 		if (Anope::ReadOnly)
 		{
-			source.Reply(READ_ONLY_MODE);
+			source.Reply(_("Services are in read-only mode."));
 			return;
 		}
+
 		if (!MemoServ::service)
 			return;
 
@@ -47,18 +48,23 @@ class CommandMSIgnore : public Command
 		MemoServ::MemoInfo *mi = MemoServ::service->GetMemoInfo(channel, ischan, isregistered, true);
 		ChanServ::Channel *ci = ChanServ::Find(channel);
 		if (!isregistered)
-			source.Reply(ischan ? CHAN_X_NOT_REGISTERED : _(NICK_X_NOT_REGISTERED), channel.c_str());
+		{
+			if (ischan)
+				source.Reply(_("Channel \002{0}\002 isn't registered."), channel);
+			else
+				source.Reply(_("\002{0}\002 isn't registered."), channel);
+		}
 		else if (ischan && !source.AccessFor(ci).HasPriv("MEMO"))
-			source.Reply(ACCESS_DENIED);
+			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "MEMO", ci->name);
 		else if (command.equals_ci("ADD") && !param.empty())
 		{
 			if (std::find(mi->ignores.begin(), mi->ignores.end(), param.ci_str()) == mi->ignores.end())
 			{
 				mi->ignores.push_back(param.ci_str());
-				source.Reply(_("\002%s\002 added to ignore list."), param.c_str());
+				source.Reply(_("\002{0}\002 has been added to your memo ignore list."), param);
 			}
 			else
-				source.Reply(_("\002%s\002 is already on the ignore list."), param.c_str());
+				source.Reply(_("\002{0}\002 is already on your memo ignore list."), param);
 		}
 		else if (command.equals_ci("DEL") && !param.empty())
 		{
@@ -67,15 +73,15 @@ class CommandMSIgnore : public Command
 			if (it != mi->ignores.end())
 			{
 				mi->ignores.erase(it);
-				source.Reply(_("\002%s\002 removed from the ignore list."), param.c_str());
+				source.Reply(_("\002{0}\002 has been removed from your memo ignore list."), param);
 			}
 			else
-				source.Reply(_("\002%s\002 is not on the ignore list."), param.c_str());
+				source.Reply(_("\002{0}\002 is not on your memo ignore list."), param);
 		}
 		else if (command.equals_ci("LIST"))
 		{
 			if (mi->ignores.empty())
-				source.Reply(_("Memo ignore list is empty."));
+				source.Reply(_("Your memo ignore list is empty."));
 			else
 			{
 				ListFormatter list(source.GetAccount());
@@ -87,7 +93,7 @@ class CommandMSIgnore : public Command
 					list.AddEntry(entry);
 				}
 
-				source.Reply(_("Ignore list:"));
+				source.Reply(_("Memo ignore list:"));
 
 				std::vector<Anope::string> replies;
 				list.Process(replies);
@@ -98,18 +104,12 @@ class CommandMSIgnore : public Command
 		}
 		else
 			this->OnSyntaxError(source, "");
-
-		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("Allows you to ignore users by nick or host from memoing\n"
-					"you or a channel. If someone on the memo ignore list tries\n"
-					"to memo you or a channel, they will not be told that you have\n"
-					"them ignored."));
+		source.Reply(_("Allows you to ignore users from memoing you or a channel."
+		               " If someone on the memo ignore list tries to memo you or a channel, they will not be told that you have them ignored."));
 		return true;
 	}
 };

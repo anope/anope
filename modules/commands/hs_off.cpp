@@ -26,24 +26,18 @@ class CommandHSOff : public Command
 		const NickServ::Nick *na = NickServ::FindNick(u->nick);
 
 		if (!na || !na->HasVhost())
-			source.Reply(HOST_NOT_ASSIGNED);
+			source.Reply(_("There is no vhost assigned to this nickname."));
 		else
 		{
 			IRCD->SendVhostDel(u);
 			Log(LOG_COMMAND, source, this) << "to disable their vhost";
 			source.Reply(_("Your vhost was removed and the normal cloaking restored."));
 		}
-
-		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("Deactivates the vhost currently assigned to the nick in use.\n"
-				"When you use this command any user who performs a /whois\n"
-				"on you will see your real host/IP address."));
+		source.Reply(_("Deactivates your vhost."));
 		return true;
 	}
 };

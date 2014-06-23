@@ -25,11 +25,11 @@ class SXLineDelCallback : public NumberList
 	~SXLineDelCallback()
 	{
 		if (!deleted)
-			source.Reply(_("No matching entries on the %s list."), source.command.c_str());
+			source.Reply(_("No matching entries on the {0} list."), source.command);
 		else if (deleted == 1)
-			source.Reply(_("Deleted 1 entry from the %s list."), source.command.c_str());
+			source.Reply(_("Deleted \0021\002 entry from the {0} list."), source.command);
 		else
-			source.Reply(_("Deleted %d entries from the %s list."), deleted, source.command.c_str());
+			source.Reply(_("Deleted \002{0}\002 entries from the {1} list."), deleted, source.command);
 	}
 
 	void HandleNumber(unsigned number) override
@@ -66,7 +66,7 @@ class CommandOSSXLineBase : public Command
 
 		if (!this->xlm() || this->xlm()->GetList().empty())
 		{
-			source.Reply(_("%s list is empty."), source.command.c_str());
+			source.Reply(_("{0} list is empty."), source.command);
 			return;
 		}
 
@@ -89,28 +89,26 @@ class CommandOSSXLineBase : public Command
 
 			if (!x)
 			{
-				source.Reply(_("\002%s\002 not found on the %s list."), mask.c_str(), source.command.c_str());
+				source.Reply(_("\002{0}\002 not found on the {1] list."), mask, source.command);
 				return;
 			}
 
 			Event::OnDelXLine(&Event::DelXLine::OnDelXLine, source, x, this->xlm());
 
 			SXLineDelCallback::DoDel(this->xlm(), source, x);
-			source.Reply(_("\002%s\002 deleted from the %s list."), mask.c_str(), source.command.c_str());
+			source.Reply(_("\002{0}\002 deleted from the {1} list."), mask, source.command);
 			Log(LOG_ADMIN, source, this) << "to remove " << mask << " from the list";
 		}
 
 		if (Anope::ReadOnly)
-			source.Reply(READ_ONLY_MODE);
-
-		return;
+			source.Reply(_("Services are in read-only mode. Any changes made may not persist."));
 	}
 
 	void ProcessList(CommandSource &source, const std::vector<Anope::string> &params, ListFormatter &list)
 	{
 		if (!this->xlm() || this->xlm()->GetList().empty())
 		{
-			source.Reply(_("%s list is empty."), source.command.c_str());
+			source.Reply(_("{0} list is empty."), source.command);
 			return;
 		}
 
@@ -172,10 +170,10 @@ class CommandOSSXLineBase : public Command
 		}
 
 		if (list.IsEmpty())
-			source.Reply(_("No matching entries on the %s list."), source.command.c_str());
+			source.Reply(_("No matching entries on the {0} list."), source.command);
 		else
 		{
-			source.Reply(_("Current %s list:"), source.command.c_str());
+			source.Reply(_("{0} list:"), source.command);
 
 			std::vector<Anope::string> replies;
 			list.Process(replies);
@@ -211,11 +209,9 @@ class CommandOSSXLineBase : public Command
 		}
 
 		Log(LOG_ADMIN, source, this) << "to CLEAR the list";
-		source.Reply(_("The %s list has been cleared."), source.command.c_str());
+		source.Reply(_("The {0} list has been cleared."), source.command);
 		if (Anope::ReadOnly)
-			source.Reply(READ_ONLY_MODE);
-
-		return;
+			source.Reply(_("Services are in read-only mode. Any changes made may not persist."));
 	}
  public:
 	CommandOSSXLineBase(Module *creator, const Anope::string &cmd) : Command(creator, cmd, 1, 4)
@@ -243,8 +239,6 @@ class CommandOSSXLineBase : public Command
 			return this->OnClear(source);
 		else
 			this->OnSyntaxError(source, "");
-
-		return;
 	}
 
 	virtual bool OnHelp(CommandSource &source, const Anope::string &subcommand) = 0;
@@ -282,7 +276,7 @@ class CommandOSSNLine : public CommandOSSXLineBase
 		/* Do not allow less than a minute expiry time */
 		if (expires && expires < 60)
 		{
-			source.Reply(BAD_EXPIRY_TIME);
+			source.Reply(_("Invalid expiry time \002{0}\002."), expiry);
 			return;
 		}
 		else if (expires > 0)
@@ -330,7 +324,7 @@ class CommandOSSNLine : public CommandOSSXLineBase
 			}
 			catch (const std::regex_error &ex)
 			{
-				source.Reply("%s", ex.what());
+				source.Reply(ex.what());
 				return;
 			}
 		}
@@ -346,7 +340,7 @@ class CommandOSSNLine : public CommandOSSXLineBase
 			return;
 		else if (mask.find_first_not_of("/.*?") == Anope::string::npos)
 		{
-			source.Reply(USERHOST_MASK_TOO_WIDE, mask.c_str());
+			source.Reply(_("\002{0}\002 coverage is too wide; please use a more specific mask."), mask);
 			return;
 		}
 
@@ -365,7 +359,7 @@ class CommandOSSNLine : public CommandOSSXLineBase
 
 		if (percent > 95)
 		{
-			source.Reply(USERHOST_MASK_TOO_WIDE, mask.c_str());
+			source.Reply(_("\002{0}\002 coverage is too wide; please use a more specific mask."), mask);
 			Log(LOG_ADMIN, source, this) << "tried to " << source.command << " " << percent << "% of the network (" << affected << " users)";
 			delete x;
 			return;
@@ -396,10 +390,10 @@ class CommandOSSNLine : public CommandOSSXLineBase
 			this->xlm()->Send(NULL, x);
 		}
 
-		source.Reply(_("\002%s\002 added to the %s list."), mask.c_str(), source.command.c_str());
+		source.Reply(_("\002{0}\002 added to the {1} list."), mask, source.command);
 		Log(LOG_ADMIN, source, this) << "on " << mask << " (" << reason << "), expires in " << (expires ? Anope::Duration(expires - Anope::CurTime) : "never") << " [affects " << affected << " user(s) (" << percent << "%)]";
 		if (Anope::ReadOnly)
-			source.Reply(READ_ONLY_MODE);
+			source.Reply(_("Services are in read-only mode. Any changes made may not persist."));
 	}
 
 	ServiceReference<XLineManager> snlines;
@@ -415,53 +409,60 @@ class CommandOSSNLine : public CommandOSSXLineBase
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("Allows Services Operators to manipulate the SNLINE list.  If\n"
-				"a user with a realname matching an SNLINE mask attempts to\n"
-				"connect, Services will not allow it to pursue his IRC\n"
-				"session."));
-		source.Reply(_(" \n"
-				"\002SNLINE ADD\002 adds the given realname mask to the SNLINE\n"
-				"list for the given reason (which \002must\002 be given).\n"
-				"\037expiry\037 is specified as an integer followed by one of \037d\037\n"
-				"(days), \037h\037 (hours), or \037m\037 (minutes). Combinations (such as\n"
-				"\0371h30m\037) are not permitted. If a unit specifier is not\n"
-				"included, the default is days (so \037+30\037 by itself means 30\n"
-				"days). To add an SNLINE which does not expire, use \037+0\037.  If the\n"
-				"realname mask to be added starts with a \037+\037, an expiry time must\n"
-				"be given, even if it is the same as the default.  The\n"
-				"current SNLINE default expiry time can be found with the\n"
-				"\002STATS AKILL\002 command.\n"
-				" \n"
-				"\002Note\002: because the realname mask may contain spaces, the\n"
-				"separator between it and the reason is a colon."));
-		const Anope::string &regexengine = Config->GetBlock("options")->Get<const Anope::string>("regexengine");
-		if (Config->regex_flags && !regexengine.empty())
+		if (subcommand.equals_ci("ADD"))
 		{
-			source.Reply(" ");
-			source.Reply(_("Regex matches are also supported using the %s engine.\n"
-					"Enclose your mask in // if this is desired."), regexengine.c_str());
+			source.Reply(_("\002{0} ADD\002 adds the given \037mask\037 to the {0} list for the given \037reason\037."
+			               " \037expiry\037 is specified as an integer followed by one of \037d\037 (days), \037h\037 (hours), or \037m\037 (minutes)."
+			               " If a unit specifier is not included, the default is days, so \037+30\037 by itself means 30 days."
+			               " To add a {0} which does not expire, use \037+0\037."
+			               " The default {0} expiry time is \002{1}\002."
+			               " Because the real name may contain spaces, the separator between it and the reason is a \002colon\002."),
+			               source.command, Anope::Duration(Config->GetModule("operserv")->Get<time_t>("snlineexpiry", "30d"), source.GetAccount()));
+
+			const Anope::string &regexengine = Config->GetBlock("options")->Get<const Anope::string>("regexengine");
+			if (!regexengine.empty())
+			{
+				source.Reply(" ");
+				source.Reply(_("Regex matches are also supported using the {0} engine. Enclose your mask in // if this is desired."), regexengine);
+			}
 		}
-		source.Reply(_(" \n"
-				"The \002SNLINE DEL\002 command removes the given mask from the\n"
-				"SNLINE list if it is present.  If a list of entry numbers is\n"
-				"given, those entries are deleted.  (See the example for LIST\n"
-				"below.)\n"
-				" \n"
-				"The \002SNLINE LIST\002 command displays the SNLINE list.\n"
-				"If a wildcard mask is given, only those entries matching the\n"
-				"mask are displayed.  If a list of entry numbers is given,\n"
-				"only those entries are shown; for example:\n"
-				"   \002SNLINE LIST 2-5,7-9\002\n"
-				"      Lists SNLINE entries numbered 2 through 5 and 7\n"
-				"      through 9.\n"
-				" \n"
-				"\002SNLINE VIEW\002 is a more verbose version of \002SNLINE LIST\002, and\n"
-				"will show who added an SNLINE, the date it was added, and when\n"
-				"it expires, as well as the realname mask and reason.\n"
-				" \n"
-				"\002SNLINE CLEAR\002 clears all entries of the SNLINE list."));
+		else if (subcommand.equals_ci("DEL"))
+			source.Reply(_("The \002{0} DEL\002 command removes the given \037mask\037 from the {0} list if it is present."
+			               " If a list of entry numbers is given, those entries are deleted."));
+		else if (subcommand.equals_ci("LIST") || subcommand.equals_ci("VIEW"))
+			source.Reply(_("The \002{0} LIST\002 and \002{0} VIEW\002 commands displays the {0} list.\n"
+			               "If a wildcard \037mask\037 is given, only those entries matching the \037mask\037 are displayed."
+			               " If a list of entry numbers is given, only those entries are shown."
+			               " \002VIEW\002 is similar to \002LIST\002 but also shows who created the {0}, when it was created, and when it expires.\n"
+			               "\n"
+			               "Example:\n"
+			               "\n"
+			               "         {0} LIST 2-5,7-9\n"
+			               "         Lists {0} entries numbered 2 through 5 and 7 through 9.\n"),
+			               source.command);
+		else if (subcommand.equals_ci("CLEAR"))
+			source.Reply(_("\002{0} CLEAR\002 removes all entries from the {0} list."),
+			               source.command);
+		else
+		{
+			CommandInfo *help = source.service->FindCommand("generic/help");
+
+			source.Reply(_("Allows you to manipulate the {0} list."
+			               " If a user attempts to use a realname that matches a {0} mask, services will kill the user."
+			               "\n"
+			               "The \002ADD\002 command adds \037mask\037 to the {0} list.\n"
+			               "\002{msg}{service} {help} {command} ADD\002 for more information.\n"
+			               "\n"
+			               "The \002DEL\002 command removes \037mask\037 from the {0} list.\n"
+			               "\002{msg}{service} {help} {command} DEL\002 for more information.\n"
+			               "\n"
+			               "The \002LIST\002 and \002VIEW\002 commands both show the {0} list, but \002VIEW\002 also shows who created the {0} entry, when it was created, and when it expires.\n"
+			               "\002{msg}{service} {help} {command} [LIST | VIEW]\002 for more information.\n"
+			               "\n"
+			               "The \002CLEAR\002 command clears th auto kill list."
+			               "\002{msg}{service} {help} {command} CLEAR\002 for more information.\n"),
+			               "msg"_kw = Config->StrictPrivmsg, "service"_kw = source.service->nick, "help"_kw = help->cname, "command"_kw = source.command);
+		}
 		return true;
 	}
 };
@@ -498,7 +499,7 @@ class CommandOSSQLine : public CommandOSSXLineBase
 		/* Do not allow less than a minute expiry time */
 		if (expires && expires < 60)
 		{
-			source.Reply(BAD_EXPIRY_TIME);
+			source.Reply(_("Invalid expiry time \002{0}\002."), expiry);
 			return;
 		}
 		else if (expires > 0)
@@ -535,7 +536,7 @@ class CommandOSSQLine : public CommandOSSXLineBase
 			}
 			catch (const std::regex_error &ex)
 			{
-				source.Reply("%s", ex.what());
+				source.Reply(ex.what());
 				return;
 			}
 		}
@@ -544,7 +545,7 @@ class CommandOSSQLine : public CommandOSSXLineBase
 			return;
 		else if (mask.find_first_not_of("./?*") == Anope::string::npos)
 		{
-			source.Reply(USERHOST_MASK_TOO_WIDE, mask.c_str());
+			source.Reply(_("\002{0}\002 coverage is too wide; please use a more specific mask."), mask);
 			return;
 		}
 
@@ -563,7 +564,7 @@ class CommandOSSQLine : public CommandOSSXLineBase
 
 		if (percent > 95)
 		{
-			source.Reply(USERHOST_MASK_TOO_WIDE, mask.c_str());
+			source.Reply(_("\002{0}\002 coverage is too wide; please use a more specific mask."), mask);
 			Log(LOG_ADMIN, source, this) << "tried to SQLine " << percent << "% of the network (" << affected << " users)";
 			delete x;
 			return;
@@ -620,10 +621,10 @@ class CommandOSSQLine : public CommandOSSXLineBase
 			this->xlm()->Send(NULL, x);
 		}
 
-		source.Reply(_("\002%s\002 added to the %s list."), mask.c_str(), source.command.c_str());
+		source.Reply(_("\002{0}\002 added to the {1} list."), mask, source.command);
 		Log(LOG_ADMIN, source, this) << "on " << mask << " (" << reason << "), expires in " << (expires ? Anope::Duration(expires - Anope::CurTime) : "never") << " [affects " << affected << " user(s) (" << percent << "%)]";
 		if (Anope::ReadOnly)
-			source.Reply(READ_ONLY_MODE);
+			source.Reply(_("Services are in read-only mode. Any changes made may not persist."));
 	}
 
  	ServiceReference<XLineManager> sqlines;
@@ -639,52 +640,60 @@ class CommandOSSQLine : public CommandOSSXLineBase
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("Allows Services Operators to manipulate the SQLINE list.  If\n"
-				"a user with a nick matching an SQLINE mask attempts to\n"
-				"connect, Services will not allow it to pursue his IRC\n"
-				"session.\n"
-				"If the first character of the mask is #, services will\n"
-				"prevent the use of matching channels."));
-		source.Reply(_(" \n"
-				"\002SQLINE ADD\002 adds the given (nick's) mask to the SQLINE\n"
-				"list for the given reason (which \002must\002 be given).\n"
-				"\037expiry\037 is specified as an integer followed by one of \037d\037\n"
-				"(days), \037h\037 (hours), or \037m\037 (minutes). Combinations (such as\n"
-				"\0371h30m\037) are not permitted. If a unit specifier is not\n"
-				"included, the default is days (so \037+30\037 by itself means 30\n"
-				"days). To add an SQLINE which does not expire, use \037+0\037.\n"
-				"If the mask to be added starts with a \037+\037, an expiry time\n"
-				"must be given, even if it is the same as the default. The\n"
-				"current SQLINE default expiry time can be found with the\n"
-				"\002STATS AKILL\002 command."));
-		const Anope::string &regexengine = Config->GetBlock("options")->Get<const Anope::string>("regexengine");
-		if (!regexengine.empty())
+		if (subcommand.equals_ci("ADD"))
 		{
-			source.Reply(" ");
-			source.Reply(_("Regex matches are also supported using the %s engine.\n"
-					"Enclose your mask in // if this is desired."), regexengine.c_str());
+			source.Reply(_("\002{0} ADD\002 adds the given \037mask\037 to the {0} list for the given \037reason\037."
+			               " \037expiry\037 is specified as an integer followed by one of \037d\037 (days), \037h\037 (hours), or \037m\037 (minutes)."
+			               " If a unit specifier is not included, the default is days, so \037+30\037 by itself means 30 days."
+			               " To add a {0} which does not expire, use \037+0\037."
+			               " The default {0} expiry time is \002{1}\002."),
+			               source.command, Anope::Duration(Config->GetModule("operserv")->Get<time_t>("sqlineexpiry", "30d"), source.GetAccount()));
+
+			const Anope::string &regexengine = Config->GetBlock("options")->Get<const Anope::string>("regexengine");
+			if (!regexengine.empty())
+			{
+				source.Reply(" ");
+				source.Reply(_("Regex matches are also supported using the {0} engine. Enclose your mask in // if this is desired."), regexengine);
+			}
 		}
-		source.Reply(_(" \n"
-				"The \002SQLINE DEL\002 command removes the given mask from the\n"
-				"SQLINE list if it is present. If a list of entry numbers is\n"
-				"given, those entries are deleted. (See the example for LIST\n"
-				"below.)\n"
-				" \n"
-				"The \002SQLINE LIST\002 command displays the SQLINE list.\n"
-				"If a wildcard mask is given, only those entries matching the\n"
-				"mask are displayed. If a list of entry numbers is given,\n"
-				"only those entries are shown; for example:\n"
-				"   \002SQLINE LIST 2-5,7-9\002\n"
-				"      Lists SQLINE entries numbered 2 through 5 and 7\n"
-				"      through 9.\n"
-				" \n"
-				"\002SQLINE VIEW\002 is a more verbose version of \002SQLINE LIST\002, and\n"
-				"will show who added an SQLINE, the date it was added, and when\n"
-				"it expires, as well as the mask and reason.\n"
-				" \n"
-				"\002SQLINE CLEAR\002 clears all entries of the SQLINE list."));
+		else if (subcommand.equals_ci("DEL"))
+			source.Reply(_("The \002{0} DEL\002 command removes the given \037mask\037 from the {0} list if it is present."
+			               " If a list of entry numbers is given, those entries are deleted."));
+		else if (subcommand.equals_ci("LIST") || subcommand.equals_ci("VIEW"))
+			source.Reply(_("The \002{0} LIST\002 and \002{0} VIEW\002 commands displays the {0} list.\n"
+			               "If a wildcard \037mask\037 is given, only those entries matching the \037mask\037 are displayed."
+			               " If a list of entry numbers is given, only those entries are shown."
+			               " \002VIEW\002 is similar to \002LIST\002 but also shows who created the {0}, when it was created, and when it expires.\n"
+			               "\n"
+			               "Example:\n"
+			               "\n"
+			               "         {0} LIST 2-5,7-9\n"
+			               "         Lists {0} entries numbered 2 through 5 and 7 through 9.\n"),
+			               source.command);
+		else if (subcommand.equals_ci("CLEAR"))
+			source.Reply(_("\002{0} CLEAR\002 removes all entries from the {0} list."),
+			               source.command);
+		else
+		{
+			CommandInfo *help = source.service->FindCommand("generic/help");
+
+			source.Reply(_("Allows you to manipulate the {0} list."
+			               " If a user attempts to use a nickname that matches a {0} mask, services will force the user off of the nickname."
+			               " If the first character of the mask is a #, services will prevent the use of matching channels."
+			               "\n"
+			               "The \002ADD\002 command adds \037mask\037 to the {0} list.\n"
+			               "\002{msg}{service} {help} {command} ADD\002 for more information.\n"
+			               "\n"
+			               "The \002DEL\002 command removes \037mask\037 from the {0} list.\n"
+			               "\002{msg}{service} {help} {command} DEL\002 for more information.\n"
+			               "\n"
+			               "The \002LIST\002 and \002VIEW\002 commands both show the {0} list, but \002VIEW\002 also shows who created the {0} entry, when it was created, and when it expires.\n"
+			               "\002{msg}{service} {help} {command} [LIST | VIEW]\002 for more information.\n"
+			               "\n"
+			               "The \002CLEAR\002 command clears th auto kill list."
+			               "\002{msg}{service} {help} {command} CLEAR\002 for more information.\n"),
+			               "msg"_kw = Config->StrictPrivmsg, "service"_kw = source.service->nick, "help"_kw = help->cname, "command"_kw = source.command);
+		}
 		return true;
 	}
 };

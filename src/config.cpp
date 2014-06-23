@@ -452,6 +452,7 @@ Conf::Conf() : Block("")
 
 		CommandInfo &c = this->Fantasy[nname];
 		c.name = service;
+		c.cname = nname;
 		c.permission = permission;
 		c.group = group;
 		c.hide = hide;
@@ -535,9 +536,13 @@ Conf::Conf() : Block("")
 		regex_flags = std::regex::grep;
 	else if (regex_engine == "egrep")
 		regex_flags = std::regex::egrep;
+	else
+		regex_flags = static_cast<std::basic_regex<char>::flag_type>(0);
 	/* always enable icase and optimize */
 	if (regex_flags)
 		regex_flags |= std::regex::icase | std::regex::optimize;
+
+	this->LineWrap = options->Get<unsigned>("linewrap", "200");
 }
 
 Conf::~Conf()

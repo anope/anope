@@ -30,6 +30,7 @@ class CommandNSStatus : public Command
 
 		while (sep.GetToken(nickbuf))
 		{
+			#if 0
 			User *u2 = User::Find(nickbuf, true);
 			if (!u2) /* Nick is not online */
 				source.Reply("STATUS %s %d %s", nickbuf.c_str(), 0, "");
@@ -44,8 +45,8 @@ class CommandNSStatus : public Command
 				 * so we tell the user about it
 				 */
 				source.Reply("STATUS %s %d %s", nickbuf.c_str(), 1, u2->Account() ? u2->Account()->display.c_str() : "");
+			#endif
 		}
-		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
@@ -80,7 +81,7 @@ class NSStatus : public Module
 	NSStatus(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
 		, commandnsstatus(this)
 	{
-
+		throw ModuleException("Remind Adam to fix this");
 	}
 };
 

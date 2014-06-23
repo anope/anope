@@ -30,9 +30,9 @@ class CommandHSOn : public Command
 		if (na && u->Account() == na->nc && na->HasVhost())
 		{
 			if (!na->GetVhostIdent().empty())
-				source.Reply(_("Your vhost of \002%s\002@\002%s\002 is now activated."), na->GetVhostIdent().c_str(), na->GetVhostHost().c_str());
+				source.Reply(_("Your vhost of \002{0}\002@\002{1}\002 is now activated."), na->GetVhostIdent(), na->GetVhostHost());
 			else
-				source.Reply(_("Your vhost of \002%s\002 is now activated."), na->GetVhostHost().c_str());
+				source.Reply(_("Your vhost of \002{0}\002 is now activated."), na->GetVhostHost());
 			Log(LOG_COMMAND, source, this) << "to enable their vhost of " << (!na->GetVhostIdent().empty() ? na->GetVhostIdent() + "@" : "") << na->GetVhostHost();
 			IRCD->SendVhost(u, na->GetVhostIdent(), na->GetVhostHost());
 			u->vhost = na->GetVhostHost();
@@ -41,18 +41,12 @@ class CommandHSOn : public Command
 			u->UpdateHost();
 		}
 		else
-			source.Reply(HOST_NOT_ASSIGNED);
-
-		return;
+			source.Reply(_("There is no vhost assigned to this nickname."));
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("Activates the vhost currently assigned to the nick in use.\n"
-				"When you use this command any user who performs a /whois\n"
-				"on you will see the vhost instead of your real host/IP address."));
+		source.Reply(_("Activates your vhost."));
 		return true;
 	}
 };

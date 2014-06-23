@@ -207,19 +207,19 @@ class CommandOSIgnore : public Command
 
 			if (t <= -1)
 			{
-				source.Reply(BAD_EXPIRY_TIME);
+				source.Reply(_("Invalid expiry time \002{0}\002."), time);
 				return;
 			}
 
 			Anope::string mask = RealMask(nick);
 			if (mask.empty())
 			{
-				source.Reply(BAD_USERHOST_MASK);
+				source.Reply(_("Mask must be in the form \037user\037@\037host\037."));
 				return;
 			}
 
 			if (Anope::ReadOnly)
-				source.Reply(READ_ONLY_MODE);
+				source.Reply(_("Services are in read-only mode. Any changes made may not persist."));
 
 			IgnoreData *ign = new IgnoreDataImpl();
 			ign->mask = mask;
@@ -230,12 +230,12 @@ class CommandOSIgnore : public Command
 			ignore_service->AddIgnore(ign);
 			if (!t)
 			{
-				source.Reply(_("\002%s\002 will now permanently be ignored."), mask.c_str());
+				source.Reply(_("\002{0}\002 will now permanently be ignored."), mask);
 				Log(LOG_ADMIN, source, this) << "to add a permanent ignore for " << mask;
 			}
 			else
 			{
-				source.Reply(_("\002%s\002 will now be ignored for \002%s\002."), mask.c_str(), Anope::Duration(t, source.GetAccount()).c_str());
+				source.Reply(_("\002{0}\002 will now be ignored for \002{1}\002."), mask, Anope::Duration(t, source.GetAccount()));
 				Log(LOG_ADMIN, source, this) << "to add an ignore on " << mask << " for " << Anope::Duration(t);
 			}
 		}
@@ -302,7 +302,7 @@ class CommandOSIgnore : public Command
 		Anope::string mask = RealMask(nick);
 		if (mask.empty())
 		{
-			source.Reply(BAD_USERHOST_MASK);
+			source.Reply(_("Mask must be in the form \037user\037@\037host\037."));
 			return;
 		}
 
@@ -310,14 +310,14 @@ class CommandOSIgnore : public Command
 		if (ign)
 		{
 			if (Anope::ReadOnly)
-				source.Reply(READ_ONLY_MODE);
+				source.Reply(_("Services are in read-only mode. Any changes made may not persist."));
 
 			Log(LOG_ADMIN, source, this) << "to remove an ignore on " << mask;
-			source.Reply(_("\002%s\002 will no longer be ignored."), mask.c_str());
+			source.Reply(_("\002{0}\002 will no longer be ignored."), mask);
 			delete ign;
 		}
 		else
-			source.Reply(_("\002%s\002 not found on ignore list."), mask.c_str());
+			source.Reply(_("\002{0}\002 not found on ignore list."), mask);
 	}
 
 	void DoClear(CommandSource &source)
@@ -326,13 +326,11 @@ class CommandOSIgnore : public Command
 			return;
 
 		if (Anope::ReadOnly)
-			source.Reply(READ_ONLY_MODE);
+			source.Reply(_("Services are in read-only mode. Any changes made may not persist."));
 
 		ignore_service->ClearIgnores();
 		Log(LOG_ADMIN, source, this) << "to CLEAR the list";
 		source.Reply(_("Ignore list has been cleared."));
-
-		return;
 	}
 
  public:
@@ -365,26 +363,18 @@ class CommandOSIgnore : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("Allows Services Operators to make Services ignore a nick or mask\n"
-				"for a certain time or until the next restart. The default\n"
-				"time format is seconds. You can specify it by using units.\n"
-				"Valid units are: \037s\037 for seconds, \037m\037 for minutes,\n"
-				"\037h\037 for hours and \037d\037 for days.\n"
-				"Combinations of these units are not permitted.\n"
-				"To make Services permanently ignore the user, type 0 as time.\n"
-				"When adding a \037mask\037, it should be in the format nick!user@host,\n"
-				"everything else will be considered a nick. Wildcards are permitted.\n"
-				" \n"
-				"Ignores will not be enforced on IRC Operators."));
+		source.Reply(_("The \002{0}\002 command allows you to make services ignore a user or hostmask."
+		               " \037expiry\037 must be an integer and can be followed by one of \037d\037 (days), \037h\037 (hours), or \037m\037 (minutes)."
+		               " If a unit specifier is not included, the default is seconds."
+		               " To make services permanently ignore the user, use 0 as the expiry time."
+		               " When adding a \037mask\037, it should be in the format nick!user@host, everything else will be considered a nicknames. Wildcards are permitted."),
+		               source.command);
 
 		const Anope::string &regexengine = Config->GetBlock("options")->Get<const Anope::string>("regexengine");
 		if (!regexengine.empty())
 		{
 			source.Reply(" ");
-			source.Reply(_("Regex matches are also supported using the %s engine.\n"
-					"Enclose your pattern in // if this is desired."), regexengine.c_str());
+			source.Reply(_("Regex matches are also supported using the %s engine. Enclose your pattern in // if this is desired."), regexengine);
 		}
 
 		return true;

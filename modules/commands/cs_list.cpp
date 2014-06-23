@@ -43,9 +43,8 @@ class CommandCSList : public Command
 			}
 			catch (const ConvertException &)
 			{
-				source.Reply(LIST_INCORRECT_RANGE);
-				source.Reply(_("To search for channels starting with #, search for the channel\n"
-					"name without the #-sign prepended (\002anope\002 instead of \002#anope\002)."));
+				source.Reply(_("Incorrect range specified. The correct syntax is \002#\037from\037-\037to\037\002."));
+				source.Reply(_("To search for channels starting with #, search for the channel name without the #-sign prepended (\002anope\002 instead of \002#anope\002)."));
 				return;
 			}
 
@@ -70,7 +69,7 @@ class CommandCSList : public Command
 		Anope::string spattern = "#" + pattern;
 		unsigned listmax = Config->GetModule(this->owner)->Get<unsigned>("listmax", "50");
 
-		source.Reply(_("List of entries matching \002%s\002:"), pattern.c_str());
+		source.Reply(_("List of entries matching \002{0}\002:"), pattern);
 
 		ListFormatter list(source.GetAccount());
 		list.AddColumn(_("Name")).AddColumn(_("Description"));
@@ -124,45 +123,36 @@ class CommandCSList : public Command
 		for (unsigned i = 0; i < replies.size(); ++i)
 			source.Reply(replies[i]);
 
-		source.Reply(_("End of list - %d/%d matches shown."), nchans > listmax ? listmax : nchans, nchans);
+		source.Reply(_("End of list - \002{0}/{1}\002 matches shown."), nchans > listmax ? listmax : nchans, nchans);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("Lists all registered channels matching the given pattern.\n"
-				"Channels with the \002PRIVATE\002 option set will only be\n"
-				"displayed to Services Operators with the proper access.\n"
-				"Channels with the \002NOEXPIRE\002 option set will have\n"
-				"a \002!\002 prefixed to the channel for Services Operators to see.\n"
-				" \n"
-				"Note that a preceding '#' specifies a range, channel names\n"
-				"are to be written without '#'.\n"
-				" \n"
-				"If the SUSPENDED or NOEXPIRE options are given, only channels\n"
-				"which, respectively, are SUSPENDED or have the NOEXPIRE\n"
-				"flag set will be displayed. If multiple options are given,\n"
-				"all channels matching at least one option will be displayed.\n"
-				"Note that these options are limited to \037Services Operators\037.\n"
-				" \n"
-				"Examples:\n"
-				" \n"
-				"    \002LIST *anope*\002\n"
-				"        Lists all registered channels with \002anope\002 in their\n"
-				"        names (case insensitive).\n"
-				" \n"
-				"    \002LIST * NOEXPIRE\002\n"
-				"        Lists all registered channels which have been set to not expire.\n"
-				" \n"
-				"    \002LIST #51-100\002\n"
-				"        Lists all registered channels within the given range (51-100)."));
+		source.Reply(_("Lists all registered channels matching the given pattern."
+		               " Channels with the \002PRIVATE\002 option set will only be displayed to Services Operators with the proper access."
+		               " Channels with the \002NOEXPIRE\002 option set will have a \002!\002 prefixed to the channel for Services Operators to see."
+		               "\n"
+		               "Note that a preceding '#' specifies a range, channel names are to be written without '#'.\n"
+		               "\n"
+		               "If the SUSPENDED or NOEXPIRE options are given, only channels which, respectively, are SUSPENDED or have the NOEXPIRE flag set will be displayed."
+		               " If multiple options are given, all channels matching at least one option will be displayed."
+		               " Note that these options are limited to \037Services Operators\037.\n"
+		               "\n"
+		               "Examples:\n"
+		               "\n"
+		               "         {0} *anope*\n"
+		               "         Lists all registered channels with \002anope\002 in their names (case insensitive).\n"
+		               "\n"
+		               "         {0} * NOEXPIRE\n"
+		               "         Lists all registered channels which have been set to not expire.\n"
+		               "\n"
+		               "         {0} #51-100\n"
+		               "         Lists all registered channels within the given range (51-100)."));
 
 		if (!Config->GetBlock("options")->Get<const Anope::string>("regexengine").empty())
 		{
 			source.Reply(" ");
-			source.Reply(_("Regex matches are also supported using the %s engine.\n"
-					"Enclose your pattern in // if this is desired."), Config->GetBlock("options")->Get<const Anope::string>("regexengine").c_str());
+			source.Reply(_("Regex matches are also supported using the {0} engine. Enclose your pattern in // if this is desired."), Config->GetBlock("options")->Get<const Anope::string>("regexengine"));
 		}
 
 		return true;
@@ -180,16 +170,18 @@ class CommandCSSetPrivate : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
+		const Anope::string &chan = params[0];
+
 		if (Anope::ReadOnly)
 		{
-			source.Reply(READ_ONLY_MODE);
+			source.Reply(_("Services are in read-only mode."));
 			return;
 		}
 
-		ChanServ::Channel *ci = ChanServ::Find(params[0]);
+		ChanServ::Channel *ci = ChanServ::Find(chan);
 		if (ci == NULL)
 		{
-			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
+			source.Reply(_("Channel \002{0}\002 isn't registered."), chan);
 			return;
 		}
 
@@ -199,7 +191,7 @@ class CommandCSSetPrivate : public Command
 
 		if (MOD_RESULT != EVENT_ALLOW && !source.AccessFor(ci).HasPriv("SET") && source.permission.empty() && !source.HasPriv("chanserv/administration"))
 		{
-			source.Reply(ACCESS_DENIED);
+			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "SET", ci->name);
 			return;
 		}
 
@@ -207,18 +199,16 @@ class CommandCSSetPrivate : public Command
 		{
 			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to enable private";
 			ci->Extend<bool>("CS_PRIVATE");
-			source.Reply(_("Private option for %s is now \002on\002."), ci->name.c_str());
+			source.Reply(_("Private option for \002{0}\002 is now \002on\002."), ci->name);
 		}
 		else if (params[1].equals_ci("OFF"))
 		{
 			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to disable private";
 			ci->Shrink<bool>("CS_PRIVATE");
-			source.Reply(_("Private option for %s is now \002off\002."), ci->name.c_str());
+			source.Reply(_("Private option for \002{0}\002 is now \002off\002."), ci->name);
 		}
 		else
 			this->OnSyntaxError(source, "PRIVATE");
-
-		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &) override
@@ -230,8 +220,7 @@ class CommandCSSetPrivate : public Command
 		BotInfo *bi;
 		Anope::string cmd;
 		if (Command::FindCommandFromService("chanserv/list", bi, cmd))
-			source.Reply(_("When \002private\002 is set, the channel will not appear in\n"
-				"%s's %s command."), bi->nick.c_str(), cmd.c_str());
+			source.Reply(_("When \002private\002 is set, the channel will not appear in the \002{0}\002 command of \002{1}\002."), cmd, bi->nick);
 		return true;
 	}
 };

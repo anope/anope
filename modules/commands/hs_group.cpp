@@ -47,7 +47,7 @@ class CommandHSGroup : public Command
 	{
 		if (Anope::ReadOnly)
 		{
-			source.Reply(READ_ONLY_MODE);
+			source.Reply(_("Services are in read-only mode."));
 			return;
 		}
 
@@ -56,23 +56,17 @@ class CommandHSGroup : public Command
 		{
 			this->Sync(na);
 			if (!na->GetVhostIdent().empty())
-				source.Reply(_("All vhost's in the group \002%s\002 have been set to \002%s\002@\002%s\002."), source.nc->display.c_str(), na->GetVhostIdent().c_str(), na->GetVhostHost().c_str());
+				source.Reply(_("All vhosts in the group \002{0}\002 have been set to \002{1}\002@\002{2}\002."), source.nc->display, na->GetVhostIdent(), na->GetVhostHost());
 			else
-				source.Reply(_("All vhost's in the group \002%s\002 have been set to \002%s\002."), source.nc->display.c_str(), na->GetVhostHost().c_str());
+				source.Reply(_("All vhosts in the group \002{0}\002 have been set to \002{1}\002."), source.nc->display, na->GetVhostHost());
 		}
 		else
-			source.Reply(HOST_NOT_ASSIGNED);
-
-		return;
+			source.Reply(_("There is no vhost assigned to this nickname."));
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("This command allows users to set the vhost of their\n"
-				"CURRENT nick to be the vhost for all nicks in the same\n"
-				"group."));
+		source.Reply(_("Sets the vhost of all nicks in your group to the vhost of your current nick."));
 		return true;
 	}
 };

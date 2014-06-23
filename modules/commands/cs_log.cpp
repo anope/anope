@@ -114,14 +114,22 @@ public:
 
 		ChanServ::Channel *ci = ChanServ::Find(channel);
 		if (ci == NULL)
-			source.Reply(CHAN_X_NOT_REGISTERED, channel.c_str());
-		else if (!source.AccessFor(ci).HasPriv("SET") && !source.HasPriv("chanserv/administration"))
-			source.Reply(ACCESS_DENIED);
-		else if (params.size() == 1)
+		{
+			source.Reply(_("Channel \002{0}\002 isn't registered."), channel);
+			return;
+		}
+
+		if (!source.AccessFor(ci).HasPriv("SET") && !source.HasPriv("chanserv/administration"))
+		{
+			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "SET", ci->name);
+			return;
+		}
+
+		if (params.size() == 1)
 		{
 			LogSettings *ls = ci->Require<LogSettings>("logsettings");
 			if (!ls || (*ls)->empty())
-				source.Reply(_("There currently are no logging configurations for %s."), ci->name.c_str());
+				source.Reply(_("There currently are no logging configurations for \002{0}\002."), ci->name);
 			else
 			{
 				ListFormatter list(source.GetAccount());
@@ -140,7 +148,7 @@ public:
 					list.AddEntry(entry);
 				}
 
-				source.Reply(_("Log list for %s:"), ci->name.c_str());
+				source.Reply(_("Log list for \002{0}\002:"), ci->name);
 
 				std::vector<Anope::string> replies;
 				list.Process(replies);
@@ -153,7 +161,7 @@ public:
 		{
 			if (Anope::ReadOnly)
 			{
-				source.Reply(READ_ONLY_MODE);
+				source.Reply(_("Services are in read-only mode."));
 				return;
 			}
 
@@ -165,7 +173,7 @@ public:
 			size_t sl = command.find('/');
 			if (sl == Anope::string::npos)
 			{
-				source.Reply(_("%s is not a valid command."), command.c_str());
+				source.Reply(_("\002{0}\002 is not a valid command."), command);
 				return;
 			}
 
@@ -190,20 +198,20 @@ public:
 			}
 			else
 			{
-				source.Reply(_("%s is not a valid command."), command.c_str());
+				source.Reply(_("\002{0}\002 is not a valid command."), command);
 				return;
 			}
 
 			if (!method.equals_ci("MESSAGE") && !method.equals_ci("NOTICE") && !method.equals_ci("MEMO"))
 			{
-				source.Reply(_("%s is not a valid logging method."), method.c_str());
+				source.Reply(_("\002%s\002 is not a valid logging method."));
 				return;
 			}
 
 			for (unsigned i = 0; i < extra.length(); ++i)
 				if (ModeManager::GetStatusChar(extra[i]) == 0)
 				{
-					source.Reply(_("%c is an unknown status mode."), extra[i]);
+					source.Reply(_("\002%c\002 is an unknown status mode."), extra[i]);
 					return;
 				}
 
@@ -218,14 +226,14 @@ public:
 					if (log->extra == extra)
 					{
 						Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to remove logging for " << command << " with method " << method << (extra == "" ? "" : " ") << extra;
-						source.Reply(_("Logging for command %s on %s with log method %s%s%s has been removed."), !log->command_name.empty() ? log->command_name.c_str() : log->service_name.c_str(), !log->command_service.empty() ? log->command_service.c_str() : "any service", method.c_str(), extra.empty() ? "" : " ", extra.empty() ? "" : extra.c_str());
+						source.Reply(_("Logging for command \002{0}\002 on \002{1}\002 with log method \002{2}{3}{4}\002 has been removed."), !log->command_name.empty() ? log->command_name : log->service_name, !log->command_service.empty() ? log->command_service : "any service", method, extra.empty() ? "" : " ", extra);
 						delete log;
 					}
 					else
 					{
 						log->extra = extra;
 						Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to change logging for " << command << " to method " << method << (extra == "" ? "" : " ") << extra;
-						source.Reply(_("Logging changed for command %s on %s, now using log method %s%s%s."), !log->command_name.empty() ? log->command_name.c_str() : log->service_name.c_str(), !log->command_service.empty() ? log->command_service.c_str() : "any service", method.c_str(), extra.empty() ? "" : " ", extra.empty() ? "" : extra.c_str());
+						source.Reply(_("Logging changed for command \002{0}\002 on \002{1}\002, now using log method \002{2}{3}{4]\002."), !log->command_name.empty() ? log->command_name : log->service_name, !log->command_service.empty() ? log->command_service : "any service", method, extra.empty() ? "" : " ", extra);
 					}
 					return;
 				}
@@ -246,7 +254,7 @@ public:
 
 			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to log " << command << " with method " << method << (extra == "" ? "" : " ") << extra;
 
-			source.Reply(_("Logging is now active for command %s on %s, using log method %s%s%s."), !command_name.empty() ? command_name.c_str() : service_name.c_str(), bi ? bi->nick.c_str() : "any service", method.c_str(), extra.empty() ? "" : " ", extra.empty() ? "" : extra.c_str());
+			source.Reply(_("Logging is now active for command \002{0}\002 on \002{1}\002, using log method \002{2}{3}{4}\002."), !command_name.empty() ? command_name : service_name, bi ? bi->nick : "any service", method, extra.empty() ? "" : " ", extra);
 		}
 		else
 			this->OnSyntaxError(source, "");
@@ -254,28 +262,24 @@ public:
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("The %s command allows users to configure logging settings\n"
-				"for their channel. If no parameters are given this command\n"
-				"lists the current logging methods in place for this channel.\n"
-				" \n"
-				"Otherwise, \037command\037 must be a command name, and \037method\037\n"
-				"is one of the following logging methods:\n"
-				" \n"
-				" MESSAGE [status], NOTICE [status], MEMO\n"
-				" \n"
-				"Which are used to message, notice, and memo the channel respectively.\n"
-				"With MESSAGE or NOTICE you must have a service bot assigned to and joined\n"
-				"to your channel. Status may be a channel status such as @ or +.\n"
-				" \n"
-				"To remove a logging method use the same syntax as you would to add it.\n"
-				" \n"
-				"Example:\n"
-				" %s #anope chanserv/access MESSAGE @%\n"
-				" Would message any channel operators whenever someone used the\n"
-				" ACCESS command on ChanServ on the channel."),
-				source.command.upper().c_str(), source.command.upper().c_str());
+		source.Reply(_("The {0} command allows users to configure logging settings for \037channel\037."
+		               " If no parameters are given this command lists the current logging methods in place on \037channel\037."
+		               " Otherwise, \037command\037 must be a command name, and \037method\037 must be one of the following logging methods:\n"
+		               "\n"
+		               " MESSAGE [status], NOTICE [status], MEMO\n"
+		               "\n"
+		               "Which are used to message, notice, and memo the channel respectively."
+		               " With MESSAGE or NOTICE you must have a service bot assigned to and joined to your channel."
+		               " Status may be a channel status such as @ or +.\n"
+	                       "\n"
+		               "To remove a logging method use the same syntax as you would to add it.\n"
+		               "\n"
+		               "Use of this command requires the \002{1}\002 privilege on \037channel\037."
+		               "\n"
+		               "Example:\n"
+		               "         {command} #anope chanserv/access MESSAGE @\n"
+		               "         Would message any channel operators of \"#anope\" whenever someone used the \"ACCESS\" command on ChanServ for \"#anope\"."),
+		               source.command, "SET");
 		return true;
 	}
 };
@@ -393,7 +397,7 @@ class CSLog : public Module
 				else if (log->method.equals_ci("MESSAGE") && l->ci->c)
 				{
 					IRCD->SendPrivmsg(l->ci->WhoSends(), log->extra + l->ci->c->name, "%s", buffer.c_str());
-					//l->ci->WhoSends()->lastmsg = Anope::CurTime;
+					//l->ci->WhoSends()->lastmsg = Anope::CurTime; XXX
 				}
 				else if (log->method.equals_ci("NOTICE") && l->ci->c)
 					IRCD->SendNotice(l->ci->WhoSends(), log->extra + l->ci->c->name, "%s", buffer.c_str());

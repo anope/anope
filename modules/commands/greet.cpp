@@ -25,24 +25,25 @@ class CommandBSSetGreet : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
-		ChanServ::Channel *ci = ChanServ::Find(params[0]);
+		const Anope::string &chan = params[0];
 		const Anope::string &value = params[1];
 
+		if (Anope::ReadOnly)
+		{
+			source.Reply(_("Services are in read-only mode."));
+			return;
+		}
+
+		ChanServ::Channel *ci = ChanServ::Find(chan);
 		if (ci == NULL)
 		{
-			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
+			source.Reply(_("Channel \002{0}\002 isn't registered."), chan);
 			return;
 		}
 
 		if (!source.HasPriv("botserv/administration") && !source.AccessFor(ci).HasPriv("SET"))
 		{
-			source.Reply(ACCESS_DENIED);
-			return;
-		}
-
-		if (Anope::ReadOnly)
-		{
-			source.Reply(READ_ONLY_MODE);
+			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "SET", ci->name);
 			return;
 		}
 
@@ -52,7 +53,7 @@ class CommandBSSetGreet : public Command
 			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to enable greets";
 
 			ci->Extend<bool>("BS_GREET");
-			source.Reply(_("Greet mode is now \002on\002 on channel %s."), ci->name.c_str());
+			source.Reply(_("Greet mode for \002{0}\002 is now \002on\002."), ci->name);
 		}
 		else if (value.equals_ci("OFF"))
 		{
@@ -60,7 +61,7 @@ class CommandBSSetGreet : public Command
 			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to disable greets";
 
 			ci->Shrink<bool>("BS_GREET");
-			source.Reply(_("Greet mode is now \002off\002 on channel %s."), ci->name.c_str());
+			source.Reply(_("Greet mode for \002{0}\002 is now \002off\002."), ci->name);
 		}
 		else
 			this->OnSyntaxError(source, source.command);
@@ -68,13 +69,10 @@ class CommandBSSetGreet : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
-		this->SendSyntax(source);
-		source.Reply(_(" \n"
-			"Enables or disables \002greet\002 mode on a channel.\n"
-			"When it is enabled, the bot will display greet\n"
-			"messages of users joining the channel, provided\n"
-			"they have enough access to the channel."));
-			return true;
+		source.Reply(_("Enables or disables \002greet\002 mode on \037channel\037."
+		               " When \002greet\002 mode is enabled, the assigned service bot will display the greet messages of users joining the channel, if they have the \002{0}\002 privilege."),
+		               "GREET");
+		return true;
 	}
 };
 
@@ -91,14 +89,14 @@ class CommandNSSetGreet : public Command
 	{
 		if (Anope::ReadOnly)
 		{
-			source.Reply(READ_ONLY_MODE);
+			source.Reply(_("Services are in read-only mode."));
 			return;
 		}
 
 		const NickServ::Nick *na = NickServ::FindNick(user);
 		if (!na)
 		{
-			source.Reply(NICK_X_NOT_REGISTERED, user.c_str());
+			source.Reply(_("\002{0}\002 isn't registered."), user);
 			return;
 		}
 		NickServ::Account *nc = na->nc;
@@ -111,13 +109,13 @@ class CommandNSSetGreet : public Command
 		{
 			Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to change the greet of " << nc->display;
 			nc->Extend<Anope::string>("greet", param);
-			source.Reply(_("Greet message for \002%s\002 changed to \002%s\002."), nc->display.c_str(), param.c_str());
+			source.Reply(_("Greet message for \002{0}\002 changed to \002{1}\002."), nc->display, param);
 		}
 		else
 		{
 			Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to unset the greet of " << nc->display;
 			nc->Shrink<Anope::string>("greet");
-			source.Reply(_("Greet message for \002%s\002 unset."), nc->display.c_str());
+			source.Reply(_("Greet message for \002{0}\002 unset."), nc->display);
 		}
 	}
 
@@ -128,12 +126,8 @@ class CommandNSSetGreet : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("Makes the given message the greet of your nickname, that\n"
-				"will be displayed when joining a channel that has GREET\n"
-				"option enabled, provided that you have the necessary\n"
-				"access on it."));
+		source.Reply(_("Sets your greet to \037message\037. Your greet is displayed when you enter channels that have the greet option enabled if you have the \002{0}\002 privilege on the channel."),
+		               "GREET");
 		return true;
 	}
 };
@@ -144,7 +138,7 @@ class CommandNSSASetGreet : public CommandNSSetGreet
 	CommandNSSASetGreet(Module *creator) : CommandNSSetGreet(creator, "nickserv/saset/greet", 1)
 	{
 		this->ClearSyntax();
-		this->SetSyntax(_("\037nickname\037 \037message\037"));
+		this->SetSyntax(_("\037user\037 \037message\037"));
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
@@ -154,12 +148,8 @@ class CommandNSSASetGreet : public CommandNSSetGreet
 
 	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("Makes the given message the greet of the nickname, that\n"
-				"will be displayed when joining a channel that has GREET\n"
-				"option enabled, provided that the user has the necessary\n"
-				"access on it."));
+		source.Reply(_("Sets the greet for \037user\037 to \037message\037. Greet messages are displayed when users enter channels that have the greet option enabiled if they have the \002{0}\002 privilege on the channel."),
+		               "GREET");
 		return true;
 	}
 };

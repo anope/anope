@@ -385,7 +385,7 @@ class ChanServCore : public Module
 	{
 		if (bi == ChanServ && Config->GetModule(this)->Get<bool>("opersonly") && !u->HasMode("OPER"))
 		{
-			u->SendMessage(bi, ACCESS_DENIED);
+			u->SendMessage(bi, _("Access denied."));
 			return EVENT_STOP;
 		}
 

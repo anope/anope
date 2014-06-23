@@ -35,14 +35,16 @@ class CommandMSList : public Command
 			ci = ChanServ::Find(chan);
 			if (!ci)
 			{
-				source.Reply(CHAN_X_NOT_REGISTERED, chan.c_str());
+				source.Reply(_("Channel \002{0}\002 isn't registered."), chan);
 				return;
 			}
-			else if (!source.AccessFor(ci).HasPriv("MEMO"))
+
+			if (!source.AccessFor(ci).HasPriv("MEMO"))
 			{
-				source.Reply(ACCESS_DENIED);
+				source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "MEMO", ci->name);
 				return;
 			}
+
 			mi = ci->memos;
 		}
 		else
@@ -53,9 +55,9 @@ class CommandMSList : public Command
 		else if (!mi->memos->size())
 		{
 			if (!chan.empty())
-				source.Reply(MEMO_X_HAS_NO_MEMOS, chan.c_str());
+				source.Reply(_("\002{0}\002 has no memos."), chan);
 			else
-				source.Reply(MEMO_HAVE_NO_MEMOS);
+				source.Reply(_("You have no memos."));
 		}
 		else
 		{
@@ -103,9 +105,9 @@ class CommandMSList : public Command
 					if (i == end)
 					{
 						if (!chan.empty())
-							source.Reply(MEMO_X_HAS_NO_NEW_MEMOS, chan.c_str());
+							source.Reply(_("\002{0}\002 has no new memos."), chan);
 						else
-							source.Reply(MEMO_HAVE_NO_NEW_MEMOS);
+							source.Reply(_("You have no new memos."));
 						return;
 					}
 				}
@@ -128,23 +130,23 @@ class CommandMSList : public Command
 			std::vector<Anope::string> replies;
 			list.Process(replies);
 
-			source.Reply(_("Memos for %s:"), ci ? ci->name.c_str() : source.GetNick().c_str());
+			source.Reply(_("Memos for \002{0}\002:"), ci ? ci->name.c_str() : source.GetNick().c_str());
 			for (unsigned i = 0; i < replies.size(); ++i)
 				source.Reply(replies[i]);
 		}
-		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("Lists any memos you currently have.  With \002NEW\002, lists only\n"
-				"new (unread) memos. Unread memos are marked with a \"*\"\n"
-				"to the left of the memo number. You can also specify a list\n"
-				"of numbers, as in the example below:\n"
-				"   \002LIST 2-5,7-9\002\n"
-				"      Lists memos numbered 2 through 5 and 7 through 9."));
+		source.Reply(_("Lists the memos you currently have."
+		               " With \002NEW\002, lists only new (unread) memos."
+		               " Unread memos are marked with a \"*\" to the left of the memo number."
+		               " You can also specify a list of numbers, as in the example below:\n"
+		               "\n"
+		               "Example:\n"
+		               "\n"
+		               "         {0} 2-5,7-9\n"
+		               "         Lists memos numbered 2 through 5 and 7 through 9."));
 		return true;
 	}
 };

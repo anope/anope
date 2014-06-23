@@ -110,9 +110,10 @@ class CommandCSAccess : public Command
 			source.Reply(_("Access level must be non-zero."));
 			return;
 		}
-		else if (level <= ChanServ::ACCESS_INVALID || level >= ChanServ::ACCESS_FOUNDER)
+
+		if (level <= ChanServ::ACCESS_INVALID || level >= ChanServ::ACCESS_FOUNDER)
 		{
-			source.Reply(CHAN_ACCESS_LEVEL_RANGE, ChanServ::ACCESS_INVALID + 1, ChanServ::ACCESS_FOUNDER - 1);
+			source.Reply(_("Access level must be between \002{0}\002 and \002{1}\002 inclusive."), ChanServ::ACCESS_INVALID + 1, ChanServ::ACCESS_FOUNDER - 1);
 			return;
 		}
 
@@ -131,7 +132,7 @@ class CommandCSAccess : public Command
 				override = true;
 			else
 			{
-				source.Reply(ACCESS_DENIED);
+				source.Reply(_("Access denied. You do not have enough privileges on \002{0}\002 to add someone at level \002{1}\002."), ci->name, level);
 				return;
 			}
 		}
@@ -147,10 +148,11 @@ class CommandCSAccess : public Command
 			ChanServ::Channel *targ_ci = ChanServ::Find(mask);
 			if (targ_ci == NULL)
 			{
-				source.Reply(CHAN_X_NOT_REGISTERED, mask.c_str());
+				source.Reply(_("Channel \002{0}\002 isn't registered."), mask);
 				return;
 			}
-			else if (ci == targ_ci)
+
+			if (ci == targ_ci)
 			{
 				source.Reply(_("You can't add a channel to its own access list."));
 				return;
@@ -166,14 +168,15 @@ class CommandCSAccess : public Command
 				source.Reply(_("Masks and unregistered users may not be on access lists."));
 				return;
 			}
-			else if (mask.find_first_of("!*@") == Anope::string::npos && !na)
+
+			if (mask.find_first_of("!*@") == Anope::string::npos && !na)
 			{
 				User *targ = User::Find(mask, true);
 				if (targ != NULL)
 					mask = "*!*@" + targ->GetDisplayedHost();
 				else
 				{
-					source.Reply(NICK_X_NOT_REGISTERED, mask.c_str());
+					source.Reply(_("\002{0}\002 isn't registered."), mask);
 					return;
 				}
 			}
@@ -187,7 +190,7 @@ class CommandCSAccess : public Command
 				/* Don't allow lowering from a level >= u_level */
 				if ((!highest || *access >= *highest) && !u_access.founder && !source.HasPriv("chanserv/access/modify"))
 				{
-					source.Reply(ACCESS_DENIED);
+					source.Reply(_("Access denied. You do not have enough privileges on \002{0}\002 to lower the access of \002{1}\002."), ci->name, access->mask);
 					return;
 				}
 				delete ci->EraseAccess(i - 1);
@@ -218,14 +221,20 @@ class CommandCSAccess : public Command
 
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to add " << mask << " with level " << level;
 		if (p != NULL)
-			source.Reply(_("\002%s\002 added to %s access list at privilege %s (level %d)"), access->mask.c_str(), ci->name.c_str(), p->name.c_str(), level);
+			source.Reply(_("\002{0}\002 added to the access list of \002{1}\002 with privilege \002{2}\002 (level \002{3}\002)."), access->mask, ci->name, p->name, level);
 		else
-			source.Reply(_("\002%s\002 added to %s access list at level \002%d\002."), access->mask.c_str(), ci->name.c_str(), level);
+			source.Reply(_("\002{0}\002 added to the access list of \002{1}\002 at level \002{2}\002."), access->mask, ci->name, level);
 	}
 
 	void DoDel(CommandSource &source, ChanServ::Channel *ci, const std::vector<Anope::string> &params)
 	{
 		Anope::string mask = params[2];
+
+		if (!ci->GetAccessCount())
+		{
+			source.Reply(_("The access list for \002{0}\002 is empty."), ci->name);
+			return;
+		}
 
 		if (!isdigit(mask[0]) && mask.find_first_of("#!*@") == Anope::string::npos && !NickServ::FindNick(mask))
 		{
@@ -234,14 +243,12 @@ class CommandCSAccess : public Command
 				mask = "*!*@" + targ->GetDisplayedHost();
 			else
 			{
-				source.Reply(NICK_X_NOT_REGISTERED, mask.c_str());
+				source.Reply(_("\002{0}\002 isn't registered."), mask);
 				return;
 			}
 		}
 
-		if (!ci->GetAccessCount())
-			source.Reply(_("%s access list is empty."), ci->name.c_str());
-		else if (isdigit(mask[0]) && mask.find_first_not_of("1234567890,-") == Anope::string::npos)
+		if (isdigit(mask[0]) && mask.find_first_not_of("1234567890,-") == Anope::string::npos)
 		{
 			class AccessDelCallback : public NumberList
 			{
@@ -252,8 +259,9 @@ class CommandCSAccess : public Command
 				Anope::string Nicks;
 				bool denied;
 				bool override;
+				Anope::string mask;
 			 public:
-				AccessDelCallback(CommandSource &_source, ChanServ::Channel *_ci, Command *_c, const Anope::string &numlist) : NumberList(numlist, true), source(_source), ci(_ci), c(_c), deleted(0), denied(false), override(false)
+				AccessDelCallback(CommandSource &_source, ChanServ::Channel *_ci, Command *_c, const Anope::string &numlist) : NumberList(numlist, true), source(_source), ci(_ci), c(_c), deleted(0), denied(false), override(false), mask(numlist)
 				{
 					if (!source.AccessFor(ci).HasPriv("ACCESS_CHANGE") && source.HasPriv("chanserv/access/modify"))
 						this->override = true;
@@ -262,17 +270,17 @@ class CommandCSAccess : public Command
 				~AccessDelCallback()
 				{
 					if (denied && !deleted)
-						source.Reply(ACCESS_DENIED);
+						source.Reply(_("Access denied. You do not have enough privileges on \002{0}\002 to remove any access entries matching \002{1}\002."));
 					else if (!deleted)
-						source.Reply(_("No matching entries on %s access list."), ci->name.c_str());
+						source.Reply(_("There are no entries matching \002{0}\002 on the access list of \002{1}\002."), mask, ci->name);
 					else
 					{
 						Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, c, ci) << "to delete " << Nicks;
 
 						if (deleted == 1)
-							source.Reply(_("Deleted 1 entry from %s access list."), ci->name.c_str());
+							source.Reply(_("Deleted \0021\002 entry from the access list of \002{0}\002."), ci->name);
 						else
-							source.Reply(_("Deleted %d entries from %s access list."), deleted, ci->name.c_str());
+							source.Reply(_("Deleted \002{0}\002 entries from the access list of \002{1}\002."), deleted, ci->name);
 					}
 				}
 
@@ -318,10 +326,10 @@ class CommandCSAccess : public Command
 				if (mask.equals_ci(access->mask))
 				{
 					if (!access->mask.equals_ci(source.nc->display) && !u_access.founder && (!highest || *highest <= *access) && !source.HasPriv("chanserv/access/modify"))
-						source.Reply(ACCESS_DENIED);
+						source.Reply(_("Access denied. You do not have enough privileges on \002{0}\002 to remove the access of \002{1}\002."), ci->name, access->mask);
 					else
 					{
-						source.Reply(_("\002%s\002 deleted from %s access list."), access->mask.c_str(), ci->name.c_str());
+						source.Reply(_("\002{0}\002 deleted from the access list of \002{1}\002."), access->mask, ci->name);
 						bool override = !u_access.founder && !u_access.HasPriv("ACCESS_CHANGE") && !access->mask.equals_ci(source.nc->display);
 						Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to delete " << access->mask;
 
@@ -333,10 +341,8 @@ class CommandCSAccess : public Command
 				}
 			}
 
-			source.Reply(_("\002%s\002 not found on %s access list."), mask.c_str(), ci->name.c_str());
+			source.Reply(_("\002{0}\002 was not found on the access list of \002{1}\002."), mask, ci->name);
 		}
-
-		return;
 	}
 
 	void ProcessList(CommandSource &source, ChanServ::Channel *ci, const std::vector<Anope::string> &params, ListFormatter &list)
@@ -344,8 +350,12 @@ class CommandCSAccess : public Command
 		const Anope::string &nick = params.size() > 2 ? params[2] : "";
 
 		if (!ci->GetAccessCount())
-			source.Reply(_("%s access list is empty."), ci->name.c_str());
-		else if (!nick.empty() && nick.find_first_not_of("1234567890,-") == Anope::string::npos)
+		{
+			source.Reply(_("The access list for \002{0}\002 is empty."), ci->name);
+			return;
+		}
+
+		if (!nick.empty() && nick.find_first_not_of("1234567890,-") == Anope::string::npos)
 		{
 			class AccessListCallback : public NumberList
 			{
@@ -428,13 +438,13 @@ class CommandCSAccess : public Command
 		}
 
 		if (list.IsEmpty())
-			source.Reply(_("No matching entries on %s access list."), ci->name.c_str());
+			source.Reply(_("No matching entries on the access list of \002{0}\002."), ci->name);
 		else
 		{
 			std::vector<Anope::string> replies;
 			list.Process(replies);
 
-			source.Reply(_("Access list for %s:"), ci->name.c_str());
+			source.Reply(_("Access list for \002{0}\002:"), ci->name);
 
 			for (unsigned i = 0; i < replies.size(); ++i)
 				source.Reply(replies[i]);
@@ -442,14 +452,13 @@ class CommandCSAccess : public Command
 			source.Reply(_("End of access list"));
 		}
 
-		return;
 	}
 
 	void DoList(CommandSource &source, ChanServ::Channel *ci, const std::vector<Anope::string> &params)
 	{
 		if (!ci->GetAccessCount())
 		{
-			source.Reply(_("%s access list is empty."), ci->name.c_str());
+			source.Reply(_("The access list for \002{0}\002 is empty."), ci->name);
 			return;
 		}
 
@@ -462,7 +471,7 @@ class CommandCSAccess : public Command
 	{
 		if (!ci->GetAccessCount())
 		{
-			source.Reply(_("%s access list is empty."), ci->name.c_str());
+			source.Reply(_("The access list for \002{0}\002 is empty."), ci->name);
 			return;
 		}
 
@@ -474,20 +483,19 @@ class CommandCSAccess : public Command
 	void DoClear(CommandSource &source, ChanServ::Channel *ci)
 	{
 		if (!source.IsFounder(ci) && !source.HasPriv("chanserv/access/modify"))
-			source.Reply(ACCESS_DENIED);
-		else
 		{
-			Event::OnAccessClear(&Event::AccessClear::OnAccessClear, ci, source);
-
-			ci->ClearAccess();
-
-			source.Reply(_("Channel %s access list has been cleared."), ci->name.c_str());
-
-			bool override = !source.IsFounder(ci);
-			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to clear the access list";
+			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "FOUNDER", ci->name);
+			return;
 		}
 
-		return;
+		Event::OnAccessClear(&Event::AccessClear::OnAccessClear, ci, source);
+
+		ci->ClearAccess();
+
+		source.Reply(_("The access list of \002{0}\002 has been cleared."), ci->name);
+
+		bool override = !source.IsFounder(ci);
+		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to clear the access list";
 	}
 
  public:
@@ -503,20 +511,23 @@ class CommandCSAccess : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
+		const Anope::string &chan = params[0];
 		const Anope::string &cmd = params[1];
 		const Anope::string &nick = params.size() > 2 ? params[2] : "";
 		const Anope::string &s = params.size() > 3 ? params[3] : "";
 
-		ChanServ::Channel *ci = ChanServ::Find(params[0]);
+		ChanServ::Channel *ci = ChanServ::Find(chan);
 		if (ci == NULL)
 		{
-			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
+			source.Reply(_("Channel \002{0}\002 isn't registered."), chan);
 			return;
 		}
 
 		bool is_list = cmd.equals_ci("LIST") || cmd.equals_ci("VIEW");
 		bool is_clear = cmd.equals_ci("CLEAR");
 		bool is_del = cmd.equals_ci("DEL");
+
+		ChanServ::AccessGroup access = source.AccessFor(ci);
 
 		bool has_access = false;
 		if (source.HasPriv("chanserv/access/modify"))
@@ -538,7 +549,7 @@ class CommandCSAccess : public Command
 		if (is_list || is_clear ? 0 : (cmd.equals_ci("DEL") ? (nick.empty() || !s.empty()) : s.empty()))
 			this->OnSyntaxError(source, cmd);
 		else if (!has_access)
-			source.Reply(ACCESS_DENIED);
+			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), is_list ? "ACCESS_LIST" : "ACCESS_CHANGE", ci->name);
 		else if (Anope::ReadOnly && !is_list)
 			source.Reply(_("Sorry, channel access list modification is temporarily disabled."));
 		else if (cmd.equals_ci("ADD"))
@@ -553,60 +564,92 @@ class CommandCSAccess : public Command
 			this->DoClear(source, ci);
 		else
 			this->OnSyntaxError(source, "");
-
-		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("Maintains the \002access list\002 for a channel.  The access\n"
-				"list specifies which users are allowed chanop status or\n"
-				"access to %s commands on the channel.  Different\n"
-				"user levels allow for access to different subsets of\n"
-				"privileges. Any registered user not on the access list has\n"
-				"a user level of 0, and any unregistered user has a user level\n"
-				"of -1."), source.service->nick.c_str());
-		source.Reply(" ");
-		source.Reply(_("The \002ACCESS ADD\002 command adds the given mask to the\n"
-				"access list with the given user level; if the mask is\n"
-				"already present on the list, its access level is changed to\n"
-				"the level specified in the command.  The \037level\037 specified\n"
-				"may be a numerical level or the name of a privilege (eg AUTOOP).\n"
-				"When a user joins the channel the access they receive is from the\n"
-				"highest level entry in the access list."));
-		if (!Config->GetModule("chanserv")->Get<bool>("disallow_channel_access"))
-			source.Reply(_("The given mask may also be a channel, which will use the\n"
-					"access list from the other channel up to the given \037level\037."));
-		source.Reply(" ");
-		source.Reply(_("The \002ACCESS DEL\002 command removes the given nick from the\n"
-				"access list.  If a list of entry numbers is given, those\n"
-				"entries are deleted.  (See the example for LIST below.)\n"
-				"You may remove yourself from an access list, even if you\n"
-				"do not have access to modify that list otherwise."));
-		source.Reply(" ");
-		source.Reply(_("The \002ACCESS LIST\002 command displays the access list.  If\n"
-				"a wildcard mask is given, only those entries matching the\n"
-				"mask are displayed.  If a list of entry numbers is given,\n"
-				"only those entries are shown; for example:\n"
-				"   \002ACCESS #channel LIST 2-5,7-9\002\n"
-				"      Lists access entries numbered 2 through 5 and\n"
-				"      7 through 9.\n"
-				" \n"
-				"The \002ACCESS VIEW\002 command displays the access list similar\n"
-				"to \002ACCESS LIST\002 but shows the creator and last used time.\n"
-				" \n"
-				"The \002ACCESS CLEAR\002 command clears all entries of the\n"
-				"access list."));
-		source.Reply(" ");
+		if (subcommand.equals_ci("ADD"))
+		{
+			source.Reply(_("The \002{0} ADD\002 adds \037mask\037 to the access list of \037channel\037 at level \037level\037."
+			               " If \037mask\037 is already present on the access list, the access level for it is changed to \037level\037."
+			               " The \037level\037 may be a numerical level between \002{1}\002 and \002{2}\002 or the name of a privilege (eg. \002{3}\002)."
+			               " The privilege set granted to a given user is the union of the privileges of access entries that match the user."
+			               " Use of this command requires the \002{4}\002 privilege on \037channel\037."),
+			               source.command, ChanServ::ACCESS_INVALID + 1, ChanServ::ACCESS_FOUNDER - 1, "AUTOOP", "ACCESS_CHANGE");
 
-		BotInfo *bi;
-		Anope::string cmd;
-		if (Command::FindCommandFromService("chanserv/levels", bi, cmd))
-			source.Reply(_("\002User access levels\002 can be seen by using the\n"
-					"\002%s\002 command; type \002%s%s HELP LEVELS\002 for\n"
-					"information."), cmd.c_str(), Config->StrictPrivmsg.c_str(), bi->nick.c_str());
+			if (!Config->GetModule("chanserv")->Get<bool>("disallow_channel_access"))
+				source.Reply(_("The given \037mask\037 may also be a channel, which will use the access list from the other channel up to the given \037level\037."));
+
+			//XXX show def levels
+
+			source.Reply(_("\n"
+			               "Examples:\n"
+			               "         {command} #anope ADD Adam 9001\n"
+			               "          Adds \"Adam\" to the access list of \"#anope\" at level \"9001\".\n"
+			               "\n"
+			               "         {command} #anope ADD *!*@anope.org AUTOOP\n"
+			               "         Adds the host mask \"*!*@anope.org\" to the access list of \"#anope\" with the privilege \"AUTOOP\"."));
+		}
+		else if (subcommand.equals_ci("DEL"))
+			source.Reply(_("The \002{0} DEL\002 command removes \037mask\037 from the access list of \037channel\037."
+				       " If a list of entry numbers is given, those entries are deleted."
+			               " You may remove yourself from an access list, even if you do not have access to modify that list otherwise."
+			               " Use of this command requires the \002{1}\002 privilege on \037channel\037.\n"
+			               "\n"
+			               "Example:\n"
+			               "         {command} #anope del DukePyrolator\n"
+			               "         Removes the access of \"DukePyrolator\" from \"#anope\"."),
+			               source.command, "ACCESS_CHANGE");
+		else if (subcommand.equals_ci("LIST") || subcommand.equals_ci("VIEW"))
+			source.Reply(_("The \002{0} LIST\002 and \002{0} VIEW\002 command displays the access list of \037channel\037."
+			               " If a wildcard mask is given, only those entries matching the mask are displayed."
+			               " If a list of entry numbers is given, only those entries are shown."
+			               " \002VIEW\002 is similar to \002LIST\002 but also shows who created the access entry, and when the access entry was last used."
+			               " Use of these commands requires the \002{1}\002 privilege on \037channel\037.\n"
+			               "\n"
+			               "Example:\n"
+					"         {0} #anope LIST 2-5,7-9\n"
+					"         Lists access entries numbered 2 through 5 and 7 through 9 on #anope."),
+			                source.command, "ACCESS_LIST");
+		else if (subcommand.equals_ci("CLEAR"))
+			source.Reply(_("The \002{0} CLEAR\002 command clears the access list of \037channel\037."
+				       " Use of this command requires the \002{1}\002 privilege on \037channel\037."),
+			               source.command, "FOUNDER");
+
+		else
+		{
+			source.Reply(_("Maintains the access list for \037channel\037. The access list specifies which users are granted which privileges to the channel."
+			               " The access system uses numerical levels to represent different sets of privileges. Users who are identified but do not match any entries on"
+			               " the access list has a level of 0. Unregistered or unidentified users who do not match any entries have a user level of 0."));
+			BotInfo *bi;
+			Anope::string name;
+			CommandInfo *help = source.service->FindCommand("generic/help");
+			if (Command::FindCommandFromService("chanserv/levels", bi, name) && help)
+				source.Reply(_("\n"
+				              "Access levels can be configured via the \002{levels}\002 command. See \002{msg}{service} {help} {levels}\002 for more information."),
+				              "msg"_kw = Config->StrictPrivmsg, "service"_kw = bi->nick, "help"_kw = help->cname, "levels"_kw = name);
+
+			if (help)
+				source.Reply(_("\n"
+				               "The \002ADD\002 command adds \037mask\037 to the access list at level \037level\037.\n"
+				               "Use of this command requires the \002{change}\002 privilege on \037channel\037.\n"
+				               "\002{msg}{service} {help} {command} ADD\002 for more information.\n"
+				               "\n"
+				               "The \002DEL\002 command removes \037mask\037 from the access list.\n"
+				               "Use of this command requires the \002{change}\002 privilege on \037channel\037.\n"
+				               "\002{msg}{service} {help} {command} DEL\002 for more information.\n"
+				               "\n"
+				               "The \002LIST\002 and \002VIEW\002 commands both show the access list for \037channel\037, but \002VIEW\002 also shows who created the access entry, and when the user was last seen.\n"
+				               "Use of these commands requires the \002{list}\002 privilege on \037channel\037.\n"
+				               "\002{msg}{service} {help} {command} [LIST | VIEW]\002 for more information.\n"
+				               "\n"
+				               "The \002CLEAR\002 command clears the access list."
+				               "Use of this command requires the \002{founder}\002 privilege on \037channel\037.\n"
+				               "\002{msg}{service} {help} {command} CLEAR\002 for more information."),
+				               "msg"_kw = Config->StrictPrivmsg, "service"_kw = source.service->nick, "command"_kw = source.command,
+				               "help"_kw = help->cname, "change"_kw = "ACCESS_CHANGE", "list"_kw = "ACCESS_LIST", "founder"_kw = "FOUNDER");
+		}
+
 		return true;
 	}
 };
@@ -636,12 +679,17 @@ class CommandCSLevels : public Command
 		}
 
 		if (level <= ChanServ::ACCESS_INVALID || level > ChanServ::ACCESS_FOUNDER)
-			source.Reply(_("Level must be between %d and %d inclusive."), ChanServ::ACCESS_INVALID + 1, ChanServ::ACCESS_FOUNDER - 1);
+			source.Reply(_("Level must be between \002{0}\002 and \002{1}\002 inclusive."), ChanServ::ACCESS_INVALID + 1, ChanServ::ACCESS_FOUNDER - 1);
 		else
 		{
 			ChanServ::Privilege *p = ChanServ::service ? ChanServ::service->FindPrivilege(what) : nullptr;
 			if (p == NULL)
-				source.Reply(_("Setting \002%s\002 not known.  Type \002%s%s HELP LEVELS\002 for a list of valid settings."), what.c_str(), Config->StrictPrivmsg.c_str(), source.service->nick.c_str());
+			{
+				CommandInfo *help = source.service->FindCommand("generic/help");
+				if (help)
+					source.Reply(_("There is no such privilege \002{0}\002. See \002{0}{1} {2} {3}\002 for a list of valid settings."),
+					                what, Config->StrictPrivmsg, source.service->nick, help->cname, source.command);
+			}
 			else
 			{
 				bool override = !source.AccessFor(ci).HasPriv("FOUNDER");
@@ -651,9 +699,9 @@ class CommandCSLevels : public Command
 				this->onlevelchange(&Event::LevelChange::OnLevelChange, source, ci, p->name, level);
 
 				if (level == ChanServ::ACCESS_FOUNDER)
-					source.Reply(_("Level for %s on channel %s changed to founder only."), p->name.c_str(), ci->name.c_str());
+					source.Reply(_("Level for privilege \002{0}\002 on channel \002{1}\002 changed to \002founder only\002."), p->name, ci->name);
 				else
-					source.Reply(_("Level for \002%s\002 on channel %s changed to \002%d\002."), p->name.c_str(), ci->name.c_str(), level);
+					source.Reply(_("Level for privilege \002{0}\002 on channel \002{1}\002 changed to \002{3}\002."), p->name, ci->name, level);
 			}
 		}
 	}
@@ -678,11 +726,14 @@ class CommandCSLevels : public Command
 			ci->SetLevel(p->name, ChanServ::ACCESS_INVALID);
 			this->onlevelchange(&Event::LevelChange::OnLevelChange, source, ci, p->name, ChanServ::ACCESS_INVALID);
 
-			source.Reply(_("\002%s\002 disabled on channel %s."), p->name.c_str(), ci->name.c_str());
+			source.Reply(_("Privileged \002{0}\002 disabled on channel \002{1}\002."), p->name, ci->name);
 			return;
 		}
 
-		source.Reply(_("Setting \002%s\002 not known.  Type \002%s%s HELP LEVELS\002 for a list of valid settings."), what.c_str(), Config->StrictPrivmsg.c_str(), source.service->nick.c_str());
+		CommandInfo *help = source.service->FindCommand("generic/help");
+		if (help)
+			source.Reply(_("There is no such privilege \002{0}\002. See \002{0}{1} {2} {3}\002 for a list of valid settings."),
+			               what, Config->StrictPrivmsg, source.service->nick, help->cname, source.command);
 	}
 
 	void DoList(CommandSource &source, ChanServ::Channel *ci)
@@ -690,7 +741,7 @@ class CommandCSLevels : public Command
 		if (!ChanServ::service)
 			return;
 
-		source.Reply(_("Access level settings for channel %s:"), ci->name.c_str());
+		source.Reply(_("Access level settings for channel \002{0}\002"), ci->name);
 
 		ListFormatter list(source.GetAccount());
 		list.AddColumn(_("Name")).AddColumn(_("Level"));
@@ -730,7 +781,7 @@ class CommandCSLevels : public Command
 		reset_levels(ci);
 		this->onlevelchange(&Event::LevelChange::OnLevelChange, source, ci, "ALL", 0);
 
-		source.Reply(_("Access levels for \002%s\002 reset to defaults."), ci->name.c_str());
+		source.Reply(_("Levels for \002{0}\002 reset to defaults."), ci->name);
 	}
 
 	EventHandlers<Event::LevelChange> &onlevelchange;
@@ -739,22 +790,23 @@ class CommandCSLevels : public Command
 	CommandCSLevels(Module *creator, EventHandlers<Event::LevelChange> &event) : Command(creator, "chanserv/levels", 2, 4), onlevelchange(event)
 	{
 		this->SetDesc(_("Redefine the meanings of access levels"));
-		this->SetSyntax(_("\037channel\037 SET \037type\037 \037level\037"));
-		this->SetSyntax(_("\037channel\037 {DIS | DISABLE} \037type\037"));
+		this->SetSyntax(_("\037channel\037 SET \037privilege\037 \037level\037"));
+		this->SetSyntax(_("\037channel\037 {DIS | DISABLE} \037privilege\037"));
 		this->SetSyntax(_("\037channel\037 LIST"));
 		this->SetSyntax(_("\037channel\037 RESET"));
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
+		const Anope::string &chan = params[0];
 		const Anope::string &cmd = params[1];
 		const Anope::string &what = params.size() > 2 ? params[2] : "";
 		const Anope::string &s = params.size() > 3 ? params[3] : "";
 
-		ChanServ::Channel *ci = ChanServ::Find(params[0]);
+		ChanServ::Channel *ci = ChanServ::Find(chan);
 		if (ci == NULL)
 		{
-			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
+			source.Reply(_("Channel \002{0}\002 isn't registered."), chan);
 			return;
 		}
 
@@ -764,9 +816,9 @@ class CommandCSLevels : public Command
 		if (cmd.equals_ci("SET") ? s.empty() : (cmd.substr(0, 3).equals_ci("DIS") ? (what.empty() || !s.empty()) : !what.empty()))
 			this->OnSyntaxError(source, cmd);
 		else if (!source.AccessFor(ci).HasPriv("FOUNDER") && !source.HasPriv("chanserv/access/modify"))
-			source.Reply(ACCESS_DENIED);
+			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "FOUNDER", ci->name);	
 		else if (Anope::ReadOnly && !cmd.equals_ci("LIST"))
-			source.Reply(READ_ONLY_MODE);
+			source.Reply(_("Services are in read-only mode."));
 		else if (cmd.equals_ci("SET"))
 			this->DoSet(source, ci, params);
 		else if (cmd.equals_ci("DIS") || cmd.equals_ci("DISABLE"))
@@ -777,15 +829,13 @@ class CommandCSLevels : public Command
 			this->DoReset(source, ci);
 		else
 			this->OnSyntaxError(source, "");
-
-		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
 		if (subcommand.equals_ci("DESC"))
 		{
-			source.Reply(_("The following feature/function names are available:"));
+			source.Reply(_("The following privileges are available:"));
 
 			ListFormatter list(source.GetAccount());
 			list.AddColumn(_("Name")).AddColumn(_("Description"));
@@ -811,27 +861,27 @@ class CommandCSLevels : public Command
 		}
 		else
 		{
-			this->SendSyntax(source);
-			source.Reply(" ");
-			source.Reply(_("The \002LEVELS\002 command allows fine control over the meaning of\n"
-					"the numeric access levels used for channels.  With this\n"
-					"command, you can define the access level required for most\n"
-					"of %s's functions. (The \002SET FOUNDER\002 and this command\n"
-					"are always restricted to the channel founder.)\n"
-					" \n"
-					"\002LEVELS SET\002 allows the access level for a function or group of\n"
-					"functions to be changed. \002LEVELS DISABLE\002 (or \002DIS\002 for short)\n"
-					"disables an automatic feature or disallows access to a\n"
-					"function by anyone, INCLUDING the founder (although, the founder\n"
-					"can always reenable it). Use \002LEVELS SET founder\002 to make a level\n"
-					"founder only.\n"
-					" \n"
-					"\002LEVELS LIST\002 shows the current levels for each function or\n"
-					"group of functions. \002LEVELS RESET\002 resets the levels to the\n"
-					"default levels of a newly-created channel.\n"
-					" \n"
-					"For a list of the features and functions whose levels can be\n"
-					"set, see \002HELP LEVELS DESC\002."), source.service->nick.c_str());
+			BotInfo *bi;
+			Anope::string name;
+			if (!Command::FindCommandFromService("chanserv/access", bi, name) || bi != source.service)
+				return false;
+			CommandInfo *help = source.service->FindCommand("generic/help");
+			if (!help)
+				return false;
+
+			source.Reply(_("The \002{0}\002 command allows fine control over the meaning of numeric access levels used in the \002{1}\001 command.\n"
+			               "\n"
+			               "\002{0} SET\002 allows changing which \037privilege\037 is included in a given \037level\37.\n"
+			               "\n"
+			               "\002{0} DISABLE\002 disables a privilege and prevents anyone from be granted it, even channel founders."
+			               " The \002{2}\002 privilege can not be disabled.\n"
+			               "\n"
+			               "\002{0} LIST\002 shows the current level for each privilege.\n"
+			               "\n"
+			               "\002{0} RESET\002 resets the levels to the default levels for newly registered channels.\n"
+			               "\n"
+			               "For the list of privileges and their descriptions, see \002{3} {4} DESC\002."),
+				       source.command, name, "FOUNDER", help->cname, source.command);
 		}
 		return true;
 	}

@@ -16,13 +16,12 @@ class CommandMSCheck : public Command
  public:
 	CommandMSCheck(Module *creator) : Command(creator, "memoserv/check", 1, 1)
 	{
-		this->SetDesc(_("Checks if last memo to a nick was read"));
-		this->SetSyntax(_("\037nick\037"));
+		this->SetDesc(_("Checks if last memo to a user was read"));
+		this->SetSyntax(_("\037user\037"));
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
-
 		const Anope::string &recipient = params[0];
 
 		bool found = false;
@@ -30,16 +29,14 @@ class CommandMSCheck : public Command
 		const NickServ::Nick *na = NickServ::FindNick(recipient);
 		if (!na)
 		{
-			source.Reply(NICK_X_NOT_REGISTERED, recipient.c_str());
+			source.Reply(_("\002{0}\002 isn't registered."), recipient);
 			return;
 		}
 
 		MemoServ::MemoInfo *mi = na->nc->memos;
 
-		/* Okay, I know this looks strange but we wanna get the LAST memo, so we
-			have to loop backwards */
-
 		if (mi)
+			/* find the last memo */
 			for (unsigned i = mi->memos->size(); i > 0; --i)
 			{
 				MemoServ::Memo *m = mi->GetMemo(i - 1);
@@ -50,25 +47,20 @@ class CommandMSCheck : public Command
 					found = true; /* Yes, we've found the memo */
 
 					if (m->unread)
-						source.Reply(_("The last memo you sent to %s (sent on %s) has not yet been read."), na->nick.c_str(), Anope::strftime(m->time, source.GetAccount()).c_str());
+						source.Reply(_("The last memo you sent to \002{0}\002 (sent on \002{1}\002) has not yet been read."), na->nick, Anope::strftime(m->time, source.GetAccount()));
 					else
-						source.Reply(_("The last memo you sent to %s (sent on %s) has been read."), na->nick.c_str(), Anope::strftime(m->time, source.GetAccount()).c_str());
+						source.Reply(_("The last memo you sent to \002{0}\002 (sent on \002{1}\002) has been read."), na->nick, Anope::strftime(m->time, source.GetAccount()));
 					break;
 				}
 			}
 
 		if (!found)
-			source.Reply(_("Nick %s doesn't have a memo from you."), na->nick.c_str());
-
-		return;
+			source.Reply(_("\002{0}\002 doesn't have a memo from you."), na->nick);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("Checks whether the _last_ memo you sent to \037nick\037 has been read\n"
-				"or not. Note that this does only work with nicks, not with channels."));
+		source.Reply(_("Checks whether the last memo you sent to \037user\037 has been read or not."));
 		return true;
 	}
 };

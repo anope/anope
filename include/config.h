@@ -122,6 +122,8 @@ namespace Configuration
 		std::vector<CommandGroup> CommandGroups;
 		/* List of modules to autoload */
 		std::vector<Anope::string> ModulesAutoLoad;
+		/* After how many characters do we wrap lines? */
+		unsigned int LineWrap;
 
 		/* module configuration blocks */
 		std::map<Anope::string, Block *> modules;

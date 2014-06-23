@@ -124,6 +124,15 @@ Type::Type(const Anope::string &n, unserialize_func f, Module *o)  : name(n), un
 
 Type::~Type()
 {
+	/* null the type of existing serializable objects of this type */
+	for (std::list<Serializable *>::iterator it = Serializable::SerializableItems->begin(); it != Serializable::SerializableItems->end(); ++it)
+	{
+		Serializable *s = *it;
+
+		if (s->s_type == this)
+			s->s_type = NULL;
+	}
+
 	std::vector<Anope::string>::iterator it = std::find(TypeOrder.begin(), TypeOrder.end(), this->name);
 	if (it != TypeOrder.end())
 		TypeOrder.erase(it);

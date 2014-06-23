@@ -60,9 +60,9 @@ class CoreExport Serializable : public virtual Base
 	 * constructed before other objects are if it isn't.
 	 */
 	static std::list<Serializable *> *SerializableItems;
+	friend class Serialize::Type;
 	/* The type of item this object is */
 	Serialize::Type *s_type;
- private:
  	/* Iterator into serializable_items */
 	std::list<Serializable *>::iterator s_iter;
 	/* The hash of the last serialized form of this object commited to the database */
@@ -109,7 +109,7 @@ class CoreExport Serializable : public virtual Base
  * of class that inherits from Serialiable. Used for unserializing objects
  * of this type, as it requires a function pointer to a static member function.
  */
-class CoreExport Serialize::Type
+class CoreExport Serialize::Type : public Base
 {
 	typedef Serializable* (*unserialize_func)(Serializable *obj, Serialize::Data &);
 
@@ -188,7 +188,7 @@ class Serialize::Checker
 {
 	Anope::string name;
 	T obj;
-	mutable Serialize::Type *type;
+	mutable ::Reference<Serialize::Type> type;
 
 	inline void Check() const
 	{

@@ -115,7 +115,7 @@ class CommandCSKick : public Command
 		source.Reply(_("Kicks a specified nick from a channel.\n"
 				" \n"
 				"By default, limited to AOPs or those with level 5 access\n"
-				"and above on the channel. Channel founders may use masks too."));
+				"and above on the channel. Channel founders can also specify masks."));
 		return true;
 	}
 };

@@ -172,7 +172,7 @@ class CommandOSSeen : public Command
 		source.Reply(" ");
 		source.Reply(_("The \002STATS\002 command prints out statistics about stored nicks and memory usage."));
 		source.Reply(_("The \002CLEAR\002 command lets you clean the database by removing all entries from the\n"
-				"entries from the database that were added within \037time\037.\n"
+				"database that were added within \037time\037.\n"
 				" \n"
 				"Example:\n"
 				" %s CLEAR 30m\n"

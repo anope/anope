@@ -27,21 +27,24 @@ class CommandHSOn : public Command
 
 		User *u = source.GetUser();
 		const NickServ::Nick *na = NickServ::FindNick(u->nick);
-		if (na && u->Account() == na->nc && na->HasVhost())
+
+		if (!na || !na->HasVhost() || na->nc != u->Account())
 		{
-			if (!na->GetVhostIdent().empty())
-				source.Reply(_("Your vhost of \002{0}\002@\002{1}\002 is now activated."), na->GetVhostIdent(), na->GetVhostHost());
-			else
-				source.Reply(_("Your vhost of \002{0}\002 is now activated."), na->GetVhostHost());
-			Log(LOG_COMMAND, source, this) << "to enable their vhost of " << (!na->GetVhostIdent().empty() ? na->GetVhostIdent() + "@" : "") << na->GetVhostHost();
-			IRCD->SendVhost(u, na->GetVhostIdent(), na->GetVhostHost());
-			u->vhost = na->GetVhostHost();
-			if (IRCD->CanSetVIdent && !na->GetVhostIdent().empty())
-				u->SetVIdent(na->GetVhostIdent());
-			u->UpdateHost();
-		}
-		else
 			source.Reply(_("There is no vhost assigned to this nickname."));
+			return;
+		}
+
+		if (!na->GetVhostIdent().empty())
+			source.Reply(_("Your vhost of \002{0}\002@\002{1}\002 is now activated."), na->GetVhostIdent(), na->GetVhostHost());
+		else
+			source.Reply(_("Your vhost of \002{0}\002 is now activated."), na->GetVhostHost());
+		
+		Log(LOG_COMMAND, source, this) << "to enable their vhost of " << (!na->GetVhostIdent().empty() ? na->GetVhostIdent() + "@" : "") << na->GetVhostHost();
+		IRCD->SendVhost(u, na->GetVhostIdent(), na->GetVhostHost());
+		u->vhost = na->GetVhostHost();
+		if (IRCD->CanSetVIdent && !na->GetVhostIdent().empty())
+			u->SetVIdent(na->GetVhostIdent());
+		u->UpdateHost();
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override

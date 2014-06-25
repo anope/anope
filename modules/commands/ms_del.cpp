@@ -73,49 +73,53 @@ class CommandMSDel : public Command
 				source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "MEMO", ci->name);
 				return;
 			}
+
 			mi = ci->memos;
 		}
 		else
 			mi = source.nc->memos;
 
 		if (numstr.empty() || (!isdigit(numstr[0]) && !numstr.equals_ci("ALL") && !numstr.equals_ci("LAST")))
+		{
 			this->OnSyntaxError(source, numstr);
-		else if (!mi || mi->memos->empty())
+			return;
+		}
+
+		if (!mi || mi->memos->empty())
 		{
 			if (!chan.empty())
 				source.Reply(_("\002{0}\002 has no memos."), chan);
 			else
 				source.Reply(_("You have no memos."));
+			return;
+		}
+
+		if (isdigit(numstr[0]))
+		{
+			MemoDelCallback list(source, ci, mi, numstr);
+			list.Process();
+		}
+		else if (numstr.equals_ci("LAST"))
+		{
+			/* Delete last memo. */
+			if (MemoServ::Event::OnMemoDel)
+				MemoServ::Event::OnMemoDel(&MemoServ::Event::MemoDel::OnMemoDel, ci ? ci->name : source.nc->display, mi, mi->GetMemo(mi->memos->size() - 1));
+			mi->Del(mi->memos->size() - 1);
+			source.Reply(_("Memo \002{0}\002 has been deleted."), mi->memos->size() + 1);
 		}
 		else
 		{
-			if (isdigit(numstr[0]))
+			/* Delete all memos. */
+			for (unsigned i = mi->memos->size(); i > 0; --i)
 			{
-				MemoDelCallback list(source, ci, mi, numstr);
-				list.Process();
-			}
-			else if (numstr.equals_ci("LAST"))
-			{
-				/* Delete last memo. */
 				if (MemoServ::Event::OnMemoDel)
-					MemoServ::Event::OnMemoDel(&MemoServ::Event::MemoDel::OnMemoDel, ci ? ci->name : source.nc->display, mi, mi->GetMemo(mi->memos->size() - 1));
-				mi->Del(mi->memos->size() - 1);
-				source.Reply(_("Memo \002{0}\002 has been deleted."), mi->memos->size() + 1);
+					MemoServ::Event::OnMemoDel(&MemoServ::Event::MemoDel::OnMemoDel, ci ? ci->name : source.nc->display, mi, mi->GetMemo(i));
+				mi->Del(i - 1);
 			}
+			if (!chan.empty())
+				source.Reply(_("All memos for channel \002{0}\002 have been deleted."), chan);
 			else
-			{
-				/* Delete all memos. */
-				for (unsigned i = mi->memos->size(); i > 0; --i)
-				{
-					if (MemoServ::Event::OnMemoDel)
-						MemoServ::Event::OnMemoDel(&MemoServ::Event::MemoDel::OnMemoDel, ci ? ci->name : source.nc->display, mi, mi->GetMemo(i));
-					mi->Del(i - 1);
-				}
-				if (!chan.empty())
-					source.Reply(_("All memos for channel \002{0}\002 have been deleted."), chan);
-				else
-					source.Reply(_("All of your memos have been deleted."));
-			}
+				source.Reply(_("All of your memos have been deleted."));
 		}
 	}
 

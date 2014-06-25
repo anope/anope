@@ -418,19 +418,20 @@ class CommandCSAKick : public Command
 		}
 
 		if (list.IsEmpty())
-			source.Reply(_("No matching entries on %s autokick list."), ci->name.c_str());
-		else
 		{
-			std::vector<Anope::string> replies;
-			list.Process(replies);
-
-			source.Reply(_("Autokick list for %s:"), ci->name.c_str());
-
-			for (unsigned i = 0; i < replies.size(); ++i)
-				source.Reply(replies[i]);
-
-			source.Reply(_("End of autokick list"));
+			source.Reply(_("No matching entries on %s autokick list."), ci->name.c_str());
+			return;
 		}
+
+		std::vector<Anope::string> replies;
+		list.Process(replies);
+
+		source.Reply(_("Autokick list for %s:"), ci->name.c_str());
+
+		for (unsigned i = 0; i < replies.size(); ++i)
+			source.Reply(replies[i]);
+
+		source.Reply(_("End of autokick list"));
 	}
 
 	void DoList(CommandSource &source, ChanServ::Channel *ci, const std::vector<Anope::string> &params)

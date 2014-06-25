@@ -129,33 +129,35 @@ public:
 		{
 			LogSettings *ls = ci->Require<LogSettings>("logsettings");
 			if (!ls || (*ls)->empty())
-				source.Reply(_("There currently are no logging configurations for \002{0}\002."), ci->name);
-			else
 			{
-				ListFormatter list(source.GetAccount());
-				list.AddColumn(_("Number")).AddColumn(_("Service")).AddColumn(_("Command")).AddColumn(_("Method")).AddColumn("");
-
-				for (unsigned i = 0; i < (*ls)->size(); ++i)
-				{
-					const LogSetting *log = (*ls)->at(i);
-
-					ListFormatter::ListEntry entry;
-					entry["Number"] = stringify(i + 1);
-					entry["Service"] = log->command_service;
-					entry["Command"] = !log->command_name.empty() ? log->command_name : log->service_name;
-					entry["Method"] = log->method;
-					entry[""] = log->extra;
-					list.AddEntry(entry);
-				}
-
-				source.Reply(_("Log list for \002{0}\002:"), ci->name);
-
-				std::vector<Anope::string> replies;
-				list.Process(replies);
-
-				for (unsigned i = 0; i < replies.size(); ++i)
-					source.Reply(replies[i]);
+				source.Reply(_("There currently are no logging configurations for \002{0}\002."), ci->name);
+				return;
 			}
+
+
+			ListFormatter list(source.GetAccount());
+			list.AddColumn(_("Number")).AddColumn(_("Service")).AddColumn(_("Command")).AddColumn(_("Method")).AddColumn("");
+
+			for (unsigned i = 0; i < (*ls)->size(); ++i)
+			{
+				const LogSetting *log = (*ls)->at(i);
+
+				ListFormatter::ListEntry entry;
+				entry["Number"] = stringify(i + 1);
+				entry["Service"] = log->command_service;
+				entry["Command"] = !log->command_name.empty() ? log->command_name : log->service_name;
+				entry["Method"] = log->method;
+				entry[""] = log->extra;
+				list.AddEntry(entry);
+			}
+
+			source.Reply(_("Log list for \002{0}\002:"), ci->name);
+
+			std::vector<Anope::string> replies;
+			list.Process(replies);
+
+			for (unsigned i = 0; i < replies.size(); ++i)
+				source.Reply(replies[i]);
 		}
 		else if (params.size() > 2)
 		{

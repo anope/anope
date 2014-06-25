@@ -27,33 +27,42 @@ class CommandNSLogout : public Command
 		const Anope::string &nick = !params.empty() ? params[0] : "";
 		const Anope::string &param = params.size() > 1 ? params[1] : "";
 
-		User *u2;
 		if (!source.IsServicesOper() && !nick.empty())
-			this->OnSyntaxError(source, "");
-		else if (!(u2 = (!nick.empty() ? User::Find(nick, true) : source.GetUser())))
-			source.Reply(_("\002{0}\002 isn't currently online."), !nick.empty() ? nick : source.GetNick());
-		else if (!nick.empty() && u2->IsServicesOper())
-			source.Reply(_("You can't logout \002{0}\002, they are a Services Operator."), nick);
-		else
 		{
-			if (!nick.empty() && !param.empty() && param.equals_ci("REVALIDATE") && NickServ::service)
-				NickServ::service->Validate(u2);
-
-			u2->super_admin = false; /* Dont let people logout and remain a SuperAdmin */
-			Log(LOG_COMMAND, source, this) << "to logout " << u2->nick;
-
-			if (!nick.empty())
-				source.Reply(_("\002{0}\002 has been logged out."), nick);
-			else
-				source.Reply(_("You have been logged out."));
-
-			IRCD->SendLogout(u2);
-			u2->RemoveMode(source.service, "REGISTERED");
-			u2->Logout();
-
-			/* Send out an event */
-			Event::OnNickLogout(&Event::NickLogout::OnNickLogout, u2);
+			this->OnSyntaxError(source, "");
+			return;
 		}
+
+		User *u2 = !nick.empty() ? User::Find(nick, true) : source.GetUser();
+		if (!u2)
+		{
+			source.Reply(_("\002{0}\002 isn't currently online."), !nick.empty() ? nick : source.GetNick());
+			return;
+		}
+
+		if (!nick.empty() && u2->IsServicesOper())
+		{
+			source.Reply(_("You can't logout \002{0}\002, they are a Services Operator."), nick);
+			return;
+		}
+
+		if (!nick.empty() && !param.empty() && param.equals_ci("REVALIDATE") && NickServ::service)
+			NickServ::service->Validate(u2);
+
+		u2->super_admin = false; /* Dont let people logout and remain a SuperAdmin */
+		Log(LOG_COMMAND, source, this) << "to logout " << u2->nick;
+
+		if (!nick.empty())
+			source.Reply(_("\002{0}\002 has been logged out."), nick);
+		else
+			source.Reply(_("You have been logged out."));
+
+		IRCD->SendLogout(u2);
+		u2->RemoveMode(source.service, "REGISTERED");
+		u2->Logout();
+
+		/* Send out an event */
+		Event::OnNickLogout(&Event::NickLogout::OnNickLogout, u2);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override

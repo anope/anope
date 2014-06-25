@@ -185,23 +185,30 @@ class CommandHSActivate : public Command
 		}
 
 		const Anope::string &nick = params[0];
-
 		NickServ::Nick *na = NickServ::FindNick(nick);
-		HostRequest *req = na ? na->GetExt<HostRequest>("hostrequest") : NULL;
-		if (req)
+
+		if (!na)
 		{
-			na->SetVhost(req->ident, req->host, source.GetNick(), req->time);
-			Event::OnSetVhost(&Event::SetVhost::OnSetVhost, na);
-
-			if (Config->GetModule(this->owner)->Get<bool>("memouser") && MemoServ::service)
-				MemoServ::service->Send(source.service->nick, na->nick, _("[auto memo] Your requested vHost has been approved."), true);
-
-			source.Reply(_("Vhost for \002{0}\002 has been activated."), na->nick);
-			Log(LOG_COMMAND, source, this) << "for " << na->nick << " for vhost " << (!req->ident.empty() ? req->ident + "@" : "") << req->host;
-			na->Shrink<HostRequest>("hostrequest");
+			source.Reply(_("\002{0}\002 isn't registered."), nick);
+			return;
 		}
-		else
-			source.Reply(_("\002{0}\002 does not have a pending vhost request."), nick);
+
+		HostRequest *req = na->GetExt<HostRequest>("hostrequest");
+		if (!req)
+		{
+			source.Reply(_("\002{0}\002 does not have a pending vhost request."), na->nick);
+			return;
+		}
+
+		na->SetVhost(req->ident, req->host, source.GetNick(), req->time);
+		Event::OnSetVhost(&Event::SetVhost::OnSetVhost, na);
+
+		if (Config->GetModule(this->owner)->Get<bool>("memouser") && MemoServ::service)
+			MemoServ::service->Send(source.service->nick, na->nick, _("[auto memo] Your requested vHost has been approved."), true);
+
+		source.Reply(_("Vhost for \002{0}\002 has been activated."), na->nick);
+		Log(LOG_COMMAND, source, this) << "for " << na->nick << " for vhost " << (!req->ident.empty() ? req->ident + "@" : "") << req->host;
+		na->Shrink<HostRequest>("hostrequest");
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
@@ -235,27 +242,34 @@ class CommandHSReject : public Command
 		const Anope::string &reason = params.size() > 1 ? params[1] : "";
 
 		NickServ::Nick *na = NickServ::FindNick(nick);
-		HostRequest *req = na ? na->GetExt<HostRequest>("hostrequest") : NULL;
-		if (req)
+		if (!na)
 		{
-			na->Shrink<HostRequest>("hostrequest");
-
-			if (Config->GetModule(this->owner)->Get<bool>("memouser") && MemoServ::service)
-			{
-				Anope::string message;
-				if (!reason.empty())
-					message = Anope::printf(_("[auto memo] Your requested vHost has been rejected. Reason: %s"), reason.c_str());
-				else
-					message = _("[auto memo] Your requested vHost has been rejected.");
-
-				MemoServ::service->Send(source.service->nick, nick, Language::Translate(source.GetAccount(), message.c_str()), true);
-			}
-
-			source.Reply(_("Vhost for \002{0}\002 has been rejected."), na->nick);
-			Log(LOG_COMMAND, source, this) << "to reject vhost for " << nick << " (" << (!reason.empty() ? reason : "no reason") << ")";
+			source.Reply(_("\002{0}\002 isn't registered."), nick);
+			return;
 		}
-		else
-			source.Reply(_("\002{0}\002 does not have a pending vhost request."), nick);
+
+		HostRequest *req = na->GetExt<HostRequest>("hostrequest");
+		if (!req)
+		{
+			source.Reply(_("\002{0}\002 does not have a pending vhost request."), na->nick);
+			return;
+		}
+
+		na->Shrink<HostRequest>("hostrequest");
+
+		if (Config->GetModule(this->owner)->Get<bool>("memouser") && MemoServ::service)
+		{
+			Anope::string message;
+			if (!reason.empty())
+				message = Anope::printf(_("[auto memo] Your requested vHost has been rejected. Reason: %s"), reason.c_str());
+			else
+				message = _("[auto memo] Your requested vHost has been rejected.");
+
+			MemoServ::service->Send(source.service->nick, nick, Language::Translate(source.GetAccount(), message.c_str()), true);
+		}
+
+		source.Reply(_("Vhost for \002{0}\002 has been rejected."), na->nick);
+		Log(LOG_COMMAND, source, this) << "to reject vhost for " << nick << " (" << (!reason.empty() ? reason : "no reason") << ")";
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override

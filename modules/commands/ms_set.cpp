@@ -154,7 +154,7 @@ class CommandMSSet : public Command
 				source.Reply(_("The memo limit for \002{0}\002 may not be changed."), chan);
 				return;
 			}
-			else if (chan.empty() && nc->HasExt("MEMO_HARDMAX"))
+			if (chan.empty() && nc->HasExt("MEMO_HARDMAX"))
 			{
 				source.Reply(_("You are not permitted to change your memo limit."));
 				return;

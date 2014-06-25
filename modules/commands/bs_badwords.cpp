@@ -245,19 +245,20 @@ class CommandBSBadwords : public Command
 		}
 
 		if (list.IsEmpty())
-			source.Reply(_("No matching entries on the bad word list of \002{0}\002."), ci->name);
-		else
 		{
-			std::vector<Anope::string> replies;
-			list.Process(replies);
-
-			source.Reply(_("Bad words list for \002{0}\002:"), ci->name);
-
-			for (unsigned i = 0; i < replies.size(); ++i)
-				source.Reply(replies[i]);
-
-			source.Reply(_("End of bad words list."));
+			source.Reply(_("No matching entries on the bad word list of \002{0}\002."), ci->name);
+			return;
 		}
+
+		std::vector<Anope::string> replies;
+		list.Process(replies);
+
+		source.Reply(_("Bad words list for \002{0}\002:"), ci->name);
+
+		for (unsigned i = 0; i < replies.size(); ++i)
+			source.Reply(replies[i]);
+
+		source.Reply(_("End of bad words list."));
 	}
 
 	void DoAdd(CommandSource &source, ChanServ::Channel *ci, const Anope::string &word)

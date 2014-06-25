@@ -51,89 +51,92 @@ class CommandMSList : public Command
 			mi = source.nc->memos;
 
 		if (!param.empty() && !isdigit(param[0]) && !param.equals_ci("NEW"))
+		{
 			this->OnSyntaxError(source, param);
-		else if (!mi->memos->size())
+			return;
+		}
+
+		if (!mi->memos->size())
 		{
 			if (!chan.empty())
 				source.Reply(_("\002{0}\002 has no memos."), chan);
 			else
 				source.Reply(_("You have no memos."));
+			return;
+		}
+
+		ListFormatter list(source.GetAccount());
+
+		list.AddColumn(_("Number")).AddColumn(_("Sender")).AddColumn(_("Date/Time"));
+
+		if (!param.empty() && isdigit(param[0]))
+		{
+			class MemoListCallback : public NumberList
+			{
+				ListFormatter &list;
+				CommandSource &source;
+				const MemoServ::MemoInfo *mi;
+			 public:
+				MemoListCallback(ListFormatter &_list, CommandSource &_source, const MemoServ::MemoInfo *_mi, const Anope::string &numlist) : NumberList(numlist, false), list(_list), source(_source), mi(_mi)
+				{
+				}
+
+				void HandleNumber(unsigned number) override
+				{
+					if (!number || number > mi->memos->size())
+						return;
+
+					const MemoServ::Memo *m = mi->GetMemo(number - 1);
+
+					ListFormatter::ListEntry entry;
+					entry["Number"] = (m->unread ? "* " : "  ") + stringify(number);
+					entry["Sender"] = m->sender;
+					entry["Date/Time"] = Anope::strftime(m->time, source.GetAccount());
+					this->list.AddEntry(entry);
+				}
+			}
+			mlc(list, source, mi, param);
+			mlc.Process();
 		}
 		else
 		{
-			ListFormatter list(source.GetAccount());
-
-			list.AddColumn(_("Number")).AddColumn(_("Sender")).AddColumn(_("Date/Time"));
-
-			if (!param.empty() && isdigit(param[0]))
+			if (!param.empty())
 			{
-				class MemoListCallback : public NumberList
+				unsigned i, end;
+				for (i = 0, end = mi->memos->size(); i < end; ++i)
+					if (mi->GetMemo(i)->unread)
+						break;
+				if (i == end)
 				{
-					ListFormatter &list;
-					CommandSource &source;
-					const MemoServ::MemoInfo *mi;
-				 public:
-					MemoListCallback(ListFormatter &_list, CommandSource &_source, const MemoServ::MemoInfo *_mi, const Anope::string &numlist) : NumberList(numlist, false), list(_list), source(_source), mi(_mi)
-					{
-					}
-
-					void HandleNumber(unsigned number) override
-					{
-						if (!number || number > mi->memos->size())
-							return;
-
-						const MemoServ::Memo *m = mi->GetMemo(number - 1);
-
-						ListFormatter::ListEntry entry;
-						entry["Number"] = (m->unread ? "* " : "  ") + stringify(number);
-						entry["Sender"] = m->sender;
-						entry["Date/Time"] = Anope::strftime(m->time, source.GetAccount());
-						this->list.AddEntry(entry);
-					}
-				}
-				mlc(list, source, mi, param);
-				mlc.Process();
-			}
-			else
-			{
-				if (!param.empty())
-				{
-					unsigned i, end;
-					for (i = 0, end = mi->memos->size(); i < end; ++i)
-						if (mi->GetMemo(i)->unread)
-							break;
-					if (i == end)
-					{
-						if (!chan.empty())
-							source.Reply(_("\002{0}\002 has no new memos."), chan);
-						else
-							source.Reply(_("You have no new memos."));
-						return;
-					}
-				}
-
-				for (unsigned i = 0, end = mi->memos->size(); i < end; ++i)
-				{
-					if (!param.empty() && !mi->GetMemo(i)->unread)
-						continue;
-
-					const MemoServ::Memo *m = mi->GetMemo(i);
-
-					ListFormatter::ListEntry entry;
-					entry["Number"] = (m->unread ? "* " : "  ") + stringify(i + 1);
-					entry["Sender"] = m->sender;
-					entry["Date/Time"] = Anope::strftime(m->time, source.GetAccount());
-					list.AddEntry(entry);
+					if (!chan.empty())
+						source.Reply(_("\002{0}\002 has no new memos."), chan);
+					else
+						source.Reply(_("You have no new memos."));
+					return;
 				}
 			}
 
-			std::vector<Anope::string> replies;
-			list.Process(replies);
+			for (unsigned i = 0, end = mi->memos->size(); i < end; ++i)
+			{
+				if (!param.empty() && !mi->GetMemo(i)->unread)
+					continue;
 
-			source.Reply(_("Memos for \002{0}\002:"), ci ? ci->name.c_str() : source.GetNick().c_str());
-			for (unsigned i = 0; i < replies.size(); ++i)
-				source.Reply(replies[i]);
+				const MemoServ::Memo *m = mi->GetMemo(i);
+
+				ListFormatter::ListEntry entry;
+				entry["Number"] = (m->unread ? "* " : "  ") + stringify(i + 1);
+				entry["Sender"] = m->sender;
+				entry["Date/Time"] = Anope::strftime(m->time, source.GetAccount());
+				list.AddEntry(entry);
+			}
 		}
+
+		std::vector<Anope::string> replies;
+		list.Process(replies);
+
+		source.Reply(_("Memos for \002{0}\002:"), ci ? ci->name.c_str() : source.GetNick().c_str());
+		for (unsigned i = 0; i < replies.size(); ++i)
+			source.Reply(replies[i]);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override

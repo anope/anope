@@ -76,7 +76,7 @@ class CommandBSBot : public Command
 		NickServ::Nick *na = NickServ::FindNick(nick);
 		if (na)
 		{
-			source.Reply(_("Nickname \002{0}\002 is already registered!"), na->nick);
+			source.Reply(_("\002{0}\002 is already registered!"), na->nick);
 			return;
 		}
 
@@ -188,7 +188,7 @@ class CommandBSBot : public Command
 			NickServ::Nick *na = NickServ::FindNick(nick);
 			if (na)
 			{
-				source.Reply(_("Nickname \002{0}\002 is already registered."), na->nick);
+				source.Reply(_("\002{0}\002 is already registered."), na->nick);
 				return;
 			}
 

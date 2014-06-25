@@ -28,32 +28,33 @@ class NSIdentifyRequestListener : public NickServ::IdentifyRequestListener
 		NickServ::Nick *na = NickServ::FindNick(req->GetAccount());
 
 		if (!na)
-			source.Reply(_("\002{0}\002 isn't registered."), req->GetAccount());
-		else
 		{
-			if (u->IsIdentified())
-				Log(LOG_COMMAND, source, cmd) << "to log out of account " << u->Account()->display;
-
-			Log(LOG_COMMAND, source, cmd) << "and identified for account " << na->nc->display;
-			source.Reply(_("Password accepted - you are now recognized as \002{0}\002."), na->nc->display);
-			u->Identify(na);
+			source.Reply(_("\002{0}\002 isn't registered."), req->GetAccount());
+			return;
 		}
+
+		if (u->IsIdentified())
+			Log(LOG_COMMAND, source, cmd) << "to log out of account " << u->Account()->display;
+
+		Log(LOG_COMMAND, source, cmd) << "and identified for account " << na->nc->display;
+		source.Reply(_("Password accepted - you are now recognized as \002{0}\002."), na->nc->display);
+		u->Identify(na);
 	}
 
 	void OnFail(NickServ::IdentifyRequest *req) override
 	{
-		if (source.GetUser())
+		if (!source.GetUser())
+			return;
+
+		bool accountexists = NickServ::FindNick(req->GetAccount()) != NULL;
+		Log(LOG_COMMAND, source, cmd) << "and failed to identify to" << (accountexists ? " " : " nonexistent ") << "account " << req->GetAccount();
+		if (accountexists)
 		{
-			bool accountexists = NickServ::FindNick(req->GetAccount()) != NULL;
-			Log(LOG_COMMAND, source, cmd) << "and failed to identify to" << (accountexists ? " " : " nonexistent ") << "account " << req->GetAccount();
-			if (accountexists)
-			{
-				source.Reply(_("Password incorrect."));
-				source.GetUser()->BadPassword();
-			}
-			else
-				source.Reply("\002{0}\002 isn't registered.", req->GetAccount());
+			source.Reply(_("Password incorrect."));
+			source.GetUser()->BadPassword();
 		}
+		else
+			source.Reply("\002{0}\002 isn't registered.", req->GetAccount());
 	}
 };
 
@@ -77,15 +78,20 @@ class CommandNSIdentify : public Command
 
 		NickServ::Nick *na = NickServ::FindNick(nick);
 		if (na && na->nc->HasExt("NS_SUSPENDED"))
-			source.Reply(_("\002{0}\002 is suspended."), na->nick);
-		else if (u->Account() && na && u->Account() == na->nc)
-			source.Reply(_("You are already identified."));
-		else
 		{
-			NickServ::IdentifyRequest *req = NickServ::service->CreateIdentifyRequest(new NSIdentifyRequestListener(source, this), owner, na ? na->nc->display : nick, pass);
-			Event::OnCheckAuthentication(&Event::CheckAuthentication::OnCheckAuthentication, u, req);
-			req->Dispatch();
+			source.Reply(_("\002{0}\002 is suspended."), na->nick);
+			return;
 		}
+
+		if (u->Account() && na && u->Account() == na->nc)
+		{
+			source.Reply(_("You are already identified."));
+			return;
+		}
+
+		NickServ::IdentifyRequest *req = NickServ::service->CreateIdentifyRequest(new NSIdentifyRequestListener(source, this), owner, na ? na->nc->display : nick, pass);
+		Event::OnCheckAuthentication(&Event::CheckAuthentication::OnCheckAuthentication, u, req);
+		req->Dispatch();
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override

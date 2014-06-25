@@ -92,30 +92,32 @@ class CommandNSAJoin : public Command
 	{
 		AJoinList *channels = nc->Require<AJoinList>("ajoinlist");
 
-		if ((*channels)->empty())
-			source.Reply(_("The auto join list of \002{0}\002 is empty."), nc->display);
-		else
+		if ((*channels)->empty())\
 		{
-			ListFormatter list(source.GetAccount());
-			list.AddColumn(_("Number")).AddColumn(_("Channel")).AddColumn(_("Key"));
-			for (unsigned i = 0; i < (*channels)->size(); ++i)
-			{
-				AJoinEntry *aj = (*channels)->at(i);
-				ListFormatter::ListEntry entry;
-				entry["Number"] = stringify(i + 1);
-				entry["Channel"] = aj->channel;
-				entry["Key"] = aj->key;
-				list.AddEntry(entry);
-			}
-
-			source.Reply(_("Auto join list of \002{0}\002:"), nc->display);
-
-			std::vector<Anope::string> replies;
-			list.Process(replies);
-
-			for (unsigned i = 0; i < replies.size(); ++i)
-				source.Reply(replies[i]);
+			source.Reply(_("The auto join list of \002{0}\002 is empty."), nc->display);
+			return;
 		}
+
+
+		ListFormatter list(source.GetAccount());
+		list.AddColumn(_("Number")).AddColumn(_("Channel")).AddColumn(_("Key"));
+		for (unsigned i = 0; i < (*channels)->size(); ++i)
+		{
+			AJoinEntry *aj = (*channels)->at(i);
+			ListFormatter::ListEntry entry;
+			entry["Number"] = stringify(i + 1);
+			entry["Channel"] = aj->channel;
+			entry["Key"] = aj->key;
+			list.AddEntry(entry);
+		}
+
+		source.Reply(_("Auto join list of \002{0}\002:"), nc->display);
+
+		std::vector<Anope::string> replies;
+		list.Process(replies);
+
+		for (unsigned i = 0; i < replies.size(); ++i)
+			source.Reply(replies[i]);
 	}
 
 	void DoAdd(CommandSource &source, NickServ::Account *nc, const Anope::string &chans, const Anope::string &keys)

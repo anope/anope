@@ -133,12 +133,12 @@ class CoreExport Command : public Service
 
 	void ClearSyntax();
 	void SetSyntax(const Anope::string &s);
-	void SendSyntax(CommandSource &);
 
 	void AllowUnregistered(bool b);
 	void RequireUser(bool b);
 
  public:
+	void SendSyntax(CommandSource &);
 	bool AllowUnregistered() const;
 	bool RequireUser() const;
 

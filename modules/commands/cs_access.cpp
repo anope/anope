@@ -437,20 +437,20 @@ class CommandCSAccess : public Command
 		}
 
 		if (list.IsEmpty())
-			source.Reply(_("No matching entries on the access list of \002{0}\002."), ci->name);
-		else
 		{
-			std::vector<Anope::string> replies;
-			list.Process(replies);
-
-			source.Reply(_("Access list for \002{0}\002:"), ci->name);
-
-			for (unsigned i = 0; i < replies.size(); ++i)
-				source.Reply(replies[i]);
-
-			source.Reply(_("End of access list"));
+			source.Reply(_("No matching entries on the access list of \002{0}\002."), ci->name);
+			return;
 		}
 
+		std::vector<Anope::string> replies;
+		list.Process(replies);
+
+		source.Reply(_("Access list for \002{0}\002:"), ci->name);
+
+		for (unsigned i = 0; i < replies.size(); ++i)
+			source.Reply(replies[i]);
+
+		source.Reply(_("End of access list."));
 	}
 
 	void DoList(CommandSource &source, ChanServ::Channel *ci, const std::vector<Anope::string> &params)
@@ -546,12 +546,24 @@ class CommandCSAccess : public Command
 		 * If DEL, we require a nick and no level.
 		 * Else (ADD), we require a level (which implies a nick). */
 		if (is_list || is_clear ? 0 : (cmd.equals_ci("DEL") ? (nick.empty() || !s.empty()) : s.empty()))
+		{
 			this->OnSyntaxError(source, cmd);
-		else if (!has_access)
+			return;
+		}
+
+		if (!has_access)
+		{
 			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), is_list ? "ACCESS_LIST" : "ACCESS_CHANGE", ci->name);
-		else if (Anope::ReadOnly && !is_list)
+			return;
+		}
+
+		if (Anope::ReadOnly && !is_list)
+		{
 			source.Reply(_("Sorry, channel access list modification is temporarily disabled."));
-		else if (cmd.equals_ci("ADD"))
+			return;
+		}
+
+		if (cmd.equals_ci("ADD"))
 			this->DoAdd(source, ci, params);
 		else if (cmd.equals_ci("DEL"))
 			this->DoDel(source, ci, params);
@@ -813,12 +825,24 @@ class CommandCSLevels : public Command
 		 * one; else, we want none.
 		 */
 		if (cmd.equals_ci("SET") ? s.empty() : (cmd.substr(0, 3).equals_ci("DIS") ? (what.empty() || !s.empty()) : !what.empty()))
+		{
 			this->OnSyntaxError(source, cmd);
-		else if (!source.AccessFor(ci).HasPriv("FOUNDER") && !source.HasPriv("chanserv/access/modify"))
+			return;
+		}
+
+		if (!source.AccessFor(ci).HasPriv("FOUNDER") && !source.HasPriv("chanserv/access/modify"))
+		{
 			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "FOUNDER", ci->name);	
-		else if (Anope::ReadOnly && !cmd.equals_ci("LIST"))
+			return;
+		}
+
+		if (Anope::ReadOnly && !cmd.equals_ci("LIST"))
+		{
 			source.Reply(_("Services are in read-only mode."));
-		else if (cmd.equals_ci("SET"))
+			return;
+		}
+
+		if (cmd.equals_ci("SET"))
 			this->DoSet(source, ci, params);
 		else if (cmd.equals_ci("DIS") || cmd.equals_ci("DISABLE"))
 			this->DoDisable(source, ci, params);

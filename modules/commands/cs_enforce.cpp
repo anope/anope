@@ -235,12 +235,24 @@ class CommandCSEnforce : public Command
 		ChanServ::Channel *ci = ChanServ::Find(params[0]);
 
 		if (!ci)
+		{
 			source.Reply(_("Channel \002{0}\002 isn't registered."), params[0]);
-		else if (!ci->c)
+			return;
+		}
+
+		if (!ci->c)
+		{
 			source.Reply(_("Channel \002{0}\002 doesn't exist."), ci->name);
-		else if (!source.AccessFor(ci).HasPriv("AKICK") && !source.HasPriv("chanserv/access/modify"))
+			return;
+		}
+
+		if (!source.AccessFor(ci).HasPriv("AKICK") && !source.HasPriv("chanserv/access/modify"))
+		{
 			source.Reply("Access denied. You do not have the \002{0}\002 privilege on \002{1}\002.", "AKICK", ci->name);
-		else if (what.equals_ci("SECUREOPS"))
+			return;
+		}
+
+		if (what.equals_ci("SECUREOPS"))
 			this->DoSecureOps(source, ci);
 		else if (what.equals_ci("RESTRICTED"))
 			this->DoRestricted(source, ci);

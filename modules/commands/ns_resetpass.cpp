@@ -25,19 +25,24 @@ class CommandNSResetPass : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
-		const NickServ::Nick *na;
+		const NickServ::Nick *na = NickServ::FindNick(params[0]);
 
-		if (!(na = NickServ::FindNick(params[0])))
-			source.Reply(_("\002{0}\002 isn't registered."), params[0]);
-		else if (!na->nc->email.equals_ci(params[1]))
-			source.Reply(_("Incorrect email address."));
-		else
+		if (!na)
 		{
-			if (SendResetEmail(source.GetUser(), na, source.service))
-			{
-				Log(LOG_COMMAND, source, this) << "for " << na->nick << " (group: " << na->nc->display << ")";
-				source.Reply(_("Password reset email for \002{0}\002 has been sent."), na->nick);
-			}
+			source.Reply(_("\002{0}\002 isn't registered."), params[0]);
+			return;
+		}
+
+		if (!na->nc->email.equals_ci(params[1]))
+		{
+			source.Reply(_("Incorrect email address."));
+			return;
+		}
+
+		if (SendResetEmail(source.GetUser(), na, source.service))
+		{
+			Log(LOG_COMMAND, source, this) << "for " << na->nick << " (group: " << na->nc->display << ")";
+			source.Reply(_("Password reset email for \002{0}\002 has been sent."), na->nick);
 		}
 	}
 

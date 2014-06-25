@@ -24,66 +24,97 @@ class CommandCSRegister : public Command
 	{
 		const Anope::string &chan = params[0];
 		const Anope::string &chdesc = params.size() > 1 ? params[1] : "";
-		unsigned maxregistered = Config->GetModule("chanserv")->Get<unsigned>("maxregistered");
 
 		User *u = source.GetUser();
 		NickServ::Account *nc = source.nc;
-		Channel *c = Channel::Find(params[0]);
-		ChanServ::Channel *ci = ChanServ::Find(params[0]);
 
 		if (Anope::ReadOnly)
+		{
 			source.Reply(_("Sorry, channel registration is temporarily disabled."));
-		else if (nc->HasExt("UNCONFIRMED"))
+			return;
+		}
+
+		if (nc->HasExt("UNCONFIRMED"))
+		{
 			source.Reply(_("You must confirm your account before you can register a channel."));
-		else if (chan[0] == '&')
+			return;
+		}
+
+		if (chan[0] == '&')
+		{
 			source.Reply(_("Local channels can not be registered."));
-		else if (chan[0] != '#')
+			return;
+		}
+
+		if (chan[0] != '#')
+		{
 			source.Reply(_("Please use the symbol of \002#\002 when attempting to register."));
-		else if (!IRCD->IsChannelValid(chan))
+			return;
+		}
+
+		if (!IRCD->IsChannelValid(chan))
+		{
 			source.Reply(_("Channel \002{0}\002 is not a valid channel."), chan);
-		else if (!c && u)
+			return;
+		}
+
+		Channel *c = Channel::Find(params[0]);
+		if (!c && u)
+		{
 			source.Reply(_("Channel \002{0}\002 doesn't exist."), chan);
-		else if (ci)
-			source.Reply(_("Channel \002%s\002 is already registered!"), chan.c_str());
-		else if (c && !c->HasUserStatus(u, "OP"))
+			return;
+		}
+
+		ChanServ::Channel *ci = ChanServ::Find(chan);
+		if (ci)
+		{
+			source.Reply(_("Channel \002{0}\002 is already registered!"), chan);
+			return;
+		}
+
+		if (c && !c->HasUserStatus(u, "OP"))
+		{
 			source.Reply(_("You must be a channel operator to register the channel."));
-		else if (maxregistered && nc->channelcount >= maxregistered && !source.HasPriv("chanserv/no-register-limit"))
+			return;
+		}
+
+		unsigned maxregistered = Config->GetModule("chanserv")->Get<unsigned>("maxregistered");
+		if (maxregistered && nc->channelcount >= maxregistered && !source.HasPriv("chanserv/no-register-limit"))
 		{
 			if (nc->channelcount > maxregistered)
 				source.Reply(_("Sorry, you have already exceeded your limit of \002{0}\002 channels."), maxregistered);
 			else
 				source.Reply(_("Sorry, you have already reached your limit of \002{0}\002 channels."), maxregistered);
+			return;
+		}
+
+		if (!ChanServ::service)
+			return;
+		ci = ChanServ::service->Create(chan);
+		ci->SetFounder(nc);
+		ci->desc = chdesc;
+
+		if (c && !c->topic.empty())
+		{
+			ci->last_topic = c->topic;
+			ci->last_topic_setter = c->topic_setter;
+			ci->last_topic_time = c->topic_time;
 		}
 		else
+			ci->last_topic_setter = source.service->nick;
+
+		Log(LOG_COMMAND, source, this, ci);
+		source.Reply(_("Channel \002{0}\002 registered under your account: \002{1}\002"), chan, nc->display);
+
+		/* Implement new mode lock */
+		if (c)
 		{
-			if (!ChanServ::service)
-				return;
-			ci = ChanServ::service->Create(chan);
-			ci->SetFounder(nc);
-			ci->desc = chdesc;
-
-			if (c && !c->topic.empty())
-			{
-				ci->last_topic = c->topic;
-				ci->last_topic_setter = c->topic_setter;
-				ci->last_topic_time = c->topic_time;
-			}
-			else
-				ci->last_topic_setter = source.service->nick;
-
-			Log(LOG_COMMAND, source, this, ci);
-			source.Reply(_("Channel \002{0}\002 registered under your account: \002{1}\002"), chan, nc->display);
-
-			/* Implement new mode lock */
-			if (c)
-			{
-				c->CheckModes();
-				if (u)
-					c->SetCorrectModes(u, true);
-			}
-
-			Event::OnChanRegistered(&Event::ChanRegistered::OnChanRegistered, ci);
+			c->CheckModes();
+			if (u)
+				c->SetCorrectModes(u, true);
 		}
+
+		Event::OnChanRegistered(&Event::ChanRegistered::OnChanRegistered, ci);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override

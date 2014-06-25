@@ -32,45 +32,49 @@ class CommandNSConfirm : public Command
 		{
 			NickServ::Nick *na = NickServ::FindNick(passcode);
 			if (na == NULL)
-				source.Reply(_("\002{0}\002 isn't registered."), passcode);
-			else if (na->nc->HasExt("UNCONFIRMED") == false)
-				source.Reply(_("\002{0}\002 is already confirmed."), na->nick);
-			else
 			{
-				na->nc->Shrink<bool>("UNCONFIRMED");
-				Log(LOG_ADMIN, source, this) << "to confirm nick " << na->nick << " (" << na->nc->display << ")";
-				source.Reply(_("\002{0}\002 has been confirmed."), na->nick);
+				source.Reply(_("\002{0}\002 isn't registered."), passcode);
+				return;
 			}
+
+			if (na->nc->HasExt("UNCONFIRMED") == false)
+			{
+				source.Reply(_("\002{0}\002 is already confirmed."), na->nick);
+				return;
+			}
+
+			na->nc->Shrink<bool>("UNCONFIRMED");
+			Log(LOG_ADMIN, source, this) << "to confirm nick " << na->nick << " (" << na->nc->display << ")";
+			source.Reply(_("\002{0}\002 has been confirmed."), na->nick);
 		}
 		else if (source.nc)
 		{
 			Anope::string *code = source.nc->GetExt<Anope::string>("passcode");
-			if (code != NULL && *code == passcode)
+			if (code == nullptr || *code != passcode)
 			{
-				NickServ::Account *nc = source.nc;
-				nc->Shrink<Anope::string>("passcode");
-				Log(LOG_COMMAND, source, this) << "to confirm their email";
-				source.Reply(_("Your email address of \002{0}\002 has been confirmed."), source.nc->email);
-				nc->Shrink<bool>("UNCONFIRMED");
+				source.Reply(_("Invalid passcode."));
+				return;
+			}
 
-				if (source.GetUser())
+			NickServ::Account *nc = source.nc;
+			nc->Shrink<Anope::string>("passcode");
+			Log(LOG_COMMAND, source, this) << "to confirm their email";
+			source.Reply(_("Your email address of \002{0}\002 has been confirmed."), source.nc->email);
+			nc->Shrink<bool>("UNCONFIRMED");
+
+			if (source.GetUser())
+			{
+				NickServ::Nick *na = NickServ::FindNick(source.GetNick());
+				if (na)
 				{
-					NickServ::Nick *na = NickServ::FindNick(source.GetNick());
-					if (na)
-					{
-						IRCD->SendLogin(source.GetUser(), na);
-						if (!Config->GetModule("nickserv")->Get<bool>("nonicknameownership") && na->nc == source.GetAccount() && !na->nc->HasExt("UNCONFIRMED"))
-							source.GetUser()->SetMode(source.service, "REGISTERED");
-					}
+					IRCD->SendLogin(source.GetUser(), na);
+					if (!Config->GetModule("nickserv")->Get<bool>("nonicknameownership") && na->nc == source.GetAccount() && !na->nc->HasExt("UNCONFIRMED"))
+						source.GetUser()->SetMode(source.service, "REGISTERED");
 				}
 			}
-			else
-				source.Reply(_("Invalid passcode."));
 		}
 		else
 			source.Reply(_("Invalid passcode."));
-
-		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
@@ -125,7 +129,7 @@ class CommandNSRegister : public Command
 		time_t reg_delay = Config->GetModule("nickserv")->Get<time_t>("regdelay");
 		if (u && !u->HasMode("OPER") && nickregdelay && Anope::CurTime - u->timestamp < nickregdelay)
 		{
-			source.Reply(_("You must have been using this nick for at least %d seconds to register."), nickregdelay);
+			source.Reply(_("You must have been using this nickname for at least {0} seconds to register."), nickregdelay);
 			return;
 		}
 
@@ -160,67 +164,88 @@ class CommandNSRegister : public Command
 			}
 
 		if (Config->GetModule("nickserv")->Get<bool>("forceemail", "yes") && email.empty())
+		{
 			this->OnSyntaxError(source, "");
-		else if (u && Anope::CurTime < u->lastnickreg + reg_delay)
+			return;
+		}
+
+		if (u && Anope::CurTime < u->lastnickreg + reg_delay)
+		{
 			source.Reply(_("Please wait \002{0}\002 seconds before using the {1} command again."), (u->lastnickreg + reg_delay) - Anope::CurTime, source.command);
-		else if (NickServ::FindNick(u_nick) != NULL)
+			return;
+		}
+
+		if (NickServ::FindNick(u_nick) != NULL)
+		{
 			source.Reply(_("\002{0}\002 is already registered."), u_nick);
-		else if (pass.equals_ci(u_nick) || (Config->GetBlock("options")->Get<bool>("strictpasswords") && pass.length() < 5))
+			return;
+		}
+
+		if (pass.equals_ci(u_nick) || (Config->GetBlock("options")->Get<bool>("strictpasswords") && pass.length() < 5))
+		{
 			source.Reply(_("Please try again with a more obscure password. Passwords should be at least five characters long, should not be something easily guessed"
 			               " (e.g. your real name or your nickname), and cannot contain the space or tab characters."));
-		else if (pass.length() > Config->GetModule("nickserv")->Get<unsigned>("passlen", "32"))
-			source.Reply(_("Your password is too long, it can not contain more than \002{0}\002 characters."), Config->GetModule("nickserv")->Get<unsigned>("passlen", "32"));
-		else if (!email.empty() && !Mail::Validate(email))
-			source.Reply(_("\002{0}\002 is not a valid e-mail address."), email);
-		else
+			return;
+		}
+
+		if (pass.length() > Config->GetModule("nickserv")->Get<unsigned>("passlen", "32"))
 		{
-			NickServ::Account *nc = NickServ::service->CreateAccount(u_nick);
-			NickServ::Nick *na = NickServ::service->CreateNick(u_nick, nc);
-			Anope::Encrypt(pass, nc->pass);
+			source.Reply(_("Your password is too long, it can not contain more than \002{0}\002 characters."), Config->GetModule("nickserv")->Get<unsigned>("passlen", "32"));
+			return;
+		}
+
+		if (!email.empty() && !Mail::Validate(email))
+		{
+			source.Reply(_("\002{0}\002 is not a valid e-mail address."), email);
+			return;
+		}
+
+		NickServ::Account *nc = NickServ::service->CreateAccount(u_nick);
+		NickServ::Nick *na = NickServ::service->CreateNick(u_nick, nc);
+		Anope::Encrypt(pass, nc->pass);
+		if (!email.empty())
+			nc->email = email;
+
+		if (u)
+		{
+			na->last_usermask = u->GetIdent() + "@" + u->GetDisplayedHost();
+			na->last_realname = u->realname;
+		}
+		else
+			na->last_realname = source.GetNick();
+
+		Log(LOG_COMMAND, source, this) << "to register " << na->nick << " (email: " << (!na->nc->email.empty() ? na->nc->email : "none") << ")";
+
+		if (NickServ::Event::OnNickRegister)
+			NickServ::Event::OnNickRegister(&NickServ::Event::NickRegister::OnNickRegister, source.GetUser(), na, pass);
+
+		if (na->nc->GetAccessCount())
+			source.Reply(_("\002{0}\002 has been registered under your hostmask: \002{1}\002"), u_nick, na->nc->GetAccess(0));
+		else
+			source.Reply(_("\002{0}\002 has been registered."), u_nick);
+
+		Anope::string tmp_pass;
+		if (Anope::Decrypt(na->nc->pass, tmp_pass) == 1)
+			source.Reply(_("Your password is \002{0}\002 - remember this for later use."), tmp_pass);
+
+		if (nsregister.equals_ci("admin"))
+		{
+			nc->Extend<bool>("UNCONFIRMED");
+			// User::Identify() called below will notify the user that their registration is pending
+		}
+		else if (nsregister.equals_ci("mail"))
+		{
 			if (!email.empty())
-				nc->email = email;
-
-			if (u)
-			{
-				na->last_usermask = u->GetIdent() + "@" + u->GetDisplayedHost();
-				na->last_realname = u->realname;
-			}
-			else
-				na->last_realname = source.GetNick();
-
-			Log(LOG_COMMAND, source, this) << "to register " << na->nick << " (email: " << (!na->nc->email.empty() ? na->nc->email : "none") << ")";
-
-			if (NickServ::Event::OnNickRegister)
-				NickServ::Event::OnNickRegister(&NickServ::Event::NickRegister::OnNickRegister, source.GetUser(), na, pass);
-
-			if (na->nc->GetAccessCount())
-				source.Reply(_("\002{0}\002 has been registered under your hostmask: \002{1}\002"), u_nick, na->nc->GetAccess(0));
-			else
-				source.Reply(_("\002{0}\002 has been registered."), u_nick);
-
-			Anope::string tmp_pass;
-			if (Anope::Decrypt(na->nc->pass, tmp_pass) == 1)
-				source.Reply(_("Your password is \002{0}\002 - remember this for later use."), tmp_pass);
-
-			if (nsregister.equals_ci("admin"))
 			{
 				nc->Extend<bool>("UNCONFIRMED");
-				// User::Identify() called below will notify the user that their registration is pending
+				SendRegmail(NULL, na, source.service);
 			}
-			else if (nsregister.equals_ci("mail"))
-			{
-				if (!email.empty())
-				{
-					nc->Extend<bool>("UNCONFIRMED");
-					SendRegmail(NULL, na, source.service);
-				}
-			}
+		}
 
-			if (u)
-			{
-				u->Identify(na);
-				u->lastnickreg = Anope::CurTime;
-			}
+		if (u)
+		{
+			u->Identify(na);
+			u->lastnickreg = Anope::CurTime;
 		}
 	}
 
@@ -267,22 +292,32 @@ class CommandNSResend : public Command
 		const NickServ::Nick *na = NickServ::FindNick(source.GetNick());
 
 		if (na == NULL)
-			source.Reply(_("Your nickname isn't registered."));
-		else if (na->nc != source.GetAccount() || !source.nc->HasExt("UNCONFIRMED"))
-			source.Reply(_("Your account is already confirmed."));
-		else
 		{
-			if (Anope::CurTime < source.nc->lastmail + Config->GetModule(this->owner)->Get<time_t>("resenddelay"))
-				source.Reply(_("Cannot send mail now; please retry a little later."));
-			else if (SendRegmail(source.GetUser(), na, source.service))
-			{
-				na->nc->lastmail = Anope::CurTime;
-				source.Reply(_("Your passcode has been re-sent to \002{0}\002."), na->nc->email);
-				Log(LOG_COMMAND, source, this) << "to resend registration verification code";
-			}
-			else
-				Log(this->owner) << "Unable to resend registration verification code for " << source.GetNick();
+			source.Reply(_("Your nickname isn't registered."));
+			return;
 		}
+
+		if (na->nc != source.GetAccount() || !source.nc->HasExt("UNCONFIRMED"))
+		{
+			source.Reply(_("Your account is already confirmed."));
+			return;
+		}
+
+		if (Anope::CurTime < source.nc->lastmail + Config->GetModule(this->owner)->Get<time_t>("resenddelay"))
+		{
+			source.Reply(_("Cannot send mail now; please retry a little later."));
+			return;
+		}
+
+		if (!SendRegmail(source.GetUser(), na, source.service))
+		{
+			Log(this->owner) << "Unable to resend registration verification code for " << source.GetNick();
+			return;
+		}
+
+		na->nc->lastmail = Anope::CurTime;
+		source.Reply(_("Your passcode has been re-sent to \002{0}\002."), na->nc->email);
+		Log(LOG_COMMAND, source, this) << "to resend registration verification code";
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override

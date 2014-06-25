@@ -43,18 +43,23 @@ class CommandNSDrop : public Command
 		bool is_mine = source.GetAccount() == na->nc;
 
 		if (!is_mine && !source.HasPriv("nickserv/drop"))
-			source.Reply(_("Access denied. You do not have the correct operator privileges to drop other user's nicknames."));
-		else if (Config->GetModule("nickserv")->Get<bool>("secureadmins", "yes") && !is_mine && na->nc->IsServicesOper())
-			source.Reply(_("You may not drop other Services Operators' nicknames."));
-		else
 		{
-			this->onnickdrop(&Event::NickDrop::OnNickDrop, source, na);
-
-			Log(!is_mine ? LOG_ADMIN : LOG_COMMAND, source, this) << "to drop nickname " << na->nick << " (group: " << na->nc->display << ") (email: " << (!na->nc->email.empty() ? na->nc->email : "none") << ")";
-			delete na;
-
-			source.Reply(_("\002{0}\002 has been dropped."), nick);
+			source.Reply(_("Access denied. You do not have the correct operator privileges to drop other user's nicknames."));
+			return;
 		}
+
+		if (Config->GetModule("nickserv")->Get<bool>("secureadmins", "yes") && !is_mine && na->nc->IsServicesOper())
+		{
+			source.Reply(_("You may not drop other Services Operators' nicknames."));
+			return;
+		}
+
+		this->onnickdrop(&Event::NickDrop::OnNickDrop, source, na);
+
+		Log(!is_mine ? LOG_ADMIN : LOG_COMMAND, source, this) << "to drop nickname " << na->nick << " (group: " << na->nc->display << ") (email: " << (!na->nc->email.empty() ? na->nc->email : "none") << ")";
+		delete na;
+
+		source.Reply(_("\002{0}\002 has been dropped."), nick);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override

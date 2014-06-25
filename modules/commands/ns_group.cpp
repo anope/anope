@@ -130,55 +130,84 @@ class CommandNSGroup : public Command
 		time_t reg_delay = Config->GetModule("nickserv")->Get<time_t>("regdelay");
 		unsigned maxaliases = Config->GetModule(this->owner)->Get<unsigned>("maxaliases");
 		if (!(target = NickServ::FindNick(nick)))
+		{
 			source.Reply(_("\002{0}\002 isn't registered."), nick);
-		else if (Anope::CurTime < u->lastnickreg + reg_delay)
+			return;
+		}
+
+		if (Anope::CurTime < u->lastnickreg + reg_delay)
+		{
 			source.Reply(_("Please wait \002{0}\002 seconds before using the \002{1}\002 command again."), (reg_delay + u->lastnickreg) - Anope::CurTime, source.command);
-		else if (target->nc->HasExt("NS_SUSPENDED"))
+			return;
+		}
+
+		if (target->nc->HasExt("NS_SUSPENDED"))
 		{
 			Log(LOG_COMMAND, source, this) << "and tried to group to suspended nick " << target->nick;
 			source.Reply(_("\002{0}\002 is suspended."), target->nick);
+			return;
 		}
-		else if (na && Config->GetModule(this->owner)->Get<bool>("nogroupchange"))
+
+		if (na && Config->GetModule(this->owner)->Get<bool>("nogroupchange"))
+		{
 			source.Reply(_("Your nick is already registered."));
-		else if (na && *target->nc == *na->nc)
+			return;
+		}
+
+		if (na && *target->nc == *na->nc)
+		{
 			source.Reply(_("You are already a member of the group of \002{0}\002."), target->nick);
-		else if (na && na->nc != u->Account())
+			return;
+		}
+
+		if (na && na->nc != u->Account())
+		{
 			source.Reply(_("\002{0}\002 is already registered."), na->nick);
-		else if (na && Config->GetModule(this->owner)->Get<bool>("nogroupchange"))
+			return;
+		}
+
+		if (na && Config->GetModule(this->owner)->Get<bool>("nogroupchange"))
+		{
 			source.Reply(_("You are already registered."));
-		else if (maxaliases && target->nc->aliases->size() >= maxaliases && !target->nc->IsServicesOper())
+			return;
+		}
+
+		if (maxaliases && target->nc->aliases->size() >= maxaliases && !target->nc->IsServicesOper())
+		{
 			source.Reply(_("There are too many nicknames in your group."));
-		else if (u->nick.length() <= guestnick.length() + 7 &&
+			return;
+		}
+
+		if (u->nick.length() <= guestnick.length() + 7 &&
 			u->nick.length() >= guestnick.length() + 1 &&
 			!u->nick.find_ci(guestnick) && !u->nick.substr(guestnick.length()).find_first_not_of("1234567890"))
 		{
 			source.Reply(_("\002{0}\002 may not be registered."), u->nick);
+			return;
+		}
+
+		bool ok = false;
+		if (!na && u->Account() == target->nc)
+			ok = true;
+
+		NSCertList *cl = target->nc->GetExt<NSCertList>("certificates");
+		if (!u->fingerprint.empty() && cl && cl->FindCert(u->fingerprint))
+			ok = true;
+
+		if (ok == false && !pass.empty())
+		{
+			NickServ::IdentifyRequest *req = NickServ::service->CreateIdentifyRequest(new NSGroupRequestListener(onnickgroup, source, this, u->nick, target), owner, target->nc->display, pass);
+			Event::OnCheckAuthentication(&Event::CheckAuthentication::OnCheckAuthentication, source.GetUser(), req);
+			req->Dispatch();
 		}
 		else
 		{
-			bool ok = false;
-			if (!na && u->Account() == target->nc)
-				ok = true;
+			NSGroupRequestListener req(onnickgroup, source, this, u->nick, target);
 
-			NSCertList *cl = target->nc->GetExt<NSCertList>("certificates");
-			if (!u->fingerprint.empty() && cl && cl->FindCert(u->fingerprint))
-				ok = true;
-
-			if (ok == false && !pass.empty())
-			{
-				NickServ::IdentifyRequest *req = NickServ::service->CreateIdentifyRequest(new NSGroupRequestListener(onnickgroup, source, this, u->nick, target), owner, target->nc->display, pass);
-				Event::OnCheckAuthentication(&Event::CheckAuthentication::OnCheckAuthentication, source.GetUser(), req);
-				req->Dispatch();
-			}
+			if (ok)
+				req.OnSuccess(nullptr);
 			else
-			{
-				NSGroupRequestListener req(onnickgroup, source, this, u->nick, target);
-
-				if (ok)
-					req.OnSuccess(nullptr);
-				else
-					req.OnFail(nullptr);
-			}
+				req.OnFail(nullptr);
 		}
 	}
 
@@ -212,38 +241,48 @@ class CommandNSUngroup : public Command
 		NickServ::Nick *na = NickServ::FindNick(!nick.empty() ? nick : u->nick);
 
 		if (u->Account()->aliases->size() == 1)
-			source.Reply(_("Your nickname is not grouped to anything, so you can't ungroup it."));
-		else if (!na)
-			source.Reply(_("\002{0}\002 isn't registered."), !nick.empty() ? nick : u->nick);
-		else if (na->nc != u->Account())
-			source.Reply(_("\002{0}\002 is not in your group."), na->nick);
-		else
 		{
-			NickServ::Account *oldcore = na->nc;
-
-			std::vector<NickServ::Nick *>::iterator it = std::find(oldcore->aliases->begin(), oldcore->aliases->end(), na);
-			if (it != oldcore->aliases->end())
-				oldcore->aliases->erase(it);
-
-			if (na->nick.equals_ci(oldcore->display))
-				oldcore->SetDisplay(oldcore->aliases->front());
-
-			NickServ::Account *nc = NickServ::service->CreateAccount(na->nick);
-			na->nc = nc;
-			nc->aliases->push_back(na);
-
-			nc->pass = oldcore->pass;
-			if (!oldcore->email.empty())
-				nc->email = oldcore->email;
-			nc->language = oldcore->language;
-
-			source.Reply(_("\002{0}\002 has been ungrouped from \002{1}\002."), na->nick, oldcore->display);
-
-			User *user = User::Find(na->nick);
-			if (user)
-				/* The user on the nick who was ungrouped may be identified to the old group, set -r */
-				user->RemoveMode(source.service, "REGISTERED");
+			source.Reply(_("Your nickname is not grouped to anything, so you can't ungroup it."));
+			return;
 		}
+
+		if (!na)
+		{
+			source.Reply(_("\002{0}\002 isn't registered."), !nick.empty() ? nick : u->nick);
+			return;
+		}
+
+		if (na->nc != u->Account())
+		{
+			source.Reply(_("\002{0}\002 is not in your group."), na->nick);
+			return;
+		}
+
+
+		NickServ::Account *oldcore = na->nc;
+
+		std::vector<NickServ::Nick *>::iterator it = std::find(oldcore->aliases->begin(), oldcore->aliases->end(), na);
+		if (it != oldcore->aliases->end())
+			oldcore->aliases->erase(it);
+
+		if (na->nick.equals_ci(oldcore->display))
+			oldcore->SetDisplay(oldcore->aliases->front());
+
+		NickServ::Account *nc = NickServ::service->CreateAccount(na->nick);
+		na->nc = nc;
+		nc->aliases->push_back(na);
+
+		nc->pass = oldcore->pass;
+		if (!oldcore->email.empty())
+			nc->email = oldcore->email;
+		nc->language = oldcore->language;
+
+		source.Reply(_("\002{0}\002 has been ungrouped from \002{1}\002."), na->nick, oldcore->display);
+
+		User *user = User::Find(na->nick);
+		if (user)
+			/* The user on the nick who was ungrouped may be identified to the old group, set -r */
+			user->RemoveMode(source.service, "REGISTERED");
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override

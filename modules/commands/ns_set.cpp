@@ -26,13 +26,10 @@ class CommandNSSet : public Command
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		this->OnSyntaxError(source, "");
-		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
-		this->SendSyntax(source);
-		source.Reply(" ");
 		source.Reply(_("Sets various options on your account\n"
 		               "\n"
 		               "Available options:"));
@@ -87,8 +84,6 @@ class CommandNSSASet : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
-		this->SendSyntax(source);
-		source.Reply(" ");
 		source.Reply(_("Sets various options on other users accounts\n"
 		               "\n"
 		               "Available options:"));
@@ -305,14 +300,8 @@ class CommandNSSASetAutoOp : public CommandNSSetAutoOp
 
 	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
-		BotInfo *bi = Config->GetClient("ChanServ");
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("Sets whether the given nickname will be given its status modes\n"
-				"in channels automatically. Set to \002ON\002 to allow %s\n"
-				"to set status modes on the given nickname automatically when it\n"
-				"is entering channels. Note that depending on channel settings\n"
-				"some modes may not get set automatically."), bi ? bi->nick.c_str() : "ChanServ");
+		source.Reply(_("Sets whether the given nickname will be given their status modes automatically when they join a channel."
+		                " Note that depending on channel settings some modes may not get set automatically."));
 		return true;
 	}
 };
@@ -480,25 +469,22 @@ class CommandNSSetEmail : public Command
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
-		if (!param.empty() && Config->GetModule("nickserv")->Get<bool>("confirmemailchanges") && !source.IsServicesOper())
+		if (param.empty())
+		{
+			Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to unset the email of " << nc->display;
+			nc->email.clear();
+			source.Reply(_("E-mail address for \002{0}\002 unset."), nc->display);
+		}
+		else if (Config->GetModule("nickserv")->Get<bool>("confirmemailchanges") && !source.IsServicesOper())
 		{
 			if (SendConfirmMail(source.GetUser(), source.service, param))
 				source.Reply(_("A confirmation e-mail has been sent to \002{0}\002. Follow the instructions in it to change your e-mail address."), param);
 		}
 		else
 		{
-			if (!param.empty())
-			{
-				Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to change the email of " << nc->display << " to " << param;
-				nc->email = param;
-				source.Reply(_("E-mail address for \002{0}\002 changed to \002{1}\002."), nc->display, param);
-			}
-			else
-			{
-				Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to unset the email of " << nc->display;
-				nc->email.clear();
-				source.Reply(_("E-mail address for \002{0}\002 unset."), nc->display);
-			}
+			Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to change the email of " << nc->display << " to " << param;
+			nc->email = param;
+			source.Reply(_("E-mail address for \002{0}\002 changed to \002{1}\002."), nc->display, param);
 		}
 	}
 

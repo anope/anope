@@ -96,6 +96,7 @@ class MSRSend : public Module
 	{
 		if (!MemoServ::service)
 			throw ModuleException("No MemoServ!");
+		throw ModuleException("XXX");
 	}
 };
 

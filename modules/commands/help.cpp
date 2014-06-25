@@ -14,8 +14,6 @@
 
 class CommandHelp : public Command
 {
-	static const unsigned help_wrap_len = 40;
-
 	static CommandGroup *FindGroup(const Anope::string &name)
 	{
 		for (unsigned i = 0; i < Config->CommandGroups.size(); ++i)
@@ -108,20 +106,10 @@ class CommandHelp : public Command
 				for (std::list<Anope::string>::iterator it2 = it->second.begin(), it2_end = it->second.end(); it2 != it2_end; ++it2)
 				{
 					const Anope::string &c_name = *it2;
-
 					buf += ", " + c_name;
-
-					if (buf.length() > help_wrap_len)
-					{
-						source.Reply("  {0}", buf.substr(2));
-						buf.clear();
-					}
 				}
 				if (buf.length() > 2)
-				{
 					source.Reply("  {0}", buf.substr(2));
-					buf.clear();
-				}
 			}
 			if (!groups.empty())
 			{
@@ -156,6 +144,8 @@ class CommandHelp : public Command
 
 				const Anope::string &subcommand = params.size() > max ? params[max] : "";
 				source.command = it->first;
+
+				c->SendSyntax(source);
 				if (!c->OnHelp(source, subcommand))
 					continue;
 

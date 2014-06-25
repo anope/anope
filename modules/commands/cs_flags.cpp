@@ -396,10 +396,18 @@ class CommandCSFlags : public Command
 			has_access = true;
 
 		if (!has_access)
+		{
 			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), is_list ? "ACCESS_LIST" : "ACCESS_CHANGE", ci->name);
-		else if (Anope::ReadOnly && !is_list)
+			return;
+		}
+
+		if (Anope::ReadOnly && !is_list)
+		{
 			source.Reply(_("Sorry, channel access list modification is temporarily disabled."));
-		else if (cmd.equals_ci("MODIFY"))
+			return;
+		}
+
+		if (cmd.equals_ci("MODIFY"))
 			this->DoModify(source, ci, params);
 		else if (is_list)
 			this->DoList(source, ci, params);

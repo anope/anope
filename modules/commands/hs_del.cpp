@@ -30,15 +30,16 @@ class CommandHSDel : public Command
 
 		const Anope::string &nick = params[0];
 		NickServ::Nick *na = NickServ::FindNick(nick);
-		if (na)
+		if (!na)
 		{
-			Log(LOG_ADMIN, source, this) << "for user " << na->nick;
-			this->OnDeleteVhost(&Event::DeleteVhost::OnDeleteVhost, na);
-			na->RemoveVhost();
-			source.Reply(_("Vhost for \002{0}\002 has been removed."), na->nick);
-		}
-		else
 			source.Reply(_("\002{0}\002 isn't registered."), nick);
+			return;
+		}
+
+		Log(LOG_ADMIN, source, this) << "for user " << na->nick;
+		this->OnDeleteVhost(&Event::DeleteVhost::OnDeleteVhost, na);
+		na->RemoveVhost();
+		source.Reply(_("Vhost for \002{0}\002 has been removed."), na->nick);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
@@ -66,20 +67,21 @@ class CommandHSDelAll : public Command
 
 		const Anope::string &nick = params[0];
 		NickServ::Nick *na = NickServ::FindNick(nick);
-		if (na)
+		if (!na)
 		{
-			this->ondeletevhost(&Event::DeleteVhost::OnDeleteVhost, na);
-			const NickServ::Account *nc = na->nc;
-			for (unsigned i = 0; i < nc->aliases->size(); ++i)
-			{
-				na = nc->aliases->at(i);
-				na->RemoveVhost();
-			}
-			Log(LOG_ADMIN, source, this) << "for all nicks in group " << nc->display;
-			source.Reply(_("Vhosts for group \002{0}\002 have been removed."), nc->display);
-		}
-		else
 			source.Reply(_("\002{0}\002 isn't registered."), nick);
+			return;
+		}
+
+		this->ondeletevhost(&Event::DeleteVhost::OnDeleteVhost, na);
+		const NickServ::Account *nc = na->nc;
+		for (unsigned i = 0; i < nc->aliases->size(); ++i)
+		{
+			na = nc->aliases->at(i);
+			na->RemoveVhost();
+		}
+		Log(LOG_ADMIN, source, this) << "for all nicks in group " << nc->display;
+		source.Reply(_("Vhosts for group \002{0}\002 have been removed."), nc->display);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override

@@ -38,88 +38,87 @@ class CommandNSInfo : public Command
 				source.Reply(_("\002{0}\002 is part of this Network's Services."), nick);
 			else
 				source.Reply(_("\002{0}\002 isn't registered."), nick);
+			return;
+		}
+
+		bool nick_online = false, show_hidden = false;
+
+		/* Is the real owner of the nick we're looking up online? -TheShadow */
+		User *u2 = User::Find(na->nick);
+		if (u2 && u2->Account() == na->nc)
+		{
+			nick_online = true;
+			na->last_seen = Anope::CurTime;
+		}
+
+		if (has_auspex || na->nc == source.GetAccount())
+			show_hidden = true;
+
+		source.Reply(_("\002{0}\002 is \002{1}\002"), na->nick, na->last_realname);
+
+		if (na->nc->HasExt("UNCONFIRMED"))
+			source.Reply(_("\002{0}\002 has not confirmed their account."), na->nick);
+
+		if (na->nc->IsServicesOper() && (show_hidden || !na->nc->HasExt("HIDE_STATUS")))
+			source.Reply(_("\002{0}\002 is a Services Operator of type \002{0}\002."), na->nick, na->nc->o->ot->GetName());
+
+		InfoFormatter info(source.nc);
+
+		if (nick_online)
+		{
+			bool shown = false;
+			if (show_hidden && !na->last_realhost.empty())
+			{
+				info[_("Online from")] = na->last_realhost;
+				shown = true;
+			}
+			if ((show_hidden || !na->nc->HasExt("HIDE_MASK")) && (!shown || na->last_usermask != na->last_realhost))
+				info[_("Online from")] = na->last_usermask;
+			else
+				source.Reply(_("\002{0}\002 is currently online."), na->nick);
 		}
 		else
 		{
-			bool nick_online = false, show_hidden = false;
-
-			/* Is the real owner of the nick we're looking up online? -TheShadow */
-			User *u2 = User::Find(na->nick);
-			if (u2 && u2->Account() == na->nc)
+			Anope::string shown;
+			if (show_hidden || !na->nc->HasExt("HIDE_MASK"))
 			{
-				nick_online = true;
-				na->last_seen = Anope::CurTime;
+				info[_("Last seen address")] = na->last_usermask;
+				shown = na->last_usermask;
 			}
 
-			if (has_auspex || na->nc == source.GetAccount())
-				show_hidden = true;
-
-			source.Reply(_("\002{0}\002 is \002{1}\002"), na->nick, na->last_realname);
-
-			if (na->nc->HasExt("UNCONFIRMED"))
-				source.Reply(_("\002{0}\002 has not confirmed their account."), na->nick);
-
-			if (na->nc->IsServicesOper() && (show_hidden || !na->nc->HasExt("HIDE_STATUS")))
-				source.Reply(_("\002{0}\002 is a Services Operator of type \002{0}\002."), na->nick, na->nc->o->ot->GetName());
-
-			InfoFormatter info(source.nc);
-
-			if (nick_online)
-			{
-				bool shown = false;
-				if (show_hidden && !na->last_realhost.empty())
-				{
-					info[_("Online from")] = na->last_realhost;
-					shown = true;
-				}
-				if ((show_hidden || !na->nc->HasExt("HIDE_MASK")) && (!shown || na->last_usermask != na->last_realhost))
-					info[_("Online from")] = na->last_usermask;
-				else
-					source.Reply(_("\002{0}\002 is currently online."), na->nick);
-			}
-			else
-			{
-				Anope::string shown;
-				if (show_hidden || !na->nc->HasExt("HIDE_MASK"))
-				{
-					info[_("Last seen address")] = na->last_usermask;
-					shown = na->last_usermask;
-				}
-
-				if (show_hidden && !na->last_realhost.empty() && na->last_realhost != shown)
-					info[_("Last seen address")] = na->last_realhost;
-			}
-
-			info[_("Registered")] = Anope::strftime(na->time_registered, source.GetAccount());
-
-			if (!nick_online)
-				info[_("Last seen")] = Anope::strftime(na->last_seen, source.GetAccount());
-
-			if (!na->last_quit.empty() && (show_hidden || !na->nc->HasExt("HIDE_QUIT")))
-				info[_("Last quit message")] = na->last_quit;
-
-			if (!na->nc->email.empty() && (show_hidden || !na->nc->HasExt("HIDE_EMAIL")))
-				info[_("Email address")] = na->nc->email;
-
-			if (show_hidden)
-			{
-				if (na->HasVhost())
-				{
-					if (IRCD->CanSetVIdent && !na->GetVhostIdent().empty())
-						info[_("VHost")] = na->GetVhostIdent() + "@" + na->GetVhostHost();
-					else
-						info[_("VHost")] = na->GetVhostHost();
-				}
-			}
-
-			this->onnickinfo(&Event::NickInfo::OnNickInfo, source, na, info, show_hidden);
-
-			std::vector<Anope::string> replies;
-			info.Process(replies);
-
-			for (unsigned i = 0; i < replies.size(); ++i)
-				source.Reply(replies[i]);
+			if (show_hidden && !na->last_realhost.empty() && na->last_realhost != shown)
+				info[_("Last seen address")] = na->last_realhost;
 		}
+
+		info[_("Registered")] = Anope::strftime(na->time_registered, source.GetAccount());
+
+		if (!nick_online)
+			info[_("Last seen")] = Anope::strftime(na->last_seen, source.GetAccount());
+
+		if (!na->last_quit.empty() && (show_hidden || !na->nc->HasExt("HIDE_QUIT")))
+			info[_("Last quit message")] = na->last_quit;
+
+		if (!na->nc->email.empty() && (show_hidden || !na->nc->HasExt("HIDE_EMAIL")))
+			info[_("Email address")] = na->nc->email;
+
+		if (show_hidden)
+		{
+			if (na->HasVhost())
+			{
+				if (IRCD->CanSetVIdent && !na->GetVhostIdent().empty())
+					info[_("VHost")] = na->GetVhostIdent() + "@" + na->GetVhostHost();
+				else
+					info[_("VHost")] = na->GetVhostHost();
+			}
+		}
+
+		this->onnickinfo(&Event::NickInfo::OnNickInfo, source, na, info, show_hidden);
+
+		std::vector<Anope::string> replies;
+		info.Process(replies);
+
+		for (unsigned i = 0; i < replies.size(); ++i)
+			source.Reply(replies[i]);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override

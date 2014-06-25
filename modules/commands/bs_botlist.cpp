@@ -44,16 +44,17 @@ class CommandBSBotList : public Command
 		list.Process(replies);
 
 		if (!count)
-			source.Reply(_("There are no bots available at this time."));
-		else
 		{
-			source.Reply(_("Bot list:"));
-
-			for (unsigned i = 0; i < replies.size(); ++i)
-				source.Reply(replies[i]);
-
-			source.Reply(_("{0} bots available."), count);
+			source.Reply(_("There are no bots available"));
+			return;
 		}
+
+		source.Reply(_("Bot list:"));
+
+		for (unsigned i = 0; i < replies.size(); ++i)
+			source.Reply(replies[i]);
+
+		source.Reply(_("{0} bots available."), count);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override

@@ -134,45 +134,48 @@ class CommandMSRead : public Command
 			mi = source.nc->memos;
 
 		if (numstr.empty() || (!numstr.equals_ci("LAST") && !numstr.equals_ci("NEW") && !numstr.is_number_only()))
+		{
 			this->OnSyntaxError(source, numstr);
-		else if (mi->memos->empty())
+			return;
+		}
+
+		if (mi->memos->empty())
 		{
 			if (!chan.empty())
 				source.Reply(_("\002{0}\002 has no memos."), chan);
 			else
 				source.Reply(_("You have no memos."));
+			return;
 		}
-		else
-		{
-			int i, end;
 
-			if (numstr.equals_ci("NEW"))
-			{
-				int readcount = 0;
-				for (i = 0, end = mi->memos->size(); i < end; ++i)
-					if (mi->GetMemo(i)->unread)
-					{
-						MemoListCallback::DoRead(source, mi, ci, i);
-						++readcount;
-					}
-				if (!readcount)
+		int i, end;
+
+		if (numstr.equals_ci("NEW"))
+		{
+			int readcount = 0;
+			for (i = 0, end = mi->memos->size(); i < end; ++i)
+				if (mi->GetMemo(i)->unread)
 				{
-					if (!chan.empty())
-						source.Reply(_("\002{0}\002 has no new memos."), chan);
-					else
-						source.Reply(_("You have no new memos."));
+					MemoListCallback::DoRead(source, mi, ci, i);
+					++readcount;
 				}
-			}
-			else if (numstr.equals_ci("LAST"))
+			if (!readcount)
 			{
-				for (i = 0, end = mi->memos->size() - 1; i < end; ++i);
-				MemoListCallback::DoRead(source, mi, ci, i);
+				if (!chan.empty())
+					source.Reply(_("\002{0}\002 has no new memos."), chan);
+				else
+					source.Reply(_("You have no new memos."));
 			}
-			else /* number[s] */
-			{
-				MemoListCallback list(source, mi, ci, numstr);
-				list.Process();
-			}
+		}
+		else if (numstr.equals_ci("LAST"))
+		{
+			for (i = 0, end = mi->memos->size() - 1; i < end; ++i);
+			MemoListCallback::DoRead(source, mi, ci, i);
+		}
+		else /* number[s] */
+		{
+			MemoListCallback list(source, mi, ci, numstr);
+			list.Process();
 		}
 	}
 

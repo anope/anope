@@ -81,7 +81,7 @@ class CommandBSInfo : public Command
 				source.Reply(replies[i]);
 		}
 		else
-			source.Reply(_("\002{0}\002 is not a valid bot or registered channel."), query.c_str());
+			source.Reply(_("\002{0}\002 is not a valid bot or registered channel."), query);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override

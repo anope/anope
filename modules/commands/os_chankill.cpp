@@ -29,7 +29,6 @@ class CommandOSChanKill : public Command
 
 		Anope::string expiry, channel;
 		unsigned last_param = 1;
-		Channel *c;
 
 		channel = params[0];
 		if (!channel.empty() && channel[0] == '+')
@@ -42,13 +41,17 @@ class CommandOSChanKill : public Command
 		time_t expires = !expiry.empty() ? Anope::DoTime(expiry) : Config->GetModule("operserv")->Get<time_t>("autokillexpiry", "30d");
 		if (!expiry.empty() && isdigit(expiry[expiry.length() - 1]))
 			expires *= 86400;
-		if (expires && expires < 60)
+
+		if (expires)
 		{
-			source.Reply(_("Invalid expiry time \002{0}\002."), expiry);
-			return;
-		}
-		else if (expires > 0)
+			if (expires < 60)
+			{
+				source.Reply(_("Invalid expiry time \002{0}\002."), expiry);
+				return;
+			}
+
 			expires += Anope::CurTime;
+		}
 
 		if (params.size() <= last_param)
 		{
@@ -59,33 +62,33 @@ class CommandOSChanKill : public Command
 		Anope::string reason = params[last_param];
 		if (params.size() > last_param + 1)
 			reason += params[last_param + 1];
-		if (!reason.empty())
+
+		Anope::string realreason;
+		if (Config->GetModule("operserv")->Get<bool>("addakiller") && !source.GetNick().empty())
+			realreason = "[" + source.GetNick() + "] " + reason;
+		else
+			realreason = reason;
+
+		Channel *c = Channel::Find(channel);
+		if (!c)
 		{
-			Anope::string realreason;
-			if (Config->GetModule("operserv")->Get<bool>("addakiller") && !source.GetNick().empty())
-				realreason = "[" + source.GetNick() + "] " + reason;
-			else
-				realreason = reason;
-
-			if ((c = Channel::Find(channel)))
-			{
-				for (Channel::ChanUserList::iterator it = c->users.begin(), it_end = c->users.end(); it != it_end; ++it)
-				{
-					ChanUserContainer *uc = it->second;
-
-					if (uc->user->server == Me || uc->user->HasMode("OPER"))
-						continue;
-
-					XLine *x = new XLine("*@" + uc->user->host, source.GetNick(), expires, realreason, XLineManager::GenerateUID());
-					akills->AddXLine(x);
-					akills->OnMatch(uc->user, x);
-				}
-
-				Log(LOG_ADMIN, source, this) << "on " << c->name << " (" << realreason << ")";
-			}
-			else
-				source.Reply(_("Channel \002%s\002 doesn't exist."), channel);
+			source.Reply(_("Channel \002{0}\002 doesn't exist."), channel);
+			return;
 		}
+
+		for (Channel::ChanUserList::iterator it = c->users.begin(), it_end = c->users.end(); it != it_end; ++it)
+		{
+			ChanUserContainer *uc = it->second;
+
+			if (uc->user->server == Me || uc->user->HasMode("OPER"))
+				continue;
+
+			XLine *x = new XLine("*@" + uc->user->host, source.GetNick(), expires, realreason, XLineManager::GenerateUID());
+			akills->AddXLine(x);
+			akills->OnMatch(uc->user, x);
+		}
+
+		Log(LOG_ADMIN, source, this) << "on " << c->name << " (" << realreason << ")";
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override

@@ -52,16 +52,23 @@ class CommandHSGroup : public Command
 		}
 
 		NickServ::Nick *na = NickServ::FindNick(source.GetNick());
-		if (na && source.GetAccount() == na->nc && na->HasVhost())
+		if (!na || na->nc != source.GetAccount())
 		{
-			this->Sync(na);
-			if (!na->GetVhostIdent().empty())
-				source.Reply(_("All vhosts in the group \002{0}\002 have been set to \002{1}\002@\002{2}\002."), source.nc->display, na->GetVhostIdent(), na->GetVhostHost());
-			else
-				source.Reply(_("All vhosts in the group \002{0}\002 have been set to \002{1}\002."), source.nc->display, na->GetVhostHost());
+			source.Reply(_("Access denied."));
+			return;
 		}
-		else
+
+		if (!na->HasVhost())
+		{
 			source.Reply(_("There is no vhost assigned to this nickname."));
+			return;
+		}
+
+		this->Sync(na);
+		if (!na->GetVhostIdent().empty())
+			source.Reply(_("All vhosts in the group \002{0}\002 have been set to \002{1}\002@\002{2}\002."), source.nc->display, na->GetVhostIdent(), na->GetVhostHost());
+		else
+			source.Reply(_("All vhosts in the group \002{0}\002 have been set to \002{1}\002."), source.nc->display, na->GetVhostHost());
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override

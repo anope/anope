@@ -146,12 +146,14 @@ class CommandOSAKill : public Command
 
 		if (!akills->CanAdd(source, mask, expires, reason))
 			return;
-		else if (mask.find_first_not_of("/~@.*?") == Anope::string::npos)
+
+		if (mask.find_first_not_of("/~@.*?") == Anope::string::npos)
 		{
 			source.Reply(_("\002{0}\002 coverage is too wide; Please use a more specific mask."), mask);
 			return;
 		}
-		else if (mask.find('@') == Anope::string::npos)
+
+		if (mask.find('@') == Anope::string::npos)
 		{
 			source.Reply(_("Mask must be in the form \037user\037@\037host\037."));
 			return;

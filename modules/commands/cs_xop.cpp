@@ -149,7 +149,8 @@ class CommandCSXOP : public Command
 				source.Reply(_("Channel \002{0}\002 isn't registered."), mask);
 				return;
 			}
-			else if (ci == targ_ci)
+
+			if (ci == targ_ci)
 			{
 				source.Reply(_("You can't add a channel to its own access list."));
 				return;
@@ -165,7 +166,8 @@ class CommandCSXOP : public Command
 				source.Reply(_("Masks and unregistered users may not be on access lists."));
 				return;
 			}
-			else if (mask.find_first_of("!*@") == Anope::string::npos && !na)
+			
+			if (mask.find_first_of("!*@") == Anope::string::npos && !na)
 			{
 				User *targ = User::Find(mask, true);
 				if (targ != NULL)

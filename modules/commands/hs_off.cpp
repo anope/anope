@@ -25,14 +25,15 @@ class CommandHSOff : public Command
 		User *u = source.GetUser();
 		const NickServ::Nick *na = NickServ::FindNick(u->nick);
 
-		if (!na || !na->HasVhost())
-			source.Reply(_("There is no vhost assigned to this nickname."));
-		else
+		if (!na || !na->HasVhost() || na->nc != source.GetAccount())
 		{
-			IRCD->SendVhostDel(u);
-			Log(LOG_COMMAND, source, this) << "to disable their vhost";
-			source.Reply(_("Your vhost was removed and the normal cloaking restored."));
+			source.Reply(_("There is no vhost assigned to this nickname."));
+			return;
 		}
+
+		IRCD->SendVhostDel(u);
+		Log(LOG_COMMAND, source, this) << "to disable their vhost";
+		source.Reply(_("Your vhost was removed and the normal cloaking restored."));
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override

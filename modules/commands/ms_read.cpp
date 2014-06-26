@@ -45,25 +45,8 @@ static void rsend_notify(CommandSource &source, MemoServ::MemoInfo *mi, MemoServ
 	m->receipt = false;
 }
 
-class MemoListCallback : public NumberList
+class CommandMSRead : public Command
 {
-	CommandSource &source;
-	MemoServ::MemoInfo *mi;
-	const ChanServ::Channel *ci;
-
- public:
-	MemoListCallback(CommandSource &_source, MemoServ::MemoInfo *_mi, const ChanServ::Channel *_ci, const Anope::string &numlist) : NumberList(numlist, false), source(_source), mi(_mi), ci(_ci)
-	{
-	}
-
-	void HandleNumber(unsigned number) override
-	{
-		if (!number || number > mi->memos->size())
-			return;
-
-		MemoListCallback::DoRead(source, mi, ci, number - 1);
-	}
-
 	static void DoRead(CommandSource &source, MemoServ::MemoInfo *mi, const ChanServ::Channel *ci, unsigned index)
 	{
 		MemoServ::Memo *m = mi->GetMemo(index);
@@ -92,10 +75,7 @@ class MemoListCallback : public NumberList
 		if (m->receipt)
 			rsend_notify(source, mi, m, ci ? ci->name : source.GetNick());
 	}
-};
 
-class CommandMSRead : public Command
-{
  public:
 	CommandMSRead(Module *creator) : Command(creator, "memoserv/read", 1, 2)
 	{
@@ -156,7 +136,7 @@ class CommandMSRead : public Command
 			for (i = 0, end = mi->memos->size(); i < end; ++i)
 				if (mi->GetMemo(i)->unread)
 				{
-					MemoListCallback::DoRead(source, mi, ci, i);
+					DoRead(source, mi, ci, i);
 					++readcount;
 				}
 			if (!readcount)
@@ -170,12 +150,19 @@ class CommandMSRead : public Command
 		else if (numstr.equals_ci("LAST"))
 		{
 			for (i = 0, end = mi->memos->size() - 1; i < end; ++i);
-			MemoListCallback::DoRead(source, mi, ci, i);
+			DoRead(source, mi, ci, i);
 		}
 		else /* number[s] */
 		{
-			MemoListCallback list(source, mi, ci, numstr);
-			list.Process();
+			NumberList(numstr, false,
+				[&](unsigned int number)
+				{
+					if (!number || number > mi->memos->size())
+						return;
+
+					DoRead(source, mi, ci, number - 1);
+				},
+				[]{});
 		}
 	}
 

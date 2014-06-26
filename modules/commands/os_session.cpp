@@ -130,48 +130,6 @@ class MySessionService : public SessionService
 	}
 };
 
-class ExceptionDelCallback : public NumberList
-{
- protected:
-	CommandSource &source;
-	unsigned deleted;
-	Command *cmd;
- public:
-	ExceptionDelCallback(CommandSource &_source, const Anope::string &numlist, Command *c) : NumberList(numlist, true), source(_source), deleted(0), cmd(c)
-	{
-	}
-
-	~ExceptionDelCallback()
-	{
-		if (!deleted)
-			source.Reply(_("No matching entries on session-limit exception list."));
-		else if (deleted == 1)
-			source.Reply(_("Deleted \0021\002 entry from session-limit exception list."));
-		else
-			source.Reply(_("Deleted \002{0}\002 entries from session-limit exception list."), deleted);
-	}
-
-	virtual void HandleNumber(unsigned number) override
-	{
-		if (!number || number > session_service->GetExceptions().size())
-			return;
-
-		Log(LOG_ADMIN, source, cmd) << "to remove the session limit exception for " << session_service->GetExceptions()[number - 1]->mask;
-
-		++deleted;
-		DoDel(source, number - 1);
-	}
-
-	static void DoDel(CommandSource &source, unsigned index)
-	{
-		Exception *e = session_service->GetExceptions()[index];
-		(*events)(&Event::Exception::OnExceptionDel, source, e);
-
-		session_service->DelException(e);
-		delete e;
-	}
-};
-
 class CommandOSSession : public Command
 {
  private:
@@ -279,6 +237,15 @@ class CommandOSSession : public Command
 
 class CommandOSException : public Command
 {
+	static void DoDel(CommandSource &source, unsigned index)
+	{
+		Exception *e = session_service->GetExceptions()[index];
+		(*events)(&Event::Exception::OnExceptionDel, source, e);
+
+		session_service->DelException(e);
+		delete e;
+	}
+
  private:
 	void DoAdd(CommandSource &source, const std::vector<Anope::string> &params)
 	{
@@ -390,8 +357,28 @@ class CommandOSException : public Command
 
 		if (isdigit(mask[0]) && mask.find_first_not_of("1234567890,-") == Anope::string::npos)
 		{
-			ExceptionDelCallback list(source, mask, this);
-			list.Process();
+			unsigned int deleted = 0;
+
+			NumberList(mask, true,
+				[&](unsigned int number)
+				{
+					if (!number || number > session_service->GetExceptions().size())
+						return;
+
+					Log(LOG_ADMIN, source, this) << "to remove the session limit exception for " << session_service->GetExceptions()[number - 1]->mask;
+
+					++deleted;
+					DoDel(source, number - 1);
+				},
+				[&]()
+				{
+					if (!deleted)
+						source.Reply(_("No matching entries on session-limit exception list."));
+					else if (deleted == 1)
+						source.Reply(_("Deleted \0021\002 entry from session-limit exception list."));
+					else
+						source.Reply(_("Deleted \002{0}\002 entries from session-limit exception list."), deleted);
+				});
 		}
 		else
 		{
@@ -400,7 +387,7 @@ class CommandOSException : public Command
 				if (mask.equals_ci(session_service->GetExceptions()[i]->mask))
 				{
 					Log(LOG_ADMIN, source, this) << "to remove the session limit exception for " << mask;
-					ExceptionDelCallback::DoDel(source, i);
+					DoDel(source, i);
 					source.Reply(_("\002{0}\002 deleted from session-limit exception list."), mask);
 					break;
 				}
@@ -460,35 +447,25 @@ class CommandOSException : public Command
 
 		if (!mask.empty() && mask.find_first_not_of("1234567890,-") == Anope::string::npos)
 		{
-			class ExceptionListCallback : public NumberList
-			{
-				CommandSource &source;
-				ListFormatter &list;
-			 public:
-				ExceptionListCallback(CommandSource &_source, ListFormatter &_list, const Anope::string &numlist) : NumberList(numlist, false), source(_source), list(_list)
+			NumberList(mask, false,
+				[&](unsigned int number)
 				{
-				}
-
-				void HandleNumber(unsigned Number) override
-				{
-					if (!Number || Number > session_service->GetExceptions().size())
+					if (!number || number > session_service->GetExceptions().size())
 						return;
 
-					Exception *e = session_service->GetExceptions()[Number - 1];
+					Exception *e = session_service->GetExceptions()[number - 1];
 
 					ListFormatter::ListEntry entry;
-					entry["Number"] = stringify(Number);
+					entry["Number"] = stringify(number);
 					entry["Mask"] = e->mask;
 					entry["By"] = e->who;
 					entry["Created"] = Anope::strftime(e->time, NULL, true);
 					entry["Expires"] = Anope::Expires(e->expires, source.GetAccount());
 					entry["Limit"] = stringify(e->limit);
 					entry["Reason"] = e->reason;
-					this->list.AddEntry(entry);
-				}
-			}
-			nl_list(source, list, mask);
-			nl_list.Process();
+					list.AddEntry(entry);
+				},
+				[]{});
 		}
 		else
 		{

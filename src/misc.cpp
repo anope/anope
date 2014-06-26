@@ -28,11 +28,13 @@
 #include <netdb.h>
 #endif
 
-NumberList::NumberList(const Anope::string &list, bool descending) : is_valid(true), desc(descending)
+NumberList::NumberList(const Anope::string &list, bool descending, std::function<void(unsigned int)> nf, std::function<void(void)> ef) : endf(ef)
 {
 	Anope::string error;
 	commasepstream sep(list);
 	Anope::string token;
+	bool is_valid = true;
+	std::set<unsigned> numbers;
 
 	sep.GetToken(token);
 	if (token.empty())
@@ -56,11 +58,8 @@ NumberList::NumberList(const Anope::string &list, bool descending) : is_valid(tr
 
 			if (!error.empty())
 			{
-				if (!this->InvalidRange(list))
-				{
-					is_valid = false;
-					return;
-				}
+				is_valid = false;
+				return;
 			}
 		}
 		else
@@ -81,44 +80,24 @@ NumberList::NumberList(const Anope::string &list, bool descending) : is_valid(tr
 
 			if (!error.empty() || !error2.empty())
 			{
-				if (!this->InvalidRange(list))
-				{
-					is_valid = false;
-					return;
-				}
+				is_valid = false;
+				return;
 			}
 		}
 	} while (sep.GetToken(token));
+
+	if (!is_valid)
+		return;
+
+	if (descending)
+		std::for_each(numbers.rbegin(), numbers.rend(), nf);
+	else
+		std::for_each(numbers.begin(), numbers.end(), nf);
 }
 
 NumberList::~NumberList()
 {
-}
-
-void NumberList::Process()
-{
-	if (!is_valid)
-		return;
-
-	if (this->desc)
-	{
-		for (std::set<unsigned>::reverse_iterator it = numbers.rbegin(), it_end = numbers.rend(); it != it_end; ++it)
-			this->HandleNumber(*it);
-	}
-	else
-	{
-		for (std::set<unsigned>::iterator it = numbers.begin(), it_end = numbers.end(); it != it_end; ++it)
-			this->HandleNumber(*it);
-	}
-}
-
-void NumberList::HandleNumber(unsigned)
-{
-}
-
-bool NumberList::InvalidRange(const Anope::string &)
-{
-	return true;
+	endf();
 }
 
 ListFormatter::ListFormatter(NickServ::Account *acc) : nc(acc)

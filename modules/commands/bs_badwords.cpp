@@ -145,43 +145,6 @@ Serializable* BadWordImpl::Unserialize(Serializable *obj, Serialize::Data &data)
 	return bw;
 }
 
-class BadwordsDelCallback : public NumberList
-{
-	CommandSource &source;
-	ChanServ::Channel *ci;
-	BadWords *bw;
-	Command *c;
-	unsigned deleted;
-	bool override;
- public:
-	BadwordsDelCallback(CommandSource &_source, ChanServ::Channel *_ci, Command *_c, const Anope::string &list) : NumberList(list, true), source(_source), ci(_ci), c(_c), deleted(0), override(false)
-	{
-		if (!source.AccessFor(ci).HasPriv("BADWORDS") && source.HasPriv("botserv/administration"))
-			this->override = true;
-		bw = ci->Require<BadWords>("badwords");
-	}
-
-	~BadwordsDelCallback()
-	{
-		if (!deleted)
-			source.Reply(_("No matching entries on the bad word list of \002{0}\002."), ci->name);
-		else if (deleted == 1)
-			source.Reply(_("Deleted \0021\002 entry from bad word list of \002{0}\002."), ci->name);
-		else
-			source.Reply(_("Deleted \002{0}\002 entries from the bad word list of \002{1}\002."), deleted, ci->name);
-	}
-
-	void HandleNumber(unsigned Number) override
-	{
-		if (!bw || !Number || Number > bw->GetBadWordCount())
-			return;
-
-		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, c, ci) << "DEL " << bw->GetBadWord(Number - 1)->word;
-		++deleted;
-		bw->EraseBadWord(Number - 1);
-	}
-};
-
 class CommandBSBadwords : public Command
 {
  private:
@@ -202,30 +165,20 @@ class CommandBSBadwords : public Command
 
 		if (!word.empty() && word.find_first_not_of("1234567890,-") == Anope::string::npos)
 		{
-			class BadwordsListCallback : public NumberList
-			{
-				ListFormatter &list;
-				BadWords *bw;
-			 public:
-				BadwordsListCallback(ListFormatter &_list, BadWords *_bw, const Anope::string &numlist) : NumberList(numlist, false), list(_list), bw(_bw)
+			NumberList(word, false,
+				[&](unsigned int num)
 				{
-				}
-
-				void HandleNumber(unsigned Number) override
-				{
-					if (!Number || Number > bw->GetBadWordCount())
+					if (!num || num > bw->GetBadWordCount())
 						return;
 
-					const BadWord *b = bw->GetBadWord(Number - 1);
+					const BadWord *b = bw->GetBadWord(num - 1);
 					ListFormatter::ListEntry entry;
-					entry["Number"] = stringify(Number);
+					entry["Number"] = stringify(num);
 					entry["Word"] = b->word;
 					entry["Type"] = b->type == BW_SINGLE ? "(SINGLE)" : (b->type == BW_START ? "(START)" : (b->type == BW_END ? "(END)" : ""));
-					this->list.AddEntry(entry);
-				}
-			}
-			nl_list(list, bw, word);
-			nl_list.Process();
+					list.AddEntry(entry);
+				},
+				[](){});
 		}
 		else
 		{
@@ -320,11 +273,32 @@ class CommandBSBadwords : public Command
 			return;
 		}
 
+		bool override = !source.AccessFor(ci).HasPriv("BADWORDS");
+
 		/* Special case: is it a number/list?  Only do search if it isn't. */
 		if (!word.empty() && isdigit(word[0]) && word.find_first_not_of("1234567890,-") == Anope::string::npos)
 		{
-			BadwordsDelCallback list(source, ci, this, word);
-			list.Process();
+			unsigned int deleted = 0;
+
+			NumberList(word, true,
+				[&](unsigned int num)
+				{
+					if (!num || num > badwords->GetBadWordCount())
+						return;
+
+					Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "DEL " << badwords->GetBadWord(num - 1)->word;
+					++deleted;
+					badwords->EraseBadWord(num - 1);
+				},
+				[&]()
+				{
+					if (!deleted)
+						source.Reply(_("No matching entries on the bad word list of \002{0}\002."), ci->name);
+					else if (deleted == 1)
+						source.Reply(_("Deleted \0021\002 entry from bad word list of \002{0}\002."), ci->name);
+					else
+						source.Reply(_("Deleted \002{0}\002 entries from the bad word list of \002{1}\002."), deleted, ci->name);
+				});
 		}
 		else
 		{
@@ -345,7 +319,6 @@ class CommandBSBadwords : public Command
 				return;
 			}
 
-			bool override = !source.AccessFor(ci).HasPriv("BADWORDS");
 			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "DEL " << badword->word;
 
 			source.Reply(_("\002{0}\002 deleted from \002{1}\002 bad words list."), badword->word, ci->name);

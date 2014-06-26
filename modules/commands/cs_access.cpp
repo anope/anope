@@ -249,24 +249,40 @@ class CommandCSAccess : public Command
 
 		if (isdigit(mask[0]) && mask.find_first_not_of("1234567890,-") == Anope::string::npos)
 		{
-			class AccessDelCallback : public NumberList
-			{
-				CommandSource &source;
-				ChanServ::Channel *ci;
-				Command *c;
-				unsigned deleted;
-				Anope::string Nicks;
-				bool denied;
-				bool override;
-				Anope::string mask;
-			 public:
-				AccessDelCallback(CommandSource &_source, ChanServ::Channel *_ci, Command *_c, const Anope::string &numlist) : NumberList(numlist, true), source(_source), ci(_ci), c(_c), deleted(0), denied(false), override(false), mask(numlist)
-				{
-					if (!source.AccessFor(ci).HasPriv("ACCESS_CHANGE") && source.HasPriv("chanserv/access/modify"))
-						this->override = true;
-				}
+			bool override = !source.AccessFor(ci).HasPriv("ACCESS_CHANGE") && source.HasPriv("chanserv/access/modify");
+			Anope::string nicks;
+			bool denied = false;
+			unsigned int deleted = 0;
 
-				~AccessDelCallback()
+			NumberList(mask, true,
+				[&](unsigned int num)
+				{
+					if (!num || num > ci->GetAccessCount())
+						return;
+
+					ChanServ::ChanAccess *access = ci->GetAccess(num - 1);
+
+					ChanServ::AccessGroup ag = source.AccessFor(ci);
+					const ChanServ::ChanAccess *u_highest = ag.Highest();
+
+					if ((!u_highest || *u_highest <= *access) && !ag.founder && !override && access->GetAccount() != source.nc)
+					{
+						denied = true;
+						return;
+					}
+
+					++deleted;
+					if (!nicks.empty())
+						nicks += ", " + access->Mask();
+					else
+						nicks = access->Mask();
+
+					ci->EraseAccess(num - 1);
+
+					Event::OnAccessDel(&Event::AccessDel::OnAccessDel, ci, source, access);
+					delete access;
+				},
+				[&]()
 				{
 					if (denied && !deleted)
 						source.Reply(_("Access denied. You do not have enough privileges on \002{0}\002 to remove any access entries matching \002{1}\002."));
@@ -274,45 +290,14 @@ class CommandCSAccess : public Command
 						source.Reply(_("There are no entries matching \002{0}\002 on the access list of \002{1}\002."), mask, ci->name);
 					else
 					{
-						Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, c, ci) << "to delete " << Nicks;
+						Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to delete " << nicks;
 
 						if (deleted == 1)
 							source.Reply(_("Deleted \0021\002 entry from the access list of \002{0}\002."), ci->name);
 						else
 							source.Reply(_("Deleted \002{0}\002 entries from the access list of \002{1}\002."), deleted, ci->name);
 					}
-				}
-
-				void HandleNumber(unsigned Number) override
-				{
-					if (!Number || Number > ci->GetAccessCount())
-						return;
-
-					ChanServ::ChanAccess *access = ci->GetAccess(Number - 1);
-
-					ChanServ::AccessGroup ag = source.AccessFor(ci);
-					const ChanServ::ChanAccess *u_highest = ag.Highest();
-
-					if ((!u_highest || *u_highest <= *access) && !ag.founder && !this->override && access->GetAccount() != source.nc)
-					{
-						denied = true;
-						return;
-					}
-
-					++deleted;
-					if (!Nicks.empty())
-						Nicks += ", " + access->Mask();
-					else
-						Nicks = access->Mask();
-
-					ci->EraseAccess(Number - 1);
-
-					Event::OnAccessDel(&Event::AccessDel::OnAccessDel, ci, source, access);
-					delete access;
-				}
-			}
-			delcallback(source, ci, this, mask);
-			delcallback.Process();
+				});
 		}
 		else
 		{
@@ -356,17 +341,8 @@ class CommandCSAccess : public Command
 
 		if (!nick.empty() && nick.find_first_not_of("1234567890,-") == Anope::string::npos)
 		{
-			class AccessListCallback : public NumberList
-			{
-				ListFormatter &list;
-				ChanServ::Channel *ci;
-
-			 public:
-				AccessListCallback(ListFormatter &_list, ChanServ::Channel *_ci, const Anope::string &numlist) : NumberList(numlist, false), list(_list), ci(_ci)
-				{
-				}
-
-				void HandleNumber(unsigned number) override
+			NumberList(nick, false,
+				[&](unsigned int number)
 				{
 					if (!number || number > ci->GetAccessCount())
 						return;
@@ -395,11 +371,9 @@ class CommandCSAccess : public Command
 					entry["Mask"] = access->Mask();
 					entry["By"] = access->creator;
 					entry["Last seen"] = timebuf;
-					this->list.AddEntry(entry);
-				}
-			}
-			nl_list(list, ci, nick);
-			nl_list.Process();
+					list.AddEntry(entry);
+				},
+				[&](){});
 		}
 		else
 		{

@@ -24,39 +24,16 @@
  */
 class CoreExport NumberList
 {
- private:
-	bool is_valid;
+	std::function<void(void)> endf;
 
-	std::set<unsigned> numbers;
-
-	bool desc;
  public:
 	/** Processes a numbered list
 	 * @param list The list
-	 * @param descending True to make HandleNumber get called with numbers in descending order
+	 * @param descending True to call the number handler callback with the numbers in descending order
 	 */
-	NumberList(const Anope::string &list, bool descending);
+	NumberList(const Anope::string &list, bool descending, std::function<void(unsigned int)> nf, std::function<void(void)> ef);
 
-	/** Destructor, does nothing
-	 */
-	virtual ~NumberList();
-
-	/** Should be called after the constructors are done running. This calls the callbacks.
-	 */
-	void Process();
-
-	/** Called with a number from the list
-	 * @param number The number
-	 */
-	virtual void HandleNumber(unsigned number);
-
-	/** Called when there is an error with the numbered list
-	 * Return false to immediatly stop processing the list and return
-	 * This is all done before we start calling HandleNumber, so no numbers will have been processed yet
-	 * @param list The list
-	 * @return false to stop processing
-	 */
-	virtual bool InvalidRange(const Anope::string &list);
+	~NumberList();
 };
 
 /** This class handles formatting LIST/VIEW replies.

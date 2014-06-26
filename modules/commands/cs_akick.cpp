@@ -248,7 +248,7 @@ class CommandCSAKick : public Command
 	void DoDel(CommandSource &source, ChanServ::Channel *ci, const std::vector<Anope::string> &params)
 	{
 		const Anope::string &mask = params[2];
-		unsigned i, end;
+		bool override = !source.AccessFor(ci).HasPriv("AKICK");
 
 		if (!ci->GetAkickCount())
 		{
@@ -259,19 +259,24 @@ class CommandCSAKick : public Command
 		/* Special case: is it a number/list?  Only do search if it isn't. */
 		if (isdigit(mask[0]) && mask.find_first_not_of("1234567890,-") == Anope::string::npos)
 		{
-			class AkickDelCallback : public NumberList
-			{
-				CommandSource &source;
-				ChanServ::Channel *ci;
-				CommandCSAKick *c;
-				unsigned deleted;
-				ChanServ::AccessGroup ag;
-			 public:
-				AkickDelCallback(CommandSource &_source, ChanServ::Channel *_ci, CommandCSAKick *_c, const Anope::string &list) : NumberList(list, true), source(_source), ci(_ci), c(_c), deleted(0), ag(source.AccessFor(ci))
-				{
-				}
+			unsigned int deleted = 0;
 
-				~AkickDelCallback()
+			NumberList(mask, true,
+				[&](unsigned int number)
+				{
+					if (!number || number > ci->GetAkickCount())
+						return;
+
+					const AutoKick *ak = ci->GetAkick(number - 1);
+
+					this->akickevents(&Event::Akick::OnAkickDel, source, ci, ak);
+
+					Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to delete " << (ak->nc ? ak->nc->display : ak->mask);
+
+					++deleted;
+					ci->EraseAkick(number - 1);
+				},
+				[&]()
 				{
 					if (!deleted)
 						source.Reply(_("No matching entries on %s autokick list."), ci->name.c_str());
@@ -279,32 +284,14 @@ class CommandCSAKick : public Command
 						source.Reply(_("Deleted 1 entry from %s autokick list."), ci->name.c_str());
 					else
 						source.Reply(_("Deleted %d entries from %s autokick list."), deleted, ci->name.c_str());
-				}
-
-				void HandleNumber(unsigned number) override
-				{
-					if (!number || number > ci->GetAkickCount())
-						return;
-
-					const AutoKick *ak = ci->GetAkick(number - 1);
-
-					c->akickevents(&Event::Akick::OnAkickDel, source, ci, ak);
-
-					bool override = !ag.HasPriv("AKICK");
-					Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, c, ci) << "to delete " << (ak->nc ? ak->nc->display : ak->mask);
-
-					++deleted;
-					ci->EraseAkick(number - 1);
-				}
-			}
-			delcallback(source, ci, this, mask);
-			delcallback.Process();
+				});
 		}
 		else
 		{
 			const NickServ::Nick *na = NickServ::FindNick(mask);
 			const NickServ::Account *nc = na ? *na->nc : NULL;
 
+			unsigned int i, end;
 			for (i = 0, end = ci->GetAkickCount(); i < end; ++i)
 			{
 				const AutoKick *ak = ci->GetAkick(i);
@@ -319,7 +306,6 @@ class CommandCSAKick : public Command
 				return;
 			}
 
-			bool override = !source.AccessFor(ci).HasPriv("AKICK");
 			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to delete " << mask;
 
 			this->akickevents(&Event::Akick::OnAkickDel, source, ci, ci->GetAkick(i));
@@ -336,17 +322,8 @@ class CommandCSAKick : public Command
 
 		if (!mask.empty() && isdigit(mask[0]) && mask.find_first_not_of("1234567890,-") == Anope::string::npos)
 		{
-			class AkickListCallback : public NumberList
-			{
-				ListFormatter &list;
-				ChanServ::Channel *ci;
-
-			 public:
-				AkickListCallback(ListFormatter &_list, ChanServ::Channel *_ci, const Anope::string &numlist) : NumberList(numlist, false), list(_list), ci(_ci)
-				{
-				}
-
-				void HandleNumber(unsigned number) override
+			NumberList(mask, false,
+				[&](unsigned int number)
 				{
 					if (!number || number > ci->GetAkickCount())
 						return;
@@ -373,11 +350,9 @@ class CommandCSAKick : public Command
 					entry["Created"] = timebuf;
 					entry["Last used"] = lastused;
 					entry["Reason"] = ak->reason;
-					this->list.AddEntry(entry);
-				}
-			}
-			nl_list(list, ci, mask);
-			nl_list.Process();
+					list.AddEntry(entry);
+				},
+				[]{});
 		}
 		else
 		{

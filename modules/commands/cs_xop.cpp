@@ -281,42 +281,18 @@ class CommandCSXOP : public Command
 		/* Special case: is it a number/list?  Only do search if it isn't. */
 		if (isdigit(mask[0]) && mask.find_first_not_of("1234567890,-") == Anope::string::npos)
 		{
-			class XOPDelCallback : public NumberList
-			{
-				CommandSource &source;
-				ChanServ::Channel *ci;
-				Command *c;
-				unsigned deleted;
-				Anope::string nicks;
-				bool override;
-			 public:
-				XOPDelCallback(CommandSource &_source, ChanServ::Channel *_ci, Command *_c, bool _override, const Anope::string &numlist) : NumberList(numlist, true), source(_source), ci(_ci), c(_c), deleted(0), override(_override)
-				{
-				}
+			unsigned int deleted = 0;
+			Anope::string nicks;
 
-				~XOPDelCallback()
-				{
-					if (!deleted)
-						 source.Reply(_("No matching entries on %s %s list."), ci->name.c_str(), source.command.c_str());
-					else
-					{
-						Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, c, ci) << "to delete " << nicks;
-
-						if (deleted == 1)
-							source.Reply(_("Deleted one entry from %s %s list."), ci->name.c_str(), source.command.c_str());
-						else
-							source.Reply(_("Deleted %d entries from %s %s list."), deleted, ci->name.c_str(), source.command.c_str());
-					}
-				}
-
-				void HandleNumber(unsigned number) override
+			NumberList(mask, true,
+				[&](unsigned int number)
 				{
 					if (!number || number > ci->GetAccessCount())
 						return;
 
 					ChanServ::ChanAccess *caccess = ci->GetAccess(number - 1);
 
-					if (caccess->provider->name != "access/xop" || this->source.command.upper() != caccess->AccessSerialize())
+					if (caccess->provider->name != "access/xop" || source.command.upper() != caccess->AccessSerialize())
 						return;
 
 					++deleted;
@@ -328,10 +304,21 @@ class CommandCSXOP : public Command
 					ci->EraseAccess(number - 1);
 					Event::OnAccessDel(&Event::AccessDel::OnAccessDel, ci, source, caccess);
 					delete caccess;
-				}
-			}
-			delcallback(source, ci, this, override, mask);
-			delcallback.Process();
+				},
+				[&]()
+				{
+					if (!deleted)
+						 source.Reply(_("No matching entries on %s %s list."), ci->name.c_str(), source.command.c_str());
+					else
+					{
+						Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to delete " << nicks;
+
+						if (deleted == 1)
+							source.Reply(_("Deleted one entry from %s %s list."), ci->name.c_str(), source.command.c_str());
+						else
+							source.Reply(_("Deleted %d entries from %s %s list."), deleted, ci->name.c_str(), source.command.c_str());
+					}
+				});
 		}
 		else
 		{
@@ -384,33 +371,23 @@ class CommandCSXOP : public Command
 
 		if (!nick.empty() && nick.find_first_not_of("1234567890,-") == Anope::string::npos)
 		{
-			class XOPListCallback : public NumberList
-			{
-				ListFormatter &list;
-				ChanServ::Channel *ci;
-				CommandSource &source;
-			 public:
-				XOPListCallback(ListFormatter &_list, ChanServ::Channel *_ci, const Anope::string &numlist, CommandSource &src) : NumberList(numlist, false), list(_list), ci(_ci), source(src)
+			NumberList(nick, false,
+				[&](unsigned int number)
 				{
-				}
-
-				void HandleNumber(unsigned Number) override
-				{
-					if (!Number || Number > ci->GetAccessCount())
+					if (!number || number > ci->GetAccessCount())
 						return;
 
-					const ChanServ::ChanAccess *a = ci->GetAccess(Number - 1);
+					const ChanServ::ChanAccess *a = ci->GetAccess(number - 1);
 
-					if (a->provider->name != "access/xop" || this->source.command.upper() != a->AccessSerialize())
+					if (a->provider->name != "access/xop" || source.command.upper() != a->AccessSerialize())
 						return;
 
 					ListFormatter::ListEntry entry;
-					entry["Number"] = stringify(Number);
+					entry["Number"] = stringify(number);
 					entry["Mask"] = a->Mask();
-					this->list.AddEntry(entry);
-				}
-			} nl_list(list, ci, nick, source);
-			nl_list.Process();
+					list.AddEntry(entry);
+				},
+				[]{});
 		}
 		else
 		{

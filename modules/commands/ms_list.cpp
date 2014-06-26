@@ -71,17 +71,8 @@ class CommandMSList : public Command
 
 		if (!param.empty() && isdigit(param[0]))
 		{
-			class MemoListCallback : public NumberList
-			{
-				ListFormatter &list;
-				CommandSource &source;
-				const MemoServ::MemoInfo *mi;
-			 public:
-				MemoListCallback(ListFormatter &_list, CommandSource &_source, const MemoServ::MemoInfo *_mi, const Anope::string &numlist) : NumberList(numlist, false), list(_list), source(_source), mi(_mi)
-				{
-				}
-
-				void HandleNumber(unsigned number) override
+			NumberList(param, false,
+				[&](unsigned int number)
 				{
 					if (!number || number > mi->memos->size())
 						return;
@@ -92,11 +83,9 @@ class CommandMSList : public Command
 					entry["Number"] = (m->unread ? "* " : "  ") + stringify(number);
 					entry["Sender"] = m->sender;
 					entry["Date/Time"] = Anope::strftime(m->time, source.GetAccount());
-					this->list.AddEntry(entry);
-				}
-			}
-			mlc(list, source, mi, param);
-			mlc.Process();
+					list.AddEntry(entry);
+				},
+				[]{});
 		}
 		else
 		{

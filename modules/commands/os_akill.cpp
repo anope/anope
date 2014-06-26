@@ -13,48 +13,6 @@
 
 static ServiceReference<XLineManager> akills("XLineManager", "xlinemanager/sgline");
 
-class AkillDelCallback : public NumberList
-{
-	CommandSource &source;
-	unsigned deleted;
-	Command *cmd;
- public:
-	AkillDelCallback(CommandSource &_source, const Anope::string &numlist, Command *c) : NumberList(numlist, true), source(_source), deleted(0), cmd(c)
-	{
-	}
-
-	~AkillDelCallback()
-	{
-		if (!deleted)
-			source.Reply(_("No matching entries on the akill list."));
-		else if (deleted == 1)
-			source.Reply(_("Deleted \0021\002 entry from the akill list."));
-		else
-			source.Reply(_("Deleted \002{0}\002 entries from the akill list."), deleted);
-	}
-
-	void HandleNumber(unsigned number) override
-	{
-		if (!number)
-			return;
-
-		XLine *x = akills->GetEntry(number - 1);
-
-		if (!x)
-			return;
-
-		Log(LOG_ADMIN, source, cmd) << "to remove " << x->mask << " from the list";
-
-		++deleted;
-		DoDel(source, x);
-	}
-
-	static void DoDel(CommandSource &source, XLine *x)
-	{
-		akills->DelXLine(x);
-	}
-};
-
 class CommandOSAKill : public Command
 {
  private:
@@ -217,8 +175,30 @@ class CommandOSAKill : public Command
 
 		if (isdigit(mask[0]) && mask.find_first_not_of("1234567890,-") == Anope::string::npos)
 		{
-			AkillDelCallback list(source, mask, this);
-			list.Process();
+			unsigned int deleted = 0;
+
+			NumberList(mask, true,
+				[&](unsigned int number)
+				{
+					XLine *x = akills->GetEntry(number - 1);
+
+					if (!x)
+						return;
+
+					Log(LOG_ADMIN, source, this) << "to remove " << x->mask << " from the list";
+
+					++deleted;
+					akills->DelXLine(x);
+				},
+				[&]()
+				{
+					if (!deleted)
+						source.Reply(_("No matching entries on the akill list."));
+					else if (deleted == 1)
+						source.Reply(_("Deleted \0021\002 entry from the akill list."));
+					else
+						source.Reply(_("Deleted \002{0}\002 entries from the akill list."), deleted);
+				});
 		}
 		else
 		{
@@ -236,7 +216,7 @@ class CommandOSAKill : public Command
 
 				Log(LOG_ADMIN, source, this) << "to remove " << x->mask << " from the list";
 				source.Reply(_("\002{0}\002 deleted from the akill list."), x->mask);
-				AkillDelCallback::DoDel(source, x);
+				akills->DelXLine(x);
 			}
 			while ((x = akills->HasEntry(mask)));
 
@@ -252,20 +232,9 @@ class CommandOSAKill : public Command
 
 		if (!mask.empty() && isdigit(mask[0]) && mask.find_first_not_of("1234567890,-") == Anope::string::npos)
 		{
-			class ListCallback : public NumberList
-			{
-				CommandSource &source;
-				ListFormatter &list;
-			 public:
-				ListCallback(CommandSource &_source, ListFormatter &_list, const Anope::string &numstr) : NumberList(numstr, false), source(_source), list(_list)
+			NumberList(mask, false,
+				[&](unsigned int number)
 				{
-				}
-
-				void HandleNumber(unsigned number) override
-				{
-					if (!number)
-						return;
-
 					const XLine *x = akills->GetEntry(number - 1);
 
 					if (!x)
@@ -278,11 +247,9 @@ class CommandOSAKill : public Command
 					entry["Created"] = Anope::strftime(x->created, NULL, true);
 					entry["Expires"] = Anope::Expires(x->expires, source.nc);
 					entry["Reason"] = x->reason;
-					this->list.AddEntry(entry);
-				}
-			}
-			nl_list(source, list, mask);
-			nl_list.Process();
+					list.AddEntry(entry);
+				},
+				[&]{});
 		}
 		else
 		{

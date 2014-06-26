@@ -12,29 +12,6 @@
 #include "module.h"
 #include "modules/memoserv.h"
 
-class MemoDelCallback : public NumberList
-{
-	CommandSource &source;
-	ChanServ::Channel *ci;
-	MemoServ::MemoInfo *mi;
- public:
-	MemoDelCallback(CommandSource &_source, ChanServ::Channel *_ci, MemoServ::MemoInfo *_mi, const Anope::string &list) : NumberList(list, true), source(_source), ci(_ci), mi(_mi)
-	{
-	}
-
-	void HandleNumber(unsigned number) override
-	{
-		if (!number || number > mi->memos->size())
-			return;
-
-		if (MemoServ::Event::OnMemoDel)
-			MemoServ::Event::OnMemoDel(&MemoServ::Event::MemoDel::OnMemoDel, ci ? ci->name : source.nc->display, mi, mi->GetMemo(number - 1));
-
-		mi->Del(number - 1);
-		source.Reply(_("Memo \002{0}\002 has been deleted."), number);
-	}
-};
-
 class CommandMSDel : public Command
 {
  public:
@@ -96,8 +73,19 @@ class CommandMSDel : public Command
 
 		if (isdigit(numstr[0]))
 		{
-			MemoDelCallback list(source, ci, mi, numstr);
-			list.Process();
+			NumberList(numstr, true,
+				[&](unsigned int number)
+				{
+					if (!number || number > mi->memos->size())
+						return;
+
+					if (MemoServ::Event::OnMemoDel)
+						MemoServ::Event::OnMemoDel(&MemoServ::Event::MemoDel::OnMemoDel, ci ? ci->name : source.nc->display, mi, mi->GetMemo(number - 1));
+
+					mi->Del(number - 1);
+					source.Reply(_("Memo \002{0}\002 has been deleted."), number);
+				},
+				[](){});
 		}
 		else if (numstr.equals_ci("LAST"))
 		{

@@ -11,49 +11,6 @@
 
 #include "module.h"
 
-class SXLineDelCallback : public NumberList
-{
-	XLineManager *xlm;
-	Command *command;
-	CommandSource &source;
-	unsigned deleted;
- public:
-	SXLineDelCallback(XLineManager *x, Command *c, CommandSource &_source, const Anope::string &numlist) : NumberList(numlist, true), xlm(x), command(c), source(_source), deleted(0)
-	{
-	}
-
-	~SXLineDelCallback()
-	{
-		if (!deleted)
-			source.Reply(_("No matching entries on the {0} list."), source.command);
-		else if (deleted == 1)
-			source.Reply(_("Deleted \0021\002 entry from the {0} list."), source.command);
-		else
-			source.Reply(_("Deleted \002{0}\002 entries from the {1} list."), deleted, source.command);
-	}
-
-	void HandleNumber(unsigned number) override
-	{
-		if (!number)
-			return;
-
-		XLine *x = this->xlm->GetEntry(number - 1);
-
-		if (!x)
-			return;
-
-		Log(LOG_ADMIN, source, command) << "to remove " << x->mask << " from the list";
-
-		++deleted;
-		DoDel(this->xlm, source, x);
-	}
-
-	static void DoDel(XLineManager *xlm, CommandSource &source, XLine *x)
-	{
-		xlm->DelXLine(x);
-	}
-};
-
 class CommandOSSXLineBase : public Command
 {
  private:
@@ -80,8 +37,30 @@ class CommandOSSXLineBase : public Command
 
 		if (isdigit(mask[0]) && mask.find_first_not_of("1234567890,-") == Anope::string::npos)
 		{
-			SXLineDelCallback list(this->xlm(), this, source, mask);
-			list.Process();
+			unsigned int deleted = 0;
+
+			NumberList(mask, true,
+				[&](unsigned int number)
+				{
+					XLine *x = this->xlm()->GetEntry(number - 1);
+
+					if (!x)
+						return;
+
+					Log(LOG_ADMIN, source, this) << "to remove " << x->mask << " from the list";
+
+					++deleted;
+					this->xlm()->DelXLine(x);
+				},
+				[&]()
+				{
+					if (!deleted)
+						source.Reply(_("No matching entries on the {0} list."), source.command);
+					else if (deleted == 1)
+						source.Reply(_("Deleted \0021\002 entry from the {0} list."), source.command);
+					else
+						source.Reply(_("Deleted \002{0}\002 entries from the {1} list."), deleted, source.command);
+				});
 		}
 		else
 		{
@@ -95,7 +74,7 @@ class CommandOSSXLineBase : public Command
 
 			Event::OnDelXLine(&Event::DelXLine::OnDelXLine, source, x, this->xlm());
 
-			SXLineDelCallback::DoDel(this->xlm(), source, x);
+			this->xlm()->DelXLine(x);
 			source.Reply(_("\002{0}\002 deleted from the {1} list."), mask, source.command);
 			Log(LOG_ADMIN, source, this) << "to remove " << mask << " from the list";
 		}
@@ -116,22 +95,10 @@ class CommandOSSXLineBase : public Command
 
 		if (!mask.empty() && isdigit(mask[0]) && mask.find_first_not_of("1234567890,-") == Anope::string::npos)
 		{
-			class SXLineListCallback : public NumberList
-			{
-				XLineManager *xlm;
-				CommandSource &source;
-				ListFormatter &list;
-			 public:
-				SXLineListCallback(XLineManager *x, CommandSource &_source, ListFormatter &_list, const Anope::string &numlist) : NumberList(numlist, false), xlm(x), source(_source), list(_list)
+			NumberList(mask, false,
+				[&](unsigned int number)
 				{
-				}
-
-				void HandleNumber(unsigned number) override
-				{
-					if (!number)
-						return;
-
-					const XLine *x = this->xlm->GetEntry(number - 1);
+					const XLine *x = this->xlm()->GetEntry(number - 1);
 
 					if (!x)
 						return;
@@ -144,10 +111,8 @@ class CommandOSSXLineBase : public Command
 					entry["Expires"] = Anope::Expires(x->expires, source.nc);
 					entry["Reason"] = x->reason;
 					list.AddEntry(entry);
-				}
-			}
-			sl_list(this->xlm(), source, list, mask);
-			sl_list.Process();
+				},
+				[]{});
 		}
 		else
 		{

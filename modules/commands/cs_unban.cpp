@@ -105,8 +105,8 @@ class CommandCSUnban : public Command
 				"given, all bans affecting you in channels you have access\n"
 				"in are removed.\n"
 				" \n"
-				"By default, limited to AOPs or those with level 5 and above\n"
-				"access on the channel."), source.service->nick.c_str());
+				"By default, limited to AOPs or those with level 5 and above access\n"
+				"on the channel."), source.service->nick.c_str());
 		return true;
 	}
 };

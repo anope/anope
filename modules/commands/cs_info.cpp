@@ -16,7 +16,7 @@ class CommandCSInfo : public Command
  public:
 	CommandCSInfo(Module *creator) : Command(creator, "chanserv/info", 1, 2)
 	{
-		this->SetDesc(_("Lists information about the named registered channel"));
+		this->SetDesc(_("Lists information about the specified registered channel"));
 		this->SetSyntax(_("\037channel\037"));
 		this->AllowUnregistered(true);
 	}
@@ -73,7 +73,7 @@ class CommandCSInfo : public Command
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Lists information about the named registered channel,\n"
+		source.Reply(_("Lists information about the specified registered channel,\n"
 				"including its founder, time of registration, last\n"
 				"time used, and description. If the user issuing the\n"
 				"command has the appropriate access for it, then the"

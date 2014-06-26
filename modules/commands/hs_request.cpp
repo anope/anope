@@ -171,7 +171,7 @@ class CommandHSRequest : public Command
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Request the given vHost to be actived for your nick by the\n"
+		source.Reply(_("Request the given vHost to be activated for your nick by the\n"
 			"network administrators. Please be patient while your request\n"
 			"is being considered."));
 		return true;

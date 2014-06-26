@@ -227,7 +227,7 @@ class CommandCSFlags : public Command
 								override = true;
 							else
 							{
-								source.Reply(_("You can not set the \002%c\002 flag."), f);
+								source.Reply(_("You cannot set the \002%c\002 flag."), f);
 								break;
 							}
 						}
@@ -417,19 +417,19 @@ class CommandCSFlags : public Command
 		source.Reply(_("%s is another way to modify the channel access list, similar to\n"
 				"the XOP and ACCESS methods."), source.command.c_str());
 		source.Reply(" ");
-		source.Reply(_("The \002MODIFY\002 command allows you to modify the access list. If mask is\n"
-				"not already on the access list is it added, then the changes are applied.\n"
+		source.Reply(_("The \002MODIFY\002 command allows you to modify the access list. If the mask is\n"
+				"not already on the access list it is added, then the changes are applied.\n"
 				"If the mask has no more flags, then the mask is removed from the access list.\n"
 				"Additionally, you may use +* or -* to add or remove all flags, respectively. You are\n"
 				"only able to modify the access list if you have the proper permission on the channel,\n"
-				"and even then you can only give other people access to up what you already have."));
+				"and even then you can only give other people access to the equivalent of what your access is."));
 		source.Reply(" ");
 		source.Reply(_("The \002LIST\002 command allows you to list existing entries on the channel access list.\n"
 				"If a mask is given, the mask is wildcard matched against all existing entries on the\n"
 				"access list, and only those entries are returned. If a set of flags is given, only those\n"
 				"on the access list with the specified flags are returned."));
 		source.Reply(" ");
-		source.Reply(_("The \002CLEAR\002 command clears the channel access list, which requires channel founder."));
+		source.Reply(_("The \002CLEAR\002 command clears the channel access list. This requires channel founder access."));
 		source.Reply(" ");
 		source.Reply(_("The available flags are:"));
 

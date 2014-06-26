@@ -400,7 +400,7 @@ class CommandBSBadwords : public Command
 
 		if (Anope::ReadOnly)
 		{
-			source.Reply(_("Sorry, channel bad words list modification is temporarily disabled."));
+			source.Reply(_("Sorry, bad words list modification is temporarily disabled."));
 			return;
 		}
 
@@ -446,7 +446,7 @@ class CommandBSBadwords : public Command
 				"      Lists bad words entries numbered 2 through 5 and\n"
 				"      7 through 9.\n"
 				" \n"
-				"The \002CLEAR\002 command clears all entries of the\n"
+				"The \002CLEAR\002 command clears all entries from the\n"
 				"bad words list."));
 		return true;
 	}

@@ -239,19 +239,19 @@ class CommandEntryMessage : public Command
 		source.Reply(_("Controls what messages will be sent to users when they join the channel."));
 		source.Reply(" ");
 		source.Reply(_("The \002ENTRYMSG ADD\002 command adds the given message to\n"
-				"the list of messages to be shown to users when they join\n"
+				"the list of messages shown to users when they join\n"
 				"the channel."));
 		source.Reply(" ");
-		source.Reply(_("The \002ENTRYMSG DEL\002 command removes the given message from\n"
-				"the list of messages to be shown to users when they join\n"
-				"the channel. You can remove the message by specifying its number\n"
+		source.Reply(_("The \002ENTRYMSG DEL\002 command removes the specified message from\n"
+				"the list of messages shown to users when they join\n"
+				"the channel. You can a message by specifying its number\n"
 				"which you can get by listing the messages as explained below."));
 		source.Reply(" ");
 		source.Reply(_("The \002ENTRYMSG LIST\002 command displays a listing of messages\n"
-				"to be shown to users when they join the channel."));
+				"shown to users when they join the channel."));
 		source.Reply(" ");
 		source.Reply(_("The \002ENTRYMSG CLEAR\002 command clears all entries from\n"
-				"the list of messages to be shown to users when they join\n"
+				"the list of messages shown to users when they join\n"
 				"the channel, effectively disabling entry messages."));
 		return true;
 	}

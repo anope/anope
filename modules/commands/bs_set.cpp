@@ -100,7 +100,7 @@ class CommandBSSetBanExpire : public Command
 
 		if (Anope::ReadOnly)
 		{
-			source.Reply(_("Sorry, bot option setting is temporarily disabled."));
+			source.Reply(_("Sorry, changing bot options is temporarily disabled."));
 			return;
 		}
 

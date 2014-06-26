@@ -75,7 +75,7 @@ class CommandBSAssign : public Command
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Assigns a bot pointed out by nick to a channel. You\n"
+		source.Reply(_("Assigns the specified bot to a channel. You\n"
 				"can then configure the bot for the channel so it fits\n"
 				"your needs."));
 		return true;
@@ -121,7 +121,7 @@ class CommandBSUnassign : public Command
 
 		if (ci->HasExt("PERSIST") && !ModeManager::FindChannelModeByName("PERM"))
 		{
-			source.Reply(_("You can not unassign bots while persist is set on the channel."));
+			source.Reply(_("You cannot unassign bots while persist is set on the channel."));
 			return;
 		}
 
@@ -195,9 +195,9 @@ class CommandBSSetNoBot : public Command
 	{
 		this->SendSyntax(source);
 		source.Reply(_(" \n"
-				"This option makes a channel be unassignable. If a bot\n"
+				"This option makes a channel unassignable. If a bot\n"
 				"is already assigned to the channel, it is unassigned\n"
-				"automatically when you enable the option."));
+				"automatically when you enable it."));
 		return true;
 	}
 };

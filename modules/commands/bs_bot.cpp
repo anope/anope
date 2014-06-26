@@ -139,7 +139,7 @@ class CommandBSBot : public Command
 		*/
 		if (nick.equals_cs(bi->nick) && (!user.empty() ? user.equals_cs(bi->GetIdent()) : 1) && (!host.empty() ? host.equals_cs(bi->host) : 1) && (!real.empty() ? real.equals_cs(bi->realname) : 1))
 		{
-			source.Reply(_("Old info is equal to the new one."));
+			source.Reply(_("The old information is the same as the new information specified."));
 			return;
 		}
 
@@ -341,13 +341,13 @@ class CommandBSBot : public Command
 				"hostname and realname. Since no integrity checks are done\n"
 				"for these settings, be really careful.\n"
 				" \n"
-				"\002BOT CHANGE\002 allows to change the nickname, username, hostname\n"
-				"or realname of a bot without actually having to delete it (and\n"
+				"\002BOT CHANGE\002 allows you to change the nickname, username, hostname\n"
+				"or realname of a bot without deleting it (and\n"
 				"all the data associated with it).\n"
 				" \n"
 				"\002BOT DEL\002 removes the given bot from the bot list.\n"
 				" \n"
-				"\002Note\002: you cannot create a bot that has a nick that is\n"
+				"\002Note\002: You cannot create a bot with a nick that is\n"
 				"currently registered. If an unregistered user is currently\n"
 				"using the nick, they will be killed."));
 		return true;

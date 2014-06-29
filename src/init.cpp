@@ -100,6 +100,8 @@ bool Anope::AtTerm()
 	return isatty(fileno(stdout)) && isatty(fileno(stdin)) && isatty(fileno(stderr));
 }
 
+static void setuidgid();
+
 void Anope::Fork()
 {
 #ifndef _WIN32
@@ -110,6 +112,8 @@ void Anope::Fork()
 	freopen("/dev/null", "w", stderr);
 
 	setpgid(0, 0);
+
+	setuidgid();
 #else
 	FreeConsole();
 #endif
@@ -418,10 +422,15 @@ void Anope::Init(int ac, char **av)
 	/* If we're root, issue a warning now */
 	if (!getuid() && !getgid())
 	{
-		std::cerr << "WARNING: You are currently running Anope as the root superuser. Anope does not" << std::endl;
-		std::cerr << "         require root privileges to run, and it is discouraged that you run Anope" << std::endl;
-		std::cerr << "         as the root superuser." << std::endl;
-		sleep(3);
+		/* If we are configured to setuid later, don't issue a warning */
+		Configuration::Block *options = Config->GetBlock("options");
+		if (options->Get<const Anope::string>("user").empty())
+		{
+			std::cerr << "WARNING: You are currently running Anope as the root superuser. Anope does not" << std::endl;
+			std::cerr << "         require root privileges to run, and it is discouraged that you run Anope" << std::endl;
+			std::cerr << "         as the root superuser." << std::endl;
+			sleep(3);
+		}
 	}
 #endif
 
@@ -513,7 +522,11 @@ void Anope::Init(int ac, char **av)
 	for (int i = 0; i < Config->CountBlock("module"); ++i)
 		ModuleManager::LoadModule(Config->GetBlock("module", i)->Get<const Anope::string>("name"), NULL);
 
-	setuidgid();
+#ifndef _WIN32
+	/* We won't background later, so we should setuid now */
+	if (Anope::NoFork || !Anope::AtTerm())
+		setuidgid();
+#endif
 
 	Module *protocol = ModuleManager::FindFirstOf(PROTOCOL);
 	if (protocol == NULL)

@@ -132,7 +132,7 @@ ChannelInfo::ChannelInfo(const ChannelInfo &ci) : Serializable("ChannelInfo"),
 	*this = ci;
 
 	if (this->founder)
-		--this->founder->channelcount;
+		++this->founder->channelcount;
 
 	this->access->clear();
 	this->akick->clear();
@@ -200,9 +200,6 @@ ChannelInfo::~ChannelInfo()
 			delete this->memos.GetMemo(i);
 		this->memos.memos->clear();
 	}
-
-	if (this->founder)
-		--this->founder->channelcount;
 }
 
 void ChannelInfo::Serialize(Serialize::Data &data) const

@@ -108,7 +108,7 @@ void Channel::CheckModes()
 		return;
 
 	/* Check for mode bouncing */
-	if (this->server_modecount >= 3 && this->chanserv_modecount >= 3)
+	if (this->chanserv_modetime == Anope::CurTime && this->server_modetime == Anope::CurTime && this->server_modecount >= 3 && this->chanserv_modecount >= 3)
 	{
 		Log() << "Warning: unable to set modes on channel " << this->name << ". Are your servers' U:lines configured correctly?";
 		this->bouncy_modes = 1;

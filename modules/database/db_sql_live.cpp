@@ -166,7 +166,7 @@ class DBMySQL : public Module, public Pipe
 		if (!this->CheckInit() || obj->GetTimestamp() == Anope::CurTime)
 			return;
 
-		Query query("SELECT * FROM `" + this->prefix + obj->GetName() + "` WHERE (`timestamp` > " + this->SQL->FromUnixtime(obj->GetTimestamp()) + " OR `timestamp` IS NULL)");
+		Query query("SELECT * FROM `" + this->prefix + obj->GetName() + "` WHERE (`timestamp` >= " + this->SQL->FromUnixtime(obj->GetTimestamp()) + " OR `timestamp` IS NULL)");
 
 		obj->UpdateTimestamp();
 
@@ -228,7 +228,10 @@ class DBMySQL : public Module, public Pipe
 				}
 				else
 				{
-					delete s;
+					if (!s)
+						this->RunQuery("UPDATE `" + prefix + obj->GetName() + "` SET `timestamp` = " + this->SQL->FromUnixtime(obj->GetTimestamp()) + " WHERE `id` = " + stringify(id));
+					else
+						delete s;
 				}
 			}
 		}

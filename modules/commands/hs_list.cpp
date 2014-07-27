@@ -133,7 +133,7 @@ class CommandHSList : public Command
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("This command lists registered vhosts to the operator\n"
+		source.Reply(_("This command lists registered vhosts to the operator.\n"
 				"If a \037key\037 is specified, only entries whose nick or vhost match\n"
 				"the pattern given in \037key\037 are displayed e.g. Rob* for all\n"
 				"entries beginning with \"Rob\"\n"

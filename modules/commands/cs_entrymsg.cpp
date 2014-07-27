@@ -244,7 +244,7 @@ class CommandEntryMessage : public Command
 		source.Reply(" ");
 		source.Reply(_("The \002ENTRYMSG DEL\002 command removes the specified message from\n"
 				"the list of messages shown to users when they join\n"
-				"the channel. You can a message by specifying its number\n"
+				"the channel. You can remove a message by specifying its number\n"
 				"which you can get by listing the messages as explained below."));
 		source.Reply(" ");
 		source.Reply(_("The \002ENTRYMSG LIST\002 command displays a listing of messages\n"

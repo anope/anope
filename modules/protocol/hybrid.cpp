@@ -209,7 +209,7 @@ class HybridProto : public IRCDProto
 
 		SendServer(Me);
 
-		UplinkSocket::Message() << "SVINFO 6 5 0 :" << Anope::CurTime;
+		UplinkSocket::Message(Me) << "SVINFO 6 5 0 :" << Anope::CurTime;
 	}
 
 	void SendClientIntroduction(User *u) anope_override
@@ -257,12 +257,15 @@ class HybridProto : public IRCDProto
 
 	void SendForceNickChange(User *u, const Anope::string &newnick, time_t when) anope_override
 	{
-		UplinkSocket::Message(Me) << "SVSNICK " << u->nick << " " << newnick << " " << when;
+		UplinkSocket::Message(Me) << "SVSNICK " << u->GetUID() << " " << newnick << " " << when;
 	}
 
-	void SendSVSJoin(const MessageSource &source, User *u, const Anope::string &chan, const Anope::string &) anope_override
+	void SendSVSJoin(const MessageSource &source, User *u, const Anope::string &chan, const Anope::string &param) anope_override
 	{
-		UplinkSocket::Message(source) << "SVSJOIN " << u->GetUID() << " " << chan;
+                if (!param.empty())
+                        UplinkSocket::Message(source) << "SVSJOIN " << u->GetUID() << " " << chan << " :" << param;
+                else
+                        UplinkSocket::Message(source) << "SVSJOIN " << u->GetUID() << " " << chan;
 	}
 
 	void SendSVSPart(const MessageSource &source, User *u, const Anope::string &chan, const Anope::string &param) anope_override
@@ -645,7 +648,7 @@ class ProtoHybrid : public Module
 		ModeManager::AddChannelMode(new ChannelModeList("EXCEPT", 'e'));
 		ModeManager::AddChannelMode(new ChannelModeList("INVITEOVERRIDE", 'I'));
 
-		/* v/h/o/a/q */
+		/* v/h/o/ */
 		ModeManager::AddChannelMode(new ChannelModeStatus("VOICE", 'v', '+', 0));
 		ModeManager::AddChannelMode(new ChannelModeStatus("HALFOP", 'h', '%', 1));
 		ModeManager::AddChannelMode(new ChannelModeStatus("OP", 'o', '@', 2));

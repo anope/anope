@@ -4513,6 +4513,7 @@ msgstr ""
 "avranno l'accesso sul canale secondo le liste di accesso."
 
 #: modules/commands/cs_set.cpp:944
+#, fuzzy, c-format
 msgid ""
 "Enables or disables signed kicks for a\n"
 "channel.  When SIGNKICK is set, kicks issued with\n"

@@ -50,6 +50,12 @@ class CommandMSIgnore : public Command
 			source.Reply(ACCESS_DENIED);
 		else if (command.equals_ci("ADD") && !param.empty())
 		{
+			if (mi->ignores.size() >= Config->GetModule(this->owner)->Get<unsigned>("max", "32"))
+			{
+				source.Reply(_("Sorry, the memo ignore list for \002%s\002 is full."), channel.c_str());
+				return;
+			}
+
 			if (std::find(mi->ignores.begin(), mi->ignores.end(), param.ci_str()) == mi->ignores.end())
 			{
 				mi->ignores.push_back(param.ci_str());

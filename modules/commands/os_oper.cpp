@@ -69,7 +69,7 @@ class CommandOSOper : public Command
 		this->SetDesc(_("View and change Services Operators"));
 		this->SetSyntax(_("ADD \037oper\037 \037type\037"));
 		this->SetSyntax(_("DEL \037oper\037"));
-		this->SetSyntax(_("INFO \037type\037"));
+		this->SetSyntax(_("INFO [\037type\037]"));
 		this->SetSyntax("LIST");
 	}
 
@@ -154,8 +154,19 @@ class CommandOSOper : public Command
 				}
 			}
 		}
-		else if (subcommand.equals_ci("INFO") && params.size() > 1)
+		else if (subcommand.equals_ci("INFO"))
 		{
+			if (params.size() < 2)
+			{
+				source.Reply(_("Available opertypes:"));
+				for (unsigned i = 0; i < Config->MyOperTypes.size(); ++i)
+				{
+					OperType *ot = Config->MyOperTypes[i];
+					source.Reply("%s", ot->GetName().c_str());
+				}
+				return;
+			}
+
 			Anope::string fulltype = params[1];
 			if (params.size() > 2)
 				fulltype += " " + params[2];

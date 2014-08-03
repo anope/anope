@@ -78,11 +78,8 @@ FlagsAccessProvider* FlagsAccessProvider::ap;
 
 class CommandCSFlags : public Command
 {
-	void DoModify(CommandSource &source, ChannelInfo *ci, const std::vector<Anope::string> &params)
+	void DoModify(CommandSource &source, ChannelInfo *ci, Anope::string mask, const Anope::string &flags)
 	{
-		Anope::string mask = params.size() > 2 ? params[2] : "";
-		Anope::string flags = params.size() > 3 ? params[3] : "";
-
 		if (flags.empty())
 		{
 			this->OnSyntaxError(source, "");
@@ -370,7 +367,7 @@ class CommandCSFlags : public Command
 	CommandCSFlags(Module *creator) : Command(creator, "chanserv/flags", 1, 4)
 	{
 		this->SetDesc(_("Modify the list of privileged users"));
-		this->SetSyntax(_("\037channel\037 MODIFY \037mask\037 \037changes\037"));
+		this->SetSyntax(_("\037channel\037 [MODIFY] \037mask\037 \037changes\037"));
 		this->SetSyntax(_("\037channel\037 LIST [\037mask\037 | +\037flags\037]"));
 		this->SetSyntax(_("\037channel\037 CLEAR"));
 	}
@@ -400,14 +397,26 @@ class CommandCSFlags : public Command
 			source.Reply(ACCESS_DENIED);
 		else if (Anope::ReadOnly && !is_list)
 			source.Reply(_("Sorry, channel access list modification is temporarily disabled."));
-		else if (cmd.equals_ci("MODIFY"))
-			this->DoModify(source, ci, params);
 		else if (is_list)
 			this->DoList(source, ci, params);
 		else if (cmd.equals_ci("CLEAR"))
 			this->DoClear(source, ci);
 		else
-			this->OnSyntaxError(source, cmd);
+		{
+			Anope::string mask, flags;
+			if (cmd.equals_ci("MODIFY"))
+			{
+				mask = params.size() > 2 ? params[2] : "";
+				flags = params.size() > 3 ? params[3] : "";
+			}
+			else
+			{
+				mask = cmd;
+				flags = params.size() > 2 ? params[2] : "";
+			}
+
+			this->DoModify(source, ci, mask, flags);
+		}
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override

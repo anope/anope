@@ -429,7 +429,7 @@ void Stats::Run(MessageSource &source, const std::vector<Anope::string> &params)
 			break;
 		case 'u':
 		{
-			time_t uptime = Anope::CurTime - Anope::StartTime;
+			long uptime = static_cast<long>(Anope::CurTime - Anope::StartTime);
 			IRCD->SendNumeric(242, source.GetSource(), ":Services up %d day%s, %02d:%02d:%02d", uptime / 86400, uptime / 86400 == 1 ? "" : "s", (uptime / 3600) % 24, (uptime / 60) % 60, uptime % 60);
 			IRCD->SendNumeric(250, source.GetSource(), ":Current users: %d (%d ops); maximum %d", UserListByNick.size(), OperCount, MaxUserCount);
 			IRCD->SendNumeric(219, source.GetSource(), "%c :End of /STATS report.", params[0][0]);

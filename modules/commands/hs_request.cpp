@@ -96,6 +96,12 @@ class CommandHSRequest : public Command
 			return;
 		}
 
+		if (source.GetAccount()->HasExt("UNCONFIRMED"))
+		{
+			source.Reply(_("You must confirm your account before you may request a vhost."));
+			return;
+		}
+
 		Anope::string rawhostmask = params[0];
 		
 		Anope::string user, host;

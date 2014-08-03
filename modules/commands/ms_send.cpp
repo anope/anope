@@ -39,6 +39,12 @@ class CommandMSSend : public Command
 			return;
 		}
 
+		if (source.GetAccount()->HasExt("UNCONFIRMED"))
+		{
+			source.Reply(_("You must confirm your account before you may send a memo."));
+			return;
+		}
+
 		MemoServService::MemoResult result = memoserv->Send(source.GetNick(), nick, text);
 		if (result == MemoServService::MEMO_SUCCESS)
 			source.Reply(_("Memo sent to \002%s\002."), nick.c_str());

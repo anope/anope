@@ -327,6 +327,8 @@ class CommandCSMode : public Command
 							source.Reply(_("Missing parameter for mode %c."), cm->mchar);
 						else if (cm->type == MODE_LIST && ci->c && IRCD->GetMaxListFor(ci->c) && ci->c->HasMode(cm->name) >= IRCD->GetMaxListFor(ci->c))
 							source.Reply(_("List for mode %c is full."), cm->mchar);
+						else if (modelocks->GetMLock().size() >= Config->GetModule(this->owner)->Get<unsigned>("max", "32"))
+							source.Reply(_("The mode lock list of \002%s\002 is full."), ci->name.c_str());
 						else
 						{
 							modelocks->SetMLock(cm, adding, mode_param, source.GetNick()); 

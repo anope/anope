@@ -242,9 +242,9 @@ class CoreExport Channel : public Base, public Extensible
 
 	/** Get a list of modes on a channel
 	 * @param name A mode name to get the list of
-	 * @return a pair of iterators for the beginning and end of the list
+	 * @return a vector of the list mode entries
 	 */
-	std::pair<ModeList::iterator, ModeList::iterator> GetModeList(const Anope::string &name);
+	std::vector<Anope::string> GetModeList(const Anope::string &name);
 
 	/** Get a string of the modes set on this channel
 	 * @param complete Include mode parameters

@@ -71,10 +71,10 @@ class CommandCSAKick : public Command
 		/* Check excepts BEFORE we get this far */
 		if (ci->c)
 		{
-			std::pair<Channel::ModeList::iterator, Channel::ModeList::iterator> modes = ci->c->GetModeList("EXCEPT");
-			for (; modes.first != modes.second; ++modes.first)
+			std::vector<Anope::string> modes = ci->c->GetModeList("EXCEPT");
+			for (unsigned int i = 0; i < modes.size(); ++i)
 			{
-				if (Anope::Match(modes.first->second, mask))
+				if (Anope::Match(modes[i], mask))
 				{
 					source.Reply(CHAN_EXCEPTED, mask.c_str(), ci->name.c_str());
 					return;

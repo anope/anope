@@ -155,21 +155,21 @@ class MyXMLRPCEvent : public XMLRPCEvent
 		{
 			request.reply("bancount", stringify(c->HasMode("BAN")));
 			int count = 0;
-			std::pair<Channel::ModeList::iterator, Channel::ModeList::iterator> its = c->GetModeList("BAN");
-			for (; its.first != its.second; ++its.first)
-				request.reply("ban" + stringify(++count), iface->Sanitize(its.first->second));
+			std::vector<Anope::string> v = c->GetModeList("BAN");
+			for (unsigned int i = 0; i < v.size(); ++i)
+				request.reply("ban" + stringify(++count), iface->Sanitize(v[i]));
 
 			request.reply("exceptcount", stringify(c->HasMode("EXCEPT")));
 			count = 0;
-			its = c->GetModeList("EXCEPT");
-			for (; its.first != its.second; ++its.first)
-				request.reply("except" + stringify(++count), iface->Sanitize(its.first->second));
+			v = c->GetModeList("EXCEPT");
+			for (unsigned int i = 0; i < v.size(); ++i)
+				request.reply("except" + stringify(++count), iface->Sanitize(v[i]));
 
 			request.reply("invitecount", stringify(c->HasMode("INVITEOVERRIDE")));
 			count = 0;
-			its = c->GetModeList("INVITEOVERRIDE");
-			for (; its.first != its.second; ++its.first)
-				request.reply("invite" + stringify(++count), iface->Sanitize(its.first->second));
+			v = c->GetModeList("INVITEOVERRIDE");
+			for (unsigned int i = 0; i < v.size(); ++i)
+				request.reply("invite" + stringify(++count), iface->Sanitize(v[i]));
 
 			Anope::string users;
 			for (Channel::ChanUserList::const_iterator it = c->users.begin(); it != c->users.end(); ++it)

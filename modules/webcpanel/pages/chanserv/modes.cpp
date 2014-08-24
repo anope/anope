@@ -94,9 +94,9 @@ bool WebCPanel::ChanServ::Modes::OnRequest(HTTPProvider *server, const Anope::st
 			WebPanel::RunCommand(na->nc->display, na->nc, "ChanServ", "chanserv/mode", params, replacements);
 		}
 
-		std::pair<Channel::ModeList::iterator, Channel::ModeList::iterator> ml = c->GetModeList(cm->name);
-		for (; ml.first != ml.second; ++ml.first)
-			replacements["MASKS"] = HTTPUtils::Escape(ml.first->second);
+		std::vector<Anope::string> v = c->GetModeList(cm->name);
+		for (unsigned int i = 0; i < v.size(); ++i)
+			replacements["MASKS"] = HTTPUtils::Escape(v[i]);
 	}
 
 	Page.Serve(server, page_name, client, message, reply, replacements);

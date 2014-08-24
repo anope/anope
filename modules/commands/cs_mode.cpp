@@ -615,15 +615,10 @@ class CommandCSMode : public Command
 							}
 							else
 							{
-								std::pair<Channel::ModeList::iterator, Channel::ModeList::iterator> its = ci->c->GetModeList(cm->name);
-								for (; its.first != its.second;)
-								{
-									const Anope::string &mask = its.first->second;
-									++its.first;
-
-									if (Anope::Match(mask, param))
-										ci->c->RemoveMode(NULL, cm, mask);
-								}
+								std::vector<Anope::string> v = ci->c->GetModeList(cm->name);
+								for (unsigned j = 0; j < v.size(); ++j)
+									if (Anope::Match(v[j], param))
+										ci->c->RemoveMode(NULL, cm, v[j]);
 							}
 					}
 			}

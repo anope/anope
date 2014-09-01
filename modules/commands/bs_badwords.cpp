@@ -138,7 +138,8 @@ Serializable* BadWordImpl::Unserialize(Serializable *obj, Serialize::Data &data)
 	bw->type = static_cast<BadWordType>(n);
 
 	BadWordsImpl *bws = ci->Require<BadWordsImpl>("badwords");
-	bws->badwords->push_back(bw);
+	if (!obj)
+		bws->badwords->push_back(bw);
 	
 	return bw;
 }

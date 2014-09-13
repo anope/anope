@@ -10303,8 +10303,7 @@ msgstr "Ora sei un IRC Operator."
 
 #: modules/commands/ns_resetpass.cpp:108
 msgid "You are now identified for your nick. Change your password now."
-msgstr ""
-"Adesso sei identificato per il tuo nick. Cambia la tua password adesso."
+msgstr "Adesso sei identificato per il tuo nick. Cambia la tua password adesso."
 
 #: modules/commands/ns_group.cpp:50
 #, c-format

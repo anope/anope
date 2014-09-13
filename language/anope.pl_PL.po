@@ -10846,9 +10846,7 @@ msgstr "Jesteś teraz IRC operatorem."
 #: modules/commands/ns_resetpass.cpp:108
 #, fuzzy
 msgid "You are now identified for your nick. Change your password now."
-msgstr ""
-"You are now identified for your nick. Change your password using \"/msg %s "
-"SET PASSWORD newpassword\" now."
+msgstr "You are now identified for your nick. Change your password now."
 
 #: modules/commands/ns_group.cpp:50
 #, c-format

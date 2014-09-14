@@ -439,7 +439,16 @@ class OSDefcon : public Module
 
 	EventReturn OnPreCommand(CommandSource &source, Command *command, std::vector<Anope::string> &params) anope_override
 	{
-		if (command->name == "nickserv/register" || command->name == "nickserv/group")
+		if (Config.Check(DEFCON_OPER_ONLY) && !source.IsOper())
+		{
+			source.Reply(_("Services are in DefCon mode, please try again later."));
+			return EVENT_STOP;
+		}
+		else if (DConfig.Check(DEFCON_SILENT_OPER_ONLY) && !source.IsOper())
+		{
+			return EVENT_STOP;
+		}
+		else if (command->name == "nickserv/register" || command->name == "nickserv/group")
 		{
 			if (DConfig.Check(DEFCON_NO_NEW_NICKS))
 			{

@@ -439,7 +439,7 @@ class OSDefcon : public Module
 
 	EventReturn OnPreCommand(CommandSource &source, Command *command, std::vector<Anope::string> &params) anope_override
 	{
-		if (Config.Check(DEFCON_OPER_ONLY) && !source.IsOper())
+		if (DConfig.Check(DEFCON_OPER_ONLY) && !source.IsOper())
 		{
 			source.Reply(_("Services are in DefCon mode, please try again later."));
 			return EVENT_STOP;

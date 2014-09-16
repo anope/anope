@@ -178,6 +178,16 @@ if [ $? -ne 0 ] ; then
 	clear
 	if exists "cmake-bin" ; then :
 	else
+		if [ `uname -m` = "x86_64" ] ; then
+		echo ""
+		echo "Sorry, Anope requires CMake 2.4 or newer, which can be downloaded at http://cmake.org"
+		echo "If you have installed CMake already, ensure it is in your PATH environment variable."
+		echo ""
+		echo "Depending on your operating system, you may download CMake using your system's built"
+		echo "in package manager. Otherwise, you may use the link provided above."
+		echo ""
+		exit 0
+	else
 		echo "Anope requires CMake 2.4 or newer, which can be downloaded at http://cmake.org"
 		echo "If you have installed CMake already, ensure it is in your PATH environment variable."
 
@@ -208,6 +218,7 @@ if [ $? -ne 0 ] ; then
 			exit 0
 		fi
 	fi
+fi
 
 	CMAKE_BIN=`find cmake-bin -name cmake`
 	CMAKE_BIN="`pwd`/`dirname $CMAKE_BIN`"

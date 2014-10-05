@@ -95,7 +95,8 @@ class NSRecoverRequest : public IdentifyRequest
 			if (IRCD->CanSVSNick)
 			{
 				/* If we can svsnick then release our hold and svsnick the user using the command */
-				nickserv->Release(na);
+				if (nickserv)
+					nickserv->Release(na);
 				IRCD->SendForceNickChange(source.GetUser(), GetAccount(), Anope::CurTime);
 				source.Reply(_("You have regained control of \002%s\002 and are now identified as \002%s\002."), GetAccount().c_str(), na->nc->display.c_str());
 			}

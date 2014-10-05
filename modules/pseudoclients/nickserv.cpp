@@ -258,6 +258,7 @@ class NickServCore : public Module, public NickServService
 
 			held.Unset(na);
 		}
+		collided.Unset(na); /* clear pending collide */
 	}
 
 	void OnReload(Configuration::Conf *conf) anope_override

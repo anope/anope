@@ -169,6 +169,11 @@ class ngIRCdProto : public IRCDProto
 	{
 		this->SendVhost(u, u->GetIdent(), "");
 	}
+
+	Anope::string Format(const Anope::string &source, const Anope::string &message) anope_override
+	{
+		return IRCDProto::Format(source.empty() ? Me->GetSID() : source, message);
+	}
 };
 
 struct IRCDMessage005 : IRCDMessage

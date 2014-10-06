@@ -11,6 +11,9 @@
 
 #include "module.h"
 
+class NickServCollide;
+static std::set<NickServCollide *> collides;
+
 /** Timer for colliding nicks to force people off of nicknames
  */
 class NickServCollide : public Timer
@@ -23,6 +26,17 @@ class NickServCollide : public Timer
  public:
 	NickServCollide(Module *me, NickServService *nss, User *user, NickAlias *nick, time_t delay) : Timer(me, delay), service(nss), u(user), ts(user->timestamp), na(nick)
 	{
+		collides.insert(this);
+	}
+
+	~NickServCollide()
+	{
+		collides.erase(this);
+	}
+
+	User *GetUser()
+	{
+		return u;
 	}
 
 	void Tick(time_t t) anope_override
@@ -343,6 +357,16 @@ class NickServCore : public Module, public NickServService
 			u->SendMessage(NickServ, _("Type \002%s%s SET EMAIL \037e-mail\037\002 in order to set your e-mail.\n"
 							"Your privacy is respected; this e-mail won't be given to\n"
 							"any third-party person."), Config->StrictPrivmsg.c_str(), NickServ->nick.c_str());
+		}
+
+		for (std::set<NickServCollide *>::iterator it = collides.begin(); it != collides.end(); ++it)
+		{
+			NickServCollide *c = *it;
+			if (c->GetUser() == u)
+			{
+				delete c;
+				break;
+			}
 		}
 	}
 

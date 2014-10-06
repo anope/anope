@@ -713,9 +713,10 @@ class OSSession : public Module
 				}
 
 				++session->hits;
-				if (max_session_kill && session->hits >= max_session_kill && akills)
+
+				const Anope::string &akillmask = "*@" + session->addr.mask();
+				if (max_session_kill && session->hits >= max_session_kill && akills && !akills->HasEntry(akillmask))
 				{
-					const Anope::string &akillmask = "*@" + session->addr.mask();
 					XLine *x = new XLine(akillmask, OperServ ? OperServ->nick : "", Anope::CurTime + session_autokill_expiry, "Session limit exceeded", XLineManager::GenerateUID());
 					akills->AddXLine(x);
 					akills->Send(NULL, x);

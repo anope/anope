@@ -47,7 +47,10 @@ class CommandMSSend : public Command
 
 		MemoServService::MemoResult result = memoserv->Send(source.GetNick(), nick, text);
 		if (result == MemoServService::MEMO_SUCCESS)
+		{
 			source.Reply(_("Memo sent to \002%s\002."), nick.c_str());
+			Log(LOG_COMMAND, source, this) << "to send a memo to " << nick;
+		}
 		else if (result == MemoServService::MEMO_INVALID_TARGET)
 			source.Reply(_("\002%s\002 is not a registered unforbidden nick or channel."), nick.c_str());
 		else if (result == MemoServService::MEMO_TOO_FAST)

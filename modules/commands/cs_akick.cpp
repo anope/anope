@@ -441,9 +441,17 @@ class CommandCSAKick : public Command
 			return;
 		}
 
+		bool is_list = cmd.equals_ci("LIST") || cmd.equals_ci("VIEW");
+		
+		bool has_access = false;
+		if (source.AccessFor(ci).HasPriv("AKICK") || source.HasPriv("chanserv/access/modify"))
+			has_access = true;
+		else if (is_list && source.HasPriv("chanserv/access/list"))
+			has_access = true;
+
 		if (mask.empty() && (cmd.equals_ci("ADD") || cmd.equals_ci("DEL")))
 			this->OnSyntaxError(source, cmd);
-		else if (!source.AccessFor(ci).HasPriv("AKICK") && !source.HasPriv("chanserv/access/modify"))
+		else if (!has_access)
 			source.Reply(ACCESS_DENIED);
 		else if (!cmd.equals_ci("LIST") && !cmd.equals_ci("VIEW") && !cmd.equals_ci("ENFORCE") && Anope::ReadOnly)
 			source.Reply(_("Sorry, channel autokick list modification is temporarily disabled."));

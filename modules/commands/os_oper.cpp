@@ -82,6 +82,12 @@ class CommandOSOper : public Command
 			const Anope::string &oper = params[1];
 			const Anope::string &otype = params[2];
 
+			if (!source.HasPriv("operserv/oper/modify"))
+			{
+				source.Reply(ACCESS_DENIED);
+				return;
+			}
+
 			const NickAlias *na = NickAlias::Find(oper);
 			if (na == NULL)
 				source.Reply(NICK_X_NOT_REGISTERED, oper.c_str());
@@ -114,6 +120,12 @@ class CommandOSOper : public Command
 		else if (subcommand.equals_ci("DEL") && params.size() > 1)
 		{
 			const Anope::string &oper = params[1];
+
+			if (!source.HasPriv("operserv/oper/modify"))
+			{
+				source.Reply(ACCESS_DENIED);
+				return;
+			}
 
 			const NickAlias *na = NickAlias::Find(oper);
 			if (na == NULL)

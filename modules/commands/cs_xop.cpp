@@ -365,7 +365,7 @@ class CommandCSXOP : public Command
 
 		AccessGroup access = source.AccessFor(ci);
 
-		if (!access.HasPriv("ACCESS_LIST") && !source.HasCommand("chanserv/access/list"))
+		if (!access.HasPriv("ACCESS_LIST") && !source.HasPriv("chanserv/access/list"))
 		{
 			source.Reply(ACCESS_DENIED);
 			return;

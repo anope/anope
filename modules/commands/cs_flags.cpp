@@ -388,6 +388,8 @@ class CommandCSFlags : public Command
 		bool has_access = false;
 		if (source.HasPriv("chanserv/access/modify"))
 			has_access = true;
+		else if (is_list && source.HasPriv("chanserv/access/list"))
+			has_access = true;
 		else if (is_list && source.AccessFor(ci).HasPriv("ACCESS_LIST"))
 			has_access = true;
 		else if (source.AccessFor(ci).HasPriv("ACCESS_CHANGE"))

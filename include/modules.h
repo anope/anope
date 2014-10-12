@@ -747,6 +747,12 @@ class CoreExport Module : public Extensible
 	 */
 	virtual void OnNickRegister(User *user, NickAlias *na, const Anope::string &pass) { throw NotImplementedException(); }
 
+	/** Called when a nick is confirmed. This will never be called if registration confirmation is not enabled.
+	 * @param user The user confirming the nick
+	 * @param The account being confirmed
+	 */
+	virtual void OnNickConfirm(User *user, NickCore *) { throw NotImplementedException(); }
+
 	/** Called when a nick is suspended
 	 * @param na The nick alias
 	 */
@@ -1091,7 +1097,7 @@ enum Implementation
 	I_OnAccessClear, I_OnLevelChange, I_OnChanDrop, I_OnChanRegistered, I_OnChanSuspend, I_OnChanUnsuspend,
 	I_OnCreateChan, I_OnDelChan, I_OnChannelCreate, I_OnChannelDelete, I_OnAkickAdd, I_OnAkickDel, I_OnCheckKick,
 	I_OnChanInfo, I_OnCheckPriv, I_OnGroupCheckPriv, I_OnNickDrop, I_OnNickGroup, I_OnNickIdentify,
-	I_OnUserLogin, I_OnNickLogout, I_OnNickRegister, I_OnNickSuspend, I_OnNickUnsuspended, I_OnDelNick, I_OnNickCoreCreate,
+	I_OnUserLogin, I_OnNickLogout, I_OnNickRegister, I_OnNickConfirm, I_OnNickSuspend, I_OnNickUnsuspended, I_OnDelNick, I_OnNickCoreCreate,
 	I_OnDelCore, I_OnChangeCoreDisplay, I_OnNickClearAccess, I_OnNickAddAccess, I_OnNickEraseAccess, I_OnNickClearCert,
 	I_OnNickAddCert, I_OnNickEraseCert, I_OnNickInfo, I_OnBotInfo, I_OnCheckAuthentication, I_OnNickUpdate,
 	I_OnFingerprint, I_OnUserAway, I_OnInvite, I_OnDeleteVhost, I_OnSetVhost, I_OnSetDisplayedHost, I_OnMemoSend, I_OnMemoDel,

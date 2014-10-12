@@ -37,6 +37,7 @@ class CommandNSConfirm : public Command
 			else
 			{
 				na->nc->Shrink<bool>("UNCONFIRMED");
+				FOREACH_MOD(OnNickConfirm, (source.GetUser(), na->nc));
 				Log(LOG_ADMIN, source, this) << "to confirm nick " << na->nick << " (" << na->nc->display << ")";
 				source.Reply(_("Nick \002%s\002 has been confirmed."), na->nick.c_str());
 			}
@@ -51,6 +52,7 @@ class CommandNSConfirm : public Command
 				Log(LOG_COMMAND, source, this) << "to confirm their email";
 				source.Reply(_("Your email address of \002%s\002 has been confirmed."), source.nc->email.c_str());
 				nc->Shrink<bool>("UNCONFIRMED");
+				FOREACH_MOD(OnNickConfirm, (source.GetUser(), nc));
 
 				if (source.GetUser())
 				{
@@ -198,8 +200,6 @@ class CommandNSRegister : public Command
 
 			Log(LOG_COMMAND, source, this) << "to register " << na->nick << " (email: " << (!na->nc->email.empty() ? na->nc->email : "none") << ")";
 
-			FOREACH_MOD(OnNickRegister, (source.GetUser(), na, pass));
-
 			if (na->nc->GetAccessCount())
 				source.Reply(_("Nickname \002%s\002 registered under your user@host-mask: %s"), u_nick.c_str(), na->nc->GetAccess(0).c_str());
 			else
@@ -222,6 +222,8 @@ class CommandNSRegister : public Command
 					SendRegmail(NULL, na, source.service);
 				}
 			}
+
+			FOREACH_MOD(OnNickRegister, (source.GetUser(), na, pass));
 
 			if (u)
 			{

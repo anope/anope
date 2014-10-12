@@ -389,6 +389,14 @@ void SQuit::Run(MessageSource &source, const std::vector<Anope::string> &params)
 		return;
 	}
 
+	if (s == Me)
+	{
+		if (Me->GetLinks().empty())
+			return;
+
+		s = Me->GetLinks().front();
+	}
+
 	s->Delete(s->GetName() + " " + s->GetUplink()->GetName());
 }
 

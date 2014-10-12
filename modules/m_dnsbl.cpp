@@ -15,12 +15,29 @@ static ServiceReference<Manager> dnsmanager("DNS::Manager", "dns/manager");
 
 struct Blacklist
 {
+	struct Reply
+	{
+		int code;
+		Anope::string reason;
+		bool allow_account;
+
+		Reply() : code(0), allow_account(false) { }
+	};
+
 	Anope::string name;
 	time_t bantime;
 	Anope::string reason;
-	std::map<int, Anope::string> replies;
+	std::vector<Reply> replies;
 
-	Blacklist(const Anope::string &n, time_t b, const Anope::string &r, const std::map<int, Anope::string> &re) : name(n), bantime(b), reason(r), replies(re) { }
+	Blacklist() : bantime(0) { }
+
+	Reply *Find(int code)
+	{
+		for (unsigned int i = 0; i < replies.size(); ++i)
+			if (replies[i].code == code)
+				return &replies[i];
+		return NULL;
+	}
 };
 
 class DNSBLResolver : public Request
@@ -42,17 +59,16 @@ class DNSBLResolver : public Request
 		if (ans_record.rdata.find("127.0.0.") != 0)
 			return;
 
-		Anope::string record_reason;
-		if (!this->blacklist.replies.empty())
-		{
-			sockaddrs sresult;
-			sresult.pton(AF_INET, ans_record.rdata);
-			int result = sresult.sa4.sin_addr.s_addr >> 24;
+		sockaddrs sresult;
+		sresult.pton(AF_INET, ans_record.rdata);
+		int result = sresult.sa4.sin_addr.s_addr >> 24;
 
-			if (!this->blacklist.replies.count(result))
-				return;
-			record_reason = this->blacklist.replies[result];
-		}
+		Blacklist::Reply *reply = blacklist.Find(result);
+		if (!blacklist.replies.empty() && !reply)
+			return;
+
+		if (reply && reply->allow_account && user->Account())
+			return;
 
 		Anope::string reason = this->blacklist.reason, addr = user->ip.addr();
 		reason = reason.replace_all_cs("%n", user->nick);
@@ -60,7 +76,7 @@ class DNSBLResolver : public Request
 		reason = reason.replace_all_cs("%g", user->realname);
 		reason = reason.replace_all_cs("%h", user->host);
 		reason = reason.replace_all_cs("%i", addr);
-		reason = reason.replace_all_cs("%r", record_reason);
+		reason = reason.replace_all_cs("%r", reply ? reply->reason : "");
 		reason = reason.replace_all_cs("%N", Config->GetBlock("networkinfo")->Get<const Anope::string>("networkname"));
 
 		BotInfo *OperServ = Config->GetClient("OperServ");
@@ -82,6 +98,7 @@ class DNSBLResolver : public Request
 class ModuleDNSBL : public Module
 {
 	std::vector<Blacklist> blacklists;
+	std::set<Anope::string> exempts;
 	bool check_on_connect;
 	bool check_on_netburst;
 	bool add_to_akill;
@@ -100,25 +117,35 @@ class ModuleDNSBL : public Module
 		this->add_to_akill = block->Get<bool>("add_to_akill", "yes");
 
 		this->blacklists.clear();
-		for (int i = 0, num = block->CountBlock("blacklist"); i < num; ++i)
+		for (int i = 0; i < block->CountBlock("blacklist"); ++i)
 		{
 			Configuration::Block *bl = block->GetBlock("blacklist", i);
+			Blacklist blacklist;
 
-			Anope::string bname = bl->Get<const Anope::string>("name");
-			if (bname.empty())
+			blacklist.name = bl->Get<Anope::string>("name");
+			if (blacklist.name.empty())
 				continue;
-			time_t bantime = bl->Get<time_t>("time", "4h");
-			Anope::string reason = bl->Get<const Anope::string>("reason");
-			std::map<int, Anope::string> replies;
-			for (int j = 0; j < 256; ++j)
+			blacklist.bantime = bl->Get<time_t>("time", "4h");
+			blacklist.reason = bl->Get<Anope::string>("reason");
+
+			for (int j = 0; j < bl->CountBlock("reply"); ++j)
 			{
-				Anope::string k = bl->Get<const Anope::string>(stringify(j));
-				if (!k.empty())
-					replies[j] = k;
+				Configuration::Block *reply = bl->GetBlock("reply", j);
+				Blacklist::Reply r;
+
+				r.code = reply->Get<int>("code");
+				r.reason = reply->Get<Anope::string>("reason");
+				r.allow_account = reply->Get<bool>("allow_account");
+
+				blacklist.replies.push_back(r);
 			}
 
-			this->blacklists.push_back(Blacklist(bname, bantime, reason, replies));
+			this->blacklists.push_back(blacklist);
 		}
+
+		this->exempts.clear();
+		for (int i = 0; i < block->CountBlock("exempt"); ++i)
+			this->exempts.insert(block->Get<Anope::string>("ip"));
 	}
 
 	void OnUserConnect(User *user, bool &exempt) anope_override
@@ -132,6 +159,9 @@ class ModuleDNSBL : public Module
 		/* At this time we only support IPv4 */
 		if (!user->ip.valid() || user->ip.sa.sa_family != AF_INET)
 			/* User doesn't have a valid IPv4 IP (ipv6/spoof/etc) */
+			return;
+
+		if (this->exempts.count(user->ip.addr()))
 			return;
 
 		const unsigned long &ip = user->ip.sa4.sin_addr.s_addr;

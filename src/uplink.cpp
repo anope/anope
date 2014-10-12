@@ -66,7 +66,7 @@ UplinkSocket::UplinkSocket() : Socket(-1, Config->Uplinks[Anope::CurrentUplink].
 
 UplinkSocket::~UplinkSocket()
 {
-	if (!error)
+	if (!error && !Anope::Quitting)
 	{
 		this->OnError("");
 		Module *protocol = ModuleManager::FindFirstOf(PROTOCOL);

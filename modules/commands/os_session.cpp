@@ -639,7 +639,10 @@ class OSSession : public Module
 		exception_type("Exception", Exception::Unserialize), ss(this), commandossession(this), commandosexception(this), akills("XLineManager", "xlinemanager/sgline")
 	{
 		this->SetPermanent(true);
+	}
 
+	void Prioritize() anope_override
+	{
 		ModuleManager::SetPriority(this, PRIORITY_FIRST);
 	}
 

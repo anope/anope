@@ -285,6 +285,8 @@ class CoreExport Module : public Extensible
 	 */
 	ModuleVersion GetVersion() const;
 
+	virtual void Prioritize();
+
 	/* Everything below here are events. Modules must ModuleManager::Attach to these events
 	 * before they will be called.
 	 */

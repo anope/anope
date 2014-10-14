@@ -496,11 +496,6 @@ class OSDefcon : public Module
 			XLine x("*@" + u->host, OperServ ? OperServ->nick : "defcon", Anope::CurTime + DConfig.akillexpire, DConfig.akillreason, XLineManager::GenerateUID());
 			akills->Send(NULL, &x);
 		}
-		if (DConfig.Check(DEFCON_NO_NEW_CLIENTS) || DConfig.Check(DEFCON_AKILL_NEW_CLIENTS))
-		{
-			u->Kill(OperServ ? OperServ->nick : "", DConfig.akillreason);
-			return;
-		}
 
 		if (DConfig.Check(DEFCON_NO_NEW_CLIENTS) || DConfig.Check(DEFCON_AKILL_NEW_CLIENTS))
 		{
@@ -529,9 +524,9 @@ class OSDefcon : public Module
 				++session->hits;
 				if (akills && DConfig.max_session_kill && session->hits >= DConfig.max_session_kill)
 				{
-					XLine x("*@" + u->host, OperServ ? OperServ->nick : "", Anope::CurTime + DConfig.session_autokill_expiry, "Defcon session limit exceeded", XLineManager::GenerateUID());
+					XLine x("*@" + session->addr.mask(), OperServ ? OperServ->nick : "", Anope::CurTime + DConfig.session_autokill_expiry, "Defcon session limit exceeded", XLineManager::GenerateUID());
 					akills->Send(NULL, &x);
-					Log(OperServ, "akill/defcon") << "[DEFCON] Added a temporary AKILL for \002*@" << u->host << "\002 due to excessive connections";
+					Log(OperServ, "akill/defcon") << "[DEFCON] Added a temporary AKILL for \002*@" << session->addr.mask() << "\002 due to excessive connections";
 				}
 				else
 				{

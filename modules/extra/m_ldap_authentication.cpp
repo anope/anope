@@ -220,7 +220,10 @@ class NSIdentifyLDAP : public Module
 	{
 
 		me = this;
+	}
 
+	void Prioritize() anope_override
+	{
 		ModuleManager::SetPriority(this, PRIORITY_FIRST);
 	}
 

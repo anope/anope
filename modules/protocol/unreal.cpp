@@ -1258,7 +1258,10 @@ class ProtoUnreal : public Module
 	{
 
 		this->AddModes();
+	}
 
+	void Prioritize() anope_override
+	{
 		ModuleManager::SetPriority(this, PRIORITY_FIRST);
 	}
 

@@ -265,6 +265,8 @@ ModuleReturn ModuleManager::LoadModule(const Anope::string &modname, User *u)
 	for (unsigned i = 0; i < I_SIZE; ++i)
 		EventHandlers[i].push_back(m);
 
+	m->Prioritize();
+
 	FOREACH_MOD(OnModuleLoad, (u, m));
 
 	return MOD_ERR_OK;

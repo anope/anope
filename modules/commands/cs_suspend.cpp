@@ -235,9 +235,9 @@ class CSSuspend : public Module
 		if (!si->reason.empty() && (show_hidden || Show(source, "reason")))
 			info[_("Suspend reason")] = si->reason;
 		if (si->when && (show_hidden || Show(source, "on")))
-			info[_("Suspended on")] = Anope::strftime(si->when, source.GetAccount(), true);
+			info[_("Suspended on")] = Anope::strftime(si->when, source.GetAccount());
 		if (si->expires && (show_hidden || Show(source, "expires")))
-			info[_("Suspension expires")] = Anope::strftime(si->expires, source.GetAccount(), true);
+			info[_("Suspension expires")] = Anope::strftime(si->expires, source.GetAccount());
 	}
 
 	void OnPreChanExpire(ChannelInfo *ci, bool &expire) anope_override

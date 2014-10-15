@@ -249,9 +249,9 @@ class NSSuspend : public Module
 		if (!s->reason.empty() && (show_hidden || Show(source, "reason")))
 			info[_("Suspend reason")] = s->reason;
 		if (s->when && (show_hidden || Show(source, "on")))
-			info[_("Suspended on")] = Anope::strftime(s->when, source.GetAccount(), true);
+			info[_("Suspended on")] = Anope::strftime(s->when, source.GetAccount());
 		if (s->expires && (show_hidden || Show(source, "expires")))
-			info[_("Suspension expires")] = Anope::strftime(s->expires, source.GetAccount(), true);
+			info[_("Suspension expires")] = Anope::strftime(s->expires, source.GetAccount());
 	}
 
 	void OnPreNickExpire(NickAlias *na, bool &expire) anope_override

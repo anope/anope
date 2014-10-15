@@ -176,6 +176,9 @@ class CommandCSXOP : public Command
 					return;
 				}
 			}
+
+			if (na)
+				mask = na->nick;
 		}
 
 		for (unsigned i = 0; i < ci->GetAccessCount(); ++i)

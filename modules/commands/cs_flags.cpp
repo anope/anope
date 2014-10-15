@@ -130,6 +130,9 @@ class CommandCSFlags : public Command
 					return;
 				}
 			}
+
+			if (na)
+				mask = na->nick;
 		}
 
 		ChanAccess *current = NULL;

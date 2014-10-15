@@ -175,6 +175,9 @@ class CommandCSAccess : public Command
 					return;
 				}
 			}
+
+			if (na)
+				mask = na->nick;
 		}
 
 		for (unsigned i = ci->GetAccessCount(); i > 0; --i)

@@ -177,6 +177,17 @@ public:
 
 			source.Reply(_("All badword entries from \002%s\002 have been cloned to \002%s\002."), channel.c_str(), target.c_str());
 		}
+		else if (what.equals_ci("LEVELS"))
+		{
+			Anope::map<int16_t> cilevels = ci->GetLevelEntries();
+
+			for(Anope::map<int16_t>::const_iterator it = cilevels.begin(); it != cilevels.end(); ++it)
+			{
+				target_ci->SetLevel(it->first, it->second);
+			}
+
+			source.Reply(_("%d level entries from \002%s\002 have been cloned into \002%s\002"), cilevels.size(), channel.c_str(), target.c_str());
+		}
 		else
 		{
 			this->OnSyntaxError(source, "");
@@ -191,7 +202,7 @@ public:
 		this->SendSyntax(source);
 		source.Reply(" ");
 		source.Reply(_("Copies all settings, access, akicks, etc from \002channel\002 to the\n"
-				"\002target\002 channel. If \037what\037 is \002ACCESS\002, \002AKICK\002, or \002BADWORDS\002\n"
+				"\002target\002 channel. If \037what\037 is \002ACCESS\002, \002AKICK\002, \002BADWORDS\002, or \002LEVELS\002\n"
 				"then only the respective settings are cloned.\n"
 				"You must be the founder of \037channel\037 and \037target\037."));
 		return true;

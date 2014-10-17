@@ -157,7 +157,7 @@ class DHAES : public Mechanism
 			std::string username = &decrypted[0];
 			std::string password = &decrypted[username.length() + 1];
 
-			if (username.empty() || password.empty())
+			if (username.empty() || password.empty() || !IRCD->IsNickValid(username) || password.find_first_of("\r\n") != Anope::string::npos)
 				return Err(sess, pubkey);
 
 			SASL::IdentifyRequest* req = new SASL::IdentifyRequest(this->owner, m.source, username, password);

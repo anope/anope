@@ -858,6 +858,26 @@ class IRCDMessageMetadata : IRCDMessage
 
 	void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
 	{
+		// We deliberately ignore non-bursting servers to avoid pseudoserver fights
+		if ((params[0][0] == '#') && (!source.GetServer()->IsSynced()))
+		{
+			Channel *c = Channel::Find(params[0]);
+			if (c && c->ci)
+			{
+				if ((do_mlock) && (params[1] == "mlock"))
+				{
+					ModeLocks *modelocks = c->ci->GetExt<ModeLocks>("modelocks");
+					Anope::string modes;
+					if (modelocks)
+						modes = modelocks->GetMLockAsString(false).replace_all_cs("+", "").replace_all_cs("-", "");
+
+					// Mode lock string is not what we say it is?
+					if (modes != params[2])
+						UplinkSocket::Message(Me) << "METADATA " << c->name << " mlock :" << modes;
+				}
+			}
+		}
+
 		if (insp12_metadata)
 			insp12_metadata->Run(source, params);
 	}

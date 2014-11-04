@@ -850,9 +850,11 @@ struct IRCDMessageSave : IRCDMessage
 class IRCDMessageMetadata : IRCDMessage
 {
 	ServiceReference<IRCDMessage> insp12_metadata;
+	const bool &do_topiclock;
+	const bool &do_mlock;
 
  public:
-	IRCDMessageMetadata(Module *creator) : IRCDMessage(creator, "METADATA", 3), insp12_metadata("IRCDMessage", "inspircd12/metadata") { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
+	IRCDMessageMetadata(Module *creator, const bool &handle_topiclock, const bool &handle_mlock) : IRCDMessage(creator, "METADATA", 3), insp12_metadata("IRCDMessage", "inspircd12/metadata"), do_topiclock(handle_topiclock), do_mlock(handle_mlock) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
 
 	void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
 	{
@@ -925,7 +927,7 @@ class ProtoInspIRCd20 : public Module
 		message_time("IRCDMessage", "inspircd20/time", "inspircd12/time"),
 		message_uid("IRCDMessage", "inspircd20/uid", "inspircd12/uid"),
 
-		message_capab(this), message_encap(this), message_fhost(this), message_fident(this), message_metadata(this),
+		message_capab(this), message_encap(this), message_fhost(this), message_fident(this), message_metadata(this, use_server_side_topiclock, use_server_side_mlock),
 		message_save(this)
 	{
 

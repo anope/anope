@@ -153,6 +153,9 @@ class CommandOSAKill : public Command
 		if (targ)
 			mask = "*@" + targ->host;
 
+		if (Config->GetModule("operserv")->Get<bool>("addakiller", "yes") && !source.GetNick().empty())
+			reason = "[" + source.GetNick() + "] " + reason;
+
 		if (!akills->CanAdd(source, mask, expires, reason))
 			return;
 		else if (mask.find_first_not_of("/~@.*?") == Anope::string::npos)
@@ -165,9 +168,6 @@ class CommandOSAKill : public Command
 			source.Reply(BAD_USERHOST_MASK);
 			return;
 		}
-
-		if (Config->GetModule("operserv")->Get<bool>("addakiller", "yes") && !source.GetNick().empty())
-			reason = "[" + source.GetNick() + "] " + reason;
 
 		XLine *x = new XLine(mask, source.GetNick(), expires, reason);
 		if (Config->GetModule("operserv")->Get<bool>("akillids"))

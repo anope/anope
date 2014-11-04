@@ -873,7 +873,7 @@ class EBCRYPT : public Module
 	}
 
  public:
-	EBCRYPT(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, ENCRYPTION | VENDOR | EXTRA),
+	EBCRYPT(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, ENCRYPTION | VENDOR),
 		rounds(10)
 	{
 		// Test a pre-calculated hash

@@ -230,12 +230,12 @@ class CommandBSKickBase : public Command
 				source.Reply(_("Bot will now kick for \002%s\002."), optname.c_str());
 
 			bool override = !source.AccessFor(ci).HasPriv("SET");
-			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to enable the " << optname << "kicker";
+			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to enable the " << optname << " kicker";
 		}
 		else if (param.equals_ci("OFF"))
 		{
 			bool override = !source.AccessFor(ci).HasPriv("SET");
-			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to disable the " << optname << "kicker";
+			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to disable the " << optname << " kicker";
 
 			val = false;
 			source.Reply(_("Bot won't kick for \002%s\002 anymore."), optname.c_str());

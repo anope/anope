@@ -577,7 +577,7 @@ static void runDefCon()
 				{
 					Log(OperServ, "operserv/defcon") << "DEFCON: setting " << newmodes << " on all channels";
 					for (channel_map::const_iterator it = ChannelList.begin(), it_end = ChannelList.end(); it != it_end; ++it)
-						it->second->SetModes(OperServ, false, "%s", newmodes.c_str());
+						it->second->SetModes(OperServ, true, "%s", newmodes.c_str());
 				}
 			}
 		}

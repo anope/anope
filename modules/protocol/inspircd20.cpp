@@ -847,6 +847,20 @@ struct IRCDMessageSave : IRCDMessage
 	}
 };
 
+class IRCDMessageMetadata : IRCDMessage
+{
+	ServiceReference<IRCDMessage> insp12_metadata;
+
+ public:
+	IRCDMessageMetadata(Module *creator) : IRCDMessage(creator, "METADATA", 3), insp12_metadata("IRCDMessage", "inspircd12/metadata") { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
+
+	void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
+	{
+		if (insp12_metadata)
+			insp12_metadata->Run(source, params);
+	}
+};
+
 class ProtoInspIRCd20 : public Module
 {
 	Module *m_insp12;
@@ -871,7 +885,7 @@ class ProtoInspIRCd20 : public Module
 
 	/* InspIRCd 1.2 message handlers */
 	ServiceAlias message_endburst, message_fjoin, message_fmode,
-				message_ftopic, message_idle, message_metadata, message_mode,
+				message_ftopic, message_idle, message_mode,
 				message_nick, message_opertype, message_rsquit, message_server,
 				message_squit, message_time, message_uid;
 
@@ -880,6 +894,7 @@ class ProtoInspIRCd20 : public Module
 	IRCDMessageEncap message_encap;
 	IRCDMessageFHost message_fhost;
 	IRCDMessageFIdent message_fident;
+	IRCDMessageMetadata message_metadata;
 	IRCDMessageSave message_save;
 
 	bool use_server_side_topiclock, use_server_side_mlock;
@@ -901,7 +916,6 @@ class ProtoInspIRCd20 : public Module
 		message_fmode("IRCDMessage", "inspircd20/fmode", "inspircd12/fmode"),
 		message_ftopic("IRCDMessage", "inspircd20/ftopic", "inspircd12/ftopic"),
 		message_idle("IRCDMessage", "inspircd20/idle", "inspircd12/idle"),
-		message_metadata("IRCDMessage", "inspircd20/metadata", "inspircd12/metadata"),
 		message_mode("IRCDMessage", "inspircd20/mode", "inspircd12/mode"),
 		message_nick("IRCDMessage", "inspircd20/nick", "inspircd12/nick"),
 		message_opertype("IRCDMessage", "inspircd20/opertype", "inspircd12/opertype"),
@@ -911,7 +925,8 @@ class ProtoInspIRCd20 : public Module
 		message_time("IRCDMessage", "inspircd20/time", "inspircd12/time"),
 		message_uid("IRCDMessage", "inspircd20/uid", "inspircd12/uid"),
 
-		message_capab(this), message_encap(this), message_fhost(this), message_fident(this), message_save(this)
+		message_capab(this), message_encap(this), message_fhost(this), message_fident(this), message_metadata(this),
+		message_save(this)
 	{
 
 		if (ModuleManager::LoadModule("inspircd12", User::Find(creator)) != MOD_ERR_OK)

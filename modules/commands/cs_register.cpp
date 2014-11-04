@@ -67,6 +67,8 @@ class CommandCSRegister : public Command
 			Log(LOG_COMMAND, source, this, ci);
 			source.Reply(_("Channel \002%s\002 registered under your account: %s"), chan.c_str(), nc->display.c_str());
 
+			FOREACH_MOD(OnChanRegistered, (ci));
+
 			/* Implement new mode lock */
 			if (c)
 			{
@@ -74,8 +76,6 @@ class CommandCSRegister : public Command
 				if (u)
 					c->SetCorrectModes(u, true);
 			}
-
-			FOREACH_MOD(OnChanRegistered, (ci));
 		}
 	}
 

@@ -33,20 +33,26 @@ class CommandOSKick : public Command
 			source.Reply(CHAN_X_NOT_IN_USE, chan.c_str());
 			return;
 		}
-		else if (c->bouncy_modes)
+
+		if (c->bouncy_modes)
 		{
 			source.Reply(_("Services is unable to change modes. Are your servers' U:lines configured correctly?"));
 			return;
 		}
-		else if (!(u2 = User::Find(nick, true)))
+
+		if (!(u2 = User::Find(nick, true)))
 		{
 			source.Reply(NICK_X_NOT_IN_USE, nick.c_str());
 			return;
 		}
 
-		c->Kick(source.service, u2, "%s (%s)", source.GetNick().c_str(), s.c_str());
+		if (!c->Kick(source.service, u2, "%s (%s)", source.GetNick().c_str(), s.c_str()))
+		{
+			source.Reply(ACCESS_DENIED);
+			return;
+		}
+
 		Log(LOG_ADMIN, source, this) << "on " << u2->nick << " in " << c->name << " (" << s << ")";
-		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override

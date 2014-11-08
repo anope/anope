@@ -455,6 +455,7 @@ class CommandOSDNS : public Command
 			}
 
 			z->servers.erase(s->GetName());
+			s->zones.erase(z->name);
 			source.Reply(_("Removed server %s from zone %s."), s->GetName().c_str(), z->name.c_str());
 			return;
 		}

@@ -122,6 +122,7 @@ class CommandCSAccess : public Command
 		tmp_access.level = level;
 
 		bool override = false;
+		const NickAlias *na = NULL;
 
 		if ((!highest || *highest <= tmp_access) && !u_access.founder)
 		{
@@ -158,7 +159,8 @@ class CommandCSAccess : public Command
 		}
 		else
 		{
-			const NickAlias *na = NickAlias::Find(mask);
+			na = NickAlias::Find(mask);
+
 			if (!na && Config->GetModule("chanserv")->Get<bool>("disallow_hostmask_access"))
 			{
 				source.Reply(_("Masks and unregistered users may not be on access lists."));
@@ -183,7 +185,7 @@ class CommandCSAccess : public Command
 		for (unsigned i = ci->GetAccessCount(); i > 0; --i)
 		{
 			const ChanAccess *access = ci->GetAccess(i - 1);
-			if (mask.equals_ci(access->Mask()))
+			if ((na && na->nc == access->GetAccount()) || mask.equals_ci(access->Mask()))
 			{
 				/* Don't allow lowering from a level >= u_level */
 				if ((!highest || *access >= *highest) && !u_access.founder && !source.HasPriv("chanserv/access/modify"))

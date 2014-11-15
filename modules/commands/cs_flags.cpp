@@ -88,6 +88,7 @@ class CommandCSFlags : public Command
 
 		AccessGroup u_access = source.AccessFor(ci);
 		const ChanAccess *highest = u_access.Highest();
+		const NickAlias *na = NULL;
 
 		if (IRCD->IsChannelValid(mask))
 		{
@@ -113,7 +114,7 @@ class CommandCSFlags : public Command
 		}
 		else
 		{
-			const NickAlias *na = NickAlias::Find(mask);
+			na = NickAlias::Find(mask);
 			if (!na && Config->GetModule("chanserv")->Get<bool>("disallow_hostmask_access"))
 			{
 				source.Reply(_("Masks and unregistered users may not be on access lists."));
@@ -142,7 +143,7 @@ class CommandCSFlags : public Command
 		for (current_idx = ci->GetAccessCount(); current_idx > 0; --current_idx)
 		{
 			ChanAccess *access = ci->GetAccess(current_idx - 1);
-			if (mask.equals_ci(access->Mask()))
+			if ((na && na->nc == access->GetAccount()) || mask.equals_ci(access->Mask()))
 			{
 				// Flags allows removing others that have the same access as you,
 				// but no other access system does.

@@ -120,6 +120,7 @@ class CommandCSXOP : public Command
 		AccessGroup access = source.AccessFor(ci);
 		const ChanAccess *highest = access.Highest();
 		bool override = false;
+		const NickAlias *na = NULL;
 
 		std::vector<Anope::string>::iterator cmd_it = std::find(order.begin(), order.end(), source.command.upper()),
 			access_it = highest ? std::find(order.begin(), order.end(), XOPChanAccess::DetermineLevel(highest)) : order.end();
@@ -159,7 +160,7 @@ class CommandCSXOP : public Command
 		}
 		else
 		{
-			const NickAlias *na = NickAlias::Find(mask);
+			na = NickAlias::Find(mask);
 			if (!na && Config->GetModule("chanserv")->Get<bool>("disallow_hostmask_access"))
 			{
 				source.Reply(_("Masks and unregistered users may not be on access lists."));
@@ -185,7 +186,7 @@ class CommandCSXOP : public Command
 		{
 			const ChanAccess *a = ci->GetAccess(i);
 
-			if (a->Mask().equals_ci(mask))
+			if ((na && na->nc == a->GetAccount()) || mask.equals_ci(a->Mask()))
 			{
 				if ((!highest || *a >= *highest) && !access.founder && !source.HasPriv("chanserv/access/modify"))
 				{

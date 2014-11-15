@@ -514,7 +514,7 @@ class CommandBSKickFlood : public CommandBSKickBase
 				try
 				{
 					i = convertTo<int16_t>(ttb);
-					if (i < 1)
+					if (i < 0)
 						throw ConvertException();
 				}
 				catch (const ConvertException &)

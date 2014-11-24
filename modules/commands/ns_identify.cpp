@@ -34,10 +34,10 @@ class NSIdentifyRequestListener : public NickServ::IdentifyRequestListener
 		}
 
 		if (u->IsIdentified())
-			Log(LOG_COMMAND, source, cmd) << "to log out of account " << u->Account()->display;
+			Log(LOG_COMMAND, source, cmd) << "to log out of account " << u->Account()->GetDisplay();
 
-		Log(LOG_COMMAND, source, cmd) << "and identified for account " << na->nc->display;
-		source.Reply(_("Password accepted - you are now recognized as \002{0}\002."), na->nc->display);
+		Log(LOG_COMMAND, source, cmd) << "and identified for account " << na->GetAccount()->GetDisplay();
+		source.Reply(_("Password accepted - you are now recognized as \002{0}\002."), na->GetAccount()->GetDisplay());
 		u->Identify(na);
 	}
 
@@ -77,19 +77,19 @@ class CommandNSIdentify : public Command
 		Anope::string pass = params[params.size() - 1];
 
 		NickServ::Nick *na = NickServ::FindNick(nick);
-		if (na && na->nc->HasExt("NS_SUSPENDED"))
+		if (na && na->GetAccount()->HasFieldS("NS_SUSPENDED"))
 		{
-			source.Reply(_("\002{0}\002 is suspended."), na->nick);
+			source.Reply(_("\002{0}\002 is suspended."), na->GetNick());
 			return;
 		}
 
-		if (u->Account() && na && u->Account() == na->nc)
+		if (u->Account() && na && u->Account() == na->GetAccount())
 		{
 			source.Reply(_("You are already identified."));
 			return;
 		}
 
-		NickServ::IdentifyRequest *req = NickServ::service->CreateIdentifyRequest(new NSIdentifyRequestListener(source, this), owner, na ? na->nc->display : nick, pass);
+		NickServ::IdentifyRequest *req = NickServ::service->CreateIdentifyRequest(new NSIdentifyRequestListener(source, this), owner, na ? na->GetAccount()->GetDisplay() : nick, pass);
 		Event::OnCheckAuthentication(&Event::CheckAuthentication::OnCheckAuthentication, u, req);
 		req->Dispatch();
 	}

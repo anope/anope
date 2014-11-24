@@ -11,6 +11,7 @@
 
 #include "event.h"
 #include "service.h"
+#include "serialize.h"
 
 namespace NickServ
 {
@@ -35,11 +36,11 @@ namespace NickServ
 		virtual IdentifyRequest *CreateIdentifyRequest(IdentifyRequestListener *l, Module *owner, const Anope::string &acc, const Anope::string &pass) anope_abstract;
 		virtual std::set<IdentifyRequest *>& GetIdentifyRequests() anope_abstract;
 
-		virtual nickalias_map& GetNickList() anope_abstract;
-		virtual nickcore_map& GetAccountList() anope_abstract;
+		virtual std::vector<Nick *> GetNickList() anope_abstract;
+		virtual nickalias_map& GetNickMap() anope_abstract;
 
-		virtual Nick *CreateNick(const Anope::string &nick, Account *acc) anope_abstract;
-		virtual Account *CreateAccount(const Anope::string &acc) anope_abstract;
+		virtual std::vector<Account *> GetAccountList() anope_abstract;
+		virtual nickcore_map& GetAccountMap() anope_abstract;
 
 		virtual Nick *FindNick(const Anope::string &nick) anope_abstract;
 		virtual Account *FindAccount(const Anope::string &acc) anope_abstract;
@@ -104,30 +105,35 @@ namespace NickServ
 	/* A registered nickname.
 	 * It matters that Base is here before Extensible (it is inherited by Serializable)
 	 */
-	class CoreExport Nick : public Serializable, public Extensible
+	class CoreExport Nick : public Serialize::Object
 	{
 	 protected:
-		Anope::string vhost_ident, vhost_host, vhost_creator;
-		time_t vhost_created;
+		using Serialize::Object::Object;
 
 	 public:
-		Anope::string nick;
-		Anope::string last_quit;
-		Anope::string last_realname;
-		/* Last usermask this nick was seen on, eg user@host */
-		Anope::string last_usermask;
-		/* Last uncloaked usermask, requires nickserv/auspex to see */
-		Anope::string last_realhost;
-		time_t time_registered;
-		time_t last_seen;
-		/* Account this nick is tied to. Multiple nicks can be tied to a single account. */
-		Serialize::Reference<Account> nc;
+		virtual Anope::string GetNick() anope_abstract;
+		virtual void SetNick(const Anope::string &) anope_abstract;
 
-	 protected:
-		Nick() : Serializable("NickAlias") { }
+		virtual Anope::string GetLastQuit() anope_abstract;
+		virtual void SetLastQuit(const Anope::string &) anope_abstract;
 
-	 public:
-		virtual ~Nick() { }
+		virtual Anope::string GetLastRealname() anope_abstract;
+		virtual void SetLastRealname(const Anope::string &) anope_abstract;
+
+		virtual Anope::string GetLastUsermask() anope_abstract;
+		virtual void SetLastUsermask(const Anope::string &) anope_abstract;
+
+		virtual Anope::string GetLastRealhost() anope_abstract;
+		virtual void SetLastRealhost(const Anope::string &) anope_abstract;
+
+		virtual time_t GetTimeRegistered() anope_abstract;
+		virtual void SetTimeRegistered(const time_t &) anope_abstract;
+
+		virtual time_t GetLastSeen() anope_abstract;
+		virtual void SetLastSeen(const time_t &) anope_abstract;
+
+		virtual Account *GetAccount() anope_abstract;
+		virtual void SetAccount(Account *acc) anope_abstract;
 
 		/** Set a vhost for the user
 		 * @param ident The ident
@@ -136,139 +142,66 @@ namespace NickServ
 		 * @param time When the vhost was craated
 		 */
 		virtual void SetVhost(const Anope::string &ident, const Anope::string &host, const Anope::string &creator, time_t created = Anope::CurTime) anope_abstract;
-
-		/** Remove a users vhost
-		 **/
 		virtual void RemoveVhost() anope_abstract;
+		virtual bool HasVhost() anope_abstract;
 
-		/** Check if the user has a vhost
-		 * @return true or false
-		 */
-		virtual bool HasVhost() const anope_abstract;
+		virtual Anope::string GetVhostIdent() anope_abstract;
+		virtual void SetVhostIdent(const Anope::string &) anope_abstract;
 
-		/** Retrieve the vhost ident
-		 * @return the ident
-		 */
-		virtual const Anope::string &GetVhostIdent() const anope_abstract;
+		virtual Anope::string GetVhostHost() anope_abstract;
+		virtual void SetVhostHost(const Anope::string &) anope_abstract;
 
-		/** Retrieve the vhost host
-		 * @return the host
-		 */
-		virtual const Anope::string &GetVhostHost() const anope_abstract;
+		virtual Anope::string GetVhostCreator() anope_abstract;
+		virtual void SetVhostCreator(const Anope::string &) anope_abstract;
 
-		/** Retrieve the vhost creator
-		 * @return the creator
-		 */
-		virtual const Anope::string &GetVhostCreator() const anope_abstract;
-
-		/** Retrieve when the vhost was created
-		 * @return the time it was created
-		 */
-		virtual time_t GetVhostCreated() const anope_abstract;
+		virtual time_t GetVhostCreated() anope_abstract;
+		virtual void SetVhostCreated(const time_t &) anope_abstract;
 	};
+
+	static Serialize::TypeReference<Nick> nick("NickAlias");
 
 	/* A registered account. Each account must have a Nick with the same nick as the
 	 * account's display.
 	 * It matters that Base is here before Extensible (it is inherited by Serializable)
 	 */
-	class CoreExport Account : public Serializable, public Extensible
+	class CoreExport Account : public Serialize::Object
 	{
-	 protected:
-		/* Channels which reference this core in some way (this is on their access list, akick list, is founder, successor, etc) */
-		Serialize::Checker<std::map<ChanServ::Channel *, int> > chanaccess;
 	 public:
-		/* Name of the account. Find(display)->nc == this. */
-		Anope::string display;
-		/* User password in form of hashm:data */
-		Anope::string pass;
-		Anope::string email;
-		/* Locale name of the language of the user. Empty means default language */
-		Anope::string language;
-		/* Access list, contains user@host masks of users who get certain privileges based
-		 * on if NI_SECURE is set and what (if any) kill protection is enabled. */
-		std::vector<Anope::string> access;
-		MemoServ::MemoInfo *memos = nullptr;
-		std::map<Anope::string, Anope::string> last_modes;
-
-		/* Nicknames registered that are grouped to this account.
-		 * for n in aliases, n->nc == this.
-		 */
-		Serialize::Checker<std::vector<Nick *> > aliases;
-
 		/* Set if this user is a services operattor. o->ot must exist. */
-		Oper *o;
+		Serialize::Reference<Oper> o;
 
 		/* Unsaved data */
 
-		/* Number of channels registered by this account */
-		uint16_t channelcount;
 		/* Last time an email was sent to this user */
-		time_t lastmail;
+		time_t lastmail = 0;
 		/* Users online now logged into this account */
-		std::list<User *> users;
+		std::vector<User *> users;
 
 	 protected:
-		/** Constructor
-		 * @param display The display nick
-		 */
-		Account() : Serializable("NickCore"), chanaccess("ChannelInfo"), aliases("NickAlias") { }
+		using Serialize::Object::Object;
 
 	 public:
-		virtual ~Account() { }
+		virtual Anope::string GetDisplay() anope_abstract;
+		virtual void SetDisplay(const Anope::string &) anope_abstract;
+
+		virtual Anope::string GetPassword() anope_abstract;
+		virtual void SetPassword(const Anope::string &) anope_abstract;
+
+		virtual Anope::string GetEmail() anope_abstract;
+		virtual void SetEmail(const Anope::string &) anope_abstract;
+
+		virtual Anope::string GetLanguage() anope_abstract;
+		virtual void SetLanguage(const Anope::string &) anope_abstract;
 
 		/** Changes the display for this account
 		 * @param na The new display, must be grouped to this account.
 		 */
-		virtual void SetDisplay(const Nick *na) anope_abstract;
+		virtual void SetDisplay(Nick *na) anope_abstract;
 
 		/** Checks whether this account is a services oper or not.
 		 * @return True if this account is a services oper, false otherwise.
 		 */
 		virtual bool IsServicesOper() const anope_abstract;
-
-		/** Add an entry to the nick's access list
-		 *
-		 * @param entry The nick!ident@host entry to add to the access list
-		 *
-		 * Adds a new entry into the access list.
-		 */
-		virtual void AddAccess(const Anope::string &entry) anope_abstract;
-
-		/** Get an entry from the nick's access list by index
-		 *
-		 * @param entry Index in the access list vector to retrieve
-		 * @return The access list entry of the given index if within bounds, an empty string if the vector is empty or the index is out of bounds
-		 *
-		 * Retrieves an entry from the access list corresponding to the given index.
-		 */
-		virtual Anope::string GetAccess(unsigned entry) const anope_abstract;
-
-		/** Get the number of entries on the access list for this account.
-		 */
-		virtual unsigned GetAccessCount() const anope_abstract;
-
-		/** Find an entry in the nick's access list
-		 *
-		 * @param entry The nick!ident@host entry to search for
-		 * @return True if the entry is found in the access list, false otherwise
-		 *
-		 * Search for an entry within the access list.
-		 */
-		virtual bool FindAccess(const Anope::string &entry) anope_abstract;
-
-		/** Erase an entry from the nick's access list
-		 *
-		 * @param entry The nick!ident@host entry to remove
-		 *
-		 * Removes the specified access list entry from the access list.
-		 */
-		virtual void EraseAccess(const Anope::string &entry) anope_abstract;
-
-		/** Clears the entire nick's access list
-		 *
-		 * Deletes all the memory allocated in the access list vector and then clears the vector.
-		 */
-		virtual void ClearAccess() anope_abstract;
 
 		/** Is the given user on this accounts access list?
 		 *
@@ -276,12 +209,14 @@ namespace NickServ
 		 *
 		 * @return true if the user is on the access list
 		 */
-		virtual bool IsOnAccess(const User *u) const anope_abstract;
+		virtual bool IsOnAccess(User *u) anope_abstract;
 
-		virtual void AddChannelReference(ChanServ::Channel *ci) anope_abstract;
-		virtual void RemoveChannelReference(ChanServ::Channel *ci) anope_abstract;
-		virtual void GetChannelReferences(std::deque<ChanServ::Channel *> &queue) anope_abstract;
+		virtual MemoServ::MemoInfo *GetMemos() anope_abstract;
+
+		virtual unsigned int GetChannelCount() anope_abstract;
 	};
+
+	static Serialize::TypeReference<Account> account("NickCore");
 
 	/* A request to check if an account/password is valid. These can exist for
 	 * extended periods due to the time some authentication modules take.
@@ -342,4 +277,19 @@ namespace NickServ
 		virtual void OnSuccess(IdentifyRequest *) anope_abstract;
 		virtual void OnFail(IdentifyRequest *) anope_abstract;
 	};
+
+	class Mode : public Serialize::Object
+	{
+	 public:
+		using Serialize::Object::Object;
+
+		virtual Account *GetAccount() anope_abstract;
+		virtual void SetAccount(Account *) anope_abstract;
+
+		virtual Anope::string GetMode() anope_abstract;
+		virtual void SetMode(const Anope::string &) anope_abstract;
+	};
+
+	static Serialize::TypeReference<Mode> mode("NSKeepMode");
+
 }

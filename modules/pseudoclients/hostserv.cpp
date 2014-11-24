@@ -21,7 +21,7 @@ class HostServCore : public Module
 	, public EventHook<Event::SetVhost>
 	, public EventHook<Event::DeleteVhost>
 {
-	Reference<BotInfo> HostServ;
+	Reference<ServiceBot> HostServ;
 
  public:
 	HostServCore(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PSEUDOCLIENT | VENDOR)
@@ -42,7 +42,7 @@ class HostServCore : public Module
 		if (hsnick.empty())
 			throw ConfigException(Module::name + ": <client> must be defined");
 
-		BotInfo *bi = BotInfo::Find(hsnick, true);
+		ServiceBot *bi = ServiceBot::Find(hsnick, true);
 		if (!bi)
 			throw ConfigException(Module::name + ": no bot named " + hsnick);
 
@@ -54,9 +54,9 @@ class HostServCore : public Module
 		if (!IRCD->CanSetVHost)
 			return;
 
-		const NickServ::Nick *na = NickServ::FindNick(u->nick);
-		if (!na || na->nc != u->Account() || !na->HasVhost())
-			na = NickServ::FindNick(u->Account()->display);
+		NickServ::Nick *na = NickServ::FindNick(u->nick);
+		if (!na || na->GetAccount() != u->Account() || !na->HasVhost())
+			na = NickServ::FindNick(u->Account()->GetDisplay());
 		if (!na || !na->HasVhost())
 			return;
 
@@ -101,9 +101,9 @@ class HostServCore : public Module
 	{
 		if (Config->GetModule(this)->Get<bool>("activate_on_set"))
 		{
-			User *u = User::Find(na->nick);
+			User *u = User::Find(na->GetNick());
 
-			if (u && u->Account() == na->nc)
+			if (u && u->Account() == na->GetAccount())
 			{
 				IRCD->SendVhost(u, na->GetVhostIdent(), na->GetVhostHost());
 
@@ -128,9 +128,9 @@ class HostServCore : public Module
 	{
 		if (Config->GetModule(this)->Get<bool>("activate_on_set"))
 		{
-			User *u = User::Find(na->nick);
+			User *u = User::Find(na->GetNick());
 
-			if (u && u->Account() == na->nc)
+			if (u && u->Account() == na->GetAccount())
 				IRCD->SendVhostDel(u);
 		}
 	}

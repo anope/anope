@@ -15,7 +15,7 @@ class CommandNSAList : public Command
 {
 	static bool ChannelSort(ChanServ::Channel *ci1, ChanServ::Channel *ci2)
 	{
-		return ci::less()(ci1->name, ci2->name);
+		return ci::less()(ci1->GetName(), ci2->GetName());
 	}
 
  public:
@@ -33,13 +33,13 @@ class CommandNSAList : public Command
 		if (params.size() && source.HasPriv("nickserv/alist"))
 		{
 			nick = params[0];
-			const NickServ::Nick *na = NickServ::FindNick(nick);
+			NickServ::Nick *na = NickServ::FindNick(nick);
 			if (!na)
 			{
 				source.Reply(_("\002{0}\002 isn't registered."), nick);
 				return;
 			}
-			nc = na->nc;
+			nc = na->GetAccount();
 		}
 
 		ListFormatter list(source.GetAccount());
@@ -47,22 +47,19 @@ class CommandNSAList : public Command
 
 		list.AddColumn(_("Number")).AddColumn(_("Channel")).AddColumn(_("Access")).AddColumn(_("Description"));
 
-		std::deque<ChanServ::Channel *> queue;
-		nc->GetChannelReferences(queue);
-		std::sort(queue.begin(), queue.end(), ChannelSort);
-
-		for (unsigned i = 0; i < queue.size(); ++i)
+		std::vector<ChanServ::Channel *> chans = nc->GetRefs<ChanServ::Channel *>(ChanServ::channel);
+		std::sort(chans.begin(), chans.end(), ChannelSort);
+		for (ChanServ::Channel *ci : chans)
 		{
-			ChanServ::Channel *ci = queue[i];
 			ListFormatter::ListEntry entry;
 
 			if (ci->GetFounder() == nc)
 			{
 				++chan_count;
 				entry["Number"] = stringify(chan_count);
-				entry["Channel"] = (ci->HasExt("CS_NO_EXPIRE") ? "!" : "") + ci->name;
+				entry["Channel"] = (ci->HasFieldS("CS_NO_EXPIRE") ? "!" : "") + ci->GetName();
 				entry["Access"] = Language::Translate(source.GetAccount(), _("Founder"));
-				entry["Description"] = ci->desc;
+				entry["Description"] = ci->GetDesc();
 				list.AddEntry(entry);
 				continue;
 			}
@@ -71,9 +68,9 @@ class CommandNSAList : public Command
 			{
 				++chan_count;
 				entry["Number"] = stringify(chan_count);
-				entry["Channel"] = (ci->HasExt("CS_NO_EXPIRE") ? "!" : "") + ci->name;
+				entry["Channel"] = (ci->HasFieldS("CS_NO_EXPIRE") ? "!" : "") + ci->GetName();
 				entry["Access"] = Language::Translate(source.GetAccount(), _("Successor"));
-				entry["Description"] = ci->desc;
+				entry["Description"] = ci->GetDesc();
 				list.AddEntry(entry);
 				continue;
 			}
@@ -85,11 +82,11 @@ class CommandNSAList : public Command
 			++chan_count;
 
 			entry["Number"] = stringify(chan_count);
-			entry["Channel"] = (ci->HasExt("CS_NO_EXPIRE") ? "!" : "") + ci->name;
+			entry["Channel"] = (ci->HasFieldS("CS_NO_EXPIRE") ? "!" : "") + ci->GetName();
 			for (unsigned j = 0; j < access.size(); ++j)
 				entry["Access"] = entry["Access"] + ", " + access[j]->AccessSerialize();
 			entry["Access"] = entry["Access"].substr(2);
-			entry["Description"] = ci->desc;
+			entry["Description"] = ci->GetDesc();
 			list.AddEntry(entry);
 		}
 
@@ -98,11 +95,11 @@ class CommandNSAList : public Command
 
 		if (!chan_count)
 		{
-			source.Reply(_("\002{0}\002 has no access in any channels."), nc->display);
+			source.Reply(_("\002{0}\002 has no access in any channels."), nc->GetDisplay());
 		}
 		else
 		{
-			source.Reply(_("Channels that \002{0}\002 has access on:"), nc->display);
+			source.Reply(_("Channels that \002{0}\002 has access on:"), nc->GetDisplay());
 
 			for (unsigned i = 0; i < replies.size(); ++i)
 				source.Reply(replies[i]);

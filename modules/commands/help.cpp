@@ -42,7 +42,7 @@ class CommandHelp : public Command
 			return;
 
 		Anope::string source_command = source.command;
-		const BotInfo *bi = source.service;
+		const ServiceBot *bi = source.service;
 		const CommandInfo::map &map = source.c ? Config->Fantasy : bi->commands;
 		bool hide_privileged_commands = Config->GetBlock("options")->Get<bool>("hideprivilegedcommands"),
 		     hide_registered_commands = Config->GetBlock("options")->Get<bool>("hideregisteredcommands");

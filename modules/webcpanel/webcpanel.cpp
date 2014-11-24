@@ -14,7 +14,7 @@ class ModuleWebCPanel : public Module
 {
 	ServiceReference<HTTPProvider> provider;
 	Panel panel;
-	PrimitiveExtensibleItem<Anope::string> id, ip;
+	ExtensibleItem<Anope::string> id, ip;
 
 	StaticFileServer style_css, logo_png, cubes_png, favicon_ico;
 
@@ -92,7 +92,7 @@ class ModuleWebCPanel : public Module
 		provider->RegisterPage(&this->_register);
 		provider->RegisterPage(&this->confirm);
 
-		BotInfo *NickServ = Config->GetClient("NickServ");
+		ServiceBot *NickServ = Config->GetClient("NickServ");
 		if (NickServ)
 		{
 			Section s;
@@ -125,7 +125,7 @@ class ModuleWebCPanel : public Module
 			panel.sections.push_back(s);
 		}
 
-		BotInfo *ChanServ = Config->GetClient("ChanServ");
+		ServiceBot *ChanServ = Config->GetClient("ChanServ");
 		if (ChanServ)
 		{
 			Section s;
@@ -165,7 +165,7 @@ class ModuleWebCPanel : public Module
 			panel.sections.push_back(s);
 		}
 
-		BotInfo *MemoServ = Config->GetClient("MemoServ");
+		ServiceBot *MemoServ = Config->GetClient("MemoServ");
 		if (MemoServ)
 		{
 			Section s;
@@ -180,7 +180,7 @@ class ModuleWebCPanel : public Module
 			panel.sections.push_back(s);
 		}
 
-		BotInfo *HostServ = Config->GetClient("HostServ");
+		ServiceBot *HostServ = Config->GetClient("HostServ");
 		if (HostServ)
 		{
 			Section s;
@@ -195,7 +195,7 @@ class ModuleWebCPanel : public Module
 			panel.sections.push_back(s);
 		}
 
-		BotInfo *OperServ = Config->GetClient("OperServ");
+		ServiceBot *OperServ = Config->GetClient("OperServ");
 		if (OperServ)
 		{
 			Section s;
@@ -260,13 +260,9 @@ namespace WebPanel
 		if (params.size() < cmd->min_params)
 			return;
 
-		BotInfo *bi = Config->GetClient(service);
+		ServiceBot *bi = Config->GetClient(service);
 		if (!bi)
-		{
-			if (BotListByNick->empty())
-				return;
-			bi = BotListByNick->begin()->second; // Pick one...
-		}
+			return;
 
 		struct MyComandReply : CommandReply
 		{

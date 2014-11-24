@@ -42,6 +42,7 @@ class StatusUpdate : public Module
 			}
 	}
 
+	// XXX this relies on the access entry already being removed from the list?
 	void OnAccessDel(ChanServ::Channel *ci, CommandSource &, ChanServ::ChanAccess *access) override
 	{
 		if (ci->c)

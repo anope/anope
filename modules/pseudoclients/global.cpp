@@ -20,9 +20,9 @@ class GlobalCore : public Module
 	, public EventHook<Event::NewServer>
 	, public EventHook<Event::Help>
 {
-	Reference<BotInfo> Global;
+	Reference<ServiceBot> Global;
 
-	void ServerGlobal(BotInfo *sender, Server *s, const Anope::string &message)
+	void ServerGlobal(ServiceBot *sender, Server *s, const Anope::string &message)
 	{
 		if (s != Me && !s->IsJuped())
 			s->Notice(sender, message);
@@ -40,7 +40,7 @@ class GlobalCore : public Module
 	{
 	}
 
-	void SendGlobal(BotInfo *sender, const Anope::string &source, const Anope::string &message) override
+	void SendGlobal(ServiceBot *sender, const Anope::string &source, const Anope::string &message) override
 	{
 		if (Me->GetLinks().empty())
 			return;
@@ -66,7 +66,7 @@ class GlobalCore : public Module
 		if (glnick.empty())
 			throw ConfigException(Module::name + ": <client> must be defined");
 
-		BotInfo *bi = BotInfo::Find(glnick, true);
+		ServiceBot *bi = ServiceBot::Find(glnick, true);
 		if (!bi)
 			throw ConfigException(Module::name + ": no bot named " + glnick);
 

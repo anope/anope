@@ -34,14 +34,14 @@ class CommandBSSay : public Command
 
 		if (!source.AccessFor(ci).HasPriv("SAY") && !source.HasPriv("botserv/administration"))
 		{
-			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "SAY", ci->name);
+			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "SAY", ci->GetName());
 			return;
 		}
 
-		if (!ci->bi)
+		if (!ci->GetBot())
 		{
-			source.Reply(_("There is no bot assigned to \002{0}\002. One must be assigned to the channel before this command can be used."), ci->name);
-			BotInfo *bi;
+			source.Reply(_("There is no bot assigned to \002{0}\002. One must be assigned to the channel before this command can be used."), ci->GetName());
+			ServiceBot *bi;
 			Anope::string name;
 			Command::FindCommandFromService("botserv/assign", bi, name);
 			CommandInfo *help = source.service->FindCommand("generic/help");
@@ -51,9 +51,9 @@ class CommandBSSay : public Command
 			return;
 		}
 
-		if (!ci->c || !ci->c->FindUser(ci->bi))
+		if (!ci->c || !ci->c->FindUser(ci->GetBot()))
 		{
-			source.Reply(_("Bot \002{0}\002 is not on channel \002{1}\002."), ci->bi->nick, ci->name);
+			source.Reply(_("Bot \002{0}\002 is not on channel \002{1}\002."), ci->GetBot()->nick, ci->GetName());
 			return;
 		}
 
@@ -63,8 +63,8 @@ class CommandBSSay : public Command
 			return;
 		}
 
-		IRCD->SendPrivmsg(*ci->bi, ci->name, "%s", text.c_str());
-		ci->bi->lastmsg = Anope::CurTime;
+		IRCD->SendPrivmsg(ci->GetBot(), ci->GetName(), "%s", text.c_str());
+		ci->GetBot()->lastmsg = Anope::CurTime;
 
 		bool override = !source.AccessFor(ci).HasPriv("SAY");
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to say: " << text;
@@ -106,14 +106,14 @@ class CommandBSAct : public Command
 
 		if (!source.AccessFor(ci).HasPriv("SAY") && !source.HasPriv("botserv/administration"))
 		{
-			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "SAY", ci->name);
+			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "SAY", ci->GetName());
 			return;
 		}
 
-		if (!ci->bi)
+		if (!ci->GetBot())
 		{
-			source.Reply(_("There is no bot assigned to \002{0}\002. One must be assigned to the channel before this command can be used."), ci->name);
-			BotInfo *bi;
+			source.Reply(_("There is no bot assigned to \002{0}\002. One must be assigned to the channel before this command can be used."), ci->GetName());
+			ServiceBot *bi;
 			Anope::string name;
 			Command::FindCommandFromService("botserv/assign", bi, name);
 			CommandInfo *help = source.service->FindCommand("generic/help");
@@ -123,9 +123,9 @@ class CommandBSAct : public Command
 			return;
 		}
 
-		if (!ci->c || !ci->c->FindUser(ci->bi))
+		if (!ci->c || !ci->c->FindUser(ci->GetBot()))
 		{
-			source.Reply(_("Bot \002{0}\002 is not on channel \002{1}\002."), ci->bi->nick, ci->name);
+			source.Reply(_("Bot \002{0}\002 is not on channel \002{1}\002."), ci->GetBot()->nick, ci->GetName());
 			return;
 		}
 
@@ -133,8 +133,8 @@ class CommandBSAct : public Command
 		if (message.empty())
 			return;
 
-		IRCD->SendAction(*ci->bi, ci->name, "%s", message.c_str());
-		ci->bi->lastmsg = Anope::CurTime;
+		IRCD->SendAction(ci->GetBot(), ci->GetName(), "%s", message.c_str());
+		ci->GetBot()->lastmsg = Anope::CurTime;
 
 		bool override = !source.AccessFor(ci).HasPriv("SAY");
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to say: " << message;

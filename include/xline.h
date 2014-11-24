@@ -13,52 +13,80 @@
 #include "service.h"
 #include "sockets.h"
 
-/* An Xline, eg, anything added with operserv/akill, or any of the operserv/sxline commands */
-class CoreExport XLine : public Serializable
+/* An XLine, eg, anything added with operserv/akill, or any of the operserv/sxline commands */
+class CoreExport XLine : public Serialize::Object
 {
-	void Init();
+	void Recache();
 	Anope::string nick, user, host, real;
  public:
-	cidr *c;
-	Anope::string mask;
-	std::regex *regex;
-	Anope::string by;
-	time_t created;
-	time_t expires;
-	Anope::string reason;
-	XLineManager *manager;
-	Anope::string id;
+	cidr *c = nullptr;
+	std::regex *regex = nullptr;
+	XLineManager *manager = nullptr;
 
 	XLine(const Anope::string &mask, const Anope::string &reason = "", const Anope::string &uid = "");
 
 	XLine(const Anope::string &mask, const Anope::string &by, const time_t expires, const Anope::string &reason, const Anope::string &uid = "");
+
+	XLine(Serialize::TypeBase *type) : Serialize::Object(type) { }
+	XLine(Serialize::TypeBase *type, Serialize::ID id) : Serialize::Object(type, id) { }
+
 	~XLine();
+
+	void SetMask(const Anope::string &);
+	Anope::string GetMask();
+
+	void SetBy(const Anope::string &);
+	Anope::string GetBy();
+
+	void SetReason(const Anope::string &);
+	Anope::string GetReason();
+
+	void SetID(const Anope::string &);
+	Anope::string GetID();
+
+	void SetCreated(const time_t &);
+	time_t GetCreated();
+
+	void SetExpires(const time_t &);
+	time_t GetExpires();
 
 	const Anope::string &GetNick() const;
 	const Anope::string &GetUser() const;
 	const Anope::string &GetHost() const;
 	const Anope::string &GetReal() const;
 
-	Anope::string GetReason() const;
+	Anope::string GetReasonWithID();
 
 	bool HasNickOrReal() const;
-	bool IsRegex() const;
+	bool IsRegex();
+};
 
-	void Serialize(Serialize::Data &data) const override;
-	static Serializable* Unserialize(Serializable *obj, Serialize::Data &data);
+static Serialize::TypeReference<XLine> xline("XLine");
+
+class XLineType : public Serialize::AbstractType
+{
+ public:
+	Serialize::Field<XLine, Anope::string> mask, by, reason, id;
+	Serialize::Field<XLine, time_t> created, expires;
+
+	XLineType(Module *m, const Anope::string &n) : Serialize::AbstractType(m, n)
+		, mask(this, "mask")
+		, by(this, "by")
+		, reason(this, "reason")
+		, id(this, "id")
+		, created(this, "created")
+		, expires(this, "expires")
+	{
+	}
 };
 
 /* Managers XLines. There is one XLineManager per type of XLine. */
 class CoreExport XLineManager : public Service
 {
 	char type;
-	/* List of XLines in this XLineManager */
-	Serialize::Checker<std::vector<XLine *> > xlines;
-	/* Akills can have the same IDs, sometimes */
-	static Serialize::Checker<std::multimap<Anope::string, XLine *, ci::less> > XLinesByUID;
  public:
 	/* List of XLine managers we check users against in XLineManager::CheckAll */
-	static std::list<XLineManager *> XLineManagers;
+	static std::vector<XLineManager *> XLineManagers;
 
 	/** Register a XLineManager, places it in XLineManagers for use in XLineManager::CheckAll
 	 * It is important XLineManagers are registered in the proper order. Eg, if you had one akilling
@@ -95,28 +123,17 @@ class CoreExport XLineManager : public Service
 	/** The type of xline provided by this service
 	 * @return The type
 	 */
-	const char &Type();
-
-	/** Get the number of XLines in this XLineManager
-	 * @return The number of XLines
-	 */
-	size_t GetCount() const;
+	char Type();
 
 	/** Get the XLine vector
 	 * @return The vector
 	 */
-	const std::vector<XLine *> &GetList() const;
+	std::vector<XLine *> GetXLines() const;
 
 	/** Add an entry to this XLineManager
 	 * @param x The entry
 	 */
 	void AddXLine(XLine *x);
-
-	/** Delete an entry from this XLineManager
-	 * @param x The entry
-	 * @return true if the entry was found and deleted, else false
-	 */
-	bool DelXLine(XLine *x);
 
 	/** Gets an entry by index
 	 * @param index The index
@@ -154,7 +171,7 @@ class CoreExport XLineManager : public Service
 	 * @param u The user
 	 * @param x The xline
 	 */
-	virtual bool Check(User *u, const XLine *x) anope_abstract;
+	virtual bool Check(User *u, XLine *x) anope_abstract;
 
 	/** Called when a user matches a xline in this XLineManager
 	 * @param u The user
@@ -165,7 +182,7 @@ class CoreExport XLineManager : public Service
 	/** Called when an XLine expires
 	 * @param x The xline
 	 */
-	virtual void OnExpire(const XLine *x);
+	virtual void OnExpire(XLine *x);
 
 	/** Called to send an XLine to the IRCd
 	 * @param u The user, if we know it

@@ -12,11 +12,12 @@
 #include "module.h"
 #include "modules/os_session.h"
 
-struct Stats : Serializable
+#if 0
+struct Stats : Serialize::Object
 {
 	static Stats *me;
 
-	Stats() : Serializable("Stats")
+	Stats() : Serialize::Object("Stats")
 	{
 		me = this;
 	}
@@ -180,10 +181,10 @@ class CommandOSStats : public Command
 		GetHashStats(ChanServ::service->GetChannels(), entries, buckets, max_chain);
 		source.Reply(_("Registered channels: {0} entries, {1} buckets, longest chain is {2}"), entries, buckets, max_chain);
 
-		GetHashStats(NickServ::service->GetNickList(), entries, buckets, max_chain);
+		GetHashStats(NickServ::service->GetNickMap(), entries, buckets, max_chain);
 		source.Reply(_("Registered nicknames: {0} entries, {1} buckets, longest chain is {2}"), entries, buckets, max_chain);
 
-		GetHashStats(NickServ::service->GetAccountList(), entries, buckets, max_chain);
+		GetHashStats(NickServ::service->GetAccountMap(), entries, buckets, max_chain);
 		source.Reply(_("Registered nick groups: {0} entries, {1} buckets, longest chain is {2}"), entries, buckets, max_chain);
 
 		if (session_service)
@@ -244,26 +245,27 @@ class CommandOSStats : public Command
 };
 
 class OSStats : public Module
-	, public EventHook<Event::UserConnect>
 {
 	CommandOSStats commandosstats;
-	Serialize::Type stats_type;
+	//Serialize::TypeBase stats_type;
 	Stats stats_saver;
 
  public:
 	OSStats(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
-		, EventHook<Event::UserConnect>("OnUserConnect")
 		, commandosstats(this)
-		, stats_type("Stats", Stats::Unserialize)
+//		, stats_type("Stats", Stats::Unserialize)
 	{
 
 	}
 
+#if 0
 	void OnUserConnect(User *u, bool &exempt) override
 	{
 		if (UserListByNick.size() == MaxUserCount && Anope::CurTime == MaxUserTime)
 			stats_saver.QueueUpdate();
 	}
+#endif
 };
 
 MODULE_INIT(OSStats)
+#endif

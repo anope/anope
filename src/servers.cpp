@@ -50,9 +50,13 @@ Server::Server(Server *up, const Anope::string &sname, unsigned shops, const Ano
 		if (Me == this->uplink && !juped)
 		{
 			/* Now do mode related stuff as we know what modes exist .. */
-			for (botinfo_map::iterator it = BotListByNick->begin(), it_end = BotListByNick->end(); it != it_end; ++it)
+			for (std::pair<Anope::string, User *> p : UserListByNick)
 			{
-				BotInfo *bi = it->second;
+				User *u = p.second;
+				if (u->type != UserType::BOT)
+					continue;
+
+				ServiceBot *bi = anope_dynamic_static_cast<ServiceBot *>(u);
 				Anope::string modes = !bi->botmodes.empty() ? ("+" + bi->botmodes) : IRCD->DefaultPseudoclientModes;
 
 				bi->SetModesInternal(bi, modes.c_str());
@@ -96,11 +100,11 @@ Server::Server(Server *up, const Anope::string &sname, unsigned shops, const Ano
 			{
 				User *u = it->second;
 
-				BotInfo *bi = BotInfo::Find(u->GetUID());
+				ServiceBot *bi = ServiceBot::Find(u->GetUID());
 				if (bi)
 				{
-					XLine x(bi->nick, "Reserved for services");
-					IRCD->SendSQLine(NULL, &x);
+					//XLine x(bi->nick, "Reserved for services");
+					//IRCD->SendSQLine(NULL, &x);
 				}
 
 				IRCD->SendClientIntroduction(u);
@@ -327,7 +331,7 @@ bool Server::IsQuitting() const
 	return quitting;
 }
 
-void Server::Notice(BotInfo *source, const Anope::string &message)
+void Server::Notice(ServiceBot *source, const Anope::string &message)
 {
 	if (Config->UsePrivmsg && Config->DefPrivmsg)
 		IRCD->SendGlobalPrivmsg(source, this, message);

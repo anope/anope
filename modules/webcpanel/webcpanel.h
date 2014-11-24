@@ -95,10 +95,10 @@ class WebPanelProtectedPage : public WebPanelPage
 		TemplateFileServer::Replacements replacements;
 
 		replacements["TITLE"] = page_title;
-		replacements["ACCOUNT"] = na->nc->display;
+		replacements["ACCOUNT"] = na->GetAccount()->GetDisplay();
 		replacements["PAGE_NAME"] = page_name;
 		replacements["CATEGORY"] = category;
-		if (na->nc->IsServicesOper())
+		if (na->GetAccount()->IsServicesOper())
 			replacements["IS_OPER"];
 
 		Anope::string sections, get;
@@ -143,7 +143,7 @@ class WebPanelProtectedPage : public WebPanelPage
 namespace WebPanel
 {
 	/** Run a command
-	 * @param User name to run command as, probably nc->display unless nc == NULL
+	 * @param User name to run command as, probably nc->GetDisplay() unless nc == NULL
 	 * @param nc Nick core to run command from
 	 * @param service Service for source.owner and source.service
 	 * @param c Command to run (as a service name)

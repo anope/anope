@@ -16,13 +16,14 @@ bool WebCPanel::OperServ::Akill::OnRequest(HTTPProvider *server, const Anope::st
 
 	static ServiceReference<XLineManager> akills("XLineManager","xlinemanager/sgline");
 
-	if (!na->nc->o || !na->nc->o->ot->HasCommand("operserv/akill"))
+	if (!na->GetAccount()->o || !na->GetAccount()->o->GetType()->HasCommand("operserv/akill"))
 	{
 		replacements["NOACCESS"];
 	}
 	else
 	{
-		if (akills->GetCount() == 0)
+		std::vector<XLine *> xlines = akills->GetXLines();
+		if (xlines.empty())
 			replacements["AKILLS"] = "No Akills to display.";
 
 		if (message.post_data.count("mask") > 0 && message.post_data.count("expiry") > 0 && message.post_data.count("reason") > 0)
@@ -34,7 +35,7 @@ bool WebCPanel::OperServ::Akill::OnRequest(HTTPProvider *server, const Anope::st
 			cmdstr << " " << HTTPUtils::URLDecode(message.post_data["mask"]);
 			cmdstr << " " << HTTPUtils::URLDecode(message.post_data["reason"]);
 			params.push_back(cmdstr.str());
-			WebPanel::RunCommand(na->nc->display, na->nc, "OperServ", "operserv/akill", params, replacements);
+			WebPanel::RunCommand(na->GetAccount()->GetDisplay(), na->GetAccount(), "OperServ", "operserv/akill", params, replacements);
 		}
 
 		if (message.get_data["del"] == "1" && message.get_data.count("number") > 0)
@@ -42,18 +43,18 @@ bool WebCPanel::OperServ::Akill::OnRequest(HTTPProvider *server, const Anope::st
 			std::vector<Anope::string> params;
 			params.push_back("DEL");
 			params.push_back(HTTPUtils::URLDecode(message.get_data["number"]));
-			WebPanel::RunCommand(na->nc->display, na->nc, "OperServ", "operserv/akill", params, replacements);
+			WebPanel::RunCommand(na->GetAccount()->GetDisplay(), na->GetAccount(), "OperServ", "operserv/akill", params, replacements);
 		}
 
-		for (unsigned i = 0, end = akills->GetCount(); i < end; ++i)
+		unsigned int i = 0;
+		for (XLine *x : xlines)
 		{
-			const XLine *x = akills->GetEntry(i);
-			replacements["NUMBER"] = stringify(i + 1);
-			replacements["HOST"] = x->mask;
-			replacements["SETTER"] = x->by;
-			replacements["TIME"] = Anope::strftime(x->created, NULL, true);
-			replacements["EXPIRE"] = Anope::Expires(x->expires, na->nc);
-			replacements["REASON"] = x->reason;
+			replacements["NUMBER"] = stringify(++i);
+			replacements["HOST"] = x->GetMask();
+			replacements["SETTER"] = x->GetBy();
+			replacements["TIME"] = Anope::strftime(x->GetCreated(), NULL, true);
+			replacements["EXPIRE"] = Anope::Expires(x->GetExpires(), na->GetAccount());
+			replacements["REASON"] = x->GetReason();
 		}
 	}
 

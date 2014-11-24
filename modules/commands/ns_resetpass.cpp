@@ -11,7 +11,7 @@
 
 #include "module.h"
 
-static bool SendResetEmail(User *u, const NickServ::Nick *na, BotInfo *bi);
+static bool SendResetEmail(User *u, NickServ::Nick *na, ServiceBot *bi);
 
 class CommandNSResetPass : public Command
 {
@@ -25,7 +25,7 @@ class CommandNSResetPass : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
-		const NickServ::Nick *na = NickServ::FindNick(params[0]);
+		NickServ::Nick *na = NickServ::FindNick(params[0]);
 
 		if (!na)
 		{
@@ -33,7 +33,7 @@ class CommandNSResetPass : public Command
 			return;
 		}
 
-		if (!na->nc->email.equals_ci(params[1]))
+		if (!na->GetAccount()->GetEmail().equals_ci(params[1]))
 		{
 			source.Reply(_("Incorrect email address."));
 			return;
@@ -41,8 +41,8 @@ class CommandNSResetPass : public Command
 
 		if (SendResetEmail(source.GetUser(), na, source.service))
 		{
-			Log(LOG_COMMAND, source, this) << "for " << na->nick << " (group: " << na->nc->display << ")";
-			source.Reply(_("Password reset email for \002{0}\002 has been sent."), na->nick);
+			Log(LOG_COMMAND, source, this) << "for " << na->GetNick() << " (group: " << na->GetAccount()->GetDisplay() << ")";
+			source.Reply(_("Password reset email for \002{0}\002 has been sent."), na->GetNick());
 		}
 	}
 
@@ -63,7 +63,7 @@ class NSResetPass : public Module
 	, public EventHook<Event::PreCommand>
 {
 	CommandNSResetPass commandnsresetpass;
-	PrimitiveExtensibleItem<ResetInfo> reset;
+	ExtensibleItem<ResetInfo> reset;
 
  public:
 	NSResetPass(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
@@ -86,10 +86,10 @@ class NSResetPass : public Module
 
 			NickServ::Nick *na = NickServ::FindNick(params[0]);
 
-			ResetInfo *ri = na ? reset.Get(na->nc) : NULL;
+			ResetInfo *ri = na ? reset.Get(na->GetAccount()) : NULL;
 			if (na && ri)
 			{
-				NickServ::Account *nc = na->nc;
+				NickServ::Account *nc = na->GetAccount();
 				const Anope::string &passcode = params[1];
 				if (ri->time < Anope::CurTime - 3600)
 				{
@@ -99,14 +99,14 @@ class NSResetPass : public Module
 				else if (passcode.equals_cs(ri->code))
 				{
 					reset.Unset(nc);
-					nc->Shrink<bool>("UNCONFIRMED");
+					nc->UnsetS<bool>("UNCONFIRMED");
 
-					Log(LOG_COMMAND, source, &commandnsresetpass) << "confirmed RESETPASS to forcefully identify as " << na->nick;
+					Log(LOG_COMMAND, source, &commandnsresetpass) << "confirmed RESETPASS to forcefully identify as " << na->GetNick();
 
 					if (source.GetUser())
 					{
 						source.GetUser()->Identify(na);
-						source.Reply(_("You are now identified for \002{0}\002. Change your password now."), na->nc->display);
+						source.Reply(_("You are now identified for \002{0}\002. Change your password now."), na->GetAccount()->GetDisplay());
 					}
 				}
 				else
@@ -120,25 +120,23 @@ class NSResetPass : public Module
 	}
 };
 
-static bool SendResetEmail(User *u, const NickServ::Nick *na, BotInfo *bi)
+static bool SendResetEmail(User *u, NickServ::Nick *na, ServiceBot *bi)
 {
-	Anope::string subject = Language::Translate(na->nc, Config->GetBlock("mail")->Get<const Anope::string>("reset_subject").c_str()),
-		message = Language::Translate(na->nc, Config->GetBlock("mail")->Get<const Anope::string>("reset_message").c_str()),
+	Anope::string subject = Language::Translate(na->GetAccount(), Config->GetBlock("mail")->Get<const Anope::string>("reset_subject").c_str()),
+		message = Language::Translate(na->GetAccount(), Config->GetBlock("mail")->Get<const Anope::string>("reset_message").c_str()),
 		passcode = Anope::Random(20);
 
-	subject = subject.replace_all_cs("%n", na->nick);
+	subject = subject.replace_all_cs("%n", na->GetNick());
 	subject = subject.replace_all_cs("%N", Config->GetBlock("networkinfo")->Get<const Anope::string>("networkname"));
 	subject = subject.replace_all_cs("%c", passcode);
 
-	message = message.replace_all_cs("%n", na->nick);
+	message = message.replace_all_cs("%n", na->GetNick());
 	message = message.replace_all_cs("%N", Config->GetBlock("networkinfo")->Get<const Anope::string>("networkname"));
 	message = message.replace_all_cs("%c", passcode);
 
-	ResetInfo *ri = na->nc->Extend<ResetInfo>("reset");
-	ri->code = passcode;
-	ri->time = Anope::CurTime;
+	na->GetAccount()->Extend<ResetInfo>("reset", ResetInfo{passcode, Anope::CurTime});
 
-	return Mail::Send(u, na->nc, bi, subject, message);
+	return Mail::Send(u, na->GetAccount(), bi, subject, message);
 }
 
 MODULE_INIT(NSResetPass)

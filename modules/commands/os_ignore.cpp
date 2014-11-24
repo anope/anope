@@ -12,94 +12,98 @@
 #include "module.h"
 #include "modules/os_ignore.h"
 
-struct IgnoreDataImpl : IgnoreData, Serializable
+class IgnoreImpl : public Ignore
 {
-	IgnoreDataImpl() : Serializable("IgnoreData") { }
-	~IgnoreDataImpl();
-	void Serialize(Serialize::Data &data) const override;
-	static Serializable* Unserialize(Serializable *obj, Serialize::Data &data);
+ public:
+	IgnoreImpl(Serialize::TypeBase *type) : Ignore(type) { }
+        IgnoreImpl(Serialize::TypeBase *type, Serialize::ID id) : Ignore(type, id) { }
+
+	Anope::string GetMask();
+	void SetMask(const Anope::string &);
+
+	Anope::string GetCreator();
+	void SetCreator(const Anope::string &);
+
+	Anope::string GetReason();
+	void SetReason(const Anope::string &);
+
+	time_t GetTime();
+	void SetTime(const time_t &);
 };
 
-IgnoreDataImpl::~IgnoreDataImpl()
+class IgnoreType : public Serialize::Type<IgnoreImpl>
 {
-	if (ignore_service)
-		ignore_service->DelIgnore(this);
+ public:
+ 	Serialize::Field<IgnoreImpl, Anope::string> mask, creator, reason;
+ 	Serialize::Field<IgnoreImpl, time_t> time;
+
+ 	IgnoreType(Module *me) : Serialize::Type<IgnoreImpl>(me, "IgnoreData")
+ 		, mask(this, "mask")
+ 		, creator(this, "creator")
+ 		, reason(this, "reason")
+ 		, time(this, "time")
+ 	{
+ 	}
+};
+
+Anope::string IgnoreImpl::GetMask()
+{
+	return Get(&IgnoreType::mask);
 }
 
-void IgnoreDataImpl::Serialize(Serialize::Data &data) const
+void IgnoreImpl::SetMask(const Anope::string &m)
 {
-	data["mask"] << this->mask;
-	data["creator"] << this->creator;
-	data["reason"] << this->reason;
-	data["time"] << this->time;
+	Set(&IgnoreType::mask, m);
 }
 
-Serializable* IgnoreDataImpl::Unserialize(Serializable *obj, Serialize::Data &data)
+Anope::string IgnoreImpl::GetCreator()
 {
-	if (!ignore_service)
-		return NULL;
-
-	IgnoreDataImpl *ign;
-	if (obj)
-		ign = anope_dynamic_static_cast<IgnoreDataImpl *>(obj);
-	else
-	{
-		ign = new IgnoreDataImpl();
-		ignore_service->AddIgnore(ign);
-	}
-
-	data["mask"] >> ign->mask;
-	data["creator"] >> ign->creator;
-	data["reason"] >> ign->reason;
-	data["time"] >> ign->time;
-
-	return ign;
+	return Get(&IgnoreType::creator);
 }
 
+void IgnoreImpl::SetCreator(const Anope::string &c)
+{
+	Set(&IgnoreType::creator, c);
+}
+
+Anope::string IgnoreImpl::GetReason()
+{
+	return Get(&IgnoreType::reason);
+}
+
+void IgnoreImpl::SetReason(const Anope::string &r)
+{
+	Set(&IgnoreType::reason, r);
+}
+
+time_t IgnoreImpl::GetTime()
+{
+	return Get(&IgnoreType::time);
+}
+
+void IgnoreImpl::SetTime(const time_t &t)
+{
+	Set(&IgnoreType::time, t);
+}
 
 class OSIgnoreService : public IgnoreService
 {
-	Serialize::Checker<std::vector<IgnoreData *> > ignores;
-
  public:
-	OSIgnoreService(Module *o) : IgnoreService(o), ignores("IgnoreData") { }
-
-	void AddIgnore(IgnoreData *ign) override
+	OSIgnoreService(Module *o) : IgnoreService(o)
 	{
-		ignores->push_back(ign);
 	}
 
-	void DelIgnore(IgnoreData *ign) override
-	{
-		std::vector<IgnoreData *>::iterator it = std::find(ignores->begin(), ignores->end(), ign);
-		if (it != ignores->end())
-			ignores->erase(it);
-	}
-
-	void ClearIgnores() override
-	{
-		for (unsigned i = ignores->size(); i > 0; --i)
-		{
-			IgnoreData *ign = ignores->at(i - 1);
-			delete ign;
-		}
-	}
-
-	IgnoreData *Create() override
-	{
-		return new IgnoreDataImpl();
-	}
-
-	IgnoreData *Find(const Anope::string &mask) override
+	Ignore *Find(const Anope::string &mask) override
 	{
 		User *u = User::Find(mask, true);
-		std::vector<IgnoreData *>::iterator ign = this->ignores->begin(), ign_end = this->ignores->end();
+		std::vector<Ignore *> ignores = Serialize::GetObjects<Ignore *>(ignoretype);
+		std::vector<Ignore *>::iterator ign = ignores.begin(), ign_end = ignores.end();
 
 		if (u)
 		{
 			for (; ign != ign_end; ++ign)
 			{
-				Entry ignore_mask("", (*ign)->mask);
+				Entry ignore_mask("", (*ign)->GetMask());
 				if (ignore_mask.Matches(u, true))
 					break;
 			}
@@ -127,30 +131,25 @@ class OSIgnoreService : public IgnoreService
 				tmp = mask + "!*@*";
 
 			for (; ign != ign_end; ++ign)
-				if (Anope::Match(tmp, (*ign)->mask, false, true))
+				if (Anope::Match(tmp, (*ign)->GetMask(), false, true))
 					break;
 		}
 
 		/* Check whether the entry has timed out */
 		if (ign != ign_end)
 		{
-			IgnoreData *id = *ign;
+			Ignore *id = *ign;
 
-			if (id->time && !Anope::NoExpire && id->time <= Anope::CurTime)
+			if (id->GetTime() && !Anope::NoExpire && id->GetTime() <= Anope::CurTime)
 			{
-				Log(LOG_NORMAL, "expire/ignore", Config->GetClient("OperServ")) << "Expiring ignore entry " << id->mask;
-				delete id;
+				Log(LOG_NORMAL, "expire/ignore", Config->GetClient("OperServ")) << "Expiring ignore entry " << id->GetMask();
+				id->Delete();
 			}
 			else
 				return id;
 		}
 
 		return NULL;
-	}
-
-	std::vector<IgnoreData *> &GetIgnores() override
-	{
-		return *ignores;
 	}
 };
 
@@ -189,9 +188,6 @@ class CommandOSIgnore : public Command
 
 	void DoAdd(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		if (!ignore_service)
-			return;
-
 		const Anope::string &time = params.size() > 1 ? params[1] : "";
 		const Anope::string &nick = params.size() > 2 ? params[2] : "";
 		const Anope::string &reason = params.size() > 3 ? params[3] : "";
@@ -201,97 +197,87 @@ class CommandOSIgnore : public Command
 			this->OnSyntaxError(source, "ADD");
 			return;
 		}
+
+		time_t t = Anope::DoTime(time);
+
+		if (t <= -1)
+		{
+			source.Reply(_("Invalid expiry time \002{0}\002."), time);
+			return;
+		}
+
+		Anope::string mask = RealMask(nick);
+		if (mask.empty())
+		{
+			source.Reply(_("Mask must be in the form \037user\037@\037host\037."));
+			return;
+		}
+
+		if (Anope::ReadOnly)
+			source.Reply(_("Services are in read-only mode. Any changes made may not persist."));
+
+		Ignore *ign = ignoretype.Create();
+		ign->SetMask(mask);
+		ign->SetCreator(source.GetNick());
+		ign->SetReason(reason);
+		ign->SetTime(t ? Anope::CurTime + t : 0);
+
+		if (!t)
+		{
+			source.Reply(_("\002{0}\002 will now permanently be ignored."), mask);
+			Log(LOG_ADMIN, source, this) << "to add a permanent ignore for " << mask;
+		}
 		else
 		{
-			time_t t = Anope::DoTime(time);
-
-			if (t <= -1)
-			{
-				source.Reply(_("Invalid expiry time \002{0}\002."), time);
-				return;
-			}
-
-			Anope::string mask = RealMask(nick);
-			if (mask.empty())
-			{
-				source.Reply(_("Mask must be in the form \037user\037@\037host\037."));
-				return;
-			}
-
-			if (Anope::ReadOnly)
-				source.Reply(_("Services are in read-only mode. Any changes made may not persist."));
-
-			IgnoreData *ign = new IgnoreDataImpl();
-			ign->mask = mask;
-			ign->creator = source.GetNick();
-			ign->reason = reason;
-			ign->time = t ? Anope::CurTime + t : 0;
-
-			ignore_service->AddIgnore(ign);
-			if (!t)
-			{
-				source.Reply(_("\002{0}\002 will now permanently be ignored."), mask);
-				Log(LOG_ADMIN, source, this) << "to add a permanent ignore for " << mask;
-			}
-			else
-			{
-				source.Reply(_("\002{0}\002 will now be ignored for \002{1}\002."), mask, Anope::Duration(t, source.GetAccount()));
-				Log(LOG_ADMIN, source, this) << "to add an ignore on " << mask << " for " << Anope::Duration(t);
-			}
+			source.Reply(_("\002{0}\002 will now be ignored for \002{1}\002."), mask, Anope::Duration(t, source.GetAccount()));
+			Log(LOG_ADMIN, source, this) << "to add an ignore on " << mask << " for " << Anope::Duration(t);
 		}
 	}
 
 	void DoList(CommandSource &source)
 	{
-		if (!ignore_service)
-			return;
+		std::vector<Ignore *> ignores = Serialize::GetObjects<Ignore *>(ignoretype);
 
-		std::vector<IgnoreData *> &ignores = ignore_service->GetIgnores();
-		for (unsigned i = ignores.size(); i > 0; --i)
+		for (Ignore *id : ignores)
 		{
-			IgnoreData *id = ignores[i - 1];
-
-			if (id->time && !Anope::NoExpire && id->time <= Anope::CurTime)
+			if (id->GetTime() && !Anope::NoExpire && id->GetTime() <= Anope::CurTime)
 			{
-				Log(LOG_NORMAL, "expire/ignore", Config->GetClient("OperServ")) << "Expiring ignore entry " << id->mask;
-				delete id;
+				Log(LOG_NORMAL, "expire/ignore", Config->GetClient("OperServ")) << "Expiring ignore entry " << id->GetMask();
+				id->Delete();
 			}
 		}
 
+		ignores = Serialize::GetObjects<Ignore *>(ignoretype);
 		if (ignores.empty())
-			source.Reply(_("Ignore list is empty."));
-		else
 		{
-			ListFormatter list(source.GetAccount());
-			list.AddColumn(_("Mask")).AddColumn(_("Creator")).AddColumn(_("Reason")).AddColumn(_("Expires"));
-
-			for (unsigned i = ignores.size(); i > 0; --i)
-			{
-				const IgnoreData *ignore = ignores[i - 1];
-
-				ListFormatter::ListEntry entry;
-				entry["Mask"] = ignore->mask;
-				entry["Creator"] = ignore->creator;
-				entry["Reason"] = ignore->reason;
-				entry["Expires"] = Anope::Expires(ignore->time, source.GetAccount());
-				list.AddEntry(entry);
-			}
-
-			source.Reply(_("Services ignore list:"));
-
-			std::vector<Anope::string> replies;
-			list.Process(replies);
-
-			for (unsigned i = 0; i < replies.size(); ++i)
-				source.Reply(replies[i]);
+			source.Reply(_("Ignore list is empty."));
+			return;
 		}
+
+		ListFormatter list(source.GetAccount());
+		list.AddColumn(_("Mask")).AddColumn(_("Creator")).AddColumn(_("Reason")).AddColumn(_("Expires"));
+
+		for (Ignore *ignore : ignores)
+		{
+			ListFormatter::ListEntry entry;
+			entry["Mask"] = ignore->GetMask();
+			entry["Creator"] = ignore->GetCreator();
+			entry["Reason"] = ignore->GetReason();
+			entry["Expires"] = Anope::Expires(ignore->GetTime(), source.GetAccount());
+			list.AddEntry(entry);
+		}
+
+		source.Reply(_("Services ignore list:"));
+
+		std::vector<Anope::string> replies;
+		list.Process(replies);
+
+		for (const Anope::string &r : replies)
+			source.Reply(r);
 	}
 
 	void DoDel(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		if (!ignore_service)
-			return;
-
 		const Anope::string nick = params.size() > 1 ? params[1] : "";
 		if (nick.empty())
 		{
@@ -306,29 +292,29 @@ class CommandOSIgnore : public Command
 			return;
 		}
 
-		IgnoreData *ign = ignore_service->Find(mask);
-		if (ign)
+		Ignore *ign = ignore_service->Find(mask);
+		if (!ign)
 		{
-			if (Anope::ReadOnly)
-				source.Reply(_("Services are in read-only mode. Any changes made may not persist."));
-
-			Log(LOG_ADMIN, source, this) << "to remove an ignore on " << mask;
-			source.Reply(_("\002{0}\002 will no longer be ignored."), mask);
-			delete ign;
-		}
-		else
-			source.Reply(_("\002{0}\002 not found on ignore list."), mask);
-	}
-
-	void DoClear(CommandSource &source)
-	{
-		if (!ignore_service)
+			source.Reply(_("\002{0}\002 not found on ignore list."), mask);	
 			return;
+		}
 
 		if (Anope::ReadOnly)
 			source.Reply(_("Services are in read-only mode. Any changes made may not persist."));
 
-		ignore_service->ClearIgnores();
+		Log(LOG_ADMIN, source, this) << "to remove an ignore on " << mask;
+		source.Reply(_("\002{0}\002 will no longer be ignored."), mask);
+		ign->Delete();
+	}
+
+	void DoClear(CommandSource &source)
+	{
+		if (Anope::ReadOnly)
+			source.Reply(_("Services are in read-only mode. Any changes made may not persist."));
+
+		for (Ignore *ign : Serialize::GetObjects<Ignore *>(ignoretype))
+			ign->Delete();
+
 		Log(LOG_ADMIN, source, this) << "to CLEAR the list";
 		source.Reply(_("Ignore list has been cleared."));
 	}
@@ -357,8 +343,6 @@ class CommandOSIgnore : public Command
 			return this->DoClear(source);
 		else
 			this->OnSyntaxError(source, "");
-
-		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
@@ -374,7 +358,7 @@ class CommandOSIgnore : public Command
 		if (!regexengine.empty())
 		{
 			source.Reply(" ");
-			source.Reply(_("Regex matches are also supported using the %s engine. Enclose your pattern in // if this is desired."), regexengine);
+			source.Reply(_("Regex matches are also supported using the \002{0}\002 engine. Enclose your pattern in // if this is desired."), regexengine);
 		}
 
 		return true;
@@ -384,21 +368,21 @@ class CommandOSIgnore : public Command
 class OSIgnore : public Module
 	, public EventHook<Event::BotPrivmsg>
 {
-	Serialize::Type ignoredata_type;
+	IgnoreType ignoretype;
 	OSIgnoreService osignoreservice;
 	CommandOSIgnore commandosignore;
 
  public:
 	OSIgnore(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
 		, EventHook<Event::BotPrivmsg>("OnBotPrivmsg")
-		, ignoredata_type("IgnoreData", IgnoreDataImpl::Unserialize)
+		, ignoretype(this)
 		, osignoreservice(this)
 		, commandosignore(this)
 	{
 
 	}
 
-	EventReturn OnBotPrivmsg(User *u, BotInfo *bi, Anope::string &message) override
+	EventReturn OnBotPrivmsg(User *u, ServiceBot *bi, Anope::string &message) override
 	{
 		if (!u->HasMode("OPER") && this->osignoreservice.Find(u->nick))
 			return EVENT_STOP;

@@ -48,10 +48,11 @@ Pipe::~Pipe()
 
 bool Pipe::ProcessRead()
 {
+	char dummy[512];
+	while (read(this->GetFD(), dummy, sizeof(dummy)) == sizeof(dummy));
+
 	this->OnNotify();
 
-	char dummy[512];
-	while (read(this->GetFD(), dummy, 512) == 512);
 	return true;
 }
 
@@ -76,6 +77,6 @@ bool Pipe::SetWriteBlocking(bool state)
 
 void Pipe::Notify()
 {
-	this->Write("\0", 1);
+	this->Write("", 1);
 }
 

@@ -17,6 +17,7 @@
 #include "hashcomp.h"
 #include "event.h"
 #include "bots.h"
+#include "modules.h"
 #include "modules/nickserv.h"
 
 using namespace Configuration;
@@ -288,18 +289,26 @@ Conf::Conf() : Block("")
 		if (ot == NULL)
 			throw ConfigException("Oper block for " + nname + " has invalid oper type " + type);
 
-		Oper *o = new Oper(nname, ot);
-		o->require_oper = require_oper;
-		o->password = password;
-		o->certfp = certfp;
-		spacesepstream(host).GetTokens(o->hosts);
-		o->vhost = vhost;
-
-		this->Opers.push_back(o);
+		Oper *o = operblock.Create();
+		o->conf = this;
+		o->SetName(nname);
+		o->SetType(ot);
+		o->SetRequireOper(require_oper);
+		o->SetPassword(password);
+		o->SetCertFP(certfp);
+		o->SetHost(host);
+		o->SetVhost(vhost);
 	}
 
-	for (botinfo_map::const_iterator it = BotListByNick->begin(), it_end = BotListByNick->end(); it != it_end; ++it)
-		it->second->conf = false;
+	for (std::pair<Anope::string, User *> p : UserListByNick)
+	{
+		User *u = p.second;
+		if (u->type != UserType::BOT)
+			continue;
+
+		ServiceBot *bi = anope_dynamic_static_cast<ServiceBot *>(u);
+		bi->conf = false;
+	}
 	for (int i = 0; i < this->CountBlock("service"); ++i)
 	{
 		Block *service = this->GetBlock("service", i);
@@ -317,9 +326,9 @@ Conf::Conf() : Block("")
 		ValidateNotEmpty("service", "gecos", gecos);
 		ValidateNoSpaces("service", "channels", channels);
 
-		BotInfo *bi = BotInfo::Find(nick, true);
+		ServiceBot *bi = ServiceBot::Find(nick, true);
 		if (!bi)
-			bi = new BotInfo(nick, user, host, gecos, modes);
+			bi = new ServiceBot(nick, user, host, gecos, modes);
 		bi->conf = true;
 
 		std::vector<Anope::string> oldchannels = bi->botchannels;
@@ -396,7 +405,7 @@ Conf::Conf() : Block("")
 
 		LogInfo l(logage, rawio, debug);
 
-		l.bot = BotInfo::Find(log->Get<const Anope::string>("bot", "Global"), true);
+		l.bot = ServiceBot::Find(log->Get<const Anope::string>("bot", "Global"), true);
 		spacesepstream(log->Get<const Anope::string>("target")).GetTokens(l.targets);
 		spacesepstream(log->Get<const Anope::string>("source")).GetTokens(l.sources);
 		spacesepstream(log->Get<const Anope::string>("admin")).GetTokens(l.admin);
@@ -410,8 +419,15 @@ Conf::Conf() : Block("")
 		this->LogInfos.push_back(l);
 	}
 
-	for (botinfo_map::const_iterator it = BotListByNick->begin(), it_end = BotListByNick->end(); it != it_end; ++it)
-		it->second->commands.clear();
+	for (std::pair<Anope::string, User *> p : UserListByNick)
+	{
+		User *u = p.second;
+		if (u->type != UserType::BOT)
+			continue;
+
+		ServiceBot *bi = anope_dynamic_static_cast<ServiceBot *>(u);
+		bi->commands.clear();
+	}
 	for (int i = 0; i < this->CountBlock("command"); ++i)
 	{
 		Block *command = this->GetBlock("command", i);
@@ -427,7 +443,7 @@ Conf::Conf() : Block("")
 		ValidateNotEmpty("command", "name", nname);
 		ValidateNotEmpty("command", "command", cmd);
 
-		BotInfo *bi = this->GetClient(service);
+		ServiceBot *bi = this->GetClient(service);
 		if (!bi)
 			continue;
 
@@ -475,30 +491,21 @@ Conf::Conf() : Block("")
 
 	/* Below here can't throw */
 
+	/* Clear existing conf opers */
 	if (Config)
-		/* Clear existing conf opers */
-		if (NickServ::service)
-		{
-			NickServ::nickcore_map& ncmap = NickServ::service->GetAccountList();
-			for (auto& it : ncmap)
-			{
-				NickServ::Account *nc = it.second;
-				if (nc->o && std::find(Config->Opers.begin(), Config->Opers.end(), nc->o) != Config->Opers.end())
-					nc->o = NULL;
-			}
-		}
+		for (Oper *o : Serialize::GetObjects<Oper *>(operblock))
+			if (o->conf == Config)
+				o->Delete();
 	/* Apply new opers */
 	if (NickServ::service)
-		for (unsigned i = 0; i < this->Opers.size(); ++i)
+		for (Oper *o : Serialize::GetObjects<Oper *>(operblock))
 		{
-			Oper *o = this->Opers[i];
-
-			NickServ::Nick *na = NickServ::service->FindNick(o->name);
+			NickServ::Nick *na = NickServ::service->FindNick(o->GetName());
 			if (!na)
 				continue;
 
-			na->nc->o = o;
-			Log() << "Tied oper " << na->nc->display << " to type " << o->ot->GetName();
+			na->GetAccount()->o = o;
+			Log() << "Tied oper " << na->GetAccount()->GetDisplay() << " to type " << o->GetType()->GetName();
 		}
 
 	if (options->Get<const Anope::string>("casemap", "ascii") == "ascii")
@@ -549,8 +556,6 @@ Conf::~Conf()
 {
 	for (unsigned i = 0; i < MyOperTypes.size(); ++i)
 		delete MyOperTypes[i];
-	for (unsigned i = 0; i < Opers.size(); ++i)
-		delete Opers[i];
 }
 
 void Conf::Post(Conf *old)
@@ -564,32 +569,22 @@ void Conf::Post(Conf *old)
 			ModuleManager::LoadModule(this->ModulesAutoLoad[i], NULL);
 
 	/* Apply opertype changes, as non-conf opers still point to the old oper types */
-	for (unsigned i = Oper::opers.size(); i > 0; --i)
+	for (Oper *o : Serialize::GetObjects<Oper *>(operblock))
 	{
-		Oper *o = Oper::opers[i - 1];
-
 		/* Oper's type is in the old config, so update it */
-		if (std::find(old->MyOperTypes.begin(), old->MyOperTypes.end(), o->ot) != old->MyOperTypes.end())
+		if (std::find(old->MyOperTypes.begin(), old->MyOperTypes.end(), o->GetType()) != old->MyOperTypes.end())
 		{
-			OperType *ot = o->ot;
-			o->ot = NULL;
+			OperType *ot = o->GetType();
+			o->SetType(nullptr);
 
 			for (unsigned j = 0; j < MyOperTypes.size(); ++j)
 				if (ot->GetName() == MyOperTypes[j]->GetName())
-					o->ot = MyOperTypes[j];
+					o->SetType(MyOperTypes[j]);
 
-			if (o->ot == NULL)
+			if (o->GetType() == NULL)
 			{
 				/* Oper block has lost type */
-				std::vector<Oper *>::iterator it = std::find(old->Opers.begin(), old->Opers.end(), o);
-				if (it != old->Opers.end())
-					old->Opers.erase(it);
-
-				it = std::find(this->Opers.begin(), this->Opers.end(), o);
-				if (it != this->Opers.end())
-					this->Opers.erase(it);
-
-				delete o;
+				o->Delete();
 			}
 		}
 	}
@@ -626,11 +621,11 @@ Block *Conf::GetModule(const Anope::string &mname)
 	return GetModule(mname);
 }
 
-BotInfo *Conf::GetClient(const Anope::string &cname)
+ServiceBot *Conf::GetClient(const Anope::string &cname)
 {
 	Anope::map<Anope::string>::iterator it = bots.find(cname);
 	if (it != bots.end())
-		return BotInfo::Find(!it->second.empty() ? it->second : cname, true);
+		return ServiceBot::Find(!it->second.empty() ? it->second : cname, true);
 
 	Block *block = GetModule(cname.lower());
 	const Anope::string &client = block->Get<const Anope::string>("client");

@@ -17,17 +17,12 @@
 
 typedef Anope::hash_map<BotInfo *> botinfo_map;
 
-extern CoreExport Serialize::Checker<botinfo_map> BotListByNick, BotListByUID;
-
 /* A service bot (NickServ, ChanServ, a BotServ bot, etc). */
-class CoreExport BotInfo : public User, public Serializable
+class CoreExport ServiceBot : public LocalUser
 {
-	/* Channels this bot is assigned to */
-	Serialize::Checker<std::set<ChanServ::Channel *> > channels;
  public:
-	time_t created;
-	/* Last time this bot said something (via privmsg) */
-	time_t lastmsg;
+	/* Underlying botinfo for this bot */
+	Serialize::Reference<BotInfo> bi;
 	/* Map of actual command names -> service name/permission required */
 	CommandInfo::map commands;
 	/* Modes the bot should have as configured in service:modes */
@@ -36,8 +31,6 @@ class CoreExport BotInfo : public User, public Serializable
 	std::vector<Anope::string> botchannels;
 	/* Whether or not this bot is introduced to the network */
 	bool introduced;
-	/* Bot can only be assigned by irc ops */
-	bool oper_only;
 	/* Bot is defined in the configuration file */
 	bool conf;
 
@@ -48,14 +41,11 @@ class CoreExport BotInfo : public User, public Serializable
 	 * @param real The realname to give the bot.
 	 * @param bmodes The modes to give the bot.
 	 */
-	BotInfo(const Anope::string &nick, const Anope::string &user = "", const Anope::string &host = "", const Anope::string &real = "", const Anope::string &bmodes = "");
+	ServiceBot(const Anope::string &nick, const Anope::string &user = "", const Anope::string &host = "", const Anope::string &real = "", const Anope::string &bmodes = "");
 
 	/** Destroy a bot, clearing up appropriately.
 	 */
-	virtual ~BotInfo();
-
-	void Serialize(Serialize::Data &data) const;
-	static Serializable* Unserialize(Serializable *obj, Serialize::Data &);
+	virtual ~ServiceBot();
 
 	void GenerateUID();
 
@@ -68,7 +58,7 @@ class CoreExport BotInfo : public User, public Serializable
 
 	/** Return the channels this bot is assigned to
 	 */
-	const std::set<ChanServ::Channel *> &GetChannels() const;
+	std::vector<ChanServ::Channel *> GetChannels() const;
 
 	/** Assign this bot to a given channel, removing the existing assigned bot if one exists.
 	 * @param u The user assigning the bot, or NULL
@@ -131,6 +121,53 @@ class CoreExport BotInfo : public User, public Serializable
 	 * @param nick_only True to only look by nick, and not by UID
 	 * @return The bot, if it exists
 	 */
-	static BotInfo* Find(const Anope::string &nick, bool nick_only = false);
+	static ServiceBot* Find(const Anope::string &nick, bool nick_only = false);
 };
+
+class BotInfo : public Serialize::Object
+{
+ public:
+	ServiceBot *bot;
+
+	BotInfo(Serialize::TypeBase *type) : Serialize::Object(type) { }
+	BotInfo(Serialize::TypeBase *type, Serialize::ID id) : Serialize::Object(type, id) { }
+
+	void SetNick(const Anope::string &);
+	Anope::string GetNick();
+
+	void SetUser(const Anope::string &);
+	Anope::string GetUser();
+
+	void SetHost(const Anope::string &);
+	Anope::string GetHost();
+
+	void SetRealName(const Anope::string &);
+	Anope::string GetRealName();
+
+	void SetCreated(const time_t &);
+	time_t GetCreated();
+
+	void SetOperOnly(const bool &);
+	bool GetOperOnly();
+};
+
+class BotInfoType : public Serialize::Type<BotInfo>
+{
+ public:
+	Serialize::Field<BotInfo, Anope::string> nick, user, host, realname;
+	Serialize::Field<BotInfo, time_t> created;
+	Serialize::Field<BotInfo, bool> operonly;
+
+	BotInfoType() : Serialize::Type<BotInfo>(nullptr, "BotInfo")
+		, nick(this, "nick")
+		, user(this, "user")
+		, host(this, "host")
+		, realname(this, "realname")
+		, created(this, "created")
+		, operonly(this, "operonly")
+	{
+	}
+};
+
+static Serialize::TypeReference<BotInfo> botinfo("BotInfo");
 

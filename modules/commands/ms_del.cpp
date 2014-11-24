@@ -47,14 +47,14 @@ class CommandMSDel : public Command
 
 			if (!source.AccessFor(ci).HasPriv("MEMO"))
 			{
-				source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "MEMO", ci->name);
+				source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "MEMO", ci->GetName());
 				return;
 			}
 
-			mi = ci->memos;
+			mi = ci->GetMemos();
 		}
 		else
-			mi = source.nc->memos;
+			mi = source.nc->GetMemos();
 
 		if (numstr.empty() || (!isdigit(numstr[0]) && !numstr.equals_ci("ALL") && !numstr.equals_ci("LAST")))
 		{
@@ -62,7 +62,7 @@ class CommandMSDel : public Command
 			return;
 		}
 
-		if (!mi || mi->memos->empty())
+		if (!mi || mi->GetMemos().empty())
 		{
 			if (!chan.empty())
 				source.Reply(_("\002{0}\002 has no memos."), chan);
@@ -71,16 +71,18 @@ class CommandMSDel : public Command
 			return;
 		}
 
+		auto memos = mi->GetMemos();
+
 		if (isdigit(numstr[0]))
 		{
 			NumberList(numstr, true,
 				[&](unsigned int number)
 				{
-					if (!number || number > mi->memos->size())
+					if (!number || number > memos.size())
 						return;
 
 					if (MemoServ::Event::OnMemoDel)
-						MemoServ::Event::OnMemoDel(&MemoServ::Event::MemoDel::OnMemoDel, ci ? ci->name : source.nc->display, mi, mi->GetMemo(number - 1));
+						MemoServ::Event::OnMemoDel(&MemoServ::Event::MemoDel::OnMemoDel, ci ? ci->GetName() : source.nc->GetDisplay(), mi, mi->GetMemo(number - 1));
 
 					mi->Del(number - 1);
 					source.Reply(_("Memo \002{0}\002 has been deleted."), number);
@@ -91,19 +93,20 @@ class CommandMSDel : public Command
 		{
 			/* Delete last memo. */
 			if (MemoServ::Event::OnMemoDel)
-				MemoServ::Event::OnMemoDel(&MemoServ::Event::MemoDel::OnMemoDel, ci ? ci->name : source.nc->display, mi, mi->GetMemo(mi->memos->size() - 1));
-			mi->Del(mi->memos->size() - 1);
-			source.Reply(_("Memo \002{0}\002 has been deleted."), mi->memos->size() + 1);
+				MemoServ::Event::OnMemoDel(&MemoServ::Event::MemoDel::OnMemoDel, ci ? ci->GetName() : source.nc->GetDisplay(), mi, mi->GetMemo(memos.size() - 1));
+			mi->Del(memos.size() - 1);
+			source.Reply(_("Memo \002{0}\002 has been deleted."), memos.size() + 1);
 		}
 		else
 		{
 			/* Delete all memos. */
-			for (unsigned i = mi->memos->size(); i > 0; --i)
+			std::for_each(memos.begin(), memos.end(),
+			[&](MemoServ::Memo *m)
 			{
 				if (MemoServ::Event::OnMemoDel)
-					MemoServ::Event::OnMemoDel(&MemoServ::Event::MemoDel::OnMemoDel, ci ? ci->name : source.nc->display, mi, mi->GetMemo(i));
-				mi->Del(i - 1);
-			}
+					MemoServ::Event::OnMemoDel(&MemoServ::Event::MemoDel::OnMemoDel, ci ? ci->GetName() : source.nc->GetDisplay(), mi, m);
+				delete m;
+			});
 			if (!chan.empty())
 				source.Reply(_("All memos for channel \002{0}\002 have been deleted."), chan);
 			else

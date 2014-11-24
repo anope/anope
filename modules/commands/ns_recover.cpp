@@ -35,13 +35,13 @@ class NSRecoverRequestListener : public NickServ::IdentifyRequestListener
 		if (!na)
 			return;
 
-		Log(LOG_COMMAND, source, cmd) << "for " << na->nick;
+		Log(LOG_COMMAND, source, cmd) << "for " << na->GetNick();
 
 		/* Nick is being held by us, release it */
-		if (na->HasExt("HELD"))
+		if (na->HasFieldS("HELD"))
 		{
 			NickServ::service->Release(na);
-			source.Reply(_("Service's hold on \002{0}\002 has been released."), na->nick);
+			source.Reply(_("Service's hold on \002{0}\002 has been released."), na->GetNick());
 		}
 		else if (!u)
 		{
@@ -49,21 +49,22 @@ class NSRecoverRequestListener : public NickServ::IdentifyRequestListener
 		}
 		// If the user being recovered is identified for the account of the nick then the user is the
 		// same person that is executing the command, so kill them off (old GHOST command).
-		else if (u->Account() == na->nc)
+		else if (u->Account() == na->GetAccount())
 		{
-			if (!source.GetAccount() && na->nc->HasExt("NS_SECURE"))
+			if (!source.GetAccount() && na->GetAccount()->HasFieldS("NS_SECURE"))
 			{
 				source.GetUser()->Login(u->Account());
-				Log(LOG_COMMAND, source, cmd) << "and was automatically identified to " << u->Account()->display;
+				Log(LOG_COMMAND, source, cmd) << "and was automatically identified to " << u->Account()->GetDisplay();
 			}
 
 			if (Config->GetModule("ns_recover")->Get<bool>("restoreonrecover"))
 			{
 				if (!u->chans.empty())
 				{
-					NSRecoverInfo *ei = source.GetUser()->Extend<NSRecoverInfo>("recover");
+					NSRecoverInfo i;
 					for (User::ChanUserList::iterator it = u->chans.begin(), it_end = u->chans.end(); it != it_end; ++it)
-						(*ei)[it->first->name] = it->second->status;
+						i[it->first->name] = it->second->status;
+					source.GetUser()->Extend<NSRecoverInfo>("recover", i);
 				}
 			}
 
@@ -81,10 +82,10 @@ class NSRecoverRequestListener : public NickServ::IdentifyRequestListener
 		/* User is not identified or not identified to the same account as the person using this command */
 		else
 		{
-			if (!source.GetAccount() && na->nc->HasExt("NS_SECURE"))
+			if (!source.GetAccount() && na->GetAccount()->HasFieldS("NS_SECURE"))
 			{
-				source.GetUser()->Login(na->nc); // Identify the user using the command if they arent identified
-				Log(LOG_COMMAND, source, cmd) << "and was automatically identified to " << na->nick << " (" << na->nc->display << ")";
+				source.GetUser()->Login(na->GetAccount()); // Identify the user using the command if they arent identified
+				Log(LOG_COMMAND, source, cmd) << "and was automatically identified to " << na->GetNick() << " (" << na->GetAccount()->GetDisplay() << ")";
 			}
 
 			u->SendMessage(*source.service, _("This nickname has been recovered by \002{0}\002."), source.GetNick());
@@ -142,7 +143,7 @@ class CommandNSRecover : public Command
 			return;
 		}
 
-		const NickServ::Nick *na = NickServ::FindNick(nick);
+		NickServ::Nick *na = NickServ::FindNick(nick);
 
 		if (!na)
 		{
@@ -150,31 +151,30 @@ class CommandNSRecover : public Command
 			return;
 		}
 
-		if (na->nc->HasExt("NS_SUSPENDED"))
+		if (na->GetAccount()->HasFieldS("NS_SUSPENDED"))
 		{
-			source.Reply(_("\002{0}\002 is suspended."), na->nick);
+			source.Reply(_("\002{0}\002 is suspended."), na->GetNick());
 			return;
 		}
 
 		bool ok = false;
-		if (source.GetAccount() == na->nc)
+		if (source.GetAccount() == na->GetAccount())
 			ok = true;
-		else if (!na->nc->HasExt("NS_SECURE") && source.GetUser() && na->nc->IsOnAccess(source.GetUser()))
+		else if (!na->GetAccount()->HasFieldS("NS_SECURE") && source.GetUser() && na->GetAccount()->IsOnAccess(source.GetUser()))
 			ok = true;
 
-		NSCertList *cl = na->nc->GetExt<NSCertList>("certificates");
-		if (source.GetUser() && !source.GetUser()->fingerprint.empty() && cl && cl->FindCert(source.GetUser()->fingerprint))
+		if (certservice && source.GetUser() && certservice->Matches(source.GetUser(), na->GetAccount()))
 			ok = true;
 
 		if (ok == false && !pass.empty())
 		{
-			NickServ::IdentifyRequest *req = NickServ::service->CreateIdentifyRequest(new NSRecoverRequestListener(source, this, na->nick, pass), owner, na->nick, pass);
+			NickServ::IdentifyRequest *req = NickServ::service->CreateIdentifyRequest(new NSRecoverRequestListener(source, this, na->GetNick(), pass), owner, na->GetNick(), pass);
 			Event::OnCheckAuthentication(&Event::CheckAuthentication::OnCheckAuthentication, source.GetUser(), req);
 			req->Dispatch();
 		}
 		else
 		{
-			NSRecoverRequestListener req(source, this, na->nick, pass);
+			NSRecoverRequestListener req(source, this, na->GetNick(), pass);
 
 			if (ok)
 				req.OnSuccess(nullptr);
@@ -198,7 +198,7 @@ class NSRecover : public Module
 	, public EventHook<Event::JoinChannel>
 {
 	CommandNSRecover commandnsrecover;
-	PrimitiveExtensibleItem<NSRecoverInfo> recover;
+	ExtensibleItem<NSRecoverInfo> recover;
 
  public:
 	NSRecover(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
@@ -218,7 +218,7 @@ class NSRecover : public Module
 		if (Config->GetModule(this)->Get<bool>("restoreonrecover"))
 		{
 			NSRecoverInfo *ei = recover.Get(u);
-			BotInfo *NickServ = Config->GetClient("NickServ");
+			ServiceBot *NickServ = Config->GetClient("NickServ");
 
 			if (ei != NULL && NickServ != NULL)
 				for (NSRecoverInfo::iterator it = ei->begin(), it_end = ei->end(); it != it_end;)

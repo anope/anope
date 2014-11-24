@@ -84,23 +84,23 @@ class InspIRCd20Proto : public IRCDProto
 		SendServer(Me);
 	}
 
-	void SendGlobalNotice(BotInfo *bi, const Server *dest, const Anope::string &msg) override
+	void SendGlobalNotice(ServiceBot *bi, const Server *dest, const Anope::string &msg) override
 	{
 		UplinkSocket::Message(bi) << "NOTICE $" << dest->GetName() << " :" << msg;
 	}
 
-	void SendGlobalPrivmsg(BotInfo *bi, const Server *dest, const Anope::string &msg) override
+	void SendGlobalPrivmsg(ServiceBot *bi, const Server *dest, const Anope::string &msg) override
 	{
 		UplinkSocket::Message(bi) << "PRIVMSG $" << dest->GetName() << " :" << msg;
 	}
 
-	void SendAkillDel(const XLine *x) override
+	void SendAkillDel(XLine *x) override
 	{
 		/* InspIRCd may support regex bans */
 		if (x->IsRegex() && Servers::Capab.count("RLINE"))
 		{
-			Anope::string mask = x->mask;
-			size_t h = x->mask.find('#');
+			Anope::string mask = x->GetMask();
+			size_t h = mask.find('#');
 			if (h != Anope::string::npos)
 				mask = mask.replace(h, 1, ' ');
 			SendDelLine("R", mask);
@@ -154,18 +154,18 @@ class InspIRCd20Proto : public IRCDProto
 	void SendAkill(User *u, XLine *x) override
 	{
 		// Calculate the time left before this would expire, capping it at 2 days
-		time_t timeleft = x->expires - Anope::CurTime;
-		if (timeleft > 172800 || !x->expires)
+		time_t timeleft = x->GetExpires() - Anope::CurTime;
+		if (timeleft > 172800 || !x->GetExpires())
 			timeleft = 172800;
 
 		/* InspIRCd may support regex bans, if they do we can send this and forget about it */
 		if (x->IsRegex() && Servers::Capab.count("RLINE"))
 		{
-			Anope::string mask = x->mask;
-			size_t h = x->mask.find('#');
+			Anope::string mask = x->GetMask();
+			size_t h = mask.find('#');
 			if (h != Anope::string::npos)
 				mask = mask.replace(h, 1, ' ');
-			SendAddLine("R", mask, timeleft, x->by, x->GetReason());
+			SendAddLine("R", mask, timeleft, x->GetBy(), x->GetReason());
 			return;
 		}
 		else if (x->IsRegex() || x->HasNickOrReal())
@@ -179,16 +179,16 @@ class InspIRCd20Proto : public IRCDProto
 				return;
 			}
 
-			const XLine *old = x;
+			XLine *old = x;
 
 			if (old->manager->HasEntry("*@" + u->host))
 				return;
 
 			/* We can't akill x as it has a nick and/or realname included, so create a new akill for *@host */
-			x = new XLine("*@" + u->host, old->by, old->expires, old->reason, old->id);
+			x = new XLine("*@" + u->host, old->GetBy(), old->GetExpires(), old->GetReason(), old->GetID());
 			old->manager->AddXLine(x);
 
-			Log(Config->GetClient("OperServ"), "akill") << "AKILL: Added an akill for " << x->mask << " because " << u->GetMask() << "#" << u->realname << " matches " << old->mask;
+			Log(Config->GetClient("OperServ"), "akill") << "AKILL: Added an akill for " << x->GetMask() << " because " << u->GetMask() << "#" << u->realname << " matches " << old->GetMask();
 		}
 
 		/* ZLine if we can instead */
@@ -202,7 +202,7 @@ class InspIRCd20Proto : public IRCDProto
 			}
 		}
 
-		SendAddLine("G", x->GetUser() + "@" + x->GetHost(), timeleft, x->by, x->GetReason());
+		SendAddLine("G", x->GetUser() + "@" + x->GetHost(), timeleft, x->GetBy(), x->GetReason());
 	}
 
 	void SendNumericInternal(int numeric, const Anope::string &dest, const Anope::string &buf) override
@@ -260,7 +260,7 @@ class InspIRCd20Proto : public IRCDProto
 			if (uc != NULL)
 				uc->status.Clear();
 
-			BotInfo *setter = BotInfo::Find(user->nick);
+			ServiceBot *setter = ServiceBot::Find(user->nick);
 			for (size_t i = 0; i < cs.Modes().length(); ++i)
 				c->SetMode(setter, ModeManager::FindChannelModeByChar(cs.Modes()[i]), user->GetUID(), false);
 
@@ -270,19 +270,19 @@ class InspIRCd20Proto : public IRCDProto
 	}
 
 	/* UNSQLINE */
-	void SendSQLineDel(const XLine *x) override
+	void SendSQLineDel(XLine *x) override
 	{
-		SendDelLine("Q", x->mask);
+		SendDelLine("Q", x->GetMask());
 	}
 
 	/* SQLINE */
-	void SendSQLine(User *, const XLine *x) override
+	void SendSQLine(User *, XLine *x) override
 	{
 		// Calculate the time left before this would expire, capping it at 2 days
-		time_t timeleft = x->expires - Anope::CurTime;
-		if (timeleft > 172800 || !x->expires)
+		time_t timeleft = x->GetExpires() - Anope::CurTime;
+		if (timeleft > 172800 || !x->GetExpires())
 			timeleft = 172800;
-		SendAddLine("Q", x->mask, timeleft, x->by, x->GetReason());
+		SendAddLine("Q", x->GetMask(), timeleft, x->GetBy(), x->GetReason());
 	}
 
 	void SendVhost(User *u, const Anope::string &vIdent, const Anope::string &vhost) override
@@ -306,19 +306,19 @@ class InspIRCd20Proto : public IRCDProto
 	}
 
 	/* UNSZLINE */
-	void SendSZLineDel(const XLine *x) override
+	void SendSZLineDel(XLine *x) override
 	{
 		SendDelLine("Z", x->GetHost());
 	}
 
 	/* SZLINE */
-	void SendSZLine(User *, const XLine *x) override
+	void SendSZLine(User *, XLine *x) override
 	{
 		// Calculate the time left before this would expire, capping it at 2 days
-		time_t timeleft = x->expires - Anope::CurTime;
-		if (timeleft > 172800 || !x->expires)
+		time_t timeleft = x->GetExpires() - Anope::CurTime;
+		if (timeleft > 172800 || !x->GetExpires())
 			timeleft = 172800;
-		SendAddLine("Z", x->GetHost(), timeleft, x->by, x->GetReason());
+		SendAddLine("Z", x->GetHost(), timeleft, x->GetBy(), x->GetReason());
 	}
 
 	void SendSVSJoin(const MessageSource &source, User *u, const Anope::string &chan, const Anope::string &) override
@@ -364,10 +364,10 @@ class InspIRCd20Proto : public IRCDProto
 	void SendLogin(User *u, NickServ::Nick *na) override
 	{
 		/* InspIRCd uses an account to bypass chmode +R, not umode +r, so we can't send this here */
-		if (na->nc->HasExt("UNCONFIRMED"))
+		if (na->GetAccount()->HasFieldS("UNCONFIRMED"))
 			return;
 
-		UplinkSocket::Message(Me) << "METADATA " << u->GetUID() << " accountname :" << na->nc->display;
+		UplinkSocket::Message(Me) << "METADATA " << u->GetUID() << " accountname :" << na->GetAccount()->GetDisplay();
 	}
 
 	void SendLogout(User *u) override
@@ -526,7 +526,7 @@ namespace InspIRCdExtban
 			const Anope::string &mask = e->GetMask();
 			Anope::string real_mask = mask.substr(2);
 
-			return u->IsIdentified() && real_mask.equals_ci(u->Account()->display);
+			return u->IsIdentified() && real_mask.equals_ci(u->Account()->GetDisplay());
 		}
 	};
 
@@ -1265,7 +1265,7 @@ struct IRCDMessageIdle : IRCDMessage
 
 	void Run(MessageSource &source, const std::vector<Anope::string> &params) override
 	{
-		BotInfo *bi = BotInfo::Find(params[0]);
+		ServiceBot *bi = ServiceBot::Find(params[0]);
 		if (bi)
 			UplinkSocket::Message(bi) << "IDLE " << source.GetSource() << " " << Anope::StartTime << " " << (Anope::CurTime - bi->lastmsg);
 		else
@@ -1309,7 +1309,7 @@ struct IRCDMessageMetadata : IRCDMessage
 				User *u = User::Find(params[0]);
 				if (!u)
 					return;
-				u->Extend<bool>("ssl");
+				u->Extend<bool>("ssl", true);
 				Anope::string data = params[2].c_str();
 				size_t pos1 = data.find(' ') + 1;
 				size_t pos2 = data.find(' ', pos1);
@@ -1546,7 +1546,7 @@ struct IRCDMessageUID : IRCDMessage
 					++it;
 			}
 
-		User *u = User::OnIntroduce(params[2], params[5], params[3], params[4], params[6], source.GetServer(), params[params.size() - 1], ts, modes, params[0], na ? *na->nc : NULL);
+		User *u = User::OnIntroduce(params[2], params[5], params[3], params[4], params[6], source.GetServer(), params[params.size() - 1], ts, modes, params[0], na ? na->GetAccount() : NULL);
 		if (u)
 			u->signon = convertTo<time_t>(params[7]);
 	}
@@ -1673,16 +1673,15 @@ class ProtoInspIRCd20 : public Module
 
 	void OnChanRegistered(ChanServ::Channel *ci) override
 	{
-		ModeLocks *modelocks = ci->GetExt<ModeLocks>("modelocks");
-		if (use_server_side_mlock && ci->c && modelocks && !modelocks->GetMLockAsString(false).empty())
+		if (use_server_side_mlock && ci->c && mlocks && !mlocks->GetMLockAsString(ci, false).empty())
 		{
-			Anope::string modes = modelocks->GetMLockAsString(false).replace_all_cs("+", "").replace_all_cs("-", "");
+			Anope::string modes = mlocks->GetMLockAsString(ci, false).replace_all_cs("+", "").replace_all_cs("-", "");
 			SendChannelMetadata(ci->c, "mlock", modes);
 		}
 
 		if (use_server_side_topiclock && Servers::Capab.count("TOPICLOCK") && ci->c)
 		{
-			if (ci->HasExt("TOPICLOCK"))
+			if (ci->HasFieldS("TOPICLOCK"))
 				SendChannelMetadata(ci->c, "topiclock", "1");
 		}
 	}
@@ -1698,11 +1697,10 @@ class ProtoInspIRCd20 : public Module
 
 	EventReturn OnMLock(ChanServ::Channel *ci, ModeLock *lock) override
 	{
-		ModeLocks *modelocks = ci->GetExt<ModeLocks>("modelocks");
-		ChannelMode *cm = ModeManager::FindChannelModeByName(lock->name);
-		if (use_server_side_mlock && cm && ci->c && modelocks && (cm->type == MODE_REGULAR || cm->type == MODE_PARAM))
+		ChannelMode *cm = ModeManager::FindChannelModeByName(lock->GetName());
+		if (use_server_side_mlock && cm && ci->c && mlocks && (cm->type == MODE_REGULAR || cm->type == MODE_PARAM))
 		{
-			Anope::string modes = modelocks->GetMLockAsString(false).replace_all_cs("+", "").replace_all_cs("-", "") + cm->mchar;
+			Anope::string modes = mlocks->GetMLockAsString(ci, false).replace_all_cs("+", "").replace_all_cs("-", "") + cm->mchar;
 			SendChannelMetadata(ci->c, "mlock", modes);
 		}
 
@@ -1711,11 +1709,10 @@ class ProtoInspIRCd20 : public Module
 
 	EventReturn OnUnMLock(ChanServ::Channel *ci, ModeLock *lock) override
 	{
-		ModeLocks *modelocks = ci->GetExt<ModeLocks>("modelocks");
-		ChannelMode *cm = ModeManager::FindChannelModeByName(lock->name);
-		if (use_server_side_mlock && cm && ci->c && modelocks && (cm->type == MODE_REGULAR || cm->type == MODE_PARAM))
+		ChannelMode *cm = ModeManager::FindChannelModeByName(lock->GetName());
+		if (use_server_side_mlock && cm && ci->c && mlocks && (cm->type == MODE_REGULAR || cm->type == MODE_PARAM))
 		{
-			Anope::string modes = modelocks->GetMLockAsString(false).replace_all_cs("+", "").replace_all_cs("-", "").replace_all_cs(cm->mchar, "");
+			Anope::string modes = mlocks->GetMLockAsString(ci, false).replace_all_cs("+", "").replace_all_cs("-", "").replace_all_cs(cm->mchar, "");
 			SendChannelMetadata(ci->c, "mlock", modes);
 		}
 

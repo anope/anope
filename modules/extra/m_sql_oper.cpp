@@ -46,7 +46,7 @@ class SQLOperResult : public SQL::Interface
 		}
 		catch (const SQL::Exception &) { }
 
-		BotInfo *OperServ = Config->GetClient("OperServ");
+		ServiceBot *OperServ = Config->GetClient("OperServ");
 		if (opertype.empty())
 		{
 			if (user->Account() && user->Account()->o && dynamic_cast<SQLOper *>(user->Account()->o))
@@ -54,7 +54,7 @@ class SQLOperResult : public SQL::Interface
 				delete user->Account()->o;
 				user->Account()->o = NULL;
 
-				Log(this->owner) << "m_sql_oper: Removed services operator from " << user->nick << " (" << user->Account()->display << ")";
+				Log(this->owner) << "m_sql_oper: Removed services operator from " << user->nick << " (" << user->Account()->GetDisplay() << ")";
 				user->RemoveMode(OperServ, "OPER"); // Probably not set, just incase
 			}
 			return;
@@ -70,7 +70,7 @@ class SQLOperResult : public SQL::Interface
 		if (!user->Account()->o || user->Account()->o->ot != ot)
 		{
 			Log(this->owner) << "m_sql_oper: Tieing oper " << user->nick << " to type " << opertype;
-			user->Account()->o = new SQLOper(user->Account()->display, ot);
+			user->Account()->o = new SQLOper(user->Account()->GetDisplay(), ot);
 		}
 
 		if (!user->HasMode("OPER"))
@@ -136,12 +136,12 @@ class ModuleSQLOper : public Module
 		}
 
 		SQL::Query q(this->query);
-		q.SetValue("a", u->Account()->display);
+		q.SetValue("a", u->Account()->GetDisplay());
 		q.SetValue("i", u->ip.addr());
 
 		this->SQL->Run(new SQLOperResult(this, u), q);
 
-		Log(LOG_DEBUG) << "m_sql_oper: Checking authentication for " << u->Account()->display;
+		Log(LOG_DEBUG) << "m_sql_oper: Checking authentication for " << u->Account()->GetDisplay();
 	}
 };
 

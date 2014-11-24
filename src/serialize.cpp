@@ -15,153 +15,321 @@
 #include "anope.h"
 #include "serialize.h"
 #include "modules.h"
-#include "bots.h"
-#include "xline.h"
 #include "event.h"
 
 using namespace Serialize;
 
-std::vector<Anope::string> Type::TypeOrder;
-std::map<Anope::string, Type *> Serialize::Type::Types;
-std::list<Serializable *> *Serializable::SerializableItems;
+std::map<Anope::string, TypeBase *> Serialize::Types;
 
-void Serialize::RegisterTypes()
+std::unordered_map<ID, Object *> Serialize::objects;
+
+std::vector<FieldBase *> Serialize::serializableFields;
+
+static ID curid;
+
+Object *Serialize::GetID(ID id)
 {
-	static Type bi("BotInfo", BotInfo::Unserialize),
-		xline("XLine", XLine::Unserialize);
+	auto it = objects.find(id);
+	if (it != objects.end())
+		return it->second;
+	return nullptr;
 }
 
-void Serialize::CheckTypes()
+void Serialize::Clear()
 {
-	for (std::map<Anope::string, Serialize::Type *>::const_iterator it = Serialize::Type::GetTypes().begin(), it_end = Serialize::Type::GetTypes().end(); it != it_end; ++it)
+	std::unordered_map<ID, Object *> o;
+	objects.swap(o);
+
+	for (const std::pair<ID, Object *> &p : o)
+		delete p.second;
+}
+
+void Serialize::Unregister(Module *m)
+{
+	for (FieldBase *field : serializableFields)
+		if (field->creator == m)
+			field->Unregister();
+
+	for (const std::pair<Anope::string, TypeBase *> &p : Types)
 	{
-		Serialize::Type *t = it->second;
-		t->Check();
+		TypeBase *s = p.second;
+
+		if (s->GetOwner() == m)
+			s->Unregister();
 	}
 }
 
-Serializable::Serializable(const Anope::string &serialize_type) : last_commit(0), last_commit_time(0), id(0), redis_ignore(0)
+std::vector<Edge> Object::GetRefs(TypeBase *type)
 {
-	if (SerializableItems == NULL)
-		SerializableItems = new std::list<Serializable *>();
-	SerializableItems->push_back(this);
+	std::vector<Edge> refs;
+	EventReturn result = Event::OnSerialize(&Event::SerializeEvents::OnSerializeGetRefs, this, type, refs);
+	if (result == EVENT_ALLOW)
+		return refs;
 
-	this->s_type = Type::Find(serialize_type);
+	if (type == nullptr)
+	{
+		refs.clear();
+		for (const std::pair<TypeBase *, std::vector<Edge>> &p : edges)
+		{
+			const std::vector<Edge> &e = p.second;
+			refs.insert(refs.end(), e.begin(), e.end());
+		}
+		return refs;
+	}
 
-	this->s_iter = SerializableItems->end();
-	--this->s_iter;
-
-	Event::OnSerializableConstruct(&Event::SerializableConstruct::OnSerializableConstruct, this);
+	auto it = edges.find(type);
+	if (it != edges.end())
+		return it->second;
+	return std::vector<Edge>();
 }
 
-Serializable::Serializable(const Serializable &other) : last_commit(0), last_commit_time(0), id(0), redis_ignore(0)
+Object::Object(TypeBase *type)
 {
-	SerializableItems->push_back(this);
-	this->s_iter = SerializableItems->end();
-	--this->s_iter;
+	ID i;
+	EventReturn result = Event::OnSerialize(&Event::SerializeEvents::OnSerializableGetId, i);
+	if (result != EVENT_ALLOW)
+	{
+		while (GetID(++curid));
+		i = curid;
+	}
 
-	this->s_type = other.s_type;
+	id = i;
+	objects[id] = this;
 
-	Event::OnSerializableConstruct(&Event::SerializableConstruct::OnSerializableConstruct, this);
+	this->s_type = type;
+
+	type->objects.insert(this);
+
+	Log(LOG_DEBUG) << "Creating object id #" << id << " type " << type->GetName();
+
+	Event::OnSerialize(&Event::SerializeEvents::OnSerializableCreate, this);
 }
 
-Serializable::~Serializable()
+Object::Object(TypeBase *type, ID i)
 {
-	Event::OnSerializableDestruct(&Event::SerializableDestruct::OnSerializableDestruct, this);
+	this->id = i;
+	objects[i] = this;
 
-	SerializableItems->erase(this->s_iter);
+	this->s_type = type;
+
+	type->objects.insert(this);
+
+	Log(LOG_DEBUG) << "Creating object from id #" << id << " type " << type->GetName();
 }
 
-Serializable &Serializable::operator=(const Serializable &)
+Object::~Object()
 {
-	return *this;
+	Log(LOG_DEBUG) << "Destructing object id #" << id << " type " << s_type->GetName();
+
+	/* Remove in memory edges */
+ cont:
+	for (const std::pair<TypeBase *, std::vector<Edge>> &p : edges)
+		for (const Edge &edge : p.second)
+		{
+			if (!edge.direction)
+			{
+				Log(LOG_DEBUG_2) << "Removing edge from object id #" << edge.other->id << " type " << edge.other->GetSerializableType()->GetName() << " on field " << edge.field->GetName();
+				edge.other->RemoveEdge(this, edge.field);
+			}
+			else
+			{
+				Log(LOG_DEBUG_2) << "Removing edge to object id #" << edge.other->id << " type " << edge.other->GetSerializableType()->GetName() << " on field " << edge.field->GetName();
+				this->RemoveEdge(edge.other, edge.field);
+			}
+			goto cont;
+		}
+
+	objects.erase(id);
+	s_type->objects.erase(this);
 }
 
-void Serializable::QueueUpdate()
+void Object::Delete()
 {
-	/* Schedule updater */
-	Event::OnSerializableUpdate(&Event::SerializableUpdate::OnSerializableUpdate, this);
+	Log(LOG_DEBUG) << "Deleting object id #" << id << " type " << s_type->GetName();
 
-	/* Check for modifications now - this can delete this object! */
-	Event::OnSerializeCheck(&Event::SerializeCheck::OnSerializeCheck, this->GetSerializableType());
+	/* Delete dependant objects */
+	for (const Edge &edge : GetRefs(nullptr))
+	{
+		Object *other = edge.other;
+		FieldBase *field = edge.field;
+
+		if (edge.direction)
+			continue;
+
+		if (field->depends)
+		{
+			Log(LOG_DEBUG_2) << "Deleting dependent object #" << other->id << " type " << other->GetSerializableType()->GetName() << " due to edge on " << field->GetName();
+			other->Delete();
+		}
+		else
+		{
+			Log(LOG_DEBUG_2) << "Unsetting field " << field->GetName() << " on object #" << other->id << " type " << other->GetSerializableType()->GetName();
+			field->UnsetS(other);
+		}
+	}
+
+	Event::OnSerialize(&Event::SerializeEvents::OnSerializableDelete, this);
+
+	delete this;
 }
 
-bool Serializable::IsCached(Serialize::Data &data)
+void Object::AddEdge(Object *other, FieldBase *field)
 {
-	return this->last_commit == data.Hash();
+	// field = the field on 'this' object
+	this->edges[other->GetSerializableType()].emplace_back(other, field, true);
+	// field = the field on the other object
+	other->edges[this->GetSerializableType()].emplace_back(this, field, false);
 }
 
-void Serializable::UpdateCache(Serialize::Data &data)
+void Object::RemoveEdge(Object *other, FieldBase *field)
 {
-	this->last_commit = data.Hash();
+	std::vector<Edge> &myedges = this->edges[other->GetSerializableType()];
+	auto it = std::find(myedges.begin(), myedges.end(), Edge(other, field, true));
+	if (it != myedges.end())
+		myedges.erase(it);
+	else
+		Log(LOG_DEBUG_2) << "Unable to locate edge for removal on #" << this->id << " type " << s_type->GetName() << " -> #" << other->id << " type " << other->GetSerializableType()->GetName();
+
+	std::vector<Edge> &theiredges = other->edges[this->GetSerializableType()];
+	it = std::find(theiredges.begin(), theiredges.end(), Edge(this, field, false));
+	if (it != theiredges.end())
+		theiredges.erase(it);
+	else
+		Log(LOG_DEBUG_2) << "Unable to locate edge for removal on #" << this->id << " type " << s_type->GetName() << " <- #" << other->id << " type " << other->GetSerializableType()->GetName();
 }
 
-bool Serializable::IsTSCached()
+TypeBase::TypeBase(Module *o, const Anope::string &n) : Service(o, "Serialize::Type", n), name(n), owner(o)
 {
-	return this->last_commit_time == Anope::CurTime;
-}
-
-void Serializable::UpdateTS()
-{
-	this->last_commit_time = Anope::CurTime;
-}
-
-const std::list<Serializable *> &Serializable::GetItems()
-{
-	return *SerializableItems;
-}
-
-Type::Type(const Anope::string &n, unserialize_func f, Module *o)  : name(n), unserialize(f), owner(o), timestamp(0)
-{
-	TypeOrder.push_back(this->name);
 	Types[this->name] = this;
-
-	Event::OnSerializeTypeCreate(&Event::SerializeTypeCreate::OnSerializeTypeCreate, this);
 }
 
-Type::~Type()
+TypeBase::~TypeBase()
 {
-	std::vector<Anope::string>::iterator it = std::find(TypeOrder.begin(), TypeOrder.end(), this->name);
-	if (it != TypeOrder.end())
-		TypeOrder.erase(it);
+	if (!Serialize::GetObjects<Object *>(this).empty())
+		throw CoreException("Type destructing with objects still alive");
+
+	if (parent)
+	{
+		auto it = std::find(parent->children.begin(), parent->children.end(), this);
+		if (it != parent->children.end())
+			parent->children.erase(it);
+	}
+
+	for (TypeBase *child : children)
+		child->parent = nullptr;
+
 	Types.erase(this->name);
 }
 
-Serializable *Type::Unserialize(Serializable *obj, Serialize::Data &data)
+void TypeBase::Unregister()
 {
-	return this->unserialize(obj, data);
+	Log(LOG_DEBUG_2) << "Unregistering type " << this->GetName();
+
+	for (Object *obj : GetObjects<Object *>(this))
+		obj->Delete();
+
+ cont:
+	for (FieldBase *field : fields)
+	{
+		field->Unregister();
+		goto cont;
+	}
 }
 
-void Type::Check()
+void TypeBase::SetParent(TypeBase *other)
 {
-	Event::OnSerializeCheck(&Event::SerializeCheck::OnSerializeCheck, this);
+	parent = other;
+	other->children.push_back(this);
 }
 
-time_t Type::GetTimestamp() const
+Serialize::FieldBase *TypeBase::GetField(const Anope::string &fname)
 {
-	return this->timestamp;
+	for (FieldBase *f : fields)
+		if (f->GetName() == fname)
+			return f;
+	return nullptr;
 }
 
-void Type::UpdateTimestamp()
+std::vector<TypeBase *> TypeBase::GetSubTypes()
 {
-	this->timestamp = Anope::CurTime;
+	std::vector<TypeBase *> v;
+
+	v.push_back(this);
+
+	for (TypeBase *b : children)
+	{
+		std::vector<TypeBase *> c = b->GetSubTypes();
+		v.insert(v.end(), c.begin(), c.end());
+	}
+
+	return v;
 }
 
-Type *Serialize::Type::Find(const Anope::string &name)
+TypeBase *TypeBase::Find(const Anope::string &name)
 {
-	std::map<Anope::string, Type *>::iterator it = Types.find(name);
+	std::map<Anope::string, TypeBase *>::iterator it = Types.find(name);
 	if (it != Types.end())
 		return it->second;
-	return NULL;
+	return nullptr;
 }
 
-const std::vector<Anope::string> &Type::GetTypeOrder()
-{
-	return TypeOrder;
-}
-
-const std::map<Anope::string, Serialize::Type *>& Type::GetTypes()
+const std::map<Anope::string, Serialize::TypeBase *>& TypeBase::GetTypes()
 {
 	return Types;
 }
 
+void Serialize::FieldBase::Listener::OnAcquire()
+{
+	TypeBase *t = *this;
+
+	if (base->unregister)
+		return;
+
+	Log(LOG_DEBUG_2) << "Acquired type reference to " << t->GetName() << " for field " << base->GetName();
+
+	auto it = std::find(t->fields.begin(), t->fields.end(), base);
+	if (it == t->fields.end())
+		t->fields.push_back(base);
+}
+
+FieldBase::FieldBase(Module *c, const Anope::string &n, const ServiceReference<TypeBase> &t, bool d) : type(this, t), creator(c), name(n), depends(d)
+{
+	serializableFields.push_back(this);
+
+	type.Check();
+}
+
+FieldBase::~FieldBase()
+{
+	if (std::find(type->fields.begin(), type->fields.end(), this) != type->fields.end())
+		Log(LOG_DEBUG) << "Destructing field " << this->GetName() << " on " << type->GetName() << " while still registered!";
+
+	auto it = std::find(serializableFields.begin(), serializableFields.end(), this);
+	if (it != serializableFields.end())
+		serializableFields.erase(it);
+}
+
+void FieldBase::Unregister()
+{
+	unregister = true;
+
+	Log(LOG_DEBUG_2) << "Unregistering field " << this->GetName() << " on " << type->GetName();
+
+	/* find edges on this field */
+	for (Object *s : Serialize::GetObjects<Object *>(type))
+	{
+		for (const std::pair<TypeBase *, std::vector<Edge>> &p : s->edges)
+			for (const Edge &edge : p.second)
+				if (edge.direction && edge.field == this)
+				{
+					Log(LOG_DEBUG_2) << "Removing edge on #" << s->id << " <-> #" << edge.other->id << " type " << edge.other->GetSerializableType()->GetName();
+					s->RemoveEdge(edge.other, edge.field);
+					goto cont;
+				}
+		cont:;
+	}
+
+	auto it = std::find(type->fields.begin(), type->fields.end(), this);
+	if (it != type->fields.end())
+		type->fields.erase(it);
+}

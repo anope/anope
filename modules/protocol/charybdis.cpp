@@ -47,14 +47,14 @@ class CharybdisProto : public IRCDProto
 	}
 
 	void SendSVSKillInternal(const MessageSource &source, User *targ, const Anope::string &reason) override { ratbox->SendSVSKillInternal(source, targ, reason); }
-	void SendGlobalNotice(BotInfo *bi, const Server *dest, const Anope::string &msg) override { ratbox->SendGlobalNotice(bi, dest, msg); }
-	void SendGlobalPrivmsg(BotInfo *bi, const Server *dest, const Anope::string &msg) override { ratbox->SendGlobalPrivmsg(bi, dest, msg); }
+	void SendGlobalNotice(ServiceBot *bi, const Server *dest, const Anope::string &msg) override { ratbox->SendGlobalNotice(bi, dest, msg); }
+	void SendGlobalPrivmsg(ServiceBot *bi, const Server *dest, const Anope::string &msg) override { ratbox->SendGlobalPrivmsg(bi, dest, msg); }
 	void SendGlobopsInternal(const MessageSource &source, const Anope::string &buf) override { ratbox->SendGlobopsInternal(source, buf); }
-	void SendSGLine(User *u, const XLine *x) override { ratbox->SendSGLine(u, x); }
-	void SendSGLineDel(const XLine *x) override { ratbox->SendSGLineDel(x); }
+	void SendSGLine(User *u, XLine *x) override { ratbox->SendSGLine(u, x); }
+	void SendSGLineDel(XLine *x) override { ratbox->SendSGLineDel(x); }
 	void SendAkill(User *u, XLine *x) override { ratbox->SendAkill(u, x); }
-	void SendAkillDel(const XLine *x) override { ratbox->SendAkillDel(x); }
-	void SendSQLineDel(const XLine *x) override { ratbox->SendSQLineDel(x); }
+	void SendAkillDel(XLine *x) override { ratbox->SendAkillDel(x); }
+	void SendSQLineDel(XLine *x) override { ratbox->SendSQLineDel(x); }
 	void SendJoin(User *user, Channel *c, const ChannelStatus *status) override { ratbox->SendJoin(user, c, status); }
 	void SendServer(const Server *server) override { ratbox->SendServer(server); }
 	void SendChannel(Channel *c) override { ratbox->SendChannel(c); }
@@ -63,9 +63,9 @@ class CharybdisProto : public IRCDProto
 	void SendLogin(User *u, NickServ::Nick *na) override { ratbox->SendLogin(u, na); }
 	void SendLogout(User *u) override { ratbox->SendLogout(u); }
 
-	void SendSQLine(User *, const XLine *x) override
+	void SendSQLine(User *, XLine *x) override
 	{
-		UplinkSocket::Message(Me) << "RESV * " << x->mask << " :" << x->GetReason();
+		UplinkSocket::Message(Me) << "RESV * " << x->GetMask() << " :" << x->GetReason();
 	}
 
 	void SendConnect() override
@@ -225,7 +225,7 @@ struct IRCDMessageEUID : IRCDMessage
 		if (params[9] != "*")
 			na = NickServ::FindNick(params[9]);
 
-		User::OnIntroduce(params[0], params[4], params[8], params[5], params[6], source.GetServer(), params[10], params[2].is_pos_number_only() ? convertTo<time_t>(params[2]) : Anope::CurTime, params[3], params[7], na ? *na->nc : NULL);
+		User::OnIntroduce(params[0], params[4], params[8], params[5], params[6], source.GetServer(), params[10], params[2].is_pos_number_only() ? convertTo<time_t>(params[2]) : Anope::CurTime, params[3], params[7], na ? na->GetAccount() : NULL);
 	}
 };
 
@@ -389,25 +389,26 @@ class ProtoCharybdis : public Module
 
 	void OnChannelSync(Channel *c) override
 	{
-		if (!c->ci)
+		if (!c->ci || !mlocks)
 			return;
 
-		ModeLocks *modelocks = c->ci->GetExt<ModeLocks>("modelocks");
-		if (use_server_side_mlock && modelocks && Servers::Capab.count("MLOCK") > 0)
+		if (use_server_side_mlock && Servers::Capab.count("MLOCK") > 0)
 		{
-			Anope::string modes = modelocks->GetMLockAsString(false).replace_all_cs("+", "").replace_all_cs("-", "");
-			UplinkSocket::Message(Me) << "MLOCK " << static_cast<long>(c->creation_time) << " " << c->ci->name << " " << modes;
+			Anope::string modes = mlocks->GetMLockAsString(c->ci, false).replace_all_cs("+", "").replace_all_cs("-", "");
+			UplinkSocket::Message(Me) << "MLOCK " << static_cast<long>(c->creation_time) << " " << c->ci->GetName() << " " << modes;
 		}
 	}
 
 	EventReturn OnMLock(ChanServ::Channel *ci, ModeLock *lock) override
 	{
-		ModeLocks *modelocks = ci->GetExt<ModeLocks>("modelocks");
-		ChannelMode *cm = ModeManager::FindChannelModeByName(lock->name);
-		if (use_server_side_mlock && cm && ci->c && modelocks && (cm->type == MODE_REGULAR || cm->type == MODE_PARAM) && Servers::Capab.count("MLOCK") > 0)
+		if (!mlocks)
+			return EVENT_CONTINUE;
+
+		ChannelMode *cm = ModeManager::FindChannelModeByName(lock->GetName());
+		if (use_server_side_mlock && cm && ci->c && (cm->type == MODE_REGULAR || cm->type == MODE_PARAM) && Servers::Capab.count("MLOCK") > 0)
 		{
-			Anope::string modes = modelocks->GetMLockAsString(false).replace_all_cs("+", "").replace_all_cs("-", "") + cm->mchar;
-			UplinkSocket::Message(Me) << "MLOCK " << static_cast<long>(ci->c->creation_time) << " " << ci->name << " " << modes;
+			Anope::string modes = mlocks->GetMLockAsString(ci, false).replace_all_cs("+", "").replace_all_cs("-", "") + cm->mchar;
+			UplinkSocket::Message(Me) << "MLOCK " << static_cast<long>(ci->c->creation_time) << " " << ci->GetName() << " " << modes;
 		}
 
 		return EVENT_CONTINUE;
@@ -415,12 +416,14 @@ class ProtoCharybdis : public Module
 
 	EventReturn OnUnMLock(ChanServ::Channel *ci, ModeLock *lock) override
 	{
-		ModeLocks *modelocks = ci->GetExt<ModeLocks>("modelocks");
-		ChannelMode *cm = ModeManager::FindChannelModeByName(lock->name);
-		if (use_server_side_mlock && cm && modelocks && ci->c && (cm->type == MODE_REGULAR || cm->type == MODE_PARAM) && Servers::Capab.count("MLOCK") > 0)
+		if (!mlocks)
+			return EVENT_CONTINUE;
+
+		ChannelMode *cm = ModeManager::FindChannelModeByName(lock->GetName());
+		if (use_server_side_mlock && cm && ci->c && (cm->type == MODE_REGULAR || cm->type == MODE_PARAM) && Servers::Capab.count("MLOCK") > 0)
 		{
-			Anope::string modes = modelocks->GetMLockAsString(false).replace_all_cs("+", "").replace_all_cs("-", "").replace_all_cs(cm->mchar, "");
-			UplinkSocket::Message(Me) << "MLOCK " << static_cast<long>(ci->c->creation_time) << " " << ci->name << " " << modes;
+			Anope::string modes = mlocks->GetMLockAsString(ci, false).replace_all_cs("+", "").replace_all_cs("-", "").replace_all_cs(cm->mchar, "");
+			UplinkSocket::Message(Me) << "MLOCK " << static_cast<long>(ci->c->creation_time) << " " << ci->GetName() << " " << modes;
 		}
 
 		return EVENT_CONTINUE;

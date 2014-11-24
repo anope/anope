@@ -24,7 +24,7 @@ class CommandNSGetPass : public Command
 	{
 		const Anope::string &nick = params[0];
 		Anope::string tmp_pass;
-		const NickServ::Nick *na = NickServ::FindNick(nick);
+		NickServ::Nick *na = NickServ::FindNick(nick);
 
 		if (!na)
 		{
@@ -32,20 +32,20 @@ class CommandNSGetPass : public Command
 			return;
 		}
 
-		if (Config->GetModule("nickserv")->Get<bool>("secureadmins", "yes") && na->nc->IsServicesOper())
+		if (Config->GetModule("nickserv")->Get<bool>("secureadmins", "yes") && na->GetAccount()->IsServicesOper())
 		{
 			source.Reply(_("You may not get the password of other Services Operators."));
 			return;
 		}
 
-		if (!Anope::Decrypt(na->nc->pass, tmp_pass))
+		if (!Anope::Decrypt(na->GetAccount()->GetPassword(), tmp_pass))
 		{
 			source.Reply(_("The \002{0}\002 command is unavailable because encryption is in use."), source.command);
 			return;
 		}
 
-		Log(LOG_ADMIN, source, this) << "for " << na->nick;
-		source.Reply(_("Password of \002{0}\02 is \002%s\002."), na->nick, tmp_pass);
+		Log(LOG_ADMIN, source, this) << "for " << na->GetNick();
+		source.Reply(_("Password of \002{0}\02 is \002%s\002."), na->GetNick(), tmp_pass);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override

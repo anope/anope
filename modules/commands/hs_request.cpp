@@ -1,18 +1,11 @@
-/* hs_request.c - Add request and activate functionality to HostServ,
+/*
  *
  *
  * (C) 2003-2014 Anope Team
  * Contact us at team@anope.org
  *
- * Based on the original module by Rob <rob@anope.org>
- * Included in the Anope module pack since Anope 1.7.11
- * Anope Coder: GeniusDex <geniusdex@anope.org>
- *
  * Please read COPYING and README for further details.
  *
- * Send bug reports to the Anope Coder instead of the module
- * author, because any changes since the inclusion into anope
- * are not supported by the original author.
  */
 
 #include "module.h"
@@ -20,48 +13,82 @@
 
 static void req_send_memos(Module *me, CommandSource &source, const Anope::string &vIdent, const Anope::string &vHost);
 
-struct HostRequest : Serializable
+class HostRequest : public Serialize::Object
 {
-	Anope::string nick;
-	Anope::string ident;
-	Anope::string host;
-	time_t time;
+ public:
+	HostRequest(Serialize::TypeBase *type) : Serialize::Object(type) { }
+        HostRequest(Serialize::TypeBase *type, Serialize::ID id) : Serialize::Object(type, id) { }
 
-	HostRequest(Extensible *) : Serializable("HostRequest") { }
+	NickServ::Nick *GetNick();
+	void SetNick(NickServ::Nick *na);
 
-	void Serialize(Serialize::Data &data) const override
+	Anope::string GetIdent();
+	void SetIdent(const Anope::string &i);
+
+	Anope::string GetHost();
+	void SetHost(const Anope::string &h);
+
+	time_t GetTime();
+	void SetTime(const time_t &t);
+};
+
+class HostRequestType : public Serialize::Type<HostRequest>
+{
+ public:
+	Serialize::ObjectField<HostRequest, NickServ::Nick *> na;
+	Serialize::Field<HostRequest, Anope::string> ident, host;
+	Serialize::Field<HostRequest, time_t> time;
+
+	HostRequestType(Module *me) : Serialize::Type<HostRequest>(me, "HostRequest")
+		, na(this, "na", true)
+		, ident(this, "ident")
+		, host(this, "host")
+		, time(this, "time")
 	{
-		data["nick"] << this->nick;
-		data["ident"] << this->ident;
-		data["host"] << this->host;
-		data.SetType("time", Serialize::Data::DT_INT); data["time"] << this->time;
-	}
-
-	static Serializable* Unserialize(Serializable *obj, Serialize::Data &data)
-	{
-		Anope::string snick;
-		data["nick"] >> snick;
-
-		NickServ::Nick *na = NickServ::FindNick(snick);
-		if (na == NULL)
-			return NULL;
-
-		HostRequest *req;
-		if (obj)
-			req = anope_dynamic_static_cast<HostRequest *>(obj);
-		else
-			req = na->Extend<HostRequest>("hostrequest");
-		if (req)
-		{
-			req->nick = na->nick;
-			data["ident"] >> req->ident;
-			data["host"] >> req->host;
-			data["time"] >> req->time;
-		}
-
-		return req;
 	}
 };
+
+NickServ::Nick *HostRequest::GetNick()
+{
+	return Get(&HostRequestType::na);
+}
+
+void HostRequest::SetNick(NickServ::Nick *na)
+{
+	Set(&HostRequestType::na, na);
+}
+
+Anope::string HostRequest::GetIdent()
+{
+	return Get(&HostRequestType::ident);
+}
+
+void HostRequest::SetIdent(const Anope::string &i)
+{
+	Set(&HostRequestType::ident, i);
+}
+
+Anope::string HostRequest::GetHost()
+{
+	return Get(&HostRequestType::host);
+}
+
+void HostRequest::SetHost(const Anope::string &h)
+{
+	Set(&HostRequestType::host, h);
+}
+
+time_t HostRequest::GetTime()
+{
+	return Get(&HostRequestType::time);
+}
+
+void HostRequest::SetTime(const time_t &t)
+{
+	Set(&HostRequestType::time, t);
+}
+
+static Serialize::TypeReference<HostRequest> hostrequest("HostRequest");
 
 class CommandHSRequest : public Command
 {
@@ -82,7 +109,7 @@ class CommandHSRequest : public Command
 
 		User *u = source.GetUser();
 		NickServ::Nick *na = NickServ::FindNick(source.GetNick());
-		if (!na || na->nc != source.GetAccount())
+		if (!na || na->GetAccount() != source.GetAccount())
 		{
 			source.Reply(_("Access denied.")); //XXX with nonickownership this should be allowed.
 			return;
@@ -148,12 +175,11 @@ class CommandHSRequest : public Command
 			return;
 		}
 
-		HostRequest req(na);
-		req.nick = source.GetNick();
-		req.ident = user;
-		req.host = host;
-		req.time = Anope::CurTime;
-		na->Extend<HostRequest>("hostrequest", req);
+		HostRequest *req = hostrequest.Create();
+		req->SetNick(na);
+		req->SetIdent(user);
+		req->SetHost(host);
+		req->SetTime(Anope::CurTime);
 
 		source.Reply(_("Your vhost has been requested."));
 		req_send_memos(owner, source, user, host);
@@ -196,19 +222,19 @@ class CommandHSActivate : public Command
 		HostRequest *req = na->GetExt<HostRequest>("hostrequest");
 		if (!req)
 		{
-			source.Reply(_("\002{0}\002 does not have a pending vhost request."), na->nick);
+			source.Reply(_("\002{0}\002 does not have a pending vhost request."), na->GetNick());
 			return;
 		}
 
-		na->SetVhost(req->ident, req->host, source.GetNick(), req->time);
+		na->SetVhost(req->GetIdent(), req->GetHost(), source.GetNick(), req->GetTime());
 		Event::OnSetVhost(&Event::SetVhost::OnSetVhost, na);
 
 		if (Config->GetModule(this->owner)->Get<bool>("memouser") && MemoServ::service)
-			MemoServ::service->Send(source.service->nick, na->nick, _("[auto memo] Your requested vHost has been approved."), true);
+			MemoServ::service->Send(source.service->nick, na->GetNick(), _("[auto memo] Your requested vHost has been approved."), true);
 
-		source.Reply(_("Vhost for \002{0}\002 has been activated."), na->nick);
-		Log(LOG_COMMAND, source, this) << "for " << na->nick << " for vhost " << (!req->ident.empty() ? req->ident + "@" : "") << req->host;
-		na->Shrink<HostRequest>("hostrequest");
+		source.Reply(_("Vhost for \002{0}\002 has been activated."), na->GetNick());
+		Log(LOG_COMMAND, source, this) << "for " << na->GetNick() << " for vhost " << (!req->GetIdent().empty() ? req->GetIdent() + "@" : "") << req->GetHost();
+		req->Delete();
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
@@ -251,11 +277,11 @@ class CommandHSReject : public Command
 		HostRequest *req = na->GetExt<HostRequest>("hostrequest");
 		if (!req)
 		{
-			source.Reply(_("\002{0}\002 does not have a pending vhost request."), na->nick);
+			source.Reply(_("\002{0}\002 does not have a pending vhost request."), na->GetNick());
 			return;
 		}
 
-		na->Shrink<HostRequest>("hostrequest");
+		req->Delete();
 
 		if (Config->GetModule(this->owner)->Get<bool>("memouser") && MemoServ::service)
 		{
@@ -268,7 +294,7 @@ class CommandHSReject : public Command
 			MemoServ::service->Send(source.service->nick, nick, Language::Translate(source.GetAccount(), message.c_str()), true);
 		}
 
-		source.Reply(_("Vhost for \002{0}\002 has been rejected."), na->nick);
+		source.Reply(_("Vhost for \002{0}\002 has been rejected."), na->GetNick());
 		Log(LOG_COMMAND, source, this) << "to reject vhost for " << nick << " (" << (!reason.empty() ? reason : "no reason") << ")";
 	}
 
@@ -298,25 +324,20 @@ class CommandHSWaiting : public Command
 
 		list.AddColumn(_("Number")).AddColumn(_("Nick")).AddColumn(_("Vhost")).AddColumn(_("Created"));
 
-		for (auto& it : NickServ::service->GetNickList())
+		for (HostRequest *hr : Serialize::GetObjects<HostRequest *>(hostrequest))
 		{
-			const NickServ::Nick *na = it.second;
-			HostRequest *hr = na->GetExt<HostRequest>("hostrequest");
-			if (!hr)
-				continue;
-
 			if (!listmax || display_counter < listmax)
 			{
 				++display_counter;
 
 				ListFormatter::ListEntry entry;
 				entry["Number"] = stringify(display_counter);
-				entry["Nick"] = na->nick;
-				if (!hr->ident.empty())
-					entry["Vhost"] = hr->ident + "@" + hr->host;
+				entry["Nick"] = hr->GetNick()->GetNick();
+				if (!hr->GetIdent().empty())
+					entry["Vhost"] = hr->GetIdent() + "@" + hr->GetHost();
 				else
-					entry["Vhost"] = hr->host;
-				entry["Created"] = Anope::strftime(hr->time, NULL, true);
+					entry["Vhost"] = hr->GetHost();
+				entry["Created"] = Anope::strftime(hr->GetTime(), NULL, true);
 				list.AddEntry(entry);
 			}
 			++counter;
@@ -345,8 +366,8 @@ class HSRequest : public Module
 	CommandHSActivate commandhsactive;
 	CommandHSReject commandhsreject;
 	CommandHSWaiting commandhswaiting;
-	ExtensibleItem<HostRequest> hostrequest;
-	Serialize::Type request_type;
+
+	HostRequestType hrtype;
 
  public:
 	HSRequest(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
@@ -354,10 +375,8 @@ class HSRequest : public Module
 		, commandhsactive(this)
 		, commandhsreject(this)
 		, commandhswaiting(this)
-		, hostrequest(this, "hostrequest")
-		, request_type("HostRequest", HostRequest::Unserialize)
+		, hrtype(this)
 	{
-
 		if (!IRCD || !IRCD->CanSetVHost)
 			throw ModuleException("Your IRCd does not support vhosts");
 	}
@@ -374,17 +393,15 @@ static void req_send_memos(Module *me, CommandSource &source, const Anope::strin
 		host = vHost;
 
 	if (Config->GetModule(me)->Get<bool>("memooper") && MemoServ::service)
-		for (unsigned i = 0; i < Oper::opers.size(); ++i)
+		for (Oper *o : Serialize::GetObjects<Oper *>(operblock))
 		{
-			Oper *o = Oper::opers[i];
-
-			const NickServ::Nick *na = NickServ::FindNick(o->name);
+			NickServ::Nick *na = NickServ::FindNick(o->GetName());
 			if (!na)
 				continue;
 
 			Anope::string message = Anope::printf(_("[auto memo] vHost \002%s\002 has been requested by %s."), host.c_str(), source.GetNick().c_str());
 
-			MemoServ::service->Send(source.service->nick, na->nick, message, true);
+			MemoServ::service->Send(source.service->nick, na->GetNick(), message, true);
 		}
 }
 

@@ -1,279 +1,373 @@
-/*
- * (C) 2003-2014 Anope Team
- * Contact us at team@anope.org
- *
- * Please read COPYING and README for further details.
- *
- * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church.
- */
-
 #include "module.h"
 #include "modules/sql.h"
 
 using namespace SQL;
 
-class SQLSQLInterface : public Interface
+class DBMySQL : public Module, public Pipe
+	, public EventHook<Event::SerializeEvents>
 {
- public:
-	SQLSQLInterface(Module *o) : Interface(o) { }
-
-	void OnResult(const Result &r) override
-	{
-		Log(LOG_DEBUG) << "SQL successfully executed query: " << r.finished_query;
-	}
-
-	void OnError(const Result &r) override
-	{
-		if (!r.GetQuery().query.empty())
-			Log(LOG_DEBUG) << "Error executing query " << r.finished_query << ": " << r.GetError();
-		else
-			Log(LOG_DEBUG) << "Error executing query: " << r.GetError();
-	}
-};
-
-class ResultSQLSQLInterface : public SQLSQLInterface
-{
-	Reference<Serializable> obj;
-
-public:
-	ResultSQLSQLInterface(Module *o, Serializable *ob) : SQLSQLInterface(o), obj(ob) { }
-
-	void OnResult(const Result &r) override
-	{
-		SQLSQLInterface::OnResult(r);
-		if (r.GetID() > 0 && this->obj)
-			this->obj->id = r.GetID();
-		delete this;
-	}
-
-	void OnError(const Result &r) override
-	{
-		SQLSQLInterface::OnError(r);
-		delete this;
-	}
-};
-
-class DBSQL : public Module, public Pipe
-	, public EventHook<Event::Shutdown>
-	, public EventHook<Event::Restart>
-	, public EventHook<Event::LoadDatabase>
-	, public EventHook<Event::SerializableConstruct>
-	, public EventHook<Event::SerializableDestruct>
-	, public EventHook<Event::SerializableUpdate>
-	, public EventHook<Event::SerializeTypeCreate>
-{
-	ServiceReference<Provider> sql;
-	SQLSQLInterface sqlinterface;
+ private:
+	bool transaction = false;
+	bool inited = false;
 	Anope::string prefix;
-	bool import;
+	ServiceReference<Provider> SQL;
 
-	std::set<Serializable *> updated_items;
-	bool shutting_down;
-	bool loading_databases;
-	bool loaded;
-	bool imported;
-
-	void RunBackground(const Query &q, Interface *iface = NULL)
+	Result Run(const Query &query)
 	{
-		if (!this->sql)
+		if (!SQL)
+			;//XXX
+
+		if (!inited)
 		{
-			static time_t last_warn = 0;
-			if (last_warn + 300 < Anope::CurTime)
-			{
-				last_warn = Anope::CurTime;
-				Log(this) << "db_sql: Unable to execute query, is SQL configured correctly?";
-			}
+			inited = true;
+			for (const Query &q : SQL->InitSchema(prefix))
+				SQL->RunQuery(q);
 		}
-		else if (!Anope::Quitting)
-		{
-			if (iface == NULL)
-				iface = &this->sqlinterface;
-			this->sql->Run(iface, q);
-		}
-		else
-			this->sql->RunQuery(q);
+
+		return SQL->RunQuery(query);
+	}
+
+	void StartTransaction()
+	{
+		if (!SQL || transaction)
+			return;
+
+		Run(SQL->BeginTransaction());
+
+		transaction = true;
+		Notify();
+	}
+
+	void Commit()
+	{
+		if (!SQL || !transaction)
+			return;
+
+		Run(SQL->Commit());
+
+		transaction = false;
 	}
 
  public:
-	DBSQL(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, DATABASE | VENDOR)
-		, EventHook<Event::Shutdown>("OnShutdown")
-		, EventHook<Event::Restart>("OnRestart")
-		, EventHook<Event::LoadDatabase>("OnLoadDatabase")
-		, EventHook<Event::SerializableConstruct>("OnSerializableConstruct")
-		, EventHook<Event::SerializableDestruct>("OnSerializableDestruct")
-		, EventHook<Event::SerializableUpdate>("OnSerializableUpdate")
-		, EventHook<Event::SerializeTypeCreate>("OnSerializeTypeCreate")
-		, sqlinterface(this)
-		, shutting_down(false)
-		, loading_databases(false)
-		, loaded(false)
-		, imported(false)
+	DBMySQL(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, DATABASE | VENDOR)
+		, EventHook<Event::SerializeEvents>("OnSerialize")
 	{
-
-
-		if (ModuleManager::FindModule("db_sql_live") != NULL)
-			throw ModuleException("db_sql can not be loaded after db_sql_live");
 	}
 
 	void OnNotify() override
 	{
-		for (std::set<Serializable *>::iterator it = this->updated_items.begin(), it_end = this->updated_items.end(); it != it_end; ++it)
-		{
-			Serializable *obj = *it;
-
-			if (this->sql)
-			{
-				Data data;
-				obj->Serialize(data);
-
-				if (obj->IsCached(data))
-					continue;
-
-				obj->UpdateCache(data);
-
-				/* If we didn't load these objects and we don't want to import just update the cache and continue */
-				if (!this->loaded && !this->imported && !this->import)
-					continue;
-
-				Serialize::Type *s_type = obj->GetSerializableType();
-				if (!s_type)
-					continue;
-
-				std::vector<Query> create = this->sql->CreateTable(this->prefix + s_type->GetName(), data);
-				for (unsigned i = 0; i < create.size(); ++i)
-					this->RunBackground(create[i]);
-
-				Query insert = this->sql->BuildInsert(this->prefix + s_type->GetName(), obj->id, data);
-				if (this->imported)
-					this->RunBackground(insert, new ResultSQLSQLInterface(this, obj));
-				else
-				{
-					/* We are importing objects from another database module, so don't do asynchronous
-					 * queries in case the core has to shut down, it will cut short the import
-					 */
-					Result r = this->sql->RunQuery(insert);
-					if (r.GetID() > 0)
-						obj->id = r.GetID();
-				}
-			}
-		}
-
-		this->updated_items.clear();
-		this->imported = true;
+		Commit();
+		Serialize::Clear();
 	}
 
 	void OnReload(Configuration::Conf *conf) override
 	{
 		Configuration::Block *block = conf->GetModule(this);
-		this->sql = ServiceReference<Provider>("SQL::Provider", block->Get<const Anope::string>("engine"));
+		this->SQL = ServiceReference<Provider>("SQL::Provider", block->Get<const Anope::string>("engine"));
 		this->prefix = block->Get<const Anope::string>("prefix", "anope_db_");
-		this->import = block->Get<bool>("import");
+		inited = false;
 	}
 
-	void OnShutdown() override
+	EventReturn OnSerializeList(Serialize::TypeBase *type, std::vector<Serialize::ID> &ids) override
 	{
-		this->shutting_down = true;
-		this->OnNotify();
-	}
+		StartTransaction();
 
-	void OnRestart() override
-	{
-		this->OnShutdown();
-	}
+		ids.clear();
 
-	EventReturn OnLoadDatabase() override
-	{
-		if (!this->sql)
+		Query query = "SELECT `id` FROM `" + prefix + type->GetName() + "`";
+		Result res = Run(query);
+		for (int i = 0; i < res.Rows(); ++i)
 		{
-			Log(this) << "Unable to load databases, is SQL configured correctly?";
+			Serialize::ID id = convertTo<Serialize::ID>(res.Get(i, "id"));
+			ids.push_back(id);
+		}
+
+		return EVENT_ALLOW;
+	}
+
+	EventReturn OnSerializeFind(Serialize::TypeBase *type, Serialize::FieldBase *field, const Anope::string &value, Serialize::ID &id) override
+	{
+		if (!SQL)
+			return EVENT_CONTINUE;
+
+		StartTransaction();
+
+		for (Query &q : SQL->CreateTable(prefix, type->GetName()))
+			Run(q);
+
+		for (Query &q : SQL->AlterTable(prefix, type->GetName(), field->GetName(), false))
+			Run(q);
+
+		for (const Query &q : SQL->CreateIndex(prefix + type->GetName(), field->GetName()))
+			Run(q);
+
+		Query query("SELECT `id` FROM `" + prefix + type->GetName() + "` WHERE `" + field->GetName() + "` = @value@");
+		query.SetValue("value", value);
+		Result res = Run(query);
+		if (res.Rows())
+			try
+			{
+				id = convertTo<Serialize::ID>(res.Get(0, "id"));
+				return EVENT_ALLOW;
+			}
+			catch (const ConvertException &)
+			{
+			}
+		return EVENT_CONTINUE;
+	}
+
+ private:
+	bool GetValue(Serialize::Object *object, Serialize::FieldBase *field, SQL::Result::Value &v)
+	{
+		StartTransaction();
+
+		Query query = "SELECT `" + field->GetName() + "` FROM `" + prefix + object->GetSerializableType()->GetName() + "` WHERE `id` = @id@";
+		query.SetValue("id", object->id);
+		Result res = Run(query);
+
+		if (res.Rows() == 0)
+			return false;
+
+		v = res.GetValue(0, field->GetName());
+		return true;
+	}
+
+ public:
+	EventReturn OnSerializeGet(Serialize::Object *object, Serialize::FieldBase *field, Anope::string &value) override
+	{
+		SQL::Result::Value v;
+
+		if (!GetValue(object, field, v))
+		{
+			field->CacheMiss(object);
 			return EVENT_CONTINUE;
 		}
 
-		this->loading_databases = true;
+		value = v.value;
+		return EVENT_ALLOW;
+	}
 
-		const std::vector<Anope::string> type_order = Serialize::Type::GetTypeOrder();
-		for (unsigned i = 0; i < type_order.size(); ++i)
+	EventReturn OnSerializeGetRefs(Serialize::Object *object, Serialize::TypeBase *type, std::vector<Serialize::Edge> &edges) override
+	{
+		StartTransaction();
+
+		edges.clear();
+
+		Query query;
+		if (type)
+			query = "SELECT field," + prefix + "edges.id,other_id,j1.type,j2.type AS other_type FROM `" + prefix + "edges` "
+				"JOIN `" + prefix + "objects` AS j1 ON " + prefix + "edges.id = j1.id "
+				"JOIN `" + prefix + "objects` AS j2 ON " + prefix + "edges.other_id = j2.id "
+				"WHERE "
+				"	(" + prefix + "edges.id = @id@ AND j2.type = @other_type@) "
+				"OR"
+				"	(other_id = @id@ AND j1.type = @other_type@)";
+		else
+			query = "SELECT field," + prefix + "edges.id,other_id,j1.type,j2.type AS other_type FROM `" + prefix + "edges` "
+				"JOIN `" + prefix + "objects` AS j1 ON " + prefix + "edges.id = j1.id "
+				"JOIN `" + prefix + "objects` AS j2 ON " + prefix + "edges.other_id = j2.id "
+				"WHERE " + prefix + "edges.id = @id@ OR other_id = @id@";
+
+		query.SetValue("type", object->GetSerializableType()->GetName());
+		query.SetValue("id", object->id);
+		if (type)
+			query.SetValue("other_type", type->GetName());
+
+		Result res = Run(query);
+		for (int i = 0; i < res.Rows(); ++i)
 		{
-			Serialize::Type *sb = Serialize::Type::Find(type_order[i]);
-			this->OnSerializeTypeCreate(sb);
+			Serialize::ID id = convertTo<Serialize::ID>(res.Get(i, "id"));
+
+			if (id == object->id)
+			{
+				// we want other type, this is my edge
+				Anope::string t = res.Get(i, "other_type");
+				Anope::string f = res.Get(i, "field");
+				id = convertTo<Serialize::ID>(res.Get(i, "other_id"));
+
+				//XXX sanity checks
+				Serialize::FieldBase *obj_field = object->GetSerializableType()->GetField(f);
+
+				Serialize::TypeBase *obj_type = Serialize::TypeBase::Find(t);
+				Serialize::Object *other = obj_type->Require(id);
+
+				edges.emplace_back(other, obj_field, true);
+			}
+			else
+			{
+				// edge to me
+				Anope::string t = res.Get(i, "type");
+				Anope::string f = res.Get(i, "field");
+
+				//XXX sanity checks
+				Serialize::TypeBase *obj_type = Serialize::TypeBase::Find(t);
+				Serialize::FieldBase *obj_field = obj_type->GetField(f);
+				Serialize::Object *other = obj_type->Require(id);
+
+				// other type, other field,
+				edges.emplace_back(other, obj_field, false);
+			}
+		}
+		
+		return EVENT_ALLOW;
+	}
+
+	EventReturn OnSerializeDeref(Serialize::ID id, Serialize::TypeBase *type) override
+	{
+		StartTransaction();
+
+		Query query = "SELECT `id` FROM `" + prefix + type->GetName() + "` WHERE `id` = @id@";
+		query.SetValue("id", id);
+		Result res = Run(query);
+		if (res.Rows() == 0)
+			return EVENT_CONTINUE;
+		return EVENT_ALLOW;
+	}
+
+	EventReturn OnSerializeGetSerializable(Serialize::Object *object, Serialize::FieldBase *field, Anope::string &type, Serialize::ID &value) override
+	{
+		StartTransaction();
+
+		Query query = "SELECT `" + field->GetName() + "`,j1.type AS " + field->GetName() + "_type FROM `" + prefix + object->GetSerializableType()->GetName() + "` "
+			"JOIN `" + prefix + "objects` AS j1 ON " + prefix + object->GetSerializableType()->GetName() + "." + field->GetName() + " = j1.id "
+			"WHERE " + prefix + object->GetSerializableType()->GetName() + ".id = @id@";
+		query.SetValue("id", object->id);
+		Result res = Run(query);
+
+		if (res.Rows() == 0)
+			return EVENT_CONTINUE;
+
+		type = res.Get(0, field->GetName() + "_type");
+		try
+		{
+			value = convertTo<Serialize::ID>(res.Get(0, field->GetName()));
+		}
+		catch (const ConvertException &ex)
+		{
+			return EVENT_STOP;
 		}
 
-		this->loading_databases = false;
-		this->loaded = true;
+		return EVENT_ALLOW;
+	}
+
+ private:
+	void DoSet(Serialize::Object *object, Serialize::FieldBase *field, bool is_object, const Anope::string *value)
+	{
+		if (!SQL)
+			return;
+
+		StartTransaction();
+
+		for (Query &q : SQL->CreateTable(prefix, object->GetSerializableType()->GetName()))
+			Run(q);
+
+		for (Query &q : SQL->AlterTable(prefix, object->GetSerializableType()->GetName(), field->GetName(), is_object))
+			Run(q);
+
+		Query q;
+		q.SetValue("id", object->id);
+		if (value)
+			q.SetValue(field->GetName(), *value);
+		else
+			q.SetNull(field->GetName());
+
+		for (Query &q : SQL->Replace(prefix + object->GetSerializableType()->GetName(), q, { "id" }))
+			Run(q);
+	}
+
+ public:
+	EventReturn OnSerializeSet(Serialize::Object *object, Serialize::FieldBase *field, const Anope::string &value) override
+	{
+		DoSet(object, field, false, &value);
+		return EVENT_STOP;
+	}
+
+	EventReturn OnSerializeSetSerializable(Serialize::Object *object, Serialize::FieldBase *field, Serialize::Object *value) override
+	{
+		if (!SQL)
+			return EVENT_CONTINUE;
+
+		StartTransaction();
+
+		if (value)
+		{
+			Anope::string v = stringify(value->id);
+			DoSet(object, field, true, &v);
+
+			Query query;
+			query.SetValue("field", field->GetName());
+			query.SetValue("id", object->id);
+			query.SetValue("other_id", value->id);
+
+			for (Query &q : SQL->Replace(prefix + "edges", query, { "id", "field" }))
+				Run(q);
+		}
+		else
+		{
+			DoSet(object, field, true, nullptr);
+
+			Query query("DELETE FROM `" + prefix + "edges` WHERE `id` = @id@ AND `field` = @field@");
+			query.SetValue("id", object->id);
+			query.SetValue("field", field->GetName());
+			Run(query);
+		}
 
 		return EVENT_STOP;
 	}
 
-	void OnSerializableConstruct(Serializable *obj) override
+	EventReturn OnSerializeUnset(Serialize::Object *object, Serialize::FieldBase *field) override
 	{
-		if (this->shutting_down || this->loading_databases)
-			return;
-		obj->UpdateTS();
-		this->updated_items.insert(obj);
-		this->Notify();
+		DoSet(object, field, false, nullptr);
+		field->CacheMiss(object);
+		return EVENT_STOP;
 	}
 
-	void OnSerializableDestruct(Serializable *obj) override
+	EventReturn OnSerializeUnsetSerializable(Serialize::Object *object, Serialize::FieldBase *field) override
 	{
-		if (this->shutting_down)
-			return;
-		Serialize::Type *s_type = obj->GetSerializableType();
-		if (s_type && obj->id > 0)
-			this->RunBackground("DELETE FROM `" + this->prefix + s_type->GetName() + "` WHERE `id` = " + stringify(obj->id));
-		this->updated_items.erase(obj);
+		DoSet(object, field, true, nullptr);
+		field->CacheMiss(object);
+
+		Query query("DELETE FROM `" + prefix + "edges` WHERE `id` = @id@ AND `field` = @field@");
+		query.SetValue("id", object->id);
+		query.SetValue("field", field->GetName());
+		Run(query);
+
+		return EVENT_STOP;
 	}
 
-	void OnSerializableUpdate(Serializable *obj) override
+	EventReturn OnSerializeHasField(Serialize::Object *object, Serialize::FieldBase *field) override
 	{
-		if (this->shutting_down || obj->IsTSCached())
-			return;
-		obj->UpdateTS();
-		this->updated_items.insert(obj);
-		this->Notify();
+		SQL::Result::Value v;
+
+		return GetValue(object, field, v) && !v.null ? EVENT_STOP : EVENT_CONTINUE;
 	}
 
-	void OnSerializeTypeCreate(Serialize::Type *sb) override
+	EventReturn OnSerializableGetId(Serialize::ID &id) override
 	{
-		if (!this->loading_databases && !this->loaded)
-			return;
+		StartTransaction();
 
-		Query query("SELECT * FROM `" + this->prefix + sb->GetName() + "`");
-		Result res = this->sql->RunQuery(query);
+		id = SQL->GetID(prefix);
+		return EVENT_ALLOW;
+	}
 
-		for (int j = 0; j < res.Rows(); ++j)
-		{
-			Data data;
+	void OnSerializableCreate(Serialize::Object *object) override
+	{
+		StartTransaction();
 
-			const std::map<Anope::string, Anope::string> &row = res.Row(j);
-			for (std::map<Anope::string, Anope::string>::const_iterator rit = row.begin(), rit_end = row.end(); rit != rit_end; ++rit)
-				data[rit->first] << rit->second;
+		Query q = Query("INSERT INTO `" + prefix + "objects` (`id`,`type`) VALUES (@id@, @type@)");
+		q.SetValue("id", object->id);
+		q.SetValue("type", object->GetSerializableType()->GetName());
+		Run(q);
+	}
 
-			Serializable *obj = sb->Unserialize(NULL, data);
-			try
-			{
-				if (obj)
-					obj->id = convertTo<unsigned int>(res.Get(j, "id"));
-			}
-			catch (const ConvertException &)
-			{
-				Log(this) << "Unable to convert id for object #" << j << " of type " << sb->GetName();
-			}
+	void OnSerializableDelete(Serialize::Object *object) override
+	{
+		StartTransaction();
 
-			if (obj)
-			{
-				/* The Unserialize operation is destructive so rebuild the data for UpdateCache.
-				 * Also the old data may contain columns that we don't use, so we reserialize the
-				 * object to know for sure our cache is consistent
-				 */
-
-				Data data2;
-				obj->Serialize(data2);
-				obj->UpdateCache(data2); /* We know this is the most up to date copy */
-			}
-		}
+		Query query("DELETE FROM `" + prefix + object->GetSerializableType()->GetName() + "` WHERE `id` = " + stringify(object->id));
+		Run(query);
 	}
 };
 
-MODULE_INIT(DBSQL)
+MODULE_INIT(DBMySQL)
 

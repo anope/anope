@@ -9,90 +9,81 @@
 #include "module.h"
 #include "modules/ns_info.h"
 #include "modules/cs_info.h"
+#include "modules/os_info.h"
 
-struct OperInfo : Serializable
+class OperInfoImpl : public OperInfo
 {
-	Anope::string target;
-	Anope::string info;
-	Anope::string adder;
-	time_t created;
+ public:
+	OperInfoImpl(Serialize::TypeBase *type) : OperInfo(type) { }
+	OperInfoImpl(Serialize::TypeBase *type, Serialize::ID id) : OperInfo(type, id) { }
 
-	OperInfo() : Serializable("OperInfo"), created(0) { }
-	OperInfo(const Anope::string &t, const Anope::string &i, const Anope::string &a, time_t c) :
-		Serializable("OperInfo"), target(t), info(i), adder(a), created(c) { }
+	Serialize::Object *GetTarget();
+	void SetTarget(Serialize::Object *);
 
-	~OperInfo();
+	Anope::string GetInfo();
+	void SetInfo(const Anope::string &);
 
-	void Serialize(Serialize::Data &data) const override
-	{
-		data["target"] << target;
-		data["info"] << info;
-		data["adder"] << adder;
-		data["created"] << created;
-	}
+	Anope::string GetCreator();
+	void SetCreator(const Anope::string &);
 
-	static Serializable *Unserialize(Serializable *obj, Serialize::Data &data);
+	time_t GetCreated();
+	void SetCreated(const time_t &);
 };
 
-struct OperInfos : Serialize::Checker<std::vector<OperInfo *> >
+class OperInfoType : public Serialize::Type<OperInfoImpl>
 {
-	OperInfos(Extensible *) : Serialize::Checker<std::vector<OperInfo *> >("OperInfo") { }
+ public:
+	Serialize::ObjectField<OperInfoImpl, Serialize::Object *> target;
+	Serialize::Field<OperInfoImpl, Anope::string> info, creator;
+	Serialize::Field<OperInfoImpl, time_t> created;
 
-	~OperInfos()
+	OperInfoType(Module *c) : Serialize::Type<OperInfoImpl>(c, "OperInfo")
+		, target(this, "target", true)
+		, info(this, "info")
+		, creator(this, "adder")
+		, created(this, "created")
 	{
-		for (unsigned i = (*this)->size(); i > 0; --i)
-			delete (*this)->at(i - 1);
-	}
-
-	static Extensible *Find(const Anope::string &target)
-	{
-		NickServ::Nick *na = NickServ::FindNick(target);
-		if (na)
-			return na->nc;
-		return ChanServ::Find(target);
 	}
 };
 
-OperInfo::~OperInfo()
+Serialize::Object *OperInfoImpl::GetTarget()
 {
-	Extensible *e = OperInfos::Find(target);
-	if (e)
-	{
-		OperInfos *op  = e->GetExt<OperInfos>("operinfo");
-		if (op)
-		{
-			std::vector<OperInfo *>::iterator it = std::find((*op)->begin(), (*op)->end(), this);
-			if (it != (*op)->end())
-				(*op)->erase(it);
-		}
-	}
+	return Get(&OperInfoType::target);
 }
 
-Serializable *OperInfo::Unserialize(Serializable *obj, Serialize::Data &data)
+void OperInfoImpl::SetTarget(Serialize::Object *t)
 {
-	Anope::string starget;
-	data["target"] >> starget;
+	Set(&OperInfoType::target, t);
+}
 
-	Extensible *e = OperInfos::Find(starget);
-	if (!e)
-		return NULL;
+Anope::string OperInfoImpl::GetInfo()
+{
+	return Get(&OperInfoType::info);
+}
 
-	OperInfos *oi = e->Require<OperInfos>("operinfo");
-	OperInfo *o;
-	if (obj)
-		o = anope_dynamic_static_cast<OperInfo *>(obj);
-	else
-	{
-		o = new OperInfo();
-		o->target = starget;
-	}
-	data["info"] >> o->info;
-	data["adder"] >> o->adder;
-	data["created"] >> o->created;
+void OperInfoImpl::SetInfo(const Anope::string &i)
+{
+	Set(&OperInfoType::info, i);
+}
 
-	if (!obj)
-		(*oi)->push_back(o);
-	return o;
+Anope::string OperInfoImpl::GetCreator()
+{
+	return Get(&OperInfoType::creator);
+}
+
+void OperInfoImpl::SetCreator(const Anope::string &c)
+{
+	Set(&OperInfoType::creator, c);
+}
+
+time_t OperInfoImpl::GetCreated()
+{
+	return Get(&OperInfoType::created);
+}
+
+void OperInfoImpl::SetCreated(const time_t &t)
+{
+	Set(&OperInfoType::created, t);
 }
 
 class CommandOSInfo : public Command
@@ -110,7 +101,7 @@ class CommandOSInfo : public Command
 	{
 		const Anope::string &cmd = params[0], target = params[1], info = params.size() > 2 ? params[2] : "";
 
-		Extensible *e;
+		Serialize::Object *e;
 		if (IRCD->IsChannelValid(target))
 		{
 			ChanServ::Channel *ci = ChanServ::Find(target);
@@ -131,7 +122,7 @@ class CommandOSInfo : public Command
 				return;
 			}
 
-			e = na->nc;
+			e = na->GetAccount();
 		}
 
 		if (cmd.equals_ci("ADD"))
@@ -142,26 +133,25 @@ class CommandOSInfo : public Command
 				return;
 			}
 
-			OperInfos *oi = e->Require<OperInfos>("operinfo");
-
-			if ((*oi)->size() >= Config->GetModule(this->module)->Get<unsigned>("max", "10"))
+			std::vector<OperInfo *> oinfos = e->GetRefs<OperInfo *>(operinfo);
+			if (oinfos.size() >= Config->GetModule(this->module)->Get<unsigned int>("max", "10"))
 			{
 				source.Reply(_("The oper info list for \002{0}\002 is full."), target);
 				return;
 			}
 
-			for (unsigned i = 0; i < (*oi)->size(); ++i)
-			{
-				OperInfo *o = (*oi)->at(i);
-
-				if (o->info.equals_ci(info))
+			for (OperInfo *o : oinfos)
+				if (o->GetInfo().equals_ci(info))
 				{
 					source.Reply(_("The oper info already exists on \002{0}\002."), target);
 					return;
 				}
-			}
 
-			(*oi)->push_back(new OperInfo(target, info, source.GetNick(), Anope::CurTime));
+			OperInfo *o = operinfo.Create();
+			o->SetTarget(e);
+			o->SetInfo(info);
+			o->SetCreator(source.GetNick());
+			o->SetCreated(Anope::CurTime);
 
 			source.Reply(_("Added info to \002{0}\002."), target);
 			Log(LOG_ADMIN, source, this) << "to add information to " << target;
@@ -177,54 +167,42 @@ class CommandOSInfo : public Command
 				return;
 			}
 
-			OperInfos *oi = e->GetExt<OperInfos>("operinfo");
-
-			if (!oi)
+			std::vector<OperInfo *> oinfos = e->GetRefs<OperInfo *>(operinfo);
+			if (oinfos.empty())
 			{
 				source.Reply(_("Oper info list for \002{0}\002 is empty."), target);
 				return;
 			}
 
-			bool found = false;
-			for (unsigned i = (*oi)->size(); i > 0; --i)
+			for (OperInfo *o : oinfos)
 			{
-				OperInfo *o = (*oi)->at(i - 1);
-
-				if (o->info.equals_ci(info))
+				if (o->GetInfo().equals_ci(info))
 				{
-					delete o;
-					found = true;
-					break;
+					o->Delete();
+
+					source.Reply(_("Deleted info from \002{0}\002."), target);
+					Log(LOG_ADMIN, source, this) << "to remove information from " << target;
+
+	        	        	if (Anope::ReadOnly)
+						source.Reply(_("Services are in read-only mode. Any changes made may not persist."));
+					return;
 				}
 			}
 
-			if (!found)
-			{
-				source.Reply(_("No such info \002{0}\002 on \002{1}\002."), info, target);
-			}
-			else
-			{
-				if ((*oi)->empty())
-					e->Shrink<OperInfos>("operinfo");
-
-				source.Reply(_("Deleted info from \002{0}\002."), target);
-				Log(LOG_ADMIN, source, this) << "to remove information from " << target;
-
-	                	if (Anope::ReadOnly)
-					source.Reply(_("Services are in read-only mode. Any changes made may not persist."));
-			}
+			source.Reply(_("No such info \002{0}\002 on \002{1}\002."), info, target);
 		}
 		else if (cmd.equals_ci("CLEAR"))
 		{
-			OperInfos *oi = e->GetExt<OperInfos>("operinfo");
+			std::vector<OperInfo *> oinfos = e->GetRefs<OperInfo *>(operinfo);
 
-			if (!oi)
+			if (oinfos.empty())
 			{
 				source.Reply(_("Oper info list for \002{0}\002 is empty."), target);
 				return;
 			}
 
-			e->Shrink<OperInfos>("operinfo");
+			for (OperInfo *o : oinfos)
+				o->Delete();
 
 			source.Reply(_("Cleared info from \002{0}\002."), target);
 			Log(LOG_ADMIN, source, this) << "to clear information for " << target;
@@ -250,23 +228,15 @@ class OSInfo : public Module
 	, public EventHook<Event::ChanInfo>
 {
 	CommandOSInfo commandosinfo;
-	ExtensibleItem<OperInfos> oinfo;
-	Serialize::Type oinfo_type;
+	OperInfoType oinfotype;
 
-	void OnInfo(CommandSource &source, Extensible *e, InfoFormatter &info)
+	void OnInfo(CommandSource &source, Serialize::Object *e, InfoFormatter &info)
 	{
 		if (!source.IsOper())
 			return;
 
-		OperInfos *oi = oinfo.Get(e);
-		if (!oi)
-			return;
-
-		for (unsigned i = 0; i < (*oi)->size(); ++i)
-		{
-			OperInfo *o = (*oi)->at(i);
-			info[_("Oper Info")] = Anope::printf(_("(by %s on %s) %s"), o->adder.c_str(), Anope::strftime(o->created, source.GetAccount(), true).c_str(), o->info.c_str());
-		}
+		for (OperInfo *o : e->GetRefs<OperInfo *>(operinfo))
+			info[_("Oper Info")] = Anope::printf(_("(by %s on %s) %s"), o->GetCreator().c_str(), Anope::strftime(o->GetCreated(), source.GetAccount(), true).c_str(), o->GetInfo().c_str());
 	}
 
  public:
@@ -274,15 +244,13 @@ class OSInfo : public Module
 		, EventHook<Event::NickInfo>("OnNickInfo")
 		, EventHook<Event::ChanInfo>("OnChanInfo")
 		, commandosinfo(this)
-		, oinfo(this, "operinfo")
-		, oinfo_type("OperInfo", OperInfo::Unserialize)
+		, oinfotype(this)
 	{
-
 	}
 
 	void OnNickInfo(CommandSource &source, NickServ::Nick *na, InfoFormatter &info, bool show_hidden) override
 	{
-		OnInfo(source, na->nc, info);
+		OnInfo(source, na->GetAccount(), info);
 	}
 
 	void OnChanInfo(CommandSource &source, ChanServ::Channel *ci, InfoFormatter &info, bool show_hidden) override

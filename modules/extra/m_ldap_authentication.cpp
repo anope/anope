@@ -104,16 +104,16 @@ class IdentifyInterface : public LDAPInterface
 					if (na == NULL)
 					{
 						na = new NickServ::Nick(ii->req->GetAccount(), new NickServ::Account(ii->req->GetAccount()));
-						na->last_realname = ii->user ? ii->user->realname : ii->req->GetAccount();
+						na->SetLastRealname(ii->user ? ii->user->realname : ii->req->GetAccount());
 						NickServ::Event::OnNickRegister(&NickServ::Event::NickRegister::OnNickRegister, ii->user, na, ii->req->GetPassword());;
-						BotInfo *NickServ = Config->GetClient("NickServ");
+						ServiceBot *NickServ = Config->GetClient("NickServ");
 						if (ii->user && NickServ)
-							ii->user->SendMessage(NickServ, _("Your account \002%s\002 has been successfully created."), na->nick.c_str());
+							ii->user->SendMessage(NickServ, _("Your account \002%s\002 has been successfully created."), na->GetNick().c_str());
 					}
 					// encrypt and store the password in the nickcore
-					Anope::Encrypt(ii->req->GetPassword(), na->nc->pass);
+					Anope::Encrypt(ii->req->GetPassword(), na->GetAccount()->pass);
 
-					na->nc->Extend<Anope::string>("m_ldap_authentication_dn", ii->dn);
+					na->GetAccount()->Extend<Anope::string>("m_ldap_authentication_dn", ii->dn);
 					ii->req->Success(me);
 				}
 				break;
@@ -164,13 +164,13 @@ class OnIdentifyInterface : public LDAPInterface
 			const LDAPAttributes &attr = r.get(0);
 			Anope::string email = attr.get(email_attribute);
 
-			if (!email.equals_ci(u->Account()->email))
+			if (!email.equals_ci(u->Account()->GetEmail()))
 			{
-				u->Account()->email = email;
-				BotInfo *NickServ = Config->GetClient("NickServ");
+				u->Account()->GetEmail() = email;
+				ServiceBot *NickServ = Config->GetClient("NickServ");
 				if (NickServ)
 					u->SendMessage(NickServ, _("Your email has been updated to \002%s\002"), email.c_str());
-				Log(this->owner) << "Updated email address for " << u->nick << " (" << u->Account()->display << ") to " << email;
+				Log(this->owner) << "Updated email address for " << u->nick << " (" << u->Account()->GetDisplay() << ") to " << email;
 			}
 		}
 		catch (const LDAPException &ex)
@@ -332,18 +332,18 @@ class NSIdentifyLDAP : public Module
 			attributes[0].values.push_back(object_class);
 
 			attributes[1].name = username_attribute;
-			attributes[1].values.push_back(na->nick);
+			attributes[1].values.push_back(na->GetNick());
 
-			if (!na->nc->email.empty())
+			if (!na->GetAccount()->GetEmail().empty())
 			{
 				attributes[2].name = email_attribute;
-				attributes[2].values.push_back(na->nc->email);
+				attributes[2].values.push_back(na->GetAccount()->GetEmail());
 			}
 
 			attributes[3].name = this->password_attribute;
 			attributes[3].values.push_back(pass);
 
-			Anope::string new_dn = username_attribute + "=" + na->nick + "," + basedn;
+			Anope::string new_dn = username_attribute + "=" + na->GetNick() + "," + basedn;
 			this->ldap->Add(&this->orinterface, new_dn, attributes);
 		}
 		catch (const LDAPException &ex)

@@ -76,7 +76,7 @@ class CommandCSUp : public Command
 
 			if (ci->c == NULL)
 			{
-				source.Reply(_("Channel \002{0}\002 doesn't exist."), ci->name);
+				source.Reply(_("Channel \002{0}\002 doesn't exist."), ci->GetName());
 				return;
 			}
 
@@ -109,7 +109,7 @@ class CommandCSUp : public Command
 				return;
 			}
 
-			if (source.GetUser() && u != source.GetUser() && c->ci->HasExt("PEACE"))
+			if (source.GetUser() && u != source.GetUser() && c->ci->HasFieldS("PEACE"))
 			{
 				if (c->ci->AccessFor(u) > c->ci->AccessFor(source.GetUser()))
 				{
@@ -117,7 +117,7 @@ class CommandCSUp : public Command
 						override = true;
 					else
 					{
-						source.Reply(_("Access denied. \002{0}\002 has more privileges than you on \002{1}\002."), u->nick, ci->name);
+						source.Reply(_("Access denied. \002{0}\002 has more privileges than you on \002{1}\002."), u->nick, ci->GetName());
 						return;
 					}
 				}
@@ -182,7 +182,7 @@ class CommandCSDown : public Command
 
 			if (ci->c == NULL)
 			{
-				source.Reply(_("Channel \002{0}\002 doesn't exist."), ci->name);
+				source.Reply(_("Channel \002{0}\002 doesn't exist."), ci->GetName());
 				return;
 			}
 
@@ -216,7 +216,7 @@ class CommandCSDown : public Command
 				return;
 			}
 
-			if (source.GetUser() && u != source.GetUser() && c->ci->HasExt("PEACE"))
+			if (source.GetUser() && u != source.GetUser() && c->ci->HasFieldS("PEACE"))
 			{
 				if (c->ci->AccessFor(u) > c->ci->AccessFor(source.GetUser()))
 				{
@@ -224,7 +224,7 @@ class CommandCSDown : public Command
 						override = true;
 					else
 					{
-						source.Reply(_("Access denied. \002{0}\002 has more privileges than you on \002{1}\002."), u->nick, ci->name);
+						source.Reply(_("Access denied. \002{0}\002 has more privileges than you on \002{1}\002."), u->nick, ci->GetName());
 						return;
 					}
 				}

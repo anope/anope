@@ -42,10 +42,8 @@ class CommandOSModInfo : public Command
 
 				source.Reply(_("   Providing service: \002{0}\002"), c->name);
 
-				for (botinfo_map::const_iterator it = BotListByNick->begin(), it_end = BotListByNick->end(); it != it_end; ++it)
+				for (ServiceBot *bi : Serialize::GetObjects<ServiceBot *>(botinfo))
 				{
-					const BotInfo *bi = it->second;
-
 					for (CommandInfo::map::const_iterator cit = bi->commands.begin(), cit_end = bi->commands.end(); cit != cit_end; ++cit)
 					{
 						const Anope::string &c_name = cit->first;

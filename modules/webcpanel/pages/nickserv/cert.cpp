@@ -20,7 +20,7 @@ bool WebCPanel::NickServ::Cert::OnRequest(HTTPProvider *server, const Anope::str
 		params.push_back("ADD");
 		params.push_back(message.post_data["certfp"]);
 
-		WebPanel::RunCommand(na->nc->display, na->nc, "NickServ", "nickserv/cert", params, replacements);
+		WebPanel::RunCommand(na->GetAccount()->GetDisplay(), na->GetAccount(), "NickServ", "nickserv/cert", params, replacements);
 	}
 	else if (message.get_data.count("del") > 0 && message.get_data.count("mask") > 0)
 	{
@@ -28,13 +28,12 @@ bool WebCPanel::NickServ::Cert::OnRequest(HTTPProvider *server, const Anope::str
 		params.push_back("DEL");
 		params.push_back(message.get_data["mask"]);
 
-		WebPanel::RunCommand(na->nc->display, na->nc, "NickServ", "nickserv/cert", params, replacements);
+		WebPanel::RunCommand(na->GetAccount()->GetDisplay(), na->GetAccount(), "NickServ", "nickserv/cert", params, replacements);
 	}
 
-	NSCertList *cl = na->nc->GetExt<NSCertList>("certificates");
-	if (cl)
-		for (unsigned i = 0; i < cl->GetCertCount(); ++i)
-			replacements["CERTS"] = cl->GetCert(i);
+	std::vector<NSCertEntry *> cl = na->GetAccount()->GetRefs<NSCertEntry *>(certentry);
+	for (NSCertEntry *e : cl)
+		replacements["CERTS"] = e->GetCert();
 
 	TemplateFileServer page("nickserv/cert.html");
 	page.Serve(server, page_name, client, message, reply, replacements);

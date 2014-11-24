@@ -28,10 +28,10 @@ class CommandNSUpdate : public Command
 		User *u = source.GetUser();
 		NickServ::Nick *na = NickServ::FindNick(u->nick);
 
-		if (na && na->nc == source.GetAccount())
+		if (na && na->GetAccount() == source.GetAccount())
 		{
-			na->last_realname = u->realname;
-			na->last_seen = Anope::CurTime;
+			na->SetLastRealname(u->realname);
+			na->SetLastSeen(Anope::CurTime);
 		}
 
 		this->onnickupdate(&Event::NickUpdate::OnNickUpdate, u);

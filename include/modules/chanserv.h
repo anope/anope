@@ -60,9 +60,7 @@ namespace ChanServ
 	};
 
 	/* A privilege, probably configured using a privilege{} block. Most
-	 * commands require specific privileges to be executed. The AccessProvider
-	 * backing each ChanAccess determines whether that ChanAccess has a given
-	 * privilege.
+	 * commands require specific privileges to be executed.
 	 */
 	struct CoreExport Privilege
 	{
@@ -70,8 +68,9 @@ namespace ChanServ
 		Anope::string desc;
 		/* Rank relative to other privileges */
 		int rank;
+		int level;
 
-		Privilege(const Anope::string &n, const Anope::string &d, int r) : name(n), desc(d), rank(r)
+		Privilege(const Anope::string &n, const Anope::string &d, int r, int l) : name(n), desc(d), rank(r), level(l)
 		{
 			if (this->desc.empty())
 				for (unsigned j = 0; j < sizeof(descriptions) / sizeof(*descriptions); ++j)
@@ -88,7 +87,40 @@ namespace ChanServ
 	class Channel;
 	using registered_channel_map = Anope::hash_map<Channel *>;
 
-	class AccessProvider;
+	class Level : public Serialize::Object
+	{
+	 public:
+		using Serialize::Object::Object;
+
+		virtual Channel *GetChannel() anope_abstract;
+		virtual void SetChannel(Channel *) anope_abstract;
+
+		virtual Anope::string GetName() anope_abstract;
+		virtual void SetName(const Anope::string &) anope_abstract;
+
+		virtual int GetLevel() anope_abstract;
+		virtual void SetLevel(const int &) anope_abstract;
+	};
+
+	static Serialize::TypeReference<Level> level("Level");
+
+	class Mode : public Serialize::Object
+	{
+	 public:
+		using Serialize::Object::Object;
+
+		virtual Channel *GetChannel() anope_abstract;
+		virtual void SetChannel(Channel *) anope_abstract;
+
+		virtual Anope::string GetMode() anope_abstract;
+		virtual void SetMode(const Anope::string &) anope_abstract;
+
+		virtual Anope::string GetParam() anope_abstract;
+		virtual void SetParam(const Anope::string &) anope_abstract;
+	};
+
+	static Serialize::TypeReference<Mode> mode("CSKeepMode");
+
 	class ChanServService : public Service
 	{
 	 public:
@@ -96,8 +128,6 @@ namespace ChanServ
 		{
 		}
 
-		virtual Channel *Create(const Anope::string &name) anope_abstract;
-		virtual Channel *Create(const Channel &) anope_abstract;
 		virtual Channel *Find(const Anope::string &name) anope_abstract;
 		virtual registered_channel_map& GetChannels() anope_abstract;
 
@@ -112,14 +142,10 @@ namespace ChanServ
 		virtual std::vector<Privilege> &GetPrivileges() anope_abstract;
 		virtual void ClearPrivileges() anope_abstract;
 
-		virtual std::vector<AccessProvider *>& GetProviders() anope_abstract;
-
-		virtual void Destruct(ChanAccess *) anope_abstract;
-		virtual void Serialize(const ChanAccess *, Serialize::Data &data) anope_abstract;
 		//XXX
-		typedef std::multimap<const ChanAccess *, const ChanAccess *> Set;
+		typedef std::multimap<ChanAccess *, ChanAccess *> Set;
 		typedef std::pair<Set, Set> Path;
-		virtual bool Matches(const ChanAccess *, const User *u, const NickServ::Account *acc, Path &p) anope_abstract;
+		virtual bool Matches(ChanAccess *, const User *u, NickServ::Account *acc, Path &p) anope_abstract;
 	};
 	static ServiceReference<ChanServService> service("ChanServService", "ChanServ");
 
@@ -152,51 +178,55 @@ namespace ChanServ
 
 	/* It matters that Base is here before Extensible (it is inherited by Serializable)
 	 */
-	class CoreExport Channel : public Serializable, public Extensible
+	class CoreExport Channel : public Serialize::Object
 	{
 	 public:
-		/* channels who reference this one */
-		Anope::map<int> references;
-		Serialize::Reference<NickServ::Account> founder;					/* Channel founder */
-		Serialize::Reference<NickServ::Account> successor;                               /* Who gets the channel if the founder nick is dropped or expires */
-		Serialize::Checker<std::vector<ChanAccess *> > access;			/* List of authorized users */
-		Serialize::Checker<std::vector<AutoKick *> > akick;			/* List of users to kickban */
-		Anope::map<int16_t> levels;
-
-		Anope::string name;                       /* Channel name */
-		Anope::string desc;
-
-		time_t time_registered;
-		time_t last_used;
-
-		Anope::string last_topic;                 /* The last topic that was set on this channel */
-		Anope::string last_topic_setter;          /* Setter */
-		time_t last_topic_time;	                  /* Time */
-
-		::Channel::ModeList last_modes;             /* The last modes set on this channel */
-
-		int16_t bantype;
-
-		MemoServ::MemoInfo *memos = nullptr;
-
-		::Channel *c;                               /* Pointer to channel, if the channel exists */
-
-		/* For BotServ */
-		Serialize::Reference<BotInfo> bi;         /* Bot used on this channel */
-
-		time_t banexpire;                       /* Time bans expire in */
+		::Channel *c = nullptr;                               /* Pointer to channel, if the channel exists */
 
 	 protected:
-		Channel() : Serializable("ChannelInfo"), access("ChanAccess"), akick("AutoKick") { }
+		using Serialize::Object::Object;
 
 	 public:
+		virtual Anope::string GetName() anope_abstract;
+		virtual void SetName(const Anope::string &) anope_abstract;
+
+		virtual Anope::string GetDesc() anope_abstract;
+		virtual void SetDesc(const Anope::string &) anope_abstract;
+
+		virtual time_t GetTimeRegistered() anope_abstract;
+		virtual void SetTimeRegistered(const time_t &) anope_abstract;
+
+		virtual time_t GetLastUsed() anope_abstract;
+		virtual void SetLastUsed(const time_t &) anope_abstract;
+
+		virtual Anope::string GetLastTopic() anope_abstract;
+		virtual void SetLastTopic(const Anope::string &) anope_abstract;
+
+		virtual Anope::string GetLastTopicSetter() anope_abstract;
+		virtual void SetLastTopicSetter(const Anope::string &) anope_abstract;
+
+		virtual time_t GetLastTopicTime() anope_abstract;
+		virtual void SetLastTopicTime(const time_t &) anope_abstract;
+
+		virtual int16_t GetBanType() anope_abstract;
+		virtual void SetBanType(const int16_t &) anope_abstract;
+
+		virtual time_t GetBanExpire() anope_abstract;
+		virtual void SetBanExpire(const time_t &) anope_abstract;
+
+		virtual BotInfo *GetBI() anope_abstract;
+		virtual void SetBI(BotInfo *) anope_abstract;
+
+		virtual ServiceBot *GetBot() anope_abstract;
+		virtual void SetBot(ServiceBot *) anope_abstract;
+
 		/** Is the user the real founder?
 		 * @param user The user
 		 * @return true or false
 		 */
 		virtual bool IsFounder(const User *user) anope_abstract;
 
-		/** Change the founder of the channek
+		/** Change the founder of the channel
 		 * @params nc The new founder
 		 */
 		virtual void SetFounder(NickServ::Account *nc) anope_abstract;
@@ -204,20 +234,30 @@ namespace ChanServ
 		/** Get the founder of the channel
 		 * @return The founder
 		 */
-		virtual NickServ::Account *GetFounder() const anope_abstract;
+		virtual NickServ::Account *GetFounder() anope_abstract;
 
 		virtual void SetSuccessor(NickServ::Account *nc) anope_abstract;
-		virtual NickServ::Account *GetSuccessor() const anope_abstract;
+		virtual NickServ::Account *GetSuccessor() anope_abstract;
 
 		/** Find which bot should send mode/topic/etc changes for this channel
 		 * @return The bot
 		 */
-		virtual BotInfo *WhoSends() const anope_abstract;
+		ServiceBot *WhoSends()
+		{
+			if (this)
+				if (ServiceBot *bi = GetBot())
+					return bi;
 
-		/** Add an entry to the channel access list
-		 * @param access The entry
-		 */
-		virtual void AddAccess(ChanAccess *access) anope_abstract;
+			ServiceBot *ChanServ = Config->GetClient("ChanServ");
+			if (ChanServ)
+				return ChanServ;
+
+			//XXX
+//			if (!BotListByNick->empty())
+//				return BotListByNick->begin()->second;
+
+			return NULL;
+		}
 
 		/** Get an entry from the channel access list by index
 		 *
@@ -226,31 +266,23 @@ namespace ChanServ
 		 *
 		 * Retrieves an entry from the access list that matches the given index.
 		 */
-		virtual ChanAccess *GetAccess(unsigned index) const anope_abstract;
+		virtual ChanAccess *GetAccess(unsigned index) /*const*/ anope_abstract;
 
 		/** Retrieve the access for a user or group in the form of a vector of access entries
 		 * (as multiple entries can affect a single user).
 		 */
 		virtual AccessGroup AccessFor(const User *u) anope_abstract;
-		virtual AccessGroup AccessFor(const NickServ::Account *nc) anope_abstract;
+		virtual AccessGroup AccessFor(NickServ::Account *nc) anope_abstract;
 
 		/** Get the size of the accss vector for this channel
 		 * @return The access vector size
 		 */
-		virtual unsigned GetAccessCount() const anope_abstract;
+		virtual unsigned GetAccessCount() /*const*/ anope_abstract;
 
 		/** Get the number of access entries for this channel,
 		 * including those that are on other channels.
 		 */
 		virtual unsigned GetDeepAccessCount() const anope_abstract;
-
-		/** Erase an entry from the channel access list
-		 *
-		 * @param index The index in the access list vector
-		 *
-		 * @return The erased entry
-		 */
-		virtual ChanAccess *EraseAccess(unsigned index) anope_abstract;
 
 		/** Clear the entire channel access list
 		 *
@@ -280,17 +312,12 @@ namespace ChanServ
 		 * @param index The index in the akick vector
 		 * @return The akick structure, or NULL if not found
 		 */
-		virtual AutoKick* GetAkick(unsigned index) const anope_abstract;
+		virtual AutoKick* GetAkick(unsigned index) anope_abstract;
 
 		/** Get the size of the akick vector for this channel
 		 * @return The akick vector size
 		 */
-		virtual unsigned GetAkickCount() const anope_abstract;
-
-		/** Erase an entry from the channel akick list
-		 * @param index The index of the akick
-		 */
-		virtual void EraseAkick(unsigned index) anope_abstract;
+		virtual unsigned GetAkickCount() anope_abstract;
 
 		/** Clear the whole akick list
 		 */
@@ -301,7 +328,7 @@ namespace ChanServ
 		 * @return the level
 		 * @throws CoreException if priv is not a valid privilege
 		 */
-		virtual int16_t GetLevel(const Anope::string &priv) const anope_abstract;
+		virtual int16_t GetLevel(const Anope::string &priv) anope_abstract;
 
 		/** Set the level for a privilege
 		 * @param priv The privilege priv
@@ -323,12 +350,12 @@ namespace ChanServ
 		 * @param u The user
 		 * @return A ban mask that affects the user
 		 */
-		virtual Anope::string GetIdealBan(User *u) const anope_abstract;
+		virtual Anope::string GetIdealBan(User *u) anope_abstract;
 
-		virtual void AddChannelReference(const Anope::string &what) anope_abstract;
-		virtual void RemoveChannelReference(const Anope::string &what) anope_abstract;
-		virtual void GetChannelReferences(std::deque<Anope::string> &chans) anope_abstract;
+		virtual MemoServ::MemoInfo *GetMemos() anope_abstract;
 	};
+
+	static Serialize::TypeReference<Channel> channel("ChannelInfo");
 
 	enum
 	{
@@ -336,114 +363,47 @@ namespace ChanServ
 		ACCESS_FOUNDER = 10001
 	};
 
-	/* A provider of access. Only used for creating ChanAccesses, as
-	 * they contain pure virtual functions.
-	 */
-	class CoreExport AccessProvider : public Service
-	{
-	 public:
-		AccessProvider(Module *o, const Anope::string &n) : Service(o, "AccessProvider", n)
-		{
-			std::vector<AccessProvider *>& providers = service->GetProviders();
-			providers.push_back(this);
-		}
-
-		virtual ~AccessProvider()
-		{
-			std::vector<AccessProvider *>& providers = service->GetProviders();
-			std::vector<AccessProvider *>::iterator it = std::find(providers.begin(), providers.end(), this);
-			if (it != providers.end())
-				providers.erase(it);
-		}
-
-		/** Creates a new ChanAccess entry using this provider.
-		 * @return The new entry
-		 */
-		virtual ChanAccess *Create() anope_abstract;
-	};
-
 	/* Represents one entry of an access list on a channel. */
-	class CoreExport ChanAccess : public Serializable
+	class CoreExport ChanAccess : public Serialize::Object
 	{
-		Anope::string mask;
-		/* account this access entry is for, if any */
-		Serialize::Reference<NickServ::Account> nc;
-
 	 public:
-		typedef std::multimap<const ChanAccess *, const ChanAccess *> Set;
+		typedef std::multimap<ChanAccess *, ChanAccess *> Set;
 		/* shows the 'path' taken to determine if an access entry matches a user
 		 * .first are access entries checked
 		 * .second are access entries which match
 		 */
 		typedef std::pair<Set, Set> Path;
 
-		/* The provider that created this access entry */
-		AccessProvider *provider;
-		/* Channel this access entry is on */
-		Serialize::Reference<Channel> ci;
-		Anope::string creator;
-		time_t last_seen;
-		time_t created;
+		ChanAccess(Serialize::TypeBase *type) : Serialize::Object(type) { }
+		ChanAccess(Serialize::TypeBase *type, Serialize::ID id) : Serialize::Object(type, id) { }
 
-		ChanAccess(AccessProvider *p) : Serializable("ChanAccess"), provider(p) { }
+		inline Channel *GetChannel();
+		inline void SetChannel(Channel *ci);
 
-		virtual ~ChanAccess()
-		{
-			service->Destruct(this);
-		}
+		inline Anope::string GetCreator();
+		inline void SetCreator(const Anope::string &c);
 
-		void SetMask(const Anope::string &mask, Channel *c)
-		{
-			if (nc != NULL)
-				 nc->RemoveChannelReference(this->ci);
-			else if (!this->mask.empty())
-			 {
-				Channel *targc = ChanServ::Find(this->mask);
-				if (targc)
-					targc->RemoveChannelReference(this->ci->name);
-			}
+		inline time_t GetLastSeen();
+		inline void SetLastSeen(const time_t &t);
 
-			ci = c;
-			this->mask.clear();
-			nc = NULL;
+		inline time_t GetCreated();
+		inline void SetCreated(const time_t &t);
 
-			const NickServ::Nick *na = NickServ::FindNick(mask);
-			if (na != NULL)
-			{
-				nc = na->nc;
-				nc->AddChannelReference(ci);
-			}
-			else
-			{
-				this->mask = mask;
+		inline Anope::string GetMask();
+		inline void SetMask(const Anope::string &);
 
-				Channel *targci = ChanServ::Find(mask);
-				if (targci != NULL)
-					targci->AddChannelReference(ci->name);
-			}
-		}
+		inline Serialize::Object *GetObj();
+		inline void SetObj(Serialize::Object *);
 
-		const Anope::string &Mask() const
-		{
-			if (nc)
-				return nc->display;
-			else
-				return mask;
-		}
-
-		NickServ::Account *GetAccount() const { return nc; }
-
-		void Serialize(Serialize::Data &data) const override
-		{
-			service->Serialize(this, data);
-		}
+		inline Anope::string Mask();
+		inline NickServ::Account *GetAccount();
 
 		/** Check if this access entry matches the given user or account
 		 * @param u The user
 		 * @param nc The account
 		 * @param p The path to the access object which matches will be put here
 		 */
-		virtual bool Matches(const User *u, const NickServ::Account *acc, Path &p) const
+		virtual bool Matches(const User *u, NickServ::Account *acc, Path &p)
 		{
 			return service->Matches(this, u, acc, p);
 		}
@@ -451,13 +411,13 @@ namespace ChanServ
 		/** Check if this access entry has the given privilege.
 		 * @param name The privilege name
 		 */
-		virtual bool HasPriv(const Anope::string &name) const anope_abstract;
+		virtual bool HasPriv(const Anope::string &name) anope_abstract;
 
 		/** Serialize the access given by this access entry into a human
 		 * readable form. chanserv/access will return a number, chanserv/xop
 		 * will be AOP, SOP, etc.
 		 */
-		virtual Anope::string AccessSerialize() const anope_abstract;
+		virtual Anope::string AccessSerialize() anope_abstract;
 
 		/** Unserialize this access entry from the given data. This data
 		 * will be fetched from AccessSerialize.
@@ -465,7 +425,7 @@ namespace ChanServ
 		virtual void AccessUnserialize(const Anope::string &data) anope_abstract;
 
 		/* Comparison operators to other Access entries */
-		virtual bool operator>(const ChanAccess &other) const
+		virtual bool operator>(ChanAccess &other)
 		{
 			const std::vector<Privilege> &privs = service->GetPrivileges();
 			for (unsigned i = privs.size(); i > 0; --i)
@@ -482,7 +442,7 @@ namespace ChanServ
 			return false;
 		}
 
-		virtual bool operator<(const ChanAccess &other) const
+		virtual bool operator<(ChanAccess &other)
 		{
 			const std::vector<Privilege> &privs = service->GetPrivileges();
 			for (unsigned i = privs.size(); i > 0; --i)
@@ -499,16 +459,115 @@ namespace ChanServ
 			return false;
 		}
 
-		bool operator>=(const ChanAccess &other) const
+		bool operator>=(ChanAccess &other)
 		{
 			return !(*this < other);
 		}
 
-		bool operator<=(const ChanAccess &other) const
+		bool operator<=(ChanAccess &other)
 		{
 			return !(*this > other);
 		}
 	};
+
+	class ChanAccessType : public Serialize::AbstractType
+	{
+	 public:
+		Serialize::ObjectField<ChanServ::ChanAccess, ChanServ::Channel *> ci;
+		Serialize::Field<ChanServ::ChanAccess, Anope::string> mask;
+		Serialize::ObjectField<ChanServ::ChanAccess, Serialize::Object *> obj;
+		Serialize::Field<ChanServ::ChanAccess, Anope::string> creator;
+		Serialize::Field<ChanServ::ChanAccess, time_t> last_seen;
+		Serialize::Field<ChanServ::ChanAccess, time_t> created;
+
+		ChanAccessType(Module *me, const Anope::string &name) : Serialize::AbstractType(me, name)
+			, ci(this, "ci", true)
+			, mask(this, "mask")
+			, obj(this, "obj", true)
+			, creator(this, "creator")
+			, last_seen(this, "last_seen")
+			, created(this, "created")
+		{
+		}
+	};
+
+	ChanServ::Channel *ChanAccess::GetChannel()
+	{
+		return Get(&ChanAccessType::ci);
+	}
+
+	void ChanAccess::SetChannel(ChanServ::Channel *ci)
+	{
+		Object::Set(&ChanAccessType::ci, ci);
+	}
+
+	Anope::string ChanAccess::GetCreator()
+	{
+		return Get(&ChanAccessType::creator);
+	}
+
+	void ChanAccess::SetCreator(const Anope::string &c)
+	{
+		Object::Set(&ChanAccessType::creator, c);
+	}
+
+	time_t ChanAccess::GetLastSeen()
+	{
+		return Get(&ChanAccessType::last_seen);
+	}
+
+	void ChanAccess::SetLastSeen(const time_t &t)
+	{
+		Object::Set(&ChanAccessType::last_seen, t);
+	}
+
+	time_t ChanAccess::GetCreated()
+	{
+		return Get(&ChanAccessType::created);
+	}
+
+	void ChanAccess::SetCreated(const time_t &t)
+	{
+		Object::Set(&ChanAccessType::created, t);
+	}
+
+	Anope::string ChanAccess::GetMask()
+	{
+		return Get(&ChanAccessType::mask);
+	}
+
+	void ChanAccess::SetMask(const Anope::string &n)
+	{
+		Object::Set(&ChanAccessType::mask, n);
+	}
+
+	Serialize::Object *ChanAccess::GetObj()
+	{
+		return Get(&ChanAccessType::obj);
+	}
+
+	void ChanAccess::SetObj(Serialize::Object *o)
+	{
+		Object::Set(&ChanAccessType::obj, o);
+	}
+
+	Anope::string ChanAccess::Mask()
+	{
+		if (NickServ::Account *acc = GetAccount())
+			return acc->GetDisplay();
+
+		return GetMask();
+	}
+
+	NickServ::Account *ChanAccess::GetAccount()
+	{
+		if (!GetObj() || GetObj()->GetSerializableType() != NickServ::account)
+			return nullptr;
+
+		return anope_dynamic_static_cast<NickServ::Account *>(GetObj());
+	}
+
+	static Serialize::TypeReference<ChanAccess> chanaccess("ChanAccess");
 
 	/* A group of access entries. This is used commonly, for example with ChanServ::Channel::AccessFor,
 	 * to show what access a user has on a channel because users can match multiple access entries.
@@ -517,7 +576,7 @@ namespace ChanServ
 	{
 	 public:
 		/* Channel these access entries are on */
-		const ChanServ::Channel *ci;
+		ChanServ::Channel *ci;
 		/* Path from these entries to other entries that they depend on */
 		ChanAccess::Path path;
 		/* Account these entries affect, if any */
@@ -533,18 +592,18 @@ namespace ChanServ
 		}
 
 	 private:
-		bool HasPriv(const ChanAccess *access, const Anope::string &name) const
+		bool HasPriv(ChanAccess *access, const Anope::string &name)
 		{
 			EventReturn MOD_RESULT = ::Event::OnCheckPriv(&::Event::CheckPriv::OnCheckPriv, access, name);
 			if (MOD_RESULT == EVENT_ALLOW || access->HasPriv(name))
 			{
-				typedef std::multimap<const ChanAccess *, const ChanAccess *> P;
+				typedef std::multimap<ChanAccess *, ChanAccess *> P;
 				std::pair<P::const_iterator, P::const_iterator> it = this->path.second.equal_range(access);
 				if (it.first != it.second)
 					/* check all of the paths for this entry */
 					for (; it.first != it.second; ++it.first)
 					{
-						const ChanAccess *a = it.first->second;
+						ChanAccess *a = it.first->second;
 						/* if only one path fully matches then we are ok */
 						if (HasPriv(a, name))
 							return true;
@@ -565,7 +624,7 @@ namespace ChanServ
 		 * @param priv The privilege
 		 * @return true if any entry has the given privilege
 		 */
-		bool HasPriv(const Anope::string &priv) const
+		bool HasPriv(const Anope::string &priv)
 		{
 			if (this->super_admin)
 				return true;
@@ -602,7 +661,7 @@ namespace ChanServ
 		 * with the highest rank (see Privilege::rank).
 		 * @return The "highest" entry
 		 */
-		const ChanAccess *Highest() const
+		ChanAccess *Highest()
 		{
 			ChanAccess *highest = NULL;
 			for (unsigned i = 0; i < this->size(); ++i)
@@ -612,7 +671,7 @@ namespace ChanServ
 		}
 
 		/* Comparison operators to other AccessGroups */
-		bool operator>(const AccessGroup &other) const
+		bool operator>(AccessGroup &other)
 		{
 			if (other.super_admin)
 				return false;
@@ -638,7 +697,7 @@ namespace ChanServ
 			return false;
 		}
 
-		bool operator<(const AccessGroup &other) const
+		bool operator<(AccessGroup &other)
 		{
 			if (this->super_admin)
 				return false;
@@ -664,12 +723,12 @@ namespace ChanServ
 			return false;
 		}
 
-		bool operator>=(const AccessGroup &other) const
+		bool operator>=(AccessGroup &other)
 		{
 			return !(*this < other);
 		}
 
-		bool operator<=(const AccessGroup &other) const
+		bool operator<=(AccessGroup &other)
 		{
 			return !(*this > other);
 		}

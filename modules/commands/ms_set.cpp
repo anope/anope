@@ -18,34 +18,34 @@ class CommandMSSet : public Command
 	{
 		const Anope::string &param = params[1];
 		NickServ::Account *nc = source.nc;
-		BotInfo *MemoServ = Config->GetClient("MemoServ");
+		ServiceBot *MemoServ = Config->GetClient("MemoServ");
 
 		if (!MemoServ)
 			return;
 
 		if (param.equals_ci("ON"))
 		{
-			nc->Extend<bool>("MEMO_SIGNON");
-			nc->Extend<bool>("MEMO_RECEIVE");
+			nc->SetS<bool>("MEMO_SIGNON", true);
+			nc->SetS<bool>("MEMO_RECEIVE", true);
 			source.Reply(_("\002{0}\002 will now notify you of memos when you log on and when they are sent to you."), MemoServ->nick);
 		}
 		else if (param.equals_ci("LOGON"))
 		{
-			nc->Extend<bool>("MEMO_SIGNON");
-			nc->Shrink<bool>("MEMO_RECEIVE");
+			nc->SetS<bool>("MEMO_SIGNON", true);
+			nc->UnsetS<bool>("MEMO_RECEIVE");
 			source.Reply(_("\002{0}\002 will now notify you of memos when you log on or unset /AWAY."), MemoServ->nick);
 		}
 		else if (param.equals_ci("NEW"))
 		{
-			nc->Shrink<bool>("MEMO_SIGNON");
-			nc->Extend<bool>("MEMO_RECEIVE");
+			nc->UnsetS<bool>("MEMO_SIGNON");
+			nc->SetS<bool>("MEMO_RECEIVE", true);
 			source.Reply(_("\002{0}\002 will now notify you of memos when they are sent to you."), MemoServ->nick);
 		}
 		else if (param.equals_ci("MAIL"))
 		{
-			if (!nc->email.empty())
+			if (!nc->GetEmail().empty())
 			{
-				nc->Extend<bool>("MEMO_MAIL");
+				nc->SetS<bool>("MEMO_MAIL", true);
 				source.Reply(_("You will now be informed about new memos via email."));
 			}
 			else
@@ -53,14 +53,14 @@ class CommandMSSet : public Command
 		}
 		else if (param.equals_ci("NOMAIL"))
 		{
-			nc->Shrink<bool>("MEMO_MAIL");
+			nc->UnsetS<bool>("MEMO_MAIL");
 			source.Reply(_("You will no longer be informed via email."));
 		}
 		else if (param.equals_ci("OFF"))
 		{
-			nc->Shrink<bool>("MEMO_SIGNON");
-			nc->Shrink<bool>("MEMO_RECEIVE");
-			nc->Shrink<bool>("MEMO_MAIL");
+			nc->UnsetS<bool>("MEMO_SIGNON");
+			nc->UnsetS<bool>("MEMO_RECEIVE");
+			nc->UnsetS<bool>("MEMO_MAIL");
 			source.Reply(_("\002{0}\002 will not send you any notification of memos."), MemoServ->nick);
 		}
 		else
@@ -95,24 +95,24 @@ class CommandMSSet : public Command
 
 			if (!is_servadmin && !source.AccessFor(ci).HasPriv("MEMO"))
 			{
-				source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "MEMO", ci->name);
+				source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "MEMO", ci->GetName());
 				return;
 			}
-			mi = ci->memos;
+			mi = ci->GetMemos();
 		}
 		if (is_servadmin)
 		{
 			if (!p2.empty() && !p2.equals_ci("HARD") && chan.empty())
 			{
-				const NickServ::Nick *na;
+				NickServ::Nick *na;
 				if (!(na = NickServ::FindNick(p1)))
 				{
 					source.Reply(_("\002{0}\002 isn't registered."), p1);
 					return;
 				}
 				user = p1;
-				mi = na->nc->memos;
-				nc = na->nc;
+				mi = na->GetAccount()->GetMemos();
+				nc = na->GetAccount();
 				p1 = p2;
 				p2 = p3;
 			}
@@ -124,16 +124,16 @@ class CommandMSSet : public Command
 			if (!chan.empty())
 			{
 				if (!p2.empty())
-					ci->Extend<bool>("MEMO_HARDMAX");
+					ci->SetS<bool>("MEMO_HARDMAX", true);
 				else
-					ci->Shrink<bool>("MEMO_HARDMAX");
+					ci->UnsetS<bool>("MEMO_HARDMAX");
 			}
 			else
 			{
 				if (!p2.empty())
-					nc->Extend<bool>("MEMO_HARDMAX");
+					nc->SetS<bool>("MEMO_HARDMAX", true);
 				else
-					nc->Shrink<bool>("MEMO_HARDMAX");
+					nc->UnsetS<bool>("MEMO_HARDMAX");
 			}
 			limit = -1;
 			try
@@ -149,12 +149,12 @@ class CommandMSSet : public Command
 				this->OnSyntaxError(source, "");
 				return;
 			}
-			if (!chan.empty() && ci->HasExt("MEMO_HARDMAX"))
+			if (!chan.empty() && ci->HasFieldS("MEMO_HARDMAX"))
 			{
 				source.Reply(_("The memo limit for \002{0}\002 may not be changed."), chan);
 				return;
 			}
-			if (chan.empty() && nc->HasExt("MEMO_HARDMAX"))
+			if (chan.empty() && nc->HasFieldS("MEMO_HARDMAX"))
 			{
 				source.Reply(_("You are not permitted to change your memo limit."));
 				return;
@@ -177,7 +177,7 @@ class CommandMSSet : public Command
 				return;
 			}
 		}
-		mi->memomax = limit;
+		mi->SetMemoMax(limit);
 		if (limit > 0)
 		{
 			if (chan.empty() && nc == source.nc)
@@ -210,7 +210,7 @@ class CommandMSSet : public Command
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		const Anope::string &cmd = params[0];
-		MemoServ::MemoInfo *mi = source.nc->memos;
+		MemoServ::MemoInfo *mi = source.nc->GetMemos();
 
 		if (Anope::ReadOnly)
 			source.Reply(_("Sorry, memo option setting is temporarily disabled."));
@@ -295,15 +295,17 @@ class CommandMSSet : public Command
 class MSSet : public Module
 {
 	CommandMSSet commandmsset;
-	SerializableExtensibleItem<bool> memo_signon, memo_receive, memo_mail, memo_hardmax;
+	Serialize::Field<NickServ::Account, bool> memo_signon, memo_receive, memo_mail, memo_hardmax_nick;
+	Serialize::Field<ChanServ::Channel, bool> memo_hardmax_channel;
 
  public:
 	MSSet(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
 		, commandmsset(this)
-		, memo_signon(this, "MEMO_SIGNON")
-		, memo_receive(this, "MEMO_RECEIVE")
-		, memo_mail(this, "MEMO_MAIL")
-		, memo_hardmax(this, "MEMO_HARDMAX")
+		, memo_signon(this, NickServ::account, "MEMO_SIGNON")
+		, memo_receive(this, NickServ::account, "MEMO_RECEIVE")
+		, memo_mail(this, NickServ::account, "MEMO_MAIL")
+		, memo_hardmax_nick(this, NickServ::account, "MEMO_HARDMAX")
+		, memo_hardmax_channel(this, ChanServ::channel, "MEMO_HARDMAX")
 	{
 
 	}

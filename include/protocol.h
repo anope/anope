@@ -105,19 +105,19 @@ class CoreExport IRCDProto : public Service
 	 * @param x The akill
 	 */
 	virtual void SendAkill(User *, XLine *) anope_abstract;
-	virtual void SendAkillDel(const XLine *) anope_abstract;
+	virtual void SendAkillDel(XLine *) anope_abstract;
 
 	/* Realname ban */
-	virtual void SendSGLine(User *, const XLine *) { }
-	virtual void SendSGLineDel(const XLine *) { }
+	virtual void SendSGLine(User *, XLine *) { }
+	virtual void SendSGLineDel(XLine *) { }
 
 	/* IP ban */
-	virtual void SendSZLine(User *u, const XLine *) { }
-	virtual void SendSZLineDel(const XLine *) { }
+	virtual void SendSZLine(User *u, XLine *) { }
+	virtual void SendSZLineDel(XLine *) { }
 
 	/* Nick ban (and sometimes channel) */
-	virtual void SendSQLine(User *, const XLine *x) { }
-	virtual void SendSQLineDel(const XLine *x) { }
+	virtual void SendSQLine(User *, XLine *x) { }
+	virtual void SendSQLineDel(XLine *x) { }
 
 	virtual void SendKill(const MessageSource &source, const Anope::string &target, const Anope::string &reason);
 
@@ -143,8 +143,8 @@ class CoreExport IRCDProto : public Service
 	virtual void SendAction(const MessageSource &source, const Anope::string &dest, const char *fmt, ...);
 	virtual void SendCTCP(const MessageSource &source, const Anope::string &dest, const char *fmt, ...);
 
-	virtual void SendGlobalNotice(BotInfo *bi, const Server *dest, const Anope::string &msg) anope_abstract;
-	virtual void SendGlobalPrivmsg(BotInfo *bi, const Server *desc, const Anope::string &msg) anope_abstract;
+	virtual void SendGlobalNotice(ServiceBot *bi, const Server *dest, const Anope::string &msg) anope_abstract;
+	virtual void SendGlobalPrivmsg(ServiceBot *bi, const Server *desc, const Anope::string &msg) anope_abstract;
 
 	virtual void SendQuit(User *u, const char *fmt, ...);
 	virtual void SendPing(const Anope::string &servname, const Anope::string &who);
@@ -181,7 +181,7 @@ class CoreExport IRCDProto : public Service
 
 	/** Sets oper flags on a user, currently only supported by Unreal
 	 */
-	virtual void SendSVSO(BotInfo *, const Anope::string &, const Anope::string &) { }
+	virtual void SendSVSO(ServiceBot *, const Anope::string &, const Anope::string &) { }
 
 	/** Sends a nick change of one of our clients.
 	 */
@@ -257,7 +257,7 @@ class CoreExport MessageSource
 	const Anope::string &GetName() const;
 	const Anope::string &GetSource() const;
 	User *GetUser() const;
-	BotInfo *GetBot() const;
+	ServiceBot *GetBot() const;
 	Server *GetServer() const;
 };
 

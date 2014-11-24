@@ -11,188 +11,182 @@
  */
 
 #include "module.h"
-#include "nick.h"
-
-NickImpl::NickImpl(const Anope::string &nickname, NickServ::Account* nickcore)
-{
-	if (nickname.empty())
-		throw CoreException("Empty nick passed to NickServ::Nick constructor");
-	else if (!nickcore)
-		throw CoreException("Empty nickcore passed to NickServ::Nick constructor");
-
-	this->time_registered = this->last_seen = Anope::CurTime;
-	this->nick = nickname;
-	this->nc = nickcore;
-	nickcore->aliases->push_back(this);
-
-	NickServ::nickalias_map &map = NickServ::service->GetNickList();
-	NickServ::Nick* &na = map[this->nick];
-	if (na)
-		Log(LOG_DEBUG) << "Duplicate nick " << nickname << " in nickalias table";
-	na = this;
-
-	if (this->nc->o == NULL)
-	{
-		Oper *o = Oper::Find(this->nick);
-		if (o == NULL)
-			o = Oper::Find(this->nc->display);
-		nickcore->o = o;
-		if (this->nc->o != NULL)
-			Log() << "Tied oper " << this->nc->display << " to type " << this->nc->o->ot->GetName();
-	}
-}
+#include "nicktype.h"
 
 NickImpl::~NickImpl()
 {
+	/* Remove us from the aliases list */
+	NickServ::nickalias_map &map = NickServ::service->GetNickMap();
+	map.erase(GetNick());
+}
+
+void NickImpl::Delete()
+{
 	Event::OnDelNick(&Event::DelNick::OnDelNick, this);
 
-	/* Accept nicks that have no core, because of database load functions */
-	if (this->nc)
+	if (this->GetAccount())
 	{
 		/* Next: see if our core is still useful. */
-		std::vector<NickServ::Nick *>::iterator it = std::find(this->nc->aliases->begin(), this->nc->aliases->end(), this);
-		if (it != this->nc->aliases->end())
-			this->nc->aliases->erase(it);
-		if (this->nc->aliases->empty())
+		std::vector<NickServ::Nick *> aliases = this->GetAccount()->GetRefs<NickServ::Nick *>(NickServ::nick);
+
+		auto it = std::find(aliases.begin(), aliases.end(), this);
+		if (it != aliases.end())
+			aliases.erase(it);
+
+		if (aliases.empty())
 		{
-			delete this->nc;
-			this->nc = NULL;
+			/* just me */
+			this->GetAccount()->Delete();
 		}
 		else
 		{
 			/* Display updating stuff */
-			if (this->nick.equals_ci(this->nc->display))
-				this->nc->SetDisplay(this->nc->aliases->front());
+			if (GetNick().equals_ci(this->GetAccount()->GetDisplay()))
+				this->GetAccount()->SetDisplay(aliases[0]);
 		}
 	}
 
-	/* Remove us from the aliases list */
-	NickServ::nickalias_map &map = NickServ::service->GetNickList();
-	map.erase(this->nick);
+	return Serialize::Object::Delete();
+}
+
+Anope::string NickImpl::GetNick()
+{
+	return Get<Anope::string>(&NickType::nick);
+}
+
+void NickImpl::SetNick(const Anope::string &nick)
+{
+	Set(&NickType::nick, nick);
+}
+
+Anope::string NickImpl::GetLastQuit()
+{
+	return Get(&NickType::last_quit);
+}
+
+void NickImpl::SetLastQuit(const Anope::string &lq)
+{
+	Set(&NickType::last_quit, lq);
+}
+
+Anope::string NickImpl::GetLastRealname()
+{
+	return Get(&NickType::last_realname);
+}
+
+void NickImpl::SetLastRealname(const Anope::string &lr)
+{
+	Set(&NickType::last_realname, lr);
+}
+
+Anope::string NickImpl::GetLastUsermask()
+{
+	return Get(&NickType::last_usermask);
+}
+
+void NickImpl::SetLastUsermask(const Anope::string &lu)
+{
+	Set(&NickType::last_usermask, lu);
+}
+
+Anope::string NickImpl::GetLastRealhost()
+{
+	return Get(&NickType::last_realhost);
+}
+
+void NickImpl::SetLastRealhost(const Anope::string &lr)
+{
+	Set(&NickType::last_realhost, lr);
+}
+
+time_t NickImpl::GetTimeRegistered()
+{
+	return Get(&NickType::time_registered);
+}
+
+void NickImpl::SetTimeRegistered(const time_t &tr)
+{
+	Set(&NickType::time_registered, tr);
+}
+
+time_t NickImpl::GetLastSeen()
+{
+	return Get(&NickType::last_seen);
+}
+
+void NickImpl::SetLastSeen(const time_t &ls)
+{
+	Set(&NickType::last_seen, ls);
+}
+
+NickServ::Account *NickImpl::GetAccount()
+{
+	return Get(&NickType::nc);
+}
+
+void NickImpl::SetAccount(NickServ::Account *acc)
+{
+	Set(&NickType::nc, acc);
 }
 
 void NickImpl::SetVhost(const Anope::string &ident, const Anope::string &host, const Anope::string &creator, time_t created)
 {
-	this->vhost_ident = ident;
-	this->vhost_host = host;
-	this->vhost_creator = creator;
-	this->vhost_created = created;
+	Set(&NickType::vhost_ident, ident);
+	Set(&NickType::vhost_host, host);
+	Set(&NickType::vhost_creator, creator);
+	Set(&NickType::vhost_created, created);
 }
 
 void NickImpl::RemoveVhost()
 {
-	this->vhost_ident.clear();
-	this->vhost_host.clear();
-	this->vhost_creator.clear();
-	this->vhost_created = 0;
+	Anope::string e;
+	Set(&NickType::vhost_ident, e);
+	Set(&NickType::vhost_host, e);
+	Set(&NickType::vhost_creator, e);
+	Set(&NickType::vhost_created, 0);
 }
 
-bool NickImpl::HasVhost() const
+bool NickImpl::HasVhost()
 {
-	return !this->vhost_host.empty();
+	return !GetVhostHost().empty();
 }
 
-const Anope::string &NickImpl::GetVhostIdent() const
+Anope::string NickImpl::GetVhostIdent()
 {
-	return this->vhost_ident;
+	return Get(&NickType::vhost_ident);
 }
 
-const Anope::string &NickImpl::GetVhostHost() const
+void NickImpl::SetVhostIdent(const Anope::string &i)
 {
-	return this->vhost_host;
+	Set(&NickType::vhost_ident, i);
 }
 
-const Anope::string &NickImpl::GetVhostCreator() const
+Anope::string NickImpl::GetVhostHost()
 {
-	return this->vhost_creator;
+	return Get(&NickType::vhost_host);
 }
 
-time_t NickImpl::GetVhostCreated() const
+void NickImpl::SetVhostHost(const Anope::string &h)
 {
-	return this->vhost_created;
+	Set(&NickType::vhost_host, h);
 }
 
-void NickImpl::Serialize(Serialize::Data &data) const
+Anope::string NickImpl::GetVhostCreator()
 {
-	data["nick"] << this->nick;
-	data["last_quit"] << this->last_quit;
-	data["last_realname"] << this->last_realname;
-	data["last_usermask"] << this->last_usermask;
-	data["last_realhost"] << this->last_realhost;
-	data.SetType("time_registered", Serialize::Data::DT_INT); data["time_registered"] << this->time_registered;
-	data.SetType("last_seen", Serialize::Data::DT_INT); data["last_seen"] << this->last_seen;
-	data["nc"] << this->nc->display;
-
-	if (this->HasVhost())
-	{
-		data["vhost_ident"] << this->GetVhostIdent();
-		data["vhost_host"] << this->GetVhostHost();
-		data["vhost_creator"] << this->GetVhostCreator();
-		data["vhost_time"] << this->GetVhostCreated();
-	}
-
-	Extensible::ExtensibleSerialize(this, this, data);
+	return Get(&NickType::vhost_creator);
 }
 
-Serializable* NickImpl::Unserialize(Serializable *obj, Serialize::Data &data)
+void NickImpl::SetVhostCreator(const Anope::string &c)
 {
-	Anope::string snc, snick;
-
-	data["nc"] >> snc;
-	data["nick"] >> snick;
-
-	NickServ::Account *core = NickServ::FindAccount(snc);
-	if (core == NULL)
-		return NULL;
-
-	NickServ::Nick *na;
-	if (obj)
-		na = anope_dynamic_static_cast<NickServ::Nick *>(obj);
-	else
-		na = new NickImpl(snick, core);
-
-	if (na->nc != core)
-	{
-		std::vector<NickServ::Nick *>::iterator it = std::find(na->nc->aliases->begin(), na->nc->aliases->end(), na);
-		if (it != na->nc->aliases->end())
-			na->nc->aliases->erase(it);
-
-		if (na->nc->aliases->empty())
-			delete na->nc;
-		else if (na->nick.equals_ci(na->nc->display))
-			na->nc->SetDisplay(na->nc->aliases->front());
-
-		na->nc = core;
-		core->aliases->push_back(na);
-	}
-
-	data["last_quit"] >> na->last_quit;
-	data["last_realname"] >> na->last_realname;
-	data["last_usermask"] >> na->last_usermask;
-	data["last_realhost"] >> na->last_realhost;
-	data["time_registered"] >> na->time_registered;
-	data["last_seen"] >> na->last_seen;
-
-	Anope::string vhost_ident, vhost_host, vhost_creator;
-	time_t vhost_time;
-
-	data["vhost_ident"] >> vhost_ident;
-	data["vhost_host"] >> vhost_host;
-	data["vhost_creator"] >> vhost_creator;
-	data["vhost_time"] >> vhost_time;
-
-	na->SetVhost(vhost_ident, vhost_host, vhost_creator, vhost_time);
-
-	Extensible::ExtensibleUnserialize(na, na, data);
-
-	/* compat */
-	bool b;
-	b = false;
-	data["extensible:NO_EXPIRE"] >> b;
-	if (b)
-		na->Extend<bool>("NS_NO_EXPIRE");
-	/* end compat */
-
-	return na;
+	Set(&NickType::vhost_creator, c);
 }
 
+time_t NickImpl::GetVhostCreated()
+{
+	return Get(&NickType::vhost_created);
+}
+
+void NickImpl::SetVhostCreated(const time_t &cr)
+{
+	Set(&NickType::vhost_created, cr);
+}

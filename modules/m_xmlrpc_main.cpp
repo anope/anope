@@ -74,7 +74,7 @@ class MyXMLRPCEvent : public XMLRPCEvent
 			request.reply("error", "Invalid parameters");
 		else
 		{
-			BotInfo *bi = BotInfo::Find(service, true);
+			ServiceBot *bi = ServiceBot::Find(service, true);
 			if (!bi)
 				request.reply("error", "Invalid service");
 			else
@@ -98,7 +98,7 @@ class MyXMLRPCEvent : public XMLRPCEvent
 				}
 				reply(out);
 
-				CommandSource source(user, NULL, na ? *na->nc : NULL, &reply, bi);
+				CommandSource source(user, NULL, na ? na->GetAccount() : NULL, &reply, bi);
 				Command::Run(source, command);
 
 				if (!out.empty())
@@ -217,9 +217,9 @@ class MyXMLRPCEvent : public XMLRPCEvent
 			request.reply("signon", stringify(u->signon));
 			if (u->Account())
 			{
-				request.reply("account", iface->Sanitize(u->Account()->display));
+				request.reply("account", iface->Sanitize(u->Account()->GetDisplay()));
 				if (u->Account()->o)
-					request.reply("opertype", iface->Sanitize(u->Account()->o->ot->GetName()));
+					request.reply("opertype", iface->Sanitize(u->Account()->o->GetType()->GetName()));
 			}
 
 			Anope::string channels;

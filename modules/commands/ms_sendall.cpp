@@ -30,13 +30,9 @@ class CommandMSSendAll : public Command
 
 		Log(LOG_ADMIN, source, this) << "to send " << text;
 
-		for (auto& it : NickServ::service->GetAccountList())
-		{
-			const NickServ::Account *nc = it.second;
-
+		for (NickServ::Account *nc : NickServ::service->GetAccountList())
 			if (nc != source.nc)
-				MemoServ::service->Send(source.GetNick(), nc->display, text);
-		}
+				MemoServ::service->Send(source.GetNick(), nc->GetDisplay(), text);
 
 		source.Reply(_("A mass memo has been sent to all registered users."));
 	}

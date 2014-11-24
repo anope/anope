@@ -34,14 +34,10 @@ class CommandCSUnban : public Command
 			if (!source.GetUser())
 				return;
 
-			std::deque<ChanServ::Channel *> queue;
-			source.GetAccount()->GetChannelReferences(queue);
-
 			unsigned count = 0;
-			for (unsigned i = 0; i < queue.size(); ++i)
-			{
-				ChanServ::Channel *ci = queue[i];
 
+			for (ChanServ::Channel *ci : source.GetAccount()->GetRefs<ChanServ::Channel *>(ChanServ::channel))
+			{
 				if (!ci->c || !source.AccessFor(ci).HasPriv("UNBAN"))
 					continue;
 
@@ -66,13 +62,13 @@ class CommandCSUnban : public Command
 
 		if (ci->c == NULL)
 		{
-			source.Reply(_("Channel \002{0}\002 doesn't exist."), ci->name);
+			source.Reply(_("Channel \002{0}\002 doesn't exist."), ci->GetName());
 			return;
 		}
 
 		if (!source.AccessFor(ci).HasPriv("UNBAN") && !source.HasPriv("chanserv/kick"))
 		{
-			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "UNBAN", ci->name);
+			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "UNBAN", ci->GetName());
 			return;
 		}
 

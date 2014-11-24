@@ -44,8 +44,8 @@ bool WebCPanel::ChanServ::Modes::OnRequest(HTTPProvider *server, const Anope::st
 		return true;
 	}
 
-	::ChanServ::AccessGroup u_access = ci->AccessFor(na->nc);
-	bool has_priv = na->nc->IsServicesOper() && na->nc->o->ot->HasPriv("chanserv/administration");
+	::ChanServ::AccessGroup u_access = ci->AccessFor(na->GetAccount());
+	bool has_priv = na->GetAccount()->IsServicesOper() && na->GetAccount()->o->GetType()->HasPriv("chanserv/administration");
 
 	if (!u_access.HasPriv("MODE") && !has_priv)
 	{
@@ -78,20 +78,20 @@ bool WebCPanel::ChanServ::Modes::OnRequest(HTTPProvider *server, const Anope::st
 		if (message.get_data["del"].empty() == false && message.get_data["mask"].empty() == false)
 		{
 			std::vector<Anope::string> params;
-			params.push_back(ci->name);
+			params.push_back(ci->GetName());
 			params.push_back("SET");
 			params.push_back("-" + Anope::string(cm->mchar));
 			params.push_back(message.get_data["mask"]);
-			WebPanel::RunCommand(na->nc->display, na->nc, "ChanServ", "chanserv/mode", params, replacements);
+			WebPanel::RunCommand(na->GetAccount()->GetDisplay(), na->GetAccount(), "ChanServ", "chanserv/mode", params, replacements);
 		}
 		else if (message.post_data["mask"].empty() == false)
 		{
 			std::vector<Anope::string> params;
-			params.push_back(ci->name);
+			params.push_back(ci->GetName());
 			params.push_back("SET");
 			params.push_back("+" + Anope::string(cm->mchar));
 			params.push_back(message.post_data["mask"]);
-			WebPanel::RunCommand(na->nc->display, na->nc, "ChanServ", "chanserv/mode", params, replacements);
+			WebPanel::RunCommand(na->GetAccount()->GetDisplay(), na->GetAccount(), "ChanServ", "chanserv/mode", params, replacements);
 		}
 
 		std::pair<Channel::ModeList::iterator, Channel::ModeList::iterator> ml = c->GetModeList(cm->name);

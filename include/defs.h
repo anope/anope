@@ -14,6 +14,7 @@
 class AutoKick;
 class BotInfo;
 class Channel;
+class ChannelMode;
 class ChannelStatus;
 namespace ChanServ
 {
@@ -28,6 +29,7 @@ class CommandSource;
 namespace Configuration { struct Conf; }
 class ConnectionSocket;
 class Entry;
+class ExtensibleBase;
 class InfoFormatter;
 class IRCDProto;
 class ListenSocket;
@@ -42,23 +44,29 @@ namespace NickServ
 namespace MemoServ
 {
 	class Memo;
-	struct MemoInfo;
+	class MemoInfo;
 }
 class MessageSource;
 class Module;
 class OperType;
 class ReferenceBase;
 class Regex;
-class Serializable;
+class ServiceBot;
+namespace Serialize
+{
+	using ID = uint64_t;
+	struct Edge;
+	class FieldBase;
+	class TypeBase;
+	class Object;
+}
 class Server;
 class Socket;
 class Thread;
 class User;
 class XLine;
 class XLineManager;
-struct BadWord;
-struct Exception;
-struct ModeLock;
-struct Oper;
+class Oper;
 namespace SASL { struct Message; }
+class UserMode;
 

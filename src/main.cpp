@@ -17,6 +17,7 @@
 #include "socketengine.h"
 #include "uplink.h"
 #include "event.h"
+#include "modules.h"
 
 #ifndef _WIN32
 #include <limits.h>

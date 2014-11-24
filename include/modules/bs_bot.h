@@ -13,7 +13,7 @@ namespace Event
 		/** Called when a new bot is made
 		 * @param bi The bot
 		 */
-		virtual void OnBotCreate(BotInfo *bi) anope_abstract;
+		virtual void OnBotCreate(ServiceBot *bi) anope_abstract;
 	};
 
 	struct CoreExport BotChange : Events
@@ -21,7 +21,7 @@ namespace Event
 		/** Called when a bot is changed
 		 * @param bi The bot
 		 */
-		virtual void OnBotChange(BotInfo *bi) anope_abstract;
+		virtual void OnBotChange(ServiceBot *bi) anope_abstract;
 	};
 
 	struct CoreExport BotDelete : Events
@@ -29,6 +29,6 @@ namespace Event
 		/** Called when a bot is deleted
 		 * @param bi The bot
 		 */
-		virtual void OnBotDelete(BotInfo *bi) anope_abstract;
+		virtual void OnBotDelete(ServiceBot *bi) anope_abstract;
 	};
 }

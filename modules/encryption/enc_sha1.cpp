@@ -226,24 +226,28 @@ class ESHA1 : public Module
 
 	void OnCheckAuthentication(User *, NickServ::IdentifyRequest *req) override
 	{
-		const NickServ::Nick *na = NickServ::FindNick(req->GetAccount());
+		NickServ::Nick *na = NickServ::FindNick(req->GetAccount());
 		if (na == NULL)
 			return;
-		NickServ::Account *nc = na->nc;
+		NickServ::Account *nc = na->GetAccount();
 
-		size_t pos = nc->pass.find(':');
+		size_t pos = nc->GetPassword().find(':');
 		if (pos == Anope::string::npos)
 			return;
-		Anope::string hash_method(nc->pass.begin(), nc->pass.begin() + pos);
+		Anope::string hash_method(nc->GetPassword().begin(), nc->GetPassword().begin() + pos);
 		if (!hash_method.equals_cs("sha1"))
 			return;
 
 		Anope::string buf;
 		this->OnEncrypt(req->GetPassword(), buf);
-		if (nc->pass.equals_cs(buf))
+		if (nc->GetPassword().equals_cs(buf))
 		{
 			if (ModuleManager::FindFirstOf(ENCRYPTION) != this)
-				Anope::Encrypt(req->GetPassword(), nc->pass);
+			{
+				Anope::string p;
+				Anope::Encrypt(req->GetPassword(), p);
+				nc->SetPassword(p);
+			}
 			req->Success(this);
 		}
 	}

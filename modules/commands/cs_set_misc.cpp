@@ -9,88 +9,82 @@
  */
 
 #include "module.h"
-#include "modules/set_misc.h"
+#include "modules/cs_set_misc.h"
 #include "modules/cs_info.h"
 #include "modules/cs_set.h"
 
-static Module *me;
-
 static Anope::map<Anope::string> descriptions;
 
-struct CSMiscData;
-static Anope::map<ExtensibleItem<CSMiscData> *> items;
-
-static ExtensibleItem<CSMiscData> *GetItem(const Anope::string &name)
+class CSMiscDataImpl : public CSMiscData
 {
-	ExtensibleItem<CSMiscData>* &it = items[name];
-	if (!it)
-		try
-		{
-			it = new ExtensibleItem<CSMiscData>(me, name);
-		}
-		catch (const ModuleException &) { }
-	return it;
-}
+ public:
+	CSMiscDataImpl(Serialize::TypeBase *type) : CSMiscData(type) { }
+	CSMiscDataImpl(Serialize::TypeBase *type, Serialize::ID id) : CSMiscData(type, id) { }
 
-struct CSMiscData : MiscData, Serializable
+	ChanServ::Channel *GetChannel() override;
+	void SetChannel(ChanServ::Channel *s) override;
+
+	Anope::string GetName() override;
+	void SetName(const Anope::string &n) override;
+
+	Anope::string GetData() override;
+	void SetData(const Anope::string &d) override;
+};
+
+class CSMiscDataType : public Serialize::Type<CSMiscDataImpl>
 {
-	CSMiscData(Extensible *obj) : Serializable("CSMiscData") { }
+ public:
+	Serialize::ObjectField<CSMiscDataImpl, ChanServ::Channel *> owner;
+	Serialize::Field<CSMiscDataImpl, Anope::string> name, data;
 
-	CSMiscData(ChanServ::Channel *c, const Anope::string &n, const Anope::string &d) : Serializable("CSMiscData")
+	CSMiscDataType(Module *me) : Serialize::Type<CSMiscDataImpl>(me, "CSMiscData")
+		, owner(this, "owner", true)
+		, name(this, "name")
+		, data(this, "data")
 	{
-		object = c->name;
-		name = n;
-		data = d;
-	}
-
-	void Serialize(Serialize::Data &sdata) const override
-	{
-		sdata["ci"] << this->object;
-		sdata["name"] << this->name;
-		sdata["data"] << this->data;
-	}
-
-	static Serializable* Unserialize(Serializable *obj, Serialize::Data &data)
-	{
-		Anope::string sci, sname, sdata;
-
-		data["ci"] >> sci;
-		data["name"] >> sname;
-		data["data"] >> sdata;
-
-		ChanServ::Channel *ci = ChanServ::Find(sci);
-		if (ci == NULL)
-			return NULL;
-
-		CSMiscData *d = NULL;
-		if (obj)
-		{
-			d = anope_dynamic_static_cast<CSMiscData *>(obj);
-			d->object = ci->name;
-			data["name"] >> d->name;
-			data["data"] >> d->data;
-		}
-		else
-		{
-			ExtensibleItem<CSMiscData> *item = GetItem(sname);
-			if (item)
-				d = item->Set(ci, CSMiscData(ci, sname, sdata));
-		}
-
-		return d;
 	}
 };
 
-static Anope::string GetAttribute(const Anope::string &command)
+ChanServ::Channel *CSMiscDataImpl::GetChannel()
 {
-	size_t sp = command.rfind(' ');
-	if (sp != Anope::string::npos)
-		return command.substr(sp + 1);
-	return command;
+	return Get(&CSMiscDataType::owner);
+}
+
+void CSMiscDataImpl::SetChannel(ChanServ::Channel *s)
+{
+	Set(&CSMiscDataType::owner, s);
+}
+
+Anope::string CSMiscDataImpl::GetName()
+{
+	return Get(&CSMiscDataType::name);
+}
+
+void CSMiscDataImpl::SetName(const Anope::string &n)
+{
+	Set(&CSMiscDataType::name, n);
+}
+
+Anope::string CSMiscDataImpl::GetData()
+{
+	return Get(&CSMiscDataType::data);
+}
+
+void CSMiscDataImpl::SetData(const Anope::string &d)
+{
+	Set(&CSMiscDataType::data, d);
 }
 
 class CommandCSSetMisc : public Command
 {
+	Anope::string GetAttribute(const Anope::string &command)
+	{
+		size_t sp = command.rfind(' ');
+		if (sp != Anope::string::npos)
+			return command.substr(sp + 1);
+		return command;
+	}
+
  public:
 	CommandCSSetMisc(Module *creator, const Anope::string &cname = "chanserv/set/misc") : Command(creator, cname, 1, 2)
 	{
@@ -122,27 +116,34 @@ class CommandCSSetMisc : public Command
 
 		if (MOD_RESULT != EVENT_ALLOW && !source.AccessFor(ci).HasPriv("SET") && source.permission.empty() && !source.HasPriv("chanserv/administration"))
 		{
-			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "SET", ci->name);
+			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "SET", ci->GetName());
 			return;
 		}
 
 		Anope::string scommand = GetAttribute(source.command);
-		Anope::string key = "cs_set_misc:" + scommand;
-		ExtensibleItem<CSMiscData> *item = GetItem(key);
-		if (item == NULL)
-			return;
+
+		/* remove existing */
+		for (CSMiscData *data : ci->GetRefs<CSMiscData *>(csmiscdata))
+			if (data->GetName() == scommand)
+			{
+				data->Delete();
+				break;
+			}
 
 		if (!param.empty())
 		{
-			item->Set(ci, CSMiscData(ci, key, param));
+			CSMiscData *data = csmiscdata.Create();
+			data->SetChannel(ci);
+			data->SetName(scommand);
+			data->SetData(param);
+
 			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to change it to " << param;
-			source.Reply(_("\002{0}\002 for \002{1}\002 set to \002{2}\002."), scommand, ci->name, param);
+			source.Reply(_("\002{0}\002 for \002{1}\002 set to \002{2}\002."), scommand, ci->GetName(), param);
 		}
 		else
 		{
-			item->Unset(ci);
 			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to unset it";
-			source.Reply(_("\002{0}\002 for \002{1}\002 unset."), scommand, ci->name);
+			source.Reply(_("\002{0}\002 for \002{1}\002 unset."), scommand, ci->GetName());
 		}
 	}
 
@@ -170,21 +171,14 @@ class CSSetMisc : public Module
 	, public EventHook<Event::ChanInfo>
 {
 	CommandCSSetMisc commandcssetmisc;
-	Serialize::Type csmiscdata_type;
+	CSMiscDataType type;
 
  public:
 	CSSetMisc(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
 		, EventHook<Event::ChanInfo>("OnChanInfo")
 		, commandcssetmisc(this)
-		, csmiscdata_type("CSMiscData", CSMiscData::Unserialize)
+		, type(this)
 	{
-		me = this;
-	}
-
-	~CSSetMisc()
-	{
-		for (Anope::map<ExtensibleItem<CSMiscData> *>::iterator it = items.begin(); it != items.end(); ++it)
-			delete it->second;
 	}
 
 	void OnReload(Configuration::Conf *conf) override
@@ -210,14 +204,8 @@ class CSSetMisc : public Module
 
 	void OnChanInfo(CommandSource &source, ChanServ::Channel *ci, InfoFormatter &info, bool) override
 	{
-		for (Anope::map<ExtensibleItem<CSMiscData> *>::iterator it = items.begin(); it != items.end(); ++it)
-		{
-			ExtensibleItem<CSMiscData> *e = it->second;
-			MiscData *data = e->Get(ci);
-
-			if (data != NULL)
-				info[e->name.substr(12).replace_all_cs("_", " ")] = data->data;
-		}
+		for (CSMiscData *data : ci->GetRefs<CSMiscData *>(csmiscdata))
+			info[data->GetName()] = data->GetData();
 	}
 };
 

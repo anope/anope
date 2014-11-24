@@ -12,89 +12,79 @@
 #include "module.h"
 #include "modules/cs_entrymsg.h"
 
-struct EntryMsgImpl : EntryMsg, Serializable
+class EntryMsgImpl : public EntryMsg
 {
-	EntryMsgImpl() : Serializable("EntryMsg")
-	{
-	}
+ public:
+	EntryMsgImpl(Serialize::TypeBase *type) : EntryMsg(type) { }
+	EntryMsgImpl(Serialize::TypeBase *type, Serialize::ID id) : EntryMsg(type, id) { }
 
-	EntryMsgImpl(ChanServ::Channel *c, const Anope::string &cname, const Anope::string &cmessage, time_t ct = Anope::CurTime) : Serializable("EntryMsg")
-	{
-		this->chan = c->name;
-		this->creator = cname;
-		this->message = cmessage;
-		this->when = ct;
-	}
+	ChanServ::Channel *GetChannel() override;
+	void SetChannel(ChanServ::Channel *ci) override;
 
-	~EntryMsgImpl();
+	Anope::string GetCreator() override;
+	void SetCreator(const Anope::string &c) override;
 
-	void Serialize(Serialize::Data &data) const override
-	{
-		data["ci"] << this->chan;
-		data["creator"] << this->creator;
-		data["message"] << this->message;
-		data.SetType("when", Serialize::Data::DT_INT); data["when"] << this->when;
-	}
+	Anope::string GetMessage() override;
+	void SetMessage(const Anope::string &m) override;
 
-	static Serializable* Unserialize(Serializable *obj, Serialize::Data &data);
+	time_t GetWhen() override;
+	void SetWhen(const time_t &t) override;
 };
 
-struct EntryMessageListImpl : EntryMessageList
+class EntryMsgType : public Serialize::Type<EntryMsgImpl>
 {
-	EntryMessageListImpl(Extensible *) { }
+ public:
+	Serialize::ObjectField<EntryMsgImpl, ChanServ::Channel *> chan;
+	Serialize::Field<EntryMsgImpl, Anope::string> creator, message;
+	Serialize::Field<EntryMsgImpl, time_t> when;
 
-	EntryMsg* Create() override
+	EntryMsgType(Module *me) : Serialize::Type<EntryMsgImpl>(me, "EntryMsg")
+		, chan(this, "chan", true)
+		, creator(this, "creator")
+		, message(this, "message")
+		, when(this, "when")
 	{
-		return new EntryMsgImpl();
 	}
 };
 
-EntryMsgImpl::~EntryMsgImpl()
+ChanServ::Channel *EntryMsgImpl::GetChannel()
 {
-	ChanServ::Channel *ci = ChanServ::Find(this->chan);
-	if (!ci)
-		return;
-
-	EntryMessageList *messages = ci->GetExt<EntryMessageList>("entrymsg");
-	if (!messages)
-		return;
-
-	std::vector<EntryMsg *>::iterator it = std::find((*messages)->begin(), (*messages)->end(), this);
-	if (it != (*messages)->end())
-		(*messages)->erase(it);
+	return Get(&EntryMsgType::chan);
 }
 
-
-Serializable* EntryMsgImpl::Unserialize(Serializable *obj, Serialize::Data &data)
+void EntryMsgImpl::SetChannel(ChanServ::Channel *ci)
 {
-	Anope::string sci, screator, smessage;
-	time_t swhen;
+	Set(&EntryMsgType::chan, ci);
+}
 
-	data["ci"] >> sci;
-	data["creator"] >> screator;
-	data["message"] >> smessage;
+Anope::string EntryMsgImpl::GetCreator()
+{
+	return Get(&EntryMsgType::creator);
+}
 
-	ChanServ::Channel *ci = ChanServ::Find(sci);
-	if (!ci)
-		return NULL;
+void EntryMsgImpl::SetCreator(const Anope::string &c)
+{
+	Set(&EntryMsgType::creator, c);
+}
 
-	if (obj)
-	{
-		EntryMsgImpl *msg = anope_dynamic_static_cast<EntryMsgImpl *>(obj);
-		msg->chan = ci->name;
-		data["creator"] >> msg->creator;
-		data["message"] >> msg->message;
-		data["when"] >> msg->when;
-		return msg;
-	}
+Anope::string EntryMsgImpl::GetMessage()
+{
+	return Get(&EntryMsgType::message);
+}
 
-	EntryMessageList *messages = ci->Require<EntryMessageList>("entrymsg");
+void EntryMsgImpl::SetMessage(const Anope::string &m)
+{
+	Set(&EntryMsgType::message, m);
+}
 
-	data["when"] >> swhen;
+time_t EntryMsgImpl::GetWhen()
+{
+	return Get(&EntryMsgType::when);
+}
 
-	EntryMsgImpl *m = new EntryMsgImpl(ci, screator, smessage, swhen);
-	(*messages)->push_back(m);
-	return m;
+void EntryMsgImpl::SetWhen(const time_t &t)
+{
+	Set(&EntryMsgType::when, t);
 }
 
 class CommandEntryMessage : public Command
@@ -102,27 +92,27 @@ class CommandEntryMessage : public Command
  private:
 	void DoList(CommandSource &source, ChanServ::Channel *ci)
 	{
-		EntryMessageList *messages = ci->Require<EntryMessageList>("entrymsg");
+		std::vector<EntryMsg *> messages = ci->GetRefs<EntryMsg *>(entrymsg);
 
-		if ((*messages)->empty())
+		if (messages.empty())
 		{
-			source.Reply(_("Entry message list for \002{0}\002 is empty."), ci->name);
+			source.Reply(_("Entry message list for \002{0}\002 is empty."), ci->GetName());
 			return;
 		}
 
-		source.Reply(_("Entry message list for \002{0}\002:"), ci->name);
+		source.Reply(_("Entry message list for \002{0}\002:"), ci->GetName());
 
 		ListFormatter list(source.GetAccount());
 		list.AddColumn(_("Number")).AddColumn(_("Creator")).AddColumn(_("Created")).AddColumn(_("Message"));
-		for (unsigned i = 0; i < (*messages)->size(); ++i)
+		for (unsigned i = 0; i < messages.size(); ++i)
 		{
-			EntryMsg *msg = (*messages)->at(i);
+			EntryMsg *msg = messages[i];
 
 			ListFormatter::ListEntry entry;
 			entry["Number"] = stringify(i + 1);
-			entry["Creator"] = msg->creator;
-			entry["Created"] = Anope::strftime(msg->when, NULL, true);
-			entry["Message"] = msg->message;
+			entry["Creator"] = msg->GetCreator();
+			entry["Created"] = Anope::strftime(msg->GetWhen(), NULL, true);
+			entry["Message"] = msg->GetMessage();
 			list.AddEntry(entry);
 		}
 
@@ -136,55 +126,58 @@ class CommandEntryMessage : public Command
 
 	void DoAdd(CommandSource &source, ChanServ::Channel *ci, const Anope::string &message)
 	{
-		EntryMessageList *messages = ci->Require<EntryMessageList>("entrymsg");
+		std::vector<EntryMsg *> messages = ci->GetRefs<EntryMsg *>(entrymsg);
 
-		if ((*messages)->size() >= Config->GetModule(this->owner)->Get<unsigned>("maxentries"))
-			source.Reply(_("The entry message list for \002{0}\002 is full."), ci->name);
-		else
+		if (messages.size() >= Config->GetModule(this->owner)->Get<unsigned>("maxentries"))
 		{
-			(*messages)->push_back(new EntryMsgImpl(ci, source.GetNick(), message));
-			Log(source.IsFounder(ci) ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to add a message";
-			source.Reply(_("Entry message added to \002{0}\002"), ci->name);
+			source.Reply(_("The entry message list for \002{0}\002 is full."), ci->GetName());
+			return;
 		}
+
+		EntryMsg *msg = entrymsg.Create();
+		msg->SetChannel(ci);
+		msg->SetCreator(source.GetNick());
+		msg->SetMessage(message);
+		Log(source.IsFounder(ci) ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to add a message";
+		source.Reply(_("Entry message added to \002{0}\002"), ci->GetName());
 	}
 
 	void DoDel(CommandSource &source, ChanServ::Channel *ci, const Anope::string &message)
 	{
-		EntryMessageList *messages = ci->Require<EntryMessageList>("entrymsg");
+		std::vector<EntryMsg *> messages = ci->GetRefs<EntryMsg *>(entrymsg);
 
 		if (!message.is_pos_number_only())
-			source.Reply(("Entry message \002{0}\002 not found on channel \002{1}\002."), message, ci->name);
-		else if ((*messages)->empty())
-			source.Reply(_("Entry message list for \002{0}\002 is empty."), ci->name);
+			source.Reply(("Entry message \002{0}\002 not found on channel \002{1}\002."), message, ci->GetName());
+		else if (messages.empty())
+			source.Reply(_("Entry message list for \002{0}\002 is empty."), ci->GetName());
 		else
 		{
 			try
 			{
 				unsigned i = convertTo<unsigned>(message);
-				if (i > 0 && i <= (*messages)->size())
+				if (i > 0 && i <= messages.size())
 				{
-					delete (*messages)->at(i - 1);
-					if ((*messages)->empty())
-						ci->Shrink<EntryMessageList>("entrymsg");
+					delete messages[i - 1];
 					Log(source.IsFounder(ci) ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to remove a message";
-					source.Reply(_("Entry message \002{0}\002 for \002{1]\002 deleted."), i, ci->name);
+					source.Reply(_("Entry message \002{0}\002 for \002{1]\002 deleted."), i, ci->GetName());
 				}
 				else
 					throw ConvertException();
 			}
 			catch (const ConvertException &)
 			{
-				source.Reply(_("Entry message \002{0}\002 not found on channel \002{1}\002."), message, ci->name);
+				source.Reply(_("Entry message \002{0}\002 not found on channel \002{1}\002."), message, ci->GetName());
 			}
 		}
 	}
 
 	void DoClear(CommandSource &source, ChanServ::Channel *ci)
 	{
-		ci->Shrink<EntryMessageList>("entrymsg");
+		for (EntryMsg *e : ci->GetRefs<EntryMsg *>(entrymsg))
+			delete e;
 
 		Log(source.IsFounder(ci) ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to remove all messages";
-		source.Reply(_("Entry messages for \002{0}\002 have been cleared."), ci->name);
+		source.Reply(_("Entry messages for \002{0}\002 have been cleared."), ci->GetName());
 	}
 
  public:
@@ -216,7 +209,7 @@ class CommandEntryMessage : public Command
 
 		if (!source.IsFounder(ci) && !source.HasPriv("chanserv/administration"))
 		{
-			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "FOUNDER", ci->name);
+			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "FOUNDER", ci->GetName());
 			return;
 		}
 
@@ -257,28 +250,21 @@ class CSEntryMessage : public Module
 	, public EventHook<Event::JoinChannel>
 {
 	CommandEntryMessage commandentrymsg;
-	ExtensibleItem<EntryMessageListImpl> eml;
-	Serialize::Type entrymsg_type;
+	EntryMsgType entrymsg_type;
 
  public:
 	CSEntryMessage(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
 		, EventHook<Event::JoinChannel>("OnJoinChannel")
 		, commandentrymsg(this)
-		, eml(this, "entrymsg")
-		, entrymsg_type("EntryMsg", EntryMsgImpl::Unserialize)
+		, entrymsg_type(this)
 	{
 	}
 
 	void OnJoinChannel(User *u, Channel *c) override
 	{
 		if (u && c && c->ci && u->server->IsSynced())
-		{
-			EntryMessageList *messages = c->ci->GetExt<EntryMessageList>("entrymsg");
-
-			if (messages != NULL)
-				for (unsigned i = 0; i < (*messages)->size(); ++i)
-					u->SendMessage(c->ci->WhoSends(), "[%s] %s", c->ci->name.c_str(), (*messages)->at(i)->message.c_str());
-		}
+			for (EntryMsg *msg : c->ci->GetRefs<EntryMsg *>(entrymsg))
+				u->SendMessage(c->ci->WhoSends(), "[{0}] {1}", c->ci->GetName(), msg->GetMessage());
 	}
 };
 

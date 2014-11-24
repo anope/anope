@@ -52,7 +52,7 @@ class CommandOSNOOP : public Command
 		}
 		else if (cmd.equals_ci("REVOKE"))
 		{
-			s->Shrink<Anope::string>("noop");
+			s->ShrinkOK<Anope::string>("noop");
 			IRCD->SendSVSNOOP(s, false);
 			Log(LOG_ADMIN, source, this) << "REVOKE on " << s->GetName();
 			source.Reply(_("All O:lines of \002{0}\002 have been reset."), s->GetName());
@@ -73,7 +73,7 @@ class OSNOOP : public Module
 	, public EventHook<Event::UserModeSet>
 {
 	CommandOSNOOP commandosnoop;
-	PrimitiveExtensibleItem<Anope::string> noop;
+	ExtensibleItem<Anope::string> noop;
 
  public:
 	OSNOOP(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
@@ -90,7 +90,7 @@ class OSNOOP : public Module
 		if (mname == "OPER" && (setter = noop.Get(u->server)))
 		{
 			Anope::string reason = "NOOP command used by " + *setter;
-			BotInfo *OperServ = Config->GetClient("OperServ");
+			ServiceBot *OperServ = Config->GetClient("OperServ");
 			u->Kill(OperServ ? OperServ->nick : "", reason);
 		}
 	}

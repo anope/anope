@@ -28,8 +28,15 @@ extern CoreExport int OperCount;
 extern CoreExport unsigned MaxUserCount;
 extern CoreExport time_t MaxUserTime;
 
+enum class UserType
+{
+	USER,
+	//LOCAL_USER,
+	BOT
+};
+
 /* Online user and channel data. */
-class CoreExport User : public virtual Base, public Extensible, public CommandReply
+class CoreExport User : public virtual Base, public virtual Extensible, public CommandReply
 {
 	/* true if the user was quit or killed */
 	bool quit;
@@ -55,7 +62,9 @@ class CoreExport User : public virtual Base, public Extensible, public CommandRe
 	time_t invalid_pw_time;
 
 
- public: // XXX: exposing a tiny bit too much
+ public:
+	UserType type = UserType::USER;
+
  	/* User's current nick */
 	Anope::string nick;
 
@@ -276,34 +285,34 @@ class CoreExport User : public virtual Base, public Extensible, public CommandRe
 	 * @param um The user mode
 	 * @param Param Optional param for the mode
 	 */
-	void SetMode(BotInfo *bi, UserMode *um, const Anope::string &param = "");
+	void SetMode(ServiceBot *bi, UserMode *um, const Anope::string &param = "");
 
 	/** Set a mode on the user
 	 * @param bi The client setting the mode
 	 * @param name The mode name
 	 * @param Param Optional param for the mode
 	 */
-	void SetMode(BotInfo *bi, const Anope::string &name, const Anope::string &param = "");
+	void SetMode(ServiceBot *bi, const Anope::string &name, const Anope::string &param = "");
 
 	/** Remove a mode on the user
 	 * @param bi The client setting the mode
 	 * @param um The user mode
 	 * @param param Optional param for the mode
 	 */
-	void RemoveMode(BotInfo *bi, UserMode *um, const Anope::string &param = "");
+	void RemoveMode(ServiceBot *bi, UserMode *um, const Anope::string &param = "");
 
 	/** Remove a mode from the user
 	 * @param bi The client setting the mode
 	 * @param name The mode name
 	 * @param param Optional param for the mode
 	 */
-	void RemoveMode(BotInfo *bi, const Anope::string &name, const Anope::string &param = "");
+	void RemoveMode(ServiceBot *bi, const Anope::string &name, const Anope::string &param = "");
 
 	/** Set a string of modes on a user
 	 * @param bi The client setting the modes
 	 * @param umodes The modes
 	 */
-	void SetModes(BotInfo *bi, const char *umodes, ...);
+	void SetModes(ServiceBot *bi, const char *umodes, ...);
 
 	/** Set a string of modes on a user internally
 	 * @param setter who/what is setting the mode
@@ -375,5 +384,14 @@ class CoreExport User : public virtual Base, public Extensible, public CommandRe
 	/** Quits all users who are pending to be quit
 	 */
 	static void QuitUsers();
+};
+
+class LocalUser : public User
+{
+ public:
+	using User::User;
+
+	/* Last time this user said something */
+	time_t lastmsg = 0;
 };
 

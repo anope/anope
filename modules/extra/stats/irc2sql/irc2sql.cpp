@@ -25,7 +25,7 @@ void IRC2SQL::OnReload(Configuration::Conf *conf)
 	const Anope::string &snick = block->Get<const Anope::string>("client");
 	if (snick.empty())
 		throw ConfigException(Module::name + ": <client> must be defined");
-	StatServ = BotInfo::Find(snick, true);
+	StatServ = ServiceBot::Find(snick, true);
 	if (!StatServ)
 		throw ConfigException(Module::name + ": no bot named " + snick);
 
@@ -99,7 +99,7 @@ void IRC2SQL::OnUserConnect(User *u, bool &exempt)
 	query.SetValue("ident", u->GetIdent());
 	query.SetValue("vident", u->GetVIdent());
 	query.SetValue("secure", u->HasMode("SSL") || u->HasExt("ssl") ? "Y" : "N");
-	query.SetValue("account", u->Account() ? u->Account()->display : "");
+	query.SetValue("account", u->Account() ? u->Account()->GetDisplay() : "");
 	query.SetValue("fingerprint", u->fingerprint);
 	query.SetValue("signon", u->signon);
 	query.SetValue("server", u->server->GetName());
@@ -158,7 +158,7 @@ void IRC2SQL::OnUserLogin(User *u)
 {
 	query = "UPDATE `" + prefix + "user` SET account=@account@ WHERE nick=@nick@";
 	query.SetValue("nick", u->nick);
-	query.SetValue("account", u->Account() ? u->Account()->display : "");
+	query.SetValue("account", u->Account() ? u->Account()->GetDisplay() : "");
 	this->RunQuery(query);
 }
 
@@ -255,7 +255,7 @@ void IRC2SQL::OnTopicUpdated(Channel *c, const Anope::string &user, const Anope:
 	this->RunQuery(query);
 }
 
-void IRC2SQL::OnBotNotice(User *u, BotInfo *bi, Anope::string &message)
+void IRC2SQL::OnBotNotice(User *u, ServiceBot *bi, Anope::string &message)
 {
 	Anope::string versionstr;
 	if (bi != StatServ)

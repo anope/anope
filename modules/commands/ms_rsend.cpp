@@ -23,6 +23,7 @@ class CommandMSRSend : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
+#if 0
 		if (!MemoServ::service)
 			return;
 
@@ -37,7 +38,7 @@ class CommandMSRSend : public Command
 		const NickServ::Nick *na = NULL;
 
 		/* prevent user from rsend to themselves */
-		if ((na = NickServ::FindNick(nick)) && na->nc == source.GetAccount())
+		if ((na = NickServ::FindNick(nick)) && na->GetAccount() == source.GetAccount())
 		{
 			source.Reply(_("You can not request a receipt when sending a memo to yourself."));
 			return;
@@ -67,6 +68,7 @@ class CommandMSRSend : public Command
 					m->receipt = true;
 			}
 		}
+#endif
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override

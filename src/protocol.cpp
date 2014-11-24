@@ -480,9 +480,9 @@ User *MessageSource::GetUser() const
 	return this->u;
 }
 
-BotInfo *MessageSource::GetBot() const
+ServiceBot *MessageSource::GetBot() const
 {
-	return BotInfo::Find(this->GetName(), true);
+	return ServiceBot::Find(this->GetName(), true);
 }
 
 Server *MessageSource::GetServer() const

@@ -40,13 +40,9 @@ class NSMaxEmail : public Module
 		if (email.empty())
 			return 0;
 
-		for (auto& it : NickServ::service->GetAccountList())
-		{
-			const NickServ::Account *nc = it.second;
-
-			if (unc != nc && !nc->email.empty() && nc->email.equals_ci(email))
+		for (NickServ::Account *nc : NickServ::service->GetAccountList())
+			if (unc != nc && !nc->GetEmail().empty() && nc->GetEmail().equals_ci(email))
 				++count;
-		}
 
 		return count;
 	}
@@ -74,7 +70,7 @@ class NSMaxEmail : public Module
 		}
 		else if (command->name == "nickserv/ungroup" && source.GetAccount())
 		{
-			if (this->CheckLimitReached(source, source.GetAccount()->email))
+			if (this->CheckLimitReached(source, source.GetAccount()->GetEmail()))
 				return EVENT_STOP;
 		}
 

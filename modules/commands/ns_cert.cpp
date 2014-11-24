@@ -16,8 +16,9 @@
 static Anope::hash_map<NickServ::Account *> certmap;
 static EventHandlers<Event::NickCertEvents> *events;
 
-struct CertServiceImpl : CertService
+class CertServiceImpl : public CertService
 {
+ public:
 	CertServiceImpl(Module *o) : CertService(o) { }
 
 	NickServ::Account* FindAccountFromCert(const Anope::string &cert) override
@@ -27,150 +28,123 @@ struct CertServiceImpl : CertService
 			return it->second;
 		return NULL;
 	}
+
+	bool Matches(User *u, NickServ::Account *nc) override
+	{
+		std::vector<NSCertEntry *> cl = nc->GetRefs<NSCertEntry *>(certentry);
+		return !u->fingerprint.empty() && FindCert(cl, u->fingerprint);
+	}
+
+	NSCertEntry *FindCert(const std::vector<NSCertEntry *> &cl, const Anope::string &certfp) override
+	{
+		for (NSCertEntry *e : cl)
+			if (e->GetCert() == certfp)
+				return e;
+		return nullptr;
+	}
 };
 
-struct NSCertListImpl : NSCertList
+class NSCertEntryImpl : public NSCertEntry
 {
-	Serialize::Reference<NickServ::Account> nc;
-	std::vector<Anope::string> certs;
-
  public:
-	NSCertListImpl(Extensible *obj) : nc(anope_dynamic_static_cast<NickServ::Account *>(obj)) { }
+	NSCertEntryImpl(Serialize::TypeBase *type) : NSCertEntry(type) { }
+	NSCertEntryImpl(Serialize::TypeBase *type, Serialize::ID id) : NSCertEntry(type, id) { }
+	~NSCertEntryImpl();
 
-	~NSCertListImpl()
-	{
-		ClearCert();
-	}
+	NickServ::Account *GetAccount() override;
+	void SetAccount(NickServ::Account *) override;
 
-	/** Add an entry to the nick's certificate list
-	 *
-	 * @param entry The fingerprint to add to the cert list
-	 *
-	 * Adds a new entry into the cert list.
-	 */
-	void AddCert(const Anope::string &entry) override
-	{
-		this->certs.push_back(entry);
-		certmap[entry] = nc;
-		(*events)(&Event::NickCertEvents::OnNickAddCert, this->nc, entry);
-	}
-
-	/** Get an entry from the nick's cert list by index
-	 *
-	 * @param entry Index in the certificaate list vector to retrieve
-	 * @return The fingerprint entry of the given index if within bounds, an empty string if the vector is empty or the index is out of bounds
-	 *
-	 * Retrieves an entry from the certificate list corresponding to the given index.
-	 */
-	Anope::string GetCert(unsigned entry) const override
-	{
-		if (entry >= this->certs.size())
-			return "";
-		return this->certs[entry];
-	}
-
-	unsigned GetCertCount() const override
-	{
-		return this->certs.size();
-	}
-
-	/** Find an entry in the nick's cert list
-	 *
-	 * @param entry The fingerprint to search for
-	 * @return True if the fingerprint is found in the cert list, false otherwise
-	 *
-	 * Search for an fingerprint within the cert list.
-	 */
-	bool FindCert(const Anope::string &entry) const override
-	{
-		return std::find(this->certs.begin(), this->certs.end(), entry) != this->certs.end();
-	}
-
-	/** Erase a fingerprint from the nick's certificate list
-	 *
-	 * @param entry The fingerprint to remove
-	 *
-	 * Removes the specified fingerprint from the cert list.
-	 */
-	void EraseCert(const Anope::string &entry) override
-	{
-		std::vector<Anope::string>::iterator it = std::find(this->certs.begin(), this->certs.end(), entry);
-		if (it != this->certs.end())
-		{
-			(*events)(&Event::NickCertEvents::OnNickEraseCert, this->nc, entry);
-			certmap.erase(entry);
-			this->certs.erase(it);
-		}
-	}
-
-	/** Clears the entire nick's cert list
-	 *
-	 * Deletes all the memory allocated in the certificate list vector and then clears the vector.
-	 */
-	void ClearCert() override
-	{
-		(*events)(&Event::NickCertEvents::OnNickClearCert, this->nc);
-		for (unsigned i = 0; i < certs.size(); ++i)
-			certmap.erase(certs[i]);
-		this->certs.clear();
-	}
-
-	void Check() override
-	{
-		if (this->certs.empty())
-			nc->Shrink<NSCertList>("certificates");
-	}
-
-	struct ExtensibleItem : ::ExtensibleItem<NSCertListImpl>
-	{
-		ExtensibleItem(Module *m, const Anope::string &ename) : ::ExtensibleItem<NSCertListImpl>(m, ename) { }
-
-		void ExtensibleSerialize(const Extensible *e, const Serializable *s, Serialize::Data &data) const override
-		{
-			if (s->GetSerializableType()->GetName() != "NickServ::Account")
-				return;
-
-			const NickServ::Account *n = anope_dynamic_static_cast<const NickServ::Account *>(e);
-			NSCertList *c = this->Get(n);
-			if (c == NULL || !c->GetCertCount())
-				return;
-
-			for (unsigned i = 0; i < c->GetCertCount(); ++i)
-				data["cert"] << c->GetCert(i) << " ";
-		}
-
-		void ExtensibleUnserialize(Extensible *e, Serializable *s, Serialize::Data &data) override
-		{
-			if (s->GetSerializableType()->GetName() != "NickServ::Account")
-				return;
-
-			NickServ::Account *n = anope_dynamic_static_cast<NickServ::Account *>(e);
-			NSCertListImpl *c = this->Require(n);
-
-			Anope::string buf;
-			data["cert"] >> buf;
-			spacesepstream sep(buf);
-			for (unsigned i = 0; i < c->certs.size(); ++i)
-				certmap.erase(c->certs[i]);
-			c->certs.clear();
-			while (sep.GetToken(buf))
-			{
-				c->certs.push_back(buf);
-				certmap[buf] = n;
-			}
-		}
-	};
+	Anope::string GetCert() override;
+	void SetCert(const Anope::string &) override;
 };
+
+class NSCertEntryType : public Serialize::Type<NSCertEntryImpl>
+{
+ public:
+	struct Account : Serialize::ObjectField<NSCertEntryImpl, NickServ::Account *>
+	{
+		using Serialize::ObjectField<NSCertEntryImpl, NickServ::Account *>::ObjectField;
+
+		void SetField(NSCertEntryImpl *s, NickServ::Account *acc) override
+		{
+			const Anope::string &cert = s->GetCert();
+			if (!cert.empty())
+				certmap.erase(cert);
+
+			Serialize::ObjectField<NSCertEntryImpl, NickServ::Account *>::SetField(s, acc);
+
+			if (!cert.empty() && s->GetAccount())
+				certmap[cert] = acc;
+		}
+	} nc;
+
+	struct Mask : Serialize::Field<NSCertEntryImpl, Anope::string>
+	{
+		using Serialize::Field<NSCertEntryImpl, Anope::string>::Field;
+
+		void SetField(NSCertEntryImpl *s, const Anope::string &m) override
+		{
+			const Anope::string &old = GetField(s);
+			if (!old.empty())
+				certmap.erase(old);
+
+			Serialize::Field<NSCertEntryImpl, Anope::string>::SetField(s, m);
+
+			if (!m.empty() && s->GetAccount())
+				certmap[m] = s->GetAccount();
+		}
+	} mask;
+
+	NSCertEntryType(Module *me) : Serialize::Type<NSCertEntryImpl>(me, "NSCertEntry")
+		, nc(this, "nc", true)
+		, mask(this, "mask")
+	{
+	}
+};
+
+NSCertEntryImpl::~NSCertEntryImpl()
+{
+	const Anope::string &old = GetCert();
+	if (!old.empty())
+		certmap.erase(old);
+}
+
+NickServ::Account *NSCertEntryImpl::GetAccount()
+{
+	return Get<NickServ::Account *>(&NSCertEntryType::nc);
+}
+
+void NSCertEntryImpl::SetAccount(NickServ::Account *nc)
+{
+	Set(&NSCertEntryType::nc, nc);
+}
+
+Anope::string NSCertEntryImpl::GetCert()
+{
+	return Get<Anope::string>(&NSCertEntryType::mask);
+}
+
+void NSCertEntryImpl::SetCert(const Anope::string &mask)
+{
+	Set(&NSCertEntryType::mask, mask);
+}
 
 class CommandNSCert : public Command
 {
- private:
+	NSCertEntry *FindCert(const std::vector<NSCertEntry *> &cl, const Anope::string &certfp)
+	{
+		for (NSCertEntry *e : cl)
+			if (e->GetCert() == certfp)
+				return e;
+		return nullptr;
+	}
+
 	void DoAdd(CommandSource &source, NickServ::Account *nc, Anope::string certfp)
 	{
-		NSCertList *cl = nc->Require<NSCertList>("certificates");
+		std::vector<NSCertEntry *> cl = nc->GetRefs<NSCertEntry *>(certentry);
 		unsigned max = Config->GetModule(this->owner)->Get<unsigned>("max", "5");
 
-		if (cl->GetCertCount() >= max)
+		if (cl.size() >= max)
 		{
 			source.Reply(_("Sorry, the maximum of \002{0}\002 certificate entries has been reached."), max);
 			return;
@@ -189,9 +163,9 @@ class CommandNSCert : public Command
 			certfp = u->fingerprint;
 		}
 
-		if (cl->FindCert(certfp))
+		if (FindCert(cl, certfp))
 		{
-			source.Reply(_("Fingerprint \002{0}\002 already present on the certificate list of \002{0}\002."), certfp, nc->display);
+			source.Reply(_("Fingerprint \002{0}\002 already present on the certificate list of \002{0}\002."), certfp, nc->GetDisplay());
 			return;
 		}
 
@@ -201,14 +175,17 @@ class CommandNSCert : public Command
 			return;
 		}
 
-		cl->AddCert(certfp);
-		Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to ADD certificate fingerprint " << certfp << " to " << nc->display;
-		source.Reply(_("\002{0}\002 added to the certificate list of \002{1}\002."), certfp, nc->display);
+		NSCertEntry *e = certentry.Create();
+		e->SetAccount(nc);
+		e->SetCert(certfp);
+
+		Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to ADD certificate fingerprint " << certfp << " to " << nc->GetDisplay();
+		source.Reply(_("\002{0}\002 added to the certificate list of \002{1}\002."), certfp, nc->GetDisplay());
 	}
 
 	void DoDel(CommandSource &source, NickServ::Account *nc, Anope::string certfp)
 	{
-		NSCertList *cl = nc->Require<NSCertList>("certificates");
+		std::vector<NSCertEntry *> cl = nc->GetRefs<NSCertEntry *>(certentry);
 
 		if (certfp.empty())
 		{
@@ -223,34 +200,32 @@ class CommandNSCert : public Command
 			return;
 		}
 
-		if (!cl->FindCert(certfp))
+		NSCertEntry *cert = FindCert(cl, certfp);
+		if (!cert)
 		{
-			source.Reply(_("\002{0}\002 not found on the certificate list of \002{1}\002."), certfp, nc->display);
+			source.Reply(_("\002{0}\002 not found on the certificate list of \002{1}\002."), certfp, nc->GetDisplay());
 			return;
 		}
 
-		cl->EraseCert(certfp);
-		cl->Check();
-		Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to DELETE certificate fingerprint " << certfp << " from " << nc->display;
-		source.Reply(_("\002{0}\002 deleted from the access list of \002{1}\002."), certfp, nc->display);
+		cert->Delete();
+
+		Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to DELETE certificate fingerprint " << certfp << " from " << nc->GetDisplay();
+		source.Reply(_("\002{0}\002 deleted from the access list of \002{1}\002."), certfp, nc->GetDisplay());
 	}
 
-	void DoList(CommandSource &source, const NickServ::Account *nc)
+	void DoList(CommandSource &source, NickServ::Account *nc)
 	{
-		NSCertList *cl = nc->GetExt<NSCertList>("certificates");
+		std::vector<NSCertEntry *> cl = nc->GetRefs<NSCertEntry *>(certentry);
 
-		if (!cl || !cl->GetCertCount())
+		if (cl.empty())
 		{
-			source.Reply(_("The certificate list of \002{0}\002 is empty."), nc->display);
+			source.Reply(_("The certificate list of \002{0}\002 is empty."), nc->GetDisplay());
 			return;
 		}
 
-		source.Reply(_("Certificate list for \002{0}\002:"), nc->display);
-		for (unsigned i = 0; i < cl->GetCertCount(); ++i)
-		{
-			Anope::string fingerprint = cl->GetCert(i);
-			source.Reply("    {0}", fingerprint);
-		}
+		source.Reply(_("Certificate list for \002{0}\002:"), nc->GetDisplay());
+		for (NSCertEntry *e : cl)
+			source.Reply("    {0}", e->GetCert());
 	}
 
  public:
@@ -278,28 +253,28 @@ class CommandNSCert : public Command
 		NickServ::Account *nc;
 		if (!nick.empty() && source.HasPriv("nickserv/access"))
 		{
-			const NickServ::Nick *na = NickServ::FindNick(nick);
+			NickServ::Nick *na = NickServ::FindNick(nick);
 			if (na == NULL)
 			{
 				source.Reply(_("\002{0}\002 isn't registered."), nick);
 				return;
 			}
 
-			if (Config->GetModule("nickserv")->Get<bool>("secureadmins", "yes") && source.GetAccount() != na->nc && na->nc->IsServicesOper() && !cmd.equals_ci("LIST"))
+			if (Config->GetModule("nickserv")->Get<bool>("secureadmins", "yes") && source.GetAccount() != na->GetAccount() && na->GetAccount()->IsServicesOper() && !cmd.equals_ci("LIST"))
 			{
 				source.Reply(_("You may view, but not modify, the certificate list of other Services Operators."));
 				return;
 			}
 
-			nc = na->nc;
+			nc = na->GetAccount();
 		}
 		else
 			nc = source.nc;
 
 		if (cmd.equals_ci("LIST"))
 			return this->DoList(source, nc);
-		else if (nc->HasExt("NS_SUSPENDED"))
-			source.Reply(_("\002{0}\002 is suspended."), nc->display);
+		else if (nc->HasFieldS("NS_SUSPENDED"))
+			source.Reply(_("\002{0}\002 is suspended."), nc->GetDisplay());
 		else if (Anope::ReadOnly)
 			source.Reply(_("Services are in read-only mode."));
 		else if (cmd.equals_ci("ADD"))
@@ -332,7 +307,6 @@ class NSCert : public Module
 	, public EventHook<NickServ::Event::NickValidate>
 {
 	CommandNSCert commandnscert;
-	NSCertListImpl::ExtensibleItem certs;
 	CertServiceImpl cs;
 
 	EventHandlers<Event::NickCertEvents> onnickservevents;
@@ -342,7 +316,6 @@ class NSCert : public Module
 		, EventHook<Event::Fingerprint>("OnFingerprint")
 		, EventHook<NickServ::Event::NickValidate>("OnNickValidate")
 		, commandnscert(this)
-		, certs(this, "certificates")
 		, cs(this)
 		, onnickservevents(this, "OnNickCert")
 	{
@@ -354,33 +327,35 @@ class NSCert : public Module
 
 	void OnFingerprint(User *u) override
 	{
-		BotInfo *NickServ = Config->GetClient("NickServ");
+		ServiceBot *NickServ = Config->GetClient("NickServ");
 		if (!NickServ || u->IsIdentified())
 			return;
 
 		NickServ::Account *nc = cs.FindAccountFromCert(u->fingerprint);
-		if (!nc || nc->HasExt("NS_SUSPENDED"))
+		if (!nc || nc->HasFieldS("NS_SUSPENDED"))
 			return;
 
 		NickServ::Nick *na = NickServ::FindNick(u->nick);
-		if (na && na->nc == nc)
+		if (na && na->GetAccount() == nc)
 			u->Identify(na);
 		else
 			u->Login(nc);
 
-		u->SendMessage(NickServ, _("SSL certificate fingerprint accepted, you are now identified to \002%s\002."), nc->display.c_str());
-		Log(NickServ) << u->GetMask() << " automatically identified for account " << nc->display << " via SSL certificate fingerprint";
+		u->SendMessage(NickServ, _("SSL certificate fingerprint accepted, you are now identified to \002%s\002."), nc->GetDisplay().c_str());
+		Log(NickServ) << u->GetMask() << " automatically identified for account " << nc->GetDisplay() << " via SSL certificate fingerprint";
 	}
 
 	EventReturn OnNickValidate(User *u, NickServ::Nick *na) override
 	{
-		NSCertList *cl = certs.Get(na->nc);
-		if (!u->fingerprint.empty() && cl && cl->FindCert(u->fingerprint))
+		if (u->fingerprint.empty())
+			return EVENT_CONTINUE;
+
+		if (cs.Matches(u, na->GetAccount()))
 		{
-			BotInfo *NickServ = Config->GetClient("NickServ");
+			ServiceBot *NickServ = Config->GetClient("NickServ");
 			u->Identify(na);
 			u->SendMessage(NickServ, _("SSL certificate fingerprint accepted, you are now identified."));
-			Log(NickServ) << u->GetMask() << " automatically identified for account " << na->nc->display << " via SSL certificate fingerprint";
+			Log(NickServ) << u->GetMask() << " automatically identified for account " << na->GetAccount()->GetDisplay() << " via SSL certificate fingerprint";
 			return EVENT_ALLOW;
 		}
 

@@ -14,17 +14,38 @@ using namespace SQL;
 class SQLiteResult : public Result
 {
  public:
-	SQLiteResult(unsigned int i, const Query &q, const Anope::string &fq) : Result(i, q, fq)
+	SQLiteResult(sqlite3 *sql, unsigned int id, const Query &q, const Anope::string &fq, sqlite3_stmt *stmt) : Result(id, q, fq)
 	{
+		int cols = sqlite3_column_count(stmt);
+		for (int i = 0; i < cols; ++i)
+			this->columns.push_back(sqlite3_column_name(stmt, i));
+
+		int err;
+		while ((err = sqlite3_step(stmt)) == SQLITE_ROW)
+		{
+			std::vector<SQL::Result::Value> values;
+
+			for (int i = 0; i < cols; ++i)
+			{
+				const char *data = reinterpret_cast<const char *>(sqlite3_column_text(stmt, i));
+
+				Value v;
+				v.null = !data;
+				v.value = data ? data : "";
+				values.push_back(v);
+			}
+
+			this->values.push_back(values);
+		}
+
+		if (err != SQLITE_DONE)
+		{
+			error = sqlite3_errmsg(sql);
+		}
 	}
 
 	SQLiteResult(const Query &q, const Anope::string &fq, const Anope::string &err) : Result(0, q, fq, err)
 	{
-	}
-
-	void AddRow(const std::map<Anope::string, Anope::string> &data)
-	{
-		this->entries.push_back(data);
 	}
 };
 
@@ -32,7 +53,7 @@ class SQLiteResult : public Result
  */
 class SQLiteService : public Provider
 {
-	std::map<Anope::string, std::set<Anope::string> > active_schema;
+	std::map<Anope::string, std::set<Anope::string> > active_schema, indexes;
 
 	Anope::string database;
 
@@ -49,15 +70,20 @@ class SQLiteService : public Provider
 
 	Result RunQuery(const Query &query);
 
-	std::vector<Query> CreateTable(const Anope::string &table, const Data &data) override;
+	std::vector<Query> InitSchema(const Anope::string &prefix) override;
+	std::vector<Query> Replace(const Anope::string &table, const Query &, const std::set<Anope::string> &) override;
+	std::vector<Query> CreateTable(const Anope::string &, const Anope::string &table) override;
+	std::vector<Query> AlterTable(const Anope::string &, const Anope::string &table, const Anope::string &field, bool) override;
+	std::vector<Query> CreateIndex(const Anope::string &table, const Anope::string &field) override;
 
-	Query BuildInsert(const Anope::string &table, unsigned int id, Data &data);
+	Query BeginTransaction() override;
+	Query Commit() override;
+
+	Serialize::ID GetID(const Anope::string &) override;
 
 	Query GetTables(const Anope::string &prefix);
 
 	Anope::string BuildQuery(const Query &q);
-
-	Anope::string FromUnixtime(time_t);
 };
 
 class ModuleSQLite : public Module
@@ -155,136 +181,164 @@ Result SQLiteService::RunQuery(const Query &query)
 	sqlite3_stmt *stmt;
 	int err = sqlite3_prepare_v2(this->sql, real_query.c_str(), real_query.length(), &stmt, NULL);
 	if (err != SQLITE_OK)
-		return SQLiteResult(query, real_query, sqlite3_errmsg(this->sql));
-
-	std::vector<Anope::string> columns;
-	int cols = sqlite3_column_count(stmt);
-	columns.resize(cols);
-	for (int i = 0; i < cols; ++i)
-		columns[i] = sqlite3_column_name(stmt, i);
-
-	SQLiteResult result(0, query, real_query);
-
-	while ((err = sqlite3_step(stmt)) == SQLITE_ROW)
 	{
-		std::map<Anope::string, Anope::string> items;
-		for (int i = 0; i < cols; ++i)
-		{
-			const char *data = reinterpret_cast<const char *>(sqlite3_column_text(stmt, i));
-			if (data && *data)
-				items[columns[i]] = data;
-		}
-		result.AddRow(items);
+		return SQLiteResult(query, real_query, sqlite3_errmsg(this->sql));
 	}
 
-	result.id = sqlite3_last_insert_rowid(this->sql);
+	int id = sqlite3_last_insert_rowid(this->sql);
+	SQLiteResult result(this->sql, id, query, real_query, stmt);
 
 	sqlite3_finalize(stmt);
-
-	if (err != SQLITE_DONE)
-		return SQLiteResult(query, real_query, sqlite3_errmsg(this->sql));
 
 	return result;
 }
 
-std::vector<Query> SQLiteService::CreateTable(const Anope::string &table, const Data &data)
+std::vector<Query> SQLiteService::InitSchema(const Anope::string &prefix)
 {
 	std::vector<Query> queries;
-	std::set<Anope::string> &known_cols = this->active_schema[table];
 
-	if (known_cols.empty())
-	{
-		Log(LOG_DEBUG) << "m_sqlite: Fetching columns for " << table;
+	Query t = "CREATE TABLE IF NOT EXISTS `" + prefix + "id` ("
+		"`id`"
+		")";
+	queries.push_back(t);
 
-		Result columns = this->RunQuery("PRAGMA table_info(" + table + ")");
-		for (int i = 0; i < columns.Rows(); ++i)
-		{
-			const Anope::string &column = columns.Get(i, "name");
+	t = "CREATE TABLE IF NOT EXISTS `" + prefix + "objects` (`id` PRIMARY KEY, `type`)";
+	queries.push_back(t);
 
-			Log(LOG_DEBUG) << "m_sqlite: Column #" << i << " for " << table << ": " << column;
-			known_cols.insert(column);
-		}
-	}
+	t = "CREATE TABLE IF NOT EXISTS `" + prefix + "edges` ("
+		"`id`,"
+		"`field`,"
+		"`other_id`,"
+		"PRIMARY KEY (`id`, `field`)"
+		")";
+	queries.push_back(t);
 
-	if (known_cols.empty())
-	{
-		Anope::string query_text = "CREATE TABLE `" + table + "` (`id` INTEGER PRIMARY KEY, `timestamp` timestamp DEFAULT CURRENT_TIMESTAMP";
-
-		for (Data::Map::const_iterator it = data.data.begin(), it_end = data.data.end(); it != it_end; ++it)
-		{
-			known_cols.insert(it->first);
-
-			query_text += ", `" + it->first + "` ";
-			if (data.GetType(it->first) == Serialize::Data::DT_INT)
-				query_text += "int(11)";
-			else
-				query_text += "text";
-		}
-
-		query_text += ")";
-
-		queries.push_back(query_text);
-
-		query_text = "CREATE UNIQUE INDEX `" + table + "_id_idx` ON `" + table + "` (`id`)";
-		queries.push_back(query_text);
-
-		query_text = "CREATE INDEX `" + table + "_timestamp_idx` ON `" + table + "` (`timestamp`)";
-		queries.push_back(query_text);
-
-		query_text = "CREATE TRIGGER `" + table + "_trigger` AFTER UPDATE ON `" + table + "` FOR EACH ROW BEGIN UPDATE `" + table + "` SET `timestamp` = CURRENT_TIMESTAMP WHERE `id` = `old.id`; end;";
-		queries.push_back(query_text);
-	}
-	else
-		for (Data::Map::const_iterator it = data.data.begin(), it_end = data.data.end(); it != it_end; ++it)
-		{
-			if (known_cols.count(it->first) > 0)
-				continue;
-
-			known_cols.insert(it->first);
-
-			Anope::string query_text = "ALTER TABLE `" + table + "` ADD `" + it->first + "` ";
-			if (data.GetType(it->first) == Serialize::Data::DT_INT)
-				query_text += "int(11)";
-			else
-				query_text += "text";
-
-			queries.push_back(query_text);
-		}
+	t = "CREATE INDEX IF NOT EXISTS idx_edge ON `" + prefix + "edges` (other_id)";
+	queries.push_back(t);
 
 	return queries;
 }
 
-Query SQLiteService::BuildInsert(const Anope::string &table, unsigned int id, Data &data)
+std::vector<Query> SQLiteService::Replace(const Anope::string &table, const Query &q, const std::set<Anope::string> &keys)
 {
-	/* Empty columns not present in the data set */
-	const std::set<Anope::string> &known_cols = this->active_schema[table];
-	for (std::set<Anope::string>::iterator it = known_cols.begin(), it_end = known_cols.end(); it != it_end; ++it)
-		if (*it != "id" && *it != "timestamp" && data.data.count(*it) == 0)
-			data[*it] << "";
+	std::vector<Query> queries;
 
-	Anope::string query_text = "REPLACE INTO `" + table + "` (";
-	if (id > 0)
-		query_text += "`id`,";
-	for (Data::Map::const_iterator it = data.data.begin(), it_end = data.data.end(); it != it_end; ++it)
-		query_text += "`" + it->first + "`,";
+	Anope::string query_text = "INSERT OR IGNORE INTO `" + table + "` (";
+	for (const std::pair<Anope::string, QueryData> &p : q.parameters)
+		query_text += "`" + p.first + "`,";
 	query_text.erase(query_text.length() - 1);
 	query_text += ") VALUES (";
-	if (id > 0)
-		query_text += stringify(id) + ",";
-	for (Data::Map::const_iterator it = data.data.begin(), it_end = data.data.end(); it != it_end; ++it)
-		query_text += "@" + it->first + "@,";
+	for (const std::pair<Anope::string, QueryData> &p : q.parameters)
+		query_text += "@" + p.first + "@,";
 	query_text.erase(query_text.length() - 1);
 	query_text += ")";
 
 	Query query(query_text);
-	for (Data::Map::const_iterator it = data.data.begin(), it_end = data.data.end(); it != it_end; ++it)
+	query.parameters = q.parameters;
+	queries.push_back(query);
+
+	query_text = "UPDATE `" + table + "` SET ";
+	for (const std::pair<Anope::string, QueryData> &p : q.parameters)
+		if (!keys.count(p.first))
+			query_text += "`" + p.first + "` = @" + p.first + "@,";
+	query_text.erase(query_text.length() - 1);
+	unsigned int i = 0;
+	for (const Anope::string &key : keys)
 	{
-		Anope::string buf;
-		*it->second >> buf;
-		query.SetValue(it->first, buf);
+		if (!i++)
+			query_text += " WHERE ";
+		else
+			query_text += " AND ";
+		query_text += "`" + key + "` = @" + key + "@";
 	}
 
-	return query;
+	query = query_text;
+	query.parameters = q.parameters;
+	queries.push_back(query);
+
+	return queries;
+}
+
+std::vector<Query> SQLiteService::CreateTable(const Anope::string &prefix, const Anope::string &table)
+{
+	std::vector<Query> queries;
+
+	if (active_schema.find(prefix + table) == active_schema.end())
+	{
+		Query t = "CREATE TABLE IF NOT EXISTS `" + prefix + table + "` (`id` bigint(20) NOT NULL, PRIMARY KEY (`id`))";
+		queries.push_back(t);
+
+		active_schema[prefix + table];
+	}
+
+	return queries;
+}
+
+std::vector<Query> SQLiteService::AlterTable(const Anope::string &prefix, const Anope::string &table, const Anope::string &field, bool)
+{
+	std::vector<Query> queries;
+	std::set<Anope::string> &s = active_schema[prefix + table];
+
+	if (!s.count(field))
+	{
+		Query t =  "ALTER TABLE `" + prefix + table + "` ADD `" + field + "` COLLATE NOCASE";
+		queries.push_back(t);
+		s.insert(field);
+	}
+
+	return queries;
+}
+
+std::vector<Query> SQLiteService::CreateIndex(const Anope::string &table, const Anope::string &field)
+{
+	std::vector<Query> queries;
+
+	if (indexes[table].count(field))
+		return queries;
+
+	Query t = "CREATE INDEX IF NOT EXISTS idx_" + field + " ON `" + table + "` (" + field + ")";
+	queries.push_back(t);
+
+	indexes[table].insert(field);
+
+	return queries;
+}
+
+Query SQLiteService::BeginTransaction()
+{
+	return Query("BEGIN TRANSACTION");
+}
+
+Query SQLiteService::Commit()
+{
+	return Query("COMMIT");
+}
+
+Serialize::ID SQLiteService::GetID(const Anope::string &prefix)
+{
+	/* must be in a deferred or reserved transaction here for atomic row update */
+
+	Query query("SELECT `id` FROM `" + prefix + "id`");
+	Serialize::ID id;
+
+	Result res = RunQuery(query);
+	if (res.Rows())
+	{
+		id = convertTo<Serialize::ID>(res.Get(0, "id"));
+
+		Query update_query("UPDATE `" + prefix + "id` SET `id` = `id` + 1");
+		RunQuery(update_query);
+	}
+	else
+	{
+		id = 0;
+
+		Query insert_query("INSERT INTO `" + prefix + "id` (id) VALUES(@id@)");
+		insert_query.SetValue("id", 1);
+		RunQuery(insert_query);
+	}
+
+	return id;
 }
 
 Query SQLiteService::GetTables(const Anope::string &prefix)
@@ -305,14 +359,21 @@ Anope::string SQLiteService::BuildQuery(const Query &q)
 	Anope::string real_query = q.query;
 
 	for (std::map<Anope::string, QueryData>::const_iterator it = q.parameters.begin(), it_end = q.parameters.end(); it != it_end; ++it)
-		real_query = real_query.replace_all_cs("@" + it->first + "@", (it->second.escape ? ("'" + this->Escape(it->second.data) + "'") : it->second.data));
+	{
+		const QueryData& qd = it->second;
+		Anope::string replacement;
+
+		if (qd.null)
+			replacement = "NULL";
+		else if (!qd.escape)
+			replacement = qd.data;
+		else
+			replacement = "'" + this->Escape(qd.data) + "'";
+
+		real_query = real_query.replace_all_cs("@" + it->first + "@", replacement);
+	}
 
 	return real_query;
-}
-
-Anope::string SQLiteService::FromUnixtime(time_t t)
-{
-	return "datetime('" + stringify(t) + "', 'unixepoch')";
 }
 
 MODULE_INIT(ModuleSQLite)

@@ -8,38 +8,25 @@ enum NewsType
 	NEWS_OPER
 };
 
-struct NewsMessages
-{
-	NewsType type;
-	Anope::string name;
-	const char *msgs[10];
-};
-
-struct NewsItem : Serializable
-{
-	NewsType type;
-	Anope::string text;
-	Anope::string who;
-	time_t time;
-
-	NewsItem() : Serializable("NewsItem") { }
-};
-
-class NewsService : public Service
+class NewsItem : public Serialize::Object
 {
  public:
-	NewsService(Module *m) : Service(m, "NewsService", "news") { }
+	using Serialize::Object::Object;
 
-	virtual NewsItem *CreateNewsItem() anope_abstract;
+	virtual NewsType GetNewsType() anope_abstract;
+	virtual void SetNewsType(const NewsType &) anope_abstract;
 
-	virtual void AddNewsItem(NewsItem *n) anope_abstract;
+	virtual Anope::string GetText() anope_abstract;
+	virtual void SetText(const Anope::string &) anope_abstract;
 
-	virtual void DelNewsItem(NewsItem *n) anope_abstract;
+	virtual Anope::string GetWho() anope_abstract;
+	virtual void SetWho(const Anope::string &) anope_abstract;
 
-	virtual std::vector<NewsItem *> &GetNewsList(NewsType t) anope_abstract;
+	virtual time_t GetTime() anope_abstract;
+	virtual void SetTime(const time_t &) anope_abstract;
 };
 
-static ServiceReference<NewsService> news_service("NewsService", "news");
+static Serialize::TypeReference<NewsItem> newsitem("NewsItem");
 
 #endif // OS_NEWS
 

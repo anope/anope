@@ -13,90 +13,136 @@
 #include "modules/cs_log.h"
 #include "modules/memoserv.h"
 
-struct LogSettingImpl : LogSetting, Serializable
+class LogSettingImpl : public LogSetting
 {
-	LogSettingImpl() : Serializable("LogSetting")
+ public:
+	LogSettingImpl(Serialize::TypeBase *type) : LogSetting(type) { }
+	LogSettingImpl(Serialize::TypeBase *type, Serialize::ID id) : LogSetting(type, id) { }
+
+	ChanServ::Channel *GetChannel() override;
+	void SetChannel(ChanServ::Channel *) override;
+
+	Anope::string GetServiceName() override;
+	void SetServiceName(const Anope::string &) override;
+
+	Anope::string GetCommandService() override;
+	void SetCommandService(const Anope::string &) override;
+
+	Anope::string GetCommandName() override;
+	void SetCommandName(const Anope::string &) override;
+
+	Anope::string GetMethod() override;
+	virtual void SetMethod(const Anope::string &) override;
+
+	Anope::string GetExtra() override;
+	void SetExtra(const Anope::string &) override;
+
+	Anope::string GetCreator() override;
+	void SetCreator(const Anope::string &) override;
+
+	time_t GetCreated() override;
+	void SetCreated(const time_t &) override;
+};
+
+class LogSettingType : public Serialize::Type<LogSettingImpl>
+{
+ public:
+	Serialize::ObjectField<LogSettingImpl, ChanServ::Channel *> ci;
+	Serialize::Field<LogSettingImpl, Anope::string> service_name, command_service, command_name, method, extra, creator;
+	Serialize::Field<LogSettingImpl, time_t> created;
+
+	LogSettingType(Module *me) : Serialize::Type<LogSettingImpl>(me, "LogSetting")
+		, ci(this, "ci", true)
+		, service_name(this, "service_name")
+		, command_service(this, "command_service")
+		, command_name(this, "command_name")
+		, method(this, "method")
+		, extra(this, "extra")
+		, creator(this, "creator")
+		, created(this, "created")
 	{
-	}
-
-	~LogSettingImpl()
-	{
-		ChanServ::Channel *ci = ChanServ::Find(chan);
-		if (ci)
-		{
-			LogSettings *ls = ci->GetExt<LogSettings>("logsettings");
-			if (ls)
-			{
-				LogSettings::iterator it = std::find((*ls)->begin(), (*ls)->end(), this);
-				if (it != (*ls)->end())
-					(*ls)->erase(it);
-			}
-		}
-	}
-
-	void Serialize(Serialize::Data &data) const override
-	{
-		data["ci"] << chan;
-		data["service_name"] << service_name;
-		data["command_service"] << command_service;
-		data["command_name"] << command_name;
-		data["method"] << method;
-		data["extra"] << extra;
-		data["creator"] << creator;
-		data.SetType("created", Serialize::Data::DT_INT); data["created"] << created;
-	}
-
-	static Serializable* Unserialize(Serializable *obj, Serialize::Data &data)
-	{
-		Anope::string sci;
-		data["ci"] >> sci;
-
-		ChanServ::Channel *ci = ChanServ::Find(sci);
-		if (ci == NULL)
-			return NULL;
-
-		LogSettingImpl *ls;
-		if (obj)
-			ls = anope_dynamic_static_cast<LogSettingImpl *>(obj);
-		else
-		{
-			LogSettings *lsettings = ci->Require<LogSettings>("logsettings");
-			ls = new LogSettingImpl();
-			(*lsettings)->push_back(ls);
-		}
-
-		ls->chan = ci->name;
-		data["service_name"] >> ls->service_name;
-		data["command_service"] >> ls->command_service;
-		data["command_name"] >> ls->command_name;
-		data["method"] >> ls->method;
-		data["extra"] >> ls->extra;
-		data["creator"] >> ls->creator;
-		data["created"] >> ls->created;
-
-		return ls;
 	}
 };
 
-struct LogSettingsImpl : LogSettings
+ChanServ::Channel *LogSettingImpl::GetChannel()
 {
-	LogSettingsImpl(Extensible *) { }
+	return Get(&LogSettingType::ci);
+}
 
- 	~LogSettingsImpl()
-	{
-		for (iterator it = (*this)->begin(); it != (*this)->end();)
-		{
-			LogSetting *ls = *it;
-			++it;
-			delete ls;
-		}
-	}
+void LogSettingImpl::SetChannel(ChanServ::Channel *ci)
+{
+	Set(&LogSettingType::ci, ci);
+}
 
-	LogSetting *Create() override
-	{
-		return new LogSettingImpl();
-	}
-};
+Anope::string LogSettingImpl::GetServiceName()
+{
+	return Get(&LogSettingType::service_name);
+}
+
+void LogSettingImpl::SetServiceName(const Anope::string &s)
+{
+	Set(&LogSettingType::service_name, s);
+}
+
+Anope::string LogSettingImpl::GetCommandService()
+{
+	return Get(&LogSettingType::command_service);
+}
+
+void LogSettingImpl::SetCommandService(const Anope::string &s)
+{
+	Set(&LogSettingType::command_service, s);
+}
+
+Anope::string LogSettingImpl::GetCommandName()
+{
+	return Get(&LogSettingType::command_name);
+}
+
+void LogSettingImpl::SetCommandName(const Anope::string &s)
+{
+	Set(&LogSettingType::command_name, s);
+}
+
+Anope::string LogSettingImpl::GetMethod()
+{
+	return Get(&LogSettingType::method);
+}
+
+void LogSettingImpl::SetMethod(const Anope::string &m)
+{
+	Set(&LogSettingType::method, m);
+}
+
+Anope::string LogSettingImpl::GetExtra()
+{
+	return Get(&LogSettingType::extra);
+}
+
+void LogSettingImpl::SetExtra(const Anope::string &e)
+{
+	Set(&LogSettingType::extra, e);
+}
+
+Anope::string LogSettingImpl::GetCreator()
+{
+	return Get(&LogSettingType::creator);
+}
+
+void LogSettingImpl::SetCreator(const Anope::string &creator)
+{
+	Set(&LogSettingType::extra, creator);
+}
+
+time_t LogSettingImpl::GetCreated()
+{
+	return Get(&LogSettingType::created);
+}
+
+void LogSettingImpl::SetCreated(const time_t &t)
+{
+	Set(&LogSettingType::created, t);
+}
 
 class CommandCSLog : public Command
 {
@@ -121,37 +167,36 @@ public:
 
 		if (!source.AccessFor(ci).HasPriv("SET") && !source.HasPriv("chanserv/administration"))
 		{
-			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "SET", ci->name);
+			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "SET", ci->GetName());
 			return;
 		}
 
 		if (params.size() == 1)
 		{
-			LogSettings *ls = ci->Require<LogSettings>("logsettings");
-			if (!ls || (*ls)->empty())
+			std::vector<LogSetting *> ls = ci->GetRefs<LogSetting *>(logsetting);
+			if (ls.empty())
 			{
-				source.Reply(_("There currently are no logging configurations for \002{0}\002."), ci->name);
+				source.Reply(_("There currently are no logging configurations for \002{0}\002."), ci->GetName());
 				return;
 			}
-
 
 			ListFormatter list(source.GetAccount());
 			list.AddColumn(_("Number")).AddColumn(_("Service")).AddColumn(_("Command")).AddColumn(_("Method")).AddColumn("");
 
-			for (unsigned i = 0; i < (*ls)->size(); ++i)
+			for (unsigned i = 0; i < ls.size(); ++i)
 			{
-				const LogSetting *log = (*ls)->at(i);
+				LogSetting *log = ls[i];
 
 				ListFormatter::ListEntry entry;
 				entry["Number"] = stringify(i + 1);
-				entry["Service"] = log->command_service;
-				entry["Command"] = !log->command_name.empty() ? log->command_name : log->service_name;
-				entry["Method"] = log->method;
-				entry[""] = log->extra;
+				entry["Service"] = log->GetCommandService();
+				entry["Command"] = !log->GetCommandName().empty() ? log->GetCommandName() : log->GetServiceName();
+				entry["Method"] = log->GetMethod();
+				entry[""] = log->GetExtra();
 				list.AddEntry(entry);
 			}
 
-			source.Reply(_("Log list for \002{0}\002:"), ci->name);
+			source.Reply(_("Log list for \002{0}\002:"), ci->GetName());
 
 			std::vector<Anope::string> replies;
 			list.Process(replies);
@@ -167,7 +212,6 @@ public:
 				return;
 			}
 
-			LogSettings *ls = ci->Require<LogSettings>("logsettings");
 			const Anope::string &command = params[1];
 			const Anope::string &method = params[2];
 			const Anope::string &extra = params.size() > 3 ? params[3] : "";
@@ -181,7 +225,7 @@ public:
 
 			Anope::string service = command.substr(0, sl),
 				command_name = command.substr(sl + 1);
-			BotInfo *bi = BotInfo::Find(service, true);
+			ServiceBot *bi = ServiceBot::Find(service, true);
 
 			Anope::string service_name;
 
@@ -219,40 +263,39 @@ public:
 
 			bool override = !source.AccessFor(ci).HasPriv("SET");
 
-			for (unsigned i = (*ls)->size(); i > 0; --i)
+			std::vector<LogSetting *> ls = ci->GetRefs<LogSetting *>(logsetting);
+			for (unsigned i = ls.size(); i > 0; --i)
 			{
-				LogSetting *log = (*ls)->at(i - 1);
+				LogSetting *log = ls[i - 1];
 
-				if (log->service_name == service_name && log->method.equals_ci(method) && command_name.equals_ci(log->command_name))
+				if (log->GetServiceName() == service_name && log->GetMethod().equals_ci(method) && command_name.equals_ci(log->GetCommandName()))
 				{
-					if (log->extra == extra)
+					if (log->GetExtra() == extra)
 					{
 						Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to remove logging for " << command << " with method " << method << (extra == "" ? "" : " ") << extra;
-						source.Reply(_("Logging for command \002{0}\002 on \002{1}\002 with log method \002{2}{3}{4}\002 has been removed."), !log->command_name.empty() ? log->command_name : log->service_name, !log->command_service.empty() ? log->command_service : "any service", method, extra.empty() ? "" : " ", extra);
+						source.Reply(_("Logging for command \002{0}\002 on \002{1}\002 with log method \002{2}{3}{4}\002 has been removed."), !log->GetCommandName().empty() ? log->GetCommandName() : log->GetServiceName(), !log->GetCommandService().empty() ? log->GetCommandService() : "any service", method, extra.empty() ? "" : " ", extra);
 						delete log;
 					}
 					else
 					{
-						log->extra = extra;
+						log->SetExtra(extra);
 						Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to change logging for " << command << " to method " << method << (extra == "" ? "" : " ") << extra;
-						source.Reply(_("Logging changed for command \002{0}\002 on \002{1}\002, now using log method \002{2}{3}{4]\002."), !log->command_name.empty() ? log->command_name : log->service_name, !log->command_service.empty() ? log->command_service : "any service", method, extra.empty() ? "" : " ", extra);
+						source.Reply(_("Logging changed for command \002{0}\002 on \002{1}\002, now using log method \002{2}{3}{4]\002."), !log->GetCommandName().empty() ? log->GetCommandName() : log->GetServiceName(), !log->GetCommandService().empty() ? log->GetCommandService() : "any service", method, extra.empty() ? "" : " ", extra);
 					}
 					return;
 				}
 			}
 
-			LogSetting *log = new LogSettingImpl();
-			log->chan = ci->name;
-			log->service_name = service_name;
+			LogSetting *log = logsetting.Create();
+			log->SetChannel(ci);
+			log->SetServiceName(service_name);
 			if (bi)
-				log->command_service = bi->nick;
-			log->command_name = command_name;
-			log->method = method;
-			log->extra = extra;
-			log->created = Anope::CurTime;
-			log->creator = source.GetNick();
-
-			(*ls)->push_back(log);
+				log->SetCommandService(bi->nick);
+			log->SetCommandName(command_name);
+			log->SetMethod(method);
+			log->SetExtra(extra);
+			log->SetCreated(Anope::CurTime);
+			log->SetCreator(source.GetNick());
 
 			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to log " << command << " with method " << method << (extra == "" ? "" : " ") << extra;
 
@@ -291,8 +334,7 @@ class CSLog : public Module
 	, public EventHook<Event::Log>
 {
 	CommandCSLog commandcslog;
-	ExtensibleItem<LogSettingsImpl> logsettings;
-	Serialize::Type logsetting_type;
+	LogSettingType logtype;
 
 	struct LogDefault
 	{
@@ -306,8 +348,7 @@ class CSLog : public Module
 		, EventHook<Event::ChanRegistered>("OnChanRegistered")
 		, EventHook<Event::Log>("OnLog")
 		, commandcslog(this)
-		, logsettings(this, "logsettings")
-		, logsetting_type("LogSetting", LogSettingImpl::Unserialize)
+		, logtype(this)
 	{
 
 	}
@@ -336,31 +377,31 @@ class CSLog : public Module
 		if (defaults.empty())
 			return;
 
-		LogSettings *ls = logsettings.Require(ci);
 		for (unsigned i = 0; i < defaults.size(); ++i)
 		{
 			LogDefault &d = defaults[i];
 
-			LogSetting *log = new LogSettingImpl();
-			log->chan = ci->name;
+			LogSetting *log = logsetting.Create();
+			log->SetChannel(ci);
 
 			if (!d.service.empty())
 			{
-				log->service_name = d.service.lower() + "/" + d.command.lower();
-				log->command_service = d.service;
-				log->command_name = d.command;
+				log->SetServiceName(d.service.lower() + "/" + d.command.lower());
+				log->SetCommandService(d.service);
+				log->SetCommandName(d.command);
 			}
 			else
-				log->service_name = d.command;
+				log->SetServiceName(d.command);
 
 			spacesepstream sep(d.method);
-			sep.GetToken(log->method);
-			log->extra = sep.GetRemaining();
+			Anope::string method, extra;
+			sep.GetToken(method);
+			extra = sep.GetRemaining();
 
-			log->created = Anope::CurTime;
-			log->creator = ci->GetFounder() ? ci->GetFounder()->display : "(default)";
-
-			(*ls)->push_back(log);
+			log->SetMethod(method);
+			log->SetExtra(extra);
+			log->SetCreated(Anope::CurTime);
+			log->SetCreator(ci->GetFounder() ? ci->GetFounder()->GetDisplay() : "(default)");
 		}
 	}
 
@@ -369,41 +410,40 @@ class CSLog : public Module
 		if (l->type != LOG_COMMAND || l->u == NULL || l->c == NULL || l->ci == NULL || !Me || !Me->IsSynced())
 			return;
 
-		LogSettings *ls = logsettings.Get(l->ci);
-		if (ls)
-			for (unsigned i = 0; i < (*ls)->size(); ++i)
-			{
-				const LogSetting *log = (*ls)->at(i);
+		std::vector<LogSetting *> ls = l->ci->GetRefs<LogSetting *>(logsetting);
+		for (unsigned i = 0; i < ls.size(); ++i)
+		{
+			LogSetting *log = ls[i];
 
-				/* wrong command */
-				if (log->service_name != l->c->name)
+			/* wrong command */
+			if (log->GetServiceName() != l->c->name)
+				continue;
+
+			/* if a command name is given check the service and the command */
+			if (!log->GetCommandName().empty())
+			{
+				/* wrong service (only check if not a fantasy command, though) */
+				if (!l->source->c && log->GetCommandService() != l->source->service->nick)
 					continue;
 
-				/* if a command name is given check the service and the command */
-				if (!log->command_name.empty())
-				{
-					/* wrong service (only check if not a fantasy command, though) */
-					if (!l->source->c && log->command_service != l->source->service->nick)
-						continue;
-
-					if (!log->command_name.equals_ci(l->source->command))
-						continue;
-				}
-
-				Anope::string buffer = l->u->nick + " used " + l->source->command.upper() + " " + l->buf.str();
-
-				if (log->method.equals_ci("MEMO") && MemoServ::service && l->ci->WhoSends() != NULL)
-					MemoServ::service->Send(l->ci->WhoSends()->nick, l->ci->name, buffer, true);
-				else if (l->source->c)
-					/* Sending a channel message or notice in response to a fantasy command */;
-				else if (log->method.equals_ci("MESSAGE") && l->ci->c)
-				{
-					IRCD->SendPrivmsg(l->ci->WhoSends(), log->extra + l->ci->c->name, "%s", buffer.c_str());
-					//l->ci->WhoSends()->lastmsg = Anope::CurTime; XXX
-				}
-				else if (log->method.equals_ci("NOTICE") && l->ci->c)
-					IRCD->SendNotice(l->ci->WhoSends(), log->extra + l->ci->c->name, "%s", buffer.c_str());
+				if (!log->GetCommandName().equals_ci(l->source->command))
+					continue;
 			}
+
+			Anope::string buffer = l->u->nick + " used " + l->source->command.upper() + " " + l->buf.str();
+
+			if (log->GetMethod().equals_ci("MEMO") && MemoServ::service && l->ci->WhoSends() != NULL)
+				MemoServ::service->Send(l->ci->WhoSends()->nick, l->ci->GetName(), buffer, true);
+			else if (l->source->c)
+				/* Sending a channel message or notice in response to a fantasy command */;
+			else if (log->GetMethod().equals_ci("MESSAGE") && l->ci->c)
+			{
+				IRCD->SendPrivmsg(l->ci->WhoSends(), log->GetExtra() + l->ci->c->name, "%s", buffer.c_str());
+				//l->ci->WhoSends()->lastmsg = Anope::CurTime; XXX
+			}
+			else if (log->GetMethod().equals_ci("NOTICE") && l->ci->c)
+				IRCD->SendNotice(l->ci->WhoSends(), log->GetExtra() + l->ci->c->name, "%s", buffer.c_str());
+		}
 	}
 };
 

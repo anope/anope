@@ -16,10 +16,10 @@
 
 class CommandBSInfo : public Command
 {
-	EventHandlers<Event::BotInfoEvent> &onbotinfo;
+	EventHandlers<Event::ServiceBotEvent> &onbotinfo;
 
  public:
-	CommandBSInfo(Module *creator, EventHandlers<Event::BotInfoEvent> &event) : Command(creator, "botserv/info", 1, 1), onbotinfo(event)
+	CommandBSInfo(Module *creator, EventHandlers<Event::ServiceBotEvent> &event) : Command(creator, "botserv/info", 1, 1), onbotinfo(event)
 	{
 		this->SetSyntax(_("{\037channel\037 | \037nickname\037}"));
 	}
@@ -28,7 +28,7 @@ class CommandBSInfo : public Command
 	{
 		const Anope::string &query = params[0];
 
-		BotInfo *bi = BotInfo::Find(query, true);
+		ServiceBot *bi = ServiceBot::Find(query, true);
 		ChanServ::Channel *ci = ChanServ::Find(query);
 		InfoFormatter info(source.nc);
 
@@ -37,11 +37,11 @@ class CommandBSInfo : public Command
 			source.Reply(_("Information for bot \002%s\002:"), bi->nick.c_str());
 			info[_("Mask")] = bi->GetIdent() + "@" + bi->host;
 			info[_("Real name")] = bi->realname;
-			info[_("Created")] = Anope::strftime(bi->created, source.GetAccount());
-			info[_("Options")] = bi->oper_only ? _("Private") : _("None");
+			info[_("Created")] = Anope::strftime(bi->bi->GetCreated(), source.GetAccount());
+			info[_("Options")] = bi->bi->GetOperOnly() ? _("Private") : _("None");
 			info[_("Used on")] = stringify(bi->GetChannelCount()) + " channel(s)";
 
-			this->onbotinfo(&Event::BotInfoEvent::OnBotInfo, source, bi, ci, info);
+			this->onbotinfo(&Event::ServiceBotEvent::OnServiceBot, source, bi, ci, info);
 
 			std::vector<Anope::string> replies;
 			info.Process(replies);
@@ -52,8 +52,8 @@ class CommandBSInfo : public Command
 			if (source.HasPriv("botserv/administration"))
 			{
 				Anope::string buf;
-				for (ChanServ::Channel *ci : bi->GetChannels())
-					buf += " " + ci->name;
+				for (ChanServ::Channel *ci2 : bi->GetChannels())
+					buf += " " + ci2->GetName();
 				source.Reply(buf);
 			}
 
@@ -62,17 +62,17 @@ class CommandBSInfo : public Command
 		{
 			if (!source.AccessFor(ci).HasPriv("INFO") && !source.HasPriv("botserv/administration"))
 			{
-				source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "INFO", ci->name);
+				source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "INFO", ci->GetName());
 				return;
 			}
 
-			source.Reply(_("Information for channel \002{0}\002:"), ci->name);
-			info[_("Bot nick")] = ci->bi ? ci->bi->nick : _("not assigned yet");
+			source.Reply(_("Information for channel \002{0}\002:"), ci->GetName());
+			info[_("Bot nick")] = ci->GetBot() ? ci->GetBot()->nick : _("not assigned yet");
 
 			Anope::string enabled = Language::Translate(source.nc, _("Enabled"));
 			Anope::string disabled = Language::Translate(source.nc, _("Disabled"));
 
-			this->onbotinfo(&Event::BotInfoEvent::OnBotInfo, source, bi, ci, info);
+			this->onbotinfo(&Event::ServiceBotEvent::OnServiceBot, source, bi, ci, info);
 
 			std::vector<Anope::string> replies;
 			info.Process(replies);
@@ -102,11 +102,11 @@ class CommandBSInfo : public Command
 class BSInfo : public Module
 {
 	CommandBSInfo commandbsinfo;
-	EventHandlers<Event::BotInfoEvent> onbotinfo;
+	EventHandlers<Event::ServiceBotEvent> onbotinfo;
 
  public:
 	BSInfo(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
-		, commandbsinfo(this, onbotinfo), onbotinfo(this, "OnBotInfo")
+		, commandbsinfo(this, onbotinfo), onbotinfo(this, "OnServiceBot")
 	{
 
 	}

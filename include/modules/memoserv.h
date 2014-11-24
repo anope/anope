@@ -12,6 +12,8 @@
 
 namespace MemoServ
 {
+	class Ignore;
+
 	class MemoServService : public Service
 	{
 	 public:
@@ -42,6 +44,8 @@ namespace MemoServ
 
 		virtual Memo *CreateMemo() anope_abstract;
 		virtual MemoInfo *GetMemoInfo(const Anope::string &targ, bool &is_registered, bool &is_chan, bool create) anope_abstract;
+
+		virtual Ignore *CreateIgnore() anope_abstract;
 	};
 	static ServiceReference<MemoServService> service("MemoServService", "MemoServ");
 
@@ -71,40 +75,76 @@ namespace MemoServ
 		static EventHandlersReference<MemoDel> OnMemoDel("OnMemoDel");
 	}
 
-	class Memo : public Serializable
+	class Memo : public Serialize::Object
 	{
-	 public:
-		bool unread;
-		bool receipt;
 	 protected:
-		Memo() : Serializable("Memo") { }
+		using Serialize::Object::Object;
+//		Memo() : Serialize::Object("Memo") { }
 	 public:
+		virtual MemoInfo *GetMemoInfo() anope_abstract;
+		virtual void SetMemoInfo(MemoInfo *) anope_abstract;
 
-		Anope::string owner;
-		/* When it was sent */
-		time_t time;
-		Anope::string sender;
-		Anope::string text;
+		virtual time_t GetTime() anope_abstract;
+		virtual void SetTime(const time_t &) anope_abstract;
+
+		virtual Anope::string GetSender() anope_abstract;
+		virtual void SetSender(const Anope::string &) anope_abstract;
+
+		virtual Anope::string GetText() anope_abstract;
+		virtual void SetText(const Anope::string &) anope_abstract;
+
+		virtual bool GetUnread() anope_abstract;
+		virtual void SetUnread(const bool &) anope_abstract;
+
+		virtual bool GetReceipt() anope_abstract;
+		virtual void SetReceipt(const bool &) anope_abstract;
 	};
+
+	static Serialize::TypeReference<Memo> memo("Memo");
 
 	/* Memo info structures.  Since both nicknames and channels can have memos,
 	 * we encapsulate memo data in a MemoInfo to make it easier to handle.
 	 */
-	struct CoreExport MemoInfo
+	class MemoInfo : public Serialize::Object
 	{
-		int16_t memomax anope_abstract;
-		Serialize::Checker<std::vector<Memo *> > memos;
-		std::vector<Anope::string> ignores;
+	 protected:
+		using Serialize::Object::Object;
+		//using MemoInfo::MemoInfo;
+		//MemoInfo() : Serialize::Object("MemoInfo") { }
+	 public:
 
-		MemoInfo() : memos("Memo") { }
-		virtual ~MemoInfo() { }
+		virtual Memo *GetMemo(unsigned index) anope_abstract;
 
-		virtual Memo *GetMemo(unsigned index) const anope_abstract;
-
-		virtual unsigned GetIndex(Memo *m) const anope_abstract;
+		virtual unsigned GetIndex(Memo *m) anope_abstract;
 
 		virtual void Del(unsigned index) anope_abstract;
 
 		virtual bool HasIgnore(User *u) anope_abstract;
+
+		virtual Serialize::Object *GetOwner() anope_abstract;
+		virtual void SetOwner(Serialize::Object *) anope_abstract;
+
+		virtual int16_t GetMemoMax() anope_abstract;
+		virtual void SetMemoMax(const int16_t &) anope_abstract;
+
+		virtual std::vector<Memo *> GetMemos() anope_abstract;
+		virtual std::vector<Ignore *> GetIgnores() anope_abstract;
 	};
+
+	static Serialize::TypeReference<MemoInfo> memoinfo("MemoInfo");
+
+	class Ignore : public Serialize::Object
+	{
+	 protected:
+		using Serialize::Object::Object;
+
+	 public:
+		virtual MemoInfo *GetMemoInfo() anope_abstract;
+		virtual void SetMemoInfo(MemoInfo *) anope_abstract;
+
+		virtual Anope::string GetMask() anope_abstract;
+		virtual void SetMask(const Anope::string &mask) anope_abstract;
+	};
+
+	static Serialize::TypeReference<Ignore> ignore("MemoIgnore");
 }

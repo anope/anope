@@ -25,23 +25,18 @@ bool WebCPanel::ChanServ::Drop::OnRequest(HTTPProvider *server, const Anope::str
 			params.push_back(channel);
 			params.push_back(channel);
 
-			WebPanel::RunCommand(na->nc->display, na->nc, "ChanServ", "chanserv/drop", params, replacements);
+			WebPanel::RunCommand(na->GetAccount()->GetDisplay(), na->GetAccount(), "ChanServ", "chanserv/drop", params, replacements);
 		}
 		else
 			replacements["MESSAGES"] = "Invalid Confirmation";
 	}
 
-	std::deque<::ChanServ::Channel *> queue;
-	na->nc->GetChannelReferences(queue);
-	for (unsigned i = 0; i < queue.size(); ++i)
-	{
-		::ChanServ::Channel *ci = queue[i];
-		if ((ci->HasExt("SECUREFOUNDER") ? ci->AccessFor(na->nc).founder : ci->AccessFor(na->nc).HasPriv("FOUNDER")) || (na->nc->IsServicesOper() && na->nc->o->ot->HasCommand("chanserv/drop")))
+	for (::ChanServ::Channel *ci : na->GetAccount()->GetRefs<::ChanServ::Channel *>(::ChanServ::channel))
+		if ((ci->HasFieldS("SECUREFOUNDER") ? ci->AccessFor(na->GetAccount()).founder : ci->AccessFor(na->GetAccount()).HasPriv("FOUNDER")) || (na->GetAccount()->IsServicesOper() && na->GetAccount()->o->GetType()->HasCommand("chanserv/drop")))
 		{
-			replacements["CHANNEL_NAMES"] = ci->name;
-			replacements["ESCAPED_CHANNEL_NAMES"] = HTTPUtils::URLEncode(ci->name);
+			replacements["CHANNEL_NAMES"] = ci->GetName();
+			replacements["ESCAPED_CHANNEL_NAMES"] = HTTPUtils::URLEncode(ci->GetName());
 		}
-	}
 
 	if (message.get_data.count("channel") > 0)
 	{

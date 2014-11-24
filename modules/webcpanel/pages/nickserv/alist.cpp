@@ -9,7 +9,7 @@
 
 static bool ChannelSort(ChanServ::Channel *ci1, ChanServ::Channel *ci2)
 {
-	return ci::less()(ci1->name, ci2->name);
+	return ci::less()(ci1->GetName(), ci2->GetName());
 }
 
 WebCPanel::NickServ::Alist::Alist(const Anope::string &cat, const Anope::string &u) : WebPanelProtectedPage(cat, u)
@@ -18,34 +18,31 @@ WebCPanel::NickServ::Alist::Alist(const Anope::string &cat, const Anope::string 
 
 bool WebCPanel::NickServ::Alist::OnRequest(HTTPProvider *server, const Anope::string &page_name, HTTPClient *client, HTTPMessage &message, HTTPReply &reply, ::NickServ::Nick *na, TemplateFileServer::Replacements &replacements)
 {
-	std::deque<::ChanServ::Channel *> queue;
-	na->nc->GetChannelReferences(queue);
-	std::sort(queue.begin(), queue.end(), ChannelSort);
+	std::vector<::ChanServ::Channel *> chans = na->GetAccount()->GetRefs<::ChanServ::Channel *>(::ChanServ::channel);
+	std::sort(chans.begin(), chans.end(), ChannelSort);
 
 	int chan_count = 0;
 
-	for (unsigned q = 0; q < queue.size(); ++q)
+	for (::ChanServ::Channel *ci : chans)
 	{
-		::ChanServ::Channel *ci = queue[q];
-
-		if (ci->GetFounder() == na->nc)
+		if (ci->GetFounder() == na->GetAccount())
 		{
 			++chan_count;
 
 			replacements["NUMBERS"] = stringify(chan_count);
-			replacements["CHANNELS"] = (ci->HasExt("CS_NO_EXPIRE") ? "!" : "") + ci->name;
+			replacements["CHANNELS"] = (ci->HasFieldS("CS_NO_EXPIRE") ? "!" : "") + ci->GetName();
 			replacements["ACCESSES"] = "Founder";
 			continue;
 		}
 
-		::ChanServ::AccessGroup access = ci->AccessFor(na->nc);
+		::ChanServ::AccessGroup access = ci->AccessFor(na->GetAccount());
 		if (access.empty())
 			continue;
 
 		++chan_count;
 
 		replacements["NUMBERS"] = stringify(chan_count);
-		replacements["CHANNELS"] = (ci->HasExt("CS_NO_EXPIRE") ? "!" : "") + ci->name;
+		replacements["CHANNELS"] = (ci->HasFieldS("CS_NO_EXPIRE") ? "!" : "") + ci->GetName();
 		Anope::string access_str;
 		for (unsigned i = 0; i < access.size(); ++i)
 			access_str += ", " + access[i]->AccessSerialize();

@@ -6,6 +6,7 @@
  */
 
 #include "../../webcpanel.h"
+#include "modules/ns_access.h"
 
 WebCPanel::NickServ::Access::Access(const Anope::string &cat, const Anope::string &u) : WebPanelProtectedPage(cat, u)
 {
@@ -19,7 +20,7 @@ bool WebCPanel::NickServ::Access::OnRequest(HTTPProvider *server, const Anope::s
 		params.push_back("ADD");
 		params.push_back(message.post_data["access"]);
 
-		WebPanel::RunCommand(na->nc->display, na->nc, "NickServ", "nickserv/access", params, replacements);
+		WebPanel::RunCommand(na->GetAccount()->GetDisplay(), na->GetAccount(), "NickServ", "nickserv/access", params, replacements);
 	}
 	else if (message.get_data.count("del") > 0 && message.get_data.count("mask") > 0)
 	{
@@ -27,11 +28,11 @@ bool WebCPanel::NickServ::Access::OnRequest(HTTPProvider *server, const Anope::s
 		params.push_back("DEL");
 		params.push_back(message.get_data["mask"]);
 
-		WebPanel::RunCommand(na->nc->display, na->nc, "NickServ", "nickserv/access", params, replacements);
+		WebPanel::RunCommand(na->GetAccount()->GetDisplay(), na->GetAccount(), "NickServ", "nickserv/access", params, replacements);
 	}
 
-	for (unsigned i = 0; i < na->nc->access.size(); ++i)
-		replacements["ACCESS"] = na->nc->access[i];
+	for (NickAccess *a : na->GetAccount()->GetRefs<NickAccess *>(nsaccess))
+		replacements["ACCESS"] = a->GetMask();
 
 	TemplateFileServer page("nickserv/access.html");
 	page.Serve(server, page_name, client, message, reply, replacements);

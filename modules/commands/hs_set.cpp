@@ -83,7 +83,7 @@ class CommandHSSet : public Command
 			return;
 		}
 
-		Log(LOG_ADMIN, source, this) << "to set the vhost of " << na->nick << " to " << (!user.empty() ? user + "@" : "") << host;
+		Log(LOG_ADMIN, source, this) << "to set the vhost of " << na->GetNick() << " to " << (!user.empty() ? user + "@" : "") << host;
 
 		na->SetVhost(user, host, source.GetNick());
 		Event::OnSetVhost(&Event::SetVhost::OnSetVhost, na);
@@ -102,17 +102,13 @@ class CommandHSSet : public Command
 
 class CommandHSSetAll : public Command
 {
-	void Sync(const NickServ::Nick *na)
+	void Sync(NickServ::Nick *na)
 	{
 		if (!na || !na->HasVhost())
 			return;
 
-		for (unsigned i = 0; i < na->nc->aliases->size(); ++i)
-		{
-			NickServ::Nick *nick = na->nc->aliases->at(i);
-			if (nick)
-				nick->SetVhost(na->GetVhostIdent(), na->GetVhostHost(), na->GetVhostCreator());
-		}
+		for (NickServ::Nick *nick : na->GetAccount()->GetRefs<NickServ::Nick *>(NickServ::nick))
+			nick->SetVhost(na->GetVhostIdent(), na->GetVhostHost(), na->GetVhostCreator());
 	}
 
  public:
@@ -184,7 +180,7 @@ class CommandHSSetAll : public Command
 			return;
 		}
 
-		Log(LOG_ADMIN, source, this) << "to set the vhost of " << na->nick << " to " << (!user.empty() ? user + "@" : "") << host;
+		Log(LOG_ADMIN, source, this) << "to set the vhost of " << na->GetNick() << " to " << (!user.empty() ? user + "@" : "") << host;
 
 		na->SetVhost(user, host, source.GetNick());
 		this->Sync(na);

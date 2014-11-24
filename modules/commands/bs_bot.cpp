@@ -25,7 +25,7 @@ class CommandBSBot : public Command
 		const Anope::string &host = params[3];
 		const Anope::string &real = params[4];
 
-		if (BotInfo::Find(nick, true))
+		if (ServiceBot::Find(nick, true))
 		{
 			source.Reply(_("Bot \002{0}\002 already exists."), nick);
 			return;
@@ -76,7 +76,7 @@ class CommandBSBot : public Command
 		NickServ::Nick *na = NickServ::FindNick(nick);
 		if (na)
 		{
-			source.Reply(_("\002{0}\002 is already registered!"), na->nick);
+			source.Reply(_("\002{0}\002 is already registered!"), na->GetNick());
 			return;
 		}
 
@@ -84,7 +84,9 @@ class CommandBSBot : public Command
 		if (targ)
 			targ->Kill(Me, "Nickname is reserved for services");
 
-		BotInfo *bi = new BotInfo(nick, user, host, real);
+		ServiceBot *bi = new ServiceBot(nick, user, host, real);
+		bi->bi = botinfo.Create();
+		bi->bi->bot = bi;
 
 		Log(LOG_ADMIN, source, this) << "ADD " << bi->GetMask() << " " << bi->realname;
 
@@ -107,7 +109,7 @@ class CommandBSBot : public Command
 			return;
 		}
 
-		BotInfo *bi = BotInfo::Find(oldnick, true);
+		ServiceBot *bi = ServiceBot::Find(oldnick, true);
 		if (!bi)
 		{
 			source.Reply(_("Bot \002{0}\002 does not exist."), oldnick);
@@ -172,7 +174,7 @@ class CommandBSBot : public Command
 			return;
 		}
 
-		BotInfo *newbi = BotInfo::Find(nick, true);
+		ServiceBot *newbi = ServiceBot::Find(nick, true);
 		if (newbi && bi != newbi)
 		{
 			source.Reply(_("Bot \002{0}\002 already exists."), newbi->nick);
@@ -188,17 +190,17 @@ class CommandBSBot : public Command
 			NickServ::Nick *na = NickServ::FindNick(nick);
 			if (na)
 			{
-				source.Reply(_("\002{0}\002 is already registered."), na->nick);
+				source.Reply(_("\002{0}\002 is already registered."), na->GetNick());
 				return;
 			}
 
 			/* The new nick is really different, so we remove the Q line for the old nick. */
-			XLine x_del(bi->nick);
-			IRCD->SendSQLineDel(&x_del);
+			//XLine x_del(bi->nick);
+			//IRCD->SendSQLineDel(&x_del);
 
 			/* Add a Q line for the new nick */
-			XLine x(nick, "Reserved for services");
-			IRCD->SendSQLine(NULL, &x);
+			//XLine x(nick, "Reserved for services");
+			//IRCD->SendSQLine(NULL, &x);
 		}
 
 		if (!user.empty())
@@ -210,14 +212,26 @@ class CommandBSBot : public Command
 			IRCD->SendNickChange(bi, nick);
 
 		if (!nick.equals_cs(bi->nick))
+		{
 			bi->SetNewNick(nick);
+			bi->bi->SetNick(nick);
+		}
 
 		if (!user.equals_cs(bi->GetIdent()))
+		{
 			bi->SetIdent(user);
+			bi->bi->SetUser(user);
+		}
 		if (!host.equals_cs(bi->host))
+		{
 			bi->host = host;
+			bi->bi->SetHost(host);
+		}
 		if (real.equals_cs(bi->realname))
+		{
 			bi->realname = real;
+			bi->bi->SetRealName(real);
+		}
 
 		if (!user.empty())
 			bi->OnKill();
@@ -238,7 +252,7 @@ class CommandBSBot : public Command
 			return;
 		}
 
-		BotInfo *bi = BotInfo::Find(nick, true);
+		ServiceBot *bi = ServiceBot::Find(nick, true);
 		if (!bi)
 		{
 			source.Reply(_("Bot \002{0}\002 does not exist."), nick);
@@ -256,6 +270,7 @@ class CommandBSBot : public Command
 		Log(LOG_ADMIN, source, this) << "DEL " << bi->nick;
 
 		source.Reply(_("Bot \002{0}\002 has been deleted."), bi->nick);
+		// XXX delete bi->bi?
 		delete bi;
 	}
 

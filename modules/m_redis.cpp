@@ -167,13 +167,6 @@ class MyRedisService : public Provider
 		this->Send(s, i, args);
 	}
 
-	void SendCommand(RedisSocket *s, Interface *i, const Anope::string &str)
-	{
-		std::vector<Anope::string> args;
-		spacesepstream(str).GetTokens(args);
-		this->SendCommand(s, i, args);
-	}
-
 	void Send(Interface *i, const std::vector<std::pair<const char *, size_t> > &args)
 	{
 		if (!sock)
@@ -200,7 +193,6 @@ class MyRedisService : public Provider
 		this->SendCommand(i, args);
 	}
 
- public:
 	bool BlockAndProcess() override
 	{
 		this->sock->ProcessWrite();
@@ -210,7 +202,7 @@ class MyRedisService : public Provider
 		return !this->sock->interfaces.empty();
 	}
 
-	void Subscribe(Interface *i, const Anope::string &pattern) override
+	void Subscribe(Interface *i, const Anope::string &ch) override
 	{
 		if (sub == NULL)
 		{
@@ -218,12 +210,10 @@ class MyRedisService : public Provider
 			sub->Connect(host, port);
 		}
 
-		std::vector<Anope::string> args;
-		args.push_back("PSUBSCRIBE");
-		args.push_back(pattern);
+		std::vector<Anope::string> args = { "SUBSCRIBE", ch };
 		this->SendCommand(sub, NULL, args);
 
-		sub->subinterfaces[pattern] = i;
+		sub->subinterfaces[ch] = i;
 	}
 
 	void Unsubscribe(const Anope::string &pattern) override
@@ -279,11 +269,6 @@ void RedisSocket::OnConnect()
 
 	this->provider->SendCommand(NULL, "CLIENT SETNAME Anope");
 	this->provider->SendCommand(NULL, "SELECT " + stringify(provider->db));
-
-	if (this != this->provider->sub)
-	{
-		this->provider->SendCommand(this, NULL, "CONFIG SET notify-keyspace-events KA");
-	}
 }
 
 void RedisSocket::OnError(const Anope::string &error)
@@ -469,17 +454,9 @@ bool RedisSocket::Read(const char *buffer, size_t l)
 
 		if (this == provider->sub)
 		{
-			if (r.multi_bulk.size() == 4)
-			{
-				/* pmessage
-				 * pattern subscribed to
-				 * __keyevent@0__:set
-				 * key
-				 */
-				std::map<Anope::string, Interface *>::iterator it = this->subinterfaces.find(r.multi_bulk[1]->bulk);
-				if (it != this->subinterfaces.end())
-					it->second->OnResult(r);
-			}
+			std::map<Anope::string, Interface *>::iterator it = this->subinterfaces.find(r.multi_bulk[1]->bulk);
+			if (it != this->subinterfaces.end())
+				it->second->OnResult(r);
 		}
 		else
 		{

@@ -122,7 +122,7 @@ class CommandOSAKill : public Command
 
 		XLine *x = new XLine(mask, source.GetNick(), expires, reason);
 		if (Config->GetModule("operserv")->Get<bool>("akillids"))
-			x->id = XLineManager::GenerateUID();
+			x->SetID(XLineManager::GenerateUID());
 
 		unsigned int affected = 0;
 		for (user_map::const_iterator it = UserListByNick.begin(); it != UserListByNick.end(); ++it)
@@ -152,7 +152,7 @@ class CommandOSAKill : public Command
 
 		source.Reply(_("\002{0}\002 added to the akill list."), mask);
 
-		Log(LOG_ADMIN, source, this) << "on " << mask << " (" << x->reason << "), expires in " << (expires ? Anope::Duration(expires - Anope::CurTime) : "never") << " [affects " << affected << " user(s) (" << percent << "%)]";
+		Log(LOG_ADMIN, source, this) << "on " << mask << " (" << x->GetReason() << "), expires in " << (expires ? Anope::Duration(expires - Anope::CurTime) : "never") << " [affects " << affected << " user(s) (" << percent << "%)]";
 		if (Anope::ReadOnly)
 			source.Reply(_("Services are in read-only mode. Any changes made may not persist."));
 	}
@@ -167,7 +167,7 @@ class CommandOSAKill : public Command
 			return;
 		}
 
-		if (akills->GetList().empty())
+		if (akills->GetXLines().empty())
 		{
 			source.Reply(_("The akill list is empty."));
 			return;
@@ -185,10 +185,10 @@ class CommandOSAKill : public Command
 					if (!x)
 						return;
 
-					Log(LOG_ADMIN, source, this) << "to remove " << x->mask << " from the list";
+					Log(LOG_ADMIN, source, this) << "to remove " << x->GetMask() << " from the list";
 
 					++deleted;
-					akills->DelXLine(x);
+					x->Delete();
 				},
 				[&]()
 				{
@@ -214,9 +214,9 @@ class CommandOSAKill : public Command
 			{
 				Event::OnDelXLine(&Event::DelXLine::OnDelXLine, source, x, akills);
 
-				Log(LOG_ADMIN, source, this) << "to remove " << x->mask << " from the list";
-				source.Reply(_("\002{0}\002 deleted from the akill list."), x->mask);
-				akills->DelXLine(x);
+				Log(LOG_ADMIN, source, this) << "to remove " << x->GetMask() << " from the list";
+				source.Reply(_("\002{0}\002 deleted from the akill list."), x->GetMask());
+				x->Delete();
 			}
 			while ((x = akills->HasEntry(mask)));
 
@@ -235,61 +235,61 @@ class CommandOSAKill : public Command
 			NumberList(mask, false,
 				[&](unsigned int number)
 				{
-					const XLine *x = akills->GetEntry(number - 1);
+					XLine *x = akills->GetEntry(number - 1);
 
 					if (!x)
 						return;
 
 					ListFormatter::ListEntry entry;
 					entry["Number"] = stringify(number);
-					entry["Mask"] = x->mask;
-					entry["Creator"] = x->by;
-					entry["Created"] = Anope::strftime(x->created, NULL, true);
-					entry["Expires"] = Anope::Expires(x->expires, source.nc);
-					entry["Reason"] = x->reason;
+					entry["Mask"] = x->GetMask();
+					entry["Creator"] = x->GetBy();
+					entry["Created"] = Anope::strftime(x->GetCreated(), NULL, true);
+					entry["Expires"] = Anope::Expires(x->GetExpires(), source.nc);
+					entry["Reason"] = x->GetReason();
 					list.AddEntry(entry);
 				},
 				[&]{});
 		}
 		else
 		{
-			for (unsigned i = 0, end = akills->GetCount(); i < end; ++i)
+			unsigned int i = 0;
+			for (XLine *x : akills->GetXLines())
 			{
-				const XLine *x = akills->GetEntry(i);
-
-				if (mask.empty() || mask.equals_ci(x->mask) || mask == x->id || Anope::Match(x->mask, mask, false, true))
+				if (mask.empty() || mask.equals_ci(x->GetMask()) || mask == x->id || Anope::Match(x->GetMask(), mask, false, true))
 				{
 					ListFormatter::ListEntry entry;
-					entry["Number"] = stringify(i + 1);
-					entry["Mask"] = x->mask;
-					entry["Creator"] = x->by;
-					entry["Created"] = Anope::strftime(x->created, NULL, true);
-					entry["Expires"] = Anope::Expires(x->expires, source.nc);
-					entry["Reason"] = x->reason;
+					entry["Number"] = stringify(++i);
+					entry["Mask"] = x->GetMask();
+					entry["Creator"] = x->GetBy();
+					entry["Created"] = Anope::strftime(x->GetCreated(), NULL, true);
+					entry["Expires"] = Anope::Expires(x->GetExpires(), source.nc);
+					entry["Reason"] = x->GetReason();
 					list.AddEntry(entry);
 				}
 			}
 		}
 
 		if (list.IsEmpty())
-			source.Reply(_("There are no matching entries on the akill list."));
-		else
 		{
-			source.Reply(_("Current akill list:"));
-
-			std::vector<Anope::string> replies;
-			list.Process(replies);
-
-			for (unsigned i = 0; i < replies.size(); ++i)
-				source.Reply(replies[i]);
-
-			source.Reply(_("End of akill list."));
+			source.Reply(_("There are no matching entries on the akill list."));
+			return;
 		}
+
+		source.Reply(_("Current akill list:"));
+
+		std::vector<Anope::string> replies;
+		list.Process(replies);
+
+		for (unsigned i = 0; i < replies.size(); ++i)
+			source.Reply(replies[i]);
+
+		source.Reply(_("End of akill list."));
 	}
 
 	void DoList(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		if (akills->GetList().empty())
+		if (akills->GetXLines().empty())
 		{
 			source.Reply(_("The akill list is empty."));
 			return;
@@ -303,7 +303,7 @@ class CommandOSAKill : public Command
 
 	void DoView(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		if (akills->GetList().empty())
+		if (akills->GetXLines().empty())
 		{
 			source.Reply(_("The akill list is empty."));
 			return;
@@ -317,12 +317,10 @@ class CommandOSAKill : public Command
 
 	void DoClear(CommandSource &source)
 	{
-
-		for (unsigned i = akills->GetCount(); i > 0; --i)
+		for (XLine *x : akills->GetXLines())
 		{
-			XLine *x = akills->GetEntry(i - 1);
 			Event::OnDelXLine(&Event::DelXLine::OnDelXLine, source, x, akills);
-			akills->DelXLine(x);
+			x->Delete();
 		}
 
 		Log(LOG_ADMIN, source, this) << "to CLEAR the list";

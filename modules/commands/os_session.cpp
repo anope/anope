@@ -37,62 +37,141 @@ namespace
 	EventHandlers<Event::Exception> *events;
 }
 
+class ExceptionImpl : public Exception
+{
+ public:
+	ExceptionImpl(Serialize::TypeBase *type) : Exception(type) { }
+	ExceptionImpl(Serialize::TypeBase *type, Serialize::ID id) : Exception(type, id) { }
+
+	Anope::string GetMask() override;
+	void SetMask(const Anope::string &) override;
+
+	unsigned int GetLimit() override;
+	void SetLimit(unsigned int) override;
+	
+	Anope::string GetWho() override;
+	void SetWho(const Anope::string &) override;
+
+	Anope::string GetReason() override;
+	void SetReason(const Anope::string &) override;
+
+	time_t GetTime() override;
+	void SetTime(const time_t &) override;
+
+	time_t GetExpires() override;
+	void SetExpires(const time_t &) override;
+};
+
+class ExceptionType : public Serialize::Type<ExceptionImpl>
+{
+ public:
+	Serialize::Field<ExceptionImpl, Anope::string> mask, who, reason;
+	Serialize::Field<ExceptionImpl, unsigned int> limit;
+	Serialize::Field<ExceptionImpl, time_t> time, expires;
+
+	ExceptionType(Module *me) : Serialize::Type<ExceptionImpl>(me, "Exception")
+			, mask(this, "mask")
+			, who(this, "who")
+			, reason(this, "reason")
+			, limit(this, "limit")
+			, time(this, "time")
+			, expires(this, "expires")
+	{
+	}
+};
+
+Anope::string ExceptionImpl::GetMask()
+{
+	return Get(&ExceptionType::mask);
+}
+
+void ExceptionImpl::SetMask(const Anope::string &m)
+{
+	Set(&ExceptionType::mask, m);
+}
+
+unsigned int ExceptionImpl::GetLimit()
+{
+	return Get(&ExceptionType::limit);
+}
+
+void ExceptionImpl::SetLimit(unsigned int l)
+{
+	Set(&ExceptionType::limit, l);
+}
+
+Anope::string ExceptionImpl::GetWho()
+{
+	return Get(&ExceptionType::who);
+}
+
+void ExceptionImpl::SetWho(const Anope::string &w)
+{
+	Set(&ExceptionType::who, w);
+}
+
+Anope::string ExceptionImpl::GetReason()
+{
+	return Get(&ExceptionType::reason);
+}
+
+void ExceptionImpl::SetReason(const Anope::string &r)
+{
+	Set(&ExceptionType::reason, r);
+}
+
+time_t ExceptionImpl::GetTime()
+{
+	return Get(&ExceptionType::time);
+}
+
+void ExceptionImpl::SetTime(const time_t &t)
+{
+	Set(&ExceptionType::time, t);
+}
+
+time_t ExceptionImpl::GetExpires()
+{
+	return Get(&ExceptionType::expires);
+}
+
+void ExceptionImpl::SetExpires(const time_t &e)
+{
+	Set(&ExceptionType::expires, e);
+}
+
 class MySessionService : public SessionService
 {
 	SessionMap Sessions;
-	Serialize::Checker<ExceptionVector> Exceptions;
+
  public:
-	MySessionService(Module *m) : SessionService(m), Exceptions("Exception") { }
-
-	Exception *CreateException() override
-	{
-		return new Exception();
-	}
-
-	void AddException(Exception *e) override
-	{
-		this->Exceptions->push_back(e);
-	}
-
-	void DelException(Exception *e) override
-	{
-		ExceptionVector::iterator it = std::find(this->Exceptions->begin(), this->Exceptions->end(), e);
-		if (it != this->Exceptions->end())
-			this->Exceptions->erase(it);
-	}
+	MySessionService(Module *m) : SessionService(m) { }
 
 	Exception *FindException(User *u) override
 	{
-		for (std::vector<Exception *>::const_iterator it = this->Exceptions->begin(), it_end = this->Exceptions->end(); it != it_end; ++it)
+		for (Exception *e : Serialize::GetObjects<Exception *>(exception))
 		{
-			Exception *e = *it;
-			if (Anope::Match(u->host, e->mask) || Anope::Match(u->ip.addr(), e->mask))
+			if (Anope::Match(u->host, e->GetMask()) || Anope::Match(u->ip.addr(), e->GetMask()))
 				return e;
 			
-			if (cidr(e->mask).match(u->ip))
+			if (cidr(e->GetMask()).match(u->ip))
 				return e;
 		}
-		return NULL;
+		return nullptr;
 	}
 
 	Exception *FindException(const Anope::string &host) override
 	{
-		for (std::vector<Exception *>::const_iterator it = this->Exceptions->begin(), it_end = this->Exceptions->end(); it != it_end; ++it)
+		for (Exception *e : Serialize::GetObjects<Exception *>(exception))
 		{
-			Exception *e = *it;
-			if (Anope::Match(host, e->mask))
+			if (Anope::Match(host, e->GetMask()))
 				return e;
 
-			if (cidr(e->mask).match(sockaddrs(host)))
+			if (cidr(e->GetMask()).match(sockaddrs(host)))
 				return e;
 		}
 
-		return NULL;
-	}
-
-	ExceptionVector &GetExceptions() override
-	{
-		return this->Exceptions;
+		return nullptr;
 	}
 
 	void DelSession(Session *s)
@@ -145,34 +224,34 @@ class CommandOSSession : public Command
 		catch (const ConvertException &) { }
 
 		if (mincount <= 1)
-			source.Reply(_("Invalid threshold value. It must be a valid integer greater than 1."));
-		else
 		{
-			ListFormatter list(source.GetAccount());
-			list.AddColumn(_("Session")).AddColumn(_("Host"));
-
-			for (SessionService::SessionMap::iterator it = session_service->GetSessions().begin(), it_end = session_service->GetSessions().end(); it != it_end; ++it)
-			{
-				Session *session = it->second;
-
-				if (session->count >= mincount)
-				{
-					ListFormatter::ListEntry entry;
-					entry["Session"] = stringify(session->count);
-					entry["Host"] = session->addr.mask();
-					list.AddEntry(entry);
-				}
-			}
-
-			source.Reply(_("Hosts with at least \002{0}\002 sessions:"), mincount);
-
-			std::vector<Anope::string> replies;
-			list.Process(replies);
-
-
-			for (unsigned i = 0; i < replies.size(); ++i)
-				source.Reply(replies[i]);
+			source.Reply(_("Invalid threshold value. It must be a valid integer greater than 1."));
+			return;
 		}
+
+		ListFormatter list(source.GetAccount());
+		list.AddColumn(_("Session")).AddColumn(_("Host"));
+
+		for (SessionService::SessionMap::iterator it = session_service->GetSessions().begin(), it_end = session_service->GetSessions().end(); it != it_end; ++it)
+		{
+			Session *session = it->second;
+
+			if (session->count >= mincount)
+			{
+				ListFormatter::ListEntry entry;
+				entry["Session"] = stringify(session->count);
+				entry["Host"] = session->addr.mask();
+				list.AddEntry(entry);
+			}
+		}
+
+		source.Reply(_("Hosts with at least \002{0}\002 sessions:"), mincount);
+
+		std::vector<Anope::string> replies;
+		list.Process(replies);
+
+		for (unsigned i = 0; i < replies.size(); ++i)
+			source.Reply(replies[i]);
 	}
 
 	void DoView(CommandSource &source, const std::vector<Anope::string> &params)
@@ -180,16 +259,16 @@ class CommandOSSession : public Command
 		Anope::string param = params[1];
 		Session *session = session_service->FindSession(param);
 
-		Exception *exception = session_service->FindException(param);
+		Exception *e = session_service->FindException(param);
 		Anope::string entry = "no entry";
 		unsigned limit = session_limit;
-		if (exception)
+		if (e)
 		{
-			if (!exception->limit)
+			if (!e->GetLimit())
 				limit = 0;
-			else if (exception->limit > limit)
-				limit = exception->limit;
-			entry = exception->mask;
+			else if (e->GetLimit() > limit)
+				limit = e->GetLimit();
+			entry = e->GetMask();
 		}
 
 		if (!session)
@@ -197,6 +276,7 @@ class CommandOSSession : public Command
 		else
 			source.Reply(_("The host \002{0}\002 currently has \002{1}\002 sessions with a limit of \002{2}\002 because it matches entry: \002{3}\002."), session->addr.mask(), session->count, limit, entry);
 	}
+
  public:
 	CommandOSSession(Module *creator) : Command(creator, "operserv/session", 2, 2)
 	{
@@ -214,9 +294,9 @@ class CommandOSSession : public Command
 		if (!session_limit)
 			source.Reply(_("Session limiting is disabled."));
 		else if (cmd.equals_ci("LIST"))
-			return this->DoList(source, params);
+			this->DoList(source, params);
 		else if (cmd.equals_ci("VIEW"))
-			return this->DoView(source, params);
+			this->DoView(source, params);
 		else
 			this->OnSyntaxError(source, "");
 	}
@@ -237,16 +317,12 @@ class CommandOSSession : public Command
 
 class CommandOSException : public Command
 {
-	static void DoDel(CommandSource &source, unsigned index)
+	static void DoDel(CommandSource &source, Exception *e)
 	{
-		Exception *e = session_service->GetExceptions()[index];
 		(*events)(&Event::Exception::OnExceptionDel, source, e);
-
-		session_service->DelException(e);
-		delete e;
+		e->Delete();
 	}
 
- private:
 	void DoAdd(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		Anope::string mask, expiry, limitstr;
@@ -306,42 +382,36 @@ class CommandOSException : public Command
 				return;
 			}
 
-			for (std::vector<Exception *>::iterator it = session_service->GetExceptions().begin(), it_end = session_service->GetExceptions().end(); it != it_end; ++it)
-			{
-				Exception *e = *it;
-				if (e->mask.equals_ci(mask))
+			for (Exception *e : Serialize::GetObjects<Exception *>(exception))
+				if (e->GetMask().equals_ci(mask))
 				{
-					if (e->limit != limit)
+					if (e->GetLimit() != limit)
 					{
-						e->limit = limit;
-						source.Reply(_("Exception for \002{0}\002 has been updated to \002{1}\002."), mask, e->limit);
+						e->SetLimit(limit);
+						source.Reply(_("Exception for \002{0}\002 has been updated to \002{1}\002."), mask, e->GetLimit());
 					}
 					else
 						source.Reply(_("\002{0}\002 already exists on the session-limit exception list."), mask);
 					return;
 				}
-			}
 
-			Exception *exception = new Exception();
-			exception->mask = mask;
-			exception->limit = limit;
-			exception->reason = reason;
-			exception->time = Anope::CurTime;
-			exception->who = source.GetNick();
-			exception->expires = expires;
+			Exception *e = exception.Create();
+			e->SetMask(mask);
+			e->SetLimit(limit);
+			e->SetReason(reason);
+			e->SetTime(Anope::CurTime);
+			e->SetWho(source.GetNick());
+			e->SetExpires(expires);
 
 			EventReturn MOD_RESULT;
-			MOD_RESULT = (*events)(&Event::Exception::OnExceptionAdd, exception);
-			if (MOD_RESULT == EVENT_STOP)
-				delete exception;
-			else
-			{
-				Log(LOG_ADMIN, source, this) << "to set the session limit for " << mask << " to " << limit;
-				session_service->AddException(exception);
-				source.Reply(_("Session limit for \002{0}\002 set to \002{1}\002."), mask, limit);
-				if (Anope::ReadOnly)
-					source.Reply(_("Services are in read-only mode. Any changes made may not persist."));
-			}
+			MOD_RESULT = (*events)(&Event::Exception::OnExceptionAdd, e);
+			if (MOD_RESULT == EVENT_STOP) 
+				return;
+
+			Log(LOG_ADMIN, source, this) << "to set the session limit for " << mask << " to " << limit;
+			source.Reply(_("Session limit for \002{0}\002 set to \002{1}\002."), mask, limit);
+			if (Anope::ReadOnly)
+				source.Reply(_("Services are in read-only mode. Any changes made may not persist."));
 		}
 	}
 
@@ -362,13 +432,16 @@ class CommandOSException : public Command
 			NumberList(mask, true,
 				[&](unsigned int number)
 				{
-					if (!number || number > session_service->GetExceptions().size())
+					std::vector<Exception *> exceptions = Serialize::GetObjects<Exception *>(exception);
+					if (!number || number > exceptions.size())
 						return;
 
-					Log(LOG_ADMIN, source, this) << "to remove the session limit exception for " << session_service->GetExceptions()[number - 1]->mask;
+					Exception *e = exceptions[number - 1];
+
+					Log(LOG_ADMIN, source, this) << "to remove the session limit exception for " << e->GetMask();
 
 					++deleted;
-					DoDel(source, number - 1);
+					DoDel(source, e);
 				},
 				[&]()
 				{
@@ -382,16 +455,17 @@ class CommandOSException : public Command
 		}
 		else
 		{
-			unsigned i = 0, end = session_service->GetExceptions().size();
-			for (; i < end; ++i)
-				if (mask.equals_ci(session_service->GetExceptions()[i]->mask))
+			bool found = false;
+			for (Exception *e : Serialize::GetObjects<Exception *>(exception))
+				if (mask.equals_ci(e->GetMask()))
 				{
 					Log(LOG_ADMIN, source, this) << "to remove the session limit exception for " << mask;
-					DoDel(source, i);
+					DoDel(source, e);
 					source.Reply(_("\002{0}\002 deleted from session-limit exception list."), mask);
+					found = true;
 					break;
 				}
-			if (i == end)
+			if (!found)
 				source.Reply(_("\002{0}\002 not found on session-limit exception list."), mask);
 		}
 
@@ -401,6 +475,8 @@ class CommandOSException : public Command
 
 	void DoMove(CommandSource &source, const std::vector<Anope::string> &params)
 	{
+		// XXX
+#if 0
 		const Anope::string &n1str = params.size() > 1 ? params[1] : ""; /* From position */
 		const Anope::string &n2str = params.size() > 2 ? params[2] : ""; /* To position */
 		int n1, n2;
@@ -433,13 +509,15 @@ class CommandOSException : public Command
 		}
 		else
 			this->OnSyntaxError(source, "MOVE");
+#endif
 	}
 
 	void ProcessList(CommandSource &source, const std::vector<Anope::string> &params, ListFormatter &list)
 	{
 		const Anope::string &mask = params.size() > 1 ? params[1] : "";
+		std::vector<Exception *> exceptions = Serialize::GetObjects<Exception *>(exception);
 
-		if (session_service->GetExceptions().empty())
+		if (exceptions.empty())
 		{
 			source.Reply(_("The session exception list is empty."));
 			return;
@@ -450,55 +528,56 @@ class CommandOSException : public Command
 			NumberList(mask, false,
 				[&](unsigned int number)
 				{
-					if (!number || number > session_service->GetExceptions().size())
+					if (!number || number > exceptions.size())
 						return;
 
-					Exception *e = session_service->GetExceptions()[number - 1];
+					Exception *e = exceptions[number - 1];
 
 					ListFormatter::ListEntry entry;
 					entry["Number"] = stringify(number);
-					entry["Mask"] = e->mask;
-					entry["By"] = e->who;
-					entry["Created"] = Anope::strftime(e->time, NULL, true);
-					entry["Expires"] = Anope::Expires(e->expires, source.GetAccount());
-					entry["Limit"] = stringify(e->limit);
-					entry["Reason"] = e->reason;
+					entry["Mask"] = e->GetMask();
+					entry["By"] = e->GetWho();
+					entry["Created"] = Anope::strftime(e->GetTime(), NULL, true);
+					entry["Expires"] = Anope::Expires(e->GetExpires(), source.GetAccount());
+					entry["Limit"] = stringify(e->GetLimit());
+					entry["Reason"] = e->GetReason();
 					list.AddEntry(entry);
 				},
 				[]{});
 		}
 		else
 		{
-			for (unsigned i = 0, end = session_service->GetExceptions().size(); i < end; ++i)
+			unsigned int i = 0;
+			for (Exception *e : exceptions)
 			{
-				Exception *e = session_service->GetExceptions()[i];
-				if (mask.empty() || Anope::Match(e->mask, mask))
+				if (mask.empty() || Anope::Match(e->GetMask(), mask))
 				{
 					ListFormatter::ListEntry entry;
-					entry["Number"] = stringify(i + 1);
-					entry["Mask"] = e->mask;
-					entry["By"] = e->who;
-					entry["Created"] = Anope::strftime(e->time, NULL, true);
-					entry["Expires"] = Anope::Expires(e->expires, source.GetAccount());
-					entry["Limit"] = stringify(e->limit);
-					entry["Reason"] = e->reason;
+					entry["Number"] = stringify(++i);
+					entry["Mask"] = e->GetMask();
+					entry["By"] = e->GetWho();
+					entry["Created"] = Anope::strftime(e->GetTime(), NULL, true);
+					entry["Expires"] = Anope::Expires(e->GetExpires(), source.GetAccount());
+					entry["Limit"] = stringify(e->GetLimit());
+					entry["Reason"] = e->GetReason();
 					list.AddEntry(entry);
 				}
 			}
 		}
 
 		if (list.IsEmpty())
-			source.Reply(_("No matching entries on session-limit exception list."));
-		else
 		{
-			source.Reply(_("Session-limit exception list:"));
-
-			std::vector<Anope::string> replies;
-			list.Process(replies);
-
-			for (unsigned i = 0; i < replies.size(); ++i)
-				source.Reply(replies[i]);
+			source.Reply(_("No matching entries on session-limit exception list."));
+			return;
 		}
+
+		source.Reply(_("Session-limit exception list:"));
+
+		std::vector<Anope::string> replies;
+		list.Process(replies);
+
+		for (const Anope::string &r : replies)
+			source.Reply(r);
 	}
 
 	void DoList(CommandSource &source, const std::vector<Anope::string> &params)
@@ -583,24 +662,24 @@ class OSSession : public Module
 	, public EventHook<Event::UserQuit>
 	, public EventHook<Event::ExpireTick>
 {
-	Serialize::Type exception_type;
 	MySessionService ss;
 	CommandOSSession commandossession;
 	CommandOSException commandosexception;
 	ServiceReference<XLineManager> akills;
 	EventHandlers<Event::Exception> exceptionevents;
+	ExceptionType etype;
 
  public:
 	OSSession(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
 		, EventHook<Event::UserConnect>("OnUserConnect", EventHook<Event::UserConnect>::Priority::FIRST)
 		, EventHook<Event::UserQuit>("OnUserQuit", EventHook<Event::UserQuit>::Priority::FIRST)
 		, EventHook<Event::ExpireTick>("OnExpireTick", EventHook<Event::ExpireTick>::Priority::FIRST)
-		, exception_type("Exception", Exception::Unserialize)
 		, ss(this)
 		, commandossession(this)
 		, commandosexception(this)
 		, akills("XLineManager", "xlinemanager/sgline")
 		, exceptionevents(this, "Exception")
+		, etype(this)
 	{
 		this->SetPermanent(true);
 
@@ -644,11 +723,11 @@ class OSSession : public Module
 			if (session->count >= session_limit)
 			{
 				kill = true;
-				Exception *exception = this->ss.FindException(u);
-				if (exception)
+				Exception *e = this->ss.FindException(u);
+				if (e)
 				{
 					kill = false;
-					if (exception->limit && session->count >= exception->limit)
+					if (e->GetLimit() && session->count >= e->GetLimit())
 						kill = true;
 				}
 			}
@@ -657,7 +736,7 @@ class OSSession : public Module
 
 			if (kill && !exempt)
 			{
-				BotInfo *OperServ = Config->GetClient("OperServ");
+				ServiceBot *OperServ = Config->GetClient("OperServ");
 				if (OperServ)
 				{
 					if (!sle_reason.empty())
@@ -717,16 +796,15 @@ class OSSession : public Module
 	{
 		if (Anope::NoExpire)
 			return;
-		for (unsigned i = this->ss.GetExceptions().size(); i > 0; --i)
-		{
-			Exception *e = this->ss.GetExceptions()[i - 1];
 
-			if (!e->expires || e->expires > Anope::CurTime)
+		for (Exception *e : Serialize::GetObjects<Exception *>(exception))
+		{
+			if (!e->GetExpires() || e->GetExpires() > Anope::CurTime)
 				continue;
-			BotInfo *OperServ = Config->GetClient("OperServ");
-			Log(OperServ, "expire/exception") << "Session exception for " << e->mask << " has expired.";
-			this->ss.DelException(e);
-			delete e;
+
+			ServiceBot *OperServ = Config->GetClient("OperServ");
+			Log(OperServ, "expire/exception") << "Session exception for " << e->GetMask() << " has expired.";
+			e->Delete();
 		}
 	}
 };

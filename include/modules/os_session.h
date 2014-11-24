@@ -1,48 +1,53 @@
-#ifndef OS_SESSION_H
-#define OS_SESSION_H
+
+#pragma once
 
 struct Session
 {
 	cidr addr;                      /* A cidr (sockaddrs + len) representing this session */
-	unsigned count;                 /* Number of clients with this host */
-	unsigned hits;                  /* Number of subsequent kills for a host */
+	unsigned int count = 1;         /* Number of clients with this host */
+	unsigned int hits = 0;          /* Number of subsequent kills for a host */
 
-	Session(const sockaddrs &ip, int len) : addr(ip, len), count(1), hits(0) { }
+	Session(const sockaddrs &ip, int len) : addr(ip, len) { }
 };
 
-struct Exception : Serializable
+class Exception : public Serialize::Object
 {
-	Anope::string mask;		/* Hosts to which this exception applies */
-	unsigned limit;			/* Session limit for exception */
-	Anope::string who;		/* Nick of person who added the exception */
-	Anope::string reason;		/* Reason for exception's addition */
-	time_t time;			/* When this exception was added */
-	time_t expires;			/* Time when it expires. 0 == no expiry */
+ protected:
+	using Serialize::Object::Object;
 
-	Exception() : Serializable("Exception") { }
-	void Serialize(Serialize::Data &data) const override;
-	static Serializable* Unserialize(Serializable *obj, Serialize::Data &data);
+ public:
+
+	virtual Anope::string GetMask() anope_abstract;
+	virtual void SetMask(const Anope::string &) anope_abstract;
+
+	virtual unsigned int GetLimit() anope_abstract;
+	virtual void SetLimit(unsigned int) anope_abstract;
+	
+	virtual Anope::string GetWho() anope_abstract;
+	virtual void SetWho(const Anope::string &) anope_abstract;
+
+	virtual Anope::string GetReason() anope_abstract;
+	virtual void SetReason(const Anope::string &) anope_abstract;
+
+	virtual time_t GetTime() anope_abstract;
+	virtual void SetTime(const time_t &) anope_abstract;
+
+	virtual time_t GetExpires() anope_abstract;
+	virtual void SetExpires(const time_t &) anope_abstract;
 };
+
+static Serialize::TypeReference<Exception> exception("Exception");
 
 class SessionService : public Service
 {
  public:
  	typedef std::unordered_map<cidr, Session *, cidr::hash> SessionMap;
-	typedef std::vector<Exception *> ExceptionVector;
 
 	SessionService(Module *m) : Service(m, "SessionService", "session") { }
-
-	virtual Exception *CreateException() anope_abstract;
-
-	virtual void AddException(Exception *e) anope_abstract;
-
-	virtual void DelException(Exception *e) anope_abstract;
 
 	virtual Exception *FindException(User *u) anope_abstract;
 
 	virtual Exception *FindException(const Anope::string &host) anope_abstract;
-
-	virtual ExceptionVector &GetExceptions() anope_abstract;
 
 	virtual Session *FindSession(const Anope::string &ip) anope_abstract;
 
@@ -68,38 +73,4 @@ namespace Event
 		virtual void OnExceptionDel(CommandSource &source, ::Exception *ex) anope_abstract;
 	};
 }
-
-void Exception::Serialize(Serialize::Data &data) const
-{
-	data["mask"] << this->mask;
-	data["limit"] << this->limit;
-	data["who"] << this->who;
-	data["reason"] << this->reason;
-	data["time"] << this->time;
-	data["expires"] << this->expires;
-}
-
-Serializable* Exception::Unserialize(Serializable *obj, Serialize::Data &data)
-{
-	if (!session_service)
-		return NULL;
-
-	Exception *ex;
-	if (obj)
-		ex = anope_dynamic_static_cast<Exception *>(obj);
-	else
-		ex = new Exception;
-	data["mask"] >> ex->mask;
-	data["limit"] >> ex->limit;
-	data["who"] >> ex->who;
-	data["reason"] >> ex->reason;
-	data["time"] >> ex->time;
-	data["expires"] >> ex->expires;
-
-	if (!obj)
-		session_service->AddException(ex);
-	return ex;
-}
-
-#endif
 

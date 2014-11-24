@@ -10,11 +10,19 @@
 #pragma once
 
 #include "service.h"
-#include "modules.h"
+
+/** Possible return types from events.
+ */
+enum EventReturn
+{
+	EVENT_STOP,
+	EVENT_CONTINUE,
+	EVENT_ALLOW
+};
 
 struct Events
 {
-	virtual ~Events() { }
+	virtual ~Events() = default;
 };
 
 /* uninstantiated */
@@ -174,7 +182,7 @@ namespace Event
 		 * @param bi The bot being assigned.
 		 * @return EVENT_CONTINUE to let other modules decide, EVENT_STOP to deny the assign.
 		 */
-		virtual EventReturn OnPreBotAssign(User *sender, ChanServ::Channel *ci, BotInfo *bi) anope_abstract;
+		virtual EventReturn OnPreBotAssign(User *sender, ChanServ::Channel *ci, ServiceBot *bi) anope_abstract;
 	};
 	extern CoreExport EventHandlers<PreBotAssign> OnPreBotAssign;
 
@@ -182,7 +190,7 @@ namespace Event
 	{
 		/** Called when a bot is assigned ot a channel
 		 */
-		virtual void OnBotAssign(User *sender, ChanServ::Channel *ci, BotInfo *bi) anope_abstract;
+		virtual void OnBotAssign(User *sender, ChanServ::Channel *ci, ServiceBot *bi) anope_abstract;
 	};
 	extern CoreExport EventHandlers<BotAssign> OnBotAssign;
 
@@ -288,13 +296,13 @@ namespace Event
 	{
 		/** Called when a bot is created or destroyed
 		 */
-		virtual void OnCreateBot(BotInfo *bi) anope_abstract;
+		virtual void OnCreateBot(ServiceBot *bi) anope_abstract;
 	};
 	extern CoreExport EventHandlers<CreateBot> OnCreateBot;
 
 	struct CoreExport DelBot : Events
 	{
-		virtual void OnDelBot(BotInfo *bi) anope_abstract;
+		virtual void OnDelBot(ServiceBot *bi) anope_abstract;
 	};
 	extern CoreExport EventHandlers<DelBot> OnDelBot;
 
@@ -854,7 +862,7 @@ namespace Event
 		 * @param message The message
 		 * @return EVENT_STOP to halt processing
 		 */
-		virtual EventReturn OnBotPrivmsg(User *u, BotInfo *bi, Anope::string &message) anope_abstract;
+		virtual EventReturn OnBotPrivmsg(User *u, ServiceBot *bi, Anope::string &message) anope_abstract;
 	};
 	extern CoreExport EventHandlers<BotPrivmsg> OnBotPrivmsg;
 
@@ -865,7 +873,7 @@ namespace Event
 		 * @param bi The target of the NOTICE
 		 * @param message The message
 		 */
-		virtual void OnBotNotice(User *u, BotInfo *bi, Anope::string &message) anope_abstract;
+		virtual void OnBotNotice(User *u, ServiceBot *bi, Anope::string &message) anope_abstract;
 	};
 	extern CoreExport EventHandlers<BotNotice> OnBotNotice;
 
@@ -935,36 +943,6 @@ namespace Event
 	};
 	extern CoreExport EventHandlers<SetCorrectModes> OnSetCorrectModes;
 
-	struct CoreExport SerializeCheck : Events
-	{
-		virtual void OnSerializeCheck(Serialize::Type *) anope_abstract;
-	};
-	extern CoreExport EventHandlers<SerializeCheck> OnSerializeCheck;
-
-	struct CoreExport SerializableConstruct : Events
-	{
-		virtual void OnSerializableConstruct(Serializable *) anope_abstract;
-	};
-	extern CoreExport EventHandlers<SerializableConstruct> OnSerializableConstruct;
-
-	struct CoreExport SerializableDestruct : Events
-	{
-		virtual void OnSerializableDestruct(Serializable *) anope_abstract;
-	};
-	extern CoreExport EventHandlers<SerializableDestruct> OnSerializableDestruct;
-
-	struct CoreExport SerializableUpdate : Events
-	{
-		virtual void OnSerializableUpdate(Serializable *) anope_abstract;
-	};
-	extern CoreExport EventHandlers<SerializableUpdate> OnSerializableUpdate;
-
-	struct CoreExport SerializeTypeCreate : Events
-	{
-		virtual void OnSerializeTypeCreate(Serialize::Type *) anope_abstract;
-	};
-	extern CoreExport EventHandlers<SerializeTypeCreate> OnSerializeTypeCreate;
-
 	struct CoreExport Message : Events
 	{
 		/** Called whenever a message is received from the uplink
@@ -1002,5 +980,36 @@ namespace Event
 	};
 	extern CoreExport EventHandlers<ExpireTick> OnExpireTick;
 
+	struct CoreExport SerializeEvents : Events
+	{
+		virtual EventReturn OnSerializeList(Serialize::TypeBase *type, std::vector<Serialize::ID> &ids) anope_abstract;
+
+		virtual EventReturn OnSerializeFind(Serialize::TypeBase *type, Serialize::FieldBase *field, const Anope::string &value, Serialize::ID &id) anope_abstract;
+
+		virtual EventReturn OnSerializeGet(Serialize::Object *object, Serialize::FieldBase *field, Anope::string &value) anope_abstract;
+
+		virtual EventReturn OnSerializeGetSerializable(Serialize::Object *object, Serialize::FieldBase *field, Anope::string &type, Serialize::ID &id) anope_abstract;
+
+		virtual EventReturn OnSerializeGetRefs(Serialize::Object *object, Serialize::TypeBase *type, std::vector<Serialize::Edge> &) anope_abstract;
+
+		virtual EventReturn OnSerializeDeref(Serialize::ID value, Serialize::TypeBase *type) anope_abstract;
+
+		virtual EventReturn OnSerializableGetId(Serialize::ID &id) anope_abstract;
+
+		virtual void OnSerializableDelete(Serialize::Object *) anope_abstract;
+
+		virtual EventReturn OnSerializeSet(Serialize::Object *object, Serialize::FieldBase *field, const Anope::string &value) anope_abstract;
+
+		virtual EventReturn OnSerializeSetSerializable(Serialize::Object *object, Serialize::FieldBase *field, Serialize::Object *value) anope_abstract;
+
+		virtual EventReturn OnSerializeUnset(Serialize::Object *object, Serialize::FieldBase *field) anope_abstract;
+
+		virtual EventReturn OnSerializeUnsetSerializable(Serialize::Object *object, Serialize::FieldBase *field) anope_abstract;
+
+		virtual EventReturn OnSerializeHasField(Serialize::Object *object, Serialize::FieldBase *field) anope_abstract;
+
+		virtual void OnSerializableCreate(Serialize::Object *) anope_abstract;
+	};
+	extern CoreExport EventHandlers<SerializeEvents> OnSerialize;
 }
 

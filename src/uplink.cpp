@@ -17,6 +17,8 @@
 #include "servers.h"
 #include "event.h"
 #include "bots.h"
+#include "timers.h"
+#include "modules.h"
 
 UplinkSocket *UplinkSock = NULL;
 
@@ -90,7 +92,7 @@ UplinkSocket::~UplinkSocket()
 			{
 				/* Don't use quitmsg here, it may contain information you don't want people to see */
 				IRCD->SendQuit(u, "Shutting down");
-				BotInfo* bi = BotInfo::Find(u->GetUID());
+				ServiceBot* bi = ServiceBot::Find(u->GetUID());
 				if (bi != NULL)
 					bi->introduced = false;
 			}
@@ -190,7 +192,7 @@ UplinkSocket::Message::~Message()
 			return;
 		}
 
-		const BotInfo *bi = this->source.GetBot();
+		const ServiceBot *bi = this->source.GetBot();
 		if (bi != NULL && bi->introduced == false)
 		{
 			Log(LOG_DEBUG) << "Attempted to send \"" << this->buffer.str() << "\" from " << bi->nick << " when not introduced";

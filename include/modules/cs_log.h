@@ -9,35 +9,36 @@
  * Based on the original code of Services by Andy Church.
  */
 
-struct LogSetting
+class LogSetting : public Serialize::Object
 {
-	Anope::string chan;
-	/* Our service name of the command */
-	Anope::string service_name;
-	/* The name of the client the command is on */
-	Anope::string command_service;
-	/* Name of the command to the user, can have spaces */
-	Anope::string command_name;
-	Anope::string method, extra;
-	Anope::string creator;
-	time_t created;
-
-	virtual ~LogSetting() { }
  protected:
-	LogSetting() { }
-};
-
-struct LogSettings : Serialize::Checker<std::vector<LogSetting *> >
-{
-	typedef std::vector<LogSetting *>::iterator iterator;
-
- protected:
-	LogSettings() : Serialize::Checker<std::vector<LogSetting *> >("LogSetting")
-	{
-	}
+	using Serialize::Object::Object;
 
  public:
- 	virtual ~LogSettings() { }
-	virtual LogSetting *Create() anope_abstract;
+	virtual ChanServ::Channel *GetChannel() anope_abstract;
+	virtual void SetChannel(ChanServ::Channel *) anope_abstract;
+
+	virtual Anope::string GetServiceName() anope_abstract;
+	virtual void SetServiceName(const Anope::string &) anope_abstract;
+
+	virtual Anope::string GetCommandService() anope_abstract;
+	virtual void SetCommandService(const Anope::string &) anope_abstract;
+
+	virtual Anope::string GetCommandName() anope_abstract;
+	virtual void SetCommandName(const Anope::string &) anope_abstract;
+
+	virtual Anope::string GetMethod() anope_abstract;
+	virtual void SetMethod(const Anope::string &) anope_abstract;
+
+	virtual Anope::string GetExtra() anope_abstract;
+	virtual void SetExtra(const Anope::string &) anope_abstract;
+
+	virtual Anope::string GetCreator() anope_abstract;
+	virtual void SetCreator(const Anope::string &) anope_abstract;
+
+	virtual time_t GetCreated() anope_abstract;
+	virtual void SetCreated(const time_t &) anope_abstract;
 };
+
+static Serialize::TypeReference<LogSetting> logsetting("LogSetting");
 

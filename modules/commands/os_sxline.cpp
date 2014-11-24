@@ -14,14 +14,13 @@
 class CommandOSSXLineBase : public Command
 {
  private:
- 	virtual XLineManager* xlm() = 0;
+ 	virtual XLineManager* xlm() anope_abstract;
 
-	virtual void OnAdd(CommandSource &source, const std::vector<Anope::string> &params) = 0;
+	virtual void OnAdd(CommandSource &source, const std::vector<Anope::string> &params) anope_abstract;
 
 	void OnDel(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-
-		if (!this->xlm() || this->xlm()->GetList().empty())
+		if (!this->xlm() || this->xlm()->GetXLines().empty())
 		{
 			source.Reply(_("{0} list is empty."), source.command);
 			return;
@@ -47,10 +46,10 @@ class CommandOSSXLineBase : public Command
 					if (!x)
 						return;
 
-					Log(LOG_ADMIN, source, this) << "to remove " << x->mask << " from the list";
+					Log(LOG_ADMIN, source, this) << "to remove " << x->GetMask() << " from the list";
 
 					++deleted;
-					this->xlm()->DelXLine(x);
+					x->Delete();
 				},
 				[&]()
 				{
@@ -74,7 +73,7 @@ class CommandOSSXLineBase : public Command
 
 			Event::OnDelXLine(&Event::DelXLine::OnDelXLine, source, x, this->xlm());
 
-			this->xlm()->DelXLine(x);
+			x->Delete();
 			source.Reply(_("\002{0}\002 deleted from the {1} list."), mask, source.command);
 			Log(LOG_ADMIN, source, this) << "to remove " << mask << " from the list";
 		}
@@ -85,7 +84,7 @@ class CommandOSSXLineBase : public Command
 
 	void ProcessList(CommandSource &source, const std::vector<Anope::string> &params, ListFormatter &list)
 	{
-		if (!this->xlm() || this->xlm()->GetList().empty())
+		if (!this->xlm() || this->xlm()->GetXLines().empty())
 		{
 			source.Reply(_("{0} list is empty."), source.command);
 			return;
@@ -98,37 +97,36 @@ class CommandOSSXLineBase : public Command
 			NumberList(mask, false,
 				[&](unsigned int number)
 				{
-					const XLine *x = this->xlm()->GetEntry(number - 1);
+					XLine *x = this->xlm()->GetEntry(number - 1);
 
 					if (!x)
 						return;
 
 					ListFormatter::ListEntry entry;
 					entry["Number"] = stringify(number);
-					entry["Mask"] = x->mask;
-					entry["By"] = x->by;
-					entry["Created"] = Anope::strftime(x->created, NULL, true);
-					entry["Expires"] = Anope::Expires(x->expires, source.nc);
-					entry["Reason"] = x->reason;
+					entry["Mask"] = x->GetMask();
+					entry["By"] = x->GetBy();
+					entry["Created"] = Anope::strftime(x->GetCreated(), NULL, true);
+					entry["Expires"] = Anope::Expires(x->GetExpires(), source.nc);
+					entry["Reason"] = x->GetReason();
 					list.AddEntry(entry);
 				},
 				[]{});
 		}
 		else
 		{
-			for (unsigned i = 0, end = this->xlm()->GetCount(); i < end; ++i)
+			unsigned int i = 0;
+			for (XLine *x : this->xlm()->GetXLines())
 			{
-				const XLine *x = this->xlm()->GetEntry(i);
-
-				if (mask.empty() || mask.equals_ci(x->mask) || mask == x->id || Anope::Match(x->mask, mask, false, true))
+				if (mask.empty() || mask.equals_ci(x->GetMask()) || mask == x->id || Anope::Match(x->GetMask(), mask, false, true))
 				{
 					ListFormatter::ListEntry entry;
 					entry["Number"] = stringify(i + 1);
-					entry["Mask"] = x->mask;
-					entry["By"] = x->by;
-					entry["Created"] = Anope::strftime(x->created, NULL, true);
-					entry["Expires"] = Anope::Expires(x->expires, source.nc);
-					entry["Reason"] = x->reason;
+					entry["Mask"] = x->GetMask();
+					entry["By"] = x->GetBy();
+					entry["Created"] = Anope::strftime(x->GetCreated(), NULL, true);
+					entry["Expires"] = Anope::Expires(x->GetExpires(), source.nc);
+					entry["Reason"] = x->GetReason();
 					list.AddEntry(entry);
 				}
 			}
@@ -167,11 +165,8 @@ class CommandOSSXLineBase : public Command
 	{
 		Event::OnDelXLine(&Event::DelXLine::OnDelXLine, source, nullptr, this->xlm());
 
-		for (unsigned i = this->xlm()->GetCount(); i > 0; --i)
-		{
-			XLine *x = this->xlm()->GetEntry(i - 1);
-			this->xlm()->DelXLine(x);
-		}
+		for (XLine *x : this->xlm()->GetXLines())
+			x->Delete();
 
 		Log(LOG_ADMIN, source, this) << "to CLEAR the list";
 		source.Reply(_("The {0} list has been cleared."), source.command);
@@ -314,7 +309,7 @@ class CommandOSSNLine : public CommandOSSXLineBase
 
 		XLine *x = new XLine(mask, source.GetNick(), expires, reason);
 		if (Config->GetModule("operserv")->Get<bool>("akillids"))
-			x->id = XLineManager::GenerateUID();
+			x->SetID(XLineManager::GenerateUID());
 
 		unsigned int affected = 0;
 		for (user_map::const_iterator it = UserListByNick.begin(); it != UserListByNick.end(); ++it)
@@ -519,7 +514,7 @@ class CommandOSSQLine : public CommandOSSXLineBase
 
 		XLine *x = new XLine(mask, source.GetNick(), expires, reason);
 		if (Config->GetModule("operserv")->Get<bool>("akillids"))
-			x->id = XLineManager::GenerateUID();
+			x->SetID(XLineManager::GenerateUID());
 
 		unsigned int affected = 0;
 		for (user_map::const_iterator it = UserListByNick.begin(); it != UserListByNick.end(); ++it)

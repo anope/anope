@@ -35,13 +35,13 @@ class PlexusProto : public IRCDProto
 	}
 
 	void SendSVSKillInternal(const MessageSource &source, User *targ, const Anope::string &reason) override { hybrid->SendSVSKillInternal(source, targ, reason); }
-	void SendGlobalNotice(BotInfo *bi, const Server *dest, const Anope::string &msg) override { hybrid->SendGlobalNotice(bi, dest, msg); }
-	void SendGlobalPrivmsg(BotInfo *bi, const Server *dest, const Anope::string &msg) override { hybrid->SendGlobalPrivmsg(bi, dest, msg); }
-	void SendSQLine(User *u, const XLine *x) override { hybrid->SendSQLine(u, x); }
-	void SendSQLineDel(const XLine *x) override { hybrid->SendSQLineDel(x); }
-	void SendSGLineDel(const XLine *x) override { hybrid->SendSGLineDel(x); }
-	void SendSGLine(User *u, const XLine *x) override { hybrid->SendSGLine(u, x); }
-	void SendAkillDel(const XLine *x) override { hybrid->SendAkillDel(x); }
+	void SendGlobalNotice(ServiceBot *bi, const Server *dest, const Anope::string &msg) override { hybrid->SendGlobalNotice(bi, dest, msg); }
+	void SendGlobalPrivmsg(ServiceBot *bi, const Server *dest, const Anope::string &msg) override { hybrid->SendGlobalPrivmsg(bi, dest, msg); }
+	void SendSQLine(User *u, XLine *x) override { hybrid->SendSQLine(u, x); }
+	void SendSQLineDel(XLine *x) override { hybrid->SendSQLineDel(x); }
+	void SendSGLineDel(XLine *x) override { hybrid->SendSGLineDel(x); }
+	void SendSGLine(User *u, XLine *x) override { hybrid->SendSGLine(u, x); }
+	void SendAkillDel(XLine *x) override { hybrid->SendAkillDel(x); }
 	void SendAkill(User *u, XLine *x) override { hybrid->SendAkill(u, x); }
 	void SendServer(const Server *server) override { hybrid->SendServer(server); }
 	void SendChannel(Channel *c) override { hybrid->SendChannel(c); }
@@ -67,7 +67,7 @@ class PlexusProto : public IRCDProto
 			if (uc != NULL)
 				uc->status.Clear();
 
-			BotInfo *setter = BotInfo::Find(user->GetUID());
+			ServiceBot *setter = ServiceBot::Find(user->GetUID());
 			for (size_t i = 0; i < cs.Modes().length(); ++i)
 				c->SetMode(setter, ModeManager::FindChannelModeByChar(cs.Modes()[i]), user->GetUID(), false);
 
@@ -144,7 +144,7 @@ class PlexusProto : public IRCDProto
 
 	void SendLogin(User *u, NickServ::Nick *na) override
 	{
-		UplinkSocket::Message(Me) << "ENCAP * SU " << u->GetUID() << " " << na->nc->display;
+		UplinkSocket::Message(Me) << "ENCAP * SU " << u->GetUID() << " " << na->GetAccount()->GetDisplay();
 	}
 
 	void SendLogout(User *u) override
@@ -282,7 +282,7 @@ struct IRCDMessageUID : IRCDMessage
 		if (params[8] != "0" && !na)
 			na = NickServ::FindNick(params[8]);
 
-		User::OnIntroduce(params[0], params[4], params[9], params[5], ip, source.GetServer(), params[10], ts, params[3], params[7], na ? *na->nc : NULL);
+		User::OnIntroduce(params[0], params[4], params[9], params[5], ip, source.GetServer(), params[10], ts, params[3], params[7], na ? na->GetAccount() : NULL);
 	}
 };
 

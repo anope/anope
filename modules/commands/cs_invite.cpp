@@ -42,7 +42,7 @@ class CommandCSInvite : public Command
 
 		if (!source.AccessFor(ci).HasPriv("INVITE") && !source.HasCommand("chanserv/invite"))
 		{
-			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "INVITE", ci->name);
+			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "INVITE", ci->GetName());
 			return;
 		}
 

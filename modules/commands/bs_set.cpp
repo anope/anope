@@ -96,7 +96,7 @@ class CommandBSSetBanExpire : public Command
 		ChanServ::AccessGroup access = source.AccessFor(ci);
 		if (!source.HasPriv("botserv/administration") && !access.HasPriv("SET"))
 		{
-			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "SET", ci->name);
+			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "SET", ci->GetName());
 			return;
 		}
 
@@ -120,15 +120,15 @@ class CommandBSSetBanExpire : public Command
 			return;
 		}
 
-		ci->banexpire = t;
+		ci->SetBanExpire(t);
 
 		bool override = !access.HasPriv("SET");
-		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to change banexpire to " << ci->banexpire;
+		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to change banexpire to " << arg;
 
-		if (!ci->banexpire)
+		if (!t)
 			source.Reply(_("Bot bans will no longer automatically expire."));
 		else
-			source.Reply(_("Bot bans will automatically expire after %s."), Anope::Duration(ci->banexpire, source.GetAccount()).c_str());
+			source.Reply(_("Bot bans will automatically expire after \002{0}\002."), Anope::Duration(t, source.GetAccount()));
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &) override
@@ -156,7 +156,7 @@ class CommandBSSetPrivate : public Command
 		if (Anope::ReadOnly)
 			source.Reply(_("Services are in read-only mode. Any changes made may not persist."));
 
-		BotInfo *bi = BotInfo::Find(nick, true);
+		ServiceBot *bi = ServiceBot::Find(nick, true);
 		if (bi == NULL)
 		{
 			source.Reply(_("Bot \002{0}\002 does not exist."), nick);
@@ -165,12 +165,12 @@ class CommandBSSetPrivate : public Command
 
 		if (value.equals_ci("ON"))
 		{
-			bi->oper_only = true;
+			bi->bi->SetOperOnly(true);
 			source.Reply(_("Private mode of bot \002{0}\002 is now \002on\002."), bi->nick);
 		}
 		else if (value.equals_ci("OFF"))
 		{
-			bi->oper_only = false;
+			bi->bi->SetOperOnly(false);
 			source.Reply(_("Private mode of bot \002{0}\002 is now \002off\002."), bi->nick);
 		}
 		else
@@ -203,10 +203,10 @@ class BSSet : public Module
 
 	void OnBotBan(User *u, ChanServ::Channel *ci, const Anope::string &mask) override
 	{
-		if (!ci->banexpire)
+		if (!ci->GetBanExpire())
 			return;
 
-		new CommandBSSetBanExpire::UnbanTimer(this, ci->name, mask, ci->banexpire);
+		new CommandBSSetBanExpire::UnbanTimer(this, ci->GetName(), mask, ci->GetBanExpire());
 	}
 };
 

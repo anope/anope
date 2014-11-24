@@ -16,15 +16,15 @@ static Anope::string UplinkSID;
 
 class HybridProto : public IRCDProto
 {
-	BotInfo *FindIntroduced()
+	ServiceBot *FindIntroduced()
 	{
-		BotInfo *bi = Config->GetClient("OperServ");
+		ServiceBot *bi = Config->GetClient("OperServ");
 		if (bi && bi->introduced)
 			return bi;
 
-		for (botinfo_map::iterator it = BotListByNick->begin(), it_end = BotListByNick->end(); it != it_end; ++it)
-			if (it->second->introduced)
-				return it->second;
+		for (ServiceBot *bi2 : Serialize::GetObjects<ServiceBot *>(botinfo))
+			if (bi2->introduced)
+				return bi2;
 
 		return NULL;
 	}
@@ -51,12 +51,12 @@ class HybridProto : public IRCDProto
 		MaxModes = 4;
 	}
 
-	void SendGlobalNotice(BotInfo *bi, const Server *dest, const Anope::string &msg) override
+	void SendGlobalNotice(ServiceBot *bi, const Server *dest, const Anope::string &msg) override
 	{
 		UplinkSocket::Message(bi) << "NOTICE $$" << dest->GetName() << " :" << msg;
 	}
 
-	void SendGlobalPrivmsg(BotInfo *bi, const Server *dest, const Anope::string &msg) override
+	void SendGlobalPrivmsg(ServiceBot *bi, const Server *dest, const Anope::string &msg) override
 	{
 		UplinkSocket::Message(bi) << "PRIVMSG $$" << dest->GetName() << " :" << msg;
 	}
@@ -66,38 +66,38 @@ class HybridProto : public IRCDProto
 		UplinkSocket::Message(source) << "GLOBOPS :" << buf;
 	}
 
-	void SendSQLine(User *, const XLine *x) override
+	void SendSQLine(User *, XLine *x) override
 	{
-		UplinkSocket::Message(FindIntroduced()) << "ENCAP * RESV " << (x->expires ? x->expires - Anope::CurTime : 0) << " " << x->mask << " 0 :" << x->reason;
+		UplinkSocket::Message(FindIntroduced()) << "ENCAP * RESV " << (x->GetExpires() ? x->GetExpires() - Anope::CurTime : 0) << " " << x->GetMask() << " 0 :" << x->GetReason();
 	}
 
-	void SendSGLineDel(const XLine *x) override
+	void SendSGLineDel(XLine *x) override
 	{
-		UplinkSocket::Message(Config->GetClient("OperServ")) << "UNXLINE * " << x->mask;
+		UplinkSocket::Message(Config->GetClient("OperServ")) << "UNXLINE * " << x->GetMask();
 	}
 
-	void SendSGLine(User *, const XLine *x) override
+	void SendSGLine(User *, XLine *x) override
 	{
-		UplinkSocket::Message(Config->GetClient("OperServ")) << "XLINE * " << x->mask << " 0 :" << x->GetReason();
+		UplinkSocket::Message(Config->GetClient("OperServ")) << "XLINE * " << x->GetMask() << " 0 :" << x->GetReason();
 	}
 
-	void SendSZLineDel(const XLine *x) override
+	void SendSZLineDel(XLine *x) override
 	{
 		UplinkSocket::Message(Config->GetClient("OperServ")) << "UNDLINE * " << x->GetHost();
 	}
 
-	void SendSZLine(User *, const XLine *x) override
+	void SendSZLine(User *, XLine *x) override
 	{
 		/* Calculate the time left before this would expire, capping it at 2 days */
-		time_t timeleft = x->expires - Anope::CurTime;
+		time_t timeleft = x->GetExpires() - Anope::CurTime;
 
-		if (timeleft > 172800 || !x->expires)
+		if (timeleft > 172800 || !x->GetExpires())
 			timeleft = 172800;
 
 		UplinkSocket::Message(Config->GetClient("OperServ")) << "DLINE * " << timeleft << " " << x->GetHost() << " :" << x->GetReason();
 	}
 
-	void SendAkillDel(const XLine *x) override
+	void SendAkillDel(XLine *x) override
 	{
 		if (x->IsRegex() || x->HasNickOrReal())
 			return;
@@ -105,9 +105,9 @@ class HybridProto : public IRCDProto
 		UplinkSocket::Message(Config->GetClient("OperServ")) << "UNKLINE * " << x->GetUser() << " " << x->GetHost();
 	}
 
-	void SendSQLineDel(const XLine *x) override
+	void SendSQLineDel(XLine *x) override
 	{
-		UplinkSocket::Message(Config->GetClient("OperServ")) << "UNRESV * " << x->mask;
+		UplinkSocket::Message(Config->GetClient("OperServ")) << "UNRESV * " << x->GetMask();
 	}
 
 	void SendJoin(User *user, Channel *c, const ChannelStatus *status) override
@@ -148,25 +148,25 @@ class HybridProto : public IRCDProto
 				return;
 			}
 
-			const XLine *old = x;
+			XLine *old = x;
 
 			if (old->manager->HasEntry("*@" + u->host))
 				return;
 
 			/* We can't akill x as it has a nick and/or realname included, so create a new akill for *@host */
-			XLine *xline = new XLine("*@" + u->host, old->by, old->expires, old->reason, old->id);
+			XLine *xl = new XLine("*@" + u->host, old->GetBy(), old->GetExpires(), old->GetReason(), old->id);
 
-			old->manager->AddXLine(xline);
-			x = xline;
+			old->manager->AddXLine(xl);
+			x = xl;
 
-			Log(Config->GetClient("OperServ"), "akill") << "AKILL: Added an akill for " << x->mask << " because " << u->GetMask() << "#"
-					<< u->realname << " matches " << old->mask;
+			Log(Config->GetClient("OperServ"), "akill") << "AKILL: Added an akill for " << x->GetMask() << " because " << u->GetMask() << "#"
+					<< u->realname << " matches " << old->GetMask();
 		}
 
 		/* Calculate the time left before this would expire, capping it at 2 days */
-		time_t timeleft = x->expires - Anope::CurTime;
+		time_t timeleft = x->GetExpires() - Anope::CurTime;
 
-		if (timeleft > 172800 || !x->expires)
+		if (timeleft > 172800 || !x->GetExpires())
 			timeleft = 172800;
 
 		UplinkSocket::Message(Config->GetClient("OperServ")) << "KLINE * " << timeleft << " " << x->GetUser() << " " << x->GetHost() << " :" << x->GetReason();
@@ -227,7 +227,7 @@ class HybridProto : public IRCDProto
 
 	void SendLogin(User *u, NickServ::Nick *na) override
 	{
-		IRCD->SendMode(Config->GetClient("NickServ"), u, "+d %s", na->nc->display.c_str());
+		IRCD->SendMode(Config->GetClient("NickServ"), u, "+d %s", na->GetAccount()->GetDisplay().c_str());
 	}
 
 	void SendLogout(User *u) override
@@ -557,7 +557,7 @@ struct IRCDMessageUID : IRCDMessage
 		User::OnIntroduce(params[0], params[4], params[5], "",
 				ip, source.GetServer(),
 				params[9], params[2].is_pos_number_only() ? convertTo<time_t>(params[2]) : 0,
-				params[3], params[7], na ? *na->nc : NULL);
+				params[3], params[7], na ? na->GetAccount() : NULL);
 	}
 };
 

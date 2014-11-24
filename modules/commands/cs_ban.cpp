@@ -57,7 +57,7 @@ class CommandCSBan : public Command
 		Channel *c = ci->c;
 		if (c == NULL)
 		{
-			source.Reply(_("Channel \002{0}\002 doesn't exist."), ci->name);
+			source.Reply(_("Channel \002{0}\002 doesn't exist."), ci->GetName());
 			return;
 		}
 
@@ -109,7 +109,7 @@ class CommandCSBan : public Command
 
 		if (!u_access.HasPriv("BAN") && !source.HasPriv("chanserv/kick"))
 		{
-			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "BAN", ci->name);
+			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "BAN", ci->GetName());
 			return;
 		}
 
@@ -117,9 +117,9 @@ class CommandCSBan : public Command
 		{
 			ChanServ::AccessGroup u2_access = ci->AccessFor(u2);
 
-			if (u != u2 && ci->HasExt("PEACE") && u2_access >= u_access && !source.HasPriv("chanserv/kick"))
+			if (u != u2 && ci->HasFieldS("PEACE") && u2_access >= u_access && !source.HasPriv("chanserv/kick"))
 			{
-				source.Reply(_("Access denied. \002{0}\002 has the same or more privileges than you on \002{1}\002."), u2->nick, ci->name);
+				source.Reply(_("Access denied. \002{0}\002 has the same or more privileges than you on \002{1}\002."), u2->nick, ci->GetName());
 				return;
 			}
 
@@ -129,7 +129,7 @@ class CommandCSBan : public Command
 			 */
 			if (c->MatchesList(u2, "EXCEPT"))
 			{
-				source.Reply(_("\002{0}\002 matches an except on \002{1}\002 and can not be banned until the except has been removed."), u2->nick, ci->name);
+				source.Reply(_("\002{0}\002 matches an except on \002{1}\002 and can not be banned until the except has been removed."), u2->nick, ci->GetName());
 				return;
 			}
 
@@ -141,7 +141,7 @@ class CommandCSBan : public Command
 
 			Anope::string mask = ci->GetIdealBan(u2);
 
-			bool override = !u_access.HasPriv("BAN") || (u != u2 && ci->HasExt("PEACE") && u2_access >= u_access);
+			bool override = !u_access.HasPriv("BAN") || (u != u2 && ci->HasFieldS("PEACE") && u2_access >= u_access);
 			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "for " << mask;
 
 			if (!c->HasMode(mode, mask))
@@ -160,7 +160,7 @@ class CommandCSBan : public Command
 
 			if (block->Get<bool>("kick", "yes"))
 			{
-				if (ci->HasExt("SIGNKICK") || (ci->HasExt("SIGNKICK_LEVEL") && !source.AccessFor(ci).HasPriv("SIGNKICK")))
+				if (ci->HasFieldS("SIGNKICK") || (ci->HasFieldS("SIGNKICK_LEVEL") && !source.AccessFor(ci).HasPriv("SIGNKICK")))
 					c->Kick(ci->WhoSends(), u2, "%s (%s)", reason.c_str(), source.GetNick().c_str());
 				else
 					c->Kick(ci->WhoSends(), u2, "%s", reason.c_str());
@@ -196,7 +196,7 @@ class CommandCSBan : public Command
 
 					if (matched > 1 && !founder)
 						continue;
-					if (u != uc->user && ci->HasExt("PEACE") && u2_access >= u_access)
+					if (u != uc->user && ci->HasFieldS("PEACE") && u2_access >= u_access)
 						continue;
 					else if (ci->c->MatchesList(uc->user, "EXCEPT"))
 						continue;
@@ -206,7 +206,7 @@ class CommandCSBan : public Command
 					if (block->Get<bool>("kick", "yes"))
 					{
 						++kicked;
-						if (ci->HasExt("SIGNKICK") || (ci->HasExt("SIGNKICK_LEVEL") && !u_access.HasPriv("SIGNKICK")))
+						if (ci->HasFieldS("SIGNKICK") || (ci->HasFieldS("SIGNKICK_LEVEL") && !u_access.HasPriv("SIGNKICK")))
 							c->Kick(ci->WhoSends(), uc->user, "%s (Matches %s) (%s)", reason.c_str(), target.c_str(), source.GetNick().c_str());
 						else
 							c->Kick(ci->WhoSends(), uc->user, "%s (Matches %s)", reason.c_str(), target.c_str());

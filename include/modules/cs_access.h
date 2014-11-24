@@ -7,6 +7,10 @@
  *
  */
 
+static Serialize::TypeReference<ChanServ::ChanAccess> accesschanaccess("AccessChanAccess");
+static Serialize::TypeReference<ChanServ::ChanAccess> flagschanaccess("FlagsChanAccess");
+static Serialize::TypeReference<ChanServ::ChanAccess> xopchanaccess("XOPChanAccess");
+
 namespace Event
 {
 	struct CoreExport LevelChange : Events

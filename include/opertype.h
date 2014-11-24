@@ -9,28 +9,36 @@
 #pragma once
 
 #include "services.h"
+#include "serialize.h"
 
-/* A services operator. Usually made by the configuration file, but not always.
- * NickServ::FindNick(name)->nc->o == this
- */
-struct CoreExport Oper
+class Oper : public Serialize::Object
 {
-	/* The oper's nick */
-	Anope::string name;
-	/* The type of operator this operator is */
-	OperType *ot;
-	/* Whether the user must be an IRC operator (umode +o) to be considered a services operator */
-	bool require_oper;
-	Anope::string password;
-	Anope::string certfp;
-	/* Hosts allowed to use this operator block */
-	std::vector<Anope::string> hosts;
-	Anope::string vhost;
+ public:
+	Configuration::Conf *conf = nullptr;
 
-	Oper(const Anope::string &n, OperType *o);
-	virtual ~Oper();
+	Oper(Serialize::TypeBase *type) : Serialize::Object(type) { }
+	Oper(Serialize::TypeBase *type, Serialize::ID id) : Serialize::Object(type, id) { }
 
-	static std::vector<Oper *> opers;
+	Anope::string GetName();
+	void SetName(const Anope::string &);
+
+	Anope::string GetPassword();
+	void SetPassword(const Anope::string &);
+
+	Anope::string GetCertFP();
+	void SetCertFP(const Anope::string &);
+
+	Anope::string GetHost();
+	void SetHost(const Anope::string &);
+
+	Anope::string GetVhost();
+	void SetVhost(const Anope::string &);
+
+	OperType *GetType();
+	void SetType(OperType *);
+
+	bool GetRequireOper();
+	void SetRequireOper(const bool &);
 
 	/** Find an oper block by name
 	 * @param name The name
@@ -38,6 +46,26 @@ struct CoreExport Oper
 	 */
 	static Oper *Find(const Anope::string &name);
 };
+
+class OperBlockType : public Serialize::Type<Oper>
+{
+ public:
+	Serialize::Field<Oper, Anope::string> name, password, certfp, host, vhost, type;
+	Serialize::Field<Oper, bool> require_oper;
+
+	OperBlockType() : Serialize::Type<Oper>(nullptr, "Oper")
+		, name(this, "name")
+		, password(this, "password")
+		, certfp(this, "certfp")
+		, host(this, "host")
+		, vhost(this, "vhost")
+		, type(this, "type")
+		, require_oper(this, "require_oper")
+	{
+	}
+};
+
+static Serialize::TypeReference<Oper> operblock("Oper");
 
 class CoreExport OperType
 {

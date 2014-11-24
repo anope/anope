@@ -13,78 +13,74 @@
 #include "modules/chanserv.h"
 #include "modules/cs_access.h"
 
-static std::map<Anope::string, int16_t, ci::less> defaultLevels;
-
-static inline void reset_levels(ChanServ::Channel *ci)
-{
-	ci->ClearLevels();
-	for (std::map<Anope::string, int16_t, ci::less>::iterator it = defaultLevels.begin(), it_end = defaultLevels.end(); it != it_end; ++it)
-		ci->SetLevel(it->first, it->second);
-}
-
 class AccessChanAccess : public ChanServ::ChanAccess
 {
  public:
-	int level;
+	AccessChanAccess(Serialize::TypeBase *type) : ChanServ::ChanAccess(type) { }
+	AccessChanAccess(Serialize::TypeBase *type, Serialize::ID id) : ChanServ::ChanAccess(type, id) { }
 
-	AccessChanAccess(ChanServ::AccessProvider *p) : ChanAccess(p), level(0)
+	int GetLevel();
+	void SetLevel(const int &);
+
+	bool HasPriv(const Anope::string &name) override
 	{
+		return this->GetChannel()->GetLevel(name) != ChanServ::ACCESS_INVALID && this->GetLevel() >= this->GetChannel()->GetLevel(name);
 	}
 
-	bool HasPriv(const Anope::string &name) const override
+	Anope::string AccessSerialize()
 	{
-		return this->ci->GetLevel(name) != ChanServ::ACCESS_INVALID && this->level >= this->ci->GetLevel(name);
-	}
-
-	Anope::string AccessSerialize() const
-	{
-		return stringify(this->level);
+		return stringify(this->GetLevel());
 	}
 
 	void AccessUnserialize(const Anope::string &data) override
 	{
 		try
 		{
-			this->level = convertTo<int>(data);
+			this->SetLevel(convertTo<int>(data));
 		}
 		catch (const ConvertException &)
 		{
 		}
 	}
 
-	bool operator>(const ChanServ::ChanAccess &other) const override
+	bool operator>(ChanServ::ChanAccess &other) override
 	{
-		if (this->provider != other.provider)
+		if (this->GetSerializableType() != other.GetSerializableType())
 			return ChanServ::ChanAccess::operator>(other);
 		else
-			return this->level > anope_dynamic_static_cast<const AccessChanAccess *>(&other)->level;
+			return this->GetLevel() > anope_dynamic_static_cast<AccessChanAccess *>(&other)->GetLevel();
 	}
 
-	bool operator<(const ChanServ::ChanAccess &other) const override
+	bool operator<(ChanServ::ChanAccess &other) override
 	{
-		if (this->provider != other.provider)
+		if (this->GetSerializableType() != other.GetSerializableType())
 			return ChanAccess::operator<(other);
 		else
-			return this->level < anope_dynamic_static_cast<const AccessChanAccess *>(&other)->level;
+			return this->GetLevel() < anope_dynamic_static_cast<AccessChanAccess *>(&other)->GetLevel();
 	}
 };
 
-class AccessAccessProvider : public ChanServ::AccessProvider
+class AccessChanAccessType : public Serialize::Type<AccessChanAccess, ChanServ::ChanAccessType>
 {
  public:
-	static AccessAccessProvider *me;
+	Serialize::Field<AccessChanAccess, int> level;
 
-	AccessAccessProvider(Module *o) : ChanServ::AccessProvider(o, "access/access")
+	AccessChanAccessType(Module *me) : Serialize::Type<AccessChanAccess, ChanAccessType>(me, "AccessChanAccess")
+		, level(this, "level")
 	{
-		me = this;
-	}
-
-	ChanServ::ChanAccess *Create() override
-	{
-		return new AccessChanAccess(this);
+		SetParent(ChanServ::chanaccess);
 	}
 };
-AccessAccessProvider* AccessAccessProvider::me;
+
+int AccessChanAccess::GetLevel()
+{
+	return Get(&AccessChanAccessType::level);
+}
+
+void AccessChanAccess::SetLevel(const int &i)
+{
+	Object::Set(&AccessChanAccessType::level, i);
+}
 
 class CommandCSAccess : public Command
 {
@@ -101,8 +97,8 @@ class CommandCSAccess : public Command
 		catch (const ConvertException &)
 		{
 			p = ChanServ::service ? ChanServ::service->FindPrivilege(params[3]) : nullptr;
-			if (p != NULL && defaultLevels[p->name])
-				level = defaultLevels[p->name];
+			if (p != NULL && p->level)
+				level = p->level;
 		}
 
 		if (!level)
@@ -118,11 +114,11 @@ class CommandCSAccess : public Command
 		}
 
 		ChanServ::AccessGroup u_access = source.AccessFor(ci);
-		const ChanServ::ChanAccess *highest = u_access.Highest();
+		ChanServ::ChanAccess *highest = u_access.Highest();
 
-		AccessChanAccess tmp_access(AccessAccessProvider::me);
-		tmp_access.ci = ci;
-		tmp_access.level = level;
+		AccessChanAccess tmp_access(nullptr);
+		tmp_access.SetChannel(ci);
+		tmp_access.SetLevel(level);
 
 		bool override = false;
 
@@ -132,10 +128,13 @@ class CommandCSAccess : public Command
 				override = true;
 			else
 			{
-				source.Reply(_("Access denied. You do not have enough privileges on \002{0}\002 to add someone at level \002{1}\002."), ci->name, level);
+				source.Reply(_("Access denied. You do not have enough privileges on \002{0}\002 to add someone at level \002{1}\002."), ci->GetName(), level);
 				return;
 			}
 		}
+
+		NickServ::Nick *na = nullptr;
+		ChanServ::Channel *targ_ci = nullptr;
 
 		if (IRCD->IsChannelValid(mask))
 		{
@@ -145,7 +144,7 @@ class CommandCSAccess : public Command
 				return;
 			}
 
-			ChanServ::Channel *targ_ci = ChanServ::Find(mask);
+			targ_ci = ChanServ::Find(mask);
 			if (targ_ci == NULL)
 			{
 				source.Reply(_("Channel \002{0}\002 isn't registered."), mask);
@@ -158,11 +157,11 @@ class CommandCSAccess : public Command
 				return;
 			}
 
-			mask = targ_ci->name;
+			mask = targ_ci->GetName();
 		}
 		else
 		{
-			const NickServ::Nick *na = NickServ::FindNick(mask);
+			na = NickServ::FindNick(mask);
 			if (!na && Config->GetModule("chanserv")->Get<bool>("disallow_hostmask_access"))
 			{
 				source.Reply(_("Masks and unregistered users may not be on access lists."));
@@ -184,16 +183,16 @@ class CommandCSAccess : public Command
 
 		for (unsigned i = ci->GetAccessCount(); i > 0; --i)
 		{
-			const ChanServ::ChanAccess *access = ci->GetAccess(i - 1);
+			ChanServ::ChanAccess *access = ci->GetAccess(i - 1);
 			if (mask.equals_ci(access->Mask()))
 			{
 				/* Don't allow lowering from a level >= u_level */
 				if ((!highest || *access >= *highest) && !u_access.founder && !source.HasPriv("chanserv/access/modify"))
 				{
-					source.Reply(_("Access denied. You do not have enough privileges on \002{0}\002 to lower the access of \002{1}\002."), ci->name, access->Mask());
+					source.Reply(_("Access denied. You do not have enough privileges on \002{0}\002 to lower the access of \002{1}\002."), ci->GetName(), access->Mask());
 					return;
 				}
-				delete ci->EraseAccess(i - 1);
+				delete access;
 				break;
 			}
 		}
@@ -205,24 +204,25 @@ class CommandCSAccess : public Command
 			return;
 		}
 
-		ServiceReference<ChanServ::AccessProvider> provider("AccessProvider", "access/access");
-		if (!provider)
-			return;
-		AccessChanAccess *access = anope_dynamic_static_cast<AccessChanAccess *>(provider->Create());
-		access->SetMask(mask, ci);
-		access->creator = source.GetNick();
-		access->level = level;
-		access->last_seen = 0;
-		access->created = Anope::CurTime;
-		ci->AddAccess(access);
+		AccessChanAccess *access = anope_dynamic_static_cast<AccessChanAccess *>(accesschanaccess.Create());
+		if (na)
+			access->SetObj(na->GetAccount());
+		else if (targ_ci)
+			access->SetObj(targ_ci);
+		access->SetChannel(ci);
+		access->SetMask(mask);
+		access->SetCreator(source.GetNick());
+		access->SetLevel(level);
+		access->SetLastSeen(0);
+		access->SetCreated(Anope::CurTime);
 
 		Event::OnAccessAdd(&Event::AccessAdd::OnAccessAdd, ci, source, access);
 
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to add " << mask << " with level " << level;
 		if (p != NULL)
-			source.Reply(_("\002{0}\002 added to the access list of \002{1}\002 with privilege \002{2}\002 (level \002{3}\002)."), access->Mask(), ci->name, p->name, level);
+			source.Reply(_("\002{0}\002 added to the access list of \002{1}\002 with privilege \002{2}\002 (level \002{3}\002)."), access->Mask(), ci->GetName(), p->name, level);
 		else
-			source.Reply(_("\002{0}\002 added to the access list of \002{1}\002 at level \002{2}\002."), access->Mask(), ci->name, level);
+			source.Reply(_("\002{0}\002 added to the access list of \002{1}\002 at level \002{2}\002."), access->Mask(), ci->GetName(), level);
 	}
 
 	void DoDel(CommandSource &source, ChanServ::Channel *ci, const std::vector<Anope::string> &params)
@@ -231,7 +231,7 @@ class CommandCSAccess : public Command
 
 		if (!ci->GetAccessCount())
 		{
-			source.Reply(_("The access list for \002{0}\002 is empty."), ci->name);
+			source.Reply(_("The access list for \002{0}\002 is empty."), ci->GetName());
 			return;
 		}
 
@@ -263,9 +263,9 @@ class CommandCSAccess : public Command
 					ChanServ::ChanAccess *access = ci->GetAccess(num - 1);
 
 					ChanServ::AccessGroup ag = source.AccessFor(ci);
-					const ChanServ::ChanAccess *u_highest = ag.Highest();
+					ChanServ::ChanAccess *u_highest = ag.Highest();
 
-					if ((!u_highest || *u_highest <= *access) && !ag.founder && !override && access->GetAccount() != source.nc)
+					if ((!u_highest || *u_highest <= *access) && !ag.founder && !override && access->GetObj() != source.nc)
 					{
 						denied = true;
 						return;
@@ -277,8 +277,6 @@ class CommandCSAccess : public Command
 					else
 						nicks = access->Mask();
 
-					ci->EraseAccess(num - 1);
-
 					Event::OnAccessDel(&Event::AccessDel::OnAccessDel, ci, source, access);
 					delete access;
 				},
@@ -287,37 +285,36 @@ class CommandCSAccess : public Command
 					if (denied && !deleted)
 						source.Reply(_("Access denied. You do not have enough privileges on \002{0}\002 to remove any access entries matching \002{1}\002."));
 					else if (!deleted)
-						source.Reply(_("There are no entries matching \002{0}\002 on the access list of \002{1}\002."), mask, ci->name);
+						source.Reply(_("There are no entries matching \002{0}\002 on the access list of \002{1}\002."), mask, ci->GetName());
 					else
 					{
 						Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to delete " << nicks;
 
 						if (deleted == 1)
-							source.Reply(_("Deleted \0021\002 entry from the access list of \002{0}\002."), ci->name);
+							source.Reply(_("Deleted \0021\002 entry from the access list of \002{0}\002."), ci->GetName());
 						else
-							source.Reply(_("Deleted \002{0}\002 entries from the access list of \002{1}\002."), deleted, ci->name);
+							source.Reply(_("Deleted \002{0}\002 entries from the access list of \002{1}\002."), deleted, ci->GetName());
 					}
 				});
 		}
 		else
 		{
 			ChanServ::AccessGroup u_access = source.AccessFor(ci);
-			const ChanServ::ChanAccess *highest = u_access.Highest();
+			ChanServ::ChanAccess *highest = u_access.Highest();
 
 			for (unsigned i = ci->GetAccessCount(); i > 0; --i)
 			{
 				ChanServ::ChanAccess *access = ci->GetAccess(i - 1);
 				if (mask.equals_ci(access->Mask()))
 				{
-					if (access->GetAccount() != source.nc && !u_access.founder && (!highest || *highest <= *access) && !source.HasPriv("chanserv/access/modify"))
-						source.Reply(_("Access denied. You do not have enough privileges on \002{0}\002 to remove the access of \002{1}\002."), ci->name, access->Mask());
+					if (access->GetObj() != source.nc && !u_access.founder && (!highest || *highest <= *access) && !source.HasPriv("chanserv/access/modify"))
+						source.Reply(_("Access denied. You do not have enough privileges on \002{0}\002 to remove the access of \002{1}\002."), ci->GetName(), access->Mask());
 					else
 					{
-						source.Reply(_("\002{0}\002 deleted from the access list of \002{1}\002."), access->Mask(), ci->name);
-						bool override = !u_access.founder && !u_access.HasPriv("ACCESS_CHANGE") && !access->Mask().equals_ci(source.nc->display);
+						source.Reply(_("\002{0}\002 deleted from the access list of \002{1}\002."), access->Mask(), ci->GetName());
+						bool override = !u_access.founder && !u_access.HasPriv("ACCESS_CHANGE") && !access->Mask().equals_ci(source.nc->GetDisplay());
 						Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to delete " << access->Mask();
 
-						ci->EraseAccess(i - 1);
 						Event::OnAccessDel(&Event::AccessDel::OnAccessDel, ci, source, access);
 						delete access;
 					}
@@ -325,7 +322,7 @@ class CommandCSAccess : public Command
 				}
 			}
 
-			source.Reply(_("\002{0}\002 was not found on the access list of \002{1}\002."), mask, ci->name);
+			source.Reply(_("\002{0}\002 was not found on the access list of \002{1}\002."), mask, ci->GetName());
 		}
 	}
 
@@ -335,7 +332,7 @@ class CommandCSAccess : public Command
 
 		if (!ci->GetAccessCount())
 		{
-			source.Reply(_("The access list for \002{0}\002 is empty."), ci->name);
+			source.Reply(_("The access list for \002{0}\002 is empty."), ci->GetName());
 			return;
 		}
 
@@ -347,7 +344,7 @@ class CommandCSAccess : public Command
 					if (!number || number > ci->GetAccessCount())
 						return;
 
-					const ChanServ::ChanAccess *access = ci->GetAccess(number - 1);
+					ChanServ::ChanAccess *access = ci->GetAccess(number - 1);
 
 					Anope::string timebuf;
 					if (ci->c)
@@ -359,17 +356,17 @@ class CommandCSAccess : public Command
 						}
 					if (timebuf.empty())
 					{
-						if (access->last_seen == 0)
+						if (access->GetLastSeen() == 0)
 							timebuf = "Never";
 						else
-							timebuf = Anope::strftime(access->last_seen, NULL, true);
+							timebuf = Anope::strftime(access->GetLastSeen(), NULL, true);
 					}
 
 					ListFormatter::ListEntry entry;
 					entry["Number"] = stringify(number);
 					entry["Level"] = access->AccessSerialize();
 					entry["Mask"] = access->Mask();
-					entry["By"] = access->creator;
+					entry["By"] = access->GetCreator();
 					entry["Last seen"] = timebuf;
 					list.AddEntry(entry);
 				},
@@ -379,7 +376,7 @@ class CommandCSAccess : public Command
 		{
 			for (unsigned i = 0, end = ci->GetAccessCount(); i < end; ++i)
 			{
-				const ChanServ::ChanAccess *access = ci->GetAccess(i);
+				ChanServ::ChanAccess *access = ci->GetAccess(i);
 
 				if (!nick.empty() && !Anope::Match(access->Mask(), nick))
 					continue;
@@ -394,17 +391,17 @@ class CommandCSAccess : public Command
 					}
 				if (timebuf.empty())
 				{
-					if (access->last_seen == 0)
+					if (access->GetLastSeen() == 0)
 						timebuf = "Never";
 					else
-						timebuf = Anope::strftime(access->last_seen, NULL, true);
+						timebuf = Anope::strftime(access->GetLastSeen(), NULL, true);
 				}
 
 				ListFormatter::ListEntry entry;
 				entry["Number"] = stringify(i + 1);
 				entry["Level"] = access->AccessSerialize();
 				entry["Mask"] = access->Mask();
-				entry["By"] = access->creator;
+				entry["By"] = access->GetCreator();
 				entry["Last seen"] = timebuf;
 				list.AddEntry(entry);
 			}
@@ -412,14 +409,14 @@ class CommandCSAccess : public Command
 
 		if (list.IsEmpty())
 		{
-			source.Reply(_("No matching entries on the access list of \002{0}\002."), ci->name);
+			source.Reply(_("No matching entries on the access list of \002{0}\002."), ci->GetName());
 			return;
 		}
 
 		std::vector<Anope::string> replies;
 		list.Process(replies);
 
-		source.Reply(_("Access list for \002{0}\002:"), ci->name);
+		source.Reply(_("Access list for \002{0}\002:"), ci->GetName());
 
 		for (unsigned i = 0; i < replies.size(); ++i)
 			source.Reply(replies[i]);
@@ -431,7 +428,7 @@ class CommandCSAccess : public Command
 	{
 		if (!ci->GetAccessCount())
 		{
-			source.Reply(_("The access list for \002{0}\002 is empty."), ci->name);
+			source.Reply(_("The access list for \002{0}\002 is empty."), ci->GetName());
 			return;
 		}
 
@@ -444,7 +441,7 @@ class CommandCSAccess : public Command
 	{
 		if (!ci->GetAccessCount())
 		{
-			source.Reply(_("The access list for \002{0}\002 is empty."), ci->name);
+			source.Reply(_("The access list for \002{0}\002 is empty."), ci->GetName());
 			return;
 		}
 
@@ -457,7 +454,7 @@ class CommandCSAccess : public Command
 	{
 		if (!source.IsFounder(ci) && !source.HasPriv("chanserv/access/modify"))
 		{
-			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "FOUNDER", ci->name);
+			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "FOUNDER", ci->GetName());
 			return;
 		}
 
@@ -465,7 +462,7 @@ class CommandCSAccess : public Command
 
 		ci->ClearAccess();
 
-		source.Reply(_("The access list of \002{0}\002 has been cleared."), ci->name);
+		source.Reply(_("The access list of \002{0}\002 has been cleared."), ci->GetName());
 
 		bool override = !source.IsFounder(ci);
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to clear the access list";
@@ -511,8 +508,8 @@ class CommandCSAccess : public Command
 			has_access = true;
 		else if (is_del)
 		{
-			const NickServ::Nick *na = NickServ::FindNick(nick);
-			if (na && na->nc == source.GetAccount())
+			NickServ::Nick *na = NickServ::FindNick(nick);
+			if (na && na->GetAccount() == source.GetAccount())
 				has_access = true;
 		}
 
@@ -527,7 +524,7 @@ class CommandCSAccess : public Command
 
 		if (!has_access)
 		{
-			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), is_list ? "ACCESS_LIST" : "ACCESS_CHANGE", ci->name);
+			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), is_list ? "ACCESS_LIST" : "ACCESS_CHANGE", ci->GetName());
 			return;
 		}
 
@@ -606,7 +603,7 @@ class CommandCSAccess : public Command
 			source.Reply(_("Maintains the access list for \037channel\037. The access list specifies which users are granted which privileges to the channel."
 			               " The access system uses numerical levels to represent different sets of privileges. Users who are identified but do not match any entries on"
 			               " the access list has a level of 0. Unregistered or unidentified users who do not match any entries have a user level of 0."));
-			BotInfo *bi;
+			ServiceBot *bi;
 			Anope::string name;
 			CommandInfo *help = source.service->FindCommand("generic/help");
 			if (Command::FindCommandFromService("chanserv/levels", bi, name) && help)
@@ -684,9 +681,9 @@ class CommandCSLevels : public Command
 				this->onlevelchange(&Event::LevelChange::OnLevelChange, source, ci, p->name, level);
 
 				if (level == ChanServ::ACCESS_FOUNDER)
-					source.Reply(_("Level for privilege \002{0}\002 on channel \002{1}\002 changed to \002founder only\002."), p->name, ci->name);
+					source.Reply(_("Level for privilege \002{0}\002 on channel \002{1}\002 changed to \002founder only\002."), p->name, ci->GetName());
 				else
-					source.Reply(_("Level for privilege \002{0}\002 on channel \002{1}\002 changed to \002{3}\002."), p->name, ci->name, level);
+					source.Reply(_("Level for privilege \002{0}\002 on channel \002{1}\002 changed to \002{3}\002."), p->name, ci->GetName(), level);
 			}
 		}
 	}
@@ -711,7 +708,7 @@ class CommandCSLevels : public Command
 			ci->SetLevel(p->name, ChanServ::ACCESS_INVALID);
 			this->onlevelchange(&Event::LevelChange::OnLevelChange, source, ci, p->name, ChanServ::ACCESS_INVALID);
 
-			source.Reply(_("Privileged \002{0}\002 disabled on channel \002{1}\002."), p->name, ci->name);
+			source.Reply(_("Privileged \002{0}\002 disabled on channel \002{1}\002."), p->name, ci->GetName());
 			return;
 		}
 
@@ -726,7 +723,7 @@ class CommandCSLevels : public Command
 		if (!ChanServ::service)
 			return;
 
-		source.Reply(_("Access level settings for channel \002{0}\002"), ci->name);
+		source.Reply(_("Access level settings for channel \002{0}\002"), ci->GetName());
 
 		ListFormatter list(source.GetAccount());
 		list.AddColumn(_("Name")).AddColumn(_("Level"));
@@ -763,10 +760,10 @@ class CommandCSLevels : public Command
 		bool override = !source.AccessFor(ci).HasPriv("FOUNDER");
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to reset all levels";
 
-		reset_levels(ci);
+		ci->ClearLevels();
 		this->onlevelchange(&Event::LevelChange::OnLevelChange, source, ci, "ALL", 0);
 
-		source.Reply(_("Levels for \002{0}\002 reset to defaults."), ci->name);
+		source.Reply(_("Levels for \002{0}\002 reset to defaults."), ci->GetName());
 	}
 
 	EventHandlers<Event::LevelChange> &onlevelchange;
@@ -806,7 +803,7 @@ class CommandCSLevels : public Command
 
 		if (!source.AccessFor(ci).HasPriv("FOUNDER") && !source.HasPriv("chanserv/access/modify"))
 		{
-			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "FOUNDER", ci->name);	
+			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "FOUNDER", ci->GetName());	
 			return;
 		}
 
@@ -858,7 +855,7 @@ class CommandCSLevels : public Command
 		}
 		else
 		{
-			BotInfo *bi;
+			ServiceBot *bi;
 			Anope::string name;
 			if (!Command::FindCommandFromService("chanserv/access", bi, name) || bi != source.service)
 				return false;
@@ -885,56 +882,23 @@ class CommandCSLevels : public Command
 };
 
 class CSAccess : public Module
-	, public EventHook<Event::CreateChan>
 	, public EventHook<Event::GroupCheckPriv>
 {
-	AccessAccessProvider accessprovider;
 	CommandCSAccess commandcsaccess;
 	CommandCSLevels commandcslevels;
 	EventHandlers<Event::LevelChange> onlevelchange;
+	AccessChanAccessType accesschanaccesstype;
 
  public:
 	CSAccess(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
-		, EventHook<Event::CreateChan>("OnCreateChan")
 		, EventHook<Event::GroupCheckPriv>("OnGroupCheckPriv")
-		, accessprovider(this)
 		, commandcsaccess(this)
 		, commandcslevels(this, onlevelchange)
 		, onlevelchange(this, "OnLevelChange")
+		, accesschanaccesstype(this)
 	{
 		this->SetPermanent(true);
 
-	}
-
-	void OnReload(Configuration::Conf *conf) override
-	{
-		defaultLevels.clear();
-
-		for (int i = 0; i < conf->CountBlock("privilege"); ++i)
-		{
-			Configuration::Block *priv = conf->GetBlock("privilege", i);
-
-			const Anope::string &pname = priv->Get<const Anope::string>("name");
-
-			ChanServ::Privilege *p = ChanServ::service ? ChanServ::service->FindPrivilege(pname) : nullptr;
-			if (p == NULL)
-				continue;
-
-			const Anope::string &value = priv->Get<const Anope::string>("level");
-			if (value.empty())
-				continue;
-			else if (value.equals_ci("founder"))
-				defaultLevels[p->name] = ChanServ::ACCESS_FOUNDER;
-			else if (value.equals_ci("disabled"))
-				defaultLevels[p->name] = ChanServ::ACCESS_INVALID;
-			else
-				defaultLevels[p->name] = priv->Get<int16_t>("level");
-		}
-	}
-
-	void OnCreateChan(ChanServ::Channel *ci) override
-	{
-		reset_levels(ci);
 	}
 
 	EventReturn OnGroupCheckPriv(const ChanServ::AccessGroup *group, const Anope::string &priv) override

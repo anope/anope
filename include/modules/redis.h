@@ -28,9 +28,9 @@ namespace Redis
 		void Clear()
 		{
 			type = NOT_PARSED;
-			i anope_abstract;
+			i = 0;
 			bulk.clear();
-			multi_bulk_size anope_abstract;
+			multi_bulk_size = 0;
 			for (unsigned j = 0; j < multi_bulk.size(); ++j)
 				delete multi_bulk[j];
 			multi_bulk.clear();
@@ -48,10 +48,21 @@ namespace Redis
 		Module *owner;
 
 		Interface(Module *m) : owner(m) { }
-		virtual ~Interface() { }
+		virtual ~Interface() = default;
 
 		virtual void OnResult(const Reply &r) anope_abstract;
 		virtual void OnError(const Anope::string &error) { Log(owner) << error; }
+	};
+
+	class FInterface : public Interface
+	{
+	 public:
+		using Func = std::function<void(const Reply &)>;
+		Func function;
+
+		FInterface(Module *m, Func f) : Interface(m), function(f) { }
+	
+		void OnResult(const Reply &r) override { function(r); }
 	};
 
 	class Provider : public Service
@@ -64,7 +75,7 @@ namespace Redis
 
 		virtual bool BlockAndProcess() anope_abstract;
 
-		virtual void Subscribe(Interface *i, const Anope::string &pattern) anope_abstract;
+		virtual void Subscribe(Interface *i, const Anope::string &) anope_abstract;
 		virtual void Unsubscribe(const Anope::string &pattern) anope_abstract;
 
 		virtual void StartTransaction() anope_abstract;

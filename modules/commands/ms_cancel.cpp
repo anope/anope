@@ -50,15 +50,21 @@ class CommandMSCancel : public Command
 			else
 				na = NickServ::FindNick(nname);
 			if (mi)
-				for (int i = mi->memos->size() - 1; i >= 0; --i)
-					if (mi->GetMemo(i)->unread && source.nc->display.equals_ci(mi->GetMemo(i)->sender))
+			{
+				auto memos = mi->GetMemos();
+				for (int i = memos.size() - 1; i >= 0; --i)
+				{
+					MemoServ::Memo *m = memos[i];
+					if (m->GetUnread() && source.nc->GetDisplay().equals_ci(m->GetSender()))
 					{
 						if (MemoServ::Event::OnMemoDel)
-							MemoServ::Event::OnMemoDel(&MemoServ::Event::MemoDel::OnMemoDel, ischan ? ci->name : na->nc->display, mi, mi->GetMemo(i));
+							MemoServ::Event::OnMemoDel(&MemoServ::Event::MemoDel::OnMemoDel, ischan ? ci->GetName() : na->GetAccount()->GetDisplay(), mi, m);
 						mi->Del(i);
 						source.Reply(_("Your last memo to \002{0}\002 has been cancelled."), nname);
 						return;
 					}
+				}
+			}
 
 			source.Reply(_("No memo to \002{0}\002 was cancelable."), nname);
 		}

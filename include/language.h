@@ -52,7 +52,7 @@ namespace Language
 	 * @param string A string to translate
 	 * @return The translated string if count, else the original string
 	 */
-	extern CoreExport const char *Translate(const NickServ::Account *nc, const char *string);
+	extern CoreExport const char *Translate(NickServ::Account *nc, const char *string);
 
 	/** Translatesa string to the given language.
 	 * @param lang The language to translate to

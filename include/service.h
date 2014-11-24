@@ -72,6 +72,11 @@ class ServiceReference : public Reference<T>
 	{
 	}
 
+	const Anope::string &GetName() const
+	{
+		return name;
+	}
+
 	void operator=(const Anope::string &n)
 	{
 		this->name = n;

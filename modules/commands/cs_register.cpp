@@ -34,7 +34,7 @@ class CommandCSRegister : public Command
 			return;
 		}
 
-		if (nc->HasExt("UNCONFIRMED"))
+		if (nc->HasFieldS("UNCONFIRMED"))
 		{
 			source.Reply(_("You must confirm your account before you can register a channel."));
 			return;
@@ -79,9 +79,9 @@ class CommandCSRegister : public Command
 		}
 
 		unsigned maxregistered = Config->GetModule("chanserv")->Get<unsigned>("maxregistered");
-		if (maxregistered && nc->channelcount >= maxregistered && !source.HasPriv("chanserv/no-register-limit"))
+		if (maxregistered && nc->GetChannelCount() >= maxregistered && !source.HasPriv("chanserv/no-register-limit"))
 		{
-			if (nc->channelcount > maxregistered)
+			if (nc->GetChannelCount() > maxregistered)
 				source.Reply(_("Sorry, you have already exceeded your limit of \002{0}\002 channels."), maxregistered);
 			else
 				source.Reply(_("Sorry, you have already reached your limit of \002{0}\002 channels."), maxregistered);
@@ -90,21 +90,22 @@ class CommandCSRegister : public Command
 
 		if (!ChanServ::service)
 			return;
-		ci = ChanServ::service->Create(chan);
+		ci = ChanServ::channel.Create();
+		ci->SetName(chan);
 		ci->SetFounder(nc);
-		ci->desc = chdesc;
+		ci->SetDesc(chdesc);
 
 		if (c && !c->topic.empty())
 		{
-			ci->last_topic = c->topic;
-			ci->last_topic_setter = c->topic_setter;
-			ci->last_topic_time = c->topic_time;
+			ci->SetLastTopic(c->topic);
+			ci->SetLastTopicSetter(c->topic_setter);
+			ci->SetLastTopicTime(c->topic_time);
 		}
 		else
-			ci->last_topic_setter = source.service->nick;
+			ci->SetLastTopicSetter(source.service->nick);
 
 		Log(LOG_COMMAND, source, this, ci);
-		source.Reply(_("Channel \002{0}\002 registered under your account: \002{1}\002"), chan, nc->display);
+		source.Reply(_("Channel \002{0}\002 registered under your account: \002{1}\002"), chan, nc->GetDisplay());
 
 		/* Implement new mode lock */
 		if (c)
@@ -129,7 +130,7 @@ class CommandCSRegister : public Command
 		               " The channel founder is allowed to change all of the channel settings for the channel,"
 		               " and will automatically be given channel operator status when entering the channel."));
 
-		BotInfo *bi;
+		ServiceBot *bi;
 		Anope::string cmd;
 		CommandInfo *help = source.service->FindCommand("generic/help");
 		if (Command::FindCommandFromService("chanserv/access", bi, cmd) && help)

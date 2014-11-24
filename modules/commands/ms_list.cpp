@@ -25,7 +25,7 @@ class CommandMSList : public Command
 
 		Anope::string param = !params.empty() ? params[0] : "", chan;
 		ChanServ::Channel *ci = NULL;
-		const MemoServ::MemoInfo *mi;
+		MemoServ::MemoInfo *mi;
 
 		if (!param.empty() && param[0] == '#')
 		{
@@ -41,14 +41,14 @@ class CommandMSList : public Command
 
 			if (!source.AccessFor(ci).HasPriv("MEMO"))
 			{
-				source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "MEMO", ci->name);
+				source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "MEMO", ci->GetName());
 				return;
 			}
 
-			mi = ci->memos;
+			mi = ci->GetMemos();
 		}
 		else
-			mi = source.nc->memos;
+			mi = source.nc->GetMemos();
 
 		if (!param.empty() && !isdigit(param[0]) && !param.equals_ci("NEW"))
 		{
@@ -56,7 +56,12 @@ class CommandMSList : public Command
 			return;
 		}
 
-		if (!mi->memos->size())
+		if (!mi)
+			return;
+
+		auto memos = mi->GetMemos();
+
+		if (!memos.size())
 		{
 			if (!chan.empty())
 				source.Reply(_("\002{0}\002 has no memos."), chan);
@@ -74,15 +79,15 @@ class CommandMSList : public Command
 			NumberList(param, false,
 				[&](unsigned int number)
 				{
-					if (!number || number > mi->memos->size())
+					if (!number || number > memos.size())
 						return;
 
-					const MemoServ::Memo *m = mi->GetMemo(number - 1);
+					MemoServ::Memo *m = mi->GetMemo(number - 1);
 
 					ListFormatter::ListEntry entry;
-					entry["Number"] = (m->unread ? "* " : "  ") + stringify(number);
-					entry["Sender"] = m->sender;
-					entry["Date/Time"] = Anope::strftime(m->time, source.GetAccount());
+					entry["Number"] = (m->GetUnread() ? "* " : "  ") + stringify(number);
+					entry["Sender"] = m->GetSender();
+					entry["Date/Time"] = Anope::strftime(m->GetTime(), source.GetAccount());
 					list.AddEntry(entry);
 				},
 				[]{});
@@ -92,8 +97,8 @@ class CommandMSList : public Command
 			if (!param.empty())
 			{
 				unsigned i, end;
-				for (i = 0, end = mi->memos->size(); i < end; ++i)
-					if (mi->GetMemo(i)->unread)
+				for (i = 0, end = memos.size(); i < end; ++i)
+					if (mi->GetMemo(i)->GetUnread())
 						break;
 				if (i == end)
 				{
@@ -105,17 +110,17 @@ class CommandMSList : public Command
 				}
 			}
 
-			for (unsigned i = 0, end = mi->memos->size(); i < end; ++i)
+			for (unsigned i = 0, end = memos.size(); i < end; ++i)
 			{
-				if (!param.empty() && !mi->GetMemo(i)->unread)
+				if (!param.empty() && !mi->GetMemo(i)->GetUnread())
 					continue;
 
-				const MemoServ::Memo *m = mi->GetMemo(i);
+				MemoServ::Memo *m = mi->GetMemo(i);
 
 				ListFormatter::ListEntry entry;
-				entry["Number"] = (m->unread ? "* " : "  ") + stringify(i + 1);
-				entry["Sender"] = m->sender;
-				entry["Date/Time"] = Anope::strftime(m->time, source.GetAccount());
+				entry["Number"] = (m->GetUnread() ? "* " : "  ") + stringify(i + 1);
+				entry["Sender"] = m->GetSender();
+				entry["Date/Time"] = Anope::strftime(m->GetTime(), source.GetAccount());
 				list.AddEntry(entry);
 			}
 		}
@@ -123,7 +128,7 @@ class CommandMSList : public Command
 		std::vector<Anope::string> replies;
 		list.Process(replies);
 
-		source.Reply(_("Memos for \002{0}\002:"), ci ? ci->name.c_str() : source.GetNick().c_str());
+		source.Reply(_("Memos for \002{0}\002:"), ci ? ci->GetName().c_str() : source.GetNick().c_str());
 		for (unsigned i = 0; i < replies.size(); ++i)
 			source.Reply(replies[i]);
 	}

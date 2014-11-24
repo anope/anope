@@ -60,12 +60,12 @@ class BahamutIRCdProto : public IRCDProto
 		UplinkSocket::Message(source) << "SVSMODE " << u->nick << " " << u->timestamp << " " << buf;
 	}
 
-	void SendGlobalNotice(BotInfo *bi, const Server *dest, const Anope::string &msg) override
+	void SendGlobalNotice(ServiceBot *bi, const Server *dest, const Anope::string &msg) override
 	{
 		UplinkSocket::Message(bi) << "NOTICE $" << dest->GetName() << " :" << msg;
 	}
 
-	void SendGlobalPrivmsg(BotInfo *bi, const Server *dest, const Anope::string &msg) override
+	void SendGlobalPrivmsg(ServiceBot *bi, const Server *dest, const Anope::string &msg) override
 	{
 		UplinkSocket::Message(bi) << "PRIVMSG $" << dest->GetName() << " :" << msg;
 	}
@@ -83,19 +83,19 @@ class BahamutIRCdProto : public IRCDProto
 	}
 
 	/* SQLINE */
-	void SendSQLine(User *, const XLine *x) override
+	void SendSQLine(User *, XLine *x) override
 	{
-		UplinkSocket::Message() << "SQLINE " << x->mask << " :" << x->GetReason();
+		UplinkSocket::Message() << "SQLINE " << x->GetMask() << " :" << x->GetReason();
 	}
 
 	/* UNSLINE */
-	void SendSGLineDel(const XLine *x) override
+	void SendSGLineDel(XLine *x) override
 	{
-		UplinkSocket::Message() << "UNSGLINE 0 :" << x->mask;
+		UplinkSocket::Message() << "UNSGLINE 0 :" << x->GetMask();
 	}
 
 	/* UNSZLINE */
-	void SendSZLineDel(const XLine *x) override
+	void SendSZLineDel(XLine *x) override
 	{
 		/* this will likely fail so its only here for legacy */
 		UplinkSocket::Message() << "UNSZLINE 0 " << x->GetHost();
@@ -104,16 +104,16 @@ class BahamutIRCdProto : public IRCDProto
 	}
 
 	/* SZLINE */
-	void SendSZLine(User *, const XLine *x) override
+	void SendSZLine(User *, XLine *x) override
 	{
 		// Calculate the time left before this would expire, capping it at 2 days
-		time_t timeleft = x->expires - Anope::CurTime;
-		if (timeleft > 172800 || !x->expires)
+		time_t timeleft = x->GetExpires() - Anope::CurTime;
+		if (timeleft > 172800 || !x->GetExpires())
 			timeleft = 172800;
 		/* this will likely fail so its only here for legacy */
 		UplinkSocket::Message() << "SZLINE " << x->GetHost() << " :" << x->GetReason();
 		/* this is how we are supposed to deal with it */
-		UplinkSocket::Message() << "AKILL " << x->GetHost() << " * " << timeleft << " " << x->by << " " << Anope::CurTime << " :" << x->GetReason();
+		UplinkSocket::Message() << "AKILL " << x->GetHost() << " * " << timeleft << " " << x->GetBy() << " " << Anope::CurTime << " :" << x->GetReason();
 	}
 
 	/* SVSNOOP */
@@ -123,13 +123,13 @@ class BahamutIRCdProto : public IRCDProto
 	}
 
 	/* SGLINE */
-	void SendSGLine(User *, const XLine *x) override
+	void SendSGLine(User *, XLine *x) override
 	{
-		UplinkSocket::Message() << "SGLINE " << x->mask.length() << " :" << x->mask << ":" << x->GetReason();
+		UplinkSocket::Message() << "SGLINE " << x->GetMask().length() << " :" << x->GetMask() << ":" << x->GetReason();
 	}
 
 	/* RAKILL */
-	void SendAkillDel(const XLine *x) override
+	void SendAkillDel(XLine *x) override
 	{
 		if (x->IsRegex() || x->HasNickOrReal())
 			return;
@@ -155,9 +155,9 @@ class BahamutIRCdProto : public IRCDProto
 	}
 
 	/* UNSQLINE */
-	void SendSQLineDel(const XLine *x) override
+	void SendSQLineDel(XLine *x) override
 	{
-		UplinkSocket::Message() << "UNSQLINE " << x->mask;
+		UplinkSocket::Message() << "UNSQLINE " << x->GetMask();
 	}
 
 	/* JOIN - SJOIN */
@@ -175,7 +175,7 @@ class BahamutIRCdProto : public IRCDProto
 			if (uc != NULL)
 				uc->status.Clear();
 
-			BotInfo *setter = BotInfo::Find(user->GetUID());
+			ServiceBot *setter = ServiceBot::Find(user->GetUID());
 			for (size_t i = 0; i < cs.Modes().length(); ++i)
 				c->SetMode(setter, ModeManager::FindChannelModeByChar(cs.Modes()[i]), user->GetUID(), false);
 
@@ -197,16 +197,21 @@ class BahamutIRCdProto : public IRCDProto
 				return;
 			}
 
-			const XLine *old = x;
+			XLine *old = x;
 
 			if (old->manager->HasEntry("*@" + u->host))
 				return;
 
 			/* We can't akill x as it has a nick and/or realname included, so create a new akill for *@host */
-			x = new XLine("*@" + u->host, old->by, old->expires, old->reason, old->id);
+			x = new XLine(xline);
+			x->SetMask("*@" + u->host);
+			x->SetBy(old->GetBy());
+			x->SetExpires(old->GetExpires());
+			x->SetReason(old->GetReason());
+			x->SetID(old->GetID());
 			old->manager->AddXLine(x);
 
-			Log(Config->GetClient("OperServ"), "akill") << "AKILL: Added an akill for " << x->mask << " because " << u->GetMask() << "#" << u->realname << " matches " << old->mask;
+			Log(Config->GetClient("OperServ"), "akill") << "AKILL: Added an akill for " << x->GetMask() << " because " << u->GetMask() << "#" << u->realname << " matches " << old->GetMask();
 		}
 
 		/* ZLine if we can instead */
@@ -221,10 +226,10 @@ class BahamutIRCdProto : public IRCDProto
 		}
 
 		// Calculate the time left before this would expire, capping it at 2 days
-		time_t timeleft = x->expires - Anope::CurTime;
+		time_t timeleft = x->GetExpires() - Anope::CurTime;
 		if (timeleft > 172800)
 			timeleft = 172800;
-		UplinkSocket::Message() << "AKILL " << x->GetHost() << " " << x->GetUser() << " " << timeleft << " " << x->by << " " << Anope::CurTime << " :" << x->GetReason();
+		UplinkSocket::Message() << "AKILL " << x->GetHost() << " " << x->GetUser() << " " << timeleft << " " << x->GetBy() << " " << Anope::CurTime << " :" << x->GetReason();
 	}
 
 	/*
@@ -379,7 +384,7 @@ struct IRCDMessageNick : IRCDMessage
 			if (signon && signon == stamp && NickServ::service)
 				na = NickServ::service->FindNick(params[0]);
 
-			User::OnIntroduce(params[0], params[4], params[5], "", params[8], s, params[9], signon, params[3], "", na ? *na->nc : NULL);
+			User::OnIntroduce(params[0], params[4], params[5], "", params[8], s, params[9], signon, params[3], "", na ? na->GetAccount() : NULL);
 		}
 		else
 			source.GetUser()->ChangeNick(params[0]);

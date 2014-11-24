@@ -35,15 +35,15 @@ class ngIRCdProto : public IRCDProto
 	void SendAkill(User *u, XLine *x) override
 	{
 		// Calculate the time left before this would expire, capping it at 2 days
-		time_t timeleft = x->expires - Anope::CurTime;
-		if (timeleft > 172800 || !x->expires)
+		time_t timeleft = x->GetExpires() - Anope::CurTime;
+		if (timeleft > 172800 || !x->GetExpires())
 			timeleft = 172800;
-		UplinkSocket::Message(Me) << "GLINE " << x->mask << " " << timeleft << " :" << x->GetReason() << " (" << x->by << ")";
+		UplinkSocket::Message(Me) << "GLINE " << x->GetMask() << " " << timeleft << " :" << x->GetReason() << " (" << x->GetBy() << ")";
 	}
 
-	void SendAkillDel(const XLine *x) override
+	void SendAkillDel(XLine *x) override
 	{
-		UplinkSocket::Message(Me) << "GLINE " << x->mask;
+		UplinkSocket::Message(Me) << "GLINE " << x->GetMask();
 	}
 
 	void SendChannel(Channel *c) override
@@ -72,12 +72,12 @@ class ngIRCdProto : public IRCDProto
 		UplinkSocket::Message(Me) << "SVSNICK " << u->nick << " " << newnick;
 	}
 
-	void SendGlobalNotice(BotInfo *bi, const Server *dest, const Anope::string &msg) override
+	void SendGlobalNotice(ServiceBot *bi, const Server *dest, const Anope::string &msg) override
 	{
 		UplinkSocket::Message(bi) << "NOTICE $" << dest->GetName() << " :" << msg;
 	}
 
-	void SendGlobalPrivmsg(BotInfo *bi, const Server *dest, const Anope::string &msg) override
+	void SendGlobalPrivmsg(ServiceBot *bi, const Server *dest, const Anope::string &msg) override
 	{
 		UplinkSocket::Message(bi) << "PRIVMSG $" << dest->GetName() << " :" << msg;
 	}
@@ -101,7 +101,7 @@ class ngIRCdProto : public IRCDProto
 			if (uc != NULL)
 				uc->status.Clear();
 
-			BotInfo *setter = BotInfo::Find(user->GetUID());
+			ServiceBot *setter = ServiceBot::Find(user->GetUID());
 			for (size_t i = 0; i < cs.Modes().length(); ++i)
 				c->SetMode(setter, ModeManager::FindChannelModeByChar(cs.Modes()[i]), user->GetUID(), false);
 
@@ -120,7 +120,7 @@ class ngIRCdProto : public IRCDProto
 
 	void SendLogin(User *u, NickServ::Nick *na) override
 	{
-		UplinkSocket::Message(Me) << "METADATA " << u->GetUID() << " accountname :" << na->nc->display;
+		UplinkSocket::Message(Me) << "METADATA " << u->GetUID() << " accountname :" << na->GetAccount()->GetDisplay();
 	}
 
 	void SendLogout(User *u) override

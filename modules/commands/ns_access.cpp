@@ -11,6 +11,53 @@
 
 #include "module.h"
 #include "modules/nickserv.h"
+#include "modules/ns_access.h"
+
+class NickAccessImpl : public NickAccess
+{
+ public:
+	NickAccessImpl(Serialize::TypeBase *type) : NickAccess(type) { }
+	NickAccessImpl(Serialize::TypeBase *type, Serialize::ID id) : NickAccess(type, id) { }
+
+	NickServ::Account *GetAccount() override;
+	void SetAccount(NickServ::Account *) override;
+
+	Anope::string GetMask() override;
+	void SetMask(const Anope::string &) override;
+};
+
+class NickAccessType : public Serialize::Type<NickAccessImpl>
+{
+ public:
+	Serialize::ObjectField<NickAccessImpl, NickServ::Account *> account;
+	Serialize::Field<NickAccessImpl, Anope::string> mask;
+
+	NickAccessType(Module *creator) : Serialize::Type<NickAccessImpl>(creator, "NSAccess")
+		, account(this, "account", true)
+		, mask(this, "mask")
+	{
+	}
+};
+
+NickServ::Account *NickAccessImpl::GetAccount()
+{
+	return Get(&NickAccessType::account);
+}
+
+void NickAccessImpl::SetAccount(NickServ::Account *acc)
+{
+	Set(&NickAccessType::account, acc);
+}
+
+Anope::string NickAccessImpl::GetMask()
+{
+	return Get(&NickAccessType::mask);
+}
+
+void NickAccessImpl::SetMask(const Anope::string &m)
+{
+	Set(&NickAccessType::mask, m);
+}
 
 class CommandNSAccess : public Command
 {
@@ -29,21 +76,27 @@ class CommandNSAccess : public Command
 			return;
 		}
 
-		if (nc->access.size() >= Config->GetModule(this->owner)->Get<unsigned>("accessmax", "32"))
+		std::vector<NickAccess *> access = nc->GetRefs<NickAccess *>(nsaccess);
+
+		if (access.size() >= Config->GetModule(this->owner)->Get<unsigned>("accessmax", "32"))
 		{
 			source.Reply(_("Sorry, the maximum of \002{0}\002 access entries has been reached."), Config->GetModule(this->owner)->Get<unsigned>("accessmax"));
 			return;
 		}
 
-		if (nc->FindAccess(mask))
-		{
-			source.Reply(_("Mask \002{0}\002 already present on the access list of \002{1}\002."), mask, nc->display);
-			return;
-		}
+		for (NickAccess *a : access)
+			if (a->GetMask().equals_ci(mask))
+			{
+				source.Reply(_("Mask \002{0}\002 already present on the access list of \002{1}\002."), mask, nc->GetDisplay());
+				return;
+			}
 
-		nc->AddAccess(mask);
-		Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to ADD mask " << mask << " to " << nc->display;
-		source.Reply(_("\002{0}\002 added to the access list of \002{1}\002."), mask, nc->display);
+		NickAccess *a = nsaccess.Create();
+		a->SetAccount(nc);
+		a->SetMask(mask);
+
+		Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to ADD mask " << mask << " to " << nc->GetDisplay();
+		source.Reply(_("\002{0}\002 added to the access list of \002{1}\002."), mask, nc->GetDisplay());
 	}
 
 	void DoDel(CommandSource &source, NickServ::Account *nc, const Anope::string &mask)
@@ -60,34 +113,35 @@ class CommandNSAccess : public Command
 			return;
 		}
 
-		if (!nc->FindAccess(mask))
-		{
-			source.Reply(_("\002{0}\002 not found on the access list of \002{1}\002."), mask, nc->display);
-			return;
-		}
+		for (NickAccess *a : nc->GetRefs<NickAccess *>(nsaccess))
+			if (a->GetMask().equals_ci(mask))
+			{
+				a->Delete();
+				Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to DELETE mask " << mask << " from " << nc->GetDisplay();
+				source.Reply(_("\002{0}\002 deleted from the access list of \002{1}\002."), mask, nc->GetDisplay());
+				return;
+			}
 
-		nc->EraseAccess(mask);
-		Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to DELETE mask " << mask << " from " << nc->display;
-		source.Reply(_("\002{0}\002 deleted from the access list of \002{1}\002."), mask, nc->display);
+
+		source.Reply(_("\002{0}\002 not found on the access list of \002{1}\002."), mask, nc->GetDisplay());
 	}
 
 	void DoList(CommandSource &source, NickServ::Account *nc, const Anope::string &mask)
 	{
-		unsigned i, end;
-
-		if (nc->access.empty())
+		std::vector<NickAccess *> access = nc->GetRefs<NickAccess *>(nsaccess);
+		if (access.empty())
 		{
-			source.Reply(_("The access list of \002{0}\002 is empty."), nc->display);
+			source.Reply(_("The access list of \002{0}\002 is empty."), nc->GetDisplay());
 			return;
 		}
 
-		source.Reply(_("Access list for \002{0}\002:"), nc->display);
-		for (i = 0, end = nc->access.size(); i < end; ++i)
+		source.Reply(_("Access list for \002{0}\002:"), nc->GetDisplay());
+		for (NickAccess *a : access)
 		{
-			Anope::string access = nc->GetAccess(i);
-			if (!mask.empty() && !Anope::Match(access, mask))
+			if (!mask.empty() && !Anope::Match(a->GetMask(), mask))
 				continue;
-			source.Reply("    {0}", access);
+
+			source.Reply("    {0}", a->GetMask());
 		}
 	}
  public:
@@ -115,20 +169,20 @@ class CommandNSAccess : public Command
 		NickServ::Account *nc;
 		if (!nick.empty() && source.HasPriv("nickserv/access"))
 		{
-			const NickServ::Nick *na = NickServ::FindNick(nick);
+			NickServ::Nick *na = NickServ::FindNick(nick);
 			if (na == NULL)
 			{
 				source.Reply(_("\002{0}\002 isn't registered."), nick);
 				return;
 			}
 
-			if (Config->GetModule("nickserv")->Get<bool>("secureadmins", "yes") && source.GetAccount() != na->nc && na->nc->IsServicesOper() && !cmd.equals_ci("LIST"))
+			if (Config->GetModule("nickserv")->Get<bool>("secureadmins", "yes") && source.GetAccount() != na->GetAccount() && na->GetAccount()->IsServicesOper() && !cmd.equals_ci("LIST"))
 			{
 				source.Reply(_("You may view but not modify the access list of other Services Operators."));
 				return;
 			}
 
-			nc = na->nc;
+			nc = na->GetAccount();
 		}
 		else
 			nc = source.nc;
@@ -140,8 +194,8 @@ class CommandNSAccess : public Command
 		}
 		else if (cmd.equals_ci("LIST"))
 			return this->DoList(source, nc, mask);
-		else if (nc->HasExt("NS_SUSPENDED"))
-			source.Reply(_("\002{0}\002 is suspended."), nc->display);
+		else if (nc->HasFieldS("NS_SUSPENDED"))
+			source.Reply(_("\002{0}\002 is suspended."), nc->GetDisplay());
 		else if (cmd.equals_ci("ADD"))
 			return this->DoAdd(source, nc, mask);
 		else if (cmd.equals_ci("DEL"))
@@ -178,18 +232,26 @@ class NSAccess : public Module
 	, public EventHook<NickServ::Event::NickRegister>
 {
 	CommandNSAccess commandnsaccess;
+	NickAccessType nick_type;
 
  public:
 	NSAccess(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
 		, EventHook<NickServ::Event::NickRegister>("OnNickRegister")
 		, commandnsaccess(this)
+		, nick_type(this)
 	{
 	}
 
 	void OnNickRegister(User *u, NickServ::Nick *na, const Anope::string &) override
 	{
 		if (u && Config->GetModule(this)->Get<bool>("addaccessonreg"))
-			na->nc->AddAccess(u->Mask());
+		{
+			NickAccess *a = nsaccess.Create();
+			a->SetAccount(na->GetAccount());
+			a->SetMask(u->Mask());
+			//XXX?
+//			source.Reply(_("\002{0}\002 has been registered under your hostmask: \002{1}\002"), u_nick, na->GetAccount()->GetAccess(0));
+		}
 	}
 };
 

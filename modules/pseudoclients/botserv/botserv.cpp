@@ -24,8 +24,8 @@ class BotServCore : public Module, public BotServ::BotServService
 	, public EventHook<Event::UserKicked>
 	, public EventHook<Event::CreateBot>
 {
-	Reference<BotInfo> BotServ;
-	ExtensibleRef<bool> persist, inhabit;
+	Reference<ServiceBot> BotServ;
+	ExtensibleRef<bool> persist, inhabit;//XXX?
 
  public:
 	BotServCore(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PSEUDOCLIENT | VENDOR)
@@ -47,21 +47,21 @@ class BotServCore : public Module, public BotServ::BotServService
 	void OnReload(Configuration::Conf *conf) override
 	{
 		const Anope::string &bsnick = conf->GetModule(this)->Get<const Anope::string>("client");
-		BotServ = BotInfo::Find(bsnick, true);
+		BotServ = ServiceBot::Find(bsnick, true);
 	}
 
 	void OnSetCorrectModes(User *user, Channel *chan, ChanServ::AccessGroup &access, bool &give_modes, bool &take_modes) override
 	{
 		/* Do not allow removing bot modes on our service bots */
-		if (chan->ci && chan->ci->bi == user)
+		if (chan->ci && chan->ci->GetBot() == user)
 		{
 			const Anope::string &botmodes = Config->GetModule(this)->Get<const Anope::string>("botmodes");
 			for (unsigned i = 0; i < botmodes.length(); ++i)
-				chan->SetMode(chan->ci->bi, ModeManager::FindChannelModeByChar(botmodes[i]), chan->ci->bi->GetUID());
+				chan->SetMode(chan->ci->GetBot(), ModeManager::FindChannelModeByChar(botmodes[i]), chan->ci->GetBot()->GetUID());
 		}
 	}
 
-	void OnBotAssign(User *sender, ChanServ::Channel *ci, BotInfo *bi) override
+	void OnBotAssign(User *sender, ChanServ::Channel *ci, ServiceBot *bi) override
 	{
 		if (ci->c && ci->c->users.size() >= Config->GetModule(this)->Get<unsigned>("minusers"))
 		{
@@ -75,7 +75,7 @@ class BotServCore : public Module, public BotServ::BotServService
 		if (!Config || !IRCD)
 			return;
 
-		BotInfo *bi = user->server == Me ? dynamic_cast<BotInfo *>(user) : NULL;
+		ServiceBot *bi = user->server == Me ? dynamic_cast<ServiceBot *>(user) : NULL;
 		if (bi && Config->GetModule(this)->Get<bool>("smartjoin"))
 		{
 			std::pair<Channel::ModeList::iterator, Channel::ModeList::iterator> bans = c->GetModeList("BAN");
@@ -108,7 +108,7 @@ class BotServCore : public Module, public BotServ::BotServService
 			ModeManager::ProcessModes();
 		}
 
-		if (user->server != Me && c->ci && c->ci->bi)
+		if (user->server != Me && c->ci && c->ci->GetBot())
 		{
 			/**
 			 * We let the bot join even if it was an ignored user, as if we don't,
@@ -117,10 +117,10 @@ class BotServCore : public Module, public BotServ::BotServService
 			 * legit users - Rob
 			 **/
 			/* This is before the user has joined the channel, so check usercount + 1 */
-			if (c->users.size() + 1 >= Config->GetModule(this)->Get<unsigned>("minusers") && !c->FindUser(c->ci->bi))
+			if (c->users.size() + 1 >= Config->GetModule(this)->Get<unsigned>("minusers") && !c->FindUser(c->ci->GetBot()))
 			{
 				ChannelStatus status(Config->GetModule(this)->Get<const Anope::string>("botmodes"));
-				c->ci->bi->Join(c, &status);
+				c->ci->GetBot()->Join(c, &status);
 			}
 		}
 	}
@@ -142,8 +142,8 @@ class BotServCore : public Module, public BotServ::BotServService
 			return;
 
 		/* This is called prior to removing the user from the channnel, so c->users.size() - 1 should be safe */
-		if (c->ci && c->ci->bi && u != *c->ci->bi && c->users.size() - 1 <= Config->GetModule(this)->Get<unsigned>("minusers") && c->FindUser(c->ci->bi))
-			c->ci->bi->Part(c->ci->c);
+		if (c->ci && c->ci->GetBot() && u != c->ci->GetBot() && c->users.size() - 1 <= Config->GetModule(this)->Get<unsigned>("minusers") && c->FindUser(c->ci->GetBot()))
+			c->ci->GetBot()->Part(c->ci->c);
 	}
 
 	EventReturn OnPreHelp(CommandSource &source, const std::vector<Anope::string> &params) override
@@ -198,9 +198,9 @@ class BotServCore : public Module, public BotServ::BotServService
 
 	EventReturn OnChannelModeSet(Channel *c, const MessageSource &source, ChannelMode *mode, const Anope::string &param) override
 	{
-		if (source.GetUser() && !source.GetBot() && Config->GetModule(this)->Get<bool>("smartjoin") && mode->name == "BAN" && c->ci && c->ci->bi && c->FindUser(c->ci->bi))
+		if (source.GetUser() && !source.GetBot() && Config->GetModule(this)->Get<bool>("smartjoin") && mode->name == "BAN" && c->ci && c->ci->GetBot() && c->FindUser(c->ci->GetBot()))
 		{
-			BotInfo *bi = c->ci->bi;
+			ServiceBot *bi = c->ci->GetBot();
 
 			Entry ban("BAN", param);
 			if (ban.Matches(bi))
@@ -215,18 +215,18 @@ class BotServCore : public Module, public BotServ::BotServService
 		/* Set default bot flags */
 		spacesepstream sep(Config->GetModule(this)->Get<const Anope::string>("defaults", "greet fantasy"));
 		for (Anope::string token; sep.GetToken(token);)
-			ci->Extend<bool>("BS_" + token.upper());
+			ci->SetS<bool>("BS_" + token.upper(), true);
 	}
 
 	void OnUserKicked(const MessageSource &source, User *target, const Anope::string &channel, ChannelStatus &status, const Anope::string &kickmsg) override
 	{
-		BotInfo *bi = BotInfo::Find(target->GetUID());
+		ServiceBot *bi = ServiceBot::Find(target->GetUID());
 		if (bi)
 			/* Bots get rejoined */
 			bi->Join(channel, &status);
 	}
 
-	void OnCreateBot(BotInfo *bi) override
+	void OnCreateBot(ServiceBot *bi) override
 	{
 		if (bi->botmodes.empty())
 			bi->botmodes = Config->GetModule(this)->Get<const Anope::string>("botumodes");

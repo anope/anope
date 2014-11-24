@@ -11,39 +11,109 @@
  *
  */
 
-/* Indices for TTB (Times To Ban) */
-enum
+class KickerData : public Serialize::Object
 {
-	TTB_BOLDS,
-	TTB_COLORS,
-	TTB_REVERSES,
-	TTB_UNDERLINES,
-	TTB_BADWORDS,
-	TTB_CAPS,
-	TTB_FLOOD,
-	TTB_REPEAT,
-	TTB_ITALICS,
-	TTB_AMSGS,
-	TTB_SIZE
-};
-
-struct KickerData
-{
-	bool amsgs, badwords, bolds, caps, colors, flood, italics, repeat, reverses, underlines;
-	int16_t ttb[TTB_SIZE];                    /* Times to ban for each kicker */
-	int16_t capsmin, capspercent;	          /* For CAPS kicker */
-	int16_t floodlines, floodsecs;            /* For FLOOD kicker */
-	int16_t repeattimes;                      /* For REPEAT kicker */
-
-	bool dontkickops, dontkickvoices;
-
  protected:
-	KickerData() { }
+	using Serialize::Object::Object;
 
  public:
-	virtual ~KickerData() { }
-	virtual void Check(ChanServ::Channel *ci) anope_abstract;
+	virtual ChanServ::Channel *GetChannel() anope_abstract;
+	virtual void SetChannel(ChanServ::Channel *) anope_abstract;
+
+	virtual bool GetAmsgs() anope_abstract;
+	virtual void SetAmsgs(const bool &) anope_abstract;
+
+	virtual bool GetBadwords() anope_abstract;
+	virtual void SetBadwords(const bool &) anope_abstract;
+
+	virtual bool GetBolds() anope_abstract;
+	virtual void SetBolds(const bool &) anope_abstract;
+
+	virtual bool GetCaps() anope_abstract;
+	virtual void SetCaps(const bool &) anope_abstract;
+
+	virtual bool GetColors() anope_abstract;
+	virtual void SetColors(const bool &) anope_abstract;
+
+	virtual bool GetFlood() anope_abstract;
+	virtual void SetFlood(const bool &) anope_abstract;
+
+	virtual bool GetItalics() anope_abstract;
+	virtual void SetItalics(const bool &) anope_abstract;
+
+	virtual bool GetRepeat() anope_abstract;
+	virtual void SetRepeat(const bool &) anope_abstract;
+
+	virtual bool GetReverses() anope_abstract;
+	virtual void SetReverses(const bool &) anope_abstract;
+
+	virtual bool GetUnderlines() anope_abstract;
+	virtual void SetUnderlines(const bool &) anope_abstract;
+
+	virtual int16_t GetTTBBolds() anope_abstract;
+	virtual void SetTTBBolds(const int16_t &) anope_abstract;
+
+	virtual int16_t GetTTBColors() anope_abstract;
+	virtual void SetTTBColors(const int16_t &) anope_abstract;
+
+	virtual int16_t GetTTBReverses() anope_abstract;
+	virtual void SetTTBReverses(const int16_t &) anope_abstract;
+
+	virtual int16_t GetTTBUnderlines() anope_abstract;
+	virtual void SetTTBUnderlines(const int16_t &) anope_abstract;
+
+	virtual int16_t GetTTBBadwords() anope_abstract;
+	virtual void SetTTBBadwords(const int16_t &) anope_abstract;
+
+	virtual int16_t GetTTBCaps() anope_abstract;
+	virtual void SetTTBCaps(const int16_t &) anope_abstract;
+	
+	virtual int16_t GetTTBFlood() anope_abstract;
+	virtual void SetTTBFlood(const int16_t &) anope_abstract;
+
+	virtual int16_t GetTTBRepeat() anope_abstract;
+	virtual void SetTTBRepeat(const int16_t &) anope_abstract;
+
+	virtual int16_t GetTTBItalics() anope_abstract;
+	virtual void SetTTBItalics(const int16_t &) anope_abstract;
+
+	virtual int16_t GetTTBAmsgs() anope_abstract;
+	virtual void SetTTBAmsgs(const int16_t &) anope_abstract;
+
+	virtual int16_t GetCapsMin() anope_abstract;
+	virtual void SetCapsMin(const int16_t &) anope_abstract;
+
+	virtual int16_t GetCapsPercent() anope_abstract;
+	virtual void SetCapsPercent(const int16_t &) anope_abstract;
+
+	virtual int16_t GetFloodLines() anope_abstract;
+	virtual void SetFloodLines(const int16_t &) anope_abstract;
+
+	virtual int16_t GetFloodSecs() anope_abstract;
+	virtual void SetFloodSecs(const int16_t &) anope_abstract;
+
+	virtual int16_t GetRepeatTimes() anope_abstract;
+	virtual void SetRepeatTimes(const int16_t &) anope_abstract;
+
+	virtual bool GetDontKickOps() anope_abstract;
+	virtual void SetDontKickOps(const bool &) anope_abstract;
+
+	virtual bool GetDontKickVoices() anope_abstract;
+	virtual void SetDontKickVoices(const bool &) anope_abstract;
 };
+
+static Serialize::TypeReference<KickerData> kickerdata("KickerData");
+
+inline KickerData *GetKickerData(ChanServ::Channel *ci)
+{
+	KickerData *kd = ci->GetRef<KickerData *>(kickerdata);
+	if (!kd && kickerdata)
+	{
+		kd = kickerdata.Create();
+		kd->SetChannel(ci);
+	}
+	return kd;
+}
 
 namespace Event
 {

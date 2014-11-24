@@ -54,7 +54,7 @@ void Mail::Message::Run()
 	SetExitState();
 }
 
-bool Mail::Send(User *u, NickServ::Account *nc, BotInfo *service, const Anope::string &subject, const Anope::string &message)
+bool Mail::Send(User *u, NickServ::Account *nc, ServiceBot *service, const Anope::string &subject, const Anope::string &message)
 {
 	if (!nc || !service || subject.empty() || message.empty())
 		return false;
@@ -65,11 +65,11 @@ bool Mail::Send(User *u, NickServ::Account *nc, BotInfo *service, const Anope::s
 	{
 		if (!b->Get<bool>("usemail") || b->Get<const Anope::string>("sendfrom").empty())
 			return false;
-		else if (nc->email.empty())
+		else if (nc->GetEmail().empty())
 			return false;
 
 		nc->lastmail = Anope::CurTime;
-		Thread *t = new Mail::Message(b->Get<const Anope::string>("sendfrom"), nc->display, nc->email, subject, message);
+		Thread *t = new Mail::Message(b->Get<const Anope::string>("sendfrom"), nc->GetDisplay(), nc->GetEmail(), subject, message);
 		t->Start();
 		return true;
 	}
@@ -79,12 +79,12 @@ bool Mail::Send(User *u, NickServ::Account *nc, BotInfo *service, const Anope::s
 			u->SendMessage(service, _("Services have been configured to not send mail."));
 		else if (Anope::CurTime - u->lastmail < b->Get<time_t>("delay"))
 			u->SendMessage(service, _("Please wait \002%d\002 seconds and retry."), b->Get<time_t>("delay") - (Anope::CurTime - u->lastmail));
-		else if (nc->email.empty())
-			u->SendMessage(service, _("E-mail for \002%s\002 is invalid."), nc->display.c_str());
+		else if (nc->GetEmail().empty())
+			u->SendMessage(service, _("E-mail for \002%s\002 is invalid."), nc->GetDisplay().c_str());
 		else
 		{
 			u->lastmail = nc->lastmail = Anope::CurTime;
-			Thread *t = new Mail::Message(b->Get<const Anope::string>("sendfrom"), nc->display, nc->email, subject, message);
+			Thread *t = new Mail::Message(b->Get<const Anope::string>("sendfrom"), nc->GetDisplay(), nc->GetEmail(), subject, message);
 			t->Start();
 			return true;
 		}
@@ -96,11 +96,11 @@ bool Mail::Send(User *u, NickServ::Account *nc, BotInfo *service, const Anope::s
 bool Mail::Send(NickServ::Account *nc, const Anope::string &subject, const Anope::string &message)
 {
 	Configuration::Block *b = Config->GetBlock("mail");
-	if (!b->Get<bool>("usemail") || b->Get<const Anope::string>("sendfrom").empty() || !nc || nc->email.empty() || subject.empty() || message.empty())
+	if (!b->Get<bool>("usemail") || b->Get<const Anope::string>("sendfrom").empty() || !nc || nc->GetEmail().empty() || subject.empty() || message.empty())
 		return false;
 
 	nc->lastmail = Anope::CurTime;
-	Thread *t = new Mail::Message(b->Get<const Anope::string>("sendfrom"), nc->display, nc->email, subject, message);
+	Thread *t = new Mail::Message(b->Get<const Anope::string>("sendfrom"), nc->GetDisplay(), nc->GetEmail(), subject, message);
 	t->Start();
 
 	return true;

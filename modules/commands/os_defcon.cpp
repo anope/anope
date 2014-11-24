@@ -501,7 +501,7 @@ class OSDefcon : public Module
 		if (exempt || u->Quitting() || !u->server->IsSynced() || u->server->IsULined())
 			return;
 
-		BotInfo *OperServ = Config->GetClient("OperServ");
+		ServiceBot *OperServ = Config->GetClient("OperServ");
 		if (DConfig.Check(DEFCON_AKILL_NEW_CLIENTS) && akills)
 		{
 			Log(OperServ, "operserv/defcon") << "DEFCON: adding akill for *@" << u->host;
@@ -524,9 +524,9 @@ class OSDefcon : public Module
 			return;
 
 		Session *session = session_service->FindSession(u->ip.addr());
-		Exception *exception = session_service->FindException(u);
+		Exception *e = session_service->FindException(u);
 
-		if (DConfig.Check(DEFCON_REDUCE_SESSION) && !exception)
+		if (DConfig.Check(DEFCON_REDUCE_SESSION) && !e)
 		{
 			if (session && session->count > static_cast<unsigned>(DConfig.sessionlimit))
 			{
@@ -568,7 +568,7 @@ class OSDefcon : public Module
 
 static void runDefCon()
 {
-	BotInfo *OperServ = Config->GetClient("OperServ");
+	ServiceBot *OperServ = Config->GetClient("OperServ");
 	if (DConfig.Check(DEFCON_FORCE_CHAN_MODES))
 	{
 		if (!DConfig.chanmodes.empty() && !DefConModesSet)

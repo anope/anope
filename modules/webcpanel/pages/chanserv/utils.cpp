@@ -11,7 +11,7 @@ namespace
 {
 	bool ChannelSort(ChanServ::Channel *ci1, ChanServ::Channel *ci2)
 	{
-		return ci::less()(ci1->name, ci2->name);
+		return ci::less()(ci1->GetName(), ci2->GetName());
 	}
 }
 
@@ -23,19 +23,16 @@ namespace ChanServ
 
 void BuildChanList(::NickServ::Nick *na, TemplateFileServer::Replacements &replacements)
 {
-	std::deque<::ChanServ::Channel *> queue;
-	na->nc->GetChannelReferences(queue);
-	std::sort(queue.begin(), queue.end(), ChannelSort);
+	std::vector<::ChanServ::Channel *> chans = na->GetAccount()->GetRefs<::ChanServ::Channel *>(::ChanServ::channel);
+	std::sort(chans.begin(), chans.end(), ChannelSort);
 
-	for (unsigned i = 0; i < queue.size(); ++i)
+	for (::ChanServ::Channel *ci : chans)
 	{
-		::ChanServ::Channel *ci = queue[i];
-
-		if (na->nc != ci->GetFounder() && ci->AccessFor(na->nc).empty())
+		if (na->GetAccount() != ci->GetFounder() && ci->AccessFor(na->GetAccount()).empty())
 			continue;
 
-		replacements["CHANNEL_NAMES"] = ci->name;
-		replacements["ESCAPED_CHANNEL_NAMES"] = HTTPUtils::URLEncode(ci->name);
+		replacements["CHANNEL_NAMES"] = ci->GetName();
+		replacements["ESCAPED_CHANNEL_NAMES"] = HTTPUtils::URLEncode(ci->GetName());
 	}
 }
 

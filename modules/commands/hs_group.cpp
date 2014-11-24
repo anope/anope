@@ -17,7 +17,7 @@ class CommandHSGroup : public Command
 	bool setting;
 
  public:
-	void Sync(const NickServ::Nick *na)
+	void Sync(NickServ::Nick *na)
 	{
 		if (setting)
 			return;
@@ -26,14 +26,10 @@ class CommandHSGroup : public Command
 			return;
 
 		setting = true;
-		for (unsigned i = 0; i < na->nc->aliases->size(); ++i)
+		for (NickServ::Nick *nick : na->GetAccount()->GetRefs<NickServ::Nick *>(NickServ::nick))
 		{
-			NickServ::Nick *nick = na->nc->aliases->at(i);
-			if (nick)
-			{
-				nick->SetVhost(na->GetVhostIdent(), na->GetVhostHost(), na->GetVhostCreator());
-				Event::OnSetVhost(&Event::SetVhost::OnSetVhost, nick);
-			}
+			nick->SetVhost(na->GetVhostIdent(), na->GetVhostHost(), na->GetVhostCreator());
+			Event::OnSetVhost(&Event::SetVhost::OnSetVhost, nick);
 		}
 		setting = false;
 	}
@@ -52,7 +48,7 @@ class CommandHSGroup : public Command
 		}
 
 		NickServ::Nick *na = NickServ::FindNick(source.GetNick());
-		if (!na || na->nc != source.GetAccount())
+		if (!na || na->GetAccount() != source.GetAccount())
 		{
 			source.Reply(_("Access denied."));
 			return;
@@ -66,9 +62,9 @@ class CommandHSGroup : public Command
 
 		this->Sync(na);
 		if (!na->GetVhostIdent().empty())
-			source.Reply(_("All vhosts in the group \002{0}\002 have been set to \002{1}\002@\002{2}\002."), source.nc->display, na->GetVhostIdent(), na->GetVhostHost());
+			source.Reply(_("All vhosts in the group \002{0}\002 have been set to \002{1}\002@\002{2}\002."), source.nc->GetDisplay(), na->GetVhostIdent(), na->GetVhostHost());
 		else
-			source.Reply(_("All vhosts in the group \002{0}\002 have been set to \002{1}\002."), source.nc->display, na->GetVhostHost());
+			source.Reply(_("All vhosts in the group \002{0}\002 have been set to \002{1}\002."), source.nc->GetDisplay(), na->GetVhostHost());
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override

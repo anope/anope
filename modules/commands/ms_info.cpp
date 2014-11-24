@@ -23,8 +23,8 @@ class CommandMSInfo : public Command
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		NickServ::Account *nc = source.nc;
-		const MemoServ::MemoInfo *mi;
-		const NickServ::Nick *na = NULL;
+		MemoServ::MemoInfo *mi;
+		NickServ::Nick *na = NULL;
 		ChanServ::Channel *ci = NULL;
 		const Anope::string &nname = !params.empty() ? params[0] : "";
 		bool hardmax;
@@ -37,8 +37,8 @@ class CommandMSInfo : public Command
 				source.Reply(_("\002{0}\002 isn't registered."), nname);
 				return;
 			}
-			mi = na->nc->memos;
-			hardmax = na->nc->HasExt("MEMO_HARDMAX");
+			mi = na->GetAccount()->GetMemos();
+			hardmax = na->GetAccount()->HasFieldS("MEMO_HARDMAX");
 		}
 		else if (!nname.empty() && nname[0] == '#')
 		{
@@ -51,12 +51,12 @@ class CommandMSInfo : public Command
 
 			if (!source.AccessFor(ci).HasPriv("MEMO"))
 			{
-				source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "MEMO", ci->name);
+				source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "MEMO", ci->GetName());
 				return;
 			}
 
-			mi = ci->memos;
-			hardmax = ci->HasExt("MEMO_HARDMAX");
+			mi = ci->GetMemos();
+			hardmax = ci->HasFieldS("MEMO_HARDMAX");
 		}
 		else if (!nname.empty()) /* It's not a chan and we aren't an oper */
 		{
@@ -65,19 +65,21 @@ class CommandMSInfo : public Command
 		}
 		else
 		{
-			mi = nc->memos;
-			hardmax = nc->HasExt("MEMO_HARDMAX");
+			mi = nc->GetMemos();
+			hardmax = nc->HasFieldS("MEMO_HARDMAX");
 		}
 		if (!mi)
 			return;
 
-		if (!nname.empty() && (ci || na->nc != nc))
+		auto memos = mi->GetMemos();
+
+		if (!nname.empty() && (ci || na->GetAccount() != nc))
 		{
-			if (mi->memos->empty())
+			if (memos.empty())
 				source.Reply(_("%s currently has no memos."), nname.c_str());
-			else if (mi->memos->size() == 1)
+			else if (memos.size() == 1)
 			{
-				if (mi->GetMemo(0)->unread)
+				if (mi->GetMemo(0)->GetUnread())
 					source.Reply(_("\002{0}\002 currently has \0021\002 memo, and it has not yet been read."), nname);
 				else
 					source.Reply(_("\002{0}\002 currently has \0021\002 memo."), nname);
@@ -85,35 +87,35 @@ class CommandMSInfo : public Command
 			else
 			{
 				unsigned count = 0, i, end;
-				for (i = 0, end = mi->memos->size(); i < end; ++i)
-					if (mi->GetMemo(i)->unread)
+				for (i = 0, end = memos.size(); i < end; ++i)
+					if (mi->GetMemo(i)->GetUnread())
 						++count;
-				if (count == mi->memos->size())
+				if (count == memos.size())
 					source.Reply(_("\002{0}\002 currently has \002{1]\002 memos; all of them are unread."), nname, count);
 				else if (!count)
-					source.Reply(_("\002{0}\002 currently has \002{1}\002 memos."), nname, mi->memos->size());
+					source.Reply(_("\002{0}\002 currently has \002{1}\002 memos."), nname, memos.size());
 				else if (count == 1)
-					source.Reply(_("\002{0}\002 currently has \002{1}\002 memos, of which \0021\002 is unread."), nname, mi->memos->size());
+					source.Reply(_("\002{0}\002 currently has \002{1}\002 memos, of which \0021\002 is unread."), nname, memos.size());
 				else
-					source.Reply(_("\002{0}\002 currently has \002{1]\002 memos, of which \002{2}\002 are unread."), nname, mi->memos->size(), count);
+					source.Reply(_("\002{0}\002 currently has \002{1]\002 memos, of which \002{2}\002 are unread."), nname, memos.size(), count);
 			}
-			if (mi->memomax >= 0)
+			if (mi->GetMemoMax() >= 0)
 			{
 				if (hardmax)
-					source.Reply(_("The memo limit of \002{0}\002 is \002{1}\002, and may not be changed."), nname, mi->memomax);
+					source.Reply(_("The memo limit of \002{0}\002 is \002{1}\002, and may not be changed."), nname, mi->GetMemoMax());
 				else
-					source.Reply(_("The memo limit of \002{0}\002 is \002{1}\002."), nname, mi->memomax);
+					source.Reply(_("The memo limit of \002{0}\002 is \002{1}\002."), nname, mi->GetMemoMax());
 			}
 			else
 				source.Reply(_("\002{0}\002 has no memo limit."), nname);
 
 			if (na)
 			{
-				if (na->nc->HasExt("MEMO_RECEIVE") && na->nc->HasExt("MEMO_SIGNON"))
+				if (na->GetAccount()->HasFieldS("MEMO_RECEIVE") && na->GetAccount()->HasFieldS("MEMO_SIGNON"))
 					source.Reply(_("\002{0}\002 is notified of new memos at logon and when they arrive."), nname);
-				else if (na->nc->HasExt("MEMO_RECEIVE"))
+				else if (na->GetAccount()->HasFieldS("MEMO_RECEIVE"))
 					source.Reply(_("\002{0}\002 is notified when new memos arrive."), nname);
-				else if (na->nc->HasExt("MEMO_SIGNON"))
+				else if (na->GetAccount()->HasFieldS("MEMO_SIGNON"))
 					source.Reply(_("\002{0}\002 is notified of news memos at logon."), nname);
 				else
 					source.Reply(_("\002{0}\002 is not notified of new memos."), nname);
@@ -121,11 +123,11 @@ class CommandMSInfo : public Command
 		}
 		else
 		{
-			if (mi->memos->empty())
+			if (memos.empty())
 				source.Reply(_("You currently have no memos."));
-			else if (mi->memos->size() == 1)
+			else if (memos.size() == 1)
 			{
-				if (mi->GetMemo(0)->unread)
+				if (mi->GetMemo(0)->GetUnread())
 					source.Reply(_("You currently have \0021\002 memo, and it has not yet been read."));
 				else
 					source.Reply(_("You currently have \0021\002 memo."));
@@ -133,41 +135,41 @@ class CommandMSInfo : public Command
 			else
 			{
 				unsigned count = 0, i, end;
-				for (i = 0, end = mi->memos->size(); i < end; ++i)
-					if (mi->GetMemo(i)->unread)
+				for (i = 0, end = memos.size(); i < end; ++i)
+					if (mi->GetMemo(i)->GetUnread())
 						++count;
-				if (count == mi->memos->size())
+				if (count == memos.size())
 					source.Reply(_("You currently have \002{0}\002 memos; all of them are unread."), count);
 				else if (!count)
-					source.Reply(_("You currently have \002{0}\002 memos."), mi->memos->size());
+					source.Reply(_("You currently have \002{0}\002 memos."), memos.size());
 				else if (count == 1)
-					source.Reply(_("You currently have \002{0}\002 memos, of which \0021\002 is unread."), mi->memos->size());
+					source.Reply(_("You currently have \002{0}\002 memos, of which \0021\002 is unread."), memos.size());
 				else
-					source.Reply(_("You currently have \002{0}\002 memos, of which \002{1}\002 are unread."), mi->memos->size(), count);
+					source.Reply(_("You currently have \002{0}\002 memos, of which \002{1}\002 are unread."), memos.size(), count);
 			}
 
-			if (!mi->memomax)
+			if (!mi->GetMemoMax())
 			{
 				if (!source.IsServicesOper() && hardmax)
 					source.Reply(_("Your memo limit is \0020\002; you will not receive any new memos. You cannot change this limit."));
 				else
 					source.Reply(_("Your memo limit is \0020\002; you will not receive any new memos."));
 			}
-			else if (mi->memomax > 0)
+			else if (mi->GetMemoMax() > 0)
 			{
 				if (!source.IsServicesOper() && hardmax)
-					source.Reply(_("Your memo limit is \002{0}\002, and may not be changed."), mi->memomax);
+					source.Reply(_("Your memo limit is \002{0}\002, and may not be changed."), mi->GetMemoMax());
 				else
-					source.Reply(_("Your memo limit is \002{0}\002."), mi->memomax);
+					source.Reply(_("Your memo limit is \002{0}\002."), mi->GetMemoMax());
 			}
 			else
 				source.Reply(_("You have no limit on the number of memos you may keep."));
 
-			if (nc->HasExt("MEMO_RECEIVE") && nc->HasExt("MEMO_SIGNON"))
+			if (nc->HasFieldS("MEMO_RECEIVE") && nc->HasFieldS("MEMO_SIGNON"))
 				source.Reply(_("You will be notified of new memos at logon and when they arrive."));
-			else if (nc->HasExt("MEMO_RECEIVE"))
+			else if (nc->HasFieldS("MEMO_RECEIVE"))
 				source.Reply(_("You will be notified when new memos arrive."));
-			else if (nc->HasExt("MEMO_SIGNON"))
+			else if (nc->HasFieldS("MEMO_SIGNON"))
 				source.Reply(_("You will be notified of new memos at logon."));
 			else
 				source.Reply(_("You will not be notified of new memos."));

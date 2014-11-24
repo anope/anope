@@ -23,9 +23,9 @@ class CommandHSOff : public Command
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		User *u = source.GetUser();
-		const NickServ::Nick *na = NickServ::FindNick(u->nick);
+		NickServ::Nick *na = NickServ::FindNick(u->nick);
 
-		if (!na || !na->HasVhost() || na->nc != source.GetAccount())
+		if (!na || !na->HasVhost() || na->GetAccount() != source.GetAccount())
 		{
 			source.Reply(_("There is no vhost assigned to this nickname."));
 			return;

@@ -20,6 +20,7 @@
 #include "servers.h"
 #include "language.h"
 #include "event.h"
+#include "modules.h"
 
 #ifndef _WIN32
 #include <sys/wait.h>
@@ -289,7 +290,7 @@ void Anope::Init(int ac, char **av)
 	umask(DEFUMASK);
 #endif
 
-	Serialize::RegisterTypes();
+	//Serialize::RegisterTypes();
 
 	/* Parse command line arguments */
 	ParseCommandLineArguments(ac, av);
@@ -473,6 +474,10 @@ void Anope::Init(int ac, char **av)
 	/* Initialize the socket engine. Note that some engines can not survive a fork(), so this must be here. */
 	SocketEngine::Init();
 
+	new BotInfoType();
+	new XLineType(nullptr, "XLine");
+	new OperBlockType();
+
 	/* Read configuration file; exit if there are problems. */
 	try
 	{
@@ -491,9 +496,14 @@ void Anope::Init(int ac, char **av)
 	/* Create me */
 	Configuration::Block *block = Config->GetBlock("serverinfo");
 	Me = new Server(NULL, block->Get<const Anope::string>("name"), 0, block->Get<const Anope::string>("description"), block->Get<const Anope::string>("id"));
-	for (botinfo_map::const_iterator it = BotListByNick->begin(), it_end = BotListByNick->end(); it != it_end; ++it)
+	for (std::pair<Anope::string, User *> p : UserListByNick)
 	{
-		it->second->server = Me;
+		User *u = p.second;
+		if (u->type != UserType::BOT)
+			continue;
+
+		ServiceBot *bi = anope_dynamic_static_cast<ServiceBot *>(u);
+		bi->server = Me;
 		++Me->users;
 	}
 
@@ -531,8 +541,15 @@ void Anope::Init(int ac, char **av)
 		Anope::string sid = IRCD->SID_Retrieve();
 		if (Me->GetSID() == Me->GetName())
 			Me->SetSID(sid);
-		for (botinfo_map::iterator it = BotListByNick->begin(), it_end = BotListByNick->end(); it != it_end; ++it)
-			it->second->GenerateUID();
+		for (std::pair<Anope::string, User *> p : UserListByNick)
+		{
+			User *u = p.second;
+			if (u->type != UserType::BOT)
+				continue;
+
+			ServiceBot *bi = anope_dynamic_static_cast<ServiceBot *>(u);
+			bi->GenerateUID();
+		}
 	}
 
 	/* Load up databases */
@@ -545,6 +562,6 @@ void Anope::Init(int ac, char **av)
 	for (channel_map::const_iterator it = ChannelList.begin(), it_end = ChannelList.end(); it != it_end; ++it)
 		it->second->Sync();
 
-	Serialize::CheckTypes();
+	//Serialize::CheckTypes();
 }
 

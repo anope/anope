@@ -29,14 +29,14 @@ class RatboxProto : public IRCDProto
 	}
 
 	void SendSVSKillInternal(const MessageSource &source, User *targ, const Anope::string &reason) override { hybrid->SendSVSKillInternal(source, targ, reason); }
-	void SendGlobalNotice(BotInfo *bi, const Server *dest, const Anope::string &msg) override { hybrid->SendGlobalNotice(bi, dest, msg); }
-	void SendGlobalPrivmsg(BotInfo *bi, const Server *dest, const Anope::string &msg) override { hybrid->SendGlobalPrivmsg(bi, dest, msg); }
-	void SendSQLine(User *u, const XLine *x) override { hybrid->SendSQLine(u, x); }
-	void SendSGLine(User *u, const XLine *x) override { hybrid->SendSGLine(u, x); }
-	void SendSGLineDel(const XLine *x) override { hybrid->SendSGLineDel(x); }
+	void SendGlobalNotice(ServiceBot *bi, const Server *dest, const Anope::string &msg) override { hybrid->SendGlobalNotice(bi, dest, msg); }
+	void SendGlobalPrivmsg(ServiceBot *bi, const Server *dest, const Anope::string &msg) override { hybrid->SendGlobalPrivmsg(bi, dest, msg); }
+	void SendSQLine(User *u, XLine *x) override { hybrid->SendSQLine(u, x); }
+	void SendSGLine(User *u, XLine *x) override { hybrid->SendSGLine(u, x); }
+	void SendSGLineDel(XLine *x) override { hybrid->SendSGLineDel(x); }
 	void SendAkill(User *u, XLine *x) override { hybrid->SendAkill(u, x); }
-	void SendAkillDel(const XLine *x) override { hybrid->SendAkillDel(x); }
-	void SendSQLineDel(const XLine *x) override { hybrid->SendSQLineDel(x); }
+	void SendAkillDel(XLine *x) override { hybrid->SendAkillDel(x); }
+	void SendSQLineDel(XLine *x) override { hybrid->SendSQLineDel(x); }
 	void SendJoin(User *user, Channel *c, const ChannelStatus *status) override { hybrid->SendJoin(user, c, status); }
 	void SendServer(const Server *server) override { hybrid->SendServer(server); }
 	void SendModeInternal(const MessageSource &source, User *u, const Anope::string &buf) override { hybrid->SendModeInternal(source, u, buf); }
@@ -83,10 +83,10 @@ class RatboxProto : public IRCDProto
 
 	void SendLogin(User *u, NickServ::Nick *na) override
 	{
-		if (na->nc->HasExt("UNCONFIRMED"))
+		if (na->GetAccount()->HasFieldS("UNCONFIRMED"))
 			return;
 
-		UplinkSocket::Message(Me) << "ENCAP * SU " << u->GetUID() << " " << na->nc->display;
+		UplinkSocket::Message(Me) << "ENCAP * SU " << u->GetUID() << " " << na->GetAccount()->GetDisplay();
 	}
 
 	void SendLogout(User *u) override
@@ -96,7 +96,7 @@ class RatboxProto : public IRCDProto
 
 	void SendTopic(const MessageSource &source, Channel *c) override
 	{
-		BotInfo *bi = source.GetBot();
+		ServiceBot *bi = source.GetBot();
 		bool needjoin = c->FindUser(bi) == NULL;
 
 		if (needjoin)
@@ -134,7 +134,7 @@ struct IRCDMessageEncap : IRCDMessage
 			 * their server isn't syncing) and then we receive this.. so tell them about it.
 			 */
 			if (u->server->IsSynced())
-				u->SendMessage(Config->GetClient("NickServ"), _("You have been logged in as \002%s\002."), nc->display.c_str());
+				u->SendMessage(Config->GetClient("NickServ"), _("You have been logged in as \002%s\002."), nc->GetDisplay().c_str());
 		}
 	}
 };

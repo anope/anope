@@ -15,9 +15,9 @@ macro(calculate_libraries SRC SRC_LDFLAGS EXTRA_DEPENDS)
   set(LIBRARIES)
   # Check to see if there are any lines matching: /* RequiredLibraries: [something] */
   if(WIN32)
-    file(STRINGS ${SRC} REQUIRED_LIBRARIES REGEX "/\\\\*[ \t]*RequiredWindowsLibraries:[ \t]*.*[ \t]*\\\\*/")
+    file(STRINGS ${SRC} REQUIRED_LIBRARIES REGEX "/\\*[ \t]*RequiredWindowsLibraries:[ \t]*.*[ \t]*\\*/")
   else(WIN32)
-    file(STRINGS ${SRC} REQUIRED_LIBRARIES REGEX "/\\\\*[ \t]*RequiredLibraries:[ \t]*.*[ \t]*\\\\*/")
+    file(STRINGS ${SRC} REQUIRED_LIBRARIES REGEX "/\\*[ \t]*RequiredLibraries:[ \t]*.*[ \t]*\\*/")
   endif(WIN32)
   # Iterate through those lines
   foreach(REQUIRED_LIBRARY ${REQUIRED_LIBRARIES})

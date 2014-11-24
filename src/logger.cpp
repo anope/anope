@@ -78,7 +78,7 @@ const Anope::string &LogFile::GetName() const
 	return this->filename;
 }
 
-Log::Log(LogType t, const Anope::string &cat, BotInfo *b) : bi(b), u(NULL), nc(NULL), c(NULL), source(NULL), chan(NULL), ci(NULL), s(NULL), m(NULL), type(t), category(cat)
+Log::Log(LogType t, const Anope::string &cat, ServiceBot *b) : bi(b), u(NULL), nc(NULL), c(NULL), source(NULL), chan(NULL), ci(NULL), s(NULL), m(NULL), type(t), category(cat)
 {
 }
 
@@ -93,7 +93,7 @@ Log::Log(LogType t, CommandSource &src, Command *_c, ChanServ::Channel *_ci) : u
 	size_t sl = c->name.find('/');
 	this->bi = NULL;
 	if (sl != Anope::string::npos)
-		this->bi = BotInfo::Find(c->name.substr(0, sl), true);
+		this->bi = ServiceBot::Find(c->name.substr(0, sl), true);
 	this->category = c->name;
 }
 
@@ -103,23 +103,23 @@ Log::Log(User *_u, Channel *ch, const Anope::string &cat) : bi(NULL), u(_u), nc(
 		throw CoreException("Invalid pointers passed to Log::Log");
 }
 
-Log::Log(User *_u, const Anope::string &cat, BotInfo *_bi) : bi(_bi), u(_u), nc(NULL), c(NULL), source(NULL), chan(NULL), ci(NULL), s(NULL), m(NULL), type(LOG_USER), category(cat)
+Log::Log(User *_u, const Anope::string &cat, ServiceBot *_bi) : bi(_bi), u(_u), nc(NULL), c(NULL), source(NULL), chan(NULL), ci(NULL), s(NULL), m(NULL), type(LOG_USER), category(cat)
 {
 	if (!u)
 		throw CoreException("Invalid pointers passed to Log::Log");
 }
 
-Log::Log(Server *serv, const Anope::string &cat, BotInfo *_bi) : bi(_bi), u(NULL), nc(NULL), c(NULL), source(NULL), chan(NULL), ci(NULL), s(serv), m(NULL), type(LOG_SERVER), category(cat)
+Log::Log(Server *serv, const Anope::string &cat, ServiceBot *_bi) : bi(_bi), u(NULL), nc(NULL), c(NULL), source(NULL), chan(NULL), ci(NULL), s(serv), m(NULL), type(LOG_SERVER), category(cat)
 {
 	if (!s)
 		throw CoreException("Invalid pointer passed to Log::Log");
 }
 
-Log::Log(BotInfo *b, const Anope::string &cat) : bi(b), u(NULL), nc(NULL), c(NULL), source(NULL), chan(NULL), ci(NULL), s(NULL), m(NULL), type(LOG_NORMAL), category(cat)
+Log::Log(ServiceBot *b, const Anope::string &cat) : bi(b), u(NULL), nc(NULL), c(NULL), source(NULL), chan(NULL), ci(NULL), s(NULL), m(NULL), type(LOG_NORMAL), category(cat)
 {
 }
 
-Log::Log(Module *mod, const Anope::string &cat, BotInfo *_bi) : bi(_bi), u(NULL), nc(NULL), c(NULL), source(NULL), chan(NULL), ci(NULL), s(NULL), m(mod), type(LOG_MODULE), category(cat)
+Log::Log(Module *mod, const Anope::string &cat, ServiceBot *_bi) : bi(_bi), u(NULL), nc(NULL), c(NULL), source(NULL), chan(NULL), ci(NULL), s(NULL), m(mod), type(LOG_MODULE), category(cat)
 {
 }
 
@@ -144,11 +144,11 @@ Anope::string Log::FormatSource() const
 {
 	if (u)
 		if (nc)
-			return this->u->GetMask() + " (" + this->nc->display + ")";
+			return this->u->GetMask() + " (" + this->nc->GetDisplay() + ")";
 		else
 			return this->u->GetMask();
 	else if (nc)
-		return nc->display;
+		return nc->GetDisplay();
 	return "";
 }
 
@@ -156,7 +156,7 @@ Anope::string Log::FormatCommand() const
 {
 	Anope::string buffer = FormatSource() + " used " + (source != NULL && !source->command.empty() ? source->command : this->c->name) + " ";
 	if (this->ci)
-		buffer += "on " + this->ci->name + " ";
+		buffer += "on " + this->ci->GetName() + " ";
 
 	return buffer;
 }
@@ -333,9 +333,9 @@ void LogInfo::ProcessMessage(const Log *l)
 				log = true;
 			else if (l->u && src == l->u->nick)
 				log = true;
-			else if (l->nc && src == l->nc->display)
+			else if (l->nc && src == l->nc->GetDisplay())
 				log = true;
-			else if (l->ci && src == l->ci->name)
+			else if (l->ci && src == l->ci->GetName())
 				log = true;
 			else if (l->m && src == l->m->name)
 				log = true;

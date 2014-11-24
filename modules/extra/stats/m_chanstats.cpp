@@ -73,25 +73,25 @@ class CommandNSSetChanstats : public Command
 		}
 
 		EventReturn MOD_RESULT;
-		MOD_RESULT = Event::OnSetNickOption(&Event::SetNickOption::OnSetNickOption, source, this, na->nc, param);
+		MOD_RESULT = Event::OnSetNickOption(&Event::SetNickOption::OnSetNickOption, source, this, na->GetAccount(), param);
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
 		if (param.equals_ci("ON"))
 		{
-			Log(na->nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to enable chanstats for " << na->nc->display;
-			na->nc->Extend<bool>("NS_STATS");
+			Log(na->GetAccount() == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to enable chanstats for " << na->GetAccount()->GetDisplay();
+			na->GetAccount()->Extend<bool>("NS_STATS");
 			if (saset)
-				source.Reply(_("Chanstats statistics are now enabled for %s"), na->nc->display.c_str());
+				source.Reply(_("Chanstats statistics are now enabled for %s"), na->GetAccount()->GetDisplay().c_str());
 			else
 				source.Reply(_("Chanstats statistics are now enabled for your nick."));
 		}
 		else if (param.equals_ci("OFF"))
 		{
-			Log(na->nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to disable chanstats for " << na->nc->display;
-			na->nc->Shrink<bool>("NS_STATS");
+			Log(na->GetAccount() == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to disable chanstats for " << na->GetAccount()->GetDisplay();
+			na->GetAccount()->Shrink<bool>("NS_STATS");
 			if (saset)
-				source.Reply(_("Chanstats statistics are now disabled for %s"), na->nc->display.c_str());
+				source.Reply(_("Chanstats statistics are now disabled for %s"), na->GetAccount()->GetDisplay().c_str());
 			else
 				source.Reply(_("Chanstats statistics are now disabled for your nick."));
 		}
@@ -101,7 +101,7 @@ class CommandNSSetChanstats : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
-		this->Run(source, source.nc->display, params[0]);
+		this->Run(source, source.nc->GetDisplay(), params[0]);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &) override
@@ -156,7 +156,7 @@ class MySQLInterface : public SQL::Interface
 
 class MChanstats : public Module
 {
-	SerializableExtensibleItem<bool> cs_stats, ns_stats;
+	Serialize::Field<bool> cs_stats, ns_stats;
 
 	CommandCSSetChanstats commandcssetchanstats;
 
@@ -200,7 +200,7 @@ class MChanstats : public Module
 	const Anope::string GetDisplay(User *u)
 	{
 		if (u && u->Account() && ns_stats.HasExt(u->Account()))
-			return u->Account()->display;
+			return u->Account()->GetDisplay();
 		else
 			return "";
 	}
@@ -513,7 +513,7 @@ class MChanstats : public Module
 	{
 		if (!show_hidden)
 			return;
-		if (ns_stats.HasExt(na->nc))
+		if (ns_stats.HasExt(na->GetAccount()))
 			info.AddOption(_("Chanstats"));
 	}
 
@@ -613,14 +613,14 @@ class MChanstats : public Module
 	void OnDelCore(NickServ::Account *nc) override
 	{
 		query = "DELETE FROM `" + prefix + "chanstats` WHERE `nick` = @nick@;";
-		query.SetValue("nick", nc->display);
+		query.SetValue("nick", nc->GetDisplay());
 		this->RunQuery(query);
 	}
 
 	void OnChangeCoreDisplay(NickServ::Account *nc, const Anope::string &newdisplay) override
 	{
 		query = "CALL " + prefix + "chanstats_proc_chgdisplay(@old_display@, @new_display@);";
-		query.SetValue("old_display", nc->display);
+		query.SetValue("old_display", nc->GetDisplay());
 		query.SetValue("new_display", newdisplay);
 		this->RunQuery(query);
 	}
@@ -628,7 +628,7 @@ class MChanstats : public Module
 	void OnDelChan(ChanServ::Channel *ci) override
 	{
 		query = "DELETE FROM `" + prefix + "chanstats` WHERE `chan` = @channel@;";
-		query.SetValue("channel", ci->name);
+		query.SetValue("channel", ci->GetName());
 		this->RunQuery(query);
 	}
 
@@ -641,7 +641,7 @@ class MChanstats : public Module
 	void OnNickRegister(User *user, NickAlias *na, const Anope::string &)
 	{
 		if (NSDefChanstats)
-			na->nc->Extend<bool>("NS_STATS");
+			na->GetAccount()->Extend<bool>("NS_STATS");
 	}
 };
 

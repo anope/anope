@@ -26,8 +26,8 @@ class CommandCSEnforce : public Command
 		 * part of the code. This way we can enforce SECUREOPS even
 		 * if it's off.
 		 */
-		bool hadsecureops = ci->HasExt("SECUREOPS");
-		ci->Extend<bool>("SECUREOPS");
+		bool hadsecureops = ci->HasFieldS("SECUREOPS");
+		ci->SetS<bool>("SECUREOPS", true);
 
 		for (Channel::ChanUserList::iterator it = ci->c->users.begin(), it_end = ci->c->users.end(); it != it_end; ++it)
 		{
@@ -37,9 +37,9 @@ class CommandCSEnforce : public Command
 		}
 
 		if (!hadsecureops)
-			ci->Shrink<bool>("SECUREOPS");
+			ci->UnsetS<bool>("SECUREOPS");
 
-		source.Reply(_("\002Secureops\002 enforced on \002{0}\002."), ci->name);
+		source.Reply(_("\002Secureops\002 enforced on \002{0}\002."), ci->GetName());
 	}
 
 	void DoRestricted(CommandSource &source, ChanServ::Channel *ci)
@@ -70,7 +70,7 @@ class CommandCSEnforce : public Command
 			ci->c->Kick(NULL, user, "%s", reason.c_str());
 		}
 
-		source.Reply(_("\002Restricted\002 enforced on \002{0}\002."), ci->name);
+		source.Reply(_("\002Restricted\002 enforced on \002{0}\002."), ci->GetName());
 	}
 
 	void DoRegOnly(CommandSource &source, ChanServ::Channel *ci)
@@ -102,7 +102,7 @@ class CommandCSEnforce : public Command
 			ci->c->Kick(NULL, user, "%s", reason.c_str());
 		}
 
-		source.Reply(_("\002Registered only\002 enforced on \002{0}\002."), ci->name);
+		source.Reply(_("\002Registered only\002 enforced on \002{0}\002."), ci->GetName());
 	}
 
 	void DoSSLOnly(CommandSource &source, ChanServ::Channel *ci)
@@ -119,7 +119,7 @@ class CommandCSEnforce : public Command
 			if (user->IsProtected())
 				continue;
 
-			if (!user->HasMode("SSL") && !user->HasExt("ssl"))
+			if (!user->HasMode("SSL") && !user->HasExtOK("ssl"))
 				users.push_back(user);
 		}
 
@@ -134,7 +134,7 @@ class CommandCSEnforce : public Command
 			ci->c->Kick(NULL, user, "%s", reason.c_str());
 		}
 
-		source.Reply(_("\002SSL only\002 enforced on %s."), ci->name.c_str());
+		source.Reply(_("\002SSL only\002 enforced on %s."), ci->GetName().c_str());
 	}
 
 	void DoBans(CommandSource &source, ChanServ::Channel *ci)
@@ -163,7 +163,7 @@ class CommandCSEnforce : public Command
 			ci->c->Kick(NULL, user, "%s", reason.c_str());
 		}
 
-		source.Reply(_("\002Bans\002 enforced on %s."), ci->name.c_str());
+		source.Reply(_("\002Bans\002 enforced on %s."), ci->GetName().c_str());
 	}
 
 	void DoLimit(CommandSource &source, ChanServ::Channel *ci)
@@ -174,7 +174,7 @@ class CommandCSEnforce : public Command
 		Anope::string l_str;
 		if (!ci->c->GetParam("LIMIT", l_str))
 		{
-			source.Reply(_("There is no limit is set on \002{0}\002."), ci->name);
+			source.Reply(_("There is no limit is set on \002{0}\002."), ci->GetName());
 			return;
 		}
 
@@ -187,7 +187,7 @@ class CommandCSEnforce : public Command
 		}
 		catch (const ConvertException &)
 		{
-			source.Reply(_("The limit on \002{0}\002 is not valid."), ci->name);
+			source.Reply(_("The limit on \002{0}\002 is not valid."), ci->GetName());
 			return;
 		}
 
@@ -218,7 +218,7 @@ class CommandCSEnforce : public Command
 			ci->c->Kick(NULL, user, "%s", reason.c_str());
 		}
 
-		source.Reply(_("LIMIT enforced on \002{0}\002, \002{1]\002 users removed."), ci->name, users.size());
+		source.Reply(_("LIMIT enforced on \002{0}\002, \002{1]\002 users removed."), ci->GetName(), users.size());
 	}
 
  public:
@@ -242,13 +242,13 @@ class CommandCSEnforce : public Command
 
 		if (!ci->c)
 		{
-			source.Reply(_("Channel \002{0}\002 doesn't exist."), ci->name);
+			source.Reply(_("Channel \002{0}\002 doesn't exist."), ci->GetName());
 			return;
 		}
 
 		if (!source.AccessFor(ci).HasPriv("AKICK") && !source.HasPriv("chanserv/access/modify"))
 		{
-			source.Reply("Access denied. You do not have the \002{0}\002 privilege on \002{1}\002.", "AKICK", ci->name);
+			source.Reply("Access denied. You do not have the \002{0}\002 privilege on \002{1}\002.", "AKICK", ci->GetName());
 			return;
 		}
 

@@ -11,7 +11,6 @@
 using namespace DNS;
 
 static ServiceReference<XLineManager> akills("XLineManager", "xlinemanager/sgline");
-static ServiceReference<Manager> dnsmanager("DNS::Manager", "dns/manager");
 
 struct Blacklist
 {
@@ -30,7 +29,7 @@ class DNSBLResolver : public Request
 	bool add_to_akill;
 
  public:
-	DNSBLResolver(Module *c, User *u, const Blacklist &b, const Anope::string &host, bool add_akill) : Request(dnsmanager, c, host, QUERY_A, true), user(u), blacklist(b), add_to_akill(add_akill) { }
+	DNSBLResolver(Module *c, User *u, const Blacklist &b, const Anope::string &host, bool add_akill) : Request(DNS::manager, c, host, QUERY_A, true), user(u), blacklist(b), add_to_akill(add_akill) { }
 
 	void OnLookupComplete(const Query *record) override
 	{
@@ -63,9 +62,17 @@ class DNSBLResolver : public Request
 		reason = reason.replace_all_cs("%r", record_reason);
 		reason = reason.replace_all_cs("%N", Config->GetBlock("networkinfo")->Get<const Anope::string>("networkname"));
 
-		BotInfo *OperServ = Config->GetClient("OperServ");
+		ServiceBot *OperServ = Config->GetClient("OperServ");
 		Log(creator, "dnsbl", OperServ) << user->GetMask() << " (" << addr << ") appears in " << this->blacklist.name;
-		XLine *x = new XLine("*@" + addr, OperServ ? OperServ->nick : "m_dnsbl", Anope::CurTime + this->blacklist.bantime, reason, XLineManager::GenerateUID());
+
+		XLine *x = new XLine(xline);
+		x->SetMask("*@" + addr);
+		x->SetBy(OperServ ? OperServ->nick : "m_dnsbl");
+		x->SetCreated(Anope::CurTime);
+		x->SetExpires(Anope::CurTime + this->blacklist.bantime);
+		x->SetReason(reason);
+		x->SetID(XLineManager::GenerateUID());
+
 		if (this->add_to_akill && akills)
 		{
 			akills->AddXLine(x);
@@ -125,7 +132,7 @@ class ModuleDNSBL : public Module
 
 	void OnUserConnect(User *user, bool &exempt) override
 	{
-		if (exempt || user->Quitting() || (!this->check_on_connect && !Me->IsSynced()) || !dnsmanager)
+		if (exempt || user->Quitting() || (!this->check_on_connect && !Me->IsSynced()) || !DNS::manager)
 			return;
 
 		if (!this->check_on_netburst && !user->server->IsSynced())
@@ -151,7 +158,7 @@ class ModuleDNSBL : public Module
 			try
 			{
 				res = new DNSBLResolver(this, user, b, dnsbl_host, this->add_to_akill);
-				dnsmanager->Process(res);
+				DNS::manager->Process(res);
 			}
 			catch (const SocketException &ex)
 			{

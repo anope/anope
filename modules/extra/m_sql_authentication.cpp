@@ -39,18 +39,18 @@ class SQLAuthenticationResult : public SQL::Interface
 		catch (const SQL::Exception &) { }
 
 		NickServ::Nick *na = NickServ::FindNick(req->GetAccount());
-		BotInfo *NickServ = Config->GetClient("NickServ");
+		ServiceBot *NickServ = Config->GetClient("NickServ");
 		if (na == NULL)
 		{
 			na = new NickServ::Nick(req->GetAccount(), new NickServ::Account(req->GetAccount()));
 			NickServ::Event::OnNickRegister(&NickServ::Event::NickRegister::OnNickRegister, user, na, "");
 			if (user && NickServ)
-				user->SendMessage(NickServ, _("Your account \002%s\002 has been successfully created."), na->nick.c_str());
+				user->SendMessage(NickServ, _("Your account \002%s\002 has been successfully created."), na->GetNick().c_str());
 		}
 
-		if (!email.empty() && email != na->nc->email)
+		if (!email.empty() && email != na->GetAccount()->GetEmail())
 		{
-			na->nc->email = email;
+			na->GetAccount()->GetEmail() = email;
 			if (user && NickServ)
 				user->SendMessage(NickServ, _("Your email has been updated to \002%s\002."), email.c_str());
 		}

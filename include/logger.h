@@ -53,7 +53,7 @@ class CoreExport Log
 {
  public:
  	/* Bot that should log this message */
-	BotInfo *bi;
+	ServiceBot *bi;
 	/* For commands, the user executing the command, but might not always exist */
 	User *u;
 	/* For commands, the account executing the command, but will not always exist */
@@ -65,7 +65,7 @@ class CoreExport Log
 	/* Used for LOG_CHANNEL */
 	Channel *chan;
 	/* For commands, the channel the command was executed on, will not always exist */
-	const ChanServ::Channel *ci;
+	ChanServ::Channel *ci;
 	/* For LOG_SERVER */
 	Server *s;
 	/* For LOG_MODULE */
@@ -75,7 +75,7 @@ class CoreExport Log
 
 	std::stringstream buf;
 
-	Log(LogType type = LOG_NORMAL, const Anope::string &category = "", BotInfo *bi = NULL);
+	Log(LogType type = LOG_NORMAL, const Anope::string &category = "", ServiceBot *bi = NULL);
 
 	/* LOG_COMMAND/OVERRIDE/ADMIN */
 	Log(LogType type, CommandSource &source, Command *c, ChanServ::Channel *ci = NULL);
@@ -84,14 +84,14 @@ class CoreExport Log
 	Log(User *u, Channel *c, const Anope::string &category = "");
 
 	/* LOG_USER */
-	Log(User *u, const Anope::string &category = "", BotInfo *bi = NULL);
+	Log(User *u, const Anope::string &category = "", ServiceBot *bi = NULL);
 
 	/* LOG_SERVER */
-	Log(Server *s, const Anope::string &category = "", BotInfo *bi = NULL);
+	Log(Server *s, const Anope::string &category = "", ServiceBot *bi = NULL);
 
-	Log(BotInfo *b, const Anope::string &category = "");
+	Log(ServiceBot *b, const Anope::string &category = "");
 
-	Log(Module *m, const Anope::string &category = "", BotInfo *bi = NULL);
+	Log(Module *m, const Anope::string &category = "", ServiceBot *bi = NULL);
 
 	~Log();
 
@@ -113,7 +113,7 @@ class CoreExport Log
 class CoreExport LogInfo
 {
  public:
- 	BotInfo *bot;
+ 	ServiceBot *bot;
 	std::vector<Anope::string> targets;
 	std::vector<LogFile *> logfiles;
 	int last_day;

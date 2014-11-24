@@ -55,7 +55,6 @@ static const unsigned SHA256_BLOCK_SIZE = 512 / 8;
 
 inline static uint32_t SHFR(uint32_t x, uint32_t n) { return x >> n; }
 inline static uint32_t ROTR(uint32_t x, uint32_t n) { return (x >> n) | (x << ((sizeof(x) << 3) - n)); }
-inline static uint32_t ROTL(uint32_t x, uint32_t n) { return (x << n) | (x >> ((sizeof(x) << 3) - n)); }
 inline static uint32_t CH(uint32_t x, uint32_t y, uint32_t z) { return (x & y) ^ (~x & z); }
 inline static uint32_t MAJ(uint32_t x, uint32_t y, uint32_t z) { return (x & y) ^ (x & z) ^ (y & z); }
 
@@ -308,29 +307,33 @@ class ESHA256 : public Module
 
 	void OnCheckAuthentication(User *, NickServ::IdentifyRequest *req) override
 	{
-		const NickServ::Nick *na = NickServ::FindNick(req->GetAccount());
+		NickServ::Nick *na = NickServ::FindNick(req->GetAccount());
 		if (na == NULL)
 			return;
-		NickServ::Account *nc = na->nc;
+		NickServ::Account *nc = na->GetAccount();
 
-		size_t pos = nc->pass.find(':');
+		size_t pos = nc->GetPassword().find(':');
 		if (pos == Anope::string::npos)
 			return;
-		Anope::string hash_method(nc->pass.begin(), nc->pass.begin() + pos);
+		Anope::string hash_method(nc->GetPassword().substr(0, pos));
 		if (!hash_method.equals_cs("sha256"))
 			return;
 
-		GetIVFromPass(nc->pass);
+		GetIVFromPass(nc->GetPassword());
 		use_iv = true;
 		Anope::string buf;
 		this->OnEncrypt(req->GetPassword(), buf);
-		if (nc->pass.equals_cs(buf))
+		if (nc->GetPassword().equals_cs(buf))
 		{
 			/* if we are NOT the first module in the list,
 			 * we want to re-encrypt the pass with the new encryption
 			 */
 			if (ModuleManager::FindFirstOf(ENCRYPTION) != this)
-				Anope::Encrypt(req->GetPassword(), nc->pass);
+			{
+				Anope::string p;
+				Anope::Encrypt(req->GetPassword(), p);
+				nc->SetPassword(p);
+			}
 			req->Success(this);
 		}
 	}

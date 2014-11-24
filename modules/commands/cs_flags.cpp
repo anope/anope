@@ -10,40 +10,38 @@
  */
 
 #include "module.h"
+#include "modules/cs_access.h"
 
 static std::map<Anope::string, char> defaultFlags;
 
 class FlagsChanAccess : public ChanServ::ChanAccess
 {
  public:
-	std::set<char> flags;
+	FlagsChanAccess(Serialize::TypeBase *type) : ChanServ::ChanAccess(type) { }
+	FlagsChanAccess(Serialize::TypeBase *type, Serialize::ID id) : ChanServ::ChanAccess(type, id) { }
 
-	FlagsChanAccess(ChanServ::AccessProvider *p) : ChanAccess(p)
-	{
-	}
+	Anope::string GetFlags();
+	void SetFlags(const Anope::string &);
 
-	bool HasPriv(const Anope::string &priv) const override
+	bool HasPriv(const Anope::string &priv) override
 	{
 		std::map<Anope::string, char>::iterator it = defaultFlags.find(priv);
-		if (it != defaultFlags.end() && this->flags.count(it->second) > 0)
-			return true;
-		return false;
+		return it != defaultFlags.end() && GetFlags().find(it->second) != Anope::string::npos;
 	}
 
-	Anope::string AccessSerialize() const
+	Anope::string AccessSerialize()
 	{
-		return Anope::string(this->flags.begin(), this->flags.end());
+		return GetFlags();
 	}
 
 	void AccessUnserialize(const Anope::string &data) override
 	{
-		for (unsigned i = data.length(); i > 0; --i)
-			this->flags.insert(data[i - 1]);
+		SetFlags(data);
 	}
 
-	static Anope::string DetermineFlags(const ChanServ::ChanAccess *access)
+	static Anope::string DetermineFlags(ChanServ::ChanAccess *access)
 	{
-		if (access->provider->name == "access/flags")
+		if (access->GetSerializableType()->GetName() != "FlagsChanAccess")
 			return access->AccessSerialize();
 
 		std::set<char> buffer;
@@ -59,22 +57,28 @@ class FlagsChanAccess : public ChanServ::ChanAccess
 	}
 };
 
-class FlagsAccessProvider : public ChanServ::AccessProvider
+class FlagsChanAccessType : public Serialize::Type<FlagsChanAccess, ChanServ::ChanAccessType>
 {
  public:
-	static FlagsAccessProvider *ap;
+	Serialize::Field<FlagsChanAccess, Anope::string> flags;
+	//Serialize::Field<FlagsChanAccess, std::set<char>>> flags; XXX?
 
-	FlagsAccessProvider(Module *o) : ChanServ::AccessProvider(o, "access/flags")
+	FlagsChanAccessType(Module *me) : Serialize::Type<FlagsChanAccess, ChanAccessType>(me, "FlagsChanAccess")
+		, flags(this, "flags")
 	{
-		ap = this;
-	}
-
-	ChanServ::ChanAccess *Create() override
-	{
-		return new FlagsChanAccess(this);
+		SetParent(ChanServ::chanaccess);
 	}
 };
-FlagsAccessProvider* FlagsAccessProvider::ap;
+
+Anope::string FlagsChanAccess::GetFlags()
+{
+	return Get(&FlagsChanAccessType::flags);
+}
+
+void FlagsChanAccess::SetFlags(const Anope::string &i)
+{
+	Object::Set(&FlagsChanAccessType::flags, i);
+}
 
 class CommandCSFlags : public Command
 {
@@ -90,7 +94,10 @@ class CommandCSFlags : public Command
 		}
 
 		ChanServ::AccessGroup u_access = source.AccessFor(ci);
-		const ChanServ::ChanAccess *highest = u_access.Highest();
+		ChanServ::ChanAccess *highest = u_access.Highest();
+
+		NickServ::Nick *na = nullptr;
+		ChanServ::Channel *targ_ci = nullptr;
 
 		if (IRCD->IsChannelValid(mask))
 		{
@@ -100,7 +107,7 @@ class CommandCSFlags : public Command
 				return;
 			}
 
-			ChanServ::Channel *targ_ci = ChanServ::Find(mask);
+			targ_ci = ChanServ::Find(mask);
 			if (targ_ci == NULL)
 			{
 				source.Reply(_("Channel \002{0}\002 isn't registered."), mask);
@@ -112,11 +119,11 @@ class CommandCSFlags : public Command
 				return;
 			}
 
-			mask = targ_ci->name;
+			mask = targ_ci->GetName();
 		}
 		else
 		{
-			const NickServ::Nick *na = NickServ::FindNick(mask);
+			na = NickServ::FindNick(mask);
 			if (!na && Config->GetModule("chanserv")->Get<bool>("disallow_hostmask_access"))
 			{
 				source.Reply(_("Masks and unregistered users may not be on access lists."));
@@ -146,7 +153,7 @@ class CommandCSFlags : public Command
 			{
 				// Flags allows removing others that have the same access as you,
 				// but no other access system does.
-				if (highest && highest->provider != FlagsAccessProvider::ap && !u_access.founder)
+				if (highest && highest->GetSerializableType()->GetName() != "FlagsChanAccess" && !u_access.founder)
 					// operator<= on the non-me entry!
 					if (*highest <= *access)
 					{
@@ -154,7 +161,7 @@ class CommandCSFlags : public Command
 							override = true;
 						else
 						{
-							source.Reply(_("Access denied. You do not have enough privileges on \002{0}\002 to modify the access of \002{1}\002."), ci->name, access->Mask());
+							source.Reply(_("Access denied. You do not have enough privileges on \002{0}\002 to modify the access of \002{1}\002."), ci->GetName(), access->Mask());
 							return;
 						}
 					}
@@ -243,33 +250,32 @@ class CommandCSFlags : public Command
 		{
 			if (current != NULL)
 			{
-				ci->EraseAccess(current_idx - 1);
 				Event::OnAccessDel(&Event::AccessDel::OnAccessDel, ci, source, current);
 				delete current;
 				Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to delete " << mask;
-				source.Reply(_("\002{0}\002 removed from the access list of \002{1}\002."), mask, ci->name);
+				source.Reply(_("\002{0}\002 removed from the access list of \002{1}\002."), mask, ci->GetName());
 			}
 			else
 			{
-				source.Reply(_("\002{0}\002 not found on the access list of \002{1}\002."), mask, ci->name);
+				source.Reply(_("\002{0}\002 not found on the access list of \002{1}\002."), mask, ci->GetName());
 			}
 			return;
 		}
 
-		ServiceReference<ChanServ::AccessProvider> provider("AccessProvider", "access/flags");
-		if (!provider)
-			return;
-		FlagsChanAccess *access = anope_dynamic_static_cast<FlagsChanAccess *>(provider->Create());
-		access->SetMask(mask, ci);
-		access->creator = source.GetNick();
-		access->last_seen = current ? current->last_seen : 0;
-		access->created = Anope::CurTime;
-		access->flags = current_flags;
+		FlagsChanAccess *access = anope_dynamic_static_cast<FlagsChanAccess *>(flagschanaccess.Create());
+		if (na)
+			access->SetObj(na->GetAccount());
+		else if (targ_ci)
+			access->SetObj(targ_ci);
+		access->SetChannel(ci);
+		access->SetMask(mask);
+		access->SetCreator(source.GetNick());
+		access->SetLastSeen(current ? current->GetLastSeen() : 0);
+		access->SetCreated(Anope::CurTime);
+		access->SetFlags(Anope::string(current_flags.begin(), current_flags.end()));
 
 		if (current != NULL)
 			delete current;
-
-		ci->AddAccess(access);
 
 		Event::OnAccessAdd(&Event::AccessAdd::OnAccessAdd, ci, source, access);
 
@@ -277,12 +283,12 @@ class CommandCSFlags : public Command
 		if (p != NULL)
 		{
 			if (add)
-				source.Reply(_("Privilege \002{0}\002 added to \002{1}\002 on \002{2}\002, new flags are +\002{3}\002"), p->name, access->Mask(), ci->name, access->AccessSerialize());
+				source.Reply(_("Privilege \002{0}\002 added to \002{1}\002 on \002{2}\002, new flags are +\002{3}\002"), p->name, access->Mask(), ci->GetName(), access->AccessSerialize());
 			else
-				source.Reply(_("Privilege \002{0}\002 removed from \002{1}\002 on \002{2}\002, new flags are +\002{3}\002"), p->name, access->Mask(), ci->name, access->AccessSerialize());
+				source.Reply(_("Privilege \002{0}\002 removed from \002{1}\002 on \002{2}\002, new flags are +\002{3}\002"), p->name, access->Mask(), ci->GetName(), access->AccessSerialize());
 		}
 		else
-			source.Reply(_("Flags for \002{0}\002 on \002{1}\002 set to +\002{2}\002"), access->Mask(), ci->name, access->AccessSerialize());
+			source.Reply(_("Flags for \002{0}\002 on \002{1}\002 set to +\002{2}\002"), access->Mask(), ci->GetName(), access->AccessSerialize());
 	}
 
 	void DoList(CommandSource &source, ChanServ::Channel *ci, const std::vector<Anope::string> &params)
@@ -291,7 +297,7 @@ class CommandCSFlags : public Command
 
 		if (!ci->GetAccessCount())
 		{
-			source.Reply(_("The access list of \002{0}\002 is empty."), ci->name);
+			source.Reply(_("The access list of \002{0}\002 is empty."), ci->GetName());
 			return;
 		}
 
@@ -302,7 +308,7 @@ class CommandCSFlags : public Command
 		unsigned count = 0;
 		for (unsigned i = 0, end = ci->GetAccessCount(); i < end; ++i)
 		{
-			const ChanServ::ChanAccess *access = ci->GetAccess(i);
+			ChanServ::ChanAccess *access = ci->GetAccess(i);
 			const Anope::string &flags = FlagsChanAccess::DetermineFlags(access);
 
 			if (!arg.empty())
@@ -325,19 +331,19 @@ class CommandCSFlags : public Command
 			entry["Number"] = stringify(i + 1);
 			entry["Mask"] = access->Mask();
 			entry["Flags"] = flags;
-			entry["Creator"] = access->creator;
-			entry["Created"] = Anope::strftime(access->created, source.nc, true);
+			entry["Creator"] = access->GetCreator();
+			entry["Created"] = Anope::strftime(access->GetCreated(), source.nc, true);
 			list.AddEntry(entry);
 		}
 
 		if (list.IsEmpty())
-			source.Reply(_("No matching entries on the access list of \002{0}\002."), ci->name);
+			source.Reply(_("No matching entries on the access list of \002{0}\002."), ci->GetName());
 		else
 		{
 			std::vector<Anope::string> replies;
 			list.Process(replies);
 
-			source.Reply(_("Flags list for \002{0}\002:"), ci->name);
+			source.Reply(_("Flags list for \002{0}\002:"), ci->GetName());
 			for (unsigned i = 0; i < replies.size(); ++i)
 				source.Reply(replies[i]);
 			if (count == ci->GetAccessCount())
@@ -351,7 +357,7 @@ class CommandCSFlags : public Command
 	{
 		if (!source.IsFounder(ci) && !source.HasPriv("chanserv/access/modify"))
 		{
-			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "FOUNDER", ci->name);
+			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "FOUNDER", ci->GetName());
 			return;
 		}
 
@@ -359,7 +365,7 @@ class CommandCSFlags : public Command
 
 		Event::OnAccessClear(&Event::AccessClear::OnAccessClear, ci, source);
 
-		source.Reply(_("The access list of \002{0}\002 has been cleared."), ci->name);
+		source.Reply(_("The access list of \002{0}\002 has been cleared."), ci->GetName());
 
 		bool override = !source.IsFounder(ci);
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to clear the access list";
@@ -397,7 +403,7 @@ class CommandCSFlags : public Command
 
 		if (!has_access)
 		{
-			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), is_list ? "ACCESS_LIST" : "ACCESS_CHANGE", ci->name);
+			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), is_list ? "ACCESS_LIST" : "ACCESS_CHANGE", ci->GetName());
 			return;
 		}
 
@@ -463,13 +469,13 @@ class CommandCSFlags : public Command
 
 class CSFlags : public Module
 {
-	FlagsAccessProvider accessprovider;
 	CommandCSFlags commandcsflags;
+	FlagsChanAccessType flagsaccesstype;
 
  public:
 	CSFlags(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
-		, accessprovider(this)
 		, commandcsflags(this)
+		, flagsaccesstype(this)
 	{
 		this->SetPermanent(true);
 

@@ -7,73 +7,6 @@
 
 namespace SQL
 {
-
-	class Data : public Serialize::Data
-	{
-	 public:
- 		typedef std::map<Anope::string, std::stringstream *> Map;
-		Map data;
-		std::map<Anope::string, Type> types;
-
-		~Data()
-		{
-			Clear();
-		}
-
-		std::iostream& operator[](const Anope::string &key) override
-		{
-			std::stringstream *&ss = data[key];
-			if (!ss)
-				ss = new std::stringstream();
-			return *ss;
-		}
-
-		std::set<Anope::string> KeySet() const override
-		{
-			std::set<Anope::string> keys;
-			for (Map::const_iterator it = this->data.begin(), it_end = this->data.end(); it != it_end; ++it)
-				keys.insert(it->first);
-			return keys;
-		}
-
-		size_t Hash() const override
-		{
-			size_t hash anope_abstract;
-			for (Map::const_iterator it = this->data.begin(), it_end = this->data.end(); it != it_end; ++it)
-				if (!it->second->str().empty())
-					hash ^= Anope::hash_cs()(it->second->str());
-			return hash;
-		}
-
-		std::map<Anope::string, std::iostream *> GetData() const
-		{
-			std::map<Anope::string, std::iostream *> d;
-			for (Map::const_iterator it = this->data.begin(), it_end = this->data.end(); it != it_end; ++it)
-				d[it->first] = it->second;
-			return d;
-		}
-
-		void Clear()
-		{
-			for (Map::const_iterator it = this->data.begin(), it_end = this->data.end(); it != it_end; ++it)
-				delete it->second;
-			this->data.clear();
-		}
-
-		void SetType(const Anope::string &key, Type t) override
-		{
-			this->types[key] = t;
-		}
-
-		Type GetType(const Anope::string &key) const override
-		{
-			std::map<Anope::string, Type>::const_iterator it = this->types.find(key);
-			if (it != this->types.end())
-				return it->second;
-			return DT_TEXT;
-		}
-	};
-
 	/** A SQL exception, can be thrown at various points
 	 */
 	class Exception : public ModuleException
@@ -91,6 +24,7 @@ namespace SQL
 	{
 		Anope::string data;
 		bool escape;
+		bool null;
 	};
 
 	struct Query
@@ -128,15 +62,33 @@ namespace SQL
 			}
 			catch (const ConvertException &ex) { }
 		}
+
+		void SetNull(const Anope::string &key)
+		{
+			QueryData &qd = this->parameters[key];
+
+			qd.data = "";
+			qd.escape = false;
+			qd.null = true;
+		}
 	};
 
 	/** A result from a SQL query
 	 */
 	class Result
 	{
+	 public:
+		struct Value
+		{
+			bool null = false;
+			Anope::string value;
+		};
+
 	 protected:
-		/* Rows, column, item */
-		std::vector<std::map<Anope::string, Anope::string> > entries;
+		std::vector<Anope::string> columns;
+		// row, column
+		std::vector<std::vector<Value>> values;
+
 		Query query;
 		Anope::string error;
 	 public:
@@ -152,13 +104,16 @@ namespace SQL
 		inline const Query &GetQuery() const { return this->query; }
 		inline const Anope::string &GetError() const { return this->error; }
 
-		int Rows() const { return this->entries.size(); }
+		int Rows() const
+		{
+			return this->values.size();
+		}
 
-		const std::map<Anope::string, Anope::string> &Row(size_t index) const
+		const std::vector<Value> &Row(size_t index) const
 		{
 			try
 			{
-				return this->entries.at(index);
+				return this->values.at(index);
 			}
 			catch (const std::out_of_range &)
 			{
@@ -166,15 +121,35 @@ namespace SQL
 			}
 		}
 
-		const Anope::string Get(size_t index, const Anope::string &col) const
+		const Value &GetValue(size_t index, const Anope::string &col) const
 		{
-			const std::map<Anope::string, Anope::string> rows = this->Row(index);
+			const std::vector<Value> &v = this->Row(index);
 
-			std::map<Anope::string, Anope::string>::const_iterator it = rows.find(col);
-			if (it == rows.end())
+			auto it = std::find(this->columns.begin(), this->columns.end(), col);
+			if (it == this->columns.end())
 				throw Exception("Unknown column name in SQLResult: " + col);
+			unsigned int col_idx = it - this->columns.begin();
 
-			return it->second;
+			try
+			{
+				return v[col_idx];
+			}
+			catch (const std::out_of_range &)
+			{
+				throw Exception("Out of bounds access to SQLResult");
+			}
+		}
+
+		const Anope::string &Get(size_t index, const Anope::string &col) const
+		{
+			const Value &value = GetValue(index, col);
+			return value.value;
+		}
+
+		bool IsNull(size_t index, const Anope::string &col) const
+		{
+			const Value &value = GetValue(index, col);
+			return value.null;
 		}
 	};
 
@@ -203,13 +178,18 @@ namespace SQL
 
 		virtual Result RunQuery(const Query &query) anope_abstract;
 
-		virtual std::vector<Query> CreateTable(const Anope::string &table, const Data &data) anope_abstract;
+		virtual std::vector<Query> InitSchema(const Anope::string &prefix) anope_abstract;
+		virtual std::vector<Query> Replace(const Anope::string &table, const Query &, const std::set<Anope::string> &) anope_abstract;
+		virtual std::vector<Query> CreateTable(const Anope::string &prefix, const Anope::string &table) anope_abstract;
+		virtual std::vector<Query> AlterTable(const Anope::string &, const Anope::string &table, const Anope::string &field, bool object) anope_abstract;
+		virtual std::vector<Query> CreateIndex(const Anope::string &table, const Anope::string &field) anope_abstract;
 
-		virtual Query BuildInsert(const Anope::string &table, unsigned int id, Data &data) anope_abstract;
+		virtual Query BeginTransaction() anope_abstract;
+		virtual Query Commit() anope_abstract;
+
+		virtual Serialize::ID GetID(const Anope::string &) anope_abstract;
 
 		virtual Query GetTables(const Anope::string &prefix) anope_abstract;
-
-		virtual Anope::string FromUnixtime(time_t) anope_abstract;
 	};
 
 }

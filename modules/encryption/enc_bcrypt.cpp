@@ -900,19 +900,19 @@ class EBCRYPT : public Module
 
 	void OnCheckAuthentication(User *, NickServ::IdentifyRequest *req) override
 	{
-		const NickServ::Nick *na = NickServ::FindNick(req->GetAccount());
+		NickServ::Nick *na = NickServ::FindNick(req->GetAccount());
 		if (na == NULL)
 			return;
-		NickServ::Account *nc = na->nc;
+		NickServ::Account *nc = na->GetAccount();
 
-		size_t pos = nc->pass.find(':');
+		size_t pos = nc->GetPassword().find(':');
 		if (pos == Anope::string::npos)
 			return;
-		Anope::string hash_method(nc->pass.begin(), nc->pass.begin() + pos);
+		Anope::string hash_method(nc->GetPassword().begin(), nc->GetPassword().begin() + pos);
 		if (hash_method != "bcrypt")
 			return;
 
-		if (Compare(req->GetPassword(), nc->pass.substr(7)))
+		if (Compare(req->GetPassword(), nc->GetPassword().substr(7)))
 		{
 			/* if we are NOT the first module in the list,
 			 * we want to re-encrypt the pass with the new encryption
@@ -921,19 +921,23 @@ class EBCRYPT : public Module
 			unsigned int hashrounds = 0;
 			try
 			{
-				size_t roundspos = nc->pass.find('$', 11);
+				size_t roundspos = nc->GetPassword().find('$', 11);
 				if (roundspos == Anope::string::npos)
 					throw ConvertException("Could not find hashrounds");
 
-				hashrounds = convertTo<unsigned int>(nc->pass.substr(11, roundspos - 11));
+				hashrounds = convertTo<unsigned int>(nc->GetPassword().substr(11, roundspos - 11));
 			}
 			catch (const ConvertException &)
 			{
-				Log(this) << "Could not get the round size of a hash. This is probably a bug. Hash: " << nc->pass;
+				Log(this) << "Could not get the round size of a hash. This is probably a bug. Hash: " << nc->GetPassword();
 			}
 
 			if (ModuleManager::FindFirstOf(ENCRYPTION) != this || (hashrounds && hashrounds != rounds))
-				Anope::Encrypt(req->GetPassword(), nc->pass);
+			{
+				Anope::string p;
+				Anope::Encrypt(req->GetPassword(), p);
+				nc->SetPassword(p);
+			}
 			req->Success(this);
 		}
 	}

@@ -86,14 +86,14 @@ namespace SASL
 				return;
 
 			NickServ::Nick *na = NickServ::FindNick(req->GetAccount());
-			if (!na || na->nc->HasExt("NS_SUSPENDED"))
+			if (!na || na->GetAccount()->HasFieldS("NS_SUSPENDED"))
 				return OnFail(req);
 
 			Session *s = sasl->GetSession(uid);
 			if (s)
 			{
 				Log(Config->GetClient("NickServ")) << "A user identified to account " << req->GetAccount() << " using SASL";
-				sasl->Succeed(s, na->nc);
+				sasl->Succeed(s, na->GetAccount());
 				delete s;
 			}
 		}
@@ -114,7 +114,7 @@ namespace SASL
 			NickServ::Nick *na = NickServ::FindNick(req->GetAccount());
 			if (!na)
 				accountstatus = "nonexistent ";
-			else if (na->nc->HasExt("NS_SUSPENDED"))
+			else if (na->GetAccount()->HasFieldS("NS_SUSPENDED"))
 				accountstatus = "suspended ";
 
 			Log(Config->GetClient("NickServ")) << "A user failed to identify for " << accountstatus << "account " << req->GetAccount() << " using SASL";

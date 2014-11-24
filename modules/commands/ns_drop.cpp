@@ -40,7 +40,7 @@ class CommandNSDrop : public Command
 			return;
 		}
 
-		bool is_mine = source.GetAccount() == na->nc;
+		bool is_mine = source.GetAccount() == na->GetAccount();
 
 		if (!is_mine && !source.HasPriv("nickserv/drop"))
 		{
@@ -48,7 +48,7 @@ class CommandNSDrop : public Command
 			return;
 		}
 
-		if (Config->GetModule("nickserv")->Get<bool>("secureadmins", "yes") && !is_mine && na->nc->IsServicesOper())
+		if (Config->GetModule("nickserv")->Get<bool>("secureadmins", "yes") && !is_mine && na->GetAccount()->IsServicesOper())
 		{
 			source.Reply(_("You may not drop other Services Operators' nicknames."));
 			return;
@@ -56,8 +56,8 @@ class CommandNSDrop : public Command
 
 		this->onnickdrop(&Event::NickDrop::OnNickDrop, source, na);
 
-		Log(!is_mine ? LOG_ADMIN : LOG_COMMAND, source, this) << "to drop nickname " << na->nick << " (group: " << na->nc->display << ") (email: " << (!na->nc->email.empty() ? na->nc->email : "none") << ")";
-		delete na;
+		Log(!is_mine ? LOG_ADMIN : LOG_COMMAND, source, this) << "to drop nickname " << na->GetNick() << " (group: " << na->GetAccount()->GetDisplay() << ") (email: " << (!na->GetAccount()->GetEmail().empty() ? na->GetAccount()->GetEmail() : "none") << ")";
+		na->Delete();
 
 		source.Reply(_("\002{0}\002 has been dropped."), nick);
 	}

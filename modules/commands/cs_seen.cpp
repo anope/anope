@@ -10,6 +10,7 @@
  */
 
 
+#if 0
 #include "module.h"
 
 enum TypeInfo
@@ -23,7 +24,7 @@ static SeenInfo *FindInfo(const Anope::string &nick);
 typedef Anope::hash_map<SeenInfo *> database_map;
 database_map database;
 
-struct SeenInfo : Serializable
+struct SeenInfo : Serialize::Object
 {
 	Anope::string nick;
 	Anope::string vhost;
@@ -33,7 +34,7 @@ struct SeenInfo : Serializable
 	Anope::string message;  // for part/kick/quit
 	time_t last;            // the time when the user was last seen
 
-	SeenInfo() : Serializable("SeenInfo")
+	SeenInfo() : Serialize::Object("SeenInfo")
 	{
 	}
 
@@ -44,6 +45,7 @@ struct SeenInfo : Serializable
 			database.erase(iter);
 	}
 
+#if 0
 	void Serialize(Serialize::Data &data) const override
 	{
 		data["nick"] << nick;
@@ -86,6 +88,7 @@ struct SeenInfo : Serializable
 			database[s->nick] = s;
 		return s;
 	}
+#endif
 };
 
 static SeenInfo *FindInfo(const Anope::string &nick)
@@ -190,10 +193,10 @@ class CommandSeen : public Command
 			return;
 		}
 
-		BotInfo *bi = BotInfo::Find(params[0], true);
+		ServiceBot *bi = ServiceBot::Find(params[0], true);
 		if (bi)
 		{
-			if (bi == source.c->ci->bi)
+			if (bi == source.c->ci->GetBot())
 				source.Reply(_("You found me, %s!"), source.GetNick().c_str());
 			else
 				source.Reply(_("%s is a network service."), bi->nick.c_str());
@@ -207,7 +210,7 @@ class CommandSeen : public Command
 			return;
 		}
 
-		if (source.GetAccount() == na->nc)
+		if (source.GetAccount() == na->GetAccount())
 		{
 			source.Reply(_("Looking for yourself, eh %s?"), source.GetNick().c_str());
 			return;
@@ -226,27 +229,27 @@ class CommandSeen : public Command
 			ChanUserContainer *uc = it->second;
 			User *u = uc->user;
 
-			if (u->Account() == na->nc)
+			if (u->Account() == na->GetAccount())
 			{
 				source.Reply(_("%s is on the channel right now (as %s)!"), params[0].c_str(), u->nick.c_str());
 				return;
 			}
 		}
 
-		ChanServ::AccessGroup ag = source.c->ci->AccessFor(na->nc);
+		ChanServ::AccessGroup ag = source.c->ci->AccessFor(na->GetAccount());
 		time_t last = 0;
 		for (unsigned i = 0; i < ag.size(); ++i)
 		{
 			ChanServ::ChanAccess *a = ag[i];
 
-			if (a->GetAccount() == na->nc && a->last_seen > last)
-				last = a->last_seen;
+			if (a->GetAccount() == na->GetAccount() && a->GetLastSeen() > last)
+				last = a->GetLastSeen();
 		}
 
 		if (last > Anope::CurTime || !last)
-			source.Reply(_("I've never seen %s on this channel."), na->nick.c_str());
+			source.Reply(_("I've never seen %s on this channel."), na->GetNick().c_str());
 		else
-			source.Reply(_("%s was last seen here %s ago."), na->nick.c_str(), Anope::Duration(Anope::CurTime - last, source.GetAccount()).c_str());
+			source.Reply(_("%s was last seen here %s ago."), na->GetNick().c_str(), Anope::Duration(Anope::CurTime - last, source.GetAccount()).c_str());
 	}
 
  public:
@@ -269,7 +272,7 @@ class CommandSeen : public Command
 			return;
 		}
 
-		if (BotInfo::Find(target, true) != NULL)
+		if (ServiceBot::Find(target, true) != NULL)
 		{
 			source.Reply(_("\002{0}\002 is a service bot."), target);
 			return;
@@ -369,7 +372,7 @@ class CSSeen : public Module
 	, public EventHook<Event::PartChannel>
 	, public EventHook<Event::PreUserKicked>
 {
-	Serialize::Type seeninfo_type;
+	//Serialize::TypeBase seeninfo_type;
 	CommandSeen commandseen;
 	CommandOSSeen commandosseen;
 
@@ -382,7 +385,7 @@ class CSSeen : public Module
 		, EventHook<Event::JoinChannel>("OnJoinChannel")
 		, EventHook<Event::PartChannel>("OnPartChannel")
 		, EventHook<Event::PreUserKicked>("OnPreUserKicked")
-		, seeninfo_type("SeenInfo", SeenInfo::Unserialize)
+	//	, seeninfo_type("SeenInfo", SeenInfo::Unserialize)
 		, commandseen(this)
 		, commandosseen(this)
 	{
@@ -466,3 +469,4 @@ class CSSeen : public Module
 };
 
 MODULE_INIT(CSSeen)
+#endif

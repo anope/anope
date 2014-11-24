@@ -45,22 +45,22 @@ class CommandCSInfo : public Command
 
 		InfoFormatter info(nc);
 
-		source.Reply(_("Information for channel \002{0}\002:"), ci->name);
+		source.Reply(_("Information for channel \002{0}\002:"), ci->GetName());
 		if (ci->GetFounder())
-			info[_("Founder")] = ci->GetFounder()->display;
+			info[_("Founder")] = ci->GetFounder()->GetDisplay();
 
 		if (show_all && ci->GetSuccessor())
-			info[_("Successor")] = ci->GetSuccessor()->display;
+			info[_("Successor")] = ci->GetSuccessor()->GetDisplay();
 
-		if (!ci->desc.empty())
-			info[_("Description")] = ci->desc;
+		if (!ci->GetDesc().empty())
+			info[_("Description")] = ci->GetDesc();
 
-		info[_("Registered")] = Anope::strftime(ci->time_registered, source.GetAccount());
-		info[_("Last used")] = Anope::strftime(ci->last_used, source.GetAccount());
+		info[_("Registered")] = Anope::strftime(ci->GetTimeRegistered(), source.GetAccount());
+		info[_("Last used")] = Anope::strftime(ci->GetLastUsed(), source.GetAccount());
 
 		if (show_all)
 		{
-			info[_("Ban type")] = stringify(ci->bantype);
+			info[_("Ban type")] = stringify(ci->GetBanType());
 		}
 
 		this->eventonchaninfo(&Event::ChanInfo::OnChanInfo, source, ci, info, show_all);

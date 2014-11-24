@@ -23,10 +23,16 @@ enum
 	MSG_DEL_NOT_FOUND,
 	MSG_DELETED,
 	MSG_DEL_NONE,
-	MSG_DELETED_ALL
+	MSG_DELETED_ALL,
+	MSG_SIZE
 };
 
-struct NewsMessages msgarray[] = {
+static struct NewsMessages
+{
+	NewsType type;
+	Anope::string name;
+	const char *msgs[MSG_SIZE];
+} msgarray[] = {
 	{NEWS_LOGON, "LOGON",
 	 {_("LOGONNEWS {ADD|DEL|LIST} [\037text\037|\037num\037]\002"),
 	  _("Logon news items:"),
@@ -59,82 +65,85 @@ struct NewsMessages msgarray[] = {
 	 }
 };
 
-struct MyNewsItem : NewsItem
+class NewsItemImpl : public NewsItem
 {
-	void Serialize(Serialize::Data &data) const override
-	{
-		data["type"] << this->type;
-		data["text"] << this->text;
-		data["who"] << this->who;
-		data["time"] << this->time;
-	}
-
-	static Serializable* Unserialize(Serializable *obj, Serialize::Data &data)
-	{
-		if (!news_service)
-			return NULL;
-
-		NewsItem *ni;
-		if (obj)
-			ni = anope_dynamic_static_cast<NewsItem *>(obj);
-		else
-			ni = new MyNewsItem();
-
-		unsigned int t;
-		data["type"] >> t;
-		ni->type = static_cast<NewsType>(t);
-		data["text"] >> ni->text;
-		data["who"] >> ni->who;
-		data["time"] >> ni->time;
-
-		if (!obj)
-			news_service->AddNewsItem(ni);
-		return ni;
-	}
-};
-
-class MyNewsService : public NewsService
-{
-	std::vector<NewsItem *> newsItems[3];
  public:
-	MyNewsService(Module *m) : NewsService(m) { }
+	NewsItemImpl(Serialize::TypeBase *type) : NewsItem(type) { }
+        NewsItemImpl(Serialize::TypeBase *type, Serialize::ID id) : NewsItem(type, id) { }
 
-	~MyNewsService()
-	{
-		for (unsigned i = 0; i < 3; ++i)
-			for (unsigned j = 0; j < newsItems[i].size(); ++j)
-				delete newsItems[i][j];
-	}
+	NewsType GetNewsType() override;
+	void SetNewsType(const NewsType &) override;
 
-	NewsItem *CreateNewsItem() override
-	{
-		return new MyNewsItem();
-	}
+	Anope::string GetText() override;
+	void SetText(const Anope::string &) override;
 
-	void AddNewsItem(NewsItem *n)
-	{
-		this->newsItems[n->type].push_back(n);
-	}
+	Anope::string GetWho() override;
+	void SetWho(const Anope::string &) override;
 
-	void DelNewsItem(NewsItem *n)
-	{
-		std::vector<NewsItem *> &list = this->GetNewsList(n->type);
-		std::vector<NewsItem *>::iterator it = std::find(list.begin(), list.end(), n);
-		if (it != list.end())
-			list.erase(it);
-		delete n;
-	}
+	time_t GetTime() override;
+	void SetTime(const time_t &) override;
+};
 
-	std::vector<NewsItem *> &GetNewsList(NewsType t)
+class NewsItemType : public Serialize::Type<NewsItemImpl>
+{
+ public:
+	Serialize::Field<NewsItemImpl, NewsType> type;
+	Serialize::Field<NewsItemImpl, Anope::string> text;
+	Serialize::Field<NewsItemImpl, Anope::string> who;
+	Serialize::Field<NewsItemImpl, time_t> time;
+
+	NewsItemType(Module *me) : Serialize::Type<NewsItemImpl>(me, "NewsItem")
+		, type(this, "type")
+		, text(this, "text")
+		, who(this, "who")
+		, time(this, "time")
 	{
-		return this->newsItems[t];
 	}
 };
 
-#define lenof(a)        (sizeof(a) / sizeof(*(a)))
+NewsType NewsItemImpl::GetNewsType()
+{
+	return Get(&NewsItemType::type);
+}
+
+void NewsItemImpl::SetNewsType(const NewsType &t)
+{
+	Set(&NewsItemType::type, t);
+}
+
+Anope::string NewsItemImpl::GetText()
+{
+	return Get(&NewsItemType::text);
+}
+
+void NewsItemImpl::SetText(const Anope::string &t)
+{
+	Set(&NewsItemType::text, t);
+}
+
+Anope::string NewsItemImpl::GetWho()
+{
+	return Get(&NewsItemType::who);
+}
+
+void NewsItemImpl::SetWho(const Anope::string &w)
+{
+	Set(&NewsItemType::who, w);
+}
+
+time_t NewsItemImpl::GetTime()
+{
+	return Get(&NewsItemType::time);
+}
+
+void NewsItemImpl::SetTime(const time_t &t)
+{
+	Set(&NewsItemType::time, t);
+}
+
 static const char **findmsgs(NewsType type)
 {
-	for (unsigned i = 0; i < lenof(msgarray); ++i)
+	for (unsigned i = 0; i < sizeof(msgarray) / sizeof(*msgarray); ++i)
 		if (msgarray[i].type == type)
 			return msgarray[i].msgs;
 	return NULL;
@@ -142,41 +151,40 @@ static const char **findmsgs(NewsType type)
 
 class NewsBase : public Command
 {
-	ServiceReference<NewsService> ns;
-
  protected:
 	void DoList(CommandSource &source, NewsType ntype, const char **msgs)
 	{
-		std::vector<NewsItem *> &list = this->ns->GetNewsList(ntype);
+		std::vector<NewsItem *> list = Serialize::GetObjects<NewsItem *>(newsitem);
+
 		if (list.empty())
-			source.Reply(msgs[MSG_LIST_NONE]);
-		else
 		{
-			ListFormatter lflist(source.GetAccount());
-			lflist.AddColumn(_("Number")).AddColumn(_("Creator")).AddColumn(_("Created")).AddColumn(_("Text"));
-
-			for (unsigned i = 0, end = list.size(); i < end; ++i)
-			{
-				ListFormatter::ListEntry entry;
-				entry["Number"] = stringify(i + 1);
-				entry["Creator"] = list[i]->who;
-				entry["Created"] = Anope::strftime(list[i]->time, NULL, true);
-				entry["Text"] = list[i]->text;
-				lflist.AddEntry(entry);
-			}
-
-			source.Reply(msgs[MSG_LIST_HEADER]);
-
-			std::vector<Anope::string> replies;
-			lflist.Process(replies);
-
-			for (unsigned i = 0; i < replies.size(); ++i)
-				source.Reply(replies[i]);
-
-			source.Reply(_("End of news list."));
+			source.Reply(msgs[MSG_LIST_NONE]);
+			return;
 		}
 
-		return;
+		ListFormatter lflist(source.GetAccount());
+		lflist.AddColumn(_("Number")).AddColumn(_("Creator")).AddColumn(_("Created")).AddColumn(_("Text"));
+
+		unsigned int i = 1;
+		for (NewsItem *n : list)
+		{
+			ListFormatter::ListEntry entry;
+			entry["Number"] = stringify(i++ + 1);
+			entry["Creator"] = n->GetWho();
+			entry["Created"] = Anope::strftime(n->GetTime(), NULL, true);
+			entry["Text"] = n->GetText();
+			lflist.AddEntry(entry);
+		}
+
+		source.Reply(msgs[MSG_LIST_HEADER]);
+
+		std::vector<Anope::string> replies;
+		lflist.Process(replies);
+
+		for (i = 0; i < replies.size(); ++i)
+			source.Reply(replies[i]);
+
+		source.Reply(_("End of news list."));
 	}
 
 	void DoAdd(CommandSource &source, const std::vector<Anope::string> &params, NewsType ntype, const char **msgs)
@@ -184,77 +192,72 @@ class NewsBase : public Command
 		const Anope::string text = params.size() > 1 ? params[1] : "";
 
 		if (text.empty())
-			this->OnSyntaxError(source, "ADD");
-		else
 		{
-			if (Anope::ReadOnly)
-				source.Reply(_("Services are in read-only mode. Any changes made may not persist."));
-
-			NewsItem *news = new MyNewsItem();
-			news->type = ntype;
-			news->text = text;
-			news->time = Anope::CurTime;
-			news->who = source.GetNick();
-
-			this->ns->AddNewsItem(news);
-
-			source.Reply(msgs[MSG_ADDED]);
-			Log(LOG_ADMIN, source, this) << "to add a news item";
+			this->OnSyntaxError(source, "ADD");
+			return;
 		}
 
-		return;
+		if (Anope::ReadOnly)
+			source.Reply(_("Services are in read-only mode. Any changes made may not persist."));
+
+		NewsItem *ni = newsitem.Create();
+		ni->SetNewsType(ntype);
+		ni->SetText(text);
+		ni->SetTime(Anope::CurTime);
+		ni->SetWho(source.GetNick());
+
+		source.Reply(msgs[MSG_ADDED]);
+		Log(LOG_ADMIN, source, this) << "to add a news item";
 	}
 
 	void DoDel(CommandSource &source, const std::vector<Anope::string> &params, NewsType ntype, const char **msgs)
 	{
 		const Anope::string &text = params.size() > 1 ? params[1] : "";
+		std::vector<NewsItem *> list = Serialize::GetObjects<NewsItem *>(newsitem);
 
 		if (text.empty())
-			this->OnSyntaxError(source, "DEL");
-		else
 		{
-			std::vector<NewsItem *> &list = this->ns->GetNewsList(ntype);
-			if (list.empty())
-				source.Reply(msgs[MSG_LIST_NONE]);
-			else
-			{
-				if (Anope::ReadOnly)
-					source.Reply(_("Services are in read-only mode. Any changes made may not persist."));
-				if (!text.equals_ci("ALL"))
-				{
-					try
-					{
-						unsigned num = convertTo<unsigned>(text);
-						if (num > 0 && num <= list.size())
-						{
-							this->ns->DelNewsItem(list[num - 1]);
-							source.Reply(msgs[MSG_DELETED], num);
-							Log(LOG_ADMIN, source, this) << "to delete a news item";
-							return;
-						}
-					}
-					catch (const ConvertException &) { }
-
-					source.Reply(msgs[MSG_DEL_NOT_FOUND], text.c_str());
-				}
-				else
-				{
-					for (unsigned i = list.size(); i > 0; --i)
-						this->ns->DelNewsItem(list[i - 1]);
-					source.Reply(msgs[MSG_DELETED_ALL]);
-					Log(LOG_ADMIN, source, this) << "to delete all news items";
-				}
-			}
+			this->OnSyntaxError(source, "DEL");
+			return;
 		}
 
-		return;
+		if (list.empty())
+		{
+			source.Reply(msgs[MSG_LIST_NONE]);
+			return;
+		}
+
+		if (Anope::ReadOnly)
+			source.Reply(_("Services are in read-only mode. Any changes made may not persist."));
+
+		if (!text.equals_ci("ALL"))
+		{
+			try
+			{
+				unsigned num = convertTo<unsigned>(text);
+				if (num > 0 && num <= list.size())
+				{
+					list[num - 1]->Delete();
+					source.Reply(msgs[MSG_DELETED], num);
+					Log(LOG_ADMIN, source, this) << "to delete a news item";
+					return;
+				}
+			}
+			catch (const ConvertException &) { }
+
+			source.Reply(msgs[MSG_DEL_NOT_FOUND], text.c_str());
+		}
+		else
+		{
+			for (NewsItem *n : list)
+				n->Delete();
+			source.Reply(msgs[MSG_DELETED_ALL]);
+			Log(LOG_ADMIN, source, this) << "to delete all news items";
+		}
 	}
 
 	void DoNews(CommandSource &source, const std::vector<Anope::string> &params, NewsType ntype)
 	{
-		if (!this->ns)
-			return;
-
 		const Anope::string &cmd = params[0];
 
 		const char **msgs = findmsgs(ntype);
@@ -269,24 +272,18 @@ class NewsBase : public Command
 			return this->DoDel(source, params, ntype, msgs);
 		else
 			this->OnSyntaxError(source, "");
-
-		return;
 	}
  public:
-	NewsBase(Module *creator, const Anope::string &newstype) : Command(creator, newstype, 1, 2), ns("NewsService", "news")
+	NewsBase(Module *creator, const Anope::string &newstype) : Command(creator, newstype, 1, 2)
 	{
 		this->SetSyntax(_("ADD \037text\037"));
 		this->SetSyntax(_("DEL {\037num\037 | ALL}"));
 		this->SetSyntax("LIST");
 	}
 
-	virtual ~NewsBase()
-	{
-	}
+	virtual void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_abstract;
 
-	virtual void Execute(CommandSource &source, const std::vector<Anope::string> &params) = 0;
-
-	virtual bool OnHelp(CommandSource &source, const Anope::string &subcommand) = 0;
+	virtual bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_abstract;
 };
 
 class CommandOSLogonNews : public NewsBase
@@ -356,14 +353,11 @@ class CommandOSRandomNews : public NewsBase
 	}
 };
 
-static unsigned cur_rand_news = 0;
-
 class OSNews : public Module
 	, public EventHook<Event::UserModeSet>
 	, public EventHook<Event::UserConnect>
 {
-	MyNewsService newsservice;
-	Serialize::Type newsitem_type;
+	NewsItemType newsitemtype;
 
 	CommandOSLogonNews commandoslogonnews;
 	CommandOSOperNews commandosopernews;
@@ -371,36 +365,51 @@ class OSNews : public Module
 
 	Anope::string oper_announcer, announcer;
 	unsigned news_count;
+	unsigned cur_rand_news = 0;
 
 	void DisplayNews(User *u, NewsType Type)
 	{
-		std::vector<NewsItem *> &newsList = this->newsservice.GetNewsList(Type);
-		if (newsList.empty())
+		std::vector<NewsItem *> list = Serialize::GetObjects<NewsItem *>(newsitem);
+		if (list.empty())
 			return;
 
-		BotInfo *bi = NULL;
+		ServiceBot *bi = NULL;
 		if (Type == NEWS_OPER)
-			bi = BotInfo::Find(Config->GetModule(this)->Get<const Anope::string>("oper_announcer", "OperServ"), true);
+			bi = ServiceBot::Find(Config->GetModule(this)->Get<const Anope::string>("oper_announcer", "OperServ"), true);
 		else
-			bi = BotInfo::Find(Config->GetModule(this)->Get<const Anope::string>("announcer", "Global"), true);
+			bi = ServiceBot::Find(Config->GetModule(this)->Get<const Anope::string>("announcer", "Global"), true);
 		if (bi == NULL)
 			return;
 
 		Anope::string msg;
 		if (Type == NEWS_LOGON)
-			msg = _("[\002Logon News\002 - %s] %s");
+			msg = _("[\002Logon News\002 - {0}] {1}");
 		else if (Type == NEWS_OPER)
-			msg = _("[\002Oper News\002 - %s] %s");
+			msg = _("[\002Oper News\002 - {0}] {1}");
 		else if (Type == NEWS_RANDOM)
-			msg = _("[\002Random News\002 - %s] %s");
+			msg = _("[\002Random News\002 - {0}] {1]");
+		else
+			return;
 
-		unsigned displayed = 0;
-		for (unsigned i = 0, end = newsList.size(); i < end; ++i)
+		unsigned int randnews = 0;
+		for (NewsItem *n : list)
+			if (n->GetNewsType() == NEWS_RANDOM)
+				++randnews;
+
+		/* Reset to head of list to get first random news value */
+		if (Type == NEWS_RANDOM && cur_rand_news >= randnews)
+			cur_rand_news = 0;
+
+		unsigned i = 0, displayed = 0;
+		for (NewsItem *n : list)
 		{
-			if (Type == NEWS_RANDOM && i != cur_rand_news)
+			if (n->GetNewsType() != Type)
 				continue;
 
-			u->SendMessage(bi, msg.c_str(), Anope::strftime(newsList[i]->time, u->Account(), true).c_str(), newsList[i]->text.c_str());
+			if (Type == NEWS_RANDOM && i++ != cur_rand_news)
+				continue;
+
+			u->SendMessage(bi, msg.c_str(), Anope::strftime(n->GetTime(), u->Account(), true), n->GetText());
 
 			++displayed;
 
@@ -409,21 +418,17 @@ class OSNews : public Module
 				++cur_rand_news;
 				break;
 			}
-			else if (displayed >= news_count)
+
+			if (displayed >= news_count)
 				break;
 		}
-
-		/* Reset to head of list to get first random news value */
-		if (Type == NEWS_RANDOM && cur_rand_news >= newsList.size())
-			cur_rand_news = 0;
 	}
 
  public:
 	OSNews(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
 		, EventHook<Event::UserModeSet>("OnUserModeSet")
 		, EventHook<Event::UserConnect>("OnUserConnect")
-		, newsservice(this)
-		, newsitem_type("NewsItem", MyNewsItem::Unserialize)
+		, newsitemtype(this)
 		, commandoslogonnews(this)
 		, commandosopernews(this)
 		, commandosrandomnews(this)

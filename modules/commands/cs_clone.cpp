@@ -53,7 +53,7 @@ public:
 
 		if (ci == target_ci)
 		{
-			source.Reply(_("Cannot clone channel \002{0}\002 to itself!"), ci->name);
+			source.Reply(_("Cannot clone channel \002{0}\002 to itself!"), ci->GetName());
 			return;
 		}
 
@@ -61,7 +61,7 @@ public:
 		{
 			if (!source.HasPriv("chanserv/administration"))
 			{
-				source.Reply(_("Access denied. You do not have the privilege \002{0}\002 on \002{1}\002 and \002{2}\002."), "FOUNDER", ci->name, target_ci->name);
+				source.Reply(_("Access denied. You do not have the privilege \002{0}\002 on \002{1}\002 and \002{2}\002."), "FOUNDER", ci->GetName(), target_ci->GetName());
 				return;
 			}
 			else
@@ -74,15 +74,16 @@ public:
 		if (what.empty())
 		{
 			delete target_ci;
-			target_ci = ChanServ::service->Create(*ci);
-			target_ci->name = target;
+			target_ci = ChanServ::channel.Create();
+			target_ci->SetName(target);
 			ChanServ::registered_channel_map& map = ChanServ::service->GetChannels();
-			map[target_ci->name] = target_ci;
-			target_ci->c = Channel::Find(target_ci->name);
+			map[target_ci->GetName()] = target_ci;
+			target_ci->c = Channel::Find(target_ci->GetName());
 
-			target_ci->bi = NULL;
-			if (ci->bi)
-				ci->bi->Assign(u, target_ci);
+			if (ci->GetBot())
+				ci->GetBot()->Assign(u, target_ci);
+			else
+				target_ci->SetBot(nullptr);
 
 			if (target_ci->c)
 			{
@@ -95,12 +96,12 @@ public:
 
 			if (target_ci->c && !target_ci->c->topic.empty())
 			{
-				target_ci->last_topic = target_ci->c->topic;
-				target_ci->last_topic_setter = target_ci->c->topic_setter;
-				target_ci->last_topic_time = target_ci->c->topic_time;
+				target_ci->SetLastTopic(target_ci->GetLastTopic());
+				target_ci->SetLastTopicSetter(target_ci->c->topic_setter);
+				target_ci->SetLastTopicTime(target_ci->c->topic_time);
 			}
 			else
-				target_ci->last_topic_setter = source.service->nick;
+				target_ci->SetLastTopicSetter(source.service->nick);
 
 			Event::OnChanRegistered(&Event::ChanRegistered::OnChanRegistered, target_ci);
 
@@ -117,8 +118,7 @@ public:
 
 			for (unsigned i = 0; i < ci->GetAccessCount(); ++i)
 			{
-				const ChanServ::ChanAccess *taccess = ci->GetAccess(i);
-				ChanServ::AccessProvider *provider = taccess->provider;
+				ChanServ::ChanAccess *taccess = ci->GetAccess(i);
 
 				if (access_max && target_ci->GetDeepAccessCount() >= access_max)
 					break;
@@ -127,14 +127,14 @@ public:
 					continue;
 				masks.insert(taccess->Mask());
 
-				ChanServ::ChanAccess *newaccess = provider->Create();
-				newaccess->SetMask(taccess->Mask(), target_ci);
-				newaccess->creator = taccess->creator;
-				newaccess->last_seen = taccess->last_seen;
-				newaccess->created = taccess->created;
+				ChanServ::ChanAccess *newaccess = anope_dynamic_static_cast<ChanServ::ChanAccess *>(taccess->GetSerializableType()->Create());
+				newaccess->SetChannel(taccess->GetChannel());
+				newaccess->SetMask(taccess->GetMask());
+				newaccess->SetMask(taccess->GetMask());
+				newaccess->SetCreator(taccess->GetCreator());
+				newaccess->SetLastSeen(taccess->GetLastSeen());
+				newaccess->SetCreated(taccess->GetCreated());
 				newaccess->AccessUnserialize(taccess->AccessSerialize());
-
-				target_ci->AddAccess(newaccess);
 
 				++count;
 			}
@@ -146,36 +146,30 @@ public:
 			target_ci->ClearAkick();
 			for (unsigned i = 0; i < ci->GetAkickCount(); ++i)
 			{
-				const AutoKick *ak = ci->GetAkick(i);
-				if (ak->nc)
-					target_ci->AddAkick(ak->creator, ak->nc, ak->reason, ak->addtime, ak->last_used);
+				AutoKick *ak = ci->GetAkick(i);
+				if (ak->GetAccount())
+					target_ci->AddAkick(ak->GetCreator(), ak->GetAccount(), ak->GetReason(), ak->GetAddTime(), ak->GetLastUsed());
 				else
-					target_ci->AddAkick(ak->creator, ak->mask, ak->reason, ak->addtime, ak->last_used);
+					target_ci->AddAkick(ak->GetCreator(), ak->GetMask(), ak->GetReason(), ak->GetAddTime(), ak->GetLastUsed());
 			}
 
 			source.Reply(_("All auto kick entries from \002{0}\002 have been cloned to \002{1}\002."), channel, target);
 		}
 		else if (what.equals_ci("BADWORDS"))
 		{
-			BadWords *target_badwords = target_ci->Require<BadWords>("badwords"),
-				*badwords = ci->Require<BadWords>("badwords");
-
-			if (!target_badwords || !badwords)
+			if (!badwords)
 			{
 				source.Reply(_("All badword entries from \002{0}\002 have been cloned to \002{1}\002."), channel, target); // BotServ doesn't exist/badwords isn't loaded
 				return;
 			}
 
-			target_badwords->ClearBadWords();
+			badwords->ClearBadWords(target_ci);
 
-			for (unsigned i = 0; i < badwords->GetBadWordCount(); ++i)
+			for (unsigned i = 0; i < badwords->GetBadWordCount(ci); ++i)
 			{
-				const BadWord *bw = badwords->GetBadWord(i);
-				target_badwords->AddBadWord(bw->word, bw->type);
+				BadWord *bw = badwords->GetBadWord(ci, i);
+				badwords->AddBadWord(target_ci, bw->GetWord(), bw->GetType());
 			}
-
-			badwords->Check();
-			target_badwords->Check();
 
 			source.Reply(_("All badword entries from \002{0}\002 have been cloned to \002{1}\002."), channel, target);
 		}
@@ -185,7 +179,7 @@ public:
 			return;
 		}
 
-		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to clone " << (what.empty() ? "everything from it" : what) << " to " << target_ci->name;
+		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to clone " << (what.empty() ? "everything from it" : what) << " to " << target_ci->GetName();
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override

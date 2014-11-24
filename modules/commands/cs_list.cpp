@@ -75,6 +75,7 @@ class CommandCSList : public Command
 		ListFormatter list(source.GetAccount());
 		list.AddColumn(_("Name")).AddColumn(_("Description"));
 
+		// XXX wtf
 		Anope::map<ChanServ::Channel *> ordered_map;
 		if (ChanServ::service)
 			for (auto& it : ChanServ::service->GetChannels())
@@ -82,41 +83,43 @@ class CommandCSList : public Command
 
 		for (Anope::map<ChanServ::Channel *>::const_iterator it = ordered_map.begin(), it_end = ordered_map.end(); it != it_end; ++it)
 		{
-			const ChanServ::Channel *ci = it->second;
+			ChanServ::Channel *ci = it->second;
 
 			if (!is_servadmin)
 			{
-				if (ci->HasExt("CS_PRIVATE") || ci->HasExt("CS_SUSPENDED"))
+				if (ci->HasFieldS("CS_PRIVATE") || ci->HasFieldS("CS_SUSPENDED"))
 					continue;
 				if (ci->c && ci->c->HasMode("SECRET"))
 					continue;
 
-				ModeLocks *ml = ci->GetExt<ModeLocks>("modelocks");
-				const ModeLock *secret = ml ? ml->GetMLock("SECRET") : NULL;
-				if (secret && secret->set)
-					continue;
+				if (mlocks)
+				{
+					ModeLock *secret = mlocks->GetMLock(ci, "SECRET");
+					if (secret && secret->GetSet())
+						continue;
+				}
 			}
 
-			if (suspended && !ci->HasExt("CS_SUSPENDED"))
+			if (suspended && !ci->HasFieldS("CS_SUSPENDED"))
 				continue;
 
-			if (channoexpire && !ci->HasExt("CS_NO_EXPIRE"))
+			if (channoexpire && !ci->HasFieldS("CS_NO_EXPIRE"))
 				continue;
 
-			if (pattern.equals_ci(ci->name) || ci->name.equals_ci(spattern) || Anope::Match(ci->name, pattern, false, true) || Anope::Match(ci->name, spattern, false, true) || Anope::Match(ci->desc, pattern, false, true) || Anope::Match(ci->last_topic, pattern, false, true))
+			if (pattern.equals_ci(ci->GetName()) || ci->GetName().equals_ci(spattern) || Anope::Match(ci->GetName(), pattern, false, true) || Anope::Match(ci->GetName(), spattern, false, true) || Anope::Match(ci->GetDesc(), pattern, false, true) || Anope::Match(ci->GetLastTopic(), pattern, false, true))
 			{
 				if (((count + 1 >= from && count + 1 <= to) || (!from && !to)) && ++nchans <= listmax)
 				{
 					bool isnoexpire = false;
-					if (is_servadmin && (ci->HasExt("CS_NO_EXPIRE")))
+					if (is_servadmin && (ci->HasFieldS("CS_NO_EXPIRE")))
 						isnoexpire = true;
 
 					ListFormatter::ListEntry entry;
-					entry["Name"] = (isnoexpire ? "!" : "") + ci->name;
-					if (ci->HasExt("CS_SUSPENDED"))
+					entry["Name"] = (isnoexpire ? "!" : "") + ci->GetName();
+					if (ci->HasFieldS("CS_SUSPENDED"))
 						entry["Description"] = Language::Translate(source.GetAccount(), _("[Suspended]"));
 					else
-						entry["Description"] = ci->desc;
+						entry["Description"] = ci->GetDesc();
 					list.AddEntry(entry);
 				}
 				++count;
@@ -197,21 +200,21 @@ class CommandCSSetPrivate : public Command
 
 		if (MOD_RESULT != EVENT_ALLOW && !source.AccessFor(ci).HasPriv("SET") && source.permission.empty() && !source.HasPriv("chanserv/administration"))
 		{
-			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "SET", ci->name);
+			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "SET", ci->GetName());
 			return;
 		}
 
 		if (params[1].equals_ci("ON"))
 		{
 			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to enable private";
-			ci->Extend<bool>("CS_PRIVATE");
-			source.Reply(_("Private option for \002{0}\002 is now \002on\002."), ci->name);
+			ci->SetS<bool>("CS_PRIVATE", true);
+			source.Reply(_("Private option for \002{0}\002 is now \002on\002."), ci->GetName());
 		}
 		else if (params[1].equals_ci("OFF"))
 		{
 			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to disable private";
-			ci->Shrink<bool>("CS_PRIVATE");
-			source.Reply(_("Private option for \002{0}\002 is now \002off\002."), ci->name);
+			ci->UnsetS<bool>("CS_PRIVATE");
+			source.Reply(_("Private option for \002{0}\002 is now \002off\002."), ci->GetName());
 		}
 		else
 			this->OnSyntaxError(source, "PRIVATE");
@@ -223,7 +226,7 @@ class CommandCSSetPrivate : public Command
 		source.Reply(" ");
 		source.Reply(_("Enables or disables the \002private\002 option for a channel."));
 
-		BotInfo *bi;
+		ServiceBot *bi;
 		Anope::string cmd;
 		if (Command::FindCommandFromService("chanserv/list", bi, cmd))
 			source.Reply(_("When \002private\002 is set, the channel will not appear in the \002{0}\002 command of \002{1}\002."), cmd, bi->nick);
@@ -237,7 +240,7 @@ class CSList : public Module
 	CommandCSList commandcslist;
 	CommandCSSetPrivate commandcssetprivate;
 
-	SerializableExtensibleItem<bool> priv;
+	ExtensibleItem<bool> priv; // XXX
 
  public:
 	CSList(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)

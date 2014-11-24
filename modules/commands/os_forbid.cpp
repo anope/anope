@@ -14,124 +14,141 @@
 #include "modules/nickserv.h"
 #include "modules/chanserv.h"
 
-struct ForbidDataImpl : ForbidData, Serializable
+class ForbidDataImpl : public ForbidData
 {
-	ForbidDataImpl() : Serializable("ForbidData") { }
-	void Serialize(Serialize::Data &data) const override;
-	static Serializable* Unserialize(Serializable *obj, Serialize::Data &data);
+ public:
+	ForbidDataImpl(Serialize::TypeBase *type) : ForbidData(type) { }
+	ForbidDataImpl(Serialize::TypeBase *type, Serialize::ID id) : ForbidData(type, id) { }
+
+	Anope::string GetMask() override;
+	void SetMask(const Anope::string &) override;
+
+	Anope::string GetCreator() override;
+	void SetCreator(const Anope::string &) override;
+
+	Anope::string GetReason() override;
+	void SetReason(const Anope::string &) override;
+
+	time_t GetCreated() override;
+	void SetCreated(const time_t &) override;
+
+	time_t GetExpires() override;
+	void SetExpires(const time_t &) override;
+
+	ForbidType GetType() override;
+	void SetType(const ForbidType &) override;
 };
 
-void ForbidDataImpl::Serialize(Serialize::Data &data) const
+class ForbidDataType : public Serialize::Type<ForbidDataImpl>
 {
-	data["mask"] << this->mask;
-	data["creator"] << this->creator;
-	data["reason"] << this->reason;
-	data["created"] << this->created;
-	data["expires"] << this->expires;
-	data["type"] << this->type;
+ public:
+	Serialize::Field<ForbidDataImpl, Anope::string> mask, creator, reason;
+	Serialize::Field<ForbidDataImpl, time_t> created, expires;
+	Serialize::Field<ForbidDataImpl, ForbidType> type;
+
+	ForbidDataType(Module *me) : Serialize::Type<ForbidDataImpl>(me, "ForbidData")
+		, mask(this, "mask")
+		, creator(this, "creator")
+		, reason(this, "reason")
+		, created(this, "created")
+		, expires(this, "expires")
+		, type(this, "type")
+	{
+	}
+};
+
+Anope::string ForbidDataImpl::GetMask()
+{
+	return Get(&ForbidDataType::mask);
 }
 
-Serializable* ForbidDataImpl::Unserialize(Serializable *obj, Serialize::Data &data)
+void ForbidDataImpl::SetMask(const Anope::string &m)
 {
-	if (!forbid_service)
-		return NULL;
+	Set(&ForbidDataType::mask, m);
+}
 
-	ForbidDataImpl *fb;
-	if (obj)
-		fb = anope_dynamic_static_cast<ForbidDataImpl *>(obj);
-	else
-		fb = new ForbidDataImpl();
+Anope::string ForbidDataImpl::GetCreator()
+{
+	return Get(&ForbidDataType::creator);
+}
 
-	data["mask"] >> fb->mask;
-	data["creator"] >> fb->creator;
-	data["reason"] >> fb->reason;
-	data["created"] >> fb->created;
-	data["expires"] >> fb->expires;
-	unsigned int t;
-	data["type"] >> t;
-	fb->type = static_cast<ForbidType>(t);
+void ForbidDataImpl::SetCreator(const Anope::string &c)
+{
+	Set(&ForbidDataType::creator, c);
+}
 
-	if (t > FT_SIZE - 1)
-		return NULL;
+Anope::string ForbidDataImpl::GetReason()
+{
+	return Get(&ForbidDataType::reason);
+}
 
-	if (!obj)
-		forbid_service->AddForbid(fb);
-	return fb;
+void ForbidDataImpl::SetReason(const Anope::string &r)
+{
+	Set(&ForbidDataType::reason, r);
+}
+
+time_t ForbidDataImpl::GetCreated()
+{
+	return Get(&ForbidDataType::created);
+}
+
+void ForbidDataImpl::SetCreated(const time_t &t)
+{
+	Set(&ForbidDataType::created, t);
+}
+
+time_t ForbidDataImpl::GetExpires()
+{
+	return Get(&ForbidDataType::expires);
+}
+
+void ForbidDataImpl::SetExpires(const time_t &t)
+{
+	Set(&ForbidDataType::expires, t);
+}
+
+ForbidType ForbidDataImpl::GetType()
+{
+	return Get(&ForbidDataType::type);
+}
+
+void ForbidDataImpl::SetType(const ForbidType &t)
+{
+	Set(&ForbidDataType::type, t);
 }
 
 class MyForbidService : public ForbidService
 {
-	Serialize::Checker<std::vector<ForbidData *>[FT_SIZE - 1]> forbid_data;
-
-	inline std::vector<ForbidData *>& forbids(unsigned t) { return (*this->forbid_data)[t - 1]; }
-
  public:
-	MyForbidService(Module *m) : ForbidService(m), forbid_data("ForbidData") { }
-
-	~MyForbidService()
+	MyForbidService(Module *m) : ForbidService(m)
 	{
-		std::vector<ForbidData *> f = GetForbids();
-		for (unsigned i = 0; i < f.size(); ++i)
-			delete f[i];
-	}
-
-	void AddForbid(ForbidData *d) override
-	{
-		this->forbids(d->type).push_back(d);
-	}
-
-	void RemoveForbid(ForbidData *d) override
-	{
-		std::vector<ForbidData *>::iterator it = std::find(this->forbids(d->type).begin(), this->forbids(d->type).end(), d);
-		if (it != this->forbids(d->type).end())
-			this->forbids(d->type).erase(it);
-		delete d;
-	}
-
-	ForbidData *CreateForbid() override
-	{
-		return new ForbidDataImpl();
 	}
 
 	ForbidData *FindForbid(const Anope::string &mask, ForbidType ftype) override
 	{
-		for (unsigned i = this->forbids(ftype).size(); i > 0; --i)
-		{
-			ForbidData *d = this->forbids(ftype)[i - 1];
-
-			if (Anope::Match(mask, d->mask, false, true))
+		for (ForbidData *d : GetForbids())
+			if (d->GetType() == ftype && Anope::Match(mask, d->GetMask(), false, true))
 				return d;
-		}
 		return NULL;
 	}
 
 	std::vector<ForbidData *> GetForbids() override
 	{
-		std::vector<ForbidData *> f;
-		for (unsigned j = FT_NICK; j < FT_SIZE; ++j)
-			for (unsigned i = this->forbids(j).size(); i > 0; --i)
+		for (ForbidData *d : Serialize::GetObjects<ForbidData *>(forbiddata))
+			if (d->GetExpires() && !Anope::NoExpire && Anope::CurTime >= d->GetExpires())
 			{
-				ForbidData *d = this->forbids(j).at(i - 1);
+				Anope::string ftype = "none";
+				if (d->GetType() == FT_NICK)
+					ftype = "nick";
+				else if (d->GetType() == FT_CHAN)
+					ftype = "chan";
+				else if (d->GetType() == FT_EMAIL)
+					ftype = "email";
 
-				if (d->expires && !Anope::NoExpire && Anope::CurTime >= d->expires)
-				{
-					Anope::string ftype = "none";
-					if (d->type == FT_NICK)
-						ftype = "nick";
-					else if (d->type == FT_CHAN)
-						ftype = "chan";
-					else if (d->type == FT_EMAIL)
-						ftype = "email";
-
-					Log(LOG_NORMAL, "expire/forbid", Config->GetClient("OperServ")) << "Expiring forbid for " << d->mask << " type " << ftype;
-					this->forbids(j).erase(this->forbids(j).begin() + i - 1);
-					delete d;
-				}
-				else
-					f.push_back(d);
+				Log(LOG_NORMAL, "expire/forbid", Config->GetClient("OperServ")) << "Expiring forbid for " << d->GetMask() << " type " << ftype;
+				d->Delete();
 			}
-
-		return f;
+		return Serialize::GetObjects<ForbidData *>(forbiddata);
 	}
 };
 
@@ -155,11 +172,11 @@ class CommandOSForbid : public Command
 		ForbidData *d = fs->FindForbid(u->nick, FT_NICK);
 		if (d != NULL)
 		{
-			BotInfo *bi = Config->GetClient("NickServ");
+			ServiceBot *bi = Config->GetClient("NickServ");
 			if (!bi)
 				bi = Config->GetClient("OperServ");
 			if (bi)
-				u->SendMessage(bi, _("This nickname has been forbidden: \002{0}\002"), d->reason);
+				u->SendMessage(bi, _("This nickname has been forbidden: \002{0}\002"), d->GetReason());
 			if (NickServ::service)
 				NickServ::service->Collide(u, NULL);
 		}
@@ -215,7 +232,7 @@ class CommandOSForbid : public Command
 			}
 
 			NickServ::Nick *target = NickServ::FindNick(entry);
-			if (target != NULL && Config->GetModule("nickserv")->Get<bool>("secureadmins", "yes") && target->nc->IsServicesOper())
+			if (target != NULL && Config->GetModule("nickserv")->Get<bool>("secureadmins", "yes") && target->GetAccount()->IsServicesOper())
 			{
 				source.Reply(_("Access denied."));
 				return;
@@ -225,24 +242,22 @@ class CommandOSForbid : public Command
 			bool created = false;
 			if (d == NULL)
 			{
-				d = new ForbidDataImpl();
+				d = forbiddata.Create();
 				created = true;
 			}
 
-			d->mask = entry;
-			d->creator = source.GetNick();
-			d->reason = reason;
-			d->created = Anope::CurTime;
-			d->expires = expiryt;
-			d->type = ftype;
-			if (created)
-				this->fs->AddForbid(d);
+			d->SetMask(entry);
+			d->SetCreator(source.GetNick());
+			d->SetReason(reason);
+			d->SetCreated(Anope::CurTime);
+			d->SetExpires(expiryt);
+			d->SetType(ftype);
 
 			if (Anope::ReadOnly)
 				source.Reply(_("Services are in read-only mode. Any changes made may not persist."));
 
 			Log(LOG_ADMIN, source, this) << "to add a forbid on " << entry << " of type " << subcommand;
-			source.Reply(_("Added a forbid on \002{0}\002 of type \002{1}\002 to expire on \002{2}\002."), entry, subcommand.lower(), d->expires ? Anope::strftime(d->expires, source.GetAccount()) : "never");
+			source.Reply(_("Added a forbid on \002{0}\002 of type \002{1}\002 to expire on \002{2}\002."), entry, subcommand.lower(), expiryt ? Anope::strftime(expiryt, source.GetAccount()) : "never");
 
 			/* apply forbid */
 			switch (ftype)
@@ -256,10 +271,10 @@ class CommandOSForbid : public Command
 
 					for (auto it = NickServ::service->GetNickList().begin(); it != NickServ::service->GetNickList().end();)
 					{
-						NickServ::Nick *na = it->second;
+						NickServ::Nick *na = *it;
 						++it;
 
-						d = this->fs->FindForbid(na->nick, FT_NICK);
+						d = this->fs->FindForbid(na->GetNick(), FT_NICK);
 						if (d == NULL)
 							continue;
 
@@ -284,11 +299,11 @@ class CommandOSForbid : public Command
 						if (d == NULL)
 							continue;
 
-						BotInfo *OperServ = Config->GetClient("OperServ");
+						ServiceBot *OperServ = Config->GetClient("OperServ");
 						if (IRCD->CanSQLineChannel && OperServ)
 						{
 							time_t inhabit = Config->GetModule("chanserv")->Get<time_t>("inhabit", "15s");
-							XLine x(c->name, OperServ->nick, Anope::CurTime + inhabit, d->reason);
+							XLine x(c->name, OperServ->nick, Anope::CurTime + inhabit, d->GetReason());
 							IRCD->SendSQLine(NULL, &x);
 						}
 						else if (ChanServ::service)
@@ -306,7 +321,7 @@ class CommandOSForbid : public Command
 							if (u->server == Me || u->HasMode("OPER"))
 								continue;
 
-							reason = Anope::printf(Language::Translate(u, _("This channel has been forbidden: \002%s\002")), d->reason.c_str());
+							reason = Anope::printf(Language::Translate(u, _("This channel has been forbidden: \002%s\002")), d->GetReason().c_str());
 
 							c->Kick(source.service, u, "%s", reason.c_str());
 						}
@@ -317,7 +332,7 @@ class CommandOSForbid : public Command
 						ChanServ::Channel *ci = it->second;
 						++it;
 
-						d = this->fs->FindForbid(ci->name, FT_CHAN);
+						d = this->fs->FindForbid(ci->GetName(), FT_CHAN);
 						if (d == NULL)
 							continue;
 
@@ -340,78 +355,79 @@ class CommandOSForbid : public Command
 			const Anope::string &entry = params[2];
 
 			ForbidData *d = this->fs->FindForbid(entry, ftype);
-			if (d != NULL)
+			if (d == nullptr)
 			{
-				if (Anope::ReadOnly)
-					source.Reply(_("Services are in read-only mode. Any changes made may not persist."));
-
-				Log(LOG_ADMIN, source, this) << "to remove forbid on " << d->mask << " of type " << subcommand;
-				source.Reply(_("\002{0}\002 deleted from the \002{1}\002 forbid list."), d->mask, subcommand);
-				this->fs->RemoveForbid(d);
-			}
-			else
 				source.Reply(_("Forbid on \002{0}\002 was not found."), entry);
+				return;
+			}
+
+			if (Anope::ReadOnly)
+				source.Reply(_("Services are in read-only mode. Any changes made may not persist."));
+
+			Log(LOG_ADMIN, source, this) << "to remove forbid on " << d->GetMask() << " of type " << subcommand;
+			source.Reply(_("\002{0}\002 deleted from the \002{1}\002 forbid list."), d->GetMask(), subcommand);
+			d->Delete();
 		}
 		else if (command.equals_ci("LIST"))
 		{
 			const std::vector<ForbidData *> &forbids = this->fs->GetForbids();
 			if (forbids.empty())
-				source.Reply(_("Forbid list is empty."));
-			else
 			{
-				ListFormatter list(source.GetAccount());
-				list.AddColumn(_("Mask")).AddColumn(_("Type")).AddColumn(_("Creator")).AddColumn(_("Expires")).AddColumn(_("Reason"));
-
-				unsigned shown = 0;
-				for (unsigned i = 0; i < forbids.size(); ++i)
-				{
-					ForbidData *d = forbids[i];
-
-					if (ftype != FT_SIZE && ftype != d->type)
-						continue;
-
-					Anope::string stype;
-					if (d->type == FT_NICK)
-						stype = "NICK";
-					else if (d->type == FT_CHAN)
-						stype = "CHAN";
-					else if (d->type == FT_EMAIL)
-						stype = "EMAIL";
-					else if (d->type == FT_REGISTER)
-						stype = "REGISTER";
-					else
-						continue;
-
-					ListFormatter::ListEntry entry;
-					entry["Mask"] = d->mask;
-					entry["Type"] = stype;
-					entry["Creator"] = d->creator;
-					entry["Expires"] = d->expires ? Anope::strftime(d->expires, NULL, true).c_str() : Language::Translate(source.GetAccount(), _("Never"));
-					entry["Reason"] = d->reason;
-					list.AddEntry(entry);
-					++shown;
-				}
-
-				if (!shown)
-				{
-					source.Reply(_("There are no forbids of type \002{0}\002."), subcommand.upper());
-				}
-				else
-				{
-					source.Reply(_("Forbid list:"));
-
-					std::vector<Anope::string> replies;
-					list.Process(replies);
-
-					for (unsigned i = 0; i < replies.size(); ++i)
-						source.Reply(replies[i]);
-
-					if (shown >= forbids.size())
-						source.Reply(_("End of forbid list."));
-					else
-						source.Reply(_("End of forbid list - \002{0}\002/\002{1}\002 entries shown."), shown, forbids.size());
-				}
+				source.Reply(_("Forbid list is empty."));
+				return;
 			}
+
+			ListFormatter list(source.GetAccount());
+			list.AddColumn(_("Mask")).AddColumn(_("Type")).AddColumn(_("Creator")).AddColumn(_("Expires")).AddColumn(_("Reason"));
+
+			unsigned shown = 0;
+			for (unsigned i = 0; i < forbids.size(); ++i)
+			{
+				ForbidData *d = forbids[i];
+
+				if (ftype != FT_SIZE && ftype != d->GetType())
+					continue;
+
+				Anope::string stype;
+				if (d->GetType() == FT_NICK)
+					stype = "NICK";
+				else if (d->GetType() == FT_CHAN)
+					stype = "CHAN";
+				else if (d->GetType() == FT_EMAIL)
+					stype = "EMAIL";
+				else if (d->GetType() == FT_REGISTER)
+					stype = "REGISTER";
+				else
+					continue;
+
+				ListFormatter::ListEntry entry;
+				entry["Mask"] = d->GetMask();
+				entry["Type"] = stype;
+				entry["Creator"] = d->GetCreator();
+				entry["Expires"] = d->GetExpires() ? Anope::strftime(d->GetExpires(), NULL, true).c_str() : Language::Translate(source.GetAccount(), _("Never"));
+				entry["Reason"] = d->GetReason();
+				list.AddEntry(entry);
+				++shown;
+			}
+
+			if (!shown)
+			{
+				source.Reply(_("There are no forbids of type \002{0}\002."), subcommand.upper());
+				return;
+			}
+
+			source.Reply(_("Forbid list:"));
+
+			std::vector<Anope::string> replies;
+			list.Process(replies);
+
+			for (unsigned i = 0; i < replies.size(); ++i)
+				source.Reply(replies[i]);
+
+			if (shown >= forbids.size())
+				source.Reply(_("End of forbid list."));
+			else
+				source.Reply(_("End of forbid list - \002{0}\002/\002{1}\002 entries shown."), shown, forbids.size());
 		}
 		else
 			this->OnSyntaxError(source, command);
@@ -438,8 +454,8 @@ class OSForbid : public Module
 	, public EventHook<Event::CheckKick>
 	, public EventHook<Event::PreCommand>
 {
-	MyForbidService forbidService;
-	Serialize::Type forbiddata_type;
+	MyForbidService forbid_service;
+	ForbidDataType type;
 	CommandOSForbid commandosforbid;
 
  public:
@@ -448,11 +464,10 @@ class OSForbid : public Module
 		, EventHook<Event::UserNickChange>("OnUserNickChange")
 		, EventHook<Event::CheckKick>("OnCheckKick")
 		, EventHook<Event::PreCommand>("OnPreCommand")
-		, forbidService(this)
-		, forbiddata_type("ForbidData", ForbidDataImpl::Unserialize)
+		, forbid_service(this)
+		, type(this)
 		, commandosforbid(this)
 	{
-
 	}
 
 	void OnUserConnect(User *u, bool &exempt) override
@@ -470,17 +485,17 @@ class OSForbid : public Module
 
 	EventReturn OnCheckKick(User *u, Channel *c, Anope::string &mask, Anope::string &reason) override
 	{
-		BotInfo *OperServ = Config->GetClient("OperServ");
+		ServiceBot *OperServ = Config->GetClient("OperServ");
 		if (u->HasMode("OPER") || !OperServ)
 			return EVENT_CONTINUE;
 
-		ForbidData *d = this->forbidService.FindForbid(c->name, FT_CHAN);
+		ForbidData *d = this->forbid_service.FindForbid(c->name, FT_CHAN);
 		if (d != NULL)
 		{
 			if (IRCD->CanSQLineChannel)
 			{
 				time_t inhabit = Config->GetModule("chanserv")->Get<time_t>("inhabit", "15s");
-				XLine x(c->name, OperServ->nick, Anope::CurTime + inhabit, d->reason);
+				XLine x(c->name, OperServ->nick, Anope::CurTime + inhabit, d->GetReason());
 				IRCD->SendSQLine(NULL, &x);
 			}
 			else if (ChanServ::service)
@@ -488,7 +503,7 @@ class OSForbid : public Module
 				ChanServ::service->Hold(c);
 			}
 
-			reason = Anope::printf(Language::Translate(u, _("This channel has been forbidden: %s")), d->reason.c_str());
+			reason = Anope::printf(Language::Translate(u, _("This channel has been forbidden: %s")), d->GetReason().c_str());
 
 			return EVENT_STOP;
 		}
@@ -500,25 +515,25 @@ class OSForbid : public Module
 	{
 		if (command->name == "nickserv/info" && params.size() > 0)
 		{
-			ForbidData *d = this->forbidService.FindForbid(params[0], FT_NICK);
+			ForbidData *d = this->forbid_service.FindForbid(params[0], FT_NICK);
 			if (d != NULL)
 			{
 				if (source.IsOper())
-					source.Reply(_("Nick \002%s\002 is forbidden by %s: %s"), params[0].c_str(), d->creator.c_str(), d->reason.c_str());
+					source.Reply(_("Nick \002%s\002 is forbidden by %s: %s"), params[0], d->GetCreator(), d->GetReason());
 				else
-					source.Reply(_("Nick \002%s\002 is forbidden."), params[0].c_str());
+					source.Reply(_("Nick \002%s\002 is forbidden."), params[0]);
 				return EVENT_STOP;
 			}
 		}
 		else if (command->name == "chanserv/info" && params.size() > 0)
 		{
-			ForbidData *d = this->forbidService.FindForbid(params[0], FT_CHAN);
+			ForbidData *d = this->forbid_service.FindForbid(params[0], FT_CHAN);
 			if (d != NULL)
 			{
 				if (source.IsOper())
-					source.Reply(_("Channel \002%s\002 is forbidden by %s: %s"), params[0].c_str(), d->creator.c_str(), d->reason.c_str());
+					source.Reply(_("Channel \002%s\002 is forbidden by %s: %s"), params[0], d->GetCreator(), d->GetReason());
 				else
-					source.Reply(_("Channel \002%s\002 is forbidden."), params[0].c_str());
+					source.Reply(_("Channel \002%s\002 is forbidden."), params[0]);
 				return EVENT_STOP;
 			}
 		}
@@ -526,14 +541,14 @@ class OSForbid : public Module
 			return EVENT_CONTINUE;
 		else if (command->name == "nickserv/register" && params.size() > 1)
 		{
-			ForbidData *d = this->forbidService.FindForbid(source.GetNick(), FT_REGISTER);
+			ForbidData *d = this->forbid_service.FindForbid(source.GetNick(), FT_REGISTER);
 			if (d != NULL)
 			{
 				source.Reply(_("\002{0}\002 may not be registered."), source.GetNick());
 				return EVENT_STOP;
 			}
 
-			d = this->forbidService.FindForbid(params[1], FT_EMAIL);
+			d = this->forbid_service.FindForbid(params[1], FT_EMAIL);
 			if (d != NULL)
 			{
 				source.Reply(_("Your email address is not allowed, choose a different one."));
@@ -542,7 +557,7 @@ class OSForbid : public Module
 		}
 		else if (command->name == "nickserv/set/email" && params.size() > 0)
 		{
-			ForbidData *d = this->forbidService.FindForbid(params[0], FT_EMAIL);
+			ForbidData *d = this->forbid_service.FindForbid(params[0], FT_EMAIL);
 			if (d != NULL)
 			{
 				source.Reply(_("Your email address is not allowed, choose a different one."));
@@ -551,7 +566,7 @@ class OSForbid : public Module
 		}
 		else if (command->name == "chanserv/register" && !params.empty())
 		{
-			ForbidData *d = this->forbidService.FindForbid(params[0], FT_REGISTER);
+			ForbidData *d = this->forbid_service.FindForbid(params[0], FT_REGISTER);
 			if (d != NULL)
 			{
 				source.Reply(_("Channel \002{0}\002 is currently suspended."), params[0]);

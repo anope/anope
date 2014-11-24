@@ -28,13 +28,13 @@ class CommandNSInfo : public Command
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 
-		const Anope::string &nick = params.size() ? params[0] : (source.nc ? source.nc->display : source.GetNick());
+		const Anope::string &nick = params.size() ? params[0] : (source.nc ? source.nc->GetDisplay() : source.GetNick());
 		NickServ::Nick *na = NickServ::FindNick(nick);
 		bool has_auspex = source.HasPriv("nickserv/auspex");
 
 		if (!na)
 		{
-			if (BotInfo::Find(nick, true))
+			if (ServiceBot::Find(nick, true))
 				source.Reply(_("\002{0}\002 is part of this Network's Services."), nick);
 			else
 				source.Reply(_("\002{0}\002 isn't registered."), nick);
@@ -44,62 +44,62 @@ class CommandNSInfo : public Command
 		bool nick_online = false, show_hidden = false;
 
 		/* Is the real owner of the nick we're looking up online? -TheShadow */
-		User *u2 = User::Find(na->nick);
-		if (u2 && u2->Account() == na->nc)
+		User *u2 = User::Find(na->GetNick());
+		if (u2 && u2->Account() == na->GetAccount())
 		{
 			nick_online = true;
-			na->last_seen = Anope::CurTime;
+			na->SetLastSeen(Anope::CurTime);
 		}
 
-		if (has_auspex || na->nc == source.GetAccount())
+		if (has_auspex || na->GetAccount() == source.GetAccount())
 			show_hidden = true;
 
-		source.Reply(_("\002{0}\002 is \002{1}\002"), na->nick, na->last_realname);
+		source.Reply(_("\002{0}\002 is \002{1}\002"), na->GetNick(), na->GetLastRealname());
 
-		if (na->nc->HasExt("UNCONFIRMED"))
-			source.Reply(_("\002{0}\002 has not confirmed their account."), na->nick);
+		if (na->GetAccount()->HasFieldS("UNCONFIRMED"))
+			source.Reply(_("\002{0}\002 has not confirmed their account."), na->GetNick());
 
-		if (na->nc->IsServicesOper() && (show_hidden || !na->nc->HasExt("HIDE_STATUS")))
-			source.Reply(_("\002{0}\002 is a Services Operator of type \002{0}\002."), na->nick, na->nc->o->ot->GetName());
+		if (na->GetAccount()->IsServicesOper() && (show_hidden || !na->GetAccount()->HasFieldS("HIDE_STATUS")))
+			source.Reply(_("\002{0}\002 is a Services Operator of type \002{0}\002."), na->GetNick(), na->GetAccount()->o->GetType()->GetName());
 
 		InfoFormatter info(source.nc);
 
 		if (nick_online)
 		{
 			bool shown = false;
-			if (show_hidden && !na->last_realhost.empty())
+			if (show_hidden && !na->GetLastRealhost().empty())
 			{
-				info[_("Online from")] = na->last_realhost;
+				info[_("Online from")] = na->GetLastRealhost();
 				shown = true;
 			}
-			if ((show_hidden || !na->nc->HasExt("HIDE_MASK")) && (!shown || na->last_usermask != na->last_realhost))
-				info[_("Online from")] = na->last_usermask;
+			if ((show_hidden || !na->GetAccount()->HasFieldS("HIDE_MASK")) && (!shown || na->GetLastUsermask() != na->GetLastRealhost()))
+				info[_("Online from")] = na->GetLastUsermask();
 			else
-				source.Reply(_("\002{0}\002 is currently online."), na->nick);
+				source.Reply(_("\002{0}\002 is currently online."), na->GetNick());
 		}
 		else
 		{
 			Anope::string shown;
-			if (show_hidden || !na->nc->HasExt("HIDE_MASK"))
+			if (show_hidden || !na->GetAccount()->HasFieldS("HIDE_MASK"))
 			{
-				info[_("Last seen address")] = na->last_usermask;
-				shown = na->last_usermask;
+				info[_("Last seen address")] = na->GetLastUsermask();
+				shown = na->GetLastUsermask();
 			}
 
-			if (show_hidden && !na->last_realhost.empty() && na->last_realhost != shown)
-				info[_("Last seen address")] = na->last_realhost;
+			if (show_hidden && !na->GetLastRealhost().empty() && na->GetLastRealhost() != shown)
+				info[_("Last seen address")] = na->GetLastRealhost();
 		}
 
-		info[_("Registered")] = Anope::strftime(na->time_registered, source.GetAccount());
+		info[_("Registered")] = Anope::strftime(na->GetTimeRegistered(), source.GetAccount());
 
 		if (!nick_online)
-			info[_("Last seen")] = Anope::strftime(na->last_seen, source.GetAccount());
+			info[_("Last seen")] = Anope::strftime(na->GetLastSeen(), source.GetAccount());
 
-		if (!na->last_quit.empty() && (show_hidden || !na->nc->HasExt("HIDE_QUIT")))
-			info[_("Last quit message")] = na->last_quit;
+		if (!na->GetLastQuit().empty() && (show_hidden || !na->GetAccount()->HasFieldS("HIDE_QUIT")))
+			info[_("Last quit message")] = na->GetLastQuit();
 
-		if (!na->nc->email.empty() && (show_hidden || !na->nc->HasExt("HIDE_EMAIL")))
-			info[_("Email address")] = na->nc->email;
+		if (!na->GetAccount()->GetEmail().empty() && (show_hidden || !na->GetAccount()->HasFieldS("HIDE_EMAIL")))
+			info[_("Email address")] = na->GetAccount()->GetEmail();
 
 		if (show_hidden)
 		{
@@ -153,13 +153,13 @@ class CommandNSSetHide : public Command
 			return;
 		}
 
-		const NickServ::Nick *na = NickServ::FindNick(user);
+		NickServ::Nick *na = NickServ::FindNick(user);
 		if (!na)
 		{
 			source.Reply(_("\002{0}\002 isn't registered."), user);
 			return;
 		}
-		NickServ::Account *nc = na->nc;
+		NickServ::Account *nc = na->GetAccount();
 
 		EventReturn MOD_RESULT = Event::OnSetNickOption(&Event::SetNickOption::OnSetNickOption, source, this, nc, param);
 		if (MOD_RESULT == EVENT_STOP)
@@ -199,15 +199,15 @@ class CommandNSSetHide : public Command
 
 		if (arg.equals_ci("ON"))
 		{
-			Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to change hide " << param.upper() << " to " << arg.upper() << " for " << nc->display;
-			nc->Extend<bool>(flag);
-			source.Reply(onmsg, nc->display, source.service->nick);
+			Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to change hide " << param.upper() << " to " << arg.upper() << " for " << nc->GetDisplay();
+			nc->SetS<bool>(flag, true);
+			source.Reply(onmsg, nc->GetDisplay(), source.service->nick);
 		}
 		else if (arg.equals_ci("OFF"))
 		{
-			Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to change hide " << param.upper() << " to " << arg.upper() << " for " << nc->display;
-			nc->Shrink<bool>(flag);
-			source.Reply(offmsg, nc->display, source.service->nick);
+			Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to change hide " << param.upper() << " to " << arg.upper() << " for " << nc->GetDisplay();
+			nc->UnsetS<bool>(flag);
+			source.Reply(offmsg, nc->GetDisplay(), source.service->nick);
 		}
 		else
 			this->OnSyntaxError(source, "HIDE");
@@ -215,7 +215,7 @@ class CommandNSSetHide : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
-		this->Run(source, source.nc->display, params[0], params[1]);
+		this->Run(source, source.nc->GetDisplay(), params[0], params[1]);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &) override
@@ -261,7 +261,7 @@ class NSInfo : public Module
 
 	EventHandlers<Event::NickInfo> onnickinfo;
 
-	SerializableExtensibleItem<bool> hide_email, hide_usermask, hide_status, hide_quit;
+	Serialize::Field<NickServ::Account, bool> hide_email, hide_usermask, hide_status, hide_quit;
 
  public:
 	NSInfo(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
@@ -269,10 +269,10 @@ class NSInfo : public Module
 		, commandnssethide(this)
 		, commandnssasethide(this)
 		, onnickinfo(this, "OnNickInfo")
-		, hide_email(this, "HIDE_EMAIL")
-		, hide_usermask(this, "HIDE_MASK")
-		, hide_status(this, "HIDE_STATUS")
-		, hide_quit(this, "HIDE_QUIT")
+		, hide_email(this, NickServ::account, "HIDE_EMAIL")
+		, hide_usermask(this, NickServ::account, "HIDE_MASK")
+		, hide_status(this, NickServ::account, "HIDE_STATUS")
+		, hide_quit(this, NickServ::account, "HIDE_QUIT")
 	{
 
 	}

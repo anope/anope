@@ -26,15 +26,13 @@ class CommandBSBotList : public Command
 
 		list.AddColumn(_("Nick")).AddColumn(_("Mask"));
 
-		for (botinfo_map::const_iterator it = BotListByNick->begin(), it_end = BotListByNick->end(); it != it_end; ++it)
+		for (ServiceBot *bi : Serialize::GetObjects<ServiceBot *>(botinfo))
 		{
-			BotInfo *bi = it->second;
-
-			if (source.HasPriv("botserv/administration") || !bi->oper_only)
+			if (source.HasPriv("botserv/administration") || !bi->bi->GetOperOnly())
 			{
 				++count;
 				ListFormatter::ListEntry entry;
-				entry["Nick"] = (bi->oper_only ? "* " : "") + bi->nick;
+				entry["Nick"] = (bi->bi->GetOperOnly() ? "* " : "") + bi->nick;
 				entry["Mask"] = bi->GetIdent() + "@" + bi->host;
 				list.AddEntry(entry);
 			}
@@ -59,7 +57,7 @@ class CommandBSBotList : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
-		BotInfo *bi;
+		ServiceBot *bi;
 		Anope::string name;
 		Command::FindCommandFromService("botserv/assign", bi, name);
 		if (!bi)

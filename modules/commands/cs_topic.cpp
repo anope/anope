@@ -48,21 +48,21 @@ class CommandCSSetKeepTopic : public Command
 
 		if (MOD_RESULT != EVENT_ALLOW && !source.AccessFor(ci).HasPriv("SET") && source.permission.empty() && !source.HasPriv("chanserv/administration"))
 		{
-			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "SET", ci->name);
+			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "SET", ci->GetName());
 			return;
 		}
 
 		if (param.equals_ci("ON"))
 		{
 			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to enable keeptopic";
-			ci->Extend<bool>("KEEPTOPIC");
-			source.Reply(_("Topic retention option for \002{0}\002 is now \002on\002."), ci->name);
+			ci->SetS<bool>("KEEPTOPIC", true);
+			source.Reply(_("Topic retention option for \002{0}\002 is now \002on\002."), ci->GetName());
 		}
 		else if (param.equals_ci("OFF"))
 		{
 			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to disable keeptopic";
-			ci->Shrink<bool>("KEEPTOPIC");
-			source.Reply(_("Topic retention option for \002{0}\002 is now \002off\002."), ci->name);
+			ci->UnsetS<bool>("KEEPTOPIC");
+			source.Reply(_("Topic retention option for \002{0}\002 is now \002off\002."), ci->GetName());
 		}
 		else
 			this->OnSyntaxError(source, "KEEPTOPIC");
@@ -95,7 +95,7 @@ class CommandCSTopic : public Command
 			return;
 
 		topiclock->Set(ci, true);
-		source.Reply(_("Topic lock option for \002{0}\002 is now \002on\002."), ci->name);
+		source.Reply(_("Topic lock option for \002{0}\002 is now \002on\002."), ci->GetName());
 	}
 
 	void Unlock(CommandSource &source, ChanServ::Channel *ci, const std::vector<Anope::string> &params)
@@ -112,7 +112,7 @@ class CommandCSTopic : public Command
 			return;
 
 		topiclock->Unset(ci);
-		source.Reply(_("Topic lock option for \002{0}\002 is now \002off\002."), ci->name);
+		source.Reply(_("Topic lock option for \002{0}\002 is now \002off\002."), ci->GetName());
 	}
 
 	void Set(CommandSource &source, ChanServ::Channel *ci, const std::vector<Anope::string> &params)
@@ -123,7 +123,7 @@ class CommandCSTopic : public Command
 		topiclock->Unset(ci);
 		ci->c->ChangeTopic(source.GetNick(), topic, Anope::CurTime);
 		if (has_topiclock)
-			topiclock->Set(ci);
+			topiclock->Set(ci, true);
 
 		bool override = !source.AccessFor(ci).HasPriv("TOPIC");
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << (!topic.empty() ? "to change the topic to: " : "to unset the topic") << (!topic.empty() ? topic : "");
@@ -137,14 +137,14 @@ class CommandCSTopic : public Command
 		if (!ci->c->topic.empty())
 		{
 			new_topic = ci->c->topic + " " + topic;
-			ci->last_topic.clear();
+			ci->SetLastTopic("");
 		}
 		else
 			new_topic = topic;
 
 		std::vector<Anope::string> new_params;
 		new_params.push_back("SET");
-		new_params.push_back(ci->name);
+		new_params.push_back(ci->GetName());
 		new_params.push_back(new_topic);
 
 		this->Set(source, ci, new_params);
@@ -169,13 +169,13 @@ class CommandCSTopic : public Command
 		if (ci == NULL)
 			source.Reply(_("Channel \002{0}\002 isn't registered."), channel);
 		else if (!source.AccessFor(ci).HasPriv("TOPIC") && !source.HasCommand("chanserv/topic"))
-			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "TOPIC", ci->name);
+			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "TOPIC", ci->GetName());
 		else if (subcmd.equals_ci("LOCK"))
 			this->Lock(source, ci, params);
 		else if (subcmd.equals_ci("UNLOCK"))
 			this->Unlock(source, ci, params);
 		else if (!ci->c)
-			source.Reply(_("Channel \002{0}\002 doesn't exist."), ci->name);
+			source.Reply(_("Channel \002{0}\002 doesn't exist."), ci->GetName());
 		else if (subcmd.equals_ci("SET"))
 			this->Set(source, ci, params);
 		else if (subcmd.equals_ci("APPEND") && params.size() > 2)
@@ -207,7 +207,7 @@ class CSTopic : public Module
 	CommandCSTopic commandcstopic;
 	CommandCSSetKeepTopic commandcssetkeeptopic;
 
-	SerializableExtensibleItem<bool> topiclock, keeptopic;
+	/*Serializable*/ExtensibleItem<bool> topiclock, keeptopic;
 
  public:
 	CSTopic(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
@@ -227,9 +227,9 @@ class CSTopic : public Module
 		if (c->ci)
 		{
 			/* Update channel topic */
-			if ((topiclock.HasExt(c->ci) || keeptopic.HasExt(c->ci)) && c->ci->last_topic != c->topic)
+			if ((topiclock.HasExt(c->ci) || keeptopic.HasExt(c->ci)) && c->ci->GetLastTopic() != c->topic)
 			{
-				c->ChangeTopic(!c->ci->last_topic_setter.empty() ? c->ci->last_topic_setter : c->ci->WhoSends()->nick, c->ci->last_topic, c->ci->last_topic_time ? c->ci->last_topic_time : Anope::CurTime);
+				c->ChangeTopic(!c->ci->GetLastTopicSetter().empty() ? c->ci->GetLastTopicSetter() : c->ci->WhoSends()->nick, c->ci->GetLastTopic(), c->ci->GetLastTopicTime() ? c->ci->GetLastTopicTime() : Anope::CurTime);
 			}
 		}
 	}
@@ -244,15 +244,15 @@ class CSTopic : public Module
 		 * This desyncs what is really set with what we have stored, and we end up resetting the topic often when
 		 * it is not required
 		 */
-		if (topiclock.HasExt(c->ci) && c->ci->last_topic != c->topic)
+		if (topiclock.HasExt(c->ci) && c->ci->GetLastTopic() != c->topic)
 		{
-			c->ChangeTopic(c->ci->last_topic_setter, c->ci->last_topic, c->ci->last_topic_time);
+			c->ChangeTopic(c->ci->GetLastTopicSetter(), c->ci->GetLastTopic(), c->ci->GetLastTopicTime());
 		}
 		else
 		{
-			c->ci->last_topic = c->topic;
-			c->ci->last_topic_setter = c->topic_setter;
-			c->ci->last_topic_time = c->topic_ts;
+			c->ci->SetLastTopic(c->topic);
+			c->ci->SetLastTopicSetter(c->topic_setter);
+			c->ci->SetLastTopicTime(c->topic_ts);
 		}
 	}
 
@@ -263,12 +263,11 @@ class CSTopic : public Module
 		if (topiclock.HasExt(ci))
 			info.AddOption(_("Topic lock"));
 
-		ModeLocks *ml = ci->GetExt<ModeLocks>("modelocks");
-		const ModeLock *secret = ml ? ml->GetMLock("SECRET") : NULL;
-		if (!ci->last_topic.empty() && (show_all || ((!secret || secret->set == false) && (!ci->c || !ci->c->HasMode("SECRET")))))
+		ModeLock *secret = mlocks ? mlocks->GetMLock(ci, "SECRET") : nullptr;
+		if (!ci->GetLastTopic().empty() && (show_all || ((!secret || secret->GetSet() == false) && (!ci->c || !ci->c->HasMode("SECRET")))))
 		{
-			info[_("Last topic")] = ci->last_topic;
-			info[_("Topic set by")] = ci->last_topic_setter;
+			info[_("Last topic")] = ci->GetLastTopic();
+			info[_("Topic set by")] = ci->GetLastTopicSetter();
 		}
 	}
 };

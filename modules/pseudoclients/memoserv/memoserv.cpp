@@ -14,8 +14,12 @@
 #include "modules/help.h"
 #include "modules/bs_bot.h"
 #include "modules/memoserv.h"
-#include "memoinfo.h"
-#include "memo.h"
+//#include "memoinfo.h"
+//#include "memo.h"
+//#include "ignore.h"
+#include "memotype.h"
+#include "memoinfotype.h"
+#include "ignoretype.h"
 
 class MemoServCore : public Module, public MemoServ::MemoServService
 	, public EventHook<Event::NickCoreCreate>
@@ -27,26 +31,29 @@ class MemoServCore : public Module, public MemoServ::MemoServService
 	, public EventHook<Event::NickUpdate>
 	, public EventHook<Event::Help>
 {
-	Reference<BotInfo> MemoServ;
+	Reference<ServiceBot> MemoServ;
 	EventHandlers<MemoServ::Event::MemoSend> onmemosend;
 	EventHandlers<MemoServ::Event::MemoDel> onmemodel;
-	Serialize::Type memo_type;
+
+	MemoInfoType memoinfo_type;
+	MemoType memo_type;
+	IgnoreType ignore_type;
 
 	bool SendMemoMail(NickServ::Account *nc, MemoServ::MemoInfo *mi, MemoServ::Memo *m)
 	{
 		Anope::string subject = Language::Translate(nc, Config->GetBlock("mail")->Get<const Anope::string>("memo_subject").c_str()),
 			message = Language::Translate(Config->GetBlock("mail")->Get<const Anope::string>("memo_message").c_str());
 
-		subject = subject.replace_all_cs("%n", nc->display);
-		subject = subject.replace_all_cs("%s", m->sender);
+		subject = subject.replace_all_cs("%n", nc->GetDisplay());
+		subject = subject.replace_all_cs("%s", m->GetSender());
 		subject = subject.replace_all_cs("%d", stringify(mi->GetIndex(m) + 1));
-		subject = subject.replace_all_cs("%t", m->text);
+		subject = subject.replace_all_cs("%t", m->GetText());
 		subject = subject.replace_all_cs("%N", Config->GetBlock("networkinfo")->Get<const Anope::string>("networkname"));
 
-		message = message.replace_all_cs("%n", nc->display);
-		message = message.replace_all_cs("%s", m->sender);
+		message = message.replace_all_cs("%n", nc->GetDisplay());
+		message = message.replace_all_cs("%s", m->GetSender());
 		message = message.replace_all_cs("%d", stringify(mi->GetIndex(m) + 1));
-		message = message.replace_all_cs("%t", m->text);
+		message = message.replace_all_cs("%t", m->GetText());
 		message = message.replace_all_cs("%N", Config->GetBlock("networkinfo")->Get<const Anope::string>("networkname"));
 
 		return Mail::Send(nc, subject, message);
@@ -65,7 +72,9 @@ class MemoServCore : public Module, public MemoServ::MemoServService
 		, EventHook<Event::Help>("OnHelp")
 		, onmemosend(this, "OnMemoSend")
 		, onmemodel(this, "OnMemoDel")
-		, memo_type("Memo", MemoImpl::Unserialize)
+		, memoinfo_type(this)
+		, memo_type(this)
+		, ignore_type(this)
 	{
 	}
 
@@ -83,9 +92,9 @@ class MemoServCore : public Module, public MemoServ::MemoServService
 			time_t send_delay = Config->GetModule("memoserv")->Get<time_t>("senddelay");
 			if (send_delay > 0 && sender->lastmemosend + send_delay > Anope::CurTime)
 				return MEMO_TOO_FAST;
-			else if (!mi->memomax)
+			else if (!mi->GetMemoMax())
 				return MEMO_TARGET_FULL;
-			else if (mi->memomax > 0 && mi->memos->size() >= static_cast<unsigned>(mi->memomax))
+			else if (mi->GetMemoMax() > 0 && mi->GetMemos().size() >= static_cast<unsigned>(mi->GetMemoMax()))
 				return MEMO_TARGET_FULL;
 			else if (mi->HasIgnore(sender))
 				return MEMO_SUCCESS;
@@ -94,13 +103,12 @@ class MemoServCore : public Module, public MemoServ::MemoServService
 		if (sender != NULL)
 			sender->lastmemosend = Anope::CurTime;
 
-		MemoServ::Memo *m = new MemoImpl();
-		mi->memos->push_back(m);
-		m->owner = target;
-		m->sender = source;
-		m->time = Anope::CurTime;
-		m->text = message;
-		m->unread = true;
+		MemoServ::Memo *m = new MemoImpl(&memo_type);
+		m->SetMemoInfo(mi);
+		m->SetSender(source);
+		m->SetTime(Anope::CurTime);
+		m->SetText(message);
+		m->SetUnread(true);
 
 		this->onmemosend(&MemoServ::Event::MemoSend::OnMemoSend, source, target, mi, m);
 
@@ -116,29 +124,22 @@ class MemoServCore : public Module, public MemoServ::MemoServService
 
 					if (ci->AccessFor(cu->user).HasPriv("MEMO"))
 					{
-						if (cu->user->Account() && cu->user->Account()->HasExt("MEMO_RECEIVE"))
-							cu->user->SendMessage(*MemoServ, _("There is a new memo on channel \002{0}\002. Type \002{1}{2} READ {3} {4}\002 to read it."), ci->name, Config->StrictPrivmsg, MemoServ->nick, ci->name, mi->memos->size()); // XXX
+						if (cu->user->Account() && cu->user->Account()->HasFieldS("MEMO_RECEIVE"))
+							cu->user->SendMessage(*MemoServ, _("There is a new memo on channel \002{0}\002. Type \002{1}{2} READ {3} {4}\002 to read it."), ci->GetName(), Config->StrictPrivmsg, MemoServ->nick, ci->GetName(), mi->GetMemos().size()); // XXX
 					}
 				}
 			}
 		}
 		else
 		{
-			NickServ::Account *nc = NickServ::FindNick(target)->nc;
+			NickServ::Account *nc = NickServ::FindNick(target)->GetAccount();
 
-			if (nc->HasExt("MEMO_RECEIVE"))
-			{
-				for (unsigned i = 0; i < nc->aliases->size(); ++i)
-				{
-					const NickServ::Nick *na = nc->aliases->at(i);
-					User *user = User::Find(na->nick);
-					if (user && user->IsIdentified())
-						user->SendMessage(*MemoServ, _("You have a new memo from \002{0}\002. Type \002{1}{2} READ {3}\002 to read it."), source, Config->StrictPrivmsg, MemoServ->nick, mi->memos->size());//XXX
-				}
-			}
+			if (nc->HasFieldS("MEMO_RECEIVE"))
+				for (User *u : nc->users)
+					u->SendMessage(*MemoServ, _("You have a new memo from \002{0}\002. Type \002{1}{2} READ {3}\002 to read it."), source, Config->StrictPrivmsg, MemoServ->nick, mi->GetMemos().size());//XXX
 
 			/* let's get out the mail if set in the nickcore - certus */
-			if (nc->HasExt("MEMO_MAIL"))
+			if (nc->HasFieldS("MEMO_MAIL"))
 				SendMemoMail(nc, mi, m);
 		}
 
@@ -147,28 +148,34 @@ class MemoServCore : public Module, public MemoServ::MemoServService
 
 	void Check(User *u) override
 	{
-		const NickServ::Account *nc = u->Account();
-		if (!nc || !nc->memos)
+		NickServ::Account *nc = u->Account();
+		if (!nc || !nc->GetMemos())
 			return;
 
-		unsigned i = 0, end = nc->memos->memos->size(), newcnt = 0;
+		auto memos = nc->GetMemos()->GetMemos();
+		unsigned i = 0, end = memos.size(), newcnt = 0;
 		for (; i < end; ++i)
-			if (nc->memos->GetMemo(i)->unread)
+			if (memos[i]->GetUnread())
 				++newcnt;
 		if (newcnt > 0)
 			u->SendMessage(*MemoServ, newcnt == 1 ? _("You have 1 new memo.") : _("You have %d new memos."), newcnt);
-		if (nc->memos->memomax > 0 && nc->memos->memos->size() >= static_cast<unsigned>(nc->memos->memomax))
+		if (nc->GetMemos()->GetMemoMax() > 0 && memos.size() >= static_cast<unsigned>(nc->GetMemos()->GetMemoMax()))
 		{
-			if (nc->memos->memos->size() > static_cast<unsigned>(nc->memos->memomax))
-				u->SendMessage(*MemoServ, _("You are over your maximum number of memos (%d). You will be unable to receive any new memos until you delete some of your current ones."), nc->memos->memomax);
+			if (memos.size() > static_cast<unsigned>(nc->GetMemos()->GetMemoMax()))
+				u->SendMessage(*MemoServ, _("You are over your maximum number of memos (%d). You will be unable to receive any new memos until you delete some of your current ones."), nc->GetMemos()->GetMemoMax());
 			else
-				u->SendMessage(*MemoServ, _("You have reached your maximum number of memos (%d). You will be unable to receive any new memos until you delete some of your current ones."), nc->memos->memomax);
+				u->SendMessage(*MemoServ, _("You have reached your maximum number of memos (%d). You will be unable to receive any new memos until you delete some of your current ones."), nc->GetMemos()->GetMemoMax());
 		}
 	}
 
 	MemoServ::Memo *CreateMemo() override
 	{
-		return new MemoImpl();
+		return new MemoImpl(&memo_type);
+	}
+
+	MemoServ::Ignore *CreateIgnore() override
+	{
+		return new IgnoreImpl(&ignore_type);
 	}
 
 	MemoServ::MemoInfo *GetMemoInfo(const Anope::string &target, bool &is_registered, bool &ischan, bool create) override
@@ -180,9 +187,12 @@ class MemoServCore : public Module, public MemoServ::MemoServService
 			if (ci != NULL)
 			{
 				is_registered = true;
-				if (create && !ci->memos)
-					ci->memos = new MemoInfoImpl();
-				return ci->memos;
+				if (create && !ci->GetMemos())
+				{
+					MemoServ::MemoInfo *mi = new MemoInfoImpl(&memoinfo_type);
+					mi->SetOwner(ci);
+				}
+				return ci->GetMemos();
 			}
 			else
 				is_registered = false;
@@ -194,9 +204,12 @@ class MemoServCore : public Module, public MemoServ::MemoServService
 			if (na != NULL)
 			{
 				is_registered = true;
-				if (create && !na->nc->memos)
-					na->nc->memos = new MemoInfoImpl();
-				return na->nc->memos;
+				if (create && !na->GetAccount()->GetMemos())
+				{
+					MemoServ::MemoInfo *mi = new MemoInfoImpl(&memoinfo_type);
+					mi->SetOwner(na->GetAccount());
+				}
+				return na->GetAccount()->GetMemos();
 			}
 			else
 				is_registered = false;
@@ -212,7 +225,7 @@ class MemoServCore : public Module, public MemoServ::MemoServService
 		if (msnick.empty())
 			throw ConfigException(Module::name + ": <client> must be defined");
 
-		BotInfo *bi = BotInfo::Find(msnick, true);
+		ServiceBot *bi = ServiceBot::Find(msnick, true);
 		if (!bi)
 			throw ConfigException(Module::name + ": no bot named " + msnick);
 
@@ -221,17 +234,19 @@ class MemoServCore : public Module, public MemoServ::MemoServService
 
 	void OnNickCoreCreate(NickServ::Account *nc) override
 	{
-		nc->memos = new MemoInfoImpl();
-		nc->memos->memomax = Config->GetModule(this)->Get<int>("maxmemos");
+		MemoServ::MemoInfo *mi = new MemoInfoImpl(&memoinfo_type);
+		mi->SetOwner(mi);
+		mi->SetMemoMax(Config->GetModule(this)->Get<int>("maxmemos"));
 	}
 
 	void OnCreateChan(ChanServ::Channel *ci) override
 	{
-		ci->memos = new MemoInfoImpl();
-		ci->memos->memomax = Config->GetModule(this)->Get<int>("maxmemos");
+		MemoServ::MemoInfo *mi = new MemoInfoImpl(&memoinfo_type);
+		mi->SetOwner(ci);
+		mi->SetMemoMax(Config->GetModule(this)->Get<int>("maxmemos"));
 	}
 
-	void OnBotDelete(BotInfo *bi) override
+	void OnBotDelete(ServiceBot *bi) override
 	{
 		if (bi == MemoServ)
 			MemoServ = NULL;
@@ -244,12 +259,12 @@ class MemoServCore : public Module, public MemoServ::MemoServService
 
 	void OnJoinChannel(User *u, Channel *c) override
 	{
-		if (c->ci && c->ci->memos && !c->ci->memos->memos->empty() && c->ci->AccessFor(u).HasPriv("MEMO"))
+		if (u->server && u->server->IsSynced() && c->ci && c->ci->GetMemos() && !c->ci->GetMemos()->GetMemos().empty() && c->ci->AccessFor(u).HasPriv("MEMO"))
 		{
-			if (c->ci->memos->memos->size() == 1)
-				u->SendMessage(*MemoServ, _("There is \002%d\002 memo on channel %s."), c->ci->memos->memos->size(), c->ci->name.c_str());
+			if (c->ci->GetMemos()->GetMemos().size() == 1)
+				u->SendMessage(*MemoServ, _("There is \002{0}\002 memo on channel \002{1}\002."), c->ci->GetMemos()->GetMemos().size(), c->ci->GetName());
 			else
-				u->SendMessage(*MemoServ, _("There are \002%d\002 memos on channel %s."), c->ci->memos->memos->size(), c->ci->name.c_str());
+				u->SendMessage(*MemoServ, _("There are \002{0}\002 memos on channel \002{1}\002."), c->ci->GetMemos()->GetMemos().size(), c->ci->GetName());
 		}
 	}
 

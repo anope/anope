@@ -21,7 +21,7 @@ namespace Global
 		 * @param source The sender of the global
 		 * @param message The message
 		 */
-		virtual void SendGlobal(BotInfo *sender, const Anope::string &source, const Anope::string &message) anope_abstract;
+		virtual void SendGlobal(ServiceBot *sender, const Anope::string &source, const Anope::string &message) anope_abstract;
 	};
 	static ServiceReference<GlobalService> service("GlobalService", "Global");
 }

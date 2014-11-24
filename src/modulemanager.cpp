@@ -327,6 +327,8 @@ ModuleReturn ModuleManager::DeleteModule(Module *m)
 	if (!m || !m->handle)
 		return MOD_ERR_PARAMS;
 
+	Serialize::Unregister(m);
+
 	void *handle = m->handle;
 	Anope::string filename = m->filename;
 

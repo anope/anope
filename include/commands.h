@@ -15,13 +15,14 @@
 #include "anope.h"
 #include "channels.h"
 #include "language.h"
+#include "modules/nickserv.h"// XXX clang
 
 struct CommandGroup
 {
 	Anope::string name, description;
 };
 
-/* Used in BotInfo::commands */
+/* Used in ServiceBot::commands */
 struct CommandInfo
 {
 	typedef Anope::map<CommandInfo> map;
@@ -66,13 +67,13 @@ class CoreExport CommandSource
 	/* Channel the command was executed on (fantasy) */
 	Reference<Channel> c;
 	/* The service this command is on */
-	Reference<BotInfo> service;
+	Reference<ServiceBot> service;
 	/* The actual name of the command being executed */
 	Anope::string command;
 	/* The permission of the command being executed */
 	Anope::string permission;
 
-	CommandSource(const Anope::string &n, User *user, NickServ::Account *core, CommandReply *reply, BotInfo *bi);
+	CommandSource(const Anope::string &n, User *user, NickServ::Account *core, CommandReply *reply, ServiceBot *bi);
 
 	const Anope::string &GetNick() const;
 	User *GetUser();
@@ -185,6 +186,6 @@ class CoreExport Command : public Service
 	 * @param name If found, is set to the comand name, eg REGISTER
 	 * @return true if the given command service exists
 	 */
-	static bool FindCommandFromService(const Anope::string &command_service, BotInfo* &bi, Anope::string &name);
+	static bool FindCommandFromService(const Anope::string &command_service, ServiceBot* &bi, Anope::string &name);
 };
 

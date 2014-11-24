@@ -50,7 +50,7 @@ class IdentifyInterface : public LDAPInterface
 				o = new Oper(u->nick, ot);
 				my_opers.insert(o);
 				nc->o = o;
-				Log(this->owner) << "m_ldap_oper: Tied " << u->nick << " (" << nc->display << ") to opertype " << ot->GetName();
+				Log(this->owner) << "m_ldap_oper: Tied " << u->nick << " (" << nc->GetDisplay() << ") to opertype " << ot->GetName();
 			}
 		}
 		catch (const LDAPException &ex)
@@ -64,7 +64,7 @@ class IdentifyInterface : public LDAPInterface
 				}
 				nc->o = NULL;
 
-				Log() << "Removed services operator from " << u->nick << " (" << nc->display << ")";
+				Log() << "Removed services operator from " << u->nick << " (" << nc->GetDisplay() << ")";
 			}
 		}
 	}
@@ -121,8 +121,8 @@ class LDAPOper : public Module
 				throw LDAPException("Could not search LDAP for opertype settings, invalid configuration.");
 
 			if (!this->binddn.empty())
-				this->ldap->Bind(NULL, this->binddn.replace_all_cs("%a", u->Account()->display), this->password.c_str());
-			LDAPQuery id = this->ldap->Search(&this->iinterface, this->basedn, this->filter.replace_all_cs("%a", u->Account()->display));
+				this->ldap->Bind(NULL, this->binddn.replace_all_cs("%a", u->Account()->GetDisplay()), this->password.c_str());
+			LDAPQuery id = this->ldap->Search(&this->iinterface, this->basedn, this->filter.replace_all_cs("%a", u->Account()->GetDisplay()));
 			this->iinterface.Add(id, u->nick);
 		}
 		catch (const LDAPException &ex)

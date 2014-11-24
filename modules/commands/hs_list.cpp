@@ -57,22 +57,20 @@ class CommandHSList : public Command
 		ListFormatter list(source.GetAccount());
 		list.AddColumn(_("Number")).AddColumn(_("Nick")).AddColumn(_("Vhost")).AddColumn(_("Creator")).AddColumn(_("Created"));
 
-		for (auto& it : NickServ::service->GetNickList())
+		for (NickServ::Nick *na : NickServ::service->GetNickList())
 		{
-			const NickServ::Nick *na = it.second;
-
 			if (!na->HasVhost())
 				continue;
 
 			if (!key.empty() && key[0] != '#')
 			{
-				if ((Anope::Match(na->nick, key) || Anope::Match(na->GetVhostHost(), key)) && display_counter < listmax)
+				if ((Anope::Match(na->GetNick(), key) || Anope::Match(na->GetVhostHost(), key)) && display_counter < listmax)
 				{
 					++display_counter;
 
 					ListFormatter::ListEntry entry;
 					entry["Number"] = stringify(display_counter);
-					entry["Nick"] = na->nick;
+					entry["Nick"] = na->GetNick();
 					if (!na->GetVhostIdent().empty())
 						entry["Vhost"] = na->GetVhostIdent() + "@" + na->GetVhostHost();
 					else
@@ -93,7 +91,7 @@ class CommandHSList : public Command
 					++display_counter;
 					ListFormatter::ListEntry entry;
 					entry["Number"] = stringify(display_counter);
-					entry["Nick"] = na->nick;
+					entry["Nick"] = na->GetNick();
 					if (!na->GetVhostIdent().empty())
 						entry["Vhost"] = na->GetVhostIdent() + "@" + na->GetVhostHost();
 					else

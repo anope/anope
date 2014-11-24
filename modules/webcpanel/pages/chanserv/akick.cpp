@@ -35,8 +35,8 @@ bool WebCPanel::ChanServ::Akick::OnRequest(HTTPProvider *server, const Anope::st
 		return true;
 	}
 
-	::ChanServ::AccessGroup u_access = ci->AccessFor(na->nc);
-	bool has_priv = na->nc->IsServicesOper() && na->nc->o->ot->HasPriv("chanserv/access/modify");
+	::ChanServ::AccessGroup u_access = ci->AccessFor(na->GetAccount());
+	bool has_priv = na->GetAccount()->IsServicesOper() && na->GetAccount()->o->GetType()->HasPriv("chanserv/access/modify");
 
 	if (!u_access.HasPriv("AKICK") && !has_priv)
 	{
@@ -50,22 +50,22 @@ bool WebCPanel::ChanServ::Akick::OnRequest(HTTPProvider *server, const Anope::st
 	if (message.get_data["del"].empty() == false && message.get_data["mask"].empty() == false)
 	{
 		std::vector<Anope::string> params;
-		params.push_back(ci->name);
+		params.push_back(ci->GetName());
 		params.push_back("DEL");
 		params.push_back(message.get_data["mask"]);
 
-		WebPanel::RunCommand(na->nc->display, na->nc, "ChanServ", "chanserv/akick", params, replacements);
+		WebPanel::RunCommand(na->GetAccount()->GetDisplay(), na->GetAccount(), "ChanServ", "chanserv/akick", params, replacements);
 	}
 	else if (message.post_data["mask"].empty() == false)
 	{
 		std::vector<Anope::string> params;
-		params.push_back(ci->name);
+		params.push_back(ci->GetName());
 		params.push_back("ADD");
 		params.push_back(message.post_data["mask"]);
 		if (message.post_data["reason"].empty() == false)
 			params.push_back(message.post_data["reason"]);
 
-		WebPanel::RunCommand(na->nc->display, na->nc, "ChanServ", "chanserv/akick", params, replacements);
+		WebPanel::RunCommand(na->GetAccount()->GetDisplay(), na->GetAccount(), "ChanServ", "chanserv/akick", params, replacements);
 	}
 
 	replacements["ESCAPED_CHANNEL"] = HTTPUtils::URLEncode(chname);
@@ -74,12 +74,12 @@ bool WebCPanel::ChanServ::Akick::OnRequest(HTTPProvider *server, const Anope::st
 	{
 		AutoKick *ak = ci->GetAkick(i);
 
-		if (ak->nc)
-			replacements["MASKS"] = HTTPUtils::Escape(ak->nc->display);
+		if (ak->GetAccount())
+			replacements["MASKS"] = HTTPUtils::Escape(ak->GetAccount()->GetDisplay());
 		else
-			replacements["MASKS"] = HTTPUtils::Escape(ak->mask);
-		replacements["CREATORS"] = HTTPUtils::Escape(ak->creator);
-		replacements["REASONS"] = HTTPUtils::Escape(ak->reason);
+			replacements["MASKS"] = HTTPUtils::Escape(ak->GetMask());
+		replacements["CREATORS"] = HTTPUtils::Escape(ak->GetCreator());
+		replacements["REASONS"] = HTTPUtils::Escape(ak->GetReason());
 	}
 
 	Page.Serve(server, page_name, client, message, reply, replacements);

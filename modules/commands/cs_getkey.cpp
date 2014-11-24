@@ -33,21 +33,21 @@ class CommandCSGetKey : public Command
 
 		if (!source.AccessFor(ci).HasPriv("GETKEY") && !source.HasCommand("chanserv/getkey"))
 		{
-			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "GETKEY", ci->name);
+			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "GETKEY", ci->GetName());
 			return;
 		}
 
 		Anope::string key;
 		if (!ci->c || !ci->c->GetParam("KEY", key))
 		{
-			source.Reply(_("Channel \002{0}\002 does not have a key."), ci->name);
+			source.Reply(_("Channel \002{0}\002 does not have a key."), ci->GetName());
 			return;
 		}
 
 		bool override = !source.AccessFor(ci).HasPriv("GETKEY");
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci);
 
-		source.Reply(_("Key for channel \002{0}\002 is \002{1}\002."), ci->name, key);
+		source.Reply(_("Key for channel \002{0}\002 is \002{1}\002."), ci->GetName(), key);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override

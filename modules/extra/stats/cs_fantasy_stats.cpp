@@ -114,7 +114,7 @@ class CSStats : public Module
 				else
 				{
 					if (NickServ::Nick *na = NickServ::FindNick(params[0]))
-						display = na->nc->display;
+						display = na->GetAccount()->GetDisplay();
 					else
 					{
 						source.Reply(_("%s not found."), params[0].c_str());
@@ -125,7 +125,7 @@ class CSStats : public Module
 		}
 
 		if (display.empty())
-			display = source.nc->display;
+			display = source.nc->GetDisplay();
 
 		try
 		{

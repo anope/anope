@@ -291,7 +291,7 @@ time_t Anope::DoTime(const Anope::string &s)
 	return amount;
 }
 
-Anope::string Anope::Duration(time_t t, const NickServ::Account *nc)
+Anope::string Anope::Duration(time_t t, NickServ::Account *nc)
 {
 	/* We first calculate everything */
 	time_t years = t / 31536000;
@@ -332,7 +332,7 @@ Anope::string Anope::Duration(time_t t, const NickServ::Account *nc)
 	}
 }
 
-Anope::string Anope::strftime(time_t t, const NickServ::Account *nc, bool short_output)
+Anope::string Anope::strftime(time_t t, NickServ::Account *nc, bool short_output)
 {
 	tm tm = *localtime(&t);
 	char buf[BUFSIZE];
@@ -347,7 +347,7 @@ Anope::string Anope::strftime(time_t t, const NickServ::Account *nc, bool short_
 		return Anope::string(buf) + " " + Language::Translate(nc, _("(now)"));
 }
 
-Anope::string Anope::Expires(time_t expires, const NickServ::Account *nc)
+Anope::string Anope::Expires(time_t expires, NickServ::Account *nc)
 {
 	if (!expires)
 		return Language::Translate(nc, _("does not expire"));

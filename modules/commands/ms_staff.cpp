@@ -28,13 +28,9 @@ class CommandMSStaff : public Command
 
 		const Anope::string &text = params[0];
 
-		for (auto& it : NickServ::service->GetAccountList())
-		{
-			const NickServ::Account *nc = it.second;
-
+		for (NickServ::Account *nc : NickServ::service->GetAccountList())
 			if (source.nc != nc && nc->IsServicesOper())
-				MemoServ::service->Send(source.GetNick(), nc->display, text, true);
-		}
+				MemoServ::service->Send(source.GetNick(), nc->GetDisplay(), text, true);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override

@@ -101,21 +101,21 @@ class CommandCSSetAutoOp : public Command
 
 		if (MOD_RESULT != EVENT_ALLOW && !source.AccessFor(ci).HasPriv("SET") && source.permission.empty() && !source.HasPriv("chanserv/administration"))
 		{
-			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "SET", ci->name);
+			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "SET", ci->GetName());
 			return;
 		}
 
 		if (params[1].equals_ci("ON"))
 		{
 			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to enable autoop";
-			ci->Shrink<bool>("NOAUTOOP");
-			source.Reply(_("Services will now automatically give modes to users in \002{0}\002."), ci->name);
+			ci->UnsetS<bool>("NOAUTOOP");
+			source.Reply(_("Services will now automatically give modes to users in \002{0}\002."), ci->GetName());
 		}
 		else if (params[1].equals_ci("OFF"))
 		{
 			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to disable autoop";
-			ci->Extend<bool>("NOAUTOOP");
-			source.Reply(_("Services will no longer automatically give modes to users in \002{0}\002."), ci->name);
+			ci->SetS<bool>("NOAUTOOP", true);
+			source.Reply(_("Services will no longer automatically give modes to users in \002{0}\002."), ci->GetName());
 		}
 		else
 			this->OnSyntaxError(source, "AUTOOP");
@@ -161,7 +161,7 @@ class CommandCSSetBanType : public Command
 
 		if (MOD_RESULT != EVENT_ALLOW && !source.AccessFor(ci).HasPriv("SET") && source.permission.empty() && !source.HasPriv("chanserv/administration"))
 		{
-			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "SET", ci->name);
+			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "SET", ci->GetName());
 			return;
 		}
 
@@ -171,8 +171,8 @@ class CommandCSSetBanType : public Command
 			if (new_type < 0 || new_type > 3)
 				throw ConvertException("Invalid range");
 			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to change the ban type to " << new_type;
-			ci->bantype = new_type;
-			source.Reply(_("Ban type for channel \002{0}\002 is now \002#{1}\002."), ci->name, ci->bantype);
+			ci->SetBanType(new_type);
+			source.Reply(_("Ban type for channel \002{0}\002 is now \002#{1}\002."), ci->GetName(), new_type);
 		}
 		catch (const ConvertException &)
 		{
@@ -228,21 +228,20 @@ class CommandCSSetDescription : public Command
 
 		if (MOD_RESULT != EVENT_ALLOW && !source.AccessFor(ci).HasPriv("SET") && source.permission.empty() && !source.HasPriv("chanserv/administration"))
 		{
-			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "SET", ci->name);
+			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "SET", ci->GetName());
 			return;
 		}
 
+		ci->SetDesc(param);
 		if (!param.empty())
 		{
-			ci->desc = param;
-			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to change the description to " << ci->desc;
-			source.Reply(_("Description of \002{0}\002 changed to \002{1}\002."), ci->name, ci->desc);
+			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to change the description to " << ci->GetDesc();
+			source.Reply(_("Description of \002{0}\002 changed to \002{1}\002."), ci->GetName(), ci->GetDesc());
 		}
 		else
 		{
-			ci->desc.clear();
 			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to unset the description";
-			source.Reply(_("Description of \002{0}\002 unset."), ci->name);
+			source.Reply(_("Description of \002{0}\002 unset."), ci->GetName());
 		}
 	}
 
@@ -285,32 +284,32 @@ class CommandCSSetFounder : public Command
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
-		if (MOD_RESULT != EVENT_ALLOW && (ci->HasExt("SECUREFOUNDER") ? !source.IsFounder(ci) : !source.AccessFor(ci).HasPriv("FOUNDER")) && source.permission.empty() && !source.HasPriv("chanserv/administration"))
+		if (MOD_RESULT != EVENT_ALLOW && (ci->HasFieldS("SECUREFOUNDER") ? !source.IsFounder(ci) : !source.AccessFor(ci).HasPriv("FOUNDER")) && source.permission.empty() && !source.HasPriv("chanserv/administration"))
 		{
-			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "FOUNDER", ci->name);
+			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "FOUNDER", ci->GetName());
 			return;
 		}
 
-		const NickServ::Nick *na = NickServ::FindNick(param);
+		NickServ::Nick *na = NickServ::FindNick(param);
 		if (!na)
 		{
 			source.Reply(_("\002{0}\002 isn't registered."), param);
 			return;
 		}
 
-		NickServ::Account *nc = na->nc;
+		NickServ::Account *nc = na->GetAccount();
 		unsigned max_reg = Config->GetModule("chanserv")->Get<unsigned>("maxregistered");
-		if (max_reg && nc->channelcount >= max_reg && !source.HasPriv("chanserv/no-register-limit"))
+		if (max_reg && nc->GetChannelCount() >= max_reg && !source.HasPriv("chanserv/no-register-limit"))
 		{
-			source.Reply(_("\002{0}\002 has too many channels registered."), na->nick);
+			source.Reply(_("\002{0}\002 has too many channels registered."), na->GetNick());
 			return;
 		}
 
-		Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to change the founder from " << (ci->GetFounder() ? ci->GetFounder()->display : "(none)") << " to " << nc->display;
+		Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to change the founder from " << (ci->GetFounder() ? ci->GetFounder()->GetDisplay() : "(none)") << " to " << nc->GetDisplay();
 
 		ci->SetFounder(nc);
 
-		source.Reply(_("Founder of \002{0}\002 changed to \002{1}\002."), ci->name, na->nick);
+		source.Reply(_("Founder of \002{0}\002 changed to \002{1}\002."), ci->GetName(), na->GetNick());
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &) override
@@ -350,30 +349,37 @@ class CommandCSSetKeepModes : public Command
 		}
 
 		EventReturn MOD_RESULT;
-		MOD_RESULT = Event::OnSetChannelOption(&Event::SetChannelOption::OnSetChannelOption, source, this, ci, params[1]);
+		MOD_RESULT = Event::OnSetChannelOption(&Event::SetChannelOption::OnSetChannelOption, source, this, ci, param);
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
 		if (MOD_RESULT != EVENT_ALLOW && !source.AccessFor(ci).HasPriv("SET") && source.permission.empty() && !source.HasPriv("chanserv/administration"))
 		{
-			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "SET", ci->name);
+			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "SET", ci->GetName());
 			return;
 		}
 
-		if (params[1].equals_ci("ON"))
+		if (param.equals_ci("ON"))
 		{
 			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to enable keep modes";
-			ci->Extend<bool>("CS_KEEP_MODES");
-			source.Reply(_("Keep modes for \002{0}\002 is now \002on\002."), ci->name);
+			ci->SetS<bool>("CS_KEEP_MODES", true);
+			source.Reply(_("Keep modes for \002{0}\002 is now \002on\002."), ci->GetName());
 			if (ci->c)
-				ci->last_modes = ci->c->GetModes();
+				for (const std::pair<Anope::string, Anope::string> &p : ci->c->GetModes())
+				{
+					ChanServ::Mode *mode = ChanServ::mode.Create();
+					mode->SetChannel(ci);
+					mode->SetMode(p.first);
+					mode->SetParam(p.second);
+				}
 		}
-		else if (params[1].equals_ci("OFF"))
+		else if (param.equals_ci("OFF"))
 		{
 			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to disable keep modes";
-			ci->Shrink<bool>("CS_KEEP_MODES");
-			source.Reply(_("Keep modes for \002{0}\002 is now \002off\002."), ci->name);
-			ci->last_modes.clear();
+			ci->UnsetS<bool>("CS_KEEP_MODES");
+			source.Reply(_("Keep modes for \002{0}\002 is now \002off\002."), ci->GetName());
+			for (ChanServ::Mode *m : ci->GetRefs<ChanServ::Mode *>(ChanServ::mode))
+				m->Delete();
 		}
 		else
 			this->OnSyntaxError(source, "KEEPMODES");
@@ -420,21 +426,21 @@ class CommandCSSetPeace : public Command
 
 		if (MOD_RESULT != EVENT_ALLOW && !source.AccessFor(ci).HasPriv("SET") && source.permission.empty() && !source.HasPriv("chanserv/administration"))
 		{
-			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "SET", ci->name);
+			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "SET", ci->GetName());
 			return;
 		}
 
 		if (param.equals_ci("ON"))
 		{
 			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to enable peace";
-			ci->Extend<bool>("PEACE");
-			source.Reply(_("Peace option for \002{0}\002 is now \002on\002."), ci->name);
+			ci->SetS<bool>("PEACE", true);
+			source.Reply(_("Peace option for \002{0}\002 is now \002on\002."), ci->GetName());
 		}
 		else if (param.equals_ci("OFF"))
 		{
 			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to disable peace";
-			ci->Shrink<bool>("PEACE");
-			source.Reply(_("Peace option for \002{0}\002 is now \002off\002."), ci->name);
+			ci->UnsetS<bool>("PEACE");
+			source.Reply(_("Peace option for \002{0}\002 is now \002off\002."), ci->GetName());
 		}
 		else
 			this->OnSyntaxError(source, "PEACE");
@@ -490,7 +496,7 @@ class CommandCSSetPersist : public Command
 
 		if (MOD_RESULT != EVENT_ALLOW && !source.AccessFor(ci).HasPriv("SET") && source.permission.empty() && !source.HasPriv("chanserv/administration"))
 		{
-			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "SET", ci->name);
+			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "SET", ci->GetName());
 			return;
 		}
 
@@ -498,19 +504,19 @@ class CommandCSSetPersist : public Command
 
 		if (params[1].equals_ci("ON"))
 		{
-			if (!ci->HasExt("PERSIST"))
+			if (!ci->HasFieldS("PERSIST"))
 			{
-				ci->Extend<bool>("PERSIST");
+				ci->SetS<bool>("PERSIST", true);
 
 				/* Channel doesn't exist, create it */
 				if (!ci->c)
 				{
 					bool created;
-					Channel *c = Channel::FindOrCreate(ci->name, created);
-					if (ci->bi)
+					Channel *c = Channel::FindOrCreate(ci->GetName(), created);
+					if (ci->GetBot())
 					{
 						ChannelStatus status(BotModes());
-						ci->bi->Join(c, &status);
+						ci->GetBot()->Join(c, &status);
 					}
 					if (created)
 						c->Sync();
@@ -522,16 +528,15 @@ class CommandCSSetPersist : public Command
 					if (ci->c && !ci->c->HasMode("PERM"))
 						ci->c->SetMode(NULL, cm);
 					/* Add it to the channels mlock */
-					ModeLocks *ml = ci->Require<ModeLocks>("modelocks");
-					if (ml)
-						ml->SetMLock(cm, true, "", source.GetNick());
+					if (mlocks)
+						mlocks->SetMLock(ci, cm, true, "", source.GetNick());
 				}
 				/* No botserv bot, no channel mode, give them ChanServ.
 				 * Yes, this works fine with no BotServ.
 				 */
-				else if (!ci->bi)
+				else if (!ci->GetBot())
 				{
-					BotInfo *ChanServ = Config->GetClient("ChanServ");
+					ServiceBot *ChanServ = Config->GetClient("ChanServ");
 					if (!ChanServ)
 					{
 						source.Reply(_("ChanServ is required to enable persist on this network."));
@@ -548,15 +553,15 @@ class CommandCSSetPersist : public Command
 			}
 
 			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to enable persist";
-			source.Reply(_("Channel \002{0}\002 is now persistent."), ci->name);
+			source.Reply(_("Channel \002{0}\002 is now persistent."), ci->GetName());
 		}
 		else if (params[1].equals_ci("OFF"))
 		{
-			if (ci->HasExt("PERSIST"))
+			if (ci->HasFieldS("PERSIST"))
 			{
-				ci->Shrink<bool>("PERSIST");
+				ci->UnsetS<bool>("PERSIST");
 
-				BotInfo *ChanServ = Config->GetClient("ChanServ"),
+				ServiceBot *ChanServ = Config->GetClient("ChanServ"),
 					*BotServ = Config->GetClient("BotServ");
 
 				/* Unset perm mode */
@@ -565,14 +570,13 @@ class CommandCSSetPersist : public Command
 					if (ci->c && ci->c->HasMode("PERM"))
 						ci->c->RemoveMode(NULL, cm);
 					/* Remove from mlock */
-					ModeLocks *ml = ci->GetExt<ModeLocks>("modelocks");
-					if (ml)
-						ml->RemoveMLock(cm, true);
+					if (mlocks)
+						mlocks->RemoveMLock(ci, cm, true);
 				}
 				/* No channel mode, no BotServ, but using ChanServ as the botserv bot
 				 * which was assigned when persist was set on
 				 */
-				else if (!cm && !BotServ && ci->bi)
+				else if (!cm && !BotServ && ci->GetBot())
 				{
 					if (!ChanServ)
 					{
@@ -586,7 +590,7 @@ class CommandCSSetPersist : public Command
 			}
 
 			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to disable persist";
-			source.Reply(_("Channel \002{0}\002 is no longer persistent."), ci->name);
+			source.Reply(_("Channel \002{0}\002 is no longer persistent."), ci->GetName());
 		}
 		else
 			this->OnSyntaxError(source, "PERSIST");
@@ -634,21 +638,21 @@ class CommandCSSetRestricted : public Command
 
 		if (MOD_RESULT != EVENT_ALLOW && !source.AccessFor(ci).HasPriv("SET") && source.permission.empty() && !source.HasPriv("chanserv/administration"))
 		{
-			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "SET", ci->name);
+			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "SET", ci->GetName());
 			return;
 		}
 
 		if (param.equals_ci("ON"))
 		{
 			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to enable restricted";
-			ci->Extend<bool>("RESTRICTED");
-			source.Reply(_("Restricted access option for \002{0}\002 is now \002on\002."), ci->name);
+			ci->SetS<bool>("RESTRICTED", true);
+			source.Reply(_("Restricted access option for \002{0}\002 is now \002on\002."), ci->GetName());
 		}
 		else if (param.equals_ci("OFF"))
 		{
 			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to disable restricted";
-			ci->Shrink<bool>("RESTRICTED");
-			source.Reply(_("Restricted access option for \002{0}\002 is now \002off\002."), ci->name);
+			ci->UnsetS<bool>("RESTRICTED");
+			source.Reply(_("Restricted access option for \002{0}\002 is now \002off\002."), ci->GetName());
 		}
 		else
 			this->OnSyntaxError(source, "RESTRICTED");
@@ -695,21 +699,21 @@ class CommandCSSetSecure : public Command
 
 		if (MOD_RESULT != EVENT_ALLOW && !source.AccessFor(ci).HasPriv("SET") && source.permission.empty() && !source.HasPriv("chanserv/administration"))
 		{
-			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "SET", ci->name);
+			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "SET", ci->GetName());
 			return;
 		}
 
 		if (param.equals_ci("ON"))
 		{
 			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to enable secure";
-			ci->Extend<bool>("CS_SECURE");
-			source.Reply(_("Secure option for \002{0}\002 is now \002on\002."), ci->name);
+			ci->SetS<bool>("CS_SECURE", true);
+			source.Reply(_("Secure option for \002{0}\002 is now \002on\002."), ci->GetName());
 		}
 		else if (param.equals_ci("OFF"))
 		{
 			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to disable secure";
-			ci->Shrink<bool>("CS_SECURE");
-			source.Reply(_("Secure option for \002{0}\002 is now \002off\002."), ci->name);
+			ci->UnsetS<bool>("CS_SECURE");
+			source.Reply(_("Secure option for \002{0}\002 is now \002off\002."), ci->GetName());
 		}
 		else
 			this->OnSyntaxError(source, "SECURE");
@@ -755,23 +759,23 @@ class CommandCSSetSecureFounder : public Command
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
-		if (MOD_RESULT != EVENT_ALLOW && (ci->HasExt("SECUREFOUNDER") ? !source.IsFounder(ci) : !source.AccessFor(ci).HasPriv("FOUNDER")) && source.permission.empty() && !source.HasPriv("chanserv/administration"))
+		if (MOD_RESULT != EVENT_ALLOW && (ci->HasFieldS("SECUREFOUNDER") ? !source.IsFounder(ci) : !source.AccessFor(ci).HasPriv("FOUNDER")) && source.permission.empty() && !source.HasPriv("chanserv/administration"))
 		{
-			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "FOUNDER", ci->name);
+			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "FOUNDER", ci->GetName());
 			return;
 		}
 
 		if (param.equals_ci("ON"))
 		{
 			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to enable secure founder";
-			ci->Extend<bool>("SECUREFOUNDER");
-			source.Reply(_("Secure founder option for \002{0}\002 is now \002on\002."), ci->name);
+			ci->SetS<bool>("SECUREFOUNDER", true);
+			source.Reply(_("Secure founder option for \002{0}\002 is now \002on\002."), ci->GetName());
 		}
 		else if (param.equals_ci("OFF"))
 		{
 			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to disable secure founder";
-			ci->Shrink<bool>("SECUREFOUNDER");
-			source.Reply(_("Secure founder option for \002{0}\002 is now \002off\002."), ci->name);
+			ci->UnsetS<bool>("SECUREFOUNDER");
+			source.Reply(_("Secure founder option for \002{0}\002 is now \002off\002."), ci->GetName());
 		}
 		else
 			this->OnSyntaxError(source, "SECUREFOUNDER");
@@ -823,21 +827,21 @@ class CommandCSSetSecureOps : public Command
 
 		if (MOD_RESULT != EVENT_ALLOW && !source.AccessFor(ci).HasPriv("SET") && source.permission.empty() && !source.HasPriv("chanserv/administration"))
 		{
-			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "SET", ci->name);
+			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "SET", ci->GetName());
 			return;
 		}
 
 		if (param.equals_ci("ON"))
 		{
 			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to enable secure ops";
-			ci->Extend<bool>("SECUREOPS");
-			source.Reply(_("Secure ops option for \002{0}\002 is now \002on\002."), ci->name);
+			ci->SetS<bool>("SECUREOPS", true);
+			source.Reply(_("Secure ops option for \002{0}\002 is now \002on\002."), ci->GetName());
 		}
 		else if (param.equals_ci("OFF"))
 		{
 			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to disable secure ops";
-			ci->Shrink<bool>("SECUREOPS");
-			source.Reply(_("Secure ops option for \002{0}\002 is now \002off\002."), ci->name);
+			ci->UnsetS<bool>("SECUREOPS");
+			source.Reply(_("Secure ops option for \002{0}\002 is now \002off\002."), ci->GetName());
 		}
 		else
 			this->OnSyntaxError(source, "SECUREOPS");
@@ -885,29 +889,29 @@ class CommandCSSetSignKick : public Command
 
 		if (MOD_RESULT != EVENT_ALLOW && !source.AccessFor(ci).HasPriv("SET") && source.permission.empty() && !source.HasPriv("chanserv/administration"))
 		{
-			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "SET", ci->name);
+			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "SET", ci->GetName());
 			return;
 		}
 
 		if (param.equals_ci("ON"))
 		{
-			ci->Extend<bool>("SIGNKICK");
-			ci->Shrink<bool>("SIGNKICK_LEVEL");
-			source.Reply(_("Signed kick option for \002{0}\002 is now \002on\002."), ci->name);
+			ci->SetS<bool>("SIGNKICK", true);
+			ci->UnsetS<bool>("SIGNKICK_LEVEL");
+			source.Reply(_("Signed kick option for \002{0}\002 is now \002on\002."), ci->GetName());
 			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to enable sign kick";
 		}
 		else if (param.equals_ci("LEVEL"))
 		{
-			ci->Extend<bool>("SIGNKICK_LEVEL");
-			ci->Shrink<bool>("SIGNKICK");
-			source.Reply(_("Signed kick option for \002{0}\002 is now \002on\002, but depends of the privileges of the user that is using the command."), ci->name);
+			ci->SetS<bool>("SIGNKICK_LEVEL", true);
+			ci->UnsetS<bool>("SIGNKICK");
+			source.Reply(_("Signed kick option for \002{0}\002 is now \002on\002, but depends of the privileges of the user that is using the command."), ci->GetName());
 			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to enable sign kick level";
 		}
 		else if (param.equals_ci("OFF"))
 		{
-			ci->Shrink<bool>("SIGNKICK");
-			ci->Shrink<bool>("SIGNKICK_LEVEL");
-			source.Reply(_("Signed kick option for \002{0}\002 is now \002off\002."), ci->name);
+			ci->UnsetS<bool>("SIGNKICK");
+			ci->UnsetS<bool>("SIGNKICK_LEVEL");
+			source.Reply(_("Signed kick option for \002{0}\002 is now \002off\002."), ci->GetName());
 			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to disable sign kick";
 		}
 		else
@@ -956,9 +960,9 @@ class CommandCSSetSuccessor : public Command
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
-		if (MOD_RESULT != EVENT_ALLOW && (ci->HasExt("SECUREFOUNDER") ? !source.IsFounder(ci) : !source.AccessFor(ci).HasPriv("FOUNDER")) && source.permission.empty() && !source.HasPriv("chanserv/administration"))
+		if (MOD_RESULT != EVENT_ALLOW && (ci->HasFieldS("SECUREFOUNDER") ? !source.IsFounder(ci) : !source.AccessFor(ci).HasPriv("FOUNDER")) && source.permission.empty() && !source.HasPriv("chanserv/administration"))
 		{
-			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "FOUNDER", ci->name);
+			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "FOUNDER", ci->GetName());
 			return;
 		}
 
@@ -966,7 +970,7 @@ class CommandCSSetSuccessor : public Command
 
 		if (!param.empty())
 		{
-			const NickServ::Nick *na = NickServ::FindNick(param);
+			NickServ::Nick *na = NickServ::FindNick(param);
 
 			if (!na)
 			{
@@ -974,25 +978,25 @@ class CommandCSSetSuccessor : public Command
 				return;
 			}
 
-			if (na->nc == ci->GetFounder())
+			if (na->GetAccount() == ci->GetFounder())
 			{
-				source.Reply(_("\002{0}\002 cannot be the successor of channel \002{1}\002 as they are the founder."), na->nick, ci->name);
+				source.Reply(_("\002{0}\002 cannot be the successor of channel \002{1}\002 as they are the founder."), na->GetNick(), ci->GetName());
 				return;
 			}
 
-			nc = na->nc;
+			nc = na->GetAccount();
 		}
 		else
 			nc = NULL;
 
-		Log(!source.permission.empty() ? LOG_ADMIN : LOG_COMMAND, source, this, ci) << "to change the successor from " << (ci->GetSuccessor() ? ci->GetSuccessor()->display : "(none)") << " to " << (nc ? nc->display : "(none)");
+		Log(!source.permission.empty() ? LOG_ADMIN : LOG_COMMAND, source, this, ci) << "to change the successor from " << (ci->GetSuccessor() ? ci->GetSuccessor()->GetDisplay() : "(none)") << " to " << (nc ? nc->GetDisplay() : "(none)");
 
 		ci->SetSuccessor(nc);
 
 		if (nc)
-			source.Reply(_("Successor for \002{0}\002 changed to \002{1}\002."), ci->name, nc->display);
+			source.Reply(_("Successor for \002{0}\002 changed to \002{1}\002."), ci->GetName(), nc->GetDisplay());
 		else
-			source.Reply(_("Successor for \002{0}\002 unset."), ci->name);
+			source.Reply(_("Successor for \002{0}\002 unset."), ci->GetName());
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &) override
@@ -1033,21 +1037,21 @@ class CommandCSSetNoexpire : public Command
 
 		if (source.permission.empty() && !source.AccessFor(ci).HasPriv("SET"))
 		{
-			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "SET", ci->name);
+			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "SET", ci->GetName());
 			return;
 		}
 
-		if (params[1].equals_ci("ON"))
+		if (param.equals_ci("ON"))
 		{
 			Log(LOG_ADMIN, source, this, ci) << "to enable noexpire";
-			ci->Extend<bool>("CS_NO_EXPIRE");
-			source.Reply(_("Channel \002{0} will not\002 expire."), ci->name);
+			ci->SetS<bool>("CS_NO_EXPIRE", true);
+			source.Reply(_("Channel \002{0} will not\002 expire."), ci->GetName());
 		}
-		else if (params[1].equals_ci("OFF"))
+		else if (param.equals_ci("OFF"))
 		{
 			Log(LOG_ADMIN, source, this, ci) << "to disable noexpire";
-			ci->Shrink<bool>("CS_NO_EXPIRE");
-			source.Reply(_("Channel \002{0} will\002 expire."), ci->name);
+			ci->UnsetS<bool>("CS_NO_EXPIRE");
+			source.Reply(_("Channel \002{0} will\002 expire."), ci->GetName());
 		}
 		else
 			this->OnSyntaxError(source, "NOEXPIRE");
@@ -1074,97 +1078,8 @@ class CSSet : public Module
 	, public EventHook<ChanServ::Event::PreChanExpire>
 	, public EventHook<Event::ChanInfo>
 {
-	SerializableExtensibleItem<bool> noautoop, peace, securefounder,
-		restricted, secure, secureops, signkick, signkick_level, noexpire;
-
-	struct KeepModes : SerializableExtensibleItem<bool>
-	{
-		KeepModes(Module *m, const Anope::string &n) : SerializableExtensibleItem<bool>(m, n) { }
-
-		void ExtensibleSerialize(const Extensible *e, const Serializable *s, Serialize::Data &data) const override
-		{
-			SerializableExtensibleItem<bool>::ExtensibleSerialize(e, s, data);
-
-			if (s->GetSerializableType()->GetName() != "ChannelInfo")
-				return;
-
-			const ChanServ::Channel *ci = anope_dynamic_static_cast<const ChanServ::Channel *>(s);
-			Anope::string modes;
-			for (Channel::ModeList::const_iterator it = ci->last_modes.begin(); it != ci->last_modes.end(); ++it)
-			{
-				if (!modes.empty())
-					modes += " ";
-				modes += it->first;
-				if (!it->second.empty())
-					modes += "," + it->second;
-			}
-			data["last_modes"] << modes;
-		}
-
-		void ExtensibleUnserialize(Extensible *e, Serializable *s, Serialize::Data &data) override
-		{
-			SerializableExtensibleItem<bool>::ExtensibleUnserialize(e, s, data);
-
-			if (s->GetSerializableType()->GetName() != "ChannelInfo")
-				return;
-
-			ChanServ::Channel *ci = anope_dynamic_static_cast<ChanServ::Channel *>(s);
-			Anope::string modes;
-			data["last_modes"] >> modes;
-			for (spacesepstream sep(modes); sep.GetToken(modes);)
-			{
-				size_t c = modes.find(',');
-				if (c == Anope::string::npos)
-					ci->last_modes.insert(std::make_pair(modes, ""));
-				else
-					ci->last_modes.insert(std::make_pair(modes.substr(0, c), modes.substr(c + 1)));
-			}
-		}
-	} keep_modes;
-
-	struct Persist : SerializableExtensibleItem<bool>
-	{
-		Persist(Module *m, const Anope::string &n) : SerializableExtensibleItem<bool>(m, n) { }
-
-		void ExtensibleUnserialize(Extensible *e, Serializable *s, Serialize::Data &data) override
-		{
-			SerializableExtensibleItem<bool>::ExtensibleUnserialize(e, s, data);
-
-			if (s->GetSerializableType()->GetName() != "ChanServ::Channel" || !this->HasExt(e))
-				return;
-
-			ChanServ::Channel *ci = anope_dynamic_static_cast<ChanServ::Channel *>(s);
-			if (ci->c)
-				return;
-
-			bool created;
-			Channel *c = Channel::FindOrCreate(ci->name, created);
-
-			ChannelMode *cm = ModeManager::FindChannelModeByName("PERM");
-			if (cm)
-			{
-				c->SetMode(NULL, cm);
-			}
-			else
-			{
-				if (!ci->bi)
-				{
-					BotInfo *ChanServ = Config->GetClient("ChanServ");
-					if (ChanServ)
-						ChanServ->Assign(NULL, ci);
-				}
-
-				if (ci->bi && !c->FindUser(ci->bi))
-				{
-					ChannelStatus status(BotModes());
-					ci->bi->Join(c, &status);
-				}
-			}
-
-			if (created)
-				c->Sync();
-		}
-	} persist;
+	Serialize::Field<ChanServ::Channel, bool> noautoop, peace, securefounder,
+		restricted, secure, secureops, signkick, signkick_level, noexpire, keep_modes, persist;
 
 	CommandCSSet commandcsset;
 	CommandCSSetAutoOp commandcssetautoop;
@@ -1198,17 +1113,18 @@ class CSSet : public Module
 		, EventHook<Event::SetCorrectModes>("OnSetCorrectModes")
 		, EventHook<ChanServ::Event::PreChanExpire>("OnPreChanExpire")
 		, EventHook<Event::ChanInfo>("OnChanInfo")
-		, noautoop(this, "NOAUTOOP")
-		, peace(this, "PEACE")
-		, securefounder(this, "SECUREFOUNDER")
-		, restricted(this, "RESTRICTED")
-		, secure(this, "CS_SECURE")
-		, secureops(this, "SECUREOPS")
-		, signkick(this, "SIGNKICK")
-		, signkick_level(this, "SIGNKICK_LEVEL")
-		, noexpire(this, "CS_NO_EXPIRE")
-		, keep_modes(this, "CS_KEEP_MODES")
-		, persist(this, "PERSIST")
+
+		, noautoop(this, ChanServ::channel, "NOAUTOOP")
+		, peace(this, ChanServ::channel, "PEACE")
+		, securefounder(this, ChanServ::channel, "SECUREFOUNDER")
+		, restricted(this, ChanServ::channel, "RESTRICTED")
+		, secure(this, ChanServ::channel, "CS_SECURE")
+		, secureops(this, ChanServ::channel, "SECUREOPS")
+		, signkick(this, ChanServ::channel, "SIGNKICK")
+		, signkick_level(this, ChanServ::channel, "SIGNKICK_LEVEL")
+		, noexpire(this, ChanServ::channel, "CS_NO_EXPIRE")
+		, keep_modes(this, ChanServ::channel, "CS_KEEP_MODES")
+		, persist(this, ChanServ::channel, "PERSIST")
 
 		, commandcsset(this)
 		, commandcssetautoop(this)
@@ -1235,17 +1151,14 @@ class CSSet : public Module
 
 	void OnCreateChan(ChanServ::Channel *ci) override
 	{
-		ci->bantype = Config->GetModule(this)->Get<int>("defbantype", "2");
+		ci->SetBanType(Config->GetModule(this)->Get<int>("defbantype", "2"));
 	}
 
 	void OnChannelCreate(Channel *c) override
 	{
 		if (c->ci && keep_modes.HasExt(c->ci))
-		{
-			Channel::ModeList ml = c->ci->last_modes;
-			for (Channel::ModeList::iterator it = ml.begin(); it != ml.end(); ++it)
-				c->SetMode(c->ci->WhoSends(), it->first, it->second);
-		}
+			for (ChanServ::Mode *m : c->ci->GetRefs<ChanServ::Mode *>(ChanServ::mode))
+				c->SetMode(c->ci->WhoSends(), m->GetMode(), m->GetParam());
 	}
 
 	void OnChannelSync(Channel *c) override
@@ -1279,8 +1192,13 @@ class CSSet : public Module
 			if (mode->name == "PERM")
 				persist.Set(c->ci, true);
 
-			if (mode->type != MODE_STATUS && !c->syncing && Me->IsSynced())
-				c->ci->last_modes = c->GetModes();
+			if (mode->type != MODE_STATUS && !c->syncing && Me->IsSynced() && ChanServ::mode)
+			{
+				ChanServ::Mode *m = ChanServ::mode.Create();
+				m->SetChannel(c->ci);
+				m->SetMode(mode->name);
+				m->SetParam(param);
+			}
 		}
 
 		return EVENT_CONTINUE;
@@ -1295,7 +1213,9 @@ class CSSet : public Module
 		}
 
 		if (c->ci && mode->type != MODE_STATUS && !c->syncing && Me->IsSynced())
-			c->ci->last_modes = c->GetModes();
+			for (ChanServ::Mode *m : c->ci->GetRefs<ChanServ::Mode *>(ChanServ::mode))
+				if (m->GetMode() == mode->name && m->GetParam().equals_ci(param))
+					m->Delete();
 
 		return EVENT_CONTINUE;
 	}
@@ -1309,10 +1229,10 @@ class CSSet : public Module
 
 	void OnJoinChannel(User *u, Channel *c) override
 	{
-		if (persist_lower_ts && c->ci && persist.HasExt(c->ci) && c->creation_time > c->ci->time_registered)
+		if (persist_lower_ts && c->ci && persist.HasExt(c->ci) && c->creation_time > c->ci->GetTimeRegistered())
 		{
-			Log(LOG_DEBUG) << "Changing TS of " << c->name << " from " << c->creation_time << " to " << c->ci->time_registered;
-			c->creation_time = c->ci->time_registered;
+			Log(LOG_DEBUG) << "Changing TS of " << c->name << " from " << c->creation_time << " to " << c->ci->GetTimeRegistered();
+			c->creation_time = c->ci->GetTimeRegistered();
 			IRCD->SendChannel(c);
 			c->Reset();
 		}

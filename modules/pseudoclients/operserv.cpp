@@ -13,6 +13,15 @@
 #include "modules/help.h"
 #include "modules/nickserv.h"
 
+class SGlineType : public XLineType
+{
+ public:
+	SGlineType(Module *creator) : XLineType(creator, "SGLine")
+	{
+		SetParent(xline);
+	}
+};
+
 class SGLineManager : public XLineManager
 {
  public:
@@ -23,9 +32,9 @@ class SGLineManager : public XLineManager
 		this->Send(u, x);
 	}
 
-	void OnExpire(const XLine *x) override
+	void OnExpire(XLine *x) override
 	{
-		::Log(Config->GetClient("OperServ"), "expire/akill") << "AKILL on \002" << x->mask << "\002 has expired";
+		::Log(Config->GetClient("OperServ"), "expire/akill") << "AKILL on \002" << x->GetMask() << "\002 has expired";
 	}
 
 	void Send(User *u, XLine *x) override
@@ -38,7 +47,7 @@ class SGLineManager : public XLineManager
 		IRCD->SendAkillDel(x);
 	}
 
-	bool Check(User *u, const XLine *x) override
+	bool Check(User *u, XLine *x) override
 	{
 		if (x->regex)
 		{
@@ -65,6 +74,15 @@ class SGLineManager : public XLineManager
 	}
 };
 
+class SQlineType : public XLineType
+{
+ public:
+	SQlineType(Module *creator) : XLineType(creator, "SQLine")
+	{
+		SetParent(xline);
+	}
+};
+
 class SQLineManager : public XLineManager
 {
  public:
@@ -75,9 +93,9 @@ class SQLineManager : public XLineManager
 		this->Send(u, x);
 	}
 
-	void OnExpire(const XLine *x) override
+	void OnExpire(XLine *x) override
 	{
-		::Log(Config->GetClient("OperServ"), "expire/sqline") << "SQLINE on \002" << x->mask << "\002 has expired";
+		::Log(Config->GetClient("OperServ"), "expire/sqline") << "SQLINE on \002" << x->GetMask() << "\002 has expired";
 	}
 
 	void Send(User *u, XLine *x) override
@@ -89,11 +107,11 @@ class SQLineManager : public XLineManager
 			else if (NickServ::service)
 				NickServ::service->Collide(u, NULL);
 			else
-				u->Kill(Config->GetClient("OperServ"), "Q-Lined: " + x->reason);
+				u->Kill(Config->GetClient("OperServ"), "Q-Lined: " + x->GetReason());
 		}
 		else if (x->IsRegex())
 			;
-		else if (x->mask[0] != '#' || IRCD->CanSQLineChannel)
+		else if (x->GetMask()[0] != '#' || IRCD->CanSQLineChannel)
 			IRCD->SendSQLine(u, x);
 	}
 
@@ -101,31 +119,41 @@ class SQLineManager : public XLineManager
 	{
 		if (!IRCD->CanSQLine || x->IsRegex())
 			;
-		else if (x->mask[0] != '#' || IRCD->CanSQLineChannel)
+		else if (x->GetMask()[0] != '#' || IRCD->CanSQLineChannel)
 			IRCD->SendSQLineDel(x);
 	}
 
-	bool Check(User *u, const XLine *x) override
+	bool Check(User *u, XLine *x) override
 	{
 		if (x->regex)
 			return std::regex_match(u->nick.c_str(), *x->regex);
-		return Anope::Match(u->nick, x->mask);
+		return Anope::Match(u->nick, x->GetMask());
 	}
 
 	XLine *CheckChannel(Channel *c)
 	{
-		for (std::vector<XLine *>::const_iterator it = this->GetList().begin(), it_end = this->GetList().end(); it != it_end; ++it)
+		for (XLine *x : this->GetXLines())
 		{
-			XLine *x = *it;
 			if (x->regex)
 			{
 				if (std::regex_match(c->name.str(), *x->regex))
 					return x;
 			}
-			else if (Anope::Match(c->name, x->mask, false, true))
+			else if (Anope::Match(c->name, x->GetMask(), false, true))
+			{
 				return x;
+			}
 		}
-		return NULL;
+		return nullptr;
+	}
+};
+
+class SNlineType : public XLineType
+{
+ public:
+	SNlineType(Module *creator) : XLineType(creator, "SNLine")
+	{
+		SetParent(xline);
 	}
 };
 
@@ -139,9 +167,9 @@ class SNLineManager : public XLineManager
 		this->Send(u, x);
 	}
 
-	void OnExpire(const XLine *x) override
+	void OnExpire(XLine *x) override
 	{
-		::Log(Config->GetClient("OperServ"), "expire/snline") << "SNLINE on \002" << x->mask << "\002 has expired";
+		::Log(Config->GetClient("OperServ"), "expire/snline") << "SNLINE on \002" << x->GetMask() << "\002 has expired";
 	}
 
 	void Send(User *u, XLine *x) override
@@ -150,7 +178,7 @@ class SNLineManager : public XLineManager
 			IRCD->SendSGLine(u, x);
 
 		if (u)
-			u->Kill(Config->GetClient("OperServ"), "SNLined: " + x->reason);
+			u->Kill(Config->GetClient("OperServ"), "SNLined: " + x->GetReason());
 	}
 
 	void SendDel(XLine *x) override
@@ -159,11 +187,11 @@ class SNLineManager : public XLineManager
 			IRCD->SendSGLineDel(x);
 	}
 
-	bool Check(User *u, const XLine *x) override
+	bool Check(User *u, XLine *x) override
 	{
 		if (x->regex)
 			return std::regex_match(u->realname.str(), *x->regex);
-		return Anope::Match(u->realname, x->mask, false, true);
+		return Anope::Match(u->realname, x->GetMask(), false, true);
 	}
 };
 
@@ -178,9 +206,12 @@ class OperServCore : public Module
 	, public EventHook<Event::Help>
 	, public EventHook<Event::Log>
 {
-	Reference<BotInfo> OperServ;
+	Reference<ServiceBot> OperServ;
+	SGlineType sgtype;
 	SGLineManager sglines;
+	SQlineType sqtype;
 	SQLineManager sqlines;
+	SNlineType sntype;
 	SNLineManager snlines;
 
  public:
@@ -194,8 +225,11 @@ class OperServCore : public Module
 		, EventHook<Event::CheckKick>("OnCheckKick")
 		, EventHook<Event::Help>("OnHelp")
 		, EventHook<Event::Log>("OnLog")
+		, sgtype(this)
 		, sglines(this)
+		, sqtype(this)
 		, sqlines(this)
+		, sntype(this)
 		, snlines(this)
 	{
 
@@ -223,14 +257,14 @@ class OperServCore : public Module
 		if (osnick.empty())
 			throw ConfigException(this->name + ": <client> must be defined");
 
-		BotInfo *bi = BotInfo::Find(osnick, true);
+		ServiceBot *bi = ServiceBot::Find(osnick, true);
 		if (!bi)
 			throw ConfigException(this->name + ": no bot named " + osnick);
 
 		OperServ = bi;
 	}
 
-	EventReturn OnBotPrivmsg(User *u, BotInfo *bi, Anope::string &message) override
+	EventReturn OnBotPrivmsg(User *u, ServiceBot *bi, Anope::string &message) override
 	{
 		if (bi == OperServ && !u->HasMode("OPER") && Config->GetModule(this)->Get<bool>("opersonly"))
 		{
@@ -278,7 +312,7 @@ class OperServCore : public Module
 		if (x)
 		{
 			this->sqlines.OnMatch(u, x);
-			reason = x->reason;
+			reason = x->GetReason();
 			return EVENT_STOP;
 		}
 

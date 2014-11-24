@@ -10,108 +10,93 @@
  */
 
 #include "module.h"
+#include "modules/ns_ajoin.h"
 
-struct AJoinEntry;
-
-struct AJoinList : Serialize::Checker<std::vector<AJoinEntry *> >
+class AutoJoinImpl : public AutoJoin
 {
-	AJoinList(Extensible *) : Serialize::Checker<std::vector<AJoinEntry *> >("AJoinEntry") { }
-	~AJoinList();
+ public:
+	AutoJoinImpl(Serialize::TypeBase *type) : AutoJoin(type) { }
+	AutoJoinImpl(Serialize::TypeBase *type, Serialize::ID id) : AutoJoin(type, id) { }
+
+	NickServ::Account *GetOwner() override;
+	void SetOwner(NickServ::Account *acc) override;
+
+	Anope::string GetChannel() override;
+	void SetChannel(const Anope::string &c) override;
+
+	Anope::string GetKey() override;
+	void SetKey(const Anope::string &k) override;
 };
 
-struct AJoinEntry : Serializable
+class AutoJoinType : public Serialize::Type<AutoJoinImpl>
 {
-	Serialize::Reference<NickServ::Account> owner;
-	Anope::string channel;
-	Anope::string key;
+ public:
+	Serialize::ObjectField<AutoJoinImpl, NickServ::Account *> owner;
+	Serialize::Field<AutoJoinImpl, Anope::string> channel, key;
 
-	AJoinEntry(Extensible *) : Serializable("AJoinEntry") { }
-
-	~AJoinEntry()
+	AutoJoinType(Module *me) : Serialize::Type<AutoJoinImpl>(me, "AutoJoin")
+		, owner(this, "owner", true)
+		, channel(this, "channel")
+		, key(this, "key")
 	{
-		AJoinList *channels = owner->GetExt<AJoinList>("ajoinlist");
-		if (channels)
-		{
-			std::vector<AJoinEntry *>::iterator it = std::find((*channels)->begin(), (*channels)->end(), this);
-			if (it != (*channels)->end())
-				(*channels)->erase(it);
-		}
-	}
-
-	void Serialize(Serialize::Data &sd) const override
-	{
-		if (!this->owner)
-			return;
-
-		sd["owner"] << this->owner->display;
-		sd["channel"] << this->channel;
-		sd["key"] << this->key;
-	}
-
-	static Serializable* Unserialize(Serializable *obj, Serialize::Data &sd)
-	{
-		Anope::string sowner;
-
-		sd["owner"] >> sowner;
-
-		NickServ::Account *nc = NickServ::FindAccount(sowner);
-		if (nc == NULL)
-			return NULL;
-
-		AJoinEntry *aj;
-		if (obj)
-			aj = anope_dynamic_static_cast<AJoinEntry *>(obj);
-		else
-		{
-			aj = new AJoinEntry(nc);
-			aj->owner = nc;
-		}
-
-		sd["channel"] >> aj->channel;
-		sd["key"] >> aj->key;
-
-		if (!obj)
-		{
-			AJoinList *channels = nc->Require<AJoinList>("ajoinlist");
-			(*channels)->push_back(aj);
-		}
-
-		return aj;
 	}
 };
 
-AJoinList::~AJoinList()
+NickServ::Account *AutoJoinImpl::GetOwner()
 {
-	for (unsigned i = 0; i < (*this)->size(); ++i)
-		delete (*this)->at(i);
+	return Get(&AutoJoinType::owner);
+}
+
+void AutoJoinImpl::SetOwner(NickServ::Account *acc)
+{
+	Set(&AutoJoinType::owner, acc);
+}
+
+Anope::string AutoJoinImpl::GetChannel()
+{
+	return Get(&AutoJoinType::channel);
+}
+
+void AutoJoinImpl::SetChannel(const Anope::string &c)
+{
+	Set(&AutoJoinType::channel, c);
+}
+
+Anope::string AutoJoinImpl::GetKey()
+{
+	return Get(&AutoJoinType::key);
+}
+
+void AutoJoinImpl::SetKey(const Anope::string &k)
+{
+	Set(&AutoJoinType::key, k);
 }
 
 class CommandNSAJoin : public Command
 {
 	void DoList(CommandSource &source, NickServ::Account *nc)
 	{
-		AJoinList *channels = nc->Require<AJoinList>("ajoinlist");
+		std::vector<AutoJoin *> channels = nc->GetRefs<AutoJoin *>(autojoin);
 
-		if ((*channels)->empty())\
+		if (channels.empty())
 		{
-			source.Reply(_("The auto join list of \002{0}\002 is empty."), nc->display);
+			source.Reply(_("The auto join list of \002{0}\002 is empty."), nc->GetDisplay());
 			return;
 		}
 
-
 		ListFormatter list(source.GetAccount());
 		list.AddColumn(_("Number")).AddColumn(_("Channel")).AddColumn(_("Key"));
-		for (unsigned i = 0; i < (*channels)->size(); ++i)
+		for (unsigned i = 0; i < channels.size(); ++i)
 		{
-			AJoinEntry *aj = (*channels)->at(i);
+			AutoJoin *aj = channels[i];
 			ListFormatter::ListEntry entry;
 			entry["Number"] = stringify(i + 1);
-			entry["Channel"] = aj->channel;
-			entry["Key"] = aj->key;
+			entry["Channel"] = aj->GetChannel();
+			entry["Key"] = aj->GetKey();
 			list.AddEntry(entry);
 		}
 
-		source.Reply(_("Auto join list of \002{0}\002:"), nc->display);
+		source.Reply(_("Auto join list of \002{0}\002:"), nc->GetDisplay());
 
 		std::vector<Anope::string> replies;
 		list.Process(replies);
@@ -122,7 +107,7 @@ class CommandNSAJoin : public Command
 
 	void DoAdd(CommandSource &source, NickServ::Account *nc, const Anope::string &chans, const Anope::string &keys)
 	{
-		AJoinList *channels = nc->Require<AJoinList>("ajoinlist");
+		std::vector<AutoJoin *> channels = nc->GetRefs<AutoJoin *>(autojoin);
 
 		Anope::string addedchans;
 		Anope::string alreadyadded;
@@ -134,17 +119,17 @@ class CommandNSAJoin : public Command
 			ksep.GetToken(key);
 
 			unsigned i = 0;
-			for (; i < (*channels)->size(); ++i)
-				if ((*channels)->at(i)->channel.equals_ci(chan))
+			for (; i < channels.size(); ++i)
+				if (channels[i]->GetChannel().equals_ci(chan))
 					break;
 
-			if ((*channels)->size() >= Config->GetModule(this->owner)->Get<unsigned>("ajoinmax"))
+			if (channels.size() >= Config->GetModule(this->owner)->Get<unsigned>("ajoinmax"))
 			{
 				source.Reply(_("Sorry, the maximum of \002{0}\002 auto join entries has been reached."), Config->GetModule(this->owner)->Get<unsigned>("ajoinmax"));
 				return;
 			}
 
-			if (i != (*channels)->size())
+			if (i != channels.size())
 				alreadyadded += chan + ", ";
 			else if (IRCD->IsChannelValid(chan) == false)
 	 			source.Reply(_("\002{0}\002 isn't a valid channel."), chan);
@@ -158,11 +143,11 @@ class CommandNSAJoin : public Command
 					continue;
 				}
 
-				AJoinEntry *entry = new AJoinEntry(nc);
-				entry->owner = nc;
-				entry->channel = chan;
-				entry->key = key;
-				(*channels)->push_back(entry);
+				AutoJoin *entry = autojoin.Create();
+				entry->SetOwner(nc);
+				entry->SetChannel(chan);
+				entry->SetKey(key);
+
 				addedchans += chan + ", ";
 			}
 		}
@@ -170,7 +155,7 @@ class CommandNSAJoin : public Command
 		if (!alreadyadded.empty())
 		{
 			alreadyadded = alreadyadded.substr(0, alreadyadded.length() - 2);
-			source.Reply(_("\002{0}\002 is already on the auto join list of \002{1}\002."), alreadyadded, nc->display);
+			source.Reply(_("\002{0}\002 is already on the auto join list of \002{1}\002."), alreadyadded, nc->GetDisplay());
 		}
 
 		if (!invalidkey.empty())
@@ -183,13 +168,13 @@ class CommandNSAJoin : public Command
 			return;
 
 		addedchans = addedchans.substr(0, addedchans.length() - 2);
-		Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to ADD channel " << addedchans << " to " << nc->display;
-		source.Reply(_("\002{0}\002 added to the auto join list of \002{1}\002."), addedchans, nc->display);
+		Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to ADD channel " << addedchans << " to " << nc->GetDisplay();
+		source.Reply(_("\002{0}\002 added to the auto join list of \002{1}\002."), addedchans, nc->GetDisplay());
 	}
 
 	void DoDel(CommandSource &source, NickServ::Account *nc, const Anope::string &chans)
 	{
-		AJoinList *channels = nc->Require<AJoinList>("ajoinlist");
+		std::vector<AutoJoin *> channels = nc->GetRefs<AutoJoin *>(autojoin);
 		Anope::string delchans;
 		Anope::string notfoundchans;
 		commasepstream sep(chans);
@@ -197,15 +182,15 @@ class CommandNSAJoin : public Command
 		for (Anope::string chan; sep.GetToken(chan);)
 		{
 			unsigned i = 0;
-			for (; i < (*channels)->size(); ++i)
-				if ((*channels)->at(i)->channel.equals_ci(chan))
+			for (; i < channels.size(); ++i)
+				if (channels[i]->GetChannel().equals_ci(chan))
 					break;
 
-			if (i == (*channels)->size())
+			if (i == channels.size())
 				notfoundchans += chan + ", ";
 			else
 			{
-				delete (*channels)->at(i);
+				delete channels[i];
 				delchans += chan + ", ";
 			}
 		}
@@ -213,18 +198,15 @@ class CommandNSAJoin : public Command
 		if (!notfoundchans.empty())
 		{
 			notfoundchans = notfoundchans.substr(0, notfoundchans.length() - 2);
-			source.Reply(_("\002{0}\002 was not found on the auto join list of \002{1}\002."), notfoundchans, nc->display);
+			source.Reply(_("\002{0}\002 was not found on the auto join list of \002{1}\002."), notfoundchans, nc->GetDisplay());
 		}
 
 		if (delchans.empty())
 			return;
 
 		delchans = delchans.substr(0, delchans.length() - 2);
-		Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to DELETE channel " << delchans << " from " << nc->display;
-		source.Reply(_("\002{0}\002 was removed from the auto join list of \002{1}\002."), delchans, nc->display);
-
-		if ((*channels)->empty())
-			nc->Shrink<AJoinList>("ajoinlist");
+		Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to DELETE channel " << delchans << " from " << nc->GetDisplay();
+		source.Reply(_("\002{0}\002 was removed from the auto join list of \002{1}\002."), delchans, nc->GetDisplay());
 	}
 
  public:
@@ -249,14 +231,14 @@ class CommandNSAJoin : public Command
 		NickServ::Account *nc;
 		if (!nick.empty() && !source.HasCommand("nickserv/ajoin"))
 		{
-			const NickServ::Nick *na = NickServ::FindNick(nick);
+			NickServ::Nick *na = NickServ::FindNick(nick);
 			if (na == NULL)
 			{
 				source.Reply(_("\002{0}\002 isn't registered."), nick);
 				return;
 			}
 
-			nc = na->nc;
+			nc = na->GetAccount();
 			param = params.size() > 2 ? params[2] : "";
 			param2 = params.size() > 3 ? params[3] : "";
 		}
@@ -269,8 +251,8 @@ class CommandNSAJoin : public Command
 
 		if (cmd.equals_ci("LIST"))
 			return this->DoList(source, nc);
-		else if (nc->HasExt("NS_SUSPENDED"))
-			source.Reply(_("\002{0}\002 isn't registered."), nc->display);
+		else if (nc->HasFieldS("NS_SUSPENDED"))
+			source.Reply(_("\002{0}\002 isn't registered."), nc->GetDisplay());
 		else if (param.empty())
 			this->OnSyntaxError(source, "");
 		else if (Anope::ReadOnly)
@@ -296,14 +278,13 @@ class NSAJoin : public Module
 	, public EventHook<Event::UserLogin>
 {
 	CommandNSAJoin commandnsajoin;
-	ExtensibleItem<AJoinList> ajoinlist;
-	Serialize::Type ajoinentry_type;
+	AutoJoinType ajtype;
 
  public:
 	NSAJoin(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
 		, EventHook<Event::UserLogin>("OnUserLogin")
-		, commandnsajoin(this), ajoinlist(this, "ajoinlist")
-		, ajoinentry_type("AJoinEntry", AJoinEntry::Unserialize)
+		, commandnsajoin(this)
+		, ajtype(this)
 	{
 
 		if (!IRCD || !IRCD->CanSVSJoin)
@@ -313,35 +294,34 @@ class NSAJoin : public Module
 
 	void OnUserLogin(User *u) override
 	{
-		BotInfo *NickServ = Config->GetClient("NickServ");
+		ServiceBot *NickServ = Config->GetClient("NickServ");
 		if (!NickServ)
 			return;
 
-		AJoinList *channels = u->Account()->GetExt<AJoinList>("ajoinlist");
-		if (channels == NULL)
+		std::vector<AutoJoin *> channels = u->Account()->GetRefs<AutoJoin *>(autojoin);
+		if (channels.empty())
 			return;
 
 		/* Set +r now, so we can ajoin users into +R channels */
 		ModeManager::ProcessModes();
 
-		for (unsigned i = 0; i < (*channels)->size(); ++i)
+		for (AutoJoin *entry : channels)
 		{
-			AJoinEntry *entry = (*channels)->at(i);
-			Channel *c = Channel::Find(entry->channel);
+			Channel *c = Channel::Find(entry->GetChannel());
 			ChanServ::Channel *ci;
 
 			if (c)
 				ci = c->ci;
 			else
-				ci = ChanServ::Find(entry->channel);
+				ci = ChanServ::Find(entry->GetChannel());
 
 			bool need_invite = false;
-			Anope::string key = entry->key;
+			Anope::string key = entry->GetKey();
 			ChanServ::AccessGroup u_access;
 
 			if (ci != NULL)
 			{
-				if (ci->HasExt("CS_SUSPENDED"))
+				if (ci->HasFieldS("CS_SUSPENDED"))
 					continue;
 				u_access = ci->AccessFor(u);
 			}
@@ -353,7 +333,7 @@ class NSAJoin : public Module
 					continue;
 				else if (c->HasMode("ADMINONLY") && !u->HasMode("ADMIN"))
 					continue;
-				else if (c->HasMode("SSL") && !(u->HasMode("SSL") || u->HasExt("ssl")))
+				else if (c->HasMode("SSL") && !(u->HasMode("SSL") || u->HasExtOK("ssl")))
 					continue;
 				else if (c->MatchesList(u, "BAN") == true && c->MatchesList(u, "EXCEPT") == false)
 					need_invite = true;
@@ -394,7 +374,7 @@ class NSAJoin : public Module
 				IRCD->SendInvite(NickServ, c, u);
 			}
 
-			IRCD->SendSVSJoin(NickServ, u, entry->channel, key);
+			IRCD->SendSVSJoin(NickServ, u, entry->GetChannel(), key);
 		}
 	}
 };

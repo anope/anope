@@ -38,7 +38,7 @@ class UnrealIRCdProto : public IRCDProto
 		UplinkSocket::Message() << "SVSNOOP " << server->GetName() << " " << (set ? "+" : "-");
 	}
 
-	void SendAkillDel(const XLine *x) override
+	void SendAkillDel(XLine *x) override
 	{
 		if (x->IsRegex() || x->HasNickOrReal())
 			return;
@@ -54,7 +54,7 @@ class UnrealIRCdProto : public IRCDProto
 			}
 		}
 
-		UplinkSocket::Message() << "TKL - G " << x->GetUser() << " " << x->GetHost() << " " << x->by;
+		UplinkSocket::Message() << "TKL - G " << x->GetUser() << " " << x->GetHost() << " " << x->GetBy();
 	}
 
 	void SendTopic(const MessageSource &source, Channel *c) override
@@ -62,19 +62,19 @@ class UnrealIRCdProto : public IRCDProto
 		UplinkSocket::Message(source) << "TOPIC " << c->name << " " << c->topic_setter << " " << c->topic_ts << " :" << c->topic;
 	}
 
-	void SendGlobalNotice(BotInfo *bi, const Server *dest, const Anope::string &msg) override
+	void SendGlobalNotice(ServiceBot *bi, const Server *dest, const Anope::string &msg) override
 	{
 		UplinkSocket::Message(bi) << "NOTICE $" << dest->GetName() << " :" << msg;
 	}
 
-	void SendGlobalPrivmsg(BotInfo *bi, const Server *dest, const Anope::string &msg) override
+	void SendGlobalPrivmsg(ServiceBot *bi, const Server *dest, const Anope::string &msg) override
 	{
 		UplinkSocket::Message(bi) << "PRIVMSG $" << dest->GetName() << " :" << msg;
 	}
 
 	void SendVhostDel(User *u) override
 	{
-		BotInfo *HostServ = Config->GetClient("HostServ");
+		ServiceBot *HostServ = Config->GetClient("HostServ");
 		u->RemoveMode(HostServ, "CLOAK");
 		u->RemoveMode(HostServ, "VHOST");
 		ModeManager::ProcessModes();
@@ -94,17 +94,17 @@ class UnrealIRCdProto : public IRCDProto
 				return;
 			}
 
-			const XLine *old = x;
+			XLine *old = x;
 
 			if (old->manager->HasEntry("*@" + u->host))
 				return;
 
 			/* We can't akill x as it has a nick and/or realname included, so create a new akill for *@host */
-			XLine *xline = new XLine("*@" + u->host, old->by, old->expires, old->reason, old->id);
-			old->manager->AddXLine(xline);
-			x = xline;
+			XLine *xl = new XLine("*@" + u->host, old->GetBy(), old->GetExpires(), old->GetReason(), old->GetID());
+			old->manager->AddXLine(xl);
+			x = xl;
 
-			Log(Config->GetClient("OperServ"), "akill") << "AKILL: Added an akill for " << x->mask << " because " << u->GetMask() << "#" << u->realname << " matches " << old->mask;
+			Log(Config->GetClient("OperServ"), "akill") << "AKILL: Added an akill for " << x->GetMask() << " because " << u->GetMask() << "#" << u->realname << " matches " << old->GetMask();
 		}
 
 		/* ZLine if we can instead */
@@ -119,10 +119,10 @@ class UnrealIRCdProto : public IRCDProto
 		}
 
 		// Calculate the time left before this would expire, capping it at 2 days
-		time_t timeleft = x->expires - Anope::CurTime;
-		if (timeleft > 172800 || !x->expires)
+		time_t timeleft = x->GetExpires() - Anope::CurTime;
+		if (timeleft > 172800 || !x->GetExpires())
 			timeleft = 172800;
-		UplinkSocket::Message() << "TKL + G " << x->GetUser() << " " << x->GetHost() << " " << x->by << " " << Anope::CurTime + timeleft << " " << x->created << " :" << x->GetReason();
+		UplinkSocket::Message() << "TKL + G " << x->GetUser() << " " << x->GetHost() << " " << x->GetBy() << " " << Anope::CurTime + timeleft << " " << x->GetCreated() << " :" << x->GetReason();
 	}
 
 	void SendSVSKillInternal(const MessageSource &source, User *user, const Anope::string &buf) override
@@ -167,7 +167,7 @@ class UnrealIRCdProto : public IRCDProto
 			if (uc != NULL)
 				uc->status.Clear();
 
-			BotInfo *setter = BotInfo::Find(user->GetUID());
+			ServiceBot *setter = ServiceBot::Find(user->GetUID());
 			for (size_t i = 0; i < cs.Modes().length(); ++i)
 				c->SetMode(setter, ModeManager::FindChannelModeByChar(cs.Modes()[i]), user->GetUID(), false);
 
@@ -178,9 +178,9 @@ class UnrealIRCdProto : public IRCDProto
 
 	/* unsqline
 	*/
-	void SendSQLineDel(const XLine *x) override
+	void SendSQLineDel(XLine *x) override
 	{
-		UplinkSocket::Message() << "UNSQLINE " << x->mask;
+		UplinkSocket::Message() << "UNSQLINE " << x->GetMask();
 	}
 
 	/* SQLINE */
@@ -188,9 +188,9 @@ class UnrealIRCdProto : public IRCDProto
 	** - Unreal will translate this to TKL for us
 	**
 	*/
-	void SendSQLine(User *, const XLine *x) override
+	void SendSQLine(User *, XLine *x) override
 	{
-		UplinkSocket::Message() << "SQLINE " << x->mask << " :" << x->GetReason();
+		UplinkSocket::Message() << "SQLINE " << x->GetMask() << " :" << x->GetReason();
 	}
 
 	/*
@@ -199,7 +199,7 @@ class UnrealIRCdProto : public IRCDProto
 	**	  parv[1] = nick
 	**	  parv[2] = options
 	*/
-	void SendSVSO(BotInfo *source, const Anope::string &nick, const Anope::string &flag) override
+	void SendSVSO(ServiceBot *source, const Anope::string &nick, const Anope::string &flag) override
 	{
 		UplinkSocket::Message(source) << "SVSO " << nick << " " << flag;
 	}
@@ -255,36 +255,36 @@ class UnrealIRCdProto : public IRCDProto
 	/*
 	 * SVSNLINE - :realname mask
 	*/
-	void SendSGLineDel(const XLine *x) override
+	void SendSGLineDel(XLine *x) override
 	{
-		UplinkSocket::Message() << "SVSNLINE - :" << x->mask;
+		UplinkSocket::Message() << "SVSNLINE - :" << x->GetMask();
 	}
 
 	/* UNSZLINE */
-	void SendSZLineDel(const XLine *x) override
+	void SendSZLineDel(XLine *x) override
 	{
-		UplinkSocket::Message() << "TKL - Z * " << x->GetHost() << " " << x->by;
+		UplinkSocket::Message() << "TKL - Z * " << x->GetHost() << " " << x->GetBy();
 	}
 
 	/* SZLINE */
-	void SendSZLine(User *, const XLine *x) override
+	void SendSZLine(User *, XLine *x) override
 	{
 		// Calculate the time left before this would expire, capping it at 2 days
-		time_t timeleft = x->expires - Anope::CurTime;
-		if (timeleft > 172800 || !x->expires)
+		time_t timeleft = x->GetExpires() - Anope::CurTime;
+		if (timeleft > 172800 || !x->GetExpires())
 			timeleft = 172800;
-		UplinkSocket::Message() << "TKL + Z * " << x->GetHost() << " " << x->by << " " << Anope::CurTime + timeleft << " " << x->created << " :" << x->GetReason();
+		UplinkSocket::Message() << "TKL + Z * " << x->GetHost() << " " << x->GetBy() << " " << Anope::CurTime + timeleft << " " << x->GetCreated() << " :" << x->GetReason();
 	}
 
 	/* SGLINE */
 	/*
 	 * SVSNLINE + reason_where_is_space :realname mask with spaces
 	*/
-	void SendSGLine(User *, const XLine *x) override
+	void SendSGLine(User *, XLine *x) override
 	{
 		Anope::string edited_reason = x->GetReason();
 		edited_reason = edited_reason.replace_all_cs(" ", "_");
-		UplinkSocket::Message() << "SVSNLINE + " << edited_reason << " :" << x->mask;
+		UplinkSocket::Message() << "SVSNLINE + " << edited_reason << " :" << x->GetMask();
 	}
 
 	/* svsjoin
@@ -346,7 +346,7 @@ class UnrealIRCdProto : public IRCDProto
 	void SendLogin(User *u, NickServ::Nick *na) override
 	{
 		if (Servers::Capab.count("ESVID") > 0)
-			IRCD->SendMode(Config->GetClient("NickServ"), u, "+d %s", na->nc->display.c_str());
+			IRCD->SendMode(Config->GetClient("NickServ"), u, "+d %s", na->GetAccount()->GetDisplay().c_str());
 		else
 			IRCD->SendMode(Config->GetClient("NickServ"), u, "+d %d", u->signon);
 	}
@@ -361,7 +361,7 @@ class UnrealIRCdProto : public IRCDProto
 		/* Unreal does not support updating a channels TS without actually joining a user,
 		 * so we will join and part us now
 		 */
-		BotInfo *bi = c->ci->WhoSends();
+		ServiceBot *bi = c->ci->WhoSends();
 		if (!bi)
 			;
 		else if (c->FindUser(bi) == NULL)
@@ -382,7 +382,7 @@ class UnrealIRCdProto : public IRCDProto
 		if (p == Anope::string::npos)
 			return;
 
-		UplinkSocket::Message(BotInfo::Find(message.source)) << "SASL " << message.target.substr(0, p) << " " << message.target << " " << message.type << " " << message.data << (message.ext.empty() ? "" : " " + message.ext);
+		UplinkSocket::Message(ServiceBot::Find(message.source)) << "SASL " << message.target.substr(0, p) << " " << message.target << " " << message.type << " " << message.data << (message.ext.empty() ? "" : " " + message.ext);
 	}
 
 	void SendSVSLogin(const Anope::string &uid, const Anope::string &acc) override
@@ -536,7 +536,7 @@ namespace UnrealExtban
 	 		const Anope::string &mask = e->GetMask();
 			Anope::string real_mask = mask.substr(3);
 
-	 		return u->Account() && Anope::Match(u->Account()->display, real_mask);
+	 		return u->Account() && Anope::Match(u->Account()->GetDisplay(), real_mask);
 	 	}
 	};
 }
@@ -925,7 +925,7 @@ struct IRCDMessageNick : IRCDMessage
 				na = NickServ::FindNick(params[6]);
 			}
 
-			User::OnIntroduce(params[0], params[3], params[4], vhost, ip, s, params[10], user_ts, params[7], "", na ? *na->nc : NULL);
+			User::OnIntroduce(params[0], params[3], params[4], vhost, ip, s, params[10], user_ts, params[7], "", na ? na->GetAccount() : NULL);
 		}
 		else
 			source.GetUser()->ChangeNick(params[0]);
@@ -1261,6 +1261,7 @@ class ProtoUnreal : public Module
 		, message_join(this)
 		, message_kick(this)
 		, message_kill(this)
+		, message_svskill(this, "SVSKILL")
 		, message_motd(this)
 		, message_notice(this)
 		, message_part(this)
@@ -1269,7 +1270,6 @@ class ProtoUnreal : public Module
 		, message_quit(this)
 		, message_squit(this)
 		, message_stats(this)
-		, message_svskill(this, "SVSKILL")
 		, message_time(this)
 		, message_version(this)
 		, message_whois(this)
@@ -1315,38 +1315,35 @@ class ProtoUnreal : public Module
 		if (!c->ci)
 			return;
 
-		ModeLocks *modelocks = c->ci->GetExt<ModeLocks>("modelocks");
-		if (use_server_side_mlock && Servers::Capab.count("MLOCK") > 0 && modelocks)
+		if (use_server_side_mlock && Servers::Capab.count("MLOCK") > 0 && mlocks)
 		{
-			Anope::string modes = modelocks->GetMLockAsString(false).replace_all_cs("+", "").replace_all_cs("-", "");
-			UplinkSocket::Message(Me) << "MLOCK " << static_cast<long>(c->creation_time) << " " << c->ci->name << " " << modes;
+			Anope::string modes = mlocks->GetMLockAsString(c->ci, false).replace_all_cs("+", "").replace_all_cs("-", "");
+			UplinkSocket::Message(Me) << "MLOCK " << static_cast<long>(c->creation_time) << " " << c->ci->GetName() << " " << modes;
 		}
 	}
 
 	void OnChanRegistered(ChanServ::Channel *ci) override
 	{
-		ModeLocks *modelocks = ci->GetExt<ModeLocks>("modelocks");
-		if (!ci->c || !use_server_side_mlock || !modelocks || !Servers::Capab.count("MLOCK"))
+		if (!ci->c || !use_server_side_mlock || !mlocks || !Servers::Capab.count("MLOCK"))
 			return;
-		Anope::string modes = modelocks->GetMLockAsString(false).replace_all_cs("+", "").replace_all_cs("-", "");
-		UplinkSocket::Message(Me) << "MLOCK " << static_cast<long>(ci->c->creation_time) << " " << ci->name << " " << modes;
+		Anope::string modes = mlocks->GetMLockAsString(ci, false).replace_all_cs("+", "").replace_all_cs("-", "");
+		UplinkSocket::Message(Me) << "MLOCK " << static_cast<long>(ci->c->creation_time) << " " << ci->GetName() << " " << modes;
 	}
 
 	void OnDelChan(ChanServ::Channel *ci) override
 	{
 		if (!ci->c || !use_server_side_mlock || !Servers::Capab.count("MLOCK"))
 			return;
-		UplinkSocket::Message(Me) << "MLOCK " << static_cast<long>(ci->c->creation_time) << " " << ci->name << " :";
+		UplinkSocket::Message(Me) << "MLOCK " << static_cast<long>(ci->c->creation_time) << " " << ci->GetName() << " :";
 	}
 
 	EventReturn OnMLock(ChanServ::Channel *ci, ModeLock *lock) override
 	{
-		ModeLocks *modelocks = ci->GetExt<ModeLocks>("modelocks");
-		ChannelMode *cm = ModeManager::FindChannelModeByName(lock->name);
-		if (use_server_side_mlock && cm && modelocks && ci->c && (cm->type == MODE_REGULAR || cm->type == MODE_PARAM) && Servers::Capab.count("MLOCK") > 0)
+		ChannelMode *cm = ModeManager::FindChannelModeByName(lock->GetName());
+		if (use_server_side_mlock && cm && mlocks && ci->c && (cm->type == MODE_REGULAR || cm->type == MODE_PARAM) && Servers::Capab.count("MLOCK") > 0)
 		{
-			Anope::string modes = modelocks->GetMLockAsString(false).replace_all_cs("+", "").replace_all_cs("-", "") + cm->mchar;
-			UplinkSocket::Message(Me) << "MLOCK " << static_cast<long>(ci->c->creation_time) << " " << ci->name << " " << modes;
+			Anope::string modes = mlocks->GetMLockAsString(ci, false).replace_all_cs("+", "").replace_all_cs("-", "") + cm->mchar;
+			UplinkSocket::Message(Me) << "MLOCK " << static_cast<long>(ci->c->creation_time) << " " << ci->GetName() << " " << modes;
 		}
 
 		return EVENT_CONTINUE;
@@ -1354,12 +1351,11 @@ class ProtoUnreal : public Module
 
 	EventReturn OnUnMLock(ChanServ::Channel *ci, ModeLock *lock) override
 	{
-		ModeLocks *modelocks = ci->GetExt<ModeLocks>("modelocks");
-		ChannelMode *cm = ModeManager::FindChannelModeByName(lock->name);
-		if (use_server_side_mlock && cm && modelocks && ci->c && (cm->type == MODE_REGULAR || cm->type == MODE_PARAM) && Servers::Capab.count("MLOCK") > 0)
+		ChannelMode *cm = ModeManager::FindChannelModeByName(lock->GetName());
+		if (use_server_side_mlock && cm && mlocks && ci->c && (cm->type == MODE_REGULAR || cm->type == MODE_PARAM) && Servers::Capab.count("MLOCK") > 0)
 		{
-			Anope::string modes = modelocks->GetMLockAsString(false).replace_all_cs("+", "").replace_all_cs("-", "").replace_all_cs(cm->mchar, "");
-			UplinkSocket::Message(Me) << "MLOCK " << static_cast<long>(ci->c->creation_time) << " " << ci->name << " " << modes;
+			Anope::string modes = mlocks->GetMLockAsString(ci, false).replace_all_cs("+", "").replace_all_cs("-", "").replace_all_cs(cm->mchar, "");
+			UplinkSocket::Message(Me) << "MLOCK " << static_cast<long>(ci->c->creation_time) << " " << ci->GetName() << " " << modes;
 		}
 
 		return EVENT_CONTINUE;

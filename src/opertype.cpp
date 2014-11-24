@@ -12,31 +12,83 @@
 #include "opertype.h"
 #include "config.h"
 
-std::vector<Oper *> Oper::opers;
-
-Oper::Oper(const Anope::string &n, OperType *o) : name(n), ot(o), require_oper(false)
+Anope::string Oper::GetName()
 {
-	opers.push_back(this);
+	return Get(&OperBlockType::name);
 }
 
-Oper::~Oper()
+void Oper::SetName(const Anope::string &n)
 {
-	std::vector<Oper *>::iterator it = std::find(opers.begin(), opers.end(), this);
-	if (it != opers.end())
-		opers.erase(it);
+	Set(&OperBlockType::name, n);
+}
+
+Anope::string Oper::GetPassword()
+{
+	return Get(&OperBlockType::password);
+}
+
+void Oper::SetPassword(const Anope::string &s)
+{
+	Set(&OperBlockType::password, s);
+}
+
+Anope::string Oper::GetCertFP()
+{
+	return Get(&OperBlockType::certfp);
+}
+
+void Oper::SetCertFP(const Anope::string &s)
+{
+	Set(&OperBlockType::certfp, s);
+}
+
+Anope::string Oper::GetHost()
+{
+	return Get(&OperBlockType::host);
+}
+
+void Oper::SetHost(const Anope::string &h)
+{
+	Set(&OperBlockType::host, h);
+}
+
+Anope::string Oper::GetVhost()
+{
+	return Get(&OperBlockType::vhost);
+}
+
+void Oper::SetVhost(const Anope::string &s)
+{
+	Set(&OperBlockType::vhost, s);
+}
+
+OperType *Oper::GetType()
+{
+	return OperType::Find(Get(&OperBlockType::type));
+}
+
+void Oper::SetType(OperType *type)
+{
+	Set(&OperBlockType::type, type->GetName());
+}
+
+bool Oper::GetRequireOper()
+{
+	return Get(&OperBlockType::require_oper);
+}
+
+void Oper::SetRequireOper(const bool &b)
+{
+	Set(&OperBlockType::require_oper, b);
 }
 
 Oper *Oper::Find(const Anope::string &name)
 {
-	for (unsigned i = 0; i < opers.size(); ++i)
-	{
-		Oper *o = opers[i];
-
-		if (o->name.equals_ci(name))
+	for (Oper *o : Serialize::GetObjects<Oper *>(operblock))
+		if (o->GetName() == name)
 			return o;
-	}
 
-	return NULL;
+	return nullptr;
 }
 
 OperType *OperType::Find(const Anope::string &name)

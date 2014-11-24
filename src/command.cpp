@@ -20,7 +20,7 @@
 #include "modules/botserv.h"
 #include "modules/chanserv.h"
 
-CommandSource::CommandSource(const Anope::string &n, User *user, NickServ::Account *core, CommandReply *r, BotInfo *bi) : nick(n), u(user), nc(core), reply(r),
+CommandSource::CommandSource(const Anope::string &n, User *user, NickServ::Account *core, CommandReply *r, ServiceBot *bi) : nick(n), u(user), nc(core), reply(r),
 	c(NULL), service(bi)
 {
 }
@@ -64,7 +64,7 @@ bool CommandSource::HasCommand(const Anope::string &cmd)
 	if (this->u)
 		return this->u->HasCommand(cmd);
 	else if (this->nc && this->nc->o)
-		return this->nc->o->ot->HasCommand(cmd);
+		return this->nc->o->GetType()->HasCommand(cmd);
 	return false;
 }
 
@@ -73,7 +73,7 @@ bool CommandSource::HasPriv(const Anope::string &cmd)
 	if (this->u)
 		return this->u->HasPriv(cmd);
 	else if (this->nc && this->nc->o)
-		return this->nc->o->ot->HasPriv(cmd);
+		return this->nc->o->GetType()->HasPriv(cmd);
 	return false;
 }
 
@@ -274,13 +274,17 @@ void Command::Run(CommandSource &source, const Anope::string &message)
 	Event::OnPostCommand(&Event::PostCommand::OnPostCommand, source, c, params);
 }
 
-bool Command::FindCommandFromService(const Anope::string &command_service, BotInfo* &bot, Anope::string &name)
+bool Command::FindCommandFromService(const Anope::string &command_service, ServiceBot* &bot, Anope::string &name)
 {
 	bot = NULL;
 
-	for (botinfo_map::iterator it = BotListByNick->begin(), it_end = BotListByNick->end(); it != it_end; ++it)
+	for (std::pair<Anope::string, User *> p : UserListByNick)
 	{
-		BotInfo *bi = it->second;
+		User *u = p.second;
+		if (u->type != UserType::BOT)
+			continue;
+
+		ServiceBot *bi = anope_dynamic_static_cast<ServiceBot *>(u);
 
 		for (CommandInfo::map::const_iterator cit = bi->commands.begin(), cit_end = bi->commands.end(); cit != cit_end; ++cit)
 		{

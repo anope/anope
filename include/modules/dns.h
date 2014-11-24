@@ -131,6 +131,8 @@ namespace DNS
 		virtual uint32_t GetSerial() const anope_abstract;
 	};
 
+	static ServiceReference<DNS::Manager> manager("DNS::Manager", "dns/manager");
+
 	/** A DNS query.
 	 */
 	class Request : public Timer, public Question

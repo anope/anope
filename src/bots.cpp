@@ -20,17 +20,12 @@
 #include "event.h"
 #include "modules/chanserv.h"
 
-Serialize::Checker<botinfo_map> BotListByNick("BotInfo"), BotListByUID("BotInfo");
-
-BotInfo::BotInfo(const Anope::string &nnick, const Anope::string &nuser, const Anope::string &nhost, const Anope::string &nreal, const Anope::string &bmodes) : User(nnick, nuser, nhost, "", "", Me, nreal, Anope::CurTime, "", IRCD ? IRCD->UID_Retrieve() : "", NULL), Serializable("BotInfo"), channels("ChannelInfo"), botmodes(bmodes)
+ServiceBot::ServiceBot(const Anope::string &nnick, const Anope::string &nuser, const Anope::string &nhost, const Anope::string &nreal, const Anope::string &bmodes) : LocalUser(nnick, nuser, nhost, "", "", Me, nreal, Anope::CurTime, "", IRCD ? IRCD->UID_Retrieve() : "", NULL), botmodes(bmodes)
 {
-	this->lastmsg = this->created = Anope::CurTime;
+	this->type = UserType::BOT;
+	this->lastmsg = Anope::CurTime;
 	this->introduced = false;
-	this->oper_only = this->conf = false;
-
-	(*BotListByNick)[this->nick] = this;
-	if (!this->uid.empty())
-		(*BotListByUID)[this->uid] = this;
+	this->conf = false;
 
 	Event::OnCreateBot(&Event::CreateBot::OnCreateBot, this);
 
@@ -41,14 +36,15 @@ BotInfo::BotInfo(const Anope::string &nnick, const Anope::string &nuser, const A
 		if (!tmodes.empty())
 			this->SetModesInternal(this, tmodes.c_str());
 
-		XLine x(this->nick, "Reserved for services");
-		IRCD->SendSQLine(NULL, &x);
+		//XXX
+		//XLine x(this->nick, "Reserved for services");
+		//IRCD->SendSQLine(NULL, &x);
 		IRCD->SendClientIntroduction(this);
 		this->introduced = true;
 	}
 }
 
-BotInfo::~BotInfo()
+ServiceBot::~ServiceBot()
 {
 	Event::OnDelBot(&Event::DelBot::OnDelBot, this);
 
@@ -58,73 +54,25 @@ BotInfo::~BotInfo()
 		IRCD->SendQuit(this, "");
 		Event::OnUserQuit(&Event::UserQuit::OnUserQuit, this, "");
 		this->introduced = false;
-		XLine x(this->nick);
-		IRCD->SendSQLineDel(&x);
+		// XXX ?
+		//XLine x(this->nick);
+		//IRCD->SendSQLineDel(&x);
 	}
-
-	for (std::set<ChanServ::Channel *>::iterator it = this->channels->begin(), it_end = this->channels->end(); it != it_end; ++it)
-	{
-		ChanServ::Channel *ci = *it;
-		this->UnAssign(NULL, ci);
-	}
-
-	BotListByNick->erase(this->nick);
-	if (!this->uid.empty())
-		BotListByUID->erase(this->uid);
 }
 
-void BotInfo::Serialize(Serialize::Data &data) const
-{
-	data["nick"] << this->nick;
-	data["user"] << this->ident;
-	data["host"] << this->host;
-	data["realname"] << this->realname;
-	data["created"] << this->created;
-	data["oper_only"] << this->oper_only;
 
-	Extensible::ExtensibleSerialize(this, this, data);
-}
-
-Serializable* BotInfo::Unserialize(Serializable *obj, Serialize::Data &data)
-{
-	Anope::string nick, user, host, realname, flags;
-
-	data["nick"] >> nick;
-	data["user"] >> user;
-	data["host"] >> host;
-	data["realname"] >> realname;
-
-	BotInfo *bi;
-	if (obj)
-		bi = anope_dynamic_static_cast<BotInfo *>(obj);
-	else if (!(bi = BotInfo::Find(nick, true)))
-		bi = new BotInfo(nick, user, host, realname);
-
-	data["created"] >> bi->created;
-	data["oper_only"] >> bi->oper_only;
-
-	Extensible::ExtensibleUnserialize(bi, bi, data);
-
-	return bi;
-}
-
-void BotInfo::GenerateUID()
+void ServiceBot::GenerateUID()
 {
 	if (this->introduced)
 		throw CoreException("Changing bot UID when it is introduced?");
 
 	if (!this->uid.empty())
-	{
-		BotListByUID->erase(this->uid);
 		UserListByUID.erase(this->uid);
-	}
-
 	this->uid = IRCD->UID_Retrieve();
-	(*BotListByUID)[this->uid] = this;
 	UserListByUID[this->uid] = this;
 }
 
-void BotInfo::OnKill()
+void ServiceBot::OnKill()
 {
 	this->introduced = false;
 	this->GenerateUID();
@@ -135,63 +83,60 @@ void BotInfo::OnKill()
 		IRCD->SendJoin(this, cit->second->chan, &cit->second->status);
 }
 
-void BotInfo::SetNewNick(const Anope::string &newnick)
+void ServiceBot::SetNewNick(const Anope::string &newnick)
 {
 	UserListByNick.erase(this->nick);
-	BotListByNick->erase(this->nick);
 
+	bi->SetNick(newnick);
 	this->nick = newnick;
 
 	UserListByNick[this->nick] = this;
-	(*BotListByNick)[this->nick] = this;
 }
 
-const std::set<ChanServ::Channel *> &BotInfo::GetChannels() const
+std::vector<ChanServ::Channel *> ServiceBot::GetChannels() const
 {
-	return this->channels;
+	return bi->GetRefs<ChanServ::Channel *>(ChanServ::channel);
 }
 
-void BotInfo::Assign(User *u, ChanServ::Channel *ci)
+void ServiceBot::Assign(User *u, ChanServ::Channel *ci)
 {
 	EventReturn MOD_RESULT;
 	MOD_RESULT = Event::OnPreBotAssign(&Event::PreBotAssign::OnPreBotAssign, u, ci, this);
 	if (MOD_RESULT == EVENT_STOP)
 		return;
 
-	if (ci->bi)
-		ci->bi->UnAssign(u, ci);
+	if (ci->GetBot())
+		ci->GetBot()->UnAssign(u, ci);
 
-	ci->bi = this;
-	this->channels->insert(ci);
+	ci->SetBot(this);
 
 	Event::OnBotAssign(&Event::BotAssign::OnBotAssign, u, ci, this);
 }
 
-void BotInfo::UnAssign(User *u, ChanServ::Channel *ci)
+void ServiceBot::UnAssign(User *u, ChanServ::Channel *ci)
 {
 	EventReturn MOD_RESULT;
 	MOD_RESULT = Event::OnBotUnAssign(&Event::BotUnAssign::OnBotUnAssign, u, ci);
 	if (MOD_RESULT == EVENT_STOP)
 		return;
 
-	if (ci->c && ci->c->FindUser(ci->bi))
+	if (ci->c && ci->c->FindUser(ci->GetBot()))
 	{
 		if (u)
-			ci->bi->Part(ci->c, "UNASSIGN from " + u->nick);
+			ci->GetBot()->Part(ci->c, "UNASSIGN from " + u->nick);
 		else
-			ci->bi->Part(ci->c);
+			ci->GetBot()->Part(ci->c);
 	}
 
-	ci->bi = NULL;
-	this->channels->erase(ci);
+	ci->SetBot(nullptr);
 }
 
-unsigned BotInfo::GetChannelCount() const
+unsigned ServiceBot::GetChannelCount() const
 {
-	return this->channels->size();
+	return GetChannels().size();
 }
 
-void BotInfo::Join(Channel *c, ChannelStatus *status)
+void ServiceBot::Join(Channel *c, ChannelStatus *status)
 {
 	if (c->FindUser(this) != NULL)
 		return;
@@ -203,13 +148,13 @@ void BotInfo::Join(Channel *c, ChannelStatus *status)
 	Event::OnJoinChannel(&Event::JoinChannel::OnJoinChannel, this, c);
 }
 
-void BotInfo::Join(const Anope::string &chname, ChannelStatus *status)
+void ServiceBot::Join(const Anope::string &chname, ChannelStatus *status)
 {
 	bool c;
 	return this->Join(Channel::FindOrCreate(chname, c), status);
 }
 
-void BotInfo::Part(Channel *c, const Anope::string &reason)
+void ServiceBot::Part(Channel *c, const Anope::string &reason)
 {
 	if (c->FindUser(this) == NULL)
 		return;
@@ -226,7 +171,7 @@ void BotInfo::Part(Channel *c, const Anope::string &reason)
 	Event::OnPartChannel(&Event::PartChannel::OnPartChannel, this, cref, cname, reason);
 }
 
-void BotInfo::OnMessage(User *u, const Anope::string &message)
+void ServiceBot::OnMessage(User *u, const Anope::string &message)
 {
 	if (this->commands.empty())
 		return;
@@ -235,7 +180,7 @@ void BotInfo::OnMessage(User *u, const Anope::string &message)
 	Command::Run(source, message);
 }
 
-CommandInfo& BotInfo::SetCommand(const Anope::string &cname, const Anope::string &sname, const Anope::string &permission)
+CommandInfo& ServiceBot::SetCommand(const Anope::string &cname, const Anope::string &sname, const Anope::string &permission)
 {
 	CommandInfo ci;
 	ci.name = sname;
@@ -245,7 +190,7 @@ CommandInfo& BotInfo::SetCommand(const Anope::string &cname, const Anope::string
 	return this->commands[cname];
 }
 
-CommandInfo *BotInfo::GetCommand(const Anope::string &cname)
+CommandInfo *ServiceBot::GetCommand(const Anope::string &cname)
 {
 	CommandInfo::map::iterator it = this->commands.find(cname);
 	if (it != this->commands.end())
@@ -253,7 +198,7 @@ CommandInfo *BotInfo::GetCommand(const Anope::string &cname)
 	return NULL;
 }
 
-CommandInfo *BotInfo::FindCommand(const Anope::string &service)
+CommandInfo *ServiceBot::FindCommand(const Anope::string &service)
 {
 	for (auto& it : commands)
 	{
@@ -266,30 +211,71 @@ CommandInfo *BotInfo::FindCommand(const Anope::string &service)
 	return nullptr;
 }
 
-BotInfo* BotInfo::Find(const Anope::string &nick, bool nick_only)
+ServiceBot* ServiceBot::Find(const Anope::string &nick, bool nick_only)
 {
-	if (!nick_only && IRCD != NULL && IRCD->RequiresID)
-	{
-		botinfo_map::iterator it = BotListByUID->find(nick);
-		if (it != BotListByUID->end())
-		{
-			BotInfo *bi = it->second;
-			bi->QueueUpdate();
-			return bi;
-		}
+	User *u = User::Find(nick, nick_only);
+	if (u && u->type == UserType::BOT)
+		return anope_dynamic_static_cast<ServiceBot *>(u);
+	return nullptr;
+}
 
-		if (IRCD->AmbiguousID)
-			return NULL;
-	}
+void BotInfo::SetCreated(const time_t &t)
+{
+	Set(&BotInfoType::created, t);
+}
 
-	botinfo_map::iterator it = BotListByNick->find(nick);
-	if (it != BotListByNick->end())
-	{
-		BotInfo *bi = it->second;
-		bi->QueueUpdate();
-		return bi;
-	}
+time_t BotInfo::GetCreated()
+{
+	return Get(&BotInfoType::created);
+}
 
-	return NULL;
+void BotInfo::SetOperOnly(const bool &b)
+{
+	Set(&BotInfoType::operonly, b);
+}
+
+bool BotInfo::GetOperOnly()
+{
+	return Get(&BotInfoType::operonly);
+}
+
+void BotInfo::SetNick(const Anope::string &nick)
+{
+	Set(&BotInfoType::nick, nick);
+}
+
+Anope::string BotInfo::GetNick()
+{
+	return Get(&BotInfoType::nick);
+}
+
+void BotInfo::SetUser(const Anope::string &user)
+{
+	Set(&BotInfoType::user, user);
+}
+
+Anope::string BotInfo::GetUser()
+{
+	return Get(&BotInfoType::user);
+}
+
+void BotInfo::SetHost(const Anope::string &host)
+{
+	Set(&BotInfoType::host, host);
+}
+
+Anope::string BotInfo::GetHost()
+{
+	return Get(&BotInfoType::host);
+}
+
+void BotInfo::SetRealName(const Anope::string &realname)
+{
+	Set(&BotInfoType::realname, realname);
+}
+
+Anope::string BotInfo::GetRealName()
+{
+	return Get(&BotInfoType::realname);
 }
 

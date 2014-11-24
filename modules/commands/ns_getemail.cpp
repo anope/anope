@@ -31,16 +31,12 @@ class CommandNSGetEMail : public Command
 
 		Log(LOG_ADMIN, source, this) << "on " << email;
 
-		for (auto& it : NickServ::service->GetAccountList())
-		{
-			const NickServ::Account *nc = it.second;
-
-			if (!nc->email.empty() && nc->email.equals_ci(email))
+		for (NickServ::Account *nc : NickServ::service->GetAccountList())
+			if (!nc->GetEmail().empty() && nc->GetEmail().equals_ci(email))
 			{
 				++j;
-				source.Reply(_("Email matched: \002{0}\002 to \002{1}\002."), nc->display, email);
+				source.Reply(_("Email matched: \002{0}\002 to \002{1}\002."), nc->GetDisplay(), email);
 			}
-		}
 
 		if (j <= 0)
 		{

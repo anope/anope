@@ -43,7 +43,7 @@ class CommandBSSetGreet : public Command
 
 		if (!source.HasPriv("botserv/administration") && !source.AccessFor(ci).HasPriv("SET"))
 		{
-			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "SET", ci->name);
+			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "SET", ci->GetName());
 			return;
 		}
 
@@ -52,16 +52,16 @@ class CommandBSSetGreet : public Command
 			bool override = !source.AccessFor(ci).HasPriv("SET");
 			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to enable greets";
 
-			ci->Extend<bool>("BS_GREET");
-			source.Reply(_("Greet mode for \002{0}\002 is now \002on\002."), ci->name);
+			ci->SetS<bool>("BS_GREET", true);
+			source.Reply(_("Greet mode for \002{0}\002 is now \002on\002."), ci->GetName());
 		}
 		else if (value.equals_ci("OFF"))
 		{
 			bool override = !source.AccessFor(ci).HasPriv("SET");
 			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to disable greets";
 
-			ci->Shrink<bool>("BS_GREET");
-			source.Reply(_("Greet mode for \002{0}\002 is now \002off\002."), ci->name);
+			ci->UnsetS<bool>("BS_GREET");
+			source.Reply(_("Greet mode for \002{0}\002 is now \002off\002."), ci->GetName());
 		}
 		else
 			this->OnSyntaxError(source, source.command);
@@ -93,13 +93,13 @@ class CommandNSSetGreet : public Command
 			return;
 		}
 
-		const NickServ::Nick *na = NickServ::FindNick(user);
+		NickServ::Nick *na = NickServ::FindNick(user);
 		if (!na)
 		{
 			source.Reply(_("\002{0}\002 isn't registered."), user);
 			return;
 		}
-		NickServ::Account *nc = na->nc;
+		NickServ::Account *nc = na->GetAccount();
 
 		EventReturn MOD_RESULT = Event::OnSetNickOption(&Event::SetNickOption::OnSetNickOption, source, this, nc, param);
 		if (MOD_RESULT == EVENT_STOP)
@@ -107,21 +107,21 @@ class CommandNSSetGreet : public Command
 
 		if (!param.empty())
 		{
-			Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to change the greet of " << nc->display;
-			nc->Extend<Anope::string>("greet", param);
-			source.Reply(_("Greet message for \002{0}\002 changed to \002{1}\002."), nc->display, param);
+			Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to change the greet of " << nc->GetDisplay();
+			nc->SetS<Anope::string>("greet", param);
+			source.Reply(_("Greet message for \002{0}\002 changed to \002{1}\002."), nc->GetDisplay(), param);
 		}
 		else
 		{
-			Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to unset the greet of " << nc->display;
-			nc->Shrink<Anope::string>("greet");
-			source.Reply(_("Greet message for \002{0}\002 unset."), nc->display);
+			Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to unset the greet of " << nc->GetDisplay();
+			nc->UnsetS<Anope::string>("greet");
+			source.Reply(_("Greet message for \002{0}\002 unset."), nc->GetDisplay());
 		}
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
-		this->Run(source, source.nc->display, params.size() > 0 ? params[0] : "");
+		this->Run(source, source.nc->GetDisplay(), params.size() > 0 ? params[0] : "");
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &) override
@@ -157,12 +157,12 @@ class CommandNSSASetGreet : public CommandNSSetGreet
 class Greet : public Module
 	, public EventHook<Event::JoinChannel>
 	, public EventHook<Event::NickInfo>
-	, public EventHook<Event::BotInfoEvent>
+	, public EventHook<Event::ServiceBotEvent>
 {
 	/* channel setting for whether or not greet should be shown */
-	SerializableExtensibleItem<bool> bs_greet;
+	Serialize::Field<ChanServ::Channel, bool> bs_greet;
 	/* user greets */
-	SerializableExtensibleItem<Anope::string> ns_greet;
+	Serialize::Field<NickServ::Account, Anope::string> ns_greet;
 
 	CommandBSSetGreet commandbssetgreet;
 	CommandNSSetGreet commandnssetgreet;
@@ -172,9 +172,9 @@ class Greet : public Module
 	Greet(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
 		, EventHook<Event::JoinChannel>("OnJoinChannel")
 		, EventHook<Event::NickInfo>("OnNickInfo")
-		, EventHook<Event::BotInfoEvent>("OnBotInfoEvent")
-		, bs_greet(this, "BS_GREET")
-		, ns_greet(this, "greet")
+		, EventHook<Event::ServiceBotEvent>("OnServiceBotEvent")
+		, bs_greet(this, ChanServ::channel, "BS_GREET")
+		, ns_greet(this, NickServ::account, "greet")
 		, commandbssetgreet(this)
 		, commandnssetgreet(this)
 		, commandnssasetgreet(this)
@@ -187,25 +187,25 @@ class Greet : public Module
 		 * to has synced, or we'll get greet-floods when the net
 		 * recovers from a netsplit. -GD
 		 */
-		if (!c->ci || !c->ci->bi || !user->server->IsSynced() || !user->Account())
+		if (!c->ci || !c->ci->GetBot() || !user->server->IsSynced() || !user->Account())
 			return;
 
-		Anope::string *greet = ns_greet.Get(user->Account());
-		if (bs_greet.HasExt(c->ci) && greet != NULL && !greet->empty() && c->FindUser(c->ci->bi) && c->ci->AccessFor(user).HasPriv("GREET"))
+		Anope::string greet = ns_greet.Get(user->Account());
+		if (bs_greet.HasExt(c->ci) && !greet.empty() && c->FindUser(c->ci->GetBot()) && c->ci->AccessFor(user).HasPriv("GREET"))
 		{
-			IRCD->SendPrivmsg(*c->ci->bi, c->name, "[%s] %s", user->Account()->display.c_str(), greet->c_str());
-			c->ci->bi->lastmsg = Anope::CurTime;
+			IRCD->SendPrivmsg(c->ci->GetBot(), c->name, "[%s] %s", user->Account()->GetDisplay().c_str(), greet.c_str());
+			c->ci->GetBot()->lastmsg = Anope::CurTime;
 		}
 	}
 
 	void OnNickInfo(CommandSource &source, NickServ::Nick *na, InfoFormatter &info, bool show_hidden) override
 	{
-		Anope::string *greet = ns_greet.Get(na->nc);
-		if (greet != NULL)
-			info[_("Greet")] = *greet;
+		Anope::string greet = ns_greet.Get(na->GetAccount());
+		if (!greet.empty())
+			info[_("Greet")] = greet;
 	}
 
-	void OnBotInfo(CommandSource &source, BotInfo *bi, ChanServ::Channel *ci, InfoFormatter &info) override
+	void OnServiceBot(CommandSource &source, ServiceBot *bi, ChanServ::Channel *ci, InfoFormatter &info) override
 	{
 		if (bs_greet.HasExt(ci))
 			info.AddOption(_("Greet"));

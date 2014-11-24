@@ -93,14 +93,14 @@ class External : public Mechanism
 			}
 
 			NickServ::Account *nc = certs->FindAccountFromCert(mysess->cert);
-			if (!nc || nc->HasExt("NS_SUSPENDED"))
+			if (!nc || nc->HasFieldS("NS_SUSPENDED"))
 			{
 				sasl->Fail(sess);
 				delete sess;
 				return;
 			}
 
-			Log(Config->GetClient("NickServ")) << "A user identified to account " << nc->display << " using SASL EXTERNAL";
+			Log(Config->GetClient("NickServ")) << "A user identified to account " << nc->GetDisplay() << " using SASL EXTERNAL";
 			sasl->Succeed(sess, nc);
 			delete sess;
 		}
@@ -164,7 +164,7 @@ class SASLService : public SASL::Service, public Timer
 	Anope::string GetAgent() override
 	{
 		Anope::string agent = Config->GetModule(Service::owner)->Get<Anope::string>("agent", "NickServ");
-		BotInfo *bi = Config->GetClient(agent);
+		ServiceBot *bi = Config->GetClient(agent);
 		if (bi)
 			agent = bi->GetUID();
 		return agent;
@@ -210,7 +210,7 @@ class SASLService : public SASL::Service, public Timer
 
 	void Succeed(Session *session, NickServ::Account *nc) override
 	{
-		IRCD->SendSVSLogin(session->uid, nc->display);
+		IRCD->SendSVSLogin(session->uid, nc->GetDisplay());
 		this->SendMessage(session, "D", "S");
 	}
 

@@ -184,13 +184,13 @@ void Kick::Run(MessageSource &source, const std::vector<Anope::string> &params)
 void Kill::Run(MessageSource &source, const std::vector<Anope::string> &params)
 {
 	User *u = User::Find(params[0]);
-	BotInfo *bi;
+	ServiceBot *bi;
 
 	if (!u)
 		return;
 
 	/* Recover if someone kills us. */
-	if (u->server == Me && (bi = dynamic_cast<BotInfo *>(u)))
+	if (u->server == Me && (bi = dynamic_cast<ServiceBot *>(u)))
 	{
 		static time_t last_time = 0;
 
@@ -263,7 +263,7 @@ void Notice::Run(MessageSource &source, const std::vector<Anope::string> &params
 	/* ignore channel notices */
 	if (!IRCD->IsChannelValid(params[0]))
 	{
-		BotInfo *bi = BotInfo::Find(params[0]);
+		ServiceBot *bi = ServiceBot::Find(params[0]);
 		if (!bi)
 			return;
 		Event::OnBotNotice(&Event::BotNotice::OnBotNotice, u, bi, message);
@@ -330,7 +330,7 @@ void Privmsg::Run(MessageSource &source, const std::vector<Anope::string> &param
 		}
 		else if (!IRCD->RequiresID && Config->UseStrictPrivmsg)
 		{
-			BotInfo *bi = BotInfo::Find(receiver);
+			ServiceBot *bi = ServiceBot::Find(receiver);
 			if (!bi)
 				return;
 			Log(LOG_DEBUG) << "Ignored PRIVMSG without @ from " << u->nick;
@@ -338,7 +338,7 @@ void Privmsg::Run(MessageSource &source, const std::vector<Anope::string> &param
 			return;
 		}
 
-		BotInfo *bi = BotInfo::Find(botname, nick_only);
+		ServiceBot *bi = ServiceBot::Find(botname, nick_only);
 
 		if (bi)
 		{
@@ -416,12 +416,8 @@ void Stats::Run(MessageSource &source, const std::vector<Anope::string> &params)
 				IRCD->SendNumeric(219, source.GetSource(), "%c :End of /STATS report.", params[0][0]);
 			else
 			{
-				for (unsigned i = 0; i < Oper::opers.size(); ++i)
-				{
-					Oper *o = Oper::opers[i];
-
-					IRCD->SendNumeric(243, source.GetSource(), "O * * %s %s 0", o->name.c_str(), o->ot->GetName().c_str());
-				}
+				for (Oper *o : Serialize::GetObjects<Oper *>(operblock))
+					IRCD->SendNumeric(243, source.GetSource(), "O * * %s %s 0", o->GetName().c_str(), o->GetType()->GetName().c_str());
 
 				IRCD->SendNumeric(219, source.GetSource(), "%c :End of /STATS report.", params[0][0]);
 			}
@@ -475,7 +471,7 @@ void Whois::Run(MessageSource &source, const std::vector<Anope::string> &params)
 
 	if (u && u->server == Me)
 	{
-		const BotInfo *bi = BotInfo::Find(u->GetUID());
+		const ServiceBot *bi = ServiceBot::Find(u->GetUID());
 		IRCD->SendNumeric(311, source.GetSource(), "%s %s %s * :%s", u->nick.c_str(), u->GetIdent().c_str(), u->host.c_str(), u->realname.c_str());
 		if (bi)
 			IRCD->SendNumeric(307, source.GetSource(), "%s :is a registered nick", bi->nick.c_str());

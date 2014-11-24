@@ -99,9 +99,9 @@ class SQLLog : public Module
 		}
 
 		insert.SetValue("user", l->u ? l->u->nick : "");
-		insert.SetValue("acc", l->nc ? l->nc->display : "");
+		insert.SetValue("acc", l->nc ? l->nc->GetDisplay() : "");
 		insert.SetValue("command", l->c ? l->c->name : "");
-		insert.SetValue("channel", l->ci ? l->ci->name : "");
+		insert.SetValue("channel", l->ci ? l->ci->GetName() : "");
 		insert.SetValue("msg", msg);
 
 		SQL->Run(NULL, insert);

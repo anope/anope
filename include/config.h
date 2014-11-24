@@ -14,7 +14,6 @@
 
 #include "users.h"
 #include "opertype.h"
-#include <stack>
 
 namespace Configuration
 {
@@ -113,8 +112,8 @@ namespace Configuration
 		std::vector<Anope::string> Ulines;
 		/* List of available opertypes */
 		std::vector<OperType *> MyOperTypes;
-		/* List of pairs of opers and their opertype from the config */
-		std::vector<Oper *> Opers;
+		/* names of opers configured in the configuration */
+		std::vector<Anope::string> Opers;
 		/* Map of fantasy commands */
 		CommandInfo::map Fantasy;
 		/* Command groups */
@@ -137,7 +136,7 @@ namespace Configuration
 		Block *GetModule(Module *);
 		Block *GetModule(const Anope::string &name);
 
-		BotInfo *GetClient(const Anope::string &name);
+		ServiceBot *GetClient(const Anope::string &name);
 
 		Block *GetCommand(CommandSource &);
 	};

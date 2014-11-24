@@ -7,35 +7,39 @@
  *
  */
 
+#include "modules/nickserv.h"
+
  /* AutoKick data. */
-class CoreExport AutoKick : public Serializable
+class CoreExport AutoKick : public Serialize::Object
 {
- public:
-	/* Channel this autokick is on */
-	Serialize::Reference<ChanServ::Channel> ci;
-
-	Anope::string mask;
-	Serialize::Reference<NickServ::Account> nc;
-
-	Anope::string reason;
-	Anope::string creator;
-	time_t addtime;
-	time_t last_used;
-
  protected:
-	AutoKick() : Serializable("AutoKick") { }
+	using Serialize::Object::Object;
  public:
-	virtual ~AutoKick() { }
+	virtual ~AutoKick() = default;
+
+	virtual ChanServ::Channel *GetChannel() anope_abstract;
+	virtual void SetChannel(ChanServ::Channel *) anope_abstract;
+
+	virtual Anope::string GetMask() anope_abstract;
+	virtual void SetMask(const Anope::string &) anope_abstract;
+
+	virtual NickServ::Account *GetAccount() anope_abstract;
+	virtual void SetAccount(NickServ::Account *) anope_abstract;
+
+	virtual Anope::string GetReason() anope_abstract;
+	virtual void SetReason(const Anope::string &) anope_abstract;
+
+	virtual Anope::string GetCreator() anope_abstract;
+	virtual void SetCreator(const Anope::string &) anope_abstract;
+
+	virtual time_t GetAddTime() anope_abstract;
+	virtual void SetAddTime(const time_t &) anope_abstract;
+
+	virtual time_t GetLastUsed() anope_abstract;
+	virtual void SetLastUsed(const time_t &) anope_abstract;
 };
 
-class AutoKickService : public Service
-{
- public:
-	AutoKickService(Module *o) : Service(o, "AutoKickService", "AutoKickService") { }
-
-	virtual AutoKick* Create() anope_abstract;
-};
-static ServiceReference<AutoKickService> akick("AutoKickService", "AutoKickService");
+static Serialize::TypeReference<AutoKick> autokick("AutoKick");
 
 namespace Event
 {

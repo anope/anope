@@ -42,13 +42,13 @@ class CommandCSDrop : public Command
 
 		if (params.size() < 2 || !chan.equals_ci(params[1]))
 		{
-			source.Reply(_("You must enter the channel name twice as a confirmation that you wish to drop \002{0}\002."), ci->name);
+			source.Reply(_("You must enter the channel name twice as a confirmation that you wish to drop \002{0}\002."), ci->GetName());
 			return;
 		}
 
-		if ((ci->HasExt("SECUREFOUNDER") ? !source.IsFounder(ci) : !source.AccessFor(ci).HasPriv("FOUNDER")) && !source.HasCommand("chanserv/drop"))
+		if ((ci->HasFieldS("SECUREFOUNDER") ? !source.IsFounder(ci) : !source.AccessFor(ci).HasPriv("FOUNDER")) && !source.HasCommand("chanserv/drop"))
 		{
-			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "FOUNDER", ci->name);
+			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "FOUNDER", ci->GetName());
 			return;
 		}
 
@@ -56,11 +56,11 @@ class CommandCSDrop : public Command
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
-		bool override = (ci->HasExt("SECUREFOUNDER") ? !source.IsFounder(ci) : !source.AccessFor(ci).HasPriv("FOUNDER"));
-		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "(founder was: " << (ci->GetFounder() ? ci->GetFounder()->display : "none") << ")";
+		bool override = (ci->HasFieldS("SECUREFOUNDER") ? !source.IsFounder(ci) : !source.AccessFor(ci).HasPriv("FOUNDER"));
+		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "(founder was: " << (ci->GetFounder() ? ci->GetFounder()->GetDisplay() : "none") << ")";
 
 		Reference<Channel> c = ci->c;
-		delete ci;
+		ci->Delete();
 
 		source.Reply(_("Channel \002{0}\002 has been dropped."), chan);
 

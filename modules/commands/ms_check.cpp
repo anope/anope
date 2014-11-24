@@ -26,36 +26,36 @@ class CommandMSCheck : public Command
 
 		bool found = false;
 
-		const NickServ::Nick *na = NickServ::FindNick(recipient);
+		NickServ::Nick *na = NickServ::FindNick(recipient);
 		if (!na)
 		{
 			source.Reply(_("\002{0}\002 isn't registered."), recipient);
 			return;
 		}
 
-		MemoServ::MemoInfo *mi = na->nc->memos;
+		MemoServ::MemoInfo *mi = na->GetAccount()->GetMemos();
 
 		if (mi)
 			/* find the last memo */
-			for (unsigned i = mi->memos->size(); i > 0; --i)
+			for (unsigned i = mi->GetMemos().size(); i > 0; --i)
 			{
 				MemoServ::Memo *m = mi->GetMemo(i - 1);
-				NickServ::Nick *na2 = NickServ::FindNick(m->sender);
+				NickServ::Nick *na2 = NickServ::FindNick(m->GetSender());
 
-				if (na2 != NULL && na2->nc == source.GetAccount())
+				if (na2 != NULL && na2->GetAccount() == source.GetAccount())
 				{
 					found = true; /* Yes, we've found the memo */
 
-					if (m->unread)
-						source.Reply(_("The last memo you sent to \002{0}\002 (sent on \002{1}\002) has not yet been read."), na->nick, Anope::strftime(m->time, source.GetAccount()));
+					if (m->GetUnread())
+						source.Reply(_("The last memo you sent to \002{0}\002 (sent on \002{1}\002) has not yet been read."), na->GetNick(), Anope::strftime(m->GetTime(), source.GetAccount()));
 					else
-						source.Reply(_("The last memo you sent to \002{0}\002 (sent on \002{1}\002) has been read."), na->nick, Anope::strftime(m->time, source.GetAccount()));
+						source.Reply(_("The last memo you sent to \002{0}\002 (sent on \002{1}\002) has been read."), na->GetNick(), Anope::strftime(m->GetTime(), source.GetAccount()));
 					break;
 				}
 			}
 
 		if (!found)
-			source.Reply(_("\002{0}\002 doesn't have a memo from you."), na->nick);
+			source.Reply(_("\002{0}\002 doesn't have a memo from you."), na->GetNick());
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override

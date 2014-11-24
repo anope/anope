@@ -122,7 +122,7 @@ class CSTop : public Module
 		if (!params.empty())
 			channel = params[0];
 		else if (source.c && source.c->ci)
-			channel = source.c->ci->name;
+			channel = source.c->ci->GetName();
 
 		if (!is_global && channel.empty())
 			is_global = true;

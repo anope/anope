@@ -10,88 +10,82 @@
  */
 
 #include "module.h"
-#include "modules/set_misc.h"
+#include "modules/ns_set_misc.h"
 #include "modules/ns_info.h"
 #include "modules/ns_set.h"
 
-static Module *me;
-
 static Anope::map<Anope::string> descriptions;
 
-struct NSMiscData;
-static Anope::map<ExtensibleItem<NSMiscData> *> items;
-
-static ExtensibleItem<NSMiscData> *GetItem(const Anope::string &name)
+class NSMiscDataImpl : public NSMiscData
 {
-	ExtensibleItem<NSMiscData>* &it = items[name];
-	if (!it)
-		try
-		{
-			it = new ExtensibleItem<NSMiscData>(me, name);
-		}
-		catch (const ModuleException &) { }
-	return it;
-}
+ public:
+	NSMiscDataImpl(Serialize::TypeBase *type) : NSMiscData(type) { }
+	NSMiscDataImpl(Serialize::TypeBase *type, Serialize::ID id) : NSMiscData(type, id) { }
 
-struct NSMiscData : MiscData, Serializable
+	NickServ::Account *GetAccount() override;
+	void SetAccount(NickServ::Account *s) override;
+
+	Anope::string GetName() override;
+	void SetName(const Anope::string &n) override;
+
+	Anope::string GetData() override;
+	void SetData(const Anope::string &d) override;
+};
+
+class NSMiscDataType : public Serialize::Type<NSMiscDataImpl>
 {
-	NSMiscData(Extensible *) : Serializable("NSMiscData") { }
+ public:
+	Serialize::ObjectField<NSMiscDataImpl, NickServ::Account *> owner;
+	Serialize::Field<NSMiscDataImpl, Anope::string> name, data;
 
-	NSMiscData(NickServ::Account *ncore, const Anope::string &n, const Anope::string &d) : Serializable("NSMiscData")
+	NSMiscDataType(Module *me) : Serialize::Type<NSMiscDataImpl>(me, "NSMiscData")
+		, owner(this, "nc", true)
+		, name(this, "name")
+		, data(this, "data")
 	{
-		object = ncore->display;
-		name = n;
-		data = d;
-	}
-
-	void Serialize(Serialize::Data &sdata) const override
-	{
-		sdata["nc"] << this->object;
-		sdata["name"] << this->name;
-		sdata["data"] << this->data;
-	}
-
-	static Serializable* Unserialize(Serializable *obj, Serialize::Data &data)
-	{
-		Anope::string snc, sname, sdata;
-
-		data["nc"] >> snc;
-		data["name"] >> sname;
-		data["data"] >> sdata;
-
-		NickServ::Account *nc = NickServ::FindAccount(snc);
-		if (nc == NULL)
-			return NULL;
-
-		NSMiscData *d = NULL;
-		if (obj)
-		{
-			d = anope_dynamic_static_cast<NSMiscData *>(obj);
-			d->object = nc->display;
-			data["name"] >> d->name;
-			data["data"] >> d->data;
-		}
-		else
-		{
-			ExtensibleItem<NSMiscData> *item = GetItem(sname);
-			if (item)
-				d = item->Set(nc, NSMiscData(nc, sname, sdata));
-		}
-
-		return d;
 	}
 };
 
-static Anope::string GetAttribute(const Anope::string &command)
+NickServ::Account *NSMiscDataImpl::GetAccount()
 {
-	size_t sp = command.rfind(' ');
-	if (sp != Anope::string::npos)
-		return command.substr(sp + 1);
-	return command;
+	return Get(&NSMiscDataType::owner);
+}
+
+void NSMiscDataImpl::SetAccount(NickServ::Account *s)
+{
+	Set(&NSMiscDataType::owner, s);
+}
+
+Anope::string NSMiscDataImpl::GetName()
+{
+	return Get(&NSMiscDataType::name);
+}
+
+void NSMiscDataImpl::SetName(const Anope::string &n)
+{
+	Set(&NSMiscDataType::name, n);
+}
+
+Anope::string NSMiscDataImpl::GetData()
+{
+	return Get(&NSMiscDataType::data);
+}
+
+void NSMiscDataImpl::SetData(const Anope::string &d)
+{
+	Set(&NSMiscDataType::data, d);
 }
 
 class CommandNSSetMisc : public Command
 {
+	Anope::string GetAttribute(const Anope::string &command)
+	{
+		size_t sp = command.rfind(' ');
+		if (sp != Anope::string::npos)
+			return command.substr(sp + 1);
+		return command;
+	}
+
  public:
 	CommandNSSetMisc(Module *creator, const Anope::string &cname = "nickserv/set/misc", size_t min = 0) : Command(creator, cname, min, min + 1)
 	{
@@ -106,39 +100,46 @@ class CommandNSSetMisc : public Command
 			return;
 		}
 
-		const NickServ::Nick *na = NickServ::FindNick(user);
+		NickServ::Nick *na = NickServ::FindNick(user);
 		if (!na)
 		{
 			source.Reply(_("\002{0}\002 isn't registered."), user);
 			return;
 		}
-		NickServ::Account *nc = na->nc;
+		NickServ::Account *nc = na->GetAccount();
 
 		EventReturn MOD_RESULT = Event::OnSetNickOption(&Event::SetNickOption::OnSetNickOption, source, this, nc, param);
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
 		Anope::string scommand = GetAttribute(source.command);
-		Anope::string key = "ns_set_misc:" + scommand;
-		ExtensibleItem<NSMiscData> *item = GetItem(key);
-		if (item == NULL)
-			return;
+
+		/* remove existing */
+		for (NSMiscData *data : nc->GetRefs<NSMiscData *>(nsmiscdata))
+			if (data->GetName() == scommand)
+			{
+				data->Delete();
+				break;
+			}
 
 		if (!param.empty())
 		{
-			item->Set(nc, NSMiscData(nc, key, param));
-			source.Reply(_("\002{0}\002 for \002{1}\002 set to \002{2}\002."), scommand, nc->display, param);
+			NSMiscData *data = nsmiscdata.Create();
+			data->SetAccount(nc);
+			data->SetName(scommand);
+			data->SetData(param);
+
+			source.Reply(_("\002{0}\002 for \002{1}\002 set to \002{2}\002."), scommand, nc->GetDisplay(), param);
 		}
 		else
 		{
-			item->Unset(nc);
-			source.Reply(_("\002{0}\002 for \002{1}\002 unset."), scommand, nc->display);
+			source.Reply(_("\002{0}\002 for \002{1}\002 unset."), scommand, nc->GetDisplay());
 		}
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
-		this->Run(source, source.nc->display, !params.empty() ? params[0] : "");
+		this->Run(source, source.nc->GetDisplay(), !params.empty() ? params[0] : "");
 	}
 
 	void OnServHelp(CommandSource &source) override
@@ -181,22 +182,15 @@ class NSSetMisc : public Module
 {
 	CommandNSSetMisc commandnssetmisc;
 	CommandNSSASetMisc commandnssasetmisc;
-	Serialize::Type nsmiscdata_type;
+	NSMiscDataType type;
 
  public:
 	NSSetMisc(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
 		, EventHook<Event::NickInfo>("OnNickInfo")
 		, commandnssetmisc(this)
 		, commandnssasetmisc(this)
-		, nsmiscdata_type("NSMiscData", NSMiscData::Unserialize)
+		, type(this)
 	{
-		me = this;
-	}
-
-	~NSSetMisc()
-	{
-		for (Anope::map<ExtensibleItem<NSMiscData> *>::iterator it = items.begin(); it != items.end(); ++it)
-			delete it->second;
 	}
 
 	void OnReload(Configuration::Conf *conf) override
@@ -224,14 +218,8 @@ class NSSetMisc : public Module
 
 	void OnNickInfo(CommandSource &source, NickServ::Nick *na, InfoFormatter &info, bool) override
 	{
-		for (Anope::map<ExtensibleItem<NSMiscData> *>::iterator it = items.begin(); it != items.end(); ++it)
-		{
-			ExtensibleItem<NSMiscData> *e = it->second;
-			NSMiscData *data = e->Get(na->nc);
-
-			if (data != NULL)
-				info[e->name.substr(12).replace_all_cs("_", " ")] = data->data;
-		}
+		for (NSMiscData *data : na->GetAccount()->GetRefs<NSMiscData *>(nsmiscdata))
+			info[data->GetName()] = data->GetData();
 	}
 };
 

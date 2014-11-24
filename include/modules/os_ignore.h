@@ -10,17 +10,25 @@
  */
 
 
-struct IgnoreData
+class Ignore : public Serialize::Object
 {
-	Anope::string mask;
-	Anope::string creator;
-	Anope::string reason;
-	time_t time; /* When do we stop ignoring them? */
+ public:
+	using Serialize::Object::Object;
 
-	virtual ~IgnoreData() { }
- protected:
-	IgnoreData() : time(0) { }
+	virtual Anope::string GetMask() anope_abstract;
+	virtual void SetMask(const Anope::string &) anope_abstract;
+
+	virtual Anope::string GetCreator() anope_abstract;
+	virtual void SetCreator(const Anope::string &) anope_abstract;
+
+	virtual Anope::string GetReason() anope_abstract;
+	virtual void SetReason(const Anope::string &) anope_abstract;
+
+	virtual time_t GetTime() anope_abstract;
+	virtual void SetTime(const time_t &) anope_abstract;
 };
+
+static Serialize::TypeReference<Ignore> ignoretype("IgnoreData");
 
 class IgnoreService : public Service
 {
@@ -28,17 +36,7 @@ class IgnoreService : public Service
 	IgnoreService(Module *c) : Service(c, "IgnoreService", "ignore") { }
 
  public:
-	virtual void AddIgnore(IgnoreData *) anope_abstract;
-
-	virtual void DelIgnore(IgnoreData *) anope_abstract;
-
-	virtual void ClearIgnores() anope_abstract;
-
-	virtual IgnoreData *Create() anope_abstract;
-
-	virtual IgnoreData *Find(const Anope::string &mask) anope_abstract;
-
-	virtual std::vector<IgnoreData *> &GetIgnores() anope_abstract;
+	virtual Ignore *Find(const Anope::string &mask) anope_abstract;
 };
 
 static ServiceReference<IgnoreService> ignore_service("IgnoreService", "ignore");

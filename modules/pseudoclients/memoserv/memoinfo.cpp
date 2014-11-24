@@ -1,33 +1,63 @@
-#include "memoinfo.h"
+#include "memoinfotype.h"
 
-MemoServ::Memo *MemoInfoImpl::GetMemo(unsigned index) const
+MemoServ::Memo *MemoInfoImpl::GetMemo(unsigned index)
 {
-	if (index >= this->memos->size())
-		return NULL;
-	MemoServ::Memo *m = (*memos)[index];
-	m->QueueUpdate();
-	return m;
+	auto memos = GetMemos();
+	return index >= memos.size() ? nullptr : memos[index];
 }
 
-unsigned MemoInfoImpl::GetIndex(MemoServ::Memo *m) const
+unsigned MemoInfoImpl::GetIndex(MemoServ::Memo *m)
 {
-	for (unsigned i = 0; i < this->memos->size(); ++i)
+	auto memos = GetMemos();
+	for (unsigned i = 0; i < memos.size(); ++i)
 		if (this->GetMemo(i) == m)
 			return i;
-	return -1;
+	return -1; // XXX wtf?
 }
 
 void MemoInfoImpl::Del(unsigned index)
 {
-	if (index >= this->memos->size())
-		return;
-	delete this->GetMemo(index);
+	delete GetMemo(index);
 }
 
 bool MemoInfoImpl::HasIgnore(User *u)
 {
-	for (unsigned i = 0; i < this->ignores.size(); ++i)
-		if (u->nick.equals_ci(this->ignores[i]) || (u->Account() && u->Account()->display.equals_ci(this->ignores[i])) || Anope::Match(u->GetMask(), Anope::string(this->ignores[i])))
+	for (MemoServ::Ignore *ign : GetIgnores())
+	{
+		const Anope::string &mask = ign->GetMask();
+		if (u->nick.equals_ci(mask) || (u->Account() && u->Account()->GetDisplay().equals_ci(mask)) || Anope::Match(u->GetMask(), mask))
 			return true;
+	}
 	return false;
 }
+
+Serialize::Object *MemoInfoImpl::GetOwner()
+{
+	return Get(&MemoInfoType::owner);
+}
+
+void MemoInfoImpl::SetOwner(Serialize::Object *o)
+{
+	Set(&MemoInfoType::owner, o);
+}
+
+int16_t MemoInfoImpl::GetMemoMax()
+{
+	return Get(&MemoInfoType::memomax);
+}
+
+void MemoInfoImpl::SetMemoMax(const int16_t &i)
+{
+	Set(&MemoInfoType::memomax, i);
+}
+
+std::vector<MemoServ::Memo *> MemoInfoImpl::GetMemos()
+{
+	return GetRefs<MemoServ::Memo *>(MemoServ::memo);
+}
+
+std::vector<MemoServ::Ignore *> MemoInfoImpl::GetIgnores()
+{
+	return GetRefs<MemoServ::Ignore *>(MemoServ::ignore);
+}
+

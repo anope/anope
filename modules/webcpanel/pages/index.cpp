@@ -46,7 +46,7 @@ class WebpanelRequest : public NickServ::IdentifyRequestListener
 
 		{
 			HTTPReply::cookie c;
-			c.push_back(std::make_pair("account", na->nick));
+			c.push_back(std::make_pair("account", na->GetNick()));
 			c.push_back(std::make_pair("Path", "/"));
 			reply.cookies.push_back(c);
 		}

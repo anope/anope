@@ -502,21 +502,21 @@ namespace Anope
 	 * @param nc The account to use language settings for to translate this string, if applicable
 	 * @return A human readable string, eg "1 minute"
 	 */
-	extern CoreExport Anope::string Duration(time_t seconds, const NickServ::Account *nc = NULL);
+	extern CoreExport Anope::string Duration(time_t seconds, NickServ::Account *nc = NULL);
 
 	/** Generates a human readable string of type "expires in ..."
 	 * @param expires time in seconds
 	 * @param nc The account to use language settings for to translate this string, if applicable
 	 * @return A human readable string, eg "expires in 5 days"
 	 */
-	extern CoreExport Anope::string Expires(time_t seconds, const NickServ::Account *nc = NULL);
+	extern CoreExport Anope::string Expires(time_t seconds, NickServ::Account *nc = NULL);
 
 	/** Converts a time in seconds (epoch) to a human readable format.
 	 * @param t The time
 	 * @param nc The account to use language settings for to translate this string, if applicable
 	 * @param short_output If true, the output is just a date (eg, "Apr 12 20:18:22 2009 MSD"), else it includes the date and how long ago/from now that date is, (eg "Apr 12 20:18:22 2009 MSD (1313 days, 9 hours, 32 minutes ago)"
 	 */
-	extern CoreExport Anope::string strftime(time_t t, const NickServ::Account *nc = NULL, bool short_output = false);
+	extern CoreExport Anope::string strftime(time_t t, NickServ::Account *nc = NULL, bool short_output = false);
 
 	/** Normalize buffer, stripping control characters and colors
 	 * @param A string to be parsed for control and color codes
@@ -704,6 +704,22 @@ class ConvertException : public CoreException
 	virtual ~ConvertException() throw() { }
 };
 
+template<typename T>
+typename std::enable_if<std::is_enum<T>::value, std::ostream &>::type
+operator<<(std::ostream &os, T t)
+{
+	// XXX
+	return os;
+}
+
+template<typename T>
+typename std::enable_if<std::is_enum<T>::value, std::istream &>::type
+operator>>(std::istream &is, T& t)
+{
+	// XXX
+	return is;
+}
+
 /** Convert something to a string
  */
 template<typename T> inline Anope::string stringify(const T &x)
@@ -790,7 +806,7 @@ struct kwarg
 
 inline kwarg operator"" _kw(const char *literal, size_t n)
 {
-	return kwarg{ literal };
+	return { literal };
 }
 
 struct FormatInfo

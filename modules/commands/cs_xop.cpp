@@ -10,6 +10,7 @@
  */
 
 #include "module.h"
+#include "modules/cs_access.h"
 
 namespace
 {
@@ -20,15 +21,15 @@ namespace
 class XOPChanAccess : public ChanServ::ChanAccess
 {
  public:
-	Anope::string type;
+	XOPChanAccess(Serialize::TypeBase *type) : ChanServ::ChanAccess(type) { }
+	XOPChanAccess(Serialize::TypeBase *type, Serialize::ID id) : ChanServ::ChanAccess(type, id) { }
 
-	XOPChanAccess(ChanServ::AccessProvider *p) : ChanAccess(p)
-	{
-	}
+	Anope::string GetType();
+	void SetType(const Anope::string &);
 
-	bool HasPriv(const Anope::string &priv) const override
+	bool HasPriv(const Anope::string &priv) override
 	{
-		for (std::vector<Anope::string>::iterator it = std::find(order.begin(), order.end(), this->type); it != order.end(); ++it)
+		for (std::vector<Anope::string>::iterator it = std::find(order.begin(), order.end(), this->GetType()); it != order.end(); ++it)
 		{
 			const std::vector<Anope::string> &privs = permissions[*it];
 			if (std::find(privs.begin(), privs.end(), priv) != privs.end())
@@ -37,62 +38,70 @@ class XOPChanAccess : public ChanServ::ChanAccess
 		return false;
 	}
 
-	Anope::string AccessSerialize() const
+	Anope::string AccessSerialize() override
 	{
-		return this->type;
+		return this->GetType();
 	}
 
 	void AccessUnserialize(const Anope::string &data) override
 	{
-		this->type = data;
+		this->SetType(data);
 	}
 
-	static Anope::string DetermineLevel(const ChanServ::ChanAccess *access)
+	static Anope::string DetermineLevel(ChanServ::ChanAccess *access)
 	{
-		if (access->provider->name == "access/xop")
+		if (access->GetSerializableType()->GetName() == "XOPChanAccess")
 		{
-			const XOPChanAccess *xaccess = anope_dynamic_static_cast<const XOPChanAccess *>(access);
-			return xaccess->type;
+			XOPChanAccess *xaccess = anope_dynamic_static_cast<XOPChanAccess *>(access);
+			return xaccess->GetType();
 		}
-		else
-		{
-			std::map<Anope::string, int> count;
 
-			for (std::map<Anope::string, std::vector<Anope::string> >::const_iterator it = permissions.begin(), it_end = permissions.end(); it != it_end; ++it)
+		std::map<Anope::string, int> count;
+
+		for (std::map<Anope::string, std::vector<Anope::string> >::const_iterator it = permissions.begin(), it_end = permissions.end(); it != it_end; ++it)
+		{
+			int &c = count[it->first];
+			const std::vector<Anope::string> &perms = it->second;
+			for (unsigned i = 0; i < perms.size(); ++i)
+				if (access->HasPriv(perms[i]))
+					++c;
+		}
+
+		Anope::string max;
+		int maxn = 0;
+		for (std::map<Anope::string, int>::iterator it = count.begin(), it_end = count.end(); it != it_end; ++it)
+			if (it->second > maxn)
 			{
-				int &c = count[it->first];
-				const std::vector<Anope::string> &perms = it->second;
-				for (unsigned i = 0; i < perms.size(); ++i)
-					if (access->HasPriv(perms[i]))
-						++c;
+				maxn = it->second;
+				max = it->first;
 			}
 
-			Anope::string max;
-			int maxn = 0;
-			for (std::map<Anope::string, int>::iterator it = count.begin(), it_end = count.end(); it != it_end; ++it)
-				if (it->second > maxn)
-				{
-					maxn = it->second;
-					max = it->first;
-				}
-
-			return max;
-		}
+		return max;
 	}
+
 };
 
-class XOPAccessProvider : public ChanServ::AccessProvider
+class XOPChanAccessType : public Serialize::Type<XOPChanAccess, ChanServ::ChanAccessType>
 {
  public:
-	XOPAccessProvider(Module *o) : AccessProvider(o, "access/xop")
-	{
-	}
+	Serialize::Field<XOPChanAccess, Anope::string> type;
 
-	ChanServ::ChanAccess *Create() override
+	XOPChanAccessType(Module *me) : Serialize::Type<XOPChanAccess, ChanAccessType>(me, "XOPChanAccess")
+		, type(this, "type")
 	{
-		return new XOPChanAccess(this);
+		SetParent(ChanServ::chanaccess);
 	}
 };
+
+Anope::string XOPChanAccess::GetType()
+{
+	return Get(&XOPChanAccessType::type);
+}
+
+void XOPChanAccess::SetType(const Anope::string &i)
+{
+	Object::Set(&XOPChanAccessType::type, i);
+}
 
 class CommandCSXOP : public Command
 {
@@ -114,11 +123,11 @@ class CommandCSXOP : public Command
 		}
 
 		XOPChanAccess tmp_access(NULL);
-		tmp_access.ci = ci;
-		tmp_access.type = source.command.upper();
+		tmp_access.SetChannel(ci);
+		tmp_access.SetType(source.command.upper());
 
 		ChanServ::AccessGroup access = source.AccessFor(ci);
-		const ChanServ::ChanAccess *highest = access.Highest();
+		ChanServ::ChanAccess *highest = access.Highest();
 		bool override = false;
 
 		std::vector<Anope::string>::iterator cmd_it = std::find(order.begin(), order.end(), source.command.upper()),
@@ -130,10 +139,13 @@ class CommandCSXOP : public Command
 				override = true;
 			else
 			{
-				source.Reply(_("Access denied. You do not have the \002{0}\002 privilege on \002{1}\002."), "ACCESS_CHANGE", ci->name);
+				source.Reply(_("Access denied. You do not have the \002{0}\002 privilege on \002{1}\002."), "ACCESS_CHANGE", ci->GetName());
 				return;
 			}
 		}
+
+		NickServ::Nick *na = nullptr;
+		ChanServ::Channel *targ_ci = nullptr;
 
 		if (IRCD->IsChannelValid(mask))
 		{
@@ -143,7 +155,7 @@ class CommandCSXOP : public Command
 				return;
 			}
 
-			ChanServ::Channel *targ_ci = ChanServ::Find(mask);
+			targ_ci = ChanServ::Find(mask);
 			if (targ_ci == NULL)
 			{
 				source.Reply(_("Channel \002{0}\002 isn't registered."), mask);
@@ -156,11 +168,11 @@ class CommandCSXOP : public Command
 				return;
 			}
 
-			mask = targ_ci->name;
+			mask = targ_ci->GetName();
 		}
 		else
 		{
-			const NickServ::Nick *na = NickServ::FindNick(mask);
+			na = NickServ::FindNick(mask);
 			if (!na && Config->GetModule("chanserv")->Get<bool>("disallow_hostmask_access"))
 			{
 				source.Reply(_("Masks and unregistered users may not be on access lists."));
@@ -182,17 +194,17 @@ class CommandCSXOP : public Command
 
 		for (unsigned i = 0; i < ci->GetAccessCount(); ++i)
 		{
-			const ChanServ::ChanAccess *a = ci->GetAccess(i);
+			ChanServ::ChanAccess *a = ci->GetAccess(i);
 
 			if (a->Mask().equals_ci(mask))
 			{
 				if ((!highest || *a >= *highest) && !access.founder && !source.HasPriv("chanserv/access/modify"))
 				{
-					source.Reply(_("Access denied. You do not have enough privileges on \002{0}\002 to lower the access of \002{1}\002."), ci->name, a->Mask());
+					source.Reply(_("Access denied. You do not have enough privileges on \002{0}\002 to lower the access of \002{1}\002."), ci->GetName(), a->Mask());
 					return;
 				}
 
-				delete ci->EraseAccess(i);
+				a->Delete();
 				break;
 			}
 		}
@@ -204,21 +216,22 @@ class CommandCSXOP : public Command
 			return;
 		}
 
-		ServiceReference<ChanServ::AccessProvider> provider("AccessProvider", "access/xop");
-		if (!provider)
-			return;
-		XOPChanAccess *acc = anope_dynamic_static_cast<XOPChanAccess *>(provider->Create());
-		acc->SetMask(mask, ci);
-		acc->creator = source.GetNick();
-		acc->type = source.command.upper();
-		acc->last_seen = 0;
-		acc->created = Anope::CurTime;
-		ci->AddAccess(acc);
+		XOPChanAccess *acc = anope_dynamic_static_cast<XOPChanAccess *>(xopchanaccess.Create());
+		if (na)
+			acc->SetObj(na->GetAccount());
+		else if (targ_ci)
+			acc->SetObj(targ_ci);
+		acc->SetChannel(ci);
+		acc->SetMask(mask);
+		acc->SetCreator(source.GetNick());
+		acc->SetType(source.command.upper());
+		acc->SetLastSeen(0);
+		acc->SetCreated(Anope::CurTime);
 
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to add " << mask;
 
 		Event::OnAccessAdd(&Event::AccessAdd::OnAccessAdd, ci, source, acc);
-		source.Reply(_("\002%s\002 added to %s %s list."), acc->Mask(), ci->name.c_str(), source.command.c_str());
+		source.Reply(_("\002%s\002 added to %s %s list."), acc->Mask(), ci->GetName().c_str(), source.command.c_str());
 	}
 
 	void DoDel(CommandSource &source, ChanServ::Channel *ci, const std::vector<Anope::string> &params)
@@ -240,16 +253,12 @@ class CommandCSXOP : public Command
 
 		if (!ci->GetAccessCount())
 		{
-			source.Reply(_("%s %s list is empty."), ci->name.c_str(), source.command.c_str());
+			source.Reply(_("%s %s list is empty."), ci->GetName().c_str(), source.command.c_str());
 			return;
 		}
 
-		XOPChanAccess tmp_access(NULL);
-		tmp_access.ci = ci;
-		tmp_access.type = source.command.upper();
-
 		ChanServ::AccessGroup access = source.AccessFor(ci);
-		const ChanServ::ChanAccess *highest = access.Highest();
+		ChanServ::ChanAccess *highest = access.Highest();
 		bool override = false;
 
 		if (!isdigit(mask[0]) && mask.find_first_of("#!*@") == Anope::string::npos && !NickServ::FindNick(mask))
@@ -267,13 +276,13 @@ class CommandCSXOP : public Command
 		std::vector<Anope::string>::iterator cmd_it = std::find(order.begin(), order.end(), source.command.upper()),
 			access_it = highest ? std::find(order.begin(), order.end(), XOPChanAccess::DetermineLevel(highest)) : order.end();
 
-		if (!mask.equals_ci(nc->display) && !access.founder && (!access.HasPriv("ACCESS_CHANGE") || cmd_it <= access_it))
+		if (!mask.equals_ci(nc->GetDisplay()) && !access.founder && (!access.HasPriv("ACCESS_CHANGE") || cmd_it <= access_it))
 		{
 			if (source.HasPriv("chanserv/access/modify"))
 				override = true;
 			else
 			{
-				source.Reply(_("Access denied. You do not have the \002{0}\002 privilege on \002{1}\002."), "ACCESS_CHANGE", ci->name);
+				source.Reply(_("Access denied. You do not have the \002{0}\002 privilege on \002{1}\002."), "ACCESS_CHANGE", ci->GetName());
 				return;
 			}
 		}
@@ -292,7 +301,7 @@ class CommandCSXOP : public Command
 
 					ChanServ::ChanAccess *caccess = ci->GetAccess(number - 1);
 
-					if (caccess->provider->name != "access/xop" || source.command.upper() != caccess->AccessSerialize())
+					if (caccess->GetSerializableType()->GetName() != "XOPChanAccess" || source.command.upper() != caccess->AccessSerialize())
 						return;
 
 					++deleted;
@@ -301,22 +310,21 @@ class CommandCSXOP : public Command
 					else
 						nicks = caccess->Mask();
 
-					ci->EraseAccess(number - 1);
 					Event::OnAccessDel(&Event::AccessDel::OnAccessDel, ci, source, caccess);
 					delete caccess;
 				},
 				[&]()
 				{
 					if (!deleted)
-						 source.Reply(_("No matching entries on %s %s list."), ci->name.c_str(), source.command.c_str());
+						 source.Reply(_("No matching entries on %s %s list."), ci->GetName().c_str(), source.command.c_str());
 					else
 					{
 						Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to delete " << nicks;
 
 						if (deleted == 1)
-							source.Reply(_("Deleted one entry from %s %s list."), ci->name.c_str(), source.command.c_str());
+							source.Reply(_("Deleted one entry from %s %s list."), ci->GetName().c_str(), source.command.c_str());
 						else
-							source.Reply(_("Deleted %d entries from %s %s list."), deleted, ci->name.c_str(), source.command.c_str());
+							source.Reply(_("Deleted %d entries from %s %s list."), deleted, ci->GetName().c_str(), source.command.c_str());
 					}
 				});
 		}
@@ -326,16 +334,15 @@ class CommandCSXOP : public Command
 			{
 				ChanServ::ChanAccess *a = ci->GetAccess(i);
 
-				if (a->provider->name != "access/xop" || source.command.upper() != a->AccessSerialize())
+				if (a->GetSerializableType()->GetName() != "XOPChanAccess" || source.command.upper() != a->AccessSerialize())
 					continue;
 
 				if (a->Mask().equals_ci(mask))
 				{
 					Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to delete " << a->Mask();
 
-					source.Reply(_("\002%s\002 deleted from %s %s list."), a->Mask().c_str(), ci->name.c_str(), source.command.c_str());
+					source.Reply(_("\002%s\002 deleted from %s %s list."), a->Mask().c_str(), ci->GetName().c_str(), source.command.c_str());
 
-					ci->EraseAccess(i);
 					Event::OnAccessDel(&Event::AccessDel::OnAccessDel, ci, source, a);
 					delete a;
 
@@ -343,7 +350,7 @@ class CommandCSXOP : public Command
 				}
 			}
 
-			source.Reply(_("\002%s\002 not found on %s %s list."), mask.c_str(), ci->name.c_str(), source.command.c_str());
+			source.Reply(_("\002%s\002 not found on %s %s list."), mask.c_str(), ci->GetName().c_str(), source.command.c_str());
 		}
 	}
 
@@ -356,13 +363,13 @@ class CommandCSXOP : public Command
 
 		if (!access.HasPriv("ACCESS_LIST") && !source.HasCommand("chanserv/access/list"))
 		{
-			source.Reply(_("Access denied. You do not have the \002{0}\002 privilege on \002{1}\002."), "ACCESS_LIST", ci->name);
+			source.Reply(_("Access denied. You do not have the \002{0}\002 privilege on \002{1}\002."), "ACCESS_LIST", ci->GetName());
 			return;
 		}
 
 		if (!ci->GetAccessCount())
 		{
-			source.Reply(_("%s %s list is empty."), ci->name.c_str(), source.command.c_str());
+			source.Reply(_("%s %s list is empty."), ci->GetName().c_str(), source.command.c_str());
 			return;
 		}
 
@@ -377,9 +384,9 @@ class CommandCSXOP : public Command
 					if (!number || number > ci->GetAccessCount())
 						return;
 
-					const ChanServ::ChanAccess *a = ci->GetAccess(number - 1);
+					ChanServ::ChanAccess *a = ci->GetAccess(number - 1);
 
-					if (a->provider->name != "access/xop" || source.command.upper() != a->AccessSerialize())
+					if (a->GetSerializableType()->GetName() != "XOPChanAccess" || source.command.upper() != a->AccessSerialize())
 						return;
 
 					ListFormatter::ListEntry entry;
@@ -393,11 +400,11 @@ class CommandCSXOP : public Command
 		{
 			for (unsigned i = 0, end = ci->GetAccessCount(); i < end; ++i)
 			{
-				const ChanServ::ChanAccess *a = ci->GetAccess(i);
+				ChanServ::ChanAccess *a = ci->GetAccess(i);
 
-				if (a->provider->name != "access/xop" || source.command.upper() != a->AccessSerialize())
+				if (a->GetSerializableType()->GetName() != "XOPChanAccess" || source.command.upper() != a->AccessSerialize())
 					continue;
-				else if (!nick.empty() && !Anope::Match(a->Mask(), nick))
+				if (!nick.empty() && !Anope::Match(a->Mask(), nick))
 					continue;
 
 				ListFormatter::ListEntry entry;
@@ -408,13 +415,13 @@ class CommandCSXOP : public Command
 		}
 
 		if (list.IsEmpty())
-			source.Reply(_("No matching entries on %s access list."), ci->name.c_str());
+			source.Reply(_("No matching entries on %s access list."), ci->GetName().c_str());
 		else
 		{
 			std::vector<Anope::string> replies;
 			list.Process(replies);
 
-			source.Reply(_("%s list for %s"), source.command.c_str(), ci->name.c_str());
+			source.Reply(_("%s list for %s"), source.command.c_str(), ci->GetName().c_str());
 			for (unsigned i = 0; i < replies.size(); ++i)
 				source.Reply(replies[i]);
 		}
@@ -430,13 +437,13 @@ class CommandCSXOP : public Command
 
 		if (!ci->GetAccessCount())
 		{
-			source.Reply(_("%s %s list is empty."), ci->name.c_str(), source.command.c_str());
+			source.Reply(_("%s %s list is empty."), ci->GetName().c_str(), source.command.c_str());
 			return;
 		}
 
 		if (!source.AccessFor(ci).HasPriv("FOUNDER") && !source.HasPriv("chanserv/access/modify"))
 		{
-			source.Reply(_("Access denied. You do not have the \002{0}\002 privilege on \002{1}\002."), "FOUNDER", ci->name);
+			source.Reply(_("Access denied. You do not have the \002{0}\002 privilege on \002{1}\002."), "FOUNDER", ci->GetName());
 			return;
 		}
 
@@ -445,17 +452,17 @@ class CommandCSXOP : public Command
 
 		for (unsigned i = ci->GetAccessCount(); i > 0; --i)
 		{
-			const ChanServ::ChanAccess *access = ci->GetAccess(i - 1);
+			ChanServ::ChanAccess *access = ci->GetAccess(i - 1);
 
-			if (access->provider->name != "access/xop" || source.command.upper() != access->AccessSerialize())
+			if (access->GetSerializableType()->GetName() != "XOPChanAccess" || source.command.upper() != access->AccessSerialize())
 				continue;
 
-			delete ci->EraseAccess(i - 1);
+			delete access;
 		}
 
 		Event::OnAccessClear(&Event::AccessClear::OnAccessClear, ci, source);
 
-		source.Reply(_("Channel %s %s list has been cleared."), ci->name.c_str(), source.command.c_str());
+		source.Reply(_("Channel %s %s list has been cleared."), ci->GetName().c_str(), source.command.c_str());
 	}
 
  public:
@@ -571,7 +578,7 @@ class CommandCSXOP : public Command
 				               source.command, "change"_kw = "ACCESS_CHANGE", "list"_kw = "ACCESS_LIST", "help"_kw = help->cname);
 
 				Anope::string access_cmd, flags_cmd;
-				BotInfo *access_bi, *flags_bi;
+				ServiceBot *access_bi, *flags_bi;
 				Command::FindCommandFromService("chanserv/access", access_bi, access_cmd);
 				Command::FindCommandFromService("chanserv/flags", flags_bi, access_cmd);
 				if (!access_cmd.empty() || !flags_cmd.empty())
@@ -591,13 +598,13 @@ class CommandCSXOP : public Command
 
 class CSXOP : public Module
 {
-	XOPAccessProvider accessprovider;
 	CommandCSXOP commandcsxop;
+	XOPChanAccessType xopaccesstype;
 
  public:
 	CSXOP(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
-		, accessprovider(this)
 		, commandcsxop(this)
+		, xopaccesstype(this)
 	{
 		this->SetPermanent(true);
 

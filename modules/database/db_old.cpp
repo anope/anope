@@ -14,9 +14,12 @@
 #include "modules/cs_mode.h"
 #include "modules/bs_badwords.h"
 #include "modules/os_news.h"
-#include "modules/suspend.h"
 #include "modules/os_forbid.h"
 #include "modules/cs_entrymsg.h"
+#include "modules/ns_suspend.h"
+#include "modules/cs_suspend.h"
+#include "modules/cs_access.h"
+#include "modules/ns_access.h"
 
 #define READ(x) \
 if (true) \
@@ -93,6 +96,18 @@ else \
 #define OLD_NEWS_OPER	1
 #define OLD_NEWS_RANDOM	2
 
+enum
+{
+	TTB_BOLDS,
+	TTB_COLORS,
+	TTB_REVERSES,
+	TTB_UNDERLINES,
+	TTB_BADWORDS,
+	TTB_CAPS,
+	TTB_FLOOD,
+	TTB_REPEAT,
+};
+
 static struct mlock_info
 {
 	char c;
@@ -144,19 +159,21 @@ enum
 
 static void process_mlock(ChanServ::Channel *ci, uint32_t lock, bool status, uint32_t *limit, Anope::string *key)
 {
-	ModeLocks *ml = ci->Require<ModeLocks>("modelocks");
+	if (!mlocks)
+		return;
+
 	for (unsigned i = 0; i < (sizeof(mlock_infos) / sizeof(mlock_info)); ++i)
 		if (lock & mlock_infos[i].m)
 		{
 			ChannelMode *cm = ModeManager::FindChannelModeByChar(mlock_infos[i].c);
-			if (cm && ml)
+			if (cm)
 			{
 				if (limit && mlock_infos[i].c == 'l')
-					ml->SetMLock(cm, status, stringify(*limit));
+					mlocks->SetMLock(ci, cm, status, stringify(*limit));
 				else if (key && mlock_infos[i].c == 'k')
-					ml->SetMLock(cm, status, *key);
+					mlocks->SetMLock(ci, cm, status, *key);
 				else
-					ml->SetMLock(cm, status);
+					mlocks->SetMLock(ci, cm, status);
 			}
 		}
 }
@@ -436,7 +453,6 @@ static void LoadNicks()
 {
 	if (!NickServ::service)
 		return;
-	ServiceReference<ForbidService> forbid("ForbidService", "forbid");
 	dbFILE *f = open_db_read("NickServ", "nick.db", 14);
 	if (f == NULL)
 		return;
@@ -446,27 +462,33 @@ static void LoadNicks()
 			Anope::string buffer;
 
 			READ(read_string(buffer, f));
-			NickServ::Account *nc = NickServ::service->CreateAccount(buffer);
+
+			NickServ::Account *nc = NickServ::account.Create();
+			nc->SetDisplay(buffer);
 
 			const Anope::string settings[] = { "killprotect", "kill_quick", "ns_secure", "ns_private", "hide_email",
 				"hide_mask", "hide_quit", "memo_signon", "memo_receive", "autoop", "msg", "ns_keepmodes" };
 			for (unsigned j = 0; j < sizeof(settings) / sizeof(Anope::string); ++j)
-				nc->Shrink<bool>(settings[j].upper());
+				nc->UnsetS<bool>(settings[j].upper());
 
 			char pwbuf[32];
 			READ(read_buffer(pwbuf, f));
 			if (hashm == "plain")
-				my_b64_encode(pwbuf, nc->pass);
+			{
+				Anope::string p;
+				my_b64_encode(pwbuf, p);
+				nc->SetPassword(p);
+			}
 			else if (hashm == "md5" || hashm == "oldmd5")
-				nc->pass = Hex(pwbuf, 16);
+				nc->SetPassword(Hex(pwbuf, 16));
 			else if (hashm == "sha1")
-				nc->pass = Hex(pwbuf, 20);
+				nc->SetPassword(Hex(pwbuf, 20));
 			else
-				nc->pass = Hex(pwbuf, strlen(pwbuf));
-			nc->pass = hashm + ":" + nc->pass;
+				nc->SetPassword(Hex(pwbuf, strlen(pwbuf)));
+			nc->SetPassword(hashm + ":" + nc->GetPassword());
 
 			READ(read_string(buffer, f));
-			nc->email = buffer;
+			nc->SetEmail(buffer);
 
 			READ(read_string(buffer, f));
 			if (!buffer.empty())
@@ -481,103 +503,111 @@ static void LoadNicks()
 
 			READ(read_uint32(&u32, f));
 			if (u32 & OLD_NI_KILLPROTECT)
-				nc->Extend<bool>("KILLPROTECT");
+				nc->SetS<bool>("KILLPROTECT", true);
 			if (u32 & OLD_NI_SECURE)
-				nc->Extend<bool>("NS_SECURE");
+				nc->SetS<bool>("NS_SECURE", true);
 			if (u32 & OLD_NI_MSG)
-				nc->Extend<bool>("MSG");
+				nc->SetS<bool>("MSG", true);
 			if (u32 & OLD_NI_MEMO_HARDMAX)
-				nc->Extend<bool>("MEMO_HARDMAX");
+				nc->SetS<bool>("MEMO_HARDMAX", true);
 			if (u32 & OLD_NI_MEMO_SIGNON)
-				nc->Extend<bool>("MEMO_SIGNON");
+				nc->SetS<bool>("MEMO_SIGNON", true);
 			if (u32 & OLD_NI_MEMO_RECEIVE)
-				nc->Extend<bool>("MEMO_RECEIVE");
+				nc->SetS<bool>("MEMO_RECEIVE", true);
 			if (u32 & OLD_NI_PRIVATE)
-				nc->Extend<bool>("NS_PRIVATE");
+				nc->SetS<bool>("NS_PRIVATE", true);
 			if (u32 & OLD_NI_HIDE_EMAIL)
-				nc->Extend<bool>("HIDE_EMAIL");
+				nc->SetS<bool>("HIDE_EMAIL", true);
 			if (u32 & OLD_NI_HIDE_MASK)
-				nc->Extend<bool>("HIDE_MASK");
+				nc->SetS<bool>("HIDE_MASK", true);
 			if (u32 & OLD_NI_HIDE_QUIT)
-				nc->Extend<bool>("HIDE_QUIT");
+				nc->SetS<bool>("HIDE_QUIT", true);
 			if (u32 & OLD_NI_KILL_QUICK)
-				nc->Extend<bool>("KILL_QUICK");
+				nc->SetS<bool>("KILL_QUICK", true);
 			if (u32 & OLD_NI_KILL_IMMED)
-				nc->Extend<bool>("KILL_IMMED");
+				nc->SetS<bool>("KILL_IMMED", true);
 			if (u32 & OLD_NI_MEMO_MAIL)
-				nc->Extend<bool>("MEMO_MAIL");
+				nc->SetS<bool>("MEMO_MAIL", true);
 			if (u32 & OLD_NI_HIDE_STATUS)
-				nc->Extend<bool>("HIDE_STATUS");
+				nc->SetS<bool>("HIDE_STATUS", true);
 			if (u32 & OLD_NI_SUSPENDED)
 			{
-				SuspendInfo si;
-				si.what = nc->display;
-				si.when = si.expires = 0;
-				nc->Extend("NS_SUSPENDED", si);
+				if (nssuspendinfo)
+				{
+					NSSuspendInfo *si = nssuspendinfo.Create();
+					si->SetAccount(nc);
+				}
 			}
 			if (!(u32 & OLD_NI_AUTOOP))
-				nc->Extend<bool>("AUTOOP");
+				nc->SetS<bool>("AUTOOP", true);
 
 			uint16_t u16;
 			READ(read_uint16(&u16, f));
 			switch (u16)
 			{
 				case LANG_ES:
-					nc->language = "es_ES";
+					nc->SetLanguage("es_ES");
 					break;
 				case LANG_PT:
-					nc->language = "pt_PT";
+					nc->SetLanguage("pt_PT");
 					break;
 				case LANG_FR:
-					nc->language = "fr_FR";
+					nc->SetLanguage("fr_FR");
 					break;
 				case LANG_TR:
-					nc->language = "tr_TR";
+					nc->SetLanguage("tr_TR");
 					break;
 				case LANG_IT:
-					nc->language = "it_IT";
+					nc->SetLanguage("it_IT");
 					break;
 				case LANG_DE:
-					nc->language = "de_DE";
+					nc->SetLanguage("de_DE");
 					break;
 				case LANG_CAT:
-					nc->language = "ca_ES"; // yes, iso639 defines catalan as CA
+					nc->SetLanguage("ca_ES"); // yes, iso639 defines catalan as CA
 					break;
 				case LANG_GR:
-					nc->language = "el_GR";
+					nc->SetLanguage("el_GR");
 					break;
 				case LANG_NL:
-					nc->language = "nl_NL";
+					nc->SetLanguage("nl_NL");
 					break;
 				case LANG_RU:
-					nc->language = "ru_RU";
+					nc->SetLanguage("ru_RU");
 					break;
 				case LANG_HUN:
-					nc->language = "hu_HU";
+					nc->SetLanguage("hu_HU");
 					break;
 				case LANG_PL:
-					nc->language = "pl_PL";
+					nc->SetLanguage("pl_PL");
 					break;
 				case LANG_EN_US:
 				case LANG_JA_JIS:
 				case LANG_JA_EUC:
 				case LANG_JA_SJIS: // these seem to be unused
 				default:
-					nc->language = "en";
+					nc->SetLanguage("en");
 			}
 
 			READ(read_uint16(&u16, f));
 			for (uint16_t j = 0; j < u16; ++j)
 			{
 				READ(read_string(buffer, f));
-				nc->access.push_back(buffer);
+
+				if (nsaccess)
+				{
+					NickAccess *a = nsaccess.Create();
+					a->SetAccount(nc);
+					a->SetMask(buffer);
+				}
 			}
 
 			int16_t i16;
 			READ(read_int16(&i16, f));
 			READ(read_int16(&i16, f));
-			if (nc->memos)
-				nc->memos->memomax = i16;
+			MemoServ::MemoInfo *mi = nc->GetMemos();
+			if (mi)
+				mi->SetMemoMax(i16);
 			for (int16_t j = 0; j < i16; ++j)
 			{
 				MemoServ::Memo *m = MemoServ::service ? MemoServ::service->CreateMemo() : nullptr;
@@ -587,26 +617,20 @@ static void LoadNicks()
 				int32_t tmp32;
 				READ(read_int32(&tmp32, f));
 				if (m)
-					m->time = tmp32;
+					m->SetTime(tmp32);
 				char sbuf[32];
 				READ(read_buffer(sbuf, f));
 				if (m)
-					m->sender = sbuf;
+					m->SetSender(sbuf);
 				Anope::string text;
 				READ(read_string(text, f));
 				if (m)
-					m->text = text;
-				if (m)
-					m->owner = nc->display;
-				if (nc->memos && m)
-					nc->memos->memos->push_back(m);
-				else
-					delete m;
+					m->SetText(text);
 			}
 			READ(read_uint16(&u16, f));
 			READ(read_int16(&i16, f));
 
-			Log(LOG_DEBUG) << "Loaded NickServ::Account " << nc->display;
+			Log(LOG_DEBUG) << "Loaded NickServ::Account " << nc->GetDisplay();
 		}
 
 	for (int i = 0; i < 1024; ++i)
@@ -640,41 +664,40 @@ static void LoadNicks()
 
 			if (tmpu16 & OLD_NS_VERBOTEN)
 			{
-				if (!forbid)
+				if (!forbiddata)
 				{
 					delete nc;
 					continue;
 				}
 
-				if (nc->display.find_first_of("?*") != Anope::string::npos)
+				if (nc->GetDisplay().find_first_of("?*") != Anope::string::npos)
 				{
 					delete nc;
 					continue;
 				}
 
-				ForbidData *d = forbid->CreateForbid();
-				d->mask = nc->display;
-				d->creator = last_usermask;
-				d->reason = last_realname;
-				d->expires = 0;
-				d->created = 0;
-				d->type = FT_NICK;
+				ForbidData *d = forbiddata.Create();
+				d->SetMask(nc->GetDisplay());
+				d->SetCreator(last_usermask);
+				d->SetReason(last_realname);
+				d->SetType(FT_NICK);
 				delete nc;
-				forbid->AddForbid(d);
 				continue;
 			}
 
-			NickServ::Nick *na = NickServ::service->CreateNick(nick, nc);
-			na->last_usermask = last_usermask;
-			na->last_realname = last_realname;
-			na->last_quit = last_quit;
-			na->time_registered = time_registered;
-			na->last_seen = last_seen;
+			NickServ::Nick *na = NickServ::nick.Create();
+			na->SetNick(nick);
+			na->SetAccount(nc);
+			na->SetLastUsermask(last_usermask);
+			na->SetLastRealname(last_realname);
+			na->SetLastQuit(last_quit);
+			na->SetTimeRegistered(time_registered);
+			na->SetLastSeen(last_seen);
 
 			if (tmpu16 & OLD_NS_NO_EXPIRE)
-				na->Extend<bool>("NS_NO_EXPIRE");
+				na->SetS<bool>("NS_NO_EXPIRE", true);
 
-			Log(LOG_DEBUG) << "Loaded NickServ::Nick " << na->nick;
+			Log(LOG_DEBUG) << "Loaded NickServ::Nick " << na->GetNick();
 		}
 
 	close_db(f); /* End of section Ia */
@@ -706,7 +729,7 @@ static void LoadVHosts()
 
 		na->SetVhost(ident, host, creator, vtime);
 
-		Log() << "Loaded vhost for " << na->nick;
+		Log() << "Loaded vhost for " << na->GetNick();
 	}
 
 	close_db(f);
@@ -732,13 +755,14 @@ static void LoadBots()
 		READ(read_int32(&created, f));
 		READ(read_int16(&chancount, f));
 
-		BotInfo *bi = BotInfo::Find(nick, true);
-		if (!bi)
-			bi = new BotInfo(nick, user, host, real);
-		bi->created = created;
+		ServiceBot *bi = ServiceBot::Find(nick, true);
+		//XXX
+	//	if (!bi)
+	//		bi = new ServiceBot(nick, user, host, real);
+		bi->bi->SetCreated(created);
 
 		if (flags & OLD_BI_PRIVATE)
-			bi->oper_only = true;
+			bi->bi->SetOperOnly(true);
 
 		Log(LOG_DEBUG) << "Loaded bot " << bi->nick;
 	}
@@ -762,12 +786,13 @@ static void LoadChannels()
 			Anope::string buffer;
 			char namebuf[64];
 			READ(read_buffer(namebuf, f));
-			ChanServ::Channel *ci = ChanServ::service->Create(namebuf);
+			ChanServ::Channel *ci = ChanServ::channel.Create();
+			ci->SetName(namebuf);
 
 			const Anope::string settings[] = { "keeptopic", "peace", "cs_private", "restricted", "cs_secure", "secureops", "securefounder",
 				"signkick", "signkick_level", "topiclock", "persist", "noautoop", "cs_keepmodes" };
 			for (unsigned j = 0; j < sizeof(settings) / sizeof(Anope::string); ++j)
-				ci->Shrink<bool>(settings[j].upper());
+				ci->UnsetS<bool>(settings[j].upper());
 
 			READ(read_string(buffer, f));
 			ci->SetFounder(NickServ::FindAccount(buffer));
@@ -778,71 +803,75 @@ static void LoadChannels()
 			char pwbuf[32];
 			READ(read_buffer(pwbuf, f));
 
-			READ(read_string(ci->desc, f));
+			Anope::string desc;
+			READ(read_string(desc, f));
+			ci->SetDesc(desc);
 			READ(read_string(buffer, f));
 			READ(read_string(buffer, f));
 
 			int32_t tmp32;
 			READ(read_int32(&tmp32, f));
-			ci->time_registered = tmp32;
+			ci->SetTimeRegistered(tmp32);
 
 			READ(read_int32(&tmp32, f));
-			ci->last_used = tmp32;
+			ci->SetLastUsed(tmp32);
 
-			READ(read_string(ci->last_topic, f));
+			Anope::string last_topic;
+			READ(read_string(last_topic, f));
+			ci->SetLastTopic(last_topic);
 
 			READ(read_buffer(pwbuf, f));
-			ci->last_topic_setter = pwbuf;
+			ci->SetLastTopicSetter(pwbuf);
 
 			READ(read_int32(&tmp32, f));
-			ci->last_topic_time = tmp32;
+			ci->SetLastTopicTime(tmp32);
 
 			uint32_t tmpu32;
 			READ(read_uint32(&tmpu32, f));
 			// Temporary flags cleanup
 			tmpu32 &= ~0x80000000;
 			if (tmpu32 & OLD_CI_KEEPTOPIC)
-				ci->Extend<bool>("KEEPTOPIC");
+				ci->SetS<bool>("KEEPTOPIC", true);
 			if (tmpu32 & OLD_CI_SECUREOPS)
-				ci->Extend<bool>("SECUREOPS");
+				ci->SetS<bool>("SECUREOPS", true);
 			if (tmpu32 & OLD_CI_PRIVATE)
-				ci->Extend<bool>("CS_PRIVATE");
+				ci->SetS<bool>("CS_PRIVATE", true);
 			if (tmpu32 & OLD_CI_TOPICLOCK)
-				ci->Extend<bool>("TOPICLOCK");
+				ci->SetS<bool>("TOPICLOCK", true);
 			if (tmpu32 & OLD_CI_RESTRICTED)
-				ci->Extend<bool>("RESTRICTED");
+				ci->SetS<bool>("RESTRICTED", true);
 			if (tmpu32 & OLD_CI_PEACE)
-				ci->Extend<bool>("PEACE");
+				ci->SetS<bool>("PEACE", true);
 			if (tmpu32 & OLD_CI_SECURE)
-				ci->Extend<bool>("CS_SECURE");
+				ci->SetS<bool>("CS_SECURE", true);
 			if (tmpu32 & OLD_CI_NO_EXPIRE)
-				ci->Extend<bool>("CS_NO_EXPIRE");
+				ci->SetS<bool>("CS_NO_EXPIRE", true);
 			if (tmpu32 & OLD_CI_MEMO_HARDMAX)
-				ci->Extend<bool>("MEMO_HARDMAX");
+				ci->SetS<bool>("MEMO_HARDMAX", true);
 			if (tmpu32 & OLD_CI_SECUREFOUNDER)
-				ci->Extend<bool>("SECUREFOUNDER");
+				ci->SetS<bool>("SECUREFOUNDER", true);
 			if (tmpu32 & OLD_CI_SIGNKICK)
-				ci->Extend<bool>("SIGNKICK");
+				ci->SetS<bool>("SIGNKICK", true);
 			if (tmpu32 & OLD_CI_SIGNKICK_LEVEL)
-				ci->Extend<bool>("SIGNKICK_LEVEL");
+				ci->SetS<bool>("SIGNKICK_LEVEL", true);
 
 			Anope::string forbidby, forbidreason;
 			READ(read_string(forbidby, f));
 			READ(read_string(forbidreason, f));
 			if (tmpu32 & OLD_CI_SUSPENDED)
 			{
-				SuspendInfo si;
-				si.what = ci->name;
-				si.by = forbidby;
-				si.reason = forbidreason;
-				si.when = si.expires = 0;
-				ci->Extend("CS_SUSPENDED", si);
+				if (cssuspendinfo)
+				{
+					CSSuspendInfo *si = cssuspendinfo.Create();
+					si->SetChannel(ci);
+					si->SetBy(forbidby);
+				}
 			}
 			bool forbid_chan = tmpu32 & OLD_CI_VERBOTEN;
 
 			int16_t tmp16;
 			READ(read_int16(&tmp16, f));
-			ci->bantype = tmp16;
+			ci->SetBanType(tmp16);
 
 			READ(read_int16(&tmp16, f));
 			if (tmp16 > 36)
@@ -856,13 +885,12 @@ static void LoadChannels()
 					level = ChanServ::ACCESS_FOUNDER;
 
 				if (j == 10 && level < 0) // NOJOIN
-					ci->Shrink<bool>("RESTRICTED"); // If CSDefRestricted was enabled this can happen
+					ci->UnsetS<bool>("RESTRICTED"); // If CSDefRestricted was enabled this can happen
 
 				ci->SetLevel(GetLevelName(j), level);
 			}
 
 			bool xop = tmpu32 & OLD_CI_XOP;
-			ServiceReference<ChanServ::AccessProvider> provider_access("AccessProvider", "access/access"), provider_xop("AccessProvider", "access/xop");
 			uint16_t tmpu16;
 			READ(read_uint16(&tmpu16, f));
 			for (uint16_t j = 0; j < tmpu16; ++j)
@@ -875,15 +903,17 @@ static void LoadChannels()
 
 					if (xop)
 					{
-						if (provider_xop)
-							access = provider_xop->Create();
+						if (xopchanaccess)
+							access = xopchanaccess.Create();
 					}
 					else
-						if (provider_access)
-							access = provider_access->Create();
+					{
+						if (accesschanaccess)
+							access = accesschanaccess.Create();
+					}
 
 					if (access)
-						access->ci = ci;
+						access->SetChannel(ci);
 
 					int16_t level;
 					READ(read_int16(&level, f));
@@ -914,16 +944,19 @@ static void LoadChannels()
 					Anope::string mask;
 					READ(read_string(mask, f));
 					if (access)
-						access->SetMask(mask, ci);
+					{
+						access->SetMask(mask);
+						NickServ::Nick *na = NickServ::FindNick(mask);
+						if (na)
+							na->SetAccount(na->GetAccount());
+					}
 
 					READ(read_int32(&tmp32, f));
 					if (access)
 					{
-						access->last_seen = tmp32;
-						access->creator = "Unknown";
-						access->created = Anope::CurTime;
-
-						ci->AddAccess(access);
+						access->SetLastSeen(tmp32);
+						access->SetCreator("Unknown");
+						access->SetCreated(Anope::CurTime);
 					}
 				}
 			}
@@ -958,8 +991,9 @@ static void LoadChannels()
 
 			READ(read_int16(&tmp16, f));
 			READ(read_int16(&tmp16, f));
-			if (ci->memos)
-				ci->memos->memomax = tmp16;
+			MemoServ::MemoInfo *mi = ci->GetMemos();
+			if (mi)
+				mi->SetMemoMax(tmp16);
 			for (int16_t j = 0; j < tmp16; ++j)
 			{
 				READ(read_uint32(&tmpu32, f));
@@ -967,74 +1001,56 @@ static void LoadChannels()
 				MemoServ::Memo *m = MemoServ::service ? MemoServ::service->CreateMemo() : nullptr;
 				READ(read_int32(&tmp32, f));
 				if (m)
-					m->time = tmp32;
+					m->SetTime(tmp32);
 				char sbuf[32];
 				READ(read_buffer(sbuf, f));
 				if (m)
-					m->sender = sbuf;
+					m->SetSender(sbuf);
 				Anope::string text;
 				READ(read_string(text, f));
 				if (m)
-					m->text = text;
-				if (m)
-					m->owner = ci->name;
-				if (ci->memos && m)
-					ci->memos->memos->push_back(m);
-				else
-					delete m;
+					m->SetText(text);
 			}
 
 			READ(read_string(buffer, f));
 			if (!buffer.empty())
 			{
-				EntryMessageList *eml = ci->Require<EntryMessageList>("entrymsg");
-				if (eml)
+				if (entrymsg)
 				{
-					EntryMsg *e = eml->Create();
-
-					e->chan = ci->name;
-					e->creator = "Unknown";
-					e->message = buffer;
-					e->when = Anope::CurTime;
-
-					(*eml)->push_back(e);
+					EntryMsg *e = entrymsg.Create();
+					e->SetChannel(ci);
+					e->SetCreator("Unknown");
+					e->SetMessage(buffer);
+					e->SetWhen(Anope::CurTime);
 				}
 			}
 
 			READ(read_string(buffer, f));
-			ci->bi = BotInfo::Find(buffer, true);
+			ci->SetBot(ServiceBot::Find(buffer, true));
 
 			READ(read_int32(&tmp32, f));
 			if (tmp32 & OLD_BS_DONTKICKOPS)
-				ci->Extend<bool>("BS_DONTKICKOPS");
+				ci->SetS<bool>("BS_DONTKICKOPS", true);
 			if (tmp32 & OLD_BS_DONTKICKVOICES)
-				ci->Extend<bool>("BS_DONTKICKVOICES");
+				ci->SetS<bool>("BS_DONTKICKVOICES", true);
 			if (tmp32 & OLD_BS_FANTASY)
-				ci->Extend<bool>("BS_FANTASY");
+				ci->SetS<bool>("BS_FANTASY", true);
 			if (tmp32 & OLD_BS_GREET)
-				ci->Extend<bool>("BS_GREET");
+				ci->SetS<bool>("BS_GREET", true);
 			if (tmp32 & OLD_BS_NOBOT)
-				ci->Extend<bool>("BS_NOBOT");
+				ci->SetS<bool>("BS_NOBOT", true);
 
-			KickerData *kd = ci->Require<KickerData>("kickerdata");
+			KickerData *kd = GetKickerData(ci);
 			if (kd)
 			{
-				if (tmp32 & OLD_BS_KICK_BOLDS)
-					kd->bolds = true;
-				if (tmp32 & OLD_BS_KICK_COLORS)
-					kd->colors = true;
-				if (tmp32 & OLD_BS_KICK_REVERSES)
-					kd->reverses = true;
-				if (tmp32 & OLD_BS_KICK_UNDERLINES)
-					kd->underlines = true;
-				if (tmp32 & OLD_BS_KICK_BADWORDS)
-					kd->badwords = true;
-				if (tmp32 & OLD_BS_KICK_CAPS)
-					kd->caps = true;
-				if (tmp32 & OLD_BS_KICK_FLOOD)
-					kd->flood = true;
-				if (tmp32 & OLD_BS_KICK_REPEAT)
-					kd->repeat = true;
+				kd->SetBolds(tmp32 & OLD_BS_KICK_BOLDS);
+				kd->SetColors(tmp32 & OLD_BS_KICK_COLORS);
+				kd->SetReverses(tmp32 & OLD_BS_KICK_REVERSES);
+				kd->SetUnderlines(tmp32 & OLD_BS_KICK_UNDERLINES);
+				kd->SetBadwords(tmp32 & OLD_BS_KICK_BADWORDS);
+				kd->SetCaps(tmp32 & OLD_BS_KICK_CAPS);
+				kd->SetFlood(tmp32 & OLD_BS_KICK_FLOOD);
+				kd->SetRepeat(tmp32 & OLD_BS_KICK_REPEAT);
 			}
 
 			READ(read_int16(&tmp16, f));
@@ -1042,27 +1058,51 @@ static void LoadChannels()
 			{
 				int16_t ttb;
 				READ(read_int16(&ttb, f));
-				if (j < TTB_SIZE && kd)
-					kd->ttb[j] = ttb;
+				switch (j)
+				{
+					case TTB_BOLDS:
+						kd->SetTTBBolds(ttb);
+						break;
+					case TTB_COLORS:
+						kd->SetTTBColors(ttb);
+						break;
+					case TTB_REVERSES:
+						kd->SetTTBReverses(ttb);
+						break;
+					case TTB_UNDERLINES:
+						kd->SetTTBUnderlines(ttb);
+						break;
+					case TTB_BADWORDS:
+						kd->SetTTBBadwords(ttb);
+						break;
+					case TTB_CAPS:
+						kd->SetTTBCaps(ttb);
+						break;
+					case TTB_FLOOD:
+						kd->SetTTBFlood(ttb);
+						break;
+					case TTB_REPEAT:
+						kd->SetTTBRepeat(ttb);
+						break;
+				}
 			}
 
 			READ(read_int16(&tmp16, f));
 			if (kd)
-				kd->capsmin = tmp16;
+				kd->SetCapsMin(tmp16);
 			READ(read_int16(&tmp16, f));
 			if (kd)
-				kd->capspercent = tmp16;
+				kd->SetCapsPercent(tmp16);
 			READ(read_int16(&tmp16, f));
 			if (kd)
-				kd->floodlines = tmp16;
+				kd->SetFloodLines(tmp16);
 			READ(read_int16(&tmp16, f));
 			if (kd)
-				kd->floodsecs = tmp16;
+				kd->SetFloodSecs(tmp16);
 			READ(read_int16(&tmp16, f));
 			if (kd)
-				kd->repeattimes = tmp16;
+				kd->SetRepeatTimes(tmp16);
 
-			BadWords *bw = ci->Require<BadWords>("badwords");
 			READ(read_uint16(&tmpu16, f));
 			for (uint16_t j = 0; j < tmpu16; ++j)
 			{
@@ -1082,38 +1122,35 @@ static void LoadChannels()
 					else if (type == 3)
 						bwtype = BW_END;
 
-					if (bw)
-						bw->AddBadWord(buffer, bwtype);
+					if (badwords)
+						badwords->AddBadWord(ci, buffer, bwtype);
 				}
 			}
 
 			if (forbid_chan)
 			{
-				if (!forbid)
+				if (!forbiddata)
 				{
 					delete ci;
 					continue;
 				}
 
-				if (ci->name.find_first_of("?*") != Anope::string::npos)
+				if (ci->GetName().find_first_of("?*") != Anope::string::npos)
 				{
 					delete ci;
 					continue;
 				}
 
-				ForbidData *d = forbid->CreateForbid();
-				d->mask = ci->name;
-				d->creator = forbidby;
-				d->reason = forbidreason;
-				d->expires = 0;
-				d->created = 0;
-				d->type = FT_CHAN;
+				ForbidData *d = forbiddata.Create();
+				d->SetMask(ci->GetName());
+				d->SetCreator(forbidby);
+				d->SetReason(forbidreason);
+				d->SetType(FT_CHAN);
 				delete ci;
-				forbid->AddForbid(d);
 				continue;
 			}
 
-			Log(LOG_DEBUG) << "Loaded channel " << ci->name;
+			Log(LOG_DEBUG) << "Loaded channel " << ci->GetName();
 		}
 
 	close_db(f);
@@ -1128,9 +1165,8 @@ static void LoadOper()
 	XLineManager *akill, *sqline, *snline, *szline;
 	akill = sqline = snline = szline = NULL;
 
-	for (std::list<XLineManager *>::iterator it = XLineManager::XLineManagers.begin(), it_end = XLineManager::XLineManagers.end(); it != it_end; ++it)
+	for (XLineManager *xl : XLineManager::XLineManagers)
 	{
-		XLineManager *xl = *it;
 		if (xl->Type() == 'G')
 			akill = xl;
 		else if (xl->Type() == 'Q')
@@ -1163,7 +1199,7 @@ static void LoadOper()
 			continue;
 
 		XLine *x = new XLine(user + "@" + host, by, expires, reason, XLineManager::GenerateUID());
-		x->created = seton;
+		x->SetCreated(seton);
 		akill->AddXLine(x);
 	}
 
@@ -1183,7 +1219,7 @@ static void LoadOper()
 			continue;
 
 		XLine *x = new XLine(mask, by, expires, reason, XLineManager::GenerateUID());
-		x->created = seton;
+		x->SetCreated(seton);
 		snline->AddXLine(x);
 	}
 
@@ -1203,7 +1239,7 @@ static void LoadOper()
 			continue;
 
 		XLine *x = new XLine(mask, by, expires, reason, XLineManager::GenerateUID());
-		x->created = seton;
+		x->SetCreated(seton);
 		sqline->AddXLine(x);
 	}
 
@@ -1223,7 +1259,7 @@ static void LoadOper()
 			continue;
 
 		XLine *x = new XLine(mask, by, expires, reason, XLineManager::GenerateUID());
-		x->created = seton;
+		x->SetCreated(seton);
 		szline->AddXLine(x);
 	}
 
@@ -1255,14 +1291,16 @@ static void LoadExceptions()
 		READ(read_int32(&time, f));
 		READ(read_int32(&expires, f));
 
-		Exception *exception = session_service->CreateException();
-		exception->mask = mask;
-		exception->limit = limit;
-		exception->who = who;
-		exception->time = time;
-		exception->expires = expires;
-		exception->reason = reason;
-		session_service->AddException(exception);
+		if (exception && session_service)
+		{
+			Exception *e = exception.Create();
+			e->SetMask(mask);
+			e->SetLimit(limit);
+			e->SetWho(who);
+			e->SetTime(time);
+			e->SetExpires(expires);
+			e->SetReason(reason);
+		}
 	}
 
 	close_db(f);
@@ -1270,7 +1308,7 @@ static void LoadExceptions()
 
 static void LoadNews()
 {
-	if (!news_service)
+	if (!newsitem)
 		return;
 
 	dbFILE *f = open_db_read("OperServ", "news.db", 9);
@@ -1284,37 +1322,37 @@ static void LoadNews()
 	for (int16_t i = 0; i < n; i++)
 	{
 		int16_t type;
-		NewsItem *ni = news_service->CreateNewsItem();
+		NewsItem *ni = newsitem.Create();
 
 		READ(read_int16(&type, f));
 
 		switch (type)
 		{
 			case OLD_NEWS_LOGON:
-				ni->type = NEWS_LOGON;
+				ni->SetNewsType(NEWS_LOGON);
 				break;
 			case OLD_NEWS_OPER:
-				ni->type = NEWS_OPER;
+				ni->SetNewsType(NEWS_OPER);
 				break;
 			case OLD_NEWS_RANDOM:
-				ni->type = NEWS_RANDOM;
+				ni->SetNewsType(NEWS_RANDOM);
 				break;
 		}
 
 		int32_t unused;
 		READ(read_int32(&unused, f));
 
-		READ(read_string(ni->text, f));
+		Anope::string text;
+		READ(read_string(text, f));
+		ni->SetText(text);
 
 		char who[32];
 		READ(read_buffer(who, f));
-		ni->who = who;
+		ni->SetWho(who);
 
 		int32_t tmp;
 		READ(read_int32(&tmp, f));
-		ni->time = tmp;
-
-		news_service->AddNewsItem(ni);
+		ni->SetTime(tmp);
 	}
 
 	close_db(f);
@@ -1324,8 +1362,8 @@ class DBOld : public Module
 	, public EventHook<Event::LoadDatabase>
 	, public EventHook<Event::UplinkSync>
 {
-	PrimitiveExtensibleItem<uint32_t> mlock_on, mlock_off, mlock_limit;
-	PrimitiveExtensibleItem<Anope::string> mlock_key;
+	ExtensibleItem<uint32_t> mlock_on, mlock_off, mlock_limit;
+	ExtensibleItem<Anope::string> mlock_key;
 
  public:
 	DBOld(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, DATABASE | VENDOR)

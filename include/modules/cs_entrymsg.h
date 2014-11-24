@@ -6,30 +6,24 @@
  *
  */
 
-struct EntryMsg
-{
-	Anope::string chan;
-	Anope::string creator;
-	Anope::string message;
-	time_t when;
-
-	virtual ~EntryMsg() { }
- protected:
-	EntryMsg() { }
-};
-
-struct EntryMessageList : Serialize::Checker<std::vector<EntryMsg *> >
+class EntryMsg : public Serialize::Object
 {
  protected:
-	EntryMessageList() : Serialize::Checker<std::vector<EntryMsg *> >("EntryMsg") { }
+	using Serialize::Object::Object;
 
  public:
-	virtual ~EntryMessageList()
-	{
-		for (unsigned i = (*this)->size(); i > 0; --i)
-			delete (*this)->at(i - 1);
-	}
+	virtual ChanServ::Channel *GetChannel() anope_abstract;
+	virtual void SetChannel(ChanServ::Channel *) anope_abstract;
 
-	virtual EntryMsg* Create() anope_abstract;
+	virtual Anope::string GetCreator() anope_abstract;
+	virtual void SetCreator(const Anope::string &) anope_abstract;
+
+	virtual Anope::string GetMessage() anope_abstract;
+	virtual void SetMessage(const Anope::string &) anope_abstract;
+
+	virtual time_t GetWhen() anope_abstract;
+	virtual void SetWhen(const time_t &) anope_abstract;
 };
+
+static Serialize::TypeReference<EntryMsg> entrymsg("EntryMsg");
 

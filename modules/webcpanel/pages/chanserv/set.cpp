@@ -36,7 +36,7 @@ bool WebCPanel::ChanServ::Set::OnRequest(HTTPProvider *server, const Anope::stri
 
 	replacements["OKAY"];
 
-	if (ci->AccessFor(na->nc).HasPriv("SET"))
+	if (ci->AccessFor(na->GetAccount()).HasPriv("SET"))
 	{
 		replacements["CAN_SET"];
 		can_set = true;
@@ -44,101 +44,101 @@ bool WebCPanel::ChanServ::Set::OnRequest(HTTPProvider *server, const Anope::stri
 
 	if (can_set && message.post_data.empty() == false)
 	{
-		if (ci->HasExt("KEEPTOPIC") != message.post_data.count("keeptopic"))
+		if (ci->HasFieldS("KEEPTOPIC") != message.post_data.count("keeptopic"))
 		{
-			if (!ci->HasExt("KEEPTOPIC"))
-				ci->Extend<bool>("KEEPTOPIC");
+			if (!ci->HasFieldS("KEEPTOPIC"))
+				ci->SetS<bool>("KEEPTOPIC", true);
 			else
-				ci->Shrink<bool>("KEEPTOPIC");
+				ci->UnsetS<bool>("KEEPTOPIC");
 			replacements["MESSAGES"] = "Secure updated";
 		}
-		if (ci->HasExt("PEACE") != message.post_data.count("peace"))
+		if (ci->HasFieldS("PEACE") != message.post_data.count("peace"))
 		{
-			if (!ci->HasExt("PEACE"))
-				ci->Extend<bool>("PEACE");
+			if (!ci->HasFieldS("PEACE"))
+				ci->SetS<bool>("PEACE", true);
 			else
-				ci->Shrink<bool>("PEACE");
+				ci->UnsetS<bool>("PEACE");
 			replacements["MESSAGES"] = "Peace updated";
 		}
-		if (ci->HasExt("CS_PRIVATE") != message.post_data.count("private"))
+		if (ci->HasFieldS("CS_PRIVATE") != message.post_data.count("private"))
 		{
-			if (!ci->HasExt("CS_PRIVATE"))
-				ci->Extend<bool>("CS_PRIVATE");
+			if (!ci->HasFieldS("CS_PRIVATE"))
+				ci->SetS<bool>("CS_PRIVATE", true);
 			else
-				ci->Shrink<bool>("CS_PRIVATE");
+				ci->UnsetS<bool>("CS_PRIVATE");
 			replacements["MESSAGES"] = "Private updated";
 		}
-		if (ci->HasExt("RESTRICTED") != message.post_data.count("restricted"))
+		if (ci->HasFieldS("RESTRICTED") != message.post_data.count("restricted"))
 		{
-			if (!ci->HasExt("RESTRICTED"))
-				ci->Extend<bool>("RESTRICTED");
+			if (!ci->HasFieldS("RESTRICTED"))
+				ci->SetS<bool>("RESTRICTED", true);
 			else
-				ci->Shrink<bool>("RESTRICTED");
+				ci->UnsetS<bool>("RESTRICTED");
 			replacements["MESSAGES"] = "Restricted updated";
 		}
-		if (ci->HasExt("CS_SECURE") != message.post_data.count("secure"))
+		if (ci->HasFieldS("CS_SECURE") != message.post_data.count("secure"))
 		{
-			if (!ci->HasExt("CS_SECURE"))
-				ci->Extend<bool>("CS_SECURE");
+			if (!ci->HasFieldS("CS_SECURE"))
+				ci->SetS<bool>("CS_SECURE", true);
 			else
-				ci->Shrink<bool>("CS_SECURE");
+				ci->UnsetS<bool>("CS_SECURE");
 			replacements["MESSAGES"] = "Secure updated";
 		}
-		if (ci->HasExt("SECUREOPS") != message.post_data.count("secureops"))
+		if (ci->HasFieldS("SECUREOPS") != message.post_data.count("secureops"))
 		{
-			if (!ci->HasExt("SECUREOPS"))
-				ci->Extend<bool>("SECUREOPS");
+			if (!ci->HasFieldS("SECUREOPS"))
+				ci->SetS<bool>("SECUREOPS", true);
 			else
-				ci->Shrink<bool>("SECUREOPS");
+				ci->UnsetS<bool>("SECUREOPS");
 			replacements["MESSAGES"] = "Secureops updated";
 		}
-		if (ci->HasExt("TOPICLOCK") != message.post_data.count("topiclock"))
+		if (ci->HasFieldS("TOPICLOCK") != message.post_data.count("topiclock"))
 		{
-			if (!ci->HasExt("TOPICLOCK"))
-				ci->Extend<bool>("TOPICLOCK");
+			if (!ci->HasFieldS("TOPICLOCK"))
+				ci->SetS<bool>("TOPICLOCK", true);
 			else
-				ci->Shrink<bool>("TOPICLOCK");
+				ci->UnsetS<bool>("TOPICLOCK");
 			replacements["MESSAGES"] = "Topiclock updated";
 		}
 	}
 
-	replacements["CHANNEL"] = HTTPUtils::Escape(ci->name);
-	replacements["CHANNEL_ESCAPED"] = HTTPUtils::URLEncode(ci->name);
+	replacements["CHANNEL"] = HTTPUtils::Escape(ci->GetName());
+	replacements["CHANNEL_ESCAPED"] = HTTPUtils::URLEncode(ci->GetName());
 	if (ci->GetFounder())
-		replacements["FOUNDER"] = ci->GetFounder()->display;
+		replacements["FOUNDER"] = ci->GetFounder()->GetDisplay();
 	if (ci->GetSuccessor())
-		replacements["SUCCESSOR"] = ci->GetSuccessor()->display;
-	replacements["TIME_REGISTERED"] = Anope::strftime(ci->time_registered, na->nc);
-	replacements["LAST_USED"] = Anope::strftime(ci->last_used, na->nc);
+		replacements["SUCCESSOR"] = ci->GetSuccessor()->GetDisplay();
+	replacements["TIME_REGISTERED"] = Anope::strftime(ci->GetTimeRegistered(), na->GetAccount());
+	replacements["LAST_USED"] = Anope::strftime(ci->GetLastUsed(), na->GetAccount());
 	replacements["ESCAPED_CHANNEL"] = HTTPUtils::URLEncode(chname);
 
-	if (!ci->last_topic.empty())
+	if (!ci->GetLastTopic().empty())
 	{
-		replacements["LAST_TOPIC"] = HTTPUtils::Escape(ci->last_topic);
-		replacements["LAST_TOPIC_SETTER"] = HTTPUtils::Escape(ci->last_topic_setter);
+		replacements["LAST_TOPIC"] = HTTPUtils::Escape(ci->GetLastTopic());
+		replacements["LAST_TOPIC_SETTER"] = HTTPUtils::Escape(ci->GetLastTopicSetter());
 	}
 
 	if (can_set)
 	{
-		if (ci->HasExt("KEEPTOPIC"))
+		if (ci->HasFieldS("KEEPTOPIC"))
 			replacements["KEEPTOPIC"];
 
-		if (ci->HasExt("PEACE"))
+		if (ci->HasFieldS("PEACE"))
 			replacements["PEACE"];
 
-		if (ci->HasExt("CS_PRIVATE"))
+		if (ci->HasFieldS("CS_PRIVATE"))
 			replacements["PRIVATE"];
 
-		if (ci->HasExt("RESTRICTED"))
+		if (ci->HasFieldS("RESTRICTED"))
 			replacements["RESTRICTED"];
 
-		if (ci->HasExt("CS_SECURE"))
+		if (ci->HasFieldS("CS_SECURE"))
 			replacements["SECURE"];
 
-		if (ci->HasExt("SECUREOPS"))
+		if (ci->HasFieldS("SECUREOPS"))
 			replacements["SECUREOPS"];
 
-		if (ci->HasExt("TOPICLOCK"))
+		if (ci->HasFieldS("TOPICLOCK"))
 			replacements["TOPICLOCK"];
 	}
 

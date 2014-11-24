@@ -51,15 +51,6 @@
 	}
 #endif
 
-/** Possible return types from events.
- */
-enum EventReturn
-{
-	EVENT_STOP,
-	EVENT_CONTINUE,
-	EVENT_ALLOW
-};
-
 enum ModuleReturn
 {
 	MOD_ERR_OK,

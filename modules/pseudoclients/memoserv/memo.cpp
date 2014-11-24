@@ -1,58 +1,72 @@
-#include "memo.h"
+//#include "memo.h"
+#include "memotype.h"
 
-MemoImpl::MemoImpl()
+/*MemoImpl::MemoImpl()
 {
-	unread = receipt = false;
-}
+	//unread = receipt = false;
+}*/
 
 MemoImpl::~MemoImpl()
 {
-	bool ischan, isregistered;
-	MemoServ::MemoInfo *mi = MemoServ::service->GetMemoInfo(this->owner, ischan, isregistered, false);
-	if (mi)
-	{
-		std::vector<Memo *>::iterator it = std::find(mi->memos->begin(), mi->memos->end(), this);
-
-		if (it != mi->memos->end())
-			mi->memos->erase(it);
-	}
 }
 
-void MemoImpl::Serialize(Serialize::Data &data) const
+MemoServ::MemoInfo *MemoImpl::GetMemoInfo()
 {
-	data["owner"] << this->owner;
-	data.SetType("time", Serialize::Data::DT_INT); data["time"] << this->time;
-	data["sender"] << this->sender;
-	data["text"] << this->text;
-	data["unread"] << this->unread;
-	data["receipt"] << this->receipt;
+	return Get(&MemoType::mi);
 }
 
-Serializable* MemoImpl::Unserialize(Serializable *obj, Serialize::Data &data)
+void MemoImpl::SetMemoInfo(MemoServ::MemoInfo *mi)
 {
-	Anope::string owner;
-
-	data["owner"] >> owner;
-
-	bool ischan, isregistered;
-	MemoServ::MemoInfo *mi = MemoServ::service->GetMemoInfo(owner, ischan, isregistered, true);
-	if (!mi)
-		return NULL;
-
-	Memo *m;
-	if (obj)
-		m = anope_dynamic_static_cast<Memo *>(obj);
-	else
-		m = new MemoImpl();
-
-	m->owner = owner;
-	data["time"] >> m->time;
-	data["sender"] >> m->sender;
-	data["text"] >> m->text;
-	data["unread"] >> m->unread;
-	data["receipt"] >> m->receipt;
-
-	if (obj == NULL)
-		mi->memos->push_back(m);
-	return m;
+	Set(&MemoType::mi, mi);
 }
+
+time_t MemoImpl::GetTime()
+{
+	return Get(&MemoType::time);
+}
+
+void MemoImpl::SetTime(const time_t &t)
+{
+	Set(&MemoType::time, t);
+}
+
+Anope::string MemoImpl::GetSender()
+{
+	return Get(&MemoType::sender);
+}
+
+void MemoImpl::SetSender(const Anope::string &s)
+{
+	Set(&MemoType::sender, s);
+}
+
+Anope::string MemoImpl::GetText()
+{
+	return Get(&MemoType::text);
+}
+
+void MemoImpl::SetText(const Anope::string &t)
+{
+	Set(&MemoType::text, t);
+}
+
+bool MemoImpl::GetUnread()
+{
+	return Get(&MemoType::unread);
+}
+
+void MemoImpl::SetUnread(const bool &b)
+{
+	Set(&MemoType::unread, b);
+}
+
+bool MemoImpl::GetReceipt()
+{
+	return Get(&MemoType::receipt);
+}
+
+void MemoImpl::SetReceipt(const bool &b)
+{
+	Set(&MemoType::receipt, b);
+}
+

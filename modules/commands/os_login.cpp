@@ -28,22 +28,33 @@ class CommandOSLogin : public Command
 		User *u = source.GetUser();
 		Oper *o = source.nc->o;
 		if (o == NULL)
+		{
 			source.Reply(_("No oper block for your nickname."));
-		else if (o->password.empty())
+			return;
+		}
+
+		if (o->GetPassword().empty())
+		{
 			source.Reply(_("Your oper block doesn't require logging in."));
-		else if (u->HasExt("os_login"))
+			return;
+		}
+
+		if (u->HasExtOK("os_login"))
+		{
 			source.Reply(_("You are already logged in."));
-		else if (o->password != password)
+			return;
+		}
+
+		if (o->GetPassword() != password)
 		{
 			source.Reply(_("Password incorrect."));
 			u->BadPassword();
+			return;
 		}
-		else
-		{
-			Log(LOG_ADMIN, source, this) << "and successfully identified to " << source.service->nick;
-			u->Extend<bool>("os_login");
-			source.Reply(_("Password accepted."));
-		}
+
+		Log(LOG_ADMIN, source, this) << "and successfully identified to " << source.service->nick;
+		u->Extend<bool>("os_login", true);
+		source.Reply(_("Password accepted."));
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
@@ -71,17 +82,26 @@ class CommandOSLogout : public Command
 		User *u = source.GetUser();
 		Oper *o = source.nc->o;
 		if (o == NULL)
-			source.Reply(_("No oper block for your nick."));
-		else if (o->password.empty())
-			source.Reply(_("Your oper block doesn't require logging in."));
-		else if (!u->HasExt("os_login"))
-			source.Reply(_("You are not identified."));
-		else
 		{
-			Log(LOG_ADMIN, source, this);
-			u->Shrink<bool>("os_login");
-			source.Reply(_("You have been logged out."));
+			source.Reply(_("No oper block for your nick."));
+			return;
 		}
+
+		if (o->GetPassword().empty())
+		{
+			source.Reply(_("Your oper block doesn't require logging in."));
+			return;
+		}
+
+		if (!u->HasExtOK("os_login"))
+		{
+			source.Reply(_("You are not identified."));
+			return;
+		}
+
+		Log(LOG_ADMIN, source, this);
+		u->ShrinkOK<bool>("os_login");
+		source.Reply(_("You have been logged out."));
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
@@ -115,7 +135,7 @@ class OSLogin : public Module
 
 	EventReturn IsServicesOper(User *u) override
 	{
-		if (!u->Account()->o->password.empty())
+		if (!u->Account()->o->GetPassword().empty())
 		{
 			if (os_login.HasExt(u))
 				return EVENT_ALLOW;

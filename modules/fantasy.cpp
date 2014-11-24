@@ -35,7 +35,7 @@ class CommandBSSetFantasy : public Command
 
 		if (!source.HasPriv("botserv/administration") && !source.AccessFor(ci).HasPriv("SET"))
 		{
-			source.Reply(_("Access denied. You do not have the \002{0}\002 privilege on \002{1}\002."), "SET", ci->name);
+			source.Reply(_("Access denied. You do not have the \002{0}\002 privilege on \002{1}\002."), "SET", ci->GetName());
 			return;
 		}
 
@@ -50,16 +50,16 @@ class CommandBSSetFantasy : public Command
 			bool override = !source.AccessFor(ci).HasPriv("SET");
 			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to enable fantasy";
 
-			ci->Extend<bool>("BS_FANTASY");
-			source.Reply(_("Fantasy mode is now \002on\002 on channel \002{0}\002."), ci->name);
+			ci->SetS<bool>("BS_FANTASY", true);
+			source.Reply(_("Fantasy mode is now \002on\002 on channel \002{0}\002."), ci->GetName());
 		}
 		else if (value.equals_ci("OFF"))
 		{
 			bool override = !source.AccessFor(ci).HasPriv("SET");
 			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to disable fantasy";
 
-			ci->Shrink<bool>("BS_FANTASY");
-			source.Reply(_("Fantasy mode is now \002off\002 on channel \002{0}\002."), ci->name);
+			ci->UnsetS<bool>("BS_FANTASY");
+			source.Reply(_("Fantasy mode is now \002off\002 on channel \002{0}\002."), ci->GetName());
 		}
 		else
 			this->OnSyntaxError(source, source.command);
@@ -84,9 +84,9 @@ class CommandBSSetFantasy : public Command
 
 class Fantasy : public Module
 	, public EventHook<Event::Privmsg>
-	, public EventHook<Event::BotInfoEvent>
+	, public EventHook<Event::ServiceBotEvent>
 {
-	SerializableExtensibleItem<bool> fantasy;
+	Serialize::Field<ChanServ::Channel, bool> fantasy;
 
 	CommandBSSetFantasy commandbssetfantasy;
 
@@ -96,8 +96,8 @@ class Fantasy : public Module
  public:
 	Fantasy(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
 		, EventHook<Event::Privmsg>("OnPrivmsg")
-		, EventHook<Event::BotInfoEvent>("OnBotInfoEvent")
-		, fantasy(this, "BS_FANTASY")
+		, EventHook<Event::ServiceBotEvent>("OnServiceBotEvent")
+		, fantasy(this, ChanServ::channel, "BS_FANTASY")
 		, commandbssetfantasy(this)
 		, OnBotFantasy(this, "OnBotFantasy")
 		, OnBotNoFantasyAccess(this, "OnBotNoFantasyAccess")
@@ -106,7 +106,7 @@ class Fantasy : public Module
 
 	void OnPrivmsg(User *u, Channel *c, Anope::string &msg) override
 	{
-		if (!u || !c || !c->ci || !c->ci->bi || msg.empty() || msg[0] == '\1')
+		if (!u || !c || !c->ci || !c->ci->GetBot() || msg.empty() || msg[0] == '\1')
 			return;
 
 		if (Config->GetClient("BotServ") && !fantasy.HasExt(c->ci))
@@ -115,7 +115,7 @@ class Fantasy : public Module
 		std::vector<Anope::string> params;
 		spacesepstream(msg).GetTokens(params);
 
-		if (!msg.find(c->ci->bi->nick))
+		if (!msg.find(c->ci->GetBot()->nick))
 			params.erase(params.begin());
 		else if (!msg.find_first_of(Config->GetModule(this)->Get<const Anope::string>("fantasycharacter", "!")))
 			params[0].erase(params[0].begin());
@@ -169,7 +169,7 @@ class Fantasy : public Module
 		if (params.size() < cmd->min_params)
 			return;
 
-		CommandSource source(u->nick, u, u->Account(), u, c->ci->bi);
+		CommandSource source(u->nick, u, u->Account(), u, c->ci->GetBot());
 		source.c = c;
 		source.command = it->first;
 		source.permission = info.permission;
@@ -204,7 +204,7 @@ class Fantasy : public Module
 		Event::OnPostCommand(&Event::PostCommand::OnPostCommand, source, cmd, params);
 	}
 
-	void OnBotInfo(CommandSource &source, BotInfo *bi, ChanServ::Channel *ci, InfoFormatter &info) override
+	void OnServiceBot(CommandSource &source, ServiceBot *bi, ChanServ::Channel *ci, InfoFormatter &info) override
 	{
 		if (fantasy.HasExt(ci))
 			info.AddOption(_("Fantasy"));

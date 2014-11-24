@@ -53,54 +53,67 @@ class CommandMSIgnore : public Command
 				source.Reply(_("Channel \002{0}\002 isn't registered."), channel);
 			else
 				source.Reply(_("\002{0}\002 isn't registered."), channel);
+			return;
 		}
-		else if (ischan && !source.AccessFor(ci).HasPriv("MEMO"))
-			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "MEMO", ci->name);
-		else if (command.equals_ci("ADD") && !param.empty())
+
+		if (ischan && !source.AccessFor(ci).HasPriv("MEMO"))
 		{
-			if (std::find(mi->ignores.begin(), mi->ignores.end(), param.ci_str()) == mi->ignores.end())
-			{
-				mi->ignores.push_back(param.ci_str());
-				source.Reply(_("\002{0}\002 has been added to your memo ignore list."), param);
-			}
-			else
-				source.Reply(_("\002{0}\002 is already on your memo ignore list."), param);
+			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "MEMO", ci->GetName());
+			return;
+		}
+
+		auto ignores = mi->GetIgnores();
+
+		if (command.equals_ci("ADD") && !param.empty())
+		{
+			for (MemoServ::Ignore *ign : ignores)
+				if (ign->GetMask().equals_ci(param))
+				{
+					source.Reply(_("\002{0}\002 is already on your memo ignore list."), param);
+					return;
+				}
+
+			MemoServ::Ignore *ign = MemoServ::service->CreateIgnore();
+			ign->SetMemoInfo(mi);
+			ign->SetMask(param);
+
+			source.Reply(_("\002{0}\002 has been added to your memo ignore list."), param);
 		}
 		else if (command.equals_ci("DEL") && !param.empty())
 		{
-			std::vector<Anope::string>::iterator it = std::find(mi->ignores.begin(), mi->ignores.end(), param.ci_str());
+			for (MemoServ::Ignore *ign : ignores)
+				if (ign->GetMask().equals_ci(param))
+				{
+					delete ign;
+					source.Reply(_("\002{0}\002 has been removed from your memo ignore list."), param);
+					return;
+				}
 
-			if (it != mi->ignores.end())
-			{
-				mi->ignores.erase(it);
-				source.Reply(_("\002{0}\002 has been removed from your memo ignore list."), param);
-			}
-			else
-				source.Reply(_("\002{0}\002 is not on your memo ignore list."), param);
+			source.Reply(_("\002{0}\002 is not on your memo ignore list."), param);
 		}
 		else if (command.equals_ci("LIST"))
 		{
-			if (mi->ignores.empty())
-				source.Reply(_("Your memo ignore list is empty."));
-			else
+			if (ignores.empty())
 			{
-				ListFormatter list(source.GetAccount());
-				list.AddColumn(_("Mask"));
-				for (unsigned i = 0; i < mi->ignores.size(); ++i)
-				{
-					ListFormatter::ListEntry entry;
-					entry["Mask"] = mi->ignores[i];
-					list.AddEntry(entry);
-				}
-
-				source.Reply(_("Memo ignore list:"));
-
-				std::vector<Anope::string> replies;
-				list.Process(replies);
-
-				for (unsigned i = 0; i < replies.size(); ++i)
-					source.Reply(replies[i]);
+				source.Reply(_("Your memo ignore list is empty."));
+				return;
 			}
+			ListFormatter list(source.GetAccount());
+			list.AddColumn(_("Mask"));
+			for (MemoServ::Ignore *ign : ignores)
+			{
+				ListFormatter::ListEntry entry;
+				entry["Mask"] = ign->GetMask();
+				list.AddEntry(entry);
+			}
+
+			source.Reply(_("Memo ignore list:"));
+
+			std::vector<Anope::string> replies;
+			list.Process(replies);
+
+			for (unsigned i = 0; i < replies.size(); ++i)
+				source.Reply(replies[i]);
 		}
 		else
 			this->OnSyntaxError(source, "");

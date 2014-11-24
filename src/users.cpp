@@ -56,7 +56,6 @@ User::User(const Anope::string &snick, const Anope::string &sident, const Anope:
 	this->SetModesInternal(sserver, "%s", smodes.c_str());
 	this->uid = suid;
 	this->super_admin = false;
-	this->nc = NULL;
 
 	size_t old = UserListByNick.size();
 	UserListByNick[snick] = this;
@@ -99,7 +98,7 @@ static void CollideKill(User *target, const Anope::string &reason)
 		IRCD->SendQuit(target, "%s", reason.c_str());
 
 		// Reintroduce my client
-		if (BotInfo *bi = dynamic_cast<BotInfo *>(target))
+		if (ServiceBot *bi = dynamic_cast<ServiceBot *>(target))
 			bi->OnKill();
 		else
 			target->Quit(reason);
@@ -159,7 +158,7 @@ void User::ChangeNick(const Anope::string &newnick, time_t ts)
 		{
 			NickServ::Nick *old_na = NickServ::service->FindNick(this->nick);
 			if (old_na && (this->IsIdentified(true) || this->IsRecognized()))
-				old_na->last_seen = Anope::CurTime;
+				old_na->SetLastSeen(Anope::CurTime);
 		}
 
 		UserListByNick.erase(this->nick);
@@ -181,11 +180,11 @@ void User::ChangeNick(const Anope::string &newnick, time_t ts)
 			NickServ::Nick *na = NickServ::service->FindNick(this->nick);
 			if (na)
 			{
-				on_access = na->nc->IsOnAccess(this);
+				on_access = na->GetAccount()->IsOnAccess(this);
 
-				if (na->nc == this->Account())
+				if (na->GetAccount() == this->Account())
 				{
-					na->last_seen = Anope::CurTime;
+					na->SetLastSeen(Anope::CurTime);
 					this->UpdateHost();
 				}
 			}
@@ -297,7 +296,7 @@ void User::SetRealname(const Anope::string &srealname)
 		NickServ::Nick *na = NickServ::service->FindNick(this->nick);
 
 		if (na && (this->IsIdentified(true) || this->IsRecognized()))
-			na->last_realname = srealname;
+			na->SetLastRealname(srealname);
 	}
 
 	Log(this, "realname") << "changed realname to " << srealname;
@@ -339,7 +338,7 @@ void User::SendMessage(const MessageSource &source, const Anope::string &msg)
 	* - The user is not registered and NSDefMsg is enabled
 	* - The user is registered and has set /ns set msg on
 	*/
-	bool send_privmsg = Config->UsePrivmsg && ((!this->nc && Config->DefPrivmsg) || (this->nc && this->nc->HasExt("MSG")));
+	bool send_privmsg = Config->UsePrivmsg && ((!this->nc && Config->DefPrivmsg) || (this->nc && this->nc->HasFieldS("MSG")));
 	sepstream sep(translated_message, '\n', true);
 	for (Anope::string tok; sep.GetToken(tok);)
 	{
@@ -376,35 +375,36 @@ void User::SendMessage(const MessageSource &source, const Anope::string &msg)
 
 void User::Identify(NickServ::Nick *na)
 {
-	if (this->nick.equals_ci(na->nick))
+	if (this->nick.equals_ci(na->GetNick()))
 	{
-		na->last_usermask = this->GetIdent() + "@" + this->GetDisplayedHost();
-		na->last_realhost = this->GetIdent() + "@" + this->host;
-		na->last_realname = this->realname;
-		na->last_seen = Anope::CurTime;
+		na->SetLastUsermask(this->GetIdent() + "@" + this->GetDisplayedHost());
+		na->SetLastRealhost(this->GetIdent() + "@" + this->host);
+		na->SetLastRealname(this->realname);
+		na->SetLastSeen(Anope::CurTime);
 	}
 
 	IRCD->SendLogin(this, na);
 
-	this->Login(na->nc);
+	this->Login(na->GetAccount());
 
 	Event::OnNickIdentify(&Event::NickIdentify::OnNickIdentify, this);
 
 	if (this->IsServicesOper())
 	{
-		if (!this->nc->o->ot->modes.empty())
+		Anope::string m = this->nc->o->GetType()->modes;
+		if (!m.empty())
 		{
-			this->SetModes(NULL, "%s", this->nc->o->ot->modes.c_str());
-			this->SendMessage(Me, "Changing your usermodes to \002{0}\002", this->nc->o->ot->modes);
+			this->SetModes(NULL, "%s", m.c_str());
+			this->SendMessage(Me, "Changing your usermodes to \002{0}\002", m.c_str());
 			UserMode *um = ModeManager::FindUserModeByName("OPER");
-			if (um && !this->HasMode("OPER") && this->nc->o->ot->modes.find(um->mchar) != Anope::string::npos)
+			if (um && !this->HasMode("OPER") && m.find(um->mchar) != Anope::string::npos)
 				IRCD->SendOper(this);
 		}
-		if (IRCD->CanSetVHost && !this->nc->o->vhost.empty())
+		if (IRCD->CanSetVHost && !this->nc->o->GetVhost().empty())
 		{
-			this->SendMessage(Me, "Changing your vhost to \002{0}\002", this->nc->o->vhost);
- 			this->SetDisplayedHost(this->nc->o->vhost);
-			IRCD->SendVhost(this, "", this->nc->o->vhost);
+			this->SendMessage(Me, "Changing your vhost to \002{0}\002", this->nc->o->GetVhost());
+ 			this->SetDisplayedHost(this->nc->o->GetVhost());
+			IRCD->SendVhost(this, "", this->nc->o->GetVhost());
 		}
 	}
 }
@@ -422,7 +422,7 @@ void User::Login(NickServ::Account *core)
 	this->UpdateHost();
 
 	if (this->server->IsSynced())
-		Log(this, "account") << "is now identified as " << this->nc->display;
+		Log(this, "account") << "is now identified as " << this->nc->GetDisplay();
 
 	Event::OnUserLogin(&Event::UserLogin::OnUserLogin, this);
 }
@@ -432,9 +432,9 @@ void User::Logout()
 	if (!this->nc)
 		return;
 
-	Log(this, "account") << "is no longer identified as " << this->nc->display;
+	Log(this, "account") << "is no longer identified as " << this->nc->GetDisplay();
 
-	std::list<User *>::iterator it = std::find(this->nc->users.begin(), this->nc->users.end(), this);
+	auto it = std::find(this->nc->users.begin(), this->nc->users.end(), this);
 	if (it != this->nc->users.end())
 		this->nc->users.erase(it);
 
@@ -450,8 +450,8 @@ bool User::IsIdentified(bool check_nick) const
 {
 	if (check_nick && this->nc)
 	{
-		NickServ::Nick *na = NickServ::service ? NickServ::service->FindNick(this->nick) : nullptr;
-		return na && *na->nc == *this->nc;
+		NickServ::Nick *na = NickServ::FindNick(nick);
+		return na && na->GetAccount() == *this->nc;
 	}
 
 	return this->nc ? true : false;
@@ -461,9 +461,9 @@ bool User::IsRecognized(bool check_secure) const
 {
 	if (check_secure && on_access)
 	{
-		const NickServ::Nick *na = NickServ::service ? NickServ::service->FindNick(this->nick) : nullptr;
+		NickServ::Nick *na = NickServ::FindNick(nick);
 
-		if (!na || na->nc->HasExt("NS_SECURE"))
+		if (!na || na->GetAccount()->HasFieldS("NS_SECURE"))
 			return false;
 	}
 
@@ -475,17 +475,20 @@ bool User::IsServicesOper()
 	if (!this->nc || !this->nc->IsServicesOper())
 		// No opertype.
 		return false;
-	else if (this->nc->o->require_oper && !this->HasMode("OPER"))
+	else if (this->nc->o->GetRequireOper() && !this->HasMode("OPER"))
 		return false;
-	else if (!this->nc->o->certfp.empty() && this->fingerprint != this->nc->o->certfp)
+	else if (!this->nc->o->GetCertFP().empty() && this->fingerprint != this->nc->o->GetCertFP())
 		// Certfp mismatch
 		return false;
-	else if (!this->nc->o->hosts.empty())
+	else if (!this->nc->o->GetHost().empty())
 	{
+		std::vector<Anope::string> hosts;
+		spacesepstream(this->nc->o->GetHost()).GetTokens(hosts);
+
 		bool match = false;
 		Anope::string match_host = this->GetIdent() + "@" + this->host;
-		for (unsigned i = 0; i < this->nc->o->hosts.size(); ++i)
-			if (Anope::Match(match_host, this->nc->o->hosts[i]))
+		for (Anope::string h : hosts)
+			if (Anope::Match(match_host, h))
 				match = true;
 		if (match == false)
 			return false;
@@ -502,14 +505,14 @@ bool User::IsServicesOper()
 bool User::HasCommand(const Anope::string &command)
 {
 	if (this->IsServicesOper())
-		return this->nc->o->ot->HasCommand(command);
+		return this->nc->o->GetType()->HasCommand(command);
 	return false;
 }
 
 bool User::HasPriv(const Anope::string &priv)
 {
 	if (this->IsServicesOper())
-		return this->nc->o->ot->HasPriv(priv);
+		return this->nc->o->GetType()->HasPriv(priv);
 	return false;
 }
 
@@ -522,14 +525,14 @@ void User::UpdateHost()
 	NickServ::Nick *na = NickServ::service ? NickServ::service->FindNick(this->nick) : nullptr;
 	on_access = false;
 	if (na)
-		on_access = na->nc->IsOnAccess(this);
+		on_access = na->GetAccount()->IsOnAccess(this);
 
 	if (na && (this->IsIdentified(true) || this->IsRecognized()))
 	{
 		Anope::string last_usermask = this->GetIdent() + "@" + this->GetDisplayedHost();
 		Anope::string last_realhost = this->GetIdent() + "@" + this->host;
-		na->last_usermask = last_usermask;
-		na->last_realhost = last_realhost;
+		na->SetLastUsermask(last_usermask);
+		na->SetLastRealhost(last_realhost);
 	}
 }
 
@@ -551,19 +554,20 @@ void User::SetModeInternal(const MessageSource &source, UserMode *um, const Anop
 
 		if (this->IsServicesOper())
 		{
-			if (!this->nc->o->ot->modes.empty())
+			Anope::string m = this->nc->o->GetType()->modes;
+			if (!m.empty())
 			{
-				this->SetModes(NULL, "%s", this->nc->o->ot->modes.c_str());
-				this->SendMessage(Me, "Changing your usermodes to \002%s\002", this->nc->o->ot->modes.c_str());
+				this->SetModes(NULL, "%s", m.c_str());
+				this->SendMessage(Me, "Changing your usermodes to \002{0}\002", m);
 				UserMode *oper = ModeManager::FindUserModeByName("OPER");
-				if (oper && !this->HasMode("OPER") && this->nc->o->ot->modes.find(oper->mchar) != Anope::string::npos)
+				if (oper && !this->HasMode("OPER") && m.find(oper->mchar) != Anope::string::npos)
 					IRCD->SendOper(this);
 			}
-			if (IRCD->CanSetVHost && !this->nc->o->vhost.empty())
+			if (IRCD->CanSetVHost && !this->nc->o->GetVhost().empty())
 			{
-				this->SendMessage(Me, "Changing your vhost to \002%s\002", this->nc->o->vhost.c_str());
-				this->SetDisplayedHost(this->nc->o->vhost);
-				IRCD->SendVhost(this, "", this->nc->o->vhost);
+				this->SendMessage(Me, "Changing your vhost to \002{0}\002", this->nc->o->GetVhost());
+				this->SetDisplayedHost(this->nc->o->GetVhost());
+				IRCD->SendVhost(this, "", this->nc->o->GetVhost());
 			}
 		}
 	}
@@ -593,7 +597,7 @@ void User::RemoveModeInternal(const MessageSource &source, UserMode *um)
 	Event::OnUserModeUnset(&Event::UserModeUnset::OnUserModeUnset, source, this, um->name);
 }
 
-void User::SetMode(BotInfo *bi, UserMode *um, const Anope::string &param)
+void User::SetMode(ServiceBot *bi, UserMode *um, const Anope::string &param)
 {
 	if (!um || HasMode(um->name))
 		return;
@@ -602,12 +606,12 @@ void User::SetMode(BotInfo *bi, UserMode *um, const Anope::string &param)
 	SetModeInternal(bi, um, param);
 }
 
-void User::SetMode(BotInfo *bi, const Anope::string &uname, const Anope::string &param)
+void User::SetMode(ServiceBot *bi, const Anope::string &uname, const Anope::string &param)
 {
 	SetMode(bi, ModeManager::FindUserModeByName(uname), param);
 }
 
-void User::RemoveMode(BotInfo *bi, UserMode *um, const Anope::string &param)
+void User::RemoveMode(ServiceBot *bi, UserMode *um, const Anope::string &param)
 {
 	if (!um || !HasMode(um->name))
 		return;
@@ -616,12 +620,12 @@ void User::RemoveMode(BotInfo *bi, UserMode *um, const Anope::string &param)
 	RemoveModeInternal(bi, um);
 }
 
-void User::RemoveMode(BotInfo *bi, const Anope::string &name, const Anope::string &param)
+void User::RemoveMode(ServiceBot *bi, const Anope::string &name, const Anope::string &param)
 {
 	RemoveMode(bi, ModeManager::FindUserModeByName(name), param);
 }
 
-void User::SetModes(BotInfo *bi, const char *umodes, ...)
+void User::SetModes(ServiceBot *bi, const char *umodes, ...)
 {
 	char buf[BUFSIZE] = "";
 	va_list args;

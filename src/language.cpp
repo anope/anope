@@ -70,9 +70,9 @@ const char *Language::Translate(User *u, const char *string)
 		return Translate("", string);
 }
 
-const char *Language::Translate(const NickServ::Account *nc, const char *string)
+const char *Language::Translate(NickServ::Account *nc, const char *string)
 {
-	return Translate(nc ? nc->language.c_str() : "", string);
+	return Translate(nc ? nc->GetLanguage().c_str() : "", string);
 }
 
 #if GETTEXT_FOUND

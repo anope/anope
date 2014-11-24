@@ -17,7 +17,7 @@ enum BadWordType
 {
 	/* Always kicks if the word is said */
 	BW_ANY,
-	/* User must way the entire word */
+	/* User must say the entire word */
 	BW_SINGLE,
 	/* The word has to start with the badword */
 	BW_START,
@@ -26,50 +26,60 @@ enum BadWordType
 };
 
 /* Structure used to contain bad words. */
-struct BadWord
+class BadWord : public Serialize::Object
 {
-	Anope::string chan;
-	Anope::string word;
-	BadWordType type;
-
-	virtual ~BadWord() { }
  protected:
-	BadWord() { }
+	using Serialize::Object::Object;
+ public:
+	virtual ~BadWord() = default;
+
+	virtual ChanServ::Channel *GetChannel() anope_abstract;
+	virtual void SetChannel(ChanServ::Channel *) anope_abstract;
+
+	virtual Anope::string GetWord() anope_abstract;
+	virtual void SetWord(const Anope::string &) anope_abstract;
+
+	virtual BadWordType GetType() anope_abstract;
+	virtual void SetType(const BadWordType &) anope_abstract;
 };
 
-struct BadWords
+static Serialize::TypeReference<BadWord> badword("BadWord");
+
+struct BadWords : public Service
 {
-	virtual ~BadWords() { }
+	BadWords(Module *me) : Service(me, "BadWords", "badwords") { }
 
 	/** Add a badword to the badword list
 	 * @param word The badword
 	 * @param type The type (SINGLE START END)
 	 * @return The badword
 	 */
-	virtual BadWord* AddBadWord(const Anope::string &word, BadWordType type) anope_abstract;
+	virtual BadWord* AddBadWord(ChanServ::Channel *, const Anope::string &word, BadWordType type) anope_abstract;
+
+	virtual std::vector<BadWord *> GetBadWords(ChanServ::Channel *ci) anope_abstract;
 
 	/** Get a badword structure by index
 	 * @param index The index
 	 * @return The badword
 	 */
-	virtual BadWord* GetBadWord(unsigned index) const anope_abstract;
+	virtual BadWord* GetBadWord(ChanServ::Channel *, unsigned index) anope_abstract;
 
 	/** Get how many badwords are on this channel
 	 * @return The number of badwords in the vector
 	 */
-	virtual unsigned GetBadWordCount() const anope_abstract;
+	virtual unsigned GetBadWordCount(ChanServ::Channel *) anope_abstract;
 
 	/** Remove a badword
 	 * @param index The index of the badword
 	 */
-	virtual void EraseBadWord(unsigned index) anope_abstract;
+	virtual void EraseBadWord(ChanServ::Channel *, unsigned index) anope_abstract;
 
 	/** Clear all badwords from the channel
 	 */
-	virtual void ClearBadWords() anope_abstract;
-
-	virtual void Check() anope_abstract;
+	virtual void ClearBadWords(ChanServ::Channel *) anope_abstract;
 };
+
+static ServiceReference<BadWords> badwords("BadWords", "badwords");
 
 namespace Event
 {

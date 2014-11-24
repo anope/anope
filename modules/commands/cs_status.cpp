@@ -34,7 +34,7 @@ public:
 
 		if (!source.AccessFor(ci).HasPriv("ACCESS_CHANGE") && !source.HasPriv("chanserv/auspex"))
 		{
-			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "ACCESS_CHANGE", ci->name);
+			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "ACCESS_CHANGE", ci->GetName());
 			return;
 		}
 
@@ -51,18 +51,18 @@ public:
 		{
 			na = NickServ::FindNick(nick);
 			if (na != NULL)
-				ag = ci->AccessFor(na->nc);
+				ag = ci->AccessFor(na->GetAccount());
 		}
 
 		if (ag.super_admin)
 			source.Reply(_("\002{0}\002 is a super administrator."), nick);
 		else if (ag.founder)
-			source.Reply(_("\002{0}\002 is the founder of \002{1}\002."), nick, ci->name);
+			source.Reply(_("\002{0}\002 is the founder of \002{1}\002."), nick, ci->GetName());
 		else  if (ag.empty())
-			source.Reply(_("\002{0}\002 has no access on \002{1}\002."), nick, ci->name);
+			source.Reply(_("\002{0}\002 has no access on \002{1}\002."), nick, ci->GetName());
 		else
 		{
-			source.Reply(_("Access for \002{0}\002 on \002{1}\002:"), nick, ci->name);
+			source.Reply(_("Access for \002{0}\002 on \002{1}\002:"), nick, ci->GetName());
 
 			for (unsigned i = 0; i < ag.size(); ++i)
 			{
@@ -74,18 +74,18 @@ public:
 
 		for (unsigned j = 0, end = ci->GetAkickCount(); j < end; ++j)
 		{
-			AutoKick *autokick = ci->GetAkick(j);
+			AutoKick *ak = ci->GetAkick(j);
 
-			if (autokick->nc)
+			if (ak->GetAccount())
 			{
-				if (na && *autokick->nc == na->nc)
-					source.Reply(_("\002{0}\002 is on the auto kick list of \002{1}\002 ({2})."), na->nc->display, ci->name, autokick->reason);
+				if (na && ak->GetAccount() == na->GetAccount())
+					source.Reply(_("\002{0}\002 is on the auto kick list of \002{1}\002 ({2})."), na->GetAccount()->GetDisplay(), ci->GetName(), ak->GetReason());
 			}
 			else if (u != NULL)
 			{
-				Entry akick_mask("", autokick->mask);
+				Entry akick_mask("", ak->GetMask());
 				if (akick_mask.Matches(u))
-					source.Reply(_("\002{0}\002 matches auto kick entry \002{1}\002 on \002{2}\002 ({3})."), u->nick, autokick->mask, ci->name, autokick->reason);
+					source.Reply(_("\002{0}\002 matches auto kick entry \002{1}\002 on \002{2}\002 ({3})."), u->nick, ak->GetMask(), ci->GetName(), ak->GetReason());
 			}
 		}
 	}

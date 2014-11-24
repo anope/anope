@@ -7,207 +7,265 @@
 
 #include "module.h"
 #include "modules/dns.h"
-
-static ServiceReference<DNS::Manager> dnsmanager("DNS::Manager", "dns/manager");
-
-struct DNSZone;
-class DNSServer;
-
-static Serialize::Checker<std::vector<DNSZone *> > zones("DNSZone");
-static Serialize::Checker<std::vector<DNSServer *> > dns_servers("DNSServer");
+#include "modules/os_dns.h"
 
 static std::map<Anope::string, std::list<time_t> > server_quit_times;
 
-struct DNSZone : Serializable
+class DNSZoneImpl : public DNSZone
 {
-	Anope::string name;
-	std::set<Anope::string, ci::less> servers;
+ public:
+	DNSZoneImpl(Serialize::TypeBase *type) : DNSZone(type) { }
+	DNSZoneImpl(Serialize::TypeBase *type, Serialize::ID id) : DNSZone(type, id) { }
 
-	DNSZone(const Anope::string &n) : Serializable("DNSZone"), name(n)
-	{
-		zones->push_back(this);
-	}
-
-	~DNSZone()
-	{
-		std::vector<DNSZone *>::iterator it = std::find(zones->begin(), zones->end(), this);
-		if (it != zones->end())
-			zones->erase(it);
-	}
-
-	void Serialize(Serialize::Data &data) const override
-	{
-		data["name"] << name;
-		unsigned count = 0;
-		for (std::set<Anope::string, ci::less>::iterator it = servers.begin(), it_end = servers.end(); it != it_end; ++it)
-			data["server" + stringify(count++)] << *it;
-	}
-
-	static Serializable* Unserialize(Serializable *obj, Serialize::Data &data)
-	{
-		DNSZone *zone;
-		Anope::string zone_name;
-
-		data["name"] >> zone_name;
-
-		if (obj)
-		{
-			zone = anope_dynamic_static_cast<DNSZone *>(obj);
-			data["name"] >> zone->name;
-		}
-		else
-			zone = new DNSZone(zone_name);
-
-		zone->servers.clear();
-		for (unsigned count = 0; true; ++count)
-		{
-			Anope::string server_str;
-			data["server" + stringify(count)] >> server_str;
-			if (server_str.empty())
-				break;
-			zone->servers.insert(server_str);
-		}
-
-		return zone;
-	}
+	Anope::string GetName() override;
+	void SetName(const Anope::string &) override;
 
 	static DNSZone *Find(const Anope::string &name)
 	{
-		for (unsigned i = 0; i < zones->size(); ++i)
-			if (zones->at(i)->name.equals_ci(name))
-			{
-				DNSZone *z = zones->at(i);
-				z->QueueUpdate();
-				return z;
-			}
-		return NULL;
+		for (DNSZone *zone : Serialize::GetObjects<DNSZone *>(dnszone))
+			if (zone->GetName().equals_ci(name))
+				return zone;
+		return nullptr;
 	}
 };
 
-class DNSServer : public Serializable
+class DNSZoneType : public Serialize::Type<DNSZoneImpl>
 {
-	Anope::string server_name;
-	std::vector<Anope::string> ips;
-	unsigned limit;
-	/* wants to be in the pool */
- 	bool pooled;
+ public:
+	Serialize::Field<DNSZoneImpl, Anope::string> name;
+
+	DNSZoneType(Module *creator) : Serialize::Type<DNSZoneImpl>(creator, "DNSZone")
+		, name(this, "name")
+	{
+	}
+};
+
+Anope::string DNSZoneImpl::GetName()
+{
+	return Get(&DNSZoneType::name);
+}
+
+void DNSZoneImpl::SetName(const Anope::string &name)
+{
+	Set(&DNSZoneType::name, name);
+}
+
+class DNSServerImpl : public DNSServer
+{
 	/* is actually in the pool */
-	bool active;
+	bool active = false;
 
  public:
  	std::set<Anope::string, ci::less> zones;
-	time_t repool;
+	time_t repool = 0;
 
-	DNSServer(const Anope::string &sn) : Serializable("DNSServer"), server_name(sn), limit(0), pooled(false), active(false), repool(0)
+	DNSServerImpl(Serialize::TypeBase *type) : DNSServer(type) { }
+	DNSServerImpl(Serialize::TypeBase *type, Serialize::ID id) : DNSServer(type, id) { }
+
+	DNSZone *GetZone() override;
+	void SetZone(DNSZone *) override;
+
+	Anope::string GetName() override;
+	void SetName(const Anope::string &) override;
+
+	unsigned int GetLimit() override;
+	void SetLimit(const unsigned int &) override;
+
+	bool GetPooled() override;
+	void SetPool(const bool &) override;
+
+	bool Active()
 	{
-		dns_servers->push_back(this);
+		return GetPooled() && active;
 	}
 
-	~DNSServer()
-	{
-		std::vector<DNSServer *>::iterator it = std::find(dns_servers->begin(), dns_servers->end(), this);
-		if (it != dns_servers->end())
-			dns_servers->erase(it);
-	}
-
-	const Anope::string &GetName() const { return server_name; }
-	std::vector<Anope::string> &GetIPs() { return ips; }
-	unsigned GetLimit() const { return limit; }
-	void SetLimit(unsigned l) { limit = l; }
-
-	bool Pooled() const { return pooled; }
-	void Pool(bool p)
-	{
-		if (!p)
-			this->SetActive(p);
-		pooled = p;
-	}
-
-	bool Active() const { return pooled && active; }
 	void SetActive(bool p)
 	{
 		if (p)
-			this->Pool(p);
+			this->SetPool(p);
 		active = p;
 
-		if (dnsmanager)
+		if (DNS::manager)
 		{
-			dnsmanager->UpdateSerial();
+			DNS::manager->UpdateSerial();
 			for (std::set<Anope::string, ci::less>::iterator it = zones.begin(), it_end = zones.end(); it != it_end; ++it)
-				dnsmanager->Notify(*it);
+				DNS::manager->Notify(*it);
 		}
 	}
 
-	void Serialize(Serialize::Data &data) const override
+	static DNSServerImpl *Find(const Anope::string &s)
 	{
-		data["server_name"] << server_name;
-		for (unsigned i = 0; i < ips.size(); ++i)
-			data["ip" + stringify(i)] << ips[i];
-		data["limit"] << limit;
-		data["pooled"] << pooled;
-		unsigned count = 0;
-		for (std::set<Anope::string, ci::less>::iterator it = zones.begin(), it_end = zones.end(); it != it_end; ++it)
-			data["zone" + stringify(count++)] << *it;
-	}
-
-	static Serializable* Unserialize(Serializable *obj, Serialize::Data &data)
-	{
-		DNSServer *req;
-		Anope::string server_name;
-
-		data["server_name"] >> server_name;
-
-		if (obj)
-		{
-			req = anope_dynamic_static_cast<DNSServer *>(obj);
-			req->server_name = server_name;
-		}
-		else
-			req = new DNSServer(server_name);
-
-		for (unsigned i = 0; true; ++i)
-		{
-			Anope::string ip_str;
-			data["ip" + stringify(i)] >> ip_str;
-			if (ip_str.empty())
-				break;
-			req->ips.push_back(ip_str);
-		}
-
-		data["limit"] >> req->limit;
-		data["pooled"] >> req->pooled;
-
-		req->zones.clear();
-		for (unsigned i = 0; true; ++i)
-		{
-			Anope::string zone_str;
-			data["zone" + stringify(i)] >> zone_str;
-			if (zone_str.empty())
-				break;
-			req->zones.insert(zone_str);
-		}
-
-		return req;
-	}
-
-	static DNSServer *Find(const Anope::string &s)
-	{
-		for (unsigned i = 0; i < dns_servers->size(); ++i)
-			if (dns_servers->at(i)->GetName().equals_ci(s))
-			{
-				DNSServer *serv = dns_servers->at(i);
-				serv->QueueUpdate();
-				return serv;
-			}
-		return NULL;
+		for (DNSServerImpl *server : Serialize::GetObjects<DNSServerImpl *>(dnsserver))
+			if (server->GetName().equals_ci(s))
+				return server;
+		return nullptr;
 	}
 };
+
+class DNSServerType : public Serialize::Type<DNSServerImpl>
+{
+ public:
+	Serialize::ObjectField<DNSServerImpl, DNSZone *> zone;
+	Serialize::Field<DNSServerImpl, Anope::string> name;
+	Serialize::Field<DNSServerImpl, unsigned int> limit;
+	Serialize::Field<DNSServerImpl, bool> pooled;
+
+	DNSServerType(Module *creator) : Serialize::Type<DNSServerImpl>(creator, "DNSServer")
+		, zone(this, "zone")
+		, name(this, "name")
+		, limit(this, "limit")
+		, pooled(this, "pooled")
+	{
+	}
+};
+
+DNSZone *DNSServerImpl::GetZone()
+{
+	return Get(&DNSServerType::zone);
+}
+
+void DNSServerImpl::SetZone(DNSZone *z)
+{
+	Set(&DNSServerType::zone, z);
+}
+
+Anope::string DNSServerImpl::GetName()
+{
+	return Get(&DNSServerType::name);
+}
+
+void DNSServerImpl::SetName(const Anope::string &n)
+{
+	Set(&DNSServerType::name, n);
+}
+
+unsigned int DNSServerImpl::GetLimit()
+{
+	return Get(&DNSServerType::limit);
+}
+
+void DNSServerImpl::SetLimit(const unsigned int &l)
+{
+	Set(&DNSServerType::limit, l);
+}
+
+bool DNSServerImpl::GetPooled()
+{
+	return Get(&DNSServerType::pooled);
+}
+
+void DNSServerImpl::SetPool(const bool &p)
+{
+	Set(&DNSServerType::pooled, p);
+}
+
+class DNSZoneMembershipImpl : public DNSZoneMembership
+{
+ public:
+	DNSZoneMembershipImpl(Serialize::TypeBase *type) : DNSZoneMembership(type) { }
+	DNSZoneMembershipImpl(Serialize::TypeBase *type, Serialize::ID id) : DNSZoneMembership(type, id) { }
+
+	DNSServer *GetServer() override;
+	void SetServer(DNSServer *) override;
+
+	DNSZone *GetZone() override;
+	void SetZone(DNSZone *) override;
+
+	static DNSZoneMembership *Find(DNSServer *server, DNSZone *zone)
+	{
+		for (DNSZoneMembership *mem : Serialize::GetObjects<DNSZoneMembership *>(dnszonemembership))
+			if (mem->GetServer() == server && mem->GetZone() == zone)
+				return mem;
+		return nullptr;
+	}
+};
+
+class DNSZoneMembershipType : public Serialize::Type<DNSZoneMembershipImpl>
+{
+ public:
+	Serialize::ObjectField<DNSZoneMembershipImpl, DNSServer *> server;
+	Serialize::ObjectField<DNSZoneMembershipImpl, DNSZone *> zone;
+
+	DNSZoneMembershipType(Module *creator) : Serialize::Type<DNSZoneMembershipImpl>(creator, "DNSZoneMembership")
+		, server(this, "server")
+		, zone(this, "zone")
+	{
+	}
+};
+
+DNSServer *DNSZoneMembershipImpl::GetServer()
+{
+	return Get(&DNSZoneMembershipType::server);
+}
+
+void DNSZoneMembershipImpl::SetServer(DNSServer *s)
+{
+	Set(&DNSZoneMembershipType::server, s);
+}
+
+DNSZone *DNSZoneMembershipImpl::GetZone()
+{
+	return Get(&DNSZoneMembershipType::zone);
+}
+
+void DNSZoneMembershipImpl::SetZone(DNSZone *z)
+{
+	Set(&DNSZoneMembershipType::zone, z);
+}
+
+class DNSIPImpl : public DNSIP
+{
+ public:
+	DNSIPImpl(Serialize::TypeBase *type) : DNSIP(type) { }
+	DNSIPImpl(Serialize::TypeBase *type, Serialize::ID id) : DNSIP(type, id) { }
+
+	DNSServer *GetServer() override;
+	void SetServer(DNSServer *) override;
+
+	Anope::string GetIP() override;
+	void SetIP(const Anope::string &) override;
+};
+
+class DNSIPType : public Serialize::Type<DNSIPImpl>
+{
+ public:
+	Serialize::ObjectField<DNSServerImpl, DNSServer *> server;
+	Serialize::Field<DNSServerImpl, Anope::string> ip;
+
+	DNSIPType(Module *creator) : Serialize::Type<DNSIPImpl>(creator, "DNSIP")
+		, server(this, "server")
+		, ip(this, "ip")
+	{
+	}
+};
+
+DNSServer *DNSIPImpl::GetServer()
+{
+	return Get(&DNSIPType::server);
+}
+
+void DNSIPImpl::SetServer(DNSServer *s)
+{
+	Set(&DNSIPType::server, s);
+}
+
+Anope::string DNSIPImpl::GetIP()
+{
+	return Get(&DNSIPType::ip);
+}
+
+void DNSIPImpl::SetIP(const Anope::string &ip)
+{
+	Set(&DNSIPType::ip, ip);
+}
 
 class CommandOSDNS : public Command
 {
 	void DisplayPoolState(CommandSource &source)
 	{
-		if (dns_servers->empty())
+		std::vector<DNSServerImpl *> servers = Serialize::GetObjects<DNSServerImpl *>(dnsserver);
+
+		if (servers.empty())
 		{
 			source.Reply(_("There are no configured servers."));
 			return;
@@ -215,9 +273,8 @@ class CommandOSDNS : public Command
 
 		ListFormatter lf(source.GetAccount());
 		lf.AddColumn(_("Server")).AddColumn(_("IP")).AddColumn(_("Limit")).AddColumn(_("State"));
-		for (unsigned i = 0; i < dns_servers->size(); ++i)
+		for (DNSServerImpl *s : servers)
 		{
-			DNSServer *s = dns_servers->at(i);
 			Server *srv = Server::Find(s->GetName(), true);
 
 			ListFormatter::ListEntry entry;
@@ -225,8 +282,8 @@ class CommandOSDNS : public Command
 			entry["Limit"] = s->GetLimit() ? stringify(s->GetLimit()) : Language::Translate(source.GetAccount(), _("None"));
 
 			Anope::string ip_str;
-			for (unsigned j = 0; j < s->GetIPs().size(); ++j)
-				ip_str += s->GetIPs()[j] + " ";
+			for (DNSIP *ip : s->GetRefs<DNSIP *>(dnsip))
+				ip_str += ip->GetIP() + " ";
 			ip_str.trim();
 			if (ip_str.empty())
 				ip_str = "None";
@@ -234,7 +291,7 @@ class CommandOSDNS : public Command
 
 			if (s->Active())
 				entry["State"] = Language::Translate(source.GetAccount(), _("Pooled/Active"));
-			else if (s->Pooled())
+			else if (s->GetPooled())
 				entry["State"] = Language::Translate(source.GetAccount(), _("Pooled/Not Active"));
 			else
 				entry["State"] = Language::Translate(source.GetAccount(), _("Unpooled"));
@@ -248,21 +305,20 @@ class CommandOSDNS : public Command
 		std::vector<Anope::string> replies;
 		lf.Process(replies);
 
-		if (!zones->empty())
+		std::vector<DNSZone *> zones = Serialize::GetObjects<DNSZone *>(dnszone);
+		if (!zones.empty())
 		{
 			ListFormatter lf2(source.GetAccount());
 			lf2.AddColumn(_("Zone")).AddColumn(_("Servers"));
 
-			for (unsigned i = 0; i < zones->size(); ++i)
+			for (DNSZone *z : zones)
 			{
-				const DNSZone *z = zones->at(i);
-
 				ListFormatter::ListEntry entry;
-				entry["Zone"] = z->name;
+				entry["Zone"] = z->GetName();
 
 				Anope::string server_str;
-				for (std::set<Anope::string, ci::less>::iterator it = z->servers.begin(), it_end = z->servers.end(); it != it_end; ++it)
-					server_str += *it + " ";
+				for (DNSServer *s : z->GetRefs<DNSServer *>(dnsserver))
+					server_str += s->GetName() + " ";
 				server_str.trim();
 
 				if (server_str.empty())
@@ -276,15 +332,15 @@ class CommandOSDNS : public Command
 			lf2.Process(replies);
 		}
 
-		for (unsigned i = 0; i < replies.size(); ++i)
-			source.Reply(replies[i]);
+		for (const Anope::string &r : replies)
+			source.Reply(r);
 	}
 
 	void AddZone(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		const Anope::string &zone = params[1];
 
-		if (DNSZone::Find(zone))
+		if (DNSZoneImpl::Find(zone))
 		{
 			source.Reply(_("Zone \002{0}\002 already exists."), zone);
 			return;
@@ -295,7 +351,8 @@ class CommandOSDNS : public Command
 
 		Log(LOG_ADMIN, source, this) << "to add zone " << zone;
 
-		new DNSZone(zone);
+		DNSZone *z = dnszone.Create();
+		z->SetName(zone);
 		source.Reply(_("Added zone \002{0}\002."), zone);
 	}
 
@@ -303,7 +360,7 @@ class CommandOSDNS : public Command
 	{
 		const Anope::string &zone = params[1];
 
-		DNSZone *z = DNSZone::Find(zone);
+		DNSZone *z = DNSZoneImpl::Find(zone);
 		if (!z)
 		{
 			source.Reply(_("Zone \002{0}\002 does not exist."), zone);
@@ -313,28 +370,24 @@ class CommandOSDNS : public Command
 		if (Anope::ReadOnly)
 			source.Reply(_("Services are in read-only mode. Any changes made may not persist."));
 
-		Log(LOG_ADMIN, source, this) << "to delete zone " << z->name;
+		Log(LOG_ADMIN, source, this) << "to delete zone " << z->GetName();
 
-		for (std::set<Anope::string, ci::less>::iterator it = z->servers.begin(), it_end = z->servers.end(); it != it_end; ++it)
+		for (DNSZoneMembership *mem : z->GetRefs<DNSZoneMembership *>(dnszonemembership))
+			mem->Delete();
+
+		if (DNS::manager)
 		{
-			DNSServer *s = DNSServer::Find(*it);
-			if (s)
-				s->zones.erase(z->name);
+			DNS::manager->UpdateSerial();
+			DNS::manager->Notify(z->GetName());
 		}
 
-		if (dnsmanager)
-		{
-			dnsmanager->UpdateSerial();
-			dnsmanager->Notify(z->name);
-		}
-
-		source.Reply(_("Zone \002{0}\002 removed."), z->name);
-		delete z;
+		source.Reply(_("Zone \002{0}\002 removed."), z->GetName());
+		z->Delete();
 	}
 
 	void AddServer(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		DNSServer *s = DNSServer::Find(params[1]);
+		DNSServer *s = DNSServerImpl::Find(params[1]);
 		const Anope::string &zone = params.size() > 2 ? params[2] : "";
 
 		if (s)
@@ -345,34 +398,36 @@ class CommandOSDNS : public Command
 			}
 			else
 			{
-				DNSZone *z = DNSZone::Find(zone);
+				DNSZone *z = DNSZoneImpl::Find(zone);
 				if (!z)
 				{
 					source.Reply(_("Zone \002{0}\002 does not exist."), zone);
 					return;
 				}
 
-				if (z->servers.count(s->GetName()))
+				DNSZoneMembership *mem = DNSZoneMembershipImpl::Find(s, z);
+				if (mem)
 				{
-					source.Reply(_("Server \002{0}\002 is already in zone \002{1}\002."), s->GetName(), z->name);
+					source.Reply(_("Server \002{0}\002 is already in zone \002{1}\002."), s->GetName(), z->GetName());
 					return;
 				}
 
 				if (Anope::ReadOnly)
 					source.Reply(_("Services are in read-only mode. Any changes made may not persist."));
 
-				z->servers.insert(s->GetName());
-				s->zones.insert(zone);
+				mem = dnszonemembership.Create();
+				mem->SetZone(z);
+				mem->SetServer(s);
 
-				if (dnsmanager)
+				if (DNS::manager)
 				{
-					dnsmanager->UpdateSerial();
-					dnsmanager->Notify(zone);
+					DNS::manager->UpdateSerial();
+					DNS::manager->Notify(zone);
 				}
 
-				Log(LOG_ADMIN, source, this) << "to add server " << s->GetName() << " to zone " << z->name;
+				Log(LOG_ADMIN, source, this) << "to add server " << s->GetName() << " to zone " << z->GetName();
 
-				source.Reply(_("Server \002{0}\002 added to zone \002{1}\002."), s->GetName(), z->name);
+				source.Reply(_("Server \002{0}\002 added to zone \002{1}\002."), s->GetName(), z->GetName());
 			}
 
 			return;
@@ -385,7 +440,8 @@ class CommandOSDNS : public Command
 			return;
 		}
 
-		s = new DNSServer(params[1]);
+		s = dnsserver.Create();
+		s->SetName(params[1]);
 		if (zone.empty())
 		{
 			if (Anope::ReadOnly)
@@ -396,11 +452,11 @@ class CommandOSDNS : public Command
 		}
 		else
 		{
-			DNSZone *z = DNSZone::Find(zone);
+			DNSZone *z = DNSZoneImpl::Find(zone);
 			if (!z)
 			{
 				source.Reply(_("Zone \002{0}\002 does not exist."), zone);
-				delete s;
+				s->Delete();
 				return;
 			}
 
@@ -409,20 +465,21 @@ class CommandOSDNS : public Command
 
 			Log(LOG_ADMIN, source, this) << "to add server " << s->GetName() << " to zone " << zone;
 
-			z->servers.insert(s->GetName());
-			s->zones.insert(z->name);
+			DNSZoneMembership *mem = dnszonemembership.Create();
+			mem->SetServer(s);
+			mem->SetZone(z);
 
-			if (dnsmanager)
+			if (DNS::manager)
 			{
-				dnsmanager->UpdateSerial();
-				dnsmanager->Notify(z->name);
+				DNS::manager->UpdateSerial();
+				DNS::manager->Notify(z->GetName());
 			}
 		}
 	}
 
 	void DelServer(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		DNSServer *s = DNSServer::Find(params[1]);
+		DNSServer *s = DNSServerImpl::Find(params[1]);
 		const Anope::string &zone = params.size() > 2 ? params[2] : "";
 
 		if (!s)
@@ -433,32 +490,33 @@ class CommandOSDNS : public Command
 
 		if (!zone.empty())
 		{
-			DNSZone *z = DNSZone::Find(zone);
+			DNSZone *z = DNSZoneImpl::Find(zone);
 			if (!z)
 			{
 				source.Reply(_("Zone \002{0}\002 does not exist."), zone);
 				return;
 			}
 
-			if (!z->servers.count(s->GetName()))
+			DNSZoneMembership *mem = DNSZoneMembershipImpl::Find(s, z);
+			if (!mem)
 			{
-				source.Reply(_("Server \002{0}\002 is not in zone \002{1}\002."), s->GetName(), z->name);
+				source.Reply(_("Server \002{0}\002 is not in zone \002{1}\002."), s->GetName(), z->GetName());
 				return;
 			}
 
 			if (Anope::ReadOnly)
 				source.Reply(_("Services are in read-only mode. Any changes made may not persist."));
 
-			Log(LOG_ADMIN, source, this) << "to remove server " << s->GetName() << " from zone " << z->name;
+			Log(LOG_ADMIN, source, this) << "to remove server " << s->GetName() << " from zone " << z->GetName();
 
-			if (dnsmanager)
+			if (DNS::manager)
 			{
-				dnsmanager->UpdateSerial();
-				dnsmanager->Notify(z->name);
+				DNS::manager->UpdateSerial();
+				DNS::manager->Notify(z->GetName());
 			}
 
-			z->servers.erase(s->GetName());
-			source.Reply(_("Removed server \002{0}\002 from zone \002{1}\002."), s->GetName(), z->name);
+			mem->Delete();
+			source.Reply(_("Removed server \002{0}\002 from zone \002{1}\002."), s->GetName(), z->GetName());
 			return;
 		}
 
@@ -468,27 +526,23 @@ class CommandOSDNS : public Command
 			return;
 		}
 
-		for (std::set<Anope::string, ci::less>::iterator it = s->zones.begin(), it_end = s->zones.end(); it != it_end; ++it)
-		{
-			DNSZone *z = DNSZone::Find(*it);
-			if (z)
-				z->servers.erase(s->GetName());
-		}
+		for (DNSZoneMembership *mem : s->GetRefs<DNSZoneMembership *>(dnszonemembership))
+			mem->Delete();
 
 		if (Anope::ReadOnly)
 			source.Reply(_("Services are in read-only mode. Any changes made may not persist."));
 
-		if (dnsmanager)
-			dnsmanager->UpdateSerial();
+		if (DNS::manager)
+			DNS::manager->UpdateSerial();
 
 		Log(LOG_ADMIN, source, this) << "to delete server " << s->GetName();
 		source.Reply(_("Removed server \002{0}\002."), s->GetName());
-		delete s;
+		s->Delete();
 	}
 
 	void AddIP(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		DNSServer *s = DNSServer::Find(params[1]);
+		DNSServerImpl *s = DNSServerImpl::Find(params[1]);
 
 		if (!s)
 		{
@@ -496,10 +550,10 @@ class CommandOSDNS : public Command
 			return;
 		}
 
-		for (unsigned i = 0; i < s->GetIPs().size(); ++i)
-			if (params[2].equals_ci(s->GetIPs()[i]))
+		for (DNSIP *ip : s->GetRefs<DNSIP *>(dnsip))
+			if (params[2].equals_ci(ip->GetIP()))
 			{
-				source.Reply(_("IP \002{0}\002 already exists for \002{1}\002."), s->GetIPs()[i], s->GetName());
+				source.Reply(_("IP \002{0}\002 already exists for \002{1}\002."), ip->GetIP(), s->GetName());
 				return;
 			}
 
@@ -513,21 +567,24 @@ class CommandOSDNS : public Command
 		if (Anope::ReadOnly)
 			source.Reply(_("Services are in read-only mode. Any changes made may not persist."));
 
-		s->GetIPs().push_back(params[2]);
+		DNSIP *ip = dnsip.Create();
+		ip->SetServer(s);
+		ip->SetIP(params[2]);
+
 		source.Reply(_("Added IP \002{0}\002 to \002{1}\002."), params[2], s->GetName());
 		Log(LOG_ADMIN, source, this) << "to add IP " << params[2] << " to " << s->GetName();
 
-		if (s->Active() && dnsmanager)
+		if (s->Active() && DNS::manager)
 		{
-			dnsmanager->UpdateSerial();
-			for (std::set<Anope::string, ci::less>::iterator it = s->zones.begin(), it_end = s->zones.end(); it != it_end; ++it)
-				dnsmanager->Notify(*it);
+			DNS::manager->UpdateSerial();
+			for (DNSZone *zone : s->GetRefs<DNSZone *>(dnszone))
+				DNS::manager->Notify(zone->GetName());
 		}
 	}
 
 	void DelIP(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		DNSServer *s = DNSServer::Find(params[1]);
+		DNSServerImpl *s = DNSServerImpl::Find(params[1]);
 
 		if (!s)
 		{
@@ -538,24 +595,25 @@ class CommandOSDNS : public Command
 		if (Anope::ReadOnly)
 			source.Reply(_("Services are in read-only mode. Any changes made may not persist."));
 
-		for (unsigned i = 0; i < s->GetIPs().size(); ++i)
-			if (params[2].equals_ci(s->GetIPs()[i]))
+		for (DNSIP *ip : s->GetRefs<DNSIP *>(dnsip))
+			if (params[2].equals_ci(ip->GetIP()))
 			{
-				s->GetIPs().erase(s->GetIPs().begin() + i);
+				ip->Delete();
+
 				source.Reply(_("Removed IP \002{0}\002 from \002{1}\002."), params[2], s->GetName());
 				Log(LOG_ADMIN, source, this) << "to remove IP " << params[2] << " from " << s->GetName();
 
-				if (s->GetIPs().empty())
+				if (s->GetRefs<DNSIP *>(dnsip).empty())
 				{
 					s->repool = 0;
-					s->Pool(false);
+					s->SetPool(false);
 				}
 
-				if (s->Active() && dnsmanager)
+				if (s->Active() && DNS::manager)
 				{
-					dnsmanager->UpdateSerial();
-					for (std::set<Anope::string, ci::less>::iterator it = s->zones.begin(), it_end = s->zones.end(); it != it_end; ++it)
-						dnsmanager->Notify(*it);
+					DNS::manager->UpdateSerial();
+					for (DNSZone *zone : s->GetRefs<DNSZone *>(dnszone))
+						DNS::manager->Notify(zone->GetName());
 				}
 
 				return;
@@ -566,7 +624,7 @@ class CommandOSDNS : public Command
 
 	void OnSet(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		DNSServer *s = DNSServer::Find(params[1]);
+		DNSServer *s = DNSServerImpl::Find(params[1]);
 
 		if (!s)
 		{
@@ -599,7 +657,7 @@ class CommandOSDNS : public Command
 
 	void OnPool(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		DNSServer *s = DNSServer::Find(params[1]);
+		DNSServerImpl *s = DNSServerImpl::Find(params[1]);
 
 		if (!s)
 		{
@@ -613,13 +671,13 @@ class CommandOSDNS : public Command
 			return;
 		}
 
-		if (s->Pooled())
+		if (s->GetPooled())
 		{
 			source.Reply(_("Server \002{0}\002 is already pooled."), s->GetName());
 			return;
 		}
 
-		if (s->GetIPs().empty())
+		if (s->GetRefs<DNSIP *>(dnsip).empty())
 		{
 			source.Reply(_("Server \002{0}\002 has no configured IPs."), s->GetName());
 			return;
@@ -637,7 +695,7 @@ class CommandOSDNS : public Command
 
 	void OnDepool(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		DNSServer *s = DNSServer::Find(params[1]);
+		DNSServer *s = DNSServerImpl::Find(params[1]);
 
 		if (!s)
 		{
@@ -645,7 +703,7 @@ class CommandOSDNS : public Command
 			return;
 		}
 
-		if (!s->Pooled())
+		if (!s->GetPooled())
 		{
 			source.Reply(_("Server \002{0}\002 is not pooled."), s->GetName());
 			return;
@@ -654,7 +712,7 @@ class CommandOSDNS : public Command
 		if (Anope::ReadOnly)
 			source.Reply(_("Services are in read-only mode. Any changes made may not persist."));
 
-		s->Pool(false);
+		s->SetPool(false);
 
 		source.Reply(_("Depooled \002{0}\002."), s->GetName());
 		Log(LOG_ADMIN, source, this) << "to depool " << s->GetName();
@@ -727,7 +785,10 @@ class ModuleDNS : public Module
 	, public EventHook<Event::PreUserLogoff>
 	, public EventHook<Event::DnsRequest>
 {
-	Serialize::Type zone_type, dns_type;
+	DNSZoneType zonetype;
+	DNSServerType servertype;
+	DNSZoneMembershipType zonemembtype;
+	DNSIPType iptype;
 	CommandOSDNS commandosdns;
 
 	time_t ttl;
@@ -746,27 +807,25 @@ class ModuleDNS : public Module
 		, EventHook<Event::UserConnect>("OnUserConnect")
 		, EventHook<Event::PreUserLogoff>("OnPreUserLogoff")
 		, EventHook<Event::DnsRequest>("OnDnsRequest")
-		, zone_type("DNSZone", DNSZone::Unserialize)
-		, dns_type("DNSServer", DNSServer::Unserialize)
+		, zonetype(this)
+		, servertype(this)
+		, zonemembtype(this)
+		, iptype(this)
 		, commandosdns(this)
 		, last_warn(0)
 	{
-
-
+#if 0
 		for (unsigned j = 0; j < dns_servers->size(); ++j)
 		{
 			DNSServer *s = dns_servers->at(j);
 			if (s->Pooled() && Server::Find(s->GetName(), true))
 				s->SetActive(true);
 		}
+#endif
 	}
 
 	~ModuleDNS()
 	{
-		for (unsigned i = zones->size(); i > 0; --i)
-			delete zones->at(i - 1);
-		for (unsigned i = dns_servers->size(); i > 0; --i)
-			delete dns_servers->at(i - 1);
 	}
 
 	void OnReload(Configuration::Conf *conf) override
@@ -786,8 +845,8 @@ class ModuleDNS : public Module
 			return;
 		if (!Me->IsSynced() || this->readd_connected_servers)
 		{
-			DNSServer *dns = DNSServer::Find(s->GetName());
-			if (dns && dns->Pooled() && !dns->Active() && !dns->GetIPs().empty())
+			DNSServerImpl *dns = DNSServerImpl::Find(s->GetName());
+			if (dns && dns->GetPooled() && !dns->Active() && !dns->GetRefs<DNSIP *>(dnsip).empty())
 			{
 				dns->SetActive(true);
 				Log(this) << "Pooling server " << s->GetName();
@@ -797,13 +856,13 @@ class ModuleDNS : public Module
 
 	void OnServerQuit(Server *s) override
 	{
-		DNSServer *dns = DNSServer::Find(s->GetName());
-		if (remove_split_servers && dns && dns->Pooled() && dns->Active())
+		DNSServerImpl *dns = DNSServerImpl::Find(s->GetName());
+		if (remove_split_servers && dns && dns->GetPooled() && dns->Active())
 		{
 			if (readd_connected_servers)
 				dns->SetActive(false); // Will be reactivated when it comes back
 			else
-				dns->Pool(false); // Otherwise permanently pull this
+				dns->SetPool(false); // Otherwise permanently pull this
 			Log(this) << "Depooling delinked server " << s->GetName();
 		}
 	}
@@ -812,9 +871,9 @@ class ModuleDNS : public Module
 	{
 		if (!u->Quitting() && u->server)
 		{
-			DNSServer *s = DNSServer::Find(u->server->GetName());
+			DNSServerImpl *s = DNSServerImpl::Find(u->server->GetName());
 			/* Check for user limit reached */
-			if (s && s->Pooled() && s->Active() && s->GetLimit() && u->server->users >= s->GetLimit())
+			if (s && s->GetPooled() && s->Active() && s->GetLimit() && u->server->users >= s->GetLimit())
 			{
 				Log(this) << "Depooling full server " << s->GetName() << ": " << u->server->users << " users";
 				s->SetActive(false);
@@ -826,8 +885,8 @@ class ModuleDNS : public Module
 	{
 		if (u && u->server)
 		{
-			DNSServer *s = DNSServer::Find(u->server->GetName());
-			if (!s || !s->Pooled())
+			DNSServerImpl *s = DNSServerImpl::Find(u->server->GetName());
+			if (!s || !s->GetPooled())
 				return;
 
 			/* Check for dropping under userlimit */
@@ -876,25 +935,24 @@ class ModuleDNS : public Module
 		if (q.type != DNS::QUERY_A && q.type != DNS::QUERY_AAAA && q.type != DNS::QUERY_AXFR && q.type != DNS::QUERY_ANY)
 			return;
 
-		DNSZone *zone = DNSZone::Find(q.name);
+		DNSZone *zone = DNSZoneImpl::Find(q.name);
 		size_t answer_size = packet->answers.size();
 		if (zone)
 		{
-			for (std::set<Anope::string, ci::less>::iterator it = zone->servers.begin(), it_end = zone->servers.end(); it != it_end; ++it)
+			for (DNSServerImpl *s : zone->GetRefs<DNSServerImpl *>(dnsserver))
 			{
-				DNSServer *s = DNSServer::Find(*it);
-				if (!s || !s->Active())
+				if (!s->Active())
 					continue;
 
-				for (unsigned j = 0; j < s->GetIPs().size(); ++j)
+				for (DNSIP *ip : s->GetRefs<DNSIP *>(dnsip))
 				{
-					DNS::QueryType q_type = s->GetIPs()[j].find(':') != Anope::string::npos ? DNS::QUERY_AAAA : DNS::QUERY_A;
+					DNS::QueryType q_type = ip->GetIP().find(':') != Anope::string::npos ? DNS::QUERY_AAAA : DNS::QUERY_A;
 
 					if (q.type == DNS::QUERY_AXFR || q.type == DNS::QUERY_ANY || q_type == q.type)
 					{
 						DNS::ResourceRecord rr(q.name, q_type);
 						rr.ttl = this->ttl;
-						rr.rdata = s->GetIPs()[j];
+						rr.rdata = ip->GetIP();
 						packet->answers.push_back(rr);
 					}
 				}
@@ -904,21 +962,20 @@ class ModuleDNS : public Module
 		if (packet->answers.size() == answer_size)
 		{
 			/* Default zone */
-			for (unsigned i = 0; i < dns_servers->size(); ++i)
+			for (DNSServerImpl *s : Serialize::GetObjects<DNSServerImpl *>(dnsserver))
 			{
-				DNSServer *s = dns_servers->at(i);
 				if (!s->Active())
 					continue;
 
-				for (unsigned j = 0; j < s->GetIPs().size(); ++j)
+				for (DNSIP *ip : s->GetRefs<DNSIP *>(dnsip))
 				{
-					DNS::QueryType q_type = s->GetIPs()[j].find(':') != Anope::string::npos ? DNS::QUERY_AAAA : DNS::QUERY_A;
+					DNS::QueryType q_type = ip->GetIP().find(':') != Anope::string::npos ? DNS::QUERY_AAAA : DNS::QUERY_A;
 
 					if (q.type == DNS::QUERY_AXFR || q.type == DNS::QUERY_ANY || q_type == q.type)
 					{
 						DNS::ResourceRecord rr(q.name, q_type);
 						rr.ttl = this->ttl;
-						rr.rdata = s->GetIPs()[j];
+						rr.rdata = ip->GetIP();
 						packet->answers.push_back(rr);
 					}
 				}
@@ -934,23 +991,19 @@ class ModuleDNS : public Module
 			}
 
 			/* Something messed up, just return them all and hope one is available */
-			for (unsigned i = 0; i < dns_servers->size(); ++i)
-			{
-				DNSServer *s = dns_servers->at(i);
-
-				for (unsigned j = 0; j < s->GetIPs().size(); ++j)
+			for (DNSServer *s : Serialize::GetObjects<DNSServer *>(dnsserver))
+				for (DNSIP *ip : s->GetRefs<DNSIP *>(dnsip))
 				{
-					DNS::QueryType q_type = s->GetIPs()[j].find(':') != Anope::string::npos ? DNS::QUERY_AAAA : DNS::QUERY_A;
+					DNS::QueryType q_type = ip->GetIP().find(':') != Anope::string::npos ? DNS::QUERY_AAAA : DNS::QUERY_A;
 
 					if (q.type == DNS::QUERY_AXFR || q.type == DNS::QUERY_ANY || q_type == q.type)
 					{
 						DNS::ResourceRecord rr(q.name, q_type);
 						rr.ttl = this->ttl;
-						rr.rdata = s->GetIPs()[j];
+						rr.rdata = ip->GetIP();
 						packet->answers.push_back(rr);
 					}
 				}
-			}
 
 			if (packet->answers.size() == answer_size)
 			{

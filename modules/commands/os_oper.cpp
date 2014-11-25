@@ -109,6 +109,7 @@ class CommandOSOper : public Command
 				}
 
 				na->nc->o = new MyOper(na->nc->display, ot);
+				na->nc->o->require_oper = true;
 
 				if (Anope::ReadOnly)
 					source.Reply(READ_ONLY_MODE);

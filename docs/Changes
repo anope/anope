@@ -1,3 +1,17 @@
+Anope Version 2.0.1
+-------------------
+Fix access entries on accounts sometimes not updating when a user's display name changes
+Fix ns_group to properly validate the account of the user against the target
+Fix os_stats not saving max user count and time when using SQL
+Fix nickalias's 'nc' field sometimes not being updated when using SQL
+Fix several crashes on Windows related to being unable to load modules
+Fix bs_bot change not properly reintroducing bots after changing their ident, host, or realname
+
+Add English language file to allow users to easily modify language strings
+Add configuring which mode cs_ban sets, and added a MUTE command to BotServ's fantasy
+Allow SVSPART to take an optional reason
+Allow cs_list to search channel topics and descriptions
+
 Anope Version 2.0.0
 -------------------
 Added irc2sql stats module

@@ -74,6 +74,10 @@ class CoreExport AccessProvider : public Service
 /* Represents one entry of an access list on a channel. */
 class CoreExport ChanAccess : public Serializable
 {
+	Anope::string mask;
+	/* account this access entry is for, if any */
+	Serialize::Reference<NickCore> nc;
+
  public:
 	typedef std::multimap<const ChanAccess *, const ChanAccess *> Set;
  	/* shows the 'path' taken to determine if an access entry matches a user
@@ -86,15 +90,16 @@ class CoreExport ChanAccess : public Serializable
 	AccessProvider *provider;
 	/* Channel this access entry is on */
 	Serialize::Reference<ChannelInfo> ci;
-	/* account this access entry is for, if any */
-	Serialize::Reference<NickCore> nc;
-	Anope::string mask;
 	Anope::string creator;
 	time_t last_seen;
 	time_t created;
 
 	ChanAccess(AccessProvider *p);
 	virtual ~ChanAccess();
+
+	void SetMask(const Anope::string &mask, ChannelInfo *ci);
+	const Anope::string &Mask() const;
+	NickCore *GetAccount() const;
 
 	void Serialize(Serialize::Data &data) const anope_override;
 	static Serializable* Unserialize(Serializable *obj, Serialize::Data &);

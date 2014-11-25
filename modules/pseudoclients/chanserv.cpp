@@ -154,7 +154,7 @@ class ChanServCore : public Module, public ChanServService
 					for (unsigned j = 0; j < ci->GetAccessCount(); ++j)
 					{
 						const ChanAccess *ca = ci->GetAccess(j);
-						const NickCore *anc = NickCore::Find(ca->mask);
+						NickCore *anc = ca->GetAccount();
 
 						if (!anc || (!anc->IsServicesOper() && max_reg && anc->channelcount >= max_reg) || (anc == nc))
 							continue;
@@ -162,7 +162,7 @@ class ChanServCore : public Module, public ChanServService
 							highest = ca;
 					}
 					if (highest)
-						newowner = NickCore::Find(highest->mask);
+						newowner = highest->GetAccount();
 				}
 
 				if (newowner)
@@ -186,9 +186,8 @@ class ChanServCore : public Module, public ChanServService
 			for (unsigned j = 0; j < ci->GetAccessCount(); ++j)
 			{
 				const ChanAccess *ca = ci->GetAccess(j);
-				const NickCore *anc = NickCore::Find(ca->mask);
 
-				if (anc && anc == nc)
+				if (ca->GetAccount() == nc)
 				{
 					delete ci->EraseAccess(j);
 					break;
@@ -224,7 +223,7 @@ class ChanServCore : public Module, public ChanServService
 			{
 				ChanAccess *a = c->GetAccess(j);
 
-				if (a->mask.equals_ci(ci->name))
+				if (a->Mask().equals_ci(ci->name))
 				{
 					delete a;
 					break;

@@ -180,7 +180,7 @@ class CommandOSUserList : public Command
 
 				if (!pattern.empty())
 				{
-					Anope::string mask = u2->nick + "!" + u2->GetIdent() + "@" + u2->GetDisplayedHost(), mask2 = u2->nick + "!" + u2->GetIdent() + "@" + u2->host, mask3 = u2->nick + "!" + u2->GetIdent() + "@" + (!u2->ip.empty() ? u2->ip : u2->host);
+					Anope::string mask = u2->nick + "!" + u2->GetIdent() + "@" + u2->GetDisplayedHost(), mask2 = u2->nick + "!" + u2->GetIdent() + "@" + u2->host, mask3 = u2->nick + "!" + u2->GetIdent() + "@" + u2->ip.addr();
 					if (!Anope::Match(mask, pattern) && !Anope::Match(mask2, pattern) && !Anope::Match(mask3, pattern))
 						continue;
 					if (!modes.empty())

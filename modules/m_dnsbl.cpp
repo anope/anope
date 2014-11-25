@@ -54,18 +54,18 @@ class DNSBLResolver : public Request
 			record_reason = this->blacklist.replies[result];
 		}
 
-		Anope::string reason = this->blacklist.reason;
+		Anope::string reason = this->blacklist.reason, addr = user->ip.addr();
 		reason = reason.replace_all_cs("%n", user->nick);
 		reason = reason.replace_all_cs("%u", user->GetIdent());
 		reason = reason.replace_all_cs("%g", user->realname);
 		reason = reason.replace_all_cs("%h", user->host);
-		reason = reason.replace_all_cs("%i", user->ip);
+		reason = reason.replace_all_cs("%i", addr);
 		reason = reason.replace_all_cs("%r", record_reason);
 		reason = reason.replace_all_cs("%N", Config->GetBlock("networkinfo")->Get<const Anope::string>("networkname"));
 
 		BotInfo *OperServ = Config->GetClient("OperServ");
-		Log(creator, "dnsbl", OperServ) << user->GetMask() << " (" << user->ip << ") appears in " << this->blacklist.name;
-		XLine *x = new XLine("*@" + user->ip, OperServ ? OperServ->nick : "m_dnsbl", Anope::CurTime + this->blacklist.bantime, reason, XLineManager::GenerateUID());
+		Log(creator, "dnsbl", OperServ) << user->GetMask() << " (" << addr << ") appears in " << this->blacklist.name;
+		XLine *x = new XLine("*@" + addr, OperServ ? OperServ->nick : "m_dnsbl", Anope::CurTime + this->blacklist.bantime, reason, XLineManager::GenerateUID());
 		if (this->add_to_akill && akills)
 		{
 			akills->AddXLine(x);
@@ -130,22 +130,21 @@ class ModuleDNSBL : public Module
 			return;
 
 		/* At this time we only support IPv4 */
-		sockaddrs user_ip;
-		user_ip.pton(AF_INET, user->ip);
-		if (!user_ip.valid())
+		if (!user->ip.valid() || user->ip.sa.sa_family != AF_INET)
 			/* User doesn't have a valid IPv4 IP (ipv6/spoof/etc) */
 			return;
 
-		const unsigned long &ip = user_ip.sa4.sin_addr.s_addr;
+		const unsigned long &ip = user->ip.sa4.sin_addr.s_addr;
 		unsigned long reverse_ip = (ip << 24) | ((ip & 0xFF00) << 8) | ((ip & 0xFF0000) >> 8) | (ip >> 24);
 
-		user_ip.sa4.sin_addr.s_addr = reverse_ip;
+		sockaddrs reverse = user->ip;
+		reverse.sa4.sin_addr.s_addr = reverse_ip;
 
 		for (unsigned i = 0; i < this->blacklists.size(); ++i)
 		{
 			const Blacklist &b = this->blacklists[i];
 
-			Anope::string dnsbl_host = user_ip.addr() + "." + b.name;
+			Anope::string dnsbl_host = reverse.addr() + "." + b.name;
 			DNSBLResolver *res = NULL;
 			try
 			{

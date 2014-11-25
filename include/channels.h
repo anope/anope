@@ -276,10 +276,11 @@ class CoreExport Channel : public Base, public Extensible
 
 	/** Unbans a user from this channel.
 	 * @param u The user to unban
+	 * @param mode The mode to unban
 	 * @param full Whether or not to match using the user's real host and IP
 	 * @return whether or not a ban was removed
 	 */
-	bool Unban(User *u, bool full = false);
+	bool Unban(User *u, const Anope::string &mode, bool full = false);
 
 	/** Check whether a user is permitted to be on this channel
 	 * @param u The user

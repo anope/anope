@@ -198,7 +198,7 @@ class BotServCore : public Module
 
 	void OnUserKicked(const MessageSource &source, User *target, const Anope::string &channel, ChannelStatus &status, const Anope::string &kickmsg) anope_override
 	{
-		BotInfo *bi = BotInfo::Find(target->nick);
+		BotInfo *bi = BotInfo::Find(target->GetUID());
 		if (bi)
 			/* Bots get rejoined */
 			bi->Join(channel, &status);

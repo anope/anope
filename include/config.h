@@ -51,14 +51,13 @@ namespace Configuration
 		template<typename T> T Get(const Anope::string &tag, const Anope::string &def) const
 		{
 			const Anope::string &value = this->Get<const Anope::string>(tag, def);
-			try
-			{
-				return convertTo<T>(value);
-			}
-			catch (const ConvertException &)
-			{
-				return T();
-			}
+			if (!value.empty())
+				try
+				{
+					return convertTo<T>(value);
+				}
+				catch (const ConvertException &) { }
+			return T();
 		}
 
 		bool Set(const Anope::string &tag, const Anope::string &value);
@@ -138,6 +137,8 @@ namespace Configuration
 		Block *GetModule(const Anope::string &name);
 
 		BotInfo *GetClient(const Anope::string &name);
+
+		Block *GetCommand(CommandSource &);
 	};
 
 	struct Uplink

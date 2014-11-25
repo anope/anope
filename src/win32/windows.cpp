@@ -26,6 +26,7 @@ static struct WindowsLanguage
 	{"ca_ES", LANG_CATALAN},
 	{"de_DE", LANG_GERMAN},
 	{"el_GR", LANG_GREEK},
+	{"en_US", LANG_ENGLISH},
 	{"es_ES", LANG_SPANISH},
 	{"fr_FR", LANG_FRENCH},
 	{"hu_HU", LANG_HUNGARIAN},

@@ -502,7 +502,7 @@ class OSDefcon : public Module
 		if (DConfig.sessionlimit <= 0 || !session_service)
 			return;
 
-		Session *session = session_service->FindSession(u->ip);
+		Session *session = session_service->FindSession(u->ip.addr());
 		Exception *exception = session_service->FindException(u);
 
 		if (DConfig.Check(DEFCON_REDUCE_SESSION) && !exception)
@@ -511,7 +511,7 @@ class OSDefcon : public Module
 			{
 				if (!DConfig.sle_reason.empty())
 				{
-					Anope::string message = DConfig.sle_reason.replace_all_cs("%IP%", u->ip);
+					Anope::string message = DConfig.sle_reason.replace_all_cs("%IP%", u->ip.addr());
 					u->SendMessage(OperServ, message);
 				}
 				if (!DConfig.sle_detailsloc.empty())

@@ -74,7 +74,7 @@ class MyXMLRPCEvent : public XMLRPCEvent
 			request.reply("error", "Invalid parameters");
 		else
 		{
-			BotInfo *bi = BotInfo::Find(service);
+			BotInfo *bi = BotInfo::Find(service, true);
 			if (!bi)
 				request.reply("error", "Invalid service");
 			else
@@ -212,8 +212,7 @@ class MyXMLRPCEvent : public XMLRPCEvent
 				request.reply("vhost", iface->Sanitize(u->vhost));
 			if (!u->chost.empty())
 				request.reply("chost", iface->Sanitize(u->chost));
-			if (!u->ip.empty())
-				request.reply("ip", u->ip);
+			request.reply("ip", u->ip.addr());
 			request.reply("timestamp", stringify(u->timestamp));
 			request.reply("signon", stringify(u->signon));
 			if (u->Account())

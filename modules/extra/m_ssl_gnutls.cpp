@@ -7,6 +7,7 @@
  */
 
 /* RequiredLibraries: gnutls */
+/* RequiredWindowsLibraries: libgnutls-28 */
 
 #include "module.h"
 #include "modules/ssl.h"

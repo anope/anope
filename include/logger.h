@@ -96,6 +96,11 @@ class CoreExport Log
 
 	~Log();
 
+ private:
+	Anope::string FormatSource() const;
+	Anope::string FormatCommand() const;
+
+ public:
 	Anope::string BuildPrefix() const;
 
 	template<typename T> Log &operator<<(T val)

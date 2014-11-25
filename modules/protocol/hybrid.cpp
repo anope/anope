@@ -1,7 +1,7 @@
 /* ircd-hybrid-8 protocol module
  *
  * (C) 2003-2014 Anope Team
- * (C) 2012-2013 by the Hybrid Development Team
+ * (C) 2012-2014 ircd-hybrid development team
  *
  * Please read COPYING and README for further details.
  *
@@ -40,10 +40,11 @@ class HybridProto : public IRCDProto
 	{
 		DefaultPseudoclientModes = "+oi";
 		CanSVSNick = true;
+		CanSVSHold = true;
+		CanSVSJoin = true;
 		CanSNLine = true;
 		CanSQLine = true;
 		CanSZLine = true;
-		CanSVSHold = true;
 		CanCertFP = true;
 		CanSetVHost = true;
 		RequiresID = true;
@@ -174,9 +175,9 @@ class HybridProto : public IRCDProto
 	void SendServer(const Server *server) anope_override
 	{
 		if (server == Me)
-			UplinkSocket::Message() << "SERVER " << server->GetName() << " " << server->GetHops() << " :" << server->GetDescription();
+			UplinkSocket::Message() << "SERVER " << server->GetName() << " " << server->GetHops() + 1 << " :" << server->GetDescription();
 		else
-			UplinkSocket::Message(Me) << "SID " << server->GetName() << " " << server->GetHops() << " " << server->GetSID() << " :" << server->GetDescription();
+			UplinkSocket::Message(Me) << "SID " << server->GetName() << " " << server->GetHops() + 1 << " " << server->GetSID() << " :" << server->GetDescription();
 	}
 
 	void SendConnect() anope_override
@@ -252,6 +253,19 @@ class HybridProto : public IRCDProto
 	void SendForceNickChange(User *u, const Anope::string &newnick, time_t when) anope_override
 	{
 		UplinkSocket::Message(Me) << "SVSNICK " << u->nick << " " << newnick << " " << when;
+	}
+
+	void SendSVSJoin(const MessageSource &source, User *u, const Anope::string &chan, const Anope::string &) anope_override
+	{
+		UplinkSocket::Message(source) << "SVSJOIN " << u->GetUID() << " " << chan;
+	}
+
+	void SendSVSPart(const MessageSource &source, User *u, const Anope::string &chan, const Anope::string &param) anope_override
+	{
+		if (!param.empty())
+			UplinkSocket::Message(source) << "SVSPART " << u->GetUID() << " " << chan << " :" << param;
+		else
+			UplinkSocket::Message(source) << "SVSPART " << u->GetUID() << " " << chan;
 	}
 
 	void SendSVSHold(const Anope::string &nick, time_t t) anope_override

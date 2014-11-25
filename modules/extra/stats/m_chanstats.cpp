@@ -638,7 +638,7 @@ class MChanstats : public Module
 			ci->Extend<bool>("CS_STATS");
 	}
 
-	void OnNickRegister(User *user, NickAlias *na)
+	void OnNickRegister(User *user, NickAlias *na, const Anope::string &)
 	{
 		if (NSDefChanstats)
 			na->nc->Extend<bool>("NS_STATS");

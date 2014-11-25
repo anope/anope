@@ -90,7 +90,7 @@ Log::Log(LogType t, CommandSource &src, Command *_c, ChannelInfo *_ci) : u(src.G
 	size_t sl = c->name.find('/');
 	this->bi = NULL;
 	if (sl != Anope::string::npos)
-		this->bi = BotInfo::Find(c->name.substr(0, sl));
+		this->bi = BotInfo::Find(c->name.substr(0, sl), true);
 	this->category = c->name;
 }
 
@@ -137,6 +137,27 @@ Log::~Log()
 				Config->LogInfos[i].ProcessMessage(this);
 }
 
+Anope::string Log::FormatSource() const
+{
+	if (u)
+		if (nc)
+			return this->u->GetMask() + " (" + this->nc->display + ")";
+		else
+			return this->u->GetMask();
+	else if (nc)
+		return nc->display;
+	return "";
+}
+
+Anope::string Log::FormatCommand() const
+{
+	Anope::string buffer = FormatSource() + " used " + (source != NULL && !source->command.empty() ? source->command : this->c->name) + " ";
+	if (this->ci)
+		buffer += "on " + this->ci->name + " ";
+
+	return buffer;
+}
+
 Anope::string Log::BuildPrefix() const
 {
 	Anope::string buffer;
@@ -147,44 +168,21 @@ Anope::string Log::BuildPrefix() const
 		{
 			if (!this->c)
 				break;
-			buffer += "ADMIN: ";
-			Anope::string cname = source != NULL && !source->command.empty() ? source->command : this->c->name;
-			if (this->u)
-				buffer += this->u->GetMask() + " used " + cname + " ";
-			else if (this->nc)
-				buffer += this->nc->display + " used " + cname + " ";
-			if (this->ci)
-				buffer += "on " + this->ci->name + " ";
+			buffer += "ADMIN: " + FormatCommand();
 			break;
 		}
 		case LOG_OVERRIDE:
 		{
 			if (!this->c)
 				break;
-			buffer += "OVERRIDE: ";
-			Anope::string cname = source != NULL && !source->command.empty() ? source->command : this->c->name;
-			if (this->u)
-				buffer += this->u->GetMask() + " used " + cname + " ";
-			else if (this->nc)
-				buffer += this->nc->display + " used " + cname + " ";
-			if (this->ci)
-				buffer += "on " + this->ci->name + " ";
+			buffer += "OVERRIDE: " + FormatCommand();
 			break;
 		}
 		case LOG_COMMAND:
 		{
 			if (!this->c)
 				break;
-			buffer += "COMMAND: ";
-			Anope::string cname = source != NULL && !source->command.empty() ? source->command : this->c->name;
-			if (this->u)
-				buffer += this->u->GetMask() + " used " + cname + " ";
-			else if (this->source)
-				buffer += this->source->GetNick() + " used " + cname + " ";
-			else if (this->nc)
-				buffer += this->nc->display + " used " + cname + " ";
-			if (this->ci)
-				buffer += "on " + this->ci->name + " ";
+			buffer += "COMMAND: " + FormatCommand();
 			break;
 		}
 		case LOG_CHANNEL:
@@ -192,16 +190,16 @@ Anope::string Log::BuildPrefix() const
 			if (!this->chan)
 				break;
 			buffer += "CHANNEL: ";
-			if (this->u)
-				buffer += this->u->GetMask() + " " + this->category + " " + this->chan->name + " ";
-			else
-				buffer += this->category + " " + this->chan->name + " ";
+			Anope::string src = FormatSource();
+			if (!src.empty())
+				buffer += src + " ";
+			buffer += this->category + " " + this->chan->name + " ";
 			break;
 		}
 		case LOG_USER:
 		{
 			if (this->u)
-				buffer += "USERS: " + this->u->GetMask() + " ";
+				buffer += "USERS: " + FormatSource() + " ";
 			break;
 		}
 		case LOG_SERVER:

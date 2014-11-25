@@ -13,7 +13,7 @@
 
 static Module *me;
 
-static std::map<Anope::string, Anope::string> descriptions;
+static Anope::map<Anope::string> descriptions;
 
 struct CSMiscData;
 static Anope::map<ExtensibleItem<CSMiscData> *> items;

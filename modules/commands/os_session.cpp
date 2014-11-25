@@ -64,10 +64,10 @@ class MySessionService : public SessionService
 		for (std::vector<Exception *>::const_iterator it = this->Exceptions->begin(), it_end = this->Exceptions->end(); it != it_end; ++it)
 		{
 			Exception *e = *it;
-			if (Anope::Match(u->host, e->mask) || Anope::Match(u->ip, e->mask))
+			if (Anope::Match(u->host, e->mask) || Anope::Match(u->ip.addr(), e->mask))
 				return e;
 			
-			if (cidr(e->mask).match(sockaddrs(u->ip)))
+			if (cidr(e->mask).match(u->ip))
 				return e;
 		}
 		return NULL;
@@ -109,9 +109,9 @@ class MySessionService : public SessionService
 		return NULL;
 	}
 
-	SessionMap::iterator FindSessionIterator(const Anope::string &ip)
+	SessionMap::iterator FindSessionIterator(const sockaddrs &ip)
 	{
-		cidr c(ip, ip.find(':') != Anope::string::npos ? ipv6_cidr : ipv4_cidr);
+		cidr c(ip, ip.ipv6() ? ipv6_cidr : ipv4_cidr);
 		if (!c.valid())
 			return this->Sessions.end();
 		return this->Sessions.find(c);
@@ -668,7 +668,7 @@ class OSSession : public Module
 		if (u->Quitting() || !session_limit || exempt || !u->server || u->server->IsULined())
 			return;
 
-		cidr u_ip(u->ip, u->ip.find(':') != Anope::string::npos ? ipv6_cidr : ipv4_cidr);
+		cidr u_ip(u->ip, u->ip.ipv6() ? ipv6_cidr : ipv4_cidr);
 		if (!u_ip.valid())
 			return;
 
@@ -705,7 +705,7 @@ class OSSession : public Module
 				{
 					if (!sle_reason.empty())
 					{
-						Anope::string message = sle_reason.replace_all_cs("%IP%", u->ip);
+						Anope::string message = sle_reason.replace_all_cs("%IP%", u->ip.addr());
 						u->SendMessage(OperServ, message);
 					}
 					if (!sle_detailsloc.empty())
@@ -729,7 +729,7 @@ class OSSession : public Module
 		}
 		else
 		{
-			session = new Session(u->ip, u->ip.find(':') != Anope::string::npos ? ipv6_cidr : ipv4_cidr);
+			session = new Session(u->ip, u->ip.ipv6() ? ipv6_cidr : ipv4_cidr);
 		}
 	}
 

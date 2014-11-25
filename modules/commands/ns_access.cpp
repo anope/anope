@@ -196,7 +196,7 @@ class NSAccess : public Module
 	{
 	}
 
-	void OnNickRegister(User *u, NickAlias *na) anope_override
+	void OnNickRegister(User *u, NickAlias *na, const Anope::string &) anope_override
 	{
 		if (u && Config->GetModule(this)->Get<bool>("addaccessonreg"))
 			na->nc->AddAccess(u->Mask());

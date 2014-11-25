@@ -1,4 +1,5 @@
 /* RequiredLibraries: sqlite3 */
+/* RequiredWindowsLibraries: sqlite3 */
 
 #include "module.h"
 #include "modules/sql.h"

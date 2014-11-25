@@ -42,7 +42,7 @@ class SQLAuthenticationResult : public SQL::Interface
 		if (na == NULL)
 		{
 			na = new NickAlias(req->GetAccount(), new NickCore(req->GetAccount()));
-			FOREACH_MOD(OnNickRegister, (user, na));
+			FOREACH_MOD(OnNickRegister, (user, na, ""));
 			if (user && NickServ)
 				user->SendMessage(NickServ, _("Your account \002%s\002 has been successfully created."), na->nick.c_str());
 		}
@@ -122,7 +122,7 @@ class ModuleSQLAuthentication : public Module
 		if (u)
 		{
 			q.SetValue("n", u->nick);
-			q.SetValue("i", u->ip);
+			q.SetValue("i", u->ip.addr());
 		}
 		else
 		{

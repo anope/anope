@@ -182,7 +182,7 @@ class CommandCSXOP : public Command
 		{
 			const ChanAccess *a = ci->GetAccess(i);
 
-			if (a->mask.equals_ci(mask))
+			if (a->Mask().equals_ci(mask))
 			{
 				if ((!highest || *a >= *highest) && !access.founder && !source.HasPriv("chanserv/access/modify"))
 				{
@@ -206,8 +206,7 @@ class CommandCSXOP : public Command
 		if (!provider)
 			return;
 		XOPChanAccess *acc = anope_dynamic_static_cast<XOPChanAccess *>(provider->Create());
-		acc->ci = ci;
-		acc->mask = mask;
+		acc->SetMask(mask, ci);
 		acc->creator = source.GetNick();
 		acc->type = source.command.upper();
 		acc->last_seen = 0;
@@ -217,7 +216,7 @@ class CommandCSXOP : public Command
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to add " << mask;
 
 		FOREACH_MOD(OnAccessAdd, (ci, source, acc));
-		source.Reply(_("\002%s\002 added to %s %s list."), acc->mask.c_str(), ci->name.c_str(), source.command.c_str());
+		source.Reply(_("\002%s\002 added to %s %s list."), acc->Mask().c_str(), ci->name.c_str(), source.command.c_str());
 	}
 
 	void DoDel(CommandSource &source, ChannelInfo *ci, const std::vector<Anope::string> &params)
@@ -320,9 +319,9 @@ class CommandCSXOP : public Command
 
 					++deleted;
 					if (!nicks.empty())
-						nicks += ", " + caccess->mask;
+						nicks += ", " + caccess->Mask();
 					else
-						nicks = caccess->mask;
+						nicks = caccess->Mask();
 
 					ci->EraseAccess(number - 1);
 					FOREACH_MOD(OnAccessDel, (ci, source, caccess));
@@ -341,11 +340,11 @@ class CommandCSXOP : public Command
 				if (a->provider->name != "access/xop" || source.command.upper() != a->AccessSerialize())
 					continue;
 
-				if (a->mask.equals_ci(mask))
+				if (a->Mask().equals_ci(mask))
 				{
-					Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to delete " << a->mask;
+					Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to delete " << a->Mask();
 
-					source.Reply(_("\002%s\002 deleted from %s %s list."), a->mask.c_str(), ci->name.c_str(), source.command.c_str());
+					source.Reply(_("\002%s\002 deleted from %s %s list."), a->Mask().c_str(), ci->name.c_str(), source.command.c_str());
 
 					ci->EraseAccess(i);
 					FOREACH_MOD(OnAccessDel, (ci, source, a));
@@ -405,7 +404,7 @@ class CommandCSXOP : public Command
 
 					ListFormatter::ListEntry entry;
 					entry["Number"] = stringify(Number);
-					entry["Mask"] = a->mask;
+					entry["Mask"] = a->Mask();
 					this->list.AddEntry(entry);
 				}
 			} nl_list(list, ci, nick, source);
@@ -419,12 +418,12 @@ class CommandCSXOP : public Command
 
 				if (a->provider->name != "access/xop" || source.command.upper() != a->AccessSerialize())
 					continue;
-				else if (!nick.empty() && !Anope::Match(a->mask, nick))
+				else if (!nick.empty() && !Anope::Match(a->Mask(), nick))
 					continue;
 
 				ListFormatter::ListEntry entry;
 				entry["Number"] = stringify(i + 1);
-				entry["Mask"] = a->mask;
+				entry["Mask"] = a->Mask();
 				list.AddEntry(entry);
 			}
 		}

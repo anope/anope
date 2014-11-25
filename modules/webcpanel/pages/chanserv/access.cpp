@@ -75,7 +75,7 @@ bool WebCPanel::ChanServ::Access::OnRequest(HTTPProvider *server, const Anope::s
 				{
 					ChanAccess *acc = ci->GetAccess(i);
 
-					if (acc->mask == message.post_data["mask"])
+					if (acc->Mask() == message.post_data["mask"])
 					{
 						if ((!highest || *acc >= *highest) && !u_access.founder && !has_priv)
 						{
@@ -95,8 +95,7 @@ bool WebCPanel::ChanServ::Access::OnRequest(HTTPProvider *server, const Anope::s
 				else if (!denied)
 				{
 					ChanAccess *new_acc = a->Create();
-					new_acc->ci = ci;
-					new_acc->mask = message.post_data["mask"];
+					new_acc->SetMask(message.post_data["mask"], ci);
 					new_acc->creator = na->nc->display;
 					try
 					{
@@ -123,7 +122,7 @@ bool WebCPanel::ChanServ::Access::OnRequest(HTTPProvider *server, const Anope::s
 						else
 						{
 							ci->AddAccess(new_acc);
-							replacements["MESSAGES"] = "Access for " + new_acc->mask + " set to " + new_acc->AccessSerialize();
+							replacements["MESSAGES"] = "Access for " + new_acc->Mask() + " set to " + new_acc->AccessSerialize();
 						}
 					}
 				}
@@ -138,7 +137,7 @@ bool WebCPanel::ChanServ::Access::OnRequest(HTTPProvider *server, const Anope::s
 	{
 		ChanAccess *access = ci->GetAccess(i);
 
-		replacements["MASKS"] = HTTPUtils::Escape(access->mask);
+		replacements["MASKS"] = HTTPUtils::Escape(access->Mask());
 		replacements["ACCESSES"] = HTTPUtils::Escape(access->AccessSerialize());
 		replacements["CREATORS"] = HTTPUtils::Escape(access->creator);
 	}

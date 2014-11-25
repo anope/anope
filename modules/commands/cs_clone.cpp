@@ -111,7 +111,7 @@ public:
 			unsigned count = 0;
 
 			for (unsigned i = 0; i < target_ci->GetAccessCount(); ++i)
-				masks.insert(target_ci->GetAccess(i)->mask);
+				masks.insert(target_ci->GetAccess(i)->Mask());
 
 			for (unsigned i = 0; i < ci->GetAccessCount(); ++i)
 			{
@@ -121,13 +121,12 @@ public:
 				if (access_max && target_ci->GetDeepAccessCount() >= access_max)
 					break;
 
-				if (masks.count(taccess->mask))
+				if (masks.count(taccess->Mask()))
 					continue;
-				masks.insert(taccess->mask);
+				masks.insert(taccess->Mask());
 
 				ChanAccess *newaccess = provider->Create();
-				newaccess->ci = target_ci;
-				newaccess->mask = taccess->mask;
+				newaccess->SetMask(taccess->Mask(), target_ci);
 				newaccess->creator = taccess->creator;
 				newaccess->last_seen = taccess->last_seen;
 				newaccess->created = taccess->created;

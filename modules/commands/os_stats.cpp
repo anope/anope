@@ -14,7 +14,12 @@
 
 struct Stats : Serializable
 {
-	Stats() : Serializable("Stats") { }
+	static Stats *me;
+
+	Stats() : Serializable("Stats")
+	{
+		me = this;
+	}
 
 	void Serialize(Serialize::Data &data) const anope_override
 	{
@@ -26,9 +31,11 @@ struct Stats : Serializable
 	{
 		data["maxusercnt"] >> MaxUserCount;
 		data["maxusertime"] >> MaxUserTime;
-		return NULL;
+		return me;
 	}
 };
+
+Stats *Stats::me;
 
 /**
  * Count servers connected to server s
@@ -257,6 +264,12 @@ class OSStats : public Module
 		commandosstats(this), stats_type("Stats", Stats::Unserialize)
 	{
 
+	}
+
+	void OnUserConnect(User *u, bool &exempt) anope_override
+	{
+		if (UserListByNick.size() == MaxUserCount && Anope::CurTime == MaxUserTime)
+			stats_saver.QueueUpdate();
 	}
 };
 

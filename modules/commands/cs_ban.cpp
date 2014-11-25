@@ -19,15 +19,16 @@ class TempBan : public Timer
  private:
  	Anope::string channel;
 	Anope::string mask;
+	Anope::string mode;
 
  public:
-	TempBan(time_t seconds, Channel *c, const Anope::string &banmask) : Timer(me, seconds), channel(c->name), mask(banmask) { }
+	TempBan(time_t seconds, Channel *c, const Anope::string &banmask, const Anope::string &mod) : Timer(me, seconds), channel(c->name), mask(banmask), mode(mod) { }
 
 	void Tick(time_t ctime) anope_override
 	{
 		Channel *c = Channel::Find(this->channel);
 		if (c)
-			c->RemoveMode(NULL, "BAN", this->mask);
+			c->RemoveMode(NULL, mode, this->mask);
 	}
 };
 
@@ -43,6 +44,8 @@ class CommandCSBan : public Command
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		const Anope::string &chan = params[0];
+		Configuration::Block *block = Config->GetCommand(source);
+		const Anope::string &mode = block->Get<Anope::string>("mode", "BAN");
 
 		ChannelInfo *ci = ChannelInfo::Find(chan);
 		if (ci == NULL)
@@ -57,9 +60,9 @@ class CommandCSBan : public Command
 			source.Reply(CHAN_X_NOT_IN_USE, chan.c_str());
 			return;
 		}
-		else if (IRCD->GetMaxListFor(c) && c->HasMode("BAN") >= IRCD->GetMaxListFor(c))
+		else if (IRCD->GetMaxListFor(c) && c->HasMode(mode) >= IRCD->GetMaxListFor(c))
 		{
-			source.Reply(_("The ban list for %s is full."), c->name.c_str());
+			source.Reply(_("The %s list for %s is full."), mode.lower().c_str(), c->name.c_str());
 			return;
 		}
 
@@ -126,12 +129,12 @@ class CommandCSBan : public Command
 				bool override = !u_access.HasPriv("BAN") || (u != u2 && ci->HasExt("PEACE") && u2_access >= u_access);
 				Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "for " << mask;
 
-				if (!c->HasMode("BAN", mask))
+				if (!c->HasMode(mode, mask))
 				{
-					c->SetMode(NULL, "BAN", mask);
+					c->SetMode(NULL, mode, mask);
 					if (ban_time)
 					{
-						new TempBan(ban_time, c, mask);
+						new TempBan(ban_time, c, mask, mode);
 						source.Reply(_("Ban on \002%s\002 expires in %s."), mask.c_str(), Anope::Duration(ban_time, source.GetAccount()).c_str());
 					}
 				}
@@ -140,10 +143,13 @@ class CommandCSBan : public Command
 				if (!c->FindUser(u2))
 					return;
 
-				if (ci->HasExt("SIGNKICK") || (ci->HasExt("SIGNKICK_LEVEL") && !source.AccessFor(ci).HasPriv("SIGNKICK")))
-					c->Kick(ci->WhoSends(), u2, "%s (%s)", reason.c_str(), source.GetNick().c_str());
-				else
-					c->Kick(ci->WhoSends(), u2, "%s", reason.c_str());
+				if (block->Get<bool>("kick", "yes"))
+				{
+					if (ci->HasExt("SIGNKICK") || (ci->HasExt("SIGNKICK_LEVEL") && !source.AccessFor(ci).HasPriv("SIGNKICK")))
+						c->Kick(ci->WhoSends(), u2, "%s (%s)", reason.c_str(), source.GetNick().c_str());
+					else
+						c->Kick(ci->WhoSends(), u2, "%s", reason.c_str());
+				}
 			}
 		}
 		else
@@ -152,12 +158,12 @@ class CommandCSBan : public Command
 			bool override = !founder && !u_access.HasPriv("BAN");
 			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "for " << target;
 
-			if (!c->HasMode("BAN", target))
+			if (!c->HasMode(mode, target))
 			{
-				c->SetMode(NULL, "BAN", target);
+				c->SetMode(NULL, mode, target);
 				if (ban_time)
 				{
-					new TempBan(ban_time, c, target);
+					new TempBan(ban_time, c, target, mode);
 					source.Reply(_("Ban on \002%s\002 expires in %s."), target.c_str(), Anope::Duration(ban_time, source.GetAccount()).c_str());
 				}
 			}
@@ -183,11 +189,14 @@ class CommandCSBan : public Command
 					else if (uc->user->IsProtected())
 						continue;
 
-					++kicked;
-					if (ci->HasExt("SIGNKICK") || (ci->HasExt("SIGNKICK_LEVEL") && !u_access.HasPriv("SIGNKICK")))
-						c->Kick(ci->WhoSends(), uc->user, "%s (Matches %s) (%s)", reason.c_str(), target.c_str(), source.GetNick().c_str());
-					else
-						c->Kick(ci->WhoSends(), uc->user, "%s (Matches %s)", reason.c_str(), target.c_str());
+					if (block->Get<bool>("kick", "yes"))
+					{
+						++kicked;
+						if (ci->HasExt("SIGNKICK") || (ci->HasExt("SIGNKICK_LEVEL") && !u_access.HasPriv("SIGNKICK")))
+							c->Kick(ci->WhoSends(), uc->user, "%s (Matches %s) (%s)", reason.c_str(), target.c_str(), source.GetNick().c_str());
+						else
+							c->Kick(ci->WhoSends(), uc->user, "%s (Matches %s)", reason.c_str(), target.c_str());
+					}
 				}
 			}
 

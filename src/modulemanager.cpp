@@ -159,25 +159,25 @@ ModuleReturn ModuleManager::LoadModule(const Anope::string &modname, User *u)
 	dlerror();
 	void *handle = dlopen(pbuf.c_str(), RTLD_NOW);
 	const char *err = dlerror();
-	if (!handle && err && *err)
+	if (!handle)
 	{
-		Log() << err;
+		if (err && *err)
+			Log() << err;
 		return MOD_ERR_NOLOAD;
 	}
 
 	dlerror();
 	Module *(*func)(const Anope::string &, const Anope::string &) = function_cast<Module *(*)(const Anope::string &, const Anope::string &)>(dlsym(handle, "AnopeInit"));
 	err = dlerror();
-	if (!func && err && *err)
+	if (!func)
 	{
 		Log() << "No init function found, not an Anope module";
+		if (err && *err)
+			Log(LOG_DEBUG) << err;
 		dlclose(handle);
 		return MOD_ERR_NOLOAD;
 	}
-
-	if (!func)
-		throw CoreException("Couldn't find constructor, yet moderror wasn't set?");
-
+	
 	/* Create module. */
 	Anope::string nick;
 	if (u)
@@ -185,6 +185,7 @@ ModuleReturn ModuleManager::LoadModule(const Anope::string &modname, User *u)
 
 	Module *m;
 
+	ModuleReturn moderr = MOD_ERR_OK;
 	try
 	{
 		m = func(modname, nick);
@@ -192,7 +193,14 @@ ModuleReturn ModuleManager::LoadModule(const Anope::string &modname, User *u)
 	catch (const ModuleException &ex)
 	{
 		Log() << "Error while loading " << modname << ": " << ex.GetReason();
-		return MOD_ERR_EXCEPTION;
+		moderr = MOD_ERR_EXCEPTION;
+	}
+	
+	if (moderr != MOD_ERR_OK)
+	{
+		if (dlclose(handle))
+			Log() << dlerror();
+		return moderr;
 	}
 
 	m->filename = pbuf;
@@ -234,17 +242,21 @@ ModuleReturn ModuleManager::LoadModule(const Anope::string &modname, User *u)
 	catch (const ModuleException &ex)
 	{
 		Log() << "Module " << modname << " couldn't load:" << ex.GetReason();
-		DeleteModule(m);
-		return MOD_ERR_EXCEPTION;
+		moderr = MOD_ERR_EXCEPTION;
 	}
 	catch (const ConfigException &ex)
 	{
 		Log() << "Module " << modname << " couldn't load due to configuration problems: " << ex.GetReason();
-		DeleteModule(m);
-		return MOD_ERR_EXCEPTION;
+		moderr = MOD_ERR_EXCEPTION;
 	}
 	catch (const NotImplementedException &ex)
 	{
+	}
+	
+	if (moderr != MOD_ERR_OK)
+	{
+		DeleteModule(m);
+		return moderr;
 	}
 
 	Log(LOG_DEBUG) << "Module " << modname << " loaded.";

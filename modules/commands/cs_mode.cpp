@@ -488,8 +488,7 @@ class CommandCSMode : public Command
 					for (unsigned j = 0; j < ModeManager::GetChannelModes().size(); ++j)
 					{
 						ChannelMode *cm = ModeManager::GetChannelModes()[j];
-						if (!cm)
-							continue;
+
 						if (!u || cm->CanSet(u) || can_override)
 						{
 							if (cm->type == MODE_REGULAR || (!adding && cm->type == MODE_PARAM))

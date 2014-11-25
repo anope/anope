@@ -394,7 +394,7 @@ Conf::Conf() : Block("")
 
 		LogInfo l(logage, rawio, debug);
 
-		l.bot = BotInfo::Find(log->Get<const Anope::string>("bot", "Global"));
+		l.bot = BotInfo::Find(log->Get<const Anope::string>("bot", "Global"), true);
 		spacesepstream(log->Get<const Anope::string>("target")).GetTokens(l.targets);
 		spacesepstream(log->Get<const Anope::string>("source")).GetTokens(l.sources);
 		spacesepstream(log->Get<const Anope::string>("admin")).GetTokens(l.admin);
@@ -618,6 +618,21 @@ BotInfo *Conf::GetClient(const Anope::string &cname)
 	const Anope::string &client = block->Get<const Anope::string>("client");
 	bots[cname] = client;
 	return GetClient(cname);
+}
+
+Block *Conf::GetCommand(CommandSource &source)
+{
+	const Anope::string &block_name = source.c ? "fantasy" : "command";
+
+	for (std::pair<block_map::iterator, block_map::iterator> iters = blocks.equal_range(block_name); iters.first != iters.second; ++iters.first)
+	{
+		Block *b = &iters.first->second;
+
+		if (b->Get<Anope::string>("name") == source.command)
+			return b;
+	}
+
+	return NULL;
 }
 
 File::File(const Anope::string &n, bool e) : name(n), executable(e), fp(NULL)

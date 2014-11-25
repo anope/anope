@@ -325,7 +325,7 @@ class CommandBSKickBolds : public CommandBSKickBase
  public:
 	CommandBSKickBolds(Module *creator) : CommandBSKickBase(creator, "botserv/kick/bolds", 2, 3)
 	{
-		this->SetDesc(_("Configures badwords kicker"));
+		this->SetDesc(_("Configures bolds kicker"));
 		this->SetSyntax(_("\037channel\037 {\037ON|OFF\037} [\037ttb\037]"));
 	}
 

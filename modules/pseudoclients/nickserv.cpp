@@ -441,7 +441,7 @@ class NickServCore : public Module, public NickServService
 			IRCD->SendLogin(u, na);
 			if (!Config->GetModule("nickserv")->Get<bool>("nonicknameownership") && na->nc == u->Account() && !na->nc->HasExt("UNCONFIRMED"))
 				u->SetMode(NickServ, "REGISTERED");
-			Log(NickServ) << u->GetMask() << " automatically identified for group " << u->Account()->display;
+			Log(u, "", NickServ) << u->GetMask() << " automatically identified for group " << u->Account()->display;
 		}
 
 		if (!u->nick.equals_ci(oldnick) && old_na)

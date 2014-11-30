@@ -448,7 +448,14 @@ struct IRCDMessageNick : IRCDMessage
 		else if (params.size() == 7)
 		{
 			// a new user is connecting to the network
-			User::OnIntroduce(params[0], params[2], params[3], "", "", source.GetServer(), params[6], Anope::CurTime, params[5], "", NULL);
+			Server *s = Server::Find(params[4]);
+			if (s == NULL)
+			{
+				Log(LOG_DEBUG) << "User " << params[0] << " introduced from nonexistant server " << params[4] << "?";
+				return;
+			}
+			User::OnIntroduce(params[0], params[2], params[3], "", "", s, params[6], Anope::CurTime, params[5], "", NULL);
+			Log(LOG_DEBUG) << "Registered nick \"" << params[0] << "\" on server " << s->GetName() << ".";
 		}
 		else
 		{

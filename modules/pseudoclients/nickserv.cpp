@@ -243,16 +243,15 @@ class NickServCore : public Module, public NickServService
 			while (User::Find(guestnick) && i++ < 10);
 
 			if (i == 11)
-				u->Kill(NickServ ? NickServ->nick : "", "Services nickname-enforcer kill");
+				u->Kill(*NickServ, "Services nickname-enforcer kill");
 			else
 			{
-				if (NickServ)
-					u->SendMessage(NickServ, _("Your nickname is now being changed to \002%s\002"), guestnick.c_str());
+				u->SendMessage(*NickServ, _("Your nickname is now being changed to \002%s\002"), guestnick.c_str());
 				IRCD->SendForceNickChange(u, guestnick, Anope::CurTime);
 			}
 		}
 		else
-			u->Kill(NickServ ? NickServ->nick : "", "Services nickname-enforcer kill");
+			u->Kill(*NickServ, "Services nickname-enforcer kill");
 	}
 
 	void Release(NickAlias *na) anope_override

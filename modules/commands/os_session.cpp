@@ -727,7 +727,7 @@ class OSSession : public Module
 				}
 				else
 				{
-					u->Kill(OperServ ? OperServ->nick : "", "Session limit exceeded");
+					u->Kill(OperServ, "Session limit exceeded");
 				}
 			}
 		}

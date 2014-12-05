@@ -203,7 +203,7 @@ void Kill::Run(MessageSource &source, const std::vector<Anope::string> &params)
 		bi->OnKill();
 	}
 	else
-		u->KillInternal(source.GetSource(), params[1]);
+		u->KillInternal(source, params[1]);
 }
 
 void Message::Mode::Run(MessageSource &source, const std::vector<Anope::string> &params)

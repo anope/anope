@@ -399,7 +399,7 @@ class CommandOSSNLine : public CommandOSSXLineBase
 				User *user = it->second;
 
 				if (!user->HasMode("OPER") && user->server != Me && this->xlm()->Check(user, x))
-					user->Kill(Me->GetName(), rreason);
+					user->Kill(Me, rreason);
 			}
 
 			this->xlm()->Send(NULL, x);
@@ -631,7 +631,7 @@ class CommandOSSQLine : public CommandOSSXLineBase
 					User *user = it->second;
 
 					if (!user->HasMode("OPER") && user->server != Me && this->xlm()->Check(user, x))
-						user->Kill(Me->GetName(), rreason);
+						user->Kill(Me, rreason);
 				}
 			}
 

@@ -499,7 +499,7 @@ class OSDefcon : public Module
 
 		if (DConfig.Check(DEFCON_NO_NEW_CLIENTS) || DConfig.Check(DEFCON_AKILL_NEW_CLIENTS))
 		{
-			u->Kill(OperServ ? OperServ->nick : "", DConfig.akillreason);
+			u->Kill(OperServ, DConfig.akillreason);
 			return;
 		}
 
@@ -530,7 +530,7 @@ class OSDefcon : public Module
 				}
 				else
 				{
-					u->Kill(OperServ ? OperServ->nick : "", "Defcon session limit exceeded");
+					u->Kill(OperServ, "Defcon session limit exceeded");
 				}
 			}
 		}

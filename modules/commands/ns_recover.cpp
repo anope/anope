@@ -72,7 +72,7 @@ class NSRecoverRequest : public IdentifyRequest
 							source.GetNick().c_str(), source.GetNick().c_str());
 
 			Anope::string buf = source.command.upper() + " command used by " + source.GetNick();
-			u->Kill(source.service->nick, buf);
+			u->Kill(*source.service, buf);
 
 			source.Reply(_("Ghost with your nick has been killed."));
 

@@ -170,6 +170,8 @@ class CoreExport Command : public Service
 	 */
 	static void Run(CommandSource &source, const Anope::string &message);
 
+	void Run(CommandSource &source, const Anope::string &, const CommandInfo &, std::vector<Anope::string> &params);
+
 	/** Looks up a command name from the service name.
 	 * Note that if the same command exists multiple places this will return the first one encountered
 	 * @param command_service The command service to lookup, eg, nickserv/register

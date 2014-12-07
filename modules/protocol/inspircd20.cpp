@@ -792,6 +792,48 @@ struct IRCDMessageFIdent : IRCDMessage
 	}
 };
 
+struct IRCDMessageSave : IRCDMessage
+{
+	time_t last_collide;
+
+	IRCDMessageSave(Module *creator) : IRCDMessage(creator, "SAVE", 2), last_collide(0) { }
+
+	void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
+	{
+		User *targ = User::Find(params[0]);
+		time_t ts;
+
+		try
+		{
+			ts = convertTo<time_t>(params[1]);
+		}
+		catch (const ConvertException &)
+		{
+			return;
+		}
+
+		if (!targ || targ->timestamp != ts)
+			return;
+
+		BotInfo *bi;
+		if (targ->server == Me && (bi = dynamic_cast<BotInfo *>(targ)))
+		{
+			if (last_collide == Anope::CurTime)
+			{
+				Anope::QuitReason = "Nick collision fight on " + targ->nick;
+				Anope::Quitting = true;
+				return;
+			}
+
+			IRCD->SendKill(Me, targ->nick, "Nick collision");
+			IRCD->SendNickChange(targ, targ->nick);
+			last_collide = Anope::CurTime;
+		}
+		else
+			targ->ChangeNick(targ->GetUID());
+	}
+};
+
 class ProtoInspIRCd20 : public Module
 {
 	Module *m_insp12;
@@ -824,6 +866,7 @@ class ProtoInspIRCd20 : public Module
 	IRCDMessageCapab message_capab;
 	IRCDMessageEncap message_encap;
 	IRCDMessageFIdent message_fident;
+	IRCDMessageSave message_save;
 
 	bool use_server_side_topiclock, use_server_side_mlock;
 
@@ -855,7 +898,7 @@ class ProtoInspIRCd20 : public Module
 		message_time("IRCDMessage", "inspircd20/time", "inspircd12/time"),
 		message_uid("IRCDMessage", "inspircd20/uid", "inspircd12/uid"),
 
-		message_capab(this), message_encap(this), message_fident(this)
+		message_capab(this), message_encap(this), message_fident(this), message_save(this)
 	{
 
 		if (ModuleManager::LoadModule("inspircd12", User::Find(creator)) != MOD_ERR_OK)

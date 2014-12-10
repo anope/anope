@@ -211,9 +211,9 @@ class CSTopic : public Module
 
  public:
 	CSTopic(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
-		, EventHook<Event::ChannelSync>("OnChannelSync")
-		, EventHook<Event::TopicUpdated>("OnTopicUpdated")
-		, EventHook<Event::ChanInfo>("OnChanInfo")
+		, EventHook<Event::ChannelSync>()
+		, EventHook<Event::TopicUpdated>()
+		, EventHook<Event::ChanInfo>()
 		, commandcstopic(this)
 		, commandcssetkeeptopic(this)
 		, topiclock(this, "TOPICLOCK")

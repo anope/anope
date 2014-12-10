@@ -175,7 +175,7 @@ class CSSetMisc : public Module
 
  public:
 	CSSetMisc(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
-		, EventHook<Event::ChanInfo>("OnChanInfo")
+		, EventHook<Event::ChanInfo>()
 		, commandcssetmisc(this)
 		, type(this)
 	{

@@ -99,7 +99,7 @@ class ModuleSQLOper : public Module
 
  public:
 	ModuleSQLOper(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, EXTRA | VENDOR),
-	       EventHook<Event::NickIdentify>("OnNickIdentify")
+	       EventHook<Event::NickIdentify>()
 	{
 	}
 

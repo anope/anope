@@ -268,14 +268,14 @@ class CSSuspend : public Module
 
  public:
 	CSSuspend(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
-		, EventHook<Event::ChanInfo>("OnChanInfo")
-		, EventHook<ChanServ::Event::PreChanExpire>("OnPreChanExpire")
-		, EventHook<Event::CheckKick>("OnCheckKick")
-		, EventHook<Event::ChanDrop>("OnChanDrop")
+		, EventHook<Event::ChanInfo>()
+		, EventHook<ChanServ::Event::PreChanExpire>()
+		, EventHook<Event::CheckKick>()
+		, EventHook<Event::ChanDrop>()
 		, commandcssuspend(this, onchansuspend)
 		, commandcsunsuspend(this, onchanunsuspend)
-		, onchansuspend(this, "OnChanSuspend")
-		, onchanunsuspend(this, "OnChanUnsuspend")
+		, onchansuspend(this)
+		, onchanunsuspend(this)
 		, cst(this)
 	{
 	}

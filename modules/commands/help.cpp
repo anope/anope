@@ -188,7 +188,7 @@ class Help : public Module
  public:
 	Help(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
 		, commandhelp(this, onhelp)
-		, onhelp(this, "Help")
+		, onhelp(this)
 	{
 
 	}

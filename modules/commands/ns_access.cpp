@@ -236,7 +236,7 @@ class NSAccess : public Module
 
  public:
 	NSAccess(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
-		, EventHook<NickServ::Event::NickRegister>("OnNickRegister")
+		, EventHook<NickServ::Event::NickRegister>()
 		, commandnsaccess(this)
 		, nick_type(this)
 	{

@@ -18,3 +18,5 @@ namespace Event
 		virtual void OnNickGroup(User *u, NickServ::Nick *target) anope_abstract;
 	};
 }
+
+template<> struct EventName<Event::NickGroup> { static constexpr const char *const name = "OnNickGroup"; };

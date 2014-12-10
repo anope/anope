@@ -455,7 +455,7 @@ class BSBadwords : public Module
 	BSBadwords(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
 		, commandbsbadwords(this)
 		, badwords(this)
-		, events(this, "Badwords")
+		, events(this)
 		, bwtype(this)
 	{
 		bwevents = &events;

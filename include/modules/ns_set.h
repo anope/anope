@@ -20,5 +20,7 @@ namespace Event
 		 */
 		virtual EventReturn OnSetNickOption(CommandSource &source, Command *cmd, NickServ::Account *nc, const Anope::string &setting) anope_abstract;
 	};
-	static EventHandlersReference<SetNickOption> OnSetNickOption("OnSetNickOption");
+	static EventHandlersReference<SetNickOption> OnSetNickOption;
 }
+
+template<> struct EventName<Event::SetNickOption> { static constexpr const char *const name = "OnSetNickOption"; };

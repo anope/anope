@@ -62,3 +62,5 @@ namespace Event
 	};
 }
 
+
+template<> struct EventName<Event::NickCertEvents> { static constexpr const char *const name = "OnNickCert"; };

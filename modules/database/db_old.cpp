@@ -1367,8 +1367,8 @@ class DBOld : public Module
 
  public:
 	DBOld(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, DATABASE | VENDOR)
-		, EventHook<Event::LoadDatabase>("OnLoadDatabase")
-		, EventHook<Event::UplinkSync>("OnUplinkSync")
+		, EventHook<Event::LoadDatabase>()
+		, EventHook<Event::UplinkSync>()
 		, mlock_on(this, "mlock_on")
 		, mlock_off(this, "mlock_off")
 		, mlock_limit(this, "mlock_limit")

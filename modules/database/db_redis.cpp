@@ -65,8 +65,8 @@ class DatabaseRedis : public Module
 	ServiceReference<Provider> redis;
 
 	DatabaseRedis(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, DATABASE | VENDOR)
-		, EventHook<Event::LoadDatabase>("OnLoadDatabase")
-		, EventHook<Event::SerializeEvents>("OnSerialize")
+		, EventHook<Event::LoadDatabase>()
+		, EventHook<Event::SerializeEvents>()
 		, sl(this)
 	{
 		me = this;

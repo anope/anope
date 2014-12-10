@@ -282,7 +282,7 @@ class NSAJoin : public Module
 
  public:
 	NSAJoin(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
-		, EventHook<Event::UserLogin>("OnUserLogin")
+		, EventHook<Event::UserLogin>()
 		, commandnsajoin(this)
 		, ajtype(this)
 	{

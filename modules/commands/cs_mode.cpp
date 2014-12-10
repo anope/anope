@@ -861,14 +861,14 @@ class CSMode : public Module
 
  public:
 	CSMode(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
-		, EventHook<Event::CheckModes>("OnCheckModes")
-		, EventHook<Event::ChanRegistered>("OnChanRegistered")
-		, EventHook<Event::ChanInfo>("OnChanInfo")
+		, EventHook<Event::CheckModes>()
+		, EventHook<Event::ChanRegistered>()
+		, EventHook<Event::ChanInfo>()
 		, commandcsmode(this)
 		, commandcsmodes(this)
 		, modelock(this)
 		, modelock_type(this)
-		, modelockevents(this, "MLock")
+		, modelockevents(this)
 	{
 		events = &modelockevents;
 	}

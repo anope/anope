@@ -21,3 +21,4 @@ namespace Event
 	};
 }
 
+template<> struct EventName<Event::ChanInfo> { static constexpr const char *const name = "OnChanInfo"; };

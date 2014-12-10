@@ -1249,11 +1249,11 @@ class ProtoUnreal : public Module
 
  public:
 	ProtoUnreal(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PROTOCOL | VENDOR)
-		, EventHook<Event::UserNickChange>("OnUserNickChange", EventHook<Event::UserNickChange>::Priority::FIRST)
-		, EventHook<Event::ChannelSync>("OnChannelSync", EventHook<Event::ChannelSync>::Priority::FIRST)
-		, EventHook<Event::ChanRegistered>("OnChanRegistered", EventHook<Event::ChanRegistered>::Priority::FIRST)
-		, EventHook<Event::DelChan>("OnDelChan", EventHook<Event::DelChan>::Priority::FIRST)
-		, EventHook<Event::MLockEvents>("MLock", EventHook<Event::MLockEvents>::Priority::FIRST)
+		, EventHook<Event::UserNickChange>(EventHook<Event::UserNickChange>::Priority::FIRST)
+		, EventHook<Event::ChannelSync>(EventHook<Event::ChannelSync>::Priority::FIRST)
+		, EventHook<Event::ChanRegistered>(EventHook<Event::ChanRegistered>::Priority::FIRST)
+		, EventHook<Event::DelChan>(EventHook<Event::DelChan>::Priority::FIRST)
+		, EventHook<Event::MLockEvents>(EventHook<Event::MLockEvents>::Priority::FIRST)
 		, ircd_proto(this)
 		, message_away(this)
 		, message_error(this)

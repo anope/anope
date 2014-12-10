@@ -49,3 +49,5 @@ namespace Event
 	extern CoreExport EventHandlers<ChanUnsuspend> OnChanUnsuspend;
 }
 
+template<> struct EventName<Event::ChanSuspend> { static constexpr const char *const name = "OnChanSuspend"; };
+template<> struct EventName<Event::ChanUnsuspend> { static constexpr const char *const name = "OnChanUnsuspend"; };

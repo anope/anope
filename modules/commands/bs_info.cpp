@@ -106,7 +106,8 @@ class BSInfo : public Module
 
  public:
 	BSInfo(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
-		, commandbsinfo(this, onbotinfo), onbotinfo(this, "OnServiceBot")
+		, commandbsinfo(this, onbotinfo)
+		, onbotinfo(this)
 	{
 
 	}

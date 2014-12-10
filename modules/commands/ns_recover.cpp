@@ -202,8 +202,8 @@ class NSRecover : public Module
 
  public:
 	NSRecover(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
-		, EventHook<Event::UserNickChange>("OnUserNickChange")
-		, EventHook<Event::JoinChannel>("OnJoinChannel")
+		, EventHook<Event::UserNickChange>()
+		, EventHook<Event::JoinChannel>()
 		, commandnsrecover(this)
 		, recover(this, "recover")
 	{

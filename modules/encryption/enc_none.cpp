@@ -16,9 +16,9 @@ class ENone : public Module
 {
  public:
 	ENone(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, ENCRYPTION | VENDOR)
-		, EventHook<Event::Encrypt>("OnEncrypt")
-		, EventHook<Event::Decrypt>("OnDecrypt")
-		, EventHook<Event::CheckAuthentication>("OnCheckAuthentication")
+		, EventHook<Event::Encrypt>()
+		, EventHook<Event::Decrypt>()
+		, EventHook<Event::CheckAuthentication>()
 	{
 
 	}

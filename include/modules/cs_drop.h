@@ -18,3 +18,5 @@ namespace Event
 		virtual EventReturn OnChanDrop(CommandSource &source, ChanServ::Channel *ci) anope_abstract;
 	};
 }
+
+template<> struct EventName<Event::ChanDrop> { static constexpr const char *const name = "OnChanDrop"; };

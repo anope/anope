@@ -120,3 +120,4 @@ namespace Event
 	};
 }
 
+template<> struct EventName<Event::MLockEvents> { static constexpr const char *const name = "MLock"; };

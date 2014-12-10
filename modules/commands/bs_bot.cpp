@@ -275,7 +275,10 @@ class CommandBSBot : public Command
 	}
 
  public:
-	CommandBSBot(Module *creator) : Command(creator, "botserv/bot", 1, 6), OnBotCreate(creator, "OnBotCreate"), OnBotChange(creator, "OnBotChange"), OnBotDelete(creator, "OnBotDelete")
+	CommandBSBot(Module *creator) : Command(creator, "botserv/bot", 1, 6)
+		, OnBotCreate(creator)
+		, OnBotChange(creator)
+		, OnBotDelete(creator)
 	{
 		this->SetDesc(_("Maintains network bot list"));
 		this->SetSyntax(_("\002ADD \037nicknae\037 \037username\037 \037hostname\037 \037realname\037\002"));

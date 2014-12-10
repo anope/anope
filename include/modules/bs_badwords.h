@@ -99,3 +99,4 @@ namespace Event
 	};
 }
 
+template<> struct EventName<Event::BadWordEvents> { static constexpr const char *const name = "Badwords"; };

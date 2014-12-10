@@ -340,7 +340,7 @@ class HTTPD : public Module
 	std::map<Anope::string, MyHTTPProvider *> providers;
  public:
 	HTTPD(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, EXTRA | VENDOR)
-	, EventHook<Event::ModuleLoad>("OnModuleLoad")
+	, EventHook<Event::ModuleLoad>()
 	, sslref("SSLService", "ssl")
 	{
 

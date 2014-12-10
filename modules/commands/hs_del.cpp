@@ -99,7 +99,7 @@ class HSDel : public Module
 	HSDel(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
 		, commandhsdel(this, ondeletevhost)
 		, commandhsdelall(this, ondeletevhost)
-		, ondeletevhost(this, "OnDeleteVhost")
+		, ondeletevhost(this)
 	{
 
 	}

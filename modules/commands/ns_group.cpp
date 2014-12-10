@@ -375,7 +375,7 @@ class NSGroup : public Module
 		, commandnsgroup(this, onnickgroup)
 		, commandnsungroup(this)
 		, commandnsglist(this)
-		, onnickgroup(this, "OnNickGroup")
+		, onnickgroup(this)
 	{
 		if (Config->GetModule("nickserv")->Get<bool>("nonicknameownership"))
 			throw ModuleException(modname + " can not be used with options:nonicknameownership enabled");

@@ -40,12 +40,14 @@ namespace Event
 		virtual void OnNickSuspend(NickServ::Nick *na) anope_abstract;
 	};
 
-	struct CoreExport NickUnsuspended : Events
+	struct CoreExport NickUnsuspend : Events
 	{
 		/** Called when a nick is unsuspneded
 		 * @param na The nick alias
 		 */
-		virtual void OnNickUnsuspended(NickServ::Nick *na) anope_abstract;
+		virtual void OnNickUnsuspend(NickServ::Nick *na) anope_abstract;
 	};
 }
 
+template<> struct EventName<Event::NickSuspend> { static constexpr const char *const name = "OnNickSuspend"; };
+template<> struct EventName<Event::NickUnsuspend> { static constexpr const char *const name = "OnNickUnsuspend"; };

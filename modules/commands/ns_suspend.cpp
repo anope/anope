@@ -199,10 +199,10 @@ class CommandNSSuspend : public Command
 
 class CommandNSUnSuspend : public Command
 {
-	EventHandlers<Event::NickUnsuspended> &onnickunsuspend;
+	EventHandlers<Event::NickUnsuspend> &onnickunsuspend;
 
  public:
-	CommandNSUnSuspend(Module *creator, EventHandlers<Event::NickUnsuspended> &event) : Command(creator, "nickserv/unsuspend", 1, 1), onnickunsuspend(event)
+	CommandNSUnSuspend(Module *creator, EventHandlers<Event::NickUnsuspend> &event) : Command(creator, "nickserv/unsuspend", 1, 1), onnickunsuspend(event)
 	{
 		this->SetDesc(_("Unsuspend a given nick"));
 		this->SetSyntax(_("\037account\037"));
@@ -235,7 +235,7 @@ class CommandNSUnSuspend : public Command
 
 		source.Reply(_("\002{0}\002 is now released."), na->GetNick());
 
-		this->onnickunsuspend(&Event::NickUnsuspended::OnNickUnsuspended, na);
+		this->onnickunsuspend(&Event::NickUnsuspend::OnNickUnsuspend, na);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
@@ -253,7 +253,7 @@ class NSSuspend : public Module
 	CommandNSSuspend commandnssuspend;
 	CommandNSUnSuspend commandnsunsuspend;
 	EventHandlers<Event::NickSuspend> onnicksuspend;
-	EventHandlers<Event::NickUnsuspended> onnickunsuspend;
+	EventHandlers<Event::NickUnsuspend> onnickunsuspend;
 	std::vector<Anope::string> show;
 	NSSuspendType nst;
 
@@ -272,13 +272,13 @@ class NSSuspend : public Module
 
  public:
 	NSSuspend(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
-		, EventHook<Event::NickInfo>("OnNickInfo")
-		, EventHook<NickServ::Event::PreNickExpire>("OnPreNickExpire")
-		, EventHook<NickServ::Event::NickValidate>("OnNickValidate")
+		, EventHook<Event::NickInfo>()
+		, EventHook<NickServ::Event::PreNickExpire>()
+		, EventHook<NickServ::Event::NickValidate>()
 		, commandnssuspend(this, onnicksuspend)
 		, commandnsunsuspend(this, onnickunsuspend)
-		, onnicksuspend(this, "OnNickSuspend")
-		, onnickunsuspend(this, "OnNickUnsuspended")
+		, onnicksuspend(this)
+		, onnickunsuspend(this)
 		, nst(this)
 	{
 	}

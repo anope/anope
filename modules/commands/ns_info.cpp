@@ -268,7 +268,7 @@ class NSInfo : public Module
 		, commandnsinfo(this, onnickinfo)
 		, commandnssethide(this)
 		, commandnssasethide(this)
-		, onnickinfo(this, "OnNickInfo")
+		, onnickinfo(this)
 		, hide_email(this, NickServ::account, "HIDE_EMAIL")
 		, hide_usermask(this, NickServ::account, "HIDE_MASK")
 		, hide_status(this, NickServ::account, "HIDE_STATUS")

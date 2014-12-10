@@ -671,14 +671,14 @@ class OSSession : public Module
 
  public:
 	OSSession(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
-		, EventHook<Event::UserConnect>("OnUserConnect", EventHook<Event::UserConnect>::Priority::FIRST)
-		, EventHook<Event::UserQuit>("OnUserQuit", EventHook<Event::UserQuit>::Priority::FIRST)
-		, EventHook<Event::ExpireTick>("OnExpireTick", EventHook<Event::ExpireTick>::Priority::FIRST)
+		, EventHook<Event::UserConnect>(EventHook<Event::UserConnect>::Priority::FIRST)
+		, EventHook<Event::UserQuit>(EventHook<Event::UserQuit>::Priority::FIRST)
+		, EventHook<Event::ExpireTick>(EventHook<Event::ExpireTick>::Priority::FIRST)
 		, ss(this)
 		, commandossession(this)
 		, commandosexception(this)
 		, akills("XLineManager", "xlinemanager/sgline")
-		, exceptionevents(this, "Exception")
+		, exceptionevents(this)
 		, etype(this)
 	{
 		this->SetPermanent(true);

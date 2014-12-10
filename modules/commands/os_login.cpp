@@ -125,7 +125,7 @@ class OSLogin : public Module
 
  public:
 	OSLogin(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
-		, EventHook<Event::IsServicesOperEvent>("OnIsServicesOperEvent")
+		, EventHook<Event::IsServicesOperEvent>()
 		, commandoslogin(this)
 		, commandoslogout(this)
 		, os_login(this, "os_login")

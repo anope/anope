@@ -668,7 +668,7 @@ class ProtongIRCd : public Module
 
  public:
 	ProtongIRCd(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PROTOCOL | VENDOR)
-		, EventHook<Event::UserNickChange>("OnUserNickChange")
+		, EventHook<Event::UserNickChange>()
 		, ircd_proto(this)
 		, message_capab(this)
 		, message_error(this)

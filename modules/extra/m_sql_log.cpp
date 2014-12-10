@@ -18,7 +18,7 @@ class SQLLog : public Module
 
  public:
 	SQLLog(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR | EXTRA)
-		, EventHook<Event::LogMessage>("OnLogMessage")
+		, EventHook<Event::LogMessage>()
 	{
 	}
 

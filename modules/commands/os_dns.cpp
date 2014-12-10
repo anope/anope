@@ -802,11 +802,11 @@ class ModuleDNS : public Module
 
  public:
 	ModuleDNS(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, EXTRA | VENDOR)
-		, EventHook<Event::NewServer>("OnNewServer")
-		, EventHook<Event::ServerQuit>("OnServerQuit")
-		, EventHook<Event::UserConnect>("OnUserConnect")
-		, EventHook<Event::PreUserLogoff>("OnPreUserLogoff")
-		, EventHook<Event::DnsRequest>("OnDnsRequest")
+		, EventHook<Event::NewServer>()
+		, EventHook<Event::ServerQuit>()
+		, EventHook<Event::UserConnect>()
+		, EventHook<Event::PreUserLogoff>()
+		, EventHook<Event::DnsRequest>()
 		, zonetype(this)
 		, servertype(this)
 		, zonemembtype(this)

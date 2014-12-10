@@ -20,6 +20,7 @@ namespace Event
 		 */
 		virtual EventReturn OnSetChannelOption(CommandSource &source, Command *cmd, ChanServ::Channel *ci, const Anope::string &setting) anope_abstract;
 	};
-	static EventHandlersReference<SetChannelOption> OnSetChannelOption("OnSetChannelOption");
+	static EventHandlersReference<SetChannelOption> OnSetChannelOption;
 }
 
+template<> struct EventName<Event::SetChannelOption> { static constexpr const char *const name = "OnSetChannelOption"; };

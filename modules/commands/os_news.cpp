@@ -426,8 +426,8 @@ class OSNews : public Module
 
  public:
 	OSNews(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
-		, EventHook<Event::UserModeSet>("OnUserModeSet")
-		, EventHook<Event::UserConnect>("OnUserConnect")
+		, EventHook<Event::UserModeSet>()
+		, EventHook<Event::UserConnect>()
 		, newsitemtype(this)
 		, commandoslogonnews(this)
 		, commandosopernews(this)

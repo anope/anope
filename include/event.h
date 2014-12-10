@@ -59,6 +59,9 @@ struct Caller<EventHandler, Func, EventReturn, Args...>
 	}
 };
 
+template<typename T>
+struct EventName;
+
 template<typename EventHandler>
 class EventHook;
 
@@ -69,7 +72,7 @@ class EventHandlers : public Service
 	friend class EventHook<EventHandler>;
 
  public:
-	EventHandlers(Module *o, const Anope::string &ename) : Service(o, "EventHandlers", ename)
+	EventHandlers(Module *o) : Service(o, "EventHandlers", EventName<EventHandler>::name)
 	{
 	}
 
@@ -85,7 +88,7 @@ class EventHandlersReference
 {
 	ServiceReference<EventHandlers<EventHandler>> ref;
  public:
-	EventHandlersReference(const Anope::string &name) : ref("EventHandlers", name) { }
+	EventHandlersReference() : ref("EventHandlers", EventName<EventHandler>::name) { }
 
 	explicit operator bool()
 	{
@@ -131,7 +134,7 @@ class EventHook : public EventHandler
 	}
 	priority;
 
-	EventHook(const Anope::string &name, Priority p = Priority::LAST) : handlers(this, name), priority(p)
+	EventHook(Priority p = Priority::LAST) : handlers(this, EventName<EventHandler>::name), priority(p)
 	{
 		handlers.Check();
 	}
@@ -1012,4 +1015,89 @@ namespace Event
 	};
 	extern CoreExport EventHandlers<SerializeEvents> OnSerialize;
 }
+
+template<> struct EventName<Event::PreUserKicked> { static constexpr const char *const name = "OnPreUserKicked"; };
+template<> struct EventName<Event::UserKicked> { static constexpr const char *const name = "OnUserKicked"; };
+template<> struct EventName<Event::PreBotAssign> { static constexpr const char *const name = "OnPreBotAssign"; };
+template<> struct EventName<Event::BotAssign> { static constexpr const char *const name = "OnBotAssign"; };
+template<> struct EventName<Event::BotUnAssign> { static constexpr const char *const name = "OnBotUnAssign"; };
+template<> struct EventName<Event::UserConnect> { static constexpr const char *const name = "OnUserConnect"; };
+template<> struct EventName<Event::NewServer> { static constexpr const char *const name = "OnNewServer"; };
+template<> struct EventName<Event::UserNickChange> { static constexpr const char *const name = "OnUserNickChange"; };
+template<> struct EventName<Event::PreCommand> { static constexpr const char *const name = "OnPreCommand"; };
+template<> struct EventName<Event::PostCommand> { static constexpr const char *const name = "OnPostCommand"; };
+template<> struct EventName<Event::SaveDatabase> { static constexpr const char *const name = "OnSaveDatabase"; };
+template<> struct EventName<Event::LoadDatabase> { static constexpr const char *const name = "OnLoadDatabase"; };
+template<> struct EventName<Event::Encrypt> { static constexpr const char *const name = "OnEncrypt"; };
+template<> struct EventName<Event::Decrypt> { static constexpr const char *const name = "OnDecrypt"; };
+template<> struct EventName<Event::CreateBot> { static constexpr const char *const name = "OnCreateBot"; };
+template<> struct EventName<Event::DelBot> { static constexpr const char *const name = "OnDelBot"; };
+template<> struct EventName<Event::PrePartChannel> { static constexpr const char *const name = "OnPrePartChannel"; };
+template<> struct EventName<Event::PartChannel> { static constexpr const char *const name = "OnPartChannel"; };
+template<> struct EventName<Event::LeaveChannel> { static constexpr const char *const name = "OnLeaveChannel"; };
+template<> struct EventName<Event::JoinChannel> { static constexpr const char *const name = "OnJoinChannel"; };
+template<> struct EventName<Event::TopicUpdated> { static constexpr const char *const name = "OnTopicUpdated"; };
+template<> struct EventName<Event::PreServerConnect> { static constexpr const char *const name = "OnPreServerConnect"; };
+template<> struct EventName<Event::ServerConnect> { static constexpr const char *const name = "OnServerConnect"; };
+template<> struct EventName<Event::PreUplinkSync> { static constexpr const char *const name = "OnPreUplinkSync"; };
+template<> struct EventName<Event::ServerDisconnect> { static constexpr const char *const name = "OnServerDisconnect"; };
+template<> struct EventName<Event::Restart> { static constexpr const char *const name = "OnRestart"; };
+template<> struct EventName<Event::Shutdown> { static constexpr const char *const name = "OnShutdown"; };
+template<> struct EventName<Event::AddXLine> { static constexpr const char *const name = "OnAddXLine"; };
+template<> struct EventName<Event::DelXLine> { static constexpr const char *const name = "OnDelXLine"; };
+template<> struct EventName<Event::IsServicesOperEvent> { static constexpr const char *const name = "OnIsServicesOper"; };
+template<> struct EventName<Event::ServerQuit> { static constexpr const char *const name = "OnServerQuit"; };
+template<> struct EventName<Event::UserQuit> { static constexpr const char *const name = "OnUserQuit"; };
+template<> struct EventName<Event::PreUserLogoff> { static constexpr const char *const name = "OnPreUserLogoff"; };
+template<> struct EventName<Event::PostUserLogoff> { static constexpr const char *const name = "OnPostUserLogoff"; };
+template<> struct EventName<Event::AccessDel> { static constexpr const char *const name = "OnAccessDel"; };
+template<> struct EventName<Event::AccessAdd> { static constexpr const char *const name = "OnAccessAdd"; };
+template<> struct EventName<Event::AccessClear> { static constexpr const char *const name = "OnAccessClear"; };
+template<> struct EventName<Event::ChanRegistered> { static constexpr const char *const name = "OnChanRegistered"; };
+template<> struct EventName<Event::CreateChan> { static constexpr const char *const name = "OnCreateChan"; };
+template<> struct EventName<Event::DelChan> { static constexpr const char *const name = "OnDelChan"; };
+template<> struct EventName<Event::ChannelCreate> { static constexpr const char *const name = "OnChannelCreate"; };
+template<> struct EventName<Event::ChannelDelete> { static constexpr const char *const name = "OnChannelDelete"; };
+template<> struct EventName<Event::CheckKick> { static constexpr const char *const name = "OnCheckKick"; };
+template<> struct EventName<Event::CheckPriv> { static constexpr const char *const name = "OnCheckPriv"; };
+template<> struct EventName<Event::GroupCheckPriv> { static constexpr const char *const name = "OnGroupCheckPriv"; };
+template<> struct EventName<Event::NickIdentify> { static constexpr const char *const name = "OnNickIdentify"; };
+template<> struct EventName<Event::UserLogin> { static constexpr const char *const name = "OnUserLogin"; };
+template<> struct EventName<Event::NickLogout> { static constexpr const char *const name = "OnNickLogout"; };
+template<> struct EventName<Event::DelNick> { static constexpr const char *const name = "OnDelNick"; };
+template<> struct EventName<Event::NickCoreCreate> { static constexpr const char *const name = "OnNickCoreCreate"; };
+template<> struct EventName<Event::DelCore> { static constexpr const char *const name = "OnDelCore"; };
+template<> struct EventName<Event::ChangeCoreDisplay> { static constexpr const char *const name = "OnChangeCoreDisplay"; };
+template<> struct EventName<Event::NickClearAccess> { static constexpr const char *const name = "OnNickClearAccess"; };
+template<> struct EventName<Event::NickAddAccess> { static constexpr const char *const name = "OnNickAddAccess"; };
+template<> struct EventName<Event::NickEraseAccess> { static constexpr const char *const name = "OnNickEraseAccess"; };
+template<> struct EventName<Event::CheckAuthentication> { static constexpr const char *const name = "OnCheckAuthentication"; };
+template<> struct EventName<Event::Fingerprint> { static constexpr const char *const name = "OnFingerprint"; };
+template<> struct EventName<Event::UserAway> { static constexpr const char *const name = "OnUserAway"; };
+template<> struct EventName<Event::Invite> { static constexpr const char *const name = "OnInvite"; };
+template<> struct EventName<Event::SetVhost> { static constexpr const char *const name = "OnSetVhost"; };
+template<> struct EventName<Event::SetDisplayedHost> { static constexpr const char *const name = "OnSetDisplayedHost"; };
+template<> struct EventName<Event::ChannelModeSet> { static constexpr const char *const name = "OnChannelModeSet"; };
+template<> struct EventName<Event::ChannelModeUnset> { static constexpr const char *const name = "OnChannelModeUnset"; };
+template<> struct EventName<Event::UserModeSet> { static constexpr const char *const name = "OnUserModeSet"; };
+template<> struct EventName<Event::UserModeUnset> { static constexpr const char *const name = "OnUserModeUnset"; };
+template<> struct EventName<Event::ChannelModeAdd> { static constexpr const char *const name = "OnChannelModeAdd"; };
+template<> struct EventName<Event::UserModeAdd> { static constexpr const char *const name = "OnUserModeAdd"; };
+template<> struct EventName<Event::ModuleLoad> { static constexpr const char *const name = "OnModuleLoad"; };
+template<> struct EventName<Event::ModuleUnload> { static constexpr const char *const name = "OnModuleUnload"; };
+template<> struct EventName<Event::ServerSync> { static constexpr const char *const name = "OnServerSync"; };
+template<> struct EventName<Event::UplinkSync> { static constexpr const char *const name = "OnUplinkSync"; };
+template<> struct EventName<Event::BotPrivmsg> { static constexpr const char *const name = "OnBotPrivmsg"; };
+template<> struct EventName<Event::BotNotice> { static constexpr const char *const name = "OnBotNotice"; };
+template<> struct EventName<Event::Privmsg> { static constexpr const char *const name = "OnPrivmsg"; };
+template<> struct EventName<Event::Log> { static constexpr const char *const name = "OnLog"; };
+template<> struct EventName<Event::LogMessage> { static constexpr const char *const name = "OnLogMessage"; };
+template<> struct EventName<Event::CheckModes> { static constexpr const char *const name = "OnCheckModes"; };
+template<> struct EventName<Event::ChannelSync> { static constexpr const char *const name = "OnChannelSync"; };
+template<> struct EventName<Event::SetCorrectModes> { static constexpr const char *const name = "OnSetCorrectModes"; };
+template<> struct EventName<Event::Message> { static constexpr const char *const name = "OnMessage"; };
+template<> struct EventName<Event::CanSet> { static constexpr const char *const name = "OnCanSet"; };
+template<> struct EventName<Event::CheckDelete> { static constexpr const char *const name = "OnCheckDelete"; };
+template<> struct EventName<Event::ExpireTick> { static constexpr const char *const name = "OnExpireTick"; };
+template<> struct EventName<Event::SerializeEvents> { static constexpr const char *const name = "OnSerialize"; };
 

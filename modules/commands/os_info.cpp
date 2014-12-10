@@ -241,8 +241,8 @@ class OSInfo : public Module
 
  public:
 	OSInfo(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
-		, EventHook<Event::NickInfo>("OnNickInfo")
-		, EventHook<Event::ChanInfo>("OnChanInfo")
+		, EventHook<Event::NickInfo>()
+		, EventHook<Event::ChanInfo>()
 		, commandosinfo(this)
 		, oinfotype(this)
 	{

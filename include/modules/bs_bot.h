@@ -32,3 +32,7 @@ namespace Event
 		virtual void OnBotDelete(ServiceBot *bi) anope_abstract;
 	};
 }
+
+template<> struct EventName<Event::BotCreate> { static constexpr const char *const name = "OnBotCreate"; };
+template<> struct EventName<Event::BotChange> { static constexpr const char *const name = "OnBotChange"; };
+template<> struct EventName<Event::BotDelete> { static constexpr const char *const name = "OnBotDelete"; };

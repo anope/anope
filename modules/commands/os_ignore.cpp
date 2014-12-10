@@ -374,7 +374,7 @@ class OSIgnore : public Module
 
  public:
 	OSIgnore(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
-		, EventHook<Event::BotPrivmsg>("OnBotPrivmsg")
+		, EventHook<Event::BotPrivmsg>()
 		, ignoretype(this)
 		, osignoreservice(this)
 		, commandosignore(this)

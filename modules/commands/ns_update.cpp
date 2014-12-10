@@ -58,7 +58,7 @@ class NSUpdate : public Module
  public:
 	NSUpdate(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
 		, commandnsupdate(this, onnickupdate)
-		, onnickupdate(this, "OnNickUpdate")
+		, onnickupdate(this)
 	{
 
 	}

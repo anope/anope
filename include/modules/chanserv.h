@@ -164,7 +164,7 @@ namespace ChanServ
 			 */
 			virtual void OnPreChanExpire(Channel *ci, bool &expire) anope_abstract;
 		};
-		static EventHandlersReference<PreChanExpire> OnPreChanExpire("OnPreChanExpire");
+		static EventHandlersReference<PreChanExpire> OnPreChanExpire;
 
 		struct CoreExport ChanExpire : Events
 		{
@@ -173,7 +173,7 @@ namespace ChanServ
 			 */
 			virtual void OnChanExpire(Channel *ci) anope_abstract;
 		};
-		static EventHandlersReference<ChanExpire> OnChanExpire("OnChanExpire");
+		static EventHandlersReference<ChanExpire> OnChanExpire;
 	}
 
 	/* It matters that Base is here before Extensible (it is inherited by Serializable)
@@ -734,3 +734,6 @@ namespace ChanServ
 		}
 	};
 }
+
+template<> struct EventName<ChanServ::Event::PreChanExpire> { static constexpr const char *const name = "OnPreChanExpire"; };
+template<> struct EventName<ChanServ::Event::ChanExpire> { static constexpr const char *const name = "OnChanExpire"; };

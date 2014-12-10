@@ -18,3 +18,4 @@ namespace Event
 	};
 }
 
+template<> struct EventName<Event::DefconLevel> { static constexpr const char *const name = "OnDefconLevel"; };

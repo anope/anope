@@ -84,8 +84,8 @@ class HSGroup : public Module
 
  public:
 	HSGroup(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
-		, EventHook<Event::SetVhost>("OnSetVhost")
-		, EventHook<Event::NickGroup>("OnNickGroup")
+		, EventHook<Event::SetVhost>()
+		, EventHook<Event::NickGroup>()
 		, commandhsgroup(this)
 	{
 	}

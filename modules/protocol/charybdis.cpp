@@ -324,8 +324,8 @@ class ProtoCharybdis : public Module
 
  public:
 	ProtoCharybdis(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PROTOCOL | VENDOR)
-		, EventHook<Event::ChannelSync>("OnChannelSync")
-		, EventHook<Event::MLockEvents>("MLock")
+		, EventHook<Event::ChannelSync>()
+		, EventHook<Event::MLockEvents>()
 		, ircd_proto(this)
 		, message_away(this)
 		, message_capab(this)

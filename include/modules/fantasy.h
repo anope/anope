@@ -33,3 +33,6 @@ namespace Event
 		virtual EventReturn OnBotNoFantasyAccess(CommandSource &source, Command *c, ChanServ::Channel *ci, const std::vector<Anope::string> &params) anope_abstract;
 	};
 }
+
+template<> struct EventName<Event::BotFantasy> { static constexpr const char *const name = "OnBotFantasy"; };
+template<> struct EventName<Event::BotNoFantasyAccess> { static constexpr const char *const name = "OnBotNoFantasyAccess"; };

@@ -74,3 +74,4 @@ namespace Event
 	};
 }
 
+template<> struct EventName<Event::Exception> { static constexpr const char *const name = "Exception"; };

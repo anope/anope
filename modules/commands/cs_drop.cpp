@@ -92,7 +92,7 @@ class CSDrop : public Module
  public:
 	CSDrop(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
 		, commandcsdrop(this, onchandrop)
-		, onchandrop(this, "OnChanDrop")
+		, onchandrop(this)
 	{
 
 	}

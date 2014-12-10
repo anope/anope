@@ -80,8 +80,8 @@ class DBFlatFile : public Module
 
  public:
 	DBFlatFile(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, DATABASE | VENDOR)
-		, EventHook<Event::LoadDatabase>("OnLoadDatabase")
-		, EventHook<Event::SaveDatabase>("OnSaveDatabase")
+		, EventHook<Event::LoadDatabase>()
+		, EventHook<Event::SaveDatabase>()
 		, last_day(0)
 		, loaded(false)
 	{

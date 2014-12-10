@@ -60,3 +60,5 @@ namespace Event
 		virtual void OnAkickDel(CommandSource &source, ChanServ::Channel *ci, const AutoKick *ak) anope_abstract;
 	};
 }
+
+template<> struct EventName<Event::Akick> { static constexpr const char *const name = "Akick"; };

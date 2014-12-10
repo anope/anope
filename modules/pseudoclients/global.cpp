@@ -33,10 +33,10 @@ class GlobalCore : public Module
  public:
 	GlobalCore(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PSEUDOCLIENT | VENDOR)
 		, GlobalService(this)
-		, EventHook<Event::Restart>("OnRestart")
-		, EventHook<Event::Shutdown>("OnShutdown")
-		, EventHook<Event::NewServer>("OnNewServer")
-		, EventHook<Event::Help>("OnHelp")
+		, EventHook<Event::Restart>()
+		, EventHook<Event::Shutdown>()
+		, EventHook<Event::NewServer>()
+		, EventHook<Event::Help>()
 	{
 	}
 

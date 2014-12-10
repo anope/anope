@@ -25,3 +25,5 @@ namespace Event
 		virtual void OnPostHelp(CommandSource &source, const std::vector<Anope::string> &params) anope_abstract;
 	};
 }
+
+template<> struct EventName<Event::Help> { static constexpr const char *const name = "Help"; };

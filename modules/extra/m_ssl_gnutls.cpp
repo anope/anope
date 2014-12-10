@@ -303,7 +303,7 @@ class GnuTLSModule : public Module
 	MySSLService service;
 
 	GnuTLSModule(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, EXTRA | VENDOR)
-		, EventHook<Event::PreServerConnect>("OnPreServerConnect")
+		, EventHook<Event::PreServerConnect>()
 		, cred(NULL)
 		, service(this, "ssl")
 	{

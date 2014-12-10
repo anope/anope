@@ -18,3 +18,4 @@ namespace Event
 	extern CoreExport EventHandlers<ServiceBotEvent> OnServiceBot;
 }
 
+template<> struct EventName<Event::ServiceBotEvent> { static constexpr const char *const name = "OnServiceBot"; };

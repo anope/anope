@@ -77,7 +77,7 @@ class OSNOOP : public Module
 
  public:
 	OSNOOP(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
-		, EventHook<Event::UserModeSet>("OnUserModeSet")
+		, EventHook<Event::UserModeSet>()
 		, commandosnoop(this)
 		, noop(this, "noop")
 	{

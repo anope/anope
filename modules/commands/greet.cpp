@@ -170,9 +170,9 @@ class Greet : public Module
 
  public:
 	Greet(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
-		, EventHook<Event::JoinChannel>("OnJoinChannel")
-		, EventHook<Event::NickInfo>("OnNickInfo")
-		, EventHook<Event::ServiceBotEvent>("OnServiceBotEvent")
+		, EventHook<Event::JoinChannel>()
+		, EventHook<Event::NickInfo>()
+		, EventHook<Event::ServiceBotEvent>()
 		, bs_greet(this, ChanServ::channel, "BS_GREET")
 		, ns_greet(this, NickServ::account, "greet")
 		, commandbssetgreet(this)

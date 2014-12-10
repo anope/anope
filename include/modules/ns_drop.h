@@ -19,3 +19,4 @@ namespace Event
 	extern CoreExport EventHandlers<NickDrop> OnNickDrop;
 }
 
+template<> struct EventName<Event::NickDrop> { static constexpr const char *const name = "OnNickDrop"; };

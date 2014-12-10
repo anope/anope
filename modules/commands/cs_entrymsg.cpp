@@ -254,7 +254,7 @@ class CSEntryMessage : public Module
 
  public:
 	CSEntryMessage(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
-		, EventHook<Event::JoinChannel>("OnJoinChannel")
+		, EventHook<Event::JoinChannel>()
 		, commandentrymsg(this)
 		, entrymsg_type(this)
 	{

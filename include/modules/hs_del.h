@@ -16,3 +16,5 @@ namespace Event
 		virtual void OnDeleteVhost(NickServ::Nick *na) anope_abstract;
 	};
 }
+
+template<> struct EventName<Event::DeleteVhost> { static constexpr const char *const name = "OnDeleteVhost"; };

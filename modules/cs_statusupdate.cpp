@@ -13,8 +13,8 @@ class StatusUpdate : public Module
 {
  public:
 	StatusUpdate(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
-		, EventHook<Event::AccessAdd>("OnAccessAdd")
-		, EventHook<Event::AccessDel>("OnAccessDel")
+		, EventHook<Event::AccessAdd>()
+		, EventHook<Event::AccessDel>()
 	{
 
 	}

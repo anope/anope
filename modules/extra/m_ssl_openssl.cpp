@@ -90,7 +90,7 @@ class SSLModule : public Module
 	MySSLService service;
 
 	SSLModule(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, EXTRA | VENDOR)
-		, EventHook<Event::PreServerConnect>("OnPreServerConnect")
+		, EventHook<Event::PreServerConnect>()
 		, service(this, "ssl")
 	{
 		me = this;

@@ -345,8 +345,8 @@ class CSLog : public Module
 
  public:
 	CSLog(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
-		, EventHook<Event::ChanRegistered>("OnChanRegistered")
-		, EventHook<Event::Log>("OnLog")
+		, EventHook<Event::ChanRegistered>()
+		, EventHook<Event::Log>()
 		, commandcslog(this)
 		, logtype(this)
 	{

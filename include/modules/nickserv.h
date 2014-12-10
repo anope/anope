@@ -67,7 +67,7 @@ namespace NickServ
 			 */
 			virtual void OnPreNickExpire(Nick *na, bool &expire) anope_abstract;
 		};
-		static EventHandlersReference<PreNickExpire> OnPreNickExpire("OnPreNickExpire");
+		static EventHandlersReference<PreNickExpire> OnPreNickExpire;
 
 		struct CoreExport NickExpire : Events
 		{
@@ -76,7 +76,7 @@ namespace NickServ
 			 */
 			virtual void OnNickExpire(Nick *na) anope_abstract;
 		};
-		static EventHandlersReference<NickExpire> OnNickExpire("OnNickExpire");
+		static EventHandlersReference<NickExpire> OnNickExpire;
 
 		struct CoreExport NickRegister : Events
 		{
@@ -87,7 +87,7 @@ namespace NickServ
 			 */
 			virtual void OnNickRegister(User *user, Nick *na, const Anope::string &password) anope_abstract;
 		};
-		static EventHandlersReference<NickRegister> OnNickRegister("OnNickRegister");
+		static EventHandlersReference<NickRegister> OnNickRegister;
 
 		struct CoreExport NickValidate : Events
 		{
@@ -99,7 +99,7 @@ namespace NickServ
 			 */
 			virtual EventReturn OnNickValidate(User *u, Nick *na) anope_abstract;
 		};
-		static EventHandlersReference<NickValidate> OnNickValidate("OnNickValidate");
+		static EventHandlersReference<NickValidate> OnNickValidate;
 	}
 
 	/* A registered nickname.
@@ -293,3 +293,8 @@ namespace NickServ
 	static Serialize::TypeReference<Mode> mode("NSKeepMode");
 
 }
+
+template<> struct EventName<NickServ::Event::PreNickExpire> { static constexpr const char *const name = "OnPreNickExpire"; };
+template<> struct EventName<NickServ::Event::NickExpire> { static constexpr const char *const name = "OnNickExpire"; };
+template<> struct EventName<NickServ::Event::NickRegister> { static constexpr const char *const name = "OnNickRegister"; };
+template<> struct EventName<NickServ::Event::NickValidate> { static constexpr const char *const name = "OnNickValidate"; };

@@ -18,3 +18,4 @@ namespace Event
 	};
 }
 
+template<> struct EventName<Event::NickUpdate> { static constexpr const char *const name = "OnNickUpdate"; };

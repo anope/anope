@@ -24,3 +24,5 @@ namespace Event
 		virtual void OnLevelChange(CommandSource &source, ChanServ::Channel *ci, const Anope::string &priv, int16_t what) anope_abstract;
 	};
 }
+
+template<> struct EventName<Event::LevelChange> { static constexpr const char *const name = "OnLevelChange"; };

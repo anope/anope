@@ -244,7 +244,7 @@ class CSList : public Module
 
  public:
 	CSList(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
-		, EventHook<Event::ChanInfo>("OnChanInfo")
+		, EventHook<Event::ChanInfo>()
 		, commandcslist(this)
 		, commandcssetprivate(this)
 		, priv(this, "CS_PRIVATE")

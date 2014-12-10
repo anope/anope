@@ -88,7 +88,7 @@ class CSInfo : public Module
  public:
 	CSInfo(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
 		, commandcsinfo(this, eventonchaninfo)
-		, eventonchaninfo(this, "OnChanInfo")
+		, eventonchaninfo(this)
 	{
 
 	}

@@ -20,3 +20,5 @@ namespace Event
 		virtual void OnNickInfo(CommandSource &source, NickServ::Nick *na, InfoFormatter &info, bool show_hidden) anope_abstract;
 	};
 }
+
+template<> struct EventName<Event::NickInfo> { static constexpr const char *const name = "OnNickInfo"; };

@@ -1107,13 +1107,13 @@ class NSSet : public Module
 
  public:
 	NSSet(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
-		, EventHook<Event::PreCommand>("OnPreCommand")
-		, EventHook<Event::SetCorrectModes>("OnSetCorrectModes")
-		, EventHook<NickServ::Event::PreNickExpire>("OnPreNickExpire")
-		, EventHook<Event::NickInfo>("OnNickInfo")
-		, EventHook<Event::UserModeSet>("OnUserModeSet")
-		, EventHook<Event::UserModeUnset>("OnUserModeUnset")
-		, EventHook<Event::UserLogin>("OnUserLogin")
+		, EventHook<Event::PreCommand>()
+		, EventHook<Event::SetCorrectModes>()
+		, EventHook<NickServ::Event::PreNickExpire>()
+		, EventHook<Event::NickInfo>()
+		, EventHook<Event::UserModeSet>()
+		, EventHook<Event::UserModeUnset>()
+		, EventHook<Event::UserLogin>()
 		, commandnsset(this)
 		, commandnssaset(this)
 		, commandnssetautoop(this)
@@ -1147,7 +1147,7 @@ class NSSet : public Module
 
 		, ns_set_email(this, "ns_set_email")
 
-		, onsetnickoption(this, "OnSetNickOption")
+		, onsetnickoption(this)
 	{
 
 	}

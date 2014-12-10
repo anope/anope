@@ -891,10 +891,10 @@ class CSAccess : public Module
 
  public:
 	CSAccess(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
-		, EventHook<Event::GroupCheckPriv>("OnGroupCheckPriv")
+		, EventHook<Event::GroupCheckPriv>()
 		, commandcsaccess(this)
 		, commandcslevels(this, onlevelchange)
-		, onlevelchange(this, "OnLevelChange")
+		, onlevelchange(this)
 		, accesschanaccesstype(this)
 	{
 		this->SetPermanent(true);

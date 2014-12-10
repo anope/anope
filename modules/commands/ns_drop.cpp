@@ -82,7 +82,7 @@ class NSDrop : public Module
  public:
 	NSDrop(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
 		, commandnsdrop(this, onnickdrop)
-		, onnickdrop(this, "OnNickDrop")
+		, onnickdrop(this)
 	{
 
 	}

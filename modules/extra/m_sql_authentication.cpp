@@ -78,8 +78,8 @@ class ModuleSQLAuthentication : public Module
 
  public:
 	ModuleSQLAuthentication(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, EXTRA | VENDOR)
-		, EventHook<Event::PreCommand>("OnPreCommand")
-		, EventHook<Event::CheckAuthentication>("OnCheckAuthentication")
+		, EventHook<Event::PreCommand>()
+		, EventHook<Event::CheckAuthentication>()
 	{
 		me = this;
 

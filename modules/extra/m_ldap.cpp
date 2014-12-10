@@ -451,7 +451,7 @@ class ModuleLDAP : public Module, public Pipe
  public:
 
 	ModuleLDAP(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, EXTRA | VENDOR)
-		, EventHook<Event::ModuleUnload>("OnModuleUnload")
+		, EventHook<Event::ModuleUnload>()
 	{
 		me = this;
 

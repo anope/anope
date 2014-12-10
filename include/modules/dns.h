@@ -188,9 +188,10 @@ namespace Event
 		 */
 		virtual void OnDnsRequest(DNS::Query &req, DNS::Query *reply) anope_abstract;
 	};
-	static EventHandlersReference<DnsRequest> OnDnsRequest("OnDnsRequest");
+	static EventHandlersReference<DnsRequest> OnDnsRequest;
 }
 
+template<> struct EventName<Event::DnsRequest> { static constexpr const char *const name = "OnDnsRequest"; };
 
 #endif // DNS_H
 

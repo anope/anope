@@ -25,11 +25,11 @@ class HostServCore : public Module
 
  public:
 	HostServCore(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PSEUDOCLIENT | VENDOR)
-		, EventHook<Event::UserLogin>("OnUserLogin")
-		, EventHook<Event::NickUpdate>("OnNickUpdate")
-		, EventHook<Event::Help>("OnHelp")
-		, EventHook<Event::SetVhost>("OnSetVhost")
-		, EventHook<Event::DeleteVhost>("OnDeleteVhost")
+		, EventHook<Event::UserLogin>()
+		, EventHook<Event::NickUpdate>()
+		, EventHook<Event::Help>()
+		, EventHook<Event::SetVhost>()
+		, EventHook<Event::DeleteVhost>()
 	{
 		if (!IRCD || !IRCD->CanSetVHost)
 			throw ModuleException("Your IRCd does not support vhosts");

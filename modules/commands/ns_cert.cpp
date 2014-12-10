@@ -313,11 +313,11 @@ class NSCert : public Module
 
  public:
 	NSCert(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
-		, EventHook<Event::Fingerprint>("OnFingerprint")
-		, EventHook<NickServ::Event::NickValidate>("OnNickValidate")
+		, EventHook<Event::Fingerprint>()
+		, EventHook<NickServ::Event::NickValidate>()
 		, commandnscert(this)
 		, cs(this)
-		, onnickservevents(this, "OnNickCert")
+		, onnickservevents(this)
 	{
 		if (!IRCD || !IRCD->CanCertFP)
 			throw ModuleException("Your IRCd does not support ssl client certificates");

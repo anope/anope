@@ -270,7 +270,7 @@ class NSList : public Module
 
  public:
 	NSList(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
-		, EventHook<Event::NickInfo>("OnNickInfo")
+		, EventHook<Event::NickInfo>()
 		, commandnslist(this)
 		, commandnssetprivate(this)
 		, commandnssasetprivate(this)

@@ -61,7 +61,7 @@ namespace MemoServ
 			 */
 			virtual void OnMemoSend(const Anope::string &source, const Anope::string &target, MemoInfo *mi, Memo *m) anope_abstract;
 		};
-		static EventHandlersReference<MemoSend> OnMemoSend("OnMemoSend");
+		static EventHandlersReference<MemoSend> OnMemoSend;
 
 		struct CoreExport MemoDel : Events
 		{
@@ -72,14 +72,14 @@ namespace MemoServ
 			 */
 			virtual void OnMemoDel(const Anope::string &target, MemoInfo *mi, const Memo *m) anope_abstract;
 		};
-		static EventHandlersReference<MemoDel> OnMemoDel("OnMemoDel");
+		static EventHandlersReference<MemoDel> OnMemoDel;
 	}
 
 	class Memo : public Serialize::Object
 	{
 	 protected:
 		using Serialize::Object::Object;
-//		Memo() : Serialize::Object("Memo") { }
+
 	 public:
 		virtual MemoInfo *GetMemoInfo() anope_abstract;
 		virtual void SetMemoInfo(MemoInfo *) anope_abstract;
@@ -109,8 +109,7 @@ namespace MemoServ
 	{
 	 protected:
 		using Serialize::Object::Object;
-		//using MemoInfo::MemoInfo;
-		//MemoInfo() : Serialize::Object("MemoInfo") { }
+
 	 public:
 
 		virtual Memo *GetMemo(unsigned index) anope_abstract;
@@ -148,3 +147,6 @@ namespace MemoServ
 
 	static Serialize::TypeReference<Ignore> ignore("MemoIgnore");
 }
+
+template<> struct EventName<MemoServ::Event::MemoSend> { static constexpr const char *const name = "OnMemoSend"; };
+template<> struct EventName<MemoServ::Event::MemoDel> { static constexpr const char *const name = "OnMemoDel"; };

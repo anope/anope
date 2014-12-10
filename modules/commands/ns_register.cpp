@@ -350,8 +350,8 @@ class NSRegister : public Module
 
  public:
 	NSRegister(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
-		, EventHook<Event::NickIdentify>("OnNickIdentify")
-		, EventHook<NickServ::Event::PreNickExpire>("OnPreNickExpire")
+		, EventHook<Event::NickIdentify>()
+		, EventHook<NickServ::Event::PreNickExpire>()
 		, commandnsregister(this)
 		, commandnsconfirm(this)
 		, commandnsrsend(this)

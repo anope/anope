@@ -12,7 +12,7 @@ class HelpChannel : public Module
 {
  public:
 	HelpChannel(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
-		, EventHook<Event::ChannelModeSet>("OnChannelModeSet")
+		, EventHook<Event::ChannelModeSet>()
 	{
 	}
 

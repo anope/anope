@@ -95,12 +95,12 @@ class Fantasy : public Module
 
  public:
 	Fantasy(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
-		, EventHook<Event::Privmsg>("OnPrivmsg")
-		, EventHook<Event::ServiceBotEvent>("OnServiceBotEvent")
+		, EventHook<Event::Privmsg>()
+		, EventHook<Event::ServiceBotEvent>()
 		, fantasy(this, ChanServ::channel, "BS_FANTASY")
 		, commandbssetfantasy(this)
-		, OnBotFantasy(this, "OnBotFantasy")
-		, OnBotNoFantasyAccess(this, "OnBotNoFantasyAccess")
+		, OnBotFantasy(this)
+		, OnBotNoFantasyAccess(this)
 	{
 	}
 

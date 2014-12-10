@@ -186,7 +186,7 @@ class NSSetMisc : public Module
 
  public:
 	NSSetMisc(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
-		, EventHook<Event::NickInfo>("OnNickInfo")
+		, EventHook<Event::NickInfo>()
 		, commandnssetmisc(this)
 		, commandnssasetmisc(this)
 		, type(this)

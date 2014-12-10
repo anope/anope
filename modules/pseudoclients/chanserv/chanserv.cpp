@@ -258,7 +258,7 @@ class ChanServCore : public Module
 
 	void OnReload(Configuration::Conf *conf) override
 	{
-		const Anope::string &channick = conf->GetModule(this)->Get<const Anope::string>("client");
+		const Anope::string &channick = conf->GetModule(this)->Get<Anope::string>("client");
 
 		if (channick.empty())
 			throw ConfigException(Module::name + ": <client> must be defined");
@@ -274,8 +274,8 @@ class ChanServCore : public Module
 		{
 			Configuration::Block *privilege = conf->GetBlock("privilege", i);
 
-			const Anope::string &nname = privilege->Get<const Anope::string>("name"),
-						&desc = privilege->Get<const Anope::string>("desc");
+			const Anope::string &nname = privilege->Get<Anope::string>("name"),
+						&desc = privilege->Get<Anope::string>("desc");
 			int rank = privilege->Get<int>("rank");
 			Anope::string value = privilege->Get<Anope::string>("level");
 			int level;
@@ -289,7 +289,7 @@ class ChanServCore : public Module
 			AddPrivilege(ChanServ::Privilege(nname, desc, rank, level));
 		}
 
-		spacesepstream(conf->GetModule(this)->Get<const Anope::string>("defaults", "greet fantasy")).GetTokens(defaults);
+		spacesepstream(conf->GetModule(this)->Get<Anope::string>("defaults", "greet fantasy")).GetTokens(defaults);
 		if (defaults.empty())
 		{
 			defaults.push_back("KEEPTOPIC");
@@ -419,7 +419,7 @@ class ChanServCore : public Module
 		{
 			ci->c->RemoveMode(ci->WhoSends(), "REGISTERED", "", false);
 
-			const Anope::string &require = Config->GetModule(this)->Get<const Anope::string>("require");
+			const Anope::string &require = Config->GetModule(this)->Get<Anope::string>("require");
 			if (!require.empty())
 				ci->c->SetModes(ci->WhoSends(), false, "-%s", require.c_str());
 		}
@@ -467,7 +467,7 @@ class ChanServCore : public Module
 		else
 			c->RemoveMode(c->ci->WhoSends(), "REGISTERED", "", false);
 
-		const Anope::string &require = Config->GetModule(this)->Get<const Anope::string>("require");
+		const Anope::string &require = Config->GetModule(this)->Get<Anope::string>("require");
 		if (!require.empty())
 		{
 			if (c->ci)
@@ -486,8 +486,8 @@ class ChanServCore : public Module
 
 	EventReturn OnCanSet(User *u, const ChannelMode *cm) override
 	{
-		if (Config->GetModule(this)->Get<const Anope::string>("nomlock").find(cm->mchar) != Anope::string::npos
-			|| Config->GetModule(this)->Get<const Anope::string>("require").find(cm->mchar) != Anope::string::npos)
+		if (Config->GetModule(this)->Get<Anope::string>("nomlock").find(cm->mchar) != Anope::string::npos
+			|| Config->GetModule(this)->Get<Anope::string>("require").find(cm->mchar) != Anope::string::npos)
 			return EVENT_STOP;
 		return EVENT_CONTINUE;
 	}
@@ -579,7 +579,7 @@ class ChanServCore : public Module
 						ci->WhoSends()->Assign(NULL, ci);
 					if (ci->c->FindUser(ci->GetBot()) == NULL)
 					{
-						ChannelStatus status(Config->GetModule("botserv")->Get<const Anope::string>("botmodes"));
+						ChannelStatus status(Config->GetModule("botserv")->Get<Anope::string>("botmodes"));
 						ci->GetBot()->Join(ci->c, &status);
 					}
 				}

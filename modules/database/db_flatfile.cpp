@@ -31,7 +31,7 @@ class DBFlatFile : public Module
 			const std::map<Anope::string, Serialize::TypeBase *> &types = Serialize::TypeBase::GetTypes();
 
 			std::set<Anope::string> dbs;
-			dbs.insert(Config->GetModule(this)->Get<const Anope::string>("database", "anope.db"));
+			dbs.insert(Config->GetModule(this)->Get<Anope::string>("database", "anope.db"));
 
 			for (const std::pair<Anope::string, Serialize::TypeBase *> &p : types)
 			{

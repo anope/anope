@@ -125,7 +125,7 @@ class CommandNSGroup : public Command
 			}
 
 		NickServ::Nick *target, *na = NickServ::FindNick(u->nick);
-		const Anope::string &guestnick = Config->GetModule("nickserv")->Get<const Anope::string>("guestnickprefix", "Guest");
+		const Anope::string &guestnick = Config->GetModule("nickserv")->Get<Anope::string>("guestnickprefix", "Guest");
 		time_t reg_delay = Config->GetModule("nickserv")->Get<time_t>("regdelay");
 		unsigned maxaliases = Config->GetModule(this->owner)->Get<unsigned>("maxaliases");
 		if (!(target = NickServ::FindNick(nick)))

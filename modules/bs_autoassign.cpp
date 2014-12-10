@@ -20,7 +20,7 @@ class BSAutoAssign : public Module
 
 	void OnChanRegistered(ChanServ::Channel *ci) override
 	{
-		const Anope::string &bot = Config->GetModule(this)->Get<const Anope::string>("bot");
+		const Anope::string &bot = Config->GetModule(this)->Get<Anope::string>("bot");
 		if (bot.empty())
 			return;
 

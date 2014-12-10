@@ -206,14 +206,14 @@ static void InitSignals()
 
 static void remove_pidfile()
 {
-	remove(Config->GetBlock("serverinfo")->Get<const Anope::string>("pid").c_str());
+	remove(Config->GetBlock("serverinfo")->Get<Anope::string>("pid").c_str());
 }
 
 /* Create our PID file and write the PID to it. */
 
 static void write_pidfile()
 {
-	FILE *pidfile = fopen(Config->GetBlock("serverinfo")->Get<const Anope::string>("pid").c_str(), "w");
+	FILE *pidfile = fopen(Config->GetBlock("serverinfo")->Get<Anope::string>("pid").c_str(), "w");
 	if (pidfile)
 	{
 #ifdef _WIN32
@@ -225,7 +225,7 @@ static void write_pidfile()
 		atexit(remove_pidfile);
 	}
 	else
-		throw CoreException("Can not write to PID file " + Config->GetBlock("serverinfo")->Get<const Anope::string>("pid"));
+		throw CoreException("Can not write to PID file " + Config->GetBlock("serverinfo")->Get<Anope::string>("pid"));
 }
 
 static void setuidgid()
@@ -235,21 +235,21 @@ static void setuidgid()
 	uid_t uid = -1;
 	gid_t gid = -1;
 
-	if (!options->Get<const Anope::string>("user").empty())
+	if (!options->Get<Anope::string>("user").empty())
 	{
 		errno = 0;
-		struct passwd *u = getpwnam(options->Get<const Anope::string>("user").c_str());
+		struct passwd *u = getpwnam(options->Get<Anope::string>("user").c_str());
 		if (u == NULL)
-			Log() << "Unable to setuid to " << options->Get<const Anope::string>("user") << ": " << Anope::LastError();
+			Log() << "Unable to setuid to " << options->Get<Anope::string>("user") << ": " << Anope::LastError();
 		else
 			uid = u->pw_uid;
 	}
-	if (!options->Get<const Anope::string>("group").empty())
+	if (!options->Get<Anope::string>("group").empty())
 	{
 		errno = 0;
-		struct group *g = getgrnam(options->Get<const Anope::string>("group").c_str());
+		struct group *g = getgrnam(options->Get<Anope::string>("group").c_str());
 		if (g == NULL)
-			Log() << "Unable to setgid to " << options->Get<const Anope::string>("group") << ": " << Anope::LastError();
+			Log() << "Unable to setgid to " << options->Get<Anope::string>("group") << ": " << Anope::LastError();
 		else
 			gid = g->gr_gid;
 	}
@@ -269,16 +269,16 @@ static void setuidgid()
 	if (static_cast<int>(gid) != -1)
 	{
 		if (setgid(gid) == -1)
-			Log() << "Unable to setgid to " << options->Get<const Anope::string>("group") << ": " << Anope::LastError();
+			Log() << "Unable to setgid to " << options->Get<Anope::string>("group") << ": " << Anope::LastError();
 		else
-			Log() << "Successfully set group to " << options->Get<const Anope::string>("group");
+			Log() << "Successfully set group to " << options->Get<Anope::string>("group");
 	}
 	if (static_cast<int>(uid) != -1)
 	{
 		if (setuid(uid) == -1)
-			Log() << "Unable to setuid to " << options->Get<const Anope::string>("user") << ": " << Anope::LastError();
+			Log() << "Unable to setuid to " << options->Get<Anope::string>("user") << ": " << Anope::LastError();
 		else
-			Log() << "Successfully set user to " << options->Get<const Anope::string>("user");
+			Log() << "Successfully set user to " << options->Get<Anope::string>("user");
 	}
 #endif
 }
@@ -495,7 +495,7 @@ void Anope::Init(int ac, char **av)
 
 	/* Create me */
 	Configuration::Block *block = Config->GetBlock("serverinfo");
-	Me = new Server(NULL, block->Get<const Anope::string>("name"), 0, block->Get<const Anope::string>("description"), block->Get<const Anope::string>("id"));
+	Me = new Server(NULL, block->Get<Anope::string>("name"), 0, block->Get<Anope::string>("description"), block->Get<Anope::string>("id"));
 	for (std::pair<Anope::string, User *> p : UserListByNick)
 	{
 		User *u = p.second;
@@ -522,7 +522,7 @@ void Anope::Init(int ac, char **av)
 	/* load modules */
 	Log() << "Loading modules...";
 	for (int i = 0; i < Config->CountBlock("module"); ++i)
-		ModuleManager::LoadModule(Config->GetBlock("module", i)->Get<const Anope::string>("name"), NULL);
+		ModuleManager::LoadModule(Config->GetBlock("module", i)->Get<Anope::string>("name"), NULL);
 
 	setuidgid();
 

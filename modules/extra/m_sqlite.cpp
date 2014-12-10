@@ -115,7 +115,7 @@ class ModuleSQLite : public Module
 			++it;
 
 			for (i = 0, num = config->CountBlock("sqlite"); i < num; ++i)
-				if (config->GetBlock("sqlite", i)->Get<const Anope::string>("name", "sqlite/main") == cname)
+				if (config->GetBlock("sqlite", i)->Get<Anope::string>("name", "sqlite/main") == cname)
 					break;
 
 			if (i == num)
@@ -130,11 +130,11 @@ class ModuleSQLite : public Module
 		for (int i = 0; i < config->CountBlock("sqlite"); ++i)
 		{
 			Configuration::Block *block = config->GetBlock("sqlite", i);
-			Anope::string connname = block->Get<const Anope::string>("name", "sqlite/main");
+			Anope::string connname = block->Get<Anope::string>("name", "sqlite/main");
 
 			if (this->SQLiteServices.find(connname) == this->SQLiteServices.end())
 			{
-				Anope::string database = Anope::DataDir + "/" + block->Get<const Anope::string>("database", "anope");
+				Anope::string database = Anope::DataDir + "/" + block->Get<Anope::string>("database", "anope");
 
 				try
 				{

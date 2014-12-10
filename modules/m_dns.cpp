@@ -1038,12 +1038,12 @@ class ModuleDNS : public Module
 	{
 		Configuration::Block *block = conf->GetModule(this);
 
-		nameserver = block->Get<const Anope::string>("nameserver", "127.0.0.1");
+		nameserver = block->Get<Anope::string>("nameserver", "127.0.0.1");
 		timeout =  block->Get<time_t>("timeout", "5");
-		ip = block->Get<const Anope::string>("ip", "0.0.0.0");
+		ip = block->Get<Anope::string>("ip", "0.0.0.0");
 		port = block->Get<int>("port", "53");
-		admin = block->Get<const Anope::string>("admin", "admin@example.com");
-		nameservers = block->Get<const Anope::string>("nameservers", "ns1.example.com");
+		admin = block->Get<Anope::string>("admin", "admin@example.com");
+		nameservers = block->Get<Anope::string>("nameservers", "ns1.example.com");
 		refresh = block->Get<int>("refresh", "3600");
 
 		for (int i = 0; i < block->CountBlock("notify"); ++i)

@@ -73,10 +73,10 @@ class ModuleWebCPanel : public Module
 		me = this;
 
 		Configuration::Block *block = Config->GetModule(this);
-		provider_name = block->Get<const Anope::string>("server", "httpd/main");
-		template_name = block->Get<const Anope::string>("template", "default");
+		provider_name = block->Get<Anope::string>("server", "httpd/main");
+		template_name = block->Get<Anope::string>("template", "default");
 		template_base = Anope::DataDir + "/modules/webcpanel/templates/" + template_name;
-		page_title = block->Get<const Anope::string>("title", "Anope IRC Services");
+		page_title = block->Get<Anope::string>("title", "Anope IRC Services");
 
 		provider = ServiceReference<HTTPProvider>("HTTPProvider", provider_name);
 		if (!provider)

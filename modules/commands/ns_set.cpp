@@ -400,15 +400,15 @@ class CommandNSSetEmail : public Command
 
 		u->Account()->Extend<std::pair<Anope::string, Anope::string> >("ns_set_email", std::make_pair(new_email, code));
 
-		Anope::string subject = Config->GetBlock("mail")->Get<const Anope::string>("emailchange_subject"),
-			message = Config->GetBlock("mail")->Get<const Anope::string>("emailchange_message");
+		Anope::string subject = Config->GetBlock("mail")->Get<Anope::string>("emailchange_subject"),
+			message = Config->GetBlock("mail")->Get<Anope::string>("emailchange_message");
 
 		subject = subject.replace_all_cs("%e", u->Account()->GetEmail());
-		subject = subject.replace_all_cs("%N", Config->GetBlock("networkinfo")->Get<const Anope::string>("networkname"));
+		subject = subject.replace_all_cs("%N", Config->GetBlock("networkinfo")->Get<Anope::string>("networkname"));
 		subject = subject.replace_all_cs("%c", code);
 
 		message = message.replace_all_cs("%e", u->Account()->GetEmail());
-		message = message.replace_all_cs("%N", Config->GetBlock("networkinfo")->Get<const Anope::string>("networkname"));
+		message = message.replace_all_cs("%N", Config->GetBlock("networkinfo")->Get<Anope::string>("networkname"));
 		message = message.replace_all_cs("%c", code);
 
 		Anope::string old = u->Account()->GetEmail();

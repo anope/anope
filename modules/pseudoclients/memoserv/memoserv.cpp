@@ -41,20 +41,20 @@ class MemoServCore : public Module, public MemoServ::MemoServService
 
 	bool SendMemoMail(NickServ::Account *nc, MemoServ::MemoInfo *mi, MemoServ::Memo *m)
 	{
-		Anope::string subject = Language::Translate(nc, Config->GetBlock("mail")->Get<const Anope::string>("memo_subject").c_str()),
-			message = Language::Translate(Config->GetBlock("mail")->Get<const Anope::string>("memo_message").c_str());
+		Anope::string subject = Language::Translate(nc, Config->GetBlock("mail")->Get<Anope::string>("memo_subject").c_str()),
+			message = Language::Translate(Config->GetBlock("mail")->Get<Anope::string>("memo_message").c_str());
 
 		subject = subject.replace_all_cs("%n", nc->GetDisplay());
 		subject = subject.replace_all_cs("%s", m->GetSender());
 		subject = subject.replace_all_cs("%d", stringify(mi->GetIndex(m) + 1));
 		subject = subject.replace_all_cs("%t", m->GetText());
-		subject = subject.replace_all_cs("%N", Config->GetBlock("networkinfo")->Get<const Anope::string>("networkname"));
+		subject = subject.replace_all_cs("%N", Config->GetBlock("networkinfo")->Get<Anope::string>("networkname"));
 
 		message = message.replace_all_cs("%n", nc->GetDisplay());
 		message = message.replace_all_cs("%s", m->GetSender());
 		message = message.replace_all_cs("%d", stringify(mi->GetIndex(m) + 1));
 		message = message.replace_all_cs("%t", m->GetText());
-		message = message.replace_all_cs("%N", Config->GetBlock("networkinfo")->Get<const Anope::string>("networkname"));
+		message = message.replace_all_cs("%N", Config->GetBlock("networkinfo")->Get<Anope::string>("networkname"));
 
 		return Mail::Send(nc, subject, message);
 	}
@@ -220,7 +220,7 @@ class MemoServCore : public Module, public MemoServ::MemoServService
 
 	void OnReload(Configuration::Conf *conf) override
 	{
-		const Anope::string &msnick = conf->GetModule(this)->Get<const Anope::string>("client");
+		const Anope::string &msnick = conf->GetModule(this)->Get<Anope::string>("client");
 
 		if (msnick.empty())
 			throw ConfigException(Module::name + ": <client> must be defined");

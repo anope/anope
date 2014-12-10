@@ -375,9 +375,9 @@ class OSNews : public Module
 
 		ServiceBot *bi = NULL;
 		if (Type == NEWS_OPER)
-			bi = ServiceBot::Find(Config->GetModule(this)->Get<const Anope::string>("oper_announcer", "OperServ"), true);
+			bi = ServiceBot::Find(Config->GetModule(this)->Get<Anope::string>("oper_announcer", "OperServ"), true);
 		else
-			bi = ServiceBot::Find(Config->GetModule(this)->Get<const Anope::string>("announcer", "Global"), true);
+			bi = ServiceBot::Find(Config->GetModule(this)->Get<Anope::string>("announcer", "Global"), true);
 		if (bi == NULL)
 			return;
 
@@ -437,8 +437,8 @@ class OSNews : public Module
 
 	void OnReload(Configuration::Conf *conf) override
 	{
-		oper_announcer = conf->GetModule(this)->Get<const Anope::string>("oper_announcer", "OperServ");
-		announcer = conf->GetModule(this)->Get<const Anope::string>("announcer", "Global");
+		oper_announcer = conf->GetModule(this)->Get<Anope::string>("oper_announcer", "OperServ");
+		announcer = conf->GetModule(this)->Get<Anope::string>("announcer", "Global");
 		news_count = conf->GetModule(this)->Get<unsigned>("newscount", "3");
 	}
 

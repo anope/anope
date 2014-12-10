@@ -60,7 +60,7 @@ class DNSBLResolver : public Request
 		reason = reason.replace_all_cs("%h", user->host);
 		reason = reason.replace_all_cs("%i", addr);
 		reason = reason.replace_all_cs("%r", record_reason);
-		reason = reason.replace_all_cs("%N", Config->GetBlock("networkinfo")->Get<const Anope::string>("networkname"));
+		reason = reason.replace_all_cs("%N", Config->GetBlock("networkinfo")->Get<Anope::string>("networkname"));
 
 		ServiceBot *OperServ = Config->GetClient("OperServ");
 		Log(creator, "dnsbl", OperServ) << user->GetMask() << " (" << addr << ") appears in " << this->blacklist.name;
@@ -113,15 +113,15 @@ class ModuleDNSBL : public Module
 		{
 			Configuration::Block *bl = block->GetBlock("blacklist", i);
 
-			Anope::string bname = bl->Get<const Anope::string>("name");
+			Anope::string bname = bl->Get<Anope::string>("name");
 			if (bname.empty())
 				continue;
 			time_t bantime = bl->Get<time_t>("time", "4h");
-			Anope::string reason = bl->Get<const Anope::string>("reason");
+			Anope::string reason = bl->Get<Anope::string>("reason");
 			std::map<int, Anope::string> replies;
 			for (int j = 0; j < 256; ++j)
 			{
-				Anope::string k = bl->Get<const Anope::string>(stringify(j));
+				Anope::string k = bl->Get<Anope::string>(stringify(j));
 				if (!k.empty())
 					replies[j] = k;
 			}

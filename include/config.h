@@ -46,7 +46,7 @@ namespace Configuration
 		 */
 		template<typename T> T Get(const Anope::string &tag, const Anope::string &def) const
 		{
-			const Anope::string &value = this->Get<const Anope::string>(tag, def);
+			const Anope::string &value = this->Get<Anope::string>(tag, def);
 			if (!value.empty())
 				try
 				{

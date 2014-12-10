@@ -252,7 +252,7 @@ class OperServCore : public Module
 
 	void OnReload(Configuration::Conf *conf) override
 	{
-		const Anope::string &osnick = conf->GetModule(this)->Get<const Anope::string>("client");
+		const Anope::string &osnick = conf->GetModule(this)->Get<Anope::string>("client");
 
 		if (osnick.empty())
 			throw ConfigException(this->name + ": <client> must be defined");

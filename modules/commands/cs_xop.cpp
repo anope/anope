@@ -618,13 +618,13 @@ class CSXOP : public Module
 		for (int i = 0; i < conf->CountBlock("privilege"); ++i)
 		{
 			Configuration::Block *block = conf->GetBlock("privilege", i);
-			const Anope::string &pname = block->Get<const Anope::string>("name");
+			const Anope::string &pname = block->Get<Anope::string>("name");
 
 			ChanServ::Privilege *p = ChanServ::service ? ChanServ::service->FindPrivilege(pname) : nullptr;
 			if (p == NULL)
 				continue;
 
-			const Anope::string &xop = block->Get<const Anope::string>("xop");
+			const Anope::string &xop = block->Get<Anope::string>("xop");
 			if (pname.empty() || xop.empty())
 				continue;
 
@@ -634,8 +634,8 @@ class CSXOP : public Module
 		for (int i = 0; i < conf->CountBlock("command"); ++i)
 		{
 			Configuration::Block *block = conf->GetBlock("command", i);
-			const Anope::string &cname = block->Get<const Anope::string>("name"),
-				&cserv = block->Get<const Anope::string>("command");
+			const Anope::string &cname = block->Get<Anope::string>("name"),
+				&cserv = block->Get<Anope::string>("command");
 			if (cname.empty() || cserv != "chanserv/xop")
 				continue;
 

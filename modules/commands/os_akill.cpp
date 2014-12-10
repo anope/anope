@@ -374,7 +374,7 @@ class CommandOSAKill : public Command
 			               " The default auto kill expiry time is \002{1}\002"),
 			               source.command, Anope::Duration(Config->GetModule("operserv")->Get<time_t>("autokillexpiry", "30d"), source.GetAccount()));
 
-			const Anope::string &regexengine = Config->GetBlock("options")->Get<const Anope::string>("regexengine");
+			const Anope::string &regexengine = Config->GetBlock("options")->Get<Anope::string>("regexengine");
 			if (!regexengine.empty())
 			{
 				source.Reply(" ");

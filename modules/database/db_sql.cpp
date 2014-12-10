@@ -63,8 +63,8 @@ class DBMySQL : public Module, public Pipe
 	void OnReload(Configuration::Conf *conf) override
 	{
 		Configuration::Block *block = conf->GetModule(this);
-		this->SQL = ServiceReference<Provider>("SQL::Provider", block->Get<const Anope::string>("engine"));
-		this->prefix = block->Get<const Anope::string>("prefix", "anope_db_");
+		this->SQL = ServiceReference<Provider>("SQL::Provider", block->Get<Anope::string>("engine"));
+		this->prefix = block->Get<Anope::string>("prefix", "anope_db_");
 		inited = false;
 	}
 

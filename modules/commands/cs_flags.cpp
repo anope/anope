@@ -489,13 +489,13 @@ class CSFlags : public Module
 		{
 			Configuration::Block *priv = conf->GetBlock("privilege", i);
 
-			const Anope::string &pname = priv->Get<const Anope::string>("name");
+			const Anope::string &pname = priv->Get<Anope::string>("name");
 
 			ChanServ::Privilege *p = ChanServ::service ? ChanServ::service->FindPrivilege(pname) : nullptr;
 			if (p == NULL)
 				continue;
 
-			const Anope::string &value = priv->Get<const Anope::string>("flag");
+			const Anope::string &value = priv->Get<Anope::string>("flag");
 			if (value.empty())
 				continue;
 

@@ -158,10 +158,10 @@ class CommandCSList : public Command
 		               "         {0} #51-100\n"
 		               "         Lists all registered channels within the given range (51-100)."));
 
-		if (!Config->GetBlock("options")->Get<const Anope::string>("regexengine").empty())
+		if (!Config->GetBlock("options")->Get<Anope::string>("regexengine").empty())
 		{
 			source.Reply(" ");
-			source.Reply(_("Regex matches are also supported using the {0} engine. Enclose your pattern in // if this is desired."), Config->GetBlock("options")->Get<const Anope::string>("regexengine"));
+			source.Reply(_("Regex matches are also supported using the {0} engine. Enclose your pattern in // if this is desired."), Config->GetBlock("options")->Get<Anope::string>("regexengine"));
 		}
 
 		return true;

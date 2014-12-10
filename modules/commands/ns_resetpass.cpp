@@ -122,16 +122,16 @@ class NSResetPass : public Module
 
 static bool SendResetEmail(User *u, NickServ::Nick *na, ServiceBot *bi)
 {
-	Anope::string subject = Language::Translate(na->GetAccount(), Config->GetBlock("mail")->Get<const Anope::string>("reset_subject").c_str()),
-		message = Language::Translate(na->GetAccount(), Config->GetBlock("mail")->Get<const Anope::string>("reset_message").c_str()),
+	Anope::string subject = Language::Translate(na->GetAccount(), Config->GetBlock("mail")->Get<Anope::string>("reset_subject").c_str()),
+		message = Language::Translate(na->GetAccount(), Config->GetBlock("mail")->Get<Anope::string>("reset_message").c_str()),
 		passcode = Anope::Random(20);
 
 	subject = subject.replace_all_cs("%n", na->GetNick());
-	subject = subject.replace_all_cs("%N", Config->GetBlock("networkinfo")->Get<const Anope::string>("networkname"));
+	subject = subject.replace_all_cs("%N", Config->GetBlock("networkinfo")->Get<Anope::string>("networkname"));
 	subject = subject.replace_all_cs("%c", passcode);
 
 	message = message.replace_all_cs("%n", na->GetNick());
-	message = message.replace_all_cs("%N", Config->GetBlock("networkinfo")->Get<const Anope::string>("networkname"));
+	message = message.replace_all_cs("%N", Config->GetBlock("networkinfo")->Get<Anope::string>("networkname"));
 	message = message.replace_all_cs("%c", passcode);
 
 	na->GetAccount()->Extend<ResetInfo>("reset", ResetInfo{passcode, Anope::CurTime});

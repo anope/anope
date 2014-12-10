@@ -75,8 +75,8 @@ class NickServRelease : public User, public Timer
 	Anope::string nick;
 
  public:
-	NickServRelease(Module *me, NickServ::Nick *na, time_t delay) : User(na->GetNick(), Config->GetModule("nickserv")->Get<const Anope::string>("enforceruser", "user"),
-		Config->GetModule("nickserv")->Get<const Anope::string>("enforcerhost", "services.localhost.net"), "", "", Me, "Services Enforcer", Anope::CurTime, "", IRCD->UID_Retrieve(), NULL), Timer(me, delay), nick(na->GetNick())
+	NickServRelease(Module *me, NickServ::Nick *na, time_t delay) : User(na->GetNick(), Config->GetModule("nickserv")->Get<Anope::string>("enforceruser", "user"),
+		Config->GetModule("nickserv")->Get<Anope::string>("enforcerhost", "services.localhost.net"), "", "", Me, "Services Enforcer", Anope::CurTime, "", IRCD->UID_Retrieve(), NULL), Timer(me, delay), nick(na->GetNick())
 	{
 		/* Erase the current release timer and use the new one */
 		Anope::map<NickServRelease *>::iterator nit = NickServReleases.find(this->nick);
@@ -282,7 +282,7 @@ class NickServCore : public Module, public NickServ::NickServService
 		if (IRCD->CanSVSNick)
 		{
 			unsigned nicklen = Config->GetBlock("networkinfo")->Get<unsigned>("nicklen");
-			const Anope::string &guestprefix = Config->GetModule("nickserv")->Get<const Anope::string>("guestnickprefix", "Guest");
+			const Anope::string &guestprefix = Config->GetModule("nickserv")->Get<Anope::string>("guestnickprefix", "Guest");
 
 			Anope::string guestnick;
 
@@ -369,7 +369,7 @@ class NickServCore : public Module, public NickServ::NickServService
 
 	void OnReload(Configuration::Conf *conf) override
 	{
-		const Anope::string &nsnick = conf->GetModule(this)->Get<const Anope::string>("client");
+		const Anope::string &nsnick = conf->GetModule(this)->Get<Anope::string>("client");
 
 		if (nsnick.empty())
 			throw ConfigException(Module::name + ": <client> must be defined");
@@ -380,7 +380,7 @@ class NickServCore : public Module, public NickServ::NickServService
 
 		NickServ = bi;
 
-		spacesepstream(conf->GetModule(this)->Get<const Anope::string>("defaults", "ns_secure memo_signon memo_receive")).GetTokens(defaults);
+		spacesepstream(conf->GetModule(this)->Get<Anope::string>("defaults", "ns_secure memo_signon memo_receive")).GetTokens(defaults);
 		if (defaults.empty())
 		{
 			defaults.push_back("NS_SECURE");
@@ -436,7 +436,7 @@ class NickServCore : public Module, public NickServ::NickServService
 					c->SetCorrectModes(u, true);
 			}
 
-		const Anope::string &modesonid = block->Get<const Anope::string>("modesonid");
+		const Anope::string &modesonid = block->Get<Anope::string>("modesonid");
 		if (!modesonid.empty())
 			u->SetModes(NickServ, "%s", modesonid.c_str());
 
@@ -475,7 +475,7 @@ class NickServCore : public Module, public NickServ::NickServService
 
 		const NickServ::Nick *na = NickServ::FindNick(u->nick);
 
-		const Anope::string &unregistered_notice = Config->GetModule(this)->Get<const Anope::string>("unregistered_notice");
+		const Anope::string &unregistered_notice = Config->GetModule(this)->Get<Anope::string>("unregistered_notice");
 		if (!Config->GetModule("nickserv")->Get<bool>("nonicknameownership") && !unregistered_notice.empty() && !na && !u->Account())
 			u->SendMessage(*NickServ, unregistered_notice);
 		else if (na && !u->IsIdentified(true))

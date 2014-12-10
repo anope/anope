@@ -364,9 +364,9 @@ class CSLog : public Module
 
 			LogDefault ld;
 
-			ld.service = def->Get<const Anope::string>("service");
-			ld.command = def->Get<const Anope::string>("command");
-			ld.method = def->Get<const Anope::string>("method");
+			ld.service = def->Get<Anope::string>("service");
+			ld.command = def->Get<Anope::string>("command");
+			ld.method = def->Get<Anope::string>("method");
 
 			defaults.push_back(ld);
 		}

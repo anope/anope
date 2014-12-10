@@ -379,7 +379,7 @@ class CommandOSSNLine : public CommandOSSXLineBase
 			               " Because the real name may contain spaces, the separator between it and the reason is a \002colon\002."),
 			               source.command, Anope::Duration(Config->GetModule("operserv")->Get<time_t>("snlineexpiry", "30d"), source.GetAccount()));
 
-			const Anope::string &regexengine = Config->GetBlock("options")->Get<const Anope::string>("regexengine");
+			const Anope::string &regexengine = Config->GetBlock("options")->Get<Anope::string>("regexengine");
 			if (!regexengine.empty())
 			{
 				source.Reply(" ");
@@ -609,7 +609,7 @@ class CommandOSSQLine : public CommandOSSXLineBase
 			               " The default {0} expiry time is \002{1}\002."),
 			               source.command, Anope::Duration(Config->GetModule("operserv")->Get<time_t>("sqlineexpiry", "30d"), source.GetAccount()));
 
-			const Anope::string &regexengine = Config->GetBlock("options")->Get<const Anope::string>("regexengine");
+			const Anope::string &regexengine = Config->GetBlock("options")->Get<Anope::string>("regexengine");
 			if (!regexengine.empty())
 			{
 				source.Reply(" ");

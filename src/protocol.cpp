@@ -78,7 +78,7 @@ Anope::string IRCDProto::SID_Retrieve()
 	if (!IRCD || !IRCD->RequiresID)
 		return "";
 
-	static Anope::string current_sid = Config->GetBlock("serverinfo")->Get<const Anope::string>("id");
+	static Anope::string current_sid = Config->GetBlock("serverinfo")->Get<Anope::string>("id");
 	if (current_sid.empty())
 		current_sid = "00A";
 
@@ -403,8 +403,8 @@ bool IRCDProto::IsHostValid(const Anope::string &host)
 	if (host.empty() || host.length() > Config->GetBlock("networkinfo")->Get<unsigned>("hostlen"))
 		return false;
 
-	const Anope::string &vhostdisablebe = Config->GetBlock("networkinfo")->Get<const Anope::string>("disallow_start_or_end"),
-		vhostchars = Config->GetBlock("networkinfo")->Get<const Anope::string>("vhost_chars");
+	const Anope::string &vhostdisablebe = Config->GetBlock("networkinfo")->Get<Anope::string>("disallow_start_or_end"),
+		vhostchars = Config->GetBlock("networkinfo")->Get<Anope::string>("vhost_chars");
 
 	if (vhostdisablebe.find_first_of(host[0]) != Anope::string::npos)
 		return false;

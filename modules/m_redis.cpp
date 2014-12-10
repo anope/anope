@@ -532,8 +532,8 @@ class ModuleRedis : public Module
 		{
 			Configuration::Block *redis = block->GetBlock("redis", i);
 
-			const Anope::string &n = redis->Get<const Anope::string>("name"),
-						&ip = redis->Get<const Anope::string>("ip");
+			const Anope::string &n = redis->Get<Anope::string>("name"),
+						&ip = redis->Get<Anope::string>("ip");
 			int port = redis->Get<int>("port");
 			unsigned db = redis->Get<unsigned>("db");
 

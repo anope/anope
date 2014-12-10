@@ -37,7 +37,7 @@ class HostServCore : public Module
 
 	void OnReload(Configuration::Conf *conf) override
 	{
-		const Anope::string &hsnick = conf->GetModule(this)->Get<const Anope::string>("client");
+		const Anope::string &hsnick = conf->GetModule(this)->Get<Anope::string>("client");
 
 		if (hsnick.empty())
 			throw ConfigException(Module::name + ": <client> must be defined");

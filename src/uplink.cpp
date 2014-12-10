@@ -54,8 +54,8 @@ void Uplink::Connect()
 	Configuration::Uplink &u = Config->Uplinks[Anope::CurrentUplink];
 
 	new UplinkSocket();
-	if (!Config->GetBlock("serverinfo")->Get<const Anope::string>("localhost").empty())
-		UplinkSock->Bind(Config->GetBlock("serverinfo")->Get<const Anope::string>("localhost"));
+	if (!Config->GetBlock("serverinfo")->Get<Anope::string>("localhost").empty())
+		UplinkSock->Bind(Config->GetBlock("serverinfo")->Get<Anope::string>("localhost"));
 	Event::OnPreServerConnect(&Event::PreServerConnect::OnPreServerConnect);
 	Anope::string ip = Anope::Resolve(u.host, u.ipv6 ? AF_INET6 : AF_INET);
 	Log(LOG_TERMINAL) << "Attempting to connect to uplink #" << (Anope::CurrentUplink + 1) << " " << u.host << " (" << ip << "), port " << u.port;

@@ -102,7 +102,7 @@ class CommandOSChanList : public Command
 		               "If \002pattern\002 is given, lists only channels that match it. If a nicknam is given, lists only the channels the user using it is on."
 		               " If SECRET is specified, lists only channels matching \002pattern\002 that have the +s or +p mode."));
 
-		const Anope::string &regexengine = Config->GetBlock("options")->Get<const Anope::string>("regexengine");
+		const Anope::string &regexengine = Config->GetBlock("options")->Get<Anope::string>("regexengine");
 		if (!regexengine.empty())
 		{
 			source.Reply(" ");
@@ -209,7 +209,7 @@ class CommandOSUserList : public Command
 		               "If \002pattern\002 is given, lists only users that match it (it must be in the format nick!user@host)."
 		               " If \002channel\002 is given, lists only users that are on the given channel. If INVISIBLE is specified, only users with the +i flag will be listed."));
 
-		const Anope::string &regexengine = Config->GetBlock("options")->Get<const Anope::string>("regexengine");
+		const Anope::string &regexengine = Config->GetBlock("options")->Get<Anope::string>("regexengine");
 		if (!regexengine.empty())
 		{
 			source.Reply(" ");

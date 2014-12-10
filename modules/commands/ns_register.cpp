@@ -111,7 +111,7 @@ class CommandNSRegister : public Command
 		size_t nicklen = u_nick.length();
 		Anope::string pass = params[0];
 		Anope::string email = params.size() > 1 ? params[1] : "";
-		const Anope::string &nsregister = Config->GetModule(this->owner)->Get<const Anope::string>("registration");
+		const Anope::string &nsregister = Config->GetModule(this->owner)->Get<Anope::string>("registration");
 
 		if (Anope::ReadOnly)
 		{
@@ -138,7 +138,7 @@ class CommandNSRegister : public Command
 		/* Guest nick can now have a series of between 1 and 7 digits.
 		 *   --lara
 		 */
-		const Anope::string &guestnick = Config->GetModule("nickserv")->Get<const Anope::string>("guestnickprefix", "Guest");
+		const Anope::string &guestnick = Config->GetModule("nickserv")->Get<Anope::string>("guestnickprefix", "Guest");
 		if (nicklen <= guestnick.length() + 7 && nicklen >= guestnick.length() + 1 && !u_nick.find_ci(guestnick) && u_nick.substr(guestnick.length()).find_first_not_of("1234567890") == Anope::string::npos)
 		{
 			source.Reply(_("\002{0}\002 may not be registered."), u_nick);
@@ -284,7 +284,7 @@ class CommandNSResend : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
-		if (!Config->GetModule(this->owner)->Get<const Anope::string>("registration").equals_ci("mail"))
+		if (!Config->GetModule(this->owner)->Get<Anope::string>("registration").equals_ci("mail"))
 		{
 			source.Reply(_("Access denied."));
 			return;
@@ -323,7 +323,7 @@ class CommandNSResend : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
-		if (!Config->GetModule(this->owner)->Get<const Anope::string>("registration").equals_ci("mail"))
+		if (!Config->GetModule(this->owner)->Get<Anope::string>("registration").equals_ci("mail"))
 			return false;
 
 		source.Reply(_("This command will resend you the registration confirmation email."));
@@ -332,7 +332,7 @@ class CommandNSResend : public Command
 
 	void OnServHelp(CommandSource &source) override
 	{
-		if (Config->GetModule(this->owner)->Get<const Anope::string>("registration").equals_ci("mail"))
+		if (Config->GetModule(this->owner)->Get<Anope::string>("registration").equals_ci("mail"))
 			Command::OnServHelp(source);
 	}
 };
@@ -358,7 +358,7 @@ class NSRegister : public Module
 		, unconfirmed(this, NickServ::account, "UNCONFIRMED")
 		, passcode(this, NickServ::account, "passcode")
 	{
-		if (Config->GetModule(this)->Get<const Anope::string>("registration").equals_ci("disable"))
+		if (Config->GetModule(this)->Get<Anope::string>("registration").equals_ci("disable"))
 			throw ModuleException("Module " + this->name + " will not load with registration disabled.");
 	}
 
@@ -367,7 +367,7 @@ class NSRegister : public Module
 		ServiceBot *NickServ;
 		if (unconfirmed.HasExt(u->Account()) && (NickServ = Config->GetClient("NickServ")))
 		{
-			const Anope::string &nsregister = Config->GetModule(this)->Get<const Anope::string>("registration");
+			const Anope::string &nsregister = Config->GetModule(this)->Get<Anope::string>("registration");
 			if (nsregister.equals_ci("admin"))
 				u->SendMessage(NickServ, _("All new accounts must be validated by an administrator. Please wait for your registration to be confirmed."));
 			else
@@ -399,15 +399,15 @@ static bool SendRegmail(User *u, NickServ::Nick *na, ServiceBot *bi)
 	if (code == NULL)
 		code = na->GetAccount()->Extend<Anope::string>("passcode", Anope::Random(9));
 
-	Anope::string subject = Language::Translate(na->GetAccount(), Config->GetBlock("mail")->Get<const Anope::string>("registration_subject").c_str()),
-		message = Language::Translate(na->GetAccount(), Config->GetBlock("mail")->Get<const Anope::string>("registration_message").c_str());
+	Anope::string subject = Language::Translate(na->GetAccount(), Config->GetBlock("mail")->Get<Anope::string>("registration_subject").c_str()),
+		message = Language::Translate(na->GetAccount(), Config->GetBlock("mail")->Get<Anope::string>("registration_message").c_str());
 
 	subject = subject.replace_all_cs("%n", na->GetNick());
-	subject = subject.replace_all_cs("%N", Config->GetBlock("networkinfo")->Get<const Anope::string>("networkname"));
+	subject = subject.replace_all_cs("%N", Config->GetBlock("networkinfo")->Get<Anope::string>("networkname"));
 	subject = subject.replace_all_cs("%c", *code);
 
 	message = message.replace_all_cs("%n", na->GetNick());
-	message = message.replace_all_cs("%N", Config->GetBlock("networkinfo")->Get<const Anope::string>("networkname"));
+	message = message.replace_all_cs("%N", Config->GetBlock("networkinfo")->Get<Anope::string>("networkname"));
 	message = message.replace_all_cs("%c", *code);
 
 	return Mail::Send(u, nc, bi, subject, message);

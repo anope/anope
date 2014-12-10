@@ -179,7 +179,7 @@ class ModuleXMLRPC : public Module
 
 	void OnReload(Configuration::Conf *conf) override
 	{
-		this->httpref = ServiceReference<HTTPProvider>("HTTPProvider", conf->GetModule(this)->Get<const Anope::string>("server", "httpd/main"));
+		this->httpref = ServiceReference<HTTPProvider>("HTTPProvider", conf->GetModule(this)->Get<Anope::string>("server", "httpd/main"));
 	}
 };
 

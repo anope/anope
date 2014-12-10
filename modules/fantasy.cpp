@@ -77,7 +77,7 @@ class CommandBSSetFantasy : public Command
 				"Note that users wanting to use fantaisist\n"
 				"commands MUST have enough access for both\n"
 				"the FANTASIA and the command they are executing."),
-				Config->GetModule(this->owner)->Get<const Anope::string>("fantasycharacter", "!").c_str());
+				Config->GetModule(this->owner)->Get<Anope::string>("fantasycharacter", "!").c_str());
 		return true;
 	}
 };
@@ -117,7 +117,7 @@ class Fantasy : public Module
 
 		if (!msg.find(c->ci->GetBot()->nick))
 			params.erase(params.begin());
-		else if (!msg.find_first_of(Config->GetModule(this)->Get<const Anope::string>("fantasycharacter", "!")))
+		else if (!msg.find_first_of(Config->GetModule(this)->Get<Anope::string>("fantasycharacter", "!")))
 			params[0].erase(params[0].begin());
 		else
 			return;

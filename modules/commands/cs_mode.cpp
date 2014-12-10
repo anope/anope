@@ -881,14 +881,14 @@ class CSMode : public Module
 		{
 			Configuration::Block *block = conf->GetBlock("command", i);
 
-			const Anope::string &cname = block->Get<const Anope::string>("name"),
-					&cmd = block->Get<const Anope::string>("command");
+			const Anope::string &cname = block->Get<Anope::string>("name"),
+					&cmd = block->Get<Anope::string>("command");
 
 			if (cname.empty() || cmd != "chanserv/modes")
 				continue;
 
-			const Anope::string &set = block->Get<const Anope::string>("set"),
-					&unset = block->Get<const Anope::string>("unset");
+			const Anope::string &set = block->Get<Anope::string>("set"),
+					&unset = block->Get<Anope::string>("unset");
 
 			if (set.empty() && unset.empty())
 				continue;
@@ -946,7 +946,7 @@ class CSMode : public Module
 	void OnChanRegistered(ChanServ::Channel *ci) override
 	{
 		Anope::string mlock;
-		spacesepstream sep(Config->GetModule(this)->Get<const Anope::string>("mlock", "+nt"));
+		spacesepstream sep(Config->GetModule(this)->Get<Anope::string>("mlock", "+nt"));
 		if (sep.GetToken(mlock))
 		{
 			bool add = true;

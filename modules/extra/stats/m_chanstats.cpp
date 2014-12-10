@@ -487,13 +487,13 @@ class MChanstats : public Module
 	void OnReload(Configuration::Conf *conf) override
 	{
 		Configuration::Block *block = conf->GetModule(this);
-		prefix = block->Get<const Anope::string>("prefix", "anope_");
-		SmileysHappy = block->Get<const Anope::string>("SmileysHappy");
-		SmileysSad = block->Get<const Anope::string>("SmileysSad");
-		SmileysOther = block->Get<const Anope::string>("SmileysOther");
+		prefix = block->Get<Anope::string>("prefix", "anope_");
+		SmileysHappy = block->Get<Anope::string>("SmileysHappy");
+		SmileysSad = block->Get<Anope::string>("SmileysSad");
+		SmileysOther = block->Get<Anope::string>("SmileysOther");
 		NSDefChanstats = block->Get<bool>("ns_def_chanstats");
 		CSDefChanstats = block->Get<bool>("cs_def_chanstats");
-		Anope::string engine = block->Get<const Anope::string>("engine");
+		Anope::string engine = block->Get<Anope::string>("engine");
 		this->sql = ServiceReference<SQL::Provider>("SQL::Provider", engine);
 		if (sql)
 			this->CheckTables();

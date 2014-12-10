@@ -100,8 +100,8 @@ class CSTop : public Module
 
 	void OnReload(Configuration::Conf *conf) override
 	{
-		prefix = conf->GetModule("m_chanstats")->Get<const Anope::string>("prefix", "anope_");
-		this->sql = ServiceReference<SQL::Provider>("SQL::Provider", conf->GetModule("m_chanstats")->Get<const Anope::string>("engine"));
+		prefix = conf->GetModule("m_chanstats")->Get<Anope::string>("prefix", "anope_");
+		this->sql = ServiceReference<SQL::Provider>("SQL::Provider", conf->GetModule("m_chanstats")->Get<Anope::string>("engine"));
 	}
 
 	SQL::Result RunQuery(const SQL::Query &query)

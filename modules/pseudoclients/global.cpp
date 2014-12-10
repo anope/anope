@@ -61,7 +61,7 @@ class GlobalCore : public Module
 
 	void OnReload(Configuration::Conf *conf) override
 	{
-		const Anope::string &glnick = conf->GetModule(this)->Get<const Anope::string>("client");
+		const Anope::string &glnick = conf->GetModule(this)->Get<Anope::string>("client");
 
 		if (glnick.empty())
 			throw ConfigException(Module::name + ": <client> must be defined");
@@ -75,21 +75,21 @@ class GlobalCore : public Module
 
 	void OnRestart() override
 	{
-		const Anope::string &gl = Config->GetModule(this)->Get<const Anope::string>("globaloncycledown");
+		const Anope::string &gl = Config->GetModule(this)->Get<Anope::string>("globaloncycledown");
 		if (!gl.empty())
 			this->SendGlobal(Global, "", gl);
 	}
 
 	void OnShutdown() override
 	{
-		const Anope::string &gl = Config->GetModule(this)->Get<const Anope::string>("globaloncycledown");
+		const Anope::string &gl = Config->GetModule(this)->Get<Anope::string>("globaloncycledown");
 		if (!gl.empty())
 			this->SendGlobal(Global, "", gl);
 	}
 
 	void OnNewServer(Server *s) override
 	{
-		const Anope::string &gl = Config->GetModule(this)->Get<const Anope::string>("globaloncycleup");
+		const Anope::string &gl = Config->GetModule(this)->Get<Anope::string>("globaloncycleup");
 		if (!gl.empty() && !Me->IsSynced())
 			s->Notice(Global, gl);
 	}

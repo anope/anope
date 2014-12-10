@@ -354,7 +354,7 @@ class CommandOSIgnore : public Command
 		               " When adding a \037mask\037, it should be in the format nick!user@host, everything else will be considered a nicknames. Wildcards are permitted."),
 		               source.command);
 
-		const Anope::string &regexengine = Config->GetBlock("options")->Get<const Anope::string>("regexengine");
+		const Anope::string &regexengine = Config->GetBlock("options")->Get<Anope::string>("regexengine");
 		if (!regexengine.empty())
 		{
 			source.Reply(" ");

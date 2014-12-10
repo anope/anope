@@ -216,7 +216,7 @@ class ModuleSQL : public Module
 			++it;
 
 			for (i = 0; i < config->CountBlock("mysql"); ++i)
-				if (config->GetBlock("mysql", i)->Get<const Anope::string>("name", "mysql/main") == cname)
+				if (config->GetBlock("mysql", i)->Get<Anope::string>("name", "mysql/main") == cname)
 					break;
 
 			if (i == config->CountBlock("mysql"))
@@ -231,14 +231,14 @@ class ModuleSQL : public Module
 		for (int i = 0; i < config->CountBlock("mysql"); ++i)
 		{
 			Configuration::Block *block = config->GetBlock("mysql", i);
-			const Anope::string &connname = block->Get<const Anope::string>("name", "mysql/main");
+			const Anope::string &connname = block->Get<Anope::string>("name", "mysql/main");
 
 			if (this->MySQLServices.find(connname) == this->MySQLServices.end())
 			{
-				const Anope::string &database = block->Get<const Anope::string>("database", "anope");
-				const Anope::string &server = block->Get<const Anope::string>("server", "127.0.0.1");
-				const Anope::string &user = block->Get<const Anope::string>("username", "anope");
-				const Anope::string &password = block->Get<const Anope::string>("password");
+				const Anope::string &database = block->Get<Anope::string>("database", "anope");
+				const Anope::string &server = block->Get<Anope::string>("server", "127.0.0.1");
+				const Anope::string &user = block->Get<Anope::string>("username", "anope");
+				const Anope::string &password = block->Get<Anope::string>("password");
 				int port = block->Get<int>("port", "3306");
 
 				try

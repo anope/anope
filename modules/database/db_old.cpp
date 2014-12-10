@@ -1374,7 +1374,7 @@ class DBOld : public Module
 		, mlock_limit(this, "mlock_limit")
 		, mlock_key(this, "mlock_key")
 	{
-		hashm = Config->GetModule(this)->Get<const Anope::string>("hash");
+		hashm = Config->GetModule(this)->Get<Anope::string>("hash");
 
 		if (hashm != "md5" && hashm != "oldmd5" && hashm != "sha1" && hashm != "plain" && hashm != "sha256")
 			throw ModuleException("Invalid hash method");

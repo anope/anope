@@ -25,7 +25,7 @@ class SQLLog : public Module
 	void OnReload(Configuration::Conf *conf) override
 	{
 		Configuration::Block *config = conf->GetModule(this);
-		this->table = config->Get<const Anope::string>("table", "logs");
+		this->table = config->Get<Anope::string>("table", "logs");
 	}
 
 	void OnLogMessage(LogInfo *li, const Log *l, const Anope::string &msg) override

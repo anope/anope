@@ -424,44 +424,6 @@ class CommandOSException : public Command
 		return;
 	}
 
-	void DoMove(CommandSource &source, const std::vector<Anope::string> &params)
-	{
-		const Anope::string &n1str = params.size() > 1 ? params[1] : ""; /* From position */
-		const Anope::string &n2str = params.size() > 2 ? params[2] : ""; /* To position */
-		int n1, n2;
-
-		if (n2str.empty())
-		{
-			this->OnSyntaxError(source, "MOVE");
-			return;
-		}
-
-		n1 = n2 = -1;
-		try
-		{
-			n1 = convertTo<int>(n1str);
-			n2 = convertTo<int>(n2str);
-		}
-		catch (const ConvertException &) { }
-
-		if (n1 >= 0 && static_cast<unsigned>(n1) < session_service->GetExceptions().size() && n2 >= 0 && static_cast<unsigned>(n2) < session_service->GetExceptions().size() && n1 != n2)
-		{
-			Exception *temp = session_service->GetExceptions()[n1];
-			session_service->GetExceptions()[n1] = session_service->GetExceptions()[n2];
-			session_service->GetExceptions()[n2] = temp;
-
-			Log(LOG_ADMIN, source, this) << "to move exception " << session_service->GetExceptions()[n1]->mask << " from position " << n1 + 1 << " to position " << n2 + 1;
-			source.Reply(_("Exception for \002%s\002 (#%d) moved to position \002%d\002."), session_service->GetExceptions()[n1]->mask.c_str(), n1 + 1, n2 + 1);
-
-			if (Anope::ReadOnly)
-				source.Reply(READ_ONLY_MODE);
-		}
-		else
-			this->OnSyntaxError(source, "MOVE");
-
-		return;
-	}
-
 	void ProcessList(CommandSource &source, const std::vector<Anope::string> &params, ListFormatter &list)
 	{
 		const Anope::string &mask = params.size() > 1 ? params[1] : "";
@@ -560,7 +522,6 @@ class CommandOSException : public Command
 		this->SetDesc(_("Modify the session-limit exception list"));
 		this->SetSyntax(_("ADD [\037+expiry\037] \037mask\037 \037limit\037 \037reason\037"));
 		this->SetSyntax(_("DEL {\037mask\037 | \037entry-num\037 | \037list\037}"));
-		this->SetSyntax(_("MOVE \037num\037 \037position\037"));
 		this->SetSyntax(_("LIST [\037mask\037 | \037list\037]"));
 		this->SetSyntax(_("VIEW [\037mask\037 | \037list\037]"));
 	}
@@ -575,8 +536,6 @@ class CommandOSException : public Command
 			return this->DoAdd(source, params);
 		else if (cmd.equals_ci("DEL"))
 			return this->DoDel(source, params);
-		else if (cmd.equals_ci("MOVE"))
-			return this->DoMove(source, params);
 		else if (cmd.equals_ci("LIST"))
 			return this->DoList(source, params);
 		else if (cmd.equals_ci("VIEW"))
@@ -609,9 +568,6 @@ class CommandOSException : public Command
 				"the format of the optional \037expiry\037 parameter.\n"
 				" \n"
 				"\002EXCEPTION DEL\002 removes the given mask from the exception list.\n"
-				" \n"
-				"\002EXCEPTION MOVE\002 moves exception \037num\037 to \037position\037. The\n"
-				"sessions inbetween will be shifted up or down to fill the gap.\n"
 				" \n"
 				"\002EXCEPTION LIST\002 and \002EXCEPTION VIEW\002 show all current\n"
 				"sessions if the optional mask is given, the list is limited\n"

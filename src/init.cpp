@@ -440,7 +440,7 @@ void Anope::Init(int ac, char **av)
 	Log(LOG_TERMINAL) << "Using configuration file " << Anope::ConfigDir << "/" << ServicesConf.GetName();
 
 	/* Fork to background */
-	if (!Anope::NoFork && Anope::AtTerm())
+	if (!Anope::NoFork)
 	{
 		/* Install these before fork() - it is possible for the child to
 		 * connect and kill() the parent before it is able to install the
@@ -524,7 +524,7 @@ void Anope::Init(int ac, char **av)
 
 #ifndef _WIN32
 	/* We won't background later, so we should setuid now */
-	if (Anope::NoFork || !Anope::AtTerm())
+	if (Anope::NoFork)
 		setuidgid();
 #endif
 

@@ -287,7 +287,7 @@ void Server::Sync(bool sync_links)
 
 		FOREACH_MOD(OnUplinkSync, (this));
 
-		if (!Anope::NoFork && Anope::AtTerm())
+		if (!Anope::NoFork)
 		{
 			Log(LOG_TERMINAL) << "Successfully linked, launching into background...";
 			Anope::Fork();

@@ -367,10 +367,6 @@ class ChanServCore : public Module, public ChanServService
 		if (inhabit.HasExt(c))
 			return EVENT_STOP;
 
-		/* Channel is persistent, it shouldn't be deleted and the service bot should stay */
-		if (c->ci && persist && persist->Get(c->ci))
-			return EVENT_STOP;
-
 		return EVENT_CONTINUE;
 	}
 
@@ -382,7 +378,7 @@ class ChanServCore : public Module, public ChanServService
 		for (registered_channel_map::iterator it = RegisteredChannelList->begin(), it_end = RegisteredChannelList->end(); it != it_end; ++it)
 		{
 			ChannelInfo *ci = it->second;
-			if (persist->Get(ci))
+			if (persist->HasExt(ci))
 			{
 				bool c;
 				ci->c = Channel::FindOrCreate(ci->name, c, ci->time_registered);
@@ -416,7 +412,7 @@ class ChanServCore : public Module, public ChanServService
 		if (ci->c->HasMode("PERM"))
 			persist->Set(ci);
 		/* Persist may be in def cflags, set it here */
-		else if (persist->Get(ci))
+		else if (persist->HasExt(ci))
 			ci->c->SetMode(NULL, "PERM");
 	}
 

@@ -216,15 +216,6 @@ class OperServCore : public Module
 
  public:
 	OperServCore(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PSEUDOCLIENT | VENDOR)
-		, EventHook<Event::BotPrivmsg>()
-		, EventHook<Event::ServerQuit>()
-		, EventHook<Event::UserModeSet>()
-		, EventHook<Event::UserModeUnset>()
-		, EventHook<Event::UserConnect>()
-		, EventHook<Event::UserNickChange>()
-		, EventHook<Event::CheckKick>()
-		, EventHook<Event::Help>()
-		, EventHook<Event::Log>()
 		, sgtype(this)
 		, sglines(this)
 		, sqtype(this)

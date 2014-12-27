@@ -1016,7 +1016,6 @@ class ModuleDNS : public Module
 
  public:
 	ModuleDNS(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, EXTRA | VENDOR)
-		, EventHook<Event::ModuleUnload>()
 		, manager(this)
 	{
 

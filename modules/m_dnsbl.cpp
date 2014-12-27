@@ -96,7 +96,6 @@ class ModuleDNSBL : public Module
 
  public:
 	ModuleDNSBL(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR | EXTRA)
-		, EventHook<Event::UserConnect>()
 	{
 
 	}

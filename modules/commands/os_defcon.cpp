@@ -337,12 +337,6 @@ class OSDefcon : public Module
 
  public:
 	OSDefcon(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
-		, EventHook<Event::ChannelModeSet>()
-		, EventHook<Event::ChannelModeUnset>()
-		, EventHook<Event::PreCommand>()
-		, EventHook<Event::UserConnect>()
-		, EventHook<Event::ChannelModeAdd>()
-		, EventHook<Event::ChannelSync>()
 		, session_service("SessionService", "session")
 		, akills("XLineManager", "xlinemanager/sgline")
 		, commandosdefcon(this, ondefconlevel)

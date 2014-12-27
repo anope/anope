@@ -667,7 +667,6 @@ class ProtoHybrid : public Module
 
 public:
 	ProtoHybrid(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PROTOCOL | VENDOR)
-		, EventHook<Event::UserNickChange>()
 		, ircd_proto(this)
 		, message_away(this)
 		, message_capab(this)

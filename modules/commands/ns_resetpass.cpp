@@ -67,7 +67,6 @@ class NSResetPass : public Module
 
  public:
 	NSResetPass(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
-		, EventHook<Event::PreCommand>()
 		, commandnsresetpass(this), reset(this, "reset")
 	{
 		if (!Config->GetBlock("mail")->Get<bool>("usemail"))

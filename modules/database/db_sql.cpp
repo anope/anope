@@ -50,7 +50,6 @@ class DBMySQL : public Module, public Pipe
 
  public:
 	DBMySQL(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, DATABASE | VENDOR)
-		, EventHook<Event::SerializeEvents>()
 	{
 	}
 

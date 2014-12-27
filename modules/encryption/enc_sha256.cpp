@@ -275,8 +275,6 @@ class ESHA256 : public Module
 
  public:
 	ESHA256(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, ENCRYPTION | VENDOR)
-		, EventHook<Event::Encrypt>()
-		, EventHook<Event::CheckAuthentication>()
 		, sha256provider(this)
 	{
 

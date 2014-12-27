@@ -221,7 +221,6 @@ class ModuleProxyScan : public Module
 
  public:
 	ModuleProxyScan(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, EXTRA | VENDOR)
-		, EventHook<Event::UserConnect>()
 		, connectionTimeout(this, 5)
 	{
 

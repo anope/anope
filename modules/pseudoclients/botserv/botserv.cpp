@@ -30,15 +30,6 @@ class BotServCore : public Module, public BotServ::BotServService
  public:
 	BotServCore(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PSEUDOCLIENT | VENDOR)
 		, BotServ::BotServService(this)
-		, EventHook<Event::SetCorrectModes>()
-		, EventHook<Event::BotAssign>()
-		, EventHook<Event::JoinChannel>()
-		, EventHook<Event::LeaveChannel>()
-		, EventHook<Event::Help>()
-		, EventHook<Event::ChannelModeSet>()
-		, EventHook<Event::CreateChan>()
-		, EventHook<Event::UserKicked>()
-		, EventHook<Event::CreateBot>()
 		, persist("PERSIST")
 		, inhabit("inhabit")
 	{

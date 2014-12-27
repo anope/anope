@@ -182,7 +182,6 @@ class ModuleSQL : public Module
 	DispatcherThread *DThread;
 
 	ModuleSQL(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, EXTRA | VENDOR)
-		, EventHook<Event::ModuleUnload>()
 	{
 		me = this;
 

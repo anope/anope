@@ -1279,8 +1279,6 @@ class BSKick : public Module
 
  public:
 	BSKick(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
-		, EventHook<Event::ServiceBotEvent>()
-		, EventHook<Event::Privmsg>()
 		, bandata(this, "bandata")
 		, userdata(this, "userdata")
 

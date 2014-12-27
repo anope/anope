@@ -345,8 +345,6 @@ class EMD5 : public Module
 
  public:
 	EMD5(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, ENCRYPTION | VENDOR)
-		, EventHook<Event::Encrypt>()
-		, EventHook<Event::CheckAuthentication>()
 		, md5provider(this)
 	{
 		if (ModuleManager::FindFirstOf(ENCRYPTION) == this)

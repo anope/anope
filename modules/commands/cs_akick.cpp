@@ -668,7 +668,6 @@ class CSAKick : public Module
 
  public:
 	CSAKick(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
-		, EventHook<Event::CheckKick>()
 		, commandcsakick(this, akickevents)
 		, akickevents(this)
 		, akick_type(this)

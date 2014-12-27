@@ -194,7 +194,6 @@ class BSSet : public Module
 
  public:
 	BSSet(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
-		, EventHook<Event::BotBan>()
 		, commandbsset(this)
 		, commandbssetbanexpire(this)
 		, commandbssetprivate(this)

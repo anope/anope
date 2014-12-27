@@ -313,8 +313,6 @@ class NSCert : public Module
 
  public:
 	NSCert(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
-		, EventHook<Event::Fingerprint>()
-		, EventHook<NickServ::Event::NickValidate>()
 		, commandnscert(this)
 		, cs(this)
 		, onnickservevents(this)

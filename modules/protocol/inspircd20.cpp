@@ -1609,13 +1609,6 @@ class ProtoInspIRCd20 : public Module
 
  public:
 	ProtoInspIRCd20(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PROTOCOL | VENDOR)
-		, EventHook<Event::UserNickChange>()
-		, EventHook<Event::ChannelSync>()
-		, EventHook<Event::ChanRegistered>()
-		, EventHook<Event::DelChan>()
-		, EventHook<Event::MLockEvents>()
-		, EventHook<Event::SetChannelOption>()
-		, EventHook<Event::ChannelModeUnset>()
 		, ircd_proto(this)
 		, ssl(this, "ssl")
 		, message_away(this)

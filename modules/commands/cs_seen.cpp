@@ -378,13 +378,6 @@ class CSSeen : public Module
 
  public:
 	CSSeen(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
-		, EventHook<Event::ExpireTick>()
-		, EventHook<Event::UserConnect>()
-		, EventHook<Event::UserNickChange>()
-		, EventHook<Event::UserQuit>()
-		, EventHook<Event::JoinChannel>()
-		, EventHook<Event::PartChannel>()
-		, EventHook<Event::PreUserKicked>()
 	//	, seeninfo_type("SeenInfo", SeenInfo::Unserialize)
 		, commandseen(this)
 		, commandosseen(this)

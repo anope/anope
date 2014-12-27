@@ -1107,13 +1107,6 @@ class NSSet : public Module
 
  public:
 	NSSet(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
-		, EventHook<Event::PreCommand>()
-		, EventHook<Event::SetCorrectModes>()
-		, EventHook<NickServ::Event::PreNickExpire>()
-		, EventHook<Event::NickInfo>()
-		, EventHook<Event::UserModeSet>()
-		, EventHook<Event::UserModeUnset>()
-		, EventHook<Event::UserLogin>()
 		, commandnsset(this)
 		, commandnssaset(this)
 		, commandnssetautoop(this)

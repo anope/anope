@@ -861,9 +861,6 @@ class CSMode : public Module
 
  public:
 	CSMode(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
-		, EventHook<Event::CheckModes>()
-		, EventHook<Event::ChanRegistered>()
-		, EventHook<Event::ChanInfo>()
 		, commandcsmode(this)
 		, commandcsmodes(this)
 		, modelock(this)

@@ -44,8 +44,6 @@ class EOld : public Module
 
  public:
 	EOld(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, ENCRYPTION | VENDOR)
-		, EventHook<Event::Encrypt>()
-		, EventHook<Event::CheckAuthentication>()
 		, oldmd5provider(this)
 	{
 		if (ModuleManager::FindFirstOf(ENCRYPTION) == this)

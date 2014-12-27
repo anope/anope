@@ -200,8 +200,6 @@ class ESHA1 : public Module
 
  public:
 	ESHA1(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, ENCRYPTION | VENDOR)
-		, EventHook<Event::Encrypt>()
-		, EventHook<Event::CheckAuthentication>()
 		, sha1provider(this)
 	{
 		if (ModuleManager::FindFirstOf(ENCRYPTION) == this)

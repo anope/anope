@@ -95,8 +95,6 @@ class Fantasy : public Module
 
  public:
 	Fantasy(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
-		, EventHook<Event::Privmsg>()
-		, EventHook<Event::ServiceBotEvent>()
 		, fantasy(this, ChanServ::channel, "BS_FANTASY")
 		, commandbssetfantasy(this)
 		, OnBotFantasy(this)

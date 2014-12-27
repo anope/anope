@@ -1101,18 +1101,6 @@ class CSSet : public Module
 
  public:
 	CSSet(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
-		, EventHook<Event::CreateChan>()
-		, EventHook<Event::ChannelCreate>()
-		, EventHook<Event::ChannelSync>()
-		, EventHook<Event::CheckKick>()
-		, EventHook<Event::DelChan>()
-		, EventHook<Event::ChannelModeSet>()
-		, EventHook<Event::ChannelModeUnset>()
-		, EventHook<Event::CheckDelete>()
-		, EventHook<Event::JoinChannel>()
-		, EventHook<Event::SetCorrectModes>()
-		, EventHook<ChanServ::Event::PreChanExpire>()
-		, EventHook<Event::ChanInfo>()
 
 		, noautoop(this, ChanServ::channel, "NOAUTOOP")
 		, peace(this, ChanServ::channel, "PEACE")

@@ -272,9 +272,6 @@ class NSSuspend : public Module
 
  public:
 	NSSuspend(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
-		, EventHook<Event::NickInfo>()
-		, EventHook<NickServ::Event::PreNickExpire>()
-		, EventHook<NickServ::Event::NickValidate>()
 		, commandnssuspend(this, onnicksuspend)
 		, commandnsunsuspend(this, onnickunsuspend)
 		, onnicksuspend(this)

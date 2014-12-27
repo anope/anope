@@ -460,10 +460,6 @@ class OSForbid : public Module
 
  public:
 	OSForbid(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
-		, EventHook<Event::UserConnect>()
-		, EventHook<Event::UserNickChange>()
-		, EventHook<Event::CheckKick>()
-		, EventHook<Event::PreCommand>()
 		, forbid_service(this)
 		, type(this)
 		, commandosforbid(this)

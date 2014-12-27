@@ -88,8 +88,6 @@ class LDAPOper : public Module
 	Anope::string filter;
  public:
 	LDAPOper(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, EXTRA | VENDOR)
-		, EventHook<Event::NickIdentify>()
-		, EventHook<Event::DelCore>()
 		, ldap("LDAPProvider", "ldap/main")
 		, iinterface(this)
 	{

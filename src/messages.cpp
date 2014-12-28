@@ -428,7 +428,7 @@ void Stats::Run(MessageSource &source, const std::vector<Anope::string> &params)
 
 					const NickAlias *na = NickAlias::Find(o->name);
 					if (na)
-						IRCD->SendNumeric(243, source.GetSource(), "O * * %s %s 0", o->name.c_str(), o->ot->GetName().c_str());
+						IRCD->SendNumeric(243, source.GetSource(), "O * * %s %s 0", o->name.c_str(), o->ot->GetName().replace_all_cs(" ", "_").c_str());
 				}
 
 				IRCD->SendNumeric(219, source.GetSource(), "%c :End of /STATS report.", params[0][0]);

@@ -448,7 +448,14 @@ struct IRCDMessageNick : IRCDMessage
 		else if (params.size() == 7)
 		{
 			// a new user is connecting to the network
-			User::OnIntroduce(params[0], params[2], params[3], "", "", source.GetServer(), params[6], Anope::CurTime, params[5], "", NULL);
+			Server *s = Server::Find(params[4]);
+			if (s == NULL)
+			{
+				Log(LOG_DEBUG) << "User " << params[0] << " introduced from nonexistant server " << params[4] << "?";
+				return;
+			}
+			User::OnIntroduce(params[0], params[2], params[3], "", "", s, params[6], Anope::CurTime, params[5], "", NULL);
+			Log(LOG_DEBUG) << "Registered nick \"" << params[0] << "\" on server " << s->GetName() << ".";
 		}
 		else
 		{
@@ -524,18 +531,17 @@ struct IRCDMessageServer : IRCDMessage
 	IRCDMessageServer(Module *creator) : IRCDMessage(creator, "SERVER", 3) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
 
 	/*
+	 * New directly linked server:
+	 *
 	 * SERVER tolsun.oulu.fi 1 :Experimental server
 	 * 	New server tolsun.oulu.fi introducing itself
 	 * 	and attempting to register.
 	 *
-	 * RFC 2813 says the server has to send a hopcount
-	 * AND a servertoken. Not quite sure what ngIRCd is
-	 * sending here.
-	 *
 	 * params[0] = servername
-	 * params[1] = hop count (or servertoken?)
+	 * params[1] = hop count
 	 * params[2] = server description
 	 *
+	 * New remote server in the network:
 	 *
 	 * :tolsun.oulu.fi SERVER csd.bu.edu 5 34 :BU Central Server
 	 *	Server tolsun.oulu.fi is our uplink for csd.bu.edu
@@ -554,13 +560,13 @@ struct IRCDMessageServer : IRCDMessage
 		if (params.size() == 3)
 		{
 			// our uplink is introducing itself
-			new Server(Me, params[0], 1, params[2], "");
+			new Server(Me, params[0], 1, params[2], "1");
 		}
 		else
 		{
 			// our uplink is introducing a new server
 			unsigned int hops = params[1].is_pos_number_only() ? convertTo<unsigned>(params[1]) : 0;
-			new Server(source.GetServer(), params[0], hops, params[2], params[3]);
+			new Server(source.GetServer(), params[0], hops, params[3], params[2]);
 		}
 		/*
 		 * ngIRCd does not send an EOB, so we send a PING immediately

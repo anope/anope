@@ -45,7 +45,7 @@ class CommandCSRegister : public Command
 			source.Reply(CHAN_X_NOT_IN_USE, chan.c_str());
 		else if (ci)
 			source.Reply(_("Channel \002%s\002 is already registered!"), chan.c_str());
-		else if (c && !c->HasUserStatus(u, "OP"))
+		else if (c && u && !c->HasUserStatus(u, "OP"))
 			source.Reply(_("You must be a channel operator to register the channel."));
 		else if (maxregistered && nc->channelcount >= maxregistered && !source.HasPriv("chanserv/no-register-limit"))
 			source.Reply(nc->channelcount > maxregistered ? CHAN_EXCEEDED_CHANNEL_LIMIT : CHAN_REACHED_CHANNEL_LIMIT, maxregistered);

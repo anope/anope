@@ -19,56 +19,8 @@ namespace Anope
 {
 	class string;
 
-	/* Casemap in use by Anope. ci::string's comparation functions use this (and thus Anope::string) */
-	extern std::locale casemap;
-
-	extern void CaseMapRebuild();
 	extern unsigned char tolower(unsigned char);
 	extern unsigned char toupper(unsigned char);
-
-	/* ASCII case insensitive ctype. */
-	template<typename char_type>
-	class ascii_ctype : public std::ctype<char_type>
-	{
-	 public:
-		char_type do_toupper(char_type c) const override
-		{
-			if (c >= 'a' && c <= 'z')
-				return c - 32;
-			else
-				return c;
-		}
-
-		char_type do_tolower(char_type c) const override
-		{
-			if (c >= 'A' && c <= 'Z')
-				return c + 32;
-			else
-				return c;
-		}
-	};
-
-	/* rfc1459 case insensitive ctype, { = [, } = ], and | = \ */
-	template<typename char_type>
-	class rfc1459_ctype : public ascii_ctype<char_type>
-	{
-	 public:
-		char_type do_toupper(char_type c) const override
-		{
-			if (c == '{' || c == '}' || c == '|')
-				return c - 32;
-			else
-				return ascii_ctype<char_type>::do_toupper(c);
-		}
-
-		char_type do_tolower(char_type c) const override
-		{
-			if (c == '[' || c == ']' || c == '\\')
-				return c + 32;
-			else
-				return ascii_ctype<char_type>::do_tolower(c);
-		}
-	};
 }
 
 /** The ci namespace contains a number of helper classes relevant to case insensitive strings.

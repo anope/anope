@@ -72,7 +72,7 @@ const Block::item_map* Block::GetItems() const
 		return NULL;
 }
 
-template<> const Anope::string Block::Get(const Anope::string &tag, const Anope::string& def) const
+template<> Anope::string Block::Get(const Anope::string &tag, const Anope::string& def) const
 {
 	if (!this)
 		return def;
@@ -93,6 +93,27 @@ template<> bool Block::Get(const Anope::string &tag, const Anope::string &def) c
 {
 	const Anope::string &str = Get<Anope::string>(tag, def);
 	return !str.empty() && !str.equals_ci("no") && !str.equals_ci("off") && !str.equals_ci("false") && !str.equals_ci("0");
+}
+
+template<> unsigned int Block::Get(const Anope::string &tag, const Anope::string &def) const
+{
+	const Anope::string &str = Get<Anope::string>(tag, def);
+	std::size_t pos = str.length();
+	unsigned long l;
+
+	try
+	{
+		l = std::stoul(str.str(), &pos, 0);
+	}
+	catch (...)
+	{
+		return 0;
+	}
+
+	if (pos != str.length())
+		return 0;
+
+	return l;
 }
 
 static void ValidateNotEmpty(const Anope::string &block, const Anope::string &name, const Anope::string &value)
@@ -126,6 +147,8 @@ Conf::Conf() : Block("")
 
 		const Anope::string &type = include->Get<Anope::string>("type"),
 					&file = include->Get<Anope::string>("name");
+
+		ValidateNotEmpty("include", "name", file);
 
 		File f(file, type == "executable");
 		this->LoadConf(f);
@@ -489,6 +512,34 @@ Conf::Conf() : Block("")
 		this->CommandGroups.push_back(gr);
 	}
 
+	for (int i = 0; i < this->CountBlock("casemap"); ++i)
+	{
+		Block *casemap = this->GetBlock("casemap", i);
+
+		unsigned char upper = casemap->Get<unsigned int>("upper"),
+				lower = casemap->Get<unsigned int>("lower");
+
+		if (!upper)
+		{
+			Anope::string s = casemap->Get<Anope::string>("upper");
+			if (s.length() == 1)
+				upper = s[0];
+		}
+
+		if (!lower)
+		{
+			Anope::string s = casemap->Get<Anope::string>("lower");
+			if (s.length() == 1)
+				lower = s[0];
+		}
+
+		if (upper && lower)
+		{
+			CaseMapUpper[lower] = CaseMapUpper[upper] = upper;
+			CaseMapLower[lower] = CaseMapLower[upper] = lower;
+		}
+	}
+
 	/* Below here can't throw */
 
 	/* Clear existing conf opers */
@@ -507,23 +558,6 @@ Conf::Conf() : Block("")
 			na->GetAccount()->o = o;
 			Log() << "Tied oper " << na->GetAccount()->GetDisplay() << " to type " << o->GetType()->GetName();
 		}
-
-	if (options->Get<Anope::string>("casemap", "ascii") == "ascii")
-		Anope::casemap = std::locale(std::locale(), new Anope::ascii_ctype<char>());
-	else if (options->Get<Anope::string>("casemap") == "rfc1459")
-		Anope::casemap = std::locale(std::locale(), new Anope::rfc1459_ctype<char>());
-	else
-	{
-		try
-		{
-			Anope::casemap = std::locale(options->Get<Anope::string>("casemap").c_str());
-		}
-		catch (const std::runtime_error &)
-		{
-			Log() << "Unknown casemap " << options->Get<Anope::string>("casemap") << " - casemap not changed";
-		}
-	}
-	Anope::CaseMapRebuild();
 
 	/* Check the user keys */
 	if (!options->Get<unsigned>("seed"))

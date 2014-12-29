@@ -101,7 +101,6 @@ class DBFlatFile : public Module
 		Serialize::Object *obj = nullptr;
 		for (Anope::string buf; std::getline(fd, buf.str());)
 		{
-			Log() << buf;
 			if (buf.find("OBJECT ") == 0)
 			{
 				Anope::string t = buf.substr(7);

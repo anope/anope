@@ -60,9 +60,10 @@ namespace Configuration
 		const item_map* GetItems() const;
 	};
 
-	template<> CoreExport const Anope::string Block::Get(const Anope::string &tag, const Anope::string& def) const;
+	template<> CoreExport Anope::string Block::Get(const Anope::string &tag, const Anope::string& def) const;
 	template<> CoreExport time_t Block::Get(const Anope::string &tag, const Anope::string &def) const;
 	template<> CoreExport bool Block::Get(const Anope::string &tag, const Anope::string &def) const;
+	template<> CoreExport unsigned int Block::Get(const Anope::string &tag, const Anope::string &def) const;
 
 	/** Represents a configuration file
 	 */
@@ -122,6 +123,7 @@ namespace Configuration
 		std::vector<Anope::string> ModulesAutoLoad;
 		/* After how many characters do we wrap lines? */
 		unsigned int LineWrap;
+		unsigned char CaseMapUpper[256], CaseMapLower[256];
 
 		/* module configuration blocks */
 		std::map<Anope::string, Block *> modules;

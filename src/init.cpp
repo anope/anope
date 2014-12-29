@@ -290,8 +290,6 @@ void Anope::Init(int ac, char **av)
 	umask(DEFUMASK);
 #endif
 
-	//Serialize::RegisterTypes();
-
 	/* Parse command line arguments */
 	ParseCommandLineArguments(ac, av);
 

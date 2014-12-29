@@ -2,7 +2,9 @@
 cmake_minimum_required(VERSION 2.4 FATAL_ERROR)
 if(COMMAND cmake_policy)
   cmake_policy(SET CMP0003 NEW)
-  cmake_policy(SET CMP0026 OLD)
+  if(POLICY CMP0026)
+    cmake_policy(SET CMP0026 OLD)
+  endif(POLICY CMP0026)
 endif(COMMAND cmake_policy)
 
 # If the Source dir and the Binary dir are the same, we are building in-source, which we will disallow due to Autotools being there (but only on non-Windows)

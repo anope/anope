@@ -143,7 +143,7 @@ class CommandEntryMessage : public Command
 		else
 		{
 			(*messages)->push_back(new EntryMsgImpl(ci, source.GetNick(), message));
-			Log(source.IsFounder(ci) ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to add a message";
+			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to add a message";
 			source.Reply(_("Entry message added to \002%s\002"), ci->name.c_str());
 		}
 	}
@@ -166,7 +166,7 @@ class CommandEntryMessage : public Command
 					delete (*messages)->at(i - 1);
 					if ((*messages)->empty())
 						ci->Shrink<EntryMessageList>("entrymsg");
-					Log(source.IsFounder(ci) ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to remove a message";
+					Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to remove a message";
 					source.Reply(_("Entry message \002%i\002 for \002%s\002 deleted."), i, ci->name.c_str());
 				}
 				else
@@ -183,7 +183,7 @@ class CommandEntryMessage : public Command
 	{
 		ci->Shrink<EntryMessageList>("entrymsg");
 
-		Log(source.IsFounder(ci) ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to remove all messages";
+		Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to remove all messages";
 		source.Reply(_("Entry messages for \002%s\002 have been cleared."), ci->name.c_str());
 	}
 
@@ -212,7 +212,7 @@ class CommandEntryMessage : public Command
 			return;
 		}
 
-		if (!source.IsFounder(ci) && !source.HasPriv("chanserv/administration"))
+		if (!source.AccessFor(ci).HasPriv("SET") && !source.HasPriv("chanserv/administration"))
 		{
 			source.Reply(ACCESS_DENIED);
 			return;
@@ -253,6 +253,9 @@ class CommandEntryMessage : public Command
 		source.Reply(_("The \002ENTRYMSG CLEAR\002 command clears all entries from\n"
 				"the list of messages shown to users when they join\n"
 				"the channel, effectively disabling entry messages."));
+		source.Reply(" ");
+		source.Reply(_("Adding, deleting, or clearing entry messages requires the\n"
+				"SET permission."));
 		return true;
 	}
 };

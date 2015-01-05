@@ -16,7 +16,7 @@ class CommandBSSay : public Command
  public:
 	CommandBSSay(Module *creator) : Command(creator, "botserv/say", 2, 2)
 	{
-		this->SetDesc(_("Makes the bot say the given text on the given channel"));
+		this->SetDesc(_("Makes the bot say the specified text on the specified channel"));
 		this->SetSyntax(_("\037channel\037 \037text\037"));
 	}
 

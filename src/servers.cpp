@@ -292,7 +292,7 @@ void Server::Sync(bool sync_links)
 
 		Event::OnUplinkSync(&Event::UplinkSync::OnUplinkSync, this);
 
-		if (!Anope::NoFork && Anope::AtTerm())
+		if (!Anope::NoFork)
 		{
 			Log(LOG_TERMINAL) << "Successfully linked, launching into background...";
 			Anope::Fork();

@@ -69,12 +69,12 @@ class BotServCore : public Module, public BotServ::BotServService
 		ServiceBot *bi = user->server == Me ? dynamic_cast<ServiceBot *>(user) : NULL;
 		if (bi && Config->GetModule(this)->Get<bool>("smartjoin"))
 		{
-			std::pair<Channel::ModeList::iterator, Channel::ModeList::iterator> bans = c->GetModeList("BAN");
+			std::vector<Anope::string> bans = c->GetModeList("BAN");
 
 			/* We check for bans */
-			for (; bans.first != bans.second; ++bans.first)
+			for (unsigned int i = 0; i < bans.size(); ++i)
 			{
-				Entry ban("BAN", bans.first->second);
+				Entry ban("BAN", bans[i]);
 				if (ban.Matches(user))
 					c->RemoveMode(NULL, "BAN", ban.GetMask());
 			}

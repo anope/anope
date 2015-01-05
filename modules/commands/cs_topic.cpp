@@ -115,10 +115,8 @@ class CommandCSTopic : public Command
 		source.Reply(_("Topic lock option for \002{0}\002 is now \002off\002."), ci->GetName());
 	}
 
-	void Set(CommandSource &source, ChanServ::Channel *ci, const std::vector<Anope::string> &params)
+	void Set(CommandSource &source, ChanServ::Channel *ci, const Anope::string &topic)
 	{
-		const Anope::string &topic = params.size() > 2 ? params[2] : "";
-
 		bool has_topiclock = topiclock->HasExt(ci);
 		topiclock->Unset(ci);
 		ci->c->ChangeTopic(source.GetNick(), topic, Anope::CurTime);
@@ -142,12 +140,7 @@ class CommandCSTopic : public Command
 		else
 			new_topic = topic;
 
-		std::vector<Anope::string> new_params;
-		new_params.push_back("SET");
-		new_params.push_back(ci->GetName());
-		new_params.push_back(new_topic);
-
-		this->Set(source, ci, new_params);
+		this->Set(source, ci, new_topic);
 	}
 
  public:
@@ -155,7 +148,7 @@ class CommandCSTopic : public Command
 		topiclock("TOPICLOCK")
 	{
 		this->SetDesc(_("Manipulate the topic of the specified channel"));
-		this->SetSyntax(_("\037channel\037 SET [\037topic\037]"));
+		this->SetSyntax(_("\037channel\037 [SET] [\037topic\037]"));
 		this->SetSyntax(_("\037channel\037 APPEND \037topic\037"));
 		this->SetSyntax(_("\037channel\037 [UNLOCK|LOCK]"));
 	}
@@ -176,12 +169,23 @@ class CommandCSTopic : public Command
 			this->Unlock(source, ci, params);
 		else if (!ci->c)
 			source.Reply(_("Channel \002{0}\002 doesn't exist."), ci->GetName());
-		else if (subcmd.equals_ci("SET"))
-			this->Set(source, ci, params);
 		else if (subcmd.equals_ci("APPEND") && params.size() > 2)
 			this->Append(source, ci, params);
 		else
-			this->SendSyntax(source);
+		{
+			Anope::string topic;
+			if (subcmd.equals_ci("SET"))
+			{
+				topic = params.size() > 2 ? params[2] : "";
+			}
+			else
+			{
+				topic = subcmd;
+				if (params.size() > 2)
+					topic += " " + params[2];
+			}
+			this->Set(source, ci, topic);
+		}
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override

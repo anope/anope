@@ -89,6 +89,12 @@ namespace NickServ
 		};
 		static EventHandlersReference<NickRegister> OnNickRegister;
 
+		struct CoreExport NickConfirm : Events
+		{
+			virtual void OnNickConfirm(User *, Account *) anope_abstract;
+		};
+		static EventHandlersReference<NickConfirm> OnNickConfirm;
+
 		struct CoreExport NickValidate : Events
 		{
 			/** Called when a nick is validated. That is, to determine if a user is permissted
@@ -297,4 +303,5 @@ namespace NickServ
 template<> struct EventName<NickServ::Event::PreNickExpire> { static constexpr const char *const name = "OnPreNickExpire"; };
 template<> struct EventName<NickServ::Event::NickExpire> { static constexpr const char *const name = "OnNickExpire"; };
 template<> struct EventName<NickServ::Event::NickRegister> { static constexpr const char *const name = "OnNickRegister"; };
+template<> struct EventName<NickServ::Event::NickConfirm> { static constexpr const char *const name = "OnNickConfirm"; };
 template<> struct EventName<NickServ::Event::NickValidate> { static constexpr const char *const name = "OnNickValidate"; };

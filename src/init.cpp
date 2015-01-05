@@ -102,6 +102,8 @@ bool Anope::AtTerm()
 	return isatty(fileno(stdout)) && isatty(fileno(stdin)) && isatty(fileno(stderr));
 }
 
+static void setuidgid();
+
 void Anope::Fork()
 {
 #ifndef _WIN32
@@ -112,6 +114,8 @@ void Anope::Fork()
 	freopen("/dev/null", "w", stderr);
 
 	setpgid(0, 0);
+
+	setuidgid();
 #else
 	FreeConsole();
 #endif
@@ -418,10 +422,15 @@ void Anope::Init(int ac, char **av)
 	/* If we're root, issue a warning now */
 	if (!getuid() && !getgid())
 	{
-		std::cerr << "WARNING: You are currently running Anope as the root superuser. Anope does not" << std::endl;
-		std::cerr << "         require root privileges to run, and it is discouraged that you run Anope" << std::endl;
-		std::cerr << "         as the root superuser." << std::endl;
-		sleep(3);
+		/* If we are configured to setuid later, don't issue a warning */
+		Configuration::Block *options = Config->GetBlock("options");
+		if (options->Get<Anope::string>("user").empty())
+		{
+			std::cerr << "WARNING: You are currently running Anope as the root superuser. Anope does not" << std::endl;
+			std::cerr << "         require root privileges to run, and it is discouraged that you run Anope" << std::endl;
+			std::cerr << "         as the root superuser." << std::endl;
+			sleep(3);
+		}
 	}
 #endif
 
@@ -431,7 +440,7 @@ void Anope::Init(int ac, char **av)
 	Log(LOG_TERMINAL) << "Using configuration file " << Anope::ConfigDir << "/" << ServicesConf.GetName();
 
 	/* Fork to background */
-	if (!Anope::NoFork && Anope::AtTerm())
+	if (!Anope::NoFork)
 	{
 		/* Install these before fork() - it is possible for the child to
 		 * connect and kill() the parent before it is able to install the
@@ -522,7 +531,11 @@ void Anope::Init(int ac, char **av)
 	for (int i = 0; i < Config->CountBlock("module"); ++i)
 		ModuleManager::LoadModule(Config->GetBlock("module", i)->Get<Anope::string>("name"), NULL);
 
-	setuidgid();
+#ifndef _WIN32
+	/* We won't background later, so we should setuid now */
+	if (Anope::NoFork)
+		setuidgid();
+#endif
 
 	Module *protocol = ModuleManager::FindFirstOf(PROTOCOL);
 	if (protocol == NULL)

@@ -30,18 +30,30 @@ class Plain : public Mechanism
 
 			size_t p = decoded.find('\0');
 			if (p == Anope::string::npos)
+			{
+				sasl->Fail(sess);
+				delete sess;
 				return;
+			}
 			decoded = decoded.substr(p + 1);
 
 			p = decoded.find('\0');
 			if (p == Anope::string::npos)
+			{
+				sasl->Fail(sess);
+				delete sess;
 				return;
+			}
 
 			Anope::string acc = decoded.substr(0, p),
 				pass = decoded.substr(p + 1);
 
-			if (acc.empty() || pass.empty() || !NickServ::service)
+			if (!NickServ::service || acc.empty() || pass.empty() || !IRCD->IsNickValid(acc) || pass.find_first_of("\r\n") != Anope::string::npos)
+			{
+				sasl->Fail(sess);
+				delete sess;
 				return;
+			}
 
 			NickServ::IdentifyRequest *req = NickServ::service->CreateIdentifyRequest(new IdentifyRequestListener(m.source), this->owner, acc, pass);
 			Event::OnCheckAuthentication(&Event::CheckAuthentication::OnCheckAuthentication, nullptr, req);

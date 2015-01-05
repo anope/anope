@@ -321,6 +321,8 @@ class CommandCSMode : public Command
 							source.Reply(_("Missing parameter for mode \002{0}\002."), cm->mchar);
 						else if (cm->type == MODE_LIST && ci->c && IRCD->GetMaxListFor(ci->c) && ci->c->HasMode(cm->name) >= IRCD->GetMaxListFor(ci->c))
 							source.Reply(_("List for mode \002{0}\002 is full."), cm->mchar);
+						else if (ci->GetRefs<ModeLock *>(modelock).size() >= Config->GetModule(this->owner)->Get<unsigned>("max", "32"))
+							source.Reply(_("The mode lock list of \002{0}\002 is full."), ci->GetName());
 						else
 						{
 							mlocks->SetMLock(ci, cm, adding, mode_param, source.GetNick());
@@ -605,15 +607,10 @@ class CommandCSMode : public Command
 							}
 							else
 							{
-								std::pair<Channel::ModeList::iterator, Channel::ModeList::iterator> its = ci->c->GetModeList(cm->name);
-								for (; its.first != its.second;)
-								{
-									const Anope::string &mask = its.first->second;
-									++its.first;
-
-									if (Anope::Match(mask, param))
-										ci->c->RemoveMode(NULL, cm, mask);
-								}
+								std::vector<Anope::string> v = ci->c->GetModeList(cm->name);
+								for (unsigned j = 0; j < v.size(); ++j)
+									if (Anope::Match(v[j], param))
+										ci->c->RemoveMode(NULL, cm, v[j]);
 							}
 					}
 			}

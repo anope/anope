@@ -102,6 +102,9 @@ class CommandOSAKill : public Command
 		if (targ)
 			mask = "*@" + targ->host;
 
+		if (Config->GetModule("operserv")->Get<bool>("addakiller", "yes") && !source.GetNick().empty())
+			reason = "[" + source.GetNick() + "] " + reason;
+
 		if (!akills->CanAdd(source, mask, expires, reason))
 			return;
 
@@ -116,9 +119,6 @@ class CommandOSAKill : public Command
 			source.Reply(_("Mask must be in the form \037user\037@\037host\037."));
 			return;
 		}
-
-		if (Config->GetModule("operserv")->Get<bool>("addakiller", "yes") && !source.GetNick().empty())
-			reason = "[" + source.GetNick() + "] " + reason;
 
 		XLine *x = new XLine(mask, source.GetNick(), expires, reason);
 		if (Config->GetModule("operserv")->Get<bool>("akillids"))

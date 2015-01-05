@@ -72,7 +72,7 @@ class CommandCSRegister : public Command
 			return;
 		}
 
-		if (c && !c->HasUserStatus(u, "OP"))
+		if (c && u && !c->HasUserStatus(u, "OP"))
 		{
 			source.Reply(_("You must be a channel operator to register the channel."));
 			return;
@@ -113,9 +113,9 @@ class CommandCSRegister : public Command
 			c->CheckModes();
 			if (u)
 				c->SetCorrectModes(u, true);
-		}
 
-		Event::OnChanRegistered(&Event::ChanRegistered::OnChanRegistered, ci);
+			Event::OnChanRegistered(&Event::ChanRegistered::OnChanRegistered, ci);
+		}
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override

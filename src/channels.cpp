@@ -103,7 +103,7 @@ void Channel::CheckModes()
 		return;
 
 	/* Check for mode bouncing */
-	if (this->server_modecount >= 3 && this->chanserv_modecount >= 3)
+	if (this->chanserv_modetime == Anope::CurTime && this->server_modetime == Anope::CurTime && this->server_modecount >= 3 && this->chanserv_modecount >= 3)
 	{
 		Log() << "Warning: unable to set modes on channel " << this->name << ". Are your servers' U:lines configured correctly?";
 		this->bouncy_modes = 1;
@@ -197,9 +197,9 @@ size_t Channel::HasMode(const Anope::string &mname, const Anope::string &param)
 {
 	if (param.empty())
 		return modes.count(mname);
-	std::pair<Channel::ModeList::iterator, Channel::ModeList::iterator> its = this->GetModeList(mname);
-	for (; its.first != its.second; ++its.first)
-		if (its.first->second.equals_ci(param))
+	std::vector<Anope::string> v = this->GetModeList(mname);
+	for (unsigned int i = 0; i < v.size(); ++i)
+		if (v[i].equals_ci(param))
 			return 1;
 	return 0;
 }
@@ -235,12 +235,20 @@ const Channel::ModeList &Channel::GetModes() const
 	return this->modes;
 }
 
-std::pair<Channel::ModeList::iterator, Channel::ModeList::iterator> Channel::GetModeList(const Anope::string &mname)
+template<typename F, typename S>
+struct second
 {
-	Channel::ModeList::iterator it = this->modes.find(mname), it_end = it;
-	if (it != this->modes.end())
-		it_end = this->modes.upper_bound(mname);
-	return std::make_pair(it, it_end);
+	S operator()(const std::pair<F, S> &p)
+	{
+		return p.second;
+	}
+};
+
+std::vector<Anope::string> Channel::GetModeList(const Anope::string &mname)
+{
+	std::vector<Anope::string> r;
+	std::transform(modes.lower_bound(mname), modes.upper_bound(mname), std::back_inserter(r), second<Anope::string, Anope::string>());
+	return r;
 }
 
 void Channel::SetModeInternal(const MessageSource &setter, ChannelMode *ocm, const Anope::string &oparam, bool enforce_mlock)
@@ -357,11 +365,10 @@ void Channel::RemoveModeInternal(const MessageSource &setter, ChannelMode *ocm, 
 
 	if (cm->type == MODE_LIST)
 	{
-		std::pair<Channel::ModeList::iterator, Channel::ModeList::iterator> its = this->GetModeList(cm->name);
-		for (; its.first != its.second; ++its.first)
-			if (param.equals_ci(its.first->second))
+		for (Channel::ModeList::iterator it = modes.lower_bound(cm->name), it_end = modes.upper_bound(cm->name); it != it_end; ++it)
+			if (param.equals_ci(it->second))
 			{
-				this->modes.erase(its.first);
+				this->modes.erase(it);
 				break;
 			}
 	}
@@ -707,11 +714,10 @@ bool Channel::MatchesList(User *u, const Anope::string &mode)
 	if (!this->HasMode(mode))
 		return false;
 
-
-	std::pair<Channel::ModeList::iterator, Channel::ModeList::iterator> m = this->GetModeList(mode);
-	for (; m.first != m.second; ++m.first)
+	std::vector<Anope::string> v = this->GetModeList(mode);
+	for (unsigned i = 0; i < v.size(); ++i)
 	{
-		Entry e(mode, m.first->second);
+		Entry e(mode, v[i]);
 		if (e.Matches(u))
 			return true;
 	}
@@ -866,11 +872,10 @@ bool Channel::Unban(User *u, const Anope::string &mode, bool full)
 
 	bool ret = false;
 
-	std::pair<Channel::ModeList::iterator, Channel::ModeList::iterator> bans = this->GetModeList(mode);
-	for (; bans.first != bans.second;)
+	std::vector<Anope::string> v = this->GetModeList(mode);
+	for (unsigned int i = 0; i < v.size(); ++i)
 	{
-		Entry ban(mode, bans.first->second);
-		++bans.first;
+		Entry ban(mode, v[i]);
 		if (ban.Matches(u, full))
 		{
 			this->RemoveMode(NULL, mode, ban.GetMask());

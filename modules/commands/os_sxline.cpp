@@ -296,6 +296,9 @@ class CommandOSSNLine : public CommandOSSXLineBase
 		if (mask[masklen - 1] == ' ')
 			mask.erase(masklen - 1);
 
+		if (Config->GetModule("operserv")->Get<bool>("addakiller", "yes") && !source.GetNick().empty())
+			reason = "[" + source.GetNick() + "] " + reason;
+
 		if (!this->xlm()->CanAdd(source, mask, expires, reason))
 			return;
 		else if (mask.find_first_not_of("/.*?") == Anope::string::npos)
@@ -303,9 +306,6 @@ class CommandOSSNLine : public CommandOSSXLineBase
 			source.Reply(_("\002{0}\002 coverage is too wide; please use a more specific mask."), mask);
 			return;
 		}
-
-		if (Config->GetModule("operserv")->Get<bool>("addakiller", "yes") && !source.GetNick().empty())
-			reason = "[" + source.GetNick() + "] " + reason;
 
 		XLine *x = new XLine(mask, source.GetNick(), expires, reason);
 		if (Config->GetModule("operserv")->Get<bool>("akillids"))
@@ -344,7 +344,7 @@ class CommandOSSNLine : public CommandOSSXLineBase
 				User *user = it->second;
 
 				if (!user->HasMode("OPER") && user->server != Me && this->xlm()->Check(user, x))
-					user->Kill(Me->GetName(), rreason);
+					user->Kill(Me, rreason);
 			}
 
 			this->xlm()->Send(NULL, x);
@@ -501,6 +501,9 @@ class CommandOSSQLine : public CommandOSSXLineBase
 			}
 		}
 
+		if (Config->GetModule("operserv")->Get<bool>("addakiller", "yes") && !source.GetNick().empty())
+			reason = "[" + source.GetNick() + "] " + reason;
+
 		if (!this->sqlines->CanAdd(source, mask, expires, reason))
 			return;
 		else if (mask.find_first_not_of("./?*") == Anope::string::npos)
@@ -508,9 +511,6 @@ class CommandOSSQLine : public CommandOSSXLineBase
 			source.Reply(_("\002{0}\002 coverage is too wide; please use a more specific mask."), mask);
 			return;
 		}
-
-		if (Config->GetModule("operserv")->Get<bool>("addakiller", "yes") && !source.GetNick().empty())
-			reason = "[" + source.GetNick() + "] " + reason;
 
 		XLine *x = new XLine(mask, source.GetNick(), expires, reason);
 		if (Config->GetModule("operserv")->Get<bool>("akillids"))
@@ -574,7 +574,7 @@ class CommandOSSQLine : public CommandOSSXLineBase
 					User *user = it->second;
 
 					if (!user->HasMode("OPER") && user->server != Me && this->xlm()->Check(user, x))
-						user->Kill(Me->GetName(), rreason);
+						user->Kill(Me, rreason);
 				}
 			}
 

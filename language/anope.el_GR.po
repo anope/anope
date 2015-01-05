@@ -10917,7 +10917,7 @@ msgstr "Τώρα είστε IRC Operator."
 msgid "You are now identified for your nick. Change your password now."
 msgstr ""
 "Έχετε γίνει identify για το nick σας. Αλλάξτε τον κωδικό σας με την εντολή "
-"\"/msg %s SET PASSWORD #newpassword#\" τώρα."
+"\"/msg SET PASSWORD #newpassword#\" τώρα."
 
 #: modules/commands/ns_group.cpp:50
 #, c-format

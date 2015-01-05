@@ -19,7 +19,7 @@ class CommandCSInfo : public Command
  public:
 	CommandCSInfo(Module *creator, EventHandlers<Event::ChanInfo> &event) : Command(creator, "chanserv/info", 1, 2), eventonchaninfo(event)
 	{
-		this->SetDesc(_("Lists information about the named registered channel"));
+		this->SetDesc(_("Lists information about the specified registered channel"));
 		this->SetSyntax(_("\037channel\037"));
 		this->AllowUnregistered(true);
 	}

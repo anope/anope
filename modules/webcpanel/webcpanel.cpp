@@ -248,7 +248,7 @@ class ModuleWebCPanel : public Module
 
 namespace WebPanel
 {
-	void RunCommand(const Anope::string &user, NickServ::Account *nc, const Anope::string &service, const Anope::string &c, const std::vector<Anope::string> &params, TemplateFileServer::Replacements &r, const Anope::string &key)
+	void RunCommand(const Anope::string &user, NickServ::Account *nc, const Anope::string &service, const Anope::string &c, std::vector<Anope::string> &params, TemplateFileServer::Replacements &r, const Anope::string &key)
 	{
 		ServiceReference<Command> cmd("Command", c);
 		if (!cmd)
@@ -279,14 +279,45 @@ namespace WebPanel
 		my_reply(r, key);
 
 		CommandSource source(user, NULL, nc, &my_reply, bi);
+		CommandInfo info;
+		info.name = c;
+		cmd->Run(source, "", info, params);
+	}
 
-		if (!cmd->AllowUnregistered() && !source.nc)
+	void RunCommandWithName(NickServ::Account *nc, const Anope::string &service, const Anope::string &c, const Anope::string &cmdname, std::vector<Anope::string> &params, TemplateFileServer::Replacements &r, const Anope::string &key)
+	{
+		ServiceReference<Command> cmd("Command", c);
+		if (!cmd)
 		{
-			r[key] = "Access denied.";
+			r[key] = "Unable to find command " + c;
 			return;
 		}
 
-		cmd->Execute(source, params);
+		ServiceBot *bi = Config->GetClient(service);
+		if (!bi)
+			return;
+
+		CommandInfo *info = bi->GetCommand(cmdname);
+		if (!info)
+			return;
+
+		struct MyComandReply : CommandReply
+		{
+			TemplateFileServer::Replacements &re;
+			const Anope::string &k;
+
+			MyComandReply(TemplateFileServer::Replacements &_r, const Anope::string &_k) : re(_r), k(_k) { }
+
+			void SendMessage(const MessageSource &, const Anope::string &msg) override
+			{
+				re[k] = msg;
+			}
+		}
+		my_reply(r, key);
+
+		CommandSource source(nc->GetDisplay(), NULL, nc, &my_reply, bi);
+
+		cmd->Run(source, cmdname, *info, params);
 	}
 }
 

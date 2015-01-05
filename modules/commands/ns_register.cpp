@@ -44,6 +44,8 @@ class CommandNSConfirm : public Command
 			}
 
 			na->GetAccount()->UnsetS<bool>("UNCONFIRMED");
+			if (NickServ::Event::OnNickConfirm)
+				NickServ::Event::OnNickConfirm(&NickServ::Event::NickConfirm::OnNickConfirm, source.GetUser(), na->GetAccount());
 			Log(LOG_ADMIN, source, this) << "to confirm nick " << na->GetNick() << " (" << na->GetAccount()->GetDisplay() << ")";
 			source.Reply(_("\002{0}\002 has been confirmed."), na->GetNick());
 		}
@@ -61,6 +63,8 @@ class CommandNSConfirm : public Command
 			Log(LOG_COMMAND, source, this) << "to confirm their email";
 			source.Reply(_("Your email address of \002{0}\002 has been confirmed."), source.nc->GetEmail());
 			nc->UnsetS<bool>("UNCONFIRMED");
+			if (NickServ::Event::OnNickConfirm)
+				NickServ::Event::OnNickConfirm(&NickServ::Event::NickConfirm::OnNickConfirm, source.GetUser(), nc);
 
 			if (source.GetUser())
 			{
@@ -220,9 +224,6 @@ class CommandNSRegister : public Command
 
 		Log(LOG_COMMAND, source, this) << "to register " << na->GetNick() << " (email: " << (!na->GetAccount()->GetEmail().empty() ? na->GetAccount()->GetEmail() : "none") << ")";
 
-		if (NickServ::Event::OnNickRegister)
-			NickServ::Event::OnNickRegister(&NickServ::Event::NickRegister::OnNickRegister, source.GetUser(), na, pass);
-
 		source.Reply(_("\002{0}\002 has been registered."), u_nick);
 
 		Anope::string tmp_pass;
@@ -242,6 +243,9 @@ class CommandNSRegister : public Command
 				SendRegmail(NULL, na, source.service);
 			}
 		}
+
+		if (NickServ::Event::OnNickRegister)
+			NickServ::Event::OnNickRegister(&NickServ::Event::NickRegister::OnNickRegister, source.GetUser(), na, pass);
 
 		if (u)
 		{

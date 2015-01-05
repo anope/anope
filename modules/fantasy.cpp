@@ -173,7 +173,7 @@ class Fantasy : public Module
 		source.permission = info.permission;
 
 		ChanServ::AccessGroup ag = c->ci->AccessFor(u);
-		bool has_fantasia = ag.HasPriv("FANTASIA") || source.HasPriv("chanserv/administration");
+		bool has_fantasia = ag.HasPriv("FANTASIA") || source.HasPriv("botserv/fantasy");
 
 		EventReturn MOD_RESULT;
 		if (has_fantasia)

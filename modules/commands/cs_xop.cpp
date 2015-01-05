@@ -173,6 +173,7 @@ class CommandCSXOP : public Command
 		else
 		{
 			na = NickServ::FindNick(mask);
+
 			if (!na && Config->GetModule("chanserv")->Get<bool>("disallow_hostmask_access"))
 			{
 				source.Reply(_("Masks and unregistered users may not be on access lists."));
@@ -190,13 +191,16 @@ class CommandCSXOP : public Command
 					return;
 				}
 			}
+
+			if (na)
+				mask = na->GetNick();
 		}
 
 		for (unsigned i = 0; i < ci->GetAccessCount(); ++i)
 		{
 			ChanServ::ChanAccess *a = ci->GetAccess(i);
 
-			if (a->Mask().equals_ci(mask))
+			if ((na && na->GetAccount() == a->GetAccount()) || mask.equals_ci(a->Mask()))
 			{
 				if ((!highest || *a >= *highest) && !access.founder && !source.HasPriv("chanserv/access/modify"))
 				{
@@ -361,7 +365,7 @@ class CommandCSXOP : public Command
 
 		ChanServ::AccessGroup access = source.AccessFor(ci);
 
-		if (!access.HasPriv("ACCESS_LIST") && !source.HasCommand("chanserv/access/list"))
+		if (!access.HasPriv("ACCESS_LIST") && !source.HasPriv("chanserv/access/list"))
 		{
 			source.Reply(_("Access denied. You do not have the \002{0}\002 privilege on \002{1}\002."), "ACCESS_LIST", ci->GetName());
 			return;

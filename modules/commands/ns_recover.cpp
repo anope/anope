@@ -72,7 +72,7 @@ class NSRecoverRequestListener : public NickServ::IdentifyRequestListener
 							source.GetNick());
 
 			Anope::string buf = source.command.upper() + " command used by " + source.GetNick();
-			u->Kill(source.service->nick, buf);
+			u->Kill(*source.service, buf);
 
 			source.Reply(_("Ghost with your nick has been killed."));
 
@@ -95,8 +95,10 @@ class NSRecoverRequestListener : public NickServ::IdentifyRequestListener
 			if (IRCD->CanSVSNick)
 			{
 				/* If we can svsnick then release our hold and svsnick the user using the command */
-				NickServ::service->Release(na);
+				if (NickServ::service)
+					NickServ::service->Release(na);
 				IRCD->SendForceNickChange(source.GetUser(), user, Anope::CurTime);
+				source.Reply(_("You have regained control of \002%s\002 and are now identified as \002%s\002."), user, na->GetAccount()->GetDisplay().c_str());
 			}
 			else
 				source.Reply(_("The user with your nick has been removed. Use this command again to release services's hold on your nick."));

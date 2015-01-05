@@ -832,7 +832,7 @@ bool User::BadPassword()
 	this->invalid_pw_time = Anope::CurTime;
 	if (this->invalid_pw_count >= Config->GetBlock("options")->Get<int>("badpasslimit"))
 	{
-		this->Kill(Me->GetName(), "Too many invalid passwords");
+		this->Kill(Me, "Too many invalid passwords");
 		return true;
 	}
 

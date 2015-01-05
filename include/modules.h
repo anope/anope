@@ -198,10 +198,6 @@ class CoreExport Module : public Extensible
 	 */
 	ModuleVersion GetVersion() const;
 
-	/** Called when Services' configuration is being (re)loaded.
-	 * @param conf The config that is being built now and will replace the global Config object
-	 * @throws A ConfigException to abort the config (re)loading process.
-	 */
 	virtual void OnReload(Configuration::Conf *conf) { }
 };
 

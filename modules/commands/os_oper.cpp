@@ -34,7 +34,7 @@ class CommandOSOper : public Command
 		this->SetDesc(_("View and change Services Operators"));
 		this->SetSyntax(_("ADD \037oper\037 \037type\037"));
 		this->SetSyntax(_("DEL \037oper\037"));
-		this->SetSyntax(_("INFO \037type\037"));
+		this->SetSyntax(_("INFO [\037type\037]"));
 		this->SetSyntax("LIST");
 	}
 
@@ -47,16 +47,16 @@ class CommandOSOper : public Command
 			const Anope::string &oper = params[1];
 			const Anope::string &otype = params[2];
 
+			if (!source.HasPriv("operserv/oper/modify"))
+			{
+				source.Reply(_("Access denied. You do not have the operator privilege \002{0}\002."), "operserv/oper/modify");
+				return;
+			}
+
 			NickServ::Nick *na = NickServ::FindNick(oper);
 			if (na == NULL)
 			{
 				source.Reply(_("\002{0}\002 isn't currently online."), oper);
-				return;
-			}
-
-			if (na->GetAccount()->o)
-			{
-				source.Reply(_("Nick \002{0}\002 is already an operator."), na->GetNick());
 				return;
 			}
 
@@ -71,6 +71,12 @@ class CommandOSOper : public Command
 			{
 				source.Reply(_("Access denied."));
 				return;
+			}
+
+			if (na->GetAccount()->o)
+			{
+				na->GetAccount()->o->Delete();
+				na->GetAccount()->o = nullptr;
 			}
 
 			Oper *o = operblock.Create();
@@ -89,6 +95,12 @@ class CommandOSOper : public Command
 		else if (subcommand.equals_ci("DEL") && params.size() > 1)
 		{
 			const Anope::string &oper = params[1];
+
+			if (!source.HasPriv("operserv/oper/modify"))
+			{
+				source.Reply(_("Access denied. You do not have the operator privilege \002{0}\002."), "operserv/oper/modify");
+				return;
+			}
 
 			NickServ::Nick *na = NickServ::FindNick(oper);
 			if (na == NULL)
@@ -133,8 +145,19 @@ class CommandOSOper : public Command
 					source.Reply(_("   \002{0}\002 is online using this oper block."), u->nick);
 			}
 		}
-		else if (subcommand.equals_ci("INFO") && params.size() > 1)
+		else if (subcommand.equals_ci("INFO"))
 		{
+			if (params.size() < 2)
+			{
+				source.Reply(_("Available opertypes:"));
+				for (unsigned i = 0; i < Config->MyOperTypes.size(); ++i)
+				{
+					OperType *ot = Config->MyOperTypes[i];
+					source.Reply("%s", ot->GetName().c_str());
+				}
+				return;
+			}
+
 			Anope::string fulltype = params[1];
 			if (params.size() > 2)
 				fulltype += " " + params[2];

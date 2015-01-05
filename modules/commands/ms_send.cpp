@@ -35,11 +35,20 @@ class CommandMSSend : public Command
 			return;
 		}
 
+		if (source.GetAccount()->HasFieldS("UNCONFIRMED"))
+		{
+			source.Reply(_("You must confirm your account before you may send a memo."));
+			return;
+		}
+
 		MemoServ::MemoServService::MemoResult result = MemoServ::service->Send(source.GetNick(), nick, text);
 		if (result == MemoServ::MemoServService::MEMO_SUCCESS)
-			source.Reply(_("\002{0}\002 isn't registered."), nick);
+		{
+			source.Reply(_("Memo sent to \002%s\002."), nick.c_str());
+			Log(LOG_COMMAND, source, this) << "to send a memo to " << nick;
+		}
 		else if (result == MemoServ::MemoServService::MEMO_INVALID_TARGET)
-			source.Reply(_("\002%s\002 is not a registered unforbidden nick or channel."), nick.c_str());
+			source.Reply(_("\002{0}\002 is not a registered unforbidden nick or channel."), nick);
 		else if (result == MemoServ::MemoServService::MEMO_TOO_FAST)
 			source.Reply(_("Please wait \002{0}\002 seconds before using the \002{1}\002 command again."), Config->GetModule("memoserv")->Get<time_t>("senddelay"), source.command);
 		else if (result == MemoServ::MemoServService::MEMO_TARGET_FULL)

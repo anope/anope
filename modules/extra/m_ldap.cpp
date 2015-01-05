@@ -1,5 +1,5 @@
-/* RequiredLibraries: ldap,lber */
-/* RequiredWindowsLibraries: libldap,liblber */
+/* RequiredLibraries: ldap_r,lber */
+/* RequiredWindowsLibraries: libldap_r,liblber */
 
 #include "module.h"
 #include "modules/ldap.h"

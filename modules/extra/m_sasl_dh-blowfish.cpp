@@ -152,7 +152,7 @@ class DHBS : public Mechanism
 			const Anope::string username = reinterpret_cast<const char*>(&data[pos]);
 			// Check that the username is valid, and that we have at least one block of data
 			// 2 + 1 + 8 = uint16_t size for keylen, \0 for username, 8 for one block of data
-			if (username.empty() || username.length() + keysize + 2 + 1 + 8 > decodedlen)
+			if (username.empty() || username.length() + keysize + 2 + 1 + 8 > decodedlen || !IRCD->IsNickValid(username))
 				return Err(sess, pubkey);
 
 			pos += username.length() + 1;
@@ -167,7 +167,7 @@ class DHBS : public Mechanism
 				BF_ecb_encrypt(&data[pos + i], reinterpret_cast<unsigned char*>(&decrypted[i]), &BFKey, BF_DECRYPT);
 
 			std::string password = &decrypted[0];
-			if (password.empty())
+			if (password.empty() || password.find_first_of("\r\n") != Anope::string::npos)
 				return Err(sess, pubkey);
 
 			SASL::IdentifyRequest* req = new SASL::IdentifyRequest(this->owner, m.source, username, password);

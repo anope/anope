@@ -345,7 +345,8 @@ class UnrealIRCdProto : public IRCDProto
 
 	void SendLogin(User *u, NickServ::Nick *na) override
 	{
-		if (Servers::Capab.count("ESVID") > 0)
+		/* 3.2.10.4+ treats users logged in with accounts as fully registered, even if -r, so we can not set this here. Just use the timestamp. */
+		if (Servers::Capab.count("ESVID") > 0 && !na->GetAccount()->HasFieldS("UNCONFIRMED"))
 			IRCD->SendMode(Config->GetClient("NickServ"), u, "+d %s", na->GetAccount()->GetDisplay().c_str());
 		else
 			IRCD->SendMode(Config->GetClient("NickServ"), u, "+d %d", u->signon);

@@ -195,10 +195,10 @@ class CommandCSAKick : public Command
 		/* Check excepts BEFORE we get this far */
 		if (ci->c)
 		{
-			std::pair<Channel::ModeList::iterator, Channel::ModeList::iterator> modes = ci->c->GetModeList("EXCEPT");
-			for (; modes.first != modes.second; ++modes.first)
+			std::vector<Anope::string> modes = ci->c->GetModeList("EXCEPT");
+			for (unsigned int i = 0; i < modes.size(); ++i)
 			{
-				if (Anope::Match(modes.first->second, mask))
+				if (Anope::Match(modes[i], mask))
 				{
 					source.Reply(_("\002{0}\002 matches an except on \002{1}\002 and cannot be banned until the except has been removed."), mask, ci->GetName());
 					return;
@@ -547,19 +547,21 @@ class CommandCSAKick : public Command
 			return;
 		}
 
+		bool is_list = cmd.equals_ci("LIST") || cmd.equals_ci("VIEW");
+		
 		if (mask.empty() && (cmd.equals_ci("ADD") || cmd.equals_ci("DEL")))
 		{
 			this->OnSyntaxError(source, cmd);
 			return;
 		}
 
-		if (!source.AccessFor(ci).HasPriv("AKICK") && !source.HasPriv("chanserv/access/modify"))
+		if (!source.AccessFor(ci).HasPriv("AKICK") && !source.HasPriv("chanserv/access/modify") && (!is_list || source.HasPriv("chanserv/access/list")))
 		{
 			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "AKICK", ci->GetName());
 			return;
 		}
 
-		if (Anope::ReadOnly && (cmd.equals_ci("ADD") || cmd.equals_ci("DEL")))
+		if (Anope::ReadOnly && (cmd.equals_ci("ADD") || cmd.equals_ci("DEL") || cmd.equals_ci("CLEAR")))
 		{
 			source.Reply(_("Sorry, channel autokick list modification is temporarily disabled."));
 			return;

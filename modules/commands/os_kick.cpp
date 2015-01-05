@@ -46,7 +46,12 @@ class CommandOSKick : public Command
 			return;
 		}
 
-		c->Kick(source.service, u2, "%s (%s)", source.GetNick().c_str(), s.c_str());
+		if (!c->Kick(source.service, u2, "%s (%s)", source.GetNick().c_str(), s.c_str()))
+		{
+			source.Reply(_("Access denied."));
+			return;
+		}
+
 		Log(LOG_ADMIN, source, this) << "on " << u2->nick << " in " << c->name << " (" << s << ")";
 	}
 

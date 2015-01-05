@@ -37,7 +37,8 @@ class CommandCSSet : public Command
 		               "\n"
 		               "Available options:"));
 		Anope::string this_name = source.command;
-		bool hide_privileged_commands = Config->GetBlock("options")->Get<bool>("hideprivilegedcommands");
+		bool hide_privileged_commands = Config->GetBlock("options")->Get<bool>("hideprivilegedcommands"),
+		     hide_registered_commands = Config->GetBlock("options")->Get<bool>("hideregisteredcommands");
 		for (CommandInfo::map::const_iterator it = source.service->commands.begin(), it_end = source.service->commands.end(); it != it_end; ++it)
 		{
 			const Anope::string &c_name = it->first;
@@ -46,13 +47,12 @@ class CommandCSSet : public Command
 			{
 				ServiceReference<Command> c("Command", info.name);
 
+				// XXX dup
 				if (!c)
 					continue;
-				else if (!hide_privileged_commands)
-					; // Always show with hide_privileged_commands disabled
-				else if (!c->AllowUnregistered() && !source.GetAccount())
+				else if (hide_registered_commands && !c->AllowUnregistered() && !source.GetAccount())
 					continue;
-				else if (!info.permission.empty() && !source.HasCommand(info.permission))
+				else if (hide_privileged_commands && !info.permission.empty() && !source.HasCommand(info.permission))
 					continue;
 
 				source.command = it->first;
@@ -989,7 +989,7 @@ class CommandCSSetSuccessor : public Command
 		else
 			nc = NULL;
 
-		Log(!source.permission.empty() ? LOG_ADMIN : LOG_COMMAND, source, this, ci) << "to change the successor from " << (ci->GetSuccessor() ? ci->GetSuccessor()->GetDisplay() : "(none)") << " to " << (nc ? nc->GetDisplay() : "(none)");
+		Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to change the successor from " << (ci->GetSuccessor() ? ci->GetSuccessor()->GetDisplay() : "(none)") << " to " << (nc ? nc->GetDisplay() : "(none)");
 
 		ci->SetSuccessor(nc);
 

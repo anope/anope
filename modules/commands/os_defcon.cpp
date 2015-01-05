@@ -454,7 +454,16 @@ class OSDefcon : public Module
 
 	EventReturn OnPreCommand(CommandSource &source, Command *command, std::vector<Anope::string> &params) override
 	{
-		if (command->name == "nickserv/register" || command->name == "nickserv/group")
+		if (DConfig.Check(DEFCON_OPER_ONLY) && !source.IsOper())
+		{
+			source.Reply(_("Services are in DefCon mode, please try again later."));
+			return EVENT_STOP;
+		}
+		else if (DConfig.Check(DEFCON_SILENT_OPER_ONLY) && !source.IsOper())
+		{
+			return EVENT_STOP;
+		}
+		else if (command->name == "nickserv/register" || command->name == "nickserv/group")
 		{
 			if (DConfig.Check(DEFCON_NO_NEW_NICKS))
 			{
@@ -502,15 +511,10 @@ class OSDefcon : public Module
 			XLine x("*@" + u->host, OperServ ? OperServ->nick : "defcon", Anope::CurTime + DConfig.akillexpire, DConfig.akillreason, XLineManager::GenerateUID());
 			akills->Send(NULL, &x);
 		}
-		if (DConfig.Check(DEFCON_NO_NEW_CLIENTS) || DConfig.Check(DEFCON_AKILL_NEW_CLIENTS))
-		{
-			u->Kill(OperServ ? OperServ->nick : "", DConfig.akillreason);
-			return;
-		}
 
 		if (DConfig.Check(DEFCON_NO_NEW_CLIENTS) || DConfig.Check(DEFCON_AKILL_NEW_CLIENTS))
 		{
-			u->Kill(OperServ ? OperServ->nick : "", DConfig.akillreason);
+			u->Kill(OperServ, DConfig.akillreason);
 			return;
 		}
 
@@ -535,13 +539,13 @@ class OSDefcon : public Module
 				++session->hits;
 				if (akills && DConfig.max_session_kill && session->hits >= DConfig.max_session_kill)
 				{
-					XLine x("*@" + u->host, OperServ ? OperServ->nick : "", Anope::CurTime + DConfig.session_autokill_expiry, "Defcon session limit exceeded", XLineManager::GenerateUID());
+					XLine x("*@" + session->addr.mask(), OperServ ? OperServ->nick : "", Anope::CurTime + DConfig.session_autokill_expiry, "Defcon session limit exceeded", XLineManager::GenerateUID());
 					akills->Send(NULL, &x);
-					Log(OperServ, "akill/defcon") << "[DEFCON] Added a temporary AKILL for \002*@" << u->host << "\002 due to excessive connections";
+					Log(OperServ, "akill/defcon") << "[DEFCON] Added a temporary AKILL for \002*@" << session->addr.mask() << "\002 due to excessive connections";
 				}
 				else
 				{
-					u->Kill(OperServ ? OperServ->nick : "", "Defcon session limit exceeded");
+					u->Kill(OperServ, "Defcon session limit exceeded");
 				}
 			}
 		}
@@ -588,7 +592,7 @@ static void runDefCon()
 				{
 					Log(OperServ, "operserv/defcon") << "DEFCON: setting " << newmodes << " on all channels";
 					for (channel_map::const_iterator it = ChannelList.begin(), it_end = ChannelList.end(); it != it_end; ++it)
-						it->second->SetModes(OperServ, false, "%s", newmodes.c_str());
+						it->second->SetModes(OperServ, true, "%s", newmodes.c_str());
 				}
 			}
 		}

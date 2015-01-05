@@ -341,6 +341,7 @@ class ProtoPlexus : public Module
 		ModeManager::AddUserMode(new UserMode("REGPRIV", 'R'));
 		ModeManager::AddUserMode(new UserModeOperOnly("SNOMASK", 's'));
 		ModeManager::AddUserMode(new UserModeNoone("SSL", 'S'));
+		ModeManager::AddUserMode(new UserModeNoone("PROTECTED", 'U'));
 		ModeManager::AddUserMode(new UserMode("WALLOPS", 'w'));
 		ModeManager::AddUserMode(new UserModeNoone("WEBIRC", 'W'));
 		ModeManager::AddUserMode(new UserMode("CLOAK", 'x'));
@@ -350,7 +351,6 @@ class ProtoPlexus : public Module
 		ModeManager::AddChannelMode(new ChannelModeList("BAN", 'b'));
 		ModeManager::AddChannelMode(new ChannelModeList("EXCEPT", 'e'));
 		ModeManager::AddChannelMode(new ChannelModeList("INVITEOVERRIDE", 'I'));
-		ModeManager::AddUserMode(new UserModeNoone("PROTECTED", 'U'));
 
 		/* v/h/o/a/q */
 		ModeManager::AddChannelMode(new ChannelModeStatus("VOICE", 'v', '+', 0));
@@ -376,7 +376,6 @@ class ProtoPlexus : public Module
 		ModeManager::AddChannelMode(new ChannelMode("SECRET", 's'));
 		ModeManager::AddChannelMode(new ChannelMode("TOPIC", 't'));
 		ModeManager::AddChannelMode(new ChannelModeOperOnly("OPERONLY", 'O'));
-		ModeManager::AddChannelMode(new ChannelMode("REGMODERATED", 'M'));
 		ModeManager::AddChannelMode(new ChannelMode("REGISTEREDONLY", 'R'));
 		ModeManager::AddChannelMode(new ChannelMode("SSL", 'S'));
 		ModeManager::AddChannelMode(new ChannelMode("PERM", 'z'));

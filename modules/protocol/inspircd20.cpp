@@ -1453,6 +1453,48 @@ struct IRCDMessageRSQuit : IRCDMessage
 	}
 };
 
+struct IRCDMessageSave : IRCDMessage
+{
+	time_t last_collide;
+
+	IRCDMessageSave(Module *creator) : IRCDMessage(creator, "SAVE", 2), last_collide(0) { }
+
+	void Run(MessageSource &source, const std::vector<Anope::string> &params) override
+	{
+		User *targ = User::Find(params[0]);
+		time_t ts;
+
+		try
+		{
+			ts = convertTo<time_t>(params[1]);
+		}
+		catch (const ConvertException &)
+		{
+			return;
+		}
+
+		if (!targ || targ->timestamp != ts)
+			return;
+
+		BotInfo *bi;
+		if (targ->server == Me && (bi = dynamic_cast<BotInfo *>(targ)))
+		{
+			if (last_collide == Anope::CurTime)
+			{
+				Anope::QuitReason = "Nick collision fight on " + targ->nick;
+				Anope::Quitting = true;
+				return;
+			}
+
+			IRCD->SendKill(Me, targ->nick, "Nick collision");
+			IRCD->SendNickChange(targ, targ->nick);
+			last_collide = Anope::CurTime;
+		}
+		else
+			targ->ChangeNick(targ->GetUID());
+	}
+};
+
 struct IRCDMessageServer : IRCDMessage
 {
 	IRCDMessageServer(Module *creator) : IRCDMessage(creator, "SERVER", 5) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
@@ -1595,6 +1637,7 @@ class ProtoInspIRCd20 : public Module
 	IRCDMessageNick message_nick;
 	IRCDMessageOperType message_opertype;
 	IRCDMessageRSQuit message_rsquit;
+	IRCDMessageSave message_save;
 	IRCDMessageServer message_server;
 	IRCDMessageSQuit message_squit;
 	IRCDMessageTime message_time;
@@ -1640,6 +1683,7 @@ class ProtoInspIRCd20 : public Module
 		, message_nick(this)
 		, message_opertype(this)
 		, message_rsquit(this)
+		, message_save(this)
 		, message_server(this)
 		, message_squit(this)
 		, message_time(this)

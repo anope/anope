@@ -35,7 +35,8 @@ class CommandNSSet : public Command
 		               "Available options:"));
 
 		Anope::string this_name = source.command;
-		bool hide_privileged_commands = Config->GetBlock("options")->Get<bool>("hideprivilegedcommands");
+		bool hide_privileged_commands = Config->GetBlock("options")->Get<bool>("hideprivilegedcommands"),
+		     hide_registered_commands = Config->GetBlock("options")->Get<bool>("hideregisteredcommands");
 		for (CommandInfo::map::const_iterator it = source.service->commands.begin(), it_end = source.service->commands.end(); it != it_end; ++it)
 		{
 			const Anope::string &c_name = it->first;
@@ -44,13 +45,12 @@ class CommandNSSet : public Command
 			if (c_name.find_ci(this_name + " ") == 0)
 			{
 				ServiceReference<Command> c("Command", info.name);
+				// XXX dup
 				if (!c)
 					continue;
-				else if (!hide_privileged_commands)
-					; // Always show with hide_privileged_commands disabled
-				else if (!c->AllowUnregistered() && !source.GetAccount())
+				else if (hide_registered_commands && !c->AllowUnregistered() && !source.GetAccount())
 					continue;
-				else if (!info.permission.empty() && !source.HasCommand(info.permission))
+				else if (hide_privileged_commands && !info.permission.empty() && !source.HasCommand(info.permission))
 					continue;
 
 				source.command = c_name;

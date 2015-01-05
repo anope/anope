@@ -276,16 +276,15 @@ class NickServCore : public Module, public NickServ::NickServService
 			while (User::Find(guestnick) && i++ < 10);
 
 			if (i == 11)
-				u->Kill(NickServ ? NickServ->nick : "", "Services nickname-enforcer kill");
+				u->Kill(*NickServ, "Services nickname-enforcer kill");
 			else
 			{
-				if (NickServ)
-					u->SendMessage(*NickServ, _("Your nickname is now being changed to \002%s\002"), guestnick.c_str());
+				u->SendMessage(*NickServ, _("Your nickname is now being changed to \002%s\002"), guestnick.c_str());
 				IRCD->SendForceNickChange(u, guestnick, Anope::CurTime);
 			}
 		}
 		else
-			u->Kill(NickServ ? NickServ->nick : "", "Services nickname-enforcer kill");
+			u->Kill(*NickServ, "Services nickname-enforcer kill");
 	}
 
 	void Release(NickServ::Nick *na) override
@@ -305,6 +304,7 @@ class NickServCore : public Module, public NickServ::NickServService
 
 			held.Unset(na);
 		}
+		collided.Unset(na); /* clear pending collide */
 	}
 
 	NickServ::IdentifyRequest *CreateIdentifyRequest(NickServ::IdentifyRequestListener *l, Module *o, const Anope::string &acc, const Anope::string &pass) override
@@ -502,7 +502,7 @@ class NickServCore : public Module, public NickServ::NickServService
 			IRCD->SendLogin(u, na);
 			if (!Config->GetModule("nickserv")->Get<bool>("nonicknameownership") && na->GetAccount() == u->Account() && !na->GetAccount()->HasFieldS("UNCONFIRMED"))
 				u->SetMode(NickServ, "REGISTERED");
-			Log(NickServ) << u->GetMask() << " automatically identified for group " << u->Account()->GetDisplay();
+			Log(u, "", NickServ) << u->GetMask() << " automatically identified for group " << u->Account()->GetDisplay();
 		}
 
 		if (!u->nick.equals_ci(oldnick) && old_na)

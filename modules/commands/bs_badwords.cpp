@@ -350,7 +350,7 @@ class CommandBSBadwords : public Command
 
 		if (Anope::ReadOnly)
 		{
-			source.Reply(_("Sorry, channel bad words list modification is temporarily disabled."));
+			source.Reply(_("Sorry, bad words list modification is temporarily disabled."));
 			return;
 		}
 

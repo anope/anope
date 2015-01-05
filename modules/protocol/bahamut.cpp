@@ -333,8 +333,12 @@ struct IRCDMessageMode : IRCDMessage
 			}
 			catch (const ConvertException &) { }
 
+			Anope::string modes = params[2];
+			for (unsigned int i = 3; i < params.size(); ++i)
+				modes += " " + params[i];
+
 			if (c)
-				c->SetModesInternal(source, params[2], ts);
+				c->SetModesInternal(source, modes, ts);
 		}
 		else
 		{

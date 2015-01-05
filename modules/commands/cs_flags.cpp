@@ -82,11 +82,8 @@ void FlagsChanAccess::SetFlags(const Anope::string &i)
 
 class CommandCSFlags : public Command
 {
-	void DoModify(CommandSource &source, ChanServ::Channel *ci, const std::vector<Anope::string> &params)
+	void DoModify(CommandSource &source, ChanServ::Channel *ci, Anope::string mask, const Anope::string &flags)
 	{
-		Anope::string mask = params.size() > 2 ? params[2] : "";
-		Anope::string flags = params.size() > 3 ? params[3] : "";
-
 		if (flags.empty())
 		{
 			this->OnSyntaxError(source, "");
@@ -140,6 +137,9 @@ class CommandCSFlags : public Command
 					return;
 				}
 			}
+
+			if (na)
+				mask = na->GetNick();
 		}
 
 		ChanServ::ChanAccess *current = NULL;
@@ -149,7 +149,7 @@ class CommandCSFlags : public Command
 		for (current_idx = ci->GetAccessCount(); current_idx > 0; --current_idx)
 		{
 			ChanServ::ChanAccess *access = ci->GetAccess(current_idx - 1);
-			if (mask.equals_ci(access->Mask()))
+			if ((na && na->GetAccount() == access->GetAccount()) || mask.equals_ci(access->Mask()))
 			{
 				// Flags allows removing others that have the same access as you,
 				// but no other access system does.
@@ -375,7 +375,7 @@ class CommandCSFlags : public Command
 	CommandCSFlags(Module *creator) : Command(creator, "chanserv/flags", 1, 4)
 	{
 		this->SetDesc(_("Modify the list of privileged users"));
-		this->SetSyntax(_("\037channel\037 MODIFY \037mask\037 \037changes\037"));
+		this->SetSyntax(_("\037channel\037 [MODIFY] \037mask\037 \037changes\037"));
 		this->SetSyntax(_("\037channel\037 LIST [\037mask\037 | +\037flags\037]"));
 		this->SetSyntax(_("\037channel\037 CLEAR"));
 	}
@@ -396,6 +396,8 @@ class CommandCSFlags : public Command
 		bool has_access = false;
 		if (source.HasPriv("chanserv/access/modify"))
 			has_access = true;
+		else if (is_list && source.HasPriv("chanserv/access/list"))
+			has_access = true;
 		else if (is_list && source.AccessFor(ci).HasPriv("ACCESS_LIST"))
 			has_access = true;
 		else if (source.AccessFor(ci).HasPriv("ACCESS_CHANGE"))
@@ -413,14 +415,26 @@ class CommandCSFlags : public Command
 			return;
 		}
 
-		if (cmd.equals_ci("MODIFY"))
-			this->DoModify(source, ci, params);
-		else if (is_list)
+		if (is_list)
 			this->DoList(source, ci, params);
 		else if (cmd.equals_ci("CLEAR"))
 			this->DoClear(source, ci);
 		else
-			this->OnSyntaxError(source, cmd);
+		{
+			Anope::string mask, flags;
+			if (cmd.equals_ci("MODIFY"))
+			{
+				mask = params.size() > 2 ? params[2] : "";
+				flags = params.size() > 3 ? params[3] : "";
+			}
+			else
+			{
+				mask = cmd;
+				flags = params.size() > 2 ? params[2] : "";
+			}
+
+			this->DoModify(source, ci, mask, flags);
+		}
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override

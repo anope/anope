@@ -51,6 +51,11 @@ class HybridProto : public IRCDProto
 		MaxModes = 4;
 	}
 
+	void SendInvite(const MessageSource &source, const Channel *c, User *u) override
+	{
+		UplinkSocket::Message(source) << "INVITE " << u->GetUID() << " " << c->name << " " << c->creation_time;
+	}
+
 	void SendGlobalNotice(ServiceBot *bi, const Server *dest, const Anope::string &msg) override
 	{
 		UplinkSocket::Message(bi) << "NOTICE $$" << dest->GetName() << " :" << msg;

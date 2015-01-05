@@ -162,6 +162,7 @@ class CommandCSAccess : public Command
 		else
 		{
 			na = NickServ::FindNick(mask);
+
 			if (!na && Config->GetModule("chanserv")->Get<bool>("disallow_hostmask_access"))
 			{
 				source.Reply(_("Masks and unregistered users may not be on access lists."));
@@ -179,6 +180,9 @@ class CommandCSAccess : public Command
 					return;
 				}
 			}
+
+			if (na)
+				mask = na->GetNick();
 		}
 
 		for (unsigned i = ci->GetAccessCount(); i > 0; --i)
@@ -501,6 +505,8 @@ class CommandCSAccess : public Command
 
 		bool has_access = false;
 		if (source.HasPriv("chanserv/access/modify"))
+			has_access = true;
+		else if (is_list && source.HasPriv("chanserv/access/list"))
 			has_access = true;
 		else if (is_list && source.AccessFor(ci).HasPriv("ACCESS_LIST"))
 			has_access = true;

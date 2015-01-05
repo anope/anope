@@ -205,7 +205,7 @@ void Kill::Run(MessageSource &source, const std::vector<Anope::string> &params)
 		bi->OnKill();
 	}
 	else
-		u->KillInternal(source.GetSource(), params[1]);
+		u->KillInternal(source, params[1]);
 }
 
 void Message::Mode::Run(MessageSource &source, const std::vector<Anope::string> &params)
@@ -391,6 +391,14 @@ void SQuit::Run(MessageSource &source, const std::vector<Anope::string> &params)
 		return;
 	}
 
+	if (s == Me)
+	{
+		if (Me->GetLinks().empty())
+			return;
+
+		s = Me->GetLinks().front();
+	}
+
 	s->Delete(s->GetName() + " " + s->GetUplink()->GetName());
 }
 
@@ -417,7 +425,7 @@ void Stats::Run(MessageSource &source, const std::vector<Anope::string> &params)
 			else
 			{
 				for (Oper *o : Serialize::GetObjects<Oper *>(operblock))
-					IRCD->SendNumeric(243, source.GetSource(), "O * * %s %s 0", o->GetName().c_str(), o->GetType()->GetName().c_str());
+					IRCD->SendNumeric(243, source.GetSource(), "O * * %s %s 0", o->GetName().c_str(), o->GetType()->GetName().replace_all_cs(" ", "_").c_str());
 
 				IRCD->SendNumeric(219, source.GetSource(), "%c :End of /STATS report.", params[0][0]);
 			}
@@ -425,7 +433,7 @@ void Stats::Run(MessageSource &source, const std::vector<Anope::string> &params)
 			break;
 		case 'u':
 		{
-			time_t uptime = Anope::CurTime - Anope::StartTime;
+			long uptime = static_cast<long>(Anope::CurTime - Anope::StartTime);
 			IRCD->SendNumeric(242, source.GetSource(), ":Services up %d day%s, %02d:%02d:%02d", uptime / 86400, uptime / 86400 == 1 ? "" : "s", (uptime / 3600) % 24, (uptime / 60) % 60, uptime % 60);
 			IRCD->SendNumeric(250, source.GetSource(), ":Current users: %d (%d ops); maximum %d", UserListByNick.size(), OperCount, MaxUserCount);
 			IRCD->SendNumeric(219, source.GetSource(), "%c :End of /STATS report.", params[0][0]);

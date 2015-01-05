@@ -45,14 +45,17 @@ const Anope::string &IRCDProto::GetProtocolName()
 	return this->proto_name;
 }
 
-static inline char& nextID(char &c)
+static inline char nextID(int pos, Anope::string &buf)
 {
+	char &c = buf[pos];
 	if (c == 'Z')
 		c = '0';
 	else if (c != '9')
 		++c;
-	else
+	else if (pos)
 		c = 'A';
+	else
+		c = '0';
 	return c;
 }
 
@@ -66,7 +69,7 @@ Anope::string IRCDProto::UID_Retrieve()
 	do
 	{
 		int current_len = current_uid.length() - 1;
-		while (current_len >= 0 && nextID(current_uid[current_len--]) == 'A');
+		while (current_len >= 0 && nextID(current_len--, current_uid) == 'A');
 	}
 	while (User::Find(Me->GetSID() + current_uid) != NULL);
 
@@ -85,7 +88,7 @@ Anope::string IRCDProto::SID_Retrieve()
 	do
 	{
 		int current_len = current_sid.length() - 1;
-		while (current_len >= 0 && nextID(current_sid[current_len--]) == 'A');
+		while (current_len >= 0 && nextID(current_len--, current_sid) == 'A');
 	}
 	while (Server::Find(current_sid) != NULL);
 

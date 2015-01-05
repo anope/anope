@@ -171,6 +171,7 @@ class CommandOSSeen : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
+<<<<<<< HEAD
 		source.Reply(_("The \002STATS\002 command prints out statistics about stored nicks and memory usage.\n"
 		               "The \002CLEAR\002 command lets you clean the database by removing all entries from the entries from the database that were added within \037time\037.\n"
 		               "\n"
@@ -178,6 +179,17 @@ class CommandOSSeen : public Command
 		               "         {0} CLEAR 30m\n"
 		               "         Will remove all entries that were added within the last 30 minutes."),
 		               source.command);
+=======
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_("The \002STATS\002 command prints out statistics about stored nicks and memory usage."));
+		source.Reply(_("The \002CLEAR\002 command lets you clean the database by removing all entries from the\n"
+				"database that were added within \037time\037.\n"
+				" \n"
+				"Example:\n"
+				" %s CLEAR 30m\n"
+				" Will remove all entries that were added within the last 30 minutes."), source.command.c_str());
+>>>>>>> 2.0
 		return true;
 	}
 };

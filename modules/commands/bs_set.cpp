@@ -31,6 +31,8 @@ class CommandBSSet : public Command
 		source.Reply(_("Configures bot options.\n"
 			"\n"
 			"Available options:"));
+		bool hide_privileged_commands = Config->GetBlock("options")->Get<bool>("hideprivilegedcommands"),
+		     hide_registered_commands = Config->GetBlock("options")->Get<bool>("hideregisteredcommands");
 		Anope::string this_name = source.command;
 		for (CommandInfo::map::const_iterator it = source.service->commands.begin(), it_end = source.service->commands.end(); it != it_end; ++it)
 		{
@@ -41,6 +43,13 @@ class CommandBSSet : public Command
 				ServiceReference<Command> command("Command", info.name);
 				if (command)
 				{
+					// XXX dup
+					if (hide_registered_commands && !command->AllowUnregistered() && !source.GetAccount())
+						continue;
+
+					if (hide_privileged_commands && !info.permission.empty() && !source.HasCommand(info.permission))
+						continue;
+
 					source.command = it->first;
 					command->OnServHelp(source);
 				}
@@ -102,7 +111,7 @@ class CommandBSSetBanExpire : public Command
 
 		if (Anope::ReadOnly)
 		{
-			source.Reply(_("Sorry, bot option setting is temporarily disabled."));
+			source.Reply(_("Sorry, changing bot options is temporarily disabled."));
 			return;
 		}
 

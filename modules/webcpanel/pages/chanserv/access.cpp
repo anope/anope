@@ -46,8 +46,6 @@ bool WebCPanel::ChanServ::Access::OnRequest(HTTPProvider *server, const Anope::s
 
 	replacements["ACCESS_LIST"] = "YES";
 
-	::ChanServ::ChanAccess *highest = u_access.Highest();
-
 	if (u_access.HasPriv("ACCESS_CHANGE") || has_priv)
 	{
 		if (message.get_data["del"].empty() == false && message.get_data["mask"].empty() == false)
@@ -61,71 +59,37 @@ bool WebCPanel::ChanServ::Access::OnRequest(HTTPProvider *server, const Anope::s
 		}
 		else if (message.post_data["mask"].empty() == false && message.post_data["access"].empty() == false && message.post_data["provider"].empty() == false)
 		{
-#if 0
-			// Generic access add code here, works with any provider (so we can't call a command exactly)
-			ServiceReference<::ChanServ::AccessProvider> a("AccessProvider", "access/" + message.post_data["provider"]);
+			const Anope::string &provider = message.post_data["provider"];
 
-			if (a)
+			if (provider == "chanserv/access")
 			{
-				bool denied = false;
+				std::vector<Anope::string> params;
+				params.push_back(ci->GetName());
+				params.push_back("ADD");
+				params.push_back(message.post_data["mask"]);
+				params.push_back(message.post_data["access"]);
 
-				for (unsigned i = 0, end = ci->GetAccessCount(); i < end; ++i)
-				{
-					::ChanServ::ChanAccess *acc = ci->GetAccess(i);
-
-					if (acc->Mask() == message.post_data["mask"])
-					{
-						if ((!highest || *acc >= *highest) && !u_access.founder && !has_priv)
-						{
-							replacements["MESSAGES"] = "Access denied";
-							denied = true;
-						}
-						else
-							delete acc;
-						break;
-					}
-				}
-
-
-				unsigned access_max = Config->GetModule("chanserv")->Get<unsigned>("accessmax", "1024");
-				if (access_max && ci->GetAccessCount() >= access_max)
-					replacements["MESSAGES"] = "Sorry, you can only have " + stringify(access_max) + " access entries on a channel.";
-				else if (!denied)
-				{
-					::ChanServ::ChanAccess *new_acc = a->Create();
-					//new_acc->SetMask(message.post_data["mask"], ci);
-					new_acc->SetCreator(na->GetAccount()->GetDisplay());
-					try
-					{
-						new_acc->AccessUnserialize(message.post_data["access"]);
-					}
-					catch (...)
-					{
-						replacements["MESSAGES"] = "Invalid access expression for the given type";
-						delete new_acc;
-						new_acc = NULL;
-					}
-					if (new_acc)
-					{
-						new_acc->SetLastSeen(0);
-						new_acc->SetCreated(Anope::CurTime);
-
-						if ((!highest || *highest <= *new_acc) && !u_access.founder && !has_priv)
-							delete new_acc;
-						else if (new_acc->AccessSerialize().empty())
-						{
-							replacements["MESSAGES"] = "Invalid access expression for the given type";
-							delete new_acc;
-						}
-						else
-						{
-							ci->AddAccess(new_acc);
-							replacements["MESSAGES"] = "Access for " + new_acc->Mask() + " set to " + new_acc->AccessSerialize();
-						}
-					}
-				}
+				WebPanel::RunCommand(na->GetAccount()->GetDisplay(), na->GetAccount(), "ChanServ", "chanserv/access", params, replacements);
 			}
-#endif
+			else if (provider == "chanserv/xop")
+			{
+				std::vector<Anope::string> params;
+				params.push_back(ci->GetName());
+				params.push_back("ADD");
+				params.push_back(message.post_data["mask"]);
+
+				WebPanel::RunCommandWithName(na->GetAccount(), "ChanServ", "chanserv/xop", message.post_data["access"], params, replacements);
+			}
+			else if (provider == "chanserv/flags")
+			{
+				std::vector<Anope::string> params;
+				params.push_back(ci->GetName());
+				params.push_back("MODIFY");
+				params.push_back(message.post_data["mask"]);
+				params.push_back(message.post_data["access"]);
+
+				WebPanel::RunCommand(na->GetAccount()->GetDisplay(), na->GetAccount(), "ChanServ", "chanserv/flags", params, replacements);
+			}
 		}
 	}
 
@@ -141,11 +105,12 @@ bool WebCPanel::ChanServ::Access::OnRequest(HTTPProvider *server, const Anope::s
 		replacements["CREATORS"] = HTTPUtils::Escape(access->GetCreator());
 	}
 
-#if 0
-	if (::ChanServ::service)
-		for (::ChanServ::AccessProvider *p : ::ChanServ::service->GetProviders())
-			replacements["PROVIDERS"] = p->name;
-#endif
+	if (Service::FindService("Command", "chanserv/access"))
+		replacements["PROVIDERS"] = "chanserv/access";
+	if (Service::FindService("Command", "chanserv/xop"))
+		replacements["PROVIDERS"] = "chanserv/xop";
+	if (Service::FindService("Command", "chanserv/flags"))
+		replacements["PROVIDERS"] = "chanserv/flags";
 
 	Page.Serve(server, page_name, client, message, reply, replacements);
 	return true;

@@ -162,11 +162,8 @@ class ModuleXMLRPC : public Module
 	MyXMLRPCServiceInterface xmlrpcinterface;
 
 	ModuleXMLRPC(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, EXTRA | VENDOR),
-		httpref("HTTPProvider", "httpd/main"), xmlrpcinterface(this, "xmlrpc")
+		xmlrpcinterface(this, "xmlrpc")
 	{
-		if (!httpref)
-			throw ModuleException("Unable to find http reference, is m_httpd loaded?");
-		httpref->RegisterPage(&xmlrpcinterface);
 
 	}
 
@@ -178,7 +175,12 @@ class ModuleXMLRPC : public Module
 
 	void OnReload(Configuration::Conf *conf) anope_override
 	{
+		if (httpref)
+			httpref->UnregisterPage(&xmlrpcinterface);
 		this->httpref = ServiceReference<HTTPProvider>("HTTPProvider", conf->GetModule(this)->Get<const Anope::string>("server", "httpd/main"));
+		if (!httpref)
+			throw ConfigException("Unable to find http reference, is m_httpd loaded?");
+		httpref->RegisterPage(&xmlrpcinterface);
 	}
 };
 

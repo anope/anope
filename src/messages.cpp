@@ -25,7 +25,13 @@ using namespace Message;
 
 void Away::Run(MessageSource &source, const std::vector<Anope::string> &params)
 {
-	FOREACH_MOD(OnUserAway, (source.GetUser(), params.empty() ? "" : params[0]));
+	const Anope::string &msg = !params.empty() ? params[0] : "";
+
+	FOREACH_MOD(OnUserAway, (source.GetUser(), msg));
+	if (!msg.empty())
+		Log(source.GetUser(), "away") << "is now away: " << msg;
+	else
+		Log(source.GetUser(), "away") << "is no longer away";
 }
 
 void Capab::Run(MessageSource &source, const std::vector<Anope::string> &params)

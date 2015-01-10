@@ -746,7 +746,7 @@ void Channel::KickInternal(const MessageSource &source, const Anope::string &nic
 	if (sender)
 		Log(sender, this, "kick") << "kicked " << target->nick << " (" << reason << ")";
 	else
-		Log(target, this, "kick") << "was kicked by " << source.GetSource() << " (" << reason << ")";
+		Log(target, this, "kick") << "was kicked by " << source.GetName() << " (" << reason << ")";
 
 	Anope::string chname = this->name;
 

@@ -103,6 +103,8 @@ namespace Configuration
 		time_t TimeoutCheck;
 		/* options:usestrictprivmsg */
 		bool UseStrictPrivmsg;
+		/* networkinfo:nickchars */
+		Anope::string NickChars;
 
 		/* either "/msg " or "/" */
 		Anope::string StrictPrivmsg;

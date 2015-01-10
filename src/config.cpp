@@ -191,6 +191,7 @@ Conf::Conf() : Block("")
 	}
 	this->DefLanguage = options->Get<const Anope::string>("defaultlanguage");
 	this->TimeoutCheck = options->Get<time_t>("timeoutcheck");
+	this->NickChars = networkinfo->Get<Anope::string>("nick_chars");
 
 	for (int i = 0; i < this->CountBlock("uplink"); ++i)
 	{

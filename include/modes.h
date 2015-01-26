@@ -107,6 +107,8 @@ class CoreExport ChannelMode : public Mode
 
 	bool CanSet(User *u) const anope_override;
 
+	virtual void Check() { }
+
 	/** 'wrap' this channel mode and param to the underlying mode and param
 	 */
 	virtual ChannelMode *Wrap(Anope::string &param);
@@ -214,6 +216,8 @@ class CoreExport ChannelModeVirtual : public T
 	ChannelModeVirtual(const Anope::string &mname, const Anope::string &basename);
 
 	~ChannelModeVirtual();
+
+	void Check() anope_override;
 
 	ChannelMode *Wrap(Anope::string &param) anope_override;
 

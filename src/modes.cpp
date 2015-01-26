@@ -213,7 +213,7 @@ ChannelModeVirtual<T>::~ChannelModeVirtual()
 }
 
 template<typename T>
-ChannelMode *ChannelModeVirtual<T>::Wrap(Anope::string &param)
+void ChannelModeVirtual<T>::Check()
 {
 	if (basech == NULL)
 	{
@@ -221,7 +221,11 @@ ChannelMode *ChannelModeVirtual<T>::Wrap(Anope::string &param)
 		if (basech)
 			basech->listeners.push_back(this);
 	}
+}
 
+template<typename T>
+ChannelMode *ChannelModeVirtual<T>::Wrap(Anope::string &param)
+{
 	return basech;
 }
 
@@ -452,6 +456,9 @@ bool ModeManager::AddChannelMode(ChannelMode *cm)
 	ChannelModes.push_back(cm);
 
 	FOREACH_MOD(OnChannelModeAdd, (cm));
+
+	for (unsigned int i = 0; i < ChannelModes.size(); ++i)
+		ChannelModes[i]->Check();
 
 	return true;
 }

@@ -69,7 +69,7 @@ class IRC2SQL : public Module
 	EventReturn OnChannelModeSet(Channel *c, MessageSource &setter, ChannelMode *mode, const Anope::string &param) anope_override;
 	EventReturn OnChannelModeUnset(Channel *c, MessageSource &setter, ChannelMode *mode, const Anope::string &param) anope_override;
 
-	void OnTopicUpdated(Channel *c, const Anope::string &user, const Anope::string &topic) anope_override;
+	void OnTopicUpdated(User *source, Channel *c, const Anope::string &user, const Anope::string &topic) anope_override;
 
 	void OnBotNotice(User *u, BotInfo *bi, Anope::string &message) anope_override;
 };

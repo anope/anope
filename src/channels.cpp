@@ -789,26 +789,22 @@ bool Channel::Kick(BotInfo *bi, User *u, const char *reason, ...)
 	return true;
 }
 
-void Channel::ChangeTopicInternal(const Anope::string &user, const Anope::string &newtopic, time_t ts)
+void Channel::ChangeTopicInternal(User *u, const Anope::string &user, const Anope::string &newtopic, time_t ts)
 {
-	User *u = User::Find(user);
-
 	this->topic = newtopic;
 	this->topic_setter = u ? u->nick : user;
 	this->topic_ts = ts;
 	this->topic_time = Anope::CurTime;
 
-	Log(LOG_DEBUG) << "Topic of " << this->name << " changed by " << (u ? u->nick : user) << " to " << newtopic;
+	Log(LOG_DEBUG) << "Topic of " << this->name << " changed by " << this->topic_setter << " to " << newtopic;
 
-	FOREACH_MOD(OnTopicUpdated, (this, user, this->topic));
+	FOREACH_MOD(OnTopicUpdated, (u, this, user, this->topic));
 }
 
 void Channel::ChangeTopic(const Anope::string &user, const Anope::string &newtopic, time_t ts)
 {
-	User *u = User::Find(user);
-
 	this->topic = newtopic;
-	this->topic_setter = u ? u->nick : user;
+	this->topic_setter = user;
 	this->topic_ts = ts;
 
 	IRCD->SendTopic(this->ci->WhoSends(), this);
@@ -816,7 +812,7 @@ void Channel::ChangeTopic(const Anope::string &user, const Anope::string &newtop
 	/* Now that the topic is set update the time set. This is *after* we set it so the protocol modules are able to tell the old last set time */
 	this->topic_time = Anope::CurTime;
 
-	FOREACH_MOD(OnTopicUpdated, (this, user, this->topic));
+	FOREACH_MOD(OnTopicUpdated, (NULL, this, user, this->topic));
 }
 
 void Channel::SetCorrectModes(User *user, bool give_modes)

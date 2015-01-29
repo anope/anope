@@ -474,11 +474,12 @@ class CoreExport Module : public Extensible
 	virtual void OnJoinChannel(User *u, Channel *c) { throw NotImplementedException(); }
 
 	/** Called when a new topic is set
+	 * @param source The user changing the topic, if any
 	 * @param c The channel
-	 * @param setter The user who set the new topic
+	 * @param setter The user who set the new topic, if there is no source
 	 * @param topic The new topic
 	 */
-	virtual void OnTopicUpdated(Channel *c, const Anope::string &user, const Anope::string &topic) { throw NotImplementedException(); }
+	virtual void OnTopicUpdated(User *source, Channel *c, const Anope::string &user, const Anope::string &topic) { throw NotImplementedException(); }
 
 	/** Called before a channel expires
 	 * @param ci The channel

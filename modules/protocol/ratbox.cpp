@@ -185,7 +185,7 @@ struct IRCDMessageTBurst : IRCDMessage
 		const Anope::string &setter = params.size() == 4 ? params[2] : "",
 			topic = params.size() == 4 ? params[3] : params[2];
 
-		c->ChangeTopicInternal(setter, topic, topic_time);
+		c->ChangeTopicInternal(NULL, setter, topic, topic_time);
 	}
 };
 

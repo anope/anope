@@ -472,7 +472,7 @@ void Topic::Run(MessageSource &source, const std::vector<Anope::string> &params)
 {
 	Channel *c = Channel::Find(params[0]);
 	if (c)
-		c->ChangeTopicInternal(source.GetSource(), params[1], Anope::CurTime);
+		c->ChangeTopicInternal(source.GetUser(), source.GetSource(), params[1], Anope::CurTime);
 
 	return;
 }

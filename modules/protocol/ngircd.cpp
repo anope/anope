@@ -257,7 +257,7 @@ struct IRCDMessageChaninfo : IRCDMessage
 
 		if (params.size() == 3)
 		{
-			c->ChangeTopicInternal(source.GetName(), params[2], Anope::CurTime);
+			c->ChangeTopicInternal(NULL, source.GetName(), params[2], Anope::CurTime);
 		}
 		else if (params.size() == 5)
 		{
@@ -271,9 +271,9 @@ struct IRCDMessageChaninfo : IRCDMessage
 					case 'l':
 						modes += " " + params[3];
 						continue;
+				}
 			}
-		}
-			c->ChangeTopicInternal(source.GetName(), params[4], Anope::CurTime);
+			c->ChangeTopicInternal(NULL, source.GetName(), params[4], Anope::CurTime);
 		}
 
 		c->SetModesInternal(source, modes);
@@ -590,7 +590,7 @@ struct IRCDMessageTopic : IRCDMessage
 			Log(LOG_DEBUG) << "TOPIC for nonexistant channel " << params[0];
 			return;
 		}
-		c->ChangeTopicInternal(source.GetName(), params[1], Anope::CurTime);
+		c->ChangeTopicInternal(source.GetUser(), source.GetName(), params[1], Anope::CurTime);
 	}
 };
 

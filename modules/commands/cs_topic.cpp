@@ -227,7 +227,7 @@ class CSTopic : public Module
 		}
 	}
 
-	void OnTopicUpdated(Channel *c, const Anope::string &user, const Anope::string &topic) anope_override
+	void OnTopicUpdated(User *source, Channel *c, const Anope::string &user, const Anope::string &topic) anope_override
 	{
 		if (!c->ci)
 			return;
@@ -237,7 +237,7 @@ class CSTopic : public Module
 		 * This desyncs what is really set with what we have stored, and we end up resetting the topic often when
 		 * it is not required
 		 */
-		if (topiclock.HasExt(c->ci) && c->ci->last_topic != c->topic)
+		if (topiclock.HasExt(c->ci) && c->ci->last_topic != c->topic && (!source || !c->ci->AccessFor(source).HasPriv("TOPIC")))
 		{
 			c->ChangeTopic(c->ci->last_topic_setter, c->ci->last_topic, c->ci->last_topic_time);
 		}

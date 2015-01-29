@@ -243,7 +243,7 @@ void IRC2SQL::OnLeaveChannel(User *u, Channel *c)
 	this->RunQuery(query);
 }
 
-void IRC2SQL::OnTopicUpdated(Channel *c, const Anope::string &user, const Anope::string &topic)
+void IRC2SQL::OnTopicUpdated(User *source, Channel *c, const Anope::string &user, const Anope::string &topic)
 {
 	query = "UPDATE `" + prefix + "chan` "
 		"SET topic=@topic@, topicauthor=@author@, topictime=FROM_UNIXTIME(@time@) "

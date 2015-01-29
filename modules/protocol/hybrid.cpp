@@ -512,7 +512,7 @@ struct IRCDMessageTBurst : IRCDMessage
 		Channel *c = Channel::Find(params[1]);
 
 		if (c)
-			c->ChangeTopicInternal(setter, params[4], topic_time);
+			c->ChangeTopicInternal(NULL, setter, params[4], topic_time);
 	}
 };
 

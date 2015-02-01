@@ -101,6 +101,9 @@ class CommandCSBan : public Command
 		if (reason.length() > reasonmax)
 			reason = reason.substr(0, reasonmax);
 
+		Anope::string signkickformat = Config->GetModule("chanserv")->Get<Anope::string>("signkickformat", "%m (%n)");
+		signkickformat = signkickformat.replace_all_cs("%n", source.GetNick());
+
 		User *u = source.GetUser();
 		User *u2 = User::Find(target, true);
 
@@ -146,7 +149,10 @@ class CommandCSBan : public Command
 				if (block->Get<bool>("kick", "yes"))
 				{
 					if (ci->HasExt("SIGNKICK") || (ci->HasExt("SIGNKICK_LEVEL") && !source.AccessFor(ci).HasPriv("SIGNKICK")))
-						c->Kick(ci->WhoSends(), u2, "%s (%s)", reason.c_str(), source.GetNick().c_str());
+					{
+						signkickformat = signkickformat.replace_all_cs("%m", reason);
+						c->Kick(ci->WhoSends(), u2, "%s", signkickformat.c_str());
+					}
 					else
 						c->Kick(ci->WhoSends(), u2, "%s", reason.c_str());
 				}
@@ -197,7 +203,11 @@ class CommandCSBan : public Command
 					{
 						++kicked;
 						if (ci->HasExt("SIGNKICK") || (ci->HasExt("SIGNKICK_LEVEL") && !u_access.HasPriv("SIGNKICK")))
-							c->Kick(ci->WhoSends(), uc->user, "%s (Matches %s) (%s)", reason.c_str(), mask.c_str(), source.GetNick().c_str());
+						{
+							reason += " (Matches " + mask + ")";
+							signkickformat = signkickformat.replace_all_cs("%m", reason);
+							c->Kick(ci->WhoSends(), uc->user, "%s", signkickformat.c_str());
+						}
 						else
 							c->Kick(ci->WhoSends(), uc->user, "%s (Matches %s)", reason.c_str(), mask.c_str());
 					}

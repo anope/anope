@@ -53,6 +53,39 @@ class MyXMLRPCServiceInterface : public XMLRPCServiceInterface, public HTTPPage
 		return ret;
 	}
 
+	static Anope::string Unescape(const Anope::string &string)
+	{
+		Anope::string ret = string;
+		for (int i = 0; special[i].character.empty() == false; ++i)
+			if (!special[i].replace.empty())
+				ret = ret.replace_all_cs(special[i].replace, special[i].character);
+
+		for (size_t i, last = 0; (i = string.find("&#", last)) != Anope::string::npos;)
+		{
+			last = i + 1;
+
+			size_t end = string.find(';', i);
+			if (end == Anope::string::npos)
+				break;
+
+			Anope::string ch = string.substr(i + 2, end - (i + 2));
+
+			if (ch.empty())
+				continue;
+
+			long l;
+			if (!ch.empty() && ch[0] == 'x')
+				l = strtol(ch.substr(1).c_str(), NULL, 16);
+			else
+				l = strtol(ch.c_str(), NULL, 10);
+
+			if (l > 0 && l < 256)
+				ret = ret.replace_all_cs("&#" + ch + ";", Anope::string(l));
+		}
+
+		return ret;
+	}
+
  private:
 	static bool GetData(Anope::string &content, Anope::string &tag, Anope::string &data)
 	{
@@ -98,8 +131,8 @@ class MyXMLRPCServiceInterface : public XMLRPCServiceInterface, public HTTPPage
 		}
 		while (istag && !content.empty());
 
-		tag = prev;
-		data = cur;
+		tag = Unescape(prev);
+		data = Unescape(cur);
 		return !istag && !data.empty();
 	}
 

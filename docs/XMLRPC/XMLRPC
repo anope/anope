@@ -3,8 +3,8 @@ This allows external applications, such as websites, to execute remote procedure
 
 Currently there are 5 supported XMLRPC calls, provided by m_xmlrpc_main:
 
-checkAuthetication - Takes two parameters, an account name and a password. Checks if the account name is valid and the password
-                     is correct for the account name, useful for making login pages on websites.
+checkAuthentication - Takes two parameters, an account name and a password. Checks if the account name is valid and the password
+                      is correct for the account name, useful for making login pages on websites.
 
 command - Takes three parameters, a service name (BotServ, ChanServ, NickServ), a user name (whether online or not), and the command
           to execute. This will execute a the given command to Anope using the given service name. If the user given is online, the

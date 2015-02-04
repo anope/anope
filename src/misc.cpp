@@ -11,7 +11,7 @@
  */
 
 #include "services.h"
-#include "version.h"
+#include "build.h"
 #include "modules.h"
 #include "lists.h"
 #include "config.h"
@@ -615,11 +615,6 @@ const Anope::string Anope::LastError()
 	FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, NULL, err, 0, errbuf, 512, NULL);
 	return errbuf;
 #endif
-}
-
-ModuleVersion Module::GetVersion() const
-{
-	return ModuleVersion(VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH);
 }
 
 Anope::string Anope::Version()

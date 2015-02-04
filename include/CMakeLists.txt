@@ -7,7 +7,7 @@ get_target_property(version_BINARY version LOCATION)
 # Modify version.h from the above executable, with dependencies to version.cpp
 # and all of the source files in the main build
 add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/version_build
-  COMMAND ${version_BINARY} ${Anope_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR}/version.h
+  COMMAND ${version_BINARY} ${Anope_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR}/version.h ${CMAKE_CURRENT_BINARY_DIR}/build.h
   DEPENDS version ${SRC_SRCS}
 )
 # Add version to list of files for CPack to ignore
@@ -15,6 +15,7 @@ get_filename_component(version_BINARY ${version_BINARY} NAME)
 add_to_cpack_ignored_files("${version_BINARY}$" TRUE)
 if(NOT WIN32)
   add_to_cpack_ignored_files("version.h$" TRUE)
+  add_to_cpack_ignored_files("build.h$" TRUE)
 endif(NOT WIN32)
 
 set(PCH_SOURCES_GCH "")

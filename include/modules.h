@@ -20,6 +20,7 @@
 #include "timers.h"
 #include "logger.h"
 #include "extensible.h"
+#include "version.h"
 
 /** This definition is used as shorthand for the various classes
  * and functions needed to make a module loadable by the OS.
@@ -40,6 +41,10 @@
 	extern "C" void AnopeFini(x *m) \
 	{ \
 		delete m; \
+	} \
+	extern "C" DllExport ModuleVersion AnopeVersion() \
+	{ \
+		return ModuleVersion(VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH); \
 	}
 #else
 # define MODULE_INIT(x) \
@@ -50,6 +55,10 @@
 	extern "C" DllExport void AnopeFini(x *m) \
 	{ \
 		delete m; \
+	} \
+	extern "C" DllExport ModuleVersion AnopeVersion() \
+	{ \
+		return ModuleVersion(VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH); \
 	}
 #endif
 
@@ -278,12 +287,6 @@ class CoreExport Module : public Extensible
 	 * @param author the author of the module
 	 */
 	void SetAuthor(const Anope::string &author);
-
-	/** Get the version of Anope this module was
-	 * compiled against
-	 * @return The version
-	 */
-	ModuleVersion GetVersion() const;
 
 	virtual void Prioritize();
 
@@ -1206,6 +1209,11 @@ class CoreExport ModuleManager
 	 * @return MOD_ERR_OK on success, anything else on fail
 	 */
 	static ModuleReturn DeleteModule(Module *m);
+
+	/** Get the version of Anope the module was compiled against
+	 * @return The version
+	 */
+	static ModuleVersion GetVersion(void *handle);
 };
 
 #endif // MODULES_H

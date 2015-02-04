@@ -166,6 +166,46 @@ ModuleReturn ModuleManager::LoadModule(const Anope::string &modname, User *u)
 		return MOD_ERR_NOLOAD;
 	}
 
+	try
+	{
+		ModuleVersion v = GetVersion(handle);
+
+		if (v.GetMajor() < Anope::VersionMajor() || (v.GetMajor() == Anope::VersionMajor() && v.GetMinor() < Anope::VersionMinor()))
+		{
+			Log() << "Module " << modname << " is compiled against an older version of Anope " << v.GetMajor() << "." << v.GetMinor() << ", this is " << Anope::VersionShort();
+			dlclose(handle);
+			return MOD_ERR_VERSION;
+		}
+		else if (v.GetMajor() > Anope::VersionMajor() || (v.GetMajor() == Anope::VersionMajor() && v.GetMinor() > Anope::VersionMinor()))
+		{
+			Log() << "Module " << modname << " is compiled against a newer version of Anope " << v.GetMajor() << "." << v.GetMinor() << ", this is " << Anope::VersionShort();
+			dlclose(handle);
+			return MOD_ERR_VERSION;
+		}
+		else if (v.GetPatch() < Anope::VersionPatch())
+		{
+			Log() << "Module " << modname << " is compiled against an older version of Anope, " << v.GetMajor() << "." << v.GetMinor() << "." << v.GetPatch() << ", this is " << Anope::VersionShort();
+			dlclose(handle);
+			return MOD_ERR_VERSION;
+		}
+		else if (v.GetPatch() > Anope::VersionPatch())
+		{
+			Log() << "Module " << modname << " is compiled against a newer version of Anope, " << v.GetMajor() << "." << v.GetMinor() << "." << v.GetPatch() << ", this is " << Anope::VersionShort();
+			dlclose(handle);
+			return MOD_ERR_VERSION;
+		}
+		else
+		{
+			Log(LOG_DEBUG_2) << "Module " << modname << " is compiled against current version of Anope " << Anope::VersionShort();
+		}
+	}
+	catch (const ModuleException &ex)
+	{
+		/* this error has already been logged */
+		dlclose(handle);
+		return MOD_ERR_NOLOAD;
+	}
+
 	dlerror();
 	Module *(*func)(const Anope::string &, const Anope::string &) = function_cast<Module *(*)(const Anope::string &, const Anope::string &)>(dlsym(handle, "AnopeInit"));
 	err = dlerror();
@@ -206,34 +246,6 @@ ModuleReturn ModuleManager::LoadModule(const Anope::string &modname, User *u)
 	m->filename = pbuf;
 	m->handle = handle;
 
-	ModuleVersion v = m->GetVersion();
-	if (v.GetMajor() < Anope::VersionMajor() || (v.GetMajor() == Anope::VersionMajor() && v.GetMinor() < Anope::VersionMinor()))
-	{
-		Log() << "Module " << modname << " is compiled against an older version of Anope " << v.GetMajor() << "." << v.GetMinor() << ", this is " << Anope::VersionShort();
-		DeleteModule(m);
-		return MOD_ERR_VERSION;
-	}
-	else if (v.GetMajor() > Anope::VersionMajor() || (v.GetMajor() == Anope::VersionMajor() && v.GetMinor() > Anope::VersionMinor()))
-	{
-		Log() << "Module " << modname << " is compiled against a newer version of Anope " << v.GetMajor() << "." << v.GetMinor() << ", this is " << Anope::VersionShort();
-		DeleteModule(m);
-		return MOD_ERR_VERSION;
-	}
-	else if (v.GetPatch() < Anope::VersionPatch())
-	{
-		Log() << "Module " << modname << " is compiled against an older version of Anope, " << v.GetMajor() << "." << v.GetMinor() << "." << v.GetPatch() << ", this is " << Anope::VersionShort();
-		DeleteModule(m);
-		return MOD_ERR_VERSION;
-	}
-	else if (v.GetPatch() > Anope::VersionPatch())
-	{
-		Log() << "Module " << modname << " is compiled against a newer version of Anope, " << v.GetMajor() << "." << v.GetMinor() << "." << v.GetPatch() << ", this is " << Anope::VersionShort();
-		DeleteModule(m);
-		return MOD_ERR_VERSION;
-	}
-	else
-		Log(LOG_DEBUG_2) << "Module " << modname << " is compiled against current version of Anope " << Anope::VersionShort();
-
 	/* Initialize config */
 	try
 	{
@@ -270,6 +282,24 @@ ModuleReturn ModuleManager::LoadModule(const Anope::string &modname, User *u)
 	FOREACH_MOD(OnModuleLoad, (u, m));
 
 	return MOD_ERR_OK;
+}
+
+ModuleVersion ModuleManager::GetVersion(void *handle)
+{
+	dlerror();
+	ModuleVersion (*func)() = function_cast<ModuleVersion (*)()>(dlsym(handle, "AnopeVersion"));;
+	if (!func)
+	{
+		Log() << "No version function found, not an Anope module";
+
+		const char *err = dlerror();
+		if (err && *err)
+			Log(LOG_DEBUG) << err;
+
+		throw ModuleException("No version");
+	}
+
+	return func();
 }
 
 ModuleReturn ModuleManager::UnloadModule(Module *m, User *u)

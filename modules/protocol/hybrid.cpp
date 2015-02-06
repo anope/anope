@@ -645,7 +645,7 @@ class ProtoHybrid : public Module
 		ModeManager::AddChannelMode(new ChannelModeList("EXCEPT", 'e'));
 		ModeManager::AddChannelMode(new ChannelModeList("INVITEOVERRIDE", 'I'));
 
-		/* v/h/o/a/q */
+		/* v/h/o */
 		ModeManager::AddChannelMode(new ChannelModeStatus("VOICE", 'v', '+', 0));
 		ModeManager::AddChannelMode(new ChannelModeStatus("HALFOP", 'h', '%', 1));
 		ModeManager::AddChannelMode(new ChannelModeStatus("OP", 'o', '@', 2));
@@ -663,6 +663,7 @@ class ProtoHybrid : public Module
 		ModeManager::AddChannelMode(new ChannelModeNoone("REGISTERED", 'r'));
 		ModeManager::AddChannelMode(new ChannelMode("SECRET", 's'));
 		ModeManager::AddChannelMode(new ChannelMode("TOPIC", 't'));
+		ModeManager::AddChannelMode(new ChannelMode("NOCTCP", 'C'));
 		ModeManager::AddChannelMode(new ChannelModeOperOnly("OPERONLY", 'O'));
 		ModeManager::AddChannelMode(new ChannelMode("REGMODERATED", 'M'));
 		ModeManager::AddChannelMode(new ChannelMode("REGISTEREDONLY", 'R'));

@@ -487,7 +487,7 @@ class CommandCSMode : public Command
 				case '*':
 					if (adding == -1 || !has_access)
 						break;
-					for (unsigned j = 0; j < ModeManager::GetChannelModes().size(); ++j)
+					for (unsigned j = 0; j < ModeManager::GetChannelModes().size() && ci->c; ++j)
 					{
 						ChannelMode *cm = ModeManager::GetChannelModes()[j];
 

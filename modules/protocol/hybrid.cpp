@@ -66,11 +66,6 @@ class HybridProto : public IRCDProto
 		UplinkSocket::Message(bi) << "PRIVMSG $$" << dest->GetName() << " :" << msg;
 	}
 
-	void SendGlobopsInternal(const MessageSource &source, const Anope::string &buf) anope_override
-	{
-		UplinkSocket::Message(source) << "GLOBOPS :" << buf;
-	}
-
 	void SendSQLine(User *, const XLine *x) anope_override
 	{
 		UplinkSocket::Message(FindIntroduced()) << "ENCAP * RESV " << (x->expires ? x->expires - Anope::CurTime : 0) << " " << x->mask << " 0 :" << x->reason;

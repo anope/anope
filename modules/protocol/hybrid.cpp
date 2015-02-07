@@ -626,10 +626,13 @@ class ProtoHybrid : public Module
 	{
 		/* Add user modes */
 		ModeManager::AddUserMode(new UserModeOperOnly("ADMIN", 'a'));
+		ModeManager::AddUserMode(new UserMode("SOFTCALLERID", 'G'));
 		ModeManager::AddUserMode(new UserModeOperOnly("CALLERID", 'g'));
 		ModeManager::AddUserMode(new UserMode("INVIS", 'i'));
 		ModeManager::AddUserMode(new UserModeOperOnly("LOCOPS", 'l'));
 		ModeManager::AddUserMode(new UserModeOperOnly("OPER", 'o'));
+		ModeManager::AddUserMode(new UserMode("HIDECHANS", 'p'));
+		ModeManager::AddUserMode(new UserMode("HIDEIDLE", 'q'));
 		ModeManager::AddUserMode(new UserModeNoone("REGISTERED", 'r'));
 		ModeManager::AddUserMode(new UserModeOperOnly("SNOMASK", 's'));
 		ModeManager::AddUserMode(new UserMode("WALLOPS", 'w'));
@@ -638,6 +641,7 @@ class ProtoHybrid : public Module
 		ModeManager::AddUserMode(new UserModeOperOnly("HIDEOPER", 'H'));
 		ModeManager::AddUserMode(new UserMode("REGPRIV", 'R'));
 		ModeManager::AddUserMode(new UserModeNoone("SSL", 'S'));
+		ModeManager::AddUserMode(new UserModeNoone("WEBIRC", 'W'));
 		ModeManager::AddUserMode(new UserMode("CLOAK", 'x'));
 
 		/* b/e/I */

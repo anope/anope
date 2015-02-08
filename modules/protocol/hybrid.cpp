@@ -1,7 +1,7 @@
 /* ircd-hybrid-8 protocol module
  *
  * (C) 2003-2014 Anope Team
- * (C) 2012-2014 ircd-hybrid development team
+ * (C) 2012-2015 ircd-hybrid development team
  *
  * Please read COPYING and README for further details.
  *
@@ -48,7 +48,7 @@ class HybridProto : public IRCDProto
 		CanCertFP = true;
 		CanSetVHost = true;
 		RequiresID = true;
-		MaxModes = 4;
+		MaxModes = 6;
 	}
 
 	void SendInvite(const MessageSource &source, const Channel *c, User *u) anope_override
@@ -232,7 +232,7 @@ class HybridProto : public IRCDProto
 
 	void SendLogout(User *u) anope_override
 	{
-		IRCD->SendMode(Config->GetClient("NickServ"), u, "+d 0");
+		IRCD->SendMode(Config->GetClient("NickServ"), u, "+d *");
 	}
 
 	void SendChannel(Channel *c) anope_override
@@ -628,7 +628,6 @@ class ProtoHybrid : public Module
 		ModeManager::AddUserMode(new UserModeNoone("REGISTERED", 'r'));
 		ModeManager::AddUserMode(new UserModeOperOnly("SNOMASK", 's'));
 		ModeManager::AddUserMode(new UserMode("WALLOPS", 'w'));
-		ModeManager::AddUserMode(new UserModeOperOnly("OPERWALLS", 'z'));
 		ModeManager::AddUserMode(new UserMode("DEAF", 'D'));
 		ModeManager::AddUserMode(new UserModeOperOnly("HIDEOPER", 'H'));
 		ModeManager::AddUserMode(new UserMode("REGPRIV", 'R'));

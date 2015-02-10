@@ -6389,7 +6389,7 @@ msgstr "%s ist ein services operator vom Typ %s."
 #: modules/commands/ns_info.cpp:34
 #, c-format
 msgid "Nick %s is part of this Network's Services."
-msgstr "Der Nickname %s ist ein teil der  Network Services."
+msgstr "Der Nickname %s ist ein Teil der Netzwerkdienste."
 
 #: include/language.h:80
 #, fuzzy, c-format

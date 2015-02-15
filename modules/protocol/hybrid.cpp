@@ -36,7 +36,7 @@ class HybridProto : public IRCDProto
 	}
 
   public:
-	HybridProto(Module *creator) : IRCDProto(creator, "Hybrid 8.1.x")
+	HybridProto(Module *creator) : IRCDProto(creator, "Hybrid 8.2.x")
 	{
 		DefaultPseudoclientModes = "+oi";
 		CanSVSNick = true;
@@ -204,7 +204,7 @@ class HybridProto : public IRCDProto
 
 		SendServer(Me);
 
-		UplinkSocket::Message() << "SVINFO 6 5 0 :" << Anope::CurTime;
+		UplinkSocket::Message() << "SVINFO 6 6 0 :" << Anope::CurTime;
 	}
 
 	void SendClientIntroduction(User *u) anope_override
@@ -550,7 +550,7 @@ struct IRCDMessageUID : IRCDMessage
 			ip.clear();
 
 		NickAlias *na = NULL;
-		if (params[8] != "0")
+		if (params[8] != "0" && params[8] != "*")
 			na = NickAlias::Find(params[8]);
 
 		/* Source is always the server */

@@ -1,7 +1,9 @@
 language: cpp
+sudo: false
 
 compiler:
   - gcc
+  - clang
 
 before_script:
   - mkdir build
@@ -9,8 +11,10 @@ before_script:
   - cmake -DINSTDIR:STRING=~/services -DDEFUMASK:STRING=077 -DCMAKE_BUILD_TYPE:STRING=DEBUG -DUSE_RUN_CC_PL:BOOLEAN=ON ..
 
 script:
-  - make
+  - make -j$(nproc)
 
 notifications:
   irc:
     - "irc.anope.org#anope-devel"
+matrix:
+    fast_finish: true

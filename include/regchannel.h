@@ -198,6 +198,11 @@ class CoreExport ChannelInfo : public Serializable, public Extensible
 	 */
 	void ClearAkick();
 
+	/** Get the level entries for the current channel.
+	 * @return The levels for the specified channel.
+	 */
+	const Anope::map<int16_t> &GetLevelEntries();
+
 	/** Get the level for a privilege
 	 * @param priv The privilege name
 	 * @return the level

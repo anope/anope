@@ -14,6 +14,88 @@
 
 class CommandCSClone : public Command
 {
+	void CopySetting(ChannelInfo *ci, ChannelInfo *target_ci, const Anope::string &setting)
+	{
+		if (ci->HasExt(setting))
+			target_ci->Extend<bool>(setting);
+	}
+
+	void CopyAccess(CommandSource &source, ChannelInfo *ci, ChannelInfo *target_ci)
+	{
+		std::set<Anope::string> masks;
+		unsigned access_max = Config->GetModule("chanserv")->Get<unsigned>("accessmax", "1024");
+		unsigned count = 0;
+
+		for (unsigned i = 0; i < target_ci->GetAccessCount(); ++i)
+			masks.insert(target_ci->GetAccess(i)->Mask());
+
+		for (unsigned i = 0; i < ci->GetAccessCount(); ++i)
+		{
+			const ChanAccess *taccess = ci->GetAccess(i);
+			AccessProvider *provider = taccess->provider;
+
+			if (access_max && target_ci->GetDeepAccessCount() >= access_max)
+				break;
+
+			if (masks.count(taccess->Mask()))
+				continue;
+			masks.insert(taccess->Mask());
+
+			ChanAccess *newaccess = provider->Create();
+			newaccess->SetMask(taccess->Mask(), target_ci);
+			newaccess->creator = taccess->creator;
+			newaccess->last_seen = taccess->last_seen;
+			newaccess->created = taccess->created;
+			newaccess->AccessUnserialize(taccess->AccessSerialize());
+
+			target_ci->AddAccess(newaccess);
+
+			++count;
+		}
+
+		source.Reply(_("%d access entries from \002%s\002 have been cloned to \002%s\002."), count, ci->name.c_str(), target_ci->name.c_str());
+	}
+
+	void CopyAkick(CommandSource &source, ChannelInfo *ci, ChannelInfo *target_ci)
+	{
+		target_ci->ClearAkick();
+		for (unsigned i = 0; i < ci->GetAkickCount(); ++i)
+		{
+			const AutoKick *akick = ci->GetAkick(i);
+			if (akick->nc)
+				target_ci->AddAkick(akick->creator, akick->nc, akick->reason, akick->addtime, akick->last_used);
+			else
+				target_ci->AddAkick(akick->creator, akick->mask, akick->reason, akick->addtime, akick->last_used);
+		}
+
+		source.Reply(_("All akick entries from \002%s\002 have been cloned to \002%s\002."), ci->name.c_str(), target_ci->name.c_str());
+	}
+
+	void CopyBadwords(CommandSource &source, ChannelInfo *ci, ChannelInfo *target_ci)
+	{
+		BadWords *target_badwords = target_ci->Require<BadWords>("badwords"),
+			*badwords = ci->Require<BadWords>("badwords");
+
+		if (!target_badwords || !badwords)
+		{
+			source.Reply(ACCESS_DENIED); // BotServ doesn't exist/badwords isn't loaded
+			return;
+		}
+
+		target_badwords->ClearBadWords();
+
+		for (unsigned i = 0; i < badwords->GetBadWordCount(); ++i)
+		{
+			const BadWord *bw = badwords->GetBadWord(i);
+			target_badwords->AddBadWord(bw->word, bw->type);
+		}
+
+		badwords->Check();
+		target_badwords->Check();
+
+		source.Reply(_("All badword entries from \002%s\002 have been cloned to \002%s\002."), ci->name.c_str(), target_ci->name.c_str());
+	}
+
 public:
 	CommandCSClone(Module *creator) : Command(creator, "chanserv/clone", 2, 3)
 	{
@@ -100,82 +182,31 @@ public:
 			else
 				target_ci->last_topic_setter = source.service->nick;
 
+			const Anope::string settings[] = { "NOAUTOOP", "CS_KEEP_MODES", "PEACE", "PERSIST", "RESTRICTED",
+				"CS_SECURE", "SECUREFOUNDER", "SECUREOPS", "SIGNKICK", "SIGNKICK_LEVEL", "CS_NO_EXPIRE" };
+
+			for (unsigned int i = 0; i < sizeof(settings) / sizeof(Anope::string); ++i)
+				CopySetting(ci, target_ci, settings[i]);
+
+			CopyAccess(source, ci, target_ci);
+			CopyAkick(source, ci, target_ci);
+			CopyBadwords(source, ci, target_ci);
+
 			FOREACH_MOD(OnChanRegistered, (target_ci));
 
-			source.Reply(_("All settings from \002%s\002 have been cloned to \002%s\002."), channel.c_str(), target.c_str());
+			source.Reply(_("All settings from \002%s\002 have been cloned to \002%s\002."), ci->name.c_str(), target_ci->name.c_str());
 		}
 		else if (what.equals_ci("ACCESS"))
 		{
-			std::set<Anope::string> masks;
-			unsigned access_max = Config->GetModule("chanserv")->Get<unsigned>("accessmax", "1024");
-			unsigned count = 0;
-
-			for (unsigned i = 0; i < target_ci->GetAccessCount(); ++i)
-				masks.insert(target_ci->GetAccess(i)->Mask());
-
-			for (unsigned i = 0; i < ci->GetAccessCount(); ++i)
-			{
-				const ChanAccess *taccess = ci->GetAccess(i);
-				AccessProvider *provider = taccess->provider;
-
-				if (access_max && target_ci->GetDeepAccessCount() >= access_max)
-					break;
-
-				if (masks.count(taccess->Mask()))
-					continue;
-				masks.insert(taccess->Mask());
-
-				ChanAccess *newaccess = provider->Create();
-				newaccess->SetMask(taccess->Mask(), target_ci);
-				newaccess->creator = taccess->creator;
-				newaccess->last_seen = taccess->last_seen;
-				newaccess->created = taccess->created;
-				newaccess->AccessUnserialize(taccess->AccessSerialize());
-
-				target_ci->AddAccess(newaccess);
-
-				++count;
-			}
-
-			source.Reply(_("%d access entries from \002%s\002 have been cloned to \002%s\002."), count, channel.c_str(), target.c_str());
+			CopyAccess(source, ci, target_ci);
 		}
 		else if (what.equals_ci("AKICK"))
 		{
-			target_ci->ClearAkick();
-			for (unsigned i = 0; i < ci->GetAkickCount(); ++i)
-			{
-				const AutoKick *akick = ci->GetAkick(i);
-				if (akick->nc)
-					target_ci->AddAkick(akick->creator, akick->nc, akick->reason, akick->addtime, akick->last_used);
-				else
-					target_ci->AddAkick(akick->creator, akick->mask, akick->reason, akick->addtime, akick->last_used);
-			}
-
-			source.Reply(_("All akick entries from \002%s\002 have been cloned to \002%s\002."), channel.c_str(), target.c_str());
+			CopyAkick(source, ci, target_ci);
 		}
 		else if (what.equals_ci("BADWORDS"))
 		{
-			BadWords *target_badwords = target_ci->Require<BadWords>("badwords"),
-				*badwords = ci->Require<BadWords>("badwords");
-
-			if (!target_badwords || !badwords)
-			{
-				source.Reply(ACCESS_DENIED); // BotServ doesn't exist/badwords isn't loaded
-				return;
-			}
-
-			target_badwords->ClearBadWords();
-
-			for (unsigned i = 0; i < badwords->GetBadWordCount(); ++i)
-			{
-				const BadWord *bw = badwords->GetBadWord(i);
-				target_badwords->AddBadWord(bw->word, bw->type);
-			}
-
-			badwords->Check();
-			target_badwords->Check();
-
-			source.Reply(_("All badword entries from \002%s\002 have been cloned to \002%s\002."), channel.c_str(), target.c_str());
+			CopyBadwords(source, ci, target_ci);
 		}
 		else
 		{

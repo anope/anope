@@ -137,30 +137,6 @@ ChannelInfo::ChannelInfo(const ChannelInfo &ci) : Serializable("ChannelInfo"),
 	this->access->clear();
 	this->akick->clear();
 
-	for (unsigned i = 0; i < ci.GetAccessCount(); ++i)
-	{
-		const ChanAccess *taccess = ci.GetAccess(i);
-		AccessProvider *provider = taccess->provider;
-
-		ChanAccess *newaccess = provider->Create();
-		newaccess->SetMask(taccess->Mask(), this);
-		newaccess->creator = taccess->creator;
-		newaccess->last_seen = taccess->last_seen;
-		newaccess->created = taccess->created;
-		newaccess->AccessUnserialize(taccess->AccessSerialize());
-
-		this->AddAccess(newaccess);
-	}
-
-	for (unsigned i = 0; i < ci.GetAkickCount(); ++i)
-	{
-		const AutoKick *takick = ci.GetAkick(i);
-		if (takick->nc)
-			this->AddAkick(takick->creator, takick->nc, takick->reason, takick->addtime, takick->last_used);
-		else
-			this->AddAkick(takick->creator, takick->mask, takick->reason, takick->addtime, takick->last_used);
-	}
-
 	FOREACH_MOD(OnCreateChan, (this));
 }
 

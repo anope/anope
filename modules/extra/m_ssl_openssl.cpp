@@ -162,6 +162,20 @@ class SSLModule : public Module
 				Log() << "Unable to open private key " << this->keyfile;
 		}
 
+		// Allow disabling SSLv3
+		if (!config->Get<Anope::string>("sslv3").empty())
+		{
+			if (config->Get<bool>("sslv3"))
+			{
+				SSL_CTX_clear_options(client_ctx, SSL_OP_NO_SSLv3);
+				SSL_CTX_clear_options(server_ctx, SSL_OP_NO_SSLv3);
+			}
+			else
+			{
+				SSL_CTX_set_options(client_ctx, SSL_OP_NO_SSLv3);
+				SSL_CTX_set_options(server_ctx, SSL_OP_NO_SSLv3);
+			}
+		}
 	}
 
 	void OnPreServerConnect() anope_override

@@ -73,7 +73,9 @@ class CommandCSKick : public Command
 		}
 		else if (u_access.HasPriv("FOUNDER"))
 		{
-			Log(LOG_COMMAND, source, this, ci) << "for " << target;
+			Anope::string mask = IRCD->NormalizeMask(target);
+
+			Log(LOG_COMMAND, source, this, ci) << "for " << mask;
 
 			int matched = 0, kicked = 0;
 			for (Channel::ChanUserList::iterator it = c->users.begin(), it_end = c->users.end(); it != it_end;)
@@ -81,7 +83,8 @@ class CommandCSKick : public Command
 				ChanUserContainer *uc = it->second;
 				++it;
 
-				if (Anope::Match(uc->user->nick, target) || Anope::Match(uc->user->GetDisplayedMask(), target))
+				Entry e("",  mask);
+				if (e.Matches(uc->user))
 				{
 					++matched;
 
@@ -93,16 +96,16 @@ class CommandCSKick : public Command
 
 					++kicked;
 					if (ci->HasExt("SIGNKICK") || (ci->HasExt("SIGNKICK_LEVEL") && !u_access.HasPriv("SIGNKICK")))
-						c->Kick(ci->WhoSends(), uc->user, "%s (Matches %s) (%s)", reason.c_str(), target.c_str(), source.GetNick().c_str());
+						c->Kick(ci->WhoSends(), uc->user, "%s (Matches %s) (%s)", reason.c_str(), mask.c_str(), source.GetNick().c_str());
 					else
-						c->Kick(ci->WhoSends(), uc->user, "%s (Matches %s)", reason.c_str(), target.c_str());
+						c->Kick(ci->WhoSends(), uc->user, "%s (Matches %s)", reason.c_str(), mask.c_str());
 				}
 			}
 
 			if (matched)
-				source.Reply(_("Kicked %d/%d users matching %s from %s."), kicked, matched, target.c_str(), c->name.c_str());
+				source.Reply(_("Kicked %d/%d users matching %s from %s."), kicked, matched, mask.c_str(), c->name.c_str());
 			else
-				source.Reply(_("No users on %s match %s."), c->name.c_str(), target.c_str());
+				source.Reply(_("No users on %s match %s."), c->name.c_str(), mask.c_str());
 		}
 		else
 			source.Reply(NICK_X_NOT_IN_USE, target.c_str());

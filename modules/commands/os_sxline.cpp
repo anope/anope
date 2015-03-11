@@ -664,7 +664,9 @@ class CommandOSSQLine : public CommandOSSXLineBase
 				"connect, Services will not allow it to pursue his IRC\n"
 				"session.\n"
 				"If the first character of the mask is #, services will\n"
-				"prevent the use of matching channels."));
+				"prevent the use of matching channels. If the mask is a\n"
+				"regular expression, the expression will be matched against\n"
+				"channels too."));
 		source.Reply(_(" \n"
 				"\002SQLINE ADD\002 adds the given (nick's) mask to the SQLINE\n"
 				"list for the given reason (which \002must\002 be given).\n"

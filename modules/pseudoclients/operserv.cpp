@@ -117,13 +117,20 @@ class SQLineManager : public XLineManager
 		for (std::vector<XLine *>::const_iterator it = this->GetList().begin(), it_end = this->GetList().end(); it != it_end; ++it)
 		{
 			XLine *x = *it;
+
 			if (x->regex)
 			{
 				if (x->regex->Matches(c->name))
 					return x;
 			}
-			else if (Anope::Match(c->name, x->mask, false, true))
-				return x;
+			else
+			{
+				if (x->mask.empty() || x->mask[0] != '#')
+					continue;
+
+				if (Anope::Match(c->name, x->mask, false, true))
+					return x;
+			}
 		}
 		return NULL;
 	}

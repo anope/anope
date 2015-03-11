@@ -789,9 +789,9 @@ struct IRCDMessageFHost : IRCDMessage
 	void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		User *u = source.GetUser();
-		u->SetDisplayedHost(params[0]);
 		if (u->HasMode("CLOAK"))
 			u->RemoveModeInternal(source, ModeManager::FindUserModeByName("CLOAK"));
+		u->SetDisplayedHost(params[0]);
 	}
 };
 

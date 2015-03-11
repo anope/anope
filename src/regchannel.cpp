@@ -551,6 +551,11 @@ void ChannelInfo::ClearAkick()
 		delete this->akick->back();
 }
 
+const Anope::map<int16_t> &ChannelInfo::GetLevelEntries()
+{
+	return this->levels;
+}
+
 int16_t ChannelInfo::GetLevel(const Anope::string &priv) const
 {
 	if (PrivilegeManager::FindPrivilege(priv) == NULL)

@@ -96,6 +96,18 @@ class CommandCSClone : public Command
 		source.Reply(_("All badword entries from \002%s\002 have been cloned to \002%s\002."), ci->name.c_str(), target_ci->name.c_str());
 	}
 
+	void CopyLevels(CommandSource &source, ChannelInfo *ci, ChannelInfo *target_ci)
+	{
+		const Anope::map<int16_t> &cilevels = ci->GetLevelEntries();
+
+		for (Anope::map<int16_t>::const_iterator it = cilevels.begin(); it != cilevels.end(); ++it)
+		{
+			target_ci->SetLevel(it->first, it->second);
+		}
+
+		source.Reply(_("All level entries from \002%s\002 have been cloned into \002%s\002."), ci->name.c_str(), target_ci->name.c_str());
+	}
+
 public:
 	CommandCSClone(Module *creator) : Command(creator, "chanserv/clone", 2, 3)
 	{
@@ -191,6 +203,7 @@ public:
 			CopyAccess(source, ci, target_ci);
 			CopyAkick(source, ci, target_ci);
 			CopyBadwords(source, ci, target_ci);
+			CopyLevels(source, ci, target_ci);
 
 			FOREACH_MOD(OnChanRegistered, (target_ci));
 
@@ -208,6 +221,10 @@ public:
 		{
 			CopyBadwords(source, ci, target_ci);
 		}
+		else if (what.equals_ci("LEVELS"))
+		{
+			CopyLevels(source, ci, target_ci);
+		}
 		else
 		{
 			this->OnSyntaxError(source, "");
@@ -222,8 +239,8 @@ public:
 		this->SendSyntax(source);
 		source.Reply(" ");
 		source.Reply(_("Copies all settings, access, akicks, etc from \002channel\002 to the\n"
-				"\002target\002 channel. If \037what\037 is \002ACCESS\002, \002AKICK\002, or \002BADWORDS\002\n"
-				"then only the respective settings are cloned.\n"
+				"\002target\002 channel. If \037what\037 is \002ACCESS\002, \002AKICK\002, \002BADWORDS\002,\n"
+				"or \002LEVELS\002 then only the respective settings are cloned.\n"
 				"You must be the founder of \037channel\037 and \037target\037."));
 		return true;
 	}

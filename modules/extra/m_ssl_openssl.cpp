@@ -103,6 +103,10 @@ class SSLModule : public Module
 		if (!client_ctx || !server_ctx)
 			throw ModuleException("Error initializing SSL CTX");
 
+		long opts = SSL_OP_NO_SSLv2 | SSL_OP_NO_SESSION_RESUMPTION_ON_RENEGOTIATION | SSL_OP_CIPHER_SERVER_PREFERENCE;
+		SSL_CTX_set_options(client_ctx, opts);
+		SSL_CTX_set_options(server_ctx, opts);
+
 		SSL_CTX_set_mode(client_ctx, SSL_MODE_ENABLE_PARTIAL_WRITE | SSL_MODE_ACCEPT_MOVING_WRITE_BUFFER);
 		SSL_CTX_set_mode(server_ctx, SSL_MODE_ENABLE_PARTIAL_WRITE | SSL_MODE_ACCEPT_MOVING_WRITE_BUFFER);
 

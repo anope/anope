@@ -1,3 +1,26 @@
+Anope Version 2.0.2
+-------------------
+Fix keepmodes preventing the first user of a channel from being deopped
+Fix SQlines that don't begin with # from matching channels
+Made cs_clone behave like the help describes, copying many settings and lists by default
+Allow cs_clone to clone levels, too
+Update Hybrid protocol module for 8.2
+Fix not unescaping all characters sent over XMLRPC
+Fix crash when os_mode is used to destroy channels, like when unsetting permanent channel mode from an empty channel
+Allow users with topic change privilege to change the topic instead of requiring them to use ChanServ's topic command
+Fix negatively locking param modes in default mlock
+Change entrymsg to check for the SET privilege, not real founder
+Allow configuring characters allowed in nicknames
+Fix crash when non users register channels externally (like XMLRPC0
+Remove operserv/exception MOVE, it did not function correctly. Instead reorder the list by deleting/adding entries.
+Allow flood ttb to be 0.
+Enforce mlock when disabling defcon modes
+Fix cs_mode not being able to apply mlock on register
+Add log message when users send memos
+Fix old collide timers from staying around after successful identify. Fixes being able to identify and logout and still being hit by the old timers.
+Fix undefined behavior in cs_mode which usually crashes when clearing large list modes
+Show all opertypes in operserv/info, even if no opers use them
+
 Anope Version 2.0.1
 -------------------
 Fix access entries on accounts sometimes not updating when a user's display name changes

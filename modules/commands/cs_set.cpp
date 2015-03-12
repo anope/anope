@@ -1252,7 +1252,7 @@ class CSSet : public Module
 
 	EventReturn OnCheckKick(User *u, Channel *c, Anope::string &mask, Anope::string &reason) anope_override
 	{
-		if (!c->ci || !restricted.HasExt(c->ci) || c->MatchesList(u, "EXCEPT"))
+		if (!c->ci || !restricted.HasExt(c->ci) || c->MatchesList(u, "EXCEPT") || u->IsProtected())
 			return EVENT_CONTINUE;
 
 		if (c->ci->AccessFor(u).empty() && (!c->ci->GetFounder() || u->Account() != c->ci->GetFounder()))

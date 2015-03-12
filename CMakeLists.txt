@@ -83,7 +83,7 @@ set(DEFAULT_LIBRARY_DIRS)
 set(DEFAULT_INCLUDE_DIRS)
 
 # If we are using a GNU compiler (have to use CXX because it seems to fail on C), we will be able to determine it's default paths for libraries and includes
-if(CMAKE_COMPILER_IS_GNUCXX OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+if(CMAKE_COMPILER_IS_GNUCXX OR ${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang")
   # First look for the compiler's default library directories
   execute_process(COMMAND ${CMAKE_C_COMPILER} -print-search-dirs OUTPUT_VARIABLE LINES OUTPUT_STRIP_TRAILING_WHITESPACE)
   # Find only the part after "libraries: "
@@ -149,7 +149,7 @@ if(CMAKE_COMPILER_IS_GNUCXX OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
   if(DEFAULT_INCLUDE_DIRS)
     remove_list_duplicates(DEFAULT_INCLUDE_DIRS)
   endif(DEFAULT_INCLUDE_DIRS)
-endif(CMAKE_COMPILER_IS_GNUCXX OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+endif(CMAKE_COMPILER_IS_GNUCXX OR ${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang")
 
 # If we are using Visual Studio, locate the path of the Windows Server 2008 SDK or Windows Server 2003 Platform SDK, depending on which is installed
 if(MSVC)
@@ -411,16 +411,10 @@ endif(NOT LOGS_DIR)
 read_from_file(${Anope_SOURCE_DIR}/src/version.sh "^VERSION_" VERSIONS)
 # Iterate through the strings found
 foreach(VERSION_STR ${VERSIONS})
-  # Get the length of the string
-  string(LENGTH ${VERSION_STR} VERSION_LEN)
-  # Subtract 16 from the string's length (8 for VERSION_, 5 more for the type, 2 for the space and leading quote, 1 for the trailing quote)
-  math(EXPR VERSION_NUM_LEN "${VERSION_LEN} - 16")
-  # Extract the type from the string
-  string(SUBSTRING ${VERSION_STR} 8 5 VERSION_TYPE)
-  # Extract the actual value from the string
-  string(SUBSTRING ${VERSION_STR} 15 ${VERSION_NUM_LEN} VERSION)
-  # Set the version type to the value extract from above
-  set(VERSION_${VERSION_TYPE} ${VERSION})
+  string(REGEX REPLACE "^VERSION_([A-Z]+)=\"?([^\"]*)\"?$" "\\1;\\2" VERSION_OUT ${VERSION_STR})
+  list(GET VERSION_OUT 0 VERSION_TYPE)
+  list(GET VERSION_OUT 1 VERSION_DATA)
+  set(VERSION_${VERSION_TYPE} ${VERSION_DATA})
 endforeach(VERSION_STR ${VERSIONS})
 
 # Default build version to 0

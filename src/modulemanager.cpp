@@ -287,7 +287,7 @@ ModuleReturn ModuleManager::LoadModule(const Anope::string &modname, User *u)
 ModuleVersion ModuleManager::GetVersion(void *handle)
 {
 	dlerror();
-	ModuleVersion (*func)() = function_cast<ModuleVersion (*)()>(dlsym(handle, "AnopeVersion"));;
+	ModuleVersionC (*func)() = function_cast<ModuleVersionC (*)()>(dlsym(handle, "AnopeVersion"));;
 	if (!func)
 	{
 		Log() << "No version function found, not an Anope module";

@@ -212,7 +212,7 @@ class HybridProto : public IRCDProto
 		Anope::string modes = "+" + u->GetModes();
 
 		UplinkSocket::Message(Me) << "UID " << u->nick << " 1 " << u->timestamp << " " << modes << " "
-					 << u->GetIdent() << " " << u->host << " 0 " << u->GetUID() << " 0 :" << u->realname;
+					 << u->GetIdent() << " " << u->host << " 0 " << u->GetUID() << " * :" << u->realname;
 	}
 
 	void SendEOB() anope_override
@@ -541,7 +541,7 @@ struct IRCDMessageUID : IRCDMessage
 	IRCDMessageUID(Module *creator) : IRCDMessage(creator, "UID", 10) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
 
 	/*          0     1 2          3   4      5             6        7         8           9                   */
-	/* :0MC UID Steve 1 1350157102 +oi ~steve resolved.host 10.0.0.1 0MCAAAAAB 1350157108 :Mining all the time */
+	/* :0MC UID Steve 1 1350157102 +oi ~steve resolved.host 10.0.0.1 0MCAAAAAB Steve      :Mining all the time */
 	void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		Anope::string ip = params[6];

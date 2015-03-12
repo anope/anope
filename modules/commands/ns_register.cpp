@@ -170,6 +170,8 @@ class CommandNSRegister : public Command
 				}
 			}
 
+		unsigned int passlen = Config->GetModule("nickserv")->Get<unsigned>("passlen", "32");
+
 		if (Config->GetModule("nickserv")->Get<bool>("forceemail", "yes") && email.empty())
 			this->OnSyntaxError(source, "");
 		else if (u && Anope::CurTime < u->lastnickreg + reg_delay)
@@ -178,8 +180,8 @@ class CommandNSRegister : public Command
 			source.Reply(NICK_ALREADY_REGISTERED, u_nick.c_str());
 		else if (pass.equals_ci(u_nick) || (Config->GetBlock("options")->Get<bool>("strictpasswords") && pass.length() < 5))
 			source.Reply(MORE_OBSCURE_PASSWORD);
-		else if (pass.length() > Config->GetModule("nickserv")->Get<unsigned>("passlen", "32"))
-			source.Reply(PASSWORD_TOO_LONG);
+		else if (pass.length() > passlen)
+			source.Reply(PASSWORD_TOO_LONG, passlen);
 		else if (!email.empty() && !Mail::Validate(email))
 			source.Reply(MAIL_X_INVALID, email.c_str());
 		else

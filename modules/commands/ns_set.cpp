@@ -133,9 +133,11 @@ class CommandNSSetPassword : public Command
 			source.Reply(MORE_OBSCURE_PASSWORD);
 			return;
 		}
-		else if (len > Config->GetModule("nickserv")->Get<unsigned>("passlen", "32"))
+
+		unsigned int passlen = Config->GetModule("nickserv")->Get<unsigned>("passlen", "32");
+		if (len > passlen)
 		{
-			source.Reply(PASSWORD_TOO_LONG);
+			source.Reply(PASSWORD_TOO_LONG, passlen);
 			return;
 		}
 
@@ -191,14 +193,17 @@ class CommandNSSASetPassword : public Command
 			source.Reply(_("You may not change the password of other Services Operators."));
 			return;
 		}
-		else if (nc->display.equals_ci(params[1]) || (Config->GetBlock("options")->Get<bool>("strictpasswords") && len < 5))
+
+		if (nc->display.equals_ci(params[1]) || (Config->GetBlock("options")->Get<bool>("strictpasswords") && len < 5))
 		{
 			source.Reply(MORE_OBSCURE_PASSWORD);
 			return;
 		}
-		else if (len > Config->GetModule("nickserv")->Get<unsigned>("passlen", "32"))
+
+		unsigned int passlen = Config->GetModule("nickserv")->Get<unsigned>("passlen", "32");
+		if (len > passlen)
 		{
-			source.Reply(PASSWORD_TOO_LONG);
+			source.Reply(PASSWORD_TOO_LONG, passlen);
 			return;
 		}
 

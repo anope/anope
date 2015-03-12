@@ -252,7 +252,7 @@ class HybridProto : public IRCDProto
 
 	void SendForceNickChange(User *u, const Anope::string &newnick, time_t when) anope_override
 	{
-		UplinkSocket::Message(Me) << "SVSNICK " << u->nick << " " << newnick << " " << when;
+		UplinkSocket::Message(Me) << "SVSNICK " << u->GetUID() << " " << newnick << " " << when;
 	}
 
 	void SendSVSJoin(const MessageSource &source, User *u, const Anope::string &chan, const Anope::string &) anope_override

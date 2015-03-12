@@ -1235,7 +1235,7 @@ class CSSet : public Module
 		ci->bantype = Config->GetModule(this)->Get<int>("defbantype", "2");
 	}
 
-	void OnChannelCreate(Channel *c) anope_override
+	void OnChannelSync(Channel *c) anope_override
 	{
 		if (c->ci && keep_modes.HasExt(c->ci))
 		{
@@ -1243,11 +1243,6 @@ class CSSet : public Module
 			for (Channel::ModeList::iterator it = ml.begin(); it != ml.end(); ++it)
 				c->SetMode(c->ci->WhoSends(), it->first, it->second);
 		}
-	}
-
-	void OnChannelSync(Channel *c) anope_override
-	{
-		OnChannelCreate(c);
 	}
 
 	EventReturn OnCheckKick(User *u, Channel *c, Anope::string &mask, Anope::string &reason) anope_override

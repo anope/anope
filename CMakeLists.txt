@@ -5,6 +5,9 @@ if(COMMAND cmake_policy)
   if(POLICY CMP0026)
     cmake_policy(SET CMP0026 OLD)
   endif(POLICY CMP0026)
+  if(POLICY CMP0007)
+    cmake_policy(SET CMP0007 OLD)
+  endif(POLICY CMP0007)
 endif(COMMAND cmake_policy)
 
 # If the Source dir and the Binary dir are the same, we are building in-source, which we will disallow due to Autotools being there (but only on non-Windows)
@@ -412,9 +415,13 @@ read_from_file(${Anope_SOURCE_DIR}/src/version.sh "^VERSION_" VERSIONS)
 # Iterate through the strings found
 foreach(VERSION_STR ${VERSIONS})
   string(REGEX REPLACE "^VERSION_([A-Z]+)=\"?([^\"]*)\"?$" "\\1;\\2" VERSION_OUT ${VERSION_STR})
+  # Depends on CMP0007 OLD
+  list(LENGTH VERSION_OUT VERSION_LEN)
   list(GET VERSION_OUT 0 VERSION_TYPE)
-  list(GET VERSION_OUT 1 VERSION_DATA)
-  set(VERSION_${VERSION_TYPE} ${VERSION_DATA})
+  if(${VERSION_LEN} GREATER 1)
+    list(GET VERSION_OUT 1 VERSION_DATA)
+    set(VERSION_${VERSION_TYPE} ${VERSION_DATA})
+  endif(${VERSION_LEN} GREATER 1)
 endforeach(VERSION_STR ${VERSIONS})
 
 # Default build version to 0

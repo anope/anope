@@ -179,7 +179,7 @@ class MyXMLRPCServiceInterface : public XMLRPCServiceInterface, public HTTPPage
 		if (!request.id.empty())
 			request.reply("id", request.id);
 
-		Anope::string r = "<?xml version=\"1.0\" encoding=\"iso-8859-1\"?>\n<methodResponse>\n<methodName>" + request.name + "</methodName>\n<params>\n<param>\n<value>\n<struct>\n";
+		Anope::string r = "<?xml version=\"1.0\" encoding=\"iso-8859-1\"?>\n<methodResponse>\n<params>\n<param>\n<value>\n<struct>\n";
 		for (std::map<Anope::string, Anope::string>::const_iterator it = request.get_replies().begin(); it != request.get_replies().end(); ++it)
 			r += "<member>\n<name>" + it->first + "</name>\n<value>\n<string>" + this->Sanitize(it->second) + "</string>\n</value>\n</member>\n";
 		r += "</struct>\n</value>\n</param>\n</params>\n</methodResponse>";

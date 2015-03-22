@@ -6,27 +6,15 @@ static Anope::string opertype_attribute;
 
 class IdentifyInterface : public LDAPInterface
 {
-	std::map<LDAPQuery, Anope::string> requests;
+	Reference<User> u;
 
  public:
-	IdentifyInterface(Module *m) : LDAPInterface(m)
+	IdentifyInterface(Module *m, User *user) : LDAPInterface(m), u(user)
 	{
-	}
-
-	void Add(LDAPQuery id, const Anope::string &nick)
-	{
-		this->requests[id] = nick;
 	}
 
 	void OnResult(const LDAPResult &r) anope_override
 	{
-		std::map<LDAPQuery, Anope::string>::iterator it = this->requests.find(r.id);
-		if (it == this->requests.end())
-			return;
-		User *u = User::Find(it->second);
-		this->requests.erase(it);
-
-
 		if (!u || !u->Account())
 			return;
 
@@ -71,14 +59,17 @@ class IdentifyInterface : public LDAPInterface
 
 	void OnError(const LDAPResult &r) anope_override
 	{
-		this->requests.erase(r.id);
+	}
+
+	void OnDelete() anope_override
+	{
+		delete this;
 	}
 };
 
 class LDAPOper : public Module
 {
 	ServiceReference<LDAPProvider> ldap;
-	IdentifyInterface iinterface;
 
 	Anope::string binddn;
 	Anope::string password;
@@ -86,7 +77,7 @@ class LDAPOper : public Module
 	Anope::string filter;
  public:
 	LDAPOper(const Anope::string &modname, const Anope::string &creator) :
-		Module(modname, creator, EXTRA | VENDOR), ldap("LDAPProvider", "ldap/main"), iinterface(this)
+		Module(modname, creator, EXTRA | VENDOR), ldap("LDAPProvider", "ldap/main")
 	{
 
 	}
@@ -117,8 +108,7 @@ class LDAPOper : public Module
 
 			if (!this->binddn.empty())
 				this->ldap->Bind(NULL, this->binddn.replace_all_cs("%a", u->Account()->display), this->password.c_str());
-			LDAPQuery id = this->ldap->Search(&this->iinterface, this->basedn, this->filter.replace_all_cs("%a", u->Account()->display));
-			this->iinterface.Add(id, u->nick);
+			this->ldap->Search(new IdentifyInterface(this, u), this->basedn, this->filter.replace_all_cs("%a", u->Account()->display));
 		}
 		catch (const LDAPException &ex)
 		{

@@ -11,7 +11,7 @@ Allow users with topic change privilege to change the topic instead of requiring
 Fix negatively locking param modes in default mlock
 Change entrymsg to check for the SET privilege, not real founder
 Allow configuring characters allowed in nicknames
-Fix crash when non users register channels externally (like XMLRPC0
+Fix crash when non users register channels externally (like XMLRPC)
 Remove operserv/exception MOVE, it did not function correctly. Instead reorder the list by deleting/adding entries.
 Allow flood ttb to be 0.
 Enforce mlock when disabling defcon modes

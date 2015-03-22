@@ -847,6 +847,49 @@ struct IRCDMessageSave : IRCDMessage
 	}
 };
 
+class IRCDMessageMetadata : IRCDMessage
+{
+	ServiceReference<IRCDMessage> insp12_metadata;
+	const bool &do_topiclock;
+	const bool &do_mlock;
+
+ public:
+	IRCDMessageMetadata(Module *creator, const bool &handle_topiclock, const bool &handle_mlock) : IRCDMessage(creator, "METADATA", 3), insp12_metadata("IRCDMessage", "inspircd12/metadata"), do_topiclock(handle_topiclock), do_mlock(handle_mlock) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
+
+	void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
+	{
+		// We deliberately ignore non-bursting servers to avoid pseudoserver fights
+		if ((params[0][0] == '#') && (!source.GetServer()->IsSynced()))
+		{
+			Channel *c = Channel::Find(params[0]);
+			if (c && c->ci)
+			{
+				if ((do_mlock) && (params[1] == "mlock"))
+				{
+					ModeLocks *modelocks = c->ci->GetExt<ModeLocks>("modelocks");
+					Anope::string modes;
+					if (modelocks)
+						modes = modelocks->GetMLockAsString(false).replace_all_cs("+", "").replace_all_cs("-", "");
+
+					// Mode lock string is not what we say it is?
+					if (modes != params[2])
+						UplinkSocket::Message(Me) << "METADATA " << c->name << " mlock :" << modes;
+				}
+				else if ((do_topiclock) && (params[1] == "topiclock"))
+				{
+					bool mystate = c->ci->GetExt<bool>("TOPICLOCK");
+					bool serverstate = (params[2] == "1");
+					if (mystate != serverstate)
+						UplinkSocket::Message(Me) << "METADATA " << c->name << " topiclock :" << (mystate ? "1" : "");
+				}
+			}
+		}
+
+		if (insp12_metadata)
+			insp12_metadata->Run(source, params);
+	}
+};
+
 class ProtoInspIRCd20 : public Module
 {
 	Module *m_insp12;
@@ -871,7 +914,7 @@ class ProtoInspIRCd20 : public Module
 
 	/* InspIRCd 1.2 message handlers */
 	ServiceAlias message_endburst, message_fjoin, message_fmode,
-				message_ftopic, message_idle, message_metadata, message_mode,
+				message_ftopic, message_idle, message_mode,
 				message_nick, message_opertype, message_rsquit, message_server,
 				message_squit, message_time, message_uid;
 
@@ -880,6 +923,7 @@ class ProtoInspIRCd20 : public Module
 	IRCDMessageEncap message_encap;
 	IRCDMessageFHost message_fhost;
 	IRCDMessageFIdent message_fident;
+	IRCDMessageMetadata message_metadata;
 	IRCDMessageSave message_save;
 
 	bool use_server_side_topiclock, use_server_side_mlock;
@@ -901,7 +945,6 @@ class ProtoInspIRCd20 : public Module
 		message_fmode("IRCDMessage", "inspircd20/fmode", "inspircd12/fmode"),
 		message_ftopic("IRCDMessage", "inspircd20/ftopic", "inspircd12/ftopic"),
 		message_idle("IRCDMessage", "inspircd20/idle", "inspircd12/idle"),
-		message_metadata("IRCDMessage", "inspircd20/metadata", "inspircd12/metadata"),
 		message_mode("IRCDMessage", "inspircd20/mode", "inspircd12/mode"),
 		message_nick("IRCDMessage", "inspircd20/nick", "inspircd12/nick"),
 		message_opertype("IRCDMessage", "inspircd20/opertype", "inspircd12/opertype"),
@@ -911,7 +954,8 @@ class ProtoInspIRCd20 : public Module
 		message_time("IRCDMessage", "inspircd20/time", "inspircd12/time"),
 		message_uid("IRCDMessage", "inspircd20/uid", "inspircd12/uid"),
 
-		message_capab(this), message_encap(this), message_fhost(this), message_fident(this), message_save(this)
+		message_capab(this), message_encap(this), message_fhost(this), message_fident(this), message_metadata(this, use_server_side_topiclock, use_server_side_mlock),
+		message_save(this)
 	{
 
 		if (ModuleManager::LoadModule("inspircd12", User::Find(creator)) != MOD_ERR_OK)

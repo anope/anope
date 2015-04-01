@@ -33,8 +33,8 @@ class AnopeXMLRPC
 		$inbuf = file_get_contents($this->Host, false, $context);
 		$response = xmlrpc_decode($inbuf);
 
-		if (isset($response[0]))
-			return $response[0];
+		if (isset($response))
+			return $response;
 		return NULL;
 	}
 

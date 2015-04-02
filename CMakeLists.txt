@@ -10,11 +10,6 @@ if(COMMAND cmake_policy)
   endif(POLICY CMP0007)
 endif(COMMAND cmake_policy)
 
-# If the Source dir and the Binary dir are the same, we are building in-source, which we will disallow due to Autotools being there (but only on non-Windows)
-if(${CMAKE_CURRENT_SOURCE_DIR} STREQUAL ${CMAKE_CURRENT_BINARY_DIR} AND NOT WIN32)
-  message(FATAL_ERROR "You can not use CMake to build Anope from the root of it's source tree! Remove the CMakeCache.txt file from this directory, then create a separate directory (either below this directory or elsewhere), and then re-run CMake from there.")
-endif(${CMAKE_CURRENT_SOURCE_DIR} STREQUAL ${CMAKE_CURRENT_BINARY_DIR} AND NOT WIN32)
-
 # Set the project as C++ primarily, but have C enabled for the checks required later
 project(Anope CXX)
 enable_language(C)

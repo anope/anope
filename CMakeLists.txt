@@ -377,7 +377,7 @@ endif(PERL AND USE_RUN_CC_PL)
 # If a INSTDIR was passed in to CMake, use it as the install prefix, otherwise set the default install prefix to the services directory under the user's home directory
 if(INSTDIR)
   set(CMAKE_INSTALL_PREFIX "${INSTDIR}")
-else(INSTDIR)
+elseif(NOT CMAKE_INSTALL_PREFIX)
   set(CMAKE_INSTALL_PREFIX "$ENV{HOME}/services")
 endif(INSTDIR)
 

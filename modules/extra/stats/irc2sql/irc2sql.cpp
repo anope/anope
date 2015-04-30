@@ -131,6 +131,15 @@ void IRC2SQL::OnUserNickChange(User *u, const Anope::string &oldnick)
 	this->RunQuery(query);
 }
 
+void IRC2SQL::OnUserAway(User *u, const Anope::string &message)
+{
+	query = "UPDATE `" + prefix + "user` SET away=@away@, awaymsg=@awaymsg@ WHERE nick=@nick@";
+	query.SetValue("away", (!message.empty()) ? "Y" : "N");
+	query.SetValue("awaymsg", message);
+	query.SetValue("nick", u->nick);
+	this->RunQuery(query);
+}
+
 void IRC2SQL::OnFingerprint(User *u)
 {
 	query = "UPDATE `" + prefix + "user` SET secure=@secure@, fingerprint=@fingerprint@ WHERE nick=@nick@";

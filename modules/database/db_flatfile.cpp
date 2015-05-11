@@ -149,7 +149,7 @@ class DBFlatFile : public Module, public Pipe
 					Anope::string err = Anope::LastError();
 					Log(this) << "Unable to back up database " << *it << " (" << err << ")!";
 
-					if (!Config->GetModule(this)->Get<bool>("nobackupok"))
+					if (!Config->GetModule(this)->Get<bool>("nobackupokay"))
 					{
 						Anope::Quitting = true;
 						Anope::QuitReason = "Unable to back up database " + *it + " (" + err + ")";
@@ -214,7 +214,7 @@ class DBFlatFile : public Module, public Pipe
 
 		Log(this) << "Error saving databases: " << buf;
 
-		if (!Config->GetModule(this)->Get<bool>("nobackupok"))
+		if (!Config->GetModule(this)->Get<bool>("nobackupokay"))
 			Anope::Quitting = true;
 	}
 

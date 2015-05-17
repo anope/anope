@@ -223,8 +223,6 @@ endif(EXTRA_LIBS)
 # Find gettext
 find_package(Gettext)
 
-# Add an optional variable for using run-cc.pl for building, Perl will be checked later regardless of this setting
-option(USE_RUN_CC_PL "Use run-cc.pl for building" OFF)
 option(USE_PCH "Use precompiled headers" OFF)
 
 # Use the following directories as includes
@@ -365,14 +363,6 @@ find_program(GREP grep)
 find_program(SH sh)
 find_program(CHGRP chgrp)
 find_program(CHMOD chmod)
-find_program(PERL perl)
-
-# If perl is included on the system and the user wants to use run-cc.pl, change the commands for compiling and linking
-if(PERL AND USE_RUN_CC_PL)
-  set(CMAKE_CXX_COMPILE_OBJECT "${PERL} ${Anope_SOURCE_DIR}/run-cc.pl -q ${CMAKE_CXX_COMPILE_OBJECT}")
-  set(CMAKE_CXX_LINK_EXECUTABLE "${PERL} ${Anope_SOURCE_DIR}/run-cc.pl -q ${CMAKE_CXX_LINK_EXECUTABLE}")
-  set(CMAKE_CXX_CREATE_SHARED_MODULE "${PERL} ${Anope_SOURCE_DIR}/run-cc.pl -q ${CMAKE_CXX_CREATE_SHARED_MODULE}")
-endif(PERL AND USE_RUN_CC_PL)
 
 # If a INSTDIR was passed in to CMake, use it as the install prefix, otherwise set the default install prefix to the services directory under the user's home directory
 if(INSTDIR)

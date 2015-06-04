@@ -228,9 +228,15 @@ class NickServCore : public Module, public NickServService
 
 		if (IRCD->CanSVSNick)
 		{
-			unsigned nicklen = Config->GetBlock("networkinfo")->Get<unsigned>("nicklen");
-			const Anope::string &guestprefix = Config->GetModule("nickserv")->Get<const Anope::string>("guestnickprefix", "Guest");
+			const Anope::string &guestprefix = Config->GetModule("nickserv")->Get<const Anope::string>("guestnickprefix", IRCD->NickID ? "" : "Guest");
+			if (guestprefix.empty())
+			{
+				u->SendMessage(*NickServ, _("Your nickname is now being changed to \002%s\002"), u->GetUID().c_str());
+				IRCD->SendForceNickChange(u, u->GetUID(), Anope::CurTime);
+				return;
+			}
 
+			unsigned nicklen = Config->GetBlock("networkinfo")->Get<unsigned>("nicklen");
 			Anope::string guestnick;
 
 			int i = 0;

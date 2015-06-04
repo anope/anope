@@ -69,6 +69,8 @@ class CoreExport IRCDProto : public Service
 	bool RequiresID;
 	/* If this IRCd has unique ids, whether the IDs and nicknames are ambiguous */
 	bool AmbiguousID;
+	/* If this IRCd allows the user to use their ID as their nick. */
+	bool NickID;
 	/* The maximum number of modes we are allowed to set with one MODE command */
 	unsigned MaxModes;
 	/* The maximum number of bytes a line may have */

@@ -758,12 +758,20 @@ class CommandCSLevels : public Command
 			return;
 		}
 
+		bool has_access = false;
+		if (source.HasPriv("chanserv/access/modify"))
+			has_access = true;
+		else if (cmd.equals_ci("LIST") && source.HasPriv("chanserv/access/list"))
+			has_access = true;
+		else if (source.AccessFor(ci).HasPriv("FOUNDER"))
+			has_access = true;
+
 		/* If SET, we want two extra parameters; if DIS[ABLE] or FOUNDER, we want only
 		 * one; else, we want none.
 		 */
 		if (cmd.equals_ci("SET") ? s.empty() : (cmd.substr(0, 3).equals_ci("DIS") ? (what.empty() || !s.empty()) : !what.empty()))
 			this->OnSyntaxError(source, cmd);
-		else if (!source.AccessFor(ci).HasPriv("FOUNDER") && !source.HasPriv("chanserv/access/modify"))
+		else if (!has_access)
 			source.Reply(ACCESS_DENIED);
 		else if (Anope::ReadOnly && !cmd.equals_ci("LIST"))
 			source.Reply(READ_ONLY_MODE);

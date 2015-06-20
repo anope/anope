@@ -30,6 +30,7 @@ class CommandHSOff : public Command
 		else
 		{
 			IRCD->SendVhostDel(u);
+			u->UpdateHost();
 			Log(LOG_COMMAND, source, this) << "to disable their vhost";
 			source.Reply(_("Your vhost was removed and the normal cloaking restored."));
 		}

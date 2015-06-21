@@ -29,6 +29,7 @@ class CommandHSOff : public Command
 			source.Reply(HOST_NOT_ASSIGNED);
 		else
 		{
+			u->vhost.clear();
 			IRCD->SendVhostDel(u);
 			u->UpdateHost();
 			Log(LOG_COMMAND, source, this) << "to disable their vhost";

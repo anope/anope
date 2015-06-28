@@ -53,7 +53,7 @@ Note: You should also read the README and FAQ files!
     the memos of any user.
 
     Now go into the conf directory (by default, ~/anope/conf). Copy the example
-    configuration file (example.conf) to services.conf, and open the latter
+    configuration file (example.conf) to anope.conf, and open the latter
     with your favorite text editor. It contains all the configuration
     directives Anope will use at startup. Read the instructions contained in
     the file carefully. Using the default values is NOT a good idea, and will

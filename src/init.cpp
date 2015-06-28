@@ -493,7 +493,7 @@ void Anope::Init(int ac, char **av)
 	catch (const ConfigException &ex)
 	{
 		Log(LOG_TERMINAL) << ex.GetReason();
-		Log(LOG_TERMINAL) << "*** Support resources: Read through the services.conf self-contained";
+		Log(LOG_TERMINAL) << "*** Support resources: Read through the anope.conf self-contained";
 		Log(LOG_TERMINAL) << "*** documentation. Read the documentation files found in the 'docs'";
 		Log(LOG_TERMINAL) << "*** folder. Visit our portal located at http://www.anope.org/. Join";
 		Log(LOG_TERMINAL) << "*** our support channel on /server irc.anope.org channel #anope.";

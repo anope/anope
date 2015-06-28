@@ -8365,7 +8365,7 @@ msgid ""
 "Super admin can not be set because it is not enabled in the configuration."
 msgstr ""
 "L'impostazione SuperAdmin non può essere attivata perchè non è abilitata in "
-"services.conf"
+"anope.conf"
 
 #: modules/commands/ns_suspend.cpp:60
 msgid "Suspend a given nick"

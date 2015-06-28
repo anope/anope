@@ -18,7 +18,7 @@ ANODATA=/home/ircd/services/data
 ANOPIDF=services.pid
 
 # Name of the executable
-ANOPROG=services
+ANOPROG=anope
 
 # Parameters to pass to the executable
 ANOARGS=""

@@ -101,13 +101,7 @@ if(CMAKE_DL_LIBS)
 endif(CMAKE_DL_LIBS)
 
 if(NOT PROGRAM_NAME)
-  # Under Windows, we set the executable name for Anope to be anope
-  if(WIN32)
-    set(PROGRAM_NAME anope)
-  # Under *nix, we set the executable name for Anope to be services
-  else(WIN32)
-    set(PROGRAM_NAME services)
-  endif(WIN32)
+  set(PROGRAM_NAME anope)
 endif(NOT PROGRAM_NAME)
 
 # If we are not using Visual Studio, we'll run the following checks

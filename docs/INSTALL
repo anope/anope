@@ -95,7 +95,7 @@ Note: You should also read the README and FAQ files!
 4) Starting Anope
 
     Go into the directory where binaries were installed (by default, this is
-    ~/services/bin). Type ./services to launch Anope.
+    ~/services/bin). Type ./anope to launch Anope.
 
     If there are syntax errors in the configuration file they will be
     displayed on the screen. Correct them until there are no errors anymore.
@@ -104,7 +104,7 @@ Note: You should also read the README and FAQ files!
     Give Services at least one minute to link to your network, as certain
     IRCds on some OSes may be really slow for the link process. If nothing
     happens after about a minute, it is probably a configuration problem. Try
-    to launch Anope with ./services -debug -nofork to see any errors that it
+    to launch Anope with ./anope -debug -nofork to see any errors that it
     encounters, and try to correct them.
 
     If you need help to solve errors, feel free to subscribe to the Anope

@@ -13,7 +13,7 @@ Anope Bundled Tools
     followed by "bin/anopesmtp" and the IP address of a valid SMTP server. It
     should look like this:
 
-        sendmailpath = "/home/anope/services/bin/anopesmtp 127.0.0.1"
+        sendmailpath = "/home/ircd/anope/bin/anopesmtp 127.0.0.1"
 
     If the SMTP client doesn't send mail, or if there's an other problem with
     it, you can enable debug mode by passing the --debug flag after the server

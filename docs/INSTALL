@@ -52,7 +52,7 @@ Note: You should also read the README and FAQ files!
     cause trouble on your network if passwords are not encrypted, or read
     the memos of any user.
 
-    Now go into the conf directory (by default, ~/services/conf). Copy the example
+    Now go into the conf directory (by default, ~/anope/conf). Copy the example
     configuration file (example.conf) to services.conf, and open the latter
     with your favorite text editor. It contains all the configuration
     directives Anope will use at startup. Read the instructions contained in
@@ -95,7 +95,7 @@ Note: You should also read the README and FAQ files!
 4) Starting Anope
 
     Go into the directory where binaries were installed (by default, this is
-    ~/services/bin). Type ./anope to launch Anope.
+    ~/anope/bin). Type ./anope to launch Anope.
 
     If there are syntax errors in the configuration file they will be
     displayed on the screen. Correct them until there are no errors anymore.
@@ -116,7 +116,7 @@ Note: You should also read the README and FAQ files!
     still running, and restart it if not.
 
     First rename the example.chk script that is in Anope path (by default,
-    this is ~/services/conf) to services.chk and edit it. You'll need to 
+    this is ~/anope/conf) to services.chk and edit it. You'll need to 
     modify the CONFIGURATION part of the file. Then ensure that the file is 
     marked as executable by typing chmod +x services.chk, and try to launch the
     script to see if it works (Anope must not be running when you do this ;))
@@ -125,7 +125,7 @@ Note: You should also read the README and FAQ files!
     This will open the default text editor with the crontab file. Enter the
     following (with correct path):
 
-        */5 * * * * /home/ircd/services/conf/services.chk >/dev/null 2>&1
+        */5 * * * * /home/ircd/anope/conf/services.chk >/dev/null 2>&1
 
     The */5 at the beginning means "check every 5 minutes". You may replace
     the 5 with other another number if you want (but less than 60). Consult

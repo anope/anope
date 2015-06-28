@@ -178,7 +178,7 @@ endif(PERL AND USE_RUN_CC_PL)
 if(INSTDIR)
   set(CMAKE_INSTALL_PREFIX "${INSTDIR}")
 else(INSTDIR)
-  set(CMAKE_INSTALL_PREFIX "$ENV{HOME}/services")
+  set(CMAKE_INSTALL_PREFIX "$ENV{HOME}/anope")
 endif(INSTDIR)
 
 # Set default paths for various directories if not already defined

@@ -174,7 +174,7 @@ find_program(CHMOD chmod)
 if(INSTDIR)
   set(CMAKE_INSTALL_PREFIX "${INSTDIR}")
 elseif(NOT CMAKE_INSTALL_PREFIX)
-  set(CMAKE_INSTALL_PREFIX "$ENV{HOME}/services")
+  set(CMAKE_INSTALL_PREFIX "$ENV{HOME}/anope")
 endif(INSTDIR)
 
 # Set default paths for various directories if not already defined

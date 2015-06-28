@@ -57,7 +57,7 @@ Note : Vous devrez également lire les fichiers README et FAQ !
 
     Allez maintenant dans le répertoire conf (par défaut, ~/anope/conf).
     Copiez l'exemple de fichier de configuration (example.conf) en
-    services.conf et ouvrez ce dernier avec votre éditeur de texte favori.
+    anope.conf et ouvrez ce dernier avec votre éditeur de texte favori.
     Il contient toutes les directives de configuration qu'Anope va utiliser
     en démarrant. Lisez attentivement les instructions contenues dans le
     fichier. L'utilisation des valeurs par défaut n'est pas toujours

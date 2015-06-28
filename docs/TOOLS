@@ -8,7 +8,7 @@ Anope Bundled Tools
 
     The SMTP client can be used instead of sendmail for use with Anope's mail
     options. To use the SMTP client instead of sendmail, find the line in your
-    services configuration file (services.conf) that defines sendmailpath. On
+    services configuration file (anope.conf) that defines sendmailpath. On
     that line, change the path to your services installation directory, then
     followed by "bin/anopesmtp" and the IP address of a valid SMTP server. It
     should look like this:

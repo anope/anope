@@ -4526,7 +4526,7 @@ msgstr ""
 "angezeigt. (Es werden jedoch nur max. %d angezeigt, um ein\n"
 "Flooding des Users zu verhindern. Wenn mehr News\n"
 "existieren, werden nur die neuesten angezeigt.)\n"
-"NewsCount kann in der services.conf eingestellt werden.\n"
+"NewsCount kann in der anope.conf eingestellt werden.\n"
 "\n"
 "Diese Funktion ist beschränkt auf Services Operatoren."
 
@@ -4545,7 +4545,7 @@ msgstr ""
 "(Es werden jedoch nur max. %d Nachrichten angezeigt, um ein\n"
 "Flooding des Users zu verhindern. Wenn mehr News\n"
 "existieren, werden nur die neüsten angezeigt.)\n"
-"NewsCount can be configured in services.conf.\n"
+"NewsCount can be configured in anope.conf.\n"
 "\n"
 "Diese Funktion ist beschränkt auf Services Operatoren."
 
@@ -8708,7 +8708,7 @@ msgstr "Der Eintrag des Vertreters für %s wurde entfernt."
 #, fuzzy
 msgid ""
 "Super admin can not be set because it is not enabled in the configuration."
-msgstr "SuperAdmin muss in der services.conf eingeschaltet werden."
+msgstr "SuperAdmin muss in der anope.conf eingeschaltet werden."
 
 #: modules/commands/ns_suspend.cpp:60
 #, fuzzy

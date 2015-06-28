@@ -14,7 +14,7 @@
 
 
 
-ANOPEPID="@INSTDIR@/data/services.pid"
+ANOPEPID="@INSTDIR@/data/anope.pid"
 ANOPROG="@INSTDIR@/bin/anope"
 LOG="@INSTDIR@/data/logs/"
 ARCVERSION="2"

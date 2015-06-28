@@ -15,7 +15,7 @@ ANOPATH=/home/ircd/services/bin
 ANODATA=/home/ircd/services/data
 
 # Name of the pid file
-ANOPIDF=services.pid
+ANOPIDF=anope.pid
 
 # Name of the executable
 ANOPROG=anope

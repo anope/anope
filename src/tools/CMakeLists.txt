@@ -12,7 +12,7 @@ foreach(SRC ${TOOLS_SRCS})
   # Generate the executable and set its linker flags, also set it to depend on the main Anope executable to be built beforehand
   add_executable(${EXE} ${SRC})
   set_target_properties(${EXE} PROPERTIES LINKER_LANGUAGE CXX LINK_FLAGS "${LDFLAGS}")
-  add_dependencies(${EXE} ${PROGRAM_NAME})
+  add_dependencies(${EXE} anope)
   # Only for Windows, set anopesmtp to require the wsock32 library
   if(WIN32 AND ${EXE} STREQUAL anopesmtp)
     target_link_libraries(${EXE} wsock32)

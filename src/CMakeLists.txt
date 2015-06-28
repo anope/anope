@@ -49,24 +49,24 @@ else(MSVC)
 endif(MSVC)
 
 # Generate the Anope executable and set it's linker flags, also set it to export it's symbols even though it's not a module
-add_executable(${PROGRAM_NAME} ${SRC_SRCS})
-set_target_properties(${PROGRAM_NAME} PROPERTIES LINKER_LANGUAGE CXX LINK_FLAGS "${LDFLAGS} ${EXTRA_LDFLAGS}" ENABLE_EXPORTS ON INSTALL_RPATH_USE_LINK_PATH ON BUILD_WITH_INSTALL_RPATH ON)
+add_executable(anope ${SRC_SRCS})
+set_target_properties(anope PROPERTIES LINKER_LANGUAGE CXX LINK_FLAGS "${LDFLAGS} ${EXTRA_LDFLAGS}" ENABLE_EXPORTS ON INSTALL_RPATH_USE_LINK_PATH ON BUILD_WITH_INSTALL_RPATH ON)
 # On Windows, also link Anope to the wsock32 and Ws2_32 library, as well as set the version
 if(WIN32)
-  target_link_libraries(${PROGRAM_NAME} wsock32 Ws2_32 ${LINK_LIBS} ${GETTEXT_LIBRARIES} ${WIN32_MEMORY})
-  set_target_properties(${PROGRAM_NAME} PROPERTIES VERSION "${VERSION_DOTTED}")
+  target_link_libraries(anope wsock32 Ws2_32 ${LINK_LIBS} ${GETTEXT_LIBRARIES} ${WIN32_MEMORY})
+  set_target_properties(anope PROPERTIES VERSION "${VERSION_DOTTED}")
 else(WIN32)
-  target_link_libraries(${PROGRAM_NAME} ${LINK_LIBS} ${GETTEXT_LIBRARIES})
+  target_link_libraries(anope ${LINK_LIBS} ${GETTEXT_LIBRARIES})
 endif(WIN32)
 # Building the Anope executable requires the version.h header to be generated
-add_dependencies(${PROGRAM_NAME} headers)
+add_dependencies(anope headers)
 # Also require the language files if we have gettext
 if(GETTEXT_FOUND)
-  add_dependencies(${PROGRAM_NAME} language)
+  add_dependencies(anope language)
 endif(GETTEXT_FOUND)
 
 # Get the filename of the Anope executable as it is in on this system
-get_target_property(SERVICES_BINARY ${PROGRAM_NAME} LOCATION)
+get_target_property(SERVICES_BINARY anope LOCATION)
 get_filename_component(SERVICES_BINARY ${SERVICES_BINARY} NAME)
 # Add the Anope executable to the list of files for CPack to ignore
 add_to_cpack_ignored_files("${SERVICES_BINARY}$" TRUE)
@@ -78,6 +78,6 @@ configure_file(${Anope_SOURCE_DIR}/include/sysconf.h.cmake ${Anope_BINARY_DIR}/i
 add_subdirectory(tools)
 
 # Set Anope to be installed to the bin directory
-install(TARGETS ${PROGRAM_NAME}
+install(TARGETS anope
   DESTINATION ${BIN_DIR}
 )

@@ -104,7 +104,7 @@ Note : Vous devrez également lire les fichiers README et FAQ !
 4) Mettre en route Anope
 
     Allez dans le répertoire où les fichiers binaires ont été installés
-    (par défaut, ~/services/bin). Tapez ./services pour lancer Anope.
+    (par défaut, ~/services/bin). Tapez ./anope pour lancer Anope.
 
     S'il y a des erreurs de syntaxe dans le fichier de configuration, elles 
     seront affichées à l'écran. Corrigez-les jusqu'à ce qu'il n'y en ait
@@ -114,7 +114,7 @@ Note : Vous devrez également lire les fichiers README et FAQ !
     réseau, car certains IRCds sur certains systèmes peuvent être très
     lents pour le processus de liaison. Si rien ne se passe après environ
     une minute, il y a probablement un problème de configuration. Essayez
-    de lancer Anope en mode debug avec ./services -debug -nofork pour voir
+    de lancer Anope en mode debug avec ./anope -debug -nofork pour voir
     toutes les erreurs rencontrées et essayez de les corriger.
 
     Si vous avez besoin d'aide pour résoudre des erreurs, n'hésitez pas à

@@ -100,14 +100,6 @@ if(CMAKE_DL_LIBS)
   list(APPEND LINK_LIBS ${CMAKE_DL_LIBS})
 endif(CMAKE_DL_LIBS)
 
-# Under Windows, we set the executable name for Anope to be anope
-if(WIN32)
-  set(PROGRAM_NAME anope)
-# Under *nix, we set the executable name for Anope to be services
-else(WIN32)
-  set(PROGRAM_NAME services)
-endif(WIN32)
-
 # If we are not using Visual Studio, we'll run the following checks
 if(NOT MSVC)
   # Check if the C++ compiler can accept the -pipe flag, and add it to the compile flags if it works
@@ -286,7 +278,7 @@ add_subdirectory(modules)
 add_subdirectory(include)
 
 # Get the filename of the Anope binary, to use later
-get_target_property(SERVICES_BINARY ${PROGRAM_NAME} LOCATION)
+get_target_property(SERVICES_BINARY anope LOCATION)
 get_filename_component(SERVICES_BINARY ${SERVICES_BINARY} NAME)
 
 # At install time, create the following additional directories

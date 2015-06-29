@@ -66,11 +66,11 @@ class ChanServCore : public Module, public ChanServService
 				if (!c)
 					return;
 
-				inhabit.Unset(c);
-
 				/* In the event we don't part */
 				c->RemoveMode(NULL, "SECRET");
 				c->RemoveMode(NULL, "INVITE");
+
+				inhabit.Unset(c); /* now we're done changing modes, unset inhabit */
 
 				if (!c->ci || !c->ci->bi)
 				{

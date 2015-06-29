@@ -1207,6 +1207,8 @@ class CSSet : public Module
 	CommandCSSetSuccessor commandcssetsuccessor;
 	CommandCSSetNoexpire commandcssetnoexpire;
 
+	ExtensibleRef<bool> inhabit;
+
 	bool persist_lower_ts;
 
  public:
@@ -1221,7 +1223,9 @@ class CSSet : public Module
 		commandcssetdescription(this), commandcssetfounder(this), commandcssetkeepmodes(this),
 		commandcssetpeace(this), commandcssetpersist(this), commandcssetrestricted(this),
 		commandcssetsecure(this), commandcssetsecurefounder(this), commandcssetsecureops(this), commandcssetsignkick(this),
-		commandcssetsuccessor(this), commandcssetnoexpire(this)
+		commandcssetsuccessor(this), commandcssetnoexpire(this),
+
+		inhabit("inhabit")
 	{
 	}
 
@@ -1271,7 +1275,7 @@ class CSSet : public Module
 			if (mode->name == "PERM")
 				persist.Set(c->ci, true);
 
-			if (mode->type != MODE_STATUS && !c->syncing && Me->IsSynced())
+			if (mode->type != MODE_STATUS && !c->syncing && Me->IsSynced() && (!inhabit || !inhabit->HasExt(c)))
 				c->ci->last_modes = c->GetModes();
 		}
 
@@ -1286,7 +1290,7 @@ class CSSet : public Module
 				persist.Unset(c->ci);
 		}
 
-		if (c->ci && mode->type != MODE_STATUS && !c->syncing && Me->IsSynced())
+		if (c->ci && mode->type != MODE_STATUS && !c->syncing && Me->IsSynced() && (!inhabit || !inhabit->HasExt(c)))
 			c->ci->last_modes = c->GetModes();
 
 		return EVENT_CONTINUE;

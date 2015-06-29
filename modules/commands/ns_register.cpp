@@ -158,6 +158,12 @@ class CommandNSRegister : public Command
 			return;
 		}
 
+		if (BotInfo::Find(u_nick, true))
+		{
+			source.Reply(NICK_CANNOT_BE_REGISTERED, u_nick.c_str());
+			return;
+		}
+
 		if (Config->GetModule("nickserv")->Get<bool>("restrictopernicks"))
 			for (unsigned i = 0; i < Oper::opers.size(); ++i)
 			{

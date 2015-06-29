@@ -75,6 +75,13 @@ class CommandBSBot : public Command
 			return;
 		}
 
+		User *u = User::Find(nick, true);
+		if (u)
+		{
+			source.Reply(_("User \2%s\2 is already in use."), u->nick.c_str());
+			return;
+		}
+
 		BotInfo *bi = new BotInfo(nick, user, host, real);
 
 		Log(LOG_ADMIN, source, this) << "ADD " << bi->GetMask() << " " << bi->realname;
@@ -161,10 +168,19 @@ class CommandBSBot : public Command
 			return;
 		}
 
-		if (!nick.equals_ci(bi->nick) && BotInfo::Find(nick, true))
+		if (!nick.equals_ci(bi->nick))
 		{
-			source.Reply(_("Bot \002%s\002 already exists."), nick.c_str());
-			return;
+			if (BotInfo::Find(nick, true))
+			{
+				source.Reply(_("Bot \002%s\002 already exists."), nick.c_str());
+				return;
+			}
+
+			if (User::Find(nick, true))
+			{
+				source.Reply(_("User \2%s\2 is already in use."), nick.c_str());
+				return;
+			}
 		}
 
 		if (!nick.equals_ci(bi->nick))

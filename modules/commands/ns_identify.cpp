@@ -77,16 +77,27 @@ class CommandNSIdentify : public Command
 
 		NickAlias *na = NickAlias::Find(nick);
 		if (na && na->nc->HasExt("NS_SUSPENDED"))
-			source.Reply(NICK_X_SUSPENDED, na->nick.c_str());
-		else if (u->Account() && na && u->Account() == na->nc)
-			source.Reply(_("You are already identified."));
-		else
 		{
-			NSIdentifyRequest *req = new NSIdentifyRequest(owner, source, this, na ? na->nc->display : nick, pass);
-			FOREACH_MOD(OnCheckAuthentication, (u, req));
-			req->Dispatch();
+			source.Reply(NICK_X_SUSPENDED, na->nick.c_str());
+			return;
 		}
-		return;
+
+		if (u->Account() && na && u->Account() == na->nc)
+		{
+			source.Reply(_("You are already identified."));
+			return;
+		}
+
+		unsigned int maxlogins = Config->GetModule(this->owner)->Get<unsigned int>("maxlogins");
+		if (na && maxlogins && na->nc->users.size() >= maxlogins)
+		{
+			source.Reply(_("Account \2%s\2 has exceeeded the maximum number of simultaneous logins (%u)."), na->nc->display.c_str(), maxlogins);
+			return;
+		}
+
+		NSIdentifyRequest *req = new NSIdentifyRequest(owner, source, this, na ? na->nc->display : nick, pass);
+		FOREACH_MOD(OnCheckAuthentication, (u, req));
+		req->Dispatch();
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override

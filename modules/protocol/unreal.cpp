@@ -1220,7 +1220,7 @@ class ProtoUnreal : public Module
 		ModeManager::AddUserMode(new UserModeOperOnly("CO_ADMIN", 'C'));
 		ModeManager::AddUserMode(new UserMode("CENSOR", 'G'));
 		ModeManager::AddUserMode(new UserModeOperOnly("HIDEOPER", 'H'));
-		ModeManager::AddUserMode(new UserMode("HIDEIDLE", 'I'));
+		ModeManager::AddUserMode(new UserModeOperOnly("HIDEIDLE", 'I'));
 		ModeManager::AddUserMode(new UserModeOperOnly("NETADMIN", 'N'));
 		ModeManager::AddUserMode(new UserMode("REGPRIV", 'R'));
 		ModeManager::AddUserMode(new UserModeOperOnly("PROTECTED", 'S'));

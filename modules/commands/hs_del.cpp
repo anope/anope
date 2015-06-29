@@ -105,7 +105,8 @@ class HSDel : public Module
 	HSDel(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandhsdel(this), commandhsdelall(this)
 	{
-
+		if (!IRCD || !IRCD->CanSetVHost)
+			throw ModuleException("Your IRCd does not support vhosts");
 	}
 };
 

@@ -86,6 +86,8 @@ class HSGroup : public Module
 	HSGroup(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandhsgroup(this)
 	{
+		if (!IRCD || !IRCD->CanSetVHost)
+			throw ModuleException("Your IRCd does not support vhosts");
 	}
 
 	void OnSetVhost(NickAlias *na) anope_override

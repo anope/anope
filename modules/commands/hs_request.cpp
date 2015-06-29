@@ -362,7 +362,6 @@ class HSRequest : public Module
 		commandhsrequest(this), commandhsactive(this),
 		commandhsreject(this), commandhswaiting(this), hostrequest(this, "hostrequest"), request_type("HostRequest", HostRequest::Unserialize)
 	{
-
 		if (!IRCD || !IRCD->CanSetVHost)
 			throw ModuleException("Your IRCd does not support vhosts");
 	}

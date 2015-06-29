@@ -58,7 +58,8 @@ class HSOff : public Module
 	HSOff(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandhsoff(this)
 	{
-
+		if (!IRCD || !IRCD->CanSetVHost)
+			throw ModuleException("Your IRCd does not support vhosts");
 	}
 };
 

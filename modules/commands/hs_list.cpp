@@ -152,6 +152,8 @@ class HSList : public Module
 	HSList(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandhslist(this)
 	{
+		if (!IRCD || !IRCD->CanSetVHost)
+			throw ModuleException("Your IRCd does not support vhosts");
 	}
 };
 

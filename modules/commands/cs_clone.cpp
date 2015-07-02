@@ -128,12 +128,12 @@ public:
 		}
 
 		User *u = source.GetUser();
-		ChannelInfo *ci = ChannelInfo::Find(params[0]);
+		ChannelInfo *ci = ChannelInfo::Find(channel);
 		bool override = false;
 
 		if (ci == NULL)
 		{
-			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
+			source.Reply(CHAN_X_NOT_REGISTERED, channel.c_str());
 			return;
 		}
 

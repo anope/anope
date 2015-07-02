@@ -10,11 +10,6 @@ if(COMMAND cmake_policy)
   endif(POLICY CMP0007)
 endif(COMMAND cmake_policy)
 
-# If the Source dir and the Binary dir are the same, we are building in-source, which we will disallow due to Autotools being there (but only on non-Windows)
-if(${CMAKE_CURRENT_SOURCE_DIR} STREQUAL ${CMAKE_CURRENT_BINARY_DIR} AND NOT WIN32)
-  message(FATAL_ERROR "You can not use CMake to build Anope from the root of it's source tree! Remove the CMakeCache.txt file from this directory, then create a separate directory (either below this directory or elsewhere), and then re-run CMake from there.")
-endif(${CMAKE_CURRENT_SOURCE_DIR} STREQUAL ${CMAKE_CURRENT_BINARY_DIR} AND NOT WIN32)
-
 # Set the project as C++ primarily, but have C enabled for the checks required later
 project(Anope CXX)
 enable_language(C)
@@ -86,7 +81,7 @@ set(DEFAULT_LIBRARY_DIRS)
 set(DEFAULT_INCLUDE_DIRS)
 
 # If we are using a GNU compiler (have to use CXX because it seems to fail on C), we will be able to determine it's default paths for libraries and includes
-if(CMAKE_COMPILER_IS_GNUCXX OR ${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang")
+if(CMAKE_COMPILER_IS_GNUCXX OR ${CMAKE_CXX_COMPILER_ID} MATCHES "Clang$")
   # First look for the compiler's default library directories
   execute_process(COMMAND ${CMAKE_C_COMPILER} -print-search-dirs OUTPUT_VARIABLE LINES OUTPUT_STRIP_TRAILING_WHITESPACE)
   # Find only the part after "libraries: "
@@ -152,7 +147,7 @@ if(CMAKE_COMPILER_IS_GNUCXX OR ${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang")
   if(DEFAULT_INCLUDE_DIRS)
     remove_list_duplicates(DEFAULT_INCLUDE_DIRS)
   endif(DEFAULT_INCLUDE_DIRS)
-endif(CMAKE_COMPILER_IS_GNUCXX OR ${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang")
+endif(CMAKE_COMPILER_IS_GNUCXX OR ${CMAKE_CXX_COMPILER_ID} MATCHES "Clang$")
 
 # If we are using Visual Studio, locate the path of the Windows Server 2008 SDK or Windows Server 2003 Platform SDK, depending on which is installed
 if(MSVC)
@@ -228,8 +223,6 @@ endif(EXTRA_LIBS)
 # Find gettext
 find_package(Gettext)
 
-# Add an optional variable for using run-cc.pl for building, Perl will be checked later regardless of this setting
-option(USE_RUN_CC_PL "Use run-cc.pl for building" OFF)
 option(USE_PCH "Use precompiled headers" OFF)
 
 # Use the following directories as includes
@@ -370,19 +363,11 @@ find_program(GREP grep)
 find_program(SH sh)
 find_program(CHGRP chgrp)
 find_program(CHMOD chmod)
-find_program(PERL perl)
-
-# If perl is included on the system and the user wants to use run-cc.pl, change the commands for compiling and linking
-if(PERL AND USE_RUN_CC_PL)
-  set(CMAKE_CXX_COMPILE_OBJECT "${PERL} ${Anope_SOURCE_DIR}/run-cc.pl -q ${CMAKE_CXX_COMPILE_OBJECT}")
-  set(CMAKE_CXX_LINK_EXECUTABLE "${PERL} ${Anope_SOURCE_DIR}/run-cc.pl -q ${CMAKE_CXX_LINK_EXECUTABLE}")
-  set(CMAKE_CXX_CREATE_SHARED_MODULE "${PERL} ${Anope_SOURCE_DIR}/run-cc.pl -q ${CMAKE_CXX_CREATE_SHARED_MODULE}")
-endif(PERL AND USE_RUN_CC_PL)
 
 # If a INSTDIR was passed in to CMake, use it as the install prefix, otherwise set the default install prefix to the services directory under the user's home directory
 if(INSTDIR)
   set(CMAKE_INSTALL_PREFIX "${INSTDIR}")
-else(INSTDIR)
+elseif(NOT CMAKE_INSTALL_PREFIX)
   set(CMAKE_INSTALL_PREFIX "$ENV{HOME}/services")
 endif(INSTDIR)
 

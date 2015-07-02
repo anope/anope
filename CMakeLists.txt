@@ -275,13 +275,15 @@ if(MINGW)
   set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} ${CMAKE_SHARED_LIBRARY_CREATE_C_FLAGS}")
 endif(MINGW)
 
-# Under Windows, we set the executable name for Anope to be anope
-if(WIN32)
-  set(PROGRAM_NAME anope)
-# Under *nix, we set the executable name for Anope to be services
-else(WIN32)
-  set(PROGRAM_NAME services)
-endif(WIN32)
+if(NOT PROGRAM_NAME)
+  # Under Windows, we set the executable name for Anope to be anope
+  if(WIN32)
+    set(PROGRAM_NAME anope)
+  # Under *nix, we set the executable name for Anope to be services
+  else(WIN32)
+    set(PROGRAM_NAME services)
+  endif(WIN32)
+endif(NOT PROGRAM_NAME)
 
 # If we are not using Visual Studio, we'll run the following checks
 if(NOT MSVC)

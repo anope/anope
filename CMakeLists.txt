@@ -14,7 +14,7 @@ project(Anope CXX)
 enable_language(C)
 
 # Override the module include path to include our directory, for our Anope.cmake, as well as we are using our own version of the NSIS template
-set(CMAKE_MODULE_PATH ${Anope_SOURCE_DIR}/cmake)
+list(APPEND CMAKE_MODULE_PATH "${Anope_SOURCE_DIR}/cmake")
 
 include(Anope)
 

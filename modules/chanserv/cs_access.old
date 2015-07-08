@@ -30,7 +30,7 @@ class AccessChanAccess : public ChanAccessImpl
 		return this->GetChannel()->GetLevel(name) != ChanServ::ACCESS_INVALID && this->GetLevel() >= this->GetChannel()->GetLevel(name);
 	}
 
-	Anope::string AccessSerialize()
+	Anope::string AccessSerialize() override
 	{
 		return stringify(this->GetLevel());
 	}

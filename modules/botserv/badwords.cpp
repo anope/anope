@@ -94,7 +94,7 @@ struct BadWordsImpl : BadWords
 		return bw;
 	}
 
-	std::vector<BadWord *> GetBadWords(ChanServ::Channel *ci)
+	std::vector<BadWord *> GetBadWords(ChanServ::Channel *ci) override
 	{
 		return ci->GetRefs<BadWord *>(badword);
 	}

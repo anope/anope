@@ -486,7 +486,7 @@ class CommandCSXOP : public Command
 		return Anope::printf(Language::Translate(source.GetAccount(), _("Modify the list of %s users")), source.command.upper().c_str());
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		ChanServ::Channel *ci = ChanServ::Find(params[0]);
 		if (ci == NULL)

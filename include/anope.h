@@ -543,7 +543,7 @@ namespace Anope
 	extern CoreExport Anope::string Random(size_t len);
 }
 
-/** sepstream allows for splitting token seperated lists.
+/** sepstream allows for splitting token separated lists.
  * Each successive call to sepstream::GetToken() returns
  * the next token, until none remain, at which point the method returns
  * an empty string.
@@ -615,7 +615,7 @@ class CoreExport sepstream
 	bool StreamEnd();
 };
 
-/** A derived form of sepstream, which seperates on commas
+/** A derived form of sepstream, which separates on commas
  */
 class commasepstream : public sepstream
 {
@@ -625,7 +625,7 @@ class commasepstream : public sepstream
 	commasepstream(const Anope::string &source, bool allowempty = false) : sepstream(source, ',', allowempty) { }
 };
 
-/** A derived form of sepstream, which seperates on spaces
+/** A derived form of sepstream, which separates on spaces
  */
 class spacesepstream : public sepstream
 {

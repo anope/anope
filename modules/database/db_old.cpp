@@ -687,7 +687,7 @@ static void LoadVHosts()
 		NickAlias *na = NickAlias::Find(nick);
 		if (na == NULL)
 		{
-			Log() << "Removing vhost for nonexistant nick " << nick;
+			Log() << "Removing vhost for non-existent nick " << nick;
 			continue;
 		}
 

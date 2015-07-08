@@ -52,7 +52,7 @@ class CoreExport NumberList
 	virtual void HandleNumber(unsigned number);
 
 	/** Called when there is an error with the numbered list
-	 * Return false to immediatly stop processing the list and return
+	 * Return false to immediately stop processing the list and return
 	 * This is all done before we start calling HandleNumber, so no numbers will have been processed yet
 	 * @param list The list
 	 * @return false to stop processing

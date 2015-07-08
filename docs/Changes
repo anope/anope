@@ -173,8 +173,8 @@ A Added ns_resetpass module to the core
 A CS ACCESS VIEW which shows who added the access and last time used
 A Last used time to CS AKICK VIEW
 A Added a sha_256 encryption module
-A Added the ability to load multiple encryption modules, and the ability to seamlessly convert your database between diferent encryptions
-A Added configuration options to allow Anope to reconnect if it disconnects from the uplink instead of dieing
+A Added the ability to load multiple encryption modules, and the ability to seamlessly convert your database between different encryptions
+A Added configuration options to allow Anope to reconnect if it disconnects from the uplink instead of dying
 A Added support for linking with IPv6
 F Unban command to accept an optional nick arg
 F Some typos in services.conf

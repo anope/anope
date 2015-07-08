@@ -616,7 +616,7 @@ class CommandCSSetPersist : public Command
 				" \n"
 				"If your IRCd has a permanent (persistent) channel mode\n"
 				"and it is set or unset (for any reason, including MODE LOCK),\n"
-				"persist is automatically set and unset for the channel aswell.\n"
+				"persist is automatically set and unset for the channel as well.\n"
 				"Additionally, services will set or unset this mode when you\n"
 				"set persist on or off."), BotServ ? BotServ->nick.c_str() : "BotServ",
 				ChanServ ? ChanServ->nick.c_str() : "ChanServ");

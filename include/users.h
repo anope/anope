@@ -44,7 +44,7 @@ class CoreExport User : public virtual Base, public Extensible, public CommandRe
 	Anope::string vident;
 	Anope::string ident;
 	Anope::string uid;
-	/* If the user is on the access list of the nick theyre on */
+	/* If the user is on the access list of the nick they're on */
 	bool on_access;
 	/* Map of user modes and the params this user has (if any) */
 	ModeList modes;
@@ -103,7 +103,7 @@ class CoreExport User : public virtual Base, public Extensible, public CommandRe
 	 * @param svhost The vhost of the user
 	 * @param sip The ip of the user
 	 * @param sserver The server of the user
-	 * @param srealname The realname/gecos of teh user
+	 * @param srealname The realname/gecos of the user
 	 * @param ts User's timestamp
 	 * @param smodes User's modes
 	 * @param suid The unique identifier of the user.

@@ -90,7 +90,7 @@ class BotServCore : public Module
 		{
 			/**
 			 * We let the bot join even if it was an ignored user, as if we don't,
-			 * and the ignored user doesnt just leave, the bot will never
+			 * and the ignored user doesn't just leave, the bot will never
 			 * make it into the channel, leaving the channel botless even for
 			 * legit users - Rob
 			 **/
@@ -109,7 +109,7 @@ class BotServCore : public Module
 		if (c->ci && persist && persist->HasExt(c->ci))
 			return;
 	
-		/* Channel is syncing from a netburst, don't destroy it as more users are probably wanting to join immediatly
+		/* Channel is syncing from a netburst, don't destroy it as more users are probably wanting to join immediately
 		 * We also don't part the bot here either, if necessary we will part it after the sync
 		 */
 		if (c->syncing)

@@ -460,7 +460,7 @@ struct IRCDMessageSJoin : IRCDMessage
 			sju.second = User::Find(buf);
 			if (!sju.second)
 			{
-				Log(LOG_DEBUG) << "SJOIN for nonexistant user " << buf << " on " << params[1];
+				Log(LOG_DEBUG) << "SJOIN for non-existent user " << buf << " on " << params[1];
 				continue;
 			}
 

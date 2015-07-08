@@ -576,7 +576,7 @@ class ChannelModeFlood : public ChannelModeParam
 			while (p < arg.length() && isdigit(arg[p]))
 				++p;
 			if (p == arg.length() || !(arg[p] == 'c' || arg[p] == 'j' || arg[p] == 'k' || arg[p] == 'm' || arg[p] == 'n' || arg[p] == 't'))
-				continue; /* continue instead of break for forward compatability. */
+				continue; /* continue instead of break for forward compatibility. */
 			try
 			{
 				int v = arg.substr(0, p).is_number_only() ? convertTo<int>(arg.substr(0, p)) : 0;
@@ -908,7 +908,7 @@ struct IRCDMessageNick : IRCDMessage
 			Server *s = Server::Find(params[5]);
 			if (s == NULL)
 			{
-				Log(LOG_DEBUG) << "User " << params[0] << " introduced from nonexistant server " << params[5] << "?";
+				Log(LOG_DEBUG) << "User " << params[0] << " introduced from non-existent server " << params[5] << "?";
 				return;
 			}
 		
@@ -992,7 +992,7 @@ struct IRCDMessageSetHost : IRCDMessage
 	{
 		User *u = source.GetUser();
 
-		/* When a user sets +x we recieve the new host and then the mode change */
+		/* When a user sets +x we receive the new host and then the mode change */
 		if (u->HasMode("CLOAK"))
 			u->SetDisplayedHost(params[0]);
 		else
@@ -1096,7 +1096,7 @@ struct IRCDMessageSJoin : IRCDMessage
 				sju.second = User::Find(buf);
 				if (!sju.second)
 				{
-					Log(LOG_DEBUG) << "SJOIN for nonexistant user " << buf << " on " << params[1];
+					Log(LOG_DEBUG) << "SJOIN for non-existent user " << buf << " on " << params[1];
 					continue;
 				}
 

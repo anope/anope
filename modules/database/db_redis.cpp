@@ -139,7 +139,7 @@ class DatabaseRedis : public Module, public Pipe
 	{
 		Serialize::Type *t = obj->GetSerializableType();
 
-		/* If there is no id yet for ths object, get one */
+		/* If there is no id yet for this object, get one */
 		if (!obj->id)
 			redis->SendCommand(new IDInterface(this, obj), "INCR id:" + t->GetName());
 		else

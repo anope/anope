@@ -36,7 +36,7 @@ class CommandMSCheck : public Command
 
 		MemoInfo *mi = &na->nc->memos;
 
-		/* Okay, I know this looks strange but we wanna get the LAST memo, so we
+		/* Okay, I know this looks strange but we want to get the LAST memo, so we
 			have to loop backwards */
 
 		for (unsigned i = mi->memos->size(); i > 0; --i)

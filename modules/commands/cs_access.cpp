@@ -666,7 +666,7 @@ class CommandCSLevels : public Command
 	{
 		const Anope::string &what = params[2];
 
-		/* Don't allow disabling of the founder level. It would be hard to change it back if you dont have access to use this command */
+		/* Don't allow disabling of the founder level. It would be hard to change it back if you don't have access to use this command */
 		if (what.equals_ci("FOUNDER"))
 		{
 			source.Reply(_("You can not disable the founder privilege because it would be impossible to reenable it at a later time."));

@@ -121,7 +121,7 @@ void Channel::CheckModes()
 
 bool Channel::CheckDelete()
 {
-	/* Channel is syncing from a netburst, don't destroy it as more users are probably wanting to join immediatly
+	/* Channel is syncing from a netburst, don't destroy it as more users are probably wanting to join immediately
 	 * We also don't part the bot here either, if necessary we will part it after the sync
 	 */
 	if (this->syncing)
@@ -160,10 +160,10 @@ void Channel::DeleteUser(User *user)
 
 	ChanUserContainer *cu = user->FindChannel(this);
 	if (!this->users.erase(user))
-		Log(LOG_DEBUG) << "Channel::DeleteUser() tried to delete nonexistant user " << user->nick << " from channel " << this->name;
+		Log(LOG_DEBUG) << "Channel::DeleteUser() tried to delete non-existent user " << user->nick << " from channel " << this->name;
 
 	if (!user->chans.erase(this))
-		Log(LOG_DEBUG) << "Channel::DeleteUser() tried to delete nonexistant channel " << this->name << " from " << user->nick << "'s channel list";
+		Log(LOG_DEBUG) << "Channel::DeleteUser() tried to delete non-existent channel " << this->name << " from " << user->nick << "'s channel list";
 	delete cu;
 
 	if (this->CheckDelete())
@@ -279,7 +279,7 @@ void Channel::SetModeInternal(MessageSource &setter, ChannelMode *ocm, const Ano
 
 		if (!u)
 		{
-			Log() << "MODE " << this->name << " +" << cm->mchar << " for nonexistant user " << param;
+			Log() << "MODE " << this->name << " +" << cm->mchar << " for non-existent user " << param;
 			return;
 		}
 
@@ -350,7 +350,7 @@ void Channel::RemoveModeInternal(MessageSource &setter, ChannelMode *ocm, const 
 
 		if (!u)
 		{
-			Log() << "Channel::RemoveModeInternal() MODE " << this->name << "-" << cm->mchar << " for nonexistant user " << param;
+			Log() << "Channel::RemoveModeInternal() MODE " << this->name << "-" << cm->mchar << " for non-existent user " << param;
 			return;
 		}
 
@@ -656,7 +656,7 @@ void Channel::SetModesInternal(MessageSource &source, const Anope::string &mode,
 
 		if (cm->type == MODE_REGULAR)
 		{
-			/* something changed if we are adding a mode we dont have, or removing one we have */
+			/* something changed if we are adding a mode we don't have, or removing one we have */
 			changed |= !!add != this->HasMode(cm->name);
 			if (add)
 				this->SetModeInternal(source, cm, "", false);
@@ -691,7 +691,7 @@ void Channel::SetModesInternal(MessageSource &source, const Anope::string &mode,
 				this->RemoveModeInternal(source, cm, token, enforce_mlock);
 		}
 		else
-			Log() << "warning: Channel::SetModesInternal() recieved more modes requiring params than params, modes: " << mode;
+			Log() << "warning: Channel::SetModesInternal() received more modes requiring params than params, modes: " << mode;
 	}
 
 	if (!this_reference)

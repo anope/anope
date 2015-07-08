@@ -31,7 +31,7 @@ class FlagsChanAccess : public ChanAccessImpl
 		return it != defaultFlags.end() && GetFlags().find(it->second) != Anope::string::npos;
 	}
 
-	Anope::string AccessSerialize()
+	Anope::string AccessSerialize() override
 	{
 		return GetFlags();
 	}

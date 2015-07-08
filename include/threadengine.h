@@ -55,7 +55,7 @@ class CoreExport Thread : public Pipe
 
 	/** Called when this thread should be joined to
 	 */
-	void OnNotify();
+	void OnNotify() override;
 
 	/** Called when the thread is run.
 	 */

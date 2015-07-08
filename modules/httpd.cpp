@@ -325,7 +325,7 @@ class MyHTTPProvider : public HTTPProvider, public Timer
 		this->pages.erase(page->GetURL());
 	}
 
-	HTTPPage* FindPage(const Anope::string &pname)
+	HTTPPage* FindPage(const Anope::string &pname) override
 	{
 		if (this->pages.count(pname) == 0)
 			return NULL;

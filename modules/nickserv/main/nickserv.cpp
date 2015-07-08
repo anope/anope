@@ -77,7 +77,7 @@ class NickServHeld : public Timer
 		n->SetS<bool>("HELD", true);
 	}
 
-	void Tick(time_t)
+	void Tick(time_t) override
 	{
 		if (na)
 			na->UnsetS<bool>("HELD");

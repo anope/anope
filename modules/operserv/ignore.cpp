@@ -18,17 +18,17 @@ class IgnoreImpl : public Ignore
 	IgnoreImpl(Serialize::TypeBase *type) : Ignore(type) { }
         IgnoreImpl(Serialize::TypeBase *type, Serialize::ID id) : Ignore(type, id) { }
 
-	Anope::string GetMask();
-	void SetMask(const Anope::string &);
+	Anope::string GetMask() override;
+	void SetMask(const Anope::string &) override;
 
-	Anope::string GetCreator();
-	void SetCreator(const Anope::string &);
+	Anope::string GetCreator() override;
+	void SetCreator(const Anope::string &) override;
 
-	Anope::string GetReason();
-	void SetReason(const Anope::string &);
+	Anope::string GetReason() override;
+	void SetReason(const Anope::string &) override;
 
-	time_t GetTime();
-	void SetTime(const time_t &);
+	time_t GetTime() override;
+	void SetTime(const time_t &) override;
 };
 
 class IgnoreType : public Serialize::Type<IgnoreImpl>

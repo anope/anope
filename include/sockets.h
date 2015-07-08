@@ -373,7 +373,7 @@ class CoreExport ListenSocket : public virtual Socket
 	/** Process what has come in from the connection
 	 * @return false to destroy this socket
 	 */
-	bool ProcessRead();
+	bool ProcessRead() override;
 
 	/** Called when a connection is accepted
  	 * @param fd The FD for the new connection

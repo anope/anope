@@ -139,9 +139,9 @@ class ChanServCore : public Module, public ChanServService
 		nc->GetChannelReferences(chans);
 		int max_reg = Config->GetModule(this)->Get<int>("maxregistered");
 
-		for (unsigned i = 0; i < chans.size(); ++i)
+		for (std::deque<ChannelInfo *>::iterator i = chans.begin(); i != chans.end(); )
 		{
-			ChannelInfo *ci = chans[i];
+			ChannelInfo *ci = *i;
 
 			if (ci->GetFounder() == nc)
 			{
@@ -157,7 +157,10 @@ class ChanServCore : public Module, public ChanServService
 						NickCore *anc = ca->GetAccount();
 
 						if (!anc || (!anc->IsServicesOper() && max_reg && anc->channelcount >= max_reg) || (anc == nc))
+						{
+							++i;
 							continue;
+						}
 						if (!highest || *ca > *highest)
 							highest = ca;
 					}
@@ -174,7 +177,7 @@ class ChanServCore : public Module, public ChanServService
 				else
 				{
 					Log(LOG_NORMAL, "chanserv/drop", ChanServ) << "Deleting channel " << ci->name << " owned by deleted nick " << nc->display;
-
+					i = chans.erase(i);
 					delete ci;
 					continue;
 				}
@@ -203,6 +206,7 @@ class ChanServCore : public Module, public ChanServService
 					break;
 				}
 			}
+			++i;
 		}
 	}
 

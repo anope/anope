@@ -44,10 +44,11 @@ struct ModeLocksImpl : ModeLocks
 
 	~ModeLocksImpl()
 	{
-		for (ModeList::iterator it = this->mlocks->begin(); it != this->mlocks->end();)
+		ModeList modelist;
+		mlocks->swap(modelist);
+		for (ModeList::iterator it = modelist.begin(); it != modelist.end(); ++it)
 		{
 			ModeLock *ml = *it;
-			++it;
 			delete ml;
 		}
 	}

@@ -38,6 +38,8 @@ NickCore::NickCore(const Anope::string &coredisplay) : Serializable("NickCore"),
 
 NickCore::~NickCore()
 {
+	UnsetExtensibles();
+
 	FOREACH_MOD(OnDelCore, (this));
 
 	if (!this->chanaccess->empty())

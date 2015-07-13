@@ -40,6 +40,8 @@ class CoreExport Extensible
 
 	virtual ~Extensible();
 
+	void UnsetExtensibles();
+
 	template<typename T> T* GetExt(const Anope::string &name) const;
 	bool HasExt(const Anope::string &name) const;
 

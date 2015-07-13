@@ -292,6 +292,8 @@ void User::SetRealname(const Anope::string &srealname)
 
 User::~User()
 {
+	UnsetExtensibles();
+
 	if (this->server != NULL)
 	{
 		if (this->server->IsSynced())

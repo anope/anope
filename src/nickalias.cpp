@@ -51,6 +51,8 @@ NickAlias::NickAlias(const Anope::string &nickname, NickCore* nickcore) : Serial
 
 NickAlias::~NickAlias()
 {
+	UnsetExtensibles();
+
 	FOREACH_MOD(OnDelNick, (this));
 
 	/* Accept nicks that have no core, because of database load functions */

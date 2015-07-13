@@ -52,6 +52,8 @@ Channel::Channel(const Anope::string &nname, time_t ts)
 
 Channel::~Channel()
 {
+	UnsetExtensibles();
+
 	FOREACH_MOD(OnChannelDelete, (this));
 
 	ModeManager::StackerDel(this);

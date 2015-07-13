@@ -24,6 +24,11 @@ ExtensibleBase::~ExtensibleBase()
 
 Extensible::~Extensible()
 {
+	UnsetExtensibles();
+}
+
+void Extensible::UnsetExtensibles()
+{
 	while (!extension_items.empty())
 		(*extension_items.begin())->Unset(this);
 }

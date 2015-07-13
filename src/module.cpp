@@ -64,6 +64,8 @@ Module::Module(const Anope::string &modname, const Anope::string &, ModType modt
 
 Module::~Module()
 {
+	UnsetExtensibles();
+
 	/* Detach all event hooks for this module */
 	ModuleManager::DetachAll(this);
 	IdentifyRequest::ModuleUnload(this);

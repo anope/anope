@@ -80,6 +80,15 @@ set(ENV{LC_ALL} C)
 set(DEFAULT_LIBRARY_DIRS)
 set(DEFAULT_INCLUDE_DIRS)
 
+# Check that we aren't running on an ancient broken GCC
+if(CMAKE_COMPILER_IS_GNUCXX)
+  execute_process(COMMAND ${CMAKE_CXX_COMPILER} -dumpversion OUTPUT_VARIABLE GCC_FULL_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
+  string(REGEX REPLACE "^(\\d+\\.\\d+)" "\\1" GCC_VERSION ${GCC_FULL_VERSION})
+  if(GCC_VERSION LESS 4.2)
+    message(FATAL_ERROR "Your compiler is too old to build Anope. Upgrade to GCC 4.2 or newer!")
+  endif(GCC_VERSION LESS 4.2)
+endif(CMAKE_COMPILER_IS_GNUCXX)
+
 # If we are using a GNU compiler (have to use CXX because it seems to fail on C), we will be able to determine it's default paths for libraries and includes
 if(CMAKE_COMPILER_IS_GNUCXX OR "${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang$")
   # First look for the compiler's default library directories

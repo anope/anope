@@ -49,6 +49,8 @@ BotInfo::BotInfo(const Anope::string &nnick, const Anope::string &nuser, const A
 
 BotInfo::~BotInfo()
 {
+	UnsetExtensibles();
+
 	FOREACH_MOD(OnDelBot, (this));
 
 	// If we're synchronised with the uplink already, send the bot.

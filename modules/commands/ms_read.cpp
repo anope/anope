@@ -169,7 +169,7 @@ class CommandMSRead : public Command
 			}
 			else if (numstr.equals_ci("ALL"))
 			{
-				for (i = mi->memos->size(); -1 < i; --i)
+				for (i = 0; i < mi->memos->size(); i++)
 				{
 					MemoListCallback::DoRead(source, mi, ci, i);
 				}

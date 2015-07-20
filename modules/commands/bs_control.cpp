@@ -56,7 +56,7 @@ class CommandBSSay : public Command
 		}
 
 		IRCD->SendPrivmsg(*ci->bi, ci->name, "%s", text.c_str());
-		source.Reply("Sent message to channel", ci->name);
+		source.Reply("Sent message to channel");
 		ci->bi->lastmsg = Anope::CurTime;
 
 		bool override = !source.AccessFor(ci).HasPriv("SAY");
@@ -115,7 +115,7 @@ class CommandBSAct : public Command
 			return;
 
 		IRCD->SendAction(*ci->bi, ci->name, "%s", message.c_str());
-		source.Reply("Sent message to channel", ci->name);
+		source.Reply("Sent message to channel");
 		ci->bi->lastmsg = Anope::CurTime;
 
 		bool override = !source.AccessFor(ci).HasPriv("SAY");

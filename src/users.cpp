@@ -319,6 +319,19 @@ User::~User()
 	FOREACH_MOD(OnPostUserLogoff, (this));
 }
 
+void User::SendContextMessage(BotInfo *source, Channel *chan, const Anope::string &msg)
+{
+	/* Send privmsg instead of notice if:
+	 * - UsePrivmsg is enabled
+	 * - The user is not registered and NSDefMsg is enabled
+	 * - The user is registered and has set /ns set msg on
+	 */
+	if (Config->UsePrivmsg && ((!this->nc && Config->DefPrivmsg) || (this->nc && this->nc->HasExt("MSG"))))
+		IRCD->SendContextPrivmsg(source, this, chan, msg);
+	else
+		IRCD->SendContextNotice(source, this, chan, msg	);
+}
+
 void User::SendMessage(BotInfo *source, const char *fmt, ...)
 {
 	va_list args;

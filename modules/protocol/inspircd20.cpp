@@ -19,6 +19,8 @@ static ServiceReference<IRCDProto> insp12("IRCDProto", "inspircd12");
 class InspIRCd20Proto : public IRCDProto
 {
  public:
+	bool use_channel_context_messages;
+
 	InspIRCd20Proto(Module *creator) : IRCDProto(creator, "InspIRCd 2.0")
 	{
 		DefaultPseudoclientModes = "+I";
@@ -40,6 +42,28 @@ class InspIRCd20Proto : public IRCDProto
 		UplinkSocket::Message() << "CAPAB CAPABILITIES :PROTOCOL=1202";
 		UplinkSocket::Message() << "CAPAB END";
 		insp12->SendConnect();
+	}
+
+	void SendContextNotice(BotInfo *source, const User *dest, const Channel *chan, const Anope::string &msg)
+	{
+		if (!use_channel_context_messages)
+		{
+			IRCDProto::SendContextNotice(source, dest, chan, msg);
+			return;
+		}
+
+		UplinkSocket::Message() << "PUSH " << dest->GetUID() << " ::" << source->GetDisplayedMask() << " NOTICE " << chan->ci->name << " :" << msg;
+	}
+
+	void SendContextPrivmsg(BotInfo *source, const User *dest, const Channel *chan, const Anope::string &msg)
+	{
+		if (!use_channel_context_messages)
+		{
+			IRCDProto::SendContextPrivmsg(source, dest, chan, msg);
+			return;
+		}
+
+		UplinkSocket::Message() << "PUSH " << dest->GetUID() << " ::" << source->GetDisplayedMask() << " PRIVMSG " << chan->ci->name << " :" << msg;
 	}
 
 	void SendSVSKillInternal(const MessageSource &source, User *user, const Anope::string &buf) anope_override { insp12->SendSVSKillInternal(source, user, buf); }
@@ -977,6 +1001,7 @@ class ProtoInspIRCd20 : public Module
 
 	void OnReload(Configuration::Conf *conf) anope_override
 	{
+		ircd_proto.use_channel_context_messages = conf->GetModule(this)->Get<bool>("use_channel_context_messages");
 		use_server_side_topiclock = conf->GetModule(this)->Get<bool>("use_server_side_topiclock");
 		use_server_side_mlock = conf->GetModule(this)->Get<bool>("use_server_side_mlock");
 	}

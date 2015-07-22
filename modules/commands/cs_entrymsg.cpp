@@ -281,7 +281,7 @@ class CSEntryMessage : public Module
 
 			if (messages != NULL)
 				for (unsigned i = 0; i < (*messages)->size(); ++i)
-					u->SendMessage(c->ci->WhoSends(), "[%s] %s", c->ci->name.c_str(), (*messages)->at(i)->message.c_str());
+					u->SendContextMessage(c->ci->WhoSends(), c, (*messages)->at(i)->message);
 		}
 	}
 };

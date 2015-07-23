@@ -187,6 +187,23 @@ class LDAPService : public LDAPProvider, public Thread, public Condition
 	}
 
  private:
+	void Connect()
+	{
+		int i = ldap_initialize(&this->con, this->server.c_str());
+		if (i != LDAP_SUCCESS)
+			throw LDAPException("Unable to connect to LDAP service " + this->name + ": " + ldap_err2string(i));
+
+		const int version = LDAP_VERSION3;
+		i = ldap_set_option(this->con, LDAP_OPT_PROTOCOL_VERSION, &version);
+		if (i != LDAP_OPT_SUCCESS)
+			throw LDAPException("Unable to set protocol version for " + this->name + ": " + ldap_err2string(i));
+
+		const struct timeval tv = { 0, 0 };
+		i = ldap_set_option(this->con, LDAP_OPT_NETWORK_TIMEOUT, &tv);
+		if (i != LDAP_OPT_SUCCESS)
+			throw LDAPException("Unable to set timeout for " + this->name + ": " + ldap_err2string(i));
+	}
+
 	void Reconnect()
 	{
 		/* Only try one connect a minute. It is an expensive blocking operation */
@@ -195,9 +212,8 @@ class LDAPService : public LDAPProvider, public Thread, public Condition
 		last_connect = Anope::CurTime;
 
 		ldap_unbind_ext(this->con, NULL, NULL);
-		int i = ldap_initialize(&this->con, this->server.c_str());
-		if (i != LDAP_SUCCESS)
-			throw LDAPException("Unable to connect to LDAP service " + this->name + ": " + ldap_err2string(i));
+
+		Connect();
 	}
 
 	void QueueRequest(LDAPRequest *r)
@@ -215,19 +231,7 @@ class LDAPService : public LDAPProvider, public Thread, public Condition
 
 	LDAPService(Module *o, const Anope::string &n, const Anope::string &s, int po, const Anope::string &b, const Anope::string &p, time_t t) : LDAPProvider(o, n), server(s), port(po), admin_binddn(b), admin_pass(p), timeout(t), last_connect(0)
 	{
-		int i = ldap_initialize(&this->con, this->server.c_str());
-		if (i != LDAP_SUCCESS)
-			throw LDAPException("Unable to connect to LDAP service " + this->name + ": " + ldap_err2string(i));
-
-		const int version = LDAP_VERSION3;
-		i = ldap_set_option(this->con, LDAP_OPT_PROTOCOL_VERSION, &version);
-		if (i != LDAP_OPT_SUCCESS)
-			throw LDAPException("Unable to set protocol version for " + this->name + ": " + ldap_err2string(i));
-
-		const struct timeval tv = { 0, 0 };
-		i = ldap_set_option(this->con, LDAP_OPT_NETWORK_TIMEOUT, &tv);
-		if (i != LDAP_OPT_SUCCESS)
-			throw LDAPException("Unable to set timeout for " + this->name + ": " + ldap_err2string(i));
+		Connect();
 	}
 
 	~LDAPService()

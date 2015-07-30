@@ -870,8 +870,8 @@ class CommandCSSetSecureOps : public Command
 		this->SendSyntax(source);
 		source.Reply(" ");
 		source.Reply(_("Enables or disables the \002secure ops\002 option for a channel.\n"
-				"When \002secure ops\002 is set, users who are not on the userlist\n"
-				"will not be allowed chanop status."));
+				"When \002secure ops\002 is set, users who are not on the access list\n"
+				"will not be allowed channel operator status."));
 		return true;
 	}
 };

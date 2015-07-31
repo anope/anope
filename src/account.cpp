@@ -73,8 +73,20 @@ void IdentifyRequest::ModuleUnload(Module *m)
 		IdentifyRequest *ir = *it;
 		++it;
 
-		ir->Release(m);
-		if (ir->owner == m)
+		ir->holds.erase(m);
+		if (ir->holds.empty() && ir->dispatched)
+		{
+			if (!ir->success)
+				ir->OnFail();
 			delete ir;
+			continue;
+		}
+
+		if (ir->owner == m)
+		{
+			if (!ir->success)
+				ir->OnFail();
+			delete ir;
+		}
 	}
 }

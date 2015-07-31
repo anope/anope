@@ -41,15 +41,15 @@ bool WebCPanel::MemoServ::Memos::OnRequest(HTTPProvider *server, const Anope::st
 		{
 			replacements["MESSAGES"] = "Displaying the memos for " + chname + ".";
 			mi = &ci->memos;
+
+			replacements["CHANNEL_NAME"] = ci->name;
+			replacements["ESCAPED_CHANNEL_NAME"] = HTTPUtils::URLEncode(ci->name);
 		}
 		else
 		{
 			replacements["MESSAGES"] = "Channel " + chname + " not found, displaying the memos for your nick";
 			mi = &na->nc->memos;
 		}
-
-		replacements["CHANNEL_NAME"] = ci->name;
-		replacements["ESCAPED_CHANNEL_NAME"] = HTTPUtils::URLEncode(ci->name);
 	}
 	if (message.post_data.count("receiver") > 0 && message.post_data.count("message") > 0)
 	{

@@ -16,7 +16,10 @@ enable_language(C)
 # Override the module include path to include our directory, for our Anope.cmake, as well as we are using our own version of the NSIS template
 list(APPEND CMAKE_MODULE_PATH "${Anope_SOURCE_DIR}/cmake")
 
-include(Anope)
+include("Anope")
+include("CheckFunctionExists")
+include("CheckLibraryExists")
+include("CheckCXXCompilerFlag")
 
 # Force the locale to C for later uses of things like gcc so the messages come up in English, not the user's default language
 set(ENV{LC_ALL} C)
@@ -31,16 +34,7 @@ if(NOT MSVC)
   else()
     set(CMAKE_BUILD_TYPE DEBUG CACHE STRING "Choose the type of build, options are: None(CMAKE_CXX_FLAGS or CMAKE_C_FLAGS used) Debug Release RelWithDebInfo MinSizeRel.")
   endif()
-endif()
-
-# Include the checking functions used later in this CMakeLists.txt
-include(CheckFunctionExists)
-include(CheckIncludeFile)
-include(CheckTypeSize)
-include(CheckLibraryExists)
-include(CheckCXXCompilerFlag)
-
-if(NOT MSVC)
+ 
   check_cxx_compiler_flag("-std=c++11" COMPILER_SUPPORTS_CXX11)
   if(NOT COMPILER_SUPPORTS_CXX11)
     message(FATAL_ERROR "The compiler ${CMAKE_CXX_COMPILER} has no C++11 support. Please use a newer compiler.")

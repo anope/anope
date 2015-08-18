@@ -310,7 +310,7 @@ class ChanServCore : public Module
 
 	void OnDelCore(NickServ::Account *nc) override
 	{
-		int max_reg = Config->GetModule(this)->Get<int>("maxregistered");
+		unsigned int max_reg = Config->GetModule(this)->Get<unsigned int>("maxregistered");
 		for (ChanServ::Channel *ci : nc->GetRefs<ChanServ::Channel *>(ChanServ::channel))
 		{
 			if (ci->GetFounder() == nc)

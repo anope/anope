@@ -270,8 +270,8 @@ class DBMySQL : public Module, public Pipe
 		else
 			q.SetNull(field->GetName());
 
-		for (Query &q : SQL->Replace(prefix + object->GetSerializableType()->GetName(), q, { "id" }))
-			Run(q);
+		for (Query &q2 : SQL->Replace(prefix + object->GetSerializableType()->GetName(), q, { "id" }))
+			Run(q2);
 	}
 
  public:

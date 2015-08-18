@@ -42,6 +42,7 @@
 #include <algorithm>
 #include <iterator>
 #include <regex>
+#include <stack>
 
 #include "defs.h"
 

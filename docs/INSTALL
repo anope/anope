@@ -53,7 +53,7 @@ Note: You should also read the README and FAQ files!
     the memos of any user.
 
     Now go into the conf directory (by default, ~/anope/conf). Copy the example
-    configuration file (example.conf) to anope.conf, and open the latter
+    configuration file (anope.example.conf) to anope.conf, and open the latter
     with your favorite text editor. It contains all the configuration
     directives Anope will use at startup. Read the instructions contained in
     the file carefully. Using the default values is NOT a good idea, and will
@@ -71,7 +71,7 @@ Note: You should also read the README and FAQ files!
 
         * IMPORTANT: Back up your old databases!
         * If you are upgrading to a new major release, ALWAYS restart a
-          fresh configuration file from example.conf.
+          fresh configuration file from anope.example.conf.
 
 3) Setting up the IRCd
 
@@ -83,7 +83,7 @@ Note: You should also read the README and FAQ files!
     a shared block), and be sure that the IRCd is listneing on the given port
     in the link block.
 
-    Example link configurations can be found in example.conf for some of the
+    Example link configurations can be found in anope.example.conf for some of the
     popular IRCds.
 
     Don't forget to /rehash your IRCd to apply changes.

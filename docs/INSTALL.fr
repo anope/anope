@@ -56,7 +56,7 @@ Note : Vous devrez également lire les fichiers README et FAQ !
     utilisateurs.
 
     Allez maintenant dans le répertoire conf (par défaut, ~/anope/conf).
-    Copiez l'exemple de fichier de configuration (example.conf) en
+    Copiez l'exemple de fichier de configuration (anope.example.conf) en
     anope.conf et ouvrez ce dernier avec votre éditeur de texte favori.
     Il contient toutes les directives de configuration qu'Anope va utiliser
     en démarrant. Lisez attentivement les instructions contenues dans le
@@ -78,7 +78,7 @@ Note : Vous devrez également lire les fichiers README et FAQ !
         * IMPORTANT : Sauvegardez vos anciennes bases de données !
         * Si vous mettez à jour vers une nouvelle version majeure,
           recommencez *toujours* toute votre configuration à partir du
-          fichier example.conf.
+          fichier anope.example.conf.
 
 3) Configuration de l'IRCd
 
@@ -92,7 +92,7 @@ Note : Vous devrez également lire les fichiers README et FAQ !
     sur le port donné dans le bloc link.
 
     Des exemples de configurations de bloc link peuvent être trouvés dans
-    le fichier example.conf pour certains des IRCd les plus populaires.
+    le fichier anope.example.conf pour certains des IRCd les plus populaires.
 
     Souvenez-vous de /rehash votre IRCd pour appliquer les changements.
 

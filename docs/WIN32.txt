@@ -103,7 +103,7 @@ Anope for Windows
        INSTALL within the Solution Explorer. Right-click on INSTALL and choose Build.
 
        When you have done this, all the files will be installed to where they belong.
-       The only thing you need to do is rename "data/example.conf" to be "data/anope.conf",
+       The only thing you need to do is rename "data/anope.example.conf" to be "data/anope.conf",
        and then follow the steps to set up Anope.
 
     You have now completed the building phase of Anope for Windows. You can

@@ -39,6 +39,11 @@ class NickServCollide : public Timer
 		return u;
 	}
 
+	NickAlias *GetNick()
+	{
+		return na;
+	}
+
 	void Tick(time_t t) anope_override
 	{
 		if (!u || !na)
@@ -361,7 +366,7 @@ class NickServCore : public Module, public NickServService
 		for (std::set<NickServCollide *>::iterator it = collides.begin(); it != collides.end(); ++it)
 		{
 			NickServCollide *c = *it;
-			if (c->GetUser() == u)
+			if (c->GetUser() == u && c->GetNick() && c->GetNick()->nc == u->Account())
 			{
 				delete c;
 				break;

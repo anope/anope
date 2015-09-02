@@ -1107,13 +1107,13 @@ class CommandNSSASetNoexpire : public Command
 
 		if (param.equals_ci("ON"))
 		{
-			Log(LOG_ADMIN, source, this) << "to enable noexpire for " << na->nc->display;
+			Log(LOG_ADMIN, source, this) << "to enable noexpire for " << na->nick << " (" << na->nc->display << ")";
 			na->Extend<bool>("NS_NO_EXPIRE");
 			source.Reply(_("Nick %s \002will not\002 expire."), na->nick.c_str());
 		}
 		else if (param.equals_ci("OFF"))
 		{
-			Log(LOG_ADMIN, source, this) << "to disable noexpire for " << na->nc->display;
+			Log(LOG_ADMIN, source, this) << "to disable noexpire for " << na->nick << " (" << na->nc->display << ")";
 			na->Shrink<bool>("NS_NO_EXPIRE");
 			source.Reply(_("Nick %s \002will\002 expire."), na->nick.c_str());
 		}

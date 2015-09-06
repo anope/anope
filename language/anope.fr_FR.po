@@ -6922,7 +6922,7 @@ msgstr "Lit un ou plusieurs mémos"
 
 #: modules/commands/bs_info.cpp:57
 msgid "Real name"
-msgstr "Vrai nom : %s"
+msgstr "Vrai nom"
 
 #: modules/commands/os_session.cpp:552 modules/commands/os_ignore.cpp:266
 #: modules/commands/cs_akick.cpp:367 modules/commands/cs_akick.cpp:380

@@ -858,7 +858,8 @@ void Channel::SetCorrectModes(User *user, bool give_modes)
 				given = true;
 			}
 		}
-		else if (take_modes && !has_priv && !u_access.HasPriv(cm->name + "ME"))
+		/* modes that have no privileges assigned shouldn't be removed (like operprefix, ojoin) */
+		else if (take_modes && !has_priv && ci->GetLevel(cm->name + "ME") != ACCESS_INVALID && !u_access.HasPriv(cm->name + "ME"))
 		{
 			/* Only remove modes if they are > voice */
 			if (cm->name == "VOICE")

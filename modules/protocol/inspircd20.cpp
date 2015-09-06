@@ -1055,15 +1055,6 @@ class ProtoInspIRCd20 : public Module
 
 		return EVENT_CONTINUE;
 	}
-
-	EventReturn OnChannelModeUnset(Channel *c, MessageSource &setter, ChannelMode *mode, const Anope::string &param) anope_override
-	{
-		if ((setter.GetUser() && setter.GetUser()->server == Me) || setter.GetServer() == Me || !setter.GetServer())
-			if (mode->name == "OPERPREFIX")
-				c->SetMode(c->ci->WhoSends(), mode, param, false);
-
-		return EVENT_CONTINUE;
-	}
 };
 
 MODULE_INIT(ProtoInspIRCd20)

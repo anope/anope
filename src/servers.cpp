@@ -48,94 +48,7 @@ Server::Server(Server *up, const Anope::string &sname, unsigned shops, const Ano
 
 		/* Check to be sure this isn't a juped server */
 		if (Me == this->uplink && !juped)
-		{
-			/* Now do mode related stuff as we know what modes exist .. */
-			for (std::pair<Anope::string, User *> p : UserListByNick)
-			{
-				User *u = p.second;
-				if (u->type != UserType::BOT)
-					continue;
-
-				ServiceBot *bi = anope_dynamic_static_cast<ServiceBot *>(u);
-				Anope::string modes = !bi->botmodes.empty() ? ("+" + bi->botmodes) : IRCD->DefaultPseudoclientModes;
-
-				bi->SetModesInternal(bi, modes.c_str());
-				for (unsigned i = 0; i < bi->botchannels.size(); ++i)
-				{
-					size_t h = bi->botchannels[i].find('#');
-					if (h == Anope::string::npos)
-						continue;
-					Anope::string chname = bi->botchannels[i].substr(h);
-					Channel *c = Channel::Find(chname);
-					if (c && c->FindUser(bi))
-					{
-						Anope::string want_modes = bi->botchannels[i].substr(0, h);
-						for (unsigned j = 0; j < want_modes.length(); ++j)
-						{
-							ChannelMode *cm = ModeManager::FindChannelModeByChar(want_modes[j]);
-							if (cm == NULL)
-								cm = ModeManager::FindChannelModeByChar(ModeManager::GetStatusChar(want_modes[j]));
-							if (cm && cm->type == MODE_STATUS)
-							{
-								MessageSource ms = bi;
-								c->SetModeInternal(ms, cm, bi->nick);
-							}
-						}
-					}
-				}
-			}
-
-			IRCD->SendBOB();
-
-			for (unsigned i = 0; i < Me->GetLinks().size(); ++i)
-			{
-				Server *s = Me->GetLinks()[i];
-
-				if (s->juped)
-					IRCD->SendServer(s);
-			}
-
-			/* We make the bots go online */
-			for (user_map::const_iterator it = UserListByNick.begin(); it != UserListByNick.end(); ++it)
-			{
-				User *u = it->second;
-
-				ServiceBot *bi = ServiceBot::Find(u->GetUID());
-				if (bi)
-				{
-					//XLine x(bi->nick, "Reserved for services");
-					//IRCD->SendSQLine(NULL, &x);
-				}
-
-				IRCD->SendClientIntroduction(u);
-				if (bi)
-					bi->introduced = true;
-			}
-
-			for (channel_map::const_iterator it = ChannelList.begin(), it_end = ChannelList.end(); it != it_end; ++it)
-			{
-				Channel *c = it->second;
-
-				if (c->users.empty())
-					IRCD->SendChannel(c);
-				else
-					for (Channel::ChanUserList::const_iterator cit = c->users.begin(), cit_end = c->users.end(); cit != cit_end; ++cit)
-						IRCD->SendJoin(cit->second->user, c, &cit->second->status);
-
-				for (Channel::ModeList::const_iterator it2 = c->GetModes().begin(); it2 != c->GetModes().end(); ++it2)
-				{
-					ChannelMode *cm = ModeManager::FindChannelModeByName(it2->first);
-					if (!cm || cm->type != MODE_LIST)
-						continue;
-					ModeManager::StackerAdd(c->ci->WhoSends(), c, cm, true, it2->second);
-				}
-
-				if (!c->topic.empty() && !c->topic_setter.empty())
-					IRCD->SendTopic(c->ci->WhoSends(), c);
-
-				c->syncing = true;
-			}
-		}
+			Burst();
 	}
 
 	Event::OnNewServer(&Event::NewServer::OnNewServer, this);
@@ -175,6 +88,60 @@ void Server::Delete(const Anope::string &reason)
 	this->quitting = true;
 	Event::OnServerQuit(&Event::ServerQuit::OnServerQuit, this);
 	delete this;
+}
+
+void Server::Burst()
+{
+	IRCD->SendBOB();
+
+	for (unsigned i = 0; i < Me->GetLinks().size(); ++i)
+	{
+		Server *s = Me->GetLinks()[i];
+
+		if (s->juped)
+			IRCD->SendServer(s);
+	}
+
+	/* We make the bots go online */
+	for (user_map::const_iterator it = UserListByNick.begin(); it != UserListByNick.end(); ++it)
+	{
+		User *u = it->second;
+
+		ServiceBot *bi = ServiceBot::Find(u->GetUID());
+		if (bi)
+		{
+			//XLine x(bi->nick, "Reserved for services");
+			//IRCD->SendSQLine(NULL, &x);
+		}
+
+		IRCD->SendClientIntroduction(u);
+		if (bi)
+			bi->introduced = true;
+	}
+
+	for (channel_map::const_iterator it = ChannelList.begin(), it_end = ChannelList.end(); it != it_end; ++it)
+	{
+		Channel *c = it->second;
+
+		if (c->users.empty())
+			IRCD->SendChannel(c);
+		else
+			for (Channel::ChanUserList::const_iterator cit = c->users.begin(), cit_end = c->users.end(); cit != cit_end; ++cit)
+				IRCD->SendJoin(cit->second->user, c, &cit->second->status);
+
+		for (Channel::ModeList::const_iterator it2 = c->GetModes().begin(); it2 != c->GetModes().end(); ++it2)
+		{
+			ChannelMode *cm = ModeManager::FindChannelModeByName(it2->first);
+			if (!cm || cm->type != MODE_LIST)
+				continue;
+			ModeManager::StackerAdd(c->ci->WhoSends(), c, cm, true, it2->second);
+		}
+
+		if (!c->topic.empty() && !c->topic_setter.empty())
+			IRCD->SendTopic(c->ci->WhoSends(), c);
+
+		c->syncing = true;
+	}
 }
 
 const Anope::string &Server::GetName() const

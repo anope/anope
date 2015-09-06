@@ -13,6 +13,7 @@
 #include "anope.h"
 #include "serialize.h"
 #include "commands.h"
+#include "config.h"
 
 /* A service bot (NickServ, ChanServ, a BotServ bot, etc). */
 class CoreExport ServiceBot : public LocalUser
@@ -24,12 +25,8 @@ class CoreExport ServiceBot : public LocalUser
 	CommandInfo::map commands;
 	/* Modes the bot should have as configured in service:modes */
 	Anope::string botmodes;
-	/* Channels the bot should be in as configured in service:channels */
-	std::vector<Anope::string> botchannels;
 	/* Whether or not this bot is introduced to the network */
 	bool introduced;
-	/* Bot is defined in the configuration file */
-	bool conf;
 
 	/** Create a new bot.
 	 * @param nick The nickname to assign to the bot.
@@ -125,9 +122,12 @@ class BotInfo : public Serialize::Object
 {
  public:
 	ServiceBot *bot;
+	Configuration::Block *conf = nullptr;
 
 	BotInfo(Serialize::TypeBase *type) : Serialize::Object(type) { }
 	BotInfo(Serialize::TypeBase *type, Serialize::ID id) : Serialize::Object(type, id) { }
+
+	void Delete() override;
 
 	void SetNick(const Anope::string &);
 	Anope::string GetNick();

@@ -85,6 +85,8 @@ namespace Configuration
 	};
 
 	struct Uplink;
+	struct Usermode;
+	struct Channelmode;
 
 	struct CoreExport Conf : Block
 	{
@@ -123,6 +125,8 @@ namespace Configuration
 		std::vector<Anope::string> ModulesAutoLoad;
 		/* After how many characters do we wrap lines? */
 		unsigned int LineWrap;
+		std::vector<Usermode> Usermodes;
+		std::vector<Channelmode> Channelmodes;
 		unsigned char CaseMapUpper[256], CaseMapLower[256];
 
 		/* module configuration blocks */
@@ -154,14 +158,26 @@ namespace Configuration
 		inline bool operator==(const Uplink &other) const { return host == other.host && port == other.port && password == other.password && ipv6 == other.ipv6; }
 		inline bool operator!=(const Uplink &other) const { return !(*this == other); }
 	};
+
+	struct Usermode
+	{
+		Anope::string name;
+		char character;
+		bool param;
+		bool oper_only, setable;
+	};
+
+	struct Channelmode
+	{
+		Anope::string name, param_regex;
+		char character;
+		char status; /* status char, if any +/@ */
+		int level; /* relative level */
+		bool oper_only, list, param, param_unset, setable;
+
+	};
 }
 
-/** This class can be used on its own to represent an exception, or derived to represent a module-specific exception.
- * When a module whishes to abort, e.g. within a constructor, it should throw an exception using ModuleException or
- * a class derived from ModuleException. If a module throws an exception during its constructor, the module will not
- * be loaded. If this happens, the error message returned by ModuleException::GetReason will be displayed to the user
- * attempting to load the module, or dumped to the console if the ircd is currently loading for the first time.
- */
 class ConfigException : public CoreException
 {
  public:
@@ -171,11 +187,8 @@ class ConfigException : public CoreException
 	/** This constructor can be used to specify an error message before throwing.
 	 */
 	ConfigException(const Anope::string &message) : CoreException(message, "Config Parser") { }
-	/** This destructor solves world hunger, cancels the world debt, and causes the world to end.
-	 * Actually no, it does nothing. Never mind.
-	 * @throws Nothing!
-	 */
-	virtual ~ConfigException() throw() { }
+
+	virtual ~ConfigException() throw() = default;
 };
 
 extern Configuration::File ServicesConf;

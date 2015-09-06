@@ -239,55 +239,6 @@ class ProtoRatbox : public Module
 	IRCDMessageTBurst message_tburst;
 	IRCDMessageUID message_uid;
 
-	void AddModes()
-	{
-		/* user modes */
-		ModeManager::AddUserMode(new UserModeOperOnly("ADMIN", 'a'));
-		ModeManager::AddUserMode(new UserModeOperOnly("BOT", 'b'));
-		// c/C = con
-		// d = debug?
-		ModeManager::AddUserMode(new UserMode("DEAF", 'D'));
-		// f = full?
-		ModeManager::AddUserMode(new UserMode("CALLERID", 'g'));
-		ModeManager::AddUserMode(new UserMode("INVIS", 'i'));
-		// k = skill?
-		ModeManager::AddUserMode(new UserModeOperOnly("LOCOPS", 'l'));
-		// n = nchange
-		ModeManager::AddUserMode(new UserModeOperOnly("OPER", 'o'));
-		// r = rej
-		ModeManager::AddUserMode(new UserModeOperOnly("SNOMASK", 's'));
-		ModeManager::AddUserMode(new UserModeNoone("PROTECTED", 'S'));
-		// u = unauth?
-		ModeManager::AddUserMode(new UserMode("WALLOPS", 'w'));
-		// x = external?
-		// y = spy?
-		ModeManager::AddUserMode(new UserModeOperOnly("OPERWALLS", 'z'));
-		// Z = spy?
-
-		/* b/e/I */
-		ModeManager::AddChannelMode(new ChannelModeList("BAN", 'b'));
-		ModeManager::AddChannelMode(new ChannelModeList("EXCEPT", 'e'));
-		ModeManager::AddChannelMode(new ChannelModeList("INVITEOVERRIDE", 'I'));
-
-		/* v/h/o/a/q */
-		ModeManager::AddChannelMode(new ChannelModeStatus("VOICE", 'v', '+', 0));
-		ModeManager::AddChannelMode(new ChannelModeStatus("OP", 'o', '@', 1));
-
-		/* l/k */
-		ModeManager::AddChannelMode(new ChannelModeParam("LIMIT", 'l', true));
-		ModeManager::AddChannelMode(new ChannelModeKey('k'));
-
-		/* channel modes */
-		ModeManager::AddChannelMode(new ChannelMode("INVITE", 'i'));
-		ModeManager::AddChannelMode(new ChannelMode("MODERATED", 'm'));
-		ModeManager::AddChannelMode(new ChannelMode("NOEXTERNAL", 'n'));
-		ModeManager::AddChannelMode(new ChannelMode("PRIVATE", 'p'));
-		ModeManager::AddChannelMode(new ChannelMode("REGISTEREDONLY", 'r'));
-		ModeManager::AddChannelMode(new ChannelMode("SECRET", 's'));
-		ModeManager::AddChannelMode(new ChannelMode("TOPIC", 't'));
-		ModeManager::AddChannelMode(new ChannelMode("SSL", 'S'));
-	}
-
  public:
 	ProtoRatbox(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PROTOCOL | VENDOR)
 		, ircd_proto(this)
@@ -333,8 +284,6 @@ class ProtoRatbox : public Module
 			throw ModuleException("Unable to find hybrid");
 		if (!hybrid)
 			throw ModuleException("No protocol interface for hybrid");
-
-		this->AddModes();
 	}
 
 	~ProtoRatbox()

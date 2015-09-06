@@ -606,169 +606,6 @@ class ChannelModeUnrealSSL : public ChannelMode
 	}
 };
 
-struct IRCDMessageCapab : Message::Capab
-{
-	IRCDMessageCapab(Module *creator) : Message::Capab(creator, "PROTOCTL") { }
-
-	void Run(MessageSource &source, const std::vector<Anope::string> &params) override
-	{
-		for (unsigned i = 0; i < params.size(); ++i)
-		{
-			Anope::string capab = params[i];
-
-			if (capab.find("CHANMODES") != Anope::string::npos)
-			{
-				Anope::string modes(capab.begin() + 10, capab.end());
-				commasepstream sep(modes);
-				Anope::string modebuf;
-
-				sep.GetToken(modebuf);
-				for (size_t t = 0, end = modebuf.length(); t < end; ++t)
-				{
-					switch (modebuf[t])
-					{
-						case 'b':
-							ModeManager::AddChannelMode(new ChannelModeList("BAN", 'b'));
-
-							ModeManager::AddChannelMode(new UnrealExtban::ChannelMatcher("CHANNELBAN", "BAN", 'c'));
-							ModeManager::AddChannelMode(new UnrealExtban::EntryMatcher("JOINBAN", "BAN", 'j'));
-							ModeManager::AddChannelMode(new UnrealExtban::EntryMatcher("NONICKBAN", "BAN", 'n'));
-							ModeManager::AddChannelMode(new UnrealExtban::EntryMatcher("QUIET", "BAN", 'q'));
-							ModeManager::AddChannelMode(new UnrealExtban::RealnameMatcher("REALNAMEBAN", "BAN", 'r'));
-							ModeManager::AddChannelMode(new UnrealExtban::RegisteredMatcher("REGISTEREDBAN", "BAN", 'R'));
-							ModeManager::AddChannelMode(new UnrealExtban::AccountMatcher("ACCOUNTBAN", "BAN", 'a'));
-							continue;
-						case 'e':
-							ModeManager::AddChannelMode(new ChannelModeList("EXCEPT", 'e'));
-							continue;
-						case 'I':
-							ModeManager::AddChannelMode(new ChannelModeList("INVITEOVERRIDE", 'I'));
-							continue;
-						default:
-							ModeManager::AddChannelMode(new ChannelModeList("", modebuf[t]));
-					}
-				}
-
-				sep.GetToken(modebuf);
-				for (size_t t = 0, end = modebuf.length(); t < end; ++t)
-				{
-					switch (modebuf[t])
-					{
-						case 'k':
-							ModeManager::AddChannelMode(new ChannelModeKey('k'));
-							continue;
-						case 'f':
-							ModeManager::AddChannelMode(new ChannelModeFlood('f', false));
-							continue;
-						case 'L':
-							ModeManager::AddChannelMode(new ChannelModeParam("REDIRECT", 'L'));
-							continue;
-						default:
-							ModeManager::AddChannelMode(new ChannelModeParam("", modebuf[t]));
-					}
-				}
-
-				sep.GetToken(modebuf);
-				for (size_t t = 0, end = modebuf.length(); t < end; ++t)
-				{
-					switch (modebuf[t])
-					{
-						case 'l':
-							ModeManager::AddChannelMode(new ChannelModeParam("LIMIT", 'l', true));
-							continue;
-						case 'j':
-							ModeManager::AddChannelMode(new ChannelModeParam("JOINFLOOD", 'j', true));
-							continue;
-						default:
-							ModeManager::AddChannelMode(new ChannelModeParam("", modebuf[t], true));
-					}
-				}
-
-				sep.GetToken(modebuf);
-				for (size_t t = 0, end = modebuf.length(); t < end; ++t)
-				{
-					switch (modebuf[t])
-					{
-						case 'p':
-							ModeManager::AddChannelMode(new ChannelMode("PRIVATE", 'p'));
-							continue;
-						case 's':
-							ModeManager::AddChannelMode(new ChannelMode("SECRET", 's'));
-							continue;
-						case 'm':
-							ModeManager::AddChannelMode(new ChannelMode("MODERATED", 'm'));
-							continue;
-						case 'n':
-							ModeManager::AddChannelMode(new ChannelMode("NOEXTERNAL", 'n'));
-							continue;
-						case 't':
-							ModeManager::AddChannelMode(new ChannelMode("TOPIC", 't'));
-							continue;
-						case 'i':
-							ModeManager::AddChannelMode(new ChannelMode("INVITE", 'i'));
-							continue;
-						case 'r':
-							ModeManager::AddChannelMode(new ChannelModeNoone("REGISTERED", 'r'));
-							continue;
-						case 'R':
-							ModeManager::AddChannelMode(new ChannelMode("REGISTEREDONLY", 'R'));
-							continue;
-						case 'c':
-							ModeManager::AddChannelMode(new ChannelMode("BLOCKCOLOR", 'c'));
-							continue;
-						case 'O':
-							ModeManager::AddChannelMode(new ChannelModeOperOnly("OPERONLY", 'O'));
-							continue;
-						case 'A':
-							ModeManager::AddChannelMode(new ChannelModeOperOnly("ADMINONLY", 'A'));
-							continue;
-						case 'Q':
-							ModeManager::AddChannelMode(new ChannelMode("NOKICK", 'Q'));
-							continue;
-						case 'K':
-							ModeManager::AddChannelMode(new ChannelMode("NOKNOCK", 'K'));
-							continue;
-						case 'V':
-							ModeManager::AddChannelMode(new ChannelMode("NOINVITE", 'V'));
-							continue;
-						case 'C':
-							ModeManager::AddChannelMode(new ChannelMode("NOCTCP", 'C'));
-							continue;
-						case 'u':
-							ModeManager::AddChannelMode(new ChannelMode("AUDITORIUM", 'u'));
-							continue;
-						case 'z':
-							ModeManager::AddChannelMode(new ChannelMode("SSL", 'z'));
-							continue;
-						case 'N':
-							ModeManager::AddChannelMode(new ChannelMode("NONICK", 'N'));
-							continue;
-						case 'S':
-							ModeManager::AddChannelMode(new ChannelMode("STRIPCOLOR", 'S'));
-							continue;
-						case 'M':
-							ModeManager::AddChannelMode(new ChannelMode("REGMODERATED", 'M'));
-							continue;
-						case 'T':
-							ModeManager::AddChannelMode(new ChannelMode("NONOTICE", 'T'));
-							continue;
-						case 'G':
-							ModeManager::AddChannelMode(new ChannelMode("CENSOR", 'G'));
-							continue;
-						case 'Z':
-							ModeManager::AddChannelMode(new ChannelModeUnrealSSL("", 'Z'));
-							continue;
-						default:
-							ModeManager::AddChannelMode(new ChannelMode("", modebuf[t]));
-					}
-				}
-			}
-		}
-
-		Message::Capab::Run(source, params);
-	}
-};
-
 struct IRCDMessageChgHost : IRCDMessage
 {
 	IRCDMessageChgHost(Module *creator) : IRCDMessage(creator, "CHGHOST", 2) { }
@@ -1172,6 +1009,7 @@ class ProtoUnreal : public Module
 
 	/* Core message handlers */
 	Message::Away message_away;
+	Message::Capab message_capab;
 	Message::Error message_error;
 	Message::Invite message_invite;
 	Message::Join message_join;
@@ -1190,7 +1028,6 @@ class ProtoUnreal : public Module
 	Message::Whois message_whois;
 
 	/* Our message handlers */
-	IRCDMessageCapab message_capab;
 	IRCDMessageChgHost message_chghost;
 	IRCDMessageChgIdent message_chgident;
 	IRCDMessageChgName message_chgname;
@@ -1210,44 +1047,6 @@ class ProtoUnreal : public Module
 
 	bool use_server_side_mlock;
 
-	void AddModes()
-	{
-		ModeManager::AddChannelMode(new ChannelModeStatus("VOICE", 'v', '+', 0));
-		ModeManager::AddChannelMode(new ChannelModeStatus("HALFOP", 'h', '%', 1));
-		ModeManager::AddChannelMode(new ChannelModeStatus("OP", 'o', '@', 2));
-		/* Unreal sends +q as * and +a as ~ */
-		ModeManager::AddChannelMode(new ChannelModeStatus("PROTECT", 'a', '~', 3));
-		ModeManager::AddChannelMode(new ChannelModeStatus("OWNER", 'q', '*', 4));
-
-		/* Add user modes */
-		ModeManager::AddUserMode(new UserModeOperOnly("SERV_ADMIN", 'A'));
-		ModeManager::AddUserMode(new UserMode("BOT", 'B'));
-		ModeManager::AddUserMode(new UserModeOperOnly("CO_ADMIN", 'C'));
-		ModeManager::AddUserMode(new UserMode("CENSOR", 'G'));
-		ModeManager::AddUserMode(new UserModeOperOnly("HIDEOPER", 'H'));
-		ModeManager::AddUserMode(new UserMode("HIDEIDLE", 'I'));
-		ModeManager::AddUserMode(new UserModeOperOnly("NETADMIN", 'N'));
-		ModeManager::AddUserMode(new UserMode("REGPRIV", 'R'));
-		ModeManager::AddUserMode(new UserModeOperOnly("PROTECTED", 'S'));
-		ModeManager::AddUserMode(new UserMode("NOCTCP", 'T'));
-		ModeManager::AddUserMode(new UserMode("WEBTV", 'V'));
-		ModeManager::AddUserMode(new UserModeOperOnly("WHOIS", 'W'));
-		ModeManager::AddUserMode(new UserModeOperOnly("ADMIN", 'a'));
-		ModeManager::AddUserMode(new UserMode("DEAF", 'd'));
-		ModeManager::AddUserMode(new UserModeOperOnly("GLOBOPS", 'g'));
-		ModeManager::AddUserMode(new UserModeOperOnly("HELPOP", 'h'));
-		ModeManager::AddUserMode(new UserMode("INVIS", 'i'));
-		ModeManager::AddUserMode(new UserModeOperOnly("OPER", 'o'));
-		ModeManager::AddUserMode(new UserMode("PRIV", 'p'));
-		ModeManager::AddUserMode(new UserModeOperOnly("GOD", 'q'));
-		ModeManager::AddUserMode(new UserModeNoone("REGISTERED", 'r'));
-		ModeManager::AddUserMode(new UserModeOperOnly("SNOMASK", 's'));
-		ModeManager::AddUserMode(new UserModeNoone("VHOST", 't'));
-		ModeManager::AddUserMode(new UserMode("WALLOPS", 'w'));
-		ModeManager::AddUserMode(new UserMode("CLOAK", 'x'));
-		ModeManager::AddUserMode(new UserModeNoone("SSL", 'z'));
-	}
-
  public:
 	ProtoUnreal(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PROTOCOL | VENDOR)
 		, EventHook<Event::UserNickChange>(EventHook<Event::UserNickChange>::Priority::FIRST)
@@ -1257,6 +1056,7 @@ class ProtoUnreal : public Module
 		, EventHook<Event::MLockEvents>(EventHook<Event::MLockEvents>::Priority::FIRST)
 		, ircd_proto(this)
 		, message_away(this)
+		, message_capab(this, "PROTOCTL")
 		, message_error(this)
 		, message_invite(this)
 		, message_join(this)
@@ -1275,7 +1075,6 @@ class ProtoUnreal : public Module
 		, message_version(this)
 		, message_whois(this)
 
-		, message_capab(this)
 		, message_chghost(this)
 		, message_chgident(this)
 		, message_chgname(this)
@@ -1295,13 +1094,41 @@ class ProtoUnreal : public Module
 		, message_topic(this)
 		, message_umode2(this)
 	{
-
-		this->AddModes();
 	}
 
 	void OnReload(Configuration::Conf *conf) override
 	{
 		use_server_side_mlock = conf->GetModule(this)->Get<bool>("use_server_side_mlock");
+
+		for (int i = 0; i < conf->CountBlock("extban"); ++i)
+		{
+			Configuration::Block *extban = conf->GetBlock("extban", i);
+			Anope::string name = extban->Get<Anope::string>("name"),
+					type = extban->Get<Anope::string>("type"),
+					base = extban->Get<Anope::string>("base"),
+					character = extban->Get<Anope::string>("character");
+
+			ChannelMode *cm;
+
+			if (character.empty())
+				continue;
+
+			if (type == "channel")
+				cm = new UnrealExtban::ChannelMatcher(name, base, character[0]);
+			else if (type == "entry")
+				cm = new UnrealExtban::EntryMatcher(name, base, character[0]);
+			else if (type == "realname")
+				cm = new UnrealExtban::RealnameMatcher(name, base, character[0]);
+			else if (type == "registered")
+				cm = new UnrealExtban::RegisteredMatcher(name, base, character[0]);
+			else if (type == "account")
+				cm = new UnrealExtban::AccountMatcher(name, base, character[0]);
+			else
+				continue;
+
+			if (!ModeManager::AddChannelMode(cm))
+				delete cm;
+		}
 	}
 
 	void OnUserNickChange(User *u, const Anope::string &) override

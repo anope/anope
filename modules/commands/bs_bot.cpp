@@ -85,8 +85,6 @@ class CommandBSBot : public Command
 			targ->Kill(Me, "Nickname is reserved for services");
 
 		ServiceBot *bi = new ServiceBot(nick, user, host, real);
-		bi->bi = botinfo.Create();
-		bi->bi->bot = bi;
 
 		Log(LOG_ADMIN, source, this) << "ADD " << bi->GetMask() << " " << bi->realname;
 
@@ -116,7 +114,7 @@ class CommandBSBot : public Command
 			return;
 		}
 
-		if (bi->conf)
+		if (bi->bi->conf)
 		{
 			source.Reply(_("Bot \002{0}\002 is not changeable because it is configured in services configuration."), bi->nick.c_str());
 			return;
@@ -259,7 +257,7 @@ class CommandBSBot : public Command
 			return;
 		}
 
-		if (bi->conf)
+		if (bi->bi->conf)
 		{
 			source.Reply(_("Bot \002{0}\002 is can not be deleted because it is configured in services configuration."), bi->nick);
 			return;
@@ -270,7 +268,6 @@ class CommandBSBot : public Command
 		Log(LOG_ADMIN, source, this) << "DEL " << bi->nick;
 
 		source.Reply(_("Bot \002{0}\002 has been deleted."), bi->nick);
-		// XXX delete bi->bi?
 		delete bi;
 	}
 

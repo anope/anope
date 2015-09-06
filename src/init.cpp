@@ -526,6 +526,8 @@ void Anope::Init(int ac, char **av)
 	block = Config->GetBlock("options");
 	srand(block->Get<unsigned>("seed") ^ time(NULL));
 
+	ModeManager::Apply(nullptr);
+
 	/* load modules */
 	Log() << "Loading modules...";
 	for (int i = 0; i < Config->CountBlock("module"); ++i)

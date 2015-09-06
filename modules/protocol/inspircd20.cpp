@@ -560,10 +560,10 @@ namespace InspIRCdExtban
 	 	}
 	};
 
-	class FinerprintMatcher : public InspIRCdExtBan
+	class FingerprintMatcher : public InspIRCdExtBan
 	{
 	 public:
-	 	FinerprintMatcher(const Anope::string &mname, const Anope::string &mbase, char c) : InspIRCdExtBan(mname, mbase, c)
+		FingerprintMatcher(const Anope::string &mname, const Anope::string &mbase, char c) : InspIRCdExtBan(mname, mbase, c)
 	 	{
 	 	}
 
@@ -591,121 +591,8 @@ namespace InspIRCdExtban
 	};
 }
 
-class ColonDelimitedParamMode : public ChannelModeParam
-{
- public:
-	ColonDelimitedParamMode(const Anope::string &modename, char modeChar) : ChannelModeParam(modename, modeChar, true) { }
-
-	bool IsValid(Anope::string &value) const override
-	{
-		return IsValid(value, false);
-	}
-
-	bool IsValid(const Anope::string &value, bool historymode) const
-	{
-		if (value.empty())
-			return false; // empty param is never valid
-
-		Anope::string::size_type pos = value.find(':');
-		if ((pos == Anope::string::npos) || (pos == 0))
-			return false; // no ':' or it's the first char, both are invalid
-
-		Anope::string rest;
-		try
-		{
-			if (convertTo<int>(value, rest, false) <= 0)
-				return false; // negative numbers and zero are invalid
-
-			rest = rest.substr(1);
-			int n;
-			if (historymode)
-			{
-				// For the history mode, the part after the ':' is a duration and it
-				// can be in the user friendly "1d3h20m" format, make sure we accept that
-				n = Anope::DoTime(rest);
-			}
-			else
-				n = convertTo<int>(rest);
-
-			if (n <= 0)
-				return false;
-		}
-		catch (const ConvertException &e)
-		{
-			// conversion error, invalid
-			return false;
-		}
-
-		return true;
-	}
-};
-
-class SimpleNumberParamMode : public ChannelModeParam
-{
- public:
-	SimpleNumberParamMode(const Anope::string &modename, char modeChar) : ChannelModeParam(modename, modeChar, true) { }
-
-	bool IsValid(Anope::string &value) const override
-	{
-		if (value.empty())
-			return false; // empty param is never valid
-
-		try
-		{
-			if (convertTo<int>(value) <= 0)
-				return false;
-		}
-		catch (const ConvertException &e)
-		{
-			// conversion error, invalid
-			return false;
-		}
-
-		return true;
-	}
-};
-
-class ChannelModeFlood : public ColonDelimitedParamMode
-{
- public:
-	ChannelModeFlood(char modeChar) : ColonDelimitedParamMode("FLOOD", modeChar) { }
-
-	bool IsValid(Anope::string &value) const override
-	{
-		// The parameter of this mode is a bit different, it may begin with a '*',
-		// ignore it if that's the case
-		Anope::string v = value[0] == '*' ? value.substr(1) : value;
-		return ((!value.empty()) && (ColonDelimitedParamMode::IsValid(v)));
-	}
-};
-
-class ChannelModeHistory : public ColonDelimitedParamMode
-{
- public:
-	ChannelModeHistory(char modeChar) : ColonDelimitedParamMode("HISTORY", modeChar) { }
-
-	bool IsValid(Anope::string &value) const override
-	{
-		return (ColonDelimitedParamMode::IsValid(value, true));
-	}
-};
-
-class ChannelModeRedirect : public ChannelModeParam
-{
- public:
-	ChannelModeRedirect(char modeChar) : ChannelModeParam("REDIRECT", modeChar, true) { }
-
-	bool IsValid(Anope::string &value) const override
-	{
-		// The parameter of this mode is a channel, and channel names start with '#'
-		return ((!value.empty()) && (value[0] == '#'));
-	}
-};
-
 struct IRCDMessageCapab : Message::Capab
 {
-	std::map<char, Anope::string> chmodes, umodes;
-
 	IRCDMessageCapab(Module *creator) : Message::Capab(creator, "CAPAB") { SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
 
 	void Run(MessageSource &source, const std::vector<Anope::string> &params) override
@@ -724,8 +611,6 @@ struct IRCDMessageCapab : Message::Capab
 			}
 
 			/* reset CAPAB */
-			chmodes.clear();
-			umodes.clear();
 			Servers::Capab.insert("SERVERS");
 			Servers::Capab.insert("CHGHOST");
 			Servers::Capab.insert("CHGIDENT");
@@ -739,130 +624,35 @@ struct IRCDMessageCapab : Message::Capab
 
 			while (ssep.GetToken(capab))
 			{
+				if (capab.find('=') == Anope::string::npos)
+					continue;
+
 				Anope::string modename = capab.substr(0, capab.find('='));
 				Anope::string modechar = capab.substr(capab.find('=') + 1);
-				ChannelMode *cm = NULL;
+				char symbol = 0;
 
-				if (modename.equals_cs("admin"))
-					cm = new ChannelModeStatus("PROTECT", modechar.length() > 1 ? modechar[1] : modechar[0], modechar.length() > 1 ? modechar[0] : 0, 3);
-				else if (modename.equals_cs("allowinvite"))
-				{
-					cm = new ChannelMode("ALLINVITE", modechar[0]);
-					ModeManager::AddChannelMode(new InspIRCdExtban::EntryMatcher("INVITEBAN", "BAN", 'A'));
-				}
-				else if (modename.equals_cs("auditorium"))
-					cm = new ChannelMode("AUDITORIUM", modechar[0]);
-				else if (modename.equals_cs("ban"))
-					cm = new ChannelModeList("BAN", modechar[0]);
-				else if (modename.equals_cs("banexception"))
-					cm = new ChannelModeList("EXCEPT", modechar[0]);
-				else if (modename.equals_cs("blockcaps"))
-				{
-					cm = new ChannelMode("BLOCKCAPS", modechar[0]);
-					ModeManager::AddChannelMode(new InspIRCdExtban::EntryMatcher("BLOCKCAPSBAN", "BAN", 'B'));
-				}
-				else if (modename.equals_cs("blockcolor"))
-				{
-					cm = new ChannelMode("BLOCKCOLOR", modechar[0]);
-					ModeManager::AddChannelMode(new InspIRCdExtban::EntryMatcher("BLOCKCOLORBAN", "BAN", 'c'));
-				}
-				else if (modename.equals_cs("c_registered"))
-					cm = new ChannelModeNoone("REGISTERED", modechar[0]);
-				else if (modename.equals_cs("censor"))
-					cm = new ChannelMode("CENSOR", modechar[0]);
-				else if (modename.equals_cs("delayjoin"))
-					cm = new ChannelMode("DELAYEDJOIN", modechar[0]);
-				else if (modename.equals_cs("delaymsg"))
-					cm = new SimpleNumberParamMode("DELAYMSG", modechar[0]);
-				else if (modename.equals_cs("filter"))
-					cm = new ChannelModeList("FILTER", modechar[0]);
-				else if (modename.equals_cs("flood"))
-					cm = new ChannelModeFlood(modechar[0]);
-				else if (modename.equals_cs("founder"))
-					cm = new ChannelModeStatus("OWNER", modechar.length() > 1 ? modechar[1] : modechar[0], modechar.length() > 1 ? modechar[0] : 0, 4);
-				else if (modename.equals_cs("halfop"))
-					cm = new ChannelModeStatus("HALFOP", modechar.length() > 1 ? modechar[1] : modechar[0], modechar.length() > 1 ? modechar[0] : 0, 1);
-				else if (modename.equals_cs("history"))
-					cm = new ChannelModeHistory(modechar[0]);
-				else if (modename.equals_cs("invex"))
-					cm = new ChannelModeList("INVITEOVERRIDE", modechar[0]);
-				else if (modename.equals_cs("inviteonly"))
-					cm = new ChannelMode("INVITE", modechar[0]);
-				else if (modename.equals_cs("joinflood"))
-					cm = new ColonDelimitedParamMode("JOINFLOOD", modechar[0]);
-				else if (modename.equals_cs("key"))
-					cm = new ChannelModeKey(modechar[0]);
-				else if (modename.equals_cs("kicknorejoin"))
-					cm = new SimpleNumberParamMode("NOREJOIN", modechar[0]);
-				else if (modename.equals_cs("limit"))
-					cm = new ChannelModeParam("LIMIT", modechar[0], true);
-				else if (modename.equals_cs("moderated"))
-					cm = new ChannelMode("MODERATED", modechar[0]);
-				else if (modename.equals_cs("nickflood"))
-					cm = new ColonDelimitedParamMode("NICKFLOOD", modechar[0]);
-				else if (modename.equals_cs("noctcp"))
-				{
-					cm = new ChannelMode("NOCTCP", modechar[0]);
-					ModeManager::AddChannelMode(new InspIRCdExtban::EntryMatcher("NOCTCPBAN", "BAN", 'C'));
-				}
-				else if (modename.equals_cs("noextmsg"))
-					cm = new ChannelMode("NOEXTERNAL", modechar[0]);
-				else if (modename.equals_cs("nokick"))
-				{
-					cm = new ChannelMode("NOKICK", modechar[0]);
-					ModeManager::AddChannelMode(new InspIRCdExtban::EntryMatcher("NOKICKBAN", "BAN", 'Q'));
-				}
-				else if (modename.equals_cs("noknock"))
-					cm = new ChannelMode("NOKNOCK", modechar[0]);
-				else if (modename.equals_cs("nonick"))
-				{
-					cm = new ChannelMode("NONICK", modechar[0]);
-					ModeManager::AddChannelMode(new InspIRCdExtban::EntryMatcher("NONICKBAN", "BAN", 'N'));
-				}
-				else if (modename.equals_cs("nonotice"))
-				{
-					cm = new ChannelMode("NONOTICE", modechar[0]);
-					ModeManager::AddChannelMode(new InspIRCdExtban::EntryMatcher("NONOTICEBAN", "BAN", 'T'));
-				}
-				else if (modename.equals_cs("op"))
-					cm = new ChannelModeStatus("OP", modechar.length() > 1 ? modechar[1] : modechar[0], modechar.length() > 1 ? modechar[0] : 0, 2);
-				else if (modename.equals_cs("operonly"))
-					cm = new ChannelModeOperOnly("OPERONLY", modechar[0]);
-				else if (modename.equals_cs("permanent"))
-					cm = new ChannelMode("PERM", modechar[0]);
-				else if (modename.equals_cs("private"))
-					cm = new ChannelMode("PRIVATE", modechar[0]);
-				else if (modename.equals_cs("redirect"))
-					cm = new ChannelModeRedirect(modechar[0]);
-				else if (modename.equals_cs("reginvite"))
-					cm = new ChannelMode("REGISTEREDONLY", modechar[0]);
-				else if (modename.equals_cs("regmoderated"))
-					cm = new ChannelMode("REGMODERATED", modechar[0]);
-				else if (modename.equals_cs("secret"))
-					cm = new ChannelMode("SECRET", modechar[0]);
-				else if (modename.equals_cs("sslonly"))
-				{
-					cm = new ChannelMode("SSL", modechar[0]);
-					ModeManager::AddChannelMode(new InspIRCdExtban::FinerprintMatcher("SSLBAN", "BAN", 'z'));
-				}
-				else if (modename.equals_cs("stripcolor"))
-				{
-					cm = new ChannelMode("STRIPCOLOR", modechar[0]);
-					ModeManager::AddChannelMode(new InspIRCdExtban::EntryMatcher("STRIPCOLORBAN", "BAN", 'S'));
-				}
-				else if (modename.equals_cs("topiclock"))
-					cm = new ChannelMode("TOPIC", modechar[0]);
-				else if (modename.equals_cs("voice"))
-					cm = new ChannelModeStatus("VOICE", modechar.length() > 1 ? modechar[1] : modechar[0], modechar.length() > 1 ? modechar[0] : 0, 0);
-				/* Unknown status mode, (customprefix) - add it */
-				else if (modechar.length() == 2)
-					cm = new ChannelModeStatus(modename.upper(), modechar[1], modechar[0], -1);
-				/* Unknown non status mode, add it to our list for later */
-				else
-					chmodes[modechar[0]] = modename.upper();
+				if (modechar.empty())
+					continue;
 
-				if (cm)
-					ModeManager::AddChannelMode(cm);
+				if (modechar.length() == 2)
+				{
+					symbol = modechar[0];
+					modechar = modechar.substr(1);
+				}
+
+				ChannelMode *cm = ModeManager::FindChannelModeByChar(modechar[0]);
+				if (cm == nullptr)
+				{
+					Log(owner) << "Warning: Uplink has unknown channel mode " << modename << "=" << modechar;
+					continue;
+				}
+
+				char modesymbol = cm->type == MODE_STATUS ? (anope_dynamic_static_cast<ChannelModeStatus *>(cm))->symbol : 0;
+				if (symbol != modesymbol)
+				{
+					Log(owner) << "Warning: Channel mode " << modename << " has a misconfigured status character";
+					continue;
+				}
 			}
 		}
 		if (params[0].equals_cs("USERMODES") && params.size() > 1)
@@ -872,54 +662,21 @@ struct IRCDMessageCapab : Message::Capab
 
 			while (ssep.GetToken(capab))
 			{
+				if (capab.find('=') == Anope::string::npos)
+					continue;
+
 				Anope::string modename = capab.substr(0, capab.find('='));
 				Anope::string modechar = capab.substr(capab.find('=') + 1);
-				UserMode *um = NULL;
 
-				if (modename.equals_cs("bot"))
-					um = new UserMode("BOT", modechar[0]);
-				else if (modename.equals_cs("callerid"))
-					um = new UserMode("CALLERID", modechar[0]);
-				else if (modename.equals_cs("cloak"))
-					um = new UserMode("CLOAK", modechar[0]);
-				else if (modename.equals_cs("deaf"))
-					um = new UserMode("DEAF", modechar[0]);
-				else if (modename.equals_cs("deaf_commonchan"))
-					um = new UserMode("COMMONCHANS", modechar[0]);
-				else if (modename.equals_cs("helpop"))
-					um = new UserModeOperOnly("HELPOP", modechar[0]);
-				else if (modename.equals_cs("hidechans"))
-					um = new UserMode("PRIV", modechar[0]);
-				else if (modename.equals_cs("hideoper"))
-					um = new UserModeOperOnly("HIDEOPER", modechar[0]);
-				else if (modename.equals_cs("invisible"))
-					um = new UserMode("INVIS", modechar[0]);
-				else if (modename.equals_cs("invis-oper"))
-					um = new UserModeOperOnly("INVISIBLE_OPER", modechar[0]);
-				else if (modename.equals_cs("oper"))
-					um = new UserModeOperOnly("OPER", modechar[0]);
-				else if (modename.equals_cs("regdeaf"))
-					um = new UserMode("REGPRIV", modechar[0]);
-				else if (modename.equals_cs("servprotect"))
+				if (modechar.empty())
+					continue;
+
+				UserMode *um = ModeManager::FindUserModeByChar(modechar[0]);
+				if (um == nullptr)
 				{
-					um = new UserModeNoone("PROTECTED", modechar[0]);
-					IRCD->DefaultPseudoclientModes += modechar;
+					Log(owner) << "Warning: Uplink has unknown user mode " << modename << "=" << modechar;
+					continue;
 				}
-				else if (modename.equals_cs("showwhois"))
-					um = new UserMode("WHOIS", modechar[0]);
-				else if (modename.equals_cs("u_censor"))
-					um = new UserMode("CENSOR", modechar[0]);
-				else if (modename.equals_cs("u_registered"))
-					um = new UserModeNoone("REGISTERED", modechar[0]);
-				else if (modename.equals_cs("u_stripcolor"))
-					um = new UserMode("STRIPCOLOR", modechar[0]);
-				else if (modename.equals_cs("wallops"))
-					um = new UserMode("WALLOPS", modechar[0]);
-				else
-					umodes[modechar[0]] = modename.upper();
-
-				if (um)
-					ModeManager::AddUserMode(um);
 			}
 		}
 		else if (params[0].equals_cs("MODULES") && params.size() > 1)
@@ -950,25 +707,11 @@ struct IRCDMessageCapab : Message::Capab
 			while (ssep.GetToken(module))
 			{
 				if (module.equals_cs("m_services_account.so"))
-				{
 					Servers::Capab.insert("SERVICES");
-					ModeManager::AddChannelMode(new InspIRCdExtban::AccountMatcher("ACCOUNTBAN", "BAN", 'R'));
-					ModeManager::AddChannelMode(new InspIRCdExtban::UnidentifiedMatcher("UNREGISTEREDBAN", "BAN", 'U'));
-				}
 				else if (module.equals_cs("m_chghost.so"))
 					Servers::Capab.insert("CHGHOST");
 				else if (module.equals_cs("m_chgident.so"))
 					Servers::Capab.insert("CHGIDENT");
-				else if (module == "m_channelban.so")
-					ModeManager::AddChannelMode(new InspIRCdExtban::ChannelMatcher("CHANNELBAN", "BAN", 'j'));
-				else if (module == "m_gecosban.so")
-					ModeManager::AddChannelMode(new InspIRCdExtban::RealnameMatcher("REALNAMEBAN", "BAN", 'r'));
-				else if (module == "m_nopartmessage.so")
-					ModeManager::AddChannelMode(new InspIRCdExtban::EntryMatcher("PARTMESSAGEBAN", "BAN", 'p'));
-				else if (module == "m_serverban.so")
-					ModeManager::AddChannelMode(new InspIRCdExtban::ServerMatcher("SERVERBAN", "BAN", 's'));
-				else if (module == "m_muteban.so")
-					ModeManager::AddChannelMode(new InspIRCdExtban::EntryMatcher("QUIET", "BAN", 'm'));
 			}
 		}
 		else if (params[0].equals_cs("CAPABILITIES") && params.size() > 1)
@@ -977,88 +720,10 @@ struct IRCDMessageCapab : Message::Capab
 			Anope::string capab;
 			while (ssep.GetToken(capab))
 			{
-				if (capab.find("CHANMODES") != Anope::string::npos)
-				{
-					Anope::string modes(capab.begin() + 10, capab.end());
-					commasepstream sep(modes);
-					Anope::string modebuf;
-
-					sep.GetToken(modebuf);
-					for (size_t t = 0, end = modebuf.length(); t < end; ++t)
-					{
-						if (ModeManager::FindChannelModeByChar(modebuf[t]))
-							continue;
-						ModeManager::AddChannelMode(new ChannelModeList(chmodes[modebuf[t]], modebuf[t]));
-					}
-
-					sep.GetToken(modebuf);
-					for (size_t t = 0, end = modebuf.length(); t < end; ++t)
-					{
-						if (ModeManager::FindChannelModeByChar(modebuf[t]))
-							continue;
-						ModeManager::AddChannelMode(new ChannelModeParam(chmodes[modebuf[t]], modebuf[t]));
-					}
-
-					sep.GetToken(modebuf);
-					for (size_t t = 0, end = modebuf.length(); t < end; ++t)
-					{
-						if (ModeManager::FindChannelModeByChar(modebuf[t]))
-							continue;
-						ModeManager::AddChannelMode(new ChannelModeParam(chmodes[modebuf[t]], modebuf[t], true));
-					}
-
-					sep.GetToken(modebuf);
-					for (size_t t = 0, end = modebuf.length(); t < end; ++t)
-					{
-						if (ModeManager::FindChannelModeByChar(modebuf[t]))
-							continue;
-						ModeManager::AddChannelMode(new ChannelMode(chmodes[modebuf[t]], modebuf[t]));
-					}
-				}
-				else if (capab.find("USERMODES") != Anope::string::npos)
-				{
-					Anope::string modes(capab.begin() + 10, capab.end());
-					commasepstream sep(modes);
-					Anope::string modebuf;
-
-					sep.GetToken(modebuf);
-					sep.GetToken(modebuf);
-
-					if (sep.GetToken(modebuf))
-						for (size_t t = 0, end = modebuf.length(); t < end; ++t)
-							ModeManager::AddUserMode(new UserModeParam(umodes[modebuf[t]], modebuf[t]));
-
-					if (sep.GetToken(modebuf))
-						for (size_t t = 0, end = modebuf.length(); t < end; ++t)
-							ModeManager::AddUserMode(new UserMode(umodes[modebuf[t]], modebuf[t]));
-				}
-				else if (capab.find("MAXMODES=") != Anope::string::npos)
+				if (capab.find("MAXMODES=") != Anope::string::npos)
 				{
 					Anope::string maxmodes(capab.begin() + 9, capab.end());
 					IRCD->MaxModes = maxmodes.is_pos_number_only() ? convertTo<unsigned>(maxmodes) : 3;
-				}
-				else if (capab.find("PREFIX=") != Anope::string::npos)
-				{
-					Anope::string modes(capab.begin() + 8, capab.begin() + capab.find(')'));
-					Anope::string chars(capab.begin() + capab.find(')') + 1, capab.end());
-					short level = modes.length() - 1;
-
-					for (size_t t = 0, end = modes.length(); t < end; ++t)
-					{
-						ChannelMode *cm = ModeManager::FindChannelModeByChar(modes[t]);
-						if (cm == NULL || cm->type != MODE_STATUS)
-						{
-							Log() << "CAPAB PREFIX gave unknown channel status mode " << modes[t];
-							continue;
-						}
-
-						ChannelModeStatus *cms = anope_dynamic_static_cast<ChannelModeStatus *>(cm);
-						cms->level = level--;
-
-						Log(LOG_DEBUG) << cms->name << " is now level " << cms->level;
-					}
-
-					ModeManager::RebuildStatusModes();
 				}
 				else if (capab == "GLOBOPS=1")
 					Servers::Capab.insert("GLOBOPS");
@@ -1086,9 +751,6 @@ struct IRCDMessageCapab : Message::Capab
 				Log() << "CHGHOST missing, Usage disabled until module is loaded.";
 			if (!Servers::Capab.count("CHGIDENT"))
 				Log() << "CHGIDENT missing, Usage disabled until module is loaded.";
-
-			chmodes.clear();
-			umodes.clear();
 		}
 
 		Message::Capab::Run(source, params);
@@ -1695,6 +1357,40 @@ class ProtoInspIRCd20 : public Module
 	{
 		use_server_side_topiclock = conf->GetModule(this)->Get<bool>("use_server_side_topiclock");
 		use_server_side_mlock = conf->GetModule(this)->Get<bool>("use_server_side_mlock");
+
+		for (int i = 0; i < conf->CountBlock("extban"); ++i)
+		{
+			Configuration::Block *extban = conf->GetBlock("extban", i);
+			Anope::string name = extban->Get<Anope::string>("name"),
+					type = extban->Get<Anope::string>("type"),
+					base = extban->Get<Anope::string>("base"),
+					character = extban->Get<Anope::string>("character");
+
+			ChannelMode *cm;
+
+			if (character.empty())
+				continue;
+
+			if (type == "channel")
+				cm = new InspIRCdExtban::ChannelMatcher(name, base, character[0]);
+			else if (type == "entry")
+				cm = new InspIRCdExtban::EntryMatcher(name, base, character[0]);
+			else if (type == "realname")
+				cm = new InspIRCdExtban::RealnameMatcher(name, base, character[0]);
+			else if (type == "account")
+				cm = new InspIRCdExtban::AccountMatcher(name, base, character[0]);
+			else if (type == "fingerprint")
+				cm = new InspIRCdExtban::FingerprintMatcher(name, base, character[0]);
+			else if (type == "unidentified")
+				cm = new InspIRCdExtban::UnidentifiedMatcher(name, base, character[0]);
+			else if (type == "server")
+				cm = new InspIRCdExtban::ServerMatcher(name, base, character[0]);
+			else
+				continue;
+
+			if (!ModeManager::AddChannelMode(cm))
+				delete cm;
+		}
 	}
 
 	void OnUserNickChange(User *u, const Anope::string &) override

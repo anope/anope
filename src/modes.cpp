@@ -39,9 +39,6 @@ static std::map<Anope::string, UserMode *> UserModesByName;
 /* Sorted by status */
 static std::vector<ChannelModeStatus *> ChannelModesByStatus;
 
-/* Number of generic modes we support */
-unsigned ModeManager::GenericChannelModes = 0, ModeManager::GenericUserModes = 0;
-
 struct StackerInfo
 {
 	/* Modes to be added */
@@ -127,6 +124,12 @@ Mode::~Mode()
 
 bool Mode::CanSet(User *u) const
 {
+	if (!setable)
+		return false;
+
+	if (oper_only)
+		return u && u->HasMode("OPER");
+
 	return true;
 }
 
@@ -189,6 +192,11 @@ ChannelModeParam::ChannelModeParam(const Anope::string &cm, char mch, bool ma) :
 	this->type = MODE_PARAM;
 }
 
+bool ChannelModeParam::IsValid(Anope::string &value) const
+{
+	return std::regex_search(value.str(), param_validation);
+}
+
 ChannelModeStatus::ChannelModeStatus(const Anope::string &mname, char modeChar, char msymbol, short mlevel) : ChannelMode(mname, modeChar), symbol(msymbol), level(mlevel)
 {
 	this->type = MODE_STATUS;
@@ -229,34 +237,6 @@ ChannelMode *ChannelModeVirtual<T>::Wrap(Anope::string &param)
 
 template class ChannelModeVirtual<ChannelMode>;
 template class ChannelModeVirtual<ChannelModeList>;
-
-bool UserModeOperOnly::CanSet(User *u) const
-{
-	return u && u->HasMode("OPER");
-}
-
-bool UserModeNoone::CanSet(User *u) const
-{
-	return false;
-}
-
-bool ChannelModeKey::IsValid(Anope::string &value) const
-{
-	if (!value.empty() && value.find(':') == Anope::string::npos && value.find(',') == Anope::string::npos)
-		return true;
-
-	return false;
-}
-
-bool ChannelModeOperOnly::CanSet(User *u) const
-{
-	return u && u->HasMode("OPER");
-}
-
-bool ChannelModeNoone::CanSet(User *u) const
-{
-	return false;
-}
 
 void StackerInfo::AddMode(Mode *mode, bool set, const Anope::string &param)
 {
@@ -398,12 +378,6 @@ bool ModeManager::AddUserMode(UserMode *um)
 	if (ModeManager::FindUserModeByName(um->name) != NULL)
 		return false;
 	
-	if (um->name.empty())
-	{
-		um->name = stringify(++GenericUserModes);
-		Log() << "ModeManager: Added generic support for user mode " << um->mchar;
-	}
-
 	unsigned want = um->mchar;
 	if (want >= UserModesIdx.size())
 		UserModesIdx.resize(want + 1);
@@ -424,12 +398,6 @@ bool ModeManager::AddChannelMode(ChannelMode *cm)
 		return false;
 	if (ModeManager::FindChannelModeByName(cm->name) != NULL)
 		return false;
-
-	if (cm->name.empty())
-	{
-		cm->name = stringify(++GenericChannelModes);
-		Log() << "ModeManager: Added generic support for channel mode " << cm->mchar;
-	}
 
 	if (cm->mchar)
 	{
@@ -736,6 +704,54 @@ void ModeManager::StackerDel(Mode *m)
 			else
 				++it2;
 		}
+	}
+}
+
+void ModeManager::Apply(Configuration::Conf *old)
+{
+	/* XXX remove old modes */
+
+	for (Configuration::Channelmode &cm : Config->Channelmodes)
+	{
+		ChannelMode *mode;
+
+		if (cm.character)
+			Log(LOG_DEBUG) << "Creating channelmode " << cm.name << " (" << cm.character << ")";
+		else
+			Log(LOG_DEBUG) << "Creating channelmode " << cm.name;
+
+		if (cm.list)
+			mode = new ChannelModeList(cm.name, cm.character);
+		else if (cm.status)
+			mode = new ChannelModeStatus(cm.name, cm.character, cm.status, cm.level);
+		else if (cm.param)
+			mode = new ChannelModeParam(cm.name, cm.character, !cm.param_unset);
+		else
+			mode = new ChannelMode(cm.name, cm.character);
+
+		mode->SetSetable(cm.setable);
+		mode->SetOperOnly(cm.oper_only);
+
+		if (!AddChannelMode(mode))
+			delete mode;
+	}
+
+	for (Configuration::Usermode &um : Config->Usermodes)
+	{
+		UserMode *mode;
+
+		Log(LOG_DEBUG) << "Creating usermode " << um.name << " (" << um.character << ")";
+
+		if (um.param)
+			mode = new UserModeParam(um.name, um.character);
+		else
+			mode = new UserMode(um.name, um.character);
+
+		mode->SetSetable(um.setable);
+		mode->SetOperOnly(um.oper_only);
+
+		if (!AddUserMode(mode))
+			delete mode;
 	}
 }
 

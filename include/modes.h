@@ -47,6 +47,9 @@ class CoreExport Mode : public Base
 	/* Type of mode this is, eg MODE_LIST */
 	ModeType type;
 
+	bool setable = true;
+	bool oper_only = false;
+
 	/** constructor
 	 * @param mname The mode name
 	 * @param mclass The type of mode this is
@@ -55,6 +58,9 @@ class CoreExport Mode : public Base
 	 */
 	Mode(const Anope::string &mname, ModeClass mclass, char mc, ModeType type);
 	virtual ~Mode();
+
+	void SetSetable(bool b) { setable = b; }
+	void SetOperOnly(bool b) { oper_only = b; }
 
 	/** Can a user set this mode, used for mlock
 	 * @param u The user
@@ -143,18 +149,6 @@ class CoreExport ChannelModeList : public ChannelMode
 	 * @return true on match
 	 */
 	virtual bool Matches(User *u, const Entry *e) { return false; }
-
-	/** Called when a mask is added to a channel
-	 * @param chan The channel
-	 * @param mask The mask
-	 */
-	virtual void OnAdd(Channel *chan, const Anope::string &mask) { }
-
-	/** Called when a mask is removed from a channel
-	 * @param chan The channel
-	 * @param mask The mask
-	 */
-	virtual void OnDel(Channel *chan, const Anope::string &mask) { }
 };
 
 /** This is a mode with a paramater, eg +k/l. These modes should use/inherit from this
@@ -172,11 +166,13 @@ class CoreExport ChannelModeParam : public ChannelMode
 	/* Should we send an arg when unsetting this mode? */
 	bool minus_no_arg;
 
+	std::regex param_validation;
+
 	/** Is the param valid
 	 * @param value The param
 	 * @return true for yes, false for no
 	 */
-	virtual bool IsValid(Anope::string &value) const { return true; }
+	virtual bool IsValid(Anope::string &value) const;
 };
 
 /** This is a mode that is a channel status, eg +v/h/o/a/q.
@@ -235,53 +231,6 @@ class CoreExport ChannelStatus
 	Anope::string BuildModePrefixList() const;
 };
 
-class CoreExport UserModeOperOnly : public UserMode
-{
- public:
-	UserModeOperOnly(const Anope::string &mname, char um) : UserMode(mname, um) { }
-
-	bool CanSet(User *u) const override;
-};
-
-class CoreExport UserModeNoone : public UserMode
-{
- public:
-	UserModeNoone(const Anope::string &mname, char um) : UserMode(mname, um) { }
-
-	bool CanSet(User *u) const override;
-};
-
-/** Channel mode +k (key)
- */
-class CoreExport ChannelModeKey : public ChannelModeParam
-{
- public:
-	ChannelModeKey(char mc) : ChannelModeParam("KEY", mc) { }
-
-	bool IsValid(Anope::string &value) const override;
-};
-
-/** This class is used for oper only channel modes
- */
-class CoreExport ChannelModeOperOnly : public ChannelMode
-{
- public:
-	ChannelModeOperOnly(const Anope::string &mname, char mc) : ChannelMode(mname, mc) { }
-
-	/* Opers only */
-	bool CanSet(User *u) const override;
-};
-
-/** This class is used for channel modes only servers may set
- */
-class CoreExport ChannelModeNoone : public ChannelMode
-{
- public:
-	ChannelModeNoone(const Anope::string &mname, char mc) : ChannelMode(mname, mc) { }
-
-	bool CanSet(User *u) const override;
-};
-
 /** This is the mode manager
  * It contains functions for adding modes to Anope so Anope can track them
  * and do things such as MLOCK.
@@ -291,11 +240,6 @@ class CoreExport ChannelModeNoone : public ChannelMode
 class CoreExport ModeManager
 {
  public:
-
-	/* Number of generic channel and user modes we are tracking */
-	static unsigned GenericChannelModes;
-	static unsigned GenericUserModes;
-
 	/** Add a user mode to Anope
 	 * @param um A UserMode or UserMode derived class
 	 * @return true on success, false on error
@@ -380,6 +324,8 @@ class CoreExport ModeManager
 	static void StackerDel(User *u);
 	static void StackerDel(Channel *c);
 	static void StackerDel(Mode *m);
+
+	static void Apply(Configuration::Conf *old);
 };
 
 /** Represents a mask set on a channel (b/e/I)

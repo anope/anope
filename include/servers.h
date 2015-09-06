@@ -82,6 +82,8 @@ class CoreExport Server : public Extensible
  	/* Number of users on the server */
  	unsigned users;
 
+	void Burst();
+
 	/** Delete this server with a reason
 	 * @param reason The reason
 	 */

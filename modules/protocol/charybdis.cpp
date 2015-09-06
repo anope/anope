@@ -9,6 +9,7 @@
  * Based on the original code of Services by Andy Church.
  */
 
+#if 0
 #include "module.h"
 #include "modules/cs_mode.h"
 #include "modules/sasl.h"
@@ -429,3 +430,4 @@ class ProtoCharybdis : public Module
 };
 
 MODULE_INIT(ProtoCharybdis)
+#endif

@@ -507,43 +507,6 @@ class ProtoBahamut : public Module
 	IRCDMessageSJoin message_sjoin;
 	IRCDMessageTopic message_topic;
 
-	void AddModes()
-	{
-		/* Add user modes */
-		ModeManager::AddUserMode(new UserModeOperOnly("SERV_ADMIN", 'A'));
-		ModeManager::AddUserMode(new UserMode("REGPRIV", 'R'));
-		ModeManager::AddUserMode(new UserModeOperOnly("ADMIN", 'a'));
-		ModeManager::AddUserMode(new UserMode("INVIS", 'i'));
-		ModeManager::AddUserMode(new UserModeOperOnly("OPER", 'o'));
-		ModeManager::AddUserMode(new UserModeNoone("REGISTERED", 'r'));
-		ModeManager::AddUserMode(new UserModeOperOnly("SNOMASK", 's'));
-		ModeManager::AddUserMode(new UserModeOperOnly("WALLOPS", 'w'));
-		ModeManager::AddUserMode(new UserMode("DEAF", 'd'));
-
-		/* b/e/I */
-		ModeManager::AddChannelMode(new ChannelModeList("BAN", 'b'));
-
-		/* v/h/o/a/q */
-		ModeManager::AddChannelMode(new ChannelModeStatus("VOICE", 'v', '+', 0));
-		ModeManager::AddChannelMode(new ChannelModeStatus("OP", 'o', '@', 1));
-
-		/* Add channel modes */
-		ModeManager::AddChannelMode(new ChannelMode("BLOCKCOLOR", 'c'));
-		ModeManager::AddChannelMode(new ChannelMode("INVITE", 'i'));
-		ModeManager::AddChannelMode(new ChannelModeFlood('f', false));
-		ModeManager::AddChannelMode(new ChannelModeKey('k'));
-		ModeManager::AddChannelMode(new ChannelModeParam("LIMIT", 'l', true));
-		ModeManager::AddChannelMode(new ChannelMode("MODERATED", 'm'));
-		ModeManager::AddChannelMode(new ChannelMode("NOEXTERNAL", 'n'));
-		ModeManager::AddChannelMode(new ChannelMode("PRIVATE", 'p'));
-		ModeManager::AddChannelMode(new ChannelModeNoone("REGISTERED", 'r'));
-		ModeManager::AddChannelMode(new ChannelMode("SECRET", 's'));
-		ModeManager::AddChannelMode(new ChannelMode("TOPIC", 't'));
-		ModeManager::AddChannelMode(new ChannelMode("REGMODERATED", 'M'));
-		ModeManager::AddChannelMode(new ChannelModeOperOnly("OPERONLY", 'O'));
-		ModeManager::AddChannelMode(new ChannelMode("REGISTEREDONLY", 'R'));
-	}
-
  public:
 	ProtoBahamut(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PROTOCOL | VENDOR)
 		, ircd_proto(this)
@@ -574,9 +537,6 @@ class ProtoBahamut : public Module
 		, message_sjoin(this)
 		, message_topic(this)
 	{
-
-		this->AddModes();
-
 	}
 
 	void OnUserNickChange(User *u, const Anope::string &) override

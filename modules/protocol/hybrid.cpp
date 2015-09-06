@@ -630,53 +630,6 @@ class ProtoHybrid : public Module
 	IRCDMessageUID message_uid;
 	IRCDMessageCertFP message_certfp;
 
-	void AddModes()
-	{
-		/* Add user modes */
-		ModeManager::AddUserMode(new UserModeOperOnly("ADMIN", 'a'));
-		ModeManager::AddUserMode(new UserModeOperOnly("CALLERID", 'g'));
-		ModeManager::AddUserMode(new UserMode("INVIS", 'i'));
-		ModeManager::AddUserMode(new UserModeOperOnly("LOCOPS", 'l'));
-		ModeManager::AddUserMode(new UserModeOperOnly("OPER", 'o'));
-		ModeManager::AddUserMode(new UserModeNoone("REGISTERED", 'r'));
-		ModeManager::AddUserMode(new UserModeOperOnly("SNOMASK", 's'));
-		ModeManager::AddUserMode(new UserMode("WALLOPS", 'w'));
-		ModeManager::AddUserMode(new UserModeOperOnly("OPERWALLS", 'z'));
-		ModeManager::AddUserMode(new UserMode("DEAF", 'D'));
-		ModeManager::AddUserMode(new UserModeOperOnly("HIDEOPER", 'H'));
-		ModeManager::AddUserMode(new UserMode("REGPRIV", 'R'));
-		ModeManager::AddUserMode(new UserModeNoone("SSL", 'S'));
-		ModeManager::AddUserMode(new UserMode("CLOAK", 'x'));
-
-		/* b/e/I */
-		ModeManager::AddChannelMode(new ChannelModeList("BAN", 'b'));
-		ModeManager::AddChannelMode(new ChannelModeList("EXCEPT", 'e'));
-		ModeManager::AddChannelMode(new ChannelModeList("INVITEOVERRIDE", 'I'));
-
-		/* v/h/o/a/q */
-		ModeManager::AddChannelMode(new ChannelModeStatus("VOICE", 'v', '+', 0));
-		ModeManager::AddChannelMode(new ChannelModeStatus("HALFOP", 'h', '%', 1));
-		ModeManager::AddChannelMode(new ChannelModeStatus("OP", 'o', '@', 2));
-
-		/* l/k */
-		ModeManager::AddChannelMode(new ChannelModeParam("LIMIT", 'l', true));
-		ModeManager::AddChannelMode(new ChannelModeKey('k'));
-
-		/* Add channel modes */
-		ModeManager::AddChannelMode(new ChannelMode("BLOCKCOLOR", 'c'));
-		ModeManager::AddChannelMode(new ChannelMode("INVITE", 'i'));
-		ModeManager::AddChannelMode(new ChannelMode("MODERATED", 'm'));
-		ModeManager::AddChannelMode(new ChannelMode("NOEXTERNAL", 'n'));
-		ModeManager::AddChannelMode(new ChannelMode("PRIVATE", 'p'));
-		ModeManager::AddChannelMode(new ChannelModeNoone("REGISTERED", 'r'));
-		ModeManager::AddChannelMode(new ChannelMode("SECRET", 's'));
-		ModeManager::AddChannelMode(new ChannelMode("TOPIC", 't'));
-		ModeManager::AddChannelMode(new ChannelModeOperOnly("OPERONLY", 'O'));
-		ModeManager::AddChannelMode(new ChannelMode("REGMODERATED", 'M'));
-		ModeManager::AddChannelMode(new ChannelMode("REGISTEREDONLY", 'R'));
-		ModeManager::AddChannelMode(new ChannelMode("SSL", 'S'));
-	}
-
 public:
 	ProtoHybrid(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PROTOCOL | VENDOR)
 		, ircd_proto(this)
@@ -714,8 +667,6 @@ public:
 		, message_uid(this)
 		, message_certfp(this)
 	{
-		if (Config->GetModule(this))
-			this->AddModes();
 	}
 
 	void OnUserNickChange(User *u, const Anope::string &) override

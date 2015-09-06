@@ -306,12 +306,6 @@ void Channel::SetModeInternal(const MessageSource &setter, ChannelMode *ocm, con
 		return;
 	}
 
-	if (cm->type == MODE_LIST)
-	{
-		ChannelModeList *cml = anope_dynamic_static_cast<ChannelModeList *>(cm);
-		cml->OnAdd(this, param);
-	}
-
 	MOD_RESULT = Event::OnChannelModeSet(&Event::ChannelModeSet::OnChannelModeSet, this, setter, cm, param);
 
 	/* Check if we should enforce mlock */
@@ -374,12 +368,6 @@ void Channel::RemoveModeInternal(const MessageSource &setter, ChannelMode *ocm, 
 	}
 	else
 		this->modes.erase(cm->name);
-
-	if (cm->type == MODE_LIST)
-	{
-		ChannelModeList *cml = anope_dynamic_static_cast<ChannelModeList *>(cm);
-		cml->OnDel(this, param);
-	}
 
 	MOD_RESULT = Event::OnChannelModeUnset(&Event::ChannelModeUnset::OnChannelModeUnset, this, setter, cm, param);
 

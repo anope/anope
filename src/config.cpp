@@ -18,6 +18,8 @@
 #include "event.h"
 #include "bots.h"
 #include "modules.h"
+#include "servers.h"
+#include "protocol.h"
 #include "modules/nickserv.h"
 
 using namespace Configuration;
@@ -323,15 +325,8 @@ Conf::Conf() : Block("")
 		o->SetVhost(vhost);
 	}
 
-	for (std::pair<Anope::string, User *> p : UserListByNick)
-	{
-		User *u = p.second;
-		if (u->type != UserType::BOT)
-			continue;
-
-		ServiceBot *bi = anope_dynamic_static_cast<ServiceBot *>(u);
-		bi->conf = false;
-	}
+	for (BotInfo *bi : Serialize::GetObjects<BotInfo *>(botinfo))
+		bi->conf = nullptr;
 	for (int i = 0; i < this->CountBlock("service"); ++i)
 	{
 		Block *service = this->GetBlock("service", i);
@@ -349,73 +344,19 @@ Conf::Conf() : Block("")
 		ValidateNotEmpty("service", "gecos", gecos);
 		ValidateNoSpaces("service", "channels", channels);
 
-		ServiceBot *bi = ServiceBot::Find(nick, true);
-		if (!bi)
-			bi = new ServiceBot(nick, user, host, gecos, modes);
-		bi->conf = true;
-
-		std::vector<Anope::string> oldchannels = bi->botchannels;
-		bi->botchannels.clear();
-		commasepstream sep(channels);
-		for (Anope::string token; sep.GetToken(token);)
+		if (User *u = User::Find(nick, true))
 		{
-			bi->botchannels.push_back(token);
-			size_t ch = token.find('#');
-			Anope::string chname, want_modes;
-			if (ch == Anope::string::npos)
-				chname = token;
-			else
+			if (u->type != UserType::BOT)
 			{
-				want_modes = token.substr(0, ch);
-				chname = token.substr(ch);
-			}
-			bi->Join(chname);
-			Channel *c = Channel::Find(chname);
-			if (!c)
-				continue; // Can't happen
-
-			c->botchannel = true;
-
-			/* Remove all existing modes */
-			ChanUserContainer *cu = c->FindUser(bi);
-			if (cu != NULL)
-				for (size_t j = 0; j < cu->status.Modes().length(); ++j)
-					c->RemoveMode(bi, ModeManager::FindChannelModeByChar(cu->status.Modes()[j]), bi->GetUID());
-			/* Set the new modes */
-			for (unsigned j = 0; j < want_modes.length(); ++j)
-			{
-				ChannelMode *cm = ModeManager::FindChannelModeByChar(want_modes[j]);
-				if (cm == NULL)
-					cm = ModeManager::FindChannelModeByChar(ModeManager::GetStatusChar(want_modes[j]));
-				if (cm && cm->type == MODE_STATUS)
-					c->SetMode(bi, cm, bi->GetUID());
+				u->Kill(Me, "Nickname required by services");
 			}
 		}
-		for (unsigned k = 0; k < oldchannels.size(); ++k)
-		{
-			size_t ch = oldchannels[k].find('#');
-			Anope::string chname = oldchannels[k].substr(ch != Anope::string::npos ? ch : 0);
 
-			bool found = false;
-			for (unsigned j = 0; j < bi->botchannels.size(); ++j)
-			{
-				ch = bi->botchannels[j].find('#');
-				Anope::string ochname = bi->botchannels[j].substr(ch != Anope::string::npos ? ch : 0);
+		ServiceBot *sb = ServiceBot::Find(nick, true);
+		if (!sb)
+			sb = new ServiceBot(nick, user, host, gecos, modes);
 
-				if (chname.equals_ci(ochname))
-					found = true;
-			}
-
-			if (found)
-				continue;
-
-			Channel *c = Channel::Find(chname);
-			if (c)
-			{
-				c->botchannel = false;
-				bi->Part(c);
-			}
-		}
+		sb->bi->conf = service;
 	}
 
 	for (int i = 0; i < this->CountBlock("log"); ++i)
@@ -512,6 +453,72 @@ Conf::Conf() : Block("")
 		this->CommandGroups.push_back(gr);
 	}
 
+	for (int i = 0; i < this->CountBlock("usermode"); ++i)
+	{
+		Block *usermode = this->GetBlock("usermode", i);
+
+		Anope::string nname = usermode->Get<Anope::string>("name"),
+				character = usermode->Get<Anope::string>("character");
+		bool oper_only = usermode->Get<bool>("oper_only"),
+				setable = usermode->Get<bool>("setable"),
+				param = usermode->Get<bool>("param");
+
+		ValidateNotEmpty("usermode", "name", nname);
+
+		if (character.length() != 1)
+			throw ConfigException("Usermode character length must be 1");
+
+		Usermode um;
+		um.name = nname;
+		um.character = character[0];
+		um.param = param;
+		um.oper_only = oper_only;
+		um.setable = setable;
+
+		this->Usermodes.push_back(um);
+	}
+
+	for (int i = 0; i < this->CountBlock("channelmode"); ++i)
+	{
+		Block *channelmode = this->GetBlock("channelmode", i);
+
+		Anope::string nname = channelmode->Get<Anope::string>("name"),
+				character = channelmode->Get<Anope::string>("character"),
+				status = channelmode->Get<Anope::string>("status"),
+				param_regex = channelmode->Get<Anope::string>("param_regex");
+		bool oper_only = channelmode->Get<bool>("oper_only"),
+				setable = channelmode->Get<bool>("setable"),
+				list = channelmode->Get<bool>("list"),
+				param = channelmode->Get<bool>("param"),
+				param_unset = channelmode->Get<bool>("param_unset", "yes");
+		int level = channelmode->Get<int>("level");
+
+		ValidateNotEmpty("usermode", "name", nname);
+
+		if (character.length() != 1)
+			throw ConfigException("Channelmode character length must be 1");
+
+		if (status.length() > 1)
+			throw ConfigException("Channelmode status must be at most one character");
+
+		if (list || !param_regex.empty() || param_unset || !status.empty())
+			param = true;
+
+		Channelmode cm;
+		cm.name = nname;
+		cm.character = character[0];
+		cm.status = !status.empty() ? status[0] : 0;
+		cm.param_regex = param_regex;
+		cm.oper_only = oper_only;
+		cm.setable = setable;
+		cm.list = list;
+		cm.param = param;
+		cm.param_unset = param_unset;
+		cm.level = level;
+
+		this->Channelmodes.push_back(cm);
+	}
+
 	for (int i = 0; i < this->CountBlock("casemap"); ++i)
 	{
 		Block *casemap = this->GetBlock("casemap", i);
@@ -602,6 +609,8 @@ void Conf::Post(Conf *old)
 		if (std::find(old->ModulesAutoLoad.begin(), old->ModulesAutoLoad.end(), this->ModulesAutoLoad[i]) == old->ModulesAutoLoad.end())
 			ModuleManager::LoadModule(this->ModulesAutoLoad[i], NULL);
 
+	ModeManager::Apply(old);
+
 	/* Apply opertype changes, as non-conf opers still point to the old oper types */
 	for (Oper *o : Serialize::GetObjects<Oper *>(operblock))
 	{
@@ -619,6 +628,46 @@ void Conf::Post(Conf *old)
 			{
 				/* Oper block has lost type */
 				o->Delete();
+			}
+		}
+	}
+
+	for (BotInfo *bi : Serialize::GetObjects<BotInfo *>(botinfo))
+	{
+		if (!bi->conf)
+		{
+			bi->Delete();
+			continue;
+		}
+
+		for (int i = 0; i < bi->conf->CountBlock("channel"); ++i)
+		{
+			Block *channel = bi->conf->GetBlock("channel", i);
+
+			const Anope::string &chname = channel->Get<Anope::string>("name"),
+				&modes = channel->Get<Anope::string>("modes");
+
+			bi->bot->Join(chname);
+
+			Channel *c = Channel::Find(chname);
+			if (!c)
+				continue; // Can't happen
+
+			c->botchannel = true;
+
+			/* Remove all existing modes */
+			ChanUserContainer *cu = c->FindUser(bi->bot);
+			if (cu != NULL)
+				for (size_t j = 0; j < cu->status.Modes().length(); ++j)
+					c->RemoveMode(bi->bot, ModeManager::FindChannelModeByChar(cu->status.Modes()[j]), bi->bot->GetUID());
+			/* Set the new modes */
+			for (unsigned j = 0; j < modes.length(); ++j)
+			{
+				ChannelMode *cm = ModeManager::FindChannelModeByChar(modes[j]);
+				if (cm == NULL)
+					cm = ModeManager::FindChannelModeByChar(ModeManager::GetStatusChar(modes[j]));
+				if (cm && cm->type == MODE_STATUS)
+					c->SetMode(bi->bot, cm, bi->bot->GetUID());
 			}
 		}
 	}

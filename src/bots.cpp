@@ -25,7 +25,15 @@ ServiceBot::ServiceBot(const Anope::string &nnick, const Anope::string &nuser, c
 	this->type = UserType::BOT;
 	this->lastmsg = Anope::CurTime;
 	this->introduced = false;
-	this->conf = false;
+
+	bi = botinfo.Create();
+	bi->bot = this;
+
+	bi->SetNick(nnick);
+	bi->SetUser(nuser);
+	bi->SetHost(nhost);
+	bi->SetRealName(nreal);
+	bi->SetCreated(Anope::CurTime);
 
 	Event::OnCreateBot(&Event::CreateBot::OnCreateBot, this);
 
@@ -46,6 +54,9 @@ ServiceBot::ServiceBot(const Anope::string &nnick, const Anope::string &nuser, c
 
 ServiceBot::~ServiceBot()
 {
+	bi->bot = nullptr;
+	bi->Delete();
+
 	Event::OnDelBot(&Event::DelBot::OnDelBot, this);
 
 	// If we're synchronised with the uplink already, send the bot.
@@ -217,6 +228,18 @@ ServiceBot* ServiceBot::Find(const Anope::string &nick, bool nick_only)
 	if (u && u->type == UserType::BOT)
 		return anope_dynamic_static_cast<ServiceBot *>(u);
 	return nullptr;
+}
+
+void BotInfo::Delete()
+{
+	if (bot)
+	{
+		ServiceBot *b = bot;
+		bot = nullptr;
+		delete b;
+	}
+
+	return Serialize::Object::Delete();
 }
 
 void BotInfo::SetCreated(const time_t &t)

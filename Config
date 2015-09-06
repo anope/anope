@@ -370,7 +370,7 @@ echo ""
 ####
 
 echo "Are there any extra arguments you wish to pass to CMake?"
-echo "If you need no extra arugments to CMake, enter NONE in all caps."
+echo "If you need no extra arguments to CMake, enter NONE in all caps."
 echo2 "[$EXTRA_CONFIG_ARGS] "
 if read INPUT ; then : ; else echo "" ; exit 1 ; fi
 if [ "$INPUT" ] ; then

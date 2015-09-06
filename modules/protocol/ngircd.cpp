@@ -451,7 +451,7 @@ struct IRCDMessageNick : IRCDMessage
 			Server *s = Server::Find(params[4]);
 			if (s == NULL)
 			{
-				Log(LOG_DEBUG) << "User " << params[0] << " introduced from nonexistant server " << params[4] << "?";
+				Log(LOG_DEBUG) << "User " << params[0] << " introduced from non-existent server " << params[4] << "?";
 				return;
 			}
 			User::OnIntroduce(params[0], params[2], params[3], "", "", s, params[6], Anope::CurTime, params[5], "", NULL);
@@ -500,7 +500,7 @@ struct IRCDMessageNJoin : IRCDMessage
 			sju.second = User::Find(buf);
 			if (!sju.second)
 			{
-				Log(LOG_DEBUG) << "NJOIN for nonexistant user " << buf << " on " << params[0];
+				Log(LOG_DEBUG) << "NJOIN for non-existent user " << buf << " on " << params[0];
 				continue;
 			}
 			users.push_back(sju);
@@ -587,7 +587,7 @@ struct IRCDMessageTopic : IRCDMessage
 		Channel *c = Channel::Find(params[0]);
 		if (!c)
 		{
-			Log(LOG_DEBUG) << "TOPIC for nonexistant channel " << params[0];
+			Log(LOG_DEBUG) << "TOPIC for non-existent channel " << params[0];
 			return;
 		}
 		c->ChangeTopicInternal(source.GetUser(), source.GetName(), params[1], Anope::CurTime);

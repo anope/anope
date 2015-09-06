@@ -65,9 +65,9 @@ class CoreExport Serializable : public virtual Base
 	Serialize::Type *s_type;
  	/* Iterator into serializable_items */
 	std::list<Serializable *>::iterator s_iter;
-	/* The hash of the last serialized form of this object commited to the database */
+	/* The hash of the last serialized form of this object committed to the database */
 	size_t last_commit;
-	/* The last time this object was commited to the database */
+	/* The last time this object was committed to the database */
 	time_t last_commit_time;
 
  protected:

@@ -922,7 +922,7 @@ class CSMode : public Module
 				}
 				else if (cm->type == MODE_PARAM)
 				{
-					/* If the channel doesnt have the mode, or it does and it isn't set correctly */
+					/* If the channel doesn't have the mode, or it does and it isn't set correctly */
 					if (ml->set)
 					{
 						Anope::string param;

@@ -1016,7 +1016,7 @@ class CoreExport Module : public Extensible
 	 */
 	virtual void OnLogMessage(LogInfo *li, const Log *l, const Anope::string &msg) { throw NotImplementedException(); }
 
-	/** Called when a DNS request (question) is recieved.
+	/** Called when a DNS request (question) is received.
 	 * @param req The dns request
 	 * @param reply The reply that will be sent
 	 */

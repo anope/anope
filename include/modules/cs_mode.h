@@ -80,7 +80,7 @@ struct ModeLocks
 	virtual const ModeLock *GetMLock(const Anope::string &mname, const Anope::string &param = "") = 0;
 
 	/** Get the current mode locks as a string
-	 * @param complete True to show mlock parameters aswell
+	 * @param complete True to show mlock parameters as well
 	 * @return A string of mode locks, eg: +nrt
 	 */
 	virtual Anope::string GetMLockAsString(bool complete) const = 0;

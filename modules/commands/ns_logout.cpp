@@ -40,7 +40,7 @@ class CommandNSLogout : public Command
 			if (!nick.empty() && !param.empty() && param.equals_ci("REVALIDATE") && NickServService)
 				NickServService->Validate(u2);
 
-			u2->super_admin = false; /* Dont let people logout and remain a SuperAdmin */
+			u2->super_admin = false; /* Don't let people logout and remain a SuperAdmin */
 			Log(LOG_COMMAND, source, this) << "to logout " << u2->nick;
 
 			/* Remove founder status from this user in all channels */

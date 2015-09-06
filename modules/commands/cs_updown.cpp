@@ -124,7 +124,7 @@ class CommandCSUp : public Command
 		this->SendSyntax(source);
 		source.Reply(" ");
 		source.Reply(_("Updates a selected nicks status modes on a channel. If \037nick\037 is\n"
-				"ommited then your status is updated. If \037channel\037 is ommited then\n"
+				"omitted then your status is updated. If \037channel\037 is omitted then\n"
 				"your channel status is updated on every channel you are in."));
 		return true;
 	}
@@ -221,7 +221,7 @@ class CommandCSDown : public Command
 		this->SendSyntax(source);
 		source.Reply(" ");
 		source.Reply(_("Removes a selected nicks status modes on a channel. If \037nick\037 is\n"
-				"ommited then your status is removed. If \037channel\037 is ommited then\n"
+				"omitted then your status is removed. If \037channel\037 is omitted then\n"
 				"your channel status is removed on every channel you are in."));
 		return true;
 	}

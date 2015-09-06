@@ -21,7 +21,7 @@ The syntax is usually *_cast<type>(var).
 static_cast
 -----------
 
-From my expierence, this cast is closest to C-style casting for non-pointer
+From my experience, this cast is closest to C-style casting for non-pointer
 types as well as between some (but not all) pointer types.  This type of cast,
 like C-style casting, is performed at compile-time.  static_cast can also do
 a downcast of a derived class to a base class, but only if the base class is
@@ -80,7 +80,7 @@ Bad_cast exception.
 
 Note that in Anope we prefer if Anope::debug_cast is used.
 This uses dynamic_cast (and checks for a NULL pointer return) on debug builds
-and static_cast on release builds, to speed up the program beacuse of dynamic_cast's
+and static_cast on release builds, to speed up the program because of dynamic_cast's
 reliance on RTTI.
 
 reinterpret_cast

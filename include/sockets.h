@@ -372,7 +372,7 @@ class CoreExport ListenSocket : public virtual Socket
 	virtual ~ListenSocket();
 
 	/** Process what has come in from the connection
-	 * @return false to destory this socket
+	 * @return false to destroy this socket
 	 */
 	bool ProcessRead();
 

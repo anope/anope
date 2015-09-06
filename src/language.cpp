@@ -88,7 +88,7 @@ const char *Language::Translate(const char *lang, const char *string)
 	SetThreadLocale(MAKELCID(MAKELANGID(WindowsGetLanguage(lang), SUBLANG_DEFAULT), SORT_DEFAULT));
 #else
 	/* First, set LANG and LANGUAGE env variables.
-	 * Some systems (Debian) don't care about this, so we must setlocale LC_ALL aswell.
+	 * Some systems (Debian) don't care about this, so we must setlocale LC_ALL as well.
 	 * BUT if this call fails because the LANGUAGE env variable is set, setlocale resets
 	 * the locale to "C", which short circuits gettext and causes it to fail on systems that
 	 * use the LANGUAGE env variable. We must reset the locale to en_US (or, anything not

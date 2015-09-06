@@ -45,20 +45,20 @@ if(MINOR_VERSION GREATER 5)
   set(CMAKE242_OR_BETTER TRUE)
 else(MINOR_VERSION GREATER 5)
   set(CMAKE26_OR_BETTER FALSE)
-  # Also detect if we are using CMake 2.4.8 or better, the FIND sub-command of list() is non-existant in earlier versions
+  # Also detect if we are using CMake 2.4.8 or better, the FIND sub-command of list() is non-existent in earlier versions
   if(PATCH_VERSION GREATER 7)
     set(CMAKE248_OR_BETTER TRUE)
     set(CMAKE244_OR_BETTER TRUE)
     set(CMAKE242_OR_BETTER TRUE)
   else(PATCH_VERSION GREATER 7)
     set(CMAKE248_OR_BETTER FALSE)
-    # Also detect if we are using CMake 2.4.4 or better, the CheckCXXCompilerFlag module and SORT sub-command of list() are non-existant in earlier versions
+    # Also detect if we are using CMake 2.4.4 or better, the CheckCXXCompilerFlag module and SORT sub-command of list() are non-existent in earlier versions
     if(PATCH_VERSION GREATER 3)
       set(CMAKE244_OR_BETTER TRUE)
       set(CMAKE242_OR_BETTER TRUE)
     else(PATCH_VERSION GREATER 3)
       set(CMAKE244_OR_BETTER FALSE)
-      # ALSO detect if we are using CMake 2.4.2 or better, the APPEND sub-command of list() is non-existant in earlier versions
+      # ALSO detect if we are using CMake 2.4.2 or better, the APPEND sub-command of list() is non-existent in earlier versions
       if(PATCH_VERSION GREATER 1)
         set(CMAKE242_OR_BETTER TRUE)
       else(PATCH_VERSION GREATER 1)
@@ -347,12 +347,12 @@ if(CMAKE_BUILD_TYPE STREQUAL "DEBUG" OR CMAKE_BUILD_TYPE STREQUAL "RELWITHDEBINF
   set(DEBUG_BUILD TRUE)
 endif(CMAKE_BUILD_TYPE STREQUAL "DEBUG" OR CMAKE_BUILD_TYPE STREQUAL "RELWITHDEBINFO")
 
-# Check for the existance of the following include files
+# Check for the existence of the following include files
 check_include_file(cstdint HAVE_CSTDINT)
 check_include_file(stdint.h HAVE_STDINT_H)
 check_include_file(strings.h HAVE_STRINGS_H)
 
-# Check for the existance of the following functions
+# Check for the existence of the following functions
 check_function_exists(strcasecmp HAVE_STRCASECMP)
 check_function_exists(stricmp HAVE_STRICMP)
 check_function_exists(umask HAVE_UMASK)

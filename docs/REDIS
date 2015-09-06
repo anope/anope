@@ -152,7 +152,7 @@ Table of Contents
         HMSET hash:BotInfo:8 nick redis user redis host services.anope.org realname "Services for IRC Networks"
 
         Note if you are using HSET instead of HMSET you will need to use a transaction, as shown in the above example.
-        If you are watching your services logs you will immediatly see:
+        If you are watching your services logs you will immediately see:
 
         USERS: redis!redis@services.anope.org (Services for IRC Networks) connected to the network (services.anope.org)
 

@@ -149,7 +149,7 @@ class Fantasy : public Module
 		ServiceReference<Command> cmd("Command", info.name);
 		if (!cmd)
 		{
-			Log(LOG_DEBUG) << "Fantasy command " << it->first << " exists for nonexistant service " << info.name << "!";
+			Log(LOG_DEBUG) << "Fantasy command " << it->first << " exists for non-existent service " << info.name << "!";
 			return;
 		}
 

@@ -22,7 +22,7 @@ namespace
 	time_t timeout;
 }
 
-/** A full packet sent or recieved to/from the nameserver
+/** A full packet sent or received to/from the nameserver
  */
 class Packet : public Query
 {
@@ -804,7 +804,7 @@ class MyManager : public Manager, public Timer
 			}
 
 			Packet *packet = new Packet(recv_packet);
-			packet->flags |= QUERYFLAGS_QR; /* This is a reponse */
+			packet->flags |= QUERYFLAGS_QR; /* This is a response */
 			packet->flags |= QUERYFLAGS_AA; /* And we are authoritative */
 
 			packet->answers.clear();

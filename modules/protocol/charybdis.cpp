@@ -229,7 +229,7 @@ struct IRCDMessageEUID : IRCDMessage
 	}
 };
 
-// we cant use this function from ratbox because we set a local variable here
+// we can't use this function from ratbox because we set a local variable here
 struct IRCDMessageServer : IRCDMessage
 {
 	IRCDMessageServer(Module *creator) : IRCDMessage(creator, "SERVER", 3) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
@@ -245,7 +245,7 @@ struct IRCDMessageServer : IRCDMessage
 	}
 };
 
-// we cant use this function from ratbox because we set a local variable here
+// we can't use this function from ratbox because we set a local variable here
 struct IRCDMessagePass : IRCDMessage
 {
 	IRCDMessagePass(Module *creator) : IRCDMessage(creator, "PASS", 4) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }

@@ -424,7 +424,7 @@ class MChanstats : public Module
 			"END;";
 		this->RunQuery(query);
 
-		/* dont prepend any database prefix to events so we can always delete/change old events */
+		/* don't prepend any database prefix to events so we can always delete/change old events */
 		if (this->HasEvent("chanstats_event_cleanup_daily"))
 		{
 			query = "DROP EVENT chanstats_event_cleanup_daily";

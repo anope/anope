@@ -435,8 +435,8 @@ bool ModuleManager::SetPriority(Module *mod, Implementation i, Priority s, Modul
 			break;
 		}
 
-	/* Eh? this module doesnt exist, probably trying to set priority on an event
-	 * theyre not attached to.
+	/* Eh? this module doesn't exist, probably trying to set priority on an event
+	 * they're not attached to.
 	 */
 	if (!found)
 		return false;

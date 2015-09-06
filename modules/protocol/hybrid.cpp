@@ -22,9 +22,16 @@ class HybridProto : public IRCDProto
 		if (bi && bi->introduced)
 			return bi;
 
-		for (ServiceBot *bi2 : Serialize::GetObjects<ServiceBot *>(botinfo))
-			if (bi2->introduced)
-				return bi2;
+		for (user_map::const_iterator it = UserListByNick.begin(); it != UserListByNick.end(); ++it)
+		{
+			User *u = it->second;
+			if (u->type == UserType::BOT)
+			{
+				bi = anope_dynamic_static_cast<ServiceBot *>(u);
+				if (bi->introduced)
+					return bi;
+			}
+		}
 
 		return NULL;
 	}

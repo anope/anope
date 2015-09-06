@@ -26,14 +26,14 @@ class CommandBSBotList : public Command
 
 		list.AddColumn(_("Nick")).AddColumn(_("Mask"));
 
-		for (ServiceBot *bi : Serialize::GetObjects<ServiceBot *>(botinfo))
+		for (BotInfo *bi : Serialize::GetObjects<BotInfo *>(botinfo))
 		{
-			if (source.HasPriv("botserv/administration") || !bi->bi->GetOperOnly())
+			if (source.HasPriv("botserv/administration") || !bi->GetOperOnly())
 			{
 				++count;
 				ListFormatter::ListEntry entry;
-				entry["Nick"] = (bi->bi->GetOperOnly() ? "* " : "") + bi->nick;
-				entry["Mask"] = bi->GetIdent() + "@" + bi->host;
+				entry["Nick"] = (bi->GetOperOnly() ? "* " : "") + bi->GetNick();
+				entry["Mask"] = bi->GetUser() + "@" + bi->GetHost();
 				list.AddEntry(entry);
 			}
 		}

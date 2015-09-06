@@ -14,9 +14,6 @@
 #include "serialize.h"
 #include "commands.h"
 
-
-typedef Anope::hash_map<BotInfo *> botinfo_map;
-
 /* A service bot (NickServ, ChanServ, a BotServ bot, etc). */
 class CoreExport ServiceBot : public LocalUser
 {

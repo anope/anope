@@ -110,7 +110,7 @@ class CommandMSRead : public Command
 	CommandMSRead(Module *creator) : Command(creator, "memoserv/read", 1, 2)
 	{
 		this->SetDesc(_("Read a memo or memos"));
-		this->SetSyntax(_("[\037channel\037] {\037num\037 | \037list\037 | LAST | NEW}"));
+		this->SetSyntax(_("[\037channel\037] {\037num\037 | \037list\037 | LAST | NEW | ALL}"));
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
@@ -141,7 +141,7 @@ class CommandMSRead : public Command
 		else
 			mi = &source.nc->memos;
 
-		if (numstr.empty() || (!numstr.equals_ci("LAST") && !numstr.equals_ci("NEW") && numstr.find_first_not_of("0123456789.,-") != Anope::string::npos))
+		if (numstr.empty() || (!numstr.equals_ci("LAST") && !numstr.equals_ci("NEW") && !numstr.equals_ci("ALL") && numstr.find_first_not_of("0123456789.,-") != Anope::string::npos))
 			this->OnSyntaxError(source, numstr);
 		else if (mi->memos->empty())
 		{
@@ -176,6 +176,13 @@ class CommandMSRead : public Command
 				for (i = 0, end = mi->memos->size() - 1; i < end; ++i);
 				MemoListCallback::DoRead(source, mi, ci, i);
 			}
+			else if (numstr.equals_ci("ALL"))
+			{
+				for (i = 0, end = mi->memos->size(); i < end; ++i)
+				{
+					MemoListCallback::DoRead(source, mi, ci, i);
+				}
+			}
 			else /* number[s] */
 			{
 				MemoListCallback list(source, mi, ci, numstr);
@@ -191,9 +198,10 @@ class CommandMSRead : public Command
 		source.Reply(" ");
 		source.Reply(_("Sends you the text of the memos specified. If LAST is\n"
 				"given, sends you the memo you most recently received. If\n"
-				"NEW is given, sends you all of your new memos.  Otherwise,\n"
-				"sends you memo number \037num\037. You can also give a list of\n"
-				"numbers, as in this example:\n"
+				"NEW is given, sends you all of your new memos.  If ALL is\n"
+				"given, sends you all of your memos. Otherwise, sends you\n"
+				"memo number \037num\037. You can also give a list of numbers,\n"
+				"as in this example:\n"
 				" \n"
 				"   \002READ 2-5,7-9\002\n"
 				"      Displays memos numbered 2 through 5 and 7 through 9."));

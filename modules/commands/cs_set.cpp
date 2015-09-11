@@ -1170,7 +1170,8 @@ class CSSet : public Module
 			{
 				c->SetMode(NULL, cm);
 			}
-			else
+			/* on startup we might not know mode availibity here */
+			else if (Me && Me->IsSynced())
 			{
 				if (!ci->bi)
 				{

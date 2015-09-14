@@ -30,6 +30,12 @@ class WebpanelRequest : public IdentifyRequest
 			return;
 		}
 
+		if (na->nc->HasExt("NS_SUSPENDED"))
+		{
+			this->OnFail();
+			return;
+		}
+
 		Anope::string id;
 		for (int i = 0; i < 64; ++i)
 		{

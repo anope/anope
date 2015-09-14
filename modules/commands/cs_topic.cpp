@@ -196,7 +196,8 @@ class CommandCSTopic : public Command
 				"the given topic to the existing topic.\n"
 				" \n"
 				"\002LOCK\002 and \002UNLOCK\002 may be used to enable and disable topic lock. When\n"
-				"topic lock is set, the channel topic will be unchangeable except via this command."));
+				"topic lock is set, the channel topic will be unchangeable by users who do not have\n"
+				"the \002TOPIC\002 privilege."));
 		return true;
 	}
 };

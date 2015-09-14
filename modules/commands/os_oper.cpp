@@ -277,6 +277,15 @@ class OSOper : public Module
 			}
 		}
 	}
+
+	void OnDelCore(NickCore *nc) anope_override
+	{
+		if (nc->o && dynamic_cast<MyOper *>(nc->o))
+		{
+			delete nc->o;
+			nc->o = NULL;
+		}
+	}
 };
 
 MODULE_INIT(OSOper)

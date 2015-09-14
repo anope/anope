@@ -385,7 +385,7 @@ ChanAccess *ChannelInfo::GetAccess(unsigned index) const
 	return acc;
 }
 
-AccessGroup ChannelInfo::AccessFor(const User *u)
+AccessGroup ChannelInfo::AccessFor(const User *u, bool updateLastUsed)
 {
 	AccessGroup group;
 
@@ -414,7 +414,8 @@ AccessGroup ChannelInfo::AccessFor(const User *u)
 
 	if (group.founder || !group.empty())
 	{
-		this->last_used = Anope::CurTime;
+		if (updateLastUsed)
+			this->last_used = Anope::CurTime;
 
 		for (unsigned i = 0; i < group.size(); ++i)
 			group[i]->last_seen = Anope::CurTime;
@@ -423,7 +424,7 @@ AccessGroup ChannelInfo::AccessFor(const User *u)
 	return group;
 }
 
-AccessGroup ChannelInfo::AccessFor(const NickCore *nc)
+AccessGroup ChannelInfo::AccessFor(const NickCore *nc, bool updateLastUsed)
 {
 	AccessGroup group;
 
@@ -439,9 +440,10 @@ AccessGroup ChannelInfo::AccessFor(const NickCore *nc)
 	}
 
 	if (group.founder || !group.empty())
-		this->last_used = Anope::CurTime;
+		if (updateLastUsed)
+			this->last_used = Anope::CurTime;
 
-		/* don't update access last seen here, this isn't the user requesting access */
+	/* don't update access last seen here, this isn't the user requesting access */
 
 	return group;
 }

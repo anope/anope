@@ -78,7 +78,7 @@ class CommandNSAList : public Command
 				continue;
 			}
 
-			AccessGroup access = ci->AccessFor(nc);
+			AccessGroup access = ci->AccessFor(nc, false);
 			if (access.empty())
 				continue;
 				

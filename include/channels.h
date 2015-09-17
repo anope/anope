@@ -32,6 +32,8 @@ struct ChanUserContainer : public Extensible
 
 class CoreExport Channel : public Base, public Extensible
 {
+	static std::vector<Channel *> deleting;
+
  public:
 	typedef std::multimap<Anope::string, Anope::string> ModeList;
  private:
@@ -300,6 +302,8 @@ class CoreExport Channel : public Base, public Extensible
 	 * @param ts The time the channel was created
 	 */
 	static Channel *FindOrCreate(const Anope::string &name, bool &created, time_t ts = Anope::CurTime);
+
+	static void DeleteChannels();
 };
 
 #endif // CHANNELS_H

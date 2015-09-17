@@ -27,6 +27,7 @@
 #include "uplink.h"
 
 channel_map ChannelList;
+std::vector<Channel *> Channel::deleting;
 
 Channel::Channel(const Anope::string &nname, time_t ts)
 {
@@ -168,8 +169,8 @@ void Channel::DeleteUser(User *user)
 		Log(LOG_DEBUG) << "Channel::DeleteUser() tried to delete non-existent channel " << this->name << " from " << user->nick << "'s channel list";
 	delete cu;
 
-	if (this->CheckDelete())
-		delete this;
+	if (std::find(deleting.begin(), deleting.end(), this) == deleting.end())
+		deleting.push_back(this);
 }
 
 ChanUserContainer *Channel::FindUser(User *u) const
@@ -759,12 +760,11 @@ void Channel::KickInternal(const MessageSource &source, const Anope::string &nic
 		return;
 	}
 
-	Anope::string this_name = this->name;
 	ChannelStatus status = cu->status;
 
 	FOREACH_MOD(OnPreUserKicked, (source, cu, reason));
-	this->DeleteUser(target); /* This can delete this; */
-	FOREACH_MOD(OnUserKicked, (source, target, this_name, status, reason));
+	this->DeleteUser(target);
+	FOREACH_MOD(OnUserKicked, (source, target, this->name, status, reason));
 }
 
 bool Channel::Kick(BotInfo *bi, User *u, const char *reason, ...)
@@ -937,5 +937,17 @@ Channel *Channel::FindOrCreate(const Anope::string &name, bool &created, time_t 
 	if (!chan)
 		chan = new Channel(name, ts);
 	return chan;
+}
+
+void Channel::DeleteChannels()
+{
+	for (unsigned int i = 0; i < deleting.size(); ++i)
+	{
+		Channel *c = deleting[i];
+
+		if (c->CheckDelete())
+			delete c;
+	}
+	deleting.clear();
 }
 

@@ -91,7 +91,7 @@ class CommandNSIdentify : public Command
 		unsigned int maxlogins = Config->GetModule(this->owner)->Get<unsigned int>("maxlogins");
 		if (na && maxlogins && na->nc->users.size() >= maxlogins)
 		{
-			source.Reply(_("Account \2%s\2 has exceeeded the maximum number of simultaneous logins (%u)."), na->nc->display.c_str(), maxlogins);
+			source.Reply(_("Account \2%s\2 has already reached the maximum number of simultaneous logins (%u)."), na->nc->display.c_str(), maxlogins);
 			return;
 		}
 

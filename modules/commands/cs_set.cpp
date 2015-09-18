@@ -1297,13 +1297,6 @@ class CSSet : public Module
 		return EVENT_CONTINUE;
 	}
 
-	EventReturn OnCheckDelete(Channel *c) anope_override
-	{
-		if (c->ci && persist.HasExt(c->ci))
-			return EVENT_STOP;
-		return EVENT_CONTINUE;
-	}
-
 	void OnJoinChannel(User *u, Channel *c) anope_override
 	{
 		if (persist_lower_ts && c->ci && persist.HasExt(c->ci) && c->creation_time > c->ci->time_registered)

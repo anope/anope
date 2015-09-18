@@ -78,7 +78,7 @@ class CommandBSBot : public Command
 		User *u = User::Find(nick, true);
 		if (u)
 		{
-			source.Reply(_("Nick \2%s\2 is currently in use."), u->nick.c_str());
+			source.Reply(_("Nick \002%s\002 is currently in use."), u->nick.c_str());
 			return;
 		}
 
@@ -178,7 +178,7 @@ class CommandBSBot : public Command
 
 			if (User::Find(nick, true))
 			{
-				source.Reply(_("Nick \2%s\2 is currently in use."), nick.c_str());
+				source.Reply(_("Nick \002%s\002 is currently in use."), nick.c_str());
 				return;
 			}
 		}

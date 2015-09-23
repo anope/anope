@@ -52,6 +52,26 @@ class ModuleRegexTRE : public Module
 	{
 		this->SetPermanent(true);
 	}
+
+	~ModuleRegexTRE()
+	{
+		for (std::list<XLineManager *>::iterator it = XLineManager::XLineManagers.begin(); it != XLineManager::XLineManagers.end(); ++it)
+		{
+			XLineManager *xlm = *it;
+			const std::vector<XLine *> &xlines = xlm->GetList();
+
+			for (unsigned int i = 0; i < xlines.size(); ++i)
+			{
+				XLine *x = xlines[i];
+
+				if (x->regex && dynamic_cast<TRERegex *>(x->regex))
+				{
+					delete x->regex;
+					x->regex = NULL;
+				}
+			}
+		}
+	}
 };
 
 MODULE_INIT(ModuleRegexTRE)

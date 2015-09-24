@@ -576,6 +576,12 @@ int16_t ChannelInfo::GetLevel(const Anope::string &priv) const
 
 void ChannelInfo::SetLevel(const Anope::string &priv, int16_t level)
 {
+	if (PrivilegeManager::FindPrivilege(priv) == NULL)
+	{
+		Log(LOG_DEBUG) << "Unknown privilege " + priv;
+		return;
+	}
+
 	this->levels[priv] = level;
 }
 

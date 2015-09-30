@@ -156,6 +156,17 @@ class CommandOSAKill : public Command
 		if (Config->GetModule("operserv")->Get<bool>("addakiller", "yes") && !source.GetNick().empty())
 			reason = "[" + source.GetNick() + "] " + reason;
 
+		if (mask.find_first_not_of("/~@.*?") == Anope::string::npos)
+		{
+			source.Reply(USERHOST_MASK_TOO_WIDE, mask.c_str());
+			return;
+		}
+		else if (mask.find('@') == Anope::string::npos)
+		{
+			source.Reply(BAD_USERHOST_MASK);
+			return;
+		}
+
 		XLine *x = new XLine(mask, source.GetNick(), expires, reason);
 		if (Config->GetModule("operserv")->Get<bool>("akillids"))
 			x->id = XLineManager::GenerateUID();
@@ -174,17 +185,7 @@ class CommandOSAKill : public Command
 			return;
 		}
 
-		if (mask.find_first_not_of("/~@.*?") == Anope::string::npos)
-		{
-			source.Reply(USERHOST_MASK_TOO_WIDE, mask.c_str());
-			return;
-		}
-		else if (mask.find('@') == Anope::string::npos)
-		{
-			source.Reply(BAD_USERHOST_MASK);
-			return;
-		}
-		else if (!akills->CanAdd(source, mask, expires, reason))
+		if (!akills->CanAdd(source, mask, expires, reason))
 			return;
 
 		EventReturn MOD_RESULT;

@@ -19,37 +19,62 @@
 #include "logger.h"
 #include "extensible.h"
 
+class ModuleDef;
+
+struct AnopeModule
+{
+	ModuleDef* (*init)();
+	void (*fini)(ModuleDef *);
+};
+
+class ModuleDef
+{
+	std::vector<Anope::string> dependencies;
+
+ public:
+	virtual ~ModuleDef() = default;
+	virtual Module *Create(const Anope::string &modname, const Anope::string &creator) anope_abstract;
+	virtual void Destroy(Module *) anope_abstract;
+	virtual void BuildModuleInfo() anope_abstract;
+
+	void Depends(const Anope::string &modname);
+	const std::vector<Anope::string> &GetDependencies();
+};
+
+template<class ModuleClass> void ModuleInfo(ModuleDef *moddef) { }
+
 /** This definition is used as shorthand for the various classes
  * and functions needed to make a module loadable by the OS.
- * It defines the class factory and external AnopeInit and AnopeFini functions.
  */
-#ifdef _WIN32
-# define MODULE_INIT(x) \
-	extern "C" DllExport Module *AnopeInit(const Anope::string &, const Anope::string &); \
-	extern "C" Module *AnopeInit(const Anope::string &modname, const Anope::string &creator) \
+#define MODULE_INIT(ModuleClass) \
+	class ModuleClass ## ModuleDef : public ModuleDef \
 	{ \
-		return new x(modname, creator); \
+		Module *Create(const Anope::string &modname, const Anope::string &creator) override \
+		{ \
+			return new ModuleClass(modname, creator); \
+		} \
+		void Destroy(Module *module) override \
+		{ \
+			delete module; \
+		} \
+		void BuildModuleInfo() override \
+		{ \
+			ModuleInfo<ModuleClass>(this); \
+		} \
+	}; \
+	static ModuleDef *CreateModuleDef() \
+	{ \
+		return new ModuleClass ## ModuleDef(); \
 	} \
-	BOOLEAN WINAPI DllMain(HINSTANCE, DWORD, LPVOID) \
+	static void DeleteModuleDef(ModuleDef *def) \
 	{ \
-		return TRUE; \
+		delete def; \
 	} \
-	extern "C" DllExport void AnopeFini(x *); \
-	extern "C" void AnopeFini(x *m) \
+	extern "C" DllExport struct AnopeModule AnopeMod = \
 	{ \
-		delete m; \
-	}
-#else
-# define MODULE_INIT(x) \
-	extern "C" DllExport Module *AnopeInit(const Anope::string &modname, const Anope::string &creator) \
-	{ \
-		return new x(modname, creator); \
-	} \
-	extern "C" DllExport void AnopeFini(x *m) \
-	{ \
-		delete m; \
-	}
-#endif
+		CreateModuleDef, \
+		DeleteModuleDef \
+	};
 
 enum ModuleReturn
 {
@@ -144,6 +169,9 @@ class CoreExport Module : public Extensible
 	/** Handle for this module, obtained from dlopen()
 	 */
 	void *handle;
+
+	ModuleDef *def = nullptr;
+	AnopeModule *module = nullptr;
 
 	/** Time this module was created
 	 */

@@ -89,3 +89,20 @@ macro(add_to_cpack_ignored_files ITEM)
     set(ENV{CPACK_IGNORED_FILES} "${REAL_ITEM}")
   endif(DEFINED ENV{CPACK_IGNORED_FILES})
 endmacro(add_to_cpack_ignored_files)
+
+macro(calculate_dependencies SRC)
+  file(STRINGS ${SRC} REQUIRED_LIBRARIES REGEX "/\\*[ \t]*Dependencies:[ \t]*.*[ \t]*\\*/")
+  # Iterate through those lines
+  foreach(REQUIRED_LIBRARY ${REQUIRED_LIBRARIES})
+    string(REGEX REPLACE "/\\*[ \t]*Dependencies:[ \t]*([^ \t]*)[ \t]*\\*/" "\\1" REQUIRED_LIBRARY ${REQUIRED_LIBRARY})
+    # Replace all commas with semicolons
+    string(REGEX REPLACE "," ";" REQUIRED_LIBRARY ${REQUIRED_LIBRARY})
+    # Iterate through the libraries given
+    foreach(LIBRARY ${REQUIRED_LIBRARY})
+      get_filename_component(TARGNAME ${SRC} NAME_WE)
+      target_link_libraries(${TARGNAME} ${LIBRARY})
+      add_dependencies(${TARGNAME} ${LIBRARY})
+    endforeach(LIBRARY)
+  endforeach(REQUIRED_LIBRARY)
+endmacro(calculate_dependencies)
+

@@ -9,8 +9,12 @@
  * Based on the original code of Services by Andy Church.
  */
 
+/* Dependencies: chanserv */
+
 #include "module.h"
 #include "modules/cs_access.h"
+#include "../pseudoclients/chanserv/chanaccess.h"
+#include "../pseudoclients/chanserv/chanaccesstype.h"
 
 namespace
 {
@@ -18,11 +22,11 @@ namespace
 	std::map<Anope::string, std::vector<Anope::string> > permissions;
 }
 
-class XOPChanAccess : public ChanServ::ChanAccess
+class XOPChanAccess : public ChanAccessImpl
 {
  public:
-	XOPChanAccess(Serialize::TypeBase *type) : ChanServ::ChanAccess(type) { }
-	XOPChanAccess(Serialize::TypeBase *type, Serialize::ID id) : ChanServ::ChanAccess(type, id) { }
+	XOPChanAccess(Serialize::TypeBase *type) : ChanAccessImpl(type) { }
+	XOPChanAccess(Serialize::TypeBase *type, Serialize::ID id) : ChanAccessImpl(type, id) { }
 
 	Anope::string GetType();
 	void SetType(const Anope::string &);
@@ -81,7 +85,7 @@ class XOPChanAccess : public ChanServ::ChanAccess
 
 };
 
-class XOPChanAccessType : public Serialize::Type<XOPChanAccess, ChanServ::ChanAccessType>
+class XOPChanAccessType : public Serialize::Type<XOPChanAccess, ChanAccessType>
 {
  public:
 	Serialize::Field<XOPChanAccess, Anope::string> type;
@@ -647,5 +651,10 @@ class CSXOP : public Module
 		}
 	}
 };
+
+template<> void ModuleInfo<CSXOP>(ModuleDef *def)
+{
+	def->Depends("chanserv");
+}
 
 MODULE_INIT(CSXOP)

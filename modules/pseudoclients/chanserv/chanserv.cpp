@@ -19,6 +19,8 @@
 #include "channeltype.h"
 #include "leveltype.h"
 #include "modetype.h"
+#include "chanaccesstype.h"
+#include "chanaccess.h"
 
 class ChanServCore : public Module
 	, public ChanServ::ChanServService
@@ -52,7 +54,7 @@ class ChanServCore : public Module
 	std::vector<ChanServ::Privilege> Privileges;
 	ChanServ::registered_channel_map registered_channels;
 	ChannelType channel_type;
-	ChanServ::ChanAccessType chanaccess_type;
+	ChanAccessType chanaccess_type;
 	LevelType level_type;
 	CSModeType mode_type;
 
@@ -187,54 +189,6 @@ class ChanServCore : public Module
 	void ClearPrivileges() override
 	{
 		Privileges.clear();
-	}
-
-	bool Matches(ChanServ::ChanAccess *access, const User *u, NickServ::Account *acc, ChanServ::ChanAccess::Path &p) override
-	{
-		if (access->GetAccount())
-			return access->GetAccount() == acc;
-
-		if (u)
-		{
-			bool is_mask = access->Mask().find_first_of("!@?*") != Anope::string::npos;
-			if (is_mask && Anope::Match(u->nick, access->Mask()))
-				return true;
-			else if (Anope::Match(u->GetDisplayedMask(), access->Mask()))
-				return true;
-		}
-
-		if (acc)
-			for (NickServ::Nick *na : acc->GetRefs<NickServ::Nick *>(NickServ::nick))
-				if (Anope::Match(na->GetNick(), access->Mask()))
-					return true;
-
-		if (IRCD->IsChannelValid(access->Mask()))
-		{
-			ChanServ::Channel *tci = Find(access->Mask());
-			if (tci)
-			{
-				for (unsigned i = 0; i < tci->GetAccessCount(); ++i)
-				{
-					ChanServ::ChanAccess *a = tci->GetAccess(i);
-					std::pair<ChanServ::ChanAccess *, ChanServ::ChanAccess *> pair = std::make_pair(access, a);
-
-					std::pair<Set::iterator, Set::iterator> range = p.first.equal_range(access);
-					for (; range.first != range.second; ++range.first)
-						if (range.first->first == pair.first && range.first->second == pair.second)
-							goto cont;
-
-					p.first.insert(pair);
-					if (a->Matches(u, acc, p))
-						p.second.insert(pair);
-
-					cont:;
-				}
-
-				return p.second.count(access) > 0;
-			}
-		}
-
-		return false;
 	}
 
 	void OnReload(Configuration::Conf *conf) override

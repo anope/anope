@@ -141,11 +141,6 @@ namespace ChanServ
 		virtual Privilege *FindPrivilege(const Anope::string &name) anope_abstract;
 		virtual std::vector<Privilege> &GetPrivileges() anope_abstract;
 		virtual void ClearPrivileges() anope_abstract;
-
-		//XXX
-		typedef std::multimap<ChanAccess *, ChanAccess *> Set;
-		typedef std::pair<Set, Set> Path;
-		virtual bool Matches(ChanAccess *, const User *u, NickServ::Account *acc, Path &p) anope_abstract;
 	};
 	static ServiceReference<ChanServService> service("ChanServService", "ChanServ");
 
@@ -377,36 +372,33 @@ namespace ChanServ
 		ChanAccess(Serialize::TypeBase *type) : Serialize::Object(type) { }
 		ChanAccess(Serialize::TypeBase *type, Serialize::ID id) : Serialize::Object(type, id) { }
 
-		inline Channel *GetChannel();
-		inline void SetChannel(Channel *ci);
+		virtual Channel *GetChannel() anope_abstract;
+		virtual void SetChannel(Channel *ci) anope_abstract;
 
-		inline Anope::string GetCreator();
-		inline void SetCreator(const Anope::string &c);
+		virtual Anope::string GetCreator() anope_abstract;
+		virtual void SetCreator(const Anope::string &c) anope_abstract;
 
-		inline time_t GetLastSeen();
-		inline void SetLastSeen(const time_t &t);
+		virtual time_t GetLastSeen() anope_abstract;
+		virtual void SetLastSeen(const time_t &t) anope_abstract;
 
-		inline time_t GetCreated();
-		inline void SetCreated(const time_t &t);
+		virtual time_t GetCreated() anope_abstract;
+		virtual void SetCreated(const time_t &t) anope_abstract;
 
-		inline Anope::string GetMask();
-		inline void SetMask(const Anope::string &);
+		virtual Anope::string GetMask() anope_abstract;
+		virtual void SetMask(const Anope::string &) anope_abstract;
 
-		inline Serialize::Object *GetObj();
-		inline void SetObj(Serialize::Object *);
+		virtual Serialize::Object *GetObj() anope_abstract;
+		virtual void SetObj(Serialize::Object *) anope_abstract;
 
-		inline Anope::string Mask();
-		inline NickServ::Account *GetAccount();
+		virtual Anope::string Mask() anope_abstract;
+		virtual NickServ::Account *GetAccount() anope_abstract;
 
 		/** Check if this access entry matches the given user or account
 		 * @param u The user
-		 * @param nc The account
+		 * @param acc The account
 		 * @param p The path to the access object which matches will be put here
 		 */
-		virtual bool Matches(const User *u, NickServ::Account *acc, Path &p)
-		{
-			return service->Matches(this, u, acc, p);
-		}
+		virtual bool Matches(const User *u, NickServ::Account *acc, Path &p) anope_abstract;
 
 		/** Check if this access entry has the given privilege.
 		 * @param name The privilege name
@@ -425,7 +417,7 @@ namespace ChanServ
 		virtual void AccessUnserialize(const Anope::string &data) anope_abstract;
 
 		/* Comparison operators to other Access entries */
-		virtual bool operator>(ChanAccess &other)
+		bool operator>(ChanAccess &other)
 		{
 			const std::vector<Privilege> &privs = service->GetPrivileges();
 			for (unsigned i = privs.size(); i > 0; --i)
@@ -442,7 +434,7 @@ namespace ChanServ
 			return false;
 		}
 
-		virtual bool operator<(ChanAccess &other)
+		bool operator<(ChanAccess &other)
 		{
 			const std::vector<Privilege> &privs = service->GetPrivileges();
 			for (unsigned i = privs.size(); i > 0; --i)
@@ -469,103 +461,6 @@ namespace ChanServ
 			return !(*this > other);
 		}
 	};
-
-	class ChanAccessType : public Serialize::AbstractType
-	{
-	 public:
-		Serialize::ObjectField<ChanServ::ChanAccess, ChanServ::Channel *> ci;
-		Serialize::Field<ChanServ::ChanAccess, Anope::string> mask;
-		Serialize::ObjectField<ChanServ::ChanAccess, Serialize::Object *> obj;
-		Serialize::Field<ChanServ::ChanAccess, Anope::string> creator;
-		Serialize::Field<ChanServ::ChanAccess, time_t> last_seen;
-		Serialize::Field<ChanServ::ChanAccess, time_t> created;
-
-		ChanAccessType(Module *me, const Anope::string &name) : Serialize::AbstractType(me, name)
-			, ci(this, "ci", true)
-			, mask(this, "mask")
-			, obj(this, "obj", true)
-			, creator(this, "creator")
-			, last_seen(this, "last_seen")
-			, created(this, "created")
-		{
-		}
-	};
-
-	ChanServ::Channel *ChanAccess::GetChannel()
-	{
-		return Get(&ChanAccessType::ci);
-	}
-
-	void ChanAccess::SetChannel(ChanServ::Channel *ci)
-	{
-		Object::Set(&ChanAccessType::ci, ci);
-	}
-
-	Anope::string ChanAccess::GetCreator()
-	{
-		return Get(&ChanAccessType::creator);
-	}
-
-	void ChanAccess::SetCreator(const Anope::string &c)
-	{
-		Object::Set(&ChanAccessType::creator, c);
-	}
-
-	time_t ChanAccess::GetLastSeen()
-	{
-		return Get(&ChanAccessType::last_seen);
-	}
-
-	void ChanAccess::SetLastSeen(const time_t &t)
-	{
-		Object::Set(&ChanAccessType::last_seen, t);
-	}
-
-	time_t ChanAccess::GetCreated()
-	{
-		return Get(&ChanAccessType::created);
-	}
-
-	void ChanAccess::SetCreated(const time_t &t)
-	{
-		Object::Set(&ChanAccessType::created, t);
-	}
-
-	Anope::string ChanAccess::GetMask()
-	{
-		return Get(&ChanAccessType::mask);
-	}
-
-	void ChanAccess::SetMask(const Anope::string &n)
-	{
-		Object::Set(&ChanAccessType::mask, n);
-	}
-
-	Serialize::Object *ChanAccess::GetObj()
-	{
-		return Get(&ChanAccessType::obj);
-	}
-
-	void ChanAccess::SetObj(Serialize::Object *o)
-	{
-		Object::Set(&ChanAccessType::obj, o);
-	}
-
-	Anope::string ChanAccess::Mask()
-	{
-		if (NickServ::Account *acc = GetAccount())
-			return acc->GetDisplay();
-
-		return GetMask();
-	}
-
-	NickServ::Account *ChanAccess::GetAccount()
-	{
-		if (!GetObj() || GetObj()->GetSerializableType() != NickServ::account)
-			return nullptr;
-
-		return anope_dynamic_static_cast<NickServ::Account *>(GetObj());
-	}
 
 	static Serialize::TypeReference<ChanAccess> chanaccess("ChanAccess");
 

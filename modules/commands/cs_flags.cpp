@@ -9,16 +9,20 @@
  * Based on the original code of Services by Andy Church.
  */
 
+/* Dependencies: chanserv */
+
 #include "module.h"
 #include "modules/cs_access.h"
+#include "../pseudoclients/chanserv/chanaccess.h"
+#include "../pseudoclients/chanserv/chanaccesstype.h"
 
 static std::map<Anope::string, char> defaultFlags;
 
-class FlagsChanAccess : public ChanServ::ChanAccess
+class FlagsChanAccess : public ChanAccessImpl
 {
  public:
-	FlagsChanAccess(Serialize::TypeBase *type) : ChanServ::ChanAccess(type) { }
-	FlagsChanAccess(Serialize::TypeBase *type, Serialize::ID id) : ChanServ::ChanAccess(type, id) { }
+	FlagsChanAccess(Serialize::TypeBase *type) : ChanAccessImpl(type) { }
+	FlagsChanAccess(Serialize::TypeBase *type, Serialize::ID id) : ChanAccessImpl(type, id) { }
 
 	Anope::string GetFlags();
 	void SetFlags(const Anope::string &);
@@ -57,7 +61,7 @@ class FlagsChanAccess : public ChanServ::ChanAccess
 	}
 };
 
-class FlagsChanAccessType : public Serialize::Type<FlagsChanAccess, ChanServ::ChanAccessType>
+class FlagsChanAccessType : public Serialize::Type<FlagsChanAccess, ChanAccessType>
 {
  public:
 	Serialize::Field<FlagsChanAccess, Anope::string> flags;
@@ -517,5 +521,10 @@ class CSFlags : public Module
 		}
 	}
 };
+
+template<> void ModuleInfo<CSFlags>(ModuleDef *def)
+{
+	def->Depends("chanserv");
+}
 
 MODULE_INIT(CSFlags)

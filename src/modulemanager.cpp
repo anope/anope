@@ -23,6 +23,16 @@
 
 std::list<Module *> ModuleManager::Modules;
 
+void ModuleDef::Depends(const Anope::string &modname)
+{
+	dependencies.push_back(modname);
+}
+
+const std::vector<Anope::string> &ModuleDef::GetDependencies()
+{
+	return dependencies;
+}
+
 #ifdef _WIN32
 void ModuleManager::CleanupRuntimeDirectory()
 {
@@ -111,22 +121,6 @@ static ModuleReturn moduleCopyFile(const Anope::string &name, Anope::string &out
 }
 #endif
 
-/* This code was found online at http://www.linuxjournal.com/article/3687#comment-26593
- *
- * This function will take a pointer from either dlsym or GetProcAddress and cast it in
- * a way that won't cause C++ warnings/errors to come up.
- */
-template <class TYPE> static TYPE function_cast(void *symbol)
-{
-	union
-	{
-		void *symbol;
-		TYPE function;
-	} cast;
-	cast.symbol = symbol;
-	return cast.function;
-}
-
 ModuleReturn ModuleManager::LoadModule(const Anope::string &modname, User *u)
 {
 	if (modname.empty())
@@ -166,16 +160,18 @@ ModuleReturn ModuleManager::LoadModule(const Anope::string &modname, User *u)
 	}
 
 	dlerror();
-	Module *(*func)(const Anope::string &, const Anope::string &) = function_cast<Module *(*)(const Anope::string &, const Anope::string &)>(dlsym(handle, "AnopeInit"));
+	AnopeModule *module = static_cast<AnopeModule *>(dlsym(handle, "AnopeMod"));
 	err = dlerror();
-	if (!func)
+	if (!module || !module->init || !module->fini)
 	{
-		Log() << "No init function found, not an Anope module";
+		Log() << "No module symbols function found, not an Anope module";
 		if (err && *err)
 			Log(LOG_DEBUG) << err;
 		dlclose(handle);
 		return MOD_ERR_NOLOAD;
 	}
+
+	ModuleDef *def = module->init();
 	
 	/* Create module. */
 	Anope::string nick;
@@ -187,7 +183,7 @@ ModuleReturn ModuleManager::LoadModule(const Anope::string &modname, User *u)
 	ModuleReturn moderr = MOD_ERR_OK;
 	try
 	{
-		m = func(modname, nick);
+		m = def->Create(modname, nick);
 	}
 	catch (const ModuleException &ex)
 	{
@@ -204,6 +200,8 @@ ModuleReturn ModuleManager::LoadModule(const Anope::string &modname, User *u)
 
 	m->filename = pbuf;
 	m->handle = handle;
+	m->def = def;
+	m->module = module;
 
 	ModuleVersion v = m->GetVersion();
 	if (v.GetMajor() < Anope::VersionMajor() || (v.GetMajor() == Anope::VersionMajor() && v.GetMinor() < Anope::VersionMinor()))
@@ -334,17 +332,13 @@ ModuleReturn ModuleManager::DeleteModule(Module *m)
 
 	Log(LOG_DEBUG) << "Unloading module " << m->name;
 
-	dlerror();
-	void (*destroy_func)(Module *m) = function_cast<void (*)(Module *)>(dlsym(m->handle, "AnopeFini"));
-	const char *err = dlerror();
-	if (!destroy_func || (err && *err))
-	{
-		Log() << "No destroy function found for " << m->name << ", chancing delete...";
-		delete m; /* we just have to chance they haven't overwrote the delete operator then... */
-	}
-	else
-		destroy_func(m); /* Let the module delete it self, just in case */
+	ModuleDef *def = m->def;
+	AnopeModule *module = m->module;
 
+	def->Destroy(m);
+	module->fini(def);
+
+	dlerror();
 	if (dlclose(handle))
 		Log() << dlerror();
 

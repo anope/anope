@@ -18,7 +18,7 @@ macro(build_modules SRC)
 
           file(RELATIVE_PATH FNAME ${SRC} ${MODULE_SRC})
           # Convert the real source file extension to have a .so extension
-          string(REGEX REPLACE "\\.cpp$" ".so" SO ${FNAME})
+          string(REGEX REPLACE "\\.cpp$" "" SO ${FNAME})
 
           # Reset linker flags
           set(TEMP_LDFLAGS)
@@ -40,7 +40,7 @@ macro(build_modules SRC)
           else(WIN32)
             set(WIN32_NO_LIBS)
           endif(WIN32)
-          set_target_properties(${SO} PROPERTIES LINKER_LANGUAGE CXX PREFIX "" SUFFIX "" LINK_FLAGS "${TEMP_LDFLAGS} ${WIN32_NO_LIBS}" INSTALL_RPATH_USE_LINK_PATH ON BUILD_WITH_INSTALL_RPATH ON)
+          set_target_properties(${SO} PROPERTIES LINKER_LANGUAGE CXX PREFIX "" SUFFIX ".so" LINK_FLAGS "${TEMP_LDFLAGS} ${WIN32_NO_LIBS}" INSTALL_RPATH_USE_LINK_PATH ON BUILD_WITH_INSTALL_RPATH ON)
           add_dependencies(${SO} ${PROGRAM_NAME})
           if(GETTEXT_FOUND)
             add_dependencies(${SO} module_language)
@@ -55,6 +55,7 @@ macro(build_modules SRC)
               target_link_libraries(${SO} ${PROGRAM_NAME})
             endif(APPLE)
           endif(WIN32)
+          calculate_dependencies(${MODULE_SRC})
           # Set the module to be installed to the module directory under the data directory
           install(TARGETS ${SO} DESTINATION ${LIB_DIR}/modules)
         endif(CPP)
@@ -68,7 +69,7 @@ macro(build_subdir)
   list(SORT MODULES_SUBDIR_SRCS)
 
   GET_FILENAME_COMPONENT(FOLDER_NAME ${CMAKE_CURRENT_SOURCE_DIR} NAME)
-  set(SO "${FOLDER_NAME}.so")
+  set(SO "${FOLDER_NAME}")
 
   # Set all the files to use C++ as well as set their compile flags (use the module-specific compile flags, though)
   set_source_files_properties(${MODULES_SUBDIR_SRCS} PROPERTIES LANGUAGE CXX COMPILE_FLAGS "${CXXFLAGS}")
@@ -81,6 +82,7 @@ macro(build_subdir)
     set(TEMP_DEPENDENCIES)
     # Calculate the library dependencies for the given source file
     calculate_libraries(${SRC} SKIP_LIBRARIES MODULE TEMP_LDFLAGS TEMP_DEPENDENCIES)
+    calculate_dependencies(${SRC})
 
     # Append this source file's linker flags to the subdirectoy's linker flags, if there are any to append
     if(TEMP_DEPENDENCIES)
@@ -107,7 +109,7 @@ macro(build_subdir)
 
   # Generate the module and set it's linker flags, also set it to depend on the main Anope executable to be built beforehand
   add_library(${SO} MODULE ${MODULES_SUBDIR_SRCS})
-  set_target_properties(${SO} PROPERTIES LINKER_LANGUAGE CXX PREFIX "" SUFFIX "" LINK_FLAGS "${SUBDIR_LDFLAGS}" INSTALL_RPATH_USE_LINK_PATH ON BUILD_WITH_INSTALL_RPATH ON)
+  set_target_properties(${SO} PROPERTIES LINKER_LANGUAGE CXX PREFIX "" SUFFIX ".so" LINK_FLAGS "${SUBDIR_LDFLAGS}" INSTALL_RPATH_USE_LINK_PATH ON BUILD_WITH_INSTALL_RPATH ON)
   add_dependencies(${SO} ${PROGRAM_NAME})
   if(GETTEXT_FOUND)
     add_dependencies(${SO} module_language)

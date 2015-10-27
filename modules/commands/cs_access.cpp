@@ -9,15 +9,19 @@
  * Based on the original code of Services by Andy Church.
  */
 
+/* Dependencies: chanserv */
+
 #include "module.h"
 #include "modules/chanserv.h"
 #include "modules/cs_access.h"
+#include "../pseudoclients/chanserv/chanaccess.h"
+#include "../pseudoclients/chanserv/chanaccesstype.h"
 
-class AccessChanAccess : public ChanServ::ChanAccess
+class AccessChanAccess : public ChanAccessImpl
 {
  public:
-	AccessChanAccess(Serialize::TypeBase *type) : ChanServ::ChanAccess(type) { }
-	AccessChanAccess(Serialize::TypeBase *type, Serialize::ID id) : ChanServ::ChanAccess(type, id) { }
+	AccessChanAccess(Serialize::TypeBase *type) : ChanAccessImpl(type) { }
+	AccessChanAccess(Serialize::TypeBase *type, Serialize::ID id) : ChanAccessImpl(type, id) { }
 
 	int GetLevel();
 	void SetLevel(const int &);
@@ -43,6 +47,7 @@ class AccessChanAccess : public ChanServ::ChanAccess
 		}
 	}
 
+#if 0
 	bool operator>(ChanServ::ChanAccess &other) override
 	{
 		if (this->GetSerializableType() != other.GetSerializableType())
@@ -58,9 +63,10 @@ class AccessChanAccess : public ChanServ::ChanAccess
 		else
 			return this->GetLevel() < anope_dynamic_static_cast<AccessChanAccess *>(&other)->GetLevel();
 	}
+#endif
 };
 
-class AccessChanAccessType : public Serialize::Type<AccessChanAccess, ChanServ::ChanAccessType>
+class AccessChanAccessType : public Serialize::Type<AccessChanAccess, ChanAccessType>
 {
  public:
 	Serialize::Field<AccessChanAccess, int> level;
@@ -919,5 +925,10 @@ class CSAccess : public Module
 		return EVENT_CONTINUE;
 	}
 };
+
+template<> void ModuleInfo<CSAccess>(ModuleDef *def)
+{
+	def->Depends("chanserv");
+}
 
 MODULE_INIT(CSAccess)

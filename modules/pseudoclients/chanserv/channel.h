@@ -3,11 +3,9 @@
 class ChannelImpl : public ChanServ::Channel
 {
  public:
-	//using ChanServ::Channel::Channel;
 	ChannelImpl(Serialize::TypeBase *type) : ChanServ::Channel(type) { }
 	ChannelImpl(Serialize::TypeBase *type, Serialize::ID id) : ChanServ::Channel(type, id) { }
 	ChannelImpl(Serialize::TypeBase *type, const Anope::string &chname);
-	/*ChannelImpl(const ChanServ::Channel &ci);*/
 	~ChannelImpl();
 	void Delete() override;
 

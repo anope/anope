@@ -104,6 +104,8 @@ namespace Configuration
 		bool UseStrictPrivmsg;
 		/* flag for options:regexengine */
 		std::regex::flag_type regex_flags;
+		/* networkinfo:nickchars */
+		Anope::string NickChars;
 
 		/* either "/msg " or "/" */
 		Anope::string StrictPrivmsg;

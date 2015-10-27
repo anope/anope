@@ -139,9 +139,13 @@ class SQLineManager : public XLineManager
 				if (std::regex_match(c->name.str(), *x->regex))
 					return x;
 			}
-			else if (Anope::Match(c->name, x->GetMask(), false, true))
+			else
 			{
-				return x;
+				if (x->GetMask().empty() || x->GetMask()[0] != '#')
+					continue;
+
+				if (Anope::Match(c->name, x->GetMask(), false, true))
+					return x;
 			}
 		}
 		return nullptr;

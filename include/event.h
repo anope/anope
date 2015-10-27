@@ -358,11 +358,12 @@ namespace Event
 	struct CoreExport TopicUpdated : Events
 	{
 		/** Called when a new topic is set
+		 * @param source
 		 * @param c The channel
 		 * @param setter The user who set the new topic
 		 * @param topic The new topic
 		 */
-		virtual void OnTopicUpdated(Channel *c, const Anope::string &user, const Anope::string &topic) anope_abstract;
+		virtual void OnTopicUpdated(User *source, Channel *c, const Anope::string &user, const Anope::string &topic) anope_abstract;
 	};
 	extern CoreExport EventHandlers<TopicUpdated> OnTopicUpdated;
 

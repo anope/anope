@@ -15,6 +15,20 @@
 
 class CommandCSClone : public Command
 {
+#if 0
+	void CopyLevels(CommandSource &source, ChannelInfo *ci, ChannelInfo *target_ci)
+	{
+		const Anope::map<int16_t> &cilevels = ci->GetLevelEntries();
+
+		for (Anope::map<int16_t>::const_iterator it = cilevels.begin(); it != cilevels.end(); ++it)
+		{
+			target_ci->SetLevel(it->first, it->second);
+		}
+
+		source.Reply(_("All level entries from \002%s\002 have been cloned into \002%s\002."), ci->name.c_str(), target_ci->name.c_str());
+	}
+#endif
+
 public:
 	CommandCSClone(Module *creator) : Command(creator, "chanserv/clone", 2, 3)
 	{
@@ -73,7 +87,7 @@ public:
 
 		if (what.empty())
 		{
-			delete target_ci;
+			target_ci->Delete();
 			target_ci = ChanServ::channel.Create();
 			target_ci->SetName(target);
 			ChanServ::registered_channel_map& map = ChanServ::service->GetChannels();

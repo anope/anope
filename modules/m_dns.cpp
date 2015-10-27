@@ -22,10 +22,15 @@ namespace
 	time_t timeout;
 }
 
-/** A full packet sent or recieved to/from the nameserver
+/** A full packet sent or received to/from the nameserver
  */
 class Packet : public Query
 {
+	static bool IsValidName(const Anope::string &name)
+	{
+		return name.find_first_not_of("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ.-") == Anope::string::npos;
+	}
+
 	void PackName(unsigned char *output, unsigned short output_size, unsigned short &pos, const Anope::string &name)
 	{
 		if (pos + name.length() + 2 > output_size)
@@ -116,6 +121,9 @@ class Packet : public Query
 		if (pos + 4 > input_size)
 			throw SocketException("Unable to unpack question");
 
+		if (!IsValidName(question.name))
+			throw SocketException("Invalid question name");
+
 		question.type = static_cast<QueryType>(input[pos] << 8 | input[pos + 1]);
 		pos += 2;
 
@@ -179,6 +187,10 @@ class Packet : public Query
 			case QUERY_PTR:
 			{
 				record.rdata = this->UnpackName(input, input_size, pos);
+
+				if (!IsValidName(record.rdata))
+					throw SocketException("Invalid cname/ptr record data");
+
 				break;
 			}
 			default:
@@ -792,7 +804,7 @@ class MyManager : public Manager, public Timer
 			}
 
 			Packet *packet = new Packet(recv_packet);
-			packet->flags |= QUERYFLAGS_QR; /* This is a reponse */
+			packet->flags |= QUERYFLAGS_QR; /* This is a response */
 			packet->flags |= QUERYFLAGS_AA; /* And we are authoritative */
 
 			packet->answers.clear();

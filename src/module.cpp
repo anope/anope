@@ -97,8 +97,11 @@ void Module::SetAuthor(const Anope::string &nauthor)
 	this->author = nauthor;
 }
 
-ModuleVersion::ModuleVersion(int maj, int min, int pa) : version_major(maj), version_minor(min), version_patch(pa)
+ModuleVersion::ModuleVersion(const ModuleVersionC &ver)
 {
+	version_major = ver.version_major;
+	version_minor = ver.version_minor;
+	version_patch = ver.version_patch;
 }
 
 int ModuleVersion::GetMajor() const

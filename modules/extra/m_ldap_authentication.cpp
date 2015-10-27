@@ -31,36 +31,29 @@ struct IdentifyInfo
 
 class IdentifyInterface : public LDAPInterface
 {
-	std::map<LDAPQuery, IdentifyInfo *> requests;
+	IdentifyInfo *ii;
 
  public:
-	IdentifyInterface(Module *m) : LDAPInterface(m) { }
+	IdentifyInterface(Module *m, IdentifyInfo *i) : LDAPInterface(m), ii(i) { }
 
-	void Add(LDAPQuery id, IdentifyInfo *ii)
+	~IdentifyInterface()
 	{
-		std::map<LDAPQuery, IdentifyInfo *>::iterator it = this->requests.find(id);
-		if (it != this->requests.end())
-			delete it->second;
-		this->requests[id] = ii;
+		delete ii;
+	}
+
+	void OnDelete() anope_override
+	{
+		delete this;
 	}
 
 	void OnResult(const LDAPResult &r) override
 	{
-		std::map<LDAPQuery, IdentifyInfo *>::iterator it = this->requests.find(r.id);
-		if (it == this->requests.end())
-			return;
-		IdentifyInfo *ii = it->second;
-		this->requests.erase(it);
-
 		if (!ii->lprov)
-		{
-			delete ii;
 			return;
-		}
 
 		switch (r.type)
 		{
-			case LDAPResult::QUERY_SEARCH:
+			case QUERY_SEARCH:
 			{
 				if (!r.empty())
 				{
@@ -69,9 +62,9 @@ class IdentifyInterface : public LDAPInterface
 						const LDAPAttributes &attr = r.get(0);
 						ii->dn = attr.get("dn");
 						Log(LOG_DEBUG) << "m_ldap_authenticationn: binding as " << ii->dn;
-						LDAPQuery id = ii->lprov->Bind(this, ii->dn, ii->req->GetPassword());
-						this->Add(id, ii);
-						return;
+
+						ii->lprov->Bind(new IdentifyInterface(this->owner, ii), ii->dn, ii->req->GetPassword());
+						ii = NULL;
 					}
 					catch (const LDAPException &ex)
 					{
@@ -80,7 +73,7 @@ class IdentifyInterface : public LDAPInterface
 				}
 				break;
 			}
-			case LDAPResult::QUERY_BIND:
+			case QUERY_BIND:
 			{
 				if (ii->admin_bind)
 				{
@@ -88,10 +81,9 @@ class IdentifyInterface : public LDAPInterface
 					try
 					{
 						Log(LOG_DEBUG) << "m_ldap_authentication: searching for " << sf;
-						LDAPQuery id = ii->lprov->Search(this, basedn, sf);
-						this->Add(id, ii);
+						ii->lprov->Search(new IdentifyInterface(this->owner, ii), basedn, sf);
 						ii->admin_bind = false;
-						return;
+						ii = NULL;
 					}
 					catch (const LDAPException &ex)
 					{
@@ -121,40 +113,28 @@ class IdentifyInterface : public LDAPInterface
 			default:
 				break;
 		}
-
-		delete ii;
 	}
 
 	void OnError(const LDAPResult &r) override
 	{
-		std::map<LDAPQuery, IdentifyInfo *>::iterator it = this->requests.find(r.id);
-		if (it == this->requests.end())
-			return;
-		IdentifyInfo *ii = it->second;
-		this->requests.erase(it);
-		delete ii;
 	}
 };
 
 class OnIdentifyInterface : public LDAPInterface
 {
-	std::map<LDAPQuery, Anope::string> requests;
+	Anope::string uid;
 
  public:
-	OnIdentifyInterface(Module *m) : LDAPInterface(m) { }
+	OnIdentifyInterface(Module *m, const Anope::string &i) : LDAPInterface(m), uid(i) { }
 
-	void Add(LDAPQuery id, const Anope::string &nick)
+	void OnDelete() anope_override
 	{
-		this->requests[id] = nick;
+		delete this;
 	}
 
 	void OnResult(const LDAPResult &r) override
 	{
-		std::map<LDAPQuery, Anope::string>::iterator it = this->requests.find(r.id);
-		if (it == this->requests.end())
-			return;
-		User *u = User::Find(it->second);
-		this->requests.erase(it);
+		User *u = User::Find(uid);
 
 		if (!u || !u->Account() || r.empty())
 			return;
@@ -181,7 +161,6 @@ class OnIdentifyInterface : public LDAPInterface
 
 	void OnError(const LDAPResult &r) override
 	{
-		this->requests.erase(r.id);
 		Log(this->owner) << r.error;
 	}
 };
@@ -202,15 +181,13 @@ class OnRegisterInterface : public LDAPInterface
 	}
 };
 
-class NSIdentifyLDAP : public Module
+class ModuleLDAPAuthentication : public Module
 	, public EventHook<Event::PreCommand>
 	, public EventHook<Event::CheckAuthentication>
 	, public EventHook<Event::NickIdentify>
 	, public EventHook<NickServ::Event::NickRegister>
 {
 	ServiceReference<LDAPProvider> ldap;
-	IdentifyInterface iinterface;
-	OnIdentifyInterface oninterface;
 	OnRegisterInterface orinterface;
 
 	PrimitiveExtensibleItem<Anope::string> dn;
@@ -218,29 +195,18 @@ class NSIdentifyLDAP : public Module
 	Anope::string password_attribute;
 	Anope::string disable_register_reason;
 	Anope::string disable_email_reason;
- public:
 
-	NSIdentifyLDAP(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, EXTRA | VENDOR)
+ public:
+	ModuleLDAPAuthentication(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, EXTRA | VENDOR)
 		, EventHook<Event::PreCommand>("OnPreCommand", EventHook<Event::PreCommand>::Priority::FIRST)
 		, EventHook<Event::CheckAuthentication>("OnCheckAuthentication", EventHook<Event::CheckAuthentication>::Priority::FIRST)
 		, EventHook<Event::NickIdentify>("OnNickIdentify", EventHook<Event::NickIdentify>::Priority::FIRST)
 		, EventHook<NickServ::Event::NickRegister>("OnNickRegister", EventHook<NickServ::Event::NickRegister>::Priority::FIRST)
 		, ldap("LDAPProvider", "ldap/main")
-		, iinterface(this)
-		, oninterface(this)
 		, orinterface(this)
 		, dn(this, "m_ldap_authentication_dn")
 	{
-
 		me = this;
-<<<<<<< HEAD
-=======
-	}
-
-	void Prioritize() anope_override
-	{
-		ModuleManager::SetPriority(this, PRIORITY_FIRST);
->>>>>>> 2.0
 	}
 
 	void OnReload(Configuration::Conf *config) override
@@ -287,16 +253,7 @@ class NSIdentifyLDAP : public Module
 			return;
 
 		IdentifyInfo *ii = new IdentifyInfo(u, req, this->ldap);
-		try
-		{
-			LDAPQuery id = this->ldap->BindAsAdmin(&this->iinterface);
-			this->iinterface.Add(id, ii);
-		}
-		catch (const LDAPException &ex)
-		{
-			delete ii;
-			Log(this) << ex.GetReason();
-		}
+		this->ldap->BindAsAdmin(new IdentifyInterface(this, ii));
 	}
 
 	void OnNickIdentify(User *u) override
@@ -308,57 +265,38 @@ class NSIdentifyLDAP : public Module
 		if (!d || d->empty())
 			return;
 
-		try
-		{
-			LDAPQuery id = this->ldap->Search(&this->oninterface, *d, "(" + email_attribute + "=*)");
-			this->oninterface.Add(id, u->nick);
-		}
-		catch (const LDAPException &ex)
-		{
-			Log(this) << ex.GetReason();
-		}
+		this->ldap->Search(new OnIdentifyInterface(this, u->GetUID()), *d, "(" + email_attribute + "=*)");
 	}
 
-<<<<<<< HEAD
-	void OnNickRegister(User *, NickServ::Nick *na) override
-=======
-	void OnNickRegister(User *, NickAlias *na, const Anope::string &pass) anope_override
->>>>>>> 2.0
+	void OnNickRegister(User *, NickServ::Nick *na, const Anope::string &pass) override
 	{
 		if (!this->disable_register_reason.empty() || !this->ldap)
 			return;
 
-		try
+		this->ldap->BindAsAdmin(NULL);
+
+		LDAPMods attributes;
+		attributes.resize(4);
+
+		attributes[0].name = "objectClass";
+		attributes[0].values.push_back("top");
+		attributes[0].values.push_back(object_class);
+
+		attributes[1].name = username_attribute;
+		attributes[1].values.push_back(na->GetNick());
+
+		if (!na->GetAccount()->GetEmail().empty())
 		{
-			this->ldap->BindAsAdmin(NULL);
-
-			LDAPMods attributes;
-			attributes.resize(4);
-
-			attributes[0].name = "objectClass";
-			attributes[0].values.push_back("top");
-			attributes[0].values.push_back(object_class);
-
-			attributes[1].name = username_attribute;
-			attributes[1].values.push_back(na->GetNick());
-
-			if (!na->GetAccount()->GetEmail().empty())
-			{
-				attributes[2].name = email_attribute;
-				attributes[2].values.push_back(na->GetAccount()->GetEmail());
-			}
-
-			attributes[3].name = this->password_attribute;
-			attributes[3].values.push_back(pass);
-
-			Anope::string new_dn = username_attribute + "=" + na->GetNick() + "," + basedn;
-			this->ldap->Add(&this->orinterface, new_dn, attributes);
+			attributes[2].name = email_attribute;
+			attributes[2].values.push_back(na->GetAccount()->GetEmail());
 		}
-		catch (const LDAPException &ex)
-		{
-			Log(this) << ex.GetReason();
-		}
+
+		attributes[3].name = this->password_attribute;
+		attributes[3].values.push_back(pass);
+
+		Anope::string new_dn = username_attribute + "=" + na->GetNick() + "," + basedn;
+		this->ldap->Add(&this->orinterface, new_dn, attributes);
 	}
 };
 
-MODULE_INIT(NSIdentifyLDAP)
+MODULE_INIT(ModuleLDAPAuthentication)

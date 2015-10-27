@@ -31,6 +31,12 @@ class WebpanelRequest : public NickServ::IdentifyRequestListener
 			return;
 		}
 
+		if (na->GetAccount()->HasFieldS("NS_SUSPENDED"))
+		{
+			this->OnFail(req);
+			return;
+		}
+
 		Anope::string id;
 		for (int i = 0; i < 64; ++i)
 		{

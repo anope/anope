@@ -1,7 +1,7 @@
 /* ircd-hybrid-8 protocol module
  *
  * (C) 2003-2014 Anope Team
- * (C) 2012-2014 ircd-hybrid development team
+ * (C) 2012-2015 ircd-hybrid development team
  *
  * Please read COPYING and README for further details.
  *
@@ -43,7 +43,7 @@ class HybridProto : public IRCDProto
 	}
 
   public:
-	HybridProto(Module *creator) : IRCDProto(creator, "Hybrid 8.1.x")
+	HybridProto(Module *creator) : IRCDProto(creator, "Hybrid 8.2.x")
 	{
 		DefaultPseudoclientModes = "+oi";
 		CanSVSNick = true;
@@ -55,7 +55,7 @@ class HybridProto : public IRCDProto
 		CanCertFP = true;
 		CanSetVHost = true;
 		RequiresID = true;
-		MaxModes = 4;
+		MaxModes = 6;
 	}
 
 	void SendInvite(const MessageSource &source, const Channel *c, User *u) override
@@ -71,11 +71,6 @@ class HybridProto : public IRCDProto
 	void SendGlobalPrivmsg(ServiceBot *bi, const Server *dest, const Anope::string &msg) override
 	{
 		UplinkSocket::Message(bi) << "PRIVMSG $$" << dest->GetName() << " :" << msg;
-	}
-
-	void SendGlobopsInternal(const MessageSource &source, const Anope::string &buf) override
-	{
-		UplinkSocket::Message(source) << "GLOBOPS :" << buf;
 	}
 
 	void SendSQLine(User *, XLine *x) override
@@ -216,7 +211,7 @@ class HybridProto : public IRCDProto
 
 		SendServer(Me);
 
-		UplinkSocket::Message() << "SVINFO 6 5 0 :" << Anope::CurTime;
+		UplinkSocket::Message() << "SVINFO 6 6 0 :" << Anope::CurTime;
 	}
 
 	void SendClientIntroduction(User *u) override
@@ -224,7 +219,7 @@ class HybridProto : public IRCDProto
 		Anope::string modes = "+" + u->GetModes();
 
 		UplinkSocket::Message(Me) << "UID " << u->nick << " 1 " << u->timestamp << " " << modes << " "
-					 << u->GetIdent() << " " << u->host << " 0 " << u->GetUID() << " 0 :" << u->realname;
+					 << u->GetIdent() << " " << u->host << " 0 " << u->GetUID() << " * :" << u->realname;
 	}
 
 	void SendEOB() override
@@ -244,7 +239,7 @@ class HybridProto : public IRCDProto
 
 	void SendLogout(User *u) override
 	{
-		IRCD->SendMode(Config->GetClient("NickServ"), u, "+d 0");
+		IRCD->SendMode(Config->GetClient("NickServ"), u, "+d *");
 	}
 
 	void SendChannel(Channel *c) override
@@ -264,7 +259,7 @@ class HybridProto : public IRCDProto
 
 	void SendForceNickChange(User *u, const Anope::string &newnick, time_t when) override
 	{
-		UplinkSocket::Message(Me) << "SVSNICK " << u->nick << " " << newnick << " " << when;
+		UplinkSocket::Message(Me) << "SVSNICK " << u->GetUID() << " " << newnick << " " << when;
 	}
 
 	void SendSVSJoin(const MessageSource &source, User *u, const Anope::string &chan, const Anope::string &) override
@@ -472,7 +467,7 @@ struct IRCDMessageSJoin : IRCDMessage
 			sju.second = User::Find(buf);
 			if (!sju.second)
 			{
-				Log(LOG_DEBUG) << "SJOIN for nonexistant user " << buf << " on " << params[1];
+				Log(LOG_DEBUG) << "SJOIN for non-existent user " << buf << " on " << params[1];
 				continue;
 			}
 
@@ -519,7 +514,7 @@ struct IRCDMessageTBurst : IRCDMessage
 		Channel *c = Channel::Find(params[1]);
 
 		if (c)
-			c->ChangeTopicInternal(setter, params[4], topic_time);
+			c->ChangeTopicInternal(NULL, setter, params[4], topic_time);
 	}
 };
 
@@ -553,7 +548,7 @@ struct IRCDMessageUID : IRCDMessage
 	IRCDMessageUID(Module *creator) : IRCDMessage(creator, "UID", 10) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
 
 	/*          0     1 2          3   4      5             6        7         8           9                   */
-	/* :0MC UID Steve 1 1350157102 +oi ~steve resolved.host 10.0.0.1 0MCAAAAAB 1350157108 :Mining all the time */
+	/* :0MC UID Steve 1 1350157102 +oi ~steve resolved.host 10.0.0.1 0MCAAAAAB Steve      :Mining all the time */
 	void Run(MessageSource &source, const std::vector<Anope::string> &params) override
 	{
 		Anope::string ip = params[6];
@@ -562,7 +557,7 @@ struct IRCDMessageUID : IRCDMessage
 			ip.clear();
 
 		NickServ::Nick *na = NULL;
-		if (params[8] != "0")
+		if (params[8] != "0" && params[8] != "*")
 			na = NickServ::FindNick(params[8]);
 
 		/* Source is always the server */

@@ -1,10 +1,13 @@
 # This usage of CMake requires at least version 2.8
 cmake_minimum_required(VERSION 2.8 FATAL_ERROR)
 
-# If the Source dir and the Binary dir are the same, we are building in-source, which we will disallow due to Autotools being there (but only on non-Windows)
-if(${CMAKE_CURRENT_SOURCE_DIR} STREQUAL ${CMAKE_CURRENT_BINARY_DIR} AND NOT WIN32)
-  message(FATAL_ERROR "You can not use CMake to build Anope from the root of it's source tree! Remove the CMakeCache.txt file from this directory, then create a separate directory (either below this directory or elsewhere), and then re-run CMake from there.")
-endif(${CMAKE_CURRENT_SOURCE_DIR} STREQUAL ${CMAKE_CURRENT_BINARY_DIR} AND NOT WIN32)
+cmake_policy(SET CMP0003 NEW)
+if(POLICY CMP0026)
+  cmake_policy(SET CMP0026 OLD)
+endif(POLICY CMP0026)
+if(POLICY CMP0007)
+  cmake_policy(SET CMP0007 OLD)
+endif(POLICY CMP0007)
 
 # Set the project as C++ primarily, but have C enabled for the checks required later
 project(Anope CXX)
@@ -58,9 +61,6 @@ endif(EXTRA_LIBS)
 # Find gettext
 find_package(Gettext)
 
-# Add an optional variable for using run-cc.pl for building, Perl will be checked later regardless of this setting
-option(USE_RUN_CC_PL "Use run-cc.pl for building" OFF)
-
 # Use the following directories as includes
 # Note that it is important the binary include directory comes before the
 # source include directory so the precompiled headers work correctly.
@@ -100,13 +100,15 @@ if(CMAKE_DL_LIBS)
   list(APPEND LINK_LIBS ${CMAKE_DL_LIBS})
 endif(CMAKE_DL_LIBS)
 
-# Under Windows, we set the executable name for Anope to be anope
-if(WIN32)
-  set(PROGRAM_NAME anope)
-# Under *nix, we set the executable name for Anope to be services
-else(WIN32)
-  set(PROGRAM_NAME services)
-endif(WIN32)
+if(NOT PROGRAM_NAME)
+  # Under Windows, we set the executable name for Anope to be anope
+  if(WIN32)
+    set(PROGRAM_NAME anope)
+  # Under *nix, we set the executable name for Anope to be services
+  else(WIN32)
+    set(PROGRAM_NAME services)
+  endif(WIN32)
+endif(NOT PROGRAM_NAME)
 
 # If we are not using Visual Studio, we'll run the following checks
 if(NOT MSVC)
@@ -173,19 +175,11 @@ endif(LDFLAGS)
 # Search for the following programs
 find_program(CHGRP chgrp)
 find_program(CHMOD chmod)
-find_program(PERL perl)
-
-# If perl is included on the system and the user wants to use run-cc.pl, change the commands for compiling and linking
-if(PERL AND USE_RUN_CC_PL)
-  set(CMAKE_CXX_COMPILE_OBJECT "${PERL} ${Anope_SOURCE_DIR}/cmake/run-cc.pl -q ${CMAKE_CXX_COMPILE_OBJECT}")
-  set(CMAKE_CXX_LINK_EXECUTABLE "${PERL} ${Anope_SOURCE_DIR}/cmake/run-cc.pl -q ${CMAKE_CXX_LINK_EXECUTABLE}")
-  set(CMAKE_CXX_CREATE_SHARED_MODULE "${PERL} ${Anope_SOURCE_DIR}/cmake/run-cc.pl -q ${CMAKE_CXX_CREATE_SHARED_MODULE}")
-endif(PERL AND USE_RUN_CC_PL)
 
 # If a INSTDIR was passed in to CMake, use it as the install prefix, otherwise set the default install prefix to the services directory under the user's home directory
 if(INSTDIR)
   set(CMAKE_INSTALL_PREFIX "${INSTDIR}")
-else(INSTDIR)
+elseif(NOT CMAKE_INSTALL_PREFIX)
   set(CMAKE_INSTALL_PREFIX "$ENV{HOME}/services")
 endif(INSTDIR)
 
@@ -217,16 +211,14 @@ endif(NOT LOGS_DIR)
 file(STRINGS ${Anope_SOURCE_DIR}/src/version.sh VERSIONS REGEX "^VERSION_")
 # Iterate through the strings found
 foreach(VERSION_STR ${VERSIONS})
-  # Get the length of the string
-  string(LENGTH ${VERSION_STR} VERSION_LEN)
-  # Subtract 16 from the string's length (8 for VERSION_, 5 more for the type, 2 for the space and leading quote, 1 for the trailing quote)
-  math(EXPR VERSION_NUM_LEN "${VERSION_LEN} - 16")
-  # Extract the type from the string
-  string(SUBSTRING ${VERSION_STR} 8 5 VERSION_TYPE)
-  # Extract the actual value from the string
-  string(SUBSTRING ${VERSION_STR} 15 ${VERSION_NUM_LEN} VERSION)
-  # Set the version type to the value extract from above
-  set(VERSION_${VERSION_TYPE} ${VERSION})
+  string(REGEX REPLACE "^VERSION_([A-Z]+)=\"?([^\"]*)\"?$" "\\1;\\2" VERSION_OUT ${VERSION_STR})
+  # Depends on CMP0007 OLD
+  list(LENGTH VERSION_OUT VERSION_LEN)
+  list(GET VERSION_OUT 0 VERSION_TYPE)
+  if(${VERSION_LEN} GREATER 1)
+    list(GET VERSION_OUT 1 VERSION_DATA)
+    set(VERSION_${VERSION_TYPE} ${VERSION_DATA})
+  endif(${VERSION_LEN} GREATER 1)
 endforeach(VERSION_STR ${VERSIONS})
 
 # Default build version to 0
@@ -290,16 +282,16 @@ get_target_property(SERVICES_BINARY ${PROGRAM_NAME} LOCATION)
 get_filename_component(SERVICES_BINARY ${SERVICES_BINARY} NAME)
 
 # At install time, create the following additional directories
-install(CODE "file(MAKE_DIRECTORY \"\${CMAKE_INSTALL_PREFIX}/${DB_DIR}/backups\")")
-install(CODE "file(MAKE_DIRECTORY \"\${CMAKE_INSTALL_PREFIX}/${LOGS_DIR}\")")
+install(CODE "file(MAKE_DIRECTORY \"\$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/${DB_DIR}/backups\")")
+install(CODE "file(MAKE_DIRECTORY \"\$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/${LOGS_DIR}\")")
 if(WIN32)
   install(CODE "file(MAKE_DIRECTORY \"\${CMAKE_INSTALL_PREFIX}/${DB_DIR}/runtime\")")
 endif(WIN32)
 # On non-Windows platforms, if RUNGROUP is set, change the permissions of the below directories, as well as the group of the data directory
 if(NOT WIN32 AND RUNGROUP)
-  install(CODE "execute_process(COMMAND ${CHMOD} 2775 \"\${CMAKE_INSTALL_PREFIX}/\${DB_DIR}/backups\")")
-  install(CODE "execute_process(COMMAND ${CHMOD} 2775 \"\${CMAKE_INSTALL_PREFIX}/\${LOGS_DIR}\")")
-  install(CODE "execute_process(COMMAND ${CHGRP} -R ${RUNGROUP} \"\${CMAKE_INSTALL_PREFIX}\")")
+  install(CODE "execute_process(COMMAND ${CHMOD} 2775 \"\$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/\${DB_DIR}/backups\")")
+  install(CODE "execute_process(COMMAND ${CHMOD} 2775 \"\$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/\${LOGS_DIR}\")")
+  install(CODE "execute_process(COMMAND ${CHGRP} -R ${RUNGROUP} \"\$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}\")")
 endif(NOT WIN32 AND RUNGROUP)
 # On Windows platforms, install extra files
 if(WIN32)
@@ -312,7 +304,7 @@ if(WIN32)
   install(FILES ${EXTRA_DLLS} DESTINATION ${BIN_DIR})
 endif(WIN32)
 
-install(CODE "file(REMOVE_RECURSE \"${CMAKE_INSTALL_PREFIX}/${LIB_DIR}/modules\")")
+install(CODE "file(REMOVE_RECURSE \"$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/${LIB_DIR}/modules\")")
 
 # Only process the CPack section if we have CPack
 if(EXISTS "${CMAKE_ROOT}/Modules/CPack.cmake")

@@ -102,6 +102,9 @@ class CommandCSBan : public Command
 		if (reason.length() > reasonmax)
 			reason = reason.substr(0, reasonmax);
 
+		Anope::string signkickformat = Config->GetModule("chanserv")->Get<Anope::string>("signkickformat", "%m (%n)");
+		signkickformat = signkickformat.replace_all_cs("%n", source.GetNick());
+
 		User *u = source.GetUser();
 		User *u2 = User::Find(target, true);
 
@@ -124,7 +127,7 @@ class CommandCSBan : public Command
 			}
 
 			/*
-			 * Dont ban/kick the user on channels where he is excepted
+			 * Don't ban/kick the user on channels where he is excepted
 			 * to prevent services <-> server wars.
 			 */
 			if (c->MatchesList(u2, "EXCEPT"))
@@ -161,7 +164,10 @@ class CommandCSBan : public Command
 			if (block->Get<bool>("kick", "yes"))
 			{
 				if (ci->HasFieldS("SIGNKICK") || (ci->HasFieldS("SIGNKICK_LEVEL") && !source.AccessFor(ci).HasPriv("SIGNKICK")))
-					c->Kick(ci->WhoSends(), u2, "%s (%s)", reason.c_str(), source.GetNick().c_str());
+				{
+					signkickformat = signkickformat.replace_all_cs("%m", reason);
+					c->Kick(ci->WhoSends(), u2, "%s", signkickformat.c_str());
+				}
 				else
 					c->Kick(ci->WhoSends(), u2, "%s", reason.c_str());
 			}
@@ -170,15 +176,18 @@ class CommandCSBan : public Command
 		{
 			bool founder = u_access.HasPriv("FOUNDER");
 			bool override = !founder && !u_access.HasPriv("BAN");
-			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "for " << target;
 
-			if (!c->HasMode(mode, target))
+			Anope::string mask = IRCD->NormalizeMask(target);
+
+			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "for " << mask;
+
+			if (!c->HasMode(mode, mask))
 			{
-				c->SetMode(NULL, mode, target);
+				c->SetMode(NULL, mode, mask);
 				if (ban_time)
 				{
-					new TempBan(ban_time, c, target, mode);
-					source.Reply(_("Ban on \002{0}\002 expires in \002{1}\002."), target, Anope::Duration(ban_time, source.GetAccount()));
+					new TempBan(ban_time, c, mask, mode);
+					source.Reply(_("Ban on \002{0}\002 expires in \002{1}\002."), mask, Anope::Duration(ban_time, source.GetAccount()));
 				}
 			}
 
@@ -188,7 +197,8 @@ class CommandCSBan : public Command
 				ChanUserContainer *uc = it->second;
 				++it;
 
-				if (Anope::Match(uc->user->nick, target) || Anope::Match(uc->user->GetDisplayedMask(), target))
+				Entry e(mode, mask);
+				if (e.Matches(uc->user))
 				{
 					++matched;
 
@@ -206,18 +216,23 @@ class CommandCSBan : public Command
 					if (block->Get<bool>("kick", "yes"))
 					{
 						++kicked;
+
 						if (ci->HasFieldS("SIGNKICK") || (ci->HasFieldS("SIGNKICK_LEVEL") && !u_access.HasPriv("SIGNKICK")))
-							c->Kick(ci->WhoSends(), uc->user, "%s (Matches %s) (%s)", reason.c_str(), target.c_str(), source.GetNick().c_str());
+						{
+							reason += " (Matches " + mask + ")";
+							signkickformat = signkickformat.replace_all_cs("%m", reason);
+							c->Kick(ci->WhoSends(), uc->user, "%s", signkickformat.c_str());
+						}
 						else
-							c->Kick(ci->WhoSends(), uc->user, "%s (Matches %s)", reason.c_str(), target.c_str());
+							c->Kick(ci->WhoSends(), uc->user, "%s (Matches %s)", reason.c_str(), mask.c_str());
 					}
 				}
 			}
 
 			if (matched)
-				source.Reply(_("Kicked \002{0}/{1}\002 users matching \002{2}\002 from \002{3}\002."), kicked, matched, target, c->name);
+				source.Reply(_("Kicked \002{0}/{1}\002 users matching \002{2}\002 from \002{3}\002."), kicked, matched, mask, c->name);
 			else
-				source.Reply(_("No users on \002{0}\002 match \002{1}\002."), c->name, target);
+				source.Reply(_("No users on \002{0}\002 match \002{1}\002."), c->name, mask);
 		}
 	}
 

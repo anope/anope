@@ -850,7 +850,7 @@ class CommandCSSetSecureOps : public Command
 	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
 		source.Reply(_("Enables or disables the \002secure ops\002 option for \037channel\037."
-		               " When \002secure ops\002 is set, users will not be allowed to have channel operator status if they do not have the privileges to have it."));
+		               " When \002secure ops\002 is set, users will not be allowed to have channel operator status if they do not have the privileges for it."));
 		return true;
 	}
 };
@@ -1066,13 +1066,11 @@ class CommandCSSetNoexpire : public Command
 
 class CSSet : public Module
 	, public EventHook<Event::CreateChan>
-	, public EventHook<Event::ChannelCreate>
 	, public EventHook<Event::ChannelSync>
 	, public EventHook<Event::CheckKick>
 	, public EventHook<Event::DelChan>
 	, public EventHook<Event::ChannelModeSet>
 	, public EventHook<Event::ChannelModeUnset>
-	, public EventHook<Event::CheckDelete>
 	, public EventHook<Event::JoinChannel>
 	, public EventHook<Event::SetCorrectModes>
 	, public EventHook<ChanServ::Event::PreChanExpire>
@@ -1096,6 +1094,8 @@ class CSSet : public Module
 	CommandCSSetSignKick commandcssetsignkick;
 	CommandCSSetSuccessor commandcssetsuccessor;
 	CommandCSSetNoexpire commandcssetnoexpire;
+
+	ExtensibleRef<bool> inhabit;
 
 	bool persist_lower_ts;
 
@@ -1129,6 +1129,8 @@ class CSSet : public Module
 		, commandcssetsignkick(this)
 		, commandcssetsuccessor(this)
 		, commandcssetnoexpire(this)
+
+		, inhabit("inhabit")
 	{
 	}
 
@@ -1142,16 +1144,11 @@ class CSSet : public Module
 		ci->SetBanType(Config->GetModule(this)->Get<int>("defbantype", "2"));
 	}
 
-	void OnChannelCreate(Channel *c) override
+	void OnChannelSync(Channel *c) override
 	{
 		if (c->ci && keep_modes.HasExt(c->ci))
 			for (ChanServ::Mode *m : c->ci->GetRefs<ChanServ::Mode *>(ChanServ::mode))
 				c->SetMode(c->ci->WhoSends(), m->GetMode(), m->GetParam());
-	}
-
-	void OnChannelSync(Channel *c) override
-	{
-		OnChannelCreate(c);
 	}
 
 	EventReturn OnCheckKick(User *u, Channel *c, Anope::string &mask, Anope::string &reason) override
@@ -1180,7 +1177,7 @@ class CSSet : public Module
 			if (mode->name == "PERM")
 				persist.Set(c->ci, true);
 
-			if (mode->type != MODE_STATUS && !c->syncing && Me->IsSynced() && ChanServ::mode)
+			if (mode->type != MODE_STATUS && !c->syncing && Me->IsSynced() && ChanServ::mode && (!inhabit || !inhabit->HasExt(c)))
 			{
 				ChanServ::Mode *m = ChanServ::mode.Create();
 				m->SetChannel(c->ci);
@@ -1200,18 +1197,11 @@ class CSSet : public Module
 				persist.Unset(c->ci);
 		}
 
-		if (c->ci && mode->type != MODE_STATUS && !c->syncing && Me->IsSynced())
+		if (c->ci && mode->type != MODE_STATUS && !c->syncing && Me->IsSynced() && (!inhabit || !inhabit->HasExt(c)))
 			for (ChanServ::Mode *m : c->ci->GetRefs<ChanServ::Mode *>(ChanServ::mode))
 				if (m->GetMode() == mode->name && m->GetParam().equals_ci(param))
 					m->Delete();
 
-		return EVENT_CONTINUE;
-	}
-
-	EventReturn OnCheckDelete(Channel *c) override
-	{
-		if (c->ci && persist.HasExt(c->ci))
-			return EVENT_STOP;
 		return EVENT_CONTINUE;
 	}
 

@@ -101,7 +101,8 @@ class HSDel : public Module
 		, commandhsdelall(this, ondeletevhost)
 		, ondeletevhost(this)
 	{
-
+		if (!IRCD || !IRCD->CanSetVHost)
+			throw ModuleException("Your IRCd does not support vhosts");
 	}
 };
 

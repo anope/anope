@@ -5,7 +5,7 @@
 # them into existing mysql tables. The tables are created
 # by the irc2sql module on the first load.
 
-# Dont forget to rename this file or your changes
+# Don't forget to rename this file or your changes
 # will be overwritte on the next 'make install'
 
 ############################

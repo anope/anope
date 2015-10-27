@@ -46,8 +46,10 @@ class CommandNSLogout : public Command
 			return;
 		}
 
+#if 0
 		if (!nick.empty() && !param.empty() && param.equals_ci("REVALIDATE") && NickServ::service)
 			NickServ::service->Validate(u2);
+#endif
 
 		u2->super_admin = false; /* Dont let people logout and remain a SuperAdmin */
 		Log(LOG_COMMAND, source, this) << "to logout " << u2->nick;

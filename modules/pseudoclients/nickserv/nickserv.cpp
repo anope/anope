@@ -20,6 +20,9 @@
 #include "accounttype.h"
 #include "modetype.h"
 
+class NickServCollide;
+static std::set<NickServCollide *> collides;
+
 /** Timer for colliding nicks to force people off of nicknames
  */
 class NickServCollide : public Timer
@@ -32,6 +35,22 @@ class NickServCollide : public Timer
  public:
 	NickServCollide(Module *me, NickServ::NickServService *nss, User *user, NickServ::Nick *nick, time_t delay) : Timer(me, delay), service(nss), u(user), ts(user->timestamp), na(nick)
 	{
+		collides.insert(this);
+	}
+
+	~NickServCollide()
+	{
+		collides.erase(this);
+	}
+
+	NickServ::Nick *GetNick()
+	{
+		return na;
+	}
+
+	User *GetUser()
+	{
+		return u;
 	}
 
 	void Tick(time_t t) override
@@ -429,6 +448,16 @@ class NickServCore : public Module, public NickServ::NickServService
 							"Your privacy is respected; this e-mail won't be given to\n"
 							"any third-party person."), Config->StrictPrivmsg.c_str(), NickServ->nick.c_str());
 		}
+
+		for (std::set<NickServCollide *>::iterator it = collides.begin(); it != collides.end(); ++it)
+		{
+			NickServCollide *c = *it;
+			if (c->GetUser() == u && c->GetNick() && c->GetNick()->GetAccount() == u->Account())
+			{
+				delete c;
+				break;
+			}
+		}
 	}
 
 	void OnNickGroup(User *u, NickServ::Nick *target) override
@@ -632,8 +661,23 @@ class NickServCore : public Module, public NickServ::NickServService
 			++it;
 
 			ir->Release(m);
-			if (ir->GetOwner() == m)
+#if 0
+			ir->holds.erase(m);
+			if (ir->holds.empty() && ir->dispatched)
+			{
+				if (!ir->success)
+					ir->OnFail();
 				delete ir;
+				continue;
+			}
+
+			if (ir->GetOwner() == m)
+			{
+				if (!ir->success)
+					ir->OnFail();
+				delete ir;
+			}
+#endif
 		}
 	}
 };

@@ -208,7 +208,8 @@ class HSSet : public Module
 		, commandhsset(this)
 		, commandhssetall(this)
 	{
-
+		if (!IRCD || !IRCD->CanSetVHost)
+			throw ModuleException("Your IRCd does not support vhosts");
 	}
 };
 

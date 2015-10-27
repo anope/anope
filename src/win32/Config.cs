@@ -257,7 +257,7 @@ namespace Config
 					if (!string.IsNullOrWhiteSpace(CacheResponse) && string.IsNullOrWhiteSpace(InstallerResponse))
 						InstallerResponse = CacheResponse;
 
-					// Question 4-6 are optional
+					// Question 4+ are optional
 					if (i < 3 && string.IsNullOrWhiteSpace(InstallerResponse))
 					{
 						Console.WriteLine("Invalid option");

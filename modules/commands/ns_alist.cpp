@@ -75,7 +75,7 @@ class CommandNSAList : public Command
 				continue;
 			}
 
-			ChanServ::AccessGroup access = ci->AccessFor(nc);
+			ChanServ::AccessGroup access = ci->AccessFor(nc, false);
 			if (access.empty())
 				continue;
 

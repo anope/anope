@@ -26,6 +26,7 @@
 #include "modules/chanserv.h"
 
 channel_map ChannelList;
+std::vector<Channel *> Channel::deleting;
 
 Channel::Channel(const Anope::string &nname, time_t ts)
 {
@@ -116,7 +117,7 @@ void Channel::CheckModes()
 
 bool Channel::CheckDelete()
 {
-	/* Channel is syncing from a netburst, don't destroy it as more users are probably wanting to join immediatly
+	/* Channel is syncing from a netburst, don't destroy it as more users are probably wanting to join immediately
 	 * We also don't part the bot here either, if necessary we will part it after the sync
 	 */
 	if (this->syncing)
@@ -155,14 +156,14 @@ void Channel::DeleteUser(User *user)
 
 	ChanUserContainer *cu = user->FindChannel(this);
 	if (!this->users.erase(user))
-		Log(LOG_DEBUG) << "Channel::DeleteUser() tried to delete nonexistant user " << user->nick << " from channel " << this->name;
+		Log(LOG_DEBUG) << "Channel::DeleteUser() tried to delete non-existent user " << user->nick << " from channel " << this->name;
 
 	if (!user->chans.erase(this))
-		Log(LOG_DEBUG) << "Channel::DeleteUser() tried to delete nonexistant channel " << this->name << " from " << user->nick << "'s channel list";
+		Log(LOG_DEBUG) << "Channel::DeleteUser() tried to delete non-existent channel " << this->name << " from " << user->nick << "'s channel list";
 	delete cu;
 
-	if (this->CheckDelete())
-		delete this;
+	if (std::find(deleting.begin(), deleting.end(), this) == deleting.end())
+		deleting.push_back(this);
 }
 
 ChanUserContainer *Channel::FindUser(User *u) const
@@ -274,7 +275,7 @@ void Channel::SetModeInternal(const MessageSource &setter, ChannelMode *ocm, con
 
 		if (!u)
 		{
-			Log() << "MODE " << this->name << " +" << cm->mchar << " for nonexistant user " << param;
+			Log() << "MODE " << this->name << " +" << cm->mchar << " for non-existent user " << param;
 			return;
 		}
 
@@ -338,7 +339,7 @@ void Channel::RemoveModeInternal(const MessageSource &setter, ChannelMode *ocm, 
 
 		if (!u)
 		{
-			Log() << "Channel::RemoveModeInternal() MODE " << this->name << "-" << cm->mchar << " for nonexistant user " << param;
+			Log() << "Channel::RemoveModeInternal() MODE " << this->name << "-" << cm->mchar << " for non-existent user " << param;
 			return;
 		}
 
@@ -636,7 +637,7 @@ void Channel::SetModesInternal(MessageSource &source, const Anope::string &mode,
 
 		if (cm->type == MODE_REGULAR)
 		{
-			/* something changed if we are adding a mode we dont have, or removing one we have */
+			/* something changed if we are adding a mode we don't have, or removing one we have */
 			changed |= !!add != this->HasMode(cm->name);
 			if (add)
 				this->SetModeInternal(source, cm, "", false);
@@ -671,7 +672,7 @@ void Channel::SetModesInternal(MessageSource &source, const Anope::string &mode,
 				this->RemoveModeInternal(source, cm, token, enforce_mlock);
 		}
 		else
-			Log() << "warning: Channel::SetModesInternal() recieved more modes requiring params than params, modes: " << mode;
+			Log() << "warning: Channel::SetModesInternal() received more modes requiring params than params, modes: " << mode;
 	}
 
 	if (!this_reference)
@@ -726,7 +727,7 @@ bool Channel::KickInternal(const MessageSource &source, const Anope::string &nic
 	if (sender)
 		Log(sender, this, "kick") << "kicked " << target->nick << " (" << reason << ")";
 	else
-		Log(target, this, "kick") << "was kicked by " << source.GetSource() << " (" << reason << ")";
+		Log(target, this, "kick") << "was kicked by " << source.GetName() << " (" << reason << ")";
 
 	Anope::string chname = this->name;
 
@@ -737,7 +738,6 @@ bool Channel::KickInternal(const MessageSource &source, const Anope::string &nic
 		return false;
 	}
 
-	Anope::string this_name = this->name;
 	ChannelStatus status = cu->status;
 
 	EventReturn MOD_RESULT = Event::OnPreUserKicked(&Event::PreUserKicked::OnPreUserKicked, source, cu, reason);
@@ -745,8 +745,8 @@ bool Channel::KickInternal(const MessageSource &source, const Anope::string &nic
 		if (MOD_RESULT == EVENT_STOP)
 			return false;
 
-	this->DeleteUser(target); /* This can delete this; */
-	Event::OnUserKicked(&Event::UserKicked::OnUserKicked, source, target, this_name, status, reason);
+	this->DeleteUser(target);
+	Event::OnUserKicked(&Event::UserKicked::OnUserKicked, source, target, this->name, status, reason);
 	return true;
 }
 
@@ -771,26 +771,22 @@ bool Channel::Kick(User *source, User *u, const char *reason, ...)
 	return true;
 }
 
-void Channel::ChangeTopicInternal(const Anope::string &user, const Anope::string &newtopic, time_t ts)
+void Channel::ChangeTopicInternal(User *u, const Anope::string &user, const Anope::string &newtopic, time_t ts)
 {
-	User *u = User::Find(user);
-
 	this->topic = newtopic;
 	this->topic_setter = u ? u->nick : user;
 	this->topic_ts = ts;
 	this->topic_time = Anope::CurTime;
 
-	Log(LOG_DEBUG) << "Topic of " << this->name << " changed by " << (u ? u->nick : user) << " to " << newtopic;
+	Log(LOG_DEBUG) << "Topic of " << this->name << " changed by " << this->topic_setter << " to " << newtopic;
 
-	Event::OnTopicUpdated(&Event::TopicUpdated::OnTopicUpdated, this, user, this->topic);
+	Event::OnTopicUpdated(&Event::TopicUpdated::OnTopicUpdated, u, this, user, this->topic);
 }
 
 void Channel::ChangeTopic(const Anope::string &user, const Anope::string &newtopic, time_t ts)
 {
-	User *u = User::Find(user);
-
 	this->topic = newtopic;
-	this->topic_setter = u ? u->nick : user;
+	this->topic_setter = user;
 	this->topic_ts = ts;
 
 	IRCD->SendTopic(this->ci->WhoSends(), this);
@@ -798,7 +794,7 @@ void Channel::ChangeTopic(const Anope::string &user, const Anope::string &newtop
 	/* Now that the topic is set update the time set. This is *after* we set it so the protocol modules are able to tell the old last set time */
 	this->topic_time = Anope::CurTime;
 
-	Event::OnTopicUpdated(&Event::TopicUpdated::OnTopicUpdated, this, user, this->topic);
+	Event::OnTopicUpdated(&Event::TopicUpdated::OnTopicUpdated, nullptr, this, user, this->topic);
 }
 
 void Channel::SetCorrectModes(User *user, bool give_modes)
@@ -842,7 +838,8 @@ void Channel::SetCorrectModes(User *user, bool give_modes)
 				given = true;
 			}
 		}
-		else if (take_modes && !has_priv && !u_access.HasPriv(cm->name + "ME"))
+		/* modes that have no privileges assigned shouldn't be removed (like operprefix, ojoin) */
+		else if (take_modes && !has_priv && ci->GetLevel(cm->name + "ME") != ChanServ::ACCESS_INVALID && !u_access.HasPriv(cm->name + "ME"))
 		{
 			/* Only remove modes if they are > voice */
 			if (cm->name == "VOICE")
@@ -920,5 +917,17 @@ Channel *Channel::FindOrCreate(const Anope::string &name, bool &created, time_t 
 	if (!chan)
 		chan = new Channel(name, ts);
 	return chan;
+}
+
+void Channel::DeleteChannels()
+{
+	for (unsigned int i = 0; i < deleting.size(); ++i)
+	{
+		Channel *c = deleting[i];
+
+		if (c->CheckDelete())
+			delete c;
+	}
+	deleting.clear();
 }
 

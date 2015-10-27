@@ -18,13 +18,22 @@
 #include "timers.h"
 #include "logger.h"
 #include "extensible.h"
+#include "version.h"
 
 class ModuleDef;
+struct ModuleVersionC;
+
+enum
+{
+	ANOPE_MODAPI_VER = 1
+};
 
 struct AnopeModule
 {
+	unsigned int api_version;
 	ModuleDef* (*init)();
 	void (*fini)(ModuleDef *);
+	ModuleVersionC (*version)();
 };
 
 class ModuleDef
@@ -70,10 +79,20 @@ template<class ModuleClass> void ModuleInfo(ModuleDef *moddef) { }
 	{ \
 		delete def; \
 	} \
+	static ModuleVersionC ModuleVersion() \
+	{ \
+		ModuleVersionC ver; \
+		ver.version_major = VERSION_MAJOR; \
+		ver.version_minor = VERSION_MINOR; \
+		ver.version_patch = VERSION_PATCH; \
+		return ver; \
+	} \
 	extern "C" DllExport struct AnopeModule AnopeMod = \
 	{ \
+		ANOPE_MODAPI_VER, \
 		CreateModuleDef, \
-		DeleteModuleDef \
+		DeleteModuleDef, \
+		ModuleVersion \
 	};
 
 enum ModuleReturn
@@ -113,6 +132,11 @@ enum
 };
 typedef unsigned short ModType;
 
+struct ModuleVersionC
+{
+	int version_major, version_minor, version_patch;
+};
+
 /** Returned by Module::GetVersion, used to see what version of Anope
  * a module is compiled against.
  */
@@ -124,12 +148,7 @@ class ModuleVersion
 	int version_patch;
 
  public:
-	/** Constructor
-	 * @param major The major version number
-	 * @param minor The minor version number
-	 * @param patch The patch version number
-	 */
-	ModuleVersion(int major, int minor, int patch);
+	ModuleVersion(const ModuleVersionC &);
 
 	/** Get the major version of Anope this was built against
 	 * @return The major version

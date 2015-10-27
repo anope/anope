@@ -704,7 +704,7 @@ class CommandCSLevels : public Command
 	{
 		const Anope::string &what = params[2];
 
-		/* Don't allow disabling of the founder level. It would be hard to change it back if you dont have access to use this command */
+		/* Don't allow disabling of the founder level. It would be hard to change it back if you don't have access to use this command */
 		if (what.equals_ci("FOUNDER"))
 		{
 			source.Reply(_("You can not disable the founder privilege because it would be impossible to reenable it at a later time."));
@@ -804,6 +804,14 @@ class CommandCSLevels : public Command
 			return;
 		}
 
+		bool has_access = false;
+		if (source.HasPriv("chanserv/access/modify"))
+			has_access = true;
+		else if (cmd.equals_ci("LIST") && source.HasPriv("chanserv/access/list"))
+			has_access = true;
+		else if (source.AccessFor(ci).HasPriv("FOUNDER"))
+			has_access = true;
+
 		/* If SET, we want two extra parameters; if DIS[ABLE] or FOUNDER, we want only
 		 * one; else, we want none.
 		 */
@@ -813,7 +821,7 @@ class CommandCSLevels : public Command
 			return;
 		}
 
-		if (!source.AccessFor(ci).HasPriv("FOUNDER") && !source.HasPriv("chanserv/access/modify"))
+		if (!has_access)
 		{
 			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "FOUNDER", ci->GetName());	
 			return;

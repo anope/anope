@@ -26,7 +26,7 @@ class CommandOSMode : public Command
 		const Anope::string &target = params[0];
 		const Anope::string &modes = params[1];
 
-		Channel *c = Channel::Find(target);
+		Reference<Channel> c = Channel::Find(target);
 		if (!c)
 			source.Reply(_("Channel \002{0}\002 doesn't exist."), target);
 		else if (c->bouncy_modes)
@@ -36,8 +36,14 @@ class CommandOSMode : public Command
 			bool all = params.size() > 2 && params[2].equals_ci("ALL");
 
 			const Channel::ModeList chmodes = c->GetModes();
-			for (Channel::ModeList::const_iterator it = chmodes.begin(), it_end = chmodes.end(); it != it_end; ++it)
+			for (Channel::ModeList::const_iterator it = chmodes.begin(), it_end = chmodes.end(); it != it_end && c; ++it)
 				c->RemoveMode(c->ci->WhoSends(), it->first, it->second, false);
+
+			if (!c)
+			{
+				source.Reply(_("Modes cleared on %s and the channel destroyed."), target.c_str());
+				return;
+			}
 
 			if (all)
 			{
@@ -65,7 +71,7 @@ class CommandOSMode : public Command
 			Anope::string log_modes, log_params;
 
 			sep.GetToken(mode);
-			for (unsigned i = 0; i < mode.length(); ++i)
+			for (unsigned i = 0; i < mode.length() && c; ++i)
 			{
 				char ch = mode[i];
 
@@ -116,7 +122,7 @@ class CommandOSMode : public Command
 			}
 
 			if (!log_modes.replace_all_cs("+", "").replace_all_cs("-", "").empty())
-				Log(LOG_ADMIN, source, this) << log_modes << log_params << " on " << c->name;
+				Log(LOG_ADMIN, source, this) << log_modes << log_params << " on " << (c ? c->name : target);
 		}
 	}
 

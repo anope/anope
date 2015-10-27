@@ -1,4 +1,4 @@
-/* Initalization and related routines.
+/* Initialization and related routines.
  *
  * (C) 2003-2014 Anope Team
  * Contact us at team@anope.org

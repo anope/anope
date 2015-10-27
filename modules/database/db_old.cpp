@@ -723,7 +723,7 @@ static void LoadVHosts()
 		NickServ::Nick *na = NickServ::FindNick(nick);
 		if (na == NULL)
 		{
-			Log() << "Removing vhost for nonexistant nick " << nick;
+			Log() << "Removing vhost for non-existent nick " << nick;
 			continue;
 		}
 

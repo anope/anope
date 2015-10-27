@@ -254,7 +254,7 @@ class CommandMSSet : public Command
 			               "    NEW     You will only be notified of memos when they\n"
 			               "            are sent to you.\n"
 			               "\n"
-			               "    MAIL    You will be notified of memos by email aswell as\n"
+			               "    MAIL    You will be notified of memos by email as well as\n"
 			               "            any other settings you have.\n"
 			               "\n"
 			               "    NOMAIL  You will not be notified of memos by email.\n"

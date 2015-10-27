@@ -31,6 +31,7 @@ class CommandHSOff : public Command
 			return;
 		}
 
+		u->vhost.clear();
 		IRCD->SendVhostDel(u);
 		Log(LOG_COMMAND, source, this) << "to disable their vhost";
 		source.Reply(_("Your vhost was removed and the normal cloaking restored."));
@@ -51,7 +52,8 @@ class HSOff : public Module
 	HSOff(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR)
 		, commandhsoff(this)
 	{
-
+		if (!IRCD || !IRCD->CanSetVHost)
+			throw ModuleException("Your IRCd does not support vhosts");
 	}
 };
 

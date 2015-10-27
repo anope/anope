@@ -112,6 +112,8 @@ class CoreExport ChannelMode : public Mode
 
 	bool CanSet(User *u) const override;
 
+	virtual void Check() { }
+
 	/** 'wrap' this channel mode and param to the underlying mode and param
 	 */
 	virtual ChannelMode *Wrap(Anope::string &param);
@@ -210,9 +212,11 @@ class CoreExport ChannelModeVirtual : public T
 
 	~ChannelModeVirtual();
 
+	void Check() override;
+
 	ChannelMode *Wrap(Anope::string &param) override;
 
-	ChannelMode *Unwrap(ChannelMode *cm, Anope::string &param) = 0;
+	ChannelMode *Unwrap(ChannelMode *cm, Anope::string &param) anope_abstract;
 };
 
 /* The status a user has on a channel (+v, +h, +o) etc */

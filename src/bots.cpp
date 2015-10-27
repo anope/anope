@@ -174,12 +174,9 @@ void ServiceBot::Part(Channel *c, const Anope::string &reason)
 
 	IRCD->SendPart(this, c, "%s", !reason.empty() ? reason.c_str() : "");
 
-	Anope::string cname = c->name;
-	Reference<Channel> cref = c;
-
 	c->DeleteUser(this);
 
-	Event::OnPartChannel(&Event::PartChannel::OnPartChannel, this, cref, cname, reason);
+	Event::OnPartChannel(&Event::PartChannel::OnPartChannel, this, c, c->name, reason);
 }
 
 void ServiceBot::OnMessage(User *u, const Anope::string &message)

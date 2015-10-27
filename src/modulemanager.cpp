@@ -162,11 +162,51 @@ ModuleReturn ModuleManager::LoadModule(const Anope::string &modname, User *u)
 	dlerror();
 	AnopeModule *module = static_cast<AnopeModule *>(dlsym(handle, "AnopeMod"));
 	err = dlerror();
-	if (!module || !module->init || !module->fini)
+	if (!module || module->api_version != ANOPE_MODAPI_VER)
 	{
 		Log() << "No module symbols function found, not an Anope module";
 		if (err && *err)
 			Log(LOG_DEBUG) << err;
+		dlclose(handle);
+		return MOD_ERR_NOLOAD;
+	}
+
+	try
+	{
+		ModuleVersion v = module->version();
+
+		if (v.GetMajor() < Anope::VersionMajor() || (v.GetMajor() == Anope::VersionMajor() && v.GetMinor() < Anope::VersionMinor()))
+		{
+			Log() << "Module " << modname << " is compiled against an older version of Anope " << v.GetMajor() << "." << v.GetMinor() << ", this is " << Anope::VersionShort();
+			dlclose(handle);
+			return MOD_ERR_VERSION;
+		}
+		else if (v.GetMajor() > Anope::VersionMajor() || (v.GetMajor() == Anope::VersionMajor() && v.GetMinor() > Anope::VersionMinor()))
+		{
+			Log() << "Module " << modname << " is compiled against a newer version of Anope " << v.GetMajor() << "." << v.GetMinor() << ", this is " << Anope::VersionShort();
+			dlclose(handle);
+			return MOD_ERR_VERSION;
+		}
+		else if (v.GetPatch() < Anope::VersionPatch())
+		{
+			Log() << "Module " << modname << " is compiled against an older version of Anope, " << v.GetMajor() << "." << v.GetMinor() << "." << v.GetPatch() << ", this is " << Anope::VersionShort();
+			dlclose(handle);
+			return MOD_ERR_VERSION;
+		}
+		else if (v.GetPatch() > Anope::VersionPatch())
+		{
+			Log() << "Module " << modname << " is compiled against a newer version of Anope, " << v.GetMajor() << "." << v.GetMinor() << "." << v.GetPatch() << ", this is " << Anope::VersionShort();
+			dlclose(handle);
+			return MOD_ERR_VERSION;
+		}
+		else
+		{
+			Log(LOG_DEBUG_2) << "Module " << modname << " is compiled against current version of Anope " << Anope::VersionShort();
+		}
+	}
+	catch (const ModuleException &ex)
+	{
+		/* this error has already been logged */
 		dlclose(handle);
 		return MOD_ERR_NOLOAD;
 	}
@@ -202,34 +242,6 @@ ModuleReturn ModuleManager::LoadModule(const Anope::string &modname, User *u)
 	m->handle = handle;
 	m->def = def;
 	m->module = module;
-
-	ModuleVersion v = m->GetVersion();
-	if (v.GetMajor() < Anope::VersionMajor() || (v.GetMajor() == Anope::VersionMajor() && v.GetMinor() < Anope::VersionMinor()))
-	{
-		Log() << "Module " << modname << " is compiled against an older version of Anope " << v.GetMajor() << "." << v.GetMinor() << ", this is " << Anope::VersionShort();
-		DeleteModule(m);
-		return MOD_ERR_VERSION;
-	}
-	else if (v.GetMajor() > Anope::VersionMajor() || (v.GetMajor() == Anope::VersionMajor() && v.GetMinor() > Anope::VersionMinor()))
-	{
-		Log() << "Module " << modname << " is compiled against a newer version of Anope " << v.GetMajor() << "." << v.GetMinor() << ", this is " << Anope::VersionShort();
-		DeleteModule(m);
-		return MOD_ERR_VERSION;
-	}
-	else if (v.GetPatch() < Anope::VersionPatch())
-	{
-		Log() << "Module " << modname << " is compiled against an older version of Anope, " << v.GetMajor() << "." << v.GetMinor() << "." << v.GetPatch() << ", this is " << Anope::VersionShort();
-		DeleteModule(m);
-		return MOD_ERR_VERSION;
-	}
-	else if (v.GetPatch() > Anope::VersionPatch())
-	{
-		Log() << "Module " << modname << " is compiled against a newer version of Anope, " << v.GetMajor() << "." << v.GetMinor() << "." << v.GetPatch() << ", this is " << Anope::VersionShort();
-		DeleteModule(m);
-		return MOD_ERR_VERSION;
-	}
-	else
-		Log(LOG_DEBUG_2) << "Module " << modname << " is compiled against current version of Anope " << Anope::VersionShort();
 
 	/* Initialize config */
 	try

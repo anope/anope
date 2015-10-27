@@ -29,14 +29,14 @@ static void rsend_notify(CommandSource &source, MemoServ::MemoInfo *mi, MemoServ
 		if (!nc)
 			return;
 
-		/* Text of the memo varies if the recepient was a
+		/* Text of the memo varies if the recipient was a
 		   nick or channel */
 		Anope::string text = Anope::printf(Language::Translate(na->GetAccount(), _("\002[auto-memo]\002 The memo you sent to \002%s\002 has been viewed.")), targ.c_str());
 
 		/* Send notification */
 		MemoServ::service->Send(source.GetNick(), m->GetSender(), text, true);
 
-		/* Notify recepient of the memo that a notification has
+		/* Notify recipient of the memo that a notification has
 		   been sent to the sender */
 		source.Reply(_("A notification memo has been sent to \002{0}\002 informing him/her you have read his/her memo."), nc->GetDisplay());
 	}

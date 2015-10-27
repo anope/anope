@@ -194,7 +194,7 @@ ChanServ::ChanAccess *ChannelImpl::GetAccess(unsigned index)
 	return a.size() > index ? a[index] : nullptr;
 }
 
-ChanServ::AccessGroup ChannelImpl::AccessFor(const User *u)
+ChanServ::AccessGroup ChannelImpl::AccessFor(const User *u, bool updateLastUsed)
 {
 	ChanServ::AccessGroup group;
 
@@ -223,7 +223,8 @@ ChanServ::AccessGroup ChannelImpl::AccessFor(const User *u)
 
 	if (group.founder || !group.empty())
 	{
-		this->SetLastUsed(Anope::CurTime);
+		if (updateLastUsed)
+			this->SetLastUsed(Anope::CurTime);
 
 		for (unsigned i = 0; i < group.size(); ++i)
 			group[i]->SetLastSeen(Anope::CurTime);
@@ -232,7 +233,7 @@ ChanServ::AccessGroup ChannelImpl::AccessFor(const User *u)
 	return group;
 }
 
-ChanServ::AccessGroup ChannelImpl::AccessFor(NickServ::Account *nc)
+ChanServ::AccessGroup ChannelImpl::AccessFor(NickServ::Account *nc, bool updateLastUsed)
 {
 	ChanServ::AccessGroup group;
 
@@ -248,7 +249,8 @@ ChanServ::AccessGroup ChannelImpl::AccessFor(NickServ::Account *nc)
 	}
 
 	if (group.founder || !group.empty())
-		this->SetLastUsed(Anope::CurTime);
+		if (updateLastUsed)
+			this->SetLastUsed(Anope::CurTime);
 
 	/* don't update access last seen here, this isn't the user requesting access */
 
@@ -361,6 +363,13 @@ void ChannelImpl::SetLevel(const Anope::string &priv, int16_t level)
 			l->SetLevel(level);
 			return;
 		}
+
+	ChanServ::Privilege *p = ChanServ::service ? ChanServ::service->FindPrivilege(priv) : nullptr;
+	if (!p)
+	{
+		Log(LOG_DEBUG) << "Unknown privilege " + priv;
+		return;
+	}
 
 	ChanServ::Level *l = ChanServ::level.Create();
 	l->SetChannel(this);

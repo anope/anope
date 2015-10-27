@@ -172,7 +172,7 @@ struct IRCDMessageTBurst : IRCDMessage
 	 * params[0] = channel
 	 * params[1] = ts
 	 * params[2] = topic OR who set the topic
-	 * params[3] = topic if params[2] isnt the topic
+	 * params[3] = topic if params[2] isn't the topic
 	 */
 	void Run(MessageSource &source, const std::vector<Anope::string> &params) override
 	{
@@ -185,7 +185,7 @@ struct IRCDMessageTBurst : IRCDMessage
 		const Anope::string &setter = params.size() == 4 ? params[2] : "",
 			topic = params.size() == 4 ? params[3] : params[2];
 
-		c->ChangeTopicInternal(setter, topic, topic_time);
+		c->ChangeTopicInternal(NULL, setter, topic, topic_time);
 	}
 };
 

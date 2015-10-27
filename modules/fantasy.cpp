@@ -113,13 +113,29 @@ class Fantasy : public Module
 		std::vector<Anope::string> params;
 		spacesepstream(msg).GetTokens(params);
 
-		if (!msg.find(c->ci->GetBot()->nick))
-			params.erase(params.begin());
-		else if (!msg.find_first_of(Config->GetModule(this)->Get<Anope::string>("fantasycharacter", "!")))
-			params[0].erase(params[0].begin());
-		else
+		if (params.empty())
 			return;
 
+		Anope::string normalized_param0 = Anope::NormalizeBuffer(params[0]);
+		Anope::string fantasy_chars = Config->GetModule(this)->Get<Anope::string>("fantasycharacter", "!");
+
+		if (!normalized_param0.find(c->ci->GetBot()->nick))
+		{
+			params.erase(params.begin());
+		}
+		else if (!normalized_param0.find_first_of(fantasy_chars))
+		{
+			size_t sz = params[0].find_first_of(fantasy_chars);
+			if (sz == Anope::string::npos)
+				return; /* normalized_param0 is a subset of params[0] so this can't happen */
+
+			params[0].erase(0, sz + 1);
+		}
+		else
+		{
+			return;
+		}
+		
 		if (params.empty())
 			return;
 
@@ -133,7 +149,7 @@ class Fantasy : public Module
 			full_command.erase(full_command.begin());
 
 			++count;
-			it = Config->Fantasy.find(full_command);
+			it = Config->Fantasy.find(Anope::NormalizeBuffer(full_command));
 		}
 
 		if (it == Config->Fantasy.end())
@@ -143,7 +159,7 @@ class Fantasy : public Module
 		ServiceReference<Command> cmd("Command", info.name);
 		if (!cmd)
 		{
-			Log(LOG_DEBUG) << "Fantasy command " << it->first << " exists for nonexistant service " << info.name << "!";
+			Log(LOG_DEBUG) << "Fantasy command " << it->first << " exists for non-existent service " << info.name << "!";
 			return;
 		}
 

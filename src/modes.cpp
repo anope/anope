@@ -223,7 +223,7 @@ ChannelModeVirtual<T>::~ChannelModeVirtual()
 }
 
 template<typename T>
-ChannelMode *ChannelModeVirtual<T>::Wrap(Anope::string &param)
+void ChannelModeVirtual<T>::Check()
 {
 	if (basech == NULL)
 	{
@@ -231,7 +231,11 @@ ChannelMode *ChannelModeVirtual<T>::Wrap(Anope::string &param)
 		if (basech)
 			basech->listeners.push_back(this);
 	}
+}
 
+template<typename T>
+ChannelMode *ChannelModeVirtual<T>::Wrap(Anope::string &param)
+{
 	return basech;
 }
 
@@ -268,7 +272,7 @@ void StackerInfo::AddMode(Mode *mode, bool set, const Anope::string &param)
 			break;
 		}
 	}
-	/* If the mode is on the other list, remove it from there (eg, we dont want +o-o Adam Adam) */
+	/* If the mode is on the other list, remove it from there (eg, we don't want +o-o Adam Adam) */
 	for (it = otherlist->begin(), it_end = otherlist->end(); it != it_end; ++it)
 	{
 		/* The param must match too (can have multiple status or list modes), but
@@ -298,7 +302,7 @@ static class ModePipe : public Pipe
 	}
 } *modePipe;
 
-/** Get the stacker info for an item, if one doesnt exist it is created
+/** Get the stacker info for an item, if one doesn't exist it is created
  * @param Item The user/channel etc
  * @return The stacker info
  */
@@ -423,6 +427,9 @@ bool ModeManager::AddChannelMode(ChannelMode *cm)
 	ChannelModes.push_back(cm);
 
 	Event::OnChannelModeAdd(&Event::ChannelModeAdd::OnChannelModeAdd, cm);
+
+	for (unsigned int i = 0; i < ChannelModes.size(); ++i)
+		ChannelModes[i]->Check();
 
 	return true;
 }

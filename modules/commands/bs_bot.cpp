@@ -82,7 +82,10 @@ class CommandBSBot : public Command
 
 		User *targ = User::Find(nick, true);
 		if (targ)
-			targ->Kill(Me, "Nickname is reserved for services");
+		{
+			source.Reply(_("\002{0}\002 is currently in use."), targ->nick);
+			return;
+		}
 
 		ServiceBot *bi = new ServiceBot(nick, user, host, real);
 
@@ -176,6 +179,13 @@ class CommandBSBot : public Command
 		if (newbi && bi != newbi)
 		{
 			source.Reply(_("Bot \002{0}\002 already exists."), newbi->nick);
+			return;
+		}
+
+		User *target = User::Find(nick, true);
+		if (target)
+		{
+			source.Reply(_("\002{0}\002 is currently in use."), target->nick);
 			return;
 		}
 

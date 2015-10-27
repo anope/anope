@@ -50,8 +50,8 @@ class ChannelImpl : public ChanServ::Channel
 	void SetSuccessor(NickServ::Account *nc) override;
 	NickServ::Account *GetSuccessor() override;
 	ChanServ::ChanAccess *GetAccess(unsigned index) /*const*/ override;
-	ChanServ::AccessGroup AccessFor(const User *u) override;
-	ChanServ::AccessGroup AccessFor(NickServ::Account *nc) override;
+	ChanServ::AccessGroup AccessFor(const User *u, bool = true) override;
+	ChanServ::AccessGroup AccessFor(NickServ::Account *nc, bool = true) override;
 	unsigned GetAccessCount()/* const*/ override;
 	unsigned GetDeepAccessCount() const override;
 	void ClearAccess() override;

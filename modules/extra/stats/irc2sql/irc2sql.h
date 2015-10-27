@@ -55,6 +55,7 @@ class IRC2SQL : public Module
 	void OnUserConnect(User *u, bool &exempt) override;
 	void OnUserQuit(User *u, const Anope::string &msg) override;
 	void OnUserNickChange(User *u, const Anope::string &oldnick) override;
+	void OnUserAway(User *u, const Anope::string &message) override;
 	void OnFingerprint(User *u) override;
 	void OnUserModeSet(const MessageSource &setter, User *u, const Anope::string &mname) override;
 	void OnUserModeUnset(const MessageSource &setter, User *u, const Anope::string &mname) override;
@@ -69,7 +70,7 @@ class IRC2SQL : public Module
 	EventReturn OnChannelModeSet(Channel *c, const MessageSource &setter, ChannelMode *mode, const Anope::string &param) override;
 	EventReturn OnChannelModeUnset(Channel *c, const MessageSource &setter, ChannelMode *mode, const Anope::string &param) override;
 
-	void OnTopicUpdated(Channel *c, const Anope::string &user, const Anope::string &topic) override;
+	void OnTopicUpdated(User *source, Channel *c, const Anope::string &user, const Anope::string &topic) override;
 
 	void OnBotNotice(User *u, ServiceBot *bi, Anope::string &message) override;
 };

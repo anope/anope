@@ -92,7 +92,7 @@ class ModeLocks : public Service
 	virtual ModeLock *GetMLock(ChanServ::Channel *, const Anope::string &mname, const Anope::string &param = "") anope_abstract;
 
 	/** Get the current mode locks as a string
-	 * @param complete True to show mlock parameters aswell
+	 * @param complete True to show mlock parameters as well
 	 * @return A string of mode locks, eg: +nrt
 	 */
 	virtual Anope::string GetMLockAsString(ChanServ::Channel *, bool complete) const anope_abstract;

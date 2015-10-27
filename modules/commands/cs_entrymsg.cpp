@@ -138,7 +138,7 @@ class CommandEntryMessage : public Command
 		msg->SetChannel(ci);
 		msg->SetCreator(source.GetNick());
 		msg->SetMessage(message);
-		Log(source.IsFounder(ci) ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to add a message";
+		Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to add a message";
 		source.Reply(_("Entry message added to \002{0}\002"), ci->GetName());
 	}
 
@@ -157,8 +157,8 @@ class CommandEntryMessage : public Command
 				unsigned i = convertTo<unsigned>(message);
 				if (i > 0 && i <= messages.size())
 				{
-					delete messages[i - 1];
-					Log(source.IsFounder(ci) ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to remove a message";
+					messages[i - 1]->Delete();
+					Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to remove a message";
 					source.Reply(_("Entry message \002{0}\002 for \002{1]\002 deleted."), i, ci->GetName());
 				}
 				else
@@ -176,7 +176,7 @@ class CommandEntryMessage : public Command
 		for (EntryMsg *e : ci->GetRefs<EntryMsg *>(entrymsg))
 			delete e;
 
-		Log(source.IsFounder(ci) ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to remove all messages";
+		Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to remove all messages";
 		source.Reply(_("Entry messages for \002{0}\002 have been cleared."), ci->GetName());
 	}
 
@@ -207,7 +207,7 @@ class CommandEntryMessage : public Command
 			return;
 		}
 
-		if (!source.IsFounder(ci) && !source.HasPriv("chanserv/administration"))
+		if (!source.AccessFor(ci).HasPriv("SET") && !source.HasPriv("chanserv/administration"))
 		{
 			source.Reply(_("Access denied. You do not have privilege \002{0}\002 on \002{1}\002."), "FOUNDER", ci->GetName());
 			return;
@@ -240,7 +240,7 @@ class CommandEntryMessage : public Command
 		               "\n"
 		               "The \002{0} CLEAR\002 command clears the entry message list.\n"
 		               "\n"
-		               "Use of this command requires being the founder of \037channel\037."),
+		               "Use of this command requires the \002SET\002 privilege on \037channel\037."),
 		               source.command);
 		return true;
 	}

@@ -219,6 +219,8 @@ class InspIRCd20Proto : public IRCDProto
 	{
 		Anope::string modes = "+" + u->GetModes();
 		UplinkSocket::Message(Me) << "UID " << u->GetUID() << " " << u->timestamp << " " << u->nick << " " << u->host << " " << u->host << " " << u->GetIdent() << " 0.0.0.0 " << u->timestamp << " " << modes << " :" << u->realname;
+		if (modes.find('o') != Anope::string::npos)
+			UplinkSocket::Message(u) << "OPERTYPE :services";
 	}
 
 	/* SERVER services-dev.chatspike.net password 0 :Description here */
@@ -816,7 +818,10 @@ struct IRCDMessageFHost : IRCDMessage
 
 	void Run(MessageSource &source, const std::vector<Anope::string> &params) override
 	{
-		source.GetUser()->SetDisplayedHost(params[0]);
+		User *u = source.GetUser();
+		if (u->HasMode("CLOAK"))
+			u->RemoveModeInternal(source, ModeManager::FindUserModeByName("CLOAK"));
+		u->SetDisplayedHost(params[0]);
 	}
 };
 
@@ -866,7 +871,7 @@ struct IRCDMessageFJoin : IRCDMessage
 			sju.second = User::Find(buf);
 			if (!sju.second)
 			{
-				Log(LOG_DEBUG) << "FJOIN for nonexistant user " << buf << " on " << params[0];
+				Log(LOG_DEBUG) << "FJOIN for non-existent user " << buf << " on " << params[0];
 				continue;
 			}
 
@@ -917,7 +922,7 @@ struct IRCDMessageFTopic : IRCDMessage
 
 		Channel *c = Channel::Find(params[0]);
 		if (c)
-			c->ChangeTopicInternal(params[2], params[3], Anope::string(params[1]).is_pos_number_only() ? convertTo<time_t>(params[1]) : Anope::CurTime);
+			c->ChangeTopicInternal(NULL, params[2], params[3], Anope::string(params[1]).is_pos_number_only() ? convertTo<time_t>(params[1]) : Anope::CurTime);
 	}
 };
 
@@ -947,7 +952,15 @@ struct IRCDMessageIdle : IRCDMessage
  */
 struct IRCDMessageMetadata : IRCDMessage
 {
-	IRCDMessageMetadata(Module *creator) : IRCDMessage(creator, "METADATA", 3) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
+	const bool &do_topiclock, &do_mlock;
+
+	IRCDMessageMetadata(Module *creator, const bool &handle_topiclock, const bool &handle_mlock)
+		: IRCDMessage(creator, "METADATA", 3)
+		, do_topiclock(handle_topiclock)
+		, do_mlock(handle_mlock)
+       	{
+		SetFlag(IRCDMESSAGE_REQUIRE_SERVER);
+	}
 
 	void Run(MessageSource &source, const std::vector<Anope::string> &params) override
 	{
@@ -982,8 +995,31 @@ struct IRCDMessageMetadata : IRCDMessage
 				Event::OnFingerprint(&Event::Fingerprint::OnFingerprint, u);
 			}
 		}
-		else if (params[0][0] == '#')
+		// We deliberately ignore non-bursting servers to avoid pseudoserver fights
+		else if ((params[0][0] == '#') && (!source.GetServer()->IsSynced()))
 		{
+			Channel *c = Channel::Find(params[0]);
+			if (c && c->ci)
+			{
+				if ((do_mlock) && (params[1] == "mlock"))
+				{
+					ModeLocks *modelocks = c->ci->GetExt<ModeLocks>("modelocks");
+					Anope::string modes;
+					if (modelocks)
+						modes = modelocks->GetMLockAsString(c->ci, false).replace_all_cs("+", "").replace_all_cs("-", "");
+
+					// Mode lock string is not what we say it is?
+					if (modes != params[2])
+						UplinkSocket::Message(Me) << "METADATA " << c->name << " mlock :" << modes;
+				}
+				else if ((do_topiclock) && (params[1] == "topiclock"))
+				{
+					bool mystate = c->ci->GetExt<bool>("TOPICLOCK");
+					bool serverstate = (params[2] == "1");
+					if (mystate != serverstate)
+						UplinkSocket::Message(Me) << "METADATA " << c->name << " topiclock :" << (mystate ? "1" : "");
+				}
+			}
 		}
 		else if (params[0] == "*")
 		{
@@ -1263,7 +1299,6 @@ class ProtoInspIRCd20 : public Module
 	, public EventHook<Event::DelChan>
 	, public EventHook<Event::MLockEvents>
 	, public EventHook<Event::SetChannelOption>
-	, public EventHook<Event::ChannelModeUnset>
 {
 	InspIRCd20Proto ircd_proto;
 	ExtensibleItem<bool> ssl;
@@ -1340,7 +1375,7 @@ class ProtoInspIRCd20 : public Module
 		, message_fmode(this)
 		, message_ftopic(this)
 		, message_idle(this)
-		, message_metadata(this)
+		, message_metadata(this, use_server_side_topiclock, use_server_side_mlock)
 		, message_mode(this)
 		, message_nick(this)
 		, message_opertype(this)
@@ -1461,15 +1496,6 @@ class ProtoInspIRCd20 : public Module
 			else if (setting == "topiclock off")
 				SendChannelMetadata(ci->c, "topiclock", "0");
 		}
-
-		return EVENT_CONTINUE;
-	}
-
-	EventReturn OnChannelModeUnset(Channel *c, const MessageSource &setter, ChannelMode *mode, const Anope::string &param) override
-	{
-		if ((setter.GetUser() && setter.GetUser()->server == Me) || setter.GetServer() == Me || !setter.GetServer())
-			if (mode->name == "OPERPREFIX")
-				c->SetMode(c->ci->WhoSends(), mode, param, false);
 
 		return EVENT_CONTINUE;
 	}

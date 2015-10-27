@@ -479,7 +479,7 @@ class CommandCSMode : public Command
 				case '*':
 					if (adding == -1 || !has_access)
 						break;
-					for (unsigned j = 0; j < ModeManager::GetChannelModes().size(); ++j)
+					for (unsigned j = 0; j < ModeManager::GetChannelModes().size() && ci->c; ++j)
 					{
 						ChannelMode *cm = ModeManager::GetChannelModes()[j];
 
@@ -912,7 +912,7 @@ class CSMode : public Module
 			}
 			else if (cm->type == MODE_PARAM)
 			{
-				/* If the channel doesnt have the mode, or it does and it isn't set correctly */
+				/* If the channel doesn't have the mode, or it does and it isn't set correctly */
 				if (ml->GetSet())
 				{
 					Anope::string param;
@@ -947,16 +947,40 @@ class CSMode : public Module
 			for (unsigned i = 0; i < mlock.length(); ++i)
 			{
 				if (mlock[i] == '+')
-					add = true;
-				else if (mlock[i] == '-')
-					add = false;
-				else
 				{
-					ChannelMode *cm = ModeManager::FindChannelModeByChar(mlock[i]);
-					Anope::string param;
-					if (cm && (cm->type == MODE_REGULAR || sep.GetToken(param)))
-						mlocks->SetMLock(ci, cm, add, param);
+					add = true;
+					continue;
 				}
+
+				if (mlock[i] == '-')
+				{
+					add = false;
+					continue;
+				}
+
+				ChannelMode *cm = ModeManager::FindChannelModeByChar(mlock[i]);
+				if (!cm)
+					continue;
+
+				Anope::string param;
+				if (cm->type == MODE_PARAM)
+				{
+					ChannelModeParam *cmp = anope_dynamic_static_cast<ChannelModeParam *>(cm);
+					if (add || !cmp->minus_no_arg)
+					{
+						sep.GetToken(param);
+						if (param.empty() || !cmp->IsValid(param))
+							continue;
+					}
+				}
+				else if (cm->type != MODE_REGULAR)
+				{
+					sep.GetToken(param);
+					if (param.empty())
+						continue;
+				}
+
+				mlocks->SetMLock(ci, cm, add, param);
 			}
 		}
 	}

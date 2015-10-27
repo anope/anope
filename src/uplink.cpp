@@ -140,6 +140,7 @@ bool UplinkSocket::ProcessRead()
 	{
 		Anope::Process(buf);
 		User::QuitUsers();
+		Channel::DeleteChannels();
 	}
 	return b;
 }

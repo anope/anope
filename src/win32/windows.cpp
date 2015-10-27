@@ -194,7 +194,7 @@ Anope::string GetWindowsVersion()
 				buf = "Microsoft Windows 98" + extra;
 			}
 			if (osvi.dwMajorVersion == 4 && osvi.dwMinorVersion == 90)
-				buf = "Microsoft Windows Millenium Edition";
+				buf = "Microsoft Windows Millennium Edition";
 	}
 	return buf;
 }

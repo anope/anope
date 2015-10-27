@@ -378,7 +378,7 @@ struct IRCDMessageNick : IRCDMessage
 			Server *s = Server::Find(params[6]);
 			if (s == NULL)
 			{
-				Log(LOG_DEBUG) << "User " << params[0] << " introduced from nonexistant server " << params[6] << "?";
+				Log(LOG_DEBUG) << "User " << params[0] << " introduced from non-existent server " << params[6] << "?";
 				return;
 			}
 
@@ -449,7 +449,7 @@ struct IRCDMessageSJoin : IRCDMessage
 				sju.second = User::Find(buf);
 				if (!sju.second)
 				{
-					Log(LOG_DEBUG) << "SJOIN for nonexistant user " << buf << " on " << params[1];
+					Log(LOG_DEBUG) << "SJOIN for non-existent user " << buf << " on " << params[1];
 					continue;
 				}
 
@@ -466,11 +466,11 @@ struct IRCDMessageTopic : IRCDMessage
 {
 	IRCDMessageTopic(Module *creator) : IRCDMessage(creator, "TOPIC", 4) { }
 
-	void Run(MessageSource &, const std::vector<Anope::string> &params) override
+	void Run(MessageSource &source, const std::vector<Anope::string> &params) override
 	{
 		Channel *c = Channel::Find(params[0]);
 		if (c)
-			c->ChangeTopicInternal(params[1], params[3], Anope::string(params[2]).is_pos_number_only() ? convertTo<time_t>(params[2]) : Anope::CurTime);
+			c->ChangeTopicInternal(source.GetUser(), params[1], params[3], Anope::string(params[2]).is_pos_number_only() ? convertTo<time_t>(params[2]) : Anope::CurTime);
 	}
 };
 

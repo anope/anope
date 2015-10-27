@@ -424,7 +424,7 @@ class MChanstats : public Module
 			"END;";
 		this->RunQuery(query);
 
-		/* dont prepend any database prefix to events so we can always delete/change old events */
+		/* don't prepend any database prefix to events so we can always delete/change old events */
 		if (this->HasEvent("chanstats_event_cleanup_daily"))
 		{
 			query = "DROP EVENT chanstats_event_cleanup_daily";
@@ -517,14 +517,13 @@ class MChanstats : public Module
 			info.AddOption(_("Chanstats"));
 	}
 
-	void OnTopicUpdated(Channel *c, const Anope::string &user, const Anope::string &topic) override
+	void OnTopicUpdated(User *source, Channel *c, const Anope::string &user, const Anope::string &topic) override
 	{
-		User *u = User::Find(user);
-		if (!u || !u->Account() || !c->ci || !cs_stats.HasExt(c->ci))
+		if (!source || !source->Account() || !c->ci || !cs_stats.HasExt(c->ci))
 			return;
 		query = "CALL " + prefix + "chanstats_proc_update(@channel@, @nick@, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1);";
 		query.SetValue("channel", c->name);
-		query.SetValue("nick", GetDisplay(u));
+		query.SetValue("nick", GetDisplay(source));
 		this->RunQuery(query);
 	}
 

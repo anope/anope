@@ -105,6 +105,10 @@ class SSLModule : public Module
 		if (!client_ctx || !server_ctx)
 			throw ModuleException("Error initializing SSL CTX");
 
+		long opts = SSL_OP_NO_SSLv2 | SSL_OP_NO_SESSION_RESUMPTION_ON_RENEGOTIATION | SSL_OP_CIPHER_SERVER_PREFERENCE;
+		SSL_CTX_set_options(client_ctx, opts);
+		SSL_CTX_set_options(server_ctx, opts);
+
 		SSL_CTX_set_mode(client_ctx, SSL_MODE_ENABLE_PARTIAL_WRITE | SSL_MODE_ACCEPT_MOVING_WRITE_BUFFER);
 		SSL_CTX_set_mode(server_ctx, SSL_MODE_ENABLE_PARTIAL_WRITE | SSL_MODE_ACCEPT_MOVING_WRITE_BUFFER);
 
@@ -160,6 +164,20 @@ class SSLModule : public Module
 				Log() << "Unable to open private key " << this->keyfile;
 		}
 
+		// Allow disabling SSLv3
+		if (!config->Get<Anope::string>("sslv3").empty())
+		{
+			if (config->Get<bool>("sslv3"))
+			{
+				SSL_CTX_clear_options(client_ctx, SSL_OP_NO_SSLv3);
+				SSL_CTX_clear_options(server_ctx, SSL_OP_NO_SSLv3);
+			}
+			else
+			{
+				SSL_CTX_set_options(client_ctx, SSL_OP_NO_SSLv3);
+				SSL_CTX_set_options(server_ctx, SSL_OP_NO_SSLv3);
+			}
+		}
 	}
 
 	void OnPreServerConnect() override

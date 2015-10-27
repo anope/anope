@@ -195,7 +195,7 @@ class CommandCSTopic : public Command
 		               " The \002APPEND\002 command appends the given topic to the existing topic.\n"
 		               "\n"
 		               "\002LOCK\002 and \002UNLOCK\002 may be used to enable and disable topic lock."
-		               " When topic lock is set, the channel topic will be unchangeable except via this command.\n"
+		               " When topic lock is set, the channel topic will be unchangeable by users who do not have the \002TOPIC\002 privilege.\n"
 		               "\n"
 		               "Use of this command requires the \002{0}\002 privilege on \037channel\037."),
 		               "TOPIC");
@@ -235,7 +235,7 @@ class CSTopic : public Module
 		}
 	}
 
-	void OnTopicUpdated(Channel *c, const Anope::string &user, const Anope::string &topic) override
+	void OnTopicUpdated(User *source, Channel *c, const Anope::string &user, const Anope::string &topic) override
 	{
 		if (!c->ci)
 			return;
@@ -245,7 +245,7 @@ class CSTopic : public Module
 		 * This desyncs what is really set with what we have stored, and we end up resetting the topic often when
 		 * it is not required
 		 */
-		if (topiclock.HasExt(c->ci) && c->ci->GetLastTopic() != c->topic)
+		if (topiclock.HasExt(c->ci) && c->ci->GetLastTopic() != c->topic && (!source || !c->ci->AccessFor(source).HasPriv("TOPIC")))
 		{
 			c->ChangeTopic(c->ci->GetLastTopicSetter(), c->ci->GetLastTopic(), c->ci->GetLastTopicTime());
 		}

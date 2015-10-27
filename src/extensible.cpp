@@ -24,8 +24,6 @@ ExtensibleBase::~ExtensibleBase()
 
 Extensible::~Extensible()
 {
-	while (!extension_items.empty())
-		extension_items[0]->Unset(this);
 }
 
 bool Extensible::HasExtOK(const Anope::string &name)

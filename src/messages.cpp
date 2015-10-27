@@ -27,7 +27,14 @@ using namespace Message;
 
 void Away::Run(MessageSource &source, const std::vector<Anope::string> &params)
 {
-	Event::OnUserAway(&Event::UserAway::OnUserAway, source.GetUser(), params.empty() ? "" : params[0]);
+	const Anope::string &msg = !params.empty() ? params[0] : "";
+
+	Event::OnUserAway(&Event::UserAway::OnUserAway, source.GetUser(), msg);
+
+	if (!msg.empty())
+		Log(source.GetUser(), "away") << "is now away: " << msg;
+	else
+		Log(source.GetUser(), "away") << "is no longer away";
 }
 
 void Capab::Run(MessageSource &source, const std::vector<Anope::string> &params)
@@ -78,12 +85,12 @@ void Join::Run(MessageSource &source, const std::vector<Anope::string> &params)
 			for (User::ChanUserList::iterator it = user->chans.begin(), it_end = user->chans.end(); it != it_end; )
 			{
 				ChanUserContainer *cc = it->second;
+				Channel *c = cc->chan;
 				++it;
 
-				Anope::string channame = cc->chan->name;
-				Event::OnPrePartChannel(&Event::PrePartChannel::OnPrePartChannel, user, cc->chan);
+				Event::OnPrePartChannel(&Event::PrePartChannel::OnPrePartChannel, user, c);
 				cc->chan->DeleteUser(user);
-				Event::OnPartChannel(&Event::PartChannel::OnPartChannel, user, Channel::Find(channame), channame, "");
+				Event::OnPartChannel(&Event::PartChannel::OnPartChannel, user, c, c->name,  "");
 			}
 			continue;
 		}
@@ -280,16 +287,16 @@ void Part::Run(MessageSource &source, const std::vector<Anope::string> &params)
 
 	while (sep.GetToken(channel))
 	{
-		Reference<Channel> c = Channel::Find(channel);
+		Channel *c = Channel::Find(channel);
 
 		if (!c || !u->FindChannel(c))
 			continue;
 
 		Log(u, c, "part") << "Reason: " << (!reason.empty() ? reason : "No reason");
+
 		Event::OnPrePartChannel(&Event::PrePartChannel::OnPrePartChannel, u, c);
-		Anope::string ChannelName = c->name;
 		c->DeleteUser(u);
-		Event::OnPartChannel(&Event::PartChannel::OnPartChannel, u, c, ChannelName, !reason.empty() ? reason : "");
+		Event::OnPartChannel(&Event::PartChannel::OnPartChannel, u, c, c->name, !reason.empty() ? reason : "");
 	}
 }
 
@@ -462,7 +469,7 @@ void Topic::Run(MessageSource &source, const std::vector<Anope::string> &params)
 {
 	Channel *c = Channel::Find(params[0]);
 	if (c)
-		c->ChangeTopicInternal(source.GetSource(), params[1], Anope::CurTime);
+		c->ChangeTopicInternal(source.GetUser(), source.GetSource(), params[1], Anope::CurTime);
 
 	return;
 }

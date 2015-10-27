@@ -155,6 +155,12 @@ class CommandNSRegister : public Command
 			return;
 		}
 
+		if (ServiceBot::Find(u_nick, true))
+		{
+			source.Reply(_("\002{0}\002 may not be registered."), u_nick);
+			return;
+		}
+
 		if (Config->GetModule("nickserv")->Get<bool>("restrictopernicks"))
 			for (Oper *o : Serialize::GetObjects<Oper *>(operblock))
 			{
@@ -164,6 +170,8 @@ class CommandNSRegister : public Command
 					return;
 				}
 			}
+
+		unsigned int passlen = Config->GetModule("nickserv")->Get<unsigned>("passlen", "32");
 
 		if (Config->GetModule("nickserv")->Get<bool>("forceemail", "yes") && email.empty())
 		{

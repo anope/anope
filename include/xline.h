@@ -113,6 +113,8 @@ class CoreExport XLineManager : public Service
 	 */
 	void AddXLine(XLine *x);
 
+	void RemoveXLine(XLine *);
+
 	/** Delete an entry from this XLineManager
 	 * @param x The entry
 	 * @return true if the entry was found and deleted, else false

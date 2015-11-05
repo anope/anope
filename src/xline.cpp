@@ -107,6 +107,9 @@ XLine::XLine(const Anope::string &ma, const Anope::string &b, const time_t ex, c
 
 XLine::~XLine()
 {
+	if (manager)
+		manager->RemoveXLine(this);
+
 	delete regex;
 	delete c;
 }
@@ -291,6 +294,30 @@ void XLineManager::AddXLine(XLine *x)
 	x->manager = this;
 }
 
+void XLineManager::RemoveXLine(XLine *x)
+{
+	/* called from the destructor */
+
+	std::vector<XLine *>::iterator it = std::find(this->xlines->begin(), this->xlines->end(), x);
+
+	if (!x->id.empty())
+	{
+		std::multimap<Anope::string, XLine *, ci::less>::iterator it2 = XLinesByUID->find(x->id), it3 = XLinesByUID->upper_bound(x->id);
+		for (; it2 != XLinesByUID->end() && it2 != it3; ++it2)
+			if (it2->second == x)
+			{
+				XLinesByUID->erase(it2);
+				break;
+			}
+	}
+
+	if (it != this->xlines->end())
+	{
+		this->SendDel(x);
+		this->xlines->erase(it);
+	}
+}
+
 bool XLineManager::DelXLine(XLine *x)
 {
 	std::vector<XLine *>::iterator it = std::find(this->xlines->begin(), this->xlines->end(), x);
@@ -331,14 +358,16 @@ XLine* XLineManager::GetEntry(unsigned index)
 
 void XLineManager::Clear()
 {
-	for (unsigned i = 0; i < this->xlines->size(); ++i)
+	std::vector<XLine *> xl;
+	this->xlines->swap(xl);
+
+	for (unsigned i = 0; i < xl.size(); ++i)
 	{
-		XLine *x = this->xlines->at(i);
+		XLine *x = xl[i];
 		if (!x->id.empty())
 			XLinesByUID->erase(x->id);
 		delete x;
 	}
-	this->xlines->clear();
 }
 
 bool XLineManager::CanAdd(CommandSource &source, const Anope::string &mask, time_t expires, const Anope::string &reason)

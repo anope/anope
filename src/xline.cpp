@@ -337,6 +337,7 @@ bool XLineManager::DelXLine(XLine *x)
 	{
 		this->SendDel(x);
 
+		x->manager = NULL; // Don't call remove
 		delete x;
 		this->xlines->erase(it);
 

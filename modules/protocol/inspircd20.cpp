@@ -31,6 +31,7 @@ class InspIRCd20Proto : public IRCDProto
 		CanSVSHold = true;
 		CanCertFP = true;
 		RequiresID = true;
+		NickID = true;
 		MaxModes = 20;
 	}
 

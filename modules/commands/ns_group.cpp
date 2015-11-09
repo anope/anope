@@ -127,7 +127,7 @@ class CommandNSGroup : public Command
 			}
 
 		NickAlias *target, *na = NickAlias::Find(u->nick);
-		const Anope::string &guestnick = Config->GetModule("nickserv")->Get<const Anope::string>("guestnickprefix", "Guest");
+		const Anope::string &guestnick = Config->GetModule("nickserv")->Get<const Anope::string>("guestnickprefix", IRCD->NickID ? "" : "Guest");
 		time_t reg_delay = Config->GetModule("nickserv")->Get<time_t>("regdelay");
 		unsigned maxaliases = Config->GetModule(this->owner)->Get<unsigned>("maxaliases");
 		if (!(target = NickAlias::Find(nick)))
@@ -147,7 +147,7 @@ class CommandNSGroup : public Command
 			source.Reply(NICK_IDENTIFY_REQUIRED);
 		else if (maxaliases && target->nc->aliases->size() >= maxaliases && !target->nc->IsServicesOper())
 			source.Reply(_("There are too many nicks in your group."));
-		else if (u->nick.length() <= guestnick.length() + 7 &&
+		else if (!guestnick.empty() && u->nick.length() <= guestnick.length() + 7 &&
 			u->nick.length() >= guestnick.length() + 1 &&
 			!u->nick.find_ci(guestnick) && !u->nick.substr(guestnick.length()).find_first_not_of("1234567890"))
 		{

@@ -186,6 +186,14 @@ class CoreExport User : public virtual Base, public Extensible, public CommandRe
 	void SetRealname(const Anope::string &realname);
 
 	/**
+	 * Send a message (notice or privmsg, depending on settings) to a user in the context of a channel.
+	 * @param source Sender
+	 * @param chan Channel context.
+	 * @params msg Message to send.
+	 */
+	void SendContextMessage(BotInfo *source, Channel *chan, const Anope::string &msg) anope_override;
+
+	/**
 	 * Send a message (notice or privmsg, depending on settings) to a user
 	 * @param source Sender
 	 * @param fmt Format of the Message

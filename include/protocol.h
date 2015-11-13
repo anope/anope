@@ -144,6 +144,9 @@ class CoreExport IRCDProto : public Service
 	virtual void SendAction(const MessageSource &source, const Anope::string &dest, const char *fmt, ...);
 	virtual void SendCTCP(const MessageSource &source, const Anope::string &dest, const char *fmt, ...);
 
+	virtual void SendContextNotice(BotInfo *source, const User *dest, const Channel *chan, const Anope::string &msg);
+	virtual void SendContextPrivmsg(BotInfo *source, const User *dest, const Channel *chan, const Anope::string &msg);
+
 	virtual void SendGlobalNotice(BotInfo *bi, const Server *dest, const Anope::string &msg) = 0;
 	virtual void SendGlobalPrivmsg(BotInfo *bi, const Server *desc, const Anope::string &msg) = 0;
 

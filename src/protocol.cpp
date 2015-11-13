@@ -339,6 +339,16 @@ void IRCDProto::SendCTCP(const MessageSource &source, const Anope::string &dest,
 	SendCTCPInternal(source, dest, buf);
 }
 
+void IRCDProto::SendContextNotice(BotInfo *source, const User *dest, const Channel *chan, const Anope::string &msg)
+{
+	SendNotice(source, dest->GetUID(), "[%s] %s", chan->ci->name.c_str(), msg.c_str());
+}
+
+void IRCDProto::SendContextPrivmsg(BotInfo *source, const User *dest, const Channel *chan, const Anope::string &msg)
+{
+	SendPrivmsg(source, dest->GetUID(), "[%s] %s", chan->ci->name.c_str(), msg.c_str());
+}
+
 void IRCDProto::SendNumeric(int numeric, const Anope::string &dest, const char *fmt, ...)
 {
 	va_list args;

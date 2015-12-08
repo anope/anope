@@ -16,7 +16,7 @@
 
 ANOPEPID="@INSTDIR@/data/services.pid"
 ANOPROG="@INSTDIR@/bin/services"
-LOG="@INSTDIR@/data/logs/"
+LOG="@INSTDIR@/logs/"
 ARCVERSION="2"
 
 isAnopeRunning () {

@@ -17,6 +17,8 @@ channel - Takes one parameter, a channel name, and returns real time information
 
 user - Takes one parameter, a user name, and returns real time information regarding that user.
 
+notice - Takes three parameters, source user, target user, and message. Sends a message to the user.
+
 XMLRPC was designed to be used with db_sql, and will not return any information that can be pulled from the SQL
 database, such as accounts and registered channel information. It is instead used for pulling realtime data such
 as users and channels currently online. For examples on how to use these calls in PHP, see xmlrpc.php in docs/XMLRPC.

@@ -52,8 +52,8 @@ Note: You should also read the README and FAQ files!
     cause trouble on your network if passwords are not encrypted, or read
     the memos of any user.
 
-    Now go into the conf directory (by default, ~/services/conf). Copy the example
-    configuration file (example.conf) to services.conf, and open the latter
+    Now go into the conf directory (by default, ~/anope/conf). Copy the example
+    configuration file (anope.example.conf) to anope.conf, and open the latter
     with your favorite text editor. It contains all the configuration
     directives Anope will use at startup. Read the instructions contained in
     the file carefully. Using the default values is NOT a good idea, and will
@@ -71,7 +71,7 @@ Note: You should also read the README and FAQ files!
 
         * IMPORTANT: Back up your old databases!
         * If you are upgrading to a new major release, ALWAYS restart a
-          fresh configuration file from example.conf.
+          fresh configuration file from anope.example.conf.
 
 3) Setting up the IRCd
 
@@ -83,7 +83,7 @@ Note: You should also read the README and FAQ files!
     a shared block), and be sure that the IRCd is listneing on the given port
     in the link block.
 
-    Example link configurations can be found in example.conf for some of the
+    Example link configurations can be found in anope.example.conf for some of the
     popular IRCds.
 
     Don't forget to /rehash your IRCd to apply changes.
@@ -95,7 +95,7 @@ Note: You should also read the README and FAQ files!
 4) Starting Anope
 
     Go into the directory where binaries were installed (by default, this is
-    ~/services/bin). Type ./services to launch Anope.
+    ~/anope/bin). Type ./anope to launch Anope.
 
     If there are syntax errors in the configuration file they will be
     displayed on the screen. Correct them until there are no errors anymore.
@@ -104,7 +104,7 @@ Note: You should also read the README and FAQ files!
     Give Services at least one minute to link to your network, as certain
     IRCds on some OSes may be really slow for the link process. If nothing
     happens after about a minute, it is probably a configuration problem. Try
-    to launch Anope with ./services -debug -nofork to see any errors that it
+    to launch Anope with ./anope -debug -nofork to see any errors that it
     encounters, and try to correct them.
 
     If you need help to solve errors, feel free to subscribe to the Anope
@@ -116,7 +116,7 @@ Note: You should also read the README and FAQ files!
     still running, and restart it if not.
 
     First rename the example.chk script that is in Anope path (by default,
-    this is ~/services/conf) to services.chk and edit it. You'll need to 
+    this is ~/anope/conf) to services.chk and edit it. You'll need to 
     modify the CONFIGURATION part of the file. Then ensure that the file is 
     marked as executable by typing chmod +x services.chk, and try to launch the
     script to see if it works (Anope must not be running when you do this ;))
@@ -125,7 +125,7 @@ Note: You should also read the README and FAQ files!
     This will open the default text editor with the crontab file. Enter the
     following (with correct path):
 
-        */5 * * * * /home/ircd/services/conf/services.chk >/dev/null 2>&1
+        */5 * * * * /home/ircd/anope/conf/services.chk >/dev/null 2>&1
 
     The */5 at the beginning means "check every 5 minutes". You may replace
     the 5 with other another number if you want (but less than 60). Consult

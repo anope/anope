@@ -27,6 +27,8 @@ class CommandHSOn : public Command
 
 		User *u = source.GetUser();
 		const NickAlias *na = NickAlias::Find(u->nick);
+		if (!na || na->nc != u->Account() || !na->HasVhost())
+			na = NickAlias::Find(u->Account()->display);
 		if (na && u->Account() == na->nc && na->HasVhost())
 		{
 			if (!na->GetVhostIdent().empty())

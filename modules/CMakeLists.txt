@@ -20,6 +20,13 @@ macro(build_modules SRC)
           # Convert the real source file extension to have a .so extension
           string(REGEX REPLACE "\\.cpp$" "" SO ${FNAME})
 
+          file(RELATIVE_PATH DEST "${Anope_SOURCE_DIR}/modules" ${SRC})
+          if(DEST)
+            set(TARG "module_${DEST}.${SO}")
+          else(DEST)
+            set(TARG "module_${SO}")
+          endif(DEST)
+
           # Reset linker flags
           set(TEMP_LDFLAGS)
           # Reset extra dependencies
@@ -33,31 +40,31 @@ macro(build_modules SRC)
             set(WIN32_MEMORY)
           endif(MSVC)
           # Generate the module and set its linker flags, also set it to depend on the main Anope executable to be built beforehand
-          add_library(${SO} MODULE ${MODULE_SRC})
+          add_library(${TARG} MODULE ${MODULE_SRC})
           # Windows requires this because it's weird
           if(WIN32)
             set(WIN32_NO_LIBS "/nodefaultlib:\"libcmt.lib\" /OPT:NOREF")
           else(WIN32)
             set(WIN32_NO_LIBS)
           endif(WIN32)
-          set_target_properties(${SO} PROPERTIES LINKER_LANGUAGE CXX PREFIX "" SUFFIX ".so" LINK_FLAGS "${TEMP_LDFLAGS} ${WIN32_NO_LIBS}" INSTALL_RPATH_USE_LINK_PATH ON BUILD_WITH_INSTALL_RPATH ON)
-          add_dependencies(${SO} ${PROGRAM_NAME})
+          set_target_properties(${TARG} PROPERTIES LINKER_LANGUAGE CXX PREFIX "" LINK_FLAGS "${TEMP_LDFLAGS} ${WIN32_NO_LIBS}" INSTALL_RPATH_USE_LINK_PATH ON BUILD_WITH_INSTALL_RPATH ON OUTPUT_NAME "${SO}")
+          add_dependencies(${TARG} ${PROGRAM_NAME})
           if(GETTEXT_FOUND)
-            add_dependencies(${SO} module_language)
+                  add_dependencies(${TARG} module_language)
           endif(GETTEXT_FOUND)
-          target_link_libraries(${SO} ${TEMP_DEPENDENCIES})
+          target_link_libraries(${TARG} ${TEMP_DEPENDENCIES})
           # For Windows only, have the module link to the export library of Anope as well as wsock32 and Ws2_32 libraries (most of the modules probably don't need this, but this is to be on the safe side), also set its version
           if(WIN32)
-            target_link_libraries(${SO} ${PROGRAM_NAME} wsock32 Ws2_32 ${WIN32_MEMORY})
+            target_link_libraries(${TARG} ${PROGRAM_NAME} wsock32 Ws2_32 ${WIN32_MEMORY})
             set_target_properties(${PROGRAM_NAME} PROPERTIES VERSION "${VERSION_DOTTED}")
           else(WIN32)
             if(APPLE)
-              target_link_libraries(${SO} ${PROGRAM_NAME})
+              target_link_libraries(${TARG} ${PROGRAM_NAME})
             endif(APPLE)
           endif(WIN32)
           calculate_dependencies(${MODULE_SRC})
           # Set the module to be installed to the module directory under the data directory
-          install(TARGETS ${SO} DESTINATION ${LIB_DIR}/modules)
+          install(TARGETS ${TARG} DESTINATION ${LIB_DIR}/modules/${DEST})
         endif(CPP)
       endif(IS_DIRECTORY "${MODULE_SRC}")
     endforeach(MODULE_SRC ${MODULES_SRCS})
@@ -68,8 +75,14 @@ macro(build_subdir)
   file(GLOB_RECURSE MODULES_SUBDIR_SRCS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "*.cpp")
   list(SORT MODULES_SUBDIR_SRCS)
 
-  GET_FILENAME_COMPONENT(FOLDER_NAME ${CMAKE_CURRENT_SOURCE_DIR} NAME)
-  set(SO "${FOLDER_NAME}")
+  file(RELATIVE_PATH DEST "${Anope_SOURCE_DIR}/modules" ${CMAKE_CURRENT_SOURCE_DIR})
+  GET_FILENAME_COMPONENT(DIR_NAME ${DEST} DIRECTORY)
+  GET_FILENAME_COMPONENT(FOLDER_NAME ${DEST} NAME)
+  if(DIR_NAME)
+    set(SO "${DIR_NAME}.${FOLDER_NAME}")
+  else(DIR_NAME)
+    set(SO "${FOLDER_NAME}")
+  endif(DIR_NAME)
 
   # Set all the files to use C++ as well as set their compile flags (use the module-specific compile flags, though)
   set_source_files_properties(${MODULES_SUBDIR_SRCS} PROPERTIES LANGUAGE CXX COMPILE_FLAGS "${CXXFLAGS}")
@@ -107,15 +120,15 @@ macro(build_subdir)
     set(WIN32_MEMORY)
   endif(MSVC)
 
-  # Generate the module and set it's linker flags, also set it to depend on the main Anope executable to be built beforehand
+  # Generate the module and set its linker flags, also set it to depend on the main Anope executable to be built beforehand
   add_library(${SO} MODULE ${MODULES_SUBDIR_SRCS})
-  set_target_properties(${SO} PROPERTIES LINKER_LANGUAGE CXX PREFIX "" SUFFIX ".so" LINK_FLAGS "${SUBDIR_LDFLAGS}" INSTALL_RPATH_USE_LINK_PATH ON BUILD_WITH_INSTALL_RPATH ON)
+  set_target_properties(${SO} PROPERTIES LINKER_LANGUAGE CXX PREFIX "" LINK_FLAGS "${SUBDIR_LDFLAGS}" INSTALL_RPATH_USE_LINK_PATH ON BUILD_WITH_INSTALL_RPATH ON OUTPUT_NAME "${FOLDER_NAME}")
   add_dependencies(${SO} ${PROGRAM_NAME})
   if(GETTEXT_FOUND)
     add_dependencies(${SO} module_language)
   endif(GETTEXT_FOUND)
   target_link_libraries(${SO} ${SUBDIR_EXTRA_DEPENDS})
-  # For Windows only, have the module link to the export library of Anope as well as wsock32 and Ws2_32 libraries (most of the modules probably don't need this, but this is to be on the safe side), also set it's version
+  # For Windows only, have the module link to the export library of Anope as well as wsock32 and Ws2_32 libraries (most of the modules probably don't need this, but this is to be on the safe side), also set its version
   if(WIN32)
     target_link_libraries(${SO} ${PROGRAM_NAME} wsock32 Ws2_32 ${WIN32_MEMORY})
     set_target_properties(${PROGRAM_NAME} PROPERTIES VERSION "${VERSION_DOTTED}")
@@ -125,10 +138,8 @@ macro(build_subdir)
     endif(APPLE)
   endif(WIN32)
 
-  # Set the module to be installed to the module directory under the data directory
-  install(TARGETS ${SO} DESTINATION ${LIB_DIR}/modules)
+  install(TARGETS ${SO} DESTINATION ${LIB_DIR}/modules/${DIR_NAME})
 endmacro(build_subdir)
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 build_modules(${CMAKE_CURRENT_SOURCE_DIR})
 

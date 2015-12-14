@@ -9,13 +9,12 @@
  * Based on the original code of Services by Andy Church.
  */
 
-/* Dependencies: chanserv */
 
 #include "module.h"
 #include "modules/chanserv.h"
 #include "modules/cs_access.h"
-#include "../pseudoclients/chanserv/chanaccess.h"
-#include "../pseudoclients/chanserv/chanaccesstype.h"
+#include "main/chanaccess.h"
+#include "main/chanaccesstype.h"
 
 class AccessChanAccess : public ChanAccessImpl
 {

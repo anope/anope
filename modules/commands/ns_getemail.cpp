@@ -35,16 +35,16 @@ class CommandNSGetEMail : public Command
 		{
 			const NickCore *nc = it->second;
 
-			if (!nc->email.empty() && nc->email.equals_ci(email))
+			if (!nc->email.empty() && Anope::Match(nc->email, email))
 			{
 				++j;
-				source.Reply(_("Email matched: \002%s\002 to \002%s\002."), nc->display.c_str(), email.c_str());
+				source.Reply(_("Email matched: \002%s\002 (\002%s\002) to \002%s\002."), nc->display.c_str(), nc->email.c_str(), email.c_str());
 			}
 		}
 
 		if (j <= 0)
 		{
-			source.Reply(_("No nick registrations matching \002%s\002 found."), email.c_str());
+			source.Reply(_("No registrations matching \002%s\002 were found."), email.c_str());
 			return;
 		}
 
@@ -55,10 +55,7 @@ class CommandNSGetEMail : public Command
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Returns the matching nicks that used given email. \002Note\002 that\n"
-				"you can not use wildcards. Whenever this command is used, a message\n"
-				"including the person who issued the command and the email it was used\n"
-				"on will be logged."));
+		source.Reply(_("Returns the matching accounts that used given email."));
 		return true;
 	}
 };

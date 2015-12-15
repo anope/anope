@@ -16,7 +16,7 @@ add_to_cpack_ignored_files("${version_BINARY}$" TRUE)
 if(NOT WIN32)
   add_to_cpack_ignored_files("version.h$" TRUE)
   add_to_cpack_ignored_files("build.h$" TRUE)
-endif(NOT WIN32)
+endif()
 
 # Add a custom target to the above file
 add_custom_target(headers DEPENDS version ${CMAKE_CURRENT_BINARY_DIR}/version_build)

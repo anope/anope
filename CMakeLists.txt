@@ -41,7 +41,7 @@ include(CheckLibraryExists)
 include(CheckCXXCompilerFlag)
 
 if(NOT MSVC)
-  CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
+  check_cxx_compiler_flag("-std=c++11" COMPILER_SUPPORTS_CXX11)
   if(NOT COMPILER_SUPPORTS_CXX11)
     message(FATAL_ERROR "The compiler ${CMAKE_CXX_COMPILER} has no C++11 support. Please use a newer compiler.")
   endif()
@@ -314,9 +314,9 @@ if(EXISTS "${CMAKE_ROOT}/Modules/CPack.cmake")
   # The following is primarily for NSIS
   if(WIN32)
     # By default, do not warn when built on machines using only VS Express:
-    IF(NOT DEFINED CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS_NO_WARNINGS)
-      SET(CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS_NO_WARNINGS ON)
-    ENDIF()
+    if(NOT DEFINED CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS_NO_WARNINGS)
+      set(CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS_NO_WARNINGS ON)
+    endif()
     # Also for Windows, include installing the MSVCRT library
     include(InstallRequiredSystemLibraries)
     set(CPACK_GENERATOR "NSIS")

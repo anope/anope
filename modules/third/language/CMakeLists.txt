@@ -29,7 +29,7 @@ if(GETTEXT_FOUND)
     endif()
 
     # Install the new language file
-    install(CODE "FILE(MAKE_DIRECTORY ${LOCALE_DIR}/${LANG_LANG}/LC_MESSAGES/)")
+    install(CODE "file(MAKE_DIRECTORY ${LOCALE_DIR}/${LANG_LANG}/LC_MESSAGES/)")
     install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${LANG_MO} DESTINATION ${LOCALE_DIR}/${LANG_LANG}/LC_MESSAGES RENAME ${LANG_DOMAIN}.mo PERMISSIONS ${PERMS})
   endforeach()
 

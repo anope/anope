@@ -6,10 +6,10 @@ if(WIN32)
   if(IN_SOURCE)
     # Add README.txt to list of files for CPack to ignore
     add_to_cpack_ignored_files("README.txt$" TRUE)
-  endif(IN_SOURCE)
+  endif()
   set(DOCS Changes Changes.conf DEFCON FAQ INSTALL LANGUAGE MODULES NEWS ${CMAKE_CURRENT_BINARY_DIR}/README.txt WIN32.txt)
   install(FILES ${DOCS}
     DESTINATION ${DOC_DIR}
   )
   set_directory_properties(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES "${CMAKE_CURRENT_BINARY_DIR}/README.txt")
-endif(WIN32)
+endif()

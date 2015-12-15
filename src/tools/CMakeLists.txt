@@ -21,7 +21,7 @@ foreach(SRC ${TOOLS_SRCS})
   get_target_property(EXE_BINARY ${EXE} LOCATION)
   get_filename_component(EXE_BINARY ${EXE_BINARY} NAME)
   add_to_cpack_ignored_files("${EXE_BINARY}$" TRUE)
-endforeach(SRC)
+endforeach()
 
 # If not on Windows, generate anoperc and install it along with mydbgen
 if(NOT WIN32)
@@ -32,9 +32,9 @@ if(NOT WIN32)
   install (PROGRAMS geoipupdate.sh
     DESTINATION ${BIN_DIR}
   )
-endif(NOT WIN32)
+endif()
 
 # On non-Windows platforms, if RUNGROUP is set, change the permissions of the tools directory
 if(NOT WIN32 AND RUNGROUP)
   install(CODE "execute_process(COMMAND ${CHMOD} 2770 \"\$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/bin\")")
-endif(NOT WIN32 AND RUNGROUP)
+endif()

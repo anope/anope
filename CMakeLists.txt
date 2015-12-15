@@ -171,10 +171,8 @@ endif()
 find_program(CHGRP chgrp)
 find_program(CHMOD chmod)
 
-# If a INSTDIR was passed in to CMake, use it as the install prefix, otherwise set the default install prefix to the services directory under the user's home directory
-if(INSTDIR)
-  set(CMAKE_INSTALL_PREFIX "${INSTDIR}")
-elseif()
+# If CMAKE_INSTALL_PREFIX was not passed in to CMake set the default install prefix to the "anope" directory under the user's home directory
+if(NOT CMAKE_INSTALL_PREFIX)
   set(CMAKE_INSTALL_PREFIX "$ENV{HOME}/anope")
 endif()
 

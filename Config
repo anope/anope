@@ -44,7 +44,7 @@ Run_Build_System () {
 	EXTRA_LIBS=""
 
 	if [ "$INSTDIR" != "" ] ; then
-		WITH_INST="-DINSTDIR:STRING=$INSTDIR"
+		WITH_INST="-DCMAKE_INSTALL_PREFIX:STRING=$INSTDIR"
 	fi
 
 	if [ "$RUNGROUP" != "" ] ; then

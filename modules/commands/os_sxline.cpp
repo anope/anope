@@ -354,9 +354,7 @@ class CommandOSSNLine : public CommandOSSXLineBase
 		if (Config->GetModule("operserv")->Get<bool>("addakiller", "yes") && !source.GetNick().empty())
 			reason = "[" + source.GetNick() + "] " + reason;
 
-		if (!this->xlm()->CanAdd(source, mask, expires, reason))
-			return;
-		else if (mask.find_first_not_of("/.*?") == Anope::string::npos)
+		if (mask.find_first_not_of("/.*?") == Anope::string::npos)
 		{
 			source.Reply(USERHOST_MASK_TOO_WIDE, mask.c_str());
 			return;
@@ -379,6 +377,9 @@ class CommandOSSNLine : public CommandOSSXLineBase
 			delete x;
 			return;
 		}
+
+		if (!this->xlm()->CanAdd(source, mask, expires, reason))
+			return;
 
 		EventReturn MOD_RESULT;
 		FOREACH_RESULT(OnAddXLine, MOD_RESULT, (source, x, this->xlm()));
@@ -561,9 +562,7 @@ class CommandOSSQLine : public CommandOSSXLineBase
 		if (Config->GetModule("operserv")->Get<bool>("addakiller", "yes") && !source.GetNick().empty())
 			reason = "[" + source.GetNick() + "] " + reason;
 
-		if (!this->sqlines->CanAdd(source, mask, expires, reason))
-			return;
-		else if (mask.find_first_not_of("./?*") == Anope::string::npos)
+		if (mask.find_first_not_of("./?*") == Anope::string::npos)
 		{
 			source.Reply(USERHOST_MASK_TOO_WIDE, mask.c_str());
 			return;
@@ -586,6 +585,9 @@ class CommandOSSQLine : public CommandOSSXLineBase
 			delete x;
 			return;
 		}
+
+		if (!this->sqlines->CanAdd(source, mask, expires, reason))
+			return;
 
 		EventReturn MOD_RESULT;
 		FOREACH_RESULT(OnAddXLine, MOD_RESULT, (source, x, this->xlm()));

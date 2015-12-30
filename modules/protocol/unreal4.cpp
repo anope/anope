@@ -29,8 +29,9 @@ class UnrealIRCdProto : public IRCDProto
 		CanSQLine = true;
 		CanSZLine = true;
 		CanSVSHold = true;
-		MaxModes = 12;
+		CanCertFP = true;
 		RequiresID = true;
+		MaxModes = 12;
 	}
 
  private:
@@ -813,6 +814,34 @@ struct IRCDMessageChgName : IRCDMessage
 	}
 };
 
+struct IRCDMessageMD : IRCDMessage
+{
+	IRCDMessageMD(Module *creator) : IRCDMessage(creator, "MD", 3) { }
+
+	void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
+	{
+		const Anope::string &type = params[0],
+				    &obj = params[1],
+				    &var = params[2],
+				    &value = params.size() > 3 ? params[3] : "";
+
+		if (type == "client")
+		{
+			User *u = User::Find(obj);
+
+			if (u == NULL)
+				return;
+
+			if (var == "certfp" && !value.empty())
+			{
+				u->Extend<bool>("ssl");
+				u->fingerprint = value;
+				FOREACH_MOD(OnFingerprint, (u));
+			}
+		}
+	}
+};
+
 struct IRCDMessageMode : IRCDMessage
 {
 	IRCDMessageMode(Module *creator, const Anope::string &mname) : IRCDMessage(creator, mname, 2) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
@@ -1293,6 +1322,7 @@ class ProtoUnreal : public Module
 	IRCDMessageChgHost message_chghost;
 	IRCDMessageChgIdent message_chgident;
 	IRCDMessageChgName message_chgname;
+	IRCDMessageMD message_md;
 	IRCDMessageMode message_mode, message_svsmode, message_svs2mode;
 	IRCDMessageNetInfo message_netinfo;
 	IRCDMessageNick message_nick;
@@ -1353,7 +1383,7 @@ class ProtoUnreal : public Module
 		message_privmsg(this), message_quit(this), message_squit(this), message_stats(this), message_time(this),
 		message_version(this), message_whois(this),
 
-		message_capab(this), message_chghost(this), message_chgident(this), message_chgname(this), message_mode(this, "MODE"),
+		message_capab(this), message_chghost(this), message_chgident(this), message_chgname(this), message_md(this), message_mode(this, "MODE"),
 		message_svsmode(this, "SVSMODE"), message_svs2mode(this, "SVS2MODE"), message_netinfo(this), message_nick(this), message_pong(this),
 		message_sasl(this), message_sdesc(this), message_sethost(this), message_setident(this), message_setname(this), message_server(this),
 		message_sid(this), message_sjoin(this), message_topic(this), message_uid(this), message_umode2(this)

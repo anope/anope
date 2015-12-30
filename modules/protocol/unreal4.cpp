@@ -1,6 +1,6 @@
-/* Unreal IRCD 3.2.x functions
+/* Unreal IRCD 4 functions
  *
- * (C) 2003-2014 Anope Team
+ * (C) 2003-2015 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -13,10 +13,12 @@
 #include "modules/cs_mode.h"
 #include "modules/sasl.h"
 
+static Anope::string UplinkSID;
+
 class UnrealIRCdProto : public IRCDProto
 {
  public:
-	UnrealIRCdProto(Module *creator) : IRCDProto(creator, "UnrealIRCd 3.2.x")
+	UnrealIRCdProto(Module *creator) : IRCDProto(creator, "UnrealIRCd 4")
 	{
 		DefaultPseudoclientModes = "+Soiq";
 		CanSVSNick = true;
@@ -27,8 +29,8 @@ class UnrealIRCdProto : public IRCDProto
 		CanSQLine = true;
 		CanSZLine = true;
 		CanSVSHold = true;
-		CanSVSO = true;
 		MaxModes = 12;
+		RequiresID = true;
 	}
 
  private:
@@ -139,17 +141,17 @@ class UnrealIRCdProto : public IRCDProto
 	void SendClientIntroduction(User *u) anope_override
 	{
 		Anope::string modes = "+" + u->GetModes();
-		UplinkSocket::Message() << "NICK " << u->nick << " 1 " << u->timestamp << " " << u->GetIdent() << " " << u->host << " " << u->server->GetName() << " 0 " << modes << " " << u->host << " * :" << u->realname;
+		UplinkSocket::Message(u->server) << "UID " << u->nick << " 1 " << u->timestamp << " " << u->GetIdent() << " " << u->host << " "
+					  << u->GetUID() << " * " << modes << " " << (!u->vhost.empty() ? u->vhost : "*") << " "
+					  << (!u->chost.empty() ? u->chost : "*") << " " << "*" << " :" << u->realname;
 	}
 
-	/* SERVER name hop descript */
-	/* Unreal 3.2 actually sends some info about itself in the descript area */
 	void SendServer(const Server *server) anope_override
 	{
-		if (!server->GetSID().empty() && server == Me)
-			UplinkSocket::Message() << "SERVER " << server->GetName() << " " << server->GetHops() << " :U0-*-" << server->GetSID() << " " << server->GetDescription();
+		if (server == Me)
+			UplinkSocket::Message() << "SERVER " << server->GetName() << " " << server->GetHops() + 1 << " :" << server->GetDescription();
 		else
-			UplinkSocket::Message() << "SERVER " << server->GetName() << " " << server->GetHops() << " :" << server->GetDescription();
+			UplinkSocket::Message(Me) << "SID " << server->GetName() << " " << server->GetHops() + 1 << " " << server->GetSID() << " :" << server->GetDescription();
 	}
 
 	/* JOIN */
@@ -193,17 +195,6 @@ class UnrealIRCdProto : public IRCDProto
 		UplinkSocket::Message() << "SQLINE " << x->mask << " :" << x->GetReason();
 	}
 
-	/*
-	** svso
-	**	  parv[0] = sender prefix
-	**	  parv[1] = nick
-	**	  parv[2] = options
-	*/
-	void SendSVSO(BotInfo *source, const Anope::string &nick, const Anope::string &flag) anope_override
-	{
-		UplinkSocket::Message(source) << "SVSO " << nick << " " << flag;
-	}
-
 	/* Functions that use serval cmd functions */
 
 	void SendVhost(User *u, const Anope::string &vIdent, const Anope::string &vhost) anope_override
@@ -221,21 +212,17 @@ class UnrealIRCdProto : public IRCDProto
 		   VHP    = Sends hidden host
 		   UMODE2 = sends UMODE2 on user modes
 		   NICKIP = Sends IP on NICK
-		   TOKEN  = Use tokens to talk
 		   SJ3    = Supports SJOIN
 		   NOQUIT = No Quit
 		   TKLEXT = Extended TKL we don't use it but best to have it
-		   SJB64  = Base64 encoded time stamps
-		   ESVID  = Allows storing account names as services stamp
 		   MLOCK  = Supports the MLOCK server command
 		   VL     = Version Info
-		   NS     = Config->Numeric Server
+		   SID    = SID/UID mode
 		*/
-		Anope::string protoctl = "NICKv2 VHP UMODE2 NICKIP SJOIN SJOIN2 SJ3 NOQUIT TKLEXT ESVID MLOCK VL";
-		if (!Me->GetSID().empty())
-			protoctl += " VL";
-		UplinkSocket::Message() << "PROTOCTL " << protoctl;
 		UplinkSocket::Message() << "PASS :" << Config->Uplinks[Anope::CurrentUplink].password;
+		UplinkSocket::Message() << "PROTOCTL " << "NICKv2 VHP UMODE2 NICKIP SJOIN SJOIN2 SJ3 NOQUIT TKLEXT MLOCK SID";
+		UplinkSocket::Message() << "PROTOCTL " << "EAUTH=" << Me->GetName() << ",,,Anope-" << Anope::VersionShort();
+		UplinkSocket::Message() << "PROTOCTL " << "SID=" << Me->GetSID();
 		SendServer(Me);
 	}
 
@@ -299,17 +286,17 @@ class UnrealIRCdProto : public IRCDProto
 	void SendSVSJoin(const MessageSource &source, User *user, const Anope::string &chan, const Anope::string &param) anope_override
 	{
 		if (!param.empty())
-			UplinkSocket::Message(source) << "SVSJOIN " << user->GetUID() << " " << chan << " :" << param;
+			UplinkSocket::Message() << "SVSJOIN " << user->GetUID() << " " << chan << " :" << param;
 		else
-			UplinkSocket::Message(source) << "SVSJOIN " << user->GetUID() << " " << chan;
+			UplinkSocket::Message() << "SVSJOIN " << user->GetUID() << " " << chan;
 	}
 
 	void SendSVSPart(const MessageSource &source, User *user, const Anope::string &chan, const Anope::string &param) anope_override
 	{
 		if (!param.empty())
-			UplinkSocket::Message(source) << "SVSPART " << user->GetUID() << " " << chan << " :" << param;
+			UplinkSocket::Message() << "SVSPART " << user->GetUID() << " " << chan << " :" << param;
 		else
-			UplinkSocket::Message(source) << "SVSPART " << user->GetUID() << " " << chan;
+			UplinkSocket::Message() << "SVSPART " << user->GetUID() << " " << chan;
 	}
 
 	void SendSWhois(const MessageSource &source, const Anope::string &who, const Anope::string &mask) anope_override
@@ -540,6 +527,21 @@ namespace UnrealExtban
 	 		return u->Account() && Anope::Match(u->Account()->display, real_mask);
 	 	}
 	};
+
+	class FingerprintMatcher : public UnrealExtBan
+	{
+	 public:
+		FingerprintMatcher(const Anope::string &mname, const Anope::string &mbase, char c) : UnrealExtBan(mname, mbase, c)
+		{
+		}
+
+		bool Matches(User *u, const Entry *e) anope_override
+		{
+			const Anope::string &mask = e->GetMask();
+			Anope::string real_mask = mask.substr(3);
+			return !u->fingerprint.empty() && Anope::Match(u->fingerprint, real_mask);
+		}
+	};
 }
 
 class ChannelModeFlood : public ChannelModeParam
@@ -637,6 +639,8 @@ struct IRCDMessageCapab : Message::Capab
 							ModeManager::AddChannelMode(new UnrealExtban::RealnameMatcher("REALNAMEBAN", "BAN", 'r'));
 							ModeManager::AddChannelMode(new UnrealExtban::RegisteredMatcher("REGISTEREDBAN", "BAN", 'R'));
 							ModeManager::AddChannelMode(new UnrealExtban::AccountMatcher("ACCOUNTBAN", "BAN", 'a'));
+							ModeManager::AddChannelMode(new UnrealExtban::FingerprintMatcher("SSLBAN", "BAN", 'S'));
+							// also has O for opertype extban, but it doesn't send us users opertypes
 							continue;
 						case 'e':
 							ModeManager::AddChannelMode(new ChannelModeList("EXCEPT", 'e'));
@@ -675,9 +679,6 @@ struct IRCDMessageCapab : Message::Capab
 					{
 						case 'l':
 							ModeManager::AddChannelMode(new ChannelModeParam("LIMIT", 'l', true));
-							continue;
-						case 'j':
-							ModeManager::AddChannelMode(new ChannelModeParam("JOINFLOOD", 'j', true));
 							continue;
 						default:
 							ModeManager::AddChannelMode(new ChannelModeParam("", modebuf[t], true));
@@ -719,9 +720,6 @@ struct IRCDMessageCapab : Message::Capab
 						case 'O':
 							ModeManager::AddChannelMode(new ChannelModeOperOnly("OPERONLY", 'O'));
 							continue;
-						case 'A':
-							ModeManager::AddChannelMode(new ChannelModeOperOnly("ADMINONLY", 'A'));
-							continue;
 						case 'Q':
 							ModeManager::AddChannelMode(new ChannelMode("NOKICK", 'Q'));
 							continue;
@@ -733,9 +731,6 @@ struct IRCDMessageCapab : Message::Capab
 							continue;
 						case 'C':
 							ModeManager::AddChannelMode(new ChannelMode("NOCTCP", 'C'));
-							continue;
-						case 'u':
-							ModeManager::AddChannelMode(new ChannelMode("AUDITORIUM", 'u'));
 							continue;
 						case 'z':
 							ModeManager::AddChannelMode(new ChannelMode("SSL", 'z'));
@@ -758,10 +753,23 @@ struct IRCDMessageCapab : Message::Capab
 						case 'Z':
 							ModeManager::AddChannelMode(new ChannelModeUnrealSSL("", 'Z'));
 							continue;
+						case 'd':
+							// post delayed. means that channel is -D but invisible users still exist.
+							continue;
+						case 'D':
+							ModeManager::AddChannelMode(new ChannelMode("DELAYEDJOIN", 'D'));
+							continue;
+						case 'P':
+							ModeManager::AddChannelMode(new ChannelMode("PERM", 'P'));
+							continue;
 						default:
 							ModeManager::AddChannelMode(new ChannelMode("", modebuf[t]));
 					}
 				}
+			}
+			else if (!capab.find("SID="))
+			{
+				UplinkSID = capab.substr(4);
 			}
 		}
 
@@ -1035,10 +1043,24 @@ struct IRCDMessageServer : IRCDMessage
 			Anope::string desc;
 			spacesepstream(params[2]).GetTokenRemainder(desc, 1);
 
-			new Server(source.GetServer() == NULL ? Me : source.GetServer(), params[0], hops, desc);
+			new Server(source.GetServer() == NULL ? Me : source.GetServer(), params[0], hops, desc, UplinkSID);
 		}
 		else
 			new Server(source.GetServer(), params[0], hops, params[2]);
+
+		IRCD->SendPing(Me->GetName(), params[0]);
+	}
+};
+
+struct IRCDMessageSID : IRCDMessage
+{
+	IRCDMessageSID(Module *creator) : IRCDMessage(creator, "SID", 4) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
+
+	void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
+	{
+		unsigned int hops = Anope::string(params[1]).is_pos_number_only() ? convertTo<unsigned>(params[1]) : 0;
+
+		new Server(source.GetServer(), params[0], hops, params[3], params[2]);
 
 		IRCD->SendPing(Me->GetName(), params[0]);
 	}
@@ -1150,6 +1172,88 @@ struct IRCDMessageTopic : IRCDMessage
 	}
 };
 
+/*
+ *      parv[0] = nickname
+ *      parv[1] = hopcount
+ *      parv[2] = timestamp
+ *      parv[3] = username
+ *      parv[4] = hostname
+ *      parv[5] = UID
+ *      parv[6] = servicestamp
+ *      parv[7] = umodes
+ *      parv[8] = virthost, * if none
+ *      parv[9] = cloaked host, * if none
+ *      parv[10] = ip
+ *      parv[11] = info
+ */
+struct IRCDMessageUID : IRCDMessage
+{
+	IRCDMessageUID(Module *creator) : IRCDMessage(creator, "UID", 12) { SetFlag(IRCDMESSAGE_REQUIRE_SERVER); }
+
+	void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
+	{
+		Anope::string
+			nickname  = params[0],
+			hopcount  = params[1],
+			timestamp = params[2],
+			username  = params[3],
+			hostname  = params[4],
+			uid       = params[5],
+			account   = params[6],
+			umodes    = params[7],
+			vhost     = params[8],
+			chost     = params[9],
+			ip        = params[10],
+			info      = params[11];
+
+		if (ip != "*")
+		{
+			Anope::string decoded_ip;
+			Anope::B64Decode(ip, decoded_ip);
+
+			sockaddrs ip_addr;
+			ip_addr.ntop(ip.length() == 8 ? AF_INET : AF_INET6, decoded_ip.c_str());
+			ip = ip_addr.addr();
+		}
+
+		if (vhost == "*")
+			vhost.clear();
+
+		if (chost == "*")
+			chost.clear();
+
+		time_t user_ts;
+		try
+		{
+			user_ts = convertTo<time_t>(timestamp);
+		}
+		catch (const ConvertException &)
+		{
+			user_ts = Anope::CurTime;
+		}
+
+		NickAlias *na = NULL;
+
+		if (account == "0")
+		{
+			;
+		}
+		else if (account.is_pos_number_only())
+		{
+			if (convertTo<time_t>(account) == user_ts)
+				na = NickAlias::Find(nickname);
+		}
+		else
+		{
+			na = NickAlias::Find(account);
+		}
+
+		User *u = User::OnIntroduce(nickname, username, hostname, vhost, ip, source.GetServer(), info, user_ts, umodes, uid, na ? *na->nc : NULL);
+
+		if (!chost.empty() && chost != u->GetCloakedHost())
+			u->SetCloakedHost(chost);
+	}
+};
 
 struct IRCDMessageUmode2 : IRCDMessage
 {
@@ -1199,8 +1303,10 @@ class ProtoUnreal : public Module
 	IRCDMessageSetIdent message_setident;
 	IRCDMessageSetName message_setname;
 	IRCDMessageServer message_server;
+	IRCDMessageSID message_sid;
 	IRCDMessageSJoin message_sjoin;
 	IRCDMessageTopic message_topic;
+	IRCDMessageUID message_uid;
 	IRCDMessageUmode2 message_umode2;
 
 	bool use_server_side_mlock;
@@ -1215,19 +1321,15 @@ class ProtoUnreal : public Module
 		ModeManager::AddChannelMode(new ChannelModeStatus("OWNER", 'q', '*', 4));
 
 		/* Add user modes */
-		ModeManager::AddUserMode(new UserModeOperOnly("SERV_ADMIN", 'A'));
 		ModeManager::AddUserMode(new UserMode("BOT", 'B'));
-		ModeManager::AddUserMode(new UserModeOperOnly("CO_ADMIN", 'C'));
 		ModeManager::AddUserMode(new UserMode("CENSOR", 'G'));
 		ModeManager::AddUserMode(new UserModeOperOnly("HIDEOPER", 'H'));
 		ModeManager::AddUserMode(new UserModeOperOnly("HIDEIDLE", 'I'));
-		ModeManager::AddUserMode(new UserModeOperOnly("NETADMIN", 'N'));
 		ModeManager::AddUserMode(new UserMode("REGPRIV", 'R'));
 		ModeManager::AddUserMode(new UserModeOperOnly("PROTECTED", 'S'));
 		ModeManager::AddUserMode(new UserMode("NOCTCP", 'T'));
 		ModeManager::AddUserMode(new UserMode("WEBTV", 'V'));
 		ModeManager::AddUserMode(new UserModeOperOnly("WHOIS", 'W'));
-		ModeManager::AddUserMode(new UserModeOperOnly("ADMIN", 'a'));
 		ModeManager::AddUserMode(new UserMode("DEAF", 'd'));
 		ModeManager::AddUserMode(new UserModeOperOnly("GLOBOPS", 'g'));
 		ModeManager::AddUserMode(new UserModeOperOnly("HELPOP", 'h'));
@@ -1254,7 +1356,7 @@ class ProtoUnreal : public Module
 		message_capab(this), message_chghost(this), message_chgident(this), message_chgname(this), message_mode(this, "MODE"),
 		message_svsmode(this, "SVSMODE"), message_svs2mode(this, "SVS2MODE"), message_netinfo(this), message_nick(this), message_pong(this),
 		message_sasl(this), message_sdesc(this), message_sethost(this), message_setident(this), message_setname(this), message_server(this),
-		message_sjoin(this), message_topic(this), message_umode2(this)
+		message_sid(this), message_sjoin(this), message_topic(this), message_uid(this), message_umode2(this)
 	{
 
 		this->AddModes();

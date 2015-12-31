@@ -1,13 +1,8 @@
 # This usage of CMake requires at least version 3.0
 cmake_minimum_required(VERSION 3.0 FATAL_ERROR)
 
-cmake_policy(SET CMP0003 NEW)
-if(POLICY CMP0026)
-  cmake_policy(SET CMP0026 OLD)
-endif()
-if(POLICY CMP0007)
-  cmake_policy(SET CMP0007 OLD)
-endif()
+cmake_policy(SET CMP0007 OLD)
+cmake_policy(SET CMP0026 OLD)
 
 # Set the project as C++ primarily, but have C enabled for the checks required later
 project(Anope CXX)

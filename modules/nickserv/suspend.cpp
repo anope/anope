@@ -10,8 +10,8 @@
  */
 
 #include "module.h"
-#include "modules/ns_suspend.h"
-#include "modules/ns_info.h"
+#include "modules/nickserv/suspend.h"
+#include "modules/nickserv/info.h"
 #include "modules/nickserv.h"
 
 class NSSuspendInfoImpl : public NSSuspendInfo

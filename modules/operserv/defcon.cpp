@@ -10,8 +10,8 @@
  */
 
 #include "module.h"
-#include "modules/os_session.h"
-#include "modules/os_defcon.h"
+#include "modules/operserv/session.h"
+#include "modules/operserv/defcon.h"
 #include "modules/global.h"
 
 enum DefconLevel

@@ -10,7 +10,7 @@
  */
 
 #include "module.h"
-#include "modules/cs_log.h"
+#include "modules/chanserv/log.h"
 #include "modules/memoserv.h"
 
 class LogSettingImpl : public LogSetting

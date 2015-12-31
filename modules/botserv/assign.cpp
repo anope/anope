@@ -10,7 +10,7 @@
  */
 
 #include "module.h"
-#include "modules/bs_info.h"
+#include "modules/botserv/info.h"
 
 class CommandBSAssign : public Command
 {

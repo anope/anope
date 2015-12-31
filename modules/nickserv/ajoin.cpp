@@ -10,7 +10,7 @@
  */
 
 #include "module.h"
-#include "modules/ns_ajoin.h"
+#include "modules/nickserv/ajoin.h"
 
 class AutoJoinImpl : public AutoJoin
 {

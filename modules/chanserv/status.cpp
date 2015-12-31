@@ -10,7 +10,7 @@
  */
 
 #include "module.h"
-#include "modules/cs_akick.h"
+#include "modules/chanserv/akick.h"
 
 class CommandCSStatus : public Command
 {

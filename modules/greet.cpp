@@ -10,9 +10,9 @@
  */
 
 #include "module.h"
-#include "modules/ns_info.h"
-#include "modules/bs_info.h"
-#include "modules/ns_set.h"
+#include "modules/nickserv/info.h"
+#include "modules/botserv/info.h"
+#include "modules/nickserv/set.h"
 
 class CommandBSSetGreet : public Command
 {

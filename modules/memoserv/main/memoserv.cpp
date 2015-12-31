@@ -10,9 +10,9 @@
  */
 
 #include "module.h"
-#include "modules/ns_update.h"
+#include "modules/nickserv/update.h"
 #include "modules/help.h"
-#include "modules/bs_bot.h"
+#include "modules/botserv/bot.h"
 #include "modules/memoserv.h"
 //#include "memoinfo.h"
 //#include "memo.h"

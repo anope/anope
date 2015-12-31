@@ -10,7 +10,7 @@
  */
 
 #include "module.h"
-#include "modules/hs_del.h"
+#include "modules/hostserv/del.h"
 
 class CommandHSDel : public Command
 {

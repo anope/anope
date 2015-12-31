@@ -10,10 +10,10 @@
  */
 
 #include "module.h"
-#include "modules/cs_suspend.h"
-#include "modules/cs_drop.h"
+#include "modules/chanserv/suspend.h"
+#include "modules/chanserv/drop.h"
 #include "modules/chanserv.h"
-#include "modules/cs_info.h"
+#include "modules/chanserv/info.h"
 
 class CSSuspendInfoImpl : public CSSuspendInfo
 {

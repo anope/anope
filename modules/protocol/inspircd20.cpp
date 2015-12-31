@@ -11,8 +11,8 @@
 
 #include "module.h"
 #include "modules/sasl.h"
-#include "modules/cs_mode.h"
-#include "modules/cs_set.h"
+#include "modules/chanserv/mode.h"
+#include "modules/chanserv/set.h"
 
 struct SASLUser
 {

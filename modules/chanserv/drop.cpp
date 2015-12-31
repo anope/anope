@@ -10,7 +10,7 @@
  */
 
 #include "module.h"
-#include "modules/cs_drop.h"
+#include "modules/chanserv/drop.h"
 
 class CommandCSDrop : public Command
 {

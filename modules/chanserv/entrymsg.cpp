@@ -10,7 +10,7 @@
  */
 
 #include "module.h"
-#include "modules/cs_entrymsg.h"
+#include "modules/chanserv/entrymsg.h"
 
 class EntryMsgImpl : public EntryMsg
 {

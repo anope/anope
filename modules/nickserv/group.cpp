@@ -10,8 +10,8 @@
  */
 
 #include "module.h"
-#include "modules/ns_cert.h"
-#include "modules/ns_group.h"
+#include "modules/nickserv/cert.h"
+#include "modules/nickserv/group.h"
 
 class NSGroupRequestListener : public NickServ::IdentifyRequestListener
 {

@@ -10,7 +10,7 @@
  */
 
 #include "module.h"
-#include "modules/ns_update.h"
+#include "modules/nickserv/update.h"
 
 class CommandNSUpdate : public Command
 {

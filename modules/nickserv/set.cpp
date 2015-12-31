@@ -10,8 +10,8 @@
  */
 
 #include "module.h"
-#include "modules/ns_info.h"
-#include "modules/ns_set.h"
+#include "modules/nickserv/info.h"
+#include "modules/nickserv/set.h"
 #include "modules/nickserv.h"
 
 class CommandNSSet : public Command

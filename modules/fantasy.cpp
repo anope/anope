@@ -11,7 +11,7 @@
 
 #include "module.h"
 #include "modules/fantasy.h"
-#include "modules/bs_info.h"
+#include "modules/botserv/info.h"
 
 class CommandBSSetFantasy : public Command
 {

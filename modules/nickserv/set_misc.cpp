@@ -10,9 +10,9 @@
  */
 
 #include "module.h"
-#include "modules/ns_set_misc.h"
-#include "modules/ns_info.h"
-#include "modules/ns_set.h"
+#include "modules/nickserv/set_misc.h"
+#include "modules/nickserv/info.h"
+#include "modules/nickserv/set.h"
 
 static Anope::map<Anope::string> descriptions;
 

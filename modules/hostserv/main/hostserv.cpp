@@ -10,8 +10,8 @@
  */
 
 #include "module.h"
-#include "modules/ns_update.h"
-#include "modules/hs_del.h"
+#include "modules/nickserv/update.h"
+#include "modules/hostserv/del.h"
 #include "modules/help.h"
 
 class HostServCore : public Module

@@ -12,9 +12,9 @@
  */
 
 #include "module.h"
-#include "modules/bs_kick.h"
-#include "modules/bs_badwords.h"
-#include "modules/bs_info.h"
+#include "modules/botserv/kick.h"
+#include "modules/botserv/badwords.h"
+#include "modules/botserv/info.h"
 
 static Module *me;
 

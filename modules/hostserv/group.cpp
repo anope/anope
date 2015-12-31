@@ -10,7 +10,7 @@
  */
 
 #include "module.h"
-#include "modules/ns_group.h"
+#include "modules/nickserv/group.h"
 
 class CommandHSGroup : public Command
 {

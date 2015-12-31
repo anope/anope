@@ -7,9 +7,9 @@
  */
 
 #include "module.h"
-#include "modules/ns_info.h"
-#include "modules/cs_info.h"
-#include "modules/os_info.h"
+#include "modules/nickserv/info.h"
+#include "modules/chanserv/info.h"
+#include "modules/operserv/info.h"
 
 class OperInfoImpl : public OperInfo
 {

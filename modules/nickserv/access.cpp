@@ -11,7 +11,7 @@
 
 #include "module.h"
 #include "modules/nickserv.h"
-#include "modules/ns_access.h"
+#include "modules/nickserv/access.h"
 
 class NickAccessImpl : public NickAccess
 {

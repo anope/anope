@@ -1,22 +1,25 @@
-# This usage of CMake requires at least version 2.8
-cmake_minimum_required(VERSION 2.8 FATAL_ERROR)
+# This usage of CMake requires at least version 3.0
+cmake_minimum_required(VERSION 3.0 FATAL_ERROR)
 
 cmake_policy(SET CMP0003 NEW)
 if(POLICY CMP0026)
   cmake_policy(SET CMP0026 OLD)
-endif(POLICY CMP0026)
+endif()
 if(POLICY CMP0007)
   cmake_policy(SET CMP0007 OLD)
-endif(POLICY CMP0007)
+endif()
 
 # Set the project as C++ primarily, but have C enabled for the checks required later
 project(Anope CXX)
 enable_language(C)
 
 # Override the module include path to include our directory, for our Anope.cmake, as well as we are using our own version of the NSIS template
-set(CMAKE_MODULE_PATH ${Anope_SOURCE_DIR}/cmake)
+list(APPEND CMAKE_MODULE_PATH "${Anope_SOURCE_DIR}/cmake")
 
-include(Anope)
+include("Anope")
+include("CheckFunctionExists")
+include("CheckLibraryExists")
+include("CheckCXXCompilerFlag")
 
 # Force the locale to C for later uses of things like gcc so the messages come up in English, not the user's default language
 set(ENV{LC_ALL} C)
@@ -28,35 +31,26 @@ set(ENV{LC_ALL} C)
 if(NOT MSVC)
   if(CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE ${CMAKE_BUILD_TYPE} CACHE STRING "Choose the type of build, options are: None(CMAKE_CXX_FLAGS or CMAKE_C_FLAGS used) Debug Release RelWithDebInfo MinSizeRel.")
-  else(CMAKE_BUILD_TYPE)
+  else()
     set(CMAKE_BUILD_TYPE DEBUG CACHE STRING "Choose the type of build, options are: None(CMAKE_CXX_FLAGS or CMAKE_C_FLAGS used) Debug Release RelWithDebInfo MinSizeRel.")
-  endif(CMAKE_BUILD_TYPE)
-endif(NOT MSVC)
-
-# Include the checking functions used later in this CMakeLists.txt
-include(CheckFunctionExists)
-include(CheckIncludeFile)
-include(CheckTypeSize)
-include(CheckLibraryExists)
-include(CheckCXXCompilerFlag)
-
-if(NOT MSVC)
-  CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
+  endif()
+ 
+  check_cxx_compiler_flag("-std=c++11" COMPILER_SUPPORTS_CXX11)
   if(NOT COMPILER_SUPPORTS_CXX11)
     message(FATAL_ERROR "The compiler ${CMAKE_CXX_COMPILER} has no C++11 support. Please use a newer compiler.")
-  endif(NOT COMPILER_SUPPORTS_CXX11)
+  endif()
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
-endif(NOT MSVC)
+endif()
 
 # If extra include directories were specified, tell cmake about them.
 if(EXTRA_INCLUDE)
   include_directories(${EXTRA_INCLUDE})
-endif(EXTRA_INCLUDE)
+endif()
 
 # If extra library directories were specified, tell cmake about them.
 if(EXTRA_LIBS)
   link_directories(${EXTRA_LIBS})
-endif(EXTRA_LIBS)
+endif()
 
 # Find gettext
 find_package(Gettext)
@@ -71,7 +65,7 @@ if(WIN32)
   add_definitions(-D_WIN32)
   # And include the windows specific folder for our anope_windows.h
   include_directories(${Anope_SOURCE_DIR}/src/win32)
-endif(WIN32)
+endif()
 
 # If using Visual Studio, set the C++ flags accordingly
 if(MSVC)
@@ -83,26 +77,27 @@ if(MSVC)
   set(CXXFLAGS "${CXXFLAGS} /W4 /wd4100 /wd4127 /wd4250 /wd4251 /wd4355 /wd4706 /wd4800 /wd4996 /EHs")
   add_definitions(-DMSVCPP -D_CRT_SECURE_NO_WARNINGS)
 # Otherwise, we're not using Visual Studio
-else(MSVC)
+else()
   # Set the compile flags to have all warnings on (including shadowed variables)
   set(CXXFLAGS "${CXXFLAGS} -Wall -Wshadow")
   # If on a *nix system, also set the compile flags to remove GNU extensions (favor ISO C++) as well as reject non-ISO C++ code, also remove all leading underscores in exported symbols (only on GNU compiler)
   if(UNIX)
-    set(CXXFLAGS "${CXXFLAGS} -ansi -pedantic ${CMAKE_CXX_FLAGS}")
-    if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-      set(CXXFLAGS "${CXXFLAGS} -Wno-long-long -fno-leading-underscore")
-    endif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-  endif(UNIX)
-endif(MSVC)
+    set(CXXFLAGS "${CXXFLAGS} -pedantic ${CMAKE_CXX_FLAGS}")
+    if(${CMAKE_CXX_COMPILER_ID} STREQUAL "AppleClang")
+      set(CXXFLAGS "${CXXFLAGS} -stdlib=libc++")
+      set(LDFLAGS "${LDFLAGS} -stdlib=libc++")
+    endif()
+  endif()
+endif()
 
 # If CMake has found that the given system requires a special library for dl* calls, include it with the linker flags
 if(CMAKE_DL_LIBS)
   list(APPEND LINK_LIBS ${CMAKE_DL_LIBS})
-endif(CMAKE_DL_LIBS)
+endif()
 
 if(NOT PROGRAM_NAME)
   set(PROGRAM_NAME anope)
-endif(NOT PROGRAM_NAME)
+endif()
 
 # If we are not using Visual Studio, we'll run the following checks
 if(NOT MSVC)
@@ -111,7 +106,7 @@ if(NOT MSVC)
   # If the flag was accepted, add it to the list of flags
   if(HAVE_PIPE_FLAG)
     set(CXXFLAGS "${CXXFLAGS} -pipe")
-  endif(HAVE_PIPE_FLAG)
+  endif()
 
   # The following are additional library checks, they are not required for Windows
   if(NOT WIN32)
@@ -119,37 +114,37 @@ if(NOT MSVC)
     check_library_exists(socket socket "" HAVE_SOCKET_LIB)
     if(HAVE_SOCKET_LIB)
       list(APPEND LINK_LIBS socket)
-    endif(HAVE_SOCKET_LIB)
+    endif()
     # Check if inet_addr is within the nsl library (if the library exists), and add it to the linker flags if needed
     check_library_exists(nsl inet_addr "" HAVE_NSL_LIB)
     if(HAVE_NSL_LIB)
       list(APPEND LINK_LIBS nsl)
-    endif(HAVE_NSL_LIB)
+    endif()
     # Check if pthread_create is within the pthread library (if the library exists), and add it to the linker flags if needed
     check_library_exists(pthread pthread_create "" HAVE_PTHREAD)
     if(HAVE_PTHREAD)
       if(NOT APPLE)
         set(LDFLAGS "${LDFLAGS} -pthread")
-      endif(NOT APPLE)
-    else(HAVE_PTHREAD)
+      endif()
+    else()
       message(FATAL_ERROR "The pthread library is required to build Anope")
-    endif(HAVE_PTHREAD)
-  endif(NOT WIN32)
-endif(NOT MSVC)
+    endif()
+  endif()
+endif()
 
 # If DEFUMASK wasn't passed to CMake, set a default depending on if RUNGROUP was passed in or not
 if(NOT DEFUMASK)
   if(RUNGROUP)
     set(DEFUMASK "007")
-  else(RUNGROUP)
+  else()
     set(DEFUMASK "077")
-  endif(RUNGROUP)
-endif(NOT DEFUMASK)
+  endif()
+endif()
 
 # Set the DEBUG_BUILD for sysconf.h
 if(CMAKE_BUILD_TYPE STREQUAL "DEBUG" OR CMAKE_BUILD_TYPE STREQUAL "RELWITHDEBINFO")
   set(DEBUG_BUILD TRUE)
-endif(CMAKE_BUILD_TYPE STREQUAL "DEBUG" OR CMAKE_BUILD_TYPE STREQUAL "RELWITHDEBINFO")
+endif()
 
 # Check for the existance of the following functions
 check_function_exists(umask HAVE_UMASK)
@@ -160,45 +155,43 @@ check_function_exists(kqueue HAVE_KQUEUE)
 # Strip the leading and trailing spaces from the compile flags
 if(CXXFLAGS)
   string(STRIP ${CXXFLAGS} CXXFLAGS)
-endif(CXXFLAGS)
+endif()
 # Strip the leading and trailing spaces from the linker flags
 if(LDFLAGS)
   string(STRIP ${LDFLAGS} LDFLAGS)
-endif(LDFLAGS)
+endif()
 
 # Search for the following programs
 find_program(CHGRP chgrp)
 find_program(CHMOD chmod)
 
-# If a INSTDIR was passed in to CMake, use it as the install prefix, otherwise set the default install prefix to the services directory under the user's home directory
-if(INSTDIR)
-  set(CMAKE_INSTALL_PREFIX "${INSTDIR}")
-elseif(NOT CMAKE_INSTALL_PREFIX)
+# If CMAKE_INSTALL_PREFIX was not passed in to CMake set the default install prefix to the "anope" directory under the user's home directory
+if(NOT CMAKE_INSTALL_PREFIX)
   set(CMAKE_INSTALL_PREFIX "$ENV{HOME}/anope")
-endif(INSTDIR)
+endif()
 
 # Set default paths for various directories if not already defined
 if(NOT BIN_DIR)
   set(BIN_DIR "bin")
-endif(NOT BIN_DIR)
+endif()
 if(NOT DB_DIR)
   set(DB_DIR "data")
-endif(NOT DB_DIR)
+endif()
 if(NOT DOC_DIR)
   set(DOC_DIR "doc")
-endif(NOT DOC_DIR)
+endif()
 if(NOT CONF_DIR)
   set(CONF_DIR "conf")
-endif(NOT CONF_DIR)
+endif()
 if(NOT LIB_DIR)
   set(LIB_DIR "lib")
-endif(NOT LIB_DIR)
+endif()
 if(NOT LOCALE_DIR)
   set(LOCALE_DIR "locale")
-endif(NOT LOCALE_DIR)
+endif()
 if(NOT LOGS_DIR)
   set(LOGS_DIR "logs")
-endif(NOT LOGS_DIR)
+endif()
 
 # Version number processing
 # Find all lines in src/version.sh that start with VERSION_
@@ -212,8 +205,8 @@ foreach(VERSION_STR ${VERSIONS})
   if(${VERSION_LEN} GREATER 1)
     list(GET VERSION_OUT 1 VERSION_DATA)
     set(VERSION_${VERSION_TYPE} ${VERSION_DATA})
-  endif(${VERSION_LEN} GREATER 1)
-endforeach(VERSION_STR ${VERSIONS})
+  endif()
+endforeach()
 
 # Default build version to 0
 set(VERSION_BUILD 0)
@@ -231,8 +224,8 @@ if(EXISTS "${Anope_SOURCE_DIR}/include/version.h")
     string(SUBSTRING ${VERSION_STR} 22 ${VERSION_NUM_LEN} VERSION)
     # Set VERSION_BUILD correctly
     set(VERSION_BUILD ${VERSION})
-  endforeach(VERSION_STR ${VERSIONS})
-endif(EXISTS "${Anope_SOURCE_DIR}/include/version.h")
+  endforeach()
+endif()
 
 # Set the version variables based on what was found above
 set(VERSION_COMMA "${VERSION_MAJOR},${VERSION_MINOR},${VERSION_PATCH},${VERSION_BUILD}")
@@ -245,7 +238,7 @@ set(VERSION_FULL_NOBUILD "${VERSION_DOTTED_NOBUILD}${VERSION_EXTRA}")
 if(WIN32)
   # Generate the win32.rc file using the above variables
   configure_file(${Anope_SOURCE_DIR}/src/win32/win32.rc.cmake ${Anope_BINARY_DIR}/src/win32/win32.rc)
-endif(WIN32)
+endif()
 
 # Add the initial files to ignore which will be ignored regardless of if you are building in-source or out-of-source
 add_to_cpack_ignored_files(".git\;config.cache\;CMakeFiles\;sysconf.h$\;build" TRUE)
@@ -260,8 +253,8 @@ if(${Anope_SOURCE_DIR} STREQUAL ${Anope_BINARY_DIR})
   # If using Visual Studio, add these files as well
   if(MSVC)
     add_to_cpack_ignored_files(".vcproj$\;.sln$\;.ncb$\;.suo$\;.dir$\;.ilk$\;.exp$\;.pdb$\;.lib$\;/debug$;/release$;/relwithdebinfo$;/minsizerel$" TRUE)
-  endif(MSVC)
-endif(${Anope_SOURCE_DIR} STREQUAL ${Anope_BINARY_DIR})
+  endif()
+endif()
 
 # Go into the following directories and run their CMakeLists.txt as well
 add_subdirectory(data)
@@ -280,13 +273,13 @@ install(CODE "file(MAKE_DIRECTORY \"\$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/${DB_D
 install(CODE "file(MAKE_DIRECTORY \"\$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/${LOGS_DIR}\")")
 if(WIN32)
   install(CODE "file(MAKE_DIRECTORY \"\${CMAKE_INSTALL_PREFIX}/${DB_DIR}/runtime\")")
-endif(WIN32)
+endif()
 # On non-Windows platforms, if RUNGROUP is set, change the permissions of the below directories, as well as the group of the data directory
 if(NOT WIN32 AND RUNGROUP)
   install(CODE "execute_process(COMMAND ${CHMOD} 2775 \"\$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/\${DB_DIR}/backups\")")
   install(CODE "execute_process(COMMAND ${CHMOD} 2775 \"\$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/\${LOGS_DIR}\")")
   install(CODE "execute_process(COMMAND ${CHGRP} -R ${RUNGROUP} \"\$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}\")")
-endif(NOT WIN32 AND RUNGROUP)
+endif()
 # On Windows platforms, install extra files
 if(WIN32)
   install(FILES ${Anope_SOURCE_DIR}/src/win32/anope.bat
@@ -296,7 +289,7 @@ if(WIN32)
   # Package any DLLs in src/win/
   file(GLOB EXTRA_DLLS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "${Anope_SOURCE_DIR}/src/win32/*.dll")
   install(FILES ${EXTRA_DLLS} DESTINATION ${BIN_DIR})
-endif(WIN32)
+endif()
 
 install(CODE "file(REMOVE_RECURSE \"$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/${LIB_DIR}/modules\")")
 
@@ -315,9 +308,9 @@ if(EXISTS "${CMAKE_ROOT}/Modules/CPack.cmake")
   # The following is primarily for NSIS
   if(WIN32)
     # By default, do not warn when built on machines using only VS Express:
-    IF(NOT DEFINED CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS_NO_WARNINGS)
-      SET(CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS_NO_WARNINGS ON)
-    ENDIF(NOT DEFINED CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS_NO_WARNINGS)
+    if(NOT DEFINED CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS_NO_WARNINGS)
+      set(CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS_NO_WARNINGS ON)
+    endif()
     # Also for Windows, include installing the MSVCRT library
     include(InstallRequiredSystemLibraries)
     set(CPACK_GENERATOR "NSIS")
@@ -337,10 +330,10 @@ if(EXISTS "${CMAKE_ROOT}/Modules/CPack.cmake")
     set(CPACK_NSIS_INSTALLED_ICON_NAME "${SERVICES_BINARY}")
     set(CPACK_NSIS_URL_INFO_ABOUT "http://www.anope.org/")
     set(CPACK_NSIS_COMPRESSOR "/SOLID lzma")
-  endif(WIN32)
+  endif()
   set(CPACK_SOURCE_PACKAGE_FILE_NAME "anope-${VERSION_FULL_NOBUILD}-source")
   set(CPACK_SOURCE_GENERATOR "TGZ")
   set(CPACK_SOURCE_IGNORE_FILES "$ENV{CPACK_IGNORED_FILES}")
   set(CPACK_MONOLITHIC_INSTALL TRUE)
   include(CPack)
-endif(EXISTS "${CMAKE_ROOT}/Modules/CPack.cmake")
+endif()

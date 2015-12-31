@@ -8,21 +8,17 @@ if(WIN32)
   list(APPEND SRC_SRCS win32/dl/dl.cpp)
   list(APPEND SRC_SRCS win32/pipe/pipe.cpp)
   list(APPEND SRC_SRCS win32/sigaction/sigaction.cpp)
-endif(WIN32)
+endif()
 
 if(HAVE_EPOLL)
   list(APPEND SRC_SRCS socketengines/socketengine_epoll.cpp)
-else(HAVE_EPOLL)
-  if(HAVE_KQUEUE)
-    list(APPEND SRC_SRCS socketengines/socketengine_kqueue.cpp)
-  else(HAVE_KQUEUE)
-    if(HAVE_POLL)
-      list(APPEND SRC_SRCS socketengines/socketengine_poll.cpp)
-    else(HAVE_POLL)
-      list(APPEND SRC_SRCS socketengines/socketengine_select.cpp)
-    endif(HAVE_POLL)
-  endif(HAVE_KQUEUE)
-endif(HAVE_EPOLL)
+elseif(HAVE_KQUEUE)
+  list(APPEND SRC_SRCS socketengines/socketengine_kqueue.cpp)
+elseif(HAVE_POLL)
+  list(APPEND SRC_SRCS socketengines/socketengine_poll.cpp)
+else()
+  list(APPEND SRC_SRCS socketengines/socketengine_select.cpp)
+endif()
 
 list(SORT SRC_SRCS)
 
@@ -36,7 +32,7 @@ if(WIN32)
   # Add the resource file to the list of sources
   list(APPEND SRC_SRCS ${CMAKE_CURRENT_BINARY_DIR}/win32/win32.rc)
   set_source_files_properties(${CMAKE_CURRENT_BINARY_DIR}/win32/win32.rc COMPILE_FLAGS "/i\"${Anope_SOURCE_DIR}/include\"")
-endif(WIN32)
+endif()
 
 # If compiling with Visual Studio, create a static library out of win32/win32_memory.cpp to be included with everything else, needed to override its override of new/delete operators
 if(MSVC)
@@ -44,9 +40,9 @@ if(MSVC)
   add_library(win32_memory STATIC win32/win32_memory.cpp)
   set(WIN32_MEMORY win32_memory)
   set(EXTRA_LDFLAGS "/OPT:NOREF") # https://sourceware.org/bugzilla/show_bug.cgi?id=12633
-else(MSVC)
+else()
   set(WIN32_MEMORY)
-endif(MSVC)
+endif()
 
 # Generate the Anope executable and set it's linker flags, also set it to export it's symbols even though it's not a module
 add_executable(${PROGRAM_NAME} ${SRC_SRCS})
@@ -55,15 +51,15 @@ set_target_properties(${PROGRAM_NAME} PROPERTIES LINKER_LANGUAGE CXX LINK_FLAGS 
 if(WIN32)
   target_link_libraries(${PROGRAM_NAME} wsock32 Ws2_32 ${LINK_LIBS} ${GETTEXT_LIBRARIES} ${WIN32_MEMORY})
   set_target_properties(${PROGRAM_NAME} PROPERTIES VERSION "${VERSION_DOTTED}")
-else(WIN32)
+else()
   target_link_libraries(${PROGRAM_NAME} ${LINK_LIBS} ${GETTEXT_LIBRARIES})
-endif(WIN32)
+endif()
 # Building the Anope executable requires the version.h header to be generated
 add_dependencies(${PROGRAM_NAME} headers)
 # Also require the language files if we have gettext
 if(GETTEXT_FOUND)
   add_dependencies(${PROGRAM_NAME} language)
-endif(GETTEXT_FOUND)
+endif()
 
 # Get the filename of the Anope executable as it is in on this system
 get_target_property(SERVICES_BINARY ${PROGRAM_NAME} LOCATION)
@@ -77,7 +73,7 @@ configure_file(${Anope_SOURCE_DIR}/include/sysconf.h.cmake ${Anope_BINARY_DIR}/i
 # Go into the following directories and run their CMakeLists.txt as well
 if(NOT DISABLE_TOOLS)
   add_subdirectory(tools)
-endif(NOT DISABLE_TOOLS)
+endif()
 
 # Set Anope to be installed to the bin directory
 install(TARGETS ${PROGRAM_NAME}

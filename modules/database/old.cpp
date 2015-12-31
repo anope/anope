@@ -9,17 +9,17 @@
  */
 
 #include "module.h"
-#include "modules/os_session.h"
-#include "modules/bs_kick.h"
-#include "modules/cs_mode.h"
-#include "modules/bs_badwords.h"
-#include "modules/os_news.h"
-#include "modules/os_forbid.h"
-#include "modules/cs_entrymsg.h"
-#include "modules/ns_suspend.h"
-#include "modules/cs_suspend.h"
-#include "modules/cs_access.h"
-#include "modules/ns_access.h"
+#include "modules/operserv/session.h"
+#include "modules/botserv/kick.h"
+#include "modules/chanserv/mode.h"
+#include "modules/botserv/badwords.h"
+#include "modules/operserv/news.h"
+#include "modules/operserv/forbid.h"
+#include "modules/chanserv/entrymsg.h"
+#include "modules/nickserv/suspend.h"
+#include "modules/chanserv/suspend.h"
+#include "modules/chanserv/access.h"
+#include "modules/nickserv/access.h"
 
 #define READ(x) \
 if (true) \

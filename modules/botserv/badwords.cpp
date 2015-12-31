@@ -10,7 +10,7 @@
  */
 
 #include "module.h"
-#include "modules/bs_badwords.h"
+#include "modules/botserv/badwords.h"
 
 static EventHandlers<Event::BadWordEvents> *bwevents;
 

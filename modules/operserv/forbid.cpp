@@ -10,7 +10,7 @@
  */
 
 #include "module.h"
-#include "modules/os_forbid.h"
+#include "modules/operserv/forbid.h"
 #include "modules/nickserv.h"
 #include "modules/chanserv.h"
 

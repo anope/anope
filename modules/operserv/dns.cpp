@@ -7,7 +7,7 @@
 
 #include "module.h"
 #include "modules/dns.h"
-#include "modules/os_dns.h"
+#include "modules/operserv/dns.h"
 
 static std::map<Anope::string, std::list<time_t> > server_quit_times;
 

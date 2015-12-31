@@ -9,9 +9,9 @@
  */
 
 #include "module.h"
-#include "modules/cs_set_misc.h"
-#include "modules/cs_info.h"
-#include "modules/cs_set.h"
+#include "modules/chanserv/set_misc.h"
+#include "modules/chanserv/info.h"
+#include "modules/chanserv/set.h"
 
 static Anope::map<Anope::string> descriptions;
 

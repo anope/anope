@@ -10,7 +10,7 @@
  */
 
 #include "module.h"
-#include "modules/bs_kick.h"
+#include "modules/botserv/kick.h"
 
 class CommandBSSet : public Command
 {

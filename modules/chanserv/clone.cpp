@@ -10,8 +10,8 @@
  */
 
 #include "module.h"
-#include "modules/bs_badwords.h"
-#include "modules/cs_akick.h"
+#include "modules/botserv/badwords.h"
+#include "modules/chanserv/akick.h"
 
 class CommandCSClone : public Command
 {

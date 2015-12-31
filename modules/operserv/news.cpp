@@ -10,7 +10,7 @@
  */
 
 #include "module.h"
-#include "modules/os_news.h"
+#include "modules/operserv/news.h"
 
 /* List of messages for each news type.  This simplifies message sending. */
 

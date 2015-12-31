@@ -10,7 +10,7 @@
  */
 
 #include "module.h"
-#include "modules/cs_info.h"
+#include "modules/chanserv/info.h"
 
 class CommandCSInfo : public Command
 {

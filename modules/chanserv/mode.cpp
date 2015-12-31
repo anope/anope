@@ -10,8 +10,8 @@
  */
 
 #include "module.h"
-#include "modules/cs_mode.h"
-#include "modules/cs_info.h"
+#include "modules/chanserv/mode.h"
+#include "modules/chanserv/info.h"
 
 static EventHandlers<Event::MLockEvents> *events;
 

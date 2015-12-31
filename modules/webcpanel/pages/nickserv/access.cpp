@@ -6,7 +6,7 @@
  */
 
 #include "../../webcpanel.h"
-#include "modules/ns_access.h"
+#include "modules/nickserv/access.h"
 
 WebCPanel::NickServ::Access::Access(const Anope::string &cat, const Anope::string &u) : WebPanelProtectedPage(cat, u)
 {

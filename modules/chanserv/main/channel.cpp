@@ -12,7 +12,7 @@
 
 #include "module.h"
 #include "channeltype.h"
-#include "modules/cs_akick.h"
+#include "modules/chanserv/akick.h"
 
 ChannelImpl::ChannelImpl(Serialize::TypeBase *type, const Anope::string &chname) : ChanServ::Channel(type)
 {

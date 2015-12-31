@@ -10,7 +10,7 @@
  */
 
 #include "module.h"
-#include "modules/ns_drop.h"
+#include "modules/nickserv/drop.h"
 
 class CommandNSDrop : public Command
 {

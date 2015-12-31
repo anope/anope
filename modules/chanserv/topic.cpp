@@ -10,9 +10,9 @@
  */
 
 #include "module.h"
-#include "modules/cs_mode.h"
-#include "modules/cs_info.h"
-#include "modules/cs_set.h"
+#include "modules/chanserv/mode.h"
+#include "modules/chanserv/info.h"
+#include "modules/chanserv/set.h"
 
 class CommandCSSetKeepTopic : public Command
 {

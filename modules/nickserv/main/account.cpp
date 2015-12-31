@@ -12,7 +12,7 @@
 
 #include "module.h"
 #include "accounttype.h"
-#include "modules/ns_access.h"
+#include "modules/nickserv/access.h"
 
 AccountImpl::~AccountImpl()
 {

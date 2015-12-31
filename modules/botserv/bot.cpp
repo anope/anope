@@ -10,7 +10,7 @@
  */
 
 #include "module.h"
-#include "modules/bs_bot.h"
+#include "modules/botserv/bot.h"
 
 class CommandBSBot : public Command
 {

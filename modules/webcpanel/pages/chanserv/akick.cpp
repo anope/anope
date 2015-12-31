@@ -7,7 +7,7 @@
 
 #include "../../webcpanel.h"
 #include "utils.h"
-#include "modules/cs_akick.h"
+#include "modules/chanserv/akick.h"
 
 WebCPanel::ChanServ::Akick::Akick(const Anope::string &cat, const Anope::string &u) : WebPanelProtectedPage(cat, u)
 {

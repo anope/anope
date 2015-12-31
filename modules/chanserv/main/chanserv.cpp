@@ -10,12 +10,12 @@
  */
 
 #include "module.h"
-#include "modules/cs_mode.h"
+#include "modules/chanserv/mode.h"
 #include "modules/help.h"
-#include "modules/bs_bot.h"
+#include "modules/botserv/bot.h"
 #include "modules/chanserv.h"
-#include "modules/cs_info.h"
-#include "modules/cs_akick.h"
+#include "modules/chanserv/info.h"
+#include "modules/chanserv/akick.h"
 #include "channeltype.h"
 #include "leveltype.h"
 #include "modetype.h"

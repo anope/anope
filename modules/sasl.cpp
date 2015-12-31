@@ -8,7 +8,7 @@
 
 #include "module.h"
 #include "modules/sasl.h"
-#include "modules/ns_cert.h"
+#include "modules/nickserv/cert.h"
 
 using namespace SASL;
 

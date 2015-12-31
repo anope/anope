@@ -10,9 +10,9 @@
  */
 
 #include "module.h"
-#include "modules/ns_info.h"
-#include "modules/ns_group.h"
-#include "modules/ns_update.h"
+#include "modules/nickserv/info.h"
+#include "modules/nickserv/group.h"
+#include "modules/nickserv/update.h"
 #include "modules/help.h"
 #include "modules/nickserv.h"
 #include "identifyrequest.h"

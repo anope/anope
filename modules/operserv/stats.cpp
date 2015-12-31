@@ -10,7 +10,7 @@
  */
 
 #include "module.h"
-#include "modules/os_session.h"
+#include "modules/operserv/session.h"
 
 #if 0
 struct Stats : Serialize::Object

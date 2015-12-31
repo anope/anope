@@ -56,9 +56,7 @@ endif()
 find_package(Gettext)
 
 # Use the following directories as includes
-# Note that it is important the binary include directory comes before the
-# source include directory so the precompiled headers work correctly.
-include_directories(${Anope_BINARY_DIR}/include ${Anope_SOURCE_DIR}/include ${Anope_BINARY_DIR}/language ${Anope_SOURCE_DIR}/modules/pseudoclients)
+include_directories(${Anope_BINARY_DIR}/include ${Anope_SOURCE_DIR}/include)
 
 # If using Windows, always add the _WIN32 define
 if(WIN32)

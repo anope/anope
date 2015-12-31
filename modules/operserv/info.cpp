@@ -17,17 +17,17 @@ class OperInfoImpl : public OperInfo
 	OperInfoImpl(Serialize::TypeBase *type) : OperInfo(type) { }
 	OperInfoImpl(Serialize::TypeBase *type, Serialize::ID id) : OperInfo(type, id) { }
 
-	Serialize::Object *GetTarget();
-	void SetTarget(Serialize::Object *);
+	Serialize::Object *GetTarget() override;
+	void SetTarget(Serialize::Object *) override;
 
-	Anope::string GetInfo();
-	void SetInfo(const Anope::string &);
+	Anope::string GetInfo() override;
+	void SetInfo(const Anope::string &) override;
 
-	Anope::string GetCreator();
-	void SetCreator(const Anope::string &);
+	Anope::string GetCreator() override;
+	void SetCreator(const Anope::string &) override;
 
-	time_t GetCreated();
-	void SetCreated(const time_t &);
+	time_t GetCreated() override;
+	void SetCreated(const time_t &) override;
 };
 
 class OperInfoType : public Serialize::Type<OperInfoImpl>

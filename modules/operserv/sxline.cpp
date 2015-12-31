@@ -201,12 +201,12 @@ class CommandOSSXLineBase : public Command
 			this->OnSyntaxError(source, "");
 	}
 
-	virtual bool OnHelp(CommandSource &source, const Anope::string &subcommand) = 0;
+	virtual bool OnHelp(CommandSource &source, const Anope::string &subcommand) override = 0;
 };
 
 class CommandOSSNLine : public CommandOSSXLineBase
 {
-	XLineManager *xlm()
+	XLineManager *xlm() override
 	{
 		return this->snlines;
 	}
@@ -429,7 +429,7 @@ class CommandOSSNLine : public CommandOSSXLineBase
 
 class CommandOSSQLine : public CommandOSSXLineBase
 {
-	XLineManager *xlm()
+	XLineManager *xlm() override
 	{
 		return this->sqlines;
 	}

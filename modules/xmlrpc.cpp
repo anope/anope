@@ -32,12 +32,12 @@ class MyXMLRPCServiceInterface : public XMLRPCServiceInterface, public HTTPPage
  public:
 	MyXMLRPCServiceInterface(Module *creator, const Anope::string &sname) : XMLRPCServiceInterface(creator, sname), HTTPPage("/xmlrpc", "text/xml") { }
 
-	void Register(XMLRPCEvent *event)
+	void Register(XMLRPCEvent *event) override
 	{
 		this->events.push_back(event);
 	}
 
-	void Unregister(XMLRPCEvent *event)
+	void Unregister(XMLRPCEvent *event) override
 	{
 		std::deque<XMLRPCEvent *>::iterator it = std::find(this->events.begin(), this->events.end(), event);
 
@@ -174,7 +174,7 @@ class MyXMLRPCServiceInterface : public XMLRPCServiceInterface, public HTTPPage
 		return true;
 	}
 
-	void Reply(XMLRPCRequest &request)
+	void Reply(XMLRPCRequest &request) override
 	{
 		if (!request.id.empty())
 			request.reply("id", request.id);

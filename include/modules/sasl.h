@@ -92,7 +92,7 @@ namespace SASL
 			Session *s = sasl->GetSession(uid);
 			if (s)
 			{
-				Log(Config->GetClient("NickServ")) << "A user identified to account " << this->GetAccount() << " using SASL";
+				Log(Config->GetClient("NickServ"), "sasl") << "A user identified to account " << this->GetAccount() << " using SASL";
 				sasl->Succeed(s, na->nc);
 				delete s;
 			}
@@ -117,7 +117,7 @@ namespace SASL
 			else if (na->nc->HasExt("NS_SUSPENDED"))
 				accountstatus = "suspended ";
 
-			Log(Config->GetClient("NickServ")) << "A user failed to identify for " << accountstatus << "account " << this->GetAccount() << " using SASL";
+			Log(Config->GetClient("NickServ"), "sasl") << "A user failed to identify for " << accountstatus << "account " << this->GetAccount() << " using SASL";
 		}
 	};
 }

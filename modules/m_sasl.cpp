@@ -107,7 +107,7 @@ class External : public Mechanism
 			NickCore *nc = certs->FindAccountFromCert(mysess->cert);
 			if (!nc || nc->HasExt("NS_SUSPENDED"))
 			{
-				Log(Config->GetClient("NickServ"), "sasl") << "A user failed to identify to account " << nc->display << " using SASL EXTERNAL";
+				Log(Config->GetClient("NickServ"), "sasl") << "A user failed to identify using certificate " << mysess->cert << " using SASL EXTERNAL";
 				sasl->Fail(sess);
 				delete sess;
 				return;

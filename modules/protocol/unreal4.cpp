@@ -816,16 +816,16 @@ struct IRCDMessageChgName : IRCDMessage
 
 struct IRCDMessageMD : IRCDMessage
 {
-	IRCDMessageMD(Module *creator) : IRCDMessage(creator, "MD", 3) { }
+	IRCDMessageMD(Module *creator) : IRCDMessage(creator, "MD", 3) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
 
 	void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		const Anope::string &type = params[0],
+		const Anope::string &mdtype = params[0],
 				    &obj = params[1],
 				    &var = params[2],
 				    &value = params.size() > 3 ? params[3] : "";
 
-		if (type == "client")
+		if (mdtype == "client")
 		{
 			User *u = User::Find(obj);
 

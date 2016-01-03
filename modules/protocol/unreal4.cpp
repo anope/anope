@@ -38,7 +38,7 @@ class UnrealIRCdProto : public IRCDProto
 	/* SVSNOOP */
 	void SendSVSNOOP(const Server *server, bool set) anope_override
 	{
-		UplinkSocket::Message() << "SVSNOOP " << server->GetName() << " " << (set ? "+" : "-");
+		UplinkSocket::Message() << "SVSNOOP " << server->GetSID() << " " << (set ? "+" : "-");
 	}
 
 	void SendAkillDel(const XLine *x) anope_override
@@ -130,13 +130,13 @@ class UnrealIRCdProto : public IRCDProto
 
 	void SendSVSKillInternal(const MessageSource &source, User *user, const Anope::string &buf) anope_override
 	{
-		UplinkSocket::Message(source) << "SVSKILL " << user->nick << " :" << buf;
+		UplinkSocket::Message(source) << "SVSKILL " << user->GetUID() << " :" << buf;
 		user->KillInternal(source, buf);
 	}
 
 	void SendModeInternal(const MessageSource &source, User *u, const Anope::string &buf) anope_override
 	{
-		UplinkSocket::Message(source) << "SVS2MODE " << u->nick <<" " << buf;
+		UplinkSocket::Message(source) << "SVS2MODE " << u->GetUID() <<" " << buf;
 	}
 
 	void SendClientIntroduction(User *u) anope_override
@@ -158,7 +158,7 @@ class UnrealIRCdProto : public IRCDProto
 	/* JOIN */
 	void SendJoin(User *user, Channel *c, const ChannelStatus *status) anope_override
 	{
-		UplinkSocket::Message(Me) << "SJOIN " << c->creation_time << " " << c->name << " :" << user->nick;
+		UplinkSocket::Message(Me) << "SJOIN " << c->creation_time << " " << c->name << " :" << user->GetUID();
 		if (status)
 		{
 			/* First save the channel status incase uc->Status == status */
@@ -201,9 +201,9 @@ class UnrealIRCdProto : public IRCDProto
 	void SendVhost(User *u, const Anope::string &vIdent, const Anope::string &vhost) anope_override
 	{
 		if (!vIdent.empty())
-			UplinkSocket::Message(Me) << "CHGIDENT " << u->nick << " " << vIdent;
+			UplinkSocket::Message(Me) << "CHGIDENT " << u->GetUID() << " " << vIdent;
 		if (!vhost.empty())
-			UplinkSocket::Message(Me) << "CHGHOST " << u->nick << " " << vhost;
+			UplinkSocket::Message(Me) << "CHGHOST " << u->GetUID() << " " << vhost;
 	}
 
 	void SendConnect() anope_override

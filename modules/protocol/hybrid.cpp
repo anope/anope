@@ -79,7 +79,7 @@ class HybridProto : public IRCDProto
 
 	void SendSGLine(User *, const XLine *x) anope_override
 	{
-		UplinkSocket::Message(Config->GetClient("OperServ")) << "XLINE * " << x->mask << " 0 :" << x->GetReason();
+		UplinkSocket::Message(Config->GetClient("OperServ")) << "XLINE * " << x->mask << " " (x->expires ? x->expires - Anope::CurTime : 0) " :" << x->GetReason();
 	}
 
 	void SendSZLineDel(const XLine *x) anope_override

@@ -502,6 +502,13 @@ Conf::Conf() : Block("")
 		if (!na)
 			continue;
 
+		if (!na->nc || na->nc->o)
+		{
+			// If the account is already an oper it might mean two oper blocks for the same nick, or
+			// something else has configured them as an oper (like a module)
+			continue;
+		}
+
 		na->nc->o = o;
 		Log() << "Tied oper " << na->nc->display << " to type " << o->ot->GetName();
 	}

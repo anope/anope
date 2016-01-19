@@ -135,6 +135,8 @@ class CommandOSOper : public Command
 				source.Reply(_("Nick \002%s\002 is not a Services Operator."), oper.c_str());
 			else if (!HasPrivs(source, na->nc->o->ot))
 				source.Reply(ACCESS_DENIED);
+			else if (std::find(Config->Opers.begin(), Config->Opers.end(), na->nc->o) != Config->Opers.end())
+				source.Reply(_("Oper \002%s\002 is configured in the configuration file(s) and can not be removed by this command."), na->nc->display.c_str());
 			else
 			{
 				delete na->nc->o;

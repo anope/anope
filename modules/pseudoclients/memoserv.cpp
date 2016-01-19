@@ -49,7 +49,7 @@ class MemoServCore : public Module, public MemoServService
 		if (mi == NULL)
 			return MEMO_INVALID_TARGET;
 
-		User *sender = User::Find(source);
+		User *sender = User::Find(source, true);
 		if (sender != NULL && !sender->HasPriv("memoserv/no-limit") && !force)
 		{
 			time_t send_delay = Config->GetModule("memoserv")->Get<time_t>("senddelay");
@@ -103,7 +103,7 @@ class MemoServCore : public Module, public MemoServService
 				for (unsigned i = 0; i < nc->aliases->size(); ++i)
 				{
 					const NickAlias *na = nc->aliases->at(i);
-					User *user = User::Find(na->nick);
+					User *user = User::Find(na->nick, true);
 					if (user && user->IsIdentified())
 						user->SendMessage(MemoServ, MEMO_NEW_MEMO_ARRIVED, source.c_str(), Config->StrictPrivmsg.c_str(), MemoServ->nick.c_str(), mi->memos->size());
 				}

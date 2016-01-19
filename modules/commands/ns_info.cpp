@@ -40,7 +40,7 @@ class CommandNSInfo : public Command
 			bool nick_online = false, show_hidden = false;
 
 			/* Is the real owner of the nick we're looking up online? -TheShadow */
-			User *u2 = User::Find(na->nick);
+			User *u2 = User::Find(na->nick, true);
 			if (u2 && u2->Account() == na->nc)
 			{
 				nick_online = true;

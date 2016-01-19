@@ -535,7 +535,7 @@ class NickServCore : public Module, public NickServService
 			NickAlias *na = it->second;
 			++it;
 
-			User *u = User::Find(na->nick);
+			User *u = User::Find(na->nick, true);
 			if (u && (u->IsIdentified(true) || u->IsRecognized()))
 				na->last_seen = Anope::CurTime;
 

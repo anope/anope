@@ -1,3 +1,32 @@
+Anope Version 2.0.3-git
+-------------------
+Add support for UnrealIRCd 4
+Fix cs_access to respect chanserv/access/list privilege
+Fix cs_access to match level -1 as every user, not any level <0
+Fix problems related to object destruction order when using db_sql_live
+Show memo notify settings in ms_info
+Fix some actions bumping channels last used time that shouldn't have
+Add maxlogins configuration directive to limit the number of concurrnent logins to one account
+Fix race with auto svsnick on ghost sometimes causing nick collisions instead
+Fix saset langauge reply
+Show akill/sxlines ids in VIEW
+Fix crash when an oper is configured in both the configuration and via os_oper
+Fix m_ldap reconnect logic not properly setting protocol and network timeout settings
+Fix crash from unloading regex modules when regex xlines exist
+Fix irc2sql to store away messages
+Add notice method to m_xmlrpc_main
+Fix numerics on InspIRCd from being sent to user UID
+Fix +I on InspIRCd to be considered oper only
+Fix crash in webcpanel when deleting your own access on a channel
+Fix webcpanel allowing suspended users to login
+Fix hs_off on InspIRCd to not desync active user host
+Fix bs_bot to not allow colliding bots into users
+Don't allow hostserv modules to load if there is no hostserv
+Fix ns_register allowing bot nicks to be registered through webcpanel
+Don't update chanserv keepmodes during inhabit
+Fix build on cmake 2.4
+Allow searching emails by wildcard in ns_getemail
+
 Anope Version 2.0.2
 -------------------
 Fix keepmodes preventing the first user of a channel from being deopped

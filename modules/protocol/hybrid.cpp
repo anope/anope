@@ -33,7 +33,7 @@ class HybridProto : public IRCDProto
 	void SendSVSKillInternal(const MessageSource &source, User *u, const Anope::string &buf) anope_override
 	{
 		IRCDProto::SendSVSKillInternal(source, u, buf);
-		user->KillInternal(source, buf);
+		u->KillInternal(source, buf);
 	}
 
   public:
@@ -80,7 +80,7 @@ class HybridProto : public IRCDProto
 
 	void SendSGLine(User *, const XLine *x) anope_override
 	{
-		UplinkSocket::Message(Config->GetClient("OperServ")) << "XLINE * " << x->mask << " " (x->expires ? x->expires - Anope::CurTime : 0) " :" << x->GetReason();
+		UplinkSocket::Message(Config->GetClient("OperServ")) << "XLINE * " << x->mask << " " << (x->expires ? x->expires - Anope::CurTime : 0) << " :" << x->GetReason();
 	}
 
 	void SendSZLineDel(const XLine *x) anope_override

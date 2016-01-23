@@ -93,6 +93,9 @@ bool WebCPanel::ChanServ::Access::OnRequest(HTTPProvider *server, const Anope::s
 		}
 	}
 
+	/* command might have invalidated u_access */
+	u_access = ci->AccessFor(na->nc);
+
 	replacements["ESCAPED_CHANNEL"] = HTTPUtils::URLEncode(chname);
 	replacements["ACCESS_CHANGE"] = u_access.HasPriv("ACCESS_CHANGE") ? "YES" : "NO";
 

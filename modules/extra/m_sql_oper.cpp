@@ -25,6 +25,8 @@ class SQLOperResult : public SQL::Interface
 			user->Account()->o = NULL;
 
 			Log(this->owner) << "m_sql_oper: Removed services operator from " << user->nick << " (" << user->Account()->display << ")";
+
+			BotInfo *OperServ = Config->GetClient("OperServ");
 			user->RemoveMode(OperServ, "OPER"); // Probably not set, just incase
 		}
 	}
@@ -53,7 +55,7 @@ class SQLOperResult : public SQL::Interface
 		}
 		catch (const SQL::Exception &)
 		{
-			Log(this) << "Expected column named \"opertype\" but one was not found";
+			Log(this->owner) << "Expected column named \"opertype\" but one was not found";
 			return;
 		}
 
@@ -85,7 +87,7 @@ class SQLOperResult : public SQL::Interface
 
 		if (user->Account()->o && !dynamic_cast<SQLOper *>(user->Account()->o))
 		{
-			Log(this) << "Oper " << user->Account()->display << " has type " << opertype << ", but is already configured as an oper of type " << user->Account()->o->ot->GetName();
+			Log(this->owner) << "Oper " << user->Account()->display << " has type " << opertype << ", but is already configured as an oper of type " << user->Account()->o->ot->GetName();
 			return;
 		}
 

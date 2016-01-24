@@ -6,7 +6,7 @@ Fix cs_access to match level -1 as every user, not any level <0
 Fix problems related to object destruction order when using db_sql_live
 Show memo notify settings in ms_info
 Fix some actions bumping channels last used time that shouldn't have
-Add maxlogins configuration directive to limit the number of concurrnent logins to one account
+Add maxlogins configuration directive to limit the number of concurrent logins to one account
 Fix race with auto svsnick on ghost sometimes causing nick collisions instead
 Fix saset langauge reply
 Show akill/sxlines ids in VIEW

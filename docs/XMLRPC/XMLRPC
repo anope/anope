@@ -7,7 +7,7 @@ checkAuthentication - Takes two parameters, an account name and a password. Chec
                       is correct for the account name, useful for making login pages on websites.
 
 command - Takes three parameters, a service name (BotServ, ChanServ, NickServ), a user name (whether online or not), and the command
-          to execute. This will execute a the given command to Anope using the given service name. If the user given is online, the
+          to execute. This will execute the given command to Anope using the given service name. If the user given is online, the
 	  command reply will go to them, if not it is returned by XMLRPC.
 
 stats - Takes no parameters, returns miscellaneous stats that can be found in the /operserv stats command.
@@ -17,12 +17,13 @@ channel - Takes one parameter, a channel name, and returns real time information
 
 user - Takes one parameter, a user name, and returns real time information regarding that user.
 
+opers - Takes no parameters, returns opertypes, their privileges and commands.
+
 notice - Takes three parameters, source user, target user, and message. Sends a message to the user.
 
 XMLRPC was designed to be used with db_sql, and will not return any information that can be pulled from the SQL
 database, such as accounts and registered channel information. It is instead used for pulling realtime data such
 as users and channels currently online. For examples on how to use these calls in PHP, see xmlrpc.php in docs/XMLRPC.
-          
+
 Also note that the parameter named "id" is reserved for query ID. If you pass a query to Anope containing a value for id. it will
 be stored by Anope and the same id will be passed back in the result.
-
